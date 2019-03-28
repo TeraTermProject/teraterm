@@ -39,6 +39,7 @@
 #include "dlglib.h"
 #include "tt_res.h"
 #include "ftdlg.h"
+#include "teraterml.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -150,8 +151,6 @@ void CFileTransDlg::RefreshNum()
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg message handler
-#define AddModalHandle(p1)		// TODO
-#define	RemoveModalHandle(p1)
 
 BOOL CFileTransDlg::OnInitDialog()
 {

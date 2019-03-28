@@ -289,6 +289,7 @@
 #define ID_SETUP_TERMINAL               50310
 #define ID_SETUP_WINDOW                 50320
 #define ID_SETUP_FONT                   50330
+#define ID_SETUP_DLG_FONT               50331
 #define ID_SETUP_KEYBOARD               50340
 #define ID_SETUP_SERIALPORT             50350
 #define ID_SETUP_TCPIP                  50360

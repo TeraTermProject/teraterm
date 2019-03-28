@@ -55,7 +55,7 @@ void DispConvWinToScreen
   (int Xw, int Yw, int *Xs, int *Ys, PBOOL Right);
 void DispConvScreenToWin
   (int Xs, int Ys, int *Xw, int *Yw);
-void SetLogFont();
+//void SetLogFont();
 void ChangeFont();
 void ResetIME();
 void ChangeCaret();
@@ -116,6 +116,7 @@ void DispGetWindowSize(int *width, int *height, BOOL client);
 void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
 int DispFindClosestColor(int red, int green, int blue);
 void UpdateBGBrush(void);
+void DpiChanged(void);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

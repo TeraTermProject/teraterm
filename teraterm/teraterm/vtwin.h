@@ -31,7 +31,9 @@
 
 #ifdef __cplusplus
 
-class CVTWindow : public CFrameWnd
+#include "tmfc.h"
+
+class CVTWindow : public TTCFrameWnd
 {
 private:
   BOOL FirstPaint, Minimized;
@@ -51,11 +53,9 @@ private:
     SetupMenu, ControlMenu, WinMenu, HelpMenu;
 
   // drag and drop handle
-  char **DropLists;
+  TCHAR **DropLists;
   int DropListCount;
   void DropListFree();
-  bool DropWithLeftbutton;
-  bool DropWithRightbutton;
 
   // window attribute
   BYTE Alpha;
@@ -79,84 +79,84 @@ public:
 
 	//{{AFX_VIRTUAL(CVTWindow)
 	protected:
-	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
 public:
-#ifdef _DEBUG
+#if 0 //def _DEBUG
 	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+//	virtual void Dump(CDumpContext& dc) const;
 #endif
 
 protected:
 	//{{AFX_MSG(CVTWindow)
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+#define afx_msg
+	afx_msg void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnClose();
 	afx_msg void OnAllClose();
 	afx_msg void OnDestroy();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
-	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
+	afx_msg void OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnMButtonUp(UINT nFlags, CPoint point);
-	afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnKillFocus(HWND hNewWnd);
+	afx_msg void OnLButtonDblClk(UINT nFlags, POINTS point);
+	afx_msg void OnLButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnLButtonUp(UINT nFlags, POINTS point);
+	afx_msg void OnMButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnMButtonUp(UINT nFlags, POINTS point);
+	afx_msg int OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message);
+	afx_msg void OnMouseMove(UINT nFlags, POINTS point);
 	afx_msg void OnMove(int x, int y);
-	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	afx_msg void OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *calcsize);
-	afx_msg void OnNcLButtonDblClk(UINT nHitTest, CPoint point);
-	afx_msg void OnNcRButtonDown(UINT nHitTest, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, POINTS pt);
+//	afx_msg void OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *calcsize); // 何もしていない、不要
+	afx_msg void OnNcLButtonDblClk(UINT nHitTest, POINTS point);
+	afx_msg void OnNcRButtonDown(UINT nHitTest, POINTS point);
 	afx_msg void OnPaint();
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	afx_msg void OnRButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnRButtonUp(UINT nFlags, POINTS point);
+	afx_msg void OnSetFocus(HWND hOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnSysColorChange();
+//	afx_msg void OnSysColorChange();		// 何もしていない、不要
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
 	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData);
 //<!--by AKASI
-	afx_msg LONG OnWindowPosChanging(UINT wParam, LONG lParam);
-	afx_msg LONG OnSettingChange(UINT wParam, LONG lParam);
-	afx_msg LONG OnEnterSizeMove(UINT wParam, LONG lParam);
-	afx_msg LONG  OnExitSizeMove(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnWindowPosChanging(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnSettingChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnEnterSizeMove(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
 //-->
 	afx_msg LRESULT OnIMEStartComposition(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnIMEEndComposition(WPARAM wParam, LPARAM lParam);
-	afx_msg LONG OnIMEComposition(UINT wParam, LONG lParam);
-	afx_msg LONG OnIMEInputChange(UINT wParam, LONG lParam);
-	afx_msg LONG OnIMENotify(UINT wParam, LONG lParam);
-	afx_msg LONG OnIMERequest(UINT wParam, LONG lParam);
-	afx_msg LONG OnAccelCommand(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeMenu(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeTBar(UINT wParam, LONG lParam);
-	afx_msg LONG OnCommNotify(UINT wParam, LONG lParam);
-	afx_msg LONG OnCommOpen(UINT wParam, LONG lParam);
-	afx_msg LONG OnCommStart(UINT wParam, LONG lParam);
-	afx_msg LONG OnDdeEnd(UINT wParam, LONG lParam);
-	afx_msg LONG OnDlgHelp(UINT wParam, LONG lParam);
-	afx_msg LONG OnFileTransEnd(UINT wParam, LONG lParam);
-	afx_msg LONG OnGetSerialNo(UINT wParam, LONG lParam);
-	afx_msg LONG OnKeyCode(UINT wParam, LONG lParam);
-	afx_msg LONG OnProtoEnd(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeTitle(UINT wParam, LONG lParam);
-	afx_msg LONG OnReceiveIpcMessage(UINT wParam, LONG lParam);
-	afx_msg LONG OnNonConfirmClose(UINT wParam, LONG lParam);
-	afx_msg LONG OnNotifyIcon(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnIMEComposition(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnIMEInputChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnIMENotify(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnIMERequest(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCommNotify(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCommOpen(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCommStart(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDdeEnd(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDlgHelp(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnFileTransEnd(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGetSerialNo(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnKeyCode(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnProtoEnd(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeTitle(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnNonConfirmClose(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnNotifyIcon(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnFileNewConnection();
 	afx_msg void OnDuplicateSession();
 	afx_msg void OnCygwinConnection();
@@ -199,6 +199,7 @@ protected:
 	afx_msg void OnSetupTerminal();
 	afx_msg void OnSetupWindow();
 	afx_msg void OnSetupFont();
+	afx_msg void OnSetupDlgFont();
 	afx_msg void OnSetupKeyboard();
 	afx_msg void OnSetupSerialPort();
 	afx_msg void OnSetupTCPIP();
@@ -225,12 +226,17 @@ protected:
 	afx_msg void OnWindowRestoreAll();
 	afx_msg void OnWindowUndo();
 	afx_msg void OnHelpIndex();
-	afx_msg void OnHelpUsing();
+//	afx_msg void OnHelpUsing();		// 実体なし不要
 	afx_msg void OnHelpAbout();
-	afx_msg LONG OnDropNotify(UINT ShowMenu, LONG lParam);
+	afx_msg LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP();
+//	DECLARE_MESSAGE_MAP();
+#undef afx_msg
 	void Disconnect(BOOL confirm);
+	///
+	LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };
 #endif
 

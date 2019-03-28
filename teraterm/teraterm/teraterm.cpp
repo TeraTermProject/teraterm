@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,8 @@
 
 /* TERATERM.EXE, main */
 
-#include "stdafx.h"
+#include <crtdbg.h>
+#include <tchar.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -47,11 +48,9 @@
 #include "keyboard.h"
 #include "dllutil.h"
 #include "compat_win.h"
-
-#include "teraapp.h"
-
 #include "compat_w95.h"
 #include "dlglib.h"
+#include "teraterml.h"
 
 #if 0
 //#ifdef _DEBUG
@@ -60,11 +59,6 @@
 //static char THIS_FILE[] = __FILE__;
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
-BEGIN_MESSAGE_MAP(CTeraApp, CWinApp)
-	//{{AFX_MSG_MAP(CTeraApp)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
 
 static BOOL AddFontFlag;
 static TCHAR TSpecialFont[MAX_PATH];
@@ -122,39 +116,8 @@ static void init()
 	LoadSpecialFont();
 }
 
-CTeraApp::CTeraApp()
-{
-	init();
-}
-
-// CTeraApp instance
-CTeraApp theApp;
-
-
-
-
-
-// CTeraApp initialization
-BOOL CTeraApp::InitInstance()
-{
-	hInst = m_hInstance;
-	m_pMainWnd = new CVTWindow();
-	pVTWin = m_pMainWnd;
-	// [Tera Term]セクションのDlgFont=がない場合は
-	// [TTSH]セクションのフォント設定を使用する
-	SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
-	return TRUE;
-}
-
-int CTeraApp::ExitInstance()
-{
-	UnloadSpecialFont();
-	DLLExit();
-	return CWinApp::ExitInstance();
-}
-
 // Tera Term main engine
-BOOL CTeraApp::OnIdle(LONG lCount)
+static BOOL OnIdle(LONG lCount)
 {
 	static int Busy = 2;
 	int Change, nx, ny;
@@ -280,12 +243,98 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 	return (Busy>0);
 }
 
-BOOL CTeraApp::PreTranslateMessage(MSG* pMsg)
+BOOL CallOnIdle(LONG lCount)
 {
-	if (MetaKey(ts.MetaKey)) {
-		return FALSE; /* ignore accelerator keys */
+	return OnIdle(lCount);
+}
+
+HINSTANCE GetInstance()
+{
+	return hInst;
+}
+
+static HWND main_window;
+HWND GetHWND()
+{
+	return main_window;
+}
+
+static HWND hModalWnd;
+
+void AddModalHandle(HWND hWnd)
+{
+	hModalWnd = hWnd;
+}
+
+void RemoveModalHandle(HWND hWnd)
+{
+	hModalWnd = 0;
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
+                   LPSTR lpszCmdLine, int nCmdShow)
+{
+#ifdef _DEBUG
+	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	LONG lCount = 0;
+	DWORD SleepTick = 1;
+	init();
+	hInst = hInstance;
+	CVTWindow *m_pMainWnd = new CVTWindow();
+	pVTWin = m_pMainWnd;
+	main_window = m_pMainWnd->m_hWnd;
+	// [Tera Term]セクションのDlgFont=がない場合は
+	// [TTSSH]セクションのフォント設定を使用する
+	SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
+
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		if (hModalWnd != 0) {
+			if (IsDialogMessage(hModalWnd, &msg)) {
+				continue;
+			}
+		}
+
+		bool message_processed = false;
+
+		if (m_pMainWnd->m_hAccel != NULL) {
+			if (!MetaKey(ts.MetaKey)) {
+				// matakeyが押されていない
+				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
+					// アクセラレーターキーを処理した
+					message_processed = true;
+				}
+			}
+		}
+
+		if (!message_processed) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
+			// メッセージがない
+			if (!OnIdle(lCount)) {
+				// idle不要
+				if (SleepTick < 500) {	// 最大 501ms未満
+					SleepTick += 2;
+				}
+				lCount = 0;
+				Sleep(SleepTick);
+			} else {
+				// 要idle
+				SleepTick = 0;
+				lCount++;
+			}
+		}
 	}
-	else {
-		return CWinApp::PreTranslateMessage(pMsg);
-	}
+	delete m_pMainWnd;
+	m_pMainWnd = NULL;
+
+	UnloadSpecialFont();
+	DLLExit();
+
+    return msg.wParam;
 }

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2011-2017 TeraTerm Project
+ * (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,5 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdafx.h"
+/* teraterm local header   */
+/*	teraterm/ folder only  */
 
+void AddModalHandle(HWND hWnd);
+void RemoveModalHandle(HWND hWnd);

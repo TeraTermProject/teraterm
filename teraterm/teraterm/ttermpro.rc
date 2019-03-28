@@ -274,7 +274,6 @@ END
 
 IDD_FILETRANSDLG DIALOGEX 20, 20, 176, 96
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CLASS "FTDlg32"
 FONT 14, "System", 0, 0, 0x0
 BEGIN
     CONTROL         "Filename:",IDC_TRANS_FILENAME,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,15,12,38,10
@@ -578,7 +577,11 @@ BEGIN
     BEGIN
         MENUITEM "&Terminal...",                ID_SETUP_TERMINAL
         MENUITEM "&Window...",                  ID_SETUP_WINDOW
-        MENUITEM "&Font...",                    ID_SETUP_FONT
+		POPUP "&Font"
+        BEGIN
+			MENUITEM "&Font...",                ID_SETUP_FONT
+			MENUITEM "&Dialog Font...",         ID_SETUP_DLG_FONT
+	END
         MENUITEM "&Keyboard...",                ID_SETUP_KEYBOARD
         MENUITEM "S&erial port...",             ID_SETUP_SERIALPORT
         MENUITEM "T&CP/IP...",                  ID_SETUP_TCPIP
