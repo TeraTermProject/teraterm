@@ -34,9 +34,6 @@
     <ClCompile Include="statdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ttmacro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

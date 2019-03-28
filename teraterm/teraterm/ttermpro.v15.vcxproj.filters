@@ -27,9 +27,6 @@
     <ClCompile Include="filesys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tekwin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -143,6 +140,12 @@
     </ClCompile>
     <ClCompile Include="../ttpdlg/ttdlg.c">
       <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,6 +311,9 @@
     </ClInclude>
     <ClInclude Include="../ttpdlg/ttdlg.h">
       <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tmfc.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
