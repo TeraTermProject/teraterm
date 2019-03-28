@@ -116,9 +116,6 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
-// –{‘Ì‚Í addsetting.cpp
-extern mouse_cursor_t MouseCursor[];
-
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
 #endif
@@ -4568,11 +4565,10 @@ void CVTWindow::OnExternalSetup()
 {
 	DWORD ret;
 
-	CAddSettingPropSheetDlg CAddSetting("", CWnd::FromHandle(HVTWin));
-	CAddSetting.EnableStackedTabs(FALSE);
+	CAddSettingPropSheetDlg CAddSetting(hInst, _T("Tera Term: Additional settings"), HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
-		case -1:
+		case (DWORD)-1:
 		case IDABORT:
 			ret = GetLastError();
 			break;

@@ -34,6 +34,9 @@ set(COMMON_SRC
   ../common/compat_w95.h
   ../common/compat_win.h
   ../common/compat_win.cpp
+  ../common/tmfc.cpp
+  ../common/tmfc.h
+  ../common/tmfc_frame.cpp
   ../common/i18n.h
   ../common/dllutil.cpp
   ../common/dllutil.h
