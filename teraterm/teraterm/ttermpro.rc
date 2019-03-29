@@ -1,14 +1,14 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "..\common\tt_res.h"
+#include "tt_res.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include <winresrc.h>
+#define IDC_STATIC -1
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -461,13 +461,13 @@ END
 
 1 TEXTINCLUDE 
 BEGIN
-    "..\\common\\tt_res.h\0"
+    "tt_res.h\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\0"
 END
 
 3 TEXTINCLUDE 

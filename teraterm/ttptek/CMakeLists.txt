@@ -26,7 +26,6 @@ set(SRC
   tekesc.c
   tekesc.h
   ttptek.def
-  ttptek.rc
   ttptek-version.rc
   tttek.h
   tttek.c
