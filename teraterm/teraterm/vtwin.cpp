@@ -3241,7 +3241,7 @@ LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 {
-	IMEShowingCandidate = TRUE;
+	IMECompositionState = TRUE;
 
 	// 位置を通知する
 	int CaretX = (CursorX-WinOrgX)*FontWidth;
@@ -3253,7 +3253,7 @@ LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnIMEEndComposition(WPARAM wParam, LPARAM lParam)
 {
-	IMEShowingCandidate = FALSE;
+	IMECompositionState = FALSE;
 	return CFrameWnd::DefWindowProc(WM_IME_ENDCOMPOSITION,wParam,lParam);
 }
 
@@ -3322,16 +3322,17 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 	//  MS IME 日本語(Windows 10 1809)	suport
 	//  Google 日本語入力(2.24.3250.0)	not support
 	//
-	// WM_IME_STARTCOMPOSITION, WM_IME_ENDCOMPOSITIONのみで判定可能だが
-	// 念の為このメッセージも処理する
-	case IMN_OPENCANDIDATE:
+	// WM_IME_STARTCOMPOSITION / WM_IME_ENDCOMPOSITION は
+	// 漢字入力状態がスタートした / 終了したで発生する。
+	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE は
+	// 候補ウィンドウが表示された / 閉じたで発生する。
+	case IMN_OPENCANDIDATE: {
 		// 候補ウィンドウを開こうとしている
-		IMEShowingCandidate = TRUE;
+		int CaretX = (CursorX-WinOrgX)*FontWidth;
+		int CaretY = (CursorY-WinOrgY)*FontHeight;
+		SetConversionWindow(HVTWin,CaretX,CaretY);
 		break;
-	case IMN_CLOSECANDIDATE:
-		// 候補ウィンドウを閉じようとしている
-		IMEShowingCandidate = FALSE;
-		break;
+	}
 	default:
 		break;
 	}

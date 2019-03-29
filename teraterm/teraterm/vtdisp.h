@@ -129,7 +129,7 @@ extern int PageStart, BuffEnd;
 extern TCharAttr DefCharAttr;
 
 extern BOOL IMEstat;
-extern BOOL IMEShowingCandidate;
+extern BOOL IMECompositionState;
 
 #define SCROLL_BOTTOM	1
 #define SCROLL_LINEDOWN	2

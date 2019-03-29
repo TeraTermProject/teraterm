@@ -112,7 +112,7 @@ static int Dx[TermWidthMax];
 static int CaretStatus;
 static BOOL CaretEnabled = TRUE;
 BOOL IMEstat;				/* IME Status  TRUE=IME ON */
-BOOL IMEShowingCandidate;	/* 候補ウィンドウ表示状況 TRUE=表示中 */
+BOOL IMECompositionState;	/* 変換状態 TRUE=変換中 */
 
 // ---- device context and status flags
 static HDC VTDC = NULL; /* Device context for VT window */
@@ -2227,11 +2227,11 @@ void CaretOn()
 		CaretX = (CursorX-WinOrgX)*FontWidth;
 		CaretY = (CursorY-WinOrgY)*FontHeight;
 
-		if (IMEstat && IMEShowingCandidate) {
-			// IME ON && 候補ウィンドウ表示中の場合のみの処理
-			// 候補ウィンドウが表示されている状態で
+		if (IMEstat && IMECompositionState) {
+			// IME ON && 変換中の場合のみの処理する。
+			// 変換中(漢字や候補ウィンドウが表示されている状態)で
 			// ホストからのエコーを受信してcaret位置が変化した場合、
-			// 変換ウィンドウの位置を更新する必要がある
+			// 変換している位置を更新する必要がある。
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 		}
 
