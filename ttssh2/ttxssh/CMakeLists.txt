@@ -134,6 +134,11 @@ target_link_libraries(
 
 ### create puttyversion.h
 
+set(PUTTY_ISS "${CMAKE_SOURCE_DIR}/libs/putty/windows/putty.iss")
+if(NOT EXISTS ${PUTTY_ISS})
+  message(FATAL_ERROR "${PUTTY_ISS} not found")
+endif()
+
 file(READ "${CMAKE_SOURCE_DIR}/libs/putty/windows/putty.iss" iis)
 
 string(REGEX MATCH "VersionInfoTextVersion=([^\n]+)\n" _ ${iis})

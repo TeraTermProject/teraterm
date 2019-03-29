@@ -57,8 +57,14 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
   if(Git_FOUND)
     execute_process(
       COMMAND ${GIT_EXECUTABLE} svn log --oneline -1
-      OUTPUT_VARIABLE ov)
-    string(REGEX MATCH "[0-9]+" SVNVERSION ${ov})
+      RESULT_VARIABLE rv
+      OUTPUT_VARIABLE ov
+      ERROR_QUIET)
+    if(${rv})
+      message("git svn error? please check git svn")
+    else()
+      string(REGEX MATCH "[0-9]+" SVNVERSION ${ov})
+    endif()
   endif()
 elseif(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
   # svn
