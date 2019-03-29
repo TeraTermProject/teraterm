@@ -231,10 +231,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\stdafx.cpp"
-				>
-			</File>
-			<File
 				RelativePath="ttmacro.cpp"
 				>
 			</File>

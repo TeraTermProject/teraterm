@@ -20,11 +20,13 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="creating &quot;$(ProjectDir)svnversion.h&quot;"
+				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -48,7 +50,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
+				AdditionalIncludeDirectories=".;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
 				BrowseInformation="0"
@@ -71,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib ws2_32.lib imagehlp.lib"
+				AdditionalDependencies="onig_sd.lib comctl32.lib ws2_32.lib imagehlp.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
@@ -112,11 +114,13 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="creating &quot;$(ProjectDir)svnversion.h&quot;"
+				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -141,7 +145,7 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
+				AdditionalIncludeDirectories=".;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -164,7 +168,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib ws2_32.lib imagehlp.lib"
+				AdditionalDependencies="onig_s.lib comctl32.lib ws2_32.lib imagehlp.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
@@ -245,10 +249,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\stdafx.cpp"
-				>
-			</File>
-			<File
 				RelativePath="tekwin.cpp"
 				>
 			</File>
@@ -258,6 +258,18 @@
 			</File>
 			<File
 				RelativePath="teraterm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc_frame.cpp"
 				>
 			</File>
 			<File
