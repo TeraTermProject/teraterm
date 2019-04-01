@@ -71,7 +71,7 @@
 
 #include <windowsx.h>
 #include <imm.h>
-#include <Dbt.h>
+#include <dbt.h>
 #include <assert.h>
 
 #include "tt_res.h"

@@ -33,7 +33,7 @@
 #include "ttlib.h"
 #include <string.h>
 #include <direct.h>
-#include <Shlobj.h>
+#include <shlobj.h>
 
 #include "ttmlib.h"
 
