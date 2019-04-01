@@ -117,6 +117,12 @@ add_library(
   ${SRC}
   )
 
+set_target_properties(
+  ttxssh
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   ttxssh
   libputty

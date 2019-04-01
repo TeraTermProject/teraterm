@@ -32,10 +32,13 @@
 extern "C" {
 #endif
 
+#if !defined(DllExport)
+#define DllExport __declspec(dllexport)
+#endif
 /* proto types */
-int PASCAL parse_port(char *str, char *buf, int bufsize);
-int PASCAL parse_port_from_buf(char *buf);
-char * PASCAL service_name(int num);
+DllExport int PASCAL parse_port(char *str, char *buf, int bufsize);
+DllExport int PASCAL parse_port_from_buf(char *buf);
+DllExport char * PASCAL service_name(int num);
 
 #ifdef __cplusplus
 }

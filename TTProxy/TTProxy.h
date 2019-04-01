@@ -6,7 +6,7 @@ using namespace yebisuya;
 
 #include "ProxyWSockHook.h"
 
-extern BOOL PASCAL TTXBind(WORD Version, TTXExports* exports);
+extern "C" __declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
 
 char UILanguageFile[MAX_PATH];
 
@@ -48,7 +48,7 @@ private:
 
 	static void add_error_message(const char* message) {
 		if (getInstance().error_message != NULL) {
-			StringBuffer buffer = getInstance().error_message;
+			StringBuffer buffer = (const TCHAR *)getInstance().error_message;
 			buffer.append("\n\n");
 			buffer.append(message);
 			getInstance().error_message = buffer.toString();

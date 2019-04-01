@@ -22,6 +22,12 @@ add_library(
   ${SRC}
   )
 
+set_target_properties(
+  TTXResizeMenu
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   TTXResizeMenu
   ttpcmn

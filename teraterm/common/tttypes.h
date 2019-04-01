@@ -644,7 +644,7 @@ struct tttset {
 	WORD FontQuality;
 	char ScpSendDir[MAXPATHLEN];
 	char BGImageFilePath[MAX_PATH];
-	enum rotate_mode LogRotate;
+	int LogRotate;		//	enum rotate_mode LogRotate;
 	DWORD LogRotateSize;
 	WORD LogRotateSizeType;
 	WORD LogRotateStep;
@@ -1018,7 +1018,7 @@ typedef struct {
 	BOOL Open;
 	WORD PortType;
 	WORD ComPort;
-	unsigned int s; /* SOCKET */
+	UINT_PTR s; /* SOCKET */
 	WORD RetryCount;
 	HANDLE ComID;
 	BOOL CanSend, RRQ;

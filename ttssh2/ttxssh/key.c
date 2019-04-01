@@ -592,7 +592,7 @@ BOOL key_copy(Key *dest, Key *src)
 	return TRUE;
 }
 
-char* key_fingerprint_raw(Key *k, enum digest_algorithm dgst_alg, int *dgst_raw_length)
+char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_length)
 {
 	const EVP_MD *md = NULL;
 	EVP_MD_CTX ctx;
@@ -879,7 +879,7 @@ key_fingerprint_randomart(const char *alg, u_char *dgst_raw, u_int dgst_raw_len,
 //
 // fingerprint（指紋：ホスト公開鍵のハッシュ）を生成する
 //
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum digest_algorithm dgst_alg)
+char *key_fingerprint(Key *key, enum fp_rep dgst_rep, digest_algorithm dgst_alg)
 {
 	char *retval = NULL, *alg;
 	unsigned char *dgst_raw;

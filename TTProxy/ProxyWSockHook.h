@@ -20,7 +20,7 @@ using namespace yebisuya;
 
 extern char UILanguageFile[MAX_PATH];
 
-void UTIL_get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def)
+void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 {
     GetI18nStr("TTProxy", key, buf, buf_len, def, UILanguageFile);
 }
@@ -44,7 +44,7 @@ class ProxyWSockHook {
 public:
     class MessageShower {
     public:
-        virtual void showMessage(const char* message)const = NULL;
+        virtual void showMessage(const char* message)const = 0;
     };
 private:
     struct DUMMYHOSTENT {

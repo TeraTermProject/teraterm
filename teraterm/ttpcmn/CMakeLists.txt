@@ -30,7 +30,6 @@ source_group(
   )
 
 set(SRC
-  ttpcmn.def
   cmn_res.h
   language.c
   language.h

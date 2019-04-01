@@ -17,3 +17,9 @@ add_library(
   TTXCallSysMenu SHARED
   ${SRC}
   )
+
+set_target_properties(
+  TTXCallSysMenu
+  PROPERTIES
+  PREFIX ""
+  )

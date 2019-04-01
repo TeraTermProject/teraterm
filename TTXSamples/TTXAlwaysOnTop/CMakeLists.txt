@@ -22,6 +22,12 @@ add_library(
   ${SRC}
   )
 
+set_target_properties(
+  TTXAlwaysOnTop
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   TTXAlwaysOnTop
   ttpcmn

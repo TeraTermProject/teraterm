@@ -53,17 +53,21 @@ public:
 			array[i] = source[i];
 		}
 	}
+#if 0
 	void copyFrom(Array* source) {
 		copy(source->array[i]);
 	}
+#endif
 	void copyTo(TYPE distination[])const {
 		for (int i = 0; i < length; i++) {
 			distination[i] = array[i];
 		}
 	}
+#if 0
 	void copyTo(Array* distination)const {
 		copyTo(distination->array[i]);
 	}
+#endif
 };
 
 }

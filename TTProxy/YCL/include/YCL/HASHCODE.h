@@ -25,7 +25,7 @@ public:
 	}
 	HASHCODE(const HASHCODE& code):value(code.value) {
 	}
-	HASHCODE(void* value):value((int) value) {
+	HASHCODE(const void* value):value((int)(uintptr_t) value) {
 	}
 	HASHCODE(int value):value(value) {
 	}

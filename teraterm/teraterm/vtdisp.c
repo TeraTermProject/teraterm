@@ -447,9 +447,9 @@ BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long
   if(!hSPI)
     goto error;
 
-  (FARPROC)SPI_GetPluginInfo = GetProcAddress(hSPI,"GetPluginInfo");
-  (FARPROC)SPI_IsSupported   = GetProcAddress(hSPI,"IsSupported");
-  (FARPROC)SPI_GetPicture    = GetProcAddress(hSPI,"GetPicture");
+  SPI_GetPluginInfo = (void *)GetProcAddress(hSPI,"GetPluginInfo");
+  SPI_IsSupported   = (void *)GetProcAddress(hSPI,"IsSupported");
+  SPI_GetPicture    = (void *)GetProcAddress(hSPI,"GetPicture");
 
   if(!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture)
     goto error;

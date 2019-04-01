@@ -14,7 +14,7 @@ set_target_properties(
   ttpset
   PROPERTIES FOLDER teraterm)
 
-if(NOT(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005" AND ${CMAKE_MAKE_PROGRAM} MATCHES "VCExpress.exe"))
+if((NOT(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005" AND ${CMAKE_MAKE_PROGRAM} MATCHES "VCExpress.exe")) AND (NOT(MINGW)))
   # MFCを使用しているため VS2005 Express ではビルドできない
   add_subdirectory(ttpmacro)
   set_target_properties(
@@ -36,6 +36,3 @@ add_subdirectory(keycode)
 set_target_properties(
   keycode
   PROPERTIES FOLDER teraterm)
-
-# ttpdlg内でconfig時 svnversion.h を生成
-#add_subdirectory(svnrev)

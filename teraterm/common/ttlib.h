@@ -37,9 +37,13 @@
 extern "C" {
 #endif
 
+#if !defined(DllExport)
+#define DllExport __declspec(dllexport)
+#endif
+
 BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos);
-BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
-BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
+DllExport BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
+DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 void FitFileName(PCHAR FileName, int destlen, const char *DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void DeleteSlash(PCHAR Path);
@@ -57,7 +61,7 @@ void QuoteFName(PCHAR FName);
 #endif
 int isInvalidFileNameChar(PCHAR FName);
 #define deleteInvalidFileNameChar(name) replaceInvalidFileNameChar(name, 0)
-void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
+DllExport void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 int isInvalidStrftimeChar(PCHAR FName);
 void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
@@ -76,39 +80,40 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 #endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
-BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
-void OutputDebugPrintf(const char *fmt, ...);
-DWORD get_OPENFILENAME_SIZEA();
-BOOL IsWindows95();
-BOOL IsWindowsMe();
-BOOL IsWindowsNT4();
-BOOL IsWindowsNTKernel();
-BOOL IsWindows2000();
-BOOL IsWindows2000OrLater();
-BOOL IsWindowsVistaOrLater();
-BOOL IsWindows7OrLater();
-BOOL HasMultiMonitorSupport();
-BOOL HasGetAdaptersAddresses();
-BOOL HasDnsQuery();
-BOOL HasBalloonTipSupport();
+DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
+DllExport void OutputDebugPrintf(const char *fmt, ...);
+DllExport DWORD get_OPENFILENAME_SIZEA();
+DllExport DWORD get_OPENFILENAME_SIZEW();
+DllExport BOOL IsWindows95();
+DllExport BOOL IsWindowsMe();
+DllExport BOOL IsWindowsNT4();
+DllExport BOOL IsWindowsNTKernel();
+DllExport BOOL IsWindows2000();
+DllExport BOOL IsWindows2000OrLater();
+DllExport BOOL IsWindowsVistaOrLater();
+DllExport BOOL IsWindows7OrLater();
+DllExport BOOL HasMultiMonitorSupport();
+DllExport BOOL HasGetAdaptersAddresses();
+DllExport BOOL HasDnsQuery();
+DllExport BOOL HasBalloonTipSupport();
 int KanjiCode2List(int lang, int kcode);
 int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
-char *mctimelocal(char *format, BOOL utc_flag);
+DllExport char *mctimelocal(char *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);
 
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
-int b64decode(PCHAR dst, int dsize, PCHAR src);
+DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);
 
-PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param);
-void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
+DllExport PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param);
+DllExport void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
 void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
 BOOL GetPositionOnWindow(
 	HWND hWnd, const POINT *point,
 	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
-void GetMessageboxFont(LOGFONTA *logfont);
+DllExport void GetMessageboxFont(LOGFONTA *logfont);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 

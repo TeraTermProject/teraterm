@@ -2148,10 +2148,9 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 	for (int i = 0; i < DropListCount; i++) {
 		const char *FileName = DropLists[i];
 		const DWORD attr = GetFileAttributes(FileName);
-		if (attr == -1 ) {
-			goto finish;
-		}
-		if (attr & FILE_ATTRIBUTE_DIRECTORY) {
+		if (attr == (DWORD)-1 ) {
+			FileCount++;
+		} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
 			DirectoryCount++;
 		} else {
 			FileCount++;

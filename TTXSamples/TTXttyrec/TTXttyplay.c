@@ -106,7 +106,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ChangeTitle = FALSE;
 	pvar->ReplaceHostDlg = FALSE;
 	pvar->played = FALSE;
-	gettimeofday(&(pvar->last), NULL);
+	gettimeofday(&(pvar->last) /*, NULL*/ );
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
 	pvar->pause = FALSE;
@@ -131,11 +131,12 @@ void ChangeTitle(char *title) {
 
 static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rbytes, LPOVERLAPPED rol) {
 	static struct recheader prh = { 0, 0, 0 };
-	static unsigned int lbytes;
+	static DWORD lbytes;
 	static char ibuff[BUFFSIZE];
 	static BOOL title_changed = FALSE, first_title_changed = FALSE;
 
-	int b[3], rsize;
+	int b[3];
+	DWORD rsize;
 	struct recheader h;
 	struct timeval curtime;
 	struct timeval tdiff;
@@ -189,7 +190,7 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 	}
 
 	if (!pvar->nowait) {
-		gettimeofday(&curtime, NULL);
+		gettimeofday(&curtime /*, NULL*/ );
 		tdiff = tvdiff(pvar->last, curtime);
 	}
 

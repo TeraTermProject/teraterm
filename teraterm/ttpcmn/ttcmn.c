@@ -32,13 +32,8 @@
 #endif
 
 /* TTCMN.DLL, main */
-#include "teraterm.h"
-#include "tttypes.h"
 #include <direct.h>
 #include <string.h>
-#include "ttftypes.h"
-#include "ttlib.h"
-#include "language.h"
 #include <stdio.h>
 #include <windows.h>
 #include <tchar.h>
@@ -46,10 +41,21 @@
 #include <locale.h>
 #include <htmlhelp.h>
 
+#define DllExport __declspec(dllexport)
+#include "language.h"
+#undef DllExport
+
+#include "teraterm.h"
+#include "tttypes.h"
+#include "ttftypes.h"
+#include "ttlib.h"
 #include "compat_w95.h"
 #include "tt_res.h"
-#include "ttcommon.h"
 #include "codeconv.h"
+
+#define DllExport __declspec(dllexport)
+#include "ttcommon.h"
+
 
 // TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
 // TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが

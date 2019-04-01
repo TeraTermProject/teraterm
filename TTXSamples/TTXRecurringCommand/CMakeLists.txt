@@ -34,6 +34,12 @@ add_library(
   ${COMMON_SRC}
   )
 
+set_target_properties(
+  TTXRecurringCommand
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   TTXRecurringCommand
   ttpcmn

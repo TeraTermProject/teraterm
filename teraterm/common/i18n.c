@@ -47,7 +47,7 @@ DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, i
 }
 #endif
 
-void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
 	RestoreNewLine(buf);

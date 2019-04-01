@@ -47,6 +47,10 @@ See LICENSE.TXT for the license.
 
 #define CHANNEL_READ_BUF_SIZE 8192
 
+#if defined(__MINGW32__)
+#define __FUNCTION__
+#endif
+
 static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
                                         LPARAM lParam);
 

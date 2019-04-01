@@ -18,6 +18,12 @@ add_library(
   ${SRC}
   )
 
+set_target_properties(
+  TTXCommandLineOpt
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   TTXCommandLineOpt
   ttpcmn

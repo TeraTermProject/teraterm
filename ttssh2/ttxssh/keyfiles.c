@@ -388,7 +388,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		len = fread(buf, 1, sizeof(buf), fp);
 		buffer_append(blob, buf, len);
 		if (buffer_len(blob) > MAX_KEY_FILE_SIZE) {
-			logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": key file too large.");
+			logprintf(LOG_LEVEL_WARNING, "%s: key file too large.", __FUNCTION__);
 			goto error;
 		}
 		if (len < sizeof(buf))
@@ -401,7 +401,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	cp = buffer_ptr(blob);
 	len = buffer_len(blob);
 	if (len < m1len || memcmp(cp, MARK_BEGIN, m1len)) {
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": missing begin marker");
+		logprintf(LOG_LEVEL_VERBOSE, "%s: missing begin marker", __FUNCTION__);
 		goto error;
 	}
 	cp += m1len;
@@ -420,29 +420,29 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		}
 	}
 	if (!len) {
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": no end marker");
+		logprintf(LOG_LEVEL_VERBOSE, "%s: no end marker", __FUNCTION__);
 		goto error;
 	}
 
 	// ファイルのスキャンが終わったので、base64 decodeする。
 	len = buffer_len(encoded);
 	if ((cp = buffer_append_space(copy_consumed, len)) == NULL) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_append_space");
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_append_space", __FUNCTION__);
 		goto error;
 	}
 	if ((dlen = b64decode(cp, len, buffer_ptr(encoded))) < 0) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": base64 decode failed");
+		logprintf(LOG_LEVEL_ERROR, "%s: base64 decode failed", __FUNCTION__);
 		goto error;
 	}
 	if ((unsigned int)dlen > len) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": crazy base64 length %d > %u", dlen, len);
+		logprintf(LOG_LEVEL_ERROR, "%s: crazy base64 length %d > %u", __FUNCTION__, dlen, len);
 		goto error;
 	}
 
 	buffer_consume_end(copy_consumed, len - dlen);
 	if (buffer_remain_len(copy_consumed) < sizeof(AUTH_MAGIC) ||
 	    memcmp(buffer_tail_ptr(copy_consumed), AUTH_MAGIC, sizeof(AUTH_MAGIC))) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": bad magic");
+		logprintf(LOG_LEVEL_ERROR, "%s: bad magic", __FUNCTION__);
 		goto error;
 	}
 	buffer_consume(copy_consumed, sizeof(AUTH_MAGIC));
@@ -467,23 +467,23 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	kdfname = buffer_get_string_msg(copy_consumed, NULL);
 	if (kdfname == NULL ||
 	    (!strcmp(kdfname, "none") && !strcmp(kdfname, KDFNAME))) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": unknown kdf name");
+		logprintf(LOG_LEVEL_ERROR, "%s: unknown kdf name", __FUNCTION__ );
 		goto error;
 	}
 	if (!strcmp(kdfname, "none") && strcmp(ciphername, "none") != 0) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ "%s: cipher %s requires kdf", ciphername);
+		logprintf(LOG_LEVEL_ERROR, "%s: cipher %s requires kdf", __FUNCTION__, ciphername);
 		goto error;
 	}
 
 	/* kdf options */
 	kdfp = buffer_get_string_msg(copy_consumed, &klen);
 	if (kdfp == NULL) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": kdf options not set");
+		logprintf(LOG_LEVEL_ERROR, "%s: kdf options not set", __FUNCTION__);
 		goto error;
 	}
 	if (klen > 0) {
 		if ((cp = buffer_append_space(kdf, klen)) == NULL) {
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": kdf alloc failed");
+			logprintf(LOG_LEVEL_ERROR, "%s: kdf alloc failed", __FUNCTION__);
 			goto error;
 		}
 		memcpy(cp, kdfp, klen);
@@ -491,18 +491,18 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	/* number of keys */
 	if (buffer_get_int_ret(&nkeys, copy_consumed) < 0) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": key counter missing");
+		logprintf(LOG_LEVEL_ERROR, "%s: key counter missing", __FUNCTION__);
 		goto error;
 	}
 	if (nkeys != 1) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": only one key supported");
+		logprintf(LOG_LEVEL_ERROR, "%s: only one key supported", __FUNCTION__);
 		goto error;
 	}
 
 	/* pubkey */
 	cp = buffer_get_string_msg(copy_consumed, &len);
 	if (cp == NULL) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": pubkey not found");
+		logprintf(LOG_LEVEL_ERROR, "%s: pubkey not found", __FUNCTION__);
 		goto error;
 	}
 	free(cp); /* XXX check pubkey against decrypted private key */
@@ -512,11 +512,11 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	blocksize = get_cipher_block_size(cipher);
 	authlen = 0;  // TODO: とりあえず固定化
 	if (len < blocksize) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": encrypted data too small");
+		logprintf(LOG_LEVEL_ERROR, "%s: encrypted data too small", __FUNCTION__);
 		goto error;
 	}
 	if (len % blocksize) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": length not multiple of blocksize");
+		logprintf(LOG_LEVEL_ERROR, "%s: length not multiple of blocksize", __FUNCTION__);
 		goto error;
 	}
 
@@ -527,14 +527,14 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	if (!strcmp(kdfname, KDFNAME)) {
 		salt = buffer_get_string_msg(kdf, &slen);
 		if (salt == NULL) {
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": salt not set");
+			logprintf(LOG_LEVEL_ERROR, "%s: salt not set", __FUNCTION__);
 			goto error;
 		}
 		rounds = buffer_get_int(kdf);
 		// TODO: error check
 		if (bcrypt_pbkdf(passphrase, strlen(passphrase), salt, slen,
 		    key, keylen + ivlen, rounds) < 0) {
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": bcrypt_pbkdf failed");
+			logprintf(LOG_LEVEL_ERROR, "%s: bcrypt_pbkdf failed", __FUNCTION__);
 			goto error;
 		}
 	}
@@ -551,7 +551,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	buffer_consume(copy_consumed, len);
 
 	if (buffer_remain_len(copy_consumed) != 0) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": key blob has trailing data (len = %u)",
+		logprintf(LOG_LEVEL_ERROR, "%s: key blob has trailing data (len = %u)", __FUNCTION__,
 			buffer_remain_len(copy_consumed));
 		goto error;
 	}
@@ -559,11 +559,11 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	/* check bytes */
 	if (buffer_get_int_ret(&check1, b) < 0 ||
 	    buffer_get_int_ret(&check2, b) < 0) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": check bytes missing");
+		logprintf(LOG_LEVEL_ERROR, "%s: check bytes missing", __FUNCTION__);
 		goto error;
 	}
 	if (check1 != check2) {
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": decrypt failed: 0x%08x != 0x%08x",
+		logprintf(LOG_LEVEL_VERBOSE, "%s: decrypt failed: 0x%08x != 0x%08x", __FUNCTION__,
 			check1, check2);
 		goto error;
 	}
@@ -579,7 +579,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	while (buffer_remain_len(b)) {
 		if (buffer_get_char_ret(&pad, b) == -1 ||
 		    pad != (++i & 0xff)) {
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": bad padding");
+			logprintf(LOG_LEVEL_ERROR, "%s: bad padding", __FUNCTION__);
 			key_free(keyfmt);
 			keyfmt = NULL;
 			goto error;

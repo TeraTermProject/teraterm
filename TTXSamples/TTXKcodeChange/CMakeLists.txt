@@ -18,4 +18,8 @@ add_library(
   ${SRC}
   )
 
-
+set_target_properties(
+  TTXKcodeChange
+  PROPERTIES
+  PREFIX ""
+  )
