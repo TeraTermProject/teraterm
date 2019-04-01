@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,12 +21,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -81,14 +81,13 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>nafxcw.lib;LIBCMT.lib;onig_s.lib;SFMT.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LIBCMT.lib;onig_s.lib;SFMT.lib;iphlpapi.lib;Comctl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>iphlpapi.dll;user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>nafxcw.lib;LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -118,19 +117,26 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>nafxcwd.lib;LIBCMTD.lib;onig_sd.lib;SFMTd.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LIBCMTD.lib;onig_sd.lib;SFMTd.lib;iphlpapi.lib;Comctl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>iphlpapi.dll;user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>nafxcwd.lib;LIBCMTD.lib;libcmt.lib</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
+    <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
     <ClCompile Include="..\common\i18n.c" />
+    <ClCompile Include="..\common\tmfc.cpp" />
+    <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="errdlg.cpp" />
@@ -152,6 +158,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\codeconv.h" />
+    <ClInclude Include="..\common\compat_win.h" />
+    <ClInclude Include="..\common\dlglib.h" />
+    <ClInclude Include="..\common\dllutil.h" />
+    <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="..\common\win16api.h" />
@@ -161,7 +171,6 @@
     <ClInclude Include="ListDlg.h" />
     <ClInclude Include="msgdlg.h" />
     <ClInclude Include="statdlg.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="ttl.h" />
     <ClInclude Include="ttmacro.h" />
     <ClInclude Include="ttmbuff.h" />
