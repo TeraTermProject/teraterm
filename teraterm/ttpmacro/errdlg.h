@@ -30,32 +30,24 @@
 /* TTMACRO.EXE, error dialog box */
 
 // CErrDlg dialog
-class CErrDlg : public CDialog
+#include "tmfc.h"
+
+class CErrDlg : public TTCDialog
 {
 public:
 	CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName);
+	INT_PTR DoModal();
 
-	//{{AFX_DATA(CErrDlg)
+private:
 	enum { IDD = IDD_ERRDLG };
-	//}}AFX_DATA
 
-	//{{AFX_VIRTUAL(CErrDlg)
-	//}}AFX_VIRTUAL
-
-protected:
 	PCHAR MsgStr, LineStr;
 	int PosX, PosY;
-	HFONT DlgFont;
 	int LineNo;
 	int StartPos, EndPos;
 	PCHAR MacroFileName;
 
-	//{{AFX_MSG(CErrDlg)
 	virtual BOOL OnInitDialog();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedMacroerrhelp();
+	BOOL OnCommand(WPARAM wp, LPARAM lp);
+	void OnBnClickedMacroerrhelp();
 };
-
-typedef CErrDlg *PErrDlg;

@@ -35,13 +35,15 @@ extern "C" {
 
 extern char UILanguageFile[MAX_PATH];
 
-void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s);
+void CalcTextExtent(HDC DC, const char *Text, LPSIZE s);
+void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize);	// TODO name
 void TTMGetDir(PCHAR Dir, int destlen);
 void TTMSetDir(PCHAR Dir);
 int GetAbsPath(PCHAR FName, int destlen);
 int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type);
 int GetMonitorLeftmost(int PosX, int PosY);
 void BringupWindow(HWND hWnd);
+int MessageBoxHaltScript(HWND hWnd);
 
 #ifdef __cplusplus
 }

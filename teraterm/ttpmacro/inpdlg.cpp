@@ -29,28 +29,23 @@
 
 /* TTMACRO.EXE, input dialog box */
 
-#include "stdafx.h"
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttmdef.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
+#include "dlglib.h"
 
 #include "inpdlg.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+extern HINSTANCE GetInstance();
+extern HWND GetHWND();
 
 // CInpDlg dialog
 CInpDlg::CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
                  PCHAR Default, BOOL Paswd,
-                 int x, int y) : CDialog(CInpDlg::IDD)
+                 int x, int y)
 {
-	//{{AFX_DATA_INIT(CInpDlg)
-	//}}AFX_DATA_INIT
 	InputStr = Input;
 	TextStr = Text;
 	TitleStr = Title;
@@ -58,62 +53,39 @@ CInpDlg::CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
 	PaswdFlag = Paswd;
 	PosX = x;
 	PosY = y;
-	DlgFont = NULL;
 }
 
-BEGIN_MESSAGE_MAP(CInpDlg, CDialog)
-	//{{AFX_MSG_MAP(CInpDlg)
-	ON_MESSAGE(WM_EXITSIZEMOVE, OnExitSizeMove)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-// CInpDlg message handler
+INT_PTR CInpDlg::DoModal()
+{
+	HINSTANCE hInst = GetInstance();
+	HWND parent = GetHWND();
+	return TTCDialog::DoModal(hInst, parent, CInpDlg::IDD);
+}
 
 // msgdlg のように、メッセージが長い場合にはダイアログを拡げるようにした (2006.7.29 maya)
 BOOL CInpDlg::OnInitDialog()
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ IDOK, "BTN_OK" },
+	};
 	RECT R;
-	HDC TmpDC;
 	HWND HEdit, HOk;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font, tmpfont;
 
-	CDialog::OnInitDialog();
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", m_hWnd, &logfont, &DlgFont, UILanguageFile)) {
-		SendDlgItemMessage(IDC_INPTEXT, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_INPEDIT, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDOK, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-	}
-
-	GetDlgItemText(IDOK, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDOK, uimsg);
-
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	SetWindowText(TitleStr);
 	SetDlgItemText(IDC_INPTEXT,TextStr);
 	SetDlgItemText(IDC_INPEDIT,DefaultStr);
 
-	TmpDC = ::GetDC(GetDlgItem(IDC_INPTEXT)->GetSafeHwnd());
-	if (DlgFont) {
-		tmpfont = (HFONT)SelectObject(TmpDC, DlgFont);
-	}
-	CalcTextExtent(TmpDC,TextStr,&s);
-	if (DlgFont && tmpfont != NULL) {
-		SelectObject(TmpDC, tmpfont);
-	}
-	::ReleaseDC(GetDlgItem(IDC_INPTEXT)->GetSafeHwnd(),TmpDC);
+	CalcTextExtent2(GetDlgItem(IDC_STATTEXT), NULL, TextStr, &s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 
-	HEdit = ::GetDlgItem(GetSafeHwnd(), IDC_INPEDIT);
+	HEdit = GetDlgItem(IDC_INPEDIT);
 	::GetWindowRect(HEdit,&R);
 	EW = R.right-R.left;
 	EH = R.bottom-R.top;
 
-	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
+	HOk = GetDlgItem(IDOK);
 	::GetWindowRect(HOk,&R);
 	BW = R.right-R.left;
 	BH = R.bottom-R.top;
@@ -124,18 +96,19 @@ BOOL CInpDlg::OnInitDialog()
 
 	Relocation(TRUE, WW);
 
-	BringupWindow(this->m_hWnd);
+	BringupWindow(m_hWnd);
 
 	return TRUE;
 }
 
-void CInpDlg::OnOK()
+BOOL CInpDlg::OnOK()
 {
 	GetDlgItemText(IDC_INPEDIT,InputStr,MaxStrLen-1);
 	EndDialog(IDOK);
+	return TRUE;
 }
 
-LONG CInpDlg::OnExitSizeMove(UINT wParam, LONG lParam)
+LRESULT CInpDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
 
@@ -145,14 +118,14 @@ LONG CInpDlg::OnExitSizeMove(UINT wParam, LONG lParam)
 	}
 	else if (R.bottom-R.top != WH || R.right-R.left < init_WW) {
 		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
-		SetWindowPos(&wndTop,R.left,R.top,WW,WH,0);
+		SetWindowPos(HWND_TOP, R.left,R.top,WW,WH,0);
 	}
 	else {
 		// そうでなければ再配置する
 		Relocation(FALSE, R.right-R.left);
 	}
 
-	return CDialog::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
+	return TRUE;
 }
 
 void CInpDlg::Relocation(BOOL is_init, int new_WW)
@@ -185,9 +158,9 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 		WW = new_WW;
 	}
 
-	HText = ::GetDlgItem(GetSafeHwnd(), IDC_INPTEXT);
-	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
-	HEdit = ::GetDlgItem(GetSafeHwnd(), IDC_INPEDIT);
+	HText = GetDlgItem(IDC_INPTEXT);
+	HOk = GetDlgItem(IDOK);
+	HEdit = GetDlgItem(IDC_INPEDIT);
 
 	::MoveWindow(HText,(TW-s.cx)/2,BH/2,TW,TH,TRUE);
 	::MoveWindow(HEdit,(WW-EW)/2-4,TH+BH,EW,EH,TRUE);
@@ -206,7 +179,16 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 		PosY = (GetDeviceCaps(TmpDC,VERTRES)-R.bottom+R.top) / 2;
 		::ReleaseDC(GetSafeHwnd(),TmpDC);
 	}
-	SetWindowPos(&wndTop,PosX,PosY,WW,WH,0);
+	SetWindowPos(HWND_TOP,PosX,PosY,WW,WH,0);
 
-	InvalidateRect(NULL);
+	InvalidateRect(NULL, TRUE);
+}
+
+LRESULT CInpDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch(msg) {
+	case WM_EXITSIZEMOVE:
+		return OnExitSizeMove(wp, lp);
+	}
+	return FALSE;
 }

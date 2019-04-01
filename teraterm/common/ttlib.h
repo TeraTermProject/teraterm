@@ -121,12 +121,15 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 
 #if defined(_UNICODE)
+#define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEW()
 #else
+#define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolder(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 #endif
+
 #ifdef __cplusplus
 }
 #endif

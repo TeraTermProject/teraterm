@@ -29,7 +29,9 @@
 
 /* TTMACRO.EXE, main */
 
-#include "stdafx.h"
+#include <windows.h>
+#include <commctrl.h>
+#include <stdio.h>
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmdlg.h"
@@ -40,27 +42,60 @@
 #include "ttmmain.h"
 #include "ttmbuff.h"
 #include "ttmlib.h"
+#include "dlglib.h"
 
 #include "ttlib.h"
 
 #include "wait4all.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+#include "tmfc.h"
+
+extern HINSTANCE GetInstance();
+
+static void ClientToScreen(HWND hWnd, RECT *rect)
+{
+	POINT pos;
+	pos.x = rect->left;
+	pos.y = rect->top;
+	::ClientToScreen(hWnd, &pos);
+	rect->left = pos.x;
+	rect->top = pos.y;
+
+	pos.x = rect->right;
+	pos.y = rect->bottom;
+	::ClientToScreen(hWnd, &pos);
+	rect->right = pos.x;
+	rect->bottom = pos.y;
+}
+
+static void ScreenToClient(HWND hWnd, RECT *rect)
+{
+	POINT pos;
+	pos.x = rect->left;
+	pos.y = rect->top;
+	::ScreenToClient(hWnd, &pos);
+	rect->left = pos.x;
+	rect->top = pos.y;
+
+	pos.x = rect->right;
+	pos.y = rect->bottom;
+	::ScreenToClient(hWnd, &pos);
+	rect->right = pos.x;
+	rect->bottom = pos.y;
+}
 
 // CCtrlWindow dialog
 CCtrlWindow::CCtrlWindow()
-	: CDialog()
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDI_TTMACRO);
+	HINSTANCE hInst = GetInstance();
+	m_hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_TTMACRO));
 }
 
 BOOL CCtrlWindow::Create()
 {
-	if (! CDialog::Create(CCtrlWindow::IDD, NULL)) {
+	HINSTANCE hInst = GetInstance();
+	HWND parent = NULL;
+	if (! TTCDialog::Create(hInst, parent, CCtrlWindow::IDD)) {
 		PostQuitMessage(0);
 		return FALSE;
 	}
@@ -105,14 +140,14 @@ BOOL CCtrlWindow::OnIdle()
 		// 更新対象のマクロコマンドの場合のみ、ウィンドウに更新指示を出す。
 		// 毎度 WM_PAINT を送っているとマクロの動作が遅くなるため。(2006.2.24 yutaka)
 		if (IsUpdateMacroCommand()) {
-			Invalidate(TRUE);
+			::InvalidateRect(m_hWnd, NULL, TRUE);
 		}
 		return TRUE;
 	}
 	else if (TTLStatus==IdTTLWait) {
 		ResultCode = Wait();
 		if (ResultCode>0) {
-			KillTimer(IdTimeOutTimer);
+			::KillTimer(m_hWnd, IdTimeOutTimer);
 			TTLStatus = IdTTLRun;
 			LockVar();
 			SetResult(ResultCode);
@@ -121,7 +156,7 @@ BOOL CCtrlWindow::OnIdle()
 			return TRUE;
 		}
 		else if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 	else if (TTLStatus==IdTTLWaitLn) {
@@ -133,7 +168,7 @@ BOOL CCtrlWindow::OnIdle()
 			Temp[0] = 0x0a;
 			Temp[1] = 0;
 			if (CmpWait(ResultCode,Temp)==0) { // new-line is received
-				KillTimer(IdTimeOutTimer);
+				::KillTimer(m_hWnd, IdTimeOutTimer);
 				ClearWait();
 				TTLStatus = IdTTLRun;
 				LockVar();
@@ -148,13 +183,13 @@ BOOL CCtrlWindow::OnIdle()
 			return TRUE;
 		}
 		else if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 	else if (TTLStatus==IdTTLWaitNL) {
 		ResultCode = Wait();
 		if (ResultCode>0) {
-			KillTimer(IdTimeOutTimer);
+			::KillTimer(m_hWnd, IdTimeOutTimer);
 			TTLStatus = IdTTLRun;
 			LockVar();
 			SetInputStr(GetRecvLnBuff());
@@ -162,12 +197,12 @@ BOOL CCtrlWindow::OnIdle()
 			return TRUE;
 		}
 		else if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 	else if (TTLStatus==IdTTLWait2) {
 		if (Wait2()) {
-			KillTimer(IdTimeOutTimer);
+			::KillTimer(m_hWnd, IdTimeOutTimer);
 			TTLStatus = IdTTLRun;
 			LockVar();
 			SetInputStr(Wait2Str);
@@ -176,12 +211,12 @@ BOOL CCtrlWindow::OnIdle()
 			return TRUE;
 		}
 		else if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 	else if (TTLStatus==IdTTLWaitN) {
 		if (WaitN()) {
-			KillTimer(IdTimeOutTimer);
+			::KillTimer(m_hWnd, IdTimeOutTimer);
 			TTLStatus = IdTTLRun;
 			LockVar();
 			SetResult(1);
@@ -191,13 +226,13 @@ BOOL CCtrlWindow::OnIdle()
 			return TRUE;
 		}
 		else if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 	else if (TTLStatus==IdTTLWait4all) {
 		ResultCode = Wait4all();
 		if (ResultCode>0) {
-			KillTimer(IdTimeOutTimer);
+			::KillTimer(m_hWnd, IdTimeOutTimer);
 			TTLStatus = IdTTLRun;
 			LockVar();
 			SetResult(ResultCode);
@@ -206,13 +241,14 @@ BOOL CCtrlWindow::OnIdle()
 			return TRUE;
 		}
 		else if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 
 	return FALSE;
 }
 
+#if 0
 BEGIN_MESSAGE_MAP(CCtrlWindow, CDialog)
 	//{{AFX_MSG_MAP(CCtrlWindow)
 	ON_WM_CLOSE()
@@ -231,46 +267,36 @@ BEGIN_MESSAGE_MAP(CCtrlWindow, CDialog)
 	ON_MESSAGE(WM_USER_DDEEND,OnDdeEnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
+#endif
 
 // CCtrlWindow message handler
 
 BOOL CCtrlWindow::OnInitDialog()
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ IDC_CTRLPAUSESTART, "BTN_PAUSE" },
+		{ IDC_CTRLEND, "BTN_END" },
+	};
 	HDC TmpDC;
 	int CRTWidth, CRTHeight;
 	RECT Rect;
 	char Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
 	BOOL IOption, VOption;
 	int CmdShow;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font;
 	int fuLoad = LR_DEFAULTCOLOR;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
+	HINSTANCE hInst = GetInstance();
 
-	CDialog::OnInitDialog();
-
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", m_hWnd, &logfont, &DlgFont, UILanguageFile)) {
-		SendDlgItemMessage(IDC_CTRLPAUSESTART, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_CTRLEND, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-	}
-
-	GetDlgItemText(IDC_CTRLPAUSESTART, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_PAUSE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
-	GetDlgItemText(IDC_CTRLEND, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_END", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDC_CTRLEND, uimsg);
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
 	Pause = FALSE;
 
+	// センターに持っていく
 	TmpDC = ::GetDC(GetSafeHwnd());
-	CRTWidth = GetDeviceCaps(TmpDC,HORZRES);
-	CRTHeight = GetDeviceCaps(TmpDC,VERTRES);
-	GetWindowRect(&Rect);
+	CRTWidth = ::GetDeviceCaps(TmpDC,HORZRES);
+	CRTHeight = ::GetDeviceCaps(TmpDC,VERTRES);
+	::GetWindowRect(m_hWnd, &Rect);
 	::ReleaseDC(GetSafeHwnd(), TmpDC);
 	::SetWindowPos(GetSafeHwnd(),HWND_TOP,
 	               (CRTWidth-Rect.right+Rect.left) / 2,
@@ -281,11 +307,11 @@ BOOL CCtrlWindow::OnInitDialog()
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInst,
 	                                MAKEINTRESOURCE(IDI_TTMACRO),
 	                                IMAGE_ICON,16,16,fuLoad));
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInst,
 	                                MAKEINTRESOURCE(IDI_TTMACRO),
 	                                IMAGE_ICON,0,0,fuLoad));
 
@@ -325,20 +351,20 @@ BOOL CCtrlWindow::OnInitDialog()
 	 * (2015.1.2 yutaka)
 	 */
 	// 現在サイズから必要な値を計算
-	GetClientRect(&rc_dlg);
-	ClientToScreen(&rc_dlg);
+	::GetClientRect(m_hWnd, &rc_dlg);
+	ClientToScreen(m_hWnd, &rc_dlg);
 	dlg_len = rc_dlg.right - rc_dlg.left;
 
-	GetDlgItem(IDC_FILENAME)->GetWindowRect(&rc_filename);
+	::GetWindowRect(GetDlgItem(IDC_FILENAME), &rc_filename);
 	len = rc_filename.right - rc_filename.left;
 	m_filename_ratio = len*100 / dlg_len;
 
-	GetDlgItem(IDC_LINENO)->GetWindowRect(&rc_lineno);
+	::GetWindowRect(GetDlgItem(IDC_LINENO), &rc_lineno);
 	len = rc_lineno.right - rc_lineno.left;
 	m_lineno_ratio = len * 100 / dlg_len;
 
 	// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
-	m_hStatus = CreateStatusWindow(
+	m_hStatus = ::CreateStatusWindow(
 		WS_CHILD | WS_VISIBLE |
 		CCS_BOTTOM | SBARS_SIZEGRIP, NULL, GetSafeHwnd(), 1);
 
@@ -356,10 +382,13 @@ BOOL CCtrlWindow::OnInitDialog()
 	return TRUE;
 }
 
-void CCtrlWindow::OnCancel( )
+BOOL CCtrlWindow::OnCancel( )
 {
+#if 1
 	::DestroyWindow(m_hStatus);
 	DestroyWindow();
+#endif
+	return TRUE;	// cancel(ESC押下)を無視
 }
 
 BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -367,30 +396,31 @@ BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG];
 
 	switch (LOWORD(wParam)) {
-		case IDC_CTRLPAUSESTART:
-			if (Pause) {
-				get_lang_msg("BTN_PAUSE", uimsg, sizeof(uimsg),  "Pau&se", UILanguageFile);
-				SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
-			}
-			else {
-				get_lang_msg("BTN_START", uimsg, sizeof(uimsg),  "&Start", UILanguageFile);
-				SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
-			}
-			Pause = ! Pause;
-			return TRUE;
-		case IDC_CTRLEND:
-			TTLStatus = IdTTLEnd;
-			return TRUE;
-		default:
-			return (CDialog::OnCommand(wParam,lParam));
+	case IDC_CTRLPAUSESTART:
+		if (Pause) {
+			get_lang_msg("BTN_PAUSE", uimsg, sizeof(uimsg),  "Pau&se", UILanguageFile);
+			SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
+		}
+		else {
+			get_lang_msg("BTN_START", uimsg, sizeof(uimsg),  "&Start", UILanguageFile);
+			SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
+		}
+		Pause = ! Pause;
+		return TRUE;
+	case IDC_CTRLEND:
+		TTLStatus = IdTTLEnd;
+		PostQuitMessage(0);
+		return TRUE;
+	default:
+		return FALSE;
 	}
 }
 
-void CCtrlWindow::OnClose()
+BOOL CCtrlWindow::OnClose()
 {
 	EndTTL();
 	EndDDE();
-	CDialog::OnClose();
+	return TRUE;
 }
 
 void CCtrlWindow::OnDestroy()
@@ -399,26 +429,28 @@ void CCtrlWindow::OnDestroy()
 
 	EndTTL();
 	EndDDE();
-	CDialog::OnDestroy();
+//	CDialog::OnDestroy();
 }
 
 // for icon drawing in Win NT 3.5
-BOOL CCtrlWindow::OnEraseBkgnd(CDC* pDC)
+BOOL CCtrlWindow::OnEraseBkgnd(HDC DC)
 {
-	if (IsIconic()) {
+	if (::IsIconic(m_hWnd)) {
 		return TRUE;
 	}
 	else {
-		return CDialog::OnEraseBkgnd(pDC);
+		return FALSE;
 	}
 }
 
 // for icon drawing in Win NT 3.5
 void CCtrlWindow::OnPaint()
 {
-	int OldMapMode;
-	CPaintDC dc(this);
+	PAINTSTRUCT ps;
+	HDC dc;
 	char buf[128];
+
+	dc = BeginPaint(&ps);
 
 	// line number (2005.7.18 yutaka)
 	// added line buffer (2005.7.22 yutaka)
@@ -428,13 +460,15 @@ void CCtrlWindow::OnPaint()
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
 	SetDlgItemText(IDC_LINENO, buf);
 
-	OldMapMode = dc.GetMapMode();
-	dc.SetMapMode(MM_TEXT);
+	if (::IsIconic(m_hWnd)) {
+		int OldMapMode = GetMapMode(dc);
+		SetMapMode(dc, MM_TEXT);
+		SendMessage(WM_ICONERASEBKGND,(UINT)dc, 0);	// TODO
+		DrawIcon(dc, 0, 0, m_hIcon);
+		SetMapMode(dc, OldMapMode);
+	}
 
-	if (!IsIconic()) return;
-	SendMessage(WM_ICONERASEBKGND,(UINT)(dc.m_hDC));
-	dc.DrawIcon(0, 0, m_hIcon);
-	dc.SetMapMode(OldMapMode);
+	EndPaint(&ps);
 }
 
 // マクロウィンドウをリサイズ可能とするために、OnSizeハンドラをoverrideする。
@@ -445,34 +479,36 @@ void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
 	LONG new_w, new_h, new_x, new_y;
 	LONG len;
 
-	GetClientRect(&rc_dlg);
-	ClientToScreen(&rc_dlg);
+	::GetClientRect(m_hWnd, &rc_dlg);
+	ClientToScreen(m_hWnd, &rc_dlg);
 	len = rc_dlg.right - rc_dlg.left;
 
 	// TTLファイル名の再配置
-	GetDlgItem(IDC_FILENAME)->GetWindowRect(&rc_filename);
-	ScreenToClient(&rc_filename);
+	HWND hWnd = GetDlgItem(IDC_FILENAME);
+	::GetWindowRect(hWnd, &rc_filename);
+	ScreenToClient(m_hWnd, &rc_filename);
 	new_w = (len * m_filename_ratio) / 100;
 	new_h = rc_filename.bottom - rc_filename.top;
-	GetDlgItem(IDC_FILENAME)->SetWindowPos(&CWnd::wndBottom,
+	::SetWindowPos(hWnd, HWND_BOTTOM,
 		0, 0, new_w, new_h,
 		SWP_NOMOVE | SWP_NOZORDER
 	);
 	new_x = rc_filename.left + new_w;
 
 	// 行番号の再配置
-	GetDlgItem(IDC_LINENO)->GetWindowRect(&rc_lineno);
-	ScreenToClient(&rc_lineno);
+	hWnd = GetDlgItem(IDC_LINENO);
+	::GetWindowRect(hWnd, &rc_lineno);
+	ScreenToClient(m_hWnd, &rc_lineno);
 	new_w = (len * m_lineno_ratio) / 100;
 	new_h = rc_lineno.bottom - rc_lineno.top;
 	new_y = rc_lineno.top;
-	GetDlgItem(IDC_LINENO)->SetWindowPos(&CWnd::wndBottom,
+	::SetWindowPos(hWnd, HWND_BOTTOM,
 		new_x, new_y, new_w, new_h,
 		SWP_NOZORDER
 		);
 
 	// status bar
-	::SendMessage(m_hStatus, WM_SIZE, cx, cy);
+	::SendMessage(m_hStatus, WM_SIZE, nType, (cy<<16)|cx );
 }
 
 // マクロウィンドウをリサイズ可能とするために、OnGetMinMaxInfoハンドラをoverrideする。
@@ -497,16 +533,18 @@ HCURSOR CCtrlWindow::OnQueryDragIcon()
 	return m_hIcon;
 }
 
+#if 0
 void CCtrlWindow::OnSysColorChange()
 {
 	CDialog::OnSysColorChange();
 }
+#endif
 
-void CCtrlWindow::OnTimer(UINT nIDEvent)
+void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	BOOL TimeOut;
 
-	KillTimer(nIDEvent);
+	::KillTimer(m_hWnd, nIDEvent);
 	if (nIDEvent!=IdTimeOutTimer) {
 		return;
 	}
@@ -576,15 +614,17 @@ void CCtrlWindow::OnTimer(UINT nIDEvent)
 		return;
 	}
 
-	SetTimer(IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
+	::SetTimer(m_hWnd, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 }
 
-void CCtrlWindow::PostNcDestroy()
+BOOL CCtrlWindow::PostNcDestroy()
 {
 	delete this;
 	PostQuitMessage(0);
+	return TRUE;
 }
 
+#if 0
 BOOL CCtrlWindow::PreTranslateMessage(MSG* pMsg)
 {
 	if ((pMsg->message==WM_KEYDOWN) && (pMsg->wParam==VK_ESCAPE)) { // ignore ESC key
@@ -592,8 +632,9 @@ BOOL CCtrlWindow::PreTranslateMessage(MSG* pMsg)
 	}
 	return CDialog::PreTranslateMessage(pMsg);
 }
+#endif
 
-LONG CCtrlWindow::OnDdeCmndEnd(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeCmndEnd(WPARAM wParam, LPARAM lParam)
 {
 	if (TTLStatus == IdTTLWaitCmndResult) {
 		LockVar();
@@ -608,7 +649,7 @@ LONG CCtrlWindow::OnDdeCmndEnd(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnDdeComReady(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeComReady(WPARAM wParam, LPARAM lParam)
 {
 	ComReady = wParam;
 	if ((TTLStatus == IdTTLWait) ||
@@ -617,7 +658,7 @@ LONG CCtrlWindow::OnDdeComReady(UINT wParam, LONG lParam)
 	    (TTLStatus == IdTTLWait2) ||
 	    (TTLStatus == IdTTLWaitN)) {
 		if (ComReady==0) {
-			SetTimer(IdTimeOutTimer,0, NULL);
+			::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 		}
 	}
 	else if (TTLStatus==IdTTLSleep) {
@@ -644,7 +685,7 @@ LONG CCtrlWindow::OnDdeComReady(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnDdeReady(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeReady(WPARAM wParam, LPARAM lParam)
 {
 	if (TTLStatus != IdTTLInitDDE) {
 		return 0;
@@ -662,7 +703,7 @@ LONG CCtrlWindow::OnDdeReady(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnDdeEnd(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 {
 	EndDDE();
 	if ((TTLStatus == IdTTLWaitCmndEnd) ||
@@ -674,7 +715,7 @@ LONG CCtrlWindow::OnDdeEnd(UINT wParam, LONG lParam)
 	         (TTLStatus == IdTTLWaitNL) ||
 	         (TTLStatus == IdTTLWait2) ||
 	         (TTLStatus == IdTTLWaitN)) {
-		SetTimer(IdTimeOutTimer,0, NULL);
+		::SetTimer(m_hWnd, IdTimeOutTimer,0, NULL);
 	}
 	else if (TTLStatus==IdTTLSleep) {
 		LockVar();
@@ -691,7 +732,7 @@ LONG CCtrlWindow::OnDdeEnd(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnMacroBringup(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnMacroBringup(WPARAM wParam, LPARAM lParam)
 {
 	DWORD pid;
 	DWORD thisThreadId;
@@ -701,13 +742,64 @@ LONG CCtrlWindow::OnMacroBringup(UINT wParam, LONG lParam)
 	fgThreadId = GetWindowThreadProcessId(::GetForegroundWindow(), &pid);
 
 	if (thisThreadId == fgThreadId) {
-		SetForegroundWindow();
-		BringWindowToTop();
+		::SetForegroundWindow(m_hWnd);
+		::BringWindowToTop(m_hWnd);
 	} else {
 		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
-		SetForegroundWindow();
-		BringWindowToTop();
+		::SetForegroundWindow(m_hWnd);
+		::BringWindowToTop(m_hWnd);
 		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
 	}
 	return 0;
+}
+
+LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch(msg)
+	{
+#if 0	// tmfcで処理される
+	case WM_CLOSE:
+		OnClose();
+		break;
+#endif
+	case WM_DESTROY:
+		OnDestroy();
+		PostQuitMessage(0);
+		break;
+	case WM_ERASEBKGND:
+		OnEraseBkgnd((HDC)wp);
+		break;
+	case WM_PAINT:
+		OnPaint();
+		break;
+	case WM_SIZE:
+		OnSize(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_GETMINMAXINFO:
+		OnGetMinMaxInfo((MINMAXINFO *)lp);
+		break;
+#if 0
+	case WM_QUERYDRAGICON:
+	case WM_SYSCOLORCHANGE:
+#endif
+	case WM_TIMER:
+		OnTimer(wp);
+		break;
+	case WM_USER_DDECMNDEND:
+		OnDdeCmndEnd(wp, lp);
+		break;
+	case WM_USER_DDECOMREADY:
+		OnDdeComReady(wp, lp);
+		break;
+	case WM_USER_DDEREADY:
+		OnDdeReady(wp, lp);
+		break;
+	case WM_USER_MACROBRINGUP:
+		OnMacroBringup(wp, lp);
+		break;
+	case WM_USER_DDEEND:
+		OnDdeEnd(wp, lp);
+		break;
+	}
+	return FALSE;
 }

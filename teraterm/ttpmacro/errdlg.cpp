@@ -29,7 +29,9 @@
 
 /* TTMACRO.EXE, error dialog box */
 
-#include "stdafx.h"
+#include <windowsx.h>
+#include <stdio.h>
+#include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
@@ -41,19 +43,16 @@
 #include "errdlg.h"
 #include "ttmlib.h"
 #include "ttmparse.h"
+#include "htmlhelp.h"
+#include "dlglib.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+extern HINSTANCE GetInstance();
+extern HWND GetHWND();
 
 // CErrDlg dialog
+
 CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName)
-	: CDialog(CErrDlg::IDD)
 {
-	//{{AFX_DATA_INIT(CErrDlg)
-	//}}AFX_DATA_INIT
 	MsgStr = Msg;
 	LineStr = Line;
 	PosX = x;
@@ -64,43 +63,26 @@ CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int
 	MacroFileName = FileName;
 }
 
-BEGIN_MESSAGE_MAP(CErrDlg, CDialog)
-	//{{AFX_MSG_MAP(CErrDlg)
-	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_MACROERRHELP, &CErrDlg::OnBnClickedMacroerrhelp)
-END_MESSAGE_MAP()
-
-// CErrDlg message handler
+INT_PTR CErrDlg::DoModal()
+{
+	HINSTANCE hInst = GetInstance();
+	HWND parent = GetHWND();
+	return TTCDialog::DoModal(hInst, parent, CErrDlg::IDD);
+}
 
 BOOL CErrDlg::OnInitDialog()
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ IDOK, "BTN_STOP" },
+		{ IDCANCEL, "BTN_CONTINUE" },
+		{ IDC_MACROERRHELP, "BTN_HELP" },
+	};
 	RECT R;
 	HDC TmpDC;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font;
 	char buf[MaxLineLen*2], buf2[10];
 	int i, len;
 
-	CDialog::OnInitDialog();
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", m_hWnd, &logfont, &DlgFont, UILanguageFile)) {
-		SendDlgItemMessage(IDC_ERRMSG, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_ERRLINE, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDOK, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDCANCEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-	}
-
-	GetDlgItemText(IDOK, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_STOP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDOK, uimsg);
-	GetDlgItemText(IDCANCEL, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_CONTINUE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDCANCEL, uimsg);
-	GetDlgItemText(IDC_MACROERRHELP, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDC_MACROERRHELP, uimsg);
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
 	SetDlgItemText(IDC_ERRMSG,MsgStr);
 
@@ -132,8 +114,8 @@ BOOL CErrDlg::OnInitDialog()
 		PosY = (GetDeviceCaps(TmpDC,VERTRES)-R.bottom+R.top) / 2;
 		::ReleaseDC(GetSafeHwnd(),TmpDC);
 	}
-	SetWindowPos(&wndTop,PosX,PosY,0,0,SWP_NOSIZE);
-	SetForegroundWindow();
+	SetWindowPos(HWND_TOP, PosX, PosY, 0, 0, SWP_NOSIZE);
+	::SetForegroundWindow(m_hWnd);
 
 	return TRUE;
 }
@@ -141,4 +123,14 @@ BOOL CErrDlg::OnInitDialog()
 void CErrDlg::OnBnClickedMacroerrhelp()
 {
 	OpenHelp(HH_HELP_CONTEXT, HlpMacroAppendixesError, UILanguageFile);
+}
+
+BOOL CErrDlg::OnCommand(WPARAM wp, LPARAM lp)
+{
+	const WORD wID = GET_WM_COMMAND_ID(wp, lp);
+	if (wID == IDC_MACROERRHELP) {
+		OnBnClickedMacroerrhelp();
+		return TRUE;
+	}
+	return FALSE;
 }

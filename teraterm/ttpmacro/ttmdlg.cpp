@@ -29,13 +29,16 @@
 
 /* TTMACRO.EXE, dialog boxes */
 
-#include "stdafx.h"
-#include "teraterm.h"
+#include <windows.h>
 #include <direct.h>
+#include <commdlg.h>
+#include <crtdbg.h>
+#include <assert.h>
+
+#include "teraterm.h"
 #include "ttm_res.h"
 #include "tttypes.h"
 #include "ttlib.h"
-#include <commdlg.h>
 #include "ttmdef.h"
 #include "errdlg.h"
 #include "inpdlg.h"
@@ -43,8 +46,20 @@
 #include "statdlg.h"
 #include "ListDlg.h"
 #include "ttmlib.h"
+#include "ttmdlg.h"
 
-extern "C" {
+#ifdef _DEBUG
+#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
+
+extern HINSTANCE GetInstance();
+extern HWND GetHWND();
+
 char HomeDir[MAXPATHLEN];
 char FileName[MAX_PATH];
 char TopicName[11];
@@ -53,14 +68,12 @@ char **Params = NULL;
 int ParamCnt;
 int ParamsSize;
 BOOL SleepFlag;
-}
 
 static int DlgPosX = -10000;
 static int DlgPosY = 0;
 
-static PStatDlg StatDlg = NULL;
+static CStatDlg *StatDlg = NULL;
 
-extern "C" {
 void ParseParam(PBOOL IOption, PBOOL VOption)
 {
 	int dirlen, fnpos;
@@ -69,7 +82,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	PCHAR start, cur, next;
 
 	// Get home directory
-	if (GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName)) == 0) {
+	if (GetModuleFileName(GetInstance(), FileName,sizeof(FileName)) == 0) {
 		return;
 	}
 	ExtractDirName(FileName,HomeDir);
@@ -157,9 +170,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		}
 	}
 }
-}
 
-extern "C" {
 BOOL GetFileName(HWND HWin)
 {
 	char FNFilter[31];
@@ -206,9 +217,7 @@ BOOL GetFileName(HWND HWin)
 		return TRUE;
 	}
 }
-}
 
-extern "C" {
 void SetDlgPos(int x, int y)
 {
 	DlgPosX = x;
@@ -217,34 +226,26 @@ void SetDlgPos(int x, int y)
 		StatDlg->Update(NULL,NULL,DlgPosX,DlgPosY);
 	}
 }
-}
 
-extern "C" {
 void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
                 PCHAR Default, BOOL Paswd)
 {
 	CInpDlg InpDlg(Buff,Text,Caption,Default,Paswd,DlgPosX,DlgPosY);
 	InpDlg.DoModal();
 }
-}
 
-extern "C" {
 int OpenErrDlg(PCHAR Msg, PCHAR Line, int lineno, int start, int end, PCHAR FileName)
 {
 	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end, FileName);
 	return ErrDlg.DoModal();
 }
-}
 
-extern "C" {
 int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo)
 {
 	CMsgDlg MsgDlg(Text,Caption,YesNo,DlgPosX,DlgPosY);
 	return MsgDlg.DoModal();
 }
-}
 
-extern "C" {
 void OpenStatDlg(PCHAR Text, PCHAR Caption)
 {
 	if (StatDlg==NULL) {
@@ -256,20 +257,18 @@ void OpenStatDlg(PCHAR Text, PCHAR Caption)
 		StatDlg->Update(Text,Caption,32767,0);
 	}
 }
-}
 
-extern "C" {
 void CloseStatDlg()
 {
 	if (StatDlg==NULL) {
 		return;
 	}
+	assert(_CrtCheckMemory());
 	StatDlg->DestroyWindow();
+	assert(_CrtCheckMemory());
 	StatDlg = NULL;
 }
-}
 
-extern "C" {
 void BringupStatDlg()
 {
 	if (StatDlg==NULL) {
@@ -277,18 +276,22 @@ void BringupStatDlg()
 	}
 	StatDlg->Bringup();
 }
-}
 
-extern "C" {
+/**
+ * @retval 0以上	選択項目
+ * @retval -1		cancelボタン
+ * @retval -2		closeボタン
+ */
 int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected)
 {
-	int ret = -1;
+	HINSTANCE hInst = GetInstance();
+	HWND hWnd = GetHWND();
 
 	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
-	if (ListDlg.DoModal() == IDOK) {
-		ret = ListDlg.m_SelectItem;
+	INT_PTR r = ListDlg.DoModal();
+	if (r == IDOK) {
+		return ListDlg.m_SelectItem;
 	}
-	return (ret);
-}
+	return r == IDCANCEL ? -1 : -2;
 }
 

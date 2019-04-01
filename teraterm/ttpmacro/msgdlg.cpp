@@ -29,82 +29,63 @@
 
 /* TTMACRO.EXE, message dialog box */
 
-#include "stdafx.h"
+#include <windows.h>
+#include <windowsx.h>
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
+#include "tmfc.h"
+#include "dlglib.h"
+#include "ttmdlg.h"
+#include "ttmacro.h"
 
 #include "msgdlg.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 // CMsgDlg dialog
 
-CMsgDlg::CMsgDlg(PCHAR Text, PCHAR Title, BOOL YesNo,
-                 int x, int y) : CDialog(CMsgDlg::IDD)
+CMsgDlg::CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo,
+                 int x, int y)
 {
-	//{{AFX_DATA_INIT(CMsgDlg)
-	//}}AFX_DATA_INIT
 	TextStr = Text;
 	TitleStr = Title;
 	YesNoFlag = YesNo;
 	PosX = x;
 	PosY = y;
-	DlgFont = NULL;
 }
 
-BEGIN_MESSAGE_MAP(CMsgDlg, CDialog)
-	//{{AFX_MSG_MAP(CMsgDlg)
-	ON_MESSAGE(WM_EXITSIZEMOVE, OnExitSizeMove)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-// CMsgDlg message handler
+INT_PTR CMsgDlg::DoModal()
+{
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
+	return TTCDialog::DoModal(hInst, hWndParent, CMsgDlg::IDD);
+}
 
 BOOL CMsgDlg::OnInitDialog()
 {
+	static const DlgTextInfo TextInfosOk[] = {
+		{ IDOK, "BTN_OK" },
+	};
+	static const DlgTextInfo TextInfosYesNo[] = {
+		{ IDOK, "BTN_YES" },
+		{ IDCANCEL, "BTN_NO" },
+	};
 	RECT R;
-	HDC TmpDC;
-	HWND HOk, HNo;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font, tmpfont;
+	HWND HOk;
 
-	CDialog::OnInitDialog();
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", m_hWnd, &logfont, &DlgFont, UILanguageFile)) {
-		SendDlgItemMessage(IDC_MSGTEXT, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDOK, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDCLOSE, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+	if (YesNoFlag) {
+		SetDlgTexts(m_hWnd, TextInfosYesNo, _countof(TextInfosYesNo), UILanguageFile);
+	} else {
+		SetDlgTexts(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFile);
 	}
-
-	GetDlgItemText(IDOK, uimsg2, sizeof(uimsg2));
-	get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-	SetDlgItemText(IDOK, uimsg);
 
 	SetWindowText(TitleStr);
 	SetDlgItemText(IDC_MSGTEXT,TextStr);
-
-	TmpDC = ::GetDC(GetDlgItem(IDC_MSGTEXT)->GetSafeHwnd());
-	if (DlgFont) {
-		tmpfont = (HFONT)SelectObject(TmpDC, DlgFont);
-	}
-	CalcTextExtent(TmpDC,TextStr,&s);
-	if (DlgFont && tmpfont != NULL) {
-		SelectObject(TmpDC, tmpfont);
-	}
-	::ReleaseDC(GetDlgItem(IDC_MSGTEXT)->GetSafeHwnd(),TmpDC);
+	CalcTextExtent2(GetDlgItem(IDC_STATTEXT), NULL, TextStr, &s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
-	HNo = ::GetDlgItem(GetSafeHwnd(), IDCLOSE);
 	::GetWindowRect(HOk,&R);
 	BW = R.right-R.left;
 	BH = R.bottom-R.top;
@@ -120,7 +101,7 @@ BOOL CMsgDlg::OnInitDialog()
 	return TRUE;
 }
 
-LONG CMsgDlg::OnExitSizeMove(UINT wParam, LONG lParam)
+LRESULT CMsgDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
 
@@ -130,14 +111,14 @@ LONG CMsgDlg::OnExitSizeMove(UINT wParam, LONG lParam)
 	}
 	else if (R.bottom-R.top != WH || R.right-R.left < init_WW) {
 		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
-		SetWindowPos(&wndTop,R.left,R.top,WW,WH,0);
+		SetWindowPos(HWND_TOP,R.left,R.top,WW,WH,0);
 	}
 	else {
 		// そうでなければ再配置する
 		Relocation(FALSE, R.right-R.left);
 	}
 
-	return CDialog::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
+	return TRUE;
 }
 
 void CMsgDlg::Relocation(BOOL is_init, int new_WW)
@@ -146,7 +127,6 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 	HDC TmpDC;
 	HWND HText, HOk, HNo;
 	int CW, CH;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 
 	GetClientRect(&R);
 	CW = R.right-R.left;
@@ -173,20 +153,10 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 
 	HText = ::GetDlgItem(GetSafeHwnd(), IDC_MSGTEXT);
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
-	HNo = ::GetDlgItem(GetSafeHwnd(), IDCLOSE);
+	HNo = ::GetDlgItem(GetSafeHwnd(), IDCANCEL);
 
 	::MoveWindow(HText,(TW-s.cx)/2, BH/2,TW,TH,TRUE);
 	if (YesNoFlag) {
-		if (is_init) {
-			::SetWindowText(HOk,"&Yes");
-			::SetWindowText(HNo,"&No");
-			GetDlgItemText(IDOK, uimsg2, sizeof(uimsg2));
-			get_lang_msg("BTN_YES", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			::SetWindowText(HOk,uimsg);
-			GetDlgItemText(IDCLOSE, uimsg2, sizeof(uimsg2));
-			get_lang_msg("BTN_NO", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			::SetWindowText(HNo,uimsg);
-		}
 		::MoveWindow(HOk,(2*TW-5*BW)/4,TH+BH,BW,BH,TRUE);
 		::MoveWindow(HNo,(2*TW+BW)/4,TH+BH,BW,BH,TRUE);
 		::ShowWindow(HNo,SW_SHOW);
@@ -201,38 +171,41 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 		PosY = (GetDeviceCaps(TmpDC,VERTRES)-WH) / 2;
 		::ReleaseDC(GetSafeHwnd(),TmpDC);
 	}
-	SetWindowPos(&wndTop,PosX,PosY,WW,WH,0);
+	SetWindowPos(HWND_TOP,PosX,PosY,WW,WH,0);
 	InvalidateRect(NULL);
 }
 
-BOOL CMsgDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+BOOL CMsgDlg::OnCancel()
 {
-	switch (LOWORD(wParam)) {
-	case IDCANCEL:
-		if( HIWORD(wParam) == BN_CLICKED ) {
-			// メッセージボックスをキャンセルすると、マクロの終了とする。
-			// (2008.8.5 yutaka)	
-			int ret;
-			char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-			get_lang_msg("MSG_MACRO_CONF", uimsg, sizeof(uimsg), "MACRO: confirmation", UILanguageFile);
-			get_lang_msg("MSG_MACRO_HALT_SCRIPT", uimsg2, sizeof(uimsg2), "Are you sure that you want to halt this macro script?", UILanguageFile);
-			ret = MessageBox(uimsg2, uimsg, MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
-			if (ret == IDYES) {
-				if (YesNoFlag == TRUE) {
-					EndDialog(IDCLOSE);
-				} else {
-					EndDialog(IDCANCEL);
-				}
-			}
-			return TRUE;
-		}
-		return FALSE;
-
-	case IDCLOSE:
-		EndDialog(IDCANCEL);
+	if (!YesNoFlag) {
+		// ok(yes)だけのときは、cancel処理は何もしない
 		return TRUE;
-
-	default:
-		return (CDialog::OnCommand(wParam,lParam));
+	} else {
+		// yes/noのときは、デフォルト処理(終了)
+		return TTCDialog::OnCancel();
 	}
+}
+
+// メッセージボックスをキャンセルする(closeボタンを押す)と、マクロの終了とする。
+// (2008.8.5 yutaka)	
+BOOL CMsgDlg::OnClose()
+{
+	const int ret = MessageBoxHaltScript(m_hWnd);
+	if (ret == IDYES) {
+		if (YesNoFlag == TRUE) {
+			EndDialog(IDCLOSE);
+		} else {
+			EndDialog(IDCANCEL);
+		}
+	}
+	return TRUE;
+}
+
+LRESULT CMsgDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch(msg) {
+	case WM_EXITSIZEMOVE:
+		return OnExitSizeMove(wp, lp);
+	}
+	return FALSE;
 }

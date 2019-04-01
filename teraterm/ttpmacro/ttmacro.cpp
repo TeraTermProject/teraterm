@@ -29,7 +29,10 @@
 
 /* TTMACRO.EXE, main */
 
-#include "stdafx.h"
+#include <stdio.h>
+#include <crtdbg.h>
+#include <windows.h>
+#include <commctrl.h>
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -40,25 +43,20 @@
 #include "ttlib.h"
 
 #include "compat_w95.h"
+#include "compat_win.h"
+#include "ttmdlg.h"
+#include "tmfc.h"
 
 #ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 char UILanguageFile[MAX_PATH];
+static BOOL Busy;
+static HINSTANCE hInst;
+static CCtrlWindow *pCCtrlWindow;
 
-/////////////////////////////////////////////////////////////////////////////
-
-BEGIN_MESSAGE_MAP(CCtrlApp, CWinApp)
-	//{{AFX_MSG_MAP(CCtrlApp)
-	//}}AFX_MSG
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-
-CCtrlApp::CCtrlApp()
+static void init()
 {
 	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
 	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
@@ -78,41 +76,15 @@ CCtrlApp::CCtrlApp()
 			(*setDllDir)("");
 		}
 	}
-}
 
-/////////////////////////////////////////////////////////////////////////////
-
-CCtrlApp theApp;
-
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-BOOL CCtrlApp::InitInstance()
-{
-	static HMODULE HTTSET = NULL;
-
-	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
-
-	Busy = TRUE;
-	m_pMainWnd = new CCtrlWindow();
-	PCtrlWindow(m_pMainWnd)->Create();
-	Busy = FALSE;  
-	return TRUE;
-}
-
-int CCtrlApp::ExitInstance()
-{
-	//delete m_pMainWnd;
-	if (m_pMainWnd) {
-		m_pMainWnd->DestroyWindow();
+	WinCompatInit();
+	if (pSetThreadDpiAwarenessContext) {
+		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
-	m_pMainWnd = NULL;
-	return ExitCode;
 }
 
 // TTMACRO main engine
-BOOL CCtrlApp::OnIdle(LONG lCount)
+static BOOL OnIdle(LONG lCount)
 {
 	BOOL Continue;
 
@@ -121,12 +93,112 @@ BOOL CCtrlApp::OnIdle(LONG lCount)
 		return FALSE;
 	}
 	Busy = TRUE;
-	if (m_pMainWnd != NULL) {
-		Continue = PCtrlWindow(m_pMainWnd)->OnIdle();
+	if (pCCtrlWindow != NULL) {
+		Continue = pCCtrlWindow->OnIdle();
 	}
 	else {
 		Continue = FALSE;
 	}
 	Busy = FALSE;
 	return Continue;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+// CCtrlApp theApp;
+
+static HWND CtrlWnd;
+
+HINSTANCE GetInstance()
+{
+	return hInst;
+}
+
+HWND GetHWND()
+{
+	return CtrlWnd;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
+                   LPSTR lpszCmdLine, int nCmdShow)
+{
+	hInst = hInstance;
+	static HMODULE HTTSET = NULL;
+	LONG lCount = 0;
+	DWORD SleepTick = 1;
+
+#ifdef _DEBUG
+	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	init();
+//	InitCommonControls();
+	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+
+	Busy = TRUE;
+	pCCtrlWindow = new CCtrlWindow();
+	pCCtrlWindow->Create();
+//	pCCtrlWindow->ShowWindow(SW_SHOW);
+//	tmpWnd->ShowWindow(SW_SHOW);
+	Busy = FALSE;  
+
+	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
+	CtrlWnd = hWnd;
+
+	//////////////////////////////////////////////////////////////////////
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0)) {
+#if 0
+		bool message_processed = false;
+		if (m_pMainWnd->m_hAccel != NULL) {
+			if (!MetaKey(ts.MetaKey)) {
+				// matakeyが押されていない
+				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
+					// アクセラレーターキーを処理した
+					message_processed = true;
+				}
+			}
+		}
+#endif
+
+		if (IsDialogMessage(hWnd, &msg) != 0) {
+			/* 処理された*/
+		} else {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+#if 0
+		if (!message_processed) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+#endif
+
+		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
+			// メッセージがない
+			if (!OnIdle(lCount)) {
+				// idle不要
+				if (SleepTick < 500) {	// 最大 501ms未満
+					SleepTick += 2;
+				}
+				lCount = 0;
+				Sleep(SleepTick);
+			} else {
+				// 要idle
+				SleepTick = 0;
+				lCount++;
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////
+
+	// TODO すでに閉じられている、この処理不要?
+	if (pCCtrlWindow) {
+		pCCtrlWindow->DestroyWindow();
+	}
+	pCCtrlWindow = NULL;
+	return ExitCode;
 }

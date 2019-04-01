@@ -32,6 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CCtrlApp:
 
+#if 0
 class CCtrlApp : public CWinApp
 {
 public:
@@ -49,3 +50,7 @@ public:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
+#endif
+
+HINSTANCE GetInstance();
+HWND GetHWND();
