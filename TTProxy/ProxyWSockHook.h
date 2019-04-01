@@ -1389,9 +1389,9 @@ private:
         static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         char buf[1024];
         int status_code;
-        if (sendToSocketFormat(s, strchr(realhost,':')?"CONNECT [%s]:%d HTTP/1.1\r\n":"CONNECT %s:%d HTTP/1.1\r\n", realhost, realport) == SOCKET_ERROR)
+        if (sendToSocketFormat(s, strchr((const char *)realhost,':')?"CONNECT [%s]:%d HTTP/1.1\r\n":"CONNECT %s:%d HTTP/1.1\r\n", (const char *)realhost, realport) == SOCKET_ERROR)
             return SOCKET_ERROR;
-        if (sendToSocketFormat(s, strchr(realhost,':')?"Host: [%s]:%d\r\n":"Host: %s:%d\r\n", realhost, realport) == SOCKET_ERROR)
+        if (sendToSocketFormat(s, strchr((const char *)realhost,':')?"Host: [%s]:%d\r\n":"Host: %s:%d\r\n", (const char *)realhost, realport) == SOCKET_ERROR)
             return SOCKET_ERROR;
         if (proxy.user != NULL) {
             int userlen = strlen(proxy.user);
@@ -1732,15 +1732,15 @@ private:
         while (!err) {
             switch (wait_for_prompt(s, prompt_table, countof(prompt_table), 10)) {
             case 0: /* Hostname prompt */
-                if (sendToSocketFormat(s, strchr(realhost,':')?"[%s]:%d\n":"%s:%d\n", realhost, realport) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, strchr((const char *)realhost,':')?"[%s]:%d\n":"%s:%d\n", (const char *)realhost, realport) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 1: /* Username prompt */
-                if (sendToSocketFormat(s, "%s\n", proxy.user) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, "%s\n", (const char *)proxy.user) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 2: /* Password prompt */
-                if (sendToSocketFormat(s, "%s\n", proxy.pass) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, "%s\n", (const char *)proxy.pass) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 3: /* Established message */

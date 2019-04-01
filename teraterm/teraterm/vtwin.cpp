@@ -395,7 +395,7 @@ void SetAutoConnectPort(int port)
 // (2007.9.30 yutaka)
 //
 // 例外コードを文字列へ変換する
-static char *GetExceptionString(int exception)
+static const char *GetExceptionString(DWORD exception)
 {
 #define EXCEPTION(x) case EXCEPTION_##x: return (#x);
 	static char buf[16];
