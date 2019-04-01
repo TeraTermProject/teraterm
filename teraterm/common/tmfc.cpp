@@ -616,10 +616,12 @@ LRESULT CALLBACK TTCDialog::WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM l
 void TTCDialog::DestroyWindow()
 {
 	if (m_hWnd != nullptr) {
+		HWND hWnd;
 		::EnableWindow(m_hParentWnd,TRUE);
 		::SetFocus(m_hParentWnd);
-		::DestroyWindow(m_hWnd);
+		hWnd = m_hWnd;
 		m_hWnd = nullptr;
+		::DestroyWindow(hWnd);
 	}
 }
 
