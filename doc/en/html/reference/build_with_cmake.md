@@ -1,47 +1,43 @@
-﻿# cmakeを使ったビルド
+﻿# How to build by using cmake
 
-- [cmake](<https://cmake.org/>)を使用して
-  ビルドすることができます(実験的な位置づけです)
+- You can build Tera Term by using [cmake](<https://cmake.org/>)(EXPERIMENTAL).
 
-## cmakeのバージョン
+## cmake version
 
-- Visual Studio 2005 をサポートしている cmake の最後のバージョンは 3.11.4 です
-- Visual Studio 2005 Express では ttpmacro.exe をビルドすることができません
-- Visual Studio 2005 (Expressも含む)以外を使用する場合は特に制限はありません
-- Visual Studio 2017 インストーラーで、オプションを選べば cmake をインストールできます
+- The final version of cmake supporting for Visual Studio 2005 is 3.11.4.
+- The ttpmacro.exe can not be built with Visual Studio 2005 Express.
+- This no restriction by using Visual Studio any version other than 2005(including Express).
+- When the cmake option is selected on Visual Studio 2017 installer, the cmake can be installed.
 
 ## MinGW (very experimental)
 
-- MinGW を使用してバイナリを生成することができます
-- 実験的位置づけです
-- MinGW では ttpmacro.exe をビルドすることができません
+- You can create the binary file by using MinGW.
+- EXPERIMENTAL
+- The ttpmacro.exe can not be built with MinGW.
 
-## ライブラリのビルド
+## How to build library
 
-- teraterm が使用するライブラリをビルドして準備しておきます
-- `lib/build_library_with_cmake.md` を参照してください
-- ライブラリは `develop.txt` を参照してください
+- You can prepare libraries used by Tera Term.
+- Refer to `lib/build_library_with_cmake.md`. 
+- Refet to `develop.txt`.
 
-## teratermのビルド
+## How to build Tera Term
 
-ソースツリーのトップから、次のようにコマンドを実行します。
+Please execute below commands on the top of source tree.
 
     mkdir build_vs2005
     cd build_vs2005
     ..\libs\cmake-3.11.4-win32-x86\bin\cmake.exe .. -G "Visual Studio 8 2005"
     ..\libs\cmake-3.11.4-win32-x86\bin\cmake.exe --build . --config release
 
-- `-G` オプションの後ろは使用する Visual Studio のバージョンに合わせて調整します
-- sln ファイルが生成されるので Visual Studio で開くことができます
-- パスが通っていれば cmake はフルパスで書く必要はありません
-- 生成された sln ファイルから起動したVisual Studioでビルドすると
-  CMakeLists.txt を変更を検出してプロジェクトファイルの再生成を自動で行うので
-  sln ファイルの生成を手動で行うのは最初の1回だけです
+- Change a string after `-G` option according to Visual Studio version.
+- The sln file is created, so the file can be opened with Visual Studio. 
+- If the cmake is included in path, you need not write the full path of cmake.
+- When Visual Studio is launched by sln file and is building, the Visual Studio can re-generate the project file after detecting changes to CMakeLists.txt. So, the sln file is manually created only once.
 
-## teratermのビルド(MinGW)
+## How to build Tera Term(MinGW)
 
-MinGWので使用できるcmakeを使って、
-ソースツリーのトップから、次のようにコマンドを実行します。
+Please execute below commands on the top of source tree by using the cmake available on MinGW.
 
     mkdir build_mingw_test
     cd build_mingw_test
