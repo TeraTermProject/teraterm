@@ -71,7 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="setupapi.lib"
+				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ADVAPI32.lib ole32.lib setupapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="setupapi.lib"
+				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ADVAPI32.lib ole32.lib setupapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
@@ -277,10 +277,6 @@
 			>
 			<File
 				RelativePath="ttpcmn-version.rc"
-				>
-			</File>
-			<File
-				RelativePath="ttpcmn.rc"
 				>
 			</File>
 		</Filter>

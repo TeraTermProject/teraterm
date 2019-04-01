@@ -1,6 +1,8 @@
 //Microsoft Developer Studio generated resource script.
 //
+#include <windows.h>
 #include "kc_res.h"
+#define IDC_STATIC 0
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
