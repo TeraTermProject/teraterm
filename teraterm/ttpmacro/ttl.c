@@ -3522,6 +3522,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 		// return 
 		//   0以上: 選択項目
 		//   -1: キャンセル
+		//	 -2: close
 		ret = OpenListDlg(Str1, Str2, s, sel);
 
 		for (i = 0 ; i < ary_size ; i++) {
@@ -3529,6 +3530,10 @@ int MessageCommand(int BoxId, LPWORD Err)
 		}
 		free(s);
 
+		// リストボックスの閉じるボタン(&確認ダイアログ)で、マクロの終了とする。
+		if (ret == -2) {
+			TTLStatus = IdTTLEnd;
+		}
 		return (ret);
 
 	}

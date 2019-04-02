@@ -37,13 +37,11 @@
 #include "ttmlib.h"
 #include "tmfc.h"
 #include "tttypes.h"
+#include "ttmacro.h"
 
 #include "statdlg.h"
 
 // CStatDlg dialog
-
-
-extern HINSTANCE GetInstance();
 
 BOOL CStatDlg::Create(PCHAR Text, PCHAR Title, int x, int y)
 {
@@ -73,7 +71,7 @@ void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
 	if (Text!=NULL) {
 		SIZE textSize;
 		HWND hWnd = GetDlgItem(IDC_STATTEXT);
-		CalcTextExtent2(hWnd, NULL, Text, &textSize);
+		CalcTextExtent(hWnd, NULL, Text, &textSize);
 		TW = textSize.cx + textSize.cx/10;	// (cx * (1+0.1)) ?
 		TH = textSize.cy;
 		s = textSize;			// TODO s!?

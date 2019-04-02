@@ -29,28 +29,5 @@
 
 /* TTMACRO.EXE, main */
 
-/////////////////////////////////////////////////////////////////////////////
-// CCtrlApp:
-
-#if 0
-class CCtrlApp : public CWinApp
-{
-public:
-	CCtrlApp();
-	BOOL Busy;
-
-	//{{AFX_VIRTUAL(CCtrlApp)
-	public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
-	virtual BOOL OnIdle(LONG lCount);
-	//}}AFX_VIRTUAL
-
-	//{{AFX_MSG(CCtrlApp)
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
-#endif
-
 HINSTANCE GetInstance();
 HWND GetHWND();

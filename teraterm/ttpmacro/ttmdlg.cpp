@@ -46,6 +46,8 @@
 #include "statdlg.h"
 #include "ListDlg.h"
 #include "ttmlib.h"
+#include "ttmacro.h"
+
 #include "ttmdlg.h"
 
 #ifdef _DEBUG
@@ -56,9 +58,6 @@
 #define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
-extern HINSTANCE GetInstance();
-extern HWND GetHWND();
 
 char HomeDir[MAXPATHLEN];
 char FileName[MAX_PATH];

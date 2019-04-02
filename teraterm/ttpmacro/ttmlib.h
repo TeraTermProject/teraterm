@@ -29,14 +29,17 @@
 
 // TTMACRO.EXE, misc routines
 
+#pragma once
+
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern char UILanguageFile[MAX_PATH];
 
-void CalcTextExtent(HDC DC, const char *Text, LPSIZE s);
-void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize);	// TODO name
+void CalcTextExtent(HWND hWnd, HFONT Font, const char *Text, LPSIZE s);
 void TTMGetDir(PCHAR Dir, int destlen);
 void TTMSetDir(PCHAR Dir);
 int GetAbsPath(PCHAR FName, int destlen);

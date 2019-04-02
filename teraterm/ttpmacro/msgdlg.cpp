@@ -39,6 +39,7 @@
 #include "dlglib.h"
 #include "ttmdlg.h"
 #include "ttmacro.h"
+#include "compat_win.h"
 
 #include "msgdlg.h"
 
@@ -81,7 +82,7 @@ BOOL CMsgDlg::OnInitDialog()
 
 	SetWindowText(TitleStr);
 	SetDlgItemText(IDC_MSGTEXT,TextStr);
-	CalcTextExtent2(GetDlgItem(IDC_STATTEXT), NULL, TextStr, &s);
+	CalcTextExtent(GetDlgItem(IDC_MSGTEXT), NULL, TextStr, &s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 
@@ -106,7 +107,7 @@ LRESULT CMsgDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	RECT R;
 
 	GetWindowRect(&R);
-	if (R.bottom-R.top == WH && R.right-R.left == WW) {
+		if (R.bottom-R.top == WH && R.right-R.left == WW) {
 		// ƒTƒCƒY‚ª•Ï‚í‚Á‚Ä‚¢‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
 	}
 	else if (R.bottom-R.top != WH || R.right-R.left < init_WW) {
@@ -206,6 +207,13 @@ LRESULT CMsgDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	switch(msg) {
 	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
+	case WM_DPICHANGED: {
+		RECT rect;
+		::GetWindowRect(m_hWnd, &rect);
+		WW = rect.right - rect.left;
+		WH = rect.bottom - rect.top;
+		break;
+	}
 	}
 	return FALSE;
 }

@@ -31,23 +31,21 @@
 
 #include <windowsx.h>
 #include <stdio.h>
+
 #include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
-
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "helpid.h"
-
-#include "errdlg.h"
 #include "ttmlib.h"
 #include "ttmparse.h"
 #include "htmlhelp.h"
 #include "dlglib.h"
+#include "ttmacro.h"
 
-extern HINSTANCE GetInstance();
-extern HWND GetHWND();
+#include "errdlg.h"
 
 // CErrDlg dialog
 

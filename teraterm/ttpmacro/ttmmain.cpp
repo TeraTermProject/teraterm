@@ -32,25 +32,21 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <stdio.h>
+
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmdlg.h"
 #include "ttl.h"
 #include "ttmparse.h"
 #include "ttmdde.h"
-
 #include "ttmmain.h"
 #include "ttmbuff.h"
 #include "ttmlib.h"
 #include "dlglib.h"
-
 #include "ttlib.h"
-
 #include "wait4all.h"
-
 #include "tmfc.h"
-
-extern HINSTANCE GetInstance();
+#include "ttmacro.h"
 
 static void ClientToScreen(HWND hWnd, RECT *rect)
 {
