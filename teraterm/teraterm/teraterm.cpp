@@ -109,7 +109,9 @@ static void init()
 	DLLInit();
 	WinCompatInit();
 #if defined(DPIAWARENESS)
-	if (pSetThreadDpiAwarenessContext) {
+	//SetProcessDPIAware();
+	if (pSetThreadDpiAwarenessContext != NULL) {
+		// Windows 10 Version 1703à»ç~ÇÃèÍçá?
 		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 #endif

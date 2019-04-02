@@ -101,7 +101,6 @@ int NumOfLines, NumOfColumns;
 int PageStart, BuffEnd;
 
 static BOOL CursorOnDBCS = FALSE;
-static LOGFONT VTlf;
 static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
@@ -157,36 +156,36 @@ typedef struct _BGSrc
   char       fileTmp[MAX_PATH];
 }BGSrc;
 
-BGSrc BGDest;
-BGSrc BGSrc1;
-BGSrc BGSrc2;
+static BGSrc BGDest;
+static BGSrc BGSrc1;
+static BGSrc BGSrc2;
 
 int  BGEnable;
-int  BGReverseTextAlpha;
-int  BGUseAlphaBlendAPI;
+static int  BGReverseTextAlpha;
+static int  BGUseAlphaBlendAPI;
 BOOL BGNoFrame;
-BOOL BGFastSizeMove;
+static BOOL BGFastSizeMove;
 
-char BGSPIPath[MAX_PATH];
+static char BGSPIPath[MAX_PATH];
 
-COLORREF BGVTColor[2];
-COLORREF BGVTBoldColor[2];
-COLORREF BGVTBlinkColor[2];
-COLORREF BGVTReverseColor[2];
+static COLORREF BGVTColor[2];
+static COLORREF BGVTBoldColor[2];
+static COLORREF BGVTBlinkColor[2];
+static COLORREF BGVTReverseColor[2];
 /* begin - ishizaki */
-COLORREF BGURLColor[2];
+static COLORREF BGURLColor[2];
 /* end - ishizaki */
 
-RECT BGPrevRect;
-BOOL BGReverseText;
+static RECT BGPrevRect;
+static BOOL BGReverseText;
 
 BOOL   BGNoCopyBits;
-BOOL   BGInSizeMove;
-HBRUSH BGBrushInSizeMove;
+static BOOL   BGInSizeMove;
+static HBRUSH BGBrushInSizeMove;
 
-HDC hdcBGWork;
-HDC hdcBGBuffer;
-HDC hdcBG;
+static HDC hdcBGWork;
+static HDC hdcBGBuffer;
+static HDC hdcBG;
 
 typedef struct tagWallpaperInfo
 {
@@ -1944,108 +1943,122 @@ void DispConvScreenToWin
        *Yw = (Ys - WinOrgY) * FontHeight;
 }
 
-void SetLogFont()
+static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
 {
-  memset(&VTlf, 0, sizeof(LOGFONT));
-  VTlf.lfWeight = FW_NORMAL;
-  VTlf.lfItalic = 0;
-  VTlf.lfUnderline = 0;
-  VTlf.lfStrikeOut = 0;
-  VTlf.lfWidth = ts.VTFontSize.x;
-  VTlf.lfHeight = ts.VTFontSize.y;
-  VTlf.lfCharSet = ts.VTFontCharSet;
-  VTlf.lfOutPrecision  = OUT_CHARACTER_PRECIS;
-  VTlf.lfClipPrecision = CLIP_CHARACTER_PRECIS;
-  VTlf.lfQuality       = (BYTE)ts.FontQuality;
-  VTlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
-  strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),ts.VTFont, _TRUNCATE);
+  memset(VTlf, 0, sizeof(*VTlf));
+  VTlf->lfWeight = FW_NORMAL;
+  VTlf->lfItalic = 0;
+  VTlf->lfUnderline = 0;
+  VTlf->lfStrikeOut = 0;
+  VTlf->lfWidth = ts.VTFontSize.x;
+  VTlf->lfHeight = ts.VTFontSize.y;
+  VTlf->lfCharSet = ts.VTFontCharSet;
+  VTlf->lfOutPrecision  = OUT_CHARACTER_PRECIS;
+  VTlf->lfClipPrecision = CLIP_CHARACTER_PRECIS;
+  VTlf->lfQuality       = (BYTE)ts.FontQuality;
+  VTlf->lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
+  strncpy_s(VTlf->lfFaceName, sizeof(VTlf->lfFaceName),ts.VTFont, _TRUNCATE);
+#if 1
+  if (mul) {
+	  UINT uDpi;
+	  if (pGetDpiForWindow == NULL) {
+		  HDC TmpDC = GetDC(HVTWin);
+		  uDpi = GetDeviceCaps(TmpDC,LOGPIXELSY);	// ‚¢‚Â‚à96‚ð•Ô‚·?
+		  ReleaseDC(HVTWin,TmpDC);
+	  } else {
+		  uDpi = pGetDpiForWindow(HVTWin);
+	  }
+	  VTlf->lfWidth = -MulDiv(VTlf->lfWidth, uDpi, 96);
+	  VTlf->lfHeight = -MulDiv(VTlf->lfHeight, uDpi, 96);
+  }
+#endif
 }
 
 void ChangeFont()
 {
-  int i, j;
-  TEXTMETRIC Metrics;
-  HDC TmpDC;
+	int i, j;
+	TEXTMETRIC Metrics;
+	LOGFONTA VTlf;
 
-  /* Delete Old Fonts */
-  for (i = 0 ; i <= AttrFontMask ; i++)
-  {
-    for (j = i+1 ; j <= AttrFontMask ; j++)
-      if (VTFont[j]==VTFont[i])
-        VTFont[j] = 0;
-    if (VTFont[i]!=0)
-      DeleteObject(VTFont[i]);
-  }
+	/* Delete Old Fonts */
+	for (i = 0 ; i <= AttrFontMask ; i++)
+	{
+		for (j = i+1 ; j <= AttrFontMask ; j++)
+			if (VTFont[j]==VTFont[i])
+				VTFont[j] = 0;
+		if (VTFont[i]!=0)
+			DeleteObject(VTFont[i]);
+	}
 
-  /* Normal Font */
-  SetLogFont();
-  VTFont[0] = CreateFontIndirect(&VTlf);
+	{
+		HDC TmpDC = GetDC(HVTWin);
 
-  /* set IME font */
-  SetConversionLogFont(HVTWin, &VTlf);
+		/* Normal Font */
+		SetLogFont(&VTlf, TRUE);
+		VTFont[0] = CreateFontIndirect(&VTlf);
 
-  TmpDC = GetDC(HVTWin);
+		/* set IME font */
+		SetConversionLogFont(HVTWin, &VTlf);
 
-  SelectObject(TmpDC, VTFont[0]);
-  GetTextMetrics(TmpDC, &Metrics);
-  FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-  FontHeight = Metrics.tmHeight + ts.FontDH;
+		SelectObject(TmpDC, VTFont[0]);
+		GetTextMetrics(TmpDC, &Metrics);
+		FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+		FontHeight = Metrics.tmHeight + ts.FontDH;
 
-  ReleaseDC(HVTWin,TmpDC);
+		ReleaseDC(HVTWin,TmpDC);
+	}
 
-  /* Underline */
-  VTlf.lfUnderline = 1;
-  VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
+	/* Underline */
+	VTlf.lfUnderline = 1;
+	VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
 
-  if (ts.FontFlag & FF_BOLD) {
-    /* Bold */
-    VTlf.lfUnderline = 0;
-    VTlf.lfWeight = FW_BOLD;
-    VTFont[AttrBold] = CreateFontIndirect(&VTlf);
-    /* Bold + Underline */
-    VTlf.lfUnderline = 1;
-    VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
-  }
-  else {
-    VTFont[AttrBold] = VTFont[AttrDefault];
-    VTFont[AttrBold | AttrUnder] = VTFont[AttrUnder];
-  }
+	if (ts.FontFlag & FF_BOLD) {
+		/* Bold */
+		VTlf.lfUnderline = 0;
+		VTlf.lfWeight = FW_BOLD;
+		VTFont[AttrBold] = CreateFontIndirect(&VTlf);
+		/* Bold + Underline */
+		VTlf.lfUnderline = 1;
+		VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+	}
+	else {
+		VTFont[AttrBold] = VTFont[AttrDefault];
+		VTFont[AttrBold | AttrUnder] = VTFont[AttrUnder];
+	}
 
-  /* Special font */
-  VTlf.lfWeight = FW_NORMAL;
-  VTlf.lfUnderline = 0;
-  VTlf.lfWidth = FontWidth + 1; /* adjust width */
-  VTlf.lfHeight = FontHeight;
-  VTlf.lfCharSet = SYMBOL_CHARSET;
+	/* Special font */
+	VTlf.lfWeight = FW_NORMAL;
+	VTlf.lfUnderline = 0;
+	VTlf.lfWidth = FontWidth + 1; /* adjust width */
+	VTlf.lfHeight = FontHeight;
+	VTlf.lfCharSet = SYMBOL_CHARSET;
 
-  strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),"Tera Special", _TRUNCATE);
-  VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
+	strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),"Tera Special", _TRUNCATE);
+	VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
 
-  /* Special font (Underline) */
-  VTlf.lfUnderline = 1;
-  VTlf.lfHeight = FontHeight - 1; // adjust for underline
-  VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
+	/* Special font (Underline) */
+	VTlf.lfUnderline = 1;
+	VTlf.lfHeight = FontHeight - 1; // adjust for underline
+	VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
 
-  if (ts.FontFlag & FF_BOLD) {
-    /* Special font (Bold) */
-    VTlf.lfUnderline = 0;
-    VTlf.lfHeight = FontHeight;
-    VTlf.lfWeight = FW_BOLD;
-    VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
-    /* Special font (Bold + Underline) */
-    VTlf.lfUnderline = 1;
-    VTlf.lfHeight = FontHeight - 1; // adjust for underline
-    VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
-  }
-  else {
-    VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
-    VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
-  }
+	if (ts.FontFlag & FF_BOLD) {
+		/* Special font (Bold) */
+		VTlf.lfUnderline = 0;
+		VTlf.lfHeight = FontHeight;
+		VTlf.lfWeight = FW_BOLD;
+		VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
+		/* Special font (Bold + Underline) */
+		VTlf.lfUnderline = 1;
+		VTlf.lfHeight = FontHeight - 1; // adjust for underline
+		VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+	}
+	else {
+		VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
+		VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
+	}
 
-  SetLogFont();
-
-  for (i = 0 ; i < TermWidthMax; i++)
-    Dx[i] = FontWidth;
+	for (i = 0 ; i < TermWidthMax; i++)
+		Dx[i] = FontWidth;
 }
 
 void ResetIME()
@@ -2069,8 +2082,11 @@ void ResetIME()
 
 		if (ts.UseIME>0)
 		{
-			if (ts.IMEInline>0)
+			if (ts.IMEInline>0) {
+				LOGFONTA VTlf;
+				SetLogFont(&VTlf, TRUE);
 				SetConversionLogFont(HVTWin, &VTlf);
+			}
 			else
 				SetConversionWindow(HVTWin,-1,0);
 		}
@@ -2510,8 +2526,8 @@ void DispChangeWin()
     ANSIColor[IdBack ]   = ts.VTColor[1];
 
 #ifdef ALPHABLEND_TYPE2
-      ANSIColor[IdFore ]   = BGVTColor[0];
-     ANSIColor[IdBack ]   = BGVTColor[1];
+	ANSIColor[IdFore ]   = BGVTColor[0];
+	ANSIColor[IdBack ]   = BGVTColor[1];
 #endif  // ALPHABLEND_TYPE2
 
   }
@@ -3357,10 +3373,11 @@ void DispSetupFontDlg()
 //  reset window
 {
   BOOL Ok;
+  LOGFONTA VTlf;
 
   ts.VTFlag = 1;
   if (! LoadTTDLG()) return;
-  SetLogFont();
+  SetLogFont(&VTlf, FALSE);
   Ok = ChooseFontDlg(HVTWin,&VTlf,&ts);
   FreeTTDLG();
   if (! Ok) return;
