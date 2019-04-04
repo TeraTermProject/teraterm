@@ -136,7 +136,7 @@ set(SRC
   teraterm.manifest
   #
   svnversion.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
   #
   ${COMMON_SRC}
   ${TTDLG_SRC}
@@ -197,10 +197,6 @@ add_dependencies(
   ttptek
   )
 
-configure_file(
-  svnversion.h.in
-  svnversion.h @ONLY)
-
 # copy .lng files
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
   add_custom_target(
@@ -260,4 +256,4 @@ endif()
 ####
 configure_file(
   svnversion.h.in
-  svnversion.h @ONLY)
+  ../ttpdlg/svnversion.h @ONLY)

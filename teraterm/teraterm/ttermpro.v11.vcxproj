@@ -88,6 +88,10 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
+      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -128,6 +132,10 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\dlglib.c" />
@@ -187,6 +195,9 @@
     <ClInclude Include="ttfileio.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\svnrev\svnrev.v11.vcxproj">
+      <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v11.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

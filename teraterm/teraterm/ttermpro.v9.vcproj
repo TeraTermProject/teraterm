@@ -26,6 +26,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="creating &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
+				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -49,7 +51,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)ttpfile"
+				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
 				BrowseInformation="0"
@@ -117,6 +119,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="creating &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
+				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -141,7 +145,7 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)ttpfile"
+				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
