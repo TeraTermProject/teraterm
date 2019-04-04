@@ -2161,10 +2161,11 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				// 1912 = VS2017 update5(VC++15)
 				// 1913 = VS2017 update6(VC++15)
 				// 1914 = VS2017 15.7(VC++15)
+				// 1920 = VS2019 16.0.0(VC++16)
 				// VS2017 Update3から製品バージョンが3桁表記(15.x.x)になり、
 				// _MSC_FULL_VERから算出できなくなったため、一律で15.0とする。
 				if (msc_low_ver >= 10) {
-					vs_ver = msc_ver - 4;
+					vs_ver = msc_ver - 4 + (msc_low_ver - 10)/10;
 					msc_low_ver = 0;
 				} 
 				else {
