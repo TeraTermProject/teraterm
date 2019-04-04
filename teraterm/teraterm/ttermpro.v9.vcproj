@@ -216,11 +216,19 @@
 				>
 			</File>
 			<File
-				RelativePath="dnddlg.cpp"
+				RelativePath="..\common\dlglib.c"
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib.c"
+				RelativePath="..\common\dlglib_cpp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_tmpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="dnddlg.cpp"
 				>
 			</File>
 			<File
@@ -240,10 +248,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\stdafx.cpp"
-				>
-			</File>
-			<File
 				RelativePath="tekwin.cpp"
 				>
 			</File>
@@ -253,6 +257,18 @@
 			</File>
 			<File
 				RelativePath="teraterm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc_frame.cpp"
 				>
 			</File>
 			<File
@@ -317,7 +333,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\codeconv.cpp"
+				>
+			</File>
+			<File
 				RelativePath="commlib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\compat_win.cpp"
 				>
 			</File>
 			<File
@@ -334,6 +358,10 @@
 			</File>
 			<File
 				RelativePath="telnet.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tipwin.cpp"
 				>
 			</File>
 			<File
@@ -400,10 +428,6 @@
 				RelativePath="..\common\dllutil.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\common\codeconv.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -431,6 +455,30 @@
 			</File>
 			<File
 				RelativePath="..\common\win16api.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ttdlg"
+			>
+			<File
+				RelativePath="..\ttpdlg\dlg_res.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\svnversion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\ttdlg.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\ttdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\ttpdlg.rc"
 				>
 			</File>
 		</Filter>
