@@ -29,6 +29,7 @@
 /* IPv6 modification is Copyright(C) 2000 Jun-ya Kato <kato@win6.jp> */
 
 /* TTDLG.DLL, dialog boxes */
+#include "teraterm_conf.h"
 #include "teraterm.h"
 #include <stdio.h>
 #include <string.h>

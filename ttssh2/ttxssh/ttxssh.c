@@ -33,6 +33,7 @@
    Tera Term by Takashi Teranishi (teranishi@rikaxp.riken.go.jp)
 */
 
+#include "teraterm_conf.h"
 #include "ttxssh.h"
 #include "fwdui.h"
 #include "util.h"
@@ -79,6 +80,7 @@ static char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 #include "sftp.h"
 
 #include "compat_w95.h"
+#include "compat_win.h"
 
 #include "libputty.h"
 
@@ -2404,11 +2406,13 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	SendMessage(GetDlgItem(dlg, IDC_PUTTY_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 }
 
+#if 0
 // WM_MOUSEWHEEL は winuser.h ヘッダで宣言されていますが、#define _WIN32_WINNT 0x0400 が宣言されていないと認識されません。
-#define WM_MOUSEWHEEL                   0x020A
+#define WM_MOUSEWHEEL                   0x020A1
 #define WHEEL_DELTA                     120
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 #define GET_KEYSTATE_WPARAM(wParam)     (LOWORD(wParam))
+#endif
 
 static WNDPROC g_defAboutDlgEditWndProc;  // Edit Controlのサブクラス化用
 static int g_deltaSumAboutDlg = 0;        // マウスホイールのDelta累積用

@@ -29,6 +29,7 @@
 /*
  * Additional settings dialog
  */
+#include "teraterm_conf.h"
 
 #include <stdio.h>
 #include <tchar.h>

@@ -29,6 +29,8 @@
 
 /* TERATERM.EXE, main */
 
+#include "teraterm_conf.h"
+
 #include <crtdbg.h>
 #include <tchar.h>
 #include "teraterm.h"

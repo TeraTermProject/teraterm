@@ -30,6 +30,7 @@
 
 /* TERATERM.EXE, VT window */
 
+#include "teraterm_conf.h"
 #include "teraterm.h"
 #include "tttypes.h"
 
@@ -4706,11 +4707,9 @@ void CVTWindow::OnSetupDlgFont()
 		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
 		CF_SHOWHELP | CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
-#if (WINVER >= _WIN32_WINNT_WIN7) && defined(CF_INACTIVEFONTS)
 	if (IsWindows7OrLater() && ts.ListHiddenFonts) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
-#endif
 	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;

@@ -46,6 +46,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "teraterm_conf.h"
+
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>
@@ -392,7 +394,7 @@ static const IID IID_IShellLink = {
     0x000214ee, 0x0000, 0x0000, {0xc0,0x00,0x00,0x00,0x00,0x00,0x00,0x46}
 };
 #endif
-#if (NTDDI_VERSION < NTDDI_WIN7)
+#if (_WIN32_WINNT < 0x0601)		// _WIN32_WINNT_WIN7
 static const IID IID_ICustomDestinationList = {
     0x6332debf, 0x87b5, 0x4670, {0x90,0xc0,0x5e,0x57,0xb4,0x08,0xa4,0x9e}
 };
