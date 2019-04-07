@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
@@ -73,11 +73,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib onig_s.lib SFMT.lib iphlpapi.lib"
+				AdditionalDependencies="LIBCMT.lib onig_s.lib SFMT.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
-				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -112,7 +111,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
@@ -162,11 +161,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib onig_sd.lib SFMTd.lib iphlpapi.lib"
+				AdditionalDependencies="LIBCMTD.lib onig_sd.lib SFMTd.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;LIBCMTD.lib"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
