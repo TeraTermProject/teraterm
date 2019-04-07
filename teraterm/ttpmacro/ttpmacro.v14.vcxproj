@@ -127,8 +127,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
+    <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
     <ClCompile Include="..\common\i18n.c" />
-    <ClCompile Include="..\common\stdafx.cpp" />
+    <ClCompile Include="..\common\tmfc.cpp" />
+    <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="errdlg.cpp" />
@@ -150,6 +156,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\codeconv.h" />
+    <ClInclude Include="..\common\compat_win.h" />
+    <ClInclude Include="..\common\dlglib.h" />
+    <ClInclude Include="..\common\dllutil.h" />
+    <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="..\common\win16api.h" />
@@ -159,7 +169,6 @@
     <ClInclude Include="ListDlg.h" />
     <ClInclude Include="msgdlg.h" />
     <ClInclude Include="statdlg.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="ttl.h" />
     <ClInclude Include="ttmacro.h" />
     <ClInclude Include="ttmbuff.h" />

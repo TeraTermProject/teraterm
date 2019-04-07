@@ -209,6 +209,26 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\compat_win.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_cpp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_tmpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.cpp"
+				>
+			</File>
+			<File
 				RelativePath="errdlg.cpp"
 				>
 			</File>
@@ -229,7 +249,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\stdafx.cpp"
+				RelativePath="..\common\tmfc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc_frame.cpp"
 				>
 			</File>
 			<File
@@ -251,6 +275,14 @@
 			>
 			<File
 				RelativePath="..\common\codeconv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\compat_win.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.h"
 				>
 			</File>
 			<File
@@ -279,6 +311,10 @@
 			</File>
 			<File
 				RelativePath="stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.h"
 				>
 			</File>
 			<File
@@ -351,6 +387,10 @@
 				>
 			</File>
 			<File
+				RelativePath="ttmacro_3d.ico"
+				>
+			</File>
+			<File
 				RelativePath="ttpmacro.rc"
 				>
 				<FileConfiguration
@@ -377,6 +417,10 @@
 			Name="Source Files (C)"
 			Filter="c"
 			>
+			<File
+				RelativePath="fileread.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\common\i18n.c"
 				>
@@ -415,10 +459,6 @@
 			</File>
 			<File
 				RelativePath="..\common\win16api.c"
-				>
-			</File>
-			<File
-				RelativePath="fileread.cpp"
 				>
 			</File>
 		</Filter>
