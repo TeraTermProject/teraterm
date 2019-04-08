@@ -1,5 +1,5 @@
 /*
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,15 @@
 /* Routines for dialog boxes */
 
 #include <windows.h>
+#include <crtdbg.h>
+
 #include "dlglib.h"
 #include "ttlib.h"
+
+#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
+#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#endif
 
 // ダイアログモーダル状態の時、OnIdle()を実行する
 //#define ENABLE_CALL_IDLE_MODAL	1

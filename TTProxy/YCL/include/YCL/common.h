@@ -16,6 +16,7 @@
 #include <windows.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <crtdbg.h>
 
 #ifndef countof
 #define countof(a) (sizeof (a) / sizeof (a)[0])
@@ -75,21 +76,10 @@ inline bool YclAssert(bool condition, const char* message) {
 #define YCLASSERT(condition, message) if (YclAssert(condition, message)) {__asm { int 3 }}
 #define YCLVERIFY(condition, message) if (YclAssert(condition, message)) {__asm { int 3 }}
 
-#ifdef __cplusplus
-extern "C" {
-#endif//__cplusplus
-void* _malloc_dbg(size_t length, const char* filename, int lineno);
-void* _realloc_dbg(void* pointer, size_t length, const char* filename, int lineno);
-void* _calloc_dbg(size_t num, size_t size, const char* filename, int lineno);
-void _free_dbg(void* pointer, const char* filename, int lineno);
-#ifdef __cplusplus
-}
-#endif//__cplusplus
-
-#define malloc(l)     _malloc_dbg((l), __FILE__, __LINE__)
-#define realloc(p, l) _realloc_dbg((p), (l), __FILE__, __LINE__)
-#define calloc(c, s)  _calloc_dbg((c), (s), __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), __FILE__, __LINE__)
+#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
 
 //}
 #else
