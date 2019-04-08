@@ -149,7 +149,7 @@ include_directories(
   ${SFMT_INCLUDE_DIRS}
   ${ONIGURUMA_INCLUDE_DIRS}
   .
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg
   )
 
 link_directories(
