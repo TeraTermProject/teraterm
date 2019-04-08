@@ -140,7 +140,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\teraterm\common\dlglib.c" />
+    <ClCompile Include="..\..\teraterm\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\..\teraterm\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\..\teraterm\common\tipwin.cpp" />
+    <ClCompile Include="..\..\teraterm\common\ttlib.c" />
     <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c" />
     <ClCompile Include="..\matcher\matcher.c" />
     <ClCompile Include="arc4random.c" />

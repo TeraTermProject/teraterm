@@ -452,7 +452,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\dlglib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\dlglib_cpp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\dlglib_tmpl.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\teraterm\common\tipwin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\ttlib.c"
 				>
 			</File>
 			<File
