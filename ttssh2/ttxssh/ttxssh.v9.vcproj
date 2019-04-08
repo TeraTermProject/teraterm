@@ -451,6 +451,10 @@
 				>
 			</File>
 			<File
+			<File
+				RelativePath="..\..\teraterm\common\tipwin.cpp"
+				>
+			</File>
 				RelativePath="x11util.c"
 				>
 			</File>
