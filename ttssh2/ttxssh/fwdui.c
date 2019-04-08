@@ -37,11 +37,19 @@ See LICENSE.TXT for the license.
 #include "resource.h"
 #include "x11util.h"
 #include "util.h"
+#include "dlglib.h"
 
 #include "servicenames.h"
 
-static HFONT DlgFwdEditFont;
-static HFONT DlgFwdFont;
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
+
+//static HFONT DlgFwdEditFont;
+//static HFONT DlgFwdFont;
 
 typedef struct {
 	FWDRequestSpec *spec;
@@ -975,8 +983,8 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 {
 	FWDEditClosure *closure;
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 	BOOL result;
 
 	switch (msg) {
@@ -986,7 +994,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		pvar = closure->pvar;
 		init_fwd_edit_dlg(pvar, closure->spec, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgFwdEditFont, pvar)) {
@@ -1017,6 +1025,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgFwdEditFont = NULL;
 		}
+#endif
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
@@ -1028,20 +1037,22 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			result = end_fwd_edit_dlg(closure->pvar, closure->spec, dlg);
 
 			if (result) {
+#if 0
 				if (DlgFwdEditFont != NULL) {
 					DeleteObject(DlgFwdEditFont);
 				}
+#endif
 			}
 
 			return result;
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgFwdEditFont != NULL) {
 				DeleteObject(DlgFwdEditFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_SSHFWDLOCALTOREMOTE:
@@ -1140,8 +1151,8 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                   LPARAM lParam)
 {
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 	BOOL ret;
 
 	switch (msg) {
@@ -1150,7 +1161,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLong(dlg, DWL_USER, lParam);
 
 		init_fwd_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgFwdFont, pvar)) {
@@ -1167,7 +1178,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgFwdFont = NULL;
 		}
-
+#endif
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -1177,21 +1188,21 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDOK:
 
 			ret = end_fwd_dlg(pvar, dlg);
-
+#if 0
 			if (ret == TRUE && DlgFwdFont != NULL) {
 				DeleteObject(DlgFwdFont);
 			}
-
+#endif
 			return ret;
 
 		case IDCANCEL:
 			free_all_listbox_specs(dlg);
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgFwdFont != NULL) {
 				DeleteObject(DlgFwdFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_ADD:

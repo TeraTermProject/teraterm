@@ -14,7 +14,11 @@ set(COMMON_SRC
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
   ../../teraterm/common/ttlib.h
+  ../../teraterm/common/ttlib.c
   ../../teraterm/common/dlglib.h
+  ../../teraterm/common/dlglib.c
+  ../../teraterm/common/dlglib_cpp.cpp
+  ../../teraterm/common/dlglib_tmpl.cpp
   ../../teraterm/common/servicenames.h
   ../../teraterm/common/codeconv.cpp
   ../../teraterm/common/codeconv.h

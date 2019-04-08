@@ -54,6 +54,7 @@
 #include "fwd.h"
 #include "sftp.h"
 #include "kex.h"
+#include "dlglib.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -7350,9 +7351,9 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 	char new_passwd[PASSWD_MAXLEN];
 	char retype_passwd[PASSWD_MAXLEN];
 	static struct change_password *cp;
-	LOGFONT logfont;
-	HFONT font;
-	static HFONT DlgChgPassFont;
+//	LOGFONT logfont;
+//	HFONT font;
+//	static HFONT DlgChgPassFont;
 	char uimsg[MAX_UIMSG];
 	static PTInstVar pvar;
 
@@ -7362,6 +7363,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 		cp = (struct change_password *)lParam;
 		pvar = cp->pvar;
 
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 
@@ -7371,6 +7373,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 		else {
 			DlgChgPassFont = NULL;
 		}
+#endif
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_PASSCHG_TITLE", pvar, uimsg);
@@ -7420,24 +7423,24 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 			strncpy_s(cp->new_passwd, sizeof(cp->new_passwd), new_passwd, _TRUNCATE);
 
 			EndDialog(dlg, 1); // dialog close
-
+#if 0
 			if (DlgChgPassFont != NULL) {
 				DeleteObject(DlgChgPassFont);
 				DlgChgPassFont = NULL;
 			}
-
+#endif
 			return TRUE;
 
 		case IDCANCEL:
 			// ê⁄ë±ÇêÿÇÈ
                         notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0); // dialog close
-
+#if 0
 			if (DlgChgPassFont != NULL) {
 				DeleteObject(DlgChgPassFont);
 				DlgChgPassFont = NULL;
 			}
-
+#endif
 			return TRUE;
 		}
 	}
@@ -8196,6 +8199,8 @@ static int is_canceled_window(HWND hd)
 		return 0;
 }
 
+/* dlglib Ç…ëSÇ≠ìØÇ∂Ç‡ÇÃÇ™Ç†ÇÈÇÃÇ≈ÇªÇøÇÁÇóòópÇ∑ÇÈ */
+#if 0
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 	HWND HProg;
 	HProg = GetDlgItem(HDlg, id_Progress);
@@ -8208,6 +8213,7 @@ void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 
 	return;
 }
+#endif
 
 static unsigned __stdcall ssh_scp_thread(void *p)
 {

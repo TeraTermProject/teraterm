@@ -32,6 +32,7 @@
 #include "ssh.h"
 #include "key.h"
 #include "ttlib.h"
+#include "dlglib.h"
 
 #include <io.h>
 #include <fcntl.h>
@@ -47,9 +48,16 @@
 
 #define MAX_AUTH_CONTROL IDC_SSHUSEPAGEANT
 
-static HFONT DlgAuthFont;
-static HFONT DlgTisFont;
-static HFONT DlgAuthSetupFont;
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
+
+//static HFONT DlgAuthFont;
+//static HFONT DlgTisFont;
+//static HFONT DlgAuthSetupFont;
 
 void destroy_malloced_string(char **str)
 {
@@ -702,9 +710,11 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	EndDialog(dlg, 1);
+#if 0
 	if (DlgAuthFont != NULL) {
 		DeleteObject(DlgAuthFont);
 	}
+#endif
 
 	return TRUE;
 }
@@ -758,8 +768,8 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	const int IDC_TIMER3 = 302; // challenge で ask4passwd でCheckAuthListFirst が FALSE のとき
 	const int autologin_timeout = 10; // ミリ秒
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -768,7 +778,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLong(dlg, DWL_USER, lParam);
 
 		init_auth_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgAuthFont, pvar)) {
@@ -797,7 +807,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgAuthFont = NULL;
 		}
-
+#endif
 		// SSH2 autologinが有効の場合は、タイマを仕掛ける。 (2004.12.1 yutaka)
 		if (pvar->ssh2_autologin == 1) {
 			autologin_sent_none = FALSE;
@@ -943,11 +953,11 @@ canceled:
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgAuthFont != NULL) {
 				DeleteObject(DlgAuthFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_SSHUSERNAME:
@@ -1227,8 +1237,8 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                   LPARAM lParam)
 {
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1237,7 +1247,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLong(dlg, DWL_USER, lParam);
 
 		init_TIS_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgTisFont, pvar)) {
@@ -1250,7 +1260,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgTisFont = NULL;
 		}
-
+#endif
 		// /auth=challenge を追加 (2007.10.5 maya)
 		if (pvar->ssh2_autologin == 1) {
 			SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
@@ -1264,21 +1274,22 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
+#if 0
 			if (DlgTisFont != NULL) {
 				DeleteObject(DlgTisFont);
 			}
-
+#endif
 			return end_TIS_dlg(pvar, dlg);
 
 		case IDCANCEL:			/* kill the connection */
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgTisFont != NULL) {
 				DeleteObject(DlgTisFont);
 			}
-
+#endif
 			return TRUE;
 
 		default:
@@ -1449,8 +1460,8 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 										   WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1458,7 +1469,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 		SetWindowLong(dlg, DWL_USER, lParam);
 
 		init_default_auth_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgAuthSetupFont, pvar)) {
@@ -1483,7 +1494,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 		else {
 			DlgAuthSetupFont = NULL;
 		}
-
+#endif
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -1491,20 +1502,20 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
-
+#if 0
 			if (DlgAuthSetupFont != NULL) {
 				DeleteObject(DlgAuthSetupFont);
 			}
-
+#endif
 			return end_default_auth_dlg(pvar, dlg);
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgAuthSetupFont != NULL) {
 				DeleteObject(DlgAuthSetupFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_CHOOSERSAFILE:
