@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="arc4random.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="auth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="chacha.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cipher-ctr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="crypt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_bcrypt_pbkdf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_blocks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_blowfish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_fe25519.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_ge25519.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_hash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_sc25519.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ed25519_verify.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fwd-socks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fwd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fwdui.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hosts.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="key.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="keyfiles.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\matcher\matcher.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pkt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sftp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttxssh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="x11util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\teraterm\common\tipwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="arc4random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="chacha.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttxssh-version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttxssh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="auth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cipher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="crypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ed25519_blf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ed25519_crypto_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ed25519_fe25519.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ed25519_ge25519.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ed25519_sc25519.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fwd-socks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fwdui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hosts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="key.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keyfiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pkt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sftp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="x11util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="ttsecure.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ttsecure_green.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ttsecure_yellow.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{bde719e1-d3ce-4efc-8f42-050f934c5441}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1402d13d-e827-4c6c-b334-555b8a086ca7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{198016f0-824a-4e67-b7ee-51cbf3e2b34f}</UniqueIdentifier>
+      <Extensions>ico;rc</Extensions>
+    </Filter>
+    <Filter Include="Def File">
+      <UniqueIdentifier>{95d60503-2363-4800-9a4c-add18d0c56e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttxssh-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttxssh.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ttxssh.def">
+      <Filter>Def File</Filter>
+    </None>
+  </ItemGroup>
+</Project>

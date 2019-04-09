@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{924f64f3-99d1-4df3-a201-68b1b1a000c5}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{a572c283-2f72-45e8-8e83-9b17b3960cb5}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{51ae6c43-0b05-42b4-881b-b0b848091d1b}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Source Files %28C%29">
+      <UniqueIdentifier>{1744405b-5e2a-4278-ac2e-19f0db3d82d1}</UniqueIdentifier>
+      <Extensions>c</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="errdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="inpdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ListDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="msgdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="statdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmacro.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\i18n.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttl.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ttlib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmbuff.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmdde.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmenc.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmlib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmparse.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="wait4all.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\win16api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\codeconv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fileread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib_tmpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib_cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\compat_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dllutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="errdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inpdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="msgdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="statdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttddecmnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttm_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmacro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmbuff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmdde.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmenc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\win16api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\codeconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fileread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tmfc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dlglib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\compat_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dllutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="ttmacro.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttm-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttpmacro.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

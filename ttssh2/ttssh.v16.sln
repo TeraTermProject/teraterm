@@ -1,0 +1,45 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matcher", "matcher\matcher.v16.vcxproj", "{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttssh", "ttssh\ttssh.v16.vcxproj", "{3D8EF809-7131-4AB2-B442-032A8F49DE33}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttxssh", "ttxssh\ttxssh.v16.vcxproj", "{5638BB89-44E3-4D55-BA98-A01142B4223E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "putty", "putty\putty.v16.vcxproj", "{98CA1284-8F6C-4791-BF57-7E5FAD33744E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "puttyrev", "puttyrev\puttyrev.v16.vcxproj", "{61EB955F-2794-4607-860F-0AA296FA58BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}.Debug|Win32.Build.0 = Debug|Win32
+		{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}.Release|Win32.ActiveCfg = Release|Win32
+		{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}.Release|Win32.Build.0 = Release|Win32
+		{3D8EF809-7131-4AB2-B442-032A8F49DE33}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3D8EF809-7131-4AB2-B442-032A8F49DE33}.Debug|Win32.Build.0 = Debug|Win32
+		{3D8EF809-7131-4AB2-B442-032A8F49DE33}.Release|Win32.ActiveCfg = Release|Win32
+		{3D8EF809-7131-4AB2-B442-032A8F49DE33}.Release|Win32.Build.0 = Release|Win32
+		{5638BB89-44E3-4D55-BA98-A01142B4223E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5638BB89-44E3-4D55-BA98-A01142B4223E}.Debug|Win32.Build.0 = Debug|Win32
+		{5638BB89-44E3-4D55-BA98-A01142B4223E}.Release|Win32.ActiveCfg = Release|Win32
+		{5638BB89-44E3-4D55-BA98-A01142B4223E}.Release|Win32.Build.0 = Release|Win32
+		{98CA1284-8F6C-4791-BF57-7E5FAD33744E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{98CA1284-8F6C-4791-BF57-7E5FAD33744E}.Debug|Win32.Build.0 = Debug|Win32
+		{98CA1284-8F6C-4791-BF57-7E5FAD33744E}.Release|Win32.ActiveCfg = Release|Win32
+		{98CA1284-8F6C-4791-BF57-7E5FAD33744E}.Release|Win32.Build.0 = Release|Win32
+		{61EB955F-2794-4607-860F-0AA296FA58BD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{61EB955F-2794-4607-860F-0AA296FA58BD}.Debug|Win32.Build.0 = Debug|Win32
+		{61EB955F-2794-4607-860F-0AA296FA58BD}.Release|Win32.ActiveCfg = Release|Win32
+		{61EB955F-2794-4607-860F-0AA296FA58BD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

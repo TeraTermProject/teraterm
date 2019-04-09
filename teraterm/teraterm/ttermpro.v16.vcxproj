@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BC4CDBE3-6269-47A8-BD74-EEB3A6160E06}</ProjectGuid>
+    <RootNamespace>ttermpro</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+    <ProjectName>ttermpro</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BrowseInformation />
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0411</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig_sd.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
+      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig_s.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\common\tmfc.cpp" />
+    <ClCompile Include="..\common\tmfc_frame.cpp" />
+    <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\tipwin.cpp" />
+    <ClCompile Include="..\common\win16api.c" />
+    <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
+    <ClCompile Include="addsetting.cpp" />
+    <ClCompile Include="buffer.c" />
+    <ClCompile Include="clipboar.c" />
+    <ClCompile Include="commlib.c" />
+    <ClCompile Include="dnddlg.cpp" />
+    <ClCompile Include="filesys.cpp" />
+    <ClCompile Include="ftdlg.cpp" />
+    <ClCompile Include="keyboard.c" />
+    <ClCompile Include="sizetip.c" />
+    <ClCompile Include="prnabort.cpp" />
+    <ClCompile Include="protodlg.cpp" />
+    <ClCompile Include="teklib.c" />
+    <ClCompile Include="tekwin.cpp" />
+    <ClCompile Include="telnet.c" />
+    <ClCompile Include="teraprn.cpp" />
+    <ClCompile Include="teraterm.cpp" />
+    <ClCompile Include="ttdde.c" />
+    <ClCompile Include="ttdialog.c" />
+    <ClCompile Include="ttfileio.c" />
+    <ClCompile Include="ttime.c" />
+    <ClCompile Include="ttplug.c" />
+    <ClCompile Include="ttsetup.c" />
+    <ClCompile Include="ttwinman.c" />
+    <ClCompile Include="ttwsk.c" />
+    <ClCompile Include="vtdisp.c" />
+    <ClCompile Include="vtterm.c" />
+    <ClCompile Include="vtwin.cpp" />
+    <ClCompile Include="winjump.c" />
+    <ClCompile Include="WSAAsyncGetAddrInfo.c" />
+    <ClInclude Include="../ttpdlg/dlg_res.h" />
+    <ClCompile Include="../ttpdlg/ttdlg.c" />
+    <ClInclude Include="../ttpdlg/ttdlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\cygterm\cygterm.ico" />
+    <Image Include="..\common\tek.ico" />
+    <Image Include="..\common\Teraterm.ico" />
+    <Image Include="..\common\teraterm_3d.ico" />
+    <Image Include="..\common\teraterm_classic.ico" />
+    <Image Include="..\common\vt.ico" />
+    <Image Include="..\common\vt_3d.ico" />
+    <Image Include="..\common\vt_classic.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tt-version.rc" />
+    <ResourceCompile Include="ttermpro.rc" />
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\compat_w95.h" />
+    <ClInclude Include="..\common\dlglib.h" />
+    <ClInclude Include="..\common\tektypes.h" />
+    <ClInclude Include="..\common\teraterm.h" />
+    <ClInclude Include="..\common\tmfc.h" />
+    <ClInclude Include="..\common\tt-version.h" />
+    <ClInclude Include="..\common\ttcommon.h" />
+    <ClInclude Include="..\common\ttddecmnd.h" />
+    <ClInclude Include="..\common\ttftypes.h" />
+    <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\ttplugin.h" />
+    <ClInclude Include="..\common\tttypes.h" />
+    <ClInclude Include="..\common\tt_res.h" />
+    <ClInclude Include="..\common\win16api.h" />
+    <ClInclude Include="addsetting.h" />
+    <ClInclude Include="buffer.h" />
+    <ClInclude Include="clipboar.h" />
+    <ClInclude Include="commlib.h" />
+    <ClInclude Include="dnddlg.h" />
+    <ClInclude Include="filesys.h" />
+    <ClInclude Include="ftdlg.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="prnabort.h" />
+    <ClInclude Include="protodlg.h" />
+    <ClInclude Include="sizetip.h" />
+    <ClInclude Include="teklib.h" />
+    <ClInclude Include="tekwin.h" />
+    <ClInclude Include="telnet.h" />
+    <ClInclude Include="teraapp.h" />
+    <ClInclude Include="teraprn.h" />
+    <ClInclude Include="ttdde.h" />
+    <ClInclude Include="ttdialog.h" />
+    <ClInclude Include="ttfileio.h" />
+    <ClInclude Include="ttime.h" />
+    <ClInclude Include="ttplug.h" />
+    <ClInclude Include="ttsetup.h" />
+    <ClInclude Include="ttwinman.h" />
+    <ClInclude Include="ttwsk.h" />
+    <ClInclude Include="vtdisp.h" />
+    <ClInclude Include="vtterm.h" />
+    <ClInclude Include="vtwin.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\svnrev\svnrev.v15.vcxproj">
+      <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v15.vcxproj">
+      <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\ttpfile\ttpfile.v15.vcxproj">
+      <Project>{311f2b21-aec4-4384-8209-bb83b54749b4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\ttpmacro\ttpmacro.v15.vcxproj">
+      <Project>{ba519362-a2c2-4b1a-905b-f00791f9038a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\ttpset\ttpset.v15.vcxproj">
+      <Project>{5cf58947-e861-4a5c-b0b1-e85486f149cd}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\ttptek\ttptek.v15.vcxproj">
+      <Project>{6d08053b-1c68-4a7e-8766-3553f5af010b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="ttermpro.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
