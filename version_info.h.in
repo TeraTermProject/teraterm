@@ -6,6 +6,8 @@
 // infos when generated
 #cmakedefine MSVC
 #cmakedefine MINGW
+// _WIN32_WINNT
+//	@_WIN32_WINNT@
 // CMAKE_GENERATOR
 //  @CMAKE_GENERATOR@
 // CMAKE_GENERATOR_TOOLSET (VS 2010 and above)

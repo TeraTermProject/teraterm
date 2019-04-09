@@ -48,6 +48,16 @@
 #endif
 
 /*
+ * VS2005を使っている場合、
+ * _WIN32_WINNT が 0x0501 でなければエラーを出す
+ */
+#if _MSC_VER == 1400  // VS2005
+#if _WIN32_WINNT != 0x0501
+#error check _WIN32_WINNT
+#endif
+#endif
+
+/*
  *	_WIN32_WINNTから次のdefineを適切に設定する
  *		NTDDI_VERSION
  *		WINVER
