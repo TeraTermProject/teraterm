@@ -6,21 +6,20 @@
 ## cmakeのバージョン
 
 - Visual Studio 2005 をサポートしている cmake の最後のバージョンは 3.11.4 です
-- Visual Studio 2005 Express では ttpmacro.exe をビルドすることができません
 - Visual Studio 2005 (Expressも含む)以外を使用する場合は特に制限はありません
-- Visual Studio 2017 インストーラーで、オプションを選べば cmake をインストールできます
+- Visual Studio 2017,2019 インストーラーで、オプションを選べば cmake をインストールできます
+- cmake 3.14から Visual Studio 2019 をサポートしています
 
 ## MinGW (very experimental)
 
 - MinGW を使用してバイナリを生成することができます
 - 実験的位置づけです
-- MinGW では ttpmacro.exe をビルドすることができません
 
 ## ライブラリのビルド
 
 - teraterm が使用するライブラリをビルドして準備しておきます
-- `lib/build_library_with_cmake.md` を参照してください
-- ライブラリは `develop.txt` を参照してください
+- ビルド方法は [`build_library_with_cmake`](<build_library_with_cmake.html>) を参照してください
+- ライブラリについては [`develop.txt`](<develop.txt>) を参照してください
 
 ## teratermのビルド
 
@@ -37,6 +36,9 @@
 - 生成された sln ファイルから起動したVisual Studioでビルドすると
   CMakeLists.txt を変更を検出してプロジェクトファイルの再生成を自動で行うので
   sln ファイルの生成を手動で行うのは最初の1回だけです
+- Visual Studio 2019 + cmake のとき、`-A` オプションが必要です
+
+    cmake.exe .. -G "Visual Studio 16 2019" -A Win32
 
 ## teratermのビルド(MinGW)
 

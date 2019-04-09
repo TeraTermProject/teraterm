@@ -583,9 +583,20 @@
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Build with CMake build system (experimental)">
-				<param name="Local" value="html\reference\build_with_cmake.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="library">
+					<param name="Local" value="html\reference\build_library_with_cmake.html">
+					<param name="ImageNumber" value="11">
+				  </OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Tera Term">
+					<param name="Local" value="html\reference\build_with_cmake.html">
+					<param name="ImageNumber" value="11">
+				  </OBJECT>
+			</UL>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Source Code Overview">
