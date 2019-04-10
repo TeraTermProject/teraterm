@@ -1,38 +1,37 @@
 ﻿
-# libsフォルダ
+# libs directory
 
-- Tera Term のビルドに利用する外部のライブラリを置いておくためのフォルダ
-- 各コンパイラ向けにソース/ライブラリ/実行ファイルを置いておく
-- ライブラリはあらかじめ1度だけ生成しておく
+- This directory for storing external libraries to build Tera Term.
+- Source, library and executable file are stored for each compiler.
+- Library is generated only once in advance.
 
-# 準備
+# Preparing
 
 ## Visual Studio
 
 - cmake
-	- PATHが通してあればok
-	- cygwinのcmakeはつかえない(Visual Studioをサポートしていない)
-	- Visual Studio 2005 を使う場合は cmake 3.11.4 を使用する必要がある
+	- It is OK if PATH is passed.
+	- Do not use Cygwin's cmake(Not supporting for Visual Studio).
+	- Use cmake 3.11.4 when Visual Studio 2005 is used.
 - perl
-	- OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要
-	- ActivePerl 5.8 以上、または cygwin perl
-	- PATHが通っていなければ自動で探す
+	- It is necessary for compiling OpenSSL, and converting character code of document and code of carriage return.
+	- ActivePerl 5.8 or later, also cygwin perl.
+	- It will be searched automatically if PATH is not passed.
 
-## MinGW 共通 (experimental)
+## MinGW common (experimental)
 
-- Cygwin,MSYS2,linux(wsl)上のMinGWでビルド可能
-- 各環境で動作するcmake,make,(MinGW)gcc,(clang),perlが必要
+- Can be built with MinGW on Cygwin,MSYS2,linux(wsl).
+- The cmake,make,(MinGW)gcc,(clang) and perl that work in each environment are required.
 
-# ビルド手順
+# How to build
 
-必要なアーカイブを自動的にダウンロードするので、
-インターネットが利用できる環境でビルドする必要がある
+You need to use Internet service because some archives are automatically downloaded.
 
-## Visual Studioの場合
+## Case of Visual Studio
 
-### batファイルを使用する場合
+### By using batch file
 
-buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
+Execute buildall_cmake.bat, and select Visual Studio.
 
     1. Visual Studio 16 2019
     2. Visual Studio 15 2017
@@ -44,55 +43,52 @@ buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
     8. Visual Studio 8 2005
     select no
 
-VS2005を選択した場合、
-このバッチファイルから cmake 3.11.4 をダウンロードして `libs\cmake-3.11.4-win32-x86` に
-インストールできます。
+When VS2005 is selected, you can download cmake 3.11.4 and install into `libs\cmake-3.11.4-win32-x86`.
 
-### cmakeを使用する場合
+### By using cmake
 
-Visual Studio 2019 x86 の場合
+Case of Visual Studio 2019 x86
 
     cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildall.cmake
 
-Visual Studio 2017 x86 の場合
+Case of Visual Studio 2017 x86
 
     cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildall.cmake
 
-Visual Studio 2017 x64 の場合
+Case of Visual Studio 2017 x64
 
     cmake -DCMAKE_GENERATOR="Visual Studio 15 2017 Win64" -P buildall.cmake`
 
-Visual Studio 2005の場合は、cmakeのバージョン3.11.4以前を使用
-(cmake が libs\cmake-3.11.4-win32-x86 にインストールしてある場合)
+When Visual Studio 2005 is used, cmake 3.11.4 or earlier(if cmake is installed in libs\cmake-3.11.4-win32-x86). 
 
     libs\cmake-3.11.4-win32-x86\bin\cmake.exe" -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
 
-## MinGW 共通
+## MinGW common
 
-各々の環境のcmakeを使用する
+Using cmake in each environment.
 
     cmake -DCMAKE_GENERATOR="Unix Makefiles" -P buildall.cmake
 
-# 各フォルダについて
+# Regarding each directory
 
-## 生成されるライブラリフォルダ
+## Library directory generated
 
-- 次のフォルダにライブラリの `*.h` , `*.lib` が生成される
+- Library `*.h` and `*.lib` are created in the following:
 	- `oniguruma_{compiler}`
 	- `openssl_{compiler}`
 	- `putty`
 	- `SFMT_{compiler}`
 	- `zlib_{compiler}`
 
-## download アーカイブダウンロードフォルダ
+## Downloaded archive directory
 
-- ダウンロードしたアーカイブファイルが置かれる
-- 自動でダウンロードされる
-- ダウンロードされていると再利用する
-- ビルド後、参照する必要がなければ削除できる
+- Downloaded archives are stored.
+- Downloading automatically.
+- Re-use these archives downloaded already.
+- Can be removed if these archives do not need after building.
 
-## build ビルドフォルダ
+## Build directory
 
-- `build/oniguruma/{compiler}/` などの下でビルドされる
-- 再ビルドするときは、あらかじめ削除すること
-- ビルド後、参照する必要がなければ削除できる
+- Building under `build/oniguruma/{compiler}/`.
+- Remove it in advance if rebuliding.
+- Can be removed if this do not need after building.
