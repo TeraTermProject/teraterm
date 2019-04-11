@@ -218,10 +218,6 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
-				RelativePath="set_res.h"
-				>
-			</File>
-			<File
 				RelativePath="..\common\teraterm.h"
 				>
 			</File>
@@ -253,10 +249,6 @@
 			>
 			<File
 				RelativePath="ttpset-version.rc"
-				>
-			</File>
-			<File
-				RelativePath="ttpset.rc"
 				>
 			</File>
 		</Filter>
