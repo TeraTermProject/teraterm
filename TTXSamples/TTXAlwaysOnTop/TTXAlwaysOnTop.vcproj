@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot;"
+				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot; user32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot;"
+				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot; user32.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
