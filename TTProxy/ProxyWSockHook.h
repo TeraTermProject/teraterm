@@ -730,7 +730,7 @@ private:
         Window conn;
         Window erro;
         Window log;
-        HFONT DlgFont;
+//      HFONT DlgFont;
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND && wParam == MAKEWPARAM(IDC_REFER, BN_CLICKED)) {
@@ -765,11 +765,12 @@ private:
         }
         virtual bool onInitDialog() {
             char uimsg[MAX_UIMSG], uitmp[MAX_UIMSG];
-            LOGFONT logfont;
-            HFONT font;
+//          LOGFONT logfont;
+//          HFONT font;
 
             Dialog::onInitDialog();
 
+#if 0
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
             GetObject(font, sizeof(LOGFONT), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
@@ -800,6 +801,7 @@ private:
             else {
                 DlgFont = NULL;
             }
+#endif
 
             GetWindowText(uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("DLG_OTHER_TITLE", uimsg, sizeof(uimsg), uitmp);
@@ -904,15 +906,19 @@ private:
 
             logfile = log.GetWindowTextLength() > 0 ? log.GetWindowText() : NULL;
 
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onOK();
         }
         virtual void onCancel() {
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onCancel();
         }
     public:
@@ -941,7 +947,7 @@ private:
         EditBoxCtrl  user;
         EditBoxCtrl  pass;
         bool lock;
-        HFONT DlgFont;
+//      HFONT DlgFont;
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND) {
@@ -963,11 +969,12 @@ private:
         }
         virtual bool onInitDialog() {
             char uimsg[MAX_UIMSG], uitmp[MAX_UIMSG];
-            LOGFONT logfont;
-            HFONT font;
+//          LOGFONT logfont;
+//          HFONT font;
 
             Dialog::onInitDialog();
 
+#if 0
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
             GetObject(font, sizeof(LOGFONT), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
@@ -990,6 +997,7 @@ private:
             else {
                 DlgFont = NULL;
             }
+#endif
 
             GetWindowText(uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("DLG_SETUP_TITLE", uimsg, sizeof(uimsg), uitmp);
@@ -1081,15 +1089,19 @@ private:
                     return;
                 }
             }
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onOK();
         }
         virtual void onCancel() {
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onCancel();
         }
         void onOptions() {
@@ -1194,16 +1206,17 @@ private:
 
     class AboutDialog : public Dialog {
     private:
-        HFONT DlgFont;
+//      HFONT DlgFont;
         virtual bool onInitDialog() {
             String buf;
             char *buf2;
             const char *ver;
             int n, a, b, c, d, len;
             char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], uimsg3[MAX_UIMSG];
-            LOGFONT logfont;
-            HFONT font;
+//          LOGFONT logfont;
+//          HFONT font;
 
+#if 0
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
             GetObject(font, sizeof(LOGFONT), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
@@ -1213,6 +1226,7 @@ private:
             else {
                 DlgFont = NULL;
             }
+#endif
 
             GetWindowText(uimsg2, sizeof(uimsg2));
             UTIL_get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2);
@@ -1244,9 +1258,11 @@ private:
             return true;
         }
         virtual void onOK() {
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onOK();
         }
     public :

@@ -249,10 +249,16 @@ private:
 		switch (cmd) {
 		case ID_ABOUTMENU:
 			copy_UILanguageFile();
+			SetDialogFont(getInstance().ts->SetupFName,
+						  getInstance().ts->UILanguageFile,
+						  "TTProxy");
 			ProxyWSockHook::aboutDialog(hWin);
 			return 1;
 		case ID_PROXYSETUPMENU:
 			copy_UILanguageFile();
+			SetDialogFont(getInstance().ts->SetupFName,
+						  getInstance().ts->UILanguageFile,
+						  "TTProxy");
 			ProxyWSockHook::setupDialog(hWin);
 			return 1;
 		case ID_ASYNCMESSAGEBOX:
