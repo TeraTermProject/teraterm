@@ -238,10 +238,6 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
-				RelativePath="cmn_res.h"
-				>
-			</File>
-			<File
 				RelativePath="..\common\i18n.h"
 				>
 			</File>

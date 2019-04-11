@@ -138,7 +138,6 @@
     <ClCompile Include="ttcmn.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cmn_res.h" />
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="language.h" />
@@ -149,7 +148,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpcmn-version.rc" />
-    <ResourceCompile Include="ttpcmn.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

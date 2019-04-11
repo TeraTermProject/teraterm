@@ -36,9 +36,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cmn_res.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\i18n.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -59,9 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpcmn-version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="ttpcmn.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
