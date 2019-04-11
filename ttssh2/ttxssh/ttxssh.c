@@ -5155,6 +5155,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			return 0;  // SSH2で処理されなかった場合は、本来の動作を行うべく、ゼロを返す。
 
 	case ID_SSHSCPMENU:
+		UTIL_SetDialogFont();
 		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHSCP), hWin, TTXScpDialog,
 			(LPARAM) pvar) == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_SCP_ERROR", pvar,
@@ -5166,6 +5167,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		return 1;
 
 	case ID_SSHKEYGENMENU:
+		UTIL_SetDialogFont();
 		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHKEYGEN), hWin, TTXKeyGenerator,
 			(LPARAM) pvar) == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_KEYGEN_ERROR", pvar,
@@ -5177,6 +5179,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		return 1;
 
 	case ID_ABOUTMENU:
+		UTIL_SetDialogFont();
 		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG),
 		                   hWin, TTXAboutDlg, (LPARAM) pvar) == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_ABOUT_ERROR", pvar,
@@ -5187,9 +5190,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		}
 		return 1;
 	case ID_SSHAUTH:
+		UTIL_SetDialogFont();
 		AUTH_do_cred_dialog(pvar);
 		return 1;
 	case ID_SSHSETUPMENU:
+		UTIL_SetDialogFont();
 		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHSETUP),
 		                   hWin, TTXSetupDlg, (LPARAM) pvar) == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_SETUP_ERROR", pvar,
@@ -5200,15 +5205,19 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		}
 		return 1;
 	case ID_SSHAUTHSETUPMENU:
+		UTIL_SetDialogFont();
 		AUTH_do_default_cred_dialog(pvar);
 		return 1;
 	case ID_SSHFWDSETUPMENU:
+		UTIL_SetDialogFont();
 		FWDUI_do_forwarding_dialog(pvar);
 		return 1;
 	case ID_SSHUNKNOWNHOST:
+		UTIL_SetDialogFont();
 		HOSTS_do_unknown_host_dialog(hWin, pvar);
 		return 1;
 	case ID_SSHDIFFERENTKEY:
+		UTIL_SetDialogFont();
 		HOSTS_do_different_key_dialog(hWin, pvar);
 		return 1;
 	case ID_SSHASYNCMESSAGEBOX:
