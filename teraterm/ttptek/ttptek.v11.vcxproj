@@ -129,7 +129,6 @@
     <ClCompile Include="tttek.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="tek_res.h" />
     <ClInclude Include="tekesc.h" />
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttptek-version.rc" />
-    <ResourceCompile Include="ttptek.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v11.vcxproj">

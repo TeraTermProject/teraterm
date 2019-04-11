@@ -22,7 +22,6 @@ source_group(
   )
 
 set(SRC
-  tek_res.h
   tekesc.c
   tekesc.h
   ttptek.def
