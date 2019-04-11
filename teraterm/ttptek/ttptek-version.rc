@@ -3,7 +3,11 @@
 // Version
 //
 
+#include <winresrc.h>
+
 #include "tt-version.h"
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION TT_VERSION_MAJOR,TT_VERSION_MINOR,0,0
