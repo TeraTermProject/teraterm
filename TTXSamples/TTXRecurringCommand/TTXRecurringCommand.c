@@ -8,6 +8,7 @@
 #include "tt_res.h"
 #include "resource.h"
 #include "i18n.h"
+#include "dlglib.h"
 
 #include "compat_w95.h"
 
@@ -465,12 +466,15 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 //
 static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	char uimsg[MAX_UIMSG];
+#if 0
 	static HFONT DlgFont;
 	LOGFONT logfont;
 	HFONT font;
+#endif
 
 	switch (msg) {
 	  case WM_INITDIALOG:
+#if 0
 	  	font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 
@@ -487,6 +491,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		else {
 			DlgFont = NULL;
 		}
+#endif
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		GetI18nStr(SECTION, "DLG_TITLE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
@@ -548,16 +553,20 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 			}
 
 			EndDialog(dlg, IDOK);
+#if 0
 			if (DlgFont != NULL) {
 				DeleteObject(DlgFont);
 			}
+#endif
 			return TRUE;
 
 		  case IDCANCEL:
 			EndDialog(dlg, IDCANCEL);
+#if 0
 			if (DlgFont != NULL) {
 				DeleteObject(DlgFont);
 			}
+#endif
 			return TRUE;
 		}
 		break;
@@ -571,8 +580,11 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	switch (cmd) {
 	  case ID_MENU_SETUP:
-		switch (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
-		                       hWin, RecurringCommandSetting, (LPARAM)NULL)) {
+		  SetDialogFont(pvar->ts->SetupFName,
+						pvar->ts->UILanguageFile,
+						SECTION);
+		switch (TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
+								 hWin, RecurringCommandSetting, (LPARAM)NULL)) {
 		  case IDOK:
 			break;
 		  case IDCANCEL:
