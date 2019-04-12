@@ -2059,6 +2059,82 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 	parent->timer_done = 0;
 }
 
+#if defined(_MSC_VER)
+// ビルドしたときに使われたVisual C++のバージョンを取得する(2009.3.3 yutaka)
+static void GetCompilerInfo(char *buf, size_t buf_size)
+{
+	char tmpbuf[128];
+	int msc_ver, vs_ver, msc_low_ver;
+
+	strcpy(buf, "Microsoft Visual C++ ");
+#ifdef _MSC_FULL_VER
+	// VS2015では Compiler version = 19 だが、Visual Studio version = 14 となっているため、
+	// 減算を調整する。
+	// (2015.12.23 yutaka)
+	msc_ver = (_MSC_FULL_VER / 10000000);
+	msc_low_ver = (_MSC_FULL_VER / 100000) % 100;
+	if (msc_ver < 19) {
+		vs_ver = msc_ver - 6;
+	}
+	else {
+		// 1900 = VS2015(VC++14)
+		// 1910 = VS2017(VC++15)
+		// 1911 = VS2017 update3-4(VC++15)
+		// 1912 = VS2017 update5(VC++15)
+		// 1913 = VS2017 update6(VC++15)
+		// 1914 = VS2017 15.7(VC++15)
+		// 1920 = VS2019 16.0.0(VC++16)
+		// VS2017 Update3から製品バージョンが3桁表記(15.x.x)になり、
+		// _MSC_FULL_VERから算出できなくなったため、一律で15.0とする。
+		if (msc_low_ver >= 10) {
+			vs_ver = msc_ver - 4 + (msc_low_ver - 10)/10;
+			msc_low_ver = 0;
+		}
+		else {
+			vs_ver = msc_ver - 5;
+		}
+	}
+
+	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
+				vs_ver,
+				msc_low_ver);
+	strncat_s(buf, buf_size, tmpbuf, _TRUNCATE);
+	if (_MSC_FULL_VER % 100000) {
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " build %d",
+					_MSC_FULL_VER % 100000);
+		strncat_s(buf, buf_size, tmpbuf, _TRUNCATE);
+	}
+#elif defined(_MSC_VER)
+	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
+				(_MSC_VER / 100) - 6,
+				_MSC_VER % 100);
+	strncat_s(buf, buf_size, tmpbuf, _TRUNCATE);
+#endif
+}
+
+#elif defined(__MINGW32__)
+static void GetCompilerInfo(char *buf, size_t buf_size)
+{
+#if defined(__GNUC__) || defined(__clang__)
+	_snprintf_s(buf, buf_size, _TRUNCATE,
+				"mingw " __MINGW64_VERSION_STR " "
+#if defined(__clang__)
+				"clang " __clang_version__
+#elif defined(__GNUC__)
+				"gcc " __VERSION__
+#endif
+		);
+#else
+	strncat_s(buf, buf_size, "mingw", _TRUNCATE);
+#endif
+}
+
+#else
+static void GetCompilerInfo(char *buf, size_t buf_size)
+{
+	strncpy_s(buf, buf_size, "unknown compiler");
+}
+#endif
 
 static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -2073,7 +2149,6 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	WORD w, h;
 	POINT point;
 	char uimsg[MAX_UIMSG];
-	int msc_ver, vs_ver, msc_low_ver;
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
@@ -2144,62 +2219,20 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
 			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
 
-			// ビルドしたときに使われたVisual C++のバージョンを設定する。(2009.3.3 yutaka)
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using Microsoft Visual C++");
-#ifdef _MSC_FULL_VER
-			// VS2015では Compiler version = 19 だが、Visual Studio version = 14 となっているため、
-			// 減算を調整する。
-			// (2015.12.23 yutaka)
-			msc_ver = (_MSC_FULL_VER / 10000000);
-			msc_low_ver = (_MSC_FULL_VER / 100000) % 100;
-			if (msc_ver < 19) {
-				vs_ver = msc_ver - 6;
-			}
-			else {
-				// 1900 = VS2015(VC++14)
-				// 1910 = VS2017(VC++15)
-				// 1911 = VS2017 update3-4(VC++15)
-				// 1912 = VS2017 update5(VC++15)
-				// 1913 = VS2017 update6(VC++15)
-				// 1914 = VS2017 15.7(VC++15)
-				// 1920 = VS2019 16.0.0(VC++16)
-				// VS2017 Update3から製品バージョンが3桁表記(15.x.x)になり、
-				// _MSC_FULL_VERから算出できなくなったため、一律で15.0とする。
-				if (msc_low_ver >= 10) {
-					vs_ver = msc_ver - 4 + (msc_low_ver - 10)/10;
-					msc_low_ver = 0;
-				} 
-				else {
-					vs_ver = msc_ver - 5;
-				}
-			}
-
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
-				vs_ver,
-				msc_low_ver);
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-			if (_MSC_FULL_VER % 100000) {
-				_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " build %d",
-					_MSC_FULL_VER % 100000);
-				strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-			}
-#elif defined(_MSC_VER)
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
-				(_MSC_VER / 100) - 6,
-				_MSC_VER % 100);
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#endif
-			SendMessage(GetDlgItem(Dialog, IDC_BUILDTOOL), WM_SETTEXT, 0, (LPARAM)buf);
+			// ビルドしたときに使われたコンパイラを設定する。(2009.3.3 yutaka)
+			GetCompilerInfo(tmpbuf, sizeof(tmpbuf));
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using %s", tmpbuf);
+			SetDlgItemTextA(Dialog, IDC_BUILDTOOL, buf);
 
 			// ビルドタイムを設定する。(2009.3.4 yutaka)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Build time: %s %s", __DATE__, __TIME__);
-			SendMessage(GetDlgItem(Dialog, IDC_BUILDTIME), WM_SETTEXT, 0, (LPARAM)buf);
+			SetDlgItemTextA(Dialog, IDC_BUILDTIME, buf);
 
 			// static text のサイズを変更 (2007.4.16 maya)
 			hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
 			hdc = GetDC(hwnd);
 			SelectObject(hdc, (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0));
-			GetDlgItemText(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
+			GetDlgItemTextA(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
 			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
 			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
 			h = HIWORD(dwExt);
@@ -2212,7 +2245,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			hwnd = GetDlgItem(Dialog, IDC_FORUM_URL);
 			hdc = GetDC(hwnd);
 			SelectObject(hdc, (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0));
-			GetDlgItemText(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
+			GetDlgItemTextA(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
 			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
 			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
 			h = HIWORD(dwExt);
