@@ -440,6 +440,10 @@ static wchar_t FontFaceName[LF_FACESIZE];
 static LONG FontHeight;
 static BYTE FontCharSet;
 
+/**
+ *	ダイアログのフォントを設定する
+ *	heightの単位はポイント
+ */
 void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 {
 	if (face != NULL) {
@@ -451,6 +455,10 @@ void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 	FontCharSet = (BYTE)charset;
 }
 
+/**
+ *	ダイアログのフォントを設定する
+ *	heightの単位はポイント
+ */
 void TTSetDlgFontA(const char *face, int height, int charset)
 {
 	if (face != NULL) {

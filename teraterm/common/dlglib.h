@@ -91,6 +91,8 @@ void SetDialogFont(const char *SetupFName, const char *UILanguageFile, const cha
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
 				  const char *UILanguageFile, PCHAR key);
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
+int GetFontPointFromPixel(HWND hWnd, int pixel);
+int GetFontPixelFromPoint(HWND hWnd, int point);
 
 #if defined(_UNICODE)
 #define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontW(p1,p2,p3)

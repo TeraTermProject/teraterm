@@ -319,6 +319,40 @@ void SetDialogFont(const char *SetupFName,
 	{
 		LOGFONT logfont;
 		GetMessageboxFont(&logfont);
+		if (logfont.lfHeight < 0) {
+			logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
+		}
 		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 	}
+}
+
+
+/**
+ *	pixel数をpoint数に変換する(フォント用)
+ *		注 1point = 1/72 inch, フォントの単位
+ *		注 ウィンドウの表示具合で倍率が変化するので hWnd が必要
+ */
+int GetFontPixelFromPoint(HWND hWnd, int pixel)
+{
+	if (hWnd == NULL) {
+		hWnd = GetDesktopWindow();
+	}
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);	// dpi = dot per inch (96DPI)
+	int point = MulDiv(pixel, dpi, 72);			// pixel = point / 72 * dpi
+	ReleaseDC(hWnd, DC);
+	return point;
+}
+
+/**
+ *	point数をpixel数に変換する(フォント用)
+ *		注 1point = 1/72 inch, フォントの単位
+ */
+int GetFontPointFromPixel(HWND hWnd, int point)
+{
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);	// dpi = dot per inch (96DPI)
+	int pixel = MulDiv(point, 72, dpi);			// point = pixel / dpi * 72
+	ReleaseDC(hWnd, DC);
+	return pixel;
 }
