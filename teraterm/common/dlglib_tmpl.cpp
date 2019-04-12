@@ -446,6 +446,7 @@ static BYTE FontCharSet;
  */
 void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 {
+	assert(height > 0);
 	if (face != NULL) {
 		wcscpy_s(FontFaceName, face);
 	} else {
@@ -461,6 +462,7 @@ void TTSetDlgFontW(const wchar_t *face, int height, int charset)
  */
 void TTSetDlgFontA(const char *face, int height, int charset)
 {
+	assert(height > 0);
 	if (face != NULL) {
 		MultiByteToWideChar(CP_ACP, 0, face, -1, FontFaceName, LF_FACESIZE);
 	} else {

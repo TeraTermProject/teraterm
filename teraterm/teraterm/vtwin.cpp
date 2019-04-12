@@ -4694,9 +4694,14 @@ void CVTWindow::OnSetupDlgFont()
 	LOGFONTA LogFont;
 	CHOOSEFONTA cf;
 	BOOL result;
+
+	// LogFont.lfHeight ‚Í point
 	result = GetI18nLogfont("Tera Term", "DlgFont", &LogFont, 0, ts.SetupFName);
-	if (result == FALSE) {
-		memset(&LogFont, 0, sizeof(LogFont));
+	if (result == TRUE) {
+		// pixel‚É•ÏŠ·
+		LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, LogFont.lfHeight);
+	} else {
+		GetMessageboxFont(&LogFont);
 	}
 
 	memset(&cf, 0, sizeof(cf));
@@ -4717,8 +4722,11 @@ void CVTWindow::OnSetupDlgFont()
 	result = ChooseFontA(&cf);
 	if (result) {
 		char Temp[80];
+		int font_point = cf.iPointSize / 10;	// point ‚Å•Û‘¶‚·‚é
 		_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s,%d,%d",
-					LogFont.lfFaceName, LogFont.lfHeight, LogFont.lfCharSet);
+					LogFont.lfFaceName,
+					font_point,
+					LogFont.lfCharSet);
 		WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, ts.SetupFName);
 
 		SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
