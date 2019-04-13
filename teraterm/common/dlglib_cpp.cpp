@@ -253,12 +253,13 @@ INT_PTR TTDialogBox(
  *	使用するダイアログフォントを決定する
  */
 void SetDialogFont(const char *SetupFName,
-				   const char *UILanguageFile, const char *Section)
+				   const char *UILanguageFile, const char *Section, const char *Key)
 {
+	LOGFONTA logfont;
+	BOOL result;
+
 	// teraterm.iniの指定
 	if (SetupFName != NULL) {
-		LOGFONTA logfont;
-		BOOL result;
 		result = GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
 		if (result == TRUE) {
 			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE);
@@ -270,60 +271,30 @@ void SetDialogFont(const char *SetupFName,
 	}
 
 	// .lngの指定
-	if (UILanguageFile != NULL) {
+	if (UILanguageFile != NULL && Section != NULL && Key != NULL) {
+#if 0
 		static const char *dlg_font_keys[] = {
 			"DLG_FONT",
 			"DLG_TAHOMA_FONT",
 			"DLG_SYSTEM_FONT",
 		};
-		BOOL result = FALSE;
-		LOGFONTA logfont;
-		size_t i;
-		if (Section != NULL) {
-			for (i = 0; i < _countof(dlg_font_keys); i++) {
-				result = GetI18nLogfont(Section, dlg_font_keys[i], &logfont, 0, UILanguageFile);
-				if (result == FALSE) {
-					continue;
-				}
-				if (logfont.lfFaceName[0] == '\0') {
-					break;
-				}
-				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
-					break;
-				}
-			}
-		}
-		if (result == FALSE) {
-			for (i = 0; i < _countof(dlg_font_keys); i++) {
-				result = GetI18nLogfont("Tera Term", dlg_font_keys[i], &logfont, 0, UILanguageFile);
-				if (result == FALSE) {
-					continue;
-				}
-				if (logfont.lfFaceName[0] == '\0') {
-					break;
-				}
-				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
-					break;
-				}
-			}
-		}
+#endif
+		result = GetI18nLogfont(Section, Key, &logfont, 0, UILanguageFile);
 		if (result == TRUE) {
-			TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-			return;
+			if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+				return;
+			}
 		}
 	}
 
 	// ini,lngで指定されたフォントが見つからなかったとき、
-	// 文字化けで正しく表示されない事態となる
 	// messagebox()のフォントをとりあえず選択しておく
-	{
-		LOGFONT logfont;
-		GetMessageboxFont(&logfont);
-		if (logfont.lfHeight < 0) {
-			logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
-		}
-		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	GetMessageboxFont(&logfont);
+	if (logfont.lfHeight < 0) {
+		logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
 	}
+	TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 }
 
 

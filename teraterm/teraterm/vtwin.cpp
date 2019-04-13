@@ -57,6 +57,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "ttplug.h"  /* TTPLUG */
+#include "teraterml.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2231,6 +2232,8 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		if (!DoSameProcess) {
 			bool DoSameProcessNextDrop;
 			bool DoNotShowDialog = !DefaultShowDialog;
+			SetDialogFont(ts.SetupFName,
+						  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 			DropType =
 				ShowDropDialogBox(hInst, HVTWin,
 								  FileName, DropType,
@@ -3885,6 +3888,8 @@ void CVTWindow::OnFileNewConnection()
 		return;
 	}
 
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	if ((*GetHostName)(HVTWin,&GetHNRec)) {
 		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 			if (ts.HistoryList) {
@@ -4441,6 +4446,8 @@ void CVTWindow::OnFileChangeDir()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*ChangeDirectory)(HVTWin,ts.FileDir);
 	FreeTTDLG();
 }
@@ -4577,6 +4584,8 @@ void CVTWindow::OnExternalSetup()
 {
 	DWORD ret;
 
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(hInst, _T("Tera Term: Additional settings"), HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
@@ -4628,6 +4637,8 @@ void CVTWindow::OnSetupTerminal()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupTerminal)(HVTWin, &ts);
 	FreeTTDLG();
 	if (Ok) {
@@ -4648,6 +4659,8 @@ void CVTWindow::OnSetupWindow()
 		return;
 	}
 
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	strncpy_s(orgTitle, sizeof(orgTitle), ts.Title, _TRUNCATE);
 	Ok = (*SetupWin)(HVTWin, &ts);
 	FreeTTDLG();
@@ -4728,8 +4741,6 @@ void CVTWindow::OnSetupDlgFont()
 					font_point,
 					LogFont.lfCharSet);
 		WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, ts.SetupFName);
-
-		SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
 	}
 }
 
@@ -4746,6 +4757,8 @@ void CVTWindow::OnSetupKeyboard()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupKeyboard)(HVTWin, &ts);
 	FreeTTDLG();
 
@@ -4763,6 +4776,8 @@ void CVTWindow::OnSetupSerialPort()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupSerialPort)(HVTWin, &ts);
 	FreeTTDLG();
 
@@ -4788,6 +4803,8 @@ void CVTWindow::OnSetupTCPIP()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	if ((*SetupTCPIP)(HVTWin, &ts)) {
 		TelUpdateKeepAliveInterval();
 	}
@@ -4800,6 +4817,8 @@ void CVTWindow::OnSetupGeneral()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	if ((*SetupGeneral)(HVTWin,&ts)) {
 		ResetCharSet();
 		ResetIME();
@@ -6184,6 +6203,8 @@ void CVTWindow::OnWindowWindow()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*WindowWindow)(HVTWin,&Close);
 	FreeTTDLG();
 	if (Close) {
@@ -6231,6 +6252,8 @@ void CVTWindow::OnHelpAbout()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*AboutDialog)(HVTWin);
 	FreeTTDLG();
 }

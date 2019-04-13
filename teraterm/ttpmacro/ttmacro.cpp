@@ -78,7 +78,7 @@ static void init()
 		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 	// messageboxÇÃÉtÉHÉìÉgÇ…ê›íËÇ∑ÇÈ
-	SetDialogFont(NULL, NULL, NULL);
+	SetDialogFont(NULL, NULL, NULL, NULL);
 }
 
 // TTMACRO main engine
