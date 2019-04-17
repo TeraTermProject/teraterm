@@ -33,6 +33,13 @@
 
 <h3 id="teraterm_4.103">2019.xx.xx (Ver 4.103)</h3>
 <ul class="history">
+  <li>変更
+    <ul>
+      <li>試験的に高DPI対応。デフォルトはdisable。teraterm.iniの[Tera Term]セクションにDPIAware=1とすると有効となる。Windows 10 Version 1703以降のみ有効。</li>
+      <li>ダイアログのフォントを設定できるようにした(<a href="../menu/setup-font.html">[Setup]/[Font])</a>。フォントサブメニューを追加した。ダイアログフォントのデフォルトは従来と同じフォント。</li>
+      <li>罫線を表示するためのフォントファイル(TSPECIAL1.TTF)がインストールされていない場合、ttermpro.exeと同一フォルダから読み込むようにした。</li>
+    </ul>
+  </li>
   <li>バグ修正
     <ul>
       <li>IMEの変換候補ウィンドウの表示位置がカーソル位置に追従しない問題を修正した。4.102でのエンバグ。</li>
