@@ -767,6 +767,18 @@ CVTWindow::CVTWindow()
 	}
 	FreeTTSET();
 
+	// DPI Aware (高DPI対応)
+	{
+		int dip_aware = 0;
+		dip_aware = GetPrivateProfileInt("Tera Term", "DPIAware", dip_aware, ts.SetupFName);
+		if (dip_aware != 0) {
+			if (pSetThreadDpiAwarenessContext != NULL) {
+				// TODO Windows 10 Version 1703以降のチェックを入れるべきか?
+				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+			}
+		}
+	}
+
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {
 		CopyShmemToTTSet(&ts);

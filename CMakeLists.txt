@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.6)
 
 project(teraterm_all)
 
-option(ENABLE_DPIAWARENESS "Dpiawareness" ON)
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(USE_UNICODE_API "unicode" OFF)
 
@@ -32,7 +31,8 @@ if(MSVC)
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /GF /Gy")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
-  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
+  if(${MSVC_VERSION} GREATER_EQUAL 1910)
+    # Visual Studio 2017以上の時
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /ZI")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
