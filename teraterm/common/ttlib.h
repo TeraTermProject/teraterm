@@ -114,6 +114,8 @@ BOOL GetPositionOnWindow(
 	HWND hWnd, const POINT *point,
 	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
 DllExport void GetMessageboxFont(LOGFONTA *logfont);
+void GetDesktopRect(HWND hWnd, RECT *rect);
+void CenterWindow(HWND hWnd, HWND hWndParent);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 

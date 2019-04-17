@@ -39,6 +39,7 @@
 #include <mbctype.h>	// for _ismbblead
 #include <assert.h>
 
+#include "teraterm_conf.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "compat_win.h"
@@ -1816,4 +1817,72 @@ void GetMessageboxFont(LOGFONT *logfont)
 	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
 	assert(r == TRUE);
 	*logfont = nci.lfStatusFont;
+}
+
+/**
+ *	ウィンドウ表示されているディスプレイのデスクトップの範囲を取得する
+ *	@param[in]		hWnd	ウィンドウのハンドル
+ *	@param[out]		rect	デスクトップ
+ */
+void GetDesktopRect(HWND hWnd, RECT *rect)
+{
+#if _WIN32_WINNT >= 0x0500
+	// Windows 2000 以上
+	if (HasMultiMonitorSupport()) {
+		// マルチモニタがサポートされている場合
+		MONITORINFO monitorInfo;
+		HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		monitorInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hMonitor, &monitorInfo);
+		*rect = monitorInfo.rcWork;
+	} else
+#endif
+	{
+		// マルチモニタがサポートされていない場合
+		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
+	}
+}
+
+/**
+ *	指定ウィンドウの中央にウィンドウを配置する
+ *	@param[in]	hWnd		位置を調整するウィンドウ
+ *	@param[in]	hWndParent	このウィンドウの中央に移動する
+ */
+void CenterWindow(HWND hWnd, HWND hWndParent)
+{
+	RECT rcWnd;
+	LONG WndWidth;
+	LONG WndHeight;
+	RECT rcParent;
+	int NewX;
+	int NewY;
+	RECT rcDesktop;
+	BOOL r;
+
+	r = GetWindowRect(hWnd, &rcWnd);
+	assert(r != FALSE); (void)r;
+	WndWidth = rcWnd.right - rcWnd.left;
+	WndHeight = rcWnd.bottom - rcWnd.top;
+	r = GetWindowRect(hWndParent, &rcParent);
+	assert(r != FALSE); (void)r;
+
+	// 新しい位置
+	NewX = (rcParent.left + rcParent.right) / 2 - WndWidth / 2;
+	NewY = (rcParent.top + rcParent.bottom) / 2 - WndHeight / 2;
+
+	// デスクトップからはみ出す場合、調整する
+	GetDesktopRect(hWndParent, &rcDesktop);
+	if (NewX + WndWidth > rcDesktop.right)
+		NewX = rcDesktop.right - WndWidth;
+	if (NewX < rcDesktop.left)
+		NewX = rcDesktop.left;
+
+	if (NewY + WndHeight > rcDesktop.bottom)
+		NewY = rcDesktop.bottom - WndHeight;
+	if (NewY < rcDesktop.top)
+		NewY = rcDesktop.top;
+
+	// 移動する
+	SetWindowPos(hWnd, NULL, NewX, NewY, 0, 0,
+				 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
