@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-02-28)
+; Updated by TeraTerm Project (2019-04-17)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -52,7 +52,9 @@ MENU_EDIT_SELECTALL=&Alles auswählen
 MENU_SETUP=Ein&stellungen
 MENU_SETUP_TERMINAL=&Terminal-Einstellungen
 MENU_SETUP_WINDOW=&Fenster-Einstellungen
+MENU_SETUP_FONT_SUBMENU=&Schriftart
 MENU_SETUP_FONT=&Schriftart...
+MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Keyboard-Einstellungen
 MENU_SETUP_SERIALPORT=Serieller Port
 MENU_SETUP_TCPIP=&Hostliste editieren
