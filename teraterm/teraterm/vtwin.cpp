@@ -4716,6 +4716,10 @@ static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		get_lang_msgT("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
 					  _T("\"Font style\" selection here won't affect actual font appearance."), ts.UILanguageFile);
 		SetDlgItemTextT(Dialog, stc6, uimsg);
+
+		SetFocus(GetDlgItem(Dialog,cmb1));
+
+		CenterWindow(Dialog, GetParent(Dialog));
 	}
 	return FALSE;
 }
