@@ -7397,6 +7397,8 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 
 		SetFocus(GetDlgItem(dlg, IDC_OLD_PASSWD));
 
+		CenterWindow(dlg, GetParent(dlg));
+
 		return FALSE;
 
 	case WM_COMMAND:
@@ -8120,6 +8122,7 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 	switch (msg) {
 		case WM_INITDIALOG:
 			closed = 0;
+			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
 		// SCPファイル受信(remote-to-local)時、使用する。

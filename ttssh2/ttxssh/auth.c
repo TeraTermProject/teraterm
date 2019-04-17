@@ -829,6 +829,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				SetTimer(dlg, IDC_TIMER3, autologin_timeout, 0);
 			}
 		}
+		CenterWindow(dlg, GetParent(dlg));
 		return FALSE;			/* because we set the focus */
 
 	case WM_TIMER:
@@ -1267,6 +1268,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			SendMessage(dlg, WM_COMMAND, IDOK, 0);
 		}
 
+		CenterWindow(dlg, GetParent(dlg));
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
@@ -1495,6 +1497,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 			DlgAuthSetupFont = NULL;
 		}
 #endif
+		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:

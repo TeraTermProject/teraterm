@@ -264,6 +264,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 			}
+			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
 
 		case WM_COMMAND:
@@ -677,6 +678,8 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			ChangeSB(Dialog,ts,IAttr,IOffset);
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1055,6 +1058,9 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				ShowDlgItem(Dialog,IDC_KEYBKEYBTEXT,IDC_KEYBKEYB);
 				SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
 			}
+
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1190,6 +1196,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,ts->DelayPerLine,FALSE);
 			SendDlgItemMessage(Dialog, IDC_SERIALDELAYLINE, EM_LIMITTEXT,4, 0);
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1307,6 +1315,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			// SSHê⁄ë±ÇÃÇ∆Ç´Ç…Ç‡ TERM ÇëóÇÈÇÃÇ≈ÅAtelnetÇ™ñ≥å¯Ç≈Ç‡ disabled Ç…ÇµÇ»Ç¢ÅB(2005.11.3 yutaka)
 			EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
 
@@ -1606,6 +1616,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				DisableDlgItem(Dialog,IDC_HOSTTCPPROTOCOLLABEL,IDC_HOSTTCPPROTOCOL);
 			}
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1810,6 +1822,8 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			// resize dialog
 			MoveWindow(Dialog,WX,WY,WW,WH,TRUE);
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
 
@@ -2315,6 +2329,8 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			ReleaseDC(hwnd, hdc);
 #endif
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -2591,6 +2607,8 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 				EnableWindow(GetDlgItem(Dialog, IDC_GENLANG_UI), FALSE);
 			}
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -2687,6 +2705,9 @@ static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 		
 			SetWinList(GetParent(Dialog),Dialog,IDC_WINLISTLIST);
+
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -2841,6 +2862,8 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(Dialog, stc6, uimsg);
 
 			SetFocus(GetDlgItem(Dialog,cmb1));
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			break;
 		}

@@ -520,6 +520,8 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		SendMessage(GetDlgItem(dlg, IDC_ADD_NL), BM_SETCHECK,
 		            pvar->add_nl?BST_CHECKED:BST_UNCHECKED, 0);
 
+		CenterWindow(dlg, GetParent(dlg));
+
 		return TRUE;
 	  case WM_COMMAND:
 		switch (LOWORD(wParam)) {

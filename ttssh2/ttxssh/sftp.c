@@ -1076,6 +1076,8 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 			hEditProc = (WNDPROC)GetWindowLong(hEdit, GWL_WNDPROC);
 			SetWindowLong(hEdit, GWL_WNDPROC, (LONG)EditProc);
 
+			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
+
 			return TRUE;
 
 		case WM_COMMAND:

@@ -879,6 +879,8 @@ private:
             if (logfile != NULL)
                 log.SetWindowText(logfile);
 
+            CenterWindow((HWND)*this, GetParent());
+
             return true;
         }
         virtual void onOK() {
@@ -1071,6 +1073,7 @@ private:
             }
             lock = false;
             onChanged(0);
+            CenterWindow((HWND)*this, GetParent());
             return true;
         }
         virtual void onOK() {
@@ -1254,6 +1257,8 @@ private:
             GetDlgItemText(IDOK, uimsg, sizeof(uimsg));
             UTIL_get_lang_msg("BTN_OK", uimsg, sizeof(uimsg),"OK");
             SetDlgItemText(IDOK, uimsg);
+
+            CenterWindow((HWND)*this, GetParent());
 
             return true;
         }

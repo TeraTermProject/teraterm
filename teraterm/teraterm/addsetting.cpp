@@ -1516,3 +1516,8 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 	delete m_CygwinPage;
 }
 
+void CAddSettingPropSheetDlg::OnInitDialog()
+{
+	TTCPropertySheet::OnInitDialog();
+	CenterWindow(m_hWnd, m_hParentWnd);
+}
