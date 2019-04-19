@@ -1826,8 +1826,6 @@ void GetMessageboxFont(LOGFONT *logfont)
  */
 void GetDesktopRect(HWND hWnd, RECT *rect)
 {
-#if _WIN32_WINNT >= 0x0500
-	// Windows 2000 以上
 	if (HasMultiMonitorSupport()) {
 		// マルチモニタがサポートされている場合
 		MONITORINFO monitorInfo;
@@ -1835,9 +1833,7 @@ void GetDesktopRect(HWND hWnd, RECT *rect)
 		monitorInfo.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hMonitor, &monitorInfo);
 		*rect = monitorInfo.rcWork;
-	} else
-#endif
-	{
+	} else {
 		// マルチモニタがサポートされていない場合
 		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
 	}
