@@ -197,12 +197,10 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
   file(APPEND "${SRC_DIR}/build_cmake.bat"
     "del crypto\\buildinf.h\n"
-    "setlocal\n"
     "set PATH=${PERL_N_PATH}\n"
     "perl Configure no-asm ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N}\n"
     "call ${DO_MS}\n"
-    "endlocal\n"
-    "set PATH=\n"
+    "set PATH=%windir%\\system32;%windir%\n"
     )
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
     ## Visual Studio 2005 特別処理
