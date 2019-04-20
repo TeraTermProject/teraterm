@@ -10,6 +10,8 @@
        例: INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
            LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
 - サポートされているコンパイラ
+-- Visual Studio 2005 Express Edition
+   注: Tera Term 4.103から対応しました。
 -- Visual Studio 2008 SP1 (Standard Edition 以上)
    注: コンパイルされた実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
 -- Visual Studio 2010 SP1 (Professional Edition 以上)
