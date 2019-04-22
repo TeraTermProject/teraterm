@@ -238,6 +238,14 @@ static void SetLogFlags(HWND Dialog)
 	}
 }
 
+/* ダイアログを中央に移動する */
+static void CenterCommonDialog(HWND hDlg)
+{
+	/* hDlgの親がダイアログのウィンドウハンドル */
+	HWND hWndDlgRoot = GetParent(hDlg);
+	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
+}
+
 /* Hook function for file name dialog box */
 static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -373,6 +381,8 @@ static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		if (BinFlag || !TsFlag) {
 			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		}
+
+		CenterCommonDialog(Dialog);
 
 		return TRUE;
 
@@ -611,6 +621,9 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		SetDlgItemText(Dialog, IDC_FOPTBIN, uimsg);
 
 		SetRB(Dialog,*pw & 1,IDC_FOPTBIN,IDC_FOPTBIN);
+
+		CenterCommonDialog(Dialog);
+
 		return TRUE;
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
@@ -1026,6 +1039,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			ShowDlgItem(Dialog,IDC_XOPTBIN,IDC_XOPTBIN);
 			SetRB(Dialog,LOWORD(*pl),IDC_XOPTBIN,IDC_XOPTBIN);
 		}
+		CenterCommonDialog(Dialog);
 		return TRUE;
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
