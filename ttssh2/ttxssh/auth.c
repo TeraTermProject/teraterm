@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,11 +38,18 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <crtdbg.h>
 
 #include "resource.h"
 #include "keyfiles.h"
 #include "libputty.h"
 #include "tipwin.h"
+#include "auth.h"
+
+#if defined(_DEBUG)
+#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#endif
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 
@@ -73,11 +80,18 @@ static int auth_types_to_control_IDs[] = {
 	IDC_SSHUSERHOSTS, IDC_SSHUSETIS, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, IDC_SSHUSEPAGEANT, -1
 };
-static TipWin *tipwin;
 
-LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
-                                   WPARAM wParam, LPARAM lParam)
+typedef struct {
+	WNDPROC ProcOrg;
+	PTInstVar pvar;
+	TipWin *tipwin;
+} TPasswordControlData;
+
+static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
+										  WPARAM wParam, LPARAM lParam)
 {
+	LRESULT result;
+	TPasswordControlData *data = (TPasswordControlData *)GetWindowLongPtr(control, GWLP_USERDATA);
 	switch (msg) {
 	case WM_CHAR:
 		if ((GetKeyState(VK_CONTROL) & 0x8000) != 0) {
@@ -86,48 +100,56 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			SendMessage(control, EM_REPLACESEL, (WPARAM) TRUE,
 			            (LPARAM) (TCHAR *) chars);
 
-			if (tipwin == NULL) {
-				TCHAR *s;
+			if (data->tipwin == NULL) {
+				TCHAR uimsg[MAX_UIMSG];
 				RECT rect;
+				PTInstVar pvar = data->pvar;
+				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
+				_tcscpy_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				if (wParam == 'V' - 'A' + 1) {
-					s = _T("制御文字を入力しています")
-						_T("\n")
-						_T("クリップボードからの貼り付けのショートカットはCTRL+Insertです");
-				} else {
-					s = _T("制御文字を入力しています");
+					// CTRL + V
+					_tcscat_s(uimsg, _countof(uimsg), _T("\n"));
+					UTIL_get_lang_msg("DLG_AUTH_TIP_PASTE_KEY", pvar, "Use Shift + Insert to paste from clipboard");
+					_tcscat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				}
 				GetWindowRect(control, &rect);
-				tipwin = TipWinCreate(control, rect.left, rect.bottom, s);
+				data->tipwin = TipWinCreate(control, rect.left, rect.bottom, uimsg);
 			}
 
 			return 0;
 		} else {
-			if (tipwin != NULL) {
-				TipWinDestroy(tipwin);
-				tipwin = NULL;
+			if (data->tipwin != NULL) {
+				TipWinDestroy(data->tipwin);
+				data->tipwin = NULL;
 			}
-		}
-		break;
-	case WM_NCDESTROY:
-		if (tipwin != NULL) {
-			TipWinDestroy(tipwin);
-			tipwin = NULL;
 		}
 		break;
 	}
 
-	return CallWindowProc((WNDPROC) GetWindowLong(control, GWL_USERDATA),
-	                      control, msg, wParam, lParam);
+	result = CallWindowProc((WNDPROC)data->ProcOrg,
+							control, msg, wParam, lParam);
+
+	if (msg == WM_NCDESTROY) {
+		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)data->ProcOrg);
+		if (data->tipwin != NULL) {
+			TipWinDestroy(data->tipwin);
+			data->tipwin = NULL;
+		}
+		free(data);
+	}
+
+	return result;
 }
 
-static void init_password_control(HWND dlg)
+void init_password_control(PTInstVar pvar, HWND dlg, int item)
 {
-	HWND passwordControl = GetDlgItem(dlg, IDC_SSHPASSWORD);
-
-	SetWindowLong(passwordControl, GWL_USERDATA,
-	              SetWindowLong(passwordControl, GWL_WNDPROC,
-	                            (LONG) password_wnd_proc));
-
+	HWND passwordControl = GetDlgItem(dlg, item);
+	TPasswordControlData *data = (TPasswordControlData *)malloc(sizeof(TPasswordControlData));
+	data->ProcOrg = (WNDPROC)GetWindowLongPtr(passwordControl, GWLP_WNDPROC);
+	data->pvar = pvar;
+	data->tipwin = NULL;
+	SetWindowLongPtr(passwordControl, GWLP_WNDPROC, (LONG_PTR)password_wnd_proc);
+	SetWindowLongPtr(passwordControl, GWLP_USERDATA, (LONG_PTR)data);
 	SetFocus(passwordControl);
 }
 
@@ -269,7 +291,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
 
 	init_auth_machine_banner(pvar, dlg);
-	init_password_control(dlg);
+	init_password_control(pvar, dlg, IDC_SSHPASSWORD);
 
 	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
@@ -1197,7 +1219,7 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
 
 	init_auth_machine_banner(pvar, dlg);
-	init_password_control(dlg);
+	init_password_control(pvar, dlg, IDC_SSHPASSWORD);
 
 	if (pvar->auth_state.TIS_prompt != NULL) {
 		if (strlen(pvar->auth_state.TIS_prompt) > 10000) {

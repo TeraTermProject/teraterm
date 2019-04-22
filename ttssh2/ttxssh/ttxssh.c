@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@
 #include "ttlib.h"
 #include "keyfiles.h"
 #include "arc4random.h"
+#include "auth.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -4163,15 +4164,6 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 	return;
 }
 
-static void init_password_control(HWND dlg, int item)
-{
-	HWND passwordControl = GetDlgItem(dlg, item);
-
-	SetWindowLong(passwordControl, GWL_USERDATA,
-	              SetWindowLong(passwordControl, GWL_WNDPROC,
-	                            (LONG) password_wnd_proc));
-}
-
 // bcrypt KDFŒ`Ž®‚Å”é–§Œ®‚ð•Û‘¶‚·‚é
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
 static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
@@ -4406,8 +4398,8 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		}
 #endif
 
-		init_password_control(dlg, IDC_KEY_EDIT);
-		init_password_control(dlg, IDC_CONFIRM_EDIT);
+		init_password_control(pvar, dlg, IDC_KEY_EDIT);
+		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT);
 
 		// default key type
 		SendMessage(GetDlgItem(dlg, IDC_RSA_TYPE), BM_SETCHECK, BST_CHECKED, 0);

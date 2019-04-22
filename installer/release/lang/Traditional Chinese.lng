@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-17)
+; Updated by TeraTerm Project (2019-04-22)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -596,6 +596,8 @@ DLG_AUTH_METHOD_PAGEANT=使用 P&ageant 登錄
 DLG_AUTH_PRIVATEKEY=密鑰文件(&K)：
 DLG_AUTH_LOCALUSER=本地用戶名(&U)：
 DLG_AUTH_HOST_PRIVATEKEY=主機密鑰文件(&F)：
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=未找到 Pageant
 MSG_PAGEANT_NOKEY=Pageant 不包含有效的密鑰
 

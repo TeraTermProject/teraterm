@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,8 +73,7 @@ void AUTH_notify_disconnecting(PTInstVar pvar);
 void AUTH_notify_end_error(PTInstVar pvar);
 void AUTH_end(PTInstVar pvar);
 void destroy_malloced_string(char **str);
-LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
-                                   WPARAM wParam, LPARAM lParam);
+void init_password_control(PTInstVar pvar, HWND dlg, int item);
 
 #define AUTH_get_cur_cred(pvar) (&(pvar)->auth_state.cur_cred)
 

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-17)
+; Updated by TeraTerm Project (2019-04-22)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -596,6 +596,8 @@ DLG_AUTH_METHOD_PAGEANT=Pageant 사용(&A)
 DLG_AUTH_PRIVATEKEY=개인키(&K):
 DLG_AUTH_LOCALUSER=지역 사용자이름(&U):
 DLG_AUTH_HOST_PRIVATEKEY=호스트 개인키(&F):
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Pageant를 찾을 수 없습니다.
 MSG_PAGEANT_NOKEY=Pageant가 유효한 키를 가지고 있지 않습니다.
 

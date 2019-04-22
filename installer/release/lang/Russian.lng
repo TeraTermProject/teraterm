@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-17)
+; Updated by TeraTerm Project (2019-04-22)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -596,6 +596,8 @@ DLG_AUTH_METHOD_PAGEANT=&Использовать Pageant
 DLG_AUTH_PRIVATEKEY=&Закрытый ключ
 DLG_AUTH_LOCALUSER=&Скрытое имя:
 DLG_AUTH_HOST_PRIVATEKEY=&Закрытый ключ
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Не удается найти Pageant.
 MSG_PAGEANT_NOKEY=Нет действующего ключа к Pageant.
 

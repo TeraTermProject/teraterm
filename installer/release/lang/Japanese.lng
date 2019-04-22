@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-17)
+; Updated by TeraTerm Project (2019-04-22)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -593,6 +593,8 @@ DLG_AUTH_METHOD_PAGEANT=P&ageantを使う
 DLG_AUTH_PRIVATEKEY=秘密鍵(&K):
 DLG_AUTH_LOCALUSER=ローカルのユーザ名(&U):
 DLG_AUTH_HOST_PRIVATEKEY=ホスト鍵(&F):
+DLG_AUTH_TIP_CONTROL_CODE=制御文字が入力されました
+DLG_AUTH_TIP_PASTE_KEY=Shift+Insertでクリップボードからペーストできます
 MSG_PAGEANT_NOTFOUND=Pageant が見つかりません.
 MSG_PAGEANT_NOKEY=Pageant に有効な鍵が登録されていません.
 
