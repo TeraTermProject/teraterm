@@ -181,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="ttmacro.ico" />
+    <Image Include="ttmacro_3d.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttm-version.rc" />

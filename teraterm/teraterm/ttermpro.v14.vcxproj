@@ -187,8 +187,10 @@
     <Image Include="..\..\cygterm\cygterm.ico" />
     <Image Include="..\common\tek.ico" />
     <Image Include="..\common\Teraterm.ico" />
+    <Image Include="..\common\teraterm_3d.ico" />
     <Image Include="..\common\teraterm_classic.ico" />
     <Image Include="..\common\vt.ico" />
+    <Image Include="..\common\vt_3d.ico" />
     <Image Include="..\common\vt_classic.ico" />
   </ItemGroup>
   <ItemGroup>

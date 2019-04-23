@@ -188,8 +188,10 @@
     <None Include="..\..\cygterm\cygterm.ico" />
     <None Include="..\common\tek.ico" />
     <None Include="..\common\Teraterm.ico" />
+    <None Include="..\common\teraterm_3d.ico" />
     <None Include="..\common\teraterm_classic.ico" />
     <None Include="..\common\vt.ico" />
+    <None Include="..\common\vt_3d.ico" />
     <None Include="..\common\vt_classic.ico" />
   </ItemGroup>
   <ItemGroup>
