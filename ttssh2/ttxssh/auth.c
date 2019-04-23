@@ -124,6 +124,12 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			}
 		}
 		break;
+	case WM_KILLFOCUS:
+		if (data->tipwin != NULL) {
+			TipWinDestroy(data->tipwin);
+			data->tipwin = NULL;
+		}
+		break;
 	}
 
 	result = CallWindowProc((WNDPROC)data->ProcOrg,
