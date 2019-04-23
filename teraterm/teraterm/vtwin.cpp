@@ -1372,7 +1372,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	ModifyMenu(SetupMenu, ID_SETUP_FONT, MF_BYCOMMAND, ID_SETUP_FONT, ts.UIMsg);
 	GetMenuString(SetupMenu, ID_SETUP_DLG_FONT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_SETUP_DIALOG_FONT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_DLG_FONT, MF_BYCOMMAND, ID_SETUP_FONT, ts.UIMsg);
+	ModifyMenu(SetupMenu, ID_SETUP_DLG_FONT, MF_BYCOMMAND, ID_SETUP_DLG_FONT, ts.UIMsg);
 	GetMenuString(SetupMenu, 2, uimsg, sizeof(uimsg), MF_BYPOSITION);
 	get_lang_msg("MENU_SETUP_FONT_SUBMENU", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(SetupMenu, 2, MF_BYPOSITION, 2, ts.UIMsg);
