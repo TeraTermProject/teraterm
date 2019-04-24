@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-17)
+; Updated by TeraTerm Project (2019-04-22)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -593,6 +593,8 @@ DLG_AUTH_METHOD_PAGEANT=Use P&ageant to log in
 DLG_AUTH_PRIVATEKEY=Private &key file:
 DLG_AUTH_LOCALUSER=Local &user name:
 DLG_AUTH_HOST_PRIVATEKEY=Host private key &file:
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Can't find Pageant.
 MSG_PAGEANT_NOKEY=Pageant has no valid key.
 
