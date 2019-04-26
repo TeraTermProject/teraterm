@@ -15,7 +15,34 @@
     <dl>
       <dt id="DefaultUserName">User name</dt>
       <dd>
-        Specify user name to be used for SSH connection.
+        Specify user name to be used for SSH connection.<br />
+		When <a href="#CheckAuthListFirst">Check the supported authentication methods before login</a> was checked, you can not change user name.
+		<ul>
+		  <li>
+			<dl>
+			  <dt>Do not enter username</dt>
+			  <dd>
+				Do not enter username.
+			  </dd>
+		  </li>
+
+		  <li>
+			<dl>
+			  <dt>Use following username</dt>
+			  <dd>
+				Use the username entered in the edit box.<br />
+				However, nothing will be input if the edit box is empty.
+			  </dd>
+		  </li>
+
+		  <li>
+			<dl>
+			  <dt>Use system username</dt>
+			  <dd>
+				User system username, Windows logon username.
+			  </dd>
+		  </li>
+		</ul>
       </dd>
 
       <dt id="DefaultAuthMethod">Specify default authentication method.</dt>

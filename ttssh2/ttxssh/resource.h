@@ -117,7 +117,6 @@
 #define IDC_ECDSA256_TYPE               1067
 #define IDC_HISTORY_LABEL               1068
 #define IDC_ECDSA384_TYPE               1068
-#define IDC_EDIT1                       1069
 #define IDC_FINGER_PRINT                1069
 #define IDC_SENDFILE_EDIT               1069
 #define IDC_PASSWD                      1069
@@ -177,7 +176,6 @@
 #define IDC_RECVFILE_TO                 1101
 #define IDC_CHOOSEHOSTRSAFILE           1102
 #define IDC_HOSTRSAFILENAME             1103
-#define IDC_EDIT3                       1103
 #define IDC_FP_RANDOMART                1103
 #define IDC_CONFIRM_PASSWD              1103
 #define IDC_TTSSH_ICON                  1104
@@ -201,7 +199,6 @@
 #define IDC_SSHUSEPAGEANT               1205
 #define IDC_SSHUSETIS2                  1206
 #define IDC_REMEMBERPASSWORD            1207
-#define IDC_EDIT2                       1208
 #define IDC_SENDFILE_TO                 1208
 #define IDC_SFTP_CONSOLE                1208
 #define IDC_REMOVEKEY_EDIT              1208
@@ -227,15 +224,22 @@
 #define IDC_SSHDYNFROMPORT              1228
 #define IDC_SSHFWDLOCALDYNAMIC_LISTEN   1229
 #define IDC_SSHDYNLISTENADDR            1230
-#define IDC_FROM_CLIPBOARD              1231
+#define IDC_SSHPASSWORD_OPTION          1231
+#define IDC_USERNAME_OPTION             1232
+#define IDC_HOSTRSAFILENAMELABEL        1235
+#define IDC_RSAFILENAMELABEL            1236
+#define IDC_SSH_NO_USERNAME             1237
+#define IDC_SSH_DEFAULTUSERNAME         1238
+#define IDC_SSH_WINDOWS_USERNAME        1239
+#define IDC_SSH_WINDOWS_USERNAME_TEXT   1241
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        115
+#define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1232
+#define _APS_NEXT_CONTROL_VALUE         1242
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

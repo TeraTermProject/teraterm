@@ -136,6 +136,8 @@ we could put them there.
 typedef struct _TS_SSH {
 	BOOL Enabled;
 	int CompressionLevel; /* 0 = NONE, else 1-9 */
+
+	int DefaultUserType;	/* 0/1/2 = no input/DefaultUserName/Windows logon user */
 	char DefaultUserName[256];
 
 	/* this next option is a string of digits. Each digit represents a

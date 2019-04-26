@@ -49,7 +49,8 @@
     </p>
 
     <p id="ssh_auth_dialog">
-      Once connected, then you will be prompted to select authentication method in a dialog.
+      Once connected, then you will be prompted to select authentication method in a dialog.<br />
+	  You can change default value in <a href="../menu/setup-sshauth.html">"TTSSH: Authentication Setup" dialog</a>
     </p>
     <div class="img"><img src="../image/Authentication.png" alt="Authentication method"></div>
     <p>
@@ -66,6 +67,23 @@
       <li>When the Pageant is used, check the [Use Pageant] and input your user name.</li>
     </ul>
 
+    <h3 id="username_input">Inputing Username</h3>
+	<p>
+	  When this dialog is displayed,
+	  username was entered according the <a href="../menu/setup-sshauth.html#DefaultUserName">setting</a>.
+	</p>
+	<p>
+	  In addition, when the username is entered, or when the focus is moved from the input field after inputing username,
+	  the server is accessed according to the <a href="../menu/setup-sshauth.html#CheckAuthListFirst">setting</a>.
+	</p>
+	<p>
+	  You can select an option by pushing the button next to the username field.
+	  <dl>
+		<dt>Paste Windows usename</dt>
+		<dd>Windows username was entered</dd>
+	  </dl>
+	</p>
+
     <h3 id="passwd_input">Inputing Password and Passphrase</h3>
     <p>
       The password and passphrase input box differs from normal dialog box.
@@ -74,6 +92,26 @@
       <li>Control character(0x01 - 0x1F) can be inputted by Control + A - Z, [, \, ], ^ and _.</li>
       <li>Control + V can not be used because the key equals SYN (0x16). Please use Shift + Insert combination for pasting.</li>
     </ul>
+	<p>
+	  You can select an option by pushing the button next to the username field.
+	  <dl>
+		<dt>Paste from clipboard</dt>
+		<dd>Paste from clipboard to password input box</dd>
+
+		<dt>Paste from clipboard and clear clipboard</dt>
+		<dd>Paste from clipboard to password input box, And clear clipboard</dd>
+
+		<dt>Use control charactors</dt>
+		<dd>If checked, you can enter control characters,
+		  but you can not perform operations such as paste clipboard paste with Control + V.
+		  If it is not checked, you can not enter control characters,
+		  but you can perform operations such as paste the clipboard with Control + V.
+		</dd>
+
+		<dt>Show passphrase</dt>
+		<dd>You can choose to display the passphrase or not</dd>
+	  </dl>
+    </p>
 
     <h2 id="securitywarning">Security Warning</h2>
 

@@ -73,7 +73,7 @@ void AUTH_notify_disconnecting(PTInstVar pvar);
 void AUTH_notify_end_error(PTInstVar pvar);
 void AUTH_end(PTInstVar pvar);
 void destroy_malloced_string(char **str);
-void init_password_control(PTInstVar pvar, HWND dlg, int item);
+void init_password_control(PTInstVar pvar, HWND dlg, int item, BOOL *UseControlChar);
 
 #define AUTH_get_cur_cred(pvar) (&(pvar)->auth_state.cur_cred)
 

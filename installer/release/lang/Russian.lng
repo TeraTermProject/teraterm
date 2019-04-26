@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-22)
+; Updated by TeraTerm Project (2019-04-24)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -582,7 +582,12 @@ DLG_AUTH_BANNER=Вход в %s
 DLG_AUTH_BANNER2=Требуется аутентификация.
 DLG_AUTH_BANNER2_FAILED=Ошибка аутентификации. Повторите попытку.
 DLG_AUTH_USERNAME=&Имя пользователя:
+DLG_AUTH_PASTE_WINDOWS_USERNAME=Paste &Windows Username
 DLG_AUTH_PASSWORD=&Фраза пароля:
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=&Запомнить пароль в памяти
 DLG_AUTH_FWDAGENT=&Первый агент
 DLG_AUTH_METHOD_PASSWORD=&Вход с простым паролем
@@ -604,7 +609,10 @@ MSG_PAGEANT_NOKEY=Нет действующего ключа к Pageant.
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Настройка аутентификации
 DLG_AUTHSETUP_BANNER=Выбрать по умолчанию:
-DLG_AUTHSETUP_USERNAME=&Имя:
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_USERNAME=U&se following username
+DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=urrent username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=&Вход с простым паролем
 DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
 DLG_AUTHSETUP_METHOD_RHOST=&Вход с rhosts (SSH1)

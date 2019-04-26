@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-22)
+; Updated by TeraTerm Project (2019-04-24)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -582,7 +582,12 @@ DLG_AUTH_BANNER=登录到 %s
 DLG_AUTH_BANNER2=需要认证。
 DLG_AUTH_BANNER2_FAILED=认证失败，请重试。
 DLG_AUTH_USERNAME=用户名(&N)：
+DLG_AUTH_PASTE_WINDOWS_USERNAME=Paste &Windows Username
 DLG_AUTH_PASSWORD=密码(&P)：
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=记住密码(&M)
 DLG_AUTH_FWDAGENT=代理转发(&O)
 DLG_AUTH_METHOD_PASSWORD=使用简单的密码来登录(&L)
@@ -604,7 +609,10 @@ MSG_PAGEANT_NOKEY=Pageant 不包含有效的密钥
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH：认证设置
 DLG_AUTHSETUP_BANNER=设置默认认证信息：
-DLG_AUTHSETUP_USERNAME=用户名(&N)：
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_USERNAME=U&se following username
+DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=urrent username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=使用简单的密码来登录(&L)
 DLG_AUTHSETUP_METHOD_RSA=使用 &RSA/DSA/ECDSA/ED25519 密钥登录
 DLG_AUTHSETUP_METHOD_RHOST=使用 r&hosts 登录(SSH1)

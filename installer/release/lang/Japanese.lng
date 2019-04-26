@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-22)
+; Updated by TeraTerm Project (2019-04-24)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -581,7 +581,12 @@ DLG_AUTH_BANNER=ログイン中: %s
 DLG_AUTH_BANNER2=認証が必要です.
 DLG_AUTH_BANNER2_FAILED=認証に失敗しました. 再試行してください.
 DLG_AUTH_USERNAME=ユーザ名(&N):
+DLG_AUTH_PASTE_WINDOWS_USERNAME=システムユーザ名をペースト(&W)
 DLG_AUTH_PASSWORD=パスフレーズ(&P):
+DLG_AUTH_PASTE_CLIPBOARD=クリップボードからペースト(&C)
+DLG_AUTH_CLEAR_CLIPBOARD=クリップボードからペーストした後クリップボードをクリアする(&E)
+DLG_AUTH_USE_CONTORL_CHARACTERS=パスフレーズに制御コードを使用する(&T)
+DLG_AUTH_SHOW_PASSPHRASE=パスフレーズを表示する(&S)
 DLG_AUTH_REMEMBER_PASSWORD=パスワードをメモリ上に記憶する(&M)
 DLG_AUTH_FWDAGENT=エージェント転送する(&O)
 DLG_AUTH_METHOD_PASSWORD=プレインパスワードを使う(&L)
@@ -601,7 +606,10 @@ MSG_PAGEANT_NOKEY=Pageant に有効な鍵が登録されていません.
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: 認証設定
 DLG_AUTHSETUP_BANNER=通常使用する認証方式:
-DLG_AUTHSETUP_USERNAME=ユーザ名(&N):
+DLG_AUTHSETUP_NO_USERNAME=入力しない(&D)
+DLG_AUTHSETUP_USERNAME=次のユーザ名を使用(&N):
+DLG_AUTHSETUP_SYSTEM_USERNAME=システムのユーザ名を使用(&E):
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=現在のログインユーザ名 "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=プレインパスワードを使う(&L)
 DLG_AUTHSETUP_METHOD_RSA=&RSA/DSA/ECDSA/ED25519鍵を使う
 DLG_AUTHSETUP_METHOD_RHOST=r&hostsを使う(SSH1)

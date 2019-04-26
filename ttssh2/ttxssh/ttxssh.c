@@ -446,6 +446,8 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	}
 
 	READ_STD_STRING_OPTION(DefaultUserName);
+	settings->DefaultUserType = GetPrivateProfileInt("TTSSH", "DefaultUserType", 1, fileName);
+
 	READ_STD_STRING_OPTION(DefaultForwarding);
 	READ_STD_STRING_OPTION(DefaultRhostsLocalUserName);
 	READ_STD_STRING_OPTION(DefaultRhostsHostPrivateKeyFile);
@@ -570,6 +572,8 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	_itoa(settings->CompressionLevel, buf, 10);
 	WritePrivateProfileString("TTSSH", "Compression", buf, fileName);
 
+	_itoa(settings->DefaultUserType, buf, 10);
+	WritePrivateProfileString("TTSSH", "DefaultUserType", buf, fileName);
 	WritePrivateProfileString("TTSSH", "DefaultUserName",
 	                          settings->DefaultUserName, fileName);
 
@@ -4398,8 +4402,8 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		}
 #endif
 
-		init_password_control(pvar, dlg, IDC_KEY_EDIT);
-		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT);
+		init_password_control(pvar, dlg, IDC_KEY_EDIT, NULL);
+		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT, NULL);
 
 		// default key type
 		SendMessage(GetDlgItem(dlg, IDC_RSA_TYPE), BM_SETCHECK, BST_CHECKED, 0);

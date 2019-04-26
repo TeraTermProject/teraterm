@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-    <TITLE>SSH 接続</title>
+    <title>SSH 接続</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
@@ -48,7 +48,8 @@
     </p>
 
     <p id="ssh_auth_dialog">
-      接続すると、今度は認証方法を選択するダイアログが現れます。
+      接続すると、今度は認証方法を選択するダイアログが現れます。<br />
+	  デフォルト値を<a href="../menu/setup-sshauth.html">"TTSSH: Authentication Setup" ダイアログボックス</a>で設定することができます。
     </p>
     <div class="img"><img src="../image/Authentication.png" alt="認証方法"></div>
     <p>
@@ -65,14 +66,53 @@
       <li>Pageant を用いて認証する場合は「Use Pageant」にチェックをつけ、ユーザ名を入力します。</li>
     </ul>
 
+    <h3 id="username_input">ユーザー名入力</h3>
+	<p>
+	  このダイアログが表示されたときに
+	  <a href="../menu/setup-sshauth.html#DefaultUserName">設定</a>によってあらかじめ
+	  ユーザー名が入力されます。
+	</p>
+	<p>
+	  また、
+	  ユーザー名が入力されていた時、または、ユーザー名を入力して入力欄からフォーカスが移動した時、
+	  <a href="../menu/setup-sshauth.html#CheckAuthListFirst">設定</a>によってサーバーへアクセスします。
+	</p>
+	<p>
+	  ユーザー名の入力欄の横のボタンを押すとオプションを選択できます。
+	  <dl>
+		<dt>Paste Windows usename</dt>
+		<dd>Windowsのユーザー名を入力します。</dd>
+	  </dl>
+	</p>
+
     <h3 id="passwd_input">パスワード / パスフレーズ入力</h3>
     <p>
       パスワード / パスフレーズの入力欄は、通常のダイアログと違い以下のような動作となります。
     </p>
     <ul>
-      <li>Control + A ～ Z, [, \, ], ^, _ で制御文字 (0x01 - 0x1F) を入力できます。</li>
+      <li>Control + A ～ Z, [, \, ], ^, _ で制御文字 (0x01 - 0x1F) を入力できます。この動作がデフォルトです</li>
       <li>Control + V は SYN (0x16) の入力となりますので、貼り付けには利用できません。貼り付けを行うには Shift + Insert を使用してください。</li>
     </ul>
+	<p>
+	  入力欄の横のボタンを押すとオプションを選択できます。
+	  <dl>
+		<dt>Paste from clipboard</dt>
+		<dd>クリップボードからパスフレーズをペーストします。</dd>
+
+		<dt>Paste from clipboard and clear clipboard</dt>
+		<dd>クリップボードからパスフレーズをペーストしてクリップボードを空にします。</dd>
+
+		<dt>Use control charactors</dt>
+		<dd>チェックが入っていると制御文字を入力することができますが、
+		  Control + Vでクリップボードのペースト等の操作はできません。
+		  チェックが入っていないと制御文字を入力できませんが、
+		  Control + Vでクリップボードのペースト等の操作が可能です。
+		</dd>
+
+		<dt>Show passphrase</dt>
+		<dd>パスフレーズを表示するか、伏字にするか選択できます</dd>
+	  </dl>
+    </p>
 
     <h2 id="securitywarning">セキュリティ警告</h2>
 

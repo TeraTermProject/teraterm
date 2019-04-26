@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-22)
+; Updated by TeraTerm Project (2019-04-24)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -582,7 +582,12 @@ DLG_AUTH_BANNER=%s로 로그인 중
 DLG_AUTH_BANNER2=인증이 필요함.
 DLG_AUTH_BANNER2_FAILED=일증 실패. 다시 시도해주세요.
 DLG_AUTH_USERNAME=사용자 이름(&N):
+DLG_AUTH_PASTE_WINDOWS_USERNAME=Paste &Windows Username
 DLG_AUTH_PASSWORD=암호(&P):
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=메모리에 암호기억(&M)
 DLG_AUTH_FWDAGENT=에이전트로 전달(&O)
 DLG_AUTH_METHOD_PASSWORD=일반텍스트 암호 로그인(&L)
@@ -604,7 +609,10 @@ MSG_PAGEANT_NOKEY=Pageant가 유효한 키를 가지고 있지 않습니다.
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: 인증 설정
 DLG_AUTHSETUP_BANNER=기본 인증 선택:
-DLG_AUTHSETUP_USERNAME=사용자 이름(&N):
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_USERNAME=U&se following username
+DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=urrent username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=일반텍스트 암호 로그인(&L)
 DLG_AUTHSETUP_METHOD_RSA=RSA/DSA/ECDSA/ED25519 키 로그인(&R)
 DLG_AUTHSETUP_METHOD_RHOST=rhosts 로그인(SSH1)(&H)
