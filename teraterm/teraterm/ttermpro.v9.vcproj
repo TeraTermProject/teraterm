@@ -466,10 +466,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ttpdlg\svnversion.h"
-				>
-			</File>
-			<File
 				RelativePath="..\ttpdlg\ttdlg.c"
 				>
 			</File>
