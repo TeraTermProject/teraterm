@@ -94,6 +94,9 @@
     <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\teraterm\common\tipwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arc4random.h">
