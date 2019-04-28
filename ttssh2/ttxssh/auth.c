@@ -801,6 +801,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 //	HFONT font;
 	static BOOL UseControlChar;
 	static BOOL ShowPassPhrase;
+	static HICON hIconDropdown;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -841,6 +842,10 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgAuthFont = NULL;
 		}
 #endif
+		hIconDropdown = LoadImage(hInst, MAKEINTRESOURCE(IDI_DROPDOWN),
+								  IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+		SendMessage(GetDlgItem(dlg, IDC_USERNAME_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
+		SendMessage(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
 
 		// SSH2 autologinが有効の場合は、タイマを仕掛ける。 (2004.12.1 yutaka)
 		if (pvar->ssh2_autologin == 1) {
@@ -1164,6 +1169,12 @@ canceled:
 		default:
 			return FALSE;
 		}
+
+	case WM_DESTROY:
+		if (hIconDropdown != NULL) {
+			DeleteObject(hIconDropdown);
+		}
+		return FALSE;
 
 	default:
 		return FALSE;

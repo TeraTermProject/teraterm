@@ -58,10 +58,10 @@ BEGIN
     LTEXT           "Authentication required.",IDC_SSHAUTHBANNER2,6,16,281,10
     LTEXT           "User &name:",IDC_SSHUSERNAMELABEL,17,31,46,8
     EDITTEXT        IDC_SSHUSERNAME,73,29,146,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_USERNAME_OPTION,224,28,14,14,BS_BITMAP
+    PUSHBUTTON      "",IDC_USERNAME_OPTION,224,28,14,14,BS_BITMAP
     LTEXT           "&Passphrase:",IDC_SSHPASSWORDCAPTION,17,46,47,8
     EDITTEXT        IDC_SSHPASSWORD,73,44,146,12,ES_PASSWORD | ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SSHPASSWORD_OPTION,224,43,14,14
+    PUSHBUTTON      "",IDC_SSHPASSWORD_OPTION,224,43,14,14,BS_BITMAP
     CONTROL         "Remember password in &memory",IDC_REMEMBER_PASSWORD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,61,132,10
     CONTROL         "F&orward agent",IDC_FORWARD_AGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,75,132,10
@@ -647,6 +647,8 @@ IDI_SECURETT            ICON                    "ttsecure.ico"
 IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
 
 IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
+
+IDI_DROPDOWN            ICON                    "dropdown.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
