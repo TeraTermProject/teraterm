@@ -47,7 +47,7 @@
 #include "tipwin.h"
 #include "auth.h"
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
 #define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p)   _free_dbg((p), _NORMAL_BLOCK)
 #endif
@@ -1060,16 +1060,17 @@ canceled:
 			HWND hWndButton;
 			int result;
 			HMENU hMenu= CreatePopupMenu();
+			char *clipboard = GetClipboardTextA(dlg, FALSE);
 			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_CLIPBOARD",
 						uimsg, _countof(uimsg),
 						"Paste from &clipboard",
 						pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1, uimsg);
+			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (clipboard == NULL ? MFS_DISABLED : 0), 1, uimsg);
 			GetI18nStrT("ttssh", "DLG_AUTH_CLEAR_CLIPBOARD",
 						uimsg, _countof(uimsg),
 						"Paste from &clipboard and cl&ear clipboard",
 						pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 2, uimsg);
+			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (clipboard == NULL ? MFS_DISABLED : 0), 2, uimsg);
 			GetI18nStrT("ttssh", "DLG_AUTH_USE_CONTORL_CHARACTERS",
 						uimsg, _countof(uimsg),
 						"Use control charac&ters",
@@ -1080,6 +1081,9 @@ canceled:
 						"&Show passphrase",
 						pvar->ts->UILanguageFile);
 			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (ShowPassPhrase ? MFS_CHECKED : 0), 4, uimsg);
+			if (clipboard != NULL) {
+				free(clipboard);
+			}
 			hWndButton = GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION);
 			GetWindowRect(hWndButton, &rect);
 			result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
@@ -1089,7 +1093,7 @@ canceled:
 			case 2: {
 				// クリップボードからペースト
 				BOOL clear_clipboard = result == 2;
-				char *clipboard = GetClipboardTextA(dlg, clear_clipboard);
+				clipboard = GetClipboardTextA(dlg, clear_clipboard);
 				if (clipboard != NULL) {
 					SetDlgItemTextA(dlg, IDC_SSHPASSWORD, clipboard);
 					free(clipboard);
