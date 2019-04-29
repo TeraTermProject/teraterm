@@ -1,7 +1,6 @@
 
 #cmakedefine USE_UNICODE_API
 #cmakedefine SVNVERSION @SVNVERSION@
-#cmakedefine ENABLE_DPIAWARENESS @ENABLE_DPIAWARENESS@
 
 // infos when generated
 #cmakedefine MSVC
