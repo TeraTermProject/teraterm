@@ -1056,6 +1056,9 @@ canceled:
 
 		case IDC_SSHPASSWORD_OPTION: {
 			TCHAR uimsg[MAX_UIMSG];
+			RECT rect;
+			HWND hWndButton;
+			int result;
 			HMENU hMenu= CreatePopupMenu();
 			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_CLIPBOARD",
 						uimsg, _countof(uimsg),
@@ -1077,10 +1080,9 @@ canceled:
 						"&Show passphrase",
 						pvar->ts->UILanguageFile);
 			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (ShowPassPhrase ? MFS_CHECKED : 0), 4, uimsg);
-			RECT rect;
-			HWND hWndButton = GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION);
+			hWndButton = GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION);
 			GetWindowRect(hWndButton, &rect);
-			int result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
+			result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
 			DestroyMenu(hMenu);
 			switch(result) {
 			case 1:
@@ -1139,16 +1141,18 @@ canceled:
 
 		case IDC_USERNAME_OPTION: {
 			TCHAR uimsg[MAX_UIMSG];
+			RECT rect;
+			HWND hWndButton;
 			HMENU hMenu= CreatePopupMenu();
+			int result;
 			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_WINDOWS_USERNAME",
 						uimsg, _countof(uimsg),
 						"Paste &Windows username",
 						pvar->ts->UILanguageFile);
 			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1, uimsg);
-			RECT rect;
-			HWND hWndButton = GetDlgItem(dlg, IDC_USERNAME_OPTION);
+			hWndButton = GetDlgItem(dlg, IDC_USERNAME_OPTION);
 			GetWindowRect(hWndButton, &rect);
-			int result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
+			result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
 			DestroyMenu(hMenu);
 			switch (result) {
 			case 1: {
