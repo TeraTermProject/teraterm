@@ -246,6 +246,34 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 	}
 }
 
+static LRESULT CALLBACK username_proc(HWND hWnd, UINT msg,
+									  WPARAM wParam, LPARAM lParam)
+{
+	const WNDPROC ProcOrg = (WNDPROC)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	const LRESULT result = CallWindowProc(ProcOrg, hWnd, msg, wParam, lParam);
+	switch (msg) {
+	case WM_CHAR:
+	case WM_SETTEXT: {
+		// ユーザー名が入力されていた場合、オプションを使うことはないので、
+		// tabでのフォーカス移動時、オプションボタンをパスするようにする
+		// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
+		const HWND dlg = GetParent(hWnd);
+		const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
+		const int len = GetWindowTextLength(hWnd);
+		LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
+		if (len > 0) {
+			// 不要tabstop
+			style = style & (~(LONG_PTR)WS_TABSTOP);
+		} else {
+			// 要tabstop
+			style = style | WS_TABSTOP;
+		}
+		SetWindowLongPtr(hWndOption, GWL_STYLE, style);
+	}
+	}
+	return result;
+}
+
 static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 {
 	const static DlgTextInfo text_info[] = {
@@ -302,6 +330,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
 		                  "Use keyboard-&interactive to log in");
 		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
+	}
+
+	// usernameのサブクラス化
+	{
+		HWND hWndUserName = GetDlgItem(dlg, IDC_SSHUSERNAME);
+		LONG_PTR ProcOrg =
+			SetWindowLongPtr(hWndUserName, GWLP_WNDPROC, (LONG_PTR)username_proc);
+		SetWindowLongPtr(hWndUserName, GWLP_USERDATA, ProcOrg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
@@ -842,6 +878,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgAuthFont = NULL;
 		}
 #endif
+		// "▼"画像をセットする
 		hIconDropdown = LoadImage(hInst, MAKEINTRESOURCE(IDI_DROPDOWN),
 								  IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
 		SendMessage(GetDlgItem(dlg, IDC_USERNAME_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
