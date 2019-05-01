@@ -5421,13 +5421,13 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	else if (pvar->settings.GexMinimalGroupSize < GEX_GRP_LIMIT_MIN) {
 		min = GEX_GRP_LIMIT_MIN;
 		logprintf(LOG_LEVEL_NOTICE,
-			__FUNCTION__ ": small GexMinimalGroupSize is too small (%d), use minimum limit (%sd)",
+			__FUNCTION__ ": small GexMinimalGroupSize is too small (%d), use minimum limit (%d)",
 			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MIN);
 	}
 	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_LIMIT_MAX) {
 		min = GEX_GRP_LIMIT_MAX;
 		logprintf(LOG_LEVEL_NOTICE,
-			__FUNCTION__ ": small GexMinimalGroupSize is too larse (%d), use maximum limit (%sd)",
+			__FUNCTION__ ": small GexMinimalGroupSize is too larse (%d), use maximum limit (%d)",
 			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MAX);
 	}
 	else {
