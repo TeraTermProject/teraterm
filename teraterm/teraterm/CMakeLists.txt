@@ -198,7 +198,7 @@ add_dependencies(
   )
 
 # copy .lng files
-if(${MSVC_VERSION} GREATER_EQUAL 1910)
+if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
   # Visual Studio 2017以上の時
   add_custom_target(
     copy_lang ALL
