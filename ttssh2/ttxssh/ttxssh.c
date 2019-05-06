@@ -977,7 +977,11 @@ void logputs(int level, char *msg)
 	}
 }
 
-void logprintf(int level, char *fmt, ...)
+#if defined(_MSC_VER)
+void logprintf(int level, _Printf_format_string_ const char *fmt, ...)
+#else
+void logprintf(int level, const char *fmt, ...)
+#endif
 {
 	char buff[4096];
 	va_list params;
@@ -1031,7 +1035,11 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 	//strncat_s(buf, buflen, "\n", _TRUNCATE);
 }
 
-void logprintf_hexdump(int level, char *data, int len, char *fmt, ...)
+#if defined(_MSC_VER)
+void logprintf_hexdump(int level, const char *data, int len, _Printf_format_string_ const char *fmt, ...)
+#else
+void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...)
+#endif
 {
 	char buff[4096];
 	va_list params;

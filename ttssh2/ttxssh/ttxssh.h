@@ -90,6 +90,11 @@ typedef struct _TInstVar *PTInstVar;
 #include "tttypes.h"
 #include "ttplugin.h"
 
+#if defined(_MSC_VER) && _MSC_VER < 1910
+// 2017–¢–ž‚Ì‚Æ‚«‚Í–³Œø‚Æ‚·‚é
+#define _Printf_format_string_
+#endif
+
 HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 
 #define ID_SSHSCPMENU       52110
@@ -356,8 +361,16 @@ void notify_closed_connection(PTInstVar pvar, char *send_msg);
 void notify_nonfatal_error(PTInstVar pvar, char *msg);
 void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect);
 void logputs(int level, char *msg);
-void logprintf(int level, char *fmt, ...);
-void logprintf_hexdump(int level, char *data, int len, char *fmt, ...);
+#if defined(_MSC_VER)
+void logprintf(int level, _Printf_format_string_ const char *fmt, ...);
+void logprintf_hexdump(int level, const char *data, int len, _Printf_format_string_ const char *fmt, ...);
+#elif defined(__GNUC__)
+void logprintf(int level, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...) __attribute__ ((format (printf, 4, 5)));
+#else
+void logprintf(int level, const char *fmt, ...);
+void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...);
+#endif
 
 void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
 int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);
