@@ -65,10 +65,6 @@ typedef enum {
 #define SOCKS5_ERROR_COMMAND     129
 #define SOCKS5_ERROR_ADDRTYPE    130
 
-#if defined(__MINGW32__)
-#define __FUNCTION__
-#endif
-
 typedef struct {
 	PTInstVar pvar;
 
@@ -88,7 +84,7 @@ void *SOCKS_init_filter(PTInstVar pvar, int channel_num, char *peer_name, int po
 	FWDDynamicFilterClosure *closure = malloc(sizeof(FWDDynamicFilterClosure));
 
 	if (closure == NULL) {
-		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": Can't allocate memory for closure.");
+		logprintf(LOG_LEVEL_ERROR, "%s: Can't allocate memory for closure.", __FUNCTION__);
 		return NULL;
 	}
 
@@ -125,7 +121,7 @@ static int send_socks_reply(FWDDynamicFilterClosure *closure, const char *data, 
 	PTInstVar pvar = closure->pvar;
 	FWDChannel *c = pvar->fwd_state.channels + closure->channel_num;
 
-	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending %d bytes.", len);
+	logprintf(LOG_LEVEL_VERBOSE, "%s: sending %d bytes.", __FUNCTION__, len);
 
 	return UTIL_sock_buffered_write(pvar, &c->writebuf, dummy_blocking_write, c->local_socket, data, len);
 }
@@ -420,9 +416,9 @@ FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, int *len,
 
 	if (newlen > SOCKS_REQUEST_MAXLEN || *len < 0) {
 		// リクエストが大きすぎる場合は切断する
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__
-			": request too large: state=%d, buflen=%d, reqlen=%d",
-			closure->status, closure->buflen, *len);
+		logprintf(LOG_LEVEL_ERROR,
+			"%s: request too large: state=%d, buflen=%d, reqlen=%d",
+			__FUNCTION__, closure->status, closure->buflen, *len);
 		return FWD_FILTER_CLOSECHANNEL;
 	}
 
@@ -446,7 +442,7 @@ FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, int *len,
 		}
 		else {
 			// Invalid request
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": Invalid request. protocol-version=%d", buf[0]);
+			logprintf(LOG_LEVEL_ERROR, "%s: Invalid request. protocol-version=%d", __FUNCTION__, buf[0]);
 			result = -1;
 		}
 		break;
@@ -456,7 +452,7 @@ FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, int *len,
 		}
 		else {
 			// Invalid request
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": Invalid request. protocol-version=%d", buf[0]);
+			logprintf(LOG_LEVEL_ERROR, "%s: Invalid request. protocol-version=%d", __FUNCTION__, buf[0]);
 			result = -1;
 		}
 		break;
@@ -482,21 +478,21 @@ FwdFilterResult SOCKS_filter(void *void_closure, FwdFilterEvent event, int *len,
 	FWDDynamicFilterClosure *closure = (FWDDynamicFilterClosure *)void_closure;
 
 	if (closure == NULL) {
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": closure does not available. event=%d", event);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: closure does not available. event=%d", __FUNCTION__, event);
 		return FWD_FILTER_REMOVE;
 	}
 
 	switch (event) {
 	case FWD_FILTER_CLEANUP:
 		// FWD_FILTER_REMOVE を返すと、リソース開放の為にこれで再度呼ばれる
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": closure cleanup. channel=%d", closure->channel_num);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: closure cleanup. channel=%d", __FUNCTION__, closure->channel_num);
 		free(closure->peer_name);
 		free(closure);
 		return FWD_FILTER_REMOVE;
 
 	case FWD_FILTER_OPENCONFIRM:
 		// SSH_open_channel() が成功
-		logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": OpenConfirmation received");
+		logprintf(LOG_LEVEL_VERBOSE, "%s: OpenConfirmation received", __FUNCTION__ );
 		if (closure->socks_ver == 4) {
 			send_socks4_reply(closure, SOCKS4_RESULT_OK);
 		}
@@ -504,13 +500,13 @@ FwdFilterResult SOCKS_filter(void *void_closure, FwdFilterEvent event, int *len,
 			send_socks5_open_success(closure);
 		}
 		else {
-			logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": protocol version missmatch. version=%d", closure->socks_ver);
+			logprintf(LOG_LEVEL_VERBOSE, "%s: protocol version missmatch. version=%d", __FUNCTION__, closure->socks_ver);
 		}
 		return FWD_FILTER_REMOVE;
 
 	case FWD_FILTER_OPENFAILURE:
 		// SSH_open_channel() が失敗
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": Open Failure. reason=%d", *len);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: Open Failure. reason=%d", __FUNCTION__, *len);
 		if (closure->socks_ver == 4) {
 			send_socks4_reply(closure, SOCKS4_RESULT_NG);
 		}
@@ -518,19 +514,19 @@ FwdFilterResult SOCKS_filter(void *void_closure, FwdFilterEvent event, int *len,
 			send_socks5_open_failure(closure, *len);
 		}
 		else {
-			logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": protocol version missmatch. version=%d", closure->socks_ver);
+			logprintf(LOG_LEVEL_VERBOSE, "%s: protocol version missmatch. version=%d", __FUNCTION__, closure->socks_ver);
 		}
 		return FWD_FILTER_CLOSECHANNEL;
 
 	case FWD_FILTER_FROM_SERVER:
 		// このフィルタが有効な時点ではサーバへのチャネルは開いていないので
 		// ここにはこないはず
-		logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": data received from server. (bug?)");
+		logprintf(LOG_LEVEL_VERBOSE, "%s: data received from server. (bug?)", __FUNCTION__);
 		return FWD_FILTER_RETAIN;
 
 	case FWD_FILTER_FROM_CLIENT:
 		// クライアントからの要求を処理する
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": data received from client. size=%d", *len);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: data received from client. size=%d", __FUNCTION__, *len);
 		return parse_client_request(closure, len, buf);
 	}
 

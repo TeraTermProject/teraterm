@@ -38,10 +38,6 @@
 #include <openssl/ec.h>
 #include <zlib.h>
 
-#if defined(__MINGW32__)
-#define __FUNCTION__
-#endif
-
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
 void buffer_rewind(buffer_t *buf)
@@ -251,7 +247,7 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 
 	ptr = malloc(buflen + 1);
 	if (ptr == NULL) {
-		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": malloc failed.");
+		logprintf(LOG_LEVEL_ERROR, "%s: malloc failed.", __FUNCTION__);
 		if (buflen_ptr != NULL)
 			*buflen_ptr = 0;
 		return NULL;

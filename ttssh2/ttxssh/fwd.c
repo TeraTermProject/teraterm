@@ -47,10 +47,6 @@ See LICENSE.TXT for the license.
 
 #define CHANNEL_READ_BUF_SIZE 8192
 
-#if defined(__MINGW32__)
-#define __FUNCTION__
-#endif
-
 static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
                                         LPARAM lParam);
 
@@ -634,8 +630,8 @@ static void accept_local_connection(PTInstVar pvar, int request_num, int listeni
 	channel->local_socket = s;
 
 	if (request->spec.type == FWD_LOCAL_TO_REMOTE) {
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
-		          ": Host %s(%d) connecting to port %d; forwarding to %s:%d; type=LtoR",
+		logprintf(LOG_LEVEL_VERBOSE,
+		          "%s: Host %s(%d) connecting to port %d; forwarding to %s:%d; type=LtoR", __FUNCTION__,
 		          hname, port, request->spec.from_port, request->spec.to_host, request->spec.to_port);
 
 		channel->filter_closure = NULL;
@@ -644,9 +640,9 @@ static void accept_local_connection(PTInstVar pvar, int request_num, int listeni
 		                 request->spec.to_port, hname, port);
 	}
 	else { // FWD_LOCAL_DYNAMIC
-		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
-		          ": Host %s(%d) connecting to port %d; type=dynamic",
-		          hname, port, request->spec.from_port);
+		logprintf(LOG_LEVEL_VERBOSE,
+		          "%s: Host %s(%d) connecting to port %d; type=dynamic",
+				  __FUNCTION__, hname, port, request->spec.from_port);
 
 		// SOCKS のリクエストを処理する為の filter を登録
 		channel->filter_closure = SOCKS_init_filter(pvar, channel_num, hname, port);
@@ -656,7 +652,7 @@ static void accept_local_connection(PTInstVar pvar, int request_num, int listeni
 		channel->status |= FWD_BOTH_CONNECTED;
 
 	}
-	logprintf(150, __FUNCTION__ ": channel info: %s", dump_fwdchannel(channel));
+	logprintf(150, "%s: channel info: %s", __FUNCTION__, dump_fwdchannel(channel));
 }
 
 static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
@@ -675,7 +671,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 {
 	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
-	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": channel=%d", channel_num);
+	logprintf(LOG_LEVEL_VERBOSE, "%s: channel=%d", __FUNCTION__, channel_num);
 
 	if ((channel->status & FWD_BOTH_CONNECTED) != FWD_BOTH_CONNECTED) {
 		return;
@@ -1214,20 +1210,20 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	// 他のも含めて LOG_LEVEL を整理したい……
 	//
 	if (LogLevel(pvar, 150)) {
-		logprintf(150, __FUNCTION__ ": old specs: %d", pvar->fwd_state.num_requests);
+		logprintf(150, "%s: old specs: %d", __FUNCTION__, pvar->fwd_state.num_requests);
 		for (i=0; i < pvar->fwd_state.num_requests; i++) {
-			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+			logprintf(150, "%s:   #%d: %s", __FUNCTION__, i,
 				dump_fwdspec(&pvar->fwd_state.requests[i].spec, pvar->fwd_state.requests[i].status));
 		}
 
-		logprintf(150, __FUNCTION__ ": new specs: %d", num_specs);
+		logprintf(150, "%s: new specs: %d", __FUNCTION__, num_specs);
 		for (i=0; i < num_specs; i++) {
-			logprintf(150, __FUNCTION__ ":   #%d: %s", i, dump_fwdspec(new_specs+i, 0));
+			logprintf(150, "%s:   #%d: %s", __FUNCTION__, i, dump_fwdspec(new_specs+i, 0));
 		}
 
-		logprintf(150, __FUNCTION__ ": listening specs: %d", num_cur_listening);
+		logprintf(150, "%s: listening specs: %d", __FUNCTION__, num_cur_listening);
 		for (i=0; i < num_cur_listening; i++) {
-			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+			logprintf(150, "%s:   #%d: %s", __FUNCTION__, i,
 				dump_fwdspec(&server_listening_specs[i], 0));
 		}
 	}
@@ -1369,14 +1365,14 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	}
 
 	if (LogLevel(pvar, 150)) {
-		logprintf(150, __FUNCTION__ ": updated specs: %d", pvar->fwd_state.num_requests);
+		logprintf(150, "%s: updated specs: %d", __FUNCTION__, pvar->fwd_state.num_requests);
 		for (i=0; i < pvar->fwd_state.num_requests; i++) {
-			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+			logprintf(150, "%s:   #%d: %s", __FUNCTION__, i,
 				dump_fwdspec(&pvar->fwd_state.requests[i].spec, pvar->fwd_state.requests[i].status));
 		}
-		logprintf(150, __FUNCTION__ ": new listening specs: %d", pvar->fwd_state.num_server_listening_specs);
+		logprintf(150, "%s: new listening specs: %d", __FUNCTION__, pvar->fwd_state.num_server_listening_specs);
 		for (i=0; i < pvar->fwd_state.num_server_listening_specs; i++) {
-			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+			logprintf(150, "%s:   #%d: %s", __FUNCTION__, i,
 				dump_fwdspec(&pvar->fwd_state.server_listening_specs[i], 0));
 		}
 	}
