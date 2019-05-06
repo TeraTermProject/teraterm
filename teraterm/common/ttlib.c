@@ -905,7 +905,7 @@ void GetDefaultFName(const char *home, const char *file, char *dest, int destlen
 	strncpy_s(MyDocSetupFName, sizeof(MyDocSetupFName), MyDoc, _TRUNCATE);
 	AppendSlash(MyDocSetupFName,sizeof(MyDocSetupFName));
 	strncat_s(MyDocSetupFName, sizeof(MyDocSetupFName), file, _TRUNCATE);
-	if (GetFileAttributes(MyDocSetupFName) != -1) {
+	if (GetFileAttributes(MyDocSetupFName) != INVALID_FILE_ATTRIBUTES) {
 		strncpy_s(dest, destlen, MyDocSetupFName, _TRUNCATE);
 		return;
 	}

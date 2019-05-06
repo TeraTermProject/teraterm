@@ -505,7 +505,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	if (FuncId == GTF_LOG) {
 		DWORD logdir = GetFileAttributes(fv->LogDefaultPath);
 		// ログ保存の場合は初期フォルダを決め打ちしないようにする。(2007.8.24 yutaka)
-		if (logdir != -1 && logdir & FILE_ATTRIBUTE_DIRECTORY) {
+		if (logdir != INVALID_FILE_ATTRIBUTES && logdir & FILE_ATTRIBUTE_DIRECTORY) {
 			// LogDefaultPathが存在するなら、そこを初期フォルダにする。(2007.11.30 maya)
 			ofn.lpstrInitialDir = fv->LogDefaultPath;
 		}
