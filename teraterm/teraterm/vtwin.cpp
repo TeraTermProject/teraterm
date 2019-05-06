@@ -117,7 +117,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #endif
 
 #ifdef _DEBUG
-#define malloc(l)   _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
 #define new  		::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
