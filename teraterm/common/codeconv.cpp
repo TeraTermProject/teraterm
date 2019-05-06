@@ -781,11 +781,15 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 				}
 				u16_out = 2;
 			} else {
-				*wstr_ptr++ = '?';
+				if (wstr_ptr != NULL) {
+					*wstr_ptr++ = '?';
+				}
 				u16_out = 1;
 			}
 		} else {
-			*wstr_ptr++ = '?';
+			if (wstr_ptr != NULL) {
+				*wstr_ptr++ = '?';
+			}
 			u16_out = 1;
 		}
 
@@ -1007,12 +1011,14 @@ u8::u8(const wchar_t *strW)
 
 u8::u8(const u8 &obj)
 {
+	u8str_ = NULL;
 	copy(obj);
 }
 
 #if defined(MOVE_CONSTRUCTOR_ENABLE)
 u8::u8(u8 &&obj) noexcept
 {
+	u8str_ = NULL;
 	move(obj);
 }
 #endif
@@ -1137,6 +1143,7 @@ tc::tc(const wchar_t *strW)
 
 tc::tc(const tc &obj)
 {
+	tstr_ = NULL;
 	copy(obj);
 }
 
