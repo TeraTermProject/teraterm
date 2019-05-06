@@ -1054,20 +1054,22 @@ void OutputDebugPrintf(const char *fmt, ...)
 	char tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
-	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	_vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
 	va_end(arg);
 	OutputDebugStringA(tmp);
 }
 
+#if defined(UNICODE)
 void OutputDebugPrintfW(const wchar_t *fmt, ...)
 {
 	wchar_t tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
-	_vsnwprintf(tmp, _countof(tmp), fmt, arg);
+	_vsnwprintf_s(tmp, _countof(tmp), _TRUNCATE, fmt, arg);
 	va_end(arg);
 	OutputDebugStringW(tmp);
 }
+#endif
 
 #if (_MSC_VER < 1800)
 BOOL vercmp(

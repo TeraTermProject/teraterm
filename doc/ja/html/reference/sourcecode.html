@@ -435,7 +435,7 @@ void OutputDebugPrintf(char *fmt, ...) {
 	char tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
-	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	_vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
 	OutputDebugString(tmp);
 }
 </pre>
