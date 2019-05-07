@@ -73,8 +73,8 @@ inline bool YclAssert(bool condition, const char* message) {
 	return false;
 }
 
-#define YCLASSERT(condition, message) if (YclAssert(condition, message)) {__asm { int 3 }}
-#define YCLVERIFY(condition, message) if (YclAssert(condition, message)) {__asm { int 3 }}
+#define YCLASSERT(condition, message) if (YclAssert(condition, message)) {__debugbreak();}
+#define YCLVERIFY(condition, message) if (YclAssert(condition, message)) {__debugbreak();}
 
 #define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
