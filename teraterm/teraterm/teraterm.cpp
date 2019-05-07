@@ -54,11 +54,7 @@
 #include "dlglib.h"
 #include "teraterml.h"
 
-#if 0
-//#ifdef _DEBUG
-//#define new DEBUG_NEW
-//#undef THIS_FILE
-//static char THIS_FILE[] = __FILE__;
+#if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
@@ -105,9 +101,6 @@ static void UnloadSpecialFont()
 
 static void init()
 {
-#ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
 	DLLInit();
 	WinCompatInit();
 	LoadSpecialFont();
@@ -272,7 +265,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 	LONG lCount = 0;
