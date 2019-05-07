@@ -49,7 +49,7 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 
-#ifdef _DEBUG
+#if defined(_MSC_VER) && defined(_DEBUG)
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
@@ -115,7 +115,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	DWORD SleepTick = 1;
 
 #ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 	init();
@@ -158,10 +158,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		}
 	}
 
-	// TODO ‚·‚Å‚É•Â‚¶‚ç‚ê‚Ä‚¢‚éA‚±‚Ìˆ—•s—v?
-	if (pCCtrlWindow) {
-		pCCtrlWindow->DestroyWindow();
-	}
+	pCCtrlWindow->DestroyWindow();
+	delete pCCtrlWindow;
 	pCCtrlWindow = NULL;
+
+	DLLExit();
 	return ExitCode;
 }

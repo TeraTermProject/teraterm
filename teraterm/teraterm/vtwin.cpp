@@ -119,7 +119,9 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #ifdef _DEBUG
 #define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p)		_free_dbg((p), _NORMAL_BLOCK)
+#if defined(_MSC_VER)
 #define new  		::new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 #endif
 
 // ウィンドウ最大化ボタンを有効にする (2005.1.15 yutaka)
