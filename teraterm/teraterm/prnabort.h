@@ -40,7 +40,6 @@ public:
 	HWND GetSafeHwnd() const {return m_hWnd;}
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
 	BOOL DestroyWindow();
-	HFONT m_hNewFont;
 
 private:
 	void OnCancel();
