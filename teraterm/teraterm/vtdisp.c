@@ -544,13 +544,13 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 
 // ‰æ‘œ“Ç‚Ýž‚ÝŠÖŒW
 
-void BGPreloadPicture(BGSrc *src)
+static void BGPreloadPicture(BGSrc *src)
 {
   char  spiPath[MAX_PATH];
   char  filespec[MAX_PATH];
   char *filePart;
   int   fileSize;
-  int   readByte;
+  DWORD readByte;
   unsigned char *fileBuf;
 
   HBITMAP hbm;
@@ -654,9 +654,9 @@ void BGPreloadPicture(BGSrc *src)
   }
 }
 
-void BGGetWallpaperInfo(WallpaperInfo *wi)
+static void BGGetWallpaperInfo(WallpaperInfo *wi)
 {
-  int  length;
+  DWORD length;
   int style;
   int  tile;
   char str[256];
@@ -868,7 +868,7 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
     return hbmNew;
 }
 
-void BGPreloadWallpaper(BGSrc *src)
+static void BGPreloadWallpaper(BGSrc *src)
 {
 	HBITMAP       hbm;
 	WallpaperInfo wi;
@@ -972,7 +972,7 @@ createdc:
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-void BGPreloadSrc(BGSrc *src)
+static void BGPreloadSrc(BGSrc *src)
 {
   DeleteBitmapDC(&(src->hdc));
 
@@ -991,7 +991,7 @@ void BGPreloadSrc(BGSrc *src)
   }
 }
 
-void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
+static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
 {
 	if(!hdcDest || !src)
 		return;
@@ -1028,7 +1028,7 @@ void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BO
 	}
 }
 
-void BGLoadPicture(HDC hdcDest,BGSrc *src)
+static void BGLoadPicture(HDC hdcDest,BGSrc *src)
 {
   int x,y,width,height,pattern;
   HDC hdc = NULL;
@@ -1091,7 +1091,7 @@ typedef struct tagLoadWallpaperStruct
   BGSrc *src;
 }LoadWallpaperStruct;
 
-BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LPRECT lprcMonitor,LPARAM dwData)
+static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LPRECT lprcMonitor,LPARAM dwData)
 {
   RECT rectDest;
   RECT rectRgn;
@@ -1196,7 +1196,7 @@ void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   SetWindowOrgEx(hdcDest,0,0,NULL);
 }
 
-void BGLoadSrc(HDC hdcDest,BGSrc *src)
+static void BGLoadSrc(HDC hdcDest,BGSrc *src)
 {
   switch(src->type)
   {
@@ -1283,7 +1283,7 @@ void BGSetupPrimary(BOOL forceSetup)
   }
 }
 
-COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
+static COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
 {
   unsigned int r,g,b;
   char colorstr[256],defstr[256];
@@ -1299,7 +1299,7 @@ COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
   return RGB(r,g,b);
 }
 
-BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,char **strList,int nList)
+static BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,char **strList,int nList)
 {
   char defstr[64],str[64];
   int  i;
