@@ -283,9 +283,6 @@ void BringupStatDlg()
  */
 int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND hWnd = GetHWND();
-
 	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
 	INT_PTR r = ListDlg.DoModal();
 	if (r == IDOK) {
