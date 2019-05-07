@@ -554,14 +554,10 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 	pseudoPtr = nullptr;
 	if (hWnd == nullptr)
 	{
-#if defined(_DEBUG)
-		DWORD e = GetLastError();
-#endif
 		assert(false);
 		return FALSE;
 	}
 
-	m_hParentWnd = hParent;
 	m_hWnd = hWnd;
 	m_hInst = hInstance;
 //	::EnableWindow(hParent,FALSE);
@@ -617,8 +613,10 @@ void TTCDialog::DestroyWindow()
 {
 	if (m_hWnd != nullptr) {
 		HWND hWnd;
-		::EnableWindow(m_hParentWnd,TRUE);
-		::SetFocus(m_hParentWnd);
+		if (m_hParentWnd != nullptr) {
+			::EnableWindow(m_hParentWnd,TRUE);
+			::SetFocus(m_hParentWnd);
+		}
 		hWnd = m_hWnd;
 		m_hWnd = nullptr;
 		::DestroyWindow(hWnd);
