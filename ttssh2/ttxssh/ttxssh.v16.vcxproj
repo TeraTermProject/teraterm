@@ -218,11 +218,11 @@
     <ResourceCompile Include="ttxssh.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\puttyrev\puttyrev.v15.vcxproj">
+    <ProjectReference Include="..\puttyrev\puttyrev.v16.vcxproj">
       <Project>{61eb955f-2794-4607-860f-0aa296fa58bd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\putty\putty.v15.vcxproj">
+    <ProjectReference Include="..\putty\putty.v16.vcxproj">
       <Project>{98ca1284-8f6c-4791-bf57-7e5fad33744e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
