@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,8 +77,9 @@ static void init()
 	if (pSetThreadDpiAwarenessContext) {
 		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
-	// messageboxのフォントに設定する
-	SetDialogFont(NULL, NULL, NULL, NULL);
+
+	// UILanguageFileの "Tera Term" セクション "DLG_SYSTEM_FONT" のフォントに設定する
+	SetDialogFont(NULL, UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 }
 
 // TTMACRO main engine
@@ -101,12 +102,6 @@ static BOOL OnIdle(LONG lCount)
 	return Continue;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-
-// CCtrlApp theApp;
-
-/////////////////////////////////////////////////////////////////////////////
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -118,9 +113,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	init();
 //	InitCommonControls();
 	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+	init();
 
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow();
@@ -130,7 +125,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
 	CtrlWnd = hWnd;
 
-	//////////////////////////////////////////////////////////////////////
+	// message pump
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
 
