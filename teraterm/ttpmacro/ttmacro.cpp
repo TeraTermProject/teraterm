@@ -54,6 +54,7 @@
 #endif
 
 char UILanguageFile[MAX_PATH];
+static char SetupFName[MAX_PATH];
 static HWND CtrlWnd;
 static HINSTANCE hInst;
 
@@ -70,16 +71,42 @@ HWND GetHWND()
 	return CtrlWnd;
 }
 
+static void GetDefaultSetupFName2(char *dest, int destlen)
+{
+	char HomeDir[MAX_PATH];
+	char Temp[MAX_PATH];
+
+	/* Get home directory */
+	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+		memset(dest, 0, destlen);
+		return;
+	}
+	ExtractDirName(Temp, HomeDir);
+
+	GetDefaultFName(HomeDir, "TERATERM.INI", dest, destlen);
+}
+
 static void init()
 {
+	GetDefaultSetupFName2(SetupFName, sizeof(SetupFName));
+	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+
 	DLLInit();
 	WinCompatInit();
-	if (pSetThreadDpiAwarenessContext) {
-		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+	// DPI Aware (高DPI対応)
+	{
+		int dip_aware = 0;
+		dip_aware = GetPrivateProfileInt("Tera Term", "DPIAware", dip_aware, SetupFName);
+		if (dip_aware != 0) {
+			if (pSetThreadDpiAwarenessContext != NULL) {
+				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+			}
+		}
 	}
 
 	// UILanguageFileの "Tera Term" セクション "DLG_SYSTEM_FONT" のフォントに設定する
-	SetDialogFont(NULL, UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(SetupFName, UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 }
 
 // TTMACRO main engine
@@ -114,7 +141,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 
 //	InitCommonControls();
-	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
 	init();
 
 	Busy = TRUE;
