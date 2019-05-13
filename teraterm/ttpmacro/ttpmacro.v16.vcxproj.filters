@@ -182,6 +182,9 @@
     <Image Include="ttmacro.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="ttmacro_3d.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttm-version.rc">

@@ -155,6 +155,9 @@
     <None Include="ttmacro.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ttmacro_3d.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttm-version.rc">

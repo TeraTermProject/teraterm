@@ -134,6 +134,12 @@
     <None Include="..\common\vt_classic.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\common\teraterm_3d.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\common\vt_3d.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tt-version.rc">
