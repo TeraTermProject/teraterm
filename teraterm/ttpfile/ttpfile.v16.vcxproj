@@ -164,7 +164,7 @@
     <None Include="ttpfile.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ttpcmn\ttpcmn.v15.vcxproj">
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v16.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

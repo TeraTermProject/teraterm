@@ -246,26 +246,26 @@
     <ClInclude Include="vtwin.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\svnrev\svnrev.v15.vcxproj">
+    <ProjectReference Include="..\svnrev\svnrev.v16.vcxproj">
       <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ttpcmn\ttpcmn.v15.vcxproj">
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v16.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpfile\ttpfile.v15.vcxproj">
+    <ProjectReference Include="..\ttpfile\ttpfile.v16.vcxproj">
       <Project>{311f2b21-aec4-4384-8209-bb83b54749b4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpmacro\ttpmacro.v15.vcxproj">
+    <ProjectReference Include="..\ttpmacro\ttpmacro.v16.vcxproj">
       <Project>{ba519362-a2c2-4b1a-905b-f00791f9038a}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpset\ttpset.v15.vcxproj">
+    <ProjectReference Include="..\ttpset\ttpset.v16.vcxproj">
       <Project>{5cf58947-e861-4a5c-b0b1-e85486f149cd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttptek\ttptek.v15.vcxproj">
+    <ProjectReference Include="..\ttptek\ttptek.v16.vcxproj">
       <Project>{6d08053b-1c68-4a7e-8766-3553f5af010b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
