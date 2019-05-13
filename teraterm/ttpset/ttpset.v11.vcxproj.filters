@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpset-version.rc">
-      <Filter>Resource File</Filter>
+      <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

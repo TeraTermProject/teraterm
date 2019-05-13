@@ -40,8 +40,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResouceCompile Include="ttptek-version.rc">
-      <Filter>Resource File</Filter>
-    </ResouceCompile>
+    <ResourceCompile Include="ttptek-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
