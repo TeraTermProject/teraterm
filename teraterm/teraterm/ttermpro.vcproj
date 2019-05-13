@@ -213,11 +213,11 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="addsetting.cpp"
+				RelativePath="..\common\codeconv.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib.c"
+				RelativePath="..\common\compat_win.cpp"
 				>
 			</File>
 			<File
@@ -229,23 +229,11 @@
 				>
 			</File>
 			<File
-				RelativePath="dnddlg.cpp"
+				RelativePath="..\common\dllutil.cpp"
 				>
 			</File>
 			<File
 				RelativePath="filesys.cpp"
-				>
-			</File>
-			<File
-				RelativePath="ftdlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="prnabort.cpp"
-				>
-			</File>
-			<File
-				RelativePath="protodlg.cpp"
 				>
 			</File>
 			<File
@@ -261,11 +249,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\tmfc.cpp"
+				RelativePath="..\common\tipwin.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\tmfc.h"
+				RelativePath="..\common\tmfc.cpp"
 				>
 			</File>
 			<File
@@ -274,6 +262,10 @@
 			</File>
 			<File
 				RelativePath="vtwin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\win16api.c"
 				>
 			</File>
 		</Filter>
@@ -334,19 +326,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\codeconv.cpp"
-				>
-			</File>
-			<File
 				RelativePath="commlib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\compat_win.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dllutil.cpp"
 				>
 			</File>
 			<File
@@ -366,15 +346,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\tipwin.cpp"
-				>
-			</File>
-			<File
 				RelativePath="ttdde.c"
-				>
-			</File>
-			<File
-				RelativePath="ttdialog.c"
 				>
 			</File>
 			<File
@@ -414,15 +386,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\win16api.c"
-				>
-			</File>
-			<File
 				RelativePath="winjump.c"
 				>
 			</File>
 			<File
-				RelativePath="WSAAsyncGetAddrInfo.c"
+				RelativePath=".\WSAAsyncGetAddrInfo.c"
 				>
 			</File>
 		</Filter>
@@ -431,11 +399,27 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="addsetting.h"
+				RelativePath=".\buffer.h"
 				>
 			</File>
 			<File
-				RelativePath="dnddlg.h"
+				RelativePath=".\clipboar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\commlib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\compat_w95.h"
+				>
+			</File>
+			<File
+				RelativePath=".\filesys.h"
+				>
+			</File>
+			<File
+				RelativePath=".\keyboard.h"
 				>
 			</File>
 			<File
@@ -443,11 +427,99 @@
 				>
 			</File>
 			<File
+				RelativePath=".\teklib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tektypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tekwin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\telnet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\teraprn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\teraterm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tt-version.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\tt_res.h"
 				>
 			</File>
 			<File
+				RelativePath="..\common\ttcommon.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttdde.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ttddecmnd.h"
+				>
+			</File>
+			<File
 				RelativePath="ttfileio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ttftypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttime.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttplug.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ttplugin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttsetup.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tttypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttwinman.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttwsk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vtdisp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vtterm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vtwin.h"
 				>
 			</File>
 			<File
@@ -456,7 +528,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="ttdlg"
+			Name="ttpdlg"
 			>
 			<File
 				RelativePath="..\ttpdlg\dlg_res.h"
@@ -472,6 +544,66 @@
 			</File>
 			<File
 				RelativePath="..\ttpdlg\ttpdlg.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="dialog"
+			>
+			<File
+				RelativePath="addsetting.cpp"
+				>
+			</File>
+			<File
+				RelativePath="addsetting.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib.h"
+				>
+			</File>
+			<File
+				RelativePath="dnddlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="dnddlg.h"
+				>
+			</File>
+			<File
+				RelativePath="ftdlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ftdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="prnabort.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\prnabort.h"
+				>
+			</File>
+			<File
+				RelativePath="protodlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\protodlg.h"
+				>
+			</File>
+			<File
+				RelativePath="ttdialog.c"
+				>
+			</File>
+			<File
+				RelativePath=".\ttdialog.h"
 				>
 			</File>
 		</Filter>

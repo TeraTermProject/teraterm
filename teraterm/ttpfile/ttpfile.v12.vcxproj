@@ -125,6 +125,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="bplus.c" />
@@ -139,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="bplus.h" />
     <ClInclude Include="file_res.h" />
     <ClInclude Include="ftlib.h" />

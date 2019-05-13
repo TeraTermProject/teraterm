@@ -16,27 +16,15 @@
       <UniqueIdentifier>{0fe7021a-7e2f-4932-b0fe-1f87c87345cc}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
+    <Filter Include="dialog">
+      <UniqueIdentifier>{23d7c62e-eff4-4a0d-b8b4-7fc703717c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ttpdlg">
+      <UniqueIdentifier>{1cdaec4a-75c1-4600-b434-45286f5bec80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="addsetting.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\dlglib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="filesys.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ftdlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="prnabort.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="protodlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tekwin.cpp">
@@ -75,9 +63,6 @@
     <ClCompile Include="ttdde.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
-    <ClCompile Include="ttdialog.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="ttfileio.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -114,6 +99,54 @@
     <ClCompile Include="dnddlg.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="ftdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="protodlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="prnabort.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ttdialog.c">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="addsetting.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.c">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\win16api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib_cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib_tmpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tipwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\codeconv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dllutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\compat_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../ttpdlg/ttdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\cygterm\cygterm.ico">
@@ -148,11 +181,11 @@
     <ResourceCompile Include="ttermpro.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc">
+      <Filter>ttpdlg</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="addsetting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sizetip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -162,8 +195,122 @@
     <ClInclude Include="ttfileio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\ttlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttwinman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttftypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teklib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\teraterm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tektypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tekwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="telnet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teraprn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttwsk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttcommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttdde.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttddecmnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttplug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttplugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttsetup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tt-version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clipboar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filesys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vtterm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vtwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vtdisp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\compat_w95.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="dnddlg.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="prnabort.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="protodlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ttdialog.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dlglib.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ftdlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="addsetting.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\win16api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpdlg\dlg_res.h">
+      <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="../ttpdlg/ttdlg.h">
+      <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tmfc.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

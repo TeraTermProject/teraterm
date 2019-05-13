@@ -177,7 +177,7 @@
     <ClInclude Include="ttmmain.h" />
     <ClInclude Include="ttmmsg.h" />
     <ClInclude Include="ttmparse.h" />
-    <ClInclude Include="..\common\win16api.h" />
+    <ClInclude Include="ttm_res.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttmacro.ico" />

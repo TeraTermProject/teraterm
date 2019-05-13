@@ -120,14 +120,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="bplus.c" />
     <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="ftlib.c" />
     <ClCompile Include="kermit.c" />
     <ClCompile Include="quickvan.c" />
     <ClCompile Include="ttfile.c" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="xmodem.c" />
     <ClCompile Include="ymodem.c" />
     <ClCompile Include="zmodem.c" />
@@ -140,6 +142,7 @@
     <ClInclude Include="kermit.h" />
     <ClInclude Include="quickvan.h" />
     <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="xmodem.h" />
     <ClInclude Include="ymodem.h" />
     <ClInclude Include="zmodem.h" />

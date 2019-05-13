@@ -212,6 +212,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\dlglib_cpp.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_tmpl.c"
+				>
+			</File>
+			<File
 				RelativePath="ftlib.c"
 				>
 			</File>
@@ -232,6 +240,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\win16api.c"
+				>
+			</File>
+			<File
 				RelativePath="xmodem.c"
 				>
 			</File>
@@ -241,10 +253,6 @@
 			</File>
 			<File
 				RelativePath="zmodem.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\win16api.c"
 				>
 			</File>
 		</Filter>
@@ -278,6 +286,10 @@
 			</File>
 			<File
 				RelativePath="..\common\ttlib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\win16api.h"
 				>
 			</File>
 			<File

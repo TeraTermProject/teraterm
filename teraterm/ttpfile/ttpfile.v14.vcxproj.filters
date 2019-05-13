@@ -22,9 +22,6 @@
     <ClCompile Include="bplus.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\dlglib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ftlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,6 +44,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zmodem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\win16api.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -79,6 +82,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zmodem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\win16api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

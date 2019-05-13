@@ -181,6 +181,7 @@
     <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="winjump.c" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
+    <ClInclude Include="..\ttpdlg\dlg_res.h" />
     <ClCompile Include="../ttpdlg/ttdlg.c" />
     <ClInclude Include="../ttpdlg/ttdlg.h" />
   </ItemGroup>
@@ -200,11 +201,46 @@
     <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="addsetting.h" />
-    <ClInclude Include="dnddlg.h" />
-    <ClInclude Include="sizetip.h" />
+    <ClInclude Include="..\common\compat_w95.h" />
+    <ClInclude Include="..\common\dlglib.h" />
+    <ClInclude Include="..\common\tektypes.h" />
+    <ClInclude Include="..\common\teraterm.h" />
+    <ClInclude Include="..\common\tmfc.h" />
+    <ClInclude Include="..\common\tt-version.h" />
+    <ClInclude Include="..\common\ttcommon.h" />
+    <ClInclude Include="..\common\ttddecmnd.h" />
+    <ClInclude Include="..\common\ttftypes.h" />
+    <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\ttplugin.h" />
+    <ClInclude Include="..\common\tttypes.h" />
     <ClInclude Include="..\common\tt_res.h" />
+    <ClInclude Include="..\common\win16api.h" />
+    <ClInclude Include="addsetting.h" />
+    <ClInclude Include="buffer.h" />
+    <ClInclude Include="clipboar.h" />
+    <ClInclude Include="commlib.h" />
+    <ClInclude Include="dnddlg.h" />
+    <ClInclude Include="filesys.h" />
+    <ClInclude Include="ftdlg.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="prnabort.h" />
+    <ClInclude Include="protodlg.h" />
+    <ClInclude Include="sizetip.h" />
+    <ClInclude Include="teklib.h" />
+    <ClInclude Include="tekwin.h" />
+    <ClInclude Include="telnet.h" />
+    <ClInclude Include="teraprn.h" />
+    <ClInclude Include="ttdde.h" />
+    <ClInclude Include="ttdialog.h" />
     <ClInclude Include="ttfileio.h" />
+    <ClInclude Include="ttime.h" />
+    <ClInclude Include="ttplug.h" />
+    <ClInclude Include="ttsetup.h" />
+    <ClInclude Include="ttwinman.h" />
+    <ClInclude Include="ttwsk.h" />
+    <ClInclude Include="vtdisp.h" />
+    <ClInclude Include="vtterm.h" />
+    <ClInclude Include="vtwin.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\svnrev\svnrev.v10.vcxproj">
