@@ -213,11 +213,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib_cpp.c"
+				RelativePath="..\common\dlglib_cpp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib_tmpl.c"
+				RelativePath="..\common\dlglib_tmpl.cpp"
 				>
 			</File>
 			<File
