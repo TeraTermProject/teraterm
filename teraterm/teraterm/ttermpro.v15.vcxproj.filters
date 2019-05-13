@@ -219,9 +219,6 @@
     <ClInclude Include="telnet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="teraapp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="teraprn.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -231,7 +231,6 @@
     <ClInclude Include="teklib.h" />
     <ClInclude Include="tekwin.h" />
     <ClInclude Include="telnet.h" />
-    <ClInclude Include="teraapp.h" />
     <ClInclude Include="teraprn.h" />
     <ClInclude Include="ttdde.h" />
     <ClInclude Include="ttdialog.h" />
