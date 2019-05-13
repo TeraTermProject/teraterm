@@ -17,118 +17,89 @@
       <dd>
 		ユーザ名の指定がないときにデフォルトで使用するユーザ名を指定します。<br />
 		<a href="#CheckAuthListFirst">Check the supported authentication methods before login</a>がチェックされていると、ユーザ名は変更できなくなります。
-		<ul>
-		  <li>
-			<dl>
-			  <dt>入力しない</dt>
-			  <dd>
-				入力しません。
-			  </dd>
-			</dl>
-		  </li>
 
-		  <li>
-			<dl>
-			  <dt>次のユーザ名を使用</dt>
-			  <dd>
-				エディットボックスに入力されたユーザ名を使用します。<br />
-				ただし、エディットボックスが空の場合は何も入力されません
-			  </dd>
-			</dl>
-		  </li>
+		<dl>
+		  <dt>入力しない</dt>
+		  <dd>
+			入力しません。
+		  </dd>
 
-		  <li>
-			<dl>
-			  <dt>システムユーザ名を使用</dt>
-			  <dd>
-				システムユーザ名(Windowsのログオンユーザ)を使用します。
-			  </dd>
-			</dl>
-		  </li>
-		</ul>
+		  <dt>次のユーザ名を使用</dt>
+		  <dd>
+			エディットボックスに入力されたユーザ名を使用します。<br />
+			ただし、エディットボックスが空の場合は何も入力されません
+		  </dd>
+
+		  <dt>システムユーザ名を使用</dt>
+		  <dd>
+			システムユーザ名(Windowsのログオンユーザ)を使用します。
+		  </dd>
+		</dl>
+
       </dd>
 
       <dt id="DefaultAuthMethod">デフォルトで使用する認証方法を設定します。</dt>
       <dd>
 
-        <ul>
-          <li>
+        <dl>
+          <dt>Use plain password to log in</dt>
+          <dd>
+            パスワード認証を用いる場合に指定します。
+          </dd>
+          
+          <dt>Use RSA/DSA/ECDSA/ED25519 key to login</dt>
+          <dd>
+            あらかじめ作成した RSA/DSA/ECDSA/ED25519 鍵を用いた認証方法を選択します。
             <dl>
-              <dt>Use plain password to log in</dt>
+              <dt id="DefaultRSAPrivateKeyFile">Private key file</dt>
               <dd>
-                パスワード認証を用いる場合に指定します。
+                OpenSSH 形式の秘密鍵ファイルを指定します。<br />
+                TTSSH 2.63(Tera Term 4.76) 以降では PuTTY 形式・SECSH(ssh.com) 形式の SSH2 秘密鍵にも対応しています。
               </dd>
             </dl>
-          </li>
-
-          <li>
+          </dd>
+          
+          <dt>Use rhost to login (SSH1)</dt>
+          <dd>
+            ホストの設定で rhost が利用できる場合に選択します。
             <dl>
-              <dt>Use RSA/DSA/ECDSA/ED25519 key to login</dt>
+              <dt id="DefaultRhostsLocalUserName">Local user name</dt>
               <dd>
-                あらかじめ作成した RSA/DSA/ECDSA/ED25519 鍵を用いた認証方法を選択します。
-                <dl>
-                  <dt id="DefaultRSAPrivateKeyFile">Private key file<dt>
-                  <dd>
-                    OpenSSH 形式の秘密鍵ファイルを指定します。<br />
-                    TTSSH 2.63(Tera Term 4.76) 以降では PuTTY 形式・SECSH(ssh.com) 形式の SSH2 秘密鍵にも対応しています。
-                  </dd>
-                </dl>
+                ユーザ名を指定します。
+              </dd>
+              <dt id="DefaultRhostsHostPrivateKeyFile">Host private key file</dt>
+              <dd>
+                OpenSSH 形式の秘密鍵ファイルを指定します。
               </dd>
             </dl>
-          </li>
-
-          <li>
+          </dd>
+          
+          <dt>Use SSH1:challenge/response(TIS) / SSH2:keyboard-interactive to log in</dt>
+          <dd>
             <dl>
-              <dt>Use rhost to login (SSH1)</dt>
+              <dt>SSH1</dt>
               <dd>
-                ホストの設定で rhost が利用できる場合に選択します。
-                <dl>
-                  <dt id="DefaultRhostsLocalUserName">Local user name<dt>
-                  <dd>
-                    ユーザ名を指定します。
-                  </dd>
-                  <dt id="DefaultRhostsHostPrivateKeyFile">Host private key file<dt>
-                  <dd>
-                    OpenSSH 形式の秘密鍵ファイルを指定します。
-                  </dd>
-                </dl>
+                チャレンジ/レスポンス認証(TIS認証)を用いる場合に指定します。
+                サーバによっては S/Key 認証になる場合があります。
+              </dd>
+              <dt>SSH2</dt>
+              <dd>
+                キーボード・インタラクティブ認証を用いる場合に指定します。
+                FreeBSD 等のパスワード認証を無効に設定したサーバへ、パスワードを使ってログインする場合は、
+                この認証方式を使います。<br>
+                この認証方式では、入力した内容が暗号化された状態でサーバへ送られます。
+                認証の為にパスワードを入力した場合は、パスワード認証と同じように、
+                暗号化されたパスワードが通信路を流れます。
               </dd>
             </dl>
-          </li>
-
-          <li>
-            <dl>
-              <dt>Use SSH1:challenge/response(TIS) / SSH2:keyboard-interactive to log in</dt>
-              <dd>
-                <dl>
-                  <dt>SSH1</dt>
-                  <dd>
-                    チャレンジ/レスポンス認証(TIS認証)を用いる場合に指定します。
-                    サーバによっては S/Key 認証になる場合があります。
-                  </dd>
-                  <dt>SSH2</dt>
-                  <dd>
-                    キーボード・インタラクティブ認証を用いる場合に指定します。
-                    FreeBSD 等のパスワード認証を無効に設定したサーバへ、パスワードを使ってログインする場合は、
-                    この認証方式を使います。<br>
-                    この認証方式では、入力した内容が暗号化された状態でサーバへ送られます。
-                    認証の為にパスワードを入力した場合は、パスワード認証と同じように、
-                    暗号化されたパスワードが通信路を流れます。
-                  </dd>
-                </dl>
-              </dd>
-            </dl>
-          </li>
-
-          <li>
-            <dl>
-              <dt>Use Pageant</dt>
-              <dd>
-                Pageant と通信して RSA/DSA 鍵を用いた認証をする場合に指定します。<br>
-                TTSSH は秘密鍵ファイルを扱いません。
-              </dd>
-            </dl>
-          </li>
+          </dd>
+          
+          <dt>Use Pageant</dt>
+          <dd>
+            Pageant と通信して RSA/DSA 鍵を用いた認証をする場合に指定します。<br>
+            TTSSH は秘密鍵ファイルを扱いません。
+          </dd>
+        </dl>
 
       </dd>
 
