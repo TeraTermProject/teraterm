@@ -50,7 +50,7 @@ void BringupStatDlg();
 
 int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected);
 
-extern char HomeDir[MAXPATHLEN];
+extern char HomeDir[MAX_PATH];
 extern char FileName[MAX_PATH];
 extern char TopicName[11];
 extern char ShortName[MAX_PATH];

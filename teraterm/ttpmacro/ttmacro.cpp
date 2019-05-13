@@ -71,25 +71,16 @@ HWND GetHWND()
 	return CtrlWnd;
 }
 
-static void GetDefaultSetupFName2(char *dest, int destlen)
-{
-	char HomeDir[MAX_PATH];
-	char Temp[MAX_PATH];
-
-	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
-		memset(dest, 0, destlen);
-		return;
-	}
-	ExtractDirName(Temp, HomeDir);
-
-	GetDefaultFName(HomeDir, "TERATERM.INI", dest, destlen);
-}
-
 static void init()
 {
-	GetDefaultSetupFName2(SetupFName, sizeof(SetupFName));
-	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+	char UILanguageFileRel[MAX_PATH];
+
+	GetHomeDir(hInst, HomeDir, sizeof(HomeDir));
+	GetDefaultFName(HomeDir, "TERATERM.INI", SetupFName, sizeof(SetupFName));
+	GetPrivateProfileString("Tera Term", "UILanguageFile", "lang\\Default.lng",
+	                        UILanguageFileRel, sizeof(UILanguageFileRel), SetupFName);
+	GetUILanguageFileFull(HomeDir, UILanguageFileRel,
+						  UILanguageFile, sizeof(UILanguageFile));
 
 	DLLInit();
 	WinCompatInit();

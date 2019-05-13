@@ -916,11 +916,50 @@ homedir:
 	strncat_s(dest, destlen, file, _TRUNCATE);
 }
 
+/*
+ * Get home(exe,dll) directory
+ * @param[in]		hInst		WinMain()の HINSTANCE または NULL
+ * @param[in,out]	HomeDir
+ * @param[out]		HomeDirLen
+ */
+void GetHomeDir(HINSTANCE hInst, char *HomeDir, size_t HomeDirLen)
+{
+	char Temp[MAX_PATH];
+	DWORD result = GetModuleFileName(NULL,Temp,sizeof(Temp));
+	if (result == 0 || result == _countof(Temp)) {
+		// パスの取得に失敗した。致命的、abort() する。
+		abort();
+		// ここでreturnしてもプラグイン(ttpset.dll)のロードに失敗してabort()する
+	}
+	ExtractDirName(Temp, Temp);
+	strncpy_s(HomeDir, HomeDirLen, Temp, _TRUNCATE);
+}
+
 // デフォルトの TERATERM.INI のフルパスを ttpmacro からも
 // 取得するために追加した。(2007.2.18 maya)
-void GetDefaultSetupFName(char *home, char *dest, int destlen)
+void GetDefaultSetupFName(const char *home, char *dest, int destlen)
 {
 	GetDefaultFName(home, "TERATERM.INI", dest, destlen);
+}
+
+/*
+ *	UILanguageFileのフルパスを取得する
+ *
+ *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
+ *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
+ *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
+ *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス
+ */
+void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
+						   char *UILanguageFileFull, size_t UILanguageFileFullLen)
+{
+	char CurDir[MAX_PATH];
+
+	/* Get UILanguageFile Full Path */
+	GetCurrentDirectory(sizeof(CurDir), CurDir);
+	SetCurrentDirectory(HomeDir);
+	_fullpath(UILanguageFileFull, UILanguageFileRel, UILanguageFileFullLen);
+	SetCurrentDirectory(CurDir);
 }
 
 void GetUILanguageFile(char *buf, int buflen)
@@ -928,26 +967,18 @@ void GetUILanguageFile(char *buf, int buflen)
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
 	char SetupFName[MAX_PATH];
-	char CurDir[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
-		memset(buf, 0, buflen);
-		return;
-	}
-	ExtractDirName(Temp, HomeDir);
+	GetHomeDir(NULL, HomeDir, sizeof(HomeDir));
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
-	
+
 	/* Get LanguageFile name */
-	GetPrivateProfileString("Tera Term", "UILanguageFile", "",
+	GetPrivateProfileString("Tera Term", "UILanguageFile", "lang\\Default.lng",
 	                        Temp, sizeof(Temp), SetupFName);
 
-	GetCurrentDirectory(sizeof(CurDir), CurDir);
-	SetCurrentDirectory(HomeDir);
-	_fullpath(buf, Temp, buflen);
-	SetCurrentDirectory(CurDir);
+	GetUILanguageFileFull(HomeDir, Temp, buf, buflen);
 }
 
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)
@@ -958,11 +989,7 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	char SetupFName[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
-		strncpy_s(buf, buflen, "off", _TRUNCATE);
-		return;
-	}
-	ExtractDirName(Temp, HomeDir);
+	GetHomeDir(NULL, HomeDir, sizeof(HomeDir));
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));

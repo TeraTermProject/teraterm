@@ -2644,15 +2644,11 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (1 <= w && w <= uilist_count && w != langui_sel) {
-							char CurDir[MAX_PATH];
-
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
 								"%s\\%s", LANG_PATH, LangUIList[w - 1]);
 
-							GetCurrentDirectory(sizeof(CurDir), CurDir);
-							SetCurrentDirectory(ts->HomeDir);
-							_fullpath(ts->UILanguageFile, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile));
-							SetCurrentDirectory(CurDir);
+							GetUILanguageFileFull(ts->HomeDir, ts->UILanguageFile_ini,
+												  ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 							// タイトルの更新を行う。(2014.2.23 yutaka)
 							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);

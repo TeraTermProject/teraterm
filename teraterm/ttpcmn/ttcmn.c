@@ -103,8 +103,6 @@ void WINAPI CopyTTSetToShmem(PTTSet ts)
 
 BOOL WINAPI StartTeraTerm(PTTSet ts)
 {
-	char Temp[MAX_PATH];
-
 	if (FirstInstance) {
 		// init window list
 		pm->NWin = 0;
@@ -122,10 +120,7 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	// if (FirstInstance) { ‚Ì•”•ª‚©‚çˆÚ“® (2008.3.13 maya)
 	// ‹N“®Žž‚É‚ÍA‹¤—Lƒƒ‚ƒŠ‚Ì HomeDir ‚Æ SetupFName ‚Í‹ó‚É‚È‚é
 	/* Get home directory */
-	if (GetModuleFileName(hInst,Temp,sizeof(Temp)) == 0) {
-		return TRUE;
-	}
-	ExtractDirName(Temp, ts->HomeDir);
+	GetHomeDir(hInst, ts->HomeDir, sizeof(ts->HomeDir));
 	_chdir(ts->HomeDir);
 	GetDefaultSetupFName(ts->HomeDir, ts->SetupFName, sizeof(ts->SetupFName));
 

@@ -59,7 +59,7 @@
 #define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
-char HomeDir[MAXPATHLEN];
+char HomeDir[MAX_PATH];
 char FileName[MAX_PATH];
 char TopicName[11];
 char ShortName[MAX_PATH];
@@ -80,11 +80,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	char Temp[MaxStrLen];
 	PCHAR start, cur, next;
 
-	// Get home directory
-	if (GetModuleFileName(GetInstance(), FileName,sizeof(FileName)) == 0) {
-		return;
-	}
-	ExtractDirName(FileName,HomeDir);
+	// go home directory
 	_chdir(HomeDir);
 
 	// Get command line parameters

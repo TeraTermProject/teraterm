@@ -71,9 +71,12 @@ BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int far *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
 void GetDownloadFolder(char *dest, int destlen);
+void GetHomeDir(HINSTANCE hInst, char *HomeDir, size_t HomeDirLen);
 void GetDefaultFName(const char *home, const char *file, char *dest, int destlen);
-void GetDefaultSetupFName(char *home, char *dest, int destlen);
+void GetDefaultSetupFName(const char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
+void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
+						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 #if defined(UNICODE)
