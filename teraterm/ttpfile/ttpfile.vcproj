@@ -286,6 +286,10 @@
 				>
 			</File>
 			<File
+				RelativePath="ymodem.h"
+				>
+			</File>
+			<File
 				RelativePath="zmodem.h"
 				>
 			</File>

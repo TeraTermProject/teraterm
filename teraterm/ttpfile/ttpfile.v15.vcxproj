@@ -151,6 +151,7 @@
     <ClInclude Include="kermit.h" />
     <ClInclude Include="quickvan.h" />
     <ClInclude Include="xmodem.h" />
+    <ClInclude Include="ymodem.h" />
     <ClInclude Include="zmodem.h" />
   </ItemGroup>
   <ItemGroup>

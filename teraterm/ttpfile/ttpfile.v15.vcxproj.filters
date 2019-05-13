@@ -78,6 +78,9 @@
     <ClInclude Include="xmodem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ymodem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="zmodem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
