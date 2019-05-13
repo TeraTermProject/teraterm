@@ -598,9 +598,19 @@ static void BGPreloadPicture(BGSrc *src)
       BITMAPINFO *pbmi;
       char       *pbuf;
       char spiFileName[MAX_PATH];
+	  const char *ext;
 
       if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         continue;
+	  ext = strrchr(fd.cFileName, '.');
+	  if (ext == NULL) {
+		  // 拡張子がないファイル?
+		  continue;
+	  }
+	  if (strcmp(ext, ".dll") != 0 && strcmp(ext, ".spi") != 0) {
+		  // .dll or .spi 以外のファイル
+		  continue;
+	  }
 
       strncpy_s(spiFileName, sizeof(spiFileName), spiPath, _TRUNCATE);
       strncat_s(spiFileName, sizeof(spiFileName), fd.cFileName, _TRUNCATE);
