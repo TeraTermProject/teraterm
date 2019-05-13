@@ -1602,7 +1602,7 @@ void BGInitialize(void)
 	  BGAlphaBlend = AlphaBlendWithoutAPI;
   }
   else {
-    BGAlphaBlend = NULL;
+    BGAlphaBlend = AlphaBlendWithoutAPI;
   }
 
 }
