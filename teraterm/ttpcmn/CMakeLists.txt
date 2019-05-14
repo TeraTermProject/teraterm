@@ -34,6 +34,7 @@ set(SRC
   language.h
   ttcmn.c
   ttpcmn-version.rc
+  ttpcmn.def
   ${COMMON_SRC}
   )
 
