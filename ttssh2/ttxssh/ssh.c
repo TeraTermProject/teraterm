@@ -5444,7 +5444,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_LIMIT_MAX) {
 		min = GEX_GRP_LIMIT_MAX;
 		logprintf(LOG_LEVEL_NOTICE,
-			"%s: small GexMinimalGroupSize is too larse (%d), use maximum limit (%d)", __FUNCTION__,
+			"%s: small GexMinimalGroupSize is too large (%d), use maximum limit (%d)", __FUNCTION__,
 			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MAX);
 	}
 	else {
