@@ -3854,26 +3854,12 @@ void DispGetWindowSize(int *width, int *height, BOOL client) {
 
 void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 {
-	HMODULE mod;
-	HMONITOR monitor;
-	MONITORINFO monitorInfo;
 	RECT desktop, win, client;
 
 	GetWindowRect(HVTWin, &win);
 	GetClientRect(HVTWin, &client);
 
-	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
-	    (GetProcAddress(mod,"MonitorFromWindow") != NULL)) {
-		// マルチモニタがサポートされている場合
-		monitor = MonitorFromWindow(HVTWin, MONITOR_DEFAULTTONEAREST);
-		monitorInfo.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(monitor, &monitorInfo);
-		desktop = monitorInfo.rcWork;
-	}
-	else {
-		// マルチモニタがサポートされていない場合
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop, 0);
-	}
+	GetDesktopRect(HVTWin, &desktop);
 
 	if (inPixels) {
 		*x = desktop.right - desktop.left;
@@ -3883,8 +3869,6 @@ void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
 		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
 	}
-
-	return;
 }
 
 int DispFindClosestColor(int red, int green, int blue)
