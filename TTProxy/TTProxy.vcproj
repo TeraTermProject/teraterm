@@ -78,6 +78,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				ModuleDefinitionFile="TTX.def"
+				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
@@ -173,6 +174,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				ModuleDefinitionFile="TTX.def"
+				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
@@ -252,26 +254,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\teraterm\common\ttlib.c"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\teraterm\common\dlglib_tmpl.cpp"
 				>
 				<FileConfiguration
@@ -312,6 +294,26 @@
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\teraterm\common\ttlib.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
 			</File>

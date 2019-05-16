@@ -78,7 +78,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\openssl\out32.dbg;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				ModuleDefinitionFile="$(ProjectName).def"
-				DelayLoadDLLs="dnsapi.dll"
+				DelayLoadDLLs="dnsapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
 				SubSystem="2"
@@ -175,7 +175,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\openssl\out32;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				ModuleDefinitionFile="$(ProjectName).def"
-				DelayLoadDLLs="dnsapi.dll"
+				DelayLoadDLLs="dnsapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				BaseAddress="0x12500000"
@@ -356,6 +356,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\dlglib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\dlglib_cpp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\dlglib_tmpl.cpp"
+				>
+			</File>
+			<File
 				RelativePath="dns.c"
 				>
 			</File>
@@ -440,6 +452,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\tipwin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\ttlib.c"
+				>
+			</File>
+			<File
 				RelativePath="ttxssh.c"
 				>
 			</File>
@@ -449,26 +469,6 @@
 			</File>
 			<File
 				RelativePath="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib_cpp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib_tmpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\tipwin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\ttlib.c"
 				>
 			</File>
 			<File

@@ -66,6 +66,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -83,6 +84,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

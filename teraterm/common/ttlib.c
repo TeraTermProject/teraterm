@@ -104,11 +104,6 @@ static char b64dec_table[] = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
-static HMODULE hModuleUser32;
-static BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
-static HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
-static HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
-
 void b64encode(PCHAR d, int dsize, PCHAR s, int len)
 {
 	unsigned int b = 0;
@@ -1426,19 +1421,13 @@ BOOL IsWindows7OrLater(void)
 //   98 以降/2000 以降は TRUE を返す
 BOOL HasMultiMonitorSupport()
 {
-	if (hModuleUser32 == NULL) {
-		hModuleUser32 = GetModuleHandle("user32.dll");
-		if (hModuleUser32 == NULL) {
-			return FALSE;	// たぶんあり得ない
-		}
+	HMODULE mod;
+
+	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	    (GetProcAddress(mod, "MonitorFromPoint") != NULL)) {
+		return TRUE;
 	}
-	if (pMonitorFromPoint == NULL) {
-		pMonitorFromPoint = (void *)GetProcAddress(hModuleUser32, "MonitorFromPoint");
-	}
-	if (pMonitorFromPoint == NULL) {
-		return FALSE;
-	}
-	return TRUE;
+	return FALSE;
 }
 
 // OS が GetAdaptersAddresses をサポートしているかどうかを判別する。
@@ -1866,29 +1855,12 @@ void GetMessageboxFont(LOGFONT *logfont)
  */
 void GetDesktopRect(HWND hWnd, RECT *rect)
 {
-	BOOL Supported = TRUE;
-	if (!HasMultiMonitorSupport()) {
-		Supported = FALSE;
-	}
-	if (Supported) {
-		if (pGetMonitorInfoA == NULL) {
-			// hModuleUser32はセットされている
-			pGetMonitorInfoA = (void *)GetProcAddress(hModuleUser32, "GetMonitorInfoA");
-		}
-		if (pMonitorFromWindow == NULL) {
-			pMonitorFromWindow = (void *)GetProcAddress(hModuleUser32, "MonitorFromWindow");
-		}
-		if (pGetMonitorInfoA == NULL || pMonitorFromWindow == NULL) {
-			Supported = FALSE;
-		}
-	}
-
-	if (Supported) {
+	if (HasMultiMonitorSupport()) {
 		// マルチモニタがサポートされている場合
 		MONITORINFO monitorInfo;
-		HMONITOR hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 		monitorInfo.cbSize = sizeof(MONITORINFO);
-		pGetMonitorInfoA(hMonitor, &monitorInfo);
+		GetMonitorInfo(hMonitor, &monitorInfo);
 		*rect = monitorInfo.rcWork;
 	} else {
 		// マルチモニタがサポートされていない場合
