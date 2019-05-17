@@ -35,13 +35,14 @@
 class CErrDlg : public TTCDialog
 {
 public:
-	CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName);
+	CErrDlg(const char *Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName);
 	INT_PTR DoModal();
 
 private:
 	enum { IDD = IDD_ERRDLG };
 
-	PCHAR MsgStr, LineStr;
+	const char* MsgStr;
+	PCHAR LineStr;
 	int PosX, PosY;
 	int LineNo;
 	int StartPos, EndPos;

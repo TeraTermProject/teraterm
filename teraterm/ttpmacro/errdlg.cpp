@@ -49,7 +49,7 @@
 
 // CErrDlg dialog
 
-CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName)
+CErrDlg::CErrDlg(const char *Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName)
 {
 	MsgStr = Msg;
 	LineStr = Line;

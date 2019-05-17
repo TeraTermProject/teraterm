@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1239,11 +1239,14 @@ WORD TTLExec()
 		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
 	else
 		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDir, &sui, &pi);
-	// TODO: check bRet
-	if (wait) {
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		GetExitCodeProcess(pi.hProcess, &ret);
-		SetResult(ret);
+	if (bRet == FALSE) {
+		Err = ErrCantExec;
+	} else {
+		if (wait) {
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			GetExitCodeProcess(pi.hProcess, &ret);
+			SetResult(ret);
+		}
 	}
 	return Err;
 }
