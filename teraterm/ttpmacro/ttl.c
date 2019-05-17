@@ -1247,6 +1247,8 @@ WORD TTLExec()
 			GetExitCodeProcess(pi.hProcess, &ret);
 			SetResult(ret);
 		}
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 	return Err;
 }
