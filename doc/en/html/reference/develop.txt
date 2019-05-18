@@ -9,6 +9,8 @@
          Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
          e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
               LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
+              Fix batch file D:\Program Files (x86)\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat
+              
 - Supported Compiler
 -- Visual Studio 2005 Express Edition
    Note: Added support from Tera Term 4.103.
