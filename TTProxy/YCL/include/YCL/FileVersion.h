@@ -105,14 +105,14 @@ private:
 	bool validateFixedFileInfo()const {
 		if (fixedInfo == NULL){
 			UINT size;
-			if (!::VerQueryValue((void*) (const void*) info, ROOT(), (LPVOID*) &fixedInfo, &size))
+			if (!::VerQueryValue((void*) (const void*) info, (LPTSTR)ROOT(), (LPVOID*) &fixedInfo, &size))
 				return false;
 		}
 		return true;
 	}
 	bool validateTranslation()const {
 		if (trans == NULL){
-			if (!::VerQueryValue((void*) (const void*) info, TRANS(), (LPVOID*) &trans, &transSize))
+			if (!::VerQueryValue((void*) (const void*) info, (LPTSTR)TRANS(), (LPVOID*) &trans, &transSize))
 				return false;
 		}
 		return true;
