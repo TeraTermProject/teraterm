@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2018 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,6 @@
 #include "compat_w95.h"
 #include "dlglib.h"
 #include "teraterml.h"
-
 
 
 static BOOL AddFontFlag;
@@ -277,7 +276,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
-	SetDialogFont(ts.SetupFName, ts.UILanguageFile, NULL);
+	// [Tera Term]セクションのDlgFont=がない場合は
+	// [TTSSH]セクションのフォント設定を使用する
+	SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {

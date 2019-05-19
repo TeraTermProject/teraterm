@@ -1,0 +1,97 @@
+EXPORTS
+  StartTeraTerm @1
+  ChangeDefaultSet @2
+  GetDefaultSet @3
+  GetKeyCode @4
+  GetKeyStr @5
+  SetCOMFlag @44
+  ClearCOMFlag @45
+  CheckCOMFlag @46
+  RegWin @10
+  UnregWin @11
+  SetWinMenu @12
+  SetWinList @13
+  SelectWin @14
+  SelectNextWin @15
+  GetNthWin @16
+  GetRegisteredWindowCount @89
+  ShowAllWin @54
+  CommReadRawByte @20
+  CommInsert1Byte @21
+  CommRead1Byte @22
+  CommRawOut @23
+  CommBinaryOut @24
+  CommBinaryBuffOut @52
+  CommTextOut @25
+  CommTextOutW
+  CommBinaryEcho @26
+  CommTextEcho @27
+  CommTextEchoW
+  DetectComPorts @42
+  GetDefaultFName @47
+  ExtractFileName @48
+  replaceInvalidFileNameChar @74
+  b64encode @75
+  b64decode @76
+  CreateNotifyIcon @77
+  DeleteNotifyIcon @78
+  ShowNotifyIcon @80
+  HideNotifyIcon @81
+  SetVerNotifyIcon @82
+  NotifyMessage @79
+  SetCustomNotifyIcon @85
+  GetCustomNotifyIcon @86
+  
+  SJIS2JIS @30
+  SJIS2EUC @31
+  JIS2SJIS @32
+  RussConv @33
+  RussConvStr @34
+  ConvertUnicode @35
+  CopyTTSetToShmem @36
+  CopyShmemToTTSet @37
+  
+  GetI18nStr @40
+  GetI18nLogfont @41
+  
+  OutputDebugPrintf @49
+  
+  doSelectFolder @51
+
+  mctimelocal @53
+  RestartTeraTerm @55
+  ShowAllWinSidebySide @56
+  ShowAllWinStacked @57
+  ShowAllWinCascade @58
+  BroadcastClosingMessage @59
+  UndoAllWin @60
+
+  OpenHelp @61
+
+  GetParam @62
+  DequoteParam @63
+
+  CheckComPort @64
+
+  IsWindows95 @65
+  IsWindowsMe @83
+  IsWindowsNT4 @66
+  IsWindows2000 @84
+  IsWindowsNTKernel @67
+  IsWindows2000OrLater @68
+  IsWindowsVistaOrLater @69
+  IsWindows7OrLater @70
+  HasMultiMonitorSupport @71
+  HasGetAdaptersAddresses @72
+  HasDnsQuery @73
+  HasBalloonTipSupport @87
+  GetDownloadFolder @88
+
+  parse_port @90
+  parse_port_from_buf @91
+  service_name @92
+  get_OPENFILENAME_SIZEA @93
+
+  SetI18DlgStrs
+  SetI18MenuStrs
+  GetMessageboxFont

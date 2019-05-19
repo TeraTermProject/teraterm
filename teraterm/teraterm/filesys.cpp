@@ -28,8 +28,6 @@
  */
 
 /* TERATERM.EXE, file transfer routines */
-//#undef UNICODE
-//#undef _UNICODE
 #include <stdio.h>
 #include <io.h>
 #include <process.h>

@@ -58,8 +58,9 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
-#include <commctrl.h>	// for CCSIZEOF_STRUCT()
 #include <assert.h>
+
+#include "ttlib.h"		// for GetMessageboxFont()
 
 #include "TipWin.h"
 
@@ -190,20 +191,6 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
 }
 
-// todo: dlglib.c‚É“¯“™‚ÈƒR[ƒh‚ ‚è
-void GetMessageboxFont(LOGFONT *logfont)
-{
-	NONCLIENTMETRICS nci;
-	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
-	BOOL r;
-
-	memset(&nci, 0, sizeof(nci));
-	nci.cbSize = st_size;
-	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
-	assert(r == TRUE);
-	*logfont = nci.lfStatusFont;
-}
-
 static void register_class(HINSTANCE hInst)
 {
 	if (!tip_class) {
@@ -244,7 +231,7 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 {
 	TipWin *pTipWin;
 	HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
-	LOGFONT logfont;
+	LOGFONTA logfont;
 
 	register_class(hInst);
 	pTipWin = (TipWin *)malloc(sizeof(TipWin));
@@ -256,7 +243,7 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	pTipWin->tip_bg = GetSysColor(COLOR_INFOBK);
 	pTipWin->tip_text = GetSysColor(COLOR_INFOTEXT);
 	GetMessageboxFont(&logfont);
-	pTipWin->tip_font = CreateFontIndirect(&logfont);
+	pTipWin->tip_font = CreateFontIndirectA(&logfont);
 	CalcStrRect(pTipWin);
 	pTipWin->hParentWnd = src;
 	create_tipwin(pTipWin, hInst, cx, cy);

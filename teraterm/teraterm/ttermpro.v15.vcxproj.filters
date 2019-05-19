@@ -19,12 +19,12 @@
     <Filter Include="dialog">
       <UniqueIdentifier>{23d7c62e-eff4-4a0d-b8b4-7fc703717c0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ttpdlg">
+      <UniqueIdentifier>{1cdaec4a-75c1-4600-b434-45286f5bec80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filesys.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tekwin.cpp">
@@ -123,6 +123,33 @@
     <ClCompile Include="..\common\win16api.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\dlglib_cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib_tmpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tipwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\codeconv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dllutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\compat_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../ttpdlg/ttdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tmfc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -156,6 +183,9 @@
     </ResourceCompile>
     <ResourceCompile Include="ttermpro.rc">
       <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc">
+      <Filter>ttpdlg</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,6 +310,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\win16api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../ttpdlg/dlg_res.h">
+      <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="../ttpdlg/ttdlg.h">
+      <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tmfc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

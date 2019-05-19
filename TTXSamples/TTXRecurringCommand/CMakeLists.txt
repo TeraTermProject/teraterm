@@ -11,6 +11,7 @@ set(COMMON_SRC
   ../../teraterm/common/dlglib.c
   ../../teraterm/common/dlglib_cpp.cpp
   ../../teraterm/common/dlglib_tmpl.cpp
+  ../../teraterm/common/ttlib.c
   )
 
 source_group(

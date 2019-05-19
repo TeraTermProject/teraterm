@@ -40,6 +40,7 @@
 #include "win16api.h"
 
 #include "tt_res.h"
+#include "tmfc.h"
 #include "prnabort.h"
 
 #include "teraprn.h"

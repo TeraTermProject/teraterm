@@ -235,6 +235,7 @@ protected:
 #undef afx_msg
 	void Disconnect(BOOL confirm);
 	///
+	LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };
 #endif

@@ -816,7 +816,6 @@ CVTWindow::CVTWindow()
 #endif
 
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-//	wc.lpfnWndProc = AfxWndProc;
 	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -1642,6 +1641,32 @@ void CVTWindow::OpenTEK()
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow message handler
 
+LRESULT CVTWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	LRESULT Result;
+
+	if (message == MsgDlgHelp) {
+		OnDlgHelp(wParam,lParam);
+		return 0;
+	}
+	else if ((ts.HideTitle>0) &&
+	         (message == WM_NCHITTEST)) {
+		Result = CFrameWnd::DefWindowProc(message,wParam,lParam);
+		if ((Result==HTCLIENT) && AltKey())
+#ifdef ALPHABLEND_TYPE2
+			if(ShiftKey())
+				Result = HTBOTTOMRIGHT;
+			else
+				Result = HTCAPTION;
+#else
+			Result = HTCAPTION;
+#endif
+		return Result;
+	}
+
+	return (CFrameWnd::DefWindowProc(message,wParam,lParam));
+}
+
 BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	WORD wID = LOWORD(wParam);
@@ -2275,7 +2300,6 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	if (MetaKey(ts.MetaKey) && (nFlags & 0x2000) != 0)
 	{
-
 		PeekMessage((LPMSG)&M,HVTWin,WM_CHAR,WM_CHAR,PM_REMOVE);
 		/* for Ctrl+Alt+Key combination */
 		GetKeyboardState((PBYTE)KeyState);
@@ -2446,7 +2470,7 @@ void CVTWindow::OnMove(int x, int y)
 BOOL CVTWindow::OnMouseWheel(
 	UINT nFlags,   // 仮想キー
 	short zDelta,  // 回転距離
-	POINTS pts    // カーソル位置
+	POINTS pts     // カーソル位置
 )
 {
 	POINT pt;
@@ -4603,6 +4627,8 @@ void CVTWindow::OnSetupDlgFont()
 		_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s,%d,%d",
 					LogFont.lfFaceName, LogFont.lfHeight, LogFont.lfCharSet);
 		WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, ts.SetupFName);
+
+		SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
 	}
 }
 

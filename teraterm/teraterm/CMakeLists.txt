@@ -48,6 +48,9 @@ set(COMMON_SRC
   ../common/tmfc.h
   ../common/tmfc_frame.cpp
   ../common/i18n.c
+  ../common/tmfc.cpp
+  ../common/tmfc.h
+  ../common/tmfc_frame.cpp
   ../common/i18n.h
   ../common/win16api.h
   ../common/win16api.c
@@ -72,6 +75,7 @@ source_group(
 set(TTDLG_SRC
   ../ttpdlg/dlg_res.h
   ../ttpdlg/ttdlg.c
+  ../ttpdlg/ttdlg.h
   ../ttpdlg/ttpdlg.rc
   )
 
@@ -111,10 +115,10 @@ set(SRC
   tekwin.h
   telnet.c
   telnet.h
-  teraapp.h
   teraprn.cpp
   teraprn.h
   teraterm.cpp
+  teraterml.h
   ttdde.c
   ttdde.h
   ttdialog.c
@@ -150,6 +154,7 @@ set(SRC
   #
   teraterm.manifest
   #
+  svnversion.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
   #
   ${COMMON_SRC}
@@ -212,6 +217,10 @@ add_dependencies(
   ttptek
   )
 
+configure_file(
+  svnversion.h.in
+  svnversion.h @ONLY)
+
 # copy .lng files
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
   add_custom_target(
@@ -267,3 +276,8 @@ if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
     )
 endif()
+
+####
+configure_file(
+  svnversion.h.in
+  svnversion.h @ONLY)

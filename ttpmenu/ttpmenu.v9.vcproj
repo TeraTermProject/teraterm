@@ -193,6 +193,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\teraterm\common\codeconv.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\teraterm\common\codeconv.h"
+			>
+		</File>
+		<File
 			RelativePath="..\teraterm\common\i18n.c"
 			>
 		</File>
