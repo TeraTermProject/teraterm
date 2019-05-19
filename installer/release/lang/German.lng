@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-02-28)
+; Updated by TeraTerm Project (2019-04-24)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -52,7 +52,9 @@ MENU_EDIT_SELECTALL=&Alles auswählen
 MENU_SETUP=Ein&stellungen
 MENU_SETUP_TERMINAL=&Terminal-Einstellungen
 MENU_SETUP_WINDOW=&Fenster-Einstellungen
+MENU_SETUP_FONT_SUBMENU=&Schriftart
 MENU_SETUP_FONT=&Schriftart...
+MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Keyboard-Einstellungen
 MENU_SETUP_SERIALPORT=Serieller Port
 MENU_SETUP_TCPIP=&Hostliste editieren
@@ -580,7 +582,12 @@ DLG_AUTH_BANNER=Einloggen auf %s
 DLG_AUTH_BANNER2=Authentifikation notwendig.
 DLG_AUTH_BANNER2_FAILED=Authentifikation fehlgeschlagen. Bitte versuchen Sie es erneut.
 DLG_AUTH_USERNAME=Benutzername:
+DLG_AUTH_PASTE_WINDOWS_USERNAME=Paste &Windows Username
 DLG_AUTH_PASSWORD=Passphrase:
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=Passphrase speichern
 DLG_AUTH_FWDAGENT=F&orward agent
 DLG_AUTH_METHOD_PASSWORD=Passwortauthentifikation verwenden
@@ -594,13 +601,18 @@ DLG_AUTH_METHOD_PAGEANT=Benutze Pageant
 DLG_AUTH_PRIVATEKEY=Schlüssel:
 DLG_AUTH_LOCALUSER=Lokaler Benutzername:
 DLG_AUTH_HOST_PRIVATEKEY=rhosts-Schlüssel:
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Can't find Pageant.
 MSG_PAGEANT_NOKEY=Pageant has no valid key.
 
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
 DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
-DLG_AUTHSETUP_USERNAME=Benutzername:
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_USERNAME=U&se following username
+DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=urrent username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)

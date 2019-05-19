@@ -39,8 +39,10 @@
 #include <mbctype.h>	// for _ismbblead
 #include <assert.h>
 
+#include "teraterm_conf.h"
 #include "teraterm.h"
 #include "tttypes.h"
+#include "compat_win.h"
 
 /* OS version with GetVersionEx(*1)
 
@@ -944,7 +946,7 @@ void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int 
 	strncpy_s(MyDocSetupFName, sizeof(MyDocSetupFName), MyDoc, _TRUNCATE);
 	AppendSlash(MyDocSetupFName,sizeof(MyDocSetupFName));
 	strncat_s(MyDocSetupFName, sizeof(MyDocSetupFName), file, _TRUNCATE);
-	if (GetFileAttributesA(MyDocSetupFName) != -1) {
+	if (GetFileAttributesA(MyDocSetupFName) != INVALID_FILE_ATTRIBUTES) {
 		strncpy_s(dest, destlen, MyDocSetupFName, _TRUNCATE);
 		return;
 	}
@@ -955,11 +957,50 @@ homedir:
 	strncat_s(dest, destlen, file, _TRUNCATE);
 }
 
+/*
+ * Get home(exe,dll) directory
+ * @param[in]		hInst		WinMain()の HINSTANCE または NULL
+ * @param[in,out]	HomeDir
+ * @param[out]		HomeDirLen
+ */
+void GetHomeDir(HINSTANCE hInst, char *HomeDir, size_t HomeDirLen)
+{
+	char Temp[MAX_PATH];
+	DWORD result = GetModuleFileNameA(NULL,Temp,sizeof(Temp));
+	if (result == 0 || result == _countof(Temp)) {
+		// パスの取得に失敗した。致命的、abort() する。
+		abort();
+		// ここでreturnしてもプラグイン(ttpset.dll)のロードに失敗してabort()する
+	}
+	ExtractDirName(Temp, Temp);
+	strncpy_s(HomeDir, HomeDirLen, Temp, _TRUNCATE);
+}
+
 // デフォルトの TERATERM.INI のフルパスを ttpmacro からも
 // 取得するために追加した。(2007.2.18 maya)
-void GetDefaultSetupFName(char *home, char *dest, int destlen)
+void GetDefaultSetupFName(const char *home, char *dest, int destlen)
 {
 	GetDefaultFName(home, "TERATERM.INI", dest, destlen);
+}
+
+/*
+ *	UILanguageFileのフルパスを取得する
+ *
+ *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
+ *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
+ *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
+ *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス
+ */
+void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
+						   char *UILanguageFileFull, size_t UILanguageFileFullLen)
+{
+	char CurDir[MAX_PATH];
+
+	/* Get UILanguageFile Full Path */
+	GetCurrentDirectoryA(sizeof(CurDir), CurDir);
+	SetCurrentDirectoryA(HomeDir);
+	_fullpath(UILanguageFileFull, UILanguageFileRel, UILanguageFileFullLen);
+	SetCurrentDirectoryA(CurDir);
 }
 
 void GetUILanguageFile(char *buf, int buflen)
@@ -967,26 +1008,18 @@ void GetUILanguageFile(char *buf, int buflen)
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
 	char SetupFName[MAX_PATH];
-	char CurDir[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileNameA(NULL,Temp,sizeof(Temp)) == 0) {
-		memset(buf, 0, buflen);
-		return;
-	}
-	ExtractDirName(Temp, HomeDir);
+	GetHomeDir(NULL, HomeDir, sizeof(HomeDir));
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
 
 	/* Get LanguageFile name */
-	GetPrivateProfileStringA("Tera Term", "UILanguageFile", "",
+	GetPrivateProfileStringA("Tera Term", "UILanguageFile", "lang\\Default.lng",
 	                        Temp, sizeof(Temp), SetupFName);
 
-	GetCurrentDirectoryA(sizeof(CurDir), CurDir);
-	SetCurrentDirectoryA(HomeDir);
-	_fullpath(buf, Temp, buflen);
-	SetCurrentDirectoryA(CurDir);
+	GetUILanguageFileFull(HomeDir, Temp, buf, buflen);
 }
 
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)
@@ -997,11 +1030,7 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	char SetupFName[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileNameA(NULL,Temp,sizeof(Temp)) == 0) {
-		strncpy_s(buf, buflen, "off", _TRUNCATE);
-		return;
-	}
-	ExtractDirName(Temp, HomeDir);
+	GetHomeDir(NULL, HomeDir, sizeof(HomeDir));
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
@@ -1151,20 +1180,22 @@ void OutputDebugPrintf(const char *fmt, ...)
 	char tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
-	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	_vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
 	va_end(arg);
 	OutputDebugStringA(tmp);
 }
 
+#if defined(UNICODE)
 void OutputDebugPrintfW(const wchar_t *fmt, ...)
 {
 	wchar_t tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
-	_vsnwprintf(tmp, _countof(tmp), fmt, arg);
+	_vsnwprintf_s(tmp, _countof(tmp), _TRUNCATE, fmt, arg);
 	va_end(arg);
 	OutputDebugStringW(tmp);
 }
+#endif
 
 #if (_MSC_VER < 1800)
 BOOL vercmp(
@@ -1535,17 +1566,10 @@ BOOL HasBalloonTipSupport()
 // OPENFILENAMEA.lStructSize に代入する値
 DWORD get_OPENFILENAME_SIZEA()
 {
-#if (_WIN32_WINNT >= 0x0500)
-#if !defined(OPENFILENAME_SIZE_VERSION_400A)
-#define OPENFILENAME_SIZE_VERSION_400A 76
-#endif
 	if (IsWindows2000OrLater()) {
 		return sizeof(OPENFILENAMEA);
 	}
 	return OPENFILENAME_SIZE_VERSION_400A;
-#else
-	return sizeof(OPENFILENAMEA);
-#endif
 }
 
 #if defined(UNICODE)
@@ -1932,4 +1956,68 @@ void GetMessageboxFont(LOGFONTA *logfont)
 	r = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
 	assert(r == TRUE);
 	*logfont = nci.lfStatusFont;
+}
+
+/**
+ *	ウィンドウ表示されているディスプレイのデスクトップの範囲を取得する
+ *	@param[in]		hWnd	ウィンドウのハンドル
+ *	@param[out]		rect	デスクトップ
+ */
+void GetDesktopRect(HWND hWnd, RECT *rect)
+{
+	if (HasMultiMonitorSupport()) {
+		// マルチモニタがサポートされている場合
+		MONITORINFO monitorInfo;
+		HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		monitorInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hMonitor, &monitorInfo);
+		*rect = monitorInfo.rcWork;
+	} else {
+		// マルチモニタがサポートされていない場合
+		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
+	}
+}
+
+/**
+ *	指定ウィンドウの中央にウィンドウを配置する
+ *	@param[in]	hWnd		位置を調整するウィンドウ
+ *	@param[in]	hWndParent	このウィンドウの中央に移動する
+ */
+void CenterWindow(HWND hWnd, HWND hWndParent)
+{
+	RECT rcWnd;
+	LONG WndWidth;
+	LONG WndHeight;
+	RECT rcParent;
+	int NewX;
+	int NewY;
+	RECT rcDesktop;
+	BOOL r;
+
+	r = GetWindowRect(hWnd, &rcWnd);
+	assert(r != FALSE); (void)r;
+	WndWidth = rcWnd.right - rcWnd.left;
+	WndHeight = rcWnd.bottom - rcWnd.top;
+	r = GetWindowRect(hWndParent, &rcParent);
+	assert(r != FALSE); (void)r;
+
+	// 新しい位置
+	NewX = (rcParent.left + rcParent.right) / 2 - WndWidth / 2;
+	NewY = (rcParent.top + rcParent.bottom) / 2 - WndHeight / 2;
+
+	// デスクトップからはみ出す場合、調整する
+	GetDesktopRect(hWndParent, &rcDesktop);
+	if (NewX + WndWidth > rcDesktop.right)
+		NewX = rcDesktop.right - WndWidth;
+	if (NewX < rcDesktop.left)
+		NewX = rcDesktop.left;
+
+	if (NewY + WndHeight > rcDesktop.bottom)
+		NewY = rcDesktop.bottom - WndHeight;
+	if (NewY < rcDesktop.top)
+		NewY = rcDesktop.top;
+
+	// 移動する
+	SetWindowPos(hWnd, NULL, NewX, NewY, 0, 0,
+				 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }

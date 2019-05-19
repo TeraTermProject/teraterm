@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -81,6 +81,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
@@ -117,6 +118,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
@@ -125,6 +127,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="bplus.c" />
@@ -139,12 +143,14 @@
   <ItemGroup>
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="bplus.h" />
     <ClInclude Include="file_res.h" />
     <ClInclude Include="ftlib.h" />
     <ClInclude Include="kermit.h" />
     <ClInclude Include="quickvan.h" />
     <ClInclude Include="xmodem.h" />
+    <ClInclude Include="ymodem.h" />
     <ClInclude Include="zmodem.h" />
   </ItemGroup>
   <ItemGroup>

@@ -30,12 +30,12 @@ source_group(
   )
 
 set(SRC
-  cmn_res.h
   language.c
   language.h
   ttcmn.c
   ttcmn_notify.c
   ttpcmn-version.rc
+  ttpcmn.def
   ${COMMON_SRC}
   )
 

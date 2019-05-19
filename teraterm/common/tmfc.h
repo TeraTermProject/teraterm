@@ -164,6 +164,7 @@ public:
 	INT_PTR DoModal();
 	PROPSHEETHEADER m_psh;
 	HWND m_hWnd;
+	HWND m_hParentWnd;
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
 	HINSTANCE m_hInst;
 };

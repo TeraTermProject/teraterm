@@ -84,8 +84,10 @@ sub check_sjis_code {
 #			printf "%s\n", $enc->name;
 			if ($enc->name !~ /ascii/) {
 #				printf "%s\n", $enc->name;
-				print "$filename:$no: $1\n";
-				print "$line\n";
+				if (!check_skipped_line($line)) {
+					print "$filename:$no: $1\n";
+					print "$line\n";
+				}
 			}
 		}
 #		if ($line =~ /([\xA1-\xDF]|[\x81-\x9F\xE0-\xEF][\x40-\x7E\x80-\xFC])/) {
@@ -97,3 +99,19 @@ sub check_sjis_code {
 	close(FP);
 }
 
+# 行が対象外かどうかをチェックする
+#   true: 対象外である
+#   false: 対象外ではない 
+sub check_skipped_line {
+	my($line) = shift;
+	my($pos);
+	
+#	print "[$line]";
+	
+	# UTF-8 BOM
+	$pos = index($line, pack("C3", 0xef, 0xbb, 0xbf));
+#	print "$pos\n";
+	return 1 if ($pos != -1);	
+
+	return 0;
+}

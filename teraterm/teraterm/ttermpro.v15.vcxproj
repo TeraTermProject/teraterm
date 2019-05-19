@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -78,7 +78,7 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0411</Culture>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>onig_sd.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -88,7 +88,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -134,8 +133,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -236,7 +233,6 @@
     <ClInclude Include="teklib.h" />
     <ClInclude Include="tekwin.h" />
     <ClInclude Include="telnet.h" />
-    <ClInclude Include="teraapp.h" />
     <ClInclude Include="teraprn.h" />
     <ClInclude Include="ttdde.h" />
     <ClInclude Include="ttdialog.h" />

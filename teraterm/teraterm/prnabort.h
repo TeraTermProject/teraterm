@@ -43,6 +43,7 @@ public:
 	BOOL OnCancel();
 	BOOL OnInitDialog();
 	BOOL PostNcDestroy();
+//	BOOL DestroyWindow();
 
 private:
 	BOOL *m_pAbort;

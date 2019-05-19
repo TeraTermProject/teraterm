@@ -168,7 +168,7 @@ include_directories(
   ${SFMT_INCLUDE_DIRS}
   ${ONIGURUMA_INCLUDE_DIRS}
   .
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg
   )
 
 link_directories(
@@ -218,7 +218,8 @@ add_dependencies(
   )
 
 # copy .lng files
-if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
+if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
+  # Visual Studio 2017以上の時
   add_custom_target(
     copy_lang ALL
     DEPENDS

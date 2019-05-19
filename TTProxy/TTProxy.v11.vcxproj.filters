@@ -27,6 +27,18 @@
     <ClCompile Include="YCL\include\YCL\libc.cpp">
       <Filter>YCL</Filter>
     </ClCompile>
+    <ClCompile Include="..\teraterm\common\ttlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\teraterm\common\dlglib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\teraterm\common\dlglib_cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\teraterm\common\dlglib_tmpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TTProxy.rc">

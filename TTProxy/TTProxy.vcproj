@@ -72,12 +72,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="ws2_32.lib ttpcmn.lib"
+				AdditionalDependencies="ws2_32.lib ttpcmn.lib gdi32.lib comdlg32.lib shell32.lib ole32.lib"
 				OutputFile="$(OutDir)\TTXProxy.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				ModuleDefinitionFile="TTX.def"
+				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
@@ -167,12 +168,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="ws2_32.lib ttpcmn.lib"
+				AdditionalDependencies="ws2_32.lib ttpcmn.lib gdi32.lib comdlg32.lib shell32.lib ole32.lib"
 				OutputFile="$(OutDir)\TTXProxy.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				ModuleDefinitionFile="TTX.def"
+				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
@@ -212,6 +214,66 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath="..\teraterm\common\dlglib.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\teraterm\common\dlglib_cpp.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\teraterm\common\dlglib_tmpl.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -232,6 +294,26 @@
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\teraterm\common\ttlib.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
 			</File>

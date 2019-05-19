@@ -124,6 +124,13 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
     (${CMAKE_GENERATOR} MATCHES "NMake Makefiles"))
   ######################################## VS
   if(${CMAKE_GENERATOR} MATCHES "NMake Makefiles")
+  elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019")
+    find_program(
+      VCVARS32 vcvarsall.bat
+      HINTS "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build"
+      HINTS "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Auxiliary/Build"
+      HINTS "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build"
+      )
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
     find_program(
       VCVARS32 vcvarsall.bat
@@ -181,7 +188,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   endif()
 
   file(WRITE "${SRC_DIR}/build_cmake.bat"
-    "cd %~dp0\n"
+    "cd /d %~dp0\n"
     "setlocal\n"
     )
   file(TO_NATIVE_PATH ${PERL} PERL_N)
@@ -190,11 +197,10 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
   file(APPEND "${SRC_DIR}/build_cmake.bat"
     "del crypto\\buildinf.h\n"
-    "setlocal\n"
     "set PATH=${PERL_N_PATH}\n"
     "perl Configure no-asm ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N}\n"
     "call ${DO_MS}\n"
-    "endlocal\n"
+    "set PATH=%windir%\\system32;%windir%\n"
     )
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
     ## Visual Studio 2005 特別処理
@@ -205,13 +211,17 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
       "set LIB=%SDK%\\lib;%LIB%\n"
       )
   endif()
-  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017 Win64")
+  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019")
     file(APPEND "${SRC_DIR}/build_cmake.bat"
-      "call \"${VCVARS32_N}\" x86_amd64 10.0.17134.0\n"
+      "call \"${VCVARS32_N}\" x86\n"
+      )
+  elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017 Win64")
+    file(APPEND "${SRC_DIR}/build_cmake.bat"
+      "call \"${VCVARS32_N}\" amd64\n"
       )
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
     file(APPEND "${SRC_DIR}/build_cmake.bat"
-      "call \"${VCVARS32_N}\" x86 10.0.17134.0\n"
+      "call \"${VCVARS32_N}\" x86\n"
       )
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio")
     file(APPEND "${SRC_DIR}/build_cmake.bat"
@@ -219,8 +229,8 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
       )
   endif()
   file(APPEND "${SRC_DIR}/build_cmake.bat"
-    "set PATH=${PERL_N_PATH};%PATH%\n"
-    "nmake -f ms\\nt.mak install ${NMAKE_OPTION}\n"
+    "set PATH=%PATH%;${PERL_N_PATH}\n"
+    "nmake -f ms\\nt.mak install\n"
     )
 
   set(BUILD_CMAKE_BAT "${SRC_DIR}/build_cmake.bat")

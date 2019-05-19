@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,11 +49,12 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 
-#ifdef _DEBUG
+#if defined(_MSC_VER) && defined(_DEBUG)
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 char UILanguageFile[MAX_PATH];
+static char SetupFName[MAX_PATH];
 static HWND CtrlWnd;
 static HINSTANCE hInst;
 
@@ -72,13 +73,31 @@ HWND GetHWND()
 
 static void init()
 {
+	char UILanguageFileRel[MAX_PATH];
+
+	GetHomeDir(hInst, HomeDir, sizeof(HomeDir));
+	GetDefaultFName(HomeDir, "TERATERM.INI", SetupFName, sizeof(SetupFName));
+	GetPrivateProfileStringA("Tera Term", "UILanguageFile", "lang\\Default.lng",
+	                        UILanguageFileRel, sizeof(UILanguageFileRel), SetupFName);
+	GetUILanguageFileFull(HomeDir, UILanguageFileRel,
+						  UILanguageFile, sizeof(UILanguageFile));
+
 	DLLInit();
 	WinCompatInit();
-	if (pSetThreadDpiAwarenessContext) {
-		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+	// DPI Aware (高DPI対応)
+	{
+		int dip_aware = 0;
+		dip_aware = GetPrivateProfileIntA("Tera Term", "DPIAware", dip_aware, SetupFName);
+		if (dip_aware != 0) {
+			if (pSetThreadDpiAwarenessContext != NULL) {
+				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+			}
+		}
 	}
-	// messageboxのフォントに設定する
-	SetDialogFont(NULL, NULL, NULL);
+
+	// UILanguageFileの "Tera Term" セクション "DLG_SYSTEM_FONT" のフォントに設定する
+	SetDialogFont(SetupFName, UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 }
 
 // TTMACRO main engine
@@ -101,12 +120,6 @@ static BOOL OnIdle(LONG lCount)
 	return Continue;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-
-// CCtrlApp theApp;
-
-/////////////////////////////////////////////////////////////////////////////
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -115,12 +128,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	DWORD SleepTick = 1;
 
 #ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	init();
 //	InitCommonControls();
-	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+	init();
 
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow();
@@ -130,7 +142,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
 	CtrlWnd = hWnd;
 
-	//////////////////////////////////////////////////////////////////////
+	// message pump
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
 
@@ -158,10 +170,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		}
 	}
 
-	// TODO すでに閉じられている、この処理不要?
-	if (pCCtrlWindow) {
-		pCCtrlWindow->DestroyWindow();
-	}
+	pCCtrlWindow->DestroyWindow();
+	delete pCCtrlWindow;
 	pCCtrlWindow = NULL;
+
+	DLLExit();
 	return ExitCode;
 }

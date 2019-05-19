@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008-2018 TeraTerm Project
+ * (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,13 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include <tchar.h>
+#include <crtdbg.h>
 #include "ttlib.h"	// for get_lang_font()
+
+#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
+#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#endif
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
 {

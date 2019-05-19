@@ -69,9 +69,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib user32.lib gdi32.lib comdlg32.lib Advapi32.lib Shell32.lib Ole32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -157,9 +158,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib user32.lib gdi32.lib comdlg32.lib Advapi32.lib Shell32.lib Ole32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"

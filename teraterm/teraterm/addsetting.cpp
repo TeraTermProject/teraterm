@@ -29,6 +29,7 @@
 /*
  * Additional settings dialog
  */
+#include "teraterm_conf.h"
 
 #include <stdio.h>
 #include <tchar.h>
@@ -1515,3 +1516,8 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 	delete m_CygwinPage;
 }
 
+void CAddSettingPropSheetDlg::OnInitDialog()
+{
+	TTCPropertySheet::OnInitDialog();
+	CenterWindow(m_hWnd, m_hParentWnd);
+}

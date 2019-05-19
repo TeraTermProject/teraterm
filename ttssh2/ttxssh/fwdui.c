@@ -1071,6 +1071,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgFwdEditFont = NULL;
 		}
 #endif
+		CenterWindow(dlg, GetParent(dlg));
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
@@ -1224,6 +1225,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgFwdFont = NULL;
 		}
 #endif
+		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:

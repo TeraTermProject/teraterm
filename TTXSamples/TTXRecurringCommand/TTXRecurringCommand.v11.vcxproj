@@ -65,6 +65,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -82,6 +83,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -90,6 +92,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\teraterm\common\dlglib.c" />
+    <ClCompile Include="..\..\teraterm\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\..\teraterm\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\..\teraterm\common\ttlib.c" />
     <ClCompile Include="TTXRecurringCommand.c" />
   </ItemGroup>
   <ItemGroup>

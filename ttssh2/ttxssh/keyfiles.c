@@ -454,7 +454,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	ciphername = buffer_get_string_msg(copy_consumed, NULL);
 	cipher = get_cipher_by_name(ciphername);
 	if (cipher == NULL && strcmp(ciphername, "none") != 0) {
-		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": unknown cipher name");
+		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
 		goto error;
 	}
 	// パスフレーズのチェック。暗号化が none でない場合は空のパスワードを認めない。

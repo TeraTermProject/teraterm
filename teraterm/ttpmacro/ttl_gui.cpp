@@ -456,51 +456,6 @@ WORD TTLMessageBox()
 	return Err;
 }
 
-/* ttmparse.c‚©‚çˆÚ“® */
-extern "C" void DispErr(WORD Err)
-{
-	const TCHAR *Msg;
-	int i;
-	int no, start, end;
-	char *filename;
-
-	Msg = _T("Unknown error message number.");
-
-	switch (Err) {
-		case ErrCloseParent: Msg = _T("\")\" expected."); break;
-		case ErrCantCall: Msg = _T("Can't call sub."); break;
-		case ErrCantConnect: Msg = _T("Can't link macro."); break;
-		case ErrCantOpen: Msg = _T("Can't open file."); break;
-		case ErrDivByZero: Msg = _T("Divide by zero."); break;
-		case ErrInvalidCtl: Msg = _T("Invalid control."); break;
-		case ErrLabelAlreadyDef: Msg = _T("Label already defined."); break;
-		case ErrLabelReq: Msg = _T("Label requiered."); break;
-		case ErrLinkFirst: Msg = _T("Link macro first. Use 'connect' macro."); break;
-		case ErrStackOver: Msg = _T("Stack overflow."); break;
-		case ErrSyntax: Msg = _T("Syntax error."); break;
-		case ErrTooManyLabels: Msg = _T("Too many labels."); break;
-		case ErrTooManyVar: Msg = _T("Too many variables."); break;
-		case ErrTypeMismatch: Msg = _T("Type mismatch."); break;
-		case ErrVarNotInit: Msg = _T("Variable not initialized."); break;
-		case ErrCloseComment: Msg = _T("\"*/\" expected."); break;
-		case ErrOutOfRange: Msg = _T("Index out of range."); break;
-		case ErrCloseBracket: Msg = _T("\"]\" expected."); break;
-		case ErrFewMemory: Msg = _T("Can't allocate memory."); break;
-		case ErrNotSupported: Msg = _T("Unknown command."); break;
-	}
-
-	no = GetLineNo();
-	start = LineParsePtr;
-	end = LinePtr;
-	if (start == end)
-		end = LineLen;
-
-	filename = GetMacroFileName();
-
-	i = OpenErrDlg(Msg, tc::fromUtf8(LineBuff), no, start, end, (tc)filename);
-	if (i==IDOK) TTLStatus = IdTTLEnd;
-}
-
 WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2;

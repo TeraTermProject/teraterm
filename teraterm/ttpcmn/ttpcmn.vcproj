@@ -75,7 +75,6 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
-				IgnoreDefaultLibraryNames="nafxcw.lib"
 				ModuleDefinitionFile="$(ProjectName).def"
 				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"
@@ -167,7 +166,6 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
-				IgnoreDefaultLibraryNames="nafxcwd.lib"
 				ModuleDefinitionFile="$(ProjectName).def"
 				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"
@@ -237,10 +235,6 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
-			<File
-				RelativePath="cmn_res.h"
-				>
-			</File>
 			<File
 				RelativePath="..\common\i18n.h"
 				>

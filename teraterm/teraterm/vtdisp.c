@@ -275,7 +275,7 @@ HDC  CreateBitmapDC(HBITMAP hbm)
   HDC hdc;
 
   #ifdef _DEBUG
-    OutputDebugPrintf("CreateBitmapDC : hbm = %x\n",hbm);
+    OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
   #endif
 
   hdc = CreateCompatibleDC(NULL);
@@ -291,7 +291,7 @@ void DeleteBitmapDC(HDC *hdc)
   HBITMAP hbm;
 
   #ifdef _DEBUG
-    OutputDebugPrintf("DeleteBitmapDC : *hdc = %x\n",hdc);
+    OutputDebugPrintf("DeleteBitmapDC : *hdc = %p\n",hdc);
   #endif
 
   if(!hdc)
@@ -317,7 +317,7 @@ void FillBitmapDC(HDC hdc,COLORREF color)
   HBRUSH  hBrush;
 
   #ifdef _DEBUG
-    OutputDebugPrintf("FillBitmapDC : hdc = %x color = %x\n",hdc,color);
+    OutputDebugPrintf("FillBitmapDC : hdc = %x color = %p\n",hdc,color);
   #endif
 
   if(!hdc)
@@ -541,7 +541,7 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 
 // 画像読み込み関係
 
-void BGPreloadPicture(BGSrc *src)
+static void BGPreloadPicture(BGSrc *src)
 {
   char  spiPath[MAX_PATH];
   char  filespec[MAX_PATH];
@@ -595,9 +595,19 @@ void BGPreloadPicture(BGSrc *src)
       BITMAPINFO *pbmi;
       char       *pbuf;
       char spiFileName[MAX_PATH];
+	  const char *ext;
 
       if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         continue;
+	  ext = strrchr(fd.cFileName, '.');
+	  if (ext == NULL) {
+		  // 拡張子がないファイル?
+		  continue;
+	  }
+	  if (strcmp(ext, ".dll") != 0 && strcmp(ext, ".spi") != 0) {
+		  // .dll or .spi 以外のファイル
+		  continue;
+	  }
 
       strncpy_s(spiFileName, sizeof(spiFileName), spiPath, _TRUNCATE);
       strncat_s(spiFileName, sizeof(spiFileName), fd.cFileName, _TRUNCATE);
@@ -651,7 +661,7 @@ void BGPreloadPicture(BGSrc *src)
   }
 }
 
-void BGGetWallpaperInfo(WallpaperInfo *wi)
+static void BGGetWallpaperInfo(WallpaperInfo *wi)
 {
   DWORD length;
   int style;
@@ -865,7 +875,7 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
     return hbmNew;
 }
 
-void BGPreloadWallpaper(BGSrc *src)
+static void BGPreloadWallpaper(BGSrc *src)
 {
 	HBITMAP       hbm;
 	WallpaperInfo wi;
@@ -959,7 +969,7 @@ createdc:
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-void BGPreloadSrc(BGSrc *src)
+static void BGPreloadSrc(BGSrc *src)
 {
   DeleteBitmapDC(&(src->hdc));
 
@@ -978,7 +988,7 @@ void BGPreloadSrc(BGSrc *src)
   }
 }
 
-void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
+static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
 {
 	if(!hdcDest || !src)
 		return;
@@ -1015,7 +1025,7 @@ void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BO
 	}
 }
 
-void BGLoadPicture(HDC hdcDest,BGSrc *src)
+static void BGLoadPicture(HDC hdcDest,BGSrc *src)
 {
   int x,y,width,height,pattern;
   HDC hdc = NULL;
@@ -1078,7 +1088,7 @@ typedef struct tagLoadWallpaperStruct
   BGSrc *src;
 }LoadWallpaperStruct;
 
-BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LPRECT lprcMonitor,LPARAM dwData)
+static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LPRECT lprcMonitor,LPARAM dwData)
 {
   RECT rectDest;
   RECT rectRgn;
@@ -1183,7 +1193,7 @@ void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   SetWindowOrgEx(hdcDest,0,0,NULL);
 }
 
-void BGLoadSrc(HDC hdcDest,BGSrc *src)
+static void BGLoadSrc(HDC hdcDest,BGSrc *src)
 {
   switch(src->type)
   {
@@ -1270,7 +1280,7 @@ void BGSetupPrimary(BOOL forceSetup)
   }
 }
 
-COLORREF BGGetColor(const char *name,COLORREF defcolor,char *file)
+static COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
 {
   unsigned int r,g,b;
   char colorstr[256],defstr[256];
@@ -1286,7 +1296,7 @@ COLORREF BGGetColor(const char *name,COLORREF defcolor,char *file)
   return RGB(r,g,b);
 }
 
-BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,const char *strList[],int nList)
+static BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,char **strList,int nList)
 {
   char defstr[64],str[64];
   int  i;
@@ -1584,7 +1594,7 @@ void BGInitialize(void)
 	  BGAlphaBlend = AlphaBlendWithoutAPI;
   }
   else {
-    BGAlphaBlend = NULL;
+    BGAlphaBlend = AlphaBlendWithoutAPI;
   }
 
 }
@@ -3819,26 +3829,12 @@ void DispGetWindowSize(int *width, int *height, BOOL client) {
 
 void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 {
-	HMODULE mod;
-	HMONITOR monitor;
-	MONITORINFO monitorInfo;
 	RECT desktop, win, client;
 
 	GetWindowRect(HVTWin, &win);
 	GetClientRect(HVTWin, &client);
 
-	if (((mod = GetModuleHandleA("user32.dll")) != NULL) &&
-	    (GetProcAddress(mod,"MonitorFromWindow") != NULL)) {
-		// マルチモニタがサポートされている場合
-		monitor = MonitorFromWindow(HVTWin, MONITOR_DEFAULTTONEAREST);
-		monitorInfo.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(monitor, &monitorInfo);
-		desktop = monitorInfo.rcWork;
-	}
-	else {
-		// マルチモニタがサポートされていない場合
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop, 0);
-	}
+	GetDesktopRect(HVTWin, &desktop);
 
 	if (inPixels) {
 		*x = desktop.right - desktop.left;
@@ -3848,8 +3844,6 @@ void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
 		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
 	}
-
-	return;
 }
 
 int DispFindClosestColor(int red, int green, int blue)

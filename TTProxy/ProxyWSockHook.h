@@ -35,7 +35,7 @@ void UTIL_get_lang_msgU8(const char *key, char *buf, int buf_len, const char *de
 
 void UTIL_set_dialog_font()
 {
-	SetDialogFont(SetupFName, UILanguageFile, "TTProxy");
+	SetDialogFont(SetupFName, UILanguageFile, "TTProxy", "DLG_TAHOMA_FONT");
 }
 
 #if 0
@@ -749,7 +749,7 @@ private:
         Window conn;
         Window erro;
         Window log;
-//        HFONT DlgFont;
+//      HFONT DlgFont;
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND && wParam == MAKEWPARAM(IDC_REFER, BN_CLICKED)) {
@@ -921,6 +921,8 @@ private:
             if (logfile != NULL)
                 log.SetWindowText((tc)logfile);
 
+            CenterWindow((HWND)*this, GetParent());
+
             return true;
         }
         virtual void onOK() {
@@ -990,7 +992,7 @@ private:
         EditBoxCtrl  user;
         EditBoxCtrl  pass;
         bool lock;
-//        HFONT DlgFont;
+//      HFONT DlgFont;
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND) {
@@ -1130,6 +1132,7 @@ private:
             }
             lock = false;
             onChanged(0);
+            CenterWindow((HWND)*this, GetParent());
             return true;
         }
         virtual void onOK() {
@@ -1266,7 +1269,7 @@ private:
 
     class AboutDialog : public Dialog {
     private:
-        HFONT DlgFont;
+//      HFONT DlgFont;
         virtual bool onInitDialog() {
             String buf;
             TCHAR *buf2;
@@ -1315,12 +1318,16 @@ private:
             UTIL_get_lang_msg("BTN_OK", uimsg, _countof(uimsg), _T("OK"));
             SetDlgItemText(IDOK, uimsg);
 
+            CenterWindow((HWND)*this, GetParent());
+
             return true;
         }
         virtual void onOK() {
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onOK();
         }
     public :

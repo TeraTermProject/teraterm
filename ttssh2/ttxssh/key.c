@@ -2266,6 +2266,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgHostsAddFont = NULL;
 		}
 #endif
+		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:

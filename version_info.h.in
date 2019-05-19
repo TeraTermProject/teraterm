@@ -6,8 +6,14 @@
 #cmakedefine MSVC
 #cmakedefine MINGW
 #cmakedefine USE_UNICODE_API
+// _WIN32_WINNT
+//	@_WIN32_WINNT@
 // CMAKE_GENERATOR
 //  @CMAKE_GENERATOR@
+// CMAKE_GENERATOR_TOOLSET (VS 2010 and above)
+//  @CMAKE_GENERATOR_TOOLSET@
+// CMAKE_BUILD_TYPE (single-configuration generator)
+//  @CMAKE_BUILD_TYPE@
 // CMAKE_COMMAND
 //  @CMAKE_COMMAND@
 // CMAKE_C_COMPILER

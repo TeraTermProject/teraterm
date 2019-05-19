@@ -29,6 +29,8 @@
 
 /* TERATERM.EXE, main */
 
+#include "teraterm_conf.h"
+
 #include <crtdbg.h>
 #include <tchar.h>
 #include "teraterm.h"
@@ -52,6 +54,9 @@
 #include "dlglib.h"
 #include "teraterml.h"
 
+#if defined(_DEBUG) && defined(_MSC_VER)
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 static BOOL AddFontFlag;
 static TCHAR TSpecialFont[MAX_PATH];
@@ -96,9 +101,6 @@ static void UnloadSpecialFont()
 
 static void init()
 {
-#ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
 	DLLInit();
 	WinCompatInit();
 	//SetProcessDPIAware();
@@ -268,7 +270,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 	LONG lCount = 0;
@@ -278,9 +280,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
-	// [Tera Term]セクションのDlgFont=がない場合は
-	// [TTSSH]セクションのフォント設定を使用する
-	SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
+	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
+	SetDialogFont(ts.SetupFName, ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {

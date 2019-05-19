@@ -28,10 +28,13 @@
  */
 
 /* TERATERM.EXE, file transfer dialog box */
+#include "teraterm_conf.h"
+
 #include <stdio.h>
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"

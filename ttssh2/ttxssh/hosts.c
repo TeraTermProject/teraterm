@@ -1874,6 +1874,8 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		// add host check boxにチェックをデフォルトで入れておく 
 		SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
+		CenterWindow(dlg, GetParent(dlg));
+
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -2060,6 +2062,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgHostsReplaceFont = NULL;
 		}
 #endif
+		CenterWindow(dlg, GetParent(dlg));
 		// デフォルトでチェックは入れない
 		return TRUE;			/* because we do not set the focus */
 
@@ -2249,6 +2252,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			DlgHostsAddFont = NULL;
 		}
 #endif
+		CenterWindow(dlg, GetParent(dlg));
 		// add host check box のデフォルトは off にする
 		// SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 

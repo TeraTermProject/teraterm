@@ -234,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath="fileread.cpp"
+				>
+			</File>
+			<File
 				RelativePath="inpdlg.cpp"
 				>
 			</File>
@@ -269,6 +273,10 @@
 				RelativePath="ttmmain.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16api.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -280,6 +288,10 @@
 			</File>
 			<File
 				RelativePath="..\common\compat_win.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib.h"
 				>
 			</File>
 			<File
@@ -308,10 +320,6 @@
 			</File>
 			<File
 				RelativePath="statdlg.h"
-				>
-			</File>
-			<File
-				RelativePath="stdafx.h"
 				>
 			</File>
 			<File
@@ -419,10 +427,6 @@
 			Filter="c"
 			>
 			<File
-				RelativePath="fileread.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\common\i18n.c"
 				>
 			</File>
@@ -456,10 +460,6 @@
 			</File>
 			<File
 				RelativePath="wait4all.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\win16api.c"
 				>
 			</File>
 		</Filter>

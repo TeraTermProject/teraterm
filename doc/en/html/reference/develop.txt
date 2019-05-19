@@ -10,6 +10,8 @@
          e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
               LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
 - Supported Compiler
+-- Visual Studio 2005 Express Edition
+   Note: Added support from Tera Term 4.103.
 -- Visual Studio 2008 SP1 Standard Edition (or higher edition)
    Note: The executable program which was compiled by this version does not work on Windows NT 4.0, 95, 98 and Me.
 -- Visual Studio 2010 SP1 Professional Edition (or higher edition)

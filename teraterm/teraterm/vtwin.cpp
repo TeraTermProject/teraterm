@@ -30,6 +30,7 @@
 
 /* TERATERM.EXE, VT window */
 
+#include "teraterm_conf.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "teraterm.h"
@@ -56,6 +57,7 @@
 #include "helpid.h"
 #include "teraprn.h"
 #include "ttplug.h"  /* TTPLUG */
+#include "teraterml.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,8 +117,11 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #endif
 
 #ifdef _DEBUG
-#define malloc(l)   _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
+#if defined(_MSC_VER)
 #define new  		::new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 #endif
 
 // ウィンドウ最大化ボタンを有効にする (2005.1.15 yutaka)
@@ -767,6 +772,18 @@ CVTWindow::CVTWindow()
 		(*ParseParam)(Param, &ts, &(TopicName[0]));
 	}
 	FreeTTSET();
+
+	// DPI Aware (高DPI対応)
+	{
+		int dip_aware = 0;
+		dip_aware = GetPrivateProfileIntA("Tera Term", "DPIAware", dip_aware, ts.SetupFName);
+		if (dip_aware != 0) {
+			if (pSetThreadDpiAwarenessContext != NULL) {
+				// TODO Windows 10 Version 1703以降のチェックを入れるべきか?
+				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+			}
+		}
+	}
 
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {
@@ -2033,7 +2050,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	for (int i = 0; i < DropListCount; i++) {
 		const TCHAR *FileName = DropLists[i];
 		const DWORD attr = GetFileAttributes(FileName);
-		if (attr == (DWORD)-1 ) {
+		if (attr == INVALID_FILE_ATTRIBUTES) {
 			FileCount++;
 		} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
 			DirectoryCount++;
@@ -2115,6 +2132,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		if (!DoSameProcess) {
 			bool DoSameProcessNextDrop;
 			bool DoNotShowDialog = !DefaultShowDialog;
+			SetDialogFont(ts.SetupFName,
+						  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 			DropType =
 				ShowDropDialogBox(hInst, HVTWin,
 								  FileName, DropType,
@@ -3785,6 +3804,8 @@ void CVTWindow::OnFileNewConnection()
 		return;
 	}
 
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	if ((*GetHostName)(HVTWin,&GetHNRec)) {
 		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 			if (ts.HistoryList) {
@@ -4346,6 +4367,8 @@ void CVTWindow::OnFileChangeDir()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*ChangeDirectory)(HVTWin,ts.FileDir);
 	FreeTTDLG();
 }
@@ -4483,6 +4506,8 @@ void CVTWindow::OnExternalSetup()
 {
 	DWORD ret;
 
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(hInst, _T("Tera Term: Additional settings"), HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
@@ -4534,6 +4559,8 @@ void CVTWindow::OnSetupTerminal()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupTerminal)(HVTWin, &ts);
 	FreeTTDLG();
 	if (Ok) {
@@ -4554,6 +4581,8 @@ void CVTWindow::OnSetupWindow()
 		return;
 	}
 
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	strncpy_s(orgTitle, sizeof(orgTitle), ts.Title, _TRUNCATE);
 	Ok = (*SetupWin)(HVTWin, &ts);
 	FreeTTDLG();
@@ -4591,6 +4620,10 @@ static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		get_lang_msgT("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
 					  _T("\"Font style\" selection here won't affect actual font appearance."), ts.UILanguageFile);
 		SetDlgItemTextT(Dialog, stc6, uimsg);
+
+		SetFocus(GetDlgItem(Dialog,cmb1));
+
+		CenterWindow(Dialog, GetParent(Dialog));
 	}
 	return FALSE;
 }
@@ -4600,9 +4633,14 @@ void CVTWindow::OnSetupDlgFont()
 	LOGFONTA LogFont;
 	CHOOSEFONTA cf;
 	BOOL result;
+
+	// LogFont.lfHeight は point
 	result = GetI18nLogfont("Tera Term", "DlgFont", &LogFont, 0, ts.SetupFName);
-	if (result == FALSE) {
-		memset(&LogFont, 0, sizeof(LogFont));
+	if (result == TRUE) {
+		// pixelに変換
+		LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, LogFont.lfHeight);
+	} else {
+		GetMessageboxFont(&LogFont);
 	}
 
 	memset(&cf, 0, sizeof(cf));
@@ -4613,11 +4651,9 @@ void CVTWindow::OnSetupDlgFont()
 		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
 		CF_SHOWHELP | CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
-#if (WINVER >= _WIN32_WINNT_WIN7) && defined(CF_INACTIVEFONTS)
 	if (IsWindows7OrLater() && ts.ListHiddenFonts) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
-#endif
 	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;
@@ -4625,11 +4661,12 @@ void CVTWindow::OnSetupDlgFont()
 	result = ChooseFontA(&cf);
 	if (result) {
 		char Temp[80];
+		int font_point = cf.iPointSize / 10;	// point で保存する
 		_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s,%d,%d",
-					LogFont.lfFaceName, LogFont.lfHeight, LogFont.lfCharSet);
+					LogFont.lfFaceName,
+					font_point,
+					LogFont.lfCharSet);
 		WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, ts.SetupFName);
-
-		SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
 	}
 }
 
@@ -4646,6 +4683,8 @@ void CVTWindow::OnSetupKeyboard()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupKeyboard)(HVTWin, &ts);
 	FreeTTDLG();
 
@@ -4663,6 +4702,8 @@ void CVTWindow::OnSetupSerialPort()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupSerialPort)(HVTWin, &ts);
 	FreeTTDLG();
 
@@ -4688,6 +4729,8 @@ void CVTWindow::OnSetupTCPIP()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	if ((*SetupTCPIP)(HVTWin, &ts)) {
 		TelUpdateKeepAliveInterval();
 	}
@@ -4700,6 +4743,8 @@ void CVTWindow::OnSetupGeneral()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	if ((*SetupGeneral)(HVTWin,&ts)) {
 		ResetCharSet();
 		ResetIME();
@@ -6088,6 +6133,8 @@ void CVTWindow::OnWindowWindow()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*WindowWindow)(HVTWin,&Close);
 	FreeTTDLG();
 	if (Close) {
@@ -6135,6 +6182,8 @@ void CVTWindow::OnHelpAbout()
 	if (! LoadTTDLG()) {
 		return;
 	}
+	SetDialogFont(ts.SetupFName,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*AboutDialog)(HVTWin);
 	FreeTTDLG();
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -81,7 +81,6 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>nafxcw.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -120,7 +119,6 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>nafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -132,7 +130,6 @@
     <ClCompile Include="..\common\ttlib.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cmn_res.h" />
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="language.h" />
     <ClInclude Include="..\common\servicenames.h" />
@@ -143,7 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpcmn-version.rc" />
-    <ResourceCompile Include="ttpcmn.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

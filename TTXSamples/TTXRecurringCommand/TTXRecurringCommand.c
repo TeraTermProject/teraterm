@@ -545,6 +545,8 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		SendMessage(GetDlgItem(dlg, IDC_ADD_NL), BM_SETCHECK,
 		            pvar->add_nl?BST_CHECKED:BST_UNCHECKED, 0);
 
+		CenterWindow(dlg, GetParent(dlg));
+
 		return TRUE;
 	  case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -605,9 +607,11 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	switch (cmd) {
 	  case ID_MENU_SETUP:
-		SetDialogFont(pvar->ts->SetupFName, pvar->ts->UILanguageFile, "TTXRecurringCommand");
-		switch (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
-		                       hWin, RecurringCommandSetting, (LPARAM)NULL)) {
+		SetDialogFont(pvar->ts->SetupFName,
+					  pvar->ts->UILanguageFile,
+					  SECTION, "DLG_TAHOMA_FONT");
+		switch (TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
+								 hWin, RecurringCommandSetting, (LPARAM)NULL)) {
 		  case IDOK:
 			break;
 		  case IDCANCEL:

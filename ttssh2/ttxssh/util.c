@@ -340,6 +340,10 @@ void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def)
 
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, PTInstVar pvar)
 {
+	LOGFONTA logfont_tmp;
+	if (logfont == NULL) {
+		logfont = &logfont_tmp;
+	}
 	if (GetI18nLogfont("TTSSH", key, logfont,
 					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
 					   pvar->ts->UILanguageFile) == FALSE) {

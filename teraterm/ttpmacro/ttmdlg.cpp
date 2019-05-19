@@ -56,12 +56,12 @@
 #define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
 #define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
-char HomeDir[MAXPATHLEN];
+char HomeDir[MAX_PATH];
 char FileName[MAX_PATH];
 char TopicName[11];
 char ShortName[MAX_PATH];
@@ -82,11 +82,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	char Temp[MaxStrLen];
 	PCHAR start, cur, next;
 
-	// Get home directory
-	if (GetModuleFileNameA(GetInstance(), FileName,sizeof(FileName)) == 0) {
-		return;
-	}
-	ExtractDirName(FileName,HomeDir);
+	// go home directory
 	_chdir(HomeDir);
 
 	// Get command line parameters
@@ -303,9 +299,6 @@ void BringupStatDlg()
  */
 int OpenListDlg(const TCHAR *Text, const TCHAR *Caption, const TCHAR **Lists, int Selected)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND hWnd = GetHWND();
-
 	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
 	INT_PTR r = ListDlg.DoModal();
 	if (r == IDOK) {

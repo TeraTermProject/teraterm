@@ -1,5 +1,7 @@
 ﻿# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P oniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P oniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -DCMAKE_CONFIGURATION_TYPE=Release -P oniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64 -DCMAKE_CONFIGURATION_TYPE=Release -P oniguruma.cmake
 
 ####
 if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL ""))
@@ -10,6 +12,7 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
 	  -DCMAKE_CONFIGURATION_TYPE=Release
 	  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
+	  -DARCHITECTURE=${ARCHITECTURE}
 	  -P oniguruma.cmake
 	  )
 	execute_process(
@@ -17,6 +20,7 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
 	  -DCMAKE_CONFIGURATION_TYPE=Debug
 	  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
+	  -DARCHITECTURE=${ARCHITECTURE}
 	  -P oniguruma.cmake
 	  )
 	return()
@@ -53,17 +57,17 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "onig-6.9.0")
-set(SRC_ARC "onig-6.9.0.tar.gz")
-set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.0/onig-6.9.0.tar.gz")
-set(SRC_ARC_HASH_SHA1 8e3e39e8e92f040939922ddc367a56c12bd4c4c3)
+set(SRC_DIR_BASE "onig-6.9.2")
+set(SRC_ARC "onig-6.9.2-rc2.tar.gz")
+set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.2_rc2/onig-6.9.2-rc2.tar.gz")
+set(SRC_ARC_HASH_SHA1 e437d4fd70742912ac0e3ef1e7a682943c6ccacb)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/oniguruma")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src")
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src/${SRC_DIR_BASE}")
 set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/oniguruma_${TOOLSET}")
-if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32"))
+if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32"))
   set(BUILD_DIR "${BUILD_DIR}_x64")
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
 endif()
@@ -96,8 +100,11 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 
   ######################################## multi configuration
 
+  if(NOT "${ARCHITECTURE}" STREQUAL "")
+	set(CMAKE_A_OPTION -A ${ARCHITECTURE})
+  endif()
   execute_process(
-	COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${CMAKE_GENERATOR}
+	COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${CMAKE_GENERATOR} ${CMAKE_A_OPTION}
 	-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
 	-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
 	${TOOLCHAINFILE}

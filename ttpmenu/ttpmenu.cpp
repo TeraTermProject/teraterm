@@ -1769,7 +1769,7 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	GetModuleFileName(NULL, modulePath, sizeof(modulePath));
 	ExtractDirName(modulePath, modulePath);
 	SetCurrentDirectory(modulePath);
-	if (::GetFileAttributes(g_JobInfo.szTeraTerm) == 0xFFFFFFFF) {
+	if (::GetFileAttributes(g_JobInfo.szTeraTerm) == INVALID_FILE_ATTRIBUTES) {
 		dwErr = ::GetLastError();
 		if (dwErr == ERROR_FILE_NOT_FOUND || dwErr == ERROR_PATH_NOT_FOUND) {
 			UTIL_get_lang_msg("MSG_ERROR_CHECKFILE", uimsg, sizeof(uimsg),

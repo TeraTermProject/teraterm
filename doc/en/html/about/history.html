@@ -33,6 +33,13 @@
 
 <h3 id="teraterm_4.103">2019.xx.xx (Ver 4.103)</h3>
 <ul class="history">
+  <li>Changes
+    <ul>
+      <li>added support for High DPI experimentally. The default setting is disabled. When DPIAware=1 is set in [Tera Term] of teraterm.ini file, this feature is enabled. However, this is only available for Windows 10 Version 1703 or later.</li>
+      <li>added support for configure the dialog font(<a href="../menu/setup-font.html">[Setup]/[Font])</a>. The font submenu is newly added. The default font is same as before.</li>
+      <li>When the font file(TSPECIAL1.TTF) displaying ruled line is not installed, the file is loaded from same directory as ttermpro.exe.</li>
+    </ul>
+  </li>
   <li>Bug fixes
     <ul>
       <li>Display position of IME's conversion candidate window can not follow cursor position. This bug was introduced in 4.102.</li>

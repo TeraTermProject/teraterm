@@ -74,3 +74,4 @@ BOOL FreeTTDLG()
 {
 	return TRUE;
 }
+

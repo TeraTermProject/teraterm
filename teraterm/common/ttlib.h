@@ -82,8 +82,11 @@ void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
 DllExport void GetDownloadFolder(char *dest, int destlen);
 void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int destlen);
-void GetDefaultSetupFName(char *home, char *dest, int destlen);
+void GetHomeDir(HINSTANCE hInst, char *HomeDir, size_t HomeDirLen);
+void GetDefaultSetupFName(const char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
+void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
+						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 DllExport void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 DllExport void get_lang_msgU8(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
@@ -129,6 +132,8 @@ BOOL GetPositionOnWindow(
 	HWND hWnd, const POINT *point,
 	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
 DllExport void GetMessageboxFont(LOGFONTA *logfont);
+void GetDesktopRect(HWND hWnd, RECT *rect);
+DllExport void CenterWindow(HWND hWnd, HWND hWndParent);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 

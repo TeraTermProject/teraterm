@@ -1,5 +1,5 @@
 /*
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,15 @@
 /* Routines for dialog boxes */
 
 #include <windows.h>
+#include <crtdbg.h>
+
 #include "dlglib.h"
 #include "ttlib.h"
+
+#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
+#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#endif
 
 // ダイアログモーダル状態の時、OnIdle()を実行する
 //#define ENABLE_CALL_IDLE_MODAL	1
@@ -246,12 +253,13 @@ INT_PTR TTDialogBox(
  *	使用するダイアログフォントを決定する
  */
 void SetDialogFont(const char *SetupFName,
-				   const char *UILanguageFile, const char *Section)
+				   const char *UILanguageFile, const char *Section, const char *Key)
 {
+	LOGFONTA logfont;
+	BOOL result;
+
 	// teraterm.iniの指定
 	if (SetupFName != NULL) {
-		LOGFONTA logfont;
-		BOOL result;
 		result = GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
 		if (result == TRUE) {
 			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE);
@@ -263,55 +271,59 @@ void SetDialogFont(const char *SetupFName,
 	}
 
 	// .lngの指定
-	if (UILanguageFile != NULL) {
+	if (UILanguageFile != NULL && Section != NULL && Key != NULL) {
+#if 0
 		static const char *dlg_font_keys[] = {
 			"DLG_FONT",
 			"DLG_TAHOMA_FONT",
 			"DLG_SYSTEM_FONT",
 		};
-		BOOL result = FALSE;
-		LOGFONTA logfont;
-		size_t i;
-		if (Section != NULL) {
-			for (i = 0; i < _countof(dlg_font_keys); i++) {
-				result = GetI18nLogfont(Section, dlg_font_keys[i], &logfont, 0, UILanguageFile);
-				if (result == FALSE) {
-					continue;
-				}
-				if (logfont.lfFaceName[0] == '\0') {
-					break;
-				}
-				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
-					break;
-				}
-			}
-		}
-		if (result == FALSE) {
-			for (i = 0; i < _countof(dlg_font_keys); i++) {
-				result = GetI18nLogfont("Tera Term", dlg_font_keys[i], &logfont, 0, UILanguageFile);
-				if (result == FALSE) {
-					continue;
-				}
-				if (logfont.lfFaceName[0] == '\0') {
-					break;
-				}
-				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
-					break;
-				}
-			}
-		}
+#endif
+		result = GetI18nLogfont(Section, Key, &logfont, 0, UILanguageFile);
 		if (result == TRUE) {
-			TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-			return;
+			if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+				return;
+			}
 		}
 	}
 
 	// ini,lngで指定されたフォントが見つからなかったとき、
-	// 文字化けで正しく表示されない事態となる
 	// messagebox()のフォントをとりあえず選択しておく
-	{
-		LOGFONTA logfont;
-		GetMessageboxFont(&logfont);
-		TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	GetMessageboxFont(&logfont);
+	if (logfont.lfHeight < 0) {
+		logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
 	}
+	TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+}
+
+
+/**
+ *	pixel数をpoint数に変換する(フォント用)
+ *		注 1point = 1/72 inch, フォントの単位
+ *		注 ウィンドウの表示具合で倍率が変化するので hWnd が必要
+ */
+int GetFontPixelFromPoint(HWND hWnd, int pixel)
+{
+	if (hWnd == NULL) {
+		hWnd = GetDesktopWindow();
+	}
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);	// dpi = dot per inch (96DPI)
+	int point = MulDiv(pixel, dpi, 72);			// pixel = point / 72 * dpi
+	ReleaseDC(hWnd, DC);
+	return point;
+}
+
+/**
+ *	point数をpixel数に変換する(フォント用)
+ *		注 1point = 1/72 inch, フォントの単位
+ */
+int GetFontPointFromPixel(HWND hWnd, int point)
+{
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);	// dpi = dot per inch (96DPI)
+	int pixel = MulDiv(point, 72, dpi);			// point = pixel / dpi * 72
+	ReleaseDC(hWnd, DC);
+	return pixel;
 }

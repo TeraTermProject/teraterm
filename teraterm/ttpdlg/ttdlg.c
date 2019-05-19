@@ -29,6 +29,8 @@
 /* IPv6 modification is Copyright(C) 2000 Jun-ya Kato <kato@win6.jp> */
 
 /* TTDLG.DLL, dialog boxes */
+#include "teraterm_conf.h"
+#include "teraterm.h"
 
 #include <winsock2.h>
 #include <stdio.h>
@@ -268,6 +270,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				SetDlgItemTextA(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 			}
+			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
 
 		case WM_COMMAND:
@@ -679,6 +682,8 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			ChangeSB(Dialog,ts,IAttr,IOffset);
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1057,6 +1062,9 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				ShowDlgItem(Dialog,IDC_KEYBKEYBTEXT,IDC_KEYBKEYB);
 				SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
 			}
+
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1192,6 +1200,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,ts->DelayPerLine,FALSE);
 			SendDlgItemMessage(Dialog, IDC_SERIALDELAYLINE, EM_LIMITTEXT,4, 0);
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1309,6 +1319,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
 			EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
 
@@ -1608,6 +1620,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				DisableDlgItem(Dialog,IDC_HOSTTCPPROTOCOLLABEL,IDC_HOSTTCPPROTOCOL);
 			}
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1812,6 +1826,8 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			// resize dialog
 			MoveWindow(Dialog,WX,WY,WW,WH,TRUE);
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
 
@@ -2062,6 +2078,7 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 }
 
 #if defined(_MSC_VER)
+// ビルドしたときに使われたVisual C++のバージョンを取得する(2009.3.3 yutaka)
 static void GetCompilerInfo(char *buf, size_t buf_size)
 {
 	char tmpbuf[128];
@@ -2084,12 +2101,13 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 		// 1912 = VS2017 update5(VC++15)
 		// 1913 = VS2017 update6(VC++15)
 		// 1914 = VS2017 15.7(VC++15)
+		// 1920 = VS2019 16.0.0(VC++16)
 		// VS2017 Update3から製品バージョンが3桁表記(15.x.x)になり、
 		// _MSC_FULL_VERから算出できなくなったため、一律で15.0とする。
 		if (msc_low_ver >= 10) {
-			vs_ver = msc_ver - 4;
+			vs_ver = msc_ver - 4 + (msc_low_ver - 10)/10;
 			msc_low_ver = 0;
-		} 
+		}
 		else {
 			vs_ver = msc_ver - 5;
 		}
@@ -2115,7 +2133,7 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 #elif defined(__MINGW32__)
 static void GetCompilerInfo(char *buf, size_t buf_size)
 {
-#if defined(__GNUC__) || defined(__clang__) 
+#if defined(__GNUC__) || defined(__clang__)
 	_snprintf_s(buf, buf_size, _TRUNCATE,
 				"mingw " __MINGW64_VERSION_STR " "
 #if defined(__clang__)
@@ -2221,7 +2239,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
 			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
 
-			// ビルドしたときに使われたVisual C++のバージョンを設定する。(2009.3.3 yutaka)
+			// ビルドしたときに使われたコンパイラを設定する。(2009.3.3 yutaka)
 			GetCompilerInfo(tmpbuf, sizeof(tmpbuf));
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using %s", tmpbuf);
 			SetDlgItemTextA(Dialog, IDC_BUILDTOOL, buf);
@@ -2233,6 +2251,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			// static text のサイズを変更 (2007.4.16 maya)
 			hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
 			hdc = GetDC(hwnd);
+			SelectObject(hdc, (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0));
 			GetDlgItemTextA(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
 			dwExt = GetTabbedTextExtentA(hdc,uimsg,strlen(uimsg),0,NULL);
 			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
@@ -2245,6 +2264,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			hwnd = GetDlgItem(Dialog, IDC_FORUM_URL);
 			hdc = GetDC(hwnd);
+			SelectObject(hdc, (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0));
 			GetDlgItemTextA(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
 			dwExt = GetTabbedTextExtentA(hdc,uimsg,strlen(uimsg),0,NULL);
 			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
@@ -2314,6 +2334,8 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			fullcolor = (bitspixel == 32 ? 1 : 0);
 			ReleaseDC(hwnd, hdc);
 #endif
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
 
@@ -2591,6 +2613,8 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 				EnableWindow(GetDlgItem(Dialog, IDC_GENLANG_UI), FALSE);
 			}
 
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -2626,15 +2650,11 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (1 <= w && w <= uilist_count && w != langui_sel) {
-							char CurDir[MAX_PATH];
-
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
 								"%s\\%s", LANG_PATH, LangUIList[w - 1]);
 
-							GetCurrentDirectoryA(sizeof(CurDir), CurDir);
-							SetCurrentDirectoryA(ts->HomeDir);
-							_fullpath(ts->UILanguageFile, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile));
-							SetCurrentDirectoryA(CurDir);
+							GetUILanguageFileFull(ts->HomeDir, ts->UILanguageFile_ini,
+												  ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 							strncpy_s(UILanguageFile, sizeof(UILanguageFile), ts->UILanguageFile, _TRUNCATE);
 
@@ -2689,6 +2709,9 @@ static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 		
 			SetWinList(GetParent(Dialog),Dialog,IDC_WINLISTLIST);
+
+			CenterWindow(Dialog, GetParent(Dialog));
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -2764,7 +2787,6 @@ DllExport BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 		i = IDD_TERMDLG;
 	}
 
-	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(i),
@@ -2773,7 +2795,6 @@ DllExport BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_WINDLG),
@@ -2782,7 +2803,6 @@ DllExport BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_KEYBDLG),
@@ -2791,7 +2811,6 @@ DllExport BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_SERIALDLG),
@@ -2800,7 +2819,6 @@ DllExport BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_TCPIPDLG),
@@ -2809,7 +2827,6 @@ DllExport BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 {
-	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_HOSTDLG),
@@ -2818,7 +2835,6 @@ DllExport BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 
 DllExport BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir)
 {
-	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_DIRDLG),
@@ -2827,7 +2843,6 @@ DllExport BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir)
 
 DllExport BOOL WINAPI _AboutDialog(HWND WndParent)
 {
-	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBox(hInst,
 		                MAKEINTRESOURCE(IDD_ABOUTDLG),
@@ -2851,6 +2866,8 @@ static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetDlgItemText(Dialog, stc6, uimsg);
 
 			SetFocus(GetDlgItem(Dialog,cmb1));
+
+			CenterWindow(Dialog, GetParent(Dialog));
 
 			break;
 		}
@@ -2904,7 +2921,6 @@ DllExport BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet 
 
 DllExport BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_GENDLG),
@@ -2913,7 +2929,6 @@ DllExport BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
 {
-	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	*Close = FALSE;
 	return
 		(BOOL)DialogBoxParam(hInst,

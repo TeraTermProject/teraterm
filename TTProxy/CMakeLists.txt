@@ -15,7 +15,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
 
 set(COMMON_SRC
   ../teraterm/common/ttlib.h
-  ../teraterm/common/ttlib.c
+#  ../teraterm/common/ttlib.c
   ../teraterm/common/i18n.h
   ../teraterm/common/ttplugin.h
   ../teraterm/common/tttypes.h

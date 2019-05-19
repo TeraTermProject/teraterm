@@ -28,6 +28,11 @@
 
 /* compat_win */
 
+/*
+ * 使用している Windows SDK, Visual Studio の差をなくすためのファイル
+ * windows.h などのファイルを include した後に include する
+ */
+
 #pragma once
 
 #include <windows.h>
@@ -37,14 +42,20 @@ extern "C" {
 #endif
 
 #if !defined(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)
-#define DPI_AWARENESS_CONTEXT_SYSTEM_AWARE          ((DPI_AWARENESS_CONTEXT)-2)
-#define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE     ((DPI_AWARENESS_CONTEXT)-3)
-#define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2  ((DPI_AWARENESS_CONTEXT)-4)
+#define DPI_AWARENESS_CONTEXT_SYSTEM_AWARE			((DPI_AWARENESS_CONTEXT)-2)
+#define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE		((DPI_AWARENESS_CONTEXT)-3)
+#define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2	((DPI_AWARENESS_CONTEXT)-4)
 DECLARE_HANDLE(DPI_AWARENESS_CONTEXT);
 #endif
 
 #if !defined(WM_DPICHANGED)
-#define WM_DPICHANGED                   0x02E0
+#define WM_DPICHANGED					0x02E0
+#endif
+#if !defined(CF_INACTIVEFONTS)
+#define CF_INACTIVEFONTS				0x02000000L
+#endif
+#if !defined(OPENFILENAME_SIZE_VERSION_400A)
+#define OPENFILENAME_SIZE_VERSION_400A	76
 #endif
 
 extern BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);

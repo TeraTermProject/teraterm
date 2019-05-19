@@ -40,14 +40,6 @@
 #include "codeconv.h"
 
 #ifdef _DEBUG
-
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
-
-#ifdef _DEBUG
 #define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p)       _free_dbg((p), _NORMAL_BLOCK)
@@ -133,38 +125,37 @@ void EndVar()
 	GlobalFree(HStrBuff);
 }
 
-#if 0	// ttl_gui.cÇ…Ç∆ÇËÇ†Ç¶Ç∏éùÇ¡ÇƒÇ¢Ç¡ÇΩ
 void DispErr(WORD Err)
 {
-	char Msg[41];
+	const char *Msg;
 	int i;
 	int no, start, end;
 	char *filename;
 
-	strncpy_s(Msg, sizeof(Msg), "Unknown error message number.", _TRUNCATE);
-
 	switch (Err) {
-		case ErrCloseParent: strncpy_s(Msg, sizeof(Msg),"\")\" expected.", _TRUNCATE); break;
-		case ErrCantCall: strncpy_s(Msg, sizeof(Msg),"Can't call sub.", _TRUNCATE); break;
-		case ErrCantConnect: strncpy_s(Msg, sizeof(Msg),"Can't link macro.", _TRUNCATE); break;
-		case ErrCantOpen: strncpy_s(Msg, sizeof(Msg),"Can't open file.", _TRUNCATE); break;
-		case ErrDivByZero: strncpy_s(Msg, sizeof(Msg),"Divide by zero.", _TRUNCATE); break;
-		case ErrInvalidCtl: strncpy_s(Msg, sizeof(Msg),"Invalid control.", _TRUNCATE); break;
-		case ErrLabelAlreadyDef: strncpy_s(Msg, sizeof(Msg),"Label already defined.", _TRUNCATE); break;
-		case ErrLabelReq: strncpy_s(Msg, sizeof(Msg),"Label requiered.", _TRUNCATE); break;
-		case ErrLinkFirst: strncpy_s(Msg, sizeof(Msg),"Link macro first. Use 'connect' macro.", _TRUNCATE); break;
-		case ErrStackOver: strncpy_s(Msg, sizeof(Msg),"Stack overflow.", _TRUNCATE); break;
-		case ErrSyntax: strncpy_s(Msg, sizeof(Msg),"Syntax error.", _TRUNCATE); break;
-		case ErrTooManyLabels: strncpy_s(Msg, sizeof(Msg),"Too many labels.", _TRUNCATE); break;
-		case ErrTooManyVar: strncpy_s(Msg, sizeof(Msg),"Too many variables.", _TRUNCATE); break;
-		case ErrTypeMismatch: strncpy_s(Msg, sizeof(Msg),"Type mismatch.", _TRUNCATE); break;
-		case ErrVarNotInit: strncpy_s(Msg, sizeof(Msg),"Variable not initialized.", _TRUNCATE); break;
-		case ErrCloseComment: strncpy_s(Msg, sizeof(Msg),"\"*/\" expected.", _TRUNCATE); break;
-		case ErrOutOfRange: strncpy_s(Msg, sizeof(Msg), "Index out of range.", _TRUNCATE); break;
-		case ErrCloseBracket: strncpy_s(Msg, sizeof(Msg), "\"]\" expected.", _TRUNCATE); break;
-		case ErrFewMemory: strncpy_s(Msg, sizeof(Msg), "Can't allocate memory.", _TRUNCATE); break;
-		case ErrNotSupported: strncpy_s(Msg, sizeof(Msg), "Unknown command.", _TRUNCATE); break;
-	}
+		case ErrCloseParent: Msg = "\")\" expected."; break;
+		case ErrCantCall: Msg = "Can't call sub."; break;
+		case ErrCantConnect: Msg = "Can't link macro."; break;
+		case ErrCantOpen: Msg = "Can't open file."; break;
+		case ErrDivByZero: Msg = "Divide by zero."; break;
+		case ErrInvalidCtl: Msg = "Invalid control."; break;
+		case ErrLabelAlreadyDef: Msg = "Label already defined."; break;
+		case ErrLabelReq: Msg = "Label requiered."; break;
+		case ErrLinkFirst: Msg = "Link macro first. Use 'connect' macro."; break;
+		case ErrStackOver: Msg = "Stack overflow."; break;
+		case ErrSyntax: Msg = "Syntax error."; break;
+		case ErrTooManyLabels: Msg = "Too many labels."; break;
+		case ErrTooManyVar: Msg = "Too many variables."; break;
+		case ErrTypeMismatch: Msg = "Type mismatch."; break;
+		case ErrVarNotInit: Msg = "Variable not initialized."; break;
+		case ErrCloseComment: Msg = "\"*/\" expected."; break;
+		case ErrOutOfRange: Msg = "Index out of range."; break;
+		case ErrCloseBracket: Msg = "\"]\" expected."; break;
+		case ErrFewMemory: Msg = "Can't allocate memory."; break;
+		case ErrNotSupported: Msg = "Unknown command."; break;
+		case ErrCantExec: Msg = "Can't execute command."; break;
+		default: Msg = "Unknown error message number."; break;
+	};
 
 	no = GetLineNo();
 	start = LineParsePtr;
@@ -174,10 +165,9 @@ void DispErr(WORD Err)
 
 	filename = GetMacroFileName();
 
-	i = OpenErrDlg((tc)Msg, (tc)LineBuff, no, start, end, (tc)filename);
+	i = OpenErrDlg(Msg, LineBuff, no, start, end, filename);
 	if (i==IDOK) TTLStatus = IdTTLEnd;
 }
-#endif
 
 void LockVar()
 {

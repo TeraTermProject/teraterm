@@ -621,7 +621,6 @@ void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CCtrlWindow::PostNcDestroy()
 {
-	delete this;
 	PostQuitMessage(0);
 	return TRUE;
 }

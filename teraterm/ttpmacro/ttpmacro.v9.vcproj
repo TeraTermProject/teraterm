@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
@@ -73,11 +73,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib onig_s.lib SFMT.lib iphlpapi.lib"
+				AdditionalDependencies="LIBCMT.lib onig_s.lib SFMT.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
-				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -112,7 +111,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
@@ -162,11 +161,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib onig_sd.lib SFMTd.lib iphlpapi.lib"
+				AdditionalDependencies="LIBCMTD.lib onig_sd.lib SFMTd.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;LIBCMTD.lib"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -209,7 +207,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\compat_win.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_cpp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_tmpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.cpp"
+				>
+			</File>
+			<File
 				RelativePath="errdlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="fileread.cpp"
 				>
 			</File>
 			<File
@@ -229,7 +251,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\stdafx.cpp"
+				RelativePath="..\common\tmfc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc_frame.cpp"
 				>
 			</File>
 			<File
@@ -244,6 +270,10 @@
 				RelativePath="ttmmain.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16api.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -251,6 +281,18 @@
 			>
 			<File
 				RelativePath="..\common\codeconv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\compat_win.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.h"
 				>
 			</File>
 			<File
@@ -278,7 +320,7 @@
 				>
 			</File>
 			<File
-				RelativePath="stdafx.h"
+				RelativePath="..\common\tmfc.h"
 				>
 			</File>
 			<File
@@ -351,6 +393,10 @@
 				>
 			</File>
 			<File
+				RelativePath="ttmacro_3d.ico"
+				>
+			</File>
+			<File
 				RelativePath="ttpmacro.rc"
 				>
 				<FileConfiguration
@@ -411,14 +457,6 @@
 			</File>
 			<File
 				RelativePath="wait4all.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\win16api.c"
-				>
-			</File>
-			<File
-				RelativePath="fileread.cpp"
 				>
 			</File>
 		</Filter>

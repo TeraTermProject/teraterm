@@ -16,8 +16,6 @@
 
 #include "dlglib.h"
 
-#define	DIALOGBOX_REPLACE	1
-
 namespace yebisuya {
 
 class Dialog : virtual public Window {
@@ -117,10 +115,10 @@ public:
 	}
 	int open(HINSTANCE instance, int resourceId, HWND owner = NULL) {
 		YCLVERIFY(prepareOpen(this) == NULL, "Another dialog has been opening yet.");
-#if defined(DIALOGBOX_REPLACE)
-		return ::TTDialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, (DLGPROC)DialogProc, NULL);
+#if 0
+		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, DialogProc, NULL);
 #else
-		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, (DLGPROC)DialogProc, NULL);
+		return TTDialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, DialogProc, NULL);
 #endif
 	}
 protected:
