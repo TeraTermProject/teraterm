@@ -9,7 +9,7 @@
        SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
        例: INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
            LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
-           修正バッチファイル D:\Program Files (x86)\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat
+           修正バッチファイル C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat
            
 - サポートされているコンパイラ
 -- Visual Studio 2005 Express Edition
