@@ -54,50 +54,12 @@
 
 
 
-typedef struct {
-	const TCHAR *FaceName;
-	bool found;
-} EnumFontInfo;
-
-static int CALLBACK EnumFontExProc(
-	ENUMLOGFONT* lpelf, NEWTEXTMETRIC* lpntm,
-	int nFontType, LPARAM lParam)
-{
-	EnumFontInfo *info = (EnumFontInfo *)lParam;
-	if (nFontType == DEVICE_FONTTYPE) {
-		// 接続されたデバイス(プリンタなど)内のフォント
-		return 1;
-	}
-	const TCHAR *FaceName = lpelf->elfLogFont.lfFaceName;
-	if (_tcscmp(info->FaceName, FaceName) == 0) {
-		info->found = true;
-		return 0;
-	}
-	return 1;
-}
-
-BOOL isExistFont(const TCHAR *FaceName)
-{
-	HDC hDC = GetDC(NULL);
-	LOGFONT lf;
-	memset(&lf, 0, sizeof(lf));
-	lf.lfCharSet = DEFAULT_CHARSET;// SHIFTJIS_CHARSET;
-	lf.lfPitchAndFamily = 0;
-
-	EnumFontInfo info;
-	info.FaceName = FaceName;
-	info.found = false;
-	EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)EnumFontExProc, (LPARAM)&info, 0);
-	ReleaseDC(NULL, hDC);
-	return info.found;
-}
-
 static BOOL AddFontFlag;
 static TCHAR TSpecialFont[MAX_PATH];
 
 static void LoadSpecialFont()
 {
-	if (!isExistFont(_T("Tera Special"))) {
+	if (!IsExistFontA("Tera Special", SYMBOL_CHARSET, TRUE)) {
 		int r;
 
 		if (GetModuleFileName(NULL, TSpecialFont,_countof(TSpecialFont)) == 0) {
@@ -135,6 +97,9 @@ static void UnloadSpecialFont()
 
 static void init()
 {
+#ifdef _DEBUG
+	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 	DLLInit();
 	WinCompatInit();
 	if (pSetThreadDpiAwarenessContext) {

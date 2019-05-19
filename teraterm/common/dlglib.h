@@ -57,7 +57,6 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
 #define SetDropDownListT(p1, p2, p3, p4)	SetDropDownList(p1, p2, p3, p4)
 #endif
 
-////////////////////////////////////////
 void TTSetDlgFontA(const char *face, int height, int charset);
 void TTSetDlgFontW(const wchar_t *face, int height, int charset);
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
@@ -89,6 +88,9 @@ INT_PTR TTDialogBox(
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
 void SetDialogFont(const char *SetupFName, const char *UILanguageFile, const char *Section);
+HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
+				  const char *UILanguageFile, PCHAR key);
+BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
 
 #if defined(_UNICODE)
 #define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontW(p1,p2,p3)

@@ -15,6 +15,10 @@ if(USE_UNICODE_API)
 	add_definitions(-DUNICODE_DISPLAY=1)
   endif()
 endif()
+if(ENABLE_DPIAWARENESS)
+  add_definitions(-DDPIAWARENESS)
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
@@ -29,9 +33,10 @@ set(COMMON_SRC
   ../common/teraterm.h
   ../common/ttlib.c
   ../common/ttlib.h
+  ../common/dlglib.h
   ../common/dlglib.c
   ../common/dlglib_cpp.cpp
-  ../common/dlglib.h
+  ../common/dlglib_tmpl.cpp
   ../common/win16api.h
   ../common/win16api.c
   ../common/dlglib_tmpl.cpp
@@ -50,6 +55,8 @@ set(COMMON_SRC
   ../common/dllutil.h
   ../common/codeconv.h
   ../common/codeconv.cpp
+  ../common/tipwin.h
+  ../common/tipwin.cpp
   #
   ../teraterm/uni2sjis.map
   ../ttpcmn/sjis2uni.map
@@ -205,9 +212,58 @@ add_dependencies(
   ttptek
   )
 
-configure_file(
-  svnversion.h.in
-  svnversion.h @ONLY)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../ttpdlg/svnversion.h")
-  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/../ttpdlg/svnversion.h")
+# copy .lng files
+if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
+  add_custom_target(
+    copy_lang ALL
+    DEPENDS
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Default.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/English.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/French.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/German.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Japanese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Korean.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Russian.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Simplified Chinese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
+    )
+  add_custom_command(
+    OUTPUT
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Default.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/English.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/French.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/German.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Japanese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Korean.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Russian.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Simplified Chinese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/Default.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Default.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/English.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/English.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/French.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/French.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/German.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/German.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/Japanese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Japanese.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/Korean.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Korean.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/Russian.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Russian.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/Simplified Chinese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Simplified Chinese.lng"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/installer/release/lang/Traditional Chinese.lng"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
+    )
 endif()

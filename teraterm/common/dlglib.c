@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include <tchar.h>
+#include "ttlib.h"	// for get_lang_font()
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
 {
@@ -422,7 +423,17 @@ int CALLBACK IsExistFontSubA(
 }
 
 /**
- *	フォントがインストールされているか調べる
+ *	IsExistFont
+ *	フォントが存在しているかチェックする
+ *
+ *	@param[in]	face		フォント名(ファイル名ではない)
+ *	@param[in]	charset		SHIFTJIS_CHARSETなど
+ *	@param[in]	strict		TRUE	フォントリンクは検索に含めない
+ *							FALSE	フォントリンクも検索に含める
+ *	@retval		FALSE		フォントはしない
+ *	@retval		TRUE		フォントは存在する
+ *
+ *	strict = FALSE時、存在しないフォントでも表示できるならTRUEが返る
  */
 BOOL IsExistFont(const wchar_t *face, BYTE charset, BOOL strict)
 {
@@ -430,7 +441,7 @@ BOOL IsExistFont(const wchar_t *face, BYTE charset, BOOL strict)
 	LOGFONTW lf;
 	IsExistFontInfoW info;
 	memset(&lf, 0, sizeof(lf));
-	lf.lfCharSet = strict ? DEFAULT_CHARSET : charset;
+	lf.lfCharSet = !strict ? DEFAULT_CHARSET : charset;
 	// ↑DEFAULT_CHARSETとするとフォントリンクも有効になるようだ
 	lf.lfPitchAndFamily = 0;
 	info.found = FALSE;
@@ -447,7 +458,7 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	LOGFONTA lf;
 	IsExistFontInfoA info;
 	memset(&lf, 0, sizeof(lf));
-	lf.lfCharSet = strict ? DEFAULT_CHARSET : charset;
+	lf.lfCharSet = !strict ? DEFAULT_CHARSET : charset;
 	// ↑DEFAULT_CHARSETとするとフォントリンクも有効になるようだ
 	lf.lfPitchAndFamily = 0;
 	info.found = FALSE;
@@ -456,6 +467,23 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	EnumFontFamiliesExA(hDC, &lf, (FONTENUMPROCA)IsExistFontSubA, (LPARAM)&info, 0);
 	ReleaseDC(NULL, hDC);
 	return info.found;
+}
+
+/**
+ *	ダイアログフォントを取得する
+ *	エラーは発生しない
+ */
+void GetMessageboxFont(LOGFONT *logfont)
+{
+	NONCLIENTMETRICS nci;
+	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
+	BOOL r;
+
+	memset(&nci, 0, sizeof(nci));
+	nci.cbSize = st_size;
+	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+	assert(r == TRUE);
+	*logfont = nci.lfStatusFont;
 }
 
 /**
@@ -470,7 +498,7 @@ void SetDialogFont(const char *SetupFName,
 		BOOL result;
 		result = GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
 		if (result == TRUE) {
-			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, FALSE);
+			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE);
 			if (result == TRUE) {
 				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 				return;
@@ -497,7 +525,7 @@ void SetDialogFont(const char *SetupFName,
 				if (logfont.lfFaceName[0] == '\0') {
 					break;
 				}
-				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, FALSE)) {
+				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
 					break;
 				}
 			}
@@ -511,7 +539,7 @@ void SetDialogFont(const char *SetupFName,
 				if (logfont.lfFaceName[0] == '\0') {
 					break;
 				}
-				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, FALSE)) {
+				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
 					break;
 				}
 			}
@@ -520,24 +548,35 @@ void SetDialogFont(const char *SetupFName,
 			TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 			return;
 		}
-		// フォントが見つからなかったとき、
-		// 文字化けで正しく表示されない事態となる
-		// messagebox()のフォントをとりあえず選択しておく
 	}
 
-	// messageboxのフォントを選択
+	// ini,lngで指定されたフォントが見つからなかったとき、
+	// 文字化けで正しく表示されない事態となる
+	// messagebox()のフォントをとりあえず選択しておく
 	{
-		NONCLIENTMETRICS nci;
-		int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
-		BOOL r;
-		const LOGFONT *logfont;
-
-		memset(&nci, 0, sizeof(nci));
-		nci.cbSize = st_size;
-		r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
-		assert(r == TRUE);
-		logfont = &nci.lfStatusFont;
-
-		TTSetDlgFont(logfont->lfFaceName, logfont->lfHeight, logfont->lfCharSet);
+		LOGFONT logfont;
+		GetMessageboxFont(&logfont);
+		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 	}
 }
+
+#if 0
+HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
+                  const char *UILanguageFile, PCHAR key)
+{
+	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
+	LOGFONTA logfont;
+	HFONT hNewFont;
+	if (key == NULL) key = "DLG_TAHOMA_FONT";
+	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
+	if (get_lang_font(key, hDlg, &logfont, &hNewFont, UILanguageFile)) {
+		int i;
+		for (i = 0 ; i < nIDDlgItemCount ; i++) {
+			const int nIDDlgItem = nIDDlgItems[i];
+			SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE,0));
+		}
+	}
+	return hNewFont;
+}
+#endif
+

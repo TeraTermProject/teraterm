@@ -154,19 +154,16 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		}
 
 		// focus to "SCP dest textbox" or "Cancel"
-		if (Param->ScpEnable) {
-			// "SCP" 有効時は Cancel にフォーカスを当て、最終的に SCP PATH にフォーカスが
-			// 当たるようにする。
-			SetFocus(GetDlgItem(hDlgWnd, IDC_SCP_RADIO));
-		} else {
-			// フォーカスの初期状態を Cancel にする為、この時点では IDOK に
-			// フォーカスを当てる。後で WM_NEXTDLGCTL でフォーカスが次のボタンになる。
-			SetFocus(GetDlgItem(hDlgWnd, IDOK));
+		{
+			int focus_id;
+			if (Param->ScpEnable) {
+				focus_id = IDC_SCP_PATH;
+			} else {
+				focus_id = IDCANCEL;
+			}
+			PostMessage(hDlgWnd, WM_NEXTDLGCTL,
+						(WPARAM)GetDlgItem(hDlgWnd, focus_id), TRUE);
 		}
-		// フォーカスを次のボタンに移す
-		// SetFocus() で直接フォーカスを当てるとタブキーの動作等に問題が出るため、
-		// このメッセージを併用する
-		PostMessage(hDlgWnd, WM_NEXTDLGCTL, 0, 0L);
 
 		// TRUEにするとボタンにフォーカスが当たらない。
 		return FALSE;
@@ -228,11 +225,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			DlgData->Param->DropType = DROP_TYPE_CANCEL;
 		}
 		if (wID == IDOK || wID == IDCANCEL) {
-#if 0
-			EndDialog(hDlgWnd, wID);
-#else
 			TTEndDialog(hDlgWnd, wID);
-#endif
 			break;
 		}
 		return FALSE;
@@ -274,17 +267,10 @@ enum drop_type ShowDropDialogBox(
 	Param.ScpSendDirSize = _countof(pts->ScpSendDir);
 	Param.UILanguageFile = pts->UILanguageFile;
 
-#if 0
-	int ret = DialogBoxParam(
-		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
-		hWndParent, (DLGPROC)OnDragDropDlgProc,
-		(LPARAM)&Param);
-#else
 	int ret = TTDialogBoxParam(
 		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
 		hWndParent, (DLGPROC)OnDragDropDlgProc,
 		(LPARAM)&Param);
-#endif
 	if (ret != IDOK) {
 		return DROP_TYPE_CANCEL;
 	}

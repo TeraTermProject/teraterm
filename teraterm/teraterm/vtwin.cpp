@@ -3214,7 +3214,6 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 		char buf[512];			// 参照文字列を受け取るバッファ
 		size_t str_len_count;
 		int cx;
-		assert(IsWindowUnicode(hWnd) == FALSE);
 
 		// 参照文字列取得、1行取り出す
 		{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
@@ -3235,9 +3234,19 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 		if (pReconvPtrSave != NULL) {
 			free(pReconvPtrSave);
 		}
+#if defined(UNICODE)
+#if 0
+		// TODO: bufはwchar_t
+		pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStW(
+			hWnd, buf, str_len_count, cx, &ReconvSizeSave);
+#else
+		pReconvPtrSave = NULL;
+		ReconvSizeSave = 0;
+#endif
+#else
 		pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStA(
 			hWnd, buf, str_len_count, cx, &ReconvSizeSave);
-
+#endif
 		// 1回目はサイズだけを返す
 		result = ReconvSizeSave;
 	}

@@ -30,7 +30,6 @@
 #define __I18N_H
 
 #include <windows.h>
-//#include "ttlib.h"
 
 #define MAX_UIMSG	1024
 

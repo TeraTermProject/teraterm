@@ -25,6 +25,7 @@ set(SRC
   ttpmenu.cpp
   #
   ttpmenu.rc
+  #
   left.ico
   right.ico
   teraterm.ico
