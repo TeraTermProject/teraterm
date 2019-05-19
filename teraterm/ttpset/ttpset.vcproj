@@ -70,7 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ttpcmn.lib"
+				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ole32.lib ttpcmn.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(OutDir)"
@@ -162,7 +162,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ttpcmn.lib"
+				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ole32.lib ttpcmn.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(OutDir)"

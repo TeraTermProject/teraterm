@@ -589,6 +589,13 @@
 			<param name="Local" value="html\reference\develop.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="CMakeビルドシステムを使用したビルド(experimental)">
+				<param name="Local" value="html\reference\build_with_cmake.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ソースコード解説">
 			<param name="Local" value="html\reference\sourcecode.html">

@@ -29,27 +29,19 @@
 
 /* TTMACRO.EXE, status dialog box */
 
+#include <assert.h>
+#include <crtdbg.h>
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
 #include "tmfc.h"
 #include "tttypes.h"
+#include "ttmacro.h"
 
 #include "statdlg.h"
 
 // CStatDlg dialog
-
-#if 0
-BEGIN_MESSAGE_MAP(CStatDlg, CDialog)
-	//{{AFX_MSG_MAP(CStatDlg)
-	ON_MESSAGE(WM_EXITSIZEMOVE, OnExitSizeMove)
-//	ON_MESSAGE(WM_USER_MSTATBRINGUP, OnSetForceForegroundWindow)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-#endif
-
-extern HINSTANCE GetInstance();
 
 BOOL CStatDlg::Create(const TCHAR *Text, const TCHAR *Title, int x, int y)
 {
@@ -57,7 +49,6 @@ BOOL CStatDlg::Create(const TCHAR *Text, const TCHAR *Title, int x, int y)
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
-//	DlgFont = NULL;
 	HINSTANCE hInst = GetInstance();
 	return TTCDialog::Create(hInst, GetDesktopWindow(), CStatDlg::IDD);
 }
@@ -80,7 +71,7 @@ void CStatDlg::Update(const TCHAR *Text, const TCHAR *Title, int x, int y)
 	if (Text!=NULL) {
 		SIZE textSize;
 		HWND hWnd = GetDlgItem(IDC_STATTEXT);
-		CalcTextExtent2(hWnd, NULL, Text, &textSize);
+		CalcTextExtent(hWnd, NULL, Text, &textSize);
 		TW = textSize.cx + textSize.cx/10;	// (cx * (1+0.1)) ?
 		TH = textSize.cy;
 		s = textSize;			// TODO s!?
@@ -101,20 +92,9 @@ void CStatDlg::Update(const TCHAR *Text, const TCHAR *Title, int x, int y)
 
 BOOL CStatDlg::OnInitDialog()
 {
-#if 0
-	LOGFONT logfont;
-	HFONT font;
-#endif
 
 	Update(TextStr,TitleStr,PosX,PosY);
 	SetForegroundWindow(m_hWnd);
-#if 0
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", m_hWnd, &logfont, &DlgFont, UILanguageFile)) {
-		SendDlgItemMessage(IDC_STATTEXT, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-	}
-#endif
 	return TRUE;
 }
 
@@ -147,15 +127,6 @@ BOOL CStatDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 BOOL CStatDlg::PostNcDestroy()
 {
-#if 0
-	// statusboxとclosesboxを繰り返すと、GDIリソースリークとなる問題を修正した。
-	//   - CreateFontIndirect()で作成した論理フォントを削除する。
-	// (2016.10.5 yutaka)
-	if (DlgFont) {
-		DeleteObject(DlgFont);
-		DlgFont = NULL;
-	}
-#endif
 	delete this;
 	return TRUE;
 }

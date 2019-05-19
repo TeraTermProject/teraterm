@@ -23,11 +23,11 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -63,7 +63,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)common;$(SolutionDir)ttpfile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation>
@@ -79,9 +79,9 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onig_sd.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -90,6 +90,10 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
+      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -105,7 +109,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)common;$(SolutionDir)ttpfile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -120,9 +124,9 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onig_sd.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -131,11 +135,19 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\dlglib.c" />
-    <ClCompile Include="..\common\stdafx.cpp" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\common\tmfc.cpp" />
+    <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\tipwin.cpp" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="..\common\codeconv.cpp" />
     <ClCompile Include="..\common\dllutil.cpp" />
@@ -169,6 +181,8 @@
     <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="winjump.c" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
+    <ClCompile Include="../ttpdlg/ttdlg.c" />
+    <ClInclude Include="../ttpdlg/ttdlg.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\cygterm\cygterm.ico" />
@@ -181,6 +195,7 @@
   <ItemGroup>
     <ResourceCompile Include="tt-version.rc" />
     <ResourceCompile Include="ttermpro.rc" />
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="addsetting.h" />
@@ -190,6 +205,9 @@
     <ClInclude Include="ttfileio.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\svnrev\svnrev.v10.vcxproj">
+      <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v10.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

@@ -36,6 +36,7 @@
 #include "ttmlib.h"
 #include "dlglib.h"
 #include "ttmacro.h"
+#include "compat_win.h"
 
 #include "inpdlg.h"
 
@@ -74,7 +75,7 @@ BOOL CInpDlg::OnInitDialog()
 	SetDlgItemText(IDC_INPTEXT,TextStr);
 	SetDlgItemText(IDC_INPEDIT,DefaultStr);
 
-	CalcTextExtent2(GetDlgItem(IDC_STATTEXT), NULL, TextStr, &s);
+	CalcTextExtent(GetDlgItem(IDC_INPTEXT), NULL, TextStr, &s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 
@@ -187,6 +188,13 @@ LRESULT CInpDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	switch(msg) {
 	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
+	case WM_DPICHANGED: {
+		RECT rect;
+		::GetWindowRect(m_hWnd, &rect);
+		WW = rect.right - rect.left;
+		WH = rect.bottom - rect.top;
+		break;
+	}
 	}
 	return FALSE;
 }

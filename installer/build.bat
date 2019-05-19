@@ -37,10 +37,16 @@ call "%VS140COMNTOOLS%\VsDevCmd.bat"
 goto vs2015
 
 :check_2017
-if "%VS150COMNTOOLS%" == "" goto novs
-if not exist "%VS150COMNTOOLS%\VsDevCmd.bat" goto novs
+if "%VS150COMNTOOLS%" == "" goto check_2019
+if not exist "%VS150COMNTOOLS%\VsDevCmd.bat" goto check_2019
 call "%VS150COMNTOOLS%\VsDevCmd.bat"
 goto vs2017
+
+:check_2019
+if "%VS160COMNTOOLS%" == "" goto novs
+if not exist "%VS160COMNTOOLS%\VsDevCmd.bat" goto novs
+call "%VS160COMNTOOLS%\VsDevCmd.bat"
+goto vs2019
 
 :novs
 echo "Can't find Visual Studio"
@@ -58,6 +64,7 @@ if /I %VSCMNDIR% EQU "%VS110COMNTOOLS%" goto vs2012
 if /I %VSCMNDIR% EQU "%VS120COMNTOOLS%" goto vs2013
 if /I %VSCMNDIR% EQU "%VS140COMNTOOLS%" goto vs2015
 if /I %VSCMNDIR% EQU "%VS150COMNTOOLS%" goto vs2017
+if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
 
 echo Unknown Visual Studio version
 exit /b
@@ -123,6 +130,15 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v15.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v15.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v15.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v15.sln
+goto vsend
+
+:vs2019
+set TERATERMSLN=..\teraterm\ttermpro.v16.sln
+set TTSSHSLN=..\ttssh2\ttssh.v16.sln
+set TTPROXYSLN=..\TTProxy\TTProxy.v16.sln
+set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v16.sln
+set TTPMENUSLN=..\ttpmenu\ttpmenu.v16.sln
+set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v16.sln
 goto vsend
 
 :vsend

@@ -95,7 +95,7 @@ return
 ;;;		messagebox
 :test_statusbox
 call test_statusbox_centerwindow
-;call test_statusbox_setdlgpos
+call test_statusbox_setdlgpos
 return
 
 ; 表示されていない→表示する 時 センタリングされる

@@ -48,3 +48,9 @@ target_link_libraries(
   #
   gdi32
   )
+
+set_target_properties(
+  TTXViewMode
+  PROPERTIES
+  PREFIX ""
+  )

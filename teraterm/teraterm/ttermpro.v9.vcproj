@@ -21,11 +21,13 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="creating &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
+				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -49,7 +51,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)ttpfile"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
 				BrowseInformation="0"
@@ -72,10 +74,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib imagehlp.lib"
+				AdditionalDependencies="onig_sd.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comctl32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(OutDir)"
+				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
 				GenerateManifest="false"
 				DelayLoadDLLs="imagehlp.dll;user32.dll;shell32.dll"
 				GenerateDebugInformation="true"
@@ -112,11 +114,13 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="creating &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
+				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -141,7 +145,7 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)ttpfile"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -164,10 +168,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib imagehlp.lib"
+				AdditionalDependencies="onig_s.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comctl32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(OutDir)"
+				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
 				GenerateManifest="false"
 				DelayLoadDLLs="imagehlp.dll;user32.dll;shell32.dll"
 				GenerateDebugInformation="true"
@@ -212,11 +216,19 @@
 				>
 			</File>
 			<File
-				RelativePath="dnddlg.cpp"
+				RelativePath="..\common\dlglib.c"
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib.c"
+				RelativePath="..\common\dlglib_cpp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dlglib_tmpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="dnddlg.cpp"
 				>
 			</File>
 			<File
@@ -236,10 +248,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\stdafx.cpp"
-				>
-			</File>
-			<File
 				RelativePath="tekwin.cpp"
 				>
 			</File>
@@ -249,6 +257,18 @@
 			</File>
 			<File
 				RelativePath="teraterm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tmfc_frame.cpp"
 				>
 			</File>
 			<File
@@ -313,7 +333,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\codeconv.cpp"
+				>
+			</File>
+			<File
 				RelativePath="commlib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\compat_win.cpp"
 				>
 			</File>
 			<File
@@ -330,6 +358,10 @@
 			</File>
 			<File
 				RelativePath="telnet.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\tipwin.cpp"
 				>
 			</File>
 			<File
@@ -396,10 +428,6 @@
 				RelativePath="..\common\dllutil.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\common\codeconv.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -427,6 +455,30 @@
 			</File>
 			<File
 				RelativePath="..\common\win16api.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ttdlg"
+			>
+			<File
+				RelativePath="..\ttpdlg\dlg_res.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\svnversion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\ttdlg.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\ttdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpdlg\ttpdlg.rc"
 				>
 			</File>
 		</Filter>

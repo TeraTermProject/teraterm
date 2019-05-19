@@ -36,19 +36,16 @@
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
-
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "helpid.h"
-
-#include "errdlg.h"
 #include "ttmlib.h"
 #include "ttmparse.h"
 #include <htmlhelp.h>
 #include "dlglib.h"
 #include "ttmacro.h"
 
-// CErrDlg dialog
+#include "errdlg.h"
 
 CErrDlg::CErrDlg(const TCHAR *Msg, const TCHAR *Line, int x, int y, int lineno, int start, int end, const TCHAR *FileName)
 {

@@ -36,6 +36,9 @@
 #include <shlobj.h>
 #include <tchar.h>
 
+#include "compat_win.h"
+#include "ttmlib.h"
+
 static char CurrentDir[MAXPATHLEN];
 
 typedef struct {
@@ -63,44 +66,62 @@ static SpFolder spfolders[] = {
 	{ NULL,                -1}
 };
 
-void CalcTextExtent(HDC DC, const TCHAR *Text, LPSIZE s)
+/**
+ * 文字を描画した時のサイズを算出する
+ *	@param[in]	hWnd
+ *	@param[in]	Font	フォントハンドル
+ *						NULLの時はhWndに設定されているフォント
+ *	@param[in]	Text	描画するテキスト
+ *	@param[out]	size	描画サイズ(cx,cy)
+ */
+void CalcTextExtent(HWND hWnd, HFONT hFont, const TCHAR *Text, LPSIZE s)
 {
-  int W, H, i, i0;
-  TCHAR Temp[512];
-  DWORD dwExt;
+	HDC DC = GetDC(hWnd);
+	int W, H, i, i0;
+	TCHAR Temp[512];
+	DWORD dwExt;
+	HFONT prevFont;
+	if (hFont == NULL) {
+		hFont = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
+	}
+	prevFont = (HFONT)SelectObject(DC, hFont);
 
-  W = 0;
-  H = 0;
-  i = 0;
-  do {
-    i0 = i;
-    while ((Text[i]!=0) &&
-	   (Text[i]!=0x0d) &&
-	   (Text[i]!=0x0a))
-      i++;
-    memcpy(Temp,&Text[i0],sizeof(TCHAR) * (i-i0));
-    Temp[i-i0] = 0;
-    if (Temp[0]==0)
-    {
-     Temp[0] = 0x20;
-     Temp[1] = 0;
-    }
-    dwExt = GetTabbedTextExtent(DC,Temp,_tcslen(Temp),0,NULL);
-    s->cx = LOWORD(dwExt);
-    s->cy = HIWORD(dwExt);
-    if (s->cx > W) W = s->cx;
-    H = H + s->cy;
-    if (Text[i]!=0)
-    {
-      i++;
-      if ((Text[i]==0x0a) &&
-	  (Text[i-1]==0x0d))
-	i++;
-    }
-  } while (Text[i]!=0);
-  if ((i-i0 == 0) && (H > s->cy)) H = H - s->cy;
-  s->cx = W;
-  s->cy = H;
+	W = 0;
+	H = 0;
+	i = 0;
+	do {
+		i0 = i;
+		while ((Text[i]!=0) &&
+			   (Text[i]!=0x0d) &&
+			   (Text[i]!=0x0a))
+			i++;
+		memcpy(Temp,&Text[i0],i-i0);
+		Temp[i-i0] = 0;
+		if (Temp[0]==0)
+		{
+			Temp[0] = 0x20;
+			Temp[1] = 0;
+		}
+		dwExt = GetTabbedTextExtent(DC,Temp,_tcslen(Temp),0,NULL);
+		s->cx = LOWORD(dwExt);
+		s->cy = HIWORD(dwExt);
+		if (s->cx > W) W = s->cx;
+		H = H + s->cy;
+		if (Text[i]!=0)
+		{
+			i++;
+			if ((Text[i]==0x0a) &&
+				(Text[i-1]==0x0d))
+				i++;
+		}
+	} while (Text[i]!=0);
+	if ((i-i0 == 0) && (H > s->cy)) H = H - s->cy;
+	s->cx = W;
+	s->cy = H;
+	if (prevFont != NULL) {
+		SelectObject(DC, prevFont);
+	}
+	ReleaseDC(hWnd, DC);
 }
 
 void TTMGetDir(PCHAR Dir, int destlen)
@@ -218,24 +239,7 @@ void BringupWindow(HWND hWnd)
 	}
 }
 
-/**
- * 文字を描画した時どんな範囲になるか計算する
- */
-void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize)
-{
-	HDC TmpDC = GetDC(hWnd);
-	HFONT prevFont = NULL;
-	if (Font) {
-		prevFont = (HFONT)SelectObject(TmpDC, Font);
-	}
-	CalcTextExtent(TmpDC, Text, textSize);
-	if (Font && prevFont != NULL) {
-		SelectObject(TmpDC, prevFont);
-	}
-	ReleaseDC(hWnd, TmpDC);
-}
-
-int MessageBoxHaltScript(HWND hWnd, const char *UILanguageFile)
+int MessageBoxHaltScript(HWND hWnd)//, const char *UILanguageFile)
 {
 	TCHAR uimsg[MAX_UIMSG];
 	TCHAR uimsg2[MAX_UIMSG];

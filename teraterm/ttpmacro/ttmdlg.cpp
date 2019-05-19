@@ -34,6 +34,7 @@
 #include <commdlg.h>
 #include <crtdbg.h>
 #include <tchar.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "ttm_res.h"
@@ -48,6 +49,8 @@
 #include "ttmlib.h"
 #include "ttmdlg.h"
 #include "ttmacro.h"
+
+#include "ttmdlg.h"
 
 #ifdef _DEBUG
 #define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
@@ -279,7 +282,9 @@ void CloseStatDlg()
 	if (StatDlg==NULL) {
 		return;
 	}
+	assert(_CrtCheckMemory());
 	StatDlg->DestroyWindow();
+	assert(_CrtCheckMemory());
 	StatDlg = NULL;
 }
 

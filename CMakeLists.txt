@@ -59,8 +59,14 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
   if(Git_FOUND)
     execute_process(
       COMMAND ${GIT_EXECUTABLE} svn log --oneline -1
-      OUTPUT_VARIABLE ov)
-    string(REGEX MATCH "[0-9]+" SVNVERSION ${ov})
+      RESULT_VARIABLE rv
+      OUTPUT_VARIABLE ov
+      ERROR_QUIET)
+    if(${rv})
+      message("git svn error? please check git svn")
+    else()
+      string(REGEX MATCH "[0-9]+" SVNVERSION ${ov})
+    endif()
   endif()
 elseif(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
   # svn
@@ -92,7 +98,12 @@ endif()
 ####
 # ソースツリー内に生成ファイルが存在していたら削除する
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
+  # r7517より前
   file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/teraterm/svnversion.h")
+  # r7517以後
+  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/teraterm/svnversion.h")
 endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
   file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")

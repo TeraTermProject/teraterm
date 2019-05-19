@@ -33,55 +33,52 @@
 #include <crtdbg.h>
 #include <windows.h>
 #include <commctrl.h>
+
 #include "teraterm.h"
-#include "ttm_res.h"
-#include "ttmmain.h"
-#include "ttl.h"
-
-#include "ttmacro.h"
-#include "ttmlib.h"
-#include "ttlib.h"
-
 #include "compat_w95.h"
 #include "compat_win.h"
 #include "ttmdlg.h"
 #include "tmfc.h"
 #include "dlglib.h"
+#include "dllutil.h"
+
+#include "ttm_res.h"
+#include "ttmmain.h"
+#include "ttl.h"
+#include "ttmacro.h"
+#include "ttmlib.h"
+#include "ttlib.h"
 
 #ifdef _DEBUG
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 char UILanguageFile[MAX_PATH];
-static BOOL Busy;
+static HWND CtrlWnd;
 static HINSTANCE hInst;
+
+static BOOL Busy;
 static CCtrlWindow *pCCtrlWindow;
+
+HINSTANCE GetInstance()
+{
+	return hInst;
+}
+
+HWND GetHWND()
+{
+	return CtrlWnd;
+}
 
 static void init()
 {
-	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
-	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
-
-	HMODULE module;
-	pSetDllDir setDllDir;
-	pSetDefDllDir setDefDllDir;
-
-	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
-		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
-			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
-			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
-		}
-		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() が使えなくても、SetDllDirectory() が使える場合は
-			// カレントディレクトリだけでも検索パスからはずしておく。
-			(*setDllDir)("");
-		}
-	}
-
+	DLLInit();
 	WinCompatInit();
 	if (pSetThreadDpiAwarenessContext) {
 		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
+	// messageboxのフォントに設定する
+	SetDialogFont(NULL, NULL, NULL);
 }
 
 // TTMACRO main engine
@@ -108,25 +105,12 @@ static BOOL OnIdle(LONG lCount)
 
 // CCtrlApp theApp;
 
-static HWND CtrlWnd;
-
-HINSTANCE GetInstance()
-{
-	return hInst;
-}
-
-HWND GetHWND()
-{
-	return CtrlWnd;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
 	hInst = hInstance;
-//	static HMODULE HTTSET = NULL;
 	LONG lCount = 0;
 	DWORD SleepTick = 1;
 
@@ -135,14 +119,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 
 	init();
-	InitCommonControls();
+//	InitCommonControls();
 	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
-	SetDialogFont(NULL, UILanguageFile, NULL);
 
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow();
 	pCCtrlWindow->Create();
-//	pCCtrlWindow->ShowWindow(SW_SHOW);
 	Busy = FALSE;
 
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
@@ -151,18 +133,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	//////////////////////////////////////////////////////////////////////
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
-#if 0
-		bool message_processed = false;
-		if (m_pMainWnd->m_hAccel != NULL) {
-			if (!MetaKey(ts.MetaKey)) {
-				// matakeyが押されていない
-				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
-					// アクセラレーターキーを処理した
-					message_processed = true;
-				}
-			}
-		}
-#endif
 
 		if (IsDialogMessage(hWnd, &msg) != 0) {
 			/* 処理された*/
@@ -170,12 +140,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-#if 0
-		if (!message_processed) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-#endif
 
 		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
 			// メッセージがない
@@ -193,8 +157,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			}
 		}
 	}
-
-	//////////////////////////////////////////////////////////////////////
 
 	// TODO すでに閉じられている、この処理不要?
 	if (pCCtrlWindow) {

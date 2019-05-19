@@ -41,7 +41,6 @@ private:
 	const TCHAR *TitleStr;
 	int  PosX, PosY, init_WW, WW, WH, TW, TH;
 	SIZE s;
-//	HFONT DlgFont;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnOK();

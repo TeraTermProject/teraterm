@@ -26,23 +26,24 @@ sub get_file_paths {
 	closedir(DIR);
 	foreach my $path (sort @temp) {
 		next if( $path =~ /^\.{1,2}$/ );                # '.' と '..' はスキップ
-		next if( $path =~ /^\.svn$/ );                # '.svn' はスキップ
-		
+		next if( $path =~ /^\.svn$/ );                  # '.svn' はスキップ
+
 		my $full_path = "$top_dir" . '/' . "$path";
-		next if (-B $full_path);     # バイナリファイルはスキップ
-		
-#		print "$full_path\r\n";                     # 表示だけなら全てを表示してくれる-------
+#		print "$full_path\r\n";                         # 表示だけなら全てを表示してくれる-------
 		push(@paths, $full_path);                       # データとして取り込んでも前の取り込みが初期化される
 		if( -d "$top_dir/$path" ){                      #-- ディレクトリの場合は自分自身を呼び出す
 			&get_file_paths("$full_path");
-			
+		} elsif (-B $full_path) {
+			# バイナリファイルはスキップ
+			next;
+
 		} elsif (&check_exclude_file($path)) {
 			print "$full_path skipped\n";
 			next;
-			
+
 		} else {
 			check_sjis_code($full_path);
-		
+
 		}
 	}
 	return \@paths;
@@ -53,7 +54,7 @@ sub get_file_paths {
 sub check_exclude_file {
 	my($fn) = shift;
 	my($s);
-	
+
 	foreach $s (@exclude_files) {
 		if ($fn eq $s) {
 			return 1;

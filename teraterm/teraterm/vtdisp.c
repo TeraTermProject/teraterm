@@ -114,7 +114,7 @@ static int Dx[TermWidthMax];
 static int CaretStatus;
 static BOOL CaretEnabled = TRUE;
 BOOL IMEstat;				/* IME Status  TRUE=IME ON */
-BOOL IMEShowingCandidate;	/* 候補ウィンドウ表示状況 TRUE=表示中 */
+BOOL IMECompositionState;	/* 変換状態 TRUE=変換中 */
 
 // ---- device context and status flags
 static HDC VTDC = NULL; /* Device context for VT window */
@@ -171,20 +171,20 @@ static BOOL BGFastSizeMove;
 
 static char BGSPIPath[MAX_PATH];
 
-COLORREF BGVTColor[2];
-COLORREF BGVTBoldColor[2];
-COLORREF BGVTBlinkColor[2];
-COLORREF BGVTReverseColor[2];
+static COLORREF BGVTColor[2];
+static COLORREF BGVTBoldColor[2];
+static COLORREF BGVTBlinkColor[2];
+static COLORREF BGVTReverseColor[2];
 /* begin - ishizaki */
-COLORREF BGURLColor[2];
+static COLORREF BGURLColor[2];
 /* end - ishizaki */
 
-RECT BGPrevRect;
-BOOL BGReverseText;
+static RECT BGPrevRect;
+static BOOL BGReverseText;
 
 BOOL   BGNoCopyBits;
-BOOL   BGInSizeMove;
-HBRUSH BGBrushInSizeMove;
+static BOOL   BGInSizeMove;
+static HBRUSH BGBrushInSizeMove;
 
 static HDC hdcBGWork;
 static HDC hdcBGBuffer;
@@ -1911,7 +1911,7 @@ void DispConvScreenToWin
        *Yw = (Ys - WinOrgY) * FontHeight;
 }
 
-static void SetLogFont(LOGFONTA *VTlf)
+static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
 {
   memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;
@@ -1926,101 +1926,107 @@ static void SetLogFont(LOGFONTA *VTlf)
   VTlf->lfQuality       = (BYTE)ts.FontQuality;
   VTlf->lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
   strncpy_s(VTlf->lfFaceName, sizeof(VTlf->lfFaceName),ts.VTFont, _TRUNCATE);
+#if 1
+  if (mul) {
+	  UINT uDpi;
+	  if (pGetDpiForWindow == NULL) {
+		  HDC TmpDC = GetDC(HVTWin);
+		  uDpi = GetDeviceCaps(TmpDC,LOGPIXELSY);	// いつも96を返す?
+		  ReleaseDC(HVTWin,TmpDC);
+	  } else {
+		  uDpi = pGetDpiForWindow(HVTWin);
+	  }
+	  VTlf->lfWidth = -MulDiv(VTlf->lfWidth, uDpi, 96);
+	  VTlf->lfHeight = -MulDiv(VTlf->lfHeight, uDpi, 96);
+  }
+#endif
 }
 
 void ChangeFont()
 {
-  int i, j;
-  TEXTMETRIC Metrics;
-  LOGFONTA VTlf;
+	int i, j;
+	TEXTMETRIC Metrics;
+	LOGFONTA VTlf;
 
-  /* Delete Old Fonts */
-  for (i = 0 ; i <= AttrFontMask ; i++)
-  {
-    for (j = i+1 ; j <= AttrFontMask ; j++)
-      if (VTFont[j]==VTFont[i])
-        VTFont[j] = 0;
-    if (VTFont[i]!=0)
-      DeleteObject(VTFont[i]);
-  }
+	/* Delete Old Fonts */
+	for (i = 0 ; i <= AttrFontMask ; i++)
+	{
+		for (j = i+1 ; j <= AttrFontMask ; j++)
+			if (VTFont[j]==VTFont[i])
+				VTFont[j] = 0;
+		if (VTFont[i]!=0)
+			DeleteObject(VTFont[i]);
+	}
 
-  {
-  HDC TmpDC = GetDC(HVTWin);
-  UINT uDpi;
+	{
+		HDC TmpDC = GetDC(HVTWin);
 
-  /* Normal Font */
-  SetLogFont(&VTlf);
-  if (pGetDpiForWindow == NULL) {
-	  uDpi = GetDeviceCaps(TmpDC,LOGPIXELSY);	// いつも96を返す?
-  } else {
-	  uDpi = pGetDpiForWindow(HVTWin);
-  }
-  VTlf.lfWidth = -MulDiv(VTlf.lfWidth, uDpi, 72);
-  VTlf.lfHeight = -MulDiv(VTlf.lfHeight, uDpi, 72);
-  VTFont[0] = CreateFontIndirect(&VTlf);
+		/* Normal Font */
+		SetLogFont(&VTlf, TRUE);
+		VTFont[0] = CreateFontIndirect(&VTlf);
 
-  /* set IME font */
-  SetConversionLogFont(HVTWin, &VTlf);
+		/* set IME font */
+		SetConversionLogFont(HVTWin, &VTlf);
 
-  SelectObject(TmpDC, VTFont[0]);
-  GetTextMetrics(TmpDC, &Metrics);
-  FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-  FontHeight = Metrics.tmHeight + ts.FontDH;
+		SelectObject(TmpDC, VTFont[0]);
+		GetTextMetrics(TmpDC, &Metrics);
+		FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+		FontHeight = Metrics.tmHeight + ts.FontDH;
 
-  ReleaseDC(HVTWin,TmpDC);
-  }
+		ReleaseDC(HVTWin,TmpDC);
+	}
 
-  /* Underline */
-  VTlf.lfUnderline = 1;
-  VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
+	/* Underline */
+	VTlf.lfUnderline = 1;
+	VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
 
-  if (ts.FontFlag & FF_BOLD) {
-    /* Bold */
-    VTlf.lfUnderline = 0;
-    VTlf.lfWeight = FW_BOLD;
-    VTFont[AttrBold] = CreateFontIndirect(&VTlf);
-    /* Bold + Underline */
-    VTlf.lfUnderline = 1;
-    VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
-  }
-  else {
-    VTFont[AttrBold] = VTFont[AttrDefault];
-    VTFont[AttrBold | AttrUnder] = VTFont[AttrUnder];
-  }
+	if (ts.FontFlag & FF_BOLD) {
+		/* Bold */
+		VTlf.lfUnderline = 0;
+		VTlf.lfWeight = FW_BOLD;
+		VTFont[AttrBold] = CreateFontIndirect(&VTlf);
+		/* Bold + Underline */
+		VTlf.lfUnderline = 1;
+		VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+	}
+	else {
+		VTFont[AttrBold] = VTFont[AttrDefault];
+		VTFont[AttrBold | AttrUnder] = VTFont[AttrUnder];
+	}
 
-  /* Special font */
-  VTlf.lfWeight = FW_NORMAL;
-  VTlf.lfUnderline = 0;
-  VTlf.lfWidth = FontWidth + 1; /* adjust width */
-  VTlf.lfHeight = FontHeight;
-  VTlf.lfCharSet = SYMBOL_CHARSET;
+	/* Special font */
+	VTlf.lfWeight = FW_NORMAL;
+	VTlf.lfUnderline = 0;
+	VTlf.lfWidth = FontWidth + 1; /* adjust width */
+	VTlf.lfHeight = FontHeight;
+	VTlf.lfCharSet = SYMBOL_CHARSET;
 
-  strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),"Tera Special", _TRUNCATE);
-  VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
+	strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),"Tera Special", _TRUNCATE);
+	VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
 
-  /* Special font (Underline) */
-  VTlf.lfUnderline = 1;
-  VTlf.lfHeight = FontHeight - 1; // adjust for underline
-  VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
+	/* Special font (Underline) */
+	VTlf.lfUnderline = 1;
+	VTlf.lfHeight = FontHeight - 1; // adjust for underline
+	VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
 
-  if (ts.FontFlag & FF_BOLD) {
-    /* Special font (Bold) */
-    VTlf.lfUnderline = 0;
-    VTlf.lfHeight = FontHeight;
-    VTlf.lfWeight = FW_BOLD;
-    VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
-    /* Special font (Bold + Underline) */
-    VTlf.lfUnderline = 1;
-    VTlf.lfHeight = FontHeight - 1; // adjust for underline
-    VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
-  }
-  else {
-    VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
-    VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
-  }
+	if (ts.FontFlag & FF_BOLD) {
+		/* Special font (Bold) */
+		VTlf.lfUnderline = 0;
+		VTlf.lfHeight = FontHeight;
+		VTlf.lfWeight = FW_BOLD;
+		VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
+		/* Special font (Bold + Underline) */
+		VTlf.lfUnderline = 1;
+		VTlf.lfHeight = FontHeight - 1; // adjust for underline
+		VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+	}
+	else {
+		VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
+		VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
+	}
 
-  for (i = 0 ; i < TermWidthMax; i++)
-    Dx[i] = FontWidth;
+	for (i = 0 ; i < TermWidthMax; i++)
+		Dx[i] = FontWidth;
 }
 
 void ResetIME()
@@ -2046,7 +2052,7 @@ void ResetIME()
 		{
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
-				SetLogFont(&VTlf);
+				SetLogFont(&VTlf, TRUE);
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
 			else
@@ -2205,11 +2211,11 @@ void CaretOn()
 		CaretX = (CursorX-WinOrgX)*FontWidth;
 		CaretY = (CursorY-WinOrgY)*FontHeight;
 
-		if (IMEstat && IMEShowingCandidate) {
-			// IME ON && 候補ウィンドウ表示中の場合のみの処理
-			// 候補ウィンドウが表示されている状態で
+		if (IMEstat && IMECompositionState) {
+			// IME ON && 変換中の場合のみの処理する。
+			// 変換中(漢字や候補ウィンドウが表示されている状態)で
 			// ホストからのエコーを受信してcaret位置が変化した場合、
-			// 変換ウィンドウの位置を更新する必要がある
+			// 変換している位置を更新する必要がある。
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 		}
 
@@ -3332,7 +3338,7 @@ void DispSetupFontDlg()
 
   ts.VTFlag = 1;
   if (! LoadTTDLG()) return;
-  SetLogFont(&VTlf);
+  SetLogFont(&VTlf, FALSE);
   Ok = ChooseFontDlg(HVTWin,&VTlf,&ts);
   FreeTTDLG();
   if (! Ok) return;

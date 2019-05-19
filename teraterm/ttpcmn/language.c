@@ -34,10 +34,9 @@
 #undef DllExport
 #include "teraterm.h"
 #include "tttypes.h"
-#include <mbstring.h>
-#include <locale.h>
 #include "codemap.h"
 
+#define DllExport __declspec(dllexport)
 #include "language.h"
 
 #if !defined(DllExport)
@@ -48,7 +47,7 @@
 #endif
 #endif
 
-unsigned short ConvertUnicode(unsigned short code, const codemap_t *table, int tmax)
+DllExport unsigned short ConvertUnicode(unsigned short code, const codemap_t *table, int tmax)
 {
 	int low, mid, high;
 	unsigned short result;

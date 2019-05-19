@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 TeraTerm Project
+ * Copyright (C) 2013-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,11 +69,9 @@ BOOL CListDlg::OnInitDialog()
 	};
 	const TCHAR **p;
 	int ListMaxWidth = 0;
-	int ListWidth;
 	int ListCount = 0;
 	HDC DC;
 	RECT R;
-	HDC TmpDC;
 	HWND HList, HOk;
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
@@ -84,6 +82,7 @@ BOOL CListDlg::OnInitDialog()
 	p = m_Lists;
 	while (*p) {
 		SIZE size;
+		int ListWidth;
 		SendDlgItemMessage(IDC_LISTBOX, LB_ADDSTRING, 0, (LPARAM)(*p));
 		GetTextExtentPoint32(DC, *p, _tcslen(*p), &size);
 		ListWidth = size.cx;
@@ -95,7 +94,7 @@ BOOL CListDlg::OnInitDialog()
 	}
 
 	SendDlgItemMessage(IDC_LISTBOX, LB_SETHORIZONTALEXTENT, (ListMaxWidth + 5), 0);
-	::ReleaseDC(m_hWnd, DC);
+	::ReleaseDC(HList, DC);
 
 	if (m_Selected < 0 || m_Selected >= ListCount) {
 		m_Selected = 0;
@@ -106,9 +105,7 @@ BOOL CListDlg::OnInitDialog()
 	SetDlgItemText(IDC_LISTTEXT, m_Text);
 	SetWindowText(m_Caption);
 
-	TmpDC = ::GetDC(GetDlgItem(IDC_LISTTEXT));
-	CalcTextExtent(TmpDC,m_Text,&s);
-	::ReleaseDC(GetDlgItem(IDC_LISTTEXT), TmpDC);
+	CalcTextExtent(GetDlgItem(IDC_LISTTEXT), NULL, m_Text,&s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 
@@ -163,7 +160,7 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	::GetClientRect(m_hWnd, &R);
 	CW = R.right-R.left;
 	CH = R.bottom-R.top;
-
+#define CONTROL_GAP_W	14
 	// 初回のみ
 	if (is_init) {
 		// テキストコントロールサイズを補正
@@ -175,8 +172,8 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 		WH = TH + LH + (int)(BH*1.5) + (WH - CH);
 		init_WW = WW;
 		// リストボックスサイズの計算
-		if (LW < WW - BW - 14*3) {
-			LW = WW - BW - 14*3;
+		if (LW < CW - BW - CONTROL_GAP_W * 3) {
+			LW = CW - BW - CONTROL_GAP_W * 3;
 		}
 	}
 	else {
@@ -190,9 +187,9 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	HList = ::GetDlgItem(GetSafeHwnd(), IDC_LISTBOX);
 
 	::MoveWindow(HText,(TW-s.cx)/2,LH+BH,TW,TH,TRUE);
-	::MoveWindow(HList,14,BH/2,LW,LH,TRUE);
-	::MoveWindow(HOk,14+14+LW,BH/2,BW,BH,TRUE);
-	::MoveWindow(HCancel,14+14+LW,BH*2,BW,BH,TRUE);
+	::MoveWindow(HList,CONTROL_GAP_W,BH/2,LW,LH,TRUE);
+	::MoveWindow(HOk,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH/2,BW,BH,TRUE);
+	::MoveWindow(HCancel,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH*2,BW,BH,TRUE);
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		::GetWindowRect(m_hWnd, &R);

@@ -22,7 +22,6 @@ set_target_properties(
   TTXCommandLineOpt
   PROPERTIES
   PREFIX ""
-  SUFFIX ".dll"
   )
 
 target_link_libraries(

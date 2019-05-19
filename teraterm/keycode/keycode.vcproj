@@ -68,6 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="User32.lib Gdi32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				SubSystem="2"
@@ -153,6 +154,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="User32.lib Gdi32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

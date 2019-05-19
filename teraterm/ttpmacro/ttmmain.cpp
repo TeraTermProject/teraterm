@@ -39,15 +39,15 @@
 #include "ttl.h"
 #include "ttmparse.h"
 #include "ttmdde.h"
-
 #include "ttmmain.h"
 #include "ttmbuff.h"
 #include "ttmlib.h"
 #include "dlglib.h"
 
 #include "ttlib.h"
-
 #include "wait4all.h"
+#include "tmfc.h"
+#include "ttmacro.h"
 
 #include "tmfc.h"
 #include "codeconv.h"
@@ -465,7 +465,7 @@ void CCtrlWindow::OnPaint()
 	if (::IsIconic(m_hWnd)) {
 		int OldMapMode = GetMapMode(dc);
 		SetMapMode(dc, MM_TEXT);
-		SendMessage(WM_ICONERASEBKGND,(WPARAM)dc, 0);
+		SendMessage(WM_ICONERASEBKGND,(WPARAM)dc, 0);	// TODO
 		DrawIcon(dc, 0, 0, m_hIcon);
 		SetMapMode(dc, OldMapMode);
 	}

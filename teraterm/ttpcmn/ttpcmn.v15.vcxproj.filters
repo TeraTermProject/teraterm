@@ -64,8 +64,5 @@
     <ResourceCompile Include="ttpcmn-version.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-    <ResourceCompile Include="ttpcmn.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>
