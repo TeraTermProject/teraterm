@@ -249,7 +249,7 @@ void OpenInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Caption,
 	InpDlg.DoModal();
 }
 
-int OpenErrDlg(const TCHAR *Msg, const TCHAR *Line, int lineno, int start, int end, const TCHAR *FileName)
+int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName)
 {
 	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end, FileName);
 	return ErrDlg.DoModal();

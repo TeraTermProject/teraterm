@@ -44,19 +44,20 @@
 #include <htmlhelp.h>
 #include "dlglib.h"
 #include "ttmacro.h"
+#include "codeconv.h"
 
 #include "errdlg.h"
 
-CErrDlg::CErrDlg(const TCHAR *Msg, const TCHAR *Line, int x, int y, int lineno, int start, int end, const TCHAR *FileName)
+CErrDlg::CErrDlg(const char *Msg, const char *Line, int x, int y, int lineno, int start, int end, const char *FileName)
 {
-	MsgStr = Msg;
-	LineStr = Line;
+	MsgStr = _tcsdup((tc)Msg);
+	LineStr = _tcsdup((tc)Line);
 	PosX = x;
 	PosY = y;
 	LineNo = lineno;
 	StartPos = start;
 	EndPos = end;
-	MacroFileName = FileName;
+	MacroFileName = _tcsdup((tc)FileName);
 }
 
 INT_PTR CErrDlg::DoModal()
@@ -128,5 +129,13 @@ BOOL CErrDlg::OnCommand(WPARAM wp, LPARAM lp)
 		OnBnClickedMacroerrhelp();
 		return TRUE;
 	}
+	return FALSE;
+}
+
+BOOL CErrDlg::OnClose()
+{
+	free((void *)MsgStr);
+	free((void *)LineStr);
+	free((void *)MacroFileName);
 	return FALSE;
 }

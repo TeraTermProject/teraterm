@@ -35,7 +35,7 @@
 class CErrDlg : public TTCDialog
 {
 public:
-	CErrDlg(const TCHAR *Msg, const TCHAR *Line, int x, int y, int lineno, int start, int end, const TCHAR *FileName);
+	CErrDlg(const char *Msg, const char *Line, int x, int y, int lineno, int start, int end, const char *FileName);
 	INT_PTR DoModal();
 
 private:
@@ -51,4 +51,5 @@ private:
 	virtual BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wp, LPARAM lp);
 	void OnBnClickedMacroerrhelp();
+	BOOL OnClose();
 };

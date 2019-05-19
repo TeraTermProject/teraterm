@@ -42,7 +42,7 @@ BOOL GetFileName(HWND HWin);
 void SetDlgPos(int x, int y);
 void OpenInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Caption,
                 const TCHAR *Default, BOOL Paswd);
-int OpenErrDlg(const TCHAR *Msg, const TCHAR *Line, int lineno, int start, int end, const TCHAR *FileName);
+int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
 int OpenMsgDlg(const TCHAR *Text, const TCHAR *Caption, BOOL YesNo);
 void OpenStatDlg(const TCHAR *Text, const TCHAR *Caption);
 void CloseStatDlg();
