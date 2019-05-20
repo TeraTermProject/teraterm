@@ -21,25 +21,34 @@
 exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt; [&lt;current directory&gt;]]]
 </pre>
 
+
 <h2>解説</h2>
 
 <p>
 コマンドライン文字列 &lt;command line&gt; に従い、アプリケーションを起動する。
 </p>
 
-&lt;show&gt; パラメータには以下の文字列を指定することができる。
-<pre>
-hide
-minimize
-maximize
-show ;default parameters when no show command specified. 
-</pre>
 
-&lt;wait&gt; パラメータに 1 を指定すると、起動したアプリケーションが終了するまで待つ。アプリケーションの終了コードが result システム変数に格納される。<em>(バージョン 4.63以降)</em>
+<h2>パラメータ</h2>
+<dl>
+	<dt class="macro">文字列 &lt;show&gt; (オプション デフォルト="show")</dt>
+	<dd>以下の文字列を指定することができる。
+		<ul>
+			<li>hide</li>
+			<li>minimize</li>
+			<li>maximize</li>
+			<li>show</li>
+		</ul>
+	</dd>
 
-<p>
-&lt;current directory&gt; パラメータは、カレントディレクトリを指定することができる。<em>(バージョン 4.78以降)</em>
-</p>
+	<dt class="macro">整数値 &lt;wait&gt; (オプション デフォルト=0) <em>(バージョン 4.63以降)</em></dt>
+	<dd>1 の場合は、起動したアプリケーションが終了するまで待つ。アプリケーションの終了コードが result システム変数に格納される。<br />
+	    1 以外の場合は、アプリケーションを起動してマクロに制御が返る。</dd>
+
+	<dt class="macro">文字列 &lt;current directory&gt; (オプション デフォルト="") <em>(バージョン 4.78以降)</em></dt>
+	<dd>カレントディレクトリを指定することができる。</dd>
+</dl>
+
 
 <h2>例</h2>
 

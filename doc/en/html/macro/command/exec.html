@@ -21,25 +21,33 @@ Runs an application.
 exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt; [&lt;current directory&gt;]]]
 </pre>
 
+
 <h2>Remarks</h2>
 
 <p>
 Runs an application specified by &lt;command line&gt;.
 </p>
 
-<pre>
-here show command: 
-hide
-minimize
-maximize
-show ;default parameters when no show command specified. 
-</pre>
 
-When a user specifies the 1 at the &lt;wait&gt; argument, Tera Term waits to finish the launched application. The exit code of the application stores the `result' system variable. <em>(version 4.63 or later)</em>
+<h2>Parameters</h2>
+<dl>
+	<dt class="macro">string &lt;show&gt; (optional default="show")</dt>
+	<dd>The following are display style:
+		<ul>
+			<li>hide</li>
+			<li>minimize</li>
+			<li>maximize</li>
+			<li>show</li>
+		</ul>
+	</dd>
 
-<p>
-A current directory can be specified at the &lt;current directory&gt; argument. <em>(version 4.78 or later)</em>
-</p>
+	<dt class="macro">integer &lt;wait&gt; (optional default=0) <em>(version 4.63 or later)</em></dt>
+	<dd>If it is 1, macro waits to finish the launched application. The exit code of the application stores the `result' system variable.<br />
+	    If it is not 1, macro launches the application and control is returned to macro.</dd>
+
+	<dt class="macro">string &lt;current directory&gt; (optional default="") <em>(version 4.78 or later)</em></dt>
+	<dd>A current directory can be specified.</dd>
+</dl>
 
 
 <h2>Example</h2>
