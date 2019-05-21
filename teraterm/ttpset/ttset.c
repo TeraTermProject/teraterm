@@ -250,12 +250,34 @@ static void ReadFont(
 		FontName[0] = 0;
 		FontSize->x = 0;
 		FontSize->y = 0;
-		FontCharSet = 0;
+		*FontCharSet = 0;
 	} else {
 		GetNthString(Temp, 1, FontNameLen, FontName);
 		GetNthNum(Temp, 2, &(FontSize->x));
 		GetNthNum(Temp, 3, &(FontSize->y));
 		GetNthNum(Temp, 4, FontCharSet);
+		// TODO ちゃんとパースする
+	}
+}
+
+// フォント情報読み込み、3パラメータ版
+static void ReadFont3(
+	const char *Sect, const char *Key, const char *Default, const char *FName,
+	char *FontName, size_t FontNameLen, int *FontPoint, int *FontCharSet)
+{
+	char Temp[MAX_PATH];
+	GetPrivateProfileString(Sect, Key, Default,
+	                        Temp, _countof(Temp), FName);
+	if (Temp[0] == 0) {
+		// デフォルトがセットされていない & iniにエントリーがない場合
+		FontName[0] = 0;
+		*FontPoint = 0;
+		*FontCharSet = 0;
+	} else {
+		GetNthString(Temp, 1, FontNameLen, FontName);
+		GetNthNum(Temp, 2, FontPoint);
+		GetNthNum(Temp, 3, FontCharSet);
+		// TODO ちゃんとパースする
 	}
 }
 
@@ -2060,6 +2082,11 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
+
+	// dialog font
+	ReadFont3("Tera Term", "DlgFont", NULL, FName,
+			  ts->DialogFontName, sizeof(ts->DialogFontName),
+			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
 }
 
 void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -3401,6 +3428,13 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
+
+	// dialog font
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s,%d,%d",
+				ts->DialogFontName,
+				ts->DialogFontPoint,
+				ts->DialogFontCharSet);
+	WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, FName);
 }
 
 #define VTEditor "VT editor keypad"

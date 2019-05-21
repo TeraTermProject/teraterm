@@ -74,6 +74,7 @@ HWND GetHWND()
 static void init()
 {
 	char UILanguageFileRel[MAX_PATH];
+	LOGFONTA logfont;
 
 	GetHomeDir(hInst, HomeDir, sizeof(HomeDir));
 	GetDefaultFName(HomeDir, "TERATERM.INI", SetupFName, sizeof(SetupFName));
@@ -97,7 +98,9 @@ static void init()
 	}
 
 	// UILanguageFileの "Tera Term" セクション "DLG_SYSTEM_FONT" のフォントに設定する
-	SetDialogFont(SetupFName, UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
+	SetDialogFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet,
+				  UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 }
 
 // TTMACRO main engine

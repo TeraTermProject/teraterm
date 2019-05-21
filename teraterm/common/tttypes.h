@@ -684,6 +684,9 @@ struct tttset {
 	char LogTimestampFormat[48];
 	int TerminalInputSpeed;
 	int TerminalOutputSpeed;
+	char DialogFontName[LF_FACESIZE];
+	int DialogFontPoint;
+	int DialogFontCharSet;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

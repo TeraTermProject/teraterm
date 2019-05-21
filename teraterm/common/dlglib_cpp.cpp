@@ -250,35 +250,26 @@ INT_PTR TTDialogBox(
 }
 
 /**
- *	使用するダイアログフォントを決定する
+ *	ダイアログフォントを設定する
  */
-void SetDialogFont(const char *SetupFName,
+void SetDialogFont(const char *FontName, int FontPoint, int FontCharSet,
 				   const char *UILanguageFile, const char *Section, const char *Key)
 {
 	LOGFONTA logfont;
 	BOOL result;
 
-	// teraterm.iniの指定
-	if (SetupFName != NULL) {
-		result = GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
+	// 指定フォントをセット
+	if (FontName != NULL && FontName[0] != 0) {
+		// 存在チェック
+		result = IsExistFontA(FontName, FontCharSet, TRUE);
 		if (result == TRUE) {
-			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE);
-			if (result == TRUE) {
-				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-				return;
-			}
+			TTSetDlgFontA(FontName, FontPoint, FontCharSet);
+			return;
 		}
 	}
 
 	// .lngの指定
 	if (UILanguageFile != NULL && Section != NULL && Key != NULL) {
-#if 0
-		static const char *dlg_font_keys[] = {
-			"DLG_FONT",
-			"DLG_TAHOMA_FONT",
-			"DLG_SYSTEM_FONT",
-		};
-#endif
 		result = GetI18nLogfont(Section, Key, &logfont, 0, UILanguageFile);
 		if (result == TRUE) {
 			if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
