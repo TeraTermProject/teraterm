@@ -105,11 +105,7 @@ static HICON SecureSmallIcon = NULL;
 static HICON SecureNotifyIcon = NULL;
 static HICON OldNotifyIcon = NULL;
 
-//static HFONT DlgHostFont;
-//static HFONT DlgAboutFont;
 static HFONT DlgAboutTextFont;
-//static HFONT DlgSetupFont;
-//static HFONT DlgKeygenFont;
 
 static TInstVar *pvar;
 
@@ -1270,8 +1266,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	static char *ComPortDesc[MAXCOMPORT];
 	int comports;
 	BOOL Ok;
-//	LOGFONT logfont;
-//	HFONT font;
 	char uimsg[MAX_UIMSG];
 	static HWND hwndHostname     = NULL; // HOSTNAME dropdown
 	static HWND hwndHostnameEdit = NULL; // Edit control on HOSTNAME dropdown
@@ -1475,36 +1469,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SetFocus(hwnd);
 		}
 
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_SYSTEM_FONT", dlg, &logfont, &DlgHostFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_HOSTTCPIP, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTNAMELABEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTNAME, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HISTORY, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SERVICELABEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTTELNET, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSH, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTOTHER, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTTCPPORTLABEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTTCPPORT, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSH_VERSION_LABEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSH_VERSION, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOLLABEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSERIAL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTCOMLABEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTCOM, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTHELP, WM_SETFONT, (WPARAM)DlgHostFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgHostFont = NULL;
-		}
-#endif
-
 		CenterWindow(dlg, GetParent(dlg));
 
 		// SetFocus()でフォーカスをあわせた場合、FALSEを返す必要がある。
@@ -1584,21 +1548,11 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			}
 			SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)OrigHostnameEditProc);
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgHostFont != NULL) {
-				DeleteObject(DlgHostFont);
-			}
-#endif
 			return TRUE;
 
 		case IDCANCEL:
 			SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)OrigHostnameEditProc);
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgHostFont != NULL) {
-				DeleteObject(DlgHostFont);
-			}
-#endif
 			return TRUE;
 
 		case IDC_HOSTTCPIP:
@@ -2491,34 +2445,8 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
 static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
                                  LPARAM lParam)
 {
-//	LOGFONTA logfont;
-//	HFONT font;
-
 	switch (msg) {
 	case WM_INITDIALOG:
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgAboutFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_TTSSH_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHVERSIONS, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_INCLUDES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_OPENSSL_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ZLIB_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_PUTTY_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_WEBSITES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_CRYPTOGRAPHY, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CREDIT, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgAboutFont = NULL;
-		}
-#endif
-
 		// Edit controlは等幅フォントで表示したいので、別設定情報からフォントをセットする。
 		// (2014.5.5. yutaka)
 		if (!UTIL_get_lang_font("DLG_ABOUT_FONT", dlg, NULL, &DlgAboutTextFont, pvar)) {
@@ -2567,11 +2495,6 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgAboutFont != NULL) {
-				DeleteObject(DlgAboutFont);
-			}
-#endif
 			if (DlgAboutTextFont != NULL) {
 				DeleteObject(DlgAboutTextFont);
 			}
@@ -2579,11 +2502,6 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgAboutFont != NULL) {
-				DeleteObject(DlgAboutFont);
-			}
-#endif
 			if (DlgAboutTextFont != NULL) {
 				DeleteObject(DlgAboutTextFont);
 			}
@@ -3336,71 +3254,10 @@ static void choose_read_only_file(HWND dlg)
 static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
                                  LPARAM lParam)
 {
-//	LOGFONT logfont;
-//	HFONT font;
-
 	switch (msg) {
 	case WM_INITDIALOG:
 		SetWindowLong(dlg, DWL_USER, lParam);
 		init_setup_dlg((PTInstVar) lParam, dlg);
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgSetupFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_COMPRESSLABEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMPRESSNONE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMPRESSHIGH, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMPRESSNOTE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_CIPHERORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHCIPHERPREFS, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHMOVECIPHERUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHMOVECIPHERDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_KEX_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHKEX_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHKEX_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHKEX_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_HOST_KEY_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHHOST_KEY_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHHOST_KEY_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHHOST_KEY_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_MAC_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHMAC_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHMAC_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHMAC_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_COMP_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHCOMP_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHCOMP_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHCOMP_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_CHOOSEREADWRITEFILE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_READWRITEFILENAME, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CHOOSEREADONLYFILE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_READONLYFILENAME, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_KNOWNHOSTS, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HEARTBEATLABEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HEARTBEAT_EDIT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HEARTBEATLABEL2, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_REMEMBERPASSWORD, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FORWARDAGENT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FORWARDAGENTCONFIRM, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FORWARDAGENTNOTIFY, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_VERIFYHOSTKEYDNS, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_NOTICEBANNER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-
-			SendDlgItemMessage(dlg, IDC_HOSTKEY_ROTATION_STATIC, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_HOSTKEY_ROTATION_COMBO, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE, 0));
-		}
-		else {
-			DlgSetupFont = NULL;
-		}
-#endif
 
 		CenterWindow(dlg, GetParent(dlg));
 
@@ -3410,20 +3267,10 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 		case IDOK:
 			complete_setup_dlg((PTInstVar) GetWindowLong(dlg, DWL_USER), dlg);
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgSetupFont != NULL) {
-				DeleteObject(DlgSetupFont);
-			}
-#endif
 			return TRUE;
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgSetupFont != NULL) {
-				DeleteObject(DlgSetupFont);
-			}
-#endif
 			return TRUE;
 		// Cipher order
 		case IDC_SSHMOVECIPHERUP:
@@ -4334,8 +4181,6 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 	static ssh_keytype key_type;
 	static int saved_key_bits;
 	char uimsg[MAX_UIMSG];
-//	LOGFONT logfont;
-//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -4376,39 +4221,6 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_ROUNDS", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, pvar->ts->UIMsg);
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgKeygenFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_KEYTYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_RSA1_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_RSA_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_DSA_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ECDSA256_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ECDSA384_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ECDSA521_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ED25519_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_KEYBITS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_KEYBITS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_KEY_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CONFIRM_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMMENT_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_KEY_EDIT, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CONFIRM_EDIT, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMMENT_EDIT, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_KEYGEN_PROGRESS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SAVE_PUBLIC_KEY, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SAVE_PRIVATE_KEY, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_CHECK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_ROUNDS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgHostFont = NULL;
-		}
-#endif
 
 		init_password_control(pvar, dlg, IDC_KEY_EDIT, NULL);
 		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT, NULL);
@@ -4568,11 +4380,6 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			// don't forget to free SSH resource!
 			free_ssh_key();
 			EndDialog(dlg, 0); // dialog close
-#if 0
-			if (DlgKeygenFont != NULL) {
-				DeleteObject(DlgKeygenFont);
-			}
-#endif
 			return TRUE;
 
 		// if radio button pressed...

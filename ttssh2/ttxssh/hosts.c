@@ -61,9 +61,6 @@ See LICENSE.TXT for the license.
 #define EndDialog(p1,p2) \
 	TTEndDialog(p1, p2)
 
-//static HFONT DlgHostsAddFont;
-//static HFONT DlgHostsReplaceFont;
-
 // BASE64構成文字列（ここでは'='は含まれていない）
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -1710,8 +1707,6 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
 {
 	PTInstVar pvar;
-//	LOGFONT logfont;
-//	HFONT font;
 	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -1784,27 +1779,6 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgHostsAddFont = NULL;
-		}
-#endif
 		// add host check boxにチェックをデフォルトで入れておく 
 		SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
@@ -1835,11 +1809,6 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			pvar->hosts_state.hosts_dialog = NULL;
 
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgHostsAddFont != NULL) {
-				DeleteObject(DlgHostsAddFont);
-			}
-#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
@@ -1847,11 +1816,6 @@ canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgHostsAddFont != NULL) {
-				DeleteObject(DlgHostsAddFont);
-			}
-#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -1878,8 +1842,6 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                             LPARAM lParam)
 {
 	PTInstVar pvar;
-//	LOGFONT logfont;
-//	HFONT font;
 	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -1952,26 +1914,6 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsReplaceFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgHostsReplaceFont = NULL;
-		}
-#endif
 		CenterWindow(dlg, GetParent(dlg));
 		// デフォルトでチェックは入れない
 		return TRUE;			/* because we do not set the focus */
@@ -2000,11 +1942,6 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			pvar->hosts_state.hosts_dialog = NULL;
 
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgHostsReplaceFont != NULL) {
-				DeleteObject(DlgHostsReplaceFont);
-			}
-#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
@@ -2012,11 +1949,6 @@ canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgHostsReplaceFont != NULL) {
-				DeleteObject(DlgHostsReplaceFont);
-			}
-#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2117,27 +2049,6 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgHostsAddFont = NULL;
-		}
-#endif
 		CenterWindow(dlg, GetParent(dlg));
 		// add host check box のデフォルトは off にする
 		// SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
@@ -2167,11 +2078,6 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			pvar->hosts_state.hosts_dialog = NULL;
 
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgHostsAddFont != NULL) {
-				DeleteObject(DlgHostsAddFont);
-			}
-#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
@@ -2179,11 +2085,6 @@ canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgHostsAddFont != NULL) {
-				DeleteObject(DlgHostsAddFont);
-			}
-#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:

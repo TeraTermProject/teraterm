@@ -2196,10 +2196,7 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 
 static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-//	static HFONT DlgHostsAddFont;
 	PTInstVar pvar;
-//	LOGFONT logfont;
-//	HFONT font;
 	char buf[1024];
 	char *host;
 	struct hostkeys_update_ctx *ctx;
@@ -2247,25 +2244,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_NO", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-#if 0
-		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
-			SendDlgItemMessage(dlg, IDC_HOSTKEY_MESSAGE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_ADDKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_REMOVEKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-		}
-		else {
-			DlgHostsAddFont = NULL;
-		}
-#endif
+
 		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */
 
@@ -2274,22 +2253,11 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
-
 			EndDialog(dlg, 1);
-#if 0
-			if (DlgHostsAddFont != NULL) {
-				DeleteObject(DlgHostsAddFont);
-			}
-#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
 			EndDialog(dlg, 0);
-#if 0
-			if (DlgHostsAddFont != NULL) {
-				DeleteObject(DlgHostsAddFont);
-			}
-#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
