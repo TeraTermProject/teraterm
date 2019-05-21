@@ -1240,12 +1240,20 @@ WORD TTLExec()
 	else
 		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDir, &sui, &pi);
 	if (bRet == FALSE) {
+		// 実行できなかった場合、resultに-1を返す
+		SetResult(-1);
+#if 0
+		// エラーになる
 		Err = ErrCantExec;
+#endif
 	} else {
 		if (wait) {
+			// 実行 & wait指定
 			WaitForSingleObject(pi.hProcess, INFINITE);
 			GetExitCodeProcess(pi.hProcess, &ret);
 			SetResult(ret);
+		} else {
+			SetResult(0);
 		}
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);

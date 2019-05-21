@@ -28,6 +28,15 @@ exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt; [&lt;current directory&gt;
 コマンドライン文字列 &lt;command line&gt; に従い、アプリケーションを起動する。
 </p>
 
+result システム変数は次の値を取る。
+<dl>
+  <dt>0</dt>
+  <dd>アプリケーションの実行に成功、&lt;wait&gt; パラメータが 0 又は、指定されていない</dd>
+  <dt>-1</dt>
+  <dd>アプリケーションの実行に失敗した場合</dd>
+  <dt>アプリケーションの終了コード</dt>
+  <dd>アプリケーションの実行に成功、&lt;wait&gt; パラメータが 1 に指定されていない</dd>
+</dl>
 
 <h2>パラメータ</h2>
 <dl>

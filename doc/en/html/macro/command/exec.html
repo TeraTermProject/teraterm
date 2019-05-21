@@ -28,6 +28,15 @@ exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt; [&lt;current directory&gt;
 Runs an application specified by &lt;command line&gt;.
 </p>
 
+`result' system variable returns following values.
+<dl>
+  <dt>0</dt>
+  <dd>success to execute an application, when &lt;wait&gt; is 0 or is not specified.</dd>
+  <dt>-1</dt>
+  <dd>fail to execute an application</dd>
+  <dt>exit code of the application</dt>
+  <dd>success to execute an application, when &lt;wait&gt; is 1</dd>
+</dl>
 
 <h2>Parameters</h2>
 <dl>
