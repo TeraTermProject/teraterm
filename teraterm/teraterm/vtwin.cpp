@@ -5386,6 +5386,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		case IDCANCEL:
 			TTEndDialog(hDlgWnd, IDCANCEL);
+			return TRUE;
 			break;
 
 		default:
@@ -5403,6 +5404,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			openFileDirectory(path_p, filename_p, open_dir, app);
 			return TRUE;
 		}
+		return FALSE;
 
 	case WM_CLOSE:
 		TTEndDialog(hDlgWnd, 0);
