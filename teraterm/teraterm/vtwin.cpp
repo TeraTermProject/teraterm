@@ -4085,6 +4085,9 @@ void CVTWindow::OnDuplicateSession()
 		             "Can't execute Tera Term. (%d)", ts.UILanguageFile);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -4172,6 +4175,9 @@ found_path:;
 		get_lang_msg("MSG_EXEC_CYGTERM_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
 		             "Can't execute Cygterm.", ts.UILanguageFile);
 		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -4198,6 +4204,9 @@ void CVTWindow::OnTTMenuLaunch()
 		             "Can't execute TeraTerm Menu. (%d)", ts.UILanguageFile);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -4227,6 +4236,9 @@ void CVTWindow::OnLogMeInLaunch()
 		             "Can't execute LogMeTT. (%d)", ts.UILanguageFile);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -4315,6 +4327,9 @@ void CVTWindow::OnViewLog()
 		             "Can't view logging file. (%d)", ts.UILanguageFile);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -4372,6 +4387,9 @@ void CVTWindow::OnReplayLog()
 		             "Can't execute Tera Term. (%d)", ts.UILanguageFile);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -4972,6 +4990,9 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
+	} else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
 	}
 
 	ret = TRUE;
