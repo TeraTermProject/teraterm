@@ -3997,7 +3997,7 @@ void CVTWindow::OnFileNewConnection()
 void CVTWindow::OnDuplicateSession()
 {
 	char Command[1024];
-	char *exec = "ttermpro";
+	const char *exec = "ttermpro";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	char cygterm_cfg[MAX_PATH];
@@ -4100,7 +4100,7 @@ void CVTWindow::OnCygwinConnection()
 	char file[MAX_PATH], *filename;
 	char c, *envptr, *envbuff=NULL;
 	int envbufflen;
-	char *exename = "cygterm.exe";
+	const char *exename = "cygterm.exe";
 	char cygterm[MAX_PATH];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -4187,7 +4187,7 @@ found_path:;
 //
 void CVTWindow::OnTTMenuLaunch()
 {
-	char *exename = "ttpmenu.exe";
+	const char *exename = "ttpmenu.exe";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
@@ -4195,7 +4195,7 @@ void CVTWindow::OnTTMenuLaunch()
 	GetStartupInfo(&si);
 	memset(&pi, 0, sizeof(pi));
 
-	if (CreateProcess(NULL, exename, NULL, NULL, FALSE, 0,
+	if (CreateProcess(exename, NULL, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
 		char buf[80];
 		char uimsg[MAX_UIMSG];
@@ -4347,7 +4347,7 @@ void CVTWindow::OnReplayLog()
 	OPENFILENAME ofn;
 	char szFile[MAX_PATH];
 	char Command[MAX_PATH] = "notepad.exe";
-	char *exec = "ttermpro";
+	const char *exec = "ttermpro";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	char uimsg[MAX_UIMSG];
