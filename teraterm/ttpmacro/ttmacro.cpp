@@ -87,11 +87,11 @@ static void init()
 	WinCompatInit();
 
 	// DPI Aware (çÇDPIëŒâû)
-	{
-		int dip_aware = 0;
-		dip_aware = GetPrivateProfileInt("Tera Term", "DPIAware", dip_aware, SetupFName);
-		if (dip_aware != 0) {
-			if (pSetThreadDpiAwarenessContext != NULL) {
+	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
+		char Temp[4];
+		GetPrivateProfileString("Tera Term", "DPIAware", NULL, Temp, sizeof(Temp), SetupFName);
+		if (_stricmp(Temp, "on") == 0) {
+			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * (C) 2019 TeraTerm Project
+ * (C) 20018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
+BOOL (WINAPI *pIsValidDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 UINT (WINAPI *pGetDpiForWindow)(HWND hwnd);
 BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
@@ -47,6 +48,7 @@ BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 static const APIInfo Lists_user32[] = {
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
+	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
 	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
 	{ NULL },
 };
