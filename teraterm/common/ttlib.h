@@ -124,6 +124,7 @@ void CenterWindow(HWND hWnd, HWND hWndParent);
 
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+int GetMonitorDpiFromWindow(HWND hWnd);
 
 #if defined(_UNICODE)
 #define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)

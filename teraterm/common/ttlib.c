@@ -1911,3 +1911,36 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
 	SetWindowPos(hWnd, NULL, NewX, NewY, 0, 0,
 				 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
+
+/**
+ *	hWndの表示されているモニタのDPIを取得する
+ *	Per-monitor DPI awareness対応
+ *
+ *	@retval	DPI値(通常のDPIは96)
+ */
+int GetMonitorDpiFromWindow(HWND hWnd)
+{
+	static HRESULT (__stdcall  *pGetDpiForMonitor)(HMONITOR hmonitor, int/*enum MONITOR_DPI_TYPE*/ dpiType, UINT *dpiX, UINT *dpiY);
+	static HMODULE hDll;
+	if (hDll == NULL) {
+		hDll = LoadLibraryA("Shcore.dll");
+		if (hDll != NULL) {
+			pGetDpiForMonitor = (void *)GetProcAddress(hDll, "GetDpiForMonitor");
+		}
+	}
+	if (pGetDpiForMonitor == NULL) {
+		// ダイアログ内では自動スケーリングが効いているので
+		// 常に96を返すようだ
+		int dpiY;
+		HDC hDC = GetDC(hWnd);
+		dpiY = GetDeviceCaps(hDC,LOGPIXELSY);
+		ReleaseDC(hWnd, hDC);
+		return dpiY;
+	} else {
+		UINT dpiX;
+		UINT dpiY;
+		HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		pGetDpiForMonitor(hMonitor, 0 /*0=MDT_EFFECTIVE_DPI*/, &dpiX, &dpiY);
+		return (int)dpiY;
+	}
+}
