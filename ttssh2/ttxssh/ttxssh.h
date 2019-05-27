@@ -338,6 +338,10 @@ typedef struct _TInstVar {
 	char subsystem_name[256];
 
 	BOOL nosession;
+
+	// dialog resource
+	HFONT hFontFixed;		// hosts.c内のダイアログ用
+
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data

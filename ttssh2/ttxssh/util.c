@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -320,21 +320,44 @@ void UTIL_get_lang_msg(PCHAR key, PTInstVar pvar, PCHAR def)
 		def, pvar->ts->UILanguageFile);
 }
 
-int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PTInstVar pvar)
+/*
+ *	等幅フォントを取得
+ *	@retval		フォントハンドル
+ *	@retval		NULL(エラー)
+ */
+HFONT UTIL_get_lang_fixedfont(HWND hWnd, const char *UILanguageFile)
 {
-	LOGFONT logfont_tmp;
-	if (logfont == NULL) {
-		logfont = &logfont_tmp;
-	}
-	if (GetI18nLogfont("TTSSH", key, logfont,
-					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
-					   pvar->ts->UILanguageFile) == FALSE) {
-		return FALSE;
-	}
+	HFONT hFont;
+	LOGFONTA logfont;
+	int dpi = GetMonitorDpiFromWindow(hWnd);
+	BOOL result = GetI18nLogfont("TTSSH", "DLG_ABOUT_FONT", &logfont,
+								 dpi, UILanguageFile);
+	if (result == FALSE) {
+		// 読み込めなかった場合は等幅フォントを指定する。
+		// エディットコントロールはダイアログと同じフォントを持っており
+		// 等幅フォントではないため。
 
-	if ((*font = CreateFontIndirect(logfont)) == NULL) {
-		return FALSE;
-	}
+		// ウィンドウ(ダイアログ)のフォントを取得、フォント高を参照する
+		HFONT hFontDlg;
+		LOGFONT logfontDlg;
+		hFontDlg = (HFONT)SendMessage(hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0);
+		GetObject(hFontDlg, sizeof(logfontDlg), &logfontDlg);
 
-	return TRUE;
+		memset(&logfont, 0, sizeof(logfont));
+		strncpy_s(logfont.lfFaceName, sizeof(logfont.lfFaceName), "Courier New", _TRUNCATE);
+		logfont.lfCharSet = ANSI_CHARSET;	// = 0
+		logfont.lfHeight = logfontDlg.lfHeight;
+		logfont.lfWidth = 0;
+	}
+	hFont = CreateFontIndirect(&logfont);	// エラー時 NULL
+#if 1
+	if (hFont == NULL) {
+		// フォントが生成できなかった場合 stock object を使用する
+		// DeleteObject() してもokのはず
+		// It is not necessary (but it is not harmful) to
+		// delete stock objects by calling DeleteObject.
+		hFont = GetStockObject(ANSI_FIXED_FONT);
+	}
+#endif
+	return hFont;
 }

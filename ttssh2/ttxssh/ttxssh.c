@@ -105,8 +105,6 @@ static HICON SecureSmallIcon = NULL;
 static HICON SecureNotifyIcon = NULL;
 static HICON OldNotifyIcon = NULL;
 
-static HFONT DlgAboutTextFont;
-
 static TInstVar *pvar;
 
 typedef struct {
@@ -2446,21 +2444,13 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
 static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
                                  LPARAM lParam)
 {
+	static HFONT DlgAboutTextFont;
+
 	switch (msg) {
 	case WM_INITDIALOG:
 		// Edit controlは等幅フォントで表示したいので、別設定情報からフォントをセットする。
 		// (2014.5.5. yutaka)
-		if (!UTIL_get_lang_font("DLG_ABOUT_FONT", dlg, NULL, &DlgAboutTextFont, pvar)) {
-			// 読み込めなかった場合は等幅フォントを指定する。
-			// エディットコントロールはダイアログと同じフォントを持っており
-			// 等幅フォントではないため。
-			LOGFONTA logfont = {0};
-			strncpy_s(logfont.lfFaceName, sizeof(logfont.lfFaceName), "Courier New", _TRUNCATE);
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = MulDiv(8, GetDeviceCaps(GetDC(dlg),LOGPIXELSY) * -1, 72);
-			logfont.lfWidth = 0;
-			DlgAboutTextFont = CreateFontIndirect(&logfont);	// エラー時 NULL
-		}
+		DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
 		if (DlgAboutTextFont != NULL) {
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
 		}
@@ -2496,16 +2486,10 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			EndDialog(dlg, 1);
-			if (DlgAboutTextFont != NULL) {
-				DeleteObject(DlgAboutTextFont);
-			}
 			return TRUE;
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
 			EndDialog(dlg, 0);
-			if (DlgAboutTextFont != NULL) {
-				DeleteObject(DlgAboutTextFont);
-			}
 			return TRUE;
 		case IDC_FP_HASH_ALG_MD5:
 			about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_MD5);
@@ -2515,6 +2499,23 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 		}
 		break;
+
+	case WM_DESTROY:
+		if (DlgAboutTextFont != NULL) {
+			DeleteObject(DlgAboutTextFont);
+			DlgAboutTextFont = NULL;
+		}
+		break;
+
+	case WM_DPICHANGED:
+		if (DlgAboutTextFont != NULL) {
+			DeleteObject(DlgAboutTextFont);
+		}
+		DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		if (DlgAboutTextFont != NULL) {
+			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+		}
+		return FALSE;
 	}
 
 	return FALSE;

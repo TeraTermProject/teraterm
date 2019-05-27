@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,7 @@ See LICENSE.TXT for the license.
 #include "hosts.h"
 #include "dns.h"
 #include "dlglib.h"
+#include "compat_win.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -984,7 +985,11 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 
 	SetDlgItemText(dlg, IDC_HOSTWARNING, buf2);
 
-	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), TRUE);
+	pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+	if (pvar->hFontFixed != NULL) {
+		SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
+						   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
+	}
 
 	CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
 	hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
@@ -1830,6 +1835,26 @@ canceled:
 			return FALSE;
 		}
 
+	case WM_DPICHANGED:
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
+		if (pvar->hFontFixed != NULL) {
+			DeleteObject(pvar->hFontFixed);
+		}
+		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		if (pvar->hFontFixed != NULL) {
+			SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
+							   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
+		}
+		return FALSE;
+
+	case WM_DESTROY:
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
+		if (pvar->hFontFixed != NULL) {
+			DeleteObject(pvar->hFontFixed);
+			pvar->hFontFixed = NULL;
+		}
+		return FALSE;
+
 	default:
 		return FALSE;
 	}
@@ -1963,6 +1988,26 @@ canceled:
 			return FALSE;
 		}
 
+	case WM_DPICHANGED:
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
+		if (pvar->hFontFixed != NULL) {
+			DeleteObject(pvar->hFontFixed);
+		}
+		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		if (pvar->hFontFixed != NULL) {
+			SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
+							   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
+		}
+		return FALSE;
+
+	case WM_DESTROY:
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
+		if (pvar->hFontFixed != NULL) {
+			DeleteObject(pvar->hFontFixed);
+			pvar->hFontFixed = NULL;
+		}
+		return FALSE;
+
 	default:
 		return FALSE;
 	}
@@ -1975,8 +2020,6 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                          LPARAM lParam)
 {
 	PTInstVar pvar;
-//	LOGFONT logfont;
-//	HFONT font;
 	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -2098,6 +2141,26 @@ canceled:
 		default:
 			return FALSE;
 		}
+
+	case WM_DPICHANGED:
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
+		if (pvar->hFontFixed != NULL) {
+			DeleteObject(pvar->hFontFixed);
+		}
+		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		if (pvar->hFontFixed != NULL) {
+			SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
+							   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
+		}
+		return FALSE;
+
+	case WM_DESTROY:
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
+		if (pvar->hFontFixed != NULL) {
+			DeleteObject(pvar->hFontFixed);
+			pvar->hFontFixed = NULL;
+		}
+		return FALSE;
 
 	default:
 		return FALSE;
