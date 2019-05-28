@@ -6304,15 +6304,15 @@ void CVTWindow::OnHelpAbout()
 	FreeTTDLG();
 }
 
-LRESULT CVTWindow::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+LRESULT CVTWindow::OnDpiChanged(WPARAM, LPARAM lParam)
 {
-	static DWORD preTime = 0;
-	DWORD currentTime = GetTickCount();
-	if (currentTime - preTime < 1000) {
-		return 0;
-	}
-	preTime = currentTime;
-
+	const RECT *SuggestedWindowRect = (RECT *)lParam;
+	// 提案された位置に移動する
+	// サイズはDpiChange()→DispChangeWinSize()で設定される
+	::SetWindowPos(m_hWnd, NULL,
+				   SuggestedWindowRect->left, SuggestedWindowRect->top,
+				   0, 0,
+				   SWP_NOSIZE | SWP_NOZORDER);
 	DpiChanged();
 	return TRUE;
 }
