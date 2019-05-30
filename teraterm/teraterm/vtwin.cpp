@@ -802,6 +802,7 @@ CVTWindow::CVTWindow()
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
 	Alpha = 255;
+	IgnoreSizeMessage = FALSE;
 
 	/* Initialize scroll buffer */
 	InitBuffer();
@@ -2769,6 +2770,9 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(UINT nType, int cx, int cy)
 {
+	if (IgnoreSizeMessage) {
+		return;
+	}
 	RECT R;
 	int w, h;
 
@@ -6304,16 +6308,99 @@ void CVTWindow::OnHelpAbout()
 	FreeTTDLG();
 }
 
-LRESULT CVTWindow::OnDpiChanged(WPARAM, LPARAM lParam)
+LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 {
-	const RECT *SuggestedWindowRect = (RECT *)lParam;
-	// 提案された位置に移動する
-	// サイズはDpiChange()→DispChangeWinSize()で設定される
+	const UINT NewDPI = LOWORD(wp);
+	// 現在のウィンドウサイズ
+	RECT CurrentWindowRect;
+	::GetWindowRect(m_hWnd, &CurrentWindowRect);
+	const int CurrentWindowWidth = CurrentWindowRect.right - CurrentWindowRect.left;
+	const int CurrentWindowHeight = CurrentWindowRect.bottom - CurrentWindowRect.top;
+
+	// ポインタの位置
+	POINT MouseCursorScreen;
+	GetCursorPos(&MouseCursorScreen);
+	POINT MouseCursorInWindow = MouseCursorScreen;
+	MouseCursorInWindow.x -= CurrentWindowRect.left;
+	MouseCursorInWindow.y -= CurrentWindowRect.top;
+
+	// 新しいDPIに合わせてフォントを生成、
+	// クライアント領域のサイズを決定する
+	ChangeFont();
+	ScreenWidth = WinWidth*FontWidth;
+	ScreenHeight = WinHeight*FontHeight;
+	//AdjustScrollBar();
+
+	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
+	const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+	const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+	RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
+	pAdjustWindowRectExForDpi(&Rect, Style, TRUE/*menu*/, ExStyle, NewDPI);
+	const int NewWindowWidth = Rect.right - Rect.left;
+	const int NewWindowHeight = Rect.bottom - Rect.top;
+
+	// 新しいウィンドウ領域候補
+	RECT NewWindowRect[5];
+
+	// タイトルバー上のポインタ位置がなるべくずれない新しい位置
+	int t1 = (int)MouseCursorInWindow.y * (int)NewWindowHeight / (int)CurrentWindowHeight;
+	NewWindowRect[0].top =
+		CurrentWindowRect.top -
+		(t1 - (int)MouseCursorInWindow.y);
+	t1 = (int)MouseCursorInWindow.x * (int)NewWindowWidth / (int)CurrentWindowWidth;
+	NewWindowRect[0].left =
+		CurrentWindowRect.left -
+		(t1 - (int)MouseCursorInWindow.x);
+	NewWindowRect[0].bottom = NewWindowRect[0].top + NewWindowHeight;
+	NewWindowRect[0].right = NewWindowRect[0].left + NewWindowWidth;
+
+	// 現在位置から上右寄せ
+	NewWindowRect[1].top = CurrentWindowRect.top;
+	NewWindowRect[1].bottom = CurrentWindowRect.top + NewWindowHeight;
+	NewWindowRect[1].left = CurrentWindowRect.right - NewWindowWidth;
+	NewWindowRect[1].right = CurrentWindowRect.right;
+
+	// 現在位置から上左寄せ
+	NewWindowRect[2].top = CurrentWindowRect.top;
+	NewWindowRect[2].bottom = CurrentWindowRect.top + NewWindowHeight;
+	NewWindowRect[2].left = CurrentWindowRect.left;
+	NewWindowRect[2].right = CurrentWindowRect.left + NewWindowWidth;
+
+	// 現在位置から下右寄せ
+	NewWindowRect[3].top = CurrentWindowRect.bottom - NewWindowHeight;
+	NewWindowRect[3].bottom = CurrentWindowRect.top;
+	NewWindowRect[3].left = CurrentWindowRect.right - NewWindowWidth;
+	NewWindowRect[3].right = CurrentWindowRect.right;
+
+	// 現在位置から下左寄せ
+	NewWindowRect[4].top = CurrentWindowRect.bottom - NewWindowHeight;
+	NewWindowRect[4].bottom = CurrentWindowRect.top;
+	NewWindowRect[4].left = CurrentWindowRect.left;
+	NewWindowRect[4].right = CurrentWindowRect.left + NewWindowWidth;
+
+	// 確認
+	const RECT *NewRect = &NewWindowRect[0];
+	for (int i=0; i < _countof(NewWindowRect); i++) {
+		const RECT *r = &NewWindowRect[i];
+		HMONITOR hMonitor = pMonitorFromRect(r, MONITOR_DEFAULTTONULL);
+		UINT dpiX;
+		UINT dpiY;
+		pGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+		if (NewDPI == dpiX) {
+			NewRect = r;
+			break;
+		}
+	}
+
+	IgnoreSizeMessage = TRUE;
 	::SetWindowPos(m_hWnd, NULL,
-				   SuggestedWindowRect->left, SuggestedWindowRect->top,
-				   0, 0,
-				   SWP_NOSIZE | SWP_NOZORDER);
-	DpiChanged();
+				   NewRect->left, NewRect->top,
+				   NewWindowWidth, NewWindowHeight,
+				   SWP_NOZORDER);
+	IgnoreSizeMessage = FALSE;
+
+	ChangeCaret();
+
 	return TRUE;
 }
 

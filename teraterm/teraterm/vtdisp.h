@@ -116,7 +116,6 @@ void DispGetWindowSize(int *width, int *height, BOOL client);
 void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
 int DispFindClosestColor(int red, int green, int blue);
 void UpdateBGBrush(void);
-void DpiChanged(void);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

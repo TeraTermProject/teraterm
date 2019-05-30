@@ -3899,10 +3899,3 @@ int DispFindClosestColor(int red, int green, int blue)
 	}
 	return color;
 }
-
-void DpiChanged(void)
-{
-  ChangeFont();
-  DispChangeWinSize(WinWidth,WinHeight);
-  ChangeCaret();
-}

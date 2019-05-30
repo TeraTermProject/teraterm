@@ -61,6 +61,9 @@ private:
   BYTE Alpha;
   void SetWindowAlpha(BYTE alpha);
 
+  // DPI
+  BOOL IgnoreSizeMessage;
+
 protected:
 
 public:
