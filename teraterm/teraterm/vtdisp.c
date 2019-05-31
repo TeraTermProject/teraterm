@@ -1041,7 +1041,6 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 static void BGLoadPicture(HDC hdcDest,BGSrc *src)
 {
   int x,y,width,height,pattern;
-  HDC hdc = NULL;
 
   FillBitmapDC(hdcDest,src->color);
 
