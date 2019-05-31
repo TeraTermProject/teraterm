@@ -62,7 +62,7 @@
 
 #include "ttlib.h"		// for GetMessageboxFont()
 
-#include "TipWin.h"
+#include "tipwin.h"
 
 #define	FRAME_WIDTH	6
 
@@ -230,8 +230,9 @@ static void create_tipwin(TipWin *pTipWin, HINSTANCE hInst, int cx, int cy)
 TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 {
 	TipWin *pTipWin;
-	HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
-	LOGFONT logfont;
+	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
+	LOGFONTA logfont;
+	const UINT uDpi = GetMonitorDpiFromWindow(src);
 
 	register_class(hInst);
 	pTipWin = (TipWin *)malloc(sizeof(TipWin));
@@ -243,6 +244,8 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	pTipWin->tip_bg = GetSysColor(COLOR_INFOBK);
 	pTipWin->tip_text = GetSysColor(COLOR_INFOTEXT);
 	GetMessageboxFont(&logfont);
+	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
+	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
 	pTipWin->tip_font = CreateFontIndirect(&logfont);
 	CalcStrRect(pTipWin);
 	pTipWin->hParentWnd = src;
