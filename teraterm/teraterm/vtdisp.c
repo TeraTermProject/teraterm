@@ -3559,13 +3559,9 @@ void DispSetColor(unsigned int num, COLORREF color)
 
 void DispResetColor(unsigned int num)
 {
-	HDC TmpDC;
-
 	if (num == CS_UNSPEC) {
 		return;
 	}
-
-	TmpDC = GetDC(NULL);
 
 	switch(num) {
 #ifdef ALPHABLEND_TYPE2
