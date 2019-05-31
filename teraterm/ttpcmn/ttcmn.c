@@ -1229,7 +1229,7 @@ HWND WINAPI GetNthWin(int n)
 	}
 }
 
-int WINAPI GetRegisteredWindowCount()
+int WINAPI GetRegisteredWindowCount(void)
 {
 	return (pm->NWin);
 }
@@ -2489,7 +2489,7 @@ void WINAPI SetCustomNotifyIcon(HICON icon)
 	CustomIcon = icon;
 }
 
-HICON WINAPI GetCustomNotifyIcon()
+HICON WINAPI GetCustomNotifyIcon(void)
 {
 	return CustomIcon;
 }

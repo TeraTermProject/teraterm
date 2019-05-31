@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,13 +64,13 @@ DllExport void PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
 DllExport void PASCAL SelectWin(int WinId);
 DllExport void PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
 DllExport HWND PASCAL GetNthWin(int n);
-DllExport int PASCAL GetRegisteredWindowCount();
+DllExport int PASCAL GetRegisteredWindowCount(void);
 DllExport void PASCAL ShowAllWin(int stat);
 DllExport void PASCAL ShowAllWinSidebySide(HWND);
 DllExport void PASCAL ShowAllWinStacked(HWND);
 DllExport void PASCAL ShowAllWinCascade(HWND);
 DllExport void PASCAL BroadcastClosingMessage(HWND myhwnd);
-DllExport void PASCAL UndoAllWin();
+DllExport void PASCAL UndoAllWin(void);
 DllExport void PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
 
 DllExport int PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
@@ -92,7 +92,7 @@ DllExport void PASCAL ShowNotifyIcon(PComVar cv);
 DllExport void PASCAL HideNotifyIcon(PComVar cv);
 DllExport void PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
 DllExport void PASCAL SetCustomNotifyIcon(HICON icon);
-DllExport HICON PASCAL GetCustomNotifyIcon();
+DllExport HICON PASCAL GetCustomNotifyIcon(void);
 
 #define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
 #define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)
