@@ -1954,20 +1954,11 @@ static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
   VTlf->lfQuality       = (BYTE)ts.FontQuality;
   VTlf->lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
   strncpy_s(VTlf->lfFaceName, sizeof(VTlf->lfFaceName),ts.VTFont, _TRUNCATE);
-#if 1
   if (mul) {
-	  UINT uDpi;
-	  if (pGetDpiForWindow == NULL) {
-		  HDC TmpDC = GetDC(HVTWin);
-		  uDpi = GetDeviceCaps(TmpDC,LOGPIXELSY);	// ‚¢‚Â‚à96‚ð•Ô‚·?
-		  ReleaseDC(HVTWin,TmpDC);
-	  } else {
-		  uDpi = pGetDpiForWindow(HVTWin);
-	  }
-	  VTlf->lfWidth = -MulDiv(VTlf->lfWidth, uDpi, 96);
-	  VTlf->lfHeight = -MulDiv(VTlf->lfHeight, uDpi, 96);
+	  const UINT uDpi = GetMonitorDpiFromWindow(HVTWin);
+	  VTlf->lfWidth = MulDiv(VTlf->lfWidth, uDpi, 96);
+	  VTlf->lfHeight = MulDiv(VTlf->lfHeight, uDpi, 96);
   }
-#endif
 }
 
 void ChangeFont()
