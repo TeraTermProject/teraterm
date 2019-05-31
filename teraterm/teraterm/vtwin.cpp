@@ -6380,7 +6380,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 
 	// Šm”F
 	const RECT *NewRect = &NewWindowRect[0];
-	for (int i=0; i < _countof(NewWindowRect); i++) {
+	for (size_t i=0; i < _countof(NewWindowRect); i++) {
 		const RECT *r = &NewWindowRect[i];
 		HMONITOR hMonitor = pMonitorFromRect(r, MONITOR_DEFAULTTONULL);
 		UINT dpiX;
