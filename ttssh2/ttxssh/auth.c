@@ -827,6 +827,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	static BOOL UseControlChar;
 	static BOOL ShowPassPhrase;
 	static HICON hIconDropdown;
+	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1047,7 +1048,6 @@ canceled:
 			return TRUE;
 
 		case IDC_SSHPASSWORD_OPTION: {
-			TCHAR uimsg[MAX_UIMSG];
 			RECT rect;
 			HWND hWndButton;
 			int result;
@@ -1136,30 +1136,41 @@ canceled:
 		}
 
 		case IDC_USERNAME_OPTION: {
-			TCHAR uimsg[MAX_UIMSG];
 			RECT rect;
 			HWND hWndButton;
 			HMENU hMenu= CreatePopupMenu();
 			int result;
+			const BOOL DisableDefaultUserName = pvar->session_settings.DefaultUserName[0] == 0;
+			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_DEFAULT_USERNAME",
+						uimsg, _countof(uimsg),
+						"use &default username",
+						pvar->ts->UILanguageFile);
+			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (DisableDefaultUserName ? MFS_DISABLED : 0), 1,
+					   uimsg);
 			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_WINDOWS_USERNAME",
 						uimsg, _countof(uimsg),
-						"Paste &Windows username",
+						"use &Windows username",
 						pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1, uimsg);
+			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 2, uimsg);
 			hWndButton = GetDlgItem(dlg, IDC_USERNAME_OPTION);
 			GetWindowRect(hWndButton, &rect);
 			result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
 			DestroyMenu(hMenu);
 			switch (result) {
-			case 1: {
+			case 1:
+				SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
+				goto after_user_name_set;
+			case 2: {
 				TCHAR user_name[UNLEN+1];
 				DWORD len = _countof(user_name);
 				BOOL r = GetUserName(user_name, &len);
-				if (r != 0) {
-					SetDlgItemText(dlg, IDC_SSHUSERNAME, user_name);
-					SendDlgItemMessage(dlg, IDC_SSHUSERNAME, EM_SETSEL, 0, -1);
-					SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHUSERNAME), TRUE);
+				if (r == 0) {
+					break;
 				}
+				SetDlgItemText(dlg, IDC_SSHUSERNAME, user_name);
+			after_user_name_set:
+				SendDlgItemMessage(dlg, IDC_SSHUSERNAME, EM_SETSEL, 0, -1);
+				SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHUSERNAME), TRUE);
 				break;
 			}
 			}
