@@ -1521,9 +1521,10 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		CheckDlgButton(dlg, IDC_CHECKAUTH, TRUE);
 	}
 
-	if (pvar->session_settings.DefaultUserName[0] == 0) {
+	if (pvar->settings.DefaultUserType == 1 &&
+		pvar->session_settings.DefaultUserName[0] == 0) {
 		// ‹ó‚È‚Ì‚Åu“ü—Í‚µ‚È‚¢v‚É‚µ‚Ä‚¨‚­
-		pvar->session_settings.DefaultUserType = 0;
+		pvar->settings.DefaultUserType = 0;
 	}
 	id = pvar->settings.DefaultUserType == 1 ? IDC_SSH_DEFAULTUSERNAME :
 		pvar->settings.DefaultUserType == 2 ? IDC_SSH_WINDOWS_USERNAME :
