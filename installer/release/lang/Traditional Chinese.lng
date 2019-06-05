@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-24)
+; Updated by TeraTerm Project (2019-06-05)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -582,7 +582,8 @@ DLG_AUTH_BANNER=登錄到 %s
 DLG_AUTH_BANNER2=需要認證。
 DLG_AUTH_BANNER2_FAILED=認證失敗，請重試。
 DLG_AUTH_USERNAME=用戶名(&N)：
-DLG_AUTH_PASTE_WINDOWS_USERNAME=Paste &Windows Username
+DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
+DLG_AUTH_USE_SYSTEM_USERNAME=Use &system username
 DLG_AUTH_PASSWORD=密碼(&P)：
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard

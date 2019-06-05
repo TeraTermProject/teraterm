@@ -1141,15 +1141,15 @@ canceled:
 			HMENU hMenu= CreatePopupMenu();
 			int result;
 			const BOOL DisableDefaultUserName = pvar->session_settings.DefaultUserName[0] == 0;
-			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_DEFAULT_USERNAME",
+			GetI18nStrT("TTSSH", "DLG_AUTH_USE_DEFAULT_USERNAME",
 						uimsg, _countof(uimsg),
-						"use &default username",
+						"Use &default username",
 						pvar->ts->UILanguageFile);
 			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (DisableDefaultUserName ? MFS_DISABLED : 0), 1,
 					   uimsg);
-			GetI18nStrT("TTSSH", "DLG_AUTH_PASTE_WINDOWS_USERNAME",
+			GetI18nStrT("TTSSH", "DLG_AUTH_USE_SYSTEM_USERNAME",
 						uimsg, _countof(uimsg),
-						"use &Windows username",
+						"Use &system username",
 						pvar->ts->UILanguageFile);
 			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 2, uimsg);
 			hWndButton = GetDlgItem(dlg, IDC_USERNAME_OPTION);

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-04-24)
+; Updated by TeraTerm Project (2019-06-05)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -582,7 +582,8 @@ DLG_AUTH_BANNER=Einloggen auf %s
 DLG_AUTH_BANNER2=Authentifikation notwendig.
 DLG_AUTH_BANNER2_FAILED=Authentifikation fehlgeschlagen. Bitte versuchen Sie es erneut.
 DLG_AUTH_USERNAME=Benutzername:
-DLG_AUTH_PASTE_WINDOWS_USERNAME=Paste &Windows Username
+DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
+DLG_AUTH_USE_SYSTEM_USERNAME=Use &system username
 DLG_AUTH_PASSWORD=Passphrase:
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
