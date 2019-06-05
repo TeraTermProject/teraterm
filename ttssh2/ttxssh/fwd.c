@@ -740,6 +740,48 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 	}
 }
 
+// local connectionからのパケットリード(FD_READ)の通知を切り替える
+// 
+// notify: TRUE    FD_READを通知する
+//         FALSE   FD_READを通知しない
+//
+// remote_windowに空きがない場合は通知オフとし、空きができた場合は
+// 通知を再開する。
+//
+// remote_windowに余裕がない状態で、local connectionからのパケットを
+// 受信し続けると、消費メモリが肥大化するという問題を回避する。
+//
+// (2019.6.5 yutaka)
+void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notify)
+{
+	int channel_num;
+	FWDChannel* channel;
+	int ret;
+
+	channel_num = c->local_num;
+	channel = pvar->fwd_state.channels + channel_num;
+
+	if (notify) {
+		ret = WSAAsyncSelect(
+			channel->local_socket,
+			make_accept_wnd(pvar), WM_SOCK_IO,
+			FD_CONNECT | FD_READ | FD_CLOSE | FD_WRITE
+		);
+	} else {
+		ret = WSAAsyncSelect(
+			channel->local_socket,
+			make_accept_wnd(pvar), 
+			0, 0);
+	}
+
+	if (ret != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: Can not change local channel(%d) notification(%d)",
+			__FUNCTION__, channel_num, notify);
+	}
+
+}
+
+
 static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
 {

@@ -231,7 +231,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 }
 
 // remote_windowの空きがない場合に、送れなかったバッファをリスト（入力順）へつないでおく。
-static void ssh2_channel_add_bufchain(Channel_t *c, unsigned char *buf, unsigned int buflen)
+static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen)
 {
 	bufchain_t *p, *old;
 
@@ -255,12 +255,15 @@ static void ssh2_channel_add_bufchain(Channel_t *c, unsigned char *buf, unsigned
 			old = old->next;
 		old->next = p;
 	}
+
+	FWD_suspend_resume_local_connection(pvar, c, FALSE);
 }
 
 static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 {
 	bufchain_t *ch;
 	unsigned int size;
+	int count = 0;
 
 	while (c->bufchain) {
 		// 先頭から先に送る
@@ -279,6 +282,12 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 
 		buffer_free(ch->msg);
 		free(ch);
+
+		count++;
+	}
+
+	if (count > 0) {
+		FWD_suspend_resume_local_connection(pvar, c, TRUE);
 	}
 }
 
@@ -3441,14 +3450,14 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 	// これによりパケットが壊れたように見える現象が改善される。
 	// (2012.10.14 yutaka)
 	if (retry == 0 && c->bufchain) {
-		ssh2_channel_add_bufchain(c, buf, buflen);
+		ssh2_channel_add_bufchain(pvar, c, buf, buflen);
 		return;
 	}
 
 	if ((unsigned int)buflen > c->remote_window) {
 		unsigned int offset = 0;
 		// 送れないデータはいったん保存しておく
-		ssh2_channel_add_bufchain(c, buf + offset, buflen - offset);
+		ssh2_channel_add_bufchain(pvar, c, buf + offset, buflen - offset);
 		buflen = offset;
 		return;
 	}

@@ -164,5 +164,6 @@ void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num);
 int FWD_check_local_channel_num(PTInstVar pvar, int local_num);
 int FWD_agent_open(PTInstVar pvar, uint32 remote_channel_num);
 BOOL FWD_agent_forward_confirm(PTInstVar pvar);
+void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notify);
 
 #endif
