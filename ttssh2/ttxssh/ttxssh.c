@@ -2370,7 +2370,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
+	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d\r\nCompatible with SSH protocol version 1.5 and 2.0", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
 	SendMessage(GetDlgItem(dlg, IDC_TTSSH_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
 	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)

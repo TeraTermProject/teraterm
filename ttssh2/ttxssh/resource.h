@@ -126,7 +126,7 @@
 #define IDC_ADDKEY_EDIT                 1069
 #define IDC_STATIC1                     1070
 #define IDC_COMPRESSLABEL               1070
-#define IDC_SSHVERSIONS                 1070
+#define IDC_TTSSH_RIGHTS                1070
 #define IDC_STATIC2                     1071
 #define IDC_COMPRESSNONE                1071
 #define IDC_STATIC3                     1072

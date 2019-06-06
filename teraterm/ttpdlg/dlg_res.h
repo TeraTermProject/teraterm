@@ -126,13 +126,13 @@
 #define IDC_FORUM_LABEL                 1029
 #define IDC_FORUM_URL                   1030
 #define IDC_ONIGURUMA_LABEL             1031
-#define IDC_RIGHTS_LABEL                1032
+#define IDC_IPV6_LABEL                  1032
 #define IDC_PROJECT_LABEL               1033
-#define IDC_TERANISHI_LABEL             1034
+#define IDC_TT23_RIGHTS_LABEL           1034
 #define IDC_TT_PRO                      1035
 #define IDC_INLUCDE_LABEL               1036
 #define IDC_TT23_LABEL                  1037
-#define IDC_TT23DATE_LABEL              1038
+#define IDC_IPV6_RIGHTS_LABEL           1038
 #define IDC_AUTHOR_LABEL                1039
 #define IDC_TT_ICON                     1040
 #define IDC_DIRCURRENT_LABEL            1041

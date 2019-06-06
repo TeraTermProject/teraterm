@@ -19,8 +19,10 @@
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -32,10 +34,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About TTSSH"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
+    LTEXT           "TTSSH\r\nTera Term Secure Shell extension,\r\nCompatible with SSH protocol version 1.5 and 2.0",IDC_TTSSH_VERSION,6,7,220,24
     ICON            "",IDC_TTSSH_ICON,248,7,20,20
-    LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
-    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2019 TeraTerm Project",IDC_INCLUDES,6,36,262,34
+    LTEXT           "(C) 2004-2019 TeraTerm Project",IDC_TTSSH_RIGHTS,11,32,206,8
+    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp",IDC_INCLUDES,6,45,262,24
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
     LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,175,8
     LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,175,8
@@ -448,7 +450,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_ABOUTDIALOG, DIALOG
     BEGIN
@@ -643,27 +645,23 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_SECURETT            ICON                    "ttsecure.ico"
-
 IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
-
 IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
-
 IDI_DROPDOWN            ICON                    "dropdown.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // AFX_DIALOG_LAYOUT
 //
 
-IDD_SSHAUTH AFX_DIALOG_LAYOUT
+IDD_SSHAUTH AFX_DIALOG_LAYOUT 
 BEGIN
-    0
+    0x0000
 END
 
-IDD_SSHAUTHSETUP AFX_DIALOG_LAYOUT
+IDD_SSHAUTHSETUP AFX_DIALOG_LAYOUT 
 BEGIN
-    0
+    0x0000
 END
 
 #endif    // âpåÍ (ïƒçë) resources
