@@ -66,25 +66,32 @@
       <li>Pageant を用いて認証する場合は「Use Pageant」にチェックをつけ、ユーザ名を入力します。</li>
     </ul>
 
-    <h3 id="username_input">ユーザー名入力</h3>
+    <h3 id="username_input">ユーザ名入力</h3>
 	<p>
 	  このダイアログが表示されたときに
 	  <a href="../menu/setup-sshauth.html#DefaultUserName">設定</a>によってあらかじめ
-	  ユーザー名が入力されます。
+	  ユーザ名が入力されます。
 	</p>
 	<p>
 	  また、
-	  ユーザー名が入力されていた時、または、ユーザー名を入力して入力欄からフォーカスが移動した時、
+	  ユーザ名が入力されていた時、または、ユーザ名を入力して入力欄からフォーカスが移動した時、
 	  <a href="../menu/setup-sshauth.html#CheckAuthListFirst">設定</a>によってサーバーへアクセスします。
 	</p>
 	<p>
-	  ユーザー名の入力欄の横のボタンを押すとオプションを選択できます。
-	  ユーザー名が入力されていない場合は、tabキーでこのボタンにフォーカスが移動します。
-	  ユーザー名が入力されている場合は、tabキーでパスワード / パスフレーズの入力欄に
+	  ユーザ名の入力欄の横のボタンを押すとオプションを選択できます。
+	  ユーザ名が入力されていない場合は、tabキーでこのボタンにフォーカスが移動します。
+	  ユーザ名が入力されている場合は、tabキーでパスワード / パスフレーズの入力欄に
 	  フォーカスが移動します。
 	  <dl>
-		<dt>Paste Windows usename</dt>
-		<dd>Windowsのユーザー名を入力します。</dd>
+		<dt>Use default usename</dt>
+		<dd><a href="../menu/setup-sshauth.html#CheckAuthListFirst">設定</a>のデフォルトユーザ名を入力します。
+		  デフォルトユーザ名を設定していない場合は選択できません。
+		</dd>
+	  </dl>
+
+	  <dl>
+		<dt>Use system usename</dt>
+		<dd>システムのユーザ名を入力します。</dd>
 	  </dl>
 	</p>
 
