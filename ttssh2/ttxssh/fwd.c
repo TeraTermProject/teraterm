@@ -740,16 +740,17 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 	}
 }
 
-// local connectionからのパケットリード(FD_READ)の通知を切り替える
+// local connection(WinSock)からのメッセージ通知を切り替える
 // 
-// notify: TRUE    FD_READを通知する
-//         FALSE   FD_READを通知しない
+// notify: TRUE    メッセージを通知する
+//         FALSE   メッセージを通知しない
 //
+// [目的]
 // remote_windowに空きがない場合は通知オフとし、空きができた場合は
 // 通知を再開する。
-//
 // remote_windowに余裕がない状態で、local connectionからのパケットを
-// 受信し続けると、消費メモリが肥大化するという問題を回避する。
+// 受信し続けると、消費メモリが肥大化する(厳密にはメモリリークではない)
+// という問題を回避する。
 //
 // (2019.6.5 yutaka)
 void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notify)
@@ -762,12 +763,25 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 	channel = pvar->fwd_state.channels + channel_num;
 
 	if (notify) {
+		// メッセージ通知を有効にする
 		ret = WSAAsyncSelect(
 			channel->local_socket,
 			make_accept_wnd(pvar), WM_SOCK_IO,
 			FD_CONNECT | FD_READ | FD_CLOSE | FD_WRITE
 		);
 	} else {
+		/* メッセージ通知を無効にする。
+		   無効後、キューに溜まっているメッセージが送られてくることがあるので注意。
+		   
+		   https://docs.microsoft.com/en-us/windows/desktop/api/winsock/nf-winsock-wsaasyncselect
+           To cancel all notification indicating that Windows Sockets should send no further 
+		   messages related to network events on the socket, lEvent is set to zero.
+
+           Although WSAAsyncSelect immediately disables event message posting for the socket 
+		   in this instance, it is possible that messages could be waiting in the application 
+		   message queue. Therefore, the application must be prepared to receive network 
+		   event messages even after cancellation.
+		 */
 		ret = WSAAsyncSelect(
 			channel->local_socket,
 			make_accept_wnd(pvar), 
@@ -775,7 +789,7 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 	}
 
 	if (ret != 0) {
-		logprintf(LOG_LEVEL_ERROR, "%s: Can not change local channel(%d) notification(%d)",
+		logprintf(LOG_LEVEL_ERROR, "%s: Can not change local channel(%d) WinSock notification(%d).",
 			__FUNCTION__, channel_num, notify);
 	}
 

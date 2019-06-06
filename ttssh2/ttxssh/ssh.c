@@ -231,6 +231,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 }
 
 // remote_windowの空きがない場合に、送れなかったバッファをリスト（入力順）へつないでおく。
+// ここで確保したメモリは ssh2_channel_retry_send_bufchain() で解放する。
 static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen)
 {
 	bufchain_t *p, *old;
@@ -256,14 +257,18 @@ static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned cha
 		old->next = p;
 	}
 
+	// remote_windowの空きがないので、local connectionからのパケット受信の
+	// 停止指示を出す。すぐに通知が止まるわけではない。
 	FWD_suspend_resume_local_connection(pvar, c, FALSE);
 }
 
+// remote_windowの空きができたら、リストに残っているデータを順番に送る。
+// 送信ができたらメモリを解放する。
 static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 {
 	bufchain_t *ch;
 	unsigned int size;
-	int count = 0;
+	bufchain_t* ch_origin = c->bufchain;
 
 	while (c->bufchain) {
 		// 先頭から先に送る
@@ -282,11 +287,11 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 
 		buffer_free(ch->msg);
 		free(ch);
-
-		count++;
 	}
 
-	if (count > 0) {
+	// 元々あったリストが空になったら、
+	// local connectionからのパケット通知を再開する。
+	if (ch_origin && c->bufchain == NULL) {
 		FWD_suspend_resume_local_connection(pvar, c, TRUE);
 	}
 }
