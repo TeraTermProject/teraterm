@@ -2080,33 +2080,34 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 	char tmpbuf[128];
 	int msc_ver, vs_ver, msc_low_ver;
 
-	strcpy(buf, "Microsoft Visual C++ ");
+	strcpy(buf, "Microsoft Visual C++");
 #ifdef _MSC_FULL_VER
-	// VS2015では Compiler version = 19 だが、Visual Studio version = 14 となっているため、
-	// 減算を調整する。
-	// (2015.12.23 yutaka)
+	// _MSC_VER  VS Ver.  VS internal Ver.  MSVC++ Ver.
+	// 1400      2005     8.0               8.0
+	// 1500      2008     9.0               9.0
+	// 1600      2010     10.0              10.0
+	// 1700      2012     11.0              11.0
+	// 1800      2013     12.0              12.0
+	// 1900      2015     14.0              14.0
+	// 1910      2017     15.0              14.10
+	// 1910      2017     15.1              14.10
+	// 1910      2017     15.2              14.10
+	// 1911      2017     15.3.x            14.11
+	// 1911      2017     15.4.x            14.11
+	// 1912      2017     15.5.x            14.12
+	// 1913      2017     15.6.x            14.13
+	// 1914      2017     15.7.x            14.14
+	// 1915      2017     15.8.x            14.15
+	// 1916      2017     15.9.x            14.16
+	// 1920      2019     16.0.x            14.20
+	// 1921      2019     16.1.x            14.21
 	msc_ver = (_MSC_FULL_VER / 10000000);
 	msc_low_ver = (_MSC_FULL_VER / 100000) % 100;
 	if (msc_ver < 19) {
 		vs_ver = msc_ver - 6;
 	}
 	else {
-		// 1900 = VS2015(VC++14)
-		// 1910 = VS2017(VC++15)
-		// 1911 = VS2017 update3-4(VC++15)
-		// 1912 = VS2017 update5(VC++15)
-		// 1913 = VS2017 update6(VC++15)
-		// 1914 = VS2017 15.7(VC++15)
-		// 1920 = VS2019 16.0.0(VC++16)
-		// VS2017 Update3から製品バージョンが3桁表記(15.x.x)になり、
-		// _MSC_FULL_VERから算出できなくなったため、一律で15.0とする。
-		if (msc_low_ver >= 10) {
-			vs_ver = msc_ver - 4 + (msc_low_ver - 10)/10;
-			msc_low_ver = 0;
-		}
-		else {
-			vs_ver = msc_ver - 5;
-		}
+		vs_ver = msc_ver - 5;
 	}
 
 	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
