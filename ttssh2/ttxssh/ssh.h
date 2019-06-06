@@ -881,6 +881,7 @@ typedef struct channel {
 	enum channel_type type;
 	int local_num;
 	bufchain_t *bufchain;
+	unsigned long bufchain_amount;
 	scp_t scp;
 	buffer_t *agent_msg;
 	int agent_request_len;

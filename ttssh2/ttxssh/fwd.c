@@ -792,6 +792,13 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 		logprintf(LOG_LEVEL_ERROR, "%s: Can not change local channel(%d) WinSock notification(%d).",
 			__FUNCTION__, channel_num, notify);
 	}
+	else {
+		logprintf(LOG_LEVEL_NOTICE, 
+			"%s: Local channel#%d WinSock notification has been `%s' for flow control(buffer size %lu).",
+			__FUNCTION__, channel_num, 
+			notify ? "enabled" : "disabled",
+			c->bufchain_amount);
+	}
 
 }
 

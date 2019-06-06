@@ -257,6 +257,9 @@ static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned cha
 		old->next = p;
 	}
 
+	// バッファサイズの合計を更新する(記録用)
+	c->bufchain_amount += buflen;
+
 	// remote_windowの空きがないので、local connectionからのパケット受信の
 	// 停止指示を出す。すぐに通知が止まるわけではない。
 	FWD_suspend_resume_local_connection(pvar, c, FALSE);
@@ -287,6 +290,9 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 
 		buffer_free(ch->msg);
 		free(ch);
+
+		// バッファサイズの合計を更新する(記録用)
+		c->bufchain_amount -= size;
 	}
 
 	// 元々あったリストが空になったら、
