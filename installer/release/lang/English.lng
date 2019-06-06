@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-05)
+; Updated by TeraTerm Project (2019-06-06)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -608,9 +608,9 @@ MSG_PAGEANT_NOKEY=Pageant has no valid key.
 DLG_AUTHSETUP_TITLE=TTSSH: Authentication Setup
 DLG_AUTHSETUP_BANNER=Select defaults for authentication:
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
-DLG_AUTHSETUP_USERNAME=U&se following username
+DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
 DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
-DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=urrent username is "%s"
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=Use p&lain password to log in
 DLG_AUTHSETUP_METHOD_RSA=Use &RSA/DSA/ECDSA/ED25519 key to log in
 DLG_AUTHSETUP_METHOD_RHOST=Use r&hosts to log in (SSH1)

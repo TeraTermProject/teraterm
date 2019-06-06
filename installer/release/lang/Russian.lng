@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-05)
+; Updated by TeraTerm Project (2019-06-06)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -611,9 +611,9 @@ MSG_PAGEANT_NOKEY=Нет действующего ключа к Pageant.
 DLG_AUTHSETUP_TITLE=TTSSH: Настройка аутентификации
 DLG_AUTHSETUP_BANNER=Выбрать по умолчанию:
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
-DLG_AUTHSETUP_USERNAME=U&se following username
+DLG_AUTHSETUP_USERNAME=U&se default username
 DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
-DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=urrent username is "%s"
+DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=&Вход с простым паролем
 DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
 DLG_AUTHSETUP_METHOD_RHOST=&Вход с rhosts (SSH1)
