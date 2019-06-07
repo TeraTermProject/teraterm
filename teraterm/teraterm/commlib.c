@@ -168,7 +168,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	}
 
 	ClearCommError(cv->ComID,&DErr,NULL);
-	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+	//SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+	OutputDebugPrintf("%s: SetupComm was skipped.", __FUNCTION__);
 	/* flush input and output buffers */
 	if (ClearBuff) {
 		PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
