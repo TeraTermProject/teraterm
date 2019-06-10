@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-06)
+; Updated by TeraTerm Project (2019-06-10)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -583,7 +583,7 @@ DLG_AUTH_BANNER2=Требуется аутентификация.
 DLG_AUTH_BANNER2_FAILED=Ошибка аутентификации. Повторите попытку.
 DLG_AUTH_USERNAME=&Имя пользователя:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
-DLG_AUTH_USE_SYSTEM_USERNAME=Use &system username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
 DLG_AUTH_PASSWORD=&Фраза пароля:
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
@@ -612,8 +612,8 @@ DLG_AUTHSETUP_TITLE=TTSSH: Настройка аутентификации
 DLG_AUTHSETUP_BANNER=Выбрать по умолчанию:
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_USERNAME=U&se default username
-DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
-DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=&Вход с простым паролем
 DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
 DLG_AUTHSETUP_METHOD_RHOST=&Вход с rhosts (SSH1)

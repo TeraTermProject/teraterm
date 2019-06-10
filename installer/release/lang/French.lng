@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-06)
+; Updated by TeraTerm Project (2019-06-10)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -583,7 +583,7 @@ DLG_AUTH_BANNER2=Authentification requise.
 DLG_AUTH_BANNER2_FAILED=Authentification échouée. Réessayez.
 DLG_AUTH_USERNAME=&Nom d'utilisateur:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
-DLG_AUTH_USE_SYSTEM_USERNAME=Use &system username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
 DLG_AUTH_PASSWORD=&Phrase secrète:
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
@@ -612,8 +612,8 @@ DLG_AUTHSETUP_TITLE=TTSSH: Configuration de l'authentification
 DLG_AUTHSETUP_BANNER=Configuration par défaut:
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
-DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
-DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=Util. mot de passe pour la conn.
 DLG_AUTHSETUP_METHOD_RSA=Util. clé &RSA/DSA/ECDSA/ED25519 pour conn.
 DLG_AUTHSETUP_METHOD_RHOST=Util. r&hosts pour conn.(SSH1)

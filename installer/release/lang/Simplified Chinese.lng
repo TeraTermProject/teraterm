@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-06)
+; Updated by TeraTerm Project (2019-06-10)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -583,7 +583,7 @@ DLG_AUTH_BANNER2=需要认证。
 DLG_AUTH_BANNER2_FAILED=认证失败，请重试。
 DLG_AUTH_USERNAME=用户名(&N)：
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
-DLG_AUTH_USE_SYSTEM_USERNAME=Use &system username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
 DLG_AUTH_PASSWORD=密码(&P)：
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
@@ -612,8 +612,8 @@ DLG_AUTHSETUP_TITLE=TTSSH：认证设置
 DLG_AUTHSETUP_BANNER=设置默认认证信息：
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
-DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
-DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=使用简单的密码来登录(&L)
 DLG_AUTHSETUP_METHOD_RSA=使用 &RSA/DSA/ECDSA/ED25519 密钥登录
 DLG_AUTHSETUP_METHOD_RHOST=使用 r&hosts 登录(SSH1)

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-06)
+; Updated by TeraTerm Project (2019-06-10)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -583,7 +583,7 @@ DLG_AUTH_BANNER2=Authentifikation notwendig.
 DLG_AUTH_BANNER2_FAILED=Authentifikation fehlgeschlagen. Bitte versuchen Sie es erneut.
 DLG_AUTH_USERNAME=Benutzername:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
-DLG_AUTH_USE_SYSTEM_USERNAME=Use &system username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
 DLG_AUTH_PASSWORD=Passphrase:
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
@@ -612,8 +612,8 @@ DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
 DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
-DLG_AUTHSETUP_SYSTEM_USERNAME=Us&e system username
-DLG_AUTHSETUP_SYSTEM_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)
