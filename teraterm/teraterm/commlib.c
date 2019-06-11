@@ -168,8 +168,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	}
 
 	ClearCommError(cv->ComID,&DErr,NULL);
-	//SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
-	OutputDebugPrintf("%s: SetupComm was skipped.", __FUNCTION__);
+	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+	//OutputDebugPrintf("%s: SetupComm was skipped.", __FUNCTION__);
 	/* flush input and output buffers */
 	if (ClearBuff) {
 		PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
@@ -228,6 +228,9 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 		case IdFlowHard:
 			dcb.fOutxCtsFlow = TRUE;
 			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+			dcb.XonLim = CommXonLim;
+			dcb.XoffLim = CommXoffLim;
+			OutputDebugPrintf("%s: Hardware flow %u %u", __FUNCTION__, dcb.XonLim, dcb.XoffLim);
 			break;
 	}
 
