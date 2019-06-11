@@ -191,10 +191,10 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 
 	*Menu = ::LoadMenu(AfxGetInstanceHandle(),
 	                   MAKEINTRESOURCE(IDR_TEKMENU));
-	EditMenu = GetSubMenu(MainMenu,1);
-	FileMenu = GetSubMenu(MainMenu,0);
-	SetupMenu = GetSubMenu(MainMenu,2);
-	HelpMenu = GetSubMenu(MainMenu,4);
+	FileMenu = GetSubMenu(*Menu,0);
+	EditMenu = GetSubMenu(*Menu,1);
+	SetupMenu = GetSubMenu(*Menu,2);
+	HelpMenu = GetSubMenu(*Menu,4);
 
 	SetDlgMenuTexts(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
 	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
@@ -407,33 +407,33 @@ void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
 	// popup menu
 	if (ControlKey() && (MainMenu==NULL))
 	{
-		TCHAR uimsg[MAX_UIMSG];
+		int i, numItems;
+		char itemText[256];
+
 		InitMenu(&PopupMenu);
-		InitMenuPopup(EditMenu);
-		if (WinMenu!=NULL) {
-			InitMenuPopup(WinMenu);
-		}
+
 		PopupBase = CreatePopupMenu();
-		get_lang_msgT("MENU_CONTROL", uimsg, _countof(uimsg), _T("&File"), ts.UILanguageFile);
-		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT_PTR)GetSubMenu(PopupMenu,0), uimsg);
-		get_lang_msgT("TEKMENU_EDIT", uimsg, _countof(uimsg), _T("&Edit"), ts.UILanguageFile);
-		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT_PTR)EditMenu, uimsg);
-		get_lang_msgT("TEKMENU_SETUP", uimsg, _countof(uimsg), _T("&Setup"), ts.UILanguageFile);
-		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT_PTR)GetSubMenu(PopupMenu,2), uimsg);
-		get_lang_msgT("TEKMENU_VTWIN", uimsg, _countof(uimsg), _T("VT-Wind&ow"), ts.UILanguageFile);
-		AppendMenu(PopupBase, MF_STRING | MF_ENABLED,
-		           ID_TEKVTWIN, uimsg);
-		if (WinMenu!=NULL) {
-			get_lang_msgT("TEKMENU_WINDOW", uimsg, _countof(uimsg), _T("&Window"), ts.UILanguageFile);
-			AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-			           (UINT_PTR)WinMenu, uimsg);
+		numItems = GetMenuItemCount(PopupMenu);
+
+		for (i = 0; i < numItems; i++) {
+			HMENU submenu = GetSubMenu(PopupMenu, i);
+
+			if (submenu != NULL) {
+				InitMenuPopup(submenu);
+			}
+
+			if (GetMenuString(PopupMenu, i, itemText, sizeof(itemText), MF_BYPOSITION) != 0) {
+				int state = GetMenuState(PopupMenu, i, MF_BYPOSITION) &
+				            (MF_CHECKED | MF_DISABLED | MF_GRAYED | MF_HILITE |
+				             MF_MENUBARBREAK | MF_MENUBREAK | MF_SEPARATOR);
+
+				AppendMenu(PopupBase,
+				           submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
+				           submenu != NULL ? (UINT)submenu : GetMenuItemID(PopupMenu, i),
+				           itemText);
+			}
 		}
-		get_lang_msgT("TEKMENU_HELP", uimsg, _countof(uimsg), _T("&Help"), ts.UILanguageFile);
-		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT_PTR)GetSubMenu(PopupMenu,4), uimsg);
+
 		::ClientToScreen(tk.HWin, &p);
 		TrackPopupMenu(PopupBase,TPM_LEFTALIGN | TPM_LEFTBUTTON,
 		               p.x,p.y,0,tk.HWin,NULL);
@@ -443,6 +443,7 @@ void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
 		}
 		DestroyMenu(PopupBase);
 		DestroyMenu(PopupMenu);
+		PopupMenu = 0;
 		return;
 	}
 
