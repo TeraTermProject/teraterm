@@ -2,17 +2,17 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<TITLE>その他 (Tera Term 設定ファイル)</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Miscellaneous (Tera Term setup file)</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </HEAD>
 <BODY>
 
-<h1 id="beep">接続時のビープ音</h1>
+<h1 id="beep">Beep sound on connection</h1>
 
 <p>
-TCP/IP 接続が確立した時とその接続が切れた時にビープ音を鳴らすには、設定ファイルの [Tera Term] セクションの BeepOnConnect 行を以下のように変更してください。
+To enable a beep sound which is made when a TCP/IP connection is established and when the connection is terminated, edit the BeepOnConnect line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -20,59 +20,32 @@ BeepOnConnect=on
 </pre>
 
 <pre>
-省略時:
+Default:
 BeepOnConnect=off
 </pre>
 
 
-<h1 id="IME">IME (日本語入力システム)に関する設定</h1>
+<h1 id="macro">Executing a macro on startup</h1>
 
 <p>
-IME のインライン入力をしないようにするには、設定ファイルの [Tera Term] セクションの IMEInline 行を以下のように変更してください。
-</p>
-<pre>
-IMEInline=off
-</pre>
-
-<pre>
-省略時:
-IMEInline=on
-</pre>
-
-<p>
-IME に関する何らかの不具合のため Tera Term が IME を制御しないようにするには、設定ファイルの [Tera Term] セクションの IME 行を以下のように変更してください。
+A macro can be executed automatically when Tera Term is started. You can specify the macro filename by using the command line option "
+/M=&lt;macro file&gt;" or by editing the StartupMacro line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
-IME=off
+StartupMacro=&lt;macro file&gt;
 </pre>
 
 <pre>
-省略時:
-IME=on
-</pre>
-
-
-<h1 id="macro">起動時にマクロを実行</h1>
-
-<p>
-Tera Term 起動時にマクロを自動的に実行することができます。マクロファイル名はコマンドラインオプション "/M=&lt;マクロファイル名&gt;" を使うか、設定ファイルの [Tera Term] セクションの StartupMacro 行を以下のように変更することによって指定できます。
-</p>
-
-<pre>
-StartupMacro=&lt;マクロファイル名&gt;
-</pre>
-
-<pre>
-省略時:
+Default:
 StartupMacro=
 </pre>
 
 
-<h1 id="UILang">ユーザインタフェースの言語ファイル</h1>
+<h1 id="UILang">User interface language file</h1>
 
 <p>
-ユーザインタフェースのメッセージが含まれたファイルを指定すると、表示される言語を切り換えることができます。
+To switch the display language, specify user interface language file that includes the message.
 </p>
 
 <pre>
@@ -80,15 +53,15 @@ UILanguageFile=lang\Japanese.lng
 </pre>
 
 <pre>
-省略時:
+Default:
 UILanguageFile=
 </pre>
 
 
-<h1 id="broadcast">ブロードキャストコマンドの履歴の保存数</h1>
+<h1 id="broadcast">Number for the history of broadcast command</h1>
 
 <p>
-ブロードキャストコマンドの履歴の保存数を設定をしたい場合、MaxBroadcatHistory エントリを設定します。以下に例を示します。
+If you configure the number for the history of broadcast command, you need to set up MaxBroadcatHistory entry in the 'teraterm.ini' file. See example of this value below.
 </p>
 
 <pre>
@@ -96,19 +69,19 @@ MaxBroadcatHistory=200
 </pre>
 
 <pre>
-省略時:
+Default:
 MaxBroadcatHistory=99
 </pre>
 
 
-<h1 id="mousewheel">アプリケーションカーソルモード時のマウスホイールの動作</h1>
+<h1 id="mousewheel">Mouse wheel action in application cursor mode</h1>
 
 <p>
-マウスのホイールを回転させた時は通常はスクロールバーが上下しますが、アプリケーションカーソルモード(viやless等を起動すると通常はこのモードになります)時にはスクロールバーは動かさず、かわりに上または下カーソルキーのシーケンスを送信します。
+Basically, Tera Term window scrolls up and scrolls down when a user rotates the mouse wheel. However, Tera Term would send key sequences of up and down cursor when the application cursor mode is enabled by starting vi or less command.
 </p>
 
 <p>
-この機能を無効にしてアプリケーションカーソルモードでもマウスホイールの回転でスクロールバーを動かしたい場合は、設定ファイルの [Tera Term] セクションの TranslateWheelToCursor 行を以下のように変更してください。
+To disable this feature, edit the TranslateWheelToCursor line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -116,7 +89,7 @@ TranslateWheelToCursor=off
 </pre>
 
 <p>
-また、コントロールキーを押している間のみこの機能を無効にしたい場合は、設定ファイルの [Tera Term] セクションの DisableWheelToCursorByCtrl 行を以下のように変更してください。
+If a user wants to disable this feature while pushing the control key, edit the DisableWheelToCursorByCtrl line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -124,17 +97,17 @@ DisableWheelToCursorByCtrl=on
 </pre>
 
 <pre>
-省略時:
+Default:
 TranslateWheelToCursor=on
 DisableWheelToCursorByCtrl=on
 </pre>
 
 
-<h1 id="hostdlg">起動時の "New Connection" ダイアログの表示</h1>
+<h1 id="hostdlg">Showing "New Connection" dialog on startup</h1>
 
 <p>
-Tera Term はポートの種類が TCP/IP の場合、起動時に "New Connection" ダイアログを表示します。(Serialの場合には表示しません)<br>
-これを表示したくない場合は、設定ファイルの [Tera Term] セクションの HostDialogOnStartup 行を以下のように変更してください。
+Tera Term shows "New Connection" dialog on startup when the port type is TCP/IP. (The dialog is not shown when the port type is Serial). <br>
+If you do not want to show this dialog, please change HostDialogOnStartup entry of [Tera Term] section as follows.
 </p>
 
 <pre>
@@ -142,15 +115,15 @@ HostDialogOnStartup=off
 </pre>
 
 <pre>
-省略時:
+Default:
 HostDialogOnStartup=on
 </pre>
 
 
-<h1 id="DisablePasteMouseMButton">マウスの中ボタンによる貼り付けを有効にする</h1>
+<h1 id="DisablePasteMouseMButton">Enable paste by clicking the middle button of mouse</h1>
 
 <p>
-中ボタンをクリックしたときに貼り付けを有効にするには、設定ファイルの [Tera Term] セクションの DisablePasteMouseMButton 行を以下のように変更してください。
+In order to enable paste by clicking the middle button of mouse, change the DisablePasteMouseMButton line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -158,15 +131,15 @@ DisablePasteMouseMButton=off
 </pre>
 
 <pre>
-省略時:
+Default:
 DisablePasteMouseMButton=on
 </pre>
 
 
-<h1 id="DisableMenuNewConnection">メニューの New connection を無効にする</h1>
+<h1 id="DisableMenuNewConnection">Disable "New connection" menu</h1>
 
 <p>
-メニューの "New connection" を無効にするには、設定ファイルの [Tera Term] セクションの DisableMenuNewConnection 行を以下のように変更してください。
+In order to disable "New connection" menu, change the DisableMenuNewConnection line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -174,15 +147,15 @@ DisableMenuNewConnection=on
 </pre>
 
 <pre>
-省略時:
+Default:
 DisableMenuNewConnection=off
 </pre>
 
 
-<h1 id="DisableMenuDuplicateSession">メニューの Duplicate session を無効にする</h1>
+<h1 id="DisableMenuDuplicateSession">Disable "Duplicate session" menu</h1>
 
 <p>
-メニューの "Duplicate session" を無効にするには、設定ファイルの [Tera Term] セクションの DisableMenuDuplicateSession 行を以下のように変更してください。
+In order to disable "Duplicate session" menu, change the DisableMenuDuplicateSession line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -190,15 +163,15 @@ DisableMenuDuplicateSession=on
 </pre>
 
 <pre>
-省略時:
+Default:
 DisableMenuDuplicateSession=off
 </pre>
 
 
-<h1 id="DisableMenuSendBreak">メニューの Send break を無効にする</h1>
+<h1 id="DisableMenuSendBreak">Disable "Send break" menu</h1>
 
 <p>
-メニューの "Send break" を無効にするには、設定ファイルの [Tera Term] セクションの DisableMenuSendBreak 行を以下のように変更してください。
+In order to disable "Send break" menu, change the DisableMenuSendBreak line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -206,15 +179,15 @@ DisableMenuSendBreak=on
 </pre>
 
 <pre>
-省略時:
+Default:
 DisableMenuSendBreak=off
 </pre>
 
 
-<h1 id="ClearScreenOnCloseConnection">切断時に画面をクリアする</h1>
+<h1 id="ClearScreenOnCloseConnection">Clear the screen when disconnected</h1>
 
 <p>
-切断時に画面をクリアするには、設定ファイルの [Tera Term] セクションの ClearScreenOnCloseConnection 行を以下のように変更してください。
+In order to clear the screen, change the ClearScreenOnCloseConnection line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -222,15 +195,15 @@ ClearScreenOnCloseConnection=on
 </pre>
 
 <pre>
-省略時:
+Default:
 ClearScreenOnCloseConnection=off
 </pre>
 
 
-<h1 id="AcceleratorNewConnection">New Connection のアクセラレータキーを無効にする</h1>
+<h1 id="AcceleratorNewConnection">Disable accelerator key of New Connection</h1>
 
 <p>
-New Connection のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの AcceleratorNewConnection 行を以下のように変更してください。
+In order to disable accelerator key of "New Connection", change the AcceleratorNewConnection line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -238,15 +211,15 @@ AcceleratorNewConnection=off
 </pre>
 
 <pre>
-省略時:
+Default:
 AcceleratorNewConnection=on
 </pre>
 
 
-<h1 id="DisableAcceleratorDuplicateSession">Duplicate session のアクセラレータキーを無効にする</h1>
+<h1 id="DisableAcceleratorDuplicateSession">Disable accelerator key of Duplicate session</h1>
 
 <p>
-Duplicate session のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの DisableAcceleratorDuplicateSession 行を以下のように変更してください。
+In order to disable accelerator key of "Duplicate session", change the DisableAcceleratorDuplicateSession line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -254,15 +227,15 @@ DisableAcceleratorDuplicateSession=on
 </pre>
 
 <pre>
-省略時:
+Default:
 DisableAcceleratorDuplicateSession=off
 </pre>
 
 
-<h1 id="AcceleratorCygwinConnection">Cygwin connection のアクセラレータキーを無効にする</h1>
+<h1 id="AcceleratorCygwinConnection">Disable accelerator key of Cygwin connection</h1>
 
 <p>
-Cygwin connection のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの AcceleratorCygwinConnection 行を以下のように変更してください。
+In order to disable accelerator key of "Cygwin connection", change the AcceleratorCygwinConnection line at [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -270,16 +243,16 @@ AcceleratorCygwinConnection=off
 </pre>
 
 <pre>
-省略時:
+Default:
 AcceleratorCygwinConnection=on
 </pre>
 
 
-<h1 id="ClickableUrlBrowser">クリッカブル URL で起動するブラウザ</h1>
+<h1 id="ClickableUrlBrowser">A browser by using Clickable URL</h1>
 
 <p>
-URL クリックが有効な場合、通常は URL のスキームに OS で関連付けられたプログラムが起動します。<br>
-起動するブラウザと引数を指定するには、設定ファイルの [Tera Term] セクションの ClickableUrlBrowser 行と ClickableUrlBrowserArg 行を以下のように変更してください。
+When the clickable URL is enabled, the default browser will be launched.<br>
+If a user can specify the browser and the argument, change the ClickableUrlBrowser and the ClickableUrlBrowserArg entries at [Tera Term] section in the following:
 </p>
 
 <pre>
@@ -297,17 +270,20 @@ ClickableUrlBrowserArg=
 </pre>
 
 <pre>
-省略時:
+Default:
 ClickableUrlBrowser=
 ClickableUrlBrowserArg=
 </pre>
 
 
-<h1 id="JoinSplitURL">改行している URL を継続したものとして扱う</h1>
+<h1 id="JoinSplitURL">URL string concatenated of split line</h1>
 
 <p>
-端末の右端から次の行に URL が続いている場合、通常は継続した URL として扱われる。しかし、特定の環境では端末の右端で改行を送信するので、URL が次の行に継続したものとして扱われない。<br>
-改行で分割された URL を継続したものとして扱うには、設定ファイルの [Tera Term] セクションの JoinSplitURL を以下のように変更してください。
+When the end of URL string continues to the next line, basically the whole string is recognized as a URL string.
+However, when the carriage return is inserted into the URL string by the end of a line, the whole string 
+can not work well.<br>
+The URL string split by a carriage return can work well to configure the JoinSplitURL entry of the 
+[Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -315,8 +291,11 @@ JoinSplitURL=on
 </pre>
 
 <p>
-emacs 等では、ある行が次の行に継続された場合に行末に継続を表す記号を表示する。この記号が URL の一部とみなされると不都合な場合があるので、Tera Term は行末の記号を無視することができる。<br>
-行末の記号を無視しないようにするには、設定ファイルの [Tera Term] セクションの JoinSplitURLIgnoreEOLChar を以下のように変更してください。
+By using the emacs editor, a special character will be displayed at the end of the line when 
+the line continues to next line. If this character is recognized with a part of URL string,
+the whole string can not work well with the URL format. <br>
+So, Tera Term can ignore the special character to configure the JoinSplitURLIgnoreEOLChar entry
+of the [Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -324,8 +303,9 @@ JoinSplitURLIgnoreEOLChar=
 </pre>
 
 <p>
-また、emacs では継続した行の行末に表示する記号を変更することができる。<br>
-無視する行末の記号を変更するには、設定ファイルの [Tera Term] セクションの JoinSplitURLIgnoreEOLChar を以下のように変更してください。
+Also, the emacs editor can change the special character to other character.<br>
+When the character is changed, a user configures the JoinSplitURLIgnoreEOLChar entry
+of the [Tera Term] section in the following:
 </p>
 
 <pre>
@@ -333,17 +313,17 @@ JoinSplitURLIgnoreEOLChar=|
 </pre>
 
 <pre>
-省略時:
+Default:
 JoinSplitURL=off
 JoinSplitURLIgnoreEOLChar=\
 </pre>
 
 
-<h1 id="LogLockExclusive">ログファイルを排他ロックする</h1>
+<h1 id="LogLockExclusive">Exclusive-lock log file</h1>
 
 <p>
-Tera Term はログファイルを書き込むために開くとき排他ロックをかけます。これは複数のプロセスから同じログファイルに書き込みをしないためで、同時に同じファイルを開こうとすると失敗します。<br>
-何らかの理由で同じログファイルに同時に書き込みたい場合や、書き込み中のログファイルを別のエディタで開く妨げになる場合のために、排他ロックをせずにログファイルを開くことができます。
+When a log file is opened in written mode, the file will be locked exclusively. So, the log file can not be opened by multiple processes.<br>
+When this option is disabled, a user can open a log file while Tera Term is opening the file.
 </p>
 
 <pre>
@@ -351,16 +331,16 @@ LogLockExclusive=off
 </pre>
 
 <pre>
-省略時:
+Default:
 LogLockExclusive=on
 </pre>
 
 
-<h1 id="DeferredLogWriteMode">ログファイルを遅延書き込みする</h1>
+<h1 id="DeferredLogWriteMode">Deferred log write mode</h1>
 
 <p>
-ログファイルの書き込みを別スレッドで行うことで、ネットワークドライブ上にログファイルを採取しても、
-Tera Termの動作が遅くならないようにします。
+The log file is written on the thread procedure to avoid Tera Term slows down 
+when the log file is recorded on the network drive.
 </p>
 
 <pre>
@@ -368,53 +348,53 @@ DeferredLogWriteMode=off
 </pre>
 
 <pre>
-省略時:
+Default:
 DeferredLogWriteMode=on
 </pre>
 
 
-<h1 id="LogTimestampFormat">ログの行頭に追加するタイムスタンプのフォーマットを指定する</h1>
+<h1 id="LogTimestampFormat">Specify timestamp format at the start of log file's line</h1>
 
 <p>
-Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができますが、タイムスタンプのフォーマットを指定することができます。
+When the log file is written, the timestamp can be added at the start of line and the timestamp format can be specified.
 </p>
 
 <pre>
-書式
-%a      曜日の省略形。
-%b      月の省略形。
-%d      10 進数で表す月の日付 (01 ～ 31)。
-%e      10 進数で表す月の日付 ( 1 ～ 31)。
-%H      24 時間表記の時間 (00 ～ 23)。
-%N      10 進数で表すミリ秒 (000 ～ 999)。
-%m      10 進数で表す月 (01 ～ 12)。
-%M      10 進数で表す分 (00 ～ 59)。
-%S      10 進数で表す秒 (00 ～ 59)。
-%w      10 進数で表す曜日 (0 ～ 6、日曜日が 0)。
-%Y      10 進数で表す 4 桁の西暦。
-%%      パーセント記号。
+SYNOPSIS:
+%a      Abbreviated weekday name
+%b      Abbreviated month name
+%d      Day of month as decimal number (01 - 31)
+%e      Day of month as decimal number ( 1 - 31)
+%H      Hour in 24-hour format (00 - 23)
+%N      Milisecond as decimal number (000 - 999)
+%m      Month as decimal number (01 - 12)
+%M      Minute as decimal number (00 -  59)
+%S      Second as decimal number (00 - 59)
+%w      Weekday as decimal number (0 - 6; Sunday is 0)
+%Y      Year with century, as decimal number
+%%      Percent sign
 </pre>
 
 <pre>
-例:
+Example:
 ; Sun Jun  4 21:12:40.123 2017
 LogTimestampFormat=%a %b %e %H:%M:%S.%N %Y
 </pre>
 
 <pre>
-省略時:
+Default:
 ; 2017-06-04 21:12:40.123
 LogTimestampFormat=%Y-%m-%d %H:%M:%S.%N
 </pre>
 
 
-<h1 id="LogTimestampUTC">ログの行頭に追加するタイムスタンプの時刻にUTCを使用する</h1>
+<h1 id="LogTimestampUTC">UTC is used as timestamp at the start of log file's line</h1>
 
 <p>
-Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができますが、通常はローカル日時を使用します。<br>
-夏時間に対応したローカル日時を使用していると、夏時間の切り替えタイミングに時刻が進む（または戻る）ために意図しない時刻が記録されることがあります。<br>
-UTC の日時には夏時間がないため、この問題を回避することができます。<br>
-ローカル日時のかわりに UTC の日時を使用する場合は、設定ファイルの [Tera Term] セクションの LogTimestampUTC 行を以下のように変更してください。
+When the log file is written, the timestamp can be added at the start of log file's line. Basically, local time is used. <br>
+When local time is used for summer time, the clock will go or back at summer time switching. So, unexpected clock will be recorded. <br>
+Fortunately, this problem can be avoided because UTC timestamp does not support summer time. <br>
+If UTC timestamp is used instead of local time, change the LogTimestampUTC entry of [Tera Term] section in the following:
 </p>
 
 <pre>
@@ -422,40 +402,30 @@ LogTimestampUTC=on
 </pre>
 
 <pre>
-省略時:
+Default:
 LogTimestampUTC=off
 </pre>
 
-<h1 id="HighDPI">高DPI対応(High DPI Aware)</h1>
-
+<h1 id="HighDPI">High DPI Aware</h1>
 <p>
-試験的に高DPIに対応しました。<br>
-
-teraterm.iniの[Tera Term]セクションにDPIAware=onとすると、
-Per monitor DPI Aware アプリケーションとして動作します。<br>
-この設定を行わないと、従来と同様 DPI Unaware アプリケーションとして動作します。<br>
-将来的にはこの設定を参照せず、自動で高DPI対応となる予定です。<br>
+The High DPI feature is experimentally supported. Tera Term works as the Per-monitor DPI Aware application when "DPIAware=on" entry is set at [Tera Term] section of the setup file like the following:
+</p>
 
 <pre>
 DPIAware=on
 </pre>
 
 <p>
-<a href="../menu/setup-font.html">フォント</a>はTrue Type
-Fontを選択しておくとスケーリング結果がスムーズになります。
+Without the entry, Tera Term works as the DPI Unaware application as before. In the future release, it may automatically work as the Per-monitor DPI Aware application and, may ignore "DPIAware=on" entry.
 </p>
-
 <p>
-高DPI対応にはいくつかの種類があります。詳しくは<a href="https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-desktop-application-development-on-windows#dpi-awareness-mode">High DPI Desktop Application Development on WindowsのDPI AwarenessMode</a>を参照ください。<br>
+Scaling results become smooth when you choose a TrueType font for the <a href="../menu/setup-font.html">Font</a>.
 </p>
-
 <p>
-Tera Term は Windows 10 Version 1703から使用可能な Per-monitor DPI
-awareness V2 の機能を利用します。<br>
-Per-monitor DPI awareness V2について詳しくは、
-<a href="https://blogs.windows.com/buildingapps/2017/04/04/high-dpi-scaling-improvements-desktop-applications-windows-10-creators-update/">High-DPI
-Scaling Improvements for Desktop Applications in the Windows 10
-Creators Update (1703)</a>を参照ください。
+High DPI aware has some modes. For more reference, see the DPI AwarenessMode section on the <a href="https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-desktop-application-development-on-windows#dpi-awareness-mode">High DPI Desktop Application Development on Windows DPI AwarenessMode</a>.
+</p>
+<p>
+Tera Term is using the Per-monitor DPI awareness V2 feature that is supported on the Windows 10 Version 1703 or later. For more details of the Per-monitor DPI awareness V2, see the <a href="https://blogs.windows.com/buildingapps/2017/04/04/high-dpi-scaling-improvements-desktop-applications-windows-10-creators-update/"> High-DPI Scaling Improvements for Desktop Applications in the Windows 10 Creators Update (1703)</a>.
 </p>
 
 </BODY>
