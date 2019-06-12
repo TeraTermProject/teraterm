@@ -827,7 +827,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				memset(szFile, 0, sizeof(szFile));
 				ofn.lStructSize = get_OPENFILENAME_SIZEA();
 				ofn.hwndOwner = GetSafeHwnd();
-				ofn.lpstrFilter = "Image Files(*.jpg;*.jpeg;*.bmp)\\0*.jpg;*.jpeg;*.bmp\\0All Files(*.*)\\0*.*\\0\\0";
+				ofn.lpstrFilter = "Image Files(*.jpg;*.jpeg;*.bmp)\0*.jpg;*.jpeg;*.bmp\0All Files(*.*)\0*.*\0";
 				ofn.lpstrFile = szFile;
 				ofn.nMaxFile = _countof(szFile);
 				ofn.lpstrTitle = "select image file";
