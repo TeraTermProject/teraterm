@@ -35,6 +35,11 @@ See LICENSE.TXT for the license.
 #ifndef __FWD_H
 #define __FWD_H
 
+// ポート転送におけるフロー制御の閾値
+// 適用先 Channel_t.bufchain_amount
+#define FWD_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
+#define FWD_LOW_WATER_MARK (0)  // 0MB
+
 #define FWD_REMOTE_CONNECTED  0x01
 #define FWD_LOCAL_CONNECTED   0x02
 #define FWD_BOTH_CONNECTED    (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)

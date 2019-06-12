@@ -679,8 +679,20 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 
 	while (channel->local_socket != INVALID_SOCKET) {
 		char buf[CHANNEL_READ_BUF_SIZE];
-		int amount = recv(channel->local_socket, buf, sizeof(buf), 0);
+		int amount;
 		int err;
+
+		// recvの一時停止中ならば、何もせずに戻る。
+		if (SSHv2(pvar)) {
+			Channel_t* c = ssh2_local_channel_lookup(channel_num);
+			if (c->bufchain_recv_suspended) {
+				logprintf(LOG_LEVEL_NOTICE, "%s: channel=%d recv was skipped for flow control",
+					__FUNCTION__, channel_num);
+				return;
+			}
+		}
+
+		amount = recv(channel->local_socket, buf, sizeof(buf), 0);
 
 		// Xサーバからのデータ受信があれば、ノンブロッキングモードでソケット受信を行い、
 		// SSHサーバのXアプリケーションへ送信する。
@@ -740,10 +752,10 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 	}
 }
 
-// local connection(WinSock)からのメッセージ通知を切り替える
+// local connectionの受信の停止および再開の判断を行う
 // 
-// notify: TRUE    メッセージを通知する
-//         FALSE   メッセージを通知しない
+// notify: TRUE    recvを再開する
+//         FALSE   recvを停止する
 //
 // [目的]
 // remote_windowに空きがない場合は通知オフとし、空きができた場合は
@@ -757,48 +769,42 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 {
 	int channel_num;
 	FWDChannel* channel;
-	int ret;
+	int changed = 0;
 
 	channel_num = c->local_num;
 	channel = pvar->fwd_state.channels + channel_num;
 
 	if (notify) {
-		// メッセージ通知を有効にする
-		ret = WSAAsyncSelect(
-			channel->local_socket,
-			make_accept_wnd(pvar), WM_SOCK_IO,
-			FD_CONNECT | FD_READ | FD_CLOSE | FD_WRITE
-		);
+		// recvを再開するか判断する
+		if (c->bufchain_amount <= FWD_LOW_WATER_MARK) {
+			// 下限を下回ったので再開
+			c->bufchain_recv_suspended = FALSE;
+
+			// ここで再開のメッセージを飛ばす
+			PostMessage(pvar->fwd_state.accept_wnd, WM_SOCK_IO, 
+				(WPARAM)channel->local_socket,
+				MAKEWPARAM(FD_READ, 0)
+				);
+
+			changed = 1;
+		}
+
 	} else {
-		/* メッセージ通知を無効にする。
-		   無効後、キューに溜まっているメッセージが送られてくることがあるので注意。
-		   
-		   https://docs.microsoft.com/en-us/windows/desktop/api/winsock/nf-winsock-wsaasyncselect
-           To cancel all notification indicating that Windows Sockets should send no further 
-		   messages related to network events on the socket, lEvent is set to zero.
-
-           Although WSAAsyncSelect immediately disables event message posting for the socket 
-		   in this instance, it is possible that messages could be waiting in the application 
-		   message queue. Therefore, the application must be prepared to receive network 
-		   event messages even after cancellation.
-		 */
-		ret = WSAAsyncSelect(
-			channel->local_socket,
-			make_accept_wnd(pvar), 
-			0, 0);
+		// recvを停止するか判断する
+		if (c->bufchain_amount >= FWD_HIGH_WATER_MARK) {
+			// 上限を超えたので停止
+			c->bufchain_recv_suspended = TRUE;
+			changed = 1;
+		}
 	}
 
-	if (ret != 0) {
-		logprintf(LOG_LEVEL_ERROR, "%s: Can not change local channel(%d) WinSock notification(%d).",
-			__FUNCTION__, channel_num, notify);
-	}
-	else {
-		logprintf(LOG_LEVEL_NOTICE, 
-			"%s: Local channel#%d WinSock notification has been `%s' for flow control(buffer size %lu).",
-			__FUNCTION__, channel_num, 
-			notify ? "enabled" : "disabled",
-			c->bufchain_amount);
-	}
+	logprintf(LOG_LEVEL_NOTICE, 
+		"%s: Local channel#%d recv has been `%s' for flow control(buffer size %lu, recv %s).",
+		__FUNCTION__, channel_num, 
+		c->bufchain_recv_suspended ? "disabled" : "enabled",
+		c->bufchain_amount,
+		changed ? "changed" : ""
+		);
 
 }
 

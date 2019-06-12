@@ -213,6 +213,8 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 	c->type = type;
 	c->local_num = local_num;  // alloc_channel()の返値を保存しておく
 	c->bufchain = NULL;
+	c->bufchain_amount = 0;
+	c->bufchain_recv_suspended = FALSE;
 	if (type == TYPE_SCP) {
 		c->scp.state = SCP_INIT;
 		c->scp.progress_window = NULL;
@@ -390,7 +392,7 @@ static Channel_t *ssh2_channel_lookup(int id)
 // SSH1で管理しているchannel構造体から、SSH2向けのChannel_tへ変換する。
 // TODO: 将来的にはチャネル構造体は1つに統合する。
 // (2005.6.12 yutaka)
-static Channel_t *ssh2_local_channel_lookup(int local_num)
+Channel_t *ssh2_local_channel_lookup(int local_num)
 {
 	int i;
 	Channel_t *c;
