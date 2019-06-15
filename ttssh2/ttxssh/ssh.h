@@ -881,6 +881,8 @@ typedef struct channel {
 	enum channel_type type;
 	int local_num;
 	bufchain_t *bufchain;
+	unsigned long bufchain_amount;
+	BOOL bufchain_recv_suspended;
 	scp_t scp;
 	buffer_t *agent_msg;
 	int agent_request_len;
@@ -892,6 +894,7 @@ typedef struct channel {
 unsigned char *begin_send_packet(PTInstVar pvar, int type, int len);
 void finish_send_packet_special(PTInstVar pvar, int skip_compress);
 void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry);
+Channel_t* ssh2_local_channel_lookup(int local_num);
 
 #define finish_send_packet(pvar) finish_send_packet_special((pvar), 0)
 #define get_payload_uint32(pvar, offset) get_uint32_MSBfirst((pvar)->ssh_state.payload + (offset))

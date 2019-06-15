@@ -679,8 +679,20 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 
 	while (channel->local_socket != INVALID_SOCKET) {
 		char buf[CHANNEL_READ_BUF_SIZE];
-		int amount = recv(channel->local_socket, buf, sizeof(buf), 0);
+		int amount;
 		int err;
+
+		// recvの一時停止中ならば、何もせずに戻る。
+		if (SSHv2(pvar)) {
+			Channel_t* c = ssh2_local_channel_lookup(channel_num);
+			if (c->bufchain_recv_suspended) {
+				logprintf(LOG_LEVEL_NOTICE, "%s: channel=%d recv was skipped for flow control",
+					__FUNCTION__, channel_num);
+				return;
+			}
+		}
+
+		amount = recv(channel->local_socket, buf, sizeof(buf), 0);
 
 		// Xサーバからのデータ受信があれば、ノンブロッキングモードでソケット受信を行い、
 		// SSHサーバのXアプリケーションへ送信する。
@@ -739,6 +751,63 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 		}
 	}
 }
+
+// local connectionの受信の停止および再開の判断を行う
+// 
+// notify: TRUE    recvを再開する
+//         FALSE   recvを停止する
+//
+// [目的]
+// remote_windowに空きがない場合は通知オフとし、空きができた場合は
+// 通知を再開する。
+// remote_windowに余裕がない状態で、local connectionからのパケットを
+// 受信し続けると、消費メモリが肥大化する(厳密にはメモリリークではない)
+// という問題を回避する。
+//
+// (2019.6.5 yutaka)
+void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notify)
+{
+	int channel_num;
+	FWDChannel* channel;
+	int changed = 0;
+
+	channel_num = c->local_num;
+	channel = pvar->fwd_state.channels + channel_num;
+
+	if (notify) {
+		// recvを再開するか判断する
+		if (c->bufchain_amount <= FWD_LOW_WATER_MARK) {
+			// 下限を下回ったので再開
+			c->bufchain_recv_suspended = FALSE;
+
+			// ここで再開のメッセージを飛ばす
+			PostMessage(pvar->fwd_state.accept_wnd, WM_SOCK_IO, 
+				(WPARAM)channel->local_socket,
+				MAKEWPARAM(FD_READ, 0)
+				);
+
+			changed = 1;
+		}
+
+	} else {
+		// recvを停止するか判断する
+		if (c->bufchain_amount >= FWD_HIGH_WATER_MARK) {
+			// 上限を超えたので停止
+			c->bufchain_recv_suspended = TRUE;
+			changed = 1;
+		}
+	}
+
+	logprintf(LOG_LEVEL_NOTICE, 
+		"%s: Local channel#%d recv has been `%s' for flow control(buffer size %lu, recv %s).",
+		__FUNCTION__, channel_num, 
+		c->bufchain_recv_suspended ? "disabled" : "enabled",
+		c->bufchain_amount,
+		changed ? "changed" : ""
+		);
+
+}
+
 
 static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
