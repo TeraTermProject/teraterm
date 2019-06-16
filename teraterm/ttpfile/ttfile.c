@@ -521,7 +521,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	switch (FuncId) {
 	case GTF_LOG:
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER;
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&LogFnHook);
@@ -530,7 +530,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 		break;
 	case GTF_SEND:
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER;
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
@@ -742,7 +742,7 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	ofn.Flags |= OFN_SHOWHELP;
 	ofn.lCustData = 0;
 	if (FuncId==GMF_Z) {
-		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER;
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 		ofn.lCustData = (DWORD)Option;
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
@@ -1180,7 +1180,7 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 	else {
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 	}
-	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER;
+	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.Flags |= OFN_SHOWHELP;
 	ofn.lCustData = (DWORD)&opt;
 	ofn.lpstrTitle = fv->DlgCaption;
