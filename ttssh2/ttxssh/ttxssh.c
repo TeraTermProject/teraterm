@@ -4501,8 +4501,6 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			FILE *fp;
 			char comment[1024]; // comment string in private key
 
-			arc4random_stir();
-
 			// saving file dialog
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = get_OPENFILENAME_SIZE();
