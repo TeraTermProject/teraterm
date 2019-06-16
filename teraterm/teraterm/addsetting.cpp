@@ -510,7 +510,7 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				get_lang_msg("FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", uimsg, sizeof(uimsg),
 				             "Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
 				ofn.lpstrTitle = uimsg;
-				ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_FORCESHOWHIDDEN | OFN_HIDEREADONLY;
+				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 				if (GetOpenFileNameA(&ofn) != 0) {
 					SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
 				}
@@ -1201,7 +1201,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_TITLE", uimsg, sizeof(uimsg),
 				             "Choose a executing file with launching logging file", ts.UILanguageFile);
 				ofn.lpstrTitle = uimsg;
-				ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_FORCESHOWHIDDEN | OFN_HIDEREADONLY;
+				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 				if (GetOpenFileNameA(&ofn) != 0) {
 					SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 				}

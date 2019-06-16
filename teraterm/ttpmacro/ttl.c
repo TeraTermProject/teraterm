@@ -1573,10 +1573,11 @@ WORD TTLFilenameBox()
 		}
 		BringupWindow(HMainWin);
 		if (SaveFlag) {
-			ofn.Flags = OFN_OVERWRITEPROMPT;
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 			ret = GetSaveFileName(&ofn);
 		}
 		else {
+			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 			ret = GetOpenFileName(&ofn);
 		}
 		SetResult(ret);

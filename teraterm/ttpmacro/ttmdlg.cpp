@@ -183,11 +183,12 @@ BOOL GetFileName(HWND HWin)
 
 	// sizeof(OPENFILENAME) では Windows98/NT で終了してしまうため (2006.8.14 maya)
 	FNameRec.lStructSize = get_OPENFILENAME_SIZE();
-	FNameRec.hwndOwner	 = HWin;
-	FNameRec.lpstrFilter	 = FNFilter;
-	FNameRec.nFilterIndex  = 1;
-	FNameRec.lpstrFile  = FileName;
-	FNameRec.nMaxFile  = sizeof(FileName);
+	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	FNameRec.hwndOwner = HWin;
+	FNameRec.lpstrFilter = FNFilter;
+	FNameRec.nFilterIndex = 1;
+	FNameRec.lpstrFile = FileName;
+	FNameRec.nMaxFile = sizeof(FileName);
 	// 以前読み込んだ .ttl ファイルのパスを記憶できるように、初期ディレクトリを固定にしない。
 	// (2008.4.7 yutaka)
 #if 0

@@ -494,8 +494,7 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_TITLE", pvar,
 	                  "Choose a file with the RSA/DSA/ECDSA/ED25519 private key");
 	params.lpstrTitle = pvar->ts->UIMsg;
-	params.Flags =
-		OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
+	params.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
 
 	if (GetOpenFileName(&params) != 0) {
