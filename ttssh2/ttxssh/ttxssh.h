@@ -90,8 +90,8 @@ typedef struct _TInstVar *PTInstVar;
 #include "tttypes.h"
 #include "ttplugin.h"
 
-#if defined(_MSC_VER) && _MSC_VER < 1910
-// 2017–¢–ž‚Ì‚Æ‚«‚Í–³Œø‚Æ‚·‚é
+#if defined(_MSC_VER) && !defined(_Printf_format_string_)
+// ’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í‰½‚à‚µ‚È‚¢‚æ‚¤‚É’è‹`‚µ‚Ä‚¨‚­
 #define _Printf_format_string_
 #endif
 
