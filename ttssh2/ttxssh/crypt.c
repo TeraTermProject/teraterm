@@ -308,11 +308,11 @@ err:
 	return FALSE;
 }
 
-static void no_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void no_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 }
 
-static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	unsigned char *newbuff;
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
@@ -348,7 +348,7 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	}
 }
 
-static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	unsigned char *newbuff;
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
@@ -384,7 +384,7 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	}
 }
 
-static void c3DES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void c3DES_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	Cipher3DESState *encryptstate = &pvar->crypt_state.enc.c3DES;
 
@@ -396,7 +396,7 @@ static void c3DES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	                 &encryptstate->k3, &encryptstate->ivec3, DES_ENCRYPT);
 }
 
-static void c3DES_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void c3DES_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	Cipher3DESState *decryptstate = &pvar->crypt_state.dec.c3DES;
 
@@ -408,7 +408,7 @@ static void c3DES_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	                 &decryptstate->k1, &decryptstate->ivec1, DES_DECRYPT);
 }
 
-static void cDES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void cDES_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	CipherDESState *encryptstate = &pvar->crypt_state.enc.cDES;
 
@@ -416,7 +416,7 @@ static void cDES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	                 &encryptstate->k, &encryptstate->ivec, DES_ENCRYPT);
 }
 
-static void cDES_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void cDES_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	CipherDESState *decryptstate = &pvar->crypt_state.dec.cDES;
 
@@ -424,7 +424,7 @@ static void cDES_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	                 &decryptstate->k, &decryptstate->ivec, DES_DECRYPT);
 }
 
-static void flip_endianness(unsigned char *cbuf, int bytes)
+static void flip_endianness(unsigned char *cbuf, unsigned int bytes)
 {
 	uint32 *buf = (uint32 *) cbuf;
 	int count = bytes / 4;
@@ -439,7 +439,7 @@ static void flip_endianness(unsigned char *cbuf, int bytes)
 	}
 }
 
-static void cBlowfish_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void cBlowfish_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	CipherBlowfishState *encryptstate =
 		&pvar->crypt_state.enc.cBlowfish;
@@ -450,7 +450,7 @@ static void cBlowfish_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	flip_endianness(buf, bytes);
 }
 
-static void cBlowfish_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
+static void cBlowfish_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	CipherBlowfishState *decryptstate =
 		&pvar->crypt_state.dec.cBlowfish;
@@ -461,7 +461,7 @@ static void cBlowfish_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	flip_endianness(buf, bytes);
 }
 
-void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, int bytes)
+void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, unsigned int bytes)
 {
 	RAND_bytes(buf, bytes);
 }

@@ -81,7 +81,7 @@ typedef union {
   CipherBlowfishState cBlowfish;
 } CRYPTCipherState;
 
-typedef void (* CRYPTCryptFun)(PTInstVar pvar, unsigned char *buf, int bytes);
+typedef void (* CRYPTCryptFun)(PTInstVar pvar, unsigned char *buf, unsigned int bytes);
 
 typedef struct {
   CRYPTDetectAttack detect_attack_statics;
@@ -109,7 +109,7 @@ void CRYPT_init(PTInstVar pvar);
    from the server. Therefore we have some time available to do some
    moderately expensive computations. */
 void CRYPT_initialize_random_numbers(PTInstVar pvar);
-void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, int bytes);
+void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, unsigned int bytes);
 void CRYPT_end(PTInstVar pvar);
 
 void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len);

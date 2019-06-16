@@ -1151,7 +1151,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 	}
 
 	if (SSHv1(pvar)) {
-		int padding = 8 - ((len + 4) % 8);
+		unsigned int padding = 8 - ((len + 4) % 8);
 
 		data = pvar->ssh_state.outbuf + 8 - padding;
 		data_length = padding + len + 8;
