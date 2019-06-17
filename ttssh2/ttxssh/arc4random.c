@@ -32,6 +32,9 @@
 
 #define KEYSTREAM_ONLY
 #include "ttxssh.h"
+
+#ifndef LIBRESSL_VERSION_NUMBER
+
 #include "arc4random.h"
 #include "chacha.h"
 
@@ -175,3 +178,5 @@ arc4random_buf(void *buf, size_t n)
 	_rs_random_buf(buf, n);
 	_ARC4_UNLOCK();
 }
+
+#endif /* LIBRESSL_VERSION_NUMBER */
