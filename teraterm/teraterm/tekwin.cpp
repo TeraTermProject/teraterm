@@ -47,9 +47,6 @@
 #include "dlglib.h"
 #include <tchar.h>
 
-#define CWnd	TTCWnd
-#define CFrameWnd	TTCFrameWnd
-
 #define TEKClassName _T("TEKWin32")
 
 static HINSTANCE AfxGetInstanceHandle()
@@ -231,54 +228,6 @@ void CTEKWindow::InitMenuPopup(HMENU SubMenu)
 	}
 }
 
-#if 0
-BEGIN_MESSAGE_MAP(CTEKWindow, CFrameWnd)
-	//{{AFX_MSG_MAP(CTEKWindow)
-	ON_WM_ACTIVATE()
-	ON_WM_CHAR()
-	ON_WM_DESTROY()
-	ON_WM_GETMINMAXINFO()
-	ON_WM_INITMENUPOPUP()
-	ON_WM_KEYDOWN()
-	ON_WM_KEYUP()
-	ON_WM_KILLFOCUS()
-	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
-	ON_WM_MBUTTONUP()
-	ON_WM_MOUSEACTIVATE()
-	ON_WM_MOUSEMOVE()
-	ON_WM_MOVE()
-	ON_WM_PAINT()
-	ON_WM_RBUTTONUP()
-	ON_WM_SETFOCUS()
-	ON_WM_SIZE()
-	ON_WM_SYSCOMMAND()
-	ON_WM_SYSKEYDOWN()
-	ON_WM_SYSKEYUP()
-	ON_WM_TIMER()
-	ON_MESSAGE(WM_USER_ACCELCOMMAND, OnAccelCommand)
-	ON_MESSAGE(WM_USER_CHANGEMENU,OnChangeMenu)
-	ON_MESSAGE(WM_USER_CHANGETBAR,OnChangeTBar)
-	ON_MESSAGE(WM_USER_DLGHELP2,OnDlgHelp)
-	ON_MESSAGE(WM_USER_GETSERIALNO,OnGetSerialNo)
-	ON_COMMAND(ID_TEKFILE_PRINT, OnFilePrint)
-	ON_COMMAND(ID_TEKFILE_EXIT, OnFileExit)
-	ON_COMMAND(ID_TEKEDIT_COPY, OnEditCopy)
-	ON_COMMAND(ID_TEKEDIT_COPYSCREEN, OnEditCopyScreen)
-	ON_COMMAND(ID_TEKEDIT_PASTE, OnEditPaste)
-	ON_COMMAND(ID_TEKEDIT_PASTECR, OnEditPasteCR)
-	ON_COMMAND(ID_TEKEDIT_CLEARSCREEN, OnEditClearScreen)
-	ON_COMMAND(ID_TEKSETUP_WINDOW, OnSetupWindow)
-	ON_COMMAND(ID_TEKSETUP_FONT, OnSetupFont)
-	ON_COMMAND(ID_TEKVTWIN, OnVTWin)
-	ON_COMMAND(ID_TEKWINDOW_WINDOW, OnWindowWindow)
-	ON_COMMAND(ID_TEKHELP_INDEX, OnHelpIndex)
-	ON_COMMAND(ID_TEKHELP_ABOUT, OnHelpAbout)
-	ON_WM_TIMER()
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow message handler
 
@@ -289,7 +238,7 @@ BOOL CTEKWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 	else {
-		return CFrameWnd::OnCommand(wParam, lParam);
+		return TTCFrameWnd::OnCommand(wParam, lParam);
 	}
 }
 
@@ -332,7 +281,7 @@ void CTEKWindow::OnDestroy()
 	// remove this window from the window list
 	UnregWin(HTEKWin);
 
-	CFrameWnd::OnDestroy();
+	TTCFrameWnd::OnDestroy();
 
 	TEKEnd(&tk);
 	FreeTTTEK();
@@ -367,7 +316,7 @@ void CTEKWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CTEKWindow::OnKillFocus(HWND hNewWnd)
 {
 	TEKDestroyCaret(&tk,&ts);
-	CFrameWnd::OnKillFocus(hNewWnd);
+	TTCFrameWnd::OnKillFocus(hNewWnd);
 }
 
 void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
@@ -483,7 +432,7 @@ void CTEKWindow::OnRButtonUp(UINT nFlags, POINTS point)
 void CTEKWindow::OnSetFocus(HWND hOldWnd)
 {
 	TEKChangeCaret(&tk,&ts);
-	CFrameWnd::OnSetFocus(hOldWnd);
+	TTCFrameWnd::OnSetFocus(hOldWnd);
 }
 
 void CTEKWindow::OnSize(UINT nType, int cx, int cy)
@@ -514,7 +463,7 @@ void CTEKWindow::OnSysCommand(UINT nID, LPARAM lParam)
 		SwitchMenu();
 	}
 	else {
-		CFrameWnd::OnSysCommand(nID,lParam);
+		TTCFrameWnd::OnSysCommand(nID,lParam);
 	}
 }
 
@@ -524,7 +473,7 @@ void CTEKWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		OnKeyDown(nChar,nRepCnt,nFlags);
 	}
 	else {
-		CFrameWnd::OnSysKeyDown(nChar,nRepCnt,nFlags);
+		TTCFrameWnd::OnSysKeyDown(nChar,nRepCnt,nFlags);
 	}
 }
 
@@ -534,7 +483,7 @@ void CTEKWindow::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 		OnKeyUp(nChar,nRepCnt,nFlags);
 	}
 	else {
-		CFrameWnd::OnSysKeyUp(nChar,nRepCnt,nFlags);
+		TTCFrameWnd::OnSysKeyUp(nChar,nRepCnt,nFlags);
 	}
 }
 

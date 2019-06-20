@@ -47,59 +47,46 @@ public:
 	void InitMenuPopup(HMENU SubMenu);
 
 protected:
-
-public:
-	//{{AFX_VIRTUAL(CTEKWindow)
-	protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	//}}AFX_VIRTUAL
-
-protected:
-	//{{AFX_MSG(CTEKWindow)
-#define afx_msg
-	afx_msg void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
-	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnDestroy();
-	afx_msg void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
-	afx_msg void OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu);
-	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKillFocus(HWND hNewWnd);
-	afx_msg void OnLButtonDown(UINT nFlags, POINTS point);
-	afx_msg void OnLButtonUp(UINT nFlags, POINTS point);
-	afx_msg void OnMButtonUp(UINT nFlags, POINTS point);
-	afx_msg int OnMouseActivate(HWND hDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnMouseMove(UINT nFlags, POINTS point);
-	afx_msg void OnMove(int x, int y);
-	afx_msg void OnPaint();
-	afx_msg void OnRButtonUp(UINT nFlags, POINTS point);
-	afx_msg void OnSetFocus(HWND hOldWnd);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnDlgHelp(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnGetSerialNo(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnFilePrint();
-	afx_msg void OnFileExit();
-	afx_msg void OnEditCopy();
-	afx_msg void OnEditCopyScreen();
-	afx_msg void OnEditPaste();
-	afx_msg void OnEditPasteCR();
-	afx_msg void OnEditClearScreen();
-	afx_msg void OnSetupWindow();
-	afx_msg void OnSetupFont();
-	afx_msg void OnVTWin();
-	afx_msg void OnWindowWindow();
-	afx_msg void OnHelpIndex();
-	afx_msg void OnHelpUsing();
-	afx_msg void OnHelpAbout();
-	//}}AFX_MSG
-//	DECLARE_MESSAGE_MAP()
-#undef afx_msg
+	void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
+	void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+	void OnDestroy();
+	void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
+	void OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu);
+	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	void OnKillFocus(HWND hNewWnd);
+	void OnLButtonDown(UINT nFlags, POINTS point);
+	void OnLButtonUp(UINT nFlags, POINTS point);
+	void OnMButtonUp(UINT nFlags, POINTS point);
+	int OnMouseActivate(HWND hDesktopWnd, UINT nHitTest, UINT message);
+	void OnMouseMove(UINT nFlags, POINTS point);
+	void OnMove(int x, int y);
+	void OnPaint();
+	void OnRButtonUp(UINT nFlags, POINTS point);
+	void OnSetFocus(HWND hOldWnd);
+	void OnSize(UINT nType, int cx, int cy);
+	void OnSysCommand(UINT nID, LPARAM lParam);
+	void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	void OnTimer(UINT_PTR nIDEvent);
+	LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
+	LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
+	LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDlgHelp(WPARAM wParam, LPARAM lParam);
+	LRESULT OnGetSerialNo(WPARAM wParam, LPARAM lParam);
+	void OnFilePrint();
+	void OnFileExit();
+	void OnEditCopy();
+	void OnEditCopyScreen();
+	void OnEditPaste();
+	void OnEditPasteCR();
+	void OnEditClearScreen();
+	void OnSetupWindow();
+	void OnSetupFont();
+	void OnVTWin();
+	void OnWindowWindow();
+	void OnHelpIndex();
+	void OnHelpAbout();
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };
