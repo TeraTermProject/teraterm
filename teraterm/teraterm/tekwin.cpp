@@ -896,7 +896,7 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnMButtonUp(wp, MAKEPOINTS(lp));
 		break;
 	case WM_MOUSEACTIVATE:
-		OnMouseActivate((HWND)wp, LOWORD(lp), HIWORD(lp));
+		retval = OnMouseActivate((HWND)wp, LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_MOUSEMOVE:
 		OnMouseMove(wp, MAKEPOINTS(lp));
