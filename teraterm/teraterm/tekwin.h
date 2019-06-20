@@ -51,7 +51,6 @@ protected:
 public:
 	//{{AFX_VIRTUAL(CTEKWindow)
 	protected:
-	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 

@@ -85,12 +85,6 @@ public:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-public:
-#if 0 //def _DEBUG
-	virtual void AssertValid() const;
-//	virtual void Dump(CDumpContext& dc) const;
-#endif
-
 protected:
 	//{{AFX_MSG(CVTWindow)
 #define afx_msg
@@ -238,7 +232,6 @@ protected:
 #undef afx_msg
 	void Disconnect(BOOL confirm);
 	///
-	LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };
 #endif

@@ -52,12 +52,6 @@
 
 #define TEKClassName _T("TEKWin32")
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 static HINSTANCE AfxGetInstanceHandle()
 {
 	return hInst;
@@ -287,26 +281,6 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow message handler
-
-LRESULT CTEKWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT Result;
-
-	if (message == MsgDlgHelp) {
-		OnDlgHelp(wParam,lParam);
-		return 0;
-	}
-	else if ((ts.HideTitle>0) &&
-	         (message == WM_NCHITTEST)) {
-		Result = CFrameWnd::DefWindowProc(message,wParam,lParam);
-		if ((Result==HTCLIENT) && AltKey()) {
-			Result = HTCAPTION;
-		}
-		return Result;
-	}
-
-	return (CFrameWnd::DefWindowProc(message,wParam,lParam));
-}
 
 BOOL CTEKWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
@@ -859,6 +833,10 @@ void CTEKWindow::OnHelpAbout()
 LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
+	if (msg == MsgDlgHelp) {
+		OnDlgHelp(wp, lp);
+		return 0;
+	}
 	switch(msg)
 	{
 	case WM_ACTIVATE:
@@ -965,6 +943,15 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		default:
 			OnCommand(wp, lp);
 			break;
+		}
+		break;
+	}
+	case WM_NCHITTEST: {
+		retval = TTCFrameWnd::DefWindowProc(msg, wp, lp);
+		if (ts.HideTitle>0) {
+			if ((retval ==HTCLIENT) && AltKey()) {
+				retval = HTCAPTION;
+			}
 		}
 		break;
 	}

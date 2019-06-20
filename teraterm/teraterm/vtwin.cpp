@@ -952,21 +952,6 @@ CVTWindow::CVTWindow()
 
 /////////////////////////////////////////////////////////////////////////////
 
-#if 0 //def _DEBUG
-void CVTWindow::AssertValid() const
-{
-	CFrameWnd::AssertValid();
-}
-
-void CVTWindow::Dump(CDumpContext& dc) const
-{
-	CFrameWnd::Dump(dc);
-}
-
-#endif //_DEBUG
-
-/////////////////////////////////////////////////////////////////////////////
-
 int CVTWindow::Parse()
 {
 	// added ScrollLock (2006.11.14 yutaka)
@@ -1793,32 +1778,6 @@ void CVTWindow::OpenTEK()
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow message handler
-
-LRESULT CVTWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT Result;
-
-	if (message == MsgDlgHelp) {
-		OnDlgHelp(wParam,lParam);
-		return 0;
-	}
-	else if ((ts.HideTitle>0) &&
-	         (message == WM_NCHITTEST)) {
-		Result = CFrameWnd::DefWindowProc(message,wParam,lParam);
-		if ((Result==HTCLIENT) && AltKey())
-#ifdef ALPHABLEND_TYPE2
-			if(ShiftKey())
-				Result = HTBOTTOMRIGHT;
-			else
-				Result = HTCAPTION;
-#else
-			Result = HTCAPTION;
-#endif
-		return Result;
-	}
-
-	return (CFrameWnd::DefWindowProc(message,wParam,lParam));
-}
 
 BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
@@ -2666,15 +2625,6 @@ BOOL CVTWindow::OnMouseWheel(
 	return (TRUE);
 }
 
-#if 0
-// 何もしていない
-void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
-{
-	CWnd::OnNcCalcSize(valid, sizeinfo);
-	return;
-}
-#endif
-
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, POINTS point)
 {
 	if (! Minimized && !ts.TermIsWin && (nHitTest == HTCAPTION)) {
@@ -2976,14 +2926,6 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	CFrameWnd::DefWindowProc(WM_SYSCHAR, nChar, MAKELONG(nRepCnt, nFlags));
 }
-
-// 何もしていない、不要
-#if 0
-void CVTWindow::OnSysColorChange()
-{
-	CFrameWnd::OnSysColorChange();
-}
-#endif
 
 void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -5080,9 +5022,8 @@ static void openFileDirectory(char *path, char *filename, BOOL open_directory_on
 static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, int vstore_pathlen)
 {
 	BOOL ret = FALSE;
-	int flag = 0;
-	char *s, **p;
-	char *virstore_env[] = {
+	const char *s, **p;
+	const char *virstore_env[] = {
 		"ProgramFiles",
 		"ProgramData",
 		"SystemRoot",
@@ -6481,11 +6422,6 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_NCRBUTTONDOWN:
 		OnNcRButtonDown((UINT)wp, MAKEPOINTS(lp));
 		break;
-#if 0
-		// 何もしていない
-	case WM_NCCALCSIZE:
-		break;
-#endif
 	case WM_PAINT:
 		OnPaint();
 		break;
@@ -6505,15 +6441,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_SIZING:
 		OnSizing(wp, (LPRECT)lp);
 		break;
-#if 1
 	case WM_SYSCHAR:
 		OnSysChar(wp, LOWORD(lp), HIWORD(lp));
 		break;
-#endif
-#if 0	// 何もしていない、不要
-	case WM_SYSCOLORCHANGE:
-		break;
-#endif
 	case WM_SYSCOMMAND:
 		OnSysCommand(wp, lp);
 		DefWindowProc(msg, wp, lp);
@@ -6713,8 +6643,8 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 #endif
 			}
 		}
-	}
 		break;
+	}
 	default:
 		retval = DefWindowProc(msg, wp, lp);
 		break;
