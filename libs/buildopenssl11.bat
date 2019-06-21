@@ -1,7 +1,11 @@
-cd openssl-1.1.0
+cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
-perl Configure no-asm no-async VC-WIN32 --debug
+
+perl -e "open(IN,'Configurations/10-main.conf');while(<IN>){s|/WX|/W1|;print $_;}close(IN);" > conf.tmp
+move conf.tmp Configurations/10-main.conf
+
+perl Configure no-asm no-async VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
 perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
 if exist "makefile.dbg" del makefile.dbg
 ren makefile.tmp makefile.dbg
@@ -13,7 +17,7 @@ move libssl.lib out32.dbg
 :build_dbg_end
 
 if exist "out32\libcrypto.lib" goto build_end
-perl Configure no-asm no-async VC-WIN32
+perl Configure no-asm no-async VC-WIN32 -D_WIN32_WINNT=0x0501
 perl -e "open(IN,'makefile');while(<IN>){s| /MD| /MT|;print $_;}close(IN);" > makefile.tmp
 if exist "makefile" del makefile
 ren makefile.tmp makefile
