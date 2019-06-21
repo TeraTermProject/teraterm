@@ -61,7 +61,6 @@ DECLARE_SSLEAY32_API(int, SSL_connect, (SSL *ssl), (ssl))
 DECLARE_SSLEAY32_API_v(SSL_free, (SSL *ssl), (ssl))
 DECLARE_SSLEAY32_API(int, SSL_get_error, (const SSL *s,int ret_code), (s,ret_code))
 DECLARE_SSLEAY32_API(X509 *, SSL_get_peer_certificate, (const SSL *s), (s))
-DECLARE_SSLEAY32_API_v(SSL_load_error_strings, (void ), ())
 DECLARE_SSLEAY32_API(SSL *, SSL_new, (SSL_CTX *ctx), (ctx))
 DECLARE_SSLEAY32_API(int, SSL_read, (SSL *ssl,void *buf,int num), (ssl, buf, num))
 DECLARE_SSLEAY32_API(int, SSL_set_fd, (SSL *s, int fd), (s, fd))
@@ -74,6 +73,6 @@ DECLARE_SSLEAY32_API(const SSL_METHOD *, SSLv23_client_method, (void), ())
 #endif
 DECLARE_SSLEAY32_API(int, SSL_CTX_load_verify_locations, (SSL_CTX *ctx, const char *CAfile, const char *CApath), (ctx, CAfile, CApath))
 DECLARE_SSLEAY32_API(long, SSL_get_verify_result, (const SSL *ssl), (ssl))
-DECLARE_SSLEAY32_API(int, SSL_library_init, (void), ())
+DECLARE_SSLEAY32_API(int, OPENSSL_init_ssl, (uint64_t opts, const OPENSSL_INIT_SETTINGS *settings), (opts, settings))
 
 #endif//_SSLLIB_h_
