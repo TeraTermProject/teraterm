@@ -660,7 +660,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	char *data, int len, char *MAC)
 {
-	HMAC_CTX c;
+	HMAC_CTX *c = NULL;
 	unsigned char m[EVP_MAX_MD_SIZE];
 	unsigned char b[4];
 	struct Mac *mac;
@@ -682,12 +682,17 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 		goto error;
 	}
 
-	HMAC_Init(&c, mac->key, mac->key_len, mac->md);
+	/********* OPENSSL1.1.1 NOTEST *********/
+	c = HMAC_CTX_new();
+	if (c == NULL)
+		goto error;
+
+	HMAC_Init(c, mac->key, mac->key_len, mac->md);
 	set_uint32_MSBfirst(b, sequence_number);
-	HMAC_Update(&c, b, sizeof(b));
-	HMAC_Update(&c, data, len);
-	HMAC_Final(&c, m, NULL);
-	HMAC_cleanup(&c);
+	HMAC_Update(c, b, sizeof(b));
+	HMAC_Update(c, data, len);
+	HMAC_Final(c, m, NULL);
+	// HMAC_cleanup()はOpenSSL 1.1.0で削除され、HMAC_CTX_free()に集約された。
 
 	if (memcmp(m, MAC, mac->mac_len)) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
@@ -696,9 +701,14 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 		goto error;
 	}
 
+	HMAC_CTX_free(c);
+
 	return TRUE;
 
 error:
+	if (c) 
+		HMAC_CTX_free(c);
+
 	return FALSE;
 }
 
@@ -721,7 +731,7 @@ unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
                             char *data, int len, char *MAC)
 {
-	HMAC_CTX c;
+	HMAC_CTX *c = NULL;
 	static u_char m[EVP_MAX_MD_SIZE];
 	u_char b[4];
 	struct Mac *mac;
@@ -731,16 +741,23 @@ BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
 		if (mac == NULL || mac->enabled == 0) 
 			return FALSE;
 
-		HMAC_Init(&c, mac->key, mac->key_len, mac->md);
+		/********* OPENSSL1.1.1 NOTEST *********/
+		c = HMAC_CTX_new();
+		if (c == NULL)
+			return FALSE;
+
+		HMAC_Init(c, mac->key, mac->key_len, mac->md);
 		set_uint32_MSBfirst(b, sequence_number);
-		HMAC_Update(&c, b, sizeof(b));
-		HMAC_Update(&c, data, len);
-		HMAC_Final(&c, m, NULL);
-		HMAC_cleanup(&c);
+		HMAC_Update(c, b, sizeof(b));
+		HMAC_Update(c, data, len);
+		HMAC_Final(c, m, NULL);
+		// HMAC_cleanup()はOpenSSL 1.1.0で削除され、HMAC_CTX_free()に集約された。
 
 		// 20バイト分だけコピー
 		memcpy(MAC, m, pvar->ssh2_keys[MODE_OUT].mac.mac_len);
 	//	memcpy(MAC, m, sizeof(m));
+
+		HMAC_CTX_free(c);
 
 		return TRUE;
 	}
