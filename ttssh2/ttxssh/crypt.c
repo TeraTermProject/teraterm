@@ -206,7 +206,8 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	EVP_CIPHER_CTX *evp = &pvar->evpcip[MODE_OUT];
+	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_OUT];
+	/********* OPENSSL1.1.1 NOTEST *********/
 
 	if (bytes == 0)
 		return TRUE;
@@ -260,7 +261,8 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	EVP_CIPHER_CTX *evp = &pvar->evpcip[MODE_IN];
+	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_IN];
+	/********* OPENSSL1.1.1 NOTEST *********/
 
 	if (bytes == 0)
 		return TRUE;
@@ -338,7 +340,8 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 		encbufflen = bytes;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
+	/********* OPENSSL1.1.1 NOTEST *********/
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher));
@@ -374,7 +377,8 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 		encbufflen = bytes;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
+	/********* OPENSSL1.1.1 NOTEST *********/
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher));
@@ -1110,7 +1114,8 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_OUT];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				/********* OPENSSL1.1.1 NOTEST *********/
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(cipher),
 				                 enc->iv, get_cipher_iv_len(cipher),
 				                 CIPHER_ENCRYPT,
@@ -1158,7 +1163,8 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_IN];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				/********* OPENSSL1.1.1 NOTEST *********/
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(cipher),
 				                 enc->iv, get_cipher_iv_len(cipher),
 				                 CIPHER_DECRYPT,

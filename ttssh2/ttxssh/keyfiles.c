@@ -373,14 +373,17 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	int dlen, i;
 	SSH2Cipher *cipher;
 	size_t authlen;
-	EVP_CIPHER_CTX cipher_ctx;
+	EVP_CIPHER_CTX *cipher_ctx = NULL;
 
 	blob = buffer_init();
 	b = buffer_init();
 	kdf = buffer_init();
 	encoded = buffer_init();
 	copy_consumed = buffer_init();
-	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL)
+	/********* OPENSSL1.1.1 NOTEST *********/
+	cipher_ctx = EVP_CIPHER_CTX_new();
+
+	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL || cipher_ctx == NULL)
 		goto error;
 
 	// ƒtƒ@ƒCƒ‹‚ð‚·‚×‚Ä“Ç‚Ýž‚Þ
@@ -539,15 +542,16 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		}
 	}
 
+	/********* OPENSSL1.1.1 NOTEST *********/
 	// •œ†‰»
 	cp = buffer_append_space(b, len);
-	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
+	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
 		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
-	if (EVP_Cipher(&cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
+	if (EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
 		cipher_cleanup_SSH2(&cipher_ctx);
 		goto error;
 	}
-	cipher_cleanup_SSH2(&cipher_ctx);
+	cipher_cleanup_SSH2(cipher_ctx);
 	buffer_consume(copy_consumed, len);
 
 	if (buffer_remain_len(copy_consumed) != 0) {
@@ -602,6 +606,11 @@ error:
 	free(key);
 	free(salt);
 	free(comment);
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	if (cipher_ctx) {
+		EVP_CIPHER_CTX_free(cipher_ctx);
+	}
 
 	// KDF ‚Å‚Í‚È‚©‚Á‚½
 	if (keyfmt == NULL) {
@@ -915,8 +924,12 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		const EVP_MD *md = EVP_sha1();
 		EVP_MD_CTX ctx;
 		unsigned char key[40], iv[32];
-		EVP_CIPHER_CTX cipher_ctx;
+		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
+
+		/********* OPENSSL1.1.1 NOTEST *********/
+		cipher_ctx = EVP_CIPHER_CTX_new();
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
 
 		EVP_DigestInit(&ctx, md);
 		EVP_DigestUpdate(&ctx, "\0\0\0\0", 4);
@@ -930,20 +943,23 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 
 		memset(iv, 0, sizeof(iv));
 
+		/********* OPENSSL1.1.1 NOTEST *********/
 		// decrypt
-		cipher_init_SSH2(&cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
+		cipher_init_SSH2(cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
 		len = buffer_len(prikey);
 		decrypted = (char *)malloc(len);
-		if (EVP_Cipher(&cipher_ctx, decrypted, prikey->buf, len) == 0) {
+		if (EVP_Cipher(cipher_ctx, decrypted, prikey->buf, len) == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
-			cipher_cleanup_SSH2(&cipher_ctx);
+			cipher_cleanup_SSH2(cipher_ctx);
+			EVP_CIPHER_CTX_free(cipher_ctx);
 			goto error;
 		}
 		buffer_clear(prikey);
 		buffer_append(prikey, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(&cipher_ctx);
+		cipher_cleanup_SSH2(cipher_ctx);
+		EVP_CIPHER_CTX_free(cipher_ctx);
 	}
 
 	// verity MAC
@@ -1451,8 +1467,12 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	if (strcmp(encname, "3des-cbc") == 0) {
 		MD5_CTX md;
 		unsigned char key[32], iv[16];
-		EVP_CIPHER_CTX cipher_ctx;
+		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
+
+		/********* OPENSSL1.1.1 NOTEST *********/
+		cipher_ctx = EVP_CIPHER_CTX_new();
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
 
 		MD5_Init(&md);
 		MD5_Update(&md, passphrase, strlen(passphrase));
@@ -1466,16 +1486,18 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(&cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
+		cipher_init_SSH2(cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
 		decrypted = (char *)malloc(len);
-		if (EVP_Cipher(&cipher_ctx, decrypted, blob->buf + blob->offset, len) == 0) {
+		if (EVP_Cipher(cipher_ctx, decrypted, blob->buf + blob->offset, len) == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
-			cipher_cleanup_SSH2(&cipher_ctx);
+			cipher_cleanup_SSH2(cipher_ctx);
+			EVP_CIPHER_CTX_free(cipher_ctx);
 			goto error;
 		}
 		buffer_append(blob2, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(&cipher_ctx);
+		cipher_cleanup_SSH2(cipher_ctx);
+		EVP_CIPHER_CTX_free(cipher_ctx);
 
 		*invalid_passphrase = TRUE;
 	}

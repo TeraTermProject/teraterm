@@ -144,6 +144,11 @@ static void init_TTSSH(PTInstVar pvar)
 	FWDUI_init(pvar);
 
 	ssh_heartbeat_lock_initialize();
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	pvar->evpcip[MODE_IN] = EVP_CIPHER_CTX_new();
+	pvar->evpcip[MODE_OUT] = EVP_CIPHER_CTX_new();
+	/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
 }
 
 static void uninit_TTSSH(PTInstVar pvar)
@@ -175,6 +180,10 @@ static void uninit_TTSSH(PTInstVar pvar)
 	}
 
 	ssh_heartbeat_lock_finalize();
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_IN]);
+	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_OUT]);
 }
 
 static void PASCAL TTXInit(PTTSet ts, PComVar cv)
@@ -3579,7 +3588,7 @@ error:
  */
 struct ssh1_3des_ctx
 {
-	EVP_CIPHER_CTX  k1, k2, k3;
+	EVP_CIPHER_CTX  *k1, *k2, *k3;
 };
 
 static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *iv, int enc)
@@ -3589,6 +3598,11 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 
 	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) == NULL) {
 		c = malloc(sizeof(*c));
+		/********* OPENSSL1.1.1 NOTEST *********/
+		c->k1 = EVP_CIPHER_CTX_new();
+		c->k2 = EVP_CIPHER_CTX_new();
+		c->k3 = EVP_CIPHER_CTX_new();
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
 		EVP_CIPHER_CTX_set_app_data(ctx, c);
 	}
 	if (key == NULL)
@@ -3603,12 +3617,15 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 		else
 			k1 += 16;
 	}
-	EVP_CIPHER_CTX_init(&c->k1);
-	EVP_CIPHER_CTX_init(&c->k2);
-	EVP_CIPHER_CTX_init(&c->k3);
-	if (EVP_CipherInit(&c->k1, EVP_des_cbc(), k1, NULL, enc) == 0 ||
-		EVP_CipherInit(&c->k2, EVP_des_cbc(), k2, NULL, !enc) == 0 ||
-		EVP_CipherInit(&c->k3, EVP_des_cbc(), k3, NULL, enc) == 0) {
+	EVP_CIPHER_CTX_init(c->k1);
+	EVP_CIPHER_CTX_init(c->k2);
+	EVP_CIPHER_CTX_init(c->k3);
+	if (EVP_CipherInit(c->k1, EVP_des_cbc(), k1, NULL, enc) == 0 ||
+		EVP_CipherInit(c->k2, EVP_des_cbc(), k2, NULL, !enc) == 0 ||
+		EVP_CipherInit(c->k3, EVP_des_cbc(), k3, NULL, enc) == 0) {
+			EVP_CIPHER_CTX_free(c->k1);
+			EVP_CIPHER_CTX_free(c->k2);
+			EVP_CIPHER_CTX_free(c->k3);
 			SecureZeroMemory(c, sizeof(*c));
 			free(c);
 			EVP_CIPHER_CTX_set_app_data(ctx, NULL);
@@ -3625,9 +3642,10 @@ static int ssh1_3des_cbc(EVP_CIPHER_CTX *ctx, u_char *dest, const u_char *src, u
 		//error("ssh1_3des_cbc: no context");
 		return (0);
 	}
-	if (EVP_Cipher(&c->k1, dest, (u_char *)src, len) == 0 ||
-		EVP_Cipher(&c->k2, dest, dest, len) == 0 ||
-		EVP_Cipher(&c->k3, dest, dest, len) == 0)
+	/********* OPENSSL1.1.1 NOTEST *********/
+	if (EVP_Cipher(c->k1, dest, (u_char *)src, len) == 0 ||
+		EVP_Cipher(c->k2, dest, dest, len) == 0 ||
+		EVP_Cipher(c->k3, dest, dest, len) == 0)
 		return (0);
 	return (1);
 }
@@ -3674,6 +3692,8 @@ void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
 
 const EVP_CIPHER *evp_ssh1_3des(void)
 {
+	/*** TODO: OPENSSL1.1.1 ÉeÉXÉgäÆóπå„Ç…çÌèúÇ∑ÇÈ ***/
+#if 0
 	static EVP_CIPHER ssh1_3des;
 
 	memset(&ssh1_3des, 0, sizeof(EVP_CIPHER));
@@ -3686,6 +3706,22 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 	ssh1_3des.do_cipher = ssh1_3des_cbc;
 	ssh1_3des.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH;
 	return (&ssh1_3des);
+#endif
+	static EVP_CIPHER *p = NULL;
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	if (p == NULL) {
+		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/8, /*key_len*/16);
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+	}
+	if (p) {
+		EVP_CIPHER_meth_set_iv_length(p, 0);
+		EVP_CIPHER_meth_set_init(p, ssh1_3des_init);
+		EVP_CIPHER_meth_set_cleanup(p, ssh1_3des_cleanup);
+		EVP_CIPHER_meth_set_do_cipher(p, ssh1_3des_cbc);
+		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH);
+	}
+	return (p);
 }
 
 static void ssh_make_comment(char *comment, int maxlen)
@@ -4038,7 +4074,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	int blocksize, keylen, ivlen, authlen, i, n; 
 	unsigned char *key = NULL, salt[SALT_LEN];
 	char *kdfname = KDFNAME;
-	EVP_CIPHER_CTX cipher_ctx;
+	EVP_CIPHER_CTX *cipher_ctx = NULL;
 	Key keyblob;
 	unsigned char *cp = NULL;
 	unsigned int len, check;
@@ -4049,7 +4085,9 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	kdf = buffer_init();
 	encoded = buffer_init();
 	blob = buffer_init();
-	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
+	/********* OPENSSL1.1.1 NOTEST *********/
+	cipher_ctx = EVP_CIPHER_CTX_new();
+	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL || cipher_ctx == NULL)
 		goto ed25519_error;
 
 	if (passphrase == NULL || !strlen(passphrase)) {
@@ -4175,6 +4213,11 @@ ed25519_error:
 	buffer_free(kdf);
 	buffer_free(encoded);
 	buffer_free(blob);
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	if (cipher_ctx) {
+		EVP_CIPHER_CTX_free(cipher_ctx);
+	}
 }
 
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
@@ -4791,7 +4834,7 @@ public_error:
 				MD5_CTX md;
 				unsigned char digest[16];
 				char *passphrase = buf;
-				EVP_CIPHER_CTX cipher_ctx;
+				EVP_CIPHER_CTX *cipher_ctx = NULL;
 				FILE *fp;
 				char wrapped[4096];
 
@@ -4809,6 +4852,10 @@ public_error:
 					buffer_free(b);
 					break;
 				}
+
+				/********* OPENSSL1.1.1 NOTEST *********/
+				cipher_ctx = EVP_CIPHER_CTX_new();
+				/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
 
 				// set random value
 				rnd = arc4random();
@@ -4855,10 +4902,11 @@ public_error:
 				MD5_Init(&md);
 				MD5_Update(&md, (const unsigned char *)passphrase, strlen(passphrase));
 				MD5_Final(digest, &md);
+				/********* OPENSSL1.1.1 NOTEST *********/
 				if (cipher_num == SSH_CIPHER_NONE) {
-					cipher_init_SSH2(&cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, 0, pvar);
+					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, 0, pvar);
 				} else {
-					cipher_init_SSH2(&cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, evp_ssh1_3des(), 0, 0, pvar);
+					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, evp_ssh1_3des(), 0, 0, pvar);
 				}
 				len = buffer_len(b);
 				if (len % 8) { // fatal error
@@ -4870,10 +4918,10 @@ public_error:
 					goto error;
 				}
 
-				if (EVP_Cipher(&cipher_ctx, wrapped, buffer_ptr(b), len) == 0) {
+				if (EVP_Cipher(cipher_ctx, wrapped, buffer_ptr(b), len) == 0) {
 					goto error;
 				}
-				if (EVP_CIPHER_CTX_cleanup(&cipher_ctx) == 0) {
+				if (EVP_CIPHER_CTX_cleanup(cipher_ctx) == 0) {
 					goto error;
 				}
 
@@ -4896,6 +4944,10 @@ public_error:
 error:;
 				buffer_free(b);
 				buffer_free(enc);
+				/********* OPENSSL1.1.1 NOTEST *********/
+				if (cipher_ctx) {
+					EVP_CIPHER_CTX_free(cipher_ctx);
+				}
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
