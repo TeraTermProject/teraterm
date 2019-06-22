@@ -87,16 +87,24 @@ int ssh_dss_verify(DSA *key,
 {
 	DSA_SIG *sig;
 	const EVP_MD *evp_md = EVP_sha1();
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	unsigned char digest[EVP_MAX_MD_SIZE], *sigblob;
 	unsigned int len, dlen;
-	int ret;
+	int ret = -1;
 	char *ptr;
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	md = EVP_MD_CTX_new();
+	if (md == NULL) {
+		ret = -1;
+		goto error;
+	}
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		return -2;
+		ret = -2;
+		goto error;
 	}
 
 	ptr = signature;
@@ -110,7 +118,8 @@ int ssh_dss_verify(DSA *key,
 		len = get_uint32_MSBfirst(ptr);
 		ptr += 4;
 		if (strncmp("ssh-dss", ptr, len) != 0) {
-			return -3;
+			ret = -3;
+			goto error;
 		}
 		ptr += len;
 	}
@@ -122,16 +131,23 @@ int ssh_dss_verify(DSA *key,
 	ptr += len;
 
 	if (len != SIGBLOB_LEN) {
-		return -4;
+		ret = -4;
+		goto error;
 	}
 
 	/* parse signature */
-	if ((sig = DSA_SIG_new()) == NULL)
-		return -5;
-	if ((sig->r = BN_new()) == NULL)
-		return -6;
-	if ((sig->s = BN_new()) == NULL)
-		return -7;
+	if ((sig = DSA_SIG_new()) == NULL) {
+		ret = -5;
+		goto error;
+	}
+	if ((sig->r = BN_new()) == NULL) {
+		ret = -6;
+		goto error;
+	}
+	if ((sig->s = BN_new()) == NULL) {
+		ret = -7;
+		goto error;
+	}
 	BN_bin2bn(sigblob, INTBLOB_LEN, sig->r);
 	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, sig->s);
 
@@ -144,6 +160,10 @@ int ssh_dss_verify(DSA *key,
 	SecureZeroMemory(digest, sizeof(digest));
 
 	DSA_SIG_free(sig);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return ret;
 }
@@ -250,21 +270,30 @@ int ssh_rsa_verify(RSA *key,
                    u_char *data, u_int datalen)
 {
 	const EVP_MD *evp_md;
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	//	char *ktype;
 	u_char digest[EVP_MAX_MD_SIZE], *sigblob;
 	u_int len, dlen, modlen;
 //	int rlen, ret, nid;
-	int ret, nid;
+	int ret = -1, nid;
 	char *ptr;
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	md = EVP_MD_CTX_new();
+	if (md == NULL) {
+		ret = -1;
+		goto error;
+	}
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		return -2;
+		ret = -2;
+		goto error;
 	}
 	if (BN_num_bits(key->n) < SSH_RSA_MINIMUM_MODULUS_SIZE) {
-		return -3;
+		ret = -3;
+		goto error;
 	}
 	//debug_print(41, signature, signaturelen);
 	ptr = signature;
@@ -273,7 +302,8 @@ int ssh_rsa_verify(RSA *key,
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
 	if (strncmp("ssh-rsa", ptr, len) != 0) {
-		return -4;
+		ret = -4;
+		goto error;
 	}
 	ptr += len;
 
@@ -292,7 +322,8 @@ int ssh_rsa_verify(RSA *key,
 	/* RSA_verify expects a signature of RSA_size */
 	modlen = RSA_size(key);
 	if (len > modlen) {
-		return -5;
+		ret = -5;
+		goto error;
 
 	} else if (len < modlen) {
 		u_int diff = modlen - len;
@@ -307,7 +338,8 @@ int ssh_rsa_verify(RSA *key,
 	nid = NID_sha1;
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
 		//error("ssh_rsa_verify: EVP_get_digestbynid %d failed", nid);
-		return -6;
+		ret = -6;
+		goto error;
 	}
 	EVP_DigestInit(&md, evp_md);
 	EVP_DigestUpdate(&md, data, datalen);
@@ -320,6 +352,10 @@ int ssh_rsa_verify(RSA *key,
 	//free(sigblob);
 	//debug("ssh_rsa_verify: signature %scorrect", (ret==0) ? "in" : "");
 
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
+
 	return ret;
 }
 
@@ -329,16 +365,24 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 {
 	ECDSA_SIG *sig;
 	const EVP_MD *evp_md;
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	unsigned char digest[EVP_MAX_MD_SIZE], *sigblob;
 	unsigned int len, dlen;
-	int ret, nid = NID_undef;
+	int ret = -1, nid = NID_undef;
 	char *ptr;
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	md = EVP_MD_CTX_new();
+	if (md == NULL) {
+		ret = -1;
+		goto error;
+	}
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		return -2;
+		ret = -2;
+		goto error;
 	}
 
 	ptr = signature;
@@ -346,7 +390,8 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
 	if (strncmp(get_ssh_keytype_name(keytype), ptr, len) != 0) {
-		return -3;
+		ret = -3;
+		goto error;
 	}
 	ptr += len;
 
@@ -356,23 +401,31 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	ptr += len;
 
 	/* parse signature */
-	if ((sig = ECDSA_SIG_new()) == NULL)
-		return -4;
-	if ((sig->r = BN_new()) == NULL)
-		return -5;
-	if ((sig->s = BN_new()) == NULL)
-		return -6;
+	if ((sig = ECDSA_SIG_new()) == NULL) {
+		ret = -4;
+		goto error;
+	}
+	if ((sig->r = BN_new()) == NULL) {
+		ret = -5;
+		goto error;
+	}
+	if ((sig->s = BN_new()) == NULL) {
+		ret = -6;
+		goto error;
+	}
 
 	buffer_get_bignum2(&sigblob, sig->r);
 	buffer_get_bignum2(&sigblob, sig->s);
 	if (sigblob != ptr) {
-		return -7;
+		ret = -7;
+		goto error;
 	}
 
 	/* hash the data */
 	nid = keytype_to_hash_nid(keytype);
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
-		return -8;
+		ret = -8;
+		goto error;
 	}
 	EVP_DigestInit(&md, evp_md);
 	EVP_DigestUpdate(&md, data, datalen);
@@ -382,6 +435,10 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	SecureZeroMemory(digest, sizeof(digest));
 
 	ECDSA_SIG_free(sig);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return ret;
 }
@@ -603,12 +660,18 @@ BOOL key_copy(Key *dest, Key *src)
 char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_length)
 {
 	const EVP_MD *md = NULL;
-	EVP_MD_CTX ctx;
+	EVP_MD_CTX *ctx = NULL;
 	char *blob = NULL;
 	char *retval = NULL;
 	int len = 0;
 	int nlen, elen;
 	RSA *rsa;
+
+	/********* OPENSSL1.1.1 NOTEST *********/
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) {
+		goto error;
+	}
 
 	*dgst_raw_length = 0;
 
@@ -664,14 +727,19 @@ char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_lengt
 		if (retval == NULL) {
 			// TODO:
 		}
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, blob, len);
-		EVP_DigestFinal(&ctx, retval, dgst_raw_length);
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, blob, len);
+		EVP_DigestFinal(ctx, retval, dgst_raw_length);
 		SecureZeroMemory(blob, len);
 		free(blob);
 	} else {
 		//fatal("key_fingerprint_raw: blob is null");
 	}
+
+error:
+	if (ctx)
+		EVP_MD_CTX_free(ctx);
+
 	return retval;
 }
 
@@ -1461,15 +1529,22 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	case KEY_RSA: // RSA
 	{
 		const EVP_MD *evp_md = EVP_sha1();
-		EVP_MD_CTX md;
+		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE], *sig;
 		u_int slen, dlen, len;
 		int ok, nid = NID_sha1;
 
+		/********* OPENSSL1.1.1 NOTEST *********/
+		md = EVP_MD_CTX_new();
+		if (md == NULL)
+			goto error;
+
 		// ダイジェスト値の計算
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, data, datalen);
-		EVP_DigestFinal(&md, digest, &dlen);
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, data, datalen);
+		EVP_DigestFinal(md, digest, &dlen);
+
+		EVP_MD_CTX_free(md);
 
 		slen = RSA_size(keypair->rsa);
 		sig = malloc(slen);
@@ -1519,14 +1594,21 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		DSA_SIG *sig;
 		const EVP_MD *evp_md = EVP_sha1();
-		EVP_MD_CTX md;
+		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE], sigblob[SIGBLOB_LEN];
 		u_int rlen, slen, len, dlen;
 
+		/********* OPENSSL1.1.1 NOTEST *********/
+		md = EVP_MD_CTX_new();
+		if (md == NULL)
+			goto error;
+
 		// ダイジェストの計算
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, data, datalen);
-		EVP_DigestFinal(&md, digest, &dlen);
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, data, datalen);
+		EVP_DigestFinal(md, digest, &dlen);
+
+		EVP_MD_CTX_free(md);
 
 		// DSA電子署名を計算
 		sig = DSA_do_sign(digest, dlen, keypair->dsa);
@@ -1569,7 +1651,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		ECDSA_SIG *sig;
 		const EVP_MD *evp_md;
-		EVP_MD_CTX md;
+		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE];
 		u_int len, dlen, nid;
 		buffer_t *buf2 = NULL;
@@ -1578,9 +1660,17 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
 			goto error;
 		}
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, data, datalen);
-		EVP_DigestFinal(&md, digest, &dlen);
+
+		/********* OPENSSL1.1.1 NOTEST *********/
+		md = EVP_MD_CTX_new();
+		if (md == NULL)
+			goto error;
+
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, data, datalen);
+		EVP_DigestFinal(md, digest, &dlen);
+
+		EVP_MD_CTX_free(md);
 
 		sig = ECDSA_do_sign(digest, dlen, keypair->ecdsa);
 		SecureZeroMemory(digest, sizeof(digest));
