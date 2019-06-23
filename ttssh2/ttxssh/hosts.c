@@ -869,6 +869,10 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 	const EC_GROUP *group;
 	const EC_POINT *pa, *pb;
 	Key *a, *b;
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *se = NULL, *sn = NULL;
+
+	/********* OPENSSL1.1.1 NOTEST *********/
 
 	if (src->type != key->type) {
 		return -1;
@@ -889,9 +893,11 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 		*/
 
 	case KEY_RSA: // SSH2 RSA host public key
+		RSA_get0_key(key->rsa, &n, &e, NULL);
+		RSA_get0_key(src->rsa, &sn, &se, NULL);
 		return key->rsa != NULL && src->rsa != NULL &&
-			BN_cmp(key->rsa->e, src->rsa->e) == 0 &&
-			BN_cmp(key->rsa->n, src->rsa->n) == 0;
+			BN_cmp(e, se) == 0 &&
+			BN_cmp(n, sn) == 0;
 
 	case KEY_DSA: // SSH2 DSA host public key
 		return key->dsa != NULL && src->dsa &&

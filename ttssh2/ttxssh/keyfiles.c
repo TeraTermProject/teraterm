@@ -66,27 +66,35 @@ static BIGNUM *get_bignum(unsigned char *bytes)
    key must be discarded. */
 static BOOL normalize_key(RSA *key)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	BOOL OK = FALSE;
 	BIGNUM *r = BN_new();
 	BN_CTX *ctx = BN_CTX_new();
+	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+
+	RSA_get0_key(key, &n, &e, &d);
+	RSA_get0_factors(key, &p, &q);
+	RSA_get0_crt_params(key, &dmp1, &dmq1, &iqmp);
 
 	if (BN_cmp(key->p, key->q) < 0) {
-		BIGNUM *tmp = key->p;
+		BIGNUM *tmp = p;
 
-		key->p = key->q;
-		key->q = tmp;
+		p = q;
+		q = tmp;
+		RSA_set0_factors(key, p, q);
 	}
 
 	if (r != NULL && ctx != NULL) {
-		key->dmp1 = BN_new();
-		key->dmq1 = BN_new();
-		key->iqmp = BN_mod_inverse(NULL, key->q, key->p, ctx);
+		dmp1 = BN_new();
+		dmq1 = BN_new();
+		iqmp = BN_mod_inverse(NULL, key->q, key->p, ctx);
+		RSA_set0_crt_params(key, dmp1, dmq1, iqmp);
 
-		if (key->dmp1 != NULL && key->dmq1 != NULL && key->iqmp != NULL) {
-			OK = BN_sub(r, key->p, BN_value_one())
-			  && BN_mod(key->dmp1, key->d, r, ctx)
-			  && BN_sub(r, key->q, BN_value_one())
-			  && BN_mod(key->dmq1, key->d, r, ctx);
+		if (dmp1 != NULL && dmq1 != NULL && iqmp != NULL) {
+			OK = BN_sub(r, p, BN_value_one())
+			  && BN_mod(dmp1, d, r, ctx)
+			  && BN_sub(r, q, BN_value_one())
+			  && BN_mod(dmq1, d, r, ctx);
 		}
 	}
 
@@ -102,6 +110,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
                                  BOOL * invalid_passphrase,
                                  BOOL is_auto_login)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	char filename[2048];
 	int fd;
 	unsigned int length, amount_read;
@@ -110,6 +119,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	int cipher;
 	RSA *key;
 	unsigned int E_index, N_index, D_index, U_index, P_index, Q_index = 0;
+	BIGNUM *e, *n, *d, *p, *q;
 
 	*invalid_passphrase = FALSE;
 
@@ -294,11 +304,13 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	}
 
 	key = RSA_new();
-	key->n = get_bignum(keyfile_data + N_index);
-	key->e = get_bignum(keyfile_data + E_index);
-	key->d = get_bignum(keyfile_data + D_index);
-	key->p = get_bignum(keyfile_data + P_index);
-	key->q = get_bignum(keyfile_data + Q_index);
+	n = get_bignum(keyfile_data + N_index);
+	e = get_bignum(keyfile_data + E_index);
+	d = get_bignum(keyfile_data + D_index);
+	RSA_set0_key(key, n, e, d);
+	p = get_bignum(keyfile_data + P_index);
+	q = get_bignum(keyfile_data + Q_index);
+	RSA_set0_factors(key, p, q);
 
 	if (!normalize_key(key)) {
 		UTIL_get_lang_msg("MSG_KEYFILES_CRYPTOLIB_ERROR", pvar,
@@ -1091,7 +1103,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	switch (result->type) {
 	case KEY_RSA:
 	{
+		/********* OPENSSL1.1.1 NOTEST *********/
 		char *pubkey_type, *pub, *pri;
+		BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+
 		pub = pubkey->buf;
 		pri = prikey->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
@@ -1107,29 +1122,32 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->rsa->e = BN_new();
-		result->rsa->n = BN_new();
-		result->rsa->d = BN_new();
-		result->rsa->p = BN_new();
-		result->rsa->q = BN_new();
-		result->rsa->iqmp = BN_new();
-		if (result->rsa->e == NULL ||
-		    result->rsa->n == NULL ||
-		    result->rsa->d == NULL ||
-		    result->rsa->p == NULL ||
-		    result->rsa->q == NULL ||
-		    result->rsa->iqmp == NULL) {
+		e = BN_new();
+		n = BN_new();
+		d = BN_new();
+		RSA_set0_key(result->rsa, n, e, d);
+		p = BN_new();
+		q = BN_new();
+		RSA_set0_factors(result->rsa, p, q);
+		iqmp = BN_new();
+		RSA_set0_crt_params(result->rsa, NULL, NULL, iqmp);
+		if (e == NULL ||
+		    n == NULL ||
+		    d == NULL ||
+		    p == NULL ||
+		    q == NULL ||
+		    iqmp == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
 
-		buffer_get_bignum2(&pub, result->rsa->e);
-		buffer_get_bignum2(&pub, result->rsa->n);
+		buffer_get_bignum2(&pub, e);
+		buffer_get_bignum2(&pub, n);
 
-		buffer_get_bignum2(&pri, result->rsa->d);
-		buffer_get_bignum2(&pri, result->rsa->p);
-		buffer_get_bignum2(&pri, result->rsa->q);
-		buffer_get_bignum2(&pri, result->rsa->iqmp);
+		buffer_get_bignum2(&pri, d);
+		buffer_get_bignum2(&pri, p);
+		buffer_get_bignum2(&pri, q);
+		buffer_get_bignum2(&pri, iqmp);
 
 		break;
 	}
@@ -1547,33 +1565,39 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	switch (result->type) {
 	case KEY_RSA:
 	{
+		/********* OPENSSL1.1.1 NOTEST *********/
+		BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+
 		result->rsa = RSA_new();
 		if (result->rsa == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->rsa->e = BN_new();
-		result->rsa->n = BN_new();
-		result->rsa->d = BN_new();
-		result->rsa->p = BN_new();
-		result->rsa->q = BN_new();
-		result->rsa->iqmp = BN_new();
-		if (result->rsa->e == NULL ||
-		    result->rsa->n == NULL ||
-		    result->rsa->d == NULL ||
-		    result->rsa->p == NULL ||
-		    result->rsa->q == NULL ||
-		    result->rsa->iqmp == NULL) {
+		e = BN_new();
+		n = BN_new();
+		d = BN_new();
+		RSA_set0_key(result->rsa, n, e, d);
+		p = BN_new();
+		q = BN_new();
+		RSA_set0_factors(result->rsa, p, q);
+		iqmp = BN_new();
+		RSA_set0_crt_params(result->rsa, NULL, NULL, iqmp);
+		if (e == NULL ||
+		    n == NULL ||
+		    d == NULL ||
+		    p == NULL ||
+		    q == NULL ||
+		    iqmp == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
 
-		buffer_get_bignum_SECSH(blob2, result->rsa->e);
-		buffer_get_bignum_SECSH(blob2, result->rsa->d);
-		buffer_get_bignum_SECSH(blob2, result->rsa->n);
-		buffer_get_bignum_SECSH(blob2, result->rsa->iqmp);
-		buffer_get_bignum_SECSH(blob2, result->rsa->p);
-		buffer_get_bignum_SECSH(blob2, result->rsa->q);
+		buffer_get_bignum_SECSH(blob2, e);
+		buffer_get_bignum_SECSH(blob2, d);
+		buffer_get_bignum_SECSH(blob2, n);
+		buffer_get_bignum_SECSH(blob2, iqmp);
+		buffer_get_bignum_SECSH(blob2, p);
+		buffer_get_bignum_SECSH(blob2, q);
 
 		break;
 	}
