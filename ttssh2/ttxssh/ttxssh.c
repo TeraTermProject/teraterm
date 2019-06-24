@@ -4128,7 +4128,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
-	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
+	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
 		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
@@ -4172,12 +4172,12 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 
 	/* encrypt */
 	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
-	if (EVP_Cipher(&cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
+	if (EVP_Cipher(cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);
 		//goto error;
 	}
-	cipher_cleanup_SSH2(&cipher_ctx);
+	cipher_cleanup_SSH2(cipher_ctx);
 
 	len = 2 * buffer_len(encoded);
 	cp = malloc(len);
