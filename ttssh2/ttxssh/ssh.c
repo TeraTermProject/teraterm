@@ -5366,10 +5366,12 @@ error:;
 //
 static void SSH2_dh_kex_init(PTInstVar pvar)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	DH *dh = NULL;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	int len;
+	BIGNUM *pub_key;
 
 	// Diffie-Hellman key agreement
 	switch (pvar->kex_type) {
@@ -5400,7 +5402,8 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 		return;
 	}
 
-	buffer_put_bignum2(msg, dh->pub_key);
+	DH_get0_key(dh, &pub_key, NULL);
+	buffer_put_bignum2(msg, pub_key);
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEXDH_INIT, len);
@@ -5536,12 +5539,14 @@ error:;
  */
 static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	int len, grp_bits;
 	BIGNUM *p = NULL, *g = NULL;
 	DH *dh = NULL;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	char tmpbuf[256];
+	BIGNUM *pub_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_GROUP was received.");
 
@@ -5616,8 +5621,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	dh = DH_new();
 	if (dh == NULL)
 		goto error;
-	dh->p = p;
-	dh->g = g;
+	DH_set0_pqg(dh, p, NULL, g);
 
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
@@ -5627,7 +5631,8 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	if (msg == NULL) {
 		goto error;
 	}
-	buffer_put_bignum2(msg, dh->pub_key);
+	DH_get0_key(dh, &pub_key, NULL);
+	buffer_put_bignum2(msg, pub_key);
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_DH_GEX_INIT, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -5642,9 +5647,14 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	pvar->kexdh = dh;
 
 	{
-		push_bignum_memdump("DH_GEX_GROUP", "p", dh->p);
-		push_bignum_memdump("DH_GEX_GROUP", "g", dh->g);
-		push_bignum_memdump("DH_GEX_GROUP", "pub_key", dh->pub_key);
+		BIGNUM *p, *q, *pub_key;
+
+		DH_get0_pqg(dh, &p, &q, NULL);
+		DH_get0_key(dh, &pub_key, NULL);
+
+		push_bignum_memdump("DH_GEX_GROUP", "p", p);
+		push_bignum_memdump("DH_GEX_GROUP", "g", g);
+		push_bignum_memdump("DH_GEX_GROUP", "pub_key", pub_key);
 	}
 
 	SSH2_dispatch_init(2);
@@ -5836,6 +5846,7 @@ cont:
 //
 static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	char *data;
 	int len;
 	int offset = 0;
@@ -5851,6 +5862,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	BIGNUM *pub_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
 
@@ -5944,6 +5956,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hash = kex_dh_hash(
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		pvar->client_version_string,
@@ -5951,7 +5964,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
 		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
 		server_host_key_blob, bloblen,
-		pvar->kexdh->pub_key,
+		pub_key,
 		server_public,
 		share_key,
 		&hashlen);
@@ -5967,7 +5980,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
+	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
@@ -5991,6 +6005,7 @@ error:
 //
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	char *data;
 	int len;
 	int offset = 0;
@@ -6006,6 +6021,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	BIGNUM *p, *g;
+	BIGNUM *pub_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
@@ -6099,6 +6116,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
+	DH_get0_pqg(pvar->kexdh, &p, NULL, &g);
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hash = kex_dh_gex_hash(
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		pvar->client_version_string,
@@ -6109,9 +6128,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		pvar->kexgex_min,
 		pvar->kexgex_bits,
 		pvar->kexgex_max,
-		pvar->kexdh->p,
-		pvar->kexdh->g,
-		pvar->kexdh->pub_key,
+		p,
+		g,
+		pub_key,
 		server_public,
 		share_key,
 		&hashlen);
@@ -6127,7 +6146,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
+	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);

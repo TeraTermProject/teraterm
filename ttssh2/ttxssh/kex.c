@@ -33,20 +33,24 @@ extern SSHKeys current_keys[MODE_MAX];
 
 static DH *dh_new_group_asc(const char *gen, const char *modulus)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	DH *dh = NULL;
+	BIGNUM *p, *g;
 
 	if ((dh = DH_new()) == NULL) {
 		printf("dh_new_group_asc: DH_new");
 		goto error;
 	}
 
+	DH_get0_pqg(dh, &p, NULL, &g);
+
 	// PとGは公開してもよい素数の組み合わせ
-	if (BN_hex2bn(&dh->p, modulus) == 0) {
+	if (BN_hex2bn(&p, modulus) == 0) {
 		printf("BN_hex2bn p");
 		goto error;
 	}
 
-	if (BN_hex2bn(&dh->g, gen) == 0) {
+	if (BN_hex2bn(&g, gen) == 0) {
 		printf("BN_hex2bn g");
 		goto error;
 	}
@@ -230,23 +234,28 @@ DH *dh_new_group18(void)
 // DH鍵を生成する
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ )
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	int i;
+	BIGNUM *pub_key;
+	BIGNUM *priv_key;
 
-	dh->priv_key = NULL;
+	priv_key = NULL;
 
 	// 秘密にすべき乱数(X)を生成
 	for (i = 0 ; i < 10 ; i++) { // retry counter
-		if (dh->priv_key != NULL) {
-			BN_clear_free(dh->priv_key);
+		if (priv_key != NULL) {
+			BN_clear_free(priv_key);
 		}
-		dh->priv_key = BN_new();
-		if (dh->priv_key == NULL)
+		priv_key = BN_new();
+		DH_set0_key(dh, NULL, priv_key);
+		if (priv_key == NULL)
 			goto error;
-		if (BN_rand(dh->priv_key, 2*(we_need*8), 0, 0) == 0)
+		if (BN_rand(priv_key, 2*(we_need*8), 0, 0) == 0)
 			goto error;
 		if (DH_generate_key(dh) == 0)
 			goto error;
-		if (dh_pub_is_valid(dh, dh->pub_key))
+		DH_get0_key(dh, &pub_key, NULL);
+		if (dh_pub_is_valid(dh, pub_key))
 			break;
 	}
 	if (i >= 10) {
@@ -467,9 +476,11 @@ error:
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	int i;
 	int n = BN_num_bits(dh_pub);
 	int bits_set = 0;
+	const BIGNUM *p;
 
 	/********* OPENSSL1.1.1 NOTEST *********/
 	// OpenSSL 1.1.0で、BIGNUM構造体のnegメンバーに直接アクセスできなくなったため、
@@ -485,7 +496,8 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 	//debug2("bits set: %d/%d", bits_set, BN_num_bits(dh->p));
 
 	/* if g==2 and bits_set==1 then computing log_g(dh_pub) is trivial */
-	if (bits_set > 1 && (BN_cmp(dh_pub, dh->p) == -1))
+	DH_get0_pqg(dh, &p, NULL, NULL);
+	if (bits_set > 1 && (BN_cmp(dh_pub, p) == -1))
 		return 1;
 	//logit("invalid public DH value (%d/%d)", bits_set, BN_num_bits(dh->p));
 	return 0;
