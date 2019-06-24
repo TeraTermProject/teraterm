@@ -1451,20 +1451,20 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 		p = BN_new();
-		q = BN_new();
+		dsa_q = BN_new();
 		g = BN_new();
 		pub_key = BN_new();
 		DSA_set0_pqg(dsa, p, dsa_q, g);
 		DSA_set0_key(dsa, pub_key, NULL);
 		if (p == NULL ||
-		    q == NULL ||
+		    dsa_q == NULL ||
 		    g == NULL ||
 		    pub_key == NULL) {
 			goto error;
 		}
 
 		buffer_get_bignum2(&data, p);
-		buffer_get_bignum2(&data, q);
+		buffer_get_bignum2(&data, dsa_q);
 		buffer_get_bignum2(&data, g);
 		buffer_get_bignum2(&data, pub_key);
 
@@ -1717,7 +1717,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		u_char digest[EVP_MAX_MD_SIZE];
 		u_int len, dlen, nid;
 		buffer_t *buf2 = NULL;
-		BIGNUM *r, *s;
+		BIGNUM *br, *bs;
 
 		nid = keytype_to_hash_nid(keypair->type);
 		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
@@ -1747,9 +1747,9 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			// TODO: error check
 			goto error;
 		}
-		ECDSA_SIG_get0(sig, &r, &s);
-		buffer_put_bignum2(buf2, r);
-		buffer_put_bignum2(buf2, s);
+		ECDSA_SIG_get0(sig, &br, &bs);
+		buffer_put_bignum2(buf2, br);
+		buffer_put_bignum2(buf2, bs);
 		ECDSA_SIG_free(sig);
 
 		s = get_sshname_from_key(keypair);
