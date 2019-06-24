@@ -423,7 +423,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		goto error;
 	}
 
-	DSA_SIG_set0(sig, r, s);
+	ECDSA_SIG_set0(sig, r, s);
 	buffer_get_bignum2(&sigblob, r);
 	buffer_get_bignum2(&sigblob, s);
 	if (sigblob != ptr) {
@@ -1746,7 +1746,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			// TODO: error check
 			goto error;
 		}
-		DSA_SIG_get0(sig, &r, &s);
+		ECDSA_SIG_get0(sig, &r, &s);
 		buffer_put_bignum2(buf2, r);
 		buffer_put_bignum2(buf2, s);
 		ECDSA_SIG_free(sig);
