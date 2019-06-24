@@ -802,7 +802,8 @@ key_size(const Key *k)
 		RSA_get0_key(k->rsa, &n, NULL, NULL);
 		return BN_num_bits(n);
 	case KEY_RSA:
-		return BN_num_bits(k->rsa->n);
+		RSA_get0_key(k->rsa, &n, NULL, NULL);
+		return BN_num_bits(n);
 	case KEY_DSA:
 		DSA_get0_pqg(k->dsa, &p, NULL, NULL);
 		return BN_num_bits(p);
