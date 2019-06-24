@@ -319,7 +319,8 @@ static char *parse_bignum(char *data)
 	int ch;
 	int leftover_digits = 1;
 
-	BN_CTX_init(ctx);
+	// BN_CTX_initŠÖ”‚Í OpenSSL 1.1.0 ‚Åíœ‚³‚ê‚½B
+	// OpenSSL 1.0.2‚Ì“_‚Å‚·‚Å‚É deprecated ˆµ‚¢‚¾‚Á‚½B
 	BN_set_word(num, 0);
 	BN_set_word(billion, 1000000000L);
 
