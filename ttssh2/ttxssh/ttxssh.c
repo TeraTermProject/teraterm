@@ -3670,9 +3670,9 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh1_3des_ctx *c;
 
 	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		EVP_CIPHER_CTX_cleanup(&c->k1);
-		EVP_CIPHER_CTX_cleanup(&c->k2);
-		EVP_CIPHER_CTX_cleanup(&c->k3);
+		EVP_CIPHER_CTX_cleanup(c->k1);
+		EVP_CIPHER_CTX_cleanup(c->k2);
+		EVP_CIPHER_CTX_cleanup(c->k3);
 		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);

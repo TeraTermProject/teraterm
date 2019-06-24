@@ -155,9 +155,9 @@ int ssh_dss_verify(DSA *key,
 	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, s);
 
 	/* sha1 the data */
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, data, datalen);
-	EVP_DigestFinal(&md, digest, &dlen);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, data, datalen);
+	EVP_DigestFinal(md, digest, &dlen);
 
 	ret = DSA_do_verify(digest, dlen, sig, key);
 	SecureZeroMemory(digest, sizeof(digest));
@@ -348,9 +348,9 @@ int ssh_rsa_verify(RSA *key,
 		ret = -6;
 		goto error;
 	}
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, data, datalen);
-	EVP_DigestFinal(&md, digest, &dlen);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, data, datalen);
+	EVP_DigestFinal(md, digest, &dlen);
 
 	ret = openssh_RSA_verify(nid, digest, dlen, sigblob, len, key);
 
@@ -437,9 +437,9 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		ret = -8;
 		goto error;
 	}
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, data, datalen);
-	EVP_DigestFinal(&md, digest, &dlen);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, data, datalen);
+	EVP_DigestFinal(md, digest, &dlen);
 
 	ret = ECDSA_do_verify(digest, dlen, sig, key);
 	SecureZeroMemory(digest, sizeof(digest));

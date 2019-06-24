@@ -560,7 +560,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
 		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	if (EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
-		cipher_cleanup_SSH2(&cipher_ctx);
+		cipher_cleanup_SSH2(cipher_ctx);
 		goto error;
 	}
 	cipher_cleanup_SSH2(cipher_ctx);
@@ -1053,23 +1053,23 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
 			foo[i] ^= mackey[i];
 		}
-		EVP_DigestInit(&ctx[0], md);
-		EVP_DigestUpdate(&ctx[0], foo, sizeof(foo));
+		EVP_DigestInit(ctx[0], md);
+		EVP_DigestUpdate(ctx[0], foo, sizeof(foo));
 
 		memset(foo, 0x5C, sizeof(foo));
 		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
 			foo[i] ^= mackey[i];
 		}
-		EVP_DigestInit(&ctx[1], md);
-		EVP_DigestUpdate(&ctx[1], foo, sizeof(foo));
+		EVP_DigestInit(ctx[1], md);
+		EVP_DigestUpdate(ctx[1], foo, sizeof(foo));
 
 		memset(foo, 0, sizeof(foo));
 
-		EVP_DigestUpdate(&ctx[0], macdata->buf, macdata->len);
-		EVP_DigestFinal(&ctx[0], intermediate, &len);
+		EVP_DigestUpdate(ctx[0], macdata->buf, macdata->len);
+		EVP_DigestFinal(ctx[0], intermediate, &len);
 
-		EVP_DigestUpdate(&ctx[1], intermediate, sizeof(intermediate));
-		EVP_DigestFinal(&ctx[1], binary, &len);
+		EVP_DigestUpdate(ctx[1], intermediate, sizeof(intermediate));
+		EVP_DigestFinal(ctx[1], binary, &len);
 
 		EVP_MD_CTX_free(ctx[0]);
 		EVP_MD_CTX_free(ctx[1]);
