@@ -4666,7 +4666,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				char *uuenc; // uuencode data
 				int uulen;
 				BIGNUM *e, *n;
-				BIGNUM *p, *q, *g, *pub_key, *priv_key;
+				BIGNUM *p, *q, *g, *pub_key;
 				/********* OPENSSL1.1.1 NOTEST *********/
 
 				b = buffer_init();

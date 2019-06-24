@@ -1121,7 +1121,7 @@ Key *key_new(int type)
 	RSA *rsa;
 	DSA *dsa;
 	BIGNUM *e = NULL, *n = NULL;
-	BIGNUM *p, *q, *g, *pub_key, *priv_key;
+	BIGNUM *p, *q, *g, *pub_key;
 
 	k = calloc(1, sizeof(Key));
 	if (k == NULL)

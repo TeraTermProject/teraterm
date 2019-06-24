@@ -1108,7 +1108,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	{
 		/********* OPENSSL1.1.1 NOTEST *********/
 		char *pubkey_type, *pub, *pri;
-		BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
 		pub = pubkey->buf;
 		pri = prikey->buf;
@@ -1573,7 +1573,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	case KEY_RSA:
 	{
 		/********* OPENSSL1.1.1 NOTEST *********/
-		BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
 		result->rsa = RSA_new();
 		if (result->rsa == NULL) {
