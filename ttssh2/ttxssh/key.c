@@ -85,6 +85,7 @@ int ssh_dss_verify(DSA *key,
                    u_char *signature, u_int signaturelen,
                    u_char *data, u_int datalen)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	DSA_SIG *sig;
 	const EVP_MD *evp_md = EVP_sha1();
 	EVP_MD_CTX *md = NULL;
@@ -92,6 +93,7 @@ int ssh_dss_verify(DSA *key,
 	unsigned int len, dlen;
 	int ret = -1;
 	char *ptr;
+	BIGNUM *r, *s;
 
 	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
@@ -140,16 +142,17 @@ int ssh_dss_verify(DSA *key,
 		ret = -5;
 		goto error;
 	}
-	if ((sig->r = BN_new()) == NULL) {
+	if ((r = BN_new()) == NULL) {
 		ret = -6;
 		goto error;
 	}
-	if ((sig->s = BN_new()) == NULL) {
+	if ((s = BN_new()) == NULL) {
 		ret = -7;
 		goto error;
 	}
-	BN_bin2bn(sigblob, INTBLOB_LEN, sig->r);
-	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, sig->s);
+	DSA_SIG_set0(sig, r, s);
+	BN_bin2bn(sigblob, INTBLOB_LEN, r);
+	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, s);
 
 	/* sha1 the data */
 	EVP_DigestInit(&md, evp_md);
@@ -367,6 +370,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
                      u_char *signature, u_int signaturelen,
                      u_char *data, u_int datalen)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	ECDSA_SIG *sig;
 	const EVP_MD *evp_md;
 	EVP_MD_CTX *md = NULL;
@@ -374,6 +378,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	unsigned int len, dlen;
 	int ret = -1, nid = NID_undef;
 	char *ptr;
+	BIGNUM *r, *s;
 
 	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
@@ -409,17 +414,18 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		ret = -4;
 		goto error;
 	}
-	if ((sig->r = BN_new()) == NULL) {
+	if ((r = BN_new()) == NULL) {
 		ret = -5;
 		goto error;
 	}
-	if ((sig->s = BN_new()) == NULL) {
+	if ((s = BN_new()) == NULL) {
 		ret = -6;
 		goto error;
 	}
 
-	buffer_get_bignum2(&sigblob, sig->r);
-	buffer_get_bignum2(&sigblob, sig->s);
+	DSA_SIG_set0(sig, r, s);
+	buffer_get_bignum2(&sigblob, r);
+	buffer_get_bignum2(&sigblob, s);
 	if (sigblob != ptr) {
 		ret = -7;
 		goto error;
@@ -1643,11 +1649,13 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	}
 	case KEY_DSA: // DSA
 	{
+		/********* OPENSSL1.1.1 NOTEST *********/
 		DSA_SIG *sig;
 		const EVP_MD *evp_md = EVP_sha1();
 		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE], sigblob[SIGBLOB_LEN];
 		u_int rlen, slen, len, dlen;
+		BIGNUM *bignum_r, *bignum_s;
 
 		/********* OPENSSL1.1.1 NOTEST *********/
 		md = EVP_MD_CTX_new();
@@ -1669,15 +1677,16 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 
 		// BIGNUMからバイナリ値への変換
-		rlen = BN_num_bytes(sig->r);
-		slen = BN_num_bytes(sig->s);
+		DSA_SIG_get0(sig, &bignum_r, &bignum_s);
+		rlen = BN_num_bytes(bignum_r);
+		slen = BN_num_bytes(bignum_s);
 		if (rlen > INTBLOB_LEN || slen > INTBLOB_LEN) {
 			DSA_SIG_free(sig);
 			goto error;
 		}
 		memset(sigblob, 0, SIGBLOB_LEN);
-		BN_bn2bin(sig->r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
-		BN_bn2bin(sig->s, sigblob+ SIGBLOB_LEN - slen);
+		BN_bn2bin(bignum_r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
+		BN_bn2bin(bignum_s, sigblob+ SIGBLOB_LEN - slen);
 		DSA_SIG_free(sig);
 
 		// setting
@@ -1700,12 +1709,14 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 	{
+		/********* OPENSSL1.1.1 NOTEST *********/
 		ECDSA_SIG *sig;
 		const EVP_MD *evp_md;
 		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE];
 		u_int len, dlen, nid;
 		buffer_t *buf2 = NULL;
+		BIGNUM *r, *s;
 
 		nid = keytype_to_hash_nid(keypair->type);
 		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
@@ -1735,8 +1746,9 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			// TODO: error check
 			goto error;
 		}
-		buffer_put_bignum2(buf2, sig->r);
-		buffer_put_bignum2(buf2, sig->s);
+		DSA_SIG_get0(sig, &r, &s);
+		buffer_put_bignum2(buf2, r);
+		buffer_put_bignum2(buf2, s);
 		ECDSA_SIG_free(sig);
 
 		s = get_sshname_from_key(keypair);
