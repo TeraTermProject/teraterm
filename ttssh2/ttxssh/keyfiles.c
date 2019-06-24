@@ -76,7 +76,7 @@ static BOOL normalize_key(RSA *key)
 	RSA_get0_factors(key, &p, &q);
 	RSA_get0_crt_params(key, &dmp1, &dmq1, &iqmp);
 
-	if (BN_cmp(key->p, key->q) < 0) {
+	if (BN_cmp(p, q) < 0) {
 		BIGNUM *tmp = p;
 
 		p = q;
@@ -87,7 +87,7 @@ static BOOL normalize_key(RSA *key)
 	if (r != NULL && ctx != NULL) {
 		dmp1 = BN_new();
 		dmq1 = BN_new();
-		iqmp = BN_mod_inverse(NULL, key->q, key->p, ctx);
+		iqmp = BN_mod_inverse(NULL, q, p, ctx);
 		RSA_set0_crt_params(key, dmp1, dmq1, iqmp);
 
 		if (dmp1 != NULL && dmq1 != NULL && iqmp != NULL) {
