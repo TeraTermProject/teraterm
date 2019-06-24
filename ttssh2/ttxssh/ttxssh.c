@@ -3476,6 +3476,8 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 	{
 		DSA *priv = NULL;
 		DSA *pub = NULL;
+		BIGNUM *p, *q, *g, *pub_key;
+		BIGNUM *sp, *sq, *sg, *spub_key;
 
 		// private key
 		priv = DSA_generate_parameters(bits, NULL, 0, NULL, NULL, cbfunc, cbarg);
@@ -3491,19 +3493,24 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		pub = DSA_new();
 		if (pub == NULL)
 			goto error;
-		pub->p = BN_new();
-		pub->q = BN_new();
-		pub->g = BN_new();
-		pub->pub_key = BN_new();
-		if (pub->p == NULL || pub->q == NULL || pub->g == NULL || pub->pub_key == NULL) {
+		p = BN_new();
+		q = BN_new();
+		g = BN_new();
+		DSA_set0_pqg(pub, p, q, g);
+		pub_key = BN_new();
+		DSA_set0_key(pub, pub_key, NULL);
+		if (p == NULL || q == NULL || g == NULL || pub_key == NULL) {
 			DSA_free(pub);
 			goto error;
 		}
 
-		BN_copy(pub->p, priv->p);
-		BN_copy(pub->q, priv->q);
-		BN_copy(pub->g, priv->g);
-		BN_copy(pub->pub_key, priv->pub_key);
+		DSA_get0_pqg(priv, &sp, &sq, &sg);
+		DSA_get0_key(priv, &spub_key, NULL);
+
+		BN_copy(p, sp);
+		BN_copy(q, sq);
+		BN_copy(g, sg);
+		BN_copy(pub_key, spub_key);
 		public_key.dsa = pub;
 		break;
 	}
@@ -4657,6 +4664,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				char *uuenc; // uuencode data
 				int uulen;
 				BIGNUM *e, *n;
+				BIGNUM *p, *q, *g, *pub_key, *priv_key;
 				/********* OPENSSL1.1.1 NOTEST *********/
 
 				b = buffer_init();
@@ -4665,12 +4673,15 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 
 				switch (public_key.type) {
 				case KEY_DSA: // DSA
+					DSA_get0_pqg(dsa, &p, &q, &g);
+					DSA_get0_key(dsa, &pub_key, NULL);
+
 					keyname = "ssh-dss";
 					buffer_put_string(b, keyname, strlen(keyname));
-					buffer_put_bignum2(b, dsa->p);
-					buffer_put_bignum2(b, dsa->q);
-					buffer_put_bignum2(b, dsa->g);
-					buffer_put_bignum2(b, dsa->pub_key);
+					buffer_put_bignum2(b, p);
+					buffer_put_bignum2(b, q);
+					buffer_put_bignum2(b, g);
+					buffer_put_bignum2(b, pub_key);
 					break;
 
 				case KEY_RSA: // RSA

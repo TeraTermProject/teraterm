@@ -595,28 +595,35 @@ error:
 //
 DSA *duplicate_DSA(DSA *src)
 {
+	/********* OPENSSL1.1.1 NOTEST *********/
 	DSA *dsa = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
+	BIGNUM *sp, *sq, *sg, *spub_key;
 
 	dsa = DSA_new();
 	if (dsa == NULL)
 		goto error;
-	dsa->p = BN_new();
-	dsa->q = BN_new();
-	dsa->g = BN_new();
-	dsa->pub_key = BN_new();
-	if (dsa->p == NULL ||
-	    dsa->q == NULL ||
-	    dsa->g == NULL ||
-	    dsa->pub_key == NULL) {
+	p = BN_new();
+	q = BN_new();
+	g = BN_new();
+	pub_key = BN_new();
+	DSA_set0_pqg(dsa, p, q, g);
+	DSA_set0_key(dsa, pub_key, NULL);
+	if (p == NULL ||
+	    q == NULL ||
+	    g == NULL ||
+	    pub_key == NULL) {
 		DSA_free(dsa);
 		goto error;
 	}
 
 	// [‚¢ƒRƒs[(deep copy)‚ðs‚¤Bó‚¢ƒRƒs[(shallow copy)‚ÍNGB
-	BN_copy(dsa->p, src->p);
-	BN_copy(dsa->q, src->q);
-	BN_copy(dsa->g, src->g);
-	BN_copy(dsa->pub_key, src->pub_key);
+	DSA_get0_pqg(src, &sp, &sq, &sg);
+	DSA_get0_key(src, &spub_key, NULL);
+	BN_copy(p, sp);
+	BN_copy(q, sq);
+	BN_copy(g, sg);
+	BN_copy(pub_key, spub_key);
 
 error:
 	return (dsa);
@@ -782,6 +789,7 @@ key_size(const Key *k)
 {
 	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *n = NULL;
+	BIGNUM *p = NULL;
 
 	switch (k->type) {
 	case KEY_RSA1:
@@ -790,7 +798,8 @@ key_size(const Key *k)
 	case KEY_RSA:
 		return BN_num_bits(k->rsa->n);
 	case KEY_DSA:
-		return BN_num_bits(k->dsa->p);
+		DSA_get0_pqg(k->dsa, &p, NULL, NULL);
+		return BN_num_bits(p);
 	case KEY_ECDSA256:
 		return 256;
 	case KEY_ECDSA384:
@@ -1009,6 +1018,7 @@ static void key_add_private(Key *k)
 {
 	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *d, *iqmp, *q, *p, *dmq1, *dmp1;
+	BIGNUM *priv_key = NULL;
 
 	d = iqmp = q = p = dmq1 = dmp1 = NULL;
 
@@ -1033,8 +1043,9 @@ static void key_add_private(Key *k)
 			break;
 
 		case KEY_DSA:
-			k->dsa->priv_key = BN_new();
-			if (k->dsa->priv_key == NULL)
+			priv_key = BN_new();
+			DSA_set0_key(k->dsa, NULL, priv_key);
+			if (priv_key == NULL)
 				goto error;
 			break;
 
@@ -1080,9 +1091,8 @@ error:
 	}
 
 
-	if (k->dsa->priv_key == NULL) {
-		BN_free(k->dsa->priv_key);
-		k->dsa->priv_key = NULL;
+	if (priv_key == NULL) {
+		BN_free(priv_key);
 	}
 
 }
@@ -1104,6 +1114,7 @@ Key *key_new(int type)
 	RSA *rsa;
 	DSA *dsa;
 	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
 	k = calloc(1, sizeof(Key));
 	if (k == NULL)
@@ -1133,11 +1144,13 @@ Key *key_new(int type)
 			dsa = DSA_new();
 			if (dsa == NULL)
 				goto error;
-			dsa->p = BN_new();
-			dsa->q = BN_new();
-			dsa->g = BN_new();
-			dsa->pub_key = BN_new();
-			if (dsa->p == NULL || dsa->q == NULL || dsa->g == NULL || dsa->pub_key == NULL)
+			p = BN_new();
+			q = BN_new();
+			g = BN_new();
+			DSA_set0_pqg(dsa, p, q, g);
+			pub_key = BN_new();
+			DSA_set0_key(dsa, pub_key, NULL);
+			if (p == NULL || q == NULL || g == NULL || pub_key == NULL)
 				goto error;
 			k->dsa = dsa;
 			break;
@@ -1306,6 +1319,7 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 	int len;
 	int ret = 1;  // success
 	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
 
 	b = buffer_init();
 	sshname = get_sshname_from_key(key);
@@ -1318,11 +1332,13 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 		buffer_put_bignum2(b, n);
 		break;
 	case KEY_DSA:
+		DSA_get0_pqg(key->dsa, &p, &q, &g);
+		DSA_get0_key(key->dsa, &pub_key, NULL);
 		buffer_put_string(b, sshname, strlen(sshname));
-		buffer_put_bignum2(b, key->dsa->p);
-		buffer_put_bignum2(b, key->dsa->q);
-		buffer_put_bignum2(b, key->dsa->g);
-		buffer_put_bignum2(b, key->dsa->pub_key);
+		buffer_put_bignum2(b, p);
+		buffer_put_bignum2(b, q);
+		buffer_put_bignum2(b, g);
+		buffer_put_bignum2(b, pub_key);
 		break;
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
@@ -1380,6 +1396,7 @@ Key *key_from_blob(char *data, int blen)
 	ssh_keytype type;
 	unsigned char *pk = NULL;
 	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *dsa_q, *g, *pub_key;
 
 	if (data == NULL)
 		goto error;
@@ -1426,21 +1443,23 @@ Key *key_from_blob(char *data, int blen)
 		if (dsa == NULL) {
 			goto error;
 		}
-		dsa->p = BN_new();
-		dsa->q = BN_new();
-		dsa->g = BN_new();
-		dsa->pub_key = BN_new();
-		if (dsa->p == NULL ||
-		    dsa->q == NULL ||
-		    dsa->g == NULL ||
-		    dsa->pub_key == NULL) {
+		p = BN_new();
+		q = BN_new();
+		g = BN_new();
+		pub_key = BN_new();
+		DSA_set0_pqg(dsa, p, dsa_q, g);
+		DSA_set0_key(dsa, pub_key, NULL);
+		if (p == NULL ||
+		    q == NULL ||
+		    g == NULL ||
+		    pub_key == NULL) {
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, dsa->p);
-		buffer_get_bignum2(&data, dsa->q);
-		buffer_get_bignum2(&data, dsa->g);
-		buffer_get_bignum2(&data, dsa->pub_key);
+		buffer_get_bignum2(&data, p);
+		buffer_get_bignum2(&data, q);
+		buffer_get_bignum2(&data, g);
+		buffer_get_bignum2(&data, pub_key);
 
 		hostkey->type = type;
 		hostkey->dsa = dsa;
@@ -1765,6 +1784,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	Key *keypair;
 	char *s, *tmp;
 	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -1783,12 +1803,14 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 		buffer_put_bignum2(msg, n); // p~q
 		break;
 	case KEY_DSA: // DSA
+		DSA_get0_pqg(keypair->dsa, &p, &q, &g);
+		DSA_get0_key(keypair->dsa, &pub_key, NULL);
 		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, keypair->dsa->p); // ‘f”
-		buffer_put_bignum2(msg, keypair->dsa->q); // (p-1)‚Ì‘fˆö”
-		buffer_put_bignum2(msg, keypair->dsa->g); // ®”
-		buffer_put_bignum2(msg, keypair->dsa->pub_key); // ŒöŠJŒ®
+		buffer_put_bignum2(msg, p); // ‘f”
+		buffer_put_bignum2(msg, q); // (p-1)‚Ì‘fˆö”
+		buffer_put_bignum2(msg, g); // ®”
+		buffer_put_bignum2(msg, pub_key); // ŒöŠJŒ®
 		break;
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
@@ -1872,6 +1894,7 @@ void key_private_serialize(Key *key, buffer_t *b)
 	/********* OPENSSL1.1.1 NOTEST *********/
 	char *s;
 	BIGNUM *e, *n, *d, *iqmp, *p, *q;
+	BIGNUM *g, *pub_key, *priv_key;
 	
 	s = get_sshname_from_key(key);
 	buffer_put_cstring(b, s);
@@ -1891,11 +1914,13 @@ void key_private_serialize(Key *key, buffer_t *b)
 			break;
 
 		case KEY_DSA:
-			buffer_put_bignum2(b, key->dsa->p);
-			buffer_put_bignum2(b, key->dsa->q);
-			buffer_put_bignum2(b, key->dsa->g);
-			buffer_put_bignum2(b, key->dsa->pub_key);
-			buffer_put_bignum2(b, key->dsa->priv_key);
+			DSA_get0_pqg(key->dsa, &p, &q, &g);
+			DSA_get0_key(key->dsa, &pub_key, &priv_key);
+			buffer_put_bignum2(b, p);
+			buffer_put_bignum2(b, q);
+			buffer_put_bignum2(b, g);
+			buffer_put_bignum2(b, pub_key);
+			buffer_put_bignum2(b, priv_key);
 			break;
 
 		case KEY_ECDSA256:
@@ -1956,6 +1981,7 @@ Key *key_private_deserialize(buffer_t *blob)
 	unsigned int pklen, sklen;
 	int type;
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+	BIGNUM *g, *pub_key, *priv_key;
 
 	type_name = buffer_get_string_msg(blob, NULL);
 	if (type_name == NULL)
@@ -1982,11 +2008,13 @@ Key *key_private_deserialize(buffer_t *blob)
 			break;
 
 		case KEY_DSA:
-			buffer_get_bignum2_msg(blob, k->dsa->p);
-			buffer_get_bignum2_msg(blob, k->dsa->q);
-			buffer_get_bignum2_msg(blob, k->dsa->g);
-			buffer_get_bignum2_msg(blob, k->dsa->pub_key);
-			buffer_get_bignum2_msg(blob, k->dsa->priv_key);
+			DSA_get0_pqg(k->dsa, &p, &q, &g);
+			DSA_get0_key(k->dsa, &pub_key, &priv_key);
+			buffer_get_bignum2_msg(blob, p);
+			buffer_get_bignum2_msg(blob, q);
+			buffer_get_bignum2_msg(blob, g);
+			buffer_get_bignum2_msg(blob, pub_key);
+			buffer_get_bignum2_msg(blob, priv_key);
 			break;
 
 		case KEY_ECDSA256:
