@@ -64,6 +64,8 @@
 #define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
+#include "unicode_test.h"
+
 void ParseFirst(BYTE b);
 
 #define MAPSIZE(x) (sizeof(x)/sizeof((x)[0]))
@@ -661,7 +663,11 @@ void PutChar(BYTE b)
 	else
 		CharAttrTmp.Attr |= CharAttr.Attr;
 
+#if UNICODE_INTERNAL_BUFF
+	BuffPutUnicode(b, CharAttrTmp, InsertMode);
+#else
 	BuffPutChar(b, CharAttrTmp, InsertMode);
+#endif
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
 		UpdateStr();
@@ -672,7 +678,7 @@ void PutChar(BYTE b)
 	}
 }
 
-void PutDecSp(BYTE b)
+static void PutDecSp(BYTE b)
 {
 	TCharAttr CharAttrTmp;
 
@@ -717,7 +723,7 @@ void PutDecSp(BYTE b)
 	}
 }
 
-void PutKanji(BYTE b)
+static void PutKanji(BYTE b)
 {
 	int LineEnd;
 	TCharAttr CharAttrTmp;
@@ -848,7 +854,7 @@ void PutDebugChar(BYTE b)
 	}
 }
 
-void PrnParseControl(BYTE b) // printer mode
+static void PrnParseControl(BYTE b) // printer mode
 {
 	switch (b) {
 	case NUL:
@@ -897,7 +903,7 @@ void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(b, TRUE);
 }
 
-void ParseControl(BYTE b)
+static void ParseControl(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -5460,6 +5466,75 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 	return (index);
 }
 
+// unicode(UTF-32,wchar_t)をバッファへ書き込む
+// TODO @@
+#if UNICODE_INTERNAL_BUFF
+// 内部コード unicode版
+static void UnicodeToCP932(unsigned int code)
+{
+	unsigned short cset;
+	char r;
+
+	TCharAttr CharAttrTmp;
+	CharAttrTmp = CharAttr;
+	if (code <= US) {
+		// C0
+		ParseControl(code);
+#if 0
+	} else if ((0x80<=code) && (code<=0x9F)) {
+		// C1
+		ParseControl(code);
+	} else if (code < 0x20) {
+		PutChar(code);
+#endif
+#if 0
+	} else if (code <= 0xff) {
+		PutChar(code);
+#endif
+	} else {
+		// UnicodeからDEC特殊文字へのマッピング
+		if (ts.UnicodeDecSpMapping) {
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				code = cset & 0xff;
+				CharAttrTmp.Attr |= AttrSpecial;
+			}
+		}
+
+		if ((CharAttrTmp.Attr & AttrSpecial) == 0) {
+			if (Special) {
+				UpdateStr();
+				Special = FALSE;
+			}
+		} else {
+			if (!Special) {
+				UpdateStr();
+				Special = TRUE;
+			}
+		}
+
+		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
+		if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
+			UpdateStr();
+			Wrap = AutoWrapMode;
+		}
+		else {
+			if (r == '0' || r == 'V') {
+				;
+			}
+			else {
+				if (r == 'W') {
+					// 全角
+					MoveRight();
+				}
+				MoveRight();
+			}
+		}
+	}
+}
+
+#else
+
 // unicode(UTF-32)をバッファ(t.CodePage)へ書き込む
 static void UnicodeToCP932(unsigned int code)
 {
@@ -5505,6 +5580,24 @@ static void UnicodeToCP932(unsigned int code)
 	}
 }
 
+#endif
+
+// UTF-8で受信データを処理する(sub)
+#if UNICODE_INTERNAL_BUFF
+static BOOL ParseFirstUTF8Sub(BYTE b)
+{
+	if (b<=US)
+		ParseControl(b);
+	else if ((b>=0x20) && (b<=0x7E))
+		PutChar(b);
+	else if ((b>=0x80) && (b<=0x9F))
+		ParseControl(b);
+	else if (b>=0xA0)
+		PutChar(b);
+	return TRUE;
+}
+#endif
+
 // UTF-8で受信データを処理する
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
@@ -5533,10 +5626,19 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 			}
 
 			if (count == 1) {
+//#if UNICODE_INTERNAL_BUFF
+#if 0
+				ParseFirstUTF8Sub(buf[0]);
+#else
 				ParseASCII(buf[0]);
+#endif
 			}
+//#if UNICODE_INTERNAL_BUFF
+#if 0
+			ParseFirstUTF8Sub(b);
+#else
 			ParseASCII(b);
-
+#endif
 			count = 0;  // reset counter
 			return TRUE;
 		}
@@ -5636,7 +5738,7 @@ skip:
 		return TRUE;
 	}
 
-	if ((buf[0] & 0xf1) == 0xf0 &&
+	if ((buf[0] & 0xf8) == 0xf0 &&
 		(buf[1] & 0xc0) == 0x80 &&
 		(buf[2] & 0xc0) == 0x80 &&
 		(buf[3] & 0xc0) == 0x80)

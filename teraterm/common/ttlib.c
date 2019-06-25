@@ -44,6 +44,8 @@
 #include "tttypes.h"
 #include "compat_win.h"
 
+#include "../teraterm/unicode_test.h"
+
 /* OS version with GetVersionEx(*1)
 
                 dwMajorVersion   dwMinorVersion    dwPlatformId
@@ -1086,7 +1088,7 @@ void OutputDebugPrintf(const char *fmt, ...)
 	OutputDebugStringA(tmp);
 }
 
-#if defined(UNICODE)
+#if UNICODE_API // defined(UNICODE)
 void OutputDebugPrintfW(const wchar_t *fmt, ...)
 {
 	wchar_t tmp[1024];

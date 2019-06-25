@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,17 @@
  */
 
 /* TERATERM.EXE, scroll buffer routines */
+#undef UNICODE
+#undef _UNICODE
 
 #include "teraterm.h"
 #include "tttypes.h"
 #include <string.h>
 #include <stdio.h>
+#include <windows.h>
+#include <crtdbg.h>
+#include <mbstring.h>
+#include <assert.h>
 
 #include "ttwinman.h"
 #include "teraprn.h"
@@ -40,8 +46,37 @@
 #include "clipboar.h"
 #include "telnet.h"
 #include "ttplug.h" /* TTPLUG */
+#include "codeconv.h"
+#include "unicode.h"
 
 #include "buffer.h"
+
+#ifdef _DEBUG
+#define malloc(l)		_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define	realloc(p, l)	_realloc_dbg((p), (l),  _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)			_free_dbg((p), _NORMAL_BLOCK)
+#endif
+
+#include "unicode_test.h"
+
+#if UNICODE_INTERNAL_BUFF
+
+typedef unsigned long char32_t;		// C++11
+
+// バッファ内の半角1文字分の情報
+typedef struct {
+	char32_t u32;
+	char32_t u32_last;
+	char WidthProperty;		// 'W' or 'H' or 'A'
+	char CombinationCharCount16;
+	char CombinationCharSize16;
+	char CombinationCharCount32;
+	char CombinationCharSize32;
+	wchar_t *pCombinationChars16;
+	char32_t *pCombinationChars32;
+	wchar_t	wc2[2];
+} buff_char_t;
+#endif
 
 // URLを強調する（石崎氏パッチ 2005/4/2）
 #define URL_EMPHASIS 1
@@ -80,6 +115,10 @@ static PCHAR AttrLine;
 static PCHAR AttrLine2;
 static PCHAR AttrLineFG;
 static PCHAR AttrLineBG;
+#if UNICODE_INTERNAL_BUFF
+static buff_char_t *CodeBuffW;
+static buff_char_t *CodeLineW;
+#endif
 static LONG LinePtr;
 static LONG BufferSize;
 static int NumOfLinesInBuff;
@@ -94,9 +133,95 @@ static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
 
 static TCharAttr CurCharAttr;
 
-HANDLE SaveBuff = NULL;
-int SaveBuffX;
-int SaveBuffY;
+static char *SaveBuff = NULL;
+static int SaveBuffX;
+static int SaveBuffY;
+
+#if UNICODE_INTERNAL_BUFF
+static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
+{
+	size_t wstr_len;
+	buff_char_t *p = buff;
+	if (p->pCombinationChars16 != NULL) {
+		free(p->pCombinationChars16);
+		p->pCombinationChars16 = NULL;
+	}
+	p->CombinationCharCount16 = 0;
+	p->CombinationCharSize16 = 0;
+	if (p->pCombinationChars32 != NULL) {
+		free(p->pCombinationChars32);
+		p->pCombinationChars32 = NULL;
+	}
+	p->CombinationCharCount32 = 0;
+	p->CombinationCharSize32 = 0;
+	p->WidthProperty = property;
+	p->u32 = u32;
+	p->u32_last = u32;
+	wstr_len = UTF32ToUTF16(u32, &p->wc2[0], 2);
+	switch (wstr_len) {
+	case 0:
+	default:
+		p->wc2[0] = 0;
+		p->wc2[1] = 0;
+		break;
+	case 1:
+		p->wc2[1] = 0;
+		break;
+	case 2:
+		break;
+	}
+}
+
+static void BuffAddChar(buff_char_t *buff, char32_t u32, char property)
+{
+	buff_char_t *p = buff;
+	assert(p->u32 != 0);
+	// 後に続く文字領域を拡大する
+	if (p->CombinationCharSize16 < p->CombinationCharCount16 + 2) {
+		size_t new_size = p->CombinationCharSize16;
+		new_size = new_size == 0 ? 5 : new_size * 2;
+		p->pCombinationChars16 = realloc(p->pCombinationChars16, sizeof(wchar_t) * new_size);
+		p->CombinationCharSize16 = (char)new_size;
+	}
+	if (p->CombinationCharSize32 < p->CombinationCharCount32 + 2) {
+		size_t new_size = p->CombinationCharSize32;
+		new_size = new_size == 0 ? 5 : new_size * 2;
+		p->pCombinationChars32 = realloc(p->pCombinationChars32, sizeof(char32_t) * new_size);
+		p->CombinationCharSize32 = (char)new_size;
+	}
+
+	// UTF-32
+	p->u32_last = u32;
+	p->pCombinationChars32[p->CombinationCharCount32] = u32;
+	p->CombinationCharCount32++;
+
+	// UTF-16
+	{
+		wchar_t *u16 = &p->pCombinationChars16[p->CombinationCharCount16];
+		size_t wlen = UTF32ToUTF16(u32, u16, 2);
+		p->CombinationCharCount16 += (char)wlen;
+	}
+}
+
+static void memcpyW(buff_char_t *dest, const buff_char_t *src, size_t count)
+{
+	memcpy(dest, src, count * sizeof(buff_char_t));
+}
+
+static void memsetW(buff_char_t *dest, wchar_t ch, size_t count)
+{
+	size_t i;
+	for (i=0; i<count; i++) {
+		BuffSetChar(dest, ch, 'H');
+		dest++;
+	}
+}
+
+static void memmoveW(buff_char_t *dest, const buff_char_t *src, size_t count)
+{
+	memmove(dest, src, count * sizeof(buff_char_t));
+}
+#endif
 
 LONG GetLinePtr(int Line)
 {
@@ -135,6 +260,10 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
 	LONG SrcPtr, DestPtr;
 	WORD LockOld;
+#if UNICODE_INTERNAL_BUFF
+	buff_char_t *CodeDestW;
+	buff_char_t *CodeWNew;
+#endif
 
 	if (Nx > BuffXMax) {
 		Nx = BuffXMax;
@@ -157,6 +286,9 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	HAttr2New = NULL;
 	HAttrFGNew = NULL;
 	HAttrBGNew = NULL;
+#if UNICODE_INTERNAL_BUFF
+	CodeWNew = NULL;
+#endif
 
 	if ((HCodeNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (CodeDest=GlobalLock(HCodeNew)) == NULL) {
 		goto allocate_error;
@@ -173,8 +305,16 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	if ((HAttrBGNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDestBG=GlobalLock(HAttrBGNew)) == NULL) {
 		goto allocate_error;
 	}
+#if UNICODE_INTERNAL_BUFF
+	CodeWNew = malloc(NewSize * sizeof(buff_char_t));
+	CodeDestW = CodeWNew;
+#endif
 
 	memset(&CodeDest[0], 0x20, NewSize);
+#if UNICODE_INTERNAL_BUFF
+	memset(&CodeDestW[0], 0, NewSize * sizeof(buff_char_t));
+	memsetW(&CodeDestW[0], 0x20, NewSize);
+#endif
 	memset(&AttrDest[0], AttrDefault, NewSize);
 	memset(&AttrDest2[0], AttrDefault, NewSize);
 	memset(&AttrDestFG[0], AttrDefaultFG, NewSize);
@@ -199,6 +339,9 @@ BOOL ChangeBuffer(int Nx, int Ny)
 		DestPtr = 0;
 		for (i = 1 ; i <= NyCopy ; i++) {
 			memcpy(&CodeDest[DestPtr],&CodeBuff[SrcPtr],NxCopy);
+#if UNICODE_INTERNAL_BUFF
+			memcpyW(&CodeDestW[DestPtr],&CodeBuffW[SrcPtr],NxCopy);
+#endif
 			memcpy(&AttrDest[DestPtr],&AttrBuff[SrcPtr],NxCopy);
 			memcpy(&AttrDest2[DestPtr],&AttrBuff2[SrcPtr],NxCopy);
 			memcpy(&AttrDestFG[DestPtr],&AttrBuffFG[SrcPtr],NxCopy);
@@ -240,6 +383,9 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	HAttrBuff2 = HAttr2New;
 	HAttrBuffFG = HAttrFGNew;
 	HAttrBuffBG = HAttrBGNew;
+#if UNICODE_INTERNAL_BUFF
+	CodeBuffW = CodeWNew;
+#endif
 	BufferSize = NewSize;
 	NumOfLinesInBuff = Ny;
 	BuffStartAbs = 0;
@@ -262,6 +408,9 @@ BOOL ChangeBuffer(int Nx, int Ny)
 		AttrBuffFG = (PCHAR)GlobalLock(HAttrBuffFG);
 		AttrBuffBG = (PCHAR)GlobalLock(HAttrBuffBG);
 		CodeLine = CodeBuff;
+#if UNICODE_INTERNAL_BUFF
+		CodeLineW = CodeBuffW;
+#endif
 		AttrLine = AttrBuff;
 		AttrLine2 = AttrBuff2;
 		AttrLineFG = AttrBuffFG;
@@ -285,6 +434,9 @@ allocate_error:
 	if (AttrDestFG) GlobalUnlock(HAttrFGNew);
 	if (AttrDestBG) GlobalUnlock(HAttrBGNew);
 	if (HCodeNew)   GlobalFree(HCodeNew);
+#if UNICODE_INTERNAL_BUFF
+	if (CodeWNew)   free(CodeWNew);
+#endif
 	if (HAttrNew)   GlobalFree(HAttrNew);
 	if (HAttr2New)  GlobalFree(HAttr2New);
 	if (HAttrFGNew) GlobalFree(HAttrFGNew);
@@ -332,7 +484,7 @@ void InitBuffer()
 	StatusLine = 0;
 }
 
-void NewLine(int Line)
+static void NewLine(int Line)
 {
 	LinePtr = GetLinePtr(Line);
 	CodeLine = &CodeBuff[LinePtr];
@@ -340,6 +492,9 @@ void NewLine(int Line)
 	AttrLine2 = &AttrBuff2[LinePtr];
 	AttrLineFG = &AttrBuffFG[LinePtr];
 	AttrLineBG = &AttrBuffBG[LinePtr];
+#if UNICODE_INTERNAL_BUFF
+	CodeLineW = &CodeBuffW[LinePtr];
+#endif
 }
 
 void LockBuffer()
@@ -390,6 +545,12 @@ void FreeBuffer()
 		GlobalFree(HCodeBuff);
 		HCodeBuff = NULL;
 	}
+#if UNICODE_INTERNAL_BUFF
+	if (CodeBuffW != NULL) {
+		free(CodeBuffW);
+		CodeBuffW = NULL;
+	}
+#endif
 	if (HAttrBuff!=NULL) {
 		GlobalFree(HAttrBuff);
 		HAttrBuff = NULL;
@@ -496,11 +657,17 @@ void BuffScroll(int Count, int Bottom)
 		SrcPtr = GetLinePtr(PageStart+NumOfLines-1);
 		for (i=NumOfLines-1; i>=Bottom+1; i--) {
 			memcpy(&(CodeBuff[DestPtr]),&(CodeBuff[SrcPtr]),NumOfColumns);
+#if UNICODE_INTERNAL_BUFF
+			memcpyW(&(CodeBuffW[DestPtr]),&(CodeBuffW[SrcPtr]),NumOfColumns);
+#endif
 			memcpy(&(AttrBuff[DestPtr]),&(AttrBuff[SrcPtr]),NumOfColumns);
 			memcpy(&(AttrBuff2[DestPtr]),&(AttrBuff2[SrcPtr]),NumOfColumns);
 			memcpy(&(AttrBuffFG[DestPtr]),&(AttrBuffFG[SrcPtr]),NumOfColumns);
 			memcpy(&(AttrBuffBG[DestPtr]),&(AttrBuffBG[SrcPtr]),NumOfColumns);
 			memset(&(CodeBuff[SrcPtr]),0x20,NumOfColumns);
+#if UNICODE_INTERNAL_BUFF
+			memsetW(&(CodeBuffW[SrcPtr]),0x20,NumOfColumns);
+#endif
 			memset(&(AttrBuff[SrcPtr]),AttrDefault,NumOfColumns);
 			memset(&(AttrBuff2[SrcPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 			memset(&(AttrBuffFG[SrcPtr]),CurCharAttr.Fore,NumOfColumns);
@@ -512,6 +679,9 @@ void BuffScroll(int Count, int Bottom)
 	}
 	for (i = 1 ; i <= n ; i++) {
 		memset(&CodeBuff[DestPtr],0x20,NumOfColumns);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&CodeBuffW[DestPtr],0x20,NumOfColumns);
+#endif
 		memset(&AttrBuff[DestPtr],AttrDefault,NumOfColumns);
 		memset(&AttrBuff2[DestPtr],CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 		memset(&AttrBuffFG[DestPtr],CurCharAttr.Fore,NumOfColumns);
@@ -558,6 +728,9 @@ void NextLine()
 	AttrLine2 = &AttrBuff2[LinePtr];
 	AttrLineFG = &AttrBuffFG[LinePtr];
 	AttrLineBG = &AttrBuffBG[LinePtr];
+#if UNICODE_INTERNAL_BUFF
+	CodeLineW = &CodeBuffW[LinePtr];
+#endif
 }
 
 void PrevLine()
@@ -568,6 +741,9 @@ void PrevLine()
 	AttrLine2 = &AttrBuff2[LinePtr];
 	AttrLineFG = &AttrBuffFG[LinePtr];
 	AttrLineBG = &AttrBuffBG[LinePtr];
+#if UNICODE_INTERNAL_BUFF
+	CodeLineW = &CodeBuffW[LinePtr];
+#endif
 }
 
 void EraseKanji(int LR)
@@ -604,17 +780,29 @@ void EraseKanjiOnLRMargin(LONG ptr, int count)
 		pos = ptr + CursorLeftM-1;
 		if (CursorLeftM>0 && (AttrBuff[pos] & AttrKanji)) {
 			CodeBuff[pos] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[pos], 0x20, 'H');
+#endif
 			AttrBuff[pos] &= ~AttrKanji;
 			pos++;
 			CodeBuff[pos] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[pos], 0x20, 'H');
+#endif
 			AttrBuff[pos] &= ~AttrKanji;
 		}
 		pos = ptr + CursorRightM;
 		if (CursorRightM < NumOfColumns-1 && (AttrBuff[pos] & AttrKanji)) {
 			CodeBuff[pos] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[pos], 0x20, 'H');
+#endif
 			AttrBuff[pos] &= ~AttrKanji;
 			pos++;
 			CodeBuff[pos] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[pos], 0x20, 'H');
+#endif
 			AttrBuff[pos] &= ~AttrKanji;
 		}
 		ptr = NextLinePtr(ptr);
@@ -638,6 +826,9 @@ void BuffInsertSpace(int Count)
 
 	if (CursorRightM < NumOfColumns-1 && (AttrLine[CursorRightM] & AttrKanji)) {
 		CodeLine[CursorRightM+1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+		BuffSetChar(&CodeLineW[CursorRightM + 1], 0x20, 'H');
+#endif
 		AttrLine[CursorRightM+1] &= ~AttrKanji;
 		extr = 1;
 	}
@@ -649,12 +840,18 @@ void BuffInsertSpace(int Count)
 
 	if (MoveLen > 0) {
 		memmove(&(CodeLine[CursorX+Count]), &(CodeLine[CursorX]), MoveLen);
+#if UNICODE_INTERNAL_BUFF
+		memmoveW(&(CodeLineW[CursorX+Count]), &(CodeLineW[CursorX]), MoveLen);
+#endif
 		memmove(&(AttrLine[CursorX+Count]), &(AttrLine[CursorX]), MoveLen);
 		memmove(&(AttrLine2[CursorX+Count]), &(AttrLine2[CursorX]), MoveLen);
 		memmove(&(AttrLineFG[CursorX+Count]), &(AttrLineFG[CursorX]), MoveLen);
 		memmove(&(AttrLineBG[CursorX+Count]), &(AttrLineBG[CursorX]), MoveLen);
 	}
 	memset(&(CodeLine[CursorX]), 0x20, Count);
+#if UNICODE_INTERNAL_BUFF
+	memsetW(&(CodeLineW[CursorX]), 0x20, Count);
+#endif
 	memset(&(AttrLine[CursorX]), AttrDefault, Count);
 	memset(&(AttrLine2[CursorX]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[CursorX]), CurCharAttr.Fore, Count);
@@ -663,6 +860,9 @@ void BuffInsertSpace(int Count)
 	if ((AttrLine[CursorRightM] & AttrKanji) != 0) {
 		/* then delete it */
 		CodeLine[CursorRightM] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+		BuffSetChar(&CodeLineW[CursorRightM], 0x20, 'H');
+#endif
 		AttrLine[CursorRightM] &= ~AttrKanji;
 	}
 	BuffUpdateRect(CursorX, CursorY, CursorRightM+extr, CursorY);
@@ -687,6 +887,9 @@ void BuffEraseCurToEnd()
 	}
 	for (i = CursorY ; i <= YEnd ; i++) {
 		memset(&(CodeBuff[TmpPtr+offset]),0x20,NumOfColumns-offset);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[TmpPtr+offset]),0x20,NumOfColumns-offset);
+#endif
 		memset(&(AttrBuff[TmpPtr+offset]),AttrDefault,NumOfColumns-offset);
 		memset(&(AttrBuff2[TmpPtr+offset]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns-offset);
 		memset(&(AttrBuffFG[TmpPtr+offset]),CurCharAttr.Fore,NumOfColumns-offset);
@@ -722,6 +925,9 @@ void BuffEraseHomeToCur()
 			offset = CursorX+1;
 		}
 		memset(&(CodeBuff[TmpPtr]),0x20,offset);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[TmpPtr]),0x20,offset);
+#endif
 		memset(&(AttrBuff[TmpPtr]),AttrDefault,offset);
 		memset(&(AttrBuff2[TmpPtr]),CurCharAttr.Attr2 & Attr2ColorMask, offset);
 		memset(&(AttrBuffFG[TmpPtr]),CurCharAttr.Fore,offset);
@@ -756,6 +962,9 @@ void BuffInsertLines(int Count, int YEnd)
 	linelen = CursorRightM - CursorLeftM + 1;
 	for (i= YEnd-Count ; i>=CursorY ; i--) {
 		memcpy(&(CodeBuff[DestPtr]), &(CodeBuff[SrcPtr]), linelen);
+#if UNICODE_INTERNAL_BUFF
+		memcpyW(&(CodeBuffW[DestPtr]), &(CodeBuffW[SrcPtr]), linelen);
+#endif
 		memcpy(&(AttrBuff[DestPtr]), &(AttrBuff[SrcPtr]), linelen);
 		memcpy(&(AttrBuff2[DestPtr]), &(AttrBuff2[SrcPtr]), linelen);
 		memcpy(&(AttrBuffFG[DestPtr]), &(AttrBuffFG[SrcPtr]), linelen);
@@ -765,6 +974,9 @@ void BuffInsertLines(int Count, int YEnd)
 	}
 	for (i = 1 ; i <= Count ; i++) {
 		memset(&(CodeBuff[DestPtr]), 0x20, linelen);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[DestPtr]), 0x20, linelen);
+#endif
 		memset(&(AttrBuff[DestPtr]), AttrDefault, linelen);
 		memset(&(AttrBuff2[DestPtr]), CurCharAttr.Attr2 & Attr2ColorMask, linelen);
 		memset(&(AttrBuffFG[DestPtr]), CurCharAttr.Fore, linelen);
@@ -794,6 +1006,9 @@ void BuffEraseCharsInLine(int XStart, int Count)
 
 	NewLine(PageStart+CursorY);
 	memset(&(CodeLine[XStart]),0x20,Count);
+#if UNICODE_INTERNAL_BUFF
+	memsetW(&(CodeLineW[XStart]),0x20,Count);
+#endif
 	memset(&(AttrLine[XStart]),AttrDefault,Count);
 	memset(&(AttrLine2[XStart]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[XStart]),CurCharAttr.Fore,Count);
@@ -835,6 +1050,9 @@ void BuffDeleteLines(int Count, int YEnd)
 	linelen = CursorRightM - CursorLeftM + 1;
 	for (i=CursorY ; i<= YEnd-Count ; i++) {
 		memcpy(&(CodeBuff[DestPtr]), &(CodeBuff[SrcPtr]), linelen);
+#if UNICODE_INTERNAL_BUFF
+		memcpyW(&(CodeBuffW[DestPtr]), &(CodeBuffW[SrcPtr]), linelen);
+#endif
 		memcpy(&(AttrBuff[DestPtr]), &(AttrBuff[SrcPtr]), linelen);
 		memcpy(&(AttrBuff2[DestPtr]), &(AttrBuff2[SrcPtr]), linelen);
 		memcpy(&(AttrBuffFG[DestPtr]), &(AttrBuffFG[SrcPtr]), linelen);
@@ -844,6 +1062,9 @@ void BuffDeleteLines(int Count, int YEnd)
 	}
 	for (i = YEnd+1-Count ; i<=YEnd ; i++) {
 		memset(&(CodeBuff[DestPtr]), 0x20, linelen);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[DestPtr]), 0x20, linelen);
+#endif
 		memset(&(AttrBuff[DestPtr]), AttrDefault, linelen);
 		memset(&(AttrBuff2[DestPtr]), CurCharAttr.Attr2 & Attr2ColorMask,  linelen);
 		memset(&(AttrBuffFG[DestPtr]), CurCharAttr.Fore, linelen);
@@ -875,6 +1096,9 @@ void BuffDeleteChars(int Count)
 
 	if (CursorRightM < NumOfColumns-1 && (AttrLine[CursorRightM] & AttrKanji)) {
 		CodeLine[CursorRightM] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+		BuffSetChar(&CodeLineW[CursorRightM], 0x20, 'H');
+#endif
 		AttrLine[CursorRightM] &= ~AttrKanji;
 		CodeLine[CursorRightM+1] = 0x20;
 		AttrLine[CursorRightM+1] &= ~AttrKanji;
@@ -888,12 +1112,18 @@ void BuffDeleteChars(int Count)
 
 	if (MoveLen > 0) {
 		memmove(&(CodeLine[CursorX]), &(CodeLine[CursorX+Count]), MoveLen);
+#if UNICODE_INTERNAL_BUFF
+		memmoveW(&(CodeLineW[CursorX]), &(CodeLineW[CursorX+Count]), MoveLen);
+#endif
 		memmove(&(AttrLine[CursorX]), &(AttrLine[CursorX+Count]), MoveLen);
 		memmove(&(AttrLine2[CursorX]), &(AttrLine2[CursorX+Count]), MoveLen);
 		memmove(&(AttrLineFG[CursorX]), &(AttrLineFG[CursorX+Count]), MoveLen);
 		memmove(&(AttrLineBG[CursorX]), &(AttrLineBG[CursorX+Count]), MoveLen);
 	}
 	memset(&(CodeLine[CursorX + MoveLen]), 0x20, Count);
+#if UNICODE_INTERNAL_BUFF
+	memsetW(&(CodeLineW[CursorX + MoveLen]), 0x20, Count);
+#endif
 	memset(&(AttrLine[CursorX + MoveLen]), AttrDefault, Count);
 	memset(&(AttrLine2[CursorX + MoveLen]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[CursorX + MoveLen]), CurCharAttr.Fore, Count);
@@ -917,6 +1147,9 @@ void BuffEraseChars(int Count)
 		Count = NumOfColumns-CursorX;
 	}
 	memset(&(CodeLine[CursorX]),0x20,Count);
+#if UNICODE_INTERNAL_BUFF
+	memsetW(&(CodeLineW[CursorX]),0x20,Count);
+#endif
 	memset(&(AttrLine[CursorX]),AttrDefault,Count);
 	memset(&(AttrLine2[CursorX]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[CursorX]),CurCharAttr.Fore,Count);
@@ -935,6 +1168,9 @@ void BuffFillWithE()
 	TmpPtr = GetLinePtr(PageStart);
 	for (i = 0 ; i <= NumOfLines-1-StatusLine ; i++) {
 		memset(&(CodeBuff[TmpPtr]),'E',NumOfColumns);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[TmpPtr]),'E',NumOfColumns);
+#endif
 		memset(&(AttrBuff[TmpPtr]),AttrDefault,NumOfColumns);
 		memset(&(AttrBuff2[TmpPtr]),AttrDefault,NumOfColumns);
 		memset(&(AttrBuffFG[TmpPtr]),AttrDefaultFG,NumOfColumns);
@@ -974,6 +1210,9 @@ void BuffDrawLine(TCharAttr Attr, int Direction, int C)
 			}
 			Ptr = GetLinePtr(PageStart+Y);
 			memset(&(CodeBuff[Ptr+CursorX]),'q',C);
+#if UNICODE_INTERNAL_BUFF
+			memsetW(&(CodeBuffW[Ptr+CursorX]),'q',C);
+#endif
 			memset(&(AttrBuff[Ptr+CursorX]),Attr.Attr,C);
 			memset(&(AttrBuff2[Ptr+CursorX]),Attr.Attr2,C);
 			memset(&(AttrBuffFG[Ptr+CursorX]),Attr.Fore,C);
@@ -1002,6 +1241,9 @@ void BuffDrawLine(TCharAttr Attr, int Direction, int C)
 			}
 			for (i=1; i<=C; i++) {
 				CodeBuff[Ptr+X] = 'x';
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeBuffW[Ptr+X], 0x20, 'H');
+#endif
 				AttrBuff[Ptr+X] = Attr.Attr;
 				AttrBuff2[Ptr+X] = Attr.Attr2;
 				AttrBuffFG[Ptr+X] = Attr.Fore;
@@ -1037,6 +1279,9 @@ void BuffEraseBox
 		if ((XStart>0) &&
 		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0)) {
 			CodeBuff[Ptr+XStart-1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr+XStart-1], 0x20, 'H');
+#endif
 			AttrBuff[Ptr+XStart-1] = CurCharAttr.Attr;
 			AttrBuff2[Ptr+XStart-1] = CurCharAttr.Attr2;
 			AttrBuffFG[Ptr+XStart-1] = CurCharAttr.Fore;
@@ -1045,12 +1290,18 @@ void BuffEraseBox
 		if ((XStart+C<NumOfColumns) &&
 		    ((AttrBuff[Ptr+XStart+C-1] & AttrKanji) != 0)) {
 			CodeBuff[Ptr+XStart+C] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr+XStart+C], 0x20, 'H');
+#endif
 			AttrBuff[Ptr+XStart+C] = CurCharAttr.Attr;
 			AttrBuff2[Ptr+XStart+C] = CurCharAttr.Attr2;
 			AttrBuffFG[Ptr+XStart+C] = CurCharAttr.Fore;
 			AttrBuffBG[Ptr+XStart+C] = CurCharAttr.Back;
 		}
 		memset(&(CodeBuff[Ptr+XStart]),0x20,C);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[Ptr+XStart]),0x20,C);
+#endif
 		memset(&(AttrBuff[Ptr+XStart]),AttrDefault,C);
 		memset(&(AttrBuff2[Ptr+XStart]),CurCharAttr.Attr2 & Attr2ColorMask, C);
 		memset(&(AttrBuffFG[Ptr+XStart]),CurCharAttr.Fore,C);
@@ -1083,13 +1334,22 @@ void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
 		if ((XStart>0) &&
 		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0)) {
 			CodeBuff[Ptr+XStart-1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeLineW[Ptr + XStart - 1], 0x20, 'H');
+#endif
 			AttrBuff[Ptr+XStart-1] ^= AttrKanji;
 		}
 		if ((XStart+Cols<NumOfColumns) &&
 		    ((AttrBuff[Ptr+XStart+Cols-1] & AttrKanji) != 0)) {
 			CodeBuff[Ptr+XStart+Cols] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeLineW[Ptr + XStart + Cols], 0x20, 'H');
+#endif
 		}
 		memset(&(CodeBuff[Ptr+XStart]), ch, Cols);
+#if UNICODE_INTERNAL_BUFF
+		BuffSetChar(&CodeLineW[Ptr + XStart], 0x20, 'H');
+#endif
 		memset(&(AttrBuff[Ptr+XStart]), CurCharAttr.Attr, Cols);
 		memset(&(AttrBuff2[Ptr+XStart]), CurCharAttr.Attr2, Cols);
 		memset(&(AttrBuffFG[Ptr+XStart]), CurCharAttr.Fore, Cols);
@@ -1145,6 +1405,9 @@ void BuffCopyBox(
 		DPtr = GetLinePtr(PageStart+DstY);
 		for (i=0; i<L; i++) {
 			memcpy(&(CodeBuff[DPtr+DstX]), &(CodeBuff[SPtr+SrcXStart]), C);
+#if UNICODE_INTERNAL_BUFF
+			memcpyW(&(CodeBuffW[DPtr+DstX]), &(CodeBuffW[SPtr+SrcXStart]), C);
+#endif
 			memcpy(&(AttrBuff[DPtr+DstX]), &(AttrBuff[SPtr+SrcXStart]), C);
 			memcpy(&(AttrBuff2[DPtr+DstX]), &(AttrBuff2[SPtr+SrcXStart]), C);
 			memcpy(&(AttrBuffFG[DPtr+DstX]), &(AttrBuffFG[SPtr+SrcXStart]), C);
@@ -1158,6 +1421,9 @@ void BuffCopyBox(
 		DPtr = GetLinePtr(PageStart+DstY+L-1);
 		for (i=L; i>0; i--) {
 			memcpy(&(CodeBuff[DPtr+DstX]), &(CodeBuff[SPtr+SrcXStart]), C);
+#if UNICODE_INTERNAL_BUFF
+			memcpyW(&(CodeBuffW[DPtr+DstX]), &(CodeBuffW[SPtr+SrcXStart]), C);
+#endif
 			memcpy(&(AttrBuff[DPtr+DstX]), &(AttrBuff[SPtr+SrcXStart]), C);
 			memcpy(&(AttrBuff2[DPtr+DstX]), &(AttrBuff2[SPtr+SrcXStart]), C);
 			memcpy(&(AttrBuffFG[DPtr+DstX]), &(AttrBuffFG[SPtr+SrcXStart]), C);
@@ -1171,6 +1437,9 @@ void BuffCopyBox(
 		DPtr = GetLinePtr(PageStart+DstY);
 		for (i=0; i<L; i++) {
 			memmove(&(CodeBuff[DPtr+DstX]), &(CodeBuff[SPtr+SrcXStart]), C);
+#if UNICODE_INTERNAL_BUFF
+			memmoveW(&(CodeBuffW[DPtr+DstX]), &(CodeBuffW[SPtr+SrcXStart]), C);
+#endif
 			memmove(&(AttrBuff[DPtr+DstX]), &(AttrBuff[SPtr+SrcXStart]), C);
 			memmove(&(AttrBuff2[DPtr+DstX]), &(AttrBuff2[SPtr+SrcXStart]), C);
 			memmove(&(AttrBuffFG[DPtr+DstX]), &(AttrBuffFG[SPtr+SrcXStart]), C);
@@ -1386,7 +1655,7 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 	BuffUpdateRect(0, YStart, NumOfColumns-1, YEnd);
 }
 
-int LeftHalfOfDBCS(LONG Line, int CharPtr)
+static int LeftHalfOfDBCS(LONG Line, int CharPtr)
 // If CharPtr is on the right half of a DBCS character,
 // return pointer to the left half
 //   Line: points to a line in CodeBuff
@@ -1400,7 +1669,7 @@ int LeftHalfOfDBCS(LONG Line, int CharPtr)
 	return CharPtr;
 }
 
-int MoveCharPtr(LONG Line, int *x, int dx)
+static int MoveCharPtr(LONG Line, int *x, int dx)
 // move character pointer x by dx character unit
 //   in the line specified by Line
 //   Line: points to a line in CodeBuff
@@ -2002,6 +2271,242 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 	}
 }
 
+/**
+ *	ユニコードキャラクタを1文字バッファへ入力する
+ *	@param[in]	uc		unicode character
+ *	@param[in]	Attr	attributes
+ *	@param[in]	Insert	Insert flag
+ */
+#if UNICODE_INTERNAL_BUFF
+char BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert)
+{
+//	int XStart, LineEnd, MoveLen;
+//	int extr = 0;
+//	unsigned int w = uc;
+	int ret;
+//	wchar_t wchar = (wchar_t)uc;
+	BYTE b1, b2;
+	unsigned int u32 = uc;
+	char retval = 'h';
+	BOOL half_width = TRUE;
+
+	if (uc < 0x80) {
+		b1 = (BYTE)uc;
+		b2 = 0;
+		ret = 1;
+	} else {
+		char mbchar[2];
+		ret = UTF32ToCP932(uc, mbchar, 2);
+		if (ret == 0) {
+			b1 = '?';
+			b2 = 0;
+			ret = 1;
+		} else if (ret == 1) {
+			b1 = mbchar[0];
+			b2 = 0;
+		} else {	// ret == 2
+			b1 = mbchar[0];
+			b2 = mbchar[1];
+			ret = 2;
+		}
+	}
+
+#if 0
+	OutputDebugPrintf("BuffPutUnicode(%06x(%02x,%02x)\n",
+					  uc, b1, b2);
+#endif
+
+	if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] & AttrLineContinued)) {
+		Attr.Attr |= AttrLineContinued;
+	}
+
+	if (Insert) {
+		assert(FALSE);
+#if 0
+		if (CursorX > CursorRightM)
+			LineEnd = NumOfColumns - 1;
+		else
+			LineEnd = CursorRightM;
+
+		if (LineEnd < NumOfColumns - 1 && (AttrLine[LineEnd] & AttrKanji)) {
+			CodeLine[LineEnd] = 0x20;
+			CodeLineW[LineEnd].wc = 0x20;
+			CodeLineW[LineEnd].u32 = 0x20;
+			AttrLine[LineEnd] &= ~AttrKanji;
+			CodeLine[LineEnd+1] = 0x20;
+			AttrLine[LineEnd+1] &= ~AttrKanji;
+			extr = 1;
+		}
+
+		MoveLen = LineEnd - CursorX - 1;
+		if (MoveLen > 0) {
+			memmove(&CodeLine[CursorX+2], &CodeLine[CursorX], MoveLen);
+			memmove(&CodeLineW[CursorX+2], &CodeLineW[CursorX], MoveLen * sizeof(wchar_t));
+			memmove(&AttrLine[CursorX+2], &AttrLine[CursorX], MoveLen);
+			memmove(&AttrLine2[CursorX+2], &AttrLine2[CursorX], MoveLen);
+			memmove(&AttrLineFG[CursorX+2], &AttrLineFG[CursorX], MoveLen);
+			memmove(&AttrLineBG[CursorX+2], &AttrLineBG[CursorX], MoveLen);
+		}
+
+		if (HIBYTE(w) == 0) {
+			int a = 0;
+		}
+		CodeLine[CursorX] = HIBYTE(w);
+		CodeLineW[CursorX].wc = u16_high;
+		CodeLineW[CursorX].u32 = u32;
+		AttrLine[CursorX] = Attr.Attr;
+		AttrLine2[CursorX] = Attr.Attr2;
+		AttrLineFG[CursorX] = Attr.Fore;
+		AttrLineBG[CursorX] = Attr.Back;
+		if (CursorX < LineEnd) {
+			CodeLine[CursorX+1] = LOBYTE(w);
+			CodeLineW[CursorX + 1].wc = u16_low;
+			CodeLineW[CursorX + 1].u32 = 0;
+			//			CodeLineW[CursorX+1] = 0;
+			AttrLine[CursorX+1] = Attr.Attr;
+			AttrLine2[CursorX+1] = Attr.Attr2;
+			AttrLineFG[CursorX+1] = Attr.Fore;
+			AttrLineBG[CursorX+1] = Attr.Back;
+		}
+		/* begin - ishizaki */
+		markURL(CursorX);
+		markURL(CursorX+1);
+		/* end - ishizaki */
+
+		/* last char in current line is kanji first? */
+		if ((AttrLine[LineEnd] & AttrKanji) != 0) {
+			/* then delete it */
+			CodeLine[LineEnd] = 0x20;
+			BuffSetChar(&CodeLineW[LineEnd], 0x20, 'H');
+			AttrLine[LineEnd] = CurCharAttr.Attr;
+			AttrLine2[LineEnd] = CurCharAttr.Attr2;
+			AttrLineFG[LineEnd] = CurCharAttr.Fore;
+			AttrLineBG[LineEnd] = CurCharAttr.Back;
+		}
+
+		if (StrChangeCount==0) {
+			XStart = CursorX;
+		}
+		else {
+			XStart = StrChangeStart;
+		}
+		StrChangeCount = 0;
+		BuffUpdateRect(XStart, CursorY, LineEnd+extr, CursorY);
+#endif
+	} else {
+		buff_char_t *p;
+
+		if (UnicodeIsVariationSelector(u32)) {
+			retval = 'V';
+		} else if (UnicodeIsCombiningCharacter(u32)) {
+			retval = '0';
+		} else if (u32 == 0x200d) {
+			retval = '0';
+		} else {
+			retval = UnicodeGetWidthProperty(u32);
+			half_width = (retval == 'H') ? TRUE : FALSE;
+		}
+
+		// 前の文字
+		p = NULL;	// NULLのとき、前の文字はない
+		if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
+			p = &CodeLineW[CursorX - 1];
+		} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
+			p = &CodeLineW[CursorX - 2];
+		}
+		if (p != NULL && p->u32_last == 0x200d) {
+			retval = '0';
+		}
+
+		if (retval == 'V' || retval == '0') {
+			// 前の文字にくっつける
+			// VariationSelector or
+			// CombiningCharacter or
+			// ZERO WIDTH JOINER(ZWJ)
+
+			if (p != NULL) {
+				// 前の文字にくっつける
+				BuffAddChar(p, uc, retval);
+				AttrLine[CursorX] = Attr.Attr; // | AttrKanji; /* DBCS first byte */
+				AttrLine2[CursorX] = Attr.Attr2;
+				AttrLineFG[CursorX] = Attr.Fore;
+				AttrLineBG[CursorX] = Attr.Back;
+			} else {
+				// 前がないのにくっつく文字が出てきたとき
+				// とりあえずスペースにくっつける
+				p = &CodeLineW[CursorX];
+				BuffSetChar(p, ' ', 'H');
+				BuffAddChar(p, uc, retval);
+				AttrLine[CursorX] = Attr.Attr;
+				AttrLine2[CursorX] = Attr.Attr2;
+				AttrLineFG[CursorX] = Attr.Fore;
+				AttrLineBG[CursorX] = Attr.Back;
+			}
+		} else {
+			// 新しい文字追加
+			CodeLine[CursorX] = b1;
+			BuffSetChar(&CodeLineW[CursorX], u32, retval);
+			AttrLine[CursorX] = Attr.Attr; // | AttrKanji; /* DBCS first byte */
+			AttrLine2[CursorX] = Attr.Attr2;
+			AttrLineFG[CursorX] = Attr.Fore;
+			AttrLineBG[CursorX] = Attr.Back;
+
+			if (!half_width) {
+				// 全角の時は次の文字コードに0を入れる
+				if (CursorX < NumOfColumns-1) {
+					BuffSetChar(&CodeLineW[CursorX+1], 0, 'H');
+					CodeLine[CursorX+1] = b2;
+					AttrLine[CursorX+1] = Attr.Attr;
+					AttrLine2[CursorX+1] = Attr.Attr2;
+					AttrLineFG[CursorX+1] = Attr.Fore;
+					AttrLineBG[CursorX+1] = Attr.Back;
+				}
+			}
+		}
+
+		/* begin - ishizaki */
+//		markURL(CursorX);
+//		markURL(CursorX+1);
+		/* end - ishizaki */
+
+		if (StrChangeCount==0) {
+			StrChangeStart = CursorX;
+		}
+		if (retval == '0' || retval == 'V') {
+			if (StrChangeCount == 0) {
+				StrChangeCount = 1;
+			}
+		} else if (retval == 'H') {
+			// 半角
+			StrChangeCount = StrChangeCount + 1;
+		} else if (retval == 'A') {
+			// 特性値A(曖昧)を持つ文字は、全角の文字 (fullwidth) として扱う。
+			StrChangeCount = StrChangeCount + 2;
+		} else {
+			// 全角 ('F' or 'W')
+			StrChangeCount = StrChangeCount + 2;
+		}
+#if 0
+		{
+			char ba[128];
+			memcpy(ba, &CodeLine[0], _countof(ba)-1);
+			ba[127] = 0;
+			OutputDebugPrintf("A '%s'\n", ba);
+			wchar_t bb[128];
+			memcpy(bb, &CodeLineW[0], _countof(bb)-1);
+			bb[127] = 0;
+			OutputDebugPrintfW(L"W '%s'\n", bb);
+		}
+#endif
+	}
+
+#if 0
+	OutputDebugPrintf("BuffPutUnicode leave\n");
+#endif
+	return retval;
+}
+#endif
+
 BOOL CheckSelect(int x, int y)
 //  subroutine called by BuffUpdateRect
 {
@@ -2024,6 +2529,143 @@ BOOL CheckSelect(int x, int y)
 	}
 }
 
+#if UNICODE_INTERNAL_BUFF
+/*
+ *	DrawX,Y			Clint領域描画位置(pixel)
+ *	SY				スクリーン上の位置(Charactor)
+ *					PageStart + YStart など
+ *	IStart,IEnd		スクリーン上の位置(Charactor)
+ */
+static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
+{
+	int X = DrawX;
+	int Y = DrawY;
+	const LONG TmpPtr = GetLinePtr(SY);
+	int istart = IStart;
+	char bufA[TermWidthMax];
+	wchar_t bufW[TermWidthMax];
+	char bufWW[TermWidthMax];
+	int lenW = 0;
+	int lenA = 0;
+	TCharAttr CurAttr;
+	BOOL ConbinationCharInclude = FALSE;
+
+	int count = 0;		// index;
+	while (istart + count <= IEnd) {
+		buff_char_t *b;
+		TCharAttr TempAttr;
+		BOOL DrawFlag = FALSE;
+		BOOL Conbination = FALSE;
+
+		// アトリビュート取得
+		TempAttr.Attr = AttrBuff[TmpPtr+istart+count] & ~ AttrKanji;
+		TempAttr.Attr2 = AttrBuff2[TmpPtr+istart+count];
+		TempAttr.Fore = AttrBuffFG[TmpPtr+istart+count];
+		TempAttr.Back = AttrBuffBG[TmpPtr+istart+count];
+
+		bufA[lenA] = CodeBuff[TmpPtr + istart + count];
+		lenA++;
+
+		b = &CodeBuffW[TmpPtr + istart + count];
+		if (b->u32 != 0) {
+			if (b->u32 < 0x10000) {
+				bufW[lenW] = b->wc2[0];
+				bufWW[lenW] = b->WidthProperty;
+				lenW++;
+			} else {
+				bufW[lenW] = b->wc2[0];
+				bufWW[lenW] = b->WidthProperty;
+				lenW++;
+				bufW[lenW] = b->wc2[1];
+				bufWW[lenW] = '0';
+				lenW++;
+				Conbination = TRUE;
+				DrawFlag = TRUE;
+			}
+			if ((b->WidthProperty == 'W' || b->WidthProperty == 'H') &&
+				b->CombinationCharCount16 != 0)
+			{
+				int i;
+				for (i = 0 ; i < (int)b->CombinationCharCount16; i++) {
+					bufW[lenW+i] = b->pCombinationChars16[i];
+					bufWW[lenW + i] = '0';
+				}
+				lenW += b->CombinationCharCount16;
+				Conbination = TRUE;
+				DrawFlag = TRUE;
+			}
+		}
+
+		if (count == 0) {
+			// 最初の1文字目
+			CurAttr = TempAttr;
+		}
+
+		if (DrawFlag) {
+			;
+		} else if (istart + count == IEnd) {
+			// 最後までスキャンした
+			DrawFlag = TRUE;
+		} else if (b->u32 != 0) {
+			// 次の文字でアトリビュートが変化する?
+			if (count > 0 && TCharAttrCmp(CurAttr, TempAttr) != 0) {
+				// アトリビュートが変化した
+				DrawFlag = TRUE;
+				lenA--;
+				lenW--;
+			} else if ((b->WidthProperty == 'W' || b->WidthProperty == 'H' )
+					   && b->CombinationCharCount16 != 0)
+			{
+				// アトリビュート(unicode状態)が変化した
+				DrawFlag = TRUE;
+				lenA--;
+				lenW--;
+			} else {
+				if (Conbination == FALSE) {
+					if (ConbinationCharInclude) {
+						// not 結合文字 && 結合文字列?
+						DrawFlag = TRUE;
+						lenA--;
+						lenW--;
+					}
+				}
+				else {
+					ConbinationCharInclude = TRUE;
+				}
+			}
+		}
+
+		if (DrawFlag) {
+			// 描画する
+			bufA[lenA] = 0;
+			bufW[lenW] = 0;
+			bufWW[lenW] = 0;
+
+#if 0
+			OutputDebugPrintf("A[%d] '%s'\n", lenA, bufA);
+			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
+#endif
+
+			DispSetupDC(CurAttr, FALSE);
+#if UNICODE_INTERNAL_BUFF && UNICODE_DISPLAY
+			DispStrW(bufW, bufWW, lenW, Y, &X);
+#else
+			DispStr(bufA, lenA, Y, &X);
+#endif
+
+			lenA = 0;
+			lenW = 0;
+			DrawFlag = FALSE;
+			istart += (count+1);
+			count = 0;
+			ConbinationCharInclude = FALSE;
+		} else {
+			count++;
+		}
+	}
+}
+#endif
+
 void BuffUpdateRect
   (int XStart, int YStart, int XEnd, int YEnd)
 // Display text in a rectangular region in the screen
@@ -2036,8 +2678,18 @@ void BuffUpdateRect
 	int IStart, IEnd;
 	int X, Y;
 	LONG TmpPtr;
-	TCharAttr CurAttr, TempAttr;
-	BOOL CurSel, TempSel, Caret;
+	TCharAttr TempAttr;
+#if !UNICODE_INTERNAL_BUFF
+	TCharAttr CurAttr;
+	BOOL CurSel;
+#endif
+	BOOL TempSel, Caret;
+#if UNICODE_INTERNAL_BUFF
+//	char bufA[256];
+//	wchar_t bufW[256];
+//	int lenW = 0;
+//	int lenA = 0;
+#endif
 
 	if (XStart >= WinOrgX+WinWidth) {
 		return;
@@ -2065,6 +2717,13 @@ void BuffUpdateRect
 		YEnd = WinOrgY+WinHeight-1;
 	}
 
+#if 0
+	OutputDebugPrintf("BuffUpdateRect (%d,%d)-(%d,%d) [%d,%d]\n",
+					  XStart, YStart,
+					  XEnd, YEnd,
+					  XEnd - XStart + 1, YEnd - YStart + 1);
+#endif
+
 	TempAttr = DefCharAttr;
 	TempSel = FALSE;
 
@@ -2086,6 +2745,7 @@ void BuffUpdateRect
 		X = (IStart-WinOrgX)*FontWidth;
 
 		i = IStart;
+#if !UNICODE_INTERNAL_BUFF
 		do {
 			CurAttr.Attr = AttrBuff[TmpPtr+i] & ~ AttrKanji;
 			CurAttr.Attr2 = AttrBuff2[TmpPtr+i];
@@ -2113,6 +2773,11 @@ void BuffUpdateRect
 			i = i+count;
 		}
 		while (i<=IEnd);
+#else
+		{
+			BuffDrawLineI(X, Y, j, IStart, IEnd);
+		}
+#endif
 		Y = Y + FontHeight;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
@@ -2125,7 +2790,9 @@ void UpdateStr()
 // Display not-yet-displayed string
 {
 	int X, Y;
+#if !UNICODE_INTERNAL_BUFF
 	TCharAttr TempAttr;
+#endif
 	int pos, len;
 
 	if (StrChangeCount==0) {
@@ -2138,6 +2805,7 @@ void UpdateStr()
 		return;
 	}
 
+#if !UNICODE_INTERNAL_BUFF
 	TempAttr.Attr = AttrLine[StrChangeStart];
 	TempAttr.Attr2 = AttrLine2[StrChangeStart];
 	TempAttr.Fore = AttrLineFG[StrChangeStart];
@@ -2172,7 +2840,9 @@ void UpdateStr()
 		DispSetupDC(TempAttr, FALSE);
 		DispStr(&CodeLine[StrChangeStart],StrChangeCount,Y, &X);
 	}
-
+#else
+	BuffDrawLineI(X, Y, PageStart+CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
+#endif
 	StrChangeCount = 0;
 }
 
@@ -2261,6 +2931,9 @@ void ScrollUp1Line()
 		for (i = CursorBottom-1 ; i >= CursorTop ; i--) {
 			SrcPtr = PrevLinePtr(DestPtr);
 			memcpy(&(CodeBuff[DestPtr]), &(CodeBuff[SrcPtr]), linelen);
+#if UNICODE_INTERNAL_BUFF
+			memcpyW(&(CodeBuffW[DestPtr]), &(CodeBuffW[SrcPtr]), linelen);
+#endif
 			memcpy(&(AttrBuff[DestPtr]), &(AttrBuff[SrcPtr]), linelen);
 			memcpy(&(AttrBuff2[DestPtr]), &(AttrBuff2[SrcPtr]), linelen);
 			memcpy(&(AttrBuffFG[DestPtr]), &(AttrBuffFG[SrcPtr]), linelen);
@@ -2268,6 +2941,9 @@ void ScrollUp1Line()
 			DestPtr = SrcPtr;
 		}
 		memset(&(CodeBuff[SrcPtr]), 0x20, linelen);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[SrcPtr]), 0x20, linelen);
+#endif
 		memset(&(AttrBuff[SrcPtr]), AttrDefault, linelen);
 		memset(&(AttrBuff2[SrcPtr]), CurCharAttr.Attr2 & Attr2ColorMask, linelen);
 		memset(&(AttrBuffFG[SrcPtr]), CurCharAttr.Fore, linelen);
@@ -2332,6 +3008,9 @@ void BuffScrollNLines(int n)
 			SrcPtr = GetLinePtr(PageStart+CursorTop+n) + (LONG)CursorLeftM;
 			for (i = CursorTop+n ; i<=CursorBottom ; i++) {
 				memmove(&(CodeBuff[DestPtr]), &(CodeBuff[SrcPtr]), linelen);
+#if UNICODE_INTERNAL_BUFF
+				memmoveW(&(CodeBuffW[DestPtr]), &(CodeBuffW[SrcPtr]), linelen);
+#endif
 				memmove(&(AttrBuff[DestPtr]), &(AttrBuff[SrcPtr]), linelen);
 				memmove(&(AttrBuff2[DestPtr]), &(AttrBuff2[SrcPtr]), linelen);
 				memmove(&(AttrBuffFG[DestPtr]), &(AttrBuffFG[SrcPtr]), linelen);
@@ -2345,6 +3024,9 @@ void BuffScrollNLines(int n)
 		}
 		for (i = CursorBottom+1-n ; i<=CursorBottom; i++) {
 			memset(&(CodeBuff[DestPtr]), 0x20, linelen);
+#if UNICODE_INTERNAL_BUFF
+			memsetW(&(CodeBuffW[DestPtr]), 0x20, linelen);
+#endif
 			memset(&(AttrBuff[DestPtr]), AttrDefault, linelen);
 			memset(&(AttrBuff2[DestPtr]), CurCharAttr.Attr2 & Attr2ColorMask, linelen);
 			memset(&(AttrBuffFG[DestPtr]), CurCharAttr.Fore, linelen);
@@ -2393,6 +3075,9 @@ void BuffRegionScrollUpNLines(int n) {
 			SrcPtr = GetLinePtr(PageStart+CursorTop+n) + CursorLeftM;
 			for (i = CursorTop+n ; i<=CursorBottom ; i++) {
 				memmove(&(CodeBuff[DestPtr]), &(CodeBuff[SrcPtr]), linelen);
+#if UNICODE_INTERNAL_BUFF
+				memmoveW(&(CodeBuffW[DestPtr]), &(CodeBuffW[SrcPtr]), linelen);
+#endif
 				memmove(&(AttrBuff[DestPtr]), &(AttrBuff[SrcPtr]), linelen);
 				memmove(&(AttrBuff2[DestPtr]), &(AttrBuff2[SrcPtr]), linelen);
 				memmove(&(AttrBuffFG[DestPtr]), &(AttrBuffFG[SrcPtr]), linelen);
@@ -2406,6 +3091,9 @@ void BuffRegionScrollUpNLines(int n) {
 		}
 		for (i = CursorBottom+1-n ; i<=CursorBottom; i++) {
 			memset(&(CodeBuff[DestPtr]), 0x20, linelen);
+#if UNICODE_INTERNAL_BUFF
+			memsetW(&(CodeBuffW[DestPtr]), 0x20, linelen);
+#endif
 			memset(&(AttrBuff[DestPtr]), AttrDefault, linelen);
 			memset(&(AttrBuff2[DestPtr]), CurCharAttr.Attr2 & Attr2ColorMask, linelen);
 			memset(&(AttrBuffFG[DestPtr]), CurCharAttr.Fore, linelen);
@@ -2445,6 +3133,9 @@ void BuffRegionScrollDownNLines(int n) {
 		SrcPtr = GetLinePtr(PageStart+CursorBottom-n) + CursorLeftM;
 		for (i=CursorBottom-n ; i>=CursorTop ; i--) {
 			memmove(&(CodeBuff[DestPtr]), &(CodeBuff[SrcPtr]), linelen);
+#if UNICODE_INTERNAL_BUFF
+			memmoveW(&(CodeBuffW[DestPtr]), &(CodeBuffW[SrcPtr]), linelen);
+#endif
 			memmove(&(AttrBuff[DestPtr]), &(AttrBuff[SrcPtr]), linelen);
 			memmove(&(AttrBuff2[DestPtr]), &(AttrBuff2[SrcPtr]), linelen);
 			memmove(&(AttrBuffFG[DestPtr]), &(AttrBuffFG[SrcPtr]), linelen);
@@ -2458,6 +3149,9 @@ void BuffRegionScrollDownNLines(int n) {
 	}
 	for (i = CursorTop+n-1; i>=CursorTop; i--) {
 		memset(&(CodeBuff[DestPtr]), 0x20, linelen);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[DestPtr]), 0x20, linelen);
+#endif
 		memset(&(AttrBuff[DestPtr]), AttrDefault, linelen);
 		memset(&(AttrBuff2[DestPtr]), CurCharAttr.Attr2 & Attr2ColorMask, linelen);
 		memset(&(AttrBuffFG[DestPtr]), CurCharAttr.Fore, linelen);
@@ -2505,7 +3199,7 @@ void CursorUpWithScroll()
 
 // called by BuffDblClk
 //   check if a character is the word delimiter
-BOOL IsDelimiter(LONG Line, int CharPtr)
+static BOOL IsDelimiter(LONG Line, int CharPtr)
 {
 	if ((AttrBuff[Line+CharPtr] & AttrKanji) !=0) {
 		return (ts.DelimDBCS!=0);
@@ -3473,6 +4167,9 @@ void ClearBuffer()
 
 	NewLine(0);
 	memset(&CodeBuff[0],0x20,BufferSize);
+#if UNICODE_INTERNAL_BUFF
+	memsetW(&CodeBuffW[0],0x20,BufferSize);
+#endif
 	memset(&AttrBuff[0],AttrDefault,BufferSize);
 	memset(&AttrBuff2[0],CurCharAttr.Attr2 & Attr2ColorMask, BufferSize);
 	memset(&AttrBuffFG[0],CurCharAttr.Fore,BufferSize);
@@ -3697,93 +4394,119 @@ void BuffSetCurCharAttr(TCharAttr Attr) {
 void BuffSaveScreen()
 {
 	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
+#if UNICODE_INTERNAL_BUFF
+	buff_char_t *CodeDestW;
+#endif
 	LONG ScrSize;
+	size_t AllocSize;
 	LONG SrcPtr, DestPtr;
 	int i;
 
 	if (SaveBuff == NULL) {
-		ScrSize = NumOfColumns * NumOfLines;
-		if ((SaveBuff=GlobalAlloc(GMEM_MOVEABLE, ScrSize * 5)) != NULL) {
-			if ((CodeDest=GlobalLock(SaveBuff)) != NULL) {
-				AttrDest = CodeDest + ScrSize;
-				AttrDest2 = AttrDest + ScrSize;
-				AttrDestFG = AttrDest2 + ScrSize;
-				AttrDestBG = AttrDestFG + ScrSize;
+		ScrSize = NumOfColumns * NumOfLines;	// 1画面分のバッファの保存数
+#if UNICODE_INTERNAL_BUFF
+		// 全画面分のバイト数
+		AllocSize = ScrSize * (5+sizeof(buff_char_t));
+#else
+		AllocSize = ScrSize * 5;
+#endif
+		SaveBuff = malloc(AllocSize);
+		if (SaveBuff != NULL) {
+			CodeDest = SaveBuff;
+			AttrDest = CodeDest + ScrSize;
+			AttrDest2 = AttrDest + ScrSize;
+			AttrDestFG = AttrDest2 + ScrSize;
+			AttrDestBG = AttrDestFG + ScrSize;
+#if UNICODE_INTERNAL_BUFF
+			CodeDestW = (buff_char_t *)(AttrDestBG + ScrSize);
+#endif
 
-				SaveBuffX = NumOfColumns;
-				SaveBuffY = NumOfLines;
+			SaveBuffX = NumOfColumns;
+			SaveBuffY = NumOfLines;
 
-				SrcPtr = GetLinePtr(PageStart);
-				DestPtr = 0;
+			SrcPtr = GetLinePtr(PageStart);
+			DestPtr = 0;
 
-				for (i=0; i<NumOfLines; i++) {
-					memcpy(&CodeDest[DestPtr], &CodeBuff[SrcPtr], NumOfColumns);
-					memcpy(&AttrDest[DestPtr], &AttrBuff[SrcPtr], NumOfColumns);
-					memcpy(&AttrDest2[DestPtr], &AttrBuff2[SrcPtr], NumOfColumns);
-					memcpy(&AttrDestFG[DestPtr], &AttrBuffFG[SrcPtr], NumOfColumns);
-					memcpy(&AttrDestBG[DestPtr], &AttrBuffBG[SrcPtr], NumOfColumns);
-					SrcPtr = NextLinePtr(SrcPtr);
-					DestPtr += NumOfColumns;
-				}
-			}
-			else {
-				GlobalFree(SaveBuff);
-				SaveBuff = NULL;
+			for (i=0; i<NumOfLines; i++) {
+				memcpy(&CodeDest[DestPtr], &CodeBuff[SrcPtr], NumOfColumns);
+#if UNICODE_INTERNAL_BUFF
+				memcpyW(&CodeDestW[DestPtr], &CodeBuffW[SrcPtr], NumOfColumns);
+#endif
+				memcpy(&AttrDest[DestPtr], &AttrBuff[SrcPtr], NumOfColumns);
+				memcpy(&AttrDest2[DestPtr], &AttrBuff2[SrcPtr], NumOfColumns);
+				memcpy(&AttrDestFG[DestPtr], &AttrBuffFG[SrcPtr], NumOfColumns);
+				memcpy(&AttrDestBG[DestPtr], &AttrBuffBG[SrcPtr], NumOfColumns);
+				SrcPtr = NextLinePtr(SrcPtr);
+				DestPtr += NumOfColumns;
 			}
 		}
 	}
-	return;
+	_CrtCheckMemory();
 }
 
 void BuffRestoreScreen()
 {
 	PCHAR CodeSrc, AttrSrc, AttrSrc2, AttrSrcFG, AttrSrcBG;
+#if UNICODE_INTERNAL_BUFF
+	buff_char_t *CodeSrcW;
+#endif
 	LONG ScrSize;
 	LONG SrcPtr, DestPtr;
 	int i, CopyX, CopyY;
 
+	_CrtCheckMemory();
 	if (SaveBuff != NULL) {
-		if ((CodeSrc=GlobalLock(SaveBuff)) != NULL) {
-			ScrSize = SaveBuffX * SaveBuffY;
+		CodeSrc = SaveBuff;
+		ScrSize = SaveBuffX * SaveBuffY;
 
-			AttrSrc = CodeSrc + ScrSize;
-			AttrSrc2 = AttrSrc + ScrSize;
-			AttrSrcFG = AttrSrc2 + ScrSize;
-			AttrSrcBG = AttrSrcFG + ScrSize;
+		AttrSrc = CodeSrc + ScrSize;
+		AttrSrc2 = AttrSrc + ScrSize;
+		AttrSrcFG = AttrSrc2 + ScrSize;
+		AttrSrcBG = AttrSrcFG + ScrSize;
+#if UNICODE_INTERNAL_BUFF
+		CodeSrcW = (buff_char_t*)(AttrSrcBG + ScrSize);
+#endif
 
-			CopyX = (SaveBuffX > NumOfColumns) ? NumOfColumns : SaveBuffX;
-			CopyY = (SaveBuffY > NumOfLines) ? NumOfLines : SaveBuffY;
+		CopyX = (SaveBuffX > NumOfColumns) ? NumOfColumns : SaveBuffX;
+		CopyY = (SaveBuffY > NumOfLines) ? NumOfLines : SaveBuffY;
 
-			SrcPtr = 0;
-			DestPtr = GetLinePtr(PageStart);
+		SrcPtr = 0;
+		DestPtr = GetLinePtr(PageStart);
 
-			for (i=0; i<CopyY; i++) {
-				memcpy(&CodeBuff[DestPtr], &CodeSrc[SrcPtr], CopyX);
-				memcpy(&AttrBuff[DestPtr], &AttrSrc[SrcPtr], CopyX);
-				memcpy(&AttrBuff2[DestPtr], &AttrSrc2[SrcPtr], CopyX);
-				memcpy(&AttrBuffFG[DestPtr], &AttrSrcFG[SrcPtr], CopyX);
-				memcpy(&AttrBuffBG[DestPtr], &AttrSrcBG[SrcPtr], CopyX);
-				if (AttrBuff[DestPtr+CopyX-1] & AttrKanji) {
-					CodeBuff[DestPtr+CopyX-1] = ' ';
-					AttrBuff[DestPtr+CopyX-1] ^= AttrKanji;
-				}
-				SrcPtr += SaveBuffX;
-				DestPtr = NextLinePtr(DestPtr);
+		for (i=0; i<CopyY; i++) {
+			memcpy(&CodeBuff[DestPtr], &CodeSrc[SrcPtr], CopyX);
+#if UNICODE_INTERNAL_BUFF
+			memcpyW(&CodeBuffW[DestPtr], &CodeSrcW[SrcPtr], CopyX);
+#endif
+			memcpy(&AttrBuff[DestPtr], &AttrSrc[SrcPtr], CopyX);
+			memcpy(&AttrBuff2[DestPtr], &AttrSrc2[SrcPtr], CopyX);
+			memcpy(&AttrBuffFG[DestPtr], &AttrSrcFG[SrcPtr], CopyX);
+			memcpy(&AttrBuffBG[DestPtr], &AttrSrcBG[SrcPtr], CopyX);
+			if (AttrBuff[DestPtr+CopyX-1] & AttrKanji) {
+				CodeBuff[DestPtr+CopyX-1] = ' ';
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeBuffW[DestPtr+CopyX-1], 0x20, 'H');
+#endif
+				AttrBuff[DestPtr+CopyX-1] ^= AttrKanji;
 			}
-			BuffUpdateRect(WinOrgX,WinOrgY,WinOrgX+WinWidth-1,WinOrgY+WinHeight-1);
+			SrcPtr += SaveBuffX;
+			DestPtr = NextLinePtr(DestPtr);
 		}
+		BuffUpdateRect(WinOrgX,WinOrgY,WinOrgX+WinWidth-1,WinOrgY+WinHeight-1);
 
-		GlobalFree(SaveBuff);
+		free(SaveBuff);
 		SaveBuff = NULL;
 	}
-	return;
+	_CrtCheckMemory();
 }
 
-void BuffDiscardSavedScreen() {
+void BuffDiscardSavedScreen()
+{
 	if (SaveBuff != NULL) {
-		GlobalFree(SaveBuff);
+		free(SaveBuff);
 		SaveBuff = NULL;
 	}
+	_CrtCheckMemory();
 }
 
 void BuffSelectedEraseCurToEnd()
@@ -3809,6 +4532,9 @@ void BuffSelectedEraseCurToEnd()
 		for (j = TmpPtr + offset; j < TmpPtr + NumOfColumns - offset; j++) {
 			if (!(AttrBuff2[j] & Attr2Protect)) {
 				CodeBuff[j] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeBuffW[j], 0x20, 'H');
+#endif
 				AttrBuff[j] &= AttrSgrMask;
 			}
 		}
@@ -3847,6 +4573,9 @@ void BuffSelectedEraseHomeToCur()
 		for (j = TmpPtr; j < TmpPtr + offset; j++) {
 			if (!(AttrBuff2[j] & Attr2Protect)) {
 				CodeBuff[j] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeBuffW[j], 0x20, 'H');
+#endif
 				AttrBuff[j] &= AttrSgrMask;
 			}
 		}
@@ -3887,17 +4616,26 @@ void BuffSelectiveEraseBox
 		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0) &&
 		    ((AttrBuff2[Ptr+XStart-1] & Attr2Protect) == 0)) {
 			CodeBuff[Ptr+XStart-1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr+XStart-1], 0x20, 'H');
+#endif
 			AttrBuff[Ptr+XStart-1] &= AttrSgrMask;
 		}
 		if ((XStart+C<NumOfColumns) &&
 		    ((AttrBuff[Ptr+XStart+C-1] & AttrKanji) != 0) &&
 		    ((AttrBuff2[Ptr+XStart+C-1] & Attr2Protect) == 0)) {
 			CodeBuff[Ptr+XStart+C] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr+XStart+C], 0x20, 'H');
+#endif
 			AttrBuff[Ptr+XStart+C] &= AttrSgrMask;
 		}
 		for (j=Ptr+XStart; j<Ptr+XStart+C; j++) {
 			if (!(AttrBuff2[j] & Attr2Protect)) {
 				CodeBuff[j] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeBuffW[j], 0x20, 'H');
+#endif
 				AttrBuff[j] &= AttrSgrMask;
 			}
 		}
@@ -3959,28 +4697,46 @@ void BuffScrollLeft(int count)
 
 		if (AttrBuff[LPtr+CursorRightM] & AttrKanji) {
 			CodeBuff[LPtr+CursorRightM] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[LPtr+CursorRightM], 0x20, 'H');
+#endif
 			AttrBuff[LPtr+CursorRightM] &= ~AttrKanji;
 			if (CursorRightM < NumOfColumns-1) {
 				CodeBuff[LPtr+CursorRightM+1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeBuffW[LPtr+CursorRightM+1], 0x20, 'H');
+#endif
 			}
 		}
 
 		if (AttrBuff[Ptr+count-1] & AttrKanji) {
 			CodeBuff[Ptr+count] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr+count], 0x20, 'H');
+#endif
 		}
 
 		if (CursorLeftM > 0 && AttrBuff[Ptr-1] & AttrKanji) {
 			CodeBuff[Ptr-1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr-1], 0x20, 'H');
+#endif
 			AttrBuff[Ptr-1] &= ~AttrKanji;
 		}
 
 		memmove(&(CodeBuff[Ptr]),   &(CodeBuff[Ptr+count]),   MoveLen);
+#if UNICODE_INTERNAL_BUFF
+		memmoveW(&(CodeBuffW[Ptr]),   &(CodeBuffW[Ptr+count]),   MoveLen);
+#endif
 		memmove(&(AttrBuff[Ptr]),   &(AttrBuff[Ptr+count]),   MoveLen);
 		memmove(&(AttrBuff2[Ptr]),  &(AttrBuff2[Ptr+count]),  MoveLen);
 		memmove(&(AttrBuffFG[Ptr]), &(AttrBuffFG[Ptr+count]), MoveLen);
 		memmove(&(AttrBuffBG[Ptr]), &(AttrBuffBG[Ptr+count]), MoveLen);
 
 		memset(&(CodeBuff[Ptr+MoveLen]),   0x20,             count);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[Ptr+MoveLen]),   0x20,             count);
+#endif
 		memset(&(AttrBuff[Ptr+MoveLen]),   AttrDefault,      count);
 		memset(&(AttrBuff2[Ptr+MoveLen]),  CurCharAttr.Attr2 & Attr2ColorMask, count);
 		memset(&(AttrBuffFG[Ptr+MoveLen]), CurCharAttr.Fore, count);
@@ -4006,21 +4762,36 @@ void BuffScrollRight(int count)
 
 		if (CursorRightM < NumOfColumns-1 && AttrBuff[LPtr+CursorRightM] & AttrKanji) {
 			CodeBuff[LPtr+CursorRightM+1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[LPtr+CursorRightM+1], 0x20, 'H');
+#endif
 		}
 
 		if (CursorLeftM > 0 && AttrBuff[Ptr-1] & AttrKanji) {
 			CodeBuff[Ptr-1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr-1], 0x20, 'H');
+#endif
 			AttrBuff[Ptr-1] &= ~AttrKanji;
 			CodeBuff[Ptr] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[Ptr], 0x20, 'H');
+#endif
 		}
 
 		memmove(&(CodeBuff[Ptr+count]),   &(CodeBuff[Ptr]),   MoveLen);
+#if UNICODE_INTERNAL_BUFF
+		memmoveW(&(CodeBuffW[Ptr+count]),   &(CodeBuffW[Ptr]),   MoveLen);
+#endif
 		memmove(&(AttrBuff[Ptr+count]),   &(AttrBuff[Ptr]),   MoveLen);
 		memmove(&(AttrBuff2[Ptr+count]),  &(AttrBuff2[Ptr]),  MoveLen);
 		memmove(&(AttrBuffFG[Ptr+count]), &(AttrBuffFG[Ptr]), MoveLen);
 		memmove(&(AttrBuffBG[Ptr+count]), &(AttrBuffBG[Ptr]), MoveLen);
 
 		memset(&(CodeBuff[Ptr]),   0x20,             count);
+#if UNICODE_INTERNAL_BUFF
+		memsetW(&(CodeBuffW[Ptr]),   0x20,             count);
+#endif
 		memset(&(AttrBuff[Ptr]),   AttrDefault,      count);
 		memset(&(AttrBuff2[Ptr]),  CurCharAttr.Attr2 & Attr2ColorMask, count);
 		memset(&(AttrBuffFG[Ptr]), CurCharAttr.Fore, count);
@@ -4028,6 +4799,9 @@ void BuffScrollRight(int count)
 
 		if (AttrBuff[LPtr+CursorRightM] & AttrKanji) {
 			CodeBuff[LPtr+CursorRightM] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeBuffW[LPtr+CursorRightM], 0x20, 'H');
+#endif
 			AttrBuff[LPtr+CursorRightM] &= ~AttrKanji;
 		}
 
@@ -4095,4 +4869,98 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 	UnlockBuffer();
 
 	return Result;
+}
+
+/* デバグ用 */
+void BuffCheckMouse(int Xw, int Yw, wchar_t *buf, size_t buf_size)
+{
+	int X, Y;
+	int ScreenY;
+	LONG TmpPtr;
+	BOOL Right;
+	unsigned char c;
+	char cs[4];
+#if UNICODE_INTERNAL_BUFF
+	char32_t u32;
+	wchar_t wcs[4];
+#endif
+
+	DispConvWinToScreen(Xw, Yw, &X, &ScreenY, &Right);
+	Y = PageStart + ScreenY;
+
+	if (X < 0)
+		X = 0;
+	else if (X > NumOfColumns)
+		X = NumOfColumns;
+	if (Y < 0)
+		Y = 0;
+	else if (Y >= BuffEnd)
+		Y = BuffEnd - 1;
+
+	TmpPtr = GetLinePtr(Y);
+	LockBuffer();
+
+	c = (unsigned char)CodeBuff[TmpPtr+X];
+	if (c < 0x20) {
+		cs[0] = '.';
+		cs[1] = 0;
+	} else if (!_ismbblead(c)) {
+		cs[0] = c;
+		cs[1] = 0;
+	} else {
+		cs[0] = c;
+		cs[1] = CodeBuff[TmpPtr+X+1];
+		cs[2] = 0;
+	}
+
+#if UNICODE_INTERNAL_BUFF
+	{
+		const wchar_t wc1 = CodeBuffW[TmpPtr+X].wc2[0];
+		const wchar_t wc2 = CodeBuffW[TmpPtr+X+1].wc2[1];
+		u32 = CodeBuffW[TmpPtr+X].u32;
+		if (u32 < 0x20) {
+			wcs[0] = '.';
+			wcs[1] = 0;
+			wcs[2] = 0;
+		} else if (u32 < 0x10000) {
+			wcs[0] = wc1;
+			wcs[1] = 0;
+			wcs[2] = 0;
+		} else {
+			// サロゲートペア
+			wcs[0] = wc1;
+			wcs[1] = wc2;
+			wcs[2] = 0;
+		}
+	}
+#endif
+
+	swprintf_s(buf, buf_size,
+			   L"ch(%d,%d(%d)) px(%d,%d)\n"
+			   L"attr      0x%02x\n"
+			   L"attr2     0x%02x\n"
+			   L"attrFore  0x%02x\n"
+			   L"attrBack  0x%02x\n"
+			   L"CodeLine  0x%02x('%S')"
+#if UNICODE_INTERNAL_BUFF
+			   L"\n"
+			   L"CodeLineW 0+%06x('%s')"
+#endif
+			   ,
+			   X, ScreenY, Y,
+			   Xw, Yw,
+			   AttrBuff[TmpPtr+X],
+			   AttrBuff2[TmpPtr+X],
+			   AttrBuffFG[TmpPtr+X],
+			   AttrBuffBG[TmpPtr+X],
+			   c, cs
+#if UNICODE_INTERNAL_BUFF
+			   , u32, wcs
+#endif
+		);
+#if 0
+	OutputDebugPrintfW(buf);
+#endif
+
+	UnlockBuffer();
 }

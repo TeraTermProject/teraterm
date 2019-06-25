@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 TeraTerm Project
+ * Copyright (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,27 +26,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <windows.h>
-#include <tchar.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct tagTipWinData TipWin;
-
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str);
-void TipWinSetTextW(TipWin *tWin, const wchar_t *text);
-void TipWinSetTextA(TipWin *tWin, const char *text);
-void TipWinSetPos(TipWin *tWin, int x, int y);
-void TipWinDestroy(TipWin *tWin);
-
-#if defined(UNICODE)
-#define TipWinSetText(p1, p2)	TipWinSetTextW(p1, p2)
-#else
-#define TipWinSetText(p1, p2)	TipWinSetTextA(p1, p2)
-#endif
-
+char UnicodeGetWidthProperty(unsigned long u32);
+int UnicodeIsCombiningCharacter(unsigned long u32);
+int UnicodeIsVariationSelector(unsigned long u32);
 
 #ifdef __cplusplus
 }

@@ -80,6 +80,7 @@ void DispInitDC();
 void DispReleaseDC();
 void DispSetupDC(TCharAttr Attr, BOOL Reverse);
 void DispStr(PCHAR Buff, int Count, int Y, int* X);
+void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X);
 void DispEraseCurToEnd(int YEnd);
 void DispEraseHomeToCur(int YHome);
 void DispEraseCharsInLine(int XStart, int Count);

@@ -606,6 +606,14 @@
 				RelativePath=".\ttdialog.h"
 				>
 			</File>
+			<File
+				RelativePath="unicode.h"
+				>
+			</File>
+			<File
+				RelativePath="unicode.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

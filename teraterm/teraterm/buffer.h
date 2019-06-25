@@ -63,6 +63,7 @@ void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
 void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert);
+char BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);
 void BuffUpdateRect(int XStart, int YStart, int XEnd, int YEnd);
 void UpdateStr();
 void UpdateStrUnicode(void);
@@ -108,6 +109,7 @@ void BuffScrollRight(int count);
 int BuffGetCurrentLineData(char *buf, int bufsize);
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
+void BuffCheckMouse(int Xw, int Yw, wchar_t *buf, size_t buf_size);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;

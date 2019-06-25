@@ -55,14 +55,23 @@
  */
 /* based on windows/sizetip.c from PuTTY 0.60 */
 
+#define UNICODE
+#define _UNICODE
+
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <assert.h>
+#include <crtdbg.h>
 
 #include "ttlib.h"		// for GetMessageboxFont()
 
 #include "tipwin.h"
+
+#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
+#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#endif
 
 #define	FRAME_WIDTH	6
 
@@ -246,7 +255,7 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	GetMessageboxFont(&logfont);
 	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
-	pTipWin->tip_font = CreateFontIndirect(&logfont);
+	pTipWin->tip_font = CreateFontIndirectA(&logfont);
 	CalcStrRect(pTipWin);
 	pTipWin->hParentWnd = src;
 	create_tipwin(pTipWin, hInst, cx, cy);
@@ -257,15 +266,27 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	return pTipWin;
 }
 
-void TipWinSetPos(int x, int y)
-{
-}
-
-void TipWinSetText(TipWin *tWin, TCHAR *text)
+void TipWinSetTextW(TipWin *tWin, const wchar_t *text)
 {
 	if (tWin != NULL) {
 		HWND tip_wnd = tWin->tip_wnd;
-		SetWindowText(tip_wnd, text);
+		SetWindowTextW(tip_wnd, text);
+	}
+}
+
+void TipWinSetTextA(TipWin *tWin, const char *text)
+{
+	if (tWin != NULL) {
+		HWND tip_wnd = tWin->tip_wnd;
+		SetWindowTextA(tip_wnd, text);
+	}
+}
+
+void TipWinSetPos(TipWin *tWin, int x, int y)
+{
+	if (tWin != NULL) {
+		HWND tip_wnd = tWin->tip_wnd;
+		SetWindowPos(tip_wnd, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 	}
 }
 

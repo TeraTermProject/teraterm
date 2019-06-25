@@ -140,6 +140,11 @@ set(SRC
   #
   ${COMMON_SRC}
   ${TTDLG_SRC}
+  #
+  unicode.h
+  unicode.cpp
+  unicode_asian_width.tbl
+  unicode_combine.tbl
   )
 
 include_directories(

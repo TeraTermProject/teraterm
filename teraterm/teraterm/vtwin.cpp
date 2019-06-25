@@ -85,6 +85,10 @@
 #include "tekwin.h"
 #include <htmlhelp.h>
 #include "compat_win.h"
+#include "unicode_test.h"
+#if UNICODE_DEBUG
+#include "tipwin.h"
+#endif
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -142,6 +146,10 @@ static int AutoDisconnectedPort = -1;
 
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
+#endif
+
+#if UNICODE_DEBUG
+static TipWin *TipWinCodeDebug;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2266,6 +2274,12 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CVTWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyUp(nChar);
+#if UNICODE_DEBUG
+	if (TipWinCodeDebug != NULL) {
+		TipWinDestroy(TipWinCodeDebug);
+		TipWinCodeDebug = NULL;
+	}
+#endif
 }
 
 void CVTWindow::OnKillFocus(HWND hNewWnd)
@@ -2377,6 +2391,22 @@ void CVTWindow::OnMouseMove(UINT nFlags, POINTS point)
 {
 	int i;
 	BOOL mousereport;
+
+#if UNICODE_DEBUG
+    if (GetAsyncKeyState(VK_RCONTROL) != 0) {
+		wchar_t buf[128];
+		BuffCheckMouse(point.x, point.y, buf, _countof(buf));
+		POINT TipWinPos = { point.x, point.y };
+		ClientToScreen(m_hWnd, &TipWinPos);
+		if (TipWinCodeDebug == NULL) {
+			TipWinCodeDebug = TipWinCreate(m_hWnd, TipWinPos.x, TipWinPos.y, "test");
+			TipWinSetTextW(TipWinCodeDebug, buf);
+		} else {
+			TipWinSetPos(TipWinCodeDebug, TipWinPos.x, TipWinPos.y);
+			TipWinSetTextW(TipWinCodeDebug, buf);
+		}
+	}
+#endif
 
 	if (!IgnoreRelease)
 		mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
@@ -6286,7 +6316,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnRButtonUp((UINT)wp, MAKEPOINTS(lp));
 		break;
 	case WM_SETFOCUS:
+#if !UNICODE_DEBUG_CARET_OFF
 		OnSetFocus((HWND)wp);
+#endif
 		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_SIZE:
