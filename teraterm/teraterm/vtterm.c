@@ -5636,7 +5636,7 @@ skip:
 		return TRUE;
 	}
 
-	if ((buf[0] & 0xf1) == 0xf0 &&
+	if ((buf[0] & 0xf8) == 0xf0 &&
 		(buf[1] & 0xc0) == 0x80 &&
 		(buf[2] & 0xc0) == 0x80 &&
 		(buf[3] & 0xc0) == 0x80)
