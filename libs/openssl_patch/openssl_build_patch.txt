@@ -1,0 +1,13 @@
+diff -cwrp openssl-1.1.1c/crypto/bio/bio_lcl.h openssl/crypto/bio/bio_lcl.h
+*** openssl-1.1.1c/crypto/bio/bio_lcl.h	2019-05-28 22:12:20.000000000 +0900
+--- openssl/crypto/bio/bio_lcl.h	2019-06-26 19:48:45.072802700 +0900
+***************
+*** 11,16 ****
+--- 11,18 ----
+  #include "internal/sockets.h"
+  #include "internal/refcount.h"
+  
++ # undef AI_PASSIVE
++ 
+  /* BEGIN BIO_ADDRINFO/BIO_ADDR stuff. */
+  
