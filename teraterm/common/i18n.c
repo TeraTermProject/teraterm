@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2018 TeraTerm Project
+ * Copyright (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, i
 }
 #endif
 
-DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
 	RestoreNewLine(buf);
@@ -79,7 +79,7 @@ void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, 
 #endif
 }
 
-int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
+int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
 {
 	char tmp[MAX_UIMSG];
 	char font[LF_FACESIZE];
@@ -110,7 +110,7 @@ int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int 
 	return TRUE;
 }
 
-void SetI18DlgStrs(const char *section, HWND hDlgWnd,
+void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 				   const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
 {
 	size_t i;
@@ -135,7 +135,7 @@ void SetI18DlgStrs(const char *section, HWND hDlgWnd,
 	}
 }
 
-void SetI18MenuStrs(const char *section, HMENU hMenu,
+void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu,
 					const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
 {
 	size_t i;
