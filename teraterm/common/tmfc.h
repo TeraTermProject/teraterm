@@ -178,7 +178,7 @@ public:
 	virtual void OnOK();
 	virtual BOOL OnCommand(WPARAM wp, LPARAM lp);
 	virtual HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
-	PROPSHEETPAGE *GetPropSheetPage() const { return (PROPSHEETPAGE *)&m_psp; };
+	HPROPSHEETPAGE CreatePropertySheetPage();
 protected:
 	PROPSHEETPAGE_V1 m_psp;
 private:

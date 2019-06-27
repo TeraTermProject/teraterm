@@ -651,6 +651,11 @@ TTCPropertyPage::~TTCPropertyPage()
 	free((void *)m_psp.pResource);
 }
 
+HPROPSHEETPAGE TTCPropertyPage::CreatePropertySheetPage()
+{
+	return ::CreatePropertySheetPage((PROPSHEETPAGE *)&m_psp);
+}
+
 void TTCPropertyPage::OnInitDialog()
 {
 }
