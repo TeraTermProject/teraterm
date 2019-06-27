@@ -2,7 +2,7 @@ cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
 
-perl -e "open(IN,'Configurations/10-main.conf');while(<IN>){s|/WX|/W1|;print $_;}close(IN);" > conf.tmp
+perl -e "open(IN,'Configurations/10-main.conf');while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
 
 perl Configure no-asm no-async shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
@@ -14,6 +14,7 @@ nmake -f makefile.dbg
 mkdir out32.dbg
 move libcrypto* out32.dbg
 move libssl* out32.dbg
+move apps\openssl.exe out32.dbg
 :build_dbg_end
 
 if exist "out32\libcrypto.lib" goto build_end
@@ -26,6 +27,7 @@ nmake
 mkdir out32
 move libcrypto* out32
 move libssl* out32
+move apps\openssl.exe out32
 :build_end
 
 cd ..
