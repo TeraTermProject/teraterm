@@ -1490,12 +1490,12 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	m_LogPage = new CLogPropPageDlg(hInstance, this);
 	m_CygwinPage = new CCygwinPropPageDlg(hInstance, this);
 		
-	hPsp[0] = CreatePropertySheetPage(&m_GeneralPage->m_psp);
-	hPsp[1] = CreatePropertySheetPage(&m_SequencePage->m_psp);
-	hPsp[2] = CreatePropertySheetPage(&m_CopypastePage->m_psp);
-	hPsp[3] = CreatePropertySheetPage(&m_VisualPage->m_psp);
-	hPsp[4] = CreatePropertySheetPage(&m_LogPage->m_psp);
-	hPsp[5] = CreatePropertySheetPage(&m_CygwinPage->m_psp);
+	hPsp[0] = CreatePropertySheetPage(m_GeneralPage->GetPropSheetPage());
+	hPsp[1] = CreatePropertySheetPage(m_SequencePage->GetPropSheetPage());
+	hPsp[2] = CreatePropertySheetPage(m_CopypastePage->GetPropSheetPage());
+	hPsp[3] = CreatePropertySheetPage(m_VisualPage->GetPropSheetPage());
+	hPsp[4] = CreatePropertySheetPage(m_LogPage->GetPropSheetPage());
+	hPsp[5] = CreatePropertySheetPage(m_CygwinPage->GetPropSheetPage());
 	m_psh.nPages = 6;
 	m_psh.phpage = hPsp;
 

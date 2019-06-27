@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 TeraTerm Project
+ * Copyright (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -640,7 +640,6 @@ TTCPropertyPage::TTCPropertyPage(HINSTANCE inst, int id, TTCPropertySheet *sheet
 	m_psp.dwFlags |= PSP_DLGINDIRECT;
 	m_psp.pResource = TTGetDlgTemplate(inst, m_psp.pszTemplate);
 #endif
-//	m_psp.pfnDlgProc = (DLGPROC)Proc;
 	m_psp.pfnDlgProc = Proc;
 	m_psp.lParam = (LPARAM)this;
 
