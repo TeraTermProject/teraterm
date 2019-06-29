@@ -1622,13 +1622,13 @@ WORD TTLFileOpen()
 	}
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
-		return ErrCantOpen;
+		return Err;
 	}
 	fhi = HandlePut(FH);
 	if (fhi == -1) {
 		SetIntVal(VarId, -1);
 		_lclose(FH);
-		return ErrCantOpen;
+		return Err;
 	}
 	SetIntVal(VarId, fhi);
 	if (Append!=0) {
