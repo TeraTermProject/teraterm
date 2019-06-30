@@ -884,9 +884,10 @@ scp_rcv_error:
 
 		val = atoi(ParamFileName);
 		switch(val) {
-			case 1:
-			case 2:
-			case 3:
+			case 1: // Xon/Xoff 
+			case 2: // RTS/CTS
+			case 3: // none
+			case 4: // DSR/DTR
 				ts.Flow = val;
 				break;
 		}

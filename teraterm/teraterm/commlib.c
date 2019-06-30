@@ -224,9 +224,13 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			dcb.XonChar = XON;
 			dcb.XoffChar = XOFF;
 			break;
-		case IdFlowHard:
+		case IdFlowHard:  // RTS/CTS
 			dcb.fOutxCtsFlow = TRUE;
 			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+			break;
+		case IdFlowHardDsrDtr:  // DSR/DTR
+			dcb.fOutxDsrFlow = TRUE;
+			dcb.fDtrControl = DTR_CONTROL_HANDSHAKE;
 			break;
 	}
 
@@ -1182,7 +1186,8 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 	}
 	if ((cv->PortType==IdTCPIP) ||
 	    (cv->PortType==IdSerial) &&
-	    (ts->Flow!=IdFlowHard)) {
+			(!(ts->Flow == IdFlowHard || ts->Flow == IdFlowHardDsrDtr)) 
+			) { 
 		if (Lock) {
 			b = XOFF;
 		}
@@ -1192,12 +1197,17 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 		CommBinaryOut(cv,&b,1);
 	}
 	else if ((cv->PortType==IdSerial) &&
-	         (ts->Flow==IdFlowHard)) {
+	         (ts->Flow == IdFlowHard || ts->Flow == IdFlowHardDsrDtr)) {
+		// ハードウェアフローの設定に応じて拡張機能コードを切り替える。
 		if (Lock) {
 			Func = CLRRTS;
+			if (ts->Flow == IdFlowHardDsrDtr)
+				Func = CLRDTR;
 		}
 		else {
 			Func = SETRTS;
+			if (ts->Flow == IdFlowHardDsrDtr)
+				Func = SETDTR;
 		}
 		EscapeCommFunction(cv->ComID,Func);
 	}
