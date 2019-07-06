@@ -47,9 +47,11 @@ UTF-8 &lt;-----&gt; Unicode(UTF-16LE) &lt;-----&gt; MBCS
 </pre>
 
 <p>
-(1)において、UTF-8は3バイトまでしか変換していないため、
-サロゲートペア(surrogate pair)や結合文字(combining character)<!--、
-分解形式(decomposed form)-->などには対応していません。<br>
+(1)において、4.102から 4byte UTF-8 に対応したため、UTF-8のデコード時に
+Unicode の情報が欠落することはなくなりました。<br>
+漢字コード(受信) に UTF-8m が選択されていると結合文字(combining
+character)の処理が一部が行われます。Mac OS X(HFS+)を考慮したものとなっ
+ています。<br>
 
 (2)において、UnicodeとMBCS(Multiple Byte Character Set)の相互変換を行うために、
 ロケール(言語指定)を正しく設定する必要があります。
