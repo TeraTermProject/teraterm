@@ -119,14 +119,6 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv) {
     char buf[1024];
     struct _finddata_t searchData;
     long searchHandle;
-	HMODULE hm;
-
-    // ttxssh.dllにlibcrypto-1_1.dllを動的リンクしている場合、
-	// SetDefaultDllDirectories()の影響でttxssh.dllがLoadLibraryできないという
-	// 現象に対する仮処置。
-	// ただし、正式処置にはできない。
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\libcrypto-1_1.dll", ts->HomeDir);
-	hm = LoadLibrary(buf);
 
     _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts->HomeDir);
 
