@@ -1,0 +1,22 @@
+*** openssl-1.1.1c/crypto/threads_win.c	2019-05-28 22:12:20.000000000 +0900
+--- openssl/crypto/threads_win.c	2019-07-07 21:47:16.730284500 +0900
+*************** CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(vo
+*** 24,30 ****
+          return NULL;
+      }
+  
+! #if !defined(_WIN32_WCE)
+      /* 0x400 is the spin count value suggested in the documentation */
+      if (!InitializeCriticalSectionAndSpinCount(lock, 0x400)) {
+          OPENSSL_free(lock);
+--- 24,33 ----
+          return NULL;
+      }
+  
+! //#if !defined(_WIN32_WCE)
+! // We do not use InitializeCriticalSectionAndSpinCount API for
+! // running on Windows95. The API has been added on Windows98.
+! #if 0
+      /* 0x400 is the spin count value suggested in the documentation */
+      if (!InitializeCriticalSectionAndSpinCount(lock, 0x400)) {
+          OPENSSL_free(lock);

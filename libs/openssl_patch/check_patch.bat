@@ -7,6 +7,9 @@ rem
 findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
 if ERRORLEVEL 1 goto fail
 
+findstr /c:"running on Windows95" ..\openssl\crypto\threads_win.c
+if ERRORLEVEL 1 goto fail
+
 echo "パッチは適用されています"
 timeout 5
 goto end
