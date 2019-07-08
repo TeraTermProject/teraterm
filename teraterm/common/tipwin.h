@@ -35,16 +35,19 @@ extern "C" {
 
 typedef struct tagTipWinData TipWin;
 
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str);
+TipWin *TipWinCreateW(HWND src, int cx, int cy, const wchar_t *str);
+TipWin *TipWinCreateA(HWND src, int cx, int cy, const char *str);
 void TipWinSetTextW(TipWin *tWin, const wchar_t *text);
 void TipWinSetTextA(TipWin *tWin, const char *text);
 void TipWinSetPos(TipWin *tWin, int x, int y);
 void TipWinDestroy(TipWin *tWin);
 
 #if defined(UNICODE)
-#define TipWinSetText(p1, p2)	TipWinSetTextW(p1, p2)
+#define	TipWinCreate(p1, p2, p3, p4)	TipWinCreateW(p1, p2, p3, p4)
+#define TipWinSetText(p1, p2)			TipWinSetTextW(p1, p2)
 #else
-#define TipWinSetText(p1, p2)	TipWinSetTextA(p1, p2)
+#define	TipWinCreate(p1, p2, p3, p4)	TipWinCreateA(p1, p2, p3, p4)
+#define TipWinSetText(p1, p2)			TipWinSetTextA(p1, p2)
 #endif
 
 

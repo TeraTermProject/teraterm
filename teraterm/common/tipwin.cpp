@@ -55,9 +55,6 @@
  */
 /* based on windows/sizetip.c from PuTTY 0.60 */
 
-#define UNICODE
-#define _UNICODE
-
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
@@ -69,8 +66,10 @@
 #include "tipwin.h"
 
 #if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#define malloc(l)		_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)			_free_dbg((p), _NORMAL_BLOCK)
+#define _strdup(s)		_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wcsdup(s)		_wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 #define	FRAME_WIDTH	6
@@ -84,7 +83,8 @@ typedef struct tagTipWinData {
 	HWND tip_wnd;
 	HWND hParentWnd;
 	int tip_enabled;
-	const TCHAR *str;
+	const wchar_t *strW;
+	const char *str;
 	size_t str_len;
 	RECT str_rect;
 	RECT rect;
@@ -99,8 +99,13 @@ static void CalcStrRect(TipWin *pTipWin)
 	SelectObject(hdc, pTipWin->tip_font);
 	pTipWin->str_rect.top = 0;
 	pTipWin->str_rect.left = 0;
-	DrawText(hdc, pTipWin->str, pTipWin->str_len,
-			 &pTipWin->str_rect, DT_LEFT|DT_CALCRECT);
+	if (pTipWin->strW != NULL) {
+		DrawTextW(hdc, pTipWin->strW, pTipWin->str_len,
+				  &pTipWin->str_rect, DT_LEFT|DT_CALCRECT);
+	} else {
+		DrawTextA(hdc, pTipWin->str, pTipWin->str_len,
+				  &pTipWin->str_rect, DT_LEFT|DT_CALCRECT);
+	}
 	DeleteDC(hdc);
 }
 
@@ -121,43 +126,46 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 		case WM_ERASEBKGND:
 			return TRUE;
 
-		case WM_PAINT:
+		case WM_PAINT: {
+			HBRUSH hbr;
+			HGDIOBJ holdbr;
+			RECT cr;
+			HDC hdc;
+
+			PAINTSTRUCT ps;
+			hdc = BeginPaint(hWnd, &ps);
+
+			SelectObject(hdc, pTipWin->tip_font);
+			SelectObject(hdc, GetStockObject(BLACK_PEN));
+
+			hbr = CreateSolidBrush(pTipWin->tip_bg);
+			holdbr = SelectObject(hdc, hbr);
+
+			GetClientRect(hWnd, &cr);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+
+			SetTextColor(hdc, pTipWin->tip_text);
+			SetBkColor(hdc, pTipWin->tip_bg);
+
 			{
-				HBRUSH hbr;
-				HGDIOBJ holdbr;
-				RECT cr;
-				HDC hdc;
-
-				PAINTSTRUCT ps;
-				hdc = BeginPaint(hWnd, &ps);
-
-				SelectObject(hdc, pTipWin->tip_font);
-				SelectObject(hdc, GetStockObject(BLACK_PEN));
-
-				hbr = CreateSolidBrush(pTipWin->tip_bg);
-				holdbr = SelectObject(hdc, hbr);
-
-				GetClientRect(hWnd, &cr);
-				Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-
-				SetTextColor(hdc, pTipWin->tip_text);
-				SetBkColor(hdc, pTipWin->tip_bg);
-
-				{
-					RECT rect = pTipWin->str_rect;
-					rect.left = rect.left + FRAME_WIDTH;
-					rect.right = rect.right + FRAME_WIDTH;
-					rect.top = rect.top + FRAME_WIDTH;
-					rect.bottom = rect.bottom + FRAME_WIDTH;
+				RECT rect = pTipWin->str_rect;
+				rect.left = rect.left + FRAME_WIDTH;
+				rect.right = rect.right + FRAME_WIDTH;
+				rect.top = rect.top + FRAME_WIDTH;
+				rect.bottom = rect.bottom + FRAME_WIDTH;
+				if (pTipWin->strW != NULL) {
+					DrawTextW(hdc, pTipWin->strW, pTipWin->str_len, &rect, DT_LEFT);
+				} else {
 					DrawText(hdc, pTipWin->str, pTipWin->str_len, &rect, DT_LEFT);
 				}
-
-				SelectObject(hdc, holdbr);
-				DeleteObject(hbr);
-
-				EndPaint(hWnd, &ps);
 			}
+
+			SelectObject(hdc, holdbr);
+			DeleteObject(hbr);
+
+			EndPaint(hWnd, &ps);
 			return 0;
+		}
 
 		case WM_NCHITTEST:
 			return HTTRANSPARENT;
@@ -167,29 +175,14 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 			pTipWin->tip_font = NULL;
 			break;
 
-		case WM_SETTEXT:
-			{
-				LPCTSTR str = (LPCTSTR) lParam;
-				const int str_width = pTipWin->str_rect.right - pTipWin->str_rect.left;
-				const int str_height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
-
-				free((void *)(pTipWin->str));
-				pTipWin->str_len = _tcslen(str);
-				pTipWin->str = _tcsdup(str);
-				CalcStrRect(pTipWin);
-
-				SetWindowPos(hWnd, NULL,
-							 0, 0,
-							 str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
-				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
-				InvalidateRect(hWnd, NULL, FALSE);
-
-			}
-			break;
-
 		case WM_NCDESTROY:
 			if (pTipWin->auto_destroy) {
-				free((void *)pTipWin->str);
+				if (pTipWin->str != NULL) {
+					free((void *)pTipWin->str);
+				}
+				if (pTipWin->strW != NULL) {
+					free((void *)pTipWin->strW);
+				}
 				free(pTipWin);
 			}
 			break;
@@ -219,35 +212,32 @@ static void register_class(HINSTANCE hInst)
 	}
 }
 
-/* Create the tip window */
-static void create_tipwin(TipWin *pTipWin, HINSTANCE hInst, int cx, int cy)
+static void create_tipwin(TipWin *pTipWin, int cx, int cy)
 {
-	const TCHAR *str = pTipWin->str;
 	HWND hParnetWnd = pTipWin->hParentWnd;
-	const int str_width = pTipWin->str_rect.right - pTipWin->str_rect.left;
-	const int str_height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
+	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(hParnetWnd, GWLP_HINSTANCE);
+	register_class(hInst);
+
 	pTipWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 					   MAKEINTRESOURCE(tip_class),
-					   str, WS_POPUP,
-					   cx, cy,
-					   str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
+					   NULL, WS_POPUP,
+					   cx, cy, 1, 1,
 					   hParnetWnd, NULL, hInst, pTipWin);
 	assert(pTipWin->tip_wnd != NULL);
 }
 
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
+static TipWin *TipWinCreateNoStr(HWND src, int cx, int cy)
 {
 	TipWin *pTipWin;
-	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
 
-	register_class(hInst);
 	pTipWin = (TipWin *)malloc(sizeof(TipWin));
 	if (pTipWin == NULL) return NULL;
-	pTipWin->str_len = _tcslen(str);
-	pTipWin->str = _tcsdup(str);
+	pTipWin->str_len = 0;
+	pTipWin->str = NULL;
+	pTipWin->strW = NULL;
 	pTipWin->px = cx;
 	pTipWin->py = cy;
 	pTipWin->tip_bg = GetSysColor(COLOR_INFOBK);
@@ -256,29 +246,73 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
 	pTipWin->tip_font = CreateFontIndirectA(&logfont);
-	CalcStrRect(pTipWin);
-	pTipWin->hParentWnd = src;
-	create_tipwin(pTipWin, hInst, cx, cy);
-
 	pTipWin->hParentWnd = src;
 	pTipWin->auto_destroy = TRUE;
+
+	create_tipwin(pTipWin, cx, cy);
+
+	return pTipWin;
+}
+
+TipWin *TipWinCreateW(HWND src, int cx, int cy, const wchar_t *str)
+{
+	TipWin *pTipWin = TipWinCreateNoStr(src, cx, cy);
+	TipWinSetTextW(pTipWin, str);
 	ShowWindow(pTipWin->tip_wnd, SW_SHOWNOACTIVATE);
 	return pTipWin;
+}
+
+TipWin *TipWinCreateA(HWND src, int cx, int cy, const char *str)
+{
+	TipWin *pTipWin = TipWinCreateNoStr(src, cx, cy);
+	TipWinSetTextA(pTipWin, str);
+	ShowWindow(pTipWin->tip_wnd, SW_SHOWNOACTIVATE);
+	return pTipWin;
+}
+
+static void SetText(TipWin *pTipWin, const wchar_t *textW, const char *text)
+{
+	HWND hWnd = pTipWin->tip_wnd;
+
+	if (pTipWin->str != NULL) {
+		free((void *)(pTipWin->str));
+		pTipWin->str = NULL;
+	}
+	if (pTipWin->strW != NULL) {
+		free((void *)(pTipWin->strW));
+		pTipWin->strW = NULL;
+	}
+	if (textW != NULL) {
+		pTipWin->str_len = wcslen(textW);
+		pTipWin->strW = _wcsdup(textW);
+		SetWindowTextW(hWnd, textW);
+	} else {
+		pTipWin->str_len = _tcslen(text);
+		pTipWin->str = _tcsdup(text);
+		SetWindowTextA(hWnd, text);
+	}
+	CalcStrRect(pTipWin);
+
+	const int str_width = pTipWin->str_rect.right - pTipWin->str_rect.left;
+	const int str_height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
+	SetWindowPos(hWnd, NULL,
+				 0, 0,
+				 str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
+				 SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+	InvalidateRect(hWnd, NULL, FALSE);
 }
 
 void TipWinSetTextW(TipWin *tWin, const wchar_t *text)
 {
 	if (tWin != NULL) {
-		HWND tip_wnd = tWin->tip_wnd;
-		SetWindowTextW(tip_wnd, text);
+		SetText(tWin, text, NULL);
 	}
 }
 
 void TipWinSetTextA(TipWin *tWin, const char *text)
 {
 	if (tWin != NULL) {
-		HWND tip_wnd = tWin->tip_wnd;
-		SetWindowTextA(tip_wnd, text);
+		SetText(tWin, NULL, text);
 	}
 }
 
