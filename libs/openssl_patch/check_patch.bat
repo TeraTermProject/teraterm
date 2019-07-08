@@ -63,7 +63,7 @@ echo パッチコマンド %patchcmd% が見つかりません
 echo 下記サイトからダウンロードしてください
 echo http://geoffair.net/projects/patch.htm
 echo.
-exit /b
+goto patchfail
 
 :end
 @echo on
