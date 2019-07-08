@@ -32,6 +32,8 @@
 #ifdef __cplusplus
 
 #include "tmfc.h"
+#include "unicode_test.h"
+#include "tipwin.h"
 
 class CVTWindow : public TTCFrameWnd
 {
@@ -63,6 +65,12 @@ private:
 
   // DPI
   BOOL IgnoreSizeMessage;
+
+  // for debug
+#if UNICODE_DEBUG
+  TipWin *TipWinCodeDebug;
+  
+#endif
 
 public:
 	CVTWindow();
@@ -218,6 +226,9 @@ protected:
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	void Disconnect(BOOL confirm);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
+
+private:
+	void CodePopup(int client_x, int client_y);
 };
 #endif
 

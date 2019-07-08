@@ -148,10 +148,6 @@ static int AutoDisconnectedPort = -1;
 #define WM_IME_COMPOSITION              0x010F
 #endif
 
-#if UNICODE_DEBUG
-static TipWin *TipWinCodeDebug;
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
@@ -665,6 +661,9 @@ CVTWindow::CVTWindow()
 	ScrollLock = FALSE;  // èâä˙ílÇÕñ≥å¯ (2006.11.14 yutaka)
 	Alpha = 255;
 	IgnoreSizeMessage = FALSE;
+#if UNICODE_DEBUG
+	TipWinCodeDebug = NULL;
+#endif
 
 	/* Initialize scroll buffer */
 	InitBuffer();
@@ -2242,6 +2241,14 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	BYTE KeyState[256];
 	MSG M;
 
+#if UNICODE_DEBUG
+	if (nChar == VK_CONTROL && GetAsyncKeyState(VK_RCONTROL) != 0 && (nFlags & 0x4000) == 0){
+		POINT pos;
+		GetCursorPos(&pos);
+		ScreenToClient(m_hWnd, &pos);
+		CodePopup(pos.x, pos.y);
+	}
+#endif
 	switch (KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff)) {
 	case KEYDOWN_OTHER:
 		break;
@@ -2275,9 +2282,11 @@ void CVTWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyUp(nChar);
 #if UNICODE_DEBUG
-	if (TipWinCodeDebug != NULL) {
-		TipWinDestroy(TipWinCodeDebug);
-		TipWinCodeDebug = NULL;
+	if (nChar == VK_CONTROL) {
+		if (TipWinCodeDebug != NULL) {
+			TipWinDestroy(TipWinCodeDebug);
+			TipWinCodeDebug = NULL;
+		}
 	}
 #endif
 }
@@ -2387,24 +2396,29 @@ int CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 	}
 }
 
+
+void CVTWindow::CodePopup(int client_x, int client_y)
+{
+	wchar_t *buf = BuffGetCharInfo(client_x, client_y);
+	if (TipWinCodeDebug == NULL) {
+		TipWinCodeDebug = TipWinCreateW(m_hWnd, client_x, client_y, buf);
+	} else {
+		POINT pos = { client_x, client_y };
+		ClientToScreen(m_hWnd, &pos);
+		TipWinSetPos(TipWinCodeDebug, pos.x, pos.y);
+		TipWinSetTextW(TipWinCodeDebug, buf);
+	}
+	free(buf);
+}
+
 void CVTWindow::OnMouseMove(UINT nFlags, POINTS point)
 {
 	int i;
 	BOOL mousereport;
 
 #if UNICODE_DEBUG
-    if (GetAsyncKeyState(VK_RCONTROL) != 0) {
-		wchar_t buf[128];
-		BuffCheckMouse(point.x, point.y, buf, _countof(buf));
-		POINT TipWinPos = { point.x, point.y };
-		ClientToScreen(m_hWnd, &TipWinPos);
-		if (TipWinCodeDebug == NULL) {
-			TipWinCodeDebug = TipWinCreate(m_hWnd, TipWinPos.x, TipWinPos.y, "test");
-			TipWinSetTextW(TipWinCodeDebug, buf);
-		} else {
-			TipWinSetPos(TipWinCodeDebug, TipWinPos.x, TipWinPos.y);
-			TipWinSetTextW(TipWinCodeDebug, buf);
-		}
+	if (TipWinCodeDebug != NULL) {
+		CodePopup(point.x, point.y);
 	}
 #endif
 

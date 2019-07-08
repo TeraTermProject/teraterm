@@ -554,7 +554,7 @@ void BackSpace()
 	}
 }
 
-void CarriageReturn(BOOL logFlag)
+static void CarriageReturn(BOOL logFlag)
 {
 	if (!ts.EnableContinuedLineCopy || logFlag)
 		if (cv.HLogBuf!=0) Log1Byte(CR);
@@ -567,7 +567,7 @@ void CarriageReturn(BOOL logFlag)
 	Fallbacked = FALSE;
 }
 
-void LineFeed(BYTE b, BOOL logFlag)
+static void LineFeed(BYTE b, BOOL logFlag)
 {
 	/* for auto print mode */
 	if ((AutoPrintMode) &&
@@ -604,7 +604,7 @@ void Tab()
 	if (cv.HLogBuf!=0) Log1Byte(HT);
 }
 
-void PutChar(BYTE b)
+static void PutChar(BYTE b)
 {
 	BOOL SpecialNew;
 	TCharAttr CharAttrTmp;

@@ -109,7 +109,7 @@ void BuffScrollRight(int count);
 int BuffGetCurrentLineData(char *buf, int bufsize);
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
-void BuffCheckMouse(int Xw, int Yw, wchar_t *buf, size_t buf_size);
+wchar_t *BuffGetCharInfo(int Xw, int Yw);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
