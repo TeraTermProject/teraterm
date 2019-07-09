@@ -10,8 +10,14 @@ cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
 
-perl -e "open(IN,'Configurations/10-main.conf');while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
+rem VS2005だと警告エラーでコンパイルが止まる問題への処置
+perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
+
+rem GetModuleHandleExW API依存除去のため
+perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
+move conf.tmp Configurations/10-main.conf
+
 
 perl Configure no-asm no-async no-shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
 perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
