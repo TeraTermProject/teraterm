@@ -20,13 +20,14 @@ rem パッチの適用有無をチェック
 :patch1
 findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
 if ERRORLEVEL 1 goto fail1
-goto patch2
+goto patch3
 :fail1
 pushd ..
 %folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
 %folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
 popd
 
+rem 以下はあとで消す
 :patch2
 findstr /c:"running on Windows95" ..\openssl\crypto\threads_win.c
 if ERRORLEVEL 1 goto fail2
@@ -37,9 +38,20 @@ pushd ..
 %folder%\patch %cmdopt2% < %folder%\InitializeCriticalSectionAndSpinCount_patch.txt
 popd
 
-
-
 :patch3
+findstr /c:"myInitializeCriticalSectionAndSpinCount" ..\openssl\crypto\threads_win.c
+if ERRORLEVEL 1 goto fail3
+goto patch4
+:fail3
+pushd ..
+%folder%\patch %cmdopt1% < %folder%\thread_win.txt
+%folder%\patch %cmdopt2% < %folder%\thread_win.txt
+popd
+
+
+
+
+:patch4
 echo "パッチは適用されています"
 timeout 5
 goto end
