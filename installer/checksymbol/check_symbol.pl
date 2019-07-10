@@ -29,6 +29,17 @@ my %g_apilist = (
 	'win95' => 'api\\win95_dll.txt',
 );
 
+# Windows95で問題ないAPIの一覧
+my @g_whitelist_win95 = (
+	"CommDlgExtendedError",
+	"GetSaveFileNameA",
+	"GetOpenFileNameA",
+	"DnsQuery_A",
+	"DnsRecordListFree",
+	"GetMonitorInfoA",
+	"MonitorFromWindow"
+);
+
 if (@ARGV != 1) {
 	print "ERROR: no argument!\n";
 	help();
@@ -131,7 +142,7 @@ sub verify_api_list {
 	for $key (keys %g_apilist) {
 		$os = $key;
 		$file = $g_apilist{$key};
-		print "$os, $file\n";
+		print "[$os, $file]\n";
 		
 		open(FP, "<$file") || next;
 		@whole_file = <FP>;	
@@ -140,6 +151,10 @@ sub verify_api_list {
 		# モジュールの依存APIをチェックする
 		foreach $api (@g_module_symbols) {
 			#print "API($api)\n";
+			if (excluded_check_api($api)) {
+				next;
+			}
+			
 			@match = grep(/$api/, @whole_file);
 			if (@match == 0) {
 				print "APIが見当たりません($api)\n";
@@ -149,3 +164,16 @@ sub verify_api_list {
 	}
 }
 
+# チェック対象外のAPIか
+sub excluded_check_api {
+	my($arg) = @_;
+	my($s);
+	
+	foreach $s (@g_whitelist_win95) {
+		if ($s eq $arg) {
+			#print "$arg API is excluded.\n";
+			return 1;
+		}
+	}
+	return 0
+}
