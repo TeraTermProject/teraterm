@@ -28,6 +28,8 @@ pushd ..
 %folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
 %folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
 popd
+goto patch_end
+
 
 rem InitializeCriticalSectionAndSpinCount APIˆË‘¶œ‹Ž‚Ì‚½‚ß
 rem ˆÈ‰º‚Í•s—v
