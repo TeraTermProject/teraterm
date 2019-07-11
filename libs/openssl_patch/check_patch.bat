@@ -17,6 +17,8 @@ if exist %patchcmd% (goto cmd_true) else goto cmd_false
 
 
 rem パッチの適用有無をチェック
+
+rem freeaddrinfo/getnameinfo/getaddrinfo API依存除去のため
 :patch1
 findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
 if ERRORLEVEL 1 goto fail1
@@ -27,7 +29,8 @@ pushd ..
 %folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
 popd
 
-rem 以下はあとで消す
+rem InitializeCriticalSectionAndSpinCount API依存除去のため
+rem 以下は不要
 :patch2
 findstr /c:"running on Windows95" ..\openssl\crypto\threads_win.c
 if ERRORLEVEL 1 goto fail2
@@ -38,6 +41,7 @@ pushd ..
 %folder%\patch %cmdopt2% < %folder%\InitializeCriticalSectionAndSpinCount_patch.txt
 popd
 
+rem InitializeCriticalSectionAndSpinCount/InterlockedCompareExchange/InterlockedExchangeAdd API依存除去のため
 :patch3
 findstr /c:"myInitializeCriticalSectionAndSpinCount" ..\openssl\crypto\threads_win.c
 if ERRORLEVEL 1 goto fail3
@@ -49,9 +53,22 @@ pushd ..
 popd
 
 
-
-
+rem CryptAcquireContextW API依存除去のため
 :patch4
+findstr /c:"CryptAcquireContextA" ..\openssl\crypto\rand\rand_win.c
+if ERRORLEVEL 1 goto fail4
+goto patch5
+:fail4
+pushd ..
+%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW.txt
+%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW.txt
+popd
+
+
+:patch5
+
+
+:patch_end
 echo "パッチは適用されています"
 timeout 5
 goto end
