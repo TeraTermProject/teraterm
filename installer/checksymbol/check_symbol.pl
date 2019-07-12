@@ -29,6 +29,10 @@ my @g_dlllist = (
 # https://www.nirsoft.net/utils/dll_export_viewer.html
 my %g_apilist = (
 	'Windows95' => 'api\\win95_dll.txt',
+	'Windows98' => 'api\\win98_dll.txt',
+	'WindowsMe' => 'api\\winMe_dll.txt',
+	'Windows2000' => 'api\\win2000_dll.txt',
+	'WindowsXP' => 'api\\winXP_dll.txt',
 );
 
 # Windows95‚Å–â‘è‚È‚¢API‚Ìˆê——
@@ -169,7 +173,10 @@ sub verify_api_list {
 		if ($notfound) {
 			$notfound = 0;
 			print "\n$os ‚Å‚Íã‹LAPI‚ª‘¶İ‚µ‚È‚¢‚Ì‚Å Tera Term ‚ª‹N“®‚µ‚È‚¢‰Â”\\«‚ª‚ ‚è‚Ü‚·\n";
+		} else {
+			print "\n$os ‚Å‚Í–â‘è‚ ‚è‚Ü‚¹‚ñ\n";
 		}
+		print "\n\n";
 	}
 }
 
