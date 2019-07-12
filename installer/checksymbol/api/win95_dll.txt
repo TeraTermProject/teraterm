@@ -32078,3 +32078,203 @@ Full Path         : C:\WINDOWS\SYSTEM\user32.dll
 Type              : Exported Function
 ==================================================
 
+==================================================
+Function Name     : ChooseColorA
+Address           : 0x7fe95fc0
+Relative Address  : 0x00005fc0
+Ordinal           : 1 (0x1)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ChooseColorW
+Address           : 0x7fe96895
+Relative Address  : 0x00006895
+Ordinal           : 2 (0x2)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ChooseFontA
+Address           : 0x7fe96056
+Relative Address  : 0x00006056
+Ordinal           : 3 (0x3)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ChooseFontW
+Address           : 0x7fe968a1
+Relative Address  : 0x000068a1
+Ordinal           : 4 (0x4)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : CommDlgExtendedError
+Address           : 0x7fe96103
+Relative Address  : 0x00006103
+Ordinal           : 5 (0x5)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : FindTextA
+Address           : 0x7fe957b6
+Relative Address  : 0x000057b6
+Ordinal           : 6 (0x6)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : FindTextW
+Address           : 0x7fe9687d
+Relative Address  : 0x0000687d
+Ordinal           : 7 (0x7)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetFileTitleA
+Address           : 0x7fe94ff1
+Relative Address  : 0x00004ff1
+Ordinal           : 8 (0x8)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetFileTitleW
+Address           : 0x7fe968b9
+Relative Address  : 0x000068b9
+Ordinal           : 9 (0x9)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetOpenFileNameA
+Address           : 0x7fe91162
+Relative Address  : 0x00001162
+Ordinal           : 10 (0xa)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetOpenFileNameW
+Address           : 0x7fe96865
+Relative Address  : 0x00006865
+Ordinal           : 11 (0xb)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetSaveFileNameA
+Address           : 0x7fe94fe3
+Relative Address  : 0x00004fe3
+Ordinal           : 12 (0xc)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetSaveFileNameW
+Address           : 0x7fe96871
+Relative Address  : 0x00006871
+Ordinal           : 13 (0xd)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : PageSetupDlgA
+Address           : 0x7fe9690f
+Relative Address  : 0x0000690f
+Ordinal           : 14 (0xe)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : PageSetupDlgW
+Address           : 0x7fe968ad
+Relative Address  : 0x000068ad
+Ordinal           : 15 (0xf)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : PrintDlgA
+Address           : 0x7fe91298
+Relative Address  : 0x00001298
+Ordinal           : 16 (0x10)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : PrintDlgW
+Address           : 0x7fe96903
+Relative Address  : 0x00006903
+Ordinal           : 17 (0x11)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ReplaceTextA
+Address           : 0x7fe957c4
+Relative Address  : 0x000057c4
+Ordinal           : 18 (0x12)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ReplaceTextW
+Address           : 0x7fe96889
+Relative Address  : 0x00006889
+Ordinal           : 19 (0x13)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WEP
+Address           : 0x7fe94ff1
+Relative Address  : 0x00004ff1
+Ordinal           : 20 (0x14)
+Filename          : COMDLG32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
+Type              : Exported Function
+==================================================
+

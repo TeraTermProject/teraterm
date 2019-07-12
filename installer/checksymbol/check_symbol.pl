@@ -25,8 +25,10 @@ my @g_dlllist = (
 );
 
 # OSごとのAPI一覧	
+# NirSoftのDLL Export Viewerで作成する
+# https://www.nirsoft.net/utils/dll_export_viewer.html
 my %g_apilist = (
-	'win95' => 'api\\win95_dll.txt',
+	'Windows95' => 'api\\win95_dll.txt',
 );
 
 # Windows95で問題ないAPIの一覧
@@ -137,12 +139,13 @@ sub verify_api_list {
 	local(*FP);
 	my($key, $os, $file, $api);
 	my(@whole_file, @match);	
+	my($notfound) = 0;
 	
 	# OSごとのAPI一覧を順番に確認する
 	for $key (keys %g_apilist) {
 		$os = $key;
 		$file = $g_apilist{$key};
-		print "[$os, $file]\n";
+		print "[$os, $file]\n\n";
 		
 		open(FP, "<$file") || next;
 		@whole_file = <FP>;	
@@ -151,16 +154,22 @@ sub verify_api_list {
 		# モジュールの依存APIをチェックする
 		foreach $api (@g_module_symbols) {
 			#print "API($api)\n";
-			if (excluded_check_api($api)) {
-				next;
-			}
+#			if (excluded_check_api($api)) {
+#				next;
+#			}
 			
 			@match = grep(/$api/, @whole_file);
 			if (@match == 0) {
-				print "APIが見当たりません($api)\n";
+				print "$api\n";
+				$notfound = 1;
 				#last;
 			}
 		}		
+		
+		if ($notfound) {
+			$notfound = 0;
+			print "\n$os では上記APIが存在しないので Tera Term が起動しない可能\性があります\n";
+		}
 	}
 }
 
