@@ -366,6 +366,7 @@ DLG_SERIAL_FLOW=Flow control:
 DLG_SERIAL_DELAY=Transmit delay
 DLG_SERIAL_DELAYCHAR=msec/char
 DLG_SERIAL_DELAYLINE=msec/line
+DLG_SERIAL_USE_DEVICE_IO_BUFFER=&Use device's internal I/O buffer
 
 DLG_TCPIP_TITLE=Hostliste editieren
 DLG_TCPIP_HOSTLIST=Hostliste

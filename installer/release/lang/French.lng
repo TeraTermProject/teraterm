@@ -366,6 +366,7 @@ DLG_SERIAL_FLOW=Ctrl. de flux:
 DLG_SERIAL_DELAY=Délai de transmission
 DLG_SERIAL_DELAYCHAR=msec/&car
 DLG_SERIAL_DELAYLINE=msec/&ligne
+DLG_SERIAL_USE_DEVICE_IO_BUFFER=&Use device's internal I/O buffer
 
 DLG_TCPIP_TITLE=Tera Term: Configuration TCP/IP
 DLG_TCPIP_HOSTLIST=Liste d'hôtes
