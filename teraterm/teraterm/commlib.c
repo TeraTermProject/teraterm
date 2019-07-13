@@ -168,7 +168,27 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	}
 
 	ClearCommError(cv->ComID,&DErr,NULL);
-	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+
+	/* シリアルポートドライバの送受信バッファサイズを指定する場合、
+	 * SetupComm APIを呼び出して設定を行う。従来動作。
+	 *
+	 * 指定しない場合、ドライバのデフォルトのサイズを使用する。
+	 * これによりCH340G(USBシリアル変換)でハードウェアフロー制御が効かない
+	 * という現象が回避できる(ワークアラウンド)。
+	 */
+	if (ts->UseDevcieInternalBuffer) {
+		OutputDebugPrintf("%s: Use driver's default buffer size to skip SetupComm calling.\n", 
+			__FUNCTION__);
+
+	} else {
+		DWORD ret, err = 0;
+		ret = SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+		if (ret == 0)
+			err = GetLastError();
+		OutputDebugPrintf("%s: Change driver's internal buffer size to call SetupComm(ret=%lu, err=%lu).\n", 
+			__FUNCTION__, ret, err);
+	}
+
 	/* flush input and output buffers */
 	if (ClearBuff) {
 		PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |

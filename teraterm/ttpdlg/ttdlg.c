@@ -1116,6 +1116,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ IDC_SERIALDELAY, "DLG_SERIAL_DELAY" },
 		{ IDC_SERIALDELAYCHAR_LABEL, "DLG_SERIAL_DELAYCHAR" },
 		{ IDC_SERIALDELAYLINE_LABEL, "DLG_SERIAL_DELAYLINE" },
+		{ IDC_SERIALDEVICE_IO_BUFFER, "DLG_SERIAL_USE_DEVICE_IO_BUFFER" },
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_SERIALHELP, "BTN_HELP" },
@@ -1196,6 +1197,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,ts->DelayPerLine,FALSE);
 			SendDlgItemMessage(Dialog, IDC_SERIALDELAYLINE, EM_LIMITTEXT,4, 0);
 
+			SetRB(Dialog,ts->UseDevcieInternalBuffer,IDC_SERIALDEVICE_IO_BUFFER,IDC_SERIALDEVICE_IO_BUFFER);
+
 			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
@@ -1233,6 +1236,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						ts->DelayPerLine = GetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,NULL,FALSE);
 
 						ts->PortType = IdSerial;
+
+						GetRB(Dialog,&ts->UseDevcieInternalBuffer,IDC_SERIALDEVICE_IO_BUFFER,IDC_SERIALDEVICE_IO_BUFFER);
 
 						// ボーレートが変更されることがあるので、タイトル再表示の
 						// メッセージを飛ばすようにした。 (2007.7.21 maya)

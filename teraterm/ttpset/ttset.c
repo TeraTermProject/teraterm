@@ -1085,6 +1085,17 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->DelayPerLine =
 		GetPrivateProfileInt(Section, "DelayPerLine", 0, FName);
 
+	/* Using internal input and output buffer of serial device driver 
+	 * シリアルポートドライバの内部バッファの送受信サイズを明示的に指定するか、
+	 * ドライバ内部のデフォルトのパラメータで使うかを指定する。
+	 *
+	 *   TRUE: ドライバ内部のデフォルトのパラメータを使う
+	 *   FALSE: 内部バッファの送受信サイズを明示的に指定する
+	 *
+	 * デフォルトは FLASE 。従来通りの動きに合わせる。
+	 */
+	ts->UseDevcieInternalBuffer = GetOnOff(Section, "UseDevcieInternalBuffer", FName, FALSE);
+
 	/* Telnet flag */
 	ts->Telnet = GetOnOff(Section, "Telnet", FName, TRUE);
 
@@ -2653,6 +2664,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	/* Delay per line */
 	WriteInt(Section, "DelayPerLine", FName, ts->DelayPerLine);
+
+	/* Using internal input and output buffer of serial device driver */
+	WriteOnOff(Section, "UseDevcieInternalBuffer", FName, ts->UseDevcieInternalBuffer);
 
 	/* Telnet flag */
 	WriteOnOff(Section, "Telnet", FName, ts->Telnet);
