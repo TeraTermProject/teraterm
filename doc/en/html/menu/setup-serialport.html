@@ -43,6 +43,15 @@
       <dd>
 	Time intervals between characters (lines) being sent, in milliseconds.
       </dd>
+
+      <dt id="UseDevIOBuffer">Use device's internal I/O buffer</dt>
+      <dd>
+	When it is checked, the internal buffer of serial port driver is used with defaut size. <br>
+	When it is not checked, the receive size of the internal buffer is specified as 8KB and
+	the send size as 2KB. <br>
+	If hardware flow control does not work well, please check this configuration.
+      </dd>
+
     </dl>
   </body>
 </html>
