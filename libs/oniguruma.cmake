@@ -57,14 +57,14 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "oniguruma-6.9.2")
-set(SRC_ARC "onig-6.9.2.tar.gz")
-set(SRC_URL "https://github.com/kkos/oniguruma/archive/v6.9.2.tar.gz")
-set(SRC_ARC_HASH_SHA1 bccc4ac69c91093f4894cf4564f1320b8fd6e97c)
+set(SRC_DIR_BASE "92354eea3ff8f07795c3ddb91cc6886c54578f10")
+set(SRC_ARC "${SRC_DIR_BASE}.tar.gz")
+set(SRC_URL "https://github.com/kkos/oniguruma/archive/${SRC_ARC}")
+set(SRC_ARC_HASH_SHA1 1002c56649cefdc227c37ad59b81e38bd2bc7180)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/oniguruma")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src")
-set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src/${SRC_DIR_BASE}")
+set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src/oniguruma-92354eea3ff8f07795c3ddb91cc6886c54578f10")
 set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/oniguruma_${TOOLSET}")
 if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32"))
@@ -110,6 +110,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 	${TOOLCHAINFILE}
 	-DCMAKE_DEBUG_POSTFIX=d
 	-DBUILD_SHARED_LIBS=OFF
+	-DMSVC_STATIC_RUNTIME=ON
 	WORKING_DIRECTORY ${BUILD_DIR}
 	RESULT_VARIABLE rv
 	)
