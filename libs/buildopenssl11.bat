@@ -21,6 +21,10 @@ rem GetModuleHandleExW APIˆË‘¶œ‹‚Ì‚½‚ß
 perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
 
+rem Debug build‚Ìwarning LNK4099‘Îô(Workaround)
+perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/Zi|/Z7|;s|/WX||;print $_;}close(IN);" > conf.tmp
+move conf.tmp Configurations/10-main.conf
+
 perl Configure no-asm no-async no-shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
 perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
 if exist "makefile.dbg" del makefile.dbg
