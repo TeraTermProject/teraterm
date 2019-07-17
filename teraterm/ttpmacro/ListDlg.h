@@ -31,7 +31,7 @@
 class CListDlg : public TTCDialog
 {
 public:
-	CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected, int x, int y);
+	CListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected, int x, int y);
 	INT_PTR DoModal();
 	int m_SelectItem;
 
@@ -39,12 +39,13 @@ private:
 	enum { IDD = IDD_LISTDLG };
 	PCHAR m_Text;
 	PCHAR m_Caption;
-	CHAR **m_Lists;
+	const CHAR **m_Lists;
 	int m_Selected;
 	int PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW, LW, LH;
 	SIZE s;
 
 	void Relocation(BOOL is_init, int WW);
+	void InitList(HWND HList);
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnOK();

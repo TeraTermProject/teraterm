@@ -43,7 +43,7 @@
 
 // CListDlg ダイアログ
 
-CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected, int x, int y)
+CListDlg::CListDlg(const PCHAR Text, const PCHAR Caption, const CHAR **Lists, int Selected, int x, int y)
 {
 	m_Text = Text;
 	m_Caption = Caption;
@@ -60,24 +60,14 @@ INT_PTR CListDlg::DoModal()
 	return TTCDialog::DoModal(hInst, hWndParent, IDD);
 }
 
-BOOL CListDlg::OnInitDialog()
+void CListDlg::InitList(HWND HList)
 {
-	static const DlgTextInfo TextInfos[] = {
-		{ IDOK, "BTN_YES" },
-		{ IDCANCEL, "BTN_CANCEL" },
-	};
-	char **p;
+	const char **p;
 	int ListMaxWidth = 0;
 	int ListCount = 0;
-	HDC DC;
-	RECT R;
-	HWND HList, HOk;
-
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
-
-	HList = ::GetDlgItem(m_hWnd, IDC_LISTBOX);
-	DC = ::GetDC(HList);	// リストボックスを横スクロールできるように最大幅を取得
-
+	HDC DC = ::GetDC(HList);
+	HFONT hFontList = (HFONT)::SendMessage(HList,WM_GETFONT,0,0);
+	HFONT hOldFont = (HFONT)SelectObject(DC,hFontList);
 	p = m_Lists;
 	while (*p) {
 		SIZE size;
@@ -93,12 +83,28 @@ BOOL CListDlg::OnInitDialog()
 	}
 
 	SendDlgItemMessage(IDC_LISTBOX, LB_SETHORIZONTALEXTENT, (ListMaxWidth + 5), 0);
+	SelectObject(DC,hOldFont);
 	::ReleaseDC(HList, DC);
 
 	if (m_Selected < 0 || m_Selected >= ListCount) {
 		m_Selected = 0;
 	}
 	SetCurSel(IDC_LISTBOX, m_Selected);
+}
+
+BOOL CListDlg::OnInitDialog()
+{
+	static const DlgTextInfo TextInfos[] = {
+		{ IDOK, "BTN_YES" },
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	RECT R;
+	HWND HList, HOk;
+
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+
+	HList = ::GetDlgItem(m_hWnd, IDC_LISTBOX);
+	InitList(HList);
 
 	// 本文とタイトル
 	SetDlgItemText(IDC_LISTTEXT, m_Text);
@@ -138,8 +144,6 @@ BOOL CListDlg::OnCancel()
 	return TTCDialog::OnCancel();
 }
 
-//int MessageBoxHaltScript(HWND hWnd);
-
 BOOL CListDlg::OnClose()
 {
 	int ret = MessageBoxHaltScript(m_hWnd);
@@ -152,14 +156,18 @@ BOOL CListDlg::OnClose()
 void CListDlg::Relocation(BOOL is_init, int new_WW)
 {
 	RECT R;
-	HDC TmpDC;
 	HWND HText, HOk, HCancel, HList;
 	int CW, CH;
+	int NonClientAreaWidth;
+	int NonClientAreaHeight;
 
 	::GetClientRect(m_hWnd, &R);
 	CW = R.right-R.left;
 	CH = R.bottom-R.top;
-#define CONTROL_GAP_W	14
+	NonClientAreaWidth = WW - CW;
+	NonClientAreaHeight = WH - CH;
+
+#define CONTROL_GAP_W	14		// ウィンドウ端とコントロール間との幅
 	// 初回のみ
 	if (is_init) {
 		// テキストコントロールサイズを補正
@@ -167,8 +175,9 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 			TW = CW;
 		}
 		// ウインドウサイズの計算
-		WW = TW + (WW - CW);
-		WH = TH + LH + (int)(BH*1.5) + (WH - CH);
+		WW = TW + NonClientAreaWidth;
+		CW = WW - NonClientAreaWidth;
+		WH = TH + LH + (int)(BH*1.5) + NonClientAreaHeight;		// (ボタンの高さ/2) がウィンドウ端とコントロール間との高さ
 		init_WW = WW;
 		// リストボックスサイズの計算
 		if (LW < CW - BW - CONTROL_GAP_W * 3) {
@@ -189,16 +198,17 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	::MoveWindow(HList,CONTROL_GAP_W,BH/2,LW,LH,TRUE);
 	::MoveWindow(HOk,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH/2,BW,BH,TRUE);
 	::MoveWindow(HCancel,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH*2,BW,BH,TRUE);
+	::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
 
+	// PosXがウィンドウの外に-100以下の位置にある場合
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		::GetWindowRect(m_hWnd, &R);
-		TmpDC = ::GetDC(GetSafeHwnd());
-		PosX = (GetDeviceCaps(TmpDC,HORZRES)-R.right+R.left) / 2;
-		PosY = (GetDeviceCaps(TmpDC,VERTRES)-R.bottom+R.top) / 2;
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
+		// 中央に移動する
+		RECT rcWnd;
+		CenterWindow(m_hWnd, m_hParentWnd);
+		GetWindowRect(&rcWnd);
+		PosX = rcWnd.left;
+		PosY = rcWnd.top;
 	}
-	::SetWindowPos(m_hWnd, HWND_TOP,PosX,PosY,WW,WH,0);
 
 	::InvalidateRect(m_hWnd, NULL, TRUE);
 }
-

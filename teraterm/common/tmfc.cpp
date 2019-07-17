@@ -508,6 +508,8 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
  */
 INT_PTR TTCDialog::DoModal(HINSTANCE hInstance, HWND hParent, int idd)
 {
+	m_hInst = hInstance;
+	m_hParentWnd = hParent;
 	pseudoPtr = this;
 #if defined(REWRITE_TEMPLATE)
 	INT_PTR result =

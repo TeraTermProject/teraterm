@@ -9,6 +9,9 @@ call test_inputbox
 call test_passwordbox
 call test_statusbox
 call test_macrodialogbox
+type = 1
+call test_listbox
+type = 2
 call test_listbox
 messagebox "finish all tests" "test"
 end
@@ -200,9 +203,11 @@ return
 ;;;		messagebox
 :test_listbox
 N = 7
-intdim done N
-strdim strs N
-strdim srcs N
+if type == 1 then
+   intdim done N
+   strdim strs N
+   strdim srcs N
+endif
 for i 0 N-1
 	done[i] = 0
 next
@@ -233,6 +238,11 @@ while ((done_all == 0) or (done_cancel == 0))
 		endif
 	else
 		msg = "push `cancel`"
+	endif
+	if type == 2 then
+		strconcat msg "==================================================================================================="
+		strconcat msg "\n=\n=\n"
+		strspecial msg
 	endif
 	listbox msg "test listbox" strs prev
 	if result < 0 then
