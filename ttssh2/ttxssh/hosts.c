@@ -864,7 +864,6 @@ static BOOL equal_mp_ints(unsigned char *num1,
 //    1 ... “™‚µ‚¢
 int HOSTS_compare_public_key(Key *src, Key *key)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int bits;
 	unsigned char *exp;
 	unsigned char *mod;

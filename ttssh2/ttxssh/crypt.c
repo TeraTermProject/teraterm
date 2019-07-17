@@ -1174,7 +1174,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_OUT];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				/********* OPENSSL1.1.1 NOTEST *********/
 				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(cipher),
 				                 enc->iv, get_cipher_iv_len(cipher),
@@ -1223,7 +1222,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_IN];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				/********* OPENSSL1.1.1 NOTEST *********/
 				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(cipher),
 				                 enc->iv, get_cipher_iv_len(cipher),
