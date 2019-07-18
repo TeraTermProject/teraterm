@@ -430,7 +430,6 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
 	static unsigned char digest[EVP_MAX_MD_SIZE];
 	EVP_MD_CTX *md = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL)
 		goto error;
@@ -515,7 +514,6 @@ static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
 	int mdsz = EVP_MD_size(evp_md);
 	u_char *digest = malloc(roundup(need, mdsz));
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL)
 		goto skip;

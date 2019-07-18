@@ -145,7 +145,6 @@ static void init_TTSSH(PTInstVar pvar)
 
 	ssh_heartbeat_lock_initialize();
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	pvar->evpcip[MODE_IN] = EVP_CIPHER_CTX_new();
 	pvar->evpcip[MODE_OUT] = EVP_CIPHER_CTX_new();
 	/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
@@ -181,7 +180,6 @@ static void uninit_TTSSH(PTInstVar pvar)
 
 	ssh_heartbeat_lock_finalize();
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_IN]);
 	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_OUT]);
 }
@@ -4230,7 +4228,6 @@ ed25519_error:
 	buffer_free(encoded);
 	buffer_free(blob);
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (cipher_ctx) {
 		EVP_CIPHER_CTX_free(cipher_ctx);
 	}
@@ -4433,6 +4430,13 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 
 				// set focus to passphrase edit control (2007.1.27 maya)
 				SetFocus(GetDlgItem(dlg, IDC_KEY_EDIT));
+
+			} else {
+				// generate_ssh_key()が失敗した場合においても、ダイアログを
+				// クローズできるようにしておく。
+				EnableWindow(GetDlgItem(dlg, IDOK), TRUE);
+				EnableWindow(GetDlgItem(dlg, IDCANCEL), TRUE);
+
 			}
 			return TRUE;
 			}
