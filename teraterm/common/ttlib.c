@@ -1869,16 +1869,26 @@ void GetDesktopRect(HWND hWnd, RECT *rect)
 }
 
 /**
- *	指定ウィンドウの中央にウィンドウを配置する
+ *	ウィンドウを中央に配置する
+ *
  *	@param[in]	hWnd		位置を調整するウィンドウ
  *	@param[in]	hWndParent	このウィンドウの中央に移動する
+ *							(NULLの場合ディスプレイの中央)
+ *
+ *	hWndParentの指定がある場合
+ *		hWndParentが表示状態の場合
+ *			- hWndParentの中央に配置
+ *			- ただし表示されているディスプレイからはみ出す場合は調整される
+ *		hWndParentが非表示状態の場合
+ *			- hWndが表示されているディスプレイの中央に配置される
+ *	hWndParentがNULLの場合
+ *		- hWndが表示されているディスプレイの中央に配置される
  */
 void CenterWindow(HWND hWnd, HWND hWndParent)
 {
 	RECT rcWnd;
 	LONG WndWidth;
 	LONG WndHeight;
-	RECT rcParent;
 	int NewX;
 	int NewY;
 	RECT rcDesktop;
@@ -1888,15 +1898,28 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
 	assert(r != FALSE); (void)r;
 	WndWidth = rcWnd.right - rcWnd.left;
 	WndHeight = rcWnd.bottom - rcWnd.top;
-	r = GetWindowRect(hWndParent, &rcParent);
-	assert(r != FALSE); (void)r;
 
-	// 新しい位置
-	NewX = (rcParent.left + rcParent.right) / 2 - WndWidth / 2;
-	NewY = (rcParent.top + rcParent.bottom) / 2 - WndHeight / 2;
+	if (hWndParent == NULL || !IsWindowVisible(hWndParent) || IsIconic(hWndParent)) {
+		// 親が設定されていない or 表示されていない or icon化されている 場合
+		// ウィンドウの表示されているディスプレイの中央に表示する
+		GetDesktopRect(hWnd, &rcDesktop);
+
+		// デスクトップ(表示されているディスプレイ)の中央
+		NewX = (rcDesktop.left + rcDesktop.right) / 2 - WndWidth / 2;
+		NewY = (rcDesktop.top + rcDesktop.bottom) / 2 - WndHeight / 2;
+	} else {
+		RECT rcParent;
+		r = GetWindowRect(hWndParent, &rcParent);
+		assert(r != FALSE); (void)r;
+
+		// hWndParentの中央
+		NewX = (rcParent.left + rcParent.right) / 2 - WndWidth / 2;
+		NewY = (rcParent.top + rcParent.bottom) / 2 - WndHeight / 2;
+
+		GetDesktopRect(hWndParent, &rcDesktop);
+	}
 
 	// デスクトップからはみ出す場合、調整する
-	GetDesktopRect(hWndParent, &rcDesktop);
 	if (NewX + WndWidth > rcDesktop.right)
 		NewX = rcDesktop.right - WndWidth;
 	if (NewX < rcDesktop.left)
