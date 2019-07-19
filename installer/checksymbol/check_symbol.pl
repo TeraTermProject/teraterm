@@ -31,6 +31,7 @@ my %g_apilist = (
 	'Windows95' => 'api\\win95_dll.txt',
 	'Windows98' => 'api\\win98_dll.txt',
 	'WindowsMe' => 'api\\winMe_dll.txt',
+	'WindowsNT4.0' => 'api\\winnt4_dll.txt',
 	'Windows2000' => 'api\\win2000_dll.txt',
 	'WindowsXP' => 'api\\winXP_dll.txt',
 );
