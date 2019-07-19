@@ -200,11 +200,11 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	::MoveWindow(HCancel,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH*2,BW,BH,TRUE);
 	::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
 
-	// PosXがウィンドウの外に-100以下の位置にある場合
+	// PosXがディスプレイの外の-100以下の位置にある場合
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		// 中央に移動する
 		RECT rcWnd;
-		CenterWindow(m_hWnd, m_hParentWnd);
+		CenterWindow(m_hWnd, NULL);
 		GetWindowRect(&rcWnd);
 		PosX = rcWnd.left;
 		PosY = rcWnd.top;
