@@ -3432,7 +3432,6 @@ static void free_ssh_key(void)
 
 static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int, void *), void *cbarg)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 
 	// if SSH key already is generated, should free the resource.
 	free_ssh_key();

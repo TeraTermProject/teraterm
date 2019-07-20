@@ -5778,7 +5778,6 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *sha
 	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
-				/********* OPENSSL1.1.1 NOTEST *********/
 				BIGNUM *n;
 				RSA_get0_key(hostkey->rsa, &n, NULL, NULL);
 				_snprintf_s(emsg, sizeof(emsg), _TRUNCATE,

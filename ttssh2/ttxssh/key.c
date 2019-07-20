@@ -1320,7 +1320,6 @@ char *curve_keytype_to_name(ssh_keytype type)
 //
 int key_to_blob(Key *key, char **blobp, int *lenp)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	buffer_t *b;
 	char *sshname, *tmp;
 	int len;
@@ -1904,7 +1903,6 @@ ssh_keytype nid_to_keytype(int nid)
 
 void key_private_serialize(Key *key, buffer_t *b)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	char *s;
 	BIGNUM *e, *n, *d, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
