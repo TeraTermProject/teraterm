@@ -645,7 +645,6 @@ Key *read_SSH2_private_key(PTInstVar pvar,
                            char *errmsg,
                            int errmsg_len)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	Key *result = NULL;
 	EVP_PKEY *pk = NULL;
 	unsigned long err = 0;
@@ -671,6 +670,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		goto error;
 	}
 
+	/********* OPENSSL1.1.1 NOTEST *********/
 	pk_type = EVP_PKEY_id(pk);
 	switch (pk_type) {
 	case EVP_PKEY_RSA: // RSA key

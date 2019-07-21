@@ -1701,7 +1701,6 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 	{
-		/********* OPENSSL1.1.1 NOTEST *********/
 		ECDSA_SIG *sig;
 		const EVP_MD *evp_md;
 		EVP_MD_CTX *md = NULL;
@@ -1715,7 +1714,6 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			goto error;
 		}
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		md = EVP_MD_CTX_new();
 		if (md == NULL)
 			goto error;
