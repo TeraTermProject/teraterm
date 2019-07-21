@@ -147,7 +147,7 @@ static void init_TTSSH(PTInstVar pvar)
 
 	pvar->evpcip[MODE_IN] = EVP_CIPHER_CTX_new();
 	pvar->evpcip[MODE_OUT] = EVP_CIPHER_CTX_new();
-	/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+	/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 }
 
 static void uninit_TTSSH(PTInstVar pvar)
@@ -3609,16 +3609,14 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 
 	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) == NULL) {
 		c = malloc(sizeof(*c));
-		/********* OPENSSL1.1.1 NOTEST *********/
 		c->k1 = EVP_CIPHER_CTX_new();
 		c->k2 = EVP_CIPHER_CTX_new();
 		c->k3 = EVP_CIPHER_CTX_new();
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 		EVP_CIPHER_CTX_set_app_data(ctx, c);
 	}
 	if (key == NULL)
 		return (1);
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (enc == -1)
 		enc = EVP_CIPHER_CTX_encrypting(ctx); // ctx->encrypt
 	k1 = k2 = k3 = (u_char *) key;
@@ -3654,7 +3652,6 @@ static int ssh1_3des_cbc(EVP_CIPHER_CTX *ctx, u_char *dest, const u_char *src, u
 		//error("ssh1_3des_cbc: no context");
 		return (0);
 	}
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (EVP_Cipher(c->k1, dest, (u_char *)src, len) == 0 ||
 		EVP_Cipher(c->k2, dest, dest, len) == 0 ||
 		EVP_Cipher(c->k3, dest, dest, len) == 0)
@@ -3677,6 +3674,7 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
+// â∫ãLä÷êîÇÕñ¢égópÅB
 void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
 {
 	struct ssh1_3des_ctx *c;
@@ -3689,7 +3687,6 @@ void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
 		//fatal("%s: no 3des context", __func__);
 		;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (doset) {
 		//debug3("%s: Installed 3DES IV", __func__);
 		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k1), iv, 8);
@@ -3722,10 +3719,9 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 #endif
 	static EVP_CIPHER *p = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/8, /*key_len*/16);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 	}
 	if (p) {
 		EVP_CIPHER_meth_set_iv_length(p, 0);
@@ -4098,7 +4094,6 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	kdf = buffer_init();
 	encoded = buffer_init();
 	blob = buffer_init();
-	/********* OPENSSL1.1.1 NOTEST *********/
 	cipher_ctx = EVP_CIPHER_CTX_new();
 	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL || cipher_ctx == NULL)
 		goto ed25519_error;
@@ -4670,7 +4665,6 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				int uulen;
 				BIGNUM *e, *n;
 				BIGNUM *p, *q, *g, *pub_key;
-				/********* OPENSSL1.1.1 NOTEST *********/
 
 				b = buffer_init();
 				if (b == NULL)
@@ -4868,7 +4862,6 @@ public_error:
 				FILE *fp;
 				char wrapped[4096];
 				BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
-				/********* OPENSSL1.1.1 NOTEST *********/
 
 				if (passphrase[0] == '\0') { // passphrase is empty
 					cipher_num = SSH_CIPHER_NONE;
@@ -4885,9 +4878,8 @@ public_error:
 					break;
 				}
 
-				/********* OPENSSL1.1.1 NOTEST *********/
 				cipher_ctx = EVP_CIPHER_CTX_new();
-				/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+				/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 
 				// set random value
 				rnd = arc4random();
@@ -4937,7 +4929,6 @@ public_error:
 				MD5_Init(&md);
 				MD5_Update(&md, (const unsigned char *)passphrase, strlen(passphrase));
 				MD5_Final(digest, &md);
-				/********* OPENSSL1.1.1 NOTEST *********/
 				if (cipher_num == SSH_CIPHER_NONE) {
 					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, 0, pvar);
 				} else {
@@ -4979,7 +4970,6 @@ public_error:
 error:;
 				buffer_free(b);
 				buffer_free(enc);
-				/********* OPENSSL1.1.1 NOTEST *********/
 				if (cipher_ctx) {
 					EVP_CIPHER_CTX_free(cipher_ctx);
 				}

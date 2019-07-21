@@ -235,7 +235,7 @@ evp_des3_ctr(void)
 
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/DES_BLOCK_SIZE, /*key_len*/24);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 	}
 	if (p) {
 		EVP_CIPHER_meth_set_iv_length(p, DES_BLOCK_SIZE);
@@ -348,7 +348,7 @@ evp_bf_ctr(void)
 	/********* OPENSSL1.1.1 NOTEST *********/
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/BF_BLOCK, /*key_len*/16);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 	}
 	if (p) {
 		EVP_CIPHER_meth_set_iv_length(p, BF_BLOCK);
@@ -461,7 +461,7 @@ evp_cast5_ctr(void)
 
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/CAST_BLOCK, /*key_len*/16);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 	}
 	if (p) {
 		EVP_CIPHER_meth_set_iv_length(p, CAST_BLOCK);
@@ -566,7 +566,7 @@ evp_camellia_128_ctr(void)
 
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/CAMELLIA_BLOCK_SIZE, /*key_len*/16);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
 	}
 	if (p) {
 		EVP_CIPHER_meth_set_iv_length(p, CAMELLIA_BLOCK_SIZE);

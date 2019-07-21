@@ -567,7 +567,6 @@ static char *copy_mp_int(char *num)
 //
 RSA *duplicate_RSA(RSA *src)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	RSA *rsa = NULL;
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *se = NULL, *sn = NULL;
@@ -1021,7 +1020,6 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep, digest_algorithm dgst_alg)
 //
 static void key_add_private(Key *k)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *d, *iqmp, *q, *p, *dmq1, *dmp1;
 	BIGNUM *priv_key = NULL;
 
@@ -1113,7 +1111,6 @@ Key *key_new_private(int type)
 
 Key *key_new(int type)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int success = 0;
 	Key *k = NULL;
 	RSA *rsa;
@@ -1589,7 +1586,6 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		u_int slen, dlen, len;
 		int ok, nid = NID_sha1;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		md = EVP_MD_CTX_new();
 		if (md == NULL)
 			goto error;
@@ -1647,7 +1643,6 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	}
 	case KEY_DSA: // DSA
 	{
-		/********* OPENSSL1.1.1 NOTEST *********/
 		DSA_SIG *sig;
 		const EVP_MD *evp_md = EVP_sha1();
 		EVP_MD_CTX *md = NULL;
@@ -1655,7 +1650,6 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		u_int rlen, slen, len, dlen;
 		BIGNUM *bignum_r, *bignum_s;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		md = EVP_MD_CTX_new();
 		if (md == NULL)
 			goto error;
@@ -1789,7 +1783,6 @@ error:
 
 BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	buffer_t *msg = NULL;
 	Key *keypair;
 	char *s, *tmp;
@@ -1954,7 +1947,6 @@ void key_private_serialize(Key *key, buffer_t *b)
 /* calculate p-1 and q-1 */
 static void rsa_generate_additional_parameters(RSA *rsa)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *aux = NULL;
 	BN_CTX *ctx = NULL;
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
@@ -1983,7 +1975,6 @@ error:
 
 Key *key_private_deserialize(buffer_t *blob)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int success = 0;
 	char *type_name = NULL;
 	Key *k = NULL;
