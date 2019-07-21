@@ -272,7 +272,6 @@ int ssh_rsa_verify(RSA *key,
                    u_char *signature, u_int signaturelen,
                    u_char *data, u_int datalen)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	const EVP_MD *evp_md;
 	EVP_MD_CTX *md = NULL;
 	//	char *ktype;
@@ -283,7 +282,6 @@ int ssh_rsa_verify(RSA *key,
 	char *ptr;
 	BIGNUM *n;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL) {
 		ret = -1;

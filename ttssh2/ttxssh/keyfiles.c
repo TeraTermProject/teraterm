@@ -386,13 +386,13 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	SSH2Cipher *cipher;
 	size_t authlen;
 	EVP_CIPHER_CTX *cipher_ctx = NULL;
+	int ret;
 
 	blob = buffer_init();
 	b = buffer_init();
 	kdf = buffer_init();
 	encoded = buffer_init();
 	copy_consumed = buffer_init();
-	/********* OPENSSL1.1.1 NOTEST *********/
 	cipher_ctx = EVP_CIPHER_CTX_new();
 
 	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL || cipher_ctx == NULL)
@@ -554,12 +554,12 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		}
 	}
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	// ïúçÜâª
 	cp = buffer_append_space(b, len);
 	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
 		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
-	if (EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
+	ret = EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len);
+	if (ret == 0) {
 		cipher_cleanup_SSH2(cipher_ctx);
 		goto error;
 	}
@@ -619,7 +619,6 @@ error:
 	free(salt);
 	free(comment);
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (cipher_ctx) {
 		EVP_CIPHER_CTX_free(cipher_ctx);
 	}

@@ -261,7 +261,6 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned char lastiv[1];
 	char tmp[80];
 	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_IN];
-	/********* OPENSSL1.1.1 NOTEST *********/
 
 	if (bytes == 0)
 		return TRUE;
