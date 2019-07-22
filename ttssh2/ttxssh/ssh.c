@@ -6003,7 +6003,6 @@ error:
 //
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	char *data;
 	int len;
 	int offset = 0;

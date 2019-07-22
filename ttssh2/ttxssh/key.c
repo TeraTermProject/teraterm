@@ -85,7 +85,6 @@ int ssh_dss_verify(DSA *key,
                    u_char *signature, u_int signaturelen,
                    u_char *data, u_int datalen)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	DSA_SIG *sig;
 	const EVP_MD *evp_md = EVP_sha1();
 	EVP_MD_CTX *md = NULL;
@@ -95,7 +94,6 @@ int ssh_dss_verify(DSA *key,
 	char *ptr;
 	BIGNUM *r, *s;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL) {
 		ret = -1;

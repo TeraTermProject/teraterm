@@ -360,7 +360,6 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
 	static unsigned char digest[EVP_MAX_MD_SIZE];
 	EVP_MD_CTX *md = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL)
 		goto error;

@@ -338,7 +338,6 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 		encbufflen = bytes;
 	}
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (EVP_Cipher(pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
@@ -375,7 +374,6 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 		encbufflen = bytes;
 	}
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (EVP_Cipher(pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
@@ -685,7 +683,6 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 		goto error;
 	}
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	c = HMAC_CTX_new();
 	if (c == NULL)
 		goto error;
@@ -744,7 +741,6 @@ BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
 		if (mac == NULL || mac->enabled == 0) 
 			return FALSE;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		c = HMAC_CTX_new();
 		if (c == NULL)
 			return FALSE;
