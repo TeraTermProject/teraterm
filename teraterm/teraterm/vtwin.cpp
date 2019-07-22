@@ -3120,7 +3120,7 @@ LRESULT CVTWindow::OnIMEInputChange(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
-	case IMN_SETOPENSTATUS: {
+	case IMN_SETOPENSTATUS:
 		// 入力コンテキストの開閉状態が更新される(IME On/OFF)
 
 		// IMEのOn/Offを取得する
@@ -3135,14 +3135,12 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 
 			// フォントを設定する
 			ResetConversionLogFont(HVTWin);
-			OutputDebugPrintf("IMN_SETOPENSTATUS\n");
 		}
 
 		// 描画
 		ChangeCaret();
 
 		break;
-	}
 
 	// 候補ウィンドウの表示状況通知
 	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE サポート状況
@@ -3174,7 +3172,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	case IMN_OPENSTATUSWINDOW: {
+	case IMN_OPENSTATUSWINDOW:
 		// ステータスウィンドウをオープン(未確定文字を表示?)しようとしている
 
 		// IMEで未変換状態で、フォントダイアログをオープンしてクローズすると
@@ -3184,7 +3182,6 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		// フォントを設定する
 		ResetConversionLogFont(HVTWin);
 		break;
-	}
 	default:
 		break;
 	}
