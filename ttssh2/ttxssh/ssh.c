@@ -5539,7 +5539,6 @@ error:;
  */
 static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int len, grp_bits;
 	BIGNUM *p = NULL, *g = NULL;
 	DH *dh = NULL;

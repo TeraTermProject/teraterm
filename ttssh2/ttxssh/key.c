@@ -598,7 +598,6 @@ error:
 //
 DSA *duplicate_DSA(DSA *src)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	DSA *dsa = NULL;
 	BIGNUM *p, *q, *g, *pub_key;
 	BIGNUM *sp, *sq, *sg, *spub_key;
@@ -617,6 +616,9 @@ DSA *duplicate_DSA(DSA *src)
 	    g == NULL ||
 	    pub_key == NULL) {
 		DSA_free(dsa);
+		// メモリを解放しているのでNULLを返すようにする。
+		// 呼び元でのチェックはticket#39335で処置予定。
+		dsa = NULL;
 		goto error;
 	}
 
@@ -1385,7 +1387,6 @@ error:
 //
 Key *key_from_blob(char *data, int blen)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int keynamelen, len;
 	char key[128];
 	RSA *rsa = NULL;

@@ -234,7 +234,6 @@ DH *dh_new_group18(void)
 // DHåÆÇê∂ê¨Ç∑ÇÈ
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ )
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int i;
 	BIGNUM *pub_key;
 	BIGNUM *priv_key;
@@ -475,7 +474,6 @@ error:
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int i;
 	int n = BN_num_bits(dh_pub);
 	int bits_set = 0;
