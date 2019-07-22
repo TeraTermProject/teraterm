@@ -3125,11 +3125,18 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 
 		// IMEのOn/Offを取得する
 		IMEstat = GetIMEOpenStatus(HVTWin);
+		if (IMEstat != 0) {
+			// IME On
 
-		// 状態を表示するIMEのために位置を通知する
-		int CaretX = (CursorX-WinOrgX)*FontWidth;
-		int CaretY = (CursorY-WinOrgY)*FontHeight;
-		SetConversionWindow(HVTWin,CaretX,CaretY);
+			// 状態を表示するIMEのために位置を通知する
+			int CaretX = (CursorX-WinOrgX)*FontWidth;
+			int CaretY = (CursorY-WinOrgY)*FontHeight;
+			SetConversionWindow(HVTWin,CaretX,CaretY);
+
+			// フォントを設定する
+			ResetConversionLogFont(HVTWin);
+			OutputDebugPrintf("IMN_SETOPENSTATUS\n");
+		}
 
 		// 描画
 		ChangeCaret();
@@ -3151,9 +3158,31 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 	// 候補ウィンドウが表示された / 閉じたで発生する。
 	case IMN_OPENCANDIDATE: {
 		// 候補ウィンドウを開こうとしている
+
+		// 状態を表示するIMEのために位置を通知する
+		// 次の場合があるので、位置を再設定する
+		// - 漢字変換候補を表示
+		// - 次の文字を入力することで確定処理を行う
+		// - 文字入力と未変換文字入力が発生する
 		int CaretX = (CursorX-WinOrgX)*FontWidth;
 		int CaretY = (CursorY-WinOrgY)*FontHeight;
 		SetConversionWindow(HVTWin,CaretX,CaretY);
+
+		// フォントを設定する
+		ResetConversionLogFont(HVTWin);
+
+		break;
+	}
+
+	case IMN_OPENSTATUSWINDOW: {
+		// ステータスウィンドウをオープン(未確定文字を表示?)しようとしている
+
+		// IMEで未変換状態で、フォントダイアログをオープンしてクローズすると
+		// IMEに設定していたフォントが別のものに変化しているらしい
+		// ここでフォントの再設定を行う
+
+		// フォントを設定する
+		ResetConversionLogFont(HVTWin);
 		break;
 	}
 	default:

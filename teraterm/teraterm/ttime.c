@@ -45,21 +45,6 @@
 #define free(p)		_free_dbg((p), _NORMAL_BLOCK)
 #endif
 
-// imm.h が include できれば _IMM_ が define される → このブロック不要?
-#ifndef _IMM_
-  #define _IMM_
-
-  typedef DWORD HIMC;
-
-  typedef struct tagCOMPOSITIONFORM {
-    DWORD dwStyle;
-    POINT ptCurrentPos;
-    RECT  rcArea;
-  } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, *LPCOMPOSITIONFORM;
-
-#define GCS_RESULTSTR 0x0800
-#endif //_IMM_
-
 // #define ENABLE_DUMP	1
 
 typedef LONG (WINAPI *TImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
@@ -182,17 +167,23 @@ void SetConversionWindow(HWND HWnd, int X, int Y)
   (*PImmReleaseContext)(HWnd,hIMC);
 }
 
-void SetConversionLogFont(HWND HWnd, PLOGFONTA lf)
+void ResetConversionLogFont(HWND HWnd)
 {
   HIMC	hIMC;
   if (HIMEDLL == NULL) return;
-
-  memcpy(&lfIME,lf,sizeof(LOGFONT));
 
   hIMC = (*PImmGetContext)(HWnd);
   // Set font for the conversion window
   (*PImmSetCompositionFont)(hIMC,&lfIME);
   (*PImmReleaseContext)(HWnd,hIMC);
+}
+
+void SetConversionLogFont(HWND HWnd, const LOGFONTA *lf)
+{
+  if (HIMEDLL == NULL) return;
+
+  memcpy(&lfIME,lf,sizeof(LOGFONT));
+  ResetConversionLogFont(HWnd);
 }
 
 // 内部用
