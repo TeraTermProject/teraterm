@@ -34,7 +34,6 @@
 #include <string.h>
 #include <imm.h>
 #include <crtdbg.h>
-#include <stdio.h>
 #include <assert.h>
 
 #include "ttime.h"
@@ -51,7 +50,8 @@ typedef LONG (WINAPI *TImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
 typedef LONG (WINAPI *TImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
 typedef HIMC (WINAPI *TImmGetContext)(HWND);
 typedef BOOL (WINAPI *TImmReleaseContext)(HWND, HIMC);
-typedef BOOL (WINAPI *TImmSetCompositionFont)(HIMC, LPLOGFONTA);
+typedef BOOL (WINAPI *TImmSetCompositionFontA)(HIMC, LPLOGFONTA);
+typedef BOOL (WINAPI *TImmSetCompositionFontW)(HIMC, LPLOGFONTW);
 typedef BOOL (WINAPI *TImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
 typedef BOOL (WINAPI *TImmGetOpenStatus)(HIMC);
 typedef BOOL (WINAPI *TImmSetOpenStatus)(HIMC, BOOL);
@@ -60,14 +60,16 @@ static TImmGetCompositionStringW PImmGetCompositionStringW;
 static TImmGetCompositionStringA PImmGetCompositionStringA;
 static TImmGetContext PImmGetContext;
 static TImmReleaseContext PImmReleaseContext;
-static TImmSetCompositionFont PImmSetCompositionFont;
+static TImmSetCompositionFontA PImmSetCompositionFontA;
+static TImmSetCompositionFontW PImmSetCompositionFontW;
 static TImmSetCompositionWindow PImmSetCompositionWindow;
 static TImmGetOpenStatus PImmGetOpenStatus;
 static TImmSetOpenStatus PImmSetOpenStatus;
 
 
 static HANDLE HIMEDLL = NULL;
-static LOGFONTA lfIME;
+static LOGFONTA IMELogFontA;
+static LOGFONTW IMELogFontW;
 
 BOOL LoadIME(void)
 {
@@ -102,9 +104,12 @@ BOOL LoadIME(void)
 	HIMEDLL, "ImmReleaseContext");
   if (PImmReleaseContext==NULL) Err = TRUE;
 
-  PImmSetCompositionFont = (TImmSetCompositionFont)GetProcAddress(
+  PImmSetCompositionFontA = (TImmSetCompositionFontA)GetProcAddress(
 	HIMEDLL, "ImmSetCompositionFontA");
-  if (PImmSetCompositionFont==NULL) Err = TRUE;
+  if (PImmSetCompositionFontA==NULL) Err = TRUE;
+
+  PImmSetCompositionFontW = (TImmSetCompositionFontW)GetProcAddress(
+	HIMEDLL, "ImmSetCompositionFontW");
 
   PImmSetCompositionWindow = (TImmSetCompositionWindow)GetProcAddress(
 	HIMEDLL, "ImmSetCompositionWindow");
@@ -169,21 +174,49 @@ void SetConversionWindow(HWND HWnd, int X, int Y)
 
 void ResetConversionLogFont(HWND HWnd)
 {
-  HIMC	hIMC;
-  if (HIMEDLL == NULL) return;
+	HIMC	hIMC;
+	if (HIMEDLL == NULL) return;
 
-  hIMC = (*PImmGetContext)(HWnd);
-  // Set font for the conversion window
-  (*PImmSetCompositionFont)(hIMC,&lfIME);
-  (*PImmReleaseContext)(HWnd,hIMC);
+	hIMC = PImmGetContext(HWnd);
+	if (hIMC != NULL) {
+		BOOL result = FALSE;
+		if (PImmSetCompositionFontW != NULL) {
+			// ImmSetCompositionFontA()を使用すると
+			// 未変換文字列が指定フォントで表示されないことがある
+			result = PImmSetCompositionFontW(hIMC, &IMELogFontW);
+		}
+		if (result == FALSE) {
+			// ImmSetCompositionFontW() がエラーを返してきたとき A() でリトライ
+			// 9x では W()は存在するがエラーを返してくるようだ
+			PImmSetCompositionFontA(hIMC, &IMELogFontA);
+		}
+		PImmReleaseContext(HWnd,hIMC);
+	}
 }
 
 void SetConversionLogFont(HWND HWnd, const LOGFONTA *lf)
 {
-  if (HIMEDLL == NULL) return;
+	if (HIMEDLL == NULL) return;
 
-  memcpy(&lfIME,lf,sizeof(LOGFONT));
-  ResetConversionLogFont(HWnd);
+	memcpy(&IMELogFontA,lf,sizeof(LOGFONT));
+	if (PImmSetCompositionFontW != NULL) {
+		LOGFONTW *p = &IMELogFontW;
+		p->lfWeight = lf->lfWeight;
+		p->lfItalic = lf->lfItalic;
+		p->lfUnderline = lf->lfUnderline;
+		p->lfStrikeOut = lf->lfStrikeOut;
+		p->lfWidth = lf->lfWidth;
+		p->lfHeight = lf->lfHeight;
+		p->lfCharSet = lf->lfCharSet;
+		p->lfOutPrecision = lf->lfOutPrecision;
+		p->lfClipPrecision = lf->lfClipPrecision;
+		p->lfQuality = lf->lfQuality ;
+		p->lfPitchAndFamily = lf->lfPitchAndFamily;
+		MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
+							lf->lfFaceName, sizeof(lf->lfFaceName),
+							p->lfFaceName, _countof(p->lfFaceName));
+	}
+	ResetConversionLogFont(HWnd);
 }
 
 // 内部用
