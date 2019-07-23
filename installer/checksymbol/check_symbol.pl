@@ -21,7 +21,8 @@ my @g_dlllist = (
 	"ole32",
 	"KERNEL32",
 	"DNSAPI",
-	"USER32"
+	"USER32",
+	"IMM32"
 );
 
 # OS‚²‚Æ‚ÌAPIˆê——	

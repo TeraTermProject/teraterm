@@ -43888,3 +43888,1115 @@ Full Path         : C:\WINNT\system32\ws2_32.dll
 Type              : Exported Function
 ==================================================
 
+
+==================================================
+Function Name     : ImmActivateLayout
+Address           : 0x75df5f23
+Relative Address  : 0x00005f23
+Ordinal           : 1 (0x1)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmAssociateContext
+Address           : 0x75df13e5
+Relative Address  : 0x000013e5
+Ordinal           : 2 (0x2)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmAssociateContextEx
+Address           : 0x75df1cbd
+Relative Address  : 0x00001cbd
+Ordinal           : 3 (0x3)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCallImeConsoleIME
+Address           : 0x75dffa42
+Relative Address  : 0x0000fa42
+Ordinal           : 4 (0x4)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmConfigureIMEA
+Address           : 0x75df6004
+Relative Address  : 0x00006004
+Ordinal           : 5 (0x5)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmConfigureIMEW
+Address           : 0x75df61bd
+Relative Address  : 0x000061bd
+Ordinal           : 6 (0x6)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCreateContext
+Address           : 0x75df1b4c
+Relative Address  : 0x00001b4c
+Ordinal           : 7 (0x7)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCreateIMCC
+Address           : 0x75df7bdd
+Relative Address  : 0x00007bdd
+Ordinal           : 8 (0x8)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCreateSoftKeyboard
+Address           : 0x75dfb806
+Relative Address  : 0x0000b806
+Ordinal           : 9 (0x9)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDestroyContext
+Address           : 0x75df1ba5
+Relative Address  : 0x00001ba5
+Ordinal           : 10 (0xa)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDestroyIMCC
+Address           : 0x75df7bf5
+Relative Address  : 0x00007bf5
+Ordinal           : 11 (0xb)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDestroySoftKeyboard
+Address           : 0x75dfb98c
+Relative Address  : 0x0000b98c
+Ordinal           : 12 (0xc)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDisableIME
+Address           : 0x75df786e
+Relative Address  : 0x0000786e
+Ordinal           : 13 (0xd)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDisableIme
+Address           : 0x75df786e
+Relative Address  : 0x0000786e
+Ordinal           : 14 (0xe)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEnumInputContext
+Address           : 0x75df27cb
+Relative Address  : 0x000027cb
+Ordinal           : 15 (0xf)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEnumRegisterWordA
+Address           : 0x75df86e8
+Relative Address  : 0x000086e8
+Ordinal           : 16 (0x10)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEnumRegisterWordW
+Address           : 0x75df8852
+Relative Address  : 0x00008852
+Ordinal           : 17 (0x11)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEscapeA
+Address           : 0x75df6364
+Relative Address  : 0x00006364
+Ordinal           : 18 (0x12)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEscapeW
+Address           : 0x75df657c
+Relative Address  : 0x0000657c
+Ordinal           : 19 (0x13)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmFreeLayout
+Address           : 0x75df5df9
+Relative Address  : 0x00005df9
+Ordinal           : 20 (0x14)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGenerateMessage
+Address           : 0x75df7914
+Relative Address  : 0x00007914
+Ordinal           : 21 (0x15)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListA
+Address           : 0x75df3462
+Relative Address  : 0x00003462
+Ordinal           : 22 (0x16)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListCountA
+Address           : 0x75df3316
+Relative Address  : 0x00003316
+Ordinal           : 23 (0x17)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListCountW
+Address           : 0x75df3328
+Relative Address  : 0x00003328
+Ordinal           : 24 (0x18)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListW
+Address           : 0x75df347c
+Relative Address  : 0x0000347c
+Ordinal           : 25 (0x19)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateWindow
+Address           : 0x75df4091
+Relative Address  : 0x00004091
+Ordinal           : 26 (0x1a)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionFontA
+Address           : 0x75df39a9
+Relative Address  : 0x000039a9
+Ordinal           : 27 (0x1b)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionFontW
+Address           : 0x75df3a31
+Relative Address  : 0x00003a31
+Ordinal           : 28 (0x1c)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionStringA
+Address           : 0x75df2910
+Relative Address  : 0x00002910
+Ordinal           : 29 (0x1d)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionStringW
+Address           : 0x75df2990
+Relative Address  : 0x00002990
+Ordinal           : 30 (0x1e)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionWindow
+Address           : 0x75df3fd4
+Relative Address  : 0x00003fd4
+Ordinal           : 31 (0x1f)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetContext
+Address           : 0x75df1321
+Relative Address  : 0x00001321
+Ordinal           : 32 (0x20)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetConversionListA
+Address           : 0x75df3c8b
+Relative Address  : 0x00003c8b
+Ordinal           : 33 (0x21)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetConversionListW
+Address           : 0x75df3dde
+Relative Address  : 0x00003dde
+Ordinal           : 34 (0x22)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetConversionStatus
+Address           : 0x75df37fb
+Relative Address  : 0x000037fb
+Ordinal           : 35 (0x23)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetDefaultIMEWnd
+Address           : 0x75df783d
+Relative Address  : 0x0000783d
+Ordinal           : 36 (0x24)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetDescriptionA
+Address           : 0x75df6e03
+Relative Address  : 0x00006e03
+Ordinal           : 37 (0x25)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetDescriptionW
+Address           : 0x75df6d8e
+Relative Address  : 0x00006d8e
+Ordinal           : 38 (0x26)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetGuideLineA
+Address           : 0x75df35a6
+Relative Address  : 0x000035a6
+Ordinal           : 39 (0x27)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetGuideLineW
+Address           : 0x75df35c0
+Relative Address  : 0x000035c0
+Ordinal           : 40 (0x28)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetHotKey
+Address           : 0x75df5491
+Relative Address  : 0x00005491
+Ordinal           : 41 (0x29)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMCCLockCount
+Address           : 0x75df7c3d
+Relative Address  : 0x00007c3d
+Ordinal           : 42 (0x2a)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMCCSize
+Address           : 0x75df7c78
+Relative Address  : 0x00007c78
+Ordinal           : 43 (0x2b)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMCLockCount
+Address           : 0x75df7ba8
+Relative Address  : 0x00007ba8
+Ordinal           : 44 (0x2c)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMEFileNameA
+Address           : 0x75df6ed2
+Relative Address  : 0x00006ed2
+Ordinal           : 45 (0x2d)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMEFileNameW
+Address           : 0x75df6e5d
+Relative Address  : 0x00006e5d
+Ordinal           : 46 (0x2e)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetImeInfoEx
+Address           : 0x75df12ef
+Relative Address  : 0x000012ef
+Ordinal           : 47 (0x2f)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetImeMenuItemsA
+Address           : 0x75e00734
+Relative Address  : 0x00010734
+Ordinal           : 48 (0x30)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetImeMenuItemsW
+Address           : 0x75e00754
+Relative Address  : 0x00010754
+Ordinal           : 49 (0x31)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetOpenStatus
+Address           : 0x75df38f5
+Relative Address  : 0x000038f5
+Ordinal           : 50 (0x32)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetProperty
+Address           : 0x75df6f2c
+Relative Address  : 0x00006f2c
+Ordinal           : 51 (0x33)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetRegisterWordStyleA
+Address           : 0x75df8516
+Relative Address  : 0x00008516
+Ordinal           : 52 (0x34)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetRegisterWordStyleW
+Address           : 0x75df85fc
+Relative Address  : 0x000085fc
+Ordinal           : 53 (0x35)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetStatusWindowPos
+Address           : 0x75df3f2a
+Relative Address  : 0x00003f2a
+Ordinal           : 54 (0x36)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetVirtualKey
+Address           : 0x75df7a6a
+Relative Address  : 0x00007a6a
+Ordinal           : 55 (0x37)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIMPGetIMEA
+Address           : 0x75dfc02e
+Relative Address  : 0x0000c02e
+Ordinal           : 56 (0x38)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIMPGetIMEW
+Address           : 0x75dfc004
+Relative Address  : 0x0000c004
+Ordinal           : 57 (0x39)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIMPQueryIMEA
+Address           : 0x75dfc21c
+Relative Address  : 0x0000c21c
+Ordinal           : 58 (0x3a)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIMPQueryIMEW
+Address           : 0x75dfc153
+Relative Address  : 0x0000c153
+Ordinal           : 59 (0x3b)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIMPSetIMEA
+Address           : 0x75dfc37c
+Relative Address  : 0x0000c37c
+Ordinal           : 60 (0x3c)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIMPSetIMEW
+Address           : 0x75dfc290
+Relative Address  : 0x0000c290
+Ordinal           : 61 (0x3d)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmInstallIMEA
+Address           : 0x75df720c
+Relative Address  : 0x0000720c
+Ordinal           : 62 (0x3e)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmInstallIMEW
+Address           : 0x75df6fd0
+Relative Address  : 0x00006fd0
+Ordinal           : 63 (0x3f)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIsIME
+Address           : 0x75df12ca
+Relative Address  : 0x000012ca
+Ordinal           : 64 (0x40)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIsUIMessageA
+Address           : 0x75df787a
+Relative Address  : 0x0000787a
+Ordinal           : 65 (0x41)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIsUIMessageW
+Address           : 0x75df7894
+Relative Address  : 0x00007894
+Ordinal           : 66 (0x42)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLoadIME
+Address           : 0x75df5d3d
+Relative Address  : 0x00005d3d
+Ordinal           : 67 (0x43)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLoadLayout
+Address           : 0x75df69d1
+Relative Address  : 0x000069d1
+Ordinal           : 68 (0x44)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLockClientImc
+Address           : 0x75df7da7
+Relative Address  : 0x00007da7
+Ordinal           : 69 (0x45)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLockIMC
+Address           : 0x75df7b5a
+Relative Address  : 0x00007b5a
+Ordinal           : 70 (0x46)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLockIMCC
+Address           : 0x75df7c0d
+Relative Address  : 0x00007c0d
+Ordinal           : 71 (0x47)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLockImeDpi
+Address           : 0x75df7ebe
+Relative Address  : 0x00007ebe
+Ordinal           : 72 (0x48)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmNotifyIME
+Address           : 0x75df693d
+Relative Address  : 0x0000693d
+Ordinal           : 73 (0x49)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmPenAuxInput
+Address           : 0x75df6736
+Relative Address  : 0x00006736
+Ordinal           : 74 (0x4a)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmProcessKey
+Address           : 0x75dfb9b5
+Relative Address  : 0x0000b9b5
+Ordinal           : 75 (0x4b)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmPutImeMenuItemsIntoMappedFile
+Address           : 0x75dffe1b
+Relative Address  : 0x0000fe1b
+Ordinal           : 76 (0x4c)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRegisterClient
+Address           : 0x75df13bd
+Relative Address  : 0x000013bd
+Ordinal           : 78 (0x4e)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRegisterWordA
+Address           : 0x75df8024
+Relative Address  : 0x00008024
+Ordinal           : 79 (0x4f)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRegisterWordW
+Address           : 0x75df8165
+Relative Address  : 0x00008165
+Ordinal           : 80 (0x50)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmReleaseContext
+Address           : 0x75df1e09
+Relative Address  : 0x00001e09
+Ordinal           : 81 (0x51)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRequestMessageA
+Address           : 0x75df5465
+Relative Address  : 0x00005465
+Ordinal           : 82 (0x52)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRequestMessageW
+Address           : 0x75df547b
+Relative Address  : 0x0000547b
+Ordinal           : 83 (0x53)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmReSizeIMCC
+Address           : 0x75df7c5a
+Relative Address  : 0x00007c5a
+Ordinal           : 77 (0x4d)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSendIMEMessageExA
+Address           : 0x75dfbf5b
+Relative Address  : 0x0000bf5b
+Ordinal           : 84 (0x54)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSendIMEMessageExW
+Address           : 0x75dfbf49
+Relative Address  : 0x0000bf49
+Ordinal           : 85 (0x55)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSendMessageToActiveDefImeWndW
+Address           : 0x75df690f
+Relative Address  : 0x0000690f
+Ordinal           : 86 (0x56)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetActiveContext
+Address           : 0x75df1e0f
+Relative Address  : 0x00001e0f
+Ordinal           : 87 (0x57)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetActiveContextConsoleIME
+Address           : 0x75dffb8d
+Relative Address  : 0x0000fb8d
+Ordinal           : 88 (0x58)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCandidateWindow
+Address           : 0x75df40e4
+Relative Address  : 0x000040e4
+Ordinal           : 89 (0x59)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionFontA
+Address           : 0x75df3ab9
+Relative Address  : 0x00003ab9
+Ordinal           : 90 (0x5a)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionFontW
+Address           : 0x75df3ba2
+Relative Address  : 0x00003ba2
+Ordinal           : 91 (0x5b)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionStringA
+Address           : 0x75df2a10
+Relative Address  : 0x00002a10
+Ordinal           : 92 (0x5c)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionStringW
+Address           : 0x75df2a30
+Relative Address  : 0x00002a30
+Ordinal           : 93 (0x5d)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionWindow
+Address           : 0x75df401c
+Relative Address  : 0x0000401c
+Ordinal           : 94 (0x5e)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetConversionStatus
+Address           : 0x75df3831
+Relative Address  : 0x00003831
+Ordinal           : 95 (0x5f)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetHotKey
+Address           : USER32.CliImmSetHotKey
+Relative Address  : 0x000118e6
+Ordinal           : 96 (0x60)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetOpenStatus
+Address           : 0x75df391d
+Relative Address  : 0x0000391d
+Ordinal           : 97 (0x61)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetStatusWindowPos
+Address           : 0x75df3f75
+Relative Address  : 0x00003f75
+Ordinal           : 98 (0x62)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmShowSoftKeyboard
+Address           : 0x75dfb999
+Relative Address  : 0x0000b999
+Ordinal           : 99 (0x63)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSimulateHotKey
+Address           : 0x75df54b9
+Relative Address  : 0x000054b9
+Ordinal           : 100 (0x64)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSystemHandler
+Address           : 0x75df7ff9
+Relative Address  : 0x00007ff9
+Ordinal           : 101 (0x65)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmTranslateMessage
+Address           : 0x75dfbb42
+Relative Address  : 0x0000bb42
+Ordinal           : 102 (0x66)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnlockClientImc
+Address           : 0x75df7e3c
+Relative Address  : 0x00007e3c
+Ordinal           : 103 (0x67)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnlockIMC
+Address           : 0x75df7b68
+Relative Address  : 0x00007b68
+Ordinal           : 104 (0x68)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnlockIMCC
+Address           : 0x75df7c25
+Relative Address  : 0x00007c25
+Ordinal           : 105 (0x69)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnlockImeDpi
+Address           : 0x75df7f02
+Relative Address  : 0x00007f02
+Ordinal           : 106 (0x6a)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnregisterWordA
+Address           : 0x75df829d
+Relative Address  : 0x0000829d
+Ordinal           : 107 (0x6b)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnregisterWordW
+Address           : 0x75df83de
+Relative Address  : 0x000083de
+Ordinal           : 108 (0x6c)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmWINNLSEnableIME
+Address           : 0x75dfbef6
+Relative Address  : 0x0000bef6
+Ordinal           : 109 (0x6d)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmWINNLSGetEnableStatus
+Address           : 0x75dfbf1b
+Relative Address  : 0x0000bf1b
+Ordinal           : 110 (0x6e)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmWINNLSGetIMEHotkey
+Address           : 0x75dfbf44
+Relative Address  : 0x0000bf44
+Ordinal           : 111 (0x6f)
+Filename          : imm32.dll
+Full Path         : C:\WINNT\system32\imm32.dll
+Type              : Exported Function
+==================================================
+
+

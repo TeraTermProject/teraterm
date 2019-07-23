@@ -32278,3 +32278,1826 @@ Full Path         : C:\WINDOWS\SYSTEM\COMDLG32.DLL
 Type              : Exported Function
 ==================================================
 
+
+==================================================
+Function Name     : __WSAFDIsSet
+Address           : 0x7a008950
+Relative Address  : 0x00008950
+Ordinal           : 151 (0x97)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : accept
+Address           : 0x7a009468
+Relative Address  : 0x00009468
+Ordinal           : 1 (0x1)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : bind
+Address           : 0x7a008ba9
+Relative Address  : 0x00008ba9
+Ordinal           : 2 (0x2)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : closesocket
+Address           : 0x7a00967c
+Relative Address  : 0x0000967c
+Ordinal           : 3 (0x3)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : connect
+Address           : 0x7a008c27
+Relative Address  : 0x00008c27
+Ordinal           : 4 (0x4)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : gethostbyaddr
+Address           : 0x7a0046a6
+Relative Address  : 0x000046a6
+Ordinal           : 51 (0x33)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : gethostbyname
+Address           : 0x7a004784
+Relative Address  : 0x00004784
+Ordinal           : 52 (0x34)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : gethostname
+Address           : 0x7a00485a
+Relative Address  : 0x0000485a
+Ordinal           : 57 (0x39)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getpeername
+Address           : 0x7a008ccf
+Relative Address  : 0x00008ccf
+Ordinal           : 5 (0x5)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getprotobyname
+Address           : 0x7a00430b
+Relative Address  : 0x0000430b
+Ordinal           : 53 (0x35)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getprotobynumber
+Address           : 0x7a004281
+Relative Address  : 0x00004281
+Ordinal           : 54 (0x36)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getservbyname
+Address           : 0x7a004a3b
+Relative Address  : 0x00004a3b
+Ordinal           : 55 (0x37)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getservbyport
+Address           : 0x7a004956
+Relative Address  : 0x00004956
+Ordinal           : 56 (0x38)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getsockname
+Address           : 0x7a008d4c
+Relative Address  : 0x00008d4c
+Ordinal           : 6 (0x6)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : getsockopt
+Address           : 0x7a008dc9
+Relative Address  : 0x00008dc9
+Ordinal           : 7 (0x7)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : htonl
+Address           : 0x7a001000
+Relative Address  : 0x00001000
+Ordinal           : 8 (0x8)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : htons
+Address           : 0x7a00102a
+Relative Address  : 0x0000102a
+Ordinal           : 9 (0x9)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : inet_addr
+Address           : 0x7a00107a
+Relative Address  : 0x0000107a
+Ordinal           : 11 (0xb)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : inet_ntoa
+Address           : 0x7a001265
+Relative Address  : 0x00001265
+Ordinal           : 12 (0xc)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ioctlsocket
+Address           : 0x7a005078
+Relative Address  : 0x00005078
+Ordinal           : 10 (0xa)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : listen
+Address           : 0x7a008f2d
+Relative Address  : 0x00008f2d
+Ordinal           : 13 (0xd)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ntohl
+Address           : 0x7a00103d
+Relative Address  : 0x0000103d
+Ordinal           : 14 (0xe)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ntohs
+Address           : 0x7a001067
+Relative Address  : 0x00001067
+Ordinal           : 15 (0xf)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : recv
+Address           : 0x7a007369
+Relative Address  : 0x00007369
+Ordinal           : 16 (0x10)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : recvfrom
+Address           : 0x7a0073a9
+Relative Address  : 0x000073a9
+Ordinal           : 17 (0x11)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : select
+Address           : 0x7a00877f
+Relative Address  : 0x0000877f
+Ordinal           : 18 (0x12)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : send
+Address           : 0x7a00898b
+Relative Address  : 0x0000898b
+Ordinal           : 19 (0x13)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : sendto
+Address           : 0x7a0089c4
+Relative Address  : 0x000089c4
+Ordinal           : 20 (0x14)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : setsockopt
+Address           : 0x7a008fa7
+Relative Address  : 0x00008fa7
+Ordinal           : 21 (0x15)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : shutdown
+Address           : 0x7a009064
+Relative Address  : 0x00009064
+Ordinal           : 22 (0x16)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : socket
+Address           : 0x7a00927c
+Relative Address  : 0x0000927c
+Ordinal           : 23 (0x17)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WEP
+Address           : 0x7a00a675
+Relative Address  : 0x0000a675
+Ordinal           : 500 (0x1f4)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WPUCompleteOverlappedRequest
+Address           : 0x7a009dda
+Relative Address  : 0x00009dda
+Ordinal           : 25 (0x19)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAccept
+Address           : 0x7a009480
+Relative Address  : 0x00009480
+Ordinal           : 26 (0x1a)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAddressToStringA
+Address           : 0x7a0081c2
+Relative Address  : 0x000081c2
+Ordinal           : 27 (0x1b)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAddressToStringW
+Address           : 0x7a00811e
+Relative Address  : 0x0000811e
+Ordinal           : 28 (0x1c)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncGetHostByAddr
+Address           : 0x7a004daa
+Relative Address  : 0x00004daa
+Ordinal           : 102 (0x66)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncGetHostByName
+Address           : 0x7a004cfc
+Relative Address  : 0x00004cfc
+Ordinal           : 103 (0x67)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncGetProtoByName
+Address           : 0x7a004e43
+Relative Address  : 0x00004e43
+Ordinal           : 105 (0x69)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncGetProtoByNumber
+Address           : 0x7a004ef1
+Relative Address  : 0x00004ef1
+Ordinal           : 104 (0x68)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncGetServByName
+Address           : 0x7a004bc5
+Relative Address  : 0x00004bc5
+Ordinal           : 107 (0x6b)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncGetServByPort
+Address           : 0x7a004c79
+Relative Address  : 0x00004c79
+Ordinal           : 106 (0x6a)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAAsyncSelect
+Address           : 0x7a0088d0
+Relative Address  : 0x000088d0
+Ordinal           : 101 (0x65)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSACancelAsyncRequest
+Address           : 0x7a004f6e
+Relative Address  : 0x00004f6e
+Ordinal           : 108 (0x6c)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSACancelBlockingCall
+Address           : 0x7a002258
+Relative Address  : 0x00002258
+Ordinal           : 113 (0x71)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSACleanup
+Address           : 0x7a00a190
+Relative Address  : 0x0000a190
+Ordinal           : 116 (0x74)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSACloseEvent
+Address           : 0x7a0041d7
+Relative Address  : 0x000041d7
+Ordinal           : 29 (0x1d)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAConnect
+Address           : 0x7a0090de
+Relative Address  : 0x000090de
+Ordinal           : 30 (0x1e)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSACreateEvent
+Address           : 0x7a00423d
+Relative Address  : 0x0000423d
+Ordinal           : 31 (0x1f)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSADuplicateSocketA
+Address           : 0x7a003d37
+Relative Address  : 0x00003d37
+Ordinal           : 32 (0x20)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSADuplicateSocketW
+Address           : 0x7a003cba
+Relative Address  : 0x00003cba
+Ordinal           : 33 (0x21)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAEnumNameSpaceProvidersA
+Address           : 0x7a007712
+Relative Address  : 0x00007712
+Ordinal           : 34 (0x22)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAEnumNameSpaceProvidersW
+Address           : 0x7a00775f
+Relative Address  : 0x0000775f
+Ordinal           : 35 (0x23)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAEnumNetworkEvents
+Address           : 0x7a009167
+Relative Address  : 0x00009167
+Ordinal           : 36 (0x24)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAEnumProtocolsA
+Address           : 0x7a0040eb
+Relative Address  : 0x000040eb
+Ordinal           : 37 (0x25)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAEnumProtocolsW
+Address           : 0x7a003d8b
+Relative Address  : 0x00003d8b
+Ordinal           : 38 (0x26)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAEventSelect
+Address           : 0x7a008853
+Relative Address  : 0x00008853
+Ordinal           : 39 (0x27)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetLastError
+Address           : 0x7a006723
+Relative Address  : 0x00006723
+Ordinal           : 111 (0x6f)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetOverlappedResult
+Address           : 0x7a0091e4
+Relative Address  : 0x000091e4
+Ordinal           : 40 (0x28)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetQOSByName
+Address           : 0x7a006736
+Relative Address  : 0x00006736
+Ordinal           : 41 (0x29)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetServiceClassInfoA
+Address           : 0x7a008011
+Relative Address  : 0x00008011
+Ordinal           : 42 (0x2a)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetServiceClassInfoW
+Address           : 0x7a00807b
+Relative Address  : 0x0000807b
+Ordinal           : 43 (0x2b)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetServiceClassNameByClassIdA
+Address           : 0x7a007f32
+Relative Address  : 0x00007f32
+Ordinal           : 44 (0x2c)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAGetServiceClassNameByClassIdW
+Address           : 0x7a007fa3
+Relative Address  : 0x00007fa3
+Ordinal           : 45 (0x2d)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAHtonl
+Address           : 0x7a0013a7
+Relative Address  : 0x000013a7
+Ordinal           : 46 (0x2e)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAHtons
+Address           : 0x7a001458
+Relative Address  : 0x00001458
+Ordinal           : 47 (0x2f)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAInstallServiceClassA
+Address           : 0x7a007c1c
+Relative Address  : 0x00007c1c
+Ordinal           : 48 (0x30)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAInstallServiceClassW
+Address           : 0x7a007c84
+Relative Address  : 0x00007c84
+Ordinal           : 49 (0x31)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAIoctl
+Address           : 0x7a00509c
+Relative Address  : 0x0000509c
+Ordinal           : 50 (0x32)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAIsBlocking
+Address           : 0x7a0022b2
+Relative Address  : 0x000022b2
+Ordinal           : 114 (0x72)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAJoinLeaf
+Address           : 0x7a0095d9
+Relative Address  : 0x000095d9
+Ordinal           : 58 (0x3a)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSALookupServiceBeginA
+Address           : 0x7a0077ab
+Relative Address  : 0x000077ab
+Ordinal           : 59 (0x3b)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSALookupServiceBeginW
+Address           : 0x7a00782a
+Relative Address  : 0x0000782a
+Ordinal           : 60 (0x3c)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSALookupServiceEnd
+Address           : 0x7a007a08
+Relative Address  : 0x00007a08
+Ordinal           : 61 (0x3d)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSALookupServiceNextA
+Address           : 0x7a0078bd
+Relative Address  : 0x000078bd
+Ordinal           : 62 (0x3e)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSALookupServiceNextW
+Address           : 0x7a007990
+Relative Address  : 0x00007990
+Ordinal           : 63 (0x3f)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSANtohl
+Address           : 0x7a0014ee
+Relative Address  : 0x000014ee
+Ordinal           : 64 (0x40)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSANtohs
+Address           : 0x7a00159f
+Relative Address  : 0x0000159f
+Ordinal           : 65 (0x41)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAProviderConfigChange
+Address           : 0x7a0041c6
+Relative Address  : 0x000041c6
+Ordinal           : 66 (0x42)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSApSetPostRoutine
+Address           : 0x7a00a613
+Relative Address  : 0x0000a613
+Ordinal           : 24 (0x18)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSARecv
+Address           : 0x7a0073ef
+Relative Address  : 0x000073ef
+Ordinal           : 67 (0x43)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSARecvDisconnect
+Address           : 0x7a00748d
+Relative Address  : 0x0000748d
+Ordinal           : 68 (0x44)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSARecvFrom
+Address           : 0x7a007515
+Relative Address  : 0x00007515
+Ordinal           : 69 (0x45)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSARemoveServiceClass
+Address           : 0x7a007d1b
+Relative Address  : 0x00007d1b
+Ordinal           : 70 (0x46)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAResetEvent
+Address           : 0x7a00424b
+Relative Address  : 0x0000424b
+Ordinal           : 71 (0x47)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASend
+Address           : 0x7a008a03
+Relative Address  : 0x00008a03
+Ordinal           : 72 (0x48)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASendDisconnect
+Address           : 0x7a008a95
+Relative Address  : 0x00008a95
+Ordinal           : 73 (0x49)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASendTo
+Address           : 0x7a008b11
+Relative Address  : 0x00008b11
+Ordinal           : 74 (0x4a)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASetBlockingHook
+Address           : 0x7a0022e4
+Relative Address  : 0x000022e4
+Ordinal           : 109 (0x6d)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASetEvent
+Address           : 0x7a004258
+Relative Address  : 0x00004258
+Ordinal           : 75 (0x4b)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASetLastError
+Address           : 0x7a006729
+Relative Address  : 0x00006729
+Ordinal           : 112 (0x70)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASetServiceA
+Address           : 0x7a007a78
+Relative Address  : 0x00007a78
+Ordinal           : 76 (0x4c)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASetServiceW
+Address           : 0x7a007ba7
+Relative Address  : 0x00007ba7
+Ordinal           : 77 (0x4d)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASocketA
+Address           : 0x7a009416
+Relative Address  : 0x00009416
+Ordinal           : 78 (0x4e)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSASocketW
+Address           : 0x7a0092db
+Relative Address  : 0x000092db
+Ordinal           : 79 (0x4f)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAStartup
+Address           : 0x7a009fae
+Relative Address  : 0x00009fae
+Ordinal           : 115 (0x73)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAStringToAddressA
+Address           : 0x7a00834e
+Relative Address  : 0x0000834e
+Ordinal           : 80 (0x50)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAStringToAddressW
+Address           : 0x7a0082b2
+Relative Address  : 0x000082b2
+Ordinal           : 81 (0x51)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAUnhookBlockingHook
+Address           : 0x7a002341
+Relative Address  : 0x00002341
+Ordinal           : 110 (0x6e)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSAWaitForMultipleEvents
+Address           : 0x7a004265
+Relative Address  : 0x00004265
+Ordinal           : 82 (0x52)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCDeinstallProvider
+Address           : 0x7a0099bf
+Relative Address  : 0x000099bf
+Ordinal           : 83 (0x53)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCEnableNSProvider
+Address           : 0x7a005fec
+Relative Address  : 0x00005fec
+Ordinal           : 84 (0x54)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCEnumProtocols
+Address           : 0x7a003f0a
+Relative Address  : 0x00003f0a
+Ordinal           : 85 (0x55)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCGetProviderPath
+Address           : 0x7a0040d3
+Relative Address  : 0x000040d3
+Ordinal           : 86 (0x56)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCInstallNameSpace
+Address           : 0x7a005d08
+Relative Address  : 0x00005d08
+Ordinal           : 87 (0x57)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCInstallProvider
+Address           : 0x7a00976b
+Relative Address  : 0x0000976b
+Ordinal           : 88 (0x58)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : WSCUnInstallNameSpace
+Address           : 0x7a005eb6
+Relative Address  : 0x00005eb6
+Ordinal           : 89 (0x59)
+Filename          : ws2_32.dll
+Full Path         : C:\WINDOWS\SYSTEM\ws2_32.dll
+Type              : Exported Function
+==================================================
+
+
+==================================================
+Function Name     : ImmAssociateContext
+Address           : 0xbfe64d7a
+Relative Address  : 0x00004d7a
+Ordinal           : 2 (0x2)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmConfigureIME
+Address           : 0xbfe61ee3
+Relative Address  : 0x00001ee3
+Ordinal           : 3 (0x3)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmConfigureIMEA
+Address           : 0xbfe64e0d
+Relative Address  : 0x00004e0d
+Ordinal           : 4 (0x4)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmConfigureIMEW
+Address           : 0xbfe615a0
+Relative Address  : 0x000015a0
+Ordinal           : 5 (0x5)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCreateContext
+Address           : 0xbfe64d44
+Relative Address  : 0x00004d44
+Ordinal           : 6 (0x6)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCreateIMCC
+Address           : 0xbfe6161b
+Relative Address  : 0x0000161b
+Ordinal           : 7 (0x7)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmCreateSoftKeyboard
+Address           : 0xbfe6207c
+Relative Address  : 0x0000207c
+Ordinal           : 8 (0x8)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDestroyContext
+Address           : 0xbfe64f79
+Relative Address  : 0x00004f79
+Ordinal           : 9 (0x9)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDestroyIMCC
+Address           : 0xbfe61638
+Relative Address  : 0x00001638
+Ordinal           : 10 (0xa)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmDestroySoftKeyboard
+Address           : 0xbfe6224a
+Relative Address  : 0x0000224a
+Ordinal           : 11 (0xb)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEnumRegisterWordA
+Address           : 0xbfe64fec
+Relative Address  : 0x00004fec
+Ordinal           : 12 (0xc)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEnumRegisterWordW
+Address           : 0xbfe61593
+Relative Address  : 0x00001593
+Ordinal           : 13 (0xd)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEscapeA
+Address           : 0xbfe64e9a
+Relative Address  : 0x00004e9a
+Ordinal           : 14 (0xe)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmEscapeW
+Address           : 0xbfe61545
+Relative Address  : 0x00001545
+Ordinal           : 15 (0xf)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGenerateMessage
+Address           : 0xbfe64f71
+Relative Address  : 0x00004f71
+Ordinal           : 16 (0x10)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListA
+Address           : 0xbfe61b7c
+Relative Address  : 0x00001b7c
+Ordinal           : 17 (0x11)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListCountA
+Address           : 0xbfe61b0b
+Relative Address  : 0x00001b0b
+Ordinal           : 18 (0x12)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListCountW
+Address           : 0xbfe61504
+Relative Address  : 0x00001504
+Ordinal           : 19 (0x13)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateListW
+Address           : 0xbfe61511
+Relative Address  : 0x00001511
+Ordinal           : 20 (0x14)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCandidateWindow
+Address           : 0xbfe61e43
+Relative Address  : 0x00001e43
+Ordinal           : 21 (0x15)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionFontA
+Address           : 0xbfe61c88
+Relative Address  : 0x00001c88
+Ordinal           : 22 (0x16)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionFontW
+Address           : 0xbfe6152b
+Relative Address  : 0x0000152b
+Ordinal           : 23 (0x17)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionStringA
+Address           : 0xbfe61892
+Relative Address  : 0x00001892
+Ordinal           : 24 (0x18)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionStringW
+Address           : 0xbfe614e7
+Relative Address  : 0x000014e7
+Ordinal           : 25 (0x19)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetCompositionWindow
+Address           : 0xbfe61dfc
+Relative Address  : 0x00001dfc
+Ordinal           : 26 (0x1a)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetContext
+Address           : 0xbfe64d5c
+Relative Address  : 0x00004d5c
+Ordinal           : 27 (0x1b)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetConversionListA
+Address           : 0xbfe64ec3
+Relative Address  : 0x00004ec3
+Ordinal           : 28 (0x1c)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetConversionListW
+Address           : 0xbfe61552
+Relative Address  : 0x00001552
+Ordinal           : 29 (0x1d)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetConversionStatus
+Address           : 0xbfe61c20
+Relative Address  : 0x00001c20
+Ordinal           : 30 (0x1e)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetDefaultIMEWnd
+Address           : 0xbfe64bf4
+Relative Address  : 0x00004bf4
+Ordinal           : 31 (0x1f)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetDescriptionA
+Address           : 0xbfe64c10
+Relative Address  : 0x00004c10
+Ordinal           : 32 (0x20)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetDescriptionW
+Address           : 0xbfe614c0
+Relative Address  : 0x000014c0
+Ordinal           : 33 (0x21)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetGuideLineA
+Address           : 0xbfe61ccf
+Relative Address  : 0x00001ccf
+Ordinal           : 34 (0x22)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetGuideLineW
+Address           : 0xbfe6151e
+Relative Address  : 0x0000151e
+Ordinal           : 35 (0x23)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetHotKey
+Address           : 0xbfe64c88
+Relative Address  : 0x00004c88
+Ordinal           : 36 (0x24)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMCCLockCount
+Address           : 0xbfe61699
+Relative Address  : 0x00001699
+Ordinal           : 37 (0x25)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMCCSize
+Address           : 0xbfe61688
+Relative Address  : 0x00001688
+Ordinal           : 38 (0x26)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMCLockCount
+Address           : 0xbfe61605
+Relative Address  : 0x00001605
+Ordinal           : 39 (0x27)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMEFileNameA
+Address           : 0xbfe64c0c
+Relative Address  : 0x00004c0c
+Ordinal           : 40 (0x28)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetIMEFileNameW
+Address           : 0xbfe614cd
+Relative Address  : 0x000014cd
+Ordinal           : 41 (0x29)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetOpenStatus
+Address           : 0xbfe61c5c
+Relative Address  : 0x00001c5c
+Ordinal           : 42 (0x2a)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetProperty
+Address           : 0xbfe64c68
+Relative Address  : 0x00004c68
+Ordinal           : 43 (0x2b)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetRegisterWordStyleA
+Address           : 0xbfe64fc4
+Relative Address  : 0x00004fc4
+Ordinal           : 44 (0x2c)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetRegisterWordStyleW
+Address           : 0xbfe61586
+Relative Address  : 0x00001586
+Ordinal           : 45 (0x2d)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetStatusWindowPos
+Address           : 0xbfe61db6
+Relative Address  : 0x00001db6
+Ordinal           : 46 (0x2e)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmGetVirtualKey
+Address           : 0xbfe61e99
+Relative Address  : 0x00001e99
+Ordinal           : 47 (0x2f)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmInstallIMEA
+Address           : 0xbfe64c38
+Relative Address  : 0x00004c38
+Ordinal           : 48 (0x30)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmInstallIMEW
+Address           : 0xbfe614da
+Relative Address  : 0x000014da
+Ordinal           : 49 (0x31)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIsIME
+Address           : 0xbfe64f75
+Relative Address  : 0x00004f75
+Ordinal           : 50 (0x32)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIsUIMessageA
+Address           : 0xbfe64f4e
+Relative Address  : 0x00004f4e
+Ordinal           : 51 (0x33)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmIsUIMessageW
+Address           : 0xbfe6155f
+Relative Address  : 0x0000155f
+Ordinal           : 52 (0x34)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLockIMC
+Address           : 0xbfe615d2
+Relative Address  : 0x000015d2
+Ordinal           : 53 (0x35)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmLockIMCC
+Address           : 0xbfe6164c
+Relative Address  : 0x0000164c
+Ordinal           : 54 (0x36)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmNotifyIME
+Address           : 0xbfe64f00
+Relative Address  : 0x00004f00
+Ordinal           : 55 (0x37)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRegisterWordA
+Address           : 0xbfe64f94
+Relative Address  : 0x00004f94
+Ordinal           : 57 (0x39)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmRegisterWordW
+Address           : 0xbfe6156c
+Relative Address  : 0x0000156c
+Ordinal           : 58 (0x3a)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmReleaseContext
+Address           : 0xbfe64d7e
+Relative Address  : 0x00004d7e
+Ordinal           : 59 (0x3b)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmReSizeIMCC
+Address           : 0xbfe6166e
+Relative Address  : 0x0000166e
+Ordinal           : 56 (0x38)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCandidateWindow
+Address           : 0xbfe64f20
+Relative Address  : 0x00004f20
+Ordinal           : 60 (0x3c)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionFontA
+Address           : 0xbfe64f24
+Relative Address  : 0x00004f24
+Ordinal           : 61 (0x3d)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionFontW
+Address           : 0xbfe61538
+Relative Address  : 0x00001538
+Ordinal           : 62 (0x3e)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionStringA
+Address           : 0xbfe64d9f
+Relative Address  : 0x00004d9f
+Ordinal           : 63 (0x3f)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionStringW
+Address           : 0xbfe614f7
+Relative Address  : 0x000014f7
+Ordinal           : 64 (0x40)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetCompositionWindow
+Address           : 0xbfe64f2c
+Relative Address  : 0x00004f2c
+Ordinal           : 65 (0x41)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetConversionStatus
+Address           : 0xbfe64dd5
+Relative Address  : 0x00004dd5
+Ordinal           : 66 (0x42)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetHotKey
+Address           : 0xbfe64d07
+Relative Address  : 0x00004d07
+Ordinal           : 67 (0x43)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetOpenStatus
+Address           : 0xbfe64df2
+Relative Address  : 0x00004df2
+Ordinal           : 68 (0x44)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSetStatusWindowPos
+Address           : 0xbfe64f28
+Relative Address  : 0x00004f28
+Ordinal           : 69 (0x45)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmShowSoftKeyboard
+Address           : 0xbfe62257
+Relative Address  : 0x00002257
+Ordinal           : 70 (0x46)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmSimulateHotKey
+Address           : 0xbfe64d29
+Relative Address  : 0x00004d29
+Ordinal           : 71 (0x47)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnlockIMC
+Address           : 0xbfe615e3
+Relative Address  : 0x000015e3
+Ordinal           : 72 (0x48)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnlockIMCC
+Address           : 0xbfe6165d
+Relative Address  : 0x0000165d
+Ordinal           : 73 (0x49)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnregisterWordA
+Address           : 0xbfe64f90
+Relative Address  : 0x00004f90
+Ordinal           : 74 (0x4a)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ImmUnregisterWordW
+Address           : 0xbfe61579
+Relative Address  : 0x00001579
+Ordinal           : 75 (0x4b)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SKWndProcT1
+Address           : 0xbfe6471e
+Relative Address  : 0x0000471e
+Ordinal           : 76 (0x4c)
+Filename          : IMM32.DLL
+Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
+Type              : Exported Function
+==================================================
+
+
