@@ -5366,7 +5366,6 @@ error:;
 //
 static void SSH2_dh_kex_init(PTInstVar pvar)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	DH *dh = NULL;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
@@ -5844,7 +5843,6 @@ cont:
 //
 static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	char *data;
 	int len;
 	int offset = 0;

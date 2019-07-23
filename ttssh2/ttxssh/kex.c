@@ -33,7 +33,6 @@ extern SSHKeys current_keys[MODE_MAX];
 
 static DH *dh_new_group_asc(const char *gen, const char *modulus)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	DH *dh = NULL;
 	BIGNUM *p, *g;
 
@@ -54,6 +53,9 @@ static DH *dh_new_group_asc(const char *gen, const char *modulus)
 		printf("BN_hex2bn g");
 		goto error;
 	}
+
+	// BN_hex2bn()で変換したポインタをDH構造体にセットする。
+	DH_set0_pqg(dh, p, NULL, g);
 
 	return (dh);
 
@@ -296,7 +298,6 @@ unsigned char *kex_dh_hash(const EVP_MD *evp_md,
 	static unsigned char digest[EVP_MAX_MD_SIZE];
 	EVP_MD_CTX *md = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL)
 		goto error;
