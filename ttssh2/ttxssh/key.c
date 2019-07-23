@@ -366,7 +366,6 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
                      u_char *signature, u_int signaturelen,
                      u_char *data, u_int datalen)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	ECDSA_SIG *sig;
 	const EVP_MD *evp_md;
 	EVP_MD_CTX *md = NULL;
