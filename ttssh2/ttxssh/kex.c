@@ -479,7 +479,6 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 	int bits_set = 0;
 	const BIGNUM *p;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	// OpenSSL 1.1.0で、BIGNUM構造体のnegメンバーに直接アクセスできなくなったため、
 	// BN_is_negative関数に置換する。OpenSSL 1.0.2ではマクロ定義されているので、
 	// OpenSSL 1.0.2でも、この書き方でよい。

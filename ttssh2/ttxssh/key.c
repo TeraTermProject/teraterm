@@ -375,7 +375,6 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	char *ptr;
 	BIGNUM *r, *s;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	md = EVP_MD_CTX_new();
 	if (md == NULL) {
 		ret = -1;
@@ -688,7 +687,6 @@ char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_lengt
 	RSA *rsa;
 	BIGNUM *e = NULL, *n = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	ctx = EVP_MD_CTX_new();
 	if (ctx == NULL) {
 		goto error;
