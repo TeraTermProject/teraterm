@@ -677,7 +677,6 @@ BOOL key_copy(Key *dest, Key *src)
 
 char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_length)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	const EVP_MD *md = NULL;
 	EVP_MD_CTX *ctx = NULL;
 	char *blob = NULL;
@@ -787,14 +786,13 @@ ssh_key_type(ssh_keytype type)
 unsigned int
 key_size(const Key *k)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *n = NULL;
 	BIGNUM *p = NULL;
 
 	switch (k->type) {
 	case KEY_RSA1:
-		RSA_get0_key(k->rsa, &n, NULL, NULL);
-		return BN_num_bits(n);
+		// SSH1‚Ìê‡‚Í key->rsa ‚Æ key->dsa ‚Í NULL ‚Å‚ ‚é‚Ì‚ÅAŽg‚í‚È‚¢B
+		return k->bits;
 	case KEY_RSA:
 		RSA_get0_key(k->rsa, &n, NULL, NULL);
 		return BN_num_bits(n);

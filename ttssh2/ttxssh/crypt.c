@@ -488,7 +488,6 @@ RSA *make_key(PTInstVar pvar,
 	RSA *key = RSA_new();
 	BIGNUM *e = NULL, *n = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (key != NULL) {
 		// OpenSSL 1.1.0ではRSA構造体のメンバーに直接アクセスできないため、
 		// RSA_set0_key関数で設定する必要がある。
