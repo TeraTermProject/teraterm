@@ -670,7 +670,6 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	pk_type = EVP_PKEY_id(pk);
 	switch (pk_type) {
 	case EVP_PKEY_RSA: // RSA key
@@ -940,14 +939,13 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		unsigned char key[40], iv[32];
 		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
+		int ret;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		ctx = EVP_MD_CTX_new();
 		if (ctx == NULL) {
 			goto error;
 		}
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		cipher_ctx = EVP_CIPHER_CTX_new();
 		if (ctx == NULL) {
 			EVP_MD_CTX_free(ctx);
@@ -968,12 +966,12 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 
 		memset(iv, 0, sizeof(iv));
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		// decrypt
 		cipher_init_SSH2(cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
 		len = buffer_len(prikey);
 		decrypted = (char *)malloc(len);
-		if (EVP_Cipher(cipher_ctx, decrypted, prikey->buf, len) == 0) {
+		ret = EVP_Cipher(cipher_ctx, decrypted, prikey->buf, len);
+		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
 			cipher_cleanup_SSH2(cipher_ctx);
@@ -1015,7 +1013,6 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		const EVP_MD *md = EVP_sha1();
 		EVP_MD_CTX *ctx = NULL;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		ctx = EVP_MD_CTX_new();
 		if (ctx == NULL) {
 			goto error;
@@ -1037,7 +1034,6 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		unsigned char foo[64];
 		int i;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		ctx[0] = EVP_MD_CTX_new();
 		if (ctx[0] == NULL) {
 			goto error;
@@ -1105,7 +1101,6 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	switch (result->type) {
 	case KEY_RSA:
 	{
-		/********* OPENSSL1.1.1 NOTEST *********/
 		char *pubkey_type, *pub, *pri;
 		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
@@ -1525,10 +1520,13 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		unsigned char key[32], iv[16];
 		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
+		int ret;
 
-		/********* OPENSSL1.1.1 NOTEST *********/
 		cipher_ctx = EVP_CIPHER_CTX_new();
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335‚Åˆ’u—\’è) ***/
+		if (cipher_ctx == NULL) {
+			strncpy_s(errmsg, errmsg_len, "Out of memory: EVP_CIPHER_CTX_new()", _TRUNCATE);
+			goto error;
+		}
 
 		MD5_Init(&md);
 		MD5_Update(&md, passphrase, strlen(passphrase));
@@ -1544,7 +1542,8 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		// decrypt
 		cipher_init_SSH2(cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
 		decrypted = (char *)malloc(len);
-		if (EVP_Cipher(cipher_ctx, decrypted, blob->buf + blob->offset, len) == 0) {
+		ret = EVP_Cipher(cipher_ctx, decrypted, blob->buf + blob->offset, len);
+		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			cipher_cleanup_SSH2(cipher_ctx);
 			EVP_CIPHER_CTX_free(cipher_ctx);
@@ -1571,7 +1570,6 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	switch (result->type) {
 	case KEY_RSA:
 	{
-		/********* OPENSSL1.1.1 NOTEST *********/
 		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
 		result->rsa = RSA_new();
