@@ -1048,7 +1048,13 @@ static char *format_host_key(PTInstVar pvar)
 			index = strlen(result);
 		}
 
-		_snprintf_s(result + index, result_len - host_len, _TRUNCATE,
+		// 第2引数(sizeOfBuffer)の指定誤りにより、実際のバッファサイズより
+		// 大きくなっていた問題を修正した。
+		// ポート番号が22以外の場合、VS2005のdebug buildでは、add_host_key()の
+		// free(keydata)で、かならず「ブレークポイントが発生しました。ヒープが壊れていることが
+		// 原因として考えられます。」という例外が発生する。
+		// release buildでは再現性が低い。
+		_snprintf_s(result + index, result_len - index, _TRUNCATE,
 		            " %d ", pvar->hosts_state.hostkey.bits);
 		index += strlen(result + index);
 		index += print_mp_int(result + index, pvar->hosts_state.hostkey.exp);
