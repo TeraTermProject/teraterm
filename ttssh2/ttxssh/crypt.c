@@ -959,7 +959,6 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
                                           int challenge_len,
                                           unsigned char *response)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int server_key_bits;
 	int host_key_bits;
 	int server_key_bytes;

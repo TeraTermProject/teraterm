@@ -66,22 +66,19 @@ static BIGNUM *get_bignum(unsigned char *bytes)
    key must be discarded. */
 static BOOL normalize_key(RSA *key)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	BOOL OK = FALSE;
 	BIGNUM *r = BN_new();
 	BN_CTX *ctx = BN_CTX_new();
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+
+	e = n = d = dmp1 = dmq1 = iqmp = p = q = NULL;
 
 	RSA_get0_key(key, &n, &e, &d);
 	RSA_get0_factors(key, &p, &q);
 	RSA_get0_crt_params(key, &dmp1, &dmq1, &iqmp);
 
 	if (BN_cmp(p, q) < 0) {
-		BIGNUM *tmp = p;
-
-		p = q;
-		q = tmp;
-		RSA_set0_factors(key, p, q);
+		BN_swap(p, q);
 	}
 
 	if (r != NULL && ctx != NULL) {
@@ -110,7 +107,6 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
                                  BOOL * invalid_passphrase,
                                  BOOL is_auto_login)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	char filename[2048];
 	int fd;
 	unsigned int length, amount_read;
