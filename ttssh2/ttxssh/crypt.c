@@ -821,7 +821,6 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 
 unsigned int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int server_key_bits;
 	int host_key_bits;
 	int server_key_bytes;
@@ -849,7 +848,6 @@ unsigned int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 int CRYPT_choose_session_key(PTInstVar pvar,
                              unsigned char *encrypted_key_buf)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	int server_key_bits;
 	int host_key_bits;
 	int server_key_bytes;
@@ -1334,7 +1332,6 @@ void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)
 
 void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *server_n, *host_n;
 
 	// OpenSSL 1.1.0ではRSA構造体のメンバーに直接アクセスできないため、

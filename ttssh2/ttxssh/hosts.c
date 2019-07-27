@@ -875,8 +875,6 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 	BIGNUM *p, *q, *g, *pub_key;
 	BIGNUM *sp, *sq, *sg, *spub_key;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
-
 	if (src->type != key->type) {
 		return -1;
 	}
