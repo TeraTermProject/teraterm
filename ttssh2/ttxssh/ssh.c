@@ -2580,7 +2580,6 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 
 static void try_send_credentials(PTInstVar pvar)
 {
-	/********* OPENSSL1.1.1 NOTEST *********/
 	BIGNUM *e, *n;
 
 	if ((pvar->ssh_state.status_flags & STATUS_DONT_SEND_CREDENTIALS) == 0) {

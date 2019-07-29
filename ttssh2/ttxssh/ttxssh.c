@@ -3702,21 +3702,6 @@ void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
 
 const EVP_CIPHER *evp_ssh1_3des(void)
 {
-	/*** TODO: OPENSSL1.1.1 ÉeÉXÉgäÆóπå„Ç…çÌèúÇ∑ÇÈ ***/
-#if 0
-	static EVP_CIPHER ssh1_3des;
-
-	memset(&ssh1_3des, 0, sizeof(EVP_CIPHER));
-	ssh1_3des.nid = NID_undef;
-	ssh1_3des.block_size = 8;
-	ssh1_3des.iv_len = 0;
-	ssh1_3des.key_len = 16;
-	ssh1_3des.init = ssh1_3des_init;
-	ssh1_3des.cleanup = ssh1_3des_cleanup;
-	ssh1_3des.do_cipher = ssh1_3des_cbc;
-	ssh1_3des.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH;
-	return (&ssh1_3des);
-#endif
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
