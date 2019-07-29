@@ -2530,7 +2530,10 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 	if (grab_payload(pvar, challenge_bytes)) {
 		unsigned char *outmsg = begin_send_packet(pvar, SSH_CMSG_AUTH_RSA_RESPONSE, 16);
 
-		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+		// rhosts”FØ(SSH1)‚ª‚Å‚«‚é‚æ‚¤‚É SSH_AUTH_RHOSTS_RSA ‚ğğŒ‚É’Ç‰Á‚·‚éB
+		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA ||
+			pvar->auth_state.cur_cred.method == SSH_AUTH_RHOSTS_RSA
+			) {
 			if (CRYPT_generate_RSA_challenge_response
 				(pvar, pvar->ssh_state.payload + 2, challenge_bytes, outmsg)) {
 
