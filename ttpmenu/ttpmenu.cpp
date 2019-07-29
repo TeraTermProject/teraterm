@@ -317,7 +317,7 @@ BOOL AddTooltip(int idControl)
 	ti.cbSize	= sizeof(TOOLINFO);
 	ti.uFlags	= TTF_IDISHWND; 
 	ti.hwnd		= g_hWndMenu; 
-	ti.uId		= (UINT) ::GetDlgItem(g_hWndMenu, idControl); 
+	ti.uId		= (UINT_PTR)::GetDlgItem(g_hWndMenu, idControl); 
 	ti.hinst	= 0; 
 	ti.lpszText	= LPSTR_TEXTCALLBACK;
 
@@ -656,9 +656,9 @@ void init_password_control(HWND dlg, int item)
 {
 	HWND passwordControl = GetDlgItem(dlg, item);
 
-	SetWindowLong(passwordControl, GWL_USERDATA,
-	              SetWindowLong(passwordControl, GWL_WNDPROC,
-	                            (LONG) password_wnd_proc));
+	SetWindowLongPtr(passwordControl, GWLP_USERDATA,
+					 SetWindowLongPtr(passwordControl, GWLP_WNDPROC,
+									  (LONG_PTR) password_wnd_proc));
 }
 
 /* ==========================================================================
@@ -1416,7 +1416,7 @@ BOOL InitMenu(void)
 		ModifyMenu(g_hConfigMenu, ID_HOTKEY, MF_BYCOMMAND, ID_HOTKEY, uimsg);
 
 		UTIL_get_lang_msg("MENU_EXEC", uimsg, sizeof(uimsg), "Execute", UILanguageFile);
-		::ModifyMenu(g_hSubMenu, ID_EXEC, MF_BYCOMMAND | MF_POPUP, (UINT) g_hListMenu, (LPCTSTR) uimsg);
+		::ModifyMenu(g_hSubMenu, ID_EXEC, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)g_hListMenu, (LPCTSTR) uimsg);
 	}
 
 	return TRUE;
@@ -2350,7 +2350,7 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	TEXTMETRIC			textMetric;
 	PDRAWITEMSTRUCT		lpdis;
@@ -2437,7 +2437,7 @@ BOOL CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch(uMsg) {
 	case WM_INITDIALOG:
@@ -2464,7 +2464,7 @@ BOOL CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch(uMsg) {
 	case WM_INITDIALOG:

@@ -457,6 +457,6 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		}
 	}
 
-	return CallWindowProc((WNDPROC) GetWindowLong(control, GWL_USERDATA),
+	return CallWindowProc((WNDPROC) GetWindowLongPtr(control, GWLP_USERDATA),
 	                      control, msg, wParam, lParam);
 }

@@ -352,7 +352,7 @@ void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
 
 				AppendMenu(PopupBase,
 				           submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
-				           submenu != NULL ? (UINT)submenu : GetMenuItemID(PopupMenu, i),
+				           submenu != NULL ? (UINT_PTR)submenu : GetMenuItemID(PopupMenu, i),
 				           itemText);
 			}
 		}

@@ -270,7 +270,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 
 					if ( ts!=NULL ) {
 						int width, height;
@@ -683,7 +683,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			return TRUE;
 
 		case WM_COMMAND:
-			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			RestoreVar(Dialog,ts,&IAttr,&IOffset);
 			switch (LOWORD(wParam)) {
 				case IDOK:
@@ -935,7 +935,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			break;
 
 		case WM_PAINT:
-			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			if ( ts==NULL ) {
 				return TRUE;
 			}
@@ -944,7 +944,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			break;
 
 		case WM_HSCROLL:
-			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (ts==NULL) {
 				return TRUE;
 			}
@@ -1203,7 +1203,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						memset(Temp, 0, sizeof(Temp));
 						GetDlgItemText(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
@@ -1323,7 +1323,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
 						WritePrivateProfileString("Hosts",NULL,NULL,ts->SetupFName);
 
@@ -1472,7 +1472,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					GetRB(Dialog,&w,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
 					if (w==1) {
 						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
-						ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+						ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 						if (ts!=NULL) {
 							SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TelPort,FALSE);
 						}
@@ -1623,7 +1623,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWL_USER);
+					GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( GetHNRec!=NULL ) {
 						char afstr[BUFSIZ];
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
@@ -1684,7 +1684,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				case IDC_HOSTTELNET:
 					GetRB(Dialog,&i,IDC_HOSTTELNET,IDC_HOSTTELNET);
 					if ( i==1 ) {
-						GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWL_USER);
+						GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
 						if ( GetHNRec!=NULL ) {
 							SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TelPort,FALSE);
 						}
@@ -1830,7 +1830,7 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					CurDir = (PCHAR)GetWindowLong(Dialog,DWL_USER);
+					CurDir = (PCHAR)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( CurDir!=NULL ) {
 						_getcwd(HomeDir,sizeof(HomeDir));
 						_chdir(CurDir);
@@ -2615,7 +2615,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
 						w = (WORD)GetCurSel(Dialog, IDC_GENPORT);
 						if (w>1) {
@@ -2745,7 +2745,7 @@ static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						PostMessage(Hw,WM_SYSCOMMAND,SC_CLOSE,0);
 					}
 					else {
-						Close = (PBOOL)GetWindowLong(Dialog,DWL_USER);
+						Close = (PBOOL)GetWindowLongPtr(Dialog,DWLP_USER);
 						if (Close!=NULL) {
 							*Close = TRUE;
 						}

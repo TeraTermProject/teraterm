@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -184,7 +184,7 @@ static void SetLogFlags(HWND Dialog)
 	WORD BinFlag, val;
 	long opt = 0;
 
-	pl = (LPLONG)GetWindowLong(Dialog, DWL_USER);
+	pl = (LPLONG)GetWindowLongPtr(Dialog, DWLP_USER);
 	if (pl) {
 		GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
 		if (BinFlag) {
@@ -266,7 +266,7 @@ static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		ofn = (LPOPENFILENAME)lParam;
 		pl = (LPLONG)(ofn->lCustData);
 		opt = *pl;
-		SetWindowLong(Dialog, DWL_USER, (LONG)pl);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -526,7 +526,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&LogFnHook);
 		optl = *Option;
-		ofn.lCustData = (DWORD)&optl;
+		ofn.lCustData = (LPARAM)&optl;
 		break;
 	case GTF_SEND:
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -535,7 +535,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
 		optw = (WORD)*Option;
-		ofn.lCustData = (DWORD)&optw;
+		ofn.lCustData = (LPARAM)&optw;
 		break;
 	case GTF_BP:
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -600,7 +600,7 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	case WM_INITDIALOG:
 		ofn = (LPOPENFILENAME)lParam;
 		pw = (LPWORD)ofn->lCustData;
-		SetWindowLong(Dialog, DWL_USER, (LONG)pw);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -630,7 +630,7 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			pw = (LPWORD)GetWindowLong(Dialog,DWL_USER);
+			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pw!=NULL)
 				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
 			if (DlgFoptFont != NULL) {
@@ -648,7 +648,7 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		notify = (LPOFNOTIFY)lParam;
 		switch (notify->hdr.code) {
 		case CDN_FILEOK:
-			pw = (LPWORD)GetWindowLong(Dialog,DWL_USER);
+			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pw!=NULL)
 				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
 			if (DlgFoptFont != NULL) {
@@ -743,7 +743,7 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	ofn.lCustData = 0;
 	if (FuncId==GMF_Z) {
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
-		ofn.lCustData = (DWORD)Option;
+		ofn.lCustData = (LPARAM)Option;
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 	} else if (FuncId==GMF_Y) {
@@ -813,7 +813,7 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	return Ok;
 }
 
-static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PFileVar fv;
 	char TempFull[MAX_PATH];
@@ -825,7 +825,7 @@ static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 	switch (Message) {
 	case WM_INITDIALOG:
 		fv = (PFileVar)lParam;
-		SetWindowLong(Dialog, DWL_USER, lParam);
+		SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 		SendDlgItemMessage(Dialog, IDC_GETFN, EM_LIMITTEXT, sizeof(TempFull)-1,0);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
@@ -860,7 +860,7 @@ static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 		return TRUE;
 
 	case WM_COMMAND:
-		fv = (PFileVar)GetWindowLong(Dialog,DWL_USER);
+		fv = (PFileVar)GetWindowLongPtr(Dialog,DWLP_USER);
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			if (fv!=NULL) {
@@ -894,7 +894,7 @@ BOOL WINAPI GetGetFname(HWND HWin, PFileVar fv)
 {
 	return (BOOL)DialogBoxParam(hInst,
 	                            MAKEINTRESOURCE(IDD_GETFNDLG),
-	                            HWin, GetFnDlg, (LONG)fv);
+	                            HWin, GetFnDlg, (LPARAM)fv);
 }
 
 void WINAPI SetFileVar(PFileVar fv)
@@ -990,7 +990,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	case WM_INITDIALOG:
 		ofn = (LPOPENFILENAME)lParam;
 		pl = (LPLONG)ofn->lCustData;
-		SetWindowLong(Dialog, DWL_USER, (LONG)pl);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -1048,7 +1048,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
+			pl = (LPLONG)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pl!=NULL)
 			{
 				if (LOWORD(*pl)==0xFFFF) { // Send
@@ -1083,7 +1083,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 		notify = (LPOFNOTIFY)lParam;
 		switch (notify->hdr.code) {
 		case CDN_FILEOK:
-			pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
+			pl = (LPLONG)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pl!=NULL) {
 				if (LOWORD(*pl) == 0xFFFF) { // Send
 					Lo = 0xFFFF;
@@ -1182,7 +1182,7 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 	}
 	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.Flags |= OFN_SHOWHELP;
-	ofn.lCustData = (DWORD)&opt;
+	ofn.lCustData = (LPARAM)&opt;
 	ofn.lpstrTitle = fv->DlgCaption;
 	ofn.lpfnHook = (LPOFNHOOKPROC)(&XFnHook);
 	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_XOPT);

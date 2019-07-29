@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -118,7 +118,7 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   if (1) {
     char buf[1024];
     struct _finddata_t searchData;
-    long searchHandle;
+	intptr_t searchHandle;
 
     _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts->HomeDir);
 

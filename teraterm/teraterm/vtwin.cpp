@@ -254,6 +254,7 @@ void SetAutoConnectPort(int port)
 // (2007.9.30 yutaka)
 //
 // 例外コードを文字列へ変換する
+#if !defined(_M_X64)
 static const char *GetExceptionString(DWORD exception)
 {
 #define EXCEPTION(x) case EXCEPTION_##x: return (#x);
@@ -443,6 +444,7 @@ error:
 //	return (EXCEPTION_EXECUTE_HANDLER);  /* そのままプロセスを終了させる */
 	return (EXCEPTION_CONTINUE_SEARCH);  /* 引き続き［アプリケーションエラー］ポップアップメッセージボックスを呼び出す */
 }
+#endif // !defined(_M_X64 )
 
 
 // Virtual Storeが有効であるかどうかを判別する。
@@ -548,7 +550,9 @@ CVTWindow::CVTWindow()
 	BOOL isFirstInstance;
 
 	// 例外ハンドラのフック (2007.9.30 yutaka)
+#if !defined(_M_X64)
 	SetUnhandledExceptionFilter(ApplicationFaultHandler);
+#endif
 
 	CommInit(&cv);
 	isFirstInstance = StartTeraTerm(&ts);
@@ -879,7 +883,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 
 				AppendMenu(PopupBase,
 				           submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
-				           submenu != NULL ? (UINT)submenu : GetMenuItemID(PopupMenu, i),
+				           submenu != NULL ? (UINT_PTR)submenu : GetMenuItemID(PopupMenu, i),
 				           itemText);
 			}
 		}
@@ -1297,7 +1301,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		             "&Window", ts.UILanguageFile);
 		::InsertMenu(*Menu,ID_HELPMENU,
 		             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-		             (int)WinMenu, ts.UIMsg);
+		             (UINT_PTR)WinMenu, ts.UIMsg);
 	}
 
 	TTXModifyMenu(*Menu); /* TTPLUG */
@@ -1821,7 +1825,7 @@ void CVTWindow::OnAllClose()
 }
 
 // 終了問い合わせなしにTera Termを終了する。OnAllClose()受信用。
-LONG CVTWindow::OnNonConfirmClose(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 {
 	// ここで ts の内容を意図的に書き換えても、終了時に自動セーブされるわけではないので、特に問題なし。
 	ts.PortFlag &= ~PF_CONFIRMDISCONN;
@@ -1971,7 +1975,7 @@ void CVTWindow::DropListFree()
 	}
 }
 
-LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
+LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 {
 	// iniに保存されない、今実行しているTera Termでのみ有効な設定
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
@@ -3264,7 +3268,7 @@ LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 	return TTCFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
 }
 
-LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnAccelCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IdHold:
@@ -3357,7 +3361,7 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 {
 	HMENU SysMenu;
 	BOOL Show, B1, B2;
@@ -3398,7 +3402,7 @@ LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
 			             "&Window", ts.UILanguageFile);
 			::InsertMenu(MainMenu,ID_HELPMENU,
 			             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			             (int)WinMenu, ts.UIMsg);
+			             (UINT_PTR)WinMenu, ts.UIMsg);
 		}
 		else {
 			RemoveMenu(MainMenu,ID_HELPMENU,MF_BYPOSITION);
@@ -5975,7 +5979,7 @@ activate:;
 }
 
 // WM_COPYDATAの受信
-LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 {
 	COPYDATASTRUCT *cds;
 	char *buf, *msg, *name;

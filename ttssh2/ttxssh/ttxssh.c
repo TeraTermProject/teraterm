@@ -1252,8 +1252,8 @@ LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	return CallWindowProc(OrigHostnameEditProc, dlg, msg, wParam, lParam);
 }
 
-static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
-                                LPARAM lParam)
+static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
+								   LPARAM lParam)
 {
 	static char *ssh_version[] = {"SSH1", "SSH2", NULL};
 	PGetHNRec GetHNRec;
@@ -1271,7 +1271,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		GetHNRec = (PGetHNRec) lParam;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOST_TITLE", pvar, uimsg);
@@ -1348,8 +1348,8 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		// C-n/C-p のためにサブクラス化 (2007.9.4 maya)
 		hwndHostname = GetDlgItem(dlg, IDC_HOSTNAME);
 		hwndHostnameEdit = GetWindow(hwndHostname, GW_CHILD);
-		OrigHostnameEditProc = (WNDPROC)GetWindowLong(hwndHostnameEdit, GWL_WNDPROC);
-		SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)HostnameEditProc);
+		OrigHostnameEditProc = (WNDPROC)GetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC);
+		SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
 		                 pvar->settings.Enabled ? IDC_HOSTSSH : GetHNRec->
@@ -1478,7 +1478,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			GetHNRec = (PGetHNRec) GetWindowLong(dlg, DWL_USER);
+			GetHNRec = (PGetHNRec) GetWindowLongPtr(dlg, DWLP_USER);
 			if (GetHNRec != NULL) {
 				if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
 					char afstr[BUFSIZ];
@@ -1544,12 +1544,12 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 					}
 				}
 			}
-			SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)OrigHostnameEditProc);
+			SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)OrigHostnameEditProc);
 			EndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:
-			SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)OrigHostnameEditProc);
+			SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)OrigHostnameEditProc);
 			EndDialog(dlg, 0);
 			return TRUE;
 
@@ -1594,7 +1594,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, FALSE); // disabled
 hostssh_enabled:
 
-			GetHNRec = (PGetHNRec) GetWindowLong(dlg, DWL_USER);
+			GetHNRec = (PGetHNRec) GetWindowLongPtr(dlg, DWLP_USER);
 
 			if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {
 				if (GetHNRec != NULL)
@@ -2441,8 +2441,8 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
     return CallWindowProc(g_defAboutDlgEditWndProc, hWnd, msg, wp, lp);
 }
 
-static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
-                                 LPARAM lParam)
+static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
+									LPARAM lParam)
 {
 	static HFONT DlgAboutTextFont;
 
@@ -3252,12 +3252,12 @@ static void choose_read_only_file(HWND dlg)
 	}
 }
 
-static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
-                                 LPARAM lParam)
+static INT_PTR CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
+									LPARAM lParam)
 {
 	switch (msg) {
 	case WM_INITDIALOG:
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 		init_setup_dlg((PTInstVar) lParam, dlg);
 
 		CenterWindow(dlg, GetParent(dlg));
@@ -3266,7 +3266,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			complete_setup_dlg((PTInstVar) GetWindowLong(dlg, DWL_USER), dlg);
+			complete_setup_dlg((PTInstVar) GetWindowLongPtr(dlg, DWLP_USER), dlg);
 			EndDialog(dlg, 1);
 			return TRUE;
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
@@ -3783,7 +3783,7 @@ int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize
 //
 // SCP dialog
 //
-static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
+static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
 	static char sendfile[MAX_PATH] = "";
@@ -4172,8 +4172,8 @@ ed25519_error:
 	buffer_free(blob);
 }
 
-static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
-                                     LPARAM lParam)
+static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
+										LPARAM lParam)
 {
 	static ssh_keytype key_type;
 	static int saved_key_bits;
@@ -5344,7 +5344,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		hInst = hInstance;
 		pvar = &InstVar;
 		__mem_mapping =
-			CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE, 0,
+			CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
 			                  sizeof(TS_SSH), TTSSH_FILEMAPNAME);
 		if (__mem_mapping == NULL) {
 			/* fake it. The settings won't be shared, but what the heck. */

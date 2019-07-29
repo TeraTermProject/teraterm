@@ -1714,8 +1714,8 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 // TODO: finger printの表示も行う。
 // (2006.3.25 yutaka)
 //
-static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                        LPARAM lParam)
+static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+										   LPARAM lParam)
 {
 	PTInstVar pvar;
 	char uimsg[MAX_UIMSG];
@@ -1724,7 +1724,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->hosts_state.hosts_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
@@ -1798,7 +1798,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
@@ -1869,8 +1869,8 @@ canceled:
 //
 // 置き換え時の確認ダイアログを分離
 //
-static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                            LPARAM lParam)
+static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+											   LPARAM lParam)
 {
 	PTInstVar pvar;
 	char uimsg[MAX_UIMSG];
@@ -1879,7 +1879,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->hosts_state.hosts_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
@@ -1950,7 +1950,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
@@ -2022,8 +2022,8 @@ canceled:
 //
 // 同じホストで鍵形式が違う時の追加確認ダイアログを分離
 //
-static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                         LPARAM lParam)
+static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+											LPARAM lParam)
 {
 	PTInstVar pvar;
 	char uimsg[MAX_UIMSG];
@@ -2032,7 +2032,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->hosts_state.hosts_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
@@ -2105,7 +2105,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:

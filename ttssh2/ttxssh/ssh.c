@@ -7427,7 +7427,7 @@ struct change_password {
 	char new_passwd[PASSWD_MAXLEN];
 };
 
-static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	char old_passwd[PASSWD_MAXLEN];
 	char new_passwd[PASSWD_MAXLEN];

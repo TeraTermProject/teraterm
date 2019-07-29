@@ -166,9 +166,9 @@ BOOL	SaveLoginHostInformation(HWND hWnd);
 BOOL	SetDefaultEtcDlg(HWND hWnd);
 BOOL	SetMenuFont(HWND hWnd);
 BOOL	SetTaskTray(HWND hWnd, DWORD dwMessage);
-BOOL	CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-BOOL	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT	CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT	CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

@@ -191,10 +191,6 @@ private:
 		          getInstance().ts->UILanguageFile, _TRUNCATE);
 	}
 
-	static BOOL CALLBACK EnumProc(HMODULE, const char*, const char*, WORD langid, LONG lParam) {
-		*((WORD*) lParam) = langid;
-		return FALSE;
-	}
 	static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 		getInstance().ts = ts;
 		getInstance().cv = cv;

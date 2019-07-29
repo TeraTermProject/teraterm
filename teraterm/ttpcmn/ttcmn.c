@@ -1029,7 +1029,7 @@ void WINAPI SetWinList(HWND HWin, HWND HDlg, int IList)
 			Temp[1] = ' ';
 			GetWindowText(Hw,&Temp[2],sizeof(Temp)-3);
 			SendDlgItemMessage(HDlg, IList, LB_ADDSTRING,
-			                   0, (LONG)Temp);
+			                   0, (LPARAM)Temp);
 			if (Hw==HWin) {
 				SendDlgItemMessage(HDlg, IList, LB_SETCURSEL, i,0);
 			}

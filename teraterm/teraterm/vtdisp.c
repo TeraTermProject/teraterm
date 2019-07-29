@@ -445,8 +445,14 @@ BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long
   if(spiVersion[2] != 'I' || spiVersion[3] != 'N')
     goto error;
 
+#if !defined(_M_X64)
   if(!(SPI_IsSupported)(nameFile,(unsigned long)bufFile))
     goto error;
+#else
+  // TODO ƒ|ƒCƒ“ƒ^‚ğ unsigned long ‚É•ÏŠ·‚µ‚Ä‚¢‚é
+  // 64bit”ÅSusie Plug-in ‚ª‘¶İ‚·‚é?
+  goto error;
+#endif
 
   if((SPI_GetPicture)(bufFile,sizeFile,1,hbmi,hbuf,NULL,0))
     goto error;

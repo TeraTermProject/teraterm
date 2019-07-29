@@ -2161,14 +2161,14 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
 		}
-		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
+		SetDlgItemTextA(dlg, IDC_ADDKEY_EDIT, buf);
 		free(buf);
 	}
 
 	if (ctx->nold > 0) {
 		buf_len = 100 * ctx->nold;
 		buf = calloc(100, ctx->nold);
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)"");
+		SetDlgItemTextA(dlg, IDC_REMOVEKEY_EDIT, "");
 		for (i = 0; i < ctx->nold; i++) {
 			switch (dgst_alg) {
 			case SSH_DIGEST_MD5:
@@ -2189,12 +2189,12 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
 		}
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
+		SetDlgItemTextA(dlg, IDC_REMOVEKEY_EDIT, buf);
 		free(buf);
 	}
 }
 
-static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+static UINT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
 	char buf[1024];
@@ -2205,7 +2205,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		pvar = (PTInstVar)lParam;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_TITLE", pvar, uimsg);
@@ -2249,7 +2249,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar)GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar)GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -2329,6 +2329,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	buffer_t *bsig = NULL;
 	char *cp, *sig;
 	size_t i, ndone, siglen;
+	int siglen_i;
 	int ret;
 
 	// SSH2 packet format:
@@ -2384,7 +2385,8 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		free(blob);
 		blob = NULL;
 
-		sig = buffer_get_string_msg(bsig, &siglen);
+		sig = buffer_get_string_msg(bsig, &siglen_i);
+		siglen = siglen_i;
 		// Verify signature
 		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b));
 		free(sig);
