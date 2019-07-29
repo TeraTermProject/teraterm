@@ -4619,7 +4619,6 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			}
 
 			if (public_key.type == KEY_RSA1) { // SSH1 RSA
-				/********* OPENSSL1.1.1 NOTEST *********/
 				RSA *rsa = public_key.rsa;
 				int bits;
 				char *buf;

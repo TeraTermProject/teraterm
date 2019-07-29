@@ -2530,7 +2530,6 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			}
 		}
 		else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-			/********* OPENSSL1.1.1 NOTEST *********/
 			int server_key_bits;
 			int host_key_bits;
 			int server_key_bytes;

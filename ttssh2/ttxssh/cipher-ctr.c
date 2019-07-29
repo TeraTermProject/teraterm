@@ -212,25 +212,6 @@ ssh_des3_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_des3_ctr(void)
 {
-	/*** TODO: OPENSSL1.1.1 テスト完了後に削除する ***/
-#if 0
-	static EVP_CIPHER des3_ctr;
-
-	memset(&des3_ctr, 0, sizeof(EVP_CIPHER));
-	des3_ctr.nid = NID_undef;
-	des3_ctr.block_size = DES_BLOCK_SIZE;
-	des3_ctr.iv_len = DES_BLOCK_SIZE;
-	des3_ctr.key_len = 24;
-	des3_ctr.init = ssh_des3_ctr_init;
-	des3_ctr.cleanup = ssh_des3_ctr_cleanup;
-	des3_ctr.do_cipher = ssh_des3_ctr;
-#ifndef SSH_OLD_EVP
-	des3_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
-#endif
-	return (&des3_ctr);
-#endif
-
-	/********* OPENSSL1.1.1 NOTEST *********/
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -543,25 +524,7 @@ ssh_camellia_ctr_iv(EVP_CIPHER_CTX *evp, int doset, unsigned char * iv, unsigned
 const EVP_CIPHER *
 evp_camellia_128_ctr(void)
 {
-	/*** TODO: OPENSSL1.1.1 テスト完了後に削除する ***/
-#if 0
-	static EVP_CIPHER camellia_ctr;
 
-	memset(&camellia_ctr, 0, sizeof(EVP_CIPHER));
-	camellia_ctr.nid = NID_undef;
-	camellia_ctr.block_size = CAMELLIA_BLOCK_SIZE;
-	camellia_ctr.iv_len = CAMELLIA_BLOCK_SIZE;
-	camellia_ctr.key_len = 16;
-	camellia_ctr.init = ssh_camellia_ctr_init;
-	camellia_ctr.cleanup = ssh_camellia_ctr_cleanup;
-	camellia_ctr.do_cipher = ssh_camellia_ctr;
-#ifndef SSH_OLD_EVP
-	camellia_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
-#endif
-	return (&camellia_ctr);
-#endif
-
-	/********* OPENSSL1.1.1 NOTEST *********/
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
