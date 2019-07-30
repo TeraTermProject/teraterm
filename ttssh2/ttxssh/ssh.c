@@ -8676,7 +8676,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			HANDLE thread;
 			unsigned int tid;
 
-			sscanf_s(data, "C%o %lld %s", &permission, &size, filename, sizeof(filename));
+			sscanf_s(data, "C%o %lld %s", &permission, &size, filename, (unsigned int)sizeof(filename));
 
 			// Windowsなのでパーミッションは無視。サイズのみ記録。
 			c->scp.filetotalsize = size;
