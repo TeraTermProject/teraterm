@@ -54,7 +54,6 @@ private:
 
     private:
         SSLContext():ctx(NULL) {
-			/********* OPENSSL1.1.1 NOTEST *********/
 			// SSL_library_initŠÖ”‚ÍOpenSSL 1.1.0‚Ådeprecated‚Æ‚È‚èA
 			// OPENSSL_init_sslŠÖ”‚É’u‚«Š·‚í‚Á‚½B
 			OPENSSL_init_ssl(0, NULL);
