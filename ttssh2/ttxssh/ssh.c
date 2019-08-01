@@ -5682,17 +5682,22 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	const EC_GROUP *group;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	int len, ret;
+	char buf[128];
 
 	client_key = EC_KEY_new();
 	if (client_key == NULL) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_new was failed", __FUNCTION__);
 		goto error;
 	}
 	client_key = EC_KEY_new_by_curve_name(kextype_to_cipher_nid(pvar->kex_type));
 	if (client_key == NULL) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_new_by_curve_name was failed", __FUNCTION__);
 		goto error;
 	}
-	if (EC_KEY_generate_key(client_key) != 1) {
+	ret = EC_KEY_generate_key(client_key);
+	if (ret != 1) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_generate_key was failed(ret %d)", __FUNCTION__, ret);
 		goto error;
 	}
 	group = EC_KEY_get0_group(client_key);
@@ -5700,9 +5705,9 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-		return;
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: buffer_init was failed", __FUNCTION__);
+		goto error;
 	}
 
 	buffer_put_ecpoint(msg, group, EC_KEY_get0_public_key(client_key));
@@ -5731,7 +5736,7 @@ error:;
 	EC_KEY_free(client_key);
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, "error occurred @ SSH2_ecdh_kex_init()", TRUE);
+	notify_fatal_error(pvar, buf, TRUE);
 }
 
 
