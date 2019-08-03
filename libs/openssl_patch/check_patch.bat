@@ -22,7 +22,7 @@ rem freeaddrinfo/getnameinfo/getaddrinfo APIˆË‘¶œ‹‚Ì‚½‚ß
 :patch1
 findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
 if ERRORLEVEL 1 goto fail1
-goto patch3
+goto patch_end
 :fail1
 pushd ..
 %folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
