@@ -26,7 +26,8 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly 
 <dl>
 	<dt class="macro">整数変数 &lt;file handle&gt;</dt>
 	<dd>もしファイルが正しくオープンされた場合、ファイルハンドルが格納される。<br />
-        それ以外の場合、&lt;file handle&gt; に-1が格納される。</dd>
+        バージョン 4.101 以前と 4.104 以降: それ以外の場合、&lt;file handle&gt; に-1が格納される。マクロエラーとはならない。<br />
+        バージョン 4.102, 4.103: それ以外の場合、&lt;file handle&gt; に-1が格納される。マクロエラーとなり、マクロの実行が一次停止する。</dd>
 
 	<dt class="macro">文字列 &lt;filename&gt;</dt>
 	<dd>開くファイル名を指定する。<br />
@@ -46,12 +47,6 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly 
 <p>
 ファイルはバイナリモードでオープンされる。
 </p>
-
-<h2>注意</h2>
-
-<ul>
- <li>&lt;file handle&gt; に-1が格納される場合、マクロエラーとはならない。</li>
-</ul>
 
 <h2>例</h2>
 
