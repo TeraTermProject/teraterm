@@ -22,49 +22,25 @@ rem freeaddrinfo/getnameinfo/getaddrinfo APIˆË‘¶œ‹‚Ì‚½‚ß
 :patch1
 findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
 if ERRORLEVEL 1 goto fail1
-goto patch_end
+goto patch4
 :fail1
 pushd ..
 %folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
 %folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
 popd
-goto patch_end
-
-
-rem InitializeCriticalSectionAndSpinCount APIˆË‘¶œ‹‚Ì‚½‚ß
-rem ˆÈ‰º‚Í•s—v
-:patch2
-findstr /c:"running on Windows95" ..\openssl\crypto\threads_win.c
-if ERRORLEVEL 1 goto fail2
-goto patch3
-:fail2
-pushd ..
-%folder%\patch %cmdopt1% < %folder%\InitializeCriticalSectionAndSpinCount_patch.txt
-%folder%\patch %cmdopt2% < %folder%\InitializeCriticalSectionAndSpinCount_patch.txt
-popd
-
-rem InitializeCriticalSectionAndSpinCount/InterlockedCompareExchange/InterlockedExchangeAdd APIˆË‘¶œ‹‚Ì‚½‚ß
-:patch3
-findstr /c:"myInitializeCriticalSectionAndSpinCount" ..\openssl\crypto\threads_win.c
-if ERRORLEVEL 1 goto fail3
 goto patch4
-:fail3
-pushd ..
-%folder%\patch %cmdopt1% < %folder%\thread_win.txt
-%folder%\patch %cmdopt2% < %folder%\thread_win.txt
-popd
 
 
 rem CryptAcquireContextW APIˆË‘¶œ‹‚Ì‚½‚ß
 :patch4
-findstr /c:"CryptAcquireContextA" ..\openssl\crypto\rand\rand_win.c
-if ERRORLEVEL 1 goto fail4
-goto patch5
-:fail4
-pushd ..
-%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW.txt
-%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW.txt
-popd
+rem findstr /c:"add_RAND_buffer" ..\openssl\crypto\rand\rand_win.c
+rem if ERRORLEVEL 1 goto fail4
+rem goto patch5
+rem :fail4
+rem pushd ..
+rem %folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW.txt
+rem %folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW.txt
+rem popd
 
 
 :patch5
