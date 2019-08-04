@@ -36,17 +36,15 @@
   <li>Changes
     <ul>
       <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in Ver 4.102.</li>
-      <li>
-      <!--li>IMEの未確定文字のフォントが指定フォントと同一になるようにした。</li-->
+      <li>Unspecified string font in IME uses your defined font.</li>
     </ul>
   </li>
   <li>Bug fixes
     <ul>
-      <!--li>Active Window Tracking を有効時、マウスカーソルが Tera Term のウィンドウ内に移動しても、アクティブにならない問題を修正。4.103でのエンバグ。</li-->
-      <li><!-- UTF-8受信時、4byteのUTF-8のデコードを誤っていたので修正 --></li>
+      <li>When the Active Window Tracing is enabled, mouse cursor won't be active that mouse corsor in Tera Term window. This bug was introduced in 4.103.</li>
+      <li>When UTF-8 characters received, 4-byte UTF-8 characters are miss-decorded.</li>
       <li>The plugin compiled before 4.103 can not called because the DLL's calling convention is changed in Tera Term 4.103. </li>
-      <li></li>
-      <!--li>IMEの未確定文字を表示している状態でフォント選択ダイアログを使用するとIMEのフォントが変化する問題を修正。</li-->
+      <li>Displayed unspecified string font in IME changes, when you open the font setting dialog.</li>
     </ul>
   </li>
 
@@ -4782,7 +4780,7 @@ SYNOPSIS:
 
 <h3 id="ttproxy_1.0.0.25">2019.xx.xx (Ver 1.0.0.25)</h3>
 <ul class="history">
-      <li><!--OSによって正しく動作しない不具合を修正。<a href="#teraterm_4.103">teraterm 4.103</a>でのエンバグ。--></li>
+      <li>Depending on OS, it's not working correctly. This bug was introduced in 4.103.</li>
 </ul>
 
 <h3 id="ttproxy_1.0.0.24">2016.11.30 (Ver 1.0.0.24)</h3>
