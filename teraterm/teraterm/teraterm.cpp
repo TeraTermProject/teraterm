@@ -238,11 +238,6 @@ BOOL CallOnIdle(LONG lCount)
 	return OnIdle(lCount);
 }
 
-HINSTANCE GetInstance()
-{
-	return hInst;
-}
-
 static HWND main_window;
 HWND GetHWND()
 {
@@ -305,7 +300,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 	init();
 	hInst = hInstance;
-	CVTWindow *m_pMainWnd = new CVTWindow();
+	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする

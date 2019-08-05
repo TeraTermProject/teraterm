@@ -147,11 +147,6 @@ static int AutoDisconnectedPort = -1;
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
-static HINSTANCE AfxGetInstanceHandle()
-{
-	return hInst;
-}
-
 // Tera Term起動時とURL文字列mouse over時に呼ばれる (2005.4.2 yutaka)
 static void SetMouseCursor(const char *cursor)
 {
@@ -532,7 +527,7 @@ error:
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
-CVTWindow::CVTWindow()
+CVTWindow::CVTWindow(HINSTANCE hInstance)
 {
 	WNDCLASS wc;
 	RECT rect;
@@ -548,6 +543,7 @@ CVTWindow::CVTWindow()
 #endif
 	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
+	m_hInst = hInstance;
 
 	// 例外ハンドラのフック (2007.9.30 yutaka)
 #if !defined(_M_X64)
@@ -691,7 +687,7 @@ CVTWindow::CVTWindow()
 	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = AfxGetInstanceHandle();
+	wc.hInstance = hInstance;
 	wc.hIcon = NULL;
 	//wc.hCursor = LoadCursor(NULL,IDC_IBEAM);
 	wc.hCursor = NULL; // マウスカーソルは動的に変更する (2005.4.2 yutaka)
@@ -700,7 +696,7 @@ CVTWindow::CVTWindow()
 	wc.lpszClassName = VTClassName;
 
 	RegisterClass(&wc);
-	m_hAccel = ::LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACC));
+	m_hAccel = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACC));
 
 	if (ts.VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
@@ -711,7 +707,7 @@ CVTWindow::CVTWindow()
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
-	Create(hInst, VTClassName, _T("Tera Term"), Style, rect, NULL, NULL);
+	Create(hInstance, VTClassName, _T("Tera Term"), Style, rect, NULL, NULL);
 
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
@@ -742,20 +738,20 @@ CVTWindow::CVTWindow()
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(HVTWin,WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInstance,
 	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 	                                IMAGE_ICON,16,16,fuLoad));
 	// Vista の Aero において Alt+Tab 切り替えで表示されるアイコンが
 	// 16x16 アイコンの拡大になってしまうので、大きいアイコンも
 	// セットする (2008.9.3 maya)
 	::PostMessage(HVTWin,WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInstance,
 	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 	                                IMAGE_ICON, 0, 0, fuLoad));
 
 	SetCustomNotifyIcon(
 		(HICON)LoadImage(
-			AfxGetInstanceHandle(),
+			hInstance,
 			MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 			IMAGE_ICON, 16, 16, LR_VGACOLOR|LR_SHARED));
 
@@ -1051,7 +1047,7 @@ static BOOL isLogMeTTExist()
 
 void CVTWindow::InitMenu(HMENU *Menu)
 {
-	*Menu = LoadMenu(AfxGetInstanceHandle(),
+	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_MENU));
 	char uimsg[MAX_UIMSG];
 	int ret;
@@ -1481,7 +1477,7 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 {
 	char uimsg[MAX_UIMSG];
 
-	*Menu = LoadMenu(AfxGetInstanceHandle(),
+	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_PASTEMENU));
 
 	GetMenuString(*Menu, ID_EDIT_PASTE2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
@@ -1626,7 +1622,7 @@ void CVTWindow::OpenTEK()
 {
 	ActiveWin = IdTEK;
 	if (HTEKWin==NULL) {
-		pTEKWin = new CTEKWindow();
+		pTEKWin = new CTEKWindow(m_hInst);
 	}
 	else {
 		::ShowWindow(HTEKWin,SW_SHOWNORMAL);
@@ -2073,7 +2069,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 			SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 						  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 			DropType =
-				ShowDropDialogBox(hInst, HVTWin,
+				ShowDropDialogBox(m_hInst, HVTWin,
 								  FileName, DropType,
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
@@ -4123,7 +4119,7 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 void CVTWindow::OnCommentToLog()
 {
 	// ログファイルへコメントを追加する (2004.8.6 yutaka)
-	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
+	TTDialogBox(m_hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
 				HVTWin, (DLGPROC)OnCommentDlgProc);
 }
 
@@ -4454,7 +4450,7 @@ void CVTWindow::OnExternalSetup()
 
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
-	CAddSettingPropSheetDlg CAddSetting(hInst, _T("Tera Term: Additional settings"), HVTWin);
+	CAddSettingPropSheetDlg CAddSetting(m_hInst, _T("Tera Term: Additional settings"), HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
 		case (DWORD)-1:
@@ -4603,7 +4599,7 @@ void CVTWindow::OnSetupDlgFont()
 	}
 	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
-	cf.hInstance = hInst;
+	cf.hInstance = m_hInst;
 	HelpId = HlpSetupFont;
 	result = ChooseFontA(&cf);
 
@@ -5252,7 +5248,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
+	TTDialogBox(m_hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
 	            HVTWin, (DLGPROC)OnSetupDirectoryDlgProc);
 }
 
@@ -5957,7 +5953,7 @@ void CVTWindow::OnControlBroadcastCommand(void)
 		goto activate;
 	}
 
-	hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+	hDlgWnd = CreateDialog(m_hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
 	                       HVTWin, (DLGPROC)BroadcastCommandDlgProc);
 
 	if (hDlgWnd == NULL) {

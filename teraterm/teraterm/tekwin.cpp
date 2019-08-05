@@ -49,20 +49,16 @@
 
 #define TEKClassName _T("TEKWin32")
 
-static HINSTANCE AfxGetInstanceHandle()
-{
-	return hInst;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
 
-CTEKWindow::CTEKWindow()
+CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 {
 	WNDCLASS wc;
 	RECT rect;
 	DWORD Style;
 	int fuLoad = LR_DEFAULTCOLOR;
+	m_hInst = hInstance;
 
 	if (! LoadTTTEK()) {
 		return;
@@ -81,7 +77,7 @@ CTEKWindow::CTEKWindow()
 	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = AfxGetInstanceHandle();
+	wc.hInstance = hInstance;
 	wc.hIcon = NULL;
 	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
 	wc.hbrBackground = NULL;
@@ -99,7 +95,7 @@ CTEKWindow::CTEKWindow()
 		rect.right = rect.left + 640; //temporary width
 		rect.bottom = rect.top + 400; //temporary height
 	}
-	Create(hInst, TEKClassName, _T("Tera Term"), Style, rect, ::GetDesktopWindow(), NULL);
+	Create(hInstance, TEKClassName, _T("Tera Term"), Style, rect, ::GetDesktopWindow(), NULL);
 //--------------------------------------------------------
 	HTEKWin = GetSafeHwnd();
 	if (HTEKWin == NULL) {
@@ -113,11 +109,11 @@ CTEKWindow::CTEKWindow()
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(HTEKWin,WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInstance,
 	                                MAKEINTRESOURCE((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK),
 	                                IMAGE_ICON,16,16,fuLoad));
 	::PostMessage(HTEKWin,WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInstance,
 	                                MAKEINTRESOURCE((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK),
 	                                IMAGE_ICON, 0, 0, fuLoad));
 
@@ -180,7 +176,7 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 		{ ID_TEKHELP_ABOUT, "TEKMENU_HELP_ABOUT" },
 	};
 
-	*Menu = ::LoadMenu(AfxGetInstanceHandle(),
+	*Menu = ::LoadMenu(m_hInst,
 	                   MAKEINTRESOURCE(IDR_TEKMENU));
 	FileMenu = GetSubMenu(*Menu,0);
 	EditMenu = GetSubMenu(*Menu,1);
