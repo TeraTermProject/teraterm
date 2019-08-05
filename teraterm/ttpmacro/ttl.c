@@ -1405,6 +1405,7 @@ WORD TTLFileCopy()
 {
 	WORD Err;
 	TStrVal FName1, FName2;
+	BOOL ret;
 
 	Err = 0;
 	GetStrVal(FName1,&Err);
@@ -1427,9 +1428,17 @@ WORD TTLFileCopy()
 		SetResult(-2);
 		return Err;
 	}
-	if (_stricmp(FName1,FName2)==0) return Err;
+	if (_stricmp(FName1, FName2) == 0) {
+		SetResult(-3);
+		return Err;
+	}
 
-	CopyFile(FName1,FName2,FALSE);
+	ret = CopyFile(FName1, FName2, FALSE);
+	if (ret == 0) {
+		SetResult(-4);
+		return Err;
+	}
+
 	SetResult(0);
 	return Err;
 }
