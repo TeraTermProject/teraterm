@@ -258,18 +258,51 @@ void AddModalHandle(HWND hWnd)
 
 void RemoveModalHandle(HWND hWnd)
 {
+	(void)hWnd;
 	hModalWnd = 0;
+}
+
+static UINT nMsgLast;
+static POINT ptCursorLast;
+
+/**
+ *	idle状態に入るか判定する
+ */
+static BOOL IsIdleMessage(const MSG* pMsg)
+{
+	if (pMsg->message == WM_MOUSEMOVE ||
+		pMsg->message == WM_NCMOUSEMOVE)
+	{
+		if (pMsg->message == nMsgLast &&
+			pMsg->pt.x == ptCursorLast.x &&
+			pMsg->pt.y == ptCursorLast.y)
+		{	// 同じ位置だったらidleにはいらない
+			return FALSE;
+		}
+
+		ptCursorLast = pMsg->pt;
+		nMsgLast = pMsg->message;
+		return TRUE;
+	}
+
+	if (pMsg->message == WM_PAINT ||
+		pMsg->message == 0x0118/*WM_SYSTIMER*/)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
+	(void)hPreInst;
+	(void)lpszCmdLine;
+	(void)nCmdShow;
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-
-	LONG lCount = 0;
-	DWORD SleepTick = 1;
 	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow();
@@ -279,52 +312,73 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 
+	BOOL bIdle = TRUE;	// idle状態か?
+	LONG lCount = 0;
 	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0)) {
-		if (hModalWnd != 0) {
-			if (IsDialogMessage(hModalWnd, &msg)) {
-				continue;
+	for (;;) {
+		// idle状態でメッセージがない場合
+		while (bIdle) {
+			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+				// メッセージが存在する
+				break;
+			}
+
+			const BOOL continue_idle = OnIdle(lCount++);
+			if (!continue_idle) {
+				// FALSEが戻ってきたらidle処理は不要
+				bIdle = FALSE;
+				break;
 			}
 		}
 
-		bool message_processed = false;
+		// メッセージが空になるまで処理する
+		for(;;) {
+			// メッセージが何もない場合、GetMessage()でブロックすることがある
+			if (::GetMessage(&msg, NULL, 0, 0) == FALSE) {
+				// WM_QUIT
+				goto exit_message_loop;
+			}
 
-		if (m_pMainWnd->m_hAccel != NULL) {
-			if (!MetaKey(ts.MetaKey)) {
-				// matakeyが押されていない
-				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
-					// アクセラレーターキーを処理した
-					message_processed = true;
+			if (hModalWnd == 0 ||
+				::IsDialogMessage(hModalWnd, &msg) == FALSE)
+			{
+				bool message_processed = false;
+
+				if (m_pMainWnd->m_hAccel != NULL) {
+					if (!MetaKey(ts.MetaKey)) {
+						// matakeyが押されていない
+						if (::TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
+							// アクセラレーターキーを処理した
+							message_processed = true;
+						}
+					}
+				}
+
+				if (!message_processed) {
+					::TranslateMessage(&msg);
+					::DispatchMessage(&msg);
 				}
 			}
-		}
 
-		if (!message_processed) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
-			// メッセージがない
-			if (!OnIdle(lCount)) {
-				// idle不要
-				if (SleepTick < 500) {	// 最大 501ms未満
-					SleepTick += 2;
-				}
+			// idle状態に入るか?
+			if (IsIdleMessage(&msg)) {
+				bIdle = TRUE;
 				lCount = 0;
-				Sleep(SleepTick);
-			} else {
-				// 要idle
-				SleepTick = 0;
-				lCount++;
+			}
+
+			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+				// メッセージがなくなった
+				break;
 			}
 		}
 	}
+exit_message_loop:
+
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;
 
 	UnloadSpecialFont();
 	DLLExit();
 
-    return msg.wParam;
+    return (int)msg.wParam;
 }
