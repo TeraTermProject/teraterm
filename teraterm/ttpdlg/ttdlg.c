@@ -57,8 +57,6 @@
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
 
-//#include "compat_w95.h"
-
 #ifdef _DEBUG
 #define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p)       _free_dbg((p), _NORMAL_BLOCK)
@@ -75,10 +73,9 @@
 #define EndDialog(p1,p2) \
 	TTEndDialog(p1, p2)
 
-//static HANDLE hInst;
 extern HANDLE hInst;
 
-char UILanguageFile[MAX_PATH];
+static char UILanguageFile[MAX_PATH];
 
 static const char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 static PCHAR NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
@@ -2552,7 +2549,7 @@ static int get_sel_lang_ui(char **list, char *selstr)
 	return (n + 1);  // 1origin
 }
 
-static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_GEN_TITLE" },
@@ -2680,7 +2677,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_WINLIST_TITLE" },
@@ -2917,7 +2914,7 @@ BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_GENDLG),
-		                     WndParent, (DLGPROC)&GenDlg, (LPARAM)ts);
+		                     WndParent, GenDlg, (LPARAM)ts);
 }
 
 BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
@@ -2927,7 +2924,7 @@ BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_WINLISTDLG),
 		                     WndParent,
-		                     (DLGPROC)&WinListDlg, (LPARAM)Close);
+							 WinListDlg, (LPARAM)Close);
 }
 
 BOOL WINAPI _TTDLGSetUILanguageFile(char *file)
@@ -2935,28 +2932,3 @@ BOOL WINAPI _TTDLGSetUILanguageFile(char *file)
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 	return TRUE;
 }
-
-#if 0
-BOOL WINAPI DllMain(HANDLE hInstance,
-                    ULONG ul_reason_for_call,
-                    LPVOID lpReserved)
-{
-	hInst = hInstance;
-	switch (ul_reason_for_call) {
-		case DLL_THREAD_ATTACH:
-			/* do thread initialization */
-			break;
-		case DLL_THREAD_DETACH:
-			/* do thread cleanup */
-			break;
-		case DLL_PROCESS_ATTACH:
-			/* do process initialization */
-			DoCover_IsDebuggerPresent();
-			break;
-		case DLL_PROCESS_DETACH:
-			/* do process cleanup */
-			break;
-	}
-	return TRUE;
-}
-#endif
