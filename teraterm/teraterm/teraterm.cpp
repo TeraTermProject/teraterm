@@ -249,17 +249,17 @@ HWND GetHWND()
 	return main_window;
 }
 
-static HWND hModalWnd;
+static HWND hModelessDlg;
 
-void AddModalHandle(HWND hWnd)
+void AddModelessHandle(HWND hWnd)
 {
-	hModalWnd = hWnd;
+	hModelessDlg = hWnd;
 }
 
-void RemoveModalHandle(HWND hWnd)
+void RemoveModelessHandle(HWND hWnd)
 {
 	(void)hWnd;
-	hModalWnd = 0;
+	hModelessDlg = 0;
 }
 
 static UINT nMsgLast;
@@ -339,8 +339,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				goto exit_message_loop;
 			}
 
-			if (hModalWnd == 0 ||
-				::IsDialogMessage(hModalWnd, &msg) == FALSE)
+			if (hModelessDlg == 0 ||
+				::IsDialogMessage(hModelessDlg, &msg) == FALSE)
 			{
 				bool message_processed = false;
 
