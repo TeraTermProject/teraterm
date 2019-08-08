@@ -1,4 +1,4 @@
 CALL buildoniguruma6.bat
 CALL buildzlib.bat
-CALL buildopenssl.bat
+CALL buildlibressl.bat
 CALL buildSFMT.bat
