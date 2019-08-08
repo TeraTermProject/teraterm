@@ -2057,7 +2057,7 @@ WORD TTLFileStrSeek2()
 		// ファイルの1バイト目がヒットすると、ファイルポインタが突き破って
 		// INVALID_SET_FILE_POINTER になるので、
 		// ゼロオフセットになるように調整する。(2008.10.10 yutaka)
-		if (pos == INVALID_SET_FILE_POINTER) 
+		if (pos2 == INVALID_SET_FILE_POINTER)
 			_llseek(FH, 0, 0);
 		SetResult(1);
 	} else {
