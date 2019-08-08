@@ -554,17 +554,15 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 		hInstance, lpTemplate, hParent,
 		dlgproc, (LPARAM)this);
 	pseudoPtr = nullptr;
+#if defined(REWRITE_TEMPLATE)
+	free(lpTemplate);
+#endif
 	if (hWnd == nullptr)
 	{
 		assert(false);
 		return FALSE;
 	}
-
 	m_hWnd = hWnd;
-	m_hInst = hInstance;
-//	::EnableWindow(hParent,FALSE);
-//	::ShowWindow(hWnd, SW_SHOW);		// TODO ŠO‚Å‚â‚é‚Ì‚ª—Ç‚³‚»‚¤
-//	::EnableWindow(m_hWnd,TRUE);
 
 	return TRUE;
 }
