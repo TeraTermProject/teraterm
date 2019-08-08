@@ -1,11 +1,16 @@
 #ifndef _SSLLIB_h_
 #define _SSLLIB_h_
 
+#ifdef OPENSSL_VERSION_MAJOR
+// OpenSSL 3.0.0ではOPENSSL_VERSION_MAJOR, OPENSSL_VERSION_MINOR, 
+// OPENSSL_VERSION_PATCH がデフォルトで定義される。
+#else
 #define OPENSSL_VERSION_MAJOR    (OPENSSL_VERSION_NUMBER & 0xf0000000L) >> 28
 #define OPENSSL_VERSION_MINOR    (OPENSSL_VERSION_NUMBER & 0x0ff00000L) >> 20
 #define OPENSSL_VERSION_FIX      (OPENSSL_VERSION_NUMBER & 0x000ff000L) >> 12
 #define OPENSSL_VERSION_PATCH    (OPENSSL_VERSION_NUMBER & 0x00000ff0L) >> 4
 #define OPENSSL_VERSION_STATUS   (OPENSSL_VERSION_NUMBER & 0x0000000fL)
+#endif
 
 #define DECLARE_MODULE_API(module, rettype, apiname, arglist, args) \
 rettype apiname arglist {                                     \
