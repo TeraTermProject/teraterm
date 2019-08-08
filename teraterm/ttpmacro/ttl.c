@@ -1651,14 +1651,16 @@ WORD TTLFileOpen()
 WORD TTLFileLock()
 {
 	WORD Err;
-	int FH;
+	HANDLE FH;
+	int fhi;
 	DWORD timeout;
 	int result;
 	BOOL ret;
 	DWORD dwStart;
 
 	Err = 0;
-	GetIntVal(&FH,&Err);
+	GetIntVal(&fhi,&Err);
+	FH = HandleGet(fhi);
 	if (Err!=0) return Err;
 
 	timeout = -1;  // 無限大
@@ -1670,7 +1672,7 @@ WORD TTLFileLock()
 	result = 1;  // error
 	dwStart = GetTickCount();
 	do {
-		ret = LockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
+		ret = LockFile(FH, 0, 0, (DWORD)-1, (DWORD)-1);
 		if (ret != 0) { // ロック成功
 			result = 0;  // success
 			break;
@@ -1687,16 +1689,18 @@ WORD TTLFileLock()
 WORD TTLFileUnLock()
 {
 	WORD Err;
-	int FH;
+	HANDLE FH;
+	int fhi;
 	BOOL ret;
 
 	Err = 0;
-	GetIntVal(&FH,&Err);
+	GetIntVal(&fhi,&Err);
+	FH = HandleGet(fhi);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	ret = UnlockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
+	ret = UnlockFile(FH, 0, 0, (DWORD)-1, (DWORD)-1);
 	if (ret != 0) { // アンロック成功
 		SetResult(0);
 	} else {
