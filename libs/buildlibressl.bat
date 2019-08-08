@@ -70,9 +70,9 @@ goto vsend
 :vsend
 
 
-cmake -G "%CMAKE_GENERATOR%"
+cmake -G "%CMAKE_GENERATOR%" -A Win32
 perl -pi.bak -e "s/MD/MT/g" CMakeCache.txt
-cmake -G "%CMAKE_GENERATOR%"
+cmake -G "%CMAKE_GENERATOR%" -A Win32
 
 :build_debug
 IF EXIST crypto\Debug\crypto.lib GOTO build_release
