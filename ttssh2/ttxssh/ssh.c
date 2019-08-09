@@ -6825,8 +6825,9 @@ static void start_ssh_heartbeat_thread(PTInstVar pvar)
 
 	// TTSSHは thread-safe ではないのでスレッド内からのパケット送信は不可。(2007.12.26 yutaka)
 	thread = (HANDLE)_beginthreadex(NULL, 0, ssh_heartbeat_thread, pvar, 0, &tid);
-	if (thread == (HANDLE)-1) {
+	if (thread == 0) {
 		// TODO:
+		thread = INVALID_HANDLE_VALUE;
 	}
 	pvar->ssh_heartbeat_thread = thread;
 }
@@ -8436,8 +8437,9 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		}
 
 		thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_thread, c, 0, &tid);
-		if (thread == (HANDLE)-1) {
+		if (thread == 0) {
 			// TODO:
+			thread = INVALID_HANDLE_VALUE;
 		}
 		c->scp.thread = thread;
 
@@ -8697,8 +8699,9 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			ssh2_scp_alloc_packetlist(c);
 			thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_receive_thread, c, 0, &tid);
-			if (thread == (HANDLE)-1) {
+			if (thread == 0) {
 				// TODO:
+				thread = INVALID_HANDLE_VALUE;
 			}
 			c->scp.thread = thread;
 			c->scp.thread_id = tid;

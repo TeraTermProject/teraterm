@@ -515,7 +515,7 @@ void OutputDebugPrintf(char *fmt, ...) {
 <pre class=code>
 #define WM_SEND_HEARTBEAT (WM_USER + 1)
 
-static LRESULT CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 
 	switch (msg) {
@@ -566,11 +566,12 @@ void TelStartKeepAliveThread() {
   if (ts.TelKeepAliveInterval > 0) {
     nop_interval = ts.TelKeepAliveInterval;
 
-	keepalive_dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
-               HVTWin, (DLGPROC)telnet_heartbeat_dlg_proc);
+    keepalive_dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+               HVTWin, telnet_heartbeat_dlg_proc);
 
     keepalive_thread = (HANDLE)_beginthreadex(NULL, 0, TelKeepAliveThread, NULL, 0, &tid);
-    if (keepalive_thread == (HANDLE)-1) {
+    if (keepalive_thread == 0) {
+      keepalive_thread = INVALID_HANDLE_VALUE;
       nop_interval = 0;
     }
   }

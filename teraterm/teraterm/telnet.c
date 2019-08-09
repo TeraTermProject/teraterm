@@ -862,7 +862,8 @@ void TelStartKeepAliveThread() {
 										HVTWin, telnet_heartbeat_dlg_proc);
 
 		keepalive_thread = (HANDLE)_beginthreadex(NULL, 0, TelKeepAliveThread, NULL, 0, &tid);
-		if (keepalive_thread == (HANDLE)-1) {
+		if (keepalive_thread == 0) {
+			keepalive_thread = INVALID_HANDLE_VALUE;
 			nop_interval = 0;
 		}
 	}
