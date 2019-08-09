@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -565,7 +565,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		if (LogVar != NULL)
 		{
 			DWORD wrote;
-			WriteFile((HANDLE)LogVar->FileHandle, ParamFileName, strlen(ParamFileName), &wrote, NULL);
+			WriteFile(LogVar->FileHandle, ParamFileName, strlen(ParamFileName), &wrote, NULL);
 			LogVar->ByteCount =
 				LogVar->ByteCount + strlen(ParamFileName);
 			FLogRefreshNum();

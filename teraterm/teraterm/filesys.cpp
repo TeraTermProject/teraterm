@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -428,7 +428,7 @@ static void CloseFileSync(PFileVar ptr)
 	if (!ptr->FileOpen)
 		return;
 
-	if (ptr->LogThread != (HANDLE)-1) {
+	if (ptr->LogThread != INVALID_HANDLE_VALUE) {
 		// スレッドの終了待ち
 		ret = PostThreadMessage(ptr->LogThreadId, WM_QUIT, 0, 0);
 		if (ret != 0) {
@@ -439,9 +439,9 @@ static void CloseFileSync(PFileVar ptr)
 			code = GetLastError();
 		}
 		CloseHandle(ptr->LogThread);
-		ptr->LogThread = (HANDLE)-1;
+		ptr->LogThread = INVALID_HANDLE_VALUE;
 	}
-	CloseHandle((HANDLE)ptr->FileHandle);
+	CloseHandle(ptr->FileHandle);
 }
 
 // 遅延書き込み用スレッド
@@ -465,7 +465,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 			case WM_DPC_LOGTHREAD_SEND:
 				buf = (PCHAR)msg.wParam;
 				buflen = (DWORD)msg.lParam;
-				WriteFile((HANDLE)LogVar->FileHandle, buf, buflen, &wrote, NULL);
+				WriteFile(LogVar->FileHandle, buf, buflen, &wrote, NULL);
 				free(buf);   // ここでメモリ解放
 				break;
 
@@ -689,7 +689,7 @@ BOOL LogStart()
 	// 最初のファイルが設定したサイズでローテートしない問題の修正。
 	// (2016.4.9 yutaka)
 	if (LogVar->RotateMode != ROTATE_NONE) {
-		size = GetFileSize((HANDLE)LogVar->FileHandle, NULL);
+		size = GetFileSize(LogVar->FileHandle, NULL);
 		if (size != -1)
 			LogVar->ByteCount = size;
 	}
@@ -736,8 +736,8 @@ BOOL LogStart()
 				PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)pbuf, size + 2);
 			} else { // 直書き。ネットワーク経由だと遅い。
 #endif
-				WriteFile((HANDLE)LogVar->FileHandle, buf, size, &written_size, NULL);
-				WriteFile((HANDLE)LogVar->FileHandle, crlf, crlf_len, &written_size, NULL);
+				WriteFile(LogVar->FileHandle, buf, size, &written_size, NULL);
+				WriteFile(LogVar->FileHandle, crlf, crlf_len, &written_size, NULL);
 #if 0
 			}
 #endif
@@ -846,8 +846,8 @@ void CommentLogToFile(char *buf, int size)
 	}
 
 	logfile_lock();
-	WriteFile((HANDLE)LogVar->FileHandle, buf, size, &wrote, NULL);
-	WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &wrote, NULL); // 改行
+	WriteFile(LogVar->FileHandle, buf, size, &wrote, NULL);
+	WriteFile(LogVar->FileHandle, "\r\n", 2, &wrote, NULL); // 改行
 	/* Set Line End Flag
 		2007.05.24 Gentaro
 	*/
@@ -1054,9 +1054,9 @@ void LogToFile()
 						strtime = strelapsed(cv.ConnectedTime);
 						break;
 					}
-					WriteFile((HANDLE)LogVar->FileHandle, "[", 1, &wrote, NULL);
-					WriteFile((HANDLE)LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
-					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);
+					WriteFile(LogVar->FileHandle, "[", 1, &wrote, NULL);
+					WriteFile(LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
+					WriteFile(LogVar->FileHandle, "] ", 2, &wrote, NULL);
 				}
 
 				/* 2007.05.24 Gentaro */
@@ -1067,7 +1067,7 @@ void LogToFile()
 					eLineEnd = Line_Other; /* clear endmark*/
 				}
 
-				WriteFile((HANDLE)LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
+				WriteFile(LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
 				(LogVar->ByteCount)++;
 			}
 		}
@@ -1305,7 +1305,7 @@ void FileSendBinayBoost()
 
 	do {
 		if (FileSendHandler.pos == FileSendHandler.end) {
-			ReadFile((HANDLE)SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
+			ReadFile(SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
 			FileSendHandler.pos = 0;
 			FileSendHandler.end = fc;
@@ -1384,12 +1384,12 @@ void FileSend()
 			}
 		}
 		else if (! FileReadEOF) {
-			ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
+			ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
 			SendVar->ByteCount = SendVar->ByteCount + fc;
 
 			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
-				ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
+				ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 				fc = LOWORD(read_bytes);
 				SendVar->ByteCount = SendVar->ByteCount + fc;
 			}

@@ -69,7 +69,7 @@ typedef TelRec *PTelRec;
 
 static TelRec tr;
 
-static HANDLE keepalive_thread = (HANDLE)-1L;
+static HANDLE keepalive_thread = INVALID_HANDLE_VALUE;
 static HWND keepalive_dialog = NULL;
 int nop_interval = 0;
 
@@ -796,7 +796,7 @@ void TelSendNOP()
 
 #define WM_SEND_HEARTBEAT (WM_USER + 1)
 
-static LRESULT CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -857,9 +857,9 @@ void TelStartKeepAliveThread() {
 	if (ts.TelKeepAliveInterval > 0) {
 		nop_interval = ts.TelKeepAliveInterval;
 
-	// モードレスダイアログを追加 (2007.12.26 yutaka)
-	keepalive_dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
-	                                HVTWin, (DLGPROC)telnet_heartbeat_dlg_proc);
+		// モードレスダイアログを追加 (2007.12.26 yutaka)
+		keepalive_dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+										HVTWin, telnet_heartbeat_dlg_proc);
 
 		keepalive_thread = (HANDLE)_beginthreadex(NULL, 0, TelKeepAliveThread, NULL, 0, &tid);
 		if (keepalive_thread == (HANDLE)-1) {
@@ -869,11 +869,11 @@ void TelStartKeepAliveThread() {
 }
 
 void TelStopKeepAliveThread() {
-	if (keepalive_thread != (HANDLE)-1L) {
+	if (keepalive_thread != INVALID_HANDLE_VALUE) {
 		nop_interval = 0;
 		WaitForSingleObject(keepalive_thread, INFINITE);
 		CloseHandle(keepalive_thread);
-		keepalive_thread = (HANDLE)-1L;
+		keepalive_thread = INVALID_HANDLE_VALUE;
 
 		DestroyWindow(keepalive_dialog);
 	}
@@ -881,9 +881,9 @@ void TelStopKeepAliveThread() {
 
 void TelUpdateKeepAliveInterval() {
 	if (cv.Open && cv.TelFlag && ts.TCPPort==ts.TelPort) {
-		if (ts.TelKeepAliveInterval > 0 && keepalive_thread == (HANDLE)-1)
+		if (ts.TelKeepAliveInterval > 0 && keepalive_thread == INVALID_HANDLE_VALUE)
 			TelStartKeepAliveThread();
-		else if (ts.TelKeepAliveInterval == 0 && keepalive_thread != (HANDLE)-1)
+		else if (ts.TelKeepAliveInterval == 0 && keepalive_thread != INVALID_HANDLE_VALUE)
 			TelStopKeepAliveThread();
 		else
 			nop_interval = ts.TelKeepAliveInterval;

@@ -218,7 +218,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 	if (type == TYPE_SCP) {
 		c->scp.state = SCP_INIT;
 		c->scp.progress_window = NULL;
-		c->scp.thread = (HANDLE)-1;
+		c->scp.thread = INVALID_HANDLE_VALUE;
 		c->scp.localfp = NULL;
 		c->scp.filemtime = 0;
 		c->scp.fileatime = 0;
@@ -345,10 +345,10 @@ static void ssh2_channel_delete(Channel_t *c)
 			DestroyWindow(c->scp.progress_window);
 			c->scp.progress_window = NULL;
 		}
-		if (c->scp.thread != (HANDLE)-1L) {
+		if (c->scp.thread != INVALID_HANDLE_VALUE) {
 			WaitForSingleObject(c->scp.thread, INFINITE);
 			CloseHandle(c->scp.thread);
-			c->scp.thread = (HANDLE)-1L;
+			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
 		ssh2_scp_free_packetlist(c);
@@ -6813,7 +6813,7 @@ static unsigned __stdcall ssh_heartbeat_thread(void *p)
 
 static void start_ssh_heartbeat_thread(PTInstVar pvar)
 {
-	HANDLE thread = (HANDLE)-1;
+	HANDLE thread = INVALID_HANDLE_VALUE;
 	unsigned tid;
 	HWND hDlgWnd;
 
@@ -6834,10 +6834,10 @@ static void start_ssh_heartbeat_thread(PTInstVar pvar)
 // ƒXƒŒƒbƒh‚Ì’âŽ~ (2004.12.27 yutaka)
 void halt_ssh_heartbeat_thread(PTInstVar pvar)
 {
-	if (pvar->ssh_heartbeat_thread != (HANDLE)-1L) {
+	if (pvar->ssh_heartbeat_thread != INVALID_HANDLE_VALUE) {
 		WaitForSingleObject(pvar->ssh_heartbeat_thread, INFINITE);
 		CloseHandle(pvar->ssh_heartbeat_thread);
-		pvar->ssh_heartbeat_thread = (HANDLE)-1L;
+		pvar->ssh_heartbeat_thread = INVALID_HANDLE_VALUE;
 
 		DestroyWindow(pvar->ssh_hearbeat_dialog);
 	}
