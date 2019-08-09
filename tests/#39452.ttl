@@ -1,0 +1,21 @@
+filetruncate '#39452-1:.txt'
+messagebox result 'invalid file name'
+
+filetruncate '#39452-1.txt' 'string'
+messagebox result 'invalid file size'
+
+; file is not exist
+filetruncate '#39452-1.txt' 10
+messagebox result 'success'
+
+; invalid file path
+filetruncate 'aa:\#39452-1.txt' 10
+messagebox result 'invalid file path'
+
+; file is exist but cannot open with write mode
+filecreate fp '#39452-1.txt'
+filetruncate '#39452-1.txt' 10
+messagebox result 'cannot open with write mode'
+fileclose fp
+
+filedelete '#39452-1.txt'

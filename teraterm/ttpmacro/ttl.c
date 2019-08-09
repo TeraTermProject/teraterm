@@ -2096,16 +2096,14 @@ WORD TTLFileTruncate()
 	}
 
 	// ファイルを指定したサイズで切り詰める。
-   ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
-   if (ret != 0) {
-		Err = ErrCantOpen;
+	ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
+	if (ret != 0) {
 		goto end;
-   }
-   ret = _chsize_s(fh, TruncByte);
-   if (ret != 0) {
-		Err = ErrInvalidCtl;
+	}
+	ret = _chsize_s(fh, TruncByte);
+	if (ret != 0) {
 		goto end;
-   }
+	}
 
 	result = 0;
 	Err = 0;
