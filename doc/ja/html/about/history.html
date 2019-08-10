@@ -36,7 +36,7 @@
   <li>変更
     <ul>
       <li><a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで、ファイルが開けない場合にエラーにならないようにした。Ver 4.102での変更を元に戻した。</li>
-	  <li><a href="../macro/command/filetruncate.html">filetruncate</a> マクロコマンドがでファルが開けない場合・ファイルサイズの変更に失敗した場合エラーにならないようにした。</li>
+      <li><a href="../macro/command/filetruncate.html">filetruncate</a> マクロコマンドがでファルが開けない場合・ファイルサイズの変更に失敗した場合エラーにならないようにした。</li>
       <li>IMEの未確定文字のフォントが指定フォントと同一になるようにした。</li>
     </ul>
   </li>
@@ -48,8 +48,9 @@
       <li>IMEの未確定文字を表示している状態でフォント選択ダイアログを使用するとIMEのフォントが変化する問題を修正した。</li>
       <li><a href="../macro/command/filecopy.html">filecopy</a> マクロコマンドの結果が result システム変数に格納されないことがある問題を修正した。</li>
       <li>[File]/[Send file..]から大きなファイルをうまく送信できない問題を修正した。4.103でのエンバグ。</li>
-	  <li><a href="../macro/command/filelock.html">filelock</a>, <a href="../macro/command/fileunlock.html">fileunlock</a> マクロコマンドが常に失敗していた。4.101でのエンバグ。</li>
+      <li><a href="../macro/command/filelock.html">filelock</a>, <a href="../macro/command/fileunlock.html">fileunlock</a> マクロコマンドが常に失敗していた。4.101でのエンバグ。</li>
       <li><a href="../macro/command/filestrseek2.html">filestrseek2</a>マクロコマンドで、ファイルの1バイト目が一致したとき、ファイルポインタが先頭になっていなかった問題を修正した。4.101でのエンバグ。</li>
+      <li>印字中止ダイアログが出なくなっていた問題を修正した。4.103でのエンバグ。</li>
     </ul>
   </li>
 
