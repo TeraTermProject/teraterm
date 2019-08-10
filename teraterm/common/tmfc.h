@@ -146,7 +146,7 @@ public:
 	virtual BOOL PostNcDestroy();
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 
-	static LRESULT CALLBACK DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static INT_PTR CALLBACK DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static LRESULT CALLBACK WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 private:
 

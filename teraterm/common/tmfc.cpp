@@ -516,13 +516,13 @@ INT_PTR TTCDialog::DoModal(HINSTANCE hInstance, HWND hParent, int idd)
 		TTDialogBoxParam(hInstance,
 						 MAKEINTRESOURCE(idd),
 						 hParent,
-						 (DLGPROC)&DlgProcStub, (LPARAM)this);
+						 &DlgProcStub, (LPARAM)this);
 #else
 	INT_PTR result =
 		DialogBoxParam(hInstance,
 					   MAKEINTRESOURCE(idd),
 					   hParent,
-					   (DLGPROC)&DlgProcStub, (LPARAM)this);
+					   &DlgProcStub, (LPARAM)this);
 #endif
 	pseudoPtr = nullptr;
 	return result;
@@ -542,7 +542,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);
 	DLGTEMPLATE *lpTemplate = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
 #endif
-	DLGPROC dlgproc = (DLGPROC)DlgProcStub;
+	DLGPROC dlgproc = DlgProcStub;
 	const wchar_t *dialog_class = TTGetClassName(lpTemplate);
 	if (dialog_class != nullptr) {
 		// Modaless Dialog & Dialog application
@@ -571,7 +571,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
  * @retval	TRUE	メッセージを処理した時
  * @retval	FALSE	メッセージを処理しなかった時
  */
-LRESULT CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+INT_PTR CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	TTCDialog *self = (TTCDialog *)::GetWindowLongPtr(hWnd, DWLP_USER);
 	if (self == nullptr) {
