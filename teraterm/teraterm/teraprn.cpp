@@ -32,6 +32,7 @@
 #include "tttypes.h"
 #include <commdlg.h>
 #include <stdio.h>
+#include <crtdbg.h>
 
 #include "ttwinman.h"
 #include "commlib.h"
@@ -45,13 +46,11 @@
 
 #include "teraprn.h"
 
-#if 0 //def _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
+#ifdef _DEBUG
+#if defined(_MSC_VER)
+#define new		::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
-#define CWnd TTCWnd
+#endif
 
 static PRINTDLG PrnDlg;
 

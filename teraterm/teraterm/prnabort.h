@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2018 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@
 class CPrnAbortDlg
 {
 public:
-	HWND m_hWnd;
 	HWND GetSafeHwnd() const {return m_hWnd;}
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
 	BOOL DestroyWindow();
@@ -44,6 +43,7 @@ public:
 private:
 	void OnCancel();
 	void PostNcDestroy();
+	HWND m_hWnd;
 	HWND m_hParentWnd;
 	BOOL *m_pAbort;
 	TTTSet *m_ts;
