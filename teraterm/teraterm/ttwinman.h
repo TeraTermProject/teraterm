@@ -55,7 +55,6 @@ extern TTTSet ts;
 extern TComVar cv;
 
 /* pointers to window objects */
-extern void* pVTWin;
 extern void* pTEKWin;
 /* instance handle */
 extern HINSTANCE hInst;
