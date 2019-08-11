@@ -167,7 +167,6 @@
 #define IDC_TRANS_ELAPSED               2527
 #define IDC_BGIMG_LABEL                 2527
 #define IDC_TRANS_ETIME                 2528
-#define IDC_BUTTON1                     2528
 #define IDC_BGIMG_BUTTON                2528
 #define IDC_INI_SETUPDIR_BUTTON         2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
@@ -237,6 +236,7 @@
 #define IDC_SAME_PROCESS_NEXTDROP_CHECK 2586
 #define IDC_DONTSHOW_CHECK              2587
 #define IDC_DAD_NOTE                    2588
+#define IDC_SELECT_ON_ACTIVATE          2589
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003

@@ -118,7 +118,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,130,220,10
 END
 
-IDD_TABSHEET_COPYPASTE DIALOGEX 0, 0, 258, 188
+IDD_TABSHEET_COPYPASTE DIALOGEX 0, 0, 258, 194
 STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_SYSMENU
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
@@ -143,6 +143,7 @@ BEGIN
     LTEXT           "P&aste delay per line",IDC_PASTEDELAY_LABEL,11,160,70,10
     EDITTEXT        IDC_PASTEDELAY_EDIT,95,158,24,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "ms",IDC_PASTEDELAY_LABEL2,123,160,23,10
+    CONTROL         "Disa&bling text selection when the window is activated",IDC_SELECT_ON_ACTIVATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,173,200,10
 END
 
 IDD_TABSHEET_VISUAL DIALOGEX 0, 0, 258, 188
@@ -395,7 +396,7 @@ BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 252
         TOPMARGIN, 5
-        BOTTOMMARGIN, 185
+        BOTTOMMARGIN, 191
     END
 
     IDD_TABSHEET_VISUAL, DIALOG
@@ -577,11 +578,11 @@ BEGIN
     BEGIN
         MENUITEM "&Terminal...",                ID_SETUP_TERMINAL
         MENUITEM "&Window...",                  ID_SETUP_WINDOW
-		POPUP "&Font"
+        POPUP "&Font"
         BEGIN
-			MENUITEM "&Font...",                ID_SETUP_FONT
-			MENUITEM "&Dialog Font...",         ID_SETUP_DLG_FONT
-	END
+            MENUITEM "&Font...",                    ID_SETUP_FONT
+            MENUITEM "&Dialog Font...",             ID_SETUP_DLG_FONT
+        END
         MENUITEM "&Keyboard...",                ID_SETUP_KEYBOARD
         MENUITEM "S&erial port...",             ID_SETUP_SERIALPORT
         MENUITEM "T&CP/IP...",                  ID_SETUP_TCPIP

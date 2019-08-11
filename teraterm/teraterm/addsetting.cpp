@@ -427,7 +427,8 @@ void CCopypastePropPageDlg::OnInitDialog()
 		{ IDC_CONFIRM_STRING_FILE_LABEL, "DLG_TAB_COPYPASTE_STRINGFILE" },
 		{ IDC_DELIMITER, "DLG_TAB_COPYPASTE_DELIMITER" },
 		{ IDC_PASTEDELAY_LABEL, "DLG_TAB_COPYPASTE_PASTEDELAY" },
-		{ IDC_PASTEDELAY_LABEL2, "DLG_TAB_COPYPASTE_PASTEDELAY2" }
+		{ IDC_PASTEDELAY_LABEL2, "DLG_TAB_COPYPASTE_PASTEDELAY2" },
+		{ IDC_SELECT_ON_ACTIVATE, "DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE" }
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
@@ -478,6 +479,9 @@ void CCopypastePropPageDlg::OnInitDialog()
 	char buf[64];
 	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
 	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
+
+	// (11) SelectOnActivate
+	SetCheck(IDC_SELECT_ON_ACTIVATE, ts.SelOnActive ? BST_CHECKED : BST_UNCHECKED);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
@@ -598,6 +602,9 @@ void CCopypastePropPageDlg::OnOK()
 	ts.PasteDelayPerLine =
 		(val < 0) ? 0 :
 		(val > 5000) ? 5000 : val;
+
+	// (11) SelectOnActivate
+	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
 }
 
 
