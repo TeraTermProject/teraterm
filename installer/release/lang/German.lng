@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-10)
+; Updated by TeraTerm Project (2019-08-11)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -226,6 +226,7 @@ DLG_TAB_COPYPASTE_STRINGFILE=&String file
 DLG_TAB_COPYPASTE_DELIMITER=&Begrenzungszeichen
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Disa&bling text selection when the window is activated
 
 DLG_TAB_VISUAL_ALPHA=&Transparenz
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active

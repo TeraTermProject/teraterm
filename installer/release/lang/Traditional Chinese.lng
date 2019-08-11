@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-06-10)
+; Updated by TeraTerm Project (2019-08-11)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -226,6 +226,7 @@ DLG_TAB_COPYPASTE_STRINGFILE=關鍵字文件(&S)
 DLG_TAB_COPYPASTE_DELIMITER=分隔符(&I)
 DLG_TAB_COPYPASTE_PASTEDELAY=貼上時隔行延時(&A)
 DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Disa&bling text selection when the window is activated
 
 DLG_TAB_VISUAL_ALPHA=透明度
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
