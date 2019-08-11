@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -89,8 +89,6 @@ INT_PTR TTDialogBox(
 	DLGPROC lpDialogFunc);
 void SetDialogFont(const char *FontName, int FontHeight, int FontCharSet,
 				   const char *UILanguageFile, const char *Section, const char *Key);
-HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-				  const char *UILanguageFile, PCHAR key);
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
 int GetFontPointFromPixel(HWND hWnd, int pixel);
 int GetFontPixelFromPoint(HWND hWnd, int point);

@@ -390,8 +390,8 @@ typedef struct {
 	BYTE charset;
 } IsExistFontInfoA;
 
-int CALLBACK IsExistFontSubA(
-	ENUMLOGFONTA* lpelf, NEWTEXTMETRICA* lpntm,
+static int CALLBACK IsExistFontSubA(
+	const ENUMLOGFONTA* lpelf, const NEWTEXTMETRICA* lpntm,
 	int nFontType, LPARAM lParam)
 {
 	IsExistFontInfoA *info = (IsExistFontInfoA *)lParam;
@@ -435,22 +435,3 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	ReleaseDC(NULL, hDC);
 	return info.found;
 }
-
-HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-                  const char *UILanguageFile, PCHAR key)
-{
-	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
-	LOGFONT logfont;
-	HFONT hNewFont;
-	if (key == NULL) key = "DLG_TAHOMA_FONT";
-	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
-	if (get_lang_font(key, hDlg, &logfont, &hNewFont, UILanguageFile)) {
-		int i;
-		for (i = 0 ; i < nIDDlgItemCount ; i++) {
-			const int nIDDlgItem = nIDDlgItems[i];
-			SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE,0));
-		}
-	}
-	return hNewFont;
-}
-
