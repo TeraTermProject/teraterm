@@ -3877,11 +3877,11 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		switch (LOWORD(wParam)) {
-		case IDOK:
+		case IDOK:  // ファイル送信
 			hWnd = GetDlgItem(dlg, IDC_SENDFILE_EDIT);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfile), (LPARAM)sendfile);
 			if (sendfile[0] != '\0') {
-				// 送信パスを取り出し、teraterm.ini も合わせて更新する。
+				// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
 				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
 				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
 				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
@@ -3894,12 +3894,12 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			return FALSE;
 
 		case IDCANCEL:
-			// 送信パスを取り出し、teraterm.ini も合わせて更新する。
+			// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
 			hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
 			strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
 
-			// 受信パスに関しても更新する。(2013.8.18 yutaka)
+			// 受信パスを取り出し、ts->FileDir も合わせて更新する。
 			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
 			strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
