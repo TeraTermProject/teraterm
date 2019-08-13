@@ -318,8 +318,10 @@ BOOL NewFileVar(PFileVar *fv)
 		*fv = (PFileVar)malloc(sizeof(TFileVar));
 		if ((*fv)!=NULL)
 		{
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 			memset(*fv, 0, sizeof(TFileVar));
-			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName),ts.FileDir, _TRUNCATE);
+			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName), FileDirExpanded, _TRUNCATE);
 			AppendSlash((*fv)->FullName,sizeof((*fv)->FullName));
 			(*fv)->DirLen = strlen((*fv)->FullName);
 			(*fv)->FileOpen = FALSE;
@@ -490,6 +492,7 @@ BOOL LogStart()
 	char buf[512];
 	const char *crlf = "\r\n";
 	DWORD crlf_len = 2;
+	char FileDirExpanded[MAX_PATH];
 
 	if ((FileLog) || (BinLog)) return FALSE;
 
@@ -505,7 +508,8 @@ BOOL LogStart()
 		logdir = ts.LogDefaultPath;
 	}
 	else if (strlen(ts.FileDir) > 0) {
-		logdir = ts.FileDir;
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+		logdir = FileDirExpanded;
 	}
 	else {
 		logdir = ts.HomeDir;
@@ -1174,11 +1178,13 @@ void FileSendStart()
 
 	FSend = TRUE;
 
-	if (strlen(&(SendVar->FullName[SendVar->DirLen]))==0) {
+	if (strlen(&(SendVar->FullName[SendVar->DirLen])) == 0) {
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		if (ts.TransBin)
 			Option |= LOGDLG_BINARY;
 		SendVar->FullName[0] = 0;
-		if (! (*GetTransFname)(SendVar, ts.FileDir, GTF_SEND, &Option)) {
+		if (! (*GetTransFname)(SendVar, FileDirExpanded, GTF_SEND, &Option)) {
 			FileTransEnd(OpSendFile);
 			return;
 		}
@@ -1632,7 +1638,9 @@ void KermitStart(int mode)
 			FileVar->OpId = OpKmtSend;
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_KERMIT,&w) ||
+				char FileDirExpanded[MAX_PATH];
+				ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+				if (!(*GetMultiFname)(FileVar, FileDirExpanded, GMF_KERMIT, &w) ||
 				    (FileVar->NumFname==0))
 				{
 					ProtoEnd();
@@ -1690,9 +1698,11 @@ void XMODEMStart(int mode)
 
 	if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 	{
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
 		if (! (*GetXFname)(FileVar->HMainWin,
-		                   mode==IdXReceive,&Option,FileVar,ts.FileDir))
+		                   mode==IdXReceive,&Option,FileVar,FileDirExpanded))
 		{
 			ProtoEnd();
 			return;
@@ -1769,13 +1779,16 @@ void YMODEMStart(int mode)
 
 	if (mode==IdYSend)
 	{
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+
 		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 		// TODO: "Yopt1K", "YoptG", "YoptSingle"を区別したいならば、IDD_FOPTを拡張する必要あり。
 		Opt = Yopt1K;
 		FileVar->OpId = OpYSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_Y,&Opt) ||
+			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_Y,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1815,7 +1828,9 @@ void ZMODEMStart(int mode)
 		FileVar->OpId = OpZSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_Z,&Opt) ||
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_Z,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				if (mode == IdZAutoS) {
@@ -1852,8 +1867,10 @@ void BPStart(int mode)
 		FileVar->OpId = OpBPSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 			FileVar->FullName[0] = 0;
-			if (! (*GetTransFname)(FileVar, ts.FileDir, GTF_BP, &Option))
+			if (! (*GetTransFname)(FileVar, FileDirExpanded, GTF_BP, &Option))
 			{
 				ProtoEnd();
 				return;
@@ -1886,7 +1903,9 @@ void QVStart(int mode)
 		FileVar->OpId = OpQVSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_QV, &W) ||
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_QV, &W) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();

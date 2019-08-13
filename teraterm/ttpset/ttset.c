@@ -1190,8 +1190,10 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (strlen(ts->FileDir) == 0)
 		GetDownloadFolder(ts->FileDir, sizeof(ts->FileDir));
 	else {
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts->FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		_getcwd(Temp, sizeof(Temp));
-		if (_chdir(ts->FileDir) != 0)
+		if (_chdir(FileDirExpanded) != 0)
 			GetDownloadFolder(ts->FileDir, sizeof(ts->FileDir));
 		_chdir(Temp);
 	}

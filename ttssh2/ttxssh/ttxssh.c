@@ -3919,6 +3919,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				char recvpath[MAX_PATH] = "";
 				char* fn = strrchr(szFileName, '/');
 				char recvfn[sizeof(szFileName)];
+				char recvdir_expanded[MAX_PATH];
 
 				// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
 				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
@@ -3928,6 +3929,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				// 受信パスを取り出し、ts->FileDir も合わせて更新する。
 				hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
 				SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
+				ExpandEnvironmentStrings(recvdir, recvdir_expanded, sizeof(recvdir_expanded));
 				strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
 
 				if (fn) {
@@ -3941,7 +3943,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				}
 				strncpy_s(recvfn, sizeof(recvfn), fn, _TRUNCATE);
 				replaceInvalidFileNameChar(recvfn, '_');
-				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir, recvfn);
+				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir_expanded, recvfn);
 				SSH_scp_transaction(pvar, szFileName, recvpath, FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;

@@ -1829,18 +1829,21 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				case IDOK:
 					CurDir = (PCHAR)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( CurDir!=NULL ) {
+						char FileDirExpanded[MAX_PATH];
 						_getcwd(HomeDir,sizeof(HomeDir));
-						_chdir(CurDir);
+						ExpandEnvironmentStrings(CurDir, FileDirExpanded, sizeof(FileDirExpanded));
+						_chdir(FileDirExpanded);
 						GetDlgItemText(Dialog, IDC_DIRNEW, TmpDir, sizeof(TmpDir));
 						if ( strlen(TmpDir)>0 ) {
-							if (_chdir(TmpDir) != 0) {
+							ExpandEnvironmentStrings(TmpDir, FileDirExpanded, sizeof(FileDirExpanded));
+							if (_chdir(FileDirExpanded) != 0) {
 								get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
 								get_lang_msg("MSG_FIND_DIR_ERROR", uimsg, sizeof(uimsg), "Cannot find directory", UILanguageFile);
 								MessageBox(Dialog,uimsg,uimsg2,MB_ICONEXCLAMATION);
 								_chdir(HomeDir);
 								return TRUE;
 							}
-							_getcwd(CurDir,MAXPATHLEN);
+							strncpy_s(CurDir, MAXPATHLEN, TmpDir, _TRUNCATE);
 						}
 						_chdir(HomeDir);
 					}
@@ -1854,9 +1857,13 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				case IDC_SELECT_DIR:
 					get_lang_msg("DLG_SELECT_DIR_TITLE", uimsg, sizeof(uimsg),
 					             "Select new directory", UILanguageFile);
-					GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
-					if (doSelectFolder(Dialog, buf2, sizeof(buf2), buf, uimsg)) {
-						SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+					{
+						char FileDirExpanded[MAX_PATH];
+						GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
+						ExpandEnvironmentStrings(buf, FileDirExpanded, sizeof(FileDirExpanded));
+						if (doSelectFolder(Dialog, buf2, sizeof(buf2), FileDirExpanded, uimsg)) {
+							SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+						}
 					}
 					return TRUE;
 
