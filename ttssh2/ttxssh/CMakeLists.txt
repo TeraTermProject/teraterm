@@ -5,34 +5,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
 
-if(USE_UNICODE_API)
-  add_definitions(-DUNICODE -D_UNICODE)
+if (MSVC)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:dnsapi.dll")
 endif()
 
-set(COMMON_SRC
-  ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
-  ../../teraterm/common/ttcommon.h
-  ../../teraterm/common/i18n.h
-  ../../teraterm/common/ttlib.h
-  ../../teraterm/common/ttlib.c
-  ../../teraterm/common/dlglib.h
-  ../../teraterm/common/dlglib.c
-  ../../teraterm/common/dlglib_cpp.cpp
-  ../../teraterm/common/dlglib_tmpl.cpp
-  ../../teraterm/common/servicenames.h
-  ../../teraterm/common/codeconv.cpp
-  ../../teraterm/common/codeconv.h
-  ../../teraterm/common/tipwin.cpp
-  ../../teraterm/common/tipwin.h
+add_library(
+  ttxssh SHARED
   )
 
-source_group(
-  "common"
-  FILES
-  ${COMMON_SRC}
-  )
-
-set(SRC
+target_sources(
+  ttxssh
+  PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
   ../matcher/matcher.c
   arc4random.c
@@ -98,28 +81,40 @@ set(SRC
   ${COMMON_SRC}
   )
 
+target_sources(
+  ttxssh
+  PRIVATE
+  ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
+  ../../teraterm/common/ttcommon.h
+  ../../teraterm/common/i18n.h
+  ../../teraterm/common/ttlib.h
+  ../../teraterm/common/ttlib.c
+  ../../teraterm/common/dlglib.h
+  ../../teraterm/common/dlglib.c
+  ../../teraterm/common/dlglib_cpp.cpp
+  ../../teraterm/common/dlglib_tmpl.cpp
+  ../../teraterm/common/servicenames.h
+  ../../teraterm/common/codeconv.cpp
+  ../../teraterm/common/codeconv.h
+  ../../teraterm/common/tipwin.cpp
+  ../../teraterm/common/tipwin.h
+  )
 
-include_directories(
+source_group(
+  "common"
+  REGULAR_EXPRESSION
+  "teraterm\/common\/")
+
+target_include_directories(
+  ttxssh
+  PRIVATE
   ../../teraterm/teraterm
   ../../teraterm/common
   ../matcher
   ../putty
   ${OPENSSL_INCLUDE_DIRS}
   ${ZLIB_INCLUDE_DIRS}
-  )
-
-link_directories(
-  ${ZLIB_LIBRARY_DIRS}
-  )
-
-if (MSVC)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:dnsapi.dll")
-endif()
-
-add_library(
-  ttxssh SHARED
-  ${SRC}
-  )
+)
 
 set_target_properties(
   ttxssh
@@ -127,12 +122,26 @@ set_target_properties(
   PREFIX ""
   )
 
+target_compile_definitions(
+  ttxssh
+  PRIVATE
+  $<$<CONFIG:Debug>:_CRTDBG_MAP_ALLOC>
+  )
+if(USE_UNICODE_API)
+  target_compile_definitions(
+    ttxssh
+    PRIVATE
+    UNICODE
+    _UNICODE
+    )
+endif()
+
+
 target_link_libraries(
   ttxssh
   libputty
   ttpcmn
-  debug zlibstaticd
-  optimized zlibstatic
+  ${ZLIB_LIB}
   ${OPENSSL_LIB}
   #
   ws2_32
