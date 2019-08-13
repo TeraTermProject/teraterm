@@ -828,7 +828,7 @@ typedef struct PacketList {
 
 // SCP受信処理におけるフロー制御の閾値
 // 適用先 scp_t.filercvsize
-#define SCPRCV_HIGH_WATER_MARK (16 * 1024 * 1024)  // 16MB
+#define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 16MB
 #define SCPRCV_LOW_WATER_MARK (0)  // 0MB
 
 typedef struct scp {

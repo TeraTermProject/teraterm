@@ -8558,6 +8558,10 @@ done:
 	ShowWindow(c->scp.progress_window, SW_HIDE);
 
 cancel_abort:
+	// SCPの受信処理が終了した場合は、recv()のブロックを解除する。
+	// これをやらないと、Tera Termが固まったままになってしまう。
+	pvar->recv_suspended = FALSE;
+
 	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
 	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
 	// (2011.6.1 yutaka)
@@ -8647,7 +8651,12 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	// キューに詰んだデータの総サイズが下限閾値を下回った場合、
 	// SSHサーバからの受信を再開するように指示を出す。
 	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
-		pvar->recv_suspended = FALSE;
+		// recv()のブロックを解除する。
+		if (pvar->recv_suspended) {
+			pvar->recv_suspended = FALSE;
+			// FD_READメッセージを投げて recv() の再開を促す。
+			PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY, pvar->socket, MAKELPARAM(FD_READ, 0));
+		}
 	}
 
 	logprintf(LOG_LEVEL_NOTICE,
