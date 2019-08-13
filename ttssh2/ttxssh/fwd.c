@@ -771,6 +771,11 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 	FWDChannel* channel;
 	int changed = 0;
 
+	// ポート転送の未使用時は以下のフロー制御を行わない。
+	if (c->type != TYPE_PORTFWD) {
+		return;
+	}
+
 	channel_num = c->local_num;
 	channel = pvar->fwd_state.channels + channel_num;
 
