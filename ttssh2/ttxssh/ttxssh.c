@@ -3886,6 +3886,11 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
 				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
 
+				// 受信パスを取り出し、ts->FileDir も合わせて更新する。
+				hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
+				SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
+				strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
+
 				SSH_start_scp(pvar, sendfile, sendfiledir);
 				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
@@ -3914,6 +3919,17 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				char recvpath[MAX_PATH] = "";
 				char* fn = strrchr(szFileName, '/');
 				char recvfn[sizeof(szFileName)];
+
+				// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
+				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
+				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
+				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
+
+				// 受信パスを取り出し、ts->FileDir も合わせて更新する。
+				hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
+				SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
+				strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
+
 				if (fn) {
 					fn++;
 					if (*fn == '\0') {
@@ -3925,7 +3941,6 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				}
 				strncpy_s(recvfn, sizeof(recvfn), fn, _TRUNCATE);
 				replaceInvalidFileNameChar(recvfn, '_');
-				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_GETTEXT, sizeof(recvdir), (LPARAM)recvdir);
 				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir, recvfn);
 				SSH_scp_transaction(pvar, szFileName, recvpath, FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
