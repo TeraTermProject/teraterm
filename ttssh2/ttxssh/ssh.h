@@ -826,6 +826,11 @@ typedef struct PacketList {
 	struct PacketList *next;
 } PacketList_t;
 
+// SCP受信処理におけるフロー制御の閾値
+// 適用先 scp_t.filercvsize
+#define SCPRCV_HIGH_WATER_MARK (16 * 1024 * 1024)  // 16MB
+#define SCPRCV_LOW_WATER_MARK (0)  // 0MB
+
 typedef struct scp {
 	enum scp_dir dir;              // transfer direction
 	enum scp_state state;          // SCP state 
@@ -845,6 +850,7 @@ typedef struct scp {
 	DWORD fileatime;
 	PacketList_t *pktlist_head;
 	PacketList_t *pktlist_tail;
+	unsigned long pktlist_cursize;
 } scp_t;
 
 enum sftp_state {

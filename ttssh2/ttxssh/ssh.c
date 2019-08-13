@@ -136,8 +136,8 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 static void start_ssh_heartbeat_thread(PTInstVar pvar);
 void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c);
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num, unsigned char *data, unsigned int buflen);
-static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned int *buflen);
-static void ssh2_scp_free_packetlist(Channel_t *c);
+static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char **buf, unsigned int *buflen);
+static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c);
 static void get_window_pixel_size(PTInstVar pvar, int *x, int *y);
 
 // マクロ
@@ -222,6 +222,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 		c->scp.localfp = NULL;
 		c->scp.filemtime = 0;
 		c->scp.fileatime = 0;
+		c->scp.pvar = NULL;
 	}
 	if (type == TYPE_AGENT) {
 		c->agent_msg = buffer_init();
@@ -310,6 +311,7 @@ static void ssh2_channel_delete(Channel_t *c)
 {
 	bufchain_t *ch, *ptr;
 	enum scp_state prev_state;
+	PTInstVar pvar;
 
 	ch = c->bufchain;
 	while (ch) {
@@ -351,7 +353,8 @@ static void ssh2_channel_delete(Channel_t *c)
 			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
-		ssh2_scp_free_packetlist(c);
+		pvar = c->scp.pvar;
+		ssh2_scp_free_packetlist(pvar, c);
 	}
 	if (c->type == TYPE_AGENT) {
 		buffer_free(c->agent_msg);
@@ -2876,6 +2879,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->agentfwd_enable = FALSE;
 	pvar->use_subsystem = FALSE;
 	pvar->nosession = FALSE;
+	pvar->recv_suspended = FALSE;
 
 }
 
@@ -8482,7 +8486,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
-		ssh2_scp_get_packetlist(c, &data, &buflen);
+		ssh2_scp_get_packetlist(pvar, c, &data, &buflen);
 		if (data && buflen) {
 			msg.message = WM_RECEIVING_FILE;
 
@@ -8564,7 +8568,9 @@ cancel_abort:
 	return 0;
 }
 
-static void ssh2_scp_add_packetlist(Channel_t *c, unsigned char *buf, unsigned int buflen)
+// SSHサーバから送られてきたファイルのデータをリストにつなぐ。
+// リストの取り出しは ssh_scp_receive_thread スレッドで行う。
+static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen)
 {
 	PacketList_t *p, *old;
 
@@ -8588,11 +8594,31 @@ static void ssh2_scp_add_packetlist(Channel_t *c, unsigned char *buf, unsigned i
 		c->scp.pktlist_tail = p;
 	}
 
+	// キューに詰んだデータの総サイズを加算する。
+	c->scp.pktlist_cursize += buflen;
+
+	// キューに詰んだデータの総サイズが上限閾値を超えた場合、
+	// SSHサーバからの受信を停止するように指示を出す。
+	// これによりリストエントリが増え続け、消費メモリの肥大化を
+	// 回避できる。
+	if (c->scp.pktlist_cursize >= SCPRCV_HIGH_WATER_MARK) {
+		// このフラグを立てた場合、SSH通信全体のrecv()をブロックするため、
+		// SCP処理が完了 or 中断された場合は、かならずフラグを落としておく
+		// 必要がある。
+		pvar->recv_suspended = TRUE;
+	}
+
+	logprintf(LOG_LEVEL_NOTICE,
+		"%s: channel=#%d SCP recv %lu(bytes) and enqueued.(%s)",
+		__FUNCTION__, c->local_num, c->scp.pktlist_cursize,
+		pvar->recv_suspended ? "recv suspended" : "recv resumed"
+		);
+
 error:;
 	LeaveCriticalSection(&g_ssh_scp_lock);
 }
 
-static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned int *buflen)
+static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char **buf, unsigned int *buflen)
 {
 	PacketList_t *p;
 
@@ -8615,18 +8641,35 @@ static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned 
 
 	free(p);
 
+	// キューに詰んだデータの総サイズを減算する。
+	c->scp.pktlist_cursize -= *buflen;
+
+	// キューに詰んだデータの総サイズが下限閾値を下回った場合、
+	// SSHサーバからの受信を再開するように指示を出す。
+	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
+		pvar->recv_suspended = FALSE;
+	}
+
+	logprintf(LOG_LEVEL_NOTICE,
+		"%s: channel=#%d SCP recv %lu(bytes) and dequeued.(%s)",
+		__FUNCTION__, c->local_num, c->scp.pktlist_cursize,
+		pvar->recv_suspended ? "recv suspended" : "recv resumed"
+	);
+
 end:;
 	LeaveCriticalSection(&g_ssh_scp_lock);
 }
 
-static void ssh2_scp_alloc_packetlist(Channel_t *c)
+static void ssh2_scp_alloc_packetlist(PTInstVar pvar, Channel_t *c)
 {
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
 	InitializeCriticalSection(&g_ssh_scp_lock);
+	c->scp.pktlist_cursize = 0;
+	pvar->recv_suspended = FALSE;
 }
 
-static void ssh2_scp_free_packetlist(Channel_t *c)
+static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c)
 {
 	PacketList_t *p, *old;
 
@@ -8642,6 +8685,8 @@ static void ssh2_scp_free_packetlist(Channel_t *c)
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
 	DeleteCriticalSection(&g_ssh_scp_lock);
+	c->scp.pktlist_cursize = 0;
+	pvar->recv_suspended = FALSE;
 }
 
 static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
@@ -8697,7 +8742,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				ShowWindow(hDlgWnd, SW_SHOW);
 			}
 
-			ssh2_scp_alloc_packetlist(c);
+			ssh2_scp_alloc_packetlist(pvar, c);
 			thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_receive_thread, c, 0, &tid);
 			if (thread == 0) {
 				// TODO:
@@ -8728,7 +8773,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			// 自体がストールしてしまう。この問題を回避するため、スレッドのメッセージキューを
 			// 使うのをやめて、リンクドリスト方式に切り替える。
 			// (2016.11.3 yutaka)
-			ssh2_scp_add_packetlist(c, newdata, buflen);
+			ssh2_scp_add_packetlist(pvar, c, newdata, buflen);
 		}
 
 	} else if (c->scp.state == SCP_CLOSING) {  // EOFの受信

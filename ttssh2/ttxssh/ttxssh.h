@@ -342,6 +342,8 @@ typedef struct _TInstVar {
 	// dialog resource
 	HFONT hFontFixed;		// hosts.c内のダイアログ用
 
+	BOOL recv_suspended;  // SCP受信のフロー制御用
+
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data
