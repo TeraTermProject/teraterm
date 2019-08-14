@@ -139,6 +139,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char **buf, unsigned int *buflen);
 static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c);
 static void get_window_pixel_size(PTInstVar pvar, int *x, int *y);
+static void ssh2_scp_recv_unblocked(PTInstVar pvar);
 
 // マクロ
 #define remained_payload(pvar) ((pvar)->ssh_state.payload + payload_current_offset(pvar))
@@ -222,7 +223,6 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 		c->scp.localfp = NULL;
 		c->scp.filemtime = 0;
 		c->scp.fileatime = 0;
-		c->scp.pvar = NULL;
 	}
 	if (type == TYPE_AGENT) {
 		c->agent_msg = buffer_init();
@@ -2879,7 +2879,6 @@ void SSH_init(PTInstVar pvar)
 	pvar->agentfwd_enable = FALSE;
 	pvar->use_subsystem = FALSE;
 	pvar->nosession = FALSE;
-	pvar->recv_suspended = FALSE;
 
 }
 
@@ -8189,6 +8188,10 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 			{
 			scp_dlg_parm_t *parm = (scp_dlg_parm_t *)wp;
 
+			// SCPの受信処理を中断した場合にも、recv()のブロックを解除する。
+			// これをやらないと、Tera Termが固まったままになってしまう。
+			ssh2_scp_recv_unblocked(parm->pvar);
+
 			ssh2_channel_send_close(parm->pvar, parm->c);
 			}
 			return TRUE;
@@ -8558,10 +8561,6 @@ done:
 	ShowWindow(c->scp.progress_window, SW_HIDE);
 
 cancel_abort:
-	// SCPの受信処理が終了した場合は、recv()のブロックを解除する。
-	// これをやらないと、Tera Termが固まったままになってしまう。
-	pvar->recv_suspended = FALSE;
-
 	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
 	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
 	// (2011.6.1 yutaka)
@@ -8570,6 +8569,18 @@ cancel_abort:
 	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
 
 	return 0;
+}
+
+// SCPファイル受信処理中に recv をブロックしている場合は、ブロックを解除する。
+static void ssh2_scp_recv_unblocked(PTInstVar pvar)
+{
+	// ブロックしている場合
+	if (pvar->recv_suspended) {
+		// recv()のブロックを解除する。
+		pvar->recv_suspended = FALSE;
+		// FD_READメッセージを投げて recv() の再開を促す。
+		PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY, pvar->socket, MAKELPARAM(FD_READ, 0));
+	}
 }
 
 // SSHサーバから送られてきたファイルのデータをリストにつなぐ。
@@ -8652,11 +8663,7 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	// SSHサーバからの受信を再開するように指示を出す。
 	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
 		// recv()のブロックを解除する。
-		if (pvar->recv_suspended) {
-			pvar->recv_suspended = FALSE;
-			// FD_READメッセージを投げて recv() の再開を促す。
-			PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY, pvar->socket, MAKELPARAM(FD_READ, 0));
-		}
+		ssh2_scp_recv_unblocked(pvar);
 	}
 
 	logprintf(LOG_LEVEL_NOTICE,

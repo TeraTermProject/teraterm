@@ -273,10 +273,8 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				return amount_in_buf;
 
 			}
-			else {
-				amount_read = recv_data(pvar, READAMOUNT);
 
-			}
+			amount_read = recv_data(pvar, READAMOUNT);
 
 			if (amount_read == SOCKET_ERROR) {
 				if (amount_in_buf == 0) {
