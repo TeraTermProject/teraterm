@@ -34,14 +34,12 @@ extern SSHKeys current_keys[MODE_MAX];
 static DH *dh_new_group_asc(const char *gen, const char *modulus)
 {
 	DH *dh = NULL;
-	BIGNUM *p, *g;
+	BIGNUM *p = NULL, *g = NULL;
 
 	if ((dh = DH_new()) == NULL) {
 		printf("dh_new_group_asc: DH_new");
 		goto error;
 	}
-
-	DH_get0_pqg(dh, &p, NULL, &g);
 
 	// P‚ÆG‚ÍŒöŠJ‚µ‚Ä‚à‚æ‚¢‘f”‚Ì‘g‚İ‡‚í‚¹
 	if (BN_hex2bn(&p, modulus) == 0) {
