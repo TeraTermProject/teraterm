@@ -58,6 +58,8 @@ static DH *dh_new_group_asc(const char *gen, const char *modulus)
 	return (dh);
 
 error:
+    BN_free(g);
+    BN_free(p);
 	DH_free(dh);
 	return (NULL);
 }
