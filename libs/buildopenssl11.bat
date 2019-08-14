@@ -1,14 +1,15 @@
 
-rem パッチ適用チェック
-pushd openssl_patch
-call check_patch.bat
-popd
-
 rem OpenSSLのビルドへ移行
 
 cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
+
+rem パッチ適用チェック
+pushd ..\openssl_patch
+call check_patch.bat
+popd
+
 
 rem 設定ファイルのバックアップを取る
 copy /y Configurations\10-main.conf Configurations\10-main.conf.orig
