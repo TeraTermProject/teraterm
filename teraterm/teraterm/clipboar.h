@@ -35,13 +35,15 @@ extern "C" {
 
 /* prototypes */
 PCHAR CBOpen(LONG MemSize);
-void CBClose();
+void CBClose(void);
 void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
+void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed);
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);
-void CBSend();
-void CBEcho();
-void CBEndPaste();
+void CBSend(void);
+void CBSendW(void);
+void CBEcho(void);
+void CBEndPaste(void);
 
 #ifdef __cplusplus
 }

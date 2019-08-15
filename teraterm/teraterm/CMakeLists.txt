@@ -145,6 +145,9 @@ set(SRC
   unicode.cpp
   unicode_asian_width.tbl
   unicode_combine.tbl
+  #
+  ../ttpmacro/fileread.h
+  ../ttpmacro/fileread.cpp
   )
 
 include_directories(

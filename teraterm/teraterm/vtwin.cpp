@@ -849,7 +849,11 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	}
 
 	if (Paste) {
+#if UNICODE_INTERNAL_BUFF
+		CBStartPasteW(HVTWin, FALSE, BracketedPasteMode());
+#else
 		CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
+#endif
 		// スクロール位置をリセット
 		if (WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
@@ -4392,8 +4396,12 @@ void CVTWindow::OnEditCopyTable()
 
 void CVTWindow::OnEditPaste()
 {
+#if UNICODE_INTERNAL_BUFF
+	CBStartPasteW(HVTWin, FALSE, BracketedPasteMode());
+#else
 	// add confirm (2008.2.4 yutaka)
 	CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
+#endif
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
@@ -4402,8 +4410,12 @@ void CVTWindow::OnEditPaste()
 
 void CVTWindow::OnEditPasteCR()
 {
+#if UNICODE_INTERNAL_BUFF
+	CBStartPasteW(HVTWin, TRUE, BracketedPasteMode());
+#else
 	// add confirm (2008.3.11 maya)
 	CBStartPaste(HVTWin, TRUE, BracketedPasteMode());
+#endif
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);

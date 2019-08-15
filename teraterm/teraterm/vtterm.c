@@ -791,7 +791,7 @@ static void PutKanji(BYTE b)
 		Special = FALSE;
 	}
 
-#if 1
+#if UNICODE_INTERNAL_BUFF
 	{
 		// codepageˆê——
 		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
@@ -5417,7 +5417,7 @@ BOOL ParseFirstKR(BYTE b)
 
 static void ParseASCII(BYTE b)
 {
-#if 0
+#if !UNICODE_INTERNAL_BUFF
 	if (ts.Language == IdJapanese) {
 		ParseFirstJP(b);
 		return;
@@ -5829,7 +5829,7 @@ static BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
 	if (b>=128) {
-#if 0
+#if !UNICODE_INTERNAL_BUFF
 		b = RussConv(ts.RussHost,ts.RussClient,b);
 		PutChar(b);
 #else

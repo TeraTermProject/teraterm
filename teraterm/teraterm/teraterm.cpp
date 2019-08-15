@@ -202,7 +202,11 @@ static BOOL OnIdle(LONG lCount)
 		/* Talker */
 		switch (TalkStatus) {
 		case IdTalkCB:
+#if UNICODE_INTERNAL_BUFF
+			CBSendW();
+#else
 			CBSend();
+#endif
 			break; /* clip board */
 		case IdTalkFile:
 			FileSend();
@@ -300,12 +304,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		}
 
 		if (!message_processed) {
+			_CrtCheckMemory();
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 
 		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
 			// メッセージがない
+			_CrtCheckMemory();
 			if (!OnIdle(lCount)) {
 				// idle不要
 				if (SleepTick < 500) {	// 最大 501ms未満
@@ -318,6 +324,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				SleepTick = 0;
 				lCount++;
 			}
+			_CrtCheckMemory();
 		}
 	}
 	delete m_pMainWnd;
