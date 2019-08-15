@@ -4373,13 +4373,21 @@ void CVTWindow::OnFileExit()
 void CVTWindow::OnEditCopy()
 {
 	// copy selected text to clipboard
+#if	UNICODE_INTERNAL_BUFF
+	BuffCBCopyUnicode(FALSE);
+#else
 	BuffCBCopy(FALSE);
+#endif
 }
 
 void CVTWindow::OnEditCopyTable()
 {
 	// copy selected text to clipboard in Excel format
+#if	UNICODE_INTERNAL_BUFF
+	BuffCBCopyUnicode(TRUE);
+#else
 	BuffCBCopy(TRUE);
+#endif
 }
 
 void CVTWindow::OnEditPaste()

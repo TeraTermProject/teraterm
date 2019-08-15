@@ -1729,6 +1729,191 @@ static int MoveCharPtr(LONG Line, int *x, int dx)
 	return i;
 }
 
+/**
+ *	(クリップボード用に)文字列を取得
+ *	@param[in]	sx,sy,ex,ey	選択領域
+ *	@param[in]	box_select	TRUE=箱型(矩形)選択
+ *							FALSE=行選択
+ *	@param[out] _str_len	文字列長(文字端L'\0'を含む)
+ *	@return		文字列
+ *				使用後は free() すること
+ */
+#if UNICODE_INTERNAL_BUFF
+static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_select, size_t *_str_len)
+{
+	wchar_t *str_w;
+	size_t str_size;	// 確保したサイズ
+	size_t k;
+	LONG TmpPtr;
+	int IStart, IEnd;
+	int x, y;
+	BOOL LineContinued;
+
+	str_size = NumOfColumns * (ey - sy + 1);
+	str_w = malloc(sizeof(wchar_t) * str_size);
+
+	LockBuffer();
+
+	str_w[0] = 0;
+	TmpPtr = GetLinePtr(sy);
+	k = 0;
+	for (y = sy; y<=ey ; y++) {
+		if (box_select) {
+			IStart = SelectStart.x;
+			IEnd = SelectEnd.x-1;
+		}
+		else {
+			IStart = 0;
+			IEnd = NumOfColumns-1;
+			if (y== sy) {
+				IStart = sx;
+			}
+			if (y== ey) {
+				IEnd = ex -1;
+			}
+		}
+
+		// 次の行に続いてる?
+		LineContinued = FALSE;
+		if (!box_select) {
+			// 行選択の場合のみ
+			if (ts.EnableContinuedLineCopy && y!= ey ) {
+				LONG NextTmpPtr = NextLinePtr(TmpPtr);
+				if ((AttrBuff[NextTmpPtr] & AttrLineContinued) != 0) {
+					LineContinued = TRUE;
+				}
+			}
+		}
+
+		if (!LineContinued) {
+			while ((IEnd>0)) {
+				// コピー不要分を削除
+				const buff_char_t *b = &CodeBuffW[TmpPtr + IEnd];
+				if (b->u32 == 0x20) {
+					MoveCharPtr(TmpPtr,&IEnd,-1);	// 切り詰める
+				}
+				else {
+					break;
+				}
+			}
+		}
+
+		x = IStart;
+		while (x <= IEnd) {
+			const buff_char_t *b = &CodeBuffW[TmpPtr + x];
+			if (b->u32 != 0) {
+				str_w[k++] = b->wc2[0];
+				if (b->wc2[1] != 0) {
+					str_w[k++] = b->wc2[1];
+				}
+				if (k + 2 >= str_size) {
+					str_size *= 2;
+					str_w = realloc(str_w, sizeof(wchar_t) * str_size);
+				}
+				{
+					int i;
+					// コンビネーション
+					if (k + b->CombinationCharCount16 >= str_size) {
+						str_size += + b->CombinationCharCount16;
+						str_w = realloc(str_w, sizeof(wchar_t) * str_size);
+					}
+					for (i = 0 ; i < (int)b->CombinationCharCount16; i++) {
+						str_w[k++] = b->pCombinationChars16[i];
+					}
+				}
+			}
+			x++;
+		}
+
+		if (y < ey) {
+			// 改行を加える(最後の行以外の場合)
+			if (!LineContinued) {
+				str_w[k++] = 0x0d;
+				str_w[k++] = 0x0a;
+			}
+		}
+
+		TmpPtr = NextLinePtr(TmpPtr);
+	}
+	str_w[k++] = 0;
+
+	UnlockBuffer();
+
+	*_str_len = k;
+	return str_w;
+}
+#endif
+
+/**
+ *	連続したスペースをタブ1つに置換する
+ *	@param[out] _str_len	文字列長(L'\0'を含む)
+ *	@return		文字列
+ *				使用後は free() すること
+ */
+static wchar_t *ConvertTable(const wchar_t *src, size_t src_len, size_t *str_len)
+{
+	wchar_t *dest_top = malloc(sizeof(wchar_t) * src_len);
+	wchar_t *dest = dest_top;
+	BOOL WhiteSpace = FALSE;
+	while (*src != '\0') {
+		wchar_t c = *src++;
+		if (c == 0x0d || c == 0x0a) {
+			*dest++ = c;
+			WhiteSpace = FALSE;
+		} else if (c <= L' ') {
+			if (!WhiteSpace) {
+				// insert tab
+				*dest++ = 0x09;
+				WhiteSpace = TRUE;
+			}
+		} else {
+			*dest++ = c;
+			WhiteSpace = FALSE;
+		}
+	}
+	*dest = L'\0';
+	*str_len = dest - dest_top + 1;
+	return dest_top;
+}
+
+
+#if UNICODE_INTERNAL_BUFF
+void BuffCBCopyUnicode(BOOL Table)
+{
+	wchar_t *str_ptr;
+	size_t str_len;
+	str_ptr = BuffGetStringForCB(
+		SelectStart.x, SelectStart.y,
+		SelectEnd.x, SelectEnd.y, BoxSelect,
+		&str_len);
+
+	// テーブル形式へ変換
+	if (Table) {
+		size_t table_len;
+		wchar_t *table_ptr = ConvertTable(str_ptr, str_len, &table_len);
+		free(str_ptr);
+		str_ptr = table_ptr;
+		str_len = table_len;
+	}
+	OutputDebugPrintfW(L"BuffCBCopyUnicode()\n"
+					   L"%d, '%s'\n", str_len, str_ptr);
+
+	// クリップボードにセット
+	if (OpenClipboard(HVTWin)) {
+		HGLOBAL CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, sizeof(wchar_t) * str_len);
+		wchar_t *CBCopyWidePtr = (wchar_t *)GlobalLock(CBCopyWideHandle);
+		memcpy(CBCopyWidePtr, str_ptr, str_len * sizeof(wchar_t));
+		GlobalUnlock(CBCopyWideHandle);
+		EmptyClipboard();
+		SetClipboardData(CF_UNICODETEXT, CBCopyWideHandle);
+		// TODO 9x系では自動でCF_TEXTにセットされないらしい?
+		CloseClipboard();
+	}
+	free(str_ptr);
+}
+#endif
+
+#if !UNICODE_INTERNAL_BUFF
 void BuffCBCopy(BOOL Table)
 // copy selected text to clipboard
 {
@@ -1876,6 +2061,7 @@ void BuffCBCopy(BOOL Table)
 	CBClose();
 	return;
 }
+#endif
 
 void BuffPrint(BOOL ScrollRegion)
 // Print screen or selected text
@@ -3939,7 +4125,11 @@ void BuffEndSelect()
 		/* copy to the clipboard */
 		if (ts.AutoTextCopy>0) {
 			LockBuffer();
+#if UNICODE_INTERNAL_BUFF
+			BuffCBCopyUnicode(FALSE);
+#else
 			BuffCBCopy(FALSE);
+#endif
 			UnlockBuffer();
 		}
 	}

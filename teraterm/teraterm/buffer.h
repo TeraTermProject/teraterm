@@ -59,6 +59,7 @@ void BuffCopyBox(int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int Src
 void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 void BuffCBCopy(BOOL Table);
+void BuffCBCopyUnicode(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
