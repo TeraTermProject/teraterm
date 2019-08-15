@@ -2955,7 +2955,10 @@ void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int*
 		if(BGReverseText == TRUE && BGReverseTextAlpha < 255) {
 			eto_options |= ETO_OPAQUE;
 		}
+#if 0
 		ExtTextOutW(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect, StrW,Count,&Dx[0]);
+#endif
+		ExtTextOutW(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect, StrW,Count,&Dx2[0]);
 
 		// Window‚É“\‚è•t‚¯
 		BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
