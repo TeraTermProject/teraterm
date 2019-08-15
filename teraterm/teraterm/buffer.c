@@ -193,12 +193,12 @@ static void BuffAddChar(buff_char_t *buff, char32_t u32, char property)
 
 	// UTF-32
 	p->u32_last = u32;
-	p->pCombinationChars32[p->CombinationCharCount32] = u32;
+	p->pCombinationChars32[(size_t)p->CombinationCharCount32] = u32;
 	p->CombinationCharCount32++;
 
 	// UTF-16
 	{
-		wchar_t *u16 = &p->pCombinationChars16[p->CombinationCharCount16];
+		wchar_t *u16 = &p->pCombinationChars16[(size_t)p->CombinationCharCount16];
 		size_t wlen = UTF32ToUTF16(u32, u16, 2);
 		p->CombinationCharCount16 += (char)wlen;
 	}
@@ -240,7 +240,7 @@ static void memmoveW(buff_char_t *dest, const buff_char_t *src, size_t count)
 }
 #endif
 
-LONG GetLinePtr(int Line)
+static LONG GetLinePtr(int Line)
 {
 	LONG Ptr;
 
@@ -251,7 +251,7 @@ LONG GetLinePtr(int Line)
 	return Ptr;
 }
 
-LONG NextLinePtr(LONG Ptr)
+static LONG NextLinePtr(LONG Ptr)
 {
 	Ptr = Ptr + (LONG)NumOfColumns;
 	if (Ptr >= BufferSize) {
@@ -260,7 +260,7 @@ LONG NextLinePtr(LONG Ptr)
 	return Ptr;
 }
 
-LONG PrevLinePtr(LONG Ptr)
+static LONG PrevLinePtr(LONG Ptr)
 {
 	Ptr = Ptr - (LONG)NumOfColumns;
 	if (Ptr < 0) {
@@ -2582,7 +2582,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		const buff_char_t *b;
 		TCharAttr TempAttr;
 		BOOL DrawFlag = FALSE;
-		BOOL Conbination = FALSE;
 
 		// アトリビュート取得
 		TempAttr.Attr = AttrBuff[TmpPtr+istart+count] & ~ AttrKanji;
@@ -2594,9 +2593,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		lenA++;
 
 		b = &CodeBuffW[TmpPtr + istart + count];
-		if (b->u32 == 0x1a1) {
-			int a = 0;
-		}
 		if (b->u32 == 0) {
 			// 全角の次の文字,処理不要
 		} else {
@@ -2612,7 +2608,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 				bufW[lenW] = b->wc2[1];
 				bufWW[lenW] = '0';
 				lenW++;
-				Conbination = TRUE;
 				DrawFlag = TRUE;	// すぐに描画する
 			}
 			if ((b->WidthProperty == 'W' || b->WidthProperty == 'H') &&
@@ -2625,7 +2620,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 					bufWW[lenW + i] = '0';
 				}
 				lenW += b->CombinationCharCount16;
-				Conbination = TRUE;
 				DrawFlag = TRUE;	// コンビネーションがある場合はすぐ描画
 			}
 		}
@@ -2634,27 +2628,20 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			// 最初の1文字目
 			CurAttr = TempAttr;
 			CurSelected = CheckSelect(istart+count,SY);
+		} else if (b->u32 != 0 &&
+				   ((TCharAttrCmp(CurAttr, TempAttr) != 0) ||
+					(CurSelected != CheckSelect(istart+count,SY)))) {
+			// この文字でアトリビュートが変化した → 描画
+			DrawFlag = TRUE;
+			lenA--;
+			lenW--;
+			count--;
 		}
 
+		// 最後までスキャンした?
 		if (istart + count >= IEnd) {
-			// 最後までスキャンした
 			DrawFlag = TRUE;
 			EndFlag = TRUE;
-		} else if (DrawFlag) {
-			;
-		} else if (b->u32 == 0 || count == 0) {
-			// アトリビュートのチェック不要
-		} else {
-			// この文字でアトリビュートが変化する?
-			if ((TCharAttrCmp(CurAttr, TempAttr) != 0) ||
-				(CurSelected != CheckSelect(istart+count,SY)))
-			{
-				// アトリビュートが変化した
-				DrawFlag = TRUE;
-				lenA--;
-				lenW--;
-				count--;
-			}
 		}
 
 		if (DrawFlag) {
