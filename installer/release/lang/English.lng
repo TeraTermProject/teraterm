@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-08-11)
+; Updated by TeraTerm Project (2019-08-16)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -225,7 +225,7 @@ DLG_TAB_COPYPASTE_STRINGFILE=&String file
 DLG_TAB_COPYPASTE_DELIMITER=Del&imiter characters
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
-DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Disa&bling text selection when the window is activated
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated
 
 DLG_TAB_VISUAL_ALPHA=Window Transparency
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-08-11)
+; Updated by TeraTerm Project (2019-08-16)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -226,7 +226,7 @@ DLG_TAB_COPYPASTE_STRINGFILE=&Текстовый файл
 DLG_TAB_COPYPASTE_DELIMITER=&Разделитель символов
 DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку
 DLG_TAB_COPYPASTE_PASTEDELAY2=мс
-DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Disa&bling text selection when the window is activated
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated
 
 DLG_TAB_VISUAL_ALPHA=&Прозрачный
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
