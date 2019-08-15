@@ -5237,18 +5237,33 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		mb[1] = 0;
 	} else if ((AttrBuff[TmpPtr+X] & AttrKanji) == 0) {
 		// not DBCS(?TODO)
-		cs[0] = c;
-		cs[1] = 0;
+		if (_ismbblead(c)) {
+			cs[0] = '*';
+			cs[1] = 0;
+		}
+		else {
+			cs[0] = c;
+			cs[1] = 0;
+		}
 		mb[0] = c;
 		mb[1] = 0;
 	} else {
 		if (X+1 < NumOfColumns) {
-			cs[0] = c;
-			cs[1] = CodeBuff[TmpPtr+X+1];
-			cs[2] = 0;
-			mb[0] = c;
-			mb[1] = CodeBuff[TmpPtr+X+1];
+			char c2 = CodeBuff[TmpPtr+X+1];
+			if (_ismbblead(c) && _ismbbtrail(c2)) {
+				cs[0] = c;
+				cs[1] = c2;
+				cs[2] = 0;
+				mb[0] = c;
+				mb[1] = c2;
+			} else {
+				cs[0] = '*';
+				cs[1] = 0;
+				mb[0] = c;
+				mb[1] = 0;
+			}
 		} else {
+			// ˆê”Ô‰E’[
 			mb[0] = c;
 			mb[1] = 0;
 			if (_ismbblead(c)) {
@@ -5266,22 +5281,34 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	} else {
 		aswprintf(&mb_str, L"0x%02x%02x", mb[0], mb[1]);
 	}
-	str_len =
-		aswprintf(&str_ptr,
-				  L"ch(%d,%d(%d)) px(%d,%d)\n"
-				  L"attr      0x%02x\n"
-				  L"attr2     0x%02x\n"
-				  L"attrFore  0x%02x\n"
-				  L"attrBack  0x%02x\n"
-				  L"CodeLine  %s('%S')",
-				  X, ScreenY, Y,
-				  Xw, Yw,
-				  (unsigned char)AttrBuff[TmpPtr+X],
-				  (unsigned char)AttrBuff2[TmpPtr+X],
-				  (unsigned char)AttrBuffFG[TmpPtr+X],
-				  (unsigned char)AttrBuffBG[TmpPtr+X],
-				  mb_str, cs
-			);
+	{
+		const unsigned char attr = AttrBuff[TmpPtr+X];
+		str_len =
+			aswprintf(&str_ptr,
+					  L"ch(%d,%d(%d)) px(%d,%d)\n"
+					  L"attr      0x%02x\n"
+					  L" %S%S%S%S%S%S%S%S\n"
+					  L"attr2     0x%02x\n"
+					  L"attrFore  0x%02x\n"
+					  L"attrBack  0x%02x\n"
+					  L"CodeLine  %s('%S')",
+					  X, ScreenY, Y,
+					  Xw, Yw,
+					  attr,
+					  (attr & AttrBold) != 0 ? "AttrBold " : "",
+					  (attr & AttrUnder) != 0 ? "AttrUnder " : "",
+					  (attr & AttrSpecial) != 0 ? "AttrSpecial ": "",
+					  (attr & AttrBlink) != 0 ? "AttrBlink ": "",
+					  (attr & AttrReverse) != 0 ? "AttrReverse ": "",
+					  (attr & AttrLineContinued) != 0 ? "AttrLineContinued ": "",
+					  (attr & AttrURL) != 0 ? "AttrURL ": "",
+					  (attr & AttrKanji) != 0 ? "AttrKanji ": "",
+					  (unsigned char)AttrBuff2[TmpPtr+X],
+					  (unsigned char)AttrBuffFG[TmpPtr+X],
+					  (unsigned char)AttrBuffBG[TmpPtr+X],
+					  mb_str, cs
+				);
+	}
 	free(mb_str);
 
 #if UNICODE_INTERNAL_BUFF
