@@ -54,9 +54,19 @@ pushd ..
 popd
 
 
-
+rem WindowsMe‚ÅInitializeCriticalSectionAndSpinCount‚ªƒGƒ‰[‚Æ‚È‚éŒ»Û‰ñ”ğ‚Ì‚½‚ßB
 :patch6
+findstr /c:"myInitializeCriticalSectionAndSpinCount" ..\openssl\crypto\threads_win.c
+if ERRORLEVEL 1 goto fail6
+goto patch7
+:fail6
+pushd ..
+%folder%\patch %cmdopt1% < %folder%\atomic_api.txt
+%folder%\patch %cmdopt2% < %folder%\atomic_api.txt
+popd
 
+
+:patch7
 
 
 :patch_end
