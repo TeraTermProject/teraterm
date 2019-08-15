@@ -5474,6 +5474,7 @@ static void UnicodeToCP932(unsigned int code)
 {
 	unsigned short cset;
 	char r;
+	int LineEnd;
 
 	TCharAttr CharAttrTmp;
 	CharAttrTmp = CharAttr;
@@ -5513,6 +5514,33 @@ static void UnicodeToCP932(unsigned int code)
 			}
 		}
 
+		if (CursorX > CursorRightM)
+			LineEnd = NumOfColumns - 1;
+		else
+			LineEnd = CursorRightM;
+
+		BOOL half_width = (UnicodeGetWidthProperty(code) == 'H') ? TRUE : FALSE;
+
+		if (Wrap) {
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+			if (ts.EnableContinuedLineCopy)
+				CharAttrTmp.Attr |= AttrLineContinued;
+		}
+		else if (CursorX > LineEnd - 1) {
+			if (AutoWrapMode) {
+				if (ts.EnableContinuedLineCopy) {
+					CharAttrTmp.Attr |= AttrLineContinued;
+					if (half_width == FALSE && CursorX == LineEnd) {
+						// full widtho—Í‚ª”¼•ªo—Í‚É‚È‚ç‚È‚¢‚æ‚¤‚É0x20‚ðo—Í
+						BuffPutChar(0x20, CharAttr, FALSE);
+					}
+				}
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+		}
+		Wrap = FALSE;
 		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
 		if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
 			UpdateStr();
