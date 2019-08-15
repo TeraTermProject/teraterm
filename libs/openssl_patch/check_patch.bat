@@ -28,7 +28,6 @@ pushd ..
 %folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
 %folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
 popd
-goto patch4
 
 
 rem CryptAcquireContextW APIˆË‘¶œ‹Ž‚Ì‚½‚ß
@@ -43,7 +42,21 @@ rem %folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW.txt
 rem popd
 
 
+rem WindowsMe‚ÅRAND_bytes‚Å—Ž‚¿‚éŒ»Û‰ñ”ð‚Ì‚½‚ßB
 :patch5
+findstr /c:"added if meth is NULL pointer" ..\openssl\crypto\rand\rand_lib.c
+if ERRORLEVEL 1 goto fail5
+goto patch6
+:fail5
+pushd ..
+%folder%\patch %cmdopt1% < %folder%\RAND_bytes.txt
+%folder%\patch %cmdopt2% < %folder%\RAND_bytes.txt
+popd
+
+
+
+:patch6
+
 
 
 :patch_end

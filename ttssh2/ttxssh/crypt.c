@@ -463,7 +463,14 @@ static void cBlowfish_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 
 void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	RAND_bytes(buf, bytes);
+	int ret;
+
+	// OpenSSL 1.1.1を使った場合、WindowsMeでは RAND_bytes() の呼び出しで落ちる。
+	logprintf(LOG_LEVEL_VERBOSE, "%s: RAND_bytes call", __FUNCTION__);
+	ret = RAND_bytes(buf, bytes);
+	if (ret < 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: RAND_bytes error(%d)", __FUNCTION__, ret);
+	}
 }
 
 void CRYPT_initialize_random_numbers(PTInstVar pvar)
