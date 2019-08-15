@@ -66,7 +66,20 @@ pushd ..
 popd
 
 
+rem WindowsMe/NT4.0ではCryptAcquireContextWによるエントロピー取得が
+rem できないため、新しく処理を追加する。CryptAcquireContextWの利用は残す。
 :patch7
+findstr /c:"void add_RAND_buffer" ..\openssl\crypto\rand\rand_win.c
+if ERRORLEVEL 1 goto fail7
+goto patch8
+:fail7
+pushd ..
+%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW2.txt
+%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW2.txt
+popd
+
+
+:patch8
 
 
 :patch_end
