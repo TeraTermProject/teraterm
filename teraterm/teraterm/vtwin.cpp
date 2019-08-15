@@ -1743,7 +1743,6 @@ void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	unsigned int i;
-	char Code;
 
 	if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) {
 		return;
@@ -1753,19 +1752,31 @@ void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		::PostMessage(HVTWin,WM_SYSCHAR,nChar,MAKELONG(nRepCnt,nFlags));
 		return;
 	}
-	Code = nChar;
 
-	if ((ts.Language==IdRussian) &&
-	    ((BYTE)Code>=128)) {
-		Code = (char)RussConv(ts.RussKeyb,ts.RussClient,(BYTE)Code);
-	}
-
+#if UNICODE_INTERNAL_BUFF
 	for (i=1 ; i<=nRepCnt ; i++) {
-		CommTextOut(&cv,&Code,1);
+		wchar_t u16 = nChar;
+		CommTextOutW(&cv,&u16,1);
 		if (ts.LocalEcho>0) {
-			CommTextEcho(&cv,&Code,1);
+			CommTextEchoW(&cv,&u16,1);
 		}
 	}
+#else
+	{
+		char Code = nChar;
+		if ((ts.Language==IdRussian) &&
+			((BYTE)Code>=128)) {
+			Code = (char)RussConv(ts.RussKeyb,ts.RussClient,(BYTE)Code);
+		}
+
+		for (i=1 ; i<=nRepCnt ; i++) {
+			CommTextOut(&cv,&Code,1);
+			if (ts.LocalEcho>0) {
+				CommTextEcho(&cv,&Code,1);
+			}
+		}
+	}
+#endif
 
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
