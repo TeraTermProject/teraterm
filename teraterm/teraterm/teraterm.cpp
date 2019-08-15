@@ -326,6 +326,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			}
 			_CrtCheckMemory();
 		}
+		_CrtCheckMemory();
 	}
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;

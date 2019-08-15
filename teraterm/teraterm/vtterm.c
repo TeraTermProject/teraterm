@@ -214,6 +214,11 @@ static DWORD BeepOverUsedCount = 0;
 
 static _locale_t CLocale = NULL;
 
+#if UNICODE_INTERNAL_BUFF
+// 内部コード unicode版
+static void UnicodeToCP932(unsigned int code);
+#endif
+
 void ClearParams()
 {
 	ICount = 0;
@@ -665,7 +670,23 @@ static void PutChar(BYTE b)
 		CharAttrTmp.Attr |= CharAttr.Attr;
 
 #if UNICODE_INTERNAL_BUFF
-	if (ts.Language == IdRussian) {
+	if (ts.Language == IdJapanese) {
+		unsigned long u32;
+		switch (ts.KanjiCode) {
+//		case IdJIS:
+//			b = JIS2SJIS(b);
+		case IdSJIS:
+			u32 = MBCP_UTF32(b, 932);
+			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+			break;
+		case IdUTF8:
+			BuffPutUnicode(b, CharAttrTmp, InsertMode);
+			break;
+		default:
+			BuffPutUnicode(b, CharAttrTmp, InsertMode);
+			break;
+		}
+	} else if (ts.Language == IdRussian) {
 		BYTE c = RussConv(ts.RussHost, IdWindows, b);
 		unsigned long u32 = MBCP_UTF32(c, 1251);
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
@@ -796,7 +817,7 @@ static void PutKanji(BYTE b)
 		// codepage一覧
 		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
 		unsigned long u32 = 0;
-		if (ts.Language == IdKorean) {
+		if (ts.Language == IdKorean && ts.CodePage == 51949) {
 			unsigned char buf[2];
 			int ret;
 			wchar_t wchar;
@@ -805,13 +826,14 @@ static void PutKanji(BYTE b)
 			ret = MultiByteToWideChar(51949, MB_ERR_INVALID_CHARS, (char *)buf, 2, &wchar, 1);
 			u32 = wchar;
 			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
-		} else if (ts.Language == IdJapanese) {
+		} else if (ts.Language == IdJapanese && ts.CodePage == 932) {
 			// ここに来た時点でCP932になっている
 			//} else if (ts.KanjiCode == IdSJIS || ts.KanjiCode == IdEUC || ts.KanjiCode == IdJIS) {
 			u32 = CP932ToUTF32(Kanji);
 			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 		} else {
-			assert(FALSE);
+			u32 = MBCP_UTF32(Kanji, ts.CodePage);
+			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 		}
 	}
 #else
@@ -5157,10 +5179,28 @@ void CANSeen(BYTE b)
 	}
 }
 
-BOOL CheckKanji(BYTE b)
+/**
+ *	dbcsの1byte目チェック?
+ */
+static BOOL CheckKanji(BYTE b)
 {
 	BOOL Check;
 
+#if UNICODE_INTERNAL_BUFF
+	if (ts.CodePage != 932) {
+		// TODO ちゃんとチェックする
+		// IsDBCSLeadByteEx() が妥当?
+		if (ts.CodePage == 936) {
+			// chs
+			return ((0x81 <= b) && (b <= 0xfe));
+		}
+		if (ts.CodePage == 950) {
+			// cht
+			return ((0x88 <= b) && (b <= 0xfe));
+		}
+
+	}
+#endif
 	if (ts.Language!=IdJapanese)
 		return FALSE;
 
@@ -5216,7 +5256,7 @@ BOOL CheckKorean(BYTE b)
 	return Check;
 }
 
-BOOL ParseFirstJP(BYTE b)
+static BOOL ParseFirstJP(BYTE b)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
 {
@@ -5277,6 +5317,14 @@ BOOL ParseFirstJP(BYTE b)
 		if ((Gn[Glr[0]] == IdKatakana) || EUCkanaIn) {
 			b = b | 0x80;
 			EUCkanaIn = FALSE;
+#if UNICODE_INTERNAL_BUFF
+			{
+				// bはsjisの半角カタカナ
+				unsigned long u32 = CP932ToUTF32(b);
+				UnicodeToCP932(u32);
+			}
+			return TRUE;
+#endif
 		}
 		PutChar(b);
 	}
@@ -5335,9 +5383,15 @@ BOOL ParseFirstJP(BYTE b)
 		    (ts.KanjiCode==IdSJIS) ||
 		    (ts.KanjiCode==IdJIS) &&
 		    (ts.JIS7Katakana==0) &&
-		    ((ts.TermFlag & TF_FIXEDJIS)!=0))
+		    ((ts.TermFlag & TF_FIXEDJIS)!=0)) {
+#if UNICODE_INTERNAL_BUFF
+			// bはsjisの半角カタカナ
+			unsigned long u32 = CP932ToUTF32(b);
+			UnicodeToCP932(u32);
+#else
 			PutChar(b);	// katakana
-		else {
+#endif
+		} else {
 			if (Gn[Glr[1]] == IdASCII) {
 				b = b & 0x7f;
 			}
@@ -5553,7 +5607,6 @@ static void UnicodeToCP932(unsigned int code)
 		else
 			LineEnd = CursorRightM;
 
-		BOOL half_width = (UnicodeGetWidthProperty(code) == 'H') ? TRUE : FALSE;
 
 		if (Wrap) {
 			CarriageReturn(FALSE);
@@ -5564,6 +5617,7 @@ static void UnicodeToCP932(unsigned int code)
 		else if (CursorX > LineEnd - 1) {
 			if (AutoWrapMode) {
 				if (ts.EnableContinuedLineCopy) {
+					BOOL half_width = (UnicodeGetWidthProperty(code) == 'H') ? TRUE : FALSE;
 					CharAttrTmp.Attr |= AttrLineContinued;
 					if (half_width == FALSE && CursorX == LineEnd) {
 						// full width出力が半分出力にならないように0x20を出力
