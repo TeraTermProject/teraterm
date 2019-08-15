@@ -29,6 +29,39 @@ If &lt;file2&gt; already exists, it is overwritten. &lt;file1&gt; and &lt;file2&
 If the file is copy successfully, the system variable "result" is set to 0. Otherwise, "result" is set to non-zero. (version 4.104 or later)
 </p>
 
+<h2>Value of the system variable "result"</h2>
+
+<p>
+As a result of this command, the system variable "result" is set to one of the following values depending on the copy status:
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Status</th>
+ </tr>
+ <tr>
+  <td>-4</td>
+  <td>Copy failed.</td>
+ </tr>
+ <tr>
+  <td>-3</td>
+  <td>A file &lt;file1&gt; and file &lt;file2&gt; is same of name.</td>
+ </tr>
+ <tr>
+  <td>-2</td>
+  <td>Be used invalid characters to file &lt;file2&gt;.</td>
+ </tr>
+ <tr>
+  <td>-1</td>
+  <td>Be used invalid characters to file &lt;file1&gt;.</td>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Copy succeeded.</td>
+ </tr>
+</table>
+
 <h2>Example</h2>
 
 <pre class="macro-example">
