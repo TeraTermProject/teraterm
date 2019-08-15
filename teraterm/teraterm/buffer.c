@@ -100,11 +100,6 @@ static WORD TabStops[256];
 static int NTabStops;
 
 static WORD BuffLock = 0;
-static HANDLE HCodeBuff = 0;
-static HANDLE HAttrBuff = 0;
-static HANDLE HAttrBuff2 = 0;
-static HANDLE HAttrBuffFG = 0;
-static HANDLE HAttrBuffBG = 0;
 
 static PCHAR CodeBuff;  /* Character code buffer */
 static PCHAR AttrBuff;  /* Attribute buffer */
@@ -271,7 +266,6 @@ static LONG PrevLinePtr(LONG Ptr)
 
 BOOL ChangeBuffer(int Nx, int Ny)
 {
-	HANDLE HCodeNew, HAttrNew, HAttr2New, HAttrFGNew, HAttrBGNew;
 	LONG NewSize;
 	int NxCopy, NyCopy, i;
 	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
@@ -279,7 +273,6 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	WORD LockOld;
 #if UNICODE_INTERNAL_BUFF
 	buff_char_t *CodeDestW;
-	buff_char_t *CodeWNew;
 #endif
 
 	if (Nx > BuffXMax) {
@@ -298,33 +291,40 @@ BOOL ChangeBuffer(int Nx, int Ny)
 
 	NewSize = (LONG)Nx * (LONG)Ny;
 
-	HCodeNew = NULL;
-	HAttrNew = NULL;
-	HAttr2New = NULL;
-	HAttrFGNew = NULL;
-	HAttrBGNew = NULL;
+	CodeDest = NULL;
+	AttrDest = NULL;
+	AttrDest2 = NULL;
+	AttrDestFG = NULL;
+	AttrDestBG = NULL;
 #if UNICODE_INTERNAL_BUFF
-	CodeWNew = NULL;
+	CodeDestW = NULL;
 #endif
 
-	if ((HCodeNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (CodeDest=GlobalLock(HCodeNew)) == NULL) {
+	CodeDest = malloc(NewSize);
+	if (CodeDest == NULL) {
 		goto allocate_error;
 	}
-	if ((HAttrNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDest=GlobalLock(HAttrNew)) == NULL) {
+	AttrDest = malloc(NewSize);
+	if (AttrDest == NULL) {
 		goto allocate_error;
 	}
-	if ((HAttr2New=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDest2=GlobalLock(HAttr2New)) == NULL) {
+	AttrDest2 = malloc(NewSize);
+	if (AttrDest2 == NULL) {
 		goto allocate_error;
 	}
-	if ((HAttrFGNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDestFG=GlobalLock(HAttrFGNew)) == NULL) {
+	AttrDestFG = malloc(NewSize);
+	if (AttrDestFG == NULL) {
 		goto allocate_error;
 	}
-	if ((HAttrBGNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDestBG=GlobalLock(HAttrBGNew)) == NULL) {
+	AttrDestBG = malloc(NewSize);
+	if (AttrDestBG == NULL) {
 		goto allocate_error;
 	}
 #if UNICODE_INTERNAL_BUFF
-	CodeWNew = malloc(NewSize * sizeof(buff_char_t));
-	CodeDestW = CodeWNew;
+	CodeDestW = malloc(NewSize * sizeof(buff_char_t));
+	if (CodeDestW == NULL) {
+		goto allocate_error;
+	}
 #endif
 
 	memset(&CodeDest[0], 0x20, NewSize);
@@ -336,7 +336,7 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	memset(&AttrDest2[0], AttrDefault, NewSize);
 	memset(&AttrDestFG[0], AttrDefaultFG, NewSize);
 	memset(&AttrDestBG[0], AttrDefaultBG, NewSize);
-	if ( HCodeBuff!=0 ) {
+	if ( CodeBuff != NULL ) {
 		if ( NumOfColumns > Nx ) {
 			NxCopy = Nx;
 		}
@@ -395,13 +395,13 @@ BOOL ChangeBuffer(int Nx, int Ny)
 		            (SelectEnd.x > SelectStart.x));
 	}
 
-	HCodeBuff = HCodeNew;
-	HAttrBuff = HAttrNew;
-	HAttrBuff2 = HAttr2New;
-	HAttrBuffFG = HAttrFGNew;
-	HAttrBuffBG = HAttrBGNew;
+	CodeBuff = CodeDest;
+	AttrBuff = AttrDest;
+	AttrBuff2 = AttrDest2;
+	AttrBuffFG = AttrDestFG;
+	AttrBuffBG = AttrDestBG;
 #if UNICODE_INTERNAL_BUFF
-	CodeBuffW = CodeWNew;
+	CodeBuffW = CodeDestW;
 #endif
 	BufferSize = NewSize;
 	NumOfLinesInBuff = Ny;
@@ -419,11 +419,6 @@ BOOL ChangeBuffer(int Nx, int Ny)
 
 	LinePtr = 0;
 	if (LockOld>0) {
-		CodeBuff = (PCHAR)GlobalLock(HCodeBuff);
-		AttrBuff = (PCHAR)GlobalLock(HAttrBuff);
-		AttrBuff2 = (PCHAR)GlobalLock(HAttrBuff2);
-		AttrBuffFG = (PCHAR)GlobalLock(HAttrBuffFG);
-		AttrBuffBG = (PCHAR)GlobalLock(HAttrBuffBG);
 		CodeLine = CodeBuff;
 #if UNICODE_INTERNAL_BUFF
 		CodeLineW = CodeBuffW;
@@ -434,30 +429,21 @@ BOOL ChangeBuffer(int Nx, int Ny)
 		AttrLineBG = AttrBuffBG;
 	}
 	else {
-		GlobalUnlock(HCodeNew);
-		GlobalUnlock(HAttrNew);
-		GlobalUnlock(HAttr2New);
-		GlobalUnlock(HAttrFGNew);
-		GlobalUnlock(HAttrBGNew);
+		;
 	}
 	BuffLock = LockOld;
 
 	return TRUE;
 
 allocate_error:
-	if (CodeDest)   GlobalUnlock(HCodeNew);
-	if (AttrDest)   GlobalUnlock(HAttrNew);
-	if (AttrDest2)  GlobalUnlock(HAttr2New);
-	if (AttrDestFG) GlobalUnlock(HAttrFGNew);
-	if (AttrDestBG) GlobalUnlock(HAttrBGNew);
-	if (HCodeNew)   GlobalFree(HCodeNew);
+	if (CodeDest)   free(CodeDest);
+	if (AttrDest)   free(AttrDest);
+	if (AttrDest2)  free(AttrDest2);
+	if (AttrDestFG) free(AttrDestFG);
+	if (AttrDestBG) free(AttrDestBG);
 #if UNICODE_INTERNAL_BUFF
-	if (CodeWNew)   free(CodeWNew);
+	if (CodeDestW)  free(CodeDestW);
 #endif
-	if (HAttrNew)   GlobalFree(HAttrNew);
-	if (HAttr2New)  GlobalFree(HAttr2New);
-	if (HAttrFGNew) GlobalFree(HAttrFGNew);
-	if (HAttrBGNew) GlobalFree(HAttrBGNew);
 	return FALSE;
 }
 
@@ -520,11 +506,6 @@ void LockBuffer()
 	if (BuffLock>1) {
 		return;
 	}
-	CodeBuff = (PCHAR)GlobalLock(HCodeBuff);
-	AttrBuff = (PCHAR)GlobalLock(HAttrBuff);
-	AttrBuff2 = (PCHAR)GlobalLock(HAttrBuff2);
-	AttrBuffFG = (PCHAR)GlobalLock(HAttrBuffFG);
-	AttrBuffBG = (PCHAR)GlobalLock(HAttrBuffBG);
 	NewLine(PageStart+CursorY);
 }
 
@@ -537,30 +518,15 @@ void UnlockBuffer()
 	if (BuffLock>0) {
 		return;
 	}
-	if (HCodeBuff!=NULL) {
-		GlobalUnlock(HCodeBuff);
-	}
-	if (HAttrBuff!=NULL) {
-		GlobalUnlock(HAttrBuff);
-	}
-	if (HAttrBuff2!=NULL) {
-		GlobalUnlock(HAttrBuff2);
-	}
-	if (HAttrBuffFG!=NULL) {
-		GlobalUnlock(HAttrBuffFG);
-	}
-	if (HAttrBuffBG!=NULL) {
-		GlobalUnlock(HAttrBuffBG);
-	}
 }
 
 void FreeBuffer()
 {
 	BuffLock = 1;
 	UnlockBuffer();
-	if (HCodeBuff!=NULL) {
-		GlobalFree(HCodeBuff);
-		HCodeBuff = NULL;
+	if (CodeBuff!=NULL) {
+		free(CodeBuff);
+		CodeBuff = NULL;
 	}
 #if UNICODE_INTERNAL_BUFF
 	if (CodeBuffW != NULL) {
@@ -568,21 +534,21 @@ void FreeBuffer()
 		CodeBuffW = NULL;
 	}
 #endif
-	if (HAttrBuff!=NULL) {
-		GlobalFree(HAttrBuff);
-		HAttrBuff = NULL;
+	if (AttrBuff!=NULL) {
+		free(AttrBuff);
+		AttrBuff = NULL;
 	}
-	if (HAttrBuff2!=NULL) {
-		GlobalFree(HAttrBuff2);
-		HAttrBuff2 = NULL;
+	if (AttrBuff2!=NULL) {
+		free(AttrBuff2);
+		AttrBuff2 = NULL;
 	}
-	if (HAttrBuffFG!=NULL) {
-		GlobalFree(HAttrBuffFG);
-		HAttrBuffFG = NULL;
+	if (AttrBuffFG!=NULL) {
+		free(AttrBuffFG);
+		AttrBuffFG = NULL;
 	}
-	if (HAttrBuffBG!=NULL) {
-		GlobalFree(HAttrBuffBG);
-		HAttrBuffBG = NULL;
+	if (AttrBuffBG!=NULL) {
+		free(AttrBuffBG);
+		AttrBuffBG = NULL;
 	}
 }
 
@@ -2748,9 +2714,6 @@ static BOOL CheckSelect(int x, int y)
  */
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 {
-#if 1
-	OutputDebugPrintf("BuffDrawLineI(%d,%d, %d,%d-%d)\n", DrawX, DrawY, SY, IStart, IEnd);
-#endif
 	int X = DrawX;
 	int Y = DrawY;
 	const LONG TmpPtr = GetLinePtr(SY);
@@ -2764,6 +2727,9 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 	BOOL CurSelected;
 	BOOL EndFlag = FALSE;
 	int count = 0;		// åªç›íçñ⁄ÇµÇƒÇ¢ÇÈï∂éö,IStartÇ©ÇÁ
+#if 0
+	OutputDebugPrintf("BuffDrawLineI(%d,%d, %d,%d-%d)\n", DrawX, DrawY, SY, IStart, IEnd);
+#endif
 	while (!EndFlag) {
 		const buff_char_t *b;
 		TCharAttr TempAttr;
