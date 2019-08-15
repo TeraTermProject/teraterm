@@ -48,12 +48,15 @@ char UnicodeGetWidthProperty(unsigned long u32)
 		unsigned long code_to;
 		char property;
 	} east_asian_width_map_t;
+	// W or F or A がテーブルに入っている (テーブル外は H)
 	const static east_asian_width_map_t east_asian_width_map[] = {
 #include "unicode_asian_width.tbl"
 	};
 	const east_asian_width_map_t *table = east_asian_width_map;
 	const size_t table_size = _countof(east_asian_width_map);
+	char result;
 
+	// テーブル外チェック
 	if (u32 < east_asian_width_map[0].code_from) {
 		return 'H';
 	}
@@ -61,20 +64,33 @@ char UnicodeGetWidthProperty(unsigned long u32)
 		return 'H';
 	}
 
+	// テーブル検索
+	result = 'H';
 	size_t low = 0;
 	size_t high = table_size - 1;
 	while (low < high) {
 		size_t mid = (low + high) / 2;
 		if (table[mid].code_from <= u32 && u32 <= table[mid].code_to) {
-			return table[mid].property;
+			result = table[mid].property;
+			break;
 		} else if (table[mid].code_to < u32) {
 			low = mid + 1;
 		} else {
 			high = mid;
 		}
 	}
-	// テーブルの範囲外
-	return 'H';
+
+	if (result == 'A') {
+		// キリル文字特別(TODO)
+		// ?	0x500-0x520
+		// 		0x2de0-0x2dff
+		// 		0xa640-0xa69f
+		if (0x400 <= u32 && u32 <= 0x4ff) {
+			result = 'H';
+		}
+	}
+
+	return result;
 }
 
 /*

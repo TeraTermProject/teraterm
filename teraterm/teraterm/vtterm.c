@@ -665,7 +665,13 @@ static void PutChar(BYTE b)
 		CharAttrTmp.Attr |= CharAttr.Attr;
 
 #if UNICODE_INTERNAL_BUFF
-	BuffPutUnicode(b, CharAttrTmp, InsertMode);
+	if (ts.Language == IdRussian) {
+		BYTE c = RussConv(ts.RussHost, IdWindows, b);
+		unsigned long u32 = MBCP_UTF32(c, 1251);
+		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+	} else {
+		BuffPutUnicode(b, CharAttrTmp, InsertMode);
+	}
 #else
 	BuffPutChar(b, CharAttrTmp, InsertMode);
 #endif
@@ -5819,12 +5825,16 @@ skip:
 }
 
 
-BOOL ParseFirstRus(BYTE b)
+static BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
 	if (b>=128) {
+#if 0
 		b = RussConv(ts.RussHost,ts.RussClient,b);
 		PutChar(b);
+#else
+		PutChar(b);
+#endif
 		return TRUE;
 	}
 	return FALSE;

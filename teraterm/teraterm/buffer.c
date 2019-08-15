@@ -2748,7 +2748,7 @@ static BOOL CheckSelect(int x, int y)
  */
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 {
-#if 0
+#if 1
 	OutputDebugPrintf("BuffDrawLineI(%d,%d, %d,%d-%d)\n", DrawX, DrawY, SY, IStart, IEnd);
 #endif
 	int X = DrawX;
@@ -2836,7 +2836,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			bufW[lenW] = 0;
 			bufWW[lenW] = 0;
 
-#if 0
+#if 1
 			OutputDebugPrintf("A[%d] '%s'\n", lenA, bufA);
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
