@@ -38,6 +38,7 @@
 #include <ctype.h>
 #include <crtdbg.h>
 #include <tchar.h>
+#include <assert.h>
 
 #include "buffer.h"
 #include "ttwinman.h"
@@ -784,7 +785,32 @@ static void PutKanji(BYTE b)
 		Special = FALSE;
 	}
 
+#if 1
+	{
+		// codepageˆê——
+		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
+		unsigned long u32 = 0;
+		if (ts.Language == IdKorean) {
+			unsigned char buf[2];
+			int ret;
+			wchar_t wchar;
+			buf[0] = Kanji >> 8;
+			buf[1] = Kanji & 0xff;
+			ret = MultiByteToWideChar(51949, MB_ERR_INVALID_CHARS, (char *)buf, 2, &wchar, 1);
+			u32 = wchar;
+			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+		} else if (ts.Language == IdJapanese) {
+			// ‚±‚±‚É—ˆ‚½Žž“_‚ÅCP932‚É‚È‚Á‚Ä‚¢‚é
+			//} else if (ts.KanjiCode == IdSJIS || ts.KanjiCode == IdEUC || ts.KanjiCode == IdJIS) {
+			u32 = CP932ToUTF32(Kanji);
+			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+		} else {
+			assert(FALSE);
+		}
+	}
+#else
 	BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
+#endif
 
 	if (CursorX < LineEnd - 1) {
 		MoveRight();
@@ -5385,10 +5411,12 @@ BOOL ParseFirstKR(BYTE b)
 
 static void ParseASCII(BYTE b)
 {
+#if 0
 	if (ts.Language == IdJapanese) {
 		ParseFirstJP(b);
 		return;
 	}
+#endif
 
 	if (SSflag) {
 		PutChar(b);
