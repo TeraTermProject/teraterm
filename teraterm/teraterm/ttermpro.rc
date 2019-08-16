@@ -143,7 +143,7 @@ BEGIN
     LTEXT           "P&aste delay per line",IDC_PASTEDELAY_LABEL,11,160,70,10
     EDITTEXT        IDC_PASTEDELAY_EDIT,95,158,24,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "ms",IDC_PASTEDELAY_LABEL2,123,160,23,10
-    CONTROL         "Disa&bling text selection when the window is activated",IDC_SELECT_ON_ACTIVATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,173,200,10
+    CONTROL         "Ena&bling text selection when the window is activated by mouse",IDC_SELECT_ON_ACTIVATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,173,200,10
 END
 
 IDD_TABSHEET_VISUAL DIALOGEX 0, 0, 258, 188

@@ -226,7 +226,7 @@ DLG_TAB_COPYPASTE_STRINGFILE=&String file
 DLG_TAB_COPYPASTE_DELIMITER=&Begrenzungszeichen
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
-DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
 DLG_TAB_VISUAL_ALPHA=&Transparenz
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active

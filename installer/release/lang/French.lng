@@ -226,7 +226,7 @@ DLG_TAB_COPYPASTE_STRINGFILE=Fichier chaîne
 DLG_TAB_COPYPASTE_DELIMITER=Caractères délimiteurs
 DLG_TAB_COPYPASTE_PASTEDELAY=Délai avant de coller la ligne
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
-DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
 DLG_TAB_VISUAL_ALPHA=Mélange alpha
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
