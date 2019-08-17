@@ -18,7 +18,7 @@ rem VS2005だと警告エラーでコンパイルが止まる問題への処置
 perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
 
-rem GetModuleHandleExW API依存除去のため
+rem GetModuleHandleExW API(WindowsXP以降)依存除去のため
 perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
 

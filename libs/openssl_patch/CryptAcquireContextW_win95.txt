@@ -1,0 +1,38 @@
+*** openssl/crypto/rand/rand_win.c.patched	2019-08-16 23:16:30.259119000 +0900
+--- openssl/crypto/rand/rand_win.c	2019-08-17 15:08:11.171399500 +0900
+***************
+*** 39,44 ****
+--- 39,71 ----
+  #  define INTEL_DEF_PROV L"Intel Hardware Cryptographic Service Provider"
+  # endif
+  
++ #define CryptAcquireContextW myCryptAcquireContextW
++ typedef BOOL(WINAPI *CRYPTACQUIRECONTEXTW)(HCRYPTPROV*, LPCWSTR, LPCWSTR, DWORD, DWORD);
++ static BOOL myCryptAcquireContextW(
++   HCRYPTPROV *phProv,
++   LPCWSTR    szContainer,
++   LPCWSTR    szProvider,
++   DWORD      dwProvType,
++   DWORD      dwFlags
++ )
++ {
++ 	HMODULE mod;
++ 	CRYPTACQUIRECONTEXTW func;
++ 	BOOL ret;
++ 
++ 	if ( (mod = GetModuleHandle(TEXT("ADVAPI32.DLL"))) &&
++ 		 (func = (CRYPTACQUIRECONTEXTW)GetProcAddress(mod, "CryptAcquireContextW")) 
++ 		 ) {
++ 
++ 		ret = func(phProv, szContainer, szProvider, dwProvType, dwFlags);
++ 		return ret;
++ 
++ 	} else {
++ 		return FALSE;
++ 
++ 	}
++ }
++ 
+  size_t rand_pool_acquire_entropy(RAND_POOL *pool)
+  {
+  # ifndef USE_BCRYPTGENRANDOM

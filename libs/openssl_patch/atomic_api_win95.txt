@@ -1,0 +1,101 @@
+*** openssl/crypto/threads_win.c.patched	2019-08-16 23:13:33.040131200 +0900
+--- openssl/crypto/threads_win.c	2019-08-17 15:04:33.459137000 +0900
+*************** int myInitializeCriticalSectionAndSpinCo
+*** 20,52 ****
+   	return 1;
+  }
+  
+- #if 0
+  #define InterlockedCompareExchange(a, b, c) myInterlockedCompareExchange(a, b, c)
+  LONG myInterlockedCompareExchange( 
+       LPLONG volatile Destination,
+       LONG Exchange,
+       LONG Comperand
+  )
+  {
+   	LONG ret = *Destination;
+- 	OutputDebugPrintf("%s: %x\n", __FUNCTION__, ret);
+   	
+   	if (*Destination == Comperand)
+   		ret = InterlockedExchange(Destination, Exchange);
+   	return (ret);
+  }
+   
+  #define InterlockedExchangeAdd(a, b) myInterlockedExchangeAdd(a, b)
+  LONG myInterlockedExchangeAdd(
+     LONG volatile *Addend,
+     LONG          Value
+   )
+  {
+! 	OutputDebugPrintf("%s: %x\n", __FUNCTION__, Value);
+   	while (Value-- > 0) 
+   		InterlockedIncrement(Addend);
+  }
+- #endif
+  
+  #if defined(OPENSSL_THREADS) && !defined(CRYPTO_TDEBUG) && defined(OPENSSL_SYS_WINDOWS)
+  
+--- 20,82 ----
+   	return 1;
+  }
+  
+  #define InterlockedCompareExchange(a, b, c) myInterlockedCompareExchange(a, b, c)
++ typedef LONG(WINAPI *INTERLOCKEDCOMPAREEXCHANGE)(
++   LONG volatile *Destination,
++   LONG          ExChange,
++   LONG          Comperand
++ );
+  LONG myInterlockedCompareExchange( 
+       LPLONG volatile Destination,
+       LONG Exchange,
+       LONG Comperand
+  )
+  {
++ 	HMODULE mod;
++ 	INTERLOCKEDCOMPAREEXCHANGE func;
++ 
++ 	if ( (mod = GetModuleHandle(TEXT("KERNEL32.DLL"))) &&
++ 		 (func = (INTERLOCKEDCOMPAREEXCHANGE)GetProcAddress(mod, "InterlockedCompareExchange")) 
++ 		 ) {
++ 		return func(Destination, Exchange, Comperand);
++ 
++ 	} else {
+  		LONG ret = *Destination;
+  		
+  		if (*Destination == Comperand)
+  			ret = InterlockedExchange(Destination, Exchange);
+  		return (ret);
++ 
++ 	}
+  }
+   
+  #define InterlockedExchangeAdd(a, b) myInterlockedExchangeAdd(a, b)
++ typedef LONG(WINAPI *INTERLOCKEDEXCHANGEADD)(
++   LONG volatile *Addend,
++   LONG          Value
++ );
+  LONG myInterlockedExchangeAdd(
+     LONG volatile *Addend,
+     LONG          Value
+   )
+  {
+! 	HMODULE mod;
+! 	INTERLOCKEDEXCHANGEADD func;
+! 
+! 	if ( (mod = GetModuleHandle(TEXT("KERNEL32.DLL"))) &&
+! 		 (func = (INTERLOCKEDEXCHANGEADD)GetProcAddress(mod, "InterlockedExchangeAdd")) 
+! 		 ) {
+! 		return func(Addend, Value);
+! 
+! 	} else {
+! 		LONG ret = *Addend;
+! 
+  		while (Value-- > 0) 
+  			InterlockedIncrement(Addend);
++ 
++ 		return (ret);
++ 	}
+  }
+  
+  #if defined(OPENSSL_THREADS) && !defined(CRYPTO_TDEBUG) && defined(OPENSSL_SYS_WINDOWS)
+  
