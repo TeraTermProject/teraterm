@@ -6402,7 +6402,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnFileTransEnd(wp, lp);
 		break;
 	case WM_USER_GETSERIALNO:
-		OnGetSerialNo(wp, lp);
+		retval = OnGetSerialNo(wp, lp);
 		break;
 	case WM_USER_KEYCODE:
 		OnKeyCode(wp, lp);
