@@ -211,7 +211,7 @@ connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /pass
 connect '<em>myserver</em> /ssh /auth=pageant /user=<em>username</em>'
 
 
-; Tera Term を起動し、シリアルポート接続を開く。ポート番号は 1 から 4096 の範囲内
+; Tera Term を起動し、シリアルポート接続を開く。ポート番号は 1 から 最大値(MaxComPort) の範囲内。
 connect '/C=x'
 
 CommandLine = '111.111.11.11'
