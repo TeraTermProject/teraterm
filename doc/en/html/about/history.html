@@ -36,10 +36,10 @@
   <li>Changes
     <ul>
       <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in Ver 4.102.</li>
-      <!--li><a href="../macro/command/filetruncate.html">filetruncate</a> マクロコマンドがでファルが開けない場合・ファイルサイズの変更に失敗した場合エラーにならないようにした。</li-->
-      <!--li><a href="../menu/file-chdir.html">ファイル転送のためのディレクトリ</a>に含まれる環境変数を展開するようにした。</li-->
+      <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
+      <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
-      <!--li><a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a>を<a href="../menu/setup-additional.html#SelectOnActivate">ダイアログ</a>で設定できるようにした。</li-->
+      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
     </ul>
   </li>
   <li>Bug fixes
@@ -48,11 +48,11 @@
       <li>When UTF-8 characters received, 4-byte UTF-8 characters are miss-decorded.</li>
       <li>The plugin compiled before 4.103 can not called because the DLL's calling convention is changed in Tera Term 4.103. </li>
       <li>Displayed unspecified string font in IME changes, when you open the font setting dialog.</li>
-      <!--li><a href="../macro/command/filecopy.html">filecopy</a> マクロコマンドの結果が result システム変数に格納されないことがある問題を修正した。</li-->
-      <li><!-- [File]/[Send file..]から大きなファイルをうまく送信できない問題を修正した。4.103でのエンバグ。 --></li>
-      <!--li><a href="../macro/command/filelock.html">filelock</a>, <a href="../macro/command/fileunlock.html">fileunlock</a> マクロコマンドが常に失敗していた。4.101でのエンバグ。</li-->
-      <!--li><a href="../macro/command/filestrseek2.html">filestrseek2</a>マクロコマンドで、ファイルの1バイト目が一致したとき、ファイルポインタが先頭になっていなかった問題を修正した。4.101でのエンバグ。</li-->
-      <!--li>印字中止ダイアログが出なくなっていた問題を修正した。4.103でのエンバグ。</li-->
+      <li>MACRO: <a href="../macro/command/filecopy.html">filecopy</a> command may not store the result to result system variable.</li>
+      <li>A big file can not send by using [File]/[Send file..]. This bug was introduced in 4.103.</li>
+      <li>MACRO: <a href="../macro/command/filelock.html">filelock</a> and <a href="../macro/command/fileunlock.html">fileunlock</a> command always fail. This bug was introduced in 4.101.</li>
+      <li>MACRO: When the first byte of the file is matched by using <a href="../macro/command/filestrseek2.html">filestrseek2</a> command, the file pointer is invalid. This bug was introduced in 4.101.</li>
+      <li>Cancel printing dialog can not be shown. This bug was introduced in 4.103.</li>
       <li>When the locale setting is default(japanese) or invalid on English version of Windows, an application fault immediately occurs after starting Tera Term.</li>
     </ul>
   </li>
@@ -3172,7 +3172,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>SSH2: When SSH communication is slow by using port forwarding, an application fault is occurred due to increase memory consumption.</li>
-      <!--li>SSH2: SCP 転送ダイアログを閉じるときに、ファイル転送ディレクトリ設定・SCP送信先パス設定が更新されないことがある問題を修正した。</li-->
+      <li>SSH2: When SCP transfer dialog is closed, the directory of file transfer setting and the SCP destination path setting may not be updated.</li>
       <li>SSH1: When the destination port number is other than 22, an application fault may be occurred after the host key is newly written to known_hosts file.</li>
       <li>SSH1: The rhosts authentication could not be performed at all.</li>
     </ul>
