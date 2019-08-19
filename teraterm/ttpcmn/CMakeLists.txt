@@ -73,3 +73,9 @@ target_link_libraries(
   setupapi
   delayimp
   )
+
+install(
+  TARGETS ttpcmn
+  RUNTIME
+  DESTINATION .
+  )

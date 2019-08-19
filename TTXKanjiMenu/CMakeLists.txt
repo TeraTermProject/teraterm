@@ -37,4 +37,8 @@ target_link_libraries(
   ws2_32
   )
 
-
+install(
+  TARGETS ttxkanjimenu
+  RUNTIME
+  DESTINATION .
+  )

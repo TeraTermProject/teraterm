@@ -12,6 +12,9 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
+string(TIMESTAMP SNAPSHOT_DIR "snapshot-%Y%m%d_%H%M%S")
+set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
+
 # _WIN32_WINNT_WIN10 0x0a00
 set(_WIN32_WINNT "0x0a00")
 if(MSVC)
@@ -106,6 +109,7 @@ add_subdirectory(TTXKanjiMenu)
 if(${ENABLE_TTXSAMPLES})
   add_subdirectory(TTXSamples)
 endif()
+add_subdirectory(installer)
 
 ####
 # ソースツリー内に生成ファイルが存在していたら削除する

@@ -50,3 +50,9 @@ add_dependencies(
   ttpset
   ttpcmn
   )
+
+install(
+  TARGETS ttpset
+  RUNTIME
+  DESTINATION .
+  )

@@ -71,3 +71,9 @@ add_dependencies(
   ttpfile
   ttpcmn
   )
+
+install(
+  TARGETS ttpfile
+  RUNTIME
+  DESTINATION .
+  )

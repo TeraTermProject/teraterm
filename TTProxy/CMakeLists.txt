@@ -109,3 +109,9 @@ target_link_libraries(
   gdi32
   comdlg32
   )
+
+install(
+  TARGETS ttproxy
+  RUNTIME
+  DESTINATION .
+  )

@@ -51,4 +51,7 @@ target_link_libraries(
   comdlg32
   )
 
-
+install(
+  TARGETS ttpmenu
+  DESTINATION .
+  )

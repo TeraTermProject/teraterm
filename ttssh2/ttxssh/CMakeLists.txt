@@ -174,3 +174,9 @@ FILE(
   WRITE ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
   "#define PUTTYVERSION \"${version_str}\"\n"
   )
+
+install(
+  TARGETS ttxssh
+  RUNTIME
+  DESTINATION .
+  )
