@@ -26,8 +26,8 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly 
 <dl>
 	<dt class="macro">integer variable &lt;file handle&gt;</dt>
 	<dd>If the file is successfully opened, the file handle is returned in this variable.<br />
-        version 4.101 or earlier, and 4.104 or later: Otherwise, &lt;file handle&gt; is set to -1. <!-- マクロエラーとはならない。 --><br />
-        version 4.102 and 4.103: Otherwise, &lt;file handle&gt; is set to -1. <!-- マクロエラーとなり、マクロの実行が一次停止する。 --></dd>
+        version 4.101 or earlier, and 4.104 or later: Otherwise, &lt;file handle&gt; is set to -1. The macro error does not cause.<br />
+        version 4.102 and 4.103: Otherwise, &lt;file handle&gt; is set to -1. The macro script is halted after the macro eror causes.</dd>
 
 	<dt class="macro">string &lt;filename&gt;</dt>
 	<dd>Specify an opened file name<br />

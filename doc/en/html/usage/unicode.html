@@ -46,12 +46,10 @@ UTF-8 &lt;-----&gt; Unicode(UTF-16LE) &lt;-----&gt; MBCS
 
 <p>
 (1):
-<!--
-(1)において、4.102から 4byte UTF-8 に対応したため、UTF-8のデコード時に
-Unicode の情報が欠落することはなくなりました。<br>
-漢字コード(受信) に UTF-8m が選択されていると結合文字(combining
-character)の処理が一部が行われます。Mac OS X(HFS+)を考慮したものとなっ
-ています。<br> -->
+Unicode information is no longer missing on decoding UTF-8 because 
+four byte UTF-8 is supported after version 4.102.<br>
+When the KanjiCode(recv) is set to UTF-8m, a part of 
+combining character are processed for Mac OS X(HFS+). <br>
 
 (2): A user must specify the locale to convert the characters between
      Unicode and MBCS.
