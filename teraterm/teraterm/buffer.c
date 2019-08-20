@@ -1864,17 +1864,7 @@ void BuffCBCopyUnicode(BOOL Table)
 	OutputDebugPrintfW(L"BuffCBCopyUnicode()\n"
 					   L"%d, '%s'\n", str_len, str_ptr);
 
-	// クリップボードにセット
-	if (OpenClipboard(HVTWin)) {
-		HGLOBAL CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, sizeof(wchar_t) * str_len);
-		wchar_t *CBCopyWidePtr = (wchar_t *)GlobalLock(CBCopyWideHandle);
-		memcpy(CBCopyWidePtr, str_ptr, str_len * sizeof(wchar_t));
-		GlobalUnlock(CBCopyWideHandle);
-		EmptyClipboard();
-		SetClipboardData(CF_UNICODETEXT, CBCopyWideHandle);
-		// TODO 9x系では自動でCF_TEXTにセットされないらしい?
-		CloseClipboard();
-	}
+	CBSetTextW(HVTWin, str_ptr, 0);
 	free(str_ptr);
 }
 #endif

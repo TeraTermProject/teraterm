@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008-2017 TeraTerm Project
+ * (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,13 +29,20 @@
 
 /* TERATERM.EXE, Clipboard routines */
 
+#include "unicode_test.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* prototypes */
+
+#if !UNICODE_INTERNAL_BUFF
 PCHAR CBOpen(LONG MemSize);
 void CBClose(void);
+#endif
+BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
+
 void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
 void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed);
@@ -44,6 +51,7 @@ void CBSend(void);
 void CBSendW(void);
 void CBEcho(void);
 void CBEndPaste(void);
+
 
 #ifdef __cplusplus
 }

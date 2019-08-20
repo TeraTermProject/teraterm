@@ -80,6 +80,7 @@ static clipbard_work_t cbwork;
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 
+#if !UNICODE_BUF
 PCHAR CBOpen(LONG MemSize)
 {
 	if (MemSize==0) {
@@ -143,6 +144,7 @@ void CBClose()
 	CBCopyHandle = NULL;
 	CBCopyWideHandle = NULL;
 }
+#endif
 
 void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 {
@@ -1243,6 +1245,53 @@ void CBEndPaste()
 	_CrtCheckMemory();
 }
 
+/**
+ *	クリップボードにテキストをセットする
+ *	str_w	クリップボードにセットする文字列へのポインタ
+ *			NULLのときクリップボードを空にする(str_lenは参照されない)
+ *	str_len	文字列長
+ *			0のとき文字列長が自動で算出される
+ */
+BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
+{
+	HGLOBAL CBCopyWideHandle;
+
+	if (str_w == NULL) {
+		str_len = 0;
+	} else {
+		if (str_len == 0)
+			str_len = wcslen(str_w);
+	}
+
+	if (!OpenClipboard(hWnd)) {
+		return FALSE;
+	}
+
+	EmptyClipboard();
+	if (str_len == 0) {
+		return TRUE;
+	}
+
+	{
+		// 文字列をコピー、最後のL'\0'も含める
+		wchar_t *CBCopyWidePtr;
+		const size_t alloc_bytes = (str_len + 1) * sizeof(wchar_t);
+		CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, alloc_bytes);
+		CBCopyWidePtr = (wchar_t *)GlobalLock(CBCopyWideHandle);
+		memcpy(CBCopyWidePtr, str_w, alloc_bytes - sizeof(wchar_t));
+		CBCopyWidePtr[str_len] = L'\0';
+		GlobalUnlock(CBCopyWideHandle);
+	}
+
+	SetClipboardData(CF_UNICODETEXT, CBCopyWideHandle);
+
+	// TODO 9x系では自動でCF_TEXTにセットされないらしい?
+	CloseClipboard();
+
+	return TRUE;
+}
+
+#if 0
 BOOL CBSetClipboard(HWND owner, HGLOBAL hMem)
 {
 	char *buf;
@@ -1274,7 +1323,9 @@ BOOL CBSetClipboard(HWND owner, HGLOBAL hMem)
 
 	return TRUE;
 }
+#endif
 
+#if 0
 HGLOBAL CBAllocClipboardMem(char *text)
 {
 	HGLOBAL hMem;
@@ -1292,6 +1343,7 @@ HGLOBAL CBAllocClipboardMem(char *text)
 
 	return hMem;
 }
+#endif
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
