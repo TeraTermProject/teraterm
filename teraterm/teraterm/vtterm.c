@@ -5983,6 +5983,18 @@ int VTParse()
 	LockBuffer();
 
 	while ((c>0) && (ChangeEmu==0)) {
+#if UNICODE_DEBUG
+		{
+			static DWORD prev_tick;
+			DWORD now = GetTickCount();
+			if (prev_tick == 0) prev_tick = now;
+			if (now - prev_tick > 1*1000) {
+				printf("\n");
+				prev_tick = now;
+			}
+			printf("%02x(%c) ", b, isprint(b) ? b : '.');
+		}
+#endif
 		if (DebugFlag!=DEBUG_FLAG_NONE)
 			PutDebugChar(b);
 		else {

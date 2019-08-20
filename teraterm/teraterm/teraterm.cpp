@@ -31,8 +31,10 @@
 
 #include "teraterm_conf.h"
 
+#include <stdio.h>
 #include <crtdbg.h>
 #include <tchar.h>
+#include <io.h>			// for access()
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -53,6 +55,7 @@
 #include "compat_w95.h"
 #include "dlglib.h"
 #include "teraterml.h"
+#include "unicode_test.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -270,6 +273,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 {
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+#if UNICODE_DEBUG
+	if (_access("teraterm_debug.txt", 0) == 0) {
+		FILE* fp;
+		AllocConsole();
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+	}
 #endif
 
 	LONG lCount = 0;
