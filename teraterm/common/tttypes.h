@@ -404,6 +404,20 @@ typedef struct {
 	char BGThemeFile[MAX_PATH];
 } eterm_lookfeel_t;
 
+typedef struct cygterm {
+	BOOL update_flag;
+	char term[128];
+	char term_type[80];
+	char port_start[80];
+	char port_range[80];
+	char shell[80];
+	char env1[128];
+	char env2[128];
+	BOOL login_shell;
+	BOOL home_chdir;
+	BOOL agent_proxy;
+} cygterm_t;
+
 /* TTTSet */
 struct tttset {
 /*------ VTSet --------*/

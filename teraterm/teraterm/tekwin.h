@@ -40,7 +40,7 @@ private:
     FileMenu, SetupMenu, HelpMenu;
 
 public:
-	CTEKWindow();
+	CTEKWindow(HINSTANCE hInstance);
 	int Parse();
 	void RestoreSetup();
 	void InitMenu(HMENU *Menu);

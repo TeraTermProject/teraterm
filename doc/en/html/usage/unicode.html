@@ -45,10 +45,11 @@ UTF-8 &lt;-----&gt; Unicode(UTF-16LE) &lt;-----&gt; MBCS
 </pre>
 
 <p>
-(1): Tera Term can not support the surrogate pair and the combining character
-     <!--and the decomposed form-->
-     because the application does not convert UTF-8 byte sequence over three
-     bytes. <br>
+(1):
+Unicode information is no longer missing on decoding UTF-8 because 
+four byte UTF-8 is supported after version 4.102.<br>
+When the KanjiCode(recv) is set to UTF-8m, a part of 
+combining character are processed for Mac OS X(HFS+). <br>
 
 (2): A user must specify the locale to convert the characters between
      Unicode and MBCS.

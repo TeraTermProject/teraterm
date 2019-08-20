@@ -197,7 +197,7 @@ typedef struct tagWallpaperInfo
 
 static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
-static HBITMAP GetBitmapHandle(char *File);
+static HBITMAP GetBitmapHandle(const char *File);
 
 
 //便利関数☆
@@ -447,8 +447,14 @@ BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long
   if(spiVersion[2] != 'I' || spiVersion[3] != 'N')
     goto error;
 
+#if !defined(_M_X64)
   if(!(SPI_IsSupported)(nameFile,(unsigned long)bufFile))
     goto error;
+#else
+  // TODO ポインタを unsigned long に変換している
+  // 64bit版Susie Plug-in が存在する?
+  goto error;
+#endif
 
   if((SPI_GetPicture)(bufFile,sizeFile,1,hbmi,hbuf,NULL,0))
     goto error;
@@ -726,7 +732,7 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 // (2011.8.3 yutaka)
 // cf. http://www.geocities.jp/ccfjd821/purogu/wpe-ji9.html
 // この関数は Windows 2000 未満の場合には呼んではいけない
-static HBITMAP GetBitmapHandle(char *File)
+static HBITMAP GetBitmapHandle(const char *File)
 {
 	OLE_HANDLE hOle = 0;
 	IStream *iStream=NULL;
@@ -740,7 +746,7 @@ static HBITMAP GetBitmapHandle(char *File)
 
 	hFile=CreateFile(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
-		return (hBitmap);
+		return NULL;
 	}
 	nFileSize=GetFileSize(hFile,NULL);
 	hMem=GlobalAlloc(GMEM_MOVEABLE,nFileSize);
@@ -759,9 +765,9 @@ static HBITMAP GetBitmapHandle(char *File)
 	// プログラムが落ちる問題を修正した。
 	// (2015.12.5 yutaka)
 	if (iPicture == NULL)
-		return (hBitmap);
+		return NULL;
 
-	iStream->lpVtbl->Release((IStream *)iPicture);
+	iStream->lpVtbl->Release(iStream);
 
 	iPicture->lpVtbl->get_Type(iPicture,&type);
 	if(type==PICTYPE_BITMAP){
@@ -770,7 +776,7 @@ static HBITMAP GetBitmapHandle(char *File)
 
 	hBitmap=(HBITMAP)hOle;
 
-	return (hBitmap);
+	return hBitmap;
 }
 
 // 線形補完法により比較的鮮明にビットマップを拡大・縮小する。

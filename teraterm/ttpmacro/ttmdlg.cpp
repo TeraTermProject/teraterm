@@ -278,7 +278,7 @@ void BringupStatDlg()
  * @retval -1		cancelボタン
  * @retval -2		closeボタン
  */
-int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected)
+int OpenListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected)
 {
 	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
 	INT_PTR r = ListDlg.DoModal();

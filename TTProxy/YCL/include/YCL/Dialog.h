@@ -31,7 +31,7 @@ protected:
 		initializeing = next;
 		return prev;
 	}
-	static BOOL CALLBACK DialogProc(HWND dialog, UINT message, WPARAM wParam, LPARAM lParam) {
+	static INT_PTR CALLBACK DialogProc(HWND dialog, UINT message, WPARAM wParam, LPARAM lParam) {
 		Map& map = getMap();
 		Dialog* target = map.get(dialog);
 		if (target == NULL) {
@@ -53,7 +53,7 @@ protected:
 				|| message == WM_CTLCOLORLISTBOX
 				|| message == WM_CTLCOLORSCROLLBAR
 				|| message == WM_CTLCOLORSTATIC)) {
-			result = (BOOL) ::GetWindowLong(dialog, DWL_MSGRESULT);
+			result = (BOOL) ::GetWindowLongPtr(dialog, DWLP_MSGRESULT);
 		}
 		return result;
 	}
@@ -87,7 +87,7 @@ public:
 	}
 
 	void setResult(LRESULT result) {
-		SetWindowLong(DWL_MSGRESULT, result);
+		SetWindowLongPtr(DWLP_MSGRESULT, result);
 	}
 	int getDefID()const {
 		return LOWORD(SendMessage(DM_GETDEFID));
@@ -118,7 +118,7 @@ public:
 #endif
 	}
 protected:
-	virtual bool dispatch(int message, int wparam, long lparam) {
+	virtual bool dispatch(UINT message, WPARAM wparam, LPARAM lparam) {
 		switch (message) {
 		case WM_INITDIALOG:
 			return onInitDialog();

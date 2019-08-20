@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2018 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,12 +82,13 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 	m_hParentWnd = hParent;
 	m_ts = pts;
 
-	HRSRC hResource = ::FindResource(hInstance, MAKEINTRESOURCE(IDD_PRNABORTDLG), RT_DIALOG);
-	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);
-	DLGTEMPLATE *lpTemplate = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
-	HWND hWnd = ::CreateDialogIndirectParam(	
+	SetDialogFont(m_ts->DialogFontName, m_ts->DialogFontPoint, m_ts->DialogFontCharSet,
+				  m_ts->UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, MAKEINTRESOURCE(IDD_PRNABORTDLG));
+	HWND hWnd = ::CreateDialogIndirectParam(
 		hInstance, lpTemplate, hParent,
 		(DLGPROC)OnDlgProc, (LPARAM)this);
+	free(lpTemplate);
 	if (hWnd == NULL)
 	{
 		return FALSE;

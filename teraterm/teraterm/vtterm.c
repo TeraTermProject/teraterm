@@ -408,7 +408,15 @@ void ResetCharSet()
 		strcpy(ts.Locale, DEFAULT_LOCALE);
 		result = setlocale(LC_ALL, ts.Locale);
 	}
-	ts.CodePage = atoi(strrchr(result, '.')+1);
+	// 英語版Windowsでは、ts.Localeがデフォルトの"japanese"だった場合、
+	// setlocaleが NULL を返すため、Tera Termの起動時に落ちる。strrchrの
+	// 第1引数にはNULLが指定できないため。
+	// setlocale に成功した時はコードページを設定し、失敗した時は
+	// ANSIコードページを設定する。
+	if (result)
+		ts.CodePage = atoi(strrchr(result, '.')+1);
+	else
+		ts.CodePage = GetACP();
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)

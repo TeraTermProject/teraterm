@@ -218,7 +218,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 	if (type == TYPE_SCP) {
 		c->scp.state = SCP_INIT;
 		c->scp.progress_window = NULL;
-		c->scp.thread = (HANDLE)-1;
+		c->scp.thread = INVALID_HANDLE_VALUE;
 		c->scp.localfp = NULL;
 		c->scp.filemtime = 0;
 		c->scp.fileatime = 0;
@@ -345,10 +345,10 @@ static void ssh2_channel_delete(Channel_t *c)
 			DestroyWindow(c->scp.progress_window);
 			c->scp.progress_window = NULL;
 		}
-		if (c->scp.thread != (HANDLE)-1L) {
+		if (c->scp.thread != INVALID_HANDLE_VALUE) {
 			WaitForSingleObject(c->scp.thread, INFINITE);
 			CloseHandle(c->scp.thread);
-			c->scp.thread = (HANDLE)-1L;
+			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
 		ssh2_scp_free_packetlist(c);
@@ -2530,7 +2530,10 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 	if (grab_payload(pvar, challenge_bytes)) {
 		unsigned char *outmsg = begin_send_packet(pvar, SSH_CMSG_AUTH_RSA_RESPONSE, 16);
 
-		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+		// rhosts認証(SSH1)ができるように SSH_AUTH_RHOSTS_RSA を条件に追加する。
+		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA ||
+			pvar->auth_state.cur_cred.method == SSH_AUTH_RHOSTS_RSA
+			) {
 			if (CRYPT_generate_RSA_challenge_response
 				(pvar, pvar->ssh_state.payload + 2, challenge_bytes, outmsg)) {
 
@@ -4068,18 +4071,16 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE); 
 
 		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
-			char *fn, *cwd;
+			char *fn;
+			char FileDirExpanded[MAX_PATH];
 
 			fn = strrchr(sendfile, '/');
 			if (fn && fn[1] == '\0')
 				goto error;
-			cwd = pvar->ts->FileDir;
-			//cwd = _getcwd(NULL, 0);
 
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", cwd, fn ? fn : sendfile);
+			ExpandEnvironmentStrings(pvar->ts->FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpanded, fn ? fn : sendfile);
 			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-
-			//free(cwd);  // free!!
 		} else {
 			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dstfile);
 			ExtractFileName(dstfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
@@ -6810,7 +6811,7 @@ static unsigned __stdcall ssh_heartbeat_thread(void *p)
 
 static void start_ssh_heartbeat_thread(PTInstVar pvar)
 {
-	HANDLE thread = (HANDLE)-1;
+	HANDLE thread = INVALID_HANDLE_VALUE;
 	unsigned tid;
 	HWND hDlgWnd;
 
@@ -6822,8 +6823,9 @@ static void start_ssh_heartbeat_thread(PTInstVar pvar)
 
 	// TTSSHは thread-safe ではないのでスレッド内からのパケット送信は不可。(2007.12.26 yutaka)
 	thread = (HANDLE)_beginthreadex(NULL, 0, ssh_heartbeat_thread, pvar, 0, &tid);
-	if (thread == (HANDLE)-1) {
+	if (thread == 0) {
 		// TODO:
+		thread = INVALID_HANDLE_VALUE;
 	}
 	pvar->ssh_heartbeat_thread = thread;
 }
@@ -6831,10 +6833,10 @@ static void start_ssh_heartbeat_thread(PTInstVar pvar)
 // スレッドの停止 (2004.12.27 yutaka)
 void halt_ssh_heartbeat_thread(PTInstVar pvar)
 {
-	if (pvar->ssh_heartbeat_thread != (HANDLE)-1L) {
+	if (pvar->ssh_heartbeat_thread != INVALID_HANDLE_VALUE) {
 		WaitForSingleObject(pvar->ssh_heartbeat_thread, INFINITE);
 		CloseHandle(pvar->ssh_heartbeat_thread);
-		pvar->ssh_heartbeat_thread = (HANDLE)-1L;
+		pvar->ssh_heartbeat_thread = INVALID_HANDLE_VALUE;
 
 		DestroyWindow(pvar->ssh_hearbeat_dialog);
 	}
@@ -7424,7 +7426,7 @@ struct change_password {
 	char new_passwd[PASSWD_MAXLEN];
 };
 
-static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	char old_passwd[PASSWD_MAXLEN];
 	char new_passwd[PASSWD_MAXLEN];
@@ -8433,8 +8435,9 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		}
 
 		thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_thread, c, 0, &tid);
-		if (thread == (HANDLE)-1) {
+		if (thread == 0) {
 			// TODO:
+			thread = INVALID_HANDLE_VALUE;
 		}
 		c->scp.thread = thread;
 
@@ -8673,7 +8676,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			HANDLE thread;
 			unsigned int tid;
 
-			sscanf_s(data, "C%o %lld %s", &permission, &size, filename, sizeof(filename));
+			sscanf_s(data, "C%o %lld %s", &permission, &size, filename, (unsigned int)sizeof(filename));
 
 			// Windowsなのでパーミッションは無視。サイズのみ記録。
 			c->scp.filetotalsize = size;
@@ -8694,8 +8697,9 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			ssh2_scp_alloc_packetlist(c);
 			thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_receive_thread, c, 0, &tid);
-			if (thread == (HANDLE)-1) {
+			if (thread == 0) {
 				// TODO:
+				thread = INVALID_HANDLE_VALUE;
 			}
 			c->scp.thread = thread;
 			c->scp.thread_id = tid;

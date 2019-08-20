@@ -815,8 +815,8 @@ char *GetClipboardTextA(HWND hWnd, BOOL empty)
 
 
 BOOL autologin_sent_none;
-static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                   LPARAM lParam)
+static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+									  LPARAM lParam)
 {
 	const int IDC_TIMER1 = 300; // 自動ログインが有効なとき
 	const int IDC_TIMER2 = 301; // サポートされているメソッドを自動チェック(CheckAuthListFirst)
@@ -832,7 +832,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->auth_state.auth_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		UseControlChar = TRUE;
 		ShowPassPhrase = FALSE;
@@ -869,7 +869,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;			/* because we set the focus */
 
 	case WM_TIMER:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 		// 認証準備ができてから、認証データを送信する。早すぎると、落ちる。(2004.12.16 yutaka)
 		if (wParam == IDC_TIMER1) {
 			// 自動ログインのため
@@ -961,7 +961,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -1392,8 +1392,8 @@ static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 	return TRUE;
 }
 
-static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                  LPARAM lParam)
+static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+									 LPARAM lParam)
 {
 	PTInstVar pvar;
 
@@ -1401,7 +1401,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->auth_state.auth_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_TIS_dlg(pvar, dlg);
 
@@ -1415,7 +1415,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -1593,22 +1593,22 @@ static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	return TRUE;
 }
 
-static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
-										   WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
+											  WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
 
 	switch (msg) {
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_default_auth_dlg(pvar, dlg);
 		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:

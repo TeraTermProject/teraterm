@@ -529,11 +529,11 @@ static HWND make_accept_wnd(PTInstVar pvar)
 			             hInst, NULL);
 		if (pvar->fwd_state.accept_wnd != NULL) {
 			pvar->fwd_state.old_accept_wnd_proc =
-				(WNDPROC) SetWindowLong(pvar->fwd_state.accept_wnd,
-				                        GWL_WNDPROC,
-				                        (LONG) accept_wnd_proc);
-			SetWindowLong(pvar->fwd_state.accept_wnd, GWL_USERDATA,
-			              (LONG) pvar);
+				(WNDPROC) SetWindowLongPtr(pvar->fwd_state.accept_wnd,
+										   GWLP_WNDPROC,
+										   (LONG_PTR) accept_wnd_proc);
+			SetWindowLongPtr(pvar->fwd_state.accept_wnd, GWLP_USERDATA,
+							 (LONG_PTR) pvar);
 		}
 	}
 
@@ -771,6 +771,11 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 	FWDChannel* channel;
 	int changed = 0;
 
+	// ポート転送の未使用時は以下のフロー制御を行わない。
+	if (c->type != TYPE_PORTFWD) {
+		return;
+	}
+
 	channel_num = c->local_num;
 	channel = pvar->fwd_state.channels + channel_num;
 
@@ -812,7 +817,7 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
 {
-	PTInstVar pvar = (PTInstVar) GetWindowLong(wnd, GWL_USERDATA);
+	PTInstVar pvar = (PTInstVar) GetWindowLongPtr(wnd, GWLP_USERDATA);
 
 	if (msg == WM_SOCK_ACCEPT &&
 	    (LOWORD(lParam) == FD_READ || LOWORD(lParam) == FD_CLOSE ||

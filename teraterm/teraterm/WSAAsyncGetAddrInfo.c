@@ -34,8 +34,25 @@
 #include <wspiapi.h>
 #include <windows.h>
 #include <process.h>
+#include <crtdbg.h>
 #include "WSAAsyncGetAddrInfo.h"
 #include "ttwsk.h"
+
+struct getaddrinfo_args {
+  HWND hWnd;
+  unsigned int wMsg;
+  char *hostname;
+  char *portname;
+  struct addrinfo hints;
+  struct addrinfo **res;
+  HANDLE *lpHandle;
+};
+
+#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
+#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
+#define _strdup(s)	_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 static unsigned __stdcall getaddrinfo_thread(void * p);
 
@@ -73,18 +90,18 @@ HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 
 	/* create sub-thread running getaddrinfo() */
 	thread = (HANDLE)_beginthreadex(NULL, 0, getaddrinfo_thread, ga, CREATE_SUSPENDED, &tid);
-	*ga->lpHandle = (HANDLE)thread;
-	ResumeThread(thread);
-
-	/* return thread handle */
 	if (thread == 0) {
 		free(ga->lpHandle);
 		free(ga->hostname);
 		free(ga->portname);
 		free(ga);
-		return NULL;
-	} else
-		return (HANDLE)thread;
+		return NULL;	// return error
+	}
+
+	/* return thread handle */
+	*ga->lpHandle = thread;
+	ResumeThread(thread);
+	return thread;
 }
 
 static unsigned __stdcall getaddrinfo_thread(void * p)

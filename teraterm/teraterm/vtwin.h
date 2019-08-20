@@ -73,7 +73,7 @@ private:
 #endif
 
 public:
-	CVTWindow();
+	CVTWindow(HINSTANCE hInstance);
 	int Parse();
 	void ButtonUp(BOOL Paste);
 	void ButtonDown(POINT p, int LMR);
@@ -132,7 +132,7 @@ protected:
 //-->
 	LRESULT OnIMEStartComposition(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMEEndComposition(WPARAM wParam, LPARAM lParam);
-	LRESULT OnIMEComposition(UINT wParam, LONG lParam);
+	LRESULT OnIMEComposition(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMEInputChange(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMENotify(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMERequest(WPARAM wParam, LPARAM lParam);

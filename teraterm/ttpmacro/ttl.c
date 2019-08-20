@@ -1405,6 +1405,7 @@ WORD TTLFileCopy()
 {
 	WORD Err;
 	TStrVal FName1, FName2;
+	BOOL ret;
 
 	Err = 0;
 	GetStrVal(FName1,&Err);
@@ -1427,9 +1428,17 @@ WORD TTLFileCopy()
 		SetResult(-2);
 		return Err;
 	}
-	if (_stricmp(FName1,FName2)==0) return Err;
+	if (_stricmp(FName1, FName2) == 0) {
+		SetResult(-3);
+		return Err;
+	}
 
-	CopyFile(FName1,FName2,FALSE);
+	ret = CopyFile(FName1, FName2, FALSE);
+	if (ret == 0) {
+		SetResult(-4);
+		return Err;
+	}
+
 	SetResult(0);
 	return Err;
 }
@@ -1622,13 +1631,13 @@ WORD TTLFileOpen()
 	}
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
-		return ErrCantOpen;
+		return Err;
 	}
 	fhi = HandlePut(FH);
 	if (fhi == -1) {
 		SetIntVal(VarId, -1);
 		_lclose(FH);
-		return ErrCantOpen;
+		return Err;
 	}
 	SetIntVal(VarId, fhi);
 	if (Append!=0) {
@@ -1642,14 +1651,16 @@ WORD TTLFileOpen()
 WORD TTLFileLock()
 {
 	WORD Err;
-	int FH;
+	HANDLE FH;
+	int fhi;
 	DWORD timeout;
 	int result;
 	BOOL ret;
 	DWORD dwStart;
 
 	Err = 0;
-	GetIntVal(&FH,&Err);
+	GetIntVal(&fhi,&Err);
+	FH = HandleGet(fhi);
 	if (Err!=0) return Err;
 
 	timeout = -1;  // 無限大
@@ -1661,7 +1672,7 @@ WORD TTLFileLock()
 	result = 1;  // error
 	dwStart = GetTickCount();
 	do {
-		ret = LockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
+		ret = LockFile(FH, 0, 0, (DWORD)-1, (DWORD)-1);
 		if (ret != 0) { // ロック成功
 			result = 0;  // success
 			break;
@@ -1678,16 +1689,18 @@ WORD TTLFileLock()
 WORD TTLFileUnLock()
 {
 	WORD Err;
-	int FH;
+	HANDLE FH;
+	int fhi;
 	BOOL ret;
 
 	Err = 0;
-	GetIntVal(&FH,&Err);
+	GetIntVal(&fhi,&Err);
+	FH = HandleGet(fhi);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	ret = UnlockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
+	ret = UnlockFile(FH, 0, 0, (DWORD)-1, (DWORD)-1);
 	if (ret != 0) { // アンロック成功
 		SetResult(0);
 	} else {
@@ -2044,7 +2057,7 @@ WORD TTLFileStrSeek2()
 		// ファイルの1バイト目がヒットすると、ファイルポインタが突き破って
 		// INVALID_SET_FILE_POINTER になるので、
 		// ゼロオフセットになるように調整する。(2008.10.10 yutaka)
-		if (pos == INVALID_SET_FILE_POINTER) 
+		if (pos2 == INVALID_SET_FILE_POINTER)
 			_llseek(FH, 0, 0);
 		SetResult(1);
 	} else {
@@ -2083,16 +2096,14 @@ WORD TTLFileTruncate()
 	}
 
 	// ファイルを指定したサイズで切り詰める。
-   ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
-   if (ret != 0) {
-		Err = ErrCantOpen;
+	ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
+	if (ret != 0) {
 		goto end;
-   }
-   ret = _chsize_s(fh, TruncByte);
-   if (ret != 0) {
-		Err = ErrInvalidCtl;
+	}
+	ret = _chsize_s(fh, TruncByte);
+	if (ret != 0) {
 		goto end;
-   }
+	}
 
 	result = 0;
 	Err = 0;

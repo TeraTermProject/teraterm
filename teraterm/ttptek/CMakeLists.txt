@@ -68,3 +68,9 @@ add_dependencies(
   ttptek
   ttpcmn
   )
+
+install(
+  TARGETS ttptek
+  RUNTIME
+  DESTINATION .
+  )

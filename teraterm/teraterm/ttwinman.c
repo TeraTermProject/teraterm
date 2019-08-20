@@ -55,7 +55,6 @@ TTTSet ts;
 TComVar cv;
 
 /* pointers to window objects */
-void* pVTWin = NULL;
 void* pTEKWin = NULL;
 /* instance handle */
 HINSTANCE hInst;

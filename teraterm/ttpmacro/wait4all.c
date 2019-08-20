@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2017 TeraTerm Project
+ * Copyright (C) 2009-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -79,7 +79,7 @@ int is_wait4all_enabled(void)
 static int open_macro_shmem(void)
 {
 	HMap = CreateFileMapping(
-		(HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE,
+		INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
 		0, sizeof(TMacroShmem), TTM_FILEMAPNAME);
 	if (HMap == NULL)
 		return FALSE;

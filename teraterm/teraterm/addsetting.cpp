@@ -37,8 +37,8 @@
 #include <commctrl.h>
 #include <time.h>
 #include <tchar.h>
+#include <crtdbg.h>
 
-#include "addsetting.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttwinman.h"	// for ts
@@ -46,11 +46,19 @@
 #include "ttftypes.h"
 #include "dlglib.h"
 #include "compat_win.h"
+#include "addsetting.h"
 
-#undef GetDlgItemText
-#define GetDlgItemText GetDlgItemTextA
-#undef SetDlgItemText
-#define SetDlgItemText SetDlgItemTextA
+#ifdef _DEBUG
+#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
+#define _strdup(s)	_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wcsdup(s)	_wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#undef _tcsdup
+#ifdef _UNICODE
+#define _tcsdup(s)	_wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#else
+#define _tcsdup(s)	_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
+#endif
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -419,7 +427,8 @@ void CCopypastePropPageDlg::OnInitDialog()
 		{ IDC_CONFIRM_STRING_FILE_LABEL, "DLG_TAB_COPYPASTE_STRINGFILE" },
 		{ IDC_DELIMITER, "DLG_TAB_COPYPASTE_DELIMITER" },
 		{ IDC_PASTEDELAY_LABEL, "DLG_TAB_COPYPASTE_PASTEDELAY" },
-		{ IDC_PASTEDELAY_LABEL2, "DLG_TAB_COPYPASTE_PASTEDELAY2" }
+		{ IDC_PASTEDELAY_LABEL2, "DLG_TAB_COPYPASTE_PASTEDELAY2" },
+		{ IDC_SELECT_ON_ACTIVATE, "DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE" }
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
@@ -470,6 +479,9 @@ void CCopypastePropPageDlg::OnInitDialog()
 	char buf[64];
 	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
 	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
+
+	// (11) SelectOnActivate
+	SetCheck(IDC_SELECT_ON_ACTIVATE, ts.SelOnActive ? BST_CHECKED : BST_UNCHECKED);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
@@ -590,6 +602,9 @@ void CCopypastePropPageDlg::OnOK()
 	ts.PasteDelayPerLine =
 		(val < 0) ? 0 :
 		(val > 5000) ? 5000 : val;
+
+	// (11) SelectOnActivate
+	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
 }
 
 
@@ -1182,8 +1197,6 @@ void CLogPropPageDlg::OnInitDialog()
 BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	char uimsg[MAX_UIMSG];
-	char buf[MAX_PATH];
-	char buf2[MAX_PATH];
 
 	switch (wParam) {
 		case IDC_VIEWLOG_PATH | (BN_CLICKED << 16):
@@ -1212,9 +1225,13 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// ログディレクトリの選択ダイアログ
 			get_lang_msg("FILEDLG_SELECT_LOGDIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
 			             "Select log folder", ts.UILanguageFile);
-			GetDlgItemText(IDC_DEFAULTPATH_EDITOR, buf, sizeof(buf));
-			if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
-				SetDlgItemText(IDC_DEFAULTPATH_EDITOR, buf2);
+			{
+				char buf[MAX_PATH];
+				char buf2[MAX_PATH];
+				GetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, buf, sizeof(buf));
+				if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
+					SetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, buf2);
+				}
 			}
 
 			return TRUE;
@@ -1278,7 +1295,7 @@ void CLogPropPageDlg::OnOK()
 	TCHAR uimsg2[MAX_UIMSG];
 
 	// Viewlog Editor path (2005.1.29 yutaka)
-	GetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
+	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
 
 	// Log Default File Name (2006.8.28 maya)
 	GetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, buf, sizeof(buf));
@@ -1311,7 +1328,7 @@ void CLogPropPageDlg::OnOK()
 	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);
 
 	// Log Default File Path (2007.5.30 maya)
-	GetDlgItemText(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath, _countof(ts.LogDefaultPath));
+	GetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath, _countof(ts.LogDefaultPath));
 
 	/* Auto start logging (2007.5.31 maya) */
 	ts.LogAutoStart = GetCheck(IDC_AUTOSTART);
@@ -1319,7 +1336,7 @@ void CLogPropPageDlg::OnOK()
 	/* Log Rotate */
 	if (GetCheck(IDC_LOG_ROTATE)) {  /* on */
 		ts.LogRotate = ROTATE_SIZE;
-		GetDlgItemText(IDC_ROTATE_SIZE_TYPE, buf, _countof(buf));
+		GetDlgItemTextA(IDC_ROTATE_SIZE_TYPE, buf, _countof(buf));
 		ts.LogRotateSizeType = 0;
 		for (int i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
 			if (strcmp(buf, LogRotateSizeType[i]) == 0) {
@@ -1489,13 +1506,13 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	m_VisualPage = new CVisualPropPageDlg(hInstance, this);
 	m_LogPage = new CLogPropPageDlg(hInstance, this);
 	m_CygwinPage = new CCygwinPropPageDlg(hInstance, this);
-		
-	hPsp[0] = CreatePropertySheetPage(&m_GeneralPage->m_psp);
-	hPsp[1] = CreatePropertySheetPage(&m_SequencePage->m_psp);
-	hPsp[2] = CreatePropertySheetPage(&m_CopypastePage->m_psp);
-	hPsp[3] = CreatePropertySheetPage(&m_VisualPage->m_psp);
-	hPsp[4] = CreatePropertySheetPage(&m_LogPage->m_psp);
-	hPsp[5] = CreatePropertySheetPage(&m_CygwinPage->m_psp);
+
+	hPsp[0] = m_GeneralPage->CreatePropertySheetPage();
+	hPsp[1] = m_SequencePage->CreatePropertySheetPage();
+	hPsp[2] = m_CopypastePage->CreatePropertySheetPage();
+	hPsp[3] = m_VisualPage->CreatePropertySheetPage();
+	hPsp[4] = m_LogPage->CreatePropertySheetPage();
+	hPsp[5] = m_CygwinPage->CreatePropertySheetPage();
 	m_psh.nPages = 6;
 	m_psh.phpage = hPsp;
 

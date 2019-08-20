@@ -27,6 +27,10 @@ public:
 	}
 	HASHCODE(const void* value):value((int)(uintptr_t) value) {
 	}
+	HASHCODE(const FARPROC value) :value((int)(uintptr_t)value) {
+	}
+	HASHCODE(SOCKET value) :value((int)(uintptr_t)value) {
+	}
 	HASHCODE(int value):value(value) {
 	}
 	operator int()const {

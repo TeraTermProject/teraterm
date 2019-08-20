@@ -266,3 +266,8 @@ endif()
 configure_file(
   svnversion.h.in
   ../ttpdlg/svnversion.h @ONLY)
+
+install(
+  TARGETS teraterm
+  DESTINATION .
+  )

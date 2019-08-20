@@ -44,12 +44,6 @@
 #include "ftdlg.h"
 #include "teraterml.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
@@ -201,7 +195,7 @@ BOOL CFileTransDlg::OnInitDialog()
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
 				  (LPARAM)BigIcon);
 
-	AddModalHandle(m_hWnd);
+	AddModelessHandle(m_hWnd);
 
 	return TRUE;
 }
@@ -244,7 +238,7 @@ BOOL CFileTransDlg::PostNcDestroy()
 		BigIcon = NULL;
 	}
 
-	RemoveModalHandle(m_hWnd);
+	RemoveModelessHandle(m_hWnd);
 
 	delete this;
 	return TRUE;

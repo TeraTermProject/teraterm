@@ -151,11 +151,6 @@ static int AutoDisconnectedPort = -1;
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
-static HINSTANCE AfxGetInstanceHandle()
-{
-	return hInst;
-}
-
 // Tera Term起動時とURL文字列mouse over時に呼ばれる (2005.4.2 yutaka)
 static void SetMouseCursor(const char *cursor)
 {
@@ -258,6 +253,7 @@ void SetAutoConnectPort(int port)
 // (2007.9.30 yutaka)
 //
 // 例外コードを文字列へ変換する
+#if !defined(_M_X64)
 static const char *GetExceptionString(DWORD exception)
 {
 #define EXCEPTION(x) case EXCEPTION_##x: return (#x);
@@ -447,6 +443,7 @@ error:
 //	return (EXCEPTION_EXECUTE_HANDLER);  /* そのままプロセスを終了させる */
 	return (EXCEPTION_CONTINUE_SEARCH);  /* 引き続き［アプリケーションエラー］ポップアップメッセージボックスを呼び出す */
 }
+#endif // !defined(_M_X64 )
 
 
 // Virtual Storeが有効であるかどうかを判別する。
@@ -534,7 +531,7 @@ error:
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
-CVTWindow::CVTWindow()
+CVTWindow::CVTWindow(HINSTANCE hInstance)
 {
 	WNDCLASS wc;
 	RECT rect;
@@ -550,9 +547,12 @@ CVTWindow::CVTWindow()
 #endif
 	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
+	m_hInst = hInstance;
 
 	// 例外ハンドラのフック (2007.9.30 yutaka)
+#if !defined(_M_X64)
 	SetUnhandledExceptionFilter(ApplicationFaultHandler);
+#endif
 
 	CommInit(&cv);
 	isFirstInstance = StartTeraTerm(&ts);
@@ -694,7 +694,7 @@ CVTWindow::CVTWindow()
 	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = AfxGetInstanceHandle();
+	wc.hInstance = hInstance;
 	wc.hIcon = NULL;
 	//wc.hCursor = LoadCursor(NULL,IDC_IBEAM);
 	wc.hCursor = NULL; // マウスカーソルは動的に変更する (2005.4.2 yutaka)
@@ -703,7 +703,7 @@ CVTWindow::CVTWindow()
 	wc.lpszClassName = VTClassName;
 
 	RegisterClass(&wc);
-	m_hAccel = ::LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACC));
+	m_hAccel = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACC));
 
 	if (ts.VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
@@ -714,7 +714,7 @@ CVTWindow::CVTWindow()
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
-	Create(hInst, VTClassName, _T("Tera Term"), Style, rect, NULL, NULL);
+	Create(hInstance, VTClassName, _T("Tera Term"), Style, rect, NULL, NULL);
 
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
@@ -745,20 +745,20 @@ CVTWindow::CVTWindow()
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(HVTWin,WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInstance,
 	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 	                                IMAGE_ICON,16,16,fuLoad));
 	// Vista の Aero において Alt+Tab 切り替えで表示されるアイコンが
 	// 16x16 アイコンの拡大になってしまうので、大きいアイコンも
 	// セットする (2008.9.3 maya)
 	::PostMessage(HVTWin,WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
+	              (LPARAM)LoadImage(hInstance,
 	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 	                                IMAGE_ICON, 0, 0, fuLoad));
 
 	SetCustomNotifyIcon(
 		(HICON)LoadImage(
-			AfxGetInstanceHandle(),
+			hInstance,
 			MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 			IMAGE_ICON, 16, 16, LR_VGACOLOR|LR_SHARED));
 
@@ -890,7 +890,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 
 				AppendMenu(PopupBase,
 				           submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
-				           submenu != NULL ? (UINT)submenu : GetMenuItemID(PopupMenu, i),
+				           submenu != NULL ? (UINT_PTR)submenu : GetMenuItemID(PopupMenu, i),
 				           itemText);
 			}
 		}
@@ -1058,7 +1058,7 @@ static BOOL isLogMeTTExist()
 
 void CVTWindow::InitMenu(HMENU *Menu)
 {
-	*Menu = LoadMenu(AfxGetInstanceHandle(),
+	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_MENU));
 	char uimsg[MAX_UIMSG];
 	int ret;
@@ -1308,7 +1308,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		             "&Window", ts.UILanguageFile);
 		::InsertMenu(*Menu,ID_HELPMENU,
 		             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-		             (int)WinMenu, ts.UIMsg);
+		             (UINT_PTR)WinMenu, ts.UIMsg);
 	}
 
 	TTXModifyMenu(*Menu); /* TTPLUG */
@@ -1488,7 +1488,7 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 {
 	char uimsg[MAX_UIMSG];
 
-	*Menu = LoadMenu(AfxGetInstanceHandle(),
+	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_PASTEMENU));
 
 	GetMenuString(*Menu, ID_EDIT_PASTE2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
@@ -1633,7 +1633,7 @@ void CVTWindow::OpenTEK()
 {
 	ActiveWin = IdTEK;
 	if (HTEKWin==NULL) {
-		pTEKWin = new CTEKWindow();
+		pTEKWin = new CTEKWindow(m_hInst);
 	}
 	else {
 		::ShowWindow(HTEKWin,SW_SHOWNORMAL);
@@ -1843,7 +1843,7 @@ void CVTWindow::OnAllClose()
 }
 
 // 終了問い合わせなしにTera Termを終了する。OnAllClose()受信用。
-LONG CVTWindow::OnNonConfirmClose(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 {
 	// ここで ts の内容を意図的に書き換えても、終了時に自動セーブされるわけではないので、特に問題なし。
 	ts.PortFlag &= ~PF_CONFIRMDISCONN;
@@ -1993,7 +1993,7 @@ void CVTWindow::DropListFree()
 	}
 }
 
-LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
+LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 {
 	// iniに保存されない、今実行しているTera Termでのみ有効な設定
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
@@ -2091,7 +2091,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 			SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 						  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 			DropType =
-				ShowDropDialogBox(hInst, HVTWin,
+				ShowDropDialogBox(m_hInst, HVTWin,
 								  FileName, DropType,
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
@@ -3187,22 +3187,27 @@ LRESULT CVTWindow::OnIMEInputChange(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
-	case IMN_SETOPENSTATUS: {
+	case IMN_SETOPENSTATUS:
 		// 入力コンテキストの開閉状態が更新される(IME On/OFF)
 
 		// IMEのOn/Offを取得する
 		IMEstat = GetIMEOpenStatus(HVTWin);
+		if (IMEstat != 0) {
+			// IME On
 
-		// 状態を表示するIMEのために位置を通知する
-		int CaretX = (CursorX-WinOrgX)*FontWidth;
-		int CaretY = (CursorY-WinOrgY)*FontHeight;
-		SetConversionWindow(HVTWin,CaretX,CaretY);
+			// 状態を表示するIMEのために位置を通知する
+			int CaretX = (CursorX-WinOrgX)*FontWidth;
+			int CaretY = (CursorY-WinOrgY)*FontHeight;
+			SetConversionWindow(HVTWin,CaretX,CaretY);
+
+			// フォントを設定する
+			ResetConversionLogFont(HVTWin);
+		}
 
 		// 描画
 		ChangeCaret();
 
 		break;
-	}
 
 	// 候補ウィンドウの表示状況通知
 	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE サポート状況
@@ -3218,11 +3223,32 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 	// 候補ウィンドウが表示された / 閉じたで発生する。
 	case IMN_OPENCANDIDATE: {
 		// 候補ウィンドウを開こうとしている
+
+		// 状態を表示するIMEのために位置を通知する
+		// 次の場合があるので、位置を再設定する
+		// - 漢字変換候補を表示
+		// - 次の文字を入力することで確定処理を行う
+		// - 文字入力と未変換文字入力が発生する
 		int CaretX = (CursorX-WinOrgX)*FontWidth;
 		int CaretY = (CursorY-WinOrgY)*FontHeight;
 		SetConversionWindow(HVTWin,CaretX,CaretY);
+
+		// フォントを設定する
+		ResetConversionLogFont(HVTWin);
+
 		break;
 	}
+
+	case IMN_OPENSTATUSWINDOW:
+		// ステータスウィンドウをオープン(未確定文字を表示?)しようとしている
+
+		// IMEで未変換状態で、フォントダイアログをオープンしてクローズすると
+		// IMEに設定していたフォントが別のものに変化しているらしい
+		// ここでフォントの再設定を行う
+
+		// フォントを設定する
+		ResetConversionLogFont(HVTWin);
+		break;
 	default:
 		break;
 	}
@@ -3305,7 +3331,7 @@ LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 	return TTCFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
 }
 
-LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnAccelCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IdHold:
@@ -3398,7 +3424,7 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 {
 	HMENU SysMenu;
 	BOOL Show, B1, B2;
@@ -3439,7 +3465,7 @@ LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
 			             "&Window", ts.UILanguageFile);
 			::InsertMenu(MainMenu,ID_HELPMENU,
 			             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			             (int)WinMenu, ts.UIMsg);
+			             (UINT_PTR)WinMenu, ts.UIMsg);
 		}
 		else {
 			RemoveMenu(MainMenu,ID_HELPMENU,MF_BYPOSITION);
@@ -4160,7 +4186,7 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 void CVTWindow::OnCommentToLog()
 {
 	// ログファイルへコメントを追加する (2004.8.6 yutaka)
-	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
+	TTDialogBox(m_hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
 				HVTWin, (DLGPROC)OnCommentDlgProc);
 }
 
@@ -4507,7 +4533,7 @@ void CVTWindow::OnExternalSetup()
 
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
-	CAddSettingPropSheetDlg CAddSetting(hInst, _T("Tera Term: Additional settings"), HVTWin);
+	CAddSettingPropSheetDlg CAddSetting(m_hInst, _T("Tera Term: Additional settings"), HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
 		case (DWORD)-1:
@@ -4656,7 +4682,7 @@ void CVTWindow::OnSetupDlgFont()
 	}
 	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
-	cf.hInstance = hInst;
+	cf.hInstance = m_hInst;
 	HelpId = HlpSetupFont;
 	result = ChooseFontA(&cf);
 
@@ -5305,7 +5331,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
+	TTDialogBox(m_hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
 	            HVTWin, (DLGPROC)OnSetupDirectoryDlgProc);
 }
 
@@ -6010,7 +6036,7 @@ void CVTWindow::OnControlBroadcastCommand(void)
 		goto activate;
 	}
 
-	hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+	hDlgWnd = CreateDialog(m_hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
 	                       HVTWin, (DLGPROC)BroadcastCommandDlgProc);
 
 	if (hDlgWnd == NULL) {
@@ -6032,7 +6058,7 @@ activate:;
 }
 
 // WM_COPYDATAの受信
-LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 {
 	COPYDATASTRUCT *cds;
 	char *buf, *msg, *name;
@@ -6461,7 +6487,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnFileTransEnd(wp, lp);
 		break;
 	case WM_USER_GETSERIALNO:
-		OnGetSerialNo(wp, lp);
+		retval = OnGetSerialNo(wp, lp);
 		break;
 	case WM_USER_KEYCODE:
 		OnKeyCode(wp, lp);

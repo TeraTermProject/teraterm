@@ -128,3 +128,8 @@ add_dependencies(
   ttpmacro
   ttpcmn
   )
+
+install(
+  TARGETS ttpmacro
+  DESTINATION .
+  )

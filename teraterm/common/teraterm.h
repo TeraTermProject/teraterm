@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -85,16 +85,3 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 	} \
 }
 
-typedef struct cygterm {
-	BOOL update_flag;
-	char term[128];
-	char term_type[80];
-	char port_start[80];
-	char port_range[80];
-	char shell[80];
-	char env1[128];
-	char env2[128];
-	BOOL login_shell;
-	BOOL home_chdir;
-	BOOL agent_proxy;
-} cygterm_t;

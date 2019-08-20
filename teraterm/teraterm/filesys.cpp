@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -318,8 +318,10 @@ BOOL NewFileVar(PFileVar *fv)
 		*fv = (PFileVar)malloc(sizeof(TFileVar));
 		if ((*fv)!=NULL)
 		{
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 			memset(*fv, 0, sizeof(TFileVar));
-			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName),ts.FileDir, _TRUNCATE);
+			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName), FileDirExpanded, _TRUNCATE);
 			AppendSlash((*fv)->FullName,sizeof((*fv)->FullName));
 			(*fv)->DirLen = strlen((*fv)->FullName);
 			(*fv)->FileOpen = FALSE;
@@ -428,7 +430,7 @@ static void CloseFileSync(PFileVar ptr)
 	if (!ptr->FileOpen)
 		return;
 
-	if (ptr->LogThread != (HANDLE)-1) {
+	if (ptr->LogThread != INVALID_HANDLE_VALUE) {
 		// スレッドの終了待ち
 		ret = PostThreadMessage(ptr->LogThreadId, WM_QUIT, 0, 0);
 		if (ret != 0) {
@@ -439,9 +441,9 @@ static void CloseFileSync(PFileVar ptr)
 			code = GetLastError();
 		}
 		CloseHandle(ptr->LogThread);
-		ptr->LogThread = (HANDLE)-1;
+		ptr->LogThread = INVALID_HANDLE_VALUE;
 	}
-	CloseHandle((HANDLE)ptr->FileHandle);
+	CloseHandle(ptr->FileHandle);
 }
 
 // 遅延書き込み用スレッド
@@ -465,7 +467,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 			case WM_DPC_LOGTHREAD_SEND:
 				buf = (PCHAR)msg.wParam;
 				buflen = (DWORD)msg.lParam;
-				WriteFile((HANDLE)LogVar->FileHandle, buf, buflen, &wrote, NULL);
+				WriteFile(LogVar->FileHandle, buf, buflen, &wrote, NULL);
 				free(buf);   // ここでメモリ解放
 				break;
 
@@ -490,6 +492,7 @@ BOOL LogStart()
 	char buf[512];
 	const char *crlf = "\r\n";
 	DWORD crlf_len = 2;
+	char FileDirExpanded[MAX_PATH];
 
 	if ((FileLog) || (BinLog)) return FALSE;
 
@@ -505,7 +508,8 @@ BOOL LogStart()
 		logdir = ts.LogDefaultPath;
 	}
 	else if (strlen(ts.FileDir) > 0) {
-		logdir = ts.FileDir;
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+		logdir = FileDirExpanded;
 	}
 	else {
 		logdir = ts.HomeDir;
@@ -689,7 +693,7 @@ BOOL LogStart()
 	// 最初のファイルが設定したサイズでローテートしない問題の修正。
 	// (2016.4.9 yutaka)
 	if (LogVar->RotateMode != ROTATE_NONE) {
-		size = GetFileSize((HANDLE)LogVar->FileHandle, NULL);
+		size = GetFileSize(LogVar->FileHandle, NULL);
 		if (size != -1)
 			LogVar->ByteCount = size;
 	}
@@ -736,8 +740,8 @@ BOOL LogStart()
 				PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)pbuf, size + 2);
 			} else { // 直書き。ネットワーク経由だと遅い。
 #endif
-				WriteFile((HANDLE)LogVar->FileHandle, buf, size, &written_size, NULL);
-				WriteFile((HANDLE)LogVar->FileHandle, crlf, crlf_len, &written_size, NULL);
+				WriteFile(LogVar->FileHandle, buf, size, &written_size, NULL);
+				WriteFile(LogVar->FileHandle, crlf, crlf_len, &written_size, NULL);
 #if 0
 			}
 #endif
@@ -846,8 +850,8 @@ void CommentLogToFile(char *buf, int size)
 	}
 
 	logfile_lock();
-	WriteFile((HANDLE)LogVar->FileHandle, buf, size, &wrote, NULL);
-	WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &wrote, NULL); // 改行
+	WriteFile(LogVar->FileHandle, buf, size, &wrote, NULL);
+	WriteFile(LogVar->FileHandle, "\r\n", 2, &wrote, NULL); // 改行
 	/* Set Line End Flag
 		2007.05.24 Gentaro
 	*/
@@ -1054,9 +1058,9 @@ void LogToFile()
 						strtime = strelapsed(cv.ConnectedTime);
 						break;
 					}
-					WriteFile((HANDLE)LogVar->FileHandle, "[", 1, &wrote, NULL);
-					WriteFile((HANDLE)LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
-					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);
+					WriteFile(LogVar->FileHandle, "[", 1, &wrote, NULL);
+					WriteFile(LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
+					WriteFile(LogVar->FileHandle, "] ", 2, &wrote, NULL);
 				}
 
 				/* 2007.05.24 Gentaro */
@@ -1067,7 +1071,7 @@ void LogToFile()
 					eLineEnd = Line_Other; /* clear endmark*/
 				}
 
-				WriteFile((HANDLE)LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
+				WriteFile(LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
 				(LogVar->ByteCount)++;
 			}
 		}
@@ -1174,11 +1178,13 @@ void FileSendStart()
 
 	FSend = TRUE;
 
-	if (strlen(&(SendVar->FullName[SendVar->DirLen]))==0) {
+	if (strlen(&(SendVar->FullName[SendVar->DirLen])) == 0) {
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		if (ts.TransBin)
 			Option |= LOGDLG_BINARY;
 		SendVar->FullName[0] = 0;
-		if (! (*GetTransFname)(SendVar, ts.FileDir, GTF_SEND, &Option)) {
+		if (! (*GetTransFname)(SendVar, FileDirExpanded, GTF_SEND, &Option)) {
 			FileTransEnd(OpSendFile);
 			return;
 		}
@@ -1305,7 +1311,7 @@ void FileSendBinayBoost()
 
 	do {
 		if (FileSendHandler.pos == FileSendHandler.end) {
-			ReadFile((HANDLE)SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
+			ReadFile(SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
 			FileSendHandler.pos = 0;
 			FileSendHandler.end = fc;
@@ -1384,12 +1390,12 @@ void FileSend()
 			}
 		}
 		else if (! FileReadEOF) {
-			ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
+			ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
 			SendVar->ByteCount = SendVar->ByteCount + fc;
 
 			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
-				ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
+				ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 				fc = LOWORD(read_bytes);
 				SendVar->ByteCount = SendVar->ByteCount + fc;
 			}
@@ -1632,7 +1638,9 @@ void KermitStart(int mode)
 			FileVar->OpId = OpKmtSend;
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_KERMIT,&w) ||
+				char FileDirExpanded[MAX_PATH];
+				ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+				if (!(*GetMultiFname)(FileVar, FileDirExpanded, GMF_KERMIT, &w) ||
 				    (FileVar->NumFname==0))
 				{
 					ProtoEnd();
@@ -1690,9 +1698,11 @@ void XMODEMStart(int mode)
 
 	if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 	{
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
 		if (! (*GetXFname)(FileVar->HMainWin,
-		                   mode==IdXReceive,&Option,FileVar,ts.FileDir))
+		                   mode==IdXReceive,&Option,FileVar,FileDirExpanded))
 		{
 			ProtoEnd();
 			return;
@@ -1769,13 +1779,16 @@ void YMODEMStart(int mode)
 
 	if (mode==IdYSend)
 	{
+		char FileDirExpanded[MAX_PATH];
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+
 		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 		// TODO: "Yopt1K", "YoptG", "YoptSingle"を区別したいならば、IDD_FOPTを拡張する必要あり。
 		Opt = Yopt1K;
 		FileVar->OpId = OpYSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_Y,&Opt) ||
+			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_Y,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1815,7 +1828,9 @@ void ZMODEMStart(int mode)
 		FileVar->OpId = OpZSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_Z,&Opt) ||
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_Z,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				if (mode == IdZAutoS) {
@@ -1852,8 +1867,10 @@ void BPStart(int mode)
 		FileVar->OpId = OpBPSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 			FileVar->FullName[0] = 0;
-			if (! (*GetTransFname)(FileVar, ts.FileDir, GTF_BP, &Option))
+			if (! (*GetTransFname)(FileVar, FileDirExpanded, GTF_BP, &Option))
 			{
 				ProtoEnd();
 				return;
@@ -1886,7 +1903,9 @@ void QVStart(int mode)
 		FileVar->OpId = OpQVSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_QV, &W) ||
+			char FileDirExpanded[MAX_PATH];
+			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_QV, &W) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();

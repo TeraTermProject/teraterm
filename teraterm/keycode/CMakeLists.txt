@@ -28,3 +28,8 @@ add_executable(
 target_link_libraries(
   keycode
   )
+
+install(
+  TARGETS keycode
+  DESTINATION .
+  )

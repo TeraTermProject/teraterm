@@ -48,7 +48,7 @@ void OpenStatDlg(PCHAR Text, PCHAR Caption);
 void CloseStatDlg();
 void BringupStatDlg();
 
-int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected);
+int OpenListDlg(const PCHAR Text, const PCHAR Caption, const CHAR **Lists, int Selected);
 
 extern char HomeDir[MAX_PATH];
 extern char FileName[MAX_PATH];

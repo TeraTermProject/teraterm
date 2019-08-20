@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 TeraTerm Project
+ * Copyright (C) 2010-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,16 +35,6 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-
-struct getaddrinfo_args {
-  HWND hWnd;
-  unsigned int wMsg;
-  char *hostname;
-  char *portname;
-  struct addrinfo hints;
-  struct addrinfo **res;
-  HANDLE *lpHandle;
-};
 
 HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd,
 			   unsigned int wMsg,

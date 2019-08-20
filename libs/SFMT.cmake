@@ -1,4 +1,5 @@
-﻿# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P SFMT.cmake
+﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P oniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P SFMT.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P SFMT.cmake
 
 ####

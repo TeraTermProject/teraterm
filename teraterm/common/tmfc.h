@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 TeraTerm Project
+ * Copyright (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -146,7 +146,7 @@ public:
 	virtual BOOL PostNcDestroy();
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 
-	static LRESULT CALLBACK DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static INT_PTR CALLBACK DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static LRESULT CALLBACK WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 private:
 
@@ -178,8 +178,10 @@ public:
 	virtual void OnOK();
 	virtual BOOL OnCommand(WPARAM wp, LPARAM lp);
 	virtual HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
-
-	PROPSHEETPAGE m_psp;
+	HPROPSHEETPAGE CreatePropertySheetPage();
+protected:
+	PROPSHEETPAGE_V1 m_psp;
+private:
 	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static UINT CALLBACK PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp);
 	TTCPropertySheet *m_pSheet;

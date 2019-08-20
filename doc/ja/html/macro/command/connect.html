@@ -78,7 +78,7 @@ Tera Termマクロから接続する方法には、3 つの種類があります。
  <li>COM port 接続</li>
 </ul>
 
-<h3>telnet接続</h2>
+<h3>telnet接続</h3>
 
 <pre class=".code">
 <code>connect '<em>myserver</em>:23 /nossh /T=1'
@@ -211,7 +211,7 @@ connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /pass
 connect '<em>myserver</em> /ssh /auth=pageant /user=<em>username</em>'
 
 
-; Tera Term を起動し、シリアルポート接続を開く。ポート番号は 1 から 256 の範囲内
+; Tera Term を起動し、シリアルポート接続を開く。ポート番号は 1 から 最大値(MaxComPort) の範囲内。
 connect '/C=x'
 
 CommandLine = '111.111.11.11'

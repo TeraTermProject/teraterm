@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -459,7 +459,7 @@ void CCtrlWindow::OnPaint()
 	if (::IsIconic(m_hWnd)) {
 		int OldMapMode = GetMapMode(dc);
 		SetMapMode(dc, MM_TEXT);
-		SendMessage(WM_ICONERASEBKGND,(UINT)dc, 0);	// TODO
+		SendMessage(WM_ICONERASEBKGND,(WPARAM)dc, 0);	// TODO
 		DrawIcon(dc, 0, 0, m_hIcon);
 		SetMapMode(dc, OldMapMode);
 	}

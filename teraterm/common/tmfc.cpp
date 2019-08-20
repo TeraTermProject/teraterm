@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 TeraTerm Project
+ * Copyright (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -508,19 +508,21 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
  */
 INT_PTR TTCDialog::DoModal(HINSTANCE hInstance, HWND hParent, int idd)
 {
+	m_hInst = hInstance;
+	m_hParentWnd = hParent;
 	pseudoPtr = this;
 #if defined(REWRITE_TEMPLATE)
 	INT_PTR result =
 		TTDialogBoxParam(hInstance,
 						 MAKEINTRESOURCE(idd),
 						 hParent,
-						 (DLGPROC)&DlgProcStub, (LPARAM)this);
+						 &DlgProcStub, (LPARAM)this);
 #else
 	INT_PTR result =
 		DialogBoxParam(hInstance,
 					   MAKEINTRESOURCE(idd),
 					   hParent,
-					   (DLGPROC)&DlgProcStub, (LPARAM)this);
+					   &DlgProcStub, (LPARAM)this);
 #endif
 	pseudoPtr = nullptr;
 	return result;
@@ -540,7 +542,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);
 	DLGTEMPLATE *lpTemplate = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
 #endif
-	DLGPROC dlgproc = (DLGPROC)DlgProcStub;
+	DLGPROC dlgproc = DlgProcStub;
 	const wchar_t *dialog_class = TTGetClassName(lpTemplate);
 	if (dialog_class != nullptr) {
 		// Modaless Dialog & Dialog application
@@ -552,17 +554,15 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 		hInstance, lpTemplate, hParent,
 		dlgproc, (LPARAM)this);
 	pseudoPtr = nullptr;
+#if defined(REWRITE_TEMPLATE)
+	free(lpTemplate);
+#endif
 	if (hWnd == nullptr)
 	{
 		assert(false);
 		return FALSE;
 	}
-
 	m_hWnd = hWnd;
-	m_hInst = hInstance;
-//	::EnableWindow(hParent,FALSE);
-//	::ShowWindow(hWnd, SW_SHOW);		// TODO 外でやるのが良さそう
-//	::EnableWindow(m_hWnd,TRUE);
 
 	return TRUE;
 }
@@ -571,7 +571,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
  * @retval	TRUE	メッセージを処理した時
  * @retval	FALSE	メッセージを処理しなかった時
  */
-LRESULT CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+INT_PTR CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	TTCDialog *self = (TTCDialog *)::GetWindowLongPtr(hWnd, DWLP_USER);
 	if (self == nullptr) {
@@ -640,7 +640,6 @@ TTCPropertyPage::TTCPropertyPage(HINSTANCE inst, int id, TTCPropertySheet *sheet
 	m_psp.dwFlags |= PSP_DLGINDIRECT;
 	m_psp.pResource = TTGetDlgTemplate(inst, m_psp.pszTemplate);
 #endif
-//	m_psp.pfnDlgProc = (DLGPROC)Proc;
 	m_psp.pfnDlgProc = Proc;
 	m_psp.lParam = (LPARAM)this;
 
@@ -650,6 +649,11 @@ TTCPropertyPage::TTCPropertyPage(HINSTANCE inst, int id, TTCPropertySheet *sheet
 TTCPropertyPage::~TTCPropertyPage()
 {
 	free((void *)m_psp.pResource);
+}
+
+HPROPSHEETPAGE TTCPropertyPage::CreatePropertySheetPage()
+{
+	return ::CreatePropertySheetPage((PROPSHEETPAGE *)&m_psp);
 }
 
 void TTCPropertyPage::OnInitDialog()

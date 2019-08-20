@@ -57,8 +57,6 @@
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
 
-//#include "compat_w95.h"
-
 #ifdef _DEBUG
 #define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p)       _free_dbg((p), _NORMAL_BLOCK)
@@ -75,10 +73,9 @@
 #define EndDialog(p1,p2) \
 	TTEndDialog(p1, p2)
 
-//static HANDLE hInst;
 extern HANDLE hInst;
 
-char UILanguageFile[MAX_PATH];
+static char UILanguageFile[MAX_PATH];
 
 static const char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 static PCHAR NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
@@ -270,7 +267,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 
 					if ( ts!=NULL ) {
 						int width, height;
@@ -683,7 +680,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			return TRUE;
 
 		case WM_COMMAND:
-			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			RestoreVar(Dialog,ts,&IAttr,&IOffset);
 			switch (LOWORD(wParam)) {
 				case IDOK:
@@ -935,7 +932,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			break;
 
 		case WM_PAINT:
-			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			if ( ts==NULL ) {
 				return TRUE;
 			}
@@ -944,7 +941,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			break;
 
 		case WM_HSCROLL:
-			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (ts==NULL) {
 				return TRUE;
 			}
@@ -1203,7 +1200,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						memset(Temp, 0, sizeof(Temp));
 						GetDlgItemText(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
@@ -1323,7 +1320,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
 						WritePrivateProfileString("Hosts",NULL,NULL,ts->SetupFName);
 
@@ -1472,7 +1469,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					GetRB(Dialog,&w,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
 					if (w==1) {
 						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
-						ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+						ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 						if (ts!=NULL) {
 							SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TelPort,FALSE);
 						}
@@ -1623,7 +1620,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWL_USER);
+					GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( GetHNRec!=NULL ) {
 						char afstr[BUFSIZ];
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
@@ -1684,7 +1681,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				case IDC_HOSTTELNET:
 					GetRB(Dialog,&i,IDC_HOSTTELNET,IDC_HOSTTELNET);
 					if ( i==1 ) {
-						GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWL_USER);
+						GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
 						if ( GetHNRec!=NULL ) {
 							SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TelPort,FALSE);
 						}
@@ -1830,20 +1827,23 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					CurDir = (PCHAR)GetWindowLong(Dialog,DWL_USER);
+					CurDir = (PCHAR)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( CurDir!=NULL ) {
+						char FileDirExpanded[MAX_PATH];
 						_getcwd(HomeDir,sizeof(HomeDir));
-						_chdir(CurDir);
+						ExpandEnvironmentStrings(CurDir, FileDirExpanded, sizeof(FileDirExpanded));
+						_chdir(FileDirExpanded);
 						GetDlgItemText(Dialog, IDC_DIRNEW, TmpDir, sizeof(TmpDir));
 						if ( strlen(TmpDir)>0 ) {
-							if (_chdir(TmpDir) != 0) {
+							ExpandEnvironmentStrings(TmpDir, FileDirExpanded, sizeof(FileDirExpanded));
+							if (_chdir(FileDirExpanded) != 0) {
 								get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
 								get_lang_msg("MSG_FIND_DIR_ERROR", uimsg, sizeof(uimsg), "Cannot find directory", UILanguageFile);
 								MessageBox(Dialog,uimsg,uimsg2,MB_ICONEXCLAMATION);
 								_chdir(HomeDir);
 								return TRUE;
 							}
-							_getcwd(CurDir,MAXPATHLEN);
+							strncpy_s(CurDir, MAXPATHLEN, TmpDir, _TRUNCATE);
 						}
 						_chdir(HomeDir);
 					}
@@ -1857,9 +1857,13 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				case IDC_SELECT_DIR:
 					get_lang_msg("DLG_SELECT_DIR_TITLE", uimsg, sizeof(uimsg),
 					             "Select new directory", UILanguageFile);
-					GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
-					if (doSelectFolder(Dialog, buf2, sizeof(buf2), buf, uimsg)) {
-						SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+					{
+						char FileDirExpanded[MAX_PATH];
+						GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
+						ExpandEnvironmentStrings(buf, FileDirExpanded, sizeof(FileDirExpanded));
+						if (doSelectFolder(Dialog, buf2, sizeof(buf2), FileDirExpanded, uimsg)) {
+							SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+						}
 					}
 					return TRUE;
 
@@ -2552,7 +2556,7 @@ static int get_sel_lang_ui(char **list, char *selstr)
 	return (n + 1);  // 1origin
 }
 
-static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_GEN_TITLE" },
@@ -2615,7 +2619,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
 						w = (WORD)GetCurSel(Dialog, IDC_GENPORT);
 						if (w>1) {
@@ -2680,7 +2684,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_WINLIST_TITLE" },
@@ -2745,7 +2749,7 @@ static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						PostMessage(Hw,WM_SYSCOMMAND,SC_CLOSE,0);
 					}
 					else {
-						Close = (PBOOL)GetWindowLong(Dialog,DWL_USER);
+						Close = (PBOOL)GetWindowLongPtr(Dialog,DWLP_USER);
 						if (Close!=NULL) {
 							*Close = TRUE;
 						}
@@ -2917,7 +2921,7 @@ BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_GENDLG),
-		                     WndParent, (DLGPROC)&GenDlg, (LPARAM)ts);
+		                     WndParent, GenDlg, (LPARAM)ts);
 }
 
 BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
@@ -2927,7 +2931,7 @@ BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_WINLISTDLG),
 		                     WndParent,
-		                     (DLGPROC)&WinListDlg, (LPARAM)Close);
+							 WinListDlg, (LPARAM)Close);
 }
 
 BOOL WINAPI _TTDLGSetUILanguageFile(char *file)
@@ -2935,28 +2939,3 @@ BOOL WINAPI _TTDLGSetUILanguageFile(char *file)
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 	return TRUE;
 }
-
-#if 0
-BOOL WINAPI DllMain(HANDLE hInstance,
-                    ULONG ul_reason_for_call,
-                    LPVOID lpReserved)
-{
-	hInst = hInstance;
-	switch (ul_reason_for_call) {
-		case DLL_THREAD_ATTACH:
-			/* do thread initialization */
-			break;
-		case DLL_THREAD_DETACH:
-			/* do thread cleanup */
-			break;
-		case DLL_PROCESS_ATTACH:
-			/* do process initialization */
-			DoCover_IsDebuggerPresent();
-			break;
-		case DLL_PROCESS_DETACH:
-			/* do process cleanup */
-			break;
-	}
-	return TRUE;
-}
-#endif
