@@ -793,7 +793,7 @@ static wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 #if 1
 void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
-	unsigned int StrLen = 0, BuffLen = 0;
+	unsigned int StrLen = 0;
 	clipbard_work_t *p;
 	wchar_t *str_w;
 
@@ -819,10 +819,6 @@ void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		return;
 	}
 	p->send_str = str_w;
-
-	if (Bracketed) {
-		BuffLen += BracketStartLen + BracketEndLen;
-	}
 
 	if (ts.PasteFlag & CPF_TRIM_TRAILING_NL) {
 		// バッファ最後の改行を削除
