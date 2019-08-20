@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include <crtdbg.h>
+#include <wchar.h>
 
 #include "ttwinman.h"
 #include "ttcommon.h"
@@ -65,6 +66,11 @@ static BOOL CBRetryEcho;
 static BOOL CBSendCR;
 static BOOL CBEchoOnly;
 static BOOL CBInsertDelay = FALSE;
+
+wchar_t BracketStartW[] = L"\033[200~";
+wchar_t BracketEndW[] = L"\033[201~";
+size_t BracketStartLenW = ((sizeof(BracketStartW) / sizeof(wchar_t)) - 1);
+size_t BracketEndLenW = ((sizeof(BracketEndW) / sizeof(wchar_t)) - 1);
 
 #if UNICODE_BUF
 typedef struct {
@@ -845,15 +851,15 @@ void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 	if (Bracketed) {
 		size_t str_len = wcslen(str_w);
-		size_t dest_len = str_len + BracketStartLen + BracketEndLen;
+		size_t dest_len = str_len + BracketStartLenW + BracketEndLenW;
 		wchar_t *dest = malloc(sizeof(wchar_t) * (dest_len+1));
 		size_t i = 0;
-		memcpy(&dest[i], BracketStart, BracketStartLen);
-		i += BracketStartLen;
-		memcpy(&dest[i], str_w, str_len);
+		wmemcpy(&dest[i], BracketStartW, BracketStartLenW);
+		i += BracketStartLenW;
+		wmemcpy(&dest[i], str_w, str_len);
 		i += str_len;
-		memcpy(&dest[i], BracketEnd, BracketEndLen);
-		i += BracketEndLen;
+		wmemcpy(&dest[i], BracketEndW, BracketEndLenW);
+		i += BracketEndLenW;
 		dest[i] = 0;
 		free(str_w);
 		str_w = dest;
