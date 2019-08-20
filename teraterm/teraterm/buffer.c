@@ -2802,7 +2802,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			bufW[lenW] = 0;
 			bufWW[lenW] = 0;
 
-#if 1
+#if 0
 			OutputDebugPrintf("A[%d] '%s'\n", lenA, bufA);
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
