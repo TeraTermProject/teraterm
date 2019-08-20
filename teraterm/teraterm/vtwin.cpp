@@ -2263,6 +2263,14 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		ScreenToClient(m_hWnd, &pos);
 		CodePopup(pos.x, pos.y);
 	}
+	if (TipWinCodeDebug != NULL && nChar == VK_SHIFT) {
+		POINT pos;
+		GetCursorPos(&pos);
+		ScreenToClient(m_hWnd, &pos);
+		wchar_t *buf = BuffGetCharInfo(pos.x, pos.y);
+		CBSetTextW(HVTWin, buf, 0);
+		free(buf);
+	}
 #endif
 	switch (KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff)) {
 	case KEYDOWN_OTHER:
