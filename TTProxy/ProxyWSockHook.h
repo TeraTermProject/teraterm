@@ -1784,7 +1784,12 @@ private:                                                   \
             if (select((int) (s + 1), &ifd, &ofd, &efd, timeout > 0 ? &tv : NULL) == SOCKET_ERROR)
                 return SOCKET_ERROR;
             if (FD_ISSET(s, &efd)) {
-                WSASetLastError(WSAECONNREFUSED);
+				// Proxy serverへのconnectが失敗した場合、意図的に WSAECONNREFUSED エラーを
+				// セットするのをやめた。
+				// Proxy serverがホスト名として設定されていて、かつデュアルスタック環境の場合、
+				// Tera Term側でのIPv6/IPv4フォールバックが期待通りに動いていなかった。
+				// また、Proxy serverにまったく接続できない場合、Connection refusedダイアログが
+				// 3回連続表示されるという動作にもなっていた。
                 return SOCKET_ERROR;
             }
         }else{
