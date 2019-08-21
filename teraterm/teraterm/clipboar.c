@@ -80,8 +80,8 @@ typedef struct {
 	size_t send_index;
 	BOOL waited;
 	DWORD send_cr_tick;
-} clipbard_work_t;
-static clipbard_work_t cbwork;
+} clipboard_work_t;
+static clipboard_work_t cbwork;
 #endif
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
@@ -794,7 +794,7 @@ static wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	unsigned int StrLen = 0;
-	clipbard_work_t *p;
+	clipboard_work_t *p;
 	wchar_t *str_w;
 
 	if (! cv.Ready) {
@@ -1091,7 +1091,7 @@ void CBSend()
 //
 void CBSendW()
 {
-	clipbard_work_t *p = &cbwork;
+	clipboard_work_t *p = &cbwork;
 	int c;
 
 	if (p->send_str == NULL) {
@@ -1224,7 +1224,7 @@ void CBEcho()
 
 void CBEndPaste()
 {
-	clipbard_work_t *p = &cbwork;
+	clipboard_work_t *p = &cbwork;
 	TalkStatus = IdTalkKeyb;
 
 	if (p->send_str != NULL) {
