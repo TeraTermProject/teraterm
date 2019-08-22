@@ -80,6 +80,7 @@ char UnicodeGetWidthProperty(unsigned long u32)
 		}
 	}
 
+#if 0
 	if (result == 'A') {
 		// ƒLƒŠƒ‹•¶Žš“Á•Ê(TODO)
 		// ?	0x500-0x520
@@ -89,6 +90,7 @@ char UnicodeGetWidthProperty(unsigned long u32)
 			result = 'H';
 		}
 	}
+#endif
 
 	return result;
 }

@@ -826,6 +826,7 @@ static void PutKanji(BYTE b)
 		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
 		unsigned long u32 = 0;
 		if (ts.Language == IdKorean && ts.CodePage == 51949) {
+#if 0
 			unsigned char buf[2];
 			int ret;
 			wchar_t wchar;
@@ -833,16 +834,16 @@ static void PutKanji(BYTE b)
 			buf[1] = Kanji & 0xff;
 			ret = MultiByteToWideChar(51949, MB_ERR_INVALID_CHARS, (char *)buf, 2, &wchar, 1);
 			u32 = wchar;
-			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+#endif
+			u32 = MBCP_UTF32(Kanji, ts.CodePage);
 		} else if (ts.Language == IdJapanese && ts.CodePage == 932) {
 			// ここに来た時点でCP932になっている
 			//} else if (ts.KanjiCode == IdSJIS || ts.KanjiCode == IdEUC || ts.KanjiCode == IdJIS) {
 			u32 = CP932ToUTF32(Kanji);
-			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 		} else {
 			u32 = MBCP_UTF32(Kanji, ts.CodePage);
-			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 		}
+		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 	}
 #else
 	BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
@@ -5573,7 +5574,6 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 static void UnicodeToCP932(unsigned int code)
 {
 	unsigned short cset;
-	char r;
 	int LineEnd;
 
 	TCharAttr CharAttrTmp;
@@ -5593,6 +5593,8 @@ static void UnicodeToCP932(unsigned int code)
 		PutChar(code);
 #endif
 	} else {
+		int r;
+
 		// UnicodeからDEC特殊文字へのマッピング
 		if (ts.UnicodeDecSpMapping) {
 			cset = UTF32ToDecSp(code);
@@ -5620,6 +5622,9 @@ static void UnicodeToCP932(unsigned int code)
 			LineEnd = CursorRightM;
 
 
+		// TODO
+		//		PutUnicode()して、エラーが返ってきたら
+		//		カーソル位置を検討するよう変更するのはどうだろう?
 		if (Wrap) {
 			CarriageReturn(FALSE);
 			LineFeed(LF,FALSE);
@@ -5629,9 +5634,8 @@ static void UnicodeToCP932(unsigned int code)
 		else if (CursorX > LineEnd - 1) {
 			if (AutoWrapMode) {
 				if (ts.EnableContinuedLineCopy) {
-					BOOL half_width = (UnicodeGetWidthProperty(code) == 'H') ? TRUE : FALSE;
 					CharAttrTmp.Attr |= AttrLineContinued;
-					if (half_width == FALSE && CursorX == LineEnd) {
+					if (CursorX == LineEnd && BuffIsHalfWidthFromCode(&ts, code)) {
 						// full width出力が半分出力にならないように0x20を出力
 						BuffPutChar(0x20, CharAttr, FALSE);
 					}
@@ -5647,15 +5651,18 @@ static void UnicodeToCP932(unsigned int code)
 			Wrap = AutoWrapMode;
 		}
 		else {
-			if (r == '0' || r == 'V') {
+			if (r == 0) {
+				// カーソルの移動なし
 				;
-			}
-			else {
-				if (r == 'W') {
-					// 全角
-					MoveRight();
-				}
+			} else if (r == 1) {
+				// 半角
 				MoveRight();
+			} else if (r == 2) {
+				// 全角
+				MoveRight();
+				MoveRight();
+			} else {
+				assert(FALSE);
 			}
 		}
 	}

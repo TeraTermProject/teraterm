@@ -2824,9 +2824,11 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 		OutputDebugPrintf("(%d,%d)'%s'\n", *X, Y, b);
 	}
 
+#if !UNICODE_INTERNAL_BUFF
 	if ((ts.Language==IdRussian) &&
 		(ts.RussClient!=ts.RussFont))
 		RussConvStr(ts.RussClient,ts.RussFont,Buff,Count);
+#endif
 
 	if(!draw_bg_enable)
 	{
@@ -2873,8 +2875,10 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 
 	*X += Count*FontWidth;
 
+#if !UNICODE_INTERNAL_BUFF
 	if ((ts.Language==IdRussian) && (ts.RussClient!=ts.RussFont))
 		RussConvStr(ts.RussFont,ts.RussClient,Buff,Count);
+#endif
 }
 
 // DispStr() ‚Ì wchar_t”Å
@@ -2890,7 +2894,7 @@ void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int*
 
 #if 0
 	{
-		int b[TermWidthMax];
+		wchar_t b[TermWidthMax];
 		memcpy(b, StrW, Count*sizeof(wchar_t));
 		b[Count] = 0;
 		OutputDebugPrintfW(L"(%d,%d)'%s'\n", *X, Y, b);

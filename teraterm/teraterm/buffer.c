@@ -68,7 +68,8 @@ typedef unsigned long char32_t;		// C++11
 typedef struct {
 	char32_t u32;
 	char32_t u32_last;
-	char WidthProperty;		// 'W' or 'H' or 'A'
+	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' (文字の属性)
+	char HalfWidth;					// TRUE/FALSE = 半角/全角 (表示するときの文字幅)
 	char CombinationCharCount16;	// charactor count
 	char CombinationCharSize16;		// buffer size
 	char CombinationCharCount32;
@@ -134,7 +135,7 @@ static int SaveBuffX;
 static int SaveBuffY;
 
 #if UNICODE_INTERNAL_BUFF
-static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
+static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char half_width)
 {
 	size_t wstr_len;
 	buff_char_t *p = buff;
@@ -151,8 +152,11 @@ static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
 	p->CombinationCharCount32 = 0;
 	p->CombinationCharSize32 = 0;
 	p->WidthProperty = property;
+	p->HalfWidth = half_width;
 	p->u32 = u32;
 	p->u32_last = u32;
+
+	//
 	wstr_len = UTF32ToUTF16(u32, &p->wc2[0], 2);
 	switch (wstr_len) {
 	case 0:
@@ -168,7 +172,15 @@ static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
 	}
 }
 
-static void BuffAddChar(buff_char_t *buff, char32_t u32, char property)
+static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
+{
+	BuffSetChar2(buff, u32, property, TRUE);
+}
+
+/**
+ *	文字の追加、コンビネーション
+ */
+static void BuffAddChar(buff_char_t *buff, char32_t u32)
 {
 	buff_char_t *p = buff;
 	assert(p->u32 != 0);
@@ -729,7 +741,7 @@ void PrevLine()
 #endif
 }
 
-void EraseKanji(int LR)
+static void EraseKanji(int LR)
 {
 // If cursor is on left/right half of a Kanji, erase it.
 //   LR: left(0)/right(1) flag
@@ -2430,19 +2442,37 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 	}
 }
 
+#if UNICODE_INTERNAL_BUFF
+static BOOL BuffIsHalfWidthFromPropery(TTTSet *ts_, char width_property)
+{
+	if (width_property == 'H') {
+		return TRUE;
+	} else if (width_property == 'A') {
+		if (ts.Language == IdJapanese) {
+			// 全角として扱う
+			return FALSE;
+		}
+		return TRUE;
+	}
+	else /*if (prop == 'F' || prop == 'W')*/ {
+		return FALSE;
+	}
+}
+#endif
+
 /**
  *	ユニコードキャラクタを1文字バッファへ入力する
  *	@param[in]	u32		unicode character(UTF-32)
  *	@param[in]	Attr	attributes
  *	@param[in]	Insert	Insert flag
+ *	@return		カーソル移動量(0 or 1 or 2)
  */
 #if UNICODE_INTERNAL_BUFF
 char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 {
 	int ret;
 	BYTE b1, b2;
-	char retval = 'h';
-	BOOL half_width = TRUE;
+	int move_x = 0;
 
 	if (u32 < 0x80) {
 		b1 = (BYTE)u32;
@@ -2475,6 +2505,7 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	}
 
 	if (Insert) {
+		// TODO 未チェック
 		int XStart, LineEnd, MoveLen;
 		int extr = 0;
 		if (CursorX > CursorRightM)
@@ -2552,62 +2583,65 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		StrChangeCount = 0;
 		BuffUpdateRect(XStart, CursorY, LineEnd+extr, CursorY);
 	} else {
-		buff_char_t *p;
-
-		if (UnicodeIsVariationSelector(u32)) {
-			retval = 'V';
-		} else if (UnicodeIsCombiningCharacter(u32)) {
-			retval = '0';
-		} else if (u32 == 0x200d) {
-			retval = '0';
-		} else {
-			retval = UnicodeGetWidthProperty(u32);
-			half_width = (retval == 'H') ? TRUE : FALSE;
-		}
-
+		buff_char_t *p = NULL;	// NULLのとき、前の文字はない
 		// 前の文字
-		p = NULL;	// NULLのとき、前の文字はない
 		if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
 			p = &CodeLineW[CursorX - 1];
 		} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
 			p = &CodeLineW[CursorX - 2];
 		}
-		if (p != NULL && p->u32_last == 0x200d) {
-			retval = '0';
-		}
 
-		if (retval == 'V' || retval == '0') {
+		if (UnicodeIsVariationSelector(u32) ||
+			UnicodeIsCombiningCharacter(u32) ||
+			(u32 == 0x200d) ||
+			(p != NULL && p->u32_last == 0x200d))
+		{
 			// Combining
-			// 		VariationSelector or
-			// 		CombiningCharacter or
-			// 		ZERO WIDTH JOINER(ZWJ)
+			//		VariationSelector or
+			//		CombiningCharacter or
+			//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d) or
+			//		1つ前が ZWJ
+			move_x = 0;				// カーソル移動量=0
 
-			if (p != NULL) {
-				// 前の文字にくっつける
-				BuffAddChar(p, u32, retval);
-				AttrLine[CursorX] = Attr.Attr; // | AttrKanji; /* DBCS first byte */
-				AttrLine2[CursorX] = Attr.Attr2;
-				AttrLineFG[CursorX] = Attr.Fore;
-				AttrLineBG[CursorX] = Attr.Back;
-			} else {
+			if (p == NULL) {
 				// 前がないのにくっつく文字が出てきたとき
 				// とりあえずスペースにくっつける
 				p = &CodeLineW[CursorX];
 				BuffSetChar(p, ' ', 'H');
-				BuffAddChar(p, u32, retval);
-				AttrLine[CursorX] = Attr.Attr;
-				AttrLine2[CursorX] = Attr.Attr2;
-				AttrLineFG[CursorX] = Attr.Fore;
-				AttrLineBG[CursorX] = Attr.Back;
 			}
+
+			// 前の文字にくっつける
+			BuffAddChar(p, u32);
+#if 0
+			AttrLine[CursorX] = Attr.Attr;
+			AttrLine2[CursorX] = Attr.Attr2;
+			AttrLineFG[CursorX] = Attr.Fore;
+			AttrLineBG[CursorX] = Attr.Back;
+#endif
 		} else {
 			// 新しい文字追加
+
+			const char width_property = UnicodeGetWidthProperty(u32);
+			char retval;
+			BOOL half_width;
+			if (BuffIsHalfWidthFromPropery(&ts, width_property)) {
+				// 半角として扱う
+				retval = 'H';
+				move_x = 1;
+				half_width = TRUE;
+			} else {
+				// 全角として扱う
+				retval = 'W';
+				move_x = 2;
+				half_width = FALSE;
+			}
+
 			CodeLine[CursorX] = b1;
-			BuffSetChar(&CodeLineW[CursorX], u32, retval);
+			BuffSetChar2(&CodeLineW[CursorX], u32, retval, half_width);
 			if (half_width) {
 				AttrLine[CursorX] = Attr.Attr;
 			} else {
-				 /* DBCS first byte */
+				// 全角
 				AttrLine[CursorX] = Attr.Attr | AttrKanji;
 			}
 			AttrLine2[CursorX] = Attr.Attr2;
@@ -2635,18 +2669,15 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		if (StrChangeCount==0) {
 			StrChangeStart = CursorX;
 		}
-		if (retval == '0' || retval == 'V') {
+		if (move_x == 0) {
 			if (StrChangeCount == 0) {
 				StrChangeCount = 1;
 			}
-		} else if (retval == 'H') {
+		} else if (move_x == 1) {
 			// 半角
 			StrChangeCount = StrChangeCount + 1;
-		} else if (retval == 'A') {
-			// 特性値A(曖昧)を持つ文字は、全角の文字 (fullwidth) として扱う。
-			StrChangeCount = StrChangeCount + 2;
-		} else {
-			// 全角 ('F' or 'W')
+		} else /*if (move_x == 2)*/ {
+			// 全角
 			StrChangeCount = StrChangeCount + 2;
 		}
 #if 0
@@ -2666,7 +2697,7 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 #if 0
 	OutputDebugPrintf("BuffPutUnicode leave\n");
 #endif
-	return retval;
+	return move_x;
 }
 #endif
 
@@ -2745,15 +2776,14 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			} else {
 				// UTF-16でサロゲートペア
 				bufW[lenW] = b->wc2[0];
-				bufWW[lenW] = b->WidthProperty;
+				bufWW[lenW] = b->HalfWidth ? 'H' : 'W';
 				lenW++;
 				bufW[lenW] = b->wc2[1];
 				bufWW[lenW] = '0';
 				lenW++;
 				DrawFlag = TRUE;	// すぐに描画する
 			}
-			if ((b->WidthProperty == 'W' || b->WidthProperty == 'H') &&
-				b->CombinationCharCount16 != 0)
+			if (b->CombinationCharCount16 != 0)
 			{
 				// コンビネーション
 				int i;
@@ -5319,14 +5349,16 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		}
 
 		str2_len = aswprintf(&str2_ptr,
-					  L"\n"
-					  L"%s\n"
-					  L"'%s'\n"
-					  L"width %c",
-					  codes_ptr,
-					  wcs,
-					  b->WidthProperty
-				);
+							 L"\n"
+							 L"%s\n"
+							 L"'%s'\n"
+							 L"WidthProperty %c\n"
+							 L"Half %s",
+							 codes_ptr,
+							 wcs,
+							 b->WidthProperty,
+							 (b->HalfWidth ? L"TRUE" : L"FALSE")
+			);
 		free(codes_ptr);
 		free(wcs);
 
@@ -5341,3 +5373,11 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 
 	return str_ptr;
 }
+
+#if UNICODE_INTERNAL_BUFF
+BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32)
+{
+	const char width_property = UnicodeGetWidthProperty(u32);
+	return BuffIsHalfWidthFromPropery(ts_, width_property);
+}
+#endif
