@@ -47,6 +47,7 @@
 #include "dlg_res.h"
 #include "svnversion.h"
 #include "ttdlg.h"
+#include "unicode_test.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -95,7 +96,7 @@ static PCHAR KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
 static PCHAR KanjiInList[] = {"^[$@","^[$B",NULL};
 static PCHAR KanjiOutList[] = {"^[(B","^[(J",NULL};
 static PCHAR KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
-static PCHAR RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
+static PCHAR RussList[] = {"Windows(CP 1251)","KOI8-R","CP 866","ISO 8859-5",NULL};
 static PCHAR RussList2[] = {"Windows","KOI8-R",NULL};
 static PCHAR LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
 static PCHAR MetaList[] = {"off", "on", "left", "right", NULL};
@@ -244,6 +245,10 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
 				SetDropDownList(Dialog,IDC_TERMRUSSCLIENT,RussList,ts->RussClient);
 				SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
+#if UNICODE_INTERNAL_BUFF
+				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSCLIENT),FALSE);
+				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSFONT),FALSE);
+#endif
 			}
 			else if (ts->Language==IdKorean) { // HKS
 				SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, KanjiCode2List(ts->Language,ts->KanjiCode));
