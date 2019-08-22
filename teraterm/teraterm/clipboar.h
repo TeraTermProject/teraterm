@@ -47,6 +47,7 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
 void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed);
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);
+void CBStartPasteB64W(HWND HWin, PCHAR header, PCHAR footer);
 void CBSend(void);
 void CBSendW(void);
 void CBEcho(void);

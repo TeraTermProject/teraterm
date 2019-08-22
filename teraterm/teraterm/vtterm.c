@@ -4839,7 +4839,11 @@ void XsProcClipboard(PCHAR buff)
 				}
 				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
 				if (strncat_s(hdr, sizeof(hdr), buff, p - buff) == 0) {
+#if UNICODE_INTERNAL_BUFF
+					CBStartPasteB64W(HVTWin, hdr, "\033\\");
+#else
 					CBStartPasteB64(HVTWin, hdr, "\033\\");
+#endif
 				}
 			}
 			else if (ts.NotifyClipboardAccess) {

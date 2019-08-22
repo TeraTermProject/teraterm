@@ -43,6 +43,7 @@
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "dlglib.h"
+#include "codeconv.h"
 
 #include "clipboar.h"
 #include "tt_res.h"
@@ -978,6 +979,98 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	if (TalkStatus != IdTalkCB) {
 		CBEndPaste();
 	}
+}
+
+void CBStartPasteB64W(HWND HWin, PCHAR header, PCHAR footer)
+{
+	size_t mb_len, b64_len, header_len = 0, footer_len = 0;
+	clipboard_work_t *p;
+	wchar_t *str_w = NULL;
+	char *str_mb = NULL;
+	char *str_b64 = NULL;
+
+	if (! cv.Ready) {
+		return;
+	}
+	if (TalkStatus!=IdTalkKeyb) {
+		return;
+	}
+
+	CBEchoOnly = FALSE;
+
+	p = &cbwork;
+	if (p->send_str != NULL) {
+		// 送信中?
+		return;
+	}
+
+	str_w = GetClipboardTextW(HWin, FALSE);
+	if (str_w == NULL) {
+		// クリップボードから文字列を取得できなかった
+		goto error;
+		return;
+	}
+	p->send_str = str_w;
+
+	if (ts.Language == IdUtf8 || ts.KanjiCodeSend == IdUTF8) {
+		str_mb = ToU8W(str_w);
+	}
+	else {
+		str_mb = ToCharW(str_w);
+	}
+
+	if (str_mb == NULL) {
+		goto error;
+	}
+
+	if (header != NULL) {
+		header_len = strlen(header);
+	}
+	if (footer != NULL) {
+		footer_len = strlen(footer);
+	}
+
+	mb_len = strlen(str_mb);
+	b64_len = (mb_len + 2) / 3 * 4 + header_len + footer_len + 1;
+
+	if ((str_b64 = malloc(b64_len)) == NULL) {;
+		goto error;
+	}
+
+	if (header_len > 0) {
+		strncpy_s(str_b64, b64_len, header, _TRUNCATE);
+	}
+
+	b64encode(str_b64 + header_len, b64_len - header_len, str_mb, mb_len);
+
+	if (footer_len > 0) {
+		strncat_s(str_b64, b64_len, footer, _TRUNCATE);
+	}
+
+	free(str_w);
+	if ((str_w = ToWcharA(str_b64)) == NULL) {
+		goto error;
+	}
+
+	free(str_mb);
+	free(str_b64);
+
+	// 貼り付けの準備が正常に出来た
+	p->send_str = str_w;
+	p->send_index = 0;
+	p->waited = FALSE;
+	p->str_len = wcslen(p->send_str);
+	p->send_left = p->str_len;
+	TalkStatus = IdTalkCB;
+
+	return;
+
+error:
+	free(str_w);
+	free(str_mb);
+	free(str_b64);
+	CBEndPaste();
+	return;
 }
 
 // この関数はクリップボードおよびDDEデータを端末へ送り込む。
