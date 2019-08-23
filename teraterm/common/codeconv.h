@@ -61,14 +61,14 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_);
 
 // convinience funcs  (for windows api params)
-const char *ToCharA(const char *strA);
-const char *ToCharW(const wchar_t *strW);
-const char *ToCharU8(const char *strU8);
-const wchar_t *ToWcharA(const char *strA);
-const wchar_t *ToWcharW(const wchar_t *strW);
-const wchar_t *ToWcharU8(const char *strU8);
-const char *ToU8A(const char *strA);
-const char *ToU8W(const wchar_t *strW);
+char *ToCharA(const char *strA);
+char *ToCharW(const wchar_t *strW);
+char *ToCharU8(const char *strU8);
+wchar_t *ToWcharA(const char *strA);
+wchar_t *ToWcharW(const wchar_t *strW);
+wchar_t *ToWcharU8(const char *strU8);
+char *ToU8A(const char *strA);
+char *ToU8W(const wchar_t *strW);
 
 #if defined(_UNICODE)
 #define ToTcharA(s)		ToWcharA(s)
