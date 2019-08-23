@@ -154,10 +154,8 @@ include_directories(
   ../common
   ../ttpfile
   ../ttpdlg
-  ${SFMT_INCLUDE_DIRS}
   ${ONIGURUMA_INCLUDE_DIRS}
-  .
-  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg
+  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg     # for svnversion.h
   )
 
 link_directories(

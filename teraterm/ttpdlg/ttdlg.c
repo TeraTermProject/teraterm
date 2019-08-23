@@ -47,7 +47,7 @@
 #include "dlg_res.h"
 #include "svnversion.h"
 #include "ttdlg.h"
-#include "unicode_test.h"
+#include "../teraterm/unicode_test.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
