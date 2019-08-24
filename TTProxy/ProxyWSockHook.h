@@ -1528,10 +1528,37 @@ private:
             return SOCKET_ERROR;
         if (recieveFromSocket(s, buf, 4) == SOCKET_ERROR)
             return SOCKET_ERROR;
+		/* SOCKSリクエストに対するリプライ
+		   
+		   buf[0] VER  protocol version: X'05'
+		   buf[1] REP  Reply field: 
+ 				 o  X'00' succeeded
+				 o  X'01' general SOCKS server failure
+				 o  X'02' connection not allowed by ruleset
+				 o  X'03' Network unreachable
+				 o  X'04' Host unreachable
+				 o  X'05' Connection refused
+				 o  X'06' TTL expired
+				 o  X'07' Command not supported
+				 o  X'08' Address type not supported
+				 o  X'09' to X'FF' unassigned
+		   buf[2] RSV    RESERVED: X'00'
+		   buf[3] ATYP   address type of following address
+				 o  IP V4 address: X'01'
+				 o  DOMAINNAME: X'03'
+				 o  IP V6 address: X'04'
+		   buf[4:N] BND.ADDR       server bound address
+		   buf[N+1] BND.PORT       server bound port in network octet order 
+		 */
         if (buf[0] != SOCKS5_VERSION || buf[1] != SOCKS5_REP_SUCCEEDED) {   /* check reply code */
-            UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
+			char tmp[MAX_UIMSG + 32];
+
+			UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
                               "Proxy prevent this connection!");
-            return setError(s, uimsg);
+			// リプライ情報を追記してメッセージ表示する。
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS5:VER %u REP %u ATYP %u)", 
+				uimsg, buf[0], buf[1], buf[3]);
+			return setError(s, tmp);
         }
         // buf[2] is reserved
         switch (buf[3]) { /* case by ATYP */
@@ -1627,6 +1654,19 @@ private:
         if (recieveFromSocket(s, buf, 8) == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
+		/* SOCKS4の返答パケット
+		 
+		  buf[0] VN 常に0
+		  buf[1] CD
+		           90 request granted
+		           91 request rejected or failed
+		           92 request rejected becasue SOCKS server cannot connect to
+	                  identd on the client
+				   93 request rejected because the client program and identd
+	                  report different user-ids
+		  buf[2:3] DSTPORT ポート番号
+		  buf[4:7] DSTIP   IPアドレス
+		 */
         char uimsg[MAX_UIMSG];
         uimsg[0] = NULL;
         if (buf[0] != 0) {
@@ -1640,7 +1680,11 @@ private:
                               "Proxy prevent this connection!");
         }
         if (uimsg[0] != NULL) {
-            return setError(s, uimsg);
+			char tmp[MAX_UIMSG + 32];
+
+			// SOCKSの返答パケットのVNとCDを追記してメッセージ表示する。
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS4:VN %u CD %u)", uimsg, buf[0], buf[1]);
+            return setError(s, tmp);
         }
     
         /* Conguraturation, connected via SOCKS4 server! */
