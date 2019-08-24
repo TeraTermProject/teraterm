@@ -674,6 +674,10 @@ HBRUSH TTCPropertyPage::OnCtlColor(HDC hDC, HWND hWnd)
 	return (HBRUSH)::DefWindowProc(m_hWnd, WM_CTLCOLORSTATIC, (WPARAM)hDC, (LPARAM)hWnd);
 }
 
+void TTCPropertyPage::OnHelp()
+{
+}
+
 UINT CALLBACK TTCPropertyPage::PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp)
 {
 	return 0;
@@ -697,6 +701,9 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 		{
 		case PSN_APPLY:
 			self->OnOK();
+			break;
+		case PSN_HELP:
+			self->OnHelp();
 			break;
 		default:
 			break;

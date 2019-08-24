@@ -46,6 +46,7 @@
 #include "ttftypes.h"
 #include "dlglib.h"
 #include "compat_win.h"
+#include "helpid.h"
 #include "addsetting.h"
 
 #ifdef _DEBUG
@@ -92,7 +93,7 @@ CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet
 	get_lang_msgT("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
 	             _T("General"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CGeneralPropPageDlg::~CGeneralPropPageDlg()
@@ -206,6 +207,11 @@ void CGeneralPropPageDlg::OnOK()
 	ts.TitleFormat |= (GetCheck(IDC_TITLEFMT_DISPSERIALSPEED) == BST_CHECKED) << 5;
 }
 
+void CGeneralPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
+
 // CSequencePropPageDlg ダイアログ
 
 CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
@@ -215,7 +221,7 @@ CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *she
 	get_lang_msgT("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
 	             _T("Control Sequence"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CSequencePropPageDlg::~CSequencePropPageDlg()
@@ -391,6 +397,10 @@ void CSequencePropPageDlg::OnOK()
 	ts.NotifyClipboardAccess = GetCheck(IDC_CLIPBOARD_NOTIFY);
 }
 
+void CSequencePropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
 
 // CCopypastePropPageDlg ダイアログ
 
@@ -401,7 +411,7 @@ CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst, TTCPropertySheet *s
 	get_lang_msgT("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
 				  _T("Copy and Paste"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CCopypastePropPageDlg::~CCopypastePropPageDlg()
@@ -607,6 +617,10 @@ void CCopypastePropPageDlg::OnOK()
 	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
 }
 
+void CCopypastePropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
 
 // CVisualPropPageDlg ダイアログ
 
@@ -617,7 +631,7 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	get_lang_msgT("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
 	             _T("Visual"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CVisualPropPageDlg::~CVisualPropPageDlg()
@@ -1043,7 +1057,10 @@ void CVisualPropPageDlg::OnOK()
 	}
 }
 
-
+void CVisualPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
 
 // CLogPropPageDlg ダイアログ
 
@@ -1054,7 +1071,7 @@ CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	get_lang_msgT("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
 	             _T("Log"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CLogPropPageDlg::~CLogPropPageDlg()
@@ -1401,6 +1418,11 @@ void CLogPropPageDlg::OnOK()
 	ts.LogTimestampType = GetCurSel(IDC_OPT_TIMESTAMP_TYPE);
 }
 
+void CLogPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
+
 /////////////////////////////
 
 // CCygwinPropPageDlg ダイアログ
@@ -1412,7 +1434,7 @@ CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	get_lang_msgT("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
 	             _T("Cygwin"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CCygwinPropPageDlg::~CCygwinPropPageDlg()
@@ -1493,6 +1515,11 @@ void CCygwinPropPageDlg::OnOK()
 
 	// Cygwin install path
 	GetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory, sizeof(ts.CygwinDirectory));
+}
+
+void CCygwinPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
 }
 
 // CAddSettingPropSheetDlg

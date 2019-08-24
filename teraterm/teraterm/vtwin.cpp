@@ -3643,7 +3643,8 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
-	OpenHelp(HH_HELP_CONTEXT, HelpId, ts.UILanguageFile);
+	DWORD help_id = (wParam == 0) ? HelpId : wParam;
+	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
 	return 0;
 }
 
