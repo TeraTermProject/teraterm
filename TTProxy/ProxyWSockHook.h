@@ -1197,24 +1197,42 @@ private:
         return _sendToSocket(s, (const unsigned char*) buf, len);
     }
 
-    int recieveFromSocketTimeout(SOCKET s, unsigned char* buffer, int size, int timeout) {
+    /*
+	 * SOCKSサーバからデータを受信する
+	 *
+	 * return:
+	 *    1以上   受信データ数(byte)。sizeより小さい場合もある。
+	 *    -1      SOCKET_ERROR 
+	 */
+	int recieveFromSocketTimeout(SOCKET s, unsigned char* buffer, int size, int timeout) {
         int ready = 0;
+		int ret;
+
         while (!ready) {
             struct timeval tv = {timeout, 0};
             fd_set fd;
+			int n;
+
             FD_ZERO(&fd);
             FD_SET(s, &fd);
-            switch (select((int) (s + 1), &fd, NULL, NULL, timeout > 0 ? &tv : NULL)) {
+			n = select((int)(s + 1), &fd, NULL, NULL, timeout > 0 ? &tv : NULL);
+			switch (n) {
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
             case 0:
-                return 0;
+				// 受信タイムアウトの場合にもエラー扱いとする。
+                return SOCKET_ERROR;
             default:
                 ready = FD_ISSET(s, &fd);
                 break;
             }
         }
-        return ORIG_recv(s, (char*) buffer, size, 0);
+
+		// SOCKSサーバから切断された場合、recv()が0を返すため、エラー扱いとする。
+        ret = ORIG_recv(s, (char*) buffer, size, 0);
+		if (ret == 0)
+			ret = SOCKET_ERROR;
+		return (ret);
     }
 
     int recieveFromSocket(SOCKET s, unsigned char* buffer, int size) {
