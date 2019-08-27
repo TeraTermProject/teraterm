@@ -946,7 +946,7 @@ char *ToCharU8(const char *strU8)
 		return NULL;
 	}
 	char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
-	free((void *)strW);
+	free(strW);
 	return strA;
 }
 
@@ -975,12 +975,12 @@ char *ToU8W(const wchar_t *strW)
 
 char *ToU8A(const char *strA)
 {
-	const wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
+	wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
 	if (strW == NULL) {
 		return NULL;
 	}
 	char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
-	free((void *)strW);
+	free(strW);
 	return strU8;
 }
 
@@ -1190,9 +1190,9 @@ tc& tc::operator=(tc &&obj) noexcept
 
 tc tc::fromUtf8(const char *strU8)
 {
-	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
+	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	tc _tc = strW;
-	free((void *)strW);
+	free(strW);
 	return _tc;
 }
 
