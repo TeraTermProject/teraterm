@@ -69,7 +69,8 @@ private:
   // for debug
 #if UNICODE_DEBUG
   TipWin *TipWinCodeDebug;
-  
+  int CtrlKeyState;			// 0:ŠJn/1:‰Ÿ‚·/2:—£‚·/3:‰Ÿ‚·(•\¦ó‘Ô)
+  DWORD CtrlKeyDownTick;	// Å‰‚É‰Ÿ‚µ‚½tick
 #endif
 
 public:

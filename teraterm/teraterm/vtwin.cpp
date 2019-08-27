@@ -809,6 +809,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	DropLists = NULL;
 	DropListCount = 0;
+
+#if UNICODE_DEBUG
+	CtrlKeyState = 0;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2257,11 +2261,33 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	MSG M;
 
 #if UNICODE_DEBUG
-	if (nChar == VK_CONTROL && GetAsyncKeyState(VK_RCONTROL) != 0 && (nFlags & 0x4000) == 0){
-		POINT pos;
-		GetCursorPos(&pos);
-		ScreenToClient(m_hWnd, &pos);
-		CodePopup(pos.x, pos.y);
+	if (nChar == VK_CONTROL) {
+		const DWORD now = GetTickCount();
+		switch(CtrlKeyState) {
+		case 0:
+			CtrlKeyDownTick = now;
+			CtrlKeyState = 1;
+			break;
+		case 2:
+			if (now - CtrlKeyDownTick < 500 && TipWinCodeDebug == NULL) {
+				POINT pos;
+				GetCursorPos(&pos);
+				ScreenToClient(m_hWnd, &pos);
+				CodePopup(pos.x, pos.y);
+				CtrlKeyState++;
+			} else {
+				CtrlKeyDownTick = now;
+				CtrlKeyState = 1;
+			}
+			break;
+		case 3:
+			break;
+		default:
+			CtrlKeyState = 0;
+			break;
+		}
+	} else {
+		CtrlKeyState = 0;
 	}
 	if (TipWinCodeDebug != NULL && nChar == VK_SHIFT) {
 		POINT pos;
@@ -2305,10 +2331,16 @@ void CVTWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyUp(nChar);
 #if UNICODE_DEBUG
+	if (CtrlKeyState == 1 && nChar == VK_CONTROL) {
+		CtrlKeyState++;
+	} else {
+		CtrlKeyState = 0;
+	}
 	if (nChar == VK_CONTROL) {
 		if (TipWinCodeDebug != NULL) {
 			TipWinDestroy(TipWinCodeDebug);
 			TipWinCodeDebug = NULL;
+			CtrlKeyState = 0;
 		}
 	}
 #endif
