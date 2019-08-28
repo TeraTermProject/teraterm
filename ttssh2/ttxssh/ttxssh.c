@@ -795,7 +795,11 @@ static int PASCAL TTXWSAAsyncSelect(SOCKET s, HWND hWnd, u_int wMsg,
 
 		if (pvar->NotificationWindow == NULL) {
 			pvar->NotificationWindow = hWnd;
-			AUTH_advance_to_next_cred(pvar);
+			// AUTH_advance_to_next_cred()の呼び出しを削除する。
+			// NotificationWindowにハンドルは設定しておくが、このタイミングでは
+			// 認証ダイアログを出すのは早すぎた。ProxyやNAT経由でサーバに接続
+			// できない場合、すでに切断状態にも関わらず、認証ダイアログが
+			// 表示されたままとなっていた。
 		}
 	}
 
