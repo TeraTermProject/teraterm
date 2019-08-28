@@ -1,6 +1,6 @@
 #define AppName "Tera Term"
 #define AppVer "4.104-RC1"
-#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
