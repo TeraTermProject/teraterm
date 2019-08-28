@@ -29,7 +29,7 @@
 #pragma once
 
 #define TT_VERSION_MAJOR             4
-#define TT_VERSION_MINOR             103
+#define TT_VERSION_MINOR             104
 #define TT_TOSTR(x)                  TT_TOSTR2(x)
 #define TT_TOSTR2(x)                 #x
 #define TT_VERSION_STR(sep)          TT_TOSTR(TT_VERSION_MAJOR) sep TT_TOSTR(TT_VERSION_MINOR)
