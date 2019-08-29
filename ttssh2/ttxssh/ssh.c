@@ -351,7 +351,10 @@ static void ssh2_channel_delete(Channel_t *c)
 			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
-		ssh2_scp_free_packetlist(c);
+		// SCP受信の場合のみ、SCP用リストの開放を行う。
+		// Windows9xで落ちる問題を修正した。
+		if (c->scp.dir == FROMREMOTE) 
+			ssh2_scp_free_packetlist(c);
 	}
 	if (c->type == TYPE_AGENT) {
 		buffer_free(c->agent_msg);
