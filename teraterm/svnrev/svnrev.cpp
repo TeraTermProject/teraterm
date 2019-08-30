@@ -41,16 +41,31 @@ int get_svn_revision(char *svnversion, char *path) {
 	// .svn\entries を直接読み込むのをやめ、
 	// svnversion.exe コマンドを呼び出した結果を返す
 
-	// _popen はスペースが含まれる場合にダブルクォートで囲んでも
-	// うまく動かないため 8.3 形式に変換
-	DWORD r = GetShortPathName(svnversion, arg1, sizeof(arg1));
-	if (r == 0) {
-		return -1;	// svn did not exist
-	}
-	GetShortPathName(path, arg2, sizeof(arg2));
+	// 渡された svnversion が存在すれば実行するが、
+	// そうでなければ "svnversion" を実行する (PATH から検索される)
+	if ((fopen_s(&fp, svnversion, "r")) == 0) {
+		DWORD r;
 
-	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s -n %s", arg1, arg2);
-	if ((fp = _popen(command, "rt")) == NULL ) {
+		fclose(fp);
+
+		// _popen はスペースが含まれる場合にダブルクォートで囲んでも
+		// うまく動かないため 8.3 形式に変換
+		r = GetShortPathName(svnversion, arg1, sizeof(arg1));
+		if (r == 0) {
+			return -1;	// svn did not exist
+		}
+		GetShortPathName(path, arg2, sizeof(arg2));
+
+		_snprintf_s(command, sizeof(command), _TRUNCATE, "%s -n %s", arg1, arg2);
+
+	}
+	else {
+		GetShortPathName(path, arg2, sizeof(arg2));
+
+		_snprintf_s(command, sizeof(command), _TRUNCATE, "hoge -n %s", arg2);
+	}
+	
+	if ((fp = _popen(command, "rt")) == NULL) {
 		return -1;
 	}
 
