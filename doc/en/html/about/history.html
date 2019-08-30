@@ -35,28 +35,28 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in Ver 4.102.</li>
-      <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
+      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
       <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
-      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
       <li>Added help button on Additional settings dialog.</li>
+      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in Ver 4.102.</li>
+      <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
     </ul>
   </li>
   <li>Bug fixes
     <ul>
-      <li>When the Active Window Tracking is enabled, mouse cursor won't be active in Tera Term window. This bug was introduced in 4.103.</li>
       <li>When UTF-8 characters received, 4-byte UTF-8 characters are miss-decoded.</li>
+      <li>When the Active Window Tracking is enabled, mouse cursor won't be active in Tera Term window. This bug was introduced in 4.103.</li>
+      <li>The session number of window title is always 1.</li>
+      <li>When the font selection dialog is used while undetermined characters of IME are displayed , the font ot IME always is changed.</li>
+      <li>When the locale setting is default(japanese) or invalid on English version of Windows, an application fault immediately occurs after starting Tera Term.</li>
+      <li>A big file can not send by using [File]/[Send file..]. This bug was introduced in 4.103.</li>
+      <li>Cancel printing dialog can not be shown. This bug was introduced in 4.103.</li>
       <li>The plugin compiled before 4.103 can not called because the DLL's calling convention is changed in Tera Term 4.103. </li>
       <li>MACRO: <a href="../macro/command/listbox.html">listbox</a> command can not adjust the width of list according to the window size.</li>
-      <li>When the font selection dialog is used while undetermined characters of IME are displayed , the font ot IME always is changed.</li>
-      <li>The session number of window title is always 1.</li>
       <li>MACRO: <a href="../macro/command/filecopy.html">filecopy</a> command may not store the result to result system variable.</li>
-      <li>A big file can not send by using [File]/[Send file..]. This bug was introduced in 4.103.</li>
       <li>MACRO: <a href="../macro/command/filelock.html">filelock</a> and <a href="../macro/command/fileunlock.html">fileunlock</a> command always fail. This bug was introduced in 4.101.</li>
       <li>MACRO: When the first byte of the file is matched by using <a href="../macro/command/filestrseek2.html">filestrseek2</a> command, the file pointer is invalid. This bug was introduced in 4.101.</li>
-      <li>Cancel printing dialog can not be shown. This bug was introduced in 4.103.</li>
-      <li>When the locale setting is default(japanese) or invalid on English version of Windows, an application fault immediately occurs after starting Tera Term.</li>
     </ul>
   </li>
 
@@ -3167,11 +3167,11 @@ SYNOPSIS:
 
 <h3 id="ttssh_2.90">2019.xx.xx (Ver 2.90)</h3>
 <ul class="history">
-  <li>Changes
+  <!--li>Changes
     <ul>
       <li></li>
     </ul>
-  </li>
+  </li-->
 
   <li>Bug fixes
     <ul>
@@ -3183,11 +3183,11 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <li>Misc
+  <!--li>Misc
     <ul>
       <li></li>
     </ul>
-  </li>
+  </li-->
 </ul>
 
 <h3 id="ttssh_2.89">2019.06.15 (Ver 2.89)</h3>
