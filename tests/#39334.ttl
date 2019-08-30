@@ -1,0 +1,17 @@
+strdim msg 10
+msg[0] = 'line1 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45[' 
+msg[1] = 'line2 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[2] = 'line3 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[3] = 'line4 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[4] = 'line5 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[5] = 'line6 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[6] = 'line7 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[7] = 'line8 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[8] = 'line9 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+msg[9] = 'line10 4309tu 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45['
+
+getver ver
+listbox 'select asf asf asfsa dfsa fsadf asdf sadf a 3045j j345yj345 oyj453jy 45jy 4hj y[h5w4 [ioyhj45wojh45f ' ver msg
+sprintf2 var "%d" result
+messagebox var "result"
+
