@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-08-16)
+; Updated by TeraTerm Project (2019-08-31)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -592,6 +592,7 @@ DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
 DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=Passphrase speichern
 DLG_AUTH_FWDAGENT=F&orward agent
+DLG_AUTH_METHOD=Authentication methods
 DLG_AUTH_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTH_METHOD_RHOST=rhosts verwenden (SSH1)
@@ -611,10 +612,12 @@ MSG_PAGEANT_NOKEY=Pageant has no valid key.
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
 DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
+DLG_AUTHSETUP_USERNAME=User name
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
 DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
 DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_METHOD=Authentication methods
 DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)

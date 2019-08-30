@@ -85,7 +85,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_CHOOSEHOSTRSAFILE,276,171,13,13
     DEFPUSHBUTTON   "OK",IDOK,199,227,50,14,WS_GROUP
     PUSHBUTTON      "&Disconnect",IDCANCEL,255,227,47,14
-    GROUPBOX        "Authentication methods ",IDC_STATIC,6,89,295,132
+    GROUPBOX        "Authentication methods ",IDC_SSHAUTHMETHOD,6,89,295,132
 END
 
 IDD_HOSTDLG DIALOGEX 20, 20, 240, 128
@@ -219,13 +219,13 @@ CAPTION "TTSSH: Authentication Setup"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
     LTEXT           "Select defaults for authentication:",IDC_SSHAUTHBANNER,6,7,166,10
-    GROUPBOX        "User name",IDC_STATIC,6,22,295,88
+    GROUPBOX        "User name",IDC_SSH_USERNAME,6,22,295,88
     CONTROL         "&Do not enter username",IDC_SSH_NO_USERNAME,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,19,35,152,10
     CONTROL         "U&se default username",IDC_SSH_DEFAULTUSERNAME,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,50,152,10
     CONTROL         "Us&e logon username",IDC_SSH_WINDOWS_USERNAME,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,78,152,10
     EDITTEXT        IDC_SSHUSERNAME,35,62,145,12,ES_AUTOHSCROLL | WS_GROUP
     LTEXT           "Current username is ""%s""",IDC_SSH_WINDOWS_USERNAME_TEXT,35,93,128,10
-    GROUPBOX        "Authentication methods ",IDC_STATIC,6,120,295,200
+    GROUPBOX        "Authentication methods ",IDC_SSH_AUTHMETHOD,6,120,295,200
     CONTROL         "Use p&lain password to log in",IDC_SSHUSEPASSWORD,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,19,134,120,10
     CONTROL         "Use &RSA/DSA/ECDSA/ED25519 key to log in",IDC_SSHUSERSA,
