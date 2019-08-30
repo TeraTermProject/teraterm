@@ -1363,7 +1363,9 @@ private:
             }
         } while (strcmp(buf,"\r\n") != 0);
         if (status_code != 200) {
-            char uimsg[MAX_UIMSG];
+			char uimsg[MAX_UIMSG] = {0};
+			char tmp[MAX_UIMSG];
+
             switch (status_code) {
             case 401:
             case 407:
@@ -1374,8 +1376,15 @@ private:
             case 405:
             case 406:
             case 403:
+			default:
+				// 該当しないステータスコードだった場合、不定な内容のuimsg[]が
+				// MessageBoxに表示される問題を修正した。
+				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(status code %d)", 
+					"Proxy prevent this connection!", status_code
+					);
+
                 UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                                  "Proxy prevent this connection!");
+                                  tmp);
                 break;
             }
             return setError(s, uimsg);
