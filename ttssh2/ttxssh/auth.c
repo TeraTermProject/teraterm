@@ -1435,6 +1435,12 @@ static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->auth_state.auth_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		default:
 			return FALSE;
 		}

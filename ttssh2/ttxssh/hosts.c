@@ -1988,6 +1988,12 @@ canceled:
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->hosts_state.hosts_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		case IDC_FP_HASH_ALG_MD5:
 			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
 			return TRUE;
@@ -2139,6 +2145,12 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
+			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
 
