@@ -1829,6 +1829,12 @@ canceled:
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->hosts_state.hosts_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		case IDC_FP_HASH_ALG_MD5:
 			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
 			return TRUE;
@@ -2310,6 +2316,17 @@ void HOSTS_notify_disconnecting(PTInstVar pvar)
 		PostMessage(pvar->hosts_state.hosts_dialog, WM_COMMAND, IDCANCEL, 0);
 		/* the main window might not go away if it's not enabled. (see vtwin.cpp) */
 		EnableWindow(pvar->NotificationWindow, TRUE);
+	}
+}
+
+// TCPセッションがクローズされた場合、known_hostsダイアログを閉じるように指示を出す。
+// HOSTS_notify_disconnecting()とは異なり、ダイアログを閉じるのみで、
+// SSHサーバに通知は出さない。
+void HOSTS_notify_closing_on_exit(PTInstVar pvar)
+{
+	if (pvar->hosts_state.hosts_dialog != NULL) {
+		logprintf(LOG_LEVEL_INFO, "%s: Notify closing message to the known_hosts dialog.", __FUNCTION__);
+		PostMessage(pvar->hosts_state.hosts_dialog, WM_COMMAND, IDCLOSE, 0);
 	}
 }
 

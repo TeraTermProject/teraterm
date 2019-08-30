@@ -71,6 +71,7 @@ void AUTH_destroy_cur_cred(PTInstVar pvar);
 void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len);
 void AUTH_notify_disconnecting(PTInstVar pvar);
 void AUTH_notify_end_error(PTInstVar pvar);
+void AUTH_notify_closing_on_exit(PTInstVar pvar);
 void AUTH_end(PTInstVar pvar);
 void destroy_malloced_string(char **str);
 void init_password_control(PTInstVar pvar, HWND dlg, int item, BOOL *UseControlChar);

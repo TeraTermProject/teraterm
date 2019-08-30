@@ -1130,6 +1130,10 @@ static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 
 		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
 
+		// 認証ダイアログが残っていれば閉じる。
+		HOSTS_notify_closing_on_exit(pvar);
+		AUTH_notify_closing_on_exit(pvar);
+
 		*hooks->Precv = pvar->Precv;
 		*hooks->Psend = pvar->Psend;
 		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
