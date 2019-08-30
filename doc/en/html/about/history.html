@@ -39,7 +39,7 @@
       <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
       <li>Added help button on Additional settings dialog.</li>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in Ver 4.102.</li>
+      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in 4.102.</li>
       <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
     </ul>
   </li>
@@ -47,13 +47,13 @@
     <ul>
       <li>When UTF-8 characters received, 4-byte UTF-8 characters are miss-decoded.</li>
       <li>When the Active Window Tracking is enabled, mouse cursor won't be active in Tera Term window. This bug was introduced in 4.103.</li>
-      <li>The session number of window title is always 1.</li>
+      <li>The session number of window title is always 1. This bug was introduced in 4.103.</li>
       <li>When the font selection dialog is used while undetermined characters of IME are displayed , the font ot IME always is changed.</li>
       <li>When the locale setting is default(japanese) or invalid on English version of Windows, an application fault immediately occurs after starting Tera Term.</li>
       <li>A big file can not send by using [File]/[Send file..]. This bug was introduced in 4.103.</li>
       <li>Cancel printing dialog can not be shown. This bug was introduced in 4.103.</li>
       <li>The plugin compiled before 4.103 can not called because the DLL's calling convention is changed in Tera Term 4.103. </li>
-      <li>MACRO: <a href="../macro/command/listbox.html">listbox</a> command can not adjust the width of list according to the window size.</li>
+      <li>MACRO: <a href="../macro/command/listbox.html">listbox</a> command can not adjust the width of list according to the window size. This bug was introduced in 4.103.</li>
       <li>MACRO: <a href="../macro/command/filecopy.html">filecopy</a> command may not store the result to result system variable.</li>
       <li>MACRO: <a href="../macro/command/filelock.html">filelock</a> and <a href="../macro/command/fileunlock.html">fileunlock</a> command always fail. This bug was introduced in 4.101.</li>
       <li>MACRO: When the first byte of the file is matched by using <a href="../macro/command/filestrseek2.html">filestrseek2</a> command, the file pointer is invalid. This bug was introduced in 4.101.</li>
@@ -4803,7 +4803,7 @@ SYNOPSIS:
   
   <li>Bug fixes
     <ul>
-      <li>Bug fix: Depending on OS, it's not working correctly. This bug was introduced in 4.103.</li>
+      <li>Bug fix: Depending on OS, setup dialog is not working correctly. This bug was introduced in 4.103.</li>
       <li>Bug fix: When the hostname setting is domain, IPv6 and IPv4 fallback does not work well. And also, when you can not connect to the proxy server, Connection refused dialog is shown three times in a row.</li>
       <li>Bug fix: When data can not receive from SOCKS server during negotiation with SOCKS4 and 5, the data may not be handled as an error.</li>
     </ul>
