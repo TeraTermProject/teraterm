@@ -62,7 +62,7 @@ int get_svn_revision(char *svnversion, char *path) {
 	else {
 		GetShortPathName(path, arg2, sizeof(arg2));
 
-		_snprintf_s(command, sizeof(command), _TRUNCATE, "hoge -n %s", arg2);
+		_snprintf_s(command, sizeof(command), _TRUNCATE, "svnversion -n %s", arg2);
 	}
 	
 	if ((fp = _popen(command, "rt")) == NULL) {
