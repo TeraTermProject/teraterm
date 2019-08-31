@@ -1098,7 +1098,7 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 static PCHAR DataList[] = {"7 bit","8 bit",NULL};
 static PCHAR ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
 static PCHAR StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
-static PCHAR FlowList[] = {"Xon/Xoff","hardware","none",NULL};
+static PCHAR FlowList[] = {"Xon/Xoff","RTS/CTS","none", "DSR/DTR", NULL};
 
 static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {

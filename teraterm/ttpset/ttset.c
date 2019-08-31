@@ -1070,6 +1070,10 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->Flow = IdFlowX;
 	else if (_stricmp(Temp, "hard") == 0)
 		ts->Flow = IdFlowHard;
+	else if (_stricmp(Temp, "rtscts") == 0)  // hard‚Ærtscts‚Í“¯‚¶ˆÓ–¡
+		ts->Flow = IdFlowHard;
+	else if (_stricmp(Temp, "dsrdtr") == 0)
+		ts->Flow = IdFlowHardDsrDtr;
 	else
 		ts->Flow = IdFlowNone;
 
@@ -2637,6 +2641,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		break;
 	case IdFlowHard:
 		strncpy_s(Temp, sizeof(Temp), "hard", _TRUNCATE);
+		break;
+	case IdFlowHardDsrDtr:
+		strncpy_s(Temp, sizeof(Temp), "dsrdtr", _TRUNCATE);
 		break;
 	default:
 		strncpy_s(Temp, sizeof(Temp), "none", _TRUNCATE);

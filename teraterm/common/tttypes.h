@@ -816,8 +816,10 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdStopBit2  3
   /* Flow control ID */
 #define IdFlowX 1
-#define IdFlowHard 2
+#define IdFlowHard 2    // RTS/CTS(hardware flow)
 #define IdFlowNone 3
+#define IdFlowHardDsrDtr 4  // DSR/DTR(hardware flow)
+
 
 /* GetHostName dialog record */
 typedef struct {
