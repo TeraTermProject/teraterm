@@ -73,6 +73,10 @@ int get_svn_revision(char *svnversion, char *path) {
 	revision = atoi(result);
 	_pclose(fp);
 
+	if (strlen(result) == 0) {
+		return -1;
+	}
+
 	if (revision == 0) {
 		revision = -1;
 	}
