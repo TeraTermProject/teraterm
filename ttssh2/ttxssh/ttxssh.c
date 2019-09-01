@@ -43,6 +43,7 @@
 #include "keyfiles.h"
 #include "arc4random.h"
 #include "auth.h"
+#include "helpid.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -2750,6 +2751,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHSETUP_HELP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHSETUP_HELP, pvar->ts->UIMsg);
 
 	GetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_HOSTKEY_ROTATION", pvar, uimsg);
@@ -3317,6 +3321,9 @@ static INT_PTR CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
 			EndDialog(dlg, 0);
+			return TRUE;
+		case IDC_SSHSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSsh, 0);
 			return TRUE;
 		// Cipher order
 		case IDC_SSHMOVECIPHERUP:
@@ -4274,6 +4281,9 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_CLOSE", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_SSHKEYGENSETUP_HELP, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_SSHKEYGENSETUP_HELP, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_KDF", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, pvar->ts->UIMsg);
@@ -4439,6 +4449,10 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			// don't forget to free SSH resource!
 			free_ssh_key();
 			EndDialog(dlg, 0); // dialog close
+			return TRUE;
+
+		case IDC_SSHKEYGENSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSshkeygen, 0);
 			return TRUE;
 
 		// if radio button pressed...

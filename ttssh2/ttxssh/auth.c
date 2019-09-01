@@ -46,6 +46,7 @@
 #include "libputty.h"
 #include "tipwin.h"
 #include "auth.h"
+#include "helpid.h"
 
 #if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
 #define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
@@ -1505,6 +1506,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		{ IDC_CHECKAUTH, "DLG_AUTHSETUP_CHECKAUTH" },
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDC_SSHAUTHSETUP_HELP, "BTN_HELP" },
 	};
 
 	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
@@ -1630,6 +1632,10 @@ static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDC_SSHAUTHSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSshauth, 0);
 			return TRUE;
 
 		case IDC_CHOOSERSAFILE:

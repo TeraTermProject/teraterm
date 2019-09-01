@@ -236,6 +236,10 @@
 #define IDC_LOGLEVEL                    1242
 #define IDC_LOGLEVEL_VALUE              1243
 #define IDC_LOGLEVEL_UNIT               1244
+#define IDC_SSHKEYGENSETUP_HELP         1245
+#define IDC_SSHSETUP_HELP               1246
+#define IDC_SSHFWDSETUP_HELP            1247
+#define IDC_SSHAUTHSETUP_HELP           1248
 
 // Next default values for new objects
 // 
@@ -243,7 +247,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1245
+#define _APS_NEXT_CONTROL_VALUE         1249
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

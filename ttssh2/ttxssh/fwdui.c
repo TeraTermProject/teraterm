@@ -40,6 +40,7 @@ See LICENSE.TXT for the license.
 #include "dlglib.h"
 
 #include "servicenames.h"
+#include "helpid.h"
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
@@ -526,6 +527,9 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHFWDSETUP_HELP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHFWDSETUP_HELP, pvar->ts->UIMsg);
 
 	FWD_get_request_specs(pvar, requests, num_specs);
 
@@ -1128,6 +1132,10 @@ static UINT_PTR CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:
 			free_all_listbox_specs(dlg);
 			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDC_SSHFWDSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSshforward, 0);
 			return TRUE;
 
 		case IDC_ADD:
