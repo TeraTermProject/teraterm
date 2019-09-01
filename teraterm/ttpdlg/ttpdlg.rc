@@ -217,7 +217,7 @@ BEGIN
     PUSHBUTTON      "&Help",IDC_DIRHELP,115,34,36,14
 END
 
-IDD_ABOUTDLG DIALOGEX 20, 20, 187, 124
+IDD_ABOUTDLG DIALOGEX 20, 20, 187, 138
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About Tera Term"
 FONT 14, "System", 0, 0, 0x0
@@ -228,20 +228,18 @@ BEGIN
     CONTROL         "(C) 2004-2019 TeraTerm Project",IDC_PROJECT_LABEL,
                     "Static",SS_LEFTNOWORDWRAP | WS_GROUP,43,22,135,8
     LTEXT           "Includes:",IDC_INLUCDE_LABEL,38,38,140,8
-    CONTROL         "Tera Term Pro version 2.3",IDC_TT23_LABEL,
-                    "Static",SS_LEFTNOWORDWRAP | WS_GROUP,38,47,140,8
+    CONTROL         "Tera Term Pro version 2.3",IDC_TT23_LABEL,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,38,47,140,8
     CONTROL         "Copyright (C) 1994-1998 T. Teranishi",IDC_TT23_RIGHTS_LABEL,
                     "Static",SS_LEFTNOWORDWRAP | WS_GROUP,43,56,135,8
-    CONTROL         "IPv6 extention version 0.81",IDC_IPV6_LABEL,
-                    "Static",SS_LEFTNOWORDWRAP | WS_GROUP,38,65,140,8
-    CONTROL         "(C) 2000-2003 Jun-ya KATO",IDC_IPV6_RIGHTS_LABEL,
-                    "Static",SS_LEFTNOWORDWRAP | WS_GROUP,43,74,135,8
+    CONTROL         "IPv6 extention version 0.81",IDC_IPV6_LABEL,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,38,65,140,8
+    CONTROL         "(C) 2000-2003 Jun-ya KATO",IDC_IPV6_RIGHTS_LABEL,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,43,74,135,8
     LTEXT           "Oniguruma: ",IDC_ONIGURUMA_LABEL,38,83,140,8
-    LTEXT           "Built using Microsoft Visual C++",IDC_BUILDTOOL,7,95,172,8
-    LTEXT           "Build time: ",IDC_BUILDTIME,7,103,172,8
-    LTEXT           "Author:",IDC_AUTHOR_LABEL,7,112,28,8
-    LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,112,143,8,SS_NOTIFY | WS_TABSTOP
+    LTEXT           "Built using Microsoft Visual C++",IDC_BUILDTOOL,7,109,172,8
+    LTEXT           "Build time: ",IDC_BUILDTIME,7,117,172,8
+    LTEXT           "Author:",IDC_AUTHOR_LABEL,7,126,28,8
+    LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,126,143,8,SS_NOTIFY | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,145,5,32,14,WS_GROUP
+    LTEXT           "SFMT:",IDC_SFMT_VERSION,38,93,141,8
 END
 
 IDD_GENDLG DIALOGEX 20, 20, 162, 80
@@ -402,7 +400,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_HOSTDLG, DIALOG
     BEGIN
@@ -414,6 +412,7 @@ BEGIN
     IDD_ABOUTDLG, DIALOG
     BEGIN
         RIGHTMARGIN, 186
+        BOTTOMMARGIN, 124
     END
 
     IDD_GENDLG, DIALOG

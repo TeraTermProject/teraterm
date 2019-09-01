@@ -53,6 +53,9 @@
 #include "oniguruma.h"
 #undef ONIG_EXTERN
 
+// SFMT: SIMD-oriented Fast Mersenne Twister
+#include "SFMT_version_for_teraterm.h"
+
 #include <winsock2.h>
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
@@ -2237,6 +2240,10 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			// (2006.7.24 yutaka)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
 			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
+
+			// SFMTのバージョンを設定する
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "SFMT %s", SFMT_VERSION);
+			SetDlgItemTextA(Dialog, IDC_SFMT_VERSION, buf);
 
 			// ビルドしたときに使われたコンパイラを設定する。(2009.3.3 yutaka)
 			GetCompilerInfo(tmpbuf, sizeof(tmpbuf));

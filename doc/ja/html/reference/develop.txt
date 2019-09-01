@@ -155,8 +155,9 @@
 
   5. SFMT (used by Tera Term Macro)
      (1) SFMT のソースを libs/SFMT の中に展開する。
-     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildSFMT.bat を実行する。
+     (2) 必要に応じて libs/SFMT/SFMT_version_for_teraterm.h のバージョン番号を修正する。
+     (3) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (4) コマンドプロンプト上から libs ディレクトリに移動し、buildSFMT.bat を実行する。
 
 
 ■ Tera Termのビルド方法
