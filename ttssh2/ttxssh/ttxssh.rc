@@ -67,6 +67,7 @@ BEGIN
     CONTROL         "Remember password in &memory",IDC_REMEMBER_PASSWORD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,61,132,10
     CONTROL         "F&orward agent",IDC_FORWARD_AGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,75,132,10
+    GROUPBOX        "Authentication methods ",IDC_SSHAUTHMETHOD,6,89,295,132
     CONTROL         "Use p&lain password to log in",IDC_SSHUSEPASSWORD,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,16,102,252,10
     CONTROL         "Use &RSA/DSA/ECDSA/ED25519 key to log in",IDC_SSHUSERSA,
@@ -85,7 +86,6 @@ BEGIN
     PUSHBUTTON      "...",IDC_CHOOSEHOSTRSAFILE,276,171,13,13
     DEFPUSHBUTTON   "OK",IDOK,199,227,50,14,WS_GROUP
     PUSHBUTTON      "&Disconnect",IDCANCEL,255,227,47,14
-    GROUPBOX        "Authentication methods ",IDC_SSHAUTHMETHOD,6,89,295,132
 END
 
 IDD_HOSTDLG DIALOGEX 20, 20, 240, 128
