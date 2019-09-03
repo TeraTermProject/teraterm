@@ -5115,6 +5115,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		UTIL_SetDialogFont();
 		HOSTS_do_different_key_dialog(hWin, pvar);
 		return 1;
+	case ID_SSHDIFFERENT_TYPE_KEY:
+		UTIL_SetDialogFont();
+		HOSTS_do_different_type_key_dialog(hWin, pvar);
+		return 1;
 	case ID_SSHASYNCMESSAGEBOX:
 		if (pvar->err_msg != NULL) {
 			char *msg = pvar->err_msg;

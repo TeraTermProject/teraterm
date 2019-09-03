@@ -2309,14 +2309,29 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 	// させる必要があるため、直接コールに変更する。
 	// これによりknown_hostsの確認を待たずに、サーバへユーザ情報を送ってしまう問題を回避する。
 	// (2007.10.1 yutaka)
+	/*
+	 * known_hostsダイアログは非同期で表示させるのが正しかった。
+	 * known_hostsダイアログが表示されている状態で、サーバから切断を行うと、
+	 * TTXCloseTCPが呼び出され、TTSSHのリソースが解放されてしまう。
+	 * SSHハンドラの延長でknown_hostsダイアログを出して止まっているため、
+	 * 処理再開後に不正アクセスで落ちる。
+	 * (2019.9.3 yutaka)
+	 */
 	if (found_different_key) {
 		HOSTS_do_different_key_dialog(pvar->NotificationWindow, pvar);
+		//PostMessage(pvar->NotificationWindow, WM_COMMAND, ID_SSHDIFFERENTKEY, 0);
 	}
 	else if (found_different_type_key) {
 		HOSTS_do_different_type_key_dialog(pvar->NotificationWindow, pvar);
+		//PostMessage(pvar->NotificationWindow, WM_COMMAND, ID_SSHDIFFERENT_TYPE_KEY, 0);
 	}
 	else {
-		HOSTS_do_unknown_host_dialog(pvar->NotificationWindow, pvar);
+		// まずはSSH1のみ処置。
+		if (SSHv1(pvar)) {
+			PostMessage(pvar->NotificationWindow, WM_COMMAND, ID_SSHUNKNOWNHOST, 0);
+		} else {
+			HOSTS_do_unknown_host_dialog(pvar->NotificationWindow, pvar);
+		}
 	}
 
 	return TRUE;
