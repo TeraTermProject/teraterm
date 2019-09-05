@@ -80,7 +80,7 @@ extern HANDLE hInst;
 
 static char UILanguageFile[MAX_PATH];
 
-static const char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
+static const char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 static PCHAR NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
 static PCHAR NLList[] = {"CR","CR+LF", "LF", NULL};
 static PCHAR TermList[] =

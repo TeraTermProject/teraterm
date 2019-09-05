@@ -57,7 +57,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <winsock2.h>
-static char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
+static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 
 #include <lmcons.h>
 
