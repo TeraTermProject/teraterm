@@ -38,7 +38,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <Lmcons.h>		// for UNLEN
+#include <lmcons.h>		// for UNLEN
 #include <crtdbg.h>
 
 #include "resource.h"
