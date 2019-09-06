@@ -171,6 +171,7 @@ target_include_directories(
   ../ttpdlg
   ${ONIGURUMA_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg     # for svnversion.h
+  ${SFMT_INCLUDE_DIRS}
   )
 
 if(MINGW)

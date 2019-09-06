@@ -1,4 +1,5 @@
-﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P oniguruma.cmake
+﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P SFMT.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64 -P SFMT.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P SFMT.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P SFMT.cmake
 
@@ -56,6 +57,7 @@ endif()
 
 include(script_support.cmake)
 
+set(SFMT_VERSION "1.5.1")
 set(SRC_DIR_BASE "SFMT-src-1.5.1")
 set(SRC_ARC "SFMT-1.5.1.zip")
 set(SRC_URL "http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
@@ -88,11 +90,21 @@ if(NOT EXISTS ${SRC_DIR}/README.txt)
     COMMAND ${CMAKE_COMMAND} -E tar "xvf" ${DOWN_DIR}/${SRC_ARC}
     WORKING_DIRECTORY ${EXTRACT_DIR}
     )
-
 endif()
 
 ########################################
 
+if(NOT EXISTS ${SRC_DIR}/SFMT_version_for_teraterm.h)
+  file(WRITE "${SRC_DIR}/SFMT_version_for_teraterm.h"
+    "// created by cmake\n"
+    "#pragma once\n"
+    "#ifndef SFMT_VERSION_H\n"
+    "#define SFMT_VERSION_H\n"
+    "#define SFMT_VERSION \"${SFMT_VERSION}\"\n"
+    "#endif"
+    )
+
+endif()
 if(NOT EXISTS ${SRC_DIR}/CMakeLists.txt)
   file(WRITE "${SRC_DIR}/CMakeLists.txt"
 	"cmake_minimum_required(VERSION 2.4.4)\n"
@@ -112,7 +124,9 @@ if(NOT EXISTS ${SRC_DIR}/CMakeLists.txt)
 	"  ARCHIVE DESTINATION \${CMAKE_INSTALL_PREFIX}/lib\n"
 	"  )\n"
 	"install(\n"
-	"  FILES SFMT.h SFMT-params.h SFMT-params19937.h\n"
+	"  FILES\n"
+    "    SFMT.h SFMT-params.h SFMT-params19937.h\n"
+    "    SFMT_version_for_teraterm.h\n"
 	"  DESTINATION \${CMAKE_INSTALL_PREFIX}/include\n"
 	"  )\n"
 	)
