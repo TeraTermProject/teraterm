@@ -41,53 +41,6 @@
 static TipWin *SizeTip;
 static int tip_enabled = 0;
 
-/**
- *	point を
- *	スクリーンからはみ出している場合、入るように補正する
- *	NearestMonitor が TRUE のとき、最も近いモニタ
- *	FALSEのとき、マウスのあるモニタに移動させる
- *	ディスプレイの端から FrameWidth(pixel) より離れるようにする
- */
-static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
-{
-	if (HasMultiMonitorSupport()) {
-		// マルチモニタがサポートされている場合
-		HMONITOR hm;
-		MONITORINFO mi;
-
-		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
-		if (hm == NULL) {
-			if (NearestMonitor) {
-				// 最も近いモニタに表示する
-				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
-			} else {
-				// スクリーンからはみ出している場合はマウスのあるモニタに表示する
-				GetCursorPos(point);
-				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
-			}
-		}
-
-		mi.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(hm, &mi);
-		if (point->x < mi.rcMonitor.left + FrameWidth) {
-			point->x = mi.rcMonitor.left + FrameWidth;
-		}
-		if (point->y < mi.rcMonitor.top + FrameWidth) {
-			point->y = mi.rcMonitor.top + FrameWidth;
-		}
-	}
-	else
-	{
-		// マルチモニタがサポートされていない場合
-		if (point->x < FrameWidth) {
-			point->x = FrameWidth;
-		}
-		if (point->y < FrameWidth) {
-			point->y = FrameWidth;
-		}
-	}
-}
-
 void UpdateSizeTip(HWND src, int cx, int cy)
 {
 	TCHAR str[32];
@@ -101,15 +54,10 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 
 	if (SizeTip == NULL) {
 		RECT wr;
-		POINT point;
 		// ウィンドウの位置を取得
 		GetWindowRect(src, &wr);
-		// sizetipを出す位置は、ウィンドウ左上-(8,16)
-		point.x = wr.left - 16;
-		point.y = wr.top - 8;
-		FixPosFromFrame(&point, 16, FALSE);
-		cx = point.x;
-		cy = point.y;
+		cx = wr.left;
+		cy = wr.top;
 		SizeTip = TipWinCreate(src, cx, cy, str);
 	} else {
 		/* Tip already exists, just set the text */

@@ -84,6 +84,61 @@ typedef struct tagTipWinData {
 	BOOL auto_destroy;
 } TipWin;
 
+/**
+ *	point を
+ *	スクリーンからはみ出している場合、入るように補正する
+ *	NearestMonitor が TRUE のとき、最も近いモニタ
+ *	FALSEのとき、マウスのあるモニタに移動させる
+ *	ディスプレイの端から FrameWidth(pixel) より離れるようにする
+ */
+static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
+{
+	if (HasMultiMonitorSupport()) {
+		// マルチモニタがサポートされている場合
+		HMONITOR hm;
+		MONITORINFO mi;
+		int ix, iy;
+
+		// 元の座標を保存しておく
+		ix = point->x;
+		iy = point->y;
+
+		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
+		if (hm == NULL) {
+			if (NearestMonitor) {
+				// 最も近いモニタに表示する
+				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
+			} else {
+				// スクリーンからはみ出している場合はマウスのあるモニタに表示する
+				GetCursorPos(point);
+				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
+			}
+		}
+
+		mi.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hm, &mi);
+		if (ix < mi.rcMonitor.left + FrameWidth) {
+			ix = mi.rcMonitor.left + FrameWidth;
+		}
+		if (iy < mi.rcMonitor.top + FrameWidth) {
+			iy = mi.rcMonitor.top + FrameWidth;
+		}
+		
+		point->x = ix;
+		point->y = iy;
+	}
+	else
+	{
+		// マルチモニタがサポートされていない場合
+		if (point->x < FrameWidth) {
+			point->x = FrameWidth;
+		}
+		if (point->y < FrameWidth) {
+			point->y = FrameWidth;
+		}
+	}
+}
+
 static void CalcStrRect(TipWin *pTipWin)
 {
 	HDC hdc = CreateCompatibleDC(NULL);
@@ -233,6 +288,8 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
+	int height;
+	POINT point;
 
 	register_class(hInst);
 	pTipWin = (TipWin *)malloc(sizeof(TipWin));
@@ -249,6 +306,15 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	pTipWin->tip_font = CreateFontIndirect(&logfont);
 	CalcStrRect(pTipWin);
 	pTipWin->hParentWnd = src;
+
+	// 文字列の高さを取得する。
+	height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
+	point.x = cx;
+	point.y = cy - (height + FRAME_WIDTH * 2);
+	FixPosFromFrame(&point, 16, FALSE);
+	cx = point.x;
+	cy = point.y;
+
 	create_tipwin(pTipWin, hInst, cx, cy);
 
 	pTipWin->hParentWnd = src;
