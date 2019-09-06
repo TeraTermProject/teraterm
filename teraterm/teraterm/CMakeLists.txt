@@ -142,15 +142,6 @@ set(SRC
   ${TTDLG_SRC}
   )
 
-include_directories(
-  ../common
-  ../ttpfile
-  ../ttpdlg
-  ${SFMT_INCLUDE_DIRS}
-  ${ONIGURUMA_INCLUDE_DIRS}
-  .
-  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg
-  )
 
 link_directories(
   ${ONIGURUMA_LIBRARY_DIRS}
@@ -171,6 +162,24 @@ set_target_properties(
   PROPERTIES
   OUTPUT_NAME "ttermpro"
   )
+
+target_include_directories(
+  teraterm
+  PRIVATE
+  ../common
+  ../ttpfile
+  ../ttpdlg
+  ${ONIGURUMA_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg     # for svnversion.h
+  )
+
+if(MINGW)
+  target_include_directories(
+    teraterm
+    PRIVATE
+    .
+    )
+endif()
 
 target_link_libraries(
   teraterm
