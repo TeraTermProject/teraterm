@@ -37,6 +37,9 @@
     <ClCompile Include="..\common\codeconv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="comportinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\i18n.h">
@@ -49,6 +52,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\ttlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="comportinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

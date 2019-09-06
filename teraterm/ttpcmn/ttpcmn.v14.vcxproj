@@ -134,12 +134,14 @@
     <ClCompile Include="language.c" />
     <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="ttcmn.c" />
+    <ClCompile Include="comportinfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="language.h" />
     <ClInclude Include="..\common\servicenames.h" />
+    <ClInclude Include="comportinfo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpcmn.def" />
