@@ -805,6 +805,46 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
+void RestoreNewLineW(wchar_t *Text)
+{
+	int i, j=0;
+	int size= wcslen(Text);
+	wchar_t *buf = (wchar_t *)_alloca((size+1) * sizeof(wchar_t));
+
+	memset(buf, 0, (size+1) * sizeof(wchar_t));
+	for (i=0; i<size; i++) {
+		if (Text[i] == L'\\' && i<size ) {
+			switch (Text[i+1]) {
+				case L'\\':
+					buf[j] = L'\\';
+					i++;
+					break;
+				case L'n':
+					buf[j] = L'\n';
+					i++;
+					break;
+				case L't':
+					buf[j] = L'\t';
+					i++;
+					break;
+				case L'0':
+					buf[j] = L'\0';
+					i++;
+					break;
+				default:
+					buf[j] = L'\\';
+			}
+			j++;
+		}
+		else {
+			buf[j] = Text[i];
+			j++;
+		}
+	}
+	/* use memcpy to copy with '\0' */
+	memcpy(Text, buf, size * sizeof(wchar_t));
+}
+
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
 {
 	int i, j, k;

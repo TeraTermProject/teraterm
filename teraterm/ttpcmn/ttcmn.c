@@ -2493,7 +2493,7 @@ int WINAPI CheckComPort(WORD ComPort)
 	BOOL found;
 	int i;
 	int count;
-	ComPortInfo_t *info = ComPortInfoGet(&count);
+	ComPortInfo_t *info = ComPortInfoGet(&count, pm->ts.UILanguageFile);
 	if (count == 0)
 		return 0;
 	found = FALSE;

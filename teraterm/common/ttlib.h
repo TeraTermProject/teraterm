@@ -67,6 +67,7 @@ void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
 void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName, int destlen);
 void RestoreNewLine(PCHAR Text);
+void RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int far *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);

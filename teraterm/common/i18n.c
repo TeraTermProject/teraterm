@@ -33,9 +33,9 @@
 #include <assert.h>
 #include <tchar.h>
 
-#if defined(UNICODE)
-DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
+DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
 {
+#if defined(UNICODE)
 	wchar_t sectionW[64];
 	wchar_t keyW[128];
 	wchar_t iniFileW[MAX_PATH];
@@ -43,9 +43,15 @@ DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, i
 	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
 	MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
 	GetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+#else
+	char tmp[MAX_UIMSG];
+	char defA[MAX_UIMSG];
+	WideCharToMultiByte(CP_ACP, 0, def, -1, defA, _countof(defA), NULL, NULL);
+	GetPrivateProfileStringA(section, key, defA, tmp, _countof(tmp), iniFile);
+	MultiByteToWideChar(CP_ACP, 0, tmp, -1, buf, buf_len);
+#endif
 	RestoreNewLineW(buf);
 }
-#endif
 
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {

@@ -1561,7 +1561,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			j = 0;
 			w = 1;
-			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount);
+			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount, UILanguageFile);
 			if (ComPortInfoCount > 0) {
 				for (i=0; i<ComPortInfoCount; i++) {
 					ComPortInfo_t *p = &ComPortInfoPtr[i];

@@ -45,7 +45,7 @@ typedef struct {
 	wchar_t *property;
 } ComPortInfo_t;
 
-DllExport ComPortInfo_t * WINAPI ComPortInfoGet(int *count);
+DllExport ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang);
 DllExport void WINAPI ComPortInfoFree(ComPortInfo_t *info, int count);
 
 #ifdef __cplusplus

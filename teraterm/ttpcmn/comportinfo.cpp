@@ -1,4 +1,4 @@
-Ôªø/*
+/*
  * Copyright (C) 2019 TeraTerm Project
  * All rights reserved.
  *
@@ -26,7 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//#include <stdio.h>
 #include <windows.h>
 #include <devguid.h>
 #include <setupapi.h>
@@ -83,8 +82,17 @@ static BOOL IsWindows9X()
 	return !IsWindowsNTKernel();
 }
 
+#if 0
+static void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len,
+						const wchar_t *def, const char *iniFile)
+{
+	(void)iniFile;
+	wcscpy_s(buf, buf_len, def);
+}
+#endif
+
 /**
- *	„Éù„Éº„ÉàÂêç„ÇíÂèñÂæó
+ *	É|Å[ÉgñºÇéÊìæ
  */
 static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, wchar_t **str)
 {
@@ -98,7 +106,7 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 									 DICS_FLAG_GLOBAL,
 									 0, DIREG_DEV, KEY_READ);
 	if (hKey == NULL){
-		// „Éù„Éº„ÉàÂêç„ÅåÂèñÂæó„Åß„Åç„Å™„ÅÑ?
+		// É|Å[ÉgñºÇ™éÊìæÇ≈Ç´Ç»Ç¢?
 		*str = NULL;
 		return FALSE;
 	}
@@ -106,7 +114,7 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 	wchar_t* port_name = NULL;
 	long r;
 	if (pRegQueryValueExW != NULL && !IsWindows9X()) {
-		// 9xÁ≥ª„Åß„ÅØ„ÅÜ„Åæ„ÅèÂãï‰Ωú„Åó„Å™„ÅÑ
+		// 9xånÇ≈ÇÕÇ§Ç‹Ç≠ìÆçÏÇµÇ»Ç¢
 		r = pRegQueryValueExW(hKey, L"PortName", 0,
 			&dwType, NULL, &byte_len);
 		port_name = (wchar_t* )malloc(byte_len);
@@ -140,27 +148,32 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 }
 
 /**
- *	„Éó„É≠„Éë„ÉÜ„Ç£ÂèñÂæó
+ *	ÉvÉçÉpÉeÉBéÊìæ
  */
-static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
+static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, const char *lang,
 							wchar_t **friendly_name, wchar_t **str)
 {
 	typedef struct {
 		const wchar_t *name;
+		const char *key;
 		const DEVPROPKEY *PropertyKey;
 		DWORD Property;
 	} list_t;
 	static const list_t list[] = {
-		{ L"„Éï„É¨„É≥„Éâ„É™„ÉºÂêç(Device Friendly Name)",
+		{ L"Device Friendly Name",
+		  "FRIENDLY_NAME",
 		  &DEVPKEY_Device_FriendlyName,
 		  SPDRP_FRIENDLYNAME },
-		{ L"„Éá„Éê„Ç§„Çπ„Ç§„É≥„Çπ„Çø„É≥„ÇπID(Device Instance ID)",
+		{ L"Device Instance ID",
+		  "DEVICE_INSTANCE_ID",
 		  &DEVPKEY_Device_InstanceId,
 		  SPDRP_MAXIMUM_PROPERTY },
-		{ L"Ë£ΩÈÄ†ÂÖÉ(Device Manufacturer)",
+		{ L"Device Manufacturer",
+		  "DEVICE_MANUFACTURER",
 		  &DEVPKEY_Device_Manufacturer,
 		  SPDRP_MFG },
-		{ L"„Éâ„É©„Ç§„Éê„Éº„Éê„Éº„Ç∏„Éß„É≥(Driver Version)",
+		{ L"Driver Version",
+		  "DRIVER_VERSION",
 		  &DEVPKEY_Device_DriverVersion,
 		  SPDRP_MAXIMUM_PROPERTY }
 	};
@@ -188,7 +201,7 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
 			r = pSetupDiGetDevicePropertyW(hDevInfo, DeviceInfoData, p->PropertyKey,
 										   &ulPropertyType, (PBYTE)str_prop, size, &size, 0);
 		} else if (p->PropertyKey == &DEVPKEY_Device_InstanceId) {
-			// InstanceId„ÅØAÁ≥ª„ÅßÊ±∫„ÇÅÊâì„Å°
+			// InstanceIdÇÕAånÇ≈åàÇﬂë≈Çø
 			DWORD len_a;
 			SetupDiGetDeviceInstanceIdA(hDevInfo,
 										DeviceInfoData,
@@ -212,7 +225,7 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
 		} else if (p->Property == SPDRP_MAXIMUM_PROPERTY) {
 			r = FALSE;
 		} else if (pSetupDiGetDeviceRegistryPropertyW != NULL && !IsWindows9X()) {
-			// 9xÁ≥ª„Åß„ÅØ„ÅÜ„Åæ„ÅèÂãï‰Ωú„Åó„Å™„ÅÑ
+			// 9xånÇ≈ÇÕÇ§Ç‹Ç≠ìÆçÏÇµÇ»Ç¢
 			DWORD dwPropType;
 			r = pSetupDiGetDeviceRegistryPropertyW(hDevInfo,
 												   DeviceInfoData,
@@ -255,12 +268,14 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
 			free(str_prop_a);
 		}
 		if (r != FALSE) {
-			size_t name_len = wcslen(p->name);
+			wchar_t name[MAX_UIMSG];
+			GetI18nStrW("Tera Term.ComInfo", p->key, name, _countof(name), p->name, lang);
+			size_t name_len = wcslen(name);
 			size_t prop_len = wcslen(str_prop);
 			len = len + (name_len + (i==0?1:2) + 2 + 2 + prop_len);
 			s = (wchar_t *)realloc(s, sizeof(wchar_t) * len);
 			if (i != 0) wcscat_s(s, len, L"\r\n");
-			wcscat_s(s, len, p->name);
+			wcscat_s(s, len, name);
 			wcscat_s(s, len, L"\r\n  ");
 			wcscat_s(s, len, str_prop);
 		}
@@ -275,7 +290,7 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
 	*str = s;
 }
 
-/* ÈÖçÂàó„ÇΩ„Éº„ÉàÁî® */
+/* îzóÒÉ\Å[Égóp */
 static int sort_sub(const void *a_, const void *b_)
 {
 	const ComPortInfo_t *a = (ComPortInfo_t *)a_;
@@ -290,14 +305,14 @@ static int sort_sub(const void *a_, const void *b_)
 }
 
 /**
- *	com„Éù„Éº„Éà„ÅÆÊÉÖÂ†±„ÇíÂèñÂæó„Åô„Çã
+ *	comÉ|Å[ÉgÇÃèÓïÒÇéÊìæÇ∑ÇÈ
  *
- *	@param[out]	count	 	ÊÉÖÂ†±Êï∞(0„ÅÆ„Å®„Åçcom„Éù„Éº„Éà„Å™„Åó)
- *	@return		ÊÉÖÂ†±„Å∏„ÅÆ„Éù„Ç§„É≥„Çø(ÈÖçÂàó)„ÄÅ„Éù„Éº„ÉàÁï™Âè∑„ÅÆÂ∞è„Åï„ÅÑÈ†Ü
- *				NULL„ÅÆ„Å®„Åçcom„Éù„Éº„Éà„Å™„Åó
- *				‰ΩøÁî®ÂæåComPortInfoFree()„ÇíÂëº„Å∂„Åì„Å®
+ *	@param[out]	count	 	èÓïÒêî(0ÇÃÇ∆Ç´comÉ|Å[ÉgÇ»Çµ)
+ *	@return		èÓïÒÇ÷ÇÃÉ|ÉCÉìÉ^(îzóÒ)ÅAÉ|Å[Égî‘çÜÇÃè¨Ç≥Ç¢èá
+ *				NULLÇÃÇ∆Ç´comÉ|Å[ÉgÇ»Çµ
+ *				égópå„ComPortInfoFree()ÇåƒÇ‘Ç±Ç∆
  */
-ComPortInfo_t * WINAPI ComPortInfoGet(int *count)
+ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
 {
 	int comport_count = 0;
 	ComPortInfo_t *comport_infos = NULL;
@@ -327,7 +342,7 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count)
 		if (!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData))
 			break;
 
-		// „Éù„Éº„ÉàÂêçÂèñÂæó ("COM1"„Å™„Å©)
+		// É|Å[ÉgñºéÊìæ ("COM1"Ç»Ç«)
 		wchar_t *port_name;
 		if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {
 			continue;
@@ -337,10 +352,10 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count)
 			port_no = _wtoi(port_name+3);
 		}
 
-		// ÊÉÖÂ†±ÂèñÂæó
+		// èÓïÒéÊìæ
 		wchar_t *str_friendly_name;
 		wchar_t *str_prop;
-		GetComPropartys(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
+		GetComPropartys(hDevInfo, &DeviceInfoData, lang, &str_friendly_name, &str_prop);
 
 		comport_count++;
 		comport_infos = (ComPortInfo_t *)realloc(comport_infos,
@@ -352,7 +367,7 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count)
 		p->property = str_prop;
 	}
 
-	/* „Éù„Éº„ÉàÂêçÈ†Ü„Å´‰∏¶„Åπ„Çã */
+	/* É|Å[ÉgñºèáÇ…ï¿Ç◊ÇÈ */
 	qsort(comport_infos, comport_count, sizeof(comport_infos[0]), sort_sub);
 
 	*count = comport_count;
@@ -369,9 +384,3 @@ void WINAPI ComPortInfoFree(ComPortInfo_t *info, int count)
 	}
 	free(info);
 }
-
-/*
- * Local Variables:
- * coding:utf-8-with-signature
- * End:
- */
