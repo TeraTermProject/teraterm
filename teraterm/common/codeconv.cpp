@@ -617,7 +617,7 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 			return 0;
 		}
 		use_default_char = FALSE;
-		mb_len = ::WideCharToMultiByte(code_page, 0, u16_str, u16_len, mb_ptr, mb_len, NULL, &use_default_char);
+		mb_len = ::WideCharToMultiByte(code_page, 0, u16_str, (int)u16_len, mb_ptr, (int)mb_len, NULL, &use_default_char);
 		if (use_default_char) {
 			// ïœä∑Ç≈Ç´Ç∏ÅAä˘íËÇÃï∂éöÇégÇ¡ÇΩ
 			return 0;
@@ -826,7 +826,7 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 	if (wstr_len == 0) {
 		wstr_len = wcslen(wstr_ptr) + 1;
 	}
-    int len;
+    size_t len;
 	if (code_page == CP_UTF8 || code_page == 932) {
 		size_t wl = wstr_len;
 		size_t ml;
@@ -853,7 +853,7 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 	} else {
 		len = ::WideCharToMultiByte(code_page, flags,
 									wstr_ptr, (DWORD)wstr_len,
-									mb_ptr, len,
+									mb_ptr, (int)len,
 									NULL,NULL);
 	}
 	if (len == 0) {
@@ -928,59 +928,59 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 	return wstr_ptr;
 }
 
-const char *ToCharW(const wchar_t *strW)
+char *ToCharW(const wchar_t *strW)
 {
-	const char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
+	char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
 	return strA;
 }
 
-const char *ToCharA(const char *strA)
+char *ToCharA(const char *strA)
 {
 	return _strdup(strA);
 }
 
-const char *ToCharU8(const char *strU8)
+char *ToCharU8(const char *strU8)
 {
-	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
+	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	if (strW == NULL) {
 		return NULL;
 	}
-	const char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
-	free((void *)strW);
+	char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
+	free(strW);
 	return strA;
 }
 
-const wchar_t *ToWcharA(const char *strA)
+wchar_t *ToWcharA(const char *strA)
 {
 	wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
 	return strW;
 }
 
-const wchar_t *ToWcharW(const wchar_t *strW)
+wchar_t *ToWcharW(const wchar_t *strW)
 {
 	return _wcsdup(strW);
 }
 
-const wchar_t *ToWcharU8(const char *strU8)
+wchar_t *ToWcharU8(const char *strU8)
 {
-	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
+	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	return strW;
 }
 
-const char *ToU8W(const wchar_t *strW)
+char *ToU8W(const wchar_t *strW)
 {
-	const char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
+	char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
 	return strU8;
 }
 
-const char *ToU8A(const char *strA)
+char *ToU8A(const char *strA)
 {
-	const wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
+	wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
 	if (strW == NULL) {
 		return NULL;
 	}
-	const char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
-	free((void *)strW);
+	char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
+	free(strW);
 	return strU8;
 }
 
@@ -1190,9 +1190,9 @@ tc& tc::operator=(tc &&obj) noexcept
 
 tc tc::fromUtf8(const char *strU8)
 {
-	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
+	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	tc _tc = strW;
-	free((void *)strW);
+	free(strW);
 	return _tc;
 }
 
