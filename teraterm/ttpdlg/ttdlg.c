@@ -47,6 +47,8 @@
 #include "dlg_res.h"
 #include "svnversion.h"
 #include "ttdlg.h"
+#include "../ttpcmn/comportinfo.h"
+#include "codeconv.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -1510,8 +1512,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 	WORD i, j, w;
 	BOOL Ok;
 	WORD ComPortTable[MAXCOMPORT];
-	static char *ComPortDesc[MAXCOMPORT];
-	int comports;
+	static ComPortInfo_t *ComPortInfoPtr;
+	static int ComPortInfoCount;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -1559,31 +1561,34 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			j = 0;
 			w = 1;
-			if ((comports=DetectComPorts(ComPortTable, GetHNRec->MaxComPort, ComPortDesc)) >= 0) {
-				for (i=0; i<comports; i++) {
-					// MaxComPort を越えるポートは表示しない
-					if (ComPortTable[i] > GetHNRec->MaxComPort) {
-						continue;
-					}
+			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount);
+			if (ComPortInfoCount > 0) {
+				for (i=0; i<ComPortInfoCount; i++) {
+					ComPortInfo_t *p = &ComPortInfoPtr[i];
+					wchar_t strW[128];
+					char *strA;
 
-					// 使用中のポートは表示しない
-					if (CheckCOMFlag(ComPortTable[i]) == 1) {
-						continue;
+					wcsncpy_s(strW, _countof(strW), p->port_name, _TRUNCATE);
+					if (p->friendly_name != NULL) {
+						wcsncat_s(strW, _countof(strW), L": ", _TRUNCATE);
+						wcsncat_s(strW, _countof(strW), p->friendly_name, _TRUNCATE);
 					}
-
-					_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "COM%d", ComPortTable[i]);
-					if (ComPortDesc[i] != NULL) {
-						strncat_s(EntName, sizeof(EntName), ": ", _TRUNCATE);
-						strncat_s(EntName, sizeof(EntName), ComPortDesc[i], _TRUNCATE);
+					strA = ToCharW(strW);
+					SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
+					                   0, (LPARAM)strA);
+					free(strA);
+					if(i==0) {
+						strA = ToCharW(p->property);
+						SetDlgItemTextA(Dialog, IDC_HOSTCOMINFO, strA);
+						free(strA);
 					}
-					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
-					                   0, (LPARAM)EntName);
 					j++;
 					if (GetHNRec->ComPort==ComPortTable[i]) {
 						w = j;
 					}
 				}
-			} else {
+			}
+			else {
 				for (i=1; i<=GetHNRec->MaxComPort ;i++) {
 					// 使用中のポートは表示しない
 					if (CheckCOMFlag(i) == 1) {
@@ -1692,31 +1697,55 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					break;
 
 				case IDC_HOSTCOM:
-					if(HIWORD(wParam) == CBN_DROPDOWN) {
-						HWND hostcom = GetDlgItem(Dialog, IDC_HOSTCOM);
-						int count = SendMessage(hostcom, CB_GETCOUNT, 0, 0);
-						int i, len, max_len = 0;
-						char *lbl;
-						HDC TmpDC = GetDC(hostcom);
-						SIZE s;
-						for (i=0; i<count; i++) {
-							len = SendMessage(hostcom, CB_GETLBTEXTLEN, i, 0);
-							lbl = (char *)calloc(len+1, sizeof(char));
-							SendMessage(hostcom, CB_GETLBTEXT, i, (LPARAM)lbl);
-							GetTextExtentPoint32(TmpDC, lbl, len, &s);
-							if (s.cx > max_len) {
-								max_len = s.cx;
+					switch(HIWORD(wParam)) {
+						case CBN_DROPDOWN: {
+							HWND hostcom = GetDlgItem(Dialog, IDC_HOSTCOM);
+							int count = SendMessage(hostcom, CB_GETCOUNT, 0, 0);
+							int i, len, max_len = 0;
+							char *lbl;
+							HDC TmpDC = GetDC(hostcom);
+							SIZE s;
+							for (i=0; i<count; i++) {
+								len = SendMessage(hostcom, CB_GETLBTEXTLEN, i, 0);
+								lbl = (char *)calloc(len+1, sizeof(char));
+								SendMessage(hostcom, CB_GETLBTEXT, i, (LPARAM)lbl);
+								GetTextExtentPoint32(TmpDC, lbl, len, &s);
+								if (s.cx > max_len) {
+									max_len = s.cx;
+								}
+								free(lbl);
 							}
-							free(lbl);
+							SendMessage(hostcom, CB_SETDROPPEDWIDTH,
+										max_len + GetSystemMetrics(SM_CXVSCROLL), 0);
+							break;
 						}
-						SendMessage(hostcom, CB_SETDROPPEDWIDTH,
-						            max_len + GetSystemMetrics(SM_CXVSCROLL), 0);
+						case CBN_SELCHANGE: {
+							LONG_PTR sel = SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_GETCURSEL, 0, 0);
+							wchar_t *property = ComPortInfoPtr[sel].property;
+							SetDlgItemTextW(Dialog, IDC_HOSTCOMINFO, property);
+
+							// 使用中のポートは okが押せない
+							EnableWindow(GetDlgItem(Dialog, IDOK),
+										 (CheckCOMFlag(ComPortTable[ComPortInfoPtr[sel].port_no]) == 0) ?
+										 TRUE : FALSE);
+							break;
+						}
 					}
 					break;
 
 				case IDC_HOSTHELP:
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					break;
+
 			}
+			break;
+
+		case WM_DESTROY:
+			ComPortInfoFree(ComPortInfoPtr, ComPortInfoCount);
+			ComPortInfoPtr = NULL;
+			ComPortInfoCount = 0;
+			break;
+
 	}
 	return FALSE;
 }

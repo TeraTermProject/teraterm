@@ -36,6 +36,9 @@ set(SRC
   ttpcmn-version.rc
   ttpcmn.def
   ${COMMON_SRC}
+  #
+  comportinfo.cpp
+  comportinfo.h
   )
 
 include_directories(

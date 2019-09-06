@@ -52,6 +52,7 @@
 #include "compat_w95.h"
 #include "tt_res.h"
 #include "codeconv.h"
+#include "comportinfo.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
@@ -2248,6 +2249,7 @@ int WINAPI CommTextEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
+#if 0
 // listup serial port driver
 // cf. http://www.codeproject.com/system/setupdi.asp?df=100&forumid=4368&exp=0&select=479661
 // (2007.8.17 yutaka)
@@ -2351,8 +2353,9 @@ cleanup:
 // Destroy device info list
 	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
 }
+#endif
 
-
+#if 0
 int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc)
 {
 	HMODULE h;
@@ -2409,7 +2412,13 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 
 	return comports;
 }
+#endif
+int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc)
+{
+	return 0;
+}
 
+#if 0
 int WINAPI CheckComPort(WORD ComPort)
 {
 	HMODULE h;
@@ -2476,6 +2485,25 @@ int WINAPI CheckComPort(WORD ComPort)
 
 	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
 
+	return found;
+}
+#endif
+int WINAPI CheckComPort(WORD ComPort)
+{
+	BOOL found;
+	int i;
+	int count;
+	ComPortInfo_t *info = ComPortInfoGet(&count);
+	if (count == 0)
+		return 0;
+	found = FALSE;
+	for (i = 0; i < count; i++) {
+		if (info->port_no == ComPort) {
+			found = TRUE;
+			break;
+		}
+	}
+	ComPortInfoFree(info, count);
 	return found;
 }
 

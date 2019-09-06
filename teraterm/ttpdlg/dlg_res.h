@@ -171,6 +171,7 @@
 #define IDC_TERMRUSSFONT                1076
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
+#define IDC_HOSTCOMINFO                 1079
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200
