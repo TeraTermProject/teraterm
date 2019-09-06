@@ -8,7 +8,7 @@ extern "C" {
 
 typedef struct tagTipWinData TipWin;
 
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str);
+TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str, BOOL resizing_tips);
 void TipWinSetText(TipWin *tWin, TCHAR *text);
 void TipWinDestroy(TipWin *tWin);
 

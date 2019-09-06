@@ -58,7 +58,7 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 		GetWindowRect(src, &wr);
 		cx = wr.left;
 		cy = wr.top;
-		SizeTip = TipWinCreate(src, cx, cy, str);
+		SizeTip = TipWinCreate(src, cx, cy, str, TRUE);
 	} else {
 		/* Tip already exists, just set the text */
 		TipWinSetText(SizeTip, str);

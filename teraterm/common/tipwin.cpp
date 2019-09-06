@@ -282,7 +282,7 @@ static void create_tipwin(TipWin *pTipWin, HINSTANCE hInst, int cx, int cy)
 	assert(pTipWin->tip_wnd != NULL);
 }
 
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
+TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str, BOOL resizing_tips)
 {
 	TipWin *pTipWin;
 	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
@@ -307,13 +307,15 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 	CalcStrRect(pTipWin);
 	pTipWin->hParentWnd = src;
 
-	// 文字列の高さを取得する。
-	height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
-	point.x = cx;
-	point.y = cy - (height + FRAME_WIDTH * 2);
-	FixPosFromFrame(&point, 16, FALSE);
-	cx = point.x;
-	cy = point.y;
+	// 文字列の高さから表示位置を調整する。
+	if (resizing_tips) {
+		height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
+		point.x = cx;
+		point.y = cy - (height + FRAME_WIDTH * 2);
+		FixPosFromFrame(&point, 16, FALSE);
+		cx = point.x;
+		cy = point.y;
+	}
 
 	create_tipwin(pTipWin, hInst, cx, cy);
 
