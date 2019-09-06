@@ -110,6 +110,7 @@ if(${ENABLE_TTXSAMPLES})
   add_subdirectory(TTXSamples)
 endif()
 add_subdirectory(installer)
+add_subdirectory(doc)
 
 ####
 # ソースツリー内に生成ファイルが存在していたら削除する
