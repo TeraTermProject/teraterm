@@ -41,23 +41,80 @@
     ssh://user@myhost.example.com       SSH connection to the SSH protocol(ssh://)
     \\.\pipe\vmware-serial-port         Named pipe connection
     </pre>
-    
+
     This edit control can support the Ctrl+a(Home key), Ctrl+e(End key), Ctrl+b(left-arrow), Ctrl+f(right-arrow), Ctrl+n(down-arrow), Ctrl+p(up-arrow), Ctrl+d(delete the character at point), Ctrl+k(kill the text from point to the end of the line) and Ctrl+u(kill backward from point to the beginning of the line).
+      </dd>
+
+      <dt>History</dt>
+      <dd>
+        Displayed when TTSSH is enabled. <br>
+        This option is select, the entered hostname will be added to the top of the host list when connecting to the input host.
+        This checkbox uses function of <a href="setup-tcpip.html#HistoryList">History</a> in the <a href="setup-tcpip.html">[Setup] menu</a>.
       </dd>
 
       <dt>Telnet</dt>
       <dd>
-	Enables the telnet protocol. Usually, you should select this
-	option.
+        Enables the telnet protocol.
+      </dd>
+
+      <dt>SSH</dt>
+      <dd>
+        Default selected option. Displayed when TTSSH is enabled.<br>
+        Enables the SSH protocol.
+      </dd>
+
+      <dt>Other</dt>
+      <dd>
+        Displayed when TTSSH is enabled.<br>
+        Enables other protocol from except telnet and SSH.
       </dd>
 
       <dt>TCP port#</dt>
       <dd>
-	Normally, you should use the TCP port number 23 for the telnet
-	protocol.
-      </dd>
-    </dl>
+        Specify the port number according to the selected service.<br>
+        The default is as follows.<br>
+        <table border="1">
+          <tr>
+           <th>Service</th>
+           <th>TCP port#</th>
+           <th>etc.</th>
+          </tr>
 
+          <tr>
+           <td>Telnet</td>
+           <td>23</td>
+           <td>well-known ports</td>
+          </tr>
+
+          <tr>
+           <td>SSH</td>
+           <td>22</td>
+           <td>well-known ports<br>Displayed when TTSSH is enabled.</td>
+          </tr>
+
+          <tr>
+           <td>Other</td>
+           <td>(Optional)</td>
+           <td>Displayed when TTSSH is enabled.</td>
+          </tr>
+
+        </table>
+      </dd>
+
+      <dt>SSH version</dt>
+      <dd>
+        Displayed when TTSSH is enabled.<br>
+        Uses for connection by selected from version ssh1 or ssh2.
+      </dd>
+
+      <dt>IP version</dt>
+      <dd>
+        Select as an IP version from Auto or IPv6 or IPv4.<br>
+        AUTO attempts is  connect to IP address for specified hostname.<br>
+        This connect with IPv6 or IPv4 depends on the OS setting (Priority for IP version).
+      </dd>
+
+    </dl>
     <p class="indent1">
       Note:<br>
       Only if &lt;telnet flag&gt; is on and &lt;TCP port#&gt; is 23,
@@ -75,7 +132,7 @@
     <dl>
       <dt>Port</dt>
       <dd>
-	Select a port from the list. By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
+        Select a port from the list. By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
       </dd>
     </dl>
   </body>

@@ -45,17 +45,76 @@
     このエディットコントロールでは、Ctrl+a(キャレットを先頭へ移動) Ctrl+e(キャレットを最後尾へ移動) Ctrl+b(キャレットを1文字後ろへ移動) Ctrl+f(キャレットを1文字前へ移動) Ctrl+n(1つ下のHost設定を選択) Ctrl+p(1つ上のHost設定を選択) Ctrl+d(一文字削除) Ctrl+k(行末まで削除) Ctrl+u(行頭まで削除) を使うことができます。
       </dd>
 
+      <dt>History</dt>
+      <dd>
+        TTSSH 有効時に表示されます。<br>
+        このオプションを選択すると入力したホスト名は、対象のホストへ接続しようとした場合にホストリストの先頭に追加されます。<br>
+        このチェックボックスは <a href="setup-tcpip.html">[Setup] メニュー</a> の <a href="setup-tcpip.html#HistoryList">History</a> の機能を利用します。
+      </dd>
+
       <dt>Telnet</dt>
       <dd>
-	Telnet プロトコルを使用します。通常は選択してください。
+        Telnet プロトコルを使用します。
+      </dd>
+
+      <dt>SSH</dt>
+      <dd>
+        TTSSH 有効時に表示され、デフォルトで選択されます。<br>
+        SSH プロトコルを使用します。
+      </dd>
+
+      <dt>Other</dt>
+      <dd>
+        TTSSH 有効時に表示されます。<br>
+        Telnet / SSH 以外のプロトコルを使用します。
       </dd>
 
       <dt>TCP port#</dt>
       <dd>
-	Telnet を使用する場合、通常は23にしてください。
-      </dd>
-    </dl>
+        選択したサービスによって、ポート番号を指定してください。<br>
+        デフォルトは、以下の通りです。<br>
+        <table border="1">
+          <tr>
+           <th>Service</th>
+           <th>TCP port#</th>
+           <th>備考</th>
+          </tr>
 
+          <tr>
+           <td>Telnet</td>
+           <td>23</td>
+           <td>well-known ports</td>
+          </tr>
+
+          <tr>
+           <td>SSH</td>
+           <td>22</td>
+           <td>well-known ports<br>TTSSH 有効時に表示されます。</td>
+          </tr>
+
+          <tr>
+           <td>Other</td>
+           <td>（任意）</td>
+           <td>TTSSH 有効時に表示されます。</td>
+          </tr>
+
+        </table>
+      </dd>
+
+      <dt>SSH version</dt>
+      <dd>
+        TTSSH 有効時に表示されます。<br>
+        SSH1 / SSH2 から接続に利用するバージョンを選択します。
+      </dd>
+
+      <dt>IP version</dt>
+      <dd>
+        AUTO / IPv6 / IPv4 から選択します。<br>
+        AUTO は、指定したホスト名に紐づく IP アドレスに対し、接続を試みます。<br>
+        この時 IPv6 / IPv4 のどちらで接続するのかは、OS の設定（IP バージョンの優先順位）によります。<br>
+      </dd>
+
+    </dl>
     <p class="indent1">
       注:<br>
       Telnet が選択されて、かつ TCP port# が 23 のときだけ、Tera Term
@@ -73,7 +132,7 @@
     <dl>
       <dt>Port</dt>
       <dd>
-	接続するシリアルポートをリストの中から選択してください。リストに表示されるシリアルポート番号の最大値はデフォルトで256となっています。<a href="../setup/teraterm-com.html#maxport">MaxComPort</a>で最大値を変更できます。
+        接続するシリアルポートをリストの中から選択してください。リストに表示されるシリアルポート番号の最大値はデフォルトで256となっています。また、利用可能なシリアルポートが存在しない場合は表示されません。<a href="../setup/teraterm-com.html#maxport">MaxComPort</a>で最大値を変更できます。<br>
       </dd>
     </dl>
   </body>
