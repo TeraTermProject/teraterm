@@ -279,7 +279,12 @@ static void create_tipwin(TipWin *pTipWin, HINSTANCE hInst, int cx, int cy)
 					   cx, cy,
 					   str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
 					   hParnetWnd, NULL, hInst, pTipWin);
-	assert(pTipWin->tip_wnd != NULL);
+	
+	/*
+	 * WindowsMe(9x)では、SSH認証のダイアログの表示では NULL が返ってくるため、
+	 * アサーションをしないようにした。Tera Termのリサイズでは NULL ではないが、
+	 * ツールチップが描画されない。
+	 */
 }
 
 TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str, BOOL resizing_tips)
