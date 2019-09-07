@@ -2936,6 +2936,10 @@ void SSH_notify_host_OK(PTInstVar pvar)
 	if ((pvar->ssh_state.status_flags & STATUS_HOST_OK) == 0) {
 		pvar->ssh_state.status_flags |= STATUS_HOST_OK;
 		send_session_key(pvar);
+		// ユーザ認証を行ってよいタイミングになってから、認証ダイアログを出現させる。
+		// STATUS_HOST_OKが立ち、STATUS_DONT_SEND_USER_NAMEが落ちていないと、
+		// 認証ダイアログは実質使えないので、このタイミングで問題ない。
+		AUTH_advance_to_next_cred(pvar);
 	}
 }
 

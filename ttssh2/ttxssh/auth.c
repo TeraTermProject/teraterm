@@ -1316,6 +1316,8 @@ void AUTH_notify_end_error(PTInstVar pvar)
 
 void AUTH_advance_to_next_cred(PTInstVar pvar)
 {
+	logprintf(LOG_LEVEL_VERBOSE, "User authentication will be shown by %d method.", pvar->auth_state.cur_cred.method);
+
 	pvar->auth_state.failed_method = pvar->auth_state.cur_cred.method;
 
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_NONE) {
