@@ -136,6 +136,14 @@ static void init_TTSSH(PTInstVar pvar)
 	pvar->protocol_major = 0;
 	pvar->protocol_minor = 0;
 
+	/*
+	 * pvar->contents_after_known_hosts は意図的に
+	 * init_TTSSH()やuninit_TTSSH()では初期化や解放をしない。
+	 * なぜならば、known_hostsダイアログで使用するためであり、
+	 * ダイアログの表示中に TTXCloseTCP() が呼び出されることにより、
+	 * pvar->contents_after_known_hosts が初期化や解放されては困るからである。
+	 */
+
 	PKT_init(pvar);
 	SSH_init(pvar);
 	CRYPT_init(pvar);

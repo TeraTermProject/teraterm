@@ -343,6 +343,8 @@ typedef struct _TInstVar {
 	// dialog resource
 	HFONT hFontFixed;		// hosts.c内のダイアログ用
 
+	bottom_half_known_hosts_t contents_after_known_hosts;
+
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data
