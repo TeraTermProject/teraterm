@@ -112,6 +112,11 @@ void HOSTS_init(PTInstVar pvar)
 	key_init(&pvar->hosts_state.hostkey);
 	pvar->hosts_state.hosts_dialog = NULL;
 	pvar->hosts_state.file_names = NULL;
+
+	/*
+	 * 前回のオプション指定(/nosecuritywarning)が残らないように初期化しておく。
+	 */
+	pvar->nocheck_known_hosts = FALSE;
 }
 
 void HOSTS_open(PTInstVar pvar)
