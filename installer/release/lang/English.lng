@@ -311,6 +311,8 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
+TOOLTIP_TITLEBAR_TRANSPARENCY=Transparency %d
+
 ; commonlib.c
 MSG_WINSOCK_ERROR=Cannot use winsock
 MSG_INVALID_HOST_ERROR=Invalid host

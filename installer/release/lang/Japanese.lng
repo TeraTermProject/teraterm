@@ -311,6 +311,8 @@ DLG_DANDD_SAME_NEEXTDROP=次のドロップ時、同じ処理を行う(&M)
 DLG_DANDD_DONTSHOW_NEEXTDROP=次のドロップ時、ダイアログを表示しない(&I)
 DLG_DANDD_NOTE=このダイアログは、CTRLを押しながらドロップすると必ず表示されます
 
+TOOLTIP_TITLEBAR_TRANSPARENCY=半透明度 %d
+
 ; commonlib.c
 MSG_WINSOCK_ERROR=Winsock が使えません
 MSG_INVALID_HOST_ERROR=無効なホスト

@@ -85,6 +85,7 @@
 #include "tekwin.h"
 #include <htmlhelp.h>
 #include "compat_win.h"
+#include "TipWin.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -140,6 +141,10 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
+static TipWin *TransparencyTip;
+static int TransparencyTipPtsX = 0;
+static int TransparencyTipPtsY = 0;
+
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
 #endif
@@ -169,6 +174,13 @@ static void SetMouseCursor(const char *cursor)
 
 	if (hc != NULL) {
 		SetClassLongPtr(HVTWin, GCLP_HCURSOR, (LONG_PTR)hc);
+	}
+}
+
+static void DestroyTransparencyTip(void) {
+	if (TransparencyTip) {
+		TipWinDestroy(TransparencyTip);
+		TransparencyTip = NULL;
 	}
 }
 
@@ -2436,12 +2448,33 @@ BOOL CVTWindow::OnMouseWheel(
 		if (InTitleBar) {
 			int delta = zDelta < 0 ? -1 : 1;
 			int newAlpha = Alpha;
+			TCHAR tipbuf[32];
+			TCHAR uimsg[MAX_UIMSG];
+
 			newAlpha += delta * ts.MouseWheelScrollLine;
 			if (newAlpha > 255)
 				newAlpha = 255;
 			else if (newAlpha < 0)
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
+
+			get_lang_msg("TOOLTIP_TITLEBAR_TRANSPARENCY", uimsg, sizeof(uimsg), "Transparency %d", ts.UILanguageFile);
+			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), newAlpha);
+			::SetTimer(HVTWin, IdTransparencyTipTimer, 1000, NULL);
+
+			if (TransparencyTipPtsX != pt.x ||
+			    TransparencyTipPtsY != pt.y) {
+				DestroyTransparencyTip();
+			}
+
+			if (TransparencyTip == NULL) {
+				TransparencyTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf, TRUE);
+				TransparencyTipPtsX = pt.x;
+				TransparencyTipPtsY = pt.y;
+			} else {
+				TipWinSetText(TransparencyTip, tipbuf);
+			}
+
 			return TRUE;
 		}
 	}
@@ -2902,6 +2935,9 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case IdPrnProcTimer:
 			PrnFileDirectProc();
+			break;
+		case IdTransparencyTipTimer:
+			DestroyTransparencyTip();
 			break;
 	}
 }
