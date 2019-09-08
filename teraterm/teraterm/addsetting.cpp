@@ -71,7 +71,9 @@ const mouse_cursor_t MouseCursor[] = {
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
-#define round(n) ((LONG)n)
+double round(double r) {
+	return ( r > 0.0 ) ? floor(r + 0.5) : ceil(r - 0.5);
+}
 
 void CVisualPropPageDlg::SetupRGBbox(int index)
 {
@@ -689,9 +691,9 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (1)AlphaBlend
 
-	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, round((ts.AlphaBlendActive / 255.0) * 100));
+	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, (LONG)round((ts.AlphaBlendActive / 255.0) * 100.0));
 
-	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, round((ts.AlphaBlendInactive / 255.0) * 100));
+	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, (LONG)round((ts.AlphaBlendInactive / 255.0) * 100));
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
