@@ -889,11 +889,23 @@ void notify_closed_connection(PTInstVar pvar, char *send_msg)
 	            pvar->socket, MAKELPARAM(FD_CLOSE, 0));
 }
 
+// non-fatalおよびfatal時のエラーメッセージを覚えておく。
+// 一度、覚えたメッセージがあれば、改行を挟んで追加していく。
 static void add_err_msg(PTInstVar pvar, char *msg)
 {
 	if (pvar->err_msg != NULL) {
-		int buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
-		char *buf = (char *) malloc(buf_len);
+		int buf_len;
+		char *buf;
+
+		// すでに同じメッセージが登録済みの場合は追加しない。
+		if (strstr(pvar->err_msg, msg)) 
+			return;
+		
+		buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
+		buf = malloc(buf_len);
+		// メモリが確保できない場合は何もしない。
+		if (buf == NULL) 
+			return;
 
 		strncpy_s(buf, buf_len, pvar->err_msg, _TRUNCATE);
 		strncat_s(buf, buf_len, "\n\n", _TRUNCATE);
@@ -901,6 +913,7 @@ static void add_err_msg(PTInstVar pvar, char *msg)
 		free(pvar->err_msg);
 		pvar->err_msg = buf;
 	} else {
+		// メモリが確保できない場合は、_strdup()はNULLを返す。
 		pvar->err_msg = _strdup(msg);
 	}
 }
