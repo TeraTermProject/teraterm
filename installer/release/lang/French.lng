@@ -944,6 +944,7 @@ BTN_DISCONNECT=&Déconnecter
 BTN_CONTINUE=&Continuer
 BTN_YES=&Yes
 BTN_NO=&No
+BTN_HELP=&Help
 
 
 [TTProxy]

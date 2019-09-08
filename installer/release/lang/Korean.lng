@@ -944,6 +944,7 @@ BTN_DISCONNECT=연결끊음(&D)
 BTN_CONTINUE=계속(&C)
 BTN_YES=&Yes
 BTN_NO=&No
+BTN_HELP=&Help
 
 
 [TTProxy]

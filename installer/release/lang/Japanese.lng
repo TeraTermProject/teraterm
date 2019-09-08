@@ -940,6 +940,7 @@ BTN_DISCONNECT=Ú‘±’f(&D)
 BTN_CONTINUE=‘±s(&C)
 BTN_YES=‚Í‚¢(&Y)
 BTN_NO=‚¢‚¢‚¦(&N)
+BTN_HELP=ƒwƒ‹ƒv(&H)
 
 
 [TTProxy]

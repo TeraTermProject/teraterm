@@ -163,7 +163,8 @@ BEGIN
     PUSHBUTTON      "Move Down(&0)",IDC_SSHCOMP_MOVEDOWN,515,187,58,13
     RTEXT           "&LogLevel",IDC_LOGLEVEL,221,223,43,8
     EDITTEXT        IDC_LOGLEVEL_VALUE,270,220,30,14,ES_AUTOHSCROLL
-    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,216,250,187,12
+    LTEXT           "(0 to turn off)",IDC_LOGLEVEL_UNIT,307,223,93,8
+    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,216,246,187,12
     LTEXT           "None",IDC_COMPRESSNONE,499,210,18,8
     LTEXT           "Highest",IDC_COMPRESSHIGH,576,210,25,8
     RTEXT           "&Compression level:",IDC_COMPRESSLABEL,422,218,62,13
@@ -171,7 +172,7 @@ BEGIN
     LTEXT           "SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.",IDC_COMPRESSNOTE,423,245,188,25
     DEFPUSHBUTTON   "OK",IDOK,48,266,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,118,266,50,14
-    LTEXT           "(0 to turn off)",IDC_LOGLEVEL_UNIT,307,223,93,8
+    PUSHBUTTON      "Help",IDC_SSHSETUP_HELP,186,266,50,14
 END
 
 IDD_SSHUNKNOWNHOST DIALOGEX 0, 0, 260, 276
@@ -247,8 +248,9 @@ BEGIN
     PUSHBUTTON      "...",IDC_CHOOSEHOSTRSAFILE,210,246,15,14
     CONTROL         "&Check the enabled authentication methods before login (SSH2)",IDC_CHECKAUTH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,303,281,10
-    DEFPUSHBUTTON   "OK",IDOK,195,324,50,14,WS_GROUP
-    PUSHBUTTON      "Cancel",IDCANCEL,251,324,50,14
+    DEFPUSHBUTTON   "OK",IDOK,128,324,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,190,324,50,14
+    PUSHBUTTON      "Help",IDC_SSHAUTHSETUP_HELP,251,324,50,14
 END
 
 IDD_SSHFWDSETUP DIALOGEX 0, 0, 309, 185
@@ -263,9 +265,10 @@ BEGIN
     PUSHBUTTON      "&Remove",IDC_REMOVE,195,105,50,14
     CONTROL         "Display remote &X applications on local X server",IDC_SSHFWDX11,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,139,274,14
-    DEFPUSHBUTTON   "OK",IDOK,86,164,50,14,WS_GROUP
-    PUSHBUTTON      "Cancel",IDCANCEL,173,164,50,14
+    DEFPUSHBUTTON   "OK",IDOK,53,164,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,143,164,50,14
     GROUPBOX        "X Forwarding",IDC_XFORWARD,6,130,296,27
+    PUSHBUTTON      "Help",IDC_SSHFWDSETUP_HELP,232,164,50,14
 END
 
 IDD_SSHFWDEDIT DIALOGEX 0, 0, 309, 175
@@ -320,7 +323,7 @@ CAPTION "TTSSH: Key Generator"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&Generate",IDOK,199,7,50,14
-    PUSHBUTTON      "Close",IDCANCEL,199,24,50,14
+    PUSHBUTTON      "Close",IDCANCEL,199,23,50,14
     GROUPBOX        "Key type",IDC_KEYTYPE,11,7,130,47
     CONTROL         "RS&A1",IDC_RSA1_TYPE,"Button",BS_AUTORADIOBUTTON,17,17,35,10
     CONTROL         "&RSA",IDC_RSA_TYPE,"Button",BS_AUTORADIOBUTTON,57,17,30,10
@@ -343,6 +346,7 @@ BEGIN
     EDITTEXT        IDC_BCRYPT_KDF_ROUNDS,182,117,25,12,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     PUSHBUTTON      "Save publ&ic key",IDC_SAVE_PUBLIC_KEY,49,135,68,14
     PUSHBUTTON      "Save &private key",IDC_SAVE_PRIVATE_KEY,133,135,68,14
+    PUSHBUTTON      "Help",IDC_SSHKEYGENSETUP_HELP,199,40,50,14
 END
 
 IDD_SSHSCP DIALOGEX 0, 0, 279, 125
@@ -497,6 +501,7 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 612
+        VERTGUIDE, 146
         TOPMARGIN, 7
         BOTTOMMARGIN, 282
     END
