@@ -141,9 +141,9 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
-static TipWin *TransparencyTip;
-static int TransparencyTipPtsX = 0;
-static int TransparencyTipPtsY = 0;
+static TipWin *OpacityTip;
+static int OpacityTipPtsX = 0;
+static int OpacityTipPtsY = 0;
 
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
@@ -177,10 +177,10 @@ static void SetMouseCursor(const char *cursor)
 	}
 }
 
-static void DestroyTransparencyTip(void) {
-	if (TransparencyTip) {
-		TipWinDestroy(TransparencyTip);
-		TransparencyTip = NULL;
+static void DestroyOpacityTip(void) {
+	if (OpacityTip) {
+		TipWinDestroy(OpacityTip);
+		OpacityTip = NULL;
 	}
 }
 
@@ -2458,21 +2458,21 @@ BOOL CVTWindow::OnMouseWheel(
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
 
-			get_lang_msg("TOOLTIP_TITLEBAR_TRANSPARENCY", uimsg, sizeof(uimsg), "Transparency %.0f %%", ts.UILanguageFile);
+			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.0f %%", ts.UILanguageFile);
 			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
-			::SetTimer(HVTWin, IdTransparencyTipTimer, 1000, NULL);
+			::SetTimer(HVTWin, IdOpacityTipTimer, 1000, NULL);
 
-			if (TransparencyTipPtsX != pt.x ||
-			    TransparencyTipPtsY != pt.y) {
-				DestroyTransparencyTip();
+			if (OpacityTipPtsX != pt.x ||
+			    OpacityTipPtsY != pt.y) {
+				DestroyOpacityTip();
 			}
 
-			if (TransparencyTip == NULL) {
-				TransparencyTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf, TRUE);
-				TransparencyTipPtsX = pt.x;
-				TransparencyTipPtsY = pt.y;
+			if (OpacityTip == NULL) {
+				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf, TRUE);
+				OpacityTipPtsX = pt.x;
+				OpacityTipPtsY = pt.y;
 			} else {
-				TipWinSetText(TransparencyTip, tipbuf);
+				TipWinSetText(OpacityTip, tipbuf);
 			}
 
 			return TRUE;
@@ -2936,8 +2936,8 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 		case IdPrnProcTimer:
 			PrnFileDirectProc();
 			break;
-		case IdTransparencyTipTimer:
-			DestroyTransparencyTip();
+		case IdOpacityTipTimer:
+			DestroyOpacityTip();
 			break;
 	}
 }
