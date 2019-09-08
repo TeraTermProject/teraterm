@@ -136,6 +136,14 @@ static void init_TTSSH(PTInstVar pvar)
 	pvar->protocol_major = 0;
 	pvar->protocol_minor = 0;
 
+	/*
+	 * pvar->contents_after_known_hosts は意図的に
+	 * init_TTSSH()やuninit_TTSSH()では初期化や解放をしない。
+	 * なぜならば、known_hostsダイアログで使用するためであり、
+	 * ダイアログの表示中に TTXCloseTCP() が呼び出されることにより、
+	 * pvar->contents_after_known_hosts が初期化や解放されては困るからである。
+	 */
+
 	PKT_init(pvar);
 	SSH_init(pvar);
 	CRYPT_init(pvar);
@@ -1143,6 +1151,10 @@ static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 		pvar->socket = INVALID_SOCKET;
 
 		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
+
+		// 認証ダイアログが残っていれば閉じる。
+		HOSTS_notify_closing_on_exit(pvar);
+		AUTH_notify_closing_on_exit(pvar);
 
 		*hooks->Precv = pvar->Precv;
 		*hooks->Psend = pvar->Psend;
@@ -5110,6 +5122,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 	case ID_SSHDIFFERENTKEY:
 		UTIL_SetDialogFont();
 		HOSTS_do_different_key_dialog(hWin, pvar);
+		return 1;
+	case ID_SSHDIFFERENT_TYPE_KEY:
+		UTIL_SetDialogFont();
+		HOSTS_do_different_type_key_dialog(hWin, pvar);
 		return 1;
 	case ID_SSHASYNCMESSAGEBOX:
 		if (pvar->err_msg != NULL) {

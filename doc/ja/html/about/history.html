@@ -3208,12 +3208,15 @@
       <li>ユーザ認証ダイアログの表示タイミングをknown_hostsダイアログの後に変更した。</li>
       <li><a href="../menu/setup-ssh.html#LogLevel">Setupダイアログ</a>にLogLevelを追加した。</li>
       <li><a href="../menu/setup-ssh.html">Setupダイアログ</a>、<a href="../menu/setup-sshauth.html">Authentication Setupダイアログ</a>、<a href="../menu/setup-sshforward.html">Forwardingダイアログ</a>、<a href="../menu/setup-sshkeygenerator.html">Key Generatorダイアログ</a>にヘルプボタンを追加した。</li>
+      <li>known_hostsダイアログおよびユーザ認証ダイアログの表示中に、SSHサーバ側からネットワーク切断された場合、ダイアログを自動で閉じるようにした。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
       <li>メッセージボックスの表示に同一メッセージが複数含まれることがある問題を修正した。</li>
+      <li>known_hostsダイアログの表示中にSSHサーバ側からネットワーク切断されると、アプリがクラッシュすることがある問題を修正した。</li>
+      <li>SSH1: <a href="../commandline/ttssh.html#nosecuritywarning">/nosecuritywarning</a>オプションが機能していなかった問題を修正した。</li>
     </ul>
   </li>
 </ul>

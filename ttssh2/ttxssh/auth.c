@@ -995,6 +995,12 @@ canceled:
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->auth_state.auth_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		case IDC_SSHUSERNAME:
 			// ユーザ名がフォーカスを失ったとき (2007.9.29 maya)
 			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
@@ -1431,6 +1437,12 @@ static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->auth_state.auth_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		default:
 			return FALSE;
 		}
@@ -1816,6 +1828,17 @@ void AUTH_notify_disconnecting(PTInstVar pvar)
 		PostMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDCANCEL, 0);
 		/* the main window might not go away if it's not enabled. (see vtwin.cpp) */
 		EnableWindow(pvar->NotificationWindow, TRUE);
+	}
+}
+
+// TCPセッションがクローズされた場合、認証ダイアログを閉じるように指示を出す。
+// AUTH_notify_disconnecting()とは異なり、ダイアログを閉じるのみで、
+// SSHサーバに通知は出さない。
+void AUTH_notify_closing_on_exit(PTInstVar pvar)
+{
+	if (pvar->auth_state.auth_dialog != NULL) {
+		logprintf(LOG_LEVEL_INFO, "%s: Notify closing message to the authentication dialog.", __FUNCTION__);
+		PostMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDCLOSE, 0);
 	}
 }
 

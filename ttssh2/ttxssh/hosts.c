@@ -66,6 +66,10 @@ See LICENSE.TXT for the license.
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
+BOOL HOSTS_resume_session_after_known_hosts(PTInstVar pvar);
+void HOSTS_cancel_session_after_known_hosts(PTInstVar pvar);
+
+
 static char **parse_multi_path(char *buf)
 {
 	int i;
@@ -108,6 +112,11 @@ void HOSTS_init(PTInstVar pvar)
 	key_init(&pvar->hosts_state.hostkey);
 	pvar->hosts_state.hosts_dialog = NULL;
 	pvar->hosts_state.file_names = NULL;
+
+	/*
+	 * 前回のオプション指定(/nosecuritywarning)が残らないように初期化しておく。
+	 */
+	pvar->nocheck_known_hosts = FALSE;
 }
 
 void HOSTS_open(PTInstVar pvar)
@@ -1811,11 +1820,11 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				add_host_key(pvar);
 			}
 
-			if (SSHv1(pvar)) {
-				SSH_notify_host_OK(pvar);
-			} else { // SSH2
-				// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
-			}
+			/*
+			 * known_hostsダイアログのために一時停止していた
+			 * SSHサーバとのネゴシエーションを再開させる。
+			 */
+			HOSTS_resume_session_after_known_hosts(pvar);
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
@@ -1824,8 +1833,24 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
+			/*
+			 * known_hostsをキャンセルするため、再開用のリソースを破棄しておく。
+			 */
+			HOSTS_cancel_session_after_known_hosts(pvar);
+
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
+			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDCLOSE:
+			/*
+			 * known_hosts中にサーバ側からネットワーク切断された場合、
+			 * ダイアログのみを閉じる。
+			 */
+			HOSTS_cancel_session_after_known_hosts(pvar);
+
+			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
 
@@ -1964,11 +1989,11 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 				delete_different_key(pvar);
 			}
 
-			if (SSHv1(pvar)) {
-				SSH_notify_host_OK(pvar);
-			} else { // SSH2
-				// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
-			}
+			/*
+			 * known_hostsダイアログのために一時停止していた
+			 * SSHサーバとのネゴシエーションを再開させる。
+			 */
+			HOSTS_resume_session_after_known_hosts(pvar);
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
@@ -1977,8 +2002,24 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
+			/*
+			 * known_hostsをキャンセルするため、再開用のリソースを破棄しておく。
+			 */
+			HOSTS_cancel_session_after_known_hosts(pvar);
+
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
+			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDCLOSE:
+			/*
+			 * known_hosts中にサーバ側からネットワーク切断された場合、
+			 * ダイアログのみを閉じる。
+			 */
+			HOSTS_cancel_session_after_known_hosts(pvar);
+
+			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
 
@@ -2118,11 +2159,11 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				add_host_key(pvar);
 			}
 
-			if (SSHv1(pvar)) {
-				SSH_notify_host_OK(pvar);
-			} else { // SSH2
-				// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
-			}
+			/*
+			 * known_hostsダイアログのために一時停止していた
+			 * SSHサーバとのネゴシエーションを再開させる。
+			 */
+			HOSTS_resume_session_after_known_hosts(pvar);
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
@@ -2131,8 +2172,24 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
+			/*
+			 * known_hostsをキャンセルするため、再開用のリソースを破棄しておく。
+			 */
+			HOSTS_cancel_session_after_known_hosts(pvar);
+
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
+			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDCLOSE:
+			/*
+			 * known_hosts中にサーバ側からネットワーク切断された場合、
+			 * ダイアログのみを閉じる。
+			 */
+			HOSTS_cancel_session_after_known_hosts(pvar);
+
+			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
 
@@ -2176,7 +2233,15 @@ canceled:
 void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
-		HWND cur_active = GetActiveWindow();
+		/* known_hostsの読み込み時、ID_SSHASYNCMESSAGEBOX を使った
+		 * MessageBox が表示される場合、オーナーなし(no owner)になるため、
+		 * MessageBox がTera Termの裏に隠れることがある。
+		 * その状態で GetActiveWindow() を呼び出すと、known_hostsダイアログの
+		 * オーナーが MessageBox となって、Tera Termの裏に隠れてしまう。
+		 * そこで、known_hostsダイアログのオーナーは常に Tera Term を指し示す
+		 * ようにする。
+		 */
+		HWND cur_active = NULL;
 
 		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHUNKNOWNHOST),
 		               cur_active != NULL ? cur_active : wnd,
@@ -2187,7 +2252,15 @@ void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
-		HWND cur_active = GetActiveWindow();
+		/* known_hostsの読み込み時、ID_SSHASYNCMESSAGEBOX を使った
+		 * MessageBox が表示される場合、オーナーなし(no owner)になるため、
+		 * MessageBox がTera Termの裏に隠れることがある。
+		 * その状態で GetActiveWindow() を呼び出すと、known_hostsダイアログの
+		 * オーナーが MessageBox となって、Tera Termの裏に隠れてしまう。
+		 * そこで、known_hostsダイアログのオーナーは常に Tera Term を指し示す
+		 * ようにする。
+		 */
+		HWND cur_active = NULL;
 
 		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTKEY),
 		               cur_active != NULL ? cur_active : wnd,
@@ -2198,7 +2271,15 @@ void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
-		HWND cur_active = GetActiveWindow();
+		/* known_hostsの読み込み時、ID_SSHASYNCMESSAGEBOX を使った
+		 * MessageBox が表示される場合、オーナーなし(no owner)になるため、
+		 * MessageBox がTera Termの裏に隠れることがある。
+		 * その状態で GetActiveWindow() を呼び出すと、known_hostsダイアログの
+		 * オーナーが MessageBox となって、Tera Termの裏に隠れてしまう。
+		 * そこで、known_hostsダイアログのオーナーは常に Tera Term を指し示す
+		 * ようにする。
+		 */
+		HWND cur_active = NULL;
 
 		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTTYPEKEY),
 		               cur_active != NULL ? cur_active : wnd,
@@ -2206,16 +2287,24 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 	}
 }
 
-//
-// サーバから送られてきたホスト公開鍵の妥当性をチェックする
-//   key: サーバからの公開鍵
-//
-// SSH2対応を追加 (2006.3.24 yutaka)
-//
+/*
+ * サーバから送られてきたホスト公開鍵の妥当性をチェックし、
+ * 必要に応じて known_hosts ダイアログを呼び出す。
+ *
+ *   hostname: 接続先のホスト名
+ *   tcpport: 接続先ポート番号 
+ *   key: サーバからの公開鍵
+ *
+ * return:
+ *    TRUE:  known_hostsダイアログの呼び出しは不要
+ *    FALSE: known_hostsダイアログを呼び出した
+ *
+ */
 BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport, Key *key)
 {
 	int found_different_key = 0, found_different_type_key = 0;
 	Key key2; // known_hostsに登録されている鍵
+	DWORD id;
 
 	pvar->dns_key_check = DNS_VERIFY_NONE;
 
@@ -2224,12 +2313,8 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 	 && _stricmp(pvar->hosts_state.prefetched_hostname, hostname) == 0
 	 && HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key) == 1) {
 
-		if (SSHv1(pvar)) {
-			SSH_notify_host_OK(pvar);
-		} else {
-			// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
-		}
-		return TRUE;
+		 // 何もせずに戻る。		
+		 return TRUE;
 	}
 
 	// 先読みされていない場合は、この時点でファイルから読み込む
@@ -2245,13 +2330,6 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 				if (match == 1) {
 					finish_read_host_files(pvar, 0);
 					// すべてのエントリを参照して、合致するキーが見つかったら戻る。
-					// SSH2の場合はここでは何もしない。(2006.3.29 yutaka)
-					if (SSHv1(pvar)) {
-						SSH_notify_host_OK(pvar);
-					} else {
-						// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
-					}
-
 					// About TTSSH ダイアログでの表示のために、ここで保存しておく。
 					key_copy(&pvar->hosts_state.hostkey, key);
 
@@ -2280,6 +2358,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 
 	// "/nosecuritywarning"が指定されている場合、ダイアログを表示させずに return success する。
 	if (pvar->nocheck_known_hosts == TRUE) {
+		 // 何もせずに戻る。		
 		return TRUE;
 	}
 
@@ -2291,18 +2370,78 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 	// させる必要があるため、直接コールに変更する。
 	// これによりknown_hostsの確認を待たずに、サーバへユーザ情報を送ってしまう問題を回避する。
 	// (2007.10.1 yutaka)
+	/*
+	 * known_hostsダイアログは非同期で表示させるのが正しかった。
+	 * known_hostsダイアログが表示されている状態で、サーバから切断を行うと、
+	 * TTXCloseTCPが呼び出され、TTSSHのリソースが解放されてしまう。
+	 * SSHハンドラの延長でknown_hostsダイアログを出して止まっているため、
+	 * 処理再開後に不正アクセスで落ちる。
+	 * (2019.9.3 yutaka)
+	 */
 	if (found_different_key) {
-		HOSTS_do_different_key_dialog(pvar->NotificationWindow, pvar);
+		// TTXProcessCommand から HOSTS_do_different_key_dialog() を呼び出す。
+		id = ID_SSHDIFFERENTKEY;
 	}
 	else if (found_different_type_key) {
-		HOSTS_do_different_type_key_dialog(pvar->NotificationWindow, pvar);
+		// TTXProcessCommand から HOSTS_do_different_type_key_dialog() を呼び出す。
+		id = ID_SSHDIFFERENT_TYPE_KEY;
 	}
 	else {
-		HOSTS_do_unknown_host_dialog(pvar->NotificationWindow, pvar);
+		// TTXProcessCommand から HOSTS_do_unknown_host_dialog() を呼び出す。
+		id = ID_SSHUNKNOWNHOST;
 	}
 
-	return TRUE;
+	PostMessage(pvar->NotificationWindow, WM_COMMAND, id, 0);
+
+	logprintf(LOG_LEVEL_INFO, "Calling known_hosts dialog...(%s)", 
+		id == ID_SSHDIFFERENTKEY ? "SSHDIFFERENTKEY" : 
+		id == ID_SSHDIFFERENT_TYPE_KEY ? "SSHDIFFERENT_TYPE_KEY" : "SSHUNKNOWNHOST"
+		);
+
+	return FALSE;
 }
+
+/*
+ * known_hostsダイアログでユーザ承認後、SSHサーバとのネゴシエーションを再開する。
+ */
+BOOL HOSTS_resume_session_after_known_hosts(PTInstVar pvar)
+{
+	enum ssh_kex_known_hosts type;
+	int ret = FALSE;
+
+	type = pvar->contents_after_known_hosts.kex_type;
+	if (type == SSH1_PUBLIC_KEY_KNOWN_HOSTS) {
+		ret = handle_server_public_key_after_known_hosts(pvar);
+
+	} else if (type == SSH2_DH_KEX_REPLY_KNOWN_HOSTS) {
+		ret = handle_SSH2_dh_kex_reply_after_known_hosts(pvar);
+
+	} else if (type == SSH2_DH_GEX_REPLY_KNOWN_HOSTS) {
+		ret = handle_SSH2_dh_gex_reply_after_known_hosts(pvar);
+
+	} else if (type == SSH2_ECDH_KEX_REPLY_KNOWN_HOSTS) {
+		ret = handle_SSH2_ecdh_kex_reply_after_known_hosts(pvar);
+
+	}
+
+	return (ret);
+}
+
+/*
+ * known_hostsダイアログのSSHごとのキャンセル処理
+ */
+void HOSTS_cancel_session_after_known_hosts(PTInstVar pvar)
+{
+	enum ssh_kex_known_hosts type;
+
+	type = pvar->contents_after_known_hosts.kex_type;
+	if (type != NONE_KNOWN_HOSTS) {
+		handle_SSH2_canel_reply_after_known_hosts(pvar);
+	}
+
+	return;
+}
+
 
 void HOSTS_notify_disconnecting(PTInstVar pvar)
 {
@@ -2310,6 +2449,17 @@ void HOSTS_notify_disconnecting(PTInstVar pvar)
 		PostMessage(pvar->hosts_state.hosts_dialog, WM_COMMAND, IDCANCEL, 0);
 		/* the main window might not go away if it's not enabled. (see vtwin.cpp) */
 		EnableWindow(pvar->NotificationWindow, TRUE);
+	}
+}
+
+// TCPセッションがクローズされた場合、known_hostsダイアログを閉じるように指示を出す。
+// HOSTS_notify_disconnecting()とは異なり、ダイアログを閉じるのみで、
+// SSHサーバに通知は出さない。
+void HOSTS_notify_closing_on_exit(PTInstVar pvar)
+{
+	if (pvar->hosts_state.hosts_dialog != NULL) {
+		logprintf(LOG_LEVEL_INFO, "%s: Notify closing message to the known_hosts dialog.", __FUNCTION__);
+		PostMessage(pvar->hosts_state.hosts_dialog, WM_COMMAND, IDCLOSE, 0);
 	}
 }
 

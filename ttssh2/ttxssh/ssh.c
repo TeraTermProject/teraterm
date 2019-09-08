@@ -139,6 +139,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned int *buflen);
 static void ssh2_scp_free_packetlist(Channel_t *c);
 static void get_window_pixel_size(PTInstVar pvar, int *x, int *y);
+static BOOL store_contents_for_known_hosts(PTInstVar pvar, enum ssh_kex_known_hosts kex_type, UINT_PTR offset);
 
 // マクロ
 #define remained_payload(pvar) ((pvar)->ssh_state.payload + payload_current_offset(pvar))
@@ -1669,6 +1670,9 @@ static BOOL handle_auth_success(PTInstVar pvar)
 	return FALSE;
 }
 
+/*
+ * SSH1サーバから送られてきた鍵をチェックして、最後にknown_hostsダイアログを表示する。
+ */
 static BOOL handle_server_public_key(PTInstVar pvar)
 {
 	int server_key_public_exponent_len;
@@ -1683,6 +1687,7 @@ static BOOL handle_server_public_key(PTInstVar pvar)
 	char *inmsg;
 	Key hostkey;
 	int supported_types;
+	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH_SMSG_PUBLIC_KEY was received.");
 
@@ -1747,15 +1752,39 @@ static BOOL handle_server_public_key(PTInstVar pvar)
 	                                   supported_types))
 		return FALSE;
 
+	// 後半処理用のデータを退避しておく
+	if (store_contents_for_known_hosts(pvar, SSH1_PUBLIC_KEY_KNOWN_HOSTS, 0) == FALSE)
+		return FALSE;
+
 	/* this must be the LAST THING in this function, since it can cause
 	   host_is_OK to be called. */
 	hostkey.type = KEY_RSA1;
 	hostkey.bits = get_uint32(inmsg + host_key_bits_pos);
 	hostkey.exp = inmsg + host_key_bits_pos + 4;
 	hostkey.mod = inmsg + host_key_public_modulus_pos;
-	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, &hostkey);
+
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, &hostkey);
+	if (ret == TRUE) {
+		/* known_hostsダイアログの呼び出しは不要なので、
+		 * 続きの処理を実行する。
+		 */
+		ret = handle_server_public_key_after_known_hosts(pvar);
+
+	} else {
+		/* known_hostsダイアログの呼び出したので、
+		 * 以降、何もしない。
+		 */
+
+	}
 
 	return FALSE;
+}
+
+BOOL handle_server_public_key_after_known_hosts(PTInstVar pvar)
+{
+	SSH_notify_host_OK(pvar);
+
+	return TRUE;
 }
 
 /*
@@ -5836,32 +5865,63 @@ cont:
 	return TRUE;
 }
 
-//
-// Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEXDH_REPLY:31)
-//
+static BOOL store_contents_for_known_hosts(PTInstVar pvar, enum ssh_kex_known_hosts kex_type, UINT_PTR offset)
+{
+	pvar->contents_after_known_hosts.payload = malloc(pvar->ssh_state.payloadlen);
+	if (pvar->contents_after_known_hosts.payload == NULL)
+		return FALSE;
+	memcpy(pvar->contents_after_known_hosts.payload, pvar->ssh_state.payload, pvar->ssh_state.payloadlen);
+	pvar->contents_after_known_hosts.payload_len = pvar->ssh_state.payloadlen;
+	pvar->contents_after_known_hosts.payload_offset = offset;
+
+	pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received = FALSE;
+
+	// 情報がセットされているかどうかの判定に使うため、最後に設定する。
+	pvar->contents_after_known_hosts.kex_type = kex_type;
+
+	return TRUE;
+}
+
+static void clear_contents_for_known_hosts(PTInstVar pvar)
+{
+	pvar->contents_after_known_hosts.kex_type = NONE_KNOWN_HOSTS;
+	if (pvar->contents_after_known_hosts.payload) {
+		free(pvar->contents_after_known_hosts.payload);
+		pvar->contents_after_known_hosts.payload = NULL;
+	}
+	pvar->contents_after_known_hosts.payload_len = 0;
+	pvar->contents_after_known_hosts.payload_offset = 0;
+
+	/* ここでは意図的にクリアしない。
+	 * pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received = FALSE;
+	 */
+}
+
+/*
+ * Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEXDH_REPLY:31)
+ *
+ * known_hosts処理の前半：
+ * known_hostsダイアログを表示するところまで。
+ * known_hostsダイアログでの承認後の処理は後半へ。
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
 static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	int offset = 0;
 	char *server_host_key_blob;
-	int bloblen, siglen;
-	BIGNUM *server_public = NULL;
-	char *signature;
-	int dh_len, share_len;
+	int bloblen;
 	char *dh_buf = NULL;
-	BIGNUM *share_key = NULL;
-	char *hash;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
 
 	memset(&hostkey, 0, sizeof(hostkey));
-
-	// TODO: buffer overrun check
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -5894,10 +5954,104 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
-	if (pvar->socket == INVALID_SOCKET) {
+
+	// 後半処理用のデータを退避しておく
+	if (store_contents_for_known_hosts(pvar, SSH2_DH_KEX_REPLY_KNOWN_HOSTS,
+							(unsigned char *)data - pvar->ssh_state.payload) == FALSE)
+		goto error;
+
+	/*
+	 * Tera Term(SSHクライアント)側はこれから known_hosts でサーバとの接続を
+	 * 受け入れるのかを決めるが、SSHサーバ側はすでに鍵の準備ができている可能性があり、
+	 * SSH2_MSG_NEWKEYS メッセージがいつ送られてくるか分からない。
+	 * known_hosts ダイアログ表示中において、当該メッセージを受け付けられるように
+	 * しておく必要がある。
+	 */
+	SSH2_dispatch_init(3);
+	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
+
+	/*
+	 * このあと known_hosts ダイアログを非同期で呼び出し、いったんSSHサーバとの
+	 * ネゴシエーションを一時停止させる。
+	 */
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	if (ret == TRUE) {
+		/* known_hostsダイアログの呼び出しは不要なので、
+		 * 続きの処理を実行する。
+		 */
+		ret = handle_SSH2_dh_kex_reply_after_known_hosts(pvar);
+
+	} else {
+		/* known_hostsダイアログの呼び出したので、
+		 * 以降、何もしない。
+		 */
+
+	}
+
+	result = TRUE;
+
+error:
+	key_free(hostkey);
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
+/*
+ * Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEXDH_REPLY:31)
+ *
+ * known_hosts処理の後半：
+ * known_hostsダイアログから呼び出され、SSHサーバにキー情報を送信する。
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int offset = 0;
+	char *server_host_key_blob;
+	int bloblen, siglen;
+	BIGNUM *server_public = NULL;
+	char *signature;
+	int dh_len, share_len;
+	char *dh_buf = NULL;
+	BIGNUM *share_key = NULL;
+	char *hash;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
+	Key *hostkey = NULL;  // hostkey
+	BOOL result = FALSE;
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY is continued after known_hosts.");
+
+	memset(&hostkey, 0, sizeof(hostkey));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->contents_after_known_hosts.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->contents_after_known_hosts.payload_len - 1;
+
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = data; // for hash
+
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-					"%s: Server disconnected", __FUNCTION__);
+					"%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto error;
+	}
+	data += bloblen;
+
+	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
+		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -5987,36 +6141,49 @@ error:
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
 
+	clear_contents_for_known_hosts(pvar);
+
+	/* 
+	 * SSH2_MSG_NEWKEYS を受信していたら、自分で処理を呼び出す。
+	 */
+	if (pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received) {
+		pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received = FALSE;
+		handle_SSH2_newkeys(pvar);
+	}
+
 	return result;
 }
 
+void handle_SSH2_canel_reply_after_known_hosts(PTInstVar pvar)
+{
+	clear_contents_for_known_hosts(pvar);
+}
 
-//
-// Diffie-Hellman Group and Key Exchange Reply(SSH2_MSG_KEX_DH_GEX_REPLY:33)
-//
+/*
+ * Diffie-Hellman Group and Key Exchange Reply(SSH2_MSG_KEX_DH_GEX_REPLY:33)
+ *
+ * known_hosts処理の前半：
+ * known_hostsダイアログを表示するところまで。
+ * known_hostsダイアログでの承認後の処理は後半へ。
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	int offset = 0;
 	char *server_host_key_blob;
-	int bloblen, siglen;
-	BIGNUM *server_public = NULL;
-	char *signature;
-	int dh_len, share_len;
+	int bloblen;
 	char *dh_buf = NULL;
-	BIGNUM *share_key = NULL;
-	char *hash;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
 	memset(&hostkey, 0, sizeof(hostkey));
-
-	// TODO: buffer overrun check
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -6049,10 +6216,110 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
-	if (pvar->socket == INVALID_SOCKET) {
+
+	// 後半処理用のデータを退避しておく
+	if (store_contents_for_known_hosts(pvar, SSH2_DH_GEX_REPLY_KNOWN_HOSTS,
+							(unsigned char *)data - pvar->ssh_state.payload) == FALSE)
+		goto error;
+
+	/*
+	 * Tera Term(SSHクライアント)側はこれから known_hosts でサーバとの接続を
+	 * 受け入れるのかを決めるが、SSHサーバ側はすでに鍵の準備ができている可能性があり、
+	 * SSH2_MSG_NEWKEYS メッセージがいつ送られてくるか分からない。
+	 * known_hosts ダイアログ表示中において、当該メッセージを受け付けられるように
+	 * しておく必要がある。
+	 */
+	SSH2_dispatch_init(3);
+	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
+
+	/*
+	 * このあと known_hosts ダイアログを非同期で呼び出し、いったんSSHサーバとの
+	 * ネゴシエーションを一時停止させる。
+	 */
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	if (ret == TRUE) {
+		/* known_hostsダイアログの呼び出しは不要なので、
+		 * 続きの処理を実行する。
+		 */
+		ret = handle_SSH2_dh_gex_reply_after_known_hosts(pvar);
+
+	} else {
+		/* known_hostsダイアログの呼び出したので、
+		 * 以降、何もしない。
+		 */
+
+	}
+
+	result = TRUE;
+
+error:
+	key_free(hostkey);
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
+/*
+ * Diffie-Hellman Group and Key Exchange Reply(SSH2_MSG_KEX_DH_GEX_REPLY:33)
+ *
+ * known_hosts処理の後半：
+ * known_hostsダイアログから呼び出され、SSHサーバにキー情報を送信する。
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int offset = 0;
+	char *server_host_key_blob;
+	int bloblen, siglen;
+	BIGNUM *server_public = NULL;
+	char *signature;
+	int dh_len, share_len;
+	char *dh_buf = NULL;
+	BIGNUM *share_key = NULL;
+	char *hash;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
+	Key *hostkey = NULL;  // hostkey
+	BOOL result = FALSE;
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY is continued after known_hosts.");
+
+	memset(&hostkey, 0, sizeof(hostkey));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->contents_after_known_hosts.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->contents_after_known_hosts.payload_len - 1;
+
+	// for debug
+	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
+
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = data; // for hash
+
+	push_memdump("DH_GEX_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-					"%s: Server disconnected", __FUNCTION__);
+					"%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto error;
+	}
+	data += bloblen;
+
+	// known_hosts対応 (2006.3.20 yutaka)
+	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
+		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6147,37 +6414,44 @@ error:
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
 
+	clear_contents_for_known_hosts(pvar);
+
+	/* 
+	 * SSH2_MSG_NEWKEYS を受信していたら、自分で処理を呼び出す。
+	 */
+	if (pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received) {
+		pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received = FALSE;
+		handle_SSH2_newkeys(pvar);
+	}
+
 	return result;
 }
 
 
-//
-// Elliptic Curve Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_ECDH_REPLY:31)
-//
+/*
+ * Elliptic Curve Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_ECDH_REPLY:31)
+ *
+ * known_hosts処理の前半：
+ * known_hostsダイアログを表示するところまで。
+ * known_hostsダイアログでの承認後の処理は後半へ。
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
 static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	int offset = 0;
 	char *server_host_key_blob;
-	int bloblen, siglen;
-	EC_POINT *server_public = NULL;
-	const EC_GROUP *group;
-	char *signature;
-	int ecdh_len;
-	char *ecdh_buf = NULL;
-	BIGNUM *share_key = NULL;
-	char *hash;
+	int bloblen;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
 	memset(&hostkey, 0, sizeof(hostkey));
-
-	// TODO: buffer overrun check
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -6210,10 +6484,111 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
-	if (pvar->socket == INVALID_SOCKET) {
+
+	// 後半処理用のデータを退避しておく
+	if (store_contents_for_known_hosts(pvar, SSH2_ECDH_KEX_REPLY_KNOWN_HOSTS,
+							(unsigned char *)data - pvar->ssh_state.payload) == FALSE)
+		goto error;
+
+	/*
+	 * Tera Term(SSHクライアント)側はこれから known_hosts でサーバとの接続を
+	 * 受け入れるのかを決めるが、SSHサーバ側はすでに鍵の準備ができている可能性があり、
+	 * SSH2_MSG_NEWKEYS メッセージがいつ送られてくるか分からない。
+	 * known_hosts ダイアログ表示中において、当該メッセージを受け付けられるように
+	 * しておく必要がある。
+	 */
+	SSH2_dispatch_init(3);
+	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
+
+	/*
+	 * このあと known_hosts ダイアログを非同期で呼び出し、いったんSSHサーバとの
+	 * ネゴシエーションを一時停止させる。
+	 */
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	if (ret == TRUE) {
+		/* known_hostsダイアログの呼び出しは不要なので、
+		 * 続きの処理を実行する。
+		 */
+		ret = handle_SSH2_ecdh_kex_reply_after_known_hosts(pvar);
+
+	} else {
+		/* known_hostsダイアログの呼び出したので、
+		 * 以降、何もしない。
+		 */
+
+	}
+
+	result = TRUE;
+
+error:
+	key_free(hostkey);
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
+/*
+ * Elliptic Curve Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_ECDH_REPLY:31)
+ *
+ * known_hosts処理の後半：
+ * known_hostsダイアログから呼び出され、SSHサーバにキー情報を送信する。
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+BOOL handle_SSH2_ecdh_kex_reply_after_known_hosts(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int offset = 0;
+	char *server_host_key_blob;
+	int bloblen, siglen;
+	EC_POINT *server_public = NULL;
+	const EC_GROUP *group;
+	char *signature;
+	int ecdh_len;
+	char *ecdh_buf = NULL;
+	BIGNUM *share_key = NULL;
+	char *hash;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
+	Key *hostkey = NULL;  // hostkey
+	BOOL result = FALSE;
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY is continued after known_hosts.");
+
+	memset(&hostkey, 0, sizeof(hostkey));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->contents_after_known_hosts.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->contents_after_known_hosts.payload_len - 1;
+
+	// for debug
+	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
+
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = data; // for hash
+
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-					"%s: Server disconnected", __FUNCTION__);
+					"%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto error;
+	}
+	data += bloblen;
+
+	// known_hosts対応 (2006.3.20 yutaka)
+	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6326,8 +6701,19 @@ error:
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
 
+	clear_contents_for_known_hosts(pvar);
+
+	/* 
+	 * SSH2_MSG_NEWKEYS を受信していたら、自分で処理を呼び出す。
+	 */
+	if (pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received) {
+		pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received = FALSE;
+		handle_SSH2_newkeys(pvar);
+	}
+
 	return result;
 }
+
 
 
 // KEXにおいてサーバから返ってくる 31 番メッセージに対するハンドラ
@@ -6398,6 +6784,17 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	);
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
+
+
+	/*
+	 * known_hostsダイアログ表示中に SSH2_MSG_NEWKEYS を受け取った場合は
+	 * 処理を延期させる。
+	 */
+	if (pvar->contents_after_known_hosts.kex_type != NONE_KNOWN_HOSTS) {
+		pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received = TRUE;
+		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was postponed while known_hosts dialog is running.");
+		return TRUE;
+	}
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was received(DH key generation is completed).");
 
