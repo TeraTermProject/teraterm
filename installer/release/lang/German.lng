@@ -229,8 +229,8 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
 DLG_TAB_VISUAL_ALPHA=&Transparenz
-DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
-DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active(%)
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive(%)
 DLG_TAB_VISUAL_ETERM=&Eterm-Aussehen(*)
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
@@ -312,7 +312,7 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
-TOOLTIP_TITLEBAR_TRANSPARENCY=Transparenz %d
+TOOLTIP_TITLEBAR_TRANSPARENCY=Transparenz %.0f %%
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Kann Winsock nicht verwenden

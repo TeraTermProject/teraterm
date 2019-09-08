@@ -229,8 +229,8 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
 DLG_TAB_VISUAL_ALPHA=透明度
-DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
-DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active(%)
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive(%)
 DLG_TAB_VISUAL_ETERM=&Eterm 风格 (*)
 DLG_TAB_VISUAL_BGIMG=背景图像(&I)
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=图像亮度(&T)
@@ -312,7 +312,7 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
-TOOLTIP_TITLEBAR_TRANSPARENCY=透明度 %d
+TOOLTIP_TITLEBAR_TRANSPARENCY=透明度 %.0f %%
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=无法使用 Winsock

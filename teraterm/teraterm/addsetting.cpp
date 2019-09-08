@@ -38,6 +38,7 @@
 #include <time.h>
 #include <tchar.h>
 #include <crtdbg.h>
+#include <math.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -649,8 +650,8 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_ALPHABLEND, "DLG_TAB_VISUAL_ALPHA" },
-		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE_LABEL" },
-		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE_LABEL" },
+		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE" },
+		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE" },
 		{ IDC_ETERM_LOOKFEEL, "DLG_TAB_VISUAL_ETERM" },
 		{ IDC_BGIMG_CHECK, "DLG_TAB_VISUAL_BGIMG" },
 		{ IDC_BGIMG_BRIGHTNESS, "DLG_TAB_VISUAL_BGIMG_BRIGHTNESS" },
@@ -686,9 +687,9 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (1)AlphaBlend
 
-	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
+	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, round((ts.AlphaBlendActive / 255.0) * 100));
 
-	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, ts.AlphaBlendInactive);
+	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, round((ts.AlphaBlendInactive / 255.0) * 100));
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
@@ -943,14 +944,14 @@ void CVisualPropPageDlg::OnOK()
 	// (1)
 	GetDlgItemTextA(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		int i = atoi(buf);
+		int i = (int)round((255 * atoi(buf) / 100));
 		ts.AlphaBlendActive =
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
 	GetDlgItemTextA(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		int i = atoi(buf);
+		int i = (int)round((255 * atoi(buf) / 100));
 		ts.AlphaBlendInactive = 
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;

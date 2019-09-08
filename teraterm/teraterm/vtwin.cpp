@@ -2458,8 +2458,8 @@ BOOL CVTWindow::OnMouseWheel(
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
 
-			get_lang_msg("TOOLTIP_TITLEBAR_TRANSPARENCY", uimsg, sizeof(uimsg), "Transparency %d", ts.UILanguageFile);
-			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), newAlpha);
+			get_lang_msg("TOOLTIP_TITLEBAR_TRANSPARENCY", uimsg, sizeof(uimsg), "Transparency %.0f %%", ts.UILanguageFile);
+			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
 			::SetTimer(HVTWin, IdTransparencyTipTimer, 1000, NULL);
 
 			if (TransparencyTipPtsX != pt.x ||
