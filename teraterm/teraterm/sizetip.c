@@ -41,6 +41,61 @@
 static TipWin *SizeTip;
 static int tip_enabled = 0;
 
+/**
+ *	point を
+ *	スクリーンからはみ出している場合、入るように補正する
+ *	NearestMonitor が TRUE のとき、最も近いモニタ
+ *	FALSEのとき、マウスのあるモニタに移動させる
+ *	ディスプレイの端から FrameWidth(pixel) より離れるようにする
+ */
+static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
+{
+	if (HasMultiMonitorSupport()) {
+		// マルチモニタがサポートされている場合
+		HMONITOR hm;
+		MONITORINFO mi;
+		int ix, iy;
+
+		// 元の座標を保存しておく
+		ix = point->x;
+		iy = point->y;
+
+		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
+		if (hm == NULL) {
+			if (NearestMonitor) {
+				// 最も近いモニタに表示する
+				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
+			} else {
+				// スクリーンからはみ出している場合はマウスのあるモニタに表示する
+				GetCursorPos(point);
+				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
+			}
+		}
+
+		mi.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hm, &mi);
+		if (ix < mi.rcMonitor.left + FrameWidth) {
+			ix = mi.rcMonitor.left + FrameWidth;
+		}
+		if (iy < mi.rcMonitor.top + FrameWidth) {
+			iy = mi.rcMonitor.top + FrameWidth;
+		}
+		
+		point->x = ix;
+		point->y = iy;
+	}
+	else
+	{
+		// マルチモニタがサポートされていない場合
+		if (point->x < FrameWidth) {
+			point->x = FrameWidth;
+		}
+		if (point->y < FrameWidth) {
+			point->y = FrameWidth;
+		}
+	}
+}
+
 void UpdateSizeTip(HWND src, int cx, int cy)
 {
 	TCHAR str[32];
@@ -54,11 +109,23 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 
 	if (SizeTip == NULL) {
 		RECT wr;
+		POINT point;
+		int w, h;
+
+		// 文字列の縦横サイズを取得する
+		TipWinGetTextWidthHeight(src, str, &w, &h);
+
 		// ウィンドウの位置を取得
 		GetWindowRect(src, &wr);
-		cx = wr.left;
-		cy = wr.top;
-		SizeTip = TipWinCreate(src, cx, cy, str, TRUE);
+		// sizetipを出す位置は、ウィンドウ左上(X, Y)に対して、
+		// (X, Y - 文字列の高さ - FRAME_WIDTH * 2) とする。
+		point.x = wr.left;
+		point.y = wr.top - (h + FRAME_WIDTH * 2);
+		FixPosFromFrame(&point, 16, FALSE);
+		cx = point.x;
+		cy = point.y;
+
+		SizeTip = TipWinCreate(src, cx, cy, str);
 	} else {
 		/* Tip already exists, just set the text */
 		TipWinSetText(SizeTip, str);

@@ -2468,7 +2468,7 @@ BOOL CVTWindow::OnMouseWheel(
 			}
 
 			if (OpacityTip == NULL) {
-				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf, TRUE);
+				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf);
 				OpacityTipPtsX = pt.x;
 				OpacityTipPtsY = pt.y;
 			} else {

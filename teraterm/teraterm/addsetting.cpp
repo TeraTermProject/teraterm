@@ -71,6 +71,8 @@ const mouse_cursor_t MouseCursor[] = {
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
+#define round(n) ((LONG)n)
+
 void CVisualPropPageDlg::SetupRGBbox(int index)
 {
 	BYTE c;

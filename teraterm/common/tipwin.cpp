@@ -64,8 +64,6 @@
 
 #include "tipwin.h"
 
-#define	FRAME_WIDTH	6
-
 static ATOM tip_class = 0;
 
 typedef struct tagTipWinData {
@@ -83,61 +81,6 @@ typedef struct tagTipWinData {
 	int py;
 	BOOL auto_destroy;
 } TipWin;
-
-/**
- *	point を
- *	スクリーンからはみ出している場合、入るように補正する
- *	NearestMonitor が TRUE のとき、最も近いモニタ
- *	FALSEのとき、マウスのあるモニタに移動させる
- *	ディスプレイの端から FrameWidth(pixel) より離れるようにする
- */
-static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
-{
-	if (HasMultiMonitorSupport()) {
-		// マルチモニタがサポートされている場合
-		HMONITOR hm;
-		MONITORINFO mi;
-		int ix, iy;
-
-		// 元の座標を保存しておく
-		ix = point->x;
-		iy = point->y;
-
-		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
-		if (hm == NULL) {
-			if (NearestMonitor) {
-				// 最も近いモニタに表示する
-				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
-			} else {
-				// スクリーンからはみ出している場合はマウスのあるモニタに表示する
-				GetCursorPos(point);
-				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
-			}
-		}
-
-		mi.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(hm, &mi);
-		if (ix < mi.rcMonitor.left + FrameWidth) {
-			ix = mi.rcMonitor.left + FrameWidth;
-		}
-		if (iy < mi.rcMonitor.top + FrameWidth) {
-			iy = mi.rcMonitor.top + FrameWidth;
-		}
-		
-		point->x = ix;
-		point->y = iy;
-	}
-	else
-	{
-		// マルチモニタがサポートされていない場合
-		if (point->x < FrameWidth) {
-			point->x = FrameWidth;
-		}
-		if (point->y < FrameWidth) {
-			point->y = FrameWidth;
-		}
-	}
-}
 
 static void CalcStrRect(TipWin *pTipWin)
 {
@@ -287,14 +230,12 @@ static void create_tipwin(TipWin *pTipWin, HINSTANCE hInst, int cx, int cy)
 	 */
 }
 
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str, BOOL resizing_tips)
+TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 {
 	TipWin *pTipWin;
 	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
-	int height;
-	POINT point;
 
 	register_class(hInst);
 	pTipWin = (TipWin *)malloc(sizeof(TipWin));
@@ -311,23 +252,57 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str, BOOL resizing_t
 	pTipWin->tip_font = CreateFontIndirect(&logfont);
 	CalcStrRect(pTipWin);
 	pTipWin->hParentWnd = src;
-
-	// 文字列の高さから表示位置を調整する。
-	if (resizing_tips) {
-		height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
-		point.x = cx;
-		point.y = cy - (height + FRAME_WIDTH * 2);
-		FixPosFromFrame(&point, 16, FALSE);
-		cx = point.x;
-		cy = point.y;
-	}
-
 	create_tipwin(pTipWin, hInst, cx, cy);
 
 	pTipWin->hParentWnd = src;
 	pTipWin->auto_destroy = TRUE;
 	ShowWindow(pTipWin->tip_wnd, SW_SHOWNOACTIVATE);
 	return pTipWin;
+}
+
+/*
+ * 文字列をツールチップに描画した時の横と縦のサイズを取得する。
+ *
+ * [in]
+ *   src
+ *   str
+ * [out]
+ *   width
+ *   height
+ */
+void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height)
+{
+	LOGFONTA logfont;
+	HFONT tip_font;
+	UINT uDpi;
+	HDC hdc;
+	RECT str_rect;
+	size_t str_len;
+
+	/* 文字列の長さを計算する */
+	str_len = _tcslen(str);
+	
+	/* DPIを取得する */
+	uDpi = GetMonitorDpiFromWindow(src);
+
+	/* フォントを生成する */
+	GetMessageboxFont(&logfont);
+	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
+	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
+	tip_font = CreateFontIndirect(&logfont);
+
+	/* 文字列を描画してサイズを求める */
+	hdc = CreateCompatibleDC(NULL);
+	SelectObject(hdc, tip_font);
+	str_rect.top = 0;
+	str_rect.left = 0;
+	DrawText(hdc, str, str_len, &str_rect, DT_LEFT|DT_CALCRECT);
+	*width = str_rect.right - str_rect.left;
+	*height = str_rect.bottom - str_rect.top;
+	DeleteDC(hdc);
+
+	/* フォントを破棄する */
+	DeleteObject(tip_font);
 }
 
 void TipWinSetPos(int x, int y)
