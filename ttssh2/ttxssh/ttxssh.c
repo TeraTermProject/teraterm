@@ -2751,6 +2751,14 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	UTIL_get_lang_msg("DLG_SSHSETUP_HOSTKEY_ROTATION", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, pvar->ts->UIMsg);
 
+	GetDlgItemText(dlg, IDC_LOGLEVEL, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_LOGLEVEL", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_LOGLEVEL, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_LOGLEVEL_UNIT, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_LOGLEVEL_UNIT", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_LOGLEVEL_UNIT, pvar->ts->UIMsg);
+
+
 	SendMessage(compressionControl, TBM_SETRANGE, TRUE, MAKELONG(0, 9));
 	SendMessage(compressionControl, TBM_SETPOS, TRUE,
 	            pvar->settings.CompressionLevel);
@@ -2911,6 +2919,15 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	if (!(ch >= 0 && ch < SSH_UPDATE_HOSTKEYS_MAX))
 		ch = 0;
 	SendMessage(hostkeyRotationControlList, CB_SETCURSEL, ch, 0);
+
+	// LogLevel
+	{
+		char buf[10];
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+		            "%d", pvar->settings.LogLevel);
+		SetDlgItemText(dlg, IDC_LOGLEVEL_VALUE, buf);
+	}
+
 
 }
 
@@ -3174,6 +3191,13 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	if (!(i >= 0 && i < SSH_UPDATE_HOSTKEYS_MAX))
 		i = 0;
 	pvar->settings.UpdateHostkeys = i;
+
+	// get LogLevel
+	SendMessage(GetDlgItem(dlg, IDC_LOGLEVEL_VALUE), WM_GETTEXT, sizeof(buf), (LPARAM)buf);
+	i = atoi(buf);
+	if (i < 0)
+		i = 0;
+	pvar->settings.LogLevel = i;
 }
 
 static void move_cur_sel_delta(HWND listbox, int delta)

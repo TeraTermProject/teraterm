@@ -145,7 +145,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,236,187,10
     CONTROL         "&Verify hostkey fingerprint by DNS",IDC_VERIFYHOSTKEYDNS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,250,187,10
-    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,216,250,187,12
     GROUPBOX        "K&EX order (SSH2 only)",IDC_KEX_ORDER,216,8,187,98
     LISTBOX         IDC_SSHKEX_LIST,230,20,159,60,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     PUSHBUTTON      "Move Up(&3)",IDC_SSHKEX_MOVEUP,242,85,58,13,WS_GROUP
@@ -162,6 +161,9 @@ BEGIN
     LISTBOX         IDC_SSHCOMP_LIST,429,123,159,60,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     PUSHBUTTON      "Move Up(&9)",IDC_SSHCOMP_MOVEUP,441,187,58,13,WS_GROUP
     PUSHBUTTON      "Move Down(&0)",IDC_SSHCOMP_MOVEDOWN,515,187,58,13
+    RTEXT           "&LogLevel",IDC_LOGLEVEL,221,223,43,8
+    EDITTEXT        IDC_LOGLEVEL_VALUE,270,220,30,14,ES_AUTOHSCROLL
+    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,216,250,187,12
     LTEXT           "None",IDC_COMPRESSNONE,499,210,18,8
     LTEXT           "Highest",IDC_COMPRESSHIGH,576,210,25,8
     RTEXT           "&Compression level:",IDC_COMPRESSLABEL,422,218,62,13
@@ -169,6 +171,7 @@ BEGIN
     LTEXT           "SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.",IDC_COMPRESSNOTE,423,245,188,25
     DEFPUSHBUTTON   "OK",IDOK,48,266,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,118,266,50,14
+    LTEXT           "(0 to turn off)",IDC_LOGLEVEL_UNIT,307,223,93,8
 END
 
 IDD_SSHUNKNOWNHOST DIALOGEX 0, 0, 260, 276
@@ -494,7 +497,7 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 612
-        TOPMARGIN, 4
+        TOPMARGIN, 7
         BOTTOMMARGIN, 282
     END
 

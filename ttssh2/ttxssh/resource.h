@@ -236,6 +236,9 @@
 #define IDC_SSHAUTHMETHOD               1242
 #define IDC_SSH_AUTHMETHOD              1243
 #define IDC_SSH_USERNAME                1244
+#define IDC_LOGLEVEL                    1245
+#define IDC_LOGLEVEL_VALUE              1246
+#define IDC_LOGLEVEL_UNIT               1247
 
 // Next default values for new objects
 // 
@@ -243,7 +246,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1245
+#define _APS_NEXT_CONTROL_VALUE         1248
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
