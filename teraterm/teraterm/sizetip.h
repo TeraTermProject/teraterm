@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-void UpdateSizeTip(HWND src, int cx, int cy);
+void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY);
 void EnableSizeTip(int bEnable);
 
 #ifdef __cplusplus

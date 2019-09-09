@@ -2728,7 +2728,7 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 	if (h <= 0)
 		h = 1;
 
-	UpdateSizeTip(HVTWin, w, h);
+	UpdateSizeTip(HVTWin, w, h, fwSide, pRect->left, pRect->top);
 
 	fixed_width = w * FontWidth + margin_width;
 	fixed_height = h * FontHeight + margin_height;

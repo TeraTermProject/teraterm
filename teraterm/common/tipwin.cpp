@@ -305,8 +305,12 @@ void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *heigh
 	DeleteObject(tip_font);
 }
 
-void TipWinSetPos(int x, int y)
+void TipWinSetPos(TipWin *tWin, int x, int y)
 {
+	if (tWin != NULL) {
+		HWND tip_wnd = tWin->tip_wnd;
+		SetWindowPos(tip_wnd, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+	}
 }
 
 void TipWinSetText(TipWin *tWin, TCHAR *text)
