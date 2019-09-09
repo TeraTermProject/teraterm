@@ -38,18 +38,17 @@
       <li>シリアル接続でハードウェアフロー制御DSR/DTRをサポートした。
         <ul>
           <li><a href="../menu/setup-serialport.html">Serial port ([Setup] メニュー)</a>のFlow controlでhardwareをRTS/CTSに変更し、新しくDSR/DTRを追加した。</li>
-          <li><a href="../macro/command/setflowctrl.html">setflowctrl</a>マクロコマンドに4番目のパラメータを追加した。</li>
+          <li><a href="../macro/command/setflowctrl.html">setflowctrl</a>マクロコマンドで DSR/DTR を指定できるようにした。</li>
         </ul></li>
-        
       <li>バージョン情報ダイアログにSFMTの表記を追加した。</li>
       <li><a href="../menu/file-new.html">New connectionダイアログ</a>の表記を「Protocol」から「IP version」に、「UNSPEC」を「AUTO」に変更した。</li>
-      <li>VT ウィンドウのタイトルバー上でマウスホイールを操作してウィンドウの不透明度を一時的に変更すると、不透明度をツールチップに表示するようにした。</li>
+      <li>VT ウィンドウのタイトルバー上でマウスホイールを操作してウィンドウの不透明度を一時的に変更するとき、不透明度をツールチップに表示するようにした。</li>
       <li>リサイズ中の縦横サイズツールチップの表示位置をリサイズ後の座標に追従するようにした。</li>
     </ul>
   </li>
   <li>バグ修正
     <ul>
-      <li>リサイズ中の縦横サイズツールチップが、デスクトップの左端と上端で表示されなくなっていた問題を修正した。</li>
+      <li>リサイズ中の縦横サイズツールチップが、デスクトップの左端と上端で表示されなくなっていた問題を修正した。4.103でのエンバグ。</li>
     </ul>
   </li>
 
