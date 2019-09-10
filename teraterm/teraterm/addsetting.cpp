@@ -657,6 +657,7 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE" },
 		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE" },
 		{ IDC_ETERM_LOOKFEEL, "DLG_TAB_VISUAL_ETERM" },
+		{ IDC_MIXED_THEME_FILE, "DLG_TAB_VISUAL_BGMIXED_THEMEFILE" },
 		{ IDC_BGIMG_CHECK, "DLG_TAB_VISUAL_BGIMG" },
 		{ IDC_BGIMG_BRIGHTNESS, "DLG_TAB_VISUAL_BGIMG_BRIGHTNESS" },
 		{ IDC_MOUSE, "DLG_TAB_VISUAL_MOUSE" },
@@ -704,24 +705,37 @@ void CVisualPropPageDlg::OnInitDialog()
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.BGImgBrightness);
 	SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, ts.BGImgBrightness);
 
+	// BGEnable関係なく、チェックボックスを付ける。
+	if (strcmp(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE) == 0) {
+		SetCheck(IDC_BGIMG_CHECK, BST_CHECKED);
+	} else {
+		SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
+	}
+	// テーマファイルを無視する場合は壁紙と混合しない。
+	if (ts.EtermLookfeel.BGIgnoreThemeFile) {
+		SetCheck(IDC_MIXED_THEME_FILE, BST_UNCHECKED);
+	} else {
+		SetCheck(IDC_MIXED_THEME_FILE, BST_CHECKED);
+	}
+
 	if (ts.EtermLookfeel.BGEnable) {
 		EnableDlgItem(IDC_BGIMG_CHECK, TRUE);
+		EnableDlgItem(IDC_MIXED_THEME_FILE, TRUE);
 
 		if (strcmp(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE) == 0) {
-			SetCheck(IDC_BGIMG_CHECK, BST_CHECKED);
 			EnableDlgItem(IDC_BGIMG_EDIT, TRUE);
 			EnableDlgItem(IDC_BGIMG_BUTTON, TRUE);
 
 			EnableDlgItem(IDC_BGIMG_BRIGHTNESS, TRUE);
 			EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, TRUE);
 		} else {
-			SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
 			EnableDlgItem(IDC_BGIMG_EDIT, FALSE);
 			EnableDlgItem(IDC_BGIMG_BUTTON, FALSE);
 
 			EnableDlgItem(IDC_BGIMG_BRIGHTNESS, FALSE);
 			EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, FALSE);
 		}
+
 	} else {
 		EnableDlgItem(IDC_BGIMG_CHECK, FALSE);
 		EnableDlgItem(IDC_BGIMG_EDIT, FALSE);
@@ -729,6 +743,8 @@ void CVisualPropPageDlg::OnInitDialog()
 
 		EnableDlgItem(IDC_BGIMG_BRIGHTNESS, FALSE);
 		EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, FALSE);
+
+		EnableDlgItem(IDC_MIXED_THEME_FILE, FALSE);
 	}
 
 	// (3)Mouse cursor type
@@ -797,6 +813,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	case IDC_ETERM_LOOKFEEL:
 			// チェックされたら Enable/Disable をトグルする。
 			if (GetCheck(IDC_ETERM_LOOKFEEL)) {
+				EnableDlgItem(IDC_MIXED_THEME_FILE, TRUE);
 				EnableDlgItem(IDC_BGIMG_CHECK, TRUE);
 				if (GetCheck(IDC_BGIMG_CHECK)) {
 					EnableDlgItem(IDC_BGIMG_EDIT, TRUE);
@@ -824,6 +841,15 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 背景画像も無効化する。
 				SetDlgItemTextT(IDC_BGIMG_EDIT, _T(""));
 				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
+
+				EnableDlgItem(IDC_MIXED_THEME_FILE, FALSE);
+			}
+			return TRUE;
+
+		case IDC_MIXED_THEME_FILE:
+			if (GetCheck(IDC_MIXED_THEME_FILE)) {
+				// 背景画像のチェックは外す。
+				SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
 			}
 			return TRUE;
 
@@ -836,6 +862,8 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, TRUE);
 
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
+				// 混合のチェックは外す。
+				SetCheck(IDC_MIXED_THEME_FILE, BST_UNCHECKED);
 			} else {
 				EnableDlgItem(IDC_BGIMG_EDIT, FALSE);
 				EnableDlgItem(IDC_BGIMG_BUTTON, FALSE);
@@ -981,6 +1009,27 @@ void CVisualPropPageDlg::OnOK()
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
+
+	// テーマファイルを最終設定する。
+	if (ts.EtermLookfeel.BGEnable) {
+		if (GetCheck(IDC_BGIMG_CHECK)) {
+			strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
+		} else {
+			strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+		}
+		if (GetCheck(IDC_MIXED_THEME_FILE)) {
+			// 壁紙と混合の場合、デフォルトに戻しておく。
+			ts.EtermLookfeel.BGIgnoreThemeFile = FALSE;
+		} else {
+			// テーマファイルを無視する。
+			ts.EtermLookfeel.BGIgnoreThemeFile = TRUE;
+		}
+
+	} else {
+		// BGが無効の場合はデフォルトに戻しておく。
+		strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+	}
+
 
 	// (3)
 	sel = GetCurSel(IDC_MOUSE_CURSOR);

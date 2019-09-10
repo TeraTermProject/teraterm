@@ -403,6 +403,7 @@ typedef struct {
 	int BGNoCopyBits;
 	int BGNoFrame;
 	char BGThemeFile[MAX_PATH];
+	int BGIgnoreThemeFile;
 } eterm_lookfeel_t;
 
 typedef struct cygterm {

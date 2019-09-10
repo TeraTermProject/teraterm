@@ -232,6 +232,7 @@ DLG_TAB_VISUAL_ALPHA=Непрозрачность окна
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active(%)
 DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive(%)
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
+DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
 DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=&Яркость изображения
 DLG_TAB_VISUAL_MOUSE=&Курсор мыши

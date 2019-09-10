@@ -411,6 +411,15 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
     strncpy_s(tmp,tmplen,fullpath,filePart - fullpath);
     strncpy_s(filename,destlen,tmp,_TRUNCATE);
   }
+
+  // アドホックではあるが、ImageFile.INIなら別名にする。
+  // ImageFile.INIはテーマファイルとして使えないため。
+  if (strcmp(filespec_src, BG_THEME_IMAGEFILE_DEFAULT) == 0) {
+	  if (strcmp(fd.cFileName, BG_THEME_IMAGEFILE_NAME) == 0) {
+		  _snprintf_s(fd.cFileName, sizeof(fd.cFileName), _TRUNCATE, "%s", BG_THEME_THEMEFILE_SCALE);
+	  }
+  }
+
   strncat_s(filename,destlen,fd.cFileName,_TRUNCATE);
 }
 
@@ -1463,9 +1472,20 @@ void BGDestruct(void)
   DeleteFile(BGSrc2.fileTmp);
 }
 
-void BGInitialize(void)
+/*
+ * Eterm lookfeel機能による初期化処理
+ *
+ * initialize_once: 
+ *    TRUE: Tera Termの起動時
+ *    FALSE: Tera Termの起動時以外
+ */
+void BGInitialize(BOOL initialize_once)
 {
   char path[MAX_PATH],config_file[MAX_PATH],tempPath[MAX_PATH];
+
+  ZeroMemory(path, sizeof(path));
+  ZeroMemory(config_file, sizeof(config_file));
+  ZeroMemory(tempPath, sizeof(tempPath));
 
   // VTColor を読み込み
   BGVTColor[0] = ts.VTColor[0];
@@ -1530,8 +1550,16 @@ void BGInitialize(void)
 	  ts.BGImgBrightness = GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
   }
 
+  // BGEnableが真でも、initialize_once == FALSEの場合は初期化をしない。
+  // Tera Termの起動時のみに初期化する。
+  if (initialize_once) {
+	  // Tera Term起動時に一度だけ読む。
+	  ts.EtermLookfeel.BGIgnoreThemeFile = BGGetOnOff("BGIgnoreThemeFile", FALSE ,ts.SetupFName);
+  }
+
   if(!BGEnable)
     return;
+
 
   //乱数初期化
   // add cast (2006.2.18 yutaka)
@@ -1583,6 +1611,14 @@ void BGInitialize(void)
   //コンフィグファイルの決定
   GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
   RandomFile(path,config_file,sizeof(config_file));
+
+  // ImageFile.INIではない場合はランダムに選ぶ。
+  if (strstr(path, BG_THEME_IMAGEFILE_NAME) == NULL) {
+	  // テーマファイルを無視する場合は空にする。
+	  if (ts.EtermLookfeel.BGIgnoreThemeFile) {
+		ZeroMemory(config_file, sizeof(config_file));
+	  }
+  }
 
   //設定のオーバーライド
   if(strcmp(config_file,""))
@@ -1812,7 +1848,7 @@ void InitDisp()
   CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
   CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
-  BGInitialize();
+  BGInitialize(TRUE);
 #else
   InitColorTable();
 #endif  // ALPHABLEND_TYPE2

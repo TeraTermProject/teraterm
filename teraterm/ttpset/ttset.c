@@ -3055,6 +3055,8 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, Temp);
 	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, Temp, ts->BGImgBrightness);
 	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, Temp, ts->BGImgBrightness);
+	WriteOnOff(ETERM_SECTION, "BGIgnoreThemeFile", FName,
+		ts->EtermLookfeel.BGIgnoreThemeFile);
 
 #ifdef USE_NORMAL_BGCOLOR
 	// UseNormalBGColor

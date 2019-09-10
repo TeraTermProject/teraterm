@@ -1520,7 +1520,7 @@ void CVTWindow::ResetSetup()
 
 	/* background and ANSI color */
 #ifdef ALPHABLEND_TYPE2
-	BGInitialize();
+	BGInitialize(FALSE);
 	BGSetupPrimary(TRUE);
 	// 2006/03/17 by 337 : Alpha値も即時変更
 	// Layered窓になっていない場合は効果が無い
@@ -4496,7 +4496,7 @@ void CVTWindow::OnExternalSetup()
 			break;
 		case IDOK:
 #ifdef ALPHABLEND_TYPE2
-			BGInitialize();
+			BGInitialize(FALSE);
 			BGSetupPrimary(TRUE);
 #else
 			DispApplyANSIColor();
@@ -4570,7 +4570,7 @@ void CVTWindow::OnSetupWindow()
 		// Eterm lookfeelの画面情報も更新することで、リアルタイムでの背景色変更が
 		// 可能となる。(2006.2.24 yutaka)
 #ifdef ALPHABLEND_TYPE2
-		BGInitialize();
+		BGInitialize(FALSE);
 		BGSetupPrimary(TRUE);
 #endif
 
