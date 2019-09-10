@@ -948,14 +948,14 @@ void CVisualPropPageDlg::OnOK()
 	// (1)
 	GetDlgItemTextA(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		int i = (int)round((255 * atoi(buf) / 100));
+		int i = (int)round((double)(255 * atoi(buf) / 100));
 		ts.AlphaBlendActive =
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
 	GetDlgItemTextA(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		int i = (int)round((255 * atoi(buf) / 100));
+		int i = (int)round((double)(255 * atoi(buf) / 100));
 		ts.AlphaBlendInactive = 
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
