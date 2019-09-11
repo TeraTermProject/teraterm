@@ -92,6 +92,8 @@ private:
 	HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
 	enum { IDD = IDD_TABSHEET_VISUAL };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
+	void OnTimer(UINT_PTR nIDEvent);
 	void SetupRGBbox(int index);
 	void OnHelp();
 };

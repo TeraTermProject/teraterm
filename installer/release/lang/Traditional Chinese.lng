@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-09-10)
+; Updated by TeraTerm Project (2019-09-11)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -229,8 +229,8 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
 DLG_TAB_VISUAL_ALPHA=窗口不透明度
-DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active(%)
-DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive(%)
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Eterm 風格 (*)
 DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
 DLG_TAB_VISUAL_BGIMG=背景圖像(&I)
@@ -313,7 +313,7 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
-TOOLTIP_TITLEBAR_OPACITY=不透明度 %.0f %%
+TOOLTIP_TITLEBAR_OPACITY=不透明度 %.1f %%
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=無法使用 Winsock

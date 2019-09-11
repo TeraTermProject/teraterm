@@ -106,6 +106,8 @@
 #define IDC_ENABLE_ANSI_COLOR           1073
 #define IDC_DISABLE_PASTE_MBUTTON       1074
 #define IDC_URL_UNDERLINE               1075
+#define IDC_ALPHA_BLEND_ACTIVE_TRACKBAR 1076
+#define IDC_ALPHA_BLEND_INACTIVE_TRACKBAR 1077
 #define IDD_PRNABORTDLG                 2100
 #define IDD_FILETRANSDLG                2200
 #define IDC_TRANSFNAME                  2201
