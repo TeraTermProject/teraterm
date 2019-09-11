@@ -1511,7 +1511,6 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 	char TempHost[HostNameMaxLength+1];
 	WORD i, j, w;
 	BOOL Ok;
-	WORD ComPortTable[MAXCOMPORT];
 	static ComPortInfo_t *ComPortInfoPtr;
 	static int ComPortInfoCount;
 
@@ -1583,7 +1582,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						free(strA);
 					}
 					j++;
-					if (GetHNRec->ComPort==ComPortTable[i]) {
+					if (GetHNRec->ComPort == p->port_no) {
 						w = j;
 					}
 				}
@@ -1726,7 +1725,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 							// 使用中のポートは okが押せない
 							EnableWindow(GetDlgItem(Dialog, IDOK),
-										 (CheckCOMFlag(ComPortTable[ComPortInfoPtr[sel].port_no]) == 0) ?
+										 (CheckCOMFlag(ComPortInfoPtr[sel].port_no) == 0) ?
 										 TRUE : FALSE);
 							break;
 						}
