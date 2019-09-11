@@ -142,8 +142,7 @@ static HDEVNOTIFY hDevNotify = NULL;
 static int AutoDisconnectedPort = -1;
 
 static TipWin *OpacityTip;
-static int OpacityTipPtsX = 0;
-static int OpacityTipPtsY = 0;
+static POINT OpacityTipPts;
 
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
@@ -177,10 +176,10 @@ static void SetMouseCursor(const char *cursor)
 	}
 }
 
-static void DestroyOpacityTip(void) {
-	if (OpacityTip) {
-		TipWinDestroy(OpacityTip);
-		OpacityTip = NULL;
+static void DestroyTooltip(TipWin* *tooltip) {
+	if (*tooltip) {
+		TipWinDestroy(*tooltip);
+		(*tooltip) = NULL;
 	}
 }
 
@@ -2458,20 +2457,22 @@ BOOL CVTWindow::OnMouseWheel(
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
 
-			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.0f %%", ts.UILanguageFile);
+			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
 			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
 			::SetTimer(HVTWin, IdOpacityTipTimer, 1000, NULL);
 
-			if (OpacityTipPtsX != pt.x ||
-			    OpacityTipPtsY != pt.y) {
-				DestroyOpacityTip();
+			if (OpacityTipPts.x != pt.x ||
+			    OpacityTipPts.y != pt.y) {
+				DestroyTooltip(&OpacityTip);
 			}
 
 			if (OpacityTip == NULL) {
 				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf);
-				OpacityTipPtsX = pt.x;
-				OpacityTipPtsY = pt.y;
+				OpacityTipPts.x = pt.x;
+				OpacityTipPts.y = pt.y;
 			} else {
+				TipWinSetText(OpacityTip, tipbuf);
+				// ツールチップのリサイズが失敗したように見える問題の暫定対策
 				TipWinSetText(OpacityTip, tipbuf);
 			}
 
@@ -2937,7 +2938,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			PrnFileDirectProc();
 			break;
 		case IdOpacityTipTimer:
-			DestroyOpacityTip();
+			DestroyTooltip(&OpacityTip);
 			break;
 	}
 }
