@@ -26,6 +26,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// for comportinfo_test
+//#define TEST_FOR_NT
+//#define TEST_FOR_9X
+
 #include <windows.h>
 #include <devguid.h>
 #include <setupapi.h>
@@ -40,10 +44,17 @@
 #include "devpkey_teraterm.h"
 #endif
 
+#if defined(TEST_FOR_NT) || defined(TEST_FOR_9X)
+#else
 #include "ttlib.h"
+#endif
+
 #define DllExport __declspec(dllexport)
 #include "comportinfo.h"
 
+#if defined(TEST_FOR_NT) || defined(TEST_FOR_9X)
+#define MAX_UIMSG 1000
+#endif
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
@@ -77,12 +88,18 @@ typedef LONG (WINAPI *TRegQueryValueExW)(
 
 static BOOL IsWindows9X()
 {
+#if defined(TEST_FOR_NT)
+	return FALSE;
+#elif defined(TEST_FOR_9X)
+	return TRUE;
+#else
 //	return TRUE;
 //	return FAKSE;
 	return !IsWindowsNTKernel();
+#endif
 }
 
-#if 0
+#if defined(TEST_FOR_NT) || defined(TEST_FOR_9X)
 static void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len,
 						const wchar_t *def, const char *iniFile)
 {
