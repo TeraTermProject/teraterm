@@ -50,7 +50,7 @@
 #include "helpid.h"
 #include "addsetting.h"
 
-#include "TipWin.h"
+#include "tipwin.h"
 
 #ifdef _DEBUG
 #define free(p)		_free_dbg((p), _NORMAL_BLOCK)

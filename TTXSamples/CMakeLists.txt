@@ -35,7 +35,7 @@ set_target_properties(TTXResizeWin PROPERTIES FOLDER TTXSamples)
 add_subdirectory(TTXShowCommandLine)
 set_target_properties(TTXShowCommandLine PROPERTIES FOLDER TTXSamples)
 
-add_subdirectory(TTXtest)
+add_subdirectory(ttxtest)
 set_target_properties(TTXtest PROPERTIES FOLDER TTXSamples)
 
 add_subdirectory(TTXttyrec)

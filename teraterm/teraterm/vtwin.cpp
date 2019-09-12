@@ -85,7 +85,7 @@
 #include "tekwin.h"
 #include <htmlhelp.h>
 #include "compat_win.h"
-#include "TipWin.h"
+#include "tipwin.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"

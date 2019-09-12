@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include "TipWin.h"
+#include "tipwin.h"
 
 static TipWin *SizeTip;
 static int tip_enabled = 0;

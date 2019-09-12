@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "..\common\tt_res.h"
+#include "../common/tt_res.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -467,7 +467,7 @@ END
 
 1 TEXTINCLUDE 
 BEGIN
-    "..\\common\\tt_res.h\0"
+    "../common/tt_res.h\0"
 END
 
 2 TEXTINCLUDE 
