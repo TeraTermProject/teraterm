@@ -1823,6 +1823,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
  *	@retval		0=マッチしなかった
  *				マッチした文字列長
  */
+#if UNICODE_INTERNAL_BUFF
 static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 {
 	int match_pos = 0;
@@ -1862,12 +1863,14 @@ static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 	}
 	return match_pos;
 }
+#endif
 
 /**
  *	(x,y)から strと同一か調べる
  *
  *	@param		y		PageStart + CursorY
  */
+#if UNICODE_INTERNAL_BUFF
 static BOOL MatchString(int x, int y, const wchar_t *str)
 {
 	BOOL result;
@@ -1903,6 +1906,7 @@ static BOOL MatchString(int x, int y, const wchar_t *str)
 
 	return result;
 }
+#endif
 
 /**
  *	(sx,sy)から(ex,ey)までで str にマッチする文字を探して
@@ -1913,6 +1917,7 @@ static BOOL MatchString(int x, int y, const wchar_t *str)
  *	@param[out]	y		マッチした位置
  *	@retval		TRUE	マッチした
  */
+#if UNICODE_INTERNAL_BUFF
 static BOOL BuffGetMatchPosFromString(
 	int sx, int sy, int ex, int ey, const wchar_t *str,
 	int *match_x, int *match_y)
@@ -1943,6 +1948,7 @@ static BOOL BuffGetMatchPosFromString(
 	}
 	return FALSE;
 }
+#endif
 
 
 /**
