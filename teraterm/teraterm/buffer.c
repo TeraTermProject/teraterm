@@ -1823,6 +1823,144 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 #endif
 
 /**
+ *	(x,y) の1文字が strと同一か調べる
+ *		*注 1文字が複数のwchar_tから構成されている
+ *
+ *	@param		y		PageStart + CursorY
+ *	@param		str		1文字(wchar_t列)
+ *	@param		len		文字列長
+ *	@retval		0=マッチしなかった
+ *				マッチした文字列長
+ */
+#if UNICODE_INTERNAL_BUFF
+static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
+{
+	int match_pos = 0;
+	int TmpPtr = GetLinePtr(y);
+	const buff_char_t *b = &CodeBuffW[TmpPtr + x];
+	if (b->wc2[1] == 0) {
+		// サロゲートペアではない
+		if (str[match_pos] != b->wc2[0]) {
+			return 0;
+		}
+		match_pos++;
+		len--;
+	} else {
+		// サロゲートペア
+		if (len < 2) {
+			return 0;
+		}
+		if (str[match_pos+0] != b->wc2[0] ||
+			str[match_pos+1] != b->wc2[1]) {
+			return 0;
+		}
+		match_pos+=2;
+		len-=2;
+	}
+	if (b->CombinationCharCount16 > 0) {
+		// コンビネーション
+		int i;
+		if (len < b->CombinationCharCount16) {
+			return 0;
+		}
+		for (i = 0 ; i < (int)b->CombinationCharCount16; i++) {
+			if (str[match_pos++] != b->pCombinationChars16[i]) {
+				return 0;
+			}
+		}
+		len -= b->CombinationCharCount16;
+	}
+	return match_pos;
+}
+#endif
+
+/**
+ *	(x,y)から strと同一か調べる
+ *
+ *	@param		y		PageStart + CursorY
+ */
+#if UNICODE_INTERNAL_BUFF
+static BOOL MatchString(int x, int y, const wchar_t *str)
+{
+	BOOL result;
+	int match_pos = 0;
+	int TmpPtr = GetLinePtr(y);
+	size_t len = wcslen(str);
+	if (len == 0) {
+		return FALSE;
+	}
+
+	for(;;) {
+		// 1文字同一か調べる
+		size_t match_len = MatchOneString(x, y, str, len);
+		if (match_len == 0) {
+			result = FALSE;
+			break;
+		}
+		len -= match_len;
+		if (len == 0) {
+			// 全文字調べ終わった
+			result = TRUE;
+			break;
+		}
+		str += match_len;
+
+		// 次の文字
+		x++;
+		if (x == NumOfColumns) {
+			x = 0;
+			TmpPtr = NextLinePtr(TmpPtr);
+		}
+	}
+
+	return result;
+}
+#endif
+
+/**
+ *	(sx,sy)から(ex,ey)までで str にマッチする文字を探して
+ *	位置を返す
+ *
+ *	@param		sy,ex	PageStart + CursorY
+ *	@param[out]	x		マッチした位置
+ *	@param[out]	y		マッチした位置
+ *	@retval		TRUE	マッチした
+ */
+#if UNICODE_INTERNAL_BUFF
+static BOOL BuffGetMatchPosFromString(
+	int sx, int sy, int ex, int ey, const wchar_t *str,
+	int *match_x, int *match_y)
+{
+	int IStart, IEnd;
+	int x, y;
+
+	for (y = sy; y<=ey ; y++) {
+		IStart = 0;
+		IEnd = NumOfColumns-1;
+		if (y== sy) {
+			IStart = sx;
+		}
+		if (y== ey) {
+			IEnd = ex -1;
+		}
+
+		x = IStart;
+		while (x <= IEnd) {
+			if (MatchString(x, y, str)) {
+				// マッチした
+				*match_x = x;
+				*match_y = y;
+				return TRUE;
+			}
+			x++;
+		}
+	}
+	return FALSE;
+}
+#endif
+
+
+/**
  *	連続したスペースをタブ1つに置換する
  *	@param[out] _str_len	文字列長(L'\0'を含む)
  *	@return		文字列

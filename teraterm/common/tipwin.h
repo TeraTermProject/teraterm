@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+#define	FRAME_WIDTH	6
+
 typedef struct tagTipWinData TipWin;
 
 TipWin *TipWinCreateW(HWND src, int cx, int cy, const wchar_t *str);
@@ -41,6 +43,8 @@ void TipWinSetTextW(TipWin *tWin, const wchar_t *text);
 void TipWinSetTextA(TipWin *tWin, const char *text);
 void TipWinSetPos(TipWin *tWin, int x, int y);
 void TipWinDestroy(TipWin *tWin);
+void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
+void TipWinSetPos(TipWin *tWin, int x, int y);
 
 #if defined(UNICODE)
 #define	TipWinCreate(p1, p2, p3, p4)	TipWinCreateW(p1, p2, p3, p4)

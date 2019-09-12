@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-08-16)
+; Updated by TeraTerm Project (2019-09-11)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -228,10 +228,11 @@ DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
-DLG_TAB_VISUAL_ALPHA=&Transparenz
+DLG_TAB_VISUAL_ALPHA=Fenster Opazität
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
 DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Eterm-Aussehen(*)
+DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
 DLG_TAB_VISUAL_MOUSE=&Mauszeiger
@@ -312,6 +313,8 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
+TOOLTIP_TITLEBAR_OPACITY=Opazität %.1f %%
+
 ; commonlib.c
 MSG_WINSOCK_ERROR=Kann Winsock nicht verwenden
 MSG_INVALID_HOST_ERROR=Falscher Hostname
@@ -343,7 +346,7 @@ DLG_GEN_LANG_UI=Language&UI:
 DLG_HOST_TITLE=Tera Term: Neue Verbindung
 DLG_HOST_TCPIPHOST=&Rechner:
 DLG_HOST_TCPIPPORT=TCP-&Port#:
-DLG_HOST_TCPIPPROTOCOL=Protoco&ll:
+DLG_HOST_TCPIPPROTOCOL=IP Versio&n:
 DLG_HOST_SERIAL=&Seriell
 DLG_HOST_SERIALPORT=Po&rt:
 
@@ -592,6 +595,7 @@ DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
 DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=Passphrase speichern
 DLG_AUTH_FWDAGENT=F&orward agent
+DLG_AUTH_METHOD=Authentication methods
 DLG_AUTH_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTH_METHOD_RHOST=rhosts verwenden (SSH1)
@@ -611,10 +615,12 @@ MSG_PAGEANT_NOKEY=Pageant has no valid key.
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
 DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
+DLG_AUTHSETUP_USERNAME=User name
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
 DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
 DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_METHOD=Authentication methods
 DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)
@@ -695,7 +701,7 @@ DLG_HOST_TCPIPSERVICE=Dienst
 DLG_HOST_TCPIPOTHER=Anderer
 DLG_HOST_TCPIPPORT=TCP-Port
 DLG_HOST_TCPIPSSHVERSION=Protokoll-Version
-DLG_HOST_TCPIPPROTOCOL=Protokoll:
+DLG_HOST_TCPIPPROTOCOL=IP Versio&n:
 DLG_HOST_SERIAL=Seriell
 DLG_HOST_SERIALPORT=Port
 DLG_HOST_HELP=Hilfe
@@ -779,6 +785,8 @@ DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
 DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
 DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
 DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Ask
+DLG_SSHSETUP_LOGLEVEL=&LogLevel
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 to turn off)
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Choose a read/write known-hosts file
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Choose a read-only known-hosts file to add
@@ -939,6 +947,7 @@ BTN_DISCONNECT=&Trennen
 BTN_CONTINUE=&Fortsetzen
 BTN_YES=&Yes
 BTN_NO=&No
+BTN_HELP=&Help
 
 
 [TTProxy]

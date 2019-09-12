@@ -854,6 +854,9 @@ static void PutKanji(BYTE b)
 		MoveRight();
 	}
 	else {
+		if (CursorX == LineEnd - 1) {
+			MoveRight();
+		}
 		UpdateStr();
 		Wrap = AutoWrapMode;
 	}

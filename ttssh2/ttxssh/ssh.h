@@ -915,4 +915,32 @@ struct global_confirm {
 	int ref_count;
 };
 
+/*  
+ * SSH bottom half after known_hosts
+ */
+enum ssh_kex_known_hosts {
+	NONE_KNOWN_HOSTS = 0,
+	SSH1_PUBLIC_KEY_KNOWN_HOSTS,
+	SSH2_DH_KEX_REPLY_KNOWN_HOSTS,
+	SSH2_DH_GEX_REPLY_KNOWN_HOSTS,
+	SSH2_ECDH_KEX_REPLY_KNOWN_HOSTS,
+};
+
+typedef struct bottom_half_known_hosts {
+	enum ssh_kex_known_hosts kex_type;
+
+	unsigned char *payload;
+	int payload_len;
+	UINT_PTR payload_offset;
+
+	BOOL SSH2_MSG_NEWKEYS_received;	
+} bottom_half_known_hosts_t;
+
+void handle_SSH2_canel_reply_after_known_hosts(PTInstVar pvar);
+
+BOOL handle_server_public_key_after_known_hosts(PTInstVar pvar);
+BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar);
+BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar);
+BOOL handle_SSH2_ecdh_kex_reply_after_known_hosts(PTInstVar pvar);
+
 #endif

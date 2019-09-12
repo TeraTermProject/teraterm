@@ -54,6 +54,9 @@
 #include "oniguruma.h"
 #undef ONIG_EXTERN
 
+// SFMT: SIMD-oriented Fast Mersenne Twister
+#include "SFMT_version_for_teraterm.h"
+
 #include <winsock2.h>
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
@@ -78,7 +81,7 @@ extern HANDLE hInst;
 
 static char UILanguageFile[MAX_PATH];
 
-static const char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
+static const char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 static PCHAR NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
 static PCHAR NLList[] = {"CR","CR+LF", "LF", NULL};
 static PCHAR TermList[] =
@@ -1103,7 +1106,7 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 static PCHAR DataList[] = {"7 bit","8 bit",NULL};
 static PCHAR ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
 static PCHAR StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
-static PCHAR FlowList[] = {"Xon/Xoff","hardware","none",NULL};
+static PCHAR FlowList[] = {"Xon/Xoff", "RTS/CTS", "DSR/DTR", "none", NULL};
 
 static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -1128,6 +1131,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	WORD ComPortTable[MAXCOMPORT];
 	static char *ComPortDesc[MAXCOMPORT];
 	int comports;
+	WORD Flow;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -1190,7 +1194,22 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetDropDownList(Dialog, IDC_SERIALDATA, DataList, ts->DataBit);
 			SetDropDownList(Dialog, IDC_SERIALPARITY, ParityList, ts->Parity);
 			SetDropDownList(Dialog, IDC_SERIALSTOP, StopList, ts->StopBit);
-			SetDropDownList(Dialog, IDC_SERIALFLOW, FlowList, ts->Flow);
+
+			/* 
+			 * value               display
+			 * 1 IdFlowX           1 Xon/Xoff
+			 * 2 IdFlowHard        2 RTS/CTS
+			 * 3 IdFlowNone        4 none
+			 * 4 IdFlowHardDsrDtr  3 DSR/DTR
+			 */
+			Flow = ts->Flow;
+			if (Flow == 3) {
+				Flow = 4;
+			}
+			else if (Flow == 4) {
+				Flow = 3;
+			}
+			SetDropDownList(Dialog, IDC_SERIALFLOW, FlowList, Flow);
 
 			SetDlgItemInt(Dialog,IDC_SERIALDELAYCHAR,ts->DelayPerChar,FALSE);
 			SendDlgItemMessage(Dialog, IDC_SERIALDELAYCHAR, EM_LIMITTEXT,4, 0);
@@ -1227,7 +1246,21 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 							ts->StopBit = w;
 						}
 						if ((w = (WORD)GetCurSel(Dialog, IDC_SERIALFLOW)) > 0) {
-							ts->Flow = w;
+							/*
+							 * display    value
+							 * 1 Xon/Xoff 1 IdFlowX
+							 * 2 RTS/CTS  2 IdFlowHard
+							 * 3 DSR/DTR  4 IdFlowHardDsrDtr
+							 * 4 none     3 IdFlowNone
+							 */
+							Flow = w;
+							if (Flow == 3) {
+								Flow = 4;
+							}
+							else if (Flow == 4) {
+								Flow = 3;
+							}
+							ts->Flow = Flow;
 						}
 
 						ts->DelayPerChar = GetDlgItemInt(Dialog,IDC_SERIALDELAYCHAR,NULL,FALSE);
@@ -2242,6 +2275,10 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			// (2006.7.24 yutaka)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
 			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
+
+			// SFMTのバージョンを設定する
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "SFMT %s", SFMT_VERSION);
+			SetDlgItemTextA(Dialog, IDC_SFMT_VERSION, buf);
 
 			// ビルドしたときに使われたコンパイラを設定する。(2009.3.3 yutaka)
 			GetCompilerInfo(tmpbuf, sizeof(tmpbuf));

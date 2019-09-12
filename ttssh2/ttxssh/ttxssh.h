@@ -108,6 +108,7 @@ HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 #define ID_SSHUNKNOWNHOST     62502
 #define ID_SSHDIFFERENTKEY    62503
 #define ID_SSHASYNCMESSAGEBOX 62504
+#define ID_SSHDIFFERENT_TYPE_KEY 62505
 
 #define OPTION_NONE     0
 #define OPTION_CLEAR    1
@@ -341,6 +342,8 @@ typedef struct _TInstVar {
 
 	// dialog resource
 	HFONT hFontFixed;		// hosts.c内のダイアログ用
+
+	bottom_half_known_hosts_t contents_after_known_hosts;
 
 } TInstVar;
 

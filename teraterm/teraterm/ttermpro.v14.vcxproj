@@ -64,7 +64,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation />
@@ -108,7 +108,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

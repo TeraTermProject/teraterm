@@ -1,7 +1,7 @@
 // ttx.cpp : DLL アプリケーション用のエントリ ポイントを定義します。
 //
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "resource.h"
 

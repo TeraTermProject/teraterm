@@ -38,7 +38,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <Lmcons.h>		// for UNLEN
+#include <lmcons.h>		// for UNLEN
 #include <crtdbg.h>
 
 #include "resource.h"
@@ -46,6 +46,7 @@
 #include "libputty.h"
 #include "tipwin.h"
 #include "auth.h"
+#include "helpid.h"
 
 #if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
 #define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
@@ -280,6 +281,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		{ IDC_SSHPASSWORDCAPTION, "DLG_AUTH_PASSWORD" },
 		{ IDC_REMEMBER_PASSWORD, "DLG_AUTH_REMEMBER_PASSWORD" },
 		{ IDC_FORWARD_AGENT, "DLG_AUTH_FWDAGENT" },
+		{ IDC_SSHAUTHMETHOD, "DLG_AUTH_METHOD" },
 		{ IDC_SSHUSEPASSWORD, "DLG_AUTH_METHOD_PASSWORD" },
 		{ IDC_SSHUSERSA, "DLG_AUTH_METHOD_RSA" },
 		{ IDC_SSHUSERHOSTS, "DLG_AUTH_METHOD_RHOST" },
@@ -993,6 +995,12 @@ canceled:
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->auth_state.auth_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		case IDC_SSHUSERNAME:
 			// ユーザ名がフォーカスを失ったとき (2007.9.29 maya)
 			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
@@ -1315,6 +1323,8 @@ void AUTH_notify_end_error(PTInstVar pvar)
 
 void AUTH_advance_to_next_cred(PTInstVar pvar)
 {
+	logprintf(LOG_LEVEL_VERBOSE, "User authentication will be shown by %d method.", pvar->auth_state.cur_cred.method);
+
 	pvar->auth_state.failed_method = pvar->auth_state.cur_cred.method;
 
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_NONE) {
@@ -1427,6 +1437,12 @@ static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			EndDialog(dlg, 0);
 			return TRUE;
 
+		case IDCLOSE:
+			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
+			pvar->auth_state.auth_dialog = NULL;
+			EndDialog(dlg, 0);
+			return TRUE;
+
 		default:
 			return FALSE;
 		}
@@ -1476,10 +1492,12 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	const static DlgTextInfo text_info[] = {
 		{ 0, "DLG_AUTHSETUP_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_AUTHSETUP_BANNER" },
+		{ IDC_SSH_USERNAME, "DLG_AUTHSETUP_USERNAME" },
 		{ IDC_SSH_NO_USERNAME, "DLG_AUTHSETUP_NO_USERNAME" },
 		{ IDC_SSH_DEFAULTUSERNAME, "DLG_AUTHSETUP_DEFAULT_USERNAME" },
 		{ IDC_SSH_WINDOWS_USERNAME, "DLG_AUTHSETUP_LOGON_USERNAME" },
 		{ IDC_SSH_WINDOWS_USERNAME_TEXT, "DLG_AUTHSETUP_LOGON_USERNAME_TEXT" },
+		{ IDC_SSH_AUTHMETHOD, "DLG_AUTHSETUP_METHOD" },
 		{ IDC_SSHUSEPASSWORD, "DLG_AUTHSETUP_METHOD_PASSWORD" },
 		{ IDC_SSHUSERSA, "DLG_AUTHSETUP_METHOD_RSA" },
 		{ IDC_SSHUSERHOSTS, "DLG_AUTHSETUP_METHOD_RHOST" },
@@ -1491,6 +1509,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		{ IDC_CHECKAUTH, "DLG_AUTHSETUP_CHECKAUTH" },
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDC_SSHAUTHSETUP_HELP, "BTN_HELP" },
 	};
 
 	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
@@ -1616,6 +1635,10 @@ static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
+			return TRUE;
+
+		case IDC_SSHAUTHSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSshauth, 0);
 			return TRUE;
 
 		case IDC_CHOOSERSAFILE:
@@ -1805,6 +1828,17 @@ void AUTH_notify_disconnecting(PTInstVar pvar)
 		PostMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDCANCEL, 0);
 		/* the main window might not go away if it's not enabled. (see vtwin.cpp) */
 		EnableWindow(pvar->NotificationWindow, TRUE);
+	}
+}
+
+// TCPセッションがクローズされた場合、認証ダイアログを閉じるように指示を出す。
+// AUTH_notify_disconnecting()とは異なり、ダイアログを閉じるのみで、
+// SSHサーバに通知は出さない。
+void AUTH_notify_closing_on_exit(PTInstVar pvar)
+{
+	if (pvar->auth_state.auth_dialog != NULL) {
+		logprintf(LOG_LEVEL_INFO, "%s: Notify closing message to the authentication dialog.", __FUNCTION__);
+		PostMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDCLOSE, 0);
 	}
 }
 

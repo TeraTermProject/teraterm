@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-08-16)
+; Updated by TeraTerm Project (2019-09-11)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -228,10 +228,11 @@ DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку
 DLG_TAB_COPYPASTE_PASTEDELAY2=мс
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
-DLG_TAB_VISUAL_ALPHA=&Прозрачный
+DLG_TAB_VISUAL_ALPHA=Непрозрачность окна
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
 DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
+DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
 DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=&Яркость изображения
 DLG_TAB_VISUAL_MOUSE=&Курсор мыши
@@ -312,6 +313,8 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
+TOOLTIP_TITLEBAR_OPACITY=непрозрачность %.1f %%
+
 ; commonlib.c
 MSG_WINSOCK_ERROR=Не удается использовать winsock
 MSG_INVALID_HOST_ERROR=Неверный хост
@@ -343,7 +346,7 @@ DLG_GEN_LANG_UI=&Язык меню:
 DLG_HOST_TITLE=Tera Term: Новое соединение
 DLG_HOST_TCPIPHOST=&Хост:
 DLG_HOST_TCPIPPORT=&TCP-порт#:
-DLG_HOST_TCPIPPROTOCOL=&Протокол:
+DLG_HOST_TCPIPPROTOCOL=&IP версия:
 DLG_HOST_SERIAL=&COM
 DLG_HOST_SERIALPORT=&Порт:
 
@@ -592,6 +595,7 @@ DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
 DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=&Запомнить пароль в памяти
 DLG_AUTH_FWDAGENT=&Первый агент
+DLG_AUTH_METHOD=Authentication methods
 DLG_AUTH_METHOD_PASSWORD=&Вход с простым паролем
 DLG_AUTH_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
 DLG_AUTH_METHOD_RHOST=Вход с r&hosts (SSH1)
@@ -611,10 +615,12 @@ MSG_PAGEANT_NOKEY=Нет действующего ключа к Pageant.
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Настройка аутентификации
 DLG_AUTHSETUP_BANNER=Выбрать по умолчанию:
+DLG_AUTHSETUP_USERNAME=User name
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_USERNAME=U&se default username
 DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
 DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_METHOD=Authentication methods
 DLG_AUTHSETUP_METHOD_PASSWORD=&Вход с простым паролем
 DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
 DLG_AUTHSETUP_METHOD_RHOST=&Вход с rhosts (SSH1)
@@ -695,7 +701,7 @@ DLG_HOST_TCPIPSERVICE=Сервис
 DLG_HOST_TCPIPOTHER=Другие
 DLG_HOST_TCPIPPORT=&порт TCP#:
 DLG_HOST_TCPIPSSHVERSION=&версия SSH:
-DLG_HOST_TCPIPPROTOCOL=&протокол:
+DLG_HOST_TCPIPPROTOCOL=&IP версия:
 DLG_HOST_SERIAL=&COM
 DLG_HOST_SERIALPORT=&Порт:
 DLG_HOST_HELP=&Помощь
@@ -779,6 +785,8 @@ DLG_SSHSETUP_HOSTKEY_ROTATION=&Смена ключа
 DLG_SSHSETUP_HOSTKEY_ROTATION_NO=Нет
 DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Да
 DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Запрос
+DLG_SSHSETUP_LOGLEVEL=&LogLevel
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 to turn off)
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Выберите файл чтения/записи известных хостов
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы добавить
@@ -939,6 +947,7 @@ BTN_DISCONNECT=&Разъединение
 BTN_CONTINUE=&Продолжение
 BTN_YES=&Yes
 BTN_NO=&No
+BTN_HELP=&Help
 
 
 [TTProxy]

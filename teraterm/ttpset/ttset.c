@@ -1070,6 +1070,10 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->Flow = IdFlowX;
 	else if (_stricmp(Temp, "hard") == 0)
 		ts->Flow = IdFlowHard;
+	else if (_stricmp(Temp, "rtscts") == 0)  // hard‚Ærtscts‚Í“¯‚¶ˆÓ–¡
+		ts->Flow = IdFlowHard;
+	else if (_stricmp(Temp, "dsrdtr") == 0)
+		ts->Flow = IdFlowHardDsrDtr;
 	else
 		ts->Flow = IdFlowNone;
 
@@ -2638,6 +2642,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	case IdFlowHard:
 		strncpy_s(Temp, sizeof(Temp), "hard", _TRUNCATE);
 		break;
+	case IdFlowHardDsrDtr:
+		strncpy_s(Temp, sizeof(Temp), "dsrdtr", _TRUNCATE);
+		break;
 	default:
 		strncpy_s(Temp, sizeof(Temp), "none", _TRUNCATE);
 	}
@@ -3048,6 +3055,8 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, Temp);
 	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, Temp, ts->BGImgBrightness);
 	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, Temp, ts->BGImgBrightness);
+	WriteOnOff(ETERM_SECTION, "BGIgnoreThemeFile", FName,
+		ts->EtermLookfeel.BGIgnoreThemeFile);
 
 #ifdef USE_NORMAL_BGCOLOR
 	// UseNormalBGColor

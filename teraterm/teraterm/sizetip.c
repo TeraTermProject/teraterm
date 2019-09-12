@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include "TipWin.h"
+#include "tipwin.h"
 
 static TipWin *SizeTip;
 static int tip_enabled = 0;
@@ -54,6 +54,11 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 		// マルチモニタがサポートされている場合
 		HMONITOR hm;
 		MONITORINFO mi;
+		int ix, iy;
+
+		// 元の座標を保存しておく
+		ix = point->x;
+		iy = point->y;
 
 		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
 		if (hm == NULL) {
@@ -69,12 +74,15 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 
 		mi.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hm, &mi);
-		if (point->x < mi.rcMonitor.left + FrameWidth) {
-			point->x = mi.rcMonitor.left + FrameWidth;
+		if (ix < mi.rcMonitor.left + FrameWidth) {
+			ix = mi.rcMonitor.left + FrameWidth;
 		}
-		if (point->y < mi.rcMonitor.top + FrameWidth) {
-			point->y = mi.rcMonitor.top + FrameWidth;
+		if (iy < mi.rcMonitor.top + FrameWidth) {
+			iy = mi.rcMonitor.top + FrameWidth;
 		}
+		
+		point->x = ix;
+		point->y = iy;
 	}
 	else
 	{
@@ -88,33 +96,68 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 	}
 }
 
-void UpdateSizeTip(HWND src, int cx, int cy)
+/* リサイズ用ツールチップを表示する
+ *
+ * 引数：
+ *   src        ウィンドウハンドル
+ *   cx, cy     ツールチップに表示する縦横サイズ
+ *   fwSide     リサイズ時にどこのウィンドウを掴んだか
+ *   newX, newY リサイズ後の左上の座標
+ *
+ * 注意： Windows9x では動作しない
+ */
+void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 {
 	TCHAR str[32];
+	int tooltip_movable = 0;
 
 	if (!tip_enabled)
 		return;
 
 	/* Generate the tip text */
-
 	_stprintf_s(str, _countof(str), _T("%dx%d"), cx, cy);
+
+	// ウィンドウの右、右下、下を掴んだ場合は、ツールチップを左上隅に配置する。
+	// それら以外はリサイズ後の左上隅に配置する。
+	if (!(fwSide == WMSZ_RIGHT || fwSide == WMSZ_BOTTOMRIGHT || fwSide == WMSZ_BOTTOM)) {
+		tooltip_movable = 1;
+	}
 
 	if (SizeTip == NULL) {
 		RECT wr;
 		POINT point;
+		int w, h;
+
+		// 文字列の縦横サイズを取得する
+		TipWinGetTextWidthHeight(src, str, &w, &h);
+
 		// ウィンドウの位置を取得
 		GetWindowRect(src, &wr);
-		// sizetipを出す位置は、ウィンドウ左上-(8,16)
-		point.x = wr.left - 16;
-		point.y = wr.top - 8;
+
+		// sizetipを出す位置は、ウィンドウ左上(X, Y)に対して、
+		// (X, Y - 文字列の高さ - FRAME_WIDTH * 2) とする。
+		point.x = wr.left;
+		point.y = wr.top - (h + FRAME_WIDTH * 2);
 		FixPosFromFrame(&point, 16, FALSE);
 		cx = point.x;
 		cy = point.y;
+
 		SizeTip = TipWinCreate(src, cx, cy, str);
+
+		//OutputDebugPrintf("Created: (%d,%d)\n", cx, cy);
+
 	} else {
 		/* Tip already exists, just set the text */
 		TipWinSetText(SizeTip, str);
 		//SetWindowText(tip_wnd, str);
+
+		//OutputDebugPrintf("Updated: (%d,%d)\n", cx, cy);
+
+		// ウィンドウの左上が移動する場合
+		if (tooltip_movable) {
+			TipWinSetPos(SizeTip, newX + FRAME_WIDTH*2, newY + FRAME_WIDTH*2);
+			//OutputDebugPrintf("Moved: (%d,%d)\n", newX, newY);
+		}
 	}
 }
 

@@ -263,17 +263,24 @@ If the configuration is enabled as whole system, execute the upper command with 
 
     <h2 id="TabVisual">"Visual" tab</h2>
     <dl>
-      <dt id="AlphaBlendActive">Window Transparency / Active</dt>
-      <dt id="AlphaBlend">Window Transparency / Inactive</dt>
+      <dt id="AlphaBlendActive">Window Opacity / Active</dt>
+      <dt id="AlphaBlend">Window Opacity / Inactive</dt>
       <dd>
-	You can set up the value of transparency when the window is active (on focus) and not active (non-focus).
-	The range of transparency is from 0 to 255. The more transparency reduces the value, the more
+	You can set up the value of opacity when the window is active (on focus) and not active (non-focus).
+	The range of opacity is from 0 to 255. The more reduces the this value, the more
 	window transparency is blinding.
       </dd>
 
       <dt>Eterm lookfeel</dt>
       <dd>
-	Tera Term window looks like Eterm look-feel background transparency.
+	Tera Term window looks like Eterm look-feel background transparency. <br>
+	<strong>NOTICE: You need to save setup and restart Tera Term for enabling this settings.</strong>
+      </dd>
+
+     <dt id="MixedThemeFile">Mixed ThemeFile to Background</dt>
+      <dd>
+	When the Eterm look-feel feature is enabled, you can specify whether to mix the wallpaper and the image of theme file. <br>
+	Howerver, this option can not be used with Background Image at the same time. <br>
       </dd>
 
       <dt>Background Image</dt>

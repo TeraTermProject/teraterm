@@ -34,7 +34,7 @@ extern "C" {
 
 /* prototypes */
 //<!--by AKASI
-void BGInitialize(void);
+void BGInitialize(BOOL initialize_once);
 void BGSetupPrimary(BOOL);
 
 void BGExchangeColor(void);

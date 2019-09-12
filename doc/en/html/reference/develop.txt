@@ -50,7 +50,7 @@
 
 
 * Libraries
-- Oniguruma 6.9.2 (https://github.com/kkos/oniguruma)
+- Oniguruma 6.9.3 (https://github.com/kkos/oniguruma)
 - OpenSSL 1.0.2s (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
@@ -150,6 +150,7 @@ Example: adding a TTSSH menu under File menu
      (1) Extract SFMT source into libs/SFMT directory.
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
      (3) Move 'libs' directory on the command prompt. And run buildSFMT.bat.
+     (4) Modify version information in libs/SFMT/SFMT_version_for_teraterm.h if necessary.
 
 
 * How to build Tera Term

@@ -31,30 +31,64 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_4.104">2019.xx.xx (Ver 4.104)</h3>
+<h3 id="teraterm_4.105">2019.xx.xx (Ver 4.105)</h3>
 <ul class="history">
   <li>Changes
     <ul>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in Ver 4.102.</li>
-      <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
-      <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
-      <li>Unspecified string font in IME uses your defined font.</li>
-      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
+      <li>Added support for hardware flow control DSR/DTR with serial connection.
+        <ul>
+          <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
+          <li>MARCO: The DSR/DRT can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
+        </ul></li>
+      <li>Added SFMT information on version dialog.</li>
+      <li>Changed of indication from "Protocol" to "IP version" and from "UNSPEC" to "AUTO" on <a href="../menu/file-new.html">New connection dialog</a>.</li>
+      <li>When the opacity value of the window is temporarily changed by operating the mouse wheel on the title bar of VT window, the tooltip of the opacity value is shown.</li>
+      <li>The location of resizing toolchip is automatically moved to coordinates after resizing.</li>
+      <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+      <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
     </ul>
   </li>
   <li>Bug fixes
     <ul>
+      <li>The toolchip during resizing can not be displayed on the left and top edge of the desktop. This bug was introduced in 4.103.</li>
+      <li>Eterm look-feel: When a image file is randomly selected with the wallpaper, invalid file may be selected. </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded TTSSH to <a href="#ttssh_2.91">2.91</a>.</li>
+      <li>upgraded TTProxy to <a href="#ttproxy_1.0.0.26">1.0.0.26</a>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_4.104">2019.08.31 (Ver 4.104)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
+      <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
+      <li>Unspecified string font in IME uses your defined font.</li>
+      <li>Added help button on Additional settings dialog.</li>
+      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in 4.102.</li>
+      <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
+    </ul>
+  </li>
+  <li>Bug fixes
+    <ul>
+      <li>When UTF-8 characters received, 4-byte UTF-8 characters are miss-decoded.</li>
       <li>When the Active Window Tracking is enabled, mouse cursor won't be active in Tera Term window. This bug was introduced in 4.103.</li>
-      <li>When UTF-8 characters received, 4-byte UTF-8 characters are miss-decorded.</li>
-      <li>The plugin compiled before 4.103 can not called because the DLL's calling convention is changed in Tera Term 4.103. </li>
-      <li>Displayed unspecified string font in IME changes, when you open the font setting dialog.</li>
-      <li>The session number of window title is always 1.</li>
-      <li>MACRO: <a href="../macro/command/filecopy.html">filecopy</a> command may not store the result to result system variable.</li>
+      <li>The session number of window title is always 1. This bug was introduced in 4.103.</li>
+      <li>When the font selection dialog is used while undetermined characters of IME are displayed , the font ot IME always is changed.</li>
+      <li>When the locale setting is default(japanese) or invalid on English version of Windows, an application fault immediately occurs after starting Tera Term.</li>
       <li>A big file can not send by using [File]/[Send file..]. This bug was introduced in 4.103.</li>
+      <li>Cancel printing dialog can not be shown. This bug was introduced in 4.103.</li>
+      <li>The plugin compiled before 4.103 can not called because the DLL's calling convention is changed in Tera Term 4.103. </li>
+      <li>MACRO: <a href="../macro/command/listbox.html">listbox</a> command can not adjust the width of list according to the window size. This bug was introduced in 4.103.</li>
+      <li>MACRO: <a href="../macro/command/filecopy.html">filecopy</a> command may not store the result to result system variable.</li>
       <li>MACRO: <a href="../macro/command/filelock.html">filelock</a> and <a href="../macro/command/fileunlock.html">fileunlock</a> command always fail. This bug was introduced in 4.101.</li>
       <li>MACRO: When the first byte of the file is matched by using <a href="../macro/command/filestrseek2.html">filestrseek2</a> command, the file pointer is invalid. This bug was introduced in 4.101.</li>
-      <li>Cancel printing dialog can not be shown. This bug was introduced in 4.103.</li>
-      <li>When the locale setting is default(japanese) or invalid on English version of Windows, an application fault immediately occurs after starting Tera Term.</li>
     </ul>
   </li>
 
@@ -62,6 +96,7 @@
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.90">2.90</a>.</li>
       <li>upgraded TTProxy to <a href="#ttproxy_1.0.0.25">1.0.0.25</a>.</li>
+      <li>upgraded Oniguruma to 6.9.3.</li>
     </ul>
   </li>
 </ul>
@@ -3162,28 +3197,50 @@ SYNOPSIS:
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_2.90">2019.xx.xx (Ver 2.90)</h3>
+<h3 id="ttssh_2.91">2019.xx.xx (Ver 2.91)</h3>
 <ul class="history">
   <li>Changes
     <ul>
-      <li></li>
+      <li>Changed of indication from "Protocol" to "IP version" and from "UNSPEC" to "AUTO" on <a href="../menu/file-new.html">New connection dialog</a>.</li>
+      <li>The display timing of the user authentication dialog is changed to display after the known_hosts dialog.</li>
+      <li>The LogLevel entry is added on the <a href="../menu/setup-ssh.html#LogLevel">Setup dialog</a>.</li>
+      <li>The help button are added on the <a href="../menu/setup-ssh.html">Setup dialog</a>, <a href="../menu/setup-sshauth.html">Authentication Setup dialog</a>, <a href="../menu/setup-sshforward.html">Forwarding dialog</a> and <a href="../menu/setup-sshkeygenerator.html">Key Generator dialog</a>.</li>
+      <li>When the network is disconnected from SSH server side, the known_hosts and user authentication dialog are automatically closed while the dialog is shown.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
+      <li>The same messages may be included on MessageBox displaying.</li>
+      <li>When the network is disconnected from SSH server side, an application fault may be occurred while known_hosts dialog is shown.</li>
+      <li>SSH1: The <a href="../commandline/ttssh.html#nosecuritywarning">/nosecuritywarning</a> option does not work well.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttssh_2.90">2019.08.31 (Ver 2.90)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
       <li>SSH2: When SSH communication is slow by using port forwarding, an application fault is occurred due to increase memory consumption.</li>
       <li>SSH2: When SCP transfer dialog is closed, the directory of file transfer setting and the SCP destination path setting may not be updated.</li>
+      <li>SSH2: When SCP transfer is started on Windows 95/98/Me, an application fault occurs.</li>
       <li>SSH1: When the destination port number is other than 22, an application fault may be occurred after the host key is newly written to known_hosts file.</li>
       <li>SSH1: The rhosts authentication could not be performed at all.</li>
     </ul>
   </li>
 
-  <li>Misc
+  <!--li>Misc
     <ul>
       <li></li>
     </ul>
-  </li>
+  </li-->
 </ul>
 
 <h3 id="ttssh_2.89">2019.06.15 (Ver 2.89)</h3>
@@ -4789,9 +4846,36 @@ SYNOPSIS:
 
 <h2 id="ttproxy">TTProxy</h2>
 
-<h3 id="ttproxy_1.0.0.25">2019.xx.xx (Ver 1.0.0.25)</h3>
+<h3 id="ttproxy_1.0.0.26">2019.xx.xx (Ver 1.0.0.26)</h3>
 <ul class="history">
-      <li>Depending on OS, it's not working correctly. This bug was introduced in 4.103.</li>
+  <li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li>
+  
+  <li>Bug fixes
+    <ul>
+      <li>When the HTTP proxy connection fails and the status code is other than 400,401,403,405,406,407, invalid string are shown in the message box.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttproxy_1.0.0.25">2019.08.31 (Ver 1.0.0.25)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>When the negotiation is failed with SOCKS4 and 5, an error information is added to message.</li>
+    </ul>
+  </li>
+  
+  <li>Bug fixes
+    <ul>
+      <li>Bug fix: Depending on OS, setup dialog is not working correctly. This bug was introduced in 4.103.</li>
+      <li>Bug fix: When the hostname setting is domain, IPv6 and IPv4 fallback does not work well. And also, when you can not connect to the proxy server, Connection refused dialog is shown three times in a row.</li>
+      <li>Bug fix: When data can not receive from SOCKS server during negotiation with SOCKS4 and 5, the data may not be handled as an error.</li>
+    </ul>
+  </li>
 </ul>
 
 <h3 id="ttproxy_1.0.0.24">2016.11.30 (Ver 1.0.0.24)</h3>

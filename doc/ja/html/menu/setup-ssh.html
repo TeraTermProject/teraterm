@@ -321,6 +321,52 @@
 	SSH1 の場合は、Compression level が 0 であれば圧縮が無効、1 以上であれば圧縮が有効になります。<br>
 	SSH2 の場合は、Compression order で圧縮を有効にします。そのうえで Compression level を 1 以上にすると圧縮が有効になります。
       </dd>
+
+      <dt id="LogLevel">LogLevel</dt>
+      <dd>
+	TTSSHのデバッグレベルを指定します。<br>
+	デバッグレベルが 0 より大きい場合、デバッグ情報が ttermpro.exe があるディレクトリ配下に<br>
+	「TTSSH.LOG」、「ssh2connect.log」、「ssh2packet.log」というファイルに記録されます。<br>
+	<table border="1">
+	  <tr>
+	    <td>値</td>
+	    <td>意味</td>
+	  </tr>
+	  <tr>
+	    <td>0</td>
+	    <td>無効</td>
+	  </tr>
+	  <tr>
+	    <td>5</td>
+	    <td>Fatal</td>
+	  </tr>
+	  <tr>
+	    <td>10</td>
+	    <td>Error</td>
+	  </tr>
+	  <tr>
+	    <td>30</td>
+	    <td>Warning</td>
+	  </tr>
+	  <tr>
+	    <td>50</td>
+	    <td>Notice</td>
+	  </tr>
+	  <tr>
+	    <td>80</td>
+	    <td>Information</td>
+	  </tr>
+	  <tr>
+	    <td>100</td>
+	    <td>Verbose</td>
+	  </tr>
+	  <tr>
+	    <td>200</td>
+	    <td>SSH Dump</td>
+	  </tr>
+	</table>
+      </dd>
+
     </dl>
   </body>
 </html>

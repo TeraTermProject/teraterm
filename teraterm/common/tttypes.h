@@ -45,6 +45,7 @@
 #define IdPrnProcTimer       9
 #define IdCancelConnectTimer 10  // add (2007.1.10 yutaka)
 #define IdPasteDelayTimer    11
+#define IdOpacityTipTimer	12	// add (2019.9.7 yasuhide)
 
   /* Window Id */
 #define IdVT  1
@@ -402,6 +403,7 @@ typedef struct {
 	int BGNoCopyBits;
 	int BGNoFrame;
 	char BGThemeFile[MAX_PATH];
+	int BGIgnoreThemeFile;
 } eterm_lookfeel_t;
 
 typedef struct cygterm {
@@ -816,8 +818,10 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdStopBit2  3
   /* Flow control ID */
 #define IdFlowX 1
-#define IdFlowHard 2
+#define IdFlowHard 2    // RTS/CTS(hardware flow)
 #define IdFlowNone 3
+#define IdFlowHardDsrDtr 4  // DSR/DTR(hardware flow)
+
 
 /* GetHostName dialog record */
 typedef struct {

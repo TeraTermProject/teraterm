@@ -31,30 +31,64 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_4.104">2019.xx.xx (Ver 4.104)</h3>
+<h3 id="teraterm_4.105">2019.xx.xx (Ver 4.105)</h3>
 <ul class="history">
   <li>変更
     <ul>
-      <li><a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで、ファイルが開けない場合にエラーにならないようにした。Ver 4.102での変更を元に戻した。</li>
-      <li><a href="../macro/command/filetruncate.html">filetruncate</a> マクロコマンドで、ファルが開けない場合・ファイルサイズの変更に失敗した場合にエラーにならないようにした。</li>
-      <li><a href="../menu/file-chdir.html">ファイル転送のためのディレクトリ</a>に含まれる環境変数を展開するようにした。</li>
-      <li>IMEの未確定文字のフォントが指定フォントと同一になるようにした。</li>
-      <li><a href="../setup/teraterm-win.html#textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a>を<a href="../menu/setup-additional.html#SelectOnActivate">Additional settingsダイアログ</a>で設定できるようにした。</li>
+      <li>シリアル接続でハードウェアフロー制御DSR/DTRをサポートした。
+        <ul>
+          <li><a href="../menu/setup-serialport.html">Serial port ([Setup] メニュー)</a>のFlow controlでhardwareをRTS/CTSに変更し、新しくDSR/DTRを追加した。</li>
+          <li><a href="../macro/command/setflowctrl.html">setflowctrl</a>マクロコマンドで DSR/DTR を指定できるようにした。</li>
+        </ul></li>
+      <li>バージョン情報ダイアログにSFMTの表記を追加した。</li>
+      <li><a href="../menu/file-new.html">New connectionダイアログ</a>の表記を「Protocol」から「IP version」に、「UNSPEC」を「AUTO」に変更した。</li>
+      <li>VT ウィンドウのタイトルバー上でマウスホイールを操作してウィンドウの不透明度を一時的に変更するとき、不透明度をツールチップに表示するようにした。</li>
+      <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、不透明度をスライダーで指定できるようにした。</li>
+      <li>リサイズ中の縦横サイズツールチップの表示位置をリサイズ後の座標に追従するようにした。</li>
+      <li>Eterm look-feel: <a href="../menu/setup-additional.html#MixedThemeFile">壁紙と画像を混合する</a>を設定できるようにした。teraterm.ini に <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> エントリを追加した。デフォルトはoff。</li>
     </ul>
   </li>
   <li>バグ修正
     <ul>
-      <li>Active Window Tracking を有効時、マウスカーソルが Tera Term のウィンドウ内に移動しても、アクティブにならない問題を修正した。4.103でのエンバグ。</li>
+      <li>リサイズ中の縦横サイズツールチップが、デスクトップの左端と上端で表示されなくなっていた問題を修正した。4.103でのエンバグ。</li>
+      <li>Eterm look-feel: 壁紙と混合する画像ファイルをランダムに選択する際、無関係なファイルを選択することがある問題を修正した。</li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_2.91">TTSSH(2.91)</a>へ差し替えた。</li>
+      <li><a href="#ttproxy_1.0.0.26">TTProxy(1.0.0.26)</a>へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_4.104">2019.08.31 (Ver 4.104)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li><a href="../setup/teraterm-win.html#textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a>を<a href="../menu/setup-additional.html#SelectOnActivate">Additional settingsダイアログ</a>で設定できるようにした。</li>
+      <li><a href="../menu/file-chdir.html">ファイル転送のためのディレクトリ</a>に含まれる環境変数を展開するようにした。</li>
+      <li>IMEの未確定文字のフォントが指定フォントと同一になるようにした。</li>
+      <li>Additional settingsダイアログにヘルプボタンを追加した。</li>
+      <li><a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで、ファイルが開けない場合にエラーにならないようにした。4.102での変更を元に戻した。</li>
+      <li><a href="../macro/command/filetruncate.html">filetruncate</a> マクロコマンドで、ファルが開けない場合・ファイルサイズの変更に失敗した場合にエラーにならないようにした。</li>
+    </ul>
+  </li>
+  <li>バグ修正
+    <ul>
       <li>UTF-8受信時、4byteのUTF-8のデコードを誤っていたので修正した。</li>
-      <li>Ver 4.103 で DLL の呼び出し規約を変えたことで、それ以前にコンパイルされたプラグインが呼び出せなくなっていた問題を修正した。</li>
+      <li>Active Window Tracking を有効時、マウスカーソルが Tera Term のウィンドウ内に移動しても、アクティブにならない問題を修正した。4.103でのエンバグ。</li>
+      <li>ウィンドウタイトルのセッション番号が常に1となる問題を修正した。4.103でのエンバグ。</li>
       <li>IMEの未確定文字を表示している状態でフォント選択ダイアログを使用するとIMEのフォントが変化する問題を修正した。</li>
-      <li>ウィンドウタイトルのセッション番号が常に1となる問題を修正した。</li>
-      <li><a href="../macro/command/filecopy.html">filecopy</a> マクロコマンドの結果が result システム変数に格納されないことがある問題を修正した。</li>
+      <li>英語版Windowsで、ロケール設定がデフォルト(japanese)もしくは不適切な場合、Tera Termを起動してすぐにアプリケーションフォルトとなる問題を修正した。</li>
       <li>[File]/[Send file..]から大きなファイルをうまく送信できない問題を修正した。4.103でのエンバグ。</li>
+      <li>印字中止ダイアログが出なくなっていた問題を修正した。4.103でのエンバグ。</li>
+      <li>4.103 で DLL の呼び出し規約を変えたことで、それ以前にコンパイルされたプラグインが呼び出せなくなっていた問題を修正した。</li>
+      <li><a href="../macro/command/listbox.html">listbox</a> マクロコマンドで、ウィンドウサイズに合わせてリストの横幅を調整できていなかった問題を修正した。4.103でのエンバグ。</li>
+      <li><a href="../macro/command/filecopy.html">filecopy</a> マクロコマンドの結果が result システム変数に格納されないことがある問題を修正した。</li>
       <li><a href="../macro/command/filelock.html">filelock</a>, <a href="../macro/command/fileunlock.html">fileunlock</a> マクロコマンドが常に失敗していた。4.101でのエンバグ。</li>
       <li><a href="../macro/command/filestrseek2.html">filestrseek2</a>マクロコマンドで、ファイルの1バイト目が一致したとき、ファイルポインタが先頭になっていなかった問題を修正した。4.101でのエンバグ。</li>
-      <li>印字中止ダイアログが出なくなっていた問題を修正した。4.103でのエンバグ。</li>
-      <li>英語版Windowsで、ロケール設定がデフォルト(japanese)もしくは不適切な場合、Tera Termを起動してすぐにアプリケーションフォルトとなる問題を修正した。</li>
     </ul>
   </li>
 
@@ -62,6 +96,7 @@
     <ul>
       <li><a href="#ttssh_2.90">TTSSH(2.90)</a>へ差し替えた。</li>
       <li><a href="#ttproxy_1.0.0.25">TTProxy(1.0.0.25)</a>へ差し替えた。</li>
+      <li>Oniguruma 6.9.3へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -3168,28 +3203,50 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_2.90">2019.xx.xx (Ver 2.90)</h3>
+<h3 id="ttssh_2.91">2019.xx.xx (Ver 2.91)</h3>
 <ul class="history">
   <li>変更
     <ul>
-      <li></li>
+      <li><a href="../menu/file-new.html">New connectionダイアログ</a>の表記を「Protocol」から「IP version」に、「UNSPEC」を「AUTO」に変更した。</li>
+      <li>ユーザ認証ダイアログの表示タイミングをknown_hostsダイアログの後に変更した。</li>
+      <li><a href="../menu/setup-ssh.html#LogLevel">Setupダイアログ</a>にLogLevelを追加した。</li>
+      <li><a href="../menu/setup-ssh.html">Setupダイアログ</a>、<a href="../menu/setup-sshauth.html">Authentication Setupダイアログ</a>、<a href="../menu/setup-sshforward.html">Forwardingダイアログ</a>、<a href="../menu/setup-sshkeygenerator.html">Key Generatorダイアログ</a>にヘルプボタンを追加した。</li>
+      <li>known_hostsダイアログおよびユーザ認証ダイアログの表示中に、SSHサーバ側からネットワーク切断された場合、ダイアログを自動で閉じるようにした。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
+      <li>メッセージボックスの表示に同一メッセージが複数含まれることがある問題を修正した。</li>
+      <li>known_hostsダイアログの表示中にSSHサーバ側からネットワーク切断されると、アプリがクラッシュすることがある問題を修正した。</li>
+      <li>SSH1: <a href="../commandline/ttssh.html#nosecuritywarning">/nosecuritywarning</a>オプションが機能していなかった問題を修正した。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttssh_2.90">2019.08.31 (Ver 2.90)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
       <li>SSH2: ポート転送でSSH通信が遅い場合において、消費メモリが肥大化してアプリが落ちる問題を修正した。</li>
       <li>SSH2: SCP 転送ダイアログを閉じるときに、ファイル転送ディレクトリ設定・SCP送信先パス設定が更新されないことがある問題を修正した。</li>
+      <li>SSH2: Windows95/98/MeでSCP通信を開始すると、アプリが落ちる問題を修正した。</li>
       <li>SSH1: 接続先のポート番号が22以外で、新規にknown_hostsファイルへホスト鍵を書き込む時、アプリが落ちることがある問題を修正した。</li>
       <li>SSH1: rhosts認証ができなくなっていた問題を修正した。</li>
     </ul>
   </li>
 
-  <li>その他
+  <!--li>その他
     <ul>
       <li></li>
     </ul>
-  </li>
+  </li-->
 </ul>
 
 <h3 id="ttssh_2.89">2019.06.15 (Ver 2.89)</h3>
@@ -4794,9 +4851,36 @@
 
 <h2 id="ttproxy">TTProxy</h2>
 
-<h3 id="ttproxy_1.0.0.25">2019.xx.xx (Ver 1.0.0.25)</h3>
+<h3 id="ttproxy_1.0.0.26">2019.xx.xx (Ver 1.0.0.26)</h3>
 <ul class="history">
-      <li>OSによって正しく動作しない不具合を修正。<a href="#teraterm_4.103">teraterm 4.103</a>でのエンバグ。</li>
+  <li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li>
+  
+  <li>バグ修正
+    <ul>
+      <li>HTTPプロキシ接続がエラーとなり、ステータスコードが400,401,403,405,406,407以外だった場合、メッセージボックスにゴミが表示される問題を修正した。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttproxy_1.0.0.25">2019.08.31 (Ver 1.0.0.25)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>SOCKS4/5とネゴシエーションが失敗した場合、エラー情報をメッセージに追加した。</li>
+    </ul>
+  </li>
+  
+  <li>バグ修正
+    <ul>
+      <li>OSによって設定ダイアログが正しく動作しない不具合を修正。<a href="#teraterm_4.103">teraterm 4.103</a>でのエンバグ。</li>
+      <li>ホスト名の設定がドメインの場合において、IPv6/IPv4フォールバックが動作しない問題を修正した。かつ、プロキシサーバに接続できない場合、Connection refusedダイアログが3回連続表示される問題も修正した。</li>
+      <li>SOCKS4/5とネゴシエーション中に、SOCKSサーバからデータ受信できない場合、エラー扱いにできていないことがある問題を修正した。</li>
+    </ul>
+  </li>
 </ul>
 
 <h3 id="ttproxy_1.0.0.24">2016.11.30 (Ver 1.0.0.24)</h3>

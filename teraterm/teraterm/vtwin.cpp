@@ -144,6 +144,9 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
+static TipWin *OpacityTip;
+static POINT OpacityTipPts;
+
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
 #endif
@@ -173,6 +176,13 @@ static void SetMouseCursor(const char *cursor)
 
 	if (hc != NULL) {
 		SetClassLongPtr(HVTWin, GCLP_HCURSOR, (LONG_PTR)hc);
+	}
+}
+
+static void DestroyTooltip(TipWin* *tooltip) {
+	if (*tooltip) {
+		TipWinDestroy(*tooltip);
+		(*tooltip) = NULL;
 	}
 }
 
@@ -1523,7 +1533,7 @@ void CVTWindow::ResetSetup()
 
 	/* background and ANSI color */
 #ifdef ALPHABLEND_TYPE2
-	BGInitialize();
+	BGInitialize(FALSE);
 	BGSetupPrimary(TRUE);
 	// 2006/03/17 by 337 : Alpha値も即時変更
 	// Layered窓になっていない場合は効果が無い
@@ -2535,12 +2545,35 @@ BOOL CVTWindow::OnMouseWheel(
 		if (InTitleBar) {
 			int delta = zDelta < 0 ? -1 : 1;
 			int newAlpha = Alpha;
+			TCHAR tipbuf[32];
+			TCHAR uimsg[MAX_UIMSG];
+
 			newAlpha += delta * ts.MouseWheelScrollLine;
 			if (newAlpha > 255)
 				newAlpha = 255;
 			else if (newAlpha < 0)
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
+
+			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
+			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
+			::SetTimer(HVTWin, IdOpacityTipTimer, 1000, NULL);
+
+			if (OpacityTipPts.x != pt.x ||
+			    OpacityTipPts.y != pt.y) {
+				DestroyTooltip(&OpacityTip);
+			}
+
+			if (OpacityTip == NULL) {
+				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf);
+				OpacityTipPts.x = pt.x;
+				OpacityTipPts.y = pt.y;
+			} else {
+				TipWinSetText(OpacityTip, tipbuf);
+				// ツールチップのリサイズが失敗したように見える問題の暫定対策
+				TipWinSetText(OpacityTip, tipbuf);
+			}
+
 			return TRUE;
 		}
 	}
@@ -2794,7 +2827,7 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 	if (h <= 0)
 		h = 1;
 
-	UpdateSizeTip(HVTWin, w, h);
+	UpdateSizeTip(HVTWin, w, h, fwSide, pRect->left, pRect->top);
 
 	fixed_width = w * FontWidth + margin_width;
 	fixed_height = h * FontHeight + margin_height;
@@ -2963,6 +2996,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case IdProtoTimer:
 			ProtoDlgTimeOut();
+			break;
 		case IdDblClkTimer:
 			AfterDblClk = FALSE;
 			break;
@@ -3001,6 +3035,9 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case IdPrnProcTimer:
 			PrnFileDirectProc();
+			break;
+		case IdOpacityTipTimer:
+			DestroyTooltip(&OpacityTip);
 			break;
 	}
 }
@@ -3742,7 +3779,8 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
-	OpenHelp(HH_HELP_CONTEXT, HelpId, ts.UILanguageFile);
+	DWORD help_id = (wParam == 0) ? HelpId : wParam;
+	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
 	return 0;
 }
 
@@ -4205,6 +4243,7 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 				default:
 					return FALSE;
 			}
+			break;
 		case WM_CLOSE:
 			TTEndDialog(hDlgWnd, 0);
 			return TRUE;
@@ -4574,7 +4613,7 @@ void CVTWindow::OnExternalSetup()
 			break;
 		case IDOK:
 #ifdef ALPHABLEND_TYPE2
-			BGInitialize();
+			BGInitialize(FALSE);
 			BGSetupPrimary(TRUE);
 #else
 			DispApplyANSIColor();
@@ -4648,7 +4687,7 @@ void CVTWindow::OnSetupWindow()
 		// Eterm lookfeelの画面情報も更新することで、リアルタイムでの背景色変更が
 		// 可能となる。(2006.2.24 yutaka)
 #ifdef ALPHABLEND_TYPE2
-		BGInitialize();
+		BGInitialize(FALSE);
 		BGSetupPrimary(TRUE);
 #endif
 

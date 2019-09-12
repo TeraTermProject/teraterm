@@ -59,20 +59,14 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <assert.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
 #include <crtdbg.h>
 
 #include "ttlib.h"		// for GetMessageboxFont()
 
 #include "tipwin.h"
-
-#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l)		_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)			_free_dbg((p), _NORMAL_BLOCK)
-#define _strdup(s)		_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wcsdup(s)		_wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
-
-#define	FRAME_WIDTH	6
 
 static ATOM tip_class = 0;
 
@@ -100,10 +94,10 @@ static void CalcStrRect(TipWin *pTipWin)
 	pTipWin->str_rect.top = 0;
 	pTipWin->str_rect.left = 0;
 	if (pTipWin->strW != NULL) {
-		DrawTextW(hdc, pTipWin->strW, pTipWin->str_len,
+		DrawTextW(hdc, pTipWin->strW, (int)pTipWin->str_len,
 				  &pTipWin->str_rect, DT_LEFT|DT_CALCRECT);
 	} else {
-		DrawTextA(hdc, pTipWin->str, pTipWin->str_len,
+		DrawTextA(hdc, pTipWin->str, (int)pTipWin->str_len,
 				  &pTipWin->str_rect, DT_LEFT|DT_CALCRECT);
 	}
 	DeleteDC(hdc);
@@ -126,46 +120,47 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 		case WM_ERASEBKGND:
 			return TRUE;
 
-		case WM_PAINT: {
-			HBRUSH hbr;
-			HGDIOBJ holdbr;
-			RECT cr;
-			HDC hdc;
-
-			PAINTSTRUCT ps;
-			hdc = BeginPaint(hWnd, &ps);
-
-			SelectObject(hdc, pTipWin->tip_font);
-			SelectObject(hdc, GetStockObject(BLACK_PEN));
-
-			hbr = CreateSolidBrush(pTipWin->tip_bg);
-			holdbr = SelectObject(hdc, hbr);
-
-			GetClientRect(hWnd, &cr);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-
-			SetTextColor(hdc, pTipWin->tip_text);
-			SetBkColor(hdc, pTipWin->tip_bg);
-
+		case WM_PAINT:
 			{
-				RECT rect = pTipWin->str_rect;
-				rect.left = rect.left + FRAME_WIDTH;
-				rect.right = rect.right + FRAME_WIDTH;
-				rect.top = rect.top + FRAME_WIDTH;
-				rect.bottom = rect.bottom + FRAME_WIDTH;
-				if (pTipWin->strW != NULL) {
-					DrawTextW(hdc, pTipWin->strW, pTipWin->str_len, &rect, DT_LEFT);
-				} else {
-					DrawText(hdc, pTipWin->str, pTipWin->str_len, &rect, DT_LEFT);
+				HBRUSH hbr;
+				HGDIOBJ holdbr;
+				RECT cr;
+				HDC hdc;
+
+				PAINTSTRUCT ps;
+				hdc = BeginPaint(hWnd, &ps);
+
+				SelectObject(hdc, pTipWin->tip_font);
+				SelectObject(hdc, GetStockObject(BLACK_PEN));
+
+				hbr = CreateSolidBrush(pTipWin->tip_bg);
+				holdbr = SelectObject(hdc, hbr);
+
+				GetClientRect(hWnd, &cr);
+				Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+
+				SetTextColor(hdc, pTipWin->tip_text);
+				SetBkColor(hdc, pTipWin->tip_bg);
+
+				{
+					RECT rect = pTipWin->str_rect;
+					rect.left = rect.left + FRAME_WIDTH;
+					rect.right = rect.right + FRAME_WIDTH;
+					rect.top = rect.top + FRAME_WIDTH;
+					rect.bottom = rect.bottom + FRAME_WIDTH;
+					if (pTipWin->strW != NULL) {
+						DrawTextW(hdc, pTipWin->strW, (int)pTipWin->str_len, &rect, DT_LEFT);
+					} else {
+						DrawText(hdc, pTipWin->str, (int)pTipWin->str_len, &rect, DT_LEFT);
+					}
 				}
+
+				SelectObject(hdc, holdbr);
+				DeleteObject(hbr);
+
+				EndPaint(hWnd, &ps);
 			}
-
-			SelectObject(hdc, holdbr);
-			DeleteObject(hbr);
-
-			EndPaint(hWnd, &ps);
 			return 0;
-		}
 
 		case WM_NCHITTEST:
 			return HTTRANSPARENT;
@@ -173,6 +168,26 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 		case WM_DESTROY:
 			DeleteObject(pTipWin->tip_font);
 			pTipWin->tip_font = NULL;
+			break;
+
+		case WM_SETTEXT:
+			{
+				LPCTSTR str = (LPCTSTR) lParam;
+				const int str_width = pTipWin->str_rect.right - pTipWin->str_rect.left;
+				const int str_height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
+
+				free((void *)(pTipWin->str));
+				pTipWin->str_len = _tcslen(str);
+				pTipWin->str = _tcsdup(str);
+				CalcStrRect(pTipWin);
+
+				SetWindowPos(hWnd, NULL,
+							 0, 0,
+							 str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
+				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+				InvalidateRect(hWnd, NULL, FALSE);
+
+			}
 			break;
 
 		case WM_NCDESTROY:
@@ -212,19 +227,28 @@ static void register_class(HINSTANCE hInst)
 	}
 }
 
+/* Create the tip window */
 static void create_tipwin(TipWin *pTipWin, int cx, int cy)
 {
+	const TCHAR *str = pTipWin->str;
 	HWND hParnetWnd = pTipWin->hParentWnd;
 	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(hParnetWnd, GWLP_HINSTANCE);
 	register_class(hInst);
-
+	const int str_width = pTipWin->str_rect.right - pTipWin->str_rect.left;
+	const int str_height = pTipWin->str_rect.bottom - pTipWin->str_rect.top;
 	pTipWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 					   MAKEINTRESOURCE(tip_class),
-					   NULL, WS_POPUP,
-					   cx, cy, 1, 1,
+					   str, WS_POPUP,
+					   cx, cy,
+					   str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
 					   hParnetWnd, NULL, hInst, pTipWin);
-	assert(pTipWin->tip_wnd != NULL);
+	
+	/*
+	 * WindowsMe(9x)では、SSH認証のダイアログの表示では NULL が返ってくるため、
+	 * アサーションをしないようにした。Tera Termのリサイズでは NULL ではないが、
+	 * ツールチップが描画されない。
+	 */
 }
 
 static TipWin *TipWinCreateNoStr(HWND src, int cx, int cy)
@@ -300,6 +324,51 @@ static void SetText(TipWin *pTipWin, const wchar_t *textW, const char *text)
 				 str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
 				 SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 	InvalidateRect(hWnd, NULL, FALSE);
+}
+
+/*
+ * 文字列をツールチップに描画した時の横と縦のサイズを取得する。
+ *
+ * [in]
+ *   src
+ *   str
+ * [out]
+ *   width
+ *   height
+ */
+void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height)
+{
+	LOGFONTA logfont;
+	HFONT tip_font;
+	UINT uDpi;
+	HDC hdc;
+	RECT str_rect;
+	size_t str_len;
+
+	/* 文字列の長さを計算する */
+	str_len = _tcslen(str);
+	
+	/* DPIを取得する */
+	uDpi = GetMonitorDpiFromWindow(src);
+
+	/* フォントを生成する */
+	GetMessageboxFont(&logfont);
+	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
+	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
+	tip_font = CreateFontIndirect(&logfont);
+
+	/* 文字列を描画してサイズを求める */
+	hdc = CreateCompatibleDC(NULL);
+	SelectObject(hdc, tip_font);
+	str_rect.top = 0;
+	str_rect.left = 0;
+	DrawText(hdc, str, (int)str_len, &str_rect, DT_LEFT|DT_CALCRECT);
+	*width = str_rect.right - str_rect.left;
+	*height = str_rect.bottom - str_rect.top;
+	DeleteDC(hdc);
+
+	/* フォントを破棄する */
+	DeleteObject(tip_font);
 }
 
 void TipWinSetTextW(TipWin *tWin, const wchar_t *text)

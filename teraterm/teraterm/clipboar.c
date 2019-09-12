@@ -48,8 +48,7 @@
 #include "clipboar.h"
 #include "tt_res.h"
 #include "../ttpmacro/fileread.h"
-
-#define UNICODE_BUF	1
+#include "unicode_test.h"
 
 // for clipboard copy
 static HGLOBAL CBCopyHandle = NULL;
@@ -73,7 +72,7 @@ wchar_t BracketEndW[] = L"\033[201~";
 size_t BracketStartLenW = ((sizeof(BracketStartW) / sizeof(wchar_t)) - 1);
 size_t BracketEndLenW = ((sizeof(BracketEndW) / sizeof(wchar_t)) - 1);
 
-#if UNICODE_BUF
+#if UNICODE_INTERNAL_BUFF
 typedef struct {
 	wchar_t *send_str;
 	size_t str_len;
@@ -87,7 +86,7 @@ static clipboard_work_t cbwork;
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 
-#if !UNICODE_BUF
+#if !UNICODE_INTERNAL_BUFF
 PCHAR CBOpen(LONG MemSize)
 {
 	if (MemSize==0) {
@@ -791,7 +790,7 @@ static wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	return str_w;
 }
 
-#if 1
+#if UNICODE_INTERNAL_BUFF
 void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	unsigned int StrLen = 0;
@@ -981,6 +980,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	}
 }
 
+#if UNICODE_INTERNAL_BUFF
 void CBStartPasteB64W(HWND HWin, PCHAR header, PCHAR footer)
 {
 	size_t mb_len, b64_len, header_len = 0, footer_len = 0;
@@ -1072,6 +1072,7 @@ error:
 	CBEndPaste();
 	return;
 }
+#endif
 
 // この関数はクリップボードおよびDDEデータを端末へ送り込む。
 //
@@ -1182,6 +1183,7 @@ void CBSend()
 
 // クリップボードデータを端末へ送り込む。
 //
+#if UNICODE_INTERNAL_BUFF
 void CBSendW()
 {
 	clipboard_work_t *p = &cbwork;
@@ -1262,6 +1264,7 @@ void CBSendW()
 		}
 	}
 }
+#endif
 
 void CBEcho()
 {
@@ -1317,13 +1320,17 @@ void CBEcho()
 
 void CBEndPaste()
 {
-	clipboard_work_t *p = &cbwork;
 	TalkStatus = IdTalkKeyb;
 
-	if (p->send_str != NULL) {
-		free(p->send_str);
-		p->send_str = NULL;
+#if UNICODE_INTERNAL_BUFF
+	{
+		clipboard_work_t *p = &cbwork;
+		if (p->send_str != NULL) {
+			free(p->send_str);
+			p->send_str = NULL;
+		}
 	}
+#endif
 
 	if (CBMemHandle!=NULL) {
 		if (CBMemPtr!=NULL) {
@@ -1460,7 +1467,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 		case WM_INITDIALOG:
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-#if UNICODE_BUF
+#if UNICODE_INTERNAL_BUFF
 			if (cbwork.send_str != NULL) {
 				SetDlgItemTextW(hDlgWnd, IDC_EDIT, cbwork.send_str);
 			} else {

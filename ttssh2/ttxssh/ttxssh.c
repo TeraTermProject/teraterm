@@ -43,6 +43,7 @@
 #include "keyfiles.h"
 #include "arc4random.h"
 #include "auth.h"
+#include "helpid.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -57,7 +58,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <winsock2.h>
-static char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
+static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 
 #include <lmcons.h>
 
@@ -134,6 +135,14 @@ static void init_TTSSH(PTInstVar pvar)
 	pvar->NotificationWindow = NULL;
 	pvar->protocol_major = 0;
 	pvar->protocol_minor = 0;
+
+	/*
+	 * pvar->contents_after_known_hosts は意図的に
+	 * init_TTSSH()やuninit_TTSSH()では初期化や解放をしない。
+	 * なぜならば、known_hostsダイアログで使用するためであり、
+	 * ダイアログの表示中に TTXCloseTCP() が呼び出されることにより、
+	 * pvar->contents_after_known_hosts が初期化や解放されては困るからである。
+	 */
 
 	PKT_init(pvar);
 	SSH_init(pvar);
@@ -795,7 +804,11 @@ static int PASCAL TTXWSAAsyncSelect(SOCKET s, HWND hWnd, u_int wMsg,
 
 		if (pvar->NotificationWindow == NULL) {
 			pvar->NotificationWindow = hWnd;
-			AUTH_advance_to_next_cred(pvar);
+			// AUTH_advance_to_next_cred()の呼び出しを削除する。
+			// NotificationWindowにハンドルは設定しておくが、このタイミングでは
+			// 認証ダイアログを出すのは早すぎた。ProxyやNAT経由でサーバに接続
+			// できない場合、すでに切断状態にも関わらず、認証ダイアログが
+			// 表示されたままとなっていた。
 		}
 	}
 
@@ -885,11 +898,23 @@ void notify_closed_connection(PTInstVar pvar, char *send_msg)
 	            pvar->socket, MAKELPARAM(FD_CLOSE, 0));
 }
 
+// non-fatalおよびfatal時のエラーメッセージを覚えておく。
+// 一度、覚えたメッセージがあれば、改行を挟んで追加していく。
 static void add_err_msg(PTInstVar pvar, char *msg)
 {
 	if (pvar->err_msg != NULL) {
-		int buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
-		char *buf = (char *) malloc(buf_len);
+		int buf_len;
+		char *buf;
+
+		// すでに同じメッセージが登録済みの場合は追加しない。
+		if (strstr(pvar->err_msg, msg)) 
+			return;
+		
+		buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
+		buf = malloc(buf_len);
+		// メモリが確保できない場合は何もしない。
+		if (buf == NULL) 
+			return;
 
 		strncpy_s(buf, buf_len, pvar->err_msg, _TRUNCATE);
 		strncat_s(buf, buf_len, "\n\n", _TRUNCATE);
@@ -897,6 +922,7 @@ static void add_err_msg(PTInstVar pvar, char *msg)
 		free(pvar->err_msg);
 		pvar->err_msg = buf;
 	} else {
+		// メモリが確保できない場合は、_strdup()はNULLを返す。
 		pvar->err_msg = _strdup(msg);
 	}
 }
@@ -1125,6 +1151,10 @@ static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 		pvar->socket = INVALID_SOCKET;
 
 		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
+
+		// 認証ダイアログが残っていれば閉じる。
+		HOSTS_notify_closing_on_exit(pvar);
+		AUTH_notify_closing_on_exit(pvar);
 
 		*hooks->Precv = pvar->Precv;
 		*hooks->Psend = pvar->Psend;
@@ -2729,10 +2759,21 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHSETUP_HELP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHSETUP_HELP, pvar->ts->UIMsg);
 
 	GetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_HOSTKEY_ROTATION", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, pvar->ts->UIMsg);
+
+	GetDlgItemText(dlg, IDC_LOGLEVEL, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_LOGLEVEL", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_LOGLEVEL, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_LOGLEVEL_UNIT, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_LOGLEVEL_UNIT", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_LOGLEVEL_UNIT, pvar->ts->UIMsg);
+
 
 	SendMessage(compressionControl, TBM_SETRANGE, TRUE, MAKELONG(0, 9));
 	SendMessage(compressionControl, TBM_SETPOS, TRUE,
@@ -2894,6 +2935,15 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	if (!(ch >= 0 && ch < SSH_UPDATE_HOSTKEYS_MAX))
 		ch = 0;
 	SendMessage(hostkeyRotationControlList, CB_SETCURSEL, ch, 0);
+
+	// LogLevel
+	{
+		char buf[10];
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+		            "%d", pvar->settings.LogLevel);
+		SetDlgItemText(dlg, IDC_LOGLEVEL_VALUE, buf);
+	}
+
 
 }
 
@@ -3157,6 +3207,13 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	if (!(i >= 0 && i < SSH_UPDATE_HOSTKEYS_MAX))
 		i = 0;
 	pvar->settings.UpdateHostkeys = i;
+
+	// get LogLevel
+	SendMessage(GetDlgItem(dlg, IDC_LOGLEVEL_VALUE), WM_GETTEXT, sizeof(buf), (LPARAM)buf);
+	i = atoi(buf);
+	if (i < 0)
+		i = 0;
+	pvar->settings.LogLevel = i;
 }
 
 static void move_cur_sel_delta(HWND listbox, int delta)
@@ -3272,6 +3329,9 @@ static INT_PTR CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
 			EndDialog(dlg, 0);
+			return TRUE;
+		case IDC_SSHSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSsh, 0);
 			return TRUE;
 		// Cipher order
 		case IDC_SSHMOVECIPHERUP:
@@ -4229,6 +4289,9 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_CLOSE", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_SSHKEYGENSETUP_HELP, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_SSHKEYGENSETUP_HELP, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_KDF", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, pvar->ts->UIMsg);
@@ -4394,6 +4457,10 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			// don't forget to free SSH resource!
 			free_ssh_key();
 			EndDialog(dlg, 0); // dialog close
+			return TRUE;
+
+		case IDC_SSHKEYGENSETUP_HELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSshkeygen, 0);
 			return TRUE;
 
 		// if radio button pressed...
@@ -5055,6 +5122,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 	case ID_SSHDIFFERENTKEY:
 		UTIL_SetDialogFont();
 		HOSTS_do_different_key_dialog(hWin, pvar);
+		return 1;
+	case ID_SSHDIFFERENT_TYPE_KEY:
+		UTIL_SetDialogFont();
+		HOSTS_do_different_type_key_dialog(hWin, pvar);
 		return 1;
 	case ID_SSHASYNCMESSAGEBOX:
 		if (pvar->err_msg != NULL) {

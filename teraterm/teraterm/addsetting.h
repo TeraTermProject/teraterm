@@ -49,6 +49,7 @@ private:
 	void OnInitDialog();
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_GENERAL };
+	void OnHelp();
 };
 
 // Control Sequence Page
@@ -62,6 +63,7 @@ private:
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_SEQUENCE };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
 };
 
 // Copypaste Page
@@ -75,6 +77,7 @@ private:
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_COPYPASTE };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
 };
 
 // Visual Page
@@ -89,7 +92,10 @@ private:
 	HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
 	enum { IDD = IDD_TABSHEET_VISUAL };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
+	void OnTimer(UINT_PTR nIDEvent);
 	void SetupRGBbox(int index);
+	void OnHelp();
 };
 
 // Log Page
@@ -103,6 +109,7 @@ private:
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_LOG };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
 };
 
 // Cygwin Page
@@ -117,6 +124,7 @@ private:
 	enum { IDD = IDD_TABSHEET_CYGWIN };
 	cygterm_t settings;
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
 };
 
 // Property Sheet

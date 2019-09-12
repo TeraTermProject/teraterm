@@ -170,6 +170,7 @@
 #define IDC_TERMRUSSFONTLABEL           1075
 #define IDC_TERMRUSSFONT                1076
 #define IDC_GENLANG_UI                  1077
+#define IDC_SFMT_VERSION                1078
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200
@@ -189,7 +190,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1078
+#define _APS_NEXT_CONTROL_VALUE         1079
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

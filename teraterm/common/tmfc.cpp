@@ -669,9 +669,21 @@ BOOL TTCPropertyPage::OnCommand(WPARAM wp, LPARAM lp)
 	return TRUE;
 }
 
+void TTCPropertyPage::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
+{
+}
+
+void TTCPropertyPage::OnTimer(UINT_PTR nIDEvent)
+{
+}
+
 HBRUSH TTCPropertyPage::OnCtlColor(HDC hDC, HWND hWnd)
 {
 	return (HBRUSH)::DefWindowProc(m_hWnd, WM_CTLCOLORSTATIC, (WPARAM)hDC, (LPARAM)hWnd);
+}
+
+void TTCPropertyPage::OnHelp()
+{
 }
 
 UINT CALLBACK TTCPropertyPage::PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp)
@@ -698,6 +710,9 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 		case PSN_APPLY:
 			self->OnOK();
 			break;
+		case PSN_HELP:
+			self->OnHelp();
+			break;
 		default:
 			break;
 		}
@@ -708,6 +723,12 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 		break;
 	case WM_CTLCOLORSTATIC:
 		return (INT_PTR)self->OnCtlColor((HDC)wp, (HWND)lp);
+	case WM_HSCROLL:
+		self->OnHScroll(LOWORD(wp), HIWORD(wp), (HWND)lp);
+		break;
+	case WM_TIMER:
+		self->OnTimer(LOWORD(wp));
+		break;
 	}
 	return FALSE;
 }

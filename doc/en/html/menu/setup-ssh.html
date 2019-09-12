@@ -323,6 +323,54 @@
 	By using SSH1 protocol, when the Compression level is 0, the packet compression is disabled, or the Compression level is over 1, the compression is enabled. <br>
 	By using SSH2 protocol, use the Compression order to enable the packet compression. And then, set the Compression level to 1 over.
       </dd>
+
+
+      <dt id="LogLevel">LogLevel</dt>
+      <dd>
+	Specify the debug level of TTSSH module. <br>
+	When the debug level is greater than 0, the debug data is recorded in "TTSSH.LOG", <br>
+	"ssh2connect.log" and "ssh2packet.log" under ttermpro.exe directory. <br>
+	<table border="1">
+	  <tr>
+	    <td>Value</td>
+	    <td>Meaning</td>
+	  </tr>
+	  <tr>
+	    <td>0</td>
+	    <td>Disabled</td>
+	  </tr>
+	  <tr>
+	    <td>5</td>
+	    <td>Fatal</td>
+	  </tr>
+	  <tr>
+	    <td>10</td>
+	    <td>Error</td>
+	  </tr>
+	  <tr>
+	    <td>30</td>
+	    <td>Warning</td>
+	  </tr>
+	  <tr>
+	    <td>50</td>
+	    <td>Notice</td>
+	  </tr>
+	  <tr>
+	    <td>80</td>
+	    <td>Information</td>
+	  </tr>
+	  <tr>
+	    <td>100</td>
+	    <td>Verbose</td>
+	  </tr>
+	  <tr>
+	    <td>200</td>
+	    <td>SSH Dump</td>
+	  </tr>
+	</table>
+      </dd>
+
+
     </dl>
   </body>
 </html>

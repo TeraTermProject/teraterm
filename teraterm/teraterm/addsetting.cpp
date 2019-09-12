@@ -38,6 +38,7 @@
 #include <time.h>
 #include <tchar.h>
 #include <crtdbg.h>
+#include <math.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -46,7 +47,10 @@
 #include "ttftypes.h"
 #include "dlglib.h"
 #include "compat_win.h"
+#include "helpid.h"
 #include "addsetting.h"
+
+#include "tipwin.h"
 
 #ifdef _DEBUG
 #define free(p)		_free_dbg((p), _NORMAL_BLOCK)
@@ -68,6 +72,9 @@ const mouse_cursor_t MouseCursor[] = {
 	{NULL, NULL},
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
+
+static TipWin *ActiveOpacityTip;
+static TipWin *InactiveOpacityTip;
 
 void CVisualPropPageDlg::SetupRGBbox(int index)
 {
@@ -92,7 +99,7 @@ CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet
 	get_lang_msgT("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
 	             _T("General"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CGeneralPropPageDlg::~CGeneralPropPageDlg()
@@ -206,6 +213,11 @@ void CGeneralPropPageDlg::OnOK()
 	ts.TitleFormat |= (GetCheck(IDC_TITLEFMT_DISPSERIALSPEED) == BST_CHECKED) << 5;
 }
 
+void CGeneralPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
+
 // CSequencePropPageDlg ダイアログ
 
 CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
@@ -215,7 +227,7 @@ CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *she
 	get_lang_msgT("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
 	             _T("Control Sequence"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CSequencePropPageDlg::~CSequencePropPageDlg()
@@ -391,6 +403,10 @@ void CSequencePropPageDlg::OnOK()
 	ts.NotifyClipboardAccess = GetCheck(IDC_CLIPBOARD_NOTIFY);
 }
 
+void CSequencePropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
 
 // CCopypastePropPageDlg ダイアログ
 
@@ -401,7 +417,7 @@ CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst, TTCPropertySheet *s
 	get_lang_msgT("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
 				  _T("Copy and Paste"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CCopypastePropPageDlg::~CCopypastePropPageDlg()
@@ -607,6 +623,10 @@ void CCopypastePropPageDlg::OnOK()
 	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
 }
 
+void CCopypastePropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
 
 // CVisualPropPageDlg ダイアログ
 
@@ -617,7 +637,7 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	get_lang_msgT("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
 	             _T("Visual"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CVisualPropPageDlg::~CVisualPropPageDlg()
@@ -627,6 +647,13 @@ CVisualPropPageDlg::~CVisualPropPageDlg()
 
 // CVisualPropPageDlg メッセージ ハンドラ
 
+static void DestroyOpacityTip(TipWin** OpacityTip) {
+	if (*OpacityTip) {
+		TipWinDestroy(*OpacityTip);
+		(*OpacityTip) = NULL;
+	}
+}
+
 void CVisualPropPageDlg::OnInitDialog()
 {
 	char buf[MAXPATHLEN];
@@ -635,9 +662,10 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_ALPHABLEND, "DLG_TAB_VISUAL_ALPHA" },
-		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE_LABEL" },
-		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE_LABEL" },
+		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE" },
+		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE" },
 		{ IDC_ETERM_LOOKFEEL, "DLG_TAB_VISUAL_ETERM" },
+		{ IDC_MIXED_THEME_FILE, "DLG_TAB_VISUAL_BGMIXED_THEMEFILE" },
 		{ IDC_BGIMG_CHECK, "DLG_TAB_VISUAL_BGIMG" },
 		{ IDC_BGIMG_BRIGHTNESS, "DLG_TAB_VISUAL_BGIMG_BRIGHTNESS" },
 		{ IDC_MOUSE, "DLG_TAB_VISUAL_MOUSE" },
@@ -673,8 +701,14 @@ void CVisualPropPageDlg::OnInitDialog()
 	// (1)AlphaBlend
 
 	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
+	DestroyOpacityTip(&ActiveOpacityTip);
+	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
+	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendActive);
 
 	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, ts.AlphaBlendInactive);
+	DestroyOpacityTip(&InactiveOpacityTip);
+	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
+	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendInactive);
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
@@ -685,24 +719,37 @@ void CVisualPropPageDlg::OnInitDialog()
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.BGImgBrightness);
 	SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, ts.BGImgBrightness);
 
+	// BGEnable関係なく、チェックボックスを付ける。
+	if (strcmp(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE) == 0) {
+		SetCheck(IDC_BGIMG_CHECK, BST_CHECKED);
+	} else {
+		SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
+	}
+	// テーマファイルを無視する場合は壁紙と混合しない。
+	if (ts.EtermLookfeel.BGIgnoreThemeFile) {
+		SetCheck(IDC_MIXED_THEME_FILE, BST_UNCHECKED);
+	} else {
+		SetCheck(IDC_MIXED_THEME_FILE, BST_CHECKED);
+	}
+
 	if (ts.EtermLookfeel.BGEnable) {
 		EnableDlgItem(IDC_BGIMG_CHECK, TRUE);
+		EnableDlgItem(IDC_MIXED_THEME_FILE, TRUE);
 
 		if (strcmp(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE) == 0) {
-			SetCheck(IDC_BGIMG_CHECK, BST_CHECKED);
 			EnableDlgItem(IDC_BGIMG_EDIT, TRUE);
 			EnableDlgItem(IDC_BGIMG_BUTTON, TRUE);
 
 			EnableDlgItem(IDC_BGIMG_BRIGHTNESS, TRUE);
 			EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, TRUE);
 		} else {
-			SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
 			EnableDlgItem(IDC_BGIMG_EDIT, FALSE);
 			EnableDlgItem(IDC_BGIMG_BUTTON, FALSE);
 
 			EnableDlgItem(IDC_BGIMG_BRIGHTNESS, FALSE);
 			EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, FALSE);
 		}
+
 	} else {
 		EnableDlgItem(IDC_BGIMG_CHECK, FALSE);
 		EnableDlgItem(IDC_BGIMG_EDIT, FALSE);
@@ -710,6 +757,8 @@ void CVisualPropPageDlg::OnInitDialog()
 
 		EnableDlgItem(IDC_BGIMG_BRIGHTNESS, FALSE);
 		EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, FALSE);
+
+		EnableDlgItem(IDC_MIXED_THEME_FILE, FALSE);
 	}
 
 	// (3)Mouse cursor type
@@ -770,6 +819,47 @@ void CVisualPropPageDlg::OnInitDialog()
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
 }
 
+void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
+{
+	int pos;
+	if ( pScrollBar == GetDlgItem(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR) ) {
+		switch (nSBCode) {
+			case SB_TOP:
+			case SB_BOTTOM:
+			case SB_LINEDOWN:
+			case SB_LINEUP:
+			case SB_PAGEDOWN:
+			case SB_PAGEUP:
+			case SB_THUMBPOSITION:
+			case SB_THUMBTRACK:
+				pos = SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_GETPOS, NULL, NULL);
+				SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
+				break;
+			case SB_ENDSCROLL:
+			default:
+				return;
+		}
+	}
+	else if ( pScrollBar == GetDlgItem(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR) ) {
+		switch (nSBCode) {
+			case SB_TOP:
+			case SB_BOTTOM:
+			case SB_LINEDOWN:
+			case SB_LINEUP:
+			case SB_PAGEDOWN:
+			case SB_PAGEUP:
+			case SB_THUMBPOSITION:
+			case SB_THUMBTRACK:
+				pos = SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_GETPOS, NULL, NULL);
+				SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
+				break;
+			case SB_ENDSCROLL:
+			default:
+				return;
+		}
+	}
+}
+
 BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	int sel;
@@ -778,6 +868,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	case IDC_ETERM_LOOKFEEL:
 			// チェックされたら Enable/Disable をトグルする。
 			if (GetCheck(IDC_ETERM_LOOKFEEL)) {
+				EnableDlgItem(IDC_MIXED_THEME_FILE, TRUE);
 				EnableDlgItem(IDC_BGIMG_CHECK, TRUE);
 				if (GetCheck(IDC_BGIMG_CHECK)) {
 					EnableDlgItem(IDC_BGIMG_EDIT, TRUE);
@@ -805,6 +896,15 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 背景画像も無効化する。
 				SetDlgItemTextT(IDC_BGIMG_EDIT, _T(""));
 				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
+
+				EnableDlgItem(IDC_MIXED_THEME_FILE, FALSE);
+			}
+			return TRUE;
+
+		case IDC_MIXED_THEME_FILE:
+			if (GetCheck(IDC_MIXED_THEME_FILE)) {
+				// 背景画像のチェックは外す。
+				SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
 			}
 			return TRUE;
 
@@ -817,6 +917,8 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				EnableDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS, TRUE);
 
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
+				// 混合のチェックは外す。
+				SetCheck(IDC_MIXED_THEME_FILE, BST_UNCHECKED);
 			} else {
 				EnableDlgItem(IDC_BGIMG_EDIT, FALSE);
 				EnableDlgItem(IDC_BGIMG_BUTTON, FALSE);
@@ -889,11 +991,71 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
-
 			return TRUE;
+		case IDC_ALPHA_BLEND_ACTIVE | (EN_CHANGE << 16):
+			{
+				int pos;
+				pos = GetDlgItemInt(IDC_ALPHA_BLEND_ACTIVE);
+				SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
+
+				TCHAR tipbuf[32];
+				TCHAR uimsg[MAX_UIMSG];
+				RECT rc;
+				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
+				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
+
+				DestroyOpacityTip(&InactiveOpacityTip);
+				SetTimer(GetSafeHwnd(), IdOpacityTipTimer, 1000, NULL);
+				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), &rc);
+				if (ActiveOpacityTip == NULL) {
+					ActiveOpacityTip = TipWinCreate(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), rc.right, rc.bottom, tipbuf);
+				}
+				else {
+					TipWinSetText(ActiveOpacityTip, tipbuf);
+					// ツールチップのリサイズが失敗したように見える問題の暫定対策
+					TipWinSetText(ActiveOpacityTip, tipbuf);
+				}
+				return TRUE;
+			}
+		case IDC_ALPHA_BLEND_INACTIVE | (EN_CHANGE << 16):
+			{
+				int pos;
+				pos = GetDlgItemInt(IDC_ALPHA_BLEND_INACTIVE);
+				SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
+
+				TCHAR tipbuf[32], uimsg[MAX_UIMSG];
+				RECT rc;
+				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
+				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
+
+				DestroyOpacityTip(&ActiveOpacityTip);
+				SetTimer(GetSafeHwnd(), IdOpacityTipTimer, 1000, NULL);
+				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), &rc);
+				if (InactiveOpacityTip == NULL) {
+					InactiveOpacityTip = TipWinCreate(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), rc.right, rc.bottom, tipbuf);
+				}
+				else {
+					TipWinSetText(InactiveOpacityTip, tipbuf);
+					// ツールチップのリサイズが失敗したように見える問題の暫定対策
+					TipWinSetText(InactiveOpacityTip, tipbuf);
+				}
+				return TRUE;
+			}
 	}
 
 	return TTCPropertyPage::OnCommand(wParam, lParam);
+}
+
+
+void CVisualPropPageDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	KillTimer(GetSafeHwnd(), nIDEvent);
+	switch (nIDEvent) {
+		case IdOpacityTipTimer:
+			DestroyOpacityTip(&ActiveOpacityTip);
+			DestroyOpacityTip(&InactiveOpacityTip);
+			break;
+	}
 }
 
 HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
@@ -962,6 +1124,27 @@ void CVisualPropPageDlg::OnOK()
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
+
+	// テーマファイルを最終設定する。
+	if (ts.EtermLookfeel.BGEnable) {
+		if (GetCheck(IDC_BGIMG_CHECK)) {
+			strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
+		} else {
+			strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+		}
+		if (GetCheck(IDC_MIXED_THEME_FILE)) {
+			// 壁紙と混合の場合、デフォルトに戻しておく。
+			ts.EtermLookfeel.BGIgnoreThemeFile = FALSE;
+		} else {
+			// テーマファイルを無視する。
+			ts.EtermLookfeel.BGIgnoreThemeFile = TRUE;
+		}
+
+	} else {
+		// BGが無効の場合はデフォルトに戻しておく。
+		strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+	}
+
 
 	// (3)
 	sel = GetCurSel(IDC_MOUSE_CURSOR);
@@ -1043,7 +1226,10 @@ void CVisualPropPageDlg::OnOK()
 	}
 }
 
-
+void CVisualPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
 
 // CLogPropPageDlg ダイアログ
 
@@ -1054,7 +1240,7 @@ CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	get_lang_msgT("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
 	             _T("Log"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CLogPropPageDlg::~CLogPropPageDlg()
@@ -1401,6 +1587,11 @@ void CLogPropPageDlg::OnOK()
 	ts.LogTimestampType = GetCurSel(IDC_OPT_TIMESTAMP_TYPE);
 }
 
+void CLogPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
+
 /////////////////////////////
 
 // CCygwinPropPageDlg ダイアログ
@@ -1412,7 +1603,7 @@ CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	get_lang_msgT("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
 	             _T("Cygwin"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
 CCygwinPropPageDlg::~CCygwinPropPageDlg()
@@ -1493,6 +1684,11 @@ void CCygwinPropPageDlg::OnOK()
 
 	// Cygwin install path
 	GetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory, sizeof(ts.CygwinDirectory));
+}
+
+void CCygwinPropPageDlg::OnHelp()
+{
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
 }
 
 // CAddSettingPropSheetDlg
