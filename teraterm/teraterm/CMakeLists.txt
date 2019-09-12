@@ -141,6 +141,7 @@ set(SRC
   ${COMMON_SRC}
   ${TTDLG_SRC}
   #
+  unicode_test.h
   unicode.h
   unicode.cpp
   unicode_asian_width.tbl
