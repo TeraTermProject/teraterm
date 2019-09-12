@@ -2898,6 +2898,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case IdProtoTimer:
 			ProtoDlgTimeOut();
+			break;
 		case IdDblClkTimer:
 			AfterDblClk = FALSE;
 			break;
@@ -4144,6 +4145,7 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 				default:
 					return FALSE;
 			}
+			break;
 		case WM_CLOSE:
 			TTEndDialog(hDlgWnd, 0);
 			return TRUE;
