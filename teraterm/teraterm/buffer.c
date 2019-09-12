@@ -124,6 +124,10 @@ static int SaveBuffX;
 static int SaveBuffY;
 
 #if UNICODE_INTERNAL_BUFF
+static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
+#endif
+
+#if UNICODE_INTERNAL_BUFF
 static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char half_width)
 {
 	size_t wstr_len;
@@ -1870,10 +1874,14 @@ static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 /**
  *	(x,y)から strと同一か調べる
  *
+ *	@param		x		マイナスの時、上の行が対象になる
  *	@param		y		PageStart + CursorY
+ *	@param		LineCntinued	TRUE=行の継続を考慮する
+ *	@retval		TRUE	マッチした
+ *	@retval		FALSE	マッチしていない
  */
 #if UNICODE_INTERNAL_BUFF
-static BOOL MatchString(int x, int y, const wchar_t *str)
+static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 {
 	BOOL result;
 	int match_pos = 0;
@@ -1881,6 +1889,24 @@ static BOOL MatchString(int x, int y, const wchar_t *str)
 	size_t len = wcslen(str);
 	if (len == 0) {
 		return FALSE;
+	}
+	while(x < 0) {
+		if (LineContinued && (AttrBuff[TmpPtr+0] & AttrLineContinued) == 0) {
+			// 行が継続しているか考慮 & 継続していない
+			x = 0;	// 行頭からとする
+			break;
+		}
+		TmpPtr = PrevLinePtr(TmpPtr);
+		x += NumOfColumns;
+	}
+	while(x > NumOfColumns) {
+		if (LineContinued && (AttrBuff[TmpPtr+NumOfColumns-1] & AttrLineContinued) == 0) {
+			// 行が継続しているか考慮 & 継続していない
+			x = 0;	// 行頭からとする
+			break;
+		}
+		TmpPtr = NextLinePtr(TmpPtr);
+		x -= NumOfColumns;
 	}
 
 	for(;;) {
@@ -1901,8 +1927,16 @@ static BOOL MatchString(int x, int y, const wchar_t *str)
 		// 次の文字
 		x++;
 		if (x == NumOfColumns) {
-			x = 0;
-			TmpPtr = NextLinePtr(TmpPtr);
+			if (LineContinued && (AttrBuff[TmpPtr+NumOfColumns-1] & AttrLineContinued) != 0) {
+				// 次の行へ
+				x = 0;
+				TmpPtr = NextLinePtr(TmpPtr);
+				y++;
+			} else {
+				// 行末
+				result = FALSE;
+				break;
+			}
 		}
 	}
 
@@ -1934,12 +1968,12 @@ static BOOL BuffGetMatchPosFromString(
 			IStart = sx;
 		}
 		if (y== ey) {
-			IEnd = ex -1;
+			IEnd = ex;
 		}
 
 		x = IStart;
 		while (x <= IEnd) {
-			if (MatchString(x, y, str)) {
+			if (MatchString(x, y, str, TRUE)) {
 				// マッチした
 				*match_x = x;
 				*match_y = y;
@@ -2290,7 +2324,7 @@ void BuffDumpCurrentLine(BYTE TERM)
 	}
 }
 
-static BOOL isURLchar(unsigned char u32)
+static BOOL isURLchar(unsigned int u32)
 {
 	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)に準拠する
 	// by sakura editor 1.5.2.1: etc_uty.cpp
@@ -2612,6 +2646,145 @@ static BOOL BuffIsHalfWidthFromPropery(TTTSet *ts_, char width_property)
 }
 #endif
 
+#if UNICODE_INTERNAL_BUFF
+// cur_x	カーソル位置
+// cur_y	カーソル位置(!バッファ位置)
+static void mark_url_w(int cur_x, int cur_y)
+{
+	static int sw = 0;
+	if (sw == 0)
+		return;
+
+	int sx;
+	int sy;
+	int ex;
+	int ey;
+	LONG TmpPtr;
+
+	// 行頭を探す
+	sx = 0;
+	sy = cur_y;
+	TmpPtr = GetLinePtr(PageStart+sy);
+	while ((AttrBuff[TmpPtr] & AttrLineContinued) != 0) {
+		sy--;
+		TmpPtr = PrevLinePtr(TmpPtr);
+	}
+	// 行末を探す
+	ex = NumOfColumns-1;
+	ey = cur_y;
+	TmpPtr = GetLinePtr(PageStart+ey);
+	while ((AttrBuff[TmpPtr+NumOfColumns-1] & AttrLineContinued) != 0) {
+		ey++;
+		TmpPtr = NextLinePtr(TmpPtr);
+	}
+	const buff_char_t *b = &CodeBuffW[TmpPtr+ex];
+	while (1) {
+		if (b->u32 != ' ') {
+			break;
+		}
+		b--;
+		ex--;
+	}
+
+	// URLアトリビュートを落とす
+	{
+		int x;
+		int y;
+		for (y = sy; y <= ey; y++) {
+			int sx_i = 0;
+			int ex_i = NumOfColumns - 1;
+			if (y == sy) {
+				sx_i = sx;
+			}
+			else if (y == ey) {
+				ex_i = ex;
+			}
+			TmpPtr = GetLinePtr(PageStart + y);
+			for (x = sx_i; x < ex_i; x++) {
+				AttrBuff[TmpPtr + x] &= ~AttrURL;
+			}
+		}
+	}
+
+
+	// プレフィックスを探す
+	for(;;) {
+		static const struct schemes_t {
+			const wchar_t *str;
+			int len;
+		} schemes[] = {
+			{ L"https://", 8 },
+			{ L"http://", 7},
+			{ L"sftp://", 7},
+			{ L"tftp://", 7},
+			{ L"news://", 7},
+			{ L"ftp://", 6},
+			{ L"mms://", 6},
+		};
+		int i;
+		const wchar_t *prefix;
+		int len;
+		int match_x, match_y;
+
+		if (sx >= ex && sy >= ey) {
+			break;
+		}
+
+		for (i = 0; i < _countof(schemes); i++) {
+			prefix = schemes[i].str;
+			len = schemes[i].len - 1;
+			// マッチするか?
+			if (BuffGetMatchPosFromString(sx, PageStart+sy, sx, PageStart+sy, prefix, &match_x, &match_y)) {
+				// マッチした
+				break;
+			}
+		}
+
+		if (i < _countof(schemes)) {
+			// マッチした
+			int x;
+			int y;
+			int left = len;
+			for (y = match_y; y <= PageStart+ey; y++) {
+				int sx_i = 0;
+				int ex_i = NumOfColumns - 1;	// とにかく行末まで
+				if (y == PageStart+sy) {
+					sx_i = match_x;
+					//ex_i = ex_i - match_x;
+				}
+				TmpPtr = GetLinePtr(y);
+				for (x = sx_i; x <= ex_i; x++) {
+					const buff_char_t *b = &CodeBuffW[TmpPtr + x];
+					if (isURLchar(b->u32)) {
+						AttrBuff[TmpPtr + x] |= AttrURL;
+					} else {
+						// 中断, 次はここから探し始める
+						sx = x;
+						sy = y - PageStart;
+						break;
+					}
+				}
+				if (x <= ex_i) {
+					// 中断した
+					sx = x;
+					break;
+				}
+			}
+			if (y <= PageStart + ey) {
+				// 中断した
+				sy = y - PageStart;
+			}
+		}
+
+		sx++;
+		if (sx >= NumOfColumns) {
+			sx = 0;
+			sy++;
+		}
+	}
+}
+#endif
+
 /**
  *	ユニコードキャラクタを1文字バッファへ入力する
  *	@param[in]	u32		unicode character(UTF-32)
@@ -2848,13 +3021,20 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			StrChangeCount = StrChangeCount + 2;
 		}
 
-		/* begin - ishizaki */
+		// URLの検出
+		// DEL時にURLだったらURL文字列を取ってきて検査する
+#if 0
 		{
 			int x = CursorX;
 			BOOL pass = FALSE;
 
+			// TODO 1つ後ろもURL
 			// 1つ前のキャラクタがURL?
-			if (x >= 1 && AttrLine[x-1] & AttrURL) {
+			// 一番左の時は、前の行から継続していて、前の行の最後がURLだった時
+			if ((x == 0 &&
+				 ((AttrLine[0] & AttrLineContinued) != 0) &&
+				 ((AttrBuff[(PageStart + (CursorY-1)) * NumOfColumns + NumOfColumns - 1] & AttrURL) != 0)) ||
+				(x >= 1 && AttrLine[x-1] & AttrURL)) {
 				if (isURLchar(u32)) {
 					// URLを伸ばす
 					AttrLine[x] |= AttrURL;
@@ -2870,6 +3050,10 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			if (!pass) {
 				// '/' が入力されたら調べ始める
 				if (u32 == '/') {
+					if (MatchString(x-2, PageStart+CursorY, L"://", TRUE)) {
+						pass = FALSE;
+					}
+#if 0
 					if ((CodeLineW[x-2].u32 == ':') && (CodeLineW[x-2].CombinationCharCount16 == 0) &&
 						(CodeLineW[x-1].u32 == '/') && (CodeLineW[x-1].CombinationCharCount16 == 0) &&
 						(CodeLineW[x-0].u32 == '/') && (CodeLineW[x-0].CombinationCharCount16 == 0))
@@ -2878,6 +3062,7 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 					} else {
 						pass = TRUE;
 					}
+#endif
 				} else {
 					pass = TRUE;
 				}
@@ -2901,27 +3086,64 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				for (i = 0; i < _countof(schemes); i++) {
 					const wchar_t *prefix = schemes[i].str;
 					const int len = schemes[i].len - 1;
-					if (x >= len) {
-						// マッチするか?
-						int sx = x - len;
-						int sy = PageStart + CursorY;
-						int match_x, match_y;
-						if (BuffGetMatchPosFromString(sx, sy, x, sy, prefix, &match_x, &match_y)) {
-							// マッチしたのでURL属性を付ける
+					int sx = x - len;
+					int sy = PageStart + CursorY;
+					int ey = sy;
+					if (x < len) {
+						// 短い
+						if ((AttrLine[0] & AttrLineContinued) == 0) {
+							// 前の行と連結していない
+							continue;
+						}
+						// 前の行から検索かける
+						sx = NumOfColumns + sx;
+						sy = PageStart + CursorY - 1;
+					}
+					// マッチするか?
+					int match_x, match_y;
+					if (BuffGetMatchPosFromString(sx, sy, x, ey, prefix, &match_x, &match_y)) {
+						// マッチしたのでURL属性を付ける
+						if (sy == ey) {
 							int i;
 							for (i = 0; i <= len; i++) {
-								AttrLine[sx+i] |= AttrURL;
+								AttrLine[sx + i] |= AttrURL;
 							}
 							if (StrChangeStart > sx) {
 								StrChangeStart = sx;
 								StrChangeCount += len;
 							}
-							break;
 						}
+						else {
+							LONG TmpPtr = GetLinePtr(sy);
+							int xx = sx;
+							size_t left = len + 1;
+							while (left > 0) {
+								AttrBuff[TmpPtr + xx] |= AttrURL;
+								xx++;
+								if (xx == NumOfColumns) {
+									int draw_x = sx;
+									int draw_y = CursorY - 1;
+									if (IsLineVisible(&draw_x, &draw_y)) {
+										BuffDrawLineI(draw_x, draw_y, PageStart+CursorY-1, sx, NumOfColumns-1);
+									}
+									TmpPtr = NextLinePtr(TmpPtr);
+									xx = 0;
+								}
+								left--;
+							}
+							StrChangeStart = 0;
+							StrChangeCount = xx;
+						}
+						break;
 					}
 				}
 			}
 		}
+#else
+		{
+			mark_url_w(CursorX, CursorY);
+		}
+#endif
 //		markURL(CursorX);
 //		markURL(CursorX+1);
 		/* end - ishizaki */
