@@ -33,6 +33,7 @@ extern "C" {
 char UnicodeGetWidthProperty(unsigned long u32);
 int UnicodeIsCombiningCharacter(unsigned long u32);
 int UnicodeIsVariationSelector(unsigned long u32);
+int UnicodeIsEmoji(unsigned long u32);
 
 #ifdef __cplusplus
 }

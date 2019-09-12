@@ -95,28 +95,22 @@ char UnicodeGetWidthProperty(unsigned long u32)
 	return result;
 }
 
-/*
- * 結合文字か検査する
- *		EMOJI MODIFIER も結合文字として扱う
- *
- *	@retval	0		結合文字ではない
- *	@retval	1		結合文字である
+typedef struct {
+	unsigned long code_from;
+	unsigned long code_to;
+} UnicodeTable_t;
+
+/**
+ * u32がテーブルのデータに含まれているか調べる
  */
-int UnicodeIsCombiningCharacter(unsigned long u32)
+static int UnicodeSimpleSearchTable(
+	const UnicodeTable_t *table, size_t table_size,
+	unsigned long u32)
 {
-	typedef struct {
-		unsigned long code_from;
-		unsigned long code_to;
-	} CombiningCharacterList_t;
-	const static CombiningCharacterList_t CombiningCharacterList[] = {
-#include "unicode_combine.tbl"
-	};
-	const CombiningCharacterList_t *table = CombiningCharacterList;
-	const size_t table_size = _countof(CombiningCharacterList);
-	if (u32 < CombiningCharacterList[0].code_from) {
+	if (u32 < table[0].code_from) {
 		return 0;
 	}
-	if (u32 > CombiningCharacterList[table_size-1].code_to) {
+	if (u32 > table[table_size-1].code_to) {
 		return 0;
 	}
 	size_t low = 0;
@@ -133,6 +127,34 @@ int UnicodeIsCombiningCharacter(unsigned long u32)
 	}
 	// テーブルの範囲外
 	return 0;
+}
+
+/*
+ * 結合文字か検査する
+ *		EMOJI MODIFIER も結合文字として扱う
+ *
+ *	@retval	0		結合文字ではない
+ *	@retval	1		結合文字である
+ */
+int UnicodeIsCombiningCharacter(unsigned long u32)
+{
+	const static UnicodeTable_t CombiningCharacterList[] = {
+#include "unicode_combine.tbl"
+	};
+	return UnicodeSimpleSearchTable(
+		CombiningCharacterList, _countof(CombiningCharacterList),
+		u32);
+}
+
+
+int UnicodeIsEmoji(unsigned long u32)
+{
+	const static UnicodeTable_t EmojiList[] = {
+#include "unicode_emoji.tbl"
+	};
+	return UnicodeSimpleSearchTable(
+		EmojiList, _countof(EmojiList),
+		u32);
 }
 
 /**

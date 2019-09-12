@@ -146,6 +146,7 @@ set(SRC
   unicode.cpp
   unicode_asian_width.tbl
   unicode_combine.tbl
+  unicode_emoji.tbl
   #
   ../ttpmacro/fileread.h
   ../ttpmacro/fileread.cpp

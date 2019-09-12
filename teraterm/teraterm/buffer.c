@@ -2773,7 +2773,8 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			const char width_property = UnicodeGetWidthProperty(u32);
 			char retval;
 			BOOL half_width;
-			if (BuffIsHalfWidthFromPropery(&ts, width_property)) {
+			const int is_emoji = UnicodeIsEmoji(u32);
+			if (!is_emoji && BuffIsHalfWidthFromPropery(&ts, width_property)) {
 				// ”¼Šp‚Æ‚µ‚Äˆµ‚¤
 				retval = 'H';
 				move_x = 1;
