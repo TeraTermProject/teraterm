@@ -3246,6 +3246,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		const buff_char_t *b;
 		TCharAttr TempAttr;
 		BOOL DrawFlag = FALSE;
+		BOOL SetString = FALSE;
 
 		// アトリビュート取得
 		TempAttr.Attr = AttrBuff[TmpPtr+istart+count] & ~ AttrKanji;
@@ -3260,6 +3261,24 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		if (b->u32 == 0) {
 			// 全角の次の文字,処理不要
 		} else {
+			if (count == 0) {
+				// 最初の1文字目
+				CurAttr = TempAttr;
+				CurAttrEmoji = b->Emoji;
+				CurSelected = CheckSelect(istart+count,SY);
+				SetString = TRUE;
+			} else if (b->u32 != 0 &&
+					   ((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
+						(CurSelected != CheckSelect(istart+count,SY)))){
+				// この文字でアトリビュートが変化した → 描画
+				DrawFlag = TRUE;
+				count--;
+			} else {
+				SetString = TRUE;
+			}
+		}
+
+		if (SetString) {
 			if (b->u32 < 0x10000) {
 				bufW[lenW] = b->wc2[0];
 				bufWW[lenW] = b->HalfWidth ? 'H' : 'W';
@@ -3272,7 +3291,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 				bufW[lenW] = b->wc2[1];
 				bufWW[lenW] = '0';
 				lenW++;
-				DrawFlag = TRUE;	// すぐに描画する
+//				DrawFlag = TRUE;	// すぐに描画する
 			}
 			if (b->CombinationCharCount16 != 0)
 			{
@@ -3287,24 +3306,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			}
 		}
 
-		if (b->Emoji) {
-			int a = 0;
-		}
-		if (count == 0) {
-			// 最初の1文字目
-			CurAttr = TempAttr;
-			CurAttrEmoji = b->Emoji;
-			CurSelected = CheckSelect(istart+count,SY);
-		} else if (b->u32 != 0 &&
-				   ((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
-					(CurSelected != CheckSelect(istart+count,SY)))){
-			// この文字でアトリビュートが変化した → 描画
-			DrawFlag = TRUE;
-			lenA--;
-			lenW--;
-			count--;
-		}
-
 		// 最後までスキャンした?
 		if (istart + count >= IEnd) {
 			DrawFlag = TRUE;
@@ -3317,7 +3318,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			bufW[lenW] = 0;
 			bufWW[lenW] = 0;
 
-#if 0
+#if 1
 			OutputDebugPrintf("A[%d] '%s'\n", lenA, bufA);
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
@@ -5796,19 +5797,13 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	}
 	{
 		const unsigned char attr = AttrBuff[TmpPtr+X];
-		str_len =
-			aswprintf(&str_ptr,
-					  L"ch(%d,%d(%d)) px(%d,%d)\n"
-					  L"attr      0x%02x\n"
-					  L" %S%S%S%S%S%S%S%S\n"
-					  L"attr2     0x%02x\n"
-					  L"attrFore  0x%02x\n"
-					  L"attrBack  0x%02x\n"
-//					  L"CodeLine  %s('%hs')",
-					  L"CodeLine  %s",
-					  X, ScreenY, Y,
-					  Xw, Yw,
-					  attr,
+		wchar_t *attr_str;
+		if (attr == 0) {
+			attr_str = wcsdup(L"");
+		} else
+		if (attr != 0) {
+			aswprintf(&attr_str,
+					  L"(%S%S%S%S%S%S%S%S)\n",
 					  (attr & AttrBold) != 0 ? "AttrBold " : "",
 					  (attr & AttrUnder) != 0 ? "AttrUnder " : "",
 					  (attr & AttrSpecial) != 0 ? "AttrSpecial ": "",
@@ -5816,13 +5811,28 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 					  (attr & AttrReverse) != 0 ? "AttrReverse ": "",
 					  (attr & AttrLineContinued) != 0 ? "AttrLineContinued ": "",
 					  (attr & AttrURL) != 0 ? "AttrURL ": "",
-					  (attr & AttrKanji) != 0 ? "AttrKanji ": "",
+					  (attr & AttrKanji) != 0 ? "AttrKanji ": ""
+				);
+		}
+		str_len =
+			aswprintf(&str_ptr,
+					  L"ch(%d,%d(%d)) px(%d,%d)\n"
+					  L"attr      0x%02x%s%s\n"
+					  L"attr2     0x%02x\n"
+					  L"attrFore  0x%02x\n"
+					  L"attrBack  0x%02x\n"
+//					  L"CodeLine  %s('%hs')",
+					  L"CodeLine  %s",
+					  X, ScreenY, Y,
+					  Xw, Yw,
+					  attr, (attr != 0) ? L"\n " : L"", attr_str,
 					  (unsigned char)AttrBuff2[TmpPtr+X],
 					  (unsigned char)AttrBuffFG[TmpPtr+X],
 					  (unsigned char)AttrBuffBG[TmpPtr+X],
 //					  mb_str, cs
 					  mb_str
 				);
+		free(attr_str);
 	}
 	free(mb_str);
 
