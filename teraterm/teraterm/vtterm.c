@@ -5670,7 +5670,7 @@ static void UnicodeToCP932(unsigned int code)
 			CarriageReturn(FALSE);
 			LineFeed(LF,FALSE);
 			CharAttrTmp.Attr |= AttrLineContinued;
-			CharAttrTmp.Attr = CharAttrTmp.AttrEx;
+			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 		}
 #if 0
 		else if (CursorX > LineEnd - 1) {
@@ -5738,6 +5738,7 @@ static void UnicodeToCP932(unsigned int code)
 		} else if (r == 2) {
 			// 全角(2セル)
 			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
+				MoveRight();	// 全角の右側にカーソル移動
 				UpdateStr();
 				Wrap = AutoWrapMode;
 			} else {

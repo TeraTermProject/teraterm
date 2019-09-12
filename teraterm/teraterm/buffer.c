@@ -2856,137 +2856,153 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		Attr.Attr |= AttrLineContinued;
 	}
 
-	if (Insert) {
-		// TODO 未チェック
-		int XStart, LineEnd, MoveLen;
-		int extr = 0;
-		if (CursorX > CursorRightM)
-			LineEnd = NumOfColumns - 1;
-		else
-			LineEnd = CursorRightM;
+	buff_char_t *p = NULL;	// NULLのとき、前の文字はない
+	// 前の文字
+	if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
+		p = &CodeLineW[CursorX - 1];
+	} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
+		p = &CodeLineW[CursorX - 2];
+	}
 
-		if (LineEnd < NumOfColumns - 1 && (AttrLine[LineEnd] & AttrKanji)) {
-			CodeLine[LineEnd] = 0x20;
-#if UNICODE_INTERNAL_BUFF
-			BuffSetChar(&CodeLineW[LineEnd], 0x20, 'H');
-#endif
-			AttrLine[LineEnd] &= ~AttrKanji;
-			CodeLine[LineEnd+1] = 0x20;
-			AttrLine[LineEnd+1] &= ~AttrKanji;
-			extr = 1;
+	if (UnicodeIsVariationSelector(u32) ||
+		UnicodeIsCombiningCharacter(u32) ||
+		(u32 == 0x200d) ||
+		(p != NULL && p->u32_last == 0x200d))
+	{
+		// Combining
+		//		VariationSelector or
+		//		CombiningCharacter or
+		//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d) or
+		//		1つ前が ZWJ
+		move_x = 0;				// カーソル移動量=0
+
+		if (p == NULL) {
+			// 前がないのにくっつく文字が出てきたとき
+			// とりあえずスペースにくっつける
+			p = &CodeLineW[CursorX];
+			BuffSetChar(p, ' ', 'H');
 		}
 
-		MoveLen = LineEnd - CursorX - 1;
-		if (MoveLen > 0) {
-			memmove(&CodeLine[CursorX+2], &CodeLine[CursorX], MoveLen);
-#if UNICODE_INTERNAL_BUFF
-			memmoveW(&(CodeLineW[CursorX+2]), &(CodeLineW[CursorX]), MoveLen);
-#endif
-			memmove(&AttrLine[CursorX+2], &AttrLine[CursorX], MoveLen);
-			memmove(&AttrLine2[CursorX+2], &AttrLine2[CursorX], MoveLen);
-			memmove(&AttrLineFG[CursorX+2], &AttrLineFG[CursorX], MoveLen);
-			memmove(&AttrLineBG[CursorX+2], &AttrLineBG[CursorX], MoveLen);
-		}
-
-		CodeLine[CursorX] = b1;
-#if UNICODE_INTERNAL_BUFF
-		BuffSetChar(&CodeLineW[CursorX], u32, 'H');
-#endif
+		// 前の文字にくっつける
+		BuffAddChar(p, u32);
+#if 0
 		AttrLine[CursorX] = Attr.Attr;
 		AttrLine2[CursorX] = Attr.Attr2;
 		AttrLineFG[CursorX] = Attr.Fore;
 		AttrLineBG[CursorX] = Attr.Back;
-		if (CursorX < LineEnd) {
-			CodeLine[CursorX+1] = 0;
-#if UNICODE_INTERNAL_BUFF
-			BuffSetChar(&CodeLineW[CursorX + 1], 0, 'H');
 #endif
-			AttrLine[CursorX+1] = Attr.Attr;
-			AttrLine2[CursorX+1] = Attr.Attr2;
-			AttrLineFG[CursorX+1] = Attr.Fore;
-			AttrLineBG[CursorX+1] = Attr.Back;
-		}
-#if 0
-		/* begin - ishizaki */
-		markURL(CursorX);
-		markURL(CursorX+1);
-		/* end - ishizaki */
-#endif
-
-		/* last char in current line is kanji first? */
-		if ((AttrLine[LineEnd] & AttrKanji) != 0) {
-			/* then delete it */
-			CodeLine[LineEnd] = 0x20;
-#if UNICODE_INTERNAL_BUFF
-			BuffSetChar(&CodeLineW[LineEnd], 0x20, 'H');
-#endif
-			AttrLine[LineEnd] = CurCharAttr.Attr;
-			AttrLine2[LineEnd] = CurCharAttr.Attr2;
-			AttrLineFG[LineEnd] = CurCharAttr.Fore;
-			AttrLineBG[LineEnd] = CurCharAttr.Back;
-		}
-
-		if (StrChangeCount==0) {
-			XStart = CursorX;
-		}
-		else {
-			XStart = StrChangeStart;
-		}
-		StrChangeCount = 0;
-		BuffUpdateRect(XStart, CursorY, LineEnd+extr, CursorY);
 	} else {
-		if ((Attr.AttrEx & AttrPadding) != 0) {
-			// 詰め物
-			buff_char_t *p = &CodeLineW[CursorX];
-			BuffSetChar(p, u32, 'H');
-			p->Padding = TRUE;
+		char width_property;
+		char emoji;
+		BOOL half_width = BuffIsHalfWidthFromCode(&ts, u32, &width_property, &emoji);
+		if (Insert) {
+			// 挿入モード
+			// TODO 未チェック
+			int XStart, LineEnd, MoveLen;
+			int extr = 0;
+			if (CursorX > CursorRightM)
+				LineEnd = NumOfColumns - 1;
+			else
+				LineEnd = CursorRightM;
+
+			// 一番最後の文字が全角の場合、
+			if (LineEnd <= NumOfColumns - 1 && (AttrLine[LineEnd-1] & AttrKanji)) {
+				CodeLine[LineEnd-1] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeLineW[LineEnd-1], 0x20, 'H');
+#endif
+				AttrLine[LineEnd] &= ~AttrKanji;
+//				CodeLine[LineEnd+1] = 0x20;
+//				AttrLine[LineEnd+1] &= ~AttrKanji;
+				extr = 1;
+			}
+
+			if (!half_width) {
+				MoveLen = LineEnd - CursorX - 1;
+				if (MoveLen > 0) {
+					memmove(&CodeLine[CursorX+2], &CodeLine[CursorX], MoveLen);
+#if UNICODE_INTERNAL_BUFF
+					memmoveW(&(CodeLineW[CursorX+2]), &(CodeLineW[CursorX]), MoveLen);
+#endif
+					memmove(&AttrLine[CursorX+2], &AttrLine[CursorX], MoveLen);
+					memmove(&AttrLine2[CursorX+2], &AttrLine2[CursorX], MoveLen);
+					memmove(&AttrLineFG[CursorX+2], &AttrLineFG[CursorX], MoveLen);
+					memmove(&AttrLineBG[CursorX+2], &AttrLineBG[CursorX], MoveLen);
+				}
+			} else {
+				MoveLen = LineEnd - CursorX;
+				if (MoveLen > 0) {
+					memmove(&CodeLine[CursorX+1], &CodeLine[CursorX], MoveLen);
+#if UNICODE_INTERNAL_BUFF
+					memmoveW(&(CodeLineW[CursorX+1]), &(CodeLineW[CursorX]), MoveLen);
+#endif
+					memmove(&AttrLine[CursorX+1], &AttrLine[CursorX], MoveLen);
+					memmove(&AttrLine2[CursorX+1], &AttrLine2[CursorX], MoveLen);
+					memmove(&AttrLineFG[CursorX+1], &AttrLineFG[CursorX], MoveLen);
+					memmove(&AttrLineBG[CursorX+1], &AttrLineBG[CursorX], MoveLen);
+				}
+			}
+
+			CodeLine[CursorX] = b1;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar2(&CodeLineW[CursorX], u32, width_property, half_width, emoji);
+#endif
 			AttrLine[CursorX] = Attr.Attr;
 			AttrLine2[CursorX] = Attr.Attr2;
 			AttrLineFG[CursorX] = Attr.Fore;
 			AttrLineBG[CursorX] = Attr.Back;
-			move_x = 1;
-		} else {
-			buff_char_t *p = NULL;	// NULLのとき、前の文字はない
-			// 前の文字
-			if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
-				p = &CodeLineW[CursorX - 1];
-			} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
-				p = &CodeLineW[CursorX - 2];
+			if (!half_width && CursorX < LineEnd) {
+				CodeLine[CursorX+1] = 0;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeLineW[CursorX + 1], 0, 'H');
+#endif
+				AttrLine[CursorX+1] = Attr.Attr;
+				AttrLine2[CursorX+1] = Attr.Attr2;
+				AttrLineFG[CursorX+1] = Attr.Fore;
+				AttrLineBG[CursorX+1] = Attr.Back;
+			}
+#if 0
+			/* begin - ishizaki */
+			markURL(CursorX);
+			markURL(CursorX+1);
+			/* end - ishizaki */
+#endif
+
+			/* last char in current line is kanji first? */
+			if ((AttrLine[LineEnd] & AttrKanji) != 0) {
+				/* then delete it */
+				CodeLine[LineEnd] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+				BuffSetChar(&CodeLineW[LineEnd], 0x20, 'H');
+#endif
+				AttrLine[LineEnd] = CurCharAttr.Attr;
+				AttrLine2[LineEnd] = CurCharAttr.Attr2;
+				AttrLineFG[LineEnd] = CurCharAttr.Fore;
+				AttrLineBG[LineEnd] = CurCharAttr.Back;
 			}
 
-			if (UnicodeIsVariationSelector(u32) ||
-				UnicodeIsCombiningCharacter(u32) ||
-				(u32 == 0x200d) ||
-				(p != NULL && p->u32_last == 0x200d))
-			{
-				// Combining
-				//		VariationSelector or
-				//		CombiningCharacter or
-				//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d) or
-				//		1つ前が ZWJ
-				move_x = 0;				// カーソル移動量=0
-
-				if (p == NULL) {
-					// 前がないのにくっつく文字が出てきたとき
-					// とりあえずスペースにくっつける
-					p = &CodeLineW[CursorX];
-					BuffSetChar(p, ' ', 'H');
-				}
-
-				// 前の文字にくっつける
-				BuffAddChar(p, u32);
-#if 0
+			if (StrChangeCount==0) {
+				XStart = CursorX;
+			}
+			else {
+				XStart = StrChangeStart;
+			}
+			StrChangeCount = 0;
+			BuffUpdateRect(XStart, CursorY, LineEnd+extr, CursorY);
+		} else {
+			if ((Attr.AttrEx & AttrPadding) != 0) {
+				// 詰め物
+				buff_char_t *p = &CodeLineW[CursorX];
+				BuffSetChar(p, u32, 'H');
+				p->Padding = TRUE;
 				AttrLine[CursorX] = Attr.Attr;
 				AttrLine2[CursorX] = Attr.Attr2;
 				AttrLineFG[CursorX] = Attr.Fore;
 				AttrLineBG[CursorX] = Attr.Back;
-#endif
+				move_x = 1;
 			} else {
 				// 新しい文字追加
 
-				char width_property;
-				char emoji;
-				BOOL half_width = BuffIsHalfWidthFromCode(&ts, u32, &width_property, &emoji);
 				if (half_width) {
 					// 半角として扱う
 					move_x = 1;
@@ -3025,163 +3041,163 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 					}
 				}
 			}
-		}
 
-		if (StrChangeCount==0) {
-			StrChangeStart = CursorX;
-		}
-		if (move_x == 0) {
-			if (StrChangeCount == 0) {
-				StrChangeCount = 1;
+			if (StrChangeCount==0) {
+				StrChangeStart = CursorX;
 			}
-		} else if (move_x == 1) {
-			// 半角
-			StrChangeCount = StrChangeCount + 1;
-		} else /*if (move_x == 2)*/ {
-			// 全角
-			StrChangeCount = StrChangeCount + 2;
-		}
-
-		// URLの検出
-		// DEL時にURLだったらURL文字列を取ってきて検査する
-#if 0
-		{
-			int x = CursorX;
-			BOOL pass = FALSE;
-
-			// TODO 1つ後ろもURL
-			// 1つ前のキャラクタがURL?
-			// 一番左の時は、前の行から継続していて、前の行の最後がURLだった時
-			if ((x == 0 &&
-				 ((AttrLine[0] & AttrLineContinued) != 0) &&
-				 ((AttrBuff[(PageStart + (CursorY-1)) * NumOfColumns + NumOfColumns - 1] & AttrURL) != 0)) ||
-				(x >= 1 && AttrLine[x-1] & AttrURL)) {
-				if (isURLchar(u32)) {
-					// URLを伸ばす
-					AttrLine[x] |= AttrURL;
-					pass = TRUE;
+			if (move_x == 0) {
+				if (StrChangeCount == 0) {
+					StrChangeCount = 1;
 				}
+			} else if (move_x == 1) {
+				// 半角
+				StrChangeCount = StrChangeCount + 1;
+			} else /*if (move_x == 2)*/ {
+				// 全角
+				StrChangeCount = StrChangeCount + 2;
 			}
 
-			// カーソル位置がURL
-			if ((AttrLine[x] & AttrURL) != 0) {
-				pass = TRUE;	// やることなし
-			}
-
-			if (!pass) {
-				// '/' が入力されたら調べ始める
-				if (u32 == '/') {
-					if (MatchString(x-2, PageStart+CursorY, L"://", TRUE)) {
-						pass = FALSE;
-					}
+			// URLの検出
+			// DEL時にURLだったらURL文字列を取ってきて検査する
 #if 0
-					if ((CodeLineW[x-2].u32 == ':') && (CodeLineW[x-2].CombinationCharCount16 == 0) &&
-						(CodeLineW[x-1].u32 == '/') && (CodeLineW[x-1].CombinationCharCount16 == 0) &&
-						(CodeLineW[x-0].u32 == '/') && (CodeLineW[x-0].CombinationCharCount16 == 0))
-					{	// "://"が入力された
-						pass = FALSE;
+			{
+				int x = CursorX;
+				BOOL pass = FALSE;
+
+				// TODO 1つ後ろもURL
+				// 1つ前のキャラクタがURL?
+				// 一番左の時は、前の行から継続していて、前の行の最後がURLだった時
+				if ((x == 0 &&
+					 ((AttrLine[0] & AttrLineContinued) != 0) &&
+					 ((AttrBuff[(PageStart + (CursorY-1)) * NumOfColumns + NumOfColumns - 1] & AttrURL) != 0)) ||
+					(x >= 1 && AttrLine[x-1] & AttrURL)) {
+					if (isURLchar(u32)) {
+						// URLを伸ばす
+						AttrLine[x] |= AttrURL;
+						pass = TRUE;
+					}
+				}
+
+				// カーソル位置がURL
+				if ((AttrLine[x] & AttrURL) != 0) {
+					pass = TRUE;	// やることなし
+				}
+
+				if (!pass) {
+					// '/' が入力されたら調べ始める
+					if (u32 == '/') {
+						if (MatchString(x-2, PageStart+CursorY, L"://", TRUE)) {
+							pass = FALSE;
+						}
+#if 0
+						if ((CodeLineW[x-2].u32 == ':') && (CodeLineW[x-2].CombinationCharCount16 == 0) &&
+							(CodeLineW[x-1].u32 == '/') && (CodeLineW[x-1].CombinationCharCount16 == 0) &&
+							(CodeLineW[x-0].u32 == '/') && (CodeLineW[x-0].CombinationCharCount16 == 0))
+						{	// "://"が入力された
+							pass = FALSE;
+						} else {
+							pass = TRUE;
+						}
+#endif
 					} else {
 						pass = TRUE;
 					}
-#endif
-				} else {
-					pass = TRUE;
 				}
-			}
 
-			if (!pass) {
-				// 本格的に探す
-				static const struct schemes_t {
-					const wchar_t *str;
-					int len;
-				} schemes[] = {
-					{ L"https://", 8 },
-					{ L"http://", 7},
-					{ L"sftp://", 7},
-					{ L"tftp://", 7},
-					{ L"news://", 7},
-					{ L"ftp://", 6},
-					{ L"mms://", 6},
-				};
-				int i;
-				for (i = 0; i < _countof(schemes); i++) {
-					const wchar_t *prefix = schemes[i].str;
-					const int len = schemes[i].len - 1;
-					int sx = x - len;
-					int sy = PageStart + CursorY;
-					int ey = sy;
-					if (x < len) {
-						// 短い
-						if ((AttrLine[0] & AttrLineContinued) == 0) {
-							// 前の行と連結していない
-							continue;
-						}
-						// 前の行から検索かける
-						sx = NumOfColumns + sx;
-						sy = PageStart + CursorY - 1;
-					}
-					// マッチするか?
-					int match_x, match_y;
-					if (BuffGetMatchPosFromString(sx, sy, x, ey, prefix, &match_x, &match_y)) {
-						// マッチしたのでURL属性を付ける
-						if (sy == ey) {
-							int i;
-							for (i = 0; i <= len; i++) {
-								AttrLine[sx + i] |= AttrURL;
+				if (!pass) {
+					// 本格的に探す
+					static const struct schemes_t {
+						const wchar_t *str;
+						int len;
+					} schemes[] = {
+						{ L"https://", 8 },
+						{ L"http://", 7},
+						{ L"sftp://", 7},
+						{ L"tftp://", 7},
+						{ L"news://", 7},
+						{ L"ftp://", 6},
+						{ L"mms://", 6},
+					};
+					int i;
+					for (i = 0; i < _countof(schemes); i++) {
+						const wchar_t *prefix = schemes[i].str;
+						const int len = schemes[i].len - 1;
+						int sx = x - len;
+						int sy = PageStart + CursorY;
+						int ey = sy;
+						if (x < len) {
+							// 短い
+							if ((AttrLine[0] & AttrLineContinued) == 0) {
+								// 前の行と連結していない
+								continue;
 							}
-							if (StrChangeStart > sx) {
-								StrChangeStart = sx;
-								StrChangeCount += len;
-							}
+							// 前の行から検索かける
+							sx = NumOfColumns + sx;
+							sy = PageStart + CursorY - 1;
 						}
-						else {
-							LONG TmpPtr = GetLinePtr(sy);
-							int xx = sx;
-							size_t left = len + 1;
-							while (left > 0) {
-								AttrBuff[TmpPtr + xx] |= AttrURL;
-								xx++;
-								if (xx == NumOfColumns) {
-									int draw_x = sx;
-									int draw_y = CursorY - 1;
-									if (IsLineVisible(&draw_x, &draw_y)) {
-										BuffDrawLineI(draw_x, draw_y, PageStart+CursorY-1, sx, NumOfColumns-1);
-									}
-									TmpPtr = NextLinePtr(TmpPtr);
-									xx = 0;
+						// マッチするか?
+						int match_x, match_y;
+						if (BuffGetMatchPosFromString(sx, sy, x, ey, prefix, &match_x, &match_y)) {
+							// マッチしたのでURL属性を付ける
+							if (sy == ey) {
+								int i;
+								for (i = 0; i <= len; i++) {
+									AttrLine[sx + i] |= AttrURL;
 								}
-								left--;
+								if (StrChangeStart > sx) {
+									StrChangeStart = sx;
+									StrChangeCount += len;
+								}
 							}
-							StrChangeStart = 0;
-							StrChangeCount = xx;
+							else {
+								LONG TmpPtr = GetLinePtr(sy);
+								int xx = sx;
+								size_t left = len + 1;
+								while (left > 0) {
+									AttrBuff[TmpPtr + xx] |= AttrURL;
+									xx++;
+									if (xx == NumOfColumns) {
+										int draw_x = sx;
+										int draw_y = CursorY - 1;
+										if (IsLineVisible(&draw_x, &draw_y)) {
+											BuffDrawLineI(draw_x, draw_y, PageStart+CursorY-1, sx, NumOfColumns-1);
+										}
+										TmpPtr = NextLinePtr(TmpPtr);
+										xx = 0;
+									}
+									left--;
+								}
+								StrChangeStart = 0;
+								StrChangeCount = xx;
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
-		}
 #else
-		{
-			mark_url_w(CursorX, CursorY);
-		}
+			{
+				mark_url_w(CursorX, CursorY);
+			}
 #endif
 //		markURL(CursorX);
 //		markURL(CursorX+1);
-		/* end - ishizaki */
+			/* end - ishizaki */
 
 
 #if 0
-		{
-			char ba[128];
-			memcpy(ba, &CodeLine[0], _countof(ba)-1);
-			ba[127] = 0;
-			OutputDebugPrintf("A '%s'\n", ba);
-			wchar_t bb[128];
-			memcpy(bb, &CodeLineW[0], _countof(bb)-1);
-			bb[127] = 0;
-			OutputDebugPrintfW(L"W '%s'\n", bb);
-		}
+			{
+				char ba[128];
+				memcpy(ba, &CodeLine[0], _countof(ba)-1);
+				ba[127] = 0;
+				OutputDebugPrintf("A '%s'\n", ba);
+				wchar_t bb[128];
+				memcpy(bb, &CodeLineW[0], _countof(bb)-1);
+				bb[127] = 0;
+				OutputDebugPrintfW(L"W '%s'\n", bb);
+			}
 #endif
+		}
 	}
 
 #if 0
