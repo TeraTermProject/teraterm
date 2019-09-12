@@ -1,3 +1,5 @@
+SET filename=SFMT_version_for_teraterm.h
+
 cd SFMT
 
 if exist "Makefile.msc.release" goto end_mk_release
@@ -25,4 +27,16 @@ echo 	del *.lib *.obj>> Makefile.msc.debug
 nmake /f Makefile.msc.debug
 nmake /f Makefile.msc.release
 
+rem バージョンファイルがなければ作る
+IF EXIST %filename% (GOTO FILE_TRUE) ELSE GOTO FILE_FALSE
+:FILE_TRUE
+ECHO "バージョンファイルが見つかりました"
+GOTO END
+
+:FILE_FALSE
+ECHO "バージョンファイルが見つかりないので新規作成します"
+echo #define SFMT_VERSION "Unknown" > %filename%
+GOTO END
+
+:END
 cd ..
