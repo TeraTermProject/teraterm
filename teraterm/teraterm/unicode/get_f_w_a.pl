@@ -8,11 +8,17 @@ while($a = <FILE>) {
 		$start = hex $1;
 		$end = hex $2;
 		$type = $3;
+		if ($type eq "Na") {
+			$type = "n";
+		}
 	}
 	elsif ($a =~ /^([0-9A-F]+);([A-Za-z]+)/) {
 		$start = hex $1;
 		$end = hex $1;
 		$type = $2;
+		if ($type eq "Na") {
+			$type = "n";
+		}
 	} else {
 		next;
 	}
@@ -30,7 +36,8 @@ while($a = <FILE>) {
 		$oend = $end;
 		$otype = $type;
 	} else {
-		if (($otype eq "W") || ($otype eq "F") || ($otype eq "A")) {
+		if (($otype eq "W") || ($otype eq "F") || ($otype eq "A") ||
+			($otype eq "N") || ($otype eq "n")) {
 			printf("{ 0x%06x, 0x%06x, '$otype' },\n", $ostart, $oend);
 		}
 		$ostart = $start;

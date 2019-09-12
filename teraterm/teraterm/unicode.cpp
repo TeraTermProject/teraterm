@@ -37,9 +37,16 @@
  *	East_Asian_Width 参考特性 取得
  *
  *	@retval	'F'		Fullwidth 全角
+ *	@retval	'H'		Halfwidth 半角
  *	@retval	'W'		Wide 広
+ *	@retval	'n'		Na,Narrow 狭
  *	@retval	'A'		Ambiguous 曖昧
- *	@retval	'H'		半角扱い (H(Halfwidth 半角) or Na(Narrow 狭) or N(Neutral 中立))
+ *					文脈によって文字幅が異なる文字。
+ *					東アジアの組版とそれ以外の組版の両方に出現し、
+ *					東アジアの従来文字コードではいわゆる全角として扱われることがある。
+ *					ギリシア文字やキリル文字など。
+ *	@retval	'N'		Neutral 中立
+ *					東アジアの組版には通常出現せず、全角でも半角でもない。アラビア文字など。
  */
 char UnicodeGetWidthProperty(unsigned long u32)
 {
@@ -48,7 +55,7 @@ char UnicodeGetWidthProperty(unsigned long u32)
 		unsigned long code_to;
 		char property;
 	} east_asian_width_map_t;
-	// W or F or A がテーブルに入っている (テーブル外は H)
+	// テーブルに入っていない場合は H
 	const static east_asian_width_map_t east_asian_width_map[] = {
 #include "unicode_asian_width.tbl"
 	};
@@ -79,18 +86,6 @@ char UnicodeGetWidthProperty(unsigned long u32)
 			high = mid;
 		}
 	}
-
-#if 0
-	if (result == 'A') {
-		// キリル文字特別(TODO)
-		// ?	0x500-0x520
-		// 		0x2de0-0x2dff
-		// 		0xa640-0xa69f
-		if (0x400 <= u32 && u32 <= 0x4ff) {
-			result = 'H';
-		}
-	}
-#endif
 
 	return result;
 }

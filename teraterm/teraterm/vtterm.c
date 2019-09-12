@@ -5692,6 +5692,7 @@ static void UnicodeToCP932(unsigned int code)
 		//		エラー時はカーソル位置を検討する
 		Wrap = FALSE;
 		BOOL is_update = FALSE;
+		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 	retry:
 		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
 		if (r == -1) {

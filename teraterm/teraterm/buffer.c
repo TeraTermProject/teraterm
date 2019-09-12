@@ -62,6 +62,7 @@ typedef struct {
 	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' (•¶Žš‚Ì‘®«)
 	char HalfWidth;					// TRUE/FALSE = ”¼Šp/‘SŠp (•\Ž¦‚·‚é‚Æ‚«‚Ì•¶Žš•)
 	char Padding;					// TRUE = ‘SŠp‚ÌŽŸ‚Ì‹l‚ß•¨ or s––‚Ì‹l‚ß•¨
+	char Emoji;						// TRUE = ŠG•¶Žš
 	char CombinationCharCount16;	// charactor count
 	char CombinationCharSize16;		// buffer size
 	char CombinationCharCount32;
@@ -128,7 +129,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
 #endif
 
 #if UNICODE_INTERNAL_BUFF
-static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char half_width)
+static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char half_width, char emoji)
 {
 	size_t wstr_len;
 	buff_char_t *p = buff;
@@ -149,6 +150,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char ha
 	p->u32 = u32;
 	p->u32_last = u32;
 	p->Padding = FALSE;
+	p->Emoji = emoji;
 
 	//
 	wstr_len = UTF32ToUTF16(u32, &p->wc2[0], 2);
@@ -168,7 +170,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char ha
 
 static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
 {
-	BuffSetChar2(buff, u32, property, TRUE);
+	BuffSetChar2(buff, u32, property, TRUE, FALSE);
 }
 
 /**
@@ -2631,19 +2633,43 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 #if UNICODE_INTERNAL_BUFF
 static BOOL BuffIsHalfWidthFromPropery(TTTSet *ts_, char width_property)
 {
-	if (width_property == 'H') {
+	switch (width_property) {
+	case 'H':	// Halfwidth
+	case 'n':	// Narrow
+	case 'N':	// Neutral
+	default:
 		return TRUE;
-	} else if (width_property == 'A') {
+	case 'A':	// Ambiguous žB–†
 		if (ts.Language == IdJapanese) {
 			// ‘SŠp‚Æ‚µ‚Äˆµ‚¤
 			return FALSE;
 		}
 		return TRUE;
-	}
-	else /*if (prop == 'F' || prop == 'W')*/ {
-		return FALSE;
+	case 'W':
+	case 'F':
+		return FALSE;		// ‘SŠp
 	}
 }
+
+BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
+{
+	BOOL result = TRUE;
+	*width_property = UnicodeGetWidthProperty(u32);
+	*emoji = (char)UnicodeIsEmoji(u32);
+	if (*emoji) {
+		if (ts_->Language == IdJapanese) {
+			// ‘SŠp
+			return FALSE;
+		} else {
+			if (u32 >= 0x1f000) {
+				return FALSE;
+			}
+			return TRUE;
+		}
+	}
+	return BuffIsHalfWidthFromPropery(ts_, *width_property);
+}
+
 #endif
 
 #if UNICODE_INTERNAL_BUFF
@@ -2958,20 +2984,15 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			} else {
 				// V‚µ‚¢•¶Žš’Ç‰Á
 
-				const char width_property = UnicodeGetWidthProperty(u32);
-				char retval;
-				BOOL half_width;
-				const int is_emoji = UnicodeIsEmoji(u32);
-				if (!is_emoji && BuffIsHalfWidthFromPropery(&ts, width_property)) {
+				char width_property;
+				char emoji;
+				BOOL half_width = BuffIsHalfWidthFromCode(&ts, u32, &width_property, &emoji);
+				if (half_width) {
 					// ”¼Šp‚Æ‚µ‚Äˆµ‚¤
-					retval = 'H';
 					move_x = 1;
-					half_width = TRUE;
 				} else {
 					// ‘SŠp‚Æ‚µ‚Äˆµ‚¤
-					retval = 'W';
 					move_x = 2;
-					half_width = FALSE;
 					if (CursorX + 2 > NumOfColumns) {
 						// ‚Í‚Ýo‚·
 						return -1;
@@ -2979,7 +3000,7 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				}
 
 				CodeLine[CursorX] = b1;
-				BuffSetChar2(&CodeLineW[CursorX], u32, retval, half_width);
+				BuffSetChar2(&CodeLineW[CursorX], u32, width_property, half_width, emoji);
 				if (half_width) {
 					AttrLine[CursorX] = Attr.Attr;
 				} else {
@@ -3214,6 +3235,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 	int lenW = 0;
 	int lenA = 0;
 	TCharAttr CurAttr;
+	BOOL CurAttrEmoji;
 	BOOL CurSelected;
 	BOOL EndFlag = FALSE;
 	int count = 0;		// Œ»Ý’–Ú‚µ‚Ä‚¢‚é•¶Žš,IStart‚©‚ç
@@ -3240,7 +3262,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		} else {
 			if (b->u32 < 0x10000) {
 				bufW[lenW] = b->wc2[0];
-				bufWW[lenW] = b->WidthProperty;
+				bufWW[lenW] = b->HalfWidth ? 'H' : 'W';
 				lenW++;
 			} else {
 				// UTF-16‚ÅƒTƒƒQ[ƒgƒyƒA
@@ -3265,13 +3287,17 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			}
 		}
 
+		if (b->Emoji) {
+			int a = 0;
+		}
 		if (count == 0) {
 			// Å‰‚Ì1•¶Žš–Ú
 			CurAttr = TempAttr;
+			CurAttrEmoji = b->Emoji;
 			CurSelected = CheckSelect(istart+count,SY);
 		} else if (b->u32 != 0 &&
-				   ((TCharAttrCmp(CurAttr, TempAttr) != 0) ||
-					(CurSelected != CheckSelect(istart+count,SY)))) {
+				   ((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
+					(CurSelected != CheckSelect(istart+count,SY)))){
 			// ‚±‚Ì•¶Žš‚ÅƒAƒgƒŠƒrƒ…[ƒg‚ª•Ï‰»‚µ‚½ ¨ •`‰æ
 			DrawFlag = TRUE;
 			lenA--;
@@ -5809,6 +5835,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		wchar_t *str2_ptr;
 		size_t str2_len;
 		int i;
+		wchar_t *width_property;
 
 		if (b->CombinationCharCount16 == 0) {
 			// ƒRƒ“ƒrƒl[ƒVƒ‡ƒ“‚È‚µ
@@ -5851,16 +5878,25 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 			}
 		}
 
+		width_property =
+			b->WidthProperty == 'F' ? L"Fullwidth" :
+			b->WidthProperty == 'H' ? L"Halfwidth" :
+			b->WidthProperty == 'W' ? L"Wide" :
+			b->WidthProperty == 'n' ? L"Narrow" :
+			b->WidthProperty == 'A' ? L"Ambiguous" :
+			b->WidthProperty == 'N' ? L"Neutral" :
+			L"?";
+
 		str2_len = aswprintf(&str2_ptr,
 							 L"\n"
 							 L"%s\n"
 							 L"'%s'\n"
-							 L"WidthProperty %c\n"
+							 L"WidthProperty %s\n"
 							 L"Half %s\n"
 							 L"Padding %s",
 							 codes_ptr,
 							 wcs,
-							 b->WidthProperty,
+							 width_property,
 							 (b->HalfWidth ? L"TRUE" : L"FALSE"),
 							 (b->Padding ? L"TRUE" : L"FALSE")
 			);
@@ -5878,14 +5914,6 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 
 	return str_ptr;
 }
-
-#if UNICODE_INTERNAL_BUFF
-BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32)
-{
-	const char width_property = UnicodeGetWidthProperty(u32);
-	return BuffIsHalfWidthFromPropery(ts_, width_property);
-}
-#endif
 
 void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr)
 {
