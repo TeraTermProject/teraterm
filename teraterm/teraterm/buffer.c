@@ -2784,6 +2784,10 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				retval = 'W';
 				move_x = 2;
 				half_width = FALSE;
+				if (CursorX + 2 > NumOfColumns) {
+					// ÇÕÇ›èoÇ∑
+					return -1;
+				}
 			}
 
 			CodeLine[CursorX] = b1;
@@ -5534,7 +5538,8 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 					  L"attr2     0x%02x\n"
 					  L"attrFore  0x%02x\n"
 					  L"attrBack  0x%02x\n"
-					  L"CodeLine  %s('%S')",
+//					  L"CodeLine  %s('%hs')",
+					  L"CodeLine  %s",
 					  X, ScreenY, Y,
 					  Xw, Yw,
 					  attr,
@@ -5549,7 +5554,8 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 					  (unsigned char)AttrBuff2[TmpPtr+X],
 					  (unsigned char)AttrBuffFG[TmpPtr+X],
 					  (unsigned char)AttrBuffBG[TmpPtr+X],
-					  mb_str, cs
+//					  mb_str, cs
+					  mb_str
 				);
 	}
 	free(mb_str);

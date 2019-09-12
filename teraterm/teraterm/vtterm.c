@@ -5634,39 +5634,68 @@ static void UnicodeToCP932(unsigned int code)
 			if (ts.EnableContinuedLineCopy)
 				CharAttrTmp.Attr |= AttrLineContinued;
 		}
+#if 0
 		else if (CursorX > LineEnd - 1) {
 			if (AutoWrapMode) {
 				if (ts.EnableContinuedLineCopy) {
 					CharAttrTmp.Attr |= AttrLineContinued;
 					if (CursorX == LineEnd && BuffIsHalfWidthFromCode(&ts, code)) {
 						// full width出力が半分出力にならないように0x20を出力
-						BuffPutChar(0x20, CharAttr, FALSE);
+						BuffPutChar(0x20, CharAttrTmp, FALSE);
 					}
 				}
 				CarriageReturn(FALSE);
 				LineFeed(LF,FALSE);
 			}
 		}
+#endif
 		Wrap = FALSE;
+		BOOL is_update = FALSE;
+	retry:
 		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
-		if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
-			UpdateStr();
-			Wrap = AutoWrapMode;
+		if (r == -1) {
+			// 文字全角で行末、入力できない
+
+			// 、wrap処理
+			CharAttrTmp = CharAttr;
+			CharAttrTmp.Attr |= AttrLineContinued;
+			// AutoWrapMode
+			// ts.EnableContinuedLineCopy
+			//if (CursorX != LineEnd){
+			//&& BuffIsHalfWidthFromCode(&ts, code)) {
+
+			// full width出力が半分出力にならないように0x20を出力
+			BuffPutUnicode('!'/*0x20*/, CharAttrTmp, FALSE);
+
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+
+			//CharAttrTmp.Attr &= ~AttrLineContinued;
+			goto retry;
+		}
+		else if (r == 0) {
+			// カーソルの移動なし,合字など
+			;
+		} else if (r == 1) {
+			// 半角(1セル)
+			if (CursorX + 1 == CursorRightM || CursorX >= NumOfColumns - 1) {
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+			}
+		} else if (r == 2) {
+			// 全角(2セル)
+			if (CursorX + 2 == CursorRightM || CursorX + 2 >= NumOfColumns - 1) {
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+				MoveRight();
+			}
 		}
 		else {
-			if (r == 0) {
-				// カーソルの移動なし
-				;
-			} else if (r == 1) {
-				// 半角
-				MoveRight();
-			} else if (r == 2) {
-				// 全角
-				MoveRight();
-				MoveRight();
-			} else {
-				assert(FALSE);
-			}
+			assert(FALSE);
 		}
 	}
 }

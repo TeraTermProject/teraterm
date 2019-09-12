@@ -111,7 +111,9 @@ int BuffGetCurrentLineData(char *buf, int bufsize);
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
 wchar_t *BuffGetCharInfo(int Xw, int Yw);
+#if 0
 BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32);
+#endif
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
