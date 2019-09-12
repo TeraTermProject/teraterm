@@ -71,9 +71,6 @@ typedef struct {
 } buff_char_t;
 #endif
 
-// URLを強調する（石崎氏パッチ 2005/4/2）
-#define URL_EMPHASIS 1
-
 #define BuffXMax TermWidthMax
 //#define BuffYMax 100000
 //#define BuffSizeMax 8000000
@@ -2311,10 +2308,8 @@ static BOOL isURLchar(unsigned char u32)
 	return url_char[u32] == 0 ? FALSE : TRUE;
 }
 
-/* begin - ishizaki */
 static void markURL(int x)
 {
-#ifdef URL_EMPHASIS
 	LONG PrevCharPtr;
 	CHAR PrevCharAttr, PrevCharCode;
 
@@ -2403,9 +2398,7 @@ static void markURL(int x)
 		rc.bottom = CaretY + FontHeight;
 		InvalidateRect(HVTWin, &rc, FALSE);
 	}
-#endif
 }
-/* end - ishizaki */
 
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 // Put a character in the buffer at the current position
@@ -3636,12 +3629,32 @@ void GetMinMax(int i1, int i2, int i3,
 	}
 }
 
-/* start - ishizaki */
+static void invokeBrowserWithUrl(const char *url)
+{
+	if (strncmp(url, "http://", strlen("http://")) == 0 ||
+	    strncmp(url, "https://", strlen("https://")) == 0 ||
+	    strncmp(url, "ftp://", strlen("ftp://")) == 0) {
+		if (strlen(ts.ClickableUrlBrowser) > 0) {
+			char param[1024];
+			_snprintf_s(param, sizeof(param), _TRUNCATE, "%s %s",
+			            ts.ClickableUrlBrowserArg, url);
+			if (ShellExecuteA(NULL, NULL, ts.ClickableUrlBrowser, param, NULL,SW_SHOWNORMAL) >= (HINSTANCE)32) {
+				return;		// 実行できた
+			}
+			// コマンドの実行に失敗した場合は通常と同じ処理をする
+		}
+		ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+	}
+	else {
+		ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+	}
+}
+
+#if !UNICODE_INTERNAL_BUFF
 static void invokeBrowser(LONG ptr)
 {
-#ifdef URL_EMPHASIS
 	LONG i, start, end;
-	char url[1024], param[1024];
+	char url[1024];
 	char *uptr, ch;
 
 	start = ptr;
@@ -3671,27 +3684,35 @@ static void invokeBrowser(LONG ptr)
 	}
 	*uptr = '\0';
 
-	if (strncmp(url, "http://", strlen("http://")) == 0 ||
-	    strncmp(url, "https://", strlen("https://")) == 0 ||
-	    strncmp(url, "ftp://", strlen("ftp://")) == 0) {
-		if (strlen(ts.ClickableUrlBrowser) > 0) {
-			_snprintf_s(param, sizeof(param), _TRUNCATE, "%s %s",
-			            ts.ClickableUrlBrowserArg, url);
-			if ((int)ShellExecuteA(NULL, NULL, ts.ClickableUrlBrowser, param, NULL,SW_SHOWNORMAL) < 32) {
-				// コマンドの実行に失敗した場合は通常と同じ処理をする
-				ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
-			}
-		}
-		else {
-			ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
-		}
-	}
-	else {
-		ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
-	}
-#endif
+	invokeBrowserWithUrl(url);
 }
-/* end - ishizaki */
+#endif
+
+#if UNICODE_INTERNAL_BUFF
+static void invokeBrowserW(int x, int y)
+{
+	const LONG TmpPtr = GetLinePtr(y);
+	int sx;
+	int ex;
+
+	sx = x;
+	while (AttrBuff[TmpPtr + sx] & AttrURL) {
+		sx--;
+	}
+	sx++;
+
+	ex = x;
+	while (AttrBuff[TmpPtr + ex] & AttrURL) {
+		ex++;
+	}
+
+	wchar_t *url_w = BuffGetStringForCB(sx, y, ex, y, FALSE, NULL);
+	char *url = ToCharW(url_w);
+	invokeBrowserWithUrl(url);
+	free(url);
+	free(url_w);
+}
+#endif
 
 void ChangeSelectRegion()
 {
@@ -3802,7 +3823,11 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 			ChangeSelectRegion();
 
 			url_invoked = TRUE;
+#if UNICODE_INTERNAL_BUFF
+			invokeBrowserW(X, Y);
+#else
 			invokeBrowser(TmpPtr+X);
+#endif
 
 			SelectStart.x = 0;
 			SelectStart.y = 0;
