@@ -125,6 +125,9 @@ static HFONT DCPrevFont;
 TCharAttr DefCharAttr = {
   AttrDefault,
   AttrDefault,
+#if UNICODE_INTERNAL_BUFF
+  AttrDefault,
+#endif
   AttrDefaultFG,
   AttrDefaultBG
 };

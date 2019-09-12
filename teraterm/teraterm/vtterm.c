@@ -631,9 +631,20 @@ static void PutChar(BYTE b)
 	}
 
 	if (Wrap) {
+#if UNICODE_INTERNAL_BUFF
+		TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+		t.Attr |= AttrLineContinued;
+		t.AttrEx = t.Attr;
+		BuffSetCursorCharAttr(CursorX, CursorY, t);
+#endif
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
+#if !UNICODE_INTERNAL_BUFF
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
+#else
+		CharAttrTmp.Attr |= AttrLineContinued;
+		t.AttrEx = t.Attr;
+#endif
 	}
 
 	if (cv.HLogBuf !=0) {
@@ -677,7 +688,14 @@ static void PutChar(BYTE b)
 	else
 		CharAttrTmp.Attr |= CharAttr.Attr;
 
+#if 0
+	if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
+		CharAttrTmp.Attr |= AttrLineContinued;
+	}
+#endif
+
 #if UNICODE_INTERNAL_BUFF
+	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 	if (ts.Language == IdJapanese) {
 		unsigned long u32;
 		switch (ts.KanjiCode) {
@@ -748,6 +766,9 @@ static void PutDecSp(BYTE b)
 	}
 
 	CharAttrTmp.Attr |= AttrSpecial;
+#if UNICODE_INTERNAL_BUFF
+	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+#endif
 	BuffPutChar(b, CharAttrTmp, InsertMode);
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
@@ -790,13 +811,23 @@ static void PutKanji(BYTE b)
 	if (Wrap) {
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
+#if !UNICODE_INTERNAL_BUFF
 		if (ts.EnableContinuedLineCopy)
 			CharAttrTmp.Attr |= AttrLineContinued;
+#else
+		if (ts.EnableContinuedLineCopy) {
+			CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+		}
+#endif
 	}
 	else if (CursorX > LineEnd - 1) {
 		if (AutoWrapMode) {
 			if (ts.EnableContinuedLineCopy) {
 				CharAttrTmp.Attr |= AttrLineContinued;
+#if UNICODE_INTERNAL_BUFF
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+#endif
 				if (CursorX == LineEnd)
 					BuffPutChar(0x20, CharAttr, FALSE);
 			}
@@ -2115,6 +2146,9 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 		  case   0:	/* Clear all */
 			attr->Attr = DefCharAttr.Attr;
 			attr->Attr2 = DefCharAttr.Attr2 | (attr->Attr2&Attr2Protect);
+#if UNICODE_INTERNAL_BUFF
+			attr->AttrEx = attr->Attr;
+#endif
 			attr->Fore = DefCharAttr.Fore;
 			attr->Back = DefCharAttr.Back;
 			mask->Attr = AttrSgrMask;
@@ -3609,6 +3643,9 @@ void CSDol(BYTE b)
 			attr.Attr &= AttrSgrMask;
 			mask.Attr &= AttrSgrMask;
 			attr.Attr2 &= Attr2ColorMask;
+#if UNICODE_INTERNAL_BUFF
+			attr.AttrEx = attr.Attr;
+#endif
 			mask.Attr2 &= Attr2ColorMask;
 			if (RectangleMode) {
 				BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
@@ -5625,14 +5662,15 @@ static void UnicodeToCP932(unsigned int code)
 			LineEnd = CursorRightM;
 
 
-		// TODO
-		//		PutUnicode()して、エラーが返ってきたら
-		//		カーソル位置を検討するよう変更するのはどうだろう?
 		if (Wrap) {
+			TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+			t.Attr |= AttrLineContinued;
+			t.AttrEx = t.Attr;
+			BuffSetCursorCharAttr(CursorX, CursorY, t);
 			CarriageReturn(FALSE);
 			LineFeed(LF,FALSE);
-			if (ts.EnableContinuedLineCopy)
-				CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.Attr = CharAttrTmp.AttrEx;
 		}
 #if 0
 		else if (CursorX > LineEnd - 1) {
@@ -5649,6 +5687,9 @@ static void UnicodeToCP932(unsigned int code)
 			}
 		}
 #endif
+
+		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
+		//		エラー時はカーソル位置を検討する
 		Wrap = FALSE;
 		BOOL is_update = FALSE;
 	retry:
@@ -5656,19 +5697,28 @@ static void UnicodeToCP932(unsigned int code)
 		if (r == -1) {
 			// 文字全角で行末、入力できない
 
-			// 、wrap処理
-			CharAttrTmp = CharAttr;
-			CharAttrTmp.Attr |= AttrLineContinued;
-			// AutoWrapMode
-			// ts.EnableContinuedLineCopy
-			//if (CursorX != LineEnd){
-			//&& BuffIsHalfWidthFromCode(&ts, code)) {
+			if (AutoWrapMode) {
+				// 自動改行
+				// 、wrap処理
+				CharAttrTmp = CharAttr;
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
+				// AutoWrapMode
+				// ts.EnableContinuedLineCopy
+				//if (CursorX != LineEnd){
+				//&& BuffIsHalfWidthFromCode(&ts, code)) {
 
-			// full width出力が半分出力にならないように0x20を出力
-			BuffPutUnicode('!'/*0x20*/, CharAttrTmp, FALSE);
+				// full width出力が半分出力にならないように0x20を出力
+				BuffPutUnicode('!'/*0x20*/, CharAttrTmp, FALSE);
+				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
 
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+			else {
+				// 行頭に戻す
+				CursorX = 0;
+			}
 
 			//CharAttrTmp.Attr &= ~AttrLineContinued;
 			goto retry;
@@ -5678,7 +5728,7 @@ static void UnicodeToCP932(unsigned int code)
 			;
 		} else if (r == 1) {
 			// 半角(1セル)
-			if (CursorX + 1 == CursorRightM || CursorX >= NumOfColumns - 1) {
+			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
 				UpdateStr();
 				Wrap = AutoWrapMode;
 			} else {
@@ -5686,7 +5736,7 @@ static void UnicodeToCP932(unsigned int code)
 			}
 		} else if (r == 2) {
 			// 全角(2セル)
-			if (CursorX + 2 == CursorRightM || CursorX + 2 >= NumOfColumns - 1) {
+			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
 				UpdateStr();
 				Wrap = AutoWrapMode;
 			} else {

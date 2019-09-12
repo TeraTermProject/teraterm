@@ -61,6 +61,7 @@ typedef struct {
 	char32_t u32_last;
 	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' (文字の属性)
 	char HalfWidth;					// TRUE/FALSE = 半角/全角 (表示するときの文字幅)
+	char Padding;					// TRUE = 全角の次の詰め物 or 行末の詰め物
 	char CombinationCharCount16;	// charactor count
 	char CombinationCharSize16;		// buffer size
 	char CombinationCharCount32;
@@ -143,6 +144,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char ha
 	p->HalfWidth = half_width;
 	p->u32 = u32;
 	p->u32_last = u32;
+	p->Padding = FALSE;
 
 	//
 	wstr_len = UTF32ToUTF16(u32, &p->wc2[0], 2);
@@ -2374,13 +2376,13 @@ static void markURL(int x)
 	}
 
 	if ((x-2>=0) && !strncmp(&CodeLine[x-2], "://", 3)) {
-		int i, len = -1;
+		int i;
 		RECT rc;
 		int CaretX, CaretY;
 		char **p = prefix;
 
 		while (*p) {
-			len = strlen(*p) - 1;
+			size_t len = strlen(*p) - 1;
 			if ((x-len>=0) && !strncmp(&CodeLine[x-len], *p, len)) {
 				for (i = 0; i <= len; i++) {
 					AttrLine[x-i] |= AttrURL;
@@ -2623,6 +2625,8 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	BYTE b1, b2;
 	int move_x = 0;
 
+	assert(Attr.Attr == (Attr.AttrEx & 0xff));
+
 	// TODO 入力文字を CP932 に変換しておく、廃止予定
 	if (u32 < 0x80) {
 		b1 = (BYTE)u32;
@@ -2732,85 +2736,99 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		StrChangeCount = 0;
 		BuffUpdateRect(XStart, CursorY, LineEnd+extr, CursorY);
 	} else {
-		buff_char_t *p = NULL;	// NULLのとき、前の文字はない
-		// 前の文字
-		if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
-			p = &CodeLineW[CursorX - 1];
-		} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
-			p = &CodeLineW[CursorX - 2];
-		}
-
-		if (UnicodeIsVariationSelector(u32) ||
-			UnicodeIsCombiningCharacter(u32) ||
-			(u32 == 0x200d) ||
-			(p != NULL && p->u32_last == 0x200d))
-		{
-			// Combining
-			//		VariationSelector or
-			//		CombiningCharacter or
-			//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d) or
-			//		1つ前が ZWJ
-			move_x = 0;				// カーソル移動量=0
-
-			if (p == NULL) {
-				// 前がないのにくっつく文字が出てきたとき
-				// とりあえずスペースにくっつける
-				p = &CodeLineW[CursorX];
-				BuffSetChar(p, ' ', 'H');
-			}
-
-			// 前の文字にくっつける
-			BuffAddChar(p, u32);
-#if 0
+		if ((Attr.AttrEx & AttrPadding) != 0) {
+			// 詰め物
+			buff_char_t *p = &CodeLineW[CursorX];
+			BuffSetChar(p, u32, 'H');
+			p->Padding = TRUE;
 			AttrLine[CursorX] = Attr.Attr;
 			AttrLine2[CursorX] = Attr.Attr2;
 			AttrLineFG[CursorX] = Attr.Fore;
 			AttrLineBG[CursorX] = Attr.Back;
-#endif
+			move_x = 1;
 		} else {
-			// 新しい文字追加
+			buff_char_t *p = NULL;	// NULLのとき、前の文字はない
+			// 前の文字
+			if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
+				p = &CodeLineW[CursorX - 1];
+			} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
+				p = &CodeLineW[CursorX - 2];
+			}
 
-			const char width_property = UnicodeGetWidthProperty(u32);
-			char retval;
-			BOOL half_width;
-			const int is_emoji = UnicodeIsEmoji(u32);
-			if (!is_emoji && BuffIsHalfWidthFromPropery(&ts, width_property)) {
-				// 半角として扱う
-				retval = 'H';
-				move_x = 1;
-				half_width = TRUE;
-			} else {
-				// 全角として扱う
-				retval = 'W';
-				move_x = 2;
-				half_width = FALSE;
-				if (CursorX + 2 > NumOfColumns) {
-					// はみ出す
-					return -1;
+			if (UnicodeIsVariationSelector(u32) ||
+				UnicodeIsCombiningCharacter(u32) ||
+				(u32 == 0x200d) ||
+				(p != NULL && p->u32_last == 0x200d))
+			{
+				// Combining
+				//		VariationSelector or
+				//		CombiningCharacter or
+				//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d) or
+				//		1つ前が ZWJ
+				move_x = 0;				// カーソル移動量=0
+
+				if (p == NULL) {
+					// 前がないのにくっつく文字が出てきたとき
+					// とりあえずスペースにくっつける
+					p = &CodeLineW[CursorX];
+					BuffSetChar(p, ' ', 'H');
 				}
-			}
 
-			CodeLine[CursorX] = b1;
-			BuffSetChar2(&CodeLineW[CursorX], u32, retval, half_width);
-			if (half_width) {
+				// 前の文字にくっつける
+				BuffAddChar(p, u32);
+#if 0
 				AttrLine[CursorX] = Attr.Attr;
+				AttrLine2[CursorX] = Attr.Attr2;
+				AttrLineFG[CursorX] = Attr.Fore;
+				AttrLineBG[CursorX] = Attr.Back;
+#endif
 			} else {
-				// 全角
-				AttrLine[CursorX] = Attr.Attr | AttrKanji;
-			}
-			AttrLine2[CursorX] = Attr.Attr2;
-			AttrLineFG[CursorX] = Attr.Fore;
-			AttrLineBG[CursorX] = Attr.Back;
+				// 新しい文字追加
 
-			if (!half_width) {
-				// 全角の時は次の文字コードに0を入れる
-				if (CursorX < NumOfColumns-1) {
-					BuffSetChar(&CodeLineW[CursorX+1], 0, 'H');
-					CodeLine[CursorX+1] = b2;
-					AttrLine[CursorX+1] = Attr.Attr;
-					AttrLine2[CursorX+1] = Attr.Attr2;
-					AttrLineFG[CursorX+1] = Attr.Fore;
-					AttrLineBG[CursorX+1] = Attr.Back;
+				const char width_property = UnicodeGetWidthProperty(u32);
+				char retval;
+				BOOL half_width;
+				const int is_emoji = UnicodeIsEmoji(u32);
+				if (!is_emoji && BuffIsHalfWidthFromPropery(&ts, width_property)) {
+					// 半角として扱う
+					retval = 'H';
+					move_x = 1;
+					half_width = TRUE;
+				} else {
+					// 全角として扱う
+					retval = 'W';
+					move_x = 2;
+					half_width = FALSE;
+					if (CursorX + 2 > NumOfColumns) {
+						// はみ出す
+						return -1;
+					}
+				}
+
+				CodeLine[CursorX] = b1;
+				BuffSetChar2(&CodeLineW[CursorX], u32, retval, half_width);
+				if (half_width) {
+					AttrLine[CursorX] = Attr.Attr;
+				} else {
+					// 全角
+					AttrLine[CursorX] = Attr.Attr | AttrKanji;
+				}
+				AttrLine2[CursorX] = Attr.Attr2;
+				AttrLineFG[CursorX] = Attr.Fore;
+				AttrLineBG[CursorX] = Attr.Back;
+
+				if (!half_width) {
+					// 全角の時は次のセルは詰め物
+					if (CursorX < NumOfColumns-1) {
+						buff_char_t *p = &CodeLineW[CursorX+1];
+						BuffSetChar(p, 0, 'H');
+						p->Padding = TRUE;
+						CodeLine[CursorX+1] = b2;
+						AttrLine[CursorX+1] = 0;
+						AttrLine2[CursorX+1] = 0;
+						AttrLineFG[CursorX+1] = 0;
+						AttrLineBG[CursorX+1] = 0;
+					}
 				}
 			}
 		}
@@ -5616,11 +5634,13 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 							 L"%s\n"
 							 L"'%s'\n"
 							 L"WidthProperty %c\n"
-							 L"Half %s",
+							 L"Half %s\n"
+							 L"Padding %s",
 							 codes_ptr,
 							 wcs,
 							 b->WidthProperty,
-							 (b->HalfWidth ? L"TRUE" : L"FALSE")
+							 (b->HalfWidth ? L"TRUE" : L"FALSE"),
+							 (b->Padding ? L"TRUE" : L"FALSE")
 			);
 		free(codes_ptr);
 		free(wcs);
@@ -5644,3 +5664,24 @@ BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32)
 	return BuffIsHalfWidthFromPropery(ts_, width_property);
 }
 #endif
+
+void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr)
+{
+	const LONG TmpPtr = GetLinePtr(PageStart+y);
+	AttrBuff[TmpPtr + x] = Attr.Attr;
+	AttrBuff2[TmpPtr + x] = Attr.Attr2;
+	AttrBuffFG[TmpPtr + x] = Attr.Fore;
+	AttrBuffBG[TmpPtr + x] = Attr.Back;
+}
+
+TCharAttr BuffGetCursorCharAttr(int x, int y)
+{
+	const LONG TmpPtr = GetLinePtr(PageStart+y);
+	TCharAttr Attr;
+	Attr.Attr = AttrBuff[TmpPtr + x];
+	Attr.Attr2 = AttrBuff2[TmpPtr + x];
+	Attr.Fore = AttrBuffFG[TmpPtr + x];
+	Attr.Back =AttrBuffBG[TmpPtr + x];
+
+	return Attr;
+}

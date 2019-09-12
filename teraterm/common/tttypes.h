@@ -33,6 +33,7 @@
 #include <locale.h>
 #include "teraterm.h"
 #include "tt-version.h"
+#include "../teraterm/unicode_test.h"
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -77,7 +78,10 @@
 /* begin - ishizaki */
 #define AttrURL           0x40
 /* end - ishizaki */
-#define AttrKanji         0x80
+#define AttrKanji         0x80		// 1=ëSäp(2cell)/0=îºäp(1cell)
+#if UNICODE_INTERNAL_BUFF
+#define AttrPadding       0x100		// 1=padding(2cellÇÃéüÇÃ1cell or çsññ)
+#endif
   /* Color attribute bit masks */
 #define Attr2Fore         0x01
 #define Attr2Back         0x02
@@ -90,6 +94,9 @@
 typedef struct {
 	BYTE Attr;
 	BYTE Attr2;
+#if UNICODE_INTERNAL_BUFF
+	WORD AttrEx;
+#endif
 	BYTE Fore;
 	BYTE Back;
 } TCharAttr;
