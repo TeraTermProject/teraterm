@@ -28,13 +28,12 @@
  */
 
 /* TERATERM.EXE, scroll buffer routines */
-#undef UNICODE
-#undef _UNICODE
 
 #include "teraterm.h"
 #include <string.h>
 #include <stdio.h>
 #include <windows.h>
+#define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #include <mbstring.h>
 #include <assert.h>
@@ -49,15 +48,7 @@
 #include "ttplug.h" /* TTPLUG */
 #include "codeconv.h"
 #include "unicode.h"
-
 #include "buffer.h"
-
-#ifdef _DEBUG
-#define malloc(l)		_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define	realloc(p, l)	_realloc_dbg((p), (l),  _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)			_free_dbg((p), _NORMAL_BLOCK)
-#endif
-
 #include "unicode_test.h"
 
 #if UNICODE_INTERNAL_BUFF
@@ -1713,6 +1704,7 @@ static int MoveCharPtr(LONG Line, int *x, int dx)
  *	@param[in]	box_select	TRUE=箱型(矩形)選択
  *							FALSE=行選択
  *	@param[out] _str_len	文字列長(文字端L'\0'を含む)
+ *				NULLのときは返さない
  *	@return		文字列
  *				使用後は free() すること
  */
@@ -1817,7 +1809,9 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 
 	UnlockBuffer();
 
-	*_str_len = k;
+	if (_str_len != NULL) {
+		*_str_len = k;
+	}
 	return str_w;
 }
 #endif
@@ -1832,7 +1826,6 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
  *	@retval		0=マッチしなかった
  *				マッチした文字列長
  */
-#if UNICODE_INTERNAL_BUFF
 static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 {
 	int match_pos = 0;
@@ -1872,14 +1865,12 @@ static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 	}
 	return match_pos;
 }
-#endif
 
 /**
  *	(x,y)から strと同一か調べる
  *
  *	@param		y		PageStart + CursorY
  */
-#if UNICODE_INTERNAL_BUFF
 static BOOL MatchString(int x, int y, const wchar_t *str)
 {
 	BOOL result;
@@ -1915,7 +1906,6 @@ static BOOL MatchString(int x, int y, const wchar_t *str)
 
 	return result;
 }
-#endif
 
 /**
  *	(sx,sy)から(ex,ey)までで str にマッチする文字を探して
@@ -1926,7 +1916,6 @@ static BOOL MatchString(int x, int y, const wchar_t *str)
  *	@param[out]	y		マッチした位置
  *	@retval		TRUE	マッチした
  */
-#if UNICODE_INTERNAL_BUFF
 static BOOL BuffGetMatchPosFromString(
 	int sx, int sy, int ex, int ey, const wchar_t *str,
 	int *match_x, int *match_y)
@@ -1957,7 +1946,6 @@ static BOOL BuffGetMatchPosFromString(
 	}
 	return FALSE;
 }
-#endif
 
 
 /**
@@ -2297,6 +2285,31 @@ void BuffDumpCurrentLine(BYTE TERM)
 	}
 }
 
+static BOOL isURLchar(unsigned char u32)
+{
+	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)に準拠する
+	// by sakura editor 1.5.2.1: etc_uty.cpp
+	static const char	url_char[] = {
+	  /* +0  +1  +2  +3  +4  +5  +6  +7  +8  +9  +A  +B  +C  +D  +E  +F */
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,	/* +00: */
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,	/* +10: */
+	      0, -1,  0, -1, -1, -1, -1,  0,  0,  0,  0, -1, -1, -1, -1, -1,	/* +20: " !"#$%&'()*+,-./" */
+	     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0, -1,  0, -1,	/* +30: "0123456789:;<=>?" */
+	     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	/* +40: "@ABCDEFGHIJKLMNO" */
+	     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0, -1,  0,  0, -1,	/* +50: "PQRSTUVWXYZ[\]^_" */
+	      0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	/* +60: "`abcdefghijklmno" */
+	     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,  0,  0, -1,  0,	/* +70: "pqrstuvwxyz{|}~ " */
+	    /* 0    : not url char
+	     * -1   : url char
+	     * other: url head char --> url_table array number + 1
+	     */
+	};
+
+	if (u32 >= 0x80) {
+		return FALSE;
+	}
+	return url_char[u32] == 0 ? FALSE : TRUE;
+}
 
 /* begin - ishizaki */
 static void markURL(int x)
@@ -2608,17 +2621,16 @@ static BOOL BuffIsHalfWidthFromPropery(TTTSet *ts_, char width_property)
 #if UNICODE_INTERNAL_BUFF
 char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 {
-	int ret;
 	BYTE b1, b2;
 	int move_x = 0;
 
+	// TODO 入力文字を CP932 に変換しておく、廃止予定
 	if (u32 < 0x80) {
 		b1 = (BYTE)u32;
 		b2 = 0;
-		ret = 1;
 	} else {
 		char mbchar[2];
-		ret = UTF32ToCP932(u32, mbchar, 2);
+		size_t ret = UTF32ToCP932(u32, mbchar, 2);
 		if (ret == 0) {
 			b1 = '?';
 			b2 = 0;
@@ -2799,11 +2811,6 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			}
 		}
 
-		/* begin - ishizaki */
-//		markURL(CursorX);
-//		markURL(CursorX+1);
-		/* end - ishizaki */
-
 		if (StrChangeCount==0) {
 			StrChangeStart = CursorX;
 		}
@@ -2818,6 +2825,86 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			// 全角
 			StrChangeCount = StrChangeCount + 2;
 		}
+
+		/* begin - ishizaki */
+		{
+			int x = CursorX;
+			BOOL pass = FALSE;
+
+			// 1つ前のキャラクタがURL?
+			if (x >= 1 && AttrLine[x-1] & AttrURL) {
+				if (isURLchar(u32)) {
+					// URLを伸ばす
+					AttrLine[x] |= AttrURL;
+					pass = TRUE;
+				}
+			}
+
+			// カーソル位置がURL
+			if ((AttrLine[x] & AttrURL) != 0) {
+				pass = TRUE;	// やることなし
+			}
+
+			if (!pass) {
+				// '/' が入力されたら調べ始める
+				if (u32 == '/') {
+					if ((CodeLineW[x-2].u32 == ':') && (CodeLineW[x-2].CombinationCharCount16 == 0) &&
+						(CodeLineW[x-1].u32 == '/') && (CodeLineW[x-1].CombinationCharCount16 == 0) &&
+						(CodeLineW[x-0].u32 == '/') && (CodeLineW[x-0].CombinationCharCount16 == 0))
+					{	// "://"が入力された
+						pass = FALSE;
+					} else {
+						pass = TRUE;
+					}
+				} else {
+					pass = TRUE;
+				}
+			}
+
+			if (!pass) {
+				// 本格的に探す
+				static const struct schemes_t {
+					const wchar_t *str;
+					int len;
+				} schemes[] = {
+					{ L"https://", 8 },
+					{ L"http://", 7},
+					{ L"sftp://", 7},
+					{ L"tftp://", 7},
+					{ L"news://", 7},
+					{ L"ftp://", 6},
+					{ L"mms://", 6},
+				};
+				int i;
+				for (i = 0; i < _countof(schemes); i++) {
+					const wchar_t *prefix = schemes[i].str;
+					const int len = schemes[i].len - 1;
+					if (x >= len) {
+						// マッチするか?
+						int sx = x - len;
+						int sy = PageStart + CursorY;
+						int match_x, match_y;
+						if (BuffGetMatchPosFromString(sx, sy, x, sy, prefix, &match_x, &match_y)) {
+							// マッチしたのでURL属性を付ける
+							int i;
+							for (i = 0; i <= len; i++) {
+								AttrLine[sx+i] |= AttrURL;
+							}
+							if (StrChangeStart > sx) {
+								StrChangeStart = sx;
+								StrChangeCount += len;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+//		markURL(CursorX);
+//		markURL(CursorX+1);
+		/* end - ishizaki */
+
+
 #if 0
 		{
 			char ba[128];
@@ -3590,17 +3677,17 @@ static void invokeBrowser(LONG ptr)
 		if (strlen(ts.ClickableUrlBrowser) > 0) {
 			_snprintf_s(param, sizeof(param), _TRUNCATE, "%s %s",
 			            ts.ClickableUrlBrowserArg, url);
-			if ((int)ShellExecute(NULL, NULL, ts.ClickableUrlBrowser, param, NULL,SW_SHOWNORMAL) < 32) {
+			if ((int)ShellExecuteA(NULL, NULL, ts.ClickableUrlBrowser, param, NULL,SW_SHOWNORMAL) < 32) {
 				// コマンドの実行に失敗した場合は通常と同じ処理をする
-				ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+				ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
 			}
 		}
 		else {
-			ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+			ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
 		}
 	}
 	else {
-		ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+		ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
 	}
 #endif
 }
