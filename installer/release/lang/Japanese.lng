@@ -359,7 +359,7 @@ DLG_KEYB_DISABLE=無効化するモード
 DLG_KEYB_APPKEY=アプリケーションキーパッド(&A)
 DLG_KEYB_APPCUR=アプリケーションカーソル(&C)
 
-DLG_SERIAL_TITLE=Tera Term: シリアルポート 設定
+DLG_SERIAL_TITLE=Tera Term: シリアルポート 設定と接続
 DLG_SERIAL_PORT=ポート(&P):
 DLG_SERIAL_BAUD=スピード(&E):
 DLG_SERIAL_DATA=データ(&D):

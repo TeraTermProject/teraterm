@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=禁用模式：
 DLG_KEYB_APPKEY=应用键盘(&A)
 DLG_KEYB_APPCUR=应用鼠标(&C)
 
-DLG_SERIAL_TITLE=Tera Term：串口设置
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=端口(&P)：
 DLG_SERIAL_BAUD=比特率(&E)：
 DLG_SERIAL_DATA=数据位(&D)：

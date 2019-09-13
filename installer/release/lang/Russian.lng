@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=Альтернатива:
 DLG_KEYB_APPKEY=&Применить Keypad
 DLG_KEYB_APPCUR=Применить &Cursor
 
-DLG_SERIAL_TITLE=Tera Term: Настройка последовательного порта
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=&Порт:
 DLG_SERIAL_BAUD=&Скорость:
 DLG_SERIAL_DATA=&Данные:

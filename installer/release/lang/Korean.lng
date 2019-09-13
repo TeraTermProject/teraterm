@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=비활성화 모드:
 DLG_KEYB_APPKEY=어플리케이션 키패드(&A)
 DLG_KEYB_APPCUR=어플리케이션 커서(&C)
 
-DLG_SERIAL_TITLE=Tera Term: 시리얼포트 설정
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=포트(&P):
 DLG_SERIAL_BAUD=속도(&E):
 DLG_SERIAL_DATA=데이터(&D):

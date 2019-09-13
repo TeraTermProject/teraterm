@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=Abschalten:
 DLG_KEYB_APPKEY=Anwendungs-Keypad
 DLG_KEYB_APPCUR=Anwendungs-Cursor
 
-DLG_SERIAL_TITLE=Seriellen Port einrichten
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=Port:
 DLG_SERIAL_BAUD=Sp&eed:
 DLG_SERIAL_DATA=Data:
