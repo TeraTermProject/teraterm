@@ -41,32 +41,32 @@
 static TipWin *SizeTip;
 static int tip_enabled = 0;
 
-/**
- *	point を
- *	スクリーンからはみ出している場合、入るように補正する
- *	NearestMonitor が TRUE のとき、最も近いモニタ
- *	FALSEのとき、マウスのあるモニタに移動させる
- *	ディスプレイの端から FrameWidth(pixel) より離れるようにする
+/*
+ *	point ��
+ *	�X�N���[������͂ݏo���Ă���ꍇ�A����悤�ɕ␳����
+ *	NearestMonitor �� TRUE �̂Ƃ��A�ł��߂����j�^
+ *	FALSE�̂Ƃ��A�}�E�X�̂��郂�j�^�Ɉړ�������
+ *	�f�B�X�v���C�̒[���� FrameWidth(pixel) ��藣���悤�ɂ���
  */
 static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 {
 	if (HasMultiMonitorSupport()) {
-		// マルチモニタがサポートされている場合
+		// �}���`���j�^���T�|�[�g����Ă���ꍇ
 		HMONITOR hm;
 		MONITORINFO mi;
 		int ix, iy;
 
-		// 元の座標を保存しておく
+		// ���̍��W��ۑ����Ă���
 		ix = point->x;
 		iy = point->y;
 
 		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
 		if (hm == NULL) {
 			if (NearestMonitor) {
-				// 最も近いモニタに表示する
+				// �ł��߂����j�^�ɕ\������
 				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
 			} else {
-				// スクリーンからはみ出している場合はマウスのあるモニタに表示する
+				// �X�N���[������͂ݏo���Ă���ꍇ�̓}�E�X�̂��郂�j�^�ɕ\������
 				GetCursorPos(point);
 				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
 			}
@@ -86,7 +86,7 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 	}
 	else
 	{
-		// マルチモニタがサポートされていない場合
+		// �}���`���j�^���T�|�[�g����Ă��Ȃ��ꍇ
 		if (point->x < FrameWidth) {
 			point->x = FrameWidth;
 		}
@@ -96,15 +96,15 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 	}
 }
 
-/* リサイズ用ツールチップを表示する
+/* ���T�C�Y�p�c�[���`�b�v��\������
  *
- * 引数：
- *   src        ウィンドウハンドル
- *   cx, cy     ツールチップに表示する縦横サイズ
- *   fwSide     リサイズ時にどこのウィンドウを掴んだか
- *   newX, newY リサイズ後の左上の座標
+ * �����F
+ *   src        �E�B���h�E�n���h��
+ *   cx, cy     �c�[���`�b�v�ɕ\������c���T�C�Y
+ *   fwSide     ���T�C�Y���ɂǂ��̃E�B���h�E��͂񂾂�
+ *   newX, newY ���T�C�Y��̍���̍��W
  *
- * 注意： Windows9x では動作しない
+ * ���ӁF Windows9x �ł͓��삵�Ȃ�
  */
 void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 {
@@ -117,8 +117,8 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 	/* Generate the tip text */
 	_stprintf_s(str, _countof(str), _T("%dx%d"), cx, cy);
 
-	// ウィンドウの右、右下、下を掴んだ場合は、ツールチップを左上隅に配置する。
-	// それら以外はリサイズ後の左上隅に配置する。
+	// �E�B���h�E�̉E�A�E���A����͂񂾏ꍇ�́A�c�[���`�b�v��������ɔz�u����B
+	// �����ȊO�̓��T�C�Y��̍�����ɔz�u����B
 	if (!(fwSide == WMSZ_RIGHT || fwSide == WMSZ_BOTTOMRIGHT || fwSide == WMSZ_BOTTOM)) {
 		tooltip_movable = 1;
 	}
@@ -128,14 +128,14 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		POINT point;
 		int w, h;
 
-		// 文字列の縦横サイズを取得する
+		// ������̏c���T�C�Y���擾����
 		TipWinGetTextWidthHeight(src, str, &w, &h);
 
-		// ウィンドウの位置を取得
+		// �E�B���h�E�̈ʒu���擾
 		GetWindowRect(src, &wr);
 
-		// sizetipを出す位置は、ウィンドウ左上(X, Y)に対して、
-		// (X, Y - 文字列の高さ - FRAME_WIDTH * 2) とする。
+		// sizetip���o���ʒu�́A�E�B���h�E����(X, Y)�ɑ΂��āA
+		// (X, Y - ������̍��� - FRAME_WIDTH * 2) �Ƃ���B
 		point.x = wr.left;
 		point.y = wr.top - (h + FRAME_WIDTH * 2);
 		FixPosFromFrame(&point, 16, FALSE);
@@ -153,7 +153,7 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 
 		//OutputDebugPrintf("Updated: (%d,%d)\n", cx, cy);
 
-		// ウィンドウの左上が移動する場合
+		// �E�B���h�E�̍��オ�ړ�����ꍇ
 		if (tooltip_movable) {
 			TipWinSetPos(SizeTip, newX + FRAME_WIDTH*2, newY + FRAME_WIDTH*2);
 			//OutputDebugPrintf("Moved: (%d,%d)\n", newX, newY);
