@@ -996,6 +996,14 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				int pos;
 				pos = GetDlgItemInt(IDC_ALPHA_BLEND_ACTIVE);
+				if(pos < 0) {
+					pos = 0;
+					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
+				}
+				else if(pos > 255) {
+					pos = 255;
+					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
+				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
 
 				TCHAR tipbuf[32];
@@ -1021,6 +1029,14 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				int pos;
 				pos = GetDlgItemInt(IDC_ALPHA_BLEND_INACTIVE);
+				if(pos < 0) {
+					pos = 0;
+					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
+				}
+				else if(pos > 255) {
+					pos = 255;
+					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
+				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
 
 				TCHAR tipbuf[32], uimsg[MAX_UIMSG];
