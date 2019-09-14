@@ -47,6 +47,7 @@
 #include "dlg_res.h"
 #include "svnversion.h"
 #include "ttdlg.h"
+#include "tipwin.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -1104,6 +1105,8 @@ static PCHAR StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
 static PCHAR FlowList[] = {"Xon/Xoff", "RTS/CTS", "DSR/DTR", "none", NULL};
 static int g_deltaSumSerialDlg = 0;        // マウスホイールのDelta累積用
 static WNDPROC g_defSerialDlgEditWndProc;  // Edit Controlのサブクラス化用
+static WNDPROC g_defSerialDlgSpeedComboboxWndProc;  // Combo-box Controlのサブクラス化用
+static TipWin *g_SerialDlgSpeedTip;
 
 /*
  * シリアルポート設定ダイアログのテキストボックスにCOMポートの詳細情報を表示する。
@@ -1118,6 +1121,9 @@ static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 	SendDlgItemMessage(dlg, IDC_SERIALTEXT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
 }
 
+/*
+ * シリアルポート設定ダイアログのテキストボックスのプロシージャ
+ */
 static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
 {
 	WORD keys;
@@ -1155,6 +1161,55 @@ static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, 
 			break;
 	}
     return CallWindowProc(g_defSerialDlgEditWndProc, hWnd, msg, wp, lp);
+}
+
+/*
+ * シリアルポート設定ダイアログのSPEED(BAUD)のプロシージャ
+ */
+static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
+{
+	const int tooltip_timeout = 1000;  // msec
+	POINT pt;
+	int w, h;
+	int cx, cy;
+	RECT wr;
+	TCHAR str[128], uimsg[MAX_UIMSG];
+	PTTSet ts;
+
+	switch (msg) {
+		case WM_MOUSEMOVE:
+			ts = (PTTSet)GetWindowLongPtr(GetParent(hWnd) ,DWLP_USER);
+			get_lang_msg("DLG_SERIAL_SPEED_TOOLTIP", uimsg, sizeof(uimsg), "You can directly specify a number", ts->UILanguageFile);
+			_stprintf_s(str, _countof(str), _T(uimsg));
+
+			// Combo-boxの左上座標を求める
+			GetWindowRect(hWnd, &wr);
+			pt.x = wr.left;
+			pt.y = wr.top;
+
+			// 文字列の縦横サイズを取得する
+			TipWinGetTextWidthHeight(hWnd, str, &w, &h);
+
+			cx = pt.x;
+			cy = pt.y - (h + FRAME_WIDTH * 6);
+
+			// ツールチップを表示する
+			if (g_SerialDlgSpeedTip == NULL) {
+				g_SerialDlgSpeedTip = TipWinCreate(hWnd, cx, cy, str);
+				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
+
+			} else {
+				if (!TipWinIsVisible(g_SerialDlgSpeedTip))
+					TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
+
+				TipWinSetText(g_SerialDlgSpeedTip, str);
+				TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
+				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
+			}
+
+			break;
+	}
+    return CallWindowProc(g_defSerialDlgSpeedComboboxWndProc, hWnd, msg, wp, lp);
 }
 
 /*
@@ -1285,6 +1340,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				GWLP_WNDPROC, 
 				(LONG_PTR)SerialDlgEditWindowProc);
 
+			// Combo-box controlをサブクラス化する。
+			g_defSerialDlgSpeedComboboxWndProc = (WNDPROC)SetWindowLongPtr(
+				GetDlgItem(Dialog, IDC_SERIALBAUD), 
+				GWLP_WNDPROC, 
+				(LONG_PTR)SerialDlgSpeedComboboxWindowProc);
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1340,10 +1401,22 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
 					}
 
+					// ツールチップを廃棄する
+					if (g_SerialDlgSpeedTip) {
+						TipWinDestroy(g_SerialDlgSpeedTip);
+						g_SerialDlgSpeedTip = NULL;
+					}
+
 					EndDialog(Dialog, 1);
 					return TRUE;
 
 				case IDCANCEL:
+					// ツールチップを廃棄する
+					if (g_SerialDlgSpeedTip) {
+						TipWinDestroy(g_SerialDlgSpeedTip);
+						g_SerialDlgSpeedTip = NULL;
+					}
+
 					EndDialog(Dialog, 0);
 					return TRUE;
 

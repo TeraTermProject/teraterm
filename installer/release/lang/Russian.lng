@@ -370,6 +370,7 @@ DLG_SERIAL_FLOW=&Управление:
 DLG_SERIAL_DELAY=Задержка передачи
 DLG_SERIAL_DELAYCHAR=мс/&символ
 DLG_SERIAL_DELAYLINE=мс/&строка
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 
 DLG_TCPIP_TITLE=Tera Term: Настройка TCP/IP
 DLG_TCPIP_HOSTLIST=&Перечень хостов
