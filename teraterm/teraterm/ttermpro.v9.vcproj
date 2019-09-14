@@ -450,6 +450,9 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\tipwin.h"
+				>
+			<File
 				RelativePath="..\common\tmfc.h"
 				>
 			</File>

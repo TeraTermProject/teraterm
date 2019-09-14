@@ -141,9 +141,6 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
-static TipWin *OpacityTip;
-static POINT OpacityTipPts;
-
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
 #endif
@@ -173,13 +170,6 @@ static void SetMouseCursor(const char *cursor)
 
 	if (hc != NULL) {
 		SetClassLongPtr(HVTWin, GCLP_HCURSOR, (LONG_PTR)hc);
-	}
-}
-
-static void DestroyTooltip(TipWin* *tooltip) {
-	if (*tooltip) {
-		TipWinDestroy(*tooltip);
-		(*tooltip) = NULL;
 	}
 }
 
@@ -813,6 +803,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	DropLists = NULL;
 	DropListCount = 0;
+
+	// TipWin
+	TipWin = new CTipWin(HVTWin);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2449,6 +2442,7 @@ BOOL CVTWindow::OnMouseWheel(
 			int newAlpha = Alpha;
 			TCHAR tipbuf[32];
 			TCHAR uimsg[MAX_UIMSG];
+			POINT tippos;
 
 			newAlpha += delta * ts.MouseWheelScrollLine;
 			if (newAlpha > 255)
@@ -2459,21 +2453,19 @@ BOOL CVTWindow::OnMouseWheel(
 
 			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
 			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
-			::SetTimer(HVTWin, IdOpacityTipTimer, 1000, NULL);
 
-			if (OpacityTipPts.x != pt.x ||
-			    OpacityTipPts.y != pt.y) {
-				DestroyTooltip(&OpacityTip);
+			tippos = TipWin->GetPos();
+			if (tippos.x != pt.x ||
+			    tippos.y != pt.y) {
+					TipWin->SetVisible(FALSE);
 			}
 
-			if (OpacityTip == NULL) {
-				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf);
-				OpacityTipPts.x = pt.x;
-				OpacityTipPts.y = pt.y;
-			} else {
-				TipWinSetText(OpacityTip, tipbuf);
-				// ツールチップのリサイズが失敗したように見える問題の暫定対策
-				TipWinSetText(OpacityTip, tipbuf);
+			TipWin->SetText(tipbuf);
+			TipWin->SetPos(pt.x, pt.y);
+			TipWin->SetHideTimer(1000);
+
+			if(! TipWin->IsVisible()) {
+				TipWin->SetVisible(TRUE);
 			}
 
 			return TRUE;
@@ -2937,9 +2929,6 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case IdPrnProcTimer:
 			PrnFileDirectProc();
-			break;
-		case IdOpacityTipTimer:
-			DestroyTooltip(&OpacityTip);
 			break;
 	}
 }

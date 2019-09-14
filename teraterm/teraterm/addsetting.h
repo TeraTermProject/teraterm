@@ -31,6 +31,7 @@
 #include "tmfc.h"
 #include "tt_res.h"
 #include "teraterm.h"
+#include "tipwin.h"
 
 typedef struct {
 	const char *name;
@@ -93,9 +94,9 @@ private:
 	enum { IDD = IDD_TABSHEET_VISUAL };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
-	void OnTimer(UINT_PTR nIDEvent);
 	void SetupRGBbox(int index);
 	void OnHelp();
+	CTipWin* TipWin;
 };
 
 // Log Page

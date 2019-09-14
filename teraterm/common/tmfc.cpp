@@ -673,10 +673,6 @@ void TTCPropertyPage::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 {
 }
 
-void TTCPropertyPage::OnTimer(UINT_PTR nIDEvent)
-{
-}
-
 HBRUSH TTCPropertyPage::OnCtlColor(HDC hDC, HWND hWnd)
 {
 	return (HBRUSH)::DefWindowProc(m_hWnd, WM_CTLCOLORSTATIC, (WPARAM)hDC, (LPARAM)hWnd);
@@ -725,9 +721,6 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 		return (INT_PTR)self->OnCtlColor((HDC)wp, (HWND)lp);
 	case WM_HSCROLL:
 		self->OnHScroll(LOWORD(wp), HIWORD(wp), (HWND)lp);
-		break;
-	case WM_TIMER:
-		self->OnTimer(LOWORD(wp));
 		break;
 	}
 	return FALSE;

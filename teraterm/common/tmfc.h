@@ -177,7 +177,6 @@ public:
 	virtual void OnInitDialog();
 	virtual void OnOK();
 	virtual void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
-	virtual void OnTimer(UINT_PTR nIDEvent);
 	virtual BOOL OnCommand(WPARAM wp, LPARAM lp);
 	virtual HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
 	virtual void OnHelp();

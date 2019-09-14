@@ -30,7 +30,7 @@
 /* TERATERM.EXE, VT window */
 
 #ifdef __cplusplus
-
+#include "tipwin.h"
 #include "tmfc.h"
 
 class CVTWindow : public TTCFrameWnd
@@ -63,6 +63,9 @@ private:
 
   // DPI
   BOOL IgnoreSizeMessage;
+
+  // TipWin
+  CTipWin* TipWin;
 
 public:
 	CVTWindow(HINSTANCE hInstance);
