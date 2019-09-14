@@ -38,7 +38,7 @@
       <li>Added support for hardware flow control DSR/DTR with serial connection.
         <ul>
           <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
-          <li>MARCO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
+          <li>MACRO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
         </ul></li>
       <li>Added SFMT information on version dialog.</li>
       <li>Changed of indication from "Protocol" to "IP version" and from "UNSPEC" to "AUTO" on <a href="../menu/file-new.html">New connection dialog</a>.</li>
@@ -72,7 +72,7 @@
       <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
       <li>Added help button on Additional settings dialog.</li>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in 4.102.</li>
+      <li>MACRO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in 4.102.</li>
       <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
     </ul>
   </li>
@@ -148,7 +148,7 @@
       <li>The language code(CodePage) of the "<a href="../menu/setup-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
       <li>MACRO: The macro file can support UTF-8 and UTF-16(with BOM) encoding.</li>
       <li>MACRO: The <a href="../macro/command/getfileattr.html">getfileattr</a> command can be based on the current directory same as other command.</li>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
+      <li>MACRO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
     </ul>
   </li>
 
@@ -708,7 +708,7 @@
       <li>YMODEM: When the received file information contains only a file name, an end of the file name is broken.</li>
       <li>YMODEM: When the received file information does not include the file size, the file data can not be recorded well.</li>
       <li>The setting value of the <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> will not display well.</li>
-      <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> marco command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
+      <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> macro command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
       <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be re-sizable.</li>
     </ul>
   </li>
@@ -1016,7 +1016,7 @@
           <li>added the 4th argument(current directory) at the <a href="../macro/command/exec.html">exec</a> command.</li>
           <li>The '<a href="../macro/command/show.html">show</a> 1' command brings the macro window to the top.</li>
           <li>The <a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/inputbox.html">inputbox</a> and <a href="../macro/command/listbox.html">listbox</a> commands bring the macro dialog to the top.</li>
-          <li>The <a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> and <a href="../marco/command/waitregex.html">waitregex</a> commands can wait an empty strings.</li>
+          <li>The <a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> and <a href="../macro/command/waitregex.html">waitregex</a> commands can wait an empty strings.</li>
           <li>When the <a href="../macro/command/waitregex.html">waitregex</a> command matches some parameters at the same time, the first matched parameter is selected.</li>
         </ul></li>
     </ul>
@@ -1034,8 +1034,8 @@
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
       <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
       <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
-      <li>MARCO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
-      <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
+      <li>MACRO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
+      <li>MACRO: The box-style macro command can not show the dialog position well on the multi display.</li>
       <li>MACRO: The <a href="../macro/command/wait.html">wait</a> and <a href="../macro/command/waitln.html">waitln</a> command can not detect the right string.(ex. wait "aab" does not work against "aaab")</li>
     </ul>
   </li>
