@@ -142,14 +142,19 @@ set(SRC
   ${TTDLG_SRC}
   )
 
-
 link_directories(
   ${ONIGURUMA_LIBRARY_DIRS}
   ${SFMT_LIBRARY_DIRS}
   )
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+  set_source_files_properties(buffer.c PROPERTIES COMPILE_FLAGS /W4)
+
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+  if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
+    # 32bit
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll")
+  endif()
 endif()
 
 add_executable(
