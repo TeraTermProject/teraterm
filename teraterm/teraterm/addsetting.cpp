@@ -955,31 +955,46 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			return TRUE;
 
-		case IDC_COLOR_RED | (EN_KILLFOCUS << 16):
-		case IDC_COLOR_GREEN | (EN_KILLFOCUS << 16):
-		case IDC_COLOR_BLUE | (EN_KILLFOCUS << 16):
+		case IDC_COLOR_RED | (EN_CHANGE << 16) :
+		case IDC_COLOR_GREEN | (EN_CHANGE << 16) :
+		case IDC_COLOR_BLUE | (EN_CHANGE << 16) :
 			{
-				BYTE r, g, b;
-				char buf[8];
+				int r, g, b;
 
 				sel = GetCurSel(IDC_ANSI_COLOR);
 				if (sel < 0 && sel > sizeof(ts.ANSIColor)-1) {
 					return TRUE;
 				}
 
-				GetDlgItemTextA(IDC_COLOR_RED, buf, sizeof(buf));
-				r = atoi(buf);
+				r = GetDlgItemInt(IDC_COLOR_RED);
+				if (r < 0) {
+					r = 0;
+				}
+				else if (r > 255) {
+					r = 255;
+				}
+				SetDlgItemNum(IDC_COLOR_RED, r);
 
-				GetDlgItemTextA(IDC_COLOR_GREEN, buf, sizeof(buf));
-				g = atoi(buf);
+				g = GetDlgItemInt(IDC_COLOR_GREEN);
+				if (g < 0) {
+					g = 0;
+				}
+				else if (g > 255) {
+					g = 255;
+				}
+				SetDlgItemNum(IDC_COLOR_GREEN, g);
 
-				GetDlgItemTextA(IDC_COLOR_BLUE, buf, sizeof(buf));
-				b = atoi(buf);
+				b = GetDlgItemInt(IDC_COLOR_BLUE);
+				if (b < 0) {
+					b = 0;
+				}
+				else if (b > 255) {
+					b = 255;
+				}
+				SetDlgItemNum(IDC_COLOR_BLUE, b);
 
+				// OK ÇâüÇ≥Ç»Ç≠ÇƒÇ‡ê›íËÇ™ï€ë∂Ç≥ÇÍÇƒÇ¢ÇÈ
 				ts.ANSIColor[sel] = RGB(r, g, b);
-
-				// 255Çí¥Ç¶ÇΩRGBílÇÕï‚ê≥Ç≥ÇÍÇÈÇÃÇ≈ÅAÇªÇÍÇEditÇ…ï\é¶Ç∑ÇÈ (2007.2.18 maya)
-				SetupRGBbox(sel);
 
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
