@@ -227,6 +227,7 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
 
 	if (!tip_class) {
+		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = WndProc;
 		wc.cbClsExtra = 0;
@@ -399,6 +400,14 @@ void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *heigh
 	DeleteObject(tip_font);
 }
 
+void TipWinGetPos(TipWin *tWin, int *x, int *y)
+{
+	CTipWin* tipwin = (CTipWin*) tWin;
+	POINT pt = tipwin->GetPos();
+	*x = (int)pt.x;
+	*y = (int)pt.y;
+}
+
 void TipWinSetPos(TipWin *tWin, int x, int y)
 {
 	CTipWin* tipwin = (CTipWin*) tWin;
@@ -411,10 +420,22 @@ void TipWinSetText(TipWin* tWin, TCHAR *str)
 	tipwin->SetText(str);
 }
 
+void TipWinSetHideTimer(TipWin *tWin, int ms)
+{
+	CTipWin* tipwin = (CTipWin*) tWin;
+	tipwin->SetHideTimer(ms);
+}
+
 void TipWinDestroy(TipWin* tWin)
 {
 	CTipWin* tipwin = (CTipWin*) tWin;
 	tipwin->Destroy();
+}
+
+int TipWinIsExists(TipWin *tWin)
+{
+	CTipWin* tipwin = (CTipWin*) tWin;
+	return (int)tipwin->IsExists();
 }
 
 void TipWinSetVisible(TipWin* tWin, int bVisible)

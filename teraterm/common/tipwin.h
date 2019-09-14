@@ -15,10 +15,11 @@ TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str);
 void TipWinSetText(TipWin *tWin, TCHAR *text);
 void TipWinDestroy(TipWin *tWin);
 void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
+void TipWinGetPos(TipWin *tWin, int *x, int *y);
 void TipWinSetPos(TipWin *tWin, int x, int y);
-void TipWinSetShow(TipWin *tWin);
-void TipWinSetHide(TipWin *tWin);
 void TipWinSetHideTimer(TipWin *tWin, int ms);
+void TipWinSetVisible(TipWin *tWin, int visible);
+int TipWinIsExists(TipWin *tWin);
 int TipWinIsVisible(TipWin *tWin);
 
 #ifdef __cplusplus
@@ -46,7 +47,6 @@ private:
 	POINT pts;
 	UINT timerid;
 	TipWin* tWin;
-	WNDCLASS wc;
 	static ATOM tip_class;
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 	VOID CalcStrRect(VOID);
