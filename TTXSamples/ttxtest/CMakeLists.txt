@@ -9,7 +9,7 @@ include_directories(
 
 add_library(
   TTXtest SHARED
-  TTXtest.c
+  ttxtest.c
   )
 
 set_target_properties(
