@@ -1170,6 +1170,10 @@ static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 {
 	char buf[1024];
 
+	// WindowsNT4.0ˆÈ‘O‚ÍÚ×î•ñ‚ªæ“¾‚Å‚«‚È‚¢B
+	if (desc == NULL)
+		return;
+
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\r\n", desc);
 
 	SendDlgItemMessage(dlg, IDC_SERIALTEXT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
