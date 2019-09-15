@@ -1035,7 +1035,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				TCHAR uimsg[MAX_UIMSG];
 				RECT rc;
 				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
+				_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
 
 				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), &rc);
 				TipWin->SetText(tipbuf);
@@ -1063,7 +1063,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				TCHAR tipbuf[32], uimsg[MAX_UIMSG];
 				RECT rc;
 				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
+				_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
 
 				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), &rc);
 				TipWin->SetText(tipbuf);
