@@ -186,7 +186,13 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 			if (self->IsExists() && self->tWin->auto_destroy) {
 				free((void *)self->tWin->str);
 				free(self->tWin);
-				delete self;
+				/*
+				 * use-after-freeによりTera Termの動作が不安定となる問題を修正した。
+				 *
+				 * WinMainで CVTWindow クラスのコンストラクタで、アロケートした
+				 * TipWinメンバーを、ここのタイミングで解放していたため。
+				 * 正しくは CVTWindow クラスのデストラクタで解放する。
+				 */
 			}
 			break;
 		case WM_TIMER:
