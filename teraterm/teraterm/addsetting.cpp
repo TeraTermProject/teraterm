@@ -947,6 +947,21 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			return TRUE;
 
+		case IDC_EDIT_BGIMG_BRIGHTNESS | (EN_CHANGE << 16) :
+			{
+				int b;
+
+				b = GetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS);
+				if (b < 0) {
+					b = 0;
+				}
+				else if (b > 255) {
+					b = 255;
+				}
+				SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, b);
+			}
+			return TRUE;
+
 		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16):
 			sel = SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
