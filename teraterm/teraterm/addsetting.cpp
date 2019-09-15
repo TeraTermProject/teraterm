@@ -640,7 +640,7 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 CVisualPropPageDlg::~CVisualPropPageDlg()
 {
 	free((void *)m_psp.pszTitle);
-	TipWin->Destroy();
+	delete TipWin;
 }
 
 // CVisualPropPageDlg メッセージ ハンドラ

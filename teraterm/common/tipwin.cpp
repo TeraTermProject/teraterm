@@ -153,14 +153,6 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 
 		case WM_NCHITTEST:
 			return HTTRANSPARENT;
-
-		case WM_DESTROY:
-			if(self->IsExists()) {
-				DeleteObject(self->tWin->tip_font);
-				self->tWin->tip_font = NULL;
-			}
-			break;
-
 		case WM_SETTEXT:
 			{
 				LPCTSTR str = (LPCTSTR) lParam;
@@ -180,11 +172,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 
 			}
 			break;
-
 		case WM_NCDESTROY:
-			if (self->IsExists()) {
-				free((void *)self->tWin->str);
-				free(self->tWin);
 				/*
 				 * use-after-freeによりTera Termの動作が不安定となる問題を修正した。
 				 *
@@ -192,7 +180,6 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 				 * TipWinメンバーを、ここのタイミングで解放していたため。
 				 * 正しくは CVTWindow クラスのデストラクタで解放する。
 				 */
-			}
 			break;
 		case WM_TIMER:
 			KillTimer(hWnd, self->timerid);
@@ -220,7 +207,13 @@ CTipWin::CTipWin(HWND src, int cx, int cy, const TCHAR *str)
 
 CTipWin::~CTipWin()
 {
-	Destroy();
+	if(IsExists()) {
+		DestroyWindow(tWin->tip_wnd);
+		DeleteObject(tWin->tip_font);
+		tWin->tip_font = NULL;
+		free((void*)tWin->str);
+		free(tWin);
+	}
 }
 
 ATOM CTipWin::tip_class;
@@ -310,13 +303,6 @@ VOID CTipWin::SetText(TCHAR *str)
 		SetWindowText(tWin->tip_wnd, str);
 		// ツールチップのテキストとウィンドウの描画順の関係でテキストを2度描画してツールチップウィンドウをリサイズする
 		SetWindowText(tWin->tip_wnd, str);
-	}
-}
-
-VOID CTipWin::Destroy(void)
-{
-	if(IsExists()) {
-		DestroyWindow(tWin->tip_wnd);
 	}
 }
 
@@ -433,7 +419,7 @@ void TipWinSetHideTimer(TipWin *tWin, int ms)
 void TipWinDestroy(TipWin* tWin)
 {
 	CTipWin* tipwin = (CTipWin*) tWin;
-	tipwin->Destroy();
+	delete(tipwin);
 }
 
 int TipWinIsExists(TipWin *tWin)

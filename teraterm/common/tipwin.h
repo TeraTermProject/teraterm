@@ -62,12 +62,10 @@ public:
 	CTipWin(HWND hWnd);
 	~CTipWin(VOID);
 	VOID SetText(TCHAR *str);
-	VOID Destroy(VOID);
 	VOID GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
 	POINT GetPos(VOID);
 	VOID SetPos(int x, int y);
 	VOID SetHideTimer(int ms);
-	VOID Create(HWND src, int x, int y, const TCHAR *str);
 	BOOL IsExists(VOID);
 	VOID SetVisible(BOOL bVisible);
 	BOOL IsVisible();
@@ -77,6 +75,8 @@ private:
 	TipWin* tWin;
 	static ATOM tip_class;
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
+	VOID Create(HWND src, int x, int y, const TCHAR *str);
+	VOID Destroy(VOID);
 	VOID CalcStrRect(VOID);
 };
 #endif
