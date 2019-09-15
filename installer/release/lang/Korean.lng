@@ -371,6 +371,10 @@ DLG_SERIAL_DELAY=전송지연
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
 DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=&New connection
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
 
 DLG_TCPIP_TITLE=Tera Term: TCP/IP 설정
 DLG_TCPIP_HOSTLIST=호스트 목록(&L)

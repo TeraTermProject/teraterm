@@ -78,6 +78,11 @@
 	TTEndDialog(p1, p2)
 
 extern HANDLE hInst;
+/*
+ * ttwinman.hをincludeすると、hInstとシンボル衝突するため、
+ * cvのextern宣言を個別に追加する。
+ */
+extern TComVar cv;
 
 static char UILanguageFile[MAX_PATH];
 
@@ -1109,6 +1114,55 @@ static WNDPROC g_defSerialDlgSpeedComboboxWndProc;  // Combo-box Controlのサブク
 static TipWin *g_SerialDlgSpeedTip;
 
 /*
+ * シリアルポート設定ダイアログのOKボタンを接続先に応じて名称を切り替える。
+ * 条件判定は OnSetupSerialPort() と合わせる必要がある。
+ */
+static void serial_dlg_change_OK_button(HWND dlg, int portno)
+{
+	static const DlgTextInfo TextInfoNewConnection[] = {
+		{ IDOK, "DLG_SERIAL_OK_CONNECTION" },
+	};
+	static const DlgTextInfo TextInfoNewOpen[] = {
+		{ IDOK, "DLG_SERIAL_OK_OPEN" },
+	};
+	static const DlgTextInfo TextInfoCloseNewOpen[] = {
+		{ IDOK, "DLG_SERIAL_OK_CLOSEOPEN" },
+	};
+	static const DlgTextInfo TextInfoResetSetting[] = {
+		{ IDOK, "DLG_SERIAL_OK_RESET" },
+	};
+	int ret = 0;
+	TCHAR uimsg[MAX_UIMSG];
+
+	if ( cv.Ready && (cv.PortType != IdSerial) ) {
+		ret = SetDlgTexts(dlg, TextInfoNewConnection, _countof(TextInfoNewConnection), UILanguageFile);
+		strncpy_s(uimsg, sizeof(uimsg), "&New connection", _TRUNCATE);
+
+	} else {
+		if (cv.Open) {
+			if (portno != cv.ComPort) {
+				ret = SetDlgTexts(dlg, TextInfoCloseNewOpen, _countof(TextInfoCloseNewOpen), UILanguageFile);
+				strncpy_s(uimsg, sizeof(uimsg), "Close and &New open", _TRUNCATE);
+			} else {
+				ret = SetDlgTexts(dlg, TextInfoResetSetting, _countof(TextInfoResetSetting), UILanguageFile);
+				strncpy_s(uimsg, sizeof(uimsg), "&New setting", _TRUNCATE);
+			}
+
+		} else {
+			ret = SetDlgTexts(dlg, TextInfoNewOpen, _countof(TextInfoNewOpen), UILanguageFile);
+			strncpy_s(uimsg, sizeof(uimsg), "&New open", _TRUNCATE);
+		}
+	}
+
+	/* Default.lng の場合、言語ファイルから読み出せないので、
+	 * デフォルトテキストをセットする。
+	 */
+	if (ret <= 0) {
+		SetDlgItemText(dlg, IDOK, uimsg);
+	}
+}
+
+/*
  * シリアルポート設定ダイアログのテキストボックスにCOMポートの詳細情報を表示する。
  *
  */
@@ -1234,7 +1288,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_SERIALHELP, "BTN_HELP" },
 	};
-	PTTSet ts;
+	PTTSet ts = NULL;
 	int i, w, sel;
 	char Temp[128];
 	static WORD ComPortTable[MAXCOMPORT];  // 使用可能なCOMポート番号
@@ -1346,6 +1400,10 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				GWLP_WNDPROC, 
 				(LONG_PTR)SerialDlgSpeedComboboxWindowProc);
 
+			// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
+			// それに応じてOKボタンのラベル名を切り替える。
+			serial_dlg_change_OK_button(Dialog, ComPortTable[w]);
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -1426,14 +1484,18 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 				case IDC_SERIALPORT:
 					switch (HIWORD(wParam)) {
-						case CBN_SELCHANGE: // リストからCOMポートが選択された
-							sel = SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
-							portno = ComPortTable[sel];
+					case CBN_SELCHANGE: // リストからCOMポートが選択された
+						sel = SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
+						portno = ComPortTable[sel];  // 新しいポート番号
 
-							// 詳細情報を表示する
-							serial_dlg_set_comport_info(Dialog, ComPortTable[sel], ComPortDesc[sel]);
+						// 詳細情報を表示する
+						serial_dlg_set_comport_info(Dialog, ComPortTable[sel], ComPortDesc[sel]);
 
-							break;
+						// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
+						// それに応じてOKボタンのラベル名を切り替える。
+						serial_dlg_change_OK_button(Dialog, portno);
+
+						break;
 
 					}
 				
