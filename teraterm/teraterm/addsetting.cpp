@@ -38,7 +38,6 @@
 #include <time.h>
 #include <tchar.h>
 #include <crtdbg.h>
-#include <math.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
