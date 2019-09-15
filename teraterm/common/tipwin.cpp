@@ -59,6 +59,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <assert.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 
 #include "ttlib.h"		// for GetMessageboxFont()
 
