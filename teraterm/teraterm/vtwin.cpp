@@ -805,7 +805,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DropListCount = 0;
 
 	// TipWin
-	TipWin = new CTipWin(HVTWin);
+	TipWin = new CTipWin(HVTWin, 0, 0, "VTWindow");
 }
 
 /////////////////////////////////////////////////////////////////////////////

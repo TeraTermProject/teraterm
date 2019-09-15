@@ -58,8 +58,7 @@ int TipWinIsVisible(TipWin *tWin);
 class CTipWin
 {
 public:
-	CTipWin(HWND hWnd, int x, int y, const TCHAR *str);
-	CTipWin(HWND hWnd);
+	CTipWin(HWND src, int x, int y, const TCHAR *str);
 	~CTipWin(VOID);
 	VOID SetText(TCHAR *str);
 	VOID GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
