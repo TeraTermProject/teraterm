@@ -38,7 +38,6 @@
 #include <time.h>
 #include <tchar.h>
 #include <crtdbg.h>
-#include <math.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -947,6 +946,22 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			return TRUE;
 
+		case IDC_EDIT_BGIMG_BRIGHTNESS | (EN_CHANGE << 16) :
+			{
+				int b;
+
+				b = GetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS);
+				if (b < 0) {
+					b = 0;
+					SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, b);
+				}
+				else if (b > 255) {
+					b = 255;
+					SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, b);
+				}
+			}
+			return TRUE;
+
 		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16):
 			sel = SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
@@ -969,29 +984,32 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				r = GetDlgItemInt(IDC_COLOR_RED);
 				if (r < 0) {
 					r = 0;
+					SetDlgItemNum(IDC_COLOR_RED, r);
 				}
 				else if (r > 255) {
 					r = 255;
+					SetDlgItemNum(IDC_COLOR_RED, r);
 				}
-				SetDlgItemNum(IDC_COLOR_RED, r);
 
 				g = GetDlgItemInt(IDC_COLOR_GREEN);
 				if (g < 0) {
 					g = 0;
+					SetDlgItemNum(IDC_COLOR_GREEN, g);
 				}
 				else if (g > 255) {
 					g = 255;
+					SetDlgItemNum(IDC_COLOR_GREEN, g);
 				}
-				SetDlgItemNum(IDC_COLOR_GREEN, g);
 
 				b = GetDlgItemInt(IDC_COLOR_BLUE);
 				if (b < 0) {
 					b = 0;
+					SetDlgItemNum(IDC_COLOR_BLUE, b);
 				}
 				else if (b > 255) {
 					b = 255;
+					SetDlgItemNum(IDC_COLOR_BLUE, b);
 				}
-				SetDlgItemNum(IDC_COLOR_BLUE, b);
 
 				// OK ÇâüÇ≥Ç»Ç≠ÇƒÇ‡ê›íËÇ™ï€ë∂Ç≥ÇÍÇƒÇ¢ÇÈ
 				ts.ANSIColor[sel] = RGB(r, g, b);
