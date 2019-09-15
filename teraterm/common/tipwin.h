@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-#define	FRAME_WIDTH	6
+#define	TIP_WIN_FRAME_WIDTH	6
 
 typedef struct tagTipWinData TipWin;
 

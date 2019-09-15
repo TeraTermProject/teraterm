@@ -137,10 +137,10 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 
 				{
 					RECT rect = self->tWin->str_rect;
-					rect.left = rect.left + FRAME_WIDTH;
-					rect.right = rect.right + FRAME_WIDTH;
-					rect.top = rect.top + FRAME_WIDTH;
-					rect.bottom = rect.bottom + FRAME_WIDTH;
+					rect.left = rect.left + TIP_WIN_FRAME_WIDTH;
+					rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
+					rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
+					rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
 					DrawText(hdc, self->tWin->str, self->tWin->str_len, &rect, DT_LEFT);
 				}
 
@@ -166,7 +166,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 
 				SetWindowPos(hWnd, NULL,
 							 0, 0,
-							 str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
+							 str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
 				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 				InvalidateRect(hWnd, NULL, FALSE);
 
@@ -261,7 +261,7 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 					   MAKEINTRESOURCE(tip_class),
 					   str, WS_POPUP,
 					   cx, cy,
-					   str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
+					   str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
 					   src, NULL, hInst, this);
 
 	/*
