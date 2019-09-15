@@ -83,7 +83,6 @@ typedef struct tagTipWinData {
 	RECT rect;
 	int px;
 	int py;
-	BOOL auto_destroy;
 } TipWin;
 
 VOID CTipWin::CalcStrRect(VOID)
@@ -183,7 +182,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 			break;
 
 		case WM_NCDESTROY:
-			if (self->IsExists() && self->tWin->auto_destroy) {
+			if (self->IsExists()) {
 				free((void *)self->tWin->str);
 				free(self->tWin);
 				/*
@@ -279,7 +278,6 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 	 */
 
 	tWin->hParentWnd = src;
-	tWin->auto_destroy = TRUE;
 
 	pts.x = cx;
 	pts.y = cy;
