@@ -1416,10 +1416,14 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		if (cv.Ready &&
 		    ((cv.PortType==IdTCPIP) || (cv.PortType==IdFile)) ||
 			(SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
-			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
+			/*
+			 * ネットワーク接続中はシリアルポート(ID_SETUP_SERIALPORT)のメニューが
+			 * 選択できないようになっていたが、このガードを外す。
+			 */
+			// do nothing
 		}
 		else {
-			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_ENABLED);
+			// do nothing
 		}
 
 	else if (SubMenu == ControlMenu)
@@ -4668,6 +4672,8 @@ void CVTWindow::OnSetupKeyboard()
 void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
+	char Command[MAXPATHLEN + HostNameMaxLength];
+
 	HelpId = HlpSetupSerialPort;
 	if (! LoadTTDLG()) {
 		return;
@@ -4678,6 +4684,20 @@ void CVTWindow::OnSetupSerialPort()
 	FreeTTDLG();
 
 	if (Ok && ts.ComPort > 0) {
+		/* 
+		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
+		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
+		 */
+		if ( (cv.Ready && (cv.PortType != IdSerial)) || 
+			Connecting) {
+
+			_snprintf_s(Command, sizeof(Command), "ttermpro /C=%u /SPEED=%lu",
+				ts.ComPort, ts.Baud);
+
+			WinExec(Command,SW_SHOW);
+			return;
+		}
+
 		if (cv.Open) {
 			if (ts.ComPort != cv.ComPort) {
 				CommClose(&cv);
