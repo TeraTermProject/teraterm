@@ -264,19 +264,24 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 
 	const int str_width = tWin->str_rect.right - tWin->str_rect.left;
 	const int str_height = tWin->str_rect.bottom - tWin->str_rect.top;
-	tWin->tip_wnd =
-		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					   MAKEINTRESOURCE(tip_class),
-					   str, WS_POPUP,
-					   cx, cy,
-					   str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
-					   src, NULL, hInst, this);
 
 	/*
-	 * WindowsMe(9x)では、SSH認証のダイアログの表示では NULL が返ってくるため、
-	 * アサーションをしないようにした。Tera Termのリサイズでは NULL ではないが、
-	 * ツールチップが描画されない。
+	 * RegisterClass()が失敗した場合は、CreateWindowEx()が 87 (ERROR_INVALID_PARAMETER)で
+	 * エラーとなるため、呼び出さないようにする。
+	 *
+	 * WindowsMe(9x)では、SSH認証ダイアログのツールチップ表示で RegisterClass() が
+	 * 失敗する。原因不明。
 	 */
+	tWin->tip_wnd = NULL;
+	if (tip_class) {
+		tWin->tip_wnd =
+			CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
+						   MAKEINTRESOURCE(tip_class),
+						   str, WS_POPUP,
+						   cx, cy,
+						   str_width + FRAME_WIDTH * 2, str_height + FRAME_WIDTH * 2,
+						   src, NULL, hInst, this);
+	}
 
 	tWin->hParentWnd = src;
 	tWin->auto_destroy = TRUE;
