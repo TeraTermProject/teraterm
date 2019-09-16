@@ -1308,6 +1308,10 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 
+			EnableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
+			EnableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
+			EnableDlgItem(Dialog, IDOK, IDOK);
+
 			w = 0;
 
 			if ((comports = DetectComPorts(ComPortTable, ts->MaxComPort, ComPortDesc)) > 0) {
@@ -1336,6 +1340,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			} else if (comports == 0) {
 				DisableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
 				DisableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
+				// COMポートが存在しない場合はOKボタンを押せないようにする。
+				DisableDlgItem(Dialog, IDOK, IDOK);
 			} else {
 				for (i=1; i<=ts->MaxComPort; i++) {
 					_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", i);
