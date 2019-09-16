@@ -4689,8 +4689,11 @@ void CVTWindow::OnSetupSerialPort()
 		 */
 		if ( cv.Ready && (cv.PortType != IdSerial) ) {
 
-			_snprintf_s(Command, sizeof(Command), "ttermpro /C=%u /SPEED=%lu",
-				ts.ComPort, ts.Baud);
+			_snprintf_s(Command, sizeof(Command), 
+				"ttermpro /C=%u /SPEED=%lu /CDATABIT=%u /CPARITY=%u "
+				"/CSTOPBIT=%u /CFLOWCTRL=%u /CDELAYPERCHAR=%u /CDELAYPERLINE=%u",
+				ts.ComPort, ts.Baud, ts.DataBit, ts.Parity, 
+				ts.StopBit, ts.Flow, ts.DelayPerChar, ts.DelayPerLine);
 
 			WinExec(Command,SW_SHOW);
 			return;

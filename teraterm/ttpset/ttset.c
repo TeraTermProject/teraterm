@@ -4047,6 +4047,64 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			if ((ParamCom < 1) || (ParamCom > ts->MaxComPort))
 				ParamCom = 0;
 		}
+		else if (_strnicmp(Temp, "/CDATABIT=", 10) == 0) {	/* COM data bit */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[10]);
+			if (val == IdDataBit7 || 
+				val == IdDataBit8
+				) {
+				ts->DataBit = val;
+			}
+		}
+		else if (_strnicmp(Temp, "/CPARITY=", 9) == 0) {	/* COM Parity */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[9]);
+			if (val >= IdParityNone &&
+				val <= IdParitySpace
+				) {
+				ts->Parity = val;
+			}
+		}
+		else if (_strnicmp(Temp, "/CSTOPBIT=", 10) == 0) {	/* COM Stop bit */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[10]);
+			if (val >= IdStopBit1 &&
+				val <= IdStopBit2
+				) {
+				ts->StopBit = val;
+			}
+		}
+		else if (_strnicmp(Temp, "/CFLOWCTRL=", 11) == 0) {	/* COM Flow control */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[11]);
+			if (val >= IdFlowX &&
+				val <= IdFlowHardDsrDtr
+				) {
+				ts->Flow = val;
+			}
+		}
+		else if (_strnicmp(Temp, "/CDELAYPERCHAR=", 15) == 0) {	/* COM Transmit delay per character (in msec) */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[15]);
+			ts->DelayPerChar = val;
+		}
+		else if (_strnicmp(Temp, "/CDELAYPERLINE=", 15) == 0) {	/* COM Transmit delay per line (in msec) */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[15]);
+			ts->DelayPerLine = val;
+		}
 		else if (_stricmp(Temp, "/WAITCOM") == 0) {	/* wait COM arrival */
 			ts->WaitCom = 1;
 		}
