@@ -186,6 +186,8 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 			if (self->IsExists() && self->tWin->auto_destroy) {
 				free((void *)self->tWin->str);
 				free(self->tWin);
+				self->tWin = NULL;
+				delete self;
 				/*
 				 * use-after-free‚É‚æ‚èTera Term‚Ì“®ì‚ª•sˆÀ’è‚Æ‚È‚é–â‘è‚ğC³‚µ‚½B
 				 *
