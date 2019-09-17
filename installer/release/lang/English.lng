@@ -369,6 +369,7 @@ DLG_SERIAL_FLOW=&Flow control:
 DLG_SERIAL_DELAY=Transmit delay
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 
 DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
 DLG_TCPIP_HOSTLIST=Host &list
