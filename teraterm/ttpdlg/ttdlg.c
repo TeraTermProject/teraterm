@@ -1102,7 +1102,66 @@ static PCHAR DataList[] = {"7 bit","8 bit",NULL};
 static PCHAR ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
 static PCHAR StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
 static PCHAR FlowList[] = {"Xon/Xoff", "RTS/CTS", "DSR/DTR", "none", NULL};
+static int g_deltaSumSerialDlg = 0;        // マウスホイールのDelta累積用
+static WNDPROC g_defSerialDlgEditWndProc;  // Edit Controlのサブクラス化用
 
+/*
+ * シリアルポート設定ダイアログのテキストボックスにCOMポートの詳細情報を表示する。
+ *
+ */
+static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
+{
+	char buf[1024];
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\r\n", desc);
+
+	SendDlgItemMessage(dlg, IDC_SERIALTEXT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
+}
+
+static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
+{
+	WORD keys;
+	short delta;
+	BOOL page;
+
+	switch (msg) {
+		case WM_KEYDOWN:
+			// Edit control上で CTRL+A を押下すると、テキストを全選択する。
+			if (wp == 'A' && GetKeyState(VK_CONTROL) < 0) {
+				PostMessage(hWnd, EM_SETSEL, 0, -1);
+				return 0;
+			}
+			break;
+
+		case WM_MOUSEWHEEL:
+			// CTRLorSHIFT + マウスホイールの場合、横スクロールさせる。
+			keys = GET_KEYSTATE_WPARAM(wp);
+			delta = GET_WHEEL_DELTA_WPARAM(wp);
+			page = keys & (MK_CONTROL | MK_SHIFT);
+
+			if (page == 0)
+				break;
+
+			g_deltaSumSerialDlg += delta;
+
+			if (g_deltaSumSerialDlg >= WHEEL_DELTA) {
+				g_deltaSumSerialDlg -= WHEEL_DELTA;
+				SendMessage(hWnd, WM_HSCROLL, SB_PAGELEFT , 0);
+			} else if (g_deltaSumSerialDlg <= -WHEEL_DELTA) {
+				g_deltaSumSerialDlg += WHEEL_DELTA;
+				SendMessage(hWnd, WM_HSCROLL, SB_PAGERIGHT, 0);
+			}
+
+			break;
+	}
+    return CallWindowProc(g_defSerialDlgEditWndProc, hWnd, msg, wp, lp);
+}
+
+/*
+ * シリアルポート設定ダイアログ
+ *
+ *
+ */
 static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -1123,10 +1182,11 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	PTTSet ts;
 	int i, w, sel;
 	char Temp[128];
-	WORD ComPortTable[MAXCOMPORT];
-	static char *ComPortDesc[MAXCOMPORT];
-	int comports;
+	static WORD ComPortTable[MAXCOMPORT];  // 使用可能なCOMポート番号
+	static char *ComPortDesc[MAXCOMPORT];  // COMポートの詳細情報
+	static int comports; // テーブル最大数
 	WORD Flow;
+	int portno;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -1155,6 +1215,10 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					if (ComPortTable[i] == ts->ComPort) {
 						w = i;
 					}
+
+					// 詳細情報を表示する
+					serial_dlg_set_comport_info(Dialog, ComPortTable[w], ComPortDesc[w]);
+
 				}
 			} else if (comports == 0) {
 				DisableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
@@ -1213,6 +1277,13 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SendDlgItemMessage(Dialog, IDC_SERIALDELAYLINE, EM_LIMITTEXT,4, 0);
 
 			CenterWindow(Dialog, GetParent(Dialog));
+
+			// Edit controlをサブクラス化する。
+			g_deltaSumSerialDlg = 0;
+			g_defSerialDlgEditWndProc = (WNDPROC)SetWindowLongPtr(
+				GetDlgItem(Dialog, IDC_SERIALTEXT), 
+				GWLP_WNDPROC, 
+				(LONG_PTR)SerialDlgEditWindowProc);
 
 			return TRUE;
 
@@ -1278,6 +1349,22 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 				case IDC_SERIALHELP:
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					return TRUE;
+
+				case IDC_SERIALPORT:
+					switch (HIWORD(wParam)) {
+						case CBN_SELCHANGE: // リストからCOMポートが選択された
+							sel = SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
+							portno = ComPortTable[sel];
+
+							// 詳細情報を表示する
+							serial_dlg_set_comport_info(Dialog, ComPortTable[sel], ComPortDesc[sel]);
+
+							break;
+
+					}
+				
+					return TRUE;
 			}
 	}
 	return FALSE;
