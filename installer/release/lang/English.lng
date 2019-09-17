@@ -359,7 +359,7 @@ DLG_KEYB_DISABLE=Disabled mode:
 DLG_KEYB_APPKEY=&Application Keypad
 DLG_KEYB_APPCUR=Application &Cursor
 
-DLG_SERIAL_TITLE=Tera Term: Serial port setup
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=&Port:
 DLG_SERIAL_BAUD=Sp&eed:
 DLG_SERIAL_DATA=&Data:

@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=Dévalider le mode:
 DLG_KEYB_APPKEY=Codes pavé numérique
 DLG_KEYB_APPCUR=Codes Curseur pavé numérique
 
-DLG_SERIAL_TITLE=Tera Term: Config. port série
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=&Port:
 DLG_SERIAL_BAUD=&Vitesse:
 DLG_SERIAL_DATA=&Données:
