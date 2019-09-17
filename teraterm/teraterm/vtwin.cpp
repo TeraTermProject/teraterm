@@ -1413,17 +1413,16 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if (SubMenu == SetupMenu)
-		if (cv.Ready &&
-		    ((cv.PortType==IdTCPIP) || (cv.PortType==IdFile)) ||
-			(SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
-			/*
-			 * ネットワーク接続中はシリアルポート(ID_SETUP_SERIALPORT)のメニューが
-			 * 選択できないようになっていたが、このガードを外す。
-			 */
-			// do nothing
+		/*
+		 * ネットワーク接続中(TCP/IPを選択して接続した状態)はシリアルポート
+		 * (ID_SETUP_SERIALPORT)のメニューが選択できないようになっていたが、
+		 * このガードを外し、シリアルポート設定ダイアログから新しい接続ができるようにする。
+		 */
+		if ((SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
+			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 		else {
-			// do nothing
+			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_ENABLED);
 		}
 
 	else if (SubMenu == ControlMenu)
@@ -4688,8 +4687,7 @@ void CVTWindow::OnSetupSerialPort()
 		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
 		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
 		 */
-		if ( (cv.Ready && (cv.PortType != IdSerial)) || 
-			Connecting) {
+		if ( cv.Ready && (cv.PortType != IdSerial) ) {
 
 			_snprintf_s(Command, sizeof(Command), "ttermpro /C=%u /SPEED=%lu",
 				ts.ComPort, ts.Baud);
