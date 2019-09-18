@@ -62,10 +62,10 @@ public:
 	~CTipWin(VOID);
 	VOID SetText(TCHAR *str);
 	VOID GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
-	POINT GetPos(VOID);
+	POINT GetPos();
 	VOID SetPos(int x, int y);
 	VOID SetHideTimer(int ms);
-	BOOL IsExists(VOID);
+	BOOL IsExists();
 	VOID SetVisible(BOOL bVisible);
 	BOOL IsVisible();
 private:

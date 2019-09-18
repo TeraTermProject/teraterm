@@ -66,12 +66,6 @@
 
 #include "tipwin.h"
 
-#ifdef _WIN64
-        typedef LONG_PTR WINDOW_LONG_PTR;
-#else
-        typedef LONG WINDOW_LONG_PTR;
-#endif
-
 typedef struct tagTipWinData {
 	HFONT tip_font;
 	COLORREF tip_bg;
