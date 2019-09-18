@@ -1821,9 +1821,9 @@ BOOL GetPositionOnWindow(
 	return TRUE;
 }
 
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+int SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
 {
-	SetI18DlgStrs("Tera Term", hDlgWnd, infos, infoCount, UILanguageFile);
+	return SetI18DlgStrs("Tera Term", hDlgWnd, infos, infoCount, UILanguageFile);
 }
 
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)

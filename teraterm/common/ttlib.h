@@ -122,7 +122,7 @@ void CenterWindow(HWND hWnd, HWND hWndParent);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+int SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 int GetMonitorDpiFromWindow(HWND hWnd);
 

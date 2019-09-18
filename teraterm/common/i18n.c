@@ -110,15 +110,24 @@ int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfon
 	return TRUE;
 }
 
-void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
+/*
+ * 言語ファイルからDialogのコンポーネントの文字列を変換する
+ *
+ * [return]
+ *    言語ファイルで変換できた回数(infoCount以下の数になる)
+ *
+ */
+int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 				   const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
 {
 	size_t i;
+	int translatedCount = 0;
+
 	assert(hDlgWnd != NULL);
 	assert(infoCount > 0);
 	for (i = 0 ; i < infoCount; i++) {
 		const char *key = infos[i].key;
-		TCHAR uimsg[MAX_UIMSG];
+		TCHAR uimsg[MAX_UIMSG] = {0};  // オールゼロで初期化しておく
 		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
 		if (uimsg[0] != _T('\0')) {
 			const int nIDDlgItem = infos[i].nIDDlgItem;
@@ -131,8 +140,13 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 				assert(r != 0);
 			}
 			(void)r;
+
+			if (r)
+				translatedCount++;
 		}
 	}
+
+	return (translatedCount);
 }
 
 void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu,
