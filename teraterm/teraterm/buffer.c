@@ -114,7 +114,9 @@ static POINT SelectStart, SelectEnd, SelectEndOld;
 static BOOL BoxSelect;
 static POINT DblClkStart, DblClkEnd;
 
-static int StrChangeStart, StrChangeCount;
+// 描画
+static int StrChangeStart;	// 描画開始 X (Y=CursorY)
+static int StrChangeCount;	// 描画キャラクタ数(半角単位),0のとき描画するものがない
 
 static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
 
@@ -129,7 +131,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
 #endif
 
 #if UNICODE_INTERNAL_BUFF
-static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char half_width, char emoji)
+static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL half_width, char emoji)
 {
 	size_t wstr_len;
 	buff_char_t *p = buff;
@@ -146,7 +148,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, char ha
 	p->CombinationCharCount32 = 0;
 	p->CombinationCharSize32 = 0;
 	p->WidthProperty = property;
-	p->HalfWidth = half_width;
+	p->HalfWidth = (char)half_width;
 	p->u32 = u32;
 	p->u32_last = u32;
 	p->Padding = FALSE;
@@ -241,6 +243,23 @@ static void memmoveW(buff_char_t *dest, const buff_char_t *src, size_t count)
 {
 	memmove(dest, src, count * sizeof(buff_char_t));
 }
+
+static BOOL IsBuffPadding(const buff_char_t *b)
+{
+	if (b->Padding == TRUE)
+		return TRUE;
+	if (b->u32 == 0)
+		return TRUE;
+	return FALSE;
+}
+
+static BOOL IsBuffFullWidth(const buff_char_t *b)
+{
+	if (b->HalfWidth == FALSE)
+		return TRUE;
+	return FALSE;
+}
+
 #endif
 
 static LONG GetLinePtr(int Line)
@@ -272,7 +291,7 @@ static LONG PrevLinePtr(LONG Ptr)
 	return Ptr;
 }
 
-BOOL ChangeBuffer(int Nx, int Ny)
+static BOOL ChangeBuffer(int Nx, int Ny)
 {
 	LONG NewSize;
 	int NxCopy, NyCopy, i;
@@ -399,7 +418,7 @@ BOOL ChangeBuffer(int Nx, int Ny)
 		}
 
 		Selected = (SelectEnd.y > SelectStart.y) ||
-		           ((SelectEnd.y=SelectStart.y) &&
+		           ((SelectEnd.y == SelectStart.y) &&
 		            (SelectEnd.x > SelectStart.x));
 	}
 
@@ -737,11 +756,39 @@ void PrevLine()
 #endif
 }
 
-static void EraseKanji(int LR)
-{
 // If cursor is on left/right half of a Kanji, erase it.
 //   LR: left(0)/right(1) flag
-
+//	LR	0	カーソルが漢字の左側
+//		1	カーソルが漢字の右側
+static void EraseKanji(int LR)
+{
+#if UNICODE_INTERNAL_BUFF
+	buff_char_t *p;
+	int bx;
+	if (CursorX < LR) {
+		// 全角判定できない
+		return;
+	}
+	bx = CursorX-LR;
+	p = &CodeLineW[bx];
+	if (IsBuffFullWidth(p)) {
+		// 全角をつぶす
+		BuffSetChar(p, ' ', 'H');
+		CodeLine[bx] = 0x20;
+		AttrLine[bx] = CurCharAttr.Attr;
+		AttrLine2[bx] = CurCharAttr.Attr2;
+		AttrLineFG[bx] = CurCharAttr.Fore;
+		AttrLineBG[bx] = CurCharAttr.Back;
+		if (bx+1 < NumOfColumns) {
+			BuffSetChar(p + 1, ' ', 'H');
+			CodeLine[bx+1] = 0x20;
+			AttrLine[bx+1] = CurCharAttr.Attr;
+			AttrLine2[bx+1] = CurCharAttr.Attr2;
+			AttrLineFG[bx+1] = CurCharAttr.Fore;
+			AttrLineBG[bx+1] = CurCharAttr.Back;
+		}
+	}
+#else
 	if ((CursorX-LR>=0) &&
 	    ((AttrLine[CursorX-LR] & AttrKanji) != 0)) {
 		CodeLine[CursorX-LR] = 0x20;
@@ -757,6 +804,7 @@ static void EraseKanji(int LR)
 			AttrLineBG[CursorX-LR+1] = CurCharAttr.Back;
 		}
 	}
+#endif
 }
 
 void EraseKanjiOnLRMargin(LONG ptr, int count)
@@ -1886,7 +1934,6 @@ static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 {
 	BOOL result;
-	int match_pos = 0;
 	int TmpPtr = GetLinePtr(y);
 	size_t len = wcslen(str);
 	if (len == 0) {
@@ -2444,6 +2491,7 @@ static void markURL(int x)
 	}
 }
 
+#if !UNICODE_INTERNAL_BUFF
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 // Put a character in the buffer at the current position
 //   b: character
@@ -2530,6 +2578,7 @@ void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 		StrChangeCount++;
 	}
 }
+#endif
 
 void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 // Put a kanji character in the buffer at the current position
@@ -2631,7 +2680,7 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 }
 
 #if UNICODE_INTERNAL_BUFF
-static BOOL BuffIsHalfWidthFromPropery(TTTSet *ts_, char width_property)
+static BOOL BuffIsHalfWidthFromPropery(char width_property)
 {
 	switch (width_property) {
 	case 'H':	// Halfwidth
@@ -2651,9 +2700,8 @@ static BOOL BuffIsHalfWidthFromPropery(TTTSet *ts_, char width_property)
 	}
 }
 
-BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
+static BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
 {
-	BOOL result = TRUE;
 	*width_property = UnicodeGetWidthProperty(u32);
 	*emoji = (char)UnicodeIsEmoji(u32);
 	if (*emoji) {
@@ -2667,7 +2715,7 @@ BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_property
 			return TRUE;
 		}
 	}
-	return BuffIsHalfWidthFromPropery(ts_, *width_property);
+	return BuffIsHalfWidthFromPropery(*width_property);
 }
 
 #endif
@@ -2677,22 +2725,20 @@ BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_property
 // cur_y	カーソル位置(!バッファ位置)
 static void mark_url_w(int cur_x, int cur_y)
 {
-	static int sw = 0;
-	if (sw == 0)
-		return;
-
 	int sx;
 	int sy;
 	int ex;
 	int ey;
 	LONG TmpPtr;
+	const buff_char_t *b;
 
 	// 行頭を探す
-	sx = 0;
+	sx = cur_x;
 	sy = cur_y;
 	TmpPtr = GetLinePtr(PageStart+sy);
 	while ((AttrBuff[TmpPtr] & AttrLineContinued) != 0) {
 		sy--;
+		sx = 0;
 		TmpPtr = PrevLinePtr(TmpPtr);
 	}
 	// 行末を探す
@@ -2703,8 +2749,8 @@ static void mark_url_w(int cur_x, int cur_y)
 		ey++;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
-	const buff_char_t *b = &CodeBuffW[TmpPtr+ex];
-	while (1) {
+	b = &CodeBuffW[TmpPtr+ex];
+	for(;;) {
 		if (b->u32 != ' ') {
 			break;
 		}
@@ -2770,7 +2816,6 @@ static void mark_url_w(int cur_x, int cur_y)
 			// マッチした
 			int x;
 			int y;
-			int left = len;
 			for (y = match_y; y <= PageStart+ey; y++) {
 				int sx_i = 0;
 				int ex_i = NumOfColumns - 1;	// とにかく行末まで
@@ -2811,6 +2856,27 @@ static void mark_url_w(int cur_x, int cur_y)
 }
 #endif
 
+static wchar_t *GetWCS(const buff_char_t *b)
+{
+	size_t len = (b->wc2[1] == 0) ? 2 : 3;
+	wchar_t *strW;
+	wchar_t *p;
+	int i;
+
+	len += b->CombinationCharCount16;
+	strW = malloc(sizeof(wchar_t) * len);
+	p = strW;
+	*p++ = b->wc2[0];
+	if (b->wc2[1] != 0) {
+		*p++ = b->wc2[0];
+	}
+	for (i=0; i<b->CombinationCharCount16; i++) {
+		*p++ = b->pCombinationChars16[i];
+	}
+	*p = L'\0';
+	return strW;
+}
+
 /**
  *	ユニコードキャラクタを1文字バッファへ入力する
  *	@param[in]	u32		unicode character(UTF-32)
@@ -2819,10 +2885,12 @@ static void mark_url_w(int cur_x, int cur_y)
  *	@return		カーソル移動量(0 or 1 or 2)
  */
 #if UNICODE_INTERNAL_BUFF
-char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
+int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 {
 	BYTE b1, b2;
 	int move_x = 0;
+	static BOOL show_str_change = FALSE;
+	buff_char_t *p;
 
 	assert(Attr.Attr == (Attr.AttrEx & 0xff));
 
@@ -2848,19 +2916,18 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	}
 
 #if 0
-	OutputDebugPrintf("BuffPutUnicode(%06x(%02x,%02x)\n",
-					  u32, b1, b2);
+	OutputDebugPrintfW(L"BuffPutUnicode(U+%06x,(%d,%d)\n", u32, CursorX, CursorY);
 #endif
 
 	if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] & AttrLineContinued)) {
 		Attr.Attr |= AttrLineContinued;
 	}
 
-	buff_char_t *p = NULL;	// NULLのとき、前の文字はない
+	p = NULL;	// NULLのとき、前の文字はない
 	// 前の文字
-	if (CursorX >= 1 && CodeLineW[CursorX - 1].u32 != 0) {
+	if (CursorX >= 1 && !IsBuffPadding(&CodeLineW[CursorX - 1])) {
 		p = &CodeLineW[CursorX - 1];
-	} else if (CursorX >= 2 && CodeLineW[CursorX - 2].u32 != 0) {
+	} else if (CursorX >= 2 && !IsBuffPadding(&CodeLineW[CursorX - 2])) {
 		p = &CodeLineW[CursorX - 2];
 	}
 
@@ -2895,6 +2962,53 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		char width_property;
 		char emoji;
 		BOOL half_width = BuffIsHalfWidthFromCode(&ts, u32, &width_property, &emoji);
+
+		p = &CodeLineW[CursorX];
+		// 現在の位置が全角の右側?
+		if (IsBuffPadding(p)) {
+			// 全角の前半をスペースに置き換える
+			assert(CursorX > 0);	// 行頭に全角の右側はない
+			BuffSetChar(p - 1, ' ', 'H');
+			BuffSetChar(p, ' ', 'H');
+			if (StrChangeCount == 0) {
+				StrChangeCount = 3;
+				StrChangeStart = CursorX - 1;
+			} else {
+				if (StrChangeStart < CursorX) {
+					StrChangeCount += (CursorX - StrChangeStart) + 1;
+				}
+				else {
+					StrChangeStart = CursorX;
+					StrChangeCount += CursorX - StrChangeStart;
+				}
+			}
+		}
+		// 現在の位置が全角の左側 && 入力文字が半角 ?
+		if (half_width && IsBuffFullWidth(p)) {
+			// 全角をスペースに置き換える
+			assert(CursorX < NumOfColumns-1);	// 行末に全角の左はこない
+			BuffSetChar(p, ' ', 'H');
+			BuffSetChar(p+1, ' ', 'H');
+			if (StrChangeCount == 0) {
+				StrChangeCount = 3;
+				StrChangeStart = CursorX;
+			}
+			else {
+				if (CursorX < StrChangeStart) {
+					assert(FALSE);
+				}
+				else {
+					StrChangeCount += 2;
+				}
+			}
+		}
+		// 次の文字が全角 && 入力文字が全角 ?
+		if (!Insert && !half_width && IsBuffFullWidth(p+1)) {
+			// 全角を潰す
+			BuffSetChar(p+1, ' ', 'H');
+			BuffSetChar(p+2, ' ', 'H');
+		}
+
 		if (Insert) {
 			// 挿入モード
 			// TODO 未チェック
@@ -2904,6 +3018,18 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				LineEnd = NumOfColumns - 1;
 			else
 				LineEnd = CursorRightM;
+
+			if (half_width) {
+				// 半角として扱う
+				move_x = 1;
+			} else {
+				// 全角として扱う
+				move_x = 2;
+				if (CursorX + 1 > LineEnd) {
+					// はみ出す
+					return -1;
+				}
+			}
 
 			// 一番最後の文字が全角の場合、
 			if (LineEnd <= NumOfColumns - 1 && (AttrLine[LineEnd-1] & AttrKanji)) {
@@ -2955,6 +3081,7 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				CodeLine[CursorX+1] = 0;
 #if UNICODE_INTERNAL_BUFF
 				BuffSetChar(&CodeLineW[CursorX + 1], 0, 'H');
+				CodeLineW[CursorX + 1].Padding = TRUE;
 #endif
 				AttrLine[CursorX+1] = Attr.Attr;
 				AttrLine2[CursorX+1] = Attr.Attr2;
@@ -3191,19 +3318,33 @@ char BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				memcpy(ba, &CodeLine[0], _countof(ba)-1);
 				ba[127] = 0;
 				OutputDebugPrintf("A '%s'\n", ba);
-				wchar_t bb[128];
-				memcpy(bb, &CodeLineW[0], _countof(bb)-1);
-				bb[127] = 0;
-				OutputDebugPrintfW(L"W '%s'\n", bb);
 			}
 #endif
+
 		}
 	}
 
+	if (show_str_change) {
+		OutputDebugPrintf("StrChangeStart,Count %d,%d\n", StrChangeStart, StrChangeCount);
+	}
+
 #if 0
-	OutputDebugPrintf("BuffPutUnicode leave\n");
+	{
+		wchar_t *wcs;
+		p = &CodeLineW[CursorX];
+		wcs = GetWCS(p);
+		OutputDebugPrintf("BuffPutUnicode '%s' leave\n",wcs);
+		free(wcs);
+	}
 #endif
 	return move_x;
+}
+#endif
+
+#if UNICODE_INTERNAL_BUFF
+void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
+{
+	BuffPutUnicode(b, Attr, Insert);
 }
 #endif
 
@@ -3258,39 +3399,55 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 #if 0
 	OutputDebugPrintf("BuffDrawLineI(%d,%d, %d,%d-%d)\n", DrawX, DrawY, SY, IStart, IEnd);
 #endif
+	if (IEnd >= NumOfColumns) {
+		IEnd = NumOfColumns - 1;
+	}
 	while (!EndFlag) {
-		const buff_char_t *b;
-		TCharAttr TempAttr;
+		const buff_char_t *b = &CodeBuffW[TmpPtr + istart + count];
+
 		BOOL DrawFlag = FALSE;
 		BOOL SetString = FALSE;
 
 		// アトリビュート取得
-		TempAttr.Attr = AttrBuff[TmpPtr+istart+count] & ~ AttrKanji;
-		TempAttr.Attr2 = AttrBuff2[TmpPtr+istart+count];
-		TempAttr.Fore = AttrBuffFG[TmpPtr+istart+count];
-		TempAttr.Back = AttrBuffBG[TmpPtr+istart+count];
+		if (count == 0) {
+			// 最初の1文字目
+			int ptr = TmpPtr + istart + count;
+			if (b->u32 == 0) {	// TODO IsBuffPadding()
+				// 最初に表示しようとした文字が全角の右だった場合
+				ptr--;
+			}
+			CurAttr.Attr = AttrBuff[ptr] & ~ AttrKanji;
+			CurAttr.Attr2 = AttrBuff2[ptr];
+			CurAttr.Fore = AttrBuffFG[ptr];
+			CurAttr.Back = AttrBuffBG[ptr];
+			CurAttrEmoji = b->Emoji;
+			CurSelected = CheckSelect(istart+count,SY);
+		}
 
 		bufA[lenA] = CodeBuff[TmpPtr + istart + count];
 		lenA++;
 
-		b = &CodeBuffW[TmpPtr + istart + count];
-		if (b->u32 == 0) {
+		if (b->u32 == 0) {	// TODO IsBuffPadding()
 			// 全角の次の文字,処理不要
 		} else {
 			if (count == 0) {
 				// 最初の1文字目
-				CurAttr = TempAttr;
-				CurAttrEmoji = b->Emoji;
-				CurSelected = CheckSelect(istart+count,SY);
 				SetString = TRUE;
-			} else if (b->u32 != 0 &&
-					   ((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
-						(CurSelected != CheckSelect(istart+count,SY)))){
-				// この文字でアトリビュートが変化した → 描画
-				DrawFlag = TRUE;
-				count--;
 			} else {
-				SetString = TRUE;
+				TCharAttr TempAttr;
+				TempAttr.Attr = AttrBuff[TmpPtr+istart+count] & ~ AttrKanji;
+				TempAttr.Attr2 = AttrBuff2[TmpPtr+istart+count];
+				TempAttr.Fore = AttrBuffFG[TmpPtr+istart+count];
+				TempAttr.Back = AttrBuffBG[TmpPtr+istart+count];
+				if (b->u32 != 0 &&
+					((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
+					 (CurSelected != CheckSelect(istart+count,SY)))){
+					// この文字でアトリビュートが変化した → 描画
+					DrawFlag = TRUE;
+					count--;
+				} else {
+					SetString = TRUE;
+				}
 			}
 		}
 
@@ -3334,7 +3491,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			bufW[lenW] = 0;
 			bufWW[lenW] = 0;
 
-#if 1
+#if 0
 			OutputDebugPrintf("A[%d] '%s'\n", lenA, bufA);
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
@@ -3538,7 +3695,7 @@ void UpdateStr()
 		DispStr(&CodeLine[StrChangeStart],StrChangeCount,Y, &X);
 	}
 #else
-	BuffDrawLineI(X, Y, PageStart+CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
+	BuffDrawLineI(X, Y, PageStart + CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
 #endif
 	StrChangeCount = 0;
 }
@@ -4000,11 +4157,13 @@ static void invokeBrowserW(int x, int y)
 		ex++;
 	}
 
-	wchar_t *url_w = BuffGetStringForCB(sx, y, ex, y, FALSE, NULL);
-	char *url = ToCharW(url_w);
-	invokeBrowserWithUrl(url);
-	free(url);
-	free(url_w);
+	{
+		wchar_t *url_w = BuffGetStringForCB(sx, y, ex, y, FALSE, NULL);
+		char *url = ToCharW(url_w);
+		invokeBrowserWithUrl(url);
+		free(url);
+		free(url_w);
+	}
 }
 #endif
 
@@ -5633,7 +5792,7 @@ int vasprintf(char **strp, const char *fmt, va_list ap)
 {
 	char *tmp_ptr = NULL;
 	size_t tmp_size = 128;
-	while(1) {
+	for(;;) {
 		int len;
 		int err;
 		tmp_ptr = realloc(tmp_ptr, tmp_size);
@@ -5669,7 +5828,7 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 {
 	wchar_t *tmp_ptr = NULL;
 	size_t tmp_size = 128;
-	while(1) {
+	for(;;) {
 		int len;
 		int err;
 		tmp_ptr = realloc(tmp_ptr, sizeof(wchar_t) * tmp_size);
@@ -5815,9 +5974,8 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		const unsigned char attr = AttrBuff[TmpPtr+X];
 		wchar_t *attr_str;
 		if (attr == 0) {
-			attr_str = wcsdup(L"");
-		} else
-		if (attr != 0) {
+			attr_str = _wcsdup(L"");
+		} else {
 			aswprintf(&attr_str,
 					  L"(%S%S%S%S%S%S%S%S)\n",
 					  (attr & AttrBold) != 0 ? "AttrBold " : "",
@@ -5856,40 +6014,12 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	{
 		const buff_char_t *b = &CodeBuffW[TmpPtr+X];
 		const char32_t u32 = b->u32;
-		wchar_t *wcs = malloc(sizeof(wchar_t) * (b->CombinationCharCount16 + 3));
+		wchar_t *wcs = GetWCS(b);
 		wchar_t *codes_ptr;
 		wchar_t *str2_ptr;
 		size_t str2_len;
 		int i;
 		wchar_t *width_property;
-
-		if (b->CombinationCharCount16 == 0) {
-			// コンビネーションなし
-			if (u32 < 0x20) {
-				wcs[0] = '.';
-				wcs[1] = 0;
-				wcs[2] = 0;
-			} else if (u32 < 0x10000) {
-				wcs[0] = b->wc2[0];
-				wcs[1] = 0;
-				wcs[2] = 0;
-			} else {
-				// サロゲートペア
-				wcs[0] = b->wc2[0];
-				wcs[1] = b->wc2[1];
-				wcs[2] = 0;
-			}
-		} else {
-			int n = 0;
-			wcs[n++] = b->wc2[0];
-			if (b->wc2[1] != 0) {
-				wcs[n++] = b->wc2[1];
-			}
-			for (i=0; i<b->CombinationCharCount16; i++) {
-				wcs[n++] = b->pCombinationChars16[i];
-			}
-			wcs[n] = L'\0';
-		}
 
 		{
 			size_t codes_len = 10 * (b->CombinationCharCount16 + 1);

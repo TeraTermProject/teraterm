@@ -64,7 +64,7 @@ void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
 void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert);
-char BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);
+int BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);
 void BuffUpdateRect(int XStart, int YStart, int XEnd, int YEnd);
 void UpdateStr();
 void UpdateStrUnicode(void);
@@ -111,9 +111,6 @@ int BuffGetCurrentLineData(char *buf, int bufsize);
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
 wchar_t *BuffGetCharInfo(int Xw, int Yw);
-#if 0
-BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32);
-#endif
 void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr);
 TCharAttr BuffGetCursorCharAttr(int x, int y);
 

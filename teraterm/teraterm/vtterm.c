@@ -874,6 +874,7 @@ static void PutKanji(BYTE b)
 		} else {
 			u32 = MBCP_UTF32(Kanji, ts.CodePage);
 		}
+		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 	}
 #else
@@ -5634,6 +5635,7 @@ static void UnicodeToCP932(unsigned int code)
 #endif
 	} else {
 		int r;
+		BOOL is_update;
 
 		// UnicodeからDEC特殊文字へのマッピング
 		if (ts.UnicodeDecSpMapping) {
@@ -5672,26 +5674,11 @@ static void UnicodeToCP932(unsigned int code)
 			CharAttrTmp.Attr |= AttrLineContinued;
 			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 		}
-#if 0
-		else if (CursorX > LineEnd - 1) {
-			if (AutoWrapMode) {
-				if (ts.EnableContinuedLineCopy) {
-					CharAttrTmp.Attr |= AttrLineContinued;
-					if (CursorX == LineEnd && BuffIsHalfWidthFromCode(&ts, code)) {
-						// full width出力が半分出力にならないように0x20を出力
-						BuffPutChar(0x20, CharAttrTmp, FALSE);
-					}
-				}
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-		}
-#endif
 
 		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
 		//		エラー時はカーソル位置を検討する
 		Wrap = FALSE;
-		BOOL is_update = FALSE;
+		is_update = FALSE;
 		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 	retry:
 		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
