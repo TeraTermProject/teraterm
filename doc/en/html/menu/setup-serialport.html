@@ -12,7 +12,28 @@
     <h1>Serial port ([Setup] menu)</h1>
 
     <h2>"Serial port setup" dialog box</h2>
+
     <dl>
+
+      <dt id="OK">OK button</dt>
+      <dd>
+	The label of OK button is changed refering to the connection state. <br>
+	    New connection   ...  Serial connection is launched with new window since TCP/IP connection is using. <br>
+	    New open ...  Serial connection starts.<br>
+	    Close and New open  ... Current COM port is closed and serial connection starts with new COM port.<br>
+	    New setting  ... The setting of current COM port is changed.<br>
+      </dd>
+
+      <dt id="Cancel">Cancel button</dt>
+      <dd>
+	Discards the setting change and close the dialog. 
+      </dd>
+
+      <dt id="Help">Help button</dt>
+      <dd>
+	Displays the help file.
+      </dd>
+
       <dt id="ComPort">Port</dt>
       <dd>
 	Serial port to be used. By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.

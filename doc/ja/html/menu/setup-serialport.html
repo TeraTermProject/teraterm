@@ -12,7 +12,27 @@
     <h1>Serial port ([Setup] メニュー)</h1>
 
     <h2>"Serial port setup" ダイアログボックス</h2>
+
     <dl>
+      <dt id="OK">OK button</dt>
+      <dd>
+	現在の接続状態を見て、シリアル接続の動作を表します。<br>
+	    新しい接続   ...  TCP/IP接続中のため、新しいウィンドウでシリアル接続を行います。<br>
+	    新規オープン ...  シリアル接続を行います。<br>
+	    クローズ＆新規オープン  ... 現在開いているCOMポートを閉じて、新しいCOMポートでシリアル接続を行います。<br>
+	    現在の接続を設定リセット  ... 現在開いているCOMポートの設定を変更します。<br>
+      </dd>
+
+      <dt id="Cancel">Cancel button</dt>
+      <dd>
+	設定変更をキャンセルして、ダイアログを終了します。
+      </dd>
+
+      <dt id="Help">Help button</dt>
+      <dd>
+	ヘルプを表示します。
+      </dd>
+
       <dt id="ComPort">Port</dt>
       <dd>
 	使用するポートです。リストに表示されるシリアルポート番号の最大値はデフォルトで256となっています。<a href="../setup/teraterm-com.html#maxport">MaxComPort</a>で最大値を変更できます。
