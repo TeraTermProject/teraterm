@@ -26,6 +26,7 @@ IRMtest() {
   IRM off
 
   printf "[IRM ${1}]\n"
+
   printf "1234567890abcdefgかきくけこさしすせそ"
   IRM $1
   Col 6		# 6 の位置にカーソルを移動
@@ -36,6 +37,11 @@ IRMtest() {
   IRM $1
   Col 21	# "き"の後半部分にカーソルを移動
   printf "1234567890\n"
+
+  printf "1234567890abcdefgかきくけこさしすせそ"
+  IRM $1
+  Col 21	# "き"の後半部分にカーソルを移動
+  printf "あいうえお\n"
 
   IRM off
   printf "\n"
@@ -54,10 +60,12 @@ cat <<_EoF_
 [IRM on]
 12345あいうえお67890abcdefgかきくけこさしすせそ
 1234567890abcdefgか 1234567890 くけこさしすせそ
+1234567890abcdefgか あいうえお くけこさしすせそ
 
 [IRM off]
 12345あいうえおfgかきくけこさしすせそ
 1234567890abcdefgか 1234567890 すせそ
+1234567890abcdefgか あいうえお すせそ
 
 _EoF_
 
