@@ -1136,7 +1136,7 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
 
 	if ( cv.Ready && (cv.PortType != IdSerial) ) {
 		ret = SetDlgTexts(dlg, TextInfoNewConnection, _countof(TextInfoNewConnection), UILanguageFile);
-		strncpy_s(uimsg, sizeof(uimsg), "&New connection", _TRUNCATE);
+		strncpy_s(uimsg, sizeof(uimsg), "Connect with &New window", _TRUNCATE);
 
 	} else {
 		if (cv.Open) {
