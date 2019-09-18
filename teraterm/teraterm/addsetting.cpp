@@ -74,15 +74,16 @@ const mouse_cursor_t MouseCursor[] = {
 
 void CVisualPropPageDlg::SetupRGBbox(int index)
 {
+	COLORREF Color = ts.ANSIColor[index];
 	BYTE c;
 
-	c = GetRValue(ts.ANSIColor[index]);
+	c = GetRValue(Color);
 	SetDlgItemNum(IDC_COLOR_RED, c);
 
-	c = GetGValue(ts.ANSIColor[index]);
+	c = GetGValue(Color);
 	SetDlgItemNum(IDC_COLOR_GREEN, c);
 
-	c = GetBValue(ts.ANSIColor[index]);
+	c = GetBValue(Color);
 	SetDlgItemNum(IDC_COLOR_BLUE, c);
 }
 
