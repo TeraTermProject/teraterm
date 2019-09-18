@@ -185,7 +185,8 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 		case WM_TIMER:
 			if(self) {
 				KillTimer(hWnd, self->timerid);
-				self->timerid = NULL;
+				if(self->timerid > 0)
+					self->timerid = 0;
 				self->SetVisible(FALSE);
 			}
 			break;
@@ -199,7 +200,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 CTipWin::CTipWin(HWND src, int cx, int cy, const TCHAR *str)
 {
 	tWin = (TipWin *)malloc(sizeof(TipWin));
-	Create(src, cx, cy, str);
+	memset(tWin, 0, sizeof(TipWin));
 }
 
 CTipWin::~CTipWin()
@@ -271,7 +272,7 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 
 	pts.x = cx;
 	pts.y = cy;
-	timerid = NULL;
+	timerid = 0;
 }
 
 VOID CTipWin::Destroy()
@@ -281,8 +282,8 @@ VOID CTipWin::Destroy()
 		DeleteObject(tWin->tip_font);
 		tWin->tip_font = NULL;
 		// ウィンドウの破棄
-		DestroyWindow(tWin->tip_wnd);
 		SetWindowLongPtr(tWin->tip_wnd, GWLP_USERDATA, NULL);
+		DestroyWindow(tWin->tip_wnd);
 		tWin->tip_wnd = NULL;
 	}
 }
@@ -430,6 +431,7 @@ void TipWinDestroy(TipWin* tWin)
 {
 	CTipWin* tipwin = (CTipWin*) tWin;
 	delete(tipwin);
+	tipwin = NULL;
 }
 
 int TipWinIsExists(TipWin *tWin)
