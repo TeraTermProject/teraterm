@@ -805,7 +805,13 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DropListCount = 0;
 
 	// TipWin
-	TipWin = new CTipWin(HVTWin, 0, 0, "VTWindow");
+	TipWin = new CTipWin();
+	{
+		// TipWinのWindowクラスの登録はTera Term全体で1度だけ行う
+		TipWin->SetWndClass(hInstance);
+		::RegisterClass(&TipWin->GetWndClass());
+	}
+	TipWin->Create(HVTWin, 0, 0, VTClassName);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -813,6 +819,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 CVTWindow::~CVTWindow()
 {
+	TipWin->Destroy();
+	{
+		WNDCLASS wc = TipWin->GetWndClass();
+		::UnregisterClass(wc.lpszClassName, wc.hInstance);
+	}
 	delete TipWin;
 }
 

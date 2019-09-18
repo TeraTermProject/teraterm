@@ -37,6 +37,8 @@ extern "C" {
 
 #define	TIP_WIN_FRAME_WIDTH	6
 
+#define TipWinClassName _T("TipWinClass")
+
 typedef struct tagTipWinData TipWin;
 
 TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str);
@@ -58,8 +60,12 @@ int TipWinIsVisible(TipWin *tWin);
 class CTipWin
 {
 public:
-	CTipWin(HWND src, int x, int y, const TCHAR *str);
-	~CTipWin(VOID);
+	CTipWin();
+	~CTipWin();
+	VOID SetWndClass(HINSTANCE hInstance);
+	WNDCLASS GetWndClass();
+	VOID Create(HWND src, int x, int y, const TCHAR *str);
+	VOID Destroy();
 	VOID SetText(TCHAR *str);
 	VOID GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
 	POINT GetPos();
@@ -72,10 +78,8 @@ private:
 	POINT pts;
 	UINT timerid;
 	TipWin* tWin;
-	static ATOM tip_class;
+	WNDCLASS wc;
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-	VOID Create(HWND src, int x, int y, const TCHAR *str);
-	VOID Destroy(VOID);
 	VOID CalcStrRect(VOID);
 };
 #endif

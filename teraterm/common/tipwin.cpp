@@ -191,7 +191,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
 }
 
-CTipWin::CTipWin(HWND src, int cx, int cy, const TCHAR *str)
+CTipWin::CTipWin()
 {
 	tWin = (TipWin *)malloc(sizeof(TipWin));
 	memset(tWin, 0, sizeof(TipWin));
@@ -200,8 +200,9 @@ CTipWin::CTipWin(HWND src, int cx, int cy, const TCHAR *str)
 CTipWin::~CTipWin()
 {
 	if(IsExists()) {
-		if(tWin->tip_wnd)
-			Destroy();
+		Destroy();
+	}
+	if(tWin != NULL) {
 		free((void*)tWin->str);
 		tWin->str = NULL;
 		free(tWin);
@@ -209,29 +210,31 @@ CTipWin::~CTipWin()
 	}
 }
 
-ATOM CTipWin::tip_class;
+VOID CTipWin::SetWndClass(HINSTANCE hInstance)
+{
+	memset(&wc, 0, sizeof(WNDPROC));
+	wc.style = CS_HREDRAW | CS_VREDRAW | CS_GLOBALCLASS;
+	wc.lpfnWndProc = WndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.hIcon = NULL;
+	wc.hCursor = NULL;
+	wc.hbrBackground = NULL;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = (LPCSTR)TipWinClassName;
+}
+
+WNDCLASS CTipWin::GetWndClass()
+{
+	return (WNDCLASS) wc;
+}
 
 VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 {
 	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
-
-	if (!tip_class) {
-		WNDCLASS wc;
-		wc.style = CS_HREDRAW | CS_VREDRAW;
-		wc.lpfnWndProc = WndProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInst;
-		wc.hIcon = NULL;
-		wc.hCursor = NULL;
-		wc.hbrBackground = NULL;
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = _T("TipWinClass");
-
-		tip_class = RegisterClass(&wc);
-	}
 
 	if (tWin == NULL) return;
 	tWin->str_len = _tcslen(str);
@@ -250,7 +253,7 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 	const int str_height = tWin->str_rect.bottom - tWin->str_rect.top;
 	tWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					   MAKEINTRESOURCE(tip_class),
+					   (LPCSTR)TipWinClassName,
 					   str, WS_POPUP,
 					   cx, cy,
 					   str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
@@ -320,7 +323,11 @@ VOID CTipWin::SetHideTimer(int ms)
 
 BOOL CTipWin::IsExists(void)
 {
-	return (tWin != NULL);
+	if(tWin == NULL)
+		return FALSE;
+	if(tWin->tip_wnd == NULL)
+		return FALSE;
+	return TRUE;
 }
 
 VOID CTipWin::SetVisible(BOOL bVisible)
@@ -345,7 +352,8 @@ BOOL CTipWin::IsVisible(void)
 
 TipWin* TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
 {
-	CTipWin* tipwin = new CTipWin(src, cx, cy, str);
+	CTipWin* tipwin = new CTipWin();
+	tipwin->Create(src, cx, cy, str);
 	tipwin->SetVisible(TRUE);
 	return (TipWin*)tipwin;
 }
