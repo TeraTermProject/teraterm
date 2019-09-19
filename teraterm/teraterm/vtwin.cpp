@@ -825,6 +825,7 @@ CVTWindow::~CVTWindow()
 		::UnregisterClass(wc.lpszClassName, wc.hInstance);
 	}
 	delete TipWin;
+	TipWin = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////

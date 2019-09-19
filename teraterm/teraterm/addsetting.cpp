@@ -643,6 +643,7 @@ CVisualPropPageDlg::~CVisualPropPageDlg()
 	free((void *)m_psp.pszTitle);
 	TipWin->Destroy();
 	delete TipWin;
+	TipWin = NULL;
 }
 
 // CVisualPropPageDlg メッセージ ハンドラ
