@@ -46,7 +46,13 @@
       <li>The location of resizing toolchip is automatically moved to coordinates after resizing.</li>
       <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
       <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
-      <li>When the inputted over than 256 of opacity values of the <a href="../menu/setup-additional.html">Additional settings dialog</a>, change to 255.</li>
+      <li>The <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
+      <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
+      <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+      <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+      <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed refering to the connection state. </li>
+      <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
+      <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
     </ul>
   </li>
   <li>Bug fixes
@@ -3237,11 +3243,11 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <!--li>Misc
+  <li>Misc
     <ul>
-      <li></li>
+      <li>upgraded OpenSSL to 1.0.2t.</li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_2.89">2019.06.15 (Ver 2.89)</h3>

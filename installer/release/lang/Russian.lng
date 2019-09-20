@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=Альтернатива:
 DLG_KEYB_APPKEY=&Применить Keypad
 DLG_KEYB_APPCUR=Применить &Cursor
 
-DLG_SERIAL_TITLE=Tera Term: Настройка последовательного порта
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=&Порт:
 DLG_SERIAL_BAUD=&Скорость:
 DLG_SERIAL_DATA=&Данные:
@@ -370,6 +370,11 @@ DLG_SERIAL_FLOW=&Управление:
 DLG_SERIAL_DELAY=Задержка передачи
 DLG_SERIAL_DELAYCHAR=мс/&символ
 DLG_SERIAL_DELAYLINE=мс/&строка
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=Connect with &New window
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
 
 DLG_TCPIP_TITLE=Tera Term: Настройка TCP/IP
 DLG_TCPIP_HOSTLIST=&Перечень хостов

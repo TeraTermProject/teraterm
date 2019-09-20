@@ -1427,9 +1427,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if (SubMenu == SetupMenu)
-		if (cv.Ready &&
-		    ((cv.PortType==IdTCPIP) || (cv.PortType==IdFile)) ||
-			(SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
+		/*
+		 * ネットワーク接続中(TCP/IPを選択して接続した状態)はシリアルポート
+		 * (ID_SETUP_SERIALPORT)のメニューが選択できないようになっていたが、
+		 * このガードを外し、シリアルポート設定ダイアログから新しい接続ができるようにする。
+		 */
+		if ((SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 		else {
@@ -4682,6 +4685,9 @@ void CVTWindow::OnSetupKeyboard()
 void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
+	char Command[MAXPATHLEN + HostNameMaxLength];
+	char Temp[MAX_PATH], Str[MAX_PATH];
+
 	HelpId = HlpSetupSerialPort;
 	if (! LoadTTDLG()) {
 		return;
@@ -4692,6 +4698,36 @@ void CVTWindow::OnSetupSerialPort()
 	FreeTTDLG();
 
 	if (Ok && ts.ComPort > 0) {
+		/* 
+		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
+		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
+		 */
+		if ( cv.Ready && (cv.PortType != IdSerial) ) {
+			_snprintf_s(Command, sizeof(Command), 
+				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
+				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
+
+			if (SerialPortConfconvertId2Str(COM_DATABIT, ts.DataBit, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_PARITY, ts.Parity, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_STOPBIT, ts.StopBit, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_FLOWCTRL, ts.Flow, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+
+			WinExec(Command,SW_SHOW);
+			return;
+		}
+
 		if (cv.Open) {
 			if (ts.ComPort != cv.ComPort) {
 				CommClose(&cv);

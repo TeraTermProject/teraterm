@@ -104,7 +104,9 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
  *   fwSide     リサイズ時にどこのウィンドウを掴んだか
  *   newX, newY リサイズ後の左上の座標
  *
- * 注意： Windows9x では動作しない
+ * 注意: 
+ * Windows9xでは画面のプロパティで「ウィンドウの内容を表示したまま
+ * ドラッグする」にチェックを入れないと、ツールチップが表示されません。
  */
 void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 {

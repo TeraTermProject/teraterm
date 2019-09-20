@@ -359,7 +359,7 @@ DLG_KEYB_DISABLE=Disabled mode:
 DLG_KEYB_APPKEY=&Application Keypad
 DLG_KEYB_APPCUR=Application &Cursor
 
-DLG_SERIAL_TITLE=Tera Term: Serial port setup
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=&Port:
 DLG_SERIAL_BAUD=Sp&eed:
 DLG_SERIAL_DATA=&Data:
@@ -369,6 +369,11 @@ DLG_SERIAL_FLOW=&Flow control:
 DLG_SERIAL_DELAY=Transmit delay
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=Connect with &New window
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
 
 DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
 DLG_TCPIP_HOSTLIST=Host &list

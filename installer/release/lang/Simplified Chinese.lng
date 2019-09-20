@@ -360,7 +360,7 @@ DLG_KEYB_DISABLE=禁用模式：
 DLG_KEYB_APPKEY=应用键盘(&A)
 DLG_KEYB_APPCUR=应用鼠标(&C)
 
-DLG_SERIAL_TITLE=Tera Term：串口设置
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
 DLG_SERIAL_PORT=端口(&P)：
 DLG_SERIAL_BAUD=比特率(&E)：
 DLG_SERIAL_DATA=数据位(&D)：
@@ -370,6 +370,11 @@ DLG_SERIAL_FLOW=流量控制(&F)：
 DLG_SERIAL_DELAY=传输延迟
 DLG_SERIAL_DELAYCHAR=毫秒/字符
 DLG_SERIAL_DELAYLINE=毫秒/行
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=Connect with &New window
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
 
 DLG_TCPIP_TITLE=Tera Term：TCP/IP 设置
 DLG_TCPIP_HOSTLIST=主机列表(&L)
