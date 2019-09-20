@@ -210,24 +210,33 @@ CTipWin::~CTipWin()
 	}
 }
 
-VOID CTipWin::SetWndClass(HINSTANCE hInstance)
+BOOL CTipWin::IsClassRegistered(HINSTANCE hInstance)
 {
-	memset(&wc, 0, sizeof(WNDPROC));
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_GLOBALCLASS;
-	wc.lpfnWndProc = WndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.hIcon = NULL;
-	wc.hCursor = NULL;
-	wc.hbrBackground = NULL;
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = (LPCSTR)TipWinClassName;
+	WNDCLASS twc = { 0 };
+	return (BOOL)GetClassInfo(hInstance, (LPCSTR)TipWinClassName, &twc);
 }
 
-WNDCLASS CTipWin::GetWndClass()
+ATOM CTipWin::RegisterClass(HINSTANCE hInstance)
 {
-	return (WNDCLASS) wc;
+	if (! IsClassRegistered(hInstance)) {
+		memset(&wc, 0, sizeof(WNDCLASS));
+		wc.style = CS_HREDRAW | CS_VREDRAW | CS_GLOBALCLASS;
+		wc.lpfnWndProc = WndProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = NULL;
+		wc.hCursor = NULL;
+		wc.hbrBackground = NULL;
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = (LPCSTR)TipWinClassName;
+	}
+	return ::RegisterClass(&wc);
+}
+
+BOOL CTipWin::UnregisterClass()
+{
+	return ::UnregisterClass((LPCSTR)TipWinClassName, wc.hInstance);
 }
 
 VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
@@ -236,7 +245,10 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
 
-	if (tWin == NULL) return;
+	if (! IsClassRegistered(hInst))
+		return;
+	if (tWin == NULL)
+		return;
 	tWin->str_len = _tcslen(str);
 	tWin->str = _tcsdup(str);
 	tWin->px = cx;

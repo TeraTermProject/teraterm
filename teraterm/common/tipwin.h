@@ -62,8 +62,9 @@ class CTipWin
 public:
 	CTipWin();
 	~CTipWin();
-	VOID SetWndClass(HINSTANCE hInstance);
-	WNDCLASS GetWndClass();
+	ATOM RegisterClass(HINSTANCE hInstance);
+	BOOL UnregisterClass();
+	BOOL IsClassRegistered(HINSTANCE hInstance);
 	VOID Create(HWND src, int x, int y, const TCHAR *str);
 	VOID Destroy();
 	VOID SetText(TCHAR *str);
