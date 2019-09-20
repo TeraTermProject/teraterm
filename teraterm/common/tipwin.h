@@ -37,7 +37,7 @@ extern "C" {
 
 #define	TIP_WIN_FRAME_WIDTH	6
 
-#define TipWinClassName _T("TipWinClass")
+#define TipWinClassName _T("TeraTermTipWinClass")
 
 typedef struct tagTipWinData TipWin;
 
