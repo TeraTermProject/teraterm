@@ -178,9 +178,9 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 			break;
 		case WM_TIMER:
 			if(self) {
-				KillTimer(hWnd, self->timerid);
 				if(self->timerid > 0)
-					self->timerid = 0;
+					KillTimer(hWnd, self->timerid);
+				self->timerid = 0;
 				self->SetVisible(FALSE);
 			}
 			break;
