@@ -4672,6 +4672,7 @@ void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
 	char Command[MAXPATHLEN + HostNameMaxLength];
+	char Temp[MAX_PATH], Str[MAX_PATH];
 
 	HelpId = HlpSetupSerialPort;
 	if (! LoadTTDLG()) {
@@ -4688,9 +4689,26 @@ void CVTWindow::OnSetupSerialPort()
 		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
 		 */
 		if ( cv.Ready && (cv.PortType != IdSerial) ) {
+			_snprintf_s(Command, sizeof(Command), 
+				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
+				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
 
-			_snprintf_s(Command, sizeof(Command), "ttermpro /C=%u /SPEED=%lu",
-				ts.ComPort, ts.Baud);
+			if (SerialPortConfconvertId2Str(COM_DATABIT, ts.DataBit, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_PARITY, ts.Parity, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_STOPBIT, ts.StopBit, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_FLOWCTRL, ts.Flow, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
 
 			WinExec(Command,SW_SHOW);
 			return;

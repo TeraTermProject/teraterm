@@ -27,6 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "ttlib.h"
+
 /* TERATERM.EXE, TTSET interface */
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +63,8 @@ extern PAddValueToList AddValueToList;
 /* proto types */
 BOOL LoadTTSET();
 void FreeTTSET();
+
+int PASCAL SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen);
 
 #ifdef __cplusplus
 }

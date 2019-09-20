@@ -76,6 +76,59 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       By default, maximum serial port number is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
       </dd>
 
+  <dt id="cdatabit">/CDATABIT=&lt;value&gt;</dt>
+  <dd>Data bit of serial port
+      <ul>
+        <li><span class="syntax">/CDATABIT=7</span> 7bit</li>
+        <li><span class="syntax">/CDATABIT=8</span> 8bit</li>
+      </ul>
+      </dd>
+
+  <dt id="cparity">/CPARITY=&lt;value&gt;</dt>
+  <dd>Parity of serial port
+      <ul>
+        <li><span class="syntax">/CPARITY=none</span> none</li>
+        <li><span class="syntax">/CPARITY=odd</span> odd</li>
+        <li><span class="syntax">/CPARITY=even</span> even</li>
+        <li><span class="syntax">/CPARITY=mark</span> mark</li>
+        <li><span class="syntax">/CPARITY=space</span> space</li>
+      </ul>
+      </dd>
+
+  <dt id="cstopbit">/CSTOPBIT=&lt;value&gt;</dt>
+  <dd>Stop bit of serial port
+      <ul>
+        <li><span class="syntax">/CSTOPBIT=1</span> 1bit</li>
+        <li><span class="syntax">/CSTOPBIT=1.5</span> 1.5bit</li>
+        <li><span class="syntax">/CSTOPBIT=2</span> 2bit</li>
+      </ul>
+      </dd>
+
+  <dt id="cflowctrl">/CFLOWCTRL=&lt;value&gt;</dt>
+  <dd>Flow control of serial port
+      <ul>
+        <li><span class="syntax">/CFLOWCTRL=x</span> Xon/Xoff</li>
+        <li><span class="syntax">/CFLOWCTRL=hard</span> RTS/CTS</li>
+        <li><span class="syntax">/CFLOWCTRL=rtscts</span> RTS/CTS</li>
+        <li><span class="syntax">/CFLOWCTRL=none</span> none</li>
+        <li><span class="syntax">/CFLOWCTRL=dsrdtr</span> DSR/DTR</li>
+      </ul>
+      </dd>
+
+  <dt id="cdelayperchar">/CDELAYPERCHAR=&lt;value&gt;</dt>
+  <dd>Transmission delay time per character of serial port(msec)
+      <ul>
+        <li><span class="syntax">/CDELAYPERCHAR=n</span> n millisecond</li>
+      </ul>
+      </dd>
+
+  <dt id="cdelayperline">/CDELAYPERLINE=&lt;value&gt;</dt>
+  <dd>Transmission delay time per line of serial port(msec)
+      <ul>
+        <li><span class="syntax">/CDELAYPERLINE=n</span> nmillisecond</li>
+      </ul>
+      </dd>
+
 <!--
   <dt id="duplicate">/DUPLICATE</dt>
   <dd>Internal use(must not specify this option)</dd>
