@@ -83,19 +83,19 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="cdatabit">/CDATABIT=&lt;value&gt;</dt>
   <dd>シリアルポートのデータビット
       <ul>
-        <li><span class="syntax">/CDATABIT=1</span> 7bit</li>
-        <li><span class="syntax">/CDATABIT=2</span> 8bit</li>
+        <li><span class="syntax">/CDATABIT=7</span> 7bit</li>
+        <li><span class="syntax">/CDATABIT=8</span> 8bit</li>
       </ul>
       </dd>
 
   <dt id="cparity">/CPARITY=&lt;value&gt;</dt>
   <dd>シリアルポートのパリティ
       <ul>
-        <li><span class="syntax">/CPARITY=1</span> none</li>
-        <li><span class="syntax">/CPARITY=2</span> odd</li>
-        <li><span class="syntax">/CPARITY=3</span> even</li>
-        <li><span class="syntax">/CPARITY=4</span> mark</li>
-        <li><span class="syntax">/CPARITY=5</span> space</li>
+        <li><span class="syntax">/CPARITY=none</span> none</li>
+        <li><span class="syntax">/CPARITY=odd</span> odd</li>
+        <li><span class="syntax">/CPARITY=even</span> even</li>
+        <li><span class="syntax">/CPARITY=mark</span> mark</li>
+        <li><span class="syntax">/CPARITY=space</span> space</li>
       </ul>
       </dd>
 
@@ -103,18 +103,19 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>シリアルポートのストップビット
       <ul>
         <li><span class="syntax">/CSTOPBIT=1</span> 1bit</li>
-        <li><span class="syntax">/CSTOPBIT=2</span> 1.5bit</li>
-        <li><span class="syntax">/CSTOPBIT=3</span> 2bit</li>
+        <li><span class="syntax">/CSTOPBIT=1.5</span> 1.5bit</li>
+        <li><span class="syntax">/CSTOPBIT=2</span> 2bit</li>
       </ul>
       </dd>
 
   <dt id="cflowctrl">/CFLOWCTRL=&lt;value&gt;</dt>
   <dd>シリアルポートのフロー制御
       <ul>
-        <li><span class="syntax">/CFLOWCTRL=1</span> Xon/Xoff</li>
-        <li><span class="syntax">/CFLOWCTRL=2</span> RTS/CTS</li>
-        <li><span class="syntax">/CFLOWCTRL=3</span> none</li>
-        <li><span class="syntax">/CFLOWCTRL=4</span> DSR/DTR</li>
+        <li><span class="syntax">/CFLOWCTRL=x</span> Xon/Xoff</li>
+        <li><span class="syntax">/CFLOWCTRL=hard</span> RTS/CTS</li>
+        <li><span class="syntax">/CFLOWCTRL=rtscts</span> RTS/CTS</li>
+        <li><span class="syntax">/CFLOWCTRL=none</span> none</li>
+        <li><span class="syntax">/CFLOWCTRL=dsrdtr</span> DSR/DTR</li>
       </ul>
       </dd>
 

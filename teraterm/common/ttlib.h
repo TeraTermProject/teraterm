@@ -136,6 +136,16 @@ int GetMonitorDpiFromWindow(HWND hWnd);
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 #endif
 
+/*
+ * シリアルポート関連の設定定義
+ */
+enum serial_port_conf {
+	COM_DATABIT, 
+	COM_PARITY,
+	COM_STOPBIT,
+	COM_FLOWCTRL,
+};
+
 #ifdef __cplusplus
 }
 #endif
