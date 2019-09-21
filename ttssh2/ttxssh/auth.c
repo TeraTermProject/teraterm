@@ -1458,6 +1458,7 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 		HWND cur_active = GetActiveWindow();
 		DLGPROC dlg_proc;
 		LPCTSTR dialog_template;
+		INT_PTR r;
 
 		switch (pvar->auth_state.mode) {
 		case TIS_AUTH_MODE:
@@ -1470,10 +1471,11 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 			dlg_proc = auth_dlg_proc;
 		}
 
-		if (!DialogBoxParam(hInst, dialog_template,
-		                    cur_active !=
-		                    NULL ? cur_active : pvar->NotificationWindow,
-		                    dlg_proc, (LPARAM) pvar) == -1) {
+		r = DialogBoxParam(hInst, dialog_template,
+						   cur_active !=
+						   NULL ? cur_active : pvar->NotificationWindow,
+						   dlg_proc, (LPARAM) pvar);
+		if (r == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTH_ERROR", pvar,
 			                  "Unable to display authentication dialog box.\n"
 			                  "Connection terminated.");
