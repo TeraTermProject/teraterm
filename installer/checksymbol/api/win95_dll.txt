@@ -34100,4 +34100,2944 @@ Full Path         : C:\WINDOWS\SYSTEM\IMM32.DLL
 Type              : Exported Function
 ==================================================
 
+==================================================
+Function Name     : AddMiniIconToList
+Address           : 0x70c8e0bd
+Relative Address  : 0x0001e0bd
+Ordinal           : 1 (0x1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : AddTagToGroupOrderListEntry
+Address           : 0x70c91e77
+Relative Address  : 0x00021e77
+Ordinal           : 2 (0x2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : AppendStringToMultiSz
+Address           : 0x70c81912
+Relative Address  : 0x00011912
+Ordinal           : 3 (0x3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : AssertFail
+Address           : 0x70c73180
+Relative Address  : 0x00003180
+Ordinal           : 4 (0x4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : CaptureAndConvertAnsiArg
+Address           : 0x70c72263
+Relative Address  : 0x00002263
+Ordinal           : 5 (0x5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : CaptureStringArg
+Address           : 0x70c7226b
+Relative Address  : 0x0000226b
+Ordinal           : 6 (0x6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : CenterWindowRelativeToParent
+Address           : 0x70c871aa
+Relative Address  : 0x000171aa
+Ordinal           : 7 (0x7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ConcatenatePaths
+Address           : 0x70c722e8
+Relative Address  : 0x000022e8
+Ordinal           : 8 (0x8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : DelayedMove
+Address           : 0x70c71ebc
+Relative Address  : 0x00001ebc
+Ordinal           : 9 (0x9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : DelimStringToMultiSz
+Address           : 0x70c723ac
+Relative Address  : 0x000023ac
+Ordinal           : 10 (0xa)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : DestroyTextFileReadBuffer
+Address           : 0x70c716f2
+Relative Address  : 0x000016f2
+Ordinal           : 11 (0xb)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : DoesUserHavePrivilege
+Address           : 0x70c82000
+Relative Address  : 0x00012000
+Ordinal           : 12 (0xc)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : DuplicateString
+Address           : 0x70c7210f
+Relative Address  : 0x0000210f
+Ordinal           : 13 (0xd)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : EnablePrivilege
+Address           : 0x70c820c9
+Relative Address  : 0x000120c9
+Ordinal           : 14 (0xe)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ExtensionPropSheetPageProc
+Address           : 0x70c9313a
+Relative Address  : 0x0002313a
+Ordinal           : 15 (0xf)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : FileExists
+Address           : 0x70c717db
+Relative Address  : 0x000017db
+Ordinal           : 16 (0x10)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : FreeStringArray
+Address           : 0x70c81a90
+Relative Address  : 0x00011a90
+Ordinal           : 17 (0x11)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetNewInfName
+Address           : 0x70c90d9e
+Relative Address  : 0x00020d9e
+Ordinal           : 18 (0x12)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetSetFileTimestamp
+Address           : 0x70c7184b
+Relative Address  : 0x0000184b
+Ordinal           : 19 (0x13)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : GetVersionInfoFromImage
+Address           : 0x70c7171b
+Relative Address  : 0x0000171b
+Ordinal           : 20 (0x14)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : InfIsFromOemLocation
+Address           : 0x70c92826
+Relative Address  : 0x00022826
+Ordinal           : 21 (0x15)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : InstallHinfSection
+Address           : 0x70c7c564
+Relative Address  : 0x0000c564
+Ordinal           : 22 (0x16)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : InstallHinfSectionA
+Address           : 0x70c7c564
+Relative Address  : 0x0000c564
+Ordinal           : 23 (0x17)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : InstallHinfSectionW
+Address           : 0x70c7c561
+Relative Address  : 0x0000c561
+Ordinal           : 24 (0x18)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : InstallStop
+Address           : 0x70c7cac0
+Relative Address  : 0x0000cac0
+Ordinal           : 25 (0x19)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : IsUserAdmin
+Address           : 0x70c81ef4
+Relative Address  : 0x00011ef4
+Ordinal           : 26 (0x1a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : LookUpStringInTable
+Address           : 0x70c724c3
+Relative Address  : 0x000024c3
+Ordinal           : 27 (0x1b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MemoryInitialize
+Address           : 0x70c725ce
+Relative Address  : 0x000025ce
+Ordinal           : 28 (0x1c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MultiByteToUnicode
+Address           : 0x70c72206
+Relative Address  : 0x00002206
+Ordinal           : 29 (0x1d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MultiSzFromSearchControl
+Address           : 0x70c71b54
+Relative Address  : 0x00001b54
+Ordinal           : 30 (0x1e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MyFree
+Address           : 0x70c725bf
+Relative Address  : 0x000025bf
+Ordinal           : 31 (0x1f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MyGetFileTitle
+Address           : 0x70c7237e
+Relative Address  : 0x0000237e
+Ordinal           : 32 (0x20)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MyMalloc
+Address           : 0x70c7259d
+Relative Address  : 0x0000259d
+Ordinal           : 33 (0x21)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : MyRealloc
+Address           : 0x70c725ac
+Relative Address  : 0x000025ac
+Ordinal           : 34 (0x22)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : OpenAndMapFileForRead
+Address           : 0x70c71438
+Relative Address  : 0x00001438
+Ordinal           : 35 (0x23)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : OutOfMemory
+Address           : 0x70c725fc
+Relative Address  : 0x000025fc
+Ordinal           : 36 (0x24)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupDirectoryIdToPath
+Address           : 0x70c7a317
+Relative Address  : 0x0000a317
+Ordinal           : 287 (0x11f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupGetField
+Address           : 0x70c79905
+Relative Address  : 0x00009905
+Ordinal           : 288 (0x120)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupGetOsLoaderDriveAndPath
+Address           : 0x70c75b60
+Relative Address  : 0x00005b60
+Ordinal           : 289 (0x121)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupGetVersionDatum
+Address           : 0x70c77c69
+Relative Address  : 0x00007c69
+Ordinal           : 290 (0x122)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupGuidFromString
+Address           : 0x70c88f64
+Relative Address  : 0x00018f64
+Ordinal           : 291 (0x123)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupIsGuidNull
+Address           : 0x70c8902f
+Relative Address  : 0x0001902f
+Ordinal           : 292 (0x124)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupMakeSurePathExists
+Address           : 0x70c7fc89
+Relative Address  : 0x0000fc89
+Ordinal           : 293 (0x125)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : pSetupStringFromGuid
+Address           : 0x70c88fc5
+Relative Address  : 0x00018fc5
+Ordinal           : 294 (0x126)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : QueryMultiSzValueToArray
+Address           : 0x70c8168d
+Relative Address  : 0x0001168d
+Ordinal           : 37 (0x25)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : QueryRegistryValue
+Address           : 0x70c8162c
+Relative Address  : 0x0001162c
+Ordinal           : 38 (0x26)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ReadAsciiOrUnicodeTextFile
+Address           : 0x70c71541
+Relative Address  : 0x00001541
+Ordinal           : 39 (0x27)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : RegistryDelnode
+Address           : 0x70c81b9a
+Relative Address  : 0x00011b9a
+Ordinal           : 40 (0x28)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : RetreiveFileSecurity
+Address           : 0x70c718bf
+Relative Address  : 0x000018bf
+Ordinal           : 41 (0x29)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : RetrieveServiceConfig
+Address           : 0x70c91e0d
+Relative Address  : 0x00021e0d
+Ordinal           : 42 (0x2a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SearchForInfFile
+Address           : 0x70c71a32
+Relative Address  : 0x00001a32
+Ordinal           : 43 (0x2b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetArrayToMultiSzValue
+Address           : 0x70c8181c
+Relative Address  : 0x0001181c
+Ordinal           : 44 (0x2c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddInstallSectionToDiskSpaceListA
+Address           : 0x70c7dabc
+Relative Address  : 0x0000dabc
+Ordinal           : 45 (0x2d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddInstallSectionToDiskSpaceListW
+Address           : 0x70c7daef
+Relative Address  : 0x0000daef
+Ordinal           : 46 (0x2e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddSectionToDiskSpaceListA
+Address           : 0x70c7d912
+Relative Address  : 0x0000d912
+Ordinal           : 47 (0x2f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddSectionToDiskSpaceListW
+Address           : 0x70c7daaf
+Relative Address  : 0x0000daaf
+Ordinal           : 48 (0x30)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddToDiskSpaceListA
+Address           : 0x70c7d81e
+Relative Address  : 0x0000d81e
+Ordinal           : 49 (0x31)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddToDiskSpaceListW
+Address           : 0x70c7d905
+Relative Address  : 0x0000d905
+Ordinal           : 50 (0x32)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddToSourceListA
+Address           : 0x70c809ac
+Relative Address  : 0x000109ac
+Ordinal           : 51 (0x33)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAddToSourceListW
+Address           : 0x70c8099f
+Relative Address  : 0x0001099f
+Ordinal           : 52 (0x34)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAdjustDiskSpaceListA
+Address           : 0x70c7d72b
+Relative Address  : 0x0000d72b
+Ordinal           : 53 (0x35)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupAdjustDiskSpaceListW
+Address           : 0x70c7d811
+Relative Address  : 0x0000d811
+Ordinal           : 54 (0x36)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCancelTemporarySourceList
+Address           : 0x70c806de
+Relative Address  : 0x000106de
+Ordinal           : 55 (0x37)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCloseFileQueue
+Address           : 0x70c83f96
+Relative Address  : 0x00013f96
+Ordinal           : 56 (0x38)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCloseInfFile
+Address           : 0x70c77b3f
+Relative Address  : 0x00007b3f
+Ordinal           : 57 (0x39)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCommitFileQueue
+Address           : 0x70c854bb
+Relative Address  : 0x000154bb
+Ordinal           : 58 (0x3a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCommitFileQueueA
+Address           : 0x70c854d5
+Relative Address  : 0x000154d5
+Ordinal           : 59 (0x3b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCommitFileQueueW
+Address           : 0x70c854ae
+Relative Address  : 0x000154ae
+Ordinal           : 60 (0x3c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCopyErrorA
+Address           : 0x70c837ce
+Relative Address  : 0x000137ce
+Ordinal           : 61 (0x3d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCopyErrorW
+Address           : 0x70c837be
+Relative Address  : 0x000137be
+Ordinal           : 62 (0x3e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCreateDiskSpaceListA
+Address           : 0x70c7d3ff
+Relative Address  : 0x0000d3ff
+Ordinal           : 63 (0x3f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupCreateDiskSpaceListW
+Address           : 0x70c7d47d
+Relative Address  : 0x0000d47d
+Ordinal           : 64 (0x40)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDecompressOrCopyFileA
+Address           : 0x70c7f210
+Relative Address  : 0x0000f210
+Ordinal           : 65 (0x41)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDecompressOrCopyFileW
+Address           : 0x70c7f208
+Relative Address  : 0x0000f208
+Ordinal           : 66 (0x42)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDefaultQueueCallback
+Address           : 0x70c8754e
+Relative Address  : 0x0001754e
+Ordinal           : 67 (0x43)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDefaultQueueCallbackA
+Address           : 0x70c87375
+Relative Address  : 0x00017375
+Ordinal           : 68 (0x44)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDefaultQueueCallbackW
+Address           : 0x70c87368
+Relative Address  : 0x00017368
+Ordinal           : 69 (0x45)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDeleteErrorA
+Address           : 0x70c83cd2
+Relative Address  : 0x00013cd2
+Ordinal           : 70 (0x46)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDeleteErrorW
+Address           : 0x70c83cc2
+Relative Address  : 0x00013cc2
+Ordinal           : 71 (0x47)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDestroyDiskSpaceList
+Address           : 0x70c7d637
+Relative Address  : 0x0000d637
+Ordinal           : 72 (0x48)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiAskForOEMDisk
+Address           : 0x70c9288b
+Relative Address  : 0x0002288b
+Ordinal           : 73 (0x49)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiBuildClassInfoList
+Address           : 0x70c895b8
+Relative Address  : 0x000195b8
+Ordinal           : 74 (0x4a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiBuildDriverInfoList
+Address           : 0x70c8b5cb
+Relative Address  : 0x0001b5cb
+Ordinal           : 75 (0x4b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCallClassInstaller
+Address           : 0x70c8ec87
+Relative Address  : 0x0001ec87
+Ordinal           : 76 (0x4c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCancelDriverInfoSearch
+Address           : 0x70c8d60c
+Relative Address  : 0x0001d60c
+Ordinal           : 77 (0x4d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiChangeState
+Address           : 0x70c908b0
+Relative Address  : 0x000208b0
+Ordinal           : 78 (0x4e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiClassGuidsFromNameA
+Address           : 0x70c8935e
+Relative Address  : 0x0001935e
+Ordinal           : 79 (0x4f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiClassGuidsFromNameW
+Address           : 0x70c89351
+Relative Address  : 0x00019351
+Ordinal           : 80 (0x50)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiClassNameFromGuidA
+Address           : 0x70c892a8
+Relative Address  : 0x000192a8
+Ordinal           : 81 (0x51)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiClassNameFromGuidW
+Address           : 0x70c8929b
+Relative Address  : 0x0001929b
+Ordinal           : 82 (0x52)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCreateDeviceInfoA
+Address           : 0x70c89929
+Relative Address  : 0x00019929
+Ordinal           : 85 (0x55)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCreateDeviceInfoList
+Address           : 0x70c89726
+Relative Address  : 0x00019726
+Ordinal           : 86 (0x56)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCreateDeviceInfoW
+Address           : 0x70c8991c
+Relative Address  : 0x0001991c
+Ordinal           : 87 (0x57)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCreateDevRegKeyA
+Address           : 0x70c8ab47
+Relative Address  : 0x0001ab47
+Ordinal           : 83 (0x53)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiCreateDevRegKeyW
+Address           : 0x70c8ab37
+Relative Address  : 0x0001ab37
+Ordinal           : 84 (0x54)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiDeleteDeviceInfo
+Address           : 0x70c8a1d5
+Relative Address  : 0x0001a1d5
+Ordinal           : 89 (0x59)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiDeleteDevRegKey
+Address           : 0x70c8b461
+Relative Address  : 0x0001b461
+Ordinal           : 88 (0x58)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiDestroyClassImageList
+Address           : 0x70c8e6e3
+Relative Address  : 0x0001e6e3
+Ordinal           : 90 (0x5a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiDestroyDeviceInfoList
+Address           : 0x70c8988e
+Relative Address  : 0x0001988e
+Ordinal           : 91 (0x5b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiDestroyDriverInfoList
+Address           : 0x70c8d007
+Relative Address  : 0x0001d007
+Ordinal           : 92 (0x5c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiDrawMiniIcon
+Address           : 0x70c8d83d
+Relative Address  : 0x0001d83d
+Ordinal           : 93 (0x5d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiEnumDeviceInfo
+Address           : 0x70c8a2d5
+Relative Address  : 0x0001a2d5
+Ordinal           : 94 (0x5e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiEnumDriverInfoA
+Address           : 0x70c8cb6a
+Relative Address  : 0x0001cb6a
+Ordinal           : 95 (0x5f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiEnumDriverInfoW
+Address           : 0x70c8cb5d
+Relative Address  : 0x0001cb5d
+Ordinal           : 96 (0x60)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetActualSectionToInstallA
+Address           : 0x70c926b8
+Relative Address  : 0x000226b8
+Ordinal           : 97 (0x61)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetActualSectionToInstallW
+Address           : 0x70c926ab
+Relative Address  : 0x000226ab
+Ordinal           : 98 (0x62)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassBitmapIndex
+Address           : 0x70c8dda0
+Relative Address  : 0x0001dda0
+Ordinal           : 99 (0x63)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassDescriptionA
+Address           : 0x70c89465
+Relative Address  : 0x00019465
+Ordinal           : 100 (0x64)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassDescriptionW
+Address           : 0x70c89458
+Relative Address  : 0x00019458
+Ordinal           : 101 (0x65)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassDevPropertySheetsA
+Address           : 0x70c9307d
+Relative Address  : 0x0002307d
+Ordinal           : 102 (0x66)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassDevPropertySheetsW
+Address           : 0x70c93070
+Relative Address  : 0x00023070
+Ordinal           : 103 (0x67)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassDevsA
+Address           : 0x70c89da9
+Relative Address  : 0x00019da9
+Ordinal           : 104 (0x68)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassDevsW
+Address           : 0x70c89d99
+Relative Address  : 0x00019d99
+Ordinal           : 105 (0x69)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassImageIndex
+Address           : 0x70c8e7ca
+Relative Address  : 0x0001e7ca
+Ordinal           : 106 (0x6a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassImageList
+Address           : 0x70c8e322
+Relative Address  : 0x0001e322
+Ordinal           : 107 (0x6b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassInstallParamsA
+Address           : 0x70c8e9cc
+Relative Address  : 0x0001e9cc
+Ordinal           : 108 (0x6c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetClassInstallParamsW
+Address           : 0x70c8e9bf
+Relative Address  : 0x0001e9bf
+Ordinal           : 109 (0x6d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceInfoListClass
+Address           : 0x70c897dc
+Relative Address  : 0x000197dc
+Ordinal           : 110 (0x6e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceInstallParamsA
+Address           : 0x70c8e8ec
+Relative Address  : 0x0001e8ec
+Ordinal           : 111 (0x6f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceInstallParamsW
+Address           : 0x70c8e8df
+Relative Address  : 0x0001e8df
+Ordinal           : 112 (0x70)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceInstanceIdA
+Address           : 0x70c8a971
+Relative Address  : 0x0001a971
+Ordinal           : 113 (0x71)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceInstanceIdW
+Address           : 0x70c8a964
+Relative Address  : 0x0001a964
+Ordinal           : 114 (0x72)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceRegistryPropertyA
+Address           : 0x70c8b122
+Relative Address  : 0x0001b122
+Ordinal           : 115 (0x73)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDeviceRegistryPropertyW
+Address           : 0x70c8b115
+Relative Address  : 0x0001b115
+Ordinal           : 116 (0x74)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDriverInfoDetailA
+Address           : 0x70c8cef6
+Relative Address  : 0x0001cef6
+Ordinal           : 117 (0x75)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDriverInfoDetailW
+Address           : 0x70c8cee9
+Relative Address  : 0x0001cee9
+Ordinal           : 118 (0x76)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDriverInstallParamsA
+Address           : 0x70c8d167
+Relative Address  : 0x0001d167
+Ordinal           : 119 (0x77)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetDriverInstallParamsW
+Address           : 0x70c8d15a
+Relative Address  : 0x0001d15a
+Ordinal           : 120 (0x78)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetHwProfileFriendlyNameA
+Address           : 0x70c8f47a
+Relative Address  : 0x0001f47a
+Ordinal           : 121 (0x79)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetHwProfileFriendlyNameW
+Address           : 0x70c8f46d
+Relative Address  : 0x0001f46d
+Ordinal           : 122 (0x7a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetHwProfileList
+Address           : 0x70c8f56a
+Relative Address  : 0x0001f56a
+Ordinal           : 123 (0x7b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetINFClassA
+Address           : 0x70c8905c
+Relative Address  : 0x0001905c
+Ordinal           : 124 (0x7c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetINFClassW
+Address           : 0x70c8904f
+Relative Address  : 0x0001904f
+Ordinal           : 125 (0x7d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetSelectedDevice
+Address           : 0x70c9339c
+Relative Address  : 0x0002339c
+Ordinal           : 126 (0x7e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetSelectedDriverA
+Address           : 0x70c8cc9f
+Relative Address  : 0x0001cc9f
+Ordinal           : 127 (0x7f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetSelectedDriverW
+Address           : 0x70c8cc92
+Relative Address  : 0x0001cc92
+Ordinal           : 128 (0x80)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiGetWizardPage
+Address           : 0x70c931d9
+Relative Address  : 0x000231d9
+Ordinal           : 129 (0x81)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiInstallClassA
+Address           : 0x70c8f0f0
+Relative Address  : 0x0001f0f0
+Ordinal           : 130 (0x82)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiInstallClassW
+Address           : 0x70c8f0e3
+Relative Address  : 0x0001f0e3
+Ordinal           : 131 (0x83)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiInstallDevice
+Address           : 0x70c8f657
+Relative Address  : 0x0001f657
+Ordinal           : 132 (0x84)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiInstallDriverFiles
+Address           : 0x70c903b2
+Relative Address  : 0x000203b2
+Ordinal           : 133 (0x85)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiLoadClassIcon
+Address           : 0x70c8da29
+Relative Address  : 0x0001da29
+Ordinal           : 134 (0x86)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiMoveDuplicateDevice
+Address           : 0x70c905ee
+Relative Address  : 0x000205ee
+Ordinal           : 135 (0x87)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiOpenClassRegKey
+Address           : 0x70c8aa9c
+Relative Address  : 0x0001aa9c
+Ordinal           : 136 (0x88)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiOpenDeviceInfoA
+Address           : 0x70c89ba7
+Relative Address  : 0x00019ba7
+Ordinal           : 138 (0x8a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiOpenDeviceInfoW
+Address           : 0x70c89b9a
+Relative Address  : 0x00019b9a
+Ordinal           : 139 (0x8b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiOpenDevRegKey
+Address           : 0x70c8acd5
+Relative Address  : 0x0001acd5
+Ordinal           : 137 (0x89)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiRegisterDeviceInfo
+Address           : 0x70c8a3b7
+Relative Address  : 0x0001a3b7
+Ordinal           : 140 (0x8c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiRemoveDevice
+Address           : 0x70c903c4
+Relative Address  : 0x000203c4
+Ordinal           : 141 (0x8d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSelectDevice
+Address           : 0x70c9595d
+Relative Address  : 0x0002595d
+Ordinal           : 142 (0x8e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSelectOEMDrv
+Address           : 0x70c929e0
+Relative Address  : 0x000229e0
+Ordinal           : 143 (0x8f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetClassInstallParamsA
+Address           : 0x70c8ebb4
+Relative Address  : 0x0001ebb4
+Ordinal           : 144 (0x90)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetClassInstallParamsW
+Address           : 0x70c8eba7
+Relative Address  : 0x0001eba7
+Ordinal           : 145 (0x91)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetDeviceInstallParamsA
+Address           : 0x70c8eb91
+Relative Address  : 0x0001eb91
+Ordinal           : 146 (0x92)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetDeviceInstallParamsW
+Address           : 0x70c8eb84
+Relative Address  : 0x0001eb84
+Ordinal           : 147 (0x93)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetDeviceRegistryPropertyA
+Address           : 0x70c8b3e5
+Relative Address  : 0x0001b3e5
+Ordinal           : 148 (0x94)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetDeviceRegistryPropertyW
+Address           : 0x70c8b3d8
+Relative Address  : 0x0001b3d8
+Ordinal           : 149 (0x95)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetDriverInstallParamsA
+Address           : 0x70c8d27c
+Relative Address  : 0x0001d27c
+Ordinal           : 150 (0x96)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetDriverInstallParamsW
+Address           : 0x70c8d26f
+Relative Address  : 0x0001d26f
+Ordinal           : 151 (0x97)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetSelectedDevice
+Address           : 0x70c9345e
+Relative Address  : 0x0002345e
+Ordinal           : 152 (0x98)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetSelectedDriverA
+Address           : 0x70c8cda4
+Relative Address  : 0x0001cda4
+Ordinal           : 153 (0x99)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDiSetSelectedDriverW
+Address           : 0x70c8cd97
+Relative Address  : 0x0001cd97
+Ordinal           : 154 (0x9a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDuplicateDiskSpaceListA
+Address           : 0x70c7d48a
+Relative Address  : 0x0000d48a
+Ordinal           : 155 (0x9b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupDuplicateDiskSpaceListW
+Address           : 0x70c7d62a
+Relative Address  : 0x0000d62a
+Ordinal           : 156 (0x9c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFindFirstLineA
+Address           : 0x70c77cc6
+Relative Address  : 0x00007cc6
+Ordinal           : 157 (0x9d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFindFirstLineW
+Address           : 0x70c77cb9
+Relative Address  : 0x00007cb9
+Ordinal           : 158 (0x9e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFindNextLine
+Address           : 0x70c77e42
+Relative Address  : 0x00007e42
+Ordinal           : 159 (0x9f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFindNextMatchLineA
+Address           : 0x70c77e61
+Relative Address  : 0x00007e61
+Ordinal           : 160 (0xa0)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFindNextMatchLineW
+Address           : 0x70c77e54
+Relative Address  : 0x00007e54
+Ordinal           : 161 (0xa1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFreeSourceListA
+Address           : 0x70c810f5
+Relative Address  : 0x000110f5
+Ordinal           : 162 (0xa2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupFreeSourceListW
+Address           : 0x70c81105
+Relative Address  : 0x00011105
+Ordinal           : 163 (0xa3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetBinaryField
+Address           : 0x70c796e6
+Relative Address  : 0x000096e6
+Ordinal           : 164 (0xa4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetFieldCount
+Address           : 0x70c790a2
+Relative Address  : 0x000090a2
+Ordinal           : 165 (0xa5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetFileCompressionInfoA
+Address           : 0x70c7f13f
+Relative Address  : 0x0000f13f
+Ordinal           : 166 (0xa6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetFileCompressionInfoW
+Address           : 0x70c7f137
+Relative Address  : 0x0000f137
+Ordinal           : 167 (0xa7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetInfFileListA
+Address           : 0x70c7740d
+Relative Address  : 0x0000740d
+Ordinal           : 168 (0xa8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetInfFileListW
+Address           : 0x70c77400
+Relative Address  : 0x00007400
+Ordinal           : 169 (0xa9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetInfInformationA
+Address           : 0x70c76b82
+Relative Address  : 0x00006b82
+Ordinal           : 170 (0xaa)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetInfInformationW
+Address           : 0x70c76b75
+Relative Address  : 0x00006b75
+Ordinal           : 171 (0xab)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetIntField
+Address           : 0x70c79221
+Relative Address  : 0x00009221
+Ordinal           : 172 (0xac)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetLineByIndexA
+Address           : 0x70c78026
+Relative Address  : 0x00008026
+Ordinal           : 173 (0xad)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetLineByIndexW
+Address           : 0x70c78019
+Relative Address  : 0x00008019
+Ordinal           : 174 (0xae)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetLineCountA
+Address           : 0x70c781bb
+Relative Address  : 0x000081bb
+Ordinal           : 175 (0xaf)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetLineCountW
+Address           : 0x70c781ab
+Relative Address  : 0x000081ab
+Ordinal           : 176 (0xb0)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetLineTextA
+Address           : 0x70c7939c
+Relative Address  : 0x0000939c
+Ordinal           : 177 (0xb1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetLineTextW
+Address           : 0x70c7938f
+Relative Address  : 0x0000938f
+Ordinal           : 178 (0xb2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetMultiSzFieldA
+Address           : 0x70c79544
+Relative Address  : 0x00009544
+Ordinal           : 179 (0xb3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetMultiSzFieldW
+Address           : 0x70c79537
+Relative Address  : 0x00009537
+Ordinal           : 180 (0xb4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetSourceFileLocationA
+Address           : 0x70c79b04
+Relative Address  : 0x00009b04
+Ordinal           : 181 (0xb5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetSourceFileLocationW
+Address           : 0x70c79af7
+Relative Address  : 0x00009af7
+Ordinal           : 182 (0xb6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetSourceFileSizeA
+Address           : 0x70c79e3c
+Relative Address  : 0x00009e3c
+Ordinal           : 183 (0xb7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetSourceFileSizeW
+Address           : 0x70c79e2f
+Relative Address  : 0x00009e2f
+Ordinal           : 184 (0xb8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetSourceInfoA
+Address           : 0x70c7acad
+Relative Address  : 0x0000acad
+Ordinal           : 185 (0xb9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetSourceInfoW
+Address           : 0x70c7aca0
+Relative Address  : 0x0000aca0
+Ordinal           : 186 (0xba)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetStringFieldA
+Address           : 0x70c79142
+Relative Address  : 0x00009142
+Ordinal           : 187 (0xbb)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetStringFieldW
+Address           : 0x70c79135
+Relative Address  : 0x00009135
+Ordinal           : 188 (0xbc)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetTargetPathA
+Address           : 0x70c7a1f2
+Relative Address  : 0x0000a1f2
+Ordinal           : 189 (0xbd)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupGetTargetPathW
+Address           : 0x70c7a1e5
+Relative Address  : 0x0000a1e5
+Ordinal           : 190 (0xbe)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInitDefaultQueueCallback
+Address           : 0x70c872f1
+Relative Address  : 0x000172f1
+Ordinal           : 191 (0xbf)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInitDefaultQueueCallbackEx
+Address           : 0x70c872ac
+Relative Address  : 0x000172ac
+Ordinal           : 192 (0xc0)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInitializeFileLogA
+Address           : 0x70c7fe2b
+Relative Address  : 0x0000fe2b
+Ordinal           : 193 (0xc1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInitializeFileLogW
+Address           : 0x70c7fe1b
+Relative Address  : 0x0000fe1b
+Ordinal           : 194 (0xc2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFileA
+Address           : 0x70c7fc5c
+Relative Address  : 0x0000fc5c
+Ordinal           : 195 (0xc3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFileExA
+Address           : 0x70c7fb7a
+Relative Address  : 0x0000fb7a
+Ordinal           : 196 (0xc4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFileExW
+Address           : 0x70c7fb6d
+Relative Address  : 0x0000fb6d
+Ordinal           : 197 (0xc5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFilesFromInfSectionA
+Address           : 0x70c7bf3d
+Relative Address  : 0x0000bf3d
+Ordinal           : 199 (0xc7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFilesFromInfSectionW
+Address           : 0x70c7bf30
+Relative Address  : 0x0000bf30
+Ordinal           : 200 (0xc8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFileW
+Address           : 0x70c7fc4f
+Relative Address  : 0x0000fc4f
+Ordinal           : 198 (0xc6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFromInfSectionA
+Address           : 0x70c7bf01
+Relative Address  : 0x0000bf01
+Ordinal           : 201 (0xc9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallFromInfSectionW
+Address           : 0x70c7bef4
+Relative Address  : 0x0000bef4
+Ordinal           : 202 (0xca)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallServicesFromInfSectionA
+Address           : 0x70c7c515
+Relative Address  : 0x0000c515
+Ordinal           : 203 (0xcb)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupInstallServicesFromInfSectionW
+Address           : 0x70c7c508
+Relative Address  : 0x0000c508
+Ordinal           : 204 (0xcc)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupIterateCabinetA
+Address           : 0x70c7d3e5
+Relative Address  : 0x0000d3e5
+Ordinal           : 205 (0xcd)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupIterateCabinetW
+Address           : 0x70c7d3d8
+Relative Address  : 0x0000d3d8
+Ordinal           : 206 (0xce)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupLogFileA
+Address           : 0x70c80024
+Relative Address  : 0x00010024
+Ordinal           : 207 (0xcf)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupLogFileW
+Address           : 0x70c80017
+Relative Address  : 0x00010017
+Ordinal           : 208 (0xd0)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupOpenAppendInfFileA
+Address           : 0x70c77780
+Relative Address  : 0x00007780
+Ordinal           : 209 (0xd1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupOpenAppendInfFileW
+Address           : 0x70c77773
+Relative Address  : 0x00007773
+Ordinal           : 210 (0xd2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupOpenFileQueue
+Address           : 0x70c83f50
+Relative Address  : 0x00013f50
+Ordinal           : 211 (0xd3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupOpenInfFileA
+Address           : 0x70c7748a
+Relative Address  : 0x0000748a
+Ordinal           : 212 (0xd4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupOpenInfFileW
+Address           : 0x70c7747a
+Relative Address  : 0x0000747a
+Ordinal           : 213 (0xd5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupOpenMasterInf
+Address           : 0x70c77735
+Relative Address  : 0x00007735
+Ordinal           : 214 (0xd6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupPromptForDiskA
+Address           : 0x70c8365b
+Relative Address  : 0x0001365b
+Ordinal           : 215 (0xd7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupPromptForDiskW
+Address           : 0x70c8364b
+Relative Address  : 0x0001364b
+Ordinal           : 216 (0xd8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupPromptReboot
+Address           : 0x70c87805
+Relative Address  : 0x00017805
+Ordinal           : 217 (0xd9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryDrivesInDiskSpaceListA
+Address           : 0x70c7df47
+Relative Address  : 0x0000df47
+Ordinal           : 218 (0xda)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryDrivesInDiskSpaceListW
+Address           : 0x70c7df60
+Relative Address  : 0x0000df60
+Ordinal           : 219 (0xdb)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryFileLogA
+Address           : 0x70c80298
+Relative Address  : 0x00010298
+Ordinal           : 220 (0xdc)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryFileLogW
+Address           : 0x70c8028b
+Relative Address  : 0x0001028b
+Ordinal           : 221 (0xdd)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryInfFileInformationA
+Address           : 0x70c76ea1
+Relative Address  : 0x00006ea1
+Ordinal           : 222 (0xde)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryInfFileInformationW
+Address           : 0x70c76e94
+Relative Address  : 0x00006e94
+Ordinal           : 223 (0xdf)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryInfVersionInformationA
+Address           : 0x70c76fd5
+Relative Address  : 0x00006fd5
+Ordinal           : 224 (0xe0)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueryInfVersionInformationW
+Address           : 0x70c76fc8
+Relative Address  : 0x00006fc8
+Ordinal           : 225 (0xe1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQuerySourceListA
+Address           : 0x70c80d24
+Relative Address  : 0x00010d24
+Ordinal           : 226 (0xe2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQuerySourceListW
+Address           : 0x70c80d17
+Relative Address  : 0x00010d17
+Ordinal           : 227 (0xe3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQuerySpaceRequiredOnDriveA
+Address           : 0x70c7ddd6
+Relative Address  : 0x0000ddd6
+Ordinal           : 228 (0xe4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQuerySpaceRequiredOnDriveW
+Address           : 0x70c7df3a
+Relative Address  : 0x0000df3a
+Ordinal           : 229 (0xe5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueCopyA
+Address           : 0x70c841c5
+Relative Address  : 0x000141c5
+Ordinal           : 230 (0xe6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueCopySectionA
+Address           : 0x70c844ee
+Relative Address  : 0x000144ee
+Ordinal           : 231 (0xe7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueCopySectionW
+Address           : 0x70c844e1
+Relative Address  : 0x000144e1
+Ordinal           : 232 (0xe8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueCopyW
+Address           : 0x70c841b8
+Relative Address  : 0x000141b8
+Ordinal           : 233 (0xe9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueDefaultCopyA
+Address           : 0x70c847ee
+Relative Address  : 0x000147ee
+Ordinal           : 234 (0xea)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueDefaultCopyW
+Address           : 0x70c847e1
+Relative Address  : 0x000147e1
+Ordinal           : 235 (0xeb)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueDeleteA
+Address           : 0x70c84bb7
+Relative Address  : 0x00014bb7
+Ordinal           : 236 (0xec)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueDeleteSectionA
+Address           : 0x70c84c41
+Relative Address  : 0x00014c41
+Ordinal           : 237 (0xed)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueDeleteSectionW
+Address           : 0x70c84c34
+Relative Address  : 0x00014c34
+Ordinal           : 238 (0xee)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueDeleteW
+Address           : 0x70c84baa
+Relative Address  : 0x00014baa
+Ordinal           : 239 (0xef)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueRenameA
+Address           : 0x70c84d59
+Relative Address  : 0x00014d59
+Ordinal           : 240 (0xf0)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueRenameSectionA
+Address           : 0x70c84e3f
+Relative Address  : 0x00014e3f
+Ordinal           : 241 (0xf1)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueRenameSectionW
+Address           : 0x70c84e32
+Relative Address  : 0x00014e32
+Ordinal           : 242 (0xf2)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupQueueRenameW
+Address           : 0x70c84d4c
+Relative Address  : 0x00014d4c
+Ordinal           : 243 (0xf3)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveFileLogEntryA
+Address           : 0x70c801b1
+Relative Address  : 0x000101b1
+Ordinal           : 244 (0xf4)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveFileLogEntryW
+Address           : 0x70c801a4
+Relative Address  : 0x000101a4
+Ordinal           : 245 (0xf5)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveFromDiskSpaceListA
+Address           : 0x70c7dafc
+Relative Address  : 0x0000dafc
+Ordinal           : 246 (0xf6)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveFromDiskSpaceListW
+Address           : 0x70c7dbdd
+Relative Address  : 0x0000dbdd
+Ordinal           : 247 (0xf7)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveFromSourceListA
+Address           : 0x70c80cca
+Relative Address  : 0x00010cca
+Ordinal           : 248 (0xf8)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveFromSourceListW
+Address           : 0x70c80cbd
+Relative Address  : 0x00010cbd
+Ordinal           : 249 (0xf9)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveInstallSectionFromDiskSpaceListA
+Address           : 0x70c7dd97
+Relative Address  : 0x0000dd97
+Ordinal           : 250 (0xfa)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveInstallSectionFromDiskSpaceListW
+Address           : 0x70c7ddc9
+Relative Address  : 0x0000ddc9
+Ordinal           : 251 (0xfb)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveSectionFromDiskSpaceListA
+Address           : 0x70c7dbea
+Relative Address  : 0x0000dbea
+Ordinal           : 252 (0xfc)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRemoveSectionFromDiskSpaceListW
+Address           : 0x70c7dd8a
+Relative Address  : 0x0000dd8a
+Ordinal           : 253 (0xfd)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRenameErrorA
+Address           : 0x70c83bd8
+Relative Address  : 0x00013bd8
+Ordinal           : 254 (0xfe)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupRenameErrorW
+Address           : 0x70c83bc8
+Relative Address  : 0x00013bc8
+Ordinal           : 255 (0xff)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupScanFileQueue
+Address           : 0x70c877b7
+Relative Address  : 0x000177b7
+Ordinal           : 256 (0x100)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupScanFileQueueA
+Address           : 0x70c877d7
+Relative Address  : 0x000177d7
+Ordinal           : 257 (0x101)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupScanFileQueueW
+Address           : 0x70c877aa
+Relative Address  : 0x000177aa
+Ordinal           : 258 (0x102)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetDirectoryIdA
+Address           : 0x70c7aa43
+Relative Address  : 0x0000aa43
+Ordinal           : 259 (0x103)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetDirectoryIdExA
+Address           : 0x70c7a796
+Relative Address  : 0x0000a796
+Ordinal           : 260 (0x104)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetDirectoryIdExW
+Address           : 0x70c7a789
+Relative Address  : 0x0000a789
+Ordinal           : 261 (0x105)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetDirectoryIdW
+Address           : 0x70c7aa5c
+Relative Address  : 0x0000aa5c
+Ordinal           : 262 (0x106)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetPlatformPathOverrideA
+Address           : 0x70c840d3
+Relative Address  : 0x000140d3
+Ordinal           : 263 (0x107)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetPlatformPathOverrideW
+Address           : 0x70c840c6
+Relative Address  : 0x000140c6
+Ordinal           : 264 (0x108)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetSourceListA
+Address           : 0x70c805c3
+Relative Address  : 0x000105c3
+Ordinal           : 265 (0x109)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupSetSourceListW
+Address           : 0x70c805b6
+Relative Address  : 0x000105b6
+Ordinal           : 266 (0x10a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupTermDefaultQueueCallback
+Address           : 0x70c87303
+Relative Address  : 0x00017303
+Ordinal           : 267 (0x10b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : SetupTerminateFileLog
+Address           : 0x70c7ff9c
+Relative Address  : 0x0000ff9c
+Ordinal           : 268 (0x10c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : ShouldDeviceBeExcluded
+Address           : 0x70c8c8dc
+Relative Address  : 0x0001c8dc
+Ordinal           : 269 (0x10d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StampFileSecurity
+Address           : 0x70c71928
+Relative Address  : 0x00001928
+Ordinal           : 270 (0x10e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableAddString
+Address           : 0x70c72c2d
+Relative Address  : 0x00002c2d
+Ordinal           : 271 (0x10f)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableAddStringEx
+Address           : 0x70c72c8b
+Relative Address  : 0x00002c8b
+Ordinal           : 272 (0x110)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableDestroy
+Address           : 0x70c72f63
+Relative Address  : 0x00002f63
+Ordinal           : 273 (0x111)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableDuplicate
+Address           : 0x70c72fa5
+Relative Address  : 0x00002fa5
+Ordinal           : 274 (0x112)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableEnum
+Address           : 0x70c72cfa
+Relative Address  : 0x00002cfa
+Ordinal           : 275 (0x113)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableGetExtraData
+Address           : 0x70c728c2
+Relative Address  : 0x000028c2
+Ordinal           : 276 (0x114)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableInitialize
+Address           : 0x70c72ea4
+Relative Address  : 0x00002ea4
+Ordinal           : 277 (0x115)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableInitializeEx
+Address           : 0x70c72ecd
+Relative Address  : 0x00002ecd
+Ordinal           : 278 (0x116)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableLookUpString
+Address           : 0x70c727ea
+Relative Address  : 0x000027ea
+Ordinal           : 279 (0x117)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableLookUpStringEx
+Address           : 0x70c72854
+Relative Address  : 0x00002854
+Ordinal           : 280 (0x118)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableSetExtraData
+Address           : 0x70c72949
+Relative Address  : 0x00002949
+Ordinal           : 281 (0x119)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableStringFromId
+Address           : 0x70c72e1e
+Relative Address  : 0x00002e1e
+Ordinal           : 282 (0x11a)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : StringTableTrim
+Address           : 0x70c72e58
+Relative Address  : 0x00002e58
+Ordinal           : 283 (0x11b)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : TakeOwnershipOfFile
+Address           : 0x70c7194a
+Relative Address  : 0x0000194a
+Ordinal           : 284 (0x11c)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : UnicodeToMultiByte
+Address           : 0x70c721a5
+Relative Address  : 0x000021a5
+Ordinal           : 285 (0x11d)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
+==================================================
+Function Name     : UnmapAndCloseFile
+Address           : 0x70c71502
+Relative Address  : 0x00001502
+Ordinal           : 286 (0x11e)
+Filename          : SETUPAPI.DLL
+Full Path         : C:\WINDOWS\SYSTEM\SETUPAPI.DLL
+Type              : Exported Function
+==================================================
+
 
