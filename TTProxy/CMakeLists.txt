@@ -8,6 +8,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
 
+if (MSVC)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:user32.dll")
+endif()
+
 set(COMMON_SRC
   ../teraterm/common/ttlib.h
   ../teraterm/common/ttlib.c
