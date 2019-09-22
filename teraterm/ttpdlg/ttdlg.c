@@ -1175,17 +1175,6 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
  */
 static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 {
-#if 0
-	char buf[1024];
-
-	// WindowsNT4.0以前は詳細情報が取得できない。
-	if (desc == NULL)
-		return;
-
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\r\n", desc);
-
-	SendDlgItemMessage(dlg, IDC_SERIALTEXT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
-#else
 	int i;
 	ComPortInfo_t *p;
 	char *strA;
@@ -1201,7 +1190,6 @@ static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 	strA = ToCharW(p->property);
 	SetDlgItemTextA(dlg, IDC_SERIALTEXT, strA);
 	free(strA);
-#endif
 }
 
 /*
@@ -1338,6 +1326,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			EnableDlgItem(Dialog, IDOK, IDOK);
 
 			// COMポートの詳細情報を取得する。
+			// COMの接続状況は都度変わるため、ダイアログを表示する度に取得する。
+			// 不要になったら、ComPortInfoFree()でメモリを解放すること。
 			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount, UILanguageFile);
 
 			w = 0;
@@ -1445,6 +1435,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			return TRUE;
 
 		case WM_DESTROY:
+			// COMポートの詳細情報を解放する。
 			ComPortInfoFree(ComPortInfoPtr, ComPortInfoCount);
 			ComPortInfoPtr = NULL;
 			ComPortInfoCount = 0;

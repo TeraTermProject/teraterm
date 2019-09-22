@@ -40,6 +40,7 @@
 
 #include "devpkey_teraterm.h"
 #include "ttlib.h"
+#include "codeconv.h"
 
 #define DllExport __declspec(dllexport)
 #include "comportinfo.h"
@@ -145,16 +146,17 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, const char *lang,
 							wchar_t **friendly_name, wchar_t **str)
 {
+	const char *FriendlyNameString = "FRIENDLY_NAME";
+	const char *DriverDateString = "DRIVER_DATE";
 	typedef struct {
-		const wchar_t *name;
-		const char *key;
-		const DEVPROPKEY *PropertyKey;
-		DWORD Property;
+		const wchar_t *name;  // 本関数内で使う
+		const char *key;      // 本関数内で使う
+		const DEVPROPKEY *PropertyKey; // レジストリ取得に使うのはこれのみ
+		DWORD Property;       // 未使用
 	} list_t;
 	static const list_t list[] = {
-		// １番目は Friendly Name であること
 		{ L"Device Friendly Name",
-		  "FRIENDLY_NAME",
+		  FriendlyNameString,
 		  &DEVPKEY_Device_FriendlyName,
 		  SPDRP_FRIENDLYNAME },
 		{ L"Device Instance ID",
@@ -170,7 +172,7 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, 
 		  &DEVPKEY_Device_DriverProvider,
 		  SPDRP_MAXIMUM_PROPERTY },
 		{ L"Driver Date",
-		  "DRIVER_DATE",
+		  DriverDateString,
 		  &DEVPKEY_Device_DriverDate,
 		  SPDRP_MAXIMUM_PROPERTY },
 		{ L"Driver Version",
@@ -270,19 +272,20 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, 
 			free(str_prop_a);
 		}
 		if (r != FALSE) {
-			wchar_t name[MAX_UIMSG] = {0};
-
 			/* Driver Dateは DEVPROP_TYPE_FILETIME であるため、
 			 * FILETIME 構造体の8バイトで返るため、SYSTEMTIME に変換する。
 			 */
-			if (strcmp(list[i].key, "DRIVER_DATE") == 0) {
+			if (strcmp(list[i].key, DriverDateString) == 0) {
 				FILETIME ftFileTime;
 				SYSTEMTIME stFileTime;
 				int wbuflen = 64;
 				int buflen = sizeof(wchar_t) * wbuflen;
 
 				ZeroMemory(&ftFileTime, sizeof(FILETIME));
-				memcpy(&ftFileTime, str_prop, size);
+				if (sizeof(ftFileTime) >= size) {
+					// str_propはsizeバイト
+					memcpy(&ftFileTime, str_prop, size);  
+				}
 				ZeroMemory(&stFileTime, sizeof(SYSTEMTIME));
 				FileTimeToSystemTime(&ftFileTime , &stFileTime);
 				str_prop = (wchar_t *)realloc(str_prop, buflen);
@@ -291,24 +294,29 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, 
 					);
 			}
 
-			//GetI18nStrW("Tera Term.ComInfo", p->key, name, _countof(name), p->name, lang);
-			size_t name_len = wcslen(name);
+			size_t name_len = wcslen(p->name);
 			size_t prop_len = wcslen(str_prop);
 			len = len + (name_len + (i==0?1:2) + 2 + 2 + prop_len);
 			s = (wchar_t *)realloc(s, sizeof(wchar_t) * len);
-			if (i != 0) wcscat_s(s, len, L"\r\n");
-			//wcscat_s(s, len, name);
-			//wcscat_s(s, len, L"\r\n  ");
+			if (i != 0) 
+				wcscat_s(s, len, L"\r\n");
+			wcscat_s(s, len, p->name);
+			wcscat_s(s, len, L": ");
 			wcscat_s(s, len, str_prop);
 		}
-		if (i == 0) {
+
+		if (strcmp(list[i].key, FriendlyNameString) == 0) {
+			// str_propのメモリは ComPortInfoFree() で解放される。
 			*friendly_name = str_prop;
+
 		} else {
+			// s にコピーしたのでstr_propのメモリは不要となる。
 			if (str_prop != NULL) {
 				free(str_prop);
 			}
 		}
 	}
+
 	*str = s;
 }
 
@@ -365,18 +373,33 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
 		}
 
 		// 情報取得
-		wchar_t *str_friendly_name;
-		wchar_t *str_prop;
+		wchar_t *str_friendly_name = NULL;
+		wchar_t *str_prop = NULL;
 		GetComPropartys(hDevInfo, &DeviceInfoData, lang, &str_friendly_name, &str_prop);
 
 		comport_count++;
 		comport_infos = (ComPortInfo_t *)realloc(comport_infos,
 								sizeof(ComPortInfo_t) * comport_count);
 		ComPortInfo_t *p = &comport_infos[comport_count-1];
-		p->port_name = port_name;
-		p->port_no = port_no;
-		p->friendly_name = str_friendly_name;
-		p->property = str_prop;
+		p->port_name = port_name;  // COMポート名
+		p->port_no = port_no;  // COMポート番号
+		p->friendly_name = str_friendly_name;  // Device Description
+		p->property = str_prop;  // 全詳細情報
+
+#if 0
+		{
+		char *a, *b, *c;
+		a = ToCharW(p->port_name);
+		b = ToCharW(p->friendly_name);
+		c = ToCharW(p->property);
+		OutputDebugPrintf("%s: [%s] [%d] [%s] [%s]\n", __FUNCTION__,
+			a, p->port_no, b, c
+			);
+		free(a);
+		free(b);
+		free(c);
+		}
+#endif
 	}
 
 	/* ポート名順に並べる */
