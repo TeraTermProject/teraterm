@@ -48,6 +48,8 @@
 #include "svnversion.h"
 #include "ttdlg.h"
 #include "tipwin.h"
+#include "comportinfo.h"
+#include "codeconv.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -123,6 +125,11 @@ static PCHAR BaudList[] =
 	 "14400","19200","38400","57600","115200",
 	 "230400", "460800", "921600", NULL};
 
+/*
+ * COMポートに関する詳細情報
+ */
+static ComPortInfo_t *ComPortInfoPtr;
+static int ComPortInfoCount;
 
 static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -1168,15 +1175,21 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
  */
 static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 {
-	char buf[1024];
+	int i;
+	ComPortInfo_t *p;
+	char *strA;
 
-	// WindowsNT4.0以前は詳細情報が取得できない。
-	if (desc == NULL)
+	for (i = 0 ; i < ComPortInfoCount ; i++) {
+		p = &ComPortInfoPtr[i];
+		if (p->port_no == portno)
+			break;
+	}
+	if (i >= ComPortInfoCount)  // 該当するCOMポートが見つからなかった
 		return;
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\r\n", desc);
-
-	SendDlgItemMessage(dlg, IDC_SERIALTEXT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
+	strA = ToCharW(p->property);
+	SetDlgItemTextA(dlg, IDC_SERIALTEXT, strA);
+	free(strA);
 }
 
 /*
@@ -1312,6 +1325,11 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			EnableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
 			EnableDlgItem(Dialog, IDOK, IDOK);
 
+			// COMポートの詳細情報を取得する。
+			// COMの接続状況は都度変わるため、ダイアログを表示する度に取得する。
+			// 不要になったら、ComPortInfoFree()でメモリを解放すること。
+			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount, UILanguageFile);
+
 			w = 0;
 
 			if ((comports = DetectComPorts(ComPortTable, ts->MaxComPort, ComPortDesc)) > 0) {
@@ -1415,6 +1433,13 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			serial_dlg_change_OK_button(Dialog, ComPortTable[w]);
 
 			return TRUE;
+
+		case WM_DESTROY:
+			// COMポートの詳細情報を解放する。
+			ComPortInfoFree(ComPortInfoPtr, ComPortInfoCount);
+			ComPortInfoPtr = NULL;
+			ComPortInfoCount = 0;
+			break;
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
