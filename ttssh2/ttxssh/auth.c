@@ -243,30 +243,58 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 	}
 }
 
+typedef struct {
+	int tab_focus_entered;
+	WNDPROC proc_org;
+	size_t str_len;
+} username_proc_data_t;
+
 static LRESULT CALLBACK username_proc(HWND hWnd, UINT msg,
 									  WPARAM wParam, LPARAM lParam)
 {
-	const WNDPROC ProcOrg = (WNDPROC)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	username_proc_data_t *data = (username_proc_data_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	const WNDPROC ProcOrg = data->proc_org;
 	const LRESULT result = CallWindowProc(ProcOrg, hWnd, msg, wParam, lParam);
+
+
 	switch (msg) {
 	case WM_CHAR:
-	case WM_SETTEXT: {
-		// ユーザー名が入力されていた場合、オプションを使うことはないので、
-		// tabでのフォーカス移動時、オプションボタンをパスするようにする
-		// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
-		const HWND dlg = GetParent(hWnd);
-		const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
-		const int len = GetWindowTextLength(hWnd);
-		LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
-		if (len > 0) {
-			// 不要tabstop
-			style = style & (~(LONG_PTR)WS_TABSTOP);
-		} else {
-			// 要tabstop
-			style = style | WS_TABSTOP;
+	case WM_SETTEXT:
+		if (data->tab_focus_entered == 0) {
+			// ユーザー名が入力されていた場合、オプションを使うことはないので、
+			// tabでのフォーカス移動時、オプションボタンをパスするようにする
+			// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
+			const int len = GetWindowTextLength(hWnd);
+#if 0
+			if (len > 0) {
+				// ユーザー名を入力して、TABを押したときに引っかかった感じがする場合がある
+				// そこで一度でも文字入力があったら、TABストップ不要に倒す
+				data->tab_focus_entered = 1;
+			}
+#endif
+			if ((data->str_len == 0 && len != 0) ||
+				(data->str_len != 0 && len == 0)) {
+				// ユーザー名の文字長が 0になる or 0ではなくなる 時のみ処理
+				const HWND dlg = GetParent(hWnd);
+				const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
+				LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
+
+				if (len > 0) {
+					// 不要tabstop
+					style = style & (~(LONG_PTR)WS_TABSTOP);
+				}
+				else {
+					// 要tabstop
+					style = style | WS_TABSTOP;
+				}
+				SetWindowLongPtr(hWndOption, GWL_STYLE, style);
+				data->str_len = len;
+			}
 		}
-		SetWindowLongPtr(hWndOption, GWL_STYLE, style);
-	}
+		break;
+	case WM_NCDESTROY:
+		free(data);
+		break;
 	}
 	return result;
 }
@@ -333,9 +361,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	// usernameのサブクラス化
 	{
 		HWND hWndUserName = GetDlgItem(dlg, IDC_SSHUSERNAME);
-		LONG_PTR ProcOrg =
-			SetWindowLongPtr(hWndUserName, GWLP_WNDPROC, (LONG_PTR)username_proc);
-		SetWindowLongPtr(hWndUserName, GWLP_USERDATA, ProcOrg);
+		username_proc_data_t *data = (username_proc_data_t *)malloc(sizeof(username_proc_data_t));
+		if (data != NULL) {
+			SetWindowLongPtr(hWndUserName, GWLP_USERDATA, (LONG_PTR)data);
+			data->tab_focus_entered = 0;
+			data->str_len = 0;
+			data->proc_org =
+				(WNDPROC)SetWindowLongPtr(hWndUserName, GWLP_WNDPROC, (LONG_PTR)username_proc);
+		}
 	}
 
 	if (pvar->auth_state.user != NULL) {
