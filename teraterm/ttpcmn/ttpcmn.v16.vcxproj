@@ -134,6 +134,7 @@
     <ClCompile Include="..\common\codeconv.cpp" />
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="comportinfo.cpp" />
     <ClCompile Include="language.c" />
     <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="ttcmn.c" />
@@ -141,6 +142,8 @@
   <ItemGroup>
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="comportinfo.h" />
+    <ClInclude Include="devpkey_teraterm.h" />
     <ClInclude Include="language.h" />
     <ClInclude Include="..\common\servicenames.h" />
   </ItemGroup>
