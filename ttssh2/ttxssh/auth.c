@@ -243,62 +243,6 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 	}
 }
 
-typedef struct {
-	int tab_focus_entered;
-	WNDPROC proc_org;
-	size_t str_len;
-} username_proc_data_t;
-
-static LRESULT CALLBACK username_proc(HWND hWnd, UINT msg,
-									  WPARAM wParam, LPARAM lParam)
-{
-	username_proc_data_t *data = (username_proc_data_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	const WNDPROC ProcOrg = data->proc_org;
-	const LRESULT result = CallWindowProc(ProcOrg, hWnd, msg, wParam, lParam);
-
-
-	switch (msg) {
-	case WM_CHAR:
-	case WM_SETTEXT:
-		if (data->tab_focus_entered == 0) {
-			// ユーザー名が入力されていた場合、オプションを使うことはないので、
-			// tabでのフォーカス移動時、オプションボタンをパスするようにする
-			// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
-			const int len = GetWindowTextLength(hWnd);
-#if 0
-			if (len > 0) {
-				// ユーザー名を入力して、TABを押したときに引っかかった感じがする場合がある
-				// そこで一度でも文字入力があったら、TABストップ不要に倒す
-				data->tab_focus_entered = 1;
-			}
-#endif
-			if ((data->str_len == 0 && len != 0) ||
-				(data->str_len != 0 && len == 0)) {
-				// ユーザー名の文字長が 0になる or 0ではなくなる 時のみ処理
-				const HWND dlg = GetParent(hWnd);
-				const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
-				LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
-
-				if (len > 0) {
-					// 不要tabstop
-					style = style & (~(LONG_PTR)WS_TABSTOP);
-				}
-				else {
-					// 要tabstop
-					style = style | WS_TABSTOP;
-				}
-				SetWindowLongPtr(hWndOption, GWL_STYLE, style);
-				data->str_len = len;
-			}
-		}
-		break;
-	case WM_NCDESTROY:
-		free(data);
-		break;
-	}
-	return result;
-}
-
 static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 {
 	const static DlgTextInfo text_info[] = {
@@ -356,19 +300,6 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
 		                  "Use keyboard-&interactive to log in");
 		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
-	}
-
-	// usernameのサブクラス化
-	{
-		HWND hWndUserName = GetDlgItem(dlg, IDC_SSHUSERNAME);
-		username_proc_data_t *data = (username_proc_data_t *)malloc(sizeof(username_proc_data_t));
-		if (data != NULL) {
-			SetWindowLongPtr(hWndUserName, GWLP_USERDATA, (LONG_PTR)data);
-			data->tab_focus_entered = 0;
-			data->str_len = 0;
-			data->proc_org =
-				(WNDPROC)SetWindowLongPtr(hWndUserName, GWLP_WNDPROC, (LONG_PTR)username_proc);
-		}
 	}
 
 	if (pvar->auth_state.user != NULL) {
@@ -849,7 +780,6 @@ char *GetClipboardTextA(HWND hWnd, BOOL empty)
 }
 
 
-BOOL autologin_sent_none;
 static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 									  LPARAM lParam)
 {
@@ -858,9 +788,11 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	const int IDC_TIMER3 = 302; // challenge で ask4passwd でCheckAuthListFirst が FALSE のとき
 	const int autologin_timeout = 10; // ミリ秒
 	PTInstVar pvar;
+	static BOOL autologin_sent_none;
 	static BOOL UseControlChar;
 	static BOOL ShowPassPhrase;
 	static HICON hIconDropdown;
+	static size_t username_str_len;
 	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -871,6 +803,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		UseControlChar = TRUE;
 		ShowPassPhrase = FALSE;
+		username_str_len = 0;
 		init_auth_dlg(pvar, dlg, &UseControlChar);
 
 		// "▼"画像をセットする
@@ -1035,35 +968,63 @@ canceled:
 			return TRUE;
 
 		case IDC_SSHUSERNAME:
-			// ユーザ名がフォーカスを失ったとき (2007.9.29 maya)
-			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
-			    (pvar->ssh_state.status_flags & STATUS_HOST_OK) &&
-			    HIWORD(wParam) == EN_KILLFOCUS) {
-				// 設定が有効でまだ取りに行っていないなら
-				if (SSHv2(pvar) &&
-					pvar->session_settings.CheckAuthListFirst &&
-					!pvar->tryed_ssh2_authlist) {
-					// ダイアログのユーザ名を反映
-					if (pvar->auth_state.user == NULL) {
-						pvar->auth_state.user =
-							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+			switch (HIWORD(wParam)) {
+			case EN_KILLFOCUS: {
+				// ユーザ名がフォーカスを失ったとき (2007.9.29 maya)
+				if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
+					(pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
+					// 設定が有効でまだ取りに行っていないなら
+					if (SSHv2(pvar) &&
+						pvar->session_settings.CheckAuthListFirst &&
+						!pvar->tryed_ssh2_authlist) {
+						// ダイアログのユーザ名を反映
+						if (pvar->auth_state.user == NULL) {
+							pvar->auth_state.user =
+								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						}
+
+						// ユーザ名が入力されているかチェックする
+						if (strlen(pvar->auth_state.user) == 0) {
+							return FALSE;
+						}
+
+						// ユーザ名を変更させない
+						EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
+						EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
+
+						// 認証メソッド none を送る
+						do_SSH2_userauth(pvar);
+						return TRUE;
 					}
-
-					// ユーザ名が入力されているかチェックする
-					if (strlen(pvar->auth_state.user) == 0) {
-						return FALSE;
-					}
-
-					// ユーザ名を変更させない
-					EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
-					EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
-
-					// 認証メソッド none を送る
-					do_SSH2_userauth(pvar);
-					return TRUE;
 				}
+				return FALSE;
 			}
+			case EN_CHANGE: {
+				// ユーザー名が入力されていた場合、オプションを使うことはないので、
+				// tabでのフォーカス移動時、オプションボタンをパスするようにする
+				// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
+				HWND hWnd = (HWND)lParam;
+				const int len = GetWindowTextLength(hWnd);
+				if ((username_str_len == 0 && len != 0) ||
+					(username_str_len != 0 && len == 0)) {
+					// ユーザー名の文字長が 0になる or 0ではなくなる 時のみ処理
+					const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
+					LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
 
+					if (len > 0) {
+						// 不要tabstop
+						style = style & (~(LONG_PTR)WS_TABSTOP);
+					}
+					else {
+						// 要tabstop
+						style = style | WS_TABSTOP;
+					}
+					SetWindowLongPtr(hWndOption, GWL_STYLE, style);
+				}
+				username_str_len = len;
+				return FALSE;
+			}
+			}
 			return FALSE;
 
 		case IDC_SSHUSEPASSWORD:
