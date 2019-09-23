@@ -6,9 +6,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
-if(ENABLE_DPIAWARENESS)
-  add_definitions(-DDPIAWARENESS)
-endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
@@ -174,6 +171,7 @@ target_include_directories(
   ../common
   ../ttpfile
   ../ttpdlg
+  ../ttpcmn
   ${ONIGURUMA_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg     # for svnversion.h
   ${SFMT_INCLUDE_DIRS}
