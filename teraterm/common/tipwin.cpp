@@ -79,6 +79,7 @@ typedef struct tagTipWinData {
 	RECT rect;
 	int px;
 	int py;
+	TCHAR *class_name;
 } TipWin;
 
 VOID CTipWin::CalcStrRect(VOID)
@@ -205,6 +206,8 @@ CTipWin::~CTipWin()
 	if(tWin != NULL) {
 		free((void*)tWin->str);
 		tWin->str = NULL;
+		free((void*)tWin->class_name);
+		tWin->class_name = NULL;
 		free(tWin);
 		tWin = NULL;
 	}
@@ -212,15 +215,30 @@ CTipWin::~CTipWin()
 
 BOOL CTipWin::IsClassRegistered(HINSTANCE hInstance)
 {
+	OutputDebugPrintf("CTipWin::IsClassRegistered() enter\n");
+	if (tWin->class_name == NULL) {
+		TCHAR filename[MAX_PATH];
+		TCHAR *base_ptr;
+		size_t base_len;
+		size_t class_name_len;
+		GetModuleFileName(hInstance, filename, _countof(filename));
+		OutputDebugPrintf("GetModuleFileName() %s\n", filename);
+		base_ptr = _tcsrchr(filename, _T('\\'));
+		base_len = _tcslen(base_ptr);
+		class_name_len = sizeof(TipWinClassName) + base_len;
+		tWin->class_name = (TCHAR *)malloc(class_name_len);
+		_tcscpy(tWin->class_name, TipWinClassName);
+		_tcscat(tWin->class_name, base_ptr);
+	}
 	WNDCLASS twc = { 0 };
-	return (BOOL)GetClassInfo(hInstance, (LPCSTR)TipWinClassName, &twc);
+	return (BOOL)GetClassInfo(hInstance, (LPCSTR)tWin->class_name, &twc);
 }
 
 ATOM CTipWin::RegisterClass(HINSTANCE hInstance)
 {
 	if (! IsClassRegistered(hInstance)) {
 		memset(&wc, 0, sizeof(WNDCLASS));
-		wc.style = CS_HREDRAW | CS_VREDRAW | CS_GLOBALCLASS;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = WndProc;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
@@ -229,14 +247,14 @@ ATOM CTipWin::RegisterClass(HINSTANCE hInstance)
 		wc.hCursor = NULL;
 		wc.hbrBackground = NULL;
 		wc.lpszMenuName = NULL;
-		wc.lpszClassName = (LPCSTR)TipWinClassName;
+		wc.lpszClassName = (LPCSTR)tWin->class_name;
 	}
 	return ::RegisterClass(&wc);
 }
 
 BOOL CTipWin::UnregisterClass()
 {
-	return ::UnregisterClass((LPCSTR)TipWinClassName, wc.hInstance);
+	return ::UnregisterClass((LPCSTR)tWin->class_name, wc.hInstance);
 }
 
 VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
@@ -246,7 +264,7 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
 
 	if (! IsClassRegistered(hInst))
-		return;
+		RegisterClass(hInst);
 	if (tWin == NULL)
 		return;
 	tWin->str_len = _tcslen(str);
@@ -273,7 +291,7 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 	 */
 	tWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					   (LPCSTR)TipWinClassName,
+					   (LPCSTR)tWin->class_name,
 					   str, WS_POPUP,
 					   cx, cy,
 					   str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
