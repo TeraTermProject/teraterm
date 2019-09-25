@@ -49,7 +49,6 @@ BOOL Connecting = FALSE;
 
 /* 'help' button on dialog box */
 WORD MsgDlgHelp;
-LONG HelpId;
 
 TTTSet ts;
 TComVar cv;

@@ -38,6 +38,7 @@ private:
   TTEKVar tk;
   HMENU MainMenu, EditMenu, WinMenu,
     FileMenu, SetupMenu, HelpMenu;
+  LONG HelpId;
 
 public:
 	CTEKWindow(HINSTANCE hInstance);

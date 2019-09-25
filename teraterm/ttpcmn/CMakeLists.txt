@@ -33,6 +33,10 @@ set(SRC
   language.c
   language.h
   ttcmn.c
+  comportinfo.cpp
+  comportinfo.h
+  comportinfo.cpp
+  devpkey_teraterm.h
   ttpcmn-version.rc
   ttpcmn.def
   ${COMMON_SRC}

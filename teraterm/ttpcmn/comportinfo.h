@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * Copyright (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,38 +26,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, variables, flags related to VT win and TEK win */
+#pragma once
+
+#include <windows.h>	// for WORD
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* prototypes */
-void VTActivate();
-void ConvertToCP932(char *str, int len);
-void ChangeTitle();
-void SwitchMenu();
-void SwitchTitleBar();
-HMODULE LoadHomeDLL(const char *DLLname);
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
 
-extern HWND HVTWin;
-extern HWND HTEKWin;
-extern int ActiveWin; /* IdVT, IdTEK */
-extern int TalkStatus; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
-extern BOOL KeybEnabled; /* keyboard switch */
-extern BOOL Connecting;
+typedef struct {
+	wchar_t *port_name;			// É|Å[Égñº
+	int port_no;				// 0..128(9x)/255(xp)
+	wchar_t *friendly_name;
+	wchar_t *property;
+} ComPortInfo_t;
 
-/* 'help' button on dialog box */
-extern WORD MsgDlgHelp;
-
-extern TTTSet ts;
-extern TComVar cv;
-
-/* pointers to window objects */
-extern void* pTEKWin;
-/* instance handle */
-extern HINSTANCE hInst;
-
-extern int SerialNo;
+DllExport ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang);
+DllExport void WINAPI ComPortInfoFree(ComPortInfo_t *info, int count);
 
 #ifdef __cplusplus
 }

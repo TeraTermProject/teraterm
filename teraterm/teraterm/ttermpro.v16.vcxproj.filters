@@ -312,5 +312,8 @@
     <ClInclude Include="..\common\tmfc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\tipwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

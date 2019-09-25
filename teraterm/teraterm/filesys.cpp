@@ -43,7 +43,6 @@
 #include "ttcommon.h"
 #include "ttdde.h"
 #include "ttlib.h"
-#include "helpid.h"
 #include "dlglib.h"
 #include "vtterm.h"
 #include "win16api.h"
@@ -639,7 +638,6 @@ BOOL LogStart()
 	if (ts.LogHideDialog)
 		LogVar->HideDialog = 1;
 
-	HelpId = HlpFileLog;
 	/* 2007.05.24 Gentaro */
 	eLineEnd = Line_LineHead;
 

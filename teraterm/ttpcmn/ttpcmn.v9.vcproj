@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\comportinfo.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\i18n.c"
 				>
 			</File>
@@ -234,6 +238,14 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
+			<File
+				RelativePath=".\comportinfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\devpkey_teraterm.h"
+				>
+			</File>
 			<File
 				RelativePath="..\common\i18n.h"
 				>
