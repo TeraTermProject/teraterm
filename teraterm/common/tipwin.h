@@ -41,7 +41,7 @@ extern "C" {
 
 typedef struct tagTipWinData TipWin;
 
-TipWin *TipWinCreate(HWND src, int cx, int cy, const TCHAR *str);
+TipWin *TipWinCreate(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str);
 void TipWinSetText(TipWin *tWin, TCHAR *text);
 void TipWinDestroy(TipWin *tWin);
 void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
@@ -65,6 +65,7 @@ public:
 	ATOM RegisterClass(HINSTANCE hInstance);
 	BOOL UnregisterClass();
 	BOOL IsClassRegistered(HINSTANCE hInstance);
+	VOID Create(HINSTANCE hinstance, HWND src, int x, int y, const TCHAR *str);
 	VOID Create(HWND src, int x, int y, const TCHAR *str);
 	VOID Destroy();
 	VOID SetText(TCHAR *str);

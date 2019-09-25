@@ -257,14 +257,13 @@ BOOL CTipWin::UnregisterClass()
 	return ::UnregisterClass((LPCSTR)tWin->class_name, wc.hInstance);
 }
 
-VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
+VOID CTipWin::Create(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str)
 {
-	const HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(src);
 
-	if (! IsClassRegistered(hInst))
-		RegisterClass(hInst);
+	if (! IsClassRegistered(hInstance))
+		RegisterClass(hInstance);
 	if (tWin == NULL)
 		return;
 	tWin->str_len = _tcslen(str);
@@ -295,13 +294,19 @@ VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
 					   str, WS_POPUP,
 					   cx, cy,
 					   str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
-					   src, NULL, hInst, this);
+					   src, NULL, hInstance, this);
 
 	tWin->hParentWnd = src;
 
 	pts.x = cx;
 	pts.y = cy;
 	timerid = 0;
+}
+
+VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
+{
+	const HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
+	Create(hInstance, src, cx, cy, str);
 }
 
 VOID CTipWin::Destroy()
@@ -382,10 +387,14 @@ BOOL CTipWin::IsVisible(void)
 	return FALSE;
 }
 
-TipWin* TipWinCreate(HWND src, int cx, int cy, const TCHAR *str)
+TipWin *TipWinCreate(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str)
 {
 	CTipWin* tipwin = new CTipWin();
-	tipwin->Create(src, cx, cy, str);
+	if (hInstance == NULL) {
+		tipwin->Create(src, cx, cy, str);
+	} else {
+		tipwin->Create(hInstance, src, cx, cy, str);
+	}
 	tipwin->SetVisible(TRUE);
 	return (TipWin*)tipwin;
 }
