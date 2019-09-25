@@ -1116,9 +1116,75 @@ void BuffDeleteLines(int Count, int YEnd)
 	}
 }
 
-void BuffDeleteChars(int Count)
 // Delete characters in current line from cursor
 //   Count: number of characters to be deleted
+#if UNICODE_INTERNAL_BUFF
+void BuffDeleteChars(int Count)
+{
+	int MoveLen;
+	int extr = 0;
+	buff_char_t *b;
+
+	if (Count > CursorRightM + 1 - CursorX)
+		Count = CursorRightM + 1 - CursorX;
+
+	if (CursorX < CursorLeftM || CursorX > CursorRightM)
+		return;
+
+	NewLine(PageStart + CursorY);
+
+	b = &CodeLineW[CursorX];
+
+	if (IsBuffPadding(b)) {
+		// 全角の右側、全角をスペースに置き換える
+		BuffSetChar(b - 1, ' ', 'H');
+		BuffSetChar(b, ' ', 'H');
+	}
+	if (IsBuffFullWidth(b)) {
+		// 全角の左側、全角をスペースに置き換える
+		BuffSetChar(b, ' ', 'H');
+		BuffSetChar(b + 1, ' ', 'H');
+	}
+	if (Count > 1) {
+		// 終端をチェック
+		if (IsBuffPadding(b + Count)) {
+			// 全角の右側、全角をスペースに置き換える
+			BuffSetChar(b + Count - 1, ' ', 'H');
+			BuffSetChar(b + Count, ' ', 'H');
+		}
+	}
+
+	if (CursorRightM < NumOfColumns - 1 && (AttrLine[CursorRightM] & AttrKanji)) {
+		CodeLine[CursorRightM] = 0x20;
+		BuffSetChar(&CodeLineW[CursorRightM], 0x20, 'H');
+		AttrLine[CursorRightM] &= ~AttrKanji;
+		CodeLine[CursorRightM + 1] = 0x20;
+		BuffSetChar(&CodeLineW[CursorRightM + 1], 0x20, 'H');
+		AttrLine[CursorRightM + 1] &= ~AttrKanji;
+		extr = 1;
+	}
+
+	MoveLen = CursorRightM + 1 - CursorX - Count;
+
+	if (MoveLen > 0) {
+		memmove(&(CodeLine[CursorX]), &(CodeLine[CursorX + Count]), MoveLen);
+		memmoveW(&(CodeLineW[CursorX]), &(CodeLineW[CursorX + Count]), MoveLen);
+		memmove(&(AttrLine[CursorX]), &(AttrLine[CursorX + Count]), MoveLen);
+		memmove(&(AttrLine2[CursorX]), &(AttrLine2[CursorX + Count]), MoveLen);
+		memmove(&(AttrLineFG[CursorX]), &(AttrLineFG[CursorX + Count]), MoveLen);
+		memmove(&(AttrLineBG[CursorX]), &(AttrLineBG[CursorX + Count]), MoveLen);
+	}
+	memset(&(CodeLine[CursorX + MoveLen]), 0x20, Count);
+	memsetW(&(CodeLineW[CursorX + MoveLen]), ' ', Count);
+	memset(&(AttrLine[CursorX + MoveLen]), AttrDefault, Count);
+	memset(&(AttrLine2[CursorX + MoveLen]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
+	memset(&(AttrLineFG[CursorX + MoveLen]), CurCharAttr.Fore, Count);
+	memset(&(AttrLineBG[CursorX + MoveLen]), CurCharAttr.Back, Count);
+
+	BuffUpdateRect(CursorX, CursorY, CursorRightM + extr, CursorY);
+}
+#else
+void BuffDeleteChars(int Count)
 {
 	int MoveLen;
 	int extr=0;
@@ -1135,9 +1201,6 @@ void BuffDeleteChars(int Count)
 
 	if (CursorRightM < NumOfColumns-1 && (AttrLine[CursorRightM] & AttrKanji)) {
 		CodeLine[CursorRightM] = 0x20;
-#if UNICODE_INTERNAL_BUFF
-		BuffSetChar(&CodeLineW[CursorRightM], 0x20, 'H');
-#endif
 		AttrLine[CursorRightM] &= ~AttrKanji;
 		CodeLine[CursorRightM+1] = 0x20;
 		AttrLine[CursorRightM+1] &= ~AttrKanji;
@@ -1151,18 +1214,12 @@ void BuffDeleteChars(int Count)
 
 	if (MoveLen > 0) {
 		memmove(&(CodeLine[CursorX]), &(CodeLine[CursorX+Count]), MoveLen);
-#if UNICODE_INTERNAL_BUFF
-		memmoveW(&(CodeLineW[CursorX]), &(CodeLineW[CursorX+Count]), MoveLen);
-#endif
 		memmove(&(AttrLine[CursorX]), &(AttrLine[CursorX+Count]), MoveLen);
 		memmove(&(AttrLine2[CursorX]), &(AttrLine2[CursorX+Count]), MoveLen);
 		memmove(&(AttrLineFG[CursorX]), &(AttrLineFG[CursorX+Count]), MoveLen);
 		memmove(&(AttrLineBG[CursorX]), &(AttrLineBG[CursorX+Count]), MoveLen);
 	}
 	memset(&(CodeLine[CursorX + MoveLen]), 0x20, Count);
-#if UNICODE_INTERNAL_BUFF
-	memsetW(&(CodeLineW[CursorX + MoveLen]), 0x20, Count);
-#endif
 	memset(&(AttrLine[CursorX + MoveLen]), AttrDefault, Count);
 	memset(&(AttrLine2[CursorX + MoveLen]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[CursorX + MoveLen]), CurCharAttr.Fore, Count);
@@ -1170,6 +1227,7 @@ void BuffDeleteChars(int Count)
 
 	BuffUpdateRect(CursorX, CursorY, CursorRightM+extr, CursorY);
 }
+#endif
 
 void BuffEraseChars(int Count)
 // Erase characters in current line from cursor

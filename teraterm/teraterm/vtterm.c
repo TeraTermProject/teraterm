@@ -1854,7 +1854,8 @@ void CSDeleteNLines()
 	BuffDeleteLines(Count,YEnd);
 }
 
-void CSDeleteCharacter()	// DCH
+// DCH
+static void CSDeleteCharacter(void)
 {
 // Delete characters in current line from cursor
 	CheckParamVal(Param[1], NumOfColumns);
