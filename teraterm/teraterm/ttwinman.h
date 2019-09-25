@@ -49,7 +49,6 @@ extern BOOL Connecting;
 
 /* 'help' button on dialog box */
 extern WORD MsgDlgHelp;
-extern LONG HelpId;
 
 extern TTTSet ts;
 extern TComVar cv;

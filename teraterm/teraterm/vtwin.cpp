@@ -3566,6 +3566,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	if ((ts.LogFN[0]!=0) && (LogVar==NULL) && NewFileVar(&LogVar)) {
 		LogVar->DirLen = 0;
 		strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogFN, _TRUNCATE);
+		HelpId = HlpFileLog;
 		LogStart();
 	}
 
@@ -6294,7 +6295,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
 	if (msg == MsgDlgHelp) {
-		OnDlgHelp(wp,lp);
+		// HELPMSGSTRING message Žž
+		//		wp = dialog handle
+		//		lp = initialization structure
+		OnDlgHelp(0, 0);
 		return 0;
 	}
 	switch(msg)

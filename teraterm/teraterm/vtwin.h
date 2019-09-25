@@ -67,6 +67,8 @@ private:
   // TipWin
   CTipWin* TipWin;
 
+  LONG HelpId;
+
 public:
 	CVTWindow(HINSTANCE hInstance);
 	int Parse();
