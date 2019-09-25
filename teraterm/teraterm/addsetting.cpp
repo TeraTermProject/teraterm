@@ -695,6 +695,12 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (1)AlphaBlend
 
+	BOOL isLayeredWindowSupported = (pSetLayeredWindowAttributes != NULL);
+	EnableDlgItem(IDC_ALPHA_BLEND_ACTIVE, isLayeredWindowSupported);
+	EnableDlgItem(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, isLayeredWindowSupported);
+	EnableDlgItem(IDC_ALPHA_BLEND_INACTIVE, isLayeredWindowSupported);
+	EnableDlgItem(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, isLayeredWindowSupported);
+
 	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
 	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
 	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendActive);
