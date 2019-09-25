@@ -805,10 +805,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DropListCount = 0;
 
 	// TipWin
-	TipWin = new CTipWin();
+	TipWin = new CTipWin(HVTWin);
 	// TipWin‚ÌWindowƒNƒ‰ƒX‚Ì“o˜^‚ÍTera Term‘S‘Ì‚Å1“x‚¾‚¯s‚¤
 	TipWin->RegisterClass(hInstance);
-	TipWin->Create(HVTWin, 0, 0, VTClassName);
+	TipWin->Create();
 }
 
 /////////////////////////////////////////////////////////////////////////////

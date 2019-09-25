@@ -59,7 +59,9 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <assert.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
+#endif
 #include <crtdbg.h>
 
 #include "ttlib.h"		// for GetMessageboxFont()
@@ -71,8 +73,6 @@ typedef struct tagTipWinData {
 	COLORREF tip_bg;
 	COLORREF tip_text;
 	HWND tip_wnd;
-	HWND hParentWnd;
-	int tip_enabled;
 	const TCHAR *str;
 	size_t str_len;
 	RECT str_rect;
@@ -192,7 +192,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
 }
 
-CTipWin::CTipWin()
+CTipWin::CTipWin(HWND pHwnd) : pHwnd(pHwnd)
 {
 	tWin = (TipWin *)malloc(sizeof(TipWin));
 	memset(tWin, 0, sizeof(TipWin));
@@ -215,14 +215,12 @@ CTipWin::~CTipWin()
 
 BOOL CTipWin::IsClassRegistered(HINSTANCE hInstance)
 {
-	OutputDebugPrintf("CTipWin::IsClassRegistered() enter\n");
 	if (tWin->class_name == NULL) {
 		TCHAR filename[MAX_PATH];
 		TCHAR *base_ptr;
 		size_t base_len;
 		size_t class_name_len;
 		GetModuleFileName(hInstance, filename, _countof(filename));
-		OutputDebugPrintf("GetModuleFileName() %s\n", filename);
 		base_ptr = _tcsrchr(filename, _T('\\'));
 		base_len = _tcslen(base_ptr);
 		class_name_len = sizeof(TipWinClassName) + base_len;
@@ -231,7 +229,7 @@ BOOL CTipWin::IsClassRegistered(HINSTANCE hInstance)
 		_tcscat(tWin->class_name, base_ptr);
 	}
 	WNDCLASS twc = { 0 };
-	return (BOOL)GetClassInfo(hInstance, (LPCSTR)tWin->class_name, &twc);
+	return (GetClassInfo(hInstance, (LPCSTR)tWin->class_name, &twc) > 0);
 }
 
 ATOM CTipWin::RegisterClass(HINSTANCE hInstance)
@@ -257,29 +255,26 @@ BOOL CTipWin::UnregisterClass()
 	return ::UnregisterClass((LPCSTR)tWin->class_name, wc.hInstance);
 }
 
-VOID CTipWin::Create(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str)
+VOID CTipWin::Create(HINSTANCE hInstance)
 {
 	LOGFONTA logfont;
-	const UINT uDpi = GetMonitorDpiFromWindow(src);
+	const UINT uDpi = GetMonitorDpiFromWindow(pHwnd);
 
 	if (! IsClassRegistered(hInstance))
 		RegisterClass(hInstance);
 	if (tWin == NULL)
 		return;
-	tWin->str_len = _tcslen(str);
-	tWin->str = _tcsdup(str);
-	tWin->px = cx;
-	tWin->py = cy;
+	tWin->str_len = 0;
+	tWin->str = (TCHAR*)malloc(sizeof(TCHAR));
+	memset((void*)tWin->str, 0, sizeof(TCHAR));
+	tWin->px = 0;
+	tWin->py = 0;
 	tWin->tip_bg = GetSysColor(COLOR_INFOBK);
 	tWin->tip_text = GetSysColor(COLOR_INFOTEXT);
 	GetMessageboxFont(&logfont);
 	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
 	tWin->tip_font = CreateFontIndirect(&logfont);
-	CalcStrRect();
-
-	const int str_width = tWin->str_rect.right - tWin->str_rect.left;
-	const int str_height = tWin->str_rect.bottom - tWin->str_rect.top;
 
 	/*
 	 * RegisterClass()‚ªŽ¸”s‚µ‚½ê‡‚ÍACreateWindowEx()‚ª 87 (ERROR_INVALID_PARAMETER)‚Å
@@ -291,22 +286,17 @@ VOID CTipWin::Create(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR 
 	tWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 					   (LPCSTR)tWin->class_name,
-					   str, WS_POPUP,
-					   cx, cy,
-					   str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
-					   src, NULL, hInstance, this);
-
-	tWin->hParentWnd = src;
-
-	pts.x = cx;
-	pts.y = cy;
+					   NULL, WS_POPUP,
+					   0, 0,
+					   0, 0,
+					   pHwnd, NULL, hInstance, this);
 	timerid = 0;
 }
 
-VOID CTipWin::Create(HWND src, int cx, int cy, const TCHAR *str)
+VOID CTipWin::Create()
 {
-	const HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(src, GWLP_HINSTANCE);
-	Create(hInstance, src, cx, cy, str);
+	const HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(pHwnd, GWLP_HINSTANCE);
+	Create(hInstance);
 }
 
 VOID CTipWin::Destroy()
@@ -322,21 +312,19 @@ VOID CTipWin::Destroy()
 	}
 }
 
-VOID CTipWin::GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height)
-{
-	TipWinGetTextWidthHeight(src, str, width, height);
-}
-
 POINT CTipWin::GetPos(void)
 {
+	POINT pts;
+	pts.x = tWin->px;
+	pts.y = tWin->py;
 	return pts;
 }
 
 VOID CTipWin::SetPos(int x, int y)
 {
 	if(IsExists()) {
-		pts.x = x;
-		pts.y = y;
+		tWin->px = x;
+		tWin->py = y;
 		SetWindowPos(tWin->tip_wnd, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 	}
 }
@@ -389,12 +377,14 @@ BOOL CTipWin::IsVisible(void)
 
 TipWin *TipWinCreate(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str)
 {
-	CTipWin* tipwin = new CTipWin();
+	CTipWin* tipwin = new CTipWin(src);
 	if (hInstance == NULL) {
-		tipwin->Create(src, cx, cy, str);
+		tipwin->Create();
 	} else {
-		tipwin->Create(hInstance, src, cx, cy, str);
+		tipwin->Create(hInstance);
 	}
+	tipwin->SetText((TCHAR*)str);
+	tipwin->SetPos(cx, cy);
 	tipwin->SetVisible(TRUE);
 	return (TipWin*)tipwin;
 }

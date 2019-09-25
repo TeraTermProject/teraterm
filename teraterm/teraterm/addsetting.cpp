@@ -635,8 +635,8 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	             _T("Visual"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
-	TipWin = new CTipWin();
-	TipWin->Create(m_hWnd, 0, 0, "VisualPropPageDlg");
+	TipWin = new CTipWin(HVTWin);
+	TipWin->Create();
 }
 
 CVisualPropPageDlg::~CVisualPropPageDlg()

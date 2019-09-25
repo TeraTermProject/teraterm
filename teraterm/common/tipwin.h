@@ -60,13 +60,13 @@ int TipWinIsVisible(TipWin *tWin);
 class CTipWin
 {
 public:
-	CTipWin();
+	CTipWin(HWND pHwnd);
 	~CTipWin();
 	ATOM RegisterClass(HINSTANCE hInstance);
 	BOOL UnregisterClass();
 	BOOL IsClassRegistered(HINSTANCE hInstance);
-	VOID Create(HINSTANCE hinstance, HWND src, int x, int y, const TCHAR *str);
-	VOID Create(HWND src, int x, int y, const TCHAR *str);
+	VOID Create(HINSTANCE hinstance);
+	VOID Create();
 	VOID Destroy();
 	VOID SetText(TCHAR *str);
 	VOID GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
@@ -78,9 +78,10 @@ public:
 	BOOL IsVisible();
 private:
 	POINT pts;
-	UINT timerid;
+	UINT_PTR timerid;
 	TipWin* tWin;
 	WNDCLASS wc;
+	HWND pHwnd;
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 	VOID CalcStrRect(VOID);
 };
