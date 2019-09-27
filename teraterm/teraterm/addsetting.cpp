@@ -635,8 +635,7 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	             _T("Visual"), ts.UILanguageFile);
 	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
-	TipWin = new CTipWin(HVTWin);
-	TipWin->Create();
+	TipWin = new CTipWin(inst);
 }
 
 CVisualPropPageDlg::~CVisualPropPageDlg()
@@ -818,6 +817,9 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
+
+	// ツールチップ作成
+	TipWin->Create(m_hWnd);
 }
 
 void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)

@@ -79,7 +79,7 @@ typedef struct tagTipWinData {
 	RECT rect;
 	int px;
 	int py;
-	TCHAR *class_name;
+	TCHAR class_name[32];
 } TipWin;
 
 VOID CTipWin::CalcStrRect(VOID)
@@ -192,10 +192,11 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
 }
 
-CTipWin::CTipWin(HWND pHwnd) : pHwnd(pHwnd)
+CTipWin::CTipWin(HINSTANCE hInstance): hInstance(hInstance)
 {
 	tWin = (TipWin *)malloc(sizeof(TipWin));
 	memset(tWin, 0, sizeof(TipWin));
+	*class_name = NULL;
 }
 
 CTipWin::~CTipWin()
@@ -206,64 +207,56 @@ CTipWin::~CTipWin()
 	if(tWin != NULL) {
 		free((void*)tWin->str);
 		tWin->str = NULL;
-		free((void*)tWin->class_name);
-		tWin->class_name = NULL;
 		free(tWin);
 		tWin = NULL;
+		*class_name = NULL;
 	}
 }
 
-BOOL CTipWin::IsClassRegistered(HINSTANCE hInstance)
+BOOL CTipWin::IsClassRegistered()
 {
-	if (tWin->class_name == NULL) {
-		TCHAR filename[MAX_PATH];
-		TCHAR *base_ptr;
-		size_t base_len;
-		size_t class_name_len;
-		GetModuleFileName(hInstance, filename, _countof(filename));
-		base_ptr = _tcsrchr(filename, _T('\\'));
-		base_len = _tcslen(base_ptr);
-		class_name_len = sizeof(TipWinClassName) + base_len;
-		tWin->class_name = (TCHAR *)malloc(class_name_len);
-		_tcscpy(tWin->class_name, TipWinClassName);
-		_tcscat(tWin->class_name, base_ptr);
+	if (*class_name == NULL) {
+		_snprintf_s(class_name, sizeof(class_name), _TRUNCATE, _T("%s_%x"), TipWinClassName, hInstance);
 	}
 	WNDCLASS twc = { 0 };
-	return (GetClassInfo(hInstance, (LPCSTR)tWin->class_name, &twc) > 0);
+	return (GetClassInfo(hInstance, (LPCSTR)class_name, &twc) > 0);
 }
 
-ATOM CTipWin::RegisterClass(HINSTANCE hInstance)
+ATOM CTipWin::RegisterClass()
 {
-	if (! IsClassRegistered(hInstance)) {
-		memset(&wc, 0, sizeof(WNDCLASS));
-		wc.style = CS_HREDRAW | CS_VREDRAW;
-		wc.lpfnWndProc = WndProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInstance;
-		wc.hIcon = NULL;
-		wc.hCursor = NULL;
-		wc.hbrBackground = NULL;
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = (LPCSTR)tWin->class_name;
-	}
+	WNDCLASS wc;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = WndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.hIcon = NULL;
+	wc.hCursor = NULL;
+	wc.hbrBackground = NULL;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = (LPCSTR)class_name;
 	return ::RegisterClass(&wc);
 }
 
 BOOL CTipWin::UnregisterClass()
 {
-	return ::UnregisterClass((LPCSTR)tWin->class_name, wc.hInstance);
+	return ::UnregisterClass((LPCSTR)class_name, hInstance);
 }
 
-VOID CTipWin::Create(HINSTANCE hInstance)
+VOID CTipWin::Create(HWND pHwnd)
 {
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(pHwnd);
 
-	if (! IsClassRegistered(hInstance))
-		RegisterClass(hInstance);
-	if (tWin == NULL)
+	if(hInstance == NULL) {
+		hInstance = (HINSTANCE)GetWindowLongPtr(pHwnd, GWLP_HINSTANCE);
+	}
+	if (! IsClassRegistered()) {
+		RegisterClass();
+	}
+	if (tWin == NULL) {
 		return;
+	}
 	tWin->str_len = 0;
 	tWin->str = (TCHAR*)malloc(sizeof(TCHAR));
 	memset((void*)tWin->str, 0, sizeof(TCHAR));
@@ -285,18 +278,12 @@ VOID CTipWin::Create(HINSTANCE hInstance)
 	 */
 	tWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					   (LPCSTR)tWin->class_name,
+					   (LPCSTR)class_name,
 					   NULL, WS_POPUP,
 					   0, 0,
 					   0, 0,
 					   pHwnd, NULL, hInstance, this);
 	timerid = 0;
-}
-
-VOID CTipWin::Create()
-{
-	const HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(pHwnd, GWLP_HINSTANCE);
-	Create(hInstance);
 }
 
 VOID CTipWin::Destroy()
@@ -377,12 +364,8 @@ BOOL CTipWin::IsVisible(void)
 
 TipWin *TipWinCreate(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str)
 {
-	CTipWin* tipwin = new CTipWin(src);
-	if (hInstance == NULL) {
-		tipwin->Create();
-	} else {
-		tipwin->Create(hInstance);
-	}
+	CTipWin* tipwin = new CTipWin(hInstance);
+	tipwin->Create(src);
 	tipwin->SetText((TCHAR*)str);
 	tipwin->SetPos(cx, cy);
 	tipwin->SetVisible(TRUE);
