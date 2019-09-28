@@ -5711,6 +5711,9 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 	for (i=XStart; i < XStart + Count; i++) {
 		if (!(AttrLine2[i] & Attr2Protect)) {
 			CodeLine[i] = 0x20;
+#if UNICODE_INTERNAL_BUFF
+			BuffSetChar(&CodeLineW[i], 0x20, 'H');
+#endif
 			AttrLine[i] &= AttrSgrMask;
 		}
 	}

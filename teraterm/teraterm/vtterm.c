@@ -1814,7 +1814,7 @@ void CSLineErase()
 	}
 }
 
-void CSQSelLineErase()
+static void CSQSelLineErase(void)
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
