@@ -1229,9 +1229,60 @@ void BuffDeleteChars(int Count)
 }
 #endif
 
-void BuffEraseChars(int Count)
 // Erase characters in current line from cursor
 //   Count: number of characters to be deleted
+#if UNICODE_INTERNAL_BUFF
+void BuffEraseChars(int Count)
+{
+	int extr = 0;
+	int sx = CursorX;
+	buff_char_t *b;
+	NewLine(PageStart + CursorY);
+
+	if (Count > NumOfColumns - CursorX) {
+		Count = NumOfColumns - CursorX;
+	}
+
+	b = &CodeLineW[CursorX];
+	if (IsBuffPadding(b)) {
+		// 全角の右側、全角をスペースに置き換える
+		BuffSetChar(b - 1, ' ', 'H');
+		BuffSetChar(b, ' ', 'H');
+		sx--;
+		extr++;
+	}
+	if (IsBuffFullWidth(b)) {
+		// 全角の左側、全角をスペースに置き換える
+		BuffSetChar(b, ' ', 'H');
+		BuffSetChar(b + 1, ' ', 'H');
+		if (Count == 1) {
+			extr++;
+		}
+	}
+	if (Count > 1) {
+		// 終端をチェック
+		if (IsBuffPadding(b + Count)) {
+			// 全角の右側、全角をスペースに置き換える
+			BuffSetChar(b + Count - 1, ' ', 'H');
+			BuffSetChar(b + Count, ' ', 'H');
+			extr++;
+		}
+	}
+
+	memset(&(CodeLine[CursorX]), 0x20, Count);
+#if UNICODE_INTERNAL_BUFF
+	memsetW(&(CodeLineW[CursorX]), 0x20, Count);
+#endif
+	memset(&(AttrLine[CursorX]), AttrDefault, Count);
+	memset(&(AttrLine2[CursorX]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
+	memset(&(AttrLineFG[CursorX]), CurCharAttr.Fore, Count);
+	memset(&(AttrLineBG[CursorX]), CurCharAttr.Back, Count);
+
+	/* update window */
+	DispEraseCharsInLine(sx, Count + extr);
+}
+#else
+void BuffEraseChars(int Count)
 {
 	NewLine(PageStart+CursorY);
 
@@ -1255,6 +1306,7 @@ void BuffEraseChars(int Count)
 	/* update window */
 	DispEraseCharsInLine(CursorX,Count);
 }
+#endif
 
 void BuffFillWithE()
 // Fill screen with 'E' characters

@@ -1864,7 +1864,8 @@ static void CSDeleteCharacter(void)
 	BuffDeleteChars(Param[1]);
 }
 
-void CSEraseCharacter()		// ECH
+// ECH
+static void CSEraseCharacter(void)
 {
 	CheckParamVal(Param[1], NumOfColumns);
 
