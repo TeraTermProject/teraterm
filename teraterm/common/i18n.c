@@ -29,23 +29,32 @@
 #include "i18n.h"
 #include "ttlib.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 #include <assert.h>
 #include <tchar.h>
 
-#if defined(UNICODE)
-DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
+DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
+								  const char *iniFile)
 {
-	wchar_t sectionW[64];
-	wchar_t keyW[128];
-	wchar_t iniFileW[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
-	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
-	MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
-	GetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+	if (pGetPrivateProfileStringW != NULL) {
+		wchar_t sectionW[64];
+		wchar_t keyW[128];
+		wchar_t iniFileW[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
+		MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
+		MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
+		pGetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+	}
+	else {
+		char tmp[MAX_UIMSG];
+		char defA[MAX_UIMSG];
+		WideCharToMultiByte(CP_ACP, 0, def, -1, defA, _countof(defA), NULL, NULL);
+		GetPrivateProfileStringA(section, key, defA, tmp, _countof(tmp), iniFile);
+		MultiByteToWideChar(CP_ACP, 0, tmp, -1, buf, buf_len);
+	}
 	RestoreNewLineW(buf);
 }
-#endif
 
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
@@ -57,26 +66,28 @@ DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf
 void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
 {
 	size_t r;
-#if defined(UNICODE)
-	wchar_t tmp[MAX_UIMSG];
-	wchar_t defW[MAX_UIMSG];
-	r = UTF8ToWideChar(def, -1, defW, _countof(defW));
-	assert(r != 0);
-	GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
-	r = buf_len;
-	WideCharToUTF8(tmp, NULL, buf, &r);
-	assert(r != 0);
-#else
-	// ANSI -> Wide -> utf8
-	char strA[MAX_UIMSG];
-	wchar_t strW[MAX_UIMSG];
-	GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
-	r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
-	assert(r != 0);
-	r = buf_len;
-	WideCharToUTF8(strW, NULL, buf, &r);
-	assert(r != 0);
-#endif
+	if (pGetPrivateProfileStringW != NULL) {
+		// unicode base
+		wchar_t tmp[MAX_UIMSG];
+		wchar_t defW[MAX_UIMSG];
+		r = UTF8ToWideChar(def, -1, defW, _countof(defW));
+		assert(r != 0);
+		GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
+		r = buf_len;
+		WideCharToUTF8(tmp, NULL, buf, &r);
+		assert(r != 0);
+	}
+	else {
+		// ANSI -> Wide -> utf8
+		char strA[MAX_UIMSG];
+		wchar_t strW[MAX_UIMSG];
+		GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
+		r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
+		assert(r != 0);
+		r = buf_len;
+		WideCharToUTF8(strW, NULL, buf, &r);
+		assert(r != 0);
+	}
 }
 
 int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
@@ -116,21 +127,43 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 	size_t i;
 	assert(hDlgWnd != NULL);
 	assert(infoCount > 0);
-	for (i = 0 ; i < infoCount; i++) {
-		const char *key = infos[i].key;
-		TCHAR uimsg[MAX_UIMSG];
-		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
-		if (uimsg[0] != _T('\0')) {
-			const int nIDDlgItem = infos[i].nIDDlgItem;
-			BOOL r;
-			if (nIDDlgItem == 0) {
-				r = SetWindowText(hDlgWnd, uimsg);
-				assert(r != 0);
-			} else {
-				r = SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
-				assert(r != 0);
+	if (pGetPrivateProfileStringW == NULL) {
+		// ANSI
+		for (i = 0 ; i < infoCount; i++) {
+			const char *key = infos[i].key;
+			char uimsg[MAX_UIMSG];
+			GetI18nStr(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+			if (uimsg[0] != '\0') {
+				const int nIDDlgItem = infos[i].nIDDlgItem;
+				BOOL r;
+				if (nIDDlgItem == 0) {
+					r = SetWindowTextA(hDlgWnd, uimsg);
+					assert(r != 0);
+				} else {
+					r = SetDlgItemTextA(hDlgWnd, nIDDlgItem, uimsg);
+					assert(r != 0);
+				}
+				(void)r;
 			}
-			(void)r;
+		}
+	} else {
+		// UNICODE
+		for (i = 0 ; i < infoCount; i++) {
+			const char *key = infos[i].key;
+			wchar_t uimsg[MAX_UIMSG];
+			GetI18nStrW(section, key, uimsg, sizeof(uimsg), L"", UILanguageFile);
+			if (uimsg[0] != L'\0') {
+				const int nIDDlgItem = infos[i].nIDDlgItem;
+				BOOL r;
+				if (nIDDlgItem == 0) {
+					r = pSetWindowTextW(hDlgWnd, uimsg);
+					assert(r != 0);
+				} else {
+					r = pSetDlgItemTextW(hDlgWnd, nIDDlgItem, uimsg);
+					assert(r != 0);
+				}
+				(void)r;
+			}
 		}
 	}
 }

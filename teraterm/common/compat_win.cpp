@@ -34,6 +34,8 @@
 
 #include "dllutil.h"
 
+BOOL (WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
+DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
@@ -59,6 +61,7 @@ static const APIInfo Lists_user32[] = {
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
+	{ "SetWindowTextW", (void **)&pSetWindowTextW },
 	{ NULL, NULL },
 };
 
@@ -82,6 +85,7 @@ static const APIInfo Lists_Shcore[] = {
 
 static const APIInfo Lists_kernel32[] = {
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
+	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
 	{ NULL, NULL },
 };
 

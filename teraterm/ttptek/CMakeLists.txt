@@ -7,7 +7,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
   ../common/tttypes.h
-  ../common/i18n.c
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h

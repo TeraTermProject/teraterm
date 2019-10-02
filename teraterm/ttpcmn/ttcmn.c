@@ -54,6 +54,7 @@
 #include "compat_w95.h"
 #include "tt_res.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
@@ -3023,6 +3024,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 				// dllロード失敗、teratermが起動しない
 				return FALSE;
 			}
+			WinCompatInit();
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */

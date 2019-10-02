@@ -67,7 +67,10 @@ typedef enum MONITOR_DPI_TYPE {
 #define OPENFILENAME_SIZE_VERSION_400A	76
 #endif
 
-extern UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+extern BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
+extern DWORD(WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+												LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+extern UINT(WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 extern DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 extern BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 extern BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);

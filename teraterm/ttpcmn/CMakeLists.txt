@@ -21,6 +21,10 @@ set(COMMON_SRC
   ../common/tt_res.h
   ../common/codeconv.h
   ../common/codeconv.cpp
+  ../common/compat_win.h
+  ../common/compat_win.cpp
+  ../common/dllutil.h
+  ../common/dllutil.cpp
   )
 
 source_group(
