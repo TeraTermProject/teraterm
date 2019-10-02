@@ -33,6 +33,7 @@
 #include "compat_win.h"
 
 #include "dllutil.h"
+#include "ttlib.h"
 
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
@@ -115,4 +116,11 @@ void WinCompatInit()
 	done = TRUE;
 
 	DLLGetApiAddressFromLists(DllInfos);
+
+	// 9x“Á•Êˆ—
+	if (!IsWindowsNTKernel()) {
+		// GetPrivateProfileStringW() ‚ª Windows 95 ‚É‘¶İ‚µ‚Ä‚¢‚é(ŠÂ‹«ˆË‘¶?)
+		// ³‚µ‚­“®ì‚µ‚È‚¢‚Ì‚Å–³Œø‚Æ‚·‚é
+		pGetPrivateProfileStringW = NULL;
+	}
 }
