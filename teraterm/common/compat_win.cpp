@@ -34,6 +34,7 @@
 
 #include "dllutil.h"
 
+LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL (WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
@@ -64,6 +65,7 @@ static const APIInfo Lists_user32[] = {
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
 	{ "SetWindowTextW", (void **)&pSetWindowTextW },
 	{ "ModifyMenuW", (void **)&pModifyMenuW },
+	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
 	{ NULL, NULL },
 };
 

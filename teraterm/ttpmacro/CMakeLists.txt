@@ -33,7 +33,10 @@ set(COMMON_SRC
   ../common/win16api.c
   ../common/codeconv.h
   ../common/codeconv.cpp
+  ../common/dllutil.h
   ../common/dllutil.cpp
+  ../common/layer_for_unicode.h
+  ../common/layer_for_unicode.cpp
   )
 
 source_group(

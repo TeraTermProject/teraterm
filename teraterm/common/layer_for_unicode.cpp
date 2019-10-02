@@ -54,7 +54,7 @@ BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString)
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
 {
 	if (pDragQueryFileW != NULL) {
-		return DragQueryFileW(hDrop, iFile, lpszFile, cch);
+		return pDragQueryFileW(hDrop, iFile, lpszFile, cch);
 	}
 
 	UINT retval;
@@ -88,7 +88,7 @@ UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
 DWORD _GetFileAttributesW(LPCWSTR lpFileName)
 {
 	if (pGetFileAttributesW != NULL) {
-		return GetFileAttributesW(lpFileName);
+		return pGetFileAttributesW(lpFileName);
 	}
 
 	char *FileNameA;
@@ -100,4 +100,21 @@ DWORD _GetFileAttributesW(LPCWSTR lpFileName)
 	const DWORD attr = GetFileAttributesA(FileNameA);
 	free(FileNameA);
 	return attr;
+}
+
+LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	if (pSendDlgItemMessageW != NULL) {
+		return pSendDlgItemMessageW(hDlg, nIDDlgItem, Msg, wParam, lParam);
+	}
+
+	LRESULT retval;
+	if (Msg == CB_ADDSTRING || Msg == LB_ADDSTRING) {
+		char *strA = ToCharW((wchar_t *)lParam);
+		retval = SendDlgItemMessageA(hDlg, nIDDlgItem, Msg, wParam, (LPARAM)strA);
+		free(strA);
+	} else {
+		retval = SendDlgItemMessageA(hDlg, nIDDlgItem, Msg, wParam, lParam);
+	}
+	return retval;
 }

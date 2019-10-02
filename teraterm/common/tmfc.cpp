@@ -36,6 +36,7 @@
 #include <tchar.h>
 #include "dlglib.h"
 #include "ttlib.h"
+#include "layer_for_unicode.h"
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
@@ -70,7 +71,7 @@ LRESULT TTCWnd::SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
-	return ::SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
+	return ::_SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
 }
 
 LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
