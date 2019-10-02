@@ -80,9 +80,7 @@ void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
 						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-#if defined(UNICODE)
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
-#endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
 DllExport void OutputDebugPrintf(const char *fmt, ...);

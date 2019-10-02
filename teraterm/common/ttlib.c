@@ -1043,6 +1043,11 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	strncpy_s(buf, buflen, Temp, _TRUNCATE);
 }
 
+void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
+{
+	GetI18nStrW("Tera Term", key, buf, buf_len, def, iniFile);
+}
+
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);

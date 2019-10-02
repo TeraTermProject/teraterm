@@ -68,12 +68,10 @@ LRESULT TTCWnd::SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp)
 	return ::SendDlgItemMessage(m_hWnd, id, msg, wp, lp);
 }
 
-#if defined(UNICODE)
 LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
 	return ::SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
 }
-#endif
 
 LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
