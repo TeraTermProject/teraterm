@@ -119,20 +119,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\teraterm\common\codeconv.cpp" />
+    <ClCompile Include="..\teraterm\common\compat_win.cpp" />
+    <ClCompile Include="..\teraterm\common\dllutil.cpp" />
     <ClCompile Include="..\teraterm\common\i18n.c" />
     <ClCompile Include="..\teraterm\common\ttlib.c" />
-    <ClCompile Include="registry.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MinSpace</Optimization>
-    </ClCompile>
-    <ClCompile Include="ttpmenu.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MinSpace</Optimization>
-    </ClCompile>
-    <ClCompile Include="winmisc.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MinSpace</Optimization>
-    </ClCompile>
+    <ClCompile Include="registry.cpp" />
+    <ClCompile Include="ttpmenu.cpp" />
+    <ClCompile Include="winmisc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="left.ico" />
@@ -142,9 +135,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\teraterm\common\codeconv.h" />
+    <ClInclude Include="..\teraterm\common\compat_win.h" />
+    <ClInclude Include="..\teraterm\common\dllutil.h" />
     <ClInclude Include="..\teraterm\common\i18n.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ttpmenu.h" />
+    <ClInclude Include="winmisc.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpmenu.rc" />
