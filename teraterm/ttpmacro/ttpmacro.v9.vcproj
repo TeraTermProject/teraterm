@@ -274,6 +274,10 @@
 				RelativePath="..\common\win16api.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -379,6 +383,14 @@
 				RelativePath="..\common\win16api.h"
 				>
 			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -423,10 +435,6 @@
 			Name="Source Files (C)"
 			Filter="c"
 			>
-			<File
-				RelativePath="..\common\i18n.c"
-				>
-			</File>
 			<File
 				RelativePath="ttl.c"
 				>

@@ -300,6 +300,22 @@
 				/>
 			</FileConfiguration>
 		</File>
+		<File
+			RelativePath="..\teraterm\common\compat_win.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\teraterm\common\compat_win.h"
+			>
+		</File>
+		<File
+			RelativePath="..\teraterm\common\dllutil.h"
+			>
+		</File>
+		<File
+			RelativePath="..\teraterm\common\dllutil.cpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
