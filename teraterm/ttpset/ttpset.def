@@ -7,3 +7,4 @@ EXPORTS
   ParseParam @6
   CopySerialList @7
   AddValueToList @8
+  SerialPortConfconvertId2Str @9

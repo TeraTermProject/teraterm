@@ -121,21 +121,30 @@ int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfon
 	return TRUE;
 }
 
-void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
-				   const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+/*
+ * 言語ファイルからDialogのコンポーネントの文字列を変換する
+ *
+ * [return]
+ *    言語ファイルで変換できた回数(infoCount以下の数になる)
+ *
+ */
+int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
+						 const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
 {
 	size_t i;
+	int translatedCount = 0;
+
 	assert(hDlgWnd != NULL);
 	assert(infoCount > 0);
 	for (i = 0 ; i < infoCount; i++) {
 		const char *key = infos[i].key;
+		BOOL r = FALSE;
 		if (pGetPrivateProfileStringW == NULL) {
 			// ANSI
 			char uimsg[MAX_UIMSG];
-			GetI18nStr(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+			GetI18nStr(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != '\0') {
 				const int nIDDlgItem = infos[i].nIDDlgItem;
-				BOOL r;
 				if (nIDDlgItem == 0) {
 					r = SetWindowTextA(hDlgWnd, uimsg);
 					assert(r != 0);
@@ -143,16 +152,14 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 					r = SetDlgItemTextA(hDlgWnd, nIDDlgItem, uimsg);
 					assert(r != 0);
 				}
-				(void)r;
 			}
 		}
 		else {
 			// UNICODE
 			wchar_t uimsg[MAX_UIMSG];
-			GetI18nStrW(section, key, uimsg, sizeof(uimsg), L"", UILanguageFile);
+			GetI18nStrW(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != L'\0') {
 				const int nIDDlgItem = infos[i].nIDDlgItem;
-				BOOL r;
 				if (nIDDlgItem == 0) {
 					r = pSetWindowTextW(hDlgWnd, uimsg);
 					assert(r != 0);
@@ -160,10 +167,13 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 					r = pSetDlgItemTextW(hDlgWnd, nIDDlgItem, uimsg);
 					assert(r != 0);
 				}
-				(void)r;
 			}
 		}
+		if (r)
+			translatedCount++;
 	}
+
+	return (translatedCount);
 }
 
 void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *infos, size_t infoCount,

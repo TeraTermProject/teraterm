@@ -60,6 +60,148 @@ static PCHAR far RussList[] =
 	{ "Windows", "KOI8-R", "CP-866", "ISO-8859-5", NULL };
 static PCHAR far RussList2[] = { "Windows", "KOI8-R", NULL };
 
+
+/*
+ * シリアルポート関連の設定定義
+ */
+#define IDENDMARK 0xFFFF
+
+typedef struct id_str_pair {
+	WORD id;
+	char *str;
+} id_str_pair_t;
+
+static id_str_pair_t serial_conf_databit[] = {
+	{IdDataBit7, "7"},
+	{IdDataBit8, "8"},
+	{IDENDMARK, NULL},
+};
+
+static id_str_pair_t serial_conf_parity[] = {
+	{IdParityNone, "none"},
+	{IdParityOdd, "odd"},
+	{IdParityEven, "even"},
+	{IdParityMark, "mark"},
+	{IdParitySpace, "space"},
+	{IDENDMARK, NULL},
+};
+
+static id_str_pair_t serial_conf_stopbit[] = {
+	{IdStopBit1, "1"},
+	{IdStopBit15, "1.5"},
+	{IdStopBit2, "2"},
+	{IDENDMARK, NULL},
+};
+
+static id_str_pair_t serial_conf_flowctrl[] = {
+	{IdFlowX, "x"},
+	{IdFlowHard, "hard"},
+	{IdFlowHard, "rtscts"},
+	{IdFlowNone, "none"},
+	{IdFlowHardDsrDtr, "dsrdtr"},
+	{IDENDMARK, NULL},
+};
+
+
+/*
+ * シリアルポート関連の設定
+ * Idから文字列に変換する。
+ *
+ * return
+ *    TRUE: 変換成功
+ *    FALSE: 変換失敗
+ */
+int PASCAL SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
+{
+	id_str_pair_t *conf;
+	int ret = FALSE;
+	int i;
+
+	switch (type) {
+		case COM_DATABIT:
+			conf = serial_conf_databit;
+			break;
+		case COM_PARITY:
+			conf = serial_conf_parity;
+			break;
+		case COM_STOPBIT:
+			conf = serial_conf_stopbit;
+			break;
+		case COM_FLOWCTRL:
+			conf = serial_conf_flowctrl;
+			break;
+		default:
+			conf = NULL;
+			break;
+	}
+	if (conf == NULL)
+		goto error;
+
+	for (i = 0 ;  ; i++) {
+		if (conf[i].id == IDENDMARK)
+			goto error;
+		if (conf[i].id == id) {
+			strncpy_s(str, strlen, conf[i].str, _TRUNCATE);
+			break;
+		}
+	}
+
+	ret = TRUE;
+
+error:
+	return (ret);
+}
+
+/*
+ * シリアルポート関連の設定
+ * 文字列からIdに変換する。
+ *
+ * return
+ *    TRUE: 変換成功
+ *    FALSE: 変換失敗
+ */
+static int SerialPortConfconvertStr2Id(enum serial_port_conf type, PCHAR str, WORD *id)
+{
+	id_str_pair_t *conf;
+	int ret = FALSE;
+	int i;
+
+	switch (type) {
+		case COM_DATABIT:
+			conf = serial_conf_databit;
+			break;
+		case COM_PARITY:
+			conf = serial_conf_parity;
+			break;
+		case COM_STOPBIT:
+			conf = serial_conf_stopbit;
+			break;
+		case COM_FLOWCTRL:
+			conf = serial_conf_flowctrl;
+			break;
+		default:
+			conf = NULL;
+			break;
+	}
+	if (conf == NULL)
+		goto error;
+
+	for (i = 0 ;  ; i++) {
+		if (conf[i].id == IDENDMARK)
+			goto error;
+		if (_stricmp(conf[i].str, str) == 0) {
+			*id = conf[i].id;
+			break;
+		}
+	}
+
+	ret = TRUE;
+
+error:
+	return (ret);
+}
+
+
 WORD str2id(PCHAR far * List, PCHAR str, WORD DefId)
 {
 	WORD i;
@@ -1034,48 +1176,30 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Parity */
 	GetPrivateProfileString(Section, "Parity", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "even") == 0)
-		ts->Parity = IdParityEven;
-	else if (_stricmp(Temp, "odd") == 0)
-		ts->Parity = IdParityOdd;
-	else if (_stricmp(Temp, "mark") == 0)
-		ts->Parity = IdParityMark;
-	else if (_stricmp(Temp, "space") == 0)
-		ts->Parity = IdParitySpace;
-	else
+	if (!SerialPortConfconvertStr2Id(COM_PARITY, Temp, &ts->Parity)) {
 		ts->Parity = IdParityNone;
+	}
 
 	/* Data bit */
 	GetPrivateProfileString(Section, "DataBit", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "7") == 0)
-		ts->DataBit = IdDataBit7;
-	else
+	if (!SerialPortConfconvertStr2Id(COM_DATABIT, Temp, &ts->DataBit)) {
 		ts->DataBit = IdDataBit8;
+	}
 
 	/* Stop bit */
 	GetPrivateProfileString(Section, "StopBit", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "2") == 0)
-		ts->StopBit = IdStopBit2;
-	else if (_stricmp(Temp, "1.5") == 0)
-		ts->StopBit = IdStopBit15;
-	else
+	if (!SerialPortConfconvertStr2Id(COM_STOPBIT, Temp, &ts->StopBit)) {
 		ts->StopBit = IdStopBit1;
+	}
 
 	/* Flow control */
 	GetPrivateProfileString(Section, "FlowCtrl", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "x") == 0)
-		ts->Flow = IdFlowX;
-	else if (_stricmp(Temp, "hard") == 0)
-		ts->Flow = IdFlowHard;
-	else if (_stricmp(Temp, "rtscts") == 0)  // hardとrtsctsは同じ意味
-		ts->Flow = IdFlowHard;
-	else if (_stricmp(Temp, "dsrdtr") == 0)
-		ts->Flow = IdFlowHardDsrDtr;
-	else
+	if (!SerialPortConfconvertStr2Id(COM_FLOWCTRL, Temp, &ts->Flow)) {
 		ts->Flow = IdFlowNone;
+	}
 
 	/* Delay per character */
 	ts->DelayPerChar =
@@ -2593,59 +2717,25 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "BaudRate", Temp, FName);
 
 	/* Parity */
-	switch (ts->Parity) {
-	case IdParityEven:
-		strncpy_s(Temp, sizeof(Temp), "even", _TRUNCATE);
-		break;
-	case IdParityOdd:
-		strncpy_s(Temp, sizeof(Temp), "odd", _TRUNCATE);
-		break;
-	case IdParityMark:
-		strncpy_s(Temp, sizeof(Temp), "mark", _TRUNCATE);
-		break;
-	case IdParitySpace:
-		strncpy_s(Temp, sizeof(Temp), "space", _TRUNCATE);
-		break;
-	default:
+	if (!SerialPortConfconvertId2Str(COM_PARITY, ts->Parity, Temp, sizeof(Temp))) {
 		strncpy_s(Temp, sizeof(Temp), "none", _TRUNCATE);
 	}
 	WritePrivateProfileString(Section, "Parity", Temp, FName);
 
 	/* Data bit */
-	if (ts->DataBit == IdDataBit7)
-		strncpy_s(Temp, sizeof(Temp), "7", _TRUNCATE);
-	else
+	if (!SerialPortConfconvertId2Str(COM_DATABIT, ts->DataBit, Temp, sizeof(Temp))) {
 		strncpy_s(Temp, sizeof(Temp), "8", _TRUNCATE);
-
+	}
 	WritePrivateProfileString(Section, "DataBit", Temp, FName);
 
 	/* Stop bit */
-	switch (ts->StopBit) {
-	case IdStopBit2:
-		strncpy_s(Temp, sizeof(Temp), "2", _TRUNCATE);
-		break;
-	case IdStopBit15:
-		strncpy_s(Temp, sizeof(Temp), "1.5", _TRUNCATE);
-		break;
-	default:
+	if (!SerialPortConfconvertId2Str(COM_STOPBIT, ts->StopBit, Temp, sizeof(Temp))) {
 		strncpy_s(Temp, sizeof(Temp), "1", _TRUNCATE);
-		break;
 	}
-
 	WritePrivateProfileString(Section, "StopBit", Temp, FName);
 
 	/* Flow control */
-	switch (ts->Flow) {
-	case IdFlowX:
-		strncpy_s(Temp, sizeof(Temp), "x", _TRUNCATE);
-		break;
-	case IdFlowHard:
-		strncpy_s(Temp, sizeof(Temp), "hard", _TRUNCATE);
-		break;
-	case IdFlowHardDsrDtr:
-		strncpy_s(Temp, sizeof(Temp), "dsrdtr", _TRUNCATE);
-		break;
-	default:
+	if (!SerialPortConfconvertId2Str(COM_FLOWCTRL, ts->Flow, Temp, sizeof(Temp))) {
 		strncpy_s(Temp, sizeof(Temp), "none", _TRUNCATE);
 	}
 	WritePrivateProfileString(Section, "FlowCtrl", Temp, FName);
@@ -4046,6 +4136,36 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ParamCom = atoi(&Temp[3]);
 			if ((ParamCom < 1) || (ParamCom > ts->MaxComPort))
 				ParamCom = 0;
+		}
+		else if (_strnicmp(Temp, "/CDATABIT=", 10) == 0) {	/* COM data bit */
+			ParamPort = IdSerial;
+			SerialPortConfconvertStr2Id(COM_DATABIT, &Temp[10], &ts->DataBit);
+		}
+		else if (_strnicmp(Temp, "/CPARITY=", 9) == 0) {	/* COM Parity */
+			ParamPort = IdSerial;
+			SerialPortConfconvertStr2Id(COM_PARITY, &Temp[9], &ts->Parity);
+		}
+		else if (_strnicmp(Temp, "/CSTOPBIT=", 10) == 0) {	/* COM Stop bit */
+			ParamPort = IdSerial;
+			SerialPortConfconvertStr2Id(COM_STOPBIT, &Temp[10], &ts->StopBit);
+		}
+		else if (_strnicmp(Temp, "/CFLOWCTRL=", 11) == 0) {	/* COM Flow control */
+			ParamPort = IdSerial;
+			SerialPortConfconvertStr2Id(COM_FLOWCTRL, &Temp[11], &ts->Flow);
+		}
+		else if (_strnicmp(Temp, "/CDELAYPERCHAR=", 15) == 0) {	/* COM Transmit delay per character (in msec) */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[15]);
+			ts->DelayPerChar = val;
+		}
+		else if (_strnicmp(Temp, "/CDELAYPERLINE=", 15) == 0) {	/* COM Transmit delay per line (in msec) */
+			WORD val = 0;
+
+			ParamPort = IdSerial;
+			val = atoi(&Temp[15]);
+			ts->DelayPerLine = val;
 		}
 		else if (_stricmp(Temp, "/WAITCOM") == 0) {	/* wait COM arrival */
 			ts->WaitCom = 1;

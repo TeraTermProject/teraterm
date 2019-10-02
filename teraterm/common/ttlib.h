@@ -122,7 +122,7 @@ void CenterWindow(HWND hWnd, HWND hWndParent);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+int SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 int GetMonitorDpiFromWindow(HWND hWnd);
 
@@ -135,6 +135,16 @@ int GetMonitorDpiFromWindow(HWND hWnd);
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 #endif
+
+/*
+ * シリアルポート関連の設定定義
+ */
+enum serial_port_conf {
+	COM_DATABIT, 
+	COM_PARITY,
+	COM_STOPBIT,
+	COM_FLOWCTRL,
+};
 
 #ifdef __cplusplus
 }

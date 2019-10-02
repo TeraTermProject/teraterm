@@ -9606,7 +9606,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 
 	} else if (c->type == TYPE_PORTFWD) {
 		// CHANNEL_CLOSE を送り返さないとリモートのchannelが開放されない
-		// c.f. RFC 4253 5.3. Closing a Channel
+		// c.f. RFC 4254 5.3. Closing a Channel
 		ssh2_channel_send_close(pvar, c);
 
 		// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)

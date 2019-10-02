@@ -15,7 +15,6 @@ set(COMMON_SRC
   ../common/ttddecmnd.h
   ../common/tttypes.h
   ../common/tt-version.h
-  ../common/i18n.c
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h

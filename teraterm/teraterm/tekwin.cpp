@@ -636,6 +636,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 LRESULT CTEKWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
+	DWORD help_id = (wParam == 0) ? HelpId : wParam;
 	OpenHelp(HH_HELP_CONTEXT, HelpId, ts.UILanguageFile);
 	return 0;
 }
@@ -779,6 +780,9 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
 	if (msg == MsgDlgHelp) {
+		// HELPMSGSTRING message Žž
+		//		wp = dialog handle
+		//		lp = initialization structure
 		OnDlgHelp(wp, lp);
 		return 0;
 	}

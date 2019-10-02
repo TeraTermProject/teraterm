@@ -498,38 +498,19 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	FWDRequestSpec *requests =
 		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
 	int i;
-	char uimsg[MAX_UIMSG];
-
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_PORTFORWARD, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_LIST", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_PORTFORWARD, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_ADD, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_ADD", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_ADD, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_EDIT, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_EDIT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_EDIT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_REMOVE, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_REMOVE", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_REMOVE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_XFORWARD, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_X", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_XFORWARD, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDX11, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_XAPP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDX11, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
-	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDSETUP_HELP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDSETUP_HELP, pvar->ts->UIMsg);
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_FWD_TITLE" },
+		{ IDC_PORTFORWARD, "DLG_FWDSETUP_LIST" },
+		{ IDC_ADD, "DLG_FWDSETUP_ADD" },
+		{ IDC_EDIT, "DLG_FWDSETUP_EDIT" },
+		{ IDC_REMOVE, "DLG_FWDSETUP_REMOVE" },
+		{ IDC_XFORWARD, "DLG_FWDSETUP_X" },
+		{ IDC_SSHFWDX11, "DLG_FWDSETUP_XAPP" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDC_SSHFWDSETUP_HELP, "BTN_HELP" },
+	};
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	FWD_get_request_specs(pvar, requests, num_specs);
 
@@ -804,50 +785,23 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec *spec,
 
 static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 {
-	char uimsg[MAX_UIMSG];
-
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDD_SSHFWDBANNER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_BANNER", pvar, uimsg);
-	SetDlgItemText(dlg, IDD_SSHFWDBANNER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_LOCAL_PORT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_LISTEN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_LOCAL_LISTEN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_LISTEN, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_LOCAL_REMOTE", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_LOCAL_REMOTE_PORT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_REMOTE_PORT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_LISTEN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_REMOTE_LISTEN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_LISTEN, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_REMOTE_LOCAL", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_REMOTE_LOCAL_PORT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_DYNAMIC_PORT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC_LISTEN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_DYNAMIC_LISTEN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC_LISTEN, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
-	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_FWD_TITLE" },
+		{ IDD_SSHFWDBANNER, "DLG_FWD_BANNER" },
+		{ IDC_SSHFWDLOCALTOREMOTE, "DLG_FWD_LOCAL_PORT" },
+		{ IDC_SSHFWDLOCALTOREMOTE_LISTEN, "DLG_FWD_LOCAL_LISTEN" },
+		{ IDC_SSHFWDLOCALTOREMOTE_HOST, "DLG_FWD_LOCAL_REMOTE" },
+		{ IDC_SSHFWDLOCALTOREMOTE_PORT, "DLG_FWD_LOCAL_REMOTE_PORT" },
+		{ IDC_SSHFWDREMOTETOLOCAL, "DLG_FWD_REMOTE_PORT" },
+		{ IDC_SSHFWDREMOTETOLOCAL_LISTEN, "DLG_FWD_REMOTE_LISTEN" },
+		{ IDC_SSHFWDREMOTETOLOCAL_HOST, "DLG_FWD_REMOTE_LOCAL" },
+		{ IDC_SSHFWDREMOTETOLOCAL_PORT, "DLG_FWD_REMOTE_LOCAL_PORT" },
+		{ IDC_SSHFWDLOCALDYNAMIC, "DLG_FWD_DYNAMIC_PORT" },
+		{ IDC_SSHFWDLOCALDYNAMIC_LISTEN, "DLG_FWD_DYNAMIC_LISTEN" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:

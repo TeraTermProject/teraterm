@@ -146,9 +146,6 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
-static TipWin *OpacityTip;
-static POINT OpacityTipPts;
-
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
 #endif
@@ -178,13 +175,6 @@ static void SetMouseCursor(const char *cursor)
 
 	if (hc != NULL) {
 		SetClassLongPtr(HVTWin, GCLP_HCURSOR, (LONG_PTR)hc);
-	}
-}
-
-static void DestroyTooltip(TipWin* *tooltip) {
-	if (*tooltip) {
-		TipWinDestroy(*tooltip);
-		(*tooltip) = NULL;
 	}
 }
 
@@ -825,6 +815,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #if UNICODE_DEBUG
 	CtrlKeyState = 0;
 #endif
+
+	// TipWin
+	TipWin = new CTipWin(HVTWin);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1301,9 +1294,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if (SubMenu == SetupMenu)
-		if (cv.Ready &&
-		    ((cv.PortType==IdTCPIP) || (cv.PortType==IdFile)) ||
-			(SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
+		/*
+		 * ネットワーク接続中(TCP/IPを選択して接続した状態)はシリアルポート
+		 * (ID_SETUP_SERIALPORT)のメニューが選択できないようになっていたが、
+		 * このガードを外し、シリアルポート設定ダイアログから新しい接続ができるようにする。
+		 */
+		if ((SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 		else {
@@ -2328,13 +2324,12 @@ void CVTWindow::CodePopup(int client_x, int client_y)
 {
 	wchar_t *buf = BuffGetCharInfo(client_x, client_y);
 	if (TipWinCodeDebug == NULL) {
-		TipWinCodeDebug = TipWinCreateW(m_hWnd, client_x, client_y, buf);
-	} else {
-		POINT pos = { client_x, client_y };
-		ClientToScreen(m_hWnd, &pos);
-		TipWinSetPos(TipWinCodeDebug, pos.x, pos.y);
-		TipWinSetTextW(TipWinCodeDebug, buf);
+		TipWinCodeDebug = TipWinCreate(m_hWnd);
 	}
+	POINT pos = { client_x, client_y };
+	ClientToScreen(m_hWnd, &pos);
+	TipWinSetPos(TipWinCodeDebug, pos.x, pos.y);
+	TipWinSetTextW(TipWinCodeDebug, buf);
 	free(buf);
 }
 
@@ -2409,6 +2404,7 @@ BOOL CVTWindow::OnMouseWheel(
 			int newAlpha = Alpha;
 			TCHAR tipbuf[32];
 			TCHAR uimsg[MAX_UIMSG];
+			POINT tippos;
 
 			newAlpha += delta * ts.MouseWheelScrollLine;
 			if (newAlpha > 255)
@@ -2419,21 +2415,19 @@ BOOL CVTWindow::OnMouseWheel(
 
 			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
 			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
-			::SetTimer(HVTWin, IdOpacityTipTimer, 1000, NULL);
 
-			if (OpacityTipPts.x != pt.x ||
-			    OpacityTipPts.y != pt.y) {
-				DestroyTooltip(&OpacityTip);
+			tippos = TipWin->GetPos();
+			if (tippos.x != pt.x ||
+			    tippos.y != pt.y) {
+					TipWin->SetVisible(FALSE);
 			}
 
-			if (OpacityTip == NULL) {
-				OpacityTip = TipWinCreate(HVTWin, pt.x, pt.y, tipbuf);
-				OpacityTipPts.x = pt.x;
-				OpacityTipPts.y = pt.y;
-			} else {
-				TipWinSetText(OpacityTip, tipbuf);
-				// ツールチップのリサイズが失敗したように見える問題の暫定対策
-				TipWinSetText(OpacityTip, tipbuf);
+			TipWin->SetText(tipbuf);
+			TipWin->SetPos(pt.x, pt.y);
+			TipWin->SetHideTimer(1000);
+
+			if(! TipWin->IsVisible()) {
+				TipWin->SetVisible(TRUE);
 			}
 
 			return TRUE;
@@ -2897,9 +2891,6 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case IdPrnProcTimer:
 			PrnFileDirectProc();
-			break;
-		case IdOpacityTipTimer:
-			DestroyTooltip(&OpacityTip);
 			break;
 	}
 }
@@ -3534,6 +3525,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	if ((ts.LogFN[0]!=0) && (LogVar==NULL) && NewFileVar(&LogVar)) {
 		LogVar->DirLen = 0;
 		strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogFN, _TRUNCATE);
+		HelpId = HlpFileLog;
 		LogStart();
 	}
 
@@ -4655,6 +4647,9 @@ void CVTWindow::OnSetupKeyboard()
 void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
+	char Command[MAXPATHLEN + HostNameMaxLength];
+	char Temp[MAX_PATH], Str[MAX_PATH];
+
 	HelpId = HlpSetupSerialPort;
 	if (! LoadTTDLG()) {
 		return;
@@ -4665,6 +4660,36 @@ void CVTWindow::OnSetupSerialPort()
 	FreeTTDLG();
 
 	if (Ok && ts.ComPort > 0) {
+		/* 
+		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
+		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
+		 */
+		if ( cv.Ready && (cv.PortType != IdSerial) ) {
+			_snprintf_s(Command, sizeof(Command), 
+				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
+				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
+
+			if (SerialPortConfconvertId2Str(COM_DATABIT, ts.DataBit, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_PARITY, ts.Parity, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_STOPBIT, ts.StopBit, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+			if (SerialPortConfconvertId2Str(COM_FLOWCTRL, ts.Flow, Temp, sizeof(Temp))) {
+				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
+				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+			}
+
+			WinExec(Command,SW_SHOW);
+			return;
+		}
+
 		if (cv.Open) {
 			if (ts.ComPort != cv.ComPort) {
 				CommClose(&cv);
@@ -6245,7 +6270,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
 	if (msg == MsgDlgHelp) {
-		OnDlgHelp(wp,lp);
+		// HELPMSGSTRING message 時
+		//		wp = dialog handle
+		//		lp = initialization structure
+		OnDlgHelp(0, 0);
 		return 0;
 	}
 	switch(msg)

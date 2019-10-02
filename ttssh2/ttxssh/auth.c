@@ -122,7 +122,9 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 					_tcscat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				}
 				GetWindowRect(control, &rect);
-				data->tipwin = TipWinCreate(control, rect.left, rect.bottom, uimsg);
+				data->tipwin = TipWinCreate(control);
+				TipWinSetPos(data->tipwin, rect.left, rect.bottom);
+				TipWinSetText(data->tipwin, uimsg);
 			}
 
 			return 0;
@@ -243,34 +245,6 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 	}
 }
 
-static LRESULT CALLBACK username_proc(HWND hWnd, UINT msg,
-									  WPARAM wParam, LPARAM lParam)
-{
-	const WNDPROC ProcOrg = (WNDPROC)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	const LRESULT result = CallWindowProc(ProcOrg, hWnd, msg, wParam, lParam);
-	switch (msg) {
-	case WM_CHAR:
-	case WM_SETTEXT: {
-		// ユーザー名が入力されていた場合、オプションを使うことはないので、
-		// tabでのフォーカス移動時、オプションボタンをパスするようにする
-		// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
-		const HWND dlg = GetParent(hWnd);
-		const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
-		const int len = GetWindowTextLength(hWnd);
-		LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
-		if (len > 0) {
-			// 不要tabstop
-			style = style & (~(LONG_PTR)WS_TABSTOP);
-		} else {
-			// 要tabstop
-			style = style | WS_TABSTOP;
-		}
-		SetWindowLongPtr(hWndOption, GWL_STYLE, style);
-	}
-	}
-	return result;
-}
-
 static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 {
 	const static DlgTextInfo text_info[] = {
@@ -328,14 +302,6 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
 		                  "Use keyboard-&interactive to log in");
 		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
-	}
-
-	// usernameのサブクラス化
-	{
-		HWND hWndUserName = GetDlgItem(dlg, IDC_SSHUSERNAME);
-		LONG_PTR ProcOrg =
-			SetWindowLongPtr(hWndUserName, GWLP_WNDPROC, (LONG_PTR)username_proc);
-		SetWindowLongPtr(hWndUserName, GWLP_USERDATA, ProcOrg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
@@ -816,7 +782,6 @@ char *GetClipboardTextA(HWND hWnd, BOOL empty)
 }
 
 
-BOOL autologin_sent_none;
 static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 									  LPARAM lParam)
 {
@@ -825,9 +790,11 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	const int IDC_TIMER3 = 302; // challenge で ask4passwd でCheckAuthListFirst が FALSE のとき
 	const int autologin_timeout = 10; // ミリ秒
 	PTInstVar pvar;
+	static BOOL autologin_sent_none;
 	static BOOL UseControlChar;
 	static BOOL ShowPassPhrase;
 	static HICON hIconDropdown;
+	static size_t username_str_len;
 	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -838,6 +805,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		UseControlChar = TRUE;
 		ShowPassPhrase = FALSE;
+		username_str_len = 0;
 		init_auth_dlg(pvar, dlg, &UseControlChar);
 
 		// "▼"画像をセットする
@@ -1002,35 +970,63 @@ canceled:
 			return TRUE;
 
 		case IDC_SSHUSERNAME:
-			// ユーザ名がフォーカスを失ったとき (2007.9.29 maya)
-			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
-			    (pvar->ssh_state.status_flags & STATUS_HOST_OK) &&
-			    HIWORD(wParam) == EN_KILLFOCUS) {
-				// 設定が有効でまだ取りに行っていないなら
-				if (SSHv2(pvar) &&
-					pvar->session_settings.CheckAuthListFirst &&
-					!pvar->tryed_ssh2_authlist) {
-					// ダイアログのユーザ名を反映
-					if (pvar->auth_state.user == NULL) {
-						pvar->auth_state.user =
-							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+			switch (HIWORD(wParam)) {
+			case EN_KILLFOCUS: {
+				// ユーザ名がフォーカスを失ったとき (2007.9.29 maya)
+				if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
+					(pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
+					// 設定が有効でまだ取りに行っていないなら
+					if (SSHv2(pvar) &&
+						pvar->session_settings.CheckAuthListFirst &&
+						!pvar->tryed_ssh2_authlist) {
+						// ダイアログのユーザ名を反映
+						if (pvar->auth_state.user == NULL) {
+							pvar->auth_state.user =
+								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						}
+
+						// ユーザ名が入力されているかチェックする
+						if (strlen(pvar->auth_state.user) == 0) {
+							return FALSE;
+						}
+
+						// ユーザ名を変更させない
+						EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
+						EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
+
+						// 認証メソッド none を送る
+						do_SSH2_userauth(pvar);
+						return TRUE;
 					}
-
-					// ユーザ名が入力されているかチェックする
-					if (strlen(pvar->auth_state.user) == 0) {
-						return FALSE;
-					}
-
-					// ユーザ名を変更させない
-					EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
-					EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
-
-					// 認証メソッド none を送る
-					do_SSH2_userauth(pvar);
-					return TRUE;
 				}
+				return FALSE;
 			}
+			case EN_CHANGE: {
+				// ユーザー名が入力されていた場合、オプションを使うことはないので、
+				// tabでのフォーカス移動時、オプションボタンをパスするようにする
+				// 従来と同じキー操作でユーザー名とパスフレーズを入力可能とする
+				HWND hWnd = (HWND)lParam;
+				const int len = GetWindowTextLength(hWnd);
+				if ((username_str_len == 0 && len != 0) ||
+					(username_str_len != 0 && len == 0)) {
+					// ユーザー名の文字長が 0になる or 0ではなくなる 時のみ処理
+					const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
+					LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
 
+					if (len > 0) {
+						// 不要tabstop
+						style = style & (~(LONG_PTR)WS_TABSTOP);
+					}
+					else {
+						// 要tabstop
+						style = style | WS_TABSTOP;
+					}
+					SetWindowLongPtr(hWndOption, GWL_STYLE, style);
+				}
+				username_str_len = len;
+				return FALSE;
+			}
+			}
 			return FALSE;
 
 		case IDC_SSHUSEPASSWORD:
@@ -1349,20 +1345,13 @@ void AUTH_advance_to_next_cred(PTInstVar pvar)
 
 static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	char uimsg[MAX_UIMSG];
-
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_TIS_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHAUTHBANNER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_TIS_BANNER", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHAUTHBANNER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
-	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_TIS_TITLE" },
+		{ IDC_SSHAUTHBANNER, "DLG_TIS_BANNER" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, NULL);
@@ -1458,6 +1447,7 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 		HWND cur_active = GetActiveWindow();
 		DLGPROC dlg_proc;
 		LPCTSTR dialog_template;
+		INT_PTR r;
 
 		switch (pvar->auth_state.mode) {
 		case TIS_AUTH_MODE:
@@ -1470,10 +1460,11 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 			dlg_proc = auth_dlg_proc;
 		}
 
-		if (!DialogBoxParam(hInst, dialog_template,
-		                    cur_active !=
-		                    NULL ? cur_active : pvar->NotificationWindow,
-		                    dlg_proc, (LPARAM) pvar) == -1) {
+		r = DialogBoxParam(hInst, dialog_template,
+						   cur_active !=
+						   NULL ? cur_active : pvar->NotificationWindow,
+						   dlg_proc, (LPARAM) pvar);
+		if (r == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTH_ERROR", pvar,
 			                  "Unable to display authentication dialog box.\n"
 			                  "Connection terminated.");

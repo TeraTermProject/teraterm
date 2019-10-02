@@ -2696,6 +2696,14 @@ cleanup:
 }
 
 
+/*
+ * 
+ * [return]
+ *   1以上   アプリが使用可能なCOMポートの総数
+ *   0       アプリが使用可能なCOMポートがない
+ *   -1      ※未使用
+ *
+ */
 int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc)
 {
 	HMODULE h;

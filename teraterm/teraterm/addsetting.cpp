@@ -38,7 +38,6 @@
 #include <time.h>
 #include <tchar.h>
 #include <crtdbg.h>
-#include <math.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -73,20 +72,18 @@ const mouse_cursor_t MouseCursor[] = {
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
-static TipWin *ActiveOpacityTip;
-static TipWin *InactiveOpacityTip;
-
 void CVisualPropPageDlg::SetupRGBbox(int index)
 {
+	COLORREF Color = ts.ANSIColor[index];
 	BYTE c;
 
-	c = GetRValue(ts.ANSIColor[index]);
+	c = GetRValue(Color);
 	SetDlgItemNum(IDC_COLOR_RED, c);
 
-	c = GetGValue(ts.ANSIColor[index]);
+	c = GetGValue(Color);
 	SetDlgItemNum(IDC_COLOR_GREEN, c);
 
-	c = GetBValue(ts.ANSIColor[index]);
+	c = GetBValue(Color);
 	SetDlgItemNum(IDC_COLOR_BLUE, c);
 }
 
@@ -638,21 +635,16 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 				  L"Visual", ts.UILanguageFile);
 	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
+	TipWin = new CTipWin(m_hWnd);
 }
 
 CVisualPropPageDlg::~CVisualPropPageDlg()
 {
 	free((void *)m_psp.pszTitle);
+	TipWin->Destroy();
 }
 
 // CVisualPropPageDlg メッセージ ハンドラ
-
-static void DestroyOpacityTip(TipWin** OpacityTip) {
-	if (*OpacityTip) {
-		TipWinDestroy(*OpacityTip);
-		(*OpacityTip) = NULL;
-	}
-}
 
 void CVisualPropPageDlg::OnInitDialog()
 {
@@ -701,14 +693,14 @@ void CVisualPropPageDlg::OnInitDialog()
 	// (1)AlphaBlend
 
 	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
-	DestroyOpacityTip(&ActiveOpacityTip);
 	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
 	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendActive);
 
 	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, ts.AlphaBlendInactive);
-	DestroyOpacityTip(&InactiveOpacityTip);
 	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
 	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendInactive);
+
+	TipWin->SetVisible(FALSE);
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
@@ -955,6 +947,22 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			return TRUE;
 
+		case IDC_EDIT_BGIMG_BRIGHTNESS | (EN_CHANGE << 16) :
+			{
+				int b;
+
+				b = GetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS);
+				if (b < 0) {
+					b = 0;
+					SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, b);
+				}
+				else if (b > 255) {
+					b = 255;
+					SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, b);
+				}
+			}
+			return TRUE;
+
 		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16):
 			sel = SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
@@ -963,31 +971,49 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			return TRUE;
 
-		case IDC_COLOR_RED | (EN_KILLFOCUS << 16):
-		case IDC_COLOR_GREEN | (EN_KILLFOCUS << 16):
-		case IDC_COLOR_BLUE | (EN_KILLFOCUS << 16):
+		case IDC_COLOR_RED | (EN_CHANGE << 16) :
+		case IDC_COLOR_GREEN | (EN_CHANGE << 16) :
+		case IDC_COLOR_BLUE | (EN_CHANGE << 16) :
 			{
-				BYTE r, g, b;
-				char buf[8];
+				int r, g, b;
 
 				sel = GetCurSel(IDC_ANSI_COLOR);
 				if (sel < 0 && sel > sizeof(ts.ANSIColor)-1) {
 					return TRUE;
 				}
 
-				GetDlgItemTextA(IDC_COLOR_RED, buf, sizeof(buf));
-				r = atoi(buf);
+				r = GetDlgItemInt(IDC_COLOR_RED);
+				if (r < 0) {
+					r = 0;
+					SetDlgItemNum(IDC_COLOR_RED, r);
+				}
+				else if (r > 255) {
+					r = 255;
+					SetDlgItemNum(IDC_COLOR_RED, r);
+				}
 
-				GetDlgItemTextA(IDC_COLOR_GREEN, buf, sizeof(buf));
-				g = atoi(buf);
+				g = GetDlgItemInt(IDC_COLOR_GREEN);
+				if (g < 0) {
+					g = 0;
+					SetDlgItemNum(IDC_COLOR_GREEN, g);
+				}
+				else if (g > 255) {
+					g = 255;
+					SetDlgItemNum(IDC_COLOR_GREEN, g);
+				}
 
-				GetDlgItemTextA(IDC_COLOR_BLUE, buf, sizeof(buf));
-				b = atoi(buf);
+				b = GetDlgItemInt(IDC_COLOR_BLUE);
+				if (b < 0) {
+					b = 0;
+					SetDlgItemNum(IDC_COLOR_BLUE, b);
+				}
+				else if (b > 255) {
+					b = 255;
+					SetDlgItemNum(IDC_COLOR_BLUE, b);
+				}
 
+				// OK を押さなくても設定が保存されている
 				ts.ANSIColor[sel] = RGB(r, g, b);
-
-				// 255を超えたRGB値は補正されるので、それをEditに表示する (2007.2.18 maya)
-				SetupRGBbox(sel);
 
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
@@ -996,6 +1022,14 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				int pos;
 				pos = GetDlgItemInt(IDC_ALPHA_BLEND_ACTIVE);
+				if(pos < 0) {
+					pos = 0;
+					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
+				}
+				else if(pos > 255) {
+					pos = 255;
+					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
+				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
 
 				TCHAR tipbuf[32];
@@ -1004,16 +1038,12 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
 				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
 
-				DestroyOpacityTip(&InactiveOpacityTip);
-				SetTimer(GetSafeHwnd(), IdOpacityTipTimer, 1000, NULL);
 				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), &rc);
-				if (ActiveOpacityTip == NULL) {
-					ActiveOpacityTip = TipWinCreate(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), rc.right, rc.bottom, tipbuf);
-				}
-				else {
-					TipWinSetText(ActiveOpacityTip, tipbuf);
-					// ツールチップのリサイズが失敗したように見える問題の暫定対策
-					TipWinSetText(ActiveOpacityTip, tipbuf);
+				TipWin->SetText(tipbuf);
+				TipWin->SetPos(rc.right, rc.bottom);
+				TipWin->SetHideTimer(1000);
+				if (! TipWin->IsVisible()) {
+					TipWin->SetVisible(TRUE);
 				}
 				return TRUE;
 			}
@@ -1021,6 +1051,14 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				int pos;
 				pos = GetDlgItemInt(IDC_ALPHA_BLEND_INACTIVE);
+				if(pos < 0) {
+					pos = 0;
+					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
+				}
+				else if(pos > 255) {
+					pos = 255;
+					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
+				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
 
 				TCHAR tipbuf[32], uimsg[MAX_UIMSG];
@@ -1028,34 +1066,18 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
 				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
 
-				DestroyOpacityTip(&ActiveOpacityTip);
-				SetTimer(GetSafeHwnd(), IdOpacityTipTimer, 1000, NULL);
 				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), &rc);
-				if (InactiveOpacityTip == NULL) {
-					InactiveOpacityTip = TipWinCreate(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), rc.right, rc.bottom, tipbuf);
-				}
-				else {
-					TipWinSetText(InactiveOpacityTip, tipbuf);
-					// ツールチップのリサイズが失敗したように見える問題の暫定対策
-					TipWinSetText(InactiveOpacityTip, tipbuf);
+				TipWin->SetText(tipbuf);
+				TipWin->SetPos(rc.right, rc.bottom);
+				TipWin->SetHideTimer(1000);
+				if (! TipWin->IsVisible()) {
+					TipWin->SetVisible(TRUE);
 				}
 				return TRUE;
 			}
 	}
 
 	return TTCPropertyPage::OnCommand(wParam, lParam);
-}
-
-
-void CVisualPropPageDlg::OnTimer(UINT_PTR nIDEvent)
-{
-	KillTimer(GetSafeHwnd(), nIDEvent);
-	switch (nIDEvent) {
-		case IdOpacityTipTimer:
-			DestroyOpacityTip(&ActiveOpacityTip);
-			DestroyOpacityTip(&InactiveOpacityTip);
-			break;
-	}
 }
 
 HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)

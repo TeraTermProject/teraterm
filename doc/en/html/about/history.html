@@ -38,7 +38,7 @@
       <li>Added support for hardware flow control DSR/DTR with serial connection.
         <ul>
           <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
-          <li>MARCO: The DSR/DRT can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
+          <li>MACRO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
         </ul></li>
       <li>Added SFMT information on version dialog.</li>
       <li>Changed of indication from "Protocol" to "IP version" and from "UNSPEC" to "AUTO" on <a href="../menu/file-new.html">New connection dialog</a>.</li>
@@ -46,12 +46,20 @@
       <li>The location of resizing toolchip is automatically moved to coordinates after resizing.</li>
       <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
       <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
+      <li>The <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
+      <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
+      <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+      <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+      <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed refering to the connection state. </li>
+      <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
+      <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
     </ul>
   </li>
   <li>Bug fixes
     <ul>
       <li>The toolchip during resizing can not be displayed on the left and top edge of the desktop. This bug was introduced in 4.103.</li>
       <li>Eterm look-feel: When a image file is randomly selected with the wallpaper, invalid file may be selected. </li>
+      <li>The help button of File-Log, File-Trasnfer, and Setup-Font dialog does not work well. This bug was introduced in 4.104.</li>
     </ul>
   </li>
 
@@ -71,7 +79,7 @@
       <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
       <li>Added help button on Additional settings dialog.</li>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in 4.102.</li>
+      <li>MACRO: The <a href="../macro/command/fileopen.html">fileopen</a> command does not cause an error when a file can not be opened. Reverted changes in 4.102.</li>
       <li>MACRO: When <a href="../macro/command/filetruncate.html">filetruncate</a> command does not cause an error when a file can not be opened, or file size can not be changed.</li>
     </ul>
   </li>
@@ -147,7 +155,7 @@
       <li>The language code(CodePage) of the "<a href="../menu/setup-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
       <li>MACRO: The macro file can support UTF-8 and UTF-16(with BOM) encoding.</li>
       <li>MACRO: The <a href="../macro/command/getfileattr.html">getfileattr</a> command can be based on the current directory same as other command.</li>
-      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
+      <li>MACRO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
     </ul>
   </li>
 
@@ -707,7 +715,7 @@
       <li>YMODEM: When the received file information contains only a file name, an end of the file name is broken.</li>
       <li>YMODEM: When the received file information does not include the file size, the file data can not be recorded well.</li>
       <li>The setting value of the <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> will not display well.</li>
-      <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> marco command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
+      <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> macro command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
       <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be re-sizable.</li>
     </ul>
   </li>
@@ -1015,7 +1023,7 @@
           <li>added the 4th argument(current directory) at the <a href="../macro/command/exec.html">exec</a> command.</li>
           <li>The '<a href="../macro/command/show.html">show</a> 1' command brings the macro window to the top.</li>
           <li>The <a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/inputbox.html">inputbox</a> and <a href="../macro/command/listbox.html">listbox</a> commands bring the macro dialog to the top.</li>
-          <li>The <a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> and <a href="../marco/command/waitregex.html">waitregex</a> commands can wait an empty strings.</li>
+          <li>The <a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> and <a href="../macro/command/waitregex.html">waitregex</a> commands can wait an empty strings.</li>
           <li>When the <a href="../macro/command/waitregex.html">waitregex</a> command matches some parameters at the same time, the first matched parameter is selected.</li>
         </ul></li>
     </ul>
@@ -1033,8 +1041,8 @@
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
       <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
       <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
-      <li>MARCO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
-      <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
+      <li>MACRO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
+      <li>MACRO: The box-style macro command can not show the dialog position well on the multi display.</li>
       <li>MACRO: The <a href="../macro/command/wait.html">wait</a> and <a href="../macro/command/waitln.html">waitln</a> command can not detect the right string.(ex. wait "aab" does not work against "aaab")</li>
     </ul>
   </li>
@@ -3214,6 +3222,9 @@ SYNOPSIS:
       <li>The same messages may be included on MessageBox displaying.</li>
       <li>When the network is disconnected from SSH server side, an application fault may be occurred while known_hosts dialog is shown.</li>
       <li>SSH1: The <a href="../commandline/ttssh.html#nosecuritywarning">/nosecuritywarning</a> option does not work well.</li>
+      <li>The problem is improved in the user authentication dialog that the delay occurs when the focus is moved from the user name to passphrase by using TAB key after entering the user name.</li>
+      <li>When the user name is left blank in the user authentication dialog, the focus may not be moved from the user name to the pull-down menu on the right side with TAB key.</li>
+      <li>Fixed a port forwarding issue that closes the client connection before completing all data transmission.</li>
     </ul>
   </li>
 </ul>
@@ -3236,11 +3247,11 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <!--li>Misc
+  <li>Misc
     <ul>
-      <li></li>
+      <li>upgraded OpenSSL to 1.0.2t.</li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_2.89">2019.06.15 (Ver 2.89)</h3>

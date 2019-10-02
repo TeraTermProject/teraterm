@@ -30,7 +30,7 @@
 /* TERATERM.EXE, VT window */
 
 #ifdef __cplusplus
-
+#include "tipwin.h"
 #include "tmfc.h"
 #include "unicode_test.h"
 #include "tipwin.h"
@@ -72,6 +72,11 @@ private:
   int CtrlKeyState;			// 0:ŠJn/1:‰Ÿ‚·/2:—£‚·/3:‰Ÿ‚·(•\¦ó‘Ô)
   DWORD CtrlKeyDownTick;	// Å‰‚É‰Ÿ‚µ‚½tick
 #endif
+
+  // TipWin
+  CTipWin* TipWin;
+
+  LONG HelpId;
 
 public:
 	CVTWindow(HINSTANCE hInstance);

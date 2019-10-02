@@ -310,13 +310,27 @@ void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num)
 
 	channel = pvar->fwd_state.channels + local_channel_num;
 
-	if (channel->local_socket != INVALID_SOCKET) {
-		shutdown(channel->local_socket, 1);
-	}
 	channel->status |= FWD_CLOSED_REMOTE_IN;
-	if ((channel->status & FWD_CLOSED_REMOTE_OUT) == FWD_CLOSED_REMOTE_OUT) {
-		closed_local_connection(pvar, local_channel_num);
-		FWD_free_channel(pvar, local_channel_num);
+
+	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH_MSG_CHANNEL_EOF receive. channel: %d", __FUNCTION__, local_channel_num);
+
+	if (channel->writebuf.datalen == 0) {
+		// クライアントへ送るデータが残っていない場合はコネクションを shutdown する
+		logprintf(LOG_LEVEL_VERBOSE,
+		          "%s: shutdown local socket. channel: %d", __FUNCTION__, local_channel_num);
+		if (channel->local_socket != INVALID_SOCKET) {
+			shutdown(channel->local_socket, 1);
+		}
+		if ((channel->status & FWD_CLOSED_REMOTE_OUT) == FWD_CLOSED_REMOTE_OUT) {
+			closed_local_connection(pvar, local_channel_num);
+			FWD_free_channel(pvar, local_channel_num);
+		}
+	}
+	else {
+		// バッファにデータが残っている場合はここでは shutdown 出来ない
+		// write_local_connection_buffer() でデータがすべて送り終わった時に shutdown が行われる
+		logprintf(LOG_LEVEL_VERBOSE, "%s: buffer not empty. channel: %d, remained data length: %d",
+		          __FUNCTION__, local_channel_num, channel->writebuf.datalen);
 	}
 }
 
@@ -659,10 +673,29 @@ static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
 {
 	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
+	if (channel->writebuf.datalen == 0) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s: write buffer is empty. channel: %d", __FUNCTION__, channel_num);
+		return;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "%s: remained data length: %d, channel: %d", __FUNCTION__,
+	          channel->writebuf.datalen, channel_num);
+
 	if ((channel->status & FWD_BOTH_CONNECTED) == FWD_BOTH_CONNECTED) {
 		if (!UTIL_sock_write_more
 			(pvar, &channel->writebuf, channel->local_socket)) {
 			channel_error(pvar, "writing", channel_num, WSAGetLastError());
+		}
+		if (channel->writebuf.datalen == 0 && (channel->status & FWD_CLOSED_REMOTE_IN) == FWD_CLOSED_REMOTE_IN) {
+			// クライアントへのデータがすべて送り終わっており、リモートからの EOF を受信済みならば
+			// クライアントへのコネクションを shutdown する (送信方向のみ)
+			logprintf(LOG_LEVEL_VERBOSE,
+				  "%s: shutdown local socket. channel: %d", __FUNCTION__, channel_num);
+			shutdown(channel->local_socket, 1);
+			if ((channel->status & FWD_CLOSED_REMOTE_OUT) == FWD_CLOSED_REMOTE_OUT) {
+				closed_local_connection(pvar, channel_num);
+				FWD_free_channel(pvar, channel_num);
+			}
 		}
 	}
 }

@@ -43,6 +43,7 @@
 #include "tt_res.h"
 #include "ftdlg.h"
 #include "teraterml.h"
+#include "helpid.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
@@ -216,7 +217,7 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			ChangeButton(! Pause);
 			return TRUE;
 		case IDC_TRANSHELP:
-			::PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
+			::PostMessage(fv->HMainWin,WM_USER_DLGHELP2,HlpFileSend,0);
 			return TRUE;
 		default:
 			return (TTCDialog::OnCommand(wParam,lParam));

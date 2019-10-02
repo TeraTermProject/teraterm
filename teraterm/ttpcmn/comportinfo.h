@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * Copyright (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,44 +26,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ttlib.h"
+#pragma once
 
-/* TERATERM.EXE, TTSET interface */
+#include <windows.h>	// for WORD
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef void (PASCAL *PReadIniFile)
-  (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PWriteIniFile)
-  (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PReadKeyboardCnf)
-  (PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
-typedef void (PASCAL *PCopyHostList)
-  (PCHAR IniSrc, PCHAR IniDest);
-typedef void (PASCAL *PAddHostToList)
-  (PCHAR FName, PCHAR Host);
-typedef void (PASCAL *PParseParam)
-  (PCHAR Param, PTTSet ts, PCHAR DDETopic);
-typedef void (PASCAL *PCopySerialList)
-  (PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
-typedef void (PASCAL *PAddValueToList)
-  (PCHAR FName, PCHAR Host, PCHAR section, PCHAR key, int MaxList);
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
 
-extern PReadIniFile ReadIniFile;
-extern PWriteIniFile WriteIniFile;
-extern PReadKeyboardCnf ReadKeyboardCnf;
-extern PCopyHostList CopyHostList;
-extern PAddHostToList AddHostToList;
-extern PParseParam ParseParam;
-extern PCopySerialList CopySerialList;
-extern PAddValueToList AddValueToList;
+typedef struct {
+	wchar_t *port_name;			// É|Å[Égñº
+	int port_no;				// 0..128(9x)/255(xp)
+	wchar_t *friendly_name;
+	wchar_t *property;
+} ComPortInfo_t;
 
-/* proto types */
-BOOL LoadTTSET();
-void FreeTTSET();
-
-int PASCAL SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen);
+DllExport ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang);
+DllExport void WINAPI ComPortInfoFree(ComPortInfo_t *info, int count);
 
 #ifdef __cplusplus
 }
