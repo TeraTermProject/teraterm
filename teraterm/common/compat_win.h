@@ -67,6 +67,7 @@ typedef enum MONITOR_DPI_TYPE {
 #define OPENFILENAME_SIZE_VERSION_400A	76
 #endif
 
+extern BOOL(WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 extern BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
 extern DWORD(WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 												LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);

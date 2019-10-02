@@ -1074,17 +1074,100 @@ static BOOL isLogMeTTExist()
 
 void CVTWindow::InitMenu(HMENU *Menu)
 {
-	*Menu = LoadMenu(m_hInst,
-	                 MAKEINTRESOURCE(IDR_MENU));
-	char uimsg[MAX_UIMSG];
-	int ret;
+	static const DlgTextInfo MenuTextInfo[] = {
+		{ ID_FILE, "MENU_FILE" },
+		{ ID_EDIT, "MENU_EDIT" },
+		{ ID_SETUP, "MENU_SETUP" },
+		{ ID_CONTROL, "MENU_CONTROL" },
+		{ ID_HELPMENU, "MENU_HELP" },
+	};
+	static const DlgTextInfo FileMenuTextInfo[] = {
+		{ ID_FILE_NEWCONNECTION, "MENU_FILE_NEW" },
+		{ ID_FILE_DUPLICATESESSION, "MENU_FILE_DUPLICATE" },
+		{ ID_FILE_CYGWINCONNECTION, "MENU_FILE_GYGWIN" },
+		{ ID_FILE_LOG, "MENU_FILE_LOG" },
+		{ ID_FILE_COMMENTTOLOG, "MENU_FILE_COMMENTLOG" },
+		{ ID_FILE_VIEWLOG, "MENU_FILE_VIEWLOG" },
+		{ ID_FILE_SHOWLOGDIALOG, "MENU_FILE_SHOWLOGDIALOG" },
+		{ ID_FILE_SENDFILE, "MENU_FILE_SENDFILE" },
+		{ ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG" },
+		{ ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR" },
+		{ ID_FILE_LOGMEIN, "MENU_FILE_LOGMETT" },
+		{ ID_FILE_PRINT2, "MENU_FILE_PRINT" },
+		{ ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT" },
+		{ ID_FILE_EXIT, "MENU_FILE_EXIT" },
+		{ ID_FILE_EXITALL, "MENU_FILE_EXITALL" },
+		{ 9, "MENU_TRANS" },
+		{ ID_FILE_KERMITRCV, "MENU_TRANS_KERMIT_RCV" },
+		{ ID_FILE_KERMITGET, "MENU_TRANS_KERMIT_GET" },
+		{ ID_FILE_KERMITSEND, "MENU_TRANS_KERMIT_SEND" },
+		{ ID_FILE_KERMITFINISH, "MENU_TRANS_KERMIT_FINISH" },
+		{ ID_FILE_XRCV, "MENU_TRANS_X_RCV" },
+		{ ID_FILE_XSEND, "MENU_TRANS_X_SEND" },
+		{ ID_FILE_YRCV, "MENU_TRANS_Y_RCV" },
+		{ ID_FILE_YSEND, "MENU_TRANS_Y_SEND" },
+		{ ID_FILE_ZRCV, "MENU_TRANS_Z_RCV" },
+		{ ID_FILE_ZSEND, "MENU_TRANS_Z_SEND" },
+		{ ID_FILE_BPRCV, "MENU_TRANS_BP_RCV" },
+		{ ID_FILE_BPSEND, "MENU_TRANS_BP_SEND" },
+		{ ID_FILE_QVRCV, "MENU_TRANS_QV_RCV" },
+		{ ID_FILE_QVSEND, "MENU_TRANS_QV_SEND" },
+	};
+	static const DlgTextInfo EditMenuTextInfo[] = {
+		{ ID_EDIT_COPY2, "MENU_EDIT_COPY" },
+		{ ID_EDIT_COPYTABLE, "MENU_EDIT_COPYTABLE" },
+		{ ID_EDIT_PASTE2, "MENU_EDIT_PASTE" },
+		{ ID_EDIT_PASTECR, "MENU_EDIT_PASTECR" },
+		{ ID_EDIT_CLEARSCREEN, "MENU_EDIT_CLSCREEN" },
+		{ ID_EDIT_CLEARBUFFER, "MENU_EDIT_CLBUFFER" },
+		{ ID_EDIT_CANCELSELECT, "MENU_EDIT_CANCELSELECT" },
+		{ ID_EDIT_SELECTSCREEN, "MENU_EDIT_SELECTSCREEN" },
+		{ ID_EDIT_SELECTALL, "MENU_EDIT_SELECTALL" },
+	};
+	static const DlgTextInfo SetupMenuTextInfo[] = {
+		{ ID_SETUP_TERMINAL, "MENU_SETUP_TERMINAL" },
+		{ ID_SETUP_WINDOW, "MENU_SETUP_WINDOW" },
+		{ ID_SETUP_FONT, "MENU_SETUP_FONT" },
+		{ ID_SETUP_DLG_FONT, "MENU_SETUP_DIALOG_FONT" },
+		{ 2, "MENU_SETUP_FONT_SUBMENU" },
+		{ ID_SETUP_KEYBOARD, "MENU_SETUP_KEYBOARD" },
+		{ ID_SETUP_SERIALPORT, "MENU_SETUP_SERIALPORT" },
+		{ ID_SETUP_TCPIP, "MENU_SETUP_TCPIP" },
+		{ ID_SETUP_GENERAL, "MENU_SETUP_GENERAL" },
+		{ ID_SETUP_ADDITIONALSETTINGS, "MENU_SETUP_ADDITION" },
+		{ ID_SETUP_SAVE, "MENU_SETUP_SAVE" },
+		{ ID_SETUP_RESTORE, "MENU_SETUP_RESTORE" },
+		{ ID_OPEN_SETUP, "MENU_SETUP_OPENSETUP" },
+		{ ID_SETUP_LOADKEYMAP, "MENU_SETUP_LOADKEYMAP" },
+	};
+	static const DlgTextInfo ControlMenuTextInfo[] = {
+		{ ID_CONTROL_RESETTERMINAL, "MENU_CONTROL_RESET" },
+		{ ID_CONTROL_RESETREMOTETITLE, "MENU_CONTROL_RESETTITLE" },
+		{ ID_CONTROL_AREYOUTHERE, "MENU_CONTROL_AREYOUTHERE" },
+		{ ID_CONTROL_SENDBREAK, "MENU_CONTROL_SENDBREAK" },
+		{ ID_CONTROL_RESETPORT, "MENU_CONTROL_RESETPORT" },
+		{ ID_CONTROL_BROADCASTCOMMAND, "MENU_CONTROL_BROADCAST" },
+		{ ID_CONTROL_OPENTEK, "MENU_CONTROL_OPENTEK" },
+		{ ID_CONTROL_CLOSETEK, "MENU_CONTROL_CLOSETEK" },
+		{ ID_CONTROL_MACRO, "MENU_CONTROL_MACRO" },
+		{ ID_CONTROL_SHOW_MACRO, "MENU_CONTROL_SHOW_MACRO" },
+	};
+	static const DlgTextInfo HelpMenuTextInfo[] = {
+		{ ID_HELP_INDEX2, "MENU_HELP_INDEX" },
+		{ ID_HELP_ABOUT, "MENU_HELP_ABOUT" },
+	};
 
-	FileMenu = GetSubMenu(*Menu,ID_FILE);
+	HMENU hMenu = LoadMenu(m_hInst, MAKEINTRESOURCE(IDR_MENU));
+	*Menu = hMenu;
+
+	FileMenu = GetSubMenu(hMenu,ID_FILE);
 	TransMenu = GetSubMenu(FileMenu,ID_TRANSFER);
-	EditMenu = GetSubMenu(*Menu,ID_EDIT);
-	SetupMenu = GetSubMenu(*Menu,ID_SETUP);
-	ControlMenu = GetSubMenu(*Menu,ID_CONTROL);
-	HelpMenu = GetSubMenu(*Menu,ID_HELPMENU);
+	EditMenu = GetSubMenu(hMenu,ID_EDIT);
+	SetupMenu = GetSubMenu(hMenu,ID_SETUP);
+	ControlMenu = GetSubMenu(hMenu,ID_CONTROL);
+	HelpMenu = GetSubMenu(hMenu,ID_HELPMENU);
+
+	SetDlgMenuTexts(hMenu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
 
 	/* LogMeTT の存在を確認してメニューを追加する */
 	if (isLogMeTTExist()) {
@@ -1093,241 +1176,23 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		::InsertMenu(FileMenu, ID_FILE_PRINT2, MF_SEPARATOR, NULL, NULL);
 	}
 
-	GetMenuString(*Menu, ID_FILE, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_FILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_FILE, MF_BYPOSITION, ID_FILE, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_NEWCONNECTION, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_NEW", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_NEWCONNECTION, MF_BYCOMMAND, ID_FILE_NEWCONNECTION, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_DUPLICATESESSION, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_DUPLICATE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_DUPLICATESESSION, MF_BYCOMMAND, ID_FILE_DUPLICATESESSION, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_CYGWINCONNECTION, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_GYGWIN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_CYGWINCONNECTION, MF_BYCOMMAND, ID_FILE_CYGWINCONNECTION, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_LOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_LOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_LOG, MF_BYCOMMAND, ID_FILE_LOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_COMMENTTOLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_COMMENTLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_COMMENTTOLOG, MF_BYCOMMAND, ID_FILE_COMMENTTOLOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_VIEWLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_VIEWLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND, ID_FILE_VIEWLOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_SHOWLOGDIALOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_SHOWLOGDIALOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND, ID_FILE_SHOWLOGDIALOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_SENDFILE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_SENDFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_SENDFILE, MF_BYCOMMAND, ID_FILE_SENDFILE, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_REPLAYLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_REPLAYLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_REPLAYLOG, MF_BYCOMMAND, ID_FILE_REPLAYLOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_CHANGEDIR, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_CHANGEDIR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_CHANGEDIR, MF_BYCOMMAND, ID_FILE_CHANGEDIR, ts.UIMsg);
-	ret = GetMenuString(FileMenu, ID_FILE_LOGMEIN, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	if (ret != 0) {
-		get_lang_msg("MENU_FILE_LOGMETT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		ModifyMenu(FileMenu, ID_FILE_LOGMEIN, MF_BYCOMMAND, ID_FILE_LOGMEIN, ts.UIMsg);
-	}
-	GetMenuString(FileMenu, ID_FILE_PRINT2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_PRINT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_PRINT2, MF_BYCOMMAND, ID_FILE_PRINT2, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_DISCONNECT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_DISCONNECT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_DISCONNECT, MF_BYCOMMAND, ID_FILE_DISCONNECT, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_EXIT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_EXIT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_EXIT, MF_BYCOMMAND, ID_FILE_EXIT, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_EXITALL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_EXITALL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_EXITALL, MF_BYCOMMAND, ID_FILE_EXITALL, ts.UIMsg);
-
-	GetMenuString(FileMenu, 9, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_TRANS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, 9, MF_BYPOSITION, 9, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_KERMITRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITRCV, MF_BYCOMMAND, ID_FILE_KERMITRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_KERMITGET, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_GET", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITGET, MF_BYCOMMAND, ID_FILE_KERMITGET, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_KERMITSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITSEND, MF_BYCOMMAND, ID_FILE_KERMITSEND, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_KERMITFINISH, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_FINISH", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITFINISH, MF_BYCOMMAND, ID_FILE_KERMITFINISH, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_XRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_X_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_XRCV, MF_BYCOMMAND, ID_FILE_XRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_XSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_X_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_XSEND, MF_BYCOMMAND, ID_FILE_XSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_YRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Y_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_YRCV, MF_BYCOMMAND, ID_FILE_YRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_YSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Y_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_YSEND, MF_BYCOMMAND, ID_FILE_YSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_ZRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Z_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_ZRCV, MF_BYCOMMAND, ID_FILE_ZRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_ZSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Z_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_ZSEND, MF_BYCOMMAND, ID_FILE_ZSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_BPRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_BP_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_BPRCV, MF_BYCOMMAND, ID_FILE_BPRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_BPSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_BP_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_BPSEND, MF_BYCOMMAND, ID_FILE_BPSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_QVRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_QV_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_QVRCV, MF_BYCOMMAND, ID_FILE_QVRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_QVSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_QV_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_QVSEND, MF_BYCOMMAND, ID_FILE_QVSEND, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_EDIT, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_EDIT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_EDIT, MF_BYPOSITION, ID_EDIT, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_COPY2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_COPY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_COPY2, MF_BYCOMMAND, ID_EDIT_COPY2, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_COPYTABLE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_COPYTABLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_COPYTABLE, MF_BYCOMMAND, ID_EDIT_COPYTABLE, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_PASTE2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_PASTE2, MF_BYCOMMAND, ID_EDIT_PASTE2, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_PASTECR, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTECR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_PASTECR, MF_BYCOMMAND, ID_EDIT_PASTECR, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_CLEARSCREEN, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_CLSCREEN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_CLEARSCREEN, MF_BYCOMMAND, ID_EDIT_CLEARSCREEN, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_CLEARBUFFER, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_CLBUFFER", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_CLEARBUFFER, MF_BYCOMMAND, ID_EDIT_CLEARBUFFER, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_CANCELSELECT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_CANCELSELECT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_CANCELSELECT, MF_BYCOMMAND, ID_EDIT_CANCELSELECT, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_SELECTSCREEN, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_SELECTSCREEN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_SELECTSCREEN, MF_BYCOMMAND, ID_EDIT_SELECTSCREEN, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_SELECTALL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_SELECTALL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_SELECTALL, MF_BYCOMMAND, ID_EDIT_SELECTALL, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_SETUP, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_SETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_SETUP, MF_BYPOSITION, ID_SETUP, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_TERMINAL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_TERMINAL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_TERMINAL, MF_BYCOMMAND, ID_SETUP_TERMINAL, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_WINDOW, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_WINDOW", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_WINDOW, MF_BYCOMMAND, ID_SETUP_WINDOW, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_FONT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_FONT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_FONT, MF_BYCOMMAND, ID_SETUP_FONT, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_DLG_FONT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_DIALOG_FONT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_DLG_FONT, MF_BYCOMMAND, ID_SETUP_DLG_FONT, ts.UIMsg);
-	GetMenuString(SetupMenu, 2, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_SETUP_FONT_SUBMENU", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, 2, MF_BYPOSITION, 2, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_KEYBOARD, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_KEYBOARD", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_KEYBOARD, MF_BYCOMMAND, ID_SETUP_KEYBOARD, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_SERIALPORT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_SERIALPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_SERIALPORT, MF_BYCOMMAND, ID_SETUP_SERIALPORT, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_TCPIP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_TCPIP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_TCPIP, MF_BYCOMMAND, ID_SETUP_TCPIP, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_GENERAL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_GENERAL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_GENERAL, MF_BYCOMMAND, ID_SETUP_GENERAL, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_ADDITIONALSETTINGS, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_ADDITION", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_ADDITIONALSETTINGS, MF_BYCOMMAND, ID_SETUP_ADDITIONALSETTINGS, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_SAVE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_SAVE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_SAVE, MF_BYCOMMAND, ID_SETUP_SAVE, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_RESTORE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_RESTORE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_RESTORE, MF_BYCOMMAND, ID_SETUP_RESTORE, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_OPEN_SETUP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_OPENSETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_OPEN_SETUP, MF_BYCOMMAND, ID_OPEN_SETUP, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_LOADKEYMAP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_LOADKEYMAP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_LOADKEYMAP, MF_BYCOMMAND, ID_SETUP_LOADKEYMAP, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_CONTROL, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_CONTROL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_CONTROL, MF_BYPOSITION, ID_CONTROL, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_RESETTERMINAL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_RESET", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_RESETTERMINAL, MF_BYCOMMAND, ID_CONTROL_RESETTERMINAL, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_RESETREMOTETITLE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_RESETTITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_RESETREMOTETITLE, MF_BYCOMMAND, ID_CONTROL_RESETREMOTETITLE, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_AREYOUTHERE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_AREYOUTHERE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_AREYOUTHERE, MF_BYCOMMAND, ID_CONTROL_AREYOUTHERE, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_SENDBREAK, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_SENDBREAK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_SENDBREAK, MF_BYCOMMAND, ID_CONTROL_SENDBREAK, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_RESETPORT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_RESETPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_RESETPORT, MF_BYCOMMAND, ID_CONTROL_RESETPORT, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_BROADCASTCOMMAND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_BROADCAST", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_BROADCASTCOMMAND, MF_BYCOMMAND, ID_CONTROL_BROADCASTCOMMAND, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_OPENTEK, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_OPENTEK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_OPENTEK, MF_BYCOMMAND, ID_CONTROL_OPENTEK, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_CLOSETEK, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_CLOSETEK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_CLOSETEK, MF_BYCOMMAND, ID_CONTROL_CLOSETEK, ts.UIMsg);
-
-	GetMenuString(ControlMenu, ID_CONTROL_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_MACRO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND, ID_CONTROL_MACRO, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_SHOW_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_SHOW_MACRO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_SHOW_MACRO, MF_BYCOMMAND, ID_CONTROL_SHOW_MACRO, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_HELPMENU, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_HELP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_HELPMENU, MF_BYPOSITION, ID_HELPMENU, ts.UIMsg);
-	GetMenuString(HelpMenu, ID_HELP_INDEX2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_HELP_INDEX", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(HelpMenu, ID_HELP_INDEX2, MF_BYCOMMAND, ID_HELP_INDEX2, ts.UIMsg);
-	GetMenuString(HelpMenu, ID_HELP_ABOUT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_HELP_ABOUT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(HelpMenu, ID_HELP_ABOUT, MF_BYCOMMAND, ID_HELP_ABOUT, ts.UIMsg);
+	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
+		TCHAR uimsg[MAX_UIMSG];
 		WinMenu = CreatePopupMenu();
-		get_lang_msg("MENU_WINDOW", ts.UIMsg, sizeof(ts.UIMsg),
-		             "&Window", ts.UILanguageFile);
-		::InsertMenu(*Menu,ID_HELPMENU,
-		             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-		             (UINT_PTR)WinMenu, ts.UIMsg);
+		get_lang_msgT("MENU_WINDOW", uimsg, _countof(uimsg),
+					  _T("&Window"), ts.UILanguageFile);
+		::InsertMenu(hMenu, ID_HELPMENU,
+			MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+			(UINT_PTR)WinMenu, uimsg);
 	}
 
-	TTXModifyMenu(*Menu); /* TTPLUG */
+	TTXModifyMenu(hMenu); /* TTPLUG */
 }
 
 void CVTWindow::InitMenuPopup(HMENU SubMenu)
@@ -1502,17 +1367,13 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 // added ConfirmPasteMouseRButton (2007.3.17 maya)
 void CVTWindow::InitPasteMenu(HMENU *Menu)
 {
-	char uimsg[MAX_UIMSG];
-
+	static const DlgTextInfo MenuTextInfo[] = {
+		{ ID_EDIT_PASTE2, "MENU_EDIT_PASTE" },
+		{ ID_EDIT_PASTECR, "MENU_EDIT_PASTECR" },
+	};
 	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_PASTEMENU));
-
-	GetMenuString(*Menu, ID_EDIT_PASTE2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_EDIT_PASTE2, MF_BYCOMMAND, ID_EDIT_PASTE2, ts.UIMsg);
-	GetMenuString(*Menu, ID_EDIT_PASTECR, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTECR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_EDIT_PASTECR, MF_BYCOMMAND, ID_EDIT_PASTECR, ts.UIMsg);
+	SetDlgMenuTexts(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
 }
 
 void CVTWindow::ResetSetup()

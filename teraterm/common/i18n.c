@@ -127,10 +127,10 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 	size_t i;
 	assert(hDlgWnd != NULL);
 	assert(infoCount > 0);
-	if (pGetPrivateProfileStringW == NULL) {
-		// ANSI
-		for (i = 0 ; i < infoCount; i++) {
-			const char *key = infos[i].key;
+	for (i = 0 ; i < infoCount; i++) {
+		const char *key = infos[i].key;
+		if (pGetPrivateProfileStringW == NULL) {
+			// ANSI
 			char uimsg[MAX_UIMSG];
 			GetI18nStr(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
 			if (uimsg[0] != '\0') {
@@ -146,10 +146,8 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 				(void)r;
 			}
 		}
-	} else {
-		// UNICODE
-		for (i = 0 ; i < infoCount; i++) {
-			const char *key = infos[i].key;
+		else {
+			// UNICODE
 			wchar_t uimsg[MAX_UIMSG];
 			GetI18nStrW(section, key, uimsg, sizeof(uimsg), L"", UILanguageFile);
 			if (uimsg[0] != L'\0') {
@@ -168,20 +166,37 @@ void WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 	}
 }
 
-void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu,
-					const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *infos, size_t infoCount,
+						   const char *UILanguageFile)
 {
 	size_t i;
 	for (i = 0; i < infoCount; i++) {
 		const int nIDDlgItem = infos[i].nIDDlgItem;
 		const char *key = infos[i].key;
-		TCHAR uimsg[MAX_UIMSG];
-		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
-		if (uimsg[0] != '\0') {
-			if (nIDDlgItem < 1000) {
-				ModifyMenu(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
-			} else {
-				ModifyMenu(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+		if (pGetPrivateProfileStringW == NULL) {
+			// ANSI
+			char uimsg[MAX_UIMSG];
+			GetI18nStr(section, key, uimsg, sizeof(uimsg), "", UILanguageFile);
+			if (uimsg[0] != '\0') {
+				if (nIDDlgItem < 1000) {
+					ModifyMenuA(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
+				}
+				else {
+					ModifyMenuA(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+				}
+			}
+		}
+		else {
+			// UNICODE
+			wchar_t uimsg[MAX_UIMSG];
+			GetI18nStrW(section, key, uimsg, sizeof(uimsg), L"", UILanguageFile);
+			if (uimsg[0] != '\0') {
+				if (nIDDlgItem < 1000) {
+					pModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
+				}
+				else {
+					pModifyMenuW(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+				}
 			}
 		}
 	}

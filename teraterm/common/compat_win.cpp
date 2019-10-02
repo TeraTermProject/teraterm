@@ -34,6 +34,7 @@
 
 #include "dllutil.h"
 
+BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL (WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
@@ -62,6 +63,7 @@ static const APIInfo Lists_user32[] = {
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
 	{ "SetWindowTextW", (void **)&pSetWindowTextW },
+	{ "ModifyMenuW", (void **)&pModifyMenuW },
 	{ NULL, NULL },
 };
 
