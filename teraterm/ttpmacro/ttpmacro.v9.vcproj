@@ -424,10 +424,6 @@
 			Filter="c"
 			>
 			<File
-				RelativePath="..\common\i18n.c"
-				>
-			</File>
-			<File
 				RelativePath="ttl.c"
 				>
 			</File>
