@@ -72,13 +72,12 @@ public:
 	VOID SetVisible(BOOL bVisible);
 	BOOL IsVisible();
 private:
-	POINT pts;
 	UINT_PTR timerid;
 	TipWin* tWin;
 	HINSTANCE hInstance;
 	TCHAR class_name[32];
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-	VOID CalcStrRect(VOID);
+	VOID CalcStrRect();
 	ATOM RegisterClass();
 	BOOL UnregisterClass();
 	BOOL IsClassRegistered();
