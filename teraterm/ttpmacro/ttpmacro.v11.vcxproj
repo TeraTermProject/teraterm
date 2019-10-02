@@ -130,7 +130,6 @@
     <ClCompile Include="..\common\dlglib_cpp.cpp" />
     <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\common\dllutil.cpp" />
-    <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\tmfc.cpp" />
     <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />

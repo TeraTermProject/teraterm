@@ -750,58 +750,30 @@ private:
             return Dialog::dispatch(message, wParam, lParam);
         }
         virtual bool onInitDialog() {
-            char uimsg[MAX_UIMSG], uitmp[MAX_UIMSG];
+            const static DlgTextInfo text_info[] = {
+                { 0, "DLG_OTHER_TITLE" },
+                { IDC_GRP_COMMON, "DLG_OTHER_COMMON" },
+                { IDC_TIMEOUT_LABEL, "DLG_OTHER_TIMEOUT" },
+                { IDC_TIMEOUT_SECONDS, "DLG_OTHER_SECOND" },
+                { IDC_LOGFILE_LABEL, "DLG_OTHER_LOG" },
+                { IDC_REFER, "DLG_OTHER_REFER" },
+                { IDC_GRP_SOCKS, "DLG_OTHER_SOCKS" },
+                { IDC_RESOLVE_LABEL, "DLG_OTHER_RESOLV" },
+                { IDC_GRP_TELNET, "DLG_OTHER_TELNET" },
+                { IDC_HOSTNAME_LABEL, "DLG_OTHER_HOST" },
+                { IDC_USERNAME_LABEL, "DLG_OTHER_USER" },
+                { IDC_PASSWORD_LABEL, "DLG_OTHER_PASS" },
+                { IDC_CONNECTED_LABEL, "DLG_OTHER_CONNECT" },
+                { IDC_ERROR_LABEL, "DLG_OTHER_ERROR" },
+//              { IDOK, "BTN_OK" },
+//              { IDCANCEL, "BTN_CANCEL" },
+            };
+            char uimsg[MAX_UIMSG];
 
             Dialog::onInitDialog();
 
-            GetWindowText(uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_TITLE", uimsg, sizeof(uimsg), uitmp);
-            SetWindowText(uimsg);
-            GetDlgItemText(IDC_GRP_COMMON, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_COMMON", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_GRP_COMMON, uimsg);
-            GetDlgItemText(IDC_TIMEOUT_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_TIMEOUT", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_TIMEOUT_LABEL, uimsg);
-            GetDlgItemText(IDC_TIMEOUT_SECONDS, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_SECOND", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_TIMEOUT_SECONDS, uimsg);
-            GetDlgItemText(IDC_LOGFILE_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_LOG", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_LOGFILE_LABEL, uimsg);
-            GetDlgItemText(IDC_REFER, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_REFER", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_REFER, uimsg);
-            GetDlgItemText(IDC_GRP_SOCKS, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_SOCKS", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_GRP_SOCKS, uimsg);
-            GetDlgItemText(IDC_RESOLVE_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_RESOLV", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_RESOLVE_LABEL, uimsg);
-            GetDlgItemText(IDC_GRP_TELNET, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_TELNET", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_GRP_TELNET, uimsg);
-            GetDlgItemText(IDC_HOSTNAME_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_HOST", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_HOSTNAME_LABEL, uimsg);
-            GetDlgItemText(IDC_USERNAME_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_USER", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_USERNAME_LABEL, uimsg);
-            GetDlgItemText(IDC_PASSWORD_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_PASS", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_PASSWORD_LABEL, uimsg);
-            GetDlgItemText(IDC_CONNECTED_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_CONNECT", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_CONNECTED_LABEL, uimsg);
-            GetDlgItemText(IDC_ERROR_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_OTHER_ERROR", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_ERROR_LABEL, uimsg);
-            GetDlgItemText(IDOK, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDOK, uimsg);
-            GetDlgItemText(IDCANCEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDCANCEL, uimsg);
+            HWND hWnd = (HWND)this;
+			SetI18DlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 
             host = GetDlgItem(IDC_HOSTNAME);
             user = GetDlgItem(IDC_USERNAME);
@@ -910,40 +882,24 @@ private:
             return Dialog::dispatch(message, wParam, lParam);
         }
         virtual bool onInitDialog() {
-            char uimsg[MAX_UIMSG], uitmp[MAX_UIMSG];
+            char uimsg[MAX_UIMSG];
 
             Dialog::onInitDialog();
 
-            GetWindowText(uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_TITLE", uimsg, sizeof(uimsg), uitmp);
-            SetWindowText(uimsg);
-            GetDlgItemText(IDC_URL_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_URL", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_URL_LABEL, uimsg);
-            GetDlgItemText(IDC_TYPE_LEBEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_TYPE", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_TYPE_LEBEL, uimsg);
-            GetDlgItemText(IDC_HOSTNAME_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_HOST", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_HOSTNAME_LABEL, uimsg);
-            GetDlgItemText(IDC_PORT_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_PORT", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_PORT_LABEL, uimsg);
-            GetDlgItemText(IDC_USERNAME_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_USER", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_USERNAME_LABEL, uimsg);
-            GetDlgItemText(IDC_PASSWORD_LABEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_PASS", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_PASSWORD_LABEL, uimsg);
-            GetDlgItemText(IDC_OPTIONS, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_OTHER", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDC_OPTIONS, uimsg);
-            GetDlgItemText(IDOK, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDOK, uimsg);
-            GetDlgItemText(IDCANCEL, uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uitmp);
-            SetDlgItemText(IDCANCEL, uimsg);
+            const static DlgTextInfo text_info[] = {
+                { 0, "DLG_SETUP_TITLE" },
+                { IDC_URL_LABEL, "DLG_SETUP_URL" },
+                { IDC_TYPE_LEBEL, "DLG_SETUP_TYPE" },
+                { IDC_HOSTNAME_LABEL, "DLG_SETUP_HOST" },
+                { IDC_PORT_LABEL, "DLG_SETUP_PORT" },
+                { IDC_USERNAME_LABEL, "DLG_SETUP_USER" },
+                { IDC_PASSWORD_LABEL, "DLG_SETUP_PASS" },
+                { IDC_OPTIONS, "DLG_SETUP_OTHER" },
+//              { IDOK, "BTN_OK" },
+//              { IDCANCEL, "BTN_CANCEL" },
+            };
+			HWND hWnd = HWND(this);		// ‚¤‚Ü‚­“®‚©‚È‚¢?
+			SetI18DlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 
             url  <<= GetDlgItem(IDC_URL);
             type <<= GetDlgItem(IDC_TYPE);

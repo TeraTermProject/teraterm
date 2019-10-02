@@ -1285,6 +1285,21 @@ LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 								   LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_HOST_TITLE" },
+		{ IDC_HOSTNAMELABEL, "DLG_HOST_TCPIPHOST" },
+		{ IDC_HISTORY, "DLG_HOST_TCPIPHISTORY" },
+		{ IDC_SERVICELABEL, "DLG_HOST_TCPIPSERVICE" },
+		{ IDC_HOSTOTHER, "DLG_HOST_TCPIPOTHER" },
+		{ IDC_HOSTTCPPORTLABEL, "DLG_HOST_TCPIPPORT" },
+		{ IDC_SSH_VERSION_LABEL, "DLG_HOST_TCPIPSSHVERSION" },
+		{ IDC_HOSTTCPPROTOCOLLABEL, "DLG_HOST_TCPIPPROTOCOL" },
+		{ IDC_HOSTSERIAL, "DLG_HOST_SERIAL" },
+		{ IDC_HOSTCOMLABEL, "DLG_HOST_SERIALPORT" },
+		{ IDC_HOSTHELP, "DLG_HOST_HELP" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
 	static char *ssh_version[] = {"SSH1", "SSH2", NULL};
 	PGetHNRec GetHNRec;
 	char EntName[128];
@@ -1294,7 +1309,6 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	static char *ComPortDesc[MAXCOMPORT];
 	int comports;
 	BOOL Ok;
-	char uimsg[MAX_UIMSG];
 	static HWND hwndHostname     = NULL; // HOSTNAME dropdown
 	static HWND hwndHostnameEdit = NULL; // Edit control on HOSTNAME dropdown
 
@@ -1303,45 +1317,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		GetHNRec = (PGetHNRec) lParam;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTNAMELABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPHOST", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTNAMELABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HISTORY, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPHISTORY", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HISTORY, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_SERVICELABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPSERVICE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_SERVICELABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTOTHER, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPOTHER", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTOTHER, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTTCPPORTLABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPPORT", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTTCPPORTLABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_SSH_VERSION_LABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPSSHVERSION", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_SSH_VERSION_LABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTTCPPROTOCOLLABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_TCPIPPROTOCOL", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTTCPPROTOCOLLABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTSERIAL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_SERIAL", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTSERIAL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTCOMLABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_SERIALPORT", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTCOMLABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTHELP, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOST_HELP", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTHELP, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-		SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		// ホストヒストリのチェックボックスを追加 (2005.10.21 yutaka)
 		if (pvar->ts->HistoryList > 0) {
@@ -2386,17 +2362,12 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 static void init_about_dlg(PTInstVar pvar, HWND dlg)
 {
 	char buf[1024];
-	char uimsg[MAX_UIMSG];
-
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_ABOUT_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_ABOUT_FP_HASH_ALGORITHM", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_ABOUT_TITLE" },
+		{ IDC_FP_HASH_ALG, "DLG_ABOUT_FP_HASH_ALGORITHM" },
+		{ IDOK, "BTN_OK" },
+	};
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
@@ -2642,138 +2613,64 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	HWND hostkeyRotationControlList = GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_COMBO);
 	int i;
 	int ch;
-	char uimsg[MAX_UIMSG];
-	char *rotationItem[SSH_UPDATE_HOSTKEYS_MAX] = {
+	static const char *rotationItem[SSH_UPDATE_HOSTKEYS_MAX] = {
 		"No",
 		"Yes",
 		"Ask",
 	};
-	char *rotationItemKey[SSH_UPDATE_HOSTKEYS_MAX] = {
+	static const char *rotationItemKey[SSH_UPDATE_HOSTKEYS_MAX] = {
 		"DLG_SSHSETUP_HOSTKEY_ROTATION_NO",
 		"DLG_SSHSETUP_HOSTKEY_ROTATION_YES",
 		"DLG_SSHSETUP_HOSTKEY_ROTATION_ASK",
 	};
 
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_COMPRESSLABEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_COMPRESSLABEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_COMPRESSNONE, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS_NONE", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_COMPRESSNONE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_COMPRESSHIGH, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS_HIGHEST", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_COMPRESSHIGH, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_COMPRESSNOTE, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS_NOTE", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_COMPRESSNOTE, pvar->ts->UIMsg);
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_SSHSETUP_TITLE" },
+		{ IDC_COMPRESSLABEL, "DLG_SSHSETUP_COMPRESS" },
+		{ IDC_COMPRESSNONE, "DLG_SSHSETUP_COMPRESS_NONE" },
+		{ IDC_COMPRESSHIGH, "DLG_SSHSETUP_COMPRESS_HIGHEST" },
+		{ IDC_COMPRESSNOTE, "DLG_SSHSETUP_COMPRESS_NOTE" },
 
-	GetDlgItemText(dlg, IDC_CIPHERORDER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_CIPHERORDER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHMOVECIPHERUP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_UP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHMOVECIPHERUP, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHMOVECIPHERDOWN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_DOWN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHMOVECIPHERDOWN, pvar->ts->UIMsg);
+		{ IDC_CIPHERORDER, "DLG_SSHSETUP_CIPHER" },
+		{ IDC_SSHMOVECIPHERUP, "DLG_SSHSETUP_CIPHER_UP" },
+		{ IDC_SSHMOVECIPHERDOWN, "DLG_SSHSETUP_CIPHER_DOWN" },
 
-	GetDlgItemText(dlg, IDC_KEX_ORDER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_KEX", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_KEX_ORDER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHKEX_MOVEUP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_KEX_UP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHKEX_MOVEUP, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHKEX_MOVEDOWN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_KEX_DOWN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHKEX_MOVEDOWN, pvar->ts->UIMsg);
+		{ IDC_KEX_ORDER, "DLG_SSHSETUP_KEX" },
+		{ IDC_SSHKEX_MOVEUP, "DLG_SSHSETUP_KEX_UP" },
+		{ IDC_SSHKEX_MOVEDOWN, "DLG_SSHSETUP_KEX_DOWN" },
 
-	GetDlgItemText(dlg, IDC_HOST_KEY_ORDER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_HOST_KEY_ORDER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEUP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_UP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEUP, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEDOWN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_DOWN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEDOWN, pvar->ts->UIMsg);
+		{ IDC_HOST_KEY_ORDER, "DLG_SSHSETUP_HOST_KEY" },
+		{ IDC_SSHHOST_KEY_MOVEUP, "DLG_SSHSETUP_HOST_KEY_UP" },
+		{ IDC_SSHHOST_KEY_MOVEDOWN, "DLG_SSHSETUP_HOST_KEY_DOWN" },
 
-	GetDlgItemText(dlg, IDC_MAC_ORDER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_MAC", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_MAC_ORDER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHMAC_MOVEUP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_MAC_UP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHMAC_MOVEUP, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHMAC_MOVEDOWN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_MAC_DOWN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHMAC_MOVEDOWN, pvar->ts->UIMsg);
+		{ IDC_MAC_ORDER, "DLG_SSHSETUP_MAC" },
+		{ IDC_SSHMAC_MOVEUP, "DLG_SSHSETUP_MAC_UP" },
+		{ IDC_SSHMAC_MOVEDOWN, "DLG_SSHSETUP_MAC_DOWN" },
 
-	GetDlgItemText(dlg, IDC_COMP_ORDER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_COMP_ORDER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHCOMP_MOVEUP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMP_UP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHCOMP_MOVEUP, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHCOMP_MOVEDOWN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_COMP_DOWN", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHCOMP_MOVEDOWN, pvar->ts->UIMsg);
+		{ IDC_COMP_ORDER, "DLG_SSHSETUP_COMP" },
+		{ IDC_SSHCOMP_MOVEUP, "DLG_SSHSETUP_COMP_UP" },
+		{ IDC_SSHCOMP_MOVEDOWN, "DLG_SSHSETUP_COMP_DOWN" },
 
-	GetDlgItemText(dlg, IDC_KNOWNHOSTS, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_KNOWNHOST", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_KNOWNHOSTS, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_CHOOSEREADWRITEFILE, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_KNOWNHOST_RW", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_CHOOSEREADWRITEFILE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_CHOOSEREADONLYFILE, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_KNOWNHOST_RO", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_CHOOSEREADONLYFILE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_HEARTBEATLABEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_HEARTBEAT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_HEARTBEATLABEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_HEARTBEATLABEL2, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_HEARTBEAT_UNIT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_HEARTBEATLABEL2, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_REMEMBERPASSWORD, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_PASSWORD", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_REMEMBERPASSWORD, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_FORWARDAGENT, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_FORWARDAGENT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_FORWARDAGENTCONFIRM, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENTCONFIRM", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_FORWARDAGENTCONFIRM, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_FORWARDAGENTNOTIFY, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENTNOTIFY", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_FORWARDAGENTNOTIFY, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_VERIFYHOSTKEYDNS, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_VERIFYHOSTKEYDNS", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_VERIFYHOSTKEYDNS, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_NOTICEBANNER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_NOTICE", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_NOTICEBANNER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
-	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHSETUP_HELP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHSETUP_HELP, pvar->ts->UIMsg);
+		{ IDC_KNOWNHOSTS, "DLG_SSHSETUP_KNOWNHOST" },
+		{ IDC_CHOOSEREADWRITEFILE, "DLG_SSHSETUP_KNOWNHOST_RW" },
+		{ IDC_CHOOSEREADONLYFILE, "DLG_SSHSETUP_KNOWNHOST_RO" },
+		{ IDC_HEARTBEATLABEL, "DLG_SSHSETUP_HEARTBEAT" },
+		{ IDC_HEARTBEATLABEL2, "DLG_SSHSETUP_HEARTBEAT_UNIT" },
+		{ IDC_REMEMBERPASSWORD, "DLG_SSHSETUP_PASSWORD" },
+		{ IDC_FORWARDAGENT, "DLG_SSHSETUP_FORWARDAGENT" },
+		{ IDC_FORWARDAGENTCONFIRM, "DLG_SSHSETUP_FORWARDAGENTCONFIRM" },
+		{ IDC_FORWARDAGENTNOTIFY, "DLG_SSHSETUP_FORWARDAGENTNOTIFY" },
+		{ IDC_VERIFYHOSTKEYDNS, "DLG_SSHSETUP_VERIFYHOSTKEYDNS" },
+		{ IDC_NOTICEBANNER, "DLG_SSHSETUP_NOTICE" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDC_SSHSETUP_HELP, "BTN_HELP" },
 
-	GetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_HOSTKEY_ROTATION", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, pvar->ts->UIMsg);
-
-	GetDlgItemText(dlg, IDC_LOGLEVEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_LOGLEVEL", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_LOGLEVEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_LOGLEVEL_UNIT, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_LOGLEVEL_UNIT", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_LOGLEVEL_UNIT, pvar->ts->UIMsg);
-
+		{ IDC_HOSTKEY_ROTATION_STATIC, "DLG_SSHSETUP_HOSTKEY_ROTATION" },
+		{ IDC_LOGLEVEL, "DLG_SSHSETUP_LOGLEVEL" },
+		{ IDC_LOGLEVEL_UNIT, "DLG_SSHSETUP_LOGLEVEL_UNIT" },
+	};
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	SendMessage(compressionControl, TBM_SETRANGE, TRUE, MAKELONG(0, 9));
 	SendMessage(compressionControl, TBM_SETPOS, TRUE,
@@ -4259,45 +4156,22 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_KEYTYPE, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_KEYTYPE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_KEYTYPE, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_KEYBITS_LABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_BITS", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_KEYBITS_LABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_KEY_LABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_PASSPHRASE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_KEY_LABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_CONFIRM_LABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_PASSPHRASE2", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_CONFIRM_LABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_COMMENT_LABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_COMMENT", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_COMMENT_LABEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_SAVE_PUBLIC_KEY, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_SAVEPUBLIC", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_SAVE_PUBLIC_KEY, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_SAVE_PRIVATE_KEY, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_SAVEPRIVATE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_SAVE_PRIVATE_KEY, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_GENERATE", pvar, uimsg);
-		SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_CLOSE", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_SSHKEYGENSETUP_HELP, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_HELP", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_SSHKEYGENSETUP_HELP, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_KDF", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_ROUNDS", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, pvar->ts->UIMsg);
+		const static DlgTextInfo text_info[] = {
+			{ 0, "DLG_KEYGEN_TITLE" },
+			{ IDC_KEYTYPE, "DLG_KEYGEN_KEYTYPE" },
+			{ IDC_KEYBITS_LABEL, "DLG_KEYGEN_BITS" },
+			{ IDC_KEY_LABEL, "DLG_KEYGEN_PASSPHRASE" },
+			{ IDC_CONFIRM_LABEL, "DLG_KEYGEN_PASSPHRASE2" },
+			{ IDC_COMMENT_LABEL, "DLG_KEYGEN_COMMENT" },
+			{ IDC_SAVE_PUBLIC_KEY, "DLG_KEYGEN_SAVEPUBLIC" },
+			{ IDC_SAVE_PRIVATE_KEY, "DLG_KEYGEN_SAVEPRIVATE" },
+			{ IDOK, "DLG_KEYGEN_GENERATE" },
+			{ IDCANCEL, "BTN_CLOSE" },
+			{ IDC_BCRYPT_KDF_CHECK, "DLG_KEYGEN_BCRYPT_KDF" },
+			{ IDC_BCRYPT_KDF_ROUNDS_LABEL, "DLG_KEYGEN_BCRYPT_ROUNDS" },
+			{ IDC_SSHKEYGENSETUP_HELP, "BTN_HELP" },
+		};
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		init_password_control(pvar, dlg, IDC_KEY_EDIT, NULL);
 		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT, NULL);
