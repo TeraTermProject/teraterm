@@ -1343,20 +1343,13 @@ void AUTH_advance_to_next_cred(PTInstVar pvar)
 
 static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	char uimsg[MAX_UIMSG];
-
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_TIS_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHAUTHBANNER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_TIS_BANNER", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHAUTHBANNER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
-	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_TIS_TITLE" },
+		{ IDC_SSHAUTHBANNER, "DLG_TIS_BANNER" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, NULL);

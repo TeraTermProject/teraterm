@@ -1726,8 +1726,17 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 										   LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_UNKNOWNHOST_TITLE" },
+		{ IDC_HOSTWARNING, "DLG_UNKNOWNHOST_WARNING" },
+		{ IDC_HOSTWARNING2, "DLG_UNKNOWNHOST_WARNING2" },
+		{ IDC_HOSTFINGERPRINT, "DLG_UNKNOWNHOST_FINGERPRINT" },
+		{ IDC_FP_HASH_ALG, "DLG_UNKNOWNHOST_FP_HASH_ALGORITHM" },
+		{ IDC_ADDTOKNOWNHOSTS, "DLG_UNKNOWNHOST_ADD" },
+		{ IDC_CONTINUE, "BTN_CONTINUE" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
 	PTInstVar pvar;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1736,30 +1745,7 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING2", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_FINGERPRINT", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_FP_HASH_ALGORITHM", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_ADD", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_CONTINUE, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_CONTINUE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_CONTINUE, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
@@ -1897,8 +1883,17 @@ canceled:
 static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 											   LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_UNKNOWNHOST_TITLE" },
+		{ IDC_HOSTWARNING, "DLG_DIFFERENTKEY_WARNING" },
+		{ IDC_HOSTWARNING2, "DLG_DIFFERENTKEY_WARNING2" },
+		{ IDC_HOSTFINGERPRINT, "DLG_DIFFERENTKEY_FINGERPRINT" },
+		{ IDC_FP_HASH_ALG, "DLG_DIFFERENTKEY_FP_HASH_ALGORITHM" },
+		{ IDC_ADDTOKNOWNHOSTS, "DLG_DIFFERENTKEY_REPLACE" },
+		{ IDC_CONTINUE, "BTN_CONTINUE" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
 	PTInstVar pvar;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1907,30 +1902,7 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTKEY_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTKEY_WARNING", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTKEY_WARNING2", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTKEY_FINGERPRINT", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTKEY_FP_HASH_ALGORITHM", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTKEY_REPLACE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_CONTINUE, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_CONTINUE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_CONTINUE, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
@@ -2066,8 +2038,17 @@ canceled:
 static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 											LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_DIFFERENTTYPEKEY_TITLE" },
+		{ IDC_HOSTWARNING, "DLG_DIFFERENTTYPEKEY_WARNING" },
+		{ IDC_HOSTWARNING2, "DLG_DIFFERENTTYPEKEY_WARNING2" },
+		{ IDC_HOSTFINGERPRINT, "DLG_DIFFERENTTYPEKEY_FINGERPRINT" },
+		{ IDC_FP_HASH_ALG, "DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM" },
+		{ IDC_ADDTOKNOWNHOSTS, "DLG_DIFFERENTTYPEKEY_ADD" },
+		{ IDC_CONTINUE, "BTN_CONTINUE" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
 	PTInstVar pvar;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -2076,30 +2057,7 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNING", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNING2", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_FINGERPRINT", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_ADD", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDC_CONTINUE, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_CONTINUE", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_CONTINUE, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
