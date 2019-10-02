@@ -848,6 +848,68 @@ void EraseKanjiOnLRMargin(LONG ptr, int count)
 	}
 }
 
+// Insert space characters at the current position
+//   Count: Number of characters to be inserted
+#if UNICODE_INTERNAL_BUFF
+void BuffInsertSpace(int Count)
+{
+	int MoveLen;
+	int extr = 0;
+	int sx;
+	buff_char_t *b;
+
+	if (CursorX < CursorLeftM || CursorX > CursorRightM)
+		return;
+
+	NewLine(PageStart + CursorY);
+
+	sx = CursorX;
+	b = &CodeLineW[CursorX];
+	if (IsBuffPadding(b)) {
+		/* if cursor is on right half of a kanji, erase the kanji */
+		BuffSetChar(b - 1, ' ', 'H');
+		BuffSetChar(b, ' ', 'H');
+		AttrLine[CursorX] &= ~AttrKanji;
+		sx--;
+		extr++;
+	}
+
+	if (CursorRightM < NumOfColumns - 1 && (AttrLine[CursorRightM] & AttrKanji)) {
+		CodeLine[CursorRightM + 1] = 0x20;
+		BuffSetChar(&CodeLineW[CursorRightM + 1], 0x20, 'H');
+		AttrLine[CursorRightM + 1] &= ~AttrKanji;
+		extr++;
+	}
+
+	if (Count > CursorRightM + 1 - CursorX)
+		Count = CursorRightM + 1 - CursorX;
+
+	MoveLen = CursorRightM + 1 - CursorX - Count;
+
+	if (MoveLen > 0) {
+		memmove(&(CodeLine[CursorX + Count]), &(CodeLine[CursorX]), MoveLen);
+		memmoveW(&(CodeLineW[CursorX + Count]), &(CodeLineW[CursorX]), MoveLen);
+		memmove(&(AttrLine[CursorX + Count]), &(AttrLine[CursorX]), MoveLen);
+		memmove(&(AttrLine2[CursorX + Count]), &(AttrLine2[CursorX]), MoveLen);
+		memmove(&(AttrLineFG[CursorX + Count]), &(AttrLineFG[CursorX]), MoveLen);
+		memmove(&(AttrLineBG[CursorX + Count]), &(AttrLineBG[CursorX]), MoveLen);
+	}
+	memset(&(CodeLine[CursorX]), 0x20, Count);
+	memsetW(&(CodeLineW[CursorX]), 0x20, Count);
+	memset(&(AttrLine[CursorX]), AttrDefault, Count);
+	memset(&(AttrLine2[CursorX]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
+	memset(&(AttrLineFG[CursorX]), CurCharAttr.Fore, Count);
+	memset(&(AttrLineBG[CursorX]), CurCharAttr.Back, Count);
+	/* last char in current line is kanji first? */
+	if ((AttrLine[CursorRightM] & AttrKanji) != 0) {
+		/* then delete it */
+		CodeLine[CursorRightM] = 0x20;
+		BuffSetChar(&CodeLineW[CursorRightM], 0x20, 'H');
+		AttrLine[CursorRightM] &= ~AttrKanji;
+	}
+	BuffUpdateRect(sx, CursorY, CursorRightM + extr, CursorY);
+}
+#else
 void BuffInsertSpace(int Count)
 // Insert space characters at the current position
 //   Count: Number of characters to be inserted
@@ -906,6 +968,7 @@ void BuffInsertSpace(int Count)
 	}
 	BuffUpdateRect(CursorX, CursorY, CursorRightM+extr, CursorY);
 }
+#endif
 
 void BuffEraseCurToEnd()
 // Erase characters from cursor to the end of screen

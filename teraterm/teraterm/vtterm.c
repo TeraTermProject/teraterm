@@ -1653,7 +1653,8 @@ void EscapeSequence(BYTE b)
 		} \
 	}
 
-void CSInsertCharacter()		// ICH
+// ICH
+static void CSInsertCharacter(void)
 {
 	// Insert space characters at cursor
 	CheckParamVal(Param[1], NumOfColumns);
