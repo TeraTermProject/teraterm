@@ -118,3 +118,59 @@ LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam,
 	}
 	return retval;
 }
+
+HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
+{
+	if (pCreatePropertySheetPageW != NULL) {
+		return pCreatePropertySheetPageW((LPCPROPSHEETPAGEW)psp);
+	}
+
+	char *titleA = ToCharW(psp->pszTitle);
+
+	PROPSHEETPAGEA_V1 pspA;
+	memset(&pspA, 0, sizeof(pspA));
+	pspA.dwSize = sizeof(pspA);
+	pspA.dwFlags = psp->dwFlags;
+	pspA.hInstance = psp->hInstance;
+	pspA.pResource = psp->pResource;
+	pspA.pszTitle = titleA;
+	pspA.pfnDlgProc = psp->pfnDlgProc;
+	pspA.lParam = psp->lParam;
+
+	HPROPSHEETPAGE retval = CreatePropertySheetPageA((LPCPROPSHEETPAGEA)&pspA);
+
+	free(titleA);
+	return retval;
+}
+
+// リリース用SDKのヘッダに
+//	PROPSHEETHEADERW_V1 がないため
+//	PROPSHEETHEADERW を使用
+//		SDK: Windows Server 2003 R2 Platform SDK
+//			 (Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
+//INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *psh)
+INT_PTR _PropertySheetW(PROPSHEETHEADERW *psh)
+{
+	if (pPropertySheetW != NULL) {
+		return pPropertySheetW((PROPSHEETHEADERW *)psh);
+	}
+
+	char *captionA = ToCharW(psh->pszCaption);
+
+//	PROPSHEETHEADERA_V1 pshA;
+	PROPSHEETHEADERA pshA;
+	memset(&pshA, 0, sizeof(pshA));
+	pshA.dwSize = sizeof(pshA);
+	pshA.dwFlags = psh->dwFlags;
+	pshA.hwndParent = psh->hwndParent;
+	pshA.hInstance = psh->hInstance;
+	pshA.pszCaption = captionA;
+	pshA.nPages = psh->nPages;
+	pshA.phpage = psh->phpage;
+	pshA.pfnCallback = psh->pfnCallback;
+
+	INT_PTR retval = PropertySheetA(&pshA);
+
+	free(captionA);
+	return retval;
+}

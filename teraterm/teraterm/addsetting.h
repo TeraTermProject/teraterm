@@ -131,7 +131,7 @@ private:
 class CAddSettingPropSheetDlg : public TTCPropertySheet
 {
 public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd);
+	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
 	virtual ~CAddSettingPropSheetDlg();
 private:
 	void OnInitDialog();

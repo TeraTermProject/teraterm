@@ -152,11 +152,11 @@ private:
 class TTCPropertySheet
 {
 public:
-	TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd);
+	TTCPropertySheet(HINSTANCE hInstance, HWND hParentWnd);
 	virtual ~TTCPropertySheet();
 	virtual void OnInitDialog();
 	INT_PTR DoModal();
-	PROPSHEETHEADER m_psh;
+	PROPSHEETHEADERW m_psh;
 	HWND m_hWnd;
 	HWND m_hParentWnd;
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
@@ -177,7 +177,7 @@ public:
 	virtual void OnHelp();
 	HPROPSHEETPAGE CreatePropertySheetPage();
 protected:
-	PROPSHEETPAGE_V1 m_psp;
+	PROPSHEETPAGEW_V1 m_psp;
 private:
 	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static UINT CALLBACK PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp);

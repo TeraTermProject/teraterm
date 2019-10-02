@@ -634,10 +634,10 @@ TTCPropertyPage::TTCPropertyPage(HINSTANCE inst, int id, TTCPropertySheet *sheet
 	m_psp.dwSize = sizeof(m_psp);
 	m_psp.dwFlags = PSP_DEFAULT;
 	m_psp.hInstance = inst;
-	m_psp.pszTemplate = MAKEINTRESOURCE(id);
+	m_psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	m_psp.dwFlags |= PSP_DLGINDIRECT;
-	m_psp.pResource = TTGetDlgTemplate(inst, m_psp.pszTemplate);
+	m_psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
 #endif
 	m_psp.pfnDlgProc = Proc;
 	m_psp.lParam = (LPARAM)this;
@@ -652,7 +652,7 @@ TTCPropertyPage::~TTCPropertyPage()
 
 HPROPSHEETPAGE TTCPropertyPage::CreatePropertySheetPage()
 {
-	return ::CreatePropertySheetPage((PROPSHEETPAGE *)&m_psp);
+	return ::_CreatePropertySheetPageW(&m_psp);
 }
 
 void TTCPropertyPage::OnInitDialog()
@@ -734,7 +734,7 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 
 ////////////////////////////////////////
 
-TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd)
+TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, HWND hParentWnd)
 {
 	m_hInst = hInstance;
 	m_hWnd = 0;
@@ -742,11 +742,9 @@ TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND
 	memset(&m_psh, 0, sizeof(m_psh));
 	m_psh.dwSize = sizeof(m_psh);
 	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS
-	if (pszCaption != nullptr) {
-		m_psh.pszCaption = pszCaption;
-		//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
-	}
+	//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
 	m_psh.hwndParent = hParentWnd;
+	m_psh.hInstance = hInstance;
 	m_psh.pfnCallback = PropSheetProc;
 }
 
@@ -758,7 +756,7 @@ INT_PTR TTCPropertySheet::DoModal()
 {
 	ghInstance = m_hInst;
 	gTTCPS = this;
-	return PropertySheet(&m_psh);
+	return _PropertySheetW(&m_psh);
 
 	// モーダレスにするとタブの動きがおかしい
 #if 0

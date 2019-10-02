@@ -35,6 +35,8 @@
 #include "dllutil.h"
 #include "ttlib.h"
 
+HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
+INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL (WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
@@ -99,6 +101,12 @@ static const APIInfo Lists_shell32[] = {
 	{ NULL, NULL },
 };
 
+static const APIInfo Lists_comctl32[] = {
+	{ "CreatePropertySheetPageW", (void **)&pCreatePropertySheetPageW },
+	{ "PropertySheetW", (void **)&pPropertySheetW },
+	{ NULL, NULL },
+};
+
 static const DllInfo DllInfos[] = {
 	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -106,6 +114,7 @@ static const DllInfo DllInfos[] = {
 	{ _T("Shcore.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_Shcore },
 	{ _T("kernel32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
 	{ _T("shell32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
+	{ _T("Comctl32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{ NULL, DLL_GET_MODULE_HANDLE, DLL_ACCEPT_NOT_EXIST, NULL },
 };
 
