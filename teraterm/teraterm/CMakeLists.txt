@@ -44,6 +44,8 @@ set(COMMON_SRC
   ../common/codeconv.cpp
   ../common/tipwin.h
   ../common/tipwin.cpp
+  ../common/layer_for_unicode.h
+  ../common/layer_for_unicode.cpp
   #
   ../teraterm/unisym2decsp.map
   ../teraterm/uni2sjis.map

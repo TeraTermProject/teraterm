@@ -1,5 +1,5 @@
 /*
- * (C) 2005-2018 TeraTerm Project
+ * Copyright (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * W to A Wrapper
+ *
+ * API–¼‚ÍW”Å‚Ì“ª‚É '_' ‚ð•t‚¯‚½‚à‚Ì‚ðŽg—p‚·‚é
+ */
+
+#pragma once
+
 #include <windows.h>
-#include "tttypes.h"	// for TTTSet
 
-enum drop_type {
-	DROP_TYPE_CANCEL,
-	DROP_TYPE_SCP,
-	DROP_TYPE_SEND_FILE,		// past contents of file
-	DROP_TYPE_SEND_FILE_BINARY,
-	DROP_TYPE_PASTE_FILENAME,
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define DROP_TYPE_PASTE_ESCAPE	0x01
-#define	DROP_TYPE_PASTE_NEWLINE	0x02
+BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
+DWORD _GetFileAttributesW(LPCWSTR lpFileName);
+UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 
-enum drop_type ShowDropDialogBox(
-	HINSTANCE hInstance, HWND hWndParent,
-	const wchar_t *TargetFilename,
-	enum drop_type DefaultDropType,
-	int RemaingFileCount,
-	bool EnableSCP,
-	bool EnableSendFile,
-	TTTSet *pts,
-	unsigned char *DropTypePaste,
-	bool *DoSameProcess,
-	bool *DoSameProcessNextDrop,
-	bool *DoNotShowDialog);
+#ifdef __cplusplus
+}
+#endif

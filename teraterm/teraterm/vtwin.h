@@ -55,7 +55,7 @@ private:
     SetupMenu, ControlMenu, WinMenu, HelpMenu;
 
   // drag and drop handle
-  TCHAR **DropLists;
+  wchar_t **DropLists;
   int DropListCount;
   void DropListFree();
 

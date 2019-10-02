@@ -89,6 +89,8 @@
 #if UNICODE_DEBUG
 #include "tipwin.h"
 #endif
+#include "codeconv.h"
+#include "layer_for_unicode.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -1913,24 +1915,19 @@ void CVTWindow::OnDestroy()
 	DeleteNotifyIcon(&cv);
 }
 
-static void EscapeFilename(const char *src, char *dest)
+static void EscapeFilename(const wchar_t *src, wchar_t *dest)
 {
-#define ESCAPE_CHARS	" ;&()$!`'[]{}#^~"
-	const char *s = src;
-	char *d = dest;
+#define ESCAPE_CHARS	L" ;&()$!`'[]{}#^~"
+	const wchar_t *s = src;
+	wchar_t *d = dest;
 	while (*s) {
-		if (isleadbyte(*s)) { // multi-byte
-			*d++ = *s++;
-			*d++ = *s++;
-			continue;
-		}
-		char c = *s++;
-		if (c == '\\') {
+		wchar_t c = *s++;
+		if (c == L'\\') {
 			// パスの区切りを \ -> / へ
 			*d = '/';
-		} else if (strchr(ESCAPE_CHARS, c) != NULL) {
+		} else if (wcschr(ESCAPE_CHARS, c) != NULL) {
 			// エスケープが必要な文字
-			*d++ = '\\';
+			*d++ = L'\\';
 			*d = c;
 		} else {
 			*d = c;
@@ -1940,31 +1937,29 @@ static void EscapeFilename(const char *src, char *dest)
 	*d = '\0'; // null-terminate
 }
 
-static void PasteString(PComVar cv, const char *str, bool escape)
+static void PasteString(PComVar cv, const wchar_t *str, bool escape)
 {
-	PCHAR ptr = (PCHAR)str;
-	char *tmpbuf = NULL;
+	wchar_t *ptr = (wchar_t *)str;
+	wchar_t *tmpbuf = NULL;
 	if (escape) {
-		size_t len = strlen(str) * 2;
-		tmpbuf = (char *)malloc(len);
+		const size_t len = wcslen(str) * sizeof(wchar_t) * 2;
+		tmpbuf = (wchar_t *)malloc(len);
 		EscapeFilename(str, tmpbuf);
 		ptr = tmpbuf;
 	}
 
 	// consoleへ送信
-	while (*ptr) {
-		CommTextOut(cv, ptr, 1);
-		if (ts.LocalEcho > 0) {
-			CommTextEcho(cv, ptr, 1);
-		}
-		ptr++;
+	const size_t len = wcslen(ptr);
+	CommTextOutW(cv, ptr, len);
+	if (ts.LocalEcho > 0) {
+		CommTextEchoW(cv, ptr, len);
 	}
 
 	if (tmpbuf != NULL) free(tmpbuf);
 }
 
 /* 入力はファイルのみ(フォルダは含まれない) */
-static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
+static bool SendScp(wchar_t *Filenames[], int FileCount, const char *SendDir)
 {
 	typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 	static PSSH_start_scp func = NULL;
@@ -1988,8 +1983,9 @@ static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
 	}
 
 	for (int i = 0; i < FileCount; i++) {
-		const char *FileName = Filenames[i];
+		char *FileName = ToU8W(Filenames[i]);
 		func((char *)FileName, ts.ScpSendDir);
+		free(FileName);
 	}
 	return true;
 }
@@ -2018,8 +2014,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	int FileCount = 0;
 	int DirectoryCount = 0;
 	for (int i = 0; i < DropListCount; i++) {
-		const char *FileName = DropLists[i];
-		const DWORD attr = GetFileAttributes(FileName);
+		const wchar_t *FileName = DropLists[i];
+		const DWORD attr = _GetFileAttributesW(FileName);
 		if (attr == INVALID_FILE_ATTRIBUTES) {
 			FileCount++;
 		} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
@@ -2097,7 +2093,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	}
 
 	for (int i = 0; i < DropListCount; i++) {
-		const char *FileName = DropLists[i];
+		const wchar_t *FileName = DropLists[i];
 
 		if (!DoSameProcess) {
 			bool DoSameProcessNextDrop;
@@ -2136,7 +2132,9 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		case DROP_TYPE_SEND_FILE_BINARY:
 			if (SendVar==NULL && NewFileVar(&SendVar)) {
 				HelpId = HlpFileSend;
-				strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileName,  _TRUNCATE);
+				char *FileNameA = ToCharW(FileName);
+				strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileNameA,  _TRUNCATE);
+				free(FileNameA);
 				SendVar->DirLen = 0;
 				ts.TransBin = DropType == DROP_TYPE_SEND_FILE ? 0 : 1;
 				FileSendStart();
@@ -2166,7 +2164,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 
 			PasteString(&cv, FileName, escape);
 			if (DropListCount > 1 && i < DropListCount - 1) {
-				const char *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? "\n" : " ";
+				const wchar_t *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? L"\n" : L" ";
 				PasteString(&cv, separator, false);
 			}
 
@@ -2177,7 +2175,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		case DROP_TYPE_SCP:
 		{
 			// send by scp
-			char **FileNames = &DropLists[i];
+			wchar_t **FileNames = &DropLists[i];
 			int FileCount = DoSameProcess ? DropListCount - i : 1;
 			if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
 				goto finish;
@@ -2200,14 +2198,17 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 	{
 		const UINT ShowDialog =
 			((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) ? 1 : 0;
-		DropListCount = DragQueryFile(hDropInfo, -1, NULL, 0);
-		DropLists = (char **)malloc(sizeof(char *) * DropListCount);
+		DropListCount = _DragQueryFileW(hDropInfo, -1, NULL, 0);
+		DropLists = (wchar_t **)malloc(sizeof(wchar_t *) * DropListCount);
 
 		for (int i = 0; i < DropListCount; i++) {
-			const UINT cch = DragQueryFile(hDropInfo, i, NULL, 0) + 1;
-			char *FileName = (char *)malloc(cch);
+			const UINT cch = _DragQueryFileW(hDropInfo, i, NULL, 0) + 1;
+			if (cch == 0) {
+				continue;
+			}
+			wchar_t *FileName = (wchar_t *)malloc(sizeof(wchar_t) * cch);
+			_DragQueryFileW(hDropInfo,i,FileName,cch);
 			DropLists[i] = FileName;
-			DragQueryFile(hDropInfo,i,FileName,cch);
 		}
 
 		::PostMessage(HVTWin, WM_USER_DROPNOTIFY, ShowDialog, 0);

@@ -34,6 +34,9 @@
 
 #include "dllutil.h"
 
+UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
+BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
@@ -55,12 +58,13 @@ static const APIInfo Lists_user32[] = {
 	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
-	{ NULL },
+	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
+	{ NULL, NULL },
 };
 
 static const APIInfo Lists_msimg32[] = {
 	{ "AlphaBlend", (void **)&pAlphaBlend },
-	{ NULL },
+	{ NULL, NULL },
 };
 
 static const APIInfo Lists_gdi32[] = {
@@ -68,12 +72,22 @@ static const APIInfo Lists_gdi32[] = {
 	{ "RemoveFontResourceExA", (void **)&pRemoveFontResourceExA },
 	{ "AddFontResourceExW", (void **)&pAddFontResourceExW },
 	{ "RemoveFontResourceExW", (void **)&pRemoveFontResourceExW },
-	{ NULL },
+	{ NULL, NULL },
 };
 
 static const APIInfo Lists_Shcore[] = {
 	{ "GetDpiForMonitor", (void **)&pGetDpiForMonitor },
-	{ NULL },
+	{ NULL, NULL },
+};
+
+static const APIInfo Lists_kernel32[] = {
+	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
+	{ NULL, NULL },
+};
+
+static const APIInfo Lists_shell32[] = {
+	{ "DragQueryFileW", (void **)&pDragQueryFileW },
+	{ NULL, NULL },
 };
 
 static const DllInfo DllInfos[] = {
@@ -81,7 +95,9 @@ static const DllInfo DllInfos[] = {
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
 	{ _T("gdi32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_gdi32 },
 	{ _T("Shcore.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_Shcore },
-	{ NULL },
+	{ _T("kernel32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
+	{ _T("shell32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
+	{ NULL, DLL_GET_MODULE_HANDLE, DLL_ACCEPT_NOT_EXIST, NULL },
 };
 
 void WinCompatInit()
