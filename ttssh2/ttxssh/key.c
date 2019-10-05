@@ -87,16 +87,24 @@ int ssh_dss_verify(DSA *key,
 {
 	DSA_SIG *sig;
 	const EVP_MD *evp_md = EVP_sha1();
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	unsigned char digest[EVP_MAX_MD_SIZE], *sigblob;
 	unsigned int len, dlen;
-	int ret;
+	int ret = -1;
 	char *ptr;
+	BIGNUM *r, *s;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL) {
+		ret = -1;
+		goto error;
+	}
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		return -2;
+		ret = -2;
+		goto error;
 	}
 
 	ptr = signature;
@@ -110,7 +118,8 @@ int ssh_dss_verify(DSA *key,
 		len = get_uint32_MSBfirst(ptr);
 		ptr += 4;
 		if (strncmp("ssh-dss", ptr, len) != 0) {
-			return -3;
+			ret = -3;
+			goto error;
 		}
 		ptr += len;
 	}
@@ -122,28 +131,40 @@ int ssh_dss_verify(DSA *key,
 	ptr += len;
 
 	if (len != SIGBLOB_LEN) {
-		return -4;
+		ret = -4;
+		goto error;
 	}
 
 	/* parse signature */
-	if ((sig = DSA_SIG_new()) == NULL)
-		return -5;
-	if ((sig->r = BN_new()) == NULL)
-		return -6;
-	if ((sig->s = BN_new()) == NULL)
-		return -7;
-	BN_bin2bn(sigblob, INTBLOB_LEN, sig->r);
-	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, sig->s);
+	if ((sig = DSA_SIG_new()) == NULL) {
+		ret = -5;
+		goto error;
+	}
+	if ((r = BN_new()) == NULL) {
+		ret = -6;
+		goto error;
+	}
+	if ((s = BN_new()) == NULL) {
+		ret = -7;
+		goto error;
+	}
+	DSA_SIG_set0(sig, r, s);
+	BN_bin2bn(sigblob, INTBLOB_LEN, r);
+	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, s);
 
 	/* sha1 the data */
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, data, datalen);
-	EVP_DigestFinal(&md, digest, &dlen);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, data, datalen);
+	EVP_DigestFinal(md, digest, &dlen);
 
 	ret = DSA_do_verify(digest, dlen, sig, key);
 	SecureZeroMemory(digest, sizeof(digest));
 
 	DSA_SIG_free(sig);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return ret;
 }
@@ -250,21 +271,32 @@ int ssh_rsa_verify(RSA *key,
                    u_char *data, u_int datalen)
 {
 	const EVP_MD *evp_md;
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	//	char *ktype;
 	u_char digest[EVP_MAX_MD_SIZE], *sigblob;
 	u_int len, dlen, modlen;
 //	int rlen, ret, nid;
-	int ret, nid;
+	int ret = -1, nid;
 	char *ptr;
+	BIGNUM *n;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL) {
+		ret = -1;
+		goto error;
+	}
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		return -2;
+		ret = -2;
+		goto error;
 	}
-	if (BN_num_bits(key->n) < SSH_RSA_MINIMUM_MODULUS_SIZE) {
-		return -3;
+
+	RSA_get0_key(key, &n, NULL, NULL);
+	if (BN_num_bits(n) < SSH_RSA_MINIMUM_MODULUS_SIZE) {
+		ret = -3;
+		goto error;
 	}
 	//debug_print(41, signature, signaturelen);
 	ptr = signature;
@@ -273,7 +305,8 @@ int ssh_rsa_verify(RSA *key,
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
 	if (strncmp("ssh-rsa", ptr, len) != 0) {
-		return -4;
+		ret = -4;
+		goto error;
 	}
 	ptr += len;
 
@@ -292,7 +325,8 @@ int ssh_rsa_verify(RSA *key,
 	/* RSA_verify expects a signature of RSA_size */
 	modlen = RSA_size(key);
 	if (len > modlen) {
-		return -5;
+		ret = -5;
+		goto error;
 
 	} else if (len < modlen) {
 		u_int diff = modlen - len;
@@ -307,11 +341,12 @@ int ssh_rsa_verify(RSA *key,
 	nid = NID_sha1;
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
 		//error("ssh_rsa_verify: EVP_get_digestbynid %d failed", nid);
-		return -6;
+		ret = -6;
+		goto error;
 	}
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, data, datalen);
-	EVP_DigestFinal(&md, digest, &dlen);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, data, datalen);
+	EVP_DigestFinal(md, digest, &dlen);
 
 	ret = openssh_RSA_verify(nid, digest, dlen, sigblob, len, key);
 
@@ -319,6 +354,10 @@ int ssh_rsa_verify(RSA *key,
 	SecureZeroMemory(sigblob, len);
 	//free(sigblob);
 	//debug("ssh_rsa_verify: signature %scorrect", (ret==0) ? "in" : "");
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return ret;
 }
@@ -329,16 +368,24 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 {
 	ECDSA_SIG *sig;
 	const EVP_MD *evp_md;
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	unsigned char digest[EVP_MAX_MD_SIZE], *sigblob;
 	unsigned int len, dlen;
-	int ret, nid = NID_undef;
+	int ret = -1, nid = NID_undef;
 	char *ptr;
+	BIGNUM *r, *s;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL) {
+		ret = -1;
+		goto error;
+	}
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		return -2;
+		ret = -2;
+		goto error;
 	}
 
 	ptr = signature;
@@ -346,7 +393,8 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
 	if (strncmp(get_ssh_keytype_name(keytype), ptr, len) != 0) {
-		return -3;
+		ret = -3;
+		goto error;
 	}
 	ptr += len;
 
@@ -356,32 +404,45 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	ptr += len;
 
 	/* parse signature */
-	if ((sig = ECDSA_SIG_new()) == NULL)
-		return -4;
-	if ((sig->r = BN_new()) == NULL)
-		return -5;
-	if ((sig->s = BN_new()) == NULL)
-		return -6;
+	if ((sig = ECDSA_SIG_new()) == NULL) {
+		ret = -4;
+		goto error;
+	}
+	if ((r = BN_new()) == NULL) {
+		ret = -5;
+		goto error;
+	}
+	if ((s = BN_new()) == NULL) {
+		ret = -6;
+		goto error;
+	}
 
-	buffer_get_bignum2(&sigblob, sig->r);
-	buffer_get_bignum2(&sigblob, sig->s);
+	ECDSA_SIG_set0(sig, r, s);
+	buffer_get_bignum2(&sigblob, r);
+	buffer_get_bignum2(&sigblob, s);
 	if (sigblob != ptr) {
-		return -7;
+		ret = -7;
+		goto error;
 	}
 
 	/* hash the data */
 	nid = keytype_to_hash_nid(keytype);
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
-		return -8;
+		ret = -8;
+		goto error;
 	}
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, data, datalen);
-	EVP_DigestFinal(&md, digest, &dlen);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, data, datalen);
+	EVP_DigestFinal(md, digest, &dlen);
 
 	ret = ECDSA_do_verify(digest, dlen, sig, key);
 	SecureZeroMemory(digest, sizeof(digest));
 
 	ECDSA_SIG_free(sig);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return ret;
 }
@@ -503,20 +564,25 @@ static char *copy_mp_int(char *num)
 RSA *duplicate_RSA(RSA *src)
 {
 	RSA *rsa = NULL;
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *se = NULL, *sn = NULL;
 
 	rsa = RSA_new();
 	if (rsa == NULL)
 		goto error;
-	rsa->n = BN_new();
-	rsa->e = BN_new();
-	if (rsa->n == NULL || rsa->e == NULL) {
+	n = BN_new();
+	e = BN_new();
+	RSA_set0_key(rsa, n, e, NULL);
+	if (n == NULL || e == NULL) {
 		RSA_free(rsa);
 		goto error;
 	}
 
+	RSA_get0_key(src, &sn, &se, NULL);
+
 	// 深いコピー(deep copy)を行う。浅いコピー(shallow copy)はNG。
-	BN_copy(rsa->n, src->n);
-	BN_copy(rsa->e, src->e);
+	BN_copy(n, sn);
+	BN_copy(e, se);
 
 error:
 	return (rsa);
@@ -529,27 +595,36 @@ error:
 DSA *duplicate_DSA(DSA *src)
 {
 	DSA *dsa = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
+	BIGNUM *sp, *sq, *sg, *spub_key;
 
 	dsa = DSA_new();
 	if (dsa == NULL)
 		goto error;
-	dsa->p = BN_new();
-	dsa->q = BN_new();
-	dsa->g = BN_new();
-	dsa->pub_key = BN_new();
-	if (dsa->p == NULL ||
-	    dsa->q == NULL ||
-	    dsa->g == NULL ||
-	    dsa->pub_key == NULL) {
+	p = BN_new();
+	q = BN_new();
+	g = BN_new();
+	pub_key = BN_new();
+	DSA_set0_pqg(dsa, p, q, g);
+	DSA_set0_key(dsa, pub_key, NULL);
+	if (p == NULL ||
+	    q == NULL ||
+	    g == NULL ||
+	    pub_key == NULL) {
 		DSA_free(dsa);
+		// メモリを解放しているのでNULLを返すようにする。
+		// 呼び元でのチェックはticket#39335で処置予定。
+		dsa = NULL;
 		goto error;
 	}
 
 	// 深いコピー(deep copy)を行う。浅いコピー(shallow copy)はNG。
-	BN_copy(dsa->p, src->p);
-	BN_copy(dsa->q, src->q);
-	BN_copy(dsa->g, src->g);
-	BN_copy(dsa->pub_key, src->pub_key);
+	DSA_get0_pqg(src, &sp, &sq, &sg);
+	DSA_get0_key(src, &spub_key, NULL);
+	BN_copy(p, sp);
+	BN_copy(q, sq);
+	BN_copy(g, sg);
+	BN_copy(pub_key, spub_key);
 
 error:
 	return (dsa);
@@ -603,12 +678,18 @@ BOOL key_copy(Key *dest, Key *src)
 char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_length)
 {
 	const EVP_MD *md = NULL;
-	EVP_MD_CTX ctx;
+	EVP_MD_CTX *ctx = NULL;
 	char *blob = NULL;
 	char *retval = NULL;
 	int len = 0;
 	int nlen, elen;
 	RSA *rsa;
+	BIGNUM *e = NULL, *n = NULL;
+
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) {
+		goto error;
+	}
 
 	*dgst_raw_length = 0;
 
@@ -629,15 +710,16 @@ char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_lengt
 	switch (k->type) {
 	case KEY_RSA1:
 		rsa = make_key(NULL, k->bits, k->exp, k->mod);
-		nlen = BN_num_bytes(rsa->n);
-		elen = BN_num_bytes(rsa->e);
+		RSA_get0_key(rsa, &n, &e, NULL);
+		nlen = BN_num_bytes(n);
+		elen = BN_num_bytes(e);
 		len = nlen + elen;
 		blob = malloc(len);
 		if (blob == NULL) {
 			// TODO:
 		}
-		BN_bn2bin(rsa->n, blob);
-		BN_bn2bin(rsa->e, blob + nlen);
+		BN_bn2bin(n, blob);
+		BN_bn2bin(e, blob + nlen);
 		RSA_free(rsa);
 		break;
 
@@ -664,14 +746,19 @@ char* key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_lengt
 		if (retval == NULL) {
 			// TODO:
 		}
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, blob, len);
-		EVP_DigestFinal(&ctx, retval, dgst_raw_length);
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, blob, len);
+		EVP_DigestFinal(ctx, retval, dgst_raw_length);
 		SecureZeroMemory(blob, len);
 		free(blob);
 	} else {
 		//fatal("key_fingerprint_raw: blob is null");
 	}
+
+error:
+	if (ctx)
+		EVP_MD_CTX_free(ctx);
+
 	return retval;
 }
 
@@ -699,14 +786,19 @@ ssh_key_type(ssh_keytype type)
 unsigned int
 key_size(const Key *k)
 {
+	BIGNUM *n = NULL;
+	BIGNUM *p = NULL;
+
 	switch (k->type) {
 	case KEY_RSA1:
 		// SSH1の場合は key->rsa と key->dsa は NULL であるので、使わない。
 		return k->bits;
 	case KEY_RSA:
-		return BN_num_bits(k->rsa->n);
+		RSA_get0_key(k->rsa, &n, NULL, NULL);
+		return BN_num_bits(n);
 	case KEY_DSA:
-		return BN_num_bits(k->dsa->p);
+		DSA_get0_pqg(k->dsa, &p, NULL, NULL);
+		return BN_num_bits(p);
 	case KEY_ECDSA256:
 		return 256;
 	case KEY_ECDSA384:
@@ -923,23 +1015,35 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep, digest_algorithm dgst_alg)
 //
 static void key_add_private(Key *k)
 {
+	BIGNUM *d, *iqmp, *q, *p, *dmq1, *dmp1;
+	BIGNUM *priv_key = NULL;
+
+	d = iqmp = q = p = dmq1 = dmp1 = NULL;
+
 	switch (k->type) {
 		case KEY_RSA1:
 		case KEY_RSA:
-			k->rsa->d = BN_new();
-			k->rsa->iqmp = BN_new();
-			k->rsa->q = BN_new();
-			k->rsa->p = BN_new();
-			k->rsa->dmq1 = BN_new();
-			k->rsa->dmp1 = BN_new();
-			if (k->rsa->d == NULL || k->rsa->iqmp == NULL || k->rsa->q == NULL ||
-				k->rsa->p == NULL || k->rsa->dmq1 == NULL || k->rsa->dmp1 == NULL)
+			d = BN_new();
+			RSA_set0_key(k->rsa, NULL, NULL, d);
+
+			iqmp = BN_new();
+			q = BN_new();
+			p = BN_new();
+			RSA_set0_factors(k->rsa, p, q);
+
+			dmq1 = BN_new();
+			dmp1 = BN_new();
+			RSA_set0_crt_params(k->rsa, dmp1, dmq1, iqmp);
+
+			if (d == NULL || iqmp == NULL || q == NULL ||
+				p == NULL || dmq1 == NULL || dmp1 == NULL)
 				goto error;
 			break;
 
 		case KEY_DSA:
-			k->dsa->priv_key = BN_new();
-			if (k->dsa->priv_key == NULL)
+			priv_key = BN_new();
+			DSA_set0_key(k->dsa, NULL, priv_key);
+			if (priv_key == NULL)
 				goto error;
 			break;
 
@@ -963,35 +1067,30 @@ static void key_add_private(Key *k)
 	return;
 
 error:
-	if (k->rsa->d) {
-		BN_free(k->rsa->d);
-		k->rsa->d = NULL;
+	if (d) {
+		BN_free(d);
+		// k->rsa->dに NULL をセットすることはできない。
+		// RSA_set0_key()では NULL を渡しても何もしない。
 	}
-	if (k->rsa->iqmp) {
-		BN_free(k->rsa->iqmp);
-		k->rsa->iqmp = NULL;
+	if (iqmp) {
+		BN_free(iqmp);
 	}
-	if (k->rsa->q) {
-		BN_free(k->rsa->q);
-		k->rsa->q = NULL;
+	if (q) {
+		BN_free(q);
 	}
-	if (k->rsa->p) {
-		BN_free(k->rsa->p);
-		k->rsa->p = NULL;
+	if (p) {
+		BN_free(p);
 	}
-	if (k->rsa->dmq1) {
-		BN_free(k->rsa->dmq1);
-		k->rsa->dmq1 = NULL;
+	if (dmq1) {
+		BN_free(dmq1);
 	}
-	if (k->rsa->dmp1) {
-		BN_free(k->rsa->dmp1);
-		k->rsa->dmp1 = NULL;
+	if (dmp1) {
+		BN_free(dmp1);
 	}
 
 
-	if (k->dsa->priv_key == NULL) {
-		BN_free(k->dsa->priv_key);
-		k->dsa->priv_key = NULL;
+	if (priv_key == NULL) {
+		BN_free(priv_key);
 	}
 
 }
@@ -1011,6 +1110,8 @@ Key *key_new(int type)
 	Key *k = NULL;
 	RSA *rsa;
 	DSA *dsa;
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
 
 	k = calloc(1, sizeof(Key));
 	if (k == NULL)
@@ -1028,9 +1129,10 @@ Key *key_new(int type)
 			rsa = RSA_new();
 			if (rsa == NULL)
 				goto error;
-			rsa->n = BN_new();
-			rsa->e = BN_new();
-			if (rsa->n == NULL || rsa->e == NULL)
+			n = BN_new();
+			e = BN_new();
+			RSA_set0_key(rsa, n, e, NULL);
+			if (n == NULL || e == NULL)
 				goto error;
 			k->rsa = rsa;
 			break;
@@ -1039,11 +1141,13 @@ Key *key_new(int type)
 			dsa = DSA_new();
 			if (dsa == NULL)
 				goto error;
-			dsa->p = BN_new();
-			dsa->q = BN_new();
-			dsa->g = BN_new();
-			dsa->pub_key = BN_new();
-			if (dsa->p == NULL || dsa->q == NULL || dsa->g == NULL || dsa->pub_key == NULL)
+			p = BN_new();
+			q = BN_new();
+			g = BN_new();
+			DSA_set0_pqg(dsa, p, q, g);
+			pub_key = BN_new();
+			DSA_set0_key(dsa, pub_key, NULL);
+			if (p == NULL || q == NULL || g == NULL || pub_key == NULL)
 				goto error;
 			k->dsa = dsa;
 			break;
@@ -1210,22 +1314,27 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 	char *sshname, *tmp;
 	int len;
 	int ret = 1;  // success
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
 
 	b = buffer_init();
 	sshname = get_sshname_from_key(key);
 
 	switch (key->type) {
 	case KEY_RSA:
+		RSA_get0_key(key->rsa, &n, &e, NULL);
 		buffer_put_string(b, sshname, strlen(sshname));
-		buffer_put_bignum2(b, key->rsa->e);
-		buffer_put_bignum2(b, key->rsa->n);
+		buffer_put_bignum2(b, e);
+		buffer_put_bignum2(b, n);
 		break;
 	case KEY_DSA:
+		DSA_get0_pqg(key->dsa, &p, &q, &g);
+		DSA_get0_key(key->dsa, &pub_key, NULL);
 		buffer_put_string(b, sshname, strlen(sshname));
-		buffer_put_bignum2(b, key->dsa->p);
-		buffer_put_bignum2(b, key->dsa->q);
-		buffer_put_bignum2(b, key->dsa->g);
-		buffer_put_bignum2(b, key->dsa->pub_key);
+		buffer_put_bignum2(b, p);
+		buffer_put_bignum2(b, q);
+		buffer_put_bignum2(b, g);
+		buffer_put_bignum2(b, pub_key);
 		break;
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
@@ -1281,6 +1390,8 @@ Key *key_from_blob(char *data, int blen)
 	Key *hostkey = NULL;  // hostkey
 	ssh_keytype type;
 	unsigned char *pk = NULL;
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *dsa_q, *g, *pub_key;
 
 	if (data == NULL)
 		goto error;
@@ -1308,14 +1419,15 @@ Key *key_from_blob(char *data, int blen)
 		if (rsa == NULL) {
 			goto error;
 		}
-		rsa->n = BN_new();
-		rsa->e = BN_new();
-		if (rsa->n == NULL || rsa->e == NULL) {
+		n = BN_new();
+		e = BN_new();
+		RSA_set0_key(rsa, n, e, NULL);
+		if (n == NULL || e == NULL) {
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, rsa->e);
-		buffer_get_bignum2(&data, rsa->n);
+		buffer_get_bignum2(&data, e);
+		buffer_get_bignum2(&data, n);
 
 		hostkey->type = type;
 		hostkey->rsa = rsa;
@@ -1326,21 +1438,23 @@ Key *key_from_blob(char *data, int blen)
 		if (dsa == NULL) {
 			goto error;
 		}
-		dsa->p = BN_new();
-		dsa->q = BN_new();
-		dsa->g = BN_new();
-		dsa->pub_key = BN_new();
-		if (dsa->p == NULL ||
-		    dsa->q == NULL ||
-		    dsa->g == NULL ||
-		    dsa->pub_key == NULL) {
+		p = BN_new();
+		dsa_q = BN_new();
+		g = BN_new();
+		pub_key = BN_new();
+		DSA_set0_pqg(dsa, p, dsa_q, g);
+		DSA_set0_key(dsa, pub_key, NULL);
+		if (p == NULL ||
+		    dsa_q == NULL ||
+		    g == NULL ||
+		    pub_key == NULL) {
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, dsa->p);
-		buffer_get_bignum2(&data, dsa->q);
-		buffer_get_bignum2(&data, dsa->g);
-		buffer_get_bignum2(&data, dsa->pub_key);
+		buffer_get_bignum2(&data, p);
+		buffer_get_bignum2(&data, dsa_q);
+		buffer_get_bignum2(&data, g);
+		buffer_get_bignum2(&data, pub_key);
 
 		hostkey->type = type;
 		hostkey->dsa = dsa;
@@ -1461,15 +1575,21 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	case KEY_RSA: // RSA
 	{
 		const EVP_MD *evp_md = EVP_sha1();
-		EVP_MD_CTX md;
+		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE], *sig;
 		u_int slen, dlen, len;
 		int ok, nid = NID_sha1;
 
+		md = EVP_MD_CTX_new();
+		if (md == NULL)
+			goto error;
+
 		// ダイジェスト値の計算
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, data, datalen);
-		EVP_DigestFinal(&md, digest, &dlen);
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, data, datalen);
+		EVP_DigestFinal(md, digest, &dlen);
+
+		EVP_MD_CTX_free(md);
 
 		slen = RSA_size(keypair->rsa);
 		sig = malloc(slen);
@@ -1519,14 +1639,21 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		DSA_SIG *sig;
 		const EVP_MD *evp_md = EVP_sha1();
-		EVP_MD_CTX md;
+		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE], sigblob[SIGBLOB_LEN];
 		u_int rlen, slen, len, dlen;
+		BIGNUM *bignum_r, *bignum_s;
+
+		md = EVP_MD_CTX_new();
+		if (md == NULL)
+			goto error;
 
 		// ダイジェストの計算
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, data, datalen);
-		EVP_DigestFinal(&md, digest, &dlen);
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, data, datalen);
+		EVP_DigestFinal(md, digest, &dlen);
+
+		EVP_MD_CTX_free(md);
 
 		// DSA電子署名を計算
 		sig = DSA_do_sign(digest, dlen, keypair->dsa);
@@ -1536,15 +1663,16 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 
 		// BIGNUMからバイナリ値への変換
-		rlen = BN_num_bytes(sig->r);
-		slen = BN_num_bytes(sig->s);
+		DSA_SIG_get0(sig, &bignum_r, &bignum_s);
+		rlen = BN_num_bytes(bignum_r);
+		slen = BN_num_bytes(bignum_s);
 		if (rlen > INTBLOB_LEN || slen > INTBLOB_LEN) {
 			DSA_SIG_free(sig);
 			goto error;
 		}
 		memset(sigblob, 0, SIGBLOB_LEN);
-		BN_bn2bin(sig->r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
-		BN_bn2bin(sig->s, sigblob+ SIGBLOB_LEN - slen);
+		BN_bn2bin(bignum_r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
+		BN_bn2bin(bignum_s, sigblob+ SIGBLOB_LEN - slen);
 		DSA_SIG_free(sig);
 
 		// setting
@@ -1569,18 +1697,26 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		ECDSA_SIG *sig;
 		const EVP_MD *evp_md;
-		EVP_MD_CTX md;
+		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE];
 		u_int len, dlen, nid;
 		buffer_t *buf2 = NULL;
+		BIGNUM *br, *bs;
 
 		nid = keytype_to_hash_nid(keypair->type);
 		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
 			goto error;
 		}
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, data, datalen);
-		EVP_DigestFinal(&md, digest, &dlen);
+
+		md = EVP_MD_CTX_new();
+		if (md == NULL)
+			goto error;
+
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, data, datalen);
+		EVP_DigestFinal(md, digest, &dlen);
+
+		EVP_MD_CTX_free(md);
 
 		sig = ECDSA_do_sign(digest, dlen, keypair->ecdsa);
 		SecureZeroMemory(digest, sizeof(digest));
@@ -1594,8 +1730,9 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			// TODO: error check
 			goto error;
 		}
-		buffer_put_bignum2(buf2, sig->r);
-		buffer_put_bignum2(buf2, sig->s);
+		ECDSA_SIG_get0(sig, &br, &bs);
+		buffer_put_bignum2(buf2, br);
+		buffer_put_bignum2(buf2, bs);
 		ECDSA_SIG_free(sig);
 
 		s = get_sshname_from_key(keypair);
@@ -1641,6 +1778,8 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	buffer_t *msg = NULL;
 	Key *keypair;
 	char *s, *tmp;
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -1653,17 +1792,20 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	switch (keypair->type) {
 	case KEY_RSA: // RSA
 		s = get_sshname_from_key(keypair);
+		RSA_get0_key(keypair->rsa, &n, &e, NULL);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, keypair->rsa->e); // 公開指数
-		buffer_put_bignum2(msg, keypair->rsa->n); // p×q
+		buffer_put_bignum2(msg, e); // 公開指数
+		buffer_put_bignum2(msg, n); // p×q
 		break;
 	case KEY_DSA: // DSA
+		DSA_get0_pqg(keypair->dsa, &p, &q, &g);
+		DSA_get0_key(keypair->dsa, &pub_key, NULL);
 		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, keypair->dsa->p); // 素数
-		buffer_put_bignum2(msg, keypair->dsa->q); // (p-1)の素因数
-		buffer_put_bignum2(msg, keypair->dsa->g); // 整数
-		buffer_put_bignum2(msg, keypair->dsa->pub_key); // 公開鍵
+		buffer_put_bignum2(msg, p); // 素数
+		buffer_put_bignum2(msg, q); // (p-1)の素因数
+		buffer_put_bignum2(msg, g); // 整数
+		buffer_put_bignum2(msg, pub_key); // 公開鍵
 		break;
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
@@ -1745,26 +1887,34 @@ ssh_keytype nid_to_keytype(int nid)
 void key_private_serialize(Key *key, buffer_t *b)
 {
 	char *s;
+	BIGNUM *e, *n, *d, *iqmp, *p, *q;
+	BIGNUM *g, *pub_key, *priv_key;
 	
 	s = get_sshname_from_key(key);
 	buffer_put_cstring(b, s);
 
 	switch (key->type) {
 		case KEY_RSA:
-			buffer_put_bignum2(b, key->rsa->n);
-			buffer_put_bignum2(b, key->rsa->e);
-			buffer_put_bignum2(b, key->rsa->d);
-			buffer_put_bignum2(b, key->rsa->iqmp);
-			buffer_put_bignum2(b, key->rsa->p);
-			buffer_put_bignum2(b, key->rsa->q);
+			RSA_get0_key(key->rsa, &n, &e, &d);
+			RSA_get0_factors(key->rsa, &p, &q);
+			RSA_get0_crt_params(key->rsa, NULL, NULL, &iqmp);
+
+			buffer_put_bignum2(b, n);
+			buffer_put_bignum2(b, e);
+			buffer_put_bignum2(b, d);
+			buffer_put_bignum2(b, iqmp);
+			buffer_put_bignum2(b, p);
+			buffer_put_bignum2(b, q);
 			break;
 
 		case KEY_DSA:
-			buffer_put_bignum2(b, key->dsa->p);
-			buffer_put_bignum2(b, key->dsa->q);
-			buffer_put_bignum2(b, key->dsa->g);
-			buffer_put_bignum2(b, key->dsa->pub_key);
-			buffer_put_bignum2(b, key->dsa->priv_key);
+			DSA_get0_pqg(key->dsa, &p, &q, &g);
+			DSA_get0_key(key->dsa, &pub_key, &priv_key);
+			buffer_put_bignum2(b, p);
+			buffer_put_bignum2(b, q);
+			buffer_put_bignum2(b, g);
+			buffer_put_bignum2(b, pub_key);
+			buffer_put_bignum2(b, priv_key);
 			break;
 
 		case KEY_ECDSA256:
@@ -1791,16 +1941,21 @@ static void rsa_generate_additional_parameters(RSA *rsa)
 {
 	BIGNUM *aux = NULL;
 	BN_CTX *ctx = NULL;
+	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 
 	if ((aux = BN_new()) == NULL)
 		goto error;
 	if ((ctx = BN_CTX_new()) == NULL)
 		goto error;
 
-	if ((BN_sub(aux, rsa->q, BN_value_one()) == 0) ||
-	    (BN_mod(rsa->dmq1, rsa->d, aux, ctx) == 0) ||
-	    (BN_sub(aux, rsa->p, BN_value_one()) == 0) ||
-	    (BN_mod(rsa->dmp1, rsa->d, aux, ctx) == 0))
+	RSA_get0_key(rsa, &n, &e, &d);
+	RSA_get0_factors(rsa, &p, &q);
+	RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
+
+	if ((BN_sub(aux, q, BN_value_one()) == 0) ||
+	    (BN_mod(dmq1, d, aux, ctx) == 0) ||
+	    (BN_sub(aux, p, BN_value_one()) == 0) ||
+	    (BN_mod(dmp1, d, aux, ctx) == 0))
 		goto error;
 
 error:
@@ -1817,6 +1972,8 @@ Key *key_private_deserialize(buffer_t *blob)
 	Key *k = NULL;
 	unsigned int pklen, sklen;
 	int type;
+	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+	BIGNUM *g, *pub_key, *priv_key;
 
 	type_name = buffer_get_string_msg(blob, NULL);
 	if (type_name == NULL)
@@ -1827,23 +1984,29 @@ Key *key_private_deserialize(buffer_t *blob)
 
 	switch (type) {
 		case KEY_RSA:
-			buffer_get_bignum2_msg(blob, k->rsa->n);
-			buffer_get_bignum2_msg(blob, k->rsa->e);
-			buffer_get_bignum2_msg(blob, k->rsa->d);
-			buffer_get_bignum2_msg(blob, k->rsa->iqmp);
-			buffer_get_bignum2_msg(blob, k->rsa->p);
-			buffer_get_bignum2_msg(blob, k->rsa->q);
+			RSA_get0_key(k->rsa, &n, &e, &d);
+			RSA_get0_factors(k->rsa, &p, &q);
+			RSA_get0_crt_params(k->rsa, &dmp1, &dmq1, &iqmp);
+
+			buffer_get_bignum2_msg(blob, n);
+			buffer_get_bignum2_msg(blob, e);
+			buffer_get_bignum2_msg(blob, d);
+			buffer_get_bignum2_msg(blob, iqmp);
+			buffer_get_bignum2_msg(blob, p);
+			buffer_get_bignum2_msg(blob, q);
 
 			/* Generate additional parameters */
 			rsa_generate_additional_parameters(k->rsa);
 			break;
 
 		case KEY_DSA:
-			buffer_get_bignum2_msg(blob, k->dsa->p);
-			buffer_get_bignum2_msg(blob, k->dsa->q);
-			buffer_get_bignum2_msg(blob, k->dsa->g);
-			buffer_get_bignum2_msg(blob, k->dsa->pub_key);
-			buffer_get_bignum2_msg(blob, k->dsa->priv_key);
+			DSA_get0_pqg(k->dsa, &p, &q, &g);
+			DSA_get0_key(k->dsa, &pub_key, &priv_key);
+			buffer_get_bignum2_msg(blob, p);
+			buffer_get_bignum2_msg(blob, q);
+			buffer_get_bignum2_msg(blob, g);
+			buffer_get_bignum2_msg(blob, pub_key);
+			buffer_get_bignum2_msg(blob, priv_key);
 			break;
 
 		case KEY_ECDSA256:

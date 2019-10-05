@@ -1,11 +1,16 @@
 #ifndef _SSLLIB_h_
 #define _SSLLIB_h_
 
+#ifdef OPENSSL_VERSION_MAJOR
+// OpenSSL 3.0.0ではOPENSSL_VERSION_MAJOR, OPENSSL_VERSION_MINOR, 
+// OPENSSL_VERSION_PATCH がデフォルトで定義される。
+#else
 #define OPENSSL_VERSION_MAJOR    (OPENSSL_VERSION_NUMBER & 0xf0000000L) >> 28
 #define OPENSSL_VERSION_MINOR    (OPENSSL_VERSION_NUMBER & 0x0ff00000L) >> 20
 #define OPENSSL_VERSION_FIX      (OPENSSL_VERSION_NUMBER & 0x000ff000L) >> 12
 #define OPENSSL_VERSION_PATCH    (OPENSSL_VERSION_NUMBER & 0x00000ff0L) >> 4
 #define OPENSSL_VERSION_STATUS   (OPENSSL_VERSION_NUMBER & 0x0000000fL)
+#endif
 
 #define DECLARE_MODULE_API(module, rettype, apiname, arglist, args) \
 rettype apiname arglist {                                     \
@@ -61,7 +66,6 @@ DECLARE_SSLEAY32_API(int, SSL_connect, (SSL *ssl), (ssl))
 DECLARE_SSLEAY32_API_v(SSL_free, (SSL *ssl), (ssl))
 DECLARE_SSLEAY32_API(int, SSL_get_error, (const SSL *s,int ret_code), (s,ret_code))
 DECLARE_SSLEAY32_API(X509 *, SSL_get_peer_certificate, (const SSL *s), (s))
-DECLARE_SSLEAY32_API_v(SSL_load_error_strings, (void ), ())
 DECLARE_SSLEAY32_API(SSL *, SSL_new, (SSL_CTX *ctx), (ctx))
 DECLARE_SSLEAY32_API(int, SSL_read, (SSL *ssl,void *buf,int num), (ssl, buf, num))
 DECLARE_SSLEAY32_API(int, SSL_set_fd, (SSL *s, int fd), (s, fd))
@@ -74,6 +78,6 @@ DECLARE_SSLEAY32_API(const SSL_METHOD *, SSLv23_client_method, (void), ())
 #endif
 DECLARE_SSLEAY32_API(int, SSL_CTX_load_verify_locations, (SSL_CTX *ctx, const char *CAfile, const char *CApath), (ctx, CAfile, CApath))
 DECLARE_SSLEAY32_API(long, SSL_get_verify_result, (const SSL *ssl), (ssl))
-DECLARE_SSLEAY32_API(int, SSL_library_init, (void), ())
+DECLARE_SSLEAY32_API(int, OPENSSL_init_ssl, (uint64_t opts, const OPENSSL_INIT_SETTINGS *settings), (opts, settings))
 
 #endif//_SSLLIB_h_

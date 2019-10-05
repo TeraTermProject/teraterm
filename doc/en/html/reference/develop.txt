@@ -42,7 +42,7 @@
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - others
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
-  ActivePerl 5.8 or later version
+  ActivePerl 5.10 or later version
     converts character-code and return-code of documents for building OpenSSL.
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     Use the compatible version for check-outed svn version.

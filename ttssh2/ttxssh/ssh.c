@@ -2584,23 +2584,33 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			}
 		}
 		else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-			int server_key_bits = BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
-			int host_key_bits = BN_num_bits(pvar->crypt_state.host_key.RSA_key->n);
-			int server_key_bytes = (server_key_bits + 7) / 8;
-			int host_key_bytes = (host_key_bits + 7) / 8;
-			int session_buf_len = server_key_bytes + host_key_bytes + 8;
-			char *session_buf = (char *) malloc(session_buf_len);
+			int server_key_bits;
+			int host_key_bits;
+			int server_key_bytes;
+			int host_key_bytes;
+			int session_buf_len;
+			char *session_buf;
 			unsigned char session_id[16];
 
 			unsigned char *hash;
 			int pubkeylen, hashlen;
+			BIGNUM *server_n, *host_n;
+
+			RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
+			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
+			server_key_bits = BN_num_bits(server_n);
+			host_key_bits = BN_num_bits(host_n);
+			server_key_bytes = (server_key_bits + 7) / 8;
+			host_key_bytes = (host_key_bits + 7) / 8;
+			session_buf_len = server_key_bytes + host_key_bytes + 8;
+			session_buf = (char FAR *) malloc(session_buf_len);
 
 			/* Pageant にハッシュを計算してもらう */
 			// 公開鍵の長さ
 			pubkeylen = putty_get_ssh1_keylen(pvar->pageant_curkey, pvar->pageant_keylistlen);
 			// セッションIDを作成
-			BN_bn2bin(pvar->crypt_state.host_key.RSA_key->n, session_buf);
-			BN_bn2bin(pvar->crypt_state.server_key.RSA_key->n, session_buf + host_key_bytes);
+			BN_bn2bin(host_n, session_buf);
+			BN_bn2bin(server_n, session_buf + host_key_bytes);
 			memcpy(session_buf + server_key_bytes + host_key_bytes, pvar->crypt_state.server_cookie, 8);
 			MD5(session_buf, session_buf_len, session_id);
 			// ハッシュを受け取る
@@ -2626,6 +2636,8 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 
 static void try_send_credentials(PTInstVar pvar)
 {
+	BIGNUM *e, *n;
+
 	if ((pvar->ssh_state.status_flags & STATUS_DONT_SEND_CREDENTIALS) == 0) {
 		AUTHCred *cred = AUTH_get_cur_cred(pvar);
 		static const int RSA_msgs[] =
@@ -2676,26 +2688,34 @@ static void try_send_credentials(PTInstVar pvar)
 				break;
 			}
 		case SSH_AUTH_RSA:{
-				int len = BN_num_bytes(cred->key_pair->rsa->n);
-				unsigned char *outmsg =
-					begin_send_packet(pvar, SSH_CMSG_AUTH_RSA, 2 + len);
+				int len;
+				unsigned char *outmsg;
+
+				RSA_get0_key(cred->key_pair->rsa, &n, NULL, NULL);
+				len = BN_num_bytes(n);
+				outmsg = begin_send_packet(pvar, SSH_CMSG_AUTH_RSA, 2 + len);
 
 				logputs(LOG_LEVEL_VERBOSE, "Trying RSA authentication...");
 
 				set_ushort16_MSBfirst(outmsg, len * 8);
-				BN_bn2bin(cred->key_pair->rsa->n, outmsg + 2);
+				BN_bn2bin(n, outmsg + 2);
 				/* don't destroy the current credentials yet */
 				enque_handlers(pvar, 2, RSA_msgs, RSA_handlers);
 				break;
 			}
 		case SSH_AUTH_RHOSTS_RSA:{
-				int mod_len = BN_num_bytes(cred->key_pair->rsa->n);
-				int name_len = strlen(cred->rhosts_client_user);
-				int exp_len = BN_num_bytes(cred->key_pair->rsa->e);
+				int mod_len;
+				int name_len;
+				int exp_len;
 				int index;
-				unsigned char *outmsg =
-					begin_send_packet(pvar, SSH_CMSG_AUTH_RHOSTS_RSA,
-					                  12 + mod_len + name_len + exp_len);
+				unsigned char *outmsg;
+
+				RSA_get0_key(cred->key_pair->rsa, &n, &e, NULL);
+				mod_len = BN_num_bytes(n);
+				name_len = strlen(cred->rhosts_client_user);
+				exp_len = BN_num_bytes(e);
+				outmsg = begin_send_packet(pvar, SSH_CMSG_AUTH_RHOSTS_RSA,
+					                       12 + mod_len + name_len + exp_len);
 
 				logputs(LOG_LEVEL_VERBOSE, "Trying RHOSTS+RSA authentication...");
 
@@ -2705,11 +2725,11 @@ static void try_send_credentials(PTInstVar pvar)
 
 				set_uint32(outmsg + index, 8 * mod_len);
 				set_ushort16_MSBfirst(outmsg + index + 4, 8 * exp_len);
-				BN_bn2bin(cred->key_pair->rsa->e, outmsg + index + 6);
+				BN_bn2bin(e, outmsg + index + 6);
 				index += 6 + exp_len;
 
 				set_ushort16_MSBfirst(outmsg + index, 8 * mod_len);
-				BN_bn2bin(cred->key_pair->rsa->n, outmsg + index + 2);
+				BN_bn2bin(n, outmsg + index + 2);
 				/* don't destroy the current credentials yet */
 				enque_handlers(pvar, 2, RSA_msgs, RSA_handlers);
 				break;
@@ -5407,6 +5427,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	int len;
+	BIGNUM *pub_key;
 
 	// Diffie-Hellman key agreement
 	switch (pvar->kex_type) {
@@ -5437,7 +5458,8 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 		return;
 	}
 
-	buffer_put_bignum2(msg, dh->pub_key);
+	DH_get0_key(dh, &pub_key, NULL);
+	buffer_put_bignum2(msg, pub_key);
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEXDH_INIT, len);
@@ -5579,6 +5601,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	char tmpbuf[256];
+	BIGNUM *pub_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_GROUP was received.");
 
@@ -5653,8 +5676,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	dh = DH_new();
 	if (dh == NULL)
 		goto error;
-	dh->p = p;
-	dh->g = g;
+	DH_set0_pqg(dh, p, NULL, g);
 
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
@@ -5664,7 +5686,8 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	if (msg == NULL) {
 		goto error;
 	}
-	buffer_put_bignum2(msg, dh->pub_key);
+	DH_get0_key(dh, &pub_key, NULL);
+	buffer_put_bignum2(msg, pub_key);
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_DH_GEX_INIT, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -5679,9 +5702,14 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	pvar->kexdh = dh;
 
 	{
-		push_bignum_memdump("DH_GEX_GROUP", "p", dh->p);
-		push_bignum_memdump("DH_GEX_GROUP", "g", dh->g);
-		push_bignum_memdump("DH_GEX_GROUP", "pub_key", dh->pub_key);
+		BIGNUM *p, *q, *pub_key;
+
+		DH_get0_pqg(dh, &p, &q, NULL);
+		DH_get0_key(dh, &pub_key, NULL);
+
+		push_bignum_memdump("DH_GEX_GROUP", "p", p);
+		push_bignum_memdump("DH_GEX_GROUP", "g", g);
+		push_bignum_memdump("DH_GEX_GROUP", "pub_key", pub_key);
 	}
 
 	SSH2_dispatch_init(2);
@@ -5710,17 +5738,22 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	const EC_GROUP *group;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	int len, ret;
+	char buf[128];
 
 	client_key = EC_KEY_new();
 	if (client_key == NULL) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_new was failed", __FUNCTION__);
 		goto error;
 	}
 	client_key = EC_KEY_new_by_curve_name(kextype_to_cipher_nid(pvar->kex_type));
 	if (client_key == NULL) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_new_by_curve_name was failed", __FUNCTION__);
 		goto error;
 	}
-	if (EC_KEY_generate_key(client_key) != 1) {
+	ret = EC_KEY_generate_key(client_key);
+	if (ret != 1) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_generate_key was failed(ret %d)", __FUNCTION__, ret);
 		goto error;
 	}
 	group = EC_KEY_get0_group(client_key);
@@ -5728,9 +5761,9 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-		return;
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: buffer_init was failed", __FUNCTION__);
+		goto error;
 	}
 
 	buffer_put_ecpoint(msg, group, EC_KEY_get0_public_key(client_key));
@@ -5759,7 +5792,7 @@ error:;
 	EC_KEY_free(client_key);
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, "error occurred @ SSH2_ecdh_kex_init()", TRUE);
+	notify_fatal_error(pvar, buf, TRUE);
 }
 
 
@@ -5805,9 +5838,11 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *sha
 	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
+				BIGNUM *n;
+				RSA_get0_key(hostkey->rsa, &n, NULL, NULL);
 				_snprintf_s(emsg, sizeof(emsg), _TRUNCATE,
 					"%s: key verify error. remote rsa key length is too short (%d-bit)", __FUNCTION__,
-					BN_num_bits(hostkey->rsa->n));
+					BN_num_bits(n));
 			}
 			else {
 				goto cont;
@@ -6025,6 +6060,7 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	BIGNUM *pub_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY is continued after known_hosts.");
 
@@ -6103,6 +6139,7 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hash = kex_dh_hash(
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		pvar->client_version_string,
@@ -6110,7 +6147,7 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
 		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
 		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
 		server_host_key_blob, bloblen,
-		pvar->kexdh->pub_key,
+		pub_key,
 		server_public,
 		share_key,
 		&hashlen);
@@ -6126,7 +6163,8 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
+	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
@@ -6180,7 +6218,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
 	int ret;
-
+	
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
 	memset(&hostkey, 0, sizeof(hostkey));
@@ -6287,6 +6325,8 @@ BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
+	BIGNUM *p, *g;
+	BIGNUM *pub_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY is continued after known_hosts.");
 
@@ -6371,6 +6411,8 @@ BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
+	DH_get0_pqg(pvar->kexdh, &p, NULL, &g);
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hash = kex_dh_gex_hash(
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		pvar->client_version_string,
@@ -6381,9 +6423,9 @@ BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
 		pvar->kexgex_min,
 		pvar->kexgex_bits,
 		pvar->kexgex_max,
-		pvar->kexdh->p,
-		pvar->kexdh->g,
-		pvar->kexdh->pub_key,
+		p,
+		g,
+		pub_key,
 		server_public,
 		share_key,
 		&hashlen);
@@ -6399,7 +6441,8 @@ BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
+	DH_get0_key(pvar->kexdh, &pub_key, NULL);
+	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
