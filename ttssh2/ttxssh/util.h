@@ -84,7 +84,7 @@ BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf *buf, SOCKET socket);
 void UTIL_destroy_sock_write_buf(UTILSockWriteBuf *buf);
 BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf);
 
-void UTIL_get_lang_msg(PCHAR key, PTInstVar pvar, PCHAR def);
+void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def);
 HFONT UTIL_get_lang_fixedfont(HWND hWnd, const char *UILanguageFile);
 
 #endif
