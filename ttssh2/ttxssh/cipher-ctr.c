@@ -306,27 +306,8 @@ ssh_bf_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_bf_ctr(void)
 {
-	/*** TODO: OPENSSL1.1.1 テスト完了後に削除する ***/
-#if 0
-	static EVP_CIPHER blowfish_ctr;
-
-	memset(&blowfish_ctr, 0, sizeof(EVP_CIPHER));
-	blowfish_ctr.nid = NID_undef;
-	blowfish_ctr.block_size = BF_BLOCK;
-	blowfish_ctr.iv_len = BF_BLOCK;
-	blowfish_ctr.key_len = 16;
-	blowfish_ctr.init = ssh_bf_ctr_init;
-	blowfish_ctr.cleanup = ssh_bf_ctr_cleanup;
-	blowfish_ctr.do_cipher = ssh_bf_ctr;
-#ifndef SSH_OLD_EVP
-	blowfish_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
-#endif
-	return (&blowfish_ctr);
-#endif
-
 	static EVP_CIPHER *p = NULL;
 
-	/********* OPENSSL1.1.1 NOTEST *********/
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/BF_BLOCK, /*key_len*/16);
 		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
@@ -419,25 +400,6 @@ ssh_cast5_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_cast5_ctr(void)
 {
-	/*** TODO: OPENSSL1.1.1 テスト完了後に削除する ***/
-#if 0
-	static EVP_CIPHER cast5_ctr;
-
-	memset(&cast5_ctr, 0, sizeof(EVP_CIPHER));
-	cast5_ctr.nid = NID_undef;
-	cast5_ctr.block_size = CAST_BLOCK;
-	cast5_ctr.iv_len = CAST_BLOCK;
-	cast5_ctr.key_len = 16;
-	cast5_ctr.init = ssh_cast5_ctr_init;
-	cast5_ctr.cleanup = ssh_cast5_ctr_cleanup;
-	cast5_ctr.do_cipher = ssh_cast5_ctr;
-#ifndef SSH_OLD_EVP
-	cast5_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
-#endif
-	return (&cast5_ctr);
-#endif
-
-	/********* OPENSSL1.1.1 NOTEST *********/
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
