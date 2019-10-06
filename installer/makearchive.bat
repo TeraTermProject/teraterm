@@ -101,6 +101,17 @@ if "%release%"=="yes" (
 copy nul %dst%\ttpmenu.ini
 )
 
+rem cygterm のビルド確認
+if not exist ..\cygterm\cygterm.exe (
+	echo 32bit cygterm.exe がビルドできていません
+)
+if not exist ..\cygterm\cygterm+.tar.gz (
+	echo 32bit cygterm+.tar.gz が生成できていません
+)
+if not exist ..\cygterm\cygterm+-x86_64\cygterm.exe (
+	echo 64bit cygterm.exe がビルドできていません
+)
+
 exit /b
 
 :help
