@@ -1,6 +1,18 @@
+#
 # Makefile for CygTerm
+#
+# [How to build]
+# Step1. for 64bit
+#   make clean
+#   make x64
+#
+# Step2. for 32bit
+#   make clean
+#   make
+#
 
 BINDIR = $(HOME)/bin
+BINDIR64 = cygterm+-x86_64
 
 CC = gcc
 CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions
@@ -17,9 +29,20 @@ ICO = $(EXE:.exe=.ico)
 RC  = $(EXE:.exe=.rc)
 ARCHIVE = cygterm+.tar.gz
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install uninstall x64
 
 all : $(EXE) $(LAUNCH) $(ARCHIVE)
+	file $(EXE) | grep 80386
+	@echo "********************************"
+	@echo "Is cygterm.exe 32bit program?"
+	@echo "********************************"
+
+x64 : $(EXE)
+	cp -f $(EXE) $(BINDIR64)
+	file $(EXE) | grep x86-64
+	@echo "********************************"
+	@echo "Is cygterm.exe 64bit program?"
+	@echo "********************************"
 
 $(EXE) : $(SRC) $(ICO) $(RC)
 	windres -O coff -o $(RES) $(RC)
