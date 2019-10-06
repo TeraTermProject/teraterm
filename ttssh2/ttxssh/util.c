@@ -314,7 +314,7 @@ BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf)
 	return buf->buflen / 2 < buf->datalen;
 }
 
-void UTIL_get_lang_msg(PCHAR key, PTInstVar pvar, PCHAR def)
+void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def)
 {
 	GetI18nStr("TTSSH", key, pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
 		def, pvar->ts->UILanguageFile);
