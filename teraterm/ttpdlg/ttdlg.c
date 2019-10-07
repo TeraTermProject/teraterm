@@ -1262,11 +1262,11 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 			TipWinGetTextWidthHeight(hWnd, str, &w, &h);
 
 			cx = pt.x;
-			cy = pt.y - (h + FRAME_WIDTH * 6);
+			cy = pt.y - (h + TIP_WIN_FRAME_WIDTH * 6);
 
 			// ツールチップを表示する
 			if (g_SerialDlgSpeedTip == NULL) {
-				g_SerialDlgSpeedTip = TipWinCreate(hWnd, cx, cy, str);
+				g_SerialDlgSpeedTip = TipWinCreate(hInst, hWnd, cx, cy, str);
 				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
 
 			} else {

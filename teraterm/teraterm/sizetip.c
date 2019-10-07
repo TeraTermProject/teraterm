@@ -137,14 +137,14 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		GetWindowRect(src, &wr);
 
 		// sizetipを出す位置は、ウィンドウ左上(X, Y)に対して、
-		// (X, Y - 文字列の高さ - FRAME_WIDTH * 2) とする。
+		// (X, Y - 文字列の高さ - TIP_WIN_FRAME_WIDTH * 2) とする。
 		point.x = wr.left;
-		point.y = wr.top - (h + FRAME_WIDTH * 2);
+		point.y = wr.top - (h + TIP_WIN_FRAME_WIDTH * 2);
 		FixPosFromFrame(&point, 16, FALSE);
 		cx = point.x;
 		cy = point.y;
 
-		SizeTip = TipWinCreate(src, cx, cy, str);
+		SizeTip = TipWinCreate(NULL, src, cx, cy, str);
 
 		//OutputDebugPrintf("Created: (%d,%d)\n", cx, cy);
 
@@ -157,7 +157,7 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 
 		// ウィンドウの左上が移動する場合
 		if (tooltip_movable) {
-			TipWinSetPos(SizeTip, newX + FRAME_WIDTH*2, newY + FRAME_WIDTH*2);
+			TipWinSetPos(SizeTip, newX + TIP_WIN_FRAME_WIDTH*2, newY + TIP_WIN_FRAME_WIDTH*2);
 			//OutputDebugPrintf("Moved: (%d,%d)\n", newX, newY);
 		}
 	}

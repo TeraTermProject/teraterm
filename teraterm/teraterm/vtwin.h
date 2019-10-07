@@ -71,6 +71,7 @@ private:
 
 public:
 	CVTWindow(HINSTANCE hInstance);
+	~CVTWindow();
 	int Parse();
 	void ButtonUp(BOOL Paste);
 	void ButtonDown(POINT p, int LMR);

@@ -805,7 +805,18 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DropListCount = 0;
 
 	// TipWin
-	TipWin = new CTipWin(HVTWin);
+	TipWin = new CTipWin(hInstance);
+	TipWin->Create(HVTWin);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// CVTWindow destructor
+
+CVTWindow::~CVTWindow()
+{
+	TipWin->Destroy();
+	delete TipWin;
+	TipWin = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2455,7 +2466,7 @@ BOOL CVTWindow::OnMouseWheel(
 			SetWindowAlpha(newAlpha);
 
 			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
+			_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (newAlpha / 255.0) * 100);
 
 			tippos = TipWin->GetPos();
 			if (tippos.x != pt.x ||
