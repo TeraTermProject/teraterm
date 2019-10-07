@@ -1110,7 +1110,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->TEKColorEmu = GetOnOff(Section, "TEKColorEmulation", FName, FALSE);
 
 	/* VT Font */
-	ReadFont(Section, "VTFont", "Terminal,0,-13,1", FName,
+	ReadFont(Section, "VTFont", "Courier New,0,-16,0", FName,
 			 ts->VTFont, _countof(ts->VTFont),
 			 &ts->VTFontSize, &(ts->VTFontCharSet));
 
