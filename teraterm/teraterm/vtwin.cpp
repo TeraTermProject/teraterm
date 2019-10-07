@@ -3685,7 +3685,7 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
-	DWORD help_id = (wParam == 0) ? HelpId : wParam;
+	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
 	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
 	return 0;
 }
@@ -6309,7 +6309,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		// HELPMSGSTRING message Žž
 		//		wp = dialog handle
 		//		lp = initialization structure
-		OnDlgHelp(0, 0);
+		OnDlgHelp(HelpId, 0);
 		return 0;
 	}
 	switch(msg)

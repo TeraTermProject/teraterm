@@ -1634,7 +1634,7 @@ hostssh_enabled:
 			break;
 
 		case IDC_HOSTHELP:
-			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, 0, 0);
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpFileNewConnection, 0);
 		}
 	}
 	return FALSE;
