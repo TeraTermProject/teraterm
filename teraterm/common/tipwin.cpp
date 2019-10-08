@@ -216,7 +216,7 @@ CTipWin::~CTipWin()
 BOOL CTipWin::IsClassRegistered()
 {
 	if (*class_name == NULL) {
-		_snprintf_s(class_name, sizeof(class_name), _TRUNCATE, _T("%s_%x"), TipWinClassName, hInstance);
+		_snprintf_s(class_name, sizeof(class_name), _TRUNCATE, _T("%s_%p"), TipWinClassName, hInstance);
 	}
 	WNDCLASS twc = { 0 };
 	return (GetClassInfo(hInstance, (LPCSTR)class_name, &twc) > 0);
