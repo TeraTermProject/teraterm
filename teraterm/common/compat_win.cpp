@@ -55,12 +55,12 @@ static const APIInfo Lists_user32[] = {
 	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
-	{ NULL },
+	{},
 };
 
 static const APIInfo Lists_msimg32[] = {
 	{ "AlphaBlend", (void **)&pAlphaBlend },
-	{ NULL },
+	{},
 };
 
 static const APIInfo Lists_gdi32[] = {
@@ -68,12 +68,12 @@ static const APIInfo Lists_gdi32[] = {
 	{ "RemoveFontResourceExA", (void **)&pRemoveFontResourceExA },
 	{ "AddFontResourceExW", (void **)&pAddFontResourceExW },
 	{ "RemoveFontResourceExW", (void **)&pRemoveFontResourceExW },
-	{ NULL },
+	{},
 };
 
 static const APIInfo Lists_Shcore[] = {
 	{ "GetDpiForMonitor", (void **)&pGetDpiForMonitor },
-	{ NULL },
+	{},
 };
 
 static const DllInfo DllInfos[] = {
@@ -81,7 +81,7 @@ static const DllInfo DllInfos[] = {
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
 	{ _T("gdi32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_gdi32 },
 	{ _T("Shcore.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_Shcore },
-	{ NULL },
+	{},
 };
 
 void WinCompatInit()
