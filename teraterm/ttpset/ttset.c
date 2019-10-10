@@ -2131,7 +2131,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->PasteFlag |= CPF_NORMALIZE_LINEBREAK;
 
 	// List Inactive Font
-	ts->ListHiddenFonts = GetOnOff(Section, "ListHiddenFonts", FName, FALSE);
+	ts->ListHiddenFonts = GetOnOff(Section, "ListHiddenFonts", FName, TRUE);
 
 	// ISO2022ShiftFunction
 	GetPrivateProfileString(Section, "ISO2022ShiftFunction", "on", Temp, sizeof(Temp), FName);
