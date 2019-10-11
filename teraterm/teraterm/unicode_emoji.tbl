@@ -1,4 +1,4 @@
-{ 0x00203c, 0x00203c }, // double exclamation mark
+﻿{ 0x00203c, 0x00203c }, // double exclamation mark
 { 0x002049, 0x002049 }, // exclamation question mark
 { 0x002122, 0x002122 }, // trade mark
 { 0x002139, 0x002139 }, // information
