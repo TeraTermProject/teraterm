@@ -540,7 +540,7 @@ begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'UTF-8', iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'Courier New,0,-16,0', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
     end;
@@ -553,7 +553,7 @@ begin
       if CodePage = 0 then
         SetIniInt('Tera Term', 'CodePage', 932, iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-19,128', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'Courier New,0,-16,0', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,128', iniFile);
     end;
@@ -566,7 +566,7 @@ begin
       if CodePage = 0 then
         SetIniInt('Tera Term', 'CodePage', 949, iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'Courier New,0,-16,0', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
     end;
@@ -579,7 +579,7 @@ begin
       if CodePage = 0 then
         SetIniInt('Tera Term', 'CodePage', 1251, iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'Courier New,0,-16,0', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
     end;
@@ -607,7 +607,7 @@ begin
       end;
 
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'Courier New,0,-16,0', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
     end;
