@@ -216,10 +216,10 @@ CTipWin::~CTipWin()
 BOOL CTipWin::IsClassRegistered()
 {
 	if (*class_name == NULL) {
-		_snprintf_s(class_name, sizeof(class_name), _TRUNCATE, _T("%s_%x"), TipWinClassName, hInstance);
+		_snprintf_s(class_name, sizeof(class_name), _TRUNCATE, _T("%s_%p"), TipWinClassName, hInstance);
 	}
 	WNDCLASS twc = { 0 };
-	return (GetClassInfo(hInstance, (LPCSTR)class_name, &twc) > 0);
+	return (GetClassInfo(hInstance, class_name, &twc) > 0);
 }
 
 ATOM CTipWin::RegisterClass()
@@ -234,13 +234,13 @@ ATOM CTipWin::RegisterClass()
 	wc.hCursor = NULL;
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = (LPCSTR)class_name;
+	wc.lpszClassName = class_name;
 	return ::RegisterClass(&wc);
 }
 
 BOOL CTipWin::UnregisterClass()
 {
-	return ::UnregisterClass((LPCSTR)class_name, hInstance);
+	return ::UnregisterClass(class_name, hInstance);
 }
 
 VOID CTipWin::Create(HWND pHwnd)
@@ -278,7 +278,7 @@ VOID CTipWin::Create(HWND pHwnd)
 	 */
 	tWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					   (LPCSTR)class_name,
+					   class_name,
 					   NULL, WS_POPUP,
 					   0, 0,
 					   0, 0,
