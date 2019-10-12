@@ -32,11 +32,14 @@
 #include "compat_win.h"
 
 #include <assert.h>
-#include <tchar.h>
 
+/**
+ *	GetI18nStr() の unicode版
+ */
 DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
 								  const char *iniFile)
 {
+	DWORD size;
 	if (pGetPrivateProfileStringW != NULL) {
 		wchar_t sectionW[64];
 		wchar_t keyW[128];
@@ -44,21 +47,38 @@ DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t 
 		MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
 		MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
 		MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
-		pGetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+		size = pGetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+		if (size == 0 && def == NULL) {
+			buf[0] = 0;
+		}
 	}
 	else {
 		char tmp[MAX_UIMSG];
 		char defA[MAX_UIMSG];
 		WideCharToMultiByte(CP_ACP, 0, def, -1, defA, _countof(defA), NULL, NULL);
-		GetPrivateProfileStringA(section, key, defA, tmp, _countof(tmp), iniFile);
+		size = GetPrivateProfileStringA(section, key, defA, tmp, _countof(tmp), iniFile);
+		if (size == 0 && def == NULL) {
+			buf[0] = 0;
+		}
 		MultiByteToWideChar(CP_ACP, 0, tmp, -1, buf, buf_len);
 	}
 	RestoreNewLineW(buf);
 }
 
+/**
+ *	section/keyの文字列をbufにセットする
+ *	section/keyが見つからなかった場合、
+ *		defの文字列をbufにセットする
+ *		defがNULLの場合buf[0] = 0となる
+ */
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
-	GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
+	DWORD size = GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
+	if (size == 0 && def == NULL) {
+		// GetPrivateProfileStringA()の戻り値はbufにセットした文字数(終端含まず)
+		// OSのバージョンによってはdefがNULLの時、bufが未設定となることがある
+		buf[0] = 0;
+	}
 	RestoreNewLine(buf);
 }
 
