@@ -35,11 +35,6 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Added support for hardware flow control DSR/DTR with serial connection.
-        <ul>
-          <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
-          <li>MACRO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
-        </ul></li>
       <li>Added SFMT information on version dialog.</li>
       <li>Changed of indication from "Protocol" to "IP version" and from "UNSPEC" to "AUTO" on <a href="../menu/file-new.html">New connection dialog</a>.</li>
       <li>When the opacity value of the window is temporarily changed by operating the mouse wheel on the title bar of VT window, the tooltip of the opacity value is shown.</li>
@@ -47,13 +42,24 @@
       <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. When transparency is not available, made opacity not changeable.</li>
       <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
       <li>When the opacity values of the <a href="../menu/setup-additional.html">Additional settings dialog</a> is input over than 255, the value is automatically changed to 255 over the dialog.</li>
-      <li>The <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
-      <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
-      <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-      <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-      <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed refering to the connection state. </li>
-      <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
-      <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
+      
+      <li>Serial port connection
+        <ul>
+          <li>Added support for hardware flow control DSR/DTR with serial connection.
+            <ul>
+              <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
+              <li>MACRO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
+            </ul></li>
+          <li>The <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
+          <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
+          <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+          <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+          <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed refering to the connection state. </li>
+          <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
+          <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
+        </ul>
+      </li>
+      
     </ul>
   </li>
 
@@ -4862,11 +4868,11 @@ SYNOPSIS:
 
 <h3 id="ttproxy_1.0.0.26">2019.xx.xx (Ver 1.0.0.26)</h3>
 <ul class="history">
-  <li>Changes
+  <!-- li>Changes
     <ul>
       <li></li>
     </ul>
-  </li>
+  </li -->
 
   <li>Bug fixes
     <ul>

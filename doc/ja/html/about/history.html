@@ -35,11 +35,6 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>シリアル接続でハードウェアフロー制御DSR/DTRをサポートした。
-        <ul>
-          <li><a href="../menu/setup-serialport.html">Serial port ([Setup] メニュー)</a>のFlow controlでhardwareをRTS/CTSに変更し、新しくDSR/DTRを追加した。</li>
-          <li><a href="../macro/command/setflowctrl.html">setflowctrl</a>マクロコマンドで DSR/DTR を指定できるようにした。</li>
-        </ul></li>
       <li>バージョン情報ダイアログにSFMTの表記を追加した。</li>
       <li><a href="../menu/file-new.html">New connectionダイアログ</a>の表記を「Protocol」から「IP version」に、「UNSPEC」を「AUTO」に変更した。</li>
       <li>VT ウィンドウのタイトルバー上でマウスホイールを操作してウィンドウの不透明度を一時的に変更するとき、不透明度をツールチップに表示するようにした。</li>
@@ -47,13 +42,24 @@
       <li>リサイズ中の縦横サイズツールチップの表示位置をリサイズ後の座標に追従するようにした。</li>
       <li>Eterm look-feel: <a href="../menu/setup-additional.html#MixedThemeFile">壁紙と画像を混合する</a>を設定できるようにした。teraterm.ini に <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> エントリを追加した。デフォルトはoff。</li>
       <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで不透明度の値に256以上を入力したとき、ダイアログ上で255に変更するようにした。</li>
-      <li>TCP/IP接続中においても<a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログを呼び出せるようにした。</li>
-      <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログのタイトルを「シリアルポート設定」から「シリアルポート設定と接続」に変更した。</li>
-      <li><a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> ダイアログにCOMポートの詳細情報を追加した。</li>
-      <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログのスピード設定でツールチップを表示するようにした。</li>
-      <li><a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> ダイアログのOKボタンの表記を接続状態で切り替えるようにした。</li>
-      <li>使用可能なCOMポートが存在しない場合、<a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> ダイアログのOKボタンを押せないようにした。</li>
-      <li><a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> コマンドラインオプションを追加した。</li>
+      
+      <li>シリアルポート接続
+        <ul>
+          <li>シリアル接続でハードウェアフロー制御DSR/DTRをサポートした。
+            <ul>
+              <li><a href="../menu/setup-serialport.html">Serial port ([Setup] メニュー)</a>のFlow controlでhardwareをRTS/CTSに変更し、新しくDSR/DTRを追加した。</li>
+              <li><a href="../macro/command/setflowctrl.html">setflowctrl</a>マクロコマンドで DSR/DTR を指定できるようにした。</li>
+            </ul></li>
+          <li>TCP/IP接続中においても<a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログを呼び出せるようにした。</li>
+          <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログのタイトルを「シリアルポート設定」から「シリアルポート設定と接続」に変更した。</li>
+          <li><a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> ダイアログにCOMポートの詳細情報を追加した。</li>
+          <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログのスピード設定でツールチップを表示するようにした。</li>
+          <li><a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> ダイアログのOKボタンの表記を接続状態で切り替えるようにした。</li>
+          <li>使用可能なCOMポートが存在しない場合、<a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> ダイアログのOKボタンを押せないようにした。</li>
+          <li><a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> コマンドラインオプションを追加した。</li>
+        </ul>
+      </li>
+      
     </ul>
   </li>
 
@@ -4867,11 +4873,11 @@
 
 <h3 id="ttproxy_1.0.0.26">2019.xx.xx (Ver 1.0.0.26)</h3>
 <ul class="history">
-  <li>変更
+  <!--li>変更
     <ul>
       <li></li>
     </ul>
-  </li>
+  </li -->
 
   <li>バグ修正
     <ul>
