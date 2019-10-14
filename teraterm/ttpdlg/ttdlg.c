@@ -51,6 +51,7 @@
 #include "tipwin.h"
 #include "comportinfo.h"
 #include "codeconv.h"
+#include "helpid.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -286,9 +287,9 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			return TRUE;
 
 		case WM_COMMAND:
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 
 					if ( ts!=NULL ) {
 						int width, height;
@@ -426,9 +427,31 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					}
 					break;
 
-				case IDC_TERMHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+				case IDC_TERMHELP: {
+					WPARAM HelpId;
+					switch (ts->Language) {
+					case IdJapanese:
+						HelpId = HlpSetupTerminalJa;
+						break;
+					case IdEnglish:
+						HelpId = HlpSetupTerminalEn;
+						break;
+					case IdKorean:
+						HelpId = HlpSetupTerminalKo;
+						break;
+					case IdRussian:
+						HelpId = HlpSetupTerminalRu;
+						break;
+					case IdUtf8:
+						HelpId = HlpSetupTerminalUtf8;
+						break;
+					default:
+						HelpId = HlpSetupTerminal;
+						break;
+					}
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
 					break;
+				}
 			}
 	}
 	return FALSE;
@@ -946,9 +969,11 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					}
 					break;
 
-				case IDC_WINHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+				case IDC_WINHELP: {
+					const WPARAM HelpId = ts->VTFlag > 0 ? HlpSetupWindow : HlpTEKSetupWindow;
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
 					break;
+				}
 			}
 			break;
 
@@ -1082,9 +1107,9 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			return TRUE;
 
 		case WM_COMMAND:
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						WORD w;
 
@@ -1109,8 +1134,17 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					EndDialog(Dialog, 0);
 					return TRUE;
 
-				case IDC_KEYBHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+				case IDC_KEYBHELP: {
+					WPARAM HelpId;
+					if (ts->Language==IdRussian) {
+						HelpId = HlpSetupKeyboardRuss;
+					}
+					else {
+						HelpId = HlpSetupKeyboard;
+					}
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
+					break;
+				}
 			}
 	}
 	return FALSE;
@@ -1267,11 +1301,11 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 			TipWinGetTextWidthHeight(hWnd, str, &w, &h);
 
 			cx = pt.x;
-			cy = pt.y - (h + FRAME_WIDTH * 6);
+			cy = pt.y - (h + TIP_WIN_FRAME_WIDTH * 6);
 
 			// ツールチップを表示する
 			if (g_SerialDlgSpeedTip == NULL) {
-				g_SerialDlgSpeedTip = TipWinCreate(hWnd);
+				g_SerialDlgSpeedTip = TipWinCreate(hInst, hWnd);
 				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
 			}
 			if (!TipWinIsVisible(g_SerialDlgSpeedTip))
@@ -1517,7 +1551,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					return TRUE;
 
 				case IDC_SERIALHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpSetupSerialPort,0);
 					return TRUE;
 
 				case IDC_SERIALPORT:
@@ -1774,7 +1808,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					break;
 
 				case IDC_TCPIPHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpSetupTCPIP,0);
 					break;
 			}
 	}
@@ -2005,7 +2039,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					break;
 
 				case IDC_HOSTHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpFileNewConnection,0);
+					break;
 			}
 	}
 	return FALSE;
@@ -2161,7 +2196,8 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					return TRUE;
 
 				case IDC_DIRHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpFileChangeDir,0);
+					break;
 			}
 	}
 	return FALSE;
@@ -2970,7 +3006,8 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					return TRUE;
 
 				case IDC_GENHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpSetupGeneral,0);
+					break;
 			}
 			break;
 
@@ -3056,7 +3093,8 @@ static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPA
 					break;
 
 				case IDC_WINLISTHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpWindowWindow,0);
+					break;
 			}
 	}
 	return FALSE;

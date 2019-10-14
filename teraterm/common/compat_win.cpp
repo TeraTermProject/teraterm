@@ -69,12 +69,12 @@ static const APIInfo Lists_user32[] = {
 	{ "SetWindowTextW", (void **)&pSetWindowTextW },
 	{ "ModifyMenuW", (void **)&pModifyMenuW },
 	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
-	{ NULL, NULL },
+	{},
 };
 
 static const APIInfo Lists_msimg32[] = {
 	{ "AlphaBlend", (void **)&pAlphaBlend },
-	{ NULL, NULL },
+	{},
 };
 
 static const APIInfo Lists_gdi32[] = {
@@ -82,29 +82,29 @@ static const APIInfo Lists_gdi32[] = {
 	{ "RemoveFontResourceExA", (void **)&pRemoveFontResourceExA },
 	{ "AddFontResourceExW", (void **)&pAddFontResourceExW },
 	{ "RemoveFontResourceExW", (void **)&pRemoveFontResourceExW },
-	{ NULL, NULL },
+	{},
 };
 
 static const APIInfo Lists_Shcore[] = {
 	{ "GetDpiForMonitor", (void **)&pGetDpiForMonitor },
-	{ NULL, NULL },
+	{},
 };
 
 static const APIInfo Lists_kernel32[] = {
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
-	{ NULL, NULL },
+	{},
 };
 
 static const APIInfo Lists_shell32[] = {
 	{ "DragQueryFileW", (void **)&pDragQueryFileW },
-	{ NULL, NULL },
+	{},
 };
 
 static const APIInfo Lists_comctl32[] = {
 	{ "CreatePropertySheetPageW", (void **)&pCreatePropertySheetPageW },
 	{ "PropertySheetW", (void **)&pPropertySheetW },
-	{ NULL, NULL },
+	{},
 };
 
 static const DllInfo DllInfos[] = {
@@ -115,7 +115,7 @@ static const DllInfo DllInfos[] = {
 	{ _T("kernel32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
 	{ _T("shell32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
 	{ _T("Comctl32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
-	{ NULL, DLL_GET_MODULE_HANDLE, DLL_ACCEPT_NOT_EXIST, NULL },
+	{},
 };
 
 void WinCompatInit()

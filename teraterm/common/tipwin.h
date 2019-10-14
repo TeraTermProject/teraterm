@@ -35,12 +35,14 @@
 extern "C" {
 #endif
 
-#define	FRAME_WIDTH	6
+#define	TIP_WIN_FRAME_WIDTH	6
 
 typedef struct tagTipWinData TipWin;
 
-TipWin *TipWinCreate(HWND src);
-void TipWinSetText(TipWin *tWin, const char *text);
+TipWin *TipWinCreate(HINSTANCE hInstance, HWND src);
+TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char *str);
+TipWin *TipWinCreateW(HINSTANCE hInstance, HWND src, int cx, int cy, const wchar_t *str);
+void TipWinSetTextA(TipWin *tWin, const char *text);
 void TipWinSetTextW(TipWin *tWin, const wchar_t *text);
 void TipWinDestroy(TipWin *tWin);
 void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
@@ -51,6 +53,14 @@ void TipWinSetVisible(TipWin *tWin, int visible);
 int TipWinIsExists(TipWin *tWin);
 int TipWinIsVisible(TipWin *tWin);
 
+#if !defined(_UNICODE)
+#define	TipWinCreateT(p1, p2, p3, p4, p5)	TipWinCreateA(p1, p2, p3, p4, p5)
+#define TipWinSetText(p1, p2)				TipWinSetTextA(p1, p2)
+#else
+#define	TipWinCreateT(p1, p2, p3, p4, p5)	TipWinCreateW(p1, p2, p3, p4, p5)
+#define TipWinSetText(p1, p2)				TipWinSetTextW(p1, p2)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
@@ -59,26 +69,28 @@ int TipWinIsVisible(TipWin *tWin);
 class CTipWin
 {
 public:
-	CTipWin(HWND hWnd, int x, int y, const TCHAR *str);
-	CTipWin(HWND hWnd);
-	~CTipWin(VOID);
+	CTipWin(HINSTANCE hInstance);
+	~CTipWin();
+	VOID Create(HWND pHwnd);
+	VOID Destroy();
 	VOID SetText(const char *str);
-	VOID Destroy(VOID);
-	VOID GetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
-	POINT GetPos(VOID);
+	VOID SetText(const wchar_t *str);
+	POINT GetPos();
 	VOID SetPos(int x, int y);
 	VOID SetHideTimer(int ms);
-	VOID Create(HWND src, int x, int y, const TCHAR *str);
-	BOOL IsExists(VOID);
+	BOOL IsExists();
 	VOID SetVisible(BOOL bVisible);
 	BOOL IsVisible();
 private:
-	POINT pts;
-	UINT timerid;
+	UINT_PTR timerid;
 	TipWin* tWin;
-	static ATOM tip_class;
+	HINSTANCE hInstance;
+	TCHAR class_name[32];
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-	VOID CalcStrRect(VOID);
+	VOID CalcStrRect();
+	ATOM RegisterClass();
+	BOOL UnregisterClass();
+	BOOL IsClassRegistered();
 };
 #endif
 #endif

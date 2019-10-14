@@ -1120,7 +1120,7 @@ void CommSend(PComVar cv)
 
 		case IdFile:
 			if (! PWriteFile(cv->ComID, &(cv->OutBuff[cv->OutPtr]), C, (LPDWORD)&D, NULL)) {
-				if (! GetLastError() == ERROR_IO_PENDING) {
+				if (! (GetLastError() == ERROR_IO_PENDING)) {
 					D = C; /* ignore data */
 				}
 			}

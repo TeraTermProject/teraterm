@@ -44,6 +44,9 @@
 
 #include "compat_w95.h"
 
+#define DllExport __declspec(dllexport)
+#include "ttset.h"
+
 #ifndef CLEARTYPE_QUALITY
 #define CLEARTYPE_QUALITY 5
 #endif
@@ -111,7 +114,7 @@ static id_str_pair_t serial_conf_flowctrl[] = {
  *    TRUE: ïœä∑ê¨å˜
  *    FALSE: ïœä∑é∏îs
  */
-int PASCAL SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
+int WINAPI SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
 {
 	id_str_pair_t *conf;
 	int ret = FALSE;

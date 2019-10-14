@@ -635,13 +635,15 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 				  L"Visual", ts.UILanguageFile);
 	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
-	TipWin = new CTipWin(m_hWnd);
+	TipWin = new CTipWin(inst);
 }
 
 CVisualPropPageDlg::~CVisualPropPageDlg()
 {
 	free((void *)m_psp.pszTitle);
 	TipWin->Destroy();
+	delete TipWin;
+	TipWin = NULL;
 }
 
 // CVisualPropPageDlg メッセージ ハンドラ
@@ -700,7 +702,11 @@ void CVisualPropPageDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
 	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendInactive);
 
-	TipWin->SetVisible(FALSE);
+	BOOL isLayeredWindowSupported = (pSetLayeredWindowAttributes != NULL);
+	EnableDlgItem(IDC_ALPHA_BLEND_ACTIVE, isLayeredWindowSupported);
+	EnableDlgItem(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, isLayeredWindowSupported);
+	EnableDlgItem(IDC_ALPHA_BLEND_INACTIVE, isLayeredWindowSupported);
+	EnableDlgItem(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, isLayeredWindowSupported);
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
@@ -809,6 +815,9 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
+
+	// ツールチップ作成
+	TipWin->Create(m_hWnd);
 }
 
 void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
@@ -1036,7 +1045,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				TCHAR uimsg[MAX_UIMSG];
 				RECT rc;
 				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
+				_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
 
 				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), &rc);
 				TipWin->SetText(tipbuf);
@@ -1064,7 +1073,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				TCHAR tipbuf[32], uimsg[MAX_UIMSG];
 				RECT rc;
 				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-				_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (pos / 255.0) * 100);
+				_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
 
 				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), &rc);
 				TipWin->SetText(tipbuf);

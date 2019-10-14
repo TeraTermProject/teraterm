@@ -68,7 +68,7 @@ elseif(MINGW)
 endif()
 
 ### create version_info.h
-if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git/svn")
   # git-svn
   find_package(Git)
   if(Git_FOUND)
@@ -115,12 +115,7 @@ add_subdirectory(doc)
 ####
 # ソースツリー内に生成ファイルが存在していたら削除する
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
-  # r7517より前
   file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
-endif()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/teraterm/svnversion.h")
-  # r7517以後
-  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/teraterm/svnversion.h")
 endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
   file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")

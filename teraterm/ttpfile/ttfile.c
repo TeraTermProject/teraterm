@@ -882,8 +882,10 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			return TRUE;
 		case IDC_GETFNHELP:
-			if (fv!=NULL)
-			PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
+			if (fv!=NULL) {
+				// ŒÄ‚Ño‚µŒ³‚ªƒwƒ‹ƒvID‚ð€”õ‚·‚é
+				PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
+			}
 			break;
 		}
 	}

@@ -817,7 +817,18 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 
 	// TipWin
-	TipWin = new CTipWin(HVTWin);
+	TipWin = new CTipWin(hInstance);
+	TipWin->Create(HVTWin);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// CVTWindow destructor
+
+CVTWindow::~CVTWindow()
+{
+	TipWin->Destroy();
+	delete TipWin;
+	TipWin = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2324,12 +2335,13 @@ void CVTWindow::CodePopup(int client_x, int client_y)
 {
 	wchar_t *buf = BuffGetCharInfo(client_x, client_y);
 	if (TipWinCodeDebug == NULL) {
-		TipWinCodeDebug = TipWinCreate(m_hWnd);
+		TipWinCodeDebug = TipWinCreate(m_hInst, m_hWnd);
 	}
 	POINT pos = { client_x, client_y };
 	ClientToScreen(m_hWnd, &pos);
 	TipWinSetPos(TipWinCodeDebug, pos.x, pos.y);
 	TipWinSetTextW(TipWinCodeDebug, buf);
+	TipWinSetVisible(TipWinCodeDebug, TRUE);
 	free(buf);
 }
 
@@ -2414,7 +2426,7 @@ BOOL CVTWindow::OnMouseWheel(
 			SetWindowAlpha(newAlpha);
 
 			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-			_stprintf_s(tipbuf, _countof(tipbuf), _T(uimsg), (newAlpha / 255.0) * 100);
+			_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (newAlpha / 255.0) * 100);
 
 			tippos = TipWin->GetPos();
 			if (tippos.x != pt.x ||
@@ -3633,7 +3645,7 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
-	DWORD help_id = (wParam == 0) ? HelpId : wParam;
+	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
 	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
 	return 0;
 }
@@ -6273,7 +6285,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		// HELPMSGSTRING message Žž
 		//		wp = dialog handle
 		//		lp = initialization structure
-		OnDlgHelp(0, 0);
+		OnDlgHelp(HelpId, 0);
 		return 0;
 	}
 	switch(msg)
