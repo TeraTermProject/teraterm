@@ -35,6 +35,10 @@
 #include "dllutil.h"
 #include "ttlib.h"
 
+ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
+HWND(WINAPI *pCreateWindowExW)
+(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
+ HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
 HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
 INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
@@ -128,8 +132,10 @@ void WinCompatInit()
 
 	// 9xì¡ï èàóù
 	if (!IsWindowsNTKernel()) {
-		// GetPrivateProfileStringW() Ç™ Windows 95 Ç…ë∂ç›ÇµÇƒÇ¢ÇÈ(ä¬ã´àÀë∂?)
+		// Windows 9x Ç…ë∂ç›ÇµÇƒÇ¢ÇÈAPI(ä¬ã´àÀë∂?)
 		// ê≥ÇµÇ≠ìÆçÏÇµÇ»Ç¢ÇÃÇ≈ñ≥å¯Ç∆Ç∑ÇÈ
 		pGetPrivateProfileStringW = NULL;
+		pSetWindowTextW = NULL;
+		pSetDlgItemTextW = NULL;
 	}
 }

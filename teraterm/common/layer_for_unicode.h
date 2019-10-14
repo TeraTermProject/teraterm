@@ -40,6 +40,7 @@
 extern "C" {
 #endif
 
+BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
 BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 DWORD _GetFileAttributesW(LPCWSTR lpFileName);
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
@@ -47,6 +48,10 @@ LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam,
 HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
 INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
+HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
+							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
+							 LPVOID lpParam);
+ATOM _RegisterClassW(const WNDCLASSW *lpWndClass);
 
 #ifdef __cplusplus
 }

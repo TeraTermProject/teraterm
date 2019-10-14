@@ -174,3 +174,65 @@ INT_PTR _PropertySheetW(PROPSHEETHEADERW *psh)
 	free(captionA);
 	return retval;
 }
+
+HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
+							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
+{
+	if (pCreateWindowExW != NULL) {
+		return pCreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu,
+								hInstance, lpParam);
+	}
+
+	char *lpClassNameA = ToCharW(lpClassName);
+	char *lpWindowNameA = ToCharW(lpWindowName);
+	HWND hWnd = CreateWindowExA(dwExStyle, lpClassNameA, lpWindowNameA, dwStyle, X, Y, nWidth, nHeight, hWndParent,
+								hMenu, hInstance, lpParam);
+	free(lpClassNameA);
+	if (lpWindowNameA != NULL) {
+		free(lpWindowNameA);
+	}
+	return hWnd;
+}
+
+ATOM _RegisterClassW(const WNDCLASSW *lpWndClass)
+{
+	if (pRegisterClassW != NULL) {
+		return pRegisterClassW(lpWndClass);
+	}
+
+	char *menu_nameA = ToCharW(lpWndClass->lpszMenuName);
+	char *class_nameA = ToCharW(lpWndClass->lpszClassName);
+
+	WNDCLASSA WndClassA;
+	WndClassA.style = lpWndClass->style;
+	WndClassA.lpfnWndProc = lpWndClass->lpfnWndProc;
+	WndClassA.cbClsExtra = lpWndClass->cbClsExtra;
+	WndClassA.cbWndExtra = lpWndClass->cbWndExtra;
+	WndClassA.hInstance = lpWndClass->hInstance;
+	WndClassA.hIcon = lpWndClass->hIcon;
+	WndClassA.hCursor = lpWndClass->hCursor;
+	WndClassA.hbrBackground = lpWndClass->hbrBackground;
+	WndClassA.lpszMenuName = menu_nameA;
+	WndClassA.lpszClassName = class_nameA;
+	ATOM atom = RegisterClassA(&WndClassA);
+
+	if (menu_nameA != NULL) {
+		free(menu_nameA);
+	}
+	if (class_nameA != NULL) {
+		free(class_nameA);
+	}
+	return atom;
+}
+
+BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString)
+{
+	if (pSetWindowTextW != NULL) {
+		return pSetWindowTextW(hWnd, lpString);
+	}
+
+	char *strA = ToCharW(lpString);
+	BOOL retval = SetWindowTextA(hWnd, strA);
+	free(strA);
+	return retval;
+}

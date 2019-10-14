@@ -85,7 +85,7 @@ private:
 	UINT_PTR timerid;
 	TipWin* tWin;
 	HINSTANCE hInstance;
-	TCHAR class_name[32];
+	wchar_t class_name[32];
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 	VOID CalcStrRect();
 	ATOM RegisterClass();
