@@ -280,13 +280,16 @@ VOID CTipWin::SetText(const TCHAR *str)
 	self->str = _tcsdup(str);
 	CalcStrRect();
 
+	// ウィンドウのサイズは文字サイズ+左右(上下)のフレーム
 	const int str_width = self->str_rect.right - self->str_rect.left;
 	const int str_height = self->str_rect.bottom - self->str_rect.top;
-	SetWindowText(tWin->tip_wnd, str);
+	const int win_width = str_width + TIP_WIN_FRAME_WIDTH * 2;
+	const int win_height = str_height + TIP_WIN_FRAME_WIDTH * 2;
 	SetWindowPos(tWin->tip_wnd, NULL,
-				 0, 0,
-				 str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
+				 0, 0, win_width, win_height,
 				 SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+
+	// WM_PAINTで描画する
 	InvalidateRect(tWin->tip_wnd, NULL, FALSE);
 }
 
