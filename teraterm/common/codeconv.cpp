@@ -930,17 +930,20 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 
 char *ToCharW(const wchar_t *strW)
 {
+	if (strW == NULL) return NULL;
 	char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
 	return strA;
 }
 
 char *ToCharA(const char *strA)
 {
+	if (strA == NULL) return NULL;
 	return _strdup(strA);
 }
 
 char *ToCharU8(const char *strU8)
 {
+	if (strU8 == NULL) return NULL;
 	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	if (strW == NULL) {
 		return NULL;
@@ -952,29 +955,34 @@ char *ToCharU8(const char *strU8)
 
 wchar_t *ToWcharA(const char *strA)
 {
+	if (strA == NULL) return NULL;
 	wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
 	return strW;
 }
 
 wchar_t *ToWcharW(const wchar_t *strW)
 {
+	if (strW == NULL) return NULL;
 	return _wcsdup(strW);
 }
 
 wchar_t *ToWcharU8(const char *strU8)
 {
+	if (strU8 == NULL) return NULL;
 	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	return strW;
 }
 
 char *ToU8W(const wchar_t *strW)
 {
+	if (strW == NULL) return NULL;
 	char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
 	return strU8;
 }
 
 char *ToU8A(const char *strA)
 {
+	if (strA == NULL) return NULL;
 	wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
 	if (strW == NULL) {
 		return NULL;
