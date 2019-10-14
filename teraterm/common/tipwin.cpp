@@ -89,7 +89,7 @@ VOID CTipWin::CalcStrRect(VOID)
 	SelectObject(hdc, tWin->tip_font);
 	tWin->str_rect.top = 0;
 	tWin->str_rect.left = 0;
-	DrawText(hdc, tWin->str, tWin->str_len,
+	DrawText(hdc, tWin->str, (int)tWin->str_len,
 			 &tWin->str_rect, DT_LEFT|DT_CALCRECT);
 	DeleteDC(hdc);
 }
@@ -139,7 +139,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 					rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
 					rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
 					rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
-					DrawText(hdc, self->tWin->str, self->tWin->str_len, &rect, DT_LEFT);
+					DrawText(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT);
 				}
 
 				SelectObject(hdc, holdbr);
@@ -380,7 +380,7 @@ void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *heigh
 	SelectObject(hdc, tip_font);
 	str_rect.top = 0;
 	str_rect.left = 0;
-	DrawText(hdc, str, str_len, &str_rect, DT_LEFT|DT_CALCRECT);
+	DrawText(hdc, str, (int)str_len, &str_rect, DT_LEFT|DT_CALCRECT);
 	*width = str_rect.right - str_rect.left;
 	*height = str_rect.bottom - str_rect.top;
 	DeleteDC(hdc);
