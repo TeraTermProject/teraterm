@@ -37,12 +37,13 @@ extern "C" {
 
 #define	TIP_WIN_FRAME_WIDTH	6
 
-#define TipWinClassName _T("TeraTermTipWinClass")
-
 typedef struct tagTipWinData TipWin;
 
-TipWin *TipWinCreate(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str);
-void TipWinSetText(TipWin *tWin, TCHAR *text);
+TipWin *TipWinCreate(HINSTANCE hInstance, HWND src);
+TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char *str);
+TipWin *TipWinCreateW(HINSTANCE hInstance, HWND src, int cx, int cy, const wchar_t *str);
+void TipWinSetTextA(TipWin *tWin, const char *text);
+void TipWinSetTextW(TipWin *tWin, const wchar_t *text);
 void TipWinDestroy(TipWin *tWin);
 void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
 void TipWinGetPos(TipWin *tWin, int *x, int *y);
@@ -51,6 +52,14 @@ void TipWinSetHideTimer(TipWin *tWin, int ms);
 void TipWinSetVisible(TipWin *tWin, int visible);
 int TipWinIsExists(TipWin *tWin);
 int TipWinIsVisible(TipWin *tWin);
+
+#if !defined(_UNICODE)
+#define	TipWinCreateT(p1, p2, p3, p4, p5)	TipWinCreateA(p1, p2, p3, p4, p5)
+#define TipWinSetText(p1, p2)				TipWinSetTextA(p1, p2)
+#else
+#define	TipWinCreateT(p1, p2, p3, p4, p5)	TipWinCreateW(p1, p2, p3, p4, p5)
+#define TipWinSetText(p1, p2)				TipWinSetTextW(p1, p2)
+#endif
 
 #ifdef __cplusplus
 }
@@ -64,7 +73,8 @@ public:
 	~CTipWin();
 	VOID Create(HWND pHwnd);
 	VOID Destroy();
-	VOID SetText(TCHAR *str);
+	VOID SetText(const char *str);
+	VOID SetText(const wchar_t *str);
 	POINT GetPos();
 	VOID SetPos(int x, int y);
 	VOID SetHideTimer(int ms);

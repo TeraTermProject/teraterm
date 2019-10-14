@@ -1300,17 +1300,15 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 
 			// ツールチップを表示する
 			if (g_SerialDlgSpeedTip == NULL) {
-				g_SerialDlgSpeedTip = TipWinCreate(hInst, hWnd, cx, cy, str);
-				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
-
-			} else {
-				if (!TipWinIsVisible(g_SerialDlgSpeedTip))
-					TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
-
-				TipWinSetText(g_SerialDlgSpeedTip, str);
-				TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
+				g_SerialDlgSpeedTip = TipWinCreate(hInst, hWnd);
 				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
 			}
+			if (!TipWinIsVisible(g_SerialDlgSpeedTip))
+				TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
+
+			TipWinSetText(g_SerialDlgSpeedTip, str);
+			TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
+			TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
 
 			break;
 	}

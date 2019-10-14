@@ -68,6 +68,8 @@
 
 #include "tipwin.h"
 
+#define TipWinClassName _T("TeraTermTipWinClass")
+
 typedef struct tagTipWinData {
 	HFONT tip_font;
 	COLORREF tip_bg;
@@ -79,7 +81,6 @@ typedef struct tagTipWinData {
 	RECT rect;
 	int px;
 	int py;
-	TCHAR class_name[32];
 } TipWin;
 
 VOID CTipWin::CalcStrRect(VOID)
@@ -150,33 +151,6 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 
 		case WM_NCHITTEST:
 			return HTTRANSPARENT;
-		case WM_SETTEXT:
-			if(self) {
-				LPCTSTR str = (LPCTSTR) lParam;
-				const int str_width = self->tWin->str_rect.right - self->tWin->str_rect.left;
-				const int str_height = self->tWin->str_rect.bottom - self->tWin->str_rect.top;
-
-				free((void *)(self->tWin->str));
-				self->tWin->str_len = _tcslen(str);
-				self->tWin->str = _tcsdup(str);
-				self->CalcStrRect();
-
-				SetWindowPos(hWnd, NULL,
-							 0, 0,
-							 str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
-				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
-				InvalidateRect(hWnd, NULL, FALSE);
-			}
-			break;
-		case WM_NCDESTROY:
-				/*
-				 * use-after-freeによりTera Termの動作が不安定となる問題を修正した。
-				 *
-				 * WinMainで CVTWindow クラスのコンストラクタで、アロケートした
-				 * TipWinメンバーを、ここのタイミングで解放していたため。
-				 * 正しくは CVTWindow クラスのデストラクタで解放する。
-				 */
-			break;
 		case WM_TIMER:
 			if(self) {
 				if(self->timerid > 0)
@@ -213,15 +187,6 @@ CTipWin::~CTipWin()
 	}
 }
 
-BOOL CTipWin::IsClassRegistered()
-{
-	if (*class_name == NULL) {
-		_snprintf_s(class_name, sizeof(class_name), _TRUNCATE, _T("%s_%p"), TipWinClassName, hInstance);
-	}
-	WNDCLASS twc = { 0 };
-	return (GetClassInfo(hInstance, class_name, &twc) > 0);
-}
-
 ATOM CTipWin::RegisterClass()
 {
 	WNDCLASS wc;
@@ -238,11 +203,6 @@ ATOM CTipWin::RegisterClass()
 	return ::RegisterClass(&wc);
 }
 
-BOOL CTipWin::UnregisterClass()
-{
-	return ::UnregisterClass(class_name, hInstance);
-}
-
 VOID CTipWin::Create(HWND pHwnd)
 {
 	LOGFONTA logfont;
@@ -251,9 +211,10 @@ VOID CTipWin::Create(HWND pHwnd)
 	if(hInstance == NULL) {
 		hInstance = (HINSTANCE)GetWindowLongPtr(pHwnd, GWLP_HINSTANCE);
 	}
-	if (! IsClassRegistered()) {
-		RegisterClass();
+	if (class_name[0] == 0) {
+		_snprintf_s(class_name, _countof(class_name), _TRUNCATE, _T("%s_%p"), TipWinClassName, hInstance);
 	}
+	RegisterClass();
 	if (tWin == NULL) {
 		return;
 	}
@@ -268,14 +229,6 @@ VOID CTipWin::Create(HWND pHwnd)
 	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
 	tWin->tip_font = CreateFontIndirect(&logfont);
-
-	/*
-	 * RegisterClass()が失敗した場合は、CreateWindowEx()が 87 (ERROR_INVALID_PARAMETER)で
-	 * エラーとなるため、呼び出さないようにする。
-	 *
-	 * WindowsMe(9x)では、SSH認証ダイアログのツールチップ表示で RegisterClass() が
-	 * 失敗する。原因不明。
-	 */
 	tWin->tip_wnd =
 		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 					   class_name,
@@ -316,13 +269,25 @@ VOID CTipWin::SetPos(int x, int y)
 	}
 }
 
-VOID CTipWin::SetText(TCHAR *str)
+VOID CTipWin::SetText(const TCHAR *str)
 {
-	if(IsExists()) {
-		SetWindowText(tWin->tip_wnd, str);
-		// ツールチップのテキストとウィンドウの描画順の関係でテキストを2度描画してツールチップウィンドウをリサイズする
-		SetWindowText(tWin->tip_wnd, str);
+	if(!IsExists()) {
+		return;
 	}
+
+	TipWin* self = tWin;
+	self->str_len = _tcslen(str);
+	self->str = _tcsdup(str);
+	CalcStrRect();
+
+	const int str_width = self->str_rect.right - self->str_rect.left;
+	const int str_height = self->str_rect.bottom - self->str_rect.top;
+	SetWindowText(tWin->tip_wnd, str);
+	SetWindowPos(tWin->tip_wnd, NULL,
+				 0, 0,
+				 str_width + TIP_WIN_FRAME_WIDTH * 2, str_height + TIP_WIN_FRAME_WIDTH * 2,
+				 SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+	InvalidateRect(tWin->tip_wnd, NULL, FALSE);
 }
 
 VOID CTipWin::SetHideTimer(int ms)
@@ -362,11 +327,18 @@ BOOL CTipWin::IsVisible(void)
 	return FALSE;
 }
 
-TipWin *TipWinCreate(HINSTANCE hInstance, HWND src, int cx, int cy, const TCHAR *str)
+TipWin *TipWinCreate(HINSTANCE hInstance, HWND src)
 {
 	CTipWin* tipwin = new CTipWin(hInstance);
 	tipwin->Create(src);
-	tipwin->SetText((TCHAR*)str);
+	return (TipWin*)tipwin;
+}
+
+TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char *str)
+{
+	CTipWin* tipwin = new CTipWin(hInstance);
+	tipwin->Create(src);
+	tipwin->SetText(str);
 	tipwin->SetPos(cx, cy);
 	tipwin->SetVisible(TRUE);
 	return (TipWin*)tipwin;
@@ -393,7 +365,7 @@ void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *heigh
 
 	/* 文字列の長さを計算する */
 	str_len = _tcslen(str);
-	
+
 	/* DPIを取得する */
 	uDpi = GetMonitorDpiFromWindow(src);
 
@@ -431,7 +403,7 @@ void TipWinSetPos(TipWin *tWin, int x, int y)
 	tipwin->SetPos(x, y);
 }
 
-void TipWinSetText(TipWin* tWin, TCHAR *str)
+void TipWinSetTextA(TipWin* tWin, const char *str)
 {
 	CTipWin* tipwin = (CTipWin*) tWin;
 	tipwin->SetText(str);

@@ -144,7 +144,7 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		cx = point.x;
 		cy = point.y;
 
-		SizeTip = TipWinCreate(NULL, src, cx, cy, str);
+		SizeTip = TipWinCreateT(NULL, src, cx, cy, str);
 
 		//OutputDebugPrintf("Created: (%d,%d)\n", cx, cy);
 

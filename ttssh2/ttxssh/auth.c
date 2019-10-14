@@ -122,7 +122,7 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 					_tcscat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				}
 				GetWindowRect(control, &rect);
-				data->tipwin = TipWinCreate(hInst, control, rect.left, rect.bottom, uimsg);
+				data->tipwin = TipWinCreateT(hInst, control, rect.left, rect.bottom, uimsg);
 			}
 
 			return 0;
