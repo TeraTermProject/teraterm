@@ -29,16 +29,12 @@
 #include <windows.h>
 #include <tchar.h>
 #include <assert.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
 #include <crtdbg.h>
 
 #include "dllutil.h"
-
-#ifdef _DEBUG
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define	realloc(p, l) _realloc_dbg((p), (l),  _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
 
 typedef struct {
 	const TCHAR *dllName;
