@@ -1181,10 +1181,10 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	}
 
 	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(hMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
 	SetDlgMenuTexts(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(hMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(hMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(ControlMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
 		TCHAR uimsg[MAX_UIMSG];

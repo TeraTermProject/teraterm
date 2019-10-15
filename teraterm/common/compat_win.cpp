@@ -43,7 +43,8 @@ HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropS
 INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-BOOL (WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
+int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
+BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
@@ -72,6 +73,7 @@ static const APIInfo Lists_user32[] = {
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
 	{ "SetWindowTextW", (void **)&pSetWindowTextW },
 	{ "ModifyMenuW", (void **)&pModifyMenuW },
+	{ "GetMenuStringW", (void **)&pGetMenuStringW },
 	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
 	{},
 };

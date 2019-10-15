@@ -35,6 +35,7 @@
 
 /**
  *	GetI18nStr() の unicode版
+ *	@param	buf_len		文字数(\0含む)
  */
 DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
 								  const char *iniFile)
@@ -70,6 +71,7 @@ DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t 
  *	section/keyが見つからなかった場合、
  *		defの文字列をbufにセットする
  *		defがNULLの場合buf[0] = 0となる
+ *	@param	buf_len		文字数(\0含む)
  */
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
@@ -177,7 +179,7 @@ int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 		else {
 			// UNICODE
 			wchar_t uimsg[MAX_UIMSG];
-			GetI18nStrW(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
+			GetI18nStrW(section, key, uimsg, _countof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != L'\0') {
 				const int nIDDlgItem = infos[i].nIDDlgItem;
 				if (nIDDlgItem == 0) {
@@ -199,6 +201,7 @@ int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *infos, size_t infoCount,
 						   const char *UILanguageFile)
 {
+	const int id_position_threshold = 1000;
 	size_t i;
 	for (i = 0; i < infoCount; i++) {
 		const int nIDDlgItem = infos[i].nIDDlgItem;
@@ -206,26 +209,40 @@ void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *
 		if (pGetPrivateProfileStringW == NULL) {
 			// ANSI
 			char uimsg[MAX_UIMSG];
-			GetI18nStr(section, key, uimsg, sizeof(uimsg), "", UILanguageFile);
+			GetI18nStr(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != '\0') {
-				if (nIDDlgItem < 1000) {
+				if (nIDDlgItem < id_position_threshold) {
 					ModifyMenuA(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
 				}
 				else {
 					ModifyMenuA(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
 				}
 			}
+			else {
+				if (nIDDlgItem < id_position_threshold) {
+					// 一度ModifyMenu()しておかないとメニューの位置がずれる
+					GetMenuStringA(hMenu, nIDDlgItem, uimsg, _countof(uimsg), MF_BYPOSITION);
+					ModifyMenuA(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
+				}
+			}
 		}
 		else {
 			// UNICODE
 			wchar_t uimsg[MAX_UIMSG];
-			GetI18nStrW(section, key, uimsg, sizeof(uimsg), L"", UILanguageFile);
+			GetI18nStrW(section, key, uimsg, _countof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != '\0') {
-				if (nIDDlgItem < 1000) {
+				if (nIDDlgItem < id_position_threshold) {
 					pModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
 				}
 				else {
 					pModifyMenuW(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+				}
+			}
+			else {
+				if (nIDDlgItem < id_position_threshold) {
+					// 一度ModifyMenu()しておかないとメニューの位置がずれる
+					pGetMenuStringW(hMenu, nIDDlgItem, uimsg, _countof(uimsg), MF_BYPOSITION);
+					pModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
 				}
 			}
 		}
