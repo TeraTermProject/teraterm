@@ -1,0 +1,14 @@
+*** openssl-1.1.1c.org/crypto/bio/bio_lcl.h	2019-05-28 22:12:20.000000000 +0900
+--- openssl/crypto/bio/bio_lcl.h	2019-07-07 22:38:36.692285800 +0900
+***************
+*** 11,16 ****
+--- 11,19 ----
+  #include "internal/sockets.h"
+  #include "internal/refcount.h"
+  
++ # undef AI_PASSIVE
++ 
++ 
+  /* BEGIN BIO_ADDRINFO/BIO_ADDR stuff. */
+  
+  #ifndef OPENSSL_NO_SOCK

@@ -278,7 +278,7 @@ typedef struct _TInstVar {
 	char *session_id;
 	int session_id_len;
 	SSHKeys ssh2_keys[MODE_MAX];
-	EVP_CIPHER_CTX evpcip[MODE_MAX];
+	EVP_CIPHER_CTX *evpcip[MODE_MAX];
 	int userauth_success;
 	int shell_id;
 	/*int remote_id;*/

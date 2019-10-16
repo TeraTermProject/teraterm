@@ -1,15 +1,14 @@
 
+rem パッチ適用チェック
+rem pushd openssl_patch
+rem call check_patch.bat
+rem popd
+
 rem OpenSSLのビルドへ移行
 
 cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
-
-rem パッチ適用チェック
-pushd ..\openssl_patch
-call check_patch.bat
-popd
-
 
 rem 設定ファイルのバックアップを取る
 copy /y Configurations\10-main.conf Configurations\10-main.conf.orig
@@ -18,7 +17,7 @@ rem VS2005だと警告エラーでコンパイルが止まる問題への処置
 perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
 
-rem GetModuleHandleExW API(WindowsXP以降)依存除去のため
+rem GetModuleHandleExW API依存除去のため
 perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
 move conf.tmp Configurations/10-main.conf
 

@@ -59,7 +59,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\inc32;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -76,7 +76,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libeay32.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libcrypto.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\openssl\out32.dbg;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
@@ -106,7 +106,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\inc32;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -122,7 +122,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libeay32.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libcrypto.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\openssl\out32;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
