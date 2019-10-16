@@ -51,7 +51,7 @@
 
 * Libraries
 - Oniguruma 6.9.3 (https://github.com/kkos/oniguruma)
-- OpenSSL 1.0.2t (http://www.openssl.org/)
+- OpenSSL 1.1.1d (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
@@ -139,7 +139,7 @@ Example: adding a TTSSH menu under File menu
      (1) Extract openssl source into libs/openssl directory.
      (2) When the libs/openssl/Makefile.bak file exists on the OpenSSL 1.0.0e or later, delete the file only once
      (3) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-     (4) Move 'libs' directory on the command prompt. And run buildopenssl.bat.
+     (4) Move 'libs' directory on the command prompt. And run buildopenssl11.bat.
 
   4. Zlib (used by TTSSH)
      (1) Extract zlib source into libs/zlib directory.
