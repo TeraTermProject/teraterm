@@ -82,8 +82,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,25
- PRODUCTVERSION 1,0,0,25
+ FILEVERSION 1,0,0,26
+ PRODUCTVERSION 1,0,0,26
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -101,12 +101,12 @@ BEGIN
             VALUE "Comments", "プロキシ経由での通信をサポートするプラグイン。"
             VALUE "CompanyName", "蛭子屋本舗, TeraTerm Project"
             VALUE "FileDescription", "プロキシプラグイン"
-            VALUE "FileVersion", "1, 0, 0, 25"
+            VALUE "FileVersion", "1, 0, 0, 26"
             VALUE "InternalName", "TTProxy"
             VALUE "LegalCopyright", "Copyright (C) 2003-2006 蛭子屋本舗, (C) 2004-2019 TeraTerm Project"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "蛭子屋本舗プロキシプラグイン集"
-            VALUE "ProductVersion", "1, 0, 0, 25"
+            VALUE "ProductVersion", "1, 0, 0, 26"
         END
     END
     BLOCK "VarFileInfo"
@@ -134,8 +134,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,25
- PRODUCTVERSION 1,0,0,25
+ FILEVERSION 1,0,0,26
+ PRODUCTVERSION 1,0,0,26
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -153,12 +153,12 @@ BEGIN
             VALUE "Comments", "Plug-in that supports communication by way of proxy"
             VALUE "CompanyName", "Yebisuya Hompo, TeraTerm Project"
             VALUE "FileDescription", "Proxy plug-in"
-            VALUE "FileVersion", "1, 0, 0, 25"
+            VALUE "FileVersion", "1, 0, 0, 26"
             VALUE "InternalName", "TTProxy"
             VALUE "LegalCopyright", "Copyright (C) 2003-2006 Yebisuya Hompo, (C) 2004-2019 TeraTerm Project"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "Proxy plug-in collection of Yebisuya Hompo"
-            VALUE "ProductVersion", "1, 0, 0, 25"
+            VALUE "ProductVersion", "1, 0, 0, 26"
         END
     END
     BLOCK "VarFileInfo"
