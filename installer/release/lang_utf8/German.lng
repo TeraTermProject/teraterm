@@ -1,83 +1,84 @@
-; Updated by TeraTerm Project (2019-09-11)
+﻿; Updated by TeraTerm Project (2019-09-11)
+; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-MENU_FILE=&File
-MENU_FILE_NEW=&New connection...\tAlt+N
-MENU_FILE_DUPLICATE=D&uplicate session\tAlt+D
-MENU_FILE_GYGWIN=Cy&gwin connection\tAlt+G
+MENU_FILE=D&atei
+MENU_FILE_NEW=&Neue Verbindung...\tAlt+N
+MENU_FILE_DUPLICATE=&Verbindung duplizieren\tAlt+D
+MENU_FILE_GYGWIN=&Cygwin-Verbindung\tAlt+G
 MENU_FILE_LOG=&Log...
-MENU_FILE_COMMENTLOG=C&omment to Log...
-MENU_FILE_VIEWLOG=&View Log
+MENU_FILE_COMMENTLOG=&Kommentar zum Log
+MENU_FILE_VIEWLOG=Log ansehen
 MENU_FILE_SHOWLOGDIALOG=Sho&w Log dialog...
-MENU_FILE_SENDFILE=&Send file...
-MENU_FILE_CHANGEDIR=&Change directory...
-MENU_FILE_REPLAYLOG=&Replay Log...
+MENU_FILE_SENDFILE=Datei &senden
+MENU_FILE_CHANGEDIR=&Verzeichnis wechseln
+MENU_FILE_REPLAYLOG=&Log abspielen
 MENU_FILE_LOGMETT=Log&MeTT
-MENU_FILE_PRINT=&Print...\tAlt+P
-MENU_FILE_DISCONNECT=&Disconnect\tAlt+I
-MENU_FILE_EXIT=E&xit\tAlt+Q
+MENU_FILE_PRINT=&Drucken...\tAlt+P
+MENU_FILE_DISCONNECT=T&rennen\tAlt+I
+MENU_FILE_EXIT=&Beenden\tAlt+Q
 MENU_FILE_EXITALL=Exit &All
 
 MENU_TRANS=&Transfer
-MENU_TRANS_KERMIT_RCV=&Receive
-MENU_TRANS_KERMIT_GET=&Get...
-MENU_TRANS_KERMIT_SEND=&Send...
-MENU_TRANS_KERMIT_FINISH=&Finish
-MENU_TRANS_X_RCV=&Receive...
-MENU_TRANS_X_SEND=&Send...
-MENU_TRANS_Y_RCV=&Receive...
-MENU_TRANS_Y_SEND=&Send...
-MENU_TRANS_Z_RCV=&Receive
-MENU_TRANS_Z_SEND=&Send...
-MENU_TRANS_BP_RCV=&Receive
-MENU_TRANS_BP_SEND=&Send...
-MENU_TRANS_QV_RCV=&Receive
-MENU_TRANS_QV_SEND=&Send...
+MENU_TRANS_KERMIT_RCV=&Empfangen
+MENU_TRANS_KERMIT_GET=&Get
+MENU_TRANS_KERMIT_SEND=&Senden
+MENU_TRANS_KERMIT_FINISH=&Fertig
+MENU_TRANS_X_RCV=&Empfangen
+MENU_TRANS_X_SEND=&Senden
+MENU_TRANS_Y_RCV=&Empfangen
+MENU_TRANS_Y_SEND=&Senden
+MENU_TRANS_Z_RCV=&Empfangen
+MENU_TRANS_Z_SEND=&Senden
+MENU_TRANS_BP_RCV=&Empfangen
+MENU_TRANS_BP_SEND=&Senden
+MENU_TRANS_QV_RCV=&Empfangen
+MENU_TRANS_QV_SEND=&Senden
 
-MENU_EDIT=&Edit
-MENU_EDIT_COPY=&Copy\tAlt+C
-MENU_EDIT_COPYTABLE=Copy &table
-MENU_EDIT_PASTE=&Paste\tAlt+V
-MENU_EDIT_PASTECR=Paste<C&R>\tAlt+R
-MENU_EDIT_CLSCREEN=Clear &screen
-MENU_EDIT_CLBUFFER=Clear &buffer
-MENU_EDIT_CANCELSELECT=Cancel se&lection
-MENU_EDIT_SELECTSCREEN=S&elect screen
-MENU_EDIT_SELECTALL=Select &all
+MENU_EDIT=B&earbeiten
+MENU_EDIT_COPY=&Kopieren\tAlt+C
+MENU_EDIT_COPYTABLE=&Tabelle kopieren
+MENU_EDIT_PASTE=&Einfügen\tAlt+V
+MENU_EDIT_PASTECR=Einfügen<C&R>\tAlt+R
+MENU_EDIT_CLSCREEN=&Bildschirm löschen
+MENU_EDIT_CLBUFFER=&Puffer löschen
+MENU_EDIT_CANCELSELECT=&Auswahl aufheben
+MENU_EDIT_SELECTSCREEN=&Bildschirm markieren
+MENU_EDIT_SELECTALL=&Alles auswählen
 
-MENU_SETUP=&Setup
-MENU_SETUP_TERMINAL=&Terminal...
-MENU_SETUP_WINDOW=&Window...
-MENU_SETUP_FONT_SUBMENU=&Font
-MENU_SETUP_FONT=&Font...
+MENU_SETUP=Ein&stellungen
+MENU_SETUP_TERMINAL=&Terminal-Einstellungen
+MENU_SETUP_WINDOW=&Fenster-Einstellungen
+MENU_SETUP_FONT_SUBMENU=&Schriftart
+MENU_SETUP_FONT=&Schriftart...
 MENU_SETUP_DIALOG_FONT=&Dialog font...
-MENU_SETUP_KEYBOARD=&Keyboard...
-MENU_SETUP_SERIALPORT=S&erial port...
-MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=&General...
-MENU_SETUP_ADDITION=A&dditional settings...
-MENU_SETUP_SAVE=&Save setup...
-MENU_SETUP_RESTORE=&Restore setup...
+MENU_SETUP_KEYBOARD=&Keyboard-Einstellungen
+MENU_SETUP_SERIALPORT=Serieller Port
+MENU_SETUP_TCPIP=&Hostliste editieren
+MENU_SETUP_GENERAL=&Grundeinstellungen
+MENU_SETUP_ADDITION=&Erweiterte Einstellungen
+MENU_SETUP_SAVE=&Setup sichern
+MENU_SETUP_RESTORE=&Setup laden
 MENU_SETUP_OPENSETUP=Setup d&irectory...
-MENU_SETUP_LOADKEYMAP=&Load key map...
+MENU_SETUP_LOADKEYMAP=&Keyboard-Layout einstellen
 
-MENU_CONTROL=C&ontrol
-MENU_CONTROL_RESET=&Reset terminal
+MENU_CONTROL=Ste&uerung
+MENU_CONTROL_RESET=&Terminal zurücksetzen
 MENU_CONTROL_RESETTITLE=R&eset remote title
 MENU_CONTROL_AREYOUTHERE=Are you &there\tAlt+T
-MENU_CONTROL_SENDBREAK=&Send break\tAlt+B
-MENU_CONTROL_RESETPORT=Reset &port
-MENU_CONTROL_BROADCAST=&Broadcast command
-MENU_CONTROL_OPENTEK=&Open TEK
-MENU_CONTROL_CLOSETEK=&Close TEK
+MENU_CONTROL_SENDBREAK=&Abbruch senden\tAlt+B
+MENU_CONTROL_RESETPORT=Port zurücksetzen
+MENU_CONTROL_BROADCAST=&Broadcast-Kommando
+MENU_CONTROL_OPENTEK=TEK ö&ffnen
+MENU_CONTROL_CLOSETEK=TEK &schließen
 MENU_CONTROL_MACRO=&Macro
-MENU_CONTROL_SHOW_MACRO=Show Macro &Window
+MENU_CONTROL_SHOW_MACRO=&Makrofenster anzeigen
 
-MENU_WINDOW=&Window
-MENU_WINDOW_WINDOW=&Window
+MENU_WINDOW=&Fenster
+MENU_WINDOW_WINDOW=&Fenster
 MENU_WINDOW_MINIMIZEALL=&Minimize All
 MENU_WINDOW_CASCADE=&Cascade
 MENU_WINDOW_STACKED=&Stacked
@@ -87,38 +88,38 @@ MENU_WINDOW_CASCADE_UNDO=&Undo - Cascade
 MENU_WINDOW_STACKED_UNDO=&Undo - Stacked
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
 
-MENU_HELP=&Help
-MENU_HELP_INDEX=&Index
-MENU_HELP_ABOUT=&About Tera Term...
+MENU_HELP=&Hilfe
+MENU_HELP_INDEX=&Hilfedatei
+MENU_HELP_ABOUT=&Über Tera Term...
 
-MENU_SHOW_MENUBAR=Show menu &bar
+MENU_SHOW_MENUBAR=Menüleiste anzeigen
 
 
-TEKMENU_FILE=&File
-TEKMENU_FILE_PRINT=&Print...\tAlt+P
-TEKMENU_FILE_EXIT=E&xit\tAlt+Q
+TEKMENU_FILE=D&atei
+TEKMENU_FILE_PRINT=&Drucken...\tAlt+P
+TEKMENU_FILE_EXIT=&Beenden\tAlt+Q
 
-TEKMENU_EDIT=&Edit
-TEKMENU_EDIT_COPY=&Copy\tAlt+C
-TEKMENU_EDIT_COPYSCREEN=Copy &screen
-TEKMENU_EDIT_PASTE=&Paste\tAlt+V
-TEKMENU_EDIT_PASTECR=Paste<C&R>\tAlt+R
-TEKMENU_EDIT_CLSCREEN=C&lear screen
+TEKMENU_EDIT=B&earbeiten
+TEKMENU_EDIT_COPY=&Kopieren\tAlt+C
+TEKMENU_EDIT_COPYSCREEN=Bildschirm kopieren
+TEKMENU_EDIT_PASTE=&Einfügen\tAlt+V
+TEKMENU_EDIT_PASTECR=Einfügen<C&R>\tAlt+R
+TEKMENU_EDIT_CLSCREEN=Bildschirm leeren
 
-TEKMENU_SETUP=&Setup
-TEKMENU_SETUP_WINDOW=&Window
-TEKMENU_SETUP_FONT=&Font
+TEKMENU_SETUP=Ein&stellungen
+TEKMENU_SETUP_WINDOW=&Fenster
+TEKMENU_SETUP_FONT=&Schriftart
 
-TEKMENU_VTWIN=VT-Wind&ow
+TEKMENU_VTWIN=VT-Fenster(&U)
 
-TEKMENU_WINDOW=&Window
+TEKMENU_WINDOW=&Fenster
 
-TEKMENU_HELP=&Help
+TEKMENU_HELP=&Hilfe
 TEKMENU_HELP_INDEX=&Index
-TEKMENU_HELP_USING=Using &help
-TEKMENU_HELP_ABOUT=&About Tera Term...
+TEKMENU_HELP_USING=&Hilfe verwenden
+TEKMENU_HELP_ABOUT=&Über Tera Term...
 
-TEKMENU_SHOW_MENUBAR=Show menu &bar
+TEKMENU_SHOW_MENUBAR=&Menüleiste anzeigen
 
 ; ttermpro
 ; filesys.cpp
@@ -128,11 +129,11 @@ MSG_COMMENT_LOG_OPEN_ERROR=It is not opened by the log file yet.
 MSG_USE_IME_ERROR=Can't use IME
 
 ; ttplug.c
-MSG_LOAD_EXT_ERROR=Cannot load extension %s (%d)
+MSG_LOAD_EXT_ERROR=Erweiterung %s kann nicht geladen werden (%d)
 
 ; ttwinman.c
-DLG_MAIN_TITLE_CONNECTING=[connecting...]
-DLG_MAIN_TITLE_DISCONNECTED=[disconnected]
+DLG_MAIN_TITLE_CONNECTING=[verbinden...]
+DLG_MAIN_TITLE_DISCONNECTED=[getrennt]
 
 ; vtterm.c
 MSG_CBACCESS_TITLE=Clipboard Access
@@ -144,43 +145,43 @@ MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
 
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
-MSG_DISCONNECT_CONF=Disconnect?
-MSG_EXEC_TT_ERROR=Can't execute Tera Term. (%d)
-MSG_FIND_CYGTERM_DIR_ERROR=Can't find Cygwin directory.
+MSG_DISCONNECT_CONF=Verbindung trennen?
+MSG_EXEC_TT_ERROR=Tera Term kann nicht ausgeführt werden. (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=Cygwin-Ordner kann nicht gefunden werden.
 MSG_CYGTERM_ENV_ALLOC_ERROR=Can't allocate memory for environment variable.
-MSG_EXEC_CYGTERM_ERROR=Can't execute Cygterm.
-MSG_EXEC_TTMENU_ERROR=Can't execute TeraTerm Menu. (%d)
-MSG_EXEC_LOGMETT_ERROR=Can't execute LogMeTT. (%d)
-MSG_VIEW_LOGFILE_ERROR=Can't view logging file. (%d)
+MSG_EXEC_CYGTERM_ERROR=Cygterm kann nicht ausgeführt werden.
+MSG_EXEC_TTMENU_ERROR=Das TeraTerm-Menü kann nicht ausgeführt werden. (%d)
+MSG_EXEC_LOGMETT_ERROR=LogMeTT kann nicht ausgeführt werden. (%d)
+MSG_VIEW_LOGFILE_ERROR=Log-Datei kann nicht angezeigt werden. (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=Select replay log file with binary mode
-FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0
-DIRDLG_CYGTERM_DIR_TITLE=Select Cygwin directory
-MSG_CYGTERM_CONF_WRITEFILE_ERROR=Can't write CygTerm configuration file (%d).
-MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Can't remove old CygTerm configuration file (%d).
-MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Can't rename CygTerm configuration file (%d).
+FILEDLG_OPEN_LOGFILE_FILTER=Alle Dateien(*.*)\0*.*\0\0
+DIRDLG_CYGTERM_DIR_TITLE=Cygwin-Ordner auswählen
+MSG_CYGTERM_CONF_WRITEFILE_ERROR=Die CygTerm-Konfigurationsdatei kann nicht geschrieben werden (%d).
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Alte CygTerm-Konfigurationsdatei kann nicht gelöscht werden (%d).
+MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Die CygTerm-Konfigurationsdatei kann nicht umbenannt werden (%d).
 MSG_CYGTERM_CONF_SAVED_NOTICE=Cygwin tab configuration was saved in %s.
 FILEDLG_SELECT_LOGVIEW_APP_TITLE=Choose a executing file with launching logging file
 FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
-FILEDLG_SELECT_LOGDIR_TITLE=Select log folder
+FILEDLG_SELECT_LOGDIR_TITLE=Log-Ordner auswählen
 FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=Choose a file including strings for ConfirmChangePaste
-FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
+FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=Textdateien(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=Invalid character is included in log file name.
-MSG_LOGFILE_TOOLONG_ERROR=The log file name is too long.
+MSG_LOGFILE_TOOLONG_ERROR=Der Name der Log-Datei ist zu lang.
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI file doesn't have the writable permission.
 
-DLG_TABSHEET_TITLE=Tera Term: Additional settings
-DLG_TABSHEET_TITLE_GENERAL=General
+DLG_TABSHEET_TITLE=Erweiterte Einstellungen
+DLG_TABSHEET_TITLE_GENERAL=Grundeinstellungen
 DLG_TABSHEET_TITLE_SEQUENCE=Control Sequence
 DLG_TABSHEET_TITLE_COPYPASTE=Copy and Paste
-DLG_TABSHEET_TITLE_VISUAL=Visual
+DLG_TABSHEET_TITLE_VISUAL=Visuelle Einstellungen
 DLG_TABSHEET_TITLE_LOG=Log
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 
-DLG_TAB_GENERAL_CLICKURL=&Enable clickable URL
+DLG_TAB_GENERAL_CLICKURL=&Klickbare URL
 DLG_TAB_GENERAL_DISABLESENDBREAK=Disable accelerator &send break
-DLG_TAB_GENERAL_ACCEPTBROADCAST=Accept &broadcast
+DLG_TAB_GENERAL_ACCEPTBROADCAST=&Broadcast erlauben
 DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=Mouse &wheel scroll line
-DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=A&uto scroll only in bottom line
+DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=&Automatischer Bildlauf nur in unterster Zeile
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&Clear display when window resized
 DLG_TAB_GENERAL_CURSOR_CHANGE_IME=Change cursor shape with &IME state
 DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
@@ -194,7 +195,7 @@ DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accept &mouse event tracking request
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Disable mouse event tracking when Control is pressed
-DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING=Accept window &title change request
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING=Accept Window &Title Change Request
 DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF=off
 DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE=overwrite
 DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD=ahead
@@ -203,8 +204,8 @@ DLG_TAB_SEQUENCE_CURSOR_CTRL=&Cursor control sequence
 DLG_TAB_SEQUENCE_WINDOW_CTRL=&Window control sequence
 DLG_TAB_SEQUENCE_WINDOW_REPORT=Window &report sequence
 DLG_TAB_SEQUENCE_TITLE_REPORT=Window t&itle report
-DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE=ignore
-DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT=accept
+DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE=Ignorieren
+DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT=Akzeptieren
 DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY=empty
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS=C&lipboard access from remote
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=off
@@ -213,80 +214,80 @@ DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=read only
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=write only
 DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notify clipboard access from remote
 
-DLG_TAB_COPYPASTE_CONTINUE=Enable continued &line copy
-DLG_TAB_COPYPASTE_MOUSEPASTE=&Disable mouse R button paste
-DLG_TAB_COPYPASTE_CONFIRMPASTE=&Confirm mouse R button paste
-DLG_TAB_COPYPASTE_MOUSEPASTEM=Disable mouse &M button paste
-DLG_TAB_COPYPASTE_SELECTLBUTTON=Select &only by L button
+DLG_TAB_COPYPASTE_CONTINUE=Mehrere Zeilen kopieren
+DLG_TAB_COPYPASTE_MOUSEPASTE=&Einfügen mit rechter Maustaste aus
+DLG_TAB_COPYPASTE_CONFIRMPASTE=&Einfügen mit rechter Maustaste ein
+DLG_TAB_COPYPASTE_MOUSEPASTEM=Einfügen mit mittlerer Maustaste ein
+DLG_TAB_COPYPASTE_SELECTLBUTTON=&Auswahl nur über Button
 DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
 DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=Confirm change &paste
 DLG_TAB_COPYPASTE_STRINGFILE=&String file
-DLG_TAB_COPYPASTE_DELIMITER=Del&imiter characters
+DLG_TAB_COPYPASTE_DELIMITER=&Begrenzungszeichen
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
-DLG_TAB_VISUAL_ALPHA=Window Opacity
+DLG_TAB_VISUAL_ALPHA=Fenster Opazität
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
 DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
-DLG_TAB_VISUAL_ETERM=&Eterm lookfeel(*)
+DLG_TAB_VISUAL_ETERM=&Eterm-Aussehen(*)
 DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
-DLG_TAB_VISUAL_MOUSE=&Mouse cursor
+DLG_TAB_VISUAL_MOUSE=&Mauszeiger
 DLG_TAB_VISUAL_FONT_QUALITY=&Font quality
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=Default
 DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED=Non-Antialiased
 DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=Antialiased
 DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=ClearType
 DLG_TAB_VISUAL_ANSICOLOR=AN&SI color
-DLG_TAB_VISUAL_RED=&Red
-DLG_TAB_VISUAL_GREEN=&Green
-DLG_TAB_VISUAL_BLUE=&Blue
+DLG_TAB_VISUAL_RED=&Rot
+DLG_TAB_VISUAL_GREEN=&Grün
+DLG_TAB_VISUAL_BLUE=&Blau
 DLG_TAB_VISUAL_BOLD=Enable B&old attribute color
 DLG_TAB_VISUAL_BLINK=Enable B&link attribute color
 DLG_TAB_VISUAL_REVERSE=Enable Re&verse attribute color
 DLG_TAB_VISUAL_URL=Enable &URL attribute color
-DLG_TAB_VISUAL_ANSI=Enable A&NSI color
-DLG_TAB_VISUAL_URLUL=Un&derline URL string
+DLG_TAB_VISUAL_ANSI=A&NSI-Farben aktivieren
+DLG_TAB_VISUAL_URLUL=&URLs unterstreichen
 DLG_TAB_VISUAL_RESTART=(*)Need to Save setup and restart Tera Term
 
-DLG_TAB_LOG_EDITOR=View log &editor
-DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)
-DLG_TAB_LOG_FILEPATH=Default log &save folder
-DLG_TAB_LOG_AUTOSTART=A&uto start logging
+DLG_TAB_LOG_EDITOR=&Auswahl-Editor
+DLG_TAB_LOG_FILENAME=&Standardprotokoll-Name
+DLG_TAB_LOG_FILEPATH=Standardprotokoll-Ordner
+DLG_TAB_LOG_AUTOSTART=&Automatisch protokollieren
 DLG_TAB_LOG_ROTATE=&Log Rotate
 DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
 DLG_TAB_LOG_ROTATESTEP=&Rotate
 
 
-DLG_TAB_CYGWIN_PATH=Cygwin install &path
+DLG_TAB_CYGWIN_PATH=Cygwin-Installationspfad
 
 DLG_COMMENT_TITLE=Comment to Log
 
-DLG_BROADCAST_TITLE=Tera Term: Broadcast command
-DLG_BROADCAST_HISTORY=History
-DLG_BROADCAST_PARENTONLY=Send to this process only
-DLG_BROADCAST_ENTER=Enter key
-DLG_BROADCAST_SUBMIT=Submit
-DLG_BROADCAST_REALTIME=Realtime mode
+DLG_BROADCAST_TITLE=Broadcast-Befehl
+DLG_BROADCAST_HISTORY=Verlauf
+DLG_BROADCAST_PARENTONLY=Sende nur Prozess
+DLG_BROADCAST_ENTER=Auswahl-Taste
+DLG_BROADCAST_SUBMIT=Absenden
+DLG_BROADCAST_REALTIME=Echtzeit-Modus
 
 DLG_PRNABORT_PRINTING=Printing
 
-DLG_PROT_FILENAME=Filename:
-DLG_PROT_PROTO=Protocol:
-DLG_PROT_PACKET=Packet#:
-DLG_PROT_TRANS=Bytes transferred:
+DLG_PROT_FILENAME=Dateiname:
+DLG_PROT_PROTO=Protocoll:
+DLG_PROT_PACKET=Paket#:
+DLG_PROT_TRANS=Bytes übertragen:
 DLG_PROT_ELAPSED=Elapsed time:
 
-DLG_FILETRANS_FILENAME=Filename:
-DLG_FILETRANS_FULLPATH=Fullpath:
-DLG_FILETRANS_TRNAS=Bytes transferred:
+DLG_FILETRANS_FILENAME=Dateiname:
+DLG_FILETRANS_FULLPATH=Vollständiger Pfad:
+DLG_FILETRANS_TRNAS=Bytes übertragen:
 DLG_FILETRANS_ELAPSED=Elapsed time:
 DLG_FILETRANS_START=&Start
 DLG_FILETRANS_PAUSE=Pau&se
-DLG_FILETRANS_CLOSE=Close
+DLG_FILETRANS_CLOSE=Schließen
 
 DLG_SETUPDIR_TITLE=Tera Term: Setup directory
 DLG_SETUPDIR_INIFILE=Tera Term Configuration File
@@ -312,154 +313,154 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
-TOOLTIP_TITLEBAR_OPACITY=Opacity %.1f %%
+TOOLTIP_TITLEBAR_OPACITY=Opazität %.1f %%
 
 ; commonlib.c
-MSG_WINSOCK_ERROR=Cannot use winsock
-MSG_INVALID_HOST_ERROR=Invalid host
-MSG_CANTOPEN_ERROR=Cannot open %s. (0x%08x)
+MSG_WINSOCK_ERROR=Kann Winsock nicht verwenden
+MSG_INVALID_HOST_ERROR=Falscher Hostname
+MSG_CANTOPEN_ERROR=Kann %s nicht öffnen (0x%08x)
 MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
 MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied.
 MSG_CANTOPEN_ERROR_PIPEBUSY=Cannot open %s. Pipe is busy.
-MSG_CANTOPEN_FILE_ERROR=Cannot open file
-MSG_COMM_REFUSE_ERROR=Connection refused
-MSG_COMM_REACH_ERROR=Network cannot be reached
-MSG_COMM_TIMEOUT_ERROR=Connection timed out
-MSG_COMM_CONNECT_ERROR=Cannot connect the host
-MSG_CREATE_THREAD_ERROR=Can't create thread
+MSG_CANTOPEN_FILE_ERROR=Kann Datei nicht öffnen
+MSG_COMM_REFUSE_ERROR=Verbindung ist abgebrochen worden
+MSG_COMM_REACH_ERROR=Netzwerk ist nicht erreichbar
+MSG_COMM_TIMEOUT_ERROR=Timeout der Verbindung
+MSG_COMM_CONNECT_ERROR=Mit Host kann keine Verbindung hergestellt werden
+MSG_CREATE_THREAD_ERROR=Thread kann nicht erzeugt werden
 
 ; ttpdlg
 ; ttdlg.c
-DLG_ABOUT_TITLE=About Tera Term
+DLG_ABOUT_TITLE=Über Tera Term
 
-DLG_DIR_TITLE=Tera Term: Change directory
-DLG_DIR_CURRENT=Current dir:
-DLG_DIR_NEW=&New dir:
-DLG_SELECT_DIR_TITLE=Select new directory
+DLG_DIR_TITLE=Verzeichnis wechseln
+DLG_DIR_CURRENT=Aktuell:
+DLG_DIR_NEW=&Neu:
+DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
 
-DLG_GEN_TITLE=Tera Term: General setup
-DLG_GEN_PORT=Default &port:
-DLG_GEN_LANG=&Language:
+DLG_GEN_TITLE=Tera-Grundeinstellungen
+DLG_GEN_PORT=Standard-Port
+DLG_GEN_LANG=Sprache
 DLG_GEN_LANG_UI=Language&UI:
 
-DLG_HOST_TITLE=Tera Term: New connection
-DLG_HOST_TCPIPHOST=H&ost:
-DLG_HOST_TCPIPPORT=TCP &port#:
-DLG_HOST_TCPIPPROTOCOL=IP versio&n:
-DLG_HOST_SERIAL=&Serial
+DLG_HOST_TITLE=Tera Term: Neue Verbindung
+DLG_HOST_TCPIPHOST=&Rechner:
+DLG_HOST_TCPIPPORT=TCP-&Port#:
+DLG_HOST_TCPIPPROTOCOL=IP Versio&n:
+DLG_HOST_SERIAL=&Seriell
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Tera Term: Keyboard setup
-DLG_KEYB_TRANSMIT=Transmit DEL by:
-DLG_KEYB_BS=&Backspace key
-DLG_KEYB_DEL=&Delete key
-DLG_KEYB_KEYB=&Keyboard:
-DLG_KEYB_META=&Meta key:
-DLG_KEYB_DISABLE=Disabled mode:
-DLG_KEYB_APPKEY=&Application Keypad
-DLG_KEYB_APPCUR=Application &Cursor
+DLG_KEYB_TITLE=Keyboard-Einstellungen
+DLG_KEYB_TRANSMIT=DEL senden mit:
+DLG_KEYB_BS=Backspace
+DLG_KEYB_DEL=Entfernen
+DLG_KEYB_KEYB=Keyboard:
+DLG_KEYB_META=Meta-Taste:
+DLG_KEYB_DISABLE=Abschalten:
+DLG_KEYB_APPKEY=Anwendungs-Keypad
+DLG_KEYB_APPCUR=Anwendungs-Cursor
 
 DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
-DLG_SERIAL_PORT=&Port:
+DLG_SERIAL_PORT=Port:
 DLG_SERIAL_BAUD=Sp&eed:
-DLG_SERIAL_DATA=&Data:
-DLG_SERIAL_PARITY=P&arity:
-DLG_SERIAL_STOP=&Stop bits:
-DLG_SERIAL_FLOW=&Flow control:
+DLG_SERIAL_DATA=Data:
+DLG_SERIAL_PARITY=Parity:
+DLG_SERIAL_STOP=Stop bits:
+DLG_SERIAL_FLOW=Flow control:
 DLG_SERIAL_DELAY=Transmit delay
-DLG_SERIAL_DELAYCHAR=msec/&char
-DLG_SERIAL_DELAYLINE=msec/&line
+DLG_SERIAL_DELAYCHAR=msec/char
+DLG_SERIAL_DELAYLINE=msec/line
 DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
-DLG_TCPIP_HOSTLIST=Host &list
-DLG_TCPIP_ADD=&Add
-DLG_TCPIP_UP=&Up
-DLG_TCPIP_REMOVE=&Remove
-DLG_TCPIP_DOWN=&Down
-DLG_TCPIP_HISTORY=H&istory
-DLG_TCPIP_KEEPALIVE=&Keep alive on Telnet
+DLG_TCPIP_TITLE=Hostliste editieren
+DLG_TCPIP_HOSTLIST=Hostliste
+DLG_TCPIP_ADD=Hinzufügen
+DLG_TCPIP_UP=hoch
+DLG_TCPIP_REMOVE=entf
+DLG_TCPIP_DOWN=runter
+DLG_TCPIP_HISTORY=Verlauf
+DLG_TCPIP_KEEPALIVE=Keep alive
 DLG_TCPIP_KEEPALIVE_SEC=Sec
-DLG_TCPIP_AUTOCLOSE=Auto &window close
-DLG_TCPIP_PORT=&Port#:
-DLG_TCPIP_TELNET=T&elnet
-DLG_TCPIP_TERMTYPE=&Term type:
+DLG_TCPIP_AUTOCLOSE=Fenster automatisch schließen
+DLG_TCPIP_PORT=&Port:
+DLG_TCPIP_TELNET=Telnet
+DLG_TCPIP_TERMTYPE=Terminal-Typ:
 
-DLG_TERM_TITLE=Tera Term: Terminal setup
-DLG_TERM_WIDTHLABEL=&Terminal size
-DLG_TERM_ISWIN=Term &size = win size
-DLG_TERM_RESIZE=Auto &window resize
-DLG_TERM_NEWLINE=New-line
-DLG_TERM_CRRCV=&Receive:
-DLG_TERM_CRSEND=Trans&mit:
-DLG_TERM_ID=Terminal &ID:
-DLG_TERM_LOCALECHO=&Local echo
-DLG_TERM_ANSBACK=&Answerback:
-DLG_TERM_AUTOSWITCH=A&uto switch (VT<->TEK)
+DLG_TERM_TITLE=Terminal-Einstellungen
+DLG_TERM_WIDTHLABEL=Terminal-Größe
+DLG_TERM_ISWIN=Term = Fenstergröße
+DLG_TERM_RESIZE=Größe automatisch anpassen
+DLG_TERM_NEWLINE=Neue Zeile
+DLG_TERM_CRRCV=Übertragen:
+DLG_TERM_CRSEND=Absenden:
+DLG_TERM_ID=Terminal-ID:
+DLG_TERM_LOCALECHO=Lokales Echo
+DLG_TERM_ANSBACK=Rückantwort:
+DLG_TERM_AUTOSWITCH=Automatisch wechseln (VT<->TEK)
 DLG_TERM_KANJI=&Kanji (receive)
 DLG_TERM_KANA=Hal&f-width kana
 DLG_TERM_KANJISEND=Kan&ji (transmit)
 DLG_TERM_KANASEND=Half-wi&dth kana
 DLG_TERM_KIN=Kanji-i&n:
 DLG_TERM_KOUT=Kanji-&out:
-DLG_TERM_LOCALE=lo&cale:
-DLG_TERM_RUSSCHARSET=Character set
+DLG_TERM_LOCALE=locale:
+DLG_TERM_RUSSCHARSET=Zeichensatz
 DLG_TERM_RUSSHOST=H&ost:
 DLG_TERM_RUSSCLIENT=&Client:
-DLG_TERM_RUSSFONT=&Font:
+DLG_TERM_RUSSFONT=&Schriftart:
 DLG_TERMK_KANJI=Coding (r&eceive)
 DLG_TERMK_KANJISEND=Coding (tra&nsmit)
 
-DLG_WIN_TITLE=Tera Term: Window setup
-DLG_WIN_TITLELABEL=&Title:
-DLG_WIN_CURSOR=Cursor shape
-DLG_WIN_BLOCK=B&lock
-DLG_WIN_VERT=&Vertical line
-DLG_WIN_HORZ=H&orizontal line
-DLG_WIN_BOLDFONT=Enable bol&d font
-DLG_WIN_HIDETITLE=H&ide title bar
-DLG_WIN_HIDEMENU=Hide &menu bar
-DLG_WIN_COLOREMU=&Color emulation
+DLG_WIN_TITLE=Fenster-Einstellungen
+DLG_WIN_TITLELABEL=Titel
+DLG_WIN_CURSOR=Cursor-Aussehen
+DLG_WIN_BLOCK=Block
+DLG_WIN_VERT=Vertikale Linie
+DLG_WIN_HORZ=Horizontale Linie
+DLG_WIN_BOLDFONT=fettschreiben
+DLG_WIN_HIDETITLE=Titelleiste ausblenden
+DLG_WIN_HIDEMENU=Menüleiste ausblenden
+DLG_WIN_COLOREMU=&Farbemulation
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
 DLG_WIN_AIXTERM16=1&6 Colors (aixterm style)
 DLG_WIN_XTERM256=&256 Colors (xterm style)
-DLG_WIN_SCROLL1=&Scroll buffer:
-DLG_WIN_SCROLL3=li&nes
-DLG_WIN_COLOR=Color
-DLG_WIN_TEXT=Te&xt
-DLG_WIN_BG=Bac&kground
-DLG_WIN_ATTRIB=&Attribute
-DLG_WIN_REVERSE=R&everse
+DLG_WIN_SCROLL1=Scroll-Puffer:
+DLG_WIN_SCROLL3=Zeilen
+DLG_WIN_COLOR=Farben
+DLG_WIN_TEXT=Text
+DLG_WIN_BG=Hintergrund
+DLG_WIN_ATTRIB=Attribute
+DLG_WIN_REVERSE=Umkehren
 DLG_WIN_R=&R:
 DLG_WIN_G=&G:
 DLG_WIN_B=&B:
-DLG_WIN_ALWAYSBG=Always &use Normal text's BG
+DLG_WIN_ALWAYSBG=Normalen Hintergrund verwenden
 DLG_WIN_NORMAL=Normal
-DLG_WIN_BOLD=Bold
+DLG_WIN_BOLD=Fett
 DLG_WIN_BLINK=Blink
-DLG_WIN_REVERSEATTR=Reverse
+DLG_WIN_REVERSEATTR=Umkehren
 
 DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appearance.
 
-DLG_WINLIST_TITLE=Tera Term: Window list
-DLG_WINLIST_LABEL=&Window:
-DLG_WINLIST_OPEN=&Open
-DLG_WINLIST_CLOSEWIN=&Close window
+DLG_WINLIST_TITLE=Fensterliste
+DLG_WINLIST_LABEL=&Fenster:
+DLG_WINLIST_OPEN=Ö&ffnen
+DLG_WINLIST_CLOSEWIN=Fenster &schließen
 
-MSG_FIND_DIR_ERROR=Cannot find directory
+MSG_FIND_DIR_ERROR=Verzeichnis kann nicht gefunden werden
 
 ; ttpfile
 ; ttfile.c
 DLG_FOPT=Option
-DLG_FOPT_BINARY=Bina&ry
-DLG_FOPT_APPEND=&Append
-DLG_FOPT_PLAIN=&Plain text
-DLG_FOPT_TIMESTAMP=&Timestamp
-DLG_FOPT_HIDEDIALOG=Hide &dialog
+DLG_FOPT_BINARY=&Binär
+DLG_FOPT_APPEND=&Anhängen
+DLG_FOPT_PLAIN=&Plain-Text
+DLG_FOPT_TIMESTAMP=&Zeitstempel
+DLG_FOPT_HIDEDIALOG=&Dialog ausblenden
 DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer
 DLG_FOPT_TIMESTAMP_LOCAL=Local Time
 DLG_FOPT_TIMESTAMP_UTC=UTC
@@ -467,25 +468,25 @@ DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
 
 DLG_XOPT=Option
-DLG_XOPT_CHECKSUM=Check&sum
+DLG_XOPT_CHECKSUM=Check&summe
 DLG_XOPT_CRC=&CRC
 DLG_XOPT_1K=1&K
-DLG_XOPT_BINARY=Bina&ry
+DLG_XOPT_BINARY=&Binär
 
-FILEDLG_KEYBOARD_FILTER=keyboard setup files (*.cnf)\0*.cnf\0\0
+FILEDLG_KEYBOARD_FILTER=Tastaturlayout (*.cnf)\0*.cnf\0\0
 FILEDLG_SETUP_FILTER=setup files (*.ini)\0*.ini\0\0
-FILEDLG_SAVE_SETUP_TITLE=Tera Term: Save setup
-FILEDLG_RESTORE_SETUP_TITLE=Tera Term: Restore setup
-FILEDLG_LOAD_KEYMAP_TITLE=Tera Term: Load key map
-FILEDLG_ALL_FILTER=All(*.*)\0*.*\0\0
-FILEDLG_USER_FILTER_NAME=User define
+FILEDLG_SAVE_SETUP_TITLE=Setup sichern
+FILEDLG_RESTORE_SETUP_TITLE=Setup laden
+FILEDLG_LOAD_KEYMAP_TITLE=Tastaturlayout einstellen
+FILEDLG_ALL_FILTER=Alle Dateien(*.*)\0*.*\0\0
+FILEDLG_USER_FILTER_NAME=Benutzerdefiniert
 
-DLG_GETFN_TITLE=Tera Term: Kermit Get
-DLG_GETFN_FILENAME=&Filename:
+DLG_GETFN_TITLE=Kermit Get
+DLG_GETFN_FILENAME=&Datei:
 
 ; ttftypes.h
 FILEDLG_TRANS_TITLE_LOG=Log
-FILEDLG_TRANS_TITLE_SENDFILE=Send file
+FILEDLG_TRANS_TITLE_SENDFILE=Datei senden
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit Receive
 FILEDLG_TRANS_TITLE_KMTGET=Kermit Get
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit Send
@@ -506,37 +507,37 @@ DLG_CLIPBOARD_TITLE=Tera Term: Clipboard confirmation
 
 ; ttptek
 ; tttek.c
-MSG_TEK_PRINT_ERROR=Printer dose not support graphics
+MSG_TEK_PRINT_ERROR=Der Drucker unterstützt keine Grafiken
 
 ; ttpmacro
-FILEDLG_OPEN_MACRO_TITLE=MACRO: Open macro
-FILEDLG_OPEN_MACRO_FILTER=Macro files (*.ttl)\0*.ttl\0\0
+FILEDLG_OPEN_MACRO_TITLE=Makro öffnen
+FILEDLG_OPEN_MACRO_FILTER=Makro-Dateien (*.ttl)\0*.ttl\0\0
 
-BTN_PAUSE=Pau&se
-BTN_START=&Start
-BTN_END=&End
-BTN_YES=&Yes
-BTN_NO=&No
-BTN_STOP=&Stop macro
-BTN_CONTINUE=&Continue
+BTN_PAUSE=Pause
+BTN_START=Start
+BTN_END=Beenden
+BTN_YES=Ja
+BTN_NO=Nein
+BTN_STOP=Makro anhalten
+BTN_CONTINUE=Weiter
 
 MSG_MACRO_CONF=MACRO: confirmation
 MSG_MACRO_HALT_SCRIPT=Are you sure that you want to halt this macro script?
 
 ; common
-MSG_ERROR=ERROR
-MSG_TT_ERROR=Tera Term: Error
+MSG_ERROR=Fehler
+MSG_TT_ERROR=TeraTerm-Fehler
 MSG_TT_NOTICE=Tera Term: Notice
-MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.
+MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.\nAre you sure that you want to relaunch Tera Term?
 
 BTN_OK=OK
-BTN_CANCEL=Cancel
-BTN_CLOSE=Close
-BTN_HELP=&Help
+BTN_CANCEL=Abbrechen
+BTN_CLOSE=Schließen
+BTN_HELP=Hilfe
 
 ; help
 HELPFILE=teraterm.chm
-MSG_OPENHELP_ERROR=Can't open HTML help file(%s).
+MSG_OPENHELP_ERROR=Hilfedatei kann nicht geöffnet werden (%s).
 
 ; ttset
 MSG_INI_ERROR=Tera Term: Error
@@ -550,174 +551,177 @@ DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
-MENU_ABOUT=About &TTSSH...
-MENU_SSH=SS&H...
-MENU_SSH_AUTH=SSH &Authentication...
-MENU_SSH_FORWARD=SSH F&orwarding...
-MENU_SSH_KEYGEN=SSH KeyGe&nerator...
+MENU_ABOUT=&Über TTSSH
+MENU_SSH=&SSH
+MENU_SSH_AUTH=&SSH-Authentifikation
+MENU_SSH_FORWARD=&SSH-Portforwarding
+MENU_SSH_KEYGEN=&SSH-Keygenerator
 
 ; dlg about
-DLG_ABOUT_TITLE=About TTSSH
+DLG_ABOUT_TITLE=Über TTSSH
 DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_ABOUT_SERVERID=Server ID:
-DLG_ABOUT_PROTOCOL=Using protocol:
-DLG_ABOUT_ENCRYPTION=Encryption:
-DLG_ABOUT_SERVERKEY=Server keys:
+DLG_ABOUT_SERVERID=Server-ID:
+DLG_ABOUT_PROTOCOL=Verwendetes Protokoll:
+DLG_ABOUT_ENCRYPTION=Verschlüsselung:
+DLG_ABOUT_SERVERKEY=Server-Schlüssel:
 DLG_ABOUT_KEXKEY=Key exchange keys:
-DLG_ABOUT_AUTH=Authentication:
-DLG_ABOUT_COMP=Compression:
-DLG_ABOUT_CLIENTID=Client ID:
+DLG_ABOUT_AUTH=Authentifikation:
+DLG_ABOUT_COMP=Kompression:
+DLG_ABOUT_CLIENTID=Client-ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
-DLG_ABOUT_HOSTKEY=Host Key:
+DLG_ABOUT_HOSTKEY=Client-Schlüssel:
 DLG_ABOUT_MAC=MAC algorithm:
-DLG_ABOUT_MAC_INFO=%s to server, %s from server
+DLG_ABOUT_MAC_INFO=%s zum Server, %s vom Server
 DLG_ABOUT_COMPDELAY=Delayed Compression:
-DLG_ABOUT_CIPHER_INFO=%s to server, %s from server
+DLG_ABOUT_CIPHER_INFO=%s zum Server, %s vom Server
 DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key
-DLG_ABOUT_KEY_INFO2=%d-bit client key, %d-bit server key
-DLG_ABOUT_KEY_NONE=None
+DLG_ABOUT_KEY_INFO2=%d-Bit-Client-Schlüssel, %d-Bit-Server-Schlüssel
+DLG_ABOUT_KEY_NONE=Keiner
 DLG_ABOUT_COMP_INFO=level %d; ratio %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=level %d
-DLG_ABOUT_COMP_NONE=none
+DLG_ABOUT_COMP_NONE=Keiner
 DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
-DLG_ABOUT_AUTH_INFO=User '%s', using %s
+DLG_ABOUT_AUTH_INFO=Benutzer '%s' verwendet %s
 DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth
-DLG_AUTH_TITLE=SSH Authentication
-DLG_AUTH_TITLE_FAILED=Retrying SSH Authentication
-DLG_AUTH_BANNER=Logging in to %s
-DLG_AUTH_BANNER2=Authentication required.
-DLG_AUTH_BANNER2_FAILED=Authentication failed. Please retry.
-DLG_AUTH_USERNAME=User &name:
+DLG_AUTH_TITLE=SSH-Authentifikation
+DLG_AUTH_TITLE_FAILED=SSH-Authentifikation wird wiederholt
+DLG_AUTH_BANNER=Einloggen auf %s
+DLG_AUTH_BANNER2=Authentifikation notwendig.
+DLG_AUTH_BANNER2_FAILED=Authentifikation fehlgeschlagen. Bitte versuchen Sie es erneut.
+DLG_AUTH_USERNAME=Benutzername:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
-DLG_AUTH_PASSWORD=&Passphrase:
+DLG_AUTH_PASSWORD=Passphrase:
 DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
 DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
 DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
 DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
-DLG_AUTH_REMEMBER_PASSWORD=Remember password on &memory
+DLG_AUTH_REMEMBER_PASSWORD=Passphrase speichern
 DLG_AUTH_FWDAGENT=F&orward agent
 DLG_AUTH_METHOD=Authentication methods
-DLG_AUTH_METHOD_PASSWORD=Use p&lain password to log in
-DLG_AUTH_METHOD_RSA=Use &RSA/DSA/ECDSA/ED25519 key to log in
-DLG_AUTH_METHOD_RHOST=Use r&hosts to log in (SSH1)
+DLG_AUTH_METHOD_PASSWORD=Passwortauthentifikation verwenden
+DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
+DLG_AUTH_METHOD_RHOST=rhosts verwenden (SSH1)
+;DLG_AUTH_METHOD_CHALLENGE1=Benutze challenge/response (TIS)
 DLG_AUTH_METHOD_CHALLENGE1=Use challenge/response(&TIS) to log in
+;DLG_AUTH_METHOD_CHALLENGE2=Benutze challenge/response (keyboard-interactive)
 DLG_AUTH_METHOD_CHALLENGE2=Use keyboard-&interactive to log in
-DLG_AUTH_METHOD_PAGEANT=Use P&ageant to log in
-DLG_AUTH_PRIVATEKEY=Private &key file:
-DLG_AUTH_LOCALUSER=Local &user name:
-DLG_AUTH_HOST_PRIVATEKEY=Host private key &file:
+DLG_AUTH_METHOD_PAGEANT=Benutze Pageant
+DLG_AUTH_PRIVATEKEY=Schlüssel:
+DLG_AUTH_LOCALUSER=Lokaler Benutzername:
+DLG_AUTH_HOST_PRIVATEKEY=rhosts-Schlüssel:
 DLG_AUTH_TIP_CONTROL_CODE=control character is entered
 DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Can't find Pageant.
 MSG_PAGEANT_NOKEY=Pageant has no valid key.
 
 ; dlg auth setup
-DLG_AUTHSETUP_TITLE=TTSSH: Authentication Setup
-DLG_AUTHSETUP_BANNER=Select defaults for authentication:
+DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
+DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
 DLG_AUTHSETUP_USERNAME=User name
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
 DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
 DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD=Authentication methods
-DLG_AUTHSETUP_METHOD_PASSWORD=Use p&lain password to log in
-DLG_AUTHSETUP_METHOD_RSA=Use &RSA/DSA/ECDSA/ED25519 key to log in
-DLG_AUTHSETUP_METHOD_RHOST=Use r&hosts to log in (SSH1)
+DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
+DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
+DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)
+;DLG_AUTHSETUP_METHOD_CHALLENGE=Benutze challenge/response (SSH1:&TIS, SSH2:keyboard-interactive)
 DLG_AUTHSETUP_METHOD_CHALLENGE=Use SSH1:challenge/response(&TIS) / SSH2:keyboard-interactive to log in
 DLG_AUTHSETUP_METHOD_PAGEANT=Use P&ageant
-DLG_AUTHSETUP_PRIVATEKEY=Private &key file:
-DLG_AUTHSETUP_LOCALUSER=Local &user name:
-DLG_AUTHSETUP_HOST_PRIVATEKEY=Host private key &file:
-DLG_AUTHSETUP_CHECKAUTH=&Check the enabled authentication methods before login (SSH2)
+DLG_AUTHSETUP_PRIVATEKEY=Schlüssel:
+DLG_AUTHSETUP_LOCALUSER=Lokaler Benutzername:
+DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-Schlüssel:
+DLG_AUTHSETUP_CHECKAUTH=Prüfe die Authentifizierungsmethoden vor dem Logins (SSH2)
 
-FILEDLG_OPEN_PRIVATEKEY_TITLE=Choose a file with the RSA/DSA/ECDSA/ED25519 private key
+FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA/ED25519-Schlüssel auswählen
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
-MSG_KEYSPECIFY_ERROR=You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.
-MSG_READKEY_ERROR=read error SSH2 private key file\n%s
-MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menu before connecting.
-MSG_NOAUTHMETHOD_ERROR=Server does not support any of the authentication options\nprovided by TTSSH. This connection will now close.
+MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA/ED25519-Schlüssel auswählen.
+MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA/ED25519-Schlüssels\n%s
+MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.
+MSG_NOAUTHMETHOD_ERROR=Der Server unterstützt keine der von TTSSH angebotenen\nAuthentifizierungs-Optionen. Die Verbindung wird beendet.
 
 ; dlg diff key
-DLG_DIFFERENTKEY_TITLE=SECURITY WARNING
-DLG_DIFFERENTKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
-DLG_DIFFERENTKEY_WARNING2=If you choose to replace this new key to the known hosts list and continue, then you will not receive this warning again.
-DLG_DIFFERENTKEY_FINGERPRINT=The server's host key fingerprint is:
+DLG_DIFFERENTKEY_TITLE=SICHERHEITSWARNUNG
+DLG_DIFFERENTKEY_WARNING=Der Server ("####################################") ist in der "known hosts"-Liste bereits mit einem anderen Schlüssel eingetragen.
+DLG_DIFFERENTKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
+DLG_DIFFERENTKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_DIFFERENTKEY_REPLACE=&Replace the exist key with this new key
+DLG_DIFFERENTKEY_REPLACE=Den vorhanden Schlüssel durch den neuen ersetzen.
 
 ; dlg diff type key
-DLG_DIFFERENTTYPEKEY_TITLE=SECURITY WARNING
+DLG_DIFFERENTTYPEKEY_TITLE=SICHERHEITSWARNUNG
 DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
-DLG_DIFFERENTTYPEKEY_WARNING2=If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.
-DLG_DIFFERENTTYPEKEY_FINGERPRINT=The server's host key fingerprint is:
+DLG_DIFFERENTTYPEKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_DIFFERENTTYPEKEY_ADD=&Add this machine and its key to the known hosts list
+DLG_DIFFERENTTYPEKEY_ADD=Den Server zur "known hosts"-Liste hinzufügen.
 
 ; dlg fwd edit
-DLG_FWD_TITLE=SSH Port Forwarding
-DLG_FWD_BANNER=Select direction for forwarded port:
-DLG_FWD_LOCAL_PORT=Forward &local port
+DLG_FWD_TITLE=SSH-Port-Weiterleitung
+DLG_FWD_BANNER=Die Richtung der Port-Weiterleitung wählen:
+DLG_FWD_LOCAL_PORT=Lokalen Port weiterleiten
 DLG_FWD_LOCAL_LISTEN=l&isten
-DLG_FWD_LOCAL_REMOTE=to remote &machine
-DLG_FWD_LOCAL_REMOTE_PORT=&port
-DLG_FWD_LOCAL_CHECKIDENTITY=A&ccept connections from other hosts
-DLG_FWD_REMOTE_PORT=Forward &remote server port
+DLG_FWD_LOCAL_REMOTE=zur Remote-Maschine
+DLG_FWD_LOCAL_REMOTE_PORT=Rem. Port
+DLG_FWD_LOCAL_CHECKIDENTITY=Verbindungen von anderen Hosts erlauben
+DLG_FWD_REMOTE_PORT=Entfernten Port weiterleiten
 DLG_FWD_REMOTE_LISTEN=li&sten
-DLG_FWD_REMOTE_LOCAL=to local m&achine
-DLG_FWD_REMOTE_LOCAL_PORT=p&ort
+DLG_FWD_REMOTE_LOCAL=zur lokalen Maschine
+DLG_FWD_REMOTE_LOCAL_PORT=Lok. Port
 DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
 DLG_FWD_DYNAMIC_LISTEN=lis&ten
 
-MSG_SAME_SERVERPORT_ERROR=You cannot have two forwarding from the same server port (%d).
-MSG_SAME_LOCALPORT_ERROR=You cannot have two forwarding from the same local port (%d).
-MSG_UNSPECIFIED_FWD_ERROR1=The following forwarding were not specified when this SSH session began:\n\n
+MSG_SAME_SERVERPORT_ERROR=Sie können nicht zwei Weiterleitungen vom selben Server-Port definieren (%d).
+MSG_SAME_LOCALPORT_ERROR=Sie können nicht zwei Weiterleitungen vom selben lokalen Port definieren (%d).
+MSG_UNSPECIFIED_FWD_ERROR1=Die folgenden Weiterleitungen waren zu Beginn dieser SSH-Sitzung nicht definiert:\n\n
 MSG_UNSPECIFIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
-MSG_INVALID_PORT_ERROR=Port "%s" is not a valid port number.\nEither choose a port name from the list, or enter a number between 1 and 65535.
+MSG_INVALID_PORT_ERROR="%s" ist keine gültige Portnummer.\nWählen Sie entweder einen Portnamen aus der Liste, oder geben Sie eine Nummer zwischen 1 and 65535 an.
 
 ; dlg fwd setup
-DLG_FWDSETUP_TITLE=TTSSH: Forwarding Setup
-DLG_FWDSETUP_LIST=&Port Forwarding
-DLG_FWDSETUP_ADD=&Add...
-DLG_FWDSETUP_EDIT=&Edit...
-DLG_FWDSETUP_REMOVE=&Remove
-DLG_FWDSETUP_CHECKIDENTITY=Local ports a&ccept connections from other hosts
-DLG_FWDSETUP_X=X Forwarding
-DLG_FWDSETUP_XAPP=Display remote &X applications on local X server
+DLG_FWDSETUP_TITLE=SSH-Port-Weiterleitung
+DLG_FWDSETUP_LIST=SSH-Tunnel aufbauen
+DLG_FWDSETUP_ADD=Hinzufügen
+DLG_FWDSETUP_EDIT=Bearbeiten
+DLG_FWDSETUP_REMOVE=Entfernen
+DLG_FWDSETUP_CHECKIDENTITY=Lokale Ports akzeptieren Verbindungen von anderen Hosts
+DLG_FWDSETUP_X=X-Forwarding
+DLG_FWDSETUP_XAPP=Remote-X-Sitzungen auf dem lokalen X-Server anzeigen.
 
-MSG_FWD_REMOTE_XSERVER=remote X server
-MSG_FWD_REMOTE_XSCREEN=X server (display %d:%d)
+MSG_FWD_REMOTE_XSERVER=Remote-X-Server
+MSG_FWD_REMOTE_XSCREEN=X-Server (anzeige %d:%d)
 MSG_FWD_REMOTE=Remote "%s" port %s to local "%s" port %s
 MSG_FWD_LOCAL=Local "%s" port %s to remote "%s" port %s
 MSG_FWD_X=Remote X applications to local X server
 MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 
 ; dlg host
-DLG_HOST_TITLE=Tera Term: New connection
-DLG_HOST_TCPIPHOST=Hos&t:
-DLG_HOST_TCPIPHISTORY=Hist&ory
-DLG_HOST_TCPIPSERVICE=Service
-DLG_HOST_TCPIPOTHER=Other
-DLG_HOST_TCPIPPORT=TCP &port#:
-DLG_HOST_TCPIPSSHVERSION=SSH &version:
-DLG_HOST_TCPIPPROTOCOL=IP versio&n:
-DLG_HOST_SERIAL=S&erial
-DLG_HOST_SERIALPORT=Po&rt:
-DLG_HOST_HELP=&Help
+DLG_HOST_TITLE=Neue Verbindung
+DLG_HOST_TCPIPHOST=Server:
+DLG_HOST_TCPIPHISTORY=Verlauf
+DLG_HOST_TCPIPSERVICE=Dienst
+DLG_HOST_TCPIPOTHER=Anderer
+DLG_HOST_TCPIPPORT=TCP-Port
+DLG_HOST_TCPIPSSHVERSION=Protokoll-Version
+DLG_HOST_TCPIPPROTOCOL=IP Versio&n:
+DLG_HOST_SERIAL=Seriell
+DLG_HOST_SERIALPORT=Port
+DLG_HOST_HELP=Hilfe
 
-MSG_TCPPORT_NAN_ERROR=The TCP port must be a number.
+MSG_TCPPORT_NAN_ERROR=Der TCP-Port muss nummerisch sein.
 
 ; dlg keygen
-DLG_KEYGEN_TITLE=TTSSH: Key Generator
-DLG_KEYGEN_KEYTYPE=Key type
-DLG_KEYGEN_PASSPHRASE=Key passphrase:
-DLG_KEYGEN_PASSPHRASE2=Confirm passphrase:
+DLG_KEYGEN_TITLE=SSH Key Generator
+DLG_KEYGEN_KEYTYPE=Schlüssel-Typ
+DLG_KEYGEN_PASSPHRASE=Passphrase:
+DLG_KEYGEN_PASSPHRASE2=Passphrase bestätigen:
 DLG_KEYGEN_COMMENT=C&omment:
-DLG_KEYGEN_SAVEPUBLIC=Save publ&ic key
-DLG_KEYGEN_SAVEPRIVATE=Save &private key
-DLG_KEYGEN_GENERATE=&Generate
+DLG_KEYGEN_SAVEPUBLIC=Public Key
+DLG_KEYGEN_SAVEPRIVATE=Private Key
+DLG_KEYGEN_GENERATE=Generieren
 DLG_KEYGEN_BITS=Key &Bits:
 DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
 DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
@@ -728,17 +732,17 @@ MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING="generating key"
 MSG_KEYGEN_GENERATED="key generated"
 
-FILEDLG_SAVE_PUBLICKEY_TITLE=Save public key as:
+FILEDLG_SAVE_PUBLICKEY_TITLE=Public Key speichern:
 FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa.pub)\0id_ecdsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\0id_ed25519.pub\0All Files(*.*)\0*.*\0\0
-MSG_SAVE_KEY_OPENFILE_ERROR=Can't open key file
-MSG_SAVE_KEY_WRITEFILE_ERROR=Can't write key file
-MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Two passphrases don't match.
-MSG_SAVE_PRIVATEKEY_EMPTY_WARN=Are you sure that you want to use a empty passphrase?
-FILEDLG_SAVE_PRIVATEKEY_TITLE=Save private key as:
+MSG_SAVE_KEY_OPENFILE_ERROR=Schlüssel kann nicht geöffnet werden
+MSG_SAVE_KEY_WRITEFILE_ERROR=Schlüssel kann nicht speichert werden
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Die Passphrasen stimmen nicht überein
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=Möchten Sie den Schlüssel ohne Passphrase speichern?
+FILEDLG_SAVE_PRIVATEKEY_TITLE=Private Key speichern:
 FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0All Files(*.*)\0*.*\0\0
@@ -747,9 +751,9 @@ FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\0id_ed25519\
 
 ; dlg setup
 DLG_SSHSETUP_TITLE=TTSSH: Setup
-DLG_SSHSETUP_COMPRESS=&Compression level:
-DLG_SSHSETUP_COMPRESS_NONE=None
-DLG_SSHSETUP_COMPRESS_HIGHEST=Highest
+DLG_SSHSETUP_COMPRESS=&Kompressionsstufe:
+DLG_SSHSETUP_COMPRESS_NONE=Keine
+DLG_SSHSETUP_COMPRESS_HIGHEST=Höchste
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.
 DLG_SSHSETUP_CIPHER=&Preferred cipher order
 DLG_SSHSETUP_CIPHER_UP=Move Up(&1)
@@ -781,7 +785,7 @@ DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
 DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verify hostkey fingerprint by DNS
-DLG_SSHSETUP_NOTICE=All options take effect the next time a session is started.
+DLG_SSHSETUP_NOTICE=Die Einstellungen werden beim Start der nächsten Sitzung aktiv.
 DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
 DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
 DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
@@ -805,12 +809,12 @@ DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
 MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
-DLG_UNKNOWNHOST_TITLE=SECURITY WARNING
-DLG_UNKNOWNHOST_WARNING=There is no entry for the server "#####################################" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.
-DLG_UNKNOWNHOST_WARNING2=If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.
-DLG_UNKNOWNHOST_FINGERPRINT=The server's host key fingerprint is:
+DLG_UNKNOWNHOST_TITLE=SICHERHEITSWARNUNG
+DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
+DLG_UNKNOWNHOST_WARNING2=Wenn Sie auf 'Continue' klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
+DLG_UNKNOWNHOST_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_UNKNOWNHOST_ADD=&Add this machine and its key to the known hosts list
+DLG_UNKNOWNHOST_ADD=Den Server zur "known hosts"-Liste hinzufügen.
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=No host key fingerprint found in DNS.
 DLG_HOSTKEY_SSHFP_MATCH=Matching host key fingerprint found in DNS.
@@ -846,7 +850,7 @@ MSG_FWD_MACHINEDOWN_ERROR=The machine could not be contacted (possibly the machi
 MSG_FWD_ADDRNOTFOUND_ERROR=No address was found for the machine
 MSG_FWD_CONNECT_ERROR=The forwarding connection could not be established
 MSG_FWD_CHANNEL_ERROR=Communications error %s forwarded local %s.\n%s (code %d).\nThe forwarded connection will be closed.
-MSG_FWD_CHANNEL_OPEN_X_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to the X server on %s (display %d:%d).\n%s(code %d).\nThe forwarded connection will be closed.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to the X server on %s (anzeige %d:%d).\n%s(code %d).\nThe forwarded connection will be closed.
 MSG_FWD_CHANNEL_OPEN_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to %s (port %s).\n%s(code %d).\nThe forwarded connection will be closed.
 DLG_FWDMON_TITLE=TTSSH Port Forwarding Monitor
 MSG_FWD_HOSTILE_ATTACK_ERROR=Host with IP number %s tried to connect to forwarded local port %d.\nThis could be some kind of hostile attack.
@@ -922,7 +926,7 @@ MSG_SSH_AGENTERROR_TITLE=Bad agent request
 MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
 
 ; ttxssh.c
-MSG_UNKNOWN_OPTION_ERROR=Unrecognized command-line option: %s
+MSG_UNKNOWN_OPTION_ERROR=Unbekannte Befehlszeilen-Option: %s
 
 ; x11util.c
 MSG_X_AUTH_ERROR=Remote X application sent incorrect authentication data.\nIts X session is being cancelled.
@@ -936,16 +940,16 @@ MSG_CREATEWINDOW_AUTH_ERROR=Unable to display authentication dialog box.\nConnec
 MSG_CREATEWINDOW_AUTHSETUP_ERROR=Unable to display authentication setup dialog box.
 MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Unable to display file dialog box: error %d
 
-MSG_WARNING=WARNING
-MSG_ERROR=ERROR
-MSG_TTSSH_ERROR=TTSSH Error
+MSG_WARNING=ACHTUNG
+MSG_ERROR=FEHLER
+MSG_TTSSH_ERROR=TTSSH-Fehler
 MSG_NONFATAL_ERROR=Tera Term: not fatal error
 
 BTN_OK=OK
-BTN_CANCEL=Cancel
-BTN_CLOSE=Close
-BTN_DISCONNECT=&Disconnect
-BTN_CONTINUE=&Continue
+BTN_CANCEL=Abbrechen
+BTN_CLOSE=Schließen
+BTN_DISCONNECT=&Trennen
+BTN_CONTINUE=&Fortsetzen
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
@@ -955,39 +959,39 @@ BTN_HELP=&Help
 DLG_TAHOMA_FONT=Tahoma,8,0
 
 MENU_SETUP=&Proxy...
-MENU_ABOUT=About TT&Proxy...
+MENU_ABOUT=&Über TTProxy...
 
-DLG_SETUP_TITLE=Proxy Setup
+DLG_SETUP_TITLE=Proxy-Setup
 DLG_SETUP_URL=URL
-DLG_SETUP_TYPE=&Type
+DLG_SETUP_TYPE=&Typ
 DLG_SETUP_HOST=&Hostname
-DLG_SETUP_PORT=Port &number
-DLG_SETUP_USER=&Username
-DLG_SETUP_PASS=&Password
-DLG_SETUP_OTHER=&Other setup...
+DLG_SETUP_PORT=Port&nummer
+DLG_SETUP_USER=&Benutzername
+DLG_SETUP_PASS=&Passwort
+DLG_SETUP_OTHER=&Weitere Einstellungen...
 
-DLG_OTHER_TITLE=Other Setup
-DLG_OTHER_COMMON=Common setup
-DLG_OTHER_TIMEOUT=Connection &Timeout
-DLG_OTHER_SECOND=seconds
-DLG_OTHER_LOG=Proxy connection &log
+DLG_OTHER_TITLE=Weitere Einstellungen
+DLG_OTHER_COMMON=Allgemeine Einstellungen
+DLG_OTHER_TIMEOUT=&Timeout der Verbindung
+DLG_OTHER_SECOND=Sekunden
+DLG_OTHER_LOG=Proxy-Verbindungs-Log
 DLG_OTHER_REFER=Re&fer...
-DLG_OTHER_SOCKS=SOCKS proxy setup
-DLG_OTHER_RESOLV=Name &Resolving
-DLG_OTHER_RESOLV_AUTO=auto resolve
-DLG_OTHER_RESOLV_REMOTE=resolve remote
-DLG_OTHER_RESOLV_LOCAL=resolve local
-DLG_OTHER_TELNET=TELNET Proxy setup
+DLG_OTHER_SOCKS=SOCKS-Proxyeinstellungen
+DLG_OTHER_RESOLV=&Namensauflösung
+DLG_OTHER_RESOLV_AUTO=&Automatische Namensauflösung
+DLG_OTHER_RESOLV_REMOTE=Remote auflösen
+DLG_OTHER_RESOLV_LOCAL=Lokal auflösen
+DLG_OTHER_TELNET=TELNET-Proxyeinstellungen
 DLG_OTHER_HOST=&Hostname prompt
 DLG_OTHER_USER=&Username prompt
 DLG_OTHER_PASS=&Password prompt
 DLG_OTHER_CONNECT=&Connected message
-DLG_OTHER_ERROR=&Error message
+DLG_OTHER_ERROR=&Fehlermeldung
 
-DLG_ABOUT_TITLE=About TTProxy
-DLG_ABOUT_EXTENSION=Tera Term proxy extension
+DLG_ABOUT_TITLE=Über TTProxy
+DLG_ABOUT_EXTENSION=TeraTerm-Proxyerweiterung
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
-DLG_ABOUT_HOMEPAGE=TTProxy home page
+DLG_ABOUT_HOMEPAGE=TTProxy-Homepage
 
 MSG_EMPTY_HOSTNAME=Hostname is empty!
 MSG_ILLEGAL_PORT=Illegal port number!
@@ -1021,8 +1025,8 @@ MSG_CERT_REVOKED=Certificate revoked
 MSG_INVALID_CA=Invalid CA Certificate
 MSG_PATH_LENGTH_EXCEEDED=Path length constraint exceeded
 MSG_INVALID_PURPOSE=Unsupported Certificate purpose
-MSG_CERT_UNTRUSTED=Certificate not trusted
-MSG_CERT_REJECTED=Certificate rejected
+MSG_CERT_UNTRUSTED=Zertifikat nicht vertrauenswürdig
+MSG_CERT_REJECTED=Zertifikat zurückgewiesen
 MSG_SUBJECT_ISSUER_MISMATCH=Subject Issuer mismatch
 MSG_AKID_SKID_MISMATCH=Authority and Subject Key Identifier mismatch
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Authority and Issuer Serial Number mismatch
@@ -1032,61 +1036,61 @@ MSG_UNMATCH_COMMON_NAME=Unmatch Common Name
 MSG_UNABLE_TO_GET_COMMON_NAME=Unable to get Common Name
 
 BTN_OK=OK
-BTN_CANCEL=Cancel
+BTN_CANCEL=Abbrechen
 
 
 [TTMenu]
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-MENU_LISTCONFIG=List Configuration
+MENU_LISTCONFIG=Listenkonfiguration
 MENU_SETTING=Setting
-MENU_ICON=showing large icon
-MENU_FONT=specifying font
+MENU_ICON=Große Symbole anzeigen
+MENU_FONT=Schriftart angeben
 MENU_LEFTPOPUP=showing list by left-click
 MENU_HOTKEY=showing list hotkey(Ctl+Alt+M)
 MENU_VERSION=Version
-MENU_EXEC=Execute
-MENU_CLOSE=Quit
+MENU_EXEC=Ausführen
+MENU_CLOSE=Beenden
 MENU_NOTRAY=(none)
 
-DLG_ABOUT_TITLE=Version Information
+DLG_ABOUT_TITLE=Versionsinformation
 DLG_ABOUT_APPNAME=launch tool
 
-DLG_CONFIG_TITLE=List Configuration
-DLG_CONFIG_ITEM=List Item
-DLG_CONFIG_CONFIG=Configuration
+DLG_CONFIG_TITLE=Listenkonfiguration
+DLG_CONFIG_ITEM=Listenelement
+DLG_CONFIG_CONFIG=Konfiguration
 DLG_CONFIG_NAME=Name
 DLG_CONFIG_PATTERN=Launch Pattern
 DLG_CONFIG_AUTO=autologin
-DLG_CONFIG_HOST=Host Name
-DLG_CONFIG_USER=User Name
-DLG_CONFIG_PASS=Password
+DLG_CONFIG_HOST=Hostname
+DLG_CONFIG_USER=Benutzername
+DLG_CONFIG_PASS=Passwort
 DLG_CONFIG_MACRO=specified macro file
 DLG_CONFIG_LAUNCH=launch only
 DLG_CONFIG_STARTUP=kick at starting
-DLG_CONFIG_SSH=use SSH
-DLG_CONFIG_KEYFILE=Keyfile
+DLG_CONFIG_SSH=SSH verwenden
+DLG_CONFIG_KEYFILE=Schlüsseldatei
 DLG_CONFIG_CHALLENGE=use Challenge
 DLG_CONFIG_PAGEANT=use Pageant
-DLG_CONFIG_DETAIL=details
+DLG_CONFIG_DETAIL=Details
 
-DLG_ETC_TITLE=Configuration Details
-DLG_ETC_APP=Application
+DLG_ETC_TITLE=Konfigurationsdetails
+DLG_ETC_APP=Anwendung
 DLG_ETC_OPTION=Option
-DLG_ETC_CONFIG=Tera Term Configuration File(except launching)
+DLG_ETC_CONFIG=TeraTerm-Konfigurationsdatei (except launching)
 DLG_ETC_AUTO=Configuration for auto-login
-DLG_ETC_LOGFILE=log file
+DLG_ETC_LOGFILE=Log-Datei
 DLG_ETC_PROMPT=Prompt
-DLG_ETC_USER=User Name
-DLG_ETC_PASS=Password
+DLG_ETC_USER=Benutzename
+DLG_ETC_PASS=Passwort
 
 MSG_ERROR_READREG=Couldn't read the registry data.\n
 MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n
 MSG_ERROR_LAUNCH=Launching the application was failure.\n
 MSG_ERROR_NOREGNAME=error: no registry name
 MSG_ERROR_INVALIDREGNAME=can't use "\\" in registry name
-MSG_ERROR_NOHOST=error: no host name
-MSG_ERROR_NOMACRO=error: no macro filename
+MSG_ERROR_NOHOST=Fehler: Kein Hostname
+MSG_ERROR_NOMACRO=Fehler: Kein Makrodateiname
 MSG_ERROR_CHECKFILE=checking [%s] file was failure.\n
 MSG_ERROR_SAVEREG=error: couldn't save to registry.\n
 MSG_ERROR_OPENREG=error: couldn't open registry.\n
@@ -1107,13 +1111,13 @@ FILEDLG_LOG_TITLE=specifying log file
 FILEDLG_LOG_FILTER=log file(*.log)\0*.log\0all files(*.*)\0*.*\0\0
 
 BTN_OK=OK
-BTN_CANCEL=Cancel
+BTN_CANCEL=Abbrechen
 BTN_DEFAULT=Default
 
 
 [TTXKanjiMenu]
 MENU_KANJI=&KanjiCode
-MENU_KANJI_K=Coding(&K)
+MENU_KANJI_K=&Coding(&K)
 MENU_RECV_SJIS=Recv: &Shift_JIS
 MENU_RECV_EUCJP=Recv: &EUC-JP
 MENU_RECV_JIS=Recv: &JIS
@@ -1124,7 +1128,7 @@ MENU_SEND_SJIS=Send: S&hift_JIS
 MENU_SEND_EUCJP=Send: EU&C-JP
 MENU_SEND_JIS=Send: J&IS
 MENU_SEND_UTF8=Send: U&TF-8
-MENU_SEND_KS5601=Send: K&S5601
+MENU_SEND_KS5601=Send: KS&5601
 MENU_USE_ONE_SETTING=Use &one setting
 MENU_SJIS=Recv/Send: &Shift_JIS
 MENU_EUCJP=Recv/Send: &EUC-JP
@@ -1135,7 +1139,7 @@ MENU_KS5601=Recv/Send: &KS5601
 
 
 [TTXAlwaysOnTop]
-MENU_ALWAYSONTOP=&Always on top
+MENU_ALWAYSONTOP=&Immer im Vordergrund
 
 
 [TTXRecurringCommand]
@@ -1145,7 +1149,7 @@ MENU_SETUP_RECURRING=Rec&urring command
 MENU_CONTROL_RECURRING=Rec&urring command
 
 DLG_TITLE=Recurring command
-DLG_ENABLE=&Enable
-DLG_INTERVAL=&Interval(sec)
-DLG_COMMAND=&Command
+DLG_ENABLE=&Aktivieren
+DLG_INTERVAL=&Intervall (sek)
+DLG_COMMAND=&Befehl
 DLG_ADD_NEWLINE=&Add new line

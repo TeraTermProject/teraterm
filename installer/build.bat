@@ -199,6 +199,9 @@ pushd cygtool
 nmake -f cygtool.mak
 popd
 
+rem lng ƒtƒ@ƒCƒ‹‚ğì¬
+call makelang.bat
+
 popd
 exit /b 0
 
