@@ -2811,8 +2811,12 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 static PCHAR LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
 static char **LangUIList = NULL;
-#define LANG_PATH "lang"
 #define LANG_EXT ".lng"
+
+static const char *get_lang_folder()
+{
+	return (IsWindowsNTKernel()) ? "lang_utf16le" : "lang";
+}
 
 // ÉÅÉÇÉäÉtÉäÅ[
 static void free_lang_ui_list()
@@ -2838,7 +2842,7 @@ static int make_sel_lang_ui(char *HomeDir)
 
 	free_lang_ui_list();
 
-	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, LANG_PATH, LANG_EXT);
+	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, get_lang_folder(), LANG_EXT);
 
 	file_num = 0;
 	hFind = FindFirstFile(fullpath,&fd);
@@ -2983,7 +2987,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (1 <= w && w <= uilist_count && w != langui_sel) {
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
-								"%s\\%s", LANG_PATH, LangUIList[w - 1]);
+								"%s\\%s", get_lang_folder(), LangUIList[w - 1]);
 
 							GetUILanguageFileFull(ts->HomeDir, ts->UILanguageFile_ini,
 												  ts->UILanguageFile, sizeof(ts->UILanguageFile));
