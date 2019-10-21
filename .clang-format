@@ -15,6 +15,7 @@ UseTab: Always
 IndentWidth: 4
 TabWidth: 4
 AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
 BreakBeforeBraces: Custom
 BraceWrapping:
 	AfterFunction: 'true'
