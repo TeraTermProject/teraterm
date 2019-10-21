@@ -155,7 +155,7 @@ target_link_libraries(
   gdi32
   comdlg32
   delayimp
-  Comctl32
+  comctl32
   )
 
 ### create puttyversion.h
