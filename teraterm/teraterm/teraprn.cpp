@@ -97,19 +97,29 @@ static BOOL CALLBACK PrnAbortProc(HDC PDC, int Code)
 	}
 }
 
+static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+{
+	return 0;
+}
+
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
 	/* initialize PrnDlg record */
 	memset(&PrnDlg, 0, sizeof(PRINTDLG));
 	PrnDlg.lStructSize = sizeof(PRINTDLG);
 	PrnDlg.hwndOwner = HWin;
-	PrnDlg.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_SHOWHELP;
+	PrnDlg.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_SHOWHELP | PD_ENABLEPRINTHOOK;
 	if (! *Sel) {
 		PrnDlg.Flags = PrnDlg.Flags | PD_NOSELECTION;	/* when there is nothing select, gray out the "Selection" radio button */
 	} else {
 		PrnDlg.Flags = PrnDlg.Flags | PD_SELECTION;	/* when there is something select, select the "Selection" radio button by default */
 	}
 	PrnDlg.nCopies = 1;
+	/*
+	 * Windows NT系において、印刷ダイアログにヘルプボタンを表示するため、
+	 * プロシージャをフックする。
+	 */
+	PrnDlg.lpfnPrintHook = PrintHookProc;
 
 	/* 'Print' dialog box */
 	if (! PrintDlg(&PrnDlg)) {
