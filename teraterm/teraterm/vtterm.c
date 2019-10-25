@@ -206,6 +206,9 @@ static int LastX, LastY;
 static int ButtonStat;
 static int FilterTop, FilterBottom, FilterLeft, FilterRight;
 
+/* Saved IME status */
+static BOOL SavedIMEstatus;
+
 /* Beep over-used */
 static DWORD BeepStartTime = 0;
 static DWORD BeepSuppressTime = 0;
@@ -337,7 +340,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 	BracketedPaste = FALSE;
 
 	// Saved IME Status
-	IMEstat = FALSE;
+	SavedIMEstatus = FALSE;
 
 	// previous received character
 	PrevCharacter = -1;	// none
@@ -2729,13 +2732,13 @@ void CSLT(BYTE b)
 	switch (b) {
 	  case 'r':
 		if (CanUseIME()) {
-			SetIMEOpenStatus(HVTWin, IMEstat);
+			SetIMEOpenStatus(HVTWin, SavedIMEstatus);
 		}
 		break;
 
 	  case 's':
 		if (CanUseIME()) {
-			IMEstat = GetIMEOpenStatus(HVTWin);
+			SavedIMEstatus = GetIMEOpenStatus(HVTWin);
 		}
 		break;
 
