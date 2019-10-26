@@ -109,7 +109,6 @@ static PCHAR KanjiOutList[] = {"^[(B","^[(J",NULL};
 static PCHAR KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
 static PCHAR RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
 static PCHAR RussList2[] = {"Windows","KOI8-R",NULL};
-static PCHAR LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
 static PCHAR MetaList[] = {"off", "on", "left", "right", NULL};
 static PCHAR MetaList2[] = {"off", "on", NULL};
 
@@ -3176,7 +3175,7 @@ BOOL WINAPI _AboutDialog(HWND WndParent)
 		                WndParent, AboutDlg);
 }
 
-BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message) {
 		case WM_INITDIALOG:
