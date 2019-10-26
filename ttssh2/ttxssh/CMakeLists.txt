@@ -149,6 +149,8 @@ target_link_libraries(
   gdi32
   comdlg32
   delayimp
+  # OpenSSL が使用
+  crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
   )
 
 ### create puttyversion.h
