@@ -249,7 +249,7 @@ void CTEKWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 	}
 }
 
-void CTEKWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CTEKWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	unsigned int i;
 	char Code;
@@ -299,12 +299,12 @@ void CTEKWindow::OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu)
 	InitMenuPopup(hPopupMenu);
 }
 
-void CTEKWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CTEKWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyDown(HTEKWin,nChar,nRepCnt,nFlags & 0x1ff);
 }
 
-void CTEKWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CTEKWindow::OnKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyUp(nChar);
 }
@@ -315,7 +315,7 @@ void CTEKWindow::OnKillFocus(HWND hNewWnd)
 	TTCFrameWnd::OnKillFocus(hNewWnd);
 }
 
-void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
+void CTEKWindow::OnLButtonDown(WPARAM nFlags, POINTS point)
 {
 	POINT p;
 	HMENU PopupMenu, PopupBase;
@@ -369,12 +369,12 @@ void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
 	TEKWMLButtonDown(&tk,&ts,&cv,p);
 }
 
-void CTEKWindow::OnLButtonUp(UINT nFlags, POINTS point)
+void CTEKWindow::OnLButtonUp(WPARAM nFlags, POINTS point)
 {
 	TEKWMLButtonUp(&tk,&ts);
 }
 
-void CTEKWindow::OnMButtonUp(UINT nFlags, POINTS point)
+void CTEKWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 {
 	//OnRButtonUp(nFlags,point);
 }
@@ -390,7 +390,7 @@ int CTEKWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 	}
 }
 
-void CTEKWindow::OnMouseMove(UINT nFlags, POINTS point)
+void CTEKWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 {
 	POINT p;
 
@@ -431,7 +431,7 @@ void CTEKWindow::OnSetFocus(HWND hOldWnd)
 	TTCFrameWnd::OnSetFocus(hOldWnd);
 }
 
-void CTEKWindow::OnSize(UINT nType, int cx, int cy)
+void CTEKWindow::OnSize(WPARAM nType, int cx, int cy)
 {
 	int w, h;
 	RECT R;
@@ -452,7 +452,7 @@ void CTEKWindow::OnSize(UINT nType, int cx, int cy)
 	TEKWMSize(&tk,&ts,w,h,cx,cy);
 }
 
-void CTEKWindow::OnSysCommand(UINT nID, LPARAM lParam)
+void CTEKWindow::OnSysCommand(WPARAM nID, LPARAM lParam)
 {
 	if (nID==ID_SHOWMENUBAR) {
 		ts.PopupMenu = 0;
@@ -463,7 +463,7 @@ void CTEKWindow::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-void CTEKWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CTEKWindow::OnSysKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	if (nChar==VK_F10) {
 		OnKeyDown(nChar,nRepCnt,nFlags);
@@ -473,7 +473,7 @@ void CTEKWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
-void CTEKWindow::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CTEKWindow::OnSysKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	if (nChar==VK_F10) {
 		OnKeyUp(nChar,nRepCnt,nFlags);

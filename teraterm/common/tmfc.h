@@ -119,15 +119,13 @@ public:
 	///
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	///
-#if 1
 	void OnKillFocus(HWND hNewWnd);
 	void OnDestroy();
 	void OnSetFocus(HWND hOldWnd);
-	void OnSysCommand(UINT nID, LPARAM lParam);
+	void OnSysCommand(WPARAM nID, LPARAM lParam);
 	void OnClose();
-#endif
-	void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	void OnSysKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags);
+	void OnSysKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags);
 };
 
 class TTCDialog : public TTCWnd
