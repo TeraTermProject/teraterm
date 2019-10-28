@@ -747,7 +747,7 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 		u8_len = u8_len_;
 	}
 	if (wstr_ptr == NULL) {
-		wstr_len = 1;
+		wstr_len = 2;
 	}
 
 	while(wstr_len > 0 && u8_len > 0) {
@@ -773,7 +773,7 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 			}
 			u16_out = 1;
 		} else if (u32 <= 0x10ffff) {
-			if (wstr_len > 2) {
+			if (wstr_len >= 2) {
 				if (wstr_ptr != NULL) {
 					// サロゲート エンコード
 					*wstr_ptr++ = uint16_t((u32 - 0x10000) / 0x400) + 0xd800;
