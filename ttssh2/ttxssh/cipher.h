@@ -63,7 +63,7 @@ typedef struct CipherContext CipherContext;
 struct Cipher;
 struct CipherContext {
 	int	plaintext;
-	EVP_CIPHER_CTX evp;
+	EVP_CIPHER_CTX *evp;
 	Cipher *cipher;
 };
 

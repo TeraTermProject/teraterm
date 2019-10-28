@@ -69,24 +69,29 @@ static BOOL normalize_key(RSA *key)
 	BOOL OK = FALSE;
 	BIGNUM *r = BN_new();
 	BN_CTX *ctx = BN_CTX_new();
+	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 
-	if (BN_cmp(key->p, key->q) < 0) {
-		BIGNUM *tmp = key->p;
+	e = n = d = dmp1 = dmq1 = iqmp = p = q = NULL;
 
-		key->p = key->q;
-		key->q = tmp;
+	RSA_get0_key(key, &n, &e, &d);
+	RSA_get0_factors(key, &p, &q);
+	RSA_get0_crt_params(key, &dmp1, &dmq1, &iqmp);
+
+	if (BN_cmp(p, q) < 0) {
+		BN_swap(p, q);
 	}
 
 	if (r != NULL && ctx != NULL) {
-		key->dmp1 = BN_new();
-		key->dmq1 = BN_new();
-		key->iqmp = BN_mod_inverse(NULL, key->q, key->p, ctx);
+		dmp1 = BN_new();
+		dmq1 = BN_new();
+		iqmp = BN_mod_inverse(NULL, q, p, ctx);
+		RSA_set0_crt_params(key, dmp1, dmq1, iqmp);
 
-		if (key->dmp1 != NULL && key->dmq1 != NULL && key->iqmp != NULL) {
-			OK = BN_sub(r, key->p, BN_value_one())
-			  && BN_mod(key->dmp1, key->d, r, ctx)
-			  && BN_sub(r, key->q, BN_value_one())
-			  && BN_mod(key->dmq1, key->d, r, ctx);
+		if (dmp1 != NULL && dmq1 != NULL && iqmp != NULL) {
+			OK = BN_sub(r, p, BN_value_one())
+			  && BN_mod(dmp1, d, r, ctx)
+			  && BN_sub(r, q, BN_value_one())
+			  && BN_mod(dmq1, d, r, ctx);
 		}
 	}
 
@@ -110,6 +115,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	int cipher;
 	RSA *key;
 	unsigned int E_index, N_index, D_index, U_index, P_index, Q_index = 0;
+	BIGNUM *e, *n, *d, *p, *q;
 
 	*invalid_passphrase = FALSE;
 
@@ -294,11 +300,13 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	}
 
 	key = RSA_new();
-	key->n = get_bignum(keyfile_data + N_index);
-	key->e = get_bignum(keyfile_data + E_index);
-	key->d = get_bignum(keyfile_data + D_index);
-	key->p = get_bignum(keyfile_data + P_index);
-	key->q = get_bignum(keyfile_data + Q_index);
+	n = get_bignum(keyfile_data + N_index);
+	e = get_bignum(keyfile_data + E_index);
+	d = get_bignum(keyfile_data + D_index);
+	RSA_set0_key(key, n, e, d);
+	p = get_bignum(keyfile_data + P_index);
+	q = get_bignum(keyfile_data + Q_index);
+	RSA_set0_factors(key, p, q);
 
 	if (!normalize_key(key)) {
 		UTIL_get_lang_msg("MSG_KEYFILES_CRYPTOLIB_ERROR", pvar,
@@ -373,14 +381,17 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	int dlen, i;
 	SSH2Cipher *cipher;
 	size_t authlen;
-	EVP_CIPHER_CTX cipher_ctx;
+	EVP_CIPHER_CTX *cipher_ctx = NULL;
+	int ret;
 
 	blob = buffer_init();
 	b = buffer_init();
 	kdf = buffer_init();
 	encoded = buffer_init();
 	copy_consumed = buffer_init();
-	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL)
+	cipher_ctx = EVP_CIPHER_CTX_new();
+
+	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL || cipher_ctx == NULL)
 		goto error;
 
 	// ƒtƒ@ƒCƒ‹‚ð‚·‚×‚Ä“Ç‚Ýž‚Þ
@@ -541,13 +552,14 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	// •œ†‰»
 	cp = buffer_append_space(b, len);
-	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
+	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
 		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
-	if (EVP_Cipher(&cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
-		cipher_cleanup_SSH2(&cipher_ctx);
+	ret = EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len);
+	if (ret == 0) {
+		cipher_cleanup_SSH2(cipher_ctx);
 		goto error;
 	}
-	cipher_cleanup_SSH2(&cipher_ctx);
+	cipher_cleanup_SSH2(cipher_ctx);
 	buffer_consume(copy_consumed, len);
 
 	if (buffer_remain_len(copy_consumed) != 0) {
@@ -603,6 +615,10 @@ error:
 	free(salt);
 	free(comment);
 
+	if (cipher_ctx) {
+		EVP_CIPHER_CTX_free(cipher_ctx);
+	}
+
 	// KDF ‚Å‚Í‚È‚©‚Á‚½
 	if (keyfmt == NULL) {
 		fseek(fp, 0, SEEK_SET);
@@ -628,6 +644,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 	Key *result = NULL;
 	EVP_PKEY *pk = NULL;
 	unsigned long err = 0;
+	int pk_type;
 
 	OpenSSL_add_all_algorithms();
 	ERR_load_crypto_strings();
@@ -649,7 +666,8 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	switch (pk->type) {
+	pk_type = EVP_PKEY_id(pk);
+	switch (pk_type) {
 	case EVP_PKEY_RSA: // RSA key
 		result->type = KEY_RSA;
 		result->rsa = EVP_PKEY_get1_RSA(pk);
@@ -913,37 +931,54 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	// decrypt prikey with aes256-cbc
 	if (strcmp(encname, "aes256-cbc") == 0) {
 		const EVP_MD *md = EVP_sha1();
-		EVP_MD_CTX ctx;
+		EVP_MD_CTX *ctx = NULL;
 		unsigned char key[40], iv[32];
-		EVP_CIPHER_CTX cipher_ctx;
+		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
+		int ret;
 
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, "\0\0\0\0", 4);
-		EVP_DigestUpdate(&ctx, passphrase, strlen(passphrase));
-		EVP_DigestFinal(&ctx, key, &len);
+		ctx = EVP_MD_CTX_new();
+		if (ctx == NULL) {
+			goto error;
+		}
 
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, "\0\0\0\1", 4);
-		EVP_DigestUpdate(&ctx, passphrase, strlen(passphrase));
-		EVP_DigestFinal(&ctx, key + 20, &len);
+		cipher_ctx = EVP_CIPHER_CTX_new();
+		if (ctx == NULL) {
+			EVP_MD_CTX_free(ctx);
+			goto error;
+		}
+
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, "\0\0\0\0", 4);
+		EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
+		EVP_DigestFinal(ctx, key, &len);
+
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, "\0\0\0\1", 4);
+		EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
+		EVP_DigestFinal(ctx, key + 20, &len);
+
+		EVP_MD_CTX_free(ctx);
 
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(&cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
+		cipher_init_SSH2(cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
 		len = buffer_len(prikey);
 		decrypted = (char *)malloc(len);
-		if (EVP_Cipher(&cipher_ctx, decrypted, prikey->buf, len) == 0) {
+		ret = EVP_Cipher(cipher_ctx, decrypted, prikey->buf, len);
+		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
-			cipher_cleanup_SSH2(&cipher_ctx);
+			cipher_cleanup_SSH2(cipher_ctx);
+			EVP_CIPHER_CTX_free(cipher_ctx);
 			goto error;
 		}
 		buffer_clear(prikey);
 		buffer_append(prikey, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(&cipher_ctx);
+		cipher_cleanup_SSH2(cipher_ctx);
+		EVP_CIPHER_CTX_free(cipher_ctx);
 	}
 
 	// verity MAC
@@ -972,44 +1007,63 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		unsigned char mackey[20];
 		char header[] = "putty-private-key-file-mac-key";
 		const EVP_MD *md = EVP_sha1();
-		EVP_MD_CTX ctx;
+		EVP_MD_CTX *ctx = NULL;
 
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, header, sizeof(header)-1);
+		ctx = EVP_MD_CTX_new();
+		if (ctx == NULL) {
+			goto error;
+		}
+
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, header, sizeof(header)-1);
 		len = strlen(passphrase);
 		if (strcmp(encname, "aes256-cbc") == 0 && len > 0) {
-			EVP_DigestUpdate(&ctx, passphrase, len);
+			EVP_DigestUpdate(ctx, passphrase, len);
 		}
-		EVP_DigestFinal(&ctx, mackey, &len);
+		EVP_DigestFinal(ctx, mackey, &len);
+		EVP_MD_CTX_free(ctx);
 
 		//hmac_sha1_simple(mackey, sizeof(mackey), macdata->buf, macdata->len, binary);
 		{
-		EVP_MD_CTX ctx[2];
+		EVP_MD_CTX *ctx[2] = {0, 0};
 		unsigned char intermediate[20];
 		unsigned char foo[64];
 		int i;
+
+		ctx[0] = EVP_MD_CTX_new();
+		if (ctx[0] == NULL) {
+			goto error;
+		}
+		ctx[1] = EVP_MD_CTX_new();
+		if (ctx[1] == NULL) {
+			EVP_MD_CTX_free(ctx[0]);
+			goto error;
+		}
 
 		memset(foo, 0x36, sizeof(foo));
 		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
 			foo[i] ^= mackey[i];
 		}
-		EVP_DigestInit(&ctx[0], md);
-		EVP_DigestUpdate(&ctx[0], foo, sizeof(foo));
+		EVP_DigestInit(ctx[0], md);
+		EVP_DigestUpdate(ctx[0], foo, sizeof(foo));
 
 		memset(foo, 0x5C, sizeof(foo));
 		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
 			foo[i] ^= mackey[i];
 		}
-		EVP_DigestInit(&ctx[1], md);
-		EVP_DigestUpdate(&ctx[1], foo, sizeof(foo));
+		EVP_DigestInit(ctx[1], md);
+		EVP_DigestUpdate(ctx[1], foo, sizeof(foo));
 
 		memset(foo, 0, sizeof(foo));
 
-		EVP_DigestUpdate(&ctx[0], macdata->buf, macdata->len);
-		EVP_DigestFinal(&ctx[0], intermediate, &len);
+		EVP_DigestUpdate(ctx[0], macdata->buf, macdata->len);
+		EVP_DigestFinal(ctx[0], intermediate, &len);
 
-		EVP_DigestUpdate(&ctx[1], intermediate, sizeof(intermediate));
-		EVP_DigestFinal(&ctx[1], binary, &len);
+		EVP_DigestUpdate(ctx[1], intermediate, sizeof(intermediate));
+		EVP_DigestFinal(ctx[1], binary, &len);
+
+		EVP_MD_CTX_free(ctx[0]);
+		EVP_MD_CTX_free(ctx[1]);
 		}
 
 		memset(mackey, 0, sizeof(mackey));
@@ -1044,6 +1098,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	case KEY_RSA:
 	{
 		char *pubkey_type, *pub, *pri;
+		BIGNUM *e, *n, *d, *iqmp, *p, *q;
+
 		pub = pubkey->buf;
 		pri = prikey->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
@@ -1059,35 +1115,40 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->rsa->e = BN_new();
-		result->rsa->n = BN_new();
-		result->rsa->d = BN_new();
-		result->rsa->p = BN_new();
-		result->rsa->q = BN_new();
-		result->rsa->iqmp = BN_new();
-		if (result->rsa->e == NULL ||
-		    result->rsa->n == NULL ||
-		    result->rsa->d == NULL ||
-		    result->rsa->p == NULL ||
-		    result->rsa->q == NULL ||
-		    result->rsa->iqmp == NULL) {
+		e = BN_new();
+		n = BN_new();
+		d = BN_new();
+		RSA_set0_key(result->rsa, n, e, d);
+		p = BN_new();
+		q = BN_new();
+		RSA_set0_factors(result->rsa, p, q);
+		iqmp = BN_new();
+		RSA_set0_crt_params(result->rsa, NULL, NULL, iqmp);
+		if (e == NULL ||
+		    n == NULL ||
+		    d == NULL ||
+		    p == NULL ||
+		    q == NULL ||
+		    iqmp == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
 
-		buffer_get_bignum2(&pub, result->rsa->e);
-		buffer_get_bignum2(&pub, result->rsa->n);
+		buffer_get_bignum2(&pub, e);
+		buffer_get_bignum2(&pub, n);
 
-		buffer_get_bignum2(&pri, result->rsa->d);
-		buffer_get_bignum2(&pri, result->rsa->p);
-		buffer_get_bignum2(&pri, result->rsa->q);
-		buffer_get_bignum2(&pri, result->rsa->iqmp);
+		buffer_get_bignum2(&pri, d);
+		buffer_get_bignum2(&pri, p);
+		buffer_get_bignum2(&pri, q);
+		buffer_get_bignum2(&pri, iqmp);
 
 		break;
 	}
 	case KEY_DSA:
 	{
 		char *pubkey_type, *pub, *pri;
+		BIGNUM *p, *q, *g, *pub_key, *priv_key;
+
 		pub = pubkey->buf;
 		pri = prikey->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
@@ -1103,26 +1164,28 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->dsa->p = BN_new();
-		result->dsa->q = BN_new();
-		result->dsa->g = BN_new();
-		result->dsa->pub_key = BN_new();
-		result->dsa->priv_key = BN_new();
-		if (result->dsa->p == NULL ||
-		    result->dsa->q == NULL ||
-		    result->dsa->g == NULL ||
-		    result->dsa->pub_key == NULL ||
-		    result->dsa->priv_key == NULL) {
+		p = BN_new();
+		q = BN_new();
+		g = BN_new();
+		DSA_set0_pqg(result->dsa, p, q, g);
+		pub_key = BN_new();
+		priv_key = BN_new();
+		DSA_set0_key(result->dsa, pub_key, priv_key);
+		if (p == NULL ||
+		    q == NULL ||
+		    g == NULL ||
+		    pub_key == NULL ||
+		    priv_key == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
 
-		buffer_get_bignum2(&pub, result->dsa->p);
-		buffer_get_bignum2(&pub, result->dsa->q);
-		buffer_get_bignum2(&pub, result->dsa->g);
-		buffer_get_bignum2(&pub, result->dsa->pub_key);
+		buffer_get_bignum2(&pub, p);
+		buffer_get_bignum2(&pub, q);
+		buffer_get_bignum2(&pub, g);
+		buffer_get_bignum2(&pub, pub_key);
 
-		buffer_get_bignum2(&pri, result->dsa->priv_key);
+		buffer_get_bignum2(&pri, priv_key);
 
 		break;
 	}
@@ -1451,8 +1514,15 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	if (strcmp(encname, "3des-cbc") == 0) {
 		MD5_CTX md;
 		unsigned char key[32], iv[16];
-		EVP_CIPHER_CTX cipher_ctx;
+		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
+		int ret;
+
+		cipher_ctx = EVP_CIPHER_CTX_new();
+		if (cipher_ctx == NULL) {
+			strncpy_s(errmsg, errmsg_len, "Out of memory: EVP_CIPHER_CTX_new()", _TRUNCATE);
+			goto error;
+		}
 
 		MD5_Init(&md);
 		MD5_Update(&md, passphrase, strlen(passphrase));
@@ -1466,16 +1536,19 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(&cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
+		cipher_init_SSH2(cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
 		decrypted = (char *)malloc(len);
-		if (EVP_Cipher(&cipher_ctx, decrypted, blob->buf + blob->offset, len) == 0) {
+		ret = EVP_Cipher(cipher_ctx, decrypted, blob->buf + blob->offset, len);
+		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
-			cipher_cleanup_SSH2(&cipher_ctx);
+			cipher_cleanup_SSH2(cipher_ctx);
+			EVP_CIPHER_CTX_free(cipher_ctx);
 			goto error;
 		}
 		buffer_append(blob2, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(&cipher_ctx);
+		cipher_cleanup_SSH2(cipher_ctx);
+		EVP_CIPHER_CTX_free(cipher_ctx);
 
 		*invalid_passphrase = TRUE;
 	}
@@ -1493,55 +1566,63 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	switch (result->type) {
 	case KEY_RSA:
 	{
+		BIGNUM *e, *n, *d, *iqmp, *p, *q;
+
 		result->rsa = RSA_new();
 		if (result->rsa == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->rsa->e = BN_new();
-		result->rsa->n = BN_new();
-		result->rsa->d = BN_new();
-		result->rsa->p = BN_new();
-		result->rsa->q = BN_new();
-		result->rsa->iqmp = BN_new();
-		if (result->rsa->e == NULL ||
-		    result->rsa->n == NULL ||
-		    result->rsa->d == NULL ||
-		    result->rsa->p == NULL ||
-		    result->rsa->q == NULL ||
-		    result->rsa->iqmp == NULL) {
+		e = BN_new();
+		n = BN_new();
+		d = BN_new();
+		RSA_set0_key(result->rsa, n, e, d);
+		p = BN_new();
+		q = BN_new();
+		RSA_set0_factors(result->rsa, p, q);
+		iqmp = BN_new();
+		RSA_set0_crt_params(result->rsa, NULL, NULL, iqmp);
+		if (e == NULL ||
+		    n == NULL ||
+		    d == NULL ||
+		    p == NULL ||
+		    q == NULL ||
+		    iqmp == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
 
-		buffer_get_bignum_SECSH(blob2, result->rsa->e);
-		buffer_get_bignum_SECSH(blob2, result->rsa->d);
-		buffer_get_bignum_SECSH(blob2, result->rsa->n);
-		buffer_get_bignum_SECSH(blob2, result->rsa->iqmp);
-		buffer_get_bignum_SECSH(blob2, result->rsa->p);
-		buffer_get_bignum_SECSH(blob2, result->rsa->q);
+		buffer_get_bignum_SECSH(blob2, e);
+		buffer_get_bignum_SECSH(blob2, d);
+		buffer_get_bignum_SECSH(blob2, n);
+		buffer_get_bignum_SECSH(blob2, iqmp);
+		buffer_get_bignum_SECSH(blob2, p);
+		buffer_get_bignum_SECSH(blob2, q);
 
 		break;
 	}
 	case KEY_DSA:
 	{
 		int param;
+		BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
 		result->dsa = DSA_new();
 		if (result->dsa == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->dsa->p = BN_new();
-		result->dsa->q = BN_new();
-		result->dsa->g = BN_new();
-		result->dsa->pub_key = BN_new();
-		result->dsa->priv_key = BN_new();
-		if (result->dsa->p == NULL ||
-		    result->dsa->q == NULL ||
-		    result->dsa->g == NULL ||
-		    result->dsa->pub_key == NULL ||
-		    result->dsa->priv_key == NULL) {
+		p = BN_new();
+		q = BN_new();
+		g = BN_new();
+		DSA_set0_pqg(result->dsa, p, q, g);
+		pub_key = BN_new();
+		priv_key = BN_new();
+		DSA_set0_key(result->dsa, pub_key, priv_key);
+		if (p == NULL ||
+		    q == NULL ||
+		    g == NULL ||
+		    pub_key == NULL ||
+		    priv_key == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
@@ -1551,11 +1632,11 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "predefined DSA parameters not supported", _TRUNCATE);
 			goto error;
 		}
-		buffer_get_bignum_SECSH(blob2, result->dsa->p);
-		buffer_get_bignum_SECSH(blob2, result->dsa->g);
-		buffer_get_bignum_SECSH(blob2, result->dsa->q);
-		buffer_get_bignum_SECSH(blob2, result->dsa->pub_key);
-		buffer_get_bignum_SECSH(blob2, result->dsa->priv_key);
+		buffer_get_bignum_SECSH(blob2, p);
+		buffer_get_bignum_SECSH(blob2, g);
+		buffer_get_bignum_SECSH(blob2, q);
+		buffer_get_bignum_SECSH(blob2, pub_key);
+		buffer_get_bignum_SECSH(blob2, priv_key);
 
 		break;
 	}

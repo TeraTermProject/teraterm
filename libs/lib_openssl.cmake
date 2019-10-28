@@ -1,7 +1,7 @@
 ﻿
 include(${CMAKE_CURRENT_LIST_DIR}/script_support.cmake)
 
-set(OPENSSL_ROOT ${CMAKE_CURRENT_LIST_DIR}/openssl_${TOOLSET})
+set(OPENSSL_ROOT ${CMAKE_CURRENT_LIST_DIR}/openssl11_${TOOLSET})
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(OPENSSL_ROOT "${OPENSSL_ROOT}_x64")
 endif()
@@ -21,7 +21,7 @@ else()
 	)
 
   set(OPENSSL_LIB
-	debug ${OPENSSL_ROOT}_debug/lib/libeay32.lib
-	optimized ${OPENSSL_ROOT}/lib/libeay32.lib
+	debug ${OPENSSL_ROOT}_debug/lib/libcrypto.lib
+	optimized ${OPENSSL_ROOT}/lib/libcrypto.lib
 	)
 endif()

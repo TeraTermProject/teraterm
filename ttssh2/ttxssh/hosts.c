@@ -328,7 +328,8 @@ static char *parse_bignum(char *data)
 	int ch;
 	int leftover_digits = 1;
 
-	BN_CTX_init(ctx);
+	// BN_CTX_initŠÖ”‚Í OpenSSL 1.1.0 ‚Åíœ‚³‚ê‚½B
+	// OpenSSL 1.0.2‚ÌŽž“_‚Å‚·‚Å‚É deprecated ˆµ‚¢‚¾‚Á‚½B
 	BN_set_word(num, 0);
 	BN_set_word(billion, 1000000000L);
 
@@ -878,6 +879,10 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 	const EC_GROUP *group;
 	const EC_POINT *pa, *pb;
 	Key *a, *b;
+	BIGNUM *e = NULL, *n = NULL;
+	BIGNUM *se = NULL, *sn = NULL;
+	BIGNUM *p, *q, *g, *pub_key;
+	BIGNUM *sp, *sq, *sg, *spub_key;
 
 	if (src->type != key->type) {
 		return -1;
@@ -898,16 +903,22 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 		*/
 
 	case KEY_RSA: // SSH2 RSA host public key
+		RSA_get0_key(key->rsa, &n, &e, NULL);
+		RSA_get0_key(src->rsa, &sn, &se, NULL);
 		return key->rsa != NULL && src->rsa != NULL &&
-			BN_cmp(key->rsa->e, src->rsa->e) == 0 &&
-			BN_cmp(key->rsa->n, src->rsa->n) == 0;
+			BN_cmp(e, se) == 0 &&
+			BN_cmp(n, sn) == 0;
 
 	case KEY_DSA: // SSH2 DSA host public key
+		DSA_get0_pqg(key->dsa, &p, &q, &g);
+		DSA_get0_pqg(src->dsa, &sp, &sq, &sg);
+		DSA_get0_key(key->dsa, &pub_key, NULL);
+		DSA_get0_key(src->dsa, &spub_key, NULL);
 		return key->dsa != NULL && src->dsa &&
-			BN_cmp(key->dsa->p, src->dsa->p) == 0 &&
-			BN_cmp(key->dsa->q, src->dsa->q) == 0 &&
-			BN_cmp(key->dsa->g, src->dsa->g) == 0 &&
-			BN_cmp(key->dsa->pub_key, src->dsa->pub_key) == 0;
+			BN_cmp(p, sp) == 0 &&
+			BN_cmp(q, sq) == 0 &&
+			BN_cmp(g, sg) == 0 &&
+			BN_cmp(pub_key, spub_key) == 0;
 
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:

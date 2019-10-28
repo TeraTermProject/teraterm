@@ -42,7 +42,8 @@
       <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. When transparency is not available, made opacity not changeable.</li>
       <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
       <li>When the opacity values of the <a href="../menu/setup-additional.html">Additional settings dialog</a> is input over than 255, the value is automatically changed to 255 over the dialog.</li>
-      
+      <li>Added support for REP control sequence.</li>
+
       <li>Serial port connection
         <ul>
           <li>Added support for hardware flow control DSR/DTR with serial connection.
@@ -59,7 +60,6 @@
           <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
         </ul>
       </li>
-      
     </ul>
   </li>
 
@@ -67,13 +67,16 @@
     <ul>
       <li>The toolchip during resizing can not be displayed on the left and top edge of the desktop. This bug was introduced in 4.103.</li>
       <li>Eterm look-feel: When a image file is randomly selected with the wallpaper, invalid file may be selected. </li>
-      <li>The help button of File-Log, File-Trasnfer, and Setup-Font dialog does not work well. This bug was introduced in 4.104.</li>
+      <li>The help button of File-Log, File-Trasnfer, Setup-Font and Printer dialog does not work well. This bug was introduced in 4.104.</li>
+      <li>Fixed a problem that TTIMESV (Save IME status) / TTIMERS (Restore IME status) control sequences do not work.</li>
+      <li>The help button on the printer dialog can not be shown from Windows 2000 to 10(except Windows95).</li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
       <li>Bug fix: A font(TSPECIAL1.TTF) copy may fail when Tera Term installs from the installer.</li>
+      <li>NOTE: CygTerm+ is supported on Windows Vista or later. Please build CygTerm+'s source code by using Cygwin for older Windows, if CygTerm+ wants to run on older Windows.</li>
       <li>upgraded TTSSH to <a href="#ttssh_2.91">2.91</a>.</li>
       <li>upgraded TTProxy to <a href="#ttproxy_1.0.0.26">1.0.0.26</a>.</li>
     </ul>
@@ -3234,6 +3237,12 @@ SYNOPSIS:
       <li>The problem is improved in the user authentication dialog that the delay occurs when the focus is moved from the user name to passphrase by using TAB key after entering the user name.</li>
       <li>When the user name is left blank in the user authentication dialog, the focus may not be moved from the user name to the pull-down menu on the right side with TAB key.</li>
       <li>Fixed a port forwarding issue that closes the client connection before completing all data transmission.</li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded OpenSSL from 1.0.2s to 1.1.1d.</li>
     </ul>
   </li>
 </ul>

@@ -137,6 +137,8 @@ typedef TStatusBuff *PStatusBuff;
 BYTE PrevCharacter;
 BOOL PrevCRorLFGeneratedCRLF;	  // indicates that previous CR or LF really generated a CR+LF
 
+BYTE LastPutCharacter;
+
 // status buffer for main screen & status line
 static TStatusBuff SBuff1, SBuff2, SBuff3;
 
@@ -206,6 +208,9 @@ static unsigned int DecLocatorFlag;
 static int LastX, LastY;
 static int ButtonStat;
 static int FilterTop, FilterBottom, FilterLeft, FilterRight;
+
+/* Saved IME status */
+static BOOL SavedIMEstatus;
 
 /* Beep over-used */
 static DWORD BeepStartTime = 0;
@@ -343,11 +348,13 @@ void ResetTerminal() /*reset variables but don't update screen */
 	BracketedPaste = FALSE;
 
 	// Saved IME Status
-	IMEstat = FALSE;
+	SavedIMEstatus = FALSE;
 
 	// previous received character
 	PrevCharacter = -1;	// none
 	PrevCRorLFGeneratedCRLF = FALSE;
+
+	LastPutCharacter = 0;
 
 	// Beep over-used
 	BeepStartTime = GetTickCount();
@@ -618,12 +625,74 @@ void Tab()
 	if (cv.HLogBuf!=0) Log1Byte(HT);
 }
 
-static void PutChar(BYTE b)
+void RepeatChar(BYTE b, int count)
+{
+	int i;
+	BOOL SpecialNew;
+	TCharAttr CharAttrTmp, CharAttrWrap;
+
+	if (b <= US || b == DEL)
+		return;
+
+	CharAttrTmp = CharAttr;
+	LastPutCharacter = 0;
+
+	SpecialNew = FALSE;
+	if ((b>0x5F) && (b<0x80)) {
+		if (SSflag)
+			SpecialNew = (Gn[GLtmp]==IdSpecial);
+		else
+			SpecialNew = (Gn[Glr[0]]==IdSpecial);
+	}
+	else if (b>0xDF) {
+		if (SSflag)
+			SpecialNew = (Gn[GLtmp]==IdSpecial);
+		else
+			SpecialNew = (Gn[Glr[1]]==IdSpecial);
+	}
+
+	if (SpecialNew != Special) {
+		UpdateStr();
+		Special = SpecialNew;
+	}
+
+	if (Special) {
+		b = b & 0x7F;
+		CharAttrTmp.Attr |= AttrSpecial;
+	}
+	else
+		CharAttrTmp.Attr |= CharAttr.Attr;
+
+	CharAttrWrap = CharAttrTmp;
+	CharAttrWrap.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
+
+	for (i=0; i<count; i++) {
+		if (Wrap) {
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+		}
+
+		BuffPutChar(b, Wrap ? CharAttrWrap : CharAttrTmp, InsertMode);
+
+		if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
+			UpdateStr();
+			Wrap = AutoWrapMode;
+		}
+		else {
+			Wrap = FALSE;
+			MoveRight();
+		}
+	}
+}
+
+void PutChar(BYTE b)
 {
 	BOOL SpecialNew;
 	TCharAttr CharAttrTmp;
 
 	CharAttrTmp = CharAttr;
+
+	LastPutCharacter = b;
 
 	if (PrinterMode) { // printer mode
 		WriteToPrnFile(b,TRUE);
@@ -1874,6 +1943,14 @@ static void CSEraseCharacter(void)
 	BuffEraseChars(Param[1]);
 }
 
+void CSRepeatCharacter()
+{
+	CheckParamVal(Param[1], NumOfColumns * NumOfLines);
+
+	BuffUpdateScroll();
+	RepeatChar(LastPutCharacter, Param[1]);
+}
+
 void CSScrollUp()
 {
 	// TODO: スクロールの最大値を端末行数に制限すべきか要検討
@@ -2754,13 +2831,13 @@ void CSLT(BYTE b)
 	switch (b) {
 	  case 'r':
 		if (CanUseIME()) {
-			SetIMEOpenStatus(HVTWin, IMEstat);
+			SetIMEOpenStatus(HVTWin, SavedIMEstatus);
 		}
 		break;
 
 	  case 's':
 		if (CanUseIME()) {
-			IMEstat = GetIMEOpenStatus(HVTWin);
+			SavedIMEstatus = GetIMEOpenStatus(HVTWin);
 		}
 		break;
 
@@ -4040,7 +4117,7 @@ void ParseCS(BYTE b) /* b is the final char */
 //			  case '^': break;                        // SIMD -- Not support
 			  case '`': CSMoveToColumnN(); break;     // HPA
 			  case 'a': CSCursorRight(FALSE); break;  // HPR
-//			  case 'b': break;                        // REP  -- Not support
+			  case 'b': CSRepeatCharacter(); break;   // REP
 			  case 'c': AnswerTerminalType(); break;  // DA
 			  case 'd': CSMoveToLineN(); break;       // VPA
 			  case 'e': CSCursorDown(FALSE); break;   // VPR
@@ -6129,6 +6206,10 @@ int VTParse()
 		}
 
 		PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
+
+		if (LastPutCharacter != b && !(ParseMode == ModeESC || ParseMode == ModeCSI)) {
+			LastPutCharacter = 0;
+		}
 
 		if (ChangeEmu==0)
 			c = CommRead1Byte(&cv,&b);

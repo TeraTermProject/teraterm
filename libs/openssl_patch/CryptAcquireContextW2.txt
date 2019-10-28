@@ -1,0 +1,41 @@
+*** openssl-1.1.1c.org/crypto/rand/rand_win.c	2019-05-28 22:12:20.000000000 +0900
+--- openssl/crypto/rand/rand_win.c	2019-08-25 19:21:14.365244400 +0900
+*************** size_t rand_pool_acquire_entropy(RAND_PO
+*** 115,120 ****
+--- 115,150 ----
+          return entropy_available;
+  # endif
+  
++ 	/* 
++ 	 * for Windows 95/98/Me/NT4.0 
++ 	 */
++     bytes_needed = rand_pool_bytes_needed(pool, 1 /*entropy_factor*/);
++     buffer = rand_pool_add_begin(pool, bytes_needed);
++     if (buffer != NULL) {
++ 		const char *container_name = "Tera Term Project";
++         size_t bytes = 0;
++ 		BOOL cret = FALSE;
++ 
++         cret = CryptAcquireContextA(&hProvider, container_name, NULL, PROV_RSA_FULL, 0);
++ 		if (cret == FALSE) {
++ 			if (GetLastError() == NTE_BAD_KEYSET) { 
++ 				cret = CryptAcquireContextA(&hProvider, container_name, NULL, PROV_RSA_FULL, CRYPT_NEWKEYSET);
++ 			}
++ 		}
++ 
++ 		if (cret) {
++             if (CryptGenRandom(hProvider, bytes_needed, buffer) != 0)
++                 bytes = bytes_needed;
++ 
++             CryptReleaseContext(hProvider, 0);
++ 			cret = CryptAcquireContextA(&hProvider, container_name, NULL, PROV_RSA_FULL, CRYPT_DELETEKEYSET);
++         }
++         rand_pool_add_end(pool, bytes, 8 * bytes);
++         entropy_available = rand_pool_entropy_available(pool);
++     }
++     if (entropy_available > 0)
++         return entropy_available;
++ 
+      return rand_pool_entropy_available(pool);
+  }
+  

@@ -46,7 +46,7 @@
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - その他
   Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
-  ActivePerl 5.8 以上
+  ActivePerl 5.10 以上
     OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     ソースのチェックアウトに使った svn と互換性のあるバージョン。
@@ -55,7 +55,7 @@
 
 ■ ライブラリ
 - Oniguruma 6.9.3 (https://github.com/kkos/oniguruma)
-- OpenSSL 1.0.2t (http://www.openssl.org/)
+- OpenSSL 1.1.1d (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html)
@@ -146,7 +146,7 @@
      (1) openssl のソースを libs/openssl の中に展開する。
      (2) OpenSSL 1.0.0e 以降で、libs/openssl/Makefile.bak が最初から存在する場合は、一度だけ手動で削除してください。
      (3) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-     (4) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl.bat を実行する。
+     (4) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl11.bat を実行する。
 
   4. Zlib (used by TTSSH)
      (1) zlib のソースを libs/zlib の中に展開する。

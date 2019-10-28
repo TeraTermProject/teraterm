@@ -1624,7 +1624,7 @@ void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 	}
 }
 
-void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	unsigned int i;
 
@@ -2134,7 +2134,7 @@ void CVTWindow::OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu)
 	InitMenuPopup(hPopupMenu);
 }
 
-void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	BYTE KeyState[256];
 	MSG M;
@@ -2206,7 +2206,7 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 }
 
-void CVTWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CVTWindow::OnKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyUp(nChar);
 #if UNICODE_DEBUG
@@ -2236,7 +2236,7 @@ void CVTWindow::OnKillFocus(HWND hNewWnd)
 	}
 }
 
-void CVTWindow::OnLButtonDblClk(UINT nFlags, POINTS point)
+void CVTWindow::OnLButtonDblClk(WPARAM nFlags, POINTS point)
 {
 	if (LButton || MButton || RButton) {
 		return;
@@ -2265,7 +2265,7 @@ void CVTWindow::OnLButtonDblClk(UINT nFlags, POINTS point)
 	::SetTimer(HVTWin, IdScrollTimer, 100, NULL);
 }
 
-void CVTWindow::OnLButtonDown(UINT nFlags, POINTS point)
+void CVTWindow::OnLButtonDown(WPARAM nFlags, POINTS point)
 {
 	POINT p;
 
@@ -2274,7 +2274,7 @@ void CVTWindow::OnLButtonDown(UINT nFlags, POINTS point)
 	ButtonDown(p,IdLeftButton);
 }
 
-void CVTWindow::OnLButtonUp(UINT nFlags, POINTS point)
+void CVTWindow::OnLButtonUp(WPARAM nFlags, POINTS point)
 {
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
@@ -2289,7 +2289,7 @@ void CVTWindow::OnLButtonUp(UINT nFlags, POINTS point)
 	ButtonUp(FALSE);
 }
 
-void CVTWindow::OnMButtonDown(UINT nFlags, POINTS point)
+void CVTWindow::OnMButtonDown(WPARAM nFlags, POINTS point)
 {
 	POINT p;
 
@@ -2298,7 +2298,7 @@ void CVTWindow::OnMButtonDown(UINT nFlags, POINTS point)
 	ButtonDown(p,IdMiddleButton);
 }
 
-void CVTWindow::OnMButtonUp(UINT nFlags, POINTS point)
+void CVTWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 {
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
@@ -2345,7 +2345,7 @@ void CVTWindow::CodePopup(int client_x, int client_y)
 	free(buf);
 }
 
-void CVTWindow::OnMouseMove(UINT nFlags, POINTS point)
+void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 {
 	int i;
 	BOOL mousereport;
@@ -2572,7 +2572,7 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 	FocusReport(TRUE);
 }
 
-void CVTWindow::OnSize(UINT nType, int cx, int cy)
+void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
 	if (IgnoreSizeMessage) {
 		return;
@@ -2660,7 +2660,7 @@ void CVTWindow::OnSize(UINT nType, int cx, int cy)
 // リサイズ中の処理として、以下の二つを行う。
 // ・ツールチップで新しい端末サイズを表示する
 // ・フォントサイズと端末サイズに合わせて、ウィンドウ位置・サイズを調整する
-void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
+void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 {
 	int nWidth;
 	int nHeight;
@@ -2725,11 +2725,9 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 		pRect->bottom = pRect->top + fixed_height;
 		break;
 	}
-
-//TODO	TTCFrameWnd::OnSizing(fwSide, pRect);
 }
 
-void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	char e = ESC;
 	char Code;
@@ -2781,7 +2779,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	TTCFrameWnd::DefWindowProc(WM_SYSCHAR, nChar, MAKELONG(nRepCnt, nFlags));
 }
 
-void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
+void CVTWindow::OnSysCommand(WPARAM nID, LPARAM lParam)
 {
 	if (nID==ID_SHOWMENUBAR) {
 		ts.PopupMenu = 0;
@@ -2799,7 +2797,7 @@ void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 #endif
 }
 
-void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CVTWindow::OnSysKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	if ((nChar==VK_F10) || MetaKey(ts.MetaKey) && ((MainMenu==NULL) || (nChar!=VK_MENU))) {
 		KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff);
@@ -2810,7 +2808,7 @@ void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
-void CVTWindow::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CVTWindow::OnSysKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	if (nChar==VK_F10) {
 		OnKeyUp(nChar,nRepCnt,nFlags);

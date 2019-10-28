@@ -12,7 +12,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <direct.h>
 
 #define Section "Tera Term"
 char *FName = "TERATERM.INI";

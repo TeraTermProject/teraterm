@@ -54,8 +54,12 @@ private:
 
     private:
         SSLContext():ctx(NULL) {
-            SSL_library_init(); 
-            SSL_load_error_strings();
+			// SSL_library_init関数はOpenSSL 1.1.0でdeprecatedとなり、
+			// OPENSSL_init_ssl関数に置き換わった。
+			OPENSSL_init_ssl(0, NULL);
+
+            // SSL_load_error_strings関数はOpenSSL 1.1.0でdeprecatedとなり、
+			// 呼び出し不要となったため、削除した。
             ctx = SSL_CTX_new(SSLv23_client_method());
             SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
         }

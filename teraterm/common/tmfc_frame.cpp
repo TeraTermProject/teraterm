@@ -115,17 +115,17 @@ void TTCFrameWnd::OnDestroy()
 void TTCFrameWnd::OnSetFocus(HWND hOldWnd)
 {}
 
-void TTCFrameWnd::OnSysCommand(UINT nID, LPARAM lParam)
+void TTCFrameWnd::OnSysCommand(WPARAM nID, LPARAM lParam)
 {}
 
-void TTCFrameWnd::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+void TTCFrameWnd::OnSysKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	DefWindowProc(WM_SYSKEYDOWN, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
+	DefWindowProc(WM_SYSKEYDOWN, nChar, MAKELONG(nRepCnt, nFlags));
 }
 
-void TTCFrameWnd::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+void TTCFrameWnd::OnSysKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	DefWindowProc(WM_SYSKEYUP, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
+	DefWindowProc(WM_SYSKEYUP, nChar, MAKELONG(nRepCnt, nFlags));
 }
 
 void TTCFrameWnd::OnClose()
