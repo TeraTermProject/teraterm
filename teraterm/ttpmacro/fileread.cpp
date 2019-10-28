@@ -33,6 +33,9 @@
 #endif
 #include <windows.h>
 #include <tchar.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+
 #include "codeconv.h"
 #include "fileread.h"
 
@@ -175,10 +178,11 @@ wchar_t *LoadFileWA(const char *FileName, size_t *_len)
 		return NULL;
 	}
 	char *u8 = LoadFileU8(fp, NULL);
+	fclose(fp);
 	if (u8 == NULL) {
 		return NULL;
 	}
-	const wchar_t *u16 = ToWcharU8(u8);
+	wchar_t *u16 = ToWcharU8(u8);
 	free(u8);
 	if (u16 == NULL) {
 		return NULL;
@@ -186,7 +190,7 @@ wchar_t *LoadFileWA(const char *FileName, size_t *_len)
 	if (_len != NULL) {
 		*_len = wcslen(u16);
 	}
-	return (wchar_t *)u16;
+	return u16;
 }
 
 /**
