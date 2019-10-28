@@ -5777,7 +5777,7 @@ static void UnicodeToCP932(unsigned int code)
 				//&& BuffIsHalfWidthFromCode(&ts, code)) {
 
 				// full widtho—Í‚ª”¼•ªo—Í‚É‚È‚ç‚È‚¢‚æ‚¤‚É0x20‚ğo—Í
-				BuffPutUnicode('!'/*0x20*/, CharAttrTmp, FALSE);
+				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
 				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
 
 				CarriageReturn(FALSE);
