@@ -188,6 +188,12 @@
     <ClInclude Include="../ttpdlg/ttdlg.h" />
     <ClInclude Include="../ttpmacro/fileread.h" />
     <ClCompile Include="../ttpmacro/fileread.cpp" />
+    <ClInclude Include="sendmem.h" />
+    <ClCompile Include="sendmem.cpp" />
+    <ClInclude Include="ftdlg_lite.h" />
+    <ClCompile Include="ftdlg_lite.cpp" />
+    <ClInclude Include="clipboarddlg.h" />
+    <ClCompile Include="clipboarddlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\cygterm\cygterm.ico" />
