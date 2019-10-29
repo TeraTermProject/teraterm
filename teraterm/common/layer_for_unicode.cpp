@@ -109,12 +109,34 @@ LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam,
 	}
 
 	LRESULT retval;
-	if (Msg == CB_ADDSTRING || Msg == LB_ADDSTRING) {
+	switch(Msg) {
+	case CB_ADDSTRING:
+	case LB_ADDSTRING: {
 		char *strA = ToCharW((wchar_t *)lParam);
 		retval = SendDlgItemMessageA(hDlg, nIDDlgItem, Msg, wParam, (LPARAM)strA);
 		free(strA);
-	} else {
+		break;
+	}
+	case WM_GETTEXTLENGTH: {
+		retval = 0;
+		LRESULT len = SendDlgItemMessageA(hDlg, nIDDlgItem, WM_GETTEXTLENGTH, 0, 0);
+		len++;  // for '\0'
+		char *strA = (char *)malloc(sizeof(char) * len);
+		if (strA != NULL) {
+			GetDlgItemTextA(hDlg, nIDDlgItem, strA, (int)len);
+			strA[len-1] = '\0';
+			wchar_t *strW = ToWcharA(strA);
+			if (strW != NULL) {
+				retval = (LRESULT)wcslen(strW);// '\0'‚ðŠÜ‚Ü‚È‚¢’·‚³‚ð•Ô‚·
+				free(strW);
+			}
+			free(strA);
+		}
+		break;
+	}
+	default:
 		retval = SendDlgItemMessageA(hDlg, nIDDlgItem, Msg, wParam, lParam);
+		break;
 	}
 	return retval;
 }
@@ -235,4 +257,31 @@ BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString)
 	BOOL retval = SetWindowTextA(hWnd, strA);
 	free(strA);
 	return retval;
+}
+
+UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
+{
+	if (pGetDlgItemTextW != NULL) {
+		return pGetDlgItemTextW(hDlg, nIDDlgItem, lpString, cchMax);
+	}
+
+	// ‚±‚Ì•¶Žš—ñ’·‚Í ANSI
+	size_t len = SendDlgItemMessageA(hDlg, nIDDlgItem, WM_GETTEXTLENGTH, 0, 0);
+	len++;  // for '\0'
+	char *strA = (char *)malloc(sizeof(char) * len);
+	if (strA != NULL) {
+		GetDlgItemTextA(hDlg, nIDDlgItem, strA, (int)len);
+		strA[len - 1] = '\0';
+		wchar_t *strW = ToWcharA(strA);
+		if (strW != NULL) {
+			wcscpy_s(lpString, cchMax, strW);
+			UINT len = (UINT)wcslen(strW); // '\0' ‚ðŠÜ‚Ü‚È‚¢’·‚³‚ð•Ô‚·
+			free(strW);
+			return len;
+		}
+	}
+
+	if (cchMax > 0)
+		lpString[0] = 0;
+	return 0;
 }

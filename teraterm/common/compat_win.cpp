@@ -49,6 +49,7 @@ DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, 
 UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
+BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
@@ -71,6 +72,7 @@ static const APIInfo Lists_user32[] = {
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
+	{ "GetDlgItemTextW", (void **)&pGetDlgItemTextW },
 	{ "SetWindowTextW", (void **)&pSetWindowTextW },
 	{ "ModifyMenuW", (void **)&pModifyMenuW },
 	{ "GetMenuStringW", (void **)&pGetMenuStringW },
@@ -139,5 +141,7 @@ void WinCompatInit()
 		pGetPrivateProfileStringW = NULL;
 		pSetWindowTextW = NULL;
 		pSetDlgItemTextW = NULL;
+		pGetDlgItemTextW = NULL;
 	}
 }
+

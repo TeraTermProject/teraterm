@@ -42,6 +42,7 @@ extern "C" {
 
 BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
 BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
+UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 DWORD _GetFileAttributesW(LPCWSTR lpFileName);
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);

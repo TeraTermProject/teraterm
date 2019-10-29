@@ -26,7 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, Clipboard routines */
 #include "teraterm.h"
 #include "tttypes.h"
 #include "vtdisp.h"
@@ -37,16 +36,13 @@
 #include <commctrl.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
-#include <wchar.h>
 
 #include "ttwinman.h"
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "dlglib.h"
-
+#include "layer_for_unicode.h"
 #include "tt_res.h"
-#include "sendmem.h"
-
 #include "clipboarddlg.h"
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -73,7 +69,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
 
 			if (data->strW_ptr != NULL) {
-				SetDlgItemTextW(hDlgWnd, IDC_EDIT, data->strW_ptr);
+				_SetDlgItemTextW(hDlgWnd, IDC_EDIT, data->strW_ptr);
 			} else {
 				SetDlgItemTextA(hDlgWnd, IDC_EDIT, data->strA_ptr);
 			}
@@ -180,11 +176,12 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				{
 					INT_PTR result = IDCANCEL;
 
-					size_t len = SendDlgItemMessage(hDlgWnd, IDC_EDIT, WM_GETTEXTLENGTH, 0, 0);
+					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_EDIT, WM_GETTEXTLENGTH, 0, 0);
 					len++; // for '\0'
 					wchar_t *strW = (wchar_t *)malloc(sizeof(wchar_t) * len);
 					if (strW != NULL) {
-						GetDlgItemTextW(hDlgWnd, IDC_EDIT, strW, (int)len);
+						_GetDlgItemTextW(hDlgWnd, IDC_EDIT, strW, (int)len);
+						strW[len - 1] = '\0';
 						result = IDOK;
 					}
 					data->strW_edited_ptr = strW;

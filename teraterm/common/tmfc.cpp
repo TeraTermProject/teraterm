@@ -84,12 +84,10 @@ void TTCWnd::GetDlgItemTextT(int id, TCHAR *buf, size_t size)
 	::GetDlgItemText(m_hWnd, id, buf, (int)size);
 }
 
-#if defined(UNICODE)
 void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
 {
-	::GetDlgItemTextW(m_hWnd, id, buf, (int)size);
+	_GetDlgItemTextW(m_hWnd, id, buf, (int)size);
 }
-#endif
 
 void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
 {
@@ -103,7 +101,7 @@ void TTCWnd::SetDlgItemTextT(int id, const TCHAR *str)
 
 void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
 {
-	::SetDlgItemTextW(m_hWnd, id, str);
+	_SetDlgItemTextW(m_hWnd, id, str);
 }
 
 void TTCWnd::SetDlgItemTextA(int id, const char *str)
@@ -183,7 +181,7 @@ void TTCWnd::SetWindowTextT(const TCHAR *str)
 
 void TTCWnd::SetWindowTextW(const wchar_t *str)
 {
-	::SetWindowTextW(m_hWnd, str);
+	_SetWindowTextW(m_hWnd, str);
 }
 
 void TTCWnd::SetWindowTextA(const char *str)
