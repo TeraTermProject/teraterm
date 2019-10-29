@@ -634,6 +634,30 @@
 				RelativePath="..\common\layer_for_unicode.h"
 				>
 			</File>
+			<File
+				RelativePath="ftdlg_lite.cpp"
+				>
+			</File>
+			<File
+				RelativePath="ftdlg_lite.h"
+				>
+			</File>
+			<File
+				RelativePath="sendmem.cpp"
+				>
+			</File>
+			<File
+				RelativePath="sendmem.h"
+				>
+			</File>
+			<File
+				RelativePath="clipboarddlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="clipboarddlg.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
