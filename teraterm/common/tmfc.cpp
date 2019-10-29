@@ -101,12 +101,10 @@ void TTCWnd::SetDlgItemTextT(int id, const TCHAR *str)
 	::SetDlgItemText(m_hWnd, id, str);
 }
 
-#if defined(UNICODE)
 void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
 {
 	::SetDlgItemTextW(m_hWnd, id, str);
 }
-#endif
 
 void TTCWnd::SetDlgItemTextA(int id, const char *str)
 {
@@ -183,12 +181,10 @@ void TTCWnd::SetWindowTextT(const TCHAR *str)
 	::SetWindowText(m_hWnd, str);
 }
 
-#if defined(UNICODE)
 void TTCWnd::SetWindowTextW(const wchar_t *str)
 {
 	::SetWindowTextW(m_hWnd, str);
 }
-#endif
 
 void TTCWnd::SetWindowTextA(const char *str)
 {
