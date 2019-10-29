@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008-2019 TeraTerm Project
+ * (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,29 +26,34 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, Clipboard routines */
-
-#include "unicode_test.h"
+#pragma once
+#include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* prototypes */
+typedef enum {
+	SendMemTypeTextLF,		// wchar_t 0x0a
+	SendMemTypeTextCRLF,	// wchar_t 0x0d + 0x0a
+	SendMemTypeBinary,
+} SendMemType;
 
-#if !UNICODE_INTERNAL_BUFF
-PCHAR CBOpen(LONG MemSize);
-void CBClose(void);
-#endif
-BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
+typedef struct SendMemTag SendMem;
 
-void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
-void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
-void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);
-void CBSend(void);
-void CBEndPaste(void);
+SendMem *SendMemInit(void *ptr, size_t len, SendMemType type);
+void SendMemInitEcho(SendMem *sm, BOOL echo);
+void SendMemInitDelay(SendMem *sm, DWORD per_line, DWORD per_char);
+void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile);
+void SendMemInitDialogCaption(SendMem *sm, const wchar_t *caption);
+void SendMemInitDialogFilename(SendMem *sm, const wchar_t *filename);
+BOOL SendMemStart(SendMem *sm);		// 送信開始
+void SendMemFinish(SendMem *sm);
 
+// idleからの送信用API
+void SendMemContinuously(void);
 
 #ifdef __cplusplus
 }
 #endif
+

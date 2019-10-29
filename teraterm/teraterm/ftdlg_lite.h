@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008-2019 TeraTerm Project
+ * (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,29 +26,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, Clipboard routines */
+class CFileTransLiteDlg
+{
+public:
+	class Observer
+	{
+	public:
+		virtual ~Observer() {};
+		virtual void OnClose() = 0;
+		virtual void OnPause(BOOL pause) = 0;
+		virtual void OnHelp() = 0;
+	};
+	CFileTransLiteDlg();
+	virtual ~CFileTransLiteDlg();
+	BOOL Create(HINSTANCE hInstance, HWND hParent, const char *UILanguageFile);
+	void SetCaption(const wchar_t *caption);
+	void SetFilename(const wchar_t *filename);
+	void ChangeButton(BOOL PauseFlag);
+	void RefreshNum(size_t ByteCount, size_t FileSize);
+	void SetObserver(Observer *observer);
+	void Destroy();
 
-#include "unicode_test.h"
+private:
+	class PrivateData *pData;
+};
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* prototypes */
-
-#if !UNICODE_INTERNAL_BUFF
-PCHAR CBOpen(LONG MemSize);
-void CBClose(void);
-#endif
-BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
-
-void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
-void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
-void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);
-void CBSend(void);
-void CBEndPaste(void);
-
-
-#ifdef __cplusplus
-}
-#endif

@@ -43,7 +43,8 @@ HMODULE LoadHomeDLL(const char *DLLname);
 extern HWND HVTWin;
 extern HWND HTEKWin;
 extern int ActiveWin; /* IdVT, IdTEK */
-extern int TalkStatus; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
+//extern int TalkStatus; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
+extern IdTalk TalkStatus;
 extern BOOL KeybEnabled; /* keyboard switch */
 extern BOOL Connecting;
 

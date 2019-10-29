@@ -56,6 +56,9 @@
 #include "dlglib.h"
 #include "teraterml.h"
 #include "unicode_test.h"
+#if UNICODE_INTERNAL_BUFF
+#include "sendmem.h"
+#endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -206,15 +209,16 @@ static BOOL OnIdle(LONG lCount)
 		/* Talker */
 		switch (TalkStatus) {
 		case IdTalkCB:
-#if UNICODE_INTERNAL_BUFF
-			CBSendW();
-#else
 			CBSend();
-#endif
 			break; /* clip board */
 		case IdTalkFile:
 			FileSend();
 			break; /* file */
+		case IdTalkSendMem:
+			SendMemContinuously();
+			break;
+		default:
+			break;
 		}
 
 		/* Receiver */

@@ -52,10 +52,15 @@
 #define IdTEK 2
 
   /* Talker mode */
-#define IdTalkKeyb  0
-#define IdTalkCB    1
-#define IdTalkFile  2
-#define IdTalkQuiet 3
+typedef enum {
+	IdTalkKeyb = 0,
+	IdTalkCB = 1,
+	IdTalkFile = 2,
+	IdTalkQuiet = 3,
+#if UNICODE_INTERNAL_BUFF
+	IdTalkSendMem,
+#endif
+} IdTalk;
 
   /* Character sets */
 #define IdASCII    0

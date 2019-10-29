@@ -91,6 +91,8 @@
 #endif
 #include "codeconv.h"
 #include "layer_for_unicode.h"
+#include "sendmem.h"
+#include "../ttpmacro/fileread.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -869,11 +871,8 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	}
 
 	if (Paste) {
-#if UNICODE_INTERNAL_BUFF
-		CBStartPasteW(HVTWin, FALSE, BracketedPasteMode());
-#else
 		CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
-#endif
+
 		// スクロール位置をリセット
 		if (WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
@@ -4224,7 +4223,57 @@ void CVTWindow::OnReplayLog()
 void CVTWindow::OnFileSend()
 {
 	HelpId = HlpFileSend;
+#if !UNICODE_INTERNAL_BUFF
 	FileSendStart();
+#else
+	{
+		char TempDir[MAXPATHLEN];
+		GetCurrentDirectory(sizeof(TempDir), TempDir);
+
+		char file_name[MAX_PATH];
+		file_name[0] = 0;
+		OPENFILENAME ofn;
+		memset(&ofn, 0, sizeof(OPENFILENAME));
+		ofn.lStructSize = get_OPENFILENAME_SIZE();
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner   = m_hWnd;
+		ofn.lpstrFile = file_name;
+		ofn.nMaxFile = sizeof(file_name);
+		ofn.nMaxFile = MAX_PATH;
+		ofn.lpstrFilter = 	TEXT("Text files {*.txt}\0*.txt\0")
+			TEXT("HTML files {*.htm}\0*.htm;*.html\0")
+			TEXT("All files {*.*}\0*.*\0\0");
+		ofn.nFilterIndex = 0;
+		ofn.lpstrTitle = "test";
+		ofn.Flags = OFN_FILEMUSTEXIST;
+		BOOL Ok = GetOpenFileName(&ofn);
+		DWORD err = GetLastError();
+
+		SetCurrentDirectory(TempDir);
+
+		if (Ok == FALSE) {
+			return;
+		}
+
+		size_t str_len;
+		wchar_t *str_ptr = LoadFileWA(file_name, &str_len);
+		if (str_ptr == NULL) {
+			return;
+		}
+		str_len *= sizeof(wchar_t);
+
+		{
+			SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
+			SendMemInitDelay(sm, 10, 0);
+			SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
+			SendMemInitDialogCaption(sm, L"send file");
+			wchar_t *file_name_w = ToWcharA(file_name);
+			SendMemInitDialogFilename(sm, file_name_w);
+			free(file_name_w);
+			SendMemStart(sm);
+		}
+	}
+#endif
 }
 
 void CVTWindow::OnFileKermitRcv()
@@ -4376,12 +4425,9 @@ void CVTWindow::OnEditCopyTable()
 
 void CVTWindow::OnEditPaste()
 {
-#if UNICODE_INTERNAL_BUFF
-	CBStartPasteW(HVTWin, FALSE, BracketedPasteMode());
-#else
 	// add confirm (2008.2.4 yutaka)
 	CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
-#endif
+
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
@@ -4390,12 +4436,9 @@ void CVTWindow::OnEditPaste()
 
 void CVTWindow::OnEditPasteCR()
 {
-#if UNICODE_INTERNAL_BUFF
-	CBStartPasteW(HVTWin, TRUE, BracketedPasteMode());
-#else
 	// add confirm (2008.3.11 maya)
 	CBStartPaste(HVTWin, TRUE, BracketedPasteMode());
-#endif
+
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
@@ -5557,7 +5600,7 @@ void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
  * ブロードキャスト送信を行い、受信側でメッセージを取捨選択する。
  * "sendmulticast"マクロコマンドからのみ利用される。
  */
-void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buflen)
+void SendMulticastMessage(HWND hVTWin_, HWND hWnd, char *name, char *buf, int buflen)
 {
 	int i, count;
 	HWND hd;
@@ -5597,7 +5640,7 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 		}
 
 		// WM_COPYDATAを使って、プロセス間通信を行う。
-		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
+		SendMessage(hd, WM_COPYDATA, (WPARAM)hVTWin_, (LPARAM)&cds);
 	}
 
 	free(msg);
@@ -6043,6 +6086,11 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 
 	// 未送信データがある場合は先に送信する
 	// データ量が多い場合は送信しきれない可能性がある
+#if	UNICODE_INTERNAL_BUFF
+	if (TalkStatus == IdTalkSendMem) {
+		SendMemContinuously();
+	}
+#endif
 	if (TalkStatus == IdTalkCB) {
 		CBSend();
 	}

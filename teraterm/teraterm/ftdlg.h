@@ -48,7 +48,8 @@ public:
 
 	enum { IDD = IDD_FILETRANSDLG };
 
-protected:
+private:
+//protected:
 	virtual BOOL OnCancel();
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual BOOL PostNcDestroy();

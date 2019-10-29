@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <commctrl.h>
+#define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #include <wchar.h>
 
@@ -49,6 +50,8 @@
 #include "tt_res.h"
 #include "../ttpmacro/fileread.h"
 #include "unicode_test.h"
+#include "sendmem.h"
+#include "clipboarddlg.h"
 
 // for clipboard copy
 static HGLOBAL CBCopyHandle = NULL;
@@ -67,24 +70,13 @@ static BOOL CBSendCR;
 static BOOL CBEchoOnly;
 static BOOL CBInsertDelay = FALSE;
 
-wchar_t BracketStartW[] = L"\033[200~";
-wchar_t BracketEndW[] = L"\033[201~";
-size_t BracketStartLenW = ((sizeof(BracketStartW) / sizeof(wchar_t)) - 1);
-size_t BracketEndLenW = ((sizeof(BracketEndW) / sizeof(wchar_t)) - 1);
+static const wchar_t BracketStartW[] = L"\033[200~";
+static const wchar_t BracketEndW[] = L"\033[201~";
 
-#if UNICODE_INTERNAL_BUFF
-typedef struct {
-	wchar_t *send_str;
-	size_t str_len;
-	size_t send_left;
-	size_t send_index;
-	BOOL waited;
-	DWORD send_cr_tick;
-} clipboard_work_t;
-static clipboard_work_t cbwork;
-#endif
-
+static void CBEcho(void);
+#if !UNICODE_INTERNAL_BUFF
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+#endif
 
 #if !UNICODE_INTERNAL_BUFF
 PCHAR CBOpen(LONG MemSize)
@@ -152,6 +144,12 @@ void CBClose()
 }
 #endif
 
+/**
+ * 文字列送信
+ * 次のところから使用されている
+ *  - DDE(TTL)
+ *	- ブロードキャスト
+ */
 void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 {
 	if (! cv.Ready) {
@@ -186,12 +184,12 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 			TalkStatus=IdTalkCB;
 		}
 	}
-
 	if (TalkStatus != IdTalkCB) {
 		CBEndPaste();
 	}
 }
 
+#if !UNICODE_INTERNAL_BUFF
 // クリップボードバッファの末尾にある CR / LF をすべて削除する
 static BOOL TrimTrailingNL(BOOL AddCR, BOOL Bracketed)
 {
@@ -207,6 +205,7 @@ static BOOL TrimTrailingNL(BOOL AddCR, BOOL Bracketed)
 
 	return TRUE;
 }
+#endif
 
 static void TrimTrailingNLW(wchar_t *src)
 {
@@ -316,7 +315,6 @@ static wchar_t *NormalizeLineBreakW(const wchar_t *src_)
 	wchar_t *dest_top;
 	wchar_t *dest;
 	size_t len, need_len, alloc_len;
-	const size_t src_len = wcslen(src_);
 
 	// 貼り付けデータの長さ(len)、および正規化後のデータの長さ(need_len)のカウント
 	for (len=0, need_len=0, src=src_; *src != '\0'; src++, len++, need_len++) {
@@ -334,7 +332,7 @@ static wchar_t *NormalizeLineBreakW(const wchar_t *src_)
 
 	// 正規化後もデータ長が変わらない => 正規化は必要なし
 	if (need_len == len) {
-		wchar_t *dest = _wcsdup(src_);
+		dest = _wcsdup(src_);
 		return dest;
 	}
 	alloc_len = need_len + 1;
@@ -381,7 +379,7 @@ static BOOL search_dict(char *filename, char *text)
 	BOOL ret = FALSE;
 	FILE *fp = NULL;
 	char buf[256];
-	int len;
+	size_t len;
 
 	if (filename == NULL || filename[0] == '\0')
 		return FALSE;
@@ -468,10 +466,10 @@ static BOOL search_dictW(char *filename, const wchar_t *text)
  *   TRUE  -> 問題なし、貼り付けを実施
  *   FALSE -> 貼り付け中止
  */
-BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
+#if !UNICODE_INTERNAL_BUFF
+static BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
-	int pos;
-	int ret = IDOK;
+	INT_PTR ret = IDOK;
 	BOOL confirm = FALSE;
 
 	if ((ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) == 0) {
@@ -499,7 +497,7 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		}
 	}
 	else {
-		pos = strcspn(CBMemPtr, "\r\n");  // 改行が含まれていたら
+		size_t pos = strcspn(CBMemPtr, "\r\n");  // 改行が含まれていたら
 		if (CBMemPtr[pos] != '\0') {
 			confirm = TRUE;
 		}
@@ -512,7 +510,7 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 	if (confirm) {
 		ret = TTDialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-						  HWin, (DLGPROC)OnClipboardDlgProc);
+						  HWin, OnClipboardDlgProc);
 		/*
 		 * 以前はダイアログの内容をクリップボードに書き戻していたけれど、必要?
 		 */
@@ -525,6 +523,7 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		return FALSE;
 	}
 }
+#endif
 
 /*
  * クリップボードの内容を確認し、貼り付けを行うか確認ダイアログを出す。
@@ -533,11 +532,12 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
  *   TRUE  -> 問題なし、貼り付けを実施
  *   FALSE -> 貼り付け中止
  */
-static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, BOOL Bracketed)
+static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, wchar_t **out_str_w)
 {
-	int ret = IDOK;
+	INT_PTR ret;
 	BOOL confirm = FALSE;
 
+	*out_str_w = NULL;
 	if ((ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) == 0) {
 		return TRUE;
 	}
@@ -559,12 +559,13 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 		confirm = TRUE;
 	}
 
+	ret = IDOK;
 	if (confirm) {
-		ret = TTDialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-						  HWin, (DLGPROC)OnClipboardDlgProc);
-		/*
-		 * 以前はダイアログの内容をクリップボードに書き戻していたけれど、必要?
-		 */
+		clipboarddlgdata dlg_data;
+		dlg_data.strW_ptr = str_w;
+		dlg_data.UILanguageFile = ts.UILanguageFile;
+		ret = clipboarddlg(hInst, HWin, &dlg_data);
+		*out_str_w = dlg_data.strW_edited_ptr;
 	}
 
 	if (ret == IDOK) {
@@ -575,13 +576,14 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	}
 }
 
+#if !UNICODE_INTERNAL_BUFF
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	UINT Cf;
 	PCHAR TmpPtr;
 	LPWSTR TmpPtrW;
 	HGLOBAL TmpHandle;
-	unsigned int StrLen = 0, BuffLen = 0;
+	size_t StrLen = 0, BuffLen = 0;
 
 	if (! cv.Ready) {
 		return;
@@ -645,7 +647,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 			if ((CBMemHandle = GlobalAlloc(GHND, BuffLen)) != NULL) {
 				if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
 					if (Cf == CF_UNICODETEXT) {
-						WideCharToMultiByte(CP_ACP, 0, TmpPtrW, -1, CBMemPtr, BuffLen, NULL, NULL);
+						WideCharToMultiByte(CP_ACP, 0, TmpPtrW, -1, CBMemPtr, (int)BuffLen, NULL, NULL);
 					}
 					else {
 						strncpy_s(CBMemPtr, BuffLen, TmpPtr, _TRUNCATE);
@@ -724,6 +726,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	GlobalUnlock(CBMemHandle);
 	CBMemPtr = NULL;
 }
+#endif
 
 /**
  *	クリップボードからwchar_t文字列を取得する
@@ -768,18 +771,22 @@ static wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 			size_t str_cb_len = GlobalSize(TmpHandle);	// bytes
 			str_w_len = str_cb_len / sizeof(wchar_t);
 			str_w = malloc((str_w_len + 1) * sizeof(wchar_t));	// +1 for terminator
-			memcpy(str_w, str_cb, str_cb_len);
-			str_w[str_w_len] = L'\0';
+			if (str_w != NULL) {
+				memcpy(str_w, str_cb, str_cb_len);
+				str_w[str_w_len] = L'\0';
+			}
 		}
 	}
 	else {
 		const char *str_cb = (char *)GlobalLock(TmpHandle);
 		if (str_cb != NULL) {
 			size_t str_cb_len = GlobalSize(TmpHandle);
-			str_w_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str_cb, str_cb_len, NULL, 0);
+			str_w_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str_cb, (int)str_cb_len, NULL, 0);
 			str_w = malloc(sizeof(wchar_t) * (str_w_len + 1));	// +1 for terminator
-			str_w_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str_cb, str_cb_len, str_w, str_w_len);
-			str_w[str_w_len] = L'\0';
+			if (str_w != NULL) {
+				str_w_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str_cb, (int)str_cb_len, str_w, (int)str_w_len);
+				str_w[str_w_len] = L'\0';
+			}
 		}
 	}
 	GlobalUnlock(TmpHandle);
@@ -791,11 +798,40 @@ static wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 }
 
 #if UNICODE_INTERNAL_BUFF
-void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
+/**
+ *	クリップボード用テキスト送信する
+ *
+ *	@param	str_w	文字列へのポインタ
+ *					malloc()されたバッファ、送信完了時に自動でfree()される
+ *	@param	str_len	文字長(wchar_t単位)
+ *					0のとき、str_wから文字列長を得る
+ */
+static void CBSendStart(wchar_t *str_w, size_t str_len)
 {
-	unsigned int StrLen = 0;
-	clipboard_work_t *p;
+	SendMem *sm;
+	if (str_len == 0) {
+		str_len = wcslen(str_w);
+	}
+	sm = SendMemInit(str_w,
+					 str_len * sizeof(wchar_t),
+					 SendMemTypeTextLF);
+	if (sm == NULL)
+		return;
+//	SendMemInitDelay(sm, 0, 1000);
+	SendMemInitDelay(sm, 1000, 0);
+	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
+	SendMemInitDialogCaption(sm, L"from clipboard");
+	SendMemInitDialogFilename(sm, L"Clipboard");
+	SendMemStart(sm);
+}
+#endif
+
+#if UNICODE_INTERNAL_BUFF
+void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+{
+//	unsigned int StrLen = 0;
 	wchar_t *str_w;
+	wchar_t *str_w_edited;
 
 	if (! cv.Ready) {
 		return;
@@ -806,19 +842,12 @@ void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 	CBEchoOnly = FALSE;
 
-	p = &cbwork;
-	if (p->send_str != NULL) {
-		// 送信中?
-		return;
-	}
-
 	str_w = GetClipboardTextW(HWin, FALSE);
 	if (str_w == NULL) {
 		// クリップボードから文字列を取得できなかった
 		CBEndPaste();
 		return;
 	}
-	p->send_str = str_w;
 
 	if (ts.PasteFlag & CPF_TRIM_TRAILING_NL) {
 		// バッファ最後の改行を削除
@@ -832,10 +861,14 @@ void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	p->send_str = str_w;	// ダイアログで表示する
-	if (!CheckClipboardContentW(HWin, str_w, AddCR, Bracketed)) {
+	if (!CheckClipboardContentW(HWin, str_w, AddCR, &str_w_edited)) {
 		CBEndPaste();
 		return;
+	}
+	if (str_w_edited != NULL) {
+		// ダイアログで編集された
+		free(str_w);
+		str_w = str_w_edited;
 	}
 
 	if (AddCR) {
@@ -846,6 +879,8 @@ void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	}
 
 	if (Bracketed) {
+		const size_t BracketStartLenW = _countof(BracketStartW) - 1;
+		const size_t BracketEndLenW = _countof(BracketEndW) - 1;
 		size_t str_len = wcslen(str_w);
 		size_t dest_len = str_len + BracketStartLenW + BracketEndLenW;
 		wchar_t *dest = malloc(sizeof(wchar_t) * (dest_len+1));
@@ -861,21 +896,16 @@ void CBStartPasteW(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	// 貼り付けの準備が正常に出来た
-	p->send_str = str_w;
-	p->send_index = 0;
-	p->waited = FALSE;
-	p->str_len = wcslen(p->send_str);
-	p->send_left = p->str_len;
-	TalkStatus = IdTalkCB;
+	CBSendStart(str_w, 0);
 }
 #endif
 
+#if !UNICODE_INTERNAL_BUFF
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 {
 	HANDLE tmpHandle = NULL;
 	char *tmpPtr = NULL;
-	int len, header_len, footer_len, b64_len;
+	size_t len, header_len, footer_len, b64_len;
 	UINT Cf;
 	LPWSTR tmpPtrWide = NULL;
 
@@ -979,12 +1009,12 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		CBEndPaste();
 	}
 }
+#endif
 
 #if UNICODE_INTERNAL_BUFF
-void CBStartPasteB64W(HWND HWin, PCHAR header, PCHAR footer)
+void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 {
 	size_t mb_len, b64_len, header_len = 0, footer_len = 0;
-	clipboard_work_t *p;
 	wchar_t *str_w = NULL;
 	char *str_mb = NULL;
 	char *str_b64 = NULL;
@@ -998,19 +1028,11 @@ void CBStartPasteB64W(HWND HWin, PCHAR header, PCHAR footer)
 
 	CBEchoOnly = FALSE;
 
-	p = &cbwork;
-	if (p->send_str != NULL) {
-		// 送信中?
-		return;
-	}
-
 	str_w = GetClipboardTextW(HWin, FALSE);
 	if (str_w == NULL) {
 		// クリップボードから文字列を取得できなかった
 		goto error;
-		return;
 	}
-	p->send_str = str_w;
 
 	if (ts.Language == IdUtf8 || ts.KanjiCodeSend == IdUTF8) {
 		str_mb = ToU8W(str_w);
@@ -1056,12 +1078,7 @@ void CBStartPasteB64W(HWND HWin, PCHAR header, PCHAR footer)
 	free(str_b64);
 
 	// 貼り付けの準備が正常に出来た
-	p->send_str = str_w;
-	p->send_index = 0;
-	p->waited = FALSE;
-	p->str_len = wcslen(p->send_str);
-	p->send_left = p->str_len;
-	TalkStatus = IdTalkCB;
+	CBSendStart(str_w, 0);
 
 	return;
 
@@ -1181,92 +1198,7 @@ void CBSend()
 	}
 }
 
-// クリップボードデータを端末へ送り込む。
-//
-#if UNICODE_INTERNAL_BUFF
-void CBSendW()
-{
-	clipboard_work_t *p = &cbwork;
-	int c;
-
-	if (p->send_str == NULL) {
-		return;
-	}
-
-	if (CBEchoOnly) {
-		CBEcho();
-		return;
-	}
-
-	if (ts.PasteDelayPerLine > 0 && p->waited) {
-		// 行毎wait
-		if (GetTickCount() - p->send_cr_tick < (DWORD)ts.PasteDelayPerLine) {
-			return;
-		}
-	}
-
-	if (CBRetryEcho) {
-		c = CommTextEcho(&cv,(PCHAR)&CBByte,1);
-		CBRetryEcho = (c==0);
-		if (CBRetryEcho) {
-			return;
-		}
-	}
-
-	for(;;){
-		BOOL send_one_line = FALSE;
-		size_t send_len;
-		int r;
-
-		// 終端?
-		if (p->send_str[p->send_index] == 0) {
-			// 終了
-			CBEndPaste();
-			return;
-		}
-
-		send_len = p->send_left;
-		if (ts.PasteDelayPerLine > 0) {
-			// 1行取り出し(clipboardの改行は L"\r\n")
-			const wchar_t *line_top = &p->send_str[p->send_index];
-			const wchar_t *line_end = wcsstr(line_top, L"\r\n");
-			if (line_end != NULL && *line_end == 0x0d && *(line_end+1) == 0x0a) {
-				// L'\r' まで送信
-				send_len = (line_end - line_top) + 1;
-				send_one_line = TRUE;
-			} else {
-				// 改行見つからず、最後まで送信
-				send_len = p->send_left;
-			}
-		}
-
-		r = CommTextOutW(&cv, &p->send_str[p->send_index], send_len);
-		if ((r != 0) && (ts.LocalEcho>0)) {
-			CommTextEchoW(&cv, &p->send_str[p->send_index], send_len);
-		}
-		if (r == 0) {
-			// 出力できなくなった(出力バッファがいっぱい?)
-			return;
-		}
-		p->send_index += r;
-		p->send_left -= r;
-
-		if (send_one_line) {
-			// L'\n'はスルーする
-			p->send_index++;
-			p->send_left--;
-
-			// waitに入る
-			p->waited = TRUE;
-			p->send_cr_tick = GetTickCount();
-			SetTimer(HVTWin, IdPasteDelayTimer, ts.PasteDelayPerLine, NULL);
-			break;
-		}
-	}
-}
-#endif
-
-void CBEcho()
+static void CBEcho()
 {
 	if (CBMemHandle==NULL) {
 		return;
@@ -1322,16 +1254,6 @@ void CBEndPaste()
 {
 	TalkStatus = IdTalkKeyb;
 
-#if UNICODE_INTERNAL_BUFF
-	{
-		clipboard_work_t *p = &cbwork;
-		if (p->send_str != NULL) {
-			free(p->send_str);
-			p->send_str = NULL;
-		}
-	}
-#endif
-
 	if (CBMemHandle!=NULL) {
 		if (CBMemPtr!=NULL) {
 			GlobalUnlock(CBMemHandle);
@@ -1379,7 +1301,13 @@ BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
 		wchar_t *CBCopyWidePtr;
 		const size_t alloc_bytes = (str_len + 1) * sizeof(wchar_t);
 		CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, alloc_bytes);
+		if (CBCopyWideHandle == NULL) {
+			return FALSE;
+		}
 		CBCopyWidePtr = (wchar_t *)GlobalLock(CBCopyWideHandle);
+		if (CBCopyWidePtr == NULL) {
+			return FALSE;
+		}
 		memcpy(CBCopyWidePtr, str_w, alloc_bytes - sizeof(wchar_t));
 		CBCopyWidePtr[str_len] = L'\0';
 		GlobalUnlock(CBCopyWideHandle);
@@ -1447,6 +1375,7 @@ HGLOBAL CBAllocClipboardMem(char *text)
 }
 #endif
 
+#if !UNICODE_INTERNAL_BUFF
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -1467,15 +1396,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 		case WM_INITDIALOG:
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-#if UNICODE_INTERNAL_BUFF
-			if (cbwork.send_str != NULL) {
-				SetDlgItemTextW(hDlgWnd, IDC_EDIT, cbwork.send_str);
-			} else {
-				SetDlgItemTextA(hDlgWnd, IDC_EDIT, CBMemPtr);
-			}
-#else
 			SetDlgItemTextA(hDlgWnd, IDC_EDIT, CBMemPtr);
-#endif
 
 			if (ActiveWin == IdVT) { // VT Window
 				/*
@@ -1693,3 +1614,4 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	}
 	return TRUE;
 }
+#endif
