@@ -81,17 +81,15 @@ static void ScreenToClient(HWND hWnd, RECT *rect)
 }
 
 // CCtrlWindow dialog
-CCtrlWindow::CCtrlWindow()
+CCtrlWindow::CCtrlWindow(HINSTANCE hInst)
 {
-	HINSTANCE hInst = GetInstance();
+	m_hInst = hInst;
 	m_hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_TTMACRO));
 }
 
 BOOL CCtrlWindow::Create()
 {
-	HINSTANCE hInst = GetInstance();
-	HWND parent = NULL;
-	if (! TTCDialog::Create(hInst, parent, CCtrlWindow::IDD)) {
+	if (! TTCDialog::Create(m_hInst, NULL, CCtrlWindow::IDD)) {
 		PostQuitMessage(0);
 		return FALSE;
 	}
@@ -258,7 +256,6 @@ BOOL CCtrlWindow::OnInitDialog()
 	int fuLoad = LR_DEFAULTCOLOR;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
-	HINSTANCE hInst = GetInstance();
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -268,11 +265,11 @@ BOOL CCtrlWindow::OnInitDialog()
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(hInst,
+	              (LPARAM)LoadImage(m_hInst,
 	                                MAKEINTRESOURCE(IDI_TTMACRO),
 	                                IMAGE_ICON,16,16,fuLoad));
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(hInst,
+	              (LPARAM)LoadImage(m_hInst,
 	                                MAKEINTRESOURCE(IDI_TTMACRO),
 	                                IMAGE_ICON,0,0,fuLoad));
 
