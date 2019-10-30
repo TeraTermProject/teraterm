@@ -43,19 +43,13 @@ public:
 	int Create();
 	BOOL OnIdle();
 
-// Dialog Data
-	//{{AFX_DATA(CCtrlWindow)
 	enum { IDD = IDD_CTRLWIN };
-	//}}AFX_DATA
 
-	//{{AFX_VIRTUAL(CCtrlWindow)
-	protected:
-	virtual BOOL OnCancel( );
+protected:
+	virtual BOOL OnCancel();
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual BOOL PostNcDestroy();
 	virtual BOOL OnInitDialog();
-	//	virtual BOOL PreTranslateMessage(MSG* pMsg);		// TODO
-	//}}AFX_VIRTUAL
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 
 protected:
@@ -66,23 +60,19 @@ protected:
 	LONG m_filename_ratio, m_lineno_ratio;
 	HWND m_hStatus;
 
-	//{{AFX_MSG(CCtrlWindow)
-#define afx_msg
-	afx_msg BOOL OnClose();
-	afx_msg void OnDestroy();
-	afx_msg BOOL OnEraseBkgnd(HDC DC);
-	afx_msg void OnPaint();
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
-	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnSysColorChange();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg LRESULT OnDdeCmndEnd(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnDdeComReady(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnDdeReady(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnDdeEnd(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnMacroBringup(WPARAM wParam, LPARAM lParam);
-	//}}AFX_MSG
-//	DECLARE_MESSAGE_MAP()
+	BOOL OnClose();
+	void OnDestroy();
+	BOOL OnEraseBkgnd(HDC DC);
+	void OnPaint();
+	void OnSize(UINT nType, int cx, int cy);
+	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	HCURSOR OnQueryDragIcon();
+	void OnSysColorChange();
+	void OnTimer(UINT_PTR nIDEvent);
+	LRESULT OnDdeCmndEnd(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDdeComReady(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDdeReady(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDdeEnd(WPARAM wParam, LPARAM lParam);
+	LRESULT OnMacroBringup(WPARAM wParam, LPARAM lParam);
 };
 
