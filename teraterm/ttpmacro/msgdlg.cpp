@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@
 #include "tmfc.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
-#include "ttmacro.h"
 #include "compat_win.h"
 
 #include "msgdlg.h"
@@ -55,10 +54,8 @@ CMsgDlg::CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo,
 	PosY = y;
 }
 
-INT_PTR CMsgDlg::DoModal()
+INT_PTR CMsgDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND hWndParent = GetHWND();
 	return TTCDialog::DoModal(hInst, hWndParent, CMsgDlg::IDD);
 }
 

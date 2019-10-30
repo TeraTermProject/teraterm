@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,6 @@
 #include "ttmparse.h"
 #include "htmlhelp.h"
 #include "dlglib.h"
-#include "ttmacro.h"
 
 #include "errdlg.h"
 
@@ -61,11 +60,9 @@ CErrDlg::CErrDlg(const char *Msg, PCHAR Line, int x, int y, int lineno, int star
 	MacroFileName = FileName;
 }
 
-INT_PTR CErrDlg::DoModal()
+INT_PTR CErrDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND parent = GetHWND();
-	return TTCDialog::DoModal(hInst, parent, CErrDlg::IDD);
+	return TTCDialog::DoModal(hInst, hWndParent, CErrDlg::IDD);
 }
 
 BOOL CErrDlg::OnInitDialog()

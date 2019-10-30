@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -226,27 +226,34 @@ void SetDlgPos(int x, int y)
 void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
                 PCHAR Default, BOOL Paswd)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CInpDlg InpDlg(Buff,Text,Caption,Default,Paswd,DlgPosX,DlgPosY);
-	InpDlg.DoModal();
+	InpDlg.DoModal(hInst, hWndParent);
 }
 
 int OpenErrDlg(const char *Msg, PCHAR Line, int lineno, int start, int end, PCHAR FileName)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end, FileName);
-	return ErrDlg.DoModal();
+	return ErrDlg.DoModal(hInst, hWndParent);
 }
 
 int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CMsgDlg MsgDlg(Text,Caption,YesNo,DlgPosX,DlgPosY);
-	return MsgDlg.DoModal();
+	return MsgDlg.DoModal(hInst, hWndParent);
 }
 
 void OpenStatDlg(PCHAR Text, PCHAR Caption)
 {
 	if (StatDlg==NULL) {
+		HINSTANCE hInst = GetInstance();
 		StatDlg = new CStatDlg();
-		StatDlg->Create(Text,Caption,DlgPosX,DlgPosY);
+		StatDlg->Create(hInst,Text,Caption,DlgPosX,DlgPosY);
 	}
 	else {// if status box already exists,
 		// update text and caption only.
@@ -280,8 +287,10 @@ void BringupStatDlg()
  */
 int OpenListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
-	INT_PTR r = ListDlg.DoModal();
+	INT_PTR r = ListDlg.DoModal(hInst, hWndParent);
 	if (r == IDOK) {
 		return ListDlg.m_SelectItem;
 	}

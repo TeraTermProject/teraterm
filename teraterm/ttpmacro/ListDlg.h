@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 TeraTerm Project
+ * Copyright (C) 2013-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ class CListDlg : public TTCDialog
 {
 public:
 	CListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected, int x, int y);
-	INT_PTR DoModal();
+	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 	int m_SelectItem;
 
 private:

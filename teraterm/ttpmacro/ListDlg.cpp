@@ -37,7 +37,6 @@
 #include "tttypes.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
-#include "ttmacro.h"
 
 #include "ListDlg.h"
 
@@ -53,10 +52,8 @@ CListDlg::CListDlg(const PCHAR Text, const PCHAR Caption, const CHAR **Lists, in
 	PosY = y;
 }
 
-INT_PTR CListDlg::DoModal()
+INT_PTR CListDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND hWndParent = GetHWND();
 	return TTCDialog::DoModal(hInst, hWndParent, IDD);
 }
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@
 #include "ttm_res.h"
 #include "ttmlib.h"
 #include "dlglib.h"
-#include "ttmacro.h"
 #include "compat_win.h"
 
 #include "inpdlg.h"
@@ -54,11 +53,9 @@ CInpDlg::CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
 	PosY = y;
 }
 
-INT_PTR CInpDlg::DoModal()
+INT_PTR CInpDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND parent = GetHWND();
-	return TTCDialog::DoModal(hInst, parent, CInpDlg::IDD);
+	return TTCDialog::DoModal(hInst, hWndParent, CInpDlg::IDD);
 }
 
 // msgdlg のように、メッセージが長い場合にはダイアログを拡げるようにした (2006.7.29 maya)

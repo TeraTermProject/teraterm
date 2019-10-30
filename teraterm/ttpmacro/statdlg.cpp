@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,19 +37,17 @@
 #include "ttmlib.h"
 #include "tmfc.h"
 #include "tttypes.h"
-#include "ttmacro.h"
 
 #include "statdlg.h"
 
 // CStatDlg dialog
 
-BOOL CStatDlg::Create(PCHAR Text, PCHAR Title, int x, int y)
+BOOL CStatDlg::Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y)
 {
 	TextStr = Text;
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
-	HINSTANCE hInst = GetInstance();
 	return TTCDialog::Create(hInst, GetDesktopWindow(), CStatDlg::IDD);
 }
 
