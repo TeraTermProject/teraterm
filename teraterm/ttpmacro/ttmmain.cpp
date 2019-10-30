@@ -252,9 +252,6 @@ BOOL CCtrlWindow::OnInitDialog()
 		{ IDC_CTRLPAUSESTART, "BTN_PAUSE" },
 		{ IDC_CTRLEND, "BTN_END" },
 	};
-	HDC TmpDC;
-	int CRTWidth, CRTHeight;
-	RECT Rect;
 	char Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
 	BOOL IOption, VOption;
 	int CmdShow;
@@ -266,17 +263,6 @@ BOOL CCtrlWindow::OnInitDialog()
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
 	Pause = FALSE;
-
-	// ÉZÉìÉ^Å[Ç…éùÇ¡ÇƒÇ¢Ç≠
-	TmpDC = ::GetDC(GetSafeHwnd());
-	CRTWidth = ::GetDeviceCaps(TmpDC,HORZRES);
-	CRTHeight = ::GetDeviceCaps(TmpDC,VERTRES);
-	::GetWindowRect(m_hWnd, &Rect);
-	::ReleaseDC(GetSafeHwnd(), TmpDC);
-	::SetWindowPos(GetSafeHwnd(),HWND_TOP,
-	               (CRTWidth-Rect.right+Rect.left) / 2,
-	               (CRTHeight-Rect.bottom+Rect.top) / 2,
-	               0,0,SWP_NOSIZE | SWP_NOZORDER);
 
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
@@ -342,6 +328,8 @@ BOOL CCtrlWindow::OnInitDialog()
 	m_hStatus = ::CreateStatusWindow(
 		WS_CHILD | WS_VISIBLE |
 		CCS_BOTTOM | SBARS_SIZEGRIP, NULL, GetSafeHwnd(), 1);
+
+	CenterWindow(m_hWnd, NULL);
 
 	if (VOption) {
 		return TRUE;
