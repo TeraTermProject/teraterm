@@ -6560,7 +6560,7 @@ void SetGroupMatchStr(int no, PCHAR Str)
 		SetStrVal(VarId,p);
 }
 
-void SetInputStr(PCHAR Str)
+void SetInputStr(const char *Str)
 {
 	WORD VarType;
 	TVarId VarId;

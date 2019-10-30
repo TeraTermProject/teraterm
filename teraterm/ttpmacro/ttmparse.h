@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -346,7 +346,7 @@ void GetIntVar(PVarId VarId, LPWORD Err);
 void GetStrVal(PCHAR Str, LPWORD Err);
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion);
 void GetStrVar(PVarId VarId, LPWORD Err);
-void SetStrVal(TVarId VarId, PCHAR Str);
+void SetStrVal(TVarId VarId, const char *Str);
 PCHAR StrVarPtr(TVarId VarId);
 void GetVarType(LPWORD ValType, int far *Val, LPWORD Err);
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);

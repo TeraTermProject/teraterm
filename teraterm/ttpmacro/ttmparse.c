@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1790,7 +1790,7 @@ void GetStrVar(PVarId VarId, LPWORD Err)
 		*Err = ErrSyntax;
 }
 
-void SetStrVal(TVarId VarId, PCHAR Str)
+void SetStrVal(TVarId VarId, const char *Str)
 {
 	// StrBuf の運用上 MaxStrLen が正しいサイズなのでサイズを固定
 	// (2007.6.23 maya)
