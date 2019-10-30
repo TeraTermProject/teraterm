@@ -125,7 +125,6 @@ LRESULT CMsgDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 {
 	RECT R;
-	HDC TmpDC;
 	HWND HText, HOk, HNo;
 	int CW, CH;
 
@@ -167,12 +166,20 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 	}
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		TmpDC = ::GetDC(GetSafeHwnd());
-		PosX = (GetDeviceCaps(TmpDC,HORZRES)-WW) / 2;
-		PosY = (GetDeviceCaps(TmpDC,VERTRES)-WH) / 2;
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
+		// ウィンドウサイズをセット
+		::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
+		// 中央に移動する
+		CenterWindow(m_hWnd, m_hParentWnd);
+		// 位置を保存
+		RECT rcWnd;
+		GetWindowRect(&rcWnd);
+		PosX = rcWnd.left;
+		PosY = rcWnd.top;
+	} else {
+		// ウィンドウサイズをセット + 指定位置へ移動
+		::SetWindowPos(m_hWnd, HWND_TOP,PosX,PosY,WW,WH, 0);
 	}
-	SetWindowPos(HWND_TOP,PosX,PosY,WW,WH,0);
+
 	InvalidateRect(NULL);
 }
 

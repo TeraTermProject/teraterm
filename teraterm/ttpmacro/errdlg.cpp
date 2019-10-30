@@ -75,10 +75,7 @@ BOOL CErrDlg::OnInitDialog()
 		{ IDCANCEL, "BTN_CONTINUE" },
 		{ IDC_MACROERRHELP, "BTN_HELP" },
 	};
-	RECT R;
-	HDC TmpDC;
 	char buf[MaxLineLen*2], buf2[10];
-	int i, len;
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -90,9 +87,9 @@ BOOL CErrDlg::OnInitDialog()
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%d:", MacroFileName, LineNo);
 	SetDlgItemText(IDC_ERRLINE, buf);
 
-	len = strlen(LineStr);
+	size_t len = strlen(LineStr);
 	buf[0] = 0;
-	for (i = 0 ; i < len ; i++) {
+	for (size_t i = 0 ; i < len ; i++) {
 		if (i == StartPos)
 			strncat_s(buf, sizeof(buf), "<<<", _TRUNCATE);
 		if (i == EndPos)
@@ -106,13 +103,14 @@ BOOL CErrDlg::OnInitDialog()
 	SetDlgItemText(IDC_EDIT_ERRLINE, buf);
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		GetWindowRect(&R);
-		TmpDC = ::GetDC(GetSafeHwnd());
-		PosX = (GetDeviceCaps(TmpDC,HORZRES)-R.right+R.left) / 2;
-		PosY = (GetDeviceCaps(TmpDC,VERTRES)-R.bottom+R.top) / 2;
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
+		// ’†‰›‚ÉˆÚ“®‚·‚é
+		CenterWindow(m_hWnd, m_hParentWnd);
+		// ˆÊ’u‚ð•Û‘¶
+		RECT rcWnd;
+		GetWindowRect(&rcWnd);
+		PosX = rcWnd.left;
+		PosY = rcWnd.top;
 	}
-	SetWindowPos(HWND_TOP, PosX, PosY, 0, 0, SWP_NOSIZE);
 	::SetForegroundWindow(m_hWnd);
 
 	return TRUE;

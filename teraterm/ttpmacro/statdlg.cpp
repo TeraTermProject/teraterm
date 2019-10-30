@@ -176,7 +176,6 @@ LRESULT CStatDlg::OnSetForceForegroundWindow(WPARAM wParam, LPARAM lParam)
 void CStatDlg::Relocation(BOOL is_init, int new_WW)
 {
 	RECT R;
-	HDC TmpDC;
 	HWND HText;
 	int CW, CH;
 
@@ -207,12 +206,19 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 	}
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		TmpDC = ::GetDC(GetSafeHwnd());
-		PosX = (GetDeviceCaps(TmpDC,HORZRES)-WW) / 2;
-		PosY = (GetDeviceCaps(TmpDC,VERTRES)-WH) / 2;
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
+		// ウィンドウサイズをセット
+		::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
+		// 中央に移動する
+		CenterWindow(m_hWnd, NULL);
+		// 位置を保存
+		RECT rcWnd;
+		GetWindowRect(&rcWnd);
+		PosX = rcWnd.left;
+		PosY = rcWnd.top;
+	} else {
+		// ウィンドウサイズをセット + 指定位置へ移動
+		::SetWindowPos(m_hWnd, HWND_TOP,PosX,PosY,WW,WH, 0);
 	}
-	SetWindowPos(HWND_TOP,PosX,PosY,WW,WH,SWP_NOZORDER);
 
 	InvalidateRect(NULL, TRUE);
 }
