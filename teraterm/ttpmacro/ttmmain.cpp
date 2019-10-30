@@ -345,13 +345,12 @@ BOOL CCtrlWindow::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CCtrlWindow::OnCancel( )
+// ダイアログ上にキャンセルボタン IDCANCEL がないので、
+// ESCが押されたときだけ呼び出される
+BOOL CCtrlWindow::OnCancel()
 {
-#if 1
-	::DestroyWindow(m_hStatus);
-	DestroyWindow();
-#endif
-	return TRUE;	// cancel(ESC押下)を無視
+	// 何もせずにTRUEを返す -> ESCキーを無効化
+	return TRUE;
 }
 
 BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -381,8 +380,7 @@ BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 BOOL CCtrlWindow::OnClose()
 {
-	EndTTL();
-	EndDDE();
+	DestroyWindow();
 	return TRUE;
 }
 
@@ -392,7 +390,7 @@ void CCtrlWindow::OnDestroy()
 
 	EndTTL();
 	EndDDE();
-//	CDialog::OnDestroy();
+	::DestroyWindow(m_hStatus);
 }
 
 // for icon drawing in Win NT 3.5
@@ -496,13 +494,6 @@ HCURSOR CCtrlWindow::OnQueryDragIcon()
 	return m_hIcon;
 }
 
-#if 0
-void CCtrlWindow::OnSysColorChange()
-{
-	CDialog::OnSysColorChange();
-}
-#endif
-
 void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	BOOL TimeOut;
@@ -585,16 +576,6 @@ BOOL CCtrlWindow::PostNcDestroy()
 	PostQuitMessage(0);
 	return TRUE;
 }
-
-#if 0
-BOOL CCtrlWindow::PreTranslateMessage(MSG* pMsg)
-{
-	if ((pMsg->message==WM_KEYDOWN) && (pMsg->wParam==VK_ESCAPE)) { // ignore ESC key
-		return FALSE;
-	}
-	return CDialog::PreTranslateMessage(pMsg);
-}
-#endif
 
 LRESULT CCtrlWindow::OnDdeCmndEnd(WPARAM wParam, LPARAM lParam)
 {
@@ -719,11 +700,6 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg)
 	{
-#if 0	// tmfcで処理される
-	case WM_CLOSE:
-		OnClose();
-		break;
-#endif
 	case WM_DESTROY:
 		OnDestroy();
 		PostQuitMessage(0);
@@ -735,15 +711,11 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 		OnPaint();
 		break;
 	case WM_SIZE:
-		OnSize(wp, LOWORD(lp), HIWORD(lp));
+		OnSize((UINT)wp, LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_GETMINMAXINFO:
 		OnGetMinMaxInfo((MINMAXINFO *)lp);
 		break;
-#if 0
-	case WM_QUERYDRAGICON:
-	case WM_SYSCOLORCHANGE:
-#endif
 	case WM_TIMER:
 		OnTimer(wp);
 		break;
