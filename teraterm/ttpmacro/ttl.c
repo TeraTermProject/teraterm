@@ -1045,6 +1045,7 @@ WORD TTLDispStr()
 					Str[0] = LOBYTE(Val);
 					Str[1] = 0;
 					strncat_s(buff, MaxStrLen, Str, _TRUNCATE);
+					/* Falls through. */
 				case TypString:
 					strncat_s(buff, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					break;
@@ -4554,6 +4555,7 @@ WORD TTLSprintf(int getvar)
 				case 'x':
 				case 'X':
 					type = INTEGER;
+					/* Falls through. */
 
 				case 'e':
 				case 'E':
@@ -4565,6 +4567,7 @@ WORD TTLSprintf(int getvar)
 					if (type == NONE) {
 						type = DOUBLE;
 					}
+					/* Falls through. */
 
 				case 's':
 					if (type == NONE) {
