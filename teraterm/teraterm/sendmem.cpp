@@ -107,9 +107,11 @@ static void EndPaste()
 	p->send_ptr = NULL;
 
 	TalkStatus = IdTalkKeyb;
-	p->dlg->Destroy();
-	delete p->dlg;
-	delete p->dlg_observer;
+	if (p->dlg != NULL) {
+		p->dlg->Destroy();
+		delete p->dlg;
+		delete p->dlg_observer;
+	}
 	free(p->UILanguageFile);
 	free(p->dialog_caption);
 	free(p->filename);
@@ -315,7 +317,9 @@ void SendMemContinuously(void)
 		}
 
 		// ダイアログ更新
-		p->dlg->RefreshNum(p->send_index, p->send_len);
+		if (p->dlg != NULL) {
+			p->dlg->RefreshNum(p->send_index, p->send_len);
+		}
 
 		if (need_delay) {
 			// waitに入る

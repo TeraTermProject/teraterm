@@ -818,10 +818,12 @@ static void CBSendStart(wchar_t *str_w, size_t str_len)
 	if (sm == NULL)
 		return;
 //	SendMemInitDelay(sm, 0, 1000);
-	SendMemInitDelay(sm, 1000, 0);
+//	SendMemInitDelay(sm, 1000, 0);
+#if 0
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
 	SendMemInitDialogCaption(sm, L"from clipboard");
 	SendMemInitDialogFilename(sm, L"Clipboard");
+#endif
 	SendMemStart(sm);
 }
 #endif

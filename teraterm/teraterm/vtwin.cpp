@@ -4264,7 +4264,7 @@ void CVTWindow::OnFileSend()
 
 		{
 			SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
-			SendMemInitDelay(sm, 10, 0);
+			//SendMemInitDelay(sm, 10, 0);
 			SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
 			SendMemInitDialogCaption(sm, L"send file");
 			wchar_t *file_name_w = ToWcharA(file_name);
