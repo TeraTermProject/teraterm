@@ -29,7 +29,9 @@
 
 /* TTMACRO.EXE, status dialog box */
 
-class CStatDlg : public TTCDialog
+#include "macrodlgbase.h"
+
+class CStatDlg : public CMacroDlgBase
 {
 public:
 	BOOL Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y);
@@ -38,7 +40,7 @@ public:
 	enum { IDD = IDD_STATDLG };
 private:
 	PCHAR TextStr, TitleStr;
-	int  PosX, PosY, init_WW, WW, WH, TW, TH;
+	int  init_WW, TW, TH;
 	SIZE s;
 
 	virtual BOOL OnInitDialog();

@@ -31,8 +31,9 @@
 
 // CErrDlg dialog
 #include "tmfc.h"
+#include "macrodlgbase.h"
 
-class CErrDlg : public TTCDialog
+class CErrDlg : public CMacroDlgBase
 {
 public:
 	CErrDlg(const char *Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName);
@@ -43,7 +44,6 @@ private:
 
 	const char* MsgStr;
 	PCHAR LineStr;
-	int PosX, PosY;
 	int LineNo;
 	int StartPos, EndPos;
 	PCHAR MacroFileName;

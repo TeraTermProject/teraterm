@@ -48,7 +48,7 @@ BOOL CStatDlg::Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y)
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
-	return TTCDialog::Create(hInst, GetDesktopWindow(), CStatDlg::IDD);
+	return TTCDialog::Create(hInst, NULL, CStatDlg::IDD);
 }
 
 void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
@@ -203,20 +203,7 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 		::MoveWindow(HText,(TW-s.cx)/2,5,TW,TH,TRUE);
 	}
 
-	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		// ウィンドウサイズをセット
-		::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
-		// 中央に移動する
-		CenterWindow(m_hWnd, NULL);
-		// 位置を保存
-		RECT rcWnd;
-		GetWindowRect(&rcWnd);
-		PosX = rcWnd.left;
-		PosY = rcWnd.top;
-	} else {
-		// ウィンドウサイズをセット + 指定位置へ移動
-		::SetWindowPos(m_hWnd, HWND_TOP,PosX,PosY,WW,WH, 0);
-	}
+	SetDlgPos();
 
 	InvalidateRect(NULL, TRUE);
 }

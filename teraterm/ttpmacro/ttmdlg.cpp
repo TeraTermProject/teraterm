@@ -68,8 +68,9 @@ int ParamCnt;
 int ParamsSize;
 BOOL SleepFlag;
 
-static int DlgPosX = -10000;
-static int DlgPosY = 0;
+// (x,y) = (CW_USEDEFAULT, CW_USEDEFAULT)のときセンターに表示
+static int DlgPosX = CW_USEDEFAULT;
+static int DlgPosY = CW_USEDEFAULT;
 
 static CStatDlg *StatDlg = NULL;
 

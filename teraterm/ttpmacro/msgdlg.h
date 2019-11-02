@@ -29,9 +29,11 @@
 
 /* TTMACRO.EXE, message dialog box */
 
+#include "../common/tmfc.h"
+#include "macrodlgbase.h"
 #include "ttm_res.h"
 
-class CMsgDlg : public TTCDialog
+class CMsgDlg : public CMacroDlgBase
 {
 public:
 	CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo, int x, int y);
@@ -43,7 +45,7 @@ private:
 	const TCHAR *TextStr;
 	const TCHAR *TitleStr;
 	BOOL YesNoFlag;
-	int  PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW;
+	int  init_WW, TW, TH, BH, BW;
 	SIZE s;
 
 	virtual BOOL OnInitDialog();

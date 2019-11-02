@@ -29,9 +29,12 @@
 
 /* TTMACRO.EXE, input dialog box */
 
-#include "../common/tmfc.h"
+#pragma once
 
-class CInpDlg : public TTCDialog
+#include "../common/tmfc.h"
+#include "macrodlgbase.h"
+
+class CInpDlg : public CMacroDlgBase
 {
 public:
 	CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
@@ -44,7 +47,7 @@ private:
 
 	PCHAR InputStr, TextStr, TitleStr, DefaultStr;
 	BOOL PaswdFlag;
-	int PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW, EW, EH;
+	int init_WW, TW, TH, BH, BW, EW, EH;
 	SIZE s;
 
 	virtual BOOL OnInitDialog();

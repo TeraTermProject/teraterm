@@ -99,15 +99,8 @@ BOOL CErrDlg::OnInitDialog()
 		strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
 	SetDlgItemText(IDC_EDIT_ERRLINE, buf);
 
-	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		// ’†‰›‚ÉˆÚ“®‚·‚é
-		CenterWindow(m_hWnd, m_hParentWnd);
-		// ˆÊ’u‚ð•Û‘¶
-		RECT rcWnd;
-		GetWindowRect(&rcWnd);
-		PosX = rcWnd.left;
-		PosY = rcWnd.top;
-	}
+	SetDlgPos();
+
 	::SetForegroundWindow(m_hWnd);
 
 	return TRUE;

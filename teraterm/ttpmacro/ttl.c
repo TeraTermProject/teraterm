@@ -4324,16 +4324,22 @@ WORD TTLSetDir()
 
 WORD TTLSetDlgPos()
 {
-	WORD Err;
-	int x, y;
+	WORD Err = 0;
 
-	Err = 0;
-	GetIntVal(&x,&Err);
-	GetIntVal(&y,&Err);
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if (Err!=0) return Err;
-	SetDlgPos(x,y);
+	if (CheckParameterGiven()) {
+		// パラメータがあれば、x  y の2つのパラメータがある
+		int x, y;
+		GetIntVal(&x,&Err);
+		GetIntVal(&y,&Err);
+		if ((Err==0) && (GetFirstChar()!=0))
+			Err = ErrSyntax;
+		if (Err!=0) return Err;
+		SetDlgPos(x,y);
+	}
+	else {
+		// パラメータがなければデフォルト位置に戻す
+		SetDlgPos(CW_USEDEFAULT, CW_USEDEFAULT);
+	}
 	return Err;
 }
 

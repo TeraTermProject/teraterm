@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2019 TeraTerm Project
+ * Copyright (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,33 +25,75 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #pragma once
 
 #include "../common/tmfc.h"
-#include "macrodlgbase.h"
+#include "ttmlib.h"
 
-// CListDlg ダイアログ
-class CListDlg : public CMacroDlgBase
+class CMacroDlgBase : public TTCDialog
 {
-public:
-	CListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected, int x, int y);
-	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
-	int m_SelectItem;
+protected:
+	int PosX, PosY;  // ウィンドウ位置
+	int WW, WH;		 // ウィンドウ幅
+
+	CMacroDlgBase()
+	{
+		PosX = 0;
+		PosY = 0;
+		WW = 0;
+		WH = 0;
+	}
+
+	/**
+	 *	ダイアログのサイズと位置を設定する
+	 */
+	void SetDlgPos()
+	{
+		if (WW == 0 || WH == 0) {
+			// ウィンドウ位置のみ設定する errdlg
+			if (IsValidPos()) {
+				::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, 0, 0, SWP_NOSIZE);
+			}
+			else {
+				// 中央に移動する
+				CenterWindow(m_hWnd, NULL);
+				// 位置を保存
+				RECT rcWnd;
+				GetWindowRect(&rcWnd);
+				PosX = rcWnd.left;
+				PosY = rcWnd.top;
+			}
+		}
+		else {
+			// ウィンドウサイズも合わせて設定する
+			if (IsValidPos()) {
+				// ウィンドウサイズをセット + 指定位置へ移動
+				::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, WW, WH, 0);
+			}
+			else {
+				// ウィンドウサイズをセット
+				::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE);
+				// ディスプレイの中央に移動する
+				CenterWindow(m_hWnd, NULL);
+				// 位置を保存
+				RECT rcWnd;
+				GetWindowRect(&rcWnd);
+				PosX = rcWnd.left;
+				PosY = rcWnd.top;
+			}
+		}
+	}
 
 private:
-	enum { IDD = IDD_LISTDLG };
-	PCHAR m_Text;
-	PCHAR m_Caption;
-	const CHAR **m_Lists;
-	int m_Selected;
-	int init_WW, TW, TH, BH, BW, LW, LH;
-	SIZE s;
-
-	void Relocation(BOOL is_init, int WW);
-	void InitList(HWND HList);
-
-	virtual BOOL OnInitDialog();
-	virtual BOOL OnOK();
-	virtual BOOL OnCancel();
-	virtual BOOL OnClose();
+	/**
+	 *	ダイアログ位置が有効?
+	 *	@retval TRUE	有効
+	 *	@retval FALSE	無効
+	 */
+	BOOL IsValidPos()
+	{
+		// return !(PosX <= GetMonitorLeftmost(PosX, PosY) - 100);
+		return !((PosX == CW_USEDEFAULT) || (PosY == CW_USEDEFAULT));
+	}
 };

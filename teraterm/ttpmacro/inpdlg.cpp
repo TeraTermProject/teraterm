@@ -167,20 +167,7 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 
 	SendDlgItemMessage(IDC_INPEDIT, EM_LIMITTEXT, MaxStrLen, 0);
 
-	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		// ウィンドウサイズをセット
-		::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
-		// 中央に移動する
-		CenterWindow(m_hWnd, m_hParentWnd);
-		// 位置を保存
-		RECT rcWnd;
-		GetWindowRect(&rcWnd);
-		PosX = rcWnd.left;
-		PosY = rcWnd.top;
-	} else {
-		// ウィンドウサイズをセット + 指定位置へ移動
-		::SetWindowPos(m_hWnd, HWND_TOP,PosX,PosY,WW,WH, 0);
-	}
+	SetDlgPos();
 
 	InvalidateRect(NULL, TRUE);
 }

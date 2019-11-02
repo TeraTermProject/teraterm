@@ -196,21 +196,7 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	::MoveWindow(HOk,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH/2,BW,BH,TRUE);
 	::MoveWindow(HCancel,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH*2,BW,BH,TRUE);
 
-	// PosXがディスプレイの外の-100以下の位置にある場合
-	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		// ウィンドウサイズをセット
-		::SetWindowPos(m_hWnd, HWND_TOP,0,0,WW,WH,SWP_NOMOVE);
-		// 中央に移動する
-		CenterWindow(m_hWnd, NULL);
-		// 位置を保存
-		RECT rcWnd;
-		GetWindowRect(&rcWnd);
-		PosX = rcWnd.left;
-		PosY = rcWnd.top;
-	} else {
-		// ウィンドウサイズをセット + 指定位置へ移動
-		::SetWindowPos(m_hWnd, HWND_TOP,PosX,PosY,WW,WH, 0);
-	}
+	SetDlgPos();
 
 	::InvalidateRect(m_hWnd, NULL, TRUE);
 }
