@@ -120,9 +120,8 @@ static void EndPaste()
 	sendmem_work = NULL;
 
 	// 操作できるようにする
-#if 0
 	EnableWindow(HVTWin, TRUE);
-#endif
+	SetFocus(HVTWin);
 }
 
 static void OnClose()
@@ -170,9 +169,7 @@ static void SendMemStart_i(SendMem *sm)
 	TalkStatus = IdTalkSendMem;
 
 	// 送信開始時にウィンドウを操作できないようにする
-#if 0
 	EnableWindow(HVTWin, FALSE);
-#endif
 }
 
 /**
