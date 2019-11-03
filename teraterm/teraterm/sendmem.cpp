@@ -63,10 +63,6 @@ typedef struct SendMemTag {
 	//
 	PComVar cv_;
 	BOOL pause;
-	const BYTE *send_out_retry_ptr;
-	size_t send_out_retry_len;
-	const BYTE *send_echo_retry_ptr;
-	size_t send_echo_retry_len;
 } SendMem;
 
 typedef SendMem sendmem_work_t;
@@ -146,9 +142,6 @@ static void SendMemStart_i(SendMem *sm)
 
 	p->send_left = p->send_len;
 	p->send_index = 0;
-	p->send_out_retry_ptr = NULL;
-	p->send_echo_retry_ptr = NULL;
-
 	p->waited = FALSE;
 	p->pause = FALSE;
 
@@ -170,6 +163,26 @@ static void SendMemStart_i(SendMem *sm)
 
 	// 送信開始時にウィンドウを操作できないようにする
 	EnableWindow(HVTWin, FALSE);
+}
+
+static void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
+{
+	if (use != NULL) {
+		*use = cv_->OutBuffCount;
+	}
+	if (free != NULL) {
+		*free = OutBuffSize - cv_->InBuffCount;
+	}
+}
+
+static void GetInBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
+{
+	if (use != NULL) {
+		*use = cv_->InBuffCount;
+	}
+	if (free != NULL) {
+		*free = InBuffSize - cv_->InBuffCount;
+	}
 }
 
 /**
@@ -196,144 +209,118 @@ void SendMemContinuously(void)
 		}
 	}
 
-	// 送信バッファ(echo)できなかった分を再送
-	int r;
-	size_t sended_size = 0;
-	if (p->send_out_retry_ptr != NULL) {
-		if (p->type == SendMemTypeBinary) {
-			r = CommBinaryBuffOut(p->cv_, (PCHAR)p->send_out_retry_ptr, (int)p->send_out_retry_len);
-		}
-		else {
-			// text (not binary)
-			r = CommTextOutW(p->cv_, (wchar_t *)p->send_out_retry_ptr, (int)(p->send_out_retry_len / sizeof(wchar_t)));
-			r *= sizeof(wchar_t);
-		}
-		sended_size = r;
-		p->send_out_retry_len -= r;
-		if (p->send_out_retry_len == 0) {
-			p->send_out_retry_ptr = NULL;
-		}
-		else {
-			p->send_out_retry_ptr += r;
-		}
-	}
-	if (p->send_echo_retry_ptr != NULL) {
-		size_t echo_size = sended_size < p->send_echo_retry_len ? sended_size : p->send_echo_retry_len;
-		if (p->type == SendMemTypeBinary) {
-			r = CommTextEcho(p->cv_, (PCHAR)p->send_echo_retry_ptr, (int)echo_size);
-		}
-		else {
-			r = CommTextEchoW(p->cv_, (wchar_t *)p->send_echo_retry_ptr, (int)(echo_size / sizeof(wchar_t)));
-			r *= sizeof(wchar_t);
-		}
-		p->send_echo_retry_len -= r;
-		if (p->send_echo_retry_len == 0) {
-			p->send_echo_retry_ptr = NULL;
-		}
-		else {
-			p->send_echo_retry_ptr += r;
-		}
-	}
-	if (p->send_out_retry_ptr != NULL || p->send_echo_retry_ptr != NULL) {
-		// まだ全部送信できていない
-		return;
-	}
+	// 終端?
+	if (p->send_left == 0) {
+		// 終了, 送信バッファが空になるまで待つ
+		size_t out_buff_use;
+		GetOutBuffInfo(p->cv_, &out_buff_use, NULL);
 
-	// 送信
-	for (;;) {
-		// 終端?
-		if (p->send_left == 0) {
-			// 終了
+		if (p->dlg != NULL) {
+			p->dlg->RefreshNum(p->send_index, p->send_len - out_buff_use);
+		}
+
+		if (out_buff_use == 0) {
+			// 送信バッファも空になった
 			EndPaste();
 			return;
 		}
+	}
 
-		// 送信長
-		BOOL need_delay = FALSE;
-		size_t send_len;
-		if (p->delay_per_char > 0) {
-			// 1キャラクタ送信
-			need_delay = TRUE;
-			if (p->type == SendMemTypeBinary) {
-				send_len = 1;
-			}
-			else {
-				send_len = sizeof(wchar_t);
+	// 送信できるバッファサイズ
+	size_t buff_len;
+	{
+		size_t out_buff_free;
+		GetOutBuffInfo(p->cv_, NULL, &out_buff_free);
+		buff_len = out_buff_free;
+		if (p->local_echo_enable) {
+			// ローカルエコーが必要な場合は、入力バッファも考慮
+			size_t in_buff_free;
+			GetInBuffInfo(p->cv_, NULL, &in_buff_free);
+			if (buff_len > in_buff_free) {
+				buff_len = in_buff_free;
 			}
 		}
-		else if (p->delay_per_line > 0) {
-			// 1ライン送信
-			need_delay = TRUE;
+	}
+	if (buff_len == 0) {
+		// バッファに空きがない
+		return;
+	}
 
-			// 1行取り出し(改行コードは 0x0a に正規化されている)
-			const wchar_t *line_top = (wchar_t *)&p->send_ptr[p->send_index];
-			const wchar_t *line_end = wcschr(line_top, 0x0a);
-			if (line_end != NULL) {
-				// 0x0a まで送信
-				send_len = ((line_end - line_top) + 1) * sizeof(wchar_t);
-			}
-			else {
-				// 改行見つからず、最後まで送信
-				send_len = p->send_left;
-			}
+	// 送信長
+	BOOL need_delay = FALSE;
+	size_t send_len;
+	if (p->delay_per_char > 0) {
+		// 1キャラクタ送信
+		need_delay = TRUE;
+		if (p->type == SendMemTypeBinary) {
+			send_len = 1;
 		}
 		else {
-			// 全力送信
+			send_len = sizeof(wchar_t);
+		}
+	}
+	else if (p->delay_per_line > 0) {
+		// 1ライン送信
+		need_delay = TRUE;
+
+		// 1行取り出し(改行コードは 0x0a に正規化されている)
+		const wchar_t *line_top = (wchar_t *)&p->send_ptr[p->send_index];
+		const wchar_t *line_end = wcschr(line_top, 0x0a);
+		if (line_end != NULL) {
+			// 0x0a まで送信
+			send_len = ((line_end - line_top) + 1) * sizeof(wchar_t);
+		}
+		else {
+			// 改行見つからず、最後まで送信
 			send_len = p->send_left;
 		}
 
-		// 送信する
-		const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
-		p->send_index += send_len;
-		p->send_left -= send_len;
-		size_t sended_len;
-		if (p->type == SendMemTypeBinary) {
-			sended_len = CommBinaryBuffOut(p->cv_, (PCHAR)send_ptr, (int)send_len);
-		}
-		else {
-			sended_len = CommTextOutW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
-			sended_len *= sizeof(wchar_t);
-		}
-		if ((sended_len != 0) && (p->local_echo_enable)) {
-			// 送信できた分echoする
-			size_t echo_len = sended_len;
-			size_t echoed_len;
-			if (p->type == SendMemTypeBinary) {
-				echoed_len = CommTextEcho(p->cv_, (PCHAR)send_ptr, (int)echo_len);
-			}
-			else {
-				echoed_len = CommTextEchoW(p->cv_, (wchar_t *)send_ptr, (int)(echo_len / sizeof(wchar_t)));
-				sended_len *= sizeof(wchar_t);
-			}
-			if (echoed_len != echo_len) {
-				p->send_out_retry_ptr = send_ptr + echoed_len;
-				p->send_out_retry_len = echo_len - echoed_len;
-			}
-		}
-		if (sended_len < send_len) {
-			// すべて送信できなかった
-			p->send_out_retry_ptr = send_ptr + sended_len;
-			p->send_out_retry_len = send_len - sended_len;
-		}
-		if (p->send_out_retry_ptr != NULL || p->send_echo_retry_ptr != NULL) {
-			// 出力できなくなった(出力バッファがいっぱい?)
+		// 送信できない
+		if (buff_len < send_len) {
 			return;
 		}
-
-		// ダイアログ更新
-		if (p->dlg != NULL) {
-			p->dlg->RefreshNum(p->send_index, p->send_len);
+	}
+	else {
+		// 全力送信
+		send_len = p->send_left;
+		if (buff_len < send_len) {
+			send_len = buff_len;
 		}
+	}
 
-		if (need_delay) {
-			// waitに入る
-			p->waited = TRUE;
-			p->last_send_tick = GetTickCount();
-			// タイマーはidleを動作させるために使用している
-			const DWORD delay = p->delay_per_line > 0 ? p->delay_per_line : p->delay_per_char;
-			SetTimer(p->hWnd, p->timer_id, delay, NULL);
-			break;
+	// 送信する
+	const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
+	p->send_index += send_len;
+	p->send_left -= send_len;
+	size_t sended_len;
+	if (p->type == SendMemTypeBinary) {
+		sended_len = CommBinaryBuffOut(p->cv_, (PCHAR)send_ptr, (int)send_len);
+		if (p->local_echo_enable) {
+			CommTextEcho(p->cv_, (PCHAR)send_ptr, (int)send_len);
 		}
+	}
+	else {
+		sended_len = CommTextOutW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
+		if (p->local_echo_enable) {
+			CommTextEchoW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
+		}
+		sended_len *= sizeof(wchar_t);
+	}
+
+	// ダイアログ更新
+	if (p->dlg != NULL) {
+		size_t out_buff_use;
+		GetOutBuffInfo(p->cv_, &out_buff_use, NULL);
+		p->dlg->RefreshNum(p->send_index - out_buff_use, p->send_len);
+	}
+
+	if (need_delay) {
+		// waitに入る
+		p->waited = TRUE;
+		p->last_send_tick = GetTickCount();
+		// タイマーはidleを動作させるために使用している
+		const DWORD delay = p->delay_per_line > 0 ? p->delay_per_line : p->delay_per_char;
+		SetTimer(p->hWnd, p->timer_id, delay, NULL);
 	}
 }
 
