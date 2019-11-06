@@ -100,6 +100,21 @@ private:
 	void (*OnPause_)(BOOL paused);
 };
 
+static wchar_t *wcsnchr(const wchar_t *str, size_t len, wchar_t chr)
+{
+	for (size_t i = 0; i < len; ++i) {
+		wchar_t c = *str;
+		if (c == 0) {
+			return NULL;
+		}
+		if (c == chr) {
+			return (wchar_t *)str;
+		}
+		str++;
+	}
+	return NULL;
+}
+
 static void EndPaste()
 {
 	sendmem_work_t *p = sendmem_work;
@@ -272,7 +287,7 @@ void SendMemContinuously(void)
 
 		// 1行取り出し(改行コードは 0x0a に正規化されている)
 		const wchar_t *line_top = (wchar_t *)&p->send_ptr[p->send_index];
-		const wchar_t *line_end = wcschr(line_top, 0x0a);
+		const wchar_t *line_end = wcsnchr(line_top, p->send_left, 0x0a);
 		if (line_end != NULL) {
 			// 0x0a まで送信
 			send_len = ((line_end - line_top) + 1) * sizeof(wchar_t);
@@ -282,8 +297,10 @@ void SendMemContinuously(void)
 			send_len = p->send_left;
 		}
 
-		// 送信できない
+		// 1行が送信バッファより大きい
 		if (buff_len < send_len) {
+			// 送信バッファ長まで切り詰める
+			send_len = buff_len;
 			return;
 		}
 	}
