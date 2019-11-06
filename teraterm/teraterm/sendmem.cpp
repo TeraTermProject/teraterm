@@ -208,14 +208,6 @@ void SendMemContinuously(void)
 		return;
 	}
 
-	if (p->waited) {
-		const DWORD delay = p->delay_per_line > 0 ? p->delay_per_line : p->delay_per_char;
-		if (GetTickCount() - p->last_send_tick < delay) {
-			// ウエイトする
-			return;
-		}
-	}
-
 	// 終端?
 	if (p->send_left == 0) {
 		// 終了, 送信バッファが空になるまで待つ
@@ -229,6 +221,14 @@ void SendMemContinuously(void)
 		if (out_buff_use == 0) {
 			// 送信バッファも空になった
 			EndPaste();
+			return;
+		}
+	}
+
+	if (p->waited) {
+		const DWORD delay = p->delay_per_line > 0 ? p->delay_per_line : p->delay_per_char;
+		if (GetTickCount() - p->last_send_tick < delay) {
+			// ウエイトする
 			return;
 		}
 	}
@@ -321,7 +321,7 @@ void SendMemContinuously(void)
 		p->dlg->RefreshNum(p->send_index - out_buff_use, p->send_len);
 	}
 
-	if (need_delay) {
+	if (p->send_left != 0 && need_delay) {
 		// waitに入る
 		p->waited = TRUE;
 		p->last_send_tick = GetTickCount();
