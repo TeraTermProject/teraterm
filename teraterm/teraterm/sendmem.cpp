@@ -37,6 +37,9 @@
 
 #include "sendmem.h"
 
+// 送信中にVTWINに排他をかける
+#define	USE_ENABLE_WINDOW	0	// 1=排他する
+
 typedef struct SendMemTag {
 	const BYTE *send_ptr;  // 送信データへのポインタ
 	size_t send_len;	   // 送信データサイズ
@@ -116,8 +119,10 @@ static void EndPaste()
 	sendmem_work = NULL;
 
 	// 操作できるようにする
+#if USE_ENABLE_WINDOW
 	EnableWindow(HVTWin, TRUE);
 	SetFocus(HVTWin);
+#endif
 }
 
 static void OnClose()
@@ -162,7 +167,9 @@ static void SendMemStart_i(SendMem *sm)
 	TalkStatus = IdTalkSendMem;
 
 	// 送信開始時にウィンドウを操作できないようにする
+#if USE_ENABLE_WINDOW
 	EnableWindow(HVTWin, FALSE);
+#endif
 }
 
 static void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
@@ -397,6 +404,10 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
  */
 SendMem *SendMemInit(void *ptr, size_t len, SendMemType type)
 {
+	if (sendmem_work != NULL) {
+		// 送信中
+		return NULL;
+	}
 	SendMem *p = (SendMem *)calloc(sizeof(*p), 1);
 	if (p == NULL) {
 		return NULL;
