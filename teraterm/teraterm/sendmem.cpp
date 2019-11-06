@@ -351,7 +351,7 @@ void SendMemContinuously(void)
 /*
  *	改行コードをLF(0x0a)だけにする
  *
- *	@param [in]	*src_		文字列へのポインタ
+ *	@param [in]	*src		文字列へのポインタ
  *	@param [in] *len		入力文字列長(0のとき内部で文字列長を測る)
  *	@param [out] *len		出力文字列長
  *	@return					変換後文字列(mallocされた領域)
@@ -367,42 +367,28 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 		return NULL;
 	}
 
-	// LF(0x0a),CR(0x0d)があるか調べる
+	// CR+LF -> LF
+	// CR    -> LF
+	// LF    -> LF (変換不要)
 	int cr_count = 0;
 	int lf_count = 0;
 	const wchar_t *p = src;
-	for (size_t i = 0; i < src_len; i++) {
-		wchar_t c = *p++;
-		if (c == CR) {	// 0x0d
-			cr_count++;
-		} else if (c == LF) {	// 0x0d
-			lf_count++;
-		}
-	}
-
+	const wchar_t *p_end = src + src_len;
 	wchar_t *dest = dest_top;
-	if (lf_count == 0 && cr_count != 0) {
-		// LFなし、CRのみ
-		// CRをLFに変換する
-		for (size_t i = 0; i < src_len; i++) {
-			wchar_t c = *src++;
-			*dest++ = (c == CR) ? LF : c;
-		}
-	} else if (lf_count != 0 && cr_count != 0) {
-		// CR、LFともあり
-		// CRを捨てる
-		for (size_t i = 0; i < src_len; i++) {
-			wchar_t c = *src++;
-			if (c == CR) {
-				continue;
+	while (p < p_end) {
+		wchar_t c = *p++;
+		if (c == CR) {
+			if (*p == LF) {
+				// CR+LF -> LF
+				p++;
+				*dest++ = LF;
+			} else {
+				// CR -> LF
+				*dest++ = LF;
 			}
+		} else {
 			*dest++ = c;
 		}
-	} else {
-		// CRのみ or 改行が全くない
-		// 変換不要
-		memcpy(dest , src, sizeof(wchar_t) * src_len);
-		dest += src_len;
 	}
 
 	*len = dest - dest_top;
