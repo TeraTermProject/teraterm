@@ -4235,7 +4235,6 @@ void CVTWindow::OnFileSend()
 		OPENFILENAME ofn;
 		memset(&ofn, 0, sizeof(OPENFILENAME));
 		ofn.lStructSize = get_OPENFILENAME_SIZE();
-		ofn.lStructSize = sizeof(ofn);
 		ofn.hwndOwner   = m_hWnd;
 		ofn.lpstrFile = file_name;
 		ofn.nMaxFile = sizeof(file_name);
