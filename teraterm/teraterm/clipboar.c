@@ -817,8 +817,9 @@ static void CBSendStart(wchar_t *str_w, size_t str_len)
 					 SendMemTypeTextLF);
 	if (sm == NULL)
 		return;
-//	SendMemInitDelay(sm, 0, 1000);
-//	SendMemInitDelay(sm, 1000, 0);
+	if (ts.PasteDelayPerLine != 0) {
+		SendMemInitDelay(sm, ts.PasteDelayPerLine, 0);
+	}
 #if 0
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
 	SendMemInitDialogCaption(sm, L"from clipboard");
