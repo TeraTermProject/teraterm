@@ -658,6 +658,14 @@
 				RelativePath="clipboarddlg.h"
 				>
 			</File>
+			<File
+				RelativePath="debug_pp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
