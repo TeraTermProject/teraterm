@@ -49,6 +49,7 @@
 #include "compat_win.h"
 #include "helpid.h"
 #include "addsetting.h"
+#include "debug_pp.h"
 
 #include "tipwin.h"
 
@@ -1716,20 +1717,24 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	HINSTANCE hInstance, HWND hParentWnd) :
 	TTCPropertySheet(hInstance, hParentWnd)
 {
-	m_GeneralPage = new CGeneralPropPageDlg(hInstance, this);
-	m_SequencePage = new CSequencePropPageDlg(hInstance, this);
-	m_CopypastePage = new CCopypastePropPageDlg(hInstance, this);
-	m_VisualPage = new CVisualPropPageDlg(hInstance, this);
-	m_LogPage = new CLogPropPageDlg(hInstance, this);
-	m_CygwinPage = new CCygwinPropPageDlg(hInstance, this);
+	int i = 0;
+	m_Page[i++] = new CGeneralPropPageDlg(hInstance, this);
+	m_Page[i++] = new CSequencePropPageDlg(hInstance, this);
+	m_Page[i++] = new CCopypastePropPageDlg(hInstance, this);
+	m_Page[i++] = new CVisualPropPageDlg(hInstance, this);
+	m_Page[i++] = new CLogPropPageDlg(hInstance, this);
+	m_Page[i++] = new CCygwinPropPageDlg(hInstance, this);
+	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
+		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
+		m_Page[i++] = new CDebugPropPage(hInstance, this);
+	}
+	m_PageCount = i;
 
-	hPsp[0] = m_GeneralPage->CreatePropertySheetPage();
-	hPsp[1] = m_SequencePage->CreatePropertySheetPage();
-	hPsp[2] = m_CopypastePage->CreatePropertySheetPage();
-	hPsp[3] = m_VisualPage->CreatePropertySheetPage();
-	hPsp[4] = m_LogPage->CreatePropertySheetPage();
-	hPsp[5] = m_CygwinPage->CreatePropertySheetPage();
-	m_psh.nPages = 6;
+	for (i = 0; i < m_PageCount; i++) {
+		hPsp[i] = m_Page[i]->CreatePropertySheetPage();
+	}
+
+	m_psh.nPages = m_PageCount;
 	m_psh.phpage = hPsp;
 
 	wchar_t UIMsg[MAX_UIMSG];
@@ -1741,12 +1746,9 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 {
 	free((void*)m_psh.pszCaption);
-	delete m_GeneralPage;
-	delete m_SequencePage;
-	delete m_CopypastePage;
-	delete m_VisualPage;
-	delete m_LogPage;
-	delete m_CygwinPage;
+	for (int i = 0; i < m_PageCount; i++) {
+		delete m_Page[i];
+	}
 }
 
 void CAddSettingPropSheetDlg::OnInitDialog()

@@ -95,6 +95,9 @@ add_executable(
   ftdlg_lite.cpp
   clipboarddlg.h
   clipboarddlg.cpp
+  debug_pp.cpp
+  debug_pp.h
+  debug_pp.rc
   )
 
 target_sources(

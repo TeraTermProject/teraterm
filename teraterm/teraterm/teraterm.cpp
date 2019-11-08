@@ -310,14 +310,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-#if UNICODE_DEBUG
-	if (_access("teraterm_debug.txt", 0) == 0) {
-		FILE* fp;
-		AllocConsole();
-		freopen_s(&fp, "CONOUT$", "w", stdout);
-		freopen_s(&fp, "CONOUT$", "w", stderr);
-	}
-#endif
 
 	init();
 	hInst = hInstance;

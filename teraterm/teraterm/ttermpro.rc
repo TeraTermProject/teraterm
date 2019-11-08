@@ -16,10 +16,8 @@
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -153,10 +151,10 @@ BEGIN
     LTEXT           "Window Opacity",IDC_ALPHABLEND,5,5,78,8
     LTEXT           "&Active",IDC_ALPHA_BLEND_ACTIVE_LABEL,7,17,60,12
     EDITTEXT        IDC_ALPHA_BLEND_ACTIVE,69,16,19,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "", IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, "msctls_trackbar32", WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, 4, 30, 89, 12
+    CONTROL         "",IDC_ALPHA_BLEND_ACTIVE_TRACKBAR,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,4,30,89,12
     LTEXT           "Ina&ctive",IDC_ALPHA_BLEND_INACTIVE_LABEL,7,45,60,12
     EDITTEXT        IDC_ALPHA_BLEND_INACTIVE,69,44,19,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "", IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, "msctls_trackbar32", WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, 4, 58, 89, 12
+    CONTROL         "",IDC_ALPHA_BLEND_INACTIVE_TRACKBAR,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,4,58,89,12
     GROUPBOX        "",IDC_STATIC,97,2,155,70
     CONTROL         "&Eterm lookfeel(*)",IDC_ETERM_LOOKFEEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,8,66,12
     CONTROL         "Mixed &ThemeFile to Background",IDC_MIXED_THEME_FILE,
@@ -310,7 +308,7 @@ BEGIN
     LTEXT           "Elapsed time:",IDC_PROT_ELAPSED,12,48,46,8
     RTEXT           "",IDC_PROTOELAPSEDTIME,60,48,70,8
     RTEXT           "",IDC_PROTOPERCENT,104,61,26,8,0,WS_EX_TRANSPARENT
-    CONTROL         "",IDC_PROTOPROGRESS,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER | 0x1,12,58,92,14,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_PROTOPROGRESS,"msctls_progress32",PBS_SMOOTH | NOT WS_VISIBLE | WS_BORDER,12,58,92,14,WS_EX_TRANSPARENT
     DEFPUSHBUTTON   "Cancel",IDCANCEL,51,77,40,14
 END
 
@@ -362,7 +360,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DAD_DIALOG, DIALOG
     BEGIN
@@ -493,20 +491,28 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_TTERM               ICON                    "../common/teraterm.ico"
+
 IDI_VT                  ICON                    "../common/vt.ico"
+
 IDI_TEK                 ICON                    "../common/tek.ico"
+
 IDI_TTERM_CLASSIC       ICON                    "../common/teraterm_classic.ico"
+
 IDI_VT_CLASSIC          ICON                    "../common/vt_classic.ico"
+
 IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
+
 IDI_VT_3D               ICON                    "../common/vt_3d.ico"
+
 IDI_CYGTERM             ICON                    "../../cygterm/cygterm.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_MENU MENU 
+IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -624,7 +630,7 @@ BEGIN
     END
 END
 
-IDR_TEKMENU MENU 
+IDR_TEKMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -655,7 +661,7 @@ BEGIN
     END
 END
 
-IDR_PASTEMENU MENU 
+IDR_PASTEMENU MENU
 BEGIN
     MENUITEM "&Paste",                      ID_EDIT_PASTE2
     MENUITEM "Paste<C&R>",                  ID_EDIT_PASTECR
@@ -667,7 +673,7 @@ END
 // Accelerator
 //
 
-IDR_ACC ACCELERATORS 
+IDR_ACC ACCELERATORS
 BEGIN
     "T",            ID_ACC_AREYOUTHERE,     VIRTKEY, ALT, NOINVERT
     "C",            ID_ACC_COPY,            VIRTKEY, ALT, NOINVERT

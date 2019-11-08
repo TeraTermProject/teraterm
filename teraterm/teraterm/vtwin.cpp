@@ -152,6 +152,10 @@ static int AutoDisconnectedPort = -1;
 #define WM_IME_COMPOSITION              0x010F
 #endif
 
+#if UNICODE_INTERNAL_BUFF
+CUnicodeDebugParam UnicodeDebugParam;
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
@@ -2139,20 +2143,27 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	MSG M;
 
 #if UNICODE_DEBUG
-	if (nChar == VK_CONTROL) {
+	if (UnicodeDebugParam.CodePopupEnable)
+	{
 		const DWORD now = GetTickCount();
 		switch(CtrlKeyState) {
 		case 0:
-			CtrlKeyDownTick = now;
-			CtrlKeyState = 1;
+			if (nChar == UnicodeDebugParam.CodePopupKey1) {
+				CtrlKeyDownTick = now;
+				CtrlKeyState = 1;
+			}
 			break;
 		case 2:
+			if (nChar != UnicodeDebugParam.CodePopupKey2) {
+				CtrlKeyState = 0;
+				break;
+			}
 			if (now - CtrlKeyDownTick < 500 && TipWinCodeDebug == NULL) {
 				POINT pos;
 				GetCursorPos(&pos);
 				ScreenToClient(m_hWnd, &pos);
 				CodePopup(pos.x, pos.y);
-				CtrlKeyState++;
+				CtrlKeyState = 3;
 			} else {
 				CtrlKeyDownTick = now;
 				CtrlKeyState = 1;
@@ -2164,8 +2175,6 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 			CtrlKeyState = 0;
 			break;
 		}
-	} else {
-		CtrlKeyState = 0;
 	}
 	if (TipWinCodeDebug != NULL && nChar == VK_SHIFT) {
 		POINT pos;
@@ -2209,12 +2218,12 @@ void CVTWindow::OnKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	KeyUp(nChar);
 #if UNICODE_DEBUG
-	if (CtrlKeyState == 1 && nChar == VK_CONTROL) {
+	if (CtrlKeyState == 1 && nChar == UnicodeDebugParam.CodePopupKey1) {
 		CtrlKeyState++;
 	} else {
 		CtrlKeyState = 0;
 	}
-	if (nChar == VK_CONTROL) {
+	if (nChar == UnicodeDebugParam.CodePopupKey2) {
 		if (TipWinCodeDebug != NULL) {
 			TipWinDestroy(TipWinCodeDebug);
 			TipWinCodeDebug = NULL;
