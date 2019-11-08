@@ -20,5 +20,6 @@ BreakBeforeBraces: Custom
 BraceWrapping:
 	AfterFunction: 'true'
 	BeforeElse: 'true'
+	AfterClass: 'true'
 SortIncludes: false
-
+AccessModifierOffset: -4
