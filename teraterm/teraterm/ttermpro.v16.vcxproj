@@ -196,6 +196,8 @@
     <ClCompile Include="ftdlg_lite.cpp" />
     <ClInclude Include="clipboarddlg.h" />
     <ClCompile Include="clipboarddlg.cpp" />
+    <ClInclude Include="debug_pp.h" />
+    <ClCompile Include="debug_pp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico" />
