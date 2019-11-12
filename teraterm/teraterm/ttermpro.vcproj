@@ -302,6 +302,10 @@
 				>
 			</File>
 			<File
+				RelativePath="debug_pp.rc"
+				>
+			</File>
+			<File
 				RelativePath="..\common\vt.ico"
 				>
 			</File>
