@@ -1296,6 +1296,7 @@ BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
 
 	EmptyClipboard();
 	if (str_len == 0) {
+		CloseClipboard();
 		return TRUE;
 	}
 
