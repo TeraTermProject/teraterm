@@ -6228,13 +6228,37 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	//AdjustScrollBar();
 
 	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
-	const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-	const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-	const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
-	RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
-	pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
-	const int NewWindowWidth = Rect.right - Rect.left;
-	const int NewWindowHeight = Rect.bottom - Rect.top;
+	int NewWindowWidth;
+	int NewWindowHeight;
+	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
+		const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+		const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
+		if (pAdjustWindowRectExForDpi != NULL) {
+			// Windows 10, version 1607+
+			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
+		}
+		else {
+			// Windows 2000+
+			pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+		}
+		NewWindowWidth = Rect.right - Rect.left;
+		NewWindowHeight = Rect.bottom - Rect.top;
+	}
+	else {
+		// WM_DPICHANGEDが発生しない環境のはず、念の為実装
+		RECT WindowRect;
+		GetWindowRect(&WindowRect);
+		const int WindowWidth = WindowRect.right - WindowRect.left;
+		const int WindowHeight = WindowRect.bottom - WindowRect.top;
+		RECT ClientRect;
+		GetClientRect(&ClientRect);
+		const int ClientWidth =  ClientRect.right - ClientRect.left;
+		const int ClientHeight = ClientRect.bottom - ClientRect.top;
+		NewWindowWidth = WindowWidth - ClientWidth + ScreenWidth;
+		NewWindowHeight = WindowHeight - ClientHeight + ScreenHeight;
+	}
 
 	// 新しいウィンドウ領域候補
 	RECT NewWindowRect[5];
