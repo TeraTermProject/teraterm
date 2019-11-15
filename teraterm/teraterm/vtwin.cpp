@@ -6230,8 +6230,9 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
 	const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 	const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+	const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
 	RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
-	pAdjustWindowRectExForDpi(&Rect, Style, TRUE/*menu*/, ExStyle, NewDPI);
+	pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
 	const int NewWindowWidth = Rect.right - Rect.left;
 	const int NewWindowHeight = Rect.bottom - Rect.top;
 
