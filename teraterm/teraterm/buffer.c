@@ -2943,8 +2943,8 @@ static BOOL mark_url_w_sub(int sx_s, int sx_e, int sy_s, int sy_e, int *sx_match
 	}
 
 	// ƒ}ƒbƒ`‚µ‚½
-	*sx_match_s = match_x - PageStart;
-	*sy_match_s = match_y;
+	*sx_match_s = match_x;
+	*sy_match_s = match_y - PageStart;
 	rx = match_x;
 	for (y = match_y; y <= PageStart + sy_e; y++) {
 		int sx_s_i = 0;
@@ -3047,7 +3047,6 @@ static void mark_url_line_w(int cur_x, int cur_y)
 				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
 			}
 			else {
-				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
 				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
 			}
 			sx_i = sx_match_e;
