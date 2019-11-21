@@ -4289,6 +4289,17 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ts->LogFN[0] = '\0';
 			ts->LogAutoStart = 0;
 		}
+		else if (_strnicmp(Temp, "/OSC52=", 7) == 0) {	/* Clipboard access */
+			ts->CtrlFlag &= ~CSF_CBMASK;
+			if (_stricmp(&Temp[7], "on") == 0 || _stricmp(&Temp[7], "readwrite") == 0)
+				ts->CtrlFlag |= CSF_CBRW;
+			else if (_stricmp(&Temp[7], "read") == 0)
+				ts->CtrlFlag |= CSF_CBREAD;
+			else if (_stricmp(&Temp[7], "write") == 0)
+				ts->CtrlFlag |= CSF_CBWRITE;
+			else if (_stricmp(&Temp[7], "off") == 0)
+				ts->CtrlFlag |= CSF_CBNONE;
+		}
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
 			ParamTCP = ParsePortName(&Temp[3]);
