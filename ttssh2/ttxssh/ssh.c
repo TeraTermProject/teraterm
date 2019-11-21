@@ -4103,8 +4103,18 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	if (direction == TOREMOTE) {  // copy local to remote
 		fp = fopen(sendfile, "rb");
 		if (fp == NULL) {
-			char buf[80];
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "fopen: %d", GetLastError());
+			char buf[1024];
+			int len;
+			strcpy_s(buf, sizeof(buf), "Can't open file for reading: ");
+			len = strlen(buf);
+			FormatMessage(
+			    FORMAT_MESSAGE_FROM_SYSTEM,
+			    NULL,
+			    GetLastError(),
+			    0,
+			    buf+len,
+			    sizeof(buf)-len,
+			    NULL);
 			MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
 			goto error;
 		}
@@ -4159,9 +4169,19 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 
 		fp = fopen(c->scp.localfilefull, "wb");
 		if (fp == NULL) {
-			char buf[512];
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "fopen: %d", GetLastError());
-			MessageBox(NULL, buf, "TTSSH: file open write error", MB_OK | MB_ICONERROR);
+			char buf[1024];
+			int len;
+			strcpy_s(buf, sizeof(buf), "Can't open file for writing: ");
+			len = strlen(buf);
+			FormatMessage(
+			    FORMAT_MESSAGE_FROM_SYSTEM,
+			    NULL,
+			    GetLastError(),
+			    0,
+			    buf+len,
+			    sizeof(buf)-len,
+			    NULL);
+			MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
 			goto error;
 		}
 
