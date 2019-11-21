@@ -706,6 +706,7 @@ struct tttset {
 	int DialogFontPoint;
 	int DialogFontCharSet;
 	int ConfigVersion;
+	int RunningVersion;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

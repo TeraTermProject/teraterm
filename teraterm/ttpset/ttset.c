@@ -744,6 +744,9 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->ConfigVersion = 0;
 	}
 
+	// TTX で 確認できるよう、Tera Term のバージョンを格納しておく
+	ts->RunningVersion = TT_VERSION_MAJOR * 10000 + TT_VERSION_MINOR;
+
 	/* Language */
 	GetPrivateProfileString(Section, "Language", "",
 	                        Temp, sizeof(Temp), FName);
