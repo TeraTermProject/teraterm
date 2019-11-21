@@ -631,7 +631,7 @@
         </ul></li>
       <li>Eterm look-feel: <a href="../menu/setup-additional.html#ImageBrightness">背景画像の明るさ</a>を設定できるようにした。</li>
       <li><a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a>に Virtual Store パスを追加した。</li>
-      <li><a href="../menu/setup-additional.html#CygTerm">Addtional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
+      <li><a href="../menu/setup-additional.html#CygTerm">Additional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
       <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
       <li>バージョン情報ダイアログのURLをシングルクリックでブラウザが起動するようにした。</li>
       <li><a href="../macro/command/listbox.html">listbox</a> マクロコマンドで、初期状態で選択している項目を指定できるようにした。</li>
@@ -934,7 +934,7 @@
       <li>"New connection" ダイアログを表示する <a href="../commandline/teraterm.html#es">/ES</a> コマンドラインオプションを追加した。</li>
       <li>URLの途中で改行されている時に、繋がっているものとして扱える設定を追加した。
         <ul>
-          <li>tearterm.iniに<a href="../setup/teraterm-misc.html#JoinSplitURL">JoinSplitURL, JoinSplitURLIgnoreEOLChar</a>エントリを追加した。</li>
+          <li>teraterm.iniに<a href="../setup/teraterm-misc.html#JoinSplitURL">JoinSplitURL, JoinSplitURLIgnoreEOLChar</a>エントリを追加した。</li>
         </ul></li>
       <li>マクロ
         <ul>
@@ -1888,7 +1888,7 @@
       <li>EDITOR.CNF をインストーラパッケージに新規追加した。</li>
       <li>キーボード設定ファイルが無い時のエディタキーパッドおよびファンクションキーの動作を変更し、対応するVTキーのシーケンスを送出するようにした。
         <ul>
-          <li>tearterm.ini に <a href="../setup/teraterm-term.html#StrictKeyMapping">StrictKeyMapping</a> エントリを追加した。デフォルトはoff。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#StrictKeyMapping">StrictKeyMapping</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li>
       <li>バージョンダイアログに、ビルド環境(Visual C++)のバージョンとビルドタイムを表示するようにした。</li>
       <li>マクロコマンド "<a href="../macro/command/sprintf2.html">sprintf2</a>" を新規追加した。</li>
@@ -3393,7 +3393,7 @@
         <ul>
           <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
         </ul></li>
-      <li>Diffie-Hellman group exchane 鍵交換方式での最小グループサイズを 2048 に変更した。(RFC 8270)
+      <li>Diffie-Hellman group exchange 鍵交換方式での最小グループサイズを 2048 に変更した。(RFC 8270)
         <ul>
           <li>以前の動作に戻すには、teraterm.ini の GexMinimalGroupSize エントリを 1024 にする。</li>
         </ul></li>
@@ -4302,7 +4302,7 @@
 <h3 id="ttssh_2.42">2007.9.30 (Ver 2.42)</h3>
 <ul class="history">
       <li>New connection ダイアログで使用中のシリアルポートを表示しないようにした。</li>
-      <li>パスワード認証を選択しているときに keyboard-interactive 認証を使用するのをやめた。これに伴い、Authentication Setup ダイアログの keyboard-interactive チェックボックスを削除した。keyboard-interactive 認証を使用するためには、challange/response を選択する必要がある。</li>
+      <li>パスワード認証を選択しているときに keyboard-interactive 認証を使用するのをやめた。これに伴い、Authentication Setup ダイアログの keyboard-interactive チェックボックスを削除した。keyboard-interactive 認証を使用するためには、challenge/response を選択する必要がある。</li>
       <li>New connection ダイアログの Host ドロップダウンで、Ctrl+p, Ctrl+n, Ctrl+b, Ctrl+f, Ctrl+a, Ctrl+e ショートカットキーをサポートした。それぞれ↑, ↓, ←, →, Home, End キーに対応する。</li>
       <li>パケット送信処理にTCPコネクション切断の誤検出をしないようにした。</li>
       <li>内部で使用している文字列系関数のセキュアバージョンへの全置換を実施。
