@@ -115,6 +115,8 @@ BEGIN
     COMBOBOX        IDC_CLIPBOARD_ACCESS,162,114,45,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "&Notify clipboard access from remote",IDC_CLIPBOARD_NOTIFY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,130,220,10
+    CONTROL         "Accept clearing &scroll buffer from remote",IDC_ACCEPT_CLEAR_SBUFF,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,145,220,10
 END
 
 IDD_TABSHEET_COPYPASTE DIALOGEX 0, 0, 258, 194

@@ -2210,6 +2210,10 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	else
 		ts->TerminalOutputSpeed = ts->TerminalInputSpeed;
 
+	// Clear scroll buffer from remote -- special option
+	if (GetOnOff(Section, "ClearScrollBufferFromRemote", FName, TRUE))
+		ts->TermFlag |= TF_REMOTECLEARSBUFF;
+
 	// Fallback to CP932 (Experimental)
 	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
 
@@ -3529,6 +3533,10 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		WriteInt2(Section, "TerminalSpeed", FName,
 			ts->TerminalInputSpeed, ts->TerminalOutputSpeed);
 	}
+
+	// Clear scroll buffer from remote -- special option
+	WriteOnOff(Section, "ClearScrollBufferFromRemote", FName,
+		(WORD) (ts->PasteFlag & TF_REMOTECLEARSBUFF));
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);

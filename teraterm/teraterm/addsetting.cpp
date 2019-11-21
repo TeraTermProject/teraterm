@@ -251,6 +251,7 @@ void CSequencePropPageDlg::OnInitDialog()
 		{ IDC_CLIPBOARD_ACCESS_LABEL, "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS" },
 
 		{ IDC_CLIPBOARD_NOTIFY, "DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY" },
+		{ IDC_ACCEPT_CLEAR_SBUFF, "DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF" },
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
@@ -315,6 +316,9 @@ void CSequencePropPageDlg::OnInitDialog()
 	// (9)IDC_CLIPBOARD_NOTIFY
 	SetCheck(IDC_CLIPBOARD_NOTIFY, ts.NotifyClipboardAccess);
 	EnableDlgItem(IDC_CLIPBOARD_NOTIFY, HasBalloonTipSupport() ? TRUE : FALSE);
+
+	// (10)IDC_ACCEPT_CLEAR_SBUFF
+	SetCheck(IDC_ACCEPT_CLEAR_SBUFF, (ts.TermFlag & TF_REMOTECLEARSBUFF) != 0);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
@@ -398,6 +402,11 @@ void CSequencePropPageDlg::OnOK()
 
 	// (9)IDC_CLIPBOARD_ACCESS
 	ts.NotifyClipboardAccess = GetCheck(IDC_CLIPBOARD_NOTIFY);
+
+	// (10)IDC_ACCEPT_CLEAR_SBUFF
+	if (((ts.TermFlag & TF_REMOTECLEARSBUFF) != 0) != GetCheck(IDC_ACCEPT_CLEAR_SBUFF)) {
+		ts.TermFlag ^= TF_REMOTECLEARSBUFF;
+	}
 }
 
 void CSequencePropPageDlg::OnHelp()

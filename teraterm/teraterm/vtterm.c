@@ -1725,6 +1725,12 @@ void CSScreenErase()
 			}
 		}
 		break;
+
+	  case 3:
+		if (ts.TermFlag & TF_REMOTECLEARSBUFF) {
+			ClearBuffer();
+		}
+		break;
 	}
 }
 
@@ -1745,6 +1751,12 @@ void CSQSelScreenErase()
 	  case 2:
 		// Erase entire screen
 		BuffSelectedEraseScreen();
+		break;
+
+	  case 3:
+		if (ts.TermFlag & TF_REMOTECLEARSBUFF) {
+			ClearBuffer();
+		}
 		break;
 	}
 }

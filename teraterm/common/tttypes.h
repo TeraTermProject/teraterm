@@ -279,6 +279,7 @@ enum LogTimestampType {
 #define TF_LOCKTUID           1024
 #define TF_INVALIDDECRPSS     2048
 #define TF_PRINTERCTRL        4096
+#define TF_REMOTECLEARSBUFF   8192
 
 // ANSI/Attribute color flags (used in ts.ColorFlag)
 #define CF_PCBOLD16     1

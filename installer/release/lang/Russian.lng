@@ -213,6 +213,7 @@ DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=чт./запись
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=чтение
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=запись
 DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Уведомлять об удаленном доступе к буферу
+DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=Accept clearing &scroll buffer from remote
 
 DLG_TAB_COPYPASTE_CONTINUE=&Возможность продолжения копирования строки
 DLG_TAB_COPYPASTE_MOUSEPASTE=&Отключить вставку правой кнопкой мыши

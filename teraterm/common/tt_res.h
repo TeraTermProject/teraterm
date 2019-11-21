@@ -240,6 +240,7 @@
 #define IDC_DAD_NOTE                    2588
 #define IDC_SELECT_ON_ACTIVATE          2589
 #define IDC_MIXED_THEME_FILE            2590
+#define IDC_ACCEPT_CLEAR_SBUFF          2591
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
