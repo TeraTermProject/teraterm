@@ -711,7 +711,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
-	char Temp[MAX_PATH], Temp2[MAX_PATH];
+	char Temp[MAX_PATH], Temp2[MAX_PATH], *p;
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -729,9 +729,20 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	ts->DisableTCPEchoCR = FALSE;
 
-	/* Version number */
-/*  GetPrivateProfileString(Section,"Version","",
-			  Temp,sizeof(Temp),FName); */
+	/*
+	 * Version number
+	 * 設定ファイルがどのバージョンの Tera Term で保存されたかを表す
+	 * 設定ファイルの保存時はこの値ではなく、現在の Tera Term のバージョンが使われる
+	 */
+	GetPrivateProfileString(Section, "Version", TT_VERSION_STR("."), Temp, sizeof(Temp), FName);
+	p = strchr(Temp, '.');
+	if (p) {
+		*p++ = 0;
+		ts->ConfigVersion = atoi(Temp) * 10000 + atoi(p);
+	}
+	else {
+		ts->ConfigVersion = 0;
+	}
 
 	/* Language */
 	GetPrivateProfileString(Section, "Language", "",

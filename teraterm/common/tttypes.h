@@ -705,6 +705,7 @@ struct tttset {
 	char DialogFontName[LF_FACESIZE];
 	int DialogFontPoint;
 	int DialogFontCharSet;
+	int ConfigVersion;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
