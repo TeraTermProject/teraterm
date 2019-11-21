@@ -51,6 +51,8 @@ OutputBaseFilename=teraterm-{#AppVer}
 OutputBaseFilename=teraterm-{#snapshot}
 #endif
 PrivilegesRequired=none
+SolidCompression=yes
+Compression=lzma2/ultra64
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
