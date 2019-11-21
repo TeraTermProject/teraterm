@@ -56,6 +56,7 @@ static const struct {
 
 void CDebugPropPage::OnInitDialog()
 {
+	// popup
 	SetCheck(IDC_DEBUG_POPUP_ENABLE, UnicodeDebugParam.CodePopupEnable);
 	for (int i = 0; i < _countof(key_list); i++) {
 		const char *key_str = key_list[i].key_str;
@@ -68,16 +69,49 @@ void CDebugPropPage::OnInitDialog()
 			SendDlgItemMessageA(IDC_DEBUG_POPUP_KEY2, CB_SETCURSEL, i, 0);
 		}
 	}
+
+	// console button
+	const char *caption;
+	HWND hWnd = GetConsoleWindow();
+	if (hWnd == NULL) {
+		caption = "Open console window";
+	} else {
+		if (::IsWindowVisible(hWnd)) {
+			caption = "Hide console window";
+		} else {
+			caption = "Show console window";
+		}
+	}
+	SetDlgItemTextA(IDC_DEBUG_CONSOLE_BUTTON, caption);
 }
 
 BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IDC_DEBUG_CONSOLE_BUTTON | (BN_CLICKED << 16): {
-			FILE *fp;
-			AllocConsole();
-			freopen_s(&fp, "CONOUT$", "w", stdout);
-			freopen_s(&fp, "CONOUT$", "w", stderr);
+			const char *caption;
+			HWND hWnd = GetConsoleWindow();
+			if (hWnd == NULL) {
+				FILE *fp;
+				AllocConsole();
+				freopen_s(&fp, "CONOUT$", "w", stdout);
+				freopen_s(&fp, "CONOUT$", "w", stderr);
+				caption = "Hide console window";
+				HWND hWnd = GetConsoleWindow();
+				HMENU hmenu = GetSystemMenu(hWnd, FALSE);
+				RemoveMenu(hmenu, SC_CLOSE, MF_BYCOMMAND);
+			}
+			else {
+				if (::IsWindowVisible(hWnd)) {
+					::ShowWindow(hWnd, SW_HIDE);
+					caption = "Show console window";
+				}
+				else {
+					::ShowWindow(hWnd, SW_SHOW);
+					caption = "Hide console window";
+				}
+			}
+			SetDlgItemTextA(IDC_DEBUG_CONSOLE_BUTTON, caption);
 			break;
 		}
 		default:
