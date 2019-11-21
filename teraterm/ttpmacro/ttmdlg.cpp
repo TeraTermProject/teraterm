@@ -32,6 +32,10 @@
 #include <windows.h>
 #include <direct.h>
 #include <commdlg.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
 
@@ -49,15 +53,6 @@
 #include "ttmacro.h"
 
 #include "ttmdlg.h"
-
-#ifdef _DEBUG
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
 
 char HomeDir[MAX_PATH];
 char FileName[MAX_PATH];

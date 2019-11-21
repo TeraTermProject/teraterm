@@ -36,13 +36,12 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include <tchar.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #include "ttlib.h"	// for get_lang_font()
-
-#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
 {

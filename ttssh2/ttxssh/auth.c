@@ -39,6 +39,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <lmcons.h>		// for UNLEN
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 
 #include "resource.h"
@@ -47,11 +51,6 @@
 #include "tipwin.h"
 #include "auth.h"
 #include "helpid.h"
-
-#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 

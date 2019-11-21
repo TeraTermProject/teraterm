@@ -30,19 +30,16 @@
 /* TERATERM.EXE, IME interface */
 
 #include <windows.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
 #include <stdlib.h>
+#include <crtdbg.h>
 #include <string.h>
 #include <imm.h>
-#include <crtdbg.h>
 #include <assert.h>
 
 #include "ttime.h"
-
-#ifdef _DEBUG
-#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define calloc(l,n)	_calloc_dbg((l), (n), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 // #define ENABLE_DUMP	1
 

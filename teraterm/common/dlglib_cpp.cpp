@@ -29,15 +29,14 @@
 /* Routines for dialog boxes */
 
 #include <windows.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 
 #include "dlglib.h"
 #include "ttlib.h"
-
-#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 // ダイアログモーダル状態の時、OnIdle()を実行する
 //#define ENABLE_CALL_IDLE_MODAL	1

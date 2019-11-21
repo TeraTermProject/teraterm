@@ -33,16 +33,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #include "ttmdlg.h"
 #include "ttmparse.h"
 #include "ttmbuff.h"
-
-#ifdef _DEBUG
-#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 /* C言語スタイルのコメントをサポートするかどうか (2009.7.2 yutaka) */
 #define SUPPORT_C_STYLE_COMMENT
