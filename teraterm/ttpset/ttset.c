@@ -1999,6 +1999,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	}
 
 	// Clipboard Access from Remote
+	ts->CtrlFlag &= ~CSF_CBMASK;
 	GetPrivateProfileString(Section, "ClipboardAccessFromRemote", "off", Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "readwrite") == 0)
 		ts->CtrlFlag |= CSF_CBRW;
@@ -2006,6 +2007,8 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->CtrlFlag |= CSF_CBREAD;
 	else if (_stricmp(Temp, "write") == 0)
 		ts->CtrlFlag |= CSF_CBWRITE;
+	else
+		ts->CtrlFlag |= CSF_CBNONE; // ŽÀŽ¿‰½‚à‚µ‚È‚¢
 
 	// Notify Clipboard Access from Remote
 	ts->NotifyClipboardAccess = GetOnOff(Section, "NotifyClipboardAccess", FName, TRUE);
@@ -3360,7 +3363,7 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "TabStopModifySequence", Temp, FName);
 
 	// Clipboard Access from Remote
-	switch (ts->CtrlFlag & CSF_CBRW) {
+	switch (ts->CtrlFlag & CSF_CBMASK) {
 	case CSF_CBREAD:
 		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "read", FName);
 		break;

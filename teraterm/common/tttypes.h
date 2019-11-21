@@ -347,9 +347,11 @@ enum LogTimestampType {
 #define ISO2022_SHIFT_ALL    (ISO2022_LS | ISO2022_LSR | ISO2022_SS)
 
 // Control Sequence flags (used in ts.CtrlFlag)
+#define CSF_CBNONE	0
 #define CSF_CBWRITE     1
 #define CSF_CBREAD      2
 #define CSF_CBRW        (CSF_CBREAD | CSF_CBWRITE)
+#define CSF_CBMASK	CSF_CBRW
 
 // Debug Flags (used in ts.DebugModes)
 #define DBGF_NONE	0
