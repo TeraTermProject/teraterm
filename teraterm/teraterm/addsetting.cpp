@@ -37,6 +37,8 @@
 #include <commctrl.h>
 #include <time.h>
 #include <tchar.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
 
 #include "teraterm.h"
@@ -50,18 +52,6 @@
 #include "addsetting.h"
 
 #include "tipwin.h"
-
-#ifdef _DEBUG
-#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
-#define _strdup(s)	_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wcsdup(s)	_wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#undef _tcsdup
-#ifdef _UNICODE
-#define _tcsdup(s)	_wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#else
-#define _tcsdup(s)	_strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
-#endif
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
