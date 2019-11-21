@@ -97,9 +97,9 @@ int mkMenuEntry(char *buff, size_t buffsize, int x, int y, int c) {
     _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d", x, y);
 
   if (c < 15)
-    return _snprintf_s(buff, buffsize, _TRUNCATE, "%s(&%x)", tmp, c+1);
+    return _snprintf_s(buff, buffsize, _TRUNCATE, "%s (&%X)", tmp, c+1);
   else if (c < 35)
-    return _snprintf_s(buff, buffsize, _TRUNCATE, "%s(&%c)", tmp, 'a' + c - 9);
+    return _snprintf_s(buff, buffsize, _TRUNCATE, "%s (&%c)", tmp, 'A' + c - 9);
   else
     return _snprintf_s(buff, buffsize, _TRUNCATE, "%s", tmp);
 }
