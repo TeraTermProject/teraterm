@@ -31,14 +31,14 @@
  */
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <wspiapi.h>
-#include <windows.h>
-#include <process.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <wspiapi.h>
+#include <windows.h>
+#include <process.h>
 #include "WSAAsyncGetAddrInfo.h"
 #include "ttwsk.h"
 
