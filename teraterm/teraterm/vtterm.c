@@ -4983,9 +4983,20 @@ void XSequence(BYTE b)
 		  case 1: /* Change icon name */
 		  case 2: /* Change window title */
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
-				strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
-				// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
-				ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
+				if ((ts.KanjiCode == IdUTF8 || ts.KanjiCode == IdUTF8m) || ts.Language == IdUtf8) {
+					char *titleTmp;
+
+					titleTmp = ToCharU8(StrBuff);
+					if (titleTmp) {
+						strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), titleTmp, _TRUNCATE);
+						free(titleTmp);
+					}
+				}
+				else {
+					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
+					// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
+					ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
+				}
 				ChangeTitle();
 			}
 			break;
