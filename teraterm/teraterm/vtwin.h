@@ -159,6 +159,8 @@ protected:
 	void OnCommentToLog();
 	void OnViewLog();
 	void OnShowLogDialog();
+	void OnPauseLog();
+	void OnStopLog();
 	void OnReplayLog();
 	void OnExternalSetup();
 	void OnFileSend();

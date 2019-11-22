@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-09-11)
+; Updated by TeraTerm Project (2019-11-22)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -10,9 +10,11 @@ MENU_FILE_NEW=&Neue Verbindung...\tAlt+N
 MENU_FILE_DUPLICATE=&Verbindung duplizieren\tAlt+D
 MENU_FILE_GYGWIN=&Cygwin-Verbindung\tAlt+G
 MENU_FILE_LOG=&Log...
+MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=&Kommentar zum Log
 MENU_FILE_VIEWLOG=Log ansehen
 MENU_FILE_SHOWLOGDIALOG=Sho&w Log dialog...
+MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=Datei &senden
 MENU_FILE_CHANGEDIR=&Verzeichnis wechseln
 MENU_FILE_REPLAYLOG=&Log abspielen

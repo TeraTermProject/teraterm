@@ -1117,6 +1117,12 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	GetMenuString(FileMenu, ID_FILE_SHOWLOGDIALOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_FILE_SHOWLOGDIALOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(FileMenu, ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND, ID_FILE_SHOWLOGDIALOG, ts.UIMsg);
+	GetMenuString(FileMenu, ID_FILE_PAUSELOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
+	get_lang_msg("MENU_FILE_PAUSELOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	ModifyMenu(FileMenu, ID_FILE_PAUSELOG, MF_BYCOMMAND, ID_FILE_PAUSELOG, ts.UIMsg);
+	GetMenuString(FileMenu, ID_FILE_STOPLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
+	get_lang_msg("MENU_FILE_STOPLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	ModifyMenu(FileMenu, ID_FILE_STOPLOG, MF_BYCOMMAND, ID_FILE_STOPLOG, ts.UIMsg);
 	GetMenuString(FileMenu, ID_FILE_SENDFILE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_FILE_SENDFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(FileMenu, ID_FILE_SENDFILE, MF_BYCOMMAND, ID_FILE_SENDFILE, ts.UIMsg);
@@ -1144,9 +1150,9 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	get_lang_msg("MENU_FILE_EXITALL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(FileMenu, ID_FILE_EXITALL, MF_BYCOMMAND, ID_FILE_EXITALL, ts.UIMsg);
 
-	GetMenuString(FileMenu, 9, uimsg, sizeof(uimsg), MF_BYPOSITION);
+	GetMenuString(FileMenu, 11, uimsg, sizeof(uimsg), MF_BYPOSITION);
 	get_lang_msg("MENU_TRANS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, 9, MF_BYPOSITION, 9, ts.UIMsg);
+	ModifyMenu(FileMenu, 11, MF_BYPOSITION, 11, ts.UIMsg);
 
 	GetMenuString(FileMenu, ID_FILE_KERMITRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_TRANS_KERMIT_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
@@ -1383,11 +1389,23 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(FileMenu,ID_FILE_STOPLOG, MF_BYCOMMAND | MF_ENABLED);
+			if (cv.FilePause & OpLog) {
+				CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_CHECKED);
+			}
+			else {
+				CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_UNCHECKED);
+			}
 		} else {
 			EnableMenuItem(FileMenu,ID_FILE_LOG,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(FileMenu,ID_FILE_STOPLOG, MF_BYCOMMAND | MF_GRAYED);
+
+			CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_UNCHECKED);
 		}
 
 	}
@@ -4219,6 +4237,17 @@ void CVTWindow::OnShowLogDialog()
 	ShowFTDlg(OpLog);
 }
 
+// ログ取得を中断/再開する
+void CVTWindow::OnPauseLog()
+{
+	FLogChangeButton(!(cv.FilePause & OpLog));
+}
+
+// ログ取得を終了する
+void CVTWindow::OnStopLog()
+{
+	FileTransEnd(OpLog);
+}
 
 // ログの再生 (2006.12.13 yutaka)
 void CVTWindow::OnReplayLog()
@@ -6556,6 +6585,8 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_COMMENTTOLOG: OnCommentToLog(); break;
 		case ID_FILE_VIEWLOG: OnViewLog(); break;
 		case ID_FILE_SHOWLOGDIALOG: OnShowLogDialog(); break;
+		case ID_FILE_PAUSELOG: OnPauseLog(); break;
+		case ID_FILE_STOPLOG: OnStopLog(); break;
 		case ID_FILE_REPLAYLOG: OnReplayLog(); break;
 		case ID_FILE_SENDFILE: OnFileSend(); break;
 		case ID_FILE_KERMITRCV: OnFileKermitRcv(); break;
