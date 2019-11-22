@@ -1018,6 +1018,10 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 static char LogMeTTMenuString[] = "Log&MeTT";
 static char LogMeTT[MAX_PATH];
 
+#define IS_LOGMETT_NOTFOUND     0
+#define IS_LOGMETT_FOUND        1
+#define IS_LOGMETT_UNKNOWN      2
+
 static BOOL isLogMeTTExist()
 {
 	const char *LogMeTTexename = "LogMeTT.exe";
@@ -1028,6 +1032,12 @@ static BOOL isLogMeTTExist()
 	DWORD dwType;
 	DWORD dwDisposition;
 	char *path;
+
+	static int status = IS_LOGMETT_UNKNOWN;
+
+	if (status != IS_LOGMETT_UNKNOWN) {
+		return status == IS_LOGMETT_FOUND;
+	}
 
 	/* LogMeTT 2.9.6からはレジストリにインストールパスが含まれる。*/
 	result = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\LogMeTT", 0, NULL,
@@ -1055,8 +1065,10 @@ static BOOL isLogMeTTExist()
 	}
 
 	if (_access(LogMeTT, 0) == -1) {
+		status = IS_LOGMETT_NOTFOUND;
 		return FALSE;
 	}
+	status = IS_LOGMETT_FOUND;
 	return TRUE;
 }
 
