@@ -33,6 +33,7 @@
 #include "libputty.h"
 #include "key.h"
 #include "ttcommon.h"
+#include "codeconv.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -7564,7 +7565,8 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 	}
 
 	if (msglen > 0) {
-		unsigned char *msg;
+		char *msg, *msgA;
+		wchar_t *msgW;
 
 		if (pvar->authbanner_buffer == NULL) {
 			pvar->authbanner_buffer = buffer_init();
@@ -7589,6 +7591,27 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			break;
 		case 1:
 			if (pvar->authbanner_buffer != NULL) {
+				if (pvar->ts->Language == IdJapanese) { // とりあえず日本語モードのみ対応
+					switch (pvar->ts->KanjiCode) {
+					case IdSJIS:
+						msgA = ToCharU8(msg);
+						if (msgA) {
+							msg = msgA;
+							msglen = strlen(msg);
+						}
+						break;
+					case IdEUC:
+						// CP51932 への変換で手抜きしようとしたが
+						// 使えなかったのでとりあえず非対応
+						break;
+					case IdJIS:
+						// 使われる事が少ないのと面倒なのでとりあえず非対応
+						break;
+					default:
+						// nothing to do
+						break;
+					}
+				}
 				new_payload_buffer = msg;
 				pvar->ssh_state.payload_datastart = 0;
 				pvar->ssh_state.payload_datalen = msglen;
@@ -7599,10 +7622,18 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			}
 			break;
 		case 2:
-			MessageBox(pvar->cv->HWin, msg, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
+			msgA = ToCharU8(msg);
+			if (msgA) {
+				MessageBox(pvar->cv->HWin, msgA, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
+//				free(msgA);
+			}
 			break;
 		case 3:
-			NotifyInfoMessage(pvar->cv, msg, "Authentication Banner");
+			msgA = ToCharU8(msg);
+			if (msgA) {
+				NotifyInfoMessage(pvar->cv, msgA, "Authentication Banner");
+//				free(msgA);
+			}
 			break;
 		}
 		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, msg);
