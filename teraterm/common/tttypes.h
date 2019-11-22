@@ -707,6 +707,7 @@ struct tttset {
 	int DialogFontCharSet;
 	int ConfigVersion;
 	int RunningVersion;
+	DWORD SelectStartDelay;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

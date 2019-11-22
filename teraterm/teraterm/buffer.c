@@ -57,7 +57,7 @@
 int StatusLine;	//0: none 1: shown
 /* top, bottom, left & right margin */
 int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
-BOOL Selected;
+BOOL Selected, Selecting;
 BOOL Wrap;
 
 static WORD TabStops[256];
@@ -84,7 +84,8 @@ static LONG LinePtr;
 static LONG BufferSize;
 static int NumOfLinesInBuff;
 static int BuffStartAbs, BuffEndAbs;
-static POINT SelectStart, SelectEnd, SelectEndOld;
+static POINT SelectStart, SelectStartTmp, SelectEnd, SelectEndOld;
+static DWORD SelectStartTime;
 static BOOL BoxSelect;
 static POINT DblClkStart, DblClkEnd;
 
@@ -416,6 +417,7 @@ void BuffAllSelect()
 	SelectEnd.y = BuffEnd;
 //	SelectEnd.x = NumOfColumns;
 //	SelectEnd.y = BuffEnd - 1;
+	Selecting = TRUE;
 }
 
 void BuffScreenSelect()
@@ -428,6 +430,7 @@ void BuffScreenSelect()
 	SelectEnd.y = SelectStart.y + NumOfLines;
 //	SelectEnd.x = X + NumOfColumns;
 //	SelectEnd.y = Y + PageStart + NumOfLines - 1;
+	Selecting = TRUE;
 }
 
 void BuffCancelSelection()
@@ -436,6 +439,7 @@ void BuffCancelSelection()
 	SelectStart.y = 0;
 	SelectEnd.x = 0;
 	SelectEnd.y = 0;
+	Selecting = FALSE;
 }
 
 void BuffReset()
@@ -2726,6 +2730,11 @@ void BuffDblClk(int Xw, int Yw)
 
 	CaretOff();
 
+	if (!Selecting) {
+		SelectStart = SelectStartTmp;
+		Selecting = TRUE;
+	}
+
 	DispConvWinToScreen(Xw,Yw,&X,&Y,NULL);
 	Y = Y + PageStart;
 	if ((Y<0) || (Y>=BuffEnd)) {
@@ -2997,31 +3006,23 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	ChangeSelectRegion();
 	UnlockBuffer();
 
-	SelectStart.x = X;
-	SelectStart.y = Y;
-	if (SelectStart.x<0) {
-		SelectStart.x = 0;
-	}
-	if (SelectStart.x > NumOfColumns) {
-		SelectStart.x = NumOfColumns;
-	}
-	if (SelectStart.y < 0) {
-		SelectStart.y = 0;
-	}
-	if (SelectStart.y >= BuffEnd) {
-		SelectStart.y = BuffEnd - 1;
-	}
+	SelectStartTime = GetTickCount();
+	Selecting = FALSE;
+
+#define range_check(v, min, max)	((v)<(min) ? (min) : (v)>(max) ? (max) : (v))
+	SelectStartTmp.x = range_check(X, 0, NumOfColumns);
+	SelectStartTmp.y = range_check(Y, 0, BuffEnd-1);
 
 	TmpPtr = GetLinePtr(SelectStart.y);
 	// check if the cursor is on the right half of a character
-	if ((SelectStart.x>0) &&
-	    ((AttrBuff[TmpPtr+SelectStart.x-1] & AttrKanji) != 0) ||
-	    ((AttrBuff[TmpPtr+SelectStart.x] & AttrKanji) == 0) &&
+	if ((SelectStartTmp.x>0) &&
+	    ((AttrBuff[TmpPtr+SelectStartTmp.x-1] & AttrKanji) != 0) ||
+	    ((AttrBuff[TmpPtr+SelectStartTmp.x] & AttrKanji) == 0) &&
 	     Right) {
-		SelectStart.x++;
+		SelectStartTmp.x++;
 	}
 
-	SelectEnd = SelectStart;
+	SelectEnd = SelectStartTmp;
 	SelectEndOld = SelectEnd;
 	CaretOff();
 	Selected = TRUE;
@@ -3040,6 +3041,14 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	int i;
 	BYTE b;
 	BOOL DBCS;
+
+	if (!Selecting) {
+		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+			return;
+		}
+		SelectStart = SelectStartTmp;
+		Selecting = TRUE;
+	}
 
 	DispConvWinToScreen(Xw,Yw,&X,&Y,&Right);
 	Y = Y + PageStart;
@@ -3197,6 +3206,19 @@ end:
 void BuffEndSelect()
 //  End text selection by mouse button up
 {
+	if (!Selecting) {
+		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+			SelectEnd = SelectStart;
+			SelectEndOld = SelectEnd;
+			LockBuffer();
+			ChangeSelectRegion();
+			UnlockBuffer();
+			Selected = FALSE;
+			return;
+		}
+		SelectStart = SelectStartTmp;
+	}
+
 	Selected = (SelectStart.x!=SelectEnd.x) ||
 	           (SelectStart.y!=SelectEnd.y);
 	if (Selected) {

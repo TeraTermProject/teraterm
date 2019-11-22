@@ -2231,6 +2231,10 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "ClearScrollBufferFromRemote", FName, TRUE))
 		ts->TermFlag |= TF_REMOTECLEARSBUFF;
 
+	// Delay for start of mouse selection
+	ts->SelectStartDelay =
+		GetPrivateProfileInt(Section, "MouseSelectStartDelay", 0, FName);
+
 	// Fallback to CP932 (Experimental)
 	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
 
@@ -3554,6 +3558,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Clear scroll buffer from remote -- special option
 	WriteOnOff(Section, "ClearScrollBufferFromRemote", FName,
 		(WORD) (ts->PasteFlag & TF_REMOTECLEARSBUFF));
+
+	// Delay for start of mouse selection
+	WriteInt(Section, "MouseSelectStartDelay", FName, ts->SelectStartDelay);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
