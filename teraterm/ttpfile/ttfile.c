@@ -129,7 +129,7 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 
 	switch (FuncId) {
 	case GSF_SAVE:
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_SHOWHELP;
 		// 初期ファイルディレクトリをプログラム本体がある箇所に固定する (2005.1.6 yutaka)
 		// 読み込まれたteraterm.iniがあるディレクトリに固定する。
 		// これにより、/F= で指定された位置に保存されるようになる。(2005.1.26 yutaka)
@@ -145,7 +145,7 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName),Name, _TRUNCATE);
 		break;
 	case GSF_RESTORE:
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
 		get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Restore setup", UILanguageFile);
 		ofn.lpstrTitle = uimsg;
 		Ok = GetOpenFileName(&ofn);
@@ -153,7 +153,7 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName),Name, _TRUNCATE);
 		break;
 	case GSF_LOADKEY:
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
 		get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Load key map", UILanguageFile);
 		ofn.lpstrTitle = uimsg;
 		Ok = GetOpenFileName(&ofn);
@@ -161,8 +161,6 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN),Name, _TRUNCATE);
 		break;
 	}
-
-	ofn.Flags |= OFN_SHOWHELP;
 
 #if defined(_DEBUG)
 	if (!Ok) {
