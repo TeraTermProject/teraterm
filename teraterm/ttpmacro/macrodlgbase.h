@@ -54,6 +54,7 @@ protected:
 			// ウィンドウ位置のみ設定する errdlg
 			if (IsValidPos()) {
 				::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, 0, 0, SWP_NOSIZE);
+				MoveWindowToDisplay(m_hWnd);
 			}
 			else {
 				// 中央に移動する
@@ -70,6 +71,7 @@ protected:
 			if (IsValidPos()) {
 				// ウィンドウサイズをセット + 指定位置へ移動
 				::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, WW, WH, 0);
+				MoveWindowToDisplay(m_hWnd);
 			}
 			else {
 				// ウィンドウサイズをセット

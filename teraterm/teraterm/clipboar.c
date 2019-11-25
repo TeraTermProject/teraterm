@@ -866,8 +866,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 		{ IDOK, "BTN_OK" },
 	};
 	POINT p;
-	RECT rc_dsk, rc_dlg;
-	int dlg_height, dlg_width;
+	RECT rc_dlg;
 	static int ok2right, edit2ok, edit2bottom;
 	RECT rc_edit, rc_ok, rc_cancel;
 	// for status bar
@@ -903,45 +902,9 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			}
 
 			ClientToScreen(GetParent(hDlgWnd), &p);
-
-			// キャレットが画面からはみ出しているときに貼り付けをすると
-			// 確認ウインドウが見えるところに表示されないことがある。
-			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
-			if (!HasMultiMonitorSupport()) {
-				// NT4.0, 95 はマルチモニタAPIに非対応
-				SystemParametersInfo(SPI_GETWORKAREA, 0, &rc_dsk, 0);
-			}
-			else {
-				HMONITOR hm;
-				POINT pt;
-				MONITORINFO mi;
-
-				pt.x = p.x;
-				pt.y = p.y;
-				hm = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
-
-				mi.cbSize = sizeof(MONITORINFO);
-				GetMonitorInfo(hm, &mi);
-				rc_dsk = mi.rcWork;
-			}
-			GetWindowRect(hDlgWnd, &rc_dlg);
-			dlg_height = rc_dlg.bottom-rc_dlg.top;
-			dlg_width  = rc_dlg.right-rc_dlg.left;
-			if (p.y < rc_dsk.top) {
-				p.y = rc_dsk.top;
-			}
-			else if (p.y + dlg_height > rc_dsk.bottom) {
-				p.y = rc_dsk.bottom - dlg_height;
-			}
-			if (p.x < rc_dsk.left) {
-				p.x = rc_dsk.left;
-			}
-			else if (p.x + dlg_width > rc_dsk.right) {
-				p.x = rc_dsk.right - dlg_width;
-			}
-
 			SetWindowPos(hDlgWnd, NULL, p.x, p.y,
 			             0, 0, SWP_NOSIZE | SWP_NOZORDER);
+			MoveWindowToDisplay(hDlgWnd);
 
 			// ダイアログの初期サイズを保存
 			GetWindowRect(hDlgWnd, &rc_dlg);

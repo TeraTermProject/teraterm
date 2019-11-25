@@ -1869,7 +1869,52 @@ void GetDesktopRect(HWND hWnd, RECT *rect)
 }
 
 /**
- *	ウィンドウを中央に配置する
+ *	ウィンドウをディスプレイからはみ出さないように移動する
+ *	はみ出ていない場合は移動しない
+ *
+ *	@param[in]	hWnd		位置を調整するウィンドウ
+ */
+void MoveWindowToDisplay(HWND hWnd)
+{
+	RECT desktop;
+	RECT win_rect;
+	int win_width;
+	int win_height;
+	int win_x;
+	int win_y;
+	BOOL modify = FALSE;
+
+	GetDesktopRect(hWnd, &desktop);
+
+	GetWindowRect(hWnd, &win_rect);
+	win_x = win_rect.left;
+	win_y = win_rect.top;
+	win_height = win_rect.bottom - win_rect.top;
+	win_width = win_rect.right - win_rect.left;
+	if (win_y < desktop.top) {
+		win_y = desktop.top;
+		modify = TRUE;
+	}
+	else if (win_y + win_height > desktop.bottom) {
+		win_y = desktop.bottom - win_height;
+		modify = TRUE;
+	}
+	if (win_x < desktop.left) {
+		win_x = desktop.left;
+		modify = TRUE;
+	}
+	else if (win_x + win_width > desktop.right) {
+		win_x = desktop.right - win_width;
+		modify = TRUE;
+	}
+
+	if (modify) {
+		SetWindowPos(hWnd, NULL, win_x, win_y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	}
+}
+
+/**
+ *	ウィンドウをディスプレイの中央に配置する
  *
  *	@param[in]	hWnd		位置を調整するウィンドウ
  *	@param[in]	hWndParent	このウィンドウの中央に移動する
