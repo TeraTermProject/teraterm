@@ -49,6 +49,10 @@
         </ul></li>
 	<li>Added <a href="../commandline/teraterm.html#osc52">/OSC52=</a> commandline option for change the <a href="../menu/setup-additional.html#ClipboardAccessFromRemote">"Clipboard access from remote"</a> setting.</li>
       <li>Added the <a href="../menu/file.html#PauseLog">[Pause Logging]</a> and the <a href="../menu/file.html#StopLog">[Stop Logging]</a> menu into the <a href="../menu/file.html">[File]</a> menu.</li>
+      <li>The start of the text selection with the mouse can be delayed by setting.
+        <ul>
+	  <li>Added the <a href="../setup/teraterm-win.html#delayselect">MouseSelectStartDelay</a> entry in the teraterm.ini file. The default value is 0.</li>
+        </ul></li>
 
       <li>Serial port connection
         <ul>
@@ -81,6 +85,7 @@
       <li>Tera Term tries not to terminate when TEK window is closed. This bug was introduced in 4.103.</li>
       <li>When the DPI is changed while menu bar hidden, the window size is correctly adjusted.</li>
       <li>When DPI is changed, an application fault occurs on Windows 8.1.</li>
+      <li>The window title is garbled when receiving the window title setting control sequence which contains the kanji characters.</li>
       <li>MACRO: The button of yesnobox selected with left or right arrow key is reversed.</li>
       <li>The help button on the Save setup, Restore setup and Load key map dialog can not be shown.</li>
       <li>Save setup dialog shows incorrectly "Open as read-only" check-box on Windows95/98/NT4.0.</li>
@@ -3255,6 +3260,7 @@ SYNOPSIS:
       <li>When the user name is left blank in the user authentication dialog, the focus may not be moved from the user name to the pull-down menu on the right side with TAB key.</li>
       <li>Fixed a port forwarding issue that closes the client connection before completing all data transmission.</li>
       <li>Incorrect process ID is recorded in TTSSH.LOG before connecting.</li>
+      <li>Authentication banner cannot displayed correctly when banner string contains character other than US-ASCII.</li>
     </ul>
   </li>
 

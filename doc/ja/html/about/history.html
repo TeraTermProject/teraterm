@@ -49,6 +49,10 @@
         </ul></li>
 	<li><a href="../menu/setup-additional.html#ClipboardAccessFromRemote">「リモートからのクリップボードアクセス」</a>設定を変更する為のコマンドラインオプションとして<a href="../commandline/teraterm.html#osc52">/OSC52=</a>を追加した。</li>
       <li><a href="../menu/file.html">[File]</a> メニューに <a href="../menu/file.html#PauseLog">[Pause Logging]</a> / <a href="../menu/file.html#StopLog">[Stop Logging]</a> を追加した。</li>
+      <li>マウスでのテキスト選択の開始を、設定で遅らせる事が出来るようにした。
+        <ul>
+	  <li>teraterm.ini に <a href="../setup/teraterm-win.html#delayselect">MouseSelectStartDelay</a> エントリを追加した。デフォルトは0。</li>
+        </ul></li>
 
       <li>シリアルポート接続
         <ul>
@@ -81,6 +85,7 @@
       <li>TEKウィンドウを閉じたとき Tera Term 自身は終了しないようにした。4.103でのエンバグ。</li>
       <li>メニューバー非表示時、DPIが変化したときウィンドウサイズを正しく調整するよう修正した。</li>
       <li>Windows 8.1で、DPIが変化したとき Tera Term が強制終了しないようにした。</li>
+      <li>漢字を含むウィンドウタイトル設定制御シーケンスを受信した時、ウィンドウタイトルが文字化けする問題を修正した。</li>
       <li>MACRO: yesnobox で左右矢印キーで選択されるボタンが逆になっていたのを修正した。</li>
       <li>設定の保存・設定の読み込み・キーマップ読み込みダイアログにヘルプボタンが表示されていない問題を修正した。</li>
       <li>Windows95/98/NT4.0において、設定の保存ダイアログに「読み取り専用ファイルとして開く」というチェックボックスが表示される問題を修正した。</li>
@@ -3261,6 +3266,7 @@
       <li>ユーザ認証ダイアログで、ユーザ名を空欄にした後、TABキーで右側のプルダウンメニューにフォーカス移動しないことがある問題を修正した。</li>
       <li>ポート転送で、クライアントにデータを送り終わる前に接続を切断する場合がある問題を修正した。</li>
       <li>接続するまでの間、正しくないプロセスIDがTTSSH.LOGに記録される問題を修正した。</li>
+      <li>認証バナーにUS-ASCII以外の文字が含まれる時に正しく表示できない問題を修正した。</li>
     </ul>
   </li>
 
