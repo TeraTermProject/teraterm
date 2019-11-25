@@ -25,9 +25,10 @@ setdlgpos [&lt;x&gt; &lt;y&gt;]
 
 <p>
   Changes the initial position for dialog boxes opened by the "<a href="inputbox.html">inputbox</a>", "<a href="listbox.html">listbox</a>", "<a href="messagebox.html">messagebox</a>", "<a href="passwordbox.html">passwordbox</a>", "<a href="statusbox.html">statusbox</a>", "<a href="yesnobox.html">yesnobox</a>" commands and error dialogbox. If the status dialog box is displayed, the "setdlgpos" command also moves the dialog box.<br>
-Set dialog box position to defalt when no argument is given. (version 4.105+)<br>
+Set dialog box position to default in main(primary) display when no argument is given. (version 4.105 or later)<br>
 &lt;x&gt; and &lt;y&gt; specify the position (x,y) in the screen coordinate.<br>
-The origin (0,0) is upper left corner of the screen(primary display).
+The origin (0,0) is upper left corner of the screen(primary display).<br>
+Move into display, if dialog box position is outside display. (version 4.105 or later)
 </p>
 
 <h2>Example</h2>
