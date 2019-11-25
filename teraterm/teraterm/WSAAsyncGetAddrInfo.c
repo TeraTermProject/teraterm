@@ -29,11 +29,11 @@
  * WSAAsyncGetAddrInfo.c -- asynchronous version of getaddrinfo
  * Copyright(C) 2000-2003 Jun-ya Kato <kato@win6.jp>
  */
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <wspiapi.h>
