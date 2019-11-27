@@ -2899,6 +2899,33 @@ static BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_p
 #endif
 
 #if UNICODE_INTERNAL_BUFF
+/**
+ *	カーソル位置とのURLアトリビュートの先頭との距離を計算する
+ */
+int get_url_len(int cur_x, int cur_y)
+{
+	int sp = cur_x + cur_y * NumOfColumns;
+	int cp;
+	int dp;
+	{
+		int p = sp;
+		p--;
+		while (p > 0) {
+			int sy = p / NumOfColumns;
+			int sx = p % NumOfColumns;
+			int ptr = GetLinePtr(PageStart + sy) + sx;
+			if ((AttrBuff[ptr] & AttrURL) == 0) {
+				break;
+			}
+			p--;
+		}
+		sp = p;
+	}
+	cp = cur_x + cur_y * NumOfColumns;
+	dp = cp - sp;
+	return dp;
+}
+
 static const struct schemes_t {
 	const wchar_t *str;
 	int len;
@@ -3081,6 +3108,9 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	}
 }
 
+/**
+ *	カーソル位置からURL強調を行う
+ */
 static void mark_url_w(int cur_x, int cur_y)
 {
 	buff_char_t *b = &CodeLineW[cur_x];
@@ -3095,13 +3125,7 @@ static void mark_url_w(int cur_x, int cur_y)
 	int ey;
 	int len;
 
-	// カーソル位置がURL
-	if ((AttrLine[x] & AttrURL) != 0) {
-		mark_url_line_w(cur_x, cur_y);
-		return;
-	}
-
-	// 1つ前のキャラクタがURL?
+	// 1つ前のセルがURL?
 	if (x == 0) {
 		// 一番左の時は、前の行から継続していて、前の行の最後がURLだった時
 		if ((AttrLine[0] & AttrLineContinued) != 0) {
@@ -3135,15 +3159,31 @@ static void mark_url_w(int cur_x, int cur_y)
 
 	if (prev == TRUE) {
 		if (next == TRUE) {
+			if (isURLchar(u32)) {
+				// URLにはさまれていて、URLになりえるキャラクタ
+				int ptr = GetLinePtr(PageStart + cur_y) + cur_x;
+				AttrBuff[ptr] |= AttrURL;
+				return;
+			}
 			// 1line検査
 			mark_url_line_w(cur_x, cur_y);
 			return;
 		}
-		if (isURLchar(u32)) {
-			// URLを伸ばす
-			AttrLine[x] |= AttrURL;
+
+		len = get_url_len(cur_x, cur_y);
+		if (len >= 9) {
+			// URLアトリビュートがついている先頭から、
+			// 9文字以上離れている場合は
+			// 文字が上書きされてもURLが壊れることはない
+			// → カーソル位置にURLアトリビュートをつける
+			if (isURLchar(u32)) {
+				// URLを伸ばす
+				AttrLine[x] |= AttrURL;
+			}
 			return;
 		}
+		mark_url_line_w(cur_x, cur_y);
+		return;
 	}
 
 	// '/' が入力されたら調べ始める
