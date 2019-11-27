@@ -232,7 +232,7 @@ BOOL ChangeBuffer(int Nx, int Ny)
 		}
 
 		Selected = (SelectEnd.y > SelectStart.y) ||
-		           ((SelectEnd.y=SelectStart.y) &&
+		           ((SelectEnd.y == SelectStart.y) &&
 		            (SelectEnd.x > SelectStart.x));
 	}
 
