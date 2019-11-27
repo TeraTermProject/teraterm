@@ -740,8 +740,10 @@ BOOL GetLabelName(PCHAR Name)
 			LinePtr++;
 			if (LinePtr<LineLen) b = LineBuff[LinePtr];
 		}
-		if (b==q)
-			if (LinePtr<LineLen) LinePtr++;
+		if (b==q) {
+			if (LinePtr<LineLen)
+				LinePtr++;
+		}
 		else
 			return (ErrSyntax);
 
