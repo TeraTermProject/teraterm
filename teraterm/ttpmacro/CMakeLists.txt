@@ -83,6 +83,7 @@ set(SRC
 
   ttpmacro.rc
   ttm-version.rc
+  ttmacro_manifest.rc
   fileread.h
   fileread.cpp
   ${COMMON_SRC}
@@ -100,7 +101,7 @@ link_directories(
   )
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll /MANIFEST:NO")
 endif()
 
 add_executable(

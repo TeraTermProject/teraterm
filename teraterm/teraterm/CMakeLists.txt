@@ -48,7 +48,6 @@ add_executable(
   ttdde.h
   ttdialog.c
   ttdialog.h
-  ttermpro.rc
   ttfileio.c
   ttfileio.h
   ttime.c
@@ -57,7 +56,6 @@ add_executable(
   ttplug.h
   ttsetup.c
   ttsetup.h
-  tt-version.rc
   ttwinman.c
   ttwinman.h
   ttwsk.c
@@ -77,7 +75,9 @@ add_executable(
   #
   uni_combining.map
   #
-  teraterm.manifest
+  ttermpro.rc
+  tt-version.rc
+  teraterm_manifest.rc
   #
   svnversion.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
@@ -169,7 +169,7 @@ source_group(
   "..\/ttpdlg\/")
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll /MANIFEST:NO")
   if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
     # 32bit
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll")
