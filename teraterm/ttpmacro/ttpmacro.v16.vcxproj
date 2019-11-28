@@ -45,11 +45,13 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -156,11 +158,11 @@
     <ClCompile Include="wait4all.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\layer_for_unicode.h" />
     <ClInclude Include="..\common\codeconv.h" />
     <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\dllutil.h" />
+    <ClInclude Include="..\common\layer_for_unicode.h" />
     <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
@@ -193,6 +195,7 @@
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">0x0411</Culture>
     </ResourceCompile>
+    <ResourceCompile Include="ttmacro_manifest.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v16.vcxproj">
