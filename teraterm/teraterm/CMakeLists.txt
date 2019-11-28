@@ -225,10 +225,8 @@ target_link_libraries(
   ttpfile
   ttpset
   ttptek
-  optimized ${ONIGURUMA_LIB}
-  debug ${ONIGURUMA_LIB}
-  optimized ${SFMT_LIB}
-  debug ${SFMT_LIB}
+  ${ONIGURUMA_LIB}
+  ${SFMT_LIB}
   #
   gdi32
   comctl32
