@@ -42,8 +42,6 @@ EXPORTS
   SetCustomNotifyIcon @85
   GetCustomNotifyIcon @86
 
-  ToCharU8 @94
-  
   SJIS2JIS @30
   SJIS2EUC @31
   JIS2SJIS @32

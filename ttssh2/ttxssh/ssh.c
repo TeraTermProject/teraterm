@@ -7625,14 +7625,14 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			msgA = ToCharU8(msg);
 			if (msgA) {
 				MessageBox(pvar->cv->HWin, msgA, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
-//				free(msgA);
+				free(msgA);
 			}
 			break;
 		case 3:
 			msgA = ToCharU8(msg);
 			if (msgA) {
 				NotifyInfoMessage(pvar->cv, msgA, "Authentication Banner");
-//				free(msgA);
+				free(msgA);
 			}
 			break;
 		}

@@ -247,6 +247,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\codeconv.h"
+				>
+			</File>
+			<File
 				RelativePath="config.h"
 				>
 			</File>
@@ -348,6 +352,10 @@
 			</File>
 			<File
 				RelativePath="cipher-ctr.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\codeconv.cpp"
 				>
 			</File>
 			<File

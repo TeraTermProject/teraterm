@@ -109,6 +109,9 @@
     <ClCompile Include="..\..\teraterm\common\ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\teraterm\common\codeconv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arc4random.h">
@@ -193,6 +196,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="x11util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\codeconv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

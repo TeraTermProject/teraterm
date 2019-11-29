@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\teraterm\common\codeconv.cpp" />
     <ClCompile Include="..\..\teraterm\common\dlglib.c" />
     <ClCompile Include="..\..\teraterm\common\dlglib_cpp.cpp" />
     <ClCompile Include="..\..\teraterm\common\dlglib_tmpl.cpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="x11util.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\teraterm\common\codeconv.h" />
     <ClInclude Include="arc4random.h" />
     <ClInclude Include="auth.h" />
     <ClInclude Include="buffer.h" />
