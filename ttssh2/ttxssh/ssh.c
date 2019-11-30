@@ -7566,7 +7566,6 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 
 	if (msglen > 0) {
 		char *msg, *msgA;
-		wchar_t *msgW;
 
 		if (pvar->authbanner_buffer == NULL) {
 			pvar->authbanner_buffer = buffer_init();
