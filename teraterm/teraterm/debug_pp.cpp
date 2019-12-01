@@ -36,6 +36,7 @@
 #include "../common/tt_res.h"
 #include "unicode_test.h"
 #include "dlglib.h"
+#include "compat_win.h"
 
 CDebugPropPage::CDebugPropPage(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, IDD_TABSHEET_DEBUG, sheet)
@@ -59,7 +60,6 @@ void CDebugPropPage::OnInitDialog()
 	// popup
 	SetCheck(IDC_DEBUG_POPUP_ENABLE, UnicodeDebugParam.CodePopupEnable);
 	for (int i = 0; i < _countof(key_list); i++) {
-		const char *key_str = key_list[i].key_str;
 		SendDlgItemMessage(IDC_DEBUG_POPUP_KEY1, CB_ADDSTRING, 0, (LPARAM)key_list[i].key_str);
 		SendDlgItemMessage(IDC_DEBUG_POPUP_KEY2, CB_ADDSTRING, 0, (LPARAM)key_list[i].key_str);
 		if (UnicodeDebugParam.CodePopupKey1 == key_list[i].key_code) {
@@ -72,7 +72,7 @@ void CDebugPropPage::OnInitDialog()
 
 	// console button
 	const char *caption;
-	HWND hWnd = GetConsoleWindow();
+	HWND hWnd = pGetConsoleWindow();
 	if (hWnd == NULL) {
 		caption = "Open console window";
 	} else {
@@ -85,19 +85,19 @@ void CDebugPropPage::OnInitDialog()
 	SetDlgItemTextA(IDC_DEBUG_CONSOLE_BUTTON, caption);
 }
 
-BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM lParam)
+BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM)
 {
 	switch (wParam) {
 		case IDC_DEBUG_CONSOLE_BUTTON | (BN_CLICKED << 16): {
 			const char *caption;
-			HWND hWnd = GetConsoleWindow();
+			HWND hWnd = pGetConsoleWindow();
 			if (hWnd == NULL) {
 				FILE *fp;
 				AllocConsole();
 				freopen_s(&fp, "CONOUT$", "w", stdout);
 				freopen_s(&fp, "CONOUT$", "w", stderr);
 				caption = "Hide console window";
-				HWND hWnd = GetConsoleWindow();
+				hWnd = pGetConsoleWindow();
 				HMENU hmenu = GetSystemMenu(hWnd, FALSE);
 				RemoveMenu(hmenu, SC_CLOSE, MF_BYCOMMAND);
 			}

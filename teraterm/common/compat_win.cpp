@@ -63,6 +63,46 @@ BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
 HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
+HWND (WINAPI *pGetConsoleWindow)(void);
+
+/**
+ *	GetConsoleWindow() と同じ動作をする
+ *	 https://support.microsoft.com/ja-jp/help/124103/how-to-obtain-a-console-window-handle-hwnd
+ */
+static HWND WINAPI GetConsoleWindowLocal(void)
+{
+#define MY_BUFSIZE 1024					 // Buffer size for console window titles.
+	HWND hwndFound;						 // This is what is returned to the caller.
+	char pszNewWindowTitle[MY_BUFSIZE];  // Contains fabricated WindowTitle.
+	char pszOldWindowTitle[MY_BUFSIZE];  // Contains original WindowTitle.
+
+	// Fetch current window title.
+	DWORD size = GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
+	if (size == 0) {
+		DWORD err = GetLastError();
+		if (err == ERROR_INVALID_HANDLE) {
+			// コンソールが開いていない
+			return NULL;
+		}
+	}
+
+	// Format a "unique" NewWindowTitle.
+	wsprintf(pszNewWindowTitle, "%d/%d", GetTickCount(), GetCurrentProcessId());
+
+	// Change current window title.
+	SetConsoleTitle(pszNewWindowTitle);
+
+	// Ensure window title has been updated.
+	Sleep(40);
+
+	// Look for NewWindowTitle.
+	hwndFound = FindWindow(NULL, pszNewWindowTitle);
+
+	// Restore original window title.
+	SetConsoleTitle(pszOldWindowTitle);
+
+	return hwndFound;
+}
 
 static const APIInfo Lists_user32[] = {
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
@@ -101,6 +141,7 @@ static const APIInfo Lists_Shcore[] = {
 static const APIInfo Lists_kernel32[] = {
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
+	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
 };
 
@@ -143,5 +184,9 @@ void WinCompatInit()
 		pSetDlgItemTextW = NULL;
 		pGetDlgItemTextW = NULL;
 	}
-}
 
+	// GetConsoleWindow特別処理
+	if (pGetConsoleWindow == NULL) {
+		pGetConsoleWindow = GetConsoleWindowLocal;
+	}
+}

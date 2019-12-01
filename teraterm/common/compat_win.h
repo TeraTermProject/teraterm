@@ -96,6 +96,7 @@ extern int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
 extern int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
 extern BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
 extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
+extern HWND (WINAPI *pGetConsoleWindow)(void);
 
 #ifdef UNICODE
 #define pAddFontResourceEx		pAddFontResourceExW
