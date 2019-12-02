@@ -513,6 +513,8 @@ static IShellLink *make_shell_link(const char *appname,
 			OutputDebugPrintf("Release shell link failed. (%ld)\n", result);
 	}
 
+	free(app_path);
+
 	return ret;
 }
 
