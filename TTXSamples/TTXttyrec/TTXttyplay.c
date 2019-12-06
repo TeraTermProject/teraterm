@@ -24,6 +24,14 @@
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
+enum ParseMode {
+  MODE_FIRST,
+  MODE_ESC,
+  MODE_CSI,
+  MODE_STRING,
+  MODE_STR_ESC
+};
+
 struct recheader {
 	struct timeval tv;
 	int len;
@@ -241,46 +249,92 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 	char tmpbuff[2048];
 	unsigned int spos, dpos;
 	char *ptr;
+	enum ParseMode mode = MODE_FIRST;
 	BOOL speed_changed = FALSE;
 
 	ptr = (char *)buff;
 	*wbytes = 0;
 
 	for (spos = dpos = 0; spos < len; spos++, ptr++) {
-		switch (*ptr) {
-		  case '1':
-			pvar->speed = 0;
-			speed_changed = TRUE;
-			break;
-		  case 'f':
-		  case 'F':
-		  case '+':
-			if (pvar->speed < 8) {
-				pvar->speed++;
+		switch (mode) {
+		case MODE_FIRST:
+			switch (*ptr) {
+			  case '1':
+				pvar->speed = 0;
 				speed_changed = TRUE;
-			}
-			break;
-		  case 's':
-		  case 'S':
-		  case '-':
-			if (pvar->speed > -8) {
-				pvar->speed--;
+				break;
+			  case 'f':
+			  case 'F':
+			  case '+':
+				if (pvar->speed < 8) {
+					pvar->speed++;
+					speed_changed = TRUE;
+				}
+				break;
+			  case 's':
+			  case 'S':
+			  case '-':
+				if (pvar->speed > -8) {
+					pvar->speed--;
+					speed_changed = TRUE;
+				}
+				break;
+			  case 'p':
+			  case 'P':
+				pvar->pause = !(pvar->pause);
 				speed_changed = TRUE;
+				break;
+			  case ' ':
+			  case '.':
+				pvar->wait.tv_sec = 0;
+				break;
+			  case ESC:
+				mode = MODE_ESC;
+				break;
+			  default:
+				if (dpos < sizeof(tmpbuff)) {
+					tmpbuff[dpos++] = *ptr;
+				}
 			}
 			break;
-		  case 'p':
-		  case 'P':
-			pvar->pause = !(pvar->pause);
-			speed_changed = TRUE;
-			break;
-		  case ' ':
-		  case '.':
-			pvar->wait.tv_sec = 0;
-			break;
-		  default:
-			if (dpos < sizeof(tmpbuff)) {
-				tmpbuff[dpos++] = *ptr;
+		case MODE_ESC:
+			switch (*ptr) {
+			case '[':
+				mode = MODE_CSI;
+				break;
+			case 'P': // DCS
+			case ']': // OSC
+			case 'X': // SOS
+			case '^': // PM
+			case '_': // APC
+				mode = MODE_STRING;
+				break;
+			default:
+				mode = MODE_FIRST;
+				break;
 			}
+			break;
+		case MODE_CSI:
+			if (*ptr < ' ' || *ptr > '?') {
+				mode = MODE_FIRST;
+			}
+			break;
+		case MODE_STRING:
+			if (*ptr == ESC) {
+				mode = MODE_STR_ESC;
+			}
+			else if (*ptr == BEL) {
+				mode = MODE_FIRST;
+			}
+			break;
+		case MODE_STR_ESC:
+			if (*ptr == '\\') {
+				mode = MODE_FIRST;
+			}
+			else if (*ptr != ESC) {
+				mode = MODE_STRING;
+			}
+			break;
 		}
 	}
 
