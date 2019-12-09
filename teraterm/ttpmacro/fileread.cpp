@@ -195,6 +195,40 @@ wchar_t *LoadFileWA(const char *FileName, size_t *_len)
 
 /**
  *	ファイルをメモリに読み込む
+ *	中身はwchar_tに変換される
+ *
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *						NULLのときは長さを返さない
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
+ */
+wchar_t *LoadFileWW(const wchar_t *FileName, size_t *_len)
+{
+	if (_len != NULL) {
+		*_len = 0;
+	}
+	FILE *fp = _wfopen(FileName, L"rb");
+	if (fp == NULL) {
+		return NULL;
+	}
+	char *u8 = LoadFileU8(fp, NULL);
+	fclose(fp);
+	if (u8 == NULL) {
+		return NULL;
+	}
+	wchar_t *u16 = ToWcharU8(u8);
+	free(u8);
+	if (u16 == NULL) {
+		return NULL;
+	}
+	if (_len != NULL) {
+		*_len = wcslen(u16);
+	}
+	return u16;
+}
+
+/**
+ *	ファイルをメモリに読み込む
  *	中身はANSI Codepageに変換される
  *
  *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)

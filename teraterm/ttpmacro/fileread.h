@@ -34,6 +34,7 @@ char *LoadFileU8A(const char *FileName, size_t *_len);
 char *LoadFileU8T(const TCHAR *FileName, size_t *_len);
 wchar_t *LoadFileWA(const char *FileName, size_t *_len);
 char *LoadFileAA(const char *FileName, size_t *_len);
+wchar_t *LoadFileWW(const wchar_t *FileName, size_t *_len);
 
 #ifdef __cplusplus
 }
