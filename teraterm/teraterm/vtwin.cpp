@@ -5163,38 +5163,29 @@ error:;
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openDirectoryWithExplorer(char *path)
+static BOOL openDirectoryWithExplorer(const wchar_t *path)
 {
 	LPSHELLFOLDER pDesktopFolder;
 	LPMALLOC pMalloc;
 	LPITEMIDLIST pIDL;
-	WCHAR pwszDisplayName[1024];
-	size_t szRet, DisplayNameMax;
 	SHELLEXECUTEINFO si;
 	BOOL ret = FALSE;
 
-	DisplayNameMax = sizeof(pwszDisplayName) / sizeof(pwszDisplayName[0]);
-
 	if (SHGetDesktopFolder(&pDesktopFolder) == S_OK) {
 		if (SHGetMalloc(&pMalloc) == S_OK) {
-			szRet = mbstowcs(pwszDisplayName, path, DisplayNameMax - 1);
-			if (szRet != -1) {
-				pwszDisplayName[szRet] = L'\0';
+			if (pDesktopFolder->ParseDisplayName(NULL, NULL, (LPWSTR)path, NULL, &pIDL, NULL) == S_OK) {
+				::ZeroMemory(&si, sizeof(si));
+				si.cbSize = sizeof(si);
+				si.fMask = SEE_MASK_IDLIST;
+				si.lpVerb = _T("open");
+				si.lpIDList = pIDL;
+				si.nShow = SW_SHOWNORMAL;
+				::ShellExecuteEx(&si);
+				pMalloc->Free((void *)pIDL);
 
-				if (pDesktopFolder->ParseDisplayName(NULL, NULL, pwszDisplayName, NULL, &pIDL, NULL) == S_OK) {
-					::ZeroMemory(&si, sizeof(si));
-					si.cbSize = sizeof(si);
-					si.fMask = SEE_MASK_IDLIST;
-					si.lpVerb = _T("open");
-					si.lpIDList = pIDL;
-					si.nShow = SW_SHOWNORMAL;
-					::ShellExecuteEx(&si);
-					pMalloc->Free((void*)pIDL);
-
-					ret = TRUE;
-				}
-
+				ret = TRUE;
 			}
+
 			pMalloc->Release();
 		}
 		pDesktopFolder->Release();
@@ -5203,14 +5194,15 @@ static BOOL openDirectoryWithExplorer(char *path)
 	return (ret);
 }
 
-
 //
 // フォルダもしくはファイルを開く。
 //
 static void openFileDirectory(char *path, char *filename, BOOL open_directory_only, char *open_editor)
 {
 	if (open_directory_only) {
-		openDirectoryWithExplorer(path);
+		wchar_t *pathW = ToWcharA(path);
+		openDirectoryWithExplorer(pathW);
+		free(pathW);
 	}
 	else {
 		openFileWithApplication(path, filename, open_editor);
