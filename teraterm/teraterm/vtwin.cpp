@@ -93,7 +93,6 @@
 #include "codeconv.h"
 #include "layer_for_unicode.h"
 #include "sendmem.h"
-#include "../ttpmacro/fileread.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -1838,22 +1837,18 @@ static void EscapeFilename(const wchar_t *src, wchar_t *dest)
 static void PasteString(PComVar cv, const wchar_t *str, bool escape)
 {
 	wchar_t *ptr = (wchar_t *)str;
-	wchar_t *tmpbuf = NULL;
-	if (escape) {
+	wchar_t *tmpbuf;
+	if (!escape) {
+		tmpbuf = _wcsdup(str);
+	}
+	else {
 		const size_t len = wcslen(str) * sizeof(wchar_t) * 2;
 		tmpbuf = (wchar_t *)malloc(len);
 		EscapeFilename(str, tmpbuf);
 		ptr = tmpbuf;
 	}
 
-	// consoleへ送信
-	const size_t len = wcslen(ptr);
-	CommTextOutW(cv, ptr, len);
-	if (ts.LocalEcho > 0) {
-		CommTextEchoW(cv, ptr, len);
-	}
-
-	if (tmpbuf != NULL) free(tmpbuf);
+	SendMemPasteString(tmpbuf);
 }
 
 /* 入力はファイルのみ(フォルダは含まれない) */
@@ -1899,16 +1894,6 @@ void CVTWindow::DropListFree()
 		DropLists = NULL;
 		DropListCount = 0;
 	}
-}
-
-static void sendfile(const wchar_t *filename, BOOL binary)
-{
-	char *FileNameA = ToCharW(filename);
-	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileNameA,  _TRUNCATE);
-	free(FileNameA);
-	SendVar->DirLen = 0;
-	ts.TransBin = binary == FALSE ? 0 : 1;
-	FileSendStart();
 }
 
 LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
@@ -2039,7 +2024,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		case DROP_TYPE_SEND_FILE:
 		case DROP_TYPE_SEND_FILE_BINARY:
 			if (SendVar==NULL && NewFileVar(&SendVar)) {
-				sendfile(FileName, DropType == DROP_TYPE_SEND_FILE ? 0 : 1);
+				SendMemSendFile(FileName, DropType == DROP_TYPE_SEND_FILE ? FALSE : TRUE);
 			}
 			break;
 		case DROP_TYPE_PASTE_FILENAME:
@@ -4525,17 +4510,7 @@ void CVTWindow::OnFileSend()
 	}
 
 	wchar_t *filename = data.filename;
-	size_t str_len;
-	wchar_t *str_ptr = LoadFileWW(filename, &str_len);
-	if (str_ptr != NULL) {
-		str_len *= sizeof(wchar_t);
-
-		SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
-		SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
-		SendMemInitDialogCaption(sm, L"send file");			// title
-		SendMemInitDialogFilename(sm, filename);
-		SendMemStart(sm);
-	}
+	SendMemSendFile(filename, data.binary);
 	free(filename);
 #endif
 }

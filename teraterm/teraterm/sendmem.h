@@ -50,6 +50,10 @@ void SendMemInitDialogFilename(SendMem *sm, const wchar_t *filename);
 BOOL SendMemStart(SendMem *sm);		// 送信開始
 void SendMemFinish(SendMem *sm);
 
+// convenient function
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary);
+BOOL SendMemPasteString(wchar_t *str);
+
 // idleからの送信用API
 void SendMemContinuously(void);
 

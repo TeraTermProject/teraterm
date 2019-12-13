@@ -35,6 +35,18 @@
 #include "ttcommon.h"
 #include "ftdlg_lite.h"
 
+#include "ttwinman.h"		// for ts
+
+#define	SENDMEM_USE_OLD_API	0
+
+#if SENDMEM_USE_OLD_API
+#include "ttftypes.h"		// for TFileVar
+#include "filesys.h"		// for SendVar
+#include "codeconv.h"		// for ToCharW()
+#else
+#include "../ttpmacro/fileread.h"
+#endif
+
 #include "sendmem.h"
 
 // ‘—M’†‚ÉVTWIN‚É”r‘¼‚ð‚©‚¯‚é
@@ -489,4 +501,55 @@ void SendMemFinish(SendMem *sm)
 {
 	free(sm->UILanguageFile);
 	free(sm);
+}
+
+#if SENDMEM_USE_OLD_API
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
+{
+	char *FileNameA = ToCharW(filename);
+	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileNameA,  _TRUNCATE);
+	free(FileNameA);
+
+	SendVar->DirLen = 0;
+	ts.TransBin = binary == FALSE ? 0 : 1;
+	FileSendStart();
+	return TRUE;
+}
+#else
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
+{
+	binary = FALSE;
+
+	size_t str_len;
+	wchar_t *str_ptr = LoadFileWW(filename, &str_len);
+	if (str_ptr == NULL) {
+		return FALSE;
+	}
+	str_len *= sizeof(wchar_t);
+
+	SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
+	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
+	SendMemInitDialogCaption(sm, L"send file");			// title
+	SendMemInitDialogFilename(sm, filename);
+	SendMemStart(sm);
+	return TRUE;
+}
+#endif
+
+/**
+ *	’Z‚¢•¶Žš—ñ‚ð‘—M‚·‚é
+ *	@param[in]	str		malloc‚³‚ê‚½—Ìˆæ‚Ì•¶Žš—ñ
+ *						‘—MŒã free() ‚³‚ê‚é
+ *	TODO
+ *		CBSendStart() @clipboar.c ‚Æ“‡
+ */
+BOOL SendMemPasteString(wchar_t *str)
+{
+	const size_t len = wcslen(str);
+	CommTextOutW(&cv, str, len);
+	if (ts.LocalEcho > 0) {
+		CommTextEchoW(&cv, str, len);
+	}
+
+	return TRUE;
 }
