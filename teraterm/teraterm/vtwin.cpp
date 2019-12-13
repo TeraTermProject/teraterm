@@ -544,9 +544,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WNDCLASS wc;
 	RECT rect;
 	DWORD Style;
-#ifdef ALPHABLEND_TYPE2
-	DWORD ExStyle;
-#endif
 	char *Param;
 	int CmdShow;
 #ifdef SHARED_KEYMAP
@@ -739,7 +736,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI
 	if(BGNoFrame && ts.HideTitle > 0) {
-		ExStyle  = ::GetWindowLongPtr(HVTWin,GWL_EXSTYLE);
+		DWORD ExStyle = (DWORD)::GetWindowLongPtr(HVTWin,GWL_EXSTYLE);
 		ExStyle &= ~WS_EX_CLIENTEDGE;
 		::SetWindowLongPtr(HVTWin,GWL_EXSTYLE,ExStyle);
 	}
@@ -3433,8 +3430,8 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style,ExStyle;
 	HMENU SysMenu;
 
-	Style = ::GetWindowLongPtr (HVTWin, GWL_STYLE);
-	ExStyle = ::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
+	Style = (DWORD)::GetWindowLongPtr (HVTWin, GWL_STYLE);
+	ExStyle = (DWORD)::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	if (TBar == (ts.HideTitle==0)) {
 		return 0;
@@ -6494,8 +6491,8 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	int NewWindowWidth;
 	int NewWindowHeight;
 	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
-		const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-		const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+		const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
 		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
 		if (pAdjustWindowRectExForDpi != NULL) {
