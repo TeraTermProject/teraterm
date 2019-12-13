@@ -4527,17 +4527,15 @@ void CVTWindow::OnFileSend()
 	wchar_t *filename = data.filename;
 	size_t str_len;
 	wchar_t *str_ptr = LoadFileWW(filename, &str_len);
-	if (str_ptr == NULL) {
-		goto finish;
-	}
-	str_len *= sizeof(wchar_t);
+	if (str_ptr != NULL) {
+		str_len *= sizeof(wchar_t);
 
-	SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
-	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
-	SendMemInitDialogCaption(sm, L"send file");			// title
-	SendMemInitDialogFilename(sm, filename);
-	SendMemStart(sm);
-finish:
+		SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
+		SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
+		SendMemInitDialogCaption(sm, L"send file");			// title
+		SendMemInitDialogFilename(sm, filename);
+		SendMemStart(sm);
+	}
 	free(filename);
 #endif
 }
