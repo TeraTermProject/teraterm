@@ -994,7 +994,7 @@ void logputs(int level, char *msg)
 			char tmp[26];
 
 			_write(file, strtime, strlen(strtime));
-			GetWindowThreadProcessId(pvar->cv->HWin, &processid);
+			processid = GetCurrentProcessId();
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, " [%lu] ",processid);
 			_write(file, tmp, strlen(tmp));
 			_write(file, msg, strlen(msg));

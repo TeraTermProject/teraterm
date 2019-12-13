@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2019-09-11)
+﻿; Updated by TeraTerm Project (2019-11-22)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -9,9 +9,11 @@ MENU_FILE_NEW=&New connection...\tAlt+N
 MENU_FILE_DUPLICATE=D&uplicate session\tAlt+D
 MENU_FILE_GYGWIN=Cy&gwin connection\tAlt+G
 MENU_FILE_LOG=&Log...
+MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=C&omment to Log...
 MENU_FILE_VIEWLOG=&View Log
 MENU_FILE_SHOWLOGDIALOG=Sho&w Log dialog...
+MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Send file...
 MENU_FILE_CHANGEDIR=&Change directory...
 MENU_FILE_REPLAYLOG=&Replay Log...
@@ -212,6 +214,7 @@ DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=read/write
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=read only
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=write only
 DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notify clipboard access from remote
+DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=Accept clearing &scroll buffer from remote
 
 DLG_TAB_COPYPASTE_CONTINUE=Enable continued &line copy
 DLG_TAB_COPYPASTE_MOUSEPASTE=&Disable mouse R button paste

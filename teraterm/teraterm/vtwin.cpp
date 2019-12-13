@@ -1038,6 +1038,10 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 static char LogMeTTMenuString[] = "Log&MeTT";
 static char LogMeTT[MAX_PATH];
 
+#define IS_LOGMETT_NOTFOUND     0
+#define IS_LOGMETT_FOUND        1
+#define IS_LOGMETT_UNKNOWN      2
+
 static BOOL isLogMeTTExist()
 {
 	const char *LogMeTTexename = "LogMeTT.exe";
@@ -1048,6 +1052,12 @@ static BOOL isLogMeTTExist()
 	DWORD dwType;
 	DWORD dwDisposition;
 	char *path;
+
+	static int status = IS_LOGMETT_UNKNOWN;
+
+	if (status != IS_LOGMETT_UNKNOWN) {
+		return status == IS_LOGMETT_FOUND;
+	}
 
 	/* LogMeTT 2.9.6からはレジストリにインストールパスが含まれる。*/
 	result = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\LogMeTT", 0, NULL,
@@ -1075,8 +1085,10 @@ static BOOL isLogMeTTExist()
 	}
 
 	if (_access(LogMeTT, 0) == -1) {
+		status = IS_LOGMETT_NOTFOUND;
 		return FALSE;
 	}
+	status = IS_LOGMETT_FOUND;
 	return TRUE;
 }
 
@@ -1097,6 +1109,8 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_COMMENTTOLOG, "MENU_FILE_COMMENTLOG" },
 		{ ID_FILE_VIEWLOG, "MENU_FILE_VIEWLOG" },
 		{ ID_FILE_SHOWLOGDIALOG, "MENU_FILE_SHOWLOGDIALOG" },
+		{ ID_FILE_PAUSELOG, "MENU_FILE_PAUSELOG" },
+		{ ID_FILE_STOPLOG, "MENU_FILE_STOPLOG" },
 		{ ID_FILE_SENDFILE, "MENU_FILE_SENDFILE" },
 		{ ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG" },
 		{ ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR" },
@@ -1105,7 +1119,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT" },
 		{ ID_FILE_EXIT, "MENU_FILE_EXIT" },
 		{ ID_FILE_EXITALL, "MENU_FILE_EXITALL" },
-		{ 9, "MENU_TRANS" },
+		{ 11, "MENU_TRANS" },
 		{ ID_FILE_KERMITRCV, "MENU_TRANS_KERMIT_RCV" },
 		{ ID_FILE_KERMITGET, "MENU_TRANS_KERMIT_GET" },
 		{ ID_FILE_KERMITSEND, "MENU_TRANS_KERMIT_SEND" },
@@ -1256,11 +1270,23 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(FileMenu,ID_FILE_STOPLOG, MF_BYCOMMAND | MF_ENABLED);
+			if (cv.FilePause & OpLog) {
+				CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_CHECKED);
+			}
+			else {
+				CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_UNCHECKED);
+			}
 		} else {
 			EnableMenuItem(FileMenu,ID_FILE_LOG,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(FileMenu,ID_FILE_STOPLOG, MF_BYCOMMAND | MF_GRAYED);
+
+			CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_UNCHECKED);
 		}
 
 	}
@@ -4165,6 +4191,17 @@ void CVTWindow::OnShowLogDialog()
 	ShowFTDlg(OpLog);
 }
 
+// ログ取得を中断/再開する
+void CVTWindow::OnPauseLog()
+{
+	FLogChangeButton(!(cv.FilePause & OpLog));
+}
+
+// ログ取得を終了する
+void CVTWindow::OnStopLog()
+{
+	FileTransEnd(OpLog);
+}
 
 // ログの再生 (2006.12.13 yutaka)
 void CVTWindow::OnReplayLog()
@@ -6481,12 +6518,37 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	//AdjustScrollBar();
 
 	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
-	const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-	const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-	RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
-	pAdjustWindowRectExForDpi(&Rect, Style, TRUE/*menu*/, ExStyle, NewDPI);
-	const int NewWindowWidth = Rect.right - Rect.left;
-	const int NewWindowHeight = Rect.bottom - Rect.top;
+	int NewWindowWidth;
+	int NewWindowHeight;
+	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
+		const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+		const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
+		if (pAdjustWindowRectExForDpi != NULL) {
+			// Windows 10, version 1607+
+			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
+		}
+		else {
+			// Windows 2000+
+			pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+		}
+		NewWindowWidth = Rect.right - Rect.left;
+		NewWindowHeight = Rect.bottom - Rect.top;
+	}
+	else {
+		// WM_DPICHANGEDが発生しない環境のはず、念の為実装
+		RECT WindowRect;
+		GetWindowRect(&WindowRect);
+		const int WindowWidth = WindowRect.right - WindowRect.left;
+		const int WindowHeight = WindowRect.bottom - WindowRect.top;
+		RECT ClientRect;
+		GetClientRect(&ClientRect);
+		const int ClientWidth =  ClientRect.right - ClientRect.left;
+		const int ClientHeight = ClientRect.bottom - ClientRect.top;
+		NewWindowWidth = WindowWidth - ClientWidth + ScreenWidth;
+		NewWindowHeight = WindowHeight - ClientHeight + ScreenHeight;
+	}
 
 	// 新しいウィンドウ領域候補
 	RECT NewWindowRect[5];
@@ -6774,6 +6836,8 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_COMMENTTOLOG: OnCommentToLog(); break;
 		case ID_FILE_VIEWLOG: OnViewLog(); break;
 		case ID_FILE_SHOWLOGDIALOG: OnShowLogDialog(); break;
+		case ID_FILE_PAUSELOG: OnPauseLog(); break;
+		case ID_FILE_STOPLOG: OnStopLog(); break;
 		case ID_FILE_REPLAYLOG: OnReplayLog(); break;
 		case ID_FILE_SENDFILE: OnFileSend(); break;
 		case ID_FILE_KERMITRCV: OnFileKermitRcv(); break;

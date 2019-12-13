@@ -796,7 +796,6 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DESTROY:
 		OnDestroy();
-		PostQuitMessage(0);
 		break;
 	case WM_GETMINMAXINFO:
 		OnGetMinMaxInfo((MINMAXINFO *)lp);

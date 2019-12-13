@@ -113,6 +113,8 @@ BEGIN
     COMBOBOX        IDC_CLIPBOARD_ACCESS,162,114,45,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "&Notify clipboard access from remote",IDC_CLIPBOARD_NOTIFY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,130,220,10
+    CONTROL         "Accept clearing &scroll buffer from remote",IDC_ACCEPT_CLEAR_SBUFF,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,145,220,10
 END
 
 IDD_TABSHEET_COPYPASTE DIALOGEX 0, 0, 258, 194
@@ -539,9 +541,11 @@ BEGIN
         MENUITEM "Cy&gwin connection\tAlt+G",   ID_FILE_CYGWINCONNECTION
         MENUITEM SEPARATOR
         MENUITEM "&Log...",                     ID_FILE_LOG
+        MENUITEM "Pause Logg&ing",              ID_FILE_PAUSELOG
         MENUITEM "C&omment to Log...",          ID_FILE_COMMENTTOLOG
         MENUITEM "&View Log",                   ID_FILE_VIEWLOG
         MENUITEM "Sho&w Log dialog...",         ID_FILE_SHOWLOGDIALOG
+        MENUITEM "Stop Logging (&Q)",           ID_FILE_STOPLOG
         MENUITEM "&Send file...",               ID_FILE_SENDFILE
         POPUP "&Transfer"
         BEGIN

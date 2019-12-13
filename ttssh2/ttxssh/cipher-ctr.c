@@ -471,18 +471,6 @@ ssh_camellia_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
-void
-ssh_camellia_ctr_iv(EVP_CIPHER_CTX *evp, int doset, unsigned char * iv, unsigned int len)
-{
-	struct ssh_camellia_ctr_ctx *c;
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(evp)) != NULL)
-		if(doset)
-			memcpy(c->camellia_counter, iv, len);
-		else
-			memcpy(iv, c->camellia_counter, len);
-}
-
 const EVP_CIPHER *
 evp_camellia_128_ctr(void)
 {

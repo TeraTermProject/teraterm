@@ -711,7 +711,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
-	char Temp[MAX_PATH], Temp2[MAX_PATH];
+	char Temp[MAX_PATH], Temp2[MAX_PATH], *p;
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -729,9 +729,23 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	ts->DisableTCPEchoCR = FALSE;
 
-	/* Version number */
-/*  GetPrivateProfileString(Section,"Version","",
-			  Temp,sizeof(Temp),FName); */
+	/*
+	 * Version number
+	 * 設定ファイルがどのバージョンの Tera Term で保存されたかを表す
+	 * 設定ファイルの保存時はこの値ではなく、現在の Tera Term のバージョンが使われる
+	 */
+	GetPrivateProfileString(Section, "Version", TT_VERSION_STR("."), Temp, sizeof(Temp), FName);
+	p = strchr(Temp, '.');
+	if (p) {
+		*p++ = 0;
+		ts->ConfigVersion = atoi(Temp) * 10000 + atoi(p);
+	}
+	else {
+		ts->ConfigVersion = 0;
+	}
+
+	// TTX で 確認できるよう、Tera Term のバージョンを格納しておく
+	ts->RunningVersion = TT_VERSION_MAJOR * 10000 + TT_VERSION_MINOR;
 
 	/* Language */
 	GetPrivateProfileString(Section, "Language", "",
@@ -1999,6 +2013,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	}
 
 	// Clipboard Access from Remote
+	ts->CtrlFlag &= ~CSF_CBMASK;
 	GetPrivateProfileString(Section, "ClipboardAccessFromRemote", "off", Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "readwrite") == 0)
 		ts->CtrlFlag |= CSF_CBRW;
@@ -2006,6 +2021,8 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->CtrlFlag |= CSF_CBREAD;
 	else if (_stricmp(Temp, "write") == 0)
 		ts->CtrlFlag |= CSF_CBWRITE;
+	else
+		ts->CtrlFlag |= CSF_CBNONE; // 実質何もしない
 
 	// Notify Clipboard Access from Remote
 	ts->NotifyClipboardAccess = GetOnOff(Section, "NotifyClipboardAccess", FName, TRUE);
@@ -2209,6 +2226,14 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->TerminalOutputSpeed = i;
 	else
 		ts->TerminalOutputSpeed = ts->TerminalInputSpeed;
+
+	// Clear scroll buffer from remote -- special option
+	if (GetOnOff(Section, "ClearScrollBufferFromRemote", FName, TRUE))
+		ts->TermFlag |= TF_REMOTECLEARSBUFF;
+
+	// Delay for start of mouse selection
+	ts->SelectStartDelay =
+		GetPrivateProfileInt(Section, "MouseSelectStartDelay", 0, FName);
 
 	// Fallback to CP932 (Experimental)
 	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
@@ -3356,7 +3381,7 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "TabStopModifySequence", Temp, FName);
 
 	// Clipboard Access from Remote
-	switch (ts->CtrlFlag & CSF_CBRW) {
+	switch (ts->CtrlFlag & CSF_CBMASK) {
 	case CSF_CBREAD:
 		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "read", FName);
 		break;
@@ -3529,6 +3554,13 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		WriteInt2(Section, "TerminalSpeed", FName,
 			ts->TerminalInputSpeed, ts->TerminalOutputSpeed);
 	}
+
+	// Clear scroll buffer from remote -- special option
+	WriteOnOff(Section, "ClearScrollBufferFromRemote", FName,
+		(WORD) (ts->PasteFlag & TF_REMOTECLEARSBUFF));
+
+	// Delay for start of mouse selection
+	WriteInt(Section, "MouseSelectStartDelay", FName, ts->SelectStartDelay);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
@@ -4277,6 +4309,17 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		else if (_stricmp(Temp, "/NOLOG") == 0) {	/* disable auto logging */
 			ts->LogFN[0] = '\0';
 			ts->LogAutoStart = 0;
+		}
+		else if (_strnicmp(Temp, "/OSC52=", 7) == 0) {	/* Clipboard access */
+			ts->CtrlFlag &= ~CSF_CBMASK;
+			if (_stricmp(&Temp[7], "on") == 0 || _stricmp(&Temp[7], "readwrite") == 0)
+				ts->CtrlFlag |= CSF_CBRW;
+			else if (_stricmp(&Temp[7], "read") == 0)
+				ts->CtrlFlag |= CSF_CBREAD;
+			else if (_stricmp(&Temp[7], "write") == 0)
+				ts->CtrlFlag |= CSF_CBWRITE;
+			else if (_stricmp(&Temp[7], "off") == 0)
+				ts->CtrlFlag |= CSF_CBNONE;
 		}
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;

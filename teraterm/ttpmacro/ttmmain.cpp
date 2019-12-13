@@ -81,17 +81,15 @@ static void ScreenToClient(HWND hWnd, RECT *rect)
 }
 
 // CCtrlWindow dialog
-CCtrlWindow::CCtrlWindow()
+CCtrlWindow::CCtrlWindow(HINSTANCE hInst)
 {
-	HINSTANCE hInst = GetInstance();
+	m_hInst = hInst;
 	m_hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_TTMACRO));
 }
 
 BOOL CCtrlWindow::Create()
 {
-	HINSTANCE hInst = GetInstance();
-	HWND parent = NULL;
-	if (! TTCDialog::Create(hInst, parent, CCtrlWindow::IDD)) {
+	if (! TTCDialog::Create(m_hInst, NULL, CCtrlWindow::IDD)) {
 		PostQuitMessage(0);
 		return FALSE;
 	}
@@ -244,27 +242,6 @@ BOOL CCtrlWindow::OnIdle()
 	return FALSE;
 }
 
-#if 0
-BEGIN_MESSAGE_MAP(CCtrlWindow, CDialog)
-	//{{AFX_MSG_MAP(CCtrlWindow)
-	ON_WM_CLOSE()
-	ON_WM_DESTROY()
-	ON_WM_ERASEBKGND()
-	ON_WM_PAINT()
-	ON_WM_SIZE()
-	ON_WM_GETMINMAXINFO()
-	ON_WM_QUERYDRAGICON()
-	ON_WM_SYSCOLORCHANGE()
-	ON_WM_TIMER()
-	ON_MESSAGE(WM_USER_DDECMNDEND,OnDdeCmndEnd)
-	ON_MESSAGE(WM_USER_DDECOMREADY,OnDdeComReady)
-	ON_MESSAGE(WM_USER_DDEREADY,OnDdeReady)
-	ON_MESSAGE(WM_USER_MACROBRINGUP,OnMacroBringup)
-	ON_MESSAGE(WM_USER_DDEEND,OnDdeEnd)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-#endif
-
 // CCtrlWindow message handler
 
 BOOL CCtrlWindow::OnInitDialog()
@@ -273,41 +250,26 @@ BOOL CCtrlWindow::OnInitDialog()
 		{ IDC_CTRLPAUSESTART, "BTN_PAUSE" },
 		{ IDC_CTRLEND, "BTN_END" },
 	};
-	HDC TmpDC;
-	int CRTWidth, CRTHeight;
-	RECT Rect;
 	char Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
 	BOOL IOption, VOption;
 	int CmdShow;
 	int fuLoad = LR_DEFAULTCOLOR;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
-	HINSTANCE hInst = GetInstance();
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
 	Pause = FALSE;
 
-	// センターに持っていく
-	TmpDC = ::GetDC(GetSafeHwnd());
-	CRTWidth = ::GetDeviceCaps(TmpDC,HORZRES);
-	CRTHeight = ::GetDeviceCaps(TmpDC,VERTRES);
-	::GetWindowRect(m_hWnd, &Rect);
-	::ReleaseDC(GetSafeHwnd(), TmpDC);
-	::SetWindowPos(GetSafeHwnd(),HWND_TOP,
-	               (CRTWidth-Rect.right+Rect.left) / 2,
-	               (CRTHeight-Rect.bottom+Rect.top) / 2,
-	               0,0,SWP_NOSIZE | SWP_NOZORDER);
-
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(hInst,
+	              (LPARAM)LoadImage(m_hInst,
 	                                MAKEINTRESOURCE(IDI_TTMACRO),
 	                                IMAGE_ICON,16,16,fuLoad));
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(hInst,
+	              (LPARAM)LoadImage(m_hInst,
 	                                MAKEINTRESOURCE(IDI_TTMACRO),
 	                                IMAGE_ICON,0,0,fuLoad));
 
@@ -364,6 +326,8 @@ BOOL CCtrlWindow::OnInitDialog()
 		WS_CHILD | WS_VISIBLE |
 		CCS_BOTTOM | SBARS_SIZEGRIP, NULL, GetSafeHwnd(), 1);
 
+	CenterWindow(m_hWnd, NULL);
+
 	if (VOption) {
 		return TRUE;
 	}
@@ -378,13 +342,12 @@ BOOL CCtrlWindow::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CCtrlWindow::OnCancel( )
+// ダイアログ上にキャンセルボタン IDCANCEL がないので、
+// ESCが押されたときだけ呼び出される
+BOOL CCtrlWindow::OnCancel()
 {
-#if 1
-	::DestroyWindow(m_hStatus);
-	DestroyWindow();
-#endif
-	return TRUE;	// cancel(ESC押下)を無視
+	// 何もせずにTRUEを返す -> ESCキーを無効化
+	return TRUE;
 }
 
 BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -414,8 +377,7 @@ BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 BOOL CCtrlWindow::OnClose()
 {
-	EndTTL();
-	EndDDE();
+	DestroyWindow();
 	return TRUE;
 }
 
@@ -425,7 +387,7 @@ void CCtrlWindow::OnDestroy()
 
 	EndTTL();
 	EndDDE();
-//	CDialog::OnDestroy();
+	::DestroyWindow(m_hStatus);
 }
 
 // for icon drawing in Win NT 3.5
@@ -529,13 +491,6 @@ HCURSOR CCtrlWindow::OnQueryDragIcon()
 	return m_hIcon;
 }
 
-#if 0
-void CCtrlWindow::OnSysColorChange()
-{
-	CDialog::OnSysColorChange();
-}
-#endif
-
 void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	BOOL TimeOut;
@@ -618,16 +573,6 @@ BOOL CCtrlWindow::PostNcDestroy()
 	PostQuitMessage(0);
 	return TRUE;
 }
-
-#if 0
-BOOL CCtrlWindow::PreTranslateMessage(MSG* pMsg)
-{
-	if ((pMsg->message==WM_KEYDOWN) && (pMsg->wParam==VK_ESCAPE)) { // ignore ESC key
-		return FALSE;
-	}
-	return CDialog::PreTranslateMessage(pMsg);
-}
-#endif
 
 LRESULT CCtrlWindow::OnDdeCmndEnd(WPARAM wParam, LPARAM lParam)
 {
@@ -752,11 +697,6 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg)
 	{
-#if 0	// tmfcで処理される
-	case WM_CLOSE:
-		OnClose();
-		break;
-#endif
 	case WM_DESTROY:
 		OnDestroy();
 		PostQuitMessage(0);
@@ -768,15 +708,11 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 		OnPaint();
 		break;
 	case WM_SIZE:
-		OnSize(wp, LOWORD(lp), HIWORD(lp));
+		OnSize((UINT)wp, LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_GETMINMAXINFO:
 		OnGetMinMaxInfo((MINMAXINFO *)lp);
 		break;
-#if 0
-	case WM_QUERYDRAGICON:
-	case WM_SYSCOLORCHANGE:
-#endif
 	case WM_TIMER:
 		OnTimer(wp);
 		break;

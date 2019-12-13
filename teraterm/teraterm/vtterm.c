@@ -32,10 +32,13 @@
 #include "tttypes.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <mbstring.h>
 #include <locale.h>
 #include <ctype.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #include <tchar.h>
 #include <assert.h>
@@ -56,14 +59,6 @@
 #include "codeconv.h"
 
 #include "vtterm.h"
-
-#ifdef _DEBUG
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
 
 #include "unicode_test.h"
 
@@ -1819,6 +1814,12 @@ void CSScreenErase()
 			}
 		}
 		break;
+
+	  case 3:
+		if (ts.TermFlag & TF_REMOTECLEARSBUFF) {
+			ClearBuffer();
+		}
+		break;
 	}
 }
 
@@ -1839,6 +1840,12 @@ void CSQSelScreenErase()
 	  case 2:
 		// Erase entire screen
 		BuffSelectedEraseScreen();
+		break;
+
+	  case 3:
+		if (ts.TermFlag & TF_REMOTECLEARSBUFF) {
+			ClearBuffer();
+		}
 		break;
 	}
 }
@@ -5078,9 +5085,20 @@ void XSequence(BYTE b)
 		  case 1: /* Change icon name */
 		  case 2: /* Change window title */
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
-				strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
-				// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
-				ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
+				if ((ts.KanjiCode == IdUTF8 || ts.KanjiCode == IdUTF8m) || ts.Language == IdUtf8) {
+					char *titleTmp;
+
+					titleTmp = ToCharU8(StrBuff);
+					if (titleTmp) {
+						strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), titleTmp, _TRUNCATE);
+						free(titleTmp);
+					}
+				}
+				else {
+					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
+					// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
+					ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
+				}
 				ChangeTitle();
 			}
 			break;

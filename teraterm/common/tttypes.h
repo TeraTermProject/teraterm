@@ -291,6 +291,7 @@ enum LogTimestampType {
 #define TF_LOCKTUID           1024
 #define TF_INVALIDDECRPSS     2048
 #define TF_PRINTERCTRL        4096
+#define TF_REMOTECLEARSBUFF   8192
 
 // ANSI/Attribute color flags (used in ts.ColorFlag)
 #define CF_PCBOLD16     1
@@ -358,9 +359,11 @@ enum LogTimestampType {
 #define ISO2022_SHIFT_ALL    (ISO2022_LS | ISO2022_LSR | ISO2022_SS)
 
 // Control Sequence flags (used in ts.CtrlFlag)
+#define CSF_CBNONE	0
 #define CSF_CBWRITE     1
 #define CSF_CBREAD      2
 #define CSF_CBRW        (CSF_CBREAD | CSF_CBWRITE)
+#define CSF_CBMASK	CSF_CBRW
 
 // Debug Flags (used in ts.DebugModes)
 #define DBGF_NONE	0
@@ -714,6 +717,9 @@ struct tttset {
 	char DialogFontName[LF_FACESIZE];
 	int DialogFontPoint;
 	int DialogFontCharSet;
+	int ConfigVersion;
+	int RunningVersion;
+	DWORD SelectStartDelay;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

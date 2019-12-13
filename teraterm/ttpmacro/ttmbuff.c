@@ -31,6 +31,9 @@
 
 #include "teraterm.h"
 #include <string.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
 #include <stdlib.h>
 #include <crtdbg.h>
 #include "ttmparse.h"
@@ -38,11 +41,6 @@
 #include "fileread.h"
 
 #include "ttmbuff.h"
-
-#ifdef _DEBUG
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 int EndWhileFlag;
 int BreakFlag;

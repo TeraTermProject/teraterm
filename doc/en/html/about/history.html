@@ -31,18 +31,28 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_4.105">2019.xx.xx (Ver 4.105)</h3>
+<h3 id="teraterm_4.105">2019.12.7 (Ver 4.105)</h3>
 <ul class="history">
   <li>Changes
     <ul>
       <li>Added SFMT information on version dialog.</li>
       <li>Changed of indication from "Protocol" to "IP version" and from "UNSPEC" to "AUTO" on <a href="../menu/file-new.html">New connection dialog</a>.</li>
       <li>When the opacity value of the window is temporarily changed by operating the mouse wheel on the title bar of VT window, the tooltip of the opacity value is shown.</li>
-      <li>The location of resizing toolchip is automatically moved to coordinates after resizing.</li>
+      <li>The location of resizing tooltip is automatically moved to coordinates after resizing.</li>
       <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. When transparency is not available, made opacity not changeable.</li>
-      <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
+      <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
       <li>When the opacity values of the <a href="../menu/setup-additional.html">Additional settings dialog</a> is input over than 255, the value is automatically changed to 255 over the dialog.</li>
       <li>Added support for REP control sequence.</li>
+      <li>Added support for xterm ED 3 (clear scroll buffer) control sequence.
+        <ul>
+          <li>Added the <a href="../menu/setup-additional.html#ed3">"Accept clearing scroll buffer from remote"</a> setting on the <a href="../menu/setup-additional.html#TabControlSequence">Control Sequence tab</a> of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. The default value is off.</li>
+        </ul></li>
+	<li>Added <a href="../commandline/teraterm.html#osc52">/OSC52=</a> command line option for change the <a href="../menu/setup-additional.html#ClipboardAccessFromRemote">"Clipboard access from remote"</a> setting.</li>
+      <li>Added the <a href="../menu/file.html#PauseLog">[Pause Logging]</a> and the <a href="../menu/file.html#StopLog">[Stop Logging]</a> menu into the <a href="../menu/file.html">[File]</a> menu.</li>
+      <li>The start of the text selection with the mouse can be delayed by setting.
+        <ul>
+	  <li>Added the <a href="../setup/teraterm-win.html#delayselect">MouseSelectStartDelay</a> entry in the teraterm.ini file. The default value is 0.</li>
+        </ul></li>
 
       <li>Serial port connection
         <ul>
@@ -55,30 +65,44 @@
           <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
           <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
           <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-          <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed refering to the connection state. </li>
+          <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed referring to the connection state. </li>
           <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
           <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
         </ul>
       </li>
+	  <li>MACRO: When <a href="../macro/command/setdlgpos.html">setdlgpos</a> macro command has no argument, the dialog box is located on the default position.</li>
+	  <li>MACRO: The dialog position specified by <a href="../macro/command/setdlgpos.html">setdlgpos</a> becomes to not be out of range in display.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>The toolchip during resizing can not be displayed on the left and top edge of the desktop. This bug was introduced in 4.103.</li>
-      <li>Eterm look-feel: When a image file is randomly selected with the wallpaper, invalid file may be selected. </li>
-      <li>The help button of File-Log, File-Trasnfer, Setup-Font and Printer dialog does not work well. This bug was introduced in 4.104.</li>
+      <li>The tooltip during resizing can not be displayed on the left and top edge of the desktop. This bug was introduced in 4.103.</li>
+      <li>Eterm look-feel: When an image file is randomly selected with the wallpaper, invalid file may be selected. </li>
+      <li>The help button of File-Log, File-Transfer, Setup-Font and Printer dialog does not work well. This bug was introduced in 4.104.</li>
       <li>Fixed a problem that TTIMESV (Save IME status) / TTIMERS (Restore IME status) control sequences do not work.</li>
-      <li>The help button on the printer dialog can not be shown from Windows 2000 to 10(except Windows95).</li>
+      <li>The help button on the printer dialog can not be shown from Windows 2000 to 10. The help button on the printer dialog can be shown on all Windows except Windows95.</li>
+      <li>The macro window tries not to terminate when ESC key is pressed. This bug was introduced in 4.103.</li>
+      <li>Tera Term tries not to terminate when TEK window is closed. This bug was introduced in 4.103.</li>
+      <li>When the DPI is changed while menu bar hidden, the window size is correctly adjusted.</li>
+      <li>When DPI is changed, an application fault occurs on Windows 8.1.</li>
+      <li>The window title is garbled when receiving the window title setting control sequence which contains the kanji characters.</li>
+      <li>MACRO: The button of yesnobox selected with left or right arrow key is reversed.</li>
+      <li>The help button on the Save setup, Restore setup and Load key map dialog can not be shown.</li>
+      <li>Save setup dialog shows incorrectly "Open as read-only" check-box on Windows95/98/NT4.0.</li>
+      <li>MACRO: Error is displayed correctly when string constant is not terminated.</li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
       <li>Bug fix: A font(TSPECIAL1.TTF) copy may fail when Tera Term installs from the installer.</li>
-      <li>NOTE: CygTerm+ is supported on Windows Vista or later. Please build CygTerm+'s source code by using Cygwin for older Windows, if CygTerm+ wants to run on older Windows.</li>
+      <li>NOTE: CygTerm+ binary included in the installer becomes to be supported on Windows Vista or later. Please build CygTerm+'s source code by using Cygwin for older Windows, if CygTerm+ wants to run on older Windows.</li>
       <li>upgraded TTSSH to <a href="#ttssh_2.91">2.91</a>.</li>
       <li>upgraded TTProxy to <a href="#ttproxy_1.0.0.26">1.0.0.26</a>.</li>
+      <li>upgraded TTXResizeMenu Plug-in to <a href="#resizemenu_1.06">1.06</a>.</li>
+      <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.04">1.04</a>.</li>
+      <li>Changed e-mail address of <a href="contacts.html">Contacting the author</a>.</li>
     </ul>
   </li>
 </ul>
@@ -160,9 +184,9 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>The AlphaBlend VT window can be configured as a different value for each active and inative.</li>
+      <li>The AlphaBlend VT window can be configured as a different value for each active and inactive.</li>
       <li>The value of transparency can be temporarily changed by moving the mouse wheel on the title bar of the VT window.</li>
-      <li>The internal implemention of the VT window was speeded up.</li>
+      <li>The internal implementation of the VT window was speeded up.</li>
       <li>UTF-8: Four bytes character can not be shown yet but can be decoded, the impact range of character corruption was be minimized.</li>
       <li>The language code(CodePage) of the "<a href="../menu/setup-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
       <li>MACRO: The macro file can support UTF-8 and UTF-16(with BOM) encoding.</li>
@@ -227,7 +251,7 @@
     <ul>
       <li>added support for multiple files' drag&amp;drop.</li>
       <li>Functional enhancement: <a href="../usage/mouse.html#dragdropwindow">Confirmation dialog by using drag&amp;drop a file</a>.</li>
-      <li>Window size is maximized when the titlie bar is double-clicked if <a href="../menu/setup-terminal.html#TermIsWin">"Term size = win size"</a> setting is on.</li>
+      <li>Window size is maximized when the title bar is double-clicked if <a href="../menu/setup-terminal.html#TermIsWin">"Term size = win size"</a> setting is on.</li>
       <li>added the <a href="../setup/teraterm-win.html#title">Title format configuration</a> on the General tab of the <a href="../menu/setup-additional.html#TitleFormat">Additional settings dialog</a>.</li>
     </ul>
   </li>
@@ -250,7 +274,7 @@
         </ul></li>
       <li>Improved the behavior of window resizing.</li>
       <li>Accept service name instead of the port number on the command line option.</li>
-      <li>added the <a href="../commandline/teraterm.html#speed">/SPEED=</a> command line option which behavior is same as the <a href="../commandline/teraterm.html#baud">/BAUDE=</a> command line option.</li>
+      <li>added the <a href="../commandline/teraterm.html#speed">/SPEED=</a> command line option which behavior is same as the <a href="../commandline/teraterm.html#baud">/BAUD=</a> command line option.</li>
       <li>added the <a href="../macro/command/setspeed.html">setspeed</a> command.</li>
     </ul>
   </li>
@@ -491,7 +515,7 @@
         <ul>
           <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional.html#TrimTrailingNL">Additional settings dialog</a>.</li>
         </ul></li>
-      <li>When scroll back is used, scroll state is always reseted with user input.</li>
+      <li>When scroll back is used, scroll state is always reset with user input.</li>
       <li>ZMODEM: The default escaped character are added LF and GS by sending.</li>
       <li>The default value of <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting is increased from 4 to 256.</li>
       <li>changed <a href="../macro/commandline.html">macro command line</a> behavior.
@@ -568,7 +592,7 @@
           <li>Packet size(1K) can be specified at <del>receiving</del> <ins>sending</ins>.</li>
           <li>The <a href="../macro/command/xmodemrecv.html">xmodemrecv</a> and <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro argument is the same.</li>
         </ul></li>
-      <li>Cancel from remote host at XMODEM transmitter becomes as trasnfer failure.</li>
+      <li>Cancel from remote host at XMODEM transmitter becomes as transfer failure.</li>
       <li>When remote host sends 1K packet against Checksum at XMODEM receiving, Tera Term receives data as Checksum/1K.</li>
       <li>When remote host sends NAK at XMODEM CRC sending, Tera Term sends data as Checksum.</li>
       <li>added configuration for XMODEM, YMODEM and ZMODEM timeout value.
@@ -619,7 +643,7 @@
         </ul></li>
       <li>Eterm look-feel: added the <a href="../menu/setup-additional.html#ImageBrightness">Image Brightness</a> configuration.</li>
       <li>added the Virtual Store path to <a href="../menu/setup-directory.html">Setup directory</a>.</li>
-      <li>The cygterm.cfg is not saved on dialog closing but is saved on the Save setup when <a href="../menu/setup-additional.html#CygTerm">the CygTerm configuration of the Addtional settings</a> is used.</li>
+      <li>The cygterm.cfg is not saved on dialog closing but is saved on the Save setup when <a href="../menu/setup-additional.html#CygTerm">the CygTerm configuration of the Additional settings</a> is used.</li>
       <li>The command line option can be quoted from an offset when the '"' is used.</li>
       <li>When the click-able URL is not double-clicked but single-clicked on the version dialog, the browser can be launched.</li>
       <li>MACRO: added new parameter which can specify an index of selected item at the <a href="../macro/command/listbox.html">listbox</a> macro command.</li>
@@ -711,7 +735,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>When the [Reset Terminal] on the <a href="../menu/control.html">[Control]</a> is called, the color setup with OSC 10/11 will be reseted.</li>
+      <li>When the [Reset Terminal] on the <a href="../menu/control.html">[Control]</a> is called, the color setup with OSC 10/11 will be reset.</li>
       <li>YMODEM: The block0 packet size meaning end of transfer is 128 byte at all time. Special thanks to mlukoshkov.</li>
       <li>YMODEM: The packet of file information is not fixed size but variable size(128 or 1024byte).</li>
       <li>added the <a href="../macro/command/dirnamebox.html">dirnamebox</a> command.</li>
@@ -841,8 +865,8 @@
       <li>Fixed some bugs regarding Debug mode
         <ul>
           <li>When the debug mode is entered, the insertion mode and the auto-wrap mode may be changed.</li>
-          <li>When the debug mode is entered, the character attribute can not be reseted.</li>
-          <li>When the debug mode is leaved, the character attribute may be reseted.</li>
+          <li>When the debug mode is entered, the character attribute can not be reset.</li>
+          <li>When the debug mode is leaved, the character attribute may be reset.</li>
         </ul></li>
     </ul>
   </li>
@@ -1351,7 +1375,7 @@
   <li>Bug fixes
     <ul>
       <li>The log file which name length is 80 bytes over can not be opened.</li>
-      <li>When the meta key is enabled, the Control and Meta key is redundantly inputed.</li>
+      <li>When the meta key is enabled, the Control and Meta key is redundantly input.</li>
     </ul>
   </li>
 
@@ -1864,7 +1888,7 @@
         </ul></li>
       <li>Disabled the "Eterm lookfeel" check-box on the <a href="../menu/setup-additional.html">Additional settings dialog</a>. If a user enables the feature, directly edit the teraterm.ini file.</li>
       <li>The hidden fonts can be shown on the font selection dialog with Windows 7 beta(build7000).</li>
-      <li>added support for specifying the reverser color.
+      <li>added support for specifying the reversed color.
         <ul>
           <li>added VTReverseColor entry in teraterm.ini file.<br>
               Notice: This function is disabled for the backward compatibility when a user selects the upgrade installation. If a user want to enable this feature, turn on the EnableReverseAttrColor entry.</li>
@@ -3018,7 +3042,7 @@ SYNOPSIS:
 <ul class="history">
   <li>Serial ports larger than COM4</li>
   <li>Baud rate of 14400</li>
-  <li>User shortcut keys "EditCLS", "EditCLS", "ControlOpenTEK" and "ControlCloseTEK".</li>
+  <li>User shortcut keys "EditCLS", "EditCLB", "ControlOpenTEK" and "ControlCloseTEK".</li>
   <li>Macro commands "clearscreen", "code2str", "enablekeyb", "filemarkptr", "fileseekback", "filestrseek2", "findclose", "findfirst", "findnext", "getdir", "kmtfinish", "kmtget", "makepath", "sendkcode", "setdir", "setexitcode", "str2code" and "testlink".</li>
   <li>Macro operator "%".</li>
   <li>Macro: a comment can be placed in any line.</li>
@@ -3217,7 +3241,7 @@ SYNOPSIS:
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_2.91">2019.xx.xx (Ver 2.91)</h3>
+<h3 id="ttssh_2.91">2019.12.7 (Ver 2.91)</h3>
 <ul class="history">
   <li>Changes
     <ul>
@@ -3226,6 +3250,7 @@ SYNOPSIS:
       <li>The LogLevel entry is added on the <a href="../menu/setup-ssh.html#LogLevel">Setup dialog</a>.</li>
       <li>The help button are added on the <a href="../menu/setup-ssh.html">Setup dialog</a>, <a href="../menu/setup-sshauth.html">Authentication Setup dialog</a>, <a href="../menu/setup-sshforward.html">Forwarding dialog</a> and <a href="../menu/setup-sshkeygenerator.html">Key Generator dialog</a>.</li>
       <li>When the network is disconnected from SSH server side, the known_hosts and user authentication dialog are automatically closed while the dialog is shown.</li>
+      <li>Changed the error message when unable to open local file.</li>
     </ul>
   </li>
 
@@ -3237,6 +3262,8 @@ SYNOPSIS:
       <li>The problem is improved in the user authentication dialog that the delay occurs when the focus is moved from the user name to passphrase by using TAB key after entering the user name.</li>
       <li>When the user name is left blank in the user authentication dialog, the focus may not be moved from the user name to the pull-down menu on the right side with TAB key.</li>
       <li>Fixed a port forwarding issue that closes the client connection before completing all data transmission.</li>
+      <li>Incorrect process ID is recorded in TTSSH.LOG before connecting.</li>
+      <li>Authentication banner cannot display correctly when banner string contains character other than US-ASCII.</li>
     </ul>
   </li>
 
@@ -3287,7 +3314,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>garbage data is added to the CipherOrder and MacOrder settings when saving settings.</li>
-      <li>when echo flag is 1 in the server's authentication informatin message, password string is masked on the keyboard-interactive authentication dialog.</li>
+      <li>when echo flag is 1 in the server's authentication information message, password string is masked on the keyboard-interactive authentication dialog.</li>
     </ul>
   </li>
 
@@ -3744,7 +3771,7 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added support for the key exchange of Curve25519 elliptic curve DH(Diffe Hellman) algorithm.
+      <li>added support for the key exchange of Curve25519 elliptic curve DH(Diffie Hellman) algorithm.
         <ul>
           <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the ED25519 authentication key.</li>
           <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the bcrypt KDF format of the RSA/DSA/ECDSA private key.</li>
@@ -3920,7 +3947,7 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>When the SSH version of the TTSSH does not match the server protocol version, a user can not connect.</li>
-      <li>The control characters(^A-^_) can be inputed as the password string on the key generator dialog.</li>
+      <li>The control characters(^A-^_) can be input as the password string on the key generator dialog.</li>
       <li>added the <a href="../usage/ssh.html#VerifyHostKeyDNS">SSHFP RR</a> on the <a href="../usage/ssh.html#securitywarning">Security Warning</a> dialog.
         <ul>
           <li>added the "Verify hostkey fingerprint by DNS" check-box on the "<a href="../menu/setup-ssh.html">TTSSH: Setup</a>" dialog box.</li>
@@ -4231,7 +4258,7 @@ SYNOPSIS:
          <li>Only support for SSH2 protocol.</li>
          <li>Not supporting for SFTP(SSH File Transfer Protocol).</li>
        </ul></li>
-      <li>Bug fix: TCP disconnection was mis-detected in the packet sending. This bug was introduced in in TSSH 1.01 because SSH heartbeat thread was not thread-safe.</li>
+      <li>Bug fix: TCP disconnection was mis-detected in the packet sending. This bug was introduced in in TTSSH 1.01 because SSH heartbeat thread was not thread-safe.</li>
       <li>Bug fix: SSH is disabled when "/ssh1" or "/ssh2" is included in host name on New Connection dialog.</li>
       <li>Bug fix: Twice sending SSH2_MSG_SERVICE_REQUEST packet when the user default is not specified and the user authentication method is challenge, /ask4passwd is specified at command line parameter.</li>
       <li>Bug fix: TIS authentication dialog would not appear when CheckAuthListFirst entry is off and the user authentication method is challenge, /ask4passwd is specified at command line parameter.</li>
@@ -4875,7 +4902,7 @@ SYNOPSIS:
 
 <h2 id="ttproxy">TTProxy</h2>
 
-<h3 id="ttproxy_1.0.0.26">2019.xx.xx (Ver 1.0.0.26)</h3>
+<h3 id="ttproxy_1.0.0.26">2019.12.7 (Ver 1.0.0.26)</h3>
 <ul class="history">
   <!-- li>Changes
     <ul>
@@ -4885,7 +4912,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>When the HTTP proxy connection fails and the status code is other than 400,401,403,405,406,407, invalid string are shown in the message box.</li>
+      <li>When the HTTP proxy connection fails and the status code is other than 400,401,403,405,406,407, invalid string is shown in the message box.</li>
     </ul>
   </li>
 </ul>
@@ -5162,6 +5189,11 @@ SYNOPSIS:
 </ul>
 
 <h2 id="resizemenu">TTXResizeMenu</h2>
+<h3 id="resizemenu_1.06">2019.12.7 (Ver 1.06)</h3>
+<ul class="history">
+  <li>Fixed the access key for the 16th and subsequent entries in the menu.</li>
+</ul>
+
 <h3 id="resizemenu_1.05">2018.11.30 (Ver 1.05)</h3>
 <ul class="history">
   <li>added menu id to increase/decrease window size. (for shortcut keys)</li>
@@ -5194,6 +5226,11 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.04">2019.12.7 (Ver 1.04)</h3>
+<ul class="history">
+  <li>Bug fix: Unexpected pauses and playback speed changes occur when replaying the editing by Vim.</li>
+</ul>
+
 <h3 id="ttyrec_1.03">2017.02.28 (Ver 1.03)</h3>
 <ul class="history">
   <li>added [Replay again] entry under [File] menu that can replay again after one relaying.</li>

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,16 +29,18 @@
 
 /* TTMACRO.EXE, status dialog box */
 
-class CStatDlg : public TTCDialog
+#include "macrodlgbase.h"
+
+class CStatDlg : public CMacroDlgBase
 {
 public:
-	BOOL Create(PCHAR Text, PCHAR Title, int x, int y);
+	BOOL Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y);
 	void Update(PCHAR Text, PCHAR Title, int x, int y);
 	void Bringup();
 	enum { IDD = IDD_STATDLG };
 private:
 	PCHAR TextStr, TitleStr;
-	int  PosX, PosY, init_WW, WW, WH, TW, TH;
+	int  init_WW, TW, TH;
 	SIZE s;
 
 	virtual BOOL OnInitDialog();

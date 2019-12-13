@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #include "ttmdlg.h"
 #include "ttmparse.h"
 #include "ttmbuff.h"
-
-#ifdef _DEBUG
-#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#endif
 
 /* C言語スタイルのコメントをサポートするかどうか (2009.7.2 yutaka) */
 #define SUPPORT_C_STYLE_COMMENT
@@ -725,71 +723,73 @@ BOOL GetLabelName(PCHAR Name)
 	return (strlen(Name)>0);
 }
 
-	int GetQuotedStr(PCHAR Str, BYTE q, LPWORD i)
+static int GetQuotedStr(PCHAR Str, BYTE q, LPWORD i)
+{
+	BYTE b;
+
+	b=0;
+	if (LinePtr<LineLen) b = LineBuff[LinePtr];
+	while ((LinePtr<LineLen) && (b>=' '||b=='\t') && (b!=q))
 	{
-		BYTE b;
-
-		b=0;
-		if (LinePtr<LineLen) b = LineBuff[LinePtr];
-		while ((LinePtr<LineLen) && (b>=' '||b=='\t') && (b!=q))
-		{
-			if (*i<MaxStrLen-1)
-			{
-				Str[*i] = b;
-				(*i)++;
-			}
-
-			LinePtr++;
-			if (LinePtr<LineLen) b = LineBuff[LinePtr];
-		}
-		if (b==q)
-			if (LinePtr<LineLen) LinePtr++;
-		else
-			return (ErrSyntax);
-
-		return 0;
-	}
-
-	WORD GetCharByCode(PCHAR Str, LPWORD i)
-	{
-		BYTE b;
-		WORD n;
-
-		b=0;
-		n = 0;
-		if (LinePtr<LineLen) b = LineBuff[LinePtr];
-		if (!isdigit(b) && (b!='$')) return ErrSyntax;
-
-		if (b!='$') { /* decimal */
-			while ((LinePtr<LineLen) && isdigit(b)) { // [0-9]
-				n = n * 10 + b - '0';
-				LinePtr++;
-				if (LinePtr<LineLen) b = LineBuff[LinePtr];
-			}
-		}
-		else { /* hexadecimal */
-			LinePtr++;
-			if (LinePtr<LineLen) b = LineBuff[LinePtr];
-			while ((LinePtr<LineLen) && isxdigit(b)) { // [0-9A-Fa-f]
-				if (isalpha(b))
-					b = (b|0x20) - 'a' + 10;
-				else
-					b = b - '0';
-				n = n * 16 + b;
-				LinePtr++;
-				if (LinePtr<LineLen) b = LineBuff[LinePtr];
-			}
-		}
-
-		if ((n==0) || (n>255)) return ErrSyntax;
-
 		if (*i<MaxStrLen-1)
 		{
-			Str[*i] = (char)n;
+			Str[*i] = b;
 			(*i)++;
 		}
-		return 0;
+
+		LinePtr++;
+		if (LinePtr<LineLen) b = LineBuff[LinePtr];
 	}
+	if (b==q) {
+		if (LinePtr<LineLen)
+			LinePtr++;
+	}
+	else
+		return (ErrSyntax);
+
+	return 0;
+}
+
+static WORD GetCharByCode(PCHAR Str, LPWORD i)
+{
+	BYTE b;
+	WORD n;
+
+	b=0;
+	n = 0;
+	if (LinePtr<LineLen) b = LineBuff[LinePtr];
+	if (!isdigit(b) && (b!='$')) return ErrSyntax;
+
+	if (b!='$') { /* decimal */
+		while ((LinePtr<LineLen) && isdigit(b)) { // [0-9]
+			n = n * 10 + b - '0';
+			LinePtr++;
+			if (LinePtr<LineLen) b = LineBuff[LinePtr];
+		}
+	}
+	else { /* hexadecimal */
+		LinePtr++;
+		if (LinePtr<LineLen) b = LineBuff[LinePtr];
+		while ((LinePtr<LineLen) && isxdigit(b)) { // [0-9A-Fa-f]
+			if (isalpha(b))
+				b = (b|0x20) - 'a' + 10;
+			else
+				b = b - '0';
+			n = n * 16 + b;
+			LinePtr++;
+			if (LinePtr<LineLen) b = LineBuff[LinePtr];
+		}
+	}
+
+	if ((n==0) || (n>255)) return ErrSyntax;
+
+	if (*i<MaxStrLen-1)
+	{
+		Str[*i] = (char)n;
+		(*i)++;
+	}
+	return 0;
+}
 
 BOOL GetString(PCHAR Str, LPWORD Err)
 {
@@ -1790,7 +1790,7 @@ void GetStrVar(PVarId VarId, LPWORD Err)
 		*Err = ErrSyntax;
 }
 
-void SetStrVal(TVarId VarId, PCHAR Str)
+void SetStrVal(TVarId VarId, const char *Str)
 {
 	// StrBuf の運用上 MaxStrLen が正しいサイズなのでサイズを固定
 	// (2007.6.23 maya)

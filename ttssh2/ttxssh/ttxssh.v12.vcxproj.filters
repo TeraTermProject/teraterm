@@ -195,6 +195,9 @@
     <ClInclude Include="x11util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\codeconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ttsecure.ico">

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,13 +29,15 @@
 
 /* TTMACRO.EXE, message dialog box */
 
+#include "../common/tmfc.h"
+#include "macrodlgbase.h"
 #include "ttm_res.h"
 
-class CMsgDlg : public TTCDialog
+class CMsgDlg : public CMacroDlgBase
 {
 public:
 	CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo, int x, int y);
-	INT_PTR DoModal();
+	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 
 private:
 	enum { IDD = IDD_MSGDLG };
@@ -43,7 +45,7 @@ private:
 	const TCHAR *TextStr;
 	const TCHAR *TitleStr;
 	BOOL YesNoFlag;
-	int  PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW;
+	int  init_WW, TW, TH, BH, BW;
 	SIZE s;
 
 	virtual BOOL OnInitDialog();

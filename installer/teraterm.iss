@@ -1,30 +1,30 @@
 #define AppName "Tera Term"
 #define AppVer "5.0"
-;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [InnoIDE_PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [_ISToolPreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [_ISToolPostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [Setup]
 AppCopyright=(C) 2004-2019 TeraTerm Project
@@ -51,6 +51,8 @@ OutputBaseFilename=teraterm-{#AppVer}
 OutputBaseFilename=teraterm-{#snapshot}
 #endif
 PrivilegesRequired=none
+SolidCompression=yes
+Compression=lzma2/ultra64
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
@@ -71,7 +73,8 @@ Source: ..\teraterm\release\ttpfile.dll; DestDir: {app}; Components: TeraTerm; F
 Source: ..\teraterm\release\ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
+Source: release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
+;Source: release\TSPECIAL1.TTF; DestDir: {app}; Components: TeraTerm
 Source: ..\doc\en\teraterm.chm; DestDir: {app}; Components: TeraTerm
 Source: ..\doc\ja\teratermj.chm; DestDir: {app}; Components: TeraTerm
 Source: release\license.txt; DestDir: {app}; Components: TeraTerm

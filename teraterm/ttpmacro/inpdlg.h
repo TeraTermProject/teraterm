@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,22 +29,25 @@
 
 /* TTMACRO.EXE, input dialog box */
 
-#include "../common/tmfc.h"
+#pragma once
 
-class CInpDlg : public TTCDialog
+#include "../common/tmfc.h"
+#include "macrodlgbase.h"
+
+class CInpDlg : public CMacroDlgBase
 {
 public:
 	CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
 	        PCHAR Default, BOOL Paswd,
 	        int x, int y);
-	INT_PTR DoModal();
+	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 
 private:
 	enum { IDD = IDD_INPDLG };
 
 	PCHAR InputStr, TextStr, TitleStr, DefaultStr;
 	BOOL PaswdFlag;
-	int PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW, EW, EH;
+	int init_WW, TW, TH, BH, BW, EW, EH;
 	SIZE s;
 
 	virtual BOOL OnInitDialog();

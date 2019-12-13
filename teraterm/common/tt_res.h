@@ -242,14 +242,15 @@
 #define IDC_DAD_NOTE                    2588
 #define IDC_SELECT_ON_ACTIVATE          2589
 #define IDC_MIXED_THEME_FILE            2590
-#define IDC_DEBUG_POPUP_ENABLE          2591
-#define IDC_DEBUG_POPUP_KEY1            2592
-#define IDC_DEBUG_POPUP_KEY2            2593
-#define IDC_DEBUG_CONSOLE_BUTTON        2594
-#define IDC_SENDFILE_FILENAME_BUTTON    2595
-#define IDC_SENDFILE_CHECK_BINARY       2596
-#define IDC_SENDFILE_FILENAME_TITLE     2597
-#define IDC_SENDFILE_FILENAME_EDIT      2598
+#define IDC_ACCEPT_CLEAR_SBUFF          2591
+#define IDC_DEBUG_POPUP_ENABLE          2592
+#define IDC_DEBUG_POPUP_KEY1            2593
+#define IDC_DEBUG_POPUP_KEY2            2594
+#define IDC_DEBUG_CONSOLE_BUTTON        2595
+#define IDC_SENDFILE_FILENAME_BUTTON    2596
+#define IDC_SENDFILE_CHECK_BINARY       2597
+#define IDC_SENDFILE_FILENAME_TITLE     2598
+#define IDC_SENDFILE_FILENAME_EDIT      2599
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -268,6 +269,8 @@
 #define ID_FILE_COMMENTTOLOG            50121
 #define ID_FILE_VIEWLOG                 50122
 #define ID_FILE_SHOWLOGDIALOG           50123
+#define ID_FILE_PAUSELOG                50124
+#define ID_FILE_STOPLOG                 50125
 #define ID_FILE_SENDFILE                50130
 #define ID_FILE_KERMITRCV               50141
 #define ID_FILE_KERMITGET               50142
@@ -348,7 +351,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        128
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2599
+#define _APS_NEXT_CONTROL_VALUE         2600
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

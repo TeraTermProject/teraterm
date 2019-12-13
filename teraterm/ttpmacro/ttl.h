@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ void EndTTL();
 void Exec();
 void SetMatchStr(PCHAR Str);
 void SetGroupMatchStr(int no, PCHAR Str);
-void SetInputStr(PCHAR Str);
+void SetInputStr(const char *Str);
 void SetResult(int ResultCode);
 BOOL CheckTimeout();
 BOOL TestWakeup(int Wakeup);

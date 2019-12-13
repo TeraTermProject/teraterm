@@ -31,6 +31,10 @@
 #include <windows.h>
 #include <string.h>
 #include <assert.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #if (defined(_MSC_VER) && (_MSC_VER >= 1600)) || !defined(_MSC_VER)
 #include <stdint.h>
@@ -45,13 +49,6 @@
 typedef unsigned char	uint8_t;
 typedef unsigned short  uint16_t;
 typedef unsigned int	uint32_t;
-#endif
-
-#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wcsdup(s)    _wcsdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 /*

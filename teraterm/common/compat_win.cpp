@@ -62,6 +62,7 @@ BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
 BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
 HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
+BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
 HWND (WINAPI *pGetConsoleWindow)(void);
 
@@ -110,6 +111,7 @@ static const APIInfo Lists_user32[] = {
 	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
 	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
+	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
 	{ "GetDlgItemTextW", (void **)&pGetDlgItemTextW },

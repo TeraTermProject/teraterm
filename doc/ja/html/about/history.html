@@ -31,7 +31,7 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_4.105">2019.xx.xx (Ver 4.105)</h3>
+<h3 id="teraterm_4.105">2019.12.7 (Ver 4.105)</h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -43,6 +43,16 @@
       <li>Eterm look-feel: <a href="../menu/setup-additional.html#MixedThemeFile">壁紙と画像を混合する</a>を設定できるようにした。teraterm.ini に <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> エントリを追加した。デフォルトはoff。</li>
       <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで不透明度の値に256以上を入力したとき、ダイアログ上で255に変更するようにした。</li>
       <li>REP 制御シーケンスに対応した。</li>
+      <li>xterm の ED 3 (スクロールバッファ消去) 制御シーケンスに対応した。
+        <ul>
+	  <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>の<a href="../menu/setup-additional.html#TabControlSequence">Control Sequenceタブ</a>に<a href="../menu/setup-additional.html#ed3">「リモートからのスクロールバッファ消去を受け入れる」</a>を追加した。デフォルトはoff。</li>
+        </ul></li>
+	<li><a href="../menu/setup-additional.html#ClipboardAccessFromRemote">「リモートからのクリップボードアクセス」</a>設定を変更する為のコマンドラインオプションとして<a href="../commandline/teraterm.html#osc52">/OSC52=</a>を追加した。</li>
+      <li><a href="../menu/file.html">[File]</a> メニューに <a href="../menu/file.html#PauseLog">[Pause Logging]</a> / <a href="../menu/file.html#StopLog">[Stop Logging]</a> を追加した。</li>
+      <li>マウスでのテキスト選択の開始を、設定で遅らせる事が出来るようにした。
+        <ul>
+	  <li>teraterm.ini に <a href="../setup/teraterm-win.html#delayselect">MouseSelectStartDelay</a> エントリを追加した。デフォルトは0。</li>
+        </ul></li>
 
       <li>シリアルポート接続
         <ul>
@@ -60,6 +70,8 @@
           <li><a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> コマンドラインオプションを追加した。</li>
         </ul>
       </li>
+	  <li>MACRO: <a href="../macro/command/setdlgpos.html">setdlgpos</a> 引数なしのときダイアログボックスの位置をデフォルトとするようにした。</li>
+	  <li>MACRO: <a href="../macro/command/setdlgpos.html">setdlgpos</a> の位置指定でダイアログがディスプレイからはみ出さないようにした。</li>
     </ul>
   </li>
 
@@ -69,16 +81,28 @@
       <li>Eterm look-feel: 壁紙と混合する画像ファイルをランダムに選択する際、無関係なファイルを選択することがある問題を修正した。</li>
       <li>ログ採取・ファイル送信・フォント・印刷ダイアログのヘルプボタンが機能しない問題を修正した。4.104でのエンバグ。</li>
       <li>TTIMESV(IME状態保存)/TTIMERS(IME状態復元)制御シーケンスが正しく動かない問題を修正した。</li>
-      <li>Windows2000～10で、印刷ダイアログにヘルプボタンが表示されない問題を修正した(Windows95は除く)。</li>
+      <li>Windows2000～10で、印刷ダイアログにヘルプボタンが表示されない問題を修正した。Windows95を除く、すべてのWindowsで印刷ダイアログにヘルプボタンが表示されるようになった。</li>
+      <li>MACRO ウィンドウで、ESCキーを押下時終了しないようにした。4.103でのエンバグ。</li>
+      <li>TEKウィンドウを閉じたとき Tera Term 自身は終了しないようにした。4.103でのエンバグ。</li>
+      <li>メニューバー非表示時、DPIが変化したときウィンドウサイズを正しく調整するよう修正した。</li>
+      <li>Windows 8.1で、DPIが変化したとき Tera Term が強制終了しないようにした。</li>
+      <li>漢字を含むウィンドウタイトル設定制御シーケンスを受信した時、ウィンドウタイトルが文字化けする問題を修正した。</li>
+      <li>MACRO: yesnobox で左右矢印キーで選択されるボタンが逆になっていたのを修正した。</li>
+      <li>設定の保存・設定の読み込み・キーマップ読み込みダイアログにヘルプボタンが表示されていない問題を修正した。</li>
+      <li>Windows95/98/NT4.0において、設定の保存ダイアログに「読み取り専用ファイルとして開く」というチェックボックスが表示される問題を修正した。</li>
+      <li>MACRO: 文字列型定数の終端が正しくない場合、エラーが正しく表示されるようにした。</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
       <li>インストーラからインストール時、フォント(TSPECIAL1.TTF)のコピーが失敗することがある問題を修正した。</li>
-      <li>CygTerm+はWindows Vista以降のサポートとなります。古いWindowsで動作させたい場合は、古いWindowsに対応したCygwinを使ってCygTerm+をソースコードからビルドしてください。</li>
+      <li>インストーラに同梱されているCygTerm+バイナリはWindows Vista以降のサポートとなります。古いWindowsで動作させたい場合は、古いWindowsに対応したCygwinを使ってCygTerm+をソースコードからビルドしてください。</li>
       <li><a href="#ttssh_2.91">TTSSH(2.91)</a>へ差し替えた。</li>
       <li><a href="#ttproxy_1.0.0.26">TTProxy(1.0.0.26)</a>へ差し替えた。</li>
+      <li><a href="#resizemenu_1.06">TTXResizeMenu Plugin(1.06)</a>へ差し替えた。</li>
+      <li><a href="#ttyrec_1.04">TTXttyrec Plugin(1.04)</a>へ差し替えた。</li>
+      <li><a href="contacts.html">作者への連絡</a>のメールアドレスを変更した。</li>
     </ul>
   </li>
 </ul>
@@ -619,7 +643,7 @@
         </ul></li>
       <li>Eterm look-feel: <a href="../menu/setup-additional.html#ImageBrightness">背景画像の明るさ</a>を設定できるようにした。</li>
       <li><a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a>に Virtual Store パスを追加した。</li>
-      <li><a href="../menu/setup-additional.html#CygTerm">Addtional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
+      <li><a href="../menu/setup-additional.html#CygTerm">Additional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
       <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
       <li>バージョン情報ダイアログのURLをシングルクリックでブラウザが起動するようにした。</li>
       <li><a href="../macro/command/listbox.html">listbox</a> マクロコマンドで、初期状態で選択している項目を指定できるようにした。</li>
@@ -922,7 +946,7 @@
       <li>"New connection" ダイアログを表示する <a href="../commandline/teraterm.html#es">/ES</a> コマンドラインオプションを追加した。</li>
       <li>URLの途中で改行されている時に、繋がっているものとして扱える設定を追加した。
         <ul>
-          <li>tearterm.iniに<a href="../setup/teraterm-misc.html#JoinSplitURL">JoinSplitURL, JoinSplitURLIgnoreEOLChar</a>エントリを追加した。</li>
+          <li>teraterm.iniに<a href="../setup/teraterm-misc.html#JoinSplitURL">JoinSplitURL, JoinSplitURLIgnoreEOLChar</a>エントリを追加した。</li>
         </ul></li>
       <li>マクロ
         <ul>
@@ -1876,7 +1900,7 @@
       <li>EDITOR.CNF をインストーラパッケージに新規追加した。</li>
       <li>キーボード設定ファイルが無い時のエディタキーパッドおよびファンクションキーの動作を変更し、対応するVTキーのシーケンスを送出するようにした。
         <ul>
-          <li>tearterm.ini に <a href="../setup/teraterm-term.html#StrictKeyMapping">StrictKeyMapping</a> エントリを追加した。デフォルトはoff。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#StrictKeyMapping">StrictKeyMapping</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li>
       <li>バージョンダイアログに、ビルド環境(Visual C++)のバージョンとビルドタイムを表示するようにした。</li>
       <li>マクロコマンド "<a href="../macro/command/sprintf2.html">sprintf2</a>" を新規追加した。</li>
@@ -3223,7 +3247,7 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_2.91">2019.xx.xx (Ver 2.91)</h3>
+<h3 id="ttssh_2.91">2019.12.7 (Ver 2.91)</h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -3232,6 +3256,7 @@
       <li><a href="../menu/setup-ssh.html#LogLevel">Setupダイアログ</a>にLogLevelを追加した。</li>
       <li><a href="../menu/setup-ssh.html">Setupダイアログ</a>、<a href="../menu/setup-sshauth.html">Authentication Setupダイアログ</a>、<a href="../menu/setup-sshforward.html">Forwardingダイアログ</a>、<a href="../menu/setup-sshkeygenerator.html">Key Generatorダイアログ</a>にヘルプボタンを追加した。</li>
       <li>known_hostsダイアログおよびユーザ認証ダイアログの表示中に、SSHサーバ側からネットワーク切断された場合、ダイアログを自動で閉じるようにした。</li>
+      <li>SCP でローカル側のファイルが開けなかった時のメッセージを変更した。</li>
     </ul>
   </li>
 
@@ -3243,6 +3268,8 @@
       <li>ユーザ認証ダイアログで、ユーザ名を入力後のTABキーでパスフレーズ欄への移動に遅延がある問題を改善した。</li>
       <li>ユーザ認証ダイアログで、ユーザ名を空欄にした後、TABキーで右側のプルダウンメニューにフォーカス移動しないことがある問題を修正した。</li>
       <li>ポート転送で、クライアントにデータを送り終わる前に接続を切断する場合がある問題を修正した。</li>
+      <li>接続するまでの間、正しくないプロセスIDがTTSSH.LOGに記録される問題を修正した。</li>
+      <li>認証バナーにUS-ASCII以外の文字が含まれる時に正しく表示できない問題を修正した。</li>
     </ul>
   </li>
 
@@ -3380,7 +3407,7 @@
         <ul>
           <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
         </ul></li>
-      <li>Diffie-Hellman group exchane 鍵交換方式での最小グループサイズを 2048 に変更した。(RFC 8270)
+      <li>Diffie-Hellman group exchange 鍵交換方式での最小グループサイズを 2048 に変更した。(RFC 8270)
         <ul>
           <li>以前の動作に戻すには、teraterm.ini の GexMinimalGroupSize エントリを 1024 にする。</li>
         </ul></li>
@@ -4289,7 +4316,7 @@
 <h3 id="ttssh_2.42">2007.9.30 (Ver 2.42)</h3>
 <ul class="history">
       <li>New connection ダイアログで使用中のシリアルポートを表示しないようにした。</li>
-      <li>パスワード認証を選択しているときに keyboard-interactive 認証を使用するのをやめた。これに伴い、Authentication Setup ダイアログの keyboard-interactive チェックボックスを削除した。keyboard-interactive 認証を使用するためには、challange/response を選択する必要がある。</li>
+      <li>パスワード認証を選択しているときに keyboard-interactive 認証を使用するのをやめた。これに伴い、Authentication Setup ダイアログの keyboard-interactive チェックボックスを削除した。keyboard-interactive 認証を使用するためには、challenge/response を選択する必要がある。</li>
       <li>New connection ダイアログの Host ドロップダウンで、Ctrl+p, Ctrl+n, Ctrl+b, Ctrl+f, Ctrl+a, Ctrl+e ショートカットキーをサポートした。それぞれ↑, ↓, ←, →, Home, End キーに対応する。</li>
       <li>パケット送信処理にTCPコネクション切断の誤検出をしないようにした。</li>
       <li>内部で使用している文字列系関数のセキュアバージョンへの全置換を実施。
@@ -4880,7 +4907,7 @@
 
 <h2 id="ttproxy">TTProxy</h2>
 
-<h3 id="ttproxy_1.0.0.26">2019.xx.xx (Ver 1.0.0.26)</h3>
+<h3 id="ttproxy_1.0.0.26">2019.12.7 (Ver 1.0.0.26)</h3>
 <ul class="history">
   <!--li>変更
     <ul>
@@ -5169,6 +5196,11 @@
 </ul>
 
 <h2 id="resizemenu">TTXResizeMenu</h2>
+<h3 id="resizemenu_1.06">2019.12.7 (Ver 1.06)</h3>
+<ul class="history">
+  <li>メニューの16番目以降のアクセスキーが誤っているのを修正した。</li>
+</ul>
+
 <h3 id="resizemenu_1.05">2018.11.30 (Ver 1.05)</h3>
 <ul class="history">
   <li>ウインドウサイズを増減させる為のメニューIDを追加した。(ショートカットキー定義用)</li>
@@ -5201,6 +5233,11 @@
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.04">2019.12.7 (Ver 1.04)</h3>
+<ul class="history">
+  <li>Vim の編集画面を再生した時、予期しない Pause や再生速度の変更が起こる問題を修正した。</li>
+</ul>
+
 <h3 id="ttyrec_1.03">2017.02.28 (Ver 1.03)</h3>
 <ul class="history">
   <li>再生終了後、再度再生する為の [Replay again] を [File] メニューに追加するようにした。</li>

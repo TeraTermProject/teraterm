@@ -56,6 +56,7 @@ set(SRC
   msgdlg.h
   statdlg.cpp
   statdlg.h
+  macrodlgbase.h
   ttl.c
   ttl.h
   ttm_res.h

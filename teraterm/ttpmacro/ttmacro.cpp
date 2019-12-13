@@ -138,7 +138,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	init();
 
 	Busy = TRUE;
-	pCCtrlWindow = new CCtrlWindow();
+	pCCtrlWindow = new CCtrlWindow(hInst);
 	pCCtrlWindow->Create();
 	Busy = FALSE;
 

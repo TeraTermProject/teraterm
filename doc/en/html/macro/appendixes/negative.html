@@ -15,20 +15,25 @@
 Using a negative integer constant may cause a problem like the following: For example,
 </p>
 
-<pre><code>for i -10 0</code></pre>
+<pre><code>for i 5 -1</code></pre>
 
 <p>
-causes the syntax error, because the second parameter is regarded as "i-10" instead of "i". To avoid this problem, take one of the following solutions:
+causes the syntax error, because the second parameter is regarded as "5-1" instead of "5" and the third parameter is empty. To avoid this problem, take one of the following solutions:
 </p>
 
 <ol>
   <li>Put "0" before "-".
-<pre><code>for i 0-10 0</code></pre>
+<pre><code>for i 5 0-1</code></pre>
+  </li>
+
+  <li>Add parenthese.
+<pre><code>for i 5 (-1)</code></pre>
   </li>
 
   <li>Assign the negative constant to a variable.
-<pre><code>A = -10
-for i A 0
+<pre><code>
+A = -1
+for i 5 A
 </code></pre>
   </li>
 </ol>

@@ -32,14 +32,11 @@
 
 #include <wchar.h>
 #include <assert.h>
-#include <crtdbg.h>
-
-#if defined(_DEBUG) && !defined(_CRTDBG_MAP_ALLOC)
-#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)   _free_dbg((p), _NORMAL_BLOCK)
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
 #endif
-
-//#define	_countof(ary)	(sizeof(ary)/sizeof(ary[0]))
+#include <stdlib.h>
+#include <crtdbg.h>
 
 // https://docs.microsoft.com/ja-jp/windows/desktop/dlgbox/dlgtemplateex
 // https://www.pg-fl.jp/program/tips/dlgmem.htm

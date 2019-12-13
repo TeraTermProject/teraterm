@@ -1045,6 +1045,7 @@ WORD TTLDispStr()
 					Str[0] = LOBYTE(Val);
 					Str[1] = 0;
 					strncat_s(buff, MaxStrLen, Str, _TRUNCATE);
+					/* Falls through. */
 				case TypString:
 					strncat_s(buff, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					break;
@@ -4323,16 +4324,22 @@ WORD TTLSetDir()
 
 WORD TTLSetDlgPos()
 {
-	WORD Err;
-	int x, y;
+	WORD Err = 0;
 
-	Err = 0;
-	GetIntVal(&x,&Err);
-	GetIntVal(&y,&Err);
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if (Err!=0) return Err;
-	SetDlgPos(x,y);
+	if (CheckParameterGiven()) {
+		// パラメータがあれば、x  y の2つのパラメータがある
+		int x, y;
+		GetIntVal(&x,&Err);
+		GetIntVal(&y,&Err);
+		if ((Err==0) && (GetFirstChar()!=0))
+			Err = ErrSyntax;
+		if (Err!=0) return Err;
+		SetDlgPos(x,y);
+	}
+	else {
+		// パラメータがなければデフォルト位置に戻す
+		SetDlgPos(CW_USEDEFAULT, CW_USEDEFAULT);
+	}
 	return Err;
 }
 
@@ -4554,6 +4561,7 @@ WORD TTLSprintf(int getvar)
 				case 'x':
 				case 'X':
 					type = INTEGER;
+					/* Falls through. */
 
 				case 'e':
 				case 'E':
@@ -4565,6 +4573,7 @@ WORD TTLSprintf(int getvar)
 					if (type == NONE) {
 						type = DOUBLE;
 					}
+					/* Falls through. */
 
 				case 's':
 					if (type == NONE) {
@@ -6560,7 +6569,7 @@ void SetGroupMatchStr(int no, PCHAR Str)
 		SetStrVal(VarId,p);
 }
 
-void SetInputStr(PCHAR Str)
+void SetInputStr(const char *Str)
 {
 	WORD VarType;
 	TVarId VarId;

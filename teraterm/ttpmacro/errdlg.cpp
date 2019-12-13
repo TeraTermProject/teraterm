@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,6 @@
 #include "ttmparse.h"
 #include "htmlhelp.h"
 #include "dlglib.h"
-#include "ttmacro.h"
 
 #include "errdlg.h"
 
@@ -61,11 +60,9 @@ CErrDlg::CErrDlg(const char *Msg, PCHAR Line, int x, int y, int lineno, int star
 	MacroFileName = FileName;
 }
 
-INT_PTR CErrDlg::DoModal()
+INT_PTR CErrDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
-	HINSTANCE hInst = GetInstance();
-	HWND parent = GetHWND();
-	return TTCDialog::DoModal(hInst, parent, CErrDlg::IDD);
+	return TTCDialog::DoModal(hInst, hWndParent, CErrDlg::IDD);
 }
 
 BOOL CErrDlg::OnInitDialog()
@@ -75,10 +72,7 @@ BOOL CErrDlg::OnInitDialog()
 		{ IDCANCEL, "BTN_CONTINUE" },
 		{ IDC_MACROERRHELP, "BTN_HELP" },
 	};
-	RECT R;
-	HDC TmpDC;
 	char buf[MaxLineLen*2], buf2[10];
-	int i, len;
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -90,9 +84,9 @@ BOOL CErrDlg::OnInitDialog()
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%d:", MacroFileName, LineNo);
 	SetDlgItemText(IDC_ERRLINE, buf);
 
-	len = strlen(LineStr);
+	size_t len = strlen(LineStr);
 	buf[0] = 0;
-	for (i = 0 ; i < len ; i++) {
+	for (size_t i = 0 ; i < len ; i++) {
 		if (i == StartPos)
 			strncat_s(buf, sizeof(buf), "<<<", _TRUNCATE);
 		if (i == EndPos)
@@ -105,14 +99,8 @@ BOOL CErrDlg::OnInitDialog()
 		strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
 	SetDlgItemText(IDC_EDIT_ERRLINE, buf);
 
-	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		GetWindowRect(&R);
-		TmpDC = ::GetDC(GetSafeHwnd());
-		PosX = (GetDeviceCaps(TmpDC,HORZRES)-R.right+R.left) / 2;
-		PosY = (GetDeviceCaps(TmpDC,VERTRES)-R.bottom+R.top) / 2;
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
-	}
-	SetWindowPos(HWND_TOP, PosX, PosY, 0, 0, SWP_NOSIZE);
+	SetDlgPos();
+
 	::SetForegroundWindow(m_hWnd);
 
 	return TRUE;

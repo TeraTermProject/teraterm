@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,20 +37,18 @@
 #include "ttmlib.h"
 #include "tmfc.h"
 #include "tttypes.h"
-#include "ttmacro.h"
 
 #include "statdlg.h"
 
 // CStatDlg dialog
 
-BOOL CStatDlg::Create(PCHAR Text, PCHAR Title, int x, int y)
+BOOL CStatDlg::Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y)
 {
 	TextStr = Text;
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
-	HINSTANCE hInst = GetInstance();
-	return TTCDialog::Create(hInst, GetDesktopWindow(), CStatDlg::IDD);
+	return TTCDialog::Create(hInst, NULL, CStatDlg::IDD);
 }
 
 void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
@@ -176,7 +174,6 @@ LRESULT CStatDlg::OnSetForceForegroundWindow(WPARAM wParam, LPARAM lParam)
 void CStatDlg::Relocation(BOOL is_init, int new_WW)
 {
 	RECT R;
-	HDC TmpDC;
 	HWND HText;
 	int CW, CH;
 
@@ -206,13 +203,7 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 		::MoveWindow(HText,(TW-s.cx)/2,5,TW,TH,TRUE);
 	}
 
-	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
-		TmpDC = ::GetDC(GetSafeHwnd());
-		PosX = (GetDeviceCaps(TmpDC,HORZRES)-WW) / 2;
-		PosY = (GetDeviceCaps(TmpDC,VERTRES)-WH) / 2;
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
-	}
-	SetWindowPos(HWND_TOP,PosX,PosY,WW,WH,SWP_NOZORDER);
+	SetDlgPos();
 
 	InvalidateRect(NULL, TRUE);
 }

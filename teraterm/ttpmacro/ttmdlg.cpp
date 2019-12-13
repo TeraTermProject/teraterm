@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,10 @@
 #include <windows.h>
 #include <direct.h>
 #include <commdlg.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
 
@@ -50,15 +54,6 @@
 
 #include "ttmdlg.h"
 
-#ifdef _DEBUG
-#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
-
 char HomeDir[MAX_PATH];
 char FileName[MAX_PATH];
 char TopicName[11];
@@ -68,8 +63,9 @@ int ParamCnt;
 int ParamsSize;
 BOOL SleepFlag;
 
-static int DlgPosX = -10000;
-static int DlgPosY = 0;
+// (x,y) = (CW_USEDEFAULT, CW_USEDEFAULT)のときセンターに表示
+static int DlgPosX = CW_USEDEFAULT;
+static int DlgPosY = CW_USEDEFAULT;
 
 static CStatDlg *StatDlg = NULL;
 
@@ -226,27 +222,34 @@ void SetDlgPos(int x, int y)
 void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
                 PCHAR Default, BOOL Paswd)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CInpDlg InpDlg(Buff,Text,Caption,Default,Paswd,DlgPosX,DlgPosY);
-	InpDlg.DoModal();
+	InpDlg.DoModal(hInst, hWndParent);
 }
 
 int OpenErrDlg(const char *Msg, PCHAR Line, int lineno, int start, int end, PCHAR FileName)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end, FileName);
-	return ErrDlg.DoModal();
+	return ErrDlg.DoModal(hInst, hWndParent);
 }
 
 int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CMsgDlg MsgDlg(Text,Caption,YesNo,DlgPosX,DlgPosY);
-	return MsgDlg.DoModal();
+	return MsgDlg.DoModal(hInst, hWndParent);
 }
 
 void OpenStatDlg(PCHAR Text, PCHAR Caption)
 {
 	if (StatDlg==NULL) {
+		HINSTANCE hInst = GetInstance();
 		StatDlg = new CStatDlg();
-		StatDlg->Create(Text,Caption,DlgPosX,DlgPosY);
+		StatDlg->Create(hInst,Text,Caption,DlgPosX,DlgPosY);
 	}
 	else {// if status box already exists,
 		// update text and caption only.
@@ -280,8 +283,10 @@ void BringupStatDlg()
  */
 int OpenListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected)
 {
+	HINSTANCE hInst = GetInstance();
+	HWND hWndParent = GetHWND();
 	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
-	INT_PTR r = ListDlg.DoModal();
+	INT_PTR r = ListDlg.DoModal(hInst, hWndParent);
 	if (r == IDOK) {
 		return ListDlg.m_SelectItem;
 	}
