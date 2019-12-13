@@ -4252,7 +4252,7 @@ void CVTWindow::OnReplayLog()
 static wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile, size_t *len)
 {
 	// "ƒ†[ƒU’è‹`(*.txt)\0*.txt"
-	wchar_t *user_filter_str = L"";
+	wchar_t *user_filter_str = NULL;
 	size_t user_filter_len = 0;
 	if (user_filter_mask != NULL && user_filter_mask[0] != 0) {
 		wchar_t user_filter_name[MAX_UIMSG];
