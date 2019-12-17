@@ -294,11 +294,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\teraterm_manifest.rc"
+				>
+			</File>
+			<File
 				RelativePath="tt-version.rc"
 				>
 			</File>
 			<File
 				RelativePath="ttermpro.rc"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.rc"
 				>
 			</File>
 			<File
@@ -608,6 +616,62 @@
 			</File>
 			<File
 				RelativePath=".\ttdialog.h"
+				>
+			</File>
+			<File
+				RelativePath="unicode.h"
+				>
+			</File>
+			<File
+				RelativePath="unicode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpmacro\fileread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpmacro\fileread.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.h"
+				>
+			</File>
+			<File
+				RelativePath="ftdlg_lite.cpp"
+				>
+			</File>
+			<File
+				RelativePath="ftdlg_lite.h"
+				>
+			</File>
+			<File
+				RelativePath="sendmem.cpp"
+				>
+			</File>
+			<File
+				RelativePath="sendmem.h"
+				>
+			</File>
+			<File
+				RelativePath="clipboarddlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="clipboarddlg.h"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.h"
 				>
 			</File>
 		</Filter>

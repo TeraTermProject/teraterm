@@ -67,6 +67,7 @@ void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
 void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName, int destlen);
 void RestoreNewLine(PCHAR Text);
+void RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int far *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
@@ -79,12 +80,11 @@ void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
 						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-#if defined(UNICODE)
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
-#endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
 DllExport void OutputDebugPrintf(const char *fmt, ...);
+DllExport void OutputDebugPrintfW(const wchar_t *fmt, ...);
 DllExport DWORD get_OPENFILENAME_SIZEA();
 DllExport DWORD get_OPENFILENAME_SIZEW();
 DllExport BOOL IsWindows95();

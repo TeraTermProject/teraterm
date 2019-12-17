@@ -129,20 +129,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
     <ClCompile Include="..\common\i18n.c" />
-    <ClCompile Include="comportinfo.cpp" />
-    <ClCompile Include="..\common\ttlib.c" />
-    <ClCompile Include="language.c" />
     <ClCompile Include="..\common\servicenames.c" />
+    <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="comportinfo.cpp" />
+    <ClCompile Include="language.c" />
     <ClCompile Include="ttcmn.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\compat_win.h" />
+    <ClInclude Include="..\common\dllutil.h" />
     <ClInclude Include="..\common\i18n.h" />
-    <ClInclude Include="comportinfo.h" />
-    <ClInclude Include="devpkey_teraterm.h" />    
-    <ClInclude Include="..\common\ttlib.h" />
-    <ClInclude Include="language.h" />
     <ClInclude Include="..\common\servicenames.h" />
+    <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="comportinfo.h" />
+    <ClInclude Include="devpkey_teraterm.h" />
+    <ClInclude Include="language.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpcmn.def" />

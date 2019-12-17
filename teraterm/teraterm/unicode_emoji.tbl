@@ -1,0 +1,239 @@
+﻿{ 0x00203c, 0x00203c }, // double exclamation mark
+{ 0x002049, 0x002049 }, // exclamation question mark
+{ 0x002122, 0x002122 }, // trade mark
+{ 0x002139, 0x002139 }, // information
+{ 0x002194, 0x002199 }, // left-right arrow..down-left arrow
+{ 0x0021a9, 0x0021aa }, // right arrow curving left..left arrow curving right
+{ 0x00231a, 0x00231b }, // watch..hourglass done
+{ 0x002328, 0x002328 }, // keyboard
+{ 0x0023cf, 0x0023cf }, // eject button
+{ 0x0023e9, 0x0023f3 }, // fast-forward button..hourglass not done
+{ 0x0023f8, 0x0023fa }, // pause button..record button
+{ 0x0024c2, 0x0024c2 }, // circled M
+{ 0x0025aa, 0x0025ab }, // black small square..white small square
+{ 0x0025b6, 0x0025b6 }, // play button
+{ 0x0025c0, 0x0025c0 }, // reverse button
+{ 0x0025fb, 0x0025fe }, // white medium square..black medium-small square
+{ 0x002600, 0x002604 }, // sun..comet
+{ 0x00260e, 0x00260e }, // telephone
+{ 0x002611, 0x002611 }, // check box with check
+{ 0x002614, 0x002615 }, // umbrella with rain drops..hot beverage
+{ 0x002618, 0x002618 }, // shamrock
+{ 0x00261d, 0x00261d }, // index pointing up
+{ 0x002620, 0x002620 }, // skull and crossbones
+{ 0x002622, 0x002623 }, // radioactive..biohazard
+{ 0x002626, 0x002626 }, // orthodox cross
+{ 0x00262a, 0x00262a }, // star and crescent
+{ 0x00262e, 0x00262f }, // peace symbol..yin yang
+{ 0x002638, 0x00263a }, // wheel of dharma..smiling face
+{ 0x002640, 0x002640 }, // female sign
+{ 0x002642, 0x002642 }, // male sign
+{ 0x002648, 0x002653 }, // Aries..Pisces
+{ 0x00265f, 0x002660 }, // chess pawn..spade suit
+{ 0x002663, 0x002663 }, // club suit
+{ 0x002665, 0x002666 }, // heart suit..diamond suit
+{ 0x002668, 0x002668 }, // hot springs
+{ 0x00267b, 0x00267b }, // recycling symbol
+{ 0x00267e, 0x00267f }, // infinity..wheelchair symbol
+{ 0x002692, 0x002697 }, // hammer and pick..alembic
+{ 0x002699, 0x002699 }, // gear
+{ 0x00269b, 0x00269c }, // atom symbol..fleur-de-lis
+{ 0x0026a0, 0x0026a1 }, // warning..high voltage
+{ 0x0026aa, 0x0026ab }, // white circle..black circle
+{ 0x0026b0, 0x0026b1 }, // coffin..funeral urn
+{ 0x0026bd, 0x0026be }, // soccer ball..baseball
+{ 0x0026c4, 0x0026c5 }, // snowman without snow..sun behind cloud
+{ 0x0026c8, 0x0026c8 }, // cloud with lightning and rain
+{ 0x0026ce, 0x0026ce }, // Ophiuchus
+{ 0x0026cf, 0x0026cf }, // pick
+{ 0x0026d1, 0x0026d1 }, // rescue worker’s helmet
+{ 0x0026d3, 0x0026d4 }, // chains..no entry
+{ 0x0026e9, 0x0026ea }, // shinto shrine..church
+{ 0x0026f0, 0x0026f5 }, // mountain..sailboat
+{ 0x0026f7, 0x0026fa }, // skier..tent
+{ 0x0026fd, 0x0026fd }, // fuel pump
+{ 0x002702, 0x002702 }, // scissors
+{ 0x002705, 0x002705 }, // check mark button
+{ 0x002708, 0x002709 }, // airplane..envelope
+{ 0x00270a, 0x00270b }, // raised fist..raised hand
+{ 0x00270c, 0x00270d }, // victory hand..writing hand
+{ 0x00270f, 0x00270f }, // pencil
+{ 0x002712, 0x002712 }, // black nib
+{ 0x002714, 0x002714 }, // check mark
+{ 0x002716, 0x002716 }, // multiplication sign
+{ 0x00271d, 0x00271d }, // latin cross
+{ 0x002721, 0x002721 }, // star of David
+{ 0x002728, 0x002728 }, // sparkles
+{ 0x002733, 0x002734 }, // eight-spoked asterisk..eight-pointed star
+{ 0x002744, 0x002744 }, // snowflake
+{ 0x002747, 0x002747 }, // sparkle
+{ 0x00274c, 0x00274c }, // cross mark
+{ 0x00274e, 0x00274e }, // cross mark button
+{ 0x002753, 0x002755 }, // question mark..white exclamation mark
+{ 0x002757, 0x002757 }, // exclamation mark
+{ 0x002763, 0x002764 }, // heart exclamation..red heart
+{ 0x002795, 0x002797 }, // plus sign..division sign
+{ 0x0027a1, 0x0027a1 }, // right arrow
+{ 0x0027b0, 0x0027b0 }, // curly loop
+{ 0x0027bf, 0x0027bf }, // double curly loop
+{ 0x002934, 0x002935 }, // right arrow curving up..right arrow curving down
+{ 0x002b05, 0x002b07 }, // left arrow..down arrow
+{ 0x002b1b, 0x002b1c }, // black large square..white large square
+{ 0x002b50, 0x002b50 }, // star
+{ 0x002b55, 0x002b55 }, // hollow red circle
+{ 0x003030, 0x003030 }, // wavy dash
+{ 0x00303d, 0x00303d }, // part alternation mark
+{ 0x003297, 0x003297 }, // Japanese “congratulations” button
+{ 0x003299, 0x003299 }, // Japanese “secret” button
+{ 0x01f004, 0x01f004 }, // mahjong red dragon
+{ 0x01f0cf, 0x01f0cf }, // joker
+{ 0x01f170, 0x01f171 }, // A button (blood type)..B button (blood type)
+{ 0x01f17e, 0x01f17e }, // O button (blood type)
+{ 0x01f17f, 0x01f17f }, // P button
+{ 0x01f18e, 0x01f18e }, // AB button (blood type)
+{ 0x01f191, 0x01f19a }, // CL button..VS button
+{ 0x01f1e6, 0x01f1ff }, // regional indicator symbol letter a..regional indicator symbol letter z
+{ 0x01f201, 0x01f202 }, // Japanese “here” button..Japanese “service charge” button
+{ 0x01f21a, 0x01f21a }, // Japanese “free of charge” button
+{ 0x01f22f, 0x01f22f }, // Japanese “reserved” button
+{ 0x01f232, 0x01f23a }, // Japanese “prohibited” button..Japanese “open for business” button
+{ 0x01f250, 0x01f251 }, // Japanese “bargain” button..Japanese “acceptable” button
+{ 0x01f300, 0x01f320 }, // cyclone..shooting star
+{ 0x01f321, 0x01f321 }, // thermometer
+{ 0x01f324, 0x01f32c }, // sun behind small cloud..wind face
+{ 0x01f32d, 0x01f32f }, // hot dog..burrito
+{ 0x01f330, 0x01f335 }, // chestnut..cactus
+{ 0x01f336, 0x01f336 }, // hot pepper
+{ 0x01f337, 0x01f37c }, // tulip..baby bottle
+{ 0x01f37d, 0x01f37d }, // fork and knife with plate
+{ 0x01f37e, 0x01f37f }, // bottle with popping cork..popcorn
+{ 0x01f380, 0x01f393 }, // ribbon..graduation cap
+{ 0x01f396, 0x01f397 }, // military medal..reminder ribbon
+{ 0x01f399, 0x01f39b }, // studio microphone..control knobs
+{ 0x01f39e, 0x01f39f }, // film frames..admission tickets
+{ 0x01f3a0, 0x01f3c4 }, // carousel horse..person surfing
+{ 0x01f3c5, 0x01f3c5 }, // sports medal
+{ 0x01f3c6, 0x01f3ca }, // trophy..person swimming
+{ 0x01f3cb, 0x01f3ce }, // person lifting weights..racing car
+{ 0x01f3cf, 0x01f3d3 }, // cricket game..ping pong
+{ 0x01f3d4, 0x01f3df }, // snow-capped mountain..stadium
+{ 0x01f3e0, 0x01f3f0 }, // house..castle
+{ 0x01f3f3, 0x01f3f5 }, // white flag..rosette
+{ 0x01f3f7, 0x01f3f7 }, // label
+{ 0x01f3f8, 0x01f3ff }, // badminton..dark skin tone
+{ 0x01f400, 0x01f43e }, // rat..paw prints
+{ 0x01f43f, 0x01f43f }, // chipmunk
+{ 0x01f440, 0x01f440 }, // eyes
+{ 0x01f441, 0x01f441 }, // eye
+{ 0x01f442, 0x01f4f7 }, // ear..camera
+{ 0x01f4f8, 0x01f4f8 }, // camera with flash
+{ 0x01f4f9, 0x01f4fc }, // video camera..videocassette
+{ 0x01f4fd, 0x01f4fd }, // film projector
+{ 0x01f4ff, 0x01f4ff }, // prayer beads
+{ 0x01f500, 0x01f53d }, // shuffle tracks button..downwards button
+{ 0x01f549, 0x01f54a }, // om..dove
+{ 0x01f54b, 0x01f54e }, // kaaba..menorah
+{ 0x01f550, 0x01f567 }, // one o’clock..twelve-thirty
+{ 0x01f56f, 0x01f570 }, // candle..mantelpiece clock
+{ 0x01f573, 0x01f579 }, // hole..joystick
+{ 0x01f57a, 0x01f57a }, // man dancing
+{ 0x01f587, 0x01f587 }, // linked paperclips
+{ 0x01f58a, 0x01f58d }, // pen..crayon
+{ 0x01f590, 0x01f590 }, // hand with fingers splayed
+{ 0x01f595, 0x01f596 }, // middle finger..vulcan salute
+{ 0x01f5a4, 0x01f5a4 }, // black heart
+{ 0x01f5a5, 0x01f5a5 }, // desktop computer
+{ 0x01f5a8, 0x01f5a8 }, // printer
+{ 0x01f5b1, 0x01f5b2 }, // computer mouse..trackball
+{ 0x01f5bc, 0x01f5bc }, // framed picture
+{ 0x01f5c2, 0x01f5c4 }, // card index dividers..file cabinet
+{ 0x01f5d1, 0x01f5d3 }, // wastebasket..spiral calendar
+{ 0x01f5dc, 0x01f5de }, // clamp..rolled-up newspaper
+{ 0x01f5e1, 0x01f5e1 }, // dagger
+{ 0x01f5e3, 0x01f5e3 }, // speaking head
+{ 0x01f5e8, 0x01f5e8 }, // left speech bubble
+{ 0x01f5ef, 0x01f5ef }, // right anger bubble
+{ 0x01f5f3, 0x01f5f3 }, // ballot box with ballot
+{ 0x01f5fa, 0x01f5fa }, // world map
+{ 0x01f5fb, 0x01f5ff }, // mount fuji..moai
+{ 0x01f600, 0x01f600 }, // grinning face
+{ 0x01f601, 0x01f610 }, // beaming face with smiling eyes..neutral face
+{ 0x01f611, 0x01f611 }, // expressionless face
+{ 0x01f612, 0x01f614 }, // unamused face..pensive face
+{ 0x01f615, 0x01f615 }, // confused face
+{ 0x01f616, 0x01f616 }, // confounded face
+{ 0x01f617, 0x01f617 }, // kissing face
+{ 0x01f618, 0x01f618 }, // face blowing a kiss
+{ 0x01f619, 0x01f619 }, // kissing face with smiling eyes
+{ 0x01f61a, 0x01f61a }, // kissing face with closed eyes
+{ 0x01f61b, 0x01f61b }, // face with tongue
+{ 0x01f61c, 0x01f61e }, // winking face with tongue..disappointed face
+{ 0x01f61f, 0x01f61f }, // worried face
+{ 0x01f620, 0x01f625 }, // angry face..sad but relieved face
+{ 0x01f626, 0x01f627 }, // frowning face with open mouth..anguished face
+{ 0x01f628, 0x01f62b }, // fearful face..tired face
+{ 0x01f62c, 0x01f62c }, // grimacing face
+{ 0x01f62d, 0x01f62d }, // loudly crying face
+{ 0x01f62e, 0x01f62f }, // face with open mouth..hushed face
+{ 0x01f630, 0x01f633 }, // anxious face with sweat..flushed face
+{ 0x01f634, 0x01f634 }, // sleeping face
+{ 0x01f635, 0x01f640 }, // dizzy face..weary cat
+{ 0x01f641, 0x01f642 }, // slightly frowning face..slightly smiling face
+{ 0x01f643, 0x01f644 }, // upside-down face..face with rolling eyes
+{ 0x01f645, 0x01f64f }, // person gesturing NO..folded hands
+{ 0x01f680, 0x01f6c5 }, // rocket..left luggage
+{ 0x01f6cb, 0x01f6cf }, // couch and lamp..bed
+{ 0x01f6d0, 0x01f6d0 }, // place of worship
+{ 0x01f6d1, 0x01f6d2 }, // stop sign..shopping cart
+{ 0x01f6d5, 0x01f6d5 }, // hindu temple
+{ 0x01f6e0, 0x01f6e5 }, // hammer and wrench..motor boat
+{ 0x01f6e9, 0x01f6e9 }, // small airplane
+{ 0x01f6eb, 0x01f6ec }, // airplane departure..airplane arrival
+{ 0x01f6f0, 0x01f6f0 }, // satellite
+{ 0x01f6f3, 0x01f6f3 }, // passenger ship
+{ 0x01f6f4, 0x01f6f6 }, // kick scooter..canoe
+{ 0x01f6f7, 0x01f6f8 }, // sled..flying saucer
+{ 0x01f6f9, 0x01f6f9 }, // skateboard
+{ 0x01f6fa, 0x01f6fa }, // auto rickshaw
+{ 0x01f7e0, 0x01f7eb }, // orange circle..brown square
+{ 0x01f90d, 0x01f90f }, // white heart..pinching hand
+{ 0x01f910, 0x01f918 }, // zipper-mouth face..sign of the horns
+{ 0x01f919, 0x01f91e }, // call me hand..crossed fingers
+{ 0x01f91f, 0x01f91f }, // love-you gesture
+{ 0x01f920, 0x01f927 }, // cowboy hat face..sneezing face
+{ 0x01f928, 0x01f92f }, // face with raised eyebrow..exploding head
+{ 0x01f930, 0x01f930 }, // pregnant woman
+{ 0x01f931, 0x01f932 }, // breast-feeding..palms up together
+{ 0x01f933, 0x01f93a }, // selfie..person fencing
+{ 0x01f93c, 0x01f93e }, // people wrestling..person playing handball
+{ 0x01f93f, 0x01f93f }, // diving mask
+{ 0x01f940, 0x01f945 }, // wilted flower..goal net
+{ 0x01f947, 0x01f94b }, // 1st place medal..martial arts uniform
+{ 0x01f94c, 0x01f94c }, // curling stone
+{ 0x01f94d, 0x01f94f }, // lacrosse..flying disc
+{ 0x01f950, 0x01f95e }, // croissant..pancakes
+{ 0x01f95f, 0x01f96b }, // dumpling..canned food
+{ 0x01f96c, 0x01f970 }, // leafy green..smiling face with hearts
+{ 0x01f971, 0x01f971 }, // yawning face
+{ 0x01f973, 0x01f976 }, // partying face..cold face
+{ 0x01f97a, 0x01f97a }, // pleading face
+{ 0x01f97b, 0x01f97b }, // sari
+{ 0x01f97c, 0x01f97f }, // lab coat..flat shoe
+{ 0x01f980, 0x01f984 }, // crab..unicorn
+{ 0x01f985, 0x01f991 }, // eagle..squid
+{ 0x01f992, 0x01f997 }, // giraffe..cricket
+{ 0x01f998, 0x01f9a2 }, // kangaroo..swan
+{ 0x01f9a5, 0x01f9aa }, // sloth..oyster
+{ 0x01f9ae, 0x01f9af }, // guide dog..probing cane
+{ 0x01f9b0, 0x01f9b9 }, // red hair..supervillain
+{ 0x01f9ba, 0x01f9bf }, // safety vest..mechanical leg
+{ 0x01f9c0, 0x01f9c0 }, // cheese wedge
+{ 0x01f9c1, 0x01f9c2 }, // cupcake..salt
+{ 0x01f9c3, 0x01f9ca }, // beverage box..ice cube
+{ 0x01f9cd, 0x01f9cf }, // person standing..deaf person
+{ 0x01f9d0, 0x01f9e6 }, // face with monocle..socks
+{ 0x01f9e7, 0x01f9ff }, // red envelope..nazar amulet
+{ 0x01fa70, 0x01fa73 }, // ballet shoes..shorts
+{ 0x01fa78, 0x01fa7a }, // drop of blood..stethoscope
+{ 0x01fa80, 0x01fa82 }, // yo-yo..parachute
+{ 0x01fa90, 0x01fa95 }, // ringed planet..banjo

@@ -57,25 +57,27 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <tchar.h>
+#include <wchar.h>
 #include <assert.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
 #include <crtdbg.h>
 
-#include "ttlib.h"		// for GetMessageboxFont()
+#include "ttlib.h"		// for GetMessageboxFont(), IsWindowsNTKernel()
+#include "codeconv.h"
+#include "layer_for_unicode.h"
 
 #include "tipwin.h"
 
-#define TipWinClassName _T("TeraTermTipWinClass")
+#define TipWinClassName L"TeraTermTipWinClass"
 
 typedef struct tagTipWinData {
 	HFONT tip_font;
 	COLORREF tip_bg;
 	COLORREF tip_text;
 	HWND tip_wnd;
-	const TCHAR *str;
+	const wchar_t *str;
 	size_t str_len;
 	RECT str_rect;
 	RECT rect;
@@ -83,14 +85,32 @@ typedef struct tagTipWinData {
 	int py;
 } TipWin;
 
+/**
+ *	9x系でDrawTextWが使えるかよくわからない
+ *	とりあえずこのファイルでのみ使用
+ *	そのうち layer_for_unicode.cpp に移動する
+ */
+static int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
+{
+	if (IsWindowsNTKernel()) {
+		return DrawTextW(hdc, lpchText, cchText, lprc, format);
+	}
+
+	char *strA = ToCharW(lpchText);
+	size_t strA_len = strlen(strA);
+	int result = DrawTextA(hdc, strA, strA_len, lprc, format);
+	free(strA);
+	return result;
+}
+
 VOID CTipWin::CalcStrRect(VOID)
 {
 	HDC hdc = CreateCompatibleDC(NULL);
 	SelectObject(hdc, tWin->tip_font);
 	tWin->str_rect.top = 0;
 	tWin->str_rect.left = 0;
-	DrawText(hdc, tWin->str, (int)tWin->str_len,
-			 &tWin->str_rect, DT_LEFT|DT_CALCRECT);
+	_DrawTextW(hdc, tWin->str, (int)tWin->str_len,
+			   &tWin->str_rect, DT_LEFT|DT_CALCRECT);
 	DeleteDC(hdc);
 }
 
@@ -139,7 +159,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 					rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
 					rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
 					rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
-					DrawText(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT);
+					_DrawTextW(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT);
 				}
 
 				SelectObject(hdc, holdbr);
@@ -189,7 +209,7 @@ CTipWin::~CTipWin()
 
 ATOM CTipWin::RegisterClass()
 {
-	WNDCLASS wc;
+	WNDCLASSW wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = WndProc;
 	wc.cbClsExtra = 0;
@@ -200,7 +220,7 @@ ATOM CTipWin::RegisterClass()
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = class_name;
-	return ::RegisterClass(&wc);
+	return _RegisterClassW(&wc);
 }
 
 VOID CTipWin::Create(HWND pHwnd)
@@ -212,15 +232,15 @@ VOID CTipWin::Create(HWND pHwnd)
 		hInstance = (HINSTANCE)GetWindowLongPtr(pHwnd, GWLP_HINSTANCE);
 	}
 	if (class_name[0] == 0) {
-		_snprintf_s(class_name, _countof(class_name), _TRUNCATE, _T("%s_%p"), TipWinClassName, hInstance);
+		_snwprintf_s(class_name, _countof(class_name), _TRUNCATE, L"%s_%p", TipWinClassName, hInstance);
 	}
 	RegisterClass();
 	if (tWin == NULL) {
 		return;
 	}
 	tWin->str_len = 0;
-	tWin->str = (TCHAR*)malloc(sizeof(TCHAR));
-	memset((void*)tWin->str, 0, sizeof(TCHAR));
+	tWin->str = (wchar_t*)malloc(sizeof(wchar_t));
+	memset((void*)tWin->str, 0, sizeof(wchar_t));
 	tWin->px = 0;
 	tWin->py = 0;
 	tWin->tip_bg = GetSysColor(COLOR_INFOBK);
@@ -230,12 +250,12 @@ VOID CTipWin::Create(HWND pHwnd)
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
 	tWin->tip_font = CreateFontIndirect(&logfont);
 	tWin->tip_wnd =
-		CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					   class_name,
-					   NULL, WS_POPUP,
-					   0, 0,
-					   0, 0,
-					   pHwnd, NULL, hInstance, this);
+		_CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
+						 class_name,
+						 NULL, WS_POPUP,
+						 0, 0,
+						 0, 0,
+						 pHwnd, NULL, hInstance, this);
 	timerid = 0;
 }
 
@@ -269,15 +289,22 @@ VOID CTipWin::SetPos(int x, int y)
 	}
 }
 
-VOID CTipWin::SetText(const TCHAR *str)
+VOID CTipWin::SetText(const char *str)
+{
+	wchar_t *strW = ToWcharA(str);
+	SetText(strW);
+	free(strW);
+}
+
+VOID CTipWin::SetText(const wchar_t *str)
 {
 	if(!IsExists()) {
 		return;
 	}
 
 	TipWin* self = tWin;
-	self->str_len = _tcslen(str);
-	self->str = _tcsdup(str);
+	self->str_len = wcslen(str);
+	self->str = _wcsdup(str);
 	CalcStrRect();
 
 	// ウィンドウのサイズは文字サイズ+左右(上下)のフレーム
@@ -407,6 +434,12 @@ void TipWinSetPos(TipWin *tWin, int x, int y)
 }
 
 void TipWinSetTextA(TipWin* tWin, const char *str)
+{
+	CTipWin* tipwin = (CTipWin*) tWin;
+	tipwin->SetText(str);
+}
+
+void TipWinSetTextW(TipWin* tWin, const wchar_t *str)
 {
 	CTipWin* tipwin = (CTipWin*) tWin;
 	tipwin->SetText(str);

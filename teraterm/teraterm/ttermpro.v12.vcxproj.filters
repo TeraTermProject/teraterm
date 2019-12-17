@@ -147,6 +147,27 @@
     <ClCompile Include="..\common\tmfc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\layer_for_unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../ttpmacro/fileread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sendmem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clipboarddlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ftdlg_lite.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -303,7 +324,7 @@
     <ClInclude Include="..\common\win16api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\ttpdlg\dlg_res.h">
+    <ClInclude Include="../ttpdlg/dlg_res.h">
       <Filter>ttpdlg</Filter>
     </ClInclude>
     <ClInclude Include="../ttpdlg/ttdlg.h">
@@ -311,6 +332,36 @@
     </ClInclude>
     <ClInclude Include="..\common\tmfc.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tipwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../ttpmacro/fileread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sendmem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\codeconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\compat_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\layer_for_unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clipboarddlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ftdlg_lite.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

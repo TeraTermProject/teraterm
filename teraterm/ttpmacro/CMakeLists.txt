@@ -32,7 +32,10 @@ set(COMMON_SRC
   ../common/win16api.c
   ../common/codeconv.h
   ../common/codeconv.cpp
+  ../common/dllutil.h
   ../common/dllutil.cpp
+  ../common/layer_for_unicode.h
+  ../common/layer_for_unicode.cpp
   )
 
 source_group(
@@ -81,6 +84,7 @@ set(SRC
 
   ttpmacro.rc
   ttm-version.rc
+  ttmacro_manifest.rc
   fileread.h
   fileread.cpp
   ${COMMON_SRC}
@@ -98,7 +102,7 @@ link_directories(
   )
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll /MANIFEST:NO")
 endif()
 
 add_executable(

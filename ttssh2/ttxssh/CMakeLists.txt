@@ -98,6 +98,12 @@ target_sources(
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/tipwin.cpp
   ../../teraterm/common/tipwin.h
+  ../../teraterm/common/layer_for_unicode.cpp
+  ../../teraterm/common/layer_for_unicode.h
+  ../../teraterm/common/compat_win.cpp
+  ../../teraterm/common/compat_win.h
+  ../../teraterm/common/dllutil.cpp
+  ../../teraterm/common/dllutil.h
   )
 
 source_group(
@@ -149,6 +155,7 @@ target_link_libraries(
   gdi32
   comdlg32
   delayimp
+  comctl32
   # OpenSSL が使用
   crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
   )

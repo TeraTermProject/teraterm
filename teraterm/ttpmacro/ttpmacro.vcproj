@@ -77,6 +77,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
+				GenerateManifest="false"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -167,6 +168,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
+				GenerateManifest="false"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -277,6 +279,10 @@
 				RelativePath="..\common\win16api.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -382,6 +388,14 @@
 				RelativePath="..\common\win16api.h"
 				>
 			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -397,6 +411,10 @@
 			</File>
 			<File
 				RelativePath="ttmacro_3d.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\ttmacro_manifest.rc"
 				>
 			</File>
 			<File

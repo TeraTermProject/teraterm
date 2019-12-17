@@ -25,6 +25,8 @@
 #define IDD_SETUP_DIR_DIALOG            123
 #define IDI_TTERM_3D                    124
 #define IDI_VT_3D                       125
+#define IDD_TABSHEET_DEBUG              126
+#define IDD_SENDFILEDLG                 127
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -241,6 +243,14 @@
 #define IDC_SELECT_ON_ACTIVATE          2589
 #define IDC_MIXED_THEME_FILE            2590
 #define IDC_ACCEPT_CLEAR_SBUFF          2591
+#define IDC_DEBUG_POPUP_ENABLE          2592
+#define IDC_DEBUG_POPUP_KEY1            2593
+#define IDC_DEBUG_POPUP_KEY2            2594
+#define IDC_DEBUG_CONSOLE_BUTTON        2595
+#define IDC_SENDFILE_FILENAME_BUTTON    2596
+#define IDC_SENDFILE_CHECK_BINARY       2597
+#define IDC_SENDFILE_FILENAME_TITLE     2598
+#define IDC_SENDFILE_FILENAME_EDIT      2599
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -339,9 +349,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        126
+#define _APS_NEXT_RESOURCE_VALUE        128
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2591
+#define _APS_NEXT_CONTROL_VALUE         2600
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

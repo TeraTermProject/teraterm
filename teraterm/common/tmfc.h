@@ -49,9 +49,7 @@ public:
 	LRESULT SendMessage(UINT msg, WPARAM wp, LPARAM lp);
 	void ShowWindow(int nCmdShow);
 	void SetWindowTextT(const TCHAR *str);
-#if defined(UNICODE)
 	void SetWindowTextW(const wchar_t *str);
-#endif
 	void SetWindowTextA(const char *str);
 	LONG_PTR SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong);
 	LONG_PTR GetWindowLongPtr(int nIndex);
@@ -72,19 +70,13 @@ public:
 	// for controls
 	HWND GetDlgItem(int id);
 	LRESULT SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp);
-#if defined(UNICODE)
 	LRESULT SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp);
-#endif
 	LRESULT SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp);
 	void GetDlgItemTextT(int id, TCHAR *buf, size_t size);
-#if defined(UNICODE)
 	void GetDlgItemTextW(int id, wchar_t *buf, size_t size);
-#endif
 	void GetDlgItemTextA(int id, char *buf, size_t size);
 	void SetDlgItemTextT(int id, const TCHAR *str);
-#if defined(UNICODE)
 	void SetDlgItemTextW(int id, const wchar_t *str);
-#endif
 	void SetDlgItemTextA(int id, const char *str);
 	void SetDlgItemNum(int id, LONG Num);
 	void SetCheck(int id, int nCheck);
@@ -156,11 +148,11 @@ private:
 class TTCPropertySheet
 {
 public:
-	TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd);
+	TTCPropertySheet(HINSTANCE hInstance, HWND hParentWnd);
 	virtual ~TTCPropertySheet();
 	virtual void OnInitDialog();
 	INT_PTR DoModal();
-	PROPSHEETHEADER m_psh;
+	PROPSHEETHEADERW m_psh;
 	HWND m_hWnd;
 	HWND m_hParentWnd;
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
@@ -180,7 +172,7 @@ public:
 	virtual void OnHelp();
 	HPROPSHEETPAGE CreatePropertySheetPage();
 protected:
-	PROPSHEETPAGE_V1 m_psp;
+	PROPSHEETPAGEW_V1 m_psp;
 private:
 	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static UINT CALLBACK PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp);

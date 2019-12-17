@@ -1,6 +1,11 @@
 
 if not "%VSINSTALLDIR%" == "" goto vsinstdir
 
+rem InnoSetup からビルドする時は、標準で環境変数に設定されている
+rem Visual Studioが選択される。VS2019決め打ちでビルドしたい場合は
+rem 下記 goto 文を有効にすること。
+rem goto check_2019
+
 if "%VS80COMNTOOLS%" == "" goto check_2008
 if not exist "%VS80COMNTOOLS%\vsvars32.bat" goto check_2008
 call "%VS80COMNTOOLS%\vsvars32.bat"
@@ -49,7 +54,15 @@ call "%VS160COMNTOOLS%\VsDevCmd.bat"
 goto vs2019
 
 :novs
+@echo off
 echo "Can't find Visual Studio"
+echo.
+echo InnoSetupからVS2019でビルドするためには、環境変数を設定してください。
+echo.
+echo 例
+echo VS160COMNTOOLS=c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\
+@echo on
+pause
 exit /b
 
 :vsinstdir
@@ -185,6 +198,9 @@ rem cygtool をコンパイル
 pushd cygtool
 nmake -f cygtool.mak
 popd
+
+rem lng ファイルを作成
+call makelang.bat
 
 popd
 exit /b 0

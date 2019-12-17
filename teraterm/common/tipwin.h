@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2019 TeraTerm Project
+ * Copyright (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -85,7 +85,7 @@ private:
 	UINT_PTR timerid;
 	TipWin* tWin;
 	HINSTANCE hInstance;
-	TCHAR class_name[32];
+	wchar_t class_name[32];
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 	VOID CalcStrRect();
 	ATOM RegisterClass();

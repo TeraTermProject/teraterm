@@ -46,9 +46,7 @@ typedef struct {
 	const char *key;
 } DlgTextInfo;
 
-#if defined(UNICODE)
 DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
-#endif
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 DllExport int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
 DllExport int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,

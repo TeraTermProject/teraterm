@@ -132,17 +132,13 @@ private:
 class CAddSettingPropSheetDlg : public TTCPropertySheet
 {
 public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd);
+	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
 	virtual ~CAddSettingPropSheetDlg();
+
 private:
 	void OnInitDialog();
 
-	HPROPSHEETPAGE hPsp[6];
-
-	CGeneralPropPageDlg   *m_GeneralPage;
-	CSequencePropPageDlg  *m_SequencePage;
-	CCopypastePropPageDlg *m_CopypastePage;
-	CVisualPropPageDlg    *m_VisualPage;
-	CLogPropPageDlg       *m_LogPage;
-	CCygwinPropPageDlg    *m_CygwinPage;
+	int m_PageCount;
+	HPROPSHEETPAGE hPsp[7];
+	TTCPropertyPage *m_Page[7];
 };

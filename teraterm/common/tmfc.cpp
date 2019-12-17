@@ -36,6 +36,7 @@
 #include <tchar.h>
 #include "dlglib.h"
 #include "ttlib.h"
+#include "layer_for_unicode.h"
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
@@ -68,12 +69,10 @@ LRESULT TTCWnd::SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp)
 	return ::SendDlgItemMessage(m_hWnd, id, msg, wp, lp);
 }
 
-#if defined(UNICODE)
 LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
-	return ::SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
+	return ::_SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
 }
-#endif
 
 LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -85,12 +84,10 @@ void TTCWnd::GetDlgItemTextT(int id, TCHAR *buf, size_t size)
 	::GetDlgItemText(m_hWnd, id, buf, (int)size);
 }
 
-#if defined(UNICODE)
 void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
 {
-	::GetDlgItemTextW(m_hWnd, id, buf, (int)size);
+	_GetDlgItemTextW(m_hWnd, id, buf, (int)size);
 }
-#endif
 
 void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
 {
@@ -102,12 +99,10 @@ void TTCWnd::SetDlgItemTextT(int id, const TCHAR *str)
 	::SetDlgItemText(m_hWnd, id, str);
 }
 
-#if defined(UNICODE)
 void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
 {
-	::SetDlgItemTextW(m_hWnd, id, str);
+	_SetDlgItemTextW(m_hWnd, id, str);
 }
-#endif
 
 void TTCWnd::SetDlgItemTextA(int id, const char *str)
 {
@@ -184,12 +179,10 @@ void TTCWnd::SetWindowTextT(const TCHAR *str)
 	::SetWindowText(m_hWnd, str);
 }
 
-#if defined(UNICODE)
 void TTCWnd::SetWindowTextW(const wchar_t *str)
 {
-	::SetWindowTextW(m_hWnd, str);
+	_SetWindowTextW(m_hWnd, str);
 }
-#endif
 
 void TTCWnd::SetWindowTextA(const char *str)
 {
@@ -635,10 +628,10 @@ TTCPropertyPage::TTCPropertyPage(HINSTANCE inst, int id, TTCPropertySheet *sheet
 	m_psp.dwSize = sizeof(m_psp);
 	m_psp.dwFlags = PSP_DEFAULT;
 	m_psp.hInstance = inst;
-	m_psp.pszTemplate = MAKEINTRESOURCE(id);
+	m_psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	m_psp.dwFlags |= PSP_DLGINDIRECT;
-	m_psp.pResource = TTGetDlgTemplate(inst, m_psp.pszTemplate);
+	m_psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
 #endif
 	m_psp.pfnDlgProc = Proc;
 	m_psp.lParam = (LPARAM)this;
@@ -653,7 +646,7 @@ TTCPropertyPage::~TTCPropertyPage()
 
 HPROPSHEETPAGE TTCPropertyPage::CreatePropertySheetPage()
 {
-	return ::CreatePropertySheetPage((PROPSHEETPAGE *)&m_psp);
+	return ::_CreatePropertySheetPageW(&m_psp);
 }
 
 void TTCPropertyPage::OnInitDialog()
@@ -728,7 +721,7 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 
 ////////////////////////////////////////
 
-TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd)
+TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, HWND hParentWnd)
 {
 	m_hInst = hInstance;
 	m_hWnd = 0;
@@ -736,11 +729,9 @@ TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND
 	memset(&m_psh, 0, sizeof(m_psh));
 	m_psh.dwSize = sizeof(m_psh);
 	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS
-	if (pszCaption != nullptr) {
-		m_psh.pszCaption = pszCaption;
-		//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
-	}
+	//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
 	m_psh.hwndParent = hParentWnd;
+	m_psh.hInstance = hInstance;
 	m_psh.pfnCallback = PropSheetProc;
 }
 
@@ -752,7 +743,7 @@ INT_PTR TTCPropertySheet::DoModal()
 {
 	ghInstance = m_hInst;
 	gTTCPS = this;
-	return PropertySheet(&m_psh);
+	return _PropertySheetW(&m_psh);
 
 	// モーダレスにするとタブの動きがおかしい
 #if 0

@@ -43,6 +43,8 @@
 #include <locale.h>
 #include <olectl.h>
 
+#include "unicode_test.h"
+
 #define CurWidth 2
 
 static const BYTE DefaultColorTable[256][3] = {
@@ -123,6 +125,9 @@ static HFONT DCPrevFont;
 TCharAttr DefCharAttr = {
   AttrDefault,
   AttrDefault,
+#if UNICODE_INTERNAL_BUFF
+  AttrDefault,
+#endif
   AttrDefaultFG,
   AttrDefaultBG
 };
@@ -2245,6 +2250,9 @@ void UpdateCaretPosition(BOOL enforce)
 void CaretOn()
 // Turn on the cursor
 {
+#if UNICODE_DEBUG_CARET_OFF
+	return;
+#endif
 	if (ts.KillFocusCursor == 0 && !Active)
 		return;
 
@@ -2342,6 +2350,9 @@ BOOL IsCaretOn()
 
 void DispEnableCaret(BOOL On)
 {
+#if UNICODE_DEBUG_CARET_OFF
+  On = FALSE;
+#endif
   if (! On) CaretOff();
   CaretEnabled = On;
 }
@@ -2800,167 +2811,214 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
   }
 }
 
-#if 1
-// 当面はこちらの関数を使う。(2004.11.4 yutaka)
-void DispStr(PCHAR Buff, int Count, int Y, int* X)
-// Display a string
-//   Buff: points the string
-//   Y: vertical position in window cordinate
-//  *X: horizontal position
-// Return:
-//  *X: horizontal position shifted by the width of the string
+static void DrawTextBGImage(HDC hdcBGBuffer, int X, int Y, int width, int height)
 {
-  RECT RText;
+	RECT  rect;
+	SetRect(&rect,0,0,width,height);
 
-  if ((ts.Language==IdRussian) &&
-      (ts.RussClient!=ts.RussFont))
-    RussConvStr(ts.RussClient,ts.RussFont,Buff,Count);
+	//窓の移動、リサイズ中は背景を BGBrushInSizeMove で塗りつぶす
+	if(BGInSizeMove)
+		FillRect(hdcBGBuffer,&rect,BGBrushInSizeMove);
 
-  RText.top = Y;
-  RText.bottom = Y+FontHeight;
-  RText.left = *X;
-  RText.right = *X + Count*FontWidth;
+	BitBlt(hdcBGBuffer,0,0,width,height,hdcBG,X,Y,SRCCOPY);
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
-  if(!BGEnable)
-  {
-    ExtTextOut(VTDC,*X+ts.FontDX,Y+ts.FontDY,
-               ETO_CLIPPED | ETO_OPAQUE,
-               &RText,Buff,Count,&Dx[0]);
-  }else{
+	if(BGReverseText == TRUE)
+	{
+		if(BGReverseTextAlpha < 255)
+		{
+			BLENDFUNCTION bf;
+			HBRUSH hbr;
 
-    int   width;
-    int   height;
-    int   eto_options = ETO_CLIPPED;
-    RECT  rect;
-    HFONT hPrevFont;
+			hbr = CreateSolidBrush(GetBkColor(hdcBGBuffer));
+			FillRect(hdcBGWork,&rect,hbr);
+			DeleteObject(hbr);
 
-    width  = Count*FontWidth;
-    height = FontHeight;
-    SetRect(&rect,0,0,width,height);
+			ZeroMemory(&bf,sizeof(bf));
+			bf.BlendOp             = AC_SRC_OVER;
+			bf.SourceConstantAlpha = BGReverseTextAlpha;
 
-    //hdcBGBuffer の属性を設定
-    hPrevFont = SelectObject(hdcBGBuffer,GetCurrentObject(VTDC,OBJ_FONT));
-    SetTextColor(hdcBGBuffer,GetTextColor(VTDC));
-    SetBkColor(hdcBGBuffer,GetBkColor(VTDC));
-
-    //窓の移動、リサイズ中は背景を BGBrushInSizeMove で塗りつぶす
-    if(BGInSizeMove)
-      FillRect(hdcBGBuffer,&rect,BGBrushInSizeMove);
-
-    BitBlt(hdcBGBuffer,0,0,width,height,hdcBG,*X,Y,SRCCOPY);
-
-    if(BGReverseText == TRUE)
-    {
-      if(BGReverseTextAlpha < 255)
-      {
-        BLENDFUNCTION bf;
-        HBRUSH hbr;
-
-        hbr = CreateSolidBrush(GetBkColor(hdcBGBuffer));
-        FillRect(hdcBGWork,&rect,hbr);
-        DeleteObject(hbr);
-
-        ZeroMemory(&bf,sizeof(bf));
-        bf.BlendOp             = AC_SRC_OVER;
-        bf.SourceConstantAlpha = BGReverseTextAlpha;
-
-        BGAlphaBlend(hdcBGBuffer,0,0,width,height,hdcBGWork,0,0,width,height,bf);
-      }else{
-        eto_options |= ETO_OPAQUE;
-      }
-    }
-
-    ExtTextOut(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect,Buff,Count,&Dx[0]);
-    BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
-
-    SelectObject(hdcBGBuffer,hPrevFont);
-  }
-//-->
-#else
-  ExtTextOut(VTDC,*X+ts.FontDX,Y+ts.FontDY,
-             ETO_CLIPPED | ETO_OPAQUE,
-             &RText,Buff,Count,&Dx[0]);
-#endif
-  *X = RText.right;
-
-  if ((ts.Language==IdRussian) &&
-      (ts.RussClient!=ts.RussFont))
-    RussConvStr(ts.RussFont,ts.RussClient,Buff,Count);
+			BGAlphaBlend(hdcBGBuffer,0,0,width,height,hdcBGWork,0,0,width,height,bf);
+		}
+	}
 }
 
-#else
-void DispStr(PCHAR Buff, int Count, int Y, int* X)
 // Display a string
 //   Buff: points the string
 //   Y: vertical position in window cordinate
 //  *X: horizontal position
 // Return:
 //  *X: horizontal position shifted by the width of the string
+void DispStr(PCHAR Buff, int Count, int Y, int* X)
 {
-	RECT RText;
-	wchar_t *wc;
-	int len, wclen;
-	CHAR ch;
-
-#if 0
-#include <crtdbg.h>
-	_CrtSetBreakAlloc(52);
-	Buff[0] = 0x82;
-	Buff[1] = 0xe4;
-	Buff[2] = 0x82;
-	Buff[3] = 0xbd;
-	Buff[4] = 0x82;
-	Buff[5] = 0xa9;
-	Count = 6;
+#ifdef ALPHABLEND_TYPE2
+	const BOOL draw_bg_enable = BGEnable;
+#else
+	const BOOL draw_bg_enable = FALSE;
 #endif
 
-	setlocale(LC_ALL, ts.Locale);	// TODO コード変換ここでする?,無効化されたコード
+	{
+		char b[128];
+		memcpy(b, Buff, Count);
+		b[Count] = 0;
+		OutputDebugPrintf("(%d,%d)'%s'\n", *X, Y, b);
+	}
 
-	ch = Buff[Count];
-	Buff[Count] = 0;
-	len = mbstowcs(NULL, Buff, 0);
-
-	wc = malloc(sizeof(wchar_t) * (len + 1));
-	if (wc == NULL)
-		return;
-	wclen = mbstowcs(wc, Buff, len + 1);
-	Buff[Count] = ch;
-
+#if !UNICODE_INTERNAL_BUFF
 	if ((ts.Language==IdRussian) &&
 		(ts.RussClient!=ts.RussFont))
 		RussConvStr(ts.RussClient,ts.RussFont,Buff,Count);
-
-	RText.top = Y;
-	RText.bottom = Y+FontHeight;
-	RText.left = *X;
-	RText.right = *X + Count*FontWidth; //
-
-	// Unicodeで出力する。
-#if 1
-	// UTF-8環境において、tcshがEUC出力した場合、画面に何も表示されないことがある。
-	// マウスでドラッグしたり、ログファイルへ保存してみると、文字化けした文字列を
-	// 確認することができる。(2004.8.6 yutaka)
-	ExtTextOutW(VTDC,*X+ts.FontDX,Y+ts.FontDY,
-		ETO_CLIPPED | ETO_OPAQUE,
-		&RText, wc, wclen, NULL);
-//		&RText, wc, wclen, &Dx[0]);
-#else
-	TextOutW(VTDC, *X+ts.FontDX, Y+ts.FontDY, wc, wclen);
-
 #endif
 
-	*X = RText.right;
+	if(!draw_bg_enable)
+	{
+		RECT RText;
+		RText.top = Y;
+		RText.bottom = Y+FontHeight;
+		RText.left = *X;
+		RText.right = *X + Count*FontWidth;
 
-	if ((ts.Language==IdRussian) &&
-		(ts.RussClient!=ts.RussFont))
+		ExtTextOutA(VTDC,*X+ts.FontDX,Y+ts.FontDY,
+					ETO_CLIPPED | ETO_OPAQUE,
+					&RText,Buff,Count,&Dx[0]);
+	}
+#ifdef ALPHABLEND_TYPE2
+	else {
+		HFONT hPrevFont;
+		RECT  rect;
+		int   eto_options;
+		const int width  = Count*FontWidth;
+		const int height = FontHeight;
+		SetRect(&rect,0,0,width,height);
+
+		//hdcBGBuffer の属性を設定
+		hPrevFont = SelectObject(hdcBGBuffer,GetCurrentObject(VTDC,OBJ_FONT));
+		SetTextColor(hdcBGBuffer,GetTextColor(VTDC));
+		SetBkColor(hdcBGBuffer,GetBkColor(VTDC));
+
+		// 文字の背景を描画
+		DrawTextBGImage(hdcBGBuffer, *X, Y, width, height);
+
+		// 文字を描画
+		eto_options = ETO_CLIPPED;
+		if(BGReverseText == TRUE && BGReverseTextAlpha < 255) {
+			eto_options |= ETO_OPAQUE;
+		}
+		ExtTextOutA(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect,Buff,Count,&Dx[0]);
+
+		// Windowに貼り付け
+		BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
+
+		SelectObject(hdcBGBuffer,hPrevFont);
+	}
+#endif
+
+	*X += Count*FontWidth;
+
+#if !UNICODE_INTERNAL_BUFF
+	if ((ts.Language==IdRussian) && (ts.RussClient!=ts.RussFont))
 		RussConvStr(ts.RussFont,ts.RussClient,Buff,Count);
+#endif
+}
 
-	free(wc);
+// DispStr() の wchar_t版
+// TODO: 今のところ ExtTextOutW() を直呼び
+#if defined(UNICODE_DISPLAY)
+void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
+{
+#ifdef ALPHABLEND_TYPE2
+	const BOOL draw_bg_enable = BGEnable;
+#else
+	const BOOL draw_bg_enable = FALSE;
+#endif
+
+#if 0
+	{
+		wchar_t b[TermWidthMax];
+		memcpy(b, StrW, Count*sizeof(wchar_t));
+		b[Count] = 0;
+		OutputDebugPrintfW(L"(%d,%d)'%s'\n", *X, Y, b);
+		OutputDebugPrintfW(L"       '%hs'\n", WidthInfo);
+	}
+#endif
+
+	int Dx2[TermWidthMax];
+	int dx3 = 0;
+	int HalfCharCount = 0;
+	int i;
+	for(i=0; i<Count; i++) {
+		if (WidthInfo[i] == 'H') {
+			HalfCharCount++;
+			dx3++;
+			Dx2[i] = FontWidth;
+		} else if (WidthInfo[i] == '0') {
+			if (i == 0) {
+				Dx2[i] = 0;
+			} else {
+				Dx2[i] = Dx2[i-1];
+				Dx2[i-1] = 0;
+			}
+		} else {
+			HalfCharCount += 2;
+			Dx2[i] = FontWidth * 2;
+			dx3 += 2;
+		}
+	}
+
+	if(!draw_bg_enable)
+	{
+		RECT RText;
+		RText.top = Y;
+		RText.bottom = Y+FontHeight;
+		RText.left = *X;
+		RText.right = *X + HalfCharCount * FontWidth;
+		RText.right = *X + dx3 * FontWidth;
+
+#if 0
+		ExtTextOutW(VTDC, *X + ts.FontDX, Y + ts.FontDY,
+			ETO_CLIPPED | ETO_OPAQUE,
+			&RText, Buff, Count, &Dx[0]);
+#endif
+		ExtTextOutW(VTDC, *X + ts.FontDX, Y + ts.FontDY,
+			ETO_CLIPPED | ETO_OPAQUE,
+			&RText, StrW, Count, &Dx2[0]);
+	}
+#ifdef ALPHABLEND_TYPE2
+	else {
+		HFONT hPrevFont;
+		RECT  rect;
+		int   eto_options;
+		const int width  = Count*FontWidth*2;
+		const int height = FontHeight;
+		SetRect(&rect,0,0,width,height);
+
+		//hdcBGBuffer の属性を設定
+		hPrevFont = SelectObject(hdcBGBuffer,GetCurrentObject(VTDC,OBJ_FONT));
+		SetTextColor(hdcBGBuffer,GetTextColor(VTDC));
+		SetBkColor(hdcBGBuffer,GetBkColor(VTDC));
+
+		// 文字の背景を描画
+		DrawTextBGImage(hdcBGBuffer, *X, Y, width, height);
+
+		// 文字を描画
+		eto_options = ETO_CLIPPED;
+		if(BGReverseText == TRUE && BGReverseTextAlpha < 255) {
+			eto_options |= ETO_OPAQUE;
+		}
+#if 0
+		ExtTextOutW(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect, StrW,Count,&Dx[0]);
+#endif
+		ExtTextOutW(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect, StrW,Count,&Dx2[0]);
+
+		// Windowに貼り付け
+		BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
+
+		SelectObject(hdcBGBuffer,hPrevFont);
+	}
+#endif
+
+	*X += dx3 *FontWidth;
 }
 #endif
-
 
 void DispEraseCurToEnd(int YEnd)
 {

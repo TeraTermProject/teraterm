@@ -45,11 +45,13 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -133,24 +135,25 @@
     <ClCompile Include="..\common\dlglib_cpp.cpp" />
     <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\common\dllutil.cpp" />
+    <ClCompile Include="..\common\layer_for_unicode.cpp" />
     <ClCompile Include="..\common\tmfc.cpp" />
     <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\common\win16api.c" />
+    <ClCompile Include="ListDlg.cpp" />
     <ClCompile Include="errdlg.cpp" />
     <ClCompile Include="fileread.cpp" />
     <ClCompile Include="inpdlg.cpp" />
-    <ClCompile Include="ListDlg.cpp" />
     <ClCompile Include="msgdlg.cpp" />
     <ClCompile Include="statdlg.cpp" />
     <ClCompile Include="ttl.c" />
     <ClCompile Include="ttmacro.cpp" />
-    <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmbuff.c" />
     <ClCompile Include="ttmdde.c" />
     <ClCompile Include="ttmdlg.cpp" />
     <ClCompile Include="ttmenc.c" />
     <ClCompile Include="ttmlib.c" />
+    <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmparse.c" />
     <ClCompile Include="wait4all.c" />
   </ItemGroup>
@@ -159,17 +162,19 @@
     <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\dllutil.h" />
+    <ClInclude Include="..\common\layer_for_unicode.h" />
     <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="..\common\win16api.h" />
+    <ClInclude Include="ListDlg.h" />
     <ClInclude Include="errdlg.h" />
     <ClInclude Include="fileread.h" />
     <ClInclude Include="inpdlg.h" />
-    <ClInclude Include="ListDlg.h" />
     <ClInclude Include="msgdlg.h" />
     <ClInclude Include="statdlg.h" />
     <ClInclude Include="ttl.h" />
+    <ClInclude Include="ttm_res.h" />
     <ClInclude Include="ttmacro.h" />
     <ClInclude Include="ttmbuff.h" />
     <ClInclude Include="ttmdde.h" />
@@ -179,7 +184,6 @@
     <ClInclude Include="ttmmain.h" />
     <ClInclude Include="ttmmsg.h" />
     <ClInclude Include="ttmparse.h" />
-    <ClInclude Include="ttm_res.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="ttmacro.ico" />
@@ -191,6 +195,7 @@
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">0x0411</Culture>
     </ResourceCompile>
+    <ResourceCompile Include="ttmacro_manifest.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v15.vcxproj">

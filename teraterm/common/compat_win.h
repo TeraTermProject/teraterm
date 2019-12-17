@@ -67,6 +67,22 @@ typedef enum MONITOR_DPI_TYPE {
 #define OPENFILENAME_SIZE_VERSION_400A	76
 #endif
 
+extern ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
+extern HWND(WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X,
+									  int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
+									  LPVOID lpParam);
+extern HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
+extern INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
+extern LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
+extern BOOL(WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+extern int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
+extern BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
+extern DWORD(WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+												LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+extern UINT(WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+extern DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
+extern BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
+extern BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 extern BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 extern BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
@@ -81,6 +97,7 @@ extern int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
 extern int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
 extern BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
 extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
+extern HWND (WINAPI *pGetConsoleWindow)(void);
 
 #ifdef UNICODE
 #define pAddFontResourceEx		pAddFontResourceExW

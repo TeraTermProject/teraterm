@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-11-22)
+ï»¿; Updated by TeraTerm Project (2019-11-22)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -43,13 +43,13 @@ MENU_TRANS_QV_SEND=&Senden
 MENU_EDIT=B&earbeiten
 MENU_EDIT_COPY=&Kopieren\tAlt+C
 MENU_EDIT_COPYTABLE=&Tabelle kopieren
-MENU_EDIT_PASTE=&Einfügen\tAlt+V
-MENU_EDIT_PASTECR=Einfügen<C&R>\tAlt+R
-MENU_EDIT_CLSCREEN=&Bildschirm löschen
-MENU_EDIT_CLBUFFER=&Puffer löschen
+MENU_EDIT_PASTE=&EinfÃ¼gen\tAlt+V
+MENU_EDIT_PASTECR=EinfÃ¼gen<C&R>\tAlt+R
+MENU_EDIT_CLSCREEN=&Bildschirm lÃ¶schen
+MENU_EDIT_CLBUFFER=&Puffer lÃ¶schen
 MENU_EDIT_CANCELSELECT=&Auswahl aufheben
 MENU_EDIT_SELECTSCREEN=&Bildschirm markieren
-MENU_EDIT_SELECTALL=&Alles auswählen
+MENU_EDIT_SELECTALL=&Alles auswÃ¤hlen
 
 MENU_SETUP=Ein&stellungen
 MENU_SETUP_TERMINAL=&Terminal-Einstellungen
@@ -68,14 +68,14 @@ MENU_SETUP_OPENSETUP=Setup d&irectory...
 MENU_SETUP_LOADKEYMAP=&Keyboard-Layout einstellen
 
 MENU_CONTROL=Ste&uerung
-MENU_CONTROL_RESET=&Terminal zurücksetzen
+MENU_CONTROL_RESET=&Terminal zurÃ¼cksetzen
 MENU_CONTROL_RESETTITLE=R&eset remote title
 MENU_CONTROL_AREYOUTHERE=Are you &there\tAlt+T
 MENU_CONTROL_SENDBREAK=&Abbruch senden\tAlt+B
-MENU_CONTROL_RESETPORT=Port zurücksetzen
+MENU_CONTROL_RESETPORT=Port zurÃ¼cksetzen
 MENU_CONTROL_BROADCAST=&Broadcast-Kommando
-MENU_CONTROL_OPENTEK=TEK ö&ffnen
-MENU_CONTROL_CLOSETEK=TEK &schließen
+MENU_CONTROL_OPENTEK=TEK Ã¶&ffnen
+MENU_CONTROL_CLOSETEK=TEK &schlieÃŸen
 MENU_CONTROL_MACRO=&Macro
 MENU_CONTROL_SHOW_MACRO=&Makrofenster anzeigen
 
@@ -92,9 +92,9 @@ MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
 
 MENU_HELP=&Hilfe
 MENU_HELP_INDEX=&Hilfedatei
-MENU_HELP_ABOUT=&Über Tera Term...
+MENU_HELP_ABOUT=&Ãœber Tera Term...
 
-MENU_SHOW_MENUBAR=Menüleiste anzeigen
+MENU_SHOW_MENUBAR=MenÃ¼leiste anzeigen
 
 
 TEKMENU_FILE=D&atei
@@ -104,8 +104,8 @@ TEKMENU_FILE_EXIT=&Beenden\tAlt+Q
 TEKMENU_EDIT=B&earbeiten
 TEKMENU_EDIT_COPY=&Kopieren\tAlt+C
 TEKMENU_EDIT_COPYSCREEN=Bildschirm kopieren
-TEKMENU_EDIT_PASTE=&Einfügen\tAlt+V
-TEKMENU_EDIT_PASTECR=Einfügen<C&R>\tAlt+R
+TEKMENU_EDIT_PASTE=&EinfÃ¼gen\tAlt+V
+TEKMENU_EDIT_PASTECR=EinfÃ¼gen<C&R>\tAlt+R
 TEKMENU_EDIT_CLSCREEN=Bildschirm leeren
 
 TEKMENU_SETUP=Ein&stellungen
@@ -119,9 +119,9 @@ TEKMENU_WINDOW=&Fenster
 TEKMENU_HELP=&Hilfe
 TEKMENU_HELP_INDEX=&Index
 TEKMENU_HELP_USING=&Hilfe verwenden
-TEKMENU_HELP_ABOUT=&Über Tera Term...
+TEKMENU_HELP_ABOUT=&Ãœber Tera Term...
 
-TEKMENU_SHOW_MENUBAR=&Menüleiste anzeigen
+TEKMENU_SHOW_MENUBAR=&MenÃ¼leiste anzeigen
 
 ; ttermpro
 ; filesys.cpp
@@ -148,23 +148,23 @@ MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Verbindung trennen?
-MSG_EXEC_TT_ERROR=Tera Term kann nicht ausgeführt werden. (%d)
+MSG_EXEC_TT_ERROR=Tera Term kann nicht ausgefÃ¼hrt werden. (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Cygwin-Ordner kann nicht gefunden werden.
 MSG_CYGTERM_ENV_ALLOC_ERROR=Can't allocate memory for environment variable.
-MSG_EXEC_CYGTERM_ERROR=Cygterm kann nicht ausgeführt werden.
-MSG_EXEC_TTMENU_ERROR=Das TeraTerm-Menü kann nicht ausgeführt werden. (%d)
-MSG_EXEC_LOGMETT_ERROR=LogMeTT kann nicht ausgeführt werden. (%d)
+MSG_EXEC_CYGTERM_ERROR=Cygterm kann nicht ausgefÃ¼hrt werden.
+MSG_EXEC_TTMENU_ERROR=Das TeraTerm-MenÃ¼ kann nicht ausgefÃ¼hrt werden. (%d)
+MSG_EXEC_LOGMETT_ERROR=LogMeTT kann nicht ausgefÃ¼hrt werden. (%d)
 MSG_VIEW_LOGFILE_ERROR=Log-Datei kann nicht angezeigt werden. (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=Select replay log file with binary mode
 FILEDLG_OPEN_LOGFILE_FILTER=Alle Dateien(*.*)\0*.*\0\0
-DIRDLG_CYGTERM_DIR_TITLE=Cygwin-Ordner auswählen
+DIRDLG_CYGTERM_DIR_TITLE=Cygwin-Ordner auswÃ¤hlen
 MSG_CYGTERM_CONF_WRITEFILE_ERROR=Die CygTerm-Konfigurationsdatei kann nicht geschrieben werden (%d).
-MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Alte CygTerm-Konfigurationsdatei kann nicht gelöscht werden (%d).
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Alte CygTerm-Konfigurationsdatei kann nicht gelÃ¶scht werden (%d).
 MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Die CygTerm-Konfigurationsdatei kann nicht umbenannt werden (%d).
 MSG_CYGTERM_CONF_SAVED_NOTICE=Cygwin tab configuration was saved in %s.
 FILEDLG_SELECT_LOGVIEW_APP_TITLE=Choose a executing file with launching logging file
 FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
-FILEDLG_SELECT_LOGDIR_TITLE=Log-Ordner auswählen
+FILEDLG_SELECT_LOGDIR_TITLE=Log-Ordner auswÃ¤hlen
 FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=Choose a file including strings for ConfirmChangePaste
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=Textdateien(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=Invalid character is included in log file name.
@@ -218,10 +218,10 @@ DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notify clipboard access from remote
 DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=Accept clearing &scroll buffer from remote
 
 DLG_TAB_COPYPASTE_CONTINUE=Mehrere Zeilen kopieren
-DLG_TAB_COPYPASTE_MOUSEPASTE=&Einfügen mit rechter Maustaste aus
-DLG_TAB_COPYPASTE_CONFIRMPASTE=&Einfügen mit rechter Maustaste ein
-DLG_TAB_COPYPASTE_MOUSEPASTEM=Einfügen mit mittlerer Maustaste ein
-DLG_TAB_COPYPASTE_SELECTLBUTTON=&Auswahl nur über Button
+DLG_TAB_COPYPASTE_MOUSEPASTE=&EinfÃ¼gen mit rechter Maustaste aus
+DLG_TAB_COPYPASTE_CONFIRMPASTE=&EinfÃ¼gen mit rechter Maustaste ein
+DLG_TAB_COPYPASTE_MOUSEPASTEM=EinfÃ¼gen mit mittlerer Maustaste ein
+DLG_TAB_COPYPASTE_SELECTLBUTTON=&Auswahl nur Ã¼ber Button
 DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
 DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=Confirm change &paste
@@ -231,7 +231,7 @@ DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
 
-DLG_TAB_VISUAL_ALPHA=Fenster Opazität
+DLG_TAB_VISUAL_ALPHA=Fenster OpazitÃ¤t
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
 DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Eterm-Aussehen(*)
@@ -246,7 +246,7 @@ DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=Antialiased
 DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=ClearType
 DLG_TAB_VISUAL_ANSICOLOR=AN&SI color
 DLG_TAB_VISUAL_RED=&Rot
-DLG_TAB_VISUAL_GREEN=&Grün
+DLG_TAB_VISUAL_GREEN=&GrÃ¼n
 DLG_TAB_VISUAL_BLUE=&Blau
 DLG_TAB_VISUAL_BOLD=Enable B&old attribute color
 DLG_TAB_VISUAL_BLINK=Enable B&link attribute color
@@ -281,16 +281,16 @@ DLG_PRNABORT_PRINTING=Printing
 DLG_PROT_FILENAME=Dateiname:
 DLG_PROT_PROTO=Protocoll:
 DLG_PROT_PACKET=Paket#:
-DLG_PROT_TRANS=Bytes übertragen:
+DLG_PROT_TRANS=Bytes Ã¼bertragen:
 DLG_PROT_ELAPSED=Elapsed time:
 
 DLG_FILETRANS_FILENAME=Dateiname:
-DLG_FILETRANS_FULLPATH=Vollständiger Pfad:
-DLG_FILETRANS_TRNAS=Bytes übertragen:
+DLG_FILETRANS_FULLPATH=VollstÃ¤ndiger Pfad:
+DLG_FILETRANS_TRNAS=Bytes Ã¼bertragen:
 DLG_FILETRANS_ELAPSED=Elapsed time:
 DLG_FILETRANS_START=&Start
 DLG_FILETRANS_PAUSE=Pau&se
-DLG_FILETRANS_CLOSE=Schließen
+DLG_FILETRANS_CLOSE=SchlieÃŸen
 
 DLG_SETUPDIR_TITLE=Tera Term: Setup directory
 DLG_SETUPDIR_INIFILE=Tera Term Configuration File
@@ -316,16 +316,16 @@ DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
-TOOLTIP_TITLEBAR_OPACITY=Opazität %.1f %%
+TOOLTIP_TITLEBAR_OPACITY=OpazitÃ¤t %.1f %%
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Kann Winsock nicht verwenden
 MSG_INVALID_HOST_ERROR=Falscher Hostname
-MSG_CANTOPEN_ERROR=Kann %s nicht öffnen (0x%08x)
+MSG_CANTOPEN_ERROR=Kann %s nicht Ã¶ffnen (0x%08x)
 MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
 MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied.
 MSG_CANTOPEN_ERROR_PIPEBUSY=Cannot open %s. Pipe is busy.
-MSG_CANTOPEN_FILE_ERROR=Kann Datei nicht öffnen
+MSG_CANTOPEN_FILE_ERROR=Kann Datei nicht Ã¶ffnen
 MSG_COMM_REFUSE_ERROR=Verbindung ist abgebrochen worden
 MSG_COMM_REACH_ERROR=Netzwerk ist nicht erreichbar
 MSG_COMM_TIMEOUT_ERROR=Timeout der Verbindung
@@ -334,12 +334,12 @@ MSG_CREATE_THREAD_ERROR=Thread kann nicht erzeugt werden
 
 ; ttpdlg
 ; ttdlg.c
-DLG_ABOUT_TITLE=Über Tera Term
+DLG_ABOUT_TITLE=Ãœber Tera Term
 
 DLG_DIR_TITLE=Verzeichnis wechseln
 DLG_DIR_CURRENT=Aktuell:
 DLG_DIR_NEW=&Neu:
-DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
+DLG_SELECT_DIR_TITLE=Neues Verzeichnis wÃ¤hlen
 
 DLG_GEN_TITLE=Tera-Grundeinstellungen
 DLG_GEN_PORT=Standard-Port
@@ -381,28 +381,28 @@ DLG_SERIAL_OK_RESET=&New setting
 
 DLG_TCPIP_TITLE=Hostliste editieren
 DLG_TCPIP_HOSTLIST=Hostliste
-DLG_TCPIP_ADD=Hinzufügen
+DLG_TCPIP_ADD=HinzufÃ¼gen
 DLG_TCPIP_UP=hoch
 DLG_TCPIP_REMOVE=entf
 DLG_TCPIP_DOWN=runter
 DLG_TCPIP_HISTORY=Verlauf
 DLG_TCPIP_KEEPALIVE=Keep alive
 DLG_TCPIP_KEEPALIVE_SEC=Sec
-DLG_TCPIP_AUTOCLOSE=Fenster automatisch schließen
+DLG_TCPIP_AUTOCLOSE=Fenster automatisch schlieÃŸen
 DLG_TCPIP_PORT=&Port:
 DLG_TCPIP_TELNET=Telnet
 DLG_TCPIP_TERMTYPE=Terminal-Typ:
 
 DLG_TERM_TITLE=Terminal-Einstellungen
-DLG_TERM_WIDTHLABEL=Terminal-Größe
-DLG_TERM_ISWIN=Term = Fenstergröße
-DLG_TERM_RESIZE=Größe automatisch anpassen
+DLG_TERM_WIDTHLABEL=Terminal-GrÃ¶ÃŸe
+DLG_TERM_ISWIN=Term = FenstergrÃ¶ÃŸe
+DLG_TERM_RESIZE=GrÃ¶ÃŸe automatisch anpassen
 DLG_TERM_NEWLINE=Neue Zeile
-DLG_TERM_CRRCV=Übertragen:
+DLG_TERM_CRRCV=Ãœbertragen:
 DLG_TERM_CRSEND=Absenden:
 DLG_TERM_ID=Terminal-ID:
 DLG_TERM_LOCALECHO=Lokales Echo
-DLG_TERM_ANSBACK=Rückantwort:
+DLG_TERM_ANSBACK=RÃ¼ckantwort:
 DLG_TERM_AUTOSWITCH=Automatisch wechseln (VT<->TEK)
 DLG_TERM_KANJI=&Kanji (receive)
 DLG_TERM_KANA=Hal&f-width kana
@@ -426,7 +426,7 @@ DLG_WIN_VERT=Vertikale Linie
 DLG_WIN_HORZ=Horizontale Linie
 DLG_WIN_BOLDFONT=fettschreiben
 DLG_WIN_HIDETITLE=Titelleiste ausblenden
-DLG_WIN_HIDEMENU=Menüleiste ausblenden
+DLG_WIN_HIDEMENU=MenÃ¼leiste ausblenden
 DLG_WIN_COLOREMU=&Farbemulation
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
 DLG_WIN_AIXTERM16=1&6 Colors (aixterm style)
@@ -451,16 +451,16 @@ DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appeara
 
 DLG_WINLIST_TITLE=Fensterliste
 DLG_WINLIST_LABEL=&Fenster:
-DLG_WINLIST_OPEN=Ö&ffnen
-DLG_WINLIST_CLOSEWIN=Fenster &schließen
+DLG_WINLIST_OPEN=Ã–&ffnen
+DLG_WINLIST_CLOSEWIN=Fenster &schlieÃŸen
 
 MSG_FIND_DIR_ERROR=Verzeichnis kann nicht gefunden werden
 
 ; ttpfile
 ; ttfile.c
 DLG_FOPT=Option
-DLG_FOPT_BINARY=&Binär
-DLG_FOPT_APPEND=&Anhängen
+DLG_FOPT_BINARY=&BinÃ¤r
+DLG_FOPT_APPEND=&AnhÃ¤ngen
 DLG_FOPT_PLAIN=&Plain-Text
 DLG_FOPT_TIMESTAMP=&Zeitstempel
 DLG_FOPT_HIDEDIALOG=&Dialog ausblenden
@@ -474,7 +474,7 @@ DLG_XOPT=Option
 DLG_XOPT_CHECKSUM=Check&summe
 DLG_XOPT_CRC=&CRC
 DLG_XOPT_1K=1&K
-DLG_XOPT_BINARY=&Binär
+DLG_XOPT_BINARY=&BinÃ¤r
 
 FILEDLG_KEYBOARD_FILTER=Tastaturlayout (*.cnf)\0*.cnf\0\0
 FILEDLG_SETUP_FILTER=setup files (*.ini)\0*.ini\0\0
@@ -510,10 +510,10 @@ DLG_CLIPBOARD_TITLE=Tera Term: Clipboard confirmation
 
 ; ttptek
 ; tttek.c
-MSG_TEK_PRINT_ERROR=Der Drucker unterstützt keine Grafiken
+MSG_TEK_PRINT_ERROR=Der Drucker unterstÃ¼tzt keine Grafiken
 
 ; ttpmacro
-FILEDLG_OPEN_MACRO_TITLE=Makro öffnen
+FILEDLG_OPEN_MACRO_TITLE=Makro Ã¶ffnen
 FILEDLG_OPEN_MACRO_FILTER=Makro-Dateien (*.ttl)\0*.ttl\0\0
 
 BTN_PAUSE=Pause
@@ -535,12 +535,12 @@ MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.\
 
 BTN_OK=OK
 BTN_CANCEL=Abbrechen
-BTN_CLOSE=Schließen
+BTN_CLOSE=SchlieÃŸen
 BTN_HELP=Hilfe
 
 ; help
 HELPFILE=teraterm.chm
-MSG_OPENHELP_ERROR=Hilfedatei kann nicht geöffnet werden (%s).
+MSG_OPENHELP_ERROR=Hilfedatei kann nicht geÃ¶ffnet werden (%s).
 
 ; ttset
 MSG_INI_ERROR=Tera Term: Error
@@ -554,31 +554,31 @@ DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
-MENU_ABOUT=&Über TTSSH
+MENU_ABOUT=&Ãœber TTSSH
 MENU_SSH=&SSH
 MENU_SSH_AUTH=&SSH-Authentifikation
 MENU_SSH_FORWARD=&SSH-Portforwarding
 MENU_SSH_KEYGEN=&SSH-Keygenerator
 
 ; dlg about
-DLG_ABOUT_TITLE=Über TTSSH
+DLG_ABOUT_TITLE=Ãœber TTSSH
 DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_ABOUT_SERVERID=Server-ID:
 DLG_ABOUT_PROTOCOL=Verwendetes Protokoll:
-DLG_ABOUT_ENCRYPTION=Verschlüsselung:
-DLG_ABOUT_SERVERKEY=Server-Schlüssel:
+DLG_ABOUT_ENCRYPTION=VerschlÃ¼sselung:
+DLG_ABOUT_SERVERKEY=Server-SchlÃ¼ssel:
 DLG_ABOUT_KEXKEY=Key exchange keys:
 DLG_ABOUT_AUTH=Authentifikation:
 DLG_ABOUT_COMP=Kompression:
 DLG_ABOUT_CLIENTID=Client-ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
-DLG_ABOUT_HOSTKEY=Client-Schlüssel:
+DLG_ABOUT_HOSTKEY=Client-SchlÃ¼ssel:
 DLG_ABOUT_MAC=MAC algorithm:
 DLG_ABOUT_MAC_INFO=%s zum Server, %s vom Server
 DLG_ABOUT_COMPDELAY=Delayed Compression:
 DLG_ABOUT_CIPHER_INFO=%s zum Server, %s vom Server
 DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key
-DLG_ABOUT_KEY_INFO2=%d-Bit-Client-Schlüssel, %d-Bit-Server-Schlüssel
+DLG_ABOUT_KEY_INFO2=%d-Bit-Client-SchlÃ¼ssel, %d-Bit-Server-SchlÃ¼ssel
 DLG_ABOUT_KEY_NONE=Keiner
 DLG_ABOUT_COMP_INFO=level %d; ratio %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=level %d
@@ -605,16 +605,16 @@ DLG_AUTH_REMEMBER_PASSWORD=Passphrase speichern
 DLG_AUTH_FWDAGENT=F&orward agent
 DLG_AUTH_METHOD=Authentication methods
 DLG_AUTH_METHOD_PASSWORD=Passwortauthentifikation verwenden
-DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
+DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-SchlÃ¼ssel verwenden
 DLG_AUTH_METHOD_RHOST=rhosts verwenden (SSH1)
 ;DLG_AUTH_METHOD_CHALLENGE1=Benutze challenge/response (TIS)
 DLG_AUTH_METHOD_CHALLENGE1=Use challenge/response(&TIS) to log in
 ;DLG_AUTH_METHOD_CHALLENGE2=Benutze challenge/response (keyboard-interactive)
 DLG_AUTH_METHOD_CHALLENGE2=Use keyboard-&interactive to log in
 DLG_AUTH_METHOD_PAGEANT=Benutze Pageant
-DLG_AUTH_PRIVATEKEY=Schlüssel:
+DLG_AUTH_PRIVATEKEY=SchlÃ¼ssel:
 DLG_AUTH_LOCALUSER=Lokaler Benutzername:
-DLG_AUTH_HOST_PRIVATEKEY=rhosts-Schlüssel:
+DLG_AUTH_HOST_PRIVATEKEY=rhosts-SchlÃ¼ssel:
 DLG_AUTH_TIP_CONTROL_CODE=control character is entered
 DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Can't find Pageant.
@@ -622,7 +622,7 @@ MSG_PAGEANT_NOKEY=Pageant has no valid key.
 
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
-DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
+DLG_AUTHSETUP_BANNER=Standard-Einstellungen fÃ¼r Authentifikation:
 DLG_AUTHSETUP_USERNAME=User name
 DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
 DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
@@ -630,42 +630,42 @@ DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
 DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
 DLG_AUTHSETUP_METHOD=Authentication methods
 DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
-DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
+DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-SchlÃ¼ssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)
 ;DLG_AUTHSETUP_METHOD_CHALLENGE=Benutze challenge/response (SSH1:&TIS, SSH2:keyboard-interactive)
 DLG_AUTHSETUP_METHOD_CHALLENGE=Use SSH1:challenge/response(&TIS) / SSH2:keyboard-interactive to log in
 DLG_AUTHSETUP_METHOD_PAGEANT=Use P&ageant
-DLG_AUTHSETUP_PRIVATEKEY=Schlüssel:
+DLG_AUTHSETUP_PRIVATEKEY=SchlÃ¼ssel:
 DLG_AUTHSETUP_LOCALUSER=Lokaler Benutzername:
-DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-Schlüssel:
-DLG_AUTHSETUP_CHECKAUTH=Prüfe die Authentifizierungsmethoden vor dem Logins (SSH2)
+DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-SchlÃ¼ssel:
+DLG_AUTHSETUP_CHECKAUTH=PrÃ¼fe die Authentifizierungsmethoden vor dem Logins (SSH2)
 
-FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA/ED25519-Schlüssel auswählen
+FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA/ED25519-SchlÃ¼ssel auswÃ¤hlen
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
-MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA/ED25519-Schlüssel auswählen.
-MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA/ED25519-Schlüssels\n%s
+MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA/ED25519-SchlÃ¼ssel auswÃ¤hlen.
+MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA/ED25519-SchlÃ¼ssels\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.
-MSG_NOAUTHMETHOD_ERROR=Der Server unterstützt keine der von TTSSH angebotenen\nAuthentifizierungs-Optionen. Die Verbindung wird beendet.
+MSG_NOAUTHMETHOD_ERROR=Der Server unterstÃ¼tzt keine der von TTSSH angebotenen\nAuthentifizierungs-Optionen. Die Verbindung wird beendet.
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=SICHERHEITSWARNUNG
-DLG_DIFFERENTKEY_WARNING=Der Server ("####################################") ist in der "known hosts"-Liste bereits mit einem anderen Schlüssel eingetragen.
+DLG_DIFFERENTKEY_WARNING=Der Server ("####################################") ist in der "known hosts"-Liste bereits mit einem anderen SchlÃ¼ssel eingetragen.
 DLG_DIFFERENTKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
-DLG_DIFFERENTKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
+DLG_DIFFERENTKEY_FINGERPRINT=Der Fingerabdruck des SchlÃ¼ssels:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_DIFFERENTKEY_REPLACE=Den vorhanden Schlüssel durch den neuen ersetzen.
+DLG_DIFFERENTKEY_REPLACE=Den vorhanden SchlÃ¼ssel durch den neuen ersetzen.
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=SICHERHEITSWARNUNG
 DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTTYPEKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
-DLG_DIFFERENTTYPEKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=Der Fingerabdruck des SchlÃ¼ssels:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_DIFFERENTTYPEKEY_ADD=Den Server zur "known hosts"-Liste hinzufügen.
+DLG_DIFFERENTTYPEKEY_ADD=Den Server zur "known hosts"-Liste hinzufÃ¼gen.
 
 ; dlg fwd edit
 DLG_FWD_TITLE=SSH-Port-Weiterleitung
-DLG_FWD_BANNER=Die Richtung der Port-Weiterleitung wählen:
+DLG_FWD_BANNER=Die Richtung der Port-Weiterleitung wÃ¤hlen:
 DLG_FWD_LOCAL_PORT=Lokalen Port weiterleiten
 DLG_FWD_LOCAL_LISTEN=l&isten
 DLG_FWD_LOCAL_REMOTE=zur Remote-Maschine
@@ -678,16 +678,16 @@ DLG_FWD_REMOTE_LOCAL_PORT=Lok. Port
 DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
 DLG_FWD_DYNAMIC_LISTEN=lis&ten
 
-MSG_SAME_SERVERPORT_ERROR=Sie können nicht zwei Weiterleitungen vom selben Server-Port definieren (%d).
-MSG_SAME_LOCALPORT_ERROR=Sie können nicht zwei Weiterleitungen vom selben lokalen Port definieren (%d).
+MSG_SAME_SERVERPORT_ERROR=Sie kÃ¶nnen nicht zwei Weiterleitungen vom selben Server-Port definieren (%d).
+MSG_SAME_LOCALPORT_ERROR=Sie kÃ¶nnen nicht zwei Weiterleitungen vom selben lokalen Port definieren (%d).
 MSG_UNSPECIFIED_FWD_ERROR1=Die folgenden Weiterleitungen waren zu Beginn dieser SSH-Sitzung nicht definiert:\n\n
 MSG_UNSPECIFIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
-MSG_INVALID_PORT_ERROR="%s" ist keine gültige Portnummer.\nWählen Sie entweder einen Portnamen aus der Liste, oder geben Sie eine Nummer zwischen 1 and 65535 an.
+MSG_INVALID_PORT_ERROR="%s" ist keine gÃ¼ltige Portnummer.\nWÃ¤hlen Sie entweder einen Portnamen aus der Liste, oder geben Sie eine Nummer zwischen 1 and 65535 an.
 
 ; dlg fwd setup
 DLG_FWDSETUP_TITLE=SSH-Port-Weiterleitung
 DLG_FWDSETUP_LIST=SSH-Tunnel aufbauen
-DLG_FWDSETUP_ADD=Hinzufügen
+DLG_FWDSETUP_ADD=HinzufÃ¼gen
 DLG_FWDSETUP_EDIT=Bearbeiten
 DLG_FWDSETUP_REMOVE=Entfernen
 DLG_FWDSETUP_CHECKIDENTITY=Lokale Ports akzeptieren Verbindungen von anderen Hosts
@@ -718,9 +718,9 @@ MSG_TCPPORT_NAN_ERROR=Der TCP-Port muss nummerisch sein.
 
 ; dlg keygen
 DLG_KEYGEN_TITLE=SSH Key Generator
-DLG_KEYGEN_KEYTYPE=Schlüssel-Typ
+DLG_KEYGEN_KEYTYPE=SchlÃ¼ssel-Typ
 DLG_KEYGEN_PASSPHRASE=Passphrase:
-DLG_KEYGEN_PASSPHRASE2=Passphrase bestätigen:
+DLG_KEYGEN_PASSPHRASE2=Passphrase bestÃ¤tigen:
 DLG_KEYGEN_COMMENT=C&omment:
 DLG_KEYGEN_SAVEPUBLIC=Public Key
 DLG_KEYGEN_SAVEPRIVATE=Private Key
@@ -741,10 +741,10 @@ FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All File
 FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa.pub)\0id_ecdsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\0id_ed25519.pub\0All Files(*.*)\0*.*\0\0
-MSG_SAVE_KEY_OPENFILE_ERROR=Schlüssel kann nicht geöffnet werden
-MSG_SAVE_KEY_WRITEFILE_ERROR=Schlüssel kann nicht speichert werden
-MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Die Passphrasen stimmen nicht überein
-MSG_SAVE_PRIVATEKEY_EMPTY_WARN=Möchten Sie den Schlüssel ohne Passphrase speichern?
+MSG_SAVE_KEY_OPENFILE_ERROR=SchlÃ¼ssel kann nicht geÃ¶ffnet werden
+MSG_SAVE_KEY_WRITEFILE_ERROR=SchlÃ¼ssel kann nicht speichert werden
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Die Passphrasen stimmen nicht Ã¼berein
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=MÃ¶chten Sie den SchlÃ¼ssel ohne Passphrase speichern?
 FILEDLG_SAVE_PRIVATEKEY_TITLE=Private Key speichern:
 FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0All Files(*.*)\0*.*\0\0
@@ -756,7 +756,7 @@ FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\0id_ed25519\
 DLG_SSHSETUP_TITLE=TTSSH: Setup
 DLG_SSHSETUP_COMPRESS=&Kompressionsstufe:
 DLG_SSHSETUP_COMPRESS_NONE=Keine
-DLG_SSHSETUP_COMPRESS_HIGHEST=Höchste
+DLG_SSHSETUP_COMPRESS_HIGHEST=HÃ¶chste
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.
 DLG_SSHSETUP_CIPHER=&Preferred cipher order
 DLG_SSHSETUP_CIPHER_UP=Move Up(&1)
@@ -788,7 +788,7 @@ DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
 DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verify hostkey fingerprint by DNS
-DLG_SSHSETUP_NOTICE=Die Einstellungen werden beim Start der nächsten Sitzung aktiv.
+DLG_SSHSETUP_NOTICE=Die Einstellungen werden beim Start der nÃ¤chsten Sitzung aktiv.
 DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
 DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
 DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
@@ -813,11 +813,11 @@ MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=SICHERHEITSWARNUNG
-DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
+DLG_UNKNOWNHOST_WARNING=Es gibt fÃ¼r diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
 DLG_UNKNOWNHOST_WARNING2=Wenn Sie auf 'Continue' klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
-DLG_UNKNOWNHOST_FINGERPRINT=Der Fingerabdruck des Schlüssels:
+DLG_UNKNOWNHOST_FINGERPRINT=Der Fingerabdruck des SchlÃ¼ssels:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_UNKNOWNHOST_ADD=Den Server zur "known hosts"-Liste hinzufügen.
+DLG_UNKNOWNHOST_ADD=Den Server zur "known hosts"-Liste hinzufÃ¼gen.
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=No host key fingerprint found in DNS.
 DLG_HOSTKEY_SSHFP_MATCH=Matching host key fingerprint found in DNS.
@@ -950,7 +950,7 @@ MSG_NONFATAL_ERROR=Tera Term: not fatal error
 
 BTN_OK=OK
 BTN_CANCEL=Abbrechen
-BTN_CLOSE=Schließen
+BTN_CLOSE=SchlieÃŸen
 BTN_DISCONNECT=&Trennen
 BTN_CONTINUE=&Fortsetzen
 BTN_YES=&Yes
@@ -962,7 +962,7 @@ BTN_HELP=&Help
 DLG_TAHOMA_FONT=Tahoma,8,0
 
 MENU_SETUP=&Proxy...
-MENU_ABOUT=&Über TTProxy...
+MENU_ABOUT=&Ãœber TTProxy...
 
 DLG_SETUP_TITLE=Proxy-Setup
 DLG_SETUP_URL=URL
@@ -980,10 +980,10 @@ DLG_OTHER_SECOND=Sekunden
 DLG_OTHER_LOG=Proxy-Verbindungs-Log
 DLG_OTHER_REFER=Re&fer...
 DLG_OTHER_SOCKS=SOCKS-Proxyeinstellungen
-DLG_OTHER_RESOLV=&Namensauflösung
-DLG_OTHER_RESOLV_AUTO=&Automatische Namensauflösung
-DLG_OTHER_RESOLV_REMOTE=Remote auflösen
-DLG_OTHER_RESOLV_LOCAL=Lokal auflösen
+DLG_OTHER_RESOLV=&NamensauflÃ¶sung
+DLG_OTHER_RESOLV_AUTO=&Automatische NamensauflÃ¶sung
+DLG_OTHER_RESOLV_REMOTE=Remote auflÃ¶sen
+DLG_OTHER_RESOLV_LOCAL=Lokal auflÃ¶sen
 DLG_OTHER_TELNET=TELNET-Proxyeinstellungen
 DLG_OTHER_HOST=&Hostname prompt
 DLG_OTHER_USER=&Username prompt
@@ -991,7 +991,7 @@ DLG_OTHER_PASS=&Password prompt
 DLG_OTHER_CONNECT=&Connected message
 DLG_OTHER_ERROR=&Fehlermeldung
 
-DLG_ABOUT_TITLE=Über TTProxy
+DLG_ABOUT_TITLE=Ãœber TTProxy
 DLG_ABOUT_EXTENSION=TeraTerm-Proxyerweiterung
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
 DLG_ABOUT_HOMEPAGE=TTProxy-Homepage
@@ -1028,8 +1028,8 @@ MSG_CERT_REVOKED=Certificate revoked
 MSG_INVALID_CA=Invalid CA Certificate
 MSG_PATH_LENGTH_EXCEEDED=Path length constraint exceeded
 MSG_INVALID_PURPOSE=Unsupported Certificate purpose
-MSG_CERT_UNTRUSTED=Zertifikat nicht vertrauenswürdig
-MSG_CERT_REJECTED=Zertifikat zurückgewiesen
+MSG_CERT_UNTRUSTED=Zertifikat nicht vertrauenswÃ¼rdig
+MSG_CERT_REJECTED=Zertifikat zurÃ¼ckgewiesen
 MSG_SUBJECT_ISSUER_MISMATCH=Subject Issuer mismatch
 MSG_AKID_SKID_MISMATCH=Authority and Subject Key Identifier mismatch
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Authority and Issuer Serial Number mismatch
@@ -1047,12 +1047,12 @@ DLG_TAHOMA_FONT=Tahoma,8,0
 
 MENU_LISTCONFIG=Listenkonfiguration
 MENU_SETTING=Setting
-MENU_ICON=Große Symbole anzeigen
+MENU_ICON=GroÃŸe Symbole anzeigen
 MENU_FONT=Schriftart angeben
 MENU_LEFTPOPUP=showing list by left-click
 MENU_HOTKEY=showing list hotkey(Ctl+Alt+M)
 MENU_VERSION=Version
-MENU_EXEC=Ausführen
+MENU_EXEC=AusfÃ¼hren
 MENU_CLOSE=Beenden
 MENU_NOTRAY=(none)
 
@@ -1072,7 +1072,7 @@ DLG_CONFIG_MACRO=specified macro file
 DLG_CONFIG_LAUNCH=launch only
 DLG_CONFIG_STARTUP=kick at starting
 DLG_CONFIG_SSH=SSH verwenden
-DLG_CONFIG_KEYFILE=Schlüsseldatei
+DLG_CONFIG_KEYFILE=SchlÃ¼sseldatei
 DLG_CONFIG_CHALLENGE=use Challenge
 DLG_CONFIG_PAGEANT=use Pageant
 DLG_CONFIG_DETAIL=Details

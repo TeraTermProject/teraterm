@@ -138,17 +138,18 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
     <ClCompile Include="..\common\dlglib.c" />
     <ClCompile Include="..\common\dlglib_cpp.cpp" />
     <ClCompile Include="..\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
+    <ClCompile Include="..\common\layer_for_unicode.cpp" />
+    <ClCompile Include="..\common\tipwin.cpp" />
     <ClCompile Include="..\common\tmfc.cpp" />
     <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
-    <ClCompile Include="..\common\tipwin.cpp" />
     <ClCompile Include="..\common\win16api.c" />
-    <ClCompile Include="..\common\codeconv.cpp" />
-    <ClCompile Include="..\common\dllutil.cpp" />
-    <ClCompile Include="..\common\compat_win.cpp" />
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
@@ -178,9 +179,20 @@
     <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="winjump.c" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
-    <ClInclude Include="..\ttpdlg\dlg_res.h" />
+    <ClCompile Include="unicode.cpp" />
+    <ClInclude Include="../ttpdlg/dlg_res.h" />
     <ClCompile Include="../ttpdlg/ttdlg.c" />
     <ClInclude Include="../ttpdlg/ttdlg.h" />
+    <ClInclude Include="../ttpmacro/fileread.h" />
+    <ClCompile Include="../ttpmacro/fileread.cpp" />
+    <ClInclude Include="sendmem.h" />
+    <ClCompile Include="sendmem.cpp" />
+    <ClInclude Include="ftdlg_lite.h" />
+    <ClCompile Include="ftdlg_lite.cpp" />
+    <ClInclude Include="clipboarddlg.h" />
+    <ClCompile Include="clipboarddlg.cpp" />
+    <ClInclude Include="debug_pp.h" />
+    <ClCompile Include="debug_pp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico" />
@@ -193,25 +205,30 @@
     <Image Include="..\common\vt_classic.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
+    <ResourceCompile Include="debug_pp.rc" />
+    <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="tt-version.rc" />
     <ResourceCompile Include="ttermpro.rc" />
-    <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\codeconv.h" />
     <ClInclude Include="..\common\compat_w95.h" />
+    <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
+    <ClInclude Include="..\common\layer_for_unicode.h" />
     <ClInclude Include="..\common\tektypes.h" />
     <ClInclude Include="..\common\teraterm.h" />
     <ClInclude Include="..\common\tipwin.h" />
     <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\tt-version.h" />
+    <ClInclude Include="..\common\tt_res.h" />
     <ClInclude Include="..\common\ttcommon.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttftypes.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="..\common\ttplugin.h" />
     <ClInclude Include="..\common\tttypes.h" />
-    <ClInclude Include="..\common\tt_res.h" />
     <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="addsetting.h" />
     <ClInclude Include="buffer.h" />
@@ -239,6 +256,7 @@
     <ClInclude Include="vtdisp.h" />
     <ClInclude Include="vtterm.h" />
     <ClInclude Include="vtwin.h" />
+    <ClInclude Include="unicode.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\svnrev\svnrev.v11.vcxproj">

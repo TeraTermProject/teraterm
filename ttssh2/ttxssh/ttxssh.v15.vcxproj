@@ -82,7 +82,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libcrypto.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libcrypto.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;comctl32..lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\openssl\out32.dbg;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
@@ -128,7 +128,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libcrypto.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;ws2_32.lib;libcrypto.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\openssl\out32;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
@@ -142,9 +142,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\teraterm\common\codeconv.cpp" />
+    <ClCompile Include="..\..\teraterm\common\compat_win.cpp" />
     <ClCompile Include="..\..\teraterm\common\dlglib.c" />
     <ClCompile Include="..\..\teraterm\common\dlglib_cpp.cpp" />
     <ClCompile Include="..\..\teraterm\common\dlglib_tmpl.cpp" />
+    <ClCompile Include="..\..\teraterm\common\dllutil.cpp" />
+    <ClCompile Include="..\..\teraterm\common\layer_for_unicode.cpp" />
     <ClCompile Include="..\..\teraterm\common\tipwin.cpp" />
     <ClCompile Include="..\..\teraterm\common\ttlib.c" />
     <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c" />
@@ -181,6 +184,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\teraterm\common\codeconv.h" />
+    <ClInclude Include="..\..\teraterm\common\compat_win.h" />
+    <ClInclude Include="..\..\teraterm\common\dllutil.h" />
+    <ClInclude Include="..\..\teraterm\common\layer_for_unicode.h" />
+    <ClInclude Include="..\..\teraterm\common\ttlib.h" />
     <ClInclude Include="arc4random.h" />
     <ClInclude Include="auth.h" />
     <ClInclude Include="buffer.h" />

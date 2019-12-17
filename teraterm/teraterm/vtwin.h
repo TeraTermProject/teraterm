@@ -32,6 +32,8 @@
 #ifdef __cplusplus
 #include "tipwin.h"
 #include "tmfc.h"
+#include "unicode_test.h"
+#include "tipwin.h"
 
 class CVTWindow : public TTCFrameWnd
 {
@@ -53,7 +55,7 @@ private:
     SetupMenu, ControlMenu, WinMenu, HelpMenu;
 
   // drag and drop handle
-  TCHAR **DropLists;
+  wchar_t **DropLists;
   int DropListCount;
   void DropListFree();
 
@@ -63,6 +65,13 @@ private:
 
   // DPI
   BOOL IgnoreSizeMessage;
+
+  // for debug
+#if UNICODE_DEBUG
+  TipWin *TipWinCodeDebug;
+  int CtrlKeyState;			// 0:äJén/1:âüÇ∑/2:ó£Ç∑/3:âüÇ∑(ï\é¶èÛë‘)
+  DWORD CtrlKeyDownTick;	// ç≈èâÇ…âüÇµÇΩtick
+#endif
 
   // TipWin
   CTipWin* TipWin;
@@ -226,6 +235,9 @@ protected:
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	void Disconnect(BOOL confirm);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
+
+private:
+	void CodePopup(int client_x, int client_y);
 };
 #endif
 

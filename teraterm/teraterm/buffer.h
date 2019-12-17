@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,10 +59,12 @@ void BuffCopyBox(int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int Src
 void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 void BuffCBCopy(BOOL Table);
+void BuffCBCopyUnicode(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
 void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert);
+int BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);
 void BuffUpdateRect(int XStart, int YStart, int XEnd, int YEnd);
 void UpdateStr();
 void UpdateStrUnicode(void);
@@ -108,6 +110,9 @@ void BuffScrollRight(int count);
 int BuffGetCurrentLineData(char *buf, int bufsize);
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
+wchar_t *BuffGetCharInfo(int Xw, int Yw);
+void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr);
+TCharAttr BuffGetCursorCharAttr(int x, int y);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;

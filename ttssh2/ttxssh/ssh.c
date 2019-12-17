@@ -4069,6 +4069,30 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 
 }
 
+/**
+ *	fopen utf-8 wrapper
+ */
+static FILE *fopenU8(const char *filenameU8, const char *mode)
+{
+	wchar_t *filenameW = ToWcharU8(filenameU8);
+	wchar_t *modeW = ToWcharU8(mode);
+	FILE *fp;
+	_wfopen_s(&fp, filenameW, modeW);
+	free(modeW);
+	free(filenameW);
+	return fp;
+}
+
+/**
+ * stat UTF-8 wrapper
+ */
+static int statU8(const char *filenameU8, struct __stat64 *st)
+{
+	wchar_t *filenameW = ToWcharU8(filenameU8);
+	int r = _wstat64(filenameW, st);
+	free(filenameW);
+	return r;
+}
 
 //
 // SCP support
@@ -4102,7 +4126,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	}
 
 	if (direction == TOREMOTE) {  // copy local to remote
-		fp = fopen(sendfile, "rb");
+		fp = fopenU8(sendfile, "rb");
 		if (fp == NULL) {
 			char buf[1024];
 			int len;
@@ -4129,7 +4153,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		}
 		c->scp.localfp = fp;     // file pointer
 
-		if (_stat64(c->scp.localfilefull, &st) == 0) {
+		if (statU8(c->scp.localfilefull, &st) == 0) {
 			c->scp.filestat = st;
 		} else {
 			goto error;

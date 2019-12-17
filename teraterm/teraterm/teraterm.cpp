@@ -31,8 +31,10 @@
 
 #include "teraterm_conf.h"
 
+#include <stdio.h>
 #include <crtdbg.h>
 #include <tchar.h>
+#include <io.h>			// for access()
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -53,6 +55,10 @@
 #include "compat_w95.h"
 #include "dlglib.h"
 #include "teraterml.h"
+#include "unicode_test.h"
+#if UNICODE_INTERNAL_BUFF
+#include "sendmem.h"
+#endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -208,6 +214,11 @@ static BOOL OnIdle(LONG lCount)
 		case IdTalkFile:
 			FileSend();
 			break; /* file */
+		case IdTalkSendMem:
+			SendMemContinuously();
+			break;
+		default:
+			break;
 		}
 
 		/* Receiver */
@@ -299,6 +310,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
 	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);

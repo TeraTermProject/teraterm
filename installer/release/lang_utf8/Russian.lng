@@ -1,0 +1,1158 @@
+﻿; Updated by TeraTerm Project (2019-11-22)
+; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
+
+[Tera Term]
+DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_FILE=&Файл
+MENU_FILE_NEW=&Новое соединение...\tAlt+N
+MENU_FILE_DUPLICATE=&Повторная сессия\tAlt+D
+MENU_FILE_GYGWIN=Cy&gwin соединение\tAlt+G
+MENU_FILE_LOG=&Лог...
+MENU_FILE_PAUSELOG=Pause Logg&ing
+MENU_FILE_COMMENTLOG=&Комментарии к логу...
+MENU_FILE_VIEWLOG=&Просмотреть лог
+MENU_FILE_SHOWLOGDIALOG=&Показать диалог...
+MENU_FILE_STOPLOG=Stop Logging (&Q)
+MENU_FILE_SENDFILE=&Передать файл...
+MENU_FILE_CHANGEDIR=&Изменить путь...
+MENU_FILE_REPLAYLOG=&Воспроизвести лог...
+MENU_FILE_LOGMETT=&LogMeTT
+MENU_FILE_PRINT=&Печать...\tAlt+P
+MENU_FILE_DISCONNECT=&Разъединение\tAlt+I
+MENU_FILE_EXIT=&Выход\tAlt+Q
+MENU_FILE_EXITALL=Выход полный
+
+MENU_TRANS=&Трансфер
+MENU_TRANS_KERMIT_RCV=&Готовность
+MENU_TRANS_KERMIT_GET=&Прием...
+MENU_TRANS_KERMIT_SEND=&Передача...
+MENU_TRANS_KERMIT_FINISH=&Финиш
+MENU_TRANS_X_RCV=&Прием...
+MENU_TRANS_X_SEND=&Передача...
+MENU_TRANS_Y_RCV=&Прием...
+MENU_TRANS_Y_SEND=&Передача...
+MENU_TRANS_Z_RCV=&Прием
+MENU_TRANS_Z_SEND=&Передача...
+MENU_TRANS_BP_RCV=&Прием
+MENU_TRANS_BP_SEND=&Передача...
+MENU_TRANS_QV_RCV=&Прием
+MENU_TRANS_QV_SEND=&Передача...
+
+MENU_EDIT=&Операции
+MENU_EDIT_COPY=&Копировать\tAlt+C
+MENU_EDIT_COPYTABLE=&Копировать таблицу
+MENU_EDIT_PASTE=&Вставить\tAlt+V
+MENU_EDIT_PASTECR=Вставить<C&R>\tAlt+R
+MENU_EDIT_CLSCREEN=&Очистить экран
+MENU_EDIT_CLBUFFER=&Очистить буфер
+MENU_EDIT_CANCELSELECT=&Выделить до конца
+MENU_EDIT_SELECTSCREEN=&Выделить экран
+MENU_EDIT_SELECTALL=&Выделить все
+
+MENU_SETUP=&Настройка
+MENU_SETUP_TERMINAL=&Терминал...
+MENU_SETUP_WINDOW=&Окно...
+MENU_SETUP_FONT_SUBMENU=&Шрифт
+MENU_SETUP_FONT=&Шрифт...
+MENU_SETUP_DIALOG_FONT=&Dialog font...
+MENU_SETUP_KEYBOARD=&Клавиатура...
+MENU_SETUP_SERIALPORT=&COM-порт...
+MENU_SETUP_TCPIP=T&CP/IP...
+MENU_SETUP_GENERAL=&Общие...
+MENU_SETUP_ADDITION=&Дополнительные настройки...
+MENU_SETUP_SAVE=&Сохранить настройки...
+MENU_SETUP_RESTORE=&Восстановить настройки...
+MENU_SETUP_OPENSETUP=&Каталог настроек...
+MENU_SETUP_LOADKEYMAP=&Загрузить настройки клавиш...
+
+MENU_CONTROL=&Управление
+MENU_CONTROL_RESET=&Сброс терминала
+MENU_CONTROL_RESETTITLE=&Сброс удаленный
+MENU_CONTROL_AREYOUTHERE=&Вы уверены?\tAlt+T
+MENU_CONTROL_SENDBREAK=&Послать останов\tAlt+B
+MENU_CONTROL_RESETPORT=&Сброс порта
+MENU_CONTROL_BROADCAST=&Общие команды
+MENU_CONTROL_OPENTEK=&Открыть TEK
+MENU_CONTROL_CLOSETEK=&Закрыть TEK
+MENU_CONTROL_MACRO=&Макросы
+MENU_CONTROL_SHOW_MACRO=&Показать макросы
+
+MENU_WINDOW=&Окно
+MENU_WINDOW_WINDOW=&Опции
+MENU_WINDOW_MINIMIZEALL=&Свернуть окна
+MENU_WINDOW_CASCADE=&Окна каскадом
+MENU_WINDOW_STACKED=Окна &мозаикой
+MENU_WINDOW_SIDEBYSIDE=Окна &сторона к стороне
+MENU_WINDOW_RESTOREALL=&Восстановить окна
+MENU_WINDOW_CASCADE_UNDO=&Восстановить окна каскадом
+MENU_WINDOW_STACKED_UNDO=&Восстановить окна мозаикой
+MENU_WINDOW_SIDEBYSIDE_UNDO=&Восстановить окна сторона к стороне
+
+MENU_HELP=&Помощь
+MENU_HELP_INDEX=&Поиск
+MENU_HELP_ABOUT=&О программе Tera Term...
+
+MENU_SHOW_MENUBAR=&Показать меню
+
+
+TEKMENU_FILE=&Файл
+TEKMENU_FILE_PRINT=&Печать...\tAlt+P
+TEKMENU_FILE_EXIT=&Выход\tAlt+Q
+
+TEKMENU_EDIT=&Редактировать
+TEKMENU_EDIT_COPY=&Копировать\tAlt+C
+TEKMENU_EDIT_COPYSCREEN=&Копировать экран
+TEKMENU_EDIT_PASTE=&Вставить\tAlt+V
+TEKMENU_EDIT_PASTECR=Вставить <C&R>\tAlt+R
+TEKMENU_EDIT_CLSCREEN=&Очистить экран
+
+TEKMENU_SETUP=&Настройка
+TEKMENU_SETUP_WINDOW=&Окно
+TEKMENU_SETUP_FONT=&Шрифт
+
+TEKMENU_VTWIN=VT-окно
+
+TEKMENU_WINDOW=&Окно
+
+TEKMENU_HELP=&Помощь
+TEKMENU_HELP_INDEX=&Поиск
+TEKMENU_HELP_USING=&Воспользоваться помощью
+TEKMENU_HELP_ABOUT=&О программе Tera Term...
+
+TEKMENU_SHOW_MENUBAR=&Показать меню
+
+; ttermpro
+; filesys.cpp
+MSG_COMMENT_LOG_OPEN_ERROR=Лог-файл еще не открыт
+
+; ttime.c
+MSG_USE_IME_ERROR=Ошибка в IME
+
+; ttplug.c
+MSG_LOAD_EXT_ERROR=Неверное расширение %s (%d)
+
+; ttwinman.c
+DLG_MAIN_TITLE_CONNECTING=[соединяется...]
+DLG_MAIN_TITLE_DISCONNECTED=[разъединено]
+
+; vtterm.c
+MSG_CBACCESS_TITLE=Доступ к буферу
+MSG_CBACCESS_REJECT_TITLE=Отклонить доступ к буферу
+MSG_CBACCESS_READ=Удаленный хост читает из буфера
+MSG_CBACCESS_WRITE=Удаленный хост пишет в буфер
+MSG_CBACCESS_READ_REJECT=Отклонить удаленное чтение из буфера
+MSG_CBACCESS_WRITE_REJECT=Отклонить удаленную запись в буфер
+
+; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Остановить все Tera Term(ы)?
+MSG_DISCONNECT_CONF=Разъединить?
+MSG_EXEC_TT_ERROR=Не удается запустить Tera Term. (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=Не найдена папка Cygwin
+MSG_CYGTERM_ENV_ALLOC_ERROR=Не удается выделить память для переменной среды
+MSG_EXEC_CYGTERM_ERROR=Не удается запустить Cygterm
+MSG_EXEC_TTMENU_ERROR=Не удается запустить меню Tera Term (%d).
+MSG_EXEC_LOGMETT_ERROR=Не удается запустить LogMeTT (%d).
+MSG_VIEW_LOGFILE_ERROR=Не удается посмотреть лог-файл (%d).
+FILEDLG_OPEN_LOGFILE_TITLE=Посмотреть лог-файл в бинарном режиме 
+FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0
+DIRDLG_CYGTERM_DIR_TITLE=Указать папку Cygwin
+MSG_CYGTERM_CONF_WRITEFILE_ERROR=Не удается записать файл конфигурации CygTerm (%d).
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Не удается удалить файл конфигурации CygTerm (%d).
+MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Не удается переименовать файл конфигурации CygTerm (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=Таблица конфигурации Cygwin была сохранена в %s.
+FILEDLG_SELECT_LOGVIEW_APP_TITLE=Выберите исполняемый файл для запуска лог-файла
+FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
+FILEDLG_SELECT_LOGDIR_TITLE=Укажите папку лог-файла
+FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=Выберите файл, включающий строки для ConfirmChangePaste
+FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
+MSG_LOGFILE_INVALID_CHAR_ERROR=В названии лог-файла обнаружен недопустимый символ.
+MSG_LOGFILE_TOOLONG_ERROR=Название лог-файла содержит слишком много символов.
+MSG_SAVESETUP_PERMISSION_ERROR=Файл TERATERM.INI не предназначен для перезаписи.
+
+DLG_TABSHEET_TITLE=Tera Term: Дополнительные настройки
+DLG_TABSHEET_TITLE_GENERAL=Общие
+DLG_TABSHEET_TITLE_SEQUENCE=Управление
+DLG_TABSHEET_TITLE_COPYPASTE=Правка
+DLG_TABSHEET_TITLE_VISUAL=Экран
+DLG_TABSHEET_TITLE_LOG=Лог
+DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+
+DLG_TAB_GENERAL_CLICKURL=&Запуск URL одним кликом
+DLG_TAB_GENERAL_DISABLESENDBREAK=&Отключить ускоритель и послать останов
+DLG_TAB_GENERAL_ACCEPTBROADCAST=&Принять общую команду
+DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=&Прокручивание строк колесом мыши
+DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=&Автоперевод строки только на нижнюю линию
+DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&Очистить экран при изменении размера окна
+DLG_TAB_GENERAL_CURSOR_CHANGE_IME=&Изменить вид курсора в соответствии с режимом IME
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
+DLG_TAB_GENERAL_TITLEFMT_GROUP=Title format
+DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME=&Display host/port name
+DLG_TAB_GENERAL_TITLEFMT_DISPSESSION=Display session &number
+DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK=Display &VT/TEK
+DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE=Swap hostname and &title position
+DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
+DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
+
+DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Принять запрос на отслеживание событий мыши
+DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Отключить отслеживание событий мыши
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING=&Принять запрос на изменение заголовка окна
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF=выкл.
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE=замена
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD=первый
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST=последний
+DLG_TAB_SEQUENCE_CURSOR_CTRL=&Управление курсором
+DLG_TAB_SEQUENCE_WINDOW_CTRL=&Управление окном
+DLG_TAB_SEQUENCE_WINDOW_REPORT=&Окно отчета
+DLG_TAB_SEQUENCE_TITLE_REPORT=&Заголовок окна отчета
+DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE=нет
+DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT=принять
+DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY=очистить
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS=&Удаленный доступ к буферу обмена
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=выкл.
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=чт./запись
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=чтение
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=запись
+DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Уведомлять об удаленном доступе к буферу
+DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=Accept clearing &scroll buffer from remote
+
+DLG_TAB_COPYPASTE_CONTINUE=&Возможность продолжения копирования строки
+DLG_TAB_COPYPASTE_MOUSEPASTE=&Отключить вставку правой кнопкой мыши
+DLG_TAB_COPYPASTE_CONFIRMPASTE=&Разрешить вставку правой кнопкой мыши
+DLG_TAB_COPYPASTE_MOUSEPASTEM=&Отключить вставку средней кнопкой мыши
+DLG_TAB_COPYPASTE_SELECTLBUTTON=&Использовать только левую кнопку мыши
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Удалить символ новой строки при вставке
+DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Разрешить возврат строки при вставке
+DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=&Разрешить вставку изменения
+DLG_TAB_COPYPASTE_STRINGFILE=&Текстовый файл
+DLG_TAB_COPYPASTE_DELIMITER=&Разделитель символов
+DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку
+DLG_TAB_COPYPASTE_PASTEDELAY2=мс
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
+
+DLG_TAB_VISUAL_ALPHA=Непрозрачность окна
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
+DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
+DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
+DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
+DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=&Яркость изображения
+DLG_TAB_VISUAL_MOUSE=&Курсор мыши
+DLG_TAB_VISUAL_FONT_QUALITY=&Качество шрифта
+DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=По умолчанию
+DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED=Не сглаженный
+DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=Сглаженный
+DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=ClearType
+DLG_TAB_VISUAL_ANSICOLOR=AN&SI цвет
+DLG_TAB_VISUAL_RED=&      R
+DLG_TAB_VISUAL_GREEN=&      G
+DLG_TAB_VISUAL_BLUE=&      B
+DLG_TAB_VISUAL_BOLD=&Цвет полужирного шрифта
+DLG_TAB_VISUAL_BLINK=&Цвет в мигающем тексте
+DLG_TAB_VISUAL_REVERSE=&Инверсия атрибутов цвета
+DLG_TAB_VISUAL_URL=&Цвет в надписях URL
+DLG_TAB_VISUAL_ANSI=&Цвет ANSI
+DLG_TAB_VISUAL_URLUL=&Подчеркивание URL
+DLG_TAB_VISUAL_RESTART=(*) Необходимо сохранить настройки и перезапустить Tera Term
+
+DLG_TAB_LOG_EDITOR=&Редактор лог-файла
+DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
+DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла
+DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла
+DLG_TAB_LOG_ROTATE=&Ротация лог-файла
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=Р&азмер
+DLG_TAB_LOG_ROTATESTEP=&Ротация
+
+
+DLG_TAB_CYGWIN_PATH=&Путь инсталляции Cygwin
+
+DLG_COMMENT_TITLE=Комментарии к логу
+
+DLG_BROADCAST_TITLE=Tera Term: Общие команды
+DLG_BROADCAST_HISTORY=История
+DLG_BROADCAST_PARENTONLY=Только в этой сессии
+DLG_BROADCAST_ENTER=Кл.Enter
+DLG_BROADCAST_SUBMIT=Передача
+DLG_BROADCAST_REALTIME=Реальн. время
+
+DLG_PRNABORT_PRINTING=Печать
+
+DLG_PROT_FILENAME=Имя файла:
+DLG_PROT_PROTO=Протокол:
+DLG_PROT_PACKET=Пакет#:
+DLG_PROT_TRANS=Переданные байты:
+DLG_PROT_ELAPSED=Время:
+
+DLG_FILETRANS_FILENAME=Имя файла:
+DLG_FILETRANS_FULLPATH=Полный путь:
+DLG_FILETRANS_TRNAS=Переданные байты:
+DLG_FILETRANS_ELAPSED=Время:
+DLG_FILETRANS_START=&Старт
+DLG_FILETRANS_PAUSE=&Пауза
+DLG_FILETRANS_CLOSE=Закрыть
+
+DLG_SETUPDIR_TITLE=Tera Term: Каталог настроек
+DLG_SETUPDIR_INIFILE=Файл конфигурации Tera Term
+DLG_SETUPDIR_KEYBOARDFILE=Файл конфигурации клавиатуры
+DLG_SETUPDIR_CYGTERMFILE=Файл конфигурации CygTerm
+DLG_SETUPDIR_KNOWNHOSTSFILE=Файл известных хостов SSH
+DLG_SETUPDIR_NOFILE_ERROR=Файл не существует.(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=Нельзя открыть файл.(%d)
+
+DLG_DANDD_TITLE=Tera Term: Файл "Drag and Drop"
+DLG_DANDD_TEXT=Вы уверены, что хотите отправить файл?
+DLG_DANDD_SCP_RADIO=&SCP
+DLG_DANDD_SENDFILE_RADIO=S&end File (Paste content of file)
+DLG_DANDD_PASTE_RADIO=&Paste Filename
+DLG_DANDD_SCP_DEST_LABEL=des&t:
+DLG_DANDD_SCP_DEST_NOTE=dest is home directory if empty
+DLG_DANDD_SEND_BINARY_CHECK=Bina&ry
+DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
+DLG_DANDD_PASTE_SPACE_RADIO=Separat&or is Space
+DLG_DANDD_PASTE_NEWLINE_RADIO=Separator is &NewLine
+DLG_DANDD_NEXTFILES=&Do this for the next %d files
+DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
+DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
+DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
+
+TOOLTIP_TITLEBAR_OPACITY=непрозрачность %.1f %%
+
+; commonlib.c
+MSG_WINSOCK_ERROR=Не удается использовать winsock
+MSG_INVALID_HOST_ERROR=Неверный хост
+MSG_CANTOPEN_ERROR=Не удается открыть %s (0x%08x)
+MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
+MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied.
+MSG_CANTOPEN_ERROR_PIPEBUSY=Cannot open %s. Pipe is busy.
+MSG_CANTOPEN_FILE_ERROR=Не удается открыть файл
+MSG_COMM_REFUSE_ERROR=Отказ в соединении
+MSG_COMM_REACH_ERROR=Сеть недоступна
+MSG_COMM_TIMEOUT_ERROR=Время соединения истекло
+MSG_COMM_CONNECT_ERROR=Нет соединения с хостом
+MSG_CREATE_THREAD_ERROR=Не удается создать поток
+
+; ttpdlg
+; ttdlg.c
+DLG_ABOUT_TITLE=О программе Tera Term
+
+DLG_DIR_TITLE=Tera Term: Изменить папку
+DLG_DIR_CURRENT=Текущая папка:
+DLG_DIR_NEW=&Новая папка:
+DLG_SELECT_DIR_TITLE=Выбрать новую папку
+
+DLG_GEN_TITLE=Tera Term: Общие настройки
+DLG_GEN_PORT=&Порт:
+DLG_GEN_LANG=&Кодировка:
+DLG_GEN_LANG_UI=&Язык меню:
+
+DLG_HOST_TITLE=Tera Term: Новое соединение
+DLG_HOST_TCPIPHOST=&Хост:
+DLG_HOST_TCPIPPORT=&TCP-порт#:
+DLG_HOST_TCPIPPROTOCOL=&IP версия:
+DLG_HOST_SERIAL=&COM
+DLG_HOST_SERIALPORT=&Порт:
+
+DLG_KEYB_TITLE=Tera Term: Настройка клавиатуры
+DLG_KEYB_TRANSMIT=Передача DEL:
+DLG_KEYB_BS=&Клав. Backspace
+DLG_KEYB_DEL=&Клав. Delete
+DLG_KEYB_KEYB=&Клавиатура:
+DLG_KEYB_META=&Клав. Meta:
+DLG_KEYB_DISABLE=Альтернатива:
+DLG_KEYB_APPKEY=&Применить Keypad
+DLG_KEYB_APPCUR=Применить &Cursor
+
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
+DLG_SERIAL_PORT=&Порт:
+DLG_SERIAL_BAUD=&Скорость:
+DLG_SERIAL_DATA=&Данные:
+DLG_SERIAL_PARITY=&Четность:
+DLG_SERIAL_STOP=&Стоп-бит:
+DLG_SERIAL_FLOW=&Управление:
+DLG_SERIAL_DELAY=Задержка передачи
+DLG_SERIAL_DELAYCHAR=мс/&символ
+DLG_SERIAL_DELAYLINE=мс/&строка
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=Connect with &New window
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
+
+DLG_TCPIP_TITLE=Tera Term: Настройка TCP/IP
+DLG_TCPIP_HOSTLIST=&Перечень хостов
+DLG_TCPIP_ADD=&Добавить
+DLG_TCPIP_UP=&Вверх
+DLG_TCPIP_REMOVE=&Перенос
+DLG_TCPIP_DOWN=&Вниз
+DLG_TCPIP_HISTORY=&История
+DLG_TCPIP_KEEPALIVE=&Хранить
+DLG_TCPIP_KEEPALIVE_SEC=сек
+DLG_TCPIP_AUTOCLOSE=&Автоматическое закрытие окон
+DLG_TCPIP_PORT=&Порт#:
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_TERMTYPE=&Тип терминала:
+
+DLG_TERM_TITLE=Tera Term: Настройка терминала
+DLG_TERM_WIDTHLABEL=&Размер окна терминала
+DLG_TERM_ISWIN=&Размер по окну
+DLG_TERM_RESIZE=&Автомат.размер окна
+DLG_TERM_NEWLINE=Новая строка
+DLG_TERM_CRRCV=&Прием:
+DLG_TERM_CRSEND=&Передача
+DLG_TERM_ID=&Терминал ID:
+DLG_TERM_LOCALECHO=&Локальное эхо
+DLG_TERM_ANSBACK=&Ответ:
+DLG_TERM_AUTOSWITCH=&Переключение (VT<->TEK)
+DLG_TERM_KANJI=&Kanji (прием)
+DLG_TERM_KANA=Hal&f-width kana
+DLG_TERM_KANJISEND=Kan&ji (передача)
+DLG_TERM_KANASEND=Half-wi&dth kana
+DLG_TERM_KIN=Kanji-i&n:
+DLG_TERM_KOUT=Kanji-&out:
+DLG_TERM_LOCALE=&Расположение:
+DLG_TERM_RUSSCHARSET=Кодировка
+DLG_TERM_RUSSHOST=&Хост:
+DLG_TERM_RUSSCLIENT=&Клиент:
+DLG_TERM_RUSSFONT=&Шрифт:
+DLG_TERMK_KANJI=&Код на приеме
+DLG_TERMK_KANJISEND=&Код на передаче
+
+DLG_WIN_TITLE=Tera Term: Настройка окон
+DLG_WIN_TITLELABEL=&Название:
+DLG_WIN_CURSOR=Вид курсора
+DLG_WIN_BLOCK=&Блок
+DLG_WIN_VERT=&Вертикально
+DLG_WIN_HORZ=&Горизонтально
+DLG_WIN_BOLDFONT=&Полужирный шрифт
+DLG_WIN_HIDETITLE=&Скрыть название
+DLG_WIN_HIDEMENU=&Скрыть меню
+DLG_WIN_COLOREMU=&Эмуляция цвета
+DLG_WIN_PCBOLD16=&16 цветов (стиль PC)
+DLG_WIN_AIXTERM16=1&6 цветов (стиль Aixterm)
+DLG_WIN_XTERM256=&256 цветов (стиль Xterm)
+DLG_WIN_SCROLL1=&Буфер прокрутки:
+DLG_WIN_SCROLL3=&стр.
+DLG_WIN_COLOR=Цвет
+DLG_WIN_TEXT=&Текст
+DLG_WIN_BG=&Фон
+DLG_WIN_ATTRIB=&Атрибуты
+DLG_WIN_REVERSE=&Инверсия
+DLG_WIN_R=&R:
+DLG_WIN_G=&G:
+DLG_WIN_B=&B:
+DLG_WIN_ALWAYSBG=&Всегда использовать "Норма"
+DLG_WIN_NORMAL=Норма
+DLG_WIN_BOLD=Полужирный
+DLG_WIN_BLINK=Мигание
+DLG_WIN_REVERSEATTR=Инверсия
+
+DLG_CHOOSEFONT_STC6=Выбор "Стиль шрифта" не повлияет на фактический внешний вид шрифта.
+
+DLG_WINLIST_TITLE=Tera Term: Опции окон
+DLG_WINLIST_LABEL=&Окно:
+DLG_WINLIST_OPEN=&Открыть окно
+DLG_WINLIST_CLOSEWIN=&Закрыть окно
+
+MSG_FIND_DIR_ERROR=Не удается найти папку
+
+; ttpfile
+; ttfile.c
+DLG_FOPT=Вариант
+DLG_FOPT_BINARY=&Бинарный
+DLG_FOPT_APPEND=&Дополнение 
+DLG_FOPT_PLAIN=&Обычный текст
+DLG_FOPT_TIMESTAMP=&Отметка времени
+DLG_FOPT_HIDEDIALOG=&Скрыть диалог
+DLG_FOPT_ALLBUFFINFIRST=&Включить буфер экр.
+DLG_FOPT_TIMESTAMP_LOCAL=Local Time
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
+
+DLG_XOPT=Опции
+DLG_XOPT_CHECKSUM=&Контрольная сумма
+DLG_XOPT_CRC=&CRC
+DLG_XOPT_1K=1&K
+DLG_XOPT_BINARY=&Бинарный
+
+FILEDLG_KEYBOARD_FILTER=файл конфигурации клавиатуры (*.cnf)\0*.cnf\0\0
+FILEDLG_SETUP_FILTER=файл конфигурации (*.ini)\0*.ini\0\0
+FILEDLG_SAVE_SETUP_TITLE=Tera Term: Запомнить настройки
+FILEDLG_RESTORE_SETUP_TITLE=Tera Term: Восстановить настройки
+FILEDLG_LOAD_KEYMAP_TITLE=Tera Term: Загрузить настройки клавиш
+FILEDLG_ALL_FILTER=All(*.*)\0*.*\0\0
+FILEDLG_USER_FILTER_NAME=Определяется пользователем
+
+DLG_GETFN_TITLE=Tera Term: Kermit
+DLG_GETFN_FILENAME=&Имя файла:
+
+; ttftypes.h
+FILEDLG_TRANS_TITLE_LOG=Лог
+FILEDLG_TRANS_TITLE_SENDFILE=Послать файл
+FILEDLG_TRANS_TITLE_KMTRCV=Kermit принять
+FILEDLG_TRANS_TITLE_KMTGET=Kermit получить
+FILEDLG_TRANS_TITLE_KMTSEND=Kermit отправить
+FILEDLG_TRANS_TITLE_KMTFIN=Kermit финиш
+FILEDLG_TRANS_TITLE_XRCV=XMODEM прием
+FILEDLG_TRANS_TITLE_XSEND=XMODEM передача
+FILEDLG_TRANS_TITLE_YRCV=YMODEM прием
+FILEDLG_TRANS_TITLE_YSEND=YMODEM передача
+FILEDLG_TRANS_TITLE_ZRCV=ZMODEM прием
+FILEDLG_TRANS_TITLE_ZSEND=ZMODEM передача
+FILEDLG_TRANS_TITLE_BPRCV=B-Plus прием
+FILEDLG_TRANS_TITLE_BPSEND=B-Plus передача
+FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN прием
+FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN передача
+
+; dlg clipboard
+DLG_CLIPBOARD_TITLE=Tera Term: Буфер обмена
+
+; ttptek
+; tttek.c
+MSG_TEK_PRINT_ERROR=Принтер не поддерживает графику
+
+; ttpmacro
+FILEDLG_OPEN_MACRO_TITLE=MACRO: Открыть файл макросов
+FILEDLG_OPEN_MACRO_FILTER=Файл макросов (*.ttl)\0*.ttl\0\0
+
+BTN_PAUSE=&Пауза
+BTN_START=&Старт
+BTN_END=&Финиш
+BTN_YES=&Да
+BTN_NO=&Нет
+BTN_STOP=&Остановить
+BTN_CONTINUE=&Продолжить
+
+MSG_MACRO_CONF=MACRO: подтверждение
+MSG_MACRO_HALT_SCRIPT=Вы уверены, что хотите остановить этот макрос?
+
+; common
+MSG_ERROR=ОШИБКА
+MSG_TT_ERROR=Tera Term: Ошибка
+MSG_TT_NOTICE=Tera Term: Внимание
+MSG_TT_TAKE_EFFECT=Эта опция действует при следующей сессии.
+
+BTN_OK=OK
+BTN_CANCEL=Выйти
+BTN_CLOSE=Закрыть
+BTN_HELP=&Помощь
+
+; help
+HELPFILE=teraterm.chm
+MSG_OPENHELP_ERROR=Не удается открыть файл помощи HTML(%s).
+
+; ttset
+MSG_INI_ERROR=Tera Term: Ошибка
+MSG_INI_WRITE_ERROR=Не удается записать ini-файл.
+
+
+[TTSSH]
+; font
+DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+DLG_ABOUT_FONT=Courier New,8,0
+
+; menu
+MENU_ABOUT=&Информация о TTSSH...
+MENU_SSH=SS&H...
+MENU_SSH_AUTH=&Авторизация SSH...
+MENU_SSH_FORWARD=&Пересылка SSH...
+MENU_SSH_KEYGEN=&Генератор ключа SSH...
+
+; dlg информация
+DLG_ABOUT_TITLE=Информация о TTSSH
+DLG_ABOUT_FP_HASH_ALGORITHM=Алгоритм хэширования:
+DLG_ABOUT_SERVERID=Сервер ID:
+DLG_ABOUT_PROTOCOL=Протокол:
+DLG_ABOUT_ENCRYPTION=Шифрование:
+DLG_ABOUT_SERVERKEY=Ключ сервера:
+DLG_ABOUT_KEXKEY=Ключ смены ключа:
+DLG_ABOUT_AUTH=Аутентификация:
+DLG_ABOUT_COMP=Сжатие:
+DLG_ABOUT_CLIENTID=Клиент ID:
+DLG_ABOUT_KEX=Алгоритм обмена ключами:
+DLG_ABOUT_HOSTKEY=Ключ хоста:
+DLG_ABOUT_MAC=MAC-алгоритм:
+DLG_ABOUT_MAC_INFO=%s к серверу, %s от сервера
+DLG_ABOUT_COMPDELAY=Задержка сжатия:
+DLG_ABOUT_CIPHER_INFO=%s к серверу, %s от сервера
+DLG_ABOUT_KEY_INFO=%d-бит ключ сервера, %d-бит ключ хоста
+DLG_ABOUT_KEY_INFO2=%d-бит ключ клиента, %d-бит ключ сервера
+DLG_ABOUT_KEY_NONE=Нет
+DLG_ABOUT_COMP_INFO=уровень %d; отношение %.1f (%ld:%ld)
+DLG_ABOUT_COMP_INFO2=уровень %d
+DLG_ABOUT_COMP_NONE=нет
+DLG_ABOUT_COMP_UPDOWN=Направление вверх %s; вниз %s
+DLG_ABOUT_AUTH_INFO=Пользователь '%s', использовано %s
+DLG_ABOUT_FINGERPRINT=Отпечаток ключа хоста:
+
+; dlg auth
+DLG_AUTH_TITLE=Аутентификация SSH
+DLG_AUTH_TITLE_FAILED=Повторная аутентификация SSH
+DLG_AUTH_BANNER=Вход в %s
+DLG_AUTH_BANNER2=Требуется аутентификация.
+DLG_AUTH_BANNER2_FAILED=Ошибка аутентификации. Повторите попытку.
+DLG_AUTH_USERNAME=&Имя пользователя:
+DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
+DLG_AUTH_PASSWORD=&Фраза пароля:
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
+DLG_AUTH_REMEMBER_PASSWORD=&Запомнить пароль в памяти
+DLG_AUTH_FWDAGENT=&Первый агент
+DLG_AUTH_METHOD=Authentication methods
+DLG_AUTH_METHOD_PASSWORD=&Вход с простым паролем
+DLG_AUTH_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
+DLG_AUTH_METHOD_RHOST=Вход с r&hosts (SSH1)
+;DLG_AUTH_METHOD_CHALLENGE1=Использовать для входа запрос/ответ (&TIS)
+DLG_AUTH_METHOD_CHALLENGE1=Use challenge/response(&TIS) to log in
+;DLG_AUTH_METHOD_CHALLENGE2=&Использовать для входа запрос/ответ (с клавиатуры)
+DLG_AUTH_METHOD_CHALLENGE2=Use keyboard-&interactive to log in
+DLG_AUTH_METHOD_PAGEANT=&Использовать Pageant
+DLG_AUTH_PRIVATEKEY=&Закрытый ключ
+DLG_AUTH_LOCALUSER=&Скрытое имя:
+DLG_AUTH_HOST_PRIVATEKEY=&Закрытый ключ
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
+MSG_PAGEANT_NOTFOUND=Не удается найти Pageant.
+MSG_PAGEANT_NOKEY=Нет действующего ключа к Pageant.
+
+; dlg auth setup
+DLG_AUTHSETUP_TITLE=TTSSH: Настройка аутентификации
+DLG_AUTHSETUP_BANNER=Выбрать по умолчанию:
+DLG_AUTHSETUP_USERNAME=User name
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_USERNAME=U&se default username
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_METHOD=Authentication methods
+DLG_AUTHSETUP_METHOD_PASSWORD=&Вход с простым паролем
+DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
+DLG_AUTHSETUP_METHOD_RHOST=&Вход с rhosts (SSH1)
+;DLG_AUTHSETUP_METHOD_CHALLENGE=Использовать для входа запрос/ответ (SSH1:&TIS, SSH2:с клавиатуры)
+DLG_AUTHSETUP_METHOD_CHALLENGE=Use SSH1:challenge/response(&TIS) / SSH2:keyboard-interactive to log in
+DLG_AUTHSETUP_METHOD_PAGEANT=&Использовать Pageant
+DLG_AUTHSETUP_PRIVATEKEY=&Закрытый ключ:
+DLG_AUTHSETUP_LOCALUSER=&Скрытое имя пользователя:
+DLG_AUTHSETUP_HOST_PRIVATEKEY=&Закрытый ключ хоста:
+DLG_AUTHSETUP_CHECKAUTH=&Проверять до входа, включены ли методы аутентификации (SSH2)
+
+FILEDLG_OPEN_PRIVATEKEY_TITLE=Выбрать файл с закрытым ключом RSA/DSA/ECDSA/ED25519
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
+MSG_KEYSPECIFY_ERROR=Вы должны указать файл, содержащий закрытый ключ RSA/DSA/ECDSA/ED25519.
+MSG_READKEY_ERROR=Ошибка чтения файла закрытого ключа SSH2\n%s
+MSG_RHOSTS_NOTDEFAULT_ERROR=Ошибка аутентификации Rhosts, потому, что метод не был установлен по умолчанию.\nДля использования аутентификации Rhosts в TTSSH, вы должны установить его по умолчанию путем перезагрузки\nTTSSH и выбрать "SSH Authentication..." в меню инсталляции перед подключением.
+MSG_NOAUTHMETHOD_ERROR=Сервер не поддерживает ни один из параметров проверки аутентификации\nTTSSH. Это соединение будет закрыто.
+
+; dlg diff key
+DLG_DIFFERENTKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
+DLG_DIFFERENTKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ КЛЮЧ, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
+DLG_DIFFERENTKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
+DLG_DIFFERENTKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Алгоритм хэширования:
+DLG_DIFFERENTKEY_REPLACE=&Заменить существующий ключ новым ключом
+
+; dlg diff type key
+DLG_DIFFERENTTYPEKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
+DLG_DIFFERENTTYPEKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ ТИП КЛЮЧА, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
+DLG_DIFFERENTTYPEKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Алгоритм хэширования:
+DLG_DIFFERENTTYPEKEY_ADD=&Добавить этот компьютер и его ключ в список известных хостов
+
+; dlg fwd edit
+DLG_FWD_TITLE=SSH: Порт пересылки
+DLG_FWD_BANNER=Выбор направления:
+DLG_FWD_LOCAL_PORT=&Через локальный порт
+DLG_FWD_LOCAL_LISTEN=&Слушать
+DLG_FWD_LOCAL_REMOTE=&Удаленный компьютер
+DLG_FWD_LOCAL_REMOTE_PORT=&Порт
+DLG_FWD_LOCAL_CHECKIDENTITY=Принимать соединения от других хостов
+DLG_FWD_REMOTE_PORT=&Через удаленный порт
+DLG_FWD_REMOTE_LISTEN=&Слушать
+DLG_FWD_REMOTE_LOCAL=&Локальный компьютер
+DLG_FWD_REMOTE_LOCAL_PORT=&Порт
+DLG_FWD_DYNAMIC_PORT=&Динамичный порт
+DLG_FWD_DYNAMIC_LISTEN=&Прослушивание
+
+MSG_SAME_SERVERPORT_ERROR=Вы не можете иметь два перенаправления из одного и того же порта сервера (%d).
+MSG_SAME_LOCALPORT_ERROR=Вы не можете иметь два перенаправление из одного и того же порта (%d).
+MSG_UNSPECIFIED_FWD_ERROR1=Следующие перенаправления не были указаны в начале сессии SSH:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nВ связи с ограничением протокола SSH, эти пересылки не будут работать в текущем сеансе SSH.\nЕсли вы сохраните эти настройки и создадите новую сессию SSH, то перенаправление должно работать.
+MSG_INVALID_PORT_ERROR=Порт "%s" имеет недопустимый номер.\nВыберите имя порта из списка или введите число от 1 до 65535.
+
+; dlg fwd setup
+DLG_FWDSETUP_TITLE=TTSSH: настройка пересылки
+DLG_FWDSETUP_LIST=&Порт пересылки
+DLG_FWDSETUP_ADD=&Добавить...
+DLG_FWDSETUP_EDIT=&Править...
+DLG_FWDSETUP_REMOVE=&Удалить
+DLG_FWDSETUP_CHECKIDENTITY=&Локальные порты принимают соединения от других хостов
+DLG_FWDSETUP_X=X-пересылка
+DLG_FWDSETUP_XAPP=&Отображение удаленных приложений X на локальном X-сервере
+
+MSG_FWD_REMOTE_XSERVER=Удаленный X-сервер
+MSG_FWD_REMOTE_XSCREEN=X-сервер (экран %d:%d)
+MSG_FWD_REMOTE=Удаленный "%s" порт %s в локальный "%s" порт %s
+MSG_FWD_LOCAL=Локальный "%s" порт %s в удаленный "%s" порт %s
+MSG_FWD_X=удаленные приложения X на локальный X-сервер
+MSG_FWD_DYNAMIC=Локальный "%s" порт %s управляется удаленно
+
+; dlg host
+DLG_HOST_TITLE=Tera Term: Новое соединение
+DLG_HOST_TCPIPHOST=&Хост:
+DLG_HOST_TCPIPHISTORY=&История
+DLG_HOST_TCPIPSERVICE=Сервис
+DLG_HOST_TCPIPOTHER=Другие
+DLG_HOST_TCPIPPORT=&порт TCP#:
+DLG_HOST_TCPIPSSHVERSION=&версия SSH:
+DLG_HOST_TCPIPPROTOCOL=&IP версия:
+DLG_HOST_SERIAL=&COM
+DLG_HOST_SERIALPORT=&Порт:
+DLG_HOST_HELP=&Помощь
+
+MSG_TCPPORT_NAN_ERROR=TCP-порт должен иметь номер.
+
+; dlg keygen
+DLG_KEYGEN_TITLE=TTSSH: Генератор ключа
+DLG_KEYGEN_KEYTYPE=Тип ключа
+DLG_KEYGEN_PASSPHRASE=Ключевая фраза:
+DLG_KEYGEN_PASSPHRASE2=Подтвердить фразу:
+DLG_KEYGEN_COMMENT=&Комментарии:
+DLG_KEYGEN_SAVEPUBLIC=&Публичный ключ
+DLG_KEYGEN_SAVEPRIVATE=&Закрытый ключ
+DLG_KEYGEN_GENERATE=&Генерация
+DLG_KEYGEN_BITS=&Биты:
+DLG_KEYGEN_BCRYPT_KDF=хеш "bcrypt" &KDF
+DLG_KEYGEN_BCRYPT_ROUNDS=&Количество раундов:
+
+MSG_KEYBITS_MIN_ERROR=Битов ключа слишком мало!
+MSG_BCRYPT_ROUNDS_MIN_ERROR=Раундов слишком мало.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=Раундов слишком много.
+MSG_KEYGEN_GENERATING="Генерация ключа..."
+MSG_KEYGEN_GENERATED="Ключ сгенерирован успешно!"
+
+FILEDLG_SAVE_PUBLICKEY_TITLE=Сохранить публичный ключ как:
+FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa.pub)\0id_ecdsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\0id_ed25519.pub\0All Files(*.*)\0*.*\0\0
+MSG_SAVE_KEY_OPENFILE_ERROR=Не удается открыть файл ключа.
+MSG_SAVE_KEY_WRITEFILE_ERROR=Не удается сохранить файл ключа.
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Две ключевые фразы разные.
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=Вы уверены, что хотите использовать пустые фразы?
+FILEDLG_SAVE_PRIVATEKEY_TITLE=Сохранить закрытый ключ как:
+FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa)\0id_ecdsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\0id_ed25519\0All Files(*.*)\0*.*\0\0
+
+; dlg setup
+DLG_SSHSETUP_TITLE=TTSSH: Установки
+DLG_SSHSETUP_COMPRESS=&Степень сжатия:
+DLG_SSHSETUP_COMPRESS_NONE=Ниже
+DLG_SSHSETUP_COMPRESS_HIGHEST=Выше
+DLG_SSHSETUP_COMPRESS_NOTE=SSH1: вкл./выкл. через "Степень сжатия".\nSSH2: вкл./выкл. через "Степень сжатия" и "Тип сжатия".
+DLG_SSHSETUP_CIPHER=&Шифр
+DLG_SSHSETUP_CIPHER_UP=Сдвиг вверх(&1)
+DLG_SSHSETUP_CIPHER_DOWN=Сдвиг вниз(&2)
+DLG_SSHSETUP_CIPHER_BORDER=<Шифры ниже этой линии отключены>
+DLG_SSHSETUP_KEX=K&EX (только для SSH2)
+DLG_SSHSETUP_KEX_UP=Сдвиг вверх(&3)
+DLG_SSHSETUP_KEX_DOWN=Сдвиг вниз(&4)
+DLG_SSHSETUP_KEX_BORDER=<KEX ниже этой линии отключены>
+DLG_SSHSETUP_HOST_KEY=&Ключ хоста (только для SSH2)
+DLG_SSHSETUP_HOST_KEY_UP=Сдвиг вверх(&5)
+DLG_SSHSETUP_HOST_KEY_DOWN=Сдвиг вниз(&6)
+DLG_SSHSETUP_HOST_KEY_BORDER=<Ключи хоста ниже этой линии отключены>
+DLG_SSHSETUP_MAC=&MAC (только для SSH2)
+DLG_SSHSETUP_MAC_UP=Сдвиг вверх(&7)
+DLG_SSHSETUP_MAC_DOWN=Сдвиг вниз(&8)
+DLG_SSHSETUP_MAC_BORDER=<MAC ниже этой линии отключены>
+DLG_SSHSETUP_COMP=&Тип сжатия (только для SSH2)
+DLG_SSHSETUP_COMP_UP=Сдвиг вверх(&9)
+DLG_SSHSETUP_COMP_DOWN=Сдвиг вниз(&0)
+DLG_SSHSETUP_COMP_BORDER=<Сжатия ниже этой линии отключены>
+DLG_SSHSETUP_KNOWNHOST=SSH известные хосты
+DLG_SSHSETUP_KNOWNHOST_RW=&Чтение/запись:
+DLG_SSHSETUP_KNOWNHOST_RO=&Только чтение:
+DLG_SSHSETUP_HEARTBEAT=Удержание активности
+DLG_SSHSETUP_HEARTBEAT_UNIT=сек.(0 - выключить)
+DLG_SSHSETUP_PASSWORD=&Запомнить пароль в памяти
+DLG_SSHSETUP_FORWARDAGENT=&Включить агент пересылки
+DLG_SSHSETUP_FORWARDAGENTCONFIRM=&Подтвердить агента пересылки
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста в DNS
+DLG_SSHSETUP_NOTICE=Все параметры вступят в силу в следующей сессии.
+DLG_SSHSETUP_HOSTKEY_ROTATION=&Смена ключа
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=Нет
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Да
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Запрос
+DLG_SSHSETUP_LOGLEVEL=&LogLevel
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 to turn off)
+
+FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Выберите файл чтения/записи известных хостов
+FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы добавить
+
+; dlg tis
+DLG_TIS_TITLE=SSH вызов аутентификации
+DLG_TIS_BANNER=Вести лог в %s
+
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: изменить пароль
+DLG_PASSCHG_MESSAGE=Сервер просит сменить пароль
+DLG_PASSCHG_OLDPASSWD=&Старый пароль
+DLG_PASSCHG_NEWPASSWD=&Новый пароль
+DLG_PASSCHG_CONFIRMPASSWD=&Подтвердите пароль
+MSG_PASSCHG_MISMATCH=Ошибка, попробуйте еще раз
+
+; dlg unknown host
+DLG_UNKNOWNHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
+DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "####################################" в списке известных хостов. Враждебный компьютер может притворяться сервером!
+DLG_UNKNOWNHOST_WARNING2=Если вы добавите этот компьютер в список известных хостов и продолжите, то не будете получать это предупреждение.
+DLG_UNKNOWNHOST_FINGERPRINT=Ключ сервера хоста:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Алгоритм хэширования:
+DLG_UNKNOWNHOST_ADD=&Добавьте этот компьютер и его ключ в список известных хостов
+
+DLG_HOSTKEY_SSHFP_NOTFOUND=Не найден ключ хоста в DNS.
+DLG_HOSTKEY_SSHFP_MATCH=Соответствующий ключ хоста найден в DNS.
+DLG_HOSTKEY_SSHFP_MISMATCH=Несоответствие ключа хоста в DNS.
+DLG_HOSTKEY_SSHFP_DIFFTYPE=Несоответствие типа ключа хоста в DNS.
+DLG_HOSTKEY_DNSSEC_NG=Найден ненадежный пароль в DNS.
+DLG_HOSTKEY_DNSSEC_OK=Найден надежный пароль в DNS.
+
+DLG_HOSTKEY_ROTATION_TITLE=Смена ключа
+DLG_HOSTKEY_ROTATION_WARNING=Вы получили список ключей хоста от удаленного сервера `%s'.\nВы можете добавить %u новый ключ(и) и удалить %u старый ключ(и) от этого компьютера в список известных ключей хостов.\nВы уверены, что хотите обновить список известных хостов?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Алгоритм хэширования:
+DLG_HOSTKEY_ROTATION_ADD=%u новый ключ(и):
+DLG_HOSTKEY_ROTATION_REMOVE=%u старый ключ(и):
+
+; crypt.c
+MSG_ENCRYPT_ERROR1=%s ошибка шифрования(1): байты %d (%d)
+MSG_ENCRYPT_ERROR2=%s ошибка шифрования(2)
+MSG_DECRYPT_ERROR1=%s ошибка дешифрации(1): байты %d (%d)
+MSG_DECRYPT_ERROR2=%s ошибка дешифрации(2)
+MSG_CIPHER_INIT_ERROR=Ошибка инициализации шифра (%d)
+MSG_RSAKEY_SETUP_ERROR=Ошибка создания ключа RSA
+MSG_UNAVAILABLE_CIPHERS_ERROR=Сервер не поддерживает ни один из TTSSH-алгоритмов шифрования.\nЗащищенное соединение не может быть создано в направлении TTSSH-сервера.\nСоединение будет закрыто.
+MSG_CIPHER_NONE_ERROR=Все алгоритмы шифрования для этой программы и сервера были отключены.\nЧтобы общаться с этим сервером, Вы должны включить несколько шифров\nв диалоговом окне "Настройка TTSSH" при новом запуске Tera Term.\nСоединение будет закрыто.
+MSG_RSAKEY_TOOWEAK_ERROR=Ключ сервера RSA слишком слабый. Защищенное соединение не может быть установлено.
+MSG_CIPHER_NOTSELECTED_ERROR=Не выбран шифр!
+
+; fwd.c
+MSG_FWD_LOCAL_CHANNEL_ERROR=Сервер пытался манипулировать переадресацией канала, которого не существует.\nЛибо сервер имеет ошибку, либо он враждебный. Вы должны закрыть это соединение.
+MSG_FWD_REQUEST_ERROR=Ошибка связи во время прослушивания подключения пересылки. \nПрослушивание порта прекращено.
+MSG_FWD_REFUSED_ERROR=Отказ в подключении (возможно, что служба в настоящее время не работает)
+MSG_FWD_NETDOWN_ERROR=Компьютеру не удалось связаться (возможны проблемы с сетью)
+MSG_FWD_MACHINEDOWN_ERROR=Компьютеру не удалось связаться (возможно, что компьютер выключен)
+MSG_FWD_ADDRNOTFOUND_ERROR=Не найден адрес компьютера
+MSG_FWD_CONNECT_ERROR=Соединение пересылки не может быть установлено
+MSG_FWD_CHANNEL_ERROR=Ошибка связи %s локальной пересылки %s.\n%s (код %d).\nСоединение пересылки будет закрыто
+MSG_FWD_CHANNEL_OPEN_X_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения с X-сервером %s (экран %d:%d).\n%s(code %d).\nСоединение пересылки будет закрыто.
+MSG_FWD_CHANNEL_OPEN_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения через %s (порт %s).\n%s(code %d).\nСоединение пересылки будет закрыто.
+DLG_FWDMON_TITLE=TTSSH мониторинг порта пересылки
+MSG_FWD_HOSTILE_ATTACK_ERROR=Хост с IP-адресом %s пытался подключиться к локальному порту пересылки %d.\nЭто может быть враждебной атакой!
+MSG_FWD_SOCKET_ERROR=Некоторые сокеты, необходимые для портов пересылки, не могут быть инициализированы.\nНекоторые услуги портов пересылки могут быть недоступны.\n(errno %d)
+MSG_FWD_DUPLICATE_ERROR=TTSSH ВНУТРЕННЯ ОШИБКА: Не удалось установить порт пересылки, потому что был найден дубликат типа/порта
+MSG_FWD_DENIED_HANDLE_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения к компьютеру %s через порт %s.\nПроизошла ошибка при обработке запроса, но она была отклонена.
+MSG_FWD_DENIED_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения к компьютеру %s через порт %d.\nВы не указали эту переадресацию заранее на TTSSH, поэтому просьба была отклонена.
+MSG_FWD_DENIED_X_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения к локальному X-серверу.\nВы не указали эту переадресацию заранее на TTSSH, поэтому просьба была отклонена.
+MSG_FWD_DENIED_BY_SERVER_ERROR=Программа на локальном компьютере пыталась подключиться к порту.\nПросьба была отклонена сервером. Соединение будет закрыто.
+MSG_FWD_COMM_ERROR=Ошибка связи при отправке данных в локальный порт.\nСоединение будет закрыто.
+MSG_FWD_AGENT_FORWARDING_CONFIRM=Вы уверены, что хотите принять запрос агента?
+MSG_FWD_AGENT_NOTIFY=Доступ к удаленному хосту для агента.
+MSG_FWD_AGENT_NOTIFY_TITLE=Активация агента
+
+; hosts.c
+MSG_HOSTS_READ_ENOENT_ERROR=Произошла ошибка при попытке чтения файла известных хостов.\nУказанный файл не существует.
+MSG_HOSTS_READ_ERROR=Произошла ошибка при попытке чтения файла известных хостов.
+MSG_HOSTS_ALLOC_ERROR=Мало памяти для чтения файла известных хостов.
+MSG_HOSTS_HOSTNAME_INVALID_ERROR=Имя хоста содержит недопустимый символ.\nЭта сессия будет закрыта.
+MSG_HOSTS_HOSTNAME_EMPTY_ERROR=Имя хоста не должно быть пустым.\nЭта сессия будет закрыта.
+MSG_HOSTS_FILE_UNSPECIFY_ERROR=Хост и его ключ не могут быть добавлены, так как не указан файл известных хостов.\nПерезагрузите Tera Term и укажите файл известных хостов в диалоговом окне "Настройка" TTSSH.
+MSG_HOSTS_WRITE_EACCES_ERROR=Произошла ошибка при попытке записи ключа хоста. \nВы не имеете разрешения на запись в файл известных хостов.
+MSG_HOSTS_WRITE_ERROR=Произошла ошибка при попытке записи ключа хоста. \nКлюч хоста не может быть записан.
+
+; keyfiles.c
+MSG_KEYFILES_READ_ENOENT_ERROR=Произошла ошибка при попытке чтения файла ключа.\nФайл с указанным именем не существует.
+MSG_KEYFILES_READ_ERROR=Произошла ошибка при попытке чтения файла ключа.
+MSG_KEYFILES_READ_ALLOC_ERROR=Мало памяти для чтения файла ключа хоста.
+MSG_KEYFILES_PRIVATEKEY_NOTCONTAIN_ERROR=Указанный файл ключа не содержит закрытый ключ SSH.
+MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR=Указанный файл ключа был усечен и не содержит допустимого закрытого ключа.
+MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR=Указанный файл ключа не может быть расшифрован с помощью пароля.\nЭтот файл имеет неверную длину.
+MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR=Указанный файл ключа не может быть расшифрован с помощью пароля.\nИспользуемый шифр не поддерживается TTSSH.
+MSG_KEYFILES_PASSPHRASE_EMPTY_ERROR=Указанный файл ключа не может быть расшифрован с помощью пароля.\nДля автоматического входа в систему вы должны создать файл ключа без пароля.\nВНИМАНИЕ! Это означает, что ключ может быть легко украден.
+MSG_KEYFILES_PASSPHRASE_ERROR=Указанный файл ключа не может быть расшифрован с помощью пароля.\nПароль не корректный.
+MSG_KEYFILES_CRYPTOLIB_ERROR=Ошибка в криптографической библиотеке.\nВозможно, что сохраненный ключ является недействительным.
+
+; pkt.c
+MSG_PKT_OVERSIZED_ERROR=Слишком большой пакет, полученный от сервера. Соединение будет закрыто.
+
+; ssh.c
+MSG_SSH_INVALID_COMPDATA_ERROR=Ошибка сжатия данных в принятом пакете
+MSG_SSH_TRUNCATED_PKT_ERROR=Принят усеченный пакет (%ld > %d) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Принят усеченный пакет (%ld > %d) @ grab_payload_limited()
+MSG_SSH_COREINS_ERROR=Обнаружена атака ядра 'CORE insertion attack'. Соединение будет закрыто.
+MSG_SSH_CORRUPTDATA_ERROR=Обнаружено повреждение данных. Соединение будет закрыто.
+MSG_SSH_DECOMPRESS_ERROR=Внутренняя ошибка: пакет не полностью распакован.\nСообщите, пожалуйста, нам об этой ошибке.
+MSG_SSH_SEND_PKT_ERROR=Ошибка связи при отправке пакета SSH.\nСоединение будет закрыто. (%s:%d)
+MSG_SSH_COMP_ERROR=Произошла ошибка при сжатии пакета данных.\nСоединение будет закрыто.
+MSG_SSH_UNABLE_FWD_ERROR=\nСоединение разорвано, поскольку нельзя переслать в порт, который вы затребовали для пересылки из сервера.\nЭто часто происходит, когда кто-то уже пересылает что-то из сервера.
+MSG_SSH_SERVER_DISCON_ERROR=Сервер отключен с сообщением '%s'.%s
+MSG_SSH_SERVER_DISCON_NORES_ERROR=Сервер отключен без объяснения причин. %s
+MSG_SSH_VERSION_ERROR=Эта программа не понимает версию протокола сервера.
+MSG_SSH_VERSION_MISMATCH=Несоответствие версий протоколов: сервер:%d.%d клиент:%d
+MSG_SSH_SEND_ID_ERROR=Произошла ошибка при отправке строки SSH ID.\nСоединение будет закрыто.
+MSG_SSH_UNEXP_MSG2_ERROR=Неожиданное сообщение SSH2(%d) на текущем этапе(%d)
+MSG_SSH_UNEXP_MSG_ERROR=Неожиданный тип принятого пакета: %d
+MSG_SSH_ALLOC_TERMINAL_ERROR=Сервер не может выделить псевдо-терминал. Вы можете столкнуться с некоторыми проблемами.
+MSG_SSH_SETUP_COMP_ERROR=Произошла ошибка при настройке сжатия.\nСоединение будет закрыто.
+MSG_SSH_DECRYPT_RSA_ERROR=Произошла ошибка при расшифровке вызова RSA.\nВозможно поврежден файл ключа.
+MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=Внутренняя ошибка: неподдерживаемый метод аутентификации
+MSG_SSH_AUTH_FAILURE_ERROR=SSH2 ошибка авторизации: не удалось аутентифицировать пользователя.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=Сервер не имеет надежного метода аутентификации.
+MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nМетод проверки аутентификации не поддерживается сервером.
+MSG_SSH_CHANNEL_OPEN_ERROR=Было принято сообщение SSH2_MSG_CHANNEL_OPEN_FAILURE.\nКанал [%d]: причина: %s(%d) сообщение: %s
+MSG_SSH_NO_FREE_CHANNEL=Не удалось открыть новый канал. В TTSSH уже открыто очень много каналов.
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: Подтвердить размер GEX-группы
+MSG_SSH_GEX_SIZE_CANCEL=Новое соединенние отменено.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=Полученный размер группы выходит за допустимые пределы: %d
+MSG_SSH_GEX_SIZE_SMALLER=Размер группы меньше запрашиваемого минимального размера.\nзапрошено: %d, принято: %d\nВы уверены, что хотите принять полученную группу?
+MSG_SSH_GEX_SIZE_LARGER=Размер группы больше запрашиваемого максимального размера.\nзапрошено: %d, принято: %d\nВы уверены, что хотите принять полученную группу?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=Запрос подсистемы завершился неудачно. (%s)
+MSG_SSH_AGENTERROR_TITLE=Неверный запрос агента
+MSG_SSH_AGENTERROR_TOOLARGE=Запрос агента слишком велик, игнорируйте его.
+
+; ttxssh.c
+MSG_UNKNOWN_OPTION_ERROR=Неверный параметр в командной строке: %s
+
+; x11util.c
+MSG_X_AUTH_ERROR=Удаленное X-приложение послало неверные данные аутентификации.\nЭта X-сессия отменяется.
+
+MSG_CREATEWINDOW_KEYGEN_ERROR=Не удается отобразить диалог генератора ключа.
+MSG_CREATEWINDOW_ABOUT_ERROR=Не удается отобразить диалог информации.
+MSG_CREATEWINDOW_SETUP_ERROR=Не удается отобразить диалог настройки TTSSH.
+MSG_CREATEWINDOW_FWDSETUP_ERROR=Не удается отобразить диалог настроек.
+MSG_CREATEWINDOW_FWDEDIT_ERROR=Не удается отобразить диалог правки.
+MSG_CREATEWINDOW_AUTH_ERROR=Не удается отобразить диалог аутентификации.\nСоединение будет закрыто.
+MSG_CREATEWINDOW_AUTHSETUP_ERROR=Не удается отобразить диалог настройки аутентификации.
+MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Не удается отобразить диалог файлов: ошибка %d
+
+MSG_WARNING=ВНИМАНИЕ
+MSG_ERROR=ОШИБКА
+MSG_TTSSH_ERROR=Ошибка TTSSH
+MSG_NONFATAL_ERROR=Tera Term: Ошибка не фатальная
+
+BTN_OK=OK
+BTN_CANCEL=Выход
+BTN_CLOSE=Закрыть
+BTN_DISCONNECT=&Разъединение
+BTN_CONTINUE=&Продолжение
+BTN_YES=&Yes
+BTN_NO=&No
+BTN_HELP=&Help
+
+
+[TTProxy]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP=&Proxy...
+MENU_ABOUT=Информация о TT&Proxy...
+
+DLG_SETUP_TITLE=Настройка Proxy
+DLG_SETUP_URL=URL
+DLG_SETUP_TYPE=&Тип
+DLG_SETUP_HOST=&Имя хоста
+DLG_SETUP_PORT=&Номер порта
+DLG_SETUP_USER=&Имя пользователя
+DLG_SETUP_PASS=&Пароль
+DLG_SETUP_OTHER=&Другие установки...
+
+DLG_OTHER_TITLE=Другие настройки
+DLG_OTHER_COMMON=Общие настройки
+DLG_OTHER_TIMEOUT=&Время ожидания соединения
+DLG_OTHER_SECOND=секунд
+DLG_OTHER_LOG=&Лог соединения Proxy
+DLG_OTHER_REFER=&Запись
+DLG_OTHER_SOCKS=Настройка SOCKS proxy
+DLG_OTHER_RESOLV=&Разрешающее имя
+DLG_OTHER_RESOLV_AUTO=авторазрешение
+DLG_OTHER_RESOLV_REMOTE=разрешение удаленное
+DLG_OTHER_RESOLV_LOCAL=разрешение местное
+DLG_OTHER_TELNET=Настройка TELNET Proxy
+DLG_OTHER_HOST=&Запрос имени хоста
+DLG_OTHER_USER=&Запрос имени пользователя
+DLG_OTHER_PASS=&Запрос пароля
+DLG_OTHER_CONNECT=&Сообщение о соединении
+DLG_OTHER_ERROR=&Сообщение об ошибке
+
+DLG_ABOUT_TITLE=Информация о TTProxy
+DLG_ABOUT_EXTENSION=Tera Term расширенное прокси
+DLG_ABOUT_YEBISUYA=YebisuyaHompo
+DLG_ABOUT_HOMEPAGE=TTProxy home page
+
+MSG_EMPTY_HOSTNAME=Пустое имя хоста!
+MSG_ILLEGAL_PORT=Неверный номер порта!
+MSG_EMPTY_PARAMETER=Некоторые параметры пустые!
+MSG_PROXY_UNAUTHORIZED=Ошибка авторизации Proxy!
+MSG_PROXY_BAD_REQUEST=Proxy предотвратил это соединение!
+MSG_TYPE_NONE=Нет Proxy
+MSG_LOGFILE_SELECT=Выберите лог-файл
+MSG_UNABLE_TO_GET_ISSUER_CERT=Невозможно получить исходный сертификат
+MSG_UNABLE_TO_GET_CRL=Невозможно получить сертификат CRL
+MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE=Не удалось расшифровать подпись сертификата
+MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE=Не удалось расшифровать подпись CRL
+MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY=Не удалось расшифровать обычный ключ
+MSG_CERT_SIGNATURE_FAILURE=Ошибка подписи сертификата
+MSG_CRL_SIGNATURE_FAILURE=Ошибка подписи CRL
+MSG_CERT_NOT_YET_VALID=Сертификат еще не действителен
+MSG_CERT_HAS_EXPIRED=Срок действия сертификата истек
+MSG_CRL_NOT_YET_VALID=CRL еще не действителен
+MSG_CRL_HAS_EXPIRED=CRL уже истек
+MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD=Ошибка формата в поле NotBefore сертификата
+MSG_ERROR_IN_CERT_NOT_AFTER_FIELD=Ошибка формата в поле NotAfter сертификата
+MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD=Ошибка формата в поле CRL's lastUpdate
+MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD=Ошибка формата в поле CRL's nextUpdate
+MSG_OUT_OF_MEM=Мало памяти
+MSG_DEPTH_ZERO_SELF_SIGNED_CERT=Собственный сертификат
+MSG_SELF_SIGNED_CERT_IN_CHAIN=Собственный сертификат найден в списке сертификатов
+MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY=Не удается получить местный сертификат
+MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE=Не удается проверить первый сертификат
+MSG_CERT_CHAIN_TOO_LONG=Список сертификатов слишком длинный
+MSG_CERT_REVOKED=Сертификат отменен
+MSG_INVALID_CA=Неверный CA сертификата
+MSG_PATH_LENGTH_EXCEEDED=Слишком длинный путь
+MSG_INVALID_PURPOSE=Неподдерживаемый сертификат
+MSG_CERT_UNTRUSTED=Недостоверный сертификат
+MSG_CERT_REJECTED=Сертификат отклонен
+MSG_SUBJECT_ISSUER_MISMATCH=Объект не истинный
+MSG_AKID_SKID_MISMATCH=Несоответствие идентификатора прав и содержания ключа
+MSG_AKID_ISSUER_SERIAL_MISMATCH=Несоответствие идентификатора прав и содержания серийного номера
+MSG_KEYUSAGE_NO_CERTSIGN=Используемый ключ не имеет подписи сертификата
+MSG_APPLICATION_VERIFICATION=Ошибка проверки приложения
+MSG_UNMATCH_COMMON_NAME=Несоответствие общего имени
+MSG_UNABLE_TO_GET_COMMON_NAME=Не удается получить общее имя
+
+BTN_OK=OK
+BTN_CANCEL=Выход
+
+
+[TTMenu]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_LISTCONFIG=Конфигурация
+MENU_SETTING=Установки
+MENU_ICON=Показать большие иконки
+MENU_FONT=Специальный шрифт
+MENU_LEFTPOPUP=Показать список клавиш, совместимых с левой кнопкой мыши
+MENU_HOTKEY=Показать список "горячих" клавиш (Ctl+Alt+M)
+MENU_VERSION=Версия
+MENU_EXEC=Выполнить
+MENU_CLOSE=Выход
+MENU_NOTRAY=(нет)
+
+DLG_ABOUT_TITLE=Информация о версии
+DLG_ABOUT_APPNAME=запустить инструмент
+
+DLG_CONFIG_TITLE=Конфигурация
+DLG_CONFIG_ITEM=Элемент списка
+DLG_CONFIG_CONFIG=Конфигурирование
+DLG_CONFIG_NAME=Имя
+DLG_CONFIG_PATTERN=Запуск паттерна
+DLG_CONFIG_AUTO=Автоопределение
+DLG_CONFIG_HOST=Имя хоста
+DLG_CONFIG_USER=Имя пользователя
+DLG_CONFIG_PASS=Пароль
+DLG_CONFIG_MACRO=Указать файл макросов
+DLG_CONFIG_LAUNCH=Только запуск
+DLG_CONFIG_STARTUP=Старт при загрузке
+DLG_CONFIG_SSH=Использовать SSH
+DLG_CONFIG_KEYFILE=Файл ключа
+DLG_CONFIG_CHALLENGE=Использовать Challenge
+DLG_CONFIG_PAGEANT=Использовать Pageant
+DLG_CONFIG_DETAIL=Подробности
+
+DLG_ETC_TITLE=Подробная конфигурация
+DLG_ETC_APP=Применение
+DLG_ETC_OPTION=Опции
+DLG_ETC_CONFIG=Файл конфигурации Tera Term (без запуска)
+DLG_ETC_AUTO=Конфигурация автоопределения
+DLG_ETC_LOGFILE=Лог-файл
+DLG_ETC_PROMPT=Подсказка
+DLG_ETC_USER=Имя пользователя
+DLG_ETC_PASS=Пароль
+
+MSG_ERROR_READREG=Не удается прочитать данные из регистра.\n
+MSG_ERROR_MAKETTL=Не удается создать 'ttpmenu.TTL'\n
+MSG_ERROR_LAUNCH=При запуске приложения произошла ошибка\n
+MSG_ERROR_NOREGNAME=Ошибка: нет имени регистра
+MSG_ERROR_INVALIDREGNAME=Нельзя использовать "\\" в имени регистра
+MSG_ERROR_NOHOST=Ошибка: нет имени хоста
+MSG_ERROR_NOMACRO=Ошибка: нет имени файла макросов
+MSG_ERROR_CHECKFILE=Проверяемый [%s] файл был поврежден.\n
+MSG_ERROR_SAVEREG=Ошибка: нельзя сохранить регистр.\n
+MSG_ERROR_OPENREG=Ошибка: нельзя открыть регистр.\n
+MSG_ERROR_SELECTREG=Выбранное имя регистра было удалено
+MSG_ERROR_GETDELETEREG=Не удается сделать удаление
+MSG_ERROR_DELETEREG=Не удается удалить регистр.\n
+MSG_ERROR_WINCLASS=Не удается зарегистрировать класс окна.\n
+
+FILEDLG_MACRO_TITLE=Файл макросов
+FILEDLG_MACRO_FILTER=macro file(*.ttl)\0*.ttl\0all files(*.*)\0*.*\0\0
+FILEDLG_KEY_TITLE=Файл закрытого ключа
+FILEDLG_KEY_FILTER=identity files\0identity;id_rsa;id_dsa\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0all(*.*)\0*.*\0\0
+FILEDLG_TERATERM_TITLE=Tera Term
+FILEDLG_TERATERM_FILTER=execute file(*.exe)\0*.exe\0all files(*.*)\0*.*\0\0
+FILEDLG_INI_TITLE=Файл конфигурации
+FILEDLG_INI_FILTER=config file(*.ini)\0*.ini\0all files(*.*)\0*.*\0\0
+FILEDLG_LOG_TITLE=Лог-файл
+FILEDLG_LOG_FILTER=log file(*.log)\0*.log\0all files(*.*)\0*.*\0\0
+
+BTN_OK=OK
+BTN_CANCEL=Выход
+BTN_DEFAULT=По умолчанию
+
+
+[TTXKanjiMenu]
+MENU_KANJI=&Код Kanji
+MENU_KANJI_K=Код(&K)
+MENU_RECV_SJIS=Прием: &Shift_JIS
+MENU_RECV_EUCJP=Прием: &EUC-JP
+MENU_RECV_JIS=Прием: &JIS
+MENU_RECV_UTF8=Прием: &UTF-8
+MENU_RECV_UTF8m=Прием: UTF-8&m
+MENU_RECV_KS5601=Прием: &KS5601
+MENU_SEND_SJIS=Передача: S&hift_JIS
+MENU_SEND_EUCJP=Передача: EU&C-JP
+MENU_SEND_JIS=Передача: J&IS
+MENU_SEND_UTF8=Передача: U&TF-8
+MENU_SEND_KS5601=Передача: K&S5601
+MENU_USE_ONE_SETTING=&Использовать один параметр
+MENU_SJIS=Прием/Передача: &Shift_JIS
+MENU_EUCJP=Прием/Передача: &EUC-JP
+MENU_JIS=Прием/Передача: &JIS
+MENU_UTF8=Прием/Передача: &UTF-8
+MENU_UTF8m=Прием: UTF-8&m/Передача: UTF-8
+MENU_KS5601=Прием/Передача: &KS5601
+
+
+[TTXAlwaysOnTop]
+MENU_ALWAYSONTOP=&Всегда вверху
+
+
+[TTXRecurringCommand]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP_RECURRING=&Повторение команды
+MENU_CONTROL_RECURRING=&Повторение команды
+
+DLG_TITLE=повторение команды
+DLG_ENABLE=&Разрешено
+DLG_INTERVAL=&Интервал(сек)
+DLG_COMMAND=&Команда
+DLG_ADD_NEWLINE=&Добавить новую строку

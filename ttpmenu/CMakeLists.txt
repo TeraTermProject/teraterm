@@ -9,6 +9,10 @@ set(COMMON_SRC
   ../teraterm/common/i18n.c
   ../teraterm/common/codeconv.h
   ../teraterm/common/codeconv.cpp
+  ../teraterm/common/compat_win.h
+  ../teraterm/common/compat_win.cpp
+  ../teraterm/common/dllutil.h
+  ../teraterm/common/dllutil.cpp
   )
 
 source_group(

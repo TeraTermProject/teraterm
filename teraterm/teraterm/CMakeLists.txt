@@ -3,70 +3,15 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
+set(ENABLE_DEBUG_INFO 1)
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(COMMON_SRC
-  ../common/tt_res.h
-  ../common/ttcommon.h
-  ../common/ttddecmnd.h
-  ../common/tttypes.h
-  ../common/tektypes.h
-  ../common/ttftypes.h
-  ../common/ttplugin.h
-  ../common/tt-version.h
-  ../common/teraterm.h
-  ../common/ttlib.c
-  ../common/ttlib.h
-  ../common/dlglib.h
-  ../common/dlglib.c
-  ../common/dlglib_cpp.cpp
-  ../common/dlglib_tmpl.cpp
-  ../common/win16api.h
-  ../common/win16api.c
-  ../common/codemap.h
-  ../common/compat_w95.h
-  ../common/compat_win.h
-  ../common/compat_win.cpp
-  ../common/tmfc.cpp
-  ../common/tmfc.h
-  ../common/tmfc_frame.cpp
-  ../common/i18n.h
-  ../common/dllutil.cpp
-  ../common/dllutil.h
-  ../common/codeconv.h
-  ../common/codeconv.cpp
-  ../common/tipwin.h
-  ../common/tipwin.cpp
-  #
-  ../teraterm/unisym2decsp.map
-  ../teraterm/uni2sjis.map
-  ../ttpcmn/sjis2uni.map
-  )
-
-source_group(
-  "common"
-  FILES
-  ${COMMON_SRC}
-  )
-
-set(TTDLG_SRC
-  ../ttpdlg/dlg_res.h
-  ../ttpdlg/ttdlg.c
-  ../ttpdlg/ttdlg.h
-  ../ttpdlg/ttpdlg.rc
-  )
-
-source_group(
-  "ttdlg"
-  FILES
-  ${TTDLG_SRC}
-  )
-
-set(SRC
+add_executable(
+  teraterm WIN32
   addsetting.cpp
   addsetting.h
   buffer.c
@@ -103,7 +48,6 @@ set(SRC
   ttdde.h
   ttdialog.c
   ttdialog.h
-  ttermpro.rc
   ttfileio.c
   ttfileio.h
   ttime.c
@@ -112,7 +56,6 @@ set(SRC
   ttplug.h
   ttsetup.c
   ttsetup.h
-  tt-version.rc
   ttwinman.c
   ttwinman.h
   ttwsk.c
@@ -127,37 +70,111 @@ set(SRC
   winjump.h
   WSAAsyncGetAddrInfo.c
   WSAAsyncGetAddrInfo.h
+  sendmem.cpp
+  sendmem.h
   #
   uni_combining.map
   #
-  teraterm.manifest
+  ttermpro.rc
+  tt-version.rc
+  teraterm_manifest.rc
   #
   svnversion.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
   #
-  ${COMMON_SRC}
-  ${TTDLG_SRC}
+  unicode_test.h
+  unicode.h
+  unicode.cpp
+  unicode_asian_width.tbl
+  unicode_combine.tbl
+  unicode_emoji.tbl
+  #
+  ../ttpmacro/fileread.h
+  ../ttpmacro/fileread.cpp
+  ftdlg_lite.h
+  ftdlg_lite.cpp
+  clipboarddlg.h
+  clipboarddlg.cpp
+  debug_pp.cpp
+  debug_pp.h
+  debug_pp.rc
   )
 
-link_directories(
-  ${ONIGURUMA_LIBRARY_DIRS}
-  ${SFMT_LIBRARY_DIRS}
+target_sources(
+  teraterm
+  PRIVATE
+  ../common/tt_res.h
+  ../common/ttcommon.h
+  ../common/ttddecmnd.h
+  ../common/tttypes.h
+  ../common/tektypes.h
+  ../common/ttftypes.h
+  ../common/ttplugin.h
+  ../common/tt-version.h
+  ../common/teraterm.h
+  ../common/ttlib.c
+  ../common/ttlib.h
+  ../common/dlglib.h
+  ../common/dlglib.c
+  ../common/dlglib_cpp.cpp
+  ../common/dlglib_tmpl.cpp
+  ../common/win16api.h
+  ../common/win16api.c
+  ../common/codemap.h
+  ../common/compat_w95.h
+  ../common/compat_win.h
+  ../common/compat_win.cpp
+  ../common/tmfc.cpp
+  ../common/tmfc.h
+  ../common/tmfc_frame.cpp
+  ../common/i18n.h
+  ../common/dllutil.cpp
+  ../common/dllutil.h
+  ../common/codeconv.h
+  ../common/codeconv.cpp
+  ../common/tipwin.h
+  ../common/tipwin.cpp
+  ../common/layer_for_unicode.h
+  ../common/layer_for_unicode.cpp
+  #
+  ../teraterm/unisym2decsp.map
+  ../teraterm/uni2sjis.map
+  ../ttpcmn/sjis2uni.map
   )
+
+source_group(
+  "table_datas"
+  REGULAR_EXPRESSION
+  "(map|tbl)$"
+  )
+
+source_group(
+  "common"
+  REGULAR_EXPRESSION
+  "..\/common\/"
+  )
+
+target_sources(
+  teraterm
+  PRIVATE
+  ../ttpdlg/dlg_res.h
+  ../ttpdlg/ttdlg.c
+  ../ttpdlg/ttdlg.h
+  ../ttpdlg/ttpdlg.rc
+  )
+
+source_group(
+  "ttpdlg"
+  REGULAR_EXPRESSION
+  "..\/ttpdlg\/")
 
 if (MSVC)
-  set_source_files_properties(buffer.c PROPERTIES COMPILE_FLAGS /W4)
-
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll /MANIFEST:NO")
   if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
     # 32bit
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll")
   endif()
 endif()
-
-add_executable(
-  teraterm WIN32
-  ${SRC}
-  )
 
 set_target_properties(
   teraterm
@@ -185,14 +202,31 @@ if(MINGW)
     )
 endif()
 
+if(MSVC AND ENABLE_DEBUG_INFO)
+  target_compile_options(
+	teraterm
+	PRIVATE
+    $<$<CONFIG:Release>:/Zi>
+    )
+  if(${CMAKE_VERSION} VERSION_GREATER "3.13")
+	target_link_options(
+	  teraterm
+	  PRIVATE
+	  /DEBUG:FULL
+	  /pdbaltpath:ttermpro.pdb
+	  /map
+	  )
+  endif()
+endif()
+
 target_link_libraries(
   teraterm
   ttpcmn
   ttpfile
   ttpset
   ttptek
-  optimized onig.lib
-  debug onigd.lib
+  ${ONIGURUMA_LIB}
+  ${SFMT_LIB}
   #
   gdi32
   comctl32
@@ -210,63 +244,6 @@ add_dependencies(
   ttptek
   )
 
-# copy .lng files
-if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
-  # Visual Studio 2017以上の時
-  add_custom_target(
-    copy_lang ALL
-    DEPENDS
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Default.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/English.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/French.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/German.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Japanese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Korean.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Russian.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Simplified Chinese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
-    )
-  add_custom_command(
-    OUTPUT
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Default.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/English.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/French.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/German.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Japanese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Korean.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Russian.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Simplified Chinese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/Default.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Default.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/English.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/English.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/French.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/French.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/German.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/German.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/Japanese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Japanese.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/Korean.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Korean.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/Russian.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Russian.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/Simplified Chinese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Simplified Chinese.lng"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_SOURCE_DIR}/installer/release/lang/Traditional Chinese.lng"
-      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
-    )
-endif()
-
 ####
 configure_file(
   svnversion.h.in
@@ -276,3 +253,12 @@ install(
   TARGETS teraterm
   DESTINATION .
   )
+if(MSVC AND ENABLE_DEBUG_INFO)
+  install(
+    FILES
+    $<TARGET_PDB_FILE:teraterm>
+    $<$<CONFIG:Debug>:debug/ttermpro.map>
+    $<$<CONFIG:Release>:release/ttermpro.map>
+    DESTINATION .
+    )
+endif()

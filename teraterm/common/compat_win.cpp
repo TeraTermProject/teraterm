@@ -33,7 +33,23 @@
 #include "compat_win.h"
 
 #include "dllutil.h"
+#include "ttlib.h"
 
+ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
+HWND(WINAPI *pCreateWindowExW)
+(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
+ HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
+HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
+INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
+LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
+BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
+BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
+DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
+BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
+BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
@@ -48,6 +64,46 @@ HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType,
 HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
+HWND (WINAPI *pGetConsoleWindow)(void);
+
+/**
+ *	GetConsoleWindow() と同じ動作をする
+ *	 https://support.microsoft.com/ja-jp/help/124103/how-to-obtain-a-console-window-handle-hwnd
+ */
+static HWND WINAPI GetConsoleWindowLocal(void)
+{
+#define MY_BUFSIZE 1024					 // Buffer size for console window titles.
+	HWND hwndFound;						 // This is what is returned to the caller.
+	char pszNewWindowTitle[MY_BUFSIZE];  // Contains fabricated WindowTitle.
+	char pszOldWindowTitle[MY_BUFSIZE];  // Contains original WindowTitle.
+
+	// Fetch current window title.
+	DWORD size = GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
+	if (size == 0) {
+		DWORD err = GetLastError();
+		if (err == ERROR_INVALID_HANDLE) {
+			// コンソールが開いていない
+			return NULL;
+		}
+	}
+
+	// Format a "unique" NewWindowTitle.
+	wsprintf(pszNewWindowTitle, "%d/%d", GetTickCount(), GetCurrentProcessId());
+
+	// Change current window title.
+	SetConsoleTitle(pszNewWindowTitle);
+
+	// Ensure window title has been updated.
+	Sleep(40);
+
+	// Look for NewWindowTitle.
+	hwndFound = FindWindow(NULL, pszNewWindowTitle);
+
+	// Restore original window title.
+	SetConsoleTitle(pszOldWindowTitle);
+
+	return hwndFound;
+}
 
 static const APIInfo Lists_user32[] = {
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
@@ -57,6 +113,12 @@ static const APIInfo Lists_user32[] = {
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
+	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
+	{ "GetDlgItemTextW", (void **)&pGetDlgItemTextW },
+	{ "SetWindowTextW", (void **)&pSetWindowTextW },
+	{ "ModifyMenuW", (void **)&pModifyMenuW },
+	{ "GetMenuStringW", (void **)&pGetMenuStringW },
+	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
 	{},
 };
 
@@ -78,11 +140,32 @@ static const APIInfo Lists_Shcore[] = {
 	{},
 };
 
+static const APIInfo Lists_kernel32[] = {
+	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
+	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
+	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
+	{},
+};
+
+static const APIInfo Lists_shell32[] = {
+	{ "DragQueryFileW", (void **)&pDragQueryFileW },
+	{},
+};
+
+static const APIInfo Lists_comctl32[] = {
+	{ "CreatePropertySheetPageW", (void **)&pCreatePropertySheetPageW },
+	{ "PropertySheetW", (void **)&pPropertySheetW },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
 	{ _T("gdi32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_gdi32 },
 	{ _T("Shcore.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_Shcore },
+	{ _T("kernel32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
+	{ _T("shell32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
+	{ _T("Comctl32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{},
 };
 
@@ -93,4 +176,19 @@ void WinCompatInit()
 	done = TRUE;
 
 	DLLGetApiAddressFromLists(DllInfos);
+
+	// 9x特別処理
+	if (!IsWindowsNTKernel()) {
+		// Windows 9x に存在しているAPI(環境依存?)
+		// 正しく動作しないので無効とする
+		pGetPrivateProfileStringW = NULL;
+		pSetWindowTextW = NULL;
+		pSetDlgItemTextW = NULL;
+		pGetDlgItemTextW = NULL;
+	}
+
+	// GetConsoleWindow特別処理
+	if (pGetConsoleWindow == NULL) {
+		pGetConsoleWindow = GetConsoleWindowLocal;
+	}
 }

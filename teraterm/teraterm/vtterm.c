@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <tchar.h>
+#include <assert.h>
 
 #include "buffer.h"
 #include "ttwinman.h"
@@ -58,6 +59,8 @@
 #include "codeconv.h"
 
 #include "vtterm.h"
+
+#include "unicode_test.h"
 
 void ParseFirst(BYTE b);
 
@@ -210,6 +213,11 @@ static DWORD BeepSuppressTime = 0;
 static DWORD BeepOverUsedCount = 0;
 
 static _locale_t CLocale = NULL;
+
+#if UNICODE_INTERNAL_BUFF
+// 内部コード unicode版
+static void UnicodeToCP932(unsigned int code);
+#endif
 
 void ClearParams()
 {
@@ -562,7 +570,7 @@ void BackSpace()
 	}
 }
 
-void CarriageReturn(BOOL logFlag)
+static void CarriageReturn(BOOL logFlag)
 {
 	if (!ts.EnableContinuedLineCopy || logFlag)
 		if (cv.HLogBuf!=0) Log1Byte(CR);
@@ -575,7 +583,7 @@ void CarriageReturn(BOOL logFlag)
 	Fallbacked = FALSE;
 }
 
-void LineFeed(BYTE b, BOOL logFlag)
+static void LineFeed(BYTE b, BOOL logFlag)
 {
 	/* for auto print mode */
 	if ((AutoPrintMode) &&
@@ -687,9 +695,20 @@ void PutChar(BYTE b)
 	}
 
 	if (Wrap) {
+#if UNICODE_INTERNAL_BUFF
+		TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+		t.Attr |= AttrLineContinued;
+		t.AttrEx = t.Attr;
+		BuffSetCursorCharAttr(CursorX, CursorY, t);
+#endif
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
+#if !UNICODE_INTERNAL_BUFF
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
+#else
+		CharAttrTmp.Attr |= AttrLineContinued;
+		t.AttrEx = t.Attr;
+#endif
 	}
 
 	if (cv.HLogBuf !=0) {
@@ -733,7 +752,40 @@ void PutChar(BYTE b)
 	else
 		CharAttrTmp.Attr |= CharAttr.Attr;
 
+#if 0
+	if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
+		CharAttrTmp.Attr |= AttrLineContinued;
+	}
+#endif
+
+#if UNICODE_INTERNAL_BUFF
+	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+	if (ts.Language == IdJapanese) {
+		unsigned long u32;
+		switch (ts.KanjiCode) {
+//		case IdJIS:
+//			b = JIS2SJIS(b);
+		case IdSJIS:
+			u32 = MBCP_UTF32(b, 932);
+			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+			break;
+		case IdUTF8:
+			BuffPutUnicode(b, CharAttrTmp, InsertMode);
+			break;
+		default:
+			BuffPutUnicode(b, CharAttrTmp, InsertMode);
+			break;
+		}
+	} else if (ts.Language == IdRussian) {
+		BYTE c = RussConv(ts.RussHost, IdWindows, b);
+		unsigned long u32 = MBCP_UTF32(c, 1251);
+		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+	} else {
+		BuffPutUnicode(b, CharAttrTmp, InsertMode);
+	}
+#else
 	BuffPutChar(b, CharAttrTmp, InsertMode);
+#endif
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
 		UpdateStr();
@@ -744,7 +796,7 @@ void PutChar(BYTE b)
 	}
 }
 
-void PutDecSp(BYTE b)
+static void PutDecSp(BYTE b)
 {
 	TCharAttr CharAttrTmp;
 
@@ -778,6 +830,9 @@ void PutDecSp(BYTE b)
 	}
 
 	CharAttrTmp.Attr |= AttrSpecial;
+#if UNICODE_INTERNAL_BUFF
+	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+#endif
 	BuffPutChar(b, CharAttrTmp, InsertMode);
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
@@ -789,7 +844,7 @@ void PutDecSp(BYTE b)
 	}
 }
 
-void PutKanji(BYTE b)
+static void PutKanji(BYTE b)
 {
 	int LineEnd;
 	TCharAttr CharAttrTmp;
@@ -820,13 +875,23 @@ void PutKanji(BYTE b)
 	if (Wrap) {
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
+#if !UNICODE_INTERNAL_BUFF
 		if (ts.EnableContinuedLineCopy)
 			CharAttrTmp.Attr |= AttrLineContinued;
+#else
+		if (ts.EnableContinuedLineCopy) {
+			CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+		}
+#endif
 	}
 	else if (CursorX > LineEnd - 1) {
 		if (AutoWrapMode) {
 			if (ts.EnableContinuedLineCopy) {
 				CharAttrTmp.Attr |= AttrLineContinued;
+#if UNICODE_INTERNAL_BUFF
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+#endif
 				if (CursorX == LineEnd)
 					BuffPutChar(0x20, CharAttr, FALSE);
 			}
@@ -850,7 +915,35 @@ void PutKanji(BYTE b)
 		Special = FALSE;
 	}
 
+#if UNICODE_INTERNAL_BUFF
+	{
+		// codepage一覧
+		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
+		unsigned long u32 = 0;
+		if (ts.Language == IdKorean && ts.CodePage == 51949) {
+#if 0
+			unsigned char buf[2];
+			int ret;
+			wchar_t wchar;
+			buf[0] = Kanji >> 8;
+			buf[1] = Kanji & 0xff;
+			ret = MultiByteToWideChar(51949, MB_ERR_INVALID_CHARS, (char *)buf, 2, &wchar, 1);
+			u32 = wchar;
+#endif
+			u32 = MBCP_UTF32(Kanji, ts.CodePage);
+		} else if (ts.Language == IdJapanese && ts.CodePage == 932) {
+			// ここに来た時点でCP932になっている
+			//} else if (ts.KanjiCode == IdSJIS || ts.KanjiCode == IdEUC || ts.KanjiCode == IdJIS) {
+			u32 = CP932ToUTF32(Kanji);
+		} else {
+			u32 = MBCP_UTF32(Kanji, ts.CodePage);
+		}
+		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+	}
+#else
 	BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
+#endif
 
 	if (CursorX < LineEnd - 1) {
 		MoveRight();
@@ -923,7 +1016,7 @@ void PutDebugChar(BYTE b)
 	}
 }
 
-void PrnParseControl(BYTE b) // printer mode
+static void PrnParseControl(BYTE b) // printer mode
 {
 	switch (b) {
 	case NUL:
@@ -972,7 +1065,7 @@ void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(b, TRUE);
 }
 
-void ParseControl(BYTE b)
+static void ParseControl(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -1624,7 +1717,8 @@ void EscapeSequence(BYTE b)
 		} \
 	}
 
-void CSInsertCharacter()		// ICH
+// ICH
+static void CSInsertCharacter(void)
 {
 	// Insert space characters at cursor
 	CheckParamVal(Param[1], NumOfColumns);
@@ -1797,7 +1891,7 @@ void CSLineErase()
 	}
 }
 
-void CSQSelLineErase()
+static void CSQSelLineErase(void)
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
@@ -1837,7 +1931,8 @@ void CSDeleteNLines()
 	BuffDeleteLines(Count,YEnd);
 }
 
-void CSDeleteCharacter()	// DCH
+// DCH
+static void CSDeleteCharacter(void)
 {
 // Delete characters in current line from cursor
 	CheckParamVal(Param[1], NumOfColumns);
@@ -1846,7 +1941,8 @@ void CSDeleteCharacter()	// DCH
 	BuffDeleteChars(Param[1]);
 }
 
-void CSEraseCharacter()		// ECH
+// ECH
+static void CSEraseCharacter(void)
 {
 	CheckParamVal(Param[1], NumOfColumns);
 
@@ -2138,6 +2234,9 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 		  case   0:	/* Clear all */
 			attr->Attr = DefCharAttr.Attr;
 			attr->Attr2 = DefCharAttr.Attr2 | (attr->Attr2&Attr2Protect);
+#if UNICODE_INTERNAL_BUFF
+			attr->AttrEx = attr->Attr;
+#endif
 			attr->Fore = DefCharAttr.Fore;
 			attr->Back = DefCharAttr.Back;
 			mask->Attr = AttrSgrMask;
@@ -3632,6 +3731,9 @@ void CSDol(BYTE b)
 			attr.Attr &= AttrSgrMask;
 			mask.Attr &= AttrSgrMask;
 			attr.Attr2 &= Attr2ColorMask;
+#if UNICODE_INTERNAL_BUFF
+			attr.AttrEx = attr.Attr;
+#endif
 			mask.Attr2 &= Attr2ColorMask;
 			if (RectangleMode) {
 				BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
@@ -5225,10 +5327,28 @@ void CANSeen(BYTE b)
 	}
 }
 
-BOOL CheckKanji(BYTE b)
+/**
+ *	dbcsの1byte目チェック?
+ */
+static BOOL CheckKanji(BYTE b)
 {
 	BOOL Check;
 
+#if UNICODE_INTERNAL_BUFF
+	if (ts.CodePage != 932) {
+		// TODO ちゃんとチェックする
+		// IsDBCSLeadByteEx() が妥当?
+		if (ts.CodePage == 936) {
+			// chs
+			return ((0x81 <= b) && (b <= 0xfe));
+		}
+		if (ts.CodePage == 950) {
+			// cht
+			return ((0x88 <= b) && (b <= 0xfe));
+		}
+
+	}
+#endif
 	if (ts.Language!=IdJapanese)
 		return FALSE;
 
@@ -5284,7 +5404,7 @@ BOOL CheckKorean(BYTE b)
 	return Check;
 }
 
-BOOL ParseFirstJP(BYTE b)
+static BOOL ParseFirstJP(BYTE b)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
 {
@@ -5345,6 +5465,14 @@ BOOL ParseFirstJP(BYTE b)
 		if ((Gn[Glr[0]] == IdKatakana) || EUCkanaIn) {
 			b = b | 0x80;
 			EUCkanaIn = FALSE;
+#if UNICODE_INTERNAL_BUFF
+			{
+				// bはsjisの半角カタカナ
+				unsigned long u32 = CP932ToUTF32(b);
+				UnicodeToCP932(u32);
+			}
+			return TRUE;
+#endif
 		}
 		PutChar(b);
 	}
@@ -5403,9 +5531,15 @@ BOOL ParseFirstJP(BYTE b)
 		    (ts.KanjiCode==IdSJIS) ||
 		    (ts.KanjiCode==IdJIS) &&
 		    (ts.JIS7Katakana==0) &&
-		    ((ts.TermFlag & TF_FIXEDJIS)!=0))
+		    ((ts.TermFlag & TF_FIXEDJIS)!=0)) {
+#if UNICODE_INTERNAL_BUFF
+			// bはsjisの半角カタカナ
+			unsigned long u32 = CP932ToUTF32(b);
+			UnicodeToCP932(u32);
+#else
 			PutChar(b);	// katakana
-		else {
+#endif
+		} else {
 			if (Gn[Glr[1]] == IdASCII) {
 				b = b & 0x7f;
 			}
@@ -5485,10 +5619,12 @@ BOOL ParseFirstKR(BYTE b)
 
 static void ParseASCII(BYTE b)
 {
+#if !UNICODE_INTERNAL_BUFF
 	if (ts.Language == IdJapanese) {
 		ParseFirstJP(b);
 		return;
 	}
+#endif
 
 	if (SSflag) {
 		PutChar(b);
@@ -5566,6 +5702,139 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 	return (index);
 }
 
+// unicode(UTF-32,wchar_t)をバッファへ書き込む
+// TODO @@
+#if UNICODE_INTERNAL_BUFF
+// 内部コード unicode版
+static void UnicodeToCP932(unsigned int code)
+{
+	unsigned short cset;
+	int LineEnd;
+
+	TCharAttr CharAttrTmp;
+	CharAttrTmp = CharAttr;
+	if (code <= US) {
+		// C0
+		ParseControl(code);
+#if 0
+	} else if ((0x80<=code) && (code<=0x9F)) {
+		// C1
+		ParseControl(code);
+	} else if (code < 0x20) {
+		PutChar(code);
+#endif
+#if 0
+	} else if (code <= 0xff) {
+		PutChar(code);
+#endif
+	} else {
+		int r;
+		BOOL is_update;
+
+		// UnicodeからDEC特殊文字へのマッピング
+		if (ts.UnicodeDecSpMapping) {
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				code = cset & 0xff;
+				CharAttrTmp.Attr |= AttrSpecial;
+			}
+		}
+
+		if ((CharAttrTmp.Attr & AttrSpecial) == 0) {
+			if (Special) {
+				UpdateStr();
+				Special = FALSE;
+			}
+		} else {
+			if (!Special) {
+				UpdateStr();
+				Special = TRUE;
+			}
+		}
+
+		if (CursorX > CursorRightM)
+			LineEnd = NumOfColumns - 1;
+		else
+			LineEnd = CursorRightM;
+
+
+		if (Wrap) {
+			TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+			t.Attr |= AttrLineContinued;
+			t.AttrEx = t.Attr;
+			BuffSetCursorCharAttr(CursorX, CursorY, t);
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+			CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+		}
+
+		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
+		//		エラー時はカーソル位置を検討する
+		Wrap = FALSE;
+		is_update = FALSE;
+		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+	retry:
+		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
+		if (r == -1) {
+			// 文字全角で行末、入力できない
+
+			if (AutoWrapMode) {
+				// 自動改行
+				// 、wrap処理
+				CharAttrTmp = CharAttr;
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
+				// AutoWrapMode
+				// ts.EnableContinuedLineCopy
+				//if (CursorX != LineEnd){
+				//&& BuffIsHalfWidthFromCode(&ts, code)) {
+
+				// full width出力が半分出力にならないように0x20を出力
+				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
+				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
+
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+			else {
+				// 行頭に戻す
+				CursorX = 0;
+			}
+
+			//CharAttrTmp.Attr &= ~AttrLineContinued;
+			goto retry;
+		}
+		else if (r == 0) {
+			// カーソルの移動なし,合字など
+			;
+		} else if (r == 1) {
+			// 半角(1セル)
+			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+			}
+		} else if (r == 2) {
+			// 全角(2セル)
+			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
+				MoveRight();	// 全角の右側にカーソル移動
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+				MoveRight();
+			}
+		}
+		else {
+			assert(FALSE);
+		}
+	}
+}
+
+#else
+
 // unicode(UTF-32)をバッファ(t.CodePage)へ書き込む
 static void UnicodeToCP932(unsigned int code)
 {
@@ -5611,6 +5880,24 @@ static void UnicodeToCP932(unsigned int code)
 	}
 }
 
+#endif
+
+// UTF-8で受信データを処理する(sub)
+#if UNICODE_INTERNAL_BUFF
+static BOOL ParseFirstUTF8Sub(BYTE b)
+{
+	if (b<=US)
+		ParseControl(b);
+	else if ((b>=0x20) && (b<=0x7E))
+		PutChar(b);
+	else if ((b>=0x80) && (b<=0x9F))
+		ParseControl(b);
+	else if (b>=0xA0)
+		PutChar(b);
+	return TRUE;
+}
+#endif
+
 // UTF-8で受信データを処理する
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
@@ -5639,10 +5926,19 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 			}
 
 			if (count == 1) {
+//#if UNICODE_INTERNAL_BUFF
+#if 0
+				ParseFirstUTF8Sub(buf[0]);
+#else
 				ParseASCII(buf[0]);
+#endif
 			}
+//#if UNICODE_INTERNAL_BUFF
+#if 0
+			ParseFirstUTF8Sub(b);
+#else
 			ParseASCII(b);
-
+#endif
 			count = 0;  // reset counter
 			return TRUE;
 		}
@@ -5767,12 +6063,16 @@ skip:
 }
 
 
-BOOL ParseFirstRus(BYTE b)
+static BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
 	if (b>=128) {
+#if !UNICODE_INTERNAL_BUFF
 		b = RussConv(ts.RussHost,ts.RussClient,b);
 		PutChar(b);
+#else
+		PutChar(b);
+#endif
 		return TRUE;
 	}
 	return FALSE;
@@ -5867,6 +6167,18 @@ int VTParse()
 	LockBuffer();
 
 	while ((c>0) && (ChangeEmu==0)) {
+#if UNICODE_DEBUG
+		{
+			static DWORD prev_tick;
+			DWORD now = GetTickCount();
+			if (prev_tick == 0) prev_tick = now;
+			if (now - prev_tick > 1*1000) {
+				printf("\n");
+				prev_tick = now;
+			}
+			printf("%02x(%c) ", b, isprint(b) ? b : '.');
+		}
+#endif
 		if (DebugFlag!=DEBUG_FLAG_NONE)
 			PutDebugChar(b);
 		else {

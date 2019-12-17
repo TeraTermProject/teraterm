@@ -50,6 +50,7 @@
 #include "compat_win.h"
 #include "helpid.h"
 #include "addsetting.h"
+#include "debug_pp.h"
 
 #include "tipwin.h"
 
@@ -82,10 +83,10 @@ void CVisualPropPageDlg::SetupRGBbox(int index)
 CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD, sheet)
 {
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
-	             _T("General"), ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
+				  L"General", ts.UILanguageFile);
+	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -210,10 +211,10 @@ void CGeneralPropPageDlg::OnHelp()
 CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CSequencePropPageDlg::IDD, sheet)
 {
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
-	             _T("Control Sequence"), ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
+				  L"Control Sequence", ts.UILanguageFile);
+	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -245,31 +246,31 @@ void CSequencePropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	TCHAR uimsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", uimsg, _countof(uimsg), _T("off"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", uimsg, _countof(uimsg), _T("overwrite"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", uimsg, _countof(uimsg), _T("ahead"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", uimsg, _countof(uimsg), _T("last"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	wchar_t uimsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", uimsg, _countof(uimsg), L"off", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", uimsg, _countof(uimsg), L"overwrite", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", uimsg, _countof(uimsg), L"ahead", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", uimsg, _countof(uimsg), L"last", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
-	get_lang_msgT("DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", uimsg, _countof(uimsg), _T("ignore"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", uimsg, _countof(uimsg), _T("accept"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", uimsg, _countof(uimsg), _T("empty"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", uimsg, _countof(uimsg), L"ignore", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", uimsg, _countof(uimsg), L"accept", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", uimsg, _countof(uimsg), L"empty", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
-	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", uimsg, _countof(uimsg), _T("off"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", uimsg, _countof(uimsg), _T("write only"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", uimsg, _countof(uimsg), _T("read only"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", uimsg, _countof(uimsg), _T("read/write"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", uimsg, _countof(uimsg), L"off", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", uimsg, _countof(uimsg), L"write only", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", uimsg, _countof(uimsg), L"read only", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", uimsg, _countof(uimsg), L"read/write", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.MouseEventTracking);
@@ -409,10 +410,10 @@ void CSequencePropPageDlg::OnHelp()
 CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CCopypastePropPageDlg::IDD, sheet)
 {
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
-				  _T("Copy and Paste"), ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
+				  L"Copy and Paste", ts.UILanguageFile);
+	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -629,10 +630,10 @@ void CCopypastePropPageDlg::OnHelp()
 CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CVisualPropPageDlg::IDD, sheet)
 {
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
-	             _T("Visual"), ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
+				  L"Visual", ts.UILanguageFile);
+	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 	TipWin = new CTipWin(inst);
 }
@@ -677,19 +678,19 @@ void CVisualPropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	TCHAR uimsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT",
-				  uimsg, _countof(uimsg), _T("Default"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED",
-				  uimsg, _countof(uimsg), _T("Non-Antialiased"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED",
-				  uimsg, _countof(uimsg), _T("Antialiased"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE",
-				  uimsg, _countof(uimsg), _T("ClearType"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	wchar_t uimsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT",
+				  uimsg, _countof(uimsg), L"Default", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED",
+				  uimsg, _countof(uimsg), L"Non-Antialiased", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED",
+				  uimsg, _countof(uimsg), L"Antialiased", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE",
+				  uimsg, _countof(uimsg), L"ClearType", ts.UILanguageFile);
+	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
 	// (1)AlphaBlend
 
@@ -1266,10 +1267,10 @@ void CVisualPropPageDlg::OnHelp()
 CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CLogPropPageDlg::IDD, sheet)
 {
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
-	             _T("Log"), ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
+				  L"Log", ts.UILanguageFile);
+	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -1629,10 +1630,10 @@ void CLogPropPageDlg::OnHelp()
 CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CCygwinPropPageDlg::IDD, sheet)
 {
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
-	             _T("Cygwin"), ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
+				  L"Cygwin", ts.UILanguageFile);
+	m_psp.pszTitle = _wcsdup(UIMsg);
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -1723,40 +1724,41 @@ void CCygwinPropPageDlg::OnHelp()
 
 // CAddSettingPropSheetDlg
 CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
-	HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd) :
-	TTCPropertySheet(hInstance, pszCaption, hParentWnd)
+	HINSTANCE hInstance, HWND hParentWnd) :
+	TTCPropertySheet(hInstance, hParentWnd)
 {
-	m_GeneralPage = new CGeneralPropPageDlg(hInstance, this);
-	m_SequencePage = new CSequencePropPageDlg(hInstance, this);
-	m_CopypastePage = new CCopypastePropPageDlg(hInstance, this);
-	m_VisualPage = new CVisualPropPageDlg(hInstance, this);
-	m_LogPage = new CLogPropPageDlg(hInstance, this);
-	m_CygwinPage = new CCygwinPropPageDlg(hInstance, this);
+	int i = 0;
+	m_Page[i++] = new CGeneralPropPageDlg(hInstance, this);
+	m_Page[i++] = new CSequencePropPageDlg(hInstance, this);
+	m_Page[i++] = new CCopypastePropPageDlg(hInstance, this);
+	m_Page[i++] = new CVisualPropPageDlg(hInstance, this);
+	m_Page[i++] = new CLogPropPageDlg(hInstance, this);
+	m_Page[i++] = new CCygwinPropPageDlg(hInstance, this);
+	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
+		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
+		m_Page[i++] = new CDebugPropPage(hInstance, this);
+	}
+	m_PageCount = i;
 
-	hPsp[0] = m_GeneralPage->CreatePropertySheetPage();
-	hPsp[1] = m_SequencePage->CreatePropertySheetPage();
-	hPsp[2] = m_CopypastePage->CreatePropertySheetPage();
-	hPsp[3] = m_VisualPage->CreatePropertySheetPage();
-	hPsp[4] = m_LogPage->CreatePropertySheetPage();
-	hPsp[5] = m_CygwinPage->CreatePropertySheetPage();
-	m_psh.nPages = 6;
+	for (i = 0; i < m_PageCount; i++) {
+		hPsp[i] = m_Page[i]->CreatePropertySheetPage();
+	}
+
+	m_psh.nPages = m_PageCount;
 	m_psh.phpage = hPsp;
 
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_TABSHEET_TITLE", UIMsg, _countof(UIMsg),
-				 pszCaption, ts.UILanguageFile);
-	m_psh.pszCaption = _tcsdup(UIMsg);
+	wchar_t UIMsg[MAX_UIMSG];
+	get_lang_msgW("DLG_TABSHEET_TITLE", UIMsg, _countof(UIMsg),
+				  L"Tera Term: Additional settings", ts.UILanguageFile);
+	m_psh.pszCaption = _wcsdup(UIMsg);
 }
 
 CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 {
 	free((void*)m_psh.pszCaption);
-	delete m_GeneralPage;
-	delete m_SequencePage;
-	delete m_CopypastePage;
-	delete m_VisualPage;
-	delete m_LogPage;
-	delete m_CygwinPage;
+	for (int i = 0; i < m_PageCount; i++) {
+		delete m_Page[i];
+	}
 }
 
 void CAddSettingPropSheetDlg::OnInitDialog()

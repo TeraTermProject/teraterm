@@ -1,0 +1,1158 @@
+﻿; Updated by TeraTerm Project (2019-11-22)
+; Last translated (Korean language) by Daehong Kim (2013-07-25)
+
+[Tera Term]
+DLG_SYSTEM_FONT=굴림,10,128
+DLG_TAHOMA_FONT=돋움,9,128
+
+MENU_FILE=메뉴(&F)
+MENU_FILE_NEW=새로 만들기(&N)...\tAlt+N
+MENU_FILE_DUPLICATE=세션 복사(&U)\tAlt+D
+MENU_FILE_GYGWIN=Cygwin 연결(&G)\tAlt+G
+MENU_FILE_LOG=로그(&L)...
+MENU_FILE_PAUSELOG=Pause Logg&ing
+MENU_FILE_COMMENTLOG=로그 주석(&O)...
+MENU_FILE_VIEWLOG=로그 보기(&V)
+MENU_FILE_SHOWLOGDIALOG=로그 다이얼로그(&W)...
+MENU_FILE_STOPLOG=Stop Logging (&Q)
+MENU_FILE_SENDFILE=파일 보내기(&S)...
+MENU_FILE_CHANGEDIR=폴더 변경(&C)...
+MENU_FILE_REPLAYLOG=로그 재실행(&R)...
+MENU_FILE_LOGMETT=Log&MeTT
+MENU_FILE_PRINT=인쇄(&P)...\tAlt+P
+MENU_FILE_DISCONNECT=연결끊기(&D)\tAlt+I
+MENU_FILE_EXIT=종료(&X)\tAlt+Q
+MENU_FILE_EXITALL=Exit &All
+
+MENU_TRANS=전송(&T)
+MENU_TRANS_KERMIT_RCV=받기(&R)
+MENU_TRANS_KERMIT_GET=가져오기(&G)...
+MENU_TRANS_KERMIT_SEND=보내기(&S)...
+MENU_TRANS_KERMIT_FINISH=종료(&F)
+MENU_TRANS_X_RCV=받기(&R)...
+MENU_TRANS_X_SEND=보내기(&S)...
+MENU_TRANS_Y_RCV=받기(&R)...
+MENU_TRANS_Y_SEND=보내기(&S)...
+MENU_TRANS_Z_RCV=받기(&R)
+MENU_TRANS_Z_SEND=보내기(&S)...
+MENU_TRANS_BP_RCV=받기(&R)
+MENU_TRANS_BP_SEND=보내기(&S)...
+MENU_TRANS_QV_RCV=받기(&R)
+MENU_TRANS_QV_SEND=보내기(&S)...
+
+MENU_EDIT=수정(&E)
+MENU_EDIT_COPY=복사(&C)\tAlt+C
+MENU_EDIT_COPYTABLE=테이블 복사(&T)
+MENU_EDIT_PASTE=붙여넣기(&P)\tAlt+V
+MENU_EDIT_PASTECR=붙여넣기<C&R>\tAlt+R
+MENU_EDIT_CLSCREEN=화면 비우기(&S)
+MENU_EDIT_CLBUFFER=버퍼 비우기(&B)
+MENU_EDIT_CANCELSELECT=선택취소(&L)
+MENU_EDIT_SELECTSCREEN=화면 선택(&E)
+MENU_EDIT_SELECTALL=전체 선택(&A)
+
+MENU_SETUP=설정(&S)
+MENU_SETUP_TERMINAL=터미널(&T)...
+MENU_SETUP_WINDOW=창(&W)...
+MENU_SETUP_FONT_SUBMENU=글꼴(&F)
+MENU_SETUP_FONT=글꼴(&F)...
+MENU_SETUP_DIALOG_FONT=&Dialog font...
+MENU_SETUP_KEYBOARD=키보드(&K)...
+MENU_SETUP_SERIALPORT=시리얼포트(&E)...
+MENU_SETUP_TCPIP=T&CP/IP...
+MENU_SETUP_GENERAL=일반(&G)...
+MENU_SETUP_ADDITION=추가설정(&D)...
+MENU_SETUP_SAVE=저장하기(&S)...
+MENU_SETUP_RESTORE=가져오기(&R)...
+MENU_SETUP_OPENSETUP=Setup d&irectory...
+MENU_SETUP_LOADKEYMAP=키맵가져오기(&L)...
+
+MENU_CONTROL=제어(&O)
+MENU_CONTROL_RESET=터미널 초기화(&R)
+MENU_CONTROL_RESETTITLE=타이틀 초기화(&E)
+MENU_CONTROL_AREYOUTHERE=AYT(&T)\tAlt+T
+MENU_CONTROL_SENDBREAK=브레이크 보내기(&S)\tAlt+B
+MENU_CONTROL_RESETPORT=포트 초기화(&P)
+MENU_CONTROL_BROADCAST=명령전송(&B)
+MENU_CONTROL_OPENTEK=TEK 열기(&O)
+MENU_CONTROL_CLOSETEK=TEK 닫기(&C)
+MENU_CONTROL_MACRO=매크로(&M)
+MENU_CONTROL_SHOW_MACRO=매크로 창(&W)
+
+MENU_WINDOW=창(&W)
+MENU_WINDOW_WINDOW=창 목록(&W)
+MENU_WINDOW_MINIMIZEALL=창 최소화(&M)
+MENU_WINDOW_CASCADE=&Cascade
+MENU_WINDOW_STACKED=&Stacked
+MENU_WINDOW_SIDEBYSIDE=Side &By Side
+MENU_WINDOW_RESTOREALL=창 복구(&R)
+MENU_WINDOW_CASCADE_UNDO=&Undo - Cascade
+MENU_WINDOW_STACKED_UNDO=&Undo - Stacked
+MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
+
+MENU_HELP=도움말(&H)
+MENU_HELP_INDEX=차례(&I)
+MENU_HELP_ABOUT=Tera Term에 대하여(&A)...
+
+MENU_SHOW_MENUBAR=메뉴바 보이기(&B)
+
+
+TEKMENU_FILE=파일(&F)
+TEKMENU_FILE_PRINT=인쇄(&P)...\tAlt+P
+TEKMENU_FILE_EXIT=나가기(&X)\tAlt+Q
+
+TEKMENU_EDIT=수정(&E)
+TEKMENU_EDIT_COPY=복사(&C)\tAlt+C
+TEKMENU_EDIT_COPYSCREEN=화면 복사(&S)
+TEKMENU_EDIT_PASTE=붙이기(&P)\tAlt+V
+TEKMENU_EDIT_PASTECR=붙이기<CR>(&R)\tAlt+R
+TEKMENU_EDIT_CLSCREEN=화면 비우기(&L)
+
+TEKMENU_SETUP=설정(&S)
+TEKMENU_SETUP_WINDOW=창(&W)
+TEKMENU_SETUP_FONT=글꼴(&F)
+
+TEKMENU_VTWIN=VT-Wind&ow
+
+TEKMENU_WINDOW=창(&W)
+
+TEKMENU_HELP=도움말(&H)
+TEKMENU_HELP_INDEX=차례(&I)
+TEKMENU_HELP_USING=다움말 사용(&H)
+TEKMENU_HELP_ABOUT=Tera Term에 대하여...(&A)
+
+TEKMENU_SHOW_MENUBAR=메뉴바 보이기(&B)
+
+; ttermpro
+; filesys.cpp
+MSG_COMMENT_LOG_OPEN_ERROR=아직 로그 파일에 의해 열리지 않았습니다.
+
+; ttime.c
+MSG_USE_IME_ERROR=IME를 사용할 수 없습니다.
+
+; ttplug.c
+MSG_LOAD_EXT_ERROR=%s 확장을 가져올 수 없습니다 (%d)
+
+; ttwinman.c
+DLG_MAIN_TITLE_CONNECTING=[연결...]
+DLG_MAIN_TITLE_DISCONNECTED=[끊어짐]
+
+; vtterm.c
+MSG_CBACCESS_TITLE=Clipboard Access
+MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
+MSG_CBACCESS_READ=Remote host reads clipboard contents.
+MSG_CBACCESS_WRITE=Remote host writes clipboard.
+MSG_CBACCESS_READ_REJECT=Reject clipboard read access from remote.
+MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
+
+; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
+MSG_DISCONNECT_CONF=연결을 끊을까요?
+MSG_EXEC_TT_ERROR=Tera Term을 실행할 수 없습니다. (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=Cygwin 디렉토리를 찾을 수 없습니다.
+MSG_CYGTERM_ENV_ALLOC_ERROR=환경변소를 위한 메모리를 할당할 수 없습니다.
+MSG_EXEC_CYGTERM_ERROR=Cygterm을 실행할 수 없습니다.
+MSG_EXEC_TTMENU_ERROR=TeraTerm 메뉴를 실행할 수 없습니다. (%d)
+MSG_EXEC_LOGMETT_ERROR=LogMeTT를 실행할 수 없습니다. (%d)
+MSG_VIEW_LOGFILE_ERROR=로그파일을 볼 수 없습니다. (%d)
+FILEDLG_OPEN_LOGFILE_TITLE=바이너리모드로 재실행할 로그파일을 선택하세요
+FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0
+DIRDLG_CYGTERM_DIR_TITLE=Cygwin 디렉토리를 선택하세요
+MSG_CYGTERM_CONF_WRITEFILE_ERROR=CygTerm 설정파일을 저장할 수 없습니다 (%d).
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=이전 CygTerm 설정파일을 제거할 수 없습니다 (%d).
+MSG_CYGTERM_CONF_RENAMEFILE_ERROR=CygTerm 설정파일 이름을 변경할 수 없습니다 (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=Cygwin 탭 설정이 %s에 저장됐습니다..
+FILEDLG_SELECT_LOGVIEW_APP_TITLE=로그파일을 실행시킬 실행파일을 선택하세요
+FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
+FILEDLG_SELECT_LOGDIR_TITLE=로그 폴더를 선택하세요
+FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=변경-붙여넣기 확인을 위한 문자열이 포함된 파일을 선택하세요
+FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
+MSG_LOGFILE_INVALID_CHAR_ERROR=로그파일 이름에 사용불가능한 문자가 포함됐습니다.
+MSG_LOGFILE_TOOLONG_ERROR=로그파일 이름이 너무 깁니다.
+MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI 파일이 쓰기권한을 가지고 있지 않습니다.
+
+DLG_TABSHEET_TITLE=Tera Term: 추가 설정
+DLG_TABSHEET_TITLE_GENERAL=일반
+DLG_TABSHEET_TITLE_SEQUENCE=제어순서
+DLG_TABSHEET_TITLE_COPYPASTE=복사 및 붙여넣기
+DLG_TABSHEET_TITLE_VISUAL=보이기
+DLG_TABSHEET_TITLE_LOG=로그
+DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+
+DLG_TAB_GENERAL_CLICKURL=클릭가능한 URL 활성화(&E)
+DLG_TAB_GENERAL_DISABLESENDBREAK=Send break 가속을 비활성화합니다(&S)
+DLG_TAB_GENERAL_ACCEPTBROADCAST=Broadcast를 받습니다(&B)
+DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=마우스 휠 스크롤(&W)
+DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=맨 밑줄에서 자동 스크롤(&U)
+DLG_TAB_GENERAL_CLEAR_ON_RESIZE=창 크기가 재설정될 때 화면 비우기(&C)
+DLG_TAB_GENERAL_CURSOR_CHANGE_IME=IME상태에 따라 커서 모양 변경(&I)
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
+DLG_TAB_GENERAL_TITLEFMT_GROUP=Title format
+DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME=&Display host/port name
+DLG_TAB_GENERAL_TITLEFMT_DISPSESSION=Display session &number
+DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK=Display &VT/TEK
+DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE=Swap hostname and &title position
+DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
+DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
+
+DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=마우스 이벤트 추척 요청을 받습니다(&M)
+DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=컨트롤이 눌렸을 때 마우스 이벤트 추적 비활성화(&D)
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING=창 타이틀 수정 요청을 받습니다(&T)
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF=끄기
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE=덮어쓰기
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD=앞으로
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST=뒤로
+DLG_TAB_SEQUENCE_CURSOR_CTRL=커서 제어 시퀀스(&C)
+DLG_TAB_SEQUENCE_WINDOW_CTRL=창 제어 시퀀스(&W)
+DLG_TAB_SEQUENCE_WINDOW_REPORT=창 보고 시퀀스(&R)
+DLG_TAB_SEQUENCE_TITLE_REPORT=창 타이틀 보고(&I)
+DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE=무시
+DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT=수용
+DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY=비우기
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS=원격지에서 클립보드 접근(&L)
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=끄기
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=읽기/쓰기
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=읽기전용
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=쓰기 전용
+DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notify clipboard access from remote
+DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=Accept clearing &scroll buffer from remote
+
+DLG_TAB_COPYPASTE_CONTINUE=연속된 줄 복사 할성화(&L)
+DLG_TAB_COPYPASTE_MOUSEPASTE=마우스 오른쪽 버튼 붙여넣기 비활성화(&D)
+DLG_TAB_COPYPASTE_CONFIRMPASTE=마우스 오른쪽 버튼 붙여넣기 확인(&C)
+DLG_TAB_COPYPASTE_MOUSEPASTEM=마우스 가운데 버튼 붙여넣기 비활성화(&M)
+DLG_TAB_COPYPASTE_SELECTLBUTTON=마우스 왼쪽 버튼에 의해서만 선택(&O)
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
+DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
+DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=변경-붙여넣기 확인(&P)
+DLG_TAB_COPYPASTE_STRINGFILE=문자열 파일(&S)
+DLG_TAB_COPYPASTE_DELIMITER=구분자 문자(&I)
+DLG_TAB_COPYPASTE_PASTEDELAY=줄당 붙여넣기 지연(&A)
+DLG_TAB_COPYPASTE_PASTEDELAY2=ms
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
+
+DLG_TAB_VISUAL_ALPHA=불투명
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
+DLG_TAB_VISUAL_ETERM=Eterm 느낌(*)(&E)
+DLG_TAB_VISUAL_BGMIXED_THEMEFILE=Mixed &ThemeFile to Background
+DLG_TAB_VISUAL_BGIMG=배경그림(&I)
+DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
+DLG_TAB_VISUAL_MOUSE=마우스 커서(&M)
+DLG_TAB_VISUAL_FONT_QUALITY=글꼴 품질(&F)
+DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=Default
+DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED=Non-Antialiased
+DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=Antialiased
+DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=ClearType
+DLG_TAB_VISUAL_ANSICOLOR=AN&SI 색상
+DLG_TAB_VISUAL_RED=빨강(&R)
+DLG_TAB_VISUAL_GREEN=초록(&G)
+DLG_TAB_VISUAL_BLUE=블루(&B)
+DLG_TAB_VISUAL_BOLD=굵기 속성 활성화(&O)
+DLG_TAB_VISUAL_BLINK=반짝임 속성 활성화(&L)
+DLG_TAB_VISUAL_REVERSE=반전 속성 색상 활성화(&V)
+DLG_TAB_VISUAL_URL=URL 속성 활성화(&U)
+DLG_TAB_VISUAL_ANSI=ANSI 색상 활성화(&N)
+DLG_TAB_VISUAL_URLUL=밑줄 URL 문자열(&D)
+DLG_TAB_VISUAL_RESTART=(*)설정을 저장하고 Tera Term을 재시작해야 합니다.
+
+DLG_TAB_LOG_EDITOR=로그보기 에디터(&E)
+DLG_TAB_LOG_FILENAME=기본 로그 파일 이름(strftime 형식)(&F)
+DLG_TAB_LOG_FILEPATH=기본 로그 저장 폴더(&S)
+DLG_TAB_LOG_AUTOSTART=자동 로깅 시작(&U)
+DLG_TAB_LOG_ROTATE=로그 순환(&L)
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=크기(&I)
+DLG_TAB_LOG_ROTATESTEP=순환(&R)
+
+
+DLG_TAB_CYGWIN_PATH=Cygwin 설치 경로(&P)
+
+DLG_COMMENT_TITLE=로그 주석
+
+DLG_BROADCAST_TITLE=Tera Term: Broadcast 명령
+DLG_BROADCAST_HISTORY=이력
+DLG_BROADCAST_PARENTONLY=이 프로세스에만 보내기
+DLG_BROADCAST_ENTER=Enter 키
+DLG_BROADCAST_SUBMIT=제출
+DLG_BROADCAST_REALTIME=실시간 모드
+
+DLG_PRNABORT_PRINTING=인쇄
+
+DLG_PROT_FILENAME=파일이름:
+DLG_PROT_PROTO=프로토콜:
+DLG_PROT_PACKET=패킷#:
+DLG_PROT_TRANS=전송된 바이트:
+DLG_PROT_ELAPSED=경과 시간:
+
+DLG_FILETRANS_FILENAME=파일이름:
+DLG_FILETRANS_FULLPATH=전체 경로:
+DLG_FILETRANS_TRNAS=전송된 바이트:
+DLG_FILETRANS_ELAPSED=경과 시간:
+DLG_FILETRANS_START=시작(&S)
+DLG_FILETRANS_PAUSE=일시중지(&S)
+DLG_FILETRANS_CLOSE=닫기
+
+DLG_SETUPDIR_TITLE=Tera Term: Setup directory
+DLG_SETUPDIR_INIFILE=Tera Term Configuration File
+DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
+DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
+DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
+DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+
+DLG_DANDD_TITLE=Tera Term: 파일 Drag and Drop
+DLG_DANDD_TEXT=파일 내용을 보낼까요?
+DLG_DANDD_SCP_RADIO=&SCP
+DLG_DANDD_SENDFILE_RADIO=S&end File (Paste content of file)
+DLG_DANDD_PASTE_RADIO=&Paste Filename
+DLG_DANDD_SCP_DEST_LABEL=des&t:
+DLG_DANDD_SCP_DEST_NOTE=dest is home directory if empty
+DLG_DANDD_SEND_BINARY_CHECK=Bina&ry
+DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
+DLG_DANDD_PASTE_SPACE_RADIO=Separat&or is Space
+DLG_DANDD_PASTE_NEWLINE_RADIO=Separator is &NewLine
+DLG_DANDD_NEXTFILES=&Do this for the next %d files
+DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
+DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
+DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
+
+TOOLTIP_TITLEBAR_OPACITY=불투명 %.1f %%
+
+; commonlib.c
+MSG_WINSOCK_ERROR=윈속을 사용할 수 없습니다
+MSG_INVALID_HOST_ERROR=잘못된 호스트
+MSG_CANTOPEN_ERROR=%s를 열 수 없습니다 (0x%08x)
+MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
+MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied.
+MSG_CANTOPEN_ERROR_PIPEBUSY=Cannot open %s. Pipe is busy.
+MSG_CANTOPEN_FILE_ERROR=파일을 열 수 없습니다
+MSG_COMM_REFUSE_ERROR=연결이 거부됐습니다
+MSG_COMM_REACH_ERROR=네트웍크에 연결할 수 없습니다
+MSG_COMM_TIMEOUT_ERROR=연결시간 초과
+MSG_COMM_CONNECT_ERROR=호스트에 연결할 수 없습니다
+MSG_CREATE_THREAD_ERROR=쓰레드를 만들 수 없습니다
+
+; ttpdlg
+; ttdlg.c
+DLG_ABOUT_TITLE=Tera Term에 대하여
+
+DLG_DIR_TITLE=Tera Term: 디렉토리 변경
+DLG_DIR_CURRENT=현재 위치:
+DLG_DIR_NEW=새 위치(&N):
+DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
+
+DLG_GEN_TITLE=Tera Term: 일반설정
+DLG_GEN_PORT=기본 포트(&P):
+DLG_GEN_LANG=언어(&L):
+DLG_GEN_LANG_UI=UI 언어(&U):
+
+DLG_HOST_TITLE=Tera Term: 새 연결
+DLG_HOST_TCPIPHOST=호스트(&O):
+DLG_HOST_TCPIPPORT=TCP 포트(&P)#:
+DLG_HOST_TCPIPPROTOCOL=IP 버전(&N):
+DLG_HOST_SERIAL=시리얼(&S)
+DLG_HOST_SERIALPORT=포트(&R):
+
+DLG_KEYB_TITLE=Tera Term: 키보드 설정
+DLG_KEYB_TRANSMIT=DEL 키 전송 방법:
+DLG_KEYB_BS=Backspace 키(&B)
+DLG_KEYB_DEL=Delete 키(&D)
+DLG_KEYB_KEYB=키보드(&K):
+DLG_KEYB_META=메타키(&M):
+DLG_KEYB_DISABLE=비활성화 모드:
+DLG_KEYB_APPKEY=어플리케이션 키패드(&A)
+DLG_KEYB_APPCUR=어플리케이션 커서(&C)
+
+DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
+DLG_SERIAL_PORT=포트(&P):
+DLG_SERIAL_BAUD=속도(&E):
+DLG_SERIAL_DATA=데이터(&D):
+DLG_SERIAL_PARITY=패리티(&A):
+DLG_SERIAL_STOP=스탑비트(&S):
+DLG_SERIAL_FLOW=흐름제어(&F):
+DLG_SERIAL_DELAY=전송지연
+DLG_SERIAL_DELAYCHAR=msec/&char
+DLG_SERIAL_DELAYLINE=msec/&line
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=Connect with &New window
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
+
+DLG_TCPIP_TITLE=Tera Term: TCP/IP 설정
+DLG_TCPIP_HOSTLIST=호스트 목록(&L)
+DLG_TCPIP_ADD=추가(&A)
+DLG_TCPIP_UP=위(&U)
+DLG_TCPIP_REMOVE=삭제(&R)
+DLG_TCPIP_DOWN=아래(&D)
+DLG_TCPIP_HISTORY=이력(&I)
+DLG_TCPIP_KEEPALIVE=연결유지(&K)
+DLG_TCPIP_KEEPALIVE_SEC=초
+DLG_TCPIP_AUTOCLOSE=자동 창닫기(&W)
+DLG_TCPIP_PORT=포트#(&P):
+DLG_TCPIP_TELNET=텔넷(&E)
+DLG_TCPIP_TERMTYPE=종류(&T):
+
+DLG_TERM_TITLE=Tera Term: 터미널 설정
+DLG_TERM_WIDTHLABEL=터미널 크기(&T)
+DLG_TERM_ISWIN=터미널 크기(&S) = 창 크기
+DLG_TERM_RESIZE=창 자동조정(&W)
+DLG_TERM_NEWLINE=줄바꿈
+DLG_TERM_CRRCV=수신(&R):
+DLG_TERM_CRSEND=송신(&M):
+DLG_TERM_ID=터미널 ID(&I):
+DLG_TERM_LOCALECHO=지역 에코(&L)
+DLG_TERM_ANSBACK=응답(&A):
+DLG_TERM_AUTOSWITCH=자동전환(VT<->TEK)(&U)
+DLG_TERM_KANJI=&Kanji (receive)
+DLG_TERM_KANA=Hal&f-width kana
+DLG_TERM_KANJISEND=Kan&ji (transmit)
+DLG_TERM_KANASEND=Half-wi&dth kana
+DLG_TERM_KIN=Kanji-i&n:
+DLG_TERM_KOUT=Kanji-&out:
+DLG_TERM_LOCALE=lo&cale:
+DLG_TERM_RUSSCHARSET=문자세트
+DLG_TERM_RUSSHOST=호스트(&O):
+DLG_TERM_RUSSCLIENT=클라이언트(&C):
+DLG_TERM_RUSSFONT=글꼴(&F):
+DLG_TERMK_KANJI=Coding (r&eceive)
+DLG_TERMK_KANJISEND=Coding (tra&nsmit)
+
+DLG_WIN_TITLE=Tera Term: 창 설정
+DLG_WIN_TITLELABEL=타이틀(&T):
+DLG_WIN_CURSOR=커서 모양
+DLG_WIN_BLOCK=블럭(&L)
+DLG_WIN_VERT=세로(&V)
+DLG_WIN_HORZ=가로(&O)
+DLG_WIN_BOLDFONT=굵게(&D)
+DLG_WIN_HIDETITLE=타이틀 숨기기(&I)
+DLG_WIN_HIDEMENU=메뉴 숨기기(&M)
+DLG_WIN_COLOREMU=&Color emulation
+DLG_WIN_PCBOLD16=&16색 (PC 스타일)
+DLG_WIN_AIXTERM16=1&6색 (aixterm 스타일)
+DLG_WIN_XTERM256=&256색 (xterm 스타일)
+DLG_WIN_SCROLL1=스크롤 버퍼(&S):
+DLG_WIN_SCROLL3=줄(&N)
+DLG_WIN_COLOR=색상
+DLG_WIN_TEXT=문자(&X)
+DLG_WIN_BG=배경(&K)
+DLG_WIN_ATTRIB=속성(&A)
+DLG_WIN_REVERSE=반전(&E)
+DLG_WIN_R=&R:
+DLG_WIN_G=&G:
+DLG_WIN_B=&B:
+DLG_WIN_ALWAYSBG=항상 일반 배경색 사용(&U)
+DLG_WIN_NORMAL=일반
+DLG_WIN_BOLD=굵게
+DLG_WIN_BLINK=반짝임
+DLG_WIN_REVERSEATTR=반전
+
+DLG_CHOOSEFONT_STC6=여기서 "글꼴 스타일" 선택은 실제 글꼴 모양에 영향을 주지 않습니다.
+
+DLG_WINLIST_TITLE=Tera Term: 창 목록
+DLG_WINLIST_LABEL=창(&W):
+DLG_WINLIST_OPEN=열기(&O)
+DLG_WINLIST_CLOSEWIN=창 닫기(&C)
+
+MSG_FIND_DIR_ERROR=디렉토리를 찾을 수 없습니다
+
+; ttpfile
+; ttfile.c
+DLG_FOPT=선택사항
+DLG_FOPT_BINARY=바이너리(&R)
+DLG_FOPT_APPEND=추가(&A)
+DLG_FOPT_PLAIN=일반 텍스트(&P)
+DLG_FOPT_TIMESTAMP=타임스탬프(&T)
+DLG_FOPT_HIDEDIALOG=다이얼로그 숨기기(&D)
+DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer
+DLG_FOPT_TIMESTAMP_LOCAL=Local Time
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
+
+DLG_XOPT=선택사항
+DLG_XOPT_CHECKSUM=체크섬(&S)
+DLG_XOPT_CRC=CRC(&C)
+DLG_XOPT_1K=1K(&K)
+DLG_XOPT_BINARY=바이너리(&R)
+
+FILEDLG_KEYBOARD_FILTER=키보드 설정 파일 (*.cnf)\0*.cnf\0\0
+FILEDLG_SETUP_FILTER=설정 파일 (*.ini)\0*.ini\0\0
+FILEDLG_SAVE_SETUP_TITLE=Tera Term: 설정 저장
+FILEDLG_RESTORE_SETUP_TITLE=Tera Term: 설정 복구
+FILEDLG_LOAD_KEYMAP_TITLE=Tera Term: 키맵 읽기
+FILEDLG_ALL_FILTER=모든 파일 (*.*)\0*.*\0\0
+FILEDLG_USER_FILTER_NAME=사용자 설정
+
+DLG_GETFN_TITLE=Tera Term: Kermit 가져오기
+DLG_GETFN_FILENAME=파일이름(&F):
+
+; ttftypes.h
+FILEDLG_TRANS_TITLE_LOG=로그
+FILEDLG_TRANS_TITLE_SENDFILE=파일 보내기
+FILEDLG_TRANS_TITLE_KMTRCV=Kermit 받기
+FILEDLG_TRANS_TITLE_KMTGET=Kermit 가져오기
+FILEDLG_TRANS_TITLE_KMTSEND=Kermit 보내기
+FILEDLG_TRANS_TITLE_KMTFIN=Kermit 끝내기
+FILEDLG_TRANS_TITLE_XRCV=XMODEM 받기
+FILEDLG_TRANS_TITLE_XSEND=XMODEM 보내기
+FILEDLG_TRANS_TITLE_YRCV=YMODEM 받기
+FILEDLG_TRANS_TITLE_YSEND=YMODEM 보내기
+FILEDLG_TRANS_TITLE_ZRCV=ZMODEM 받기
+FILEDLG_TRANS_TITLE_ZSEND=ZMODEM 보내기
+FILEDLG_TRANS_TITLE_BPRCV=B-Plus 받기
+FILEDLG_TRANS_TITLE_BPSEND=B-Plus 보내기
+FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN 받기
+FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN 보내기
+
+; dlg clipboard
+DLG_CLIPBOARD_TITLE=Tera Term: 클립보드 확인
+
+; ttptek
+; tttek.c
+MSG_TEK_PRINT_ERROR=프린터가 그래픽을 지원하지 않습니다
+
+; ttpmacro
+FILEDLG_OPEN_MACRO_TITLE=MACRO: 매크로 열기
+FILEDLG_OPEN_MACRO_FILTER=Macro files (*.ttl)\0*.ttl\0\0
+
+BTN_PAUSE=일시정지(&P)
+BTN_START=시작(&S)
+BTN_END=끝(&E)
+BTN_YES=예(&Y)
+BTN_NO=아니요(&N)
+BTN_STOP=매크로 정지(&S)
+BTN_CONTINUE=계속(&C)
+
+MSG_MACRO_CONF=MACRO: confirmation
+MSG_MACRO_HALT_SCRIPT=Are you sure that you want to halt this macro script?
+
+; common
+MSG_ERROR=ERROR
+MSG_TT_ERROR=Tera Term: 오류
+MSG_TT_NOTICE=Tera Term: 안내
+MSG_TT_TAKE_EFFECT=이 설정은 다음 세션이 시작될 때 반영됩니다.
+
+BTN_OK=확인
+BTN_CANCEL=취소
+BTN_CLOSE=닫기
+BTN_HELP=도움말(&H)
+
+; help
+HELPFILE=teraterm.chm
+MSG_OPENHELP_ERROR=HTML 도움말을 찾을 수 없습니다(%s).
+
+; ttset
+MSG_INI_ERROR=Tera Term: 오류
+MSG_INI_WRITE_ERROR=ini 파일을 저장할 수 없습니다.
+
+
+[TTSSH]
+; font
+DLG_SYSTEM_FONT=굴림,10,128
+DLG_TAHOMA_FONT=돋움,9,128
+DLG_ABOUT_FONT=Courier New,8,0
+
+; menu
+MENU_ABOUT=TTSSH에 대하여...(&T)
+MENU_SSH=SSH...(&H)
+MENU_SSH_AUTH=SSH 인증...(&A)
+MENU_SSH_FORWARD=SSH 전달...(&O)
+MENU_SSH_KEYGEN=SSH 키생성...(&N)
+
+; dlg about
+DLG_ABOUT_TITLE=TTSSH에 대하여
+DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_ABOUT_SERVERID=서버 ID:
+DLG_ABOUT_PROTOCOL=프로토콜 사용:
+DLG_ABOUT_ENCRYPTION=암호화:
+DLG_ABOUT_SERVERKEY=서버키:
+DLG_ABOUT_KEXKEY=키 교환:
+DLG_ABOUT_AUTH=인증:
+DLG_ABOUT_COMP=압축:
+DLG_ABOUT_CLIENTID=클라이언트 ID:
+DLG_ABOUT_KEX=Key exchange algorithm:
+DLG_ABOUT_HOSTKEY=호스트 키:
+DLG_ABOUT_MAC=MAC algorithm:
+DLG_ABOUT_MAC_INFO=%s to server, %s from server
+DLG_ABOUT_COMPDELAY=지연된 압축:
+DLG_ABOUT_CIPHER_INFO=%s를 서버로, %s를 서버로부터
+DLG_ABOUT_KEY_INFO=%d-bit 서버 키, %d-bit 호스트 키
+DLG_ABOUT_KEY_INFO2=%d-bit 클라이언트 키, %d-bit 서버 키
+DLG_ABOUT_KEY_NONE=없슴
+DLG_ABOUT_COMP_INFO=수준 %d; 비율 %.1f (%ld:%ld)
+DLG_ABOUT_COMP_INFO2=수준 %d
+DLG_ABOUT_COMP_NONE=없슴
+DLG_ABOUT_COMP_UPDOWN=올림 %s; 내림 %s
+DLG_ABOUT_AUTH_INFO=사용자 '%s', %s 사용 중
+DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
+
+; dlg auth
+DLG_AUTH_TITLE=SSH 인증
+DLG_AUTH_TITLE_FAILED=SSH 인증 재시도 중
+DLG_AUTH_BANNER=%s로 로그인 중
+DLG_AUTH_BANNER2=인증이 필요함.
+DLG_AUTH_BANNER2_FAILED=일증 실패. 다시 시도해주세요.
+DLG_AUTH_USERNAME=사용자 이름(&N):
+DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
+DLG_AUTH_PASSWORD=암호(&P):
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
+DLG_AUTH_REMEMBER_PASSWORD=메모리에 암호기억(&M)
+DLG_AUTH_FWDAGENT=에이전트로 전달(&O)
+DLG_AUTH_METHOD=Authentication methods
+DLG_AUTH_METHOD_PASSWORD=일반텍스트 암호 로그인(&L)
+DLG_AUTH_METHOD_RSA=RSA/DSA/ECDSA/ED25519 키 로그인(&R)
+DLG_AUTH_METHOD_RHOST=rhosts 로그인(SSH1)(&H)
+;DLG_AUTH_METHOD_CHALLENGE1=시도/응답 로그인(TIS)(&T)
+DLG_AUTH_METHOD_CHALLENGE1=Use challenge/response(&TIS) to log in
+;DLG_AUTH_METHOD_CHALLENGE2=시도/응답 로그인(TIS)(키보드 입력)(&C)
+DLG_AUTH_METHOD_CHALLENGE2=Use keyboard-&interactive to log in
+DLG_AUTH_METHOD_PAGEANT=Pageant 사용(&A)
+DLG_AUTH_PRIVATEKEY=개인키(&K):
+DLG_AUTH_LOCALUSER=지역 사용자이름(&U):
+DLG_AUTH_HOST_PRIVATEKEY=호스트 개인키(&F):
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
+MSG_PAGEANT_NOTFOUND=Pageant를 찾을 수 없습니다.
+MSG_PAGEANT_NOKEY=Pageant가 유효한 키를 가지고 있지 않습니다.
+
+; dlg auth setup
+DLG_AUTHSETUP_TITLE=TTSSH: 인증 설정
+DLG_AUTHSETUP_BANNER=기본 인증 선택:
+DLG_AUTHSETUP_USERNAME=User name
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_METHOD=Authentication methods
+DLG_AUTHSETUP_METHOD_PASSWORD=일반텍스트 암호 로그인(&L)
+DLG_AUTHSETUP_METHOD_RSA=RSA/DSA/ECDSA/ED25519 키 로그인(&R)
+DLG_AUTHSETUP_METHOD_RHOST=rhosts 로그인(SSH1)(&H)
+;DLG_AUTHSETUP_METHOD_CHALLENGE=시도/응답 로그인(SSH1:TIS, SSH2:키보드 입력)(&T)
+DLG_AUTHSETUP_METHOD_CHALLENGE=Use SSH1:challenge/response(&TIS) / SSH2:keyboard-interactive to log in
+DLG_AUTHSETUP_METHOD_PAGEANT=Pageant 사용(&A)
+DLG_AUTHSETUP_PRIVATEKEY=개인키(&K):
+DLG_AUTHSETUP_LOCALUSER=지역사 용자이름(&U):
+DLG_AUTHSETUP_HOST_PRIVATEKEY=호스트 개인키(&F):
+DLG_AUTHSETUP_CHECKAUTH=로그인 전에 활성화된 인증 방법을 확인(SSH2)(&C)
+
+FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA/ECDSA/ED25519 개인키 파일을 선택하세요
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
+MSG_KEYSPECIFY_ERROR=RSA/DSA/ECDSA/ED25519 개인키를 포함한 파일을 지정해야만 합니다.
+MSG_READKEY_ERROR=SSH2 개인키 파일 읽기 오류\n%s
+MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts가 기본 인증방법이 아니어서 인증이 실패할 것입니다.\nTTSSH에서 Rhosts 인증을 사용하기 위해, 연결하기 전 설정 메뉴의 "SSH 인증..."에서\n기본값이 되도록 선택하고 TTSSH를 재시작해야 합니다.
+MSG_NOAUTHMETHOD_ERROR=서버가 TTSSH가 제공하는 인증 선택사항 중 어느 것도\n지원하지 않습니다. 이 연결은 종료됩니다.
+
+; dlg diff key
+DLG_DIFFERENTKEY_TITLE=보안 경고
+DLG_DIFFERENTKEY_WARNING=당신의 known-host 목록은 서버 "####################################"에 대한 항목을 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
+DLG_DIFFERENTKEY_WARNING2=만약 이 새로운 키를 known-host 목록에 추가하도록 선택하고 계속 진행하다면, 다시는 경고 메시지를 받지 않습니다.
+DLG_DIFFERENTKEY_FINGERPRINT=이 서버의 호스트키 지문은:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_DIFFERENTKEY_REPLACE=기존 키를 새 키로 교체(&R)
+
+; dlg diff type key
+DLG_DIFFERENTTYPEKEY_TITLE=보안 경고
+DLG_DIFFERENTTYPEKEY_WARNING=당신의 known-host 목록는 서버 "####################################"에 대한 정보를 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
+DLG_DIFFERENTTYPEKEY_WARNING2=만약 이 새로운 키를 known-host 목록에 추가하도록 선택하고 계속 진행하다면, 다시는 경고 메시지를 받지 않습니다.
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=이 서버의 호스트키 지문은:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_DIFFERENTTYPEKEY_ADD=이 컴퓨터와 그 키를 known-host 목록에 추가(&A)
+
+; dlg fwd edit
+DLG_FWD_TITLE=SSH Port Forwarding
+DLG_FWD_BANNER=포워드된 포트의 방향을 선택하세요:
+DLG_FWD_LOCAL_PORT=지역 포트 포워드(&L)
+DLG_FWD_LOCAL_LISTEN=듣기(&I)
+DLG_FWD_LOCAL_REMOTE=원격 컴퓨터로(&M)
+DLG_FWD_LOCAL_REMOTE_PORT=포트(&P)
+DLG_FWD_LOCAL_CHECKIDENTITY=다른 호스트에서의 접속 허용(&C)
+DLG_FWD_REMOTE_PORT=원격 서버 포트로 포워드(&R)
+DLG_FWD_REMOTE_LISTEN=듣기(&S)
+DLG_FWD_REMOTE_LOCAL=지역 컴퓨터로(&A)
+DLG_FWD_REMOTE_LOCAL_PORT=포트(&O)
+DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
+DLG_FWD_DYNAMIC_LISTEN=lis&ten
+
+MSG_SAME_SERVERPORT_ERROR=같은 서버 포트로 부터 2개의 포워딩을 할 수 없습니다(%d).
+MSG_SAME_LOCALPORT_ERROR=같은 로컬 포트로 부터 2개의 포워딩을 할 수 없습니다(%d).
+MSG_UNSPECIFIED_FWD_ERROR1=이 SSH 세션이 시작할 때 다음 포워딩이 지정되지 않았습니다:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nSSH 프로토콜 한계 때문에, 이 포워딩들은 현재 SSH 세션에서 동작하지 않습니다.\n만약 이 설정들을 저장하고 새로운 SSH 세션을 시작하면, 이 포워딩들은 동작합니다.
+MSG_INVALID_PORT_ERROR=포트 "%s"는 유효한 포트 번호가 아닙니다.\n목록에서 포트 이름을 고르거나 1에서 65535 사이의 숫자를 입력하세요.
+
+; dlg fwd setup
+DLG_FWDSETUP_TITLE=TTSSH: 포워딩 설정
+DLG_FWDSETUP_LIST=포트 포워딩(&P)
+DLG_FWDSETUP_ADD=추가...(&A)
+DLG_FWDSETUP_EDIT=수정...(&E)
+DLG_FWDSETUP_REMOVE=삭제(&R)
+DLG_FWDSETUP_CHECKIDENTITY=다른 호스트로부터 지역 포트 연결을 허용합니다.(&C)
+DLG_FWDSETUP_X=X 포워딩
+DLG_FWDSETUP_XAPP=지역 X 서버에 원격 어플리케이션을 표시(&X)
+
+MSG_FWD_REMOTE_XSERVER=원격 X 서버
+MSG_FWD_REMOTE_XSCREEN=X 서버 (해상도 %d:%d)
+MSG_FWD_REMOTE=원격 "%s" 포트 %s에서 지역 "%s" 포트 %s로
+MSG_FWD_LOCAL=지역 "%s" 포트 %s에서 원격 "%s" 포트 %s로
+MSG_FWD_X=지역 X 서버에 X 응용프로그램을 연결
+MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
+
+; dlg host
+DLG_HOST_TITLE=Tera Term: 새 연결
+DLG_HOST_TCPIPHOST=호스트(&T):
+DLG_HOST_TCPIPHISTORY=기록(&O)
+DLG_HOST_TCPIPSERVICE=서비스
+DLG_HOST_TCPIPOTHER=Other
+DLG_HOST_TCPIPPORT=TCP 포트#(&P):
+DLG_HOST_TCPIPSSHVERSION=SSH 버전(&V):
+DLG_HOST_TCPIPPROTOCOL=IP 버전(&N):
+DLG_HOST_SERIAL=시리얼(&E)
+DLG_HOST_SERIALPORT=포트(&R):
+DLG_HOST_HELP=도움말(&H)
+
+MSG_TCPPORT_NAN_ERROR=TCP 포트는 숫자여야 합니다.
+
+; dlg keygen
+DLG_KEYGEN_TITLE=TTSSH: 키 생성
+DLG_KEYGEN_KEYTYPE=키 유형
+DLG_KEYGEN_PASSPHRASE=암호:
+DLG_KEYGEN_PASSPHRASE2=암호 확인:
+DLG_KEYGEN_COMMENT=주석(&O):
+DLG_KEYGEN_SAVEPUBLIC=공개키 저장(&I)
+DLG_KEYGEN_SAVEPRIVATE=개인키 저장(&P)
+DLG_KEYGEN_GENERATE=생성(&G)
+DLG_KEYGEN_BITS=키비트(&B):
+DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
+
+MSG_KEYBITS_MIN_ERROR=키 비트가 너무 작습니다.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
+MSG_KEYGEN_GENERATING="키 생성 중"
+MSG_KEYGEN_GENERATED="키 생성됨"
+
+FILEDLG_SAVE_PUBLICKEY_TITLE=공개키를 다음으로 저장:
+FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa.pub)\0id_ecdsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\0id_ed25519.pub\0All Files(*.*)\0*.*\0\0
+MSG_SAVE_KEY_OPENFILE_ERROR=키 파일을 열 수 없습니다
+MSG_SAVE_KEY_WRITEFILE_ERROR=키 파일을 저장할 수 없습니다
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=두개의 키가 일치하지 않습니다.
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=비어있는 암호를 사용하시겠습니까?
+FILEDLG_SAVE_PRIVATEKEY_TITLE=개인키를 다음으로 저장:
+FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa)\0id_ecdsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\0id_ed25519\0All Files(*.*)\0*.*\0\0
+
+; dlg setup
+DLG_SSHSETUP_TITLE=TTSSH: 설정
+DLG_SSHSETUP_COMPRESS=압축수준(&C):
+DLG_SSHSETUP_COMPRESS_NONE=없슴
+DLG_SSHSETUP_COMPRESS_HIGHEST=최고
+DLG_SSHSETUP_COMPRESS_NOTE=SSH1: '압축수준'은 압축 켜기/끄기를 결정합니다.\nSSH2: '압축순서'와 '압축수준'은 압축 켜기/끄기를 결정합니다.
+DLG_SSHSETUP_CIPHER=선호하는 암호 순서(&P)
+DLG_SSHSETUP_CIPHER_UP=위로 이동(&1)
+DLG_SSHSETUP_CIPHER_DOWN=아래로 이동(&2)
+DLG_SSHSETUP_CIPHER_BORDER=<이 줄 밑의 암호들은 비활성화>
+DLG_SSHSETUP_KEX=K&EX 순서 (SSH2만)
+DLG_SSHSETUP_KEX_UP=위로 이동(&3)
+DLG_SSHSETUP_KEX_DOWN=아래로 이동(&4)
+DLG_SSHSETUP_KEX_BORDER=<이 줄 밑의 KEX들은 비활성화>
+DLG_SSHSETUP_HOST_KEY=Ho&st Key 순서 (SSH2만)
+DLG_SSHSETUP_HOST_KEY_UP=위로 이동(&5)
+DLG_SSHSETUP_HOST_KEY_DOWN=아래로 이동(&6)
+DLG_SSHSETUP_HOST_KEY_BORDER=<이 줄 밑의 호스트 키들은 비활성화>
+DLG_SSHSETUP_MAC=MAC 순서 (SSH2만)(&D)
+DLG_SSHSETUP_MAC_UP=위로 이동(&7)
+DLG_SSHSETUP_MAC_DOWN=아래로 이동(&8)
+DLG_SSHSETUP_MAC_BORDER=<이 줄 밑의 MAC들은 비활성화>
+DLG_SSHSETUP_COMP=압축순서 (SSH2만)(&I)
+DLG_SSHSETUP_COMP_UP=위로 이동(&9)
+DLG_SSHSETUP_COMP_DOWN=아래로 이동(&0)
+DLG_SSHSETUP_COMP_BORDER=<이 줄 밑의 압축들은 비활성화>
+DLG_SSHSETUP_KNOWNHOST=알고있는 SSH 호스트
+DLG_SSHSETUP_KNOWNHOST_RW=읽고쓰기(&W):
+DLG_SSHSETUP_KNOWNHOST_RO=읽기전용(&R):
+DLG_SSHSETUP_HEARTBEAT=심박(연결유지(&K))
+DLG_SSHSETUP_HEARTBEAT_UNIT=초.(끌려면 0)
+DLG_SSHSETUP_PASSWORD=메모리에 암호 기억(&M)
+DLG_SSHSETUP_FORWARDAGENT=agent 포워딩 활성화(&A)
+DLG_SSHSETUP_FORWARDAGENTCONFIRM=agent 포워딩 확인(&O)
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=DNS로 호스트키 지문을 검증(&V)
+DLG_SSHSETUP_NOTICE=모든 설정은 다음 세션이 시작될 때 반영됩니다.
+DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Ask
+DLG_SSHSETUP_LOGLEVEL=&LogLevel
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 to turn off)
+
+FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=읽고쓰기의 known-host 파일을 선택하세요
+FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=추가하기 위한 읽기전용의 known-host 파일을 선택하세요
+
+; dlg tis
+DLG_TIS_TITLE=SSH 인증 시도
+DLG_TIS_BANNER=%s으로 로그인 중
+
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: Change Password
+DLG_PASSCHG_MESSAGE=Server requests to change password
+DLG_PASSCHG_OLDPASSWD=&Old Password
+DLG_PASSCHG_NEWPASSWD=&New Password
+DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+MSG_PASSCHG_MISMATCH=Mismatch; try again.
+
+; dlg unknown host
+DLG_UNKNOWNHOST_TITLE=보안 경고
+DLG_UNKNOWNHOST_WARNING=당신의 known-host 목록에는 서버 "#####################################" 항목이 없습니다. 당신이 접속한 컴퓨터는 그 서버를 흉내내는 악의적인 컴퓨터일 수 있습니다.
+DLG_UNKNOWNHOST_WARNING2=known-host 목록에 이 컴퓨터를 추가하고 계속 진행하면 다시는 경고 메시지를 받지 않습니다.
+DLG_UNKNOWNHOST_FINGERPRINT=서버의 호스트키 지문은:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_UNKNOWNHOST_ADD=이 컴퓨터와 키를 known-host 목록에 추가(&A)
+
+DLG_HOSTKEY_SSHFP_NOTFOUND=DNS에서 발견된 호스트키 지문이 없슴.
+DLG_HOSTKEY_SSHFP_MATCH=DNS에서 찾은 호스트키 지문 일치.
+DLG_HOSTKEY_SSHFP_MISMATCH=DNS에서 찾은 호스트키 지문 불일치.
+DLG_HOSTKEY_SSHFP_DIFFTYPE=DNS에서 찾은 호스트키 유형 불일치.
+DLG_HOSTKEY_DNSSEC_NG=DNS에서 안전하지 않은 지문 발견.
+DLG_HOSTKEY_DNSSEC_OK=DNS에서 안전한 지문 발견.
+
+DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
+DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
+DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
+
+; crypt.c
+MSG_ENCRYPT_ERROR1=%s 암호 오류(1): 바이트 %d (%d)
+MSG_ENCRYPT_ERROR2=%s 암호 오류(2)
+MSG_DECRYPT_ERROR1=%s 해독 오류(1): 바이트 %d (%d)
+MSG_DECRYPT_ERROR2=%s 해독 오류(2)
+MSG_CIPHER_INIT_ERROR=암호 초기화 오류(%d)
+MSG_RSAKEY_SETUP_ERROR=RSA 키 설정 오류
+MSG_UNAVAILABLE_CIPHERS_ERROR=서버가 TTSSH의 암호화 알고리즘 중 어떤 것도 지원하지 않습니다.\nTTSSH에서 서버로 안전한 연결을 만들 수 없습니다.\n이 연결은 닫힙니다.
+MSG_CIPHER_NONE_ERROR=이 프로그램과 서버 모두 사용할 수 있는 모든 암호화 알고리즘이 비활성화 되어 있습니다.\n서버와 통신하기 위해 Tera Term 재실행시 TTSSH\n설정 다이얼로그에서 추가적인 암호들을 활성화 시켜야합니다.\n이 연결은 종료됩니다.
+MSG_RSAKEY_TOOWEAK_ERROR=서버 RSA키가 너무 약합니다. 안전한 연결을 만들 수 없습니다.
+MSG_CIPHER_NOTSELECTED_ERROR=암호가 선택되지 않았슴!
+
+; fwd.c
+MSG_FWD_LOCAL_CHANNEL_ERROR=이 서버가 존재하지 않는 포워드 채널을 조작하려고 합니다.\n서버에 버그가 있거나 악의적일 수 있습니다. 이 연결을 종료하세요.
+MSG_FWD_REQUEST_ERROR=포워드를 위한 연결 듣기 중 통신 오류가 발생했습니다.\n듣기 포트가 종료됩니다..
+MSG_FWD_REFUSED_ERROR=연결 거절됨 (아마도 서비스가 실행 중이 아닌것 같습니다)
+MSG_FWD_NETDOWN_ERROR=이 컴퓨터에 연결할 수 없습니다 (네트웍 문제일 가능성 있슴)
+MSG_FWD_MACHINEDOWN_ERROR=이 컴퓨터에 연결할 수 없습니다 (컴퓨터가 동작하지 않았을 가능성 있슴)
+MSG_FWD_ADDRNOTFOUND_ERROR=이 컴퓨터의 주소를 찾을 수 없습니다
+MSG_FWD_CONNECT_ERROR=포워드 연결을 설정할 수 없습니다
+MSG_FWD_CHANNEL_ERROR=통신 오류 %s 포워드된 지역 포트 %s.\n%s (코드 %d).\n포워드된 연결이 종료됩니다.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=서버가 이 컴퓨터를 통해 연결을 포워드 하려고 합니다.\n%s에 있는 X 서버로 연결을 요청했습니다 (표시 %d:%d).\n%s(code %d).\n포워드된 연결이 종료됩니다.
+MSG_FWD_CHANNEL_OPEN_ERROR=서버가 이 컴퓨터를 통해 연결을 포워드 하려고 합니다.\n%s로 연결을 요청했습니다 (포트 %s).\n%s(code %d).\n포워드된 연결이 종료됩니다.
+DLG_FWDMON_TITLE=TTSSH 포트 포워딩 감시
+MSG_FWD_HOSTILE_ATTACK_ERROR=IP %s를 가진 호스트가 포워드된 지역 포트 %d로 접속하려고 합니다.\n이것은 악의적인 공격의 한 종류일 수 있습니다.
+MSG_FWD_SOCKET_ERROR=포트 포워딩을 위한 포트에 필요한 일부 소켓들이 초기화되지 않았습니다.\n포워딩 서비스를 위한 일부 포트 일부를 사용할 수 없습니다.\n(errno %d)
+MSG_FWD_DUPLICATE_ERROR=TTSSH INTERNAL ERROR: 중복된 종류/포트 요청이 발견되어 포트를 포워드 할 수 없습니다
+MSG_FWD_DENIED_HANDLE_ERROR=서버가 이 컴퓨터를 통해 연결을 포워딩하려고 합니다.\n컴퓨터 %s 포트 %s로 연결을 요청했습니다.\n요청 처리 중 오류가 발생되서 거부됐습니다..
+MSG_FWD_DENIED_ERROR=서버가 이 컴퓨터를 통해 연결을 포워딩하려고 합니다.\n컴퓨터 %s 포트 %d로 연결을 요청했습니다.\n미리 TTSSH에서 이 포워딩을 설정하지 않아 이 요청은 거부됐습니다.
+MSG_FWD_DENIED_X_ERROR=서버가 이 컴퓨터를 통해 연결을 포워딩하려고 합니다.\n지역 X 서버로 연결을 요청했습니다.\n미리 TTSSH에서 이 포워딩을 설정하지 않아 이 요청은 거부됐습니다.
+MSG_FWD_DENIED_BY_SERVER_ERROR=지역 컴퓨터에 있는 프로그램이 포워드된 포트로 연결하려고 합니다.\n포워딩 요청은 서버에 의해 거부됐습니다. 이 연결은 종료됩니다.
+MSG_FWD_COMM_ERROR=지역 포트로 포워드된 데이터를 보내는 중 통신 에러가 발생했습니다.\n포워드된 연결이 종료됩니다.
+MSG_FWD_AGENT_FORWARDING_CONFIRM=agent-forwarding 요청을 수락하시겠습니까?
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
+
+; hosts.c
+MSG_HOSTS_READ_ENOENT_ERROR=known-host 파일을 읽는 중 오류가 발생했습니다.\n지정된 파일이 존재하지 않습니다.
+MSG_HOSTS_READ_ERROR=known-host 파일을 읽는 중 오류가 발생했습니다.
+MSG_HOSTS_ALLOC_ERROR=known-host 파일을 읽기 위해 공간 할당 중 메모리가 다 사용됐습니다.
+MSG_HOSTS_HOSTNAME_INVALID_ERROR=호스트 이름에 사용 불가능한 문자가 포함되어 있습니다.\n이 세션은 종료됩니다.
+MSG_HOSTS_HOSTNAME_EMPTY_ERROR=호스트 이름이 비어있으면 안됩니다.\n이 세션은 종료됩니다.
+MSG_HOSTS_FILE_UNSPECIFY_ERROR=known-host 파일을 지정하지 않아 호스트와 그 키를 추가할 수 없습니다.\nTTSSH 설정 다이얼로그에서 읽기/쓰기 known-host 파일을 지정하고 Tera Term을 재시작하세요.
+MSG_HOSTS_WRITE_EACCES_ERROR=호스트키를 저장 중 오류가 발생했습니다.\nknown-host 파일에 대한 쓰기 권한이 없습니다.
+MSG_HOSTS_WRITE_ERROR=호스트키를 저장 중 오류가 발생했습니다.\n호스트키가 저장되지 않았습니다.
+
+; keyfiles.c
+MSG_KEYFILES_READ_ENOENT_ERROR=키파일을 읽는 중 오류가 발생했습니다.\n지정된 파일이 존재하지 않습니다.
+MSG_KEYFILES_READ_ERROR=키파일을 읽는 중 오류가 발생됐습니다.
+MSG_KEYFILES_READ_ALLOC_ERROR=키파일을 읽기 위한 공간할당 중 메모리가 다 사용됐습니다.
+MSG_KEYFILES_PRIVATEKEY_NOTCONTAIN_ERROR=지정된 키파일이 SSH 개인키를 가지고 있지 않습니다.
+MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR=지정된 키파일이 잘려서 유효한 개인키를 가지고 있지 않습니다.
+MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR=이 암호로 지정된 키파일을 해독할 수 없습니다.\n파일의 크기가 정확하지 않습니다.
+MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR=이 암호로 지정된 키파일을 해독할 수 없습니다.\nTTSSH는 파일을 암호화하기 위해 사용된 암호유형을 이 목적을 위해 지원하지 않습니다.
+MSG_KEYFILES_PASSPHRASE_EMPTY_ERROR=빈 암호로 지정된 키파일을 해독할 수 없습니다.\n자동 로그인을 위해 암호없이 키파일을 만들어야 합니다\n주의: 이것은 키가 쉽게 노출될 수 있음을 의미합니다.
+MSG_KEYFILES_PASSPHRASE_ERROR=이 암호로 지정된 키파일을 해독할 수 없습니다.\n암호가 틀립니다.
+MSG_KEYFILES_CRYPTOLIB_ERROR=암호화 라이브러리 오류.\n아마도 저장된 키가 유효하지 않은 것 같습니다.
+
+; pkt.c
+MSG_PKT_OVERSIZED_ERROR=서버로부터 너무 큰 패킷을 받았습니다; 연결이 닫힙니다.
+
+; ssh.c
+MSG_SSH_INVALID_COMPDATA_ERROR=수신 패킷에 무효한 압축 데이타
+MSG_SSH_TRUNCATED_PKT_ERROR=잘려진 패킷을 받음 (%ld > %d) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=잘려진 패킷을 받음 (%ld > %d) @ grab_payload_limited()
+MSG_SSH_COREINS_ERROR='CORE insertion attack' 감지됨.  연결을 중단합니다.
+MSG_SSH_CORRUPTDATA_ERROR=오류 데이터 감지됨; 연결이 종료됩니다.
+MSG_SSH_DECOMPRESS_ERROR=내부 오류: 패킷이 완전하게 압축되지 않았슴.\n버그입니다, 리포팅 부탁합니다.
+MSG_SSH_SEND_PKT_ERROR=SSH 패킷전송 중 통신 에러가 발생했습니다.\n이 연결은 닫힙니다. (%s:%d)
+MSG_SSH_COMP_ERROR=패킷 압축 중 오류 발생.\n이 연결은 닫힙니다.
+MSG_SSH_UNABLE_FWD_ERROR=\n당신이 요청한 서버 포트로 포워드되지 못해 연결이 끊어진것 같습니다.\n이것은 해당 서버 포트를 누군가가 이미 사용 중 일 때 종종 발생됩니다.
+MSG_SSH_SERVER_DISCON_ERROR='%s'메시지로 서버연결 끊어짐.%s
+MSG_SSH_SERVER_DISCON_NORES_ERROR=서버연결 끊어짐 (이유를 받지 못함).%s
+MSG_SSH_VERSION_ERROR=이 프로그램은 서버의 프로토콜 버전을 인식하지 못합니다.
+MSG_SSH_VERSION_MISMATCH=프로토콜 버전이 맞지 않습니다. 서버:%d.%d 클라이언트:%d
+MSG_SSH_SEND_ID_ERROR=SSH ID 문자열 전송 중 에러 발생.\n이 연결은 닫힙니다.
+MSG_SSH_UNEXP_MSG2_ERROR=현재단계(%d)에서 예기치 않은 SSH2 메시지(%d)
+MSG_SSH_UNEXP_MSG_ERROR=예기치 않은 패킷을 받았습니다: %d
+MSG_SSH_ALLOC_TERMINAL_ERROR=이 서버는 가상 터미널을 할당할 수 없습니다. 이 터미널 사용시 문제가 발생될 수 있습니다.
+MSG_SSH_SETUP_COMP_ERROR=압축 설정 중 오류 발생.\n이 연결은 닫힙니다.
+MSG_SSH_DECRYPT_RSA_ERROR=RSA challenge 해독 중 오류 발생.\n키에 오류가 생긴것 같습니다.
+MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=내부 오류: 지원되지 않는 인증방법
+MSG_SSH_AUTH_FAILURE_ERROR=SSH2 자동로그인 오류: 사용자 인증 실패.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=이 서버는 유효한 인증방법을 가지고 있지 않습니다.
+MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\n인증방법이 서버에 의해 지원되지 않습니다.
+MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE를 받았습니다.\n채널 [%d]: 원인: %s(%d) 메시지: %s
+MSG_SSH_NO_FREE_CHANNEL=새 채널을 열 수 없습니다. TTSSH가 이미 너무 많은 채널을 열고 있습니다.
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: Confirm GEX group size
+MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
+MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
+MSG_SSH_AGENTERROR_TITLE=Bad agent request
+MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
+
+; ttxssh.c
+MSG_UNKNOWN_OPTION_ERROR=인식되지 않는 명령행 옵션: %s
+
+; x11util.c
+MSG_X_AUTH_ERROR=원격 X 응용프로그램이 잘못된 인증 데이터를 보냈습니다.\n이 X 세션을 취소 중입니다.
+
+MSG_CREATEWINDOW_KEYGEN_ERROR=키생성 다이얼로그를 표시할 수 없슴.
+MSG_CREATEWINDOW_ABOUT_ERROR=정보 다이얼로그를 표시할 수 없슴.
+MSG_CREATEWINDOW_SETUP_ERROR=TTSSH 설정 다이얼로그를 표시할 수 없슴.
+MSG_CREATEWINDOW_FWDSETUP_ERROR=포워딩 설정 다이얼로그를 표시할 수 없슴.
+MSG_CREATEWINDOW_FWDEDIT_ERROR=포워딩 수정 다이얼고를 표시할 수 없슴.
+MSG_CREATEWINDOW_AUTH_ERROR=인증 다이얼로그를 표시할 수 없슴.\n연결 종료됨.
+MSG_CREATEWINDOW_AUTHSETUP_ERROR=인증 설정 다이얼로그를 표시할 수 없슴.
+MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=파일 다이얼로그를 표시할 수 없슴: 오류 %d
+
+MSG_WARNING=경고
+MSG_ERROR=오류
+MSG_TTSSH_ERROR=TTSSH 오류
+MSG_NONFATAL_ERROR=Tera Term: 치명적 오류 아님
+
+BTN_OK=확인
+BTN_CANCEL=취소
+BTN_CLOSE=닫기
+BTN_DISCONNECT=연결끊음(&D)
+BTN_CONTINUE=계속(&C)
+BTN_YES=&Yes
+BTN_NO=&No
+BTN_HELP=&Help
+
+
+[TTProxy]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP=&Proxy...
+MENU_ABOUT=TTProxy에 대하여...(&P)
+
+DLG_SETUP_TITLE=Proxy 설정
+DLG_SETUP_URL=URL
+DLG_SETUP_TYPE=유형(&T)
+DLG_SETUP_HOST=호스트이름(&H)
+DLG_SETUP_PORT=포트번호(&N)
+DLG_SETUP_USER=사용자이름(&U)
+DLG_SETUP_PASS=암호(&P)
+DLG_SETUP_OTHER=기타 설정(&O)...
+
+DLG_OTHER_TITLE=기타 설정
+DLG_OTHER_COMMON=공통 설정
+DLG_OTHER_TIMEOUT=연결 시간초과(&T)
+DLG_OTHER_SECOND=초
+DLG_OTHER_LOG=Proxy 연결 로그(&L)
+DLG_OTHER_REFER=지정(&F)...
+DLG_OTHER_SOCKS=SOCKS proxy 설정
+DLG_OTHER_RESOLV=Name &Resolving
+DLG_OTHER_RESOLV_AUTO=auto resolve
+DLG_OTHER_RESOLV_REMOTE=resolve remote
+DLG_OTHER_RESOLV_LOCAL=resolve local
+DLG_OTHER_TELNET=TELNET Proxy 설정
+DLG_OTHER_HOST=호스트이름 묻기(&H)
+DLG_OTHER_USER=사용자이름 묻기(&U)
+DLG_OTHER_PASS=암호 묻기(&P)
+DLG_OTHER_CONNECT=연결된 메시지(&C)
+DLG_OTHER_ERROR=오류 메시지(&E)
+
+DLG_ABOUT_TITLE=TTProxy에 대하여
+DLG_ABOUT_EXTENSION=Tera Term proxy 확장
+DLG_ABOUT_YEBISUYA=YebisuyaHompo
+DLG_ABOUT_HOMEPAGE=TTProxy 홈페이지
+
+MSG_EMPTY_HOSTNAME=호스트 이름이 없슴!
+MSG_ILLEGAL_PORT=잘못된 포트 번호!
+MSG_EMPTY_PARAMETER=인자 몇 개가 비워져 있슴!
+MSG_PROXY_UNAUTHORIZED=Proxy 인증 실패!
+MSG_PROXY_BAD_REQUEST=Proxy가 이 연결을 막음!
+MSG_TYPE_NONE=Without Proxy
+MSG_LOGFILE_SELECT=로그파일을 선택하세요
+MSG_UNABLE_TO_GET_ISSUER_CERT=발행자 인증서를 얻을 수 없슴
+MSG_UNABLE_TO_GET_CRL=인증서 CRL을 얻을 수 없습니다.
+MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE=인증서 서명을 해독할 수 없습니다
+MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE=CRL의 서명을 해독할 수 없습니다
+MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY=발행자 공개키를 해석할 수 없습니다
+MSG_CERT_SIGNATURE_FAILURE=인증서 서명 실패
+MSG_CRL_SIGNATURE_FAILURE=CRL 서명 실패
+MSG_CERT_NOT_YET_VALID=인증서가 아직 유효하지 않슴
+MSG_CERT_HAS_EXPIRED=인증서 만료됨
+MSG_CRL_NOT_YET_VALID=CRL이 아직 유효하지 않슴
+MSG_CRL_HAS_EXPIRED=CRL 만료됨
+MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD=인증서의 notBefore 필드 형식 오류
+MSG_ERROR_IN_CERT_NOT_AFTER_FIELD=인증서의 notAfter 필드 형식 오류
+MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD=CRL의 lastUpdate 필드 형식 오류
+MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD=CRL의 nextUpdate 필드 형식 오류
+MSG_OUT_OF_MEM=메모리 부족
+MSG_DEPTH_ZERO_SELF_SIGNED_CERT=자기 서명 인증서
+MSG_SELF_SIGNED_CERT_IN_CHAIN=자기 서명 인증서가 인증서 체인에서 발견됨
+MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY=지역 발생자 인증서를 얻을 수 없슴
+MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE=첫번째 인정서를 검증할 수 없슴
+MSG_CERT_CHAIN_TOO_LONG=인증서 체임이 너무 김
+MSG_CERT_REVOKED=폐지된 인증서
+MSG_INVALID_CA=효력없는 CA 인증서
+MSG_PATH_LENGTH_EXCEEDED=경로 길이제한 초과
+MSG_INVALID_PURPOSE=지원되지 않는 인증서 용도
+MSG_CERT_UNTRUSTED=인증서 신뢰할 수 없슴
+MSG_CERT_REJECTED=인증서 거부됨
+MSG_SUBJECT_ISSUER_MISMATCH=주체 발행자가 일치하지 않습니다
+MSG_AKID_SKID_MISMATCH=권한과 주체 키 인식자가 일치하니 않습니다
+MSG_AKID_ISSUER_SERIAL_MISMATCH=권한과 발행자 일련번호가 일치하지 않습니다
+MSG_KEYUSAGE_NO_CERTSIGN=키 사용은 인증서 서명을 포함하지 않습니다
+MSG_APPLICATION_VERIFICATION=응용프로그램 검사 실패
+MSG_UNMATCH_COMMON_NAME=일차하지 않는 공통 이름
+MSG_UNABLE_TO_GET_COMMON_NAME=공통 이름을 얻을 수 없습니다
+
+BTN_OK=확인
+BTN_CANCEL=취소
+
+
+[TTMenu]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_LISTCONFIG=목록 설정
+MENU_SETTING=설정
+MENU_ICON=큰 아이콘 보이기
+MENU_FONT=폰트 선택
+MENU_LEFTPOPUP=왼쪽클릭으로 목록 보이기
+MENU_HOTKEY=목록 핫키 보이기(Ctl+Alt+M)
+MENU_VERSION=버전
+MENU_EXEC=실행
+MENU_CLOSE=종료
+MENU_NOTRAY=(없슴)
+
+DLG_ABOUT_TITLE=버전 정보
+DLG_ABOUT_APPNAME=실행 도구
+
+DLG_CONFIG_TITLE=목록 설정
+DLG_CONFIG_ITEM=목록 항목
+DLG_CONFIG_CONFIG=설정
+DLG_CONFIG_NAME=이름
+DLG_CONFIG_PATTERN=실행 패턴
+DLG_CONFIG_AUTO=자동 로그인
+DLG_CONFIG_HOST=호스트 이름
+DLG_CONFIG_USER=사용자 이름
+DLG_CONFIG_PASS=암호
+DLG_CONFIG_MACRO=특정 매크로파일
+DLG_CONFIG_LAUNCH=실행만
+DLG_CONFIG_STARTUP=시작시 실행
+DLG_CONFIG_SSH=SSH사용
+DLG_CONFIG_KEYFILE=키파일
+DLG_CONFIG_CHALLENGE=use Challenge
+DLG_CONFIG_PAGEANT=use Pageant
+DLG_CONFIG_DETAIL=세부사항
+
+DLG_ETC_TITLE=설정 세부사항
+DLG_ETC_APP=응용프로그램
+DLG_ETC_OPTION=선택
+DLG_ETC_CONFIG=Tera Term 설정파일(실행제외)
+DLG_ETC_AUTO=자동 로그인 설정
+DLG_ETC_LOGFILE=로그파일
+DLG_ETC_PROMPT=Prompt
+DLG_ETC_USER=사용자 이름
+DLG_ETC_PASS=암호
+
+MSG_ERROR_READREG=레지스트리 데이터를 읽을 수 없습니다.\n
+MSG_ERROR_MAKETTL='ttpmenu.TTL'를 만들 수 없습니다.\n
+MSG_ERROR_LAUNCH=어플리케이션 실행을 실패했습니다.\n
+MSG_ERROR_NOREGNAME=오류: 레지스트리 이름이 없슴
+MSG_ERROR_INVALIDREGNAME=레지스트리 이름에서 "\\"를 사용할 수 없습니다
+MSG_ERROR_NOHOST=오류: 호스트 이름이 없슴
+MSG_ERROR_NOMACRO=오류: 매크로 파일이름이 없슴
+MSG_ERROR_CHECKFILE=checking [%s] file was failure.\n
+MSG_ERROR_SAVEREG=오류: 레지스트리를 저장할 수 없습니다.\n
+MSG_ERROR_OPENREG=오류: 레지스트리를 열 수 없습니다..\n
+MSG_ERROR_SELECTREG=삭제할 레지스트리 이름을 선택하세요
+MSG_ERROR_GETDELETEREG=삭제한 항목을 가져올 수 없습니다
+MSG_ERROR_DELETEREG=레지스트리를 삭제할 수 없습니다.\n
+MSG_ERROR_WINCLASS=창 클래스를 등록할 수 없습니다.\n
+
+FILEDLG_MACRO_TITLE=매크로 파일 선택
+FILEDLG_MACRO_FILTER=macro file(*.ttl)\0*.ttl\0all files(*.*)\0*.*\0\0
+FILEDLG_KEY_TITLE=개인키 파일 선택
+FILEDLG_KEY_FILTER=identity files\0identity;id_rsa;id_dsa\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0all(*.*)\0*.*\0\0
+FILEDLG_TERATERM_TITLE=Tera Term 선택
+FILEDLG_TERATERM_FILTER=execute file(*.exe)\0*.exe\0all files(*.*)\0*.*\0\0
+FILEDLG_INI_TITLE=설정 파일 선택
+FILEDLG_INI_FILTER=config file(*.ini)\0*.ini\0all files(*.*)\0*.*\0\0
+FILEDLG_LOG_TITLE=로그 파일 선택
+FILEDLG_LOG_FILTER=log file(*.log)\0*.log\0all files(*.*)\0*.*\0\0
+
+BTN_OK=확인
+BTN_CANCEL=취소
+BTN_DEFAULT=기본값
+
+
+[TTXKanjiMenu]
+MENU_KANJI=&KanjiCode
+MENU_KANJI_K=Coding(&K)
+MENU_RECV_SJIS=Recv: &Shift_JIS
+MENU_RECV_EUCJP=Recv: &EUC-JP
+MENU_RECV_JIS=Recv: &JIS
+MENU_RECV_UTF8=Recv: &UTF-8
+MENU_RECV_UTF8m=Recv: UTF-8&m
+MENU_RECV_KS5601=Recv: &KS5601
+MENU_SEND_SJIS=Send: S&hift_JIS
+MENU_SEND_EUCJP=Send: EU&C-JP
+MENU_SEND_JIS=Send: J&IS
+MENU_SEND_UTF8=Send: U&TF-8
+MENU_SEND_KS5601=Send: K&S5601
+MENU_USE_ONE_SETTING=Use &one setting
+MENU_SJIS=Recv/Send: &Shift_JIS
+MENU_EUCJP=Recv/Send: &EUC-JP
+MENU_JIS=Recv/Send: &JIS
+MENU_UTF8=Recv/Send: &UTF-8
+MENU_UTF8m=Recv: UTF-8&m/Send: UTF-8
+MENU_KS5601=Recv/Send: &KS5601
+
+
+[TTXAlwaysOnTop]
+MENU_ALWAYSONTOP=항상 위(&A)
+
+
+[TTXRecurringCommand]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP_RECURRING=되풀이 명령(&U)
+MENU_CONTROL_RECURRING=되풀이 명령(&U)
+
+DLG_TITLE=되풀이 명령
+DLG_ENABLE=활성화(&E)
+DLG_INTERVAL=간격(sec)(&I)
+DLG_COMMAND=명령(&C)
+DLG_ADD_NEWLINE=&Add new line

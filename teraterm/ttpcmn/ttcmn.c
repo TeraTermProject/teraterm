@@ -40,6 +40,8 @@
 #include <setupapi.h>
 #include <locale.h>
 #include <htmlhelp.h>
+#include <assert.h>
+#include <crtdbg.h>
 
 #define DllExport __declspec(dllexport)
 #include "language.h"
@@ -52,6 +54,7 @@
 #include "compat_w95.h"
 #include "tt_res.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
@@ -1460,7 +1463,7 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 	return c;
 }
 
-int WINAPI CommRawOut(PComVar cv, PCHAR B, int C)
+int WINAPI CommRawOut(PComVar cv, /*const*/ PCHAR B, int C)
 {
 	int a;
 
@@ -1520,9 +1523,91 @@ int WINAPI CommBinaryOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
+/**
+ *	データ(文字列)を出力バッファへ書き込む
+ *
+ *	指定データがすべて書き込めない場合は書き込まない
+ *	CommRawOut() は書き込める分だけ書き込む
+ *
+ *	@retval	TRUE	出力できた
+ *	@retval	FALSE	出力できなかった(buffer full)
+ */
+static BOOL WriteOutBuff(PComVar cv, const char *TempStr, int TempLen)
+{
+	BOOL output;
+
+	if (TempLen == 0) {
+		// 長さ0で書き込みに来る場合あり
+		return TRUE;
+	}
+
+	output = FALSE;
+	if (cv->TelLineMode) {
+		const BOOL Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
+		if (!Full) {
+			output = TRUE;
+			memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
+			cv->LineModeBuffCount += TempLen;
+			if (cv->Flush) {
+				cv->FlushLen = cv->LineModeBuffCount;
+			}
+		}
+		if (cv->FlushLen > 0) {
+			const int OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
+			cv->FlushLen -= OutLen;
+			cv->LineModeBuffCount -= OutLen;
+			memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
+		}
+		cv->Flush = FALSE;
+	}
+	else {
+		const BOOL Full = OutBuffSize-cv->OutBuffCount-TempLen < 0;
+		if (! Full) {
+			output = TRUE;
+			CommRawOut(cv, (char *)TempStr, TempLen);
+		}
+	}
+	return output;
+}
+
+/**
+ *	データ(文字列)を入力バッファへ書き込む
+ *	入力バッファへ入れる -> エコーされる
+ *
+ *	@retval	TRUE	出力できた
+ *	@retval	FALSE	出力できなかった(buffer full)
+ */
+static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
+{
+	BOOL Full;
+
+	if (TempLen == 0) {
+		return TRUE;
+	}
+
+	Full = InBuffSize-cv->InBuffCount-TempLen < 0;
+	if (! Full) {
+		memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
+		cv->InBuffCount = cv->InBuffCount + TempLen;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/**
+ *	入力バッファの先頭に空きがあったら詰める
+ */
+static void PackInBuff(PComVar cv)
+{
+	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
+		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
+		cv->InPtr = 0;
+	}
+}
+
 int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 {
-	int a, i, Len, OutLen;
+	int a, i, Len;
 	char d[3];
 
 	if ( ! cv->Ready ) {
@@ -1549,37 +1634,12 @@ int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 			d[Len++] = '\xff';
 		}
 
-		if (cv->TelLineMode) {
-			if (OutBuffSize - cv->LineModeBuffCount - Len >= 0) {
-				memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), d, Len);
-				cv->LineModeBuffCount += Len;
-				if (cv->Flush) {
-					cv->FlushLen = cv->LineModeBuffCount;
-				}
-				a = 1;
-			}
-			else {
-				a = 0;
-			}
-			if (cv->FlushLen > 0) {
-				OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
-				cv->FlushLen -= OutLen;
-				cv->LineModeBuffCount -= OutLen;
-				memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
-			}
-			cv->Flush = FALSE;
+		if (WriteOutBuff(cv, d, Len)) {
+			a = 1;
+			i++;
+		} else {
+			a = 0;
 		}
-		else {
-			if ( OutBuffSize - cv->OutBuffCount - Len >= 0 ) {
-				CommRawOut(cv, d, Len);
-				a = 1;
-			}
-			else {
-				a = 0;
-			}
-		}
-
-		i += a;
 	}
 	return i;
 }
@@ -1605,12 +1665,13 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 //
 static int TextOutMBCS(PComVar cv, PCHAR B, int C)
 {
-	int i, TempLen, OutLen;
+	int i, TempLen;
 	WORD K;
 	char TempStr[12];
-	int SendCodeNew;
 	BYTE d;
-	BOOL Full, KanjiFlagNew;
+	BOOL Full;
+	int SendCodeNew;	// 送信コード
+	BOOL KanjiFlagNew;	// TRUE=次の文字と合わせて漢字とする
 
 	Full = FALSE;
 	i = 0;
@@ -1768,48 +1829,13 @@ static int TextOutMBCS(PComVar cv, PCHAR B, int C)
 			}
 		} // if (cv->SendKanjiFlag) else if ... else ... end
 
-		if (cv->TelLineMode) {
-			if (TempLen == 0) {
-				i++;
-				cv->SendCode = SendCodeNew;
-				cv->SendKanjiFlag = KanjiFlagNew;
-			}
-			else {
-				Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
-				if (!Full) {
-					i++;
-					cv->SendCode = SendCodeNew;
-					cv->SendKanjiFlag = KanjiFlagNew;
-					memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
-					cv->LineModeBuffCount += TempLen;
-					if (cv->Flush) {
-						cv->FlushLen = cv->LineModeBuffCount;
-					}
-				}
-			}
-			if (cv->FlushLen > 0) {
-				OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
-				cv->FlushLen -= OutLen;
-				cv->LineModeBuffCount -= OutLen;
-				memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
-			}
-			cv->Flush = FALSE;
-		}
-		else {
-			if (TempLen == 0) {
-				i++;
-				cv->SendCode = SendCodeNew;
-				cv->SendKanjiFlag = KanjiFlagNew;
-			}
-			else {
-				Full = OutBuffSize-cv->OutBuffCount-TempLen < 0;
-				if (! Full) {
-					i++;
-					cv->SendCode = SendCodeNew;
-					cv->SendKanjiFlag = KanjiFlagNew;
-					CommRawOut(cv,TempStr,TempLen);
-				}
-			}
+		if (WriteOutBuff(cv, TempStr, TempLen)) {
+			i++;	// 1文字処理した
+			// 漢字の状態を保存する
+			cv->SendCode = SendCodeNew;
+			cv->SendKanjiFlag = KanjiFlagNew;
+		} else {
+			Full = TRUE;
 		}
 
 	} // end of "while {}"
@@ -1819,7 +1845,7 @@ static int TextOutMBCS(PComVar cv, PCHAR B, int C)
 
 int WINAPI CommTextOut(PComVar cv, PCHAR B, int C)
 {
-	int i, TempLen, OutLen;
+	int i, TempLen;
 	char TempStr[12];
 	BYTE d;
 	BOOL Full;
@@ -1890,66 +1916,400 @@ int WINAPI CommTextOut(PComVar cv, PCHAR B, int C)
 			}
 		}
 
-		if (cv->TelLineMode) {
-			Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
-			if (!Full) {
-				i++;
-				memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
-				cv->LineModeBuffCount += TempLen;
-				if (cv->Flush) {
-					cv->FlushLen = cv->LineModeBuffCount;
-				}
-			}
-			if (cv->FlushLen > 0) {
-				OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
-				cv->FlushLen -= OutLen;
-				cv->LineModeBuffCount -= OutLen;
-				memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
-			}
-			cv->Flush = FALSE;
+		if (WriteOutBuff(cv, TempStr, TempLen)) {
+			i++;	// 1文字処理した
+		} else {
+			Full = TRUE;
 		}
-		else {
-			Full = OutBuffSize - cv->OutBuffCount - TempLen < 0;
-			if (! Full) {
-				i++;
-				CommRawOut(cv,TempStr,TempLen);
-			}
-		}
+
 	} // end of while {}
 
 	return i;
 }
 
-// TODO: UTF-16から直接変換して出力する
-int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
+/**
+ *	@retval	true	日本語の半角カタカナ
+ *	@retval	false	その他
+ */
+static BOOL IsHalfWidthKatakana(unsigned int u32)
 {
-	int CodePage = *cv->CodePage;
-	size_t mb_len;
-	int r;
-	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
-	if (mb_str == NULL) {
-		r = 0;
-	} else {
-		r = CommTextOut(cv, mb_str, mb_len);
-		free(mb_str);
-	}
-	return r;
+	// Halfwidth CJK punctuation (U+FF61～FF64)
+	// Halfwidth Katakana variants (U+FF65～FF9F)
+	return (0xff61 <= u32 && u32 <= 0xff9f);
 }
 
-// TODO: UTF-16から直接変換して出力する
+/**
+ *	出力用、 TODO echo用を作る
+ *	@param	cv
+ *	@param	u32			入力文字
+ *	@param	check_only	TRUEで処理は行わず、
+ *	@param	TempStr		出力文字数
+ *	@param	StrLen		TempStrへの出力文字数
+ *	@retval	処理を行った
+ */
+static BOOL OutControl(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen)
+{
+	const wchar_t d = u32;
+	size_t TempLen = 0;
+	BOOL retval = FALSE;
+	if (check_only == TRUE) {
+		/* チェックのみ */
+		if (d == CR || d == BS || d == 0x15/*ctrl-u*/) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+	if (d==CR) {
+		TempStr[TempLen++] = 0x0d;
+		if (cv->CRSend==IdCRLF) {
+			TempStr[TempLen++] = 0x0a;
+		}
+		else if ((cv->CRSend ==IdCR) &&
+				 cv->TelFlag && ! cv->TelBinSend) {
+			TempStr[TempLen++] = 0;
+		}
+		else if (cv->CRSend == IdLF) {
+			TempStr[TempLen-1] = 0x0a;
+		}
+		if (cv->TelLineMode) {
+			cv->Flush = TRUE;
+		}
+		retval = TRUE;
+	}
+	else if (d== BS) {
+		if (cv->TelLineMode) {
+			if (cv->FlushLen < cv->LineModeBuffCount) {
+				cv->LineModeBuffCount--;
+			}
+		}
+		else {
+			TempStr[TempLen++] = BS;
+		}
+		retval = TRUE;
+	}
+	else if (d==0x15) { // ctrl-u
+		if (cv->TelLineMode) {
+			cv->LineModeBuffCount = cv->FlushLen;
+		}
+		else {
+			TempStr[TempLen++] = 0x15;
+		}
+		retval = TRUE;
+	}
+	*StrLen = TempLen;
+	return retval;
+}
+static BOOL ControlEcho(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen)
+{
+	const wchar_t d = u32;
+	size_t TempLen = 0;
+	BOOL retval = FALSE;
+	if (check_only == TRUE) {
+		/* チェックのみ */
+		if (d == CR || (d == 0x15/*ctrl-u*/ && cv->TelLineMode)) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+	if (d==CR) {
+		TempStr[TempLen++] = 0x0d;
+		if (cv->CRSend==IdCRLF) {
+			TempStr[TempLen++] = 0x0a;
+		}
+		else if ((cv->CRSend ==IdCR) && cv->TelFlag && ! cv->TelBinSend) {
+			TempStr[TempLen++] = 0;
+		}
+		else if (cv->CRSend == IdLF) {
+			TempStr[TempLen-1] = 0x0a;
+		}
+		retval = TRUE;
+	}
+	else if (d==0x15/*ctrl-u*/ && cv->TelLineMode) {
+		// Move to top of line (CHA "\033[G") and erase line (EL "\033[K")
+		memcpy(TempStr, "\033[G\033[K", 6);
+		TempLen += 6;
+		retval = TRUE;
+	}
+	*StrLen = TempLen;
+	return retval;
+}
+
+/**
+ * 出力用文字列を作成する
+ *
+ *	@retval	消費した文字数
+ */
+typedef struct {
+	int KanjiCode;		// [in]出力文字コード(sjis,jisなど)
+	BOOL (*ControlOut)(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen);
+	// stateを保存する必要がある文字コードで使用
+	BOOL JIS7Katakana;	// [in](Kanji JIS)kana
+	int SendCode;		// [in,out](Kanji JIS)直前の送信コード Ascii/Kana/Kanji
+	BOOL KanjiFlag;		// [in,out](MBCS)直前の1byteが漢字だったか?(2byte文字だったか?)
+	BYTE KanjiFirst;	// [in,out](MBCS)直前の1byte
+} OutputCharState;
+
+/**
+ *	unicode(UTF-16)からunicode(UTF-32)を1文字取り出して
+ *	出力データ(TempStr)を作成する
+ */
+static size_t MakeOutputString(PComVar cv, OutputCharState *states,
+							   const wchar_t *B, int C,
+							   char *TempStr, int *TempLen_)
+{
+	BOOL (*ControlOut)(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen)
+		= states->ControlOut;
+//
+	int TempLen = 0;
+	size_t TempLen2;
+	size_t output_char_count;	// 消費した文字数
+
+	// UTF-32 を1文字取り出す
+	unsigned int u32;
+	size_t u16_len = UTF16ToUTF32(B, C, &u32);
+	if (u16_len == 0) {
+		// デコードできない? あり得ないのでは?
+		assert(FALSE);
+		u32 = '?';
+		u16_len = 1;
+	}
+	output_char_count = u16_len;
+
+	// 各種シフト状態を通常に戻す
+	if (u32 < 0x100 || ControlOut(cv, u32, TRUE, NULL, NULL)) {
+		if (cv->Language == IdJapanese && states->KanjiCode == IdJIS) {
+			// 今のところ、日本語,JISしかない
+			if (cv->SendCode == IdKanji) {
+				// 漢字ではないので、漢字OUT
+				TempStr[TempLen++] = 0x1B;
+				TempStr[TempLen++] = '(';
+				switch (cv->KanjiOut) {
+				case IdKanjiOutJ:
+					TempStr[TempLen++] = 'J';
+					break;
+				case IdKanjiOutH:
+					TempStr[TempLen++] = 'H';
+					break;
+				default:
+					TempStr[TempLen++] = 'B';
+				}
+			}
+
+			if (states->JIS7Katakana == 1) {
+				if (cv->SendCode == IdKatakana) {
+					TempStr[TempLen++] = SO;
+				}
+			}
+
+			states->SendCode = IdASCII;
+		}
+	}
+
+	// 1文字処理する
+	if (ControlOut(cv, u32, FALSE, TempStr, &TempLen2)) {
+		// 特別な文字を処理した
+		TempLen += TempLen2;
+		output_char_count = 1;
+	} else if (cv->Language == IdUtf8 ||
+			   (cv->Language == IdJapanese && states->KanjiCode == IdUTF8) ||
+			   (cv->Language == IdKorean && states->KanjiCode == IdUTF8))
+	{
+		// UTF-8 で出力
+		size_t utf8_len = sizeof(TempStr);
+		utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
+		TempLen += utf8_len;
+	} else if (cv->Language == IdJapanese && *cv->CodePage == 932) {
+		// 日本語
+		// まず CP932(SJIS) に変換してから出力
+		char mb_char[2];
+		size_t mb_len = sizeof(mb_char);
+		mb_len = UTF32ToMBCP(u32, 932, mb_char, mb_len);
+		if (mb_len == 0) {
+			// SJISに変換できない
+			TempStr[TempLen++] = '?';
+		} else {
+			switch (states->KanjiCode) {
+			case IdEUC:
+				// TODO 半角カナ
+				if (mb_len == 1) {
+					TempStr[TempLen++] = mb_char[0];
+				} else {
+					WORD K;
+					K = (((WORD)(unsigned char)mb_char[0]) << 8) +
+						(WORD)(unsigned char)mb_char[1];
+					K = SJIS2EUC(K);
+					TempStr[TempLen++] = HIBYTE(K);
+					TempStr[TempLen++] = LOBYTE(K);
+				}
+				break;
+			case IdJIS:
+				if (u32 < 0x100) {
+					// ASCII
+					TempStr[TempLen++] = mb_char[0];
+					states->SendCode = IdASCII;
+				} else if (IsHalfWidthKatakana(u32)) {
+					// 半角カタカナ
+					if (states->JIS7Katakana==1) {
+						if (cv->SendCode != IdKatakana) {
+							TempStr[TempLen++] = SI;
+						}
+						TempStr[TempLen++] = mb_char[0] & 0x7f;
+					} else {
+						TempStr[TempLen++] = mb_char[0];
+					}
+					states->SendCode = IdKatakana;
+				} else {
+					// 漢字
+					WORD K;
+					K = (((WORD)(unsigned char)mb_char[0]) << 8) +
+						(WORD)(unsigned char)mb_char[1];
+					K = SJIS2JIS(K);
+					if (states->SendCode != IdKanji) {
+						// 漢字IN
+						TempStr[TempLen++] = 0x1B;
+						TempStr[TempLen++] = '$';
+						if (cv->KanjiIn == IdKanjiInB) {
+							TempStr[TempLen++] = 'B';
+						}
+						else {
+							TempStr[TempLen++] = '@';
+						}
+						states->SendCode = IdKanji;
+					}
+					TempStr[TempLen++] = HIBYTE(K);
+					TempStr[TempLen++] = LOBYTE(K);
+				}
+				break;
+			case IdSJIS:
+				if (mb_len == 1) {
+					TempStr[TempLen++] = mb_char[0];
+				} else {
+					TempStr[TempLen++] = mb_char[0];
+					TempStr[TempLen++] = mb_char[1];
+				}
+				break;
+			default:
+				assert(FALSE);
+				break;
+			}
+		}
+	} else if (cv->Language == IdRussian) {
+		/* まずCP1251に変換して出力 */
+		char mb_char[2];
+		size_t mb_len = sizeof(mb_char);
+		BYTE b;
+		mb_len = UTF32ToMBCP(u32, 1251, mb_char, mb_len);
+		if (mb_len != 1) {
+			b = '?';
+		} else {
+			b = RussConv(IdWindows, cv->RussHost, mb_char[0]);
+		}
+		TempStr[TempLen++] = b;
+	} else if (cv->Language == IdKorean && *cv->CodePage == 51949) {
+		/* CP51949に変換して出力 */
+		char mb_char[2];
+		size_t mb_len = sizeof(mb_char);
+		mb_len = UTF32ToMBCP(u32, 51949, mb_char, mb_len);
+		if (mb_len == 0) {
+			TempStr[TempLen++] = '?';
+		}
+		else if (mb_len == 1) {
+			TempStr[TempLen++] = mb_char[0];
+		} else  {
+			TempStr[TempLen++] = mb_char[0];
+			TempStr[TempLen++] = mb_char[1];
+		}
+	} else if (cv->Language == IdEnglish) {
+		TempStr[TempLen++] = u32;
+	} else {
+		// CodePageで変換
+		char mb_char[2];
+		size_t mb_len = sizeof(mb_char);
+		mb_len = UTF32ToMBCP(u32, *cv->CodePage, mb_char, mb_len);
+		if (mb_len == 0) {
+			TempStr[TempLen++] = '?';
+		}
+		else if (mb_len == 1) {
+			TempStr[TempLen++] = mb_char[0];
+		} else  {
+			TempStr[TempLen++] = mb_char[0];
+			TempStr[TempLen++] = mb_char[1];
+		}
+	}
+
+	*TempLen_ = TempLen;
+	return output_char_count;
+}
+
+
+/**
+ * CommTextOut() の wchar_t 版
+ *
+ *	@retval		出力文字数(wchar_t単位)
+ */
+int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
+{
+	char TempStr[12];
+	BOOL Full = FALSE;
+	int i = 0;
+	while (! Full && (i < C)) {
+		// 出力用データを作成
+		int TempLen = 0;
+		size_t output_char_count;	// 消費した文字数
+		OutputCharState state;
+		state.KanjiCode = cv->KanjiCodeSend;
+		state.ControlOut = OutControl;
+		state.SendCode = cv->SendCode;
+		state.JIS7Katakana = cv->JIS7KatakanaSend;
+		output_char_count = MakeOutputString(cv, &state, &B[i], C-i, TempStr, &TempLen);
+
+		// データを出力バッファへ
+		if (WriteOutBuff(cv, TempStr, TempLen)) {
+			i += output_char_count;		// output_char_count 文字数 処理した
+			// 漢字の状態を保存する
+			cv->SendCode = state.SendCode;
+		} else {
+			Full = TRUE;
+		}
+	} // end of "while {}"
+	_CrtCheckMemory();
+	return i;
+}
+
+/**
+ * CommTextEcho() の wchar_t 版
+ *
+ *	@retval		出力文字数(wchar_t単位)
+ */
 int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C)
 {
-	int CodePage = *cv->CodePage;
-	size_t mb_len;
-	int r;
-	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
-	if (mb_str == NULL) {
-		r = 0;
-	} else {
-		r = CommTextEcho(cv, mb_str, mb_len);
-		free(mb_str);
-	}
-	return r;
+	char TempStr[12];
+	BOOL Full = FALSE;
+	int i = 0;
+	while (! Full && (i < C)) {
+		// 出力用データを作成
+		int TempLen = 0;
+		size_t output_char_count;	// 消費した文字数
+		OutputCharState state;
+		state.KanjiCode = cv->KanjiCodeEcho;
+		state.ControlOut = ControlEcho;
+		state.SendCode = cv->EchoCode;
+		state.JIS7Katakana = cv->JIS7KatakanaEcho;
+		output_char_count = MakeOutputString(cv, &state, &B[i], C-i, TempStr, &TempLen);
+
+		// データを出力バッファへ
+		if (WriteInBuff(cv, TempStr, TempLen)) {
+			i += output_char_count;		// output_char_count 文字数 処理した
+			// 漢字の状態を保存する
+			cv->EchoCode = state.SendCode;
+		} else {
+			Full = TRUE;
+		}
+	} // end of "while {}"
+	_CrtCheckMemory();
+	return i;
 }
 
 int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
@@ -1960,10 +2320,7 @@ int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 	if ( ! cv->Ready )
 		return C;
 
-	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
-		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
-		cv->InPtr = 0;
-	}
+	PackInBuff(cv);
 
 	i = 0;
 	a = 1;
@@ -1984,14 +2341,12 @@ int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 			Len++;
 		}
 
-		if ( InBuffSize-cv->InBuffCount-Len >=0 ) {
-			memcpy(&(cv->InBuff[cv->InBuffCount]),d,Len);
-			cv->InBuffCount = cv->InBuffCount + Len;
+		if (WriteInBuff(cv, d, Len)) {
 			a = 1;
-		}
-		else
+			i++;
+		} else {
 			a = 0;
-		i = i + a;
+		}
 	}
 	return i;
 }
@@ -2150,20 +2505,12 @@ static int WINAPI TextEchoMBCS(PComVar cv, PCHAR B, int C)
 			}
 		} // if (cv->EchoKanjiFlag) else if ... else ... end
 
-		if (TempLen == 0) {
+		if (WriteInBuff(cv, TempStr, TempLen)) {
 			i++;
 			cv->EchoCode = EchoCodeNew;
 			cv->EchoKanjiFlag = KanjiFlagNew;
-		}
-		else {
-			Full = InBuffSize-cv->InBuffCount-TempLen < 0;
-			if (! Full) {
-				i++;
-				cv->EchoCode = EchoCodeNew;
-				cv->EchoKanjiFlag = KanjiFlagNew;
-				memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
-				cv->InBuffCount = cv->InBuffCount + TempLen;
-			}
+		} else {
+			Full = FALSE;
 		}
 
 	} // end of "while {}"
@@ -2182,10 +2529,7 @@ int WINAPI CommTextEcho(PComVar cv, PCHAR B, int C)
 		return C;
 	}
 
-	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
-		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
-		cv->InPtr = 0;
-	}
+	PackInBuff(cv);
 
 	switch (cv->Language) {
 	  case IdUtf8:
@@ -2237,11 +2581,10 @@ int WINAPI CommTextEcho(PComVar cv, PCHAR B, int C)
 			}
 		}
 
-		Full = InBuffSize-cv->InBuffCount-TempLen < 0;
-		if (! Full) {
+		if(WriteInBuff(cv, TempStr,TempLen)) {
 			i++;
-			memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
-			cv->InBuffCount = cv->InBuffCount + TempLen;
+		} else {
+			Full = TRUE;
 		}
 	} // end of while {}
 
@@ -2689,6 +3032,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 				// dllロード失敗、teratermが起動しない
 				return FALSE;
 			}
+			WinCompatInit();
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */
