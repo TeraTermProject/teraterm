@@ -27,7 +27,6 @@ Clear() {
 
 InitScreen() {
 #  CSI "8;24;80t"
-  CSI '2*x'
   Clear
 }
 
@@ -113,5 +112,4 @@ cat <<_EoF_
           *****     $c0-----$R     $c1'''''$R     $c2.....$R     $c3#####$R     $c4*****$R
 _EoF_
 
-CSI "1*x"
 echo
