@@ -1551,7 +1551,7 @@ void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
 		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0)) {
 			CodeBuff[Ptr+XStart-1] = 0x20;
 #if UNICODE_INTERNAL_BUFF
-			BuffSetChar(&CodeLineW[Ptr + XStart - 1], 0x20, 'H');
+			BuffSetChar(&CodeBuffW[Ptr + XStart - 1], 0x20, 'H');
 #endif
 			AttrBuff[Ptr+XStart-1] ^= AttrKanji;
 		}
@@ -1559,12 +1559,12 @@ void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
 		    ((AttrBuff[Ptr+XStart+Cols-1] & AttrKanji) != 0)) {
 			CodeBuff[Ptr+XStart+Cols] = 0x20;
 #if UNICODE_INTERNAL_BUFF
-			BuffSetChar(&CodeLineW[Ptr + XStart + Cols], 0x20, 'H');
+			BuffSetChar(&CodeBuffW[Ptr + XStart + Cols], 0x20, 'H');
 #endif
 		}
 		memset(&(CodeBuff[Ptr+XStart]), ch, Cols);
 #if UNICODE_INTERNAL_BUFF
-		BuffSetChar(&CodeLineW[Ptr + XStart], 0x20, 'H');
+		memsetW(&(CodeBuffW[Ptr+XStart]), ch, Cols);
 #endif
 		memset(&(AttrBuff[Ptr+XStart]), CurCharAttr.Attr, Cols);
 		memset(&(AttrBuff2[Ptr+XStart]), CurCharAttr.Attr2, Cols);
