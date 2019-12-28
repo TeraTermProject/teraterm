@@ -45,4 +45,5 @@ set_target_properties(TTXttyplay PROPERTIES FOLDER TTXSamples)
 add_subdirectory(TTXViewMode)
 set_target_properties(TTXViewMode PROPERTIES FOLDER TTXSamples)
 
-
+add_subdirectory(TTXCheckUpdate)
+set_target_properties(TTXCheckUpdate PROPERTIES FOLDER TTXSamples)
