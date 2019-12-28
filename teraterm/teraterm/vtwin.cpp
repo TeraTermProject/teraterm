@@ -1833,7 +1833,6 @@ static void EscapeFilename(const wchar_t *src, wchar_t *dest)
 
 static void PasteString(PComVar cv, const wchar_t *str, bool escape)
 {
-	wchar_t *ptr = (wchar_t *)str;
 	wchar_t *tmpbuf;
 	if (!escape) {
 		tmpbuf = _wcsdup(str);
@@ -1842,7 +1841,6 @@ static void PasteString(PComVar cv, const wchar_t *str, bool escape)
 		const size_t len = wcslen(str) * sizeof(wchar_t) * 2;
 		tmpbuf = (wchar_t *)malloc(len);
 		EscapeFilename(str, tmpbuf);
-		ptr = tmpbuf;
 	}
 
 	SendMemPasteString(tmpbuf);
@@ -1874,7 +1872,7 @@ static bool SendScp(wchar_t *Filenames[], int FileCount, const char *SendDir)
 
 	for (int i = 0; i < FileCount; i++) {
 		char *FileName = ToU8W(Filenames[i]);
-		func((char *)FileName, ts.ScpSendDir);
+		func(FileName, ts.ScpSendDir);
 		free(FileName);
 	}
 	return true;
@@ -2019,10 +2017,10 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 			// cancel
 			break;
 		case DROP_TYPE_SEND_FILE:
+			SendMemSendFile(FileName, FALSE);
+			break;
 		case DROP_TYPE_SEND_FILE_BINARY:
-			if (SendVar==NULL && NewFileVar(&SendVar)) {
-				SendMemSendFile(FileName, DropType == DROP_TYPE_SEND_FILE ? FALSE : TRUE);
-			}
+			SendMemSendFile(FileName, TRUE);
 			break;
 		case DROP_TYPE_PASTE_FILENAME:
 		{

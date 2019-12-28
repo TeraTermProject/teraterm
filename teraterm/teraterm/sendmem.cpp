@@ -503,11 +503,24 @@ void SendMemFinish(SendMem *sm)
 	free(sm);
 }
 
+/**
+ *	ファイルを送信する
+ *	@param[in]	filename	ファイル名
+ *	@param[in]	binary		FALSE	text file
+ *							TRUE	binary file
+ */
 #if SENDMEM_USE_OLD_API
 BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
 {
+	if (SendVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&SendVar)) {
+		return FALSE;
+	}
+
 	char *FileNameA = ToCharW(filename);
-	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileNameA,  _TRUNCATE);
+	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileNameA, _TRUNCATE);
 	free(FileNameA);
 
 	SendVar->DirLen = 0;
@@ -516,7 +529,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
 	return TRUE;
 }
 #else
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)	// binary未対応
 {
 	binary = FALSE;
 
@@ -551,5 +564,6 @@ BOOL SendMemPasteString(wchar_t *str)
 		CommTextEchoW(&cv, str, len);
 	}
 
+	free(str);
 	return TRUE;
 }
