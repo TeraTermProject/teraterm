@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- meta http-equiv="Content-Type" content="text/html; charset=UTF-8" -->
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" type="text/css" href="sa.css">
+  <title>Tera Term インストーラにおける意図しない DLL 読み込みの脆弱性</title>
+</head>
+
+<body>
+  <h1>Tera Term インストーラにおける意図しない DLL 読み込みの脆弱性</h1>
+  <p>
+<!--    公開日: 2017-05-31 -->
+    最終更新日: 2017-06-01
+  <p>
+  </p>
+
+  <h2>概要</h2>
+  <p>
+    Tera Term バージョン 4.94 およびそれ以前のインストーラに、意図しない DLL を読み込む脆弱性が存在します。<br>
+    この脆弱性が悪用された場合、悪意ある第三者の攻撃により、インストーラの起動時に任意のコードが実行されてしまう危険性があります。
+  </p>
+  <p>
+    本脆弱性はインストーラの起動時のみに影響するため、インストール済みの Tera Term の利用には影響がありません。<br>
+    新たに Tera Term をインストールする場合は、以下に案内する方法で実施してください。
+  </p>
+
+  <h2>対象バージョン</h2>
+  <p>
+    Tera Term バージョン 4.94、 およびそれ以前のバージョンのインストーラ。<br>
+    ZIP アーカイブ版は影響を受けません。
+  </p>
+
+  <h2>影響</h2>
+  <p>
+    インストーラ起動時に意図しない DLL を読み込む場合があります。<br>
+    インストーラが置かれたフォルダに悪意ある第三者の DLL が置かれていた場合にその DLL を読み込み、<br>
+    その結果任意のコードが実行される可能性があります。
+  </p>
+  <p>
+    本脆弱性はインストーラの起動時のみに影響するため、インストール済みの Tera Term の利用には影響がありません。
+  </p>
+
+  <h2>対応方法</h2>
+  <p>
+    新たに Tera Term をインストール/アップグレードする場合は、最新版のインストーラを利用してください。
+  </p>
+
+  <h2>回避方法</h2>
+  <p>
+    やむを得ず旧バージョンをインストールする場合は、以下のいずれかの方法でインストールしてください。
+  </p>
+  <ul>
+    <li>ZIP アーカイブ版を利用する</li>
+    <li>新規フォルダを作り、インストーラをそこに移動してから実行する</li>
+  </ul>
+
+  <h2>関連情報</h2>
+  <ul>
+    <li><a href="http://jvn.jp/ta/JVNTA91240916/">JVNTA#91240916 Windows アプリケーションによる DLL 読み込みやコマンド実行に関する問題</a></li>
+    <li><a href="https://jvn.jp/jp/JVN06770361/">JVN#06770361 Tera Term のインストーラにおける DLL 読み込みに関する脆弱性</a></li>
+  </ul>
+
+  <h2>謝辞</h2>
+  <p>
+    脆弱性発見者の 橘総合研究所 英利 雅美 様、およびご協力いただいた IPA, JPCERT/CC の方々に深く感謝申し上げます。
+  </p>
+
+  <h2>更新履歴</h2>
+  <ul>
+    <li>2017-05-31 脆弱性情報公開</li>
+    <li>2017-06-01 JVN 脆弱性レポートへのリンクを追加</li>
+  </ul>
+
+  <h2>連絡先</h2>
+  <p>メール: ttssh2-<span class="nospam">nospam-</span>security<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me</p>
+</body>
+</html>

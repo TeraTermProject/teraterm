@@ -1,0 +1,188 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>SSL Library release timeline</title>
+
+  <style>
+    body, html {
+      font-family: arial, sans-serif;
+      font-size: 11pt;
+    }
+  </style>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vis/4.18.1/vis.js"></script>
+  <link href="//cdnjs.cloudflare.com/ajax/libs/vis/4.18.1/vis.min.css" rel="stylesheet" type="text/css" />
+  
+</head>
+<body>
+
+<div id="visualization"></div>
+
+<script>
+  var items = new vis.DataSet([
+    {id: 1, content: '0.9.7d', start: '2004-3-17', group: 1},
+    {id: 2, content: '0.9.7e', start: '2004-10-25', group: 1},
+    {id: 3, content: '0.9.7f', start: '2005-3-22', group: 1},
+    {id: 4, content: '0.9.7g', start: '2005-4-11', group: 1},
+    {id: 5, content: '0.9.7h', start: '2005-10-11', group: 1},
+    {id: 6, content: '0.9.7i', start: '2005-10-15', group: 1},
+    {id: 7, content: '0.9.7j', start: '2006-5-4', group: 1},
+    {id: 8, content: '0.9.7k', start: '2006-9-5', group: 1},
+    {id: 9, content: '0.9.7l', start: '2006-9-28', group: 1},
+    {id: 10, content: '0.9.7m', start: '2007-2-23', group: 1},
+    {id: 11, content: '0.9.8', start: '2005-6-5', group: 2},
+    {id: 12, content: '0.9.8a', start: '2005-10-11', group: 2},
+    {id: 13, content: '0.9.8b', start: '2006-5-4', group: 2},
+    {id: 14, content: '0.9.8c', start: '2006-9-5', group: 2},
+    {id: 15, content: '0.9.8d', start: '2006-9-28', group: 2},
+    {id: 16, content: '0.9.8e', start: '2007-2-23', group: 2},
+    {id: 17, content: '0.9.8f', start: '2007-10-11', group: 2},
+    {id: 18, content: '0.9.8g', start: '2007-10-19', group: 2},
+    {id: 19, content: '0.9.8h', start: '2008-5-28', group: 2},
+    {id: 20, content: '0.9.8i', start: '2008-9-19', group: 2},
+    {id: 21, content: '0.9.8j', start: '2009-1-7', group: 2},
+    {id: 22, content: '0.9.8k', start: '2009-5-25', group: 2},
+    {id: 23, content: '0.9.8m', start: '2010-2-25', group: 2},
+    {id: 24, content: '0.9.8n', start: '2010-5-24', group: 2},
+    {id: 25, content: '0.9.8o', start: '2010-6-1', group: 2},
+    {id: 26, content: '0.9.8p', start: '2010-11-16', group: 2},
+    {id: 27, content: '0.9.8q', start: '2010-12-1', group: 2},
+    {id: 28, content: '0.9.8r', start: '2011-2-8', group: 2},
+    {id: 29, content: '0.9.8s', start: '2012-1-4', group: 2},
+    {id: 30, content: '0.9.8t', start: '2012-1-18', group: 2},
+    {id: 31, content: '0.9.8u', start: '2012-3-12', group: 2},
+    {id: 32, content: '0.9.8v', start: '2012-4-19', group: 2},
+    {id: 33, content: '0.9.8w', start: '2012-4-24', group: 2},
+    {id: 34, content: '0.9.8x', start: '2012-5-10', group: 2},
+    {id: 35, content: '0.9.8y', start: '2013-2-5', group: 2},
+    {id: 36, content: '0.9.8za', start: '2014-6-5', group: 2},
+    {id: 37, content: '0.9.8zb', start: '2014-8-6', group: 2},
+    {id: 38, content: '0.9.8zc', start: '2014-10-15', group: 2},
+    {id: 39, content: '0.9.8zd', start: '2015-1-8', group: 2},
+    {id: 40, content: '0.9.8ze', start: '2015-1-15', group: 2},
+    {id: 41, content: '0.9.8zf', start: '2015-5-19', group: 2},
+    {id: 42, content: '0.9.8zg', start: '2015-6-11', group: 2},
+    {id: 43, content: '0.9.8zh', start: '2015-12-3', group: 2},
+    {id: 44, content: '1.0.0', start: '2010-5-29', group: 3},
+    {id: 45, content: '1.0.0a', start: '2010-6-1', group: 3},
+    {id: 46, content: '1.0.0b', start: '2010-11-16', group: 3},
+    {id: 47, content: '1.0.0c', start: '2010-12-1', group: 3},
+    {id: 48, content: '1.0.0d', start: '2011-2-8', group: 3},
+    {id: 49, content: '1.0.0e', start: '2011-9-6', group: 3},
+    {id: 50, content: '1.0.0f', start: '2012-1-4', group: 3},
+    {id: 51, content: '1.0.0g', start: '2012-1-18', group: 3},
+    {id: 52, content: '1.0.0h', start: '2012-3-12', group: 3},
+    {id: 53, content: '1.0.0i', start: '2012-4-19', group: 3},
+    {id: 54, content: '1.0.0j', start: '2012-5-10', group: 3},
+    {id: 55, content: '1.0.0k', start: '2013-2-5', group: 3},
+    {id: 56, content: '1.0.0l', start: '2014-1-6', group: 3},
+    {id: 57, content: '1.0.0m', start: '2014-6-5', group: 3},
+    {id: 58, content: '1.0.0n', start: '2014-8-6', group: 3},
+    {id: 59, content: '1.0.0o', start: '2014-10-15', group: 3},
+    {id: 60, content: '1.0.0p', start: '2015-1-8', group: 3},
+    {id: 61, content: '1.0.0q', start: '2015-1-15', group: 3},
+    {id: 62, content: '1.0.0r', start: '2015-5-19', group: 3},
+    {id: 63, content: '1.0.0s', start: '2015-6-11', group: 3},
+    {id: 64, content: '1.0.0t', start: '2015-12-3', group: 3},
+    {id: 65, content: '1.0.1', start: '2012-3-14', group: 4},
+    {id: 66, content: '1.0.1a', start: '2012-4-19', group: 4},
+    {id: 67, content: '1.0.1b', start: '2012-4-26', group: 4},
+    {id: 68, content: '1.0.1c', start: '2012-5-10', group: 4},
+    {id: 69, content: '1.0.1d', start: '2013-2-5', group: 4},
+    {id: 70, content: '1.0.1e', start: '2013-2-11', group: 4},
+    {id: 71, content: '1.0.1f', start: '2014-1-6', group: 4},
+    {id: 72, content: '1.0.1g', start: '2014-4-7', group: 4},
+    {id: 73, content: '1.0.1h', start: '2014-6-5', group: 4},
+    {id: 74, content: '1.0.1i', start: '2014-8-6', group: 4},
+    {id: 75, content: '1.0.1j', start: '2014-10-15', group: 4},
+    {id: 76, content: '1.0.1k', start: '2015-1-8', group: 4},
+    {id: 77, content: '1.0.1l', start: '2015-1-15', group: 4},
+    {id: 78, content: '1.0.1m', start: '2015-5-19', group: 4},
+    {id: 79, content: '1.0.1n', start: '2015-6-11', group: 4},
+    {id: 80, content: '1.0.1o', start: '2015-6-12', group: 4},
+    {id: 81, content: '1.0.1p', start: '2015-7-9', group: 4},
+    {id: 82, content: '1.0.1q', start: '2015-12-3', group: 4},
+    {id: 83, content: '1.0.1r', start: '2016-1-28', group: 4},
+    {id: 84, content: '1.0.1s', start: '2016-3-1', group: 4},
+    {id: 85, content: '1.0.1t', start: '2016-5-3', group: 4},
+    {id: 86, content: '1.0.1u', start: '2016-9-22', group: 4},
+    {id: 87, content: '1.0.2', start: '2015-1-22', group: 5},
+    {id: 88, content: '1.0.2a', start: '2015-5-19', group: 5},
+    {id: 89, content: '1.0.2b', start: '2015-6-11', group: 5},
+    {id: 90, content: '1.0.2c', start: '2015-6-12', group: 5},
+    {id: 91, content: '1.0.2d', start: '2015-7-9', group: 5},
+    {id: 92, content: '1.0.2e', start: '2015-12-3', group: 5},
+    {id: 93, content: '1.0.2f', start: '2016-1-28', group: 5},
+    {id: 94, content: '1.0.2g', start: '2016-3-1', group: 5},
+    {id: 95, content: '1.0.2h', start: '2016-5-3', group: 5},
+    {id: 96, content: '1.0.2i', start: '2016-9-22', group: 5},
+    {id: 97, content: '1.0.2j', start: '2016-9-26', group: 5},
+    {id: 98, content: '1.0.2k', start: '2017-1-26', group: 5},
+    {id: 99, content: '1.1.0', start: '2016-8-25', group: 6},
+    {id: 100, content: '1.1.0a', start: '2016-9-22', group: 6},
+    {id: 101, content: '1.1.0b', start: '2016-9-26', group: 6},
+    {id: 102, content: '1.1.0c', start: '2016-11-10', group: 6},
+    {id: 103, content: '1.1.0d', start: '2017-1-26', group: 6},
+    {id: 104, content: '2.1.4', start: '2015-5-3', group: 7},
+    {id: 105, content: '2.1.5', start: '2015-5-16', group: 7},
+    {id: 106, content: '2.1.6', start: '2015-5-19', group: 7},
+    {id: 107, content: '2.1.7', start: '2015-6-11', group: 7},
+    {id: 108, content: '2.1.8', start: '2015-10-15', group: 7},
+    {id: 109, content: '2.1.9', start: '2015-12-7', group: 7},
+    {id: 110, content: '2.1.10', start: '2016-1-28', group: 7},
+    {id: 111, content: '2.2.0', start: '2015-6-11', group: 8},
+    {id: 112, content: '2.2.1', start: '2015-7-8', group: 8},
+    {id: 113, content: '2.2.2', start: '2015-8-5', group: 8},
+    {id: 114, content: '2.2.3', start: '2015-8-29', group: 8},
+    {id: 115, content: '2.2.4', start: '2015-10-15', group: 8},
+    {id: 116, content: '2.2.5', start: '2015-12-7', group: 8},
+    {id: 117, content: '2.2.6', start: '2016-1-28', group: 8},
+    {id: 118, content: '2.2.8', start: '2016-5-31', group: 8},
+    {id: 119, content: '2.2.8', start: '2015-5-3', group: 8},
+    {id: 120, content: '2.2.9', start: '2016-6-9', group: 8},
+    {id: 121, content: '2.3.0', start: '2015-9-23', group: 9},
+    {id: 122, content: '2.3.1', start: '2015-11-2', group: 9},
+    {id: 123, content: '2.3.2', start: '2016-1-28', group: 9},
+    {id: 124, content: '2.3.3', start: '2016-3-22', group: 9},
+    {id: 125, content: '2.3.4', start: '2015-5-3', group: 9},
+    {id: 126, content: '2.3.5', start: '2016-5-31', group: 9},
+    {id: 127, content: '2.3.6', start: '2016-6-9', group: 9},
+    {id: 128, content: '2.3.7', start: '2016-8-1', group: 9},
+    {id: 129, content: '2.3.8', start: '2016-10-27', group: 9},
+    {id: 130, content: '2.3.9', start: '2016-11-6', group: 9},
+    {id: 131, content: '2.3.10', start: '2017-2-1', group: 9},
+    {id: 132, content: '2.4.1', start: '2016-6-9', group: 10},
+    {id: 133, content: '2.4.2', start: '2016-8-1', group: 10},
+    {id: 134, content: '2.4.3', start: '2016-10-27', group: 10},
+    {id: 135, content: '2.4.4', start: '2016-11-6', group: 10},
+    {id: 136, content: '2.4.5', start: '2017-2-1', group: 10},
+    {id: 137, content: '2.5.0', start: '2016-10-27', group: 11},
+    {id: 138, content: '2.5.1', start: '2017-2-1', group: 11},
+  ]);
+
+  var groups = new vis.DataSet([
+    {id: 1, content: 'OpenSSL 0.9.7', value: 1},
+    {id: 2, content: 'OpenSSL 0.9.8', value: 2},
+    {id: 3, content: 'OpenSSL 1.0.0', value: 3},
+    {id: 4, content: 'OpenSSL 1.0.1', value: 4},
+    {id: 5, content: 'OpenSSL 1.0.2', value: 5},
+    {id: 6, content: 'OpenSSL 1.1.0', value: 6},
+    {id: 7, content: 'LibreSSL 2.1.0', value: 7},
+    {id: 8, content: 'LibreSSL 2.2.0', value: 8},
+    {id: 9, content: 'LibreSSL 2.3.0', value: 9},
+    {id: 10, content: 'LibreSSL 2.4.0', value: 10},
+    {id: 11, content: 'LibreSSL 2.5.0', value: 11},
+  ]);
+
+  var container = document.getElementById('visualization');
+  var options = {
+    groupOrder: function (a, b) {
+      return a.value - b.value;
+    }
+  };
+
+  var timeline = new vis.Timeline(container, items, groups, options);
+
+</script>
+</body>
+</html>

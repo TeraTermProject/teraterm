@@ -1,0 +1,494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>color picker for Tera Term</title>
+<!--
+	<link rel="stylesheet" type="text/css" href="jquery-ui-1.8.12.custom.css" />
+	<script type="text/javascript" src="jquery-1.5.2.min.js"></script>
+	<script type="text/javascript" src="jquery-ui-1.8.12.custom.min.js"></script>
+-->
+	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/base/jquery-ui.css" />
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="color.css" />
+	<script type="text/javascript" src="color.js"></script>
+	<script language="JavaScript" type="text/javascript"> 
+<!--
+var current_sample;
+
+$(document).ready(function(){
+	// click radio button
+	$('.radio').bind('click', function(){
+		current_sample = $("input.radio[name=btn]:checked").val();
+		
+		if (current_sample == 'BG') {
+			affect_to_inputbox(rgbTo16($('#'+current_sample).css('background-color')));
+		}
+		else {
+			affect_to_inputbox(rgbTo16($('#'+current_sample).css('color')));
+		}
+		affect_to_slider();
+	});
+	
+	// onblur input value
+	$('.RGBvalue').bind('blur', function(){
+		var val = parseInt($(this).val());
+		if (isNaN(val)) {
+			val = 0;
+		}
+		else if (val < 0) {
+			val = 0;
+		}
+		else if (val > 255) {
+			val = 255;
+		}
+		$(this).val(val);
+		
+		affect_to_slider();
+		affect_to_sample(current_sample);
+		affect_to_textbox();
+	});
+	
+	// create sliders
+	$('#sliderR,#sliderG,#sliderB').slider({
+		animate:true,
+		range:'min',
+		min:0,
+		max:255
+	});
+	$('#sliderR').slider({
+		slide:function(event,ui){
+			$('#R').val(ui.value);
+			affect_to_sample(current_sample);
+			affect_to_textbox();
+		}
+	});
+	$('#sliderG').slider({
+		slide:function(event,ui){
+			$('#G').val(ui.value);
+			affect_to_sample(current_sample);
+			affect_to_textbox();
+		}
+	});
+	$('#sliderB').slider({
+		slide:function(event,ui){
+			$('#B').val(ui.value);
+			affect_to_sample(current_sample);
+			affect_to_textbox();
+		}
+	});
+	
+	// click color chart
+	$('.safe216').bind('click', function(){
+		affect_to_inputbox($(this).text());
+		affect_to_slider();
+		affect_to_sample(current_sample);
+		affect_to_textbox();
+	});
+	
+	// set Preset
+	for (i=0; i<Preset.length; i++) {
+		var html;
+		html  = '<input type="radio" class="preset" name="preset" id="preset'+i+'" value="'+i+'" ';
+		if (i == 0) {
+			html += 'checked="checked" ';
+		}
+		html += '/><label for="preset'+i+'">'+Preset[i]['name']+'</label><br />';
+		$('#preset').append(html);
+	}
+	$('.preset').bind('click', function(){
+		affect_from_preset(Preset[this.value]);
+		affect_to_inputbox(Preset[this.value][current_sample]);
+		affect_to_slider();
+		affect_to_textbox();
+	});
+	
+	// set default
+	affect_from_preset(Preset[0]);
+	current_sample = 'Normal';
+	$("input.radio[name=btn]").val([current_sample]);
+	affect_to_inputbox(Preset[0][current_sample]);
+	affect_to_slider();
+	affect_to_textbox();
+});
+// -->
+	</script>
+</head>
+
+<body>
+
+<div class="Box cl">
+
+<div id="sampleBox">
+<div class="head">Sample</div>
+<div>Click to changing sample.</div>
+<br />
+<div id="BG">
+<input type="radio" id="btnBG" name="btn" class="radio" value="BG" /><label for="btnBG">(BG)</label>
+<div id="Normal"><input type="radio" id="btnNormal" name="btn" class="radio" value="Normal" /><label for="btnNormal">Normal color sample</label></div>
+<div id="Bold"><input type="radio" id="btnBold" name="btn" class="radio" value="Bold" /><label for="btnBold">Bold color sample</label></div>
+<div id="Blink"><input type="radio" id="btnBlink" name="btn" class="radio" value="Blink" /><label for="btnBlink">Blink color sample</label></div>
+<div id="Reverse"><input type="radio" id="btnReverse" name="btn" class="radio" value="Reverse" /><label for="btnReverse">Reverse color sample</label></div>
+<div id="URL"><input type="radio" id="btnURL" name="btn" class="radio" value="URL" /><label for="btnURL">URL color sample</label></div>
+<div id="ANSI0"><input type="radio" id="btnANSI0" name="btn" class="radio" value="ANSI0" /><label for="btnANSI0">ANSI 0 color sample</label></div>
+<div id="ANSI1"><input type="radio" id="btnANSI1" name="btn" class="radio" value="ANSI1" /><label for="btnANSI1">ANSI 1 color sample</label></div>
+<div id="ANSI2"><input type="radio" id="btnANSI2" name="btn" class="radio" value="ANSI2" /><label for="btnANSI2">ANSI 2 color sample</label></div>
+<div id="ANSI3"><input type="radio" id="btnANSI3" name="btn" class="radio" value="ANSI3" /><label for="btnANSI3">ANSI 3 color sample</label></div>
+<div id="ANSI4"><input type="radio" id="btnANSI4" name="btn" class="radio" value="ANSI4" /><label for="btnANSI4">ANSI 4 color sample</label></div>
+<div id="ANSI5"><input type="radio" id="btnANSI5" name="btn" class="radio" value="ANSI5" /><label for="btnANSI5">ANSI 5 color sample</label></div>
+<div id="ANSI6"><input type="radio" id="btnANSI6" name="btn" class="radio" value="ANSI6" /><label for="btnANSI6">ANSI 6 color sample</label></div>
+<div id="ANSI7"><input type="radio" id="btnANSI7" name="btn" class="radio" value="ANSI7" /><label for="btnANSI7">ANSI 7 color sample</label></div>
+<div id="ANSI8"><input type="radio" id="btnANSI8" name="btn" class="radio" value="ANSI8" /><label for="btnANSI8">ANSI 8 color sample</label></div>
+<div id="ANSI9"><input type="radio" id="btnANSI9" name="btn" class="radio" value="ANSI9" /><label for="btnANSI9">ANSI 9 color sample</label></div>
+<div id="ANSI10"><input type="radio" id="btnANSI10" name="btn" class="radio" value="ANSI10" /><label for="btnANSI10">ANSI 10 color sample</label></div>
+<div id="ANSI11"><input type="radio" id="btnANSI11" name="btn" class="radio" value="ANSI11" /><label for="btnANSI11">ANSI 11 color sample</label></div>
+<div id="ANSI12"><input type="radio" id="btnANSI12" name="btn" class="radio" value="ANSI12" /><label for="btnANSI12">ANSI 12 color sample</label></div>
+<div id="ANSI13"><input type="radio" id="btnANSI13" name="btn" class="radio" value="ANSI13" /><label for="btnANSI13">ANSI 13 color sample</label></div>
+<div id="ANSI14"><input type="radio" id="btnANSI14" name="btn" class="radio" value="ANSI14" /><label for="btnANSI14">ANSI 14 color sample</label></div>
+<div id="ANSI15"><input type="radio" id="btnANSI15" name="btn" class="radio" value="ANSI15" /><label for="btnANSI15">ANSI 15 color sample</label></div>
+</div>
+</div>
+
+
+<div id="pickerBox">
+<div class="head">Color Picker</div>
+<br />
+
+<table>
+	<tr>
+		<td>R</td>
+		<td><input type="text" class="RGBvalue" id="R" /></td>
+		<td><div id="sliderR" class="slider"></div></td>
+	</tr>
+	<tr>
+		<td>G</td>
+		<td><input type="text" class="RGBvalue" id="G" /></td>
+		<td><div id="sliderG" class="slider"></div></td>
+	</tr>
+	<tr>
+		<td>B</td>
+		<td><input type="text" class="RGBvalue" id="B" /></td>
+		<td><div id="sliderB" class="slider"></div></td>
+	</tr>
+</table>
+<br />
+
+<div id="safe216">
+<table>
+	<tr>
+		<td class="safe216" style="background-color:#FFFFFF;">#FFFFFF</td>
+		<td class="safe216" style="background-color:#FFFFCC;">#FFFFCC</td>
+		<td class="safe216" style="background-color:#FFFF99;">#FFFF99</td>
+		<td class="safe216" style="background-color:#FFFF66;">#FFFF66</td>
+		<td class="safe216" style="background-color:#FFFF33;">#FFFF33</td>
+		<td class="safe216" style="background-color:#FFFF00;">#FFFF00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#FFCCFF;">#FFCCFF</td>
+		<td class="safe216" style="background-color:#FFCCCC;">#FFCCCC</td>
+		<td class="safe216" style="background-color:#FFCC99;">#FFCC99</td>
+		<td class="safe216" style="background-color:#FFCC66;">#FFCC66</td>
+		<td class="safe216" style="background-color:#FFCC33;">#FFCC33</td>
+		<td class="safe216" style="background-color:#FFCC00;">#FFCC00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#FF99FF;">#FF99FF</td>
+		<td class="safe216" style="background-color:#FF99CC;">#FF99CC</td>
+		<td class="safe216" style="background-color:#FF9999;">#FF9999</td>
+		<td class="safe216" style="background-color:#FF9966;">#FF9966</td>
+		<td class="safe216" style="background-color:#FF9933;">#FF9933</td>
+		<td class="safe216" style="background-color:#FF9900;">#FF9900</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#FF66FF;">#FF66FF</td>
+		<td class="safe216 rev" style="background-color:#FF66CC;">#FF66CC</td>
+		<td class="safe216 rev" style="background-color:#FF6699;">#FF6699</td>
+		<td class="safe216 rev" style="background-color:#FF6666;">#FF6666</td>
+		<td class="safe216 rev" style="background-color:#FF6633;">#FF6633</td>
+		<td class="safe216 rev" style="background-color:#FF6600;">#FF6600</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#FF33FF;">#FF33FF</td>
+		<td class="safe216 rev" style="background-color:#FF33CC;">#FF33CC</td>
+		<td class="safe216 rev" style="background-color:#FF3399;">#FF3399</td>
+		<td class="safe216 rev" style="background-color:#FF3366;">#FF3366</td>
+		<td class="safe216 rev" style="background-color:#FF3333;">#FF3333</td>
+		<td class="safe216 rev" style="background-color:#FF3300;">#FF3300</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#FF00FF;">#FF00FF</td>
+		<td class="safe216 rev" style="background-color:#FF00CC;">#FF00CC</td>
+		<td class="safe216 rev" style="background-color:#FF0099;">#FF0099</td>
+		<td class="safe216 rev" style="background-color:#FF0066;">#FF0066</td>
+		<td class="safe216 rev" style="background-color:#FF0033;">#FF0033</td>
+		<td class="safe216 rev" style="background-color:#FF0000;">#FF0000</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#CCFFFF;">#CCFFFF</td>
+		<td class="safe216" style="background-color:#CCFFCC;">#CCFFCC</td>
+		<td class="safe216" style="background-color:#CCFF99;">#CCFF99</td>
+		<td class="safe216" style="background-color:#CCFF66;">#CCFF66</td>
+		<td class="safe216" style="background-color:#CCFF33;">#CCFF33</td>
+		<td class="safe216" style="background-color:#CCFF00;">#CCFF00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#CCCCFF;">#CCCCFF</td>
+		<td class="safe216" style="background-color:#CCCCCC;">#CCCCCC</td>
+		<td class="safe216" style="background-color:#CCCC99;">#CCCC99</td>
+		<td class="safe216" style="background-color:#CCCC66;">#CCCC66</td>
+		<td class="safe216" style="background-color:#CCCC33;">#CCCC33</td>
+		<td class="safe216" style="background-color:#CCCC00;">#CCCC00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#CC99FF;">#CC99FF</td>
+		<td class="safe216" style="background-color:#CC99CC;">#CC99CC</td>
+		<td class="safe216" style="background-color:#CC9999;">#CC9999</td>
+		<td class="safe216" style="background-color:#CC9966;">#CC9966</td>
+		<td class="safe216" style="background-color:#CC9933;">#CC9933</td>
+		<td class="safe216" style="background-color:#CC9900;">#CC9900</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#CC66FF;">#CC66FF</td>
+		<td class="safe216 rev" style="background-color:#CC66CC;">#CC66CC</td>
+		<td class="safe216 rev" style="background-color:#CC6699;">#CC6699</td>
+		<td class="safe216 rev" style="background-color:#CC6666;">#CC6666</td>
+		<td class="safe216 rev" style="background-color:#CC6633;">#CC6633</td>
+		<td class="safe216 rev" style="background-color:#CC6600;">#CC6600</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#CC33FF;">#CC33FF</td>
+		<td class="safe216 rev" style="background-color:#CC33CC;">#CC33CC</td>
+		<td class="safe216 rev" style="background-color:#CC3399;">#CC3399</td>
+		<td class="safe216 rev" style="background-color:#CC3366;">#CC3366</td>
+		<td class="safe216 rev" style="background-color:#CC3333;">#CC3333</td>
+		<td class="safe216 rev" style="background-color:#CC3300;">#CC3300</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#CC00FF;">#CC00FF</td>
+		<td class="safe216 rev" style="background-color:#CC00CC;">#CC00CC</td>
+		<td class="safe216 rev" style="background-color:#CC0099;">#CC0099</td>
+		<td class="safe216 rev" style="background-color:#CC0066;">#CC0066</td>
+		<td class="safe216 rev" style="background-color:#CC0033;">#CC0033</td>
+		<td class="safe216 rev" style="background-color:#CC0000;">#CC0000</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#99FFFF;">#99FFFF</td>
+		<td class="safe216" style="background-color:#99FFCC;">#99FFCC</td>
+		<td class="safe216" style="background-color:#99FF99;">#99FF99</td>
+		<td class="safe216" style="background-color:#99FF66;">#99FF66</td>
+		<td class="safe216" style="background-color:#99FF33;">#99FF33</td>
+		<td class="safe216" style="background-color:#99FF00;">#99FF00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#99CCFF;">#99CCFF</td>
+		<td class="safe216" style="background-color:#99CCCC;">#99CCCC</td>
+		<td class="safe216" style="background-color:#99CC99;">#99CC99</td>
+		<td class="safe216" style="background-color:#99CC66;">#99CC66</td>
+		<td class="safe216" style="background-color:#99CC33;">#99CC33</td>
+		<td class="safe216" style="background-color:#99CC00;">#99CC00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#9999FF;">#9999FF</td>
+		<td class="safe216" style="background-color:#9999CC;">#9999CC</td>
+		<td class="safe216" style="background-color:#999999;">#999999</td>
+		<td class="safe216" style="background-color:#999966;">#999966</td>
+		<td class="safe216" style="background-color:#999933;">#999933</td>
+		<td class="safe216" style="background-color:#999900;">#999900</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#9966FF;">#9966FF</td>
+		<td class="safe216 rev" style="background-color:#9966CC;">#9966CC</td>
+		<td class="safe216 rev" style="background-color:#996699;">#996699</td>
+		<td class="safe216 rev" style="background-color:#996666;">#996666</td>
+		<td class="safe216 rev" style="background-color:#996633;">#996633</td>
+		<td class="safe216 rev" style="background-color:#996600;">#996600</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#9933FF;">#9933FF</td>
+		<td class="safe216 rev" style="background-color:#9933CC;">#9933CC</td>
+		<td class="safe216 rev" style="background-color:#993399;">#993399</td>
+		<td class="safe216 rev" style="background-color:#993366;">#993366</td>
+		<td class="safe216 rev" style="background-color:#993333;">#993333</td>
+		<td class="safe216 rev" style="background-color:#993300;">#993300</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#9900FF;">#9900FF</td>
+		<td class="safe216 rev" style="background-color:#9900CC;">#9900CC</td>
+		<td class="safe216 rev" style="background-color:#990099;">#990099</td>
+		<td class="safe216 rev" style="background-color:#990066;">#990066</td>
+		<td class="safe216 rev" style="background-color:#990033;">#990033</td>
+		<td class="safe216 rev" style="background-color:#990000;">#990000</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#66FFFF;">#66FFFF</td>
+		<td class="safe216" style="background-color:#66FFCC;">#66FFCC</td>
+		<td class="safe216" style="background-color:#66FF99;">#66FF99</td>
+		<td class="safe216" style="background-color:#66FF66;">#66FF66</td>
+		<td class="safe216" style="background-color:#66FF33;">#66FF33</td>
+		<td class="safe216" style="background-color:#66FF00;">#66FF00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#66CCFF;">#66CCFF</td>
+		<td class="safe216" style="background-color:#66CCCC;">#66CCCC</td>
+		<td class="safe216" style="background-color:#66CC99;">#66CC99</td>
+		<td class="safe216" style="background-color:#66CC66;">#66CC66</td>
+		<td class="safe216" style="background-color:#66CC33;">#66CC33</td>
+		<td class="safe216" style="background-color:#66CC00;">#66CC00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#6699FF;">#6699FF</td>
+		<td class="safe216" style="background-color:#6699CC;">#6699CC</td>
+		<td class="safe216" style="background-color:#669999;">#669999</td>
+		<td class="safe216" style="background-color:#669966;">#669966</td>
+		<td class="safe216" style="background-color:#669933;">#669933</td>
+		<td class="safe216" style="background-color:#669900;">#669900</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#6666FF;">#6666FF</td>
+		<td class="safe216 rev" style="background-color:#6666CC;">#6666CC</td>
+		<td class="safe216 rev" style="background-color:#666699;">#666699</td>
+		<td class="safe216 rev" style="background-color:#666666;">#666666</td>
+		<td class="safe216 rev" style="background-color:#666633;">#666633</td>
+		<td class="safe216 rev" style="background-color:#666600;">#666600</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#6633FF;">#6633FF</td>
+		<td class="safe216 rev" style="background-color:#6633CC;">#6633CC</td>
+		<td class="safe216 rev" style="background-color:#663399;">#663399</td>
+		<td class="safe216 rev" style="background-color:#663366;">#663366</td>
+		<td class="safe216 rev" style="background-color:#663333;">#663333</td>
+		<td class="safe216 rev" style="background-color:#663300;">#663300</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#6600FF;">#6600FF</td>
+		<td class="safe216 rev" style="background-color:#6600CC;">#6600CC</td>
+		<td class="safe216 rev" style="background-color:#660099;">#660099</td>
+		<td class="safe216 rev" style="background-color:#660066;">#660066</td>
+		<td class="safe216 rev" style="background-color:#660033;">#660033</td>
+		<td class="safe216 rev" style="background-color:#660000;">#660000</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#33FFFF;">#33FFFF</td>
+		<td class="safe216" style="background-color:#33FFCC;">#33FFCC</td>
+		<td class="safe216" style="background-color:#33FF99;">#33FF99</td>
+		<td class="safe216" style="background-color:#33FF66;">#33FF66</td>
+		<td class="safe216" style="background-color:#33FF33;">#33FF33</td>
+		<td class="safe216" style="background-color:#33FF00;">#33FF00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#33CCFF;">#33CCFF</td>
+		<td class="safe216" style="background-color:#33CCCC;">#33CCCC</td>
+		<td class="safe216" style="background-color:#33CC99;">#33CC99</td>
+		<td class="safe216" style="background-color:#33CC66;">#33CC66</td>
+		<td class="safe216" style="background-color:#33CC33;">#33CC33</td>
+		<td class="safe216" style="background-color:#33CC00;">#33CC00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#3399FF;">#3399FF</td>
+		<td class="safe216" style="background-color:#3399CC;">#3399CC</td>
+		<td class="safe216" style="background-color:#339999;">#339999</td>
+		<td class="safe216" style="background-color:#339966;">#339966</td>
+		<td class="safe216" style="background-color:#339933;">#339933</td>
+		<td class="safe216" style="background-color:#339900;">#339900</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#3366FF;">#3366FF</td>
+		<td class="safe216 rev" style="background-color:#3366CC;">#3366CC</td>
+		<td class="safe216 rev" style="background-color:#336699;">#336699</td>
+		<td class="safe216 rev" style="background-color:#336666;">#336666</td>
+		<td class="safe216 rev" style="background-color:#336633;">#336633</td>
+		<td class="safe216 rev" style="background-color:#336600;">#336600</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#3333FF;">#3333FF</td>
+		<td class="safe216 rev" style="background-color:#3333CC;">#3333CC</td>
+		<td class="safe216 rev" style="background-color:#333399;">#333399</td>
+		<td class="safe216 rev" style="background-color:#333366;">#333366</td>
+		<td class="safe216 rev" style="background-color:#333333;">#333333</td>
+		<td class="safe216 rev" style="background-color:#333300;">#333300</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#3300FF;">#3300FF</td>
+		<td class="safe216 rev" style="background-color:#3300CC;">#3300CC</td>
+		<td class="safe216 rev" style="background-color:#330099;">#330099</td>
+		<td class="safe216 rev" style="background-color:#330066;">#330066</td>
+		<td class="safe216 rev" style="background-color:#330033;">#330033</td>
+		<td class="safe216 rev" style="background-color:#330000;">#330000</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#00FFFF;">#00FFFF</td>
+		<td class="safe216" style="background-color:#00FFCC;">#00FFCC</td>
+		<td class="safe216" style="background-color:#00FF99;">#00FF99</td>
+		<td class="safe216" style="background-color:#00FF66;">#00FF66</td>
+		<td class="safe216" style="background-color:#00FF33;">#00FF33</td>
+		<td class="safe216" style="background-color:#00FF00;">#00FF00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#00CCFF;">#00CCFF</td>
+		<td class="safe216" style="background-color:#00CCCC;">#00CCCC</td>
+		<td class="safe216" style="background-color:#00CC99;">#00CC99</td>
+		<td class="safe216" style="background-color:#00CC66;">#00CC66</td>
+		<td class="safe216" style="background-color:#00CC33;">#00CC33</td>
+		<td class="safe216" style="background-color:#00CC00;">#00CC00</td>
+	</tr>
+	<tr>
+		<td class="safe216" style="background-color:#0099FF;">#0099FF</td>
+		<td class="safe216" style="background-color:#0099CC;">#0099CC</td>
+		<td class="safe216" style="background-color:#009999;">#009999</td>
+		<td class="safe216" style="background-color:#009966;">#009966</td>
+		<td class="safe216" style="background-color:#009933;">#009933</td>
+		<td class="safe216" style="background-color:#009900;">#009900</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#0066FF;">#0066FF</td>
+		<td class="safe216 rev" style="background-color:#0066CC;">#0066CC</td>
+		<td class="safe216 rev" style="background-color:#006699;">#006699</td>
+		<td class="safe216 rev" style="background-color:#006666;">#006666</td>
+		<td class="safe216 rev" style="background-color:#006633;">#006633</td>
+		<td class="safe216 rev" style="background-color:#006600;">#006600</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#0033FF;">#0033FF</td>
+		<td class="safe216 rev" style="background-color:#0033CC;">#0033CC</td>
+		<td class="safe216 rev" style="background-color:#003399;">#003399</td>
+		<td class="safe216 rev" style="background-color:#003366;">#003366</td>
+		<td class="safe216 rev" style="background-color:#003333;">#003333</td>
+		<td class="safe216 rev" style="background-color:#003300;">#003300</td>
+	</tr>
+	<tr>
+		<td class="safe216 rev" style="background-color:#0000FF;">#0000FF</td>
+		<td class="safe216 rev" style="background-color:#0000CC;">#0000CC</td>
+		<td class="safe216 rev" style="background-color:#000099;">#000099</td>
+		<td class="safe216 rev" style="background-color:#000066;">#000066</td>
+		<td class="safe216 rev" style="background-color:#000033;">#000033</td>
+		<td class="safe216 rev" style="background-color:#000000;">#000000</td>
+	</tr>
+</table>
+</div><!--id="safe216"-->
+</div><!--id="pickerBox"-->
+
+</div><!--class="Box"-->
+
+
+
+<div class="Box">
+
+<div id="presetBox">
+<div class="head">preset</div>
+<br />
+<div id="preset"></div>
+</div><!--id="presetBox"-->
+
+<div id="iniBox">
+<div class="head">ini</div>
+<br />
+<textarea id="ini" readonly="readonly"></textarea>
+</div><!--id="iniBox"-->
+
+</div><!--class="Box"-->
+
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+#IndexIgnore .??* *~ *# HEADER* README* RCS CVS *,v *,t
+IndexIgnore .??* *~ *# HEADER* RCS CVS *,v *,t
+
+IndexOptions Charset=UTF-8 +SuppressHTMLPreamble

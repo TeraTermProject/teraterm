@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>History of Tera Term & TTSSH icon</title>
+<script src="//code.jquery.com/jquery-2.2.4.js"></script>
+<script src="//code.highcharts.com/stock/highstock.js"></script>
+
+<script type="text/javascript">
+<!--
+$(function () {
+    $('#container').highcharts({
+        title: 'Tera Term & TTSSH icon history',
+        credits: false,
+        chart: {
+            height: 350,
+            marginLeft: 50,
+            marginRight: 50,
+        },
+        yAxis: {
+            title: {
+            	  text: null
+            }
+        },
+        xAxis: {
+            type: 'datetime',
+            plotBands: [{
+                color: '#FCFFC5',
+                from: Date.UTC(1994, 2-1, 24),
+                to: Date.UTC(1998, 3-1, 10),
+                label: {
+                    text: 'T. Teranishi',
+                    style: {
+                        color: '#999999'
+                    }
+                }
+            },
+            {
+                color: '#C5FCFF',
+                from: Date.UTC(2004, 3-1, 2),
+                to: Date.UTC(2016, 8-1, 31),
+                label: {
+                    text: 'Yutaka Hirata / TeraTerm Project',
+                    style: {
+                        color: '#999999'
+                    }
+                }
+            }]
+        },
+        series: [{
+            type: 'flags',
+            name: 'Tera Term',
+            color: '#333333',
+            shape: 'squarepin',
+            y: -40,
+            data: [
+                { x: Date.UTC(1994,  2-1, 24), text: 'Tera Term 0.0 (16bit)', title: '0.0', shape: 'squarepin' },
+                { x: Date.UTC(1996,  6-1,  7), text: 'Tera Term Pro 2.0 (32bit)', title: 'Pro 2.0', shape: 'squarepin' },
+                { x: Date.UTC(1998,  3-1, 10), text: 'Tera Term Pro 2.3 (latest original)', title: 'Pro 2.3', shape: 'squarepin' },
+                { x: Date.UTC(2004,  3-1,  2), text: 'Tera Term Pro 2.3 UTF-8 1.00 (restart)', title: 'Pro 2.3+UTF-8 1.00', shape: 'squarepin' },
+                { x: Date.UTC(2008,  6-1, 25), text: 'Tera Term 4.59 (remove "Pro")', title: '4.59', shape: 'squarepin' },
+            ],
+            showInLegend: false
+        },{
+            type: 'flags',
+            name: 'TTSSH',
+            color: '#333333',
+            shape: 'squarepin',
+            y: -80,
+            data: [
+                { x: Date.UTC(1998,  6-1,  6), text: 'TTSSH 1.2', title: '1.2', shape: 'circlepin' },
+                { x: Date.UTC(2001,  2-1, 18), text: 'TTSSH 1.5.4 (latest original)', title: '1.5.4', shape: 'circlepin' },
+                { x: Date.UTC(2004, 10-1, 11), text: 'TTSSH2 1.00 alpha2 (restart)', title: 'TTSSH2 1.00 alpha2', shape: 'circlepin' },
+            ],
+            showInLegend: false
+        },{
+            type: 'flags',
+            name: 'Tera Term icon',
+            color: '#333333',
+            fillColor: '#7cb5ec',
+            useHTML: true,
+            y: -160,
+            data: [
+                { x: Date.UTC(1994,  2-1, 24), text: '0.0',  title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-1.png" /><br />0.0', shape: 'squarepin' },
+                { x: Date.UTC(1998,  3-1, 10), text: '2.3',  title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-2.png" /><br />2.3', shape: 'squarepin' },
+                { x: Date.UTC(2006,  7-1, 26), text: '4.42', title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-3.png" /><br />4.42', shape: 'squarepin' },
+                { x: Date.UTC(2008,  6-1, 25), text: '4.59', title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-4.png" /><br />4.59', shape: 'squarepin' },
+                { x: Date.UTC(2016,  3-1, 31), text: '4.91', title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-5.png" /><br />4.91', shape: 'squarepin' },
+            ],
+            showInLegend: false
+        },{
+            type: 'flags',
+            name: 'TTSSH icon',
+            color: '#333333',
+            fillColor: '#7cb5ec',
+            useHTML: true,
+            y: -240,
+            data: [
+                { x: Date.UTC(1998,  6-1,  6), text: '1.2',  title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-1.png" /><br />1.2', shape: 'squarepin' },
+                { x: Date.UTC(2006,  7-1, 26), text: '2.30', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-2.png" /><br />2.30', shape: 'squarepin' },
+                { x: Date.UTC(2008,  6-1, 25), text: '2.47', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-3.png" /><br />2.47', shape: 'squarepin' },
+                { x: Date.UTC(2012, 12-1, 02), text: '2.63', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-4.png" /><br />2.63', shape: 'squarepin' },
+                { x: Date.UTC(2014,  2-1, 28), text: '2.68', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-5.png" /><br />2.68', shape: 'squarepin' },
+                { x: Date.UTC(2016,  3-1, 31), text: '2.77', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-6.png" /><br />2.77', shape: 'squarepin' },
+            ],
+            showInLegend: false
+        }]
+    });
+});
+// -->
+</script>
+
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>

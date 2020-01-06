@@ -1,0 +1,22 @@
+img {
+	border: 0px;
+	vertical-align: bottom;
+}
+
+table {
+	margin-right: auto;
+	margin-left: auto;
+}
+
+/*
+p {
+	text-indent: 1em;
+}
+*/
+
+img.atmark {
+	height: 0.9em;
+	width: 0.9em;
+	margin: 0 1px;
+	border: none 0;
+}

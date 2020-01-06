@@ -1,0 +1,10 @@
+.nospam {
+	display: none;
+}
+
+img.atmark {
+	height: 0.9em;
+	width: 0.9em;
+	margin: 0 1px;
+	border: none 0;
+}

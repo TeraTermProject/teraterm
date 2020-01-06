@@ -1,0 +1,74 @@
+#safe216 {
+	height: 280px;
+	overflow: auto;
+}
+
+.safe216 {
+	font-size: small;
+}
+
+.rev {
+	color: #FFFFFF;
+}
+
+.RGBvalue {
+	width: 30px;
+}
+
+.slider {
+	margin-left: 10px;
+	width: 300px;
+}
+
+.head {
+	background-color: #CCCCCC;
+	text-align: center;
+}
+
+.cl {
+	display: inline-block;
+}
+
+.cl:after {  
+	content: "";
+	display: block;
+	clear: both;
+}
+
+div.Box {
+	overflow: hidden;
+	height: auto;
+}
+
+div#sampleBox {
+	float: left;
+	width: 180px;
+	border: solid 1px #808080;
+	margin: 10px;
+}
+
+div#pickerBox {
+	float: left;
+	width: 400px;
+	border: solid 1px #808080;
+	margin: 10px;
+}
+
+div#iniBox {
+	float: left;
+	width: 380px;
+	border: solid 1px #808080;
+	margin: 10px;
+}
+
+#ini {
+	width: 350px;
+	height: 100px;
+}
+
+div#presetBox {
+	float: left;
+	width: 200px;
+	border: solid 1px #808080;
+	margin: 10px;
+}

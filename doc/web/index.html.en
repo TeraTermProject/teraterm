@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <link rel="stylesheet" type="text/css" href="teraterm.css">
+    <link rel="shortcut icon" href="/images/teraterm.ico" type="image/vnd.microsoft.icon">
+    <link rel="icon" href="/images/teraterm.ico" type="image/vnd.microsoft.icon">
+    <link rel="apple-touch-icon-precomposed" href="/images/teraterm-57.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/teraterm-72.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/teraterm-114.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/teraterm-144.png"/>
+    <title>Tera Term Open Source Project</title>
+    <meta property="og:title" content="Tera Term - Terminal Emulator for Windows">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Tera Term is a terminal emulator running on Windows. It supports telnet/ssh/serial connection.">
+    <meta property="og:url" content="https://ttssh2.osdn.jp/">
+    <meta property="og:image" content="https://ttssh2.osdn.jp/images/teraterm.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Tera_Term">
+</head>
+
+<body>
+
+<p><small>Language: {<a href="index.html.en">English</a>} {<a href="index.html.ja">Japanese</a>}</small></p>
+
+<h1><!--img src="images/teraterm.gif" alt="" width="32" height="32"-->Tera Term Home Page<!--img src="images/ttssh.gif" alt="" width="32" height="32"--></h1>
+
+<p>
+[<a href="https://osdn.net/projects/ttssh2/">Project page</a>] 
+[<a href="/manual/en/about/copyright.html">License</a>] 
+[<a href="https://osdn.net/projects/ttssh2/releases/">Download</a>]  
+[<a href="/manual/en/">Document</a>] 
+[<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
+[<a href="#Source">SourceCode</a>] 
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-commit">Commit ML</a>] 
+<!-- [<a href="http://logmett.com/forum/index.php">Forum</a>] -->
+[<a href="#Development">Development</a>]
+</p>
+
+<p>
+<script type="text/javascript">
+<!--
+var ref = escape(document.referrer);
+document.write('<a href="/cgi-bin/yucntssi/icounter.cgi?logmode"><img src="/cgi-bin/yucntssi/icounter.cgi?refer=' + ref + '" alt="Counter:"></a>');
+document.write('(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###"> Yesterday: <img src="/cgi-bin/yucntssi/icounter.cgi?yesterday" alt="###">)');
+// -->
+</script>
+</p>
+
+<noscript>
+<p>
+<img src="/cgi-bin/yucntssi/icounter.cgi" alt="Counter:">
+(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###"> Yesterday: <img src="/cgi-bin/yucntssi/icounter.cgi?yesterday" alt="###">)
+</p>
+</noscript>
+
+
+<h2>TeraTerm Project</h2>
+
+<p>
+TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH module "TTSSH". This software is open source software under <a href="/manual/en/about/copyright.html">BSD License</a>. This is Tera Term Pro 2.3 succession version and is being officially recognized by the original author. Development is continuing in <a href="https://osdn.net/projects/ttssh2/">Project Page</a> on OSDN.
+</p>
+
+<h2>Download</h2>
+
+<p>
+Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>. Current latest release is <a href="https://osdn.net/rel/ttssh2/4.105">4.105</a>.
+</p>
+
+<p>
+If you can get latest development version, the source code is available from <a href="https://osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVN repository</a>. And <a href="https://osdn.net/projects/ttssh2/storage/snapshot/">snapshot</a> is here.<br>
+Here is the <a href="https://osdn.net/projects/ttssh2/releases/p15375">Old release</a>, however we recommend using the latest release as possible.
+</p>
+
+<h2>Manual</h2>
+
+<p>
+Following manuals are available.<br>
+These manuals are the latest contents. New feature not including the release version will be written.<br>
+However, a user can check next version contents. Tera Term developer can preliminarily respond the user request.
+</p>
+<ul>
+<li><a href="/manual/en/">Tera Term Help Index</a></li>
+<li><a href="/manual/en/macro/">MACRO for Tera Term</a></li>
+</ul>
+
+<h2>Support</h2>
+
+<p>
+Please report bugs to <a href="https://osdn.net/projects/ttssh2/ticket/?type%5B%5D=5333&type_mode%5B%5D=eq&status%5B%5D=1">Bugs</a> of Ticket.
+</p>
+
+<p>
+If you have a request to Tera Term, please post to <a href="https://osdn.net/projects/ttssh2/ticket/?type%5B%5D=5336&type_mode%5B%5D=eq&status%5B%5D=1">Feature Requests</a> of ticket. It is possibly implemeneted to future release.
+</p>
+
+<p>
+The <a href="http://www.freeml.com/teraterm">TeraTerm Pro Users' ML</a> is opened for TeraTerm Project. But this mailing list is Japanese only.
+</p>
+
+<!-- <p>
+The <a href="http://logmett.com/forum/">support forum</a> is maintanced by Boris Maisuradze. This forum is English only.
+</p> -->
+
+<h2 id="Source">Source code</h2>
+
+<p>
+<a href="https://osdn.net/projects/ttssh2/scm/svn/tree/head/trunk/">View source code with web browser and download ZIP/TAR archive.</a>
+</p>
+
+<p>
+<a href="tsvn:http://svn.osdn.net/svnroot/ttssh2/trunk">Checkout source code by using TortoiseSVN software.</a>
+</p>
+
+
+<h2 id="Development">Development</h2>
+
+<h3>How to build source codes</h3>
+<p>
+Refer to <a href="https://ttssh2.osdn.jp/manual/en/reference/develop.txt">develop.txt</a>.
+</p>
+
+<h3>Translations</h3>
+<p>
+Tera Term language files to localize the menu and the message are as follows. If you want to add a new language, please download the provided `English.lng' file and translate it with your language. Also, e-mail the translated file to us.
+</p>
+
+<table border="1">
+<tr>
+  <th>Language</th>
+  <th>File</th>
+  <th>Maintener</th>
+  <th>Update</th>
+</tr>
+
+<tr>
+  <td>English</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/English.lng?root=ttssh2&view=log">English.lng</a></td>
+  <td>TeraTerm Project</td>
+  <td>latest</td>
+</tr>
+
+<tr>
+  <td>Japanese</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/Japanese.lng?root=ttssh2&view=log">Japanese.lng</a></td>
+  <td>TeraTerm Project</td>
+  <td>latest</td>
+</tr>
+
+<tr>
+  <td>German</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/German.lng?root=ttssh2&view=log">German.lng</a></td>
+  <td>Alexander Wiechert</td>
+  <td>2010-05-17</td>
+</tr>
+
+<tr>
+  <td>French</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/French.lng?root=ttssh2&view=log">French.lng</a></td>
+  <td>Francois MOCQ</td>
+  <td>2010-07-21</td>
+</tr>
+
+<tr>
+  <td>Russian</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/Russian.lng?root=ttssh2&view=log">Russian.lng</a></td>
+  <td>Sergey Ryumik</td>
+  <td>2017-07-19</td>
+</tr>
+
+<tr>
+  <td>Korean</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/Korean.lng?root=ttssh2&view=log">Korean.lng</a></td>
+  <td>Daehong Kim</td>
+  <td>2013-07-25</td>
+</tr>
+
+<tr>
+  <td>Chinese (Simplified)</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/Simplified%20Chinese.lng?root=ttssh2&view=log">Simplified Chinese.lng</a></td>
+  <td>LiShaohui</td>
+  <td>2017-04-11</td>
+</tr>
+
+<tr>
+  <td>Chinese (Traditional)</td>
+  <td><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang/Traditional%20Chinese.lng?root=ttssh2&view=log">Traditional Chinese.lng</a></td>
+  <td>Wei Yan</td>
+  <td>2014-09-22</td>
+</tr>
+
+</table>
+
+<hr>
+
+<p>If you want to comment on this web site, e-mail us at ttssh2-contact<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me.</p>
+
+<div>
+Powered by <a href="https://osdn.net/"><img src="//osdn.net/sflogo.php?group_id=1412&type=1" width="96" height="31" border="0" alt="OSDN"></a>
+</div>
+
+<p>
+<script type="text/javascript">
+<!--
+document.write('(last modified on ' + document.lastModified + ')');
+//-->
+</script>
+</p>
+
+</body>
+</html>

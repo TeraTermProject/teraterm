@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <!-- meta http-equiv="Content-Type" content="text/html; charset=UTF-8" -->
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" type="text/css" href="sa.css">
+  <title>Tera Term installer has vulnerability of DLL loading without intent</title>
+</head>
+
+<body>
+  <h1>Tera Term installer has vulnerability of DLL loading without intent</h1>
+  <p>
+<!--  Release date: May 31, 2017 -->
+    Last Update: June 1, 2017
+  </p>
+
+  <h2>Overview</h2>
+  <p>
+    The installer of Tera Term 4.94 or earlier has vulnerability of DLL loading without intent. <br>
+    When this vulnerability is used for bad ends, a malicious third person will execute any code on installer startup.
+  </p>
+  <p>
+    This vulnerability only affects on installer startup, so Tera Term already installed does not have the problem. <br>
+    Newly, please use below method when Tera Term is installed.
+  </p>
+
+  <h2>Affected version</h2>
+  <p>
+    The installer of Tera Term 4.94 or earlier.<br>
+    The zip archive can not be affected.
+  </p>
+
+  <h2>Impact</h2>
+  <p>
+    Any DLL file may be loaded without intent on installer startup.<br>
+    The DLL file that a malicious third person stores into the installer directory will be loaded, <br>
+    and then any code will be executed. 
+  </p>
+  <p>
+    Tera Term already installed does not have the problem because this vulnerability only affects on installer startup.
+  </p>
+
+  <h2>Solution</h2>
+  <p>
+    Please use the latest installer when installing or upgrading the Tera Term.
+  </p>
+
+  <h2>Workaround</h2>
+  <p>
+    Please use below method to install an older version.
+  </p>
+  <ul>
+    <li>Use zip archive.</li>
+    <li>Make a new folder and move the installer file into it. Next, execute the file.</li>
+  </ul>
+
+  <h2>References</h2>
+  <ul>
+    <li><a href="https://jvn.jp/en/ta/JVNTA91240916/index.html">JVNTA#91240916 Insecure DLL Loading and Command Execution Issues on Many Windows Application Programs</a></li>
+    <li><a href="https://jvn.jp/en/jp/JVN06770361/">JVN#06770361 Installer of Tera Term may insecurely load Dynamic Link Libraries</a></li>
+  </ul>
+
+  <h2>Acknowledgment</h2>
+  <p>
+    Thank you for Eiri Masami of Tachibana General Laboratories, IPA and JPCERT/CC relationship.
+  </p>
+
+  <h2>History</h2>
+  <ul>
+    <li>May 31, 2017 First release</li>
+    <li>June 1, 2017 Added a link to JVN vulnerability report</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>Email: ttssh2-<span class="nospam">nospam-</span>security<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me</p>
+</body>
+</html>

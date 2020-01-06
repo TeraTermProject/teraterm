@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <title>Tera Term マニュアル</title>
+  <script type="text/javascript">
+    location.replace('http://ttssh2.sourceforge.jp/manual/ja/');
+  </script>
+  <meta http-equiv="Refresh" content="0; URL=http://ttssh2.sourceforge.jp/manual/ja/">
+</head>
+
+<body>
+<noscript>
+  <ul>
+    <li><a href="http://ttssh2.sourceforge.jp/manual/ja/">Tera Term マニュアル (日本語)</a></li>
+    <li><a href="http://ttssh2.sourceforge.jp/manual/en/">Tera Term Manual (English)</a></li>
+  </ul>
+</noscript>
+</body>
+</html>
