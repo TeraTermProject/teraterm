@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 TeraTerm Project
+ * Copyright (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,24 +45,65 @@ typedef unsigned char uint8_t;
 
 /**
  *	ファイルをメモリに読み込む
- *	@param[out]	*_len	サイズ(最後に付加される"\0\0"を含む)
+ *	@param[out]	*_len		サイズ(terminater含む)
+ *	@param[in]	terminate	TRUE	最後に L'\0' ("\0\0")を付加
+ *							FALSE	ファイルをそのまま読み込む
  *	@retval		ファイルの中身へのポインタ(使用後free()すること)
- *				NULL=エラー
+ *				NULL=エラー (fclose()すること)
  */
-static void *LoadRawFile(FILE *fp, size_t *_len)
+static void *LoadRawFile(FILE *fp, size_t *_len, BOOL terminate)
 {
     fseek(fp, 0L, SEEK_END);
 	fpos_t pos;
 	fgetpos(fp, &pos);
     fseek(fp, 0L, SEEK_SET);
 	size_t len = (size_t)pos;
-	char *buf = (char *)malloc(len + 2);
-	buf[len] = 0;
-	buf[len+1] = 0;		// UTF-16対策
-	fread(buf, 1, len, fp);
-	len += 2;
-	*_len = len;
+	size_t alloc_len = terminate ? len + 2 : len;
+	char *buf = (char *)malloc(alloc_len);
+	if (buf == NULL) {
+		return NULL;
+	}
+	size_t rlen = fread(buf, 1, len, fp);
+	if (rlen != len) {
+		free(buf);
+		return NULL;
+	}
+	if (terminate) {
+		buf[len] = 0;
+		buf[len+1] = 0;		// UTF-16対策
+	}
+	*_len = alloc_len;
 	return buf;
+}
+
+/**
+ *	ファイルをメモリに読み込む
+ *	@param[out]	*_len	サイズ(最後に付加される"\0\0"を含む)
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
+ */
+static void *LoadRawFile(FILE *fp, size_t *_len)
+{
+	return LoadRawFile(fp, _len, TRUE);
+}
+
+/**
+ *	ファイルをメモリに読み込む
+ *	加工は行わない
+ *	@param[out]	*_len	サイズ
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
+ */
+uint8_t *LoadFileBinary(const wchar_t *FileName, size_t *_len)
+{
+	FILE *fp;
+	_wfopen_s(&fp, FileName, L"rb");
+	if (fp == NULL) {
+		return NULL;
+	}
+	uint8_t *ptr = (uint8_t *)LoadRawFile(fp, _len, FALSE);
+	fclose(fp);
+	return ptr;
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * (C) 2019 TeraTerm Project
+ * (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,12 @@
  */
 
 #include <windows.h>
+#include <stdio.h>
 #include <stdlib.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "tttypes.h"
 #include "ttcommon.h"
@@ -48,6 +51,12 @@
 #endif
 
 #include "sendmem.h"
+
+typedef enum {
+	SendMemTypeTextLF,		// wchar_t 0x0a
+	SendMemTypeTextCRLF,	// wchar_t 0x0d + 0x0a
+	SendMemTypeBinary,
+} SendMemType;
 
 // 送信中にVTWINに排他をかける
 #define	USE_ENABLE_WINDOW	0	// 1=排他する
@@ -408,16 +417,9 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 }
 
 /**
- *	メモリにあるデータを送信する
- *	データは送信終了後にfree()される
- *
- *	@param	ptr		データへポインタ(malloc()された領域)
- *					送信後(中断後)、自動的にfree()される
- *	@param	len		データ長(byte)
- *					文字列(wchar_t)の場合もbyte数
- *	@param	type	文字列(wchar_t,LF or CRLF or バイナリ)
+ *	初期化
  */
-SendMem *SendMemInit(void *ptr, size_t len, SendMemType type)
+static SendMem *SendMemInit_()
 {
 	if (sendmem_work != NULL) {
 		// 送信中
@@ -427,20 +429,11 @@ SendMem *SendMemInit(void *ptr, size_t len, SendMemType type)
 	if (p == NULL) {
 		return NULL;
 	}
-	if (type == SendMemTypeTextCRLF || type == SendMemTypeTextLF) {
-		// 改行コードを調整しておく
-		size_t new_len = len / sizeof(wchar_t);
-		p->send_ptr = (BYTE *)NormalizeLineBreak((wchar_t *)ptr, &new_len);
-		p->send_len = new_len * sizeof(wchar_t);
-		free(ptr);
-	} else {
-		p->send_ptr = (BYTE *)ptr;
-		p->send_len = len;
-	}
-	if (p->send_ptr == NULL) {
-		return NULL;
-	}
-	p->type = type;
+
+	p->send_ptr = NULL;
+	p->send_len = 0;
+
+	p->type = SendMemTypeBinary;
 	p->local_echo_enable = FALSE;
 	p->delay_per_char = 0;  // (ms)
 	p->delay_per_line = 0;  // (ms)
@@ -448,6 +441,56 @@ SendMem *SendMemInit(void *ptr, size_t len, SendMemType type)
 	p->hWnd = HVTWin;		// delay時に使用するタイマー用
 	p->timer_id = IdPasteDelayTimer;
 	p->hWndParent_ = NULL;
+	return p;
+}
+
+/**
+ *	メモリにあるテキストを送信する
+ *	データは送信終了後にfree()される
+ *
+ *	@param	ptr		データへポインタ(malloc()された領域)
+ *					送信後(中断後)、自動的にfree()される
+ *	@param	len		文字列長(wchar_t単位)
+ *					0 の場合は L'\0' まで
+ */
+SendMem *SendMemTextW(wchar_t *str, size_t len)
+{
+	SendMem *p = SendMemInit_();
+	if (p == NULL) {
+		return NULL;
+	}
+
+	if (len == 0) {
+		len = wcslen(str);
+	}
+
+	// 改行コードを調整しておく
+	size_t new_len = len;
+	p->send_ptr = (BYTE *)NormalizeLineBreak((wchar_t *)str, &new_len);
+	p->send_len = new_len * sizeof(wchar_t);
+	free(str);
+	p->type = SendMemTypeTextLF;
+	return p;
+}
+
+/**
+ *	メモリにあるデータを送信する
+ *	データは送信終了後にfree()される
+ *
+ *	@param	ptr		データへポインタ(malloc()された領域)
+ *					送信後(中断後)、自動的にfree()される
+ *	@param	len		データ長(byte)
+ */
+SendMem *SendMemBinary(void *ptr, size_t len)
+{
+	SendMem *p = SendMemInit_();
+	if (p == NULL) {
+		return NULL;
+	}
+
+	p->send_ptr = (BYTE *)ptr;
+	p->send_len = len;
+	p->type = SendMemTypeBinary;
 	return p;
 }
 
@@ -529,18 +572,25 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
 	return TRUE;
 }
 #else
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)	// binary未対応
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
 {
-	binary = FALSE;
-
-	size_t str_len;
-	wchar_t *str_ptr = LoadFileWW(filename, &str_len);
-	if (str_ptr == NULL) {
-		return FALSE;
+	SendMem *sm;
+	if (!binary) {
+		size_t str_len;
+		wchar_t *str_ptr = LoadFileWW(filename, &str_len);
+		if (str_ptr == NULL) {
+			return FALSE;
+		}
+		sm = SendMemTextW(str_ptr, str_len);
 	}
-	str_len *= sizeof(wchar_t);
-
-	SendMem *sm = SendMemInit(str_ptr, str_len, SendMemTypeTextLF);
+	else {
+		size_t data_len;
+		unsigned char *data_ptr = LoadFileBinary(filename, &data_len);
+		if (data_ptr == NULL) {
+			return FALSE;
+		}
+		sm = SendMemBinary(data_ptr, data_len);
+	}
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
 	SendMemInitDialogCaption(sm, L"send file");			// title
 	SendMemInitDialogFilename(sm, filename);
@@ -559,9 +609,9 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)	// binary未対応
 BOOL SendMemPasteString(wchar_t *str)
 {
 	const size_t len = wcslen(str);
-	CommTextOutW(&cv, str, len);
+	CommTextOutW(&cv, str, (int)len);
 	if (ts.LocalEcho > 0) {
-		CommTextEchoW(&cv, str, len);
+		CommTextEchoW(&cv, str, (int)len);
 	}
 
 	free(str);

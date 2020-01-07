@@ -1,5 +1,5 @@
 /*
- * (C) 2019 TeraTerm Project
+ * (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,15 +33,10 @@
 extern "C" {
 #endif
 
-typedef enum {
-	SendMemTypeTextLF,		// wchar_t 0x0a
-	SendMemTypeTextCRLF,	// wchar_t 0x0d + 0x0a
-	SendMemTypeBinary,
-} SendMemType;
-
 typedef struct SendMemTag SendMem;
 
-SendMem *SendMemInit(void *ptr, size_t len, SendMemType type);
+SendMem *SendMemTextW(wchar_t *ptr, size_t len);
+SendMem *SendMemBinary(void *ptr, size_t len);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
 void SendMemInitDelay(SendMem *sm, DWORD per_line, DWORD per_char);
 void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile);

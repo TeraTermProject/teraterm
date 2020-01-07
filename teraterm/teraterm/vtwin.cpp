@@ -4359,7 +4359,6 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			::DragAcceptFiles(hDlgWnd, TRUE);
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
-			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_CHECK_BINARY), FALSE);
 			return TRUE;
 
 		case WM_COMMAND:
@@ -4741,12 +4740,10 @@ void CVTWindow::OnEditCancelSelection()
 // (2008.5.12 maya) changed to PropertySheet
 void CVTWindow::OnExternalSetup()
 {
-	DWORD ret;
-
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
-	ret = CAddSetting.DoModal();
+	INT_PTR ret = CAddSetting.DoModal();
 	switch (ret) {
 		case (DWORD)-1:
 		case IDABORT:

@@ -804,7 +804,7 @@ static wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
  *	@param	str_w	文字列へのポインタ
  *					malloc()されたバッファ、送信完了時に自動でfree()される
  *	@param	str_len	文字長(wchar_t単位)
- *					0のとき、str_wから文字列長を得る
+ *					0 の場合は L'\0' まで
  */
 static void CBSendStart(wchar_t *str_w, size_t str_len)
 {
@@ -812,9 +812,7 @@ static void CBSendStart(wchar_t *str_w, size_t str_len)
 	if (str_len == 0) {
 		str_len = wcslen(str_w);
 	}
-	sm = SendMemInit(str_w,
-					 str_len * sizeof(wchar_t),
-					 SendMemTypeTextLF);
+	sm = SendMemTextW(str_w, str_len);
 	if (sm == NULL)
 		return;
 	if (ts.PasteDelayPerLine != 0) {
