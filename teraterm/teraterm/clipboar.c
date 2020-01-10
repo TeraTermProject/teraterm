@@ -1304,10 +1304,12 @@ BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
 		const size_t alloc_bytes = (str_len + 1) * sizeof(wchar_t);
 		CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, alloc_bytes);
 		if (CBCopyWideHandle == NULL) {
+			CloseClipboard();
 			return FALSE;
 		}
 		CBCopyWidePtr = (wchar_t *)GlobalLock(CBCopyWideHandle);
 		if (CBCopyWidePtr == NULL) {
+			CloseClipboard();
 			return FALSE;
 		}
 		memcpy(CBCopyWidePtr, str_w, alloc_bytes - sizeof(wchar_t));
