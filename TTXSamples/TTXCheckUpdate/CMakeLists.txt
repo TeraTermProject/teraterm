@@ -49,3 +49,9 @@ target_link_libraries(
   ttpcmn
   Wininet.lib
   )
+
+install(
+  TARGETS TTXCheckUpdate
+  RUNTIME
+  DESTINATION .
+  )

@@ -1,4 +1,3 @@
-Ôªø/* -*- coding: utf-8-with-signature-dos -*- */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,13 +12,14 @@
 #include "codeconv.h"
 #include "compat_w95.h"
 #include "dlglib.h"
+#include "i18n.h"
 
 #include "resource.h"
 #include "parse.h"
 #include "getcontent.h"
 
 #define ORDER 4000
-#define ID_MENUITEM 6000
+#define ID_MENUITEM 55900	// see reference/develop.txt
 
 typedef struct {
 	HANDLE hInst;
@@ -129,17 +129,21 @@ static void ShowDialog(HWND hWnd)
 	BOOL result_bool;
 	size_t json_size;
 	char *json_ptr;
+	const char *UILanguageFile = pvar->ts->UILanguageFile;
+	wchar_t UIMsg[MAX_UIMSG];
 
-	swprintf(buf, _countof(buf),
-			 L"„Éç„ÉÉ„Éà„ÉØ„Éº„ÇØ„Å´„Ç¢„ÇØ„Çª„Çπ„Åó„Åæ„Åô\n"
-			 L"  %s\n"
-			 L"„Çà„Çç„Åó„ÅÑ„Åß„Åô„Åã?",
-			 update_info_url);
+	/* ÉtÉ@ÉCÉãÇéÊìæÇµÇƒÇ‡ok? */
+	GetI18nStrW("TTXCheckUpdate", "MSG_CHECKUPDATE", UIMsg, _countof(UIMsg),
+				L"Do you want to check update?\n"
+				L"  %s\n",
+				UILanguageFile);
+	swprintf(buf, _countof(buf), UIMsg, update_info_url);
 	result_mb = MessageBoxW(hWnd, buf, L"Tera Term", MB_YESNO | MB_ICONEXCLAMATION);
 	if (result_mb == IDNO) {
 		return;
 	}
 
+	/* ÉtÉ@ÉCÉãéÊìæÅA'\0'Çí«â¡Ç∑ÇÈÅ® jsonï∂éöóÒÇçÏê¨ */
 	swprintf(agent, _countof(agent), L"%s_%d", agent_base, pvar->ts->RunningVersion);
 	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
 	if (!result_bool) {
@@ -155,16 +159,19 @@ static void ShowDialog(HWND hWnd)
 	json_raw_ptr = NULL;
 	json_ptr[json_size - 1] = '\0';
 
+	/* jsonÇÉpÅ[ÉXÇ∑ÇÈ */
 	pvar->versions = ParseJson(json_ptr, &pvar->versions_count);
 	if (pvar->versions == NULL) {
 		MessageBoxW(hWnd, L"parse error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
 	}
 
+	/* É_ÉCÉAÉçÉOÇèoÇ∑ */
 	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 				  pvar->ts->UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	TTDialogBoxParam(pvar->hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, DlgProc, (LPARAM)pvar);
 
+	/* èIóπ */
 	free(json_ptr);
 	ParseFree(pvar->versions, pvar->versions_count);
 	pvar->versions = NULL;
@@ -176,10 +183,45 @@ static void WINAPI TTXInit(PTTSet ts, PComVar cv)
 	pvar->cv = cv;
 }
 
+/**
+ *	ÉÅÉjÉÖÅ[Çí«â¡Ç∑ÇÈ
+ *
+ *	@param[in]	menu			ÉÅÉjÉÖÅ[ÉnÉìÉhÉã
+ *	@param[in]	beforeItemID	Ç±ÇÃIDÇÃÉÅÉjÉÖÅ[ÇÃëOÇ…ÉÅÉjÉÖÅ[Çí«â¡
+ *	@param[in]	flags			ÉÅÉjÉÖÅ[flag (InsertMenuÇÃëÊ3à¯êî)
+ *	@param[in]	newItemID		ÉÅÉjÉÖÅ[ID (InsertMenuÇÃëÊ4à¯êî)
+ *	@param[in]	text			ÉÅÉjÉÖÅ[ï∂éöóÒ (InsertMenuÇÃëÊ5à¯êî)
+ *
+ *	TODO: ttlibÇ…à⁄ìÆ
+ */
+static void insertMenuBeforeItem(HMENU menu, WORD beforeItemID, WORD flags,
+                                 WORD newItemID, char *text)
+{
+	int i, j;
+
+	for (i = GetMenuItemCount(menu) - 1; i >= 0; i--) {
+		HMENU submenu = GetSubMenu(menu, i);
+
+		for (j = GetMenuItemCount(submenu) - 1; j >= 0; j--) {
+			if (GetMenuItemID(submenu, j) == beforeItemID) {
+				InsertMenu(submenu, j, MF_BYPOSITION | flags, newItemID, text);
+				return;
+			}
+		}
+	}
+}
+
 static void WINAPI TTXModifyMenu(HMENU menu)
 {
-	HMENU SetupMenu = GetSubMenu(menu, 0);
-	AppendMenu(SetupMenu, MF_ENABLED, ID_MENUITEM, "Check Update");
+	static const DlgTextInfo MenuTextInfo[] = {
+		{ ID_MENUITEM, "MENU_CHECKUPDATE" },
+	};
+	const UINT ID_HELP_ABOUT = 50990;
+	const char *UILanguageFile = pvar->ts->UILanguageFile;
+
+	insertMenuBeforeItem(menu, ID_HELP_ABOUT, MF_ENABLED, ID_MENUITEM, "Check &Update...");
+
+	SetI18MenuStrs("TTXCheckUpdate", menu, MenuTextInfo, _countof(MenuTextInfo), UILanguageFile);
 }
 
 static int WINAPI TTXProcessCommand(HWND hWin, WORD cmd)
@@ -219,7 +261,7 @@ BOOL __declspec(dllexport) WINAPI TTXBind(WORD Version, TTXExports *exports)
 	}
 
 	if (!IsWindowsNTKernel()) {
-		// TODO Windows10‰ª•Â§ñ„ÄÅÊú™Ê§úË®º
+		// TODO Windows10à»äOÅAñ¢åüèÿ
 		return FALSE;
 	}
 

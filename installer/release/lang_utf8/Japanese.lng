@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-09)
+﻿; Updated by TeraTerm Project (2020-01-11)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -1151,3 +1151,7 @@ DLG_ENABLE=有効(&E)
 DLG_INTERVAL=間隔(秒)(&I)
 DLG_COMMAND=コマンド(&C)
 DLG_ADD_NEWLINE=改行を追加(&A)
+
+[TTXCheckUpdate]
+MSG_CHECKUPDATE=アップデートの確認を行いますか?\n  %s
+MENU_CHECKUPDATE=更新の確認(&U)...

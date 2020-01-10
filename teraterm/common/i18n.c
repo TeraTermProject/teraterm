@@ -211,12 +211,8 @@ void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *
 			char uimsg[MAX_UIMSG];
 			GetI18nStr(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != '\0') {
-				if (nIDDlgItem < id_position_threshold) {
-					ModifyMenuA(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
-				}
-				else {
-					ModifyMenuA(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
-				}
+				UINT uFlags = (nIDDlgItem < id_position_threshold) ? MF_BYPOSITION : MF_BYCOMMAND;
+				ModifyMenuA(hMenu, nIDDlgItem, uFlags, nIDDlgItem, uimsg);
 			}
 			else {
 				if (nIDDlgItem < id_position_threshold) {
@@ -231,12 +227,8 @@ void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *
 			wchar_t uimsg[MAX_UIMSG];
 			GetI18nStrW(section, key, uimsg, _countof(uimsg), NULL, UILanguageFile);
 			if (uimsg[0] != '\0') {
-				if (nIDDlgItem < id_position_threshold) {
-					pModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
-				}
-				else {
-					pModifyMenuW(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
-				}
+				UINT uFlags = (nIDDlgItem < id_position_threshold) ? MF_BYPOSITION : MF_BYCOMMAND;
+				pModifyMenuW(hMenu, nIDDlgItem, uFlags, nIDDlgItem, uimsg);
 			}
 			else {
 				if (nIDDlgItem < id_position_threshold) {
