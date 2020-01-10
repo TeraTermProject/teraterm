@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -2148,13 +2148,8 @@ static void insertMenuBeforeItem(HMENU menu, WORD beforeItemID, WORD flags,
 	}
 }
 
-#define GetFileMenu(menu)       GetSubMenuByChildID(menu, 50110) // ID_FILE_NEWCONNECTION
-#define GetEditMenu(menu)       GetSubMenuByChildID(menu, 50210) // ID_EDIT_COPY2
-#define GetSetupMenu(menu)      GetSubMenuByChildID(menu, 50310) // ID_SETUP_TERMINAL
-#define GetControlMenu(menu)    GetSubMenuByChildID(menu, 50410) // ID_CONTROL_RESETTERMINAL
-#define GetHelpMenu(menu)       GetSubMenuByChildID(menu, 50990) // ID_HELP_ABOUT
-
-HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
+static HMENU GetSubMenuByChildID(HMENU menu, UINT id)
+{
   int i, j, items, subitems, cur_id;
   HMENU m;
 
@@ -2176,27 +2171,35 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
 
 static void PASCAL TTXModifyMenu(HMENU menu)
 {
-	pvar->FileMenu = GetFileMenu(menu);
+	static const DlgTextInfo MenuTextInfo[] = {
+		{ ID_ABOUTMENU, "MENU_ABOUT" },
+		{ ID_SSHSETUPMENU, "MENU_SSH" },
+		{ ID_SSHAUTHSETUPMENU, "MENU_SSH_AUTH" },
+		{ ID_SSHFWDSETUPMENU, "MENU_SSH_FORWARD" },
+		{ ID_SSHKEYGENMENU, "MENU_SSH_KEYGEN" },
+		{ ID_SSHSCPMENU, "MENU_SSH_SCP" },
+	};
+	// teraterm‚Ìƒƒjƒ…[ID(tt_res.h)
+	const UINT ID_FILE_NEWCONNECTION = 50110;
+	const UINT ID_HELP_ABOUT = 50990;
+	const UINT ID_SETUP_TCPIP = 50360;
+	const UINT ID_FILE_CHANGEDIR = 50170;
+
+	pvar->FileMenu = GetSubMenuByChildID(menu, ID_FILE_NEWCONNECTION);
 
 	/* inserts before ID_HELP_ABOUT */
-	UTIL_get_lang_msg("MENU_ABOUT", pvar, "About &TTSSH...");
-	insertMenuBeforeItem(menu, 50990, MF_ENABLED, ID_ABOUTMENU, pvar->ts->UIMsg);
+	insertMenuBeforeItem(menu, ID_HELP_ABOUT, MF_ENABLED, ID_ABOUTMENU, "About &TTSSH...");
 
 	/* inserts before ID_SETUP_TCPIP */
-	UTIL_get_lang_msg("MENU_SSH", pvar, "SS&H...");
-	insertMenuBeforeItem(menu, 50360, MF_ENABLED, ID_SSHSETUPMENU, pvar->ts->UIMsg);
-	/* inserts before ID_SETUP_TCPIP */
-	UTIL_get_lang_msg("MENU_SSH_AUTH", pvar, "SSH &Authentication...");
-	insertMenuBeforeItem(menu, 50360, MF_ENABLED, ID_SSHAUTHSETUPMENU, pvar->ts->UIMsg);
-	/* inserts before ID_SETUP_TCPIP */
-	UTIL_get_lang_msg("MENU_SSH_FORWARD", pvar, "SSH F&orwarding...");
-	insertMenuBeforeItem(menu, 50360, MF_ENABLED, ID_SSHFWDSETUPMENU, pvar->ts->UIMsg);
-	UTIL_get_lang_msg("MENU_SSH_KEYGEN", pvar, "SSH KeyGe&nerator...");
-	insertMenuBeforeItem(menu, 50360, MF_ENABLED, ID_SSHKEYGENMENU, pvar->ts->UIMsg);
+	insertMenuBeforeItem(menu, ID_SETUP_TCPIP, MF_ENABLED, ID_SSHSETUPMENU, "SS&H...");
+	insertMenuBeforeItem(menu, ID_SETUP_TCPIP, MF_ENABLED, ID_SSHAUTHSETUPMENU, "SSH &Authentication...");
+	insertMenuBeforeItem(menu, ID_SETUP_TCPIP, MF_ENABLED, ID_SSHFWDSETUPMENU, "SSH F&orwarding...");
+	insertMenuBeforeItem(menu, ID_SETUP_TCPIP, MF_ENABLED, ID_SSHKEYGENMENU, "SSH KeyGe&nerator...");
 
 	/* inserts before ID_FILE_CHANGEDIR */
-	UTIL_get_lang_msg("MENU_SSH_SCP", pvar, "SS&H SCP...");
-	insertMenuBeforeItem(menu, 50170, MF_GRAYED, ID_SSHSCPMENU, pvar->ts->UIMsg);
+	insertMenuBeforeItem(menu, ID_FILE_CHANGEDIR, MF_GRAYED, ID_SSHSCPMENU, "SS&H SCP...");
+
+	SetI18MenuStrs("TTSSH", menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
 }
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
