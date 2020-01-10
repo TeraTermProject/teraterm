@@ -381,7 +381,7 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 {
 	size_t src_len = *len;
 	if (src_len == 0) {
-		return NULL;
+		src_len = wcslen(src) + 1;
 	}
 	wchar_t *dest_top = (wchar_t *)malloc(sizeof(wchar_t) * src_len);
 	if (dest_top == NULL) {

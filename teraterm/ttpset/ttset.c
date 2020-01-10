@@ -2146,10 +2146,6 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "TrimTrailingNLonPaste", FName, FALSE))
 		ts->PasteFlag |= CPF_TRIM_TRAILING_NL;
 
-	// Normalize line break when pasting
-	if (GetOnOff(Section, "NormalizeLineBreakOnPaste", FName, FALSE))
-		ts->PasteFlag |= CPF_NORMALIZE_LINEBREAK;
-
 	// List Inactive Font
 	ts->ListHiddenFonts = GetOnOff(Section, "ListHiddenFonts", FName, FALSE);
 
@@ -3494,10 +3490,6 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Trim trailing new line character when pasting
 	WriteOnOff(Section, "TrimTrailingNLonPaste", FName,
 		(WORD) (ts->PasteFlag & CPF_TRIM_TRAILING_NL));
-
-	// Normalize line break when pasting
-	WriteOnOff(Section, "NormalizeLineBreakOnPaste", FName,
-		(WORD) (ts->PasteFlag & CPF_NORMALIZE_LINEBREAK));
 
 	// List Inactive Font
 	WriteOnOff(Section, "ListHiddenFonts", FName, ts->ListHiddenFonts);

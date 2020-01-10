@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2019-11-22)
+﻿; Updated by TeraTerm Project (2020-01-09)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -222,7 +222,6 @@ DLG_TAB_COPYPASTE_CONFIRMPASTE=&Confirm mouse R button paste
 DLG_TAB_COPYPASTE_MOUSEPASTEM=Disable mouse &M button paste
 DLG_TAB_COPYPASTE_SELECTLBUTTON=Select &only by L button
 DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
-DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=Confirm change &paste
 DLG_TAB_COPYPASTE_STRINGFILE=&String file
 DLG_TAB_COPYPASTE_DELIMITER=Del&imiter characters

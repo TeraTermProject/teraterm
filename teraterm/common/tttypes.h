@@ -379,7 +379,6 @@ enum LogTimestampType {
 #define CPF_CONFIRM_CHANGEPASTE    0x0010
 #define CPF_CONFIRM_CHANGEPASTE_CR 0x0020
 #define CPF_TRIM_TRAILING_NL       0x0100
-#define CPF_NORMALIZE_LINEBREAK    0x0200
 
 // Title Reporting Type
 #define IdTitleReportIgnore 0

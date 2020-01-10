@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2019 TeraTerm Project
+ * Copyright (C) 2008-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -435,7 +435,6 @@ void CCopypastePropPageDlg::OnInitDialog()
 		{ IDC_DISABLE_PASTE_MBUTTON, "DLG_TAB_COPYPASTE_MOUSEPASTEM" },
 		{ IDC_SELECT_LBUTTON, "DLG_TAB_COPYPASTE_SELECTLBUTTON" },
 		{ IDC_TRIMNLCHAR, "DLG_TAB_COPYPASTE_TRIM_TRAILING_NL" },
-		{ IDC_NORMALIZE_LINEBREAK, "DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK" },
 		{ IDC_CONFIRM_CHANGE_PASTE, "DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE" },
 		{ IDC_CONFIRM_STRING_FILE_LABEL, "DLG_TAB_COPYPASTE_STRINGFILE" },
 		{ IDC_DELIMITER, "DLG_TAB_COPYPASTE_DELIMITER" },
@@ -469,10 +468,7 @@ void CCopypastePropPageDlg::OnInitDialog()
 	// (6)TrimTrailingNLonPaste
 	SetCheck(IDC_TRIMNLCHAR, (ts.PasteFlag & CPF_TRIM_TRAILING_NL)?BST_CHECKED:BST_UNCHECKED);
 
-	// (7)NormalizeLineBreak
-	SetCheck(IDC_NORMALIZE_LINEBREAK, (ts.PasteFlag & CPF_NORMALIZE_LINEBREAK)?BST_CHECKED:BST_UNCHECKED);
-
-	// (8)ConfirmChangePaste
+	// (7)ConfirmChangePaste
 	SetCheck(IDC_CONFIRM_CHANGE_PASTE, (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE)?BST_CHECKED:BST_UNCHECKED);
 
 	// ファイルパス
@@ -485,15 +481,15 @@ void CCopypastePropPageDlg::OnInitDialog()
 		EnableDlgItem(IDC_CONFIRM_STRING_FILE_PATH, FALSE);
 	}
 
-	// (9)delimiter characters
+	// (8)delimiter characters
 	SetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList);
 
-	// (10)PasteDelayPerLine
+	// (9)PasteDelayPerLine
 	char buf[64];
 	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
 	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
 
-	// (11) SelectOnActivate
+	// (10) SelectOnActivate
 	SetCheck(IDC_SELECT_ON_ACTIVATE, ts.SelOnActive ? BST_CHECKED : BST_UNCHECKED);
 
 	// ダイアログにフォーカスを当てる
@@ -589,15 +585,7 @@ void CCopypastePropPageDlg::OnOK()
 		ts.PasteFlag &= ~CPF_TRIM_TRAILING_NL;
 	}
 
-	// (7)
-	if (GetCheck(IDC_NORMALIZE_LINEBREAK)) {
-		ts.PasteFlag |= CPF_NORMALIZE_LINEBREAK;
-	}
-	else {
-		ts.PasteFlag &= ~CPF_NORMALIZE_LINEBREAK;
-	}
-
-	// (8)IDC_CONFIRM_CHANGE_PASTE
+	// (7)IDC_CONFIRM_CHANGE_PASTE
 	if (GetCheck(IDC_CONFIRM_CHANGE_PASTE)) {
 		ts.PasteFlag |= CPF_CONFIRM_CHANGEPASTE;
 	}
@@ -606,17 +594,17 @@ void CCopypastePropPageDlg::OnOK()
 	}
 	GetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
 
-	// (9)
+	// (8)
 	GetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
 
-	// (10)
+	// (9)
 	GetDlgItemTextA(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
 	val = atoi(buf);
 	ts.PasteDelayPerLine =
 		(val < 0) ? 0 :
 		(val > 5000) ? 5000 : val;
 
-	// (11) SelectOnActivate
+	// (10) SelectOnActivate
 	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
 }
 

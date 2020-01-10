@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -224,10 +224,6 @@ static BOOL NormalizeLineBreak(BOOL AddCR, BOOL Bracketed) {
 	char *p, *p2;
 	unsigned int len, need_len, alloc_len;
 	HGLOBAL TmpHandle;
-
-	if (!(ts.PasteFlag & CPF_NORMALIZE_LINEBREAK)) {
-		return TRUE;
-	}
 
 	p = CBMemPtr;
 
@@ -855,7 +851,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		TrimTrailingNLW(str_w);
 	}
 
-	if (!(ts.PasteFlag & CPF_NORMALIZE_LINEBREAK)) {
+	{
 		// â¸çsÇê≥ãKâª
 		wchar_t *dest = NormalizeLineBreakW(str_w);
 		free(str_w);
