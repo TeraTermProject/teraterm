@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 TeraTerm Project
+ * Copyright (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@
 
 #include <windowsx.h>
 #include <assert.h>
-#include <tchar.h>
 #include "dlglib.h"
 #include "ttlib.h"
 #include "layer_for_unicode.h"
@@ -64,11 +63,6 @@ HWND TTCWnd::GetDlgItem(int id)
 	return ::GetDlgItem(m_hWnd, id);
 }
 
-LRESULT TTCWnd::SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp)
-{
-	return ::SendDlgItemMessage(m_hWnd, id, msg, wp, lp);
-}
-
 LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
 	return ::_SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
@@ -79,11 +73,6 @@ LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
 	return ::SendDlgItemMessageA(m_hWnd, id, msg, wp, lp);
 }
 
-void TTCWnd::GetDlgItemTextT(int id, TCHAR *buf, size_t size)
-{
-	::GetDlgItemText(m_hWnd, id, buf, (int)size);
-}
-
 void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
 {
 	_GetDlgItemTextW(m_hWnd, id, buf, (int)size);
@@ -92,11 +81,6 @@ void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
 void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
 {
 	::GetDlgItemTextA(m_hWnd, id, buf, (int)size);
-}
-
-void TTCWnd::SetDlgItemTextT(int id, const TCHAR *str)
-{
-	::SetDlgItemText(m_hWnd, id, str);
 }
 
 void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
@@ -129,12 +113,12 @@ void TTCWnd::SetCurSel(int id, int no)
 {
 	HWND hWnd = GetDlgItem(id);
 	assert(hWnd != 0);
-	TCHAR ClassName[32];
-	int r = GetClassName(hWnd, ClassName, _countof(ClassName));
+	char ClassName[32];
+	int r = GetClassNameA(hWnd, ClassName, _countof(ClassName));
 	assert(r != 0); (void)r;
 	UINT msg =
-		(_tcscmp(ClassName, _T("ListBox")) == 0) ? LB_SETCURSEL :
-		(_tcscmp(ClassName, _T("ComboBox")) == 0) ? CB_SETCURSEL : 0;
+		(strcmp(ClassName, "ListBox") == 0) ? LB_SETCURSEL :
+		(strcmp(ClassName, "ComboBox") == 0) ? CB_SETCURSEL : 0;
 	assert(msg != 0);
 	::SendMessage(hWnd, msg, no, 0);
 }
@@ -143,12 +127,12 @@ int TTCWnd::GetCurSel(int id)
 {
 	HWND hWnd = GetDlgItem(id);
 	assert(hWnd != 0);
-	TCHAR ClassName[32];
-	int r = GetClassName(hWnd, ClassName, _countof(ClassName));
+	char ClassName[32];
+	int r = GetClassNameA(hWnd, ClassName, _countof(ClassName));
 	assert(r != 0); (void)r;
 	UINT msg =
-		(_tcscmp(ClassName, _T("ListBox")) == 0) ? LB_GETCURSEL :
-		(_tcscmp(ClassName, _T("ComboBox")) == 0) ? CB_GETCURSEL : 0;
+		(strcmp(ClassName, "ListBox") == 0) ? LB_GETCURSEL :
+		(strcmp(ClassName, "ComboBox") == 0) ? CB_GETCURSEL : 0;
 	assert(msg != 0);
 	LRESULT lResult = ::SendMessage(hWnd, msg, 0, 0);
 	return (int)lResult;
@@ -172,11 +156,6 @@ UINT TTCWnd::GetDlgItemInt(int id, BOOL* lpTrans, BOOL bSigned) const
 void TTCWnd::ShowWindow(int nCmdShow)
 {
 	::ShowWindow(m_hWnd, nCmdShow);
-}
-
-void TTCWnd::SetWindowTextT(const TCHAR *str)
-{
-	::SetWindowText(m_hWnd, str);
 }
 
 void TTCWnd::SetWindowTextW(const wchar_t *str)
@@ -224,11 +203,6 @@ void TTCWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags)
 void TTCWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags)
 {
 	ModifyStyleCom(GWL_EXSTYLE, dwRemove, dwAdd, nFlags);
-}
-
-int TTCWnd::MessageBoxT(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
-{
-	return ::MessageBox(m_hWnd, lpText, lpCaption, uType);
 }
 
 int TTCWnd::MessageBoxA(const char *lpText, const char *lpCaption, UINT uType)

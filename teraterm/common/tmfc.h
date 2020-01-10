@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 TeraTerm Project
+ * Copyright (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,18 +48,14 @@ public:
 	BOOL EndPaint(LPPAINTSTRUCT lpPaint);
 	LRESULT SendMessage(UINT msg, WPARAM wp, LPARAM lp);
 	void ShowWindow(int nCmdShow);
-	void SetWindowTextT(const TCHAR *str);
 	void SetWindowTextW(const wchar_t *str);
 	void SetWindowTextA(const char *str);
 	LONG_PTR SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong);
 	LONG_PTR GetWindowLongPtr(int nIndex);
 	void ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 	void ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
-	int MessageBoxT(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 	int MessageBoxA(const char * lpText, const char *lpCaption, UINT uType);
-#if defined(UNICODE)
 	int MessageBoxW(const wchar_t * lpText, const wchar_t *lpCaption, UINT uType);
-#endif
 	//virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	BOOL GetWindowRect(RECT *R);
@@ -69,13 +65,10 @@ public:
 	BOOL EndDialog(int nResult);
 	// for controls
 	HWND GetDlgItem(int id);
-	LRESULT SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp);
 	LRESULT SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp);
 	LRESULT SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp);
-	void GetDlgItemTextT(int id, TCHAR *buf, size_t size);
 	void GetDlgItemTextW(int id, wchar_t *buf, size_t size);
 	void GetDlgItemTextA(int id, char *buf, size_t size);
-	void SetDlgItemTextT(int id, const TCHAR *str);
 	void SetDlgItemTextW(int id, const wchar_t *str);
 	void SetDlgItemTextA(int id, const char *str);
 	void SetDlgItemNum(int id, LONG Num);

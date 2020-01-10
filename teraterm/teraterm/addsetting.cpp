@@ -158,7 +158,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 void CGeneralPropPageDlg::OnOK()
 {
-	TCHAR buf[64];
+	char buf[64];
 	int val;
 
 	// (1)
@@ -171,8 +171,8 @@ void CGeneralPropPageDlg::OnOK()
 	ts.AcceptBroadcast = GetCheck(IDC_ACCEPT_BROADCAST);
 
 	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	GetDlgItemTextT(IDC_SCROLL_LINE, buf, _countof(buf));
-	val = _tstoi(buf);
+	GetDlgItemText(IDC_SCROLL_LINE, buf, _countof(buf));
+	val = atoi(buf);
 	if (val > 0)
 		ts.MouseWheelScrollLine = val;
 
@@ -899,7 +899,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 無効化されたら、BGThemeFile を元に戻す。
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// 背景画像も無効化する。
-				SetDlgItemTextT(IDC_BGIMG_EDIT, _T(""));
+				SetDlgItemText(IDC_BGIMG_EDIT, "");
 				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
 
 				EnableDlgItem(IDC_MIXED_THEME_FILE, FALSE);
@@ -934,7 +934,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 無効化されたら、BGThemeFile を元に戻す。
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// 背景画像も無効化する。
-				SetDlgItemTextT(IDC_BGIMG_EDIT, _T(""));
+				SetDlgItemText(IDC_BGIMG_EDIT, "");
 				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
 			}
 			return TRUE;
