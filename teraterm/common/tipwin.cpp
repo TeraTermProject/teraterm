@@ -64,7 +64,7 @@
 #endif
 #include <crtdbg.h>
 
-#include "ttlib.h"		// for GetMessageboxFont(), IsWindowsNTKernel()
+#include "ttlib.h"		// for GetMessageboxFont()
 #include "codeconv.h"
 #include "layer_for_unicode.h"
 
@@ -84,24 +84,6 @@ typedef struct tagTipWinData {
 	int px;
 	int py;
 } TipWin;
-
-/**
- *	9x系でDrawTextWが使えるかよくわからない
- *	とりあえずこのファイルでのみ使用
- *	そのうち layer_for_unicode.cpp に移動する
- */
-static int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
-{
-	if (IsWindowsNTKernel()) {
-		return DrawTextW(hdc, lpchText, cchText, lprc, format);
-	}
-
-	char *strA = ToCharW(lpchText);
-	size_t strA_len = strlen(strA);
-	int result = DrawTextA(hdc, strA, strA_len, lprc, format);
-	free(strA);
-	return result;
-}
 
 VOID CTipWin::CalcStrRect(VOID)
 {

@@ -36,6 +36,7 @@
 
 #include "codeconv.h"
 #include "compat_win.h"
+#include "ttlib.h"		// for IsWindowsNTKernel()
 
 #include "layer_for_unicode.h"
 
@@ -284,4 +285,20 @@ UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
 	if (cchMax > 0)
 		lpString[0] = 0;
 	return 0;
+}
+
+/**
+ *	TODO:9xŒn‚ÅDrawTextW‚ªŽg‚¦‚é?
+ */
+int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
+{
+	if (IsWindowsNTKernel()) {
+		return DrawTextW(hdc, lpchText, cchText, lprc, format);
+	}
+
+	char *strA = ToCharW(lpchText);
+	int strA_len = (int)strlen(strA);
+	int result = DrawTextA(hdc, strA, strA_len, lprc, format);
+	free(strA);
+	return result;
 }

@@ -53,6 +53,7 @@ HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName
 							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
 							 LPVOID lpParam);
 ATOM _RegisterClassW(const WNDCLASSW *lpWndClass);
+int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
 
 #ifdef __cplusplus
 }
