@@ -27,7 +27,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /*
- * Copyright (C) 2008-2019 TeraTerm Project
+ * Copyright (C) 2008-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -304,6 +304,9 @@ VOID CTipWin::SetText(const wchar_t *str)
 
 	TipWin* self = tWin;
 	self->str_len = wcslen(str);
+	if (self->str != NULL) {
+		free((void *)self->str);
+	}
 	self->str = _wcsdup(str);
 	CalcStrRect();
 
