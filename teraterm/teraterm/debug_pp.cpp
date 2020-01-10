@@ -59,7 +59,7 @@ void CDebugPropPage::OnInitDialog()
 {
 	// popup
 	SetCheck(IDC_DEBUG_POPUP_ENABLE, UnicodeDebugParam.CodePopupEnable);
-	for (int i = 0; i < _countof(key_list); i++) {
+	for (int i = 0; i < (int)_countof(key_list); i++) {
 		SendDlgItemMessage(IDC_DEBUG_POPUP_KEY1, CB_ADDSTRING, 0, (LPARAM)key_list[i].key_str);
 		SendDlgItemMessage(IDC_DEBUG_POPUP_KEY2, CB_ADDSTRING, 0, (LPARAM)key_list[i].key_str);
 		if (UnicodeDebugParam.CodePopupKey1 == key_list[i].key_code) {
