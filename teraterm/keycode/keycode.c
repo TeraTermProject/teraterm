@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ static BOOL KeyDown = FALSE;
 static BOOL Short;
 static WORD Scan;
 
-int PASCAL WinMain(HINSTANCE hInstance,
+int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
                    LPSTR lpszCmdLine,
                    int nCmdShow)
@@ -63,17 +63,24 @@ int PASCAL WinMain(HINSTANCE hInstance,
 	pSetDllDir setDllDir;
 	pSetDefDllDir setDefDllDir;
 
+	(void)lpszCmdLine;
 	DoCover_IsDebuggerPresent();
 
 	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
-		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
+		FARPROC func_ptr = GetProcAddress(module, "SetDefaultDllDirectories");
+		setDefDllDir = (pSetDefDllDir)func_ptr;
+		if (setDefDllDir != NULL) {
 			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
 		}
-		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() が使えなくても、SetDllDirectory() が使える場合は
-			// カレントディレクトリだけでも検索パスからはずしておく。
-			(*setDllDir)("");
+		else {
+			func_ptr = GetProcAddress(module, "SetDllDirectoryA");
+			setDllDir = (pSetDllDir)func_ptr;
+			if (setDllDir != NULL) {
+				// SetDefaultDllDirectories() が使えなくても、SetDllDirectory() が使える場合は
+				// カレントディレクトリだけでも検索パスからはずしておく。
+				(*setDllDir)("");
+			}
 		}
 	}
 
@@ -121,7 +128,7 @@ int PASCAL WinMain(HINSTANCE hInstance,
 		DispatchMessage(&msg);
 	}
 
-	return msg.wParam;
+	return (int)msg.wParam;
 }
 
 void KeyDownProc(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -153,6 +160,8 @@ void KeyDownProc(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void KeyUpProc(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	(void)wParam;
+	(void)lParam;
 	if (! KeyDown) {
 		return;
 	}
@@ -175,7 +184,7 @@ void PaintProc(HWND hWnd)
 
 	if (KeyDown) {
 		_snprintf_s(OutStr,sizeof(OutStr),_TRUNCATE,"Key code is %u.",Scan);
-		TextOutA(hDC,10,10,OutStr,strlen(OutStr));
+		TextOutA(hDC,10,10,OutStr, (int)strlen(OutStr));
 	}
 	else {
 		TextOutA(hDC,10,10,"Push any key.",13);
