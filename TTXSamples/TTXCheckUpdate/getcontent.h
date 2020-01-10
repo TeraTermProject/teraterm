@@ -1,7 +1,5 @@
 
 #include <stdlib.h>
-#include <tchar.h>
-//#include <stdbool.h>
 #include <windows.h>
 
 #ifdef __cplusplus

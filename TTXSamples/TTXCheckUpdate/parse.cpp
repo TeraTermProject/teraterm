@@ -1,7 +1,6 @@
-#include <windows.h>
-#include <wininet.h>
-#include <tchar.h>
+
 #define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
 
 #include "cJSON/cJSON.h"

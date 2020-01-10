@@ -1,12 +1,8 @@
 
 #include <windows.h>
 #include <wininet.h>
-#include <string>
-#include <sstream>
-#include <locale.h>
-#include <conio.h>
-#include <tchar.h>
 #define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
 
 #if (defined(_MSC_VER) && (_MSC_VER >= 1600)) || !defined(_MSC_VER)

@@ -141,7 +141,7 @@ static void ShowDialog(HWND hWnd)
 	}
 
 	swprintf(agent, _countof(agent), L"%s_%d", agent_base, pvar->ts->RunningVersion);
-	result_bool = GetContent(update_info_url, agent, &json_raw_ptr, &json_raw_size);
+	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
 	if (!result_bool) {
 		MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
