@@ -133,15 +133,6 @@ target_compile_definitions(
   PRIVATE
   $<$<CONFIG:Debug>:_CRTDBG_MAP_ALLOC>
   )
-if(USE_UNICODE_API)
-  target_compile_definitions(
-    ttxssh
-    PRIVATE
-    UNICODE
-    _UNICODE
-    )
-endif()
-
 
 target_link_libraries(
   ttxssh

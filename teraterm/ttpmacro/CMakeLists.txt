@@ -3,10 +3,6 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 
-if(USE_UNICODE_API)
-  add_definitions(-DUNICODE -D_UNICODE)
-endif()
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 add_executable(

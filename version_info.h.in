@@ -1,5 +1,4 @@
 
-#cmakedefine USE_UNICODE_API
 #cmakedefine SVNVERSION @SVNVERSION@
 
 // infos when generated
