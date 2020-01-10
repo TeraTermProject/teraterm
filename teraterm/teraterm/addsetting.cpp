@@ -849,6 +849,22 @@ void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 	}
 }
 
+static void OpacityTooltip(CTipWin* tip, HWND hDlg, int trackbar, int pos, const char *UILanguageFile)
+{
+	wchar_t uimsg[MAX_UIMSG];
+	get_lang_msgW("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), L"Opacity %.1f %%", ts.UILanguageFile);
+	wchar_t tipbuf[MAX_UIMSG];
+	swprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
+	RECT rc;
+	::GetWindowRect(::GetDlgItem(hDlg, trackbar), &rc);
+	tip->SetText(tipbuf);
+	tip->SetPos(rc.right, rc.bottom);
+	tip->SetHideTimer(1000);
+	if (! tip->IsVisible()) {
+		tip->SetVisible(TRUE);
+	}
+}
+
 BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	int sel;
@@ -1028,20 +1044,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
 				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
-
-				TCHAR tipbuf[32];
-				TCHAR uimsg[MAX_UIMSG];
-				RECT rc;
-				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-				_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
-
-				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE), &rc);
-				TipWin->SetText(tipbuf);
-				TipWin->SetPos(rc.right, rc.bottom);
-				TipWin->SetHideTimer(1000);
-				if (! TipWin->IsVisible()) {
-					TipWin->SetVisible(TRUE);
-				}
+				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_ACTIVE, pos, ts.UILanguageFile);
 				return TRUE;
 			}
 		case IDC_ALPHA_BLEND_INACTIVE | (EN_CHANGE << 16):
@@ -1057,19 +1060,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
 				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
-
-				TCHAR tipbuf[32], uimsg[MAX_UIMSG];
-				RECT rc;
-				get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-				_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
-
-				::GetWindowRect(GetDlgItem(IDC_ALPHA_BLEND_INACTIVE), &rc);
-				TipWin->SetText(tipbuf);
-				TipWin->SetPos(rc.right, rc.bottom);
-				TipWin->SetHideTimer(1000);
-				if (! TipWin->IsVisible()) {
-					TipWin->SetVisible(TRUE);
-				}
+				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, ts.UILanguageFile);
 				return TRUE;
 			}
 	}
