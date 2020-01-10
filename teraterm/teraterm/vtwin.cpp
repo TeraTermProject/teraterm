@@ -60,7 +60,9 @@
 #include "teraterml.h"
 
 #include <stdio.h>
+#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
+#include <crtdbg.h>
 #include <string.h>
 #include <locale.h>
 #include <tchar.h>
@@ -69,7 +71,6 @@
 #include <io.h>
 #include <errno.h>
 #include <imagehlp.h>
-#include <crtdbg.h>
 
 #include <windowsx.h>
 #include <imm.h>
@@ -100,35 +101,6 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
 
 #define VTClassName _T("VTWin32")
-
-#undef SetDlgItemText
-#define SetDlgItemText SetDlgItemTextA
-#undef CreateProcess
-#define CreateProcess CreateProcessA
-#undef STARTUPINFO
-#define STARTUPINFO STARTUPINFOA
-#undef GetStartupInfo
-#define GetStartupInfo GetStartupInfoA
-
-#if defined(UNICODE)
-#define CreateProcessT CreateProcessW
-#define GetStartupInfoT GetStartupInfoW
-#define STARTUPINFOT STARTUPINFOW
-#define SetDlgItemTextT SetDlgItemTextW
-#else
-#define CreateProcessT CreateProcessA
-#define GetStartupInfoT GetStartupInfoA
-#define STARTUPINFOT STARTUPINFOA
-#define SetDlgItemTextT SetDlgItemTextA
-#endif
-
-#ifdef _DEBUG
-#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
-#if defined(_MSC_VER)
-#define new  		::new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
-#endif
 
 // ウィンドウ最大化ボタンを有効にする (2005.1.15 yutaka)
 #define WINDOW_MAXMIMUM_ENABLED 1
@@ -1695,7 +1667,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 }
 
 /* copy from ttset.c*/
-static void WriteInt2(PCHAR Sect, PCHAR Key, PCHAR FName, int i1, int i2)
+static void WriteInt2(const char *Sect, const char *Key, const char *FName, int i1, int i2)
 {
 	char Temp[32];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d", i1, i2);
@@ -4850,10 +4822,10 @@ void CVTWindow::OnSetupFont()
 static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if (Message == WM_INITDIALOG) {
-		TCHAR uimsg[MAX_UIMSG];
-		get_lang_msgT("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
-					  _T("\"Font style\" selection here won't affect actual font appearance."), ts.UILanguageFile);
-		SetDlgItemTextT(Dialog, stc6, uimsg);
+		wchar_t uimsg[MAX_UIMSG];
+		get_lang_msgW("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
+					  L"\"Font style\" selection here won't affect actual font appearance.", ts.UILanguageFile);
+		_SetDlgItemTextW(Dialog, stc6, uimsg);
 
 		SetFocus(GetDlgItem(Dialog,cmb1));
 

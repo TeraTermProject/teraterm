@@ -391,8 +391,6 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 	// CR+LF -> LF
 	// CR    -> LF
 	// LF    -> LF (•ÏŠ·•s—v)
-	int cr_count = 0;
-	int lf_count = 0;
 	const wchar_t *p = src;
 	const wchar_t *p_end = src + src_len;
 	wchar_t *dest = dest_top;

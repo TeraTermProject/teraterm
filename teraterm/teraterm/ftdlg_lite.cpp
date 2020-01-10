@@ -1,5 +1,5 @@
 /*
- * (C) 2019 TeraTerm Project
+ * (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -183,8 +183,6 @@ private:
 	HANDLE SmallIcon;
 	HANDLE BigIcon;
 	const char *UILanguageFile_;
-	wchar_t *Cation;
-	wchar_t *Filename;
 
 public:
 	BOOL Pause;
