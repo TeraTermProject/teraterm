@@ -9,42 +9,8 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(COMMON_SRC
-  ../common/teraterm.h
-  ../common/ttcommon.h
-  ../common/ttddecmnd.h
-  ../common/tttypes.h
-  ../common/tt-version.h
-  ../common/i18n.h
-  ../common/ttlib.c
-  ../common/ttlib.h
-  ../common/tmfc.cpp
-  ../common/tmfc.h
-  ../common/tmfc_frame.cpp
-  ../common/dlglib.h
-  ../common/dlglib.c
-  ../common/dlglib_tmpl.cpp
-  ../common/dlglib_cpp.cpp
-  ../common/compat_w95.h
-  ../common/compat_win.h
-  ../common/compat_win.cpp
-  ../common/win16api.h
-  ../common/win16api.c
-  ../common/codeconv.h
-  ../common/codeconv.cpp
-  ../common/dllutil.h
-  ../common/dllutil.cpp
-  ../common/layer_for_unicode.h
-  ../common/layer_for_unicode.cpp
-  )
-
-source_group(
-  "common"
-  FILES
-  ${COMMON_SRC}
-  )
-
-set(SRC
+add_executable(
+  ttpmacro WIN32
   ttm_res.h
   errdlg.cpp
   errdlg.h
@@ -87,38 +53,62 @@ set(SRC
   ttmacro_manifest.rc
   fileread.h
   fileread.cpp
-  ${COMMON_SRC}
   )
 
-include_directories(
+target_sources(
+  ttpmacro
+  PRIVATE
+  ../common/teraterm.h
+  ../common/ttcommon.h
+  ../common/ttddecmnd.h
+  ../common/tttypes.h
+  ../common/tt-version.h
+  ../common/i18n.h
+  ../common/ttlib.c
+  ../common/ttlib.h
+  ../common/tmfc.cpp
+  ../common/tmfc.h
+  ../common/tmfc_frame.cpp
+  ../common/dlglib.h
+  ../common/dlglib.c
+  ../common/dlglib_tmpl.cpp
+  ../common/dlglib_cpp.cpp
+  ../common/compat_w95.h
+  ../common/compat_win.h
+  ../common/compat_win.cpp
+  ../common/win16api.h
+  ../common/win16api.c
+  ../common/codeconv.h
+  ../common/codeconv.cpp
+  ../common/dllutil.h
+  ../common/dllutil.cpp
+  ../common/layer_for_unicode.h
+  ../common/layer_for_unicode.cpp
+  )
+
+source_group(
+  "common"
+  REGULAR_EXPRESSION
+  "..\/common\/"
+  )
+
+target_include_directories(
+  ttpmacro
+  PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common
   ${ONIGURUMA_INCLUDE_DIRS}
   ${SFMT_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common
-  )
-
-link_directories(
-  ${ONIGURUMA_LIBRARY_DIRS}
-  ${SFMT_LIBRARY_DIRS}
   )
 
 if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll /MANIFEST:NO")
 endif()
 
-add_executable(
-  ttpmacro WIN32
-  ${SRC}
-  )
-
 target_link_libraries(
   ttpmacro
   ttpcmn
-#  optimized LIBCMT.lib
-#  debug LIBCMTD.lib
-  optimized onig
-  debug onigd
-  optimized sfmt
-  debug sfmtd
+  ${ONIGURUMA_LIB}
+  ${SFMT_LIB}
   #
   iphlpapi
   delayimp
@@ -126,11 +116,6 @@ target_link_libraries(
   comctl32
   gdi32
   comdlg32
-  )
-
-add_dependencies(
-  ttpmacro
-  ttpcmn
   )
 
 install(
