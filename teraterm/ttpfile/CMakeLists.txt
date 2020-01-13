@@ -59,6 +59,11 @@ if(MINGW)
     )
 endif()
 
+if (MSVC)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:user32.dll")
+  # target_link_options ...
+endif()
+
 target_link_libraries(
   ttpfile
   ttpcmn
