@@ -1,5 +1,5 @@
 /*
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -225,9 +225,25 @@ INT_PTR TTDialogBoxParam(
 	return DlgResult;
 #else
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
-	INT_PTR DlgResult = DialogBoxIndirectParam(
-		hInstance, lpTemplate, hWndParent,
-		lpDialogFunc, lParamInit);
+	INT_PTR DlgResult;
+	static INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+
+	if (pDialogBoxIndirectParamW == NULL) {
+		HMODULE hDll = LoadLibrary("user32.dll");
+		FARPROC *proc = (FARPROC *)&pDialogBoxIndirectParamW;
+		*proc = GetProcAddress(hDll, "DialogBoxIndirectParamW");
+	}
+
+	if (pDialogBoxIndirectParamW == NULL) {
+		DlgResult = DialogBoxIndirectParamA(
+			hInstance, lpTemplate, hWndParent,
+			lpDialogFunc, lParamInit);
+	}
+	else {
+		DlgResult = pDialogBoxIndirectParamW(
+			hInstance, lpTemplate, hWndParent,
+			lpDialogFunc, lParamInit);
+	}
 	free(lpTemplate);
 	return DlgResult;
 #endif
