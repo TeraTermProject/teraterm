@@ -1040,7 +1040,7 @@ BOOL ZParseFile(PFileVar fv, PZVar zv)
 	/* file mtime */
 	p = zv->PktIn + i;
 	if (*p) {
-		ret = sscanf(p, "%lo%o", &modtime, &mode);
+		ret = sscanf_s(p, "%lo%o", &modtime, &mode);
 		if (ret >= 1) {
 			fv->FileMtime = modtime;
 		}

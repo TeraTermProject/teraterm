@@ -336,11 +336,13 @@ void YInit(PFileVar fv, PYVar yv, PComVar cv, PTTSet ts)
 
 	if (fv->LogFlag) {
 		char buf[128];
+		char ctime_str[128];
 		time_t tm = time(NULL);
+		ctime_s(ctime_str, sizeof(ctime_str), &tm);
 
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "YMODEM %s start: %s\n", 
 		            yv->YMode == IdYSend ? "Send" : "Recv",
-		            ctime(&tm));
+		            ctime_str);
 		_lwrite(fv->LogFile, buf, strlen(buf));
 	}
 
@@ -583,7 +585,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		}
 		nameend = name + 1 + strlen(name);
 		if (*nameend) {
-			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
+			ret = sscanf_s(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
 			if (ret >= 1) {
 				fv->FileSize = bytes_total;
 				yv->RecvFilesize = TRUE;

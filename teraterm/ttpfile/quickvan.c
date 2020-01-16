@@ -783,7 +783,8 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
 {
   int i, j;
   struct stat stbuf; 
-  struct tm * tmbuf;
+  struct tm tmbuf;
+  char fullname_upper[MAX_PATH];
 
   if (! GetNextFname(fv))
   {
@@ -820,7 +821,9 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */
   SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
-  strncpy_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,_strupr(&(fv->FullName[fv->DirLen])),_TRUNCATE);
+  strncpy_s(fullname_upper, sizeof(fullname_upper), &(fv->FullName[fv->DirLen]), _TRUNCATE);
+  _strupr_s(fullname_upper, sizeof(fullname_upper));
+  strncpy_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,fullname_upper,_TRUNCATE);
   FTConvFName(&(qv->PktOut[i]));  // replace ' ' by '_' in FName
   i = strlen(&(qv->PktOut[i])) + i;
   qv->PktOut[i] = 0;
@@ -832,16 +835,16 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
   i++;
   /* date */
   stat(fv->FullName,&stbuf);
-  tmbuf = localtime(&stbuf.st_mtime);
+  localtime_s(&tmbuf, &stbuf.st_mtime);
 
-  QVPutNum2(qv,(WORD)((tmbuf->tm_year+1900) / 100),&i);
-  QVPutNum2(qv,(WORD)((tmbuf->tm_year+1900) % 100),&i);
-  QVPutNum2(qv,(WORD)(tmbuf->tm_mon+1),&i);
-  QVPutNum2(qv,(WORD)tmbuf->tm_mday,&i);
+  QVPutNum2(qv,(WORD)((tmbuf.tm_year+1900) / 100),&i);
+  QVPutNum2(qv,(WORD)((tmbuf.tm_year+1900) % 100),&i);
+  QVPutNum2(qv,(WORD)(tmbuf.tm_mon+1),&i);
+  QVPutNum2(qv,(WORD)tmbuf.tm_mday,&i);
   /* time */
-  QVPutNum2(qv,(WORD)tmbuf->tm_hour,&i);
-  QVPutNum2(qv,(WORD)tmbuf->tm_min,&i);
-  QVPutNum2(qv,(WORD)tmbuf->tm_sec,&i);
+  QVPutNum2(qv,(WORD)tmbuf.tm_hour,&i);
+  QVPutNum2(qv,(WORD)tmbuf.tm_min,&i);
+  QVPutNum2(qv,(WORD)tmbuf.tm_sec,&i);
   for (j = i ; j <= 130 ; j++)
     qv->PktOut[j] = 0;
 

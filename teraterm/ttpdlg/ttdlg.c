@@ -2412,7 +2412,7 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 	char tmpbuf[128];
 	int msc_ver, vs_ver, msc_low_ver;
 
-	strcpy(buf, "Microsoft Visual C++");
+	strcpy_s(buf, buf_size, "Microsoft Visual C++");
 #ifdef _MSC_FULL_VER
 	// _MSC_VER  VS Ver.  VS internal Ver.  MSVC++ Ver.
 	// 1400      2005     8.0               8.0

@@ -3920,7 +3920,7 @@ void CVTWindow::OnCygwinConnection()
 
 	for (c = 'C' ; c <= 'Z' ; c++) {
 		char tmp[MAX_PATH];
-		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
+		sprintf_s(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
 		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
@@ -4389,7 +4389,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					char uimsg[MAX_UIMSG];
 					get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile,
 								 data->UILanguageFile);
-					strcpy(title, "Tera Term: ");
+					strcpy_s(title, "Tera Term: ");
 					strncat_s(title, _countof(title), uimsg, _TRUNCATE);
 
 					size_t filter_len;

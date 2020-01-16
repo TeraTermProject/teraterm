@@ -717,7 +717,7 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 	char buf[MAX_PATH];
 	char *c;
 	time_t time_local;
-	struct tm *tm_local;
+	struct tm tm_local;
 
 	// ÉtÉ@ÉCÉãñºïîï™ÇÃÇ›Ç flename Ç…äiî[
 	ExtractFileName(FName, filename ,sizeof(filename));
@@ -727,10 +727,10 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 
 	// åªç›éûçèÇéÊìæ
 	time(&time_local);
-	tm_local = localtime(&time_local);
+	localtime_s(&tm_local, &time_local);
 
 	// éûçèï∂éöóÒÇ…ïœä∑
-	if (strftime(buf, sizeof(buf), filename, tm_local) == 0) {
+	if (strftime(buf, sizeof(buf), filename, &tm_local) == 0) {
 		strncpy_s(buf, sizeof(buf), filename, _TRUNCATE);
 	}
 
@@ -876,7 +876,7 @@ void GetNthNum(PCHAR Source, int Nth, int far *Num)
 	char T[15];
 
 	GetNthString(Source,Nth,sizeof(T),T);
-	if (sscanf(T, "%d", Num) != 1) {
+	if (sscanf_s(T, "%d", Num) != 1) {
 		*Num = 0;
 	}
 }
@@ -887,7 +887,7 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 	int v;
 
 	GetNthString(Source, Nth, sizeof(T), T);
-	if (sscanf(T, "%d", &v) != 1) {
+	if (sscanf_s(T, "%d", &v) != 1) {
 		v = defval;
 	}
 	

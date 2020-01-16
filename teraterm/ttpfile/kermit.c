@@ -210,7 +210,7 @@ static void KmtStringLog(PFileVar fv, PKmtVar kv, char *fmt, ...)
 
 	if (fv->LogFlag) {
 		va_start(arg, fmt);
-		len = _vsnprintf(tmp, sizeof(tmp), fmt, arg);
+		len = _vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
 		va_end(arg);
 		_lwrite(fv->LogFile, tmp, len);
 		_lwrite(fv->LogFile,"\015\012",2);
@@ -716,9 +716,9 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 			memset(&tm, 0, sizeof(tm));
 			switch (strlen(str)) {
 				case 17:
-					if ( sscanf(str, "%04d%02d%02d %02d:%02d:%02d",
-					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-					            &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
+					if ( sscanf_s(str, "%04d%02d%02d %02d:%02d:%02d",
+								  &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+								  &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
 						kv->FileTime = time(NULL);
 					} else {
 						tm.tm_year -= 1900;		// 1900-
@@ -727,9 +727,9 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 					}
 					break;
 				case 14:
-					if ( sscanf(str, "%04d%02d%02d %02d:%02d",
-					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-					            &tm.tm_hour, &tm.tm_min) < 5 ) {
+					if ( sscanf_s(str, "%04d%02d%02d %02d:%02d",
+								  &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+								  &tm.tm_hour, &tm.tm_min) < 5 ) {
 						kv->FileTime = time(NULL);
 					} else {
 						tm.tm_year -= 1900;		// 1900-
@@ -739,8 +739,8 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 					}
 					break;
 				case 8:
-					if ( sscanf(str, "%04d%02d%02d",
-					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday) < 3 ) {
+					if ( sscanf_s(str, "%04d%02d%02d",
+								  &tm.tm_year, &tm.tm_mon, &tm.tm_mday) < 3 ) {
 						kv->FileTime = time(NULL);
 					} else {
 						tm.tm_year -= 1900;		// 1900-
@@ -752,9 +752,9 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 					}
 					break;
 				case 15:
-					if ( sscanf(str, "%02d%02d%02d %02d:%02d:%02d",
-					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-					            &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
+					if ( sscanf_s(str, "%02d%02d%02d %02d:%02d:%02d",
+								  &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+								  &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
 						kv->FileTime = time(NULL);
 					} else {
 						if (tm.tm_year <= 49) {
@@ -765,9 +765,9 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 					}
 					break;
 				case 12:
-					if ( sscanf(str, "%02d%02d%02d %02d:%02d",
-					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-					            &tm.tm_hour, &tm.tm_min) < 5 ) {
+					if ( sscanf_s(str, "%02d%02d%02d %02d:%02d",
+								  &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+								  &tm.tm_hour, &tm.tm_min) < 5 ) {
 						kv->FileTime = time(NULL);
 					} else {
 						if (tm.tm_year <= 49) {
@@ -779,8 +779,8 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 					}
 					break;
 				case 6:
-					if ( sscanf(str, "%02d%02d%02d",
-					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday) < 3 ) {
+					if ( sscanf_s(str, "%02d%02d%02d",
+								  &tm.tm_year, &tm.tm_mon, &tm.tm_mday) < 3 ) {
 						kv->FileTime = time(NULL);
 					} else {
 						if (tm.tm_year <= 49) {
@@ -799,7 +799,7 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 			break;
 		case ',':	// File attribute "664"
 			kv->FileAttrFlag |= KMT_ATTR_MODE;
-			sscanf(str, "%03o", &kv->FileMode);
+			sscanf_s(str, "%03o", &kv->FileMode);
 			break;
 		case '1':	// File length in bytes
 			kv->FileAttrFlag |= KMT_ATTR_SIZE;
@@ -1053,9 +1053,10 @@ BOOL KmtSendNextFileAttr(PFileVar fv, PKmtVar kv, PComVar cv)
 		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
 	}
 	if ( (kv->FileAttrFlag & KMT_ATTR_TIME) != 0 ) {
-		struct tm *date = localtime(&kv->FileTime);
+		struct tm date;
 		int len;
-		len = strftime(t, sizeof(t), "%Y%m%d %H:%M:%S", date);
+		localtime_s(&date, &kv->FileTime);
+		len = strftime(t, sizeof(t), "%Y%m%d %H:%M:%S", &date);
 		_snprintf_s(s, sizeof(s), _TRUNCATE, "#%c%s", KmtChar(len), t);
 		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
 	}
@@ -1190,7 +1191,9 @@ void KmtInit
 	fv->LogFlag = ((ts->LogFlag & LOG_KMT)!=0);
 	if (fv->LogFlag) {
 		char buf[128];
+		char ctime_str[128];
 		time_t tm = time(NULL);
+		ctime_s(ctime_str, sizeof(ctime_str), &tm);
 
 		fv->LogFile = _lcreat("KERMIT.LOG",0);
 		fv->LogCount = 0;
@@ -1200,7 +1203,7 @@ void KmtInit
 			kv->KmtMode == IdKmtSend ? "Send" : 
 			kv->KmtMode == IdKmtReceive ? "Receive" :
 			kv->KmtMode == IdKmtGet ? "Get" : "Finish",
-			ctime(&tm) 
+			ctime_str 
 			);
 		_lwrite(fv->LogFile, buf, strlen(buf));
 	}
