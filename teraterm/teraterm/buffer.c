@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -3662,9 +3662,9 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 	int Y = DrawY;
 	const LONG TmpPtr = GetLinePtr(SY);
 	int istart = IStart;
-	char bufA[TermWidthMax];
-	wchar_t bufW[TermWidthMax];
-	char bufWW[TermWidthMax];
+	char bufA[TermWidthMax+1];
+	wchar_t bufW[TermWidthMax+1];
+	char bufWW[TermWidthMax+1];
 	int lenW = 0;
 	int lenA = 0;
 	TCharAttr CurAttr;
