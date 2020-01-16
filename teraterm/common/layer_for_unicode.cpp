@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 TeraTerm Project
+ * Copyright (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -300,5 +300,19 @@ int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
 	int strA_len = (int)strlen(strA);
 	int result = DrawTextA(hdc, strA, strA_len, lprc, format);
 	free(strA);
+	return result;
+}
+
+int _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
+{
+	if (pMessageBoxW != NULL) {
+		return pMessageBoxW(hWnd, lpText, lpCaption, uType);
+	}
+
+	char *textA = ToCharW(lpText);
+	char *captionA = ToCharW(lpCaption);
+	int result = MessageBoxA(hWnd, textA, captionA, uType);
+	free(textA);
+	free(captionA);
 	return result;
 }

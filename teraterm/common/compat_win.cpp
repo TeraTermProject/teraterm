@@ -1,5 +1,5 @@
 /*
- * (C) 20018-2019 TeraTerm Project
+ * (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,11 @@ HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
 HWND (WINAPI *pGetConsoleWindow)(void);
+int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+
+HWND (WINAPI *pHtmlHelpW)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -119,6 +124,8 @@ static const APIInfo Lists_user32[] = {
 	{ "ModifyMenuW", (void **)&pModifyMenuW },
 	{ "GetMenuStringW", (void **)&pGetMenuStringW },
 	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
+	{ "MessageBoxW", (void **)&pMessageBoxW },
+	{ "DialogBoxIndirectParamW", (void **)&pDialogBoxIndirectParamW },
 	{},
 };
 
@@ -158,6 +165,12 @@ static const APIInfo Lists_comctl32[] = {
 	{},
 };
 
+static const APIInfo Lists_hhctrl[] = {
+	{ "HtmlHelpW", (void **)&pHtmlHelpW },
+	{ "HtmlHelpA", (void **)&pHtmlHelpA },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -166,6 +179,7 @@ static const DllInfo DllInfos[] = {
 	{ _T("kernel32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
 	{ _T("shell32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
 	{ _T("Comctl32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
+	{ _T("hhctrl.ocx"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_hhctrl },
 	{},
 };
 

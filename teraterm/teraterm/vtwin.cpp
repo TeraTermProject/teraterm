@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1693,14 +1693,18 @@ void CVTWindow::OnClose()
 		MessageBeep(0);
 		return;
 	}
-	get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Disconnect?", ts.UILanguageFile);
+
 	if (cv.Ready && (cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
-	    ! CloseTT &&
-	    (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
-	     MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL)) {
-		return;
+	    ! CloseTT) {
+		wchar_t uimsg[MAX_UIMSG];
+		get_lang_msgW("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
+					  L"Disconnect?", ts.UILanguageFile);
+		int result = _MessageBoxW(HVTWin, uimsg, L"Tera Term",
+								  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+		if (result == IDCANCEL) {
+			return;
+		}
 	}
 
 	FileTransEnd(0);
