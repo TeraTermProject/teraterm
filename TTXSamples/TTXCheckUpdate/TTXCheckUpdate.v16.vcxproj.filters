@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{7f6c33d3-32cc-4cec-be30-1f30eefcde37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cJSON">
+      <UniqueIdentifier>{eba3832e-0743-46e0-bc55-5de2f37143ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TTXCheckUpdate.c">
@@ -24,43 +30,43 @@
     <ClCompile Include="getcontent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cJSON/cJSON.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/codeconv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/dlglib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/dlglib_cpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/dlglib_tmpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="../../teraterm/common/ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="../../teraterm/common/codeconv.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="../../teraterm/common/dlglib.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="../../teraterm/common/dlglib_cpp.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="../../teraterm/common/dlglib_tmpl.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="cJSON/cJSON.c">
+      <Filter>cJSON</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="getcontent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cJSON/cJSON.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="../../teraterm/common/codeconv.h">
-      <Filter>Header Files</Filter>
+      <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="../../teraterm/common/dlglib.h">
-      <Filter>Header Files</Filter>
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="cJSON/cJSON.h">
+      <Filter>cJSON</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
