@@ -228,7 +228,9 @@ INT_PTR TTDialogBoxParam(
 	INT_PTR DlgResult;
 	static INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 
-	if (pDialogBoxIndirectParamW == NULL) {
+	// íç 9xÇ≈ÇÕ DialogBoxIndirectParamW ÇégópÇµÇ»Ç¢
+	//		DialogBoxIndirectParamW ÇÕë∂ç›ÇµÇƒÇ‡èÌÇ…é∏îsÇ∑ÇÈ
+	if (IsWindowsNTKernel() && pDialogBoxIndirectParamW == NULL) {
 		HMODULE hDll = LoadLibrary("user32.dll");
 		FARPROC *proc = (FARPROC *)&pDialogBoxIndirectParamW;
 		*proc = GetProcAddress(hDll, "DialogBoxIndirectParamW");
