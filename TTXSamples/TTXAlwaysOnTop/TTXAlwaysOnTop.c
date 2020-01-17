@@ -77,7 +77,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_BASE, "&Alwais on top");
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
-	SetI18MenuStrs(IniSection, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
+	SetI18nMenuStrs(IniSection, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
 }
 
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {

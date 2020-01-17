@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -510,7 +510,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_SSHFWDSETUP_HELP, "BTN_HELP" },
 	};
-	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	FWD_get_request_specs(pvar, requests, num_specs);
 
@@ -801,7 +801,7 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:
@@ -1130,3 +1130,5 @@ void FWDUI_do_forwarding_dialog(PTInstVar pvar)
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 	}
 }
+
+/* vim: set ts=4 sw=4 ff=dos : */

@@ -92,6 +92,6 @@ EXPORTS
   service_name @92
   get_OPENFILENAME_SIZEA @93
 
-  SetI18DlgStrs
-  SetI18MenuStrs
+  SetI18nDlgStrs
+  SetI18nMenuStrs
   GetMessageboxFont

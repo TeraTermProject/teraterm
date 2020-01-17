@@ -1324,7 +1324,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		GetHNRec = (PGetHNRec) lParam;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		// ホストヒストリのチェックボックスを追加 (2005.10.21 yutaka)
 		if (pvar->ts->HistoryList > 0) {
@@ -2199,7 +2199,7 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 	/* inserts before ID_FILE_CHANGEDIR */
 	insertMenuBeforeItem(menu, ID_FILE_CHANGEDIR, MF_GRAYED, ID_SSHSCPMENU, "SS&H SCP...");
 
-	SetI18MenuStrs("TTSSH", menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
+	SetI18nMenuStrs("TTSSH", menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
 }
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
@@ -2377,7 +2377,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 		{ IDC_FP_HASH_ALG, "DLG_ABOUT_FP_HASH_ALGORITHM" },
 		{ IDOK, "BTN_OK" },
 	};
-	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
@@ -2680,7 +2680,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		{ IDC_LOGLEVEL, "DLG_SSHSETUP_LOGLEVEL" },
 		{ IDC_LOGLEVEL_UNIT, "DLG_SSHSETUP_LOGLEVEL_UNIT" },
 	};
-	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 	SendMessage(compressionControl, TBM_SETRANGE, TRUE, MAKELONG(0, 9));
 	SendMessage(compressionControl, TBM_SETPOS, TRUE,
@@ -4209,7 +4209,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			{ IDC_BCRYPT_KDF_ROUNDS_LABEL, "DLG_KEYGEN_BCRYPT_ROUNDS" },
 			{ IDC_SSHKEYGENSETUP_HELP, "BTN_HELP" },
 		};
-		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		init_password_control(pvar, dlg, IDC_KEY_EDIT, NULL);
 		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT, NULL);
@@ -5400,3 +5400,5 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 	}
 	return TRUE;
 }
+
+/* vim: set ts=4 sw=4 ff=dos : */

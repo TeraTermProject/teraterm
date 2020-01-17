@@ -448,7 +448,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, "Rec&urring command");
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
-	SetI18MenuStrs(SECTION, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
+	SetI18nMenuStrs(SECTION, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
 }
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
@@ -476,7 +476,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 
 	switch (msg) {
 	  case WM_INITDIALOG:
-		SetI18DlgStrs(SECTION, dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18nDlgStrs(SECTION, dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 		SendMessage(GetDlgItem(dlg, IDC_ENABLE), BM_SETCHECK,
 		            pvar->enable?BST_CHECKED:BST_UNCHECKED, 0);

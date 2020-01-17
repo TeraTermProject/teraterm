@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2019 TeraTerm Project
+ * Copyright (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -150,7 +150,7 @@ int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfon
  *    åæåÍÉtÉ@ÉCÉãÇ≈ïœä∑Ç≈Ç´ÇΩâÒêî(infoCountà»â∫ÇÃêîÇ…Ç»ÇÈ)
  *
  */
-int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
+int WINAPI SetI18nDlgStrs(const char *section, HWND hDlgWnd,
 						 const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
 {
 	size_t i;
@@ -198,7 +198,7 @@ int WINAPI SetI18DlgStrs(const char *section, HWND hDlgWnd,
 	return (translatedCount);
 }
 
-void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *infos, size_t infoCount,
+void WINAPI SetI18nMenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *infos, size_t infoCount,
 						   const char *UILanguageFile)
 {
 	const int id_position_threshold = 1000;
@@ -240,3 +240,5 @@ void WINAPI SetI18MenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *
 		}
 	}
 }
+
+/* vim: set ts=4 sw=4 ff=dos : */

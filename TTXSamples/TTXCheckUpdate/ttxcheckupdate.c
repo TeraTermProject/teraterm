@@ -221,7 +221,7 @@ static void WINAPI TTXModifyMenu(HMENU menu)
 
 	insertMenuBeforeItem(menu, ID_HELP_ABOUT, MF_ENABLED, ID_MENUITEM, "Check &Update...");
 
-	SetI18MenuStrs("TTXCheckUpdate", menu, MenuTextInfo, _countof(MenuTextInfo), UILanguageFile);
+	SetI18nMenuStrs("TTXCheckUpdate", menu, MenuTextInfo, _countof(MenuTextInfo), UILanguageFile);
 }
 
 static int WINAPI TTXProcessCommand(HWND hWin, WORD cmd)

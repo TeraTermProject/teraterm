@@ -398,7 +398,7 @@ static void UpdateMenuCaption(HMENU menu, BOOL UseOneSetting) {
 		id = (nameInfo)[i].menuID; \
 		ModifyMenu(menu, id, MF_BYCOMMAND, id, (nameInfo)[i].menuStr); \
 	} \
-	SetI18MenuStrs(IniSection, menu, (i18nInfo), _countof(i18nInfo), pvar->ts->UILanguageFile); \
+	SetI18nMenuStrs(IniSection, menu, (i18nInfo), _countof(i18nInfo), pvar->ts->UILanguageFile); \
 }
 
 	if (pvar->ts->Language == IdJapanese) {
@@ -478,11 +478,11 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 		if (pos > 0) {
 			if (pvar->ts->Language == IdJapanese) {
 				MenuTitleInfoJ->nIDDlgItem = pos;
-				SetI18MenuStrs(IniSection, menu, MenuTitleInfoJ, _countof(MenuTitleInfoJ), pvar->ts->UILanguageFile);
+				SetI18nMenuStrs(IniSection, menu, MenuTitleInfoJ, _countof(MenuTitleInfoJ), pvar->ts->UILanguageFile);
 			}
 			else {
 				MenuTitleInfoK->nIDDlgItem = pos;
-				SetI18MenuStrs(IniSection, menu, MenuTitleInfoK, _countof(MenuTitleInfoK), pvar->ts->UILanguageFile);
+				SetI18nMenuStrs(IniSection, menu, MenuTitleInfoK, _countof(MenuTitleInfoK), pvar->ts->UILanguageFile);
 			}
 		}
 
