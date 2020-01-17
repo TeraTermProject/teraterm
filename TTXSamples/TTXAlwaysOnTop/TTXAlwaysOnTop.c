@@ -63,6 +63,10 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 }
 
 static void PASCAL TTXModifyMenu(HMENU menu) {
+	static const DlgTextInfo MenuTextInfo[] = {
+		{ ID_MENU_BASE, "MENU_ALWAYSONTOP" }
+	};
+
 	UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 	pvar->ControlMenu = GetControlMenu(menu);
@@ -70,10 +74,10 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 		flag |= MF_CHECKED;
 	}
 
-	GetI18nStr(IniSection, "MENU_ALWAYSONTOP", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-	           "&Always on top", pvar->ts->UILanguageFile);
-	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_BASE, pvar->ts->UIMsg);
+	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_BASE, "&Alwais on top");
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
+
+	SetI18MenuStrs(IniSection, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
 }
 
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
