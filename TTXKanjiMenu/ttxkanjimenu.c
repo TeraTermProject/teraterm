@@ -1,14 +1,14 @@
 /*
  * TTX KanjiMenu Plugin
  *    Copyright (C) 2007 Sunao HARA (naoh@nagoya-u.jp)
- *    (C) 2007-2009 TeraTerm Project
+ *    (C) 2007-2020 TeraTerm Project
  */
 
 //// ORIGINAL SOURCE CODE: ttxtest.c
 
 /* Tera Term extension mechanism
    Robert O'Callahan (roc+tt@cs.cmu.edu)
-   
+
    Tera Term by Takashi Teranishi (teranishi@rikaxp.riken.go.jp)
 */
 
@@ -70,6 +70,11 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->NeedResetCharSet = FALSE;
 }
 
+/*
+ * 端末設定ダイアログのフック関数1: UseOneSetting 用
+ *
+ * 送信と受信の漢字コード設定が同じになるように調整する。
+ */
 static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	WORD orgRecvCode, orgSendCode;
 	BOOL ret;
@@ -101,6 +106,12 @@ static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	return ret;
 }
 
+/*
+ * 端末設定ダイアログのフック関数2: 内部状態リセット用
+ *
+ * 端末設定ダイアログをフックし、設定ダイアログを開かずに TRUE を返す事によって
+ * 設定ダイアログ呼出の後処理のみを利用する。
+ */
 static BOOL PASCAL ResetCharSet(HWND parent, PTTSet ts) {
 	pvar->NeedResetCharSet = FALSE;
 	return TRUE;
@@ -108,12 +119,23 @@ static BOOL PASCAL ResetCharSet(HWND parent, PTTSet ts) {
 
 static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
 	if (pvar->NeedResetCharSet) {
+		// 内部状態リセットの為に呼び出された場合
 		*hooks->SetupTerminal = ResetCharSet;
 	}
 	else if (pvar->UseOneSetting && (pvar->ts->Language == IdJapanese || pvar->ts->Language == IdKorean)) {
+		// UseOneSetting が TRUE の時は端末設定ダイアログの後処理の為にフックする
 		pvar->origSetupTermDlg = *hooks->SetupTerminal;
 		*hooks->SetupTerminal = TTXKanjiMenuSetupTerminal;
 	}
+}
+
+/*
+ * 漢字コード関連の内部状態のリセット
+ * TTXからはTera Termの内部状態を直接いじれない為、端末設定ダイアログの後処理を利用する。
+ */
+static void CallResetCharSet(HWND hWin){
+	pvar->NeedResetCharSet = TRUE;
+	SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
 }
 
 static void PASCAL TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
@@ -159,44 +181,43 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	*hooks->WriteIniFile = TTXKanjiMenuWriteIniFile;
 }
 
-// #define ID_MI_KANJIMASK 0xFF00
 #define ID_MI_KANJIRECV 54009
 #define ID_MI_KANJISEND 54109
 #define ID_MI_USEONESETTING 54200
 
-static void PASCAL InsertSendKcodeMenu(HMENU menu) {
+static void InsertSendKcodeMenu(HMENU menu) {
 	UINT flag = MF_BYPOSITION | MF_STRING | MF_CHECKED;
 
 	if (pvar->ts->Language == IdJapanese) {
 		InsertMenu(menu, 5, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 
 		GetI18nStr(IniSection, "MENU_SEND_SJIS", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-			   "Send: S&hift_JIS", pvar->ts->UILanguageFile);
+		           "Send: S&hift_JIS", pvar->ts->UILanguageFile);
 		InsertMenu(menu, 6, flag, ID_MI_KANJISEND+IdSJIS,  pvar->ts->UIMsg);
 		GetI18nStr(IniSection, "MENU_SEND_EUCJP", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-			   "Send: EU&C-JP", pvar->ts->UILanguageFile);
+		           "Send: EU&C-JP", pvar->ts->UILanguageFile);
 		InsertMenu(menu, 7, flag, ID_MI_KANJISEND+IdEUC,   pvar->ts->UIMsg);
 		GetI18nStr(IniSection, "MENU_SEND_JIS", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-			   "Send: J&IS", pvar->ts->UILanguageFile);
+		           "Send: J&IS", pvar->ts->UILanguageFile);
 		InsertMenu(menu, 8, flag, ID_MI_KANJISEND+IdJIS,   pvar->ts->UIMsg);
 		GetI18nStr(IniSection, "MENU_SEND_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-			   "Send: U&TF-8", pvar->ts->UILanguageFile);
+		           "Send: U&TF-8", pvar->ts->UILanguageFile);
 		InsertMenu(menu, 9, flag, ID_MI_KANJISEND+IdUTF8,  pvar->ts->UIMsg);
 	}
 	else { // IdKorean
 		InsertMenu(menu, 2, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 
 		GetI18nStr(IniSection, "MENU_SEND_KS5601", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-			   "Send: K&S5601", pvar->ts->UILanguageFile);
+		           "Send: K&S5601", pvar->ts->UILanguageFile);
 		InsertMenu(menu, 3, flag, ID_MI_KANJISEND+IdSJIS,  pvar->ts->UIMsg);
 
 		GetI18nStr(IniSection, "MENU_SEND_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-			   "Send: U&TF-8", pvar->ts->UILanguageFile);
+		           "Send: U&TF-8", pvar->ts->UILanguageFile);
 		InsertMenu(menu, 4, flag, ID_MI_KANJISEND+IdUTF8,  pvar->ts->UIMsg);
 	}
 }
 
-static void PASCAL DeleteSendKcodeMenu(HMENU menu) {
+static void DeleteSendKcodeMenu(HMENU menu) {
 	if (pvar->ts->Language == IdJapanese) {
 		DeleteMenu(menu, 5, MF_BYPOSITION);
 		DeleteMenu(menu, 5, MF_BYPOSITION);
@@ -211,7 +232,7 @@ static void PASCAL DeleteSendKcodeMenu(HMENU menu) {
 	}
 }
 
-static void PASCAL UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
+static void UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
 	if (UseOneSetting) {
 		if (pvar->ts->Language == IdJapanese) {
 			GetI18nStr(IniSection, "MENU_SJIS", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
@@ -288,7 +309,7 @@ static void PASCAL UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
 static void PASCAL TTXModifyMenu(HMENU menu) {
 	UINT flag = MF_ENABLED;
 
-	// 言語が日本語のときのみメニューに追加されるようにした。 (2007.7.14 maya)
+	// 言語が日本語または韓国語の時のみメニューに追加する
 	if (pvar->ts->Language != IdJapanese && pvar->ts->Language != IdKorean) {
 		return;
 	}
@@ -324,27 +345,27 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 		flag = MF_STRING|MF_CHECKED;
 		if (pvar->ts->Language == IdJapanese) {
 			GetI18nStr(IniSection, "MENU_RECV_SJIS", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: &Shift_JIS", pvar->ts->UILanguageFile);
+			           "Recv: &Shift_JIS", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdSJIS,  pvar->ts->UIMsg);
 			GetI18nStr(IniSection, "MENU_RECV_EUCJP", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: &EUC-JP", pvar->ts->UILanguageFile);
+			           "Recv: &EUC-JP", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdEUC,   pvar->ts->UIMsg);
 			GetI18nStr(IniSection, "MENU_RECV_JIS", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: &JIS", pvar->ts->UILanguageFile);
+			           "Recv: &JIS", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdJIS,   pvar->ts->UIMsg);
 			GetI18nStr(IniSection, "MENU_RECV_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: &UTF-8", pvar->ts->UILanguageFile);
+			           "Recv: &UTF-8", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdUTF8,  pvar->ts->UIMsg);
 			GetI18nStr(IniSection, "MENU_RECV_UTF8m", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: UTF-8&m", pvar->ts->UILanguageFile);
+			           "Recv: UTF-8&m", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdUTF8m, pvar->ts->UIMsg);
 		}
 		else { // IdKorean
 			GetI18nStr(IniSection, "MENU_RECV_KS5601", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: &KS5601", pvar->ts->UILanguageFile);
+			           "Recv: &KS5601", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdSJIS,  pvar->ts->UIMsg);
 			GetI18nStr(IniSection, "MENU_RECV_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-				   "Recv: &UTF-8", pvar->ts->UILanguageFile);
+			           "Recv: &UTF-8", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdUTF8, pvar->ts->UIMsg);
 		}
 
@@ -390,9 +411,6 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	WORD val;
 
 	if ((cmd > ID_MI_KANJIRECV) && (cmd <= ID_MI_KANJIRECV+IdUTF8m)) {
-		// 範囲チェックを追加 
-		// TTProxyのバージョンダイアログを開くと、当該ハンドラが呼ばれ、誤動作していたのを修正。
-		// (2007.7.13 yutaka)
 		val = cmd - ID_MI_KANJIRECV;
 		pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = val;
 		if (pvar->UseOneSetting) {
@@ -401,8 +419,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			}
 			pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 		}
-		pvar->NeedResetCharSet = TRUE;
-		SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
+		CallResetCharSet(hWin);
 		return UpdateRecvMenu(pvar->ts->KanjiCode)?1:0;
 	}
 	else if ((cmd > ID_MI_KANJISEND) && (cmd <= ID_MI_KANJISEND+IdUTF8)) {
@@ -410,13 +427,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 		if (pvar->UseOneSetting) {
 			pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = val;
-			pvar->NeedResetCharSet = TRUE;
-			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
+			CallResetCharSet(hWin);
 			return UpdateRecvMenu(pvar->ts->KanjiCode)?1:0;
 		}
 		else {
-			pvar->NeedResetCharSet = TRUE;
-			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
+			CallResetCharSet(hWin);
 			return UpdateSendMenu(pvar->ts->KanjiCodeSend)?1:0;
 		}
 	}
@@ -490,7 +505,7 @@ BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	return TRUE;
 }
 
-BOOL WINAPI DllMain(HANDLE hInstance, 
+BOOL WINAPI DllMain(HANDLE hInstance,
                     ULONG ul_reason_for_call,
                     LPVOID lpReserved)
 {
@@ -513,3 +528,5 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 	}
 	return TRUE;
 }
+
+/* vim: set ts=4 sw=4 ff=dos : */
