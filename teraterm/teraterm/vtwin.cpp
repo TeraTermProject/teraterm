@@ -65,7 +65,6 @@
 #include <crtdbg.h>
 #include <string.h>
 #include <locale.h>
-#include <tchar.h>
 
 #include <shlobj.h>
 #include <io.h>
@@ -451,7 +450,7 @@ BOOL GetVirtualStoreEnvironment(void)
 	TOKEN_ELEVATION tokenElevation;
 	LONG lRet;
 	HKEY hKey;
-	TCHAR lpData[256];
+	char lpData[256];
 	DWORD dwDataSize;
 	DWORD dwType;
 	BYTE bValue;
@@ -1174,11 +1173,11 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	SetDlgMenuTexts(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
-		TCHAR uimsg[MAX_UIMSG];
+		char uimsg[MAX_UIMSG];
 		WinMenu = CreatePopupMenu();
 		get_lang_msgT("MENU_WINDOW", uimsg, _countof(uimsg),
-					  _T("&Window"), ts.UILanguageFile);
-		::InsertMenu(hMenu, ID_HELPMENU,
+					  "&Window", ts.UILanguageFile);
+		::InsertMenuA(hMenu, ID_HELPMENU,
 			MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 			(UINT_PTR)WinMenu, uimsg);
 	}
@@ -2395,8 +2394,8 @@ BOOL CVTWindow::OnMouseWheel(
 		if (InTitleBar) {
 			int delta = zDelta < 0 ? -1 : 1;
 			int newAlpha = Alpha;
-			TCHAR tipbuf[32];
-			TCHAR uimsg[MAX_UIMSG];
+			wchar_t tipbuf[32];
+			wchar_t uimsg[MAX_UIMSG];
 			POINT tippos;
 
 			newAlpha += delta * ts.MouseWheelScrollLine;
@@ -2406,8 +2405,8 @@ BOOL CVTWindow::OnMouseWheel(
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
 
-			get_lang_msg("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), "Opacity %.1f %%", ts.UILanguageFile);
-			_stprintf_s(tipbuf, _countof(tipbuf), uimsg, (newAlpha / 255.0) * 100);
+			get_lang_msgW("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), L"Opacity %.1f %%", ts.UILanguageFile);
+			_snwprintf_s(tipbuf, _countof(tipbuf), uimsg, (newAlpha / 255.0) * 100);
 
 			tippos = TipWin->GetPos();
 			if (tippos.x != pt.x ||
