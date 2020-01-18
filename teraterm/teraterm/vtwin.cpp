@@ -417,7 +417,8 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	GlobalUnlock(pSym);
 	GlobalFree(pSym);
 
-	MessageBox(NULL, msg, "Tera Term: Application fault", MB_OK | MB_ICONEXCLAMATION);
+	// 例外処理中なので、APIを直接呼び出す
+	::MessageBoxA(NULL, msg, "Tera Term: Application fault", MB_OK | MB_ICONEXCLAMATION);
 
 error:
 //	return (EXCEPTION_EXECUTE_HANDLER);  /* そのままプロセスを終了させる */
@@ -1719,10 +1720,10 @@ void CVTWindow::OnAllClose()
 {
 	// 突然終了させると危険なので、かならずユーザに問い合わせを出すようにする。
 	// (2013.8.17 yutaka)
-	get_lang_msg("MSG_ALL_TERMINATE_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Terminate ALL Tera Term(s)?", ts.UILanguageFile);
-	if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
-	     MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2)==IDCANCEL)
+	wchar_t uimsg[MAX_UIMSG];
+
+	get_lang_msgW("MSG_ALL_TERMINATE_CONF", uimsg, _countof(uimsg), L"Terminate ALL Tera Term(s)?", ts.UILanguageFile);
+	if (_MessageBoxW(HVTWin, uimsg, L"Tera Term", MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2) == IDCANCEL)
 		return;
 
 	BroadcastClosingMessage(HVTWin);
@@ -3820,7 +3821,7 @@ void CVTWindow::OnDuplicateSession()
 	strncpy_s(cygterm_cfg, sizeof(cygterm_cfg), ts.HomeDir, _TRUNCATE);
 	AppendSlash(cygterm_cfg, sizeof(cygterm_cfg));
 	strncat_s(cygterm_cfg, sizeof(cygterm_cfg), "cygterm.cfg", _TRUNCATE);
-	fp = fopen(cygterm_cfg, "r");
+	fopen_s(&fp, cygterm_cfg, "r");
 	if (fp != NULL) {
 		while (fgets(buf, sizeof(buf), fp) != NULL) {
 			int len = strlen(buf);
@@ -3884,13 +3885,14 @@ void CVTWindow::OnDuplicateSession()
 
 	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_TT_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute Tera Term. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		wchar_t buf[80];
+		wchar_t uimsg[MAX_UIMSG];
+		wchar_t uimsg2[MAX_UIMSG];
+		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("MSG_EXEC_TT_ERROR", uimsg2, _countof(uimsg2),
+					  L"Can't execute Tera Term. (%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
+		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3910,7 +3912,8 @@ void CVTWindow::OnCygwinConnection()
 	char cygterm[MAX_PATH];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-	char uimsg[MAX_UIMSG];
+	wchar_t uimsg[MAX_UIMSG];
+	wchar_t uimsg2[MAX_UIMSG];
 
 	if (strlen(ts.CygwinDirectory) > 0) {
 		if (SearchPath(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
@@ -3930,10 +3933,10 @@ void CVTWindow::OnCygwinConnection()
 		}
 	}
 
-	get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-	get_lang_msg("MSG_FIND_CYGTERM_DIR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Can't find Cygwin directory.", ts.UILanguageFile);
-	::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+	get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+	get_lang_msgW("MSG_FIND_CYGTERM_DIR_ERROR", uimsg2, sizeof(uimsg2),
+				  L"Can't find Cygwin directory.", ts.UILanguageFile);
+	_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 	return;
 
 found_dll:;
@@ -3942,20 +3945,20 @@ found_dll:;
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_ENV_ALLOC_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Can't allocate memory for environment variable.", ts.UILanguageFile);
-			::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+			get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
+						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
+			_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s;%s", file, envptr);
 	} else {
 		envbufflen = strlen(file) + 6; // "PATH="(5) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_ENV_ALLOC_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Can't allocate memory for environment variable.", ts.UILanguageFile);
-			::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+			get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
+						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
+			_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s", file);
@@ -3977,10 +3980,10 @@ found_path:;
 
 	if (CreateProcess(NULL, cygterm, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_CYGTERM_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute Cygterm.", ts.UILanguageFile);
-		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("MSG_EXEC_CYGTERM_ERROR", uimsg2, _countof(uimsg2),
+		              L"Can't execute Cygterm.", ts.UILanguageFile);
+		_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4003,13 +4006,14 @@ void CVTWindow::OnTTMenuLaunch()
 
 	if (CreateProcess(exename, NULL, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_TTMENU_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute TeraTerm Menu. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		wchar_t buf[80];
+		wchar_t uimsg[MAX_UIMSG];
+		wchar_t uimsg2[MAX_UIMSG];
+		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("MSG_EXEC_TTMENU_ERROR", uimsg2, _countof(uimsg2),
+					  L"Can't execute TeraTerm Menu. (%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
+		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4035,13 +4039,14 @@ void CVTWindow::OnLogMeInLaunch()
 
 	if (CreateProcess(NULL, LogMeTT, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_LOGMETT_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute LogMeTT. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		wchar_t buf[80];
+		wchar_t uimsg[MAX_UIMSG];
+		wchar_t uimsg2[MAX_UIMSG];
+		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("MSG_EXEC_LOGMETT_ERROR", uimsg2, _countof(uimsg2),
+					  L"Can't execute LogMeTT. (%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
+		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4127,13 +4132,14 @@ void CVTWindow::OnViewLog()
 
 	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_VIEW_LOGFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't view logging file. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		wchar_t buf[80];
+		wchar_t uimsgW[MAX_UIMSG];
+		wchar_t uimsgW2[MAX_UIMSG];
+		get_lang_msgW("MSG_ERROR", uimsgW, _countof(uimsgW), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("MSG_VIEW_LOGFILE_ERROR", uimsgW2, _countof(uimsgW2),
+					  L"Can't view logging file. (%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsgW2, GetLastError());
+		_MessageBoxW(NULL, buf, uimsgW, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4199,12 +4205,14 @@ void CVTWindow::OnReplayLog()
 
 	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_TT_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute Tera Term. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		wchar_t buf[80];
+		wchar_t uimsgW[MAX_UIMSG];
+		wchar_t uimsgW2[MAX_UIMSG];
+		get_lang_msgW("MSG_ERROR", uimsgW, _countof(uimsgW), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("MSG_EXEC_TT_ERROR", uimsgW2, _countof(uimsgW2),
+		              L"Can't execute Tera Term. (%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsgW2, GetLastError());
+		_MessageBoxW(NULL, buf, uimsgW, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4357,7 +4365,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 									  data->UILanguageFile);
 						get_lang_msgW("MSG_CANTOPEN_FILE_ERROR", message, _countof(message), L"Cannot open file",
 									  data->UILanguageFile);
-						MessageBoxW(hDlgWnd, message, caption, MB_TASKMODAL | MB_ICONEXCLAMATION);
+						_MessageBoxW(hDlgWnd, message, caption, MB_TASKMODAL | MB_ICONEXCLAMATION);
 
 						free(strW);
 
@@ -4591,9 +4599,10 @@ void CVTWindow::Disconnect(BOOL confirm)
 	if ((cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    (confirm)) {
-		get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Disconnect?", ts.UILanguageFile);
-		if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
+		wchar_t uimsg[MAX_UIMSG];
+		get_lang_msgW("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
+					  L"Disconnect?", ts.UILanguageFile);
+		if (_MessageBoxW(HVTWin, uimsg, L"Tera Term",
 		                 MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL) {
 			return;
 		}
@@ -5014,11 +5023,12 @@ void CVTWindow::OnSetupSave()
 	// 書き込みできるかの判別を追加 (2005.11.3 yutaka)
 	if ((ret = _access(ts.SetupFName, 0x02)) != 0) {
 		if (errno != ENOENT) {  // ファイルがすでに存在する場合のみエラーとする (2005.12.13 yutaka)
-			char uimsg[MAX_UIMSG];
-			get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_SAVESETUP_PERMISSION_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "TERATERM.INI file doesn't have the writable permission.", ts.UILanguageFile);
-			MessageBox(ts.UIMsg, uimsg, MB_OK|MB_ICONEXCLAMATION);
+			wchar_t uimsg[MAX_UIMSG];
+			wchar_t uimsg2[MAX_UIMSG];
+			get_lang_msgW("MSG_TT_ERROR", uimsg, _countof(uimsg), L"Tera Term: ERROR", ts.UILanguageFile);
+			get_lang_msgW("MSG_SAVESETUP_PERMISSION_ERROR", uimsg2, _countof(uimsg2),
+						  L"TERATERM.INI file doesn't have the writable permission.", ts.UILanguageFile);
+			_MessageBoxW(HVTWin, uimsg2, uimsg, MB_OK|MB_ICONEXCLAMATION);
 			return;
 		}
 	}
@@ -5085,19 +5095,20 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	BOOL ret = FALSE;
-	char buf[80];
-	char uimsg[MAX_UIMSG];
+	wchar_t buf[80];
+	wchar_t uimsg[MAX_UIMSG];
+	wchar_t uimsg2[MAX_UIMSG];
 
 	SetLastError(NO_ERROR);
 
 	_snprintf_s(fullpath, sizeof(fullpath), "%s\\%s", pathname, filename);
 	if (_access(fullpath, 0) != 0) { // ファイルが存在しない
 		DWORD no = GetLastError();
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("DLG_SETUPDIR_NOFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			"File does not exist.(%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("DLG_SETUPDIR_NOFILE_ERROR", uimsg2, _countof(uimsg2),
+					  L"File does not exist.(%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
+		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
 	}
 
@@ -5110,11 +5121,11 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
 		NULL, NULL, &si, &pi) == 0) { // 起動失敗
 		DWORD no = GetLastError();
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("DLG_SETUPDIR_OPENFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			"Cannot open file.(%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
-		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
+		get_lang_msgW("DLG_SETUPDIR_OPENFILE_ERROR", uimsg2, _countof(uimsg2),
+					  L"Cannot open file.(%d)", ts.UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
+		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
 	} else {
 		CloseHandle(pi.hThread);
