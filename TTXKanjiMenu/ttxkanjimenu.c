@@ -34,7 +34,7 @@
 #define UpdateRecvMenu(val)	\
 	CheckMenuRadioItem(pvar->hmEncode, \
 	                   ID_MI_KANJIRECV + IdSJIS, \
-	                   ID_MI_KANJIRECV + ((pvar->ts->Language==IdJapanese)?IdUTF8m:IdUTF8), \
+	                   ID_MI_KANJIRECV + IdUTF8m, \
 	                   ID_MI_KANJIRECV + (val), \
 	                   MF_BYCOMMAND)
 #define UpdateSendMenu(val)	\
