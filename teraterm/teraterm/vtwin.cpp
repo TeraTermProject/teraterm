@@ -3940,7 +3940,7 @@ void CVTWindow::OnCygwinConnection()
 	return;
 
 found_dll:;
-	envptr = getenv("PATH");
+	_dupenv_s(&envptr, NULL, "PATH");
 	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
@@ -3949,9 +3949,11 @@ found_dll:;
 			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
 						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
 			_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+			free(envptr);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s;%s", file, envptr);
+		free(envptr);
 	} else {
 		envbufflen = strlen(file) + 6; // "PATH="(5) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
