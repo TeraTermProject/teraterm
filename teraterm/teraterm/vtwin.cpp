@@ -1173,13 +1173,13 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	SetDlgMenuTexts(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
-		char uimsg[MAX_UIMSG];
+		wchar_t uimsg[MAX_UIMSG];
 		WinMenu = CreatePopupMenu();
-		get_lang_msgT("MENU_WINDOW", uimsg, _countof(uimsg),
-					  "&Window", ts.UILanguageFile);
-		::InsertMenuA(hMenu, ID_HELPMENU,
-			MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			(UINT_PTR)WinMenu, uimsg);
+		get_lang_msgW("MENU_WINDOW", uimsg, _countof(uimsg),
+					  L"&Window", ts.UILanguageFile);
+		_InsertMenuW(hMenu, ID_HELPMENU,
+					 MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+					 (UINT_PTR)WinMenu, uimsg);
 	}
 
 	TTXModifyMenu(hMenu); /* TTPLUG */

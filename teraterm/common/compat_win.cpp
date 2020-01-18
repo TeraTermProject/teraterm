@@ -71,6 +71,9 @@ INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW 
 HWND (WINAPI *pHtmlHelpW)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
+BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
  *	 https://support.microsoft.com/ja-jp/help/124103/how-to-obtain-a-console-window-handle-hwnd
@@ -126,6 +129,8 @@ static const APIInfo Lists_user32[] = {
 	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
 	{ "MessageBoxW", (void **)&pMessageBoxW },
 	{ "DialogBoxIndirectParamW", (void **)&pDialogBoxIndirectParamW },
+	{ "InsertMenuW", (void **)&pInsertMenuW },
+	{ "AppendMenuW", (void **)&pAppendMenuW },
 	{},
 };
 
@@ -199,6 +204,7 @@ void WinCompatInit()
 		pSetWindowTextW = NULL;
 		pSetDlgItemTextW = NULL;
 		pGetDlgItemTextW = NULL;
+		pDialogBoxIndirectParamW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

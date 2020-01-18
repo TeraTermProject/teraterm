@@ -316,3 +316,16 @@ int _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
 	free(captionA);
 	return result;
 }
+
+BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
+{
+	if (pInsertMenuW != NULL) {
+		return pInsertMenuW(hMenu, uPosition, uFlags, uIDNewItem, lpNewItem);
+	}
+
+	char *itemA = ToCharW(lpNewItem);
+	int result = InsertMenuA(hMenu, uPosition, uFlags, uIDNewItem, itemA);
+	free(itemA);
+	return result;
+}
+
