@@ -590,6 +590,7 @@ void TTCDialog::DestroyWindow()
 	}
 }
 
+#if 0
 ////////////////////////////////////////
 
 // quick hack :-(
@@ -790,3 +791,4 @@ int CALLBACK TTCPropertySheet::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 void TTCPropertySheet::OnInitDialog()
 {
 }
+#endif

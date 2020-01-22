@@ -36,6 +36,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttptek", "ttptek\ttptek.vcp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "svnrev", "svnrev\svnrev.vcproj", "{80F1C3F0-A213-4D48-85C8-A265990D19A7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "common\common_static.v8.vcproj", "{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -74,6 +76,10 @@ Global
 		{80F1C3F0-A213-4D48-85C8-A265990D19A7}.Debug|Win32.Build.0 = Debug|Win32
 		{80F1C3F0-A213-4D48-85C8-A265990D19A7}.Release|Win32.ActiveCfg = Release|Win32
 		{80F1C3F0-A213-4D48-85C8-A265990D19A7}.Release|Win32.Build.0 = Release|Win32
+		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Debug|Win32.Build.0 = Debug|Win32
+		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Release|Win32.ActiveCfg = Release|Win32
+		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

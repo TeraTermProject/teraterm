@@ -46,9 +46,6 @@ UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 DWORD _GetFileAttributesW(LPCWSTR lpFileName);
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
-HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
-INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
-//INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
 HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
 							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
 							 LPVOID lpParam);
@@ -56,6 +53,13 @@ ATOM _RegisterClassW(const WNDCLASSW *lpWndClass);
 int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
 int _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+
+// Comctl32.lib
+HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
+INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
+//INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
 
 #ifdef __cplusplus
 }

@@ -33,3 +33,9 @@ add_subdirectory(keycode)
 set_target_properties(
   keycode
   PROPERTIES FOLDER teraterm)
+
+add_subdirectory(common)
+set_target_properties(
+  common_static
+  PROPERTIES FOLDER teraterm)
+
