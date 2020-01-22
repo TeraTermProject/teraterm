@@ -35,6 +35,11 @@ set_target_properties(
   PREFIX ""
   )
 
+target_compile_definitions(
+  TTXCheckUpdate
+  PRIVATE
+  -D CJSON_HIDE_SYMBOLS)
+
 target_include_directories(
   TTXCheckUpdate
   PRIVATE
