@@ -92,7 +92,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="TTXCheckUpdate.c" />
     <ClCompile Include="../../libs/cJSON/cJSON.c" />
@@ -102,7 +101,6 @@
     <ClCompile Include="../../teraterm/common/ttlib.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="getcontent.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="../../libs/cJSON/cJSON.h" />

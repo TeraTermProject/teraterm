@@ -218,14 +218,6 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\getcontent.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\getcontent.h"
-			>
-		</File>
-		<File
 			RelativePath=".\parse.cpp"
 			>
 		</File>

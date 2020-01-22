@@ -193,6 +193,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\getcontent.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\getcontent.h"
+			>
+		</File>
+		<File
 			RelativePath="..\common\i18n.c"
 			>
 		</File>

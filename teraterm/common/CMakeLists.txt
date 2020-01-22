@@ -9,6 +9,8 @@ add_library(
   compat_win.h
   dllutil.cpp
   dllutil.h
+  getcontent.cpp
+  getcontent.h
   i18n.c
   i18n.h
   layer_for_unicode.cpp

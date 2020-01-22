@@ -7,8 +7,6 @@ add_library(
   ttxcheckupdate.c
   parse.h
   parse.cpp
-  getcontent.h
-  getcontent.cpp
   resource.rc
   resource.h
   #
@@ -21,6 +19,7 @@ add_library(
   ../../teraterm/common/dlglib_cpp.cpp
   ../../teraterm/common/dlglib_tmpl.cpp
   ../../teraterm/common/ttlib.c
+  ../../teraterm/common/getcontent.h
   )
 
 source_group(

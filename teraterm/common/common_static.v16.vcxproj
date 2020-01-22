@@ -138,6 +138,7 @@
     <ClCompile Include="..\common\compat_win.cpp" />
     <ClCompile Include="..\common\dllutil.cpp" />
     <ClCompile Include="..\common\i18n.c" />
+    <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="layer_for_unicode.cpp" />
     <ClCompile Include="layer_for_unicode_comctl32.cpp" />
   </ItemGroup>
@@ -147,6 +148,7 @@
     <ClInclude Include="..\common\dllutil.h" />
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="codeconv.h" />
+    <ClInclude Include="getcontent.h" />
     <ClInclude Include="layer_for_unicode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
