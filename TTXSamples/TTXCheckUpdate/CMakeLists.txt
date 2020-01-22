@@ -15,7 +15,6 @@ add_library(
   cJSON/cJSON.h
   cJSON/cJSON.c
   #
-  ../../teraterm/common/codeconv.cpp
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/dlglib.h
   ../../teraterm/common/dlglib.c
@@ -46,6 +45,7 @@ target_include_directories(
 target_link_libraries(
   TTXCheckUpdate
   PRIVATE
+  common_static
   ttpcmn
   Wininet.lib
   )

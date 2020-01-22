@@ -33,9 +33,6 @@
     <ClCompile Include="../../teraterm/common/ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../../teraterm/common/codeconv.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="../../teraterm/common/dlglib.c">
       <Filter>common</Filter>
     </ClCompile>

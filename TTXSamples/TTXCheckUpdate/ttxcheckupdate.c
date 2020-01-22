@@ -13,6 +13,7 @@
 #include "compat_w95.h"
 #include "dlglib.h"
 #include "i18n.h"
+#include "layer_for_unicode.h"
 
 #include "resource.h"
 #include "parse.h"
@@ -38,11 +39,11 @@ static int SetDropdown(HWND hDlg, int running_version)
 	int cursor = -1;
 	size_t i;
 
-	SendDlgItemMessageW(hDlg, IDC_COMBO1, CB_RESETCONTENT, 0, 0);
+	_SendDlgItemMessageW(hDlg, IDC_COMBO1, CB_RESETCONTENT, 0, 0);
 	for (i = 0; i < pvar->versions_count; i++) {
 		const version_one_t *v = &pvar->versions[i];
 		wchar_t *strW = ToWcharU8(v->version_text);
-		SendDlgItemMessageW(hDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)strW);
+		_SendDlgItemMessageW(hDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)strW);
 		free(strW);
 		if (cursor == -1 && v->version_major == version_major) {
 			cursor = (int)i;
@@ -59,7 +60,7 @@ static void SetTexts(HWND hDlg, const version_one_t *version)
 	const version_one_t *v = version;
 
 	wchar_t *strW = ToWcharU8(v->text);
-	SetWindowTextW(GetDlgItem(hDlg, IDC_EDIT1), strW);
+	_SetWindowTextW(GetDlgItem(hDlg, IDC_EDIT1), strW);
 	free(strW);
 
 	if (v->url == NULL) {
@@ -138,7 +139,7 @@ static void ShowDialog(HWND hWnd)
 				L"  %s\n",
 				UILanguageFile);
 	swprintf(buf, _countof(buf), UIMsg, update_info_url);
-	result_mb = MessageBoxW(hWnd, buf, L"Tera Term", MB_YESNO | MB_ICONEXCLAMATION);
+	result_mb = _MessageBoxW(hWnd, buf, L"Tera Term", MB_YESNO | MB_ICONEXCLAMATION);
 	if (result_mb == IDNO) {
 		return;
 	}
@@ -147,7 +148,7 @@ static void ShowDialog(HWND hWnd)
 	swprintf(agent, _countof(agent), L"%s_%d", agent_base, pvar->ts->RunningVersion);
 	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
 	if (!result_bool) {
-		MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
+		_MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
 	}
 	json_size = json_raw_size + 1;
@@ -162,7 +163,7 @@ static void ShowDialog(HWND hWnd)
 	/* jsonをパースする */
 	pvar->versions = ParseJson(json_ptr, &pvar->versions_count);
 	if (pvar->versions == NULL) {
-		MessageBoxW(hWnd, L"parse error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
+		_MessageBoxW(hWnd, L"parse error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
 	}
 
@@ -260,11 +261,13 @@ BOOL __declspec(dllexport) WINAPI TTXBind(WORD Version, TTXExports *exports)
 		return FALSE;
 	}
 
+#if 0
 	if (!IsWindowsNTKernel()) {
 		// TODO Windows10以外、未検証
 		return FALSE;
 	}
-
+#endif
+	
 	size = sizeof(Exports) - sizeof(exports->size);
 	if ((int)size > exports->size) {
 		size = exports->size;

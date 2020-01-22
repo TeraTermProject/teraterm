@@ -177,10 +177,6 @@
 			Name="common"
 			>
 			<File
-				RelativePath="..\..\teraterm\common\codeconv.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\teraterm\common\codeconv.h"
 				>
 			</File>
