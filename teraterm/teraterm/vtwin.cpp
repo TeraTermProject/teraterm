@@ -3898,6 +3898,19 @@ void CVTWindow::OnDuplicateSession()
 	}
 }
 
+static void __dupenv_s(char **envptr, size_t, const char* name)
+{
+#if defined(_MSC_VER)
+	_dupenv_s(envptr, NULL, name);
+#else
+    const char* s = getenv(name);
+	if (s == NULL) {
+		*envptr = NULL;
+		return;
+	}
+	*envptr = strdup(s);
+#endif
+}
 
 //
 // Connect to local cygwin
@@ -3939,7 +3952,7 @@ void CVTWindow::OnCygwinConnection()
 	return;
 
 found_dll:;
-	_dupenv_s(&envptr, NULL, "PATH");
+	__dupenv_s(&envptr, NULL, "PATH");
 	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
