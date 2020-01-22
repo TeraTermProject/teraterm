@@ -12,8 +12,8 @@ add_library(
   resource.rc
   resource.h
   #
-  cJSON/cJSON.h
-  cJSON/cJSON.c
+  ../../libs/cJSON/cJSON.h
+  ../../libs/cJSON/cJSON.c
   #
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/dlglib.h
@@ -29,6 +29,11 @@ source_group(
   "teraterm\/common\/"
   )
 
+source_group(
+  "cJSON"
+  REGULAR_EXPRESSION
+  "..\/..\/libs\/cJSON\/"
+  )
 set_target_properties(
   TTXCheckUpdate
   PROPERTIES
@@ -43,6 +48,7 @@ target_compile_definitions(
 target_include_directories(
   TTXCheckUpdate
   PRIVATE
+  ../../libs/cJSON
   ../../teraterm/teraterm
   ../../teraterm/common
 )

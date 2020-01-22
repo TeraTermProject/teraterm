@@ -42,7 +42,7 @@
     <ClCompile Include="../../teraterm/common/dlglib_tmpl.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="cJSON/cJSON.c">
+    <ClCompile Include="../../libs/cJSON/cJSON.c">
       <Filter>cJSON</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,7 +62,7 @@
     <ClInclude Include="resource.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="cJSON/cJSON.h">
+    <ClInclude Include="../../libs/cJSON/cJSON.h">
       <Filter>cJSON</Filter>
     </ClInclude>
   </ItemGroup>

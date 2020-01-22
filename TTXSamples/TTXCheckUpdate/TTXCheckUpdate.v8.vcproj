@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\teraterm\common&quot;;&quot;$(SolutionDir)..\teraterm\teraterm&quot;;&quot;$(SolutionDir)..\libs\cJSON&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CJSON_HIDE_SYMBOLS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\teraterm\common&quot;;&quot;$(SolutionDir)..\teraterm\teraterm&quot;;&quot;$(SolutionDir)..\libs\cJSON&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CJSON_HIDE_SYMBOLS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -209,11 +209,11 @@
 			Name="cJSON"
 			>
 			<File
-				RelativePath=".\cJSON\cJSON.c"
+				RelativePath="..\..\libs\cJSON\cJSON.c"
 				>
 			</File>
 			<File
-				RelativePath=".\cJSON\cJSON.h"
+				RelativePath="..\..\libs\cJSON\cJSON.h"
 				>
 			</File>
 		</Filter>

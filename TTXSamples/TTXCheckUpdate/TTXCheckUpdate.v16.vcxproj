@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm;$(ProjectDir)..\..\teraterm\common;$(ProjectDir)..\..\teraterm\teraterm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\cJSON;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CJSON_HIDE_SYMBOLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -74,7 +74,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\cJSON;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CJSON_HIDE_SYMBOLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -95,7 +95,7 @@
     <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="TTXCheckUpdate.c" />
-    <ClCompile Include="cJSON/cJSON.c" />
+    <ClCompile Include="../../libs/cJSON/cJSON.c" />
     <ClCompile Include="../../teraterm/common/dlglib.c" />
     <ClCompile Include="../../teraterm/common/dlglib_cpp.cpp" />
     <ClCompile Include="../../teraterm/common/dlglib_tmpl.cpp" />
@@ -105,7 +105,7 @@
     <ClInclude Include="getcontent.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="cJSON/cJSON.h" />
+    <ClInclude Include="../../libs/cJSON/cJSON.h" />
     <ClInclude Include="../../teraterm/common/codeconv.h" />
     <ClInclude Include="../../teraterm/common/dlglib.h" />
   </ItemGroup>

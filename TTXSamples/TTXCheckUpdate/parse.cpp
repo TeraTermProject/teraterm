@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include "cJSON/cJSON.h"
+#include "cJSON.h"
 
 #include "codeconv.h"
 
