@@ -205,6 +205,12 @@
     <ResourceCompile Include="../ttpdlg/ttpdlg.rc">
       <Filter>ttpdlg</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="debug_pp.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="teraterm_manifest.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sizetip.h">

@@ -264,6 +264,9 @@
     <ClInclude Include="unicode.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\common\common_static.v16.vcxproj">
+      <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\svnrev\svnrev.v16.vcxproj">
       <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
     </ProjectReference>

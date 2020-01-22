@@ -218,6 +218,7 @@ endif()
 
 target_link_libraries(
   teraterm
+  common_static
   ttpcmn
   ttpfile
   ttpset
@@ -226,6 +227,7 @@ target_link_libraries(
   ${SFMT_LIB}
   #
   gdi32
+  comctl32
   comctl32
   ws2_32
   imagehlp
