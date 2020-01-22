@@ -5,7 +5,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 set(COMMON_SRC
   ../common/teraterm.h
   ../common/tttypes.h
-  ../common/i18n.c
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h
@@ -16,11 +15,8 @@ set(COMMON_SRC
   ../common/ttcommon.h
   ../common/tt_res.h
   ../common/codeconv.h
-  ../common/codeconv.cpp
   ../common/compat_win.h
-  ../common/compat_win.cpp
   ../common/dllutil.h
-  ../common/dllutil.cpp
   )
 
 source_group(
@@ -73,6 +69,7 @@ endif()
 
 target_link_libraries(
   ttpcmn
+  common_static
   ole32
   setupapi
   delayimp

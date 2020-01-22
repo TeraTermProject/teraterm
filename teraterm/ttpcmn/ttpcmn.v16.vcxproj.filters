@@ -19,9 +19,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\i18n.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="language.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -32,9 +29,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\ttlib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\codeconv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="comportinfo.cpp">
@@ -59,6 +53,12 @@
     </ClInclude>
     <ClInclude Include="comportinfo.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\compat_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dllutil.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -131,10 +131,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\codeconv.cpp" />
-    <ClCompile Include="..\common\compat_win.cpp" />
-    <ClCompile Include="..\common\dllutil.cpp" />
-    <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="comportinfo.cpp" />
@@ -156,6 +152,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpcmn-version.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common_static.v16.vcxproj">
+      <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

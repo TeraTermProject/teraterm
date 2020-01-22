@@ -207,15 +207,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 			>
 			<File
-				RelativePath="..\common\codeconv.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\comportinfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\i18n.c"
 				>
 			</File>
 			<File
@@ -234,25 +226,25 @@
 				RelativePath="..\common\ttlib.c"
 				>
 			</File>
-			<File
-				RelativePath="..\common\compat_win.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dllutil.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="..\common\compat_win.h"
+				>
+			</File>
+			<File
 				RelativePath=".\comportinfo.h"
 				>
 			</File>
 			<File
 				RelativePath=".\devpkey_teraterm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.h"
 				>
 			</File>
 			<File
@@ -269,14 +261,6 @@
 			</File>
 			<File
 				RelativePath="..\common\ttlib.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\compat_win.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dllutil.h"
 				>
 			</File>
 		</Filter>

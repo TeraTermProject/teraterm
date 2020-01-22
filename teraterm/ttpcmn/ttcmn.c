@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,6 +58,7 @@
 
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
+#include "layer_for_unicode.h"
 
 
 // TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
@@ -75,14 +76,6 @@ static PMap pm;
 static HANDLE HMap = NULL;
 #define VTCLASSNAME _T("VTWin32")
 #define TEKCLASSNAME _T("TEKWin32")
-
-#ifdef UNICODE
-static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
-#define HTMLHELP_API_NAME	"HtmlHelpW"
-#else
-static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
-#define HTMLHELP_API_NAME	"HtmlHelpA"
-#endif
 
 enum window_style {
 	WIN_CASCADE,
@@ -950,6 +943,7 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 	int i;
 	char Temp[MAXPATHLEN];
 	HWND Hw;
+	wchar_t uimsg[MAX_UIMSG];
 
 	// delete all items in Window menu
 	i = GetMenuItemCount(menu);
@@ -981,39 +975,40 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 			UnregWin(Hw);
 		}
 	}
-	get_lang_msg("MENU_WINDOW_WINDOW", buf, buflen, "&Window", langFile);
 	if (VTFlag == 1) {
+		static const DlgTextInfo MenuTextInfo[] = {
+			{ ID_WINDOW_WINDOW, "MENU_WINDOW_WINDOW" },
+			{ ID_WINDOW_MINIMIZEALL, "MENU_WINDOW_MINIMIZEALL" },
+			{ ID_WINDOW_RESTOREALL, "MENU_WINDOW_RESTOREALL" },
+			{ ID_WINDOW_CASCADEALL, "MENU_WINDOW_CASCADE" },
+			{ ID_WINDOW_STACKED, "MENU_WINDOW_STACKED" },
+			{ ID_WINDOW_SIDEBYSIDE, "MENU_WINDOW_SIDEBYSIDE" },
+		};
+
 		AppendMenu(menu, MF_SEPARATOR, 0, NULL);
-		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_WINDOW, buf);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_WINDOW, "&Window");
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, "&Minimize All");
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, "&Restore All");
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, "&Cascade");
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, "&Stacked");
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, "Side &by Side");
 
-		get_lang_msg("MENU_WINDOW_MINIMIZEALL", buf, buflen, "&Minimize All", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, buf);
-
-		get_lang_msg("MENU_WINDOW_RESTOREALL", buf, buflen, "&Restore All", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, buf);
-
-		get_lang_msg("MENU_WINDOW_CASCADE", buf, buflen, "&Cascade", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, buf);
-
-		get_lang_msg("MENU_WINDOW_STACKED", buf, buflen, "&Stacked", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, buf);
-
-		get_lang_msg("MENU_WINDOW_SIDEBYSIDE", buf, buflen, "Side &by Side", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, buf);
+		SetI18nMenuStrs("Tera Term", menu, MenuTextInfo, _countof(MenuTextInfo), langFile);
 
 		if (pm->WinUndoFlag) {
 			if (pm->WinUndoStyle == WIN_CASCADE)
-				get_lang_msg("MENU_WINDOW_CASCADE_UNDO", buf, buflen, "&Undo - Cascade", langFile);
+				get_lang_msgW("MENU_WINDOW_CASCADE_UNDO", uimsg, _countof(uimsg), L"&Undo - Cascade", langFile);
 			else if (pm->WinUndoStyle == WIN_STACKED)
-				get_lang_msg("MENU_WINDOW_STACKED_UNDO", buf, buflen, "&Undo - Stacked", langFile);
+				get_lang_msgW("MENU_WINDOW_STACKED_UNDO", uimsg, _countof(uimsg), L"&Undo - Stacked", langFile);
 			else
-				get_lang_msg("MENU_WINDOW_SIDEBYSIDE_UNDO", buf, buflen, "&Undo - Side by Side", langFile);
-			AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, buf);
+				get_lang_msgW("MENU_WINDOW_SIDEBYSIDE_UNDO", uimsg, _countof(uimsg), L"&Undo - Side by Side", langFile);
+			_AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);		// TODO UNICODE
 		}
 
 	}
 	else {
-		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, buf);
+		get_lang_msgW("MENU_WINDOW_WINDOW", uimsg, _countof(uimsg), L"&Window", langFile);
+		_AppendMenuW(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
 	}
 }
 
@@ -1171,55 +1166,38 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
 	HWND HWin;
-	TCHAR HelpFN[MAX_PATH];
-	TCHAR uimsg[MAX_UIMSG];
-	TCHAR dllName[MAX_PATH];
-	const TCHAR *HomeDirT;
-	const TCHAR *errorFile;
-	TCHAR buf[MAX_PATH];
+	wchar_t HelpFN[MAX_PATH];
+	wchar_t uimsg[MAX_UIMSG];
+	wchar_t *HomeDirT;
 
 	/* Get home directory */
 	if (GetModuleFileNameA(NULL,Temp,_countof(Temp)) == 0) {
 		return;
 	}
 	ExtractDirName(Temp, HomeDir);
-	HomeDirT = ToTcharA(HomeDir);
+	HomeDirT = ToWcharA(HomeDir);
 
-	get_lang_msgT("HELPFILE", uimsg, _countof(uimsg),
-				  _T("teraterm.chm"), UILanguageFile);
+	get_lang_msgW("HELPFILE", uimsg, _countof(uimsg), L"teraterm.chm", UILanguageFile);
 
-	if (pHtmlHelp == NULL) {
-		HINSTANCE hDll;
-		GetSystemDirectory(dllName, _countof(dllName));
-		_tcscat_s(dllName, _countof(dllName), _T("\\hhctrl.ocx"));
-		hDll = LoadLibrary(dllName);
-		if (hDll == NULL) {
-			errorFile = dllName;
-			goto error;
-		}
-		pHtmlHelp = (void *)GetProcAddress(hDll, HTMLHELP_API_NAME);
-		if (pHtmlHelp == NULL) {
-			errorFile = dllName;
-			goto error;
-		}
-	}
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
 	HWin = GetDesktopWindow();
-	_sntprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, _T("%s\\%s"), (TCHAR *)HomeDirT, uimsg);
-	if (pHtmlHelp != NULL && pHtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-		errorFile = HelpFN;
+	_snwprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, L"%s\\%s", HomeDirT, uimsg);
+	if (_HtmlHelpW(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
 		goto error;
 	}
 	goto finish;
 
 error:
-	get_lang_msgT("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
-				  _T("Can't open HTML help file(%s)."), UILanguageFile);
-	_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
-	MessageBox(HWin, buf, _T("Tera Term: HTML help"), MB_OK | MB_ICONERROR);
+	{
+		wchar_t buf[MAX_PATH];
+		get_lang_msgW("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
+					  L"Can't open HTML help file(%s).", UILanguageFile);
+		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
+		_MessageBoxW(HWin, buf, L"Tera Term: HTML help", MB_OK | MB_ICONERROR);
+	}
 
 finish:
-	free((void *)HomeDirT);
+	free(HomeDirT);
 }
 
 HWND WINAPI GetNthWin(int n)
