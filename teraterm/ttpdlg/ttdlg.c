@@ -1310,7 +1310,7 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 			if (!TipWinIsVisible(g_SerialDlgSpeedTip))
 				TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
 
-			TipWinSetText(g_SerialDlgSpeedTip, str);
+			TipWinSetTextA(g_SerialDlgSpeedTip, str);
 			TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
 			TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
 

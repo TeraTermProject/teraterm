@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2019 TeraTerm Project
+ * Copyright (C) 2008-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <tchar.h>
 
 #include "tipwin.h"
 
@@ -111,14 +110,14 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
  */
 void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 {
-	TCHAR str[32];
+	char str[32];
 	int tooltip_movable = 0;
 
 	if (!tip_enabled)
 		return;
 
 	/* Generate the tip text */
-	_stprintf_s(str, _countof(str), _T("%dx%d"), cx, cy);
+	_snprintf_s(str, _countof(str), _TRUNCATE, "%dx%d", cx, cy);
 
 	// ウィンドウの右、右下、下を掴んだ場合は、ツールチップを左上隅に配置する。
 	// それら以外はリサイズ後の左上隅に配置する。
@@ -145,21 +144,14 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		cx = point.x;
 		cy = point.y;
 
-		SizeTip = TipWinCreateT(NULL, src, cx, cy, str);
-
-		//OutputDebugPrintf("Created: (%d,%d)\n", cx, cy);
-
+		SizeTip = TipWinCreateA(NULL, src, cx, cy, str);
 	} else {
 		/* Tip already exists, just set the text */
-		TipWinSetText(SizeTip, str);
-		//SetWindowText(tip_wnd, str);
-
-		//OutputDebugPrintf("Updated: (%d,%d)\n", cx, cy);
+		TipWinSetTextA(SizeTip, str);
 
 		// ウィンドウの左上が移動する場合
 		if (tooltip_movable) {
 			TipWinSetPos(SizeTip, newX + TIP_WIN_FRAME_WIDTH*2, newY + TIP_WIN_FRAME_WIDTH*2);
-			//OutputDebugPrintf("Moved: (%d,%d)\n", newX, newY);
 		}
 	}
 }

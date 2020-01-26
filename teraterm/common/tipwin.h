@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 TeraTerm Project
+ * Copyright (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 #ifndef _H_TIPWIN
 #define _H_TIPWIN
 #include <windows.h>
-#include <tchar.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +44,6 @@ TipWin *TipWinCreateW(HINSTANCE hInstance, HWND src, int cx, int cy, const wchar
 void TipWinSetTextA(TipWin *tWin, const char *text);
 void TipWinSetTextW(TipWin *tWin, const wchar_t *text);
 void TipWinDestroy(TipWin *tWin);
-void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height);
 void TipWinGetPos(TipWin *tWin, int *x, int *y);
 void TipWinSetPos(TipWin *tWin, int x, int y);
 void TipWinSetHideTimer(TipWin *tWin, int ms);
@@ -53,13 +51,8 @@ void TipWinSetVisible(TipWin *tWin, int visible);
 int TipWinIsExists(TipWin *tWin);
 int TipWinIsVisible(TipWin *tWin);
 
-#if !defined(_UNICODE)
-#define	TipWinCreateT(p1, p2, p3, p4, p5)	TipWinCreateA(p1, p2, p3, p4, p5)
-#define TipWinSetText(p1, p2)				TipWinSetTextA(p1, p2)
-#else
-#define	TipWinCreateT(p1, p2, p3, p4, p5)	TipWinCreateW(p1, p2, p3, p4, p5)
-#define TipWinSetText(p1, p2)				TipWinSetTextW(p1, p2)
-#endif
+void TipWinGetTextWidthHeight(HWND src, const char *str, int *width, int *height);
+void TipWinGetTextWidthHeightW(HWND src, const wchar_t *str, int *width, int *height);
 
 #ifdef __cplusplus
 }

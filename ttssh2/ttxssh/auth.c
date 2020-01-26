@@ -44,6 +44,7 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <tchar.h>
 
 #include "resource.h"
 #include "keyfiles.h"
@@ -121,7 +122,7 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 					_tcscat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				}
 				GetWindowRect(control, &rect);
-				data->tipwin = TipWinCreateT(hInst, control, rect.left, rect.bottom, uimsg);
+				data->tipwin = TipWinCreateA(hInst, control, rect.left, rect.bottom, uimsg);
 			}
 
 			return 0;

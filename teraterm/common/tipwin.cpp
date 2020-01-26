@@ -359,6 +359,16 @@ TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char 
 	return (TipWin*)tipwin;
 }
 
+TipWin *TipWinCreateW(HINSTANCE hInstance, HWND src, int cx, int cy, const wchar_t *str)
+{
+	CTipWin* tipwin = new CTipWin(hInstance);
+	tipwin->Create(src);
+	tipwin->SetText(str);
+	tipwin->SetPos(cx, cy);
+	tipwin->SetVisible(TRUE);
+	return (TipWin*)tipwin;
+}
+
 /*
  * 文字列をツールチップに描画した時の横と縦のサイズを取得する。
  *
@@ -369,7 +379,7 @@ TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char 
  *   width
  *   height
  */
-void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *height)
+void TipWinGetTextWidthHeight(HWND src, const char *str, int *width, int *height)
 {
 	LOGFONTA logfont;
 	HFONT tip_font;
@@ -379,7 +389,7 @@ void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *heigh
 	size_t str_len;
 
 	/* 文字列の長さを計算する */
-	str_len = _tcslen(str);
+	str_len = strlen(str);
 
 	/* DPIを取得する */
 	uDpi = GetMonitorDpiFromWindow(src);
@@ -396,6 +406,51 @@ void TipWinGetTextWidthHeight(HWND src, const TCHAR *str, int *width, int *heigh
 	str_rect.top = 0;
 	str_rect.left = 0;
 	DrawText(hdc, str, (int)str_len, &str_rect, DT_LEFT|DT_CALCRECT);
+	*width = str_rect.right - str_rect.left;
+	*height = str_rect.bottom - str_rect.top;
+	DeleteDC(hdc);
+
+	/* フォントを破棄する */
+	DeleteObject(tip_font);
+}
+
+/*
+ * 文字列をツールチップに描画した時の横と縦のサイズを取得する。
+ *
+ * [in]
+ *   src
+ *   str
+ * [out]
+ *   width
+ *   height
+ */
+void TipWinGetTextWidthHeightW(HWND src, const wchar_t *str, int *width, int *height)
+{
+	LOGFONTA logfont;
+	HFONT tip_font;
+	UINT uDpi;
+	HDC hdc;
+	RECT str_rect;
+	size_t str_len;
+
+	/* 文字列の長さを計算する */
+	str_len = wcslen(str);
+
+	/* DPIを取得する */
+	uDpi = GetMonitorDpiFromWindow(src);
+
+	/* フォントを生成する */
+	GetMessageboxFont(&logfont);
+	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
+	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
+	tip_font = CreateFontIndirect(&logfont);
+
+	/* 文字列を描画してサイズを求める */
+	hdc = CreateCompatibleDC(NULL);
+	SelectObject(hdc, tip_font);
+	str_rect.top = 0;
+	str_rect.left = 0;
+	_DrawTextW(hdc, str, (int)str_len, &str_rect, DT_LEFT|DT_CALCRECT);
 	*width = str_rect.right - str_rect.left;
 	*height = str_rect.bottom - str_rect.top;
 	DeleteDC(hdc);
