@@ -46,6 +46,28 @@
 #include "clipboarddlg.h"
 #include "compat_win.h"
 
+static void GetDesktopRectFromPoint(POINT p, RECT *rect)
+{
+	if (pMonitorFromPoint == NULL) {
+		// NT4.0, 95 はマルチモニタAPIに非対応
+		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
+	}
+	else {
+		// マルチモニタがサポートされている場合
+		HMONITOR hm;
+		POINT pt;
+		MONITORINFO mi;
+
+		pt.x = p.x;
+		pt.y = p.y;
+		hm = pMonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+
+		mi.cbSize = sizeof(MONITORINFO);
+		pGetMonitorInfoA(hm, &mi);
+		*rect = mi.rcWork;
+	}
+}
+
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -74,6 +96,12 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			} else {
 				SetDlgItemTextA(hDlgWnd, IDC_EDIT, data->strA_ptr);
 			}
+
+			// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
+			InitCommonControls();
+			hStatus = CreateStatusWindow(
+				WS_CHILD | WS_VISIBLE |
+				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hDlgWnd, 1);
 
 			if (ActiveWin == IdVT) { // VT Window
 				/*
@@ -105,23 +133,8 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			// キャレットが画面からはみ出しているときに貼り付けをすると
 			// 確認ウインドウが見えるところに表示されないことがある。
 			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
-			if (pMonitorFromPoint == NULL) {
-				// NT4.0, 95 はマルチモニタAPIに非対応
-				SystemParametersInfo(SPI_GETWORKAREA, 0, &rc_dsk, 0);
-			}
-			else {
-				HMONITOR hm;
-				POINT pt;
-				MONITORINFO mi;
+			GetDesktopRectFromPoint(p, &rc_dsk);
 
-				pt.x = p.x;
-				pt.y = p.y;
-				hm = pMonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
-
-				mi.cbSize = sizeof(MONITORINFO);
-				pGetMonitorInfoA(hm, &mi);
-				rc_dsk = mi.rcWork;
-			}
 			GetWindowRect(hDlgWnd, &rc_dlg);
 			dlg_height = rc_dlg.bottom-rc_dlg.top;
 			dlg_width  = rc_dlg.right-rc_dlg.left;
@@ -163,12 +176,6 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			             ts.PasteDialogSize.cx, ts.PasteDialogSize.cy,
 			             SWP_NOZORDER | SWP_NOMOVE);
 
-			// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
-			InitCommonControls();
-			hStatus = CreateStatusWindow(
-				WS_CHILD | WS_VISIBLE |
-				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hDlgWnd, 1);
-
 			return TRUE;
 
 		case WM_COMMAND:
@@ -200,6 +207,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				default:
 					return FALSE;
 			}
+			return TRUE;
 
 		case WM_SIZE:
 			{
