@@ -36,9 +36,23 @@
 
 #include "codeconv.h"
 #include "compat_win.h"
+#include "dllutil.h"
 #include "ttlib.h"		// for IsWindowsNTKernel()
 
 #include "layer_for_unicode.h"
+
+class Initializer {
+public:
+	Initializer() {
+		DLLInit();
+		WinCompatInit();
+	}
+	~Initializer() {
+		DLLExit();
+	}
+};
+
+static Initializer initializer;
 
 BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString)
 {

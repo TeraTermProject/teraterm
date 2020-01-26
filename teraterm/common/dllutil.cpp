@@ -260,6 +260,9 @@ static void SetupLoadLibraryPath(void)
 
 void DLLInit()
 {
+	if (HandleListCount != 0) {
+		return;		// èâä˙âªçœÇ›
+	}
 	HandleList = NULL;
 	HandleListCount = 0;
 	SetupLoadLibraryPath();
@@ -268,6 +271,9 @@ void DLLInit()
 void DLLExit()
 {
 	int i;
+	if (HandleListCount == 0) {
+		return;		// ñ¢égóp
+	}
 	for (i = 0; i < HandleListCount; i++) {
 		HandleList_t *p = &HandleList[i];
 		if (p->LoadFlag != DLL_GET_MODULE_HANDLE) {
