@@ -772,7 +772,7 @@ private:
 
             Dialog::onInitDialog();
 
-            HWND hWnd = (HWND)this;
+            HWND hWnd = HWND(*this);
 			SetI18nDlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 
             host = GetDlgItem(IDC_HOSTNAME);
@@ -898,7 +898,7 @@ private:
 //              { IDOK, "BTN_OK" },
 //              { IDCANCEL, "BTN_CANCEL" },
             };
-			HWND hWnd = HWND(this);		// ‚¤‚Ü‚­“®‚©‚È‚¢?
+			HWND hWnd = HWND(*this);
 			SetI18nDlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 
             url  <<= GetDlgItem(IDC_URL);
