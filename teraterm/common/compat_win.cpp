@@ -212,6 +212,8 @@ void WinCompatInit()
 		pSetDlgItemTextW = NULL;
 		pGetDlgItemTextW = NULL;
 		pDialogBoxIndirectParamW = NULL;
+		pCreateWindowExW = NULL;
+		pRegisterClassW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

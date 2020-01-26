@@ -232,7 +232,13 @@ UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
 }
 
 /**
- *	TODO:9xŒn‚ÅDrawTextW‚ªg‚¦‚é?
+ *	@param[in]		hdc
+ *	@param[in]		lpchText	•¶š—ñ
+ *	@param[in]		cchText		•¶š”(-1‚Ì‚Æ‚«lpchText‚Ì•¶š—ñ’·)
+ *	@param[in]		lprc		•\¦rect
+ *	@param[in]		format
+ *
+ *		TODO:9xŒn‚ÅDrawTextW‚ª³‚µ‚­“®ì‚·‚é?
  */
 int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
 {
@@ -240,9 +246,10 @@ int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
 		return DrawTextW(hdc, lpchText, cchText, lprc, format);
 	}
 
-	char *strA = ToCharW(lpchText);
-	int strA_len = (int)strlen(strA);
-	int result = DrawTextA(hdc, strA, strA_len, lprc, format);
+	int strW_len = (cchText == -1) ? 0 : cchText;
+	size_t strA_len;
+	char *strA = _WideCharToMultiByte(lpchText, strW_len, CP_ACP, &strA_len);
+	int result = DrawTextA(hdc, strA, (int)strA_len, lprc, format);
 	free(strA);
 	return result;
 }
