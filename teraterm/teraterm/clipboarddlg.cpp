@@ -1,5 +1,5 @@
 /*
- * (C) 2019 TeraTerm Project
+ * (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@
 #include "layer_for_unicode.h"
 #include "tt_res.h"
 #include "clipboarddlg.h"
+#include "compat_win.h"
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -104,7 +105,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			// キャレットが画面からはみ出しているときに貼り付けをすると
 			// 確認ウインドウが見えるところに表示されないことがある。
 			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
-			if (!HasMultiMonitorSupport()) {
+			if (pMonitorFromPoint == NULL) {
 				// NT4.0, 95 はマルチモニタAPIに非対応
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rc_dsk, 0);
 			}
@@ -115,10 +116,10 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 				pt.x = p.x;
 				pt.y = p.y;
-				hm = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+				hm = pMonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
 
 				mi.cbSize = sizeof(MONITORINFO);
-				GetMonitorInfo(hm, &mi);
+				pGetMonitorInfoA(hm, &mi);
 				rc_dsk = mi.rcWork;
 			}
 			GetWindowRect(hDlgWnd, &rc_dlg);

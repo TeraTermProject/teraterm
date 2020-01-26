@@ -74,6 +74,10 @@ HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_
 BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 
+HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
+HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
+BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
+
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
  *	 https://support.microsoft.com/ja-jp/help/124103/how-to-obtain-a-console-window-handle-hwnd
@@ -131,6 +135,9 @@ static const APIInfo Lists_user32[] = {
 	{ "DialogBoxIndirectParamW", (void **)&pDialogBoxIndirectParamW },
 	{ "InsertMenuW", (void **)&pInsertMenuW },
 	{ "AppendMenuW", (void **)&pAppendMenuW },
+	{ "MonitorFromWindow", (void **)&pMonitorFromWindow },
+	{ "MonitorFromPoint", (void **)&pMonitorFromPoint },
+	{ "GetMonitorInfoA", (void **)&pGetMonitorInfoA },
 	{},
 };
 

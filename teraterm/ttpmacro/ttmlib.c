@@ -198,27 +198,6 @@ int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
 	return 0;
 }
 
-int GetMonitorLeftmost(int PosX, int PosY)
-{
-	if (!HasMultiMonitorSupport()) {
-		// // NT4.0, 95 はマルチモニタAPIに非対応
-		return 0;
-	}
-	else {
-		HMONITOR hm;
-		POINT pt;
-		MONITORINFO mi;
-
-		pt.x = PosX;
-		pt.y = PosY;
-		hm = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
-
-		mi.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(hm, &mi);
-		return mi.rcWork.left;
-	}
-}
-
 void BringupWindow(HWND hWnd)
 {
 	DWORD thisThreadId;

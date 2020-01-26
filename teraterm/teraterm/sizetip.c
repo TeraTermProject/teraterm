@@ -31,6 +31,7 @@
 #include "tttypes.h"
 #include "ttlib.h"
 #include "ttwinman.h"
+#include "compat_win.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -60,20 +61,20 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 		ix = point->x;
 		iy = point->y;
 
-		hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
+		hm = pMonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
 		if (hm == NULL) {
 			if (NearestMonitor) {
 				// 最も近いモニタに表示する
-				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
+				hm = pMonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
 			} else {
 				// スクリーンからはみ出している場合はマウスのあるモニタに表示する
 				GetCursorPos(point);
-				hm = MonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
+				hm = pMonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
 			}
 		}
 
 		mi.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(hm, &mi);
+		pGetMonitorInfoA(hm, &mi);
 		if (ix < mi.rcMonitor.left + FrameWidth) {
 			ix = mi.rcMonitor.left + FrameWidth;
 		}

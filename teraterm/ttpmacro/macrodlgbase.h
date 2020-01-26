@@ -95,7 +95,6 @@ private:
 	 */
 	BOOL IsValidPos()
 	{
-		// return !(PosX <= GetMonitorLeftmost(PosX, PosY) - 100);
 		return !((PosX == CW_USEDEFAULT) || (PosY == CW_USEDEFAULT));
 	}
 };

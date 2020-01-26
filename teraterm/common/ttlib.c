@@ -1902,12 +1902,12 @@ void GetMessageboxFont(LOGFONT *logfont)
  */
 void GetDesktopRect(HWND hWnd, RECT *rect)
 {
-	if (HasMultiMonitorSupport()) {
+	if (pMonitorFromWindow != NULL) {
 		// マルチモニタがサポートされている場合
 		MONITORINFO monitorInfo;
-		HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		HMONITOR hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 		monitorInfo.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(hMonitor, &monitorInfo);
+		pGetMonitorInfoA(hMonitor, &monitorInfo);
 		*rect = monitorInfo.rcWork;
 	} else {
 		// マルチモニタがサポートされていない場合
@@ -2035,14 +2035,6 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
  */
 int GetMonitorDpiFromWindow(HWND hWnd)
 {
-	static HRESULT (__stdcall  *pGetDpiForMonitor)(HMONITOR hmonitor, int/*enum MONITOR_DPI_TYPE*/ dpiType, UINT *dpiX, UINT *dpiY);
-	static HMODULE hDll;
-	if (hDll == NULL) {
-		hDll = LoadLibraryA("Shcore.dll");
-		if (hDll != NULL) {
-			pGetDpiForMonitor = (void *)GetProcAddress(hDll, "GetDpiForMonitor");
-		}
-	}
 	if (pGetDpiForMonitor == NULL) {
 		// ダイアログ内では自動スケーリングが効いているので
 		// 常に96を返すようだ
@@ -2054,7 +2046,7 @@ int GetMonitorDpiFromWindow(HWND hWnd)
 	} else {
 		UINT dpiX;
 		UINT dpiY;
-		HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		HMONITOR hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 		pGetDpiForMonitor(hMonitor, 0 /*0=MDT_EFFECTIVE_DPI*/, &dpiX, &dpiY);
 		return (int)dpiY;
 	}
