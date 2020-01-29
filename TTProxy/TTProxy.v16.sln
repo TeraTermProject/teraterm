@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
+# Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTProxy", "TTProxy.v16.vcxproj", "{C4DE5FDF-DB00-4C73-9D4F-359BFCA3F2FB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "..\teraterm\common\common_static.v16.vcxproj", "{AC42387D-23EC-45DB-81F9-8933C7EFA52A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{C4DE5FDF-DB00-4C73-9D4F-359BFCA3F2FB}.Debug|Win32.Build.0 = Debug|Win32
 		{C4DE5FDF-DB00-4C73-9D4F-359BFCA3F2FB}.Release|Win32.ActiveCfg = Release|Win32
 		{C4DE5FDF-DB00-4C73-9D4F-359BFCA3F2FB}.Release|Win32.Build.0 = Release|Win32
+		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Debug|Win32.Build.0 = Debug|Win32
+		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Release|Win32.ActiveCfg = Release|Win32
+		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4DEB4C3-85FB-401C-BEFD-469E0A10C041}
 	EndGlobalSection
 EndGlobal

@@ -52,6 +52,12 @@
     <ClCompile Include="..\common\win16api.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\dlglib_cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib_tmpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bplus.h">
