@@ -61,15 +61,12 @@ endif()
 
 target_link_libraries(
   ttpfile
+  PRIVATE
+  common_static
   ttpcmn
   #
   gdi32
   comdlg32
-  )
-
-add_dependencies(
-  ttpfile
-  ttpcmn
   )
 
 install(

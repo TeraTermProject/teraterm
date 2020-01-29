@@ -42,6 +42,8 @@ set_target_properties(
 
 target_link_libraries(
   TTXRecurringCommand
+  PRIVATE
+  common_static
   ttpcmn
   #
   gdi32

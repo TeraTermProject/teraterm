@@ -44,6 +44,8 @@ set_target_properties(
 
 target_link_libraries(
   TTXViewMode
+  PRIVATE
+  common_static
   ttpcmn
   #
   gdi32

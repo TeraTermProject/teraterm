@@ -69,6 +69,7 @@ endif()
 
 target_link_libraries(
   ttpcmn
+  PRIVATE
   common_static
   ole32
   setupapi

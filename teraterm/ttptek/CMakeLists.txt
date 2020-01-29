@@ -46,15 +46,12 @@ endif()
 
 target_link_libraries(
   ttptek
+  PRIVATE
+  common_static
   ttpcmn
   #
   iphlpapi
   gdi32
-  )
-
-add_dependencies(
-  ttptek
-  ttpcmn
   )
 
 install(

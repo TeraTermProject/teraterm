@@ -102,6 +102,8 @@ set_target_properties(
 
 target_link_libraries(
   ttproxy
+  PRIVATE
+  common_static
   ttpcmn
   #
   ws2_32

@@ -41,14 +41,11 @@ endif()
 
 target_link_libraries(
   ttpset
+  PRIVATE
+  common_static
   ttpcmn
   #
   gdi32
-  )
-
-add_dependencies(
-  ttpset
-  ttpcmn
   )
 
 install(
