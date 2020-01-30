@@ -61,7 +61,6 @@ int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
 BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
 BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
-HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
 HWND (WINAPI *pGetConsoleWindow)(void);
@@ -76,6 +75,7 @@ BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWS
 
 HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
 HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
+HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 
 /**

@@ -1098,8 +1098,6 @@ void WINAPI UndoAllWin(void) {
 	int i;
 	WINDOWPLACEMENT rc0;
 	RECT rc;
-	HMONITOR hMonitor;
-	MONITORINFO mi;
 	int stat = SW_RESTORE;
 	int multi_mon = 0;
 
@@ -1120,9 +1118,11 @@ void WINAPI UndoAllWin(void) {
 			// NT4.0, 95 はマルチモニタAPIに非対応
 			if (multi_mon) {
 				// 対象モニタの情報を取得
-				hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+				HMONITOR hMonitor;
+				MONITORINFO mi;
+				hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
 				mi.cbSize = sizeof(MONITORINFO);
-				GetMonitorInfo(hMonitor, &mi);
+				pGetMonitorInfoA(hMonitor, &mi);
 
 				// 位置補正（復元前後で解像度が変わっている場合への対策）
 				if (rc.right > mi.rcMonitor.right) {

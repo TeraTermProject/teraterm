@@ -106,6 +106,7 @@ extern BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UIN
 extern BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 extern HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
 extern HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
+extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 extern BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 
 
