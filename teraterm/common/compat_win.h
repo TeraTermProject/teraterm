@@ -93,9 +93,7 @@ extern HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE d
 extern BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 extern BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
 extern BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
-extern int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
 extern int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
-extern BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
 extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 extern HWND (WINAPI *pGetConsoleWindow)(void);
 extern int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
@@ -109,14 +107,6 @@ extern HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
 extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 extern BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 
-
-#ifdef UNICODE
-#define pAddFontResourceEx		pAddFontResourceExW
-#define pRemoveFontResourceEx	pRemoveFontResourceExW
-#else
-#define pAddFontResourceEx		pAddFontResourceExA
-#define pRemoveFontResourceEx	pRemoveFontResourceExA
-#endif // !UNICODE
 
 void WinCompatInit();
 

@@ -56,10 +56,6 @@ DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONT
 BOOL (WINAPI *pIsValidDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 UINT (WINAPI *pGetDpiForWindow)(HWND hwnd);
 BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
-int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
-int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
-BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
-BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
@@ -67,6 +63,11 @@ HWND (WINAPI *pGetConsoleWindow)(void);
 int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 
+// gdi32.lib
+int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
+BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
+
+// htmlhelp.ocx
 HWND (WINAPI *pHtmlHelpW)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
@@ -147,8 +148,6 @@ static const APIInfo Lists_msimg32[] = {
 };
 
 static const APIInfo Lists_gdi32[] = {
-	{ "AddFontResourceExA", (void **)&pAddFontResourceExA },
-	{ "RemoveFontResourceExA", (void **)&pRemoveFontResourceExA },
 	{ "AddFontResourceExW", (void **)&pAddFontResourceExW },
 	{ "RemoveFontResourceExW", (void **)&pRemoveFontResourceExW },
 	{},

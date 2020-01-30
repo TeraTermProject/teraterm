@@ -56,6 +56,12 @@ BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem,
 BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
+// gdi32.lib
+int _AddFontResourceW(LPCWSTR lpFileName);
+BOOL _RemoveFontResourceW(LPCWSTR lpFileName);
+int _AddFontResourceExW(LPCWSTR name, DWORD fl, PVOID res);
+BOOL _RemoveFontResourceExW(LPCWSTR name, DWORD fl, PVOID pdv);
+
 // Comctl32.lib
 HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
 INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);

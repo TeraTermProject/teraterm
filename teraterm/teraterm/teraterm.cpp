@@ -59,50 +59,52 @@
 #if UNICODE_INTERNAL_BUFF
 #include "sendmem.h"
 #endif
+#include "layer_for_unicode.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 static BOOL AddFontFlag;
-static TCHAR TSpecialFont[MAX_PATH];
+static wchar_t TSpecialFont[MAX_PATH];
 static CVTWindow* pVTWin;
 
 static void LoadSpecialFont()
 {
-	if (!IsExistFontA("Tera Special", SYMBOL_CHARSET, TRUE)) {
-		int r;
+	if (IsExistFontA("Tera Special", SYMBOL_CHARSET, TRUE)) {
+		// すでに存在するのでロードしない
+		return;
+	}
 
-		if (GetModuleFileName(NULL, TSpecialFont,_countof(TSpecialFont)) == 0) {
-			AddFontFlag = FALSE;
-			return;
-		}
-		*_tcsrchr(TSpecialFont, _T('\\')) = 0;
-		_tcscat_s(TSpecialFont, _T("\\TSPECIAL1.TTF"));
+	if (GetModuleFileNameW(NULL, TSpecialFont, _countof(TSpecialFont)) == 0) {
+		AddFontFlag = FALSE;
+		return;
+	}
+	*wcsrchr(TSpecialFont, L'\\') = 0;
+	wcscat_s(TSpecialFont, L"\\TSPECIAL1.TTF");
 
-		if (pAddFontResourceEx != NULL) {
-			// teraterm.exeのみで有効なフォントとなる。
-			// removeしなくても終了するとOSからなくなる
-			r = pAddFontResourceEx(TSpecialFont, FR_PRIVATE, NULL);
-		} else {
-			// システム全体で使えるフォントとなる
-			// removeしないとOSが掴んだままとなる
-			r = AddFontResource(TSpecialFont);
-		}
-		if (r != 0) {
-			AddFontFlag = TRUE;
-		}
+	// teraterm.exeのみで有効なフォントとなる。
+	// removeしなくても終了するとOSからなくなる
+	int r = _AddFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
+	if (r == 0) {
+		// AddFontResourceEx() が使えなかった
+		// システム全体で使えるフォントとなる
+		// removeしないとOSが掴んだままとなる
+		r = _AddFontResourceW(TSpecialFont);
+	}
+	if (r != 0) {
+		AddFontFlag = TRUE;
 	}
 }
 
 static void UnloadSpecialFont()
 {
-	if (AddFontFlag) {
-		if (pRemoveFontResourceEx != NULL) {
-			pRemoveFontResourceEx(TSpecialFont, FR_PRIVATE, NULL);
-		} else {
-			RemoveFontResource(TSpecialFont);
-		}
+	if (!AddFontFlag) {
+		return;
+	}
+	int r = _RemoveFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
+	if (r == 0) {
+		_RemoveFontResourceW(TSpecialFont);
 	}
 }
 
