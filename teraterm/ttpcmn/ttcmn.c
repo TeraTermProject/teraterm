@@ -1168,36 +1168,29 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	HWND HWin;
 	wchar_t HelpFN[MAX_PATH];
 	wchar_t uimsg[MAX_UIMSG];
-	wchar_t *HomeDirT;
+	wchar_t *HomeDirW;
 
 	/* Get home directory */
 	if (GetModuleFileNameA(NULL,Temp,_countof(Temp)) == 0) {
 		return;
 	}
 	ExtractDirName(Temp, HomeDir);
-	HomeDirT = ToWcharA(HomeDir);
-
+	HomeDirW = ToWcharA(HomeDir);
 	get_lang_msgW("HELPFILE", uimsg, _countof(uimsg), L"teraterm.chm", UILanguageFile);
+	_snwprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, L"%s\\%s", HomeDirW, uimsg);
+	free(HomeDirW);
 
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
 	HWin = GetDesktopWindow();
-	_snwprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, L"%s\\%s", HomeDirT, uimsg);
 	if (_HtmlHelpW(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-		goto error;
-	}
-	goto finish;
-
-error:
-	{
+		// ヘルプが開けなかった
 		wchar_t buf[MAX_PATH];
 		get_lang_msgW("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
 					  L"Can't open HTML help file(%s).", UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
 		_MessageBoxW(HWin, buf, L"Tera Term: HTML help", MB_OK | MB_ICONERROR);
+		return;
 	}
-
-finish:
-	free(HomeDirT);
 }
 
 HWND WINAPI GetNthWin(int n)
