@@ -74,7 +74,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 		flag |= MF_CHECKED;
 	}
 
-	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_BASE, "&Alwais on top");
+	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_BASE, "&Always on top");
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
 	SetI18nMenuStrs(IniSection, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
