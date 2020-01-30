@@ -57,8 +57,8 @@
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
 
 
-* Notice for SVN commiter
-- SVN repository for commiter is followings:
+* Notice for SVN committer
+- SVN repository for committer is the following:
   svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk
 
 - Should not edit checkout file in copying directory.
@@ -235,7 +235,7 @@ Example: adding a TTSSH menu under File menu
 * How to build HTML help file
   To build  HTML help file is shown in the following step:
 
-  1. Intall HTML Help Workshop from below site:
+  1. Install HTML Help Workshop from below site:
      http://www.microsoft.com/en-us/download/details.aspx?id=21138
 
   2. Copy document files with batch file on command prompt.
