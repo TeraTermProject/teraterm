@@ -4742,25 +4742,16 @@ void CVTWindow::OnExternalSetup()
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
 	INT_PTR ret = CAddSetting.DoModal();
-	switch (ret) {
-		case (DWORD)-1:
-		case IDABORT:
-			ret = GetLastError();
-			break;
-		case IDOK:
+	if (ret == IDOK) {
 #ifdef ALPHABLEND_TYPE2
-			BGInitialize(FALSE);
-			BGSetupPrimary(TRUE);
+		BGInitialize(FALSE);
+		BGSetupPrimary(TRUE);
 #else
-			DispApplyANSIColor();
+		DispApplyANSIColor();
 #endif
-			DispSetNearestColors(IdBack, IdFore+8, NULL);
-			ChangeWin();
-			ChangeFont();
-			break;
-		default:
-			/* nothing to do */
-			break;
+		DispSetNearestColors(IdBack, IdFore+8, NULL);
+		ChangeWin();
+		ChangeFont();
 	}
 }
 
