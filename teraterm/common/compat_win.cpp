@@ -36,10 +36,10 @@
 #include "ttlib.h"
 
 ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
-HWND(WINAPI *pCreateWindowExW)
-(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
+HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
  HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
-HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
+LRESULT (WINAPI *pDefWindowProcW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
 INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
@@ -119,6 +119,9 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 }
 
 static const APIInfo Lists_user32[] = {
+	{ "RegisterClassW", (void **)&pRegisterClassW },
+	{ "CreateWindowExW", (void **)&pCreateWindowExW },
+	{ "DefWindowProcW", (void **)&pDefWindowProcW },
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
 	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
@@ -213,6 +216,7 @@ void WinCompatInit()
 		pDialogBoxIndirectParamW = NULL;
 		pCreateWindowExW = NULL;
 		pRegisterClassW = NULL;
+		pDefWindowProcW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

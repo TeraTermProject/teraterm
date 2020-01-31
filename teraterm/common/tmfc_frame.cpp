@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 TeraTerm Project
+ * Copyright (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,8 @@
  */
 #include "tmfc.h"
 #include "ttlib.h"
+#include "compat_win.h"
+#include "layer_for_unicode.h"
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1500)) || \
 	(__cplusplus <= 199711L)
@@ -52,10 +54,10 @@ TTCFrameWnd::~TTCFrameWnd()
 {
 }
 
-BOOL TTCFrameWnd::Create(
+BOOL TTCFrameWnd::CreateA(
 	HINSTANCE hInstance,
-	LPCTSTR lpszClassName,
-	LPCTSTR lpszWindowName,
+	LPCSTR lpszClassName,
+	LPCSTR lpszWindowName,
 	DWORD dwStyle,
 	const RECT& rect,
 	HWND hParentWnd,
@@ -87,6 +89,45 @@ BOOL TTCFrameWnd::Create(
 	}
 }
 
+BOOL TTCFrameWnd::CreateW(
+	HINSTANCE hInstance,
+	LPCWSTR lpszClassName,
+	LPCWSTR lpszWindowName,
+	DWORD dwStyle,
+	const RECT& rect,
+	HWND hParentWnd,
+	LPCTSTR lpszMenuName,
+	DWORD dwExStyle)
+{
+	m_hInst = hInstance;
+	m_hParentWnd = hParentWnd;
+	pseudoPtr = this;
+	HWND hWnd = _CreateWindowExW(
+		WS_EX_OVERLAPPEDWINDOW,
+		lpszClassName,
+		lpszWindowName,
+		dwStyle,
+		rect.left, rect.top,
+		rect.right - rect.left, rect.bottom - rect.top,
+		hParentWnd,
+		nullptr,
+		hInstance,
+		nullptr);
+	pseudoPtr = nullptr;
+	if (hWnd == nullptr) {
+		OutputDebugPrintf("CreateWindow %d\n", GetLastError());
+		return FALSE;
+	} else {
+		m_hWnd = hWnd;
+		if (pCreateWindowExW != NULL) {
+			// Unicode API‚ª‘¶Ý‚·‚é
+			m_WindowUnicode = TRUE;
+		}
+		SetWindowLongPtr(GWLP_USERDATA, (LONG_PTR)this);
+		return TRUE;
+	}
+}
+
 TTCFrameWnd *TTCFrameWnd::pseudoPtr;
 
 LRESULT TTCFrameWnd::ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -107,9 +148,6 @@ BOOL TTCFrameWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 }
 
 void TTCFrameWnd::OnKillFocus(HWND hNewWnd)
-{}
-
-void TTCFrameWnd::OnDestroy()
 {}
 
 void TTCFrameWnd::OnSetFocus(HWND hOldWnd)

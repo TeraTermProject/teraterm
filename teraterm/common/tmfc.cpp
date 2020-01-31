@@ -35,6 +35,7 @@
 #include <assert.h>
 #include "dlglib.h"
 #include "ttlib.h"
+#include "compat_win.h"
 #include "layer_for_unicode.h"
 
 // テンプレートの書き換えを行う
@@ -51,6 +52,7 @@ TTCWnd::TTCWnd()
 	m_hInst = nullptr;
 	m_hAccel = nullptr;
 	m_hParentWnd = nullptr;
+	m_WindowUnicode = FALSE;
 }
 
 LRESULT TTCWnd::SendMessage(UINT msg, WPARAM wp, LPARAM lp)
@@ -259,7 +261,13 @@ BOOL TTCWnd::EndPaint(LPPAINTSTRUCT lpPaint)
 
 LRESULT TTCWnd::DefWindowProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	return ::DefWindowProc(m_hWnd, msg, wParam, lParam);
+	if (m_WindowUnicode && pDefWindowProcW != NULL) {
+		// Unicode API あり && Unicode Window
+		return pDefWindowProcW(m_hWnd, msg, wParam, lParam);
+	}
+	else {
+		return ::DefWindowProcA(m_hWnd, msg, wParam, lParam);
+	}
 }
 
 ////////////////////////////////////////

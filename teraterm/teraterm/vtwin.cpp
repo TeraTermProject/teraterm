@@ -99,7 +99,7 @@
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
 
-#define VTClassName _T("VTWin32")
+#define VTClassName L"VTWin32"
 
 // ウィンドウ最大化ボタンを有効にする (2005.1.15 yutaka)
 #define WINDOW_MAXMIMUM_ENABLED 1
@@ -513,7 +513,7 @@ error:
 
 CVTWindow::CVTWindow(HINSTANCE hInstance)
 {
-	WNDCLASS wc;
+	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
 	char *Param;
@@ -679,7 +679,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = VTClassName;
 
-	RegisterClass(&wc);
+	_RegisterClassW(&wc);
 	m_hAccel = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACC));
 
 	if (ts.VTPos.x==CW_USEDEFAULT) {
@@ -691,7 +691,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
-	Create(hInstance, VTClassName, _T("Tera Term"), Style, rect, NULL, NULL);
+	CreateW(hInstance, VTClassName, L"Tera Term", Style, rect, NULL, NULL);
 
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
@@ -1779,7 +1779,6 @@ void CVTWindow::OnDestroy()
 
 	FreeBuffer();
 
-	TTCFrameWnd::OnDestroy();
 	TTXEnd(); /* TTPLUG */
 
 	DeleteNotifyIcon(&cv);

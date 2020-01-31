@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,15 +46,16 @@
 #include <htmlhelp.h>
 #include "dlglib.h"
 #include <tchar.h>
+#include "layer_for_unicode.h"
 
-#define TEKClassName _T("TEKWin32")
+#define TEKClassName L"TEKWin32"
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
 
 CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 {
-	WNDCLASS wc;
+	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
 	int fuLoad = LR_DEFAULTCOLOR;
@@ -84,7 +85,7 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = TEKClassName;
 
-	RegisterClass(&wc);
+	_RegisterClassW(&wc);
 
 	if (ts.TEKPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
@@ -95,7 +96,7 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 		rect.right = rect.left + 640; //temporary width
 		rect.bottom = rect.top + 400; //temporary height
 	}
-	Create(hInstance, TEKClassName, _T("Tera Term"), Style, rect, ::GetDesktopWindow(), NULL);
+	CreateW(hInstance, TEKClassName, L"Tera Term", Style, rect, ::GetDesktopWindow(), NULL);
 //--------------------------------------------------------
 	HTEKWin = GetSafeHwnd();
 	if (HTEKWin == NULL) {
@@ -276,8 +277,6 @@ void CTEKWindow::OnDestroy()
 {
 	// remove this window from the window list
 	UnregWin(HTEKWin);
-
-	TTCFrameWnd::OnDestroy();
 
 	TEKEnd(&tk);
 	FreeTTTEK();

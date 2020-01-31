@@ -246,7 +246,7 @@ void ChangeTitle()
 	if ((ts.TitleFormat & 4)!=0) // VT
 		strncat_s(TempTitle,sizeof(TempTitle)," VT",_TRUNCATE);
 
-	SetWindowText(HVTWin,TempTitle);
+	SetWindowTextA(HVTWin,TempTitle);
 
 	if (HTEKWin!=0)
 	{
@@ -254,7 +254,7 @@ void ChangeTitle()
 		{
 			strncat_s(TempTitle,sizeof(TempTitle)," TEK",_TRUNCATE);
 		}
-		SetWindowText(HTEKWin,TempTitle);
+		SetWindowTextA(HTEKWin,TempTitle);
 	}
 }
 

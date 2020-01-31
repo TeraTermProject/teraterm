@@ -79,6 +79,8 @@ public:
 	void SetDlgItemInt(int id, UINT val, BOOL bSigned = TRUE);
 	UINT GetDlgItemInt(int id, BOOL* lpTrans = NULL, BOOL bSigned = TRUE) const;
 	void EnableDlgItem(int id, BOOL enable);
+protected:
+	BOOL m_WindowUnicode;
 private:
 	void ModifyStyleCom(int nStyleOffset, DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 };
@@ -90,22 +92,28 @@ public:
 	virtual ~TTCFrameWnd();
 	static TTCFrameWnd *pseudoPtr;
 	static LRESULT CALLBACK ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
-	virtual BOOL Create(HINSTANCE hInstance,
-						LPCTSTR lpszClassName,
-						LPCTSTR lpszWindowName,
-						DWORD dwStyle = WS_OVERLAPPEDWINDOW,
-						const RECT& rect = rectDefault,
-						HWND pParentWnd = NULL,        // != NULL for popups
-						LPCTSTR lpszMenuName = NULL,
-						DWORD dwExStyle = 0);//,
-						//CCreateContext* pContext = NULL);
+	BOOL CreateA(HINSTANCE hInstance,
+				 LPCSTR lpszClassName,
+				 LPCSTR lpszWindowName,
+				 DWORD dwStyle = WS_OVERLAPPEDWINDOW,
+				 const RECT& rect = rectDefault,
+				 HWND pParentWnd = NULL,
+				 LPCTSTR lpszMenuName = NULL,
+				 DWORD dwExStyle = 0);
+	BOOL CreateW(HINSTANCE hInstance,
+				 LPCWSTR lpszClassName,
+				 LPCWSTR lpszWindowName,
+				 DWORD dwStyle = WS_OVERLAPPEDWINDOW,
+				 const RECT& rect = rectDefault,
+				 HWND pParentWnd = NULL,
+				 LPCTSTR lpszMenuName = NULL,
+				 DWORD dwExStyle = 0);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp) = 0;
 	static const RECT rectDefault;
 	///
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	///
 	void OnKillFocus(HWND hNewWnd);
-	void OnDestroy();
 	void OnSetFocus(HWND hOldWnd);
 	void OnSysCommand(WPARAM nID, LPARAM lParam);
 	void OnClose();
