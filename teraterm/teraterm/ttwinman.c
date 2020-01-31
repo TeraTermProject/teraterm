@@ -38,6 +38,8 @@
 #include "helpid.h"
 #include "i18n.h"
 #include "commlib.h"
+#include "codeconv.h"
+#include "layer_for_unicode.h"
 
 HWND HVTWin = NULL;
 HWND HTEKWin = NULL;
@@ -76,7 +78,7 @@ void ConvertToCP932(char *str, int destlen)
 #define IS_SJIS(n) (ts.KanjiCode == IdSJIS && IsDBCSLeadByte(n))
 #define IS_EUC(n) (ts.KanjiCode == IdEUC && (n & 0x80))
 	extern WORD PASCAL JIS2SJIS(WORD KCode);
-	int len = strlen(str);
+	size_t len = strlen(str);
 	char *cc = _alloca(len + 1);
 	char *c = cc;
 	int i;
@@ -148,113 +150,124 @@ void ConvertToCP932(char *str, int destlen)
  */
 void ChangeTitle()
 {
-	char TempTitle[HostNameMaxLength + TitleBuffSize * 2 + 1]; // バッファ拡張
-	char TempTitleWithRemote[TitleBuffSize * 2];
+	wchar_t TempTitle[HostNameMaxLength + TitleBuffSize * 2 + 1]; // バッファ拡張
+	wchar_t TempTitleWithRemote[TitleBuffSize * 2];
 
-	if (Connecting || !cv.Ready || strlen(cv.TitleRemote) == 0) {
-		strncpy_s(TempTitleWithRemote, sizeof(TempTitleWithRemote), ts.Title, _TRUNCATE);
-		strncpy_s(TempTitle, sizeof(TempTitle), ts.Title, _TRUNCATE);
-	}
-	else {
-		// リモートからのタイトルを別に扱う (2008.11.1 maya)
-		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOff) {
-			strncpy_s(TempTitleWithRemote, sizeof(TempTitleWithRemote), ts.Title, _TRUNCATE);
-		}
-		else if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestAhead) {
-			_snprintf_s(TempTitleWithRemote, sizeof(TempTitleWithRemote), _TRUNCATE,
-			            "%s %s", cv.TitleRemote, ts.Title);
-		}
-		else if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestLast) {
-			_snprintf_s(TempTitleWithRemote, sizeof(TempTitleWithRemote), _TRUNCATE,
-			            "%s %s", ts.Title, cv.TitleRemote);
+	{
+		wchar_t *title = ToWcharA(ts.Title);
+		wchar_t *title_remote = ToWcharA(cv.TitleRemote);
+		if (Connecting || !cv.Ready || wcslen(title_remote) == 0) {
+			wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
+			wcsncpy_s(TempTitle, _countof(TempTitle), title, _TRUNCATE);
 		}
 		else {
-			strncpy_s(TempTitleWithRemote, sizeof(TempTitleWithRemote), cv.TitleRemote, _TRUNCATE);
+			// リモートからのタイトルを別に扱う (2008.11.1 maya)
+			if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOff) {
+				wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
+			}
+			else if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestAhead) {
+				_snwprintf_s(TempTitleWithRemote, _countof(TempTitleWithRemote), _TRUNCATE,
+							 L"%s %s", title_remote, title);
+			}
+			else if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestLast) {
+				_snwprintf_s(TempTitleWithRemote, _countof(TempTitleWithRemote), _TRUNCATE,
+							 L"%s %s", title, title_remote);
+			}
+			else {
+				wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title_remote, _TRUNCATE);
+			}
+			wcsncpy_s(TempTitle, _countof(TempTitle), TempTitleWithRemote, _TRUNCATE);
 		}
-		strncpy_s(TempTitle, sizeof(TempTitle), TempTitleWithRemote, _TRUNCATE);
+		free(title);
+		free(title_remote);
 	}
 
 	if ((ts.TitleFormat & 1)!=0)
 	{ // host name
-		strncat_s(TempTitle,sizeof(TempTitle), " - ",_TRUNCATE);
+		wchar_t UIMsg[MAX_UIMSG];
+		wcsncat_s(TempTitle,_countof(TempTitle), L" - ",_TRUNCATE);
 		if (Connecting) {
-			get_lang_msg("DLG_MAIN_TITLE_CONNECTING", ts.UIMsg, sizeof(ts.UIMsg), "[connecting...]", ts.UILanguageFile);
-			strncat_s(TempTitle,sizeof(TempTitle),ts.UIMsg,_TRUNCATE);
+			get_lang_msgW("DLG_MAIN_TITLE_CONNECTING", UIMsg, _countof(UIMsg), L"[connecting...]", ts.UILanguageFile);
+			wcsncat_s(TempTitle,_countof(TempTitle), UIMsg,_TRUNCATE);
 		}
 		else if (! cv.Ready) {
-			get_lang_msg("DLG_MAIN_TITLE_DISCONNECTED", ts.UIMsg, sizeof(ts.UIMsg), "[disconnected]", ts.UILanguageFile);
-			strncat_s(TempTitle,sizeof(TempTitle),ts.UIMsg,_TRUNCATE);
+			get_lang_msgW("DLG_MAIN_TITLE_DISCONNECTED", UIMsg, _countof(UIMsg), L"[disconnected]", ts.UILanguageFile);
+			wcsncat_s(TempTitle,_countof(TempTitle), UIMsg,_TRUNCATE);
 		}
 		else if (cv.PortType==IdSerial)
 		{
 			// COM5 overに対応
-			char str[24]; // COMxxxx:xxxxxxxxxxbps
+			wchar_t str[24]; // COMxxxx:xxxxxxxxxxbps
 			if (ts.TitleFormat & 32) {
-				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d:%ubps", ts.ComPort, ts.Baud);
+				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d:%ubps", ts.ComPort, ts.Baud);
 			}
 			else {
-				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d", ts.ComPort);
+				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d", ts.ComPort);
 			}
 
 			if (ts.TitleFormat & 8) {
-				_snprintf_s(TempTitle, sizeof(TempTitle), _TRUNCATE, "%s - %s", str, TempTitleWithRemote);
+				_snwprintf_s(TempTitle, _countof(TempTitle), _TRUNCATE, L"%s - %s", str, TempTitleWithRemote);
 			} else {
-				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE);
+				wcsncat_s(TempTitle, _countof(TempTitle), str, _TRUNCATE);
 			}
 		}
 		else if (cv.PortType == IdNamedPipe)
 		{
-			char str[sizeof(TempTitle)];
-			strncpy_s(str, sizeof(str), ts.HostName, _TRUNCATE);
+			wchar_t str[_countof(TempTitle)];
+			wchar_t *host_name = ToWcharA(ts.HostName);
+			wcsncpy_s(str, _countof(str), host_name, _TRUNCATE);
+			free(host_name);
 
 			if (ts.TitleFormat & 8) {
 				// format ID = 13(8 + 5): <hots/port> - <title>
-				_snprintf_s(TempTitle, sizeof(TempTitle), _TRUNCATE, "%s - %s", str, TempTitleWithRemote);
+				_snwprintf_s(TempTitle, _countof(TempTitle), _TRUNCATE, L"%s - %s", str, TempTitleWithRemote);
 			}
 			else {
-				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE);
+				wcsncat_s(TempTitle, _countof(TempTitle), str, _TRUNCATE);
 			}
 		}
 		else {
-			char str[sizeof(TempTitle)];
+			wchar_t str[_countof(TempTitle)];
+			wchar_t *host_name = ToWcharA(ts.HostName);
 			if (ts.TitleFormat & 16) {
-				_snprintf_s(str, sizeof(str), _TRUNCATE, "%s:%d", ts.HostName, ts.TCPPort);
+				_snwprintf_s(str, _countof(str), _TRUNCATE, L"%s:%d", host_name, ts.TCPPort);
 			}
 			else {
-				strncpy_s(str, sizeof(str), ts.HostName, _TRUNCATE);
+				wcsncpy_s(str, _countof(str), host_name, _TRUNCATE);
 			}
+			free(host_name);
 
 			if (ts.TitleFormat & 8) {
 				// format ID = 13(8 + 5): <hots/port> - <title>
-				_snprintf_s(TempTitle, sizeof(TempTitle), _TRUNCATE, "%s - %s", str, TempTitleWithRemote);
+				_snwprintf_s(TempTitle, _countof(TempTitle), _TRUNCATE, L"%s - %s", str, TempTitleWithRemote);
 			}
 			else {
-				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE);
+				wcsncat_s(TempTitle, _countof(TempTitle), str, _TRUNCATE);
 			}
 		}
 	}
 
 	if ((ts.TitleFormat & 2)!=0)
 	{ // serial no.
-		char Num[11];
-		strncat_s(TempTitle,sizeof(TempTitle)," (",_TRUNCATE);
-		_snprintf_s(Num,sizeof(Num),_TRUNCATE,"%u",SerialNo);
-		strncat_s(TempTitle,sizeof(TempTitle),Num,_TRUNCATE);
-		strncat_s(TempTitle,sizeof(TempTitle),")",_TRUNCATE);
+		wchar_t Num[11];
+		wcsncat_s(TempTitle,_countof(TempTitle),L" (",_TRUNCATE);
+		_snwprintf_s(Num,_countof(Num),_TRUNCATE,L"%u",SerialNo);
+		wcsncat_s(TempTitle,_countof(TempTitle),Num,_TRUNCATE);
+		wcsncat_s(TempTitle,_countof(TempTitle),L")",_TRUNCATE);
 	}
 
 	if ((ts.TitleFormat & 4)!=0) // VT
-		strncat_s(TempTitle,sizeof(TempTitle)," VT",_TRUNCATE);
+		wcsncat_s(TempTitle,_countof(TempTitle),L" VT",_TRUNCATE);
 
-	SetWindowTextA(HVTWin,TempTitle);
+	_SetWindowTextW(HVTWin,TempTitle);
 
 	if (HTEKWin!=0)
 	{
 		if ((ts.TitleFormat & 4)!=0) // TEK
 		{
-			strncat_s(TempTitle,sizeof(TempTitle)," TEK",_TRUNCATE);
+			wcsncat_s(TempTitle,_countof(TempTitle),L" TEK",_TRUNCATE);
 		}
-		SetWindowTextA(HTEKWin,TempTitle);
+		_SetWindowTextW(HTEKWin,TempTitle);
 	}
 }
 
