@@ -93,15 +93,17 @@ if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
     PERL perl
     )
 elseif("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-  # Active/Strawberry Perl (cygwin版は使えない)
+  # Active/Strawberry Perl
   find_program(
     PERL perl.exe
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/perl/perl/bin
     HINTS c:/Perl64/bin
     HINTS c:/Perl/bin
-    HINTS C:/Strawberry/perl/bin
-#    HINTS c:/cygwin/usr/bin
-#    HINTS c:/cygwin64/usr/bin
+    HINTS c:/Strawberry/perl/bin
     )
+  if("${PERL}" MATCHES "[Cc]ygwin")
+    message(FATAL_ERROR "cygwin perl! ${PERL}")
+  endif()
 else()
   # MinGW
   find_program(
@@ -188,10 +190,8 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
 
   if((${CMAKE_GENERATOR} MATCHES "Win64") OR ("${ARCHITECTURE}" MATCHES "x64"))
     set(CONFIG_TARGET "VC-WIN64A")
-    set(DO_MS "ms\\do_win64a.bat")
   else()
     set(CONFIG_TARGET "VC-WIN32")
-    set(DO_MS "ms\\do_ms.bat")
   endif()
   if(("${CMAKE_BUILD_TYPE}" STREQUAL "Release") OR ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL "Release"))
   else()
@@ -207,7 +207,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   file(TO_NATIVE_PATH ${VCVARS32} VCVARS32_N)
   string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
   file(APPEND "${SRC_DIR}/build_cmake.bat"
-    "set PATH=${PERL_N_PATH};%PATH%\n"
+    "set PATH=${PERL_N_PATH};c:\\windows;c:\\windows\\system32\n"
     )
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
     ## Visual Studio 2005 特別処理
@@ -241,16 +241,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
       "call \"${VCVARS32_N}\"\n"
       )
   endif()
-  # jomでビルドの高速化を試したが次のエラーが出てしまう
-  # 複数の CL.EXE が同じ .PDB ファイルに書き込む場合、/FS を使用してください。
-  # if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/jom/nmake.exe")
-  #   file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR} CMAKE_CURRENT_SOURCE_DIR_N)
-  #   file(APPEND "${SRC_DIR}/build_cmake.bat"
-  #     "set PATH=${CMAKE_CURRENT_SOURCE_DIR_N}\\jom;%PATH%\n"
-  #     )
-  # endif()
   file(APPEND "${SRC_DIR}/build_cmake.bat"
-    "set PATH=%PATH%;${PERL_N_PATH}\n"
     "perl Configure no-asm no-async no-shared ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N} --openssldir=${INSTALL_DIR_N}\\SSL\n"
     "nmake -f makefile install\n"
     )

@@ -12,11 +12,13 @@ if(NOT "${ARCHITECTURE}" STREQUAL "")
   set(ARCHITECTURE_OPTION -DARCHITECTURE=${ARCHITECTURE})
 endif()
 
-# install tool
-message("jom")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -P jom.cmake
-  )
+# install tools
+if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+  message("perl")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -P perl.cmake
+    )
+endif()
 
 # build
 message("oniguruma")
