@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2019 TeraTerm Project
+ * (C) 2007-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -521,8 +521,8 @@ void *CreateReconvStringStA(
 	HWND hWnd, const char *str_ptr, size_t str_count,
 	size_t cx, size_t *st_size_)
 {
-	if (HIMEDLL != NULL) return NULL;
-	assert(IsWindowUnicode(hWnd) == FALSE);
+	if (HIMEDLL == NULL) return NULL;
+	//assert(IsWindowUnicode(hWnd) == FALSE);
 	return CreateReconvStringSt(hWnd, FALSE, str_ptr, str_count, cx, st_size_);
 }
 
@@ -542,6 +542,6 @@ void *CreateReconvStringStW(
 	size_t cx, size_t *st_size_)
 {
 	if (HIMEDLL == NULL) return NULL;
-	assert(IsWindowUnicode(hWnd) == TRUE);
+	//assert(IsWindowUnicode(hWnd) == TRUE);
 	return CreateReconvStringSt(hWnd, TRUE, str_ptr, str_count, cx, st_size_);
 }
