@@ -3178,7 +3178,7 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 		char buf[512];			// 参照文字列を受け取るバッファ
 		size_t str_len_count;
 		int cx;
-		assert(IsWindowUnicode(hWnd) == FALSE);
+//		assert(IsWindowUnicode(hWnd) == FALSE);		// TODO UNICODE/ANSI切り替え
 
 		// 参照文字列取得、1行取り出す
 		{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
