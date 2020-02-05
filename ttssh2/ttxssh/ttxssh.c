@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998-2001, Robert O'Callahan
+ * Copyright (c) 1998-2020, Robert O'Callahan
  * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
@@ -2747,7 +2747,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_mac_order(pvar->settings.MacOrder);
 	for (i = 0; pvar->settings.MacOrder[i] != 0; i++) {
 		int index = pvar->settings.MacOrder[i] - '0';
-		char *name = NULL;
+		const char *name = NULL;
 
 		if (index == 0)	{
 			UTIL_get_lang_msg("DLG_SSHSETUP_MAC_BORDER", pvar,
@@ -4031,7 +4031,7 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
 static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
-	SSH2Cipher *cipher = NULL;
+	const SSH2Cipher *cipher = NULL;
 	char *ciphername = DEFAULT_CIPHERNAME;
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;

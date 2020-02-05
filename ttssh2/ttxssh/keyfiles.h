@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,24 +76,6 @@ ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
                                    FILE **fp,
                                    char *errmsg,
                                    int errmsg_len);
-
-typedef struct keyfile_header {
-	ssh2_keyfile_type type;
-	char *header;
-} keyfile_header_t;
-
-static keyfile_header_t keyfile_headers[] = {
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN RSA PRIVATE KEY-----"},
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN DSA PRIVATE KEY-----"},
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN EC PRIVATE KEY-----"},
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN ENCRYPTED PRIVATE KEY-----"},
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN PRIVATE KEY-----"},
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN OPENSSH PRIVATE KEY-----"},	
-	{SSH2_KEYFILE_TYPE_PUTTY,   "PuTTY-User-Key-File-2"},
-	{SSH2_KEYFILE_TYPE_SECSH,   "---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----"},
-	{SSH2_KEYFILE_TYPE_NONE,    NULL},
-
-};
 
 /* openssh private key file format */
 #define MARK_BEGIN		"-----BEGIN OPENSSH PRIVATE KEY-----\n"

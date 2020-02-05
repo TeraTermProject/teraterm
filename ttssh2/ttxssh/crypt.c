@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1137,7 +1137,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 	struct Enc *enc;
 	char *encryption_key = pvar->crypt_state.sender_cipher_key;
 	char *decryption_key = pvar->crypt_state.receiver_cipher_key;
-	SSH2Cipher *cipher;
+	const SSH2Cipher *cipher;
 	BOOL isOK = TRUE;
 
 	if (sender_flag) {

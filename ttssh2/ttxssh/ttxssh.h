@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -268,8 +268,8 @@ typedef struct _TInstVar {
 	buffer_t *peer_kex;
 	kex_algorithm kex_type; // KEX algorithm
 	ssh_keytype hostkey_type;
-	SSH2Cipher *ciphers[MODE_MAX];
-	SSH2Mac *macs[MODE_MAX];
+	const SSH2Cipher *ciphers[MODE_MAX];
+	const SSH2Mac *macs[MODE_MAX];
 	compression_type ctos_compression;
 	compression_type stoc_compression;
 	int we_need;

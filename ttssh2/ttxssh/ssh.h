@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -313,27 +313,6 @@ enum kex_init_proposals {
 	PROPOSAL_MAX
 };
 
-#define KEX_DEFAULT_KEX     ""
-#define KEX_DEFAULT_PK_ALG  ""
-#define KEX_DEFAULT_ENCRYPT ""
-#define KEX_DEFAULT_MAC     ""
-#define KEX_DEFAULT_COMP    ""
-#define KEX_DEFAULT_LANG    ""
-
-static char *myproposal[PROPOSAL_MAX] = {
-	KEX_DEFAULT_KEX,
-	KEX_DEFAULT_PK_ALG,
-	KEX_DEFAULT_ENCRYPT,
-	KEX_DEFAULT_ENCRYPT,
-	KEX_DEFAULT_MAC,
-	KEX_DEFAULT_MAC,
-	KEX_DEFAULT_COMP,
-	KEX_DEFAULT_COMP,
-	KEX_DEFAULT_LANG,
-	KEX_DEFAULT_LANG,
-};
-
-
 typedef enum {
 	KEY_NONE,
 	KEY_RSA1,
@@ -347,23 +326,6 @@ typedef enum {
 	KEY_MAX = KEY_UNSPEC,
 } ssh_keytype;
 #define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ED25519)
-
-typedef struct ssh2_host_key {
-	ssh_keytype type;
-	char *name;
-} ssh2_host_key_t;
-
-static ssh2_host_key_t ssh2_host_key[] = {
-	{KEY_RSA1,     "ssh-rsa1"},            // for SSH1 only
-	{KEY_RSA,      "ssh-rsa"},             // RFC4253
-	{KEY_DSA,      "ssh-dss"},             // RFC4253
-	{KEY_ECDSA256, "ecdsa-sha2-nistp256"}, // RFC5656
-	{KEY_ECDSA384, "ecdsa-sha2-nistp384"}, // RFC5656
-	{KEY_ECDSA521, "ecdsa-sha2-nistp521"}, // RFC5656
-	{KEY_ED25519,  "ssh-ed25519"},         // draft-bjh21-ssh-ed25519-02
-	{KEY_UNSPEC,   "ssh-unknown"},
-	{KEY_NONE,     NULL},
-};
 
 /* Minimum modulus size (n) for RSA keys. */
 #define SSH_RSA_MINIMUM_MODULUS_SIZE    768
@@ -387,42 +349,6 @@ typedef struct ssh2_cipher {
 	const EVP_CIPHER *(*func)(void);
 } SSH2Cipher;
 
-static SSH2Cipher ssh2_ciphers[] = {
-	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, 0, 0, EVP_des_ede3_cbc},     // RFC4253
-	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, 0, 0, EVP_aes_128_cbc},      // RFC4253
-	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, 0, 0, EVP_aes_192_cbc},      // RFC4253
-	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, 0, 0, EVP_aes_256_cbc},      // RFC4253
-	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, 0, 0, EVP_bf_cbc},           // RFC4253
-	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, 0, 0, EVP_rc4},              // RFC4253
-	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, 0, 0, EVP_rc4},              // RFC4345
-	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, 0, 0, EVP_rc4},              // RFC4345
-	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, 0, 0, EVP_cast5_cbc},        // RFC4253
-	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, 0, 0, evp_des3_ctr},         // RFC4344
-	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 32,    0, 0, 0, evp_bf_ctr},           // RFC4344
-	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, 0, 0, evp_cast5_ctr},        // RFC4344
-	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, 0, 0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, 0, 0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, 0, 0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-#ifdef WITH_CAMELLIA_PRIVATE
-	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0,  0,  0, EVP_camellia_128_cbc},
-	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0,  0,  0, EVP_camellia_192_cbc},
-	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc@openssh.org", 16, 32, 0,  0,  0, EVP_camellia_256_cbc},
-	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr@openssh.org", 16, 16, 0,  0,  0, evp_camellia_128_ctr},
-	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr@openssh.org", 16, 24, 0,  0,  0, evp_camellia_128_ctr},
-	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr@openssh.org", 16, 32, 0,  0,  0, evp_camellia_128_ctr},
-#endif // WITH_CAMELLIA_PRIVATE
-	{SSH2_CIPHER_AES128_GCM,      "aes128-gcm@openssh.com",      16, 16, 0, 12, 16, EVP_aes_128_gcm}, // not RFC5647, PROTOCOL of OpenSSH
-	{SSH2_CIPHER_AES256_GCM,      "aes256-gcm@openssh.com",      16, 32, 0, 12, 16, EVP_aes_256_gcm}, // not RFC5647, PROTOCOL of OpenSSH
-	{SSH_CIPHER_NONE,             NULL,               0,  0,    0, 0, 0, NULL},
-};
-
-
 typedef enum {
 	KEX_DH_NONE,       /* disabled line */
 	KEX_DH_GRP1_SHA1,
@@ -438,27 +364,6 @@ typedef enum {
 	KEX_DH_UNKNOWN,
 	KEX_DH_MAX = KEX_DH_UNKNOWN,
 } kex_algorithm;
-
-typedef struct ssh2_kex_algorithm {
-	kex_algorithm kextype;
-	char *name;
-	const EVP_MD *(*evp_md)(void);
-} ssh2_kex_algorithm_t;
-
-static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
-	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},   // RFC4253
-	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},   // RFC4253
-	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},   // RFC4419
-	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256}, // RFC4419
-	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256}, // RFC5656
-	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384}, // RFC5656
-	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512}, // RFC5656
-	{KEX_DH_GRP14_SHA256, "diffie-hellman-group14-sha256",      EVP_sha256}, // RFC8268
-	{KEX_DH_GRP16_SHA512, "diffie-hellman-group16-sha512",      EVP_sha512}, // RFC8268
-	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      EVP_sha512}, // RFC8268
-	{KEX_DH_NONE      , NULL,                                   NULL},
-};
-
 
 typedef enum {
 	HMAC_NONE,      /* disabled line */
@@ -491,28 +396,6 @@ typedef struct ssh2_mac {
 	int etm;
 } SSH2Mac;
 
-static SSH2Mac ssh2_macs[] = {
-	{HMAC_SHA1,         "hmac-sha1",                     EVP_sha1,      0,  0}, // RFC4253
-	{HMAC_MD5,          "hmac-md5",                      EVP_md5,       0,  0}, // RFC4253
-	{HMAC_SHA1_96,      "hmac-sha1-96",                  EVP_sha1,      96, 0}, // RFC4253
-	{HMAC_MD5_96,       "hmac-md5-96",                   EVP_md5,       96, 0}, // RFC4253
-	{HMAC_RIPEMD160,    "hmac-ripemd160@openssh.com",    EVP_ripemd160, 0,  0},
-	{HMAC_SHA2_256,     "hmac-sha2-256",                 EVP_sha256,    0,  0}, // RFC6668
-//	{HMAC_SHA2_256_96,  "hmac-sha2-256-96",              EVP_sha256,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
-	{HMAC_SHA2_512,     "hmac-sha2-512",                 EVP_sha512,    0,  0}, // RFC6668
-//	{HMAC_SHA2_512_96,  "hmac-sha2-512-96",              EVP_sha512,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
-	{HMAC_SHA1_EtM,     "hmac-sha1-etm@openssh.com",     EVP_sha1,      0,  1},
-	{HMAC_MD5_EtM,      "hmac-md5-etm@openssh.com",      EVP_md5,       0,  1},
-	{HMAC_SHA1_96_EtM,  "hmac-sha1-96-etm@openssh.com",  EVP_sha1,      96, 1},
-	{HMAC_MD5_96_EtM,   "hmac-md5-96-etm@openssh.com",   EVP_md5,       96, 1},
-	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",EVP_ripemd160, 0,  1},
-	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", EVP_sha256,    0,  1},
-	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", EVP_sha512,    0,  1},
-	{HMAC_IMPLICIT,     "<implicit>",                    EVP_md_null,   0,  0}, // for AEAD cipher
-	{HMAC_NONE,         NULL,                            NULL,          0,  0},
-};
-
-
 typedef enum {
 	COMP_NONE,      /* disabled line */
 	COMP_NOCOMP,
@@ -521,19 +404,6 @@ typedef enum {
 	COMP_UNKNOWN,
 	COMP_MAX = COMP_UNKNOWN,
 } compression_type;
-
-typedef struct ssh2_comp {
-	compression_type type;
-	char *name;
-} ssh2_comp_t;
-
-static ssh2_comp_t ssh2_comps[] = {
-	{COMP_NOCOMP,  "none"},             // RFC4253
-	{COMP_ZLIB,    "zlib"},             // RFC4253
-	{COMP_DELAYED, "zlib@openssh.com"},
-	{COMP_NONE,    NULL},
-};
-
 
 struct Enc {
 	u_char          *key;
@@ -619,22 +489,6 @@ typedef enum {
 	SSH_DIGEST_SHA512,
 	SSH_DIGEST_MAX,
 } digest_algorithm;
-
-typedef struct ssh_digest {
-	digest_algorithm id;
-	char *name;
-} ssh_digest_t;
-
-/* NB. Indexed directly by algorithm number */
-static ssh_digest_t ssh_digests[] = {
-	{ SSH_DIGEST_MD5,       "MD5" },
-	{ SSH_DIGEST_RIPEMD160, "RIPEMD160" },
-	{ SSH_DIGEST_SHA1,      "SHA1" },
-	{ SSH_DIGEST_SHA256,    "SHA256" },
-	{ SSH_DIGEST_SHA384,    "SHA384" },
-	{ SSH_DIGEST_SHA512,    "SHA512" },
-	{ SSH_DIGEST_MAX,       NULL },
-};
 
 enum scp_dir {
 	TOREMOTE, FROMREMOTE,
@@ -776,23 +630,23 @@ void SSH2_send_kexinit(PTInstVar pvar);
 BOOL do_SSH2_userauth(PTInstVar pvar);
 BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
-int get_cipher_block_size(SSH2Cipher *cipher);
-int get_cipher_key_len(SSH2Cipher *cipher);
-int get_cipher_iv_len(SSH2Cipher *cipher);
-int get_cipher_auth_len(SSH2Cipher *cipher);
-SSH2Cipher *get_cipher_by_name(char *name);
+int get_cipher_block_size(const SSH2Cipher *cipher);
+int get_cipher_key_len(const SSH2Cipher *cipher);
+int get_cipher_iv_len(const SSH2Cipher *cipher);
+int get_cipher_auth_len(const SSH2Cipher *cipher);
+const SSH2Cipher *get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
-const EVP_CIPHER* get_cipher_EVP_CIPHER(SSH2Cipher *cipher);
+const EVP_CIPHER* get_cipher_EVP_CIPHER(const SSH2Cipher *cipher);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
-SSH2Mac *get_ssh2_mac(SSH2MacId id);
-char* get_ssh2_mac_name(SSH2Mac *mac);
-char* get_ssh2_mac_name_by_id(SSH2MacId id);
-const EVP_MD* get_ssh2_mac_EVP_MD(SSH2Mac *mac);
-int get_ssh2_mac_truncatebits(SSH2Mac *mac);
+const SSH2Mac *get_ssh2_mac(SSH2MacId id);
+char* get_ssh2_mac_name(const SSH2Mac *mac);
+const char* get_ssh2_mac_name_by_id(SSH2MacId id);
+const EVP_MD* get_ssh2_mac_EVP_MD(const SSH2Mac *mac);
+int get_ssh2_mac_truncatebits(const SSH2Mac *mac);
 char* get_ssh2_comp_name(compression_type type);
 char* get_ssh_keytype_name(ssh_keytype type);
 char* get_digest_algorithm_name(digest_algorithm id);
-int get_cipher_discard_len(SSH2Cipher *cipher);
+int get_cipher_discard_len(const SSH2Cipher *cipher);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);
