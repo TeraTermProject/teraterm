@@ -34,6 +34,7 @@
 #include "key.h"
 #include "ttcommon.h"
 #include "codeconv.h"
+#include "layer_for_unicode.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -7730,6 +7731,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 
 	if (msglen > 0) {
 		char *msg, *msgA;
+		wchar_t *msgW;
 
 		if (pvar->authbanner_buffer == NULL) {
 			pvar->authbanner_buffer = buffer_init();
@@ -7785,10 +7787,10 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			}
 			break;
 		case 2:
-			msgA = ToCharU8(msg);
-			if (msgA) {
-				MessageBox(pvar->cv->HWin, msgA, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
-				free(msgA);
+			msgW = ToWcharU8(msg);
+			if (msgW) {
+				_MessageBoxW(pvar->cv->HWin, msgW, L"Authentication Banner", MB_OK | MB_ICONINFORMATION);
+				free(msgW);
 			}
 			break;
 		case 3:
