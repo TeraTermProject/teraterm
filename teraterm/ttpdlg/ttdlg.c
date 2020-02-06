@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,8 @@
 #include <direct.h>
 #include <commdlg.h>
 #include <dlgs.h>
-#include <tchar.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
 #include "tttypes.h"
 #include "ttlib.h"
@@ -52,6 +53,7 @@
 #include "comportinfo.h"
 #include "codeconv.h"
 #include "helpid.h"
+#include "layer_for_unicode.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -64,12 +66,6 @@
 #include <winsock2.h>
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
-
-#ifdef _DEBUG
-#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
-#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
@@ -578,7 +574,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	int IAttr, IOffset;
 	WORD i, pos, ScrollCode, NewPos;
 	HDC DC;
-	TCHAR uimsg[MAX_UIMSG];
+	wchar_t uimsg[MAX_UIMSG];
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -596,8 +592,8 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				DisableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
 
 			if (ts->VTFlag>0) {
-				get_lang_msg("DLG_WIN_PCBOLD16", uimsg, sizeof(uimsg), "&16 Colors (PC style)", UILanguageFile);
-				SetDlgItemText(Dialog, IDC_WINCOLOREMU,uimsg);
+				get_lang_msgW("DLG_WIN_PCBOLD16", uimsg, _countof(uimsg), L"&16 Colors (PC style)", UILanguageFile);
+				_SetDlgItemTextW(Dialog, IDC_WINCOLOREMU,uimsg);
 				SetRB(Dialog, (ts->ColorFlag&CF_PCBOLD16)!=0, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
 				SetRB(Dialog, (ts->ColorFlag&CF_AIXTERM16)!=0, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
 				SetRB(Dialog, (ts->ColorFlag&CF_XTERM256)!=0,IDC_WINXTERM256,IDC_WINXTERM256);
@@ -673,16 +669,16 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					}
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
-				get_lang_msg("DLG_WIN_NORMAL", uimsg, sizeof(uimsg), "Normal", UILanguageFile);
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msg("DLG_WIN_BOLD", uimsg, sizeof(uimsg), "Bold", UILanguageFile);
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msg("DLG_WIN_BLINK", uimsg, sizeof(uimsg), "Blink", UILanguageFile);
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msg("DLG_WIN_REVERSEATTR", uimsg, sizeof(uimsg), "Reverse", UILanguageFile);
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				get_lang_msgW("DLG_WIN_NORMAL", uimsg, _countof(uimsg), L"Normal", UILanguageFile);
+				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				get_lang_msgW("DLG_WIN_BOLD", uimsg, _countof(uimsg), L"Bold", UILanguageFile);
+				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				get_lang_msgW("DLG_WIN_BLINK", uimsg, _countof(uimsg), L"Blink", UILanguageFile);
+				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				get_lang_msgW("DLG_WIN_REVERSEATTR", uimsg, _countof(uimsg), L"Reverse", UILanguageFile);
+				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
 				/* begin - ishizaki */
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)"URL");
+				SendDlgItemMessageA(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)"URL");
 				/* end - ishizaki */
 				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_SETCURSEL, 0,0);
 #ifdef USE_NORMAL_BGCOLOR
@@ -1412,7 +1408,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetDropDownList(Dialog, IDC_SERIALBAUD, BaudList, 0);
 			i = sel = 0;
 			while (BaudList[i] != NULL) {
-				if (atoi(BaudList[i]) == ts->Baud) {
+				if ((WORD)atoi(BaudList[i]) == ts->Baud) {
 					SendDlgItemMessage(Dialog, IDC_SERIALBAUD, CB_SETCURSEL, i, 0);
 					sel = 1;
 					break;
