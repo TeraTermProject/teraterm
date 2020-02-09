@@ -35,12 +35,16 @@
 #include "dllutil.h"
 #include "ttlib.h"
 
+// for debug
+//#define UNICODE_API_DISABLE	1
+
 ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
 HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
  HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
 LRESULT (WINAPI *pDefWindowProcW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
 INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
+LRESULT (WINAPI *pSendMessageW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
@@ -51,7 +55,6 @@ DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
-BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 BOOL (WINAPI *pIsValidDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 UINT (WINAPI *pGetDpiForWindow)(HWND hwnd);
@@ -74,10 +77,15 @@ HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_
 BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 
+// multi monitor Windows98+/Windows2000+
+BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
 HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
 HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
+
+int (WINAPI *pGetWindowTextW)(HWND hWnd, LPWSTR lpString, int nMaxCount);
+int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -119,9 +127,11 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 }
 
 static const APIInfo Lists_user32[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "RegisterClassW", (void **)&pRegisterClassW },
 	{ "CreateWindowExW", (void **)&pCreateWindowExW },
 	{ "DefWindowProcW", (void **)&pDefWindowProcW },
+#endif
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
 	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
@@ -129,6 +139,7 @@ static const APIInfo Lists_user32[] = {
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
+#ifndef UNICODE_API_DISABLE
 	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
 	{ "GetDlgItemTextW", (void **)&pGetDlgItemTextW },
 	{ "SetWindowTextW", (void **)&pSetWindowTextW },
@@ -139,6 +150,11 @@ static const APIInfo Lists_user32[] = {
 	{ "DialogBoxIndirectParamW", (void **)&pDialogBoxIndirectParamW },
 	{ "InsertMenuW", (void **)&pInsertMenuW },
 	{ "AppendMenuW", (void **)&pAppendMenuW },
+	{ "SendMessageW", (void **)&pSendMessageW },
+	{ "GetWindowTextW", (void **)&pGetWindowTextW },
+	{ "GetWindowTextLengthW", (void **)&pGetWindowTextLengthW },
+#endif
+
 	{ "MonitorFromWindow", (void **)&pMonitorFromWindow },
 	{ "MonitorFromPoint", (void **)&pMonitorFromPoint },
 	{ "GetMonitorInfoA", (void **)&pGetMonitorInfoA },
@@ -151,8 +167,10 @@ static const APIInfo Lists_msimg32[] = {
 };
 
 static const APIInfo Lists_gdi32[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "AddFontResourceExW", (void **)&pAddFontResourceExW },
 	{ "RemoveFontResourceExW", (void **)&pRemoveFontResourceExW },
+#endif
 	{},
 };
 
@@ -162,25 +180,33 @@ static const APIInfo Lists_Shcore[] = {
 };
 
 static const APIInfo Lists_kernel32[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
+#endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
 };
 
 static const APIInfo Lists_shell32[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "DragQueryFileW", (void **)&pDragQueryFileW },
+#endif
 	{},
 };
 
 static const APIInfo Lists_comctl32[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "CreatePropertySheetPageW", (void **)&pCreatePropertySheetPageW },
 	{ "PropertySheetW", (void **)&pPropertySheetW },
+#endif
 	{},
 };
 
 static const APIInfo Lists_hhctrl[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "HtmlHelpW", (void **)&pHtmlHelpW },
+#endif
 	{ "HtmlHelpA", (void **)&pHtmlHelpA },
 	{},
 };

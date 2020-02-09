@@ -107,6 +107,9 @@ extern HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
 extern HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
 extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 extern BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
+extern LRESULT (WINAPI *pSendMessageW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+extern int (WINAPI *pGetWindowTextW)(HWND hWnd, LPWSTR lpString, int nMaxCount);
+extern int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
 
 
 void WinCompatInit();

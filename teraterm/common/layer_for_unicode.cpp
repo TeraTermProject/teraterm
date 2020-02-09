@@ -117,43 +117,155 @@ DWORD _GetFileAttributesW(LPCWSTR lpFileName)
 	return attr;
 }
 
+/**
+ * hWnd Ç…ê›íËÇ≥ÇÍÇƒÇ¢ÇÈï∂éöóÒÇéÊìæ
+ *
+ * @param[in]		hWnd
+ * @param[in,out]	lenW	ï∂éöêî(L'\0'Çä‹Ç‹Ç»Ç¢)
+ * @return			ï∂éöóÒ
+ */
+static wchar_t *SendMessageAFromW_WM_GETTEXT(HWND hWnd, size_t *lenW)
+{
+	// lenA = excluding the terminating null character.
+	size_t lenA = SendMessageA(hWnd, WM_GETTEXTLENGTH, 0, 0);
+	char *strA = (char *)malloc(lenA + 1);
+	if (strA == NULL) {
+		*lenW = 0;
+		return NULL;
+	}
+	lenA = GetWindowTextA(hWnd, strA, (int)(lenA + 1));
+	strA[lenA] = '\0';
+	wchar_t *strW = ToWcharA(strA);
+	free(strA);
+	if (strW == NULL) {
+		*lenW = 0;
+		return NULL;
+	}
+	*lenW = wcslen(strW);
+	return strW;
+}
+
+/**
+ * hWnd(ListBox) Ç…ê›íËÇ≥ÇÍÇƒÇ¢ÇÈï∂éöóÒÇéÊìæ
+ *
+ * @param[in]		hWnd
+ * @param[in]		wParam	çÄñ⁄î‘çÜ(0Å`)
+ * @param[in,out]	lenW	ï∂éöêî(L'\0'Çä‹Ç‹Ç»Ç¢)
+ * @return			ï∂éöóÒ
+ */
+static wchar_t *SendMessageAFromW_LB_GETTEXT(HWND hWnd, WPARAM wParam, size_t *lenW)
+{
+	// lenA = excluding the terminating null character.
+	size_t lenA = SendMessageA(hWnd, LB_GETTEXTLEN, wParam, 0);
+	char *strA = (char *)malloc(lenA + 1);
+	if (strA == NULL) {
+		*lenW = 0;
+		return NULL;
+	}
+	lenA = SendMessageA(hWnd, LB_GETTEXT, wParam, (LPARAM)strA);
+	wchar_t *strW = ToWcharA(strA);
+	free(strA);
+	if (strW == NULL) {
+		*lenW = 0;
+		return NULL;
+	}
+	*lenW = wcslen(strW);
+	return strW;
+}
+
+int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
+{
+	if (pGetWindowTextW != NULL) {
+		GetWindowTextW(hWnd, lpString, nMaxCount);
+	}
+
+	size_t lenW;
+	wchar_t *strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
+	wchar_t *dest_ptr = (wchar_t *)lpString;
+	size_t dest_len = (size_t)nMaxCount;
+	wcsncpy_s(dest_ptr, dest_len, strW, _TRUNCATE);
+	free(strW);
+	return (int)(dest_len - 1);
+}
+
+int _GetWindowTextLengthW(HWND hWnd)
+{
+	if (pGetWindowTextLengthW != NULL) {
+		return pGetWindowTextLengthW(hWnd);
+	}
+
+	size_t lenW;
+	wchar_t *strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
+	free(strW);
+	return (int)(lenW - 1);
+}
+
+static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	LRESULT retval;
+	switch(Msg) {
+	case CB_ADDSTRING:
+	case LB_ADDSTRING:
+	case LB_INSERTSTRING: {
+		char *strA = ToCharW((wchar_t *)lParam);
+		retval = SendMessageA(hWnd, Msg, wParam, (LPARAM)strA);
+		free(strA);
+		return retval;
+	}
+	case WM_GETTEXTLENGTH:
+	case LB_GETTEXTLEN: {
+		size_t lenW;
+		wchar_t *strW;
+		if (Msg == WM_GETTEXTLENGTH) {
+			strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
+		}
+		else {
+			strW = SendMessageAFromW_LB_GETTEXT(hWnd, wParam, &lenW);
+		}
+		free(strW);
+		return lenW;
+	}
+	case WM_GETTEXT:
+	case LB_GETTEXT: {
+		size_t lenW;
+		wchar_t *strW;
+		size_t dest_len;
+		if (Msg == WM_GETTEXT) {
+			strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
+			dest_len = (size_t)wParam;
+		}
+		else {
+			strW = SendMessageAFromW_LB_GETTEXT(hWnd, wParam, &lenW);
+			dest_len = lenW + 1;
+		}
+		wchar_t *dest_ptr = (wchar_t *)lParam;
+		wcsncpy_s(dest_ptr, dest_len, strW, _TRUNCATE);
+		free(strW);
+		return dest_len - 1 < lenW ? dest_len - 1 : lenW;
+	}
+	default:
+		retval = SendMessageA(hWnd, Msg, wParam, lParam);
+		break;
+	}
+	return retval;
+}
+
+LRESULT _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	if (pSendMessageW != NULL) {
+		return pSendMessageW(hWnd, Msg, wParam, lParam);
+	}
+	return SendMessageAFromW(hWnd, Msg, wParam, lParam);
+}
+
 LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (pSendDlgItemMessageW != NULL) {
 		return pSendDlgItemMessageW(hDlg, nIDDlgItem, Msg, wParam, lParam);
 	}
 
-	LRESULT retval;
-	switch(Msg) {
-	case CB_ADDSTRING:
-	case LB_ADDSTRING: {
-		char *strA = ToCharW((wchar_t *)lParam);
-		retval = SendDlgItemMessageA(hDlg, nIDDlgItem, Msg, wParam, (LPARAM)strA);
-		free(strA);
-		break;
-	}
-	case WM_GETTEXTLENGTH: {
-		retval = 0;
-		LRESULT len = SendDlgItemMessageA(hDlg, nIDDlgItem, WM_GETTEXTLENGTH, 0, 0);
-		len++;  // for '\0'
-		char *strA = (char *)malloc(sizeof(char) * len);
-		if (strA != NULL) {
-			GetDlgItemTextA(hDlg, nIDDlgItem, strA, (int)len);
-			strA[len-1] = '\0';
-			wchar_t *strW = ToWcharA(strA);
-			if (strW != NULL) {
-				retval = (LRESULT)wcslen(strW);// '\0'Çä‹Ç‹Ç»Ç¢í∑Ç≥Çï‘Ç∑
-				free(strW);
-			}
-			free(strA);
-		}
-		break;
-	}
-	default:
-		retval = SendDlgItemMessageA(hDlg, nIDDlgItem, Msg, wParam, lParam);
-		break;
-	}
-	return retval;
+	HWND hWnd = GetDlgItem(hDlg, nIDDlgItem);
+	return SendMessageAFromW(hWnd, Msg, wParam, lParam);
 }
 
 HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
@@ -224,25 +336,18 @@ UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
 		return pGetDlgItemTextW(hDlg, nIDDlgItem, lpString, cchMax);
 	}
 
-	// Ç±ÇÃï∂éöóÒí∑ÇÕ ANSI
-	size_t len = SendDlgItemMessageA(hDlg, nIDDlgItem, WM_GETTEXTLENGTH, 0, 0);
-	len++;  // for '\0'
-	char *strA = (char *)malloc(sizeof(char) * len);
-	if (strA != NULL) {
-		GetDlgItemTextA(hDlg, nIDDlgItem, strA, (int)len);
-		strA[len - 1] = '\0';
-		wchar_t *strW = ToWcharA(strA);
-		if (strW != NULL) {
-			wcscpy_s(lpString, cchMax, strW);
-			UINT len = (UINT)wcslen(strW); // '\0' Çä‹Ç‹Ç»Ç¢í∑Ç≥Çï‘Ç∑
-			free(strW);
-			return len;
-		}
+	if (cchMax <= 1) {
+		return 0;
 	}
 
-	if (cchMax > 0)
-		lpString[0] = 0;
-	return 0;
+	HWND hWnd = GetDlgItem(hDlg, nIDDlgItem);
+	size_t lenW;
+	wchar_t *strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
+	wchar_t *dest_ptr = lpString;
+	size_t dest_len = (size_t)cchMax;
+	wcsncpy_s(dest_ptr, dest_len, strW, _TRUNCATE);
+	free(strW);
+	return (UINT)(dest_len - 1 < lenW ? dest_len - 1 : lenW);
 }
 
 /**
