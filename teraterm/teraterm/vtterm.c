@@ -5038,6 +5038,68 @@ void XsProcClipboard(PCHAR buff)
 	}
 }
 
+
+// タイトルバーのCP932への変換を行う
+// 現在、SJIS、EUCのみに対応。
+// (2005.3.13 yutaka)
+static void ConvertToCP932(char *str, int destlen)
+{
+#define IS_SJIS(n) (ts.KanjiCode == IdSJIS && IsDBCSLeadByte(n))
+#define IS_EUC(n) (ts.KanjiCode == IdEUC && (n & 0x80))
+	extern WORD PASCAL JIS2SJIS(WORD KCode);
+	size_t len = strlen(str);
+	char *cc = _alloca(len + 1);
+	char *c = cc;
+	size_t i;
+	unsigned char b;
+	WORD word;
+
+	if (_stricmp(ts.Locale, DEFAULT_LOCALE) == 0) {
+		for (i = 0 ; i < len ; i++) {
+			b = str[i];
+			if (IS_SJIS(b) || IS_EUC(b)) {
+				word = b<<8;
+
+				if (i == len - 1) {
+					*c++ = b;
+					continue;
+				}
+
+				b = str[i + 1];
+				word |= b;
+				i++;
+
+				if (ts.KanjiCode == IdSJIS) {
+					// SJISはそのままCP932として出力する
+
+				} else if (ts.KanjiCode == IdEUC) {
+					// EUC -> SJIS
+					word &= ~0x8080;
+					word = JIS2SJIS(word);
+
+				} else if (ts.KanjiCode == IdJIS) {
+
+				} else if (ts.KanjiCode == IdUTF8) {
+
+				} else if (ts.KanjiCode == IdUTF8m) {
+
+				} else {
+
+				}
+
+				*c++ = word >> 8;
+				*c++ = word & 0xff;
+
+			} else {
+				*c++ = b;
+			}
+		}
+
+		*c = '\0';
+		strncpy_s(str, destlen, cc, _TRUNCATE);
+	}
+}
+
 void XSequence(BYTE b)
 {
 	static char *StrBuff = NULL;

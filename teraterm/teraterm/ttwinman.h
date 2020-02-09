@@ -34,7 +34,6 @@ extern "C" {
 
 /* prototypes */
 void VTActivate();
-void ConvertToCP932(char *str, int len);
 void ChangeTitle();
 void SwitchMenu();
 void SwitchTitleBar();
