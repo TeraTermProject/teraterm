@@ -84,6 +84,8 @@ static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 
 #include "compat_w95.h"
 #include "compat_win.h"
+#include "layer_for_unicode.h"
+#include "codeconv.h"
 
 #include "libputty.h"
 
@@ -2532,71 +2534,61 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 	return FALSE;
 }
 
-static char *get_cipher_name(int cipher)
+void UTIL_get_lang_msgW(const char *key, wchar_t *UIMsg, const wchar_t *def)
 {
-	switch (cipher) {
-	case SSH_CIPHER_NONE:
-		UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_BORDER", pvar,
-		                  "<ciphers below this line are disabled>");
-		return pvar->ts->UIMsg;
-	case SSH_CIPHER_3DES:
-		return "3DES(SSH1)";
-	case SSH_CIPHER_DES:
-		return "DES(SSH1)";
-	case SSH_CIPHER_BLOWFISH:
-		return "Blowfish(SSH1)";
+	const char *UILanguageFile = pvar->ts->UILanguageFile;
+	GetI18nStrW("TTSSH", key, UIMsg, MAX_UIMSG, def, UILanguageFile);
+}
 
-	// for SSH2(yutaka)
-	case SSH2_CIPHER_AES128_CBC:
-		return "aes128-cbc(SSH2)";
-	case SSH2_CIPHER_AES192_CBC:
-		return "aes192-cbc(SSH2)";
-	case SSH2_CIPHER_AES256_CBC:
-		return "aes256-cbc(SSH2)";
-	case SSH2_CIPHER_3DES_CBC:
-		return "3des-cbc(SSH2)";
-	case SSH2_CIPHER_BLOWFISH_CBC:
-		return "blowfish-cbc(SSH2)";
-	case SSH2_CIPHER_AES128_CTR:
-		return "aes128-ctr(SSH2)";
-	case SSH2_CIPHER_AES192_CTR:
-		return "aes192-ctr(SSH2)";
-	case SSH2_CIPHER_AES256_CTR:
-		return "aes256-ctr(SSH2)";
-	case SSH2_CIPHER_ARCFOUR:
-		return "arcfour(SSH2)";
-	case SSH2_CIPHER_ARCFOUR128:
-		return "arcfour128(SSH2)";
-	case SSH2_CIPHER_ARCFOUR256:
-		return "arcfour256(SSH2)";
-	case SSH2_CIPHER_CAST128_CBC:
-		return "cast128-cbc(SSH2)";
-	case SSH2_CIPHER_3DES_CTR:
-		return "3des-ctr(SSH2)";
-	case SSH2_CIPHER_BLOWFISH_CTR:
-		return "blowfish-ctr(SSH2)";
-	case SSH2_CIPHER_CAST128_CTR:
-		return "cast128-ctr(SSH2)";
-	case SSH2_CIPHER_CAMELLIA128_CBC:
-		return "camellia128-cbc(SSH2)";
-	case SSH2_CIPHER_CAMELLIA192_CBC:
-		return "camellia192-cbc(SSH2)";
-	case SSH2_CIPHER_CAMELLIA256_CBC:
-		return "camellia256-cbc(SSH2)";
-	case SSH2_CIPHER_CAMELLIA128_CTR:
-		return "camellia128-ctr(SSH2)";
-	case SSH2_CIPHER_CAMELLIA192_CTR:
-		return "camellia192-ctr(SSH2)";
-	case SSH2_CIPHER_CAMELLIA256_CTR:
-		return "camellia256-ctr(SSH2)";
-	case SSH2_CIPHER_AES128_GCM:
-		return "aes128-gcm@openssh.com(SSH2)";
-	case SSH2_CIPHER_AES256_GCM:
-		return "aes256-gcm@openssh.com(SSH2)";
+static wchar_t *get_cipher_nameW(int cipher)
+{
+	typedef struct {
+		int no;
+		const char *nameA;
+	} list_t;
+	static const list_t list[] = {
+		{ SSH_CIPHER_3DES, "3DES(SSH1)" },
+		{ SSH_CIPHER_DES, "DES(SSH1)" },
+		{ SSH_CIPHER_BLOWFISH, "Blowfish(SSH1)" },
+		{ SSH2_CIPHER_AES128_CBC, "aes128-cbc(SSH2)" },
+		{ SSH2_CIPHER_AES192_CBC, "aes192-cbc(SSH2)" },
+		{ SSH2_CIPHER_AES256_CBC, "aes256-cbc(SSH2)" },
+		{ SSH2_CIPHER_3DES_CBC, "3des-cbc(SSH2)" },
+		{ SSH2_CIPHER_BLOWFISH_CBC, "blowfish-cbc(SSH2)" },
+		{ SSH2_CIPHER_AES128_CTR, "aes128-ctr(SSH2)" },
+		{ SSH2_CIPHER_AES192_CTR, "aes192-ctr(SSH2)" },
+		{ SSH2_CIPHER_AES256_CTR, "aes256-ctr(SSH2)" },
+		{ SSH2_CIPHER_ARCFOUR, "arcfour(SSH2)" },
+		{ SSH2_CIPHER_ARCFOUR128, "arcfour128(SSH2)" },
+		{ SSH2_CIPHER_ARCFOUR256, "arcfour256(SSH2)" },
+		{ SSH2_CIPHER_CAST128_CBC, "cast128-cbc(SSH2)" },
+		{ SSH2_CIPHER_3DES_CTR, "3des-ctr(SSH2)" },
+		{ SSH2_CIPHER_BLOWFISH_CTR, "blowfish-ctr(SSH2)" },
+		{ SSH2_CIPHER_CAST128_CTR, "cast128-ctr(SSH2)" },
+		{ SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc(SSH2)" },
+		{ SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc(SSH2)" },
+		{ SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc(SSH2)" },
+		{ SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr(SSH2)" },
+		{ SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr(SSH2)" },
+		{ SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr(SSH2)" },
+		{ SSH2_CIPHER_AES128_GCM, "aes128-gcm@openssh.com(SSH2)" },
+		{ SSH2_CIPHER_AES256_GCM, "aes256-gcm@openssh.com(SSH2)" },
+	};
+	int i;
+	const list_t *p = list;
 
-	default:
-		return NULL;
+	if (cipher == SSH_CIPHER_NONE) {
+		wchar_t uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgW("DLG_SSHSETUP_CIPHER_BORDER", uimsg,
+						   L"<ciphers below this line are disabled>");
+		return _wcsdup(uimsg);
 	}
+	for (i = 0; i < _countof(list); p++,i++) {
+		if (p->no == cipher) {
+			return ToWcharA(p->nameA);
+		}
+	}
+	return NULL;
 }
 
 static void set_move_button_status(HWND dlg, int type, int up, int down)
@@ -2623,16 +2615,17 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	HWND hostkeyRotationControlList = GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_COMBO);
 	int i;
 	int ch;
-	static const char *rotationItem[SSH_UPDATE_HOSTKEYS_MAX] = {
-		"No",
-		"Yes",
-		"Ask",
+	static const wchar_t *rotationItem[SSH_UPDATE_HOSTKEYS_MAX] = {
+		L"No",
+		L"Yes",
+		L"Ask",
 	};
 	static const char *rotationItemKey[SSH_UPDATE_HOSTKEYS_MAX] = {
 		"DLG_SSHSETUP_HOSTKEY_ROTATION_NO",
 		"DLG_SSHSETUP_HOSTKEY_ROTATION_YES",
 		"DLG_SSHSETUP_HOSTKEY_ROTATION_ASK",
 	};
+	wchar_t uimsg[MAX_UIMSG];
 
 	const static DlgTextInfo text_info[] = {
 		{ 0, "DLG_SSHSETUP_TITLE" },
@@ -2691,10 +2684,11 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 	for (i = 0; pvar->settings.CipherOrder[i] != 0; i++) {
 		int cipher = pvar->settings.CipherOrder[i] - '0';
-		char *name = get_cipher_name(cipher);
-
+		wchar_t *name = get_cipher_nameW(cipher);
 		if (name != NULL) {
-			SendMessage(cipherControl, LB_ADDSTRING, 0, (LPARAM) name);
+			int index = _SendMessageW(cipherControl, LB_ADDSTRING, 0, (LPARAM) name);
+			_SendMessageW(cipherControl, LB_SETITEMDATA, index, cipher);
+			free(name);
 		}
 	}
 
@@ -2705,18 +2699,16 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_kex_order(pvar->settings.KexOrder);
 	for (i = 0; pvar->settings.KexOrder[i] != 0; i++) {
 		int index = pvar->settings.KexOrder[i] - '0';
-		char *name = NULL;
 
 		if (index == 0)	{
-			UTIL_get_lang_msg("DLG_SSHSETUP_KEX_BORDER", pvar,
-							  "<KEXs below this line are disabled>");
-			name = pvar->ts->UIMsg;
+			UTIL_get_lang_msgW("DLG_SSHSETUP_KEX_BORDER", uimsg,
+							   L"<KEXs below this line are disabled>");
+			_SendMessageW(kexControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
-			name = get_kex_algorithm_name(index);
-		}
-
-		if (name != NULL) {
-			SendMessage(kexControl, LB_ADDSTRING, 0, (LPARAM) name);
+			const char *name = get_kex_algorithm_name(index);
+			if (name != NULL) {
+				SendMessageA(kexControl, LB_ADDSTRING, 0, (LPARAM) name);
+			}
 		}
 	}
 	SendMessage(kexControl, LB_SETCURSEL, 0, 0);
@@ -2726,18 +2718,16 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_host_key_order(pvar->settings.HostKeyOrder);
 	for (i = 0; pvar->settings.HostKeyOrder[i] != 0; i++) {
 		int index = pvar->settings.HostKeyOrder[i] - '0';
-		char *name = NULL;
 
 		if (index == 0)	{
-			UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
-							  "<Host Keys below this line are disabled>");
-			name = pvar->ts->UIMsg;
+			UTIL_get_lang_msgW("DLG_SSHSETUP_HOST_KEY_BORDER", uimsg,
+							   L"<Host Keys below this line are disabled>");
+			_SendMessageW(hostkeyControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
-			name = get_ssh_keytype_name(index);
-		}
-
-		if (name != NULL) {
-			SendMessage(hostkeyControl, LB_ADDSTRING, 0, (LPARAM) name);
+			const char *name = get_ssh_keytype_name(index);
+			if (name != NULL) {
+				SendMessageA(hostkeyControl, LB_ADDSTRING, 0, (LPARAM) name);
+			}
 		}
 	}
 	SendMessage(hostkeyControl, LB_SETCURSEL, 0, 0);
@@ -2747,18 +2737,16 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_mac_order(pvar->settings.MacOrder);
 	for (i = 0; pvar->settings.MacOrder[i] != 0; i++) {
 		int index = pvar->settings.MacOrder[i] - '0';
-		const char *name = NULL;
 
 		if (index == 0)	{
-			UTIL_get_lang_msg("DLG_SSHSETUP_MAC_BORDER", pvar,
-							  "<MACs below this line are disabled>");
-			name = pvar->ts->UIMsg;
+			UTIL_get_lang_msgW("DLG_SSHSETUP_MAC_BORDER", uimsg,
+							   L"<MACs below this line are disabled>");
+			_SendMessageW(macControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
-			name = get_ssh2_mac_name_by_id(index);
-		}
-
-		if (name != NULL) {
-			SendMessage(macControl, LB_ADDSTRING, 0, (LPARAM) name);
+			const char *name = get_ssh2_mac_name_by_id(index);
+			if (name != NULL) {
+				SendMessageA(macControl, LB_ADDSTRING, 0, (LPARAM) name);
+			}
 		}
 	}
 	SendMessage(macControl, LB_SETCURSEL, 0, 0);
@@ -2768,18 +2756,16 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_comp_order(pvar->settings.CompOrder);
 	for (i = 0; pvar->settings.CompOrder[i] != 0; i++) {
 		int index = pvar->settings.CompOrder[i] - '0';
-		char *name = NULL;
 
 		if (index == 0)	{
-			UTIL_get_lang_msg("DLG_SSHSETUP_COMP_BORDER", pvar,
-							  "<Compression methods below this line are disabled>");
-			name = pvar->ts->UIMsg;
+			UTIL_get_lang_msgW("DLG_SSHSETUP_COMP_BORDER", uimsg,
+							   L"<Compression methods below this line are disabled>");
+			_SendMessageW(compControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
-			name = get_ssh2_comp_name(index);
-		}
-
-		if (name != NULL) {
-			SendMessage(compControl, LB_ADDSTRING, 0, (LPARAM) name);
+			const char *name = get_ssh2_comp_name(index);
+			if (name != NULL) {
+				SendMessageA(compControl, LB_ADDSTRING, 0, (LPARAM) name);
+			}
 		}
 	}
 	SendMessage(compControl, LB_SETCURSEL, 0, 0);
@@ -2835,8 +2821,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 	// hostkey rotation(OpenSSH 6.8)
 	for (i = 0; i < SSH_UPDATE_HOSTKEYS_MAX; i++) {
-		UTIL_get_lang_msg(rotationItemKey[i], pvar, rotationItem[i]);
-		SendMessage(hostkeyRotationControlList, CB_INSERTSTRING, i, (LPARAM)pvar->ts->UIMsg);
+		UTIL_get_lang_msgW(rotationItemKey[i], uimsg, rotationItem[i]);
+		_SendMessageW(hostkeyRotationControlList, CB_INSERTSTRING, i, (LPARAM)uimsg);
 	}
 	ch = pvar->settings.UpdateHostkeys;
 	if (!(ch >= 0 && ch < SSH_UPDATE_HOSTKEYS_MAX))
@@ -2848,7 +2834,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		char buf[10];
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 		            "%d", pvar->settings.LogLevel);
-		SetDlgItemText(dlg, IDC_LOGLEVEL_VALUE, buf);
+		SetDlgItemTextA(dlg, IDC_LOGLEVEL_VALUE, buf);
 	}
 
 
@@ -2936,22 +2922,9 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
 	buf2index = 0;
 	for (i = 0; i < count; i++) {
-		int len = SendMessage(cipherControl, LB_GETTEXTLEN, i, 0);
-
-		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
-			buf[0] = 0;
-			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
-			for (j = 0; j <= SSH_CIPHER_MAX; j++) {
-				char *cipher_name = get_cipher_name(j);
-				if (cipher_name != NULL && strcmp(buf, cipher_name) == 0) {
-					break;
-				}
-			}
-			if (j <= SSH_CIPHER_MAX) {
-				buf2[buf2index] = '0' + j;
-				buf2index++;
-			}
-		}
+		int chipher = _SendMessageW(cipherControl, LB_GETITEMDATA, i, 0);
+		buf2[buf2index] = '0' + chipher;
+		buf2index++;
 	}
 	buf2[buf2index] = 0;
 	normalize_cipher_order(buf2);
@@ -3125,22 +3098,23 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 
 static void move_cur_sel_delta(HWND listbox, int delta)
 {
-	int curPos = (int) SendMessage(listbox, LB_GETCURSEL, 0, 0);
-	int maxPos = (int) SendMessage(listbox, LB_GETCOUNT, 0, 0) - 1;
+	int curPos = (int) _SendMessageW(listbox, LB_GETCURSEL, 0, 0);
+	int maxPos = (int) _SendMessageW(listbox, LB_GETCOUNT, 0, 0) - 1;
 	int newPos = curPos + delta;
-	char buf[1024];
 
 	if (curPos >= 0 && newPos >= 0 && newPos <= maxPos) {
-		int len = SendMessage(listbox, LB_GETTEXTLEN, curPos, 0);
-
-		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
-			buf[0] = 0;
-			SendMessage(listbox, LB_GETTEXT, curPos, (LPARAM) buf);
-			SendMessage(listbox, LB_DELETESTRING, curPos, 0);
-			SendMessage(listbox, LB_INSERTSTRING, newPos,
-			            (LPARAM) (char *) buf);
-			SendMessage(listbox, LB_SETCURSEL, newPos, 0);
-		}
+		int item_data;
+		int index;
+		size_t len = _SendMessageW(listbox, LB_GETTEXTLEN, curPos, 0);
+		wchar_t *buf = malloc(sizeof(wchar_t) * (len+1));
+		buf[0] = 0;
+		_SendMessageW(listbox, LB_GETTEXT, curPos, (LPARAM) buf);
+		item_data = (int)_SendMessageW(listbox, LB_GETITEMDATA, curPos, 0);
+		_SendMessageW(listbox, LB_DELETESTRING, curPos, 0);
+		index = (int)_SendMessageW(listbox, LB_INSERTSTRING, newPos, (LPARAM)buf);
+		_SendMessageW(listbox, LB_SETITEMDATA, index, item_data);
+		_SendMessageW(listbox, LB_SETCURSEL, newPos, 0);
+		free(buf);
 	}
 }
 
@@ -5360,10 +5334,9 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 	case DLL_PROCESS_ATTACH:
 		/* do process initialization */
 #ifdef _DEBUG
-  //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-  // リーク時のブロック番号を元にブレークを仕掛けるには、以下のようにする。
-  // cf. http://www.microsoft.com/japan/msdn/vs_previous/visualc/techmat/feature/MemLeaks/
-  //_CrtSetBreakAlloc(3228);
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+		// リーク時のブロック番号を元にブレークを仕掛けるには、以下のようにする。
+		//_CrtSetBreakAlloc(3228);
 #endif
 		DoCover_IsDebuggerPresent();
 		DisableThreadLibraryCalls(hInstance);
