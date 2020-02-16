@@ -1294,7 +1294,7 @@ LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 								   LPARAM lParam)
 {
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_HOST_TITLE" },
 		{ IDC_HOSTNAMELABEL, "DLG_HOST_TCPIPHOST" },
 		{ IDC_HISTORY, "DLG_HOST_TCPIPHISTORY" },
@@ -1403,7 +1403,8 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 		j = 0;
 		w = 1;
-		if ((comports=DetectComPorts(ComPortTable, GetHNRec->MaxComPort, ComPortDesc)) >= 0) {
+		comports = DetectComPorts(ComPortTable, GetHNRec->MaxComPort, ComPortDesc);
+		if (comports >= 0) {
 			for (i=0; i<comports; i++) {
 				// MaxComPort を越えるポートは表示しない
 				if (ComPortTable[i] > GetHNRec->MaxComPort) {
@@ -1658,7 +1659,8 @@ static void UTIL_SetDialogFont()
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 {
 	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-				  pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
+				  pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
+//				  pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
 	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
 	                             parent, TTXHostDlg, (LPARAM)rec);
 }
@@ -2374,7 +2376,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 static void init_about_dlg(PTInstVar pvar, HWND dlg)
 {
 	char buf[1024];
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_ABOUT_TITLE" },
 		{ IDC_FP_HASH_ALG, "DLG_ABOUT_FP_HASH_ALGORITHM" },
 		{ IDOK, "BTN_OK" },
@@ -2627,7 +2629,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	};
 	wchar_t uimsg[MAX_UIMSG];
 
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_SSHSETUP_TITLE" },
 		{ IDC_COMPRESSLABEL, "DLG_SSHSETUP_COMPRESS" },
 		{ IDC_COMPRESSNONE, "DLG_SSHSETUP_COMPRESS_NONE" },
@@ -4168,7 +4170,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		{
-		const static DlgTextInfo text_info[] = {
+		static const DlgTextInfo text_info[] = {
 			{ 0, "DLG_KEYGEN_TITLE" },
 			{ IDC_KEYTYPE, "DLG_KEYGEN_KEYTYPE" },
 			{ IDC_KEYBITS_LABEL, "DLG_KEYGEN_BITS" },

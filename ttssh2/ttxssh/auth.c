@@ -44,7 +44,6 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <tchar.h>
 
 #include "resource.h"
 #include "keyfiles.h"
@@ -114,12 +113,12 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 				RECT rect;
 				PTInstVar pvar = data->pvar;
 				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
-				_tcscpy_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
+				strcpy_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				if (wParam == 'V' - 'A' + 1) {
 					// CTRL + V
-					_tcscat_s(uimsg, _countof(uimsg), _T("\n"));
+					strcat_s(uimsg, _countof(uimsg), "\n");
 					UTIL_get_lang_msg("DLG_AUTH_TIP_PASTE_KEY", pvar, "Use Shift + Insert to paste from clipboard");
-					_tcscat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
+					strcat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
 				}
 				GetWindowRect(control, &rect);
 				data->tipwin = TipWinCreateA(hInst, control, rect.left, rect.bottom, uimsg);
@@ -1553,7 +1552,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	GetUserName(user_name, &len);
 
 	GetDlgItemText(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, uimsg, _countof(uimsg));
-	_stprintf_s(uimsg2, _countof(uimsg2), uimsg, user_name);
+	sprintf_s(uimsg2, _countof(uimsg2), uimsg, user_name);
 	SetDlgItemText(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, uimsg2);
 }
 
