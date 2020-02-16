@@ -205,6 +205,7 @@ static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 	LRESULT retval;
 	switch(Msg) {
 	case CB_ADDSTRING:
+	case CB_INSERTSTRING:
 	case LB_ADDSTRING:
 	case LB_INSERTSTRING: {
 		char *strA = ToCharW((wchar_t *)lParam);

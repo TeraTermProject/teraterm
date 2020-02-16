@@ -243,6 +243,10 @@ void WinCompatInit()
 		pCreateWindowExW = NULL;
 		pRegisterClassW = NULL;
 		pDefWindowProcW = NULL;
+		pSendMessageW = NULL;
+		pSendDlgItemMessageW = NULL;
+		pGetWindowTextW = NULL;
+		pGetWindowTextLengthW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù
