@@ -50,7 +50,6 @@ BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uI
 int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
 BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
-UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
@@ -86,6 +85,10 @@ BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 
 int (WINAPI *pGetWindowTextW)(HWND hWnd, LPWSTR lpString, int nMaxCount);
 int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
+
+// shell32
+UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+BOOL (WINAPI *pShell_NotifyIconW)(DWORD dwMessage, NOTIFYICONDATAW *lpData);
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -191,6 +194,7 @@ static const APIInfo Lists_kernel32[] = {
 static const APIInfo Lists_shell32[] = {
 #ifndef UNICODE_API_DISABLE
 	{ "DragQueryFileW", (void **)&pDragQueryFileW },
+	{ "Shell_NotifyIconW", (void **)&pShell_NotifyIconW },
 #endif
 	{},
 };
@@ -247,6 +251,7 @@ void WinCompatInit()
 		pSendDlgItemMessageW = NULL;
 		pGetWindowTextW = NULL;
 		pGetWindowTextLengthW = NULL;
+		pShell_NotifyIconW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

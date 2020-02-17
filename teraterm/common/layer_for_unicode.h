@@ -40,11 +40,61 @@
 extern "C" {
 #endif
 
+/**
+ *	NOTIFYICONDATA は define でサイズが変化する
+ *	どんな環境でも変化しないよう定義
+ *
+ * Shlwapi.dll 5.0
+ * 	Win98+,2000+
+ */
+/*  size 504 bytes */
+typedef struct {
+	DWORD cbSize;
+	HWND hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	HICON hIcon;
+	char   szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	char   szInfo[256];
+	union {
+		UINT  uTimeout;
+		UINT  uVersion;	 // used with NIM_SETVERSION, values 0, 3 and 4
+	} DUMMYUNIONNAME;
+	char   szInfoTitle[64];
+	DWORD dwInfoFlags;
+	//GUID guidItem;		// XP+
+	//HICON hBalloonIcon;	// Vista+
+} TT_NOTIFYICONDATAA_V2;
+
+/*  size 952 bytes */
+typedef struct {
+	DWORD cbSize;
+	HWND hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	HICON hIcon;
+	wchar_t	 szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	wchar_t	 szInfo[256];
+	union {
+		UINT  uTimeout;
+		UINT  uVersion;	 // used with NIM_SETVERSION, values 0, 3 and 4
+	} DUMMYUNIONNAME;
+	wchar_t	 szInfoTitle[64];
+	DWORD dwInfoFlags;
+	//GUID guidItem;		// XP+
+	//HICON hBalloonIcon;	// Vista+
+} TT_NOTIFYICONDATAW_V2;
+
 BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
 BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 DWORD _GetFileAttributesW(LPCWSTR lpFileName);
-UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 LRESULT _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
@@ -69,6 +119,10 @@ BOOL _RemoveFontResourceExW(LPCWSTR name, DWORD fl, PVOID pdv);
 HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
 INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
+
+// shell32.lib
+UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData);
 
 #ifdef __cplusplus
 }

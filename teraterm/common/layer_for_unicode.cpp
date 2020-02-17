@@ -458,3 +458,44 @@ BOOL _RemoveFontResourceW(LPCWSTR lpFileName)
 	free(filenameA);
 	return result;
 }
+
+/*
+ * lpData.cbSize == 952‚Ì‚Æ‚«‚Ì‚Ý ANSIŠÖ”‚Åˆ—‚·‚é
+ */
+BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
+{
+	if (pShell_NotifyIconW != NULL) {
+		return pShell_NotifyIconW(dwMessage, (PNOTIFYICONDATAW)lpData);
+	}
+
+	const TT_NOTIFYICONDATAW_V2 *w = lpData;
+	if (w->cbSize != sizeof(TT_NOTIFYICONDATAW_V2)) {
+		return FALSE;
+	}
+
+	TT_NOTIFYICONDATAA_V2 nid;
+	TT_NOTIFYICONDATAA_V2 *p = &nid;
+	p->cbSize = sizeof(nid);
+	p->hWnd = w->hWnd;
+	p->uID = w->uID;
+	p->uFlags = w->uFlags;
+	p->uCallbackMessage = w->uCallbackMessage;
+	p->hIcon = w->hIcon;
+	p->dwState = w->dwState;
+	p->dwStateMask = w->dwStateMask;
+	p->uTimeout = w->uTimeout;
+	p->dwInfoFlags = w->dwInfoFlags;
+
+	char *strA = ToCharW(w->szTip);
+	strcpy_s(p->szTip, strA);
+	free(strA);
+	strA = ToCharW(w->szInfoTitle);
+	strcpy_s(p->szInfoTitle, strA);
+	free(strA);
+	strA = ToCharW(w->szInfo);
+	strcpy_s(p->szInfo, strA);
+	free(strA);
+
+	BOOL r = Shell_NotifyIconA(dwMessage, (PNOTIFYICONDATAA)p);
+	return r;
+}
