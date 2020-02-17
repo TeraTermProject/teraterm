@@ -7794,10 +7794,10 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			}
 			break;
 		case 3:
-			msgA = ToCharU8(msg);
-			if (msgA) {
-				NotifyInfoMessage(pvar->cv, msgA, "Authentication Banner");
-				free(msgA);
+			msgW = ToWcharU8(msg);
+			if (msgW) {
+				NotifyInfoMessageW(pvar->cv, msgW, L"Authentication Banner");
+				free(msgW);
 			}
 			break;
 		}

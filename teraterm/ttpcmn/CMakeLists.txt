@@ -29,6 +29,7 @@ set(SRC
   language.c
   language.h
   ttcmn.c
+  ttcmn_notify.cpp
   comportinfo.cpp
   comportinfo.h
   comportinfo.cpp

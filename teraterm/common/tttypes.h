@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1123,7 +1123,7 @@ typedef struct {
 	_locale_t locale;
 	BOOL VirtualStoreEnabled;
 
-	NOTIFYICONDATA *NotifyIcon;
+	void *NotifyIcon;
 
 	DWORD ConnectedTime;
 } TComVar;

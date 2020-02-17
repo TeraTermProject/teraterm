@@ -136,6 +136,7 @@
     <ClCompile Include="comportinfo.cpp" />
     <ClCompile Include="language.c" />
     <ClCompile Include="ttcmn.c" />
+    <ClCompile Include="ttcmn_notify.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\compat_win.h" />

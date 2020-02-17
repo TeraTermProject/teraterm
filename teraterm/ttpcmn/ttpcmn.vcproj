@@ -223,6 +223,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ttcmn_notify.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\ttlib.c"
 				>
 			</File>
