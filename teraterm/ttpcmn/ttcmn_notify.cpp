@@ -178,6 +178,9 @@ void WINAPI CreateNotifyIcon(PComVar cv)
 void WINAPI DeleteNotifyIcon(PComVar cv)
 {
 	NotifyIcon* ni = GetNotifyData(cv);
+	if (ni == NULL) {
+		return;
+	}
 	NotifyDelete(ni);
 }
 
