@@ -6261,8 +6261,8 @@ void CVTWindow::OnControlBroadcastCommand(void)
 		goto activate;
 	}
 
-	hDlgWnd = CreateDialog(m_hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
-	                       HVTWin, (DLGPROC)BroadcastCommandDlgProc);
+	hDlgWnd = TTCreateDialog(m_hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+							 HVTWin, (DLGPROC)BroadcastCommandDlgProc);
 
 	if (hDlgWnd == NULL) {
 		return;

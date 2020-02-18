@@ -499,3 +499,21 @@ BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 	BOOL r = Shell_NotifyIconA(dwMessage, (PNOTIFYICONDATAA)p);
 	return r;
 }
+
+HWND _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc,
+								 LPARAM dwInitParam)
+{
+	if (pCreateDialogIndirectParamW != NULL) {
+		return pCreateDialogIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, dwInitParam);
+	}
+	return CreateDialogIndirectParamA(hInstance, lpTemplate, hWndParent, lpDialogFunc, dwInitParam);
+}
+
+INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
+								 DLGPROC lpDialogFunc, LPARAM lParamInit)
+{
+	if (pDialogBoxIndirectParamW != NULL) {
+		return pDialogBoxIndirectParamW(hInstance, hDialogTemplate, hWndParent, lpDialogFunc, lParamInit);
+	}
+	return DialogBoxIndirectParamA(hInstance, hDialogTemplate, hWndParent, lpDialogFunc, lParamInit);
+}

@@ -64,6 +64,9 @@ BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMen
 HWND (WINAPI *pGetConsoleWindow)(void);
 int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+HWND (WINAPI *pCreateDialogIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
+										   HWND hWndParent, DLGPROC lpDialogFunc,
+										   LPARAM dwInitParam);
 
 // gdi32.lib
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -151,6 +154,7 @@ static const APIInfo Lists_user32[] = {
 	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
 	{ "MessageBoxW", (void **)&pMessageBoxW },
 	{ "DialogBoxIndirectParamW", (void **)&pDialogBoxIndirectParamW },
+	{ "CreateDialogIndirectParamW", (void **)&pCreateDialogIndirectParamW },
 	{ "InsertMenuW", (void **)&pInsertMenuW },
 	{ "AppendMenuW", (void **)&pAppendMenuW },
 	{ "SendMessageW", (void **)&pSendMessageW },
@@ -244,6 +248,7 @@ void WinCompatInit()
 		pSetDlgItemTextW = NULL;
 		pGetDlgItemTextW = NULL;
 		pDialogBoxIndirectParamW = NULL;
+		pCreateDialogIndirectParamW = NULL;
 		pCreateWindowExW = NULL;
 		pRegisterClassW = NULL;
 		pDefWindowProcW = NULL;

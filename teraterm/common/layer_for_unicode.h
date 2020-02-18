@@ -124,6 +124,12 @@ INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData);
 
+HWND _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
+								 HWND hWndParent, DLGPROC lpDialogFunc,
+								 LPARAM dwInitParam);
+INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
+								 DLGPROC lpDialogFunc, LPARAM lParamInit);
+
 #ifdef __cplusplus
 }
 #endif
