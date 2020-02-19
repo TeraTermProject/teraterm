@@ -1329,8 +1329,8 @@ static char *get_cipher_name(int cipher)
 
 void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)
 {
-	UTIL_get_lang_msg("DLG_ABOUT_CIPHER_INFO", pvar,
-	                  "%s to server, %s from server");
+	UTIL_get_lang_msgU8("DLG_ABOUT_CIPHER_INFO", pvar,
+						"%s to server, %s from server");
 	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 	          get_cipher_name(pvar->crypt_state.sender_cipher),
 	          get_cipher_name(pvar->crypt_state.receiver_cipher));
@@ -1346,21 +1346,21 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 	if (SSHv1(pvar)) {
 		if (pvar->crypt_state.server_key.RSA_key == NULL
 		 || pvar->crypt_state.host_key.RSA_key == NULL) {
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_NONE", pvar, "None");
+			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_NONE", pvar, "None");
 			strncpy_s(dest, len, pvar->ts->UIMsg, _TRUNCATE);
 		} else {
 			RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
 			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
 
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO", pvar,
-			                  "%d-bit server key, %d-bit host key");
+			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO", pvar,
+								"%d-bit server key, %d-bit host key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 			            BN_num_bits(server_n),
 			            BN_num_bits(host_n));
 		}
 	} else { // SSH2
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO2", pvar,
-			                  "%d-bit client key, %d-bit server key");
+			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO2", pvar,
+								"%d-bit client key, %d-bit server key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->client_key_bits,
 			            pvar->server_key_bits);

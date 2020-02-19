@@ -1736,19 +1736,19 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 		strncpy_s(dest, len, "None", _TRUNCATE);
 	} else if (pvar->auth_state.cur_cred.method != SSH_AUTH_NONE) {
 		if (SSHv1(pvar)) {
-			UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->auth_state.user,
 			            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
 			if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 				            "RSA");
 				strncat_s(dest, len, buf, _TRUNCATE);
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 				            "RSA");
 				strncat_s(dest, len, buf, _TRUNCATE);
@@ -1764,18 +1764,18 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				} else {
 					method = get_auth_method_name(pvar->auth_state.cur_cred.method);
 				}
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
 				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->auth_state.user, method);
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
 				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->auth_state.user,
 				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 				            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type));
 				strncat_s(dest, len, buf, _TRUNCATE);
@@ -1785,14 +1785,14 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				char *s = (char *)malloc(key_len+1);
 
 				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
 				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->auth_state.user,
 				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
 				memcpy(s, pvar->pageant_curkey+4+4, key_len);
 				s[key_len] = '\0';
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 				            ssh_key_type(get_keytype_from_name(s)));
 				strncat_s(dest, len, buf, _TRUNCATE);
@@ -1802,7 +1802,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 		}
 
 	} else {
-		UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+		UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
 		_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg, pvar->auth_state.user,
 		            get_auth_method_name(pvar->auth_state.failed_method));
 	}

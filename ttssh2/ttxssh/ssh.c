@@ -3408,19 +3408,19 @@ void SSH_get_compression_info(PTInstVar pvar, char *dest, int len)
 			pvar->ssh_state.compress_stream.total_out;
 
 		if (total_out > 0) {
-			UTIL_get_lang_msg("DLG_ABOUT_COMP_INFO", pvar,
-			                  "level %d; ratio %.1f (%ld:%ld)");
+			UTIL_get_lang_msgU8("DLG_ABOUT_COMP_INFO", pvar,
+								"level %d; ratio %.1f (%ld:%ld)");
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->ssh_state.compression_level,
 			            ((double) total_in) / total_out, total_in,
 			            total_out);
 		} else {
-			UTIL_get_lang_msg("DLG_ABOUT_COMP_INFO2", pvar, "level %d");
+			UTIL_get_lang_msgU8("DLG_ABOUT_COMP_INFO2", pvar, "level %d");
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->ssh_state.compression_level);
 		}
 	} else {
-		UTIL_get_lang_msg("DLG_ABOUT_COMP_NONE", pvar, "none");
+		UTIL_get_lang_msgU8("DLG_ABOUT_COMP_NONE", pvar, "none");
 		strncpy_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 	}
 
@@ -3434,24 +3434,24 @@ void SSH_get_compression_info(PTInstVar pvar, char *dest, int len)
 			pvar->ssh_state.decompress_stream.total_out;
 
 		if (total_in > 0) {
-			UTIL_get_lang_msg("DLG_ABOUT_COMP_INFO", pvar,
-			                  "level %d; ratio %.1f (%ld:%ld)");
+			UTIL_get_lang_msgU8("DLG_ABOUT_COMP_INFO", pvar,
+								"level %d; ratio %.1f (%ld:%ld)");
 			_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->ssh_state.compression_level,
 			            ((double) total_out) / total_in, total_out,
 			            total_in);
 		} else {
-			UTIL_get_lang_msg("DLG_ABOUT_COMP_INFO2", pvar, "level %d");
+			UTIL_get_lang_msgU8("DLG_ABOUT_COMP_INFO2", pvar, "level %d");
 			_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->ssh_state.compression_level);
 		}
 	} else {
-		UTIL_get_lang_msg("DLG_ABOUT_COMP_NONE", pvar, "none");
+		UTIL_get_lang_msgU8("DLG_ABOUT_COMP_NONE", pvar, "none");
 		strncpy_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
 	}
 
-	UTIL_get_lang_msg("DLG_ABOUT_COMP_UPDOWN", pvar,
-	                  "Upstream %s; Downstream %s");
+	UTIL_get_lang_msgU8("DLG_ABOUT_COMP_UPDOWN", pvar,
+						"Upstream %s; Downstream %s");
 	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg, buf, buf2);
 }
 
@@ -3476,8 +3476,8 @@ void SSH_get_protocol_version_info(PTInstVar pvar, char *dest,
 
 void SSH_get_mac_info(PTInstVar pvar, char *dest, int len)
 {
-	UTIL_get_lang_msg("DLG_ABOUT_MAC_INFO", pvar,
-	                  "%s to server, %s from server");
+	UTIL_get_lang_msgU8("DLG_ABOUT_MAC_INFO", pvar,
+						"%s to server, %s from server");
 	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 	            get_ssh2_mac_name(pvar->macs[MODE_OUT]),
 	            get_ssh2_mac_name(pvar->macs[MODE_IN]));

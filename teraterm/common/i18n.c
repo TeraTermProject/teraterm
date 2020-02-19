@@ -84,34 +84,6 @@ DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf
 	RestoreNewLine(buf);
 }
 
-// TODO: バッファ不足時の動作
-void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
-{
-	size_t r;
-	if (pGetPrivateProfileStringW != NULL) {
-		// unicode base
-		wchar_t tmp[MAX_UIMSG];
-		wchar_t defW[MAX_UIMSG];
-		r = UTF8ToWideChar(def, -1, defW, _countof(defW));
-		assert(r != 0);
-		GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
-		r = buf_len;
-		WideCharToUTF8(tmp, NULL, buf, &r);
-		assert(r != 0);
-	}
-	else {
-		// ANSI -> Wide -> utf8
-		char strA[MAX_UIMSG];
-		wchar_t strW[MAX_UIMSG];
-		GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
-		r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
-		assert(r != 0);
-		r = buf_len;
-		WideCharToUTF8(strW, NULL, buf, &r);
-		assert(r != 0);
-	}
-}
-
 int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
 {
 	char tmp[MAX_UIMSG];

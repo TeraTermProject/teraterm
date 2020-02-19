@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -318,6 +318,12 @@ void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def)
 {
 	GetI18nStr("TTSSH", key, pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
 		def, pvar->ts->UILanguageFile);
+}
+
+void UTIL_get_lang_msgU8(const char *key, PTInstVar pvar, const char *def)
+{
+	const char *UILanguageFile = pvar->ts->UILanguageFile;
+	GetI18nStrU8("TTSSH", key, pvar->ts->UIMsg, MAX_UIMSG, def, UILanguageFile);
 }
 
 /*

@@ -87,6 +87,7 @@ target_sources(
   ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
+  ../../teraterm/common/i18n_static.c
   ../../teraterm/common/ttlib.h
   ../../teraterm/common/ttlib.c
   ../../teraterm/common/dlglib.h

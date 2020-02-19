@@ -448,6 +448,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\i18n_static.c"
+				>
+			</File>
+			<File
 				RelativePath="kex.c"
 				>
 			</File>

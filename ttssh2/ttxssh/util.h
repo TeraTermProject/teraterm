@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -85,6 +85,7 @@ void UTIL_destroy_sock_write_buf(UTILSockWriteBuf *buf);
 BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf);
 
 void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def);
+void UTIL_get_lang_msgU8(const char *key, PTInstVar pvar, const char *def);
 HFONT UTIL_get_lang_fixedfont(HWND hWnd, const char *UILanguageFile);
 
 #endif
