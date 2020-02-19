@@ -231,14 +231,16 @@ private:
 	}
 
 	static void PASCAL TTXModifyMenu(HMENU menu) {
-		char uimsg[MAX_UIMSG];
-		copy_UILanguageFile();
-		/* inserts before ID_HELP_ABOUT */
-		UTIL_get_lang_msg("MENU_ABOUT", uimsg, sizeof(uimsg), "About TT&Proxy...");
-		InsertMenu(menu, 50990, MF_BYCOMMAND | MF_ENABLED, ID_ABOUTMENU, uimsg);
-		/* inserts before ID_SETUP_TCPIP */
-		UTIL_get_lang_msg("MENU_SETUP", uimsg, sizeof(uimsg), "&Proxy...");
-		InsertMenu(menu, 50360, MF_BYCOMMAND | MF_ENABLED, ID_PROXYSETUPMENU, uimsg);
+		const UINT ID_HELP_ABOUT = 50990;
+		const UINT ID_SETUP_TCPIP = 50360;
+		InsertMenu(menu, ID_HELP_ABOUT, MF_BYCOMMAND | MF_ENABLED, ID_ABOUTMENU, "About TT&Proxy...");
+		InsertMenu(menu, ID_SETUP_TCPIP, MF_BYCOMMAND | MF_ENABLED, ID_PROXYSETUPMENU, "&Proxy...");
+
+		static const DlgTextInfo MenuTextInfo[] = {
+			{ ID_ABOUTMENU, "MENU_ABOUT" },
+			{ ID_PROXYSETUPMENU, "MENU_SETUP" },
+		};
+		SetI18nMenuStrs("TTProxy", menu, MenuTextInfo, _countof(MenuTextInfo), getInstance().ts->UILanguageFile);
 	}
 
 	static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
