@@ -239,7 +239,7 @@ static int openssh_RSA_verify(int type, u_char *hash, u_int hashlen,
 	}
 	decrypted = malloc(rsasize);
 	if (decrypted == NULL)
-		return 1; // error
+		return 0; // error
 
 	if ((len = RSA_public_decrypt(siglen, sigbuf, decrypted, rsa,
 	                              RSA_PKCS1_PADDING)) < 0) {
