@@ -2,9 +2,7 @@
  * $Id: Pointer.h,v 1.4 2007-08-18 08:52:18 maya Exp $
  */
 
-#if _MSC_VER >= 1000
 #pragma once
-#endif // _MSC_VER >= 1000
 
 #ifndef _YCL_POINTER_H_
 #define _YCL_POINTER_H_
