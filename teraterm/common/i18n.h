@@ -48,17 +48,12 @@ typedef struct {
 
 DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+void GetI18nStrU8(const char* section, const char* key, char* buf, int buf_len, const char* def, const char* iniFile);
 DllExport int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
 DllExport int WINAPI SetI18nDlgStrs(const char *section, HWND hDlgWnd,
 							 const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
 DllExport void WINAPI SetI18nMenuStrs(const char *section, HMENU hMenu,
 							  const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
-
-#if defined(_UNICODE)
-#define	GetI18nStrT(p1, p2, p3, p4, p5, p6) GetI18nStrW(p1, p2, p3, p4, p5, p6)
-#else
-#define	GetI18nStrT(p1, p2, p3, p4, p5, p6) GetI18nStr(p1, p2, p3, p4, p5, p6)
-#endif
 
 #ifdef __cplusplus
 }
