@@ -17,12 +17,18 @@ using namespace yebisuya;
 
 #include "ttlib.h"
 #include "i18n.h"
+#include "layer_for_unicode.h"
 
 extern char UILanguageFile[MAX_PATH];
 
 void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 {
     GetI18nStr("TTProxy", key, buf, buf_len, def, UILanguageFile);
+}
+
+void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def)
+{
+    GetI18nStrW("TTProxy", key, buf, buf_len, def, UILanguageFile);
 }
 
 class ProxyWSockHook {
@@ -1069,40 +1075,40 @@ private:
     class AboutDialog : public Dialog {
     private:
         virtual bool onInitDialog() {
-            String buf;
-            char *buf2;
+            wchar_t buf[MAX_UIMSG];
+            wchar_t *buf2;
             const char *ver;
-            int n, a, b, c, d, len;
-            char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], uimsg3[MAX_UIMSG];
+            int n, a, b, c, d;
+            size_t len;
+            wchar_t uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], uimsg3[MAX_UIMSG];
+            HWND hWnd = (HWND)*this;
 
-            GetWindowText(uimsg2, sizeof(uimsg2));
-            UTIL_get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2);
-            SetWindowText(uimsg);
+            const static DlgTextInfo text_info[] = {
+                { 0, "DLG_ABOUT_TITLE" },
+                { IDOK, "BTN_OK" },
+            };
+            SetI18nDlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 
-            UTIL_get_lang_msg("DLG_ABOUT_EXTENSION", uimsg, sizeof(uimsg),
-                              "Tera Term proxy extension");
-            UTIL_get_lang_msg("DLG_ABOUT_YEBISUYA", uimsg2, sizeof(uimsg2),
-                              "YebisuyaHompo");
-            UTIL_get_lang_msg("DLG_ABOUT_HOMEPAGE", uimsg3, sizeof(uimsg3),
-                              "TTProxy home page");
-            buf = GetDlgItemText(IDC_VERSION);
-            len = buf.length() + 50;
-            buf2 = (char *)_alloca(len);
+            UTIL_get_lang_msgW("DLG_ABOUT_EXTENSION", uimsg, sizeof(uimsg),
+                               L"Tera Term proxy extension");
+            UTIL_get_lang_msgW("DLG_ABOUT_YEBISUYA", uimsg2, sizeof(uimsg2),
+                               L"YebisuyaHompo");
+            UTIL_get_lang_msgW("DLG_ABOUT_HOMEPAGE", uimsg3, sizeof(uimsg3),
+                               L"TTProxy home page");
+            _GetDlgItemTextW(hWnd, IDC_VERSION, buf, _countof(buf));
+            len = wcslen(buf) + 50;
+            buf2 = (wchar_t *)_alloca(sizeof(wchar_t) * len);
             if (buf2 == NULL) {
                 return true;
             }
             ver = FileVersion::getOwnVersion().getFileVersion();
             n = sscanf_s(ver, "%d, %d, %d, %d", &a, &b, &c, &d);
             if (n == 4) {
-                sprintf_s(buf2, len, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
+                swprintf_s(buf2, len, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
             }
-            SetDlgItemText(IDC_VERSION, (n == 4) ? buf2 : buf);
+            _SetDlgItemTextW(hWnd, IDC_VERSION, (n == 4) ? buf2 : buf);
 
-            GetDlgItemText(IDOK, uimsg, sizeof(uimsg));
-            UTIL_get_lang_msg("BTN_OK", uimsg, sizeof(uimsg),"OK");
-            SetDlgItemText(IDOK, uimsg);
-
-            CenterWindow((HWND)*this, GetParent());
+            CenterWindow(hWnd, GetParent());
 
             return true;
         }
