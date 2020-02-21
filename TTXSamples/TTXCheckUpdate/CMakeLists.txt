@@ -57,7 +57,8 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  Wininet.lib
+  #
+  wininet.lib
   )
 
 install(
