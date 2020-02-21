@@ -521,7 +521,7 @@ void *CreateReconvStringStA(
 	HWND hWnd, const char *str_ptr, size_t str_count,
 	size_t cx, size_t *st_size_)
 {
-	if (HIMEDLL != NULL) return NULL;
+	if (HIMEDLL == NULL) return NULL;
 	assert(IsWindowUnicode(hWnd) == FALSE);
 	return CreateReconvStringSt(hWnd, FALSE, str_ptr, str_count, cx, st_size_);
 }
