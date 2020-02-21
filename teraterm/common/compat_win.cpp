@@ -142,7 +142,6 @@ static const APIInfo Lists_user32[] = {
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
 	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
 	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
-	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 #ifndef UNICODE_API_DISABLE
@@ -161,9 +160,10 @@ static const APIInfo Lists_user32[] = {
 	{ "GetWindowTextW", (void **)&pGetWindowTextW },
 	{ "GetWindowTextLengthW", (void **)&pGetWindowTextLengthW },
 #endif
-
+	{ "EnumDisplayMonitors", (void **)&pEnumDisplayMonitors },
 	{ "MonitorFromWindow", (void **)&pMonitorFromWindow },
 	{ "MonitorFromPoint", (void **)&pMonitorFromPoint },
+	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "GetMonitorInfoA", (void **)&pGetMonitorInfoA },
 	{},
 };
