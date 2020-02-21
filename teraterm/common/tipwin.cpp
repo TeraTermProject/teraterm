@@ -277,6 +277,9 @@ VOID CTipWin::SetText(const TCHAR *str)
 
 	TipWin* self = tWin;
 	self->str_len = _tcslen(str);
+	if (self->str != NULL) {
+		free((void *)self->str);
+	}
 	self->str = _tcsdup(str);
 	CalcStrRect();
 
