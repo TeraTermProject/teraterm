@@ -57,6 +57,7 @@ static const APIInfo Lists_user32[] = {
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
+	{ "EnumDisplayMonitors", (void **)&pEnumDisplayMonitors },
 	{},
 };
 
