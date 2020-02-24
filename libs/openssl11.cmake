@@ -129,6 +129,44 @@ if(NOT EXISTS ${SRC_DIR}/README)
     WORKING_DIRECTORY ${EXTRACT_DIR}
     )
 
+  # patch
+  find_program(
+    PATCH patch
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch
+    )
+  set(PATCH_OPT --binary --backup -p1)
+  message(PATCH=${PATCH})
+  execute_process(
+    COMMAND ${PATCH} ${PATCH_OPT}
+    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/vs2005.patch
+    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+    )
+  execute_process(
+    COMMAND ${PATCH} ${PATCH_OPT}
+    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/ws2_32_dll_patch.txt
+    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+    )
+  execute_process(
+    COMMAND ${PATCH} ${PATCH_OPT}
+    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/atomic_api.txt
+    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+    )
+  execute_process(
+    COMMAND ${PATCH} ${PATCH_OPT}
+    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/CryptAcquireContextW2.txt
+    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+    )
+  execute_process(
+    COMMAND ${PATCH} ${PATCH_OPT}
+    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/atomic_api_win95.txt
+    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+    )
+  execute_process(
+    COMMAND ${PATCH} ${PATCH_OPT}
+    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/CryptAcquireContextW_win95.txt
+    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+    )
+
 endif()
 
 ########################################
@@ -242,7 +280,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
       )
   endif()
   file(APPEND "${SRC_DIR}/build_cmake.bat"
-    "perl Configure no-asm no-async no-shared ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N} --openssldir=${INSTALL_DIR_N}\\SSL\n"
+    "perl Configure no-asm no-async no-shared no-capieng -no-dso -no-engine ${CONFIG_TARGET} -D_WIN32_WINNT=0x0501 --prefix=${INSTALL_DIR_N} --openssldir=${INSTALL_DIR_N}\\SSL\n"
     "nmake -f makefile install\n"
     )
   set(BUILD_CMAKE_BAT "${SRC_DIR}/build_cmake.bat")
@@ -299,7 +337,7 @@ else()
     set(CONFIG_NAME "mingw")
   endif()
   execute_process(
-    COMMAND ${CMAKE_COMMAND} -E env "PATH=/usr/bin:/bin" ${PERL} ./Configure no-async no-shared ${CONFIG_NAME} --prefix=${INSTALL_DIR} --openssldir=${INSTALL_DIR_N}/SSL
+    COMMAND ${CMAKE_COMMAND} -E env "PATH=/usr/bin:/bin" ${PERL} ./Configure no-asm no-async no-shared no-capieng -no-dso -no-engine ${CONFIG_NAME} -D_WIN32_WINNT=0x0501 --prefix=${INSTALL_DIR} --openssldir=${INSTALL_DIR}/SSL
     WORKING_DIRECTORY ${SRC_DIR}
     RESULT_VARIABLE rv
     )

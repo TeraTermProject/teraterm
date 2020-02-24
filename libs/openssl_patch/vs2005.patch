@@ -1,0 +1,36 @@
+--- openssl_org\Configurations\10-main.conf.orig 2019-09-10 22:13:07.000000000 +0900
++++ openssl\Configurations\10-main.conf	2020-02-23 23:50:51.000000000 +0900
+***************
+*** 1216,1222 ****
+          template         => 1,
+          CC               => "cl",
+          CPP              => '$(CC) /EP /C',
+!         CFLAGS           => "/W3 /wd4090 /nologo",
+          LDFLAGS          => add("/debug"),
+          coutflag         => "/Fo",
+          defines          => add("OPENSSL_SYS_WIN32", "WIN32_LEAN_AND_MEAN",
+--- 1216,1222 ----
+          template         => 1,
+          CC               => "cl",
+          CPP              => '$(CC) /EP /C',
+!         CFLAGS           => "/W1 /wd4090 /nologo",
+          LDFLAGS          => add("/debug"),
+          coutflag         => "/Fo",
+          defines          => add("OPENSSL_SYS_WIN32", "WIN32_LEAN_AND_MEAN",
+***************
+*** 1313,1319 ****
+      "VC-WIN32" => {
+          inherit_from     => [ "VC-noCE-common", asm("x86_asm"),
+                                sub { $disabled{shared} ? () : "uplink_common" } ],
+!         CFLAGS           => add("/WX"),
+          AS               => sub { vc_win32_info()->{AS} },
+          ASFLAGS          => sub { vc_win32_info()->{ASFLAGS} },
+          asoutflag        => sub { vc_win32_info()->{asoutflag} },
+--- 1313,1319 ----
+      "VC-WIN32" => {
+          inherit_from     => [ "VC-noCE-common", asm("x86_asm"),
+                                sub { $disabled{shared} ? () : "uplink_common" } ],
+!         CFLAGS           => add(""),
+          AS               => sub { vc_win32_info()->{AS} },
+          ASFLAGS          => sub { vc_win32_info()->{ASFLAGS} },
+          asoutflag        => sub { vc_win32_info()->{asoutflag} },
