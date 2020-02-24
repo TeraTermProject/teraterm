@@ -2,6 +2,7 @@
 # cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017 Win64" -P buildall.cmake
+# .\cmake-3.11.4-win32-x86\bin\cmake.exe -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -P buildall.cmake
 
 if("${CMAKE_GENERATOR}" STREQUAL "")
