@@ -17,9 +17,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXKcodeChange", "TTXKcodeChange\TTXKcodeChange.vcproj", "{2E487F50-84E4-404D-A7E1-F9FA4A72BC25}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXViewMode", "TTXViewMode\TTXViewMode.vcproj", "{2296FB66-3FA4-4136-8252-ABECEEAC2D70}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32} = {DF4E3C36-A743-4FB4-8EE9-49899E69ED32}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCopyIniFile", "TTXCopyIniFile\TTXCopyIniFile.vcproj", "{2B2B8D6E-4A84-49DD-8291-46172FCE422A}"
 EndProject
@@ -30,20 +27,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCommandLineOpt", "TTXCommandLineOpt\TTXCommandLineOpt.vcproj", "{EE8BFC38-7000-42F1-BBC3-17F19855918A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXRecurringCommand", "TTXRecurringCommand\TTXRecurringCommand.vcproj", "{3C656364-FAEA-41D2-B227-52187D3C2529}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32} = {DF4E3C36-A743-4FB4-8EE9-49899E69ED32}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXShowCommandLine", "TTXShowCommandLine\TTXShowCommandLine.vcproj", "{80ED9927-27F9-473A-802C-FB10DEB5ECC6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXOutputBuffering", "TTXOutputBuffering\TTXOutputBuffering.vcproj", "{80BE71D1-BEA3-4A5D-8F13-362D6364892D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCheckUpdate", "TTXCheckUpdate\TTXCheckUpdate.v8.vcproj", "{937DFA65-5709-4643-B778-482C15DEC581}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32} = {DF4E3C36-A743-4FB4-8EE9-49899E69ED32}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "..\teraterm\common\common_static.v8.vcproj", "{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,10 +108,6 @@ Global
 		{937DFA65-5709-4643-B778-482C15DEC581}.Debug|Win32.Build.0 = Debug|Win32
 		{937DFA65-5709-4643-B778-482C15DEC581}.Release|Win32.ActiveCfg = Release|Win32
 		{937DFA65-5709-4643-B778-482C15DEC581}.Release|Win32.Build.0 = Release|Win32
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Debug|Win32.Build.0 = Debug|Win32
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Release|Win32.ActiveCfg = Release|Win32
-		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

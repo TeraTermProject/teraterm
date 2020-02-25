@@ -84,7 +84,7 @@
       <Culture>0x0411</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>TTX.def</ModuleDefinitionFile>
@@ -125,7 +125,7 @@
       <Culture>0x0411</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>TTX.def</ModuleDefinitionFile>
@@ -201,11 +201,6 @@
     <ClInclude Include="YCL\include\YCL\ValueCtrl.h" />
     <ClInclude Include="YCL\include\YCL\Vector.h" />
     <ClInclude Include="YCL\include\YCL\Window.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\teraterm\common\common_static.v16.vcxproj">
-      <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

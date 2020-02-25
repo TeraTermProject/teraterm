@@ -137,6 +137,8 @@ target_compile_definitions(
 
 target_link_libraries(
   ttxssh
+  PRIVATE
+  common_static
   libputty
   ttpcmn
   ${ZLIB_LIB}

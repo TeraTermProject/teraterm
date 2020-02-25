@@ -102,6 +102,8 @@ endif()
 
 target_link_libraries(
   ttpmacro
+  PRIVATE
+  common_static
   ttpcmn
   ${ONIGURUMA_LIB}
   ${SFMT_LIB}

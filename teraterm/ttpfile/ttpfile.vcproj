@@ -71,7 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ole32.lib comdlg32.lib ttpcmn.lib"
+				AdditionalDependencies="common_static.lib User32.lib gdi32.lib SHELL32.lib ole32.lib comdlg32.lib ttpcmn.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(OutDir)"
@@ -162,7 +162,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ole32.lib comdlg32.lib ttpcmn.lib"
+				AdditionalDependencies="common_static.lib User32.lib gdi32.lib SHELL32.lib ole32.lib comdlg32.lib ttpcmn.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(OutDir)"

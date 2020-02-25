@@ -131,25 +131,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\teraterm\teraterm\common\tmfc.cpp" />
-    <ClCompile Include="..\..\..\teraterm\teraterm\common\tmfc_frame.cpp" />
-    <ClCompile Include="..\..\..\teraterm\teraterm\common\tmfc_property.cpp" />
-    <ClCompile Include="..\common\codeconv.cpp" />
-    <ClCompile Include="..\common\compat_win.cpp" />
-    <ClCompile Include="..\common\dllutil.cpp" />
-    <ClCompile Include="..\common\i18n.c" />
+    <ClCompile Include="dlglib.c" />
+    <ClCompile Include="dlglib_cpp.cpp" />
+    <ClCompile Include="dlglib_tmpl.cpp" />
+    <ClCompile Include="tipwin.cpp" />
+    <ClCompile Include="tmfc.cpp" />
+    <ClCompile Include="tmfc_frame.cpp" />
+    <ClCompile Include="tmfc_property.cpp" />
+    <ClCompile Include="codeconv.cpp" />
+    <ClCompile Include="compat_win.cpp" />
+    <ClCompile Include="dllutil.cpp" />
     <ClCompile Include="getcontent.cpp" />
+    <ClCompile Include="i18n_static.c" />
     <ClCompile Include="layer_for_unicode.cpp" />
     <ClCompile Include="layer_for_unicode_comctl32.cpp" />
+    <ClCompile Include="ttlib_static.c" />
+    <ClCompile Include="win16api.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\teraterm\teraterm\common\tmfc.h" />
-    <ClInclude Include="..\common\compat_win.h" />
-    <ClInclude Include="..\common\dllutil.h" />
-    <ClInclude Include="..\common\i18n.h" />
+    <ClInclude Include="dlglib.h" />
+    <ClInclude Include="tipwin.h" />
+    <ClInclude Include="tmfc.h" />
+    <ClInclude Include="compat_win.h" />
+    <ClInclude Include="dllutil.h" />
+    <ClInclude Include="i18n.h" />
     <ClInclude Include="codeconv.h" />
     <ClInclude Include="getcontent.h" />
     <ClInclude Include="layer_for_unicode.h" />
+    <ClInclude Include="ttlib.h" />
+    <ClInclude Include="win16api.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

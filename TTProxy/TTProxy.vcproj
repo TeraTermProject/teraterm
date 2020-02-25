@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="ws2_32.lib ttpcmn.lib gdi32.lib comdlg32.lib shell32.lib ole32.lib"
+				AdditionalDependencies="common_static.lib ws2_32.lib ttpcmn.lib gdi32.lib comdlg32.lib shell32.lib ole32.lib"
 				OutputFile="$(OutDir)\TTXProxy.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -170,7 +170,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="ws2_32.lib ttpcmn.lib gdi32.lib comdlg32.lib shell32.lib ole32.lib"
+				AdditionalDependencies="common_static.lib ws2_32.lib ttpcmn.lib gdi32.lib comdlg32.lib shell32.lib ole32.lib"
 				OutputFile="$(OutDir)\TTXProxy.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

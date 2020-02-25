@@ -43,9 +43,6 @@
     <ClCompile Include="ttmmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\i18n.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="ttl.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -98,6 +95,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\dllutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\layer_for_unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -177,6 +177,9 @@
     <ClInclude Include="..\common\dllutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\layer_for_unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ttmacro.ico">
@@ -192,6 +195,9 @@
     </ResourceCompile>
     <ResourceCompile Include="ttpmacro.rc">
       <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttmacro_manifest.rc">
+      <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

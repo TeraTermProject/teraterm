@@ -7,11 +7,16 @@ add_library(
   codeconv.h
   compat_win.cpp
   compat_win.h
+  dlglib.c
+  dlglib.h
+  dlglib_cpp.cpp
+  dlglib_tmpl.cpp
   dllutil.cpp
   dllutil.h
   getcontent.cpp
   getcontent.h
   i18n.c
+  i18n_static.c
   i18n.h
   layer_for_unicode.cpp
   layer_for_unicode.h
@@ -20,6 +25,16 @@ add_library(
   tmfc.h
   tmfc_frame.cpp
   tmfc_property.cpp
+  ttlib.h
+  ttlib_static.c
+  win16api.h
+  win16api.c
+  dlglib.h
+  dlglib.c
+  dlglib_tmpl.cpp
+  dlglib_cpp.cpp
+  tipwin.h
+  tipwin.cpp
   )
 
 target_include_directories(

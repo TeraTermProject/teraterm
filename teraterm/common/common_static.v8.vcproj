@@ -165,7 +165,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\common\codeconv.cpp"
+			RelativePath=".\codeconv.cpp"
 			>
 		</File>
 		<File
@@ -173,11 +173,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\common\compat_win.cpp"
+			RelativePath=".\compat_win.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\common\compat_win.h"
+			RelativePath=".\compat_win.h"
 			>
 		</File>
 		<File
@@ -185,11 +185,43 @@
 			>
 		</File>
 		<File
-			RelativePath="..\common\dllutil.cpp"
+			RelativePath=".\dlglib.c"
 			>
 		</File>
 		<File
-			RelativePath="..\common\dllutil.h"
+			RelativePath=".\dlglib.h"
+			>
+		</File>
+		<File
+			RelativePath=".\dlglib_cpp.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\dlglib_tmpl.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\dllutil.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\dlglib.h"
+			>
+		</File>
+		<File
+			RelativePath=".\dlglib_cpp.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\dlglib_tmpl.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\dllutil.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\dllutil.h"
 			>
 		</File>
 		<File
@@ -201,11 +233,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\common\i18n.c"
+			RelativePath=".\i18n_static.c"
 			>
 		</File>
 		<File
-			RelativePath="..\common\i18n.h"
+			RelativePath=".\i18n.h"
 			>
 		</File>
 		<File
@@ -218,6 +250,14 @@
 		</File>
 		<File
 			RelativePath=".\layer_for_unicode_comctl32.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\tipwin.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\tipwin.h"
 			>
 		</File>
 		<File
@@ -234,6 +274,22 @@
 		</File>
 		<File
 			RelativePath=".\tmfc_property.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ttlib.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ttlib_static.c"
+			>
+		</File>
+		<File
+			RelativePath=".\win16api.c"
+			>
+		</File>
+		<File
+			RelativePath=".\win16api.h"
 			>
 		</File>
 	</Files>

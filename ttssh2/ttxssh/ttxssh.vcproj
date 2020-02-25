@@ -73,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib libcrypto.lib zlibd.lib ttpcmn.lib dnsapi.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib advapi32.lib ole32.lib comctl32.lib"
+				AdditionalDependencies="common_static.lib ws2_32.lib libcrypto.lib zlibd.lib ttpcmn.lib dnsapi.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib advapi32.lib ole32.lib comctl32.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\openssl\out32.dbg;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(ConfigurationName)"
@@ -170,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib libcrypto.lib zlib.lib ttpcmn.lib dnsapi.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib advapi32.lib ole32.lib comctl32.lib"
+				AdditionalDependencies="common_static.lib ws2_32.lib libcrypto.lib zlib.lib ttpcmn.lib dnsapi.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib advapi32.lib ole32.lib comctl32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\openssl\out32;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(ConfigurationName)"

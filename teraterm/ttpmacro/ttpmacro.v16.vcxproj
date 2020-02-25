@@ -198,6 +198,9 @@
     <ResourceCompile Include="ttmacro_manifest.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\common\common_static.v16.vcxproj">
+      <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v16.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

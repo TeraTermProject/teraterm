@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="comportinfo.cpp" />
