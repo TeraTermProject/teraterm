@@ -6,6 +6,7 @@ set(COMMON_SRC
   ../common/teraterm.h
   ../common/tttypes.h
   ../common/i18n.h
+  ../common/i18n.c
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/servicenames.c

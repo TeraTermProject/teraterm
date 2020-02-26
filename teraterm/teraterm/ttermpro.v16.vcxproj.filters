@@ -114,41 +114,8 @@
     <ClCompile Include="addsetting.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\dlglib.c">
-      <Filter>dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\win16api.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\dlglib_cpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\dlglib_tmpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\tipwin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\codeconv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\dllutil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\compat_win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="../ttpdlg/ttdlg.c">
       <Filter>ttpdlg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\tmfc_frame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\tmfc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\layer_for_unicode.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="unicode.cpp">
       <Filter>Source Files</Filter>

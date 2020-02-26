@@ -129,17 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\codeconv.cpp" />
-    <ClCompile Include="..\common\compat_win.cpp" />
-    <ClCompile Include="..\common\dlglib.c" />
-    <ClCompile Include="..\common\dlglib_cpp.cpp" />
-    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
-    <ClCompile Include="..\common\dllutil.cpp" />
-    <ClCompile Include="..\common\layer_for_unicode.cpp" />
-    <ClCompile Include="..\common\tmfc.cpp" />
-    <ClCompile Include="..\common\tmfc_frame.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
-    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="ListDlg.cpp" />
     <ClCompile Include="errdlg.cpp" />
     <ClCompile Include="fileread.cpp" />

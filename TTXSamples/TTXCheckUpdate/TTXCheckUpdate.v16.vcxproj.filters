@@ -33,15 +33,6 @@
     <ClCompile Include="../../teraterm/common/ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../../teraterm/common/dlglib.c">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/dlglib_cpp.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/dlglib_tmpl.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="../../libs/cJSON/cJSON.c">
       <Filter>cJSON</Filter>
     </ClCompile>

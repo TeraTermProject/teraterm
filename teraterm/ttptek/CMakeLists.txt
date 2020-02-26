@@ -8,7 +8,6 @@ set(COMMON_SRC
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/codeconv.h
-  ../common/codeconv.cpp
   )
 
 source_group(

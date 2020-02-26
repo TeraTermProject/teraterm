@@ -95,10 +95,6 @@
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="TTXCheckUpdate.c" />
     <ClCompile Include="../../libs/cJSON/cJSON.c" />
-    <ClCompile Include="../../teraterm/common/dlglib.c" />
-    <ClCompile Include="../../teraterm/common/dlglib_cpp.cpp" />
-    <ClCompile Include="../../teraterm/common/dlglib_tmpl.cpp" />
-    <ClCompile Include="../../teraterm/common/ttlib.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="parse.h" />

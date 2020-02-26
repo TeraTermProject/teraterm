@@ -213,26 +213,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\common\codeconv.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\compat_win.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib_cpp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib_tmpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dllutil.cpp"
-				>
-			</File>
-			<File
 				RelativePath="filesys.cpp"
 				>
 			</File>
@@ -249,23 +229,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\tipwin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\tmfc.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\tmfc_frame.cpp"
-				>
-			</File>
-			<File
 				RelativePath="vtwin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\win16api.c"
 				>
 			</File>
 		</Filter>
@@ -275,6 +239,10 @@
 			>
 			<File
 				RelativePath="..\..\cygterm\cygterm.ico"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.rc"
 				>
 			</File>
 			<File
@@ -303,10 +271,6 @@
 			</File>
 			<File
 				RelativePath="ttermpro.rc"
-				>
-			</File>
-			<File
-				RelativePath="debug_pp.rc"
 				>
 			</File>
 			<File
@@ -428,6 +392,10 @@
 			</File>
 			<File
 				RelativePath=".\keyboard.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.h"
 				>
 			</File>
 			<File
@@ -571,7 +539,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib.c"
+				RelativePath="clipboarddlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="clipboarddlg.h"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="debug_pp.h"
 				>
 			</File>
 			<File
@@ -587,11 +567,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\ttpmacro\fileread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpmacro\fileread.h"
+				>
+			</File>
+			<File
 				RelativePath="ftdlg.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ftdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="ftdlg_lite.cpp"
+				>
+			</File>
+			<File
+				RelativePath="ftdlg_lite.h"
 				>
 			</File>
 			<File
@@ -611,46 +607,6 @@
 				>
 			</File>
 			<File
-				RelativePath="ttdialog.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ttdialog.h"
-				>
-			</File>
-			<File
-				RelativePath="unicode.h"
-				>
-			</File>
-			<File
-				RelativePath="unicode.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\ttpmacro\fileread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\ttpmacro\fileread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\layer_for_unicode.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
-				RelativePath="ftdlg_lite.cpp"
-				>
-			</File>
-			<File
-				RelativePath="ftdlg_lite.h"
-				>
-			</File>
-			<File
 				RelativePath="sendmem.cpp"
 				>
 			</File>
@@ -659,19 +615,19 @@
 				>
 			</File>
 			<File
-				RelativePath="clipboarddlg.cpp"
+				RelativePath="ttdialog.c"
 				>
 			</File>
 			<File
-				RelativePath="clipboarddlg.h"
+				RelativePath="ttdialog.h"
 				>
 			</File>
 			<File
-				RelativePath="debug_pp.cpp"
+				RelativePath="unicode.cpp"
 				>
 			</File>
 			<File
-				RelativePath="debug_pp.h"
+				RelativePath="unicode.h"
 				>
 			</File>
 		</Filter>

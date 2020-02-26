@@ -4,10 +4,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
   ../../teraterm/common/dlglib.h
-  ../../teraterm/common/dlglib.c
-  ../../teraterm/common/dlglib_cpp.cpp
-  ../../teraterm/common/dlglib_tmpl.cpp
-  ../../teraterm/common/ttlib.c
   )
 
 source_group(

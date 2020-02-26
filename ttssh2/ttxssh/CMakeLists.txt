@@ -87,23 +87,14 @@ target_sources(
   ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
-  ../../teraterm/common/i18n_static.c
   ../../teraterm/common/ttlib.h
   ../../teraterm/common/ttlib.c
   ../../teraterm/common/dlglib.h
-  ../../teraterm/common/dlglib.c
-  ../../teraterm/common/dlglib_cpp.cpp
-  ../../teraterm/common/dlglib_tmpl.cpp
   ../../teraterm/common/servicenames.h
-  ../../teraterm/common/codeconv.cpp
   ../../teraterm/common/codeconv.h
-  ../../teraterm/common/tipwin.cpp
   ../../teraterm/common/tipwin.h
-  ../../teraterm/common/layer_for_unicode.cpp
   ../../teraterm/common/layer_for_unicode.h
-  ../../teraterm/common/compat_win.cpp
   ../../teraterm/common/compat_win.h
-  ../../teraterm/common/dllutil.cpp
   ../../teraterm/common/dllutil.h
   )
 

@@ -62,24 +62,13 @@ target_sources(
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h
-  ../common/tmfc.cpp
   ../common/tmfc.h
-  ../common/tmfc_frame.cpp
-  ../common/dlglib.h
-  ../common/dlglib.c
-  ../common/dlglib_tmpl.cpp
-  ../common/dlglib_cpp.cpp
   ../common/compat_w95.h
   ../common/compat_win.h
-  ../common/compat_win.cpp
   ../common/win16api.h
-  ../common/win16api.c
   ../common/codeconv.h
-  ../common/codeconv.cpp
   ../common/dllutil.h
-  ../common/dllutil.cpp
   ../common/layer_for_unicode.h
-  ../common/layer_for_unicode.cpp
   )
 
 source_group(

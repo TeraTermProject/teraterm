@@ -233,11 +233,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\i18n_static.c"
+			RelativePath="..\common\i18n.h"
 			>
 		</File>
 		<File
-			RelativePath=".\i18n.h"
+			RelativePath=".\i18n_static.c"
 			>
 		</File>
 		<File

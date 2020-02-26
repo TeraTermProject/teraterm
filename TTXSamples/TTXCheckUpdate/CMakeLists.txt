@@ -15,10 +15,6 @@ add_library(
   #
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/dlglib.h
-  ../../teraterm/common/dlglib.c
-  ../../teraterm/common/dlglib_cpp.cpp
-  ../../teraterm/common/dlglib_tmpl.cpp
-  ../../teraterm/common/ttlib.c
   ../../teraterm/common/getcontent.h
   )
 

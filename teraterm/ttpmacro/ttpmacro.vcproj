@@ -208,27 +208,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\common\codeconv.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\common\compat_win.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib_cpp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib_tmpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dllutil.cpp"
 				>
 			</File>
 			<File
@@ -256,14 +236,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\tmfc.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\tmfc_frame.cpp"
-				>
-			</File>
-			<File
 				RelativePath="ttmacro.cpp"
 				>
 			</File>
@@ -273,14 +245,6 @@
 			</File>
 			<File
 				RelativePath="ttmmain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\win16api.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\layer_for_unicode.cpp"
 				>
 			</File>
 		</Filter>
@@ -305,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\dllutil.h"
+				>
+			</File>
+			<File
 				RelativePath="errdlg.h"
 				>
 			</File>
@@ -314,6 +282,10 @@
 			</File>
 			<File
 				RelativePath="inpdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\layer_for_unicode.h"
 				>
 			</File>
 			<File
@@ -386,14 +358,6 @@
 			</File>
 			<File
 				RelativePath="..\common\win16api.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dllutil.h"
 				>
 			</File>
 		</Filter>

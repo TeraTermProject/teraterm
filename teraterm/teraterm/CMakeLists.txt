@@ -112,27 +112,16 @@ target_sources(
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/dlglib.h
-  ../common/dlglib.c
-  ../common/dlglib_cpp.cpp
-  ../common/dlglib_tmpl.cpp
   ../common/win16api.h
-  ../common/win16api.c
   ../common/codemap.h
   ../common/compat_w95.h
   ../common/compat_win.h
-  ../common/compat_win.cpp
-  ../common/tmfc.cpp
   ../common/tmfc.h
-  ../common/tmfc_frame.cpp
   ../common/i18n.h
-  ../common/dllutil.cpp
   ../common/dllutil.h
   ../common/codeconv.h
-  ../common/codeconv.cpp
   ../common/tipwin.h
-  ../common/tipwin.cpp
   ../common/layer_for_unicode.h
-  ../common/layer_for_unicode.cpp
   #
   ../teraterm/unisym2decsp.map
   ../teraterm/uni2sjis.map
@@ -233,14 +222,6 @@ target_link_libraries(
   imagehlp
   delayimp
   uuid
-  )
-
-add_dependencies(
-  teraterm
-  ttpcmn
-  ttpfile
-  ttpset
-  ttptek
   )
 
 ####

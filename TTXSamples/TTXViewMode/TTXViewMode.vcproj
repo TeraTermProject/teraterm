@@ -181,22 +181,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\teraterm\common\dlglib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib_cpp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib_tmpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\ttlib.c"
-				>
-			</File>
-			<File
 				RelativePath="TTXViewMode.c"
 				>
 			</File>

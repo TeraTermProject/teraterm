@@ -240,11 +240,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\codeconv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\compat_win.h"
+				>
+			</File>
+			<File
 				RelativePath="config.h"
 				>
 			</File>
 			<File
 				RelativePath="crypt.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\teraterm\common\dllutil.h"
 				>
 			</File>
 			<File
@@ -300,6 +312,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\teraterm\common\layer_for_unicode.h"
+				>
+			</File>
+			<File
 				RelativePath="pkt.h"
 				>
 			</File>
@@ -331,22 +347,6 @@
 				RelativePath="x11util.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\teraterm\common\codeconv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\compat_win.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dllutil.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -372,23 +372,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\teraterm\common\codeconv.cpp"
-				>
-			</File>
-			<File
 				RelativePath="crypt.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib_cpp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dlglib_tmpl.cpp"
 				>
 			</File>
 			<File
@@ -448,10 +432,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\teraterm\common\i18n_static.c"
-				>
-			</File>
-			<File
 				RelativePath="kex.c"
 				>
 			</File>
@@ -480,14 +460,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\teraterm\common\tipwin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\ttlib.c"
-				>
-			</File>
-			<File
 				RelativePath="ttxssh.c"
 				>
 			</File>
@@ -501,22 +473,6 @@
 			</File>
 			<File
 				RelativePath="x11util.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\codeconv.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\layer_for_unicode.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\compat_win.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\teraterm\common\dllutil.cpp"
 				>
 			</File>
 		</Filter>

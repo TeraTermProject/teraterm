@@ -3,14 +3,10 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
-  ../common/dlglib.c
   ../common/dlglib.h
-  ../common/dlglib_cpp.cpp
-  ../common/dlglib_tmpl.cpp
-  ../common/ttlib.c
   ../common/ttlib.h
+  ../common/ttlib.c
   ../common/win16api.h
-  ../common/win16api.c
   )
 
 source_group(
