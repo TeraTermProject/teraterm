@@ -46,14 +46,23 @@ typedef struct {
 	const char *key;
 } DlgTextInfo;
 
+typedef struct {
+	const char *key;				// NULLの場合は常にdefault_text が使用される
+	const wchar_t *default_text;	// key == NULL && default_text == NULLの場合終端
+} I18nTextInfo;
+
 DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-void GetI18nStrU8(const char* section, const char* key, char* buf, int buf_len, const char* def, const char* iniFile);
 DllExport int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
 DllExport int WINAPI SetI18nDlgStrs(const char *section, HWND hDlgWnd,
 							 const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
 DllExport void WINAPI SetI18nMenuStrs(const char *section, HMENU hMenu,
 							  const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
+
+// i18n_static.c
+void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile);
+void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
+				 const char *UILanguageFile, int nsel);
 
 #ifdef __cplusplus
 }

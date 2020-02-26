@@ -40,6 +40,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -51,8 +52,8 @@
 #include "helpid.h"
 #include "addsetting.h"
 #include "debug_pp.h"
-
 #include "tipwin.h"
+#include "i18n.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -246,31 +247,31 @@ void CSequencePropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	wchar_t uimsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", uimsg, _countof(uimsg), L"off", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", uimsg, _countof(uimsg), L"overwrite", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", uimsg, _countof(uimsg), L"ahead", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", uimsg, _countof(uimsg), L"last", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	const static I18nTextInfo accept_title_changing[] = {
+		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", L"off" },
+		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", L"overwrite" },
+		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", L"ahead" },
+		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", L"last" },
+	};
+	SetI18nList("Tera Term", m_hWnd, IDC_ACCEPT_TITLE_CHANGING, accept_title_changing, _countof(accept_title_changing),
+				ts.UILanguageFile, 0);
 
-	get_lang_msgW("DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", uimsg, _countof(uimsg), L"ignore", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", uimsg, _countof(uimsg), L"accept", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", uimsg, _countof(uimsg), L"empty", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	const static I18nTextInfo sequence_title_report[] = {
+		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", L"ignore" },
+		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", L"accept" },
+		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", L"empty" },
+	};
+	SetI18nList("Tera Term", m_hWnd, IDC_TITLE_REPORT, sequence_title_report, _countof(sequence_title_report),
+				ts.UILanguageFile, 0);
 
-	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", uimsg, _countof(uimsg), L"off", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", uimsg, _countof(uimsg), L"write only", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", uimsg, _countof(uimsg), L"read only", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", uimsg, _countof(uimsg), L"read/write", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	const static I18nTextInfo sequence_clipboard_access[] = {
+		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", L"off" },
+		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", L"write only" },
+		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", L"read only" },
+		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", L"read/write" },
+	};
+	SetI18nList("Tera Term", m_hWnd, IDC_CLIPBOARD_ACCESS, sequence_clipboard_access,
+				_countof(sequence_clipboard_access), ts.UILanguageFile, 0);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.MouseEventTracking);
@@ -666,19 +667,14 @@ void CVisualPropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	wchar_t uimsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT",
-				  uimsg, _countof(uimsg), L"Default", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED",
-				  uimsg, _countof(uimsg), L"Non-Antialiased", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED",
-				  uimsg, _countof(uimsg), L"Antialiased", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
-	get_lang_msgW("DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE",
-				  uimsg, _countof(uimsg), L"ClearType", ts.UILanguageFile);
-	SendDlgItemMessageW(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	const static I18nTextInfo visual_font_quality[] = {
+		{ "DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", L"Default" },
+		{ "DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED", L"Non-Antialiased" },
+		{ "DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED", L"Antialiased" },
+		{ "DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", L"ClearType" },
+	};
+	SetI18nList("Tera Term", m_hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
+				ts.UILanguageFile, 0);
 
 	// (1)AlphaBlend
 
@@ -1298,16 +1294,14 @@ void CLogPropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	TCHAR UIMsg[MAX_UIMSG];
-	get_lang_msgT("DLG_FOPT_TIMESTAMP_LOCAL", UIMsg, _countof(UIMsg), _T("Local Time"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
-	get_lang_msgT("DLG_FOPT_TIMESTAMP_UTC", UIMsg, _countof(UIMsg), _T("UTC"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
-	get_lang_msgT("DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", UIMsg, _countof(UIMsg), _T("Elapsed Time (Logging)"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
-	get_lang_msgT("DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", UIMsg, _countof(UIMsg), _T("Elapsed Time (Connection)"), ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
-
+	const static I18nTextInfo fopt_timestamp[] = {
+		{ "DLG_FOPT_TIMESTAMP_LOCAL", L"Local Time" },
+		{ "DLG_FOPT_TIMESTAMP_UTC", L"UTC" },
+		{ "DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", L"Elapsed Time (Logging)" },
+		{ "DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", L"Elapsed Time (Connection)" },
+	};
+	SetI18nList("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
+				ts.UILanguageFile, 0);
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
