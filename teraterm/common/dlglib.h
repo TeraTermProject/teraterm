@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,6 +68,12 @@ BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult);
 HWND TTCreateDialogIndirectParam(
 	HINSTANCE hInstance,
 	LPCDLGTEMPLATE lpTemplate,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc,
+	LPARAM lParamInit);
+HWND TTCreateDialogParam(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit);

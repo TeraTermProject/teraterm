@@ -64,6 +64,20 @@ HWND TTCreateDialogIndirectParam(
 }
 
 /**
+ *	CreateDialogParam() å›ä∑ä÷êî
+ */
+HWND TTCreateDialogParam(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc,
+	LPARAM lParamInit)
+{
+	return TTCreateDialogIndirectParam(hInstance, lpTemplateName,
+									   hWndParent, lpDialogFunc, lParamInit);
+}
+
+/**
  *	CreateDialog() å›ä∑ä÷êî
  */
 HWND TTCreateDialog(
@@ -72,8 +86,8 @@ HWND TTCreateDialog(
 	HWND hWndParent,
 	DLGPROC lpDialogFunc)
 {
-	return TTCreateDialogIndirectParam(hInstance, lpTemplateName,
-									   hWndParent, lpDialogFunc, NULL);
+	return TTCreateDialogParam(hInstance, lpTemplateName,
+							   hWndParent, lpDialogFunc, NULL);
 }
 
 /**
