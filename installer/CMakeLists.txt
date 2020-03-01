@@ -132,6 +132,7 @@ if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
   add_custom_target(
     lang_copy ALL
     DEPENDS
+      lang_conv
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/Default.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/English.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/French.lng"
@@ -198,6 +199,7 @@ elseif(MINGW)
   add_custom_target(
     lang_copy ALL
     DEPENDS
+      lang_conv
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/Default.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/English.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/French.lng"

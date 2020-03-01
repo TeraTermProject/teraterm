@@ -1,0 +1,109 @@
+version: 0.1.{build}
+
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: VS_142
+      GENERATOR: "Visual Studio 16 2019"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS: -DARCHITECTURE=Win32
+      CMAKE_OPTION_GENERATE: "-A Win32"
+      CMAKE_OPTION_BUILD: --config Release
+      BUILD_DIR: build
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-vs2019.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-vs2019
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: VS_142_x64
+      GENERATOR: "Visual Studio 16 2019"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS: -DARCHITECTURE=x64
+      CMAKE_OPTION_GENERATE: "-A x64"
+      CMAKE_OPTION_BUILD: --config Release
+      BUILD_DIR: build
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-vs2019_x64.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-vs2019_x64
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+      COMPILER: VS_90
+      GENERATOR: "Visual Studio 9 2008"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS: -DARCHITECTURE=Win32
+      CMAKE_OPTION_GENERATE: "-A Win32"
+      CMAKE_OPTION_BUILD: --config Release
+      BUILD_DIR: build
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-vs2008.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-vs2008
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: mingw
+      GENERATOR: "Unix Makefiles"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS:
+      CMAKE_OPTION_GENERATE: -DCMAKE_BUILD_TYPE=Release
+      CMAKE_OPTION_BUILD:
+      BUILD_DIR: build
+      MINGW_CC: gcc
+      MINGW_CXX: g++
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-mingw-gcc.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-mingw-gcc
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: mingw
+      GENERATOR: "Unix Makefiles"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS:
+      CMAKE_OPTION_GENERATE: -DCMAKE_BUILD_TYPE=Release
+      CMAKE_OPTION_BUILD:
+      BUILD_DIR: build
+      MINGW_CC: gcc
+      MINGW_CXX: g++
+      MINGW_X64: 1
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-mingw-gcc_x64.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-mingw-gcc_x64
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: mingw
+      GENERATOR: "Unix Makefiles"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS:
+      CMAKE_OPTION_GENERATE: -DCMAKE_BUILD_TYPE=Release
+      CMAKE_OPTION_BUILD:
+      BUILD_DIR: build
+      MINGW_CC: clang
+      MINGW_CXX: clang++
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-mingw-clang.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-mingw-clang
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: mingw
+      GENERATOR: "Unix Makefiles"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS:
+      CMAKE_OPTION_GENERATE: -DCMAKE_BUILD_TYPE=Release
+      CMAKE_OPTION_BUILD:
+      BUILD_DIR: build
+      MINGW_CC: clang
+      MINGW_CXX: clang++
+      MINGW_X64: 1
+      ZIP_FILE: snapshot-r9999-20200229-appveyor-mingw-clang_x64.zip
+      SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-mingw-clang_x64
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+      #APPVEYOR_CACHE_SKIP_RESTORE: true
+
+build: off
+
+build_script:
+  - call ci_scripts\build_appveyor.bat
+
+cache:
+  - libs
+
+artifacts:
+  - path: build\%ZIP_FILE%
