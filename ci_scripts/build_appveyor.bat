@@ -3,19 +3,22 @@ if "%GENERATOR%" == "Visual Studio 8 2005" (
   call getcmake.bat nopause
   cd ..
 )
-if "%COMPILER%" == "mingw" (
-  if "%MINGW_X64%" == "1" (
-    set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin
-    pacman -S --noconfirm --needed mingw64/mingw-w64-x86_64-cmake
-    if "%MINGW_CC%" == "clang" (
-      pacman -S --noconfirm --needed mingw64/mingw-w64-x86_64-clang
-    )
-  ) else (
-    set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin
-    pacman -S --noconfirm --needed mingw32/mingw-w64-i686-cmake
-    if "%MINGW_CC%" == "clang" (
-      pacman -S --noconfirm --needed mingw32/mingw-w64-i686-clang
-    )
+if "%COMPILER%" == "mingw"  (
+  set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin
+  pacman -S --noconfirm --needed mingw32/mingw-w64-i686-cmake
+  if "%MINGW_CC%" == "clang" (
+    pacman -S --noconfirm --needed mingw32/mingw-w64-i686-clang
+  )
+  set CC=%MINGW_CC%
+  set CXX=%MINGW_CXX%
+  set CMAKE_OPTION_BUILD=-- -s -j
+  set CMAKE_OPTION_GENERATE=%CMAKE_OPTION_GENERATE% -DCMAKE_BUILD_TYPE=Release
+)
+if "%COMPILER%" == "mingw_x64"  (
+  set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin
+  pacman -S --noconfirm --needed mingw64/mingw-w64-x86_64-cmake
+  if "%MINGW_CC%" == "clang" (
+    pacman -S --noconfirm --needed mingw64/mingw-w64-x86_64-clang
   )
   set CC=%MINGW_CC%
   set CXX=%MINGW_CXX%

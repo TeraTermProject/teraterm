@@ -32,3 +32,4 @@
 ## build_local_appveyor_*
 
 - ローカルで build_appveyor.bat をテストするための bat ファイル
+- Visual Studio と msys2 を使用
