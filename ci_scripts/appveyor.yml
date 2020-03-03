@@ -53,7 +53,7 @@ environment:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       #APPVEYOR_CACHE_SKIP_RESTORE: true
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      COMPILER: mingw
+      COMPILER: mingw_x64
       GENERATOR: "Unix Makefiles"
       CMAKE_COMMAND: cmake
       CMAKE_OPTION_LIBS:
@@ -62,7 +62,6 @@ environment:
       BUILD_DIR: build
       MINGW_CC: gcc
       MINGW_CXX: g++
-      MINGW_X64: 1
       ZIP_FILE: snapshot-r9999-20200229-appveyor-mingw-gcc_x64.zip
       SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-mingw-gcc_x64
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
@@ -82,7 +81,7 @@ environment:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       #APPVEYOR_CACHE_SKIP_RESTORE: true
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      COMPILER: mingw
+      COMPILER: mingw_x64
       GENERATOR: "Unix Makefiles"
       CMAKE_COMMAND: cmake
       CMAKE_OPTION_LIBS:
@@ -91,7 +90,6 @@ environment:
       BUILD_DIR: build
       MINGW_CC: clang
       MINGW_CXX: clang++
-      MINGW_X64: 1
       ZIP_FILE: snapshot-r9999-20200229-appveyor-mingw-clang_x64.zip
       SNAPSHOT_DIR: snapshot-r9999-20200229-appveyor-mingw-clang_x64
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
