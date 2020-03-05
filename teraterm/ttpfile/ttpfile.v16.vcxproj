@@ -129,11 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\dlglib.c" />
-    <ClCompile Include="..\common\dlglib_cpp.cpp" />
-    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
-    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="bplus.c" />
     <ClCompile Include="ftlib.c" />
     <ClCompile Include="kermit.c" />

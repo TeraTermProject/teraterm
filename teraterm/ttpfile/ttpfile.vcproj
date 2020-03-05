@@ -211,18 +211,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib_cpp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\dlglib_tmpl.cpp"
-				>
-			</File>
-			<File
 				RelativePath="ftlib.c"
 				>
 			</File>
@@ -240,10 +228,6 @@
 			</File>
 			<File
 				RelativePath="..\common\ttlib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\win16api.c"
 				>
 			</File>
 			<File
