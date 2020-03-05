@@ -18,6 +18,23 @@
           coutflag         => "/Fo",
           defines          => add("OPENSSL_SYS_WIN32", "WIN32_LEAN_AND_MEAN",
 ***************
+*** 1230,1236 ****
+          shared_ldflag    => "/dll",
+          shared_target    => "win-shared", # meaningless except it gives Configure a hint
+          thread_scheme    => "winthreads",
+!         dso_scheme       => "win32",
+          apps_aux_src     => add("win32_init.c"),
+          bn_ops           => "EXPORT_VAR_AS_FN",
+          # additional parameter to build_scheme denotes install-path "flavour"
+--- 1230,1236 ----
+          shared_ldflag    => "/dll",
+          shared_target    => "win-shared", # meaningless except it gives Configure a hint
+          thread_scheme    => "winthreads",
+!         #dso_scheme       => "win32",
+          apps_aux_src     => add("win32_init.c"),
+          bn_ops           => "EXPORT_VAR_AS_FN",
+          # additional parameter to build_scheme denotes install-path "flavour"
+***************
 *** 1313,1319 ****
       "VC-WIN32" => {
           inherit_from     => [ "VC-noCE-common", asm("x86_asm"),
@@ -34,3 +51,54 @@
           AS               => sub { vc_win32_info()->{AS} },
           ASFLAGS          => sub { vc_win32_info()->{ASFLAGS} },
           asoutflag        => sub { vc_win32_info()->{asoutflag} },
+***************
+*** 1389,1395 ****
+          bn_ops           => "BN_LLONG EXPORT_VAR_AS_FN",
+          thread_scheme    => "winthreads",
+          perlasm_scheme   => "coff",
+!         dso_scheme       => "win32",
+          shared_target    => "mingw-shared",
+          shared_cppflags  => add("_WINDLL"),
+          shared_ldflag    => "-static-libgcc",
+--- 1389,1395 ----
+          bn_ops           => "BN_LLONG EXPORT_VAR_AS_FN",
+          thread_scheme    => "winthreads",
+          perlasm_scheme   => "coff",
+!         #dso_scheme       => "win32",
+          shared_target    => "mingw-shared",
+          shared_cppflags  => add("_WINDLL"),
+          shared_ldflag    => "-static-libgcc",
+***************
+*** 1425,1431 ****
+          bn_ops           => "SIXTY_FOUR_BIT EXPORT_VAR_AS_FN",
+          thread_scheme    => "winthreads",
+          perlasm_scheme   => "mingw64",
+!         dso_scheme       => "win32",
+          shared_target    => "mingw-shared",
+          shared_cppflags  => add("_WINDLL"),
+          shared_ldflag    => "-static-libgcc",
+--- 1425,1431 ----
+          bn_ops           => "SIXTY_FOUR_BIT EXPORT_VAR_AS_FN",
+          thread_scheme    => "winthreads",
+          perlasm_scheme   => "mingw64",
+!         #dso_scheme       => "win32",
+          shared_target    => "mingw-shared",
+          shared_cppflags  => add("_WINDLL"),
+          shared_ldflag    => "-static-libgcc",
+***************
+*** 1452,1458 ****
+          lib_cppflags     => "-DTERMIOS -DL_ENDIAN",
+          sys_id           => "UWIN",
+          bn_ops           => "BN_LLONG",
+!         dso_scheme       => "win32",
+      },
+  
+  #### Cygwin
+--- 1452,1458 ----
+          lib_cppflags     => "-DTERMIOS -DL_ENDIAN",
+          sys_id           => "UWIN",
+          bn_ops           => "BN_LLONG",
+!         #dso_scheme       => "win32",
+      },
+  
+  #### Cygwin

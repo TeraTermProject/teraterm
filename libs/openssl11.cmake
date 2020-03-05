@@ -280,7 +280,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
       )
   endif()
   file(APPEND "${SRC_DIR}/build_cmake.bat"
-    "perl Configure no-asm no-async no-shared no-capieng -no-dso -no-engine ${CONFIG_TARGET} -D_WIN32_WINNT=0x0501 --prefix=${INSTALL_DIR_N} --openssldir=${INSTALL_DIR_N}\\SSL\n"
+    "perl Configure no-asm no-async no-shared no-capieng no-dso no-engine ${CONFIG_TARGET} -D_WIN32_WINNT=0x0501 --prefix=${INSTALL_DIR_N} --openssldir=${INSTALL_DIR_N}\\SSL\n"
     "nmake -f makefile install\n"
     )
   set(BUILD_CMAKE_BAT "${SRC_DIR}/build_cmake.bat")
