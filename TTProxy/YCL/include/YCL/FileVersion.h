@@ -9,8 +9,6 @@
 
 #include <YCL/common.h>
 
-#pragma comment(lib, "version.lib")
-
 namespace yebisuya {
 
 class FileVersion {

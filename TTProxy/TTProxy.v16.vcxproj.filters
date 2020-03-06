@@ -24,9 +24,6 @@
     <ClCompile Include="TTProxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="YCL\include\YCL\libc.cpp">
-      <Filter>YCL</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TTProxy.rc">

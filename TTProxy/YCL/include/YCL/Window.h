@@ -354,9 +354,6 @@ public:
 	}
 };
 
-#if defined(_MSC_VER)
-#pragma comment(lib, "user32.lib")
-#endif
 }
 
 #endif//_YCL_WINDOWS_H_
