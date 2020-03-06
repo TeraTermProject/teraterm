@@ -76,7 +76,9 @@ private:
   // TipWin
   CTipWin* TipWin;
 
+  // for html help
   LONG HelpId;
+  DWORD dwCookie;
 
 public:
 	CVTWindow(HINSTANCE hInstance);

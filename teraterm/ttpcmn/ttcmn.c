@@ -1170,7 +1170,7 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	wchar_t uimsg[MAX_UIMSG];
 	wchar_t *HomeDirW;
 
-	/* Get home directory */
+	 /* Get home directory */
 	if (GetModuleFileNameA(NULL,Temp,_countof(Temp)) == 0) {
 		return;
 	}
@@ -1182,7 +1182,7 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
 	HWin = GetDesktopWindow();
-	if (_HtmlHelpW(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
+	if (_HtmlHelpW(HWin, HelpFN, Command, Data) == NULL) {
 		// ヘルプが開けなかった
 		wchar_t buf[MAX_PATH];
 		get_lang_msgW("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
