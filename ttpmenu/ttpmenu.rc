@@ -157,7 +157,7 @@ FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,61,69,44,14
     CTEXT           "Tera Term %s\r\nTeraTerm Menu Version %d.%02d",IDC_VERSION,20,9,124,19
-    LTEXT           "Includes:\nversion 0.94r2\nCopyright(C) 1997-2003 S.Hayakawa\r\\(C) 2004-2015 TeraTerm Project",IDC_INCLUDE,13,31,150,35
+    LTEXT           "Includes:\nversion 0.94r2\nCopyright(C) 1997-2003 S.Hayakawa\n(C) 2004-2020 TeraTerm Project",IDC_INCLUDE,13,31,150,35
     ICON            "",IDC_TTPMENU_ICON,4,8,20,20
 END
 
