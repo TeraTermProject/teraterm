@@ -442,12 +442,12 @@ BOOL SetForceForegroundWindow(HWND hWnd)
 	return	ret;
 }
 
-void UTIL_get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, PCHAR iniFile)
+void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetI18nStr("TTMenu", key, buf, buf_len, def, iniFile);
 }
 
-int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PCHAR iniFile)
+int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
 {
 	if (GetI18nLogfont("TTMenu", key, logfont,
 					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),

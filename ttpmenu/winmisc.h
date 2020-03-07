@@ -63,8 +63,8 @@ UINT	GetResourceType(LPCTSTR lpszPath);
 int		CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
 TCHAR	*PathTok(TCHAR *str, TCHAR *separator);
 TCHAR	*lstrstri(TCHAR *s1, TCHAR *s2);
-void	UTIL_get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, PCHAR iniFile);
-int		UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PCHAR iniFile);
+void	UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+int		UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
                                    WPARAM wParam, LPARAM lParam);
 
