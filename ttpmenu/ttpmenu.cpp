@@ -702,7 +702,7 @@ BOOL InitConfigDlg(HWND hWnd)
 
 	font = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
 	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_TAHOMA_FONT", hWnd, &logfont, &g_ConfigFont, UILanguageFile)) {
+	if (UTIL_get_lang_font("DLG_TAHOMA_FONT", hWnd, &logfont, &g_ConfigFont, UILanguageFile)) {
 		SendDlgItemMessage(hWnd, LBL_LIST, WM_SETFONT, (WPARAM)g_ConfigFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(hWnd, LIST_HOST, WM_SETFONT, (WPARAM)g_ConfigFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(hWnd, GRP_CONFIG, WM_SETFONT, (WPARAM)g_ConfigFont, MAKELPARAM(TRUE,0));
@@ -828,7 +828,7 @@ BOOL InitEtcDlg(HWND hWnd)
 
 	font = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
 	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_TAHOMA_FONT", hWnd, &logfont, &g_DetailFont, UILanguageFile)) {
+	if (UTIL_get_lang_font("DLG_TAHOMA_FONT", hWnd, &logfont, &g_DetailFont, UILanguageFile)) {
 		SendDlgItemMessage(hWnd, LBL_TTMPATH, WM_SETFONT, (WPARAM)g_DetailFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(hWnd, EDIT_TTMPATH, WM_SETFONT, (WPARAM)g_DetailFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(hWnd, BUTTON_TTMPATH, WM_SETFONT, (WPARAM)g_DetailFont, MAKELPARAM(TRUE,0));
@@ -935,7 +935,7 @@ BOOL InitVersionDlg(HWND hWnd)
 
 	font = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
 	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_TAHOMA_FONT", hWnd, &logfont, &g_AboutFont, UILanguageFile)) {
+	if (UTIL_get_lang_font("DLG_TAHOMA_FONT", hWnd, &logfont, &g_AboutFont, UILanguageFile)) {
 		SendDlgItemMessage(hWnd, IDC_VERSION, WM_SETFONT, (WPARAM)g_AboutFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(hWnd, IDC_INCLUDE, WM_SETFONT, (WPARAM)g_AboutFont, MAKELPARAM(TRUE,0));
 	}
