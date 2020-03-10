@@ -47,7 +47,7 @@
 #include "filesys.h"		// for SendVar
 #include "codeconv.h"		// for ToCharW()
 #else
-#include "../ttpmacro/fileread.h"
+#include "fileread.h"
 #endif
 
 #include "sendmem.h"

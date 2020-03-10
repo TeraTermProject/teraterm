@@ -19,6 +19,8 @@ add_library(
   dlglib_tmpl.cpp
   dllutil.cpp
   dllutil.h
+  fileread.cpp
+  fileread.h
   getcontent.cpp
   getcontent.h
   i18n.h

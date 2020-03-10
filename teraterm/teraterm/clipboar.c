@@ -48,7 +48,7 @@
 
 #include "clipboar.h"
 #include "tt_res.h"
-#include "../ttpmacro/fileread.h"
+#include "fileread.h"
 #include "unicode_test.h"
 #include "sendmem.h"
 #include "clipboarddlg.h"

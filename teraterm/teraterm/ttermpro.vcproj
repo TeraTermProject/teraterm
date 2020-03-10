@@ -567,14 +567,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ttpmacro\fileread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\ttpmacro\fileread.h"
-				>
-			</File>
-			<File
 				RelativePath="ftdlg.cpp"
 				>
 			</File>

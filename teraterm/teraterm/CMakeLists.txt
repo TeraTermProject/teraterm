@@ -86,8 +86,6 @@ add_executable(
   unicode_combine.tbl
   unicode_emoji.tbl
   #
-  ../ttpmacro/fileread.h
-  ../ttpmacro/fileread.cpp
   ftdlg_lite.h
   ftdlg_lite.cpp
   clipboarddlg.h

@@ -47,8 +47,6 @@ add_executable(
   ttpmacro.rc
   ttm-version.rc
   ttmacro_manifest.rc
-  fileread.h
-  fileread.cpp
   )
 
 target_sources(

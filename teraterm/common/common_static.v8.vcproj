@@ -221,6 +221,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\fileread.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\fileread.h"
+			>
+		</File>
+		<File
 			RelativePath=".\getcontent.cpp"
 			>
 		</File>

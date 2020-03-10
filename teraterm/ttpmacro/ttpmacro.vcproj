@@ -216,10 +216,6 @@
 				>
 			</File>
 			<File
-				RelativePath="fileread.cpp"
-				>
-			</File>
-			<File
 				RelativePath="inpdlg.cpp"
 				>
 			</File>
@@ -274,10 +270,6 @@
 			</File>
 			<File
 				RelativePath="errdlg.h"
-				>
-			</File>
-			<File
-				RelativePath="fileread.h"
 				>
 			</File>
 			<File
