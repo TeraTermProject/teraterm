@@ -64,10 +64,10 @@ typedef struct {
 	char HalfWidth;					// TRUE/FALSE = ”¼Šp/‘SŠp (•\Ž¦‚·‚é‚Æ‚«‚Ì•¶Žš•)
 	char Padding;					// TRUE = ‘SŠp‚ÌŽŸ‚Ì‹l‚ß•¨ or s––‚Ì‹l‚ß•¨
 	char Emoji;						// TRUE = ŠG•¶Žš
-	char CombinationCharCount16;	// charactor count
-	char CombinationCharSize16;		// buffer size
-	char CombinationCharCount32;
-	char CombinationCharSize32;
+	unsigned char CombinationCharCount16;	// charactor count
+	unsigned char CombinationCharSize16;		// buffer size
+	unsigned char CombinationCharCount32;
+	unsigned char CombinationCharSize32;
 	wchar_t *pCombinationChars16;
 	char32_t *pCombinationChars32;
 	wchar_t	wc2[2];
@@ -2642,7 +2642,6 @@ static void markURL(int x)
 	}
 
 	if ((x-2>=0) && !strncmp(&CodeLine[x-2], "://", 3)) {
-		int i;
 		RECT rc;
 		int CaretX, CaretY;
 		char **p = prefix;
@@ -2650,6 +2649,7 @@ static void markURL(int x)
 		while (*p) {
 			size_t len = strlen(*p) - 1;
 			if ((x-len>=0) && !strncmp(&CodeLine[x-len], *p, len)) {
+				size_t i;
 				for (i = 0; i <= len; i++) {
 					AttrLine[x-i] |= AttrURL;
 				}
