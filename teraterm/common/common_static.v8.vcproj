@@ -165,6 +165,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\asprintf.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\asprintf.h"
+			>
+		</File>
+		<File
 			RelativePath=".\codeconv.cpp"
 			>
 		</File>
@@ -190,18 +198,6 @@
 		</File>
 		<File
 			RelativePath=".\dlglib.h"
-			>
-		</File>
-		<File
-			RelativePath=".\dlglib_cpp.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dlglib_tmpl.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dllutil.cpp"
 			>
 		</File>
 		<File
