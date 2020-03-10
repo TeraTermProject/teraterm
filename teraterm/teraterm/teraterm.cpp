@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,9 @@
 
 #include <stdio.h>
 #include <crtdbg.h>
-#include <tchar.h>
 #include <io.h>			// for access()
+#include <windows.h>
+#include <htmlhelp.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -68,6 +69,7 @@
 static BOOL AddFontFlag;
 static wchar_t TSpecialFont[MAX_PATH];
 static CVTWindow* pVTWin;
+static DWORD HtmlHelpCookie;
 
 static void LoadSpecialFont()
 {
@@ -313,6 +315,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
 	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
@@ -386,6 +389,9 @@ exit_message_loop:
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;
+
+	_HtmlHelpW(NULL, NULL, HH_CLOSE_ALL, 0);
+	_HtmlHelpW(NULL, NULL, HH_UNINITIALIZE, HtmlHelpCookie);
 
 	UnloadSpecialFont();
 	DLLExit();

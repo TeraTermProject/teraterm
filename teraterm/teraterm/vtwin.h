@@ -78,7 +78,6 @@ private:
 
   // for html help
   LONG HelpId;
-  DWORD dwCookie;
 
 public:
 	CVTWindow(HINSTANCE hInstance);

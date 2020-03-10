@@ -534,8 +534,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	CommInit(&cv);
 	isFirstInstance = StartTeraTerm(&ts);
 
-	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&dwCookie);
-
 	TTXInit(&ts, &cv); /* TTPLUG */
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
@@ -1709,8 +1707,6 @@ void CVTWindow::OnClose()
 		}
 	}
 
-	_HtmlHelpW(NULL, NULL, HH_CLOSE_ALL, 0);
-	_HtmlHelpW(NULL, NULL, HH_UNINITIALIZE, dwCookie);
 	FileTransEnd(0);
 	ProtoEnd();
 
