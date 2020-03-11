@@ -811,8 +811,11 @@ static void CBSendStart(wchar_t *str_w, size_t str_len)
 	sm = SendMemTextW(str_w, str_len);
 	if (sm == NULL)
 		return;
-	if (ts.PasteDelayPerLine != 0) {
-		SendMemInitDelay(sm, ts.PasteDelayPerLine, 0);
+	if (ts.PasteDelayPerLine == 0) {
+		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+	}
+	else {
+		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, ts.PasteDelayPerLine, 0);
 	}
 #if 0
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);

@@ -28,7 +28,92 @@
 	選択しない場合は、漢字コード、改行文字が変換されて送信され、
 	TAB ($09), LF ($0A), CR ($0D)以外の制御文字は送信されません。
       </dd>
+
+      <dt>delay type</dt>
+      <dd>
+        ddです
+        <dl>
+          <dt>no delay</dt>
+          <dd>
+            ディレイ処理なし
+          </dd>
+
+          <dt>per charactor</dt>
+          <dd>
+            1文字毎にディレイ処理を行う
+          </dd>
+
+          <dt>per line</dt>
+          <dd>
+            1行毎にディレイ処理を行う
+          </dd>
+
+          <dt>per sendsize</dt>
+          <dd>
+            指定送信文字毎にディレイ処理を行う
+          </dd>
+        </dl>
+
+      </dd>
+
+      <dt>send size</dt>
+      <dd>
+        送信サイズ(delay typeが per sendsizeのとき有効)
+      </dd>
+
+      <dt>dealy time(ms)</dt>
+      <dd>
+        ディレイ時間
+      </dd>
     </dl>
+
+    <h3>送信サイズ</h3>
+
+    <p>
+      Tera Termの通信相手の受信バッファサイズと処理速度を考慮することで、
+      指定した送信サイズ毎にディレイを入れることで、
+      1キャラクタ毎、1行毎にディレイを入れるより効率的にファイル送信を行うことができます。
+    </p>
+
+    <p>
+      送信データのドロップは次のところで発生することが考えられます。
+    </p>
+
+    <pre>
+                 s1                   s2                s3                program
+Tera Term ---> Windows ---> (sshd,telnet,pipe) ---> OS,driver      ---> 擬似端末(pty) + シェル,その他コマンド
+                            (serial          )      UARTチップなど      組込プログラム等
+         <---          <---                    <---                <---
+                 r1                   r2                r3
+    </pre>
+
+    <dl>
+      <dt>s1 Windows</dt>
+      <dd>可能性は低い</dd>
+      <dt>s2 送信路</dt>
+      <dd>serialの場合はノイズなどで文字化け、
+        フロー制御が間に合わない等の原因で
+        ドロップすることがある<br>
+        TCP/IP, pipeの場合は可能性は低い
+      </dd>
+      <dt>s3 OS,UARTチップ</dt>
+      <dd>OSドライバの受信バッファの溢れ,UARTチップの受信バッファの溢れなどでドロップする<br>
+        PCの処理能力を超えたデータの受信や、programがデータを引き取らない場合にバッファが溢れる
+      </dd>
+      <dt>program</dt>
+      <dd>プログラム内の受信バッファの溢れなどでドロップする<br>
+        仮想端末(pty)のバッファが溢れそうになると0x07(BEL)が送られてくる
+      </dd>
+    </dl>
+
+    主なUARTチップ、ドライバの受信バッファサイズ
+    <pre>
+      8250 UART                 受信バッファなし
+      16550 UART                16 Byte FIFO
+      FT232R                    256 Byte receive buffer
+      TTY drive(Linux 2.6.26)   4KB
+    </pre>
+
 
     <h2>"Send file" ダイアログボックス(送信中)</h2>
     <dl>

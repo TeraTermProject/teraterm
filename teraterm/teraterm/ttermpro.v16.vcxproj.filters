@@ -132,6 +132,9 @@
     <ClCompile Include="ftdlg_lite.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="sendfiledlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -329,6 +332,9 @@
     </ClInclude>
     <ClInclude Include="ftdlg_lite.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="sendfiledlg.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

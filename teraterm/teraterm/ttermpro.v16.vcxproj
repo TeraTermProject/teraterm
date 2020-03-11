@@ -152,6 +152,7 @@
     <ClCompile Include="filesys.cpp" />
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="keyboard.c" />
+    <ClCompile Include="sendfiledlg.cpp" />
     <ClCompile Include="sizetip.c" />
     <ClCompile Include="prnabort.cpp" />
     <ClCompile Include="protodlg.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="../ttpdlg/dlg_res.h" />
     <ClCompile Include="../ttpdlg/ttdlg.c" />
     <ClInclude Include="../ttpdlg/ttdlg.h" />
+    <ClInclude Include="sendfiledlg.h" />
     <ClInclude Include="sendmem.h" />
     <ClCompile Include="sendmem.cpp" />
     <ClInclude Include="ftdlg_lite.h" />

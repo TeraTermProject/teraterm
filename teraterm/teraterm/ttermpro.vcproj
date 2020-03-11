@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sendfiledlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="tekwin.cpp"
 				>
 			</File>
@@ -395,7 +399,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\layer_for_unicode.h"
+				RelativePath=".\sendfiledlg.h"
 				>
 			</File>
 			<File

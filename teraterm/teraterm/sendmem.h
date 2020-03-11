@@ -35,19 +35,22 @@ extern "C" {
 
 typedef struct SendMemTag SendMem;
 
+typedef enum {
+	SENDMEM_DELAYTYPE_NO_DELAY,
+	SENDMEM_DELAYTYPE_PER_CHAR,
+	SENDMEM_DELAYTYPE_PER_LINE,
+	SENDMEM_DELAYTYPE_PER_SENDSIZE,
+} SendMemDelayType;
+
 SendMem *SendMemTextW(wchar_t *ptr, size_t len);
 SendMem *SendMemBinary(void *ptr, size_t len);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
-void SendMemInitDelay(SendMem *sm, DWORD per_line, DWORD per_char);
+void SendMemInitDelay(SendMem *sm, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max);
 void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile);
 void SendMemInitDialogCaption(SendMem *sm, const wchar_t *caption);
 void SendMemInitDialogFilename(SendMem *sm, const wchar_t *filename);
 BOOL SendMemStart(SendMem *sm);		// 送信開始
 void SendMemFinish(SendMem *sm);
-
-// convenient function
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary);
-BOOL SendMemPasteString(wchar_t *str);
 
 // idleからの送信用API
 void SendMemContinuously(void);
@@ -56,3 +59,8 @@ void SendMemContinuously(void);
 }
 #endif
 
+#ifdef __cplusplus
+// convenient function
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type = SENDMEM_DELAYTYPE_NO_DELAY, DWORD delay_tick = 0, size_t send_max = 0);
+BOOL SendMemPasteString(wchar_t *str);
+#endif
