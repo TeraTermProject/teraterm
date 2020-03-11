@@ -120,9 +120,6 @@
     <ClCompile Include="unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../ttpmacro/fileread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="sendmem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -307,9 +304,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\tipwin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="../ttpmacro/fileread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sendmem.h">

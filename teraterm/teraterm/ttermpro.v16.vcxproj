@@ -177,8 +177,6 @@
     <ClInclude Include="../ttpdlg/dlg_res.h" />
     <ClCompile Include="../ttpdlg/ttdlg.c" />
     <ClInclude Include="../ttpdlg/ttdlg.h" />
-    <ClInclude Include="../ttpmacro/fileread.h" />
-    <ClCompile Include="../ttpmacro/fileread.cpp" />
     <ClInclude Include="sendmem.h" />
     <ClCompile Include="sendmem.cpp" />
     <ClInclude Include="ftdlg_lite.h" />

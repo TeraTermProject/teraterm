@@ -132,7 +132,6 @@
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="ListDlg.cpp" />
     <ClCompile Include="errdlg.cpp" />
-    <ClCompile Include="fileread.cpp" />
     <ClCompile Include="inpdlg.cpp" />
     <ClCompile Include="msgdlg.cpp" />
     <ClCompile Include="statdlg.cpp" />
@@ -159,7 +158,6 @@
     <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="ListDlg.h" />
     <ClInclude Include="errdlg.h" />
-    <ClInclude Include="fileread.h" />
     <ClInclude Include="inpdlg.h" />
     <ClInclude Include="msgdlg.h" />
     <ClInclude Include="statdlg.h" />
