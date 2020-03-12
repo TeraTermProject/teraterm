@@ -517,3 +517,12 @@ INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTem
 	}
 	return DialogBoxIndirectParamA(hInstance, hDialogTemplate, hWndParent, lpDialogFunc, lParamInit);
 }
+
+LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
+{
+	if (pSetWindowLongPtrW != NULL) {
+		return pSetWindowLongPtrW(hWnd, nIndex, dwNewLong);
+	}
+	return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
+}
+

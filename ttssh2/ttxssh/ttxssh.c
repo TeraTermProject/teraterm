@@ -2371,7 +2371,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 
 		{
 			wchar_t *strW = ToWcharU8(buf2);
-			SetDlgItemTextW(dlg, IDC_ABOUTTEXT, strW);
+			_SetDlgItemTextW(dlg, IDC_ABOUTTEXT, strW);
 			free(strW);
 		}
 	}
@@ -2495,7 +2495,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 		// Edit controlをサブクラス化する。
 		g_deltaSumAboutDlg = 0;
-		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtr(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
+		g_defAboutDlgEditWndProc = (WNDPROC)_SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
 		CenterWindow(dlg, GetParent(dlg));
 
