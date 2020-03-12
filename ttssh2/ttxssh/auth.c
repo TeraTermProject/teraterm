@@ -278,10 +278,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	// ”FØŽ¸”sŒã‚Íƒ‰ƒxƒ‹‚ð‘‚«Š·‚¦
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
-		UTIL_get_lang_msg("DLG_AUTH_BANNER2_FAILED", pvar, "Authentication failed. Please retry.");
-		SetDlgItemText(dlg, IDC_SSHAUTHBANNER2, pvar->ts->UIMsg);
-		UTIL_get_lang_msg("DLG_AUTH_TITLE_FAILED", pvar, "Retrying SSH Authentication");
-		SetWindowText(dlg, pvar->ts->UIMsg);
+		wchar_t uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
+		_SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
+		UTIL_get_lang_msgW("DLG_AUTH_TITLE_FAILED", pvar, L"Retrying SSH Authentication", uimsg);
+		_SetWindowTextW(dlg, uimsg);
 		default_method = pvar->auth_state.failed_method;
 	}
 

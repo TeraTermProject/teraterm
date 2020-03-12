@@ -326,6 +326,12 @@ void UTIL_get_lang_msgU8(const char *key, PTInstVar pvar, const char *def)
 	GetI18nStrU8("TTSSH", key, pvar->ts->UIMsg, MAX_UIMSG, def, UILanguageFile);
 }
 
+void UTIL_get_lang_msgW(const char *key, PTInstVar pvar, const wchar_t *def, wchar_t *UIMsg)
+{
+	const char *UILanguageFile = pvar->ts->UILanguageFile;
+	GetI18nStrW("TTSSH", key, UIMsg, MAX_UIMSG, def, UILanguageFile);
+}
+
 /*
  *	等幅フォントを取得
  *	@retval		フォントハンドル

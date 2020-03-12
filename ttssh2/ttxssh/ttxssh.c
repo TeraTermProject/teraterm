@@ -2542,12 +2542,6 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 	return FALSE;
 }
 
-void UTIL_get_lang_msgW(const char *key, wchar_t *UIMsg, const wchar_t *def)
-{
-	const char *UILanguageFile = pvar->ts->UILanguageFile;
-	GetI18nStrW("TTSSH", key, UIMsg, MAX_UIMSG, def, UILanguageFile);
-}
-
 static wchar_t *get_cipher_nameW(int cipher)
 {
 	typedef struct {
@@ -2587,8 +2581,8 @@ static wchar_t *get_cipher_nameW(int cipher)
 
 	if (cipher == SSH_CIPHER_NONE) {
 		wchar_t uimsg[MAX_UIMSG];
-		UTIL_get_lang_msgW("DLG_SSHSETUP_CIPHER_BORDER", uimsg,
-						   L"<ciphers below this line are disabled>");
+		UTIL_get_lang_msgW("DLG_SSHSETUP_CIPHER_BORDER", pvar,
+						   L"<ciphers below this line are disabled>", uimsg);
 		return _wcsdup(uimsg);
 	}
 	for (i = 0; i < _countof(list); p++,i++) {
@@ -2709,8 +2703,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.KexOrder[i] - '0';
 
 		if (index == 0)	{
-			UTIL_get_lang_msgW("DLG_SSHSETUP_KEX_BORDER", uimsg,
-							   L"<KEXs below this line are disabled>");
+			UTIL_get_lang_msgW("DLG_SSHSETUP_KEX_BORDER", pvar,
+							   L"<KEXs below this line are disabled>", uimsg);
 			_SendMessageW(kexControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_kex_algorithm_name(index);
@@ -2728,8 +2722,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.HostKeyOrder[i] - '0';
 
 		if (index == 0)	{
-			UTIL_get_lang_msgW("DLG_SSHSETUP_HOST_KEY_BORDER", uimsg,
-							   L"<Host Keys below this line are disabled>");
+			UTIL_get_lang_msgW("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
+							   L"<Host Keys below this line are disabled>", uimsg);
 			_SendMessageW(hostkeyControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_ssh_keytype_name(index);
@@ -2747,8 +2741,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.MacOrder[i] - '0';
 
 		if (index == 0)	{
-			UTIL_get_lang_msgW("DLG_SSHSETUP_MAC_BORDER", uimsg,
-							   L"<MACs below this line are disabled>");
+			UTIL_get_lang_msgW("DLG_SSHSETUP_MAC_BORDER", pvar,
+							   L"<MACs below this line are disabled>", uimsg);
 			_SendMessageW(macControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_ssh2_mac_name_by_id(index);
@@ -2766,8 +2760,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.CompOrder[i] - '0';
 
 		if (index == 0)	{
-			UTIL_get_lang_msgW("DLG_SSHSETUP_COMP_BORDER", uimsg,
-							   L"<Compression methods below this line are disabled>");
+			UTIL_get_lang_msgW("DLG_SSHSETUP_COMP_BORDER", pvar,
+							   L"<Compression methods below this line are disabled>", uimsg);
 			_SendMessageW(compControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_ssh2_comp_name(index);
@@ -2829,7 +2823,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 	// hostkey rotation(OpenSSH 6.8)
 	for (i = 0; i < SSH_UPDATE_HOSTKEYS_MAX; i++) {
-		UTIL_get_lang_msgW(rotationItemKey[i], uimsg, rotationItem[i]);
+		UTIL_get_lang_msgW(rotationItemKey[i], pvar, rotationItem[i], uimsg);
 		_SendMessageW(hostkeyRotationControlList, CB_INSERTSTRING, i, (LPARAM)uimsg);
 	}
 	ch = pvar->settings.UpdateHostkeys;
