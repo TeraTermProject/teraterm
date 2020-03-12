@@ -109,6 +109,7 @@ HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwDat
 int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
 int _GetWindowTextLengthW(HWND hWnd);
 LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
+LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);

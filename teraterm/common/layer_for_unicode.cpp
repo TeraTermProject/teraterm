@@ -526,3 +526,10 @@ LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
 	return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
 }
 
+LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	if (pCallWindowProcW != NULL) {
+		return pCallWindowProcW(lpPrevWndFunc, hWnd, Msg, wParam, lParam);
+	}
+	return CallWindowProcA(lpPrevWndFunc, hWnd, Msg, wParam, lParam);
+}

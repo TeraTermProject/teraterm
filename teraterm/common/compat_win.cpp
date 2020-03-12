@@ -68,6 +68,7 @@ HWND (WINAPI *pCreateDialogIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW 
 										   HWND hWndParent, DLGPROC lpDialogFunc,
 										   LPARAM dwInitParam);
 LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
+LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 // gdi32.lib
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -161,6 +162,7 @@ static const APIInfo Lists_user32[] = {
 	{ "GetWindowTextW", (void **)&pGetWindowTextW },
 	{ "GetWindowTextLengthW", (void **)&pGetWindowTextLengthW },
 	{ "SetWindowLongPtrW", (void **)&pSetWindowLongPtrW },
+	{ "CallWindowProcW", (void **)&pCallWindowProcW },
 #endif
 	{ "EnumDisplayMonitors", (void **)&pEnumDisplayMonitors },
 	{ "MonitorFromWindow", (void **)&pMonitorFromWindow },
