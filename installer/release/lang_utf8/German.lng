@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-09)
+﻿; Updated by TeraTerm Project (2020-03-12)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -812,7 +812,7 @@ MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=SICHERHEITSWARNUNG
-DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
+DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("%s") keinen Eintrag in der "known hosts"-Liste.
 DLG_UNKNOWNHOST_WARNING2=Wenn Sie auf 'Continue' klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_UNKNOWNHOST_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

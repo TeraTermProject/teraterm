@@ -56,6 +56,7 @@ See LICENSE.TXT for the license.
 
 #include "codeconv.h"
 #include "layer_for_unicode.h"
+#include "asprintf.h"
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
@@ -989,25 +990,16 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 {
 	wchar_t buf[MAX_UIMSG];
-	wchar_t buf2[2048];
-	size_t i, j;
-	wchar_t ch;
+	wchar_t *buf2;
 	wchar_t *hostW;
 
-	// static textの # 部分をホスト名に置換する
-	_GetDlgItemTextW(dlg, IDC_HOSTWARNING, buf, sizeof(buf));
-	for (i = 0; (ch = buf[i]) != 0 && ch != L'#'; i++) {
-		buf2[i] = ch;
-	}
+	// ホスト名に置換する
+	_GetDlgItemTextW(dlg, IDC_HOSTWARNING, buf, _countof(buf));
 	hostW = ToWcharA(pvar->hosts_state.prefetched_hostname);
-	wcsncpy_s(buf2 + i, _countof(buf2) - i, hostW, _TRUNCATE);
+	aswprintf(&buf2, buf, hostW);
 	free(hostW);
-	j = i + wcslen(buf2 + i);
-	for (; buf[i] == L'#'; i++) {
-	}
-	wcsncpy_s(buf2 + j, _countof(buf2) - j, buf + i, _TRUNCATE);
-
 	_SetDlgItemTextW(dlg, IDC_HOSTWARNING, buf2);
+	free(buf2);
 
 	pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
 	if (pvar->hFontFixed != NULL) {

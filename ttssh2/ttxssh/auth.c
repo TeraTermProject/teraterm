@@ -53,6 +53,7 @@
 #include "helpid.h"
 #include "codeconv.h"
 #include "layer_for_unicode.h"
+#include "asprintf.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 
@@ -186,14 +187,16 @@ static void set_auth_options_status(HWND dlg, int controlID)
 
 static void init_auth_machine_banner(PTInstVar pvar, HWND dlg)
 {
-	wchar_t buf[1024], buf2[1024];
+	wchar_t* buf;
+	wchar_t buf2[1024];
 	const char *host_name = SSH_get_host_name(pvar);
 	wchar_t *host_nameW = ToWcharA(host_name);
 
 	_GetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf2, _countof(buf2));
-	_snwprintf_s(buf, _countof(buf), _TRUNCATE, buf2, host_nameW);
+	aswprintf(&buf, buf2, host_nameW);
 	_SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf);
 	free(host_nameW);
+	free(buf);
 }
 
 static void update_server_supported_types(PTInstVar pvar, HWND dlg)

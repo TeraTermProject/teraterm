@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-09)
+﻿; Updated by TeraTerm Project (2020-03-12)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -812,7 +812,7 @@ MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=ALERTE DE SECURITE
-DLG_UNKNOWNHOST_WARNING=Il n'y a pas d'entrée pour le serveur "#####################################" dans votre liste d'hôtes connus. La machine que vous avez contactée pourrait être une machine hostile se faisant passer pour le serveur.
+DLG_UNKNOWNHOST_WARNING=Il n'y a pas d'entrée pour le serveur "%s" dans votre liste d'hôtes connus. La machine que vous avez contactée pourrait être une machine hostile se faisant passer pour le serveur.
 DLG_UNKNOWNHOST_WARNING2=Si vous choisissez d'ajouter cette machine à la liste d'hôtes connus et de continuer, vous ne recevrez plus cet avertissement.
 DLG_UNKNOWNHOST_FINGERPRINT=L'empreinte de la clé du serveur est:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

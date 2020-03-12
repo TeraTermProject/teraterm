@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-02-13)
+﻿; Updated by TeraTerm Project (2020-03-12)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -812,7 +812,7 @@ MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=보안 경고
-DLG_UNKNOWNHOST_WARNING=당신의 known-host 목록에는 서버 "#####################################" 항목이 없습니다. 당신이 접속한 컴퓨터는 그 서버를 흉내내는 악의적인 컴퓨터일 수 있습니다.
+DLG_UNKNOWNHOST_WARNING=당신의 known-host 목록에는 서버 "%s" 항목이 없습니다. 당신이 접속한 컴퓨터는 그 서버를 흉내내는 악의적인 컴퓨터일 수 있습니다.
 DLG_UNKNOWNHOST_WARNING2=known-host 목록에 이 컴퓨터를 추가하고 계속 진행하면 다시는 경고 메시지를 받지 않습니다.
 DLG_UNKNOWNHOST_FINGERPRINT=서버의 호스트키 지문은:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-11)
+﻿; Updated by TeraTerm Project (2020-03-12)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -808,7 +808,7 @@ MSG_PASSCHG_MISMATCH=新パスワードが一致しません.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=セキュリティ警告
-DLG_UNKNOWNHOST_WARNING=known hostsリストにサーバ"#####################################"のエントリはありません. 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください！
+DLG_UNKNOWNHOST_WARNING=known hostsリストにサーバ"%s"のエントリはありません. 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください！
 DLG_UNKNOWNHOST_WARNING2=known hostsリストのこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_UNKNOWNHOST_FINGERPRINT=サーバ側のホスト鍵指紋:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:

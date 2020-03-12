@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-09)
+﻿; Updated by TeraTerm Project (2020-03-12)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -808,7 +808,7 @@ MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=SECURITY WARNING
-DLG_UNKNOWNHOST_WARNING=There is no entry for the server "#####################################" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.
+DLG_UNKNOWNHOST_WARNING=There is no entry for the server "%s" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.
 DLG_UNKNOWNHOST_WARNING2=If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.
 DLG_UNKNOWNHOST_FINGERPRINT=The server's host key fingerprint is:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

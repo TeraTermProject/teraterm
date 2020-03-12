@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-09)
+﻿; Updated by TeraTerm Project (2020-03-12)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -809,7 +809,7 @@ MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=安全警告
-DLG_UNKNOWNHOST_WARNING=伺服器"#####################################"不再已知主機列表中。它可能是敵對伺服器偽裝的，請小心！
+DLG_UNKNOWNHOST_WARNING=伺服器"%s"不再已知主機列表中。它可能是敵對伺服器偽裝的，請小心！
 DLG_UNKNOWNHOST_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_UNKNOWNHOST_FINGERPRINT=伺服器端主機密鑰指紋：
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

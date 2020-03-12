@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-01-09)
+﻿; Updated by TeraTerm Project (2020-03-12)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -812,7 +812,7 @@ MSG_PASSCHG_MISMATCH=Ошибка, попробуйте еще раз
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
-DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "####################################" в списке известных хостов. Враждебный компьютер может притворяться сервером!
+DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "%s" в списке известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_UNKNOWNHOST_WARNING2=Если вы добавите этот компьютер в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_UNKNOWNHOST_FINGERPRINT=Ключ сервера хоста:
 DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Алгоритм хэширования:
