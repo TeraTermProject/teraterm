@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (c) 1998-2001, Robert O'Callahan
  * (c) 2004-2020 TeraTerm Project
  * All rights reserved.
@@ -105,11 +105,11 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 	case WM_CHAR:
 		if ((data->UseControlChar == NULL || *data->UseControlChar == TRUE) &&
 			(GetKeyState(VK_CONTROL) & 0x8000) != 0)
-		{	// §Œä•¶š‚ğg—p‚·‚é && CTRLƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é
-			TCHAR chars[] = { (TCHAR) wParam, 0 };
+		{	// åˆ¶å¾¡æ–‡å­—ã‚’ä½¿ç”¨ã™ã‚‹ && CTRLã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹
+			char chars[] = { (char) wParam, 0 };
 
-			SendMessage(control, EM_REPLACESEL, (WPARAM) TRUE,
-			            (LPARAM) (TCHAR *) chars);
+			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE,
+			             (LPARAM) (TCHAR *) chars);
 
 			if (data->tipwin == NULL) {
 				TCHAR uimsg[MAX_UIMSG];
@@ -137,8 +137,7 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		break;
 	}
 
-	result = CallWindowProc((WNDPROC)data->ProcOrg,
-							control, msg, wParam, lParam);
+	result = _CallWindowProcW(data->ProcOrg, control, msg, wParam, lParam);
 
 	if (msg == WM_NCDESTROY) {
 		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)data->ProcOrg);
@@ -157,8 +156,8 @@ void init_password_control(PTInstVar pvar, HWND dlg, int item, BOOL *UseControlC
 	data->pvar = pvar;
 	data->tipwin = NULL;
 	data->UseControlChar = UseControlChar;
-	SetWindowLongPtr(passwordControl, GWLP_WNDPROC, (LONG_PTR)password_wnd_proc);
-	SetWindowLongPtr(passwordControl, GWLP_USERDATA, (LONG_PTR)data);
+	_SetWindowLongPtrW(passwordControl, GWLP_WNDPROC, (LONG_PTR)password_wnd_proc);
+	_SetWindowLongPtrW(passwordControl, GWLP_USERDATA, (LONG_PTR)data);
 	SetFocus(passwordControl);
 }
 
@@ -278,7 +277,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, UseControlChar);
 
-	// ”FØ¸”sŒã‚Íƒ‰ƒxƒ‹‚ğ‘‚«Š·‚¦
+	// èªè¨¼å¤±æ•—å¾Œã¯ãƒ©ãƒ™ãƒ«ã‚’æ›¸ãæ›ãˆ
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
 		wchar_t uimsg[MAX_UIMSG];
@@ -289,17 +288,17 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		default_method = pvar->auth_state.failed_method;
 	}
 
-	// ƒpƒXƒ[ƒh‚ğŠo‚¦‚Ä‚¨‚­ƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚É‚ÍƒfƒtƒHƒ‹ƒg‚Å—LŒø‚Æ‚·‚é (2006.8.3 yutaka)
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’è¦šãˆã¦ãŠããƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã«ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§æœ‰åŠ¹ã¨ã™ã‚‹ (2006.8.3 yutaka)
 	if (pvar->ts_SSH->remember_password) {
 		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 
-	// ForwardAgent ‚Ìİ’è‚ğ”½‰f‚·‚é (2008.12.4 maya)
+	// ForwardAgent ã®è¨­å®šã‚’åæ˜ ã™ã‚‹ (2008.12.4 maya)
 	CheckDlgButton(dlg, IDC_FORWARD_AGENT, pvar->settings.ForwardAgent);
 
-	// SSH ƒo[ƒWƒ‡ƒ“‚É‚æ‚Á‚Ä TIS ‚Ìƒ‰ƒxƒ‹‚ğ‘‚«Š·‚¦
+	// SSH ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã«ã‚ˆã£ã¦ TIS ã®ãƒ©ãƒ™ãƒ«ã‚’æ›¸ãæ›ãˆ
 	if (pvar->settings.ssh_protocol_version == 1) {
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
 		                  "Use challenge/response(&TIS) to log in");
@@ -327,12 +326,12 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	else {
 		switch(pvar->session_settings.DefaultUserType) {
 		case 0:
-			// “ü—Í‚µ‚È‚¢
+			// å…¥åŠ›ã—ãªã„
 			break;
 		case 1:
 			// use DefaultUserName
 			if (pvar->session_settings.DefaultUserName[0] == 0) {
-				// u“ü—Í‚µ‚È‚¢v‚É‚µ‚Ä‚¨‚­
+				// ã€Œå…¥åŠ›ã—ãªã„ã€ã«ã—ã¦ãŠã
 				pvar->session_settings.DefaultUserType = 0;
 			} else {
 				SetDlgItemText(dlg, IDC_SSHUSERNAME,
@@ -349,7 +348,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 			break;
 		}
 		default:
-			// “ü—Í‚µ‚È‚¢‚É‚µ‚Ä‚¨‚­
+			// å…¥åŠ›ã—ãªã„ã«ã—ã¦ãŠã
 			pvar->session_settings.DefaultUserType = 0;
 		}
 	}
@@ -382,14 +381,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 			EnableWindow(GetDlgItem(dlg, IDC_RSAFILENAME), FALSE);
 		}
 
-	// /auth=challenge ‚ğ’Ç‰Á (2007.10.5 maya)
+	// /auth=challenge ã‚’è¿½åŠ  (2007.10.5 maya)
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSETIS);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
 
-	// /auth=pageant ‚ğ’Ç‰Á
+	// /auth=pageant ã‚’è¿½åŠ 
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPAGEANT);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
@@ -397,14 +396,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
 
 	} else {
-		// ƒfƒtƒHƒ‹ƒg‚Ì”FØƒƒ\ƒbƒh‚ğƒ_ƒCƒAƒƒO‚É”½‰f
+		// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«åæ˜ 
 		set_auth_options_status(dlg, auth_types_to_control_IDs[default_method]);
 
 		update_server_supported_types(pvar, dlg);
 
-		// ƒzƒXƒgŠm”Fƒ_ƒCƒAƒƒO‚©‚ç”²‚¯‚½‚Æ‚«=ƒEƒBƒ“ƒhƒE‚ªƒAƒNƒeƒBƒu‚É‚È‚Á‚½‚Æ‚«
-		// ‚É SetFocus ‚ªÀs‚³‚êAƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Å“n‚³‚ê‚½”FØ•û®‚ªã‘‚«‚³‚ê‚Ä
-		// ‚µ‚Ü‚¤‚Ì‚ÅA©“®ƒƒOƒCƒ“—LŒø‚Í SetFocus ‚µ‚È‚¢ (2009.1.31 maya)
+		// ãƒ›ã‚¹ãƒˆç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰æŠœã‘ãŸã¨ã=ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ãªã£ãŸã¨ã
+		// ã« SetFocus ãŒå®Ÿè¡Œã•ã‚Œã€ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã§æ¸¡ã•ã‚ŒãŸèªè¨¼æ–¹å¼ãŒä¸Šæ›¸ãã•ã‚Œã¦
+		// ã—ã¾ã†ã®ã§ã€è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³æœ‰åŠ¹æ™‚ã¯ SetFocus ã—ãªã„ (2009.1.31 maya)
 		if (default_method == SSH_AUTH_TIS) {
 			/* we disabled the password control, so fix the focus */
 			SetFocus(GetDlgItem(dlg, IDC_SSHUSETIS));
@@ -422,11 +421,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		SetFocus(GetDlgItem(dlg, IDC_SSHPASSWORD));
 	}
 
-	// '/I' w’è‚ª‚ ‚é‚Æ‚«‚Ì‚İÅ¬‰»‚·‚é (2005.9.5 yutaka)
+	// '/I' æŒ‡å®šãŒã‚ã‚‹ã¨ãã®ã¿æœ€å°åŒ–ã™ã‚‹ (2005.9.5 yutaka)
 	if (pvar->ts->Minimize) {
-		//20050822’Ç‰Á start T.Takahashi
+		//20050822è¿½åŠ  start T.Takahashi
 		ShowWindow(dlg,SW_MINIMIZE);
-		//20050822’Ç‰Á end T.Takahashi
+		//20050822è¿½åŠ  end T.Takahashi
 	}
 }
 
@@ -452,8 +451,8 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	ZeroMemory(&params, sizeof(params));
 	params.lStructSize = get_OPENFILENAME_SIZE();
 	params.hwndOwner = parent;
-	// ƒtƒBƒ‹ƒ^‚Ì’Ç‰Á (2004.12.19 yutaka)
-	// 3ƒtƒ@ƒCƒ‹ƒtƒBƒ‹ƒ^‚Ì’Ç‰Á (2005.4.26 yutaka)
+	// ãƒ•ã‚£ãƒ«ã‚¿ã®è¿½åŠ  (2004.12.19 yutaka)
+	// 3ãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚£ãƒ«ã‚¿ã®è¿½åŠ  (2005.4.26 yutaka)
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
 	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0id_ed25519(SSH2)\\0id_ed25519\\0PuTTY(*.ppk)\\0*.ppk\\0PEM files(*.pem)\\0*.pem\\0all(*.*)\\0*.*\\0\\0");
 	memcpy(filter, pvar->ts->UIMsg, sizeof(filter));
@@ -598,7 +597,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 				{
 					char buf[1024];
 
-					// ƒtƒ@ƒCƒ‹‚ªŠJ‚¯‚½ê‡‚Íƒtƒ@ƒCƒ‹Œ`®‚ª•s–¾‚Å‚à“Ç‚İ‚ñ‚Å‚İ‚é
+					// ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãŸå ´åˆã¯ãƒ•ã‚¡ã‚¤ãƒ«å½¢å¼ãŒä¸æ˜ã§ã‚‚èª­ã¿è¾¼ã‚“ã§ã¿ã‚‹
 					if (fp != NULL) {
 						key_pair = read_SSH2_private_key(pvar, fp, password,
 						                                 &invalid_passphrase,
@@ -613,8 +612,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 					                  "read error SSH2 private key file\r\n%s");
 					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, errmsg);
 					notify_nonfatal_error(pvar, buf);
-					// ‚±‚±‚É—ˆ‚½‚Æ‚¢‚¤‚±‚Æ‚Í SSH2 ”é–§Œ®ƒtƒ@ƒCƒ‹‚ªŠJ‚¯‚È‚¢‚Ì‚Å
-					// Œ®ƒtƒ@ƒCƒ‹‚Ì‘I‘ğƒ{ƒ^ƒ“‚ÉƒtƒH[ƒJƒX‚ğˆÚ‚·
+					// ã“ã“ã«æ¥ãŸã¨ã„ã†ã“ã¨ã¯ SSH2 ç§˜å¯†éµãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã„ã®ã§
+					// éµãƒ•ã‚¡ã‚¤ãƒ«ã®é¸æŠãƒœã‚¿ãƒ³ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’ç§»ã™
 					SetFocus(GetDlgItem(dlg, IDC_CHOOSERSAFILE));
 					destroy_malloced_string(&password);
 					return FALSE;
@@ -627,7 +626,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 				                  "read error SSH2 private key file\r\n%s");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, errmsg);
 				notify_nonfatal_error(pvar, buf);
-				// ƒpƒXƒtƒŒ[ƒY‚ªŒ®‚Æˆê’v‚µ‚È‚©‚Á‚½ê‡‚ÍIDC_SSHPASSWORD‚ÉƒtƒH[ƒJƒX‚ğˆÚ‚· (2006.10.29 yasuhide)
+				// ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºãŒéµã¨ä¸€è‡´ã—ãªã‹ã£ãŸå ´åˆã¯IDC_SSHPASSWORDã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’ç§»ã™ (2006.10.29 yasuhide)
 				if (invalid_passphrase) {
 					HWND passwordCtl = GetDlgItem(dlg, IDC_SSHPASSWORD);
 
@@ -651,7 +650,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->pageant_keycurrent = 0;
 		pvar->pageant_keyfinal=FALSE;
 
-		// Pageant ‚Æ’ÊM
+		// Pageant ã¨é€šä¿¡
 		if (SSHv1(pvar)) {
 			pvar->pageant_keylistlen = putty_get_ssh1_keylist(&pvar->pageant_key);
 		}
@@ -667,7 +666,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		}
 		pvar->pageant_curkey = pvar->pageant_key;
 
-		// Œ®‚Ì”
+		// éµã®æ•°
 		pvar->pageant_keycount = get_uint32_MSBfirst(pvar->pageant_curkey);
 		if (pvar->pageant_keycount == 0) {
 			UTIL_get_lang_msg("MSG_PAGEANT_NOKEY", pvar,
@@ -689,16 +688,16 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 	}
 
-	// ƒpƒXƒ[ƒh‚Ì•Û‘¶‚ğ‚·‚é‚©‚Ç‚¤‚©‚ğŒˆ‚ß‚é (2006.8.3 yutaka)
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®ä¿å­˜ã‚’ã™ã‚‹ã‹ã©ã†ã‹ã‚’æ±ºã‚ã‚‹ (2006.8.3 yutaka)
 	if (SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_GETCHECK, 0,0) == BST_CHECKED) {
-		pvar->settings.remember_password = 1;  // Šo‚¦‚Ä‚¨‚­
+		pvar->settings.remember_password = 1;  // è¦šãˆã¦ãŠã
 		pvar->ts_SSH->remember_password = 1;
 	} else {
-		pvar->settings.remember_password = 0;  // ‚±‚±‚Å‚·‚Á‚©‚è–Y‚ê‚é
+		pvar->settings.remember_password = 0;  // ã“ã“ã§ã™ã£ã‹ã‚Šå¿˜ã‚Œã‚‹
 		pvar->ts_SSH->remember_password = 0;
 	}
 
-	// ŒöŠJŒ®”FØ‚Ìê‡AƒZƒbƒVƒ‡ƒ“•¡»‚ÉƒpƒXƒ[ƒh‚ğg‚¢‰ñ‚µ‚½‚¢‚Ì‚Å‰ğ•ú‚µ‚È‚¢‚æ‚¤‚É‚·‚éB
+	// å…¬é–‹éµèªè¨¼ã®å ´åˆã€ã‚»ãƒƒã‚·ãƒ§ãƒ³è¤‡è£½æ™‚ã«ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ä½¿ã„å›ã—ãŸã„ã®ã§è§£æ”¾ã—ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚
 	// (2005.4.8 yutaka)
 	if (method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA) {
 		pvar->auth_state.cur_cred.password = password;
@@ -749,12 +748,12 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 }
 
 /**
- *	ƒNƒŠƒbƒvƒ{[ƒh‚©‚çANSI•¶š—ñ‚ğæ“¾‚·‚é
- *	•¶š—ñ’·‚ª•K—v‚È‚Æ‚«‚Ístrlen()‚·‚é‚±‚Æ
+ *	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰ANSIæ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹
+ *	æ–‡å­—åˆ—é•·ãŒå¿…è¦ãªã¨ãã¯strlen()ã™ã‚‹ã“ã¨
  *	@param	hWnd
- *	@param	emtpy	TRUE‚Ì‚Æ‚«ƒNƒŠƒbƒvƒ{[ƒh‚ğ‹ó‚É‚·‚é
- *	@retval	•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ g—pŒãfree()‚·‚é‚±‚Æ
- *			•¶š‚ª‚È‚¢(‚Ü‚½‚ÍƒGƒ‰[)‚ÍNULL
+ *	@param	emtpy	TRUEã®ã¨ãã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’ç©ºã«ã™ã‚‹
+ *	@retval	æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨
+ *			æ–‡å­—ãŒãªã„(ã¾ãŸã¯ã‚¨ãƒ©ãƒ¼æ™‚)ã¯NULL
  */
 char *GetClipboardTextA(HWND hWnd, BOOL empty)
 {
@@ -791,16 +790,17 @@ char *GetClipboardTextA(HWND hWnd, BOOL empty)
 static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 									  LPARAM lParam)
 {
-	const int IDC_TIMER1 = 300; // ©“®ƒƒOƒCƒ“‚ª—LŒø‚È‚Æ‚«
-	const int IDC_TIMER2 = 301; // ƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éƒƒ\ƒbƒh‚ğ©“®ƒ`ƒFƒbƒN(CheckAuthListFirst)
-	const int IDC_TIMER3 = 302; // challenge ‚Å ask4passwd ‚ÅCheckAuthListFirst ‚ª FALSE ‚Ì‚Æ‚«
-	const int autologin_timeout = 10; // ƒ~ƒŠ•b
+	const int IDC_TIMER1 = 300; // è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ãŒæœ‰åŠ¹ãªã¨ã
+	const int IDC_TIMER2 = 301; // ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’è‡ªå‹•ãƒã‚§ãƒƒã‚¯(CheckAuthListFirst)
+	const int IDC_TIMER3 = 302; // challenge ã§ ask4passwd ã§CheckAuthListFirst ãŒ FALSE ã®ã¨ã
+	const int autologin_timeout = 10; // ãƒŸãƒªç§’
 	PTInstVar pvar;
 	static BOOL autologin_sent_none;
 	static BOOL UseControlChar;
 	static BOOL ShowPassPhrase;
 	static HICON hIconDropdown;
 	static size_t username_str_len;
+	static wchar_t password_char;	// ä¼ã›å­—ã‚­ãƒ£ãƒ©ã‚¯ã‚¿
 	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -812,29 +812,30 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		UseControlChar = TRUE;
 		ShowPassPhrase = FALSE;
 		username_str_len = 0;
+		password_char = 0;
 		init_auth_dlg(pvar, dlg, &UseControlChar);
 
-		// "¥"‰æ‘œ‚ğƒZƒbƒg‚·‚é
+		// "â–¼"ç”»åƒã‚’ã‚»ãƒƒãƒˆã™ã‚‹
 		hIconDropdown = LoadImage(hInst, MAKEINTRESOURCE(IDI_DROPDOWN),
 								  IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
 		SendMessage(GetDlgItem(dlg, IDC_USERNAME_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
 		SendMessage(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
 
-		// SSH2 autologin‚ª—LŒø‚Ìê‡‚ÍAƒ^ƒCƒ}‚ğdŠ|‚¯‚éB (2004.12.1 yutaka)
+		// SSH2 autologinãŒæœ‰åŠ¹ã®å ´åˆã¯ã€ã‚¿ã‚¤ãƒã‚’ä»•æ›ã‘ã‚‹ã€‚ (2004.12.1 yutaka)
 		if (pvar->ssh2_autologin == 1) {
 			autologin_sent_none = FALSE;
 			SetTimer(dlg, IDC_TIMER1, autologin_timeout, 0);
 		}
 		else {
-			// ƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éƒƒ\ƒbƒh‚ğƒ`ƒFƒbƒN‚·‚éB(2007.9.24 maya)
-			// İ’è‚ª—LŒø‚ÅA‚Ü‚¾æ‚è‚És‚Á‚Ä‚¨‚ç‚¸Aƒ†[ƒU–¼‚ªŠm’è‚µ‚Ä‚¢‚é
+			// ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã€‚(2007.9.24 maya)
+			// è¨­å®šãŒæœ‰åŠ¹ã§ã€ã¾ã å–ã‚Šã«è¡Œã£ã¦ãŠã‚‰ãšã€ãƒ¦ãƒ¼ã‚¶åãŒç¢ºå®šã—ã¦ã„ã‚‹
 			if (pvar->session_settings.CheckAuthListFirst &&
 			    !pvar->tryed_ssh2_authlist &&
 			    GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) > 0) {
 				SetTimer(dlg, IDC_TIMER2, autologin_timeout, 0);
 			}
-			// /auth=challenge ‚Æ /ask4passwd ‚ªw’è‚³‚ê‚Ä‚¢‚Äƒ†[ƒU–¼‚ªŠm’è‚µ‚Ä‚¢‚é
-			// ê‡‚ÍAOK ƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚Ä TIS auth ƒ_ƒCƒAƒƒO‚ğo‚·
+			// /auth=challenge ã¨ /ask4passwd ãŒæŒ‡å®šã•ã‚Œã¦ã„ã¦ãƒ¦ãƒ¼ã‚¶åãŒç¢ºå®šã—ã¦ã„ã‚‹
+			// å ´åˆã¯ã€OK ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ã¦ TIS auth ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™
 			else if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
 			         pvar->ask4passwd &&
 			         GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) > 0) {
@@ -846,9 +847,9 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 	case WM_TIMER:
 		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
-		// ”FØ€”õ‚ª‚Å‚«‚Ä‚©‚çA”FØƒf[ƒ^‚ğ‘—M‚·‚éB‘‚·‚¬‚é‚ÆA—‚¿‚éB(2004.12.16 yutaka)
+		// èªè¨¼æº–å‚™ãŒã§ãã¦ã‹ã‚‰ã€èªè¨¼ãƒ‡ãƒ¼ã‚¿ã‚’é€ä¿¡ã™ã‚‹ã€‚æ—©ã™ãã‚‹ã¨ã€è½ã¡ã‚‹ã€‚(2004.12.16 yutaka)
 		if (wParam == IDC_TIMER1) {
-			// ©“®ƒƒOƒCƒ“‚Ì‚½‚ß
+			// è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã®ãŸã‚
 			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
 			    (pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
 				if (SSHv2(pvar) &&
@@ -857,27 +858,27 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 					if (!autologin_sent_none) {
 						autologin_sent_none = TRUE;
 
-						// ƒ_ƒCƒAƒƒO‚Ìƒ†[ƒU–¼‚ğæ“¾‚·‚é
+						// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ¦ãƒ¼ã‚¶åã‚’å–å¾—ã™ã‚‹
 						if (pvar->auth_state.user == NULL) {
 							pvar->auth_state.user =
 								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 						}
 
-						// CheckAuthListFirst ‚ª TRUE ‚Ì‚Æ‚«‚Í AuthList ‚ª‹A‚Á‚Ä‚«‚Ä‚¢‚È‚¢‚Æ
-						// IDOK ‚ğ‰Ÿ‚µ‚Ä‚ài‚Ü‚È‚¢‚Ì‚ÅA”FØƒƒ\ƒbƒh none ‚ğ‘—‚é (2008.10.12 maya)
+						// CheckAuthListFirst ãŒ TRUE ã®ã¨ãã¯ AuthList ãŒå¸°ã£ã¦ãã¦ã„ãªã„ã¨
+						// IDOK ã‚’æŠ¼ã—ã¦ã‚‚é€²ã¾ãªã„ã®ã§ã€èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ none ã‚’é€ã‚‹ (2008.10.12 maya)
 						do_SSH2_userauth(pvar);
 					}
 					//else {
-					//	none ‚ğ‘—‚Á‚Ä‚©‚ç‹A‚Á‚Ä‚­‚é‚Ü‚Å‘Ò‚Â
+					//	none ã‚’é€ã£ã¦ã‹ã‚‰å¸°ã£ã¦ãã‚‹ã¾ã§å¾…ã¤
 					//}
 				}
 				else {
-					// SSH1 ‚Ì‚Æ‚«
-					// ‚Ü‚½‚Í CheckAuthListFirst ‚ª FALSE ‚Ì‚Æ‚«
-					// ‚Ü‚½‚Í CheckAuthListFirst TRUE ‚ÅAauthlist ‚ª‹A‚Á‚Ä‚«‚½‚ ‚Æ
+					// SSH1 ã®ã¨ã
+					// ã¾ãŸã¯ CheckAuthListFirst ãŒ FALSE ã®ã¨ã
+					// ã¾ãŸã¯ CheckAuthListFirst TRUE ã§ã€authlist ãŒå¸°ã£ã¦ããŸã‚ã¨
 					KillTimer(dlg, IDC_TIMER1);
 
-					// ƒ_ƒCƒAƒƒO‚Ìƒ†[ƒU–¼‚ğæ“¾‚·‚é
+					// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ¦ãƒ¼ã‚¶åã‚’å–å¾—ã™ã‚‹
 					if (pvar->auth_state.user == NULL) {
 						pvar->auth_state.user =
 							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
@@ -888,38 +889,38 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			}
 		}
 		else if (wParam == IDC_TIMER2) {
-			// authlist ‚ğ“¾‚é‚½‚ß
+			// authlist ã‚’å¾—ã‚‹ãŸã‚
 			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
 			    (pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
 				if (SSHv2(pvar)) {
 					KillTimer(dlg, IDC_TIMER2);
 
-					// ƒ_ƒCƒAƒƒO‚Ìƒ†[ƒU–¼‚ğæ“¾‚·‚é
+					// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ¦ãƒ¼ã‚¶åã‚’å–å¾—ã™ã‚‹
 					if (pvar->auth_state.user == NULL) {
 						pvar->auth_state.user =
 							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 					}
 
-					// ƒ†[ƒU–¼‚ğ•ÏX‚³‚¹‚È‚¢
+					// ãƒ¦ãƒ¼ã‚¶åã‚’å¤‰æ›´ã•ã›ãªã„
 					EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 					EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
 
-					// ”FØƒƒ\ƒbƒh none ‚ğ‘—‚é
+					// èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ none ã‚’é€ã‚‹
 					do_SSH2_userauth(pvar);
 
-					// TIS —p‚É OK ‚ğ‰Ÿ‚·‚Ì‚Í”FØ‚É¸”s‚µ‚½‚ ‚Æ‚É‚µ‚È‚¢‚Æ
-					// Unexpected SSH2 message ‚É‚È‚éB
+					// TIS ç”¨ã« OK ã‚’æŠ¼ã™ã®ã¯èªè¨¼ã«å¤±æ•—ã—ãŸã‚ã¨ã«ã—ãªã„ã¨
+					// Unexpected SSH2 message ã«ãªã‚‹ã€‚
 				}
 				else if (SSHv1(pvar)) {
 					KillTimer(dlg, IDC_TIMER2);
 
-					// TIS —p‚É OK ‚ğ‰Ÿ‚·
+					// TIS ç”¨ã« OK ã‚’æŠ¼ã™
 					if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
 						SendMessage(dlg, WM_COMMAND, IDOK, 0);
 					}
-					// SSH1 ‚Å‚Í”FØƒƒ\ƒbƒh none ‚ğ‘—‚ç‚È‚¢
+					// SSH1 ã§ã¯èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ none ã‚’é€ã‚‰ãªã„
 				}
-				// ƒvƒƒgƒRƒ‹ƒo[ƒWƒ‡ƒ“Šm’è‘O‚Í‰½‚à‚µ‚È‚¢
+				// ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ç¢ºå®šå‰ã¯ä½•ã‚‚ã—ãªã„
 			}
 		}
 		else if (wParam == IDC_TIMER3) {
@@ -928,10 +929,10 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				if (SSHv2(pvar) || SSHv1(pvar)) {
 					KillTimer(dlg, IDC_TIMER3);
 
-					// TIS —p‚É OK ‚ğ‰Ÿ‚·
+					// TIS ç”¨ã« OK ã‚’æŠ¼ã™
 					SendMessage(dlg, WM_COMMAND, IDOK, 0);
 				}
-				// ƒvƒƒgƒRƒ‹ƒo[ƒWƒ‡ƒ“Šm’è‘O‚Í‰½‚à‚µ‚È‚¢
+				// ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ç¢ºå®šå‰ã¯ä½•ã‚‚ã—ãªã„
 			}
 		}
 		return FALSE;
@@ -941,12 +942,12 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			// ”FØ’†‚ÉƒT[ƒo‚©‚çØ’f‚³‚ê‚½ê‡‚ÍAƒLƒƒƒ“ƒZƒ‹ˆµ‚¢‚Æ‚·‚éB(2014.3.31 yutaka)
+			// èªè¨¼ä¸­ã«ã‚µãƒ¼ãƒã‹ã‚‰åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã¯ã€ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ‰±ã„ã¨ã™ã‚‹ã€‚(2014.3.31 yutaka)
 			if (!pvar->cv->Ready) {
 				goto canceled;
 			}
 
-			// ”FØ€”õ‚ª‚Å‚«‚Ä‚©‚çA”FØƒf[ƒ^‚ğ‘—M‚·‚éB‘‚·‚¬‚é‚ÆA—‚¿‚éB(2001.1.25 yutaka)
+			// èªè¨¼æº–å‚™ãŒã§ãã¦ã‹ã‚‰ã€èªè¨¼ãƒ‡ãƒ¼ã‚¿ã‚’é€ä¿¡ã™ã‚‹ã€‚æ—©ã™ãã‚‹ã¨ã€è½ã¡ã‚‹ã€‚(2001.1.25 yutaka)
 			if (pvar->userauth_retry_count == 0 &&
 				((pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) ||
 				 !(pvar->ssh_state.status_flags & STATUS_HOST_OK))) {
@@ -955,8 +956,8 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			else if (SSHv2(pvar) &&
 			         pvar->session_settings.CheckAuthListFirst &&
 			         !pvar->tryed_ssh2_authlist) {
-				// CheckAuthListFirst ‚ª—LŒø‚Å”FØ•û®‚ª—ˆ‚Ä‚¢‚È‚¢‚Æ‚«‚Í
-				// OK ‚ğ‰Ÿ‚¹‚È‚¢‚æ‚¤‚É‚·‚é (2008.10.4 maya)
+				// CheckAuthListFirst ãŒæœ‰åŠ¹ã§èªè¨¼æ–¹å¼ãŒæ¥ã¦ã„ãªã„ã¨ãã¯
+				// OK ã‚’æŠ¼ã›ãªã„ã‚ˆã†ã«ã™ã‚‹ (2008.10.4 maya)
 				return FALSE;
 			}
 
@@ -970,7 +971,7 @@ canceled:
 			return TRUE;
 
 		case IDCLOSE:
-			// ”FØ’†‚Éƒlƒbƒgƒ[ƒNØ’f‚³‚ê‚½ê‡A“–ŠYƒƒbƒZ[ƒW‚Åƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚éB
+			// èªè¨¼ä¸­ã«ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã€å½“è©²ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã§ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ã‚‹ã€‚
 			pvar->auth_state.auth_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
@@ -978,29 +979,29 @@ canceled:
 		case IDC_SSHUSERNAME:
 			switch (HIWORD(wParam)) {
 			case EN_KILLFOCUS: {
-				// ƒ†[ƒU–¼‚ªƒtƒH[ƒJƒX‚ğ¸‚Á‚½‚Æ‚« (2007.9.29 maya)
+				// ãƒ¦ãƒ¼ã‚¶åãŒãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¤±ã£ãŸã¨ã (2007.9.29 maya)
 				if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
 					(pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
-					// İ’è‚ª—LŒø‚Å‚Ü‚¾æ‚è‚És‚Á‚Ä‚¢‚È‚¢‚È‚ç
+					// è¨­å®šãŒæœ‰åŠ¹ã§ã¾ã å–ã‚Šã«è¡Œã£ã¦ã„ãªã„ãªã‚‰
 					if (SSHv2(pvar) &&
 						pvar->session_settings.CheckAuthListFirst &&
 						!pvar->tryed_ssh2_authlist) {
-						// ƒ_ƒCƒAƒƒO‚Ìƒ†[ƒU–¼‚ğ”½‰f
+						// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ¦ãƒ¼ã‚¶åã‚’åæ˜ 
 						if (pvar->auth_state.user == NULL) {
 							pvar->auth_state.user =
 								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 						}
 
-						// ƒ†[ƒU–¼‚ª“ü—Í‚³‚ê‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚·‚é
+						// ãƒ¦ãƒ¼ã‚¶åãŒå…¥åŠ›ã•ã‚Œã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 						if (strlen(pvar->auth_state.user) == 0) {
 							return FALSE;
 						}
 
-						// ƒ†[ƒU–¼‚ğ•ÏX‚³‚¹‚È‚¢
+						// ãƒ¦ãƒ¼ã‚¶åã‚’å¤‰æ›´ã•ã›ãªã„
 						EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 						EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
 
-						// ”FØƒƒ\ƒbƒh none ‚ğ‘—‚é
+						// èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ none ã‚’é€ã‚‹
 						do_SSH2_userauth(pvar);
 						return TRUE;
 					}
@@ -1008,23 +1009,23 @@ canceled:
 				return FALSE;
 			}
 			case EN_CHANGE: {
-				// ƒ†[ƒU[–¼‚ª“ü—Í‚³‚ê‚Ä‚¢‚½ê‡AƒIƒvƒVƒ‡ƒ“‚ğg‚¤‚±‚Æ‚Í‚È‚¢‚Ì‚ÅA
-				// tab‚Å‚ÌƒtƒH[ƒJƒXˆÚ“®AƒIƒvƒVƒ‡ƒ“ƒ{ƒ^ƒ“‚ğƒpƒX‚·‚é‚æ‚¤‚É‚·‚é
-				// ]—ˆ‚Æ“¯‚¶ƒL[‘€ì‚Åƒ†[ƒU[–¼‚ÆƒpƒXƒtƒŒ[ƒY‚ğ“ü—Í‰Â”\‚Æ‚·‚é
+				// ãƒ¦ãƒ¼ã‚¶ãƒ¼åãŒå…¥åŠ›ã•ã‚Œã¦ã„ãŸå ´åˆã€ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’ä½¿ã†ã“ã¨ã¯ãªã„ã®ã§ã€
+				// tabã§ã®ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•æ™‚ã€ã‚ªãƒ—ã‚·ãƒ§ãƒ³ãƒœã‚¿ãƒ³ã‚’ãƒ‘ã‚¹ã™ã‚‹ã‚ˆã†ã«ã™ã‚‹
+				// å¾“æ¥ã¨åŒã˜ã‚­ãƒ¼æ“ä½œã§ãƒ¦ãƒ¼ã‚¶ãƒ¼åã¨ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºã‚’å…¥åŠ›å¯èƒ½ã¨ã™ã‚‹
 				HWND hWnd = (HWND)lParam;
 				const int len = GetWindowTextLength(hWnd);
 				if ((username_str_len == 0 && len != 0) ||
 					(username_str_len != 0 && len == 0)) {
-					// ƒ†[ƒU[–¼‚Ì•¶š’·‚ª 0‚É‚È‚é or 0‚Å‚Í‚È‚­‚È‚é ‚Ì‚İˆ—
+					// ãƒ¦ãƒ¼ã‚¶ãƒ¼åã®æ–‡å­—é•·ãŒ 0ã«ãªã‚‹ or 0ã§ã¯ãªããªã‚‹ æ™‚ã®ã¿å‡¦ç†
 					const HWND hWndOption = GetDlgItem(dlg, IDC_USERNAME_OPTION);
 					LONG_PTR style = GetWindowLongPtr(hWndOption, GWL_STYLE);
 
 					if (len > 0) {
-						// •s—vtabstop
+						// ä¸è¦tabstop
 						style = style & (~(LONG_PTR)WS_TABSTOP);
 					}
 					else {
-						// —vtabstop
+						// è¦tabstop
 						style = style | WS_TABSTOP;
 					}
 					SetWindowLongPtr(hWndOption, GWL_STYLE, style);
@@ -1052,7 +1053,7 @@ canceled:
 			return TRUE;
 
 		case IDC_FORWARD_AGENT:
-			// ‚±‚ÌƒZƒbƒVƒ‡ƒ“‚É‚Ì‚İ”½‰f‚³‚ê‚é (2008.12.4 maya)
+			// ã“ã®ã‚»ãƒƒã‚·ãƒ§ãƒ³ã«ã®ã¿åæ˜ ã•ã‚Œã‚‹ (2008.12.4 maya)
 			pvar->session_settings.ForwardAgent = IsDlgButtonChecked(dlg, IDC_FORWARD_AGENT);
 			return TRUE;
 
@@ -1092,7 +1093,7 @@ canceled:
 			switch(result) {
 			case 1:
 			case 2: {
-				// ƒNƒŠƒbƒvƒ{[ƒh‚©‚çƒy[ƒXƒg
+				// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰ãƒšãƒ¼ã‚¹ãƒˆ
 				BOOL clear_clipboard = result == 2;
 				clipboard = GetClipboardTextA(dlg, clear_clipboard);
 				if (clipboard != NULL) {
@@ -1105,36 +1106,23 @@ canceled:
 				return TRUE;
 			}
 			case 3:
-				// §ŒäƒR[ƒhg—p/–¢g—p
+				// åˆ¶å¾¡ã‚³ãƒ¼ãƒ‰ä½¿ç”¨/æœªä½¿ç”¨
 				UseControlChar = !UseControlChar;
 				break;
 			case 4:
-				// ƒpƒXƒtƒŒ[ƒY•\¦/”ñ•\¦
+				// ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºè¡¨ç¤º/éè¡¨ç¤º
 				ShowPassPhrase = !ShowPassPhrase;
 				{
-					// •š‚¹š on/off ‚ğØ‚è‘Ö‚¦‚é
+					// ä¼ã›å­— on/off ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
 					HWND hWnd = GetDlgItem(dlg, IDC_SSHPASSWORD);
-					static wchar_t password_char;
 					if (password_char == 0) {
-						wchar_t c = (wchar_t)SendMessage(hWnd, EM_GETPASSWORDCHAR, 0, 0);
-						password_char = c;
+						password_char = (wchar_t)_SendMessageW(hWnd, EM_GETPASSWORDCHAR, 0, 0);
 					}
 					if (ShowPassPhrase) {
-						SendMessage(hWnd, EM_SETPASSWORDCHAR, 0, 0);
+						_SendMessageW(hWnd, EM_SETPASSWORDCHAR, 0, 0);
 					} else {
-#if !defined(UNICODE)
-						if (password_char < 0x100) {
-							SendMessageA(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
-						} else {
-							// TODO WŒn’¼ŒÄ‚Ñ «‚¤‚Ü‚­‚¢‚©‚È‚¢
-							//SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
-							SendMessageA(hWnd, EM_SETPASSWORDCHAR, (WPARAM)'*', 0);
-						}
-#else
-						SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
-#endif
+						_SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
 					}
-					//InvalidateRect(hWnd, NULL, TRUE);
 					SendDlgItemMessage(dlg, IDC_SSHPASSWORD, EM_SETSEL, 0, -1);
 					SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHPASSWORD), TRUE);
 					return TRUE;
@@ -1217,8 +1205,8 @@ int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 	} else {
 		// for SSH2(yutaka)
 //		types &= (1 << SSH_AUTH_PASSWORD);
-		// ŒöŠJŒ®”FØ‚ğ—LŒø‚É‚·‚é (2004.12.18 yutaka)
-		// TIS‚ğ’Ç‰ÁBSSH2‚Å‚Íkeyboard-interactive‚Æ‚µ‚Äˆµ‚¤B(2005.3.12 yutaka)
+		// å…¬é–‹éµèªè¨¼ã‚’æœ‰åŠ¹ã«ã™ã‚‹ (2004.12.18 yutaka)
+		// TISã‚’è¿½åŠ ã€‚SSH2ã§ã¯keyboard-interactiveã¨ã—ã¦æ‰±ã†ã€‚(2005.3.12 yutaka)
 		types &= (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA)
 		       | (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
 	}
@@ -1241,7 +1229,7 @@ int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 
 static void start_user_auth(PTInstVar pvar)
 {
-	// ”FØƒ_ƒCƒAƒƒO‚ğ•\¦‚³‚¹‚é (2004.12.1 yutaka)
+	// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã•ã›ã‚‹ (2004.12.1 yutaka)
 	PostMessage(pvar->NotificationWindow, WM_COMMAND, (WPARAM) ID_SSHAUTH,
 				(LPARAM) NULL);
 	pvar->auth_state.cur_cred.method = SSH_AUTH_NONE;
@@ -1337,14 +1325,14 @@ void AUTH_advance_to_next_cred(PTInstVar pvar)
 				pvar->auth_state.flags |=
 					AUTH_START_USER_AUTH_ON_ERROR_END;
 			} else {
-				// ‚±‚±‚Å”FØƒ_ƒCƒAƒƒO‚ğoŒ»‚³‚¹‚é (2004.12.1 yutaka)
-				// ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“w’è‚È‚µ‚Ìê‡
+				// ã“ã“ã§èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºç¾ã•ã›ã‚‹ (2004.12.1 yutaka)
+				// ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³æŒ‡å®šãªã—ã®å ´åˆ
 				start_user_auth(pvar);
 			}
 		}
 	} else {
-		// ‚±‚±‚Å”FØƒ_ƒCƒAƒƒO‚ğoŒ»‚³‚¹‚é (2004.12.1 yutaka)
-		// ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“w’è‚ ‚è(/auth=xxxx)‚Ìê‡
+		// ã“ã“ã§èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºç¾ã•ã›ã‚‹ (2004.12.1 yutaka)
+		// ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³æŒ‡å®šã‚ã‚Š(/auth=xxxx)ã®å ´åˆ
 		start_user_auth(pvar);
 	}
 }
@@ -1410,7 +1398,7 @@ static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		init_TIS_dlg(pvar, dlg);
 
-		// /auth=challenge ‚ğ’Ç‰Á (2007.10.5 maya)
+		// /auth=challenge ã‚’è¿½åŠ  (2007.10.5 maya)
 		if (pvar->ssh2_autologin == 1) {
 			SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
 			SendMessage(dlg, WM_COMMAND, IDOK, 0);
@@ -1433,7 +1421,7 @@ static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 
 		case IDCLOSE:
-			// ”FØ’†‚Éƒlƒbƒgƒ[ƒNØ’f‚³‚ê‚½ê‡A“–ŠYƒƒbƒZ[ƒW‚Åƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚éB
+			// èªè¨¼ä¸­ã«ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã€å½“è©²ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã§ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ã‚‹ã€‚
 			pvar->auth_state.auth_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
@@ -1549,7 +1537,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 
 	if (pvar->settings.DefaultUserType == 1 &&
 		pvar->session_settings.DefaultUserName[0] == 0) {
-		// ‹ó‚È‚Ì‚Åu“ü—Í‚µ‚È‚¢v‚É‚µ‚Ä‚¨‚­
+		// ç©ºãªã®ã§ã€Œå…¥åŠ›ã—ãªã„ã€ã«ã—ã¦ãŠã
 		pvar->settings.DefaultUserType = 0;
 	}
 	id = pvar->settings.DefaultUserType == 1 ? IDC_SSH_DEFAULTUSERNAME :
@@ -1763,11 +1751,11 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				strncat_s(dest, len, buf, _TRUNCATE);
 			}
 		} else { 
-			// SSH2:”FØƒƒ\ƒbƒh‚Ì”»•Ê (2004.12.23 yutaka)
-			// keyboard-interactiveƒƒ\ƒbƒh‚ğ’Ç‰Á (2005.3.12 yutaka)
+			// SSH2:èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ã®åˆ¤åˆ¥ (2004.12.23 yutaka)
+			// keyboard-interactiveãƒ¡ã‚½ãƒƒãƒ‰ã‚’è¿½åŠ  (2005.3.12 yutaka)
 			if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD ||
 				pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-				// keyboard-interactiveƒƒ\ƒbƒh‚ğ’Ç‰Á (2005.1.24 yutaka)
+				// keyboard-interactiveãƒ¡ã‚½ãƒƒãƒ‰ã‚’è¿½åŠ  (2005.1.24 yutaka)
 				if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 					method = "keyboard-interactive";
 				} else {
@@ -1828,9 +1816,9 @@ void AUTH_notify_disconnecting(PTInstVar pvar)
 	}
 }
 
-// TCPƒZƒbƒVƒ‡ƒ“‚ªƒNƒ[ƒY‚³‚ê‚½ê‡A”FØƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚é‚æ‚¤‚Éw¦‚ğo‚·B
-// AUTH_notify_disconnecting()‚Æ‚ÍˆÙ‚È‚èAƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚é‚Ì‚İ‚ÅA
-// SSHƒT[ƒo‚É’Ê’m‚Ío‚³‚È‚¢B
+// TCPã‚»ãƒƒã‚·ãƒ§ãƒ³ãŒã‚¯ãƒ­ãƒ¼ã‚ºã•ã‚ŒãŸå ´åˆã€èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ã‚‹ã‚ˆã†ã«æŒ‡ç¤ºã‚’å‡ºã™ã€‚
+// AUTH_notify_disconnecting()ã¨ã¯ç•°ãªã‚Šã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ã‚‹ã®ã¿ã§ã€
+// SSHã‚µãƒ¼ãƒã«é€šçŸ¥ã¯å‡ºã•ãªã„ã€‚
 void AUTH_notify_closing_on_exit(PTInstVar pvar)
 {
 	if (pvar->auth_state.auth_dialog != NULL) {
