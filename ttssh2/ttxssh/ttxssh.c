@@ -2366,8 +2366,10 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 		}
 
 		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
-		strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
-		free(fp);
+		if (fp != NULL) {
+			strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
+			free(fp);
+		}
 
 		{
 			wchar_t *strW = ToWcharU8(buf2);
