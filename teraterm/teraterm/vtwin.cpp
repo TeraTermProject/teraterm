@@ -1898,8 +1898,6 @@ void CVTWindow::OnDestroy()
 	}
 	CommClose(&cv);
 
-	OpenHelp(HH_CLOSE_ALL, 0, ts.UILanguageFile);
-
 	FreeIME(HVTWin);
 	FreeTTSET();
 #if 0	// free‚ÉŽ¸”s‚·‚é‚Ü‚Åfree‚µ‘±‚¯‚é

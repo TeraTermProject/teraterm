@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,8 @@
 #include "teraterm_conf.h"
 
 #include <crtdbg.h>
-#include <tchar.h>
+#include <windows.h>
+#include <htmlhelp.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -61,6 +62,8 @@
 static BOOL AddFontFlag;
 static TCHAR TSpecialFont[MAX_PATH];
 static CVTWindow* pVTWin;
+static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+static DWORD HtmlHelpCookie;
 
 static void LoadSpecialFont()
 {
@@ -290,6 +293,20 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 	return TRUE;
 }
 
+static void GetHtmlHelpAdr()
+{
+	HINSTANCE hDll;
+	TCHAR dllName[MAX_PATH];
+	GetSystemDirectory(dllName, _countof(dllName));
+	_tcscat_s(dllName, _countof(dllName), _T("\\hhctrl.ocx"));
+	hDll = LoadLibrary(dllName);
+	if (hDll == NULL) {
+		return;
+	}
+	void **func = (void **)&pHtmlHelp;
+	*func = (void *)GetProcAddress(hDll, "HtmlHelpA");
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -300,6 +317,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 	init();
+	GetHtmlHelpAdr();
+	if (pHtmlHelp != NULL) {
+		pHtmlHelp(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
+	}
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
@@ -372,6 +393,11 @@ exit_message_loop:
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;
+
+	if (pHtmlHelp != NULL) {
+		pHtmlHelp(NULL, NULL, HH_CLOSE_ALL, 0);
+		pHtmlHelp(NULL, NULL, HH_UNINITIALIZE, HtmlHelpCookie);
+	}
 
 	UnloadSpecialFont();
 	DLLExit();
