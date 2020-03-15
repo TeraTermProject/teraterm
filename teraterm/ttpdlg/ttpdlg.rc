@@ -226,7 +226,7 @@ BEGIN
     ICON            "",IDC_TT_ICON,6,9,20,20
     CONTROL         "Tera Term",IDC_TT_PRO,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,38,4,100,8
     LTEXT           "Version",IDC_TT_VERSION,38,13,100,8
-    CONTROL         "(C) 2004-2019 TeraTerm Project",IDC_PROJECT_LABEL,
+    CONTROL         "(C) 2004-2020 TeraTerm Project",IDC_PROJECT_LABEL,
                     "Static",SS_LEFTNOWORDWRAP | WS_GROUP,43,22,135,8
     LTEXT           "Includes:",IDC_INLUCDE_LABEL,38,38,140,8
     CONTROL         "Tera Term Pro version 2.3",IDC_TT23_LABEL,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,38,47,140,8
