@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -5819,21 +5819,31 @@ static void UnicodeToCP932(unsigned int code)
 		else
 			LineEnd = CursorRightM;
 
-
+		// Wrap処理、カーソル移動
 		if (Wrap) {
-			TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
-			t.Attr |= AttrLineContinued;
-			t.AttrEx = t.Attr;
-			BuffSetCursorCharAttr(CursorX, CursorY, t);
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			CharAttrTmp.Attr |= AttrLineContinued;
-			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+			// 現在 Wrap 状態
+			if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
+				// 文字コードが結合文字ではない = カーソルが移動する
+
+				// カーソル位置に行継続アトリビュートを追加
+				TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+				t.Attr |= AttrLineContinued;
+				t.AttrEx = t.Attr;
+				BuffSetCursorCharAttr(CursorX, CursorY, t);
+
+				// 行継続アトリビュートをつける
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+
+				// 次の行の行頭へ
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
 		}
 
+		// バッファに文字を入れる
 		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
 		//		エラー時はカーソル位置を検討する
-		Wrap = FALSE;
 		is_update = FALSE;
 		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 	retry:
@@ -5856,6 +5866,7 @@ static void UnicodeToCP932(unsigned int code)
 				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
 				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
 
+				// 次の行の行頭へ
 				CarriageReturn(FALSE);
 				LineFeed(LF,FALSE);
 			}
@@ -5868,8 +5879,9 @@ static void UnicodeToCP932(unsigned int code)
 			goto retry;
 		}
 		else if (r == 0) {
-			// カーソルの移動なし,合字など
-			;
+			// カーソルの移動なし,結合文字,合字など
+			// Wrap は変化しない
+			UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
 		} else if (r == 1) {
 			// 半角(1セル)
 			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
@@ -5877,6 +5889,7 @@ static void UnicodeToCP932(unsigned int code)
 				Wrap = AutoWrapMode;
 			} else {
 				MoveRight();
+				Wrap = FALSE;
 			}
 		} else if (r == 2) {
 			// 全角(2セル)
@@ -5887,6 +5900,7 @@ static void UnicodeToCP932(unsigned int code)
 			} else {
 				MoveRight();
 				MoveRight();
+				Wrap = FALSE;
 			}
 		}
 		else {

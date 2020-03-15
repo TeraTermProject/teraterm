@@ -3282,6 +3282,61 @@ static wchar_t *GetWCS(const buff_char_t *b)
 #endif	// #if UNICODE_INTERNAL_BUFF
 
 /**
+ *	(x,y)にu32を入れるとき、結合するか?
+ *	@param[in,out]	combine		TRUE/FALSE	文字コード的には結合する/しない
+ *								NULL 結果を返さない
+ *	@return	結合する前の文字へのポインタ(1 or 2セル前)
+ *	@return	NULL	結合しない
+ */
+static buff_char_t *IsCombiningChar(int x, int y, unsigned int u32, BOOL *combine)
+{
+	buff_char_t *p = NULL;  // NULLのとき、前の文字はない
+	LONG LinePtr = GetLinePtr(PageStart+y);
+	buff_char_t *CodeLineW = &CodeBuffW[LinePtr];
+
+	// TRUE = 文字コード的には結合する
+	//		VariationSelector or
+	//		CombiningCharacter or
+	//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d)
+	BOOL combine_char = UnicodeIsVariationSelector(u32) || UnicodeIsCombiningCharacter(u32) || (u32 == 0x200d);
+	if (combine != NULL) {
+		*combine = combine_char;
+	}
+
+	if (x >= 1 && !IsBuffPadding(&CodeLineW[x - 1])) {
+		// 1セル前
+		p = &CodeLineW[x - 1];
+	}
+	else if (x >= 2 && !IsBuffPadding(&CodeLineW[x - 2])) {
+		// 2セル前
+		p = &CodeLineW[x - 2];
+	}
+	else {
+		// 前のもじはない
+		p = NULL;
+	}
+
+	// 1つ前のセルあり?
+	if (p == NULL) {
+		// 前がないので結合できない
+		return NULL;
+	}
+
+	// 結合する?
+	// 		1つ前が ZWJ
+	if (combine_char || (p->u32_last == 0x200d)) {
+		return p;
+	}
+	return NULL;
+}
+
+BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32)
+{
+	buff_char_t *p = IsCombiningChar(x, y, u32, NULL);
+	return p != NULL;
+}
+
+/**
  *	ユニコードキャラクタを1文字バッファへ入力する
  *	@param[in]	u32		unicode character(UTF-32)
  *	@param[in]	Attr	attributes
@@ -3295,6 +3350,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	int move_x = 0;
 	static BOOL show_str_change = FALSE;
 	buff_char_t *p;
+	BOOL CombiningChar;
 
 	assert(Attr.Attr == (Attr.AttrEx & 0xff));
 
@@ -3330,39 +3386,48 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		Attr.Attr |= AttrLineContinued;
 	}
 
-	p = NULL;  // NULLのとき、前の文字はない
-	// 前の文字
-	if (CursorX >= 1 && !IsBuffPadding(&CodeLineW[CursorX - 1])) {
-		p = &CodeLineW[CursorX - 1];
-	}
-	else if (CursorX >= 2 && !IsBuffPadding(&CodeLineW[CursorX - 2])) {
-		p = &CodeLineW[CursorX - 2];
-	}
-
-	if (UnicodeIsVariationSelector(u32) || UnicodeIsCombiningCharacter(u32) || (u32 == 0x200d) ||
-		(p != NULL && p->u32_last == 0x200d)) {
-		// Combining
-		//		VariationSelector or
-		//		CombiningCharacter or
-		//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d) or
-		//		1つ前が ZWJ
+	// 結合文字?
+	CombiningChar = FALSE;
+	p = IsCombiningChar(CursorX, CursorY, u32, &CombiningChar);
+	if (p != NULL || CombiningChar == TRUE) {
+		// 結合する
 		move_x = 0;  // カーソル移動量=0
 
 		if (p == NULL) {
-			// 前がないのにくっつく文字が出てきたとき
+			// 前がないのに結合文字が出てきたとき
 			// とりあえずスペースにくっつける
 			p = &CodeLineW[CursorX];
 			BuffSetChar(p, ' ', 'H');
+
+			move_x = 1;  // カーソル移動量=1
 		}
 
 		// 前の文字にくっつける
 		BuffAddChar(p, u32);
-#if 0
-		AttrLine[CursorX] = Attr.Attr;
-		AttrLine2[CursorX] = Attr.Attr2;
-		AttrLineFG[CursorX] = Attr.Fore;
-		AttrLineBG[CursorX] = Attr.Back;
-#endif
+
+		// 文字描画
+		if (StrChangeCount == 0) {
+			// 描画予定がない(StrChangeCount==0)のに、
+			// 結合文字を受信した場合、描画する
+			buff_char_t *b = &CodeLineW[CursorX];
+			if (IsBuffPadding(b)) {
+				// カーソルが2セルの右側
+				StrChangeStart = CursorX - 1;
+				StrChangeCount = 2;
+			}
+			else {
+				// カーソルが1セル又は、2セルの左側
+				if (!BuffIsHalfWidthFromPropery(p->WidthProperty)) {
+					// 1つ前の文字が2セル
+					StrChangeCount = 2;
+				}
+				else {
+					// 1つ前の文字が1セル
+					StrChangeCount = 1;
+				}
+				StrChangeStart = CursorX - StrChangeCount;
+			}
+		}
 	}
 	else {
 		char width_property;
