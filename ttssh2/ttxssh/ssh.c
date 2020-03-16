@@ -205,7 +205,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 	memset(c, 0, sizeof(Channel_t));
 	c->used = 1;
 	c->self_id = i;
-	c->remote_id = -1;
+	c->remote_id = SSH_CHANNEL_INVALID;
 	c->local_window = window;
 	c->local_window_max = window;
 	c->local_consumed = 0;
@@ -3046,11 +3046,16 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			logprintf(LOG_LEVEL_ERROR, "%s: shell channel not found.", __FUNCTION__);
 			return;
 		}
-
+		if (c->remote_id == SSH_CHANNEL_INVALID) {
+			// この状況は認証完了直後にウィンドウサイズを変更すると発生する。
+			// まだシェルのチャネルに対する SSH_MSG_OPEN_CONFIRMATION を受けていないので、
+			// 相手側のチャネル番号が判らないので window-change メッセージは送らない。
+			logprintf(LOG_LEVEL_WARNING, "%s: remote shell channel number is unknown.", __FUNCTION__);
+			return;
+		}
 
 		msg = buffer_init();
 		if (msg == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
@@ -3093,6 +3098,13 @@ int SSH_notify_break_signal(PTInstVar pvar)
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "%s: shell channel not found.", __FUNCTION__);
+			goto error;
+		}
+		if (c->remote_id == SSH_CHANNEL_INVALID) {
+			// 認証直後に send break を行うと発生する
+			// まだシェルのチャネルに対する SSH_MSG_OPEN_CONFIRMATION を受けていないので、
+			// 相手側のチャネル番号が判らないので break メッセージは送らない。
+			logprintf(LOG_LEVEL_WARNING, "%s: remote shell channel number is unknown.", __FUNCTION__);
 			goto error;
 		}
 
@@ -3244,7 +3256,7 @@ void SSH_send(PTInstVar pvar, unsigned char const *buf, unsigned int buflen)
 
 	} else { // for SSH2(yutaka)
 		Channel_t *c = ssh2_channel_lookup(pvar->shell_id);
-		if (c == NULL) {
+		if (c == NULL || c->remote_id == SSH_CHANNEL_INVALID) {
 			logprintf(LOG_LEVEL_ERROR, "%s: shell channel not found.", __FUNCTION__);
 		}
 		else {
@@ -3457,7 +3469,6 @@ void SSH_end(PTInstVar pvar)
 		pvar->session_id_len = 0;
 
 		pvar->userauth_success = 0;
-		//pvar->remote_id = 0;
 		pvar->shell_id = SSH_CHANNEL_INVALID;
 		pvar->session_nego_status = 0;
 
@@ -3537,7 +3548,6 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 	if (buflen > 0) {
 		msg = buffer_init();
 		if (msg == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
@@ -3666,7 +3676,6 @@ void SSH2_confirm_channel_open(PTInstVar pvar, Channel_t *c)
 
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return;
 	}
@@ -3745,7 +3754,6 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return;
 	}
@@ -3914,7 +3922,6 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 
 		msg = buffer_init();
 		if (msg == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
@@ -3922,6 +3929,10 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "%s: shell channel not found.", __FUNCTION__);
+			return;
+		}
+		if (c->remote_id == SSH_CHANNEL_INVALID) {
+			logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
 			return;
 		}
 
@@ -8093,6 +8104,11 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 
 	msg = buffer_init();
 	if (msg == NULL) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		return FALSE;
+	}
+	if (c->remote_id == SSH_CHANNEL_INVALID) {
+		logprintf(LOG_LEVEL_ERROR, "%s: invalid remote channel number (%d).", __FUNCTION__, c->remote_id);
 		return FALSE;
 	}
 
@@ -8135,13 +8151,11 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	// pty open
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL. (msg)", __FUNCTION__);
 		return FALSE;
 	}
 	ttymsg = buffer_init();
 	if (ttymsg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL. (ttymsg)", __FUNCTION__);
 		buffer_free(msg);
 		return FALSE;
@@ -8241,12 +8255,10 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO:
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
 		return FALSE;
 	}
 
-	// TODO: id check
 	remote_id = get_uint32_MSBfirst(data);
 	data += 4;
 
@@ -8355,7 +8367,6 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO: SSH2_MSG_DISCONNECTを送る
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
 		return FALSE;
 	}
@@ -8498,11 +8509,13 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 		pvar->session_nego_status);
 
 	if (pvar->session_nego_status == 1) {
-		// find channel by shell id(2005.2.27 yutaka)
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: shell channel not found.", __FUNCTION__);
+			return FALSE;
+		}
+		if (c->remote_id == SSH_CHANNEL_INVALID) {
+			logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
 			return FALSE;
 		}
 		pvar->agentfwd_enable = TRUE;
@@ -8511,11 +8524,13 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 	} else if (pvar->session_nego_status == 2) {
 		pvar->session_nego_status = 3;
 
-		// find channel by shell id(2005.2.27 yutaka)
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: shell channel not found.", __FUNCTION__);
+			return FALSE;
+		}
+		if (c->remote_id == SSH_CHANNEL_INVALID) {
+			logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
 			return FALSE;
 		}
 
@@ -8550,7 +8565,6 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(channel_id);
 	if (c == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, channel_id);
 		return FALSE;
 	}
@@ -8599,7 +8613,6 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 		// pty open
 		msg = buffer_init();
 		if (msg == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
@@ -8635,7 +8648,6 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 		// SSH2 serverにchannel closeを伝える
 		msg = buffer_init();
 		if (msg == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
@@ -9315,8 +9327,11 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO:
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
+		return FALSE;
+	}
+	if (c->remote_id == SSH_CHANNEL_INVALID) {
+		logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
 		return FALSE;
 	}
 
@@ -9336,7 +9351,6 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 			"len:%d local_maxpacket:%d", __FUNCTION__, str_len, c->local_maxpacket);
 	}
 	if (str_len > c->local_window) {
-		// TODO: logging
 		// local window sizeより大きなパケットは捨てる
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_window. "
 			"len:%d local_window:%d", __FUNCTION__, str_len, c->local_window);
@@ -9400,8 +9414,11 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO:
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
+		return FALSE;
+	}
+	if (c->remote_id == SSH_CHANNEL_INVALID) {
+		logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
 		return FALSE;
 	}
 
@@ -9415,12 +9432,10 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 	// バッファサイズのチェック
 	if (strlen > c->local_maxpacket) {
-		// TODO: logging
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_maxpacket. "
 			"len:%d local_maxpacket:%d", __FUNCTION__, strlen, c->local_maxpacket);
 	}
 	if (strlen > c->local_window) {
-		// TODO: logging
 		// local window sizeより大きなパケットは捨てる
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_window. "
 			"len:%d local_window:%d", __FUNCTION__, strlen, c->local_window);
@@ -9478,7 +9493,6 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO:
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
 		return FALSE;
 	}
@@ -9596,8 +9610,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 		free(orig_str);
 
-		// X server(port 6000)へ接続する。接続に失敗するとTera Term自身が切断される。
-		// TODO: 将来、切断されないようにしたい。(2005.7.3 yutaka)
+		// X server へ接続する。
 		FWD_X11_open(pvar, remote_id, NULL, 0, &chan_num);
 
 		// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
@@ -9634,7 +9647,6 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		else {
 			msg = buffer_init();
 			if (msg == NULL) {
-				// TODO: error check
 				logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 				return FALSE;
 			}
@@ -9684,7 +9696,6 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	data += 4;
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO:
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
 		return FALSE;
 	}
@@ -9744,8 +9755,11 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	data += 4;
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// TODO:
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
+		return FALSE;
+	}
+	if (c->remote_id == SSH_CHANNEL_INVALID) {
+		logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
 		return FALSE;
 	}
 
@@ -9790,7 +9804,6 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 
 		msg = buffer_init();
 		if (msg == NULL) {
-			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return FALSE;
 		}
@@ -9840,6 +9853,10 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 		// FALSEでは返さないようにする。(2007.12.26 yutaka)
 		logprintf(LOG_LEVEL_WARNING, "%s: channel not found. (%d)", __FUNCTION__, id);
 		return TRUE;
+	}
+	if (c->remote_id == SSH_CHANNEL_INVALID) {
+		logprintf(LOG_LEVEL_ERROR, "%s: remote shell channel number is unknown.", __FUNCTION__);
+		return FALSE;
 	}
 
 	adjust = get_uint32_MSBfirst(data);
