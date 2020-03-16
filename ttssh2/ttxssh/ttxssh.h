@@ -281,7 +281,6 @@ typedef struct _TInstVar {
 	EVP_CIPHER_CTX *evpcip[MODE_MAX];
 	int userauth_success;
 	int shell_id;
-	/*int remote_id;*/
 	int session_nego_status;
 	/*
 	unsigned int local_window;
