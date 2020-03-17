@@ -518,12 +518,24 @@ INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTem
 	return DialogBoxIndirectParamA(hInstance, hDialogTemplate, hWndParent, lpDialogFunc, lParamInit);
 }
 
+LONG _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong)
+{
+	if (pSetWindowLongW != NULL) {
+		return pSetWindowLongW(hWnd, nIndex, dwNewLong);
+	}
+	return SetWindowLongA(hWnd, nIndex, dwNewLong);
+}
+
 LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
 {
+#ifdef _WIN64
 	if (pSetWindowLongPtrW != NULL) {
 		return pSetWindowLongPtrW(hWnd, nIndex, dwNewLong);
 	}
 	return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
+#else
+	return _SetWindowLongW(hWnd, nIndex, dwNewLong);
+#endif
 }
 
 LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)

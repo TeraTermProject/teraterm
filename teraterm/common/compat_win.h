@@ -114,7 +114,10 @@ extern LRESULT (WINAPI *pSendMessageW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARA
 extern int (WINAPI *pGetWindowTextW)(HWND hWnd, LPWSTR lpString, int nMaxCount);
 extern int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
 extern BOOL (WINAPI *pShell_NotifyIconW)(DWORD dwMessage, NOTIFYICONDATAW *lpData);
+extern LONG (WINAPI *pSetWindowLongW)(HWND hWnd, int nIndex, LONG dwNewLong);
+#ifdef _WIN64
 extern LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
+#endif
 extern LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc,
 										  HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
