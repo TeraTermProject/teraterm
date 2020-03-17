@@ -1,7 +1,7 @@
 /*
  * TTX KanjiMenu Plugin
  *    Copyright (C) 2007 Sunao HARA (naoh@nagoya-u.jp)
- *    (C) 2007-2009 TeraTerm Project
+ *    (C) 2007-2020 TeraTerm Project
  */
 
 //// ORIGINAL SOURCE CODE: ttxtest.c
@@ -30,7 +30,7 @@
 #define UpdateRecvMenu(val)	\
 	CheckMenuRadioItem(pvar->hmEncode, \
 	                   ID_MI_KANJIRECV + IdSJIS, \
-	                   ID_MI_KANJIRECV + ((pvar->ts->Language==IdJapanese)?IdUTF8m:IdUTF8), \
+	                   ID_MI_KANJIRECV + IdUTF8m, \
 	                   ID_MI_KANJIRECV + (val), \
 	                   MF_BYCOMMAND)
 #define UpdateSendMenu(val)	\
@@ -184,15 +184,15 @@ static void PASCAL InsertSendKcodeMenu(HMENU menu) {
 		InsertMenu(menu, 9, flag, ID_MI_KANJISEND+IdUTF8,  pvar->ts->UIMsg);
 	}
 	else { // IdKorean
-		InsertMenu(menu, 2, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+		InsertMenu(menu, 3, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 
 		GetI18nStr(IniSection, "MENU_SEND_KS5601", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
 			   "Send: K&S5601", pvar->ts->UILanguageFile);
-		InsertMenu(menu, 3, flag, ID_MI_KANJISEND+IdSJIS,  pvar->ts->UIMsg);
+		InsertMenu(menu, 4, flag, ID_MI_KANJISEND+IdSJIS,  pvar->ts->UIMsg);
 
 		GetI18nStr(IniSection, "MENU_SEND_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
 			   "Send: U&TF-8", pvar->ts->UILanguageFile);
-		InsertMenu(menu, 4, flag, ID_MI_KANJISEND+IdUTF8,  pvar->ts->UIMsg);
+		InsertMenu(menu, 5, flag, ID_MI_KANJISEND+IdUTF8,  pvar->ts->UIMsg);
 	}
 }
 
@@ -244,6 +244,10 @@ static void PASCAL UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
 			           "Recv/Send: &UTF-8", pvar->ts->UILanguageFile);
 			ModifyMenu(menu, ID_MI_KANJIRECV+IdUTF8,  MF_BYCOMMAND, ID_MI_KANJIRECV+IdUTF8,
 			           pvar->ts->UIMsg);
+			GetI18nStr(IniSection, "MENU_UTF8m", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
+			           "Recv: UTF-8&m/Send: UTF-8", pvar->ts->UILanguageFile);
+			ModifyMenu(menu, ID_MI_KANJIRECV+IdUTF8m, MF_BYCOMMAND, ID_MI_KANJIRECV+IdUTF8m,
+			           pvar->ts->UIMsg);
 		}
 	}
 	else {
@@ -277,6 +281,10 @@ static void PASCAL UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
 			GetI18nStr(IniSection, "MENU_RECV_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
 			           "Recv: &UTF-8", pvar->ts->UILanguageFile);
 			ModifyMenu(menu, ID_MI_KANJIRECV+IdUTF8,  MF_BYCOMMAND, ID_MI_KANJIRECV+IdUTF8,
+			           pvar->ts->UIMsg);
+			GetI18nStr(IniSection, "MENU_RECV_UTF8m", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
+			           "Recv: UTF-8&m", pvar->ts->UILanguageFile);
+			ModifyMenu(menu, ID_MI_KANJIRECV+IdUTF8m, MF_BYCOMMAND, ID_MI_KANJIRECV+IdUTF8m,
 			           pvar->ts->UIMsg);
 		}
 	}
@@ -346,6 +354,9 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 			GetI18nStr(IniSection, "MENU_RECV_UTF8", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
 				   "Recv: &UTF-8", pvar->ts->UILanguageFile);
 			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdUTF8, pvar->ts->UIMsg);
+			GetI18nStr(IniSection, "MENU_RECV_UTF8m", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
+				   "Recv: UTF-8&m", pvar->ts->UILanguageFile);
+			AppendMenu(pvar->hmEncode, flag, ID_MI_KANJIRECV+IdUTF8m, pvar->ts->UIMsg);
 		}
 
 		if (!pvar->UseOneSetting) {
