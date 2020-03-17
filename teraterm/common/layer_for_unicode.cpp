@@ -176,7 +176,7 @@ static wchar_t *SendMessageAFromW_LB_GETTEXT(HWND hWnd, WPARAM wParam, size_t *l
 int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
 {
 	if (pGetWindowTextW != NULL) {
-		GetWindowTextW(hWnd, lpString, nMaxCount);
+		return pGetWindowTextW(hWnd, lpString, nMaxCount);
 	}
 
 	size_t lenW;
