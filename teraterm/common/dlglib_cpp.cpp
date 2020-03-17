@@ -150,7 +150,7 @@ void SetDialogFont(const char *FontName, int FontPoint, int FontCharSet,
 	if (logfont.lfHeight < 0) {
 		logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
 	}
-	TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 }
 
 

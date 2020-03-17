@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008-2019 TeraTerm Project
+ * (C) 2008-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,14 @@
 #include <assert.h>
 #include <stdio.h>
 #include <commctrl.h>
-#include <tchar.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
 #include "ttlib.h"	// for get_lang_font()
+#include "layer_for_unicode.h"
+#include "codeconv.h"
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
 {
@@ -433,4 +434,34 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	EnumFontFamiliesExA(hDC, &lf, (FONTENUMPROCA)IsExistFontSubA, (LPARAM)&info, 0);
 	ReleaseDC(NULL, hDC);
 	return info.found;
+}
+
+/**
+ *	hWndの文字列を取得する
+ *	不要になったら free() すること
+ */
+wchar_t *AllocControlTextW(HWND hWnd)
+{
+	int len = GetWindowTextLength(hWnd);
+	wchar_t *strW = malloc(sizeof(wchar_t) * (len + 1));
+	if (strW == NULL) {
+		return NULL;
+	}
+
+	_GetWindowTextW(hWnd, strW, len + 1);
+	strW[len] = 0;
+	return strW;
+}
+
+/**
+ *	hWndの文字列を取得する
+ *	不要になったら free() すること
+ *	AllocControlTextW() の char版
+ */
+char *AllocControlTextA(HWND hWnd)
+{
+	wchar_t *strW = AllocControlTextW(hWnd);
+	char *strA = ToCharW(strW);
+	free(strW);
+	return strA;
 }

@@ -431,15 +431,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 
 static char *alloc_control_text(HWND ctl)
 {
-	int len = GetWindowTextLength(ctl);
-	char *result = malloc(len + 1);
-
-	if (result != NULL) {
-		GetWindowText(ctl, result, len + 1);
-		result[len] = 0;
-	}
-
-	return result;
+	return AllocControlTextA(ctl);
 }
 
 static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar)

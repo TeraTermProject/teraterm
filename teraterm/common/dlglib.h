@@ -98,12 +98,8 @@ void SetDialogFont(const char *FontName, int FontHeight, int FontCharSet,
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
 int GetFontPointFromPixel(HWND hWnd, int pixel);
 int GetFontPixelFromPoint(HWND hWnd, int point);
-
-#if defined(_UNICODE)
-#define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontW(p1,p2,p3)
-#else
-#define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontA(p1,p2,p3)
-#endif
+wchar_t *AllocControlTextW(HWND hWnd);
+char *AllocControlTextA(HWND hWnd);
 
 #ifdef __cplusplus
 }
