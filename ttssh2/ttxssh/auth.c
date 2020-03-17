@@ -1113,7 +1113,14 @@ canceled:
 					if (ShowPassPhrase) {
 						_SendMessageW(hWnd, EM_SETPASSWORDCHAR, 0, 0);
 					} else {
-						_SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
+						if (IsWindowUnicode(hWnd)) {
+							_SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
+						}
+						else {
+							// EM_GETPASSWORDCHAR ‚Å Unicode ƒLƒƒƒ‰ƒNƒ^‚ªæ“¾‚Å‚«‚Ä‚à
+							// IsWindowUnicode(hWnd) == FALSE ‚Ì‚Æ‚« Unicode ‚Íİ’è‚Å‚«‚È‚¢
+							SendMessageA(hWnd, EM_SETPASSWORDCHAR, (WPARAM)'*', 0);
+						}
 					}
 					SendDlgItemMessage(dlg, IDC_SSHPASSWORD, EM_SETSEL, 0, -1);
 					SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHPASSWORD), TRUE);
