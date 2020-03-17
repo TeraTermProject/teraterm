@@ -251,7 +251,7 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 
 static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 {
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_AUTH_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_AUTH_BANNER" },
 		{ IDC_SSHAUTHBANNER2, "DLG_AUTH_BANNER2" },
@@ -1338,7 +1338,7 @@ void AUTH_advance_to_next_cred(PTInstVar pvar)
 
 static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_TIS_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_TIS_BANNER" },
 		{ IDOK, "BTN_OK" },
@@ -1473,7 +1473,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	DWORD len;
 	TCHAR uimsg[MAX_UIMSG];
 	TCHAR uimsg2[MAX_UIMSG];
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_AUTHSETUP_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_AUTHSETUP_BANNER" },
 		{ IDC_SSH_USERNAME, "DLG_AUTHSETUP_USERNAME" },
