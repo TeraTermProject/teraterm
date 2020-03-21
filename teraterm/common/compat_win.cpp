@@ -49,8 +49,6 @@ LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPAR
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
 BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
-DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
-DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
@@ -61,7 +59,6 @@ BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlph
 HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
-HWND (WINAPI *pGetConsoleWindow)(void);
 int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 HWND (WINAPI *pCreateDialogIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
@@ -72,6 +69,11 @@ LONG (WINAPI *pSetWindowLongW)(HWND hWnd, int nIndex, LONG dwNewLong);
 LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 #endif
 LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+
+// kernel32.dll
+DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
+DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+HWND (WINAPI *pGetConsoleWindow)(void);
 
 // gdi32.lib
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -251,8 +253,7 @@ void WinCompatInit()
 
 	// 9xì¡ï èàóù
 	if (!IsWindowsNTKernel()) {
-		// Windows 9x Ç…ë∂ç›ÇµÇƒÇ¢ÇÈAPI(ä¬ã´àÀë∂?)
-		// ê≥ÇµÇ≠ìÆçÏÇµÇ»Ç¢ÇÃÇ≈ñ≥å¯Ç∆Ç∑ÇÈ
+		// Windows 9x Ç…ë∂ç›ÇµÇƒÇ¢ÇÈÇ™ê≥ÇµÇ≠ìÆçÏÇµÇ»Ç¢ÇΩÇﬂñ≥å¯âªÇ∑ÇÈ
 		pGetPrivateProfileStringW = NULL;
 		pSetWindowTextW = NULL;
 		pSetDlgItemTextW = NULL;
@@ -267,6 +268,8 @@ void WinCompatInit()
 		pGetWindowTextW = NULL;
 		pGetWindowTextLengthW = NULL;
 		pShell_NotifyIconW = NULL;
+		pGetFileAttributesW = NULL;
+		pDragQueryFileW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù
