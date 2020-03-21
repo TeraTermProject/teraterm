@@ -37,11 +37,32 @@
 #include <crtdbg.h>
 
 #include "codeconv.h"
+#include "ttlib.h"
+
 #include "fileread.h"
 
 #if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef unsigned char uint8_t;
 #endif
+
+static void __wfopen_s(FILE **fp, wchar_t const* filename, wchar_t const* mode)
+{
+	if (IsWindowsNTKernel()) {
+		// 多分内部で CreateFileW() を使用している
+		// NTでのみ使用する
+		_wfopen_s(fp, filename, mode);
+		if (fp != NULL) {
+			return;
+		}
+		// 念の為 ANSI でもオープンする
+	}
+	// ANSI でオープン
+	char *filenameA = ToCharW(filename);
+	char *modeA = ToCharW(mode);
+	fopen_s(fp, filenameA, modeA);
+	free(filenameA);
+	free(modeA);
+}
 
 /**
  *	ファイルをメモリに読み込む
@@ -97,7 +118,7 @@ static void *LoadRawFile(FILE *fp, size_t *_len)
 uint8_t *LoadFileBinary(const wchar_t *FileName, size_t *_len)
 {
 	FILE *fp;
-	_wfopen_s(&fp, FileName, L"rb");
+	__wfopen_s(&fp, FileName, L"rb");
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -186,7 +207,8 @@ char *LoadFileU8(FILE *fp, size_t *_len)
 char *LoadFileU8A(const char *FileName, size_t *_len)
 {
 	*_len = 0;
-	FILE *fp = fopen(FileName, "rb");
+	FILE *fp;
+	fopen_s(&fp, FileName, "rb");
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -214,7 +236,8 @@ wchar_t *LoadFileWA(const char *FileName, size_t *_len)
 	if (_len != NULL) {
 		*_len = 0;
 	}
-	FILE *fp = fopen(FileName, "rb");
+	FILE *fp;
+	fopen_s(&fp, FileName, "rb");
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -248,7 +271,8 @@ wchar_t *LoadFileWW(const wchar_t *FileName, size_t *_len)
 	if (_len != NULL) {
 		*_len = 0;
 	}
-	FILE *fp = _wfopen(FileName, L"rb");
+	FILE *fp;
+	__wfopen_s(&fp, FileName, L"rb");
 	if (fp == NULL) {
 		return NULL;
 	}

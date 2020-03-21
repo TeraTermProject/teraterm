@@ -31,8 +31,7 @@
 #include <stdlib.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <assert.h>
 
 #include "tttypes.h"
 #include "ttcommon.h"
@@ -617,6 +616,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 	if (!binary) {
 		size_t str_len;
 		wchar_t *str_ptr = LoadFileWW(filename, &str_len);
+		assert(str_ptr != NULL);
 		if (str_ptr == NULL) {
 			return FALSE;
 		}
@@ -625,6 +625,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 	else {
 		size_t data_len;
 		unsigned char *data_ptr = LoadFileBinary(filename, &data_len);
+		assert(data_ptr != NULL);
 		if (data_ptr == NULL) {
 			return FALSE;
 		}
