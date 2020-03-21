@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -648,7 +648,7 @@ MSG_NOAUTHMETHOD_ERROR=서버가 TTSSH가 제공하는 인증 선택사항 중 �
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=보안 경고
-DLG_DIFFERENTKEY_WARNING=당신의 known-host 목록은 서버 "####################################"에 대한 항목을 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
+DLG_DIFFERENTKEY_WARNING=당신의 known-host 목록은 서버 "%s"에 대한 항목을 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
 DLG_DIFFERENTKEY_WARNING2=만약 이 새로운 키를 known-host 목록에 추가하도록 선택하고 계속 진행하다면, 다시는 경고 메시지를 받지 않습니다.
 DLG_DIFFERENTKEY_FINGERPRINT=이 서버의 호스트키 지문은:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
@@ -656,7 +656,7 @@ DLG_DIFFERENTKEY_REPLACE=기존 키를 새 키로 교체(&R)
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=보안 경고
-DLG_DIFFERENTTYPEKEY_WARNING=당신의 known-host 목록는 서버 "####################################"에 대한 정보를 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
+DLG_DIFFERENTTYPEKEY_WARNING=당신의 known-host 목록는 서버 "%s"에 대한 정보를 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
 DLG_DIFFERENTTYPEKEY_WARNING2=만약 이 새로운 키를 known-host 목록에 추가하도록 선택하고 계속 진행하다면, 다시는 경고 메시지를 받지 않습니다.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=이 서버의 호스트키 지문은:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

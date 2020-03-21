@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -645,7 +645,7 @@ MSG_NOAUTHMETHOD_ERROR=伺服器不支持 TTSSH 提供的認證方式。\n連接
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=安全警告
-DLG_DIFFERENTKEY_WARNING=伺服器"####################################"已存在於主機列表中，但是提供了一個不同的密鑰，這可能是惡意人士所偽造的。
+DLG_DIFFERENTKEY_WARNING=伺服器"%s"已存在於主機列表中，但是提供了一個不同的密鑰，這可能是惡意人士所偽造的。
 DLG_DIFFERENTKEY_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_DIFFERENTKEY_FINGERPRINT=伺服器密鑰指紋：
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
@@ -653,7 +653,7 @@ DLG_DIFFERENTKEY_REPLACE=使用新的密鑰更換現有密鑰(&R)
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=安全警告
-DLG_DIFFERENTTYPEKEY_WARNING=伺服器"####################################"已存在於主機列表中，但是提供了一個不同的密鑰，這可能是惡意人士所偽造的。
+DLG_DIFFERENTTYPEKEY_WARNING=伺服器"%s"已存在於主機列表中，但是提供了一個不同的密鑰，這可能是惡意人士所偽造的。
 DLG_DIFFERENTTYPEKEY_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=伺服器密鑰指紋：
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

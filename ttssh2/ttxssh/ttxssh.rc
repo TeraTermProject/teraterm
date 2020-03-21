@@ -180,7 +180,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SECURITY WARNING"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "There is no entry for the server ""#####################################"" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.",IDC_HOSTWARNING,15,7,229,41
+    LTEXT           "There is no entry for the server ""%s"" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.",IDC_HOSTWARNING,15,7,229,41
     LTEXT           "If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,229,26
     LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,229,16
     LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,229,8
@@ -201,7 +201,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SECURITY WARNING"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,229,43
+    LTEXT           "Your known hosts list has an entry for the server ""%s"", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,229,43
     LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,229,24
     LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,229,16
     LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,229,8
@@ -408,7 +408,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SECURITY WARNING"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,229,43
+    LTEXT           "Your known hosts list has an entry for the server ""%s"", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,229,43
     LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,229,24
     LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,229,16
     LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,229,8

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -648,7 +648,7 @@ MSG_NOAUTHMETHOD_ERROR=Der Server unterstützt keine der von TTSSH angebotenen\n
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=SICHERHEITSWARNUNG
-DLG_DIFFERENTKEY_WARNING=Der Server ("####################################") ist in der "known hosts"-Liste bereits mit einem anderen Schlüssel eingetragen.
+DLG_DIFFERENTKEY_WARNING=Der Server ("%s") ist in der "known hosts"-Liste bereits mit einem anderen Schlüssel eingetragen.
 DLG_DIFFERENTKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_DIFFERENTKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
@@ -656,7 +656,7 @@ DLG_DIFFERENTKEY_REPLACE=Den vorhanden Schlüssel durch den neuen ersetzen.
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=SICHERHEITSWARNUNG
-DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
+DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "%s", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTTYPEKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

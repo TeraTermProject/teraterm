@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -648,7 +648,7 @@ MSG_NOAUTHMETHOD_ERROR=Le serveur ne supporte aucune des options d'authentificat
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=ALERTE DE SECURITE
-DLG_DIFFERENTKEY_WARNING=Votre liste d'hôte connus a une entrée pour le serveur "####################################", mais la machine contactée a présenté une CLE DIFFERENTE ! Une machine hostile pourrait se faire passer pour le serveur.
+DLG_DIFFERENTKEY_WARNING=Votre liste d'hôte connus a une entrée pour le serveur "%s", mais la machine contactée a présenté une CLE DIFFERENTE ! Une machine hostile pourrait se faire passer pour le serveur.
 DLG_DIFFERENTKEY_WARNING2=Si vous choisissez d'ajouter la nouvelle clé à votre liste et de continuer, vous ne recevrez plus cet avertissement.
 DLG_DIFFERENTKEY_FINGERPRINT=L'empreinte de la clé du serveur est:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
@@ -656,7 +656,7 @@ DLG_DIFFERENTKEY_REPLACE=&Remplacer la clé actuelle avec cette nouvelle clé
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=ALERTE DE SECURITE
-DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
+DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "%s", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTTYPEKEY_WARNING2=Si vous choisissez d'ajouter la nouvelle clé à votre liste et de continuer, vous ne recevrez plus cet avertissement.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=L'empreinte de la clé du serveur est:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

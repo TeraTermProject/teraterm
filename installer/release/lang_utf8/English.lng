@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -644,7 +644,7 @@ MSG_NOAUTHMETHOD_ERROR=Server does not support any of the authentication options
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=SECURITY WARNING
-DLG_DIFFERENTKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
+DLG_DIFFERENTKEY_WARNING=Your known hosts list has an entry for the server "%s", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTKEY_WARNING2=If you choose to replace this new key to the known hosts list and continue, then you will not receive this warning again.
 DLG_DIFFERENTKEY_FINGERPRINT=The server's host key fingerprint is:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
@@ -652,7 +652,7 @@ DLG_DIFFERENTKEY_REPLACE=&Replace the exist key with this new key
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=SECURITY WARNING
-DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
+DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "%s", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTTYPEKEY_WARNING2=If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=The server's host key fingerprint is:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:

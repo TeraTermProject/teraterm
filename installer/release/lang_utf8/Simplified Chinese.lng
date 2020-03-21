@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -648,7 +648,7 @@ MSG_NOAUTHMETHOD_ERROR=服务器不支持 TTSSH 提供的认证方式。\n连接
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=安全警告
-DLG_DIFFERENTKEY_WARNING=服务器"####################################"已存在于主机列表中，但是提供了一个不同的密钥，这可能是敌对方伪装的。
+DLG_DIFFERENTKEY_WARNING=服务器"%s"已存在于主机列表中，但是提供了一个不同的密钥，这可能是敌对方伪装的。
 DLG_DIFFERENTKEY_WARNING2=将该服务器追加到已知主机列表中后，将不再提示本警告。
 DLG_DIFFERENTKEY_FINGERPRINT=服务器密钥指纹：
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=指纹散列算法：
@@ -656,7 +656,7 @@ DLG_DIFFERENTKEY_REPLACE=使用新的密钥更换现有密钥(&R)
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=安全警告
-DLG_DIFFERENTTYPEKEY_WARNING=服务器"####################################"已存在于主机列表中，但是提供了一个不同的密钥，这可能是敌对方伪装的。
+DLG_DIFFERENTTYPEKEY_WARNING=服务器"%s"已存在于主机列表中，但是提供了一个不同的密钥，这可能是敌对方伪装的。
 DLG_DIFFERENTTYPEKEY_WARNING2=将该服务器追加到已知主机列表中后，将不再提示本警告。
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=服务器密钥指纹：
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=指纹散列算法：

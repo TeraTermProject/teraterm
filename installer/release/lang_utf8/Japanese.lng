@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-12)
+﻿; Updated by TeraTerm Project (2020-03-21)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -644,7 +644,7 @@ MSG_NOAUTHMETHOD_ERROR=サーバはTTSSH が提供する認証オプションを
 
 ; dlg diff key
 DLG_DIFFERENTKEY_TITLE=セキュリティ警告
-DLG_DIFFERENTKEY_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
+DLG_DIFFERENTKEY_WARNING=knows hostsリスト中のサーバ"%s"のエントリと, 接続先のホスト鍵が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
 DLG_DIFFERENTKEY_WARNING2=known hostsリストにこのホストを上書きして続行すると, 次回からこの警告は出なくなります.
 DLG_DIFFERENTKEY_FINGERPRINT=サーバ側のホスト鍵指紋:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
@@ -652,7 +652,7 @@ DLG_DIFFERENTKEY_REPLACE=既存の鍵を, 新しい鍵で上書きする(&R)
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=セキュリティ警告
-DLG_DIFFERENTTYPEKEY_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵の種類が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
+DLG_DIFFERENTTYPEKEY_WARNING=knows hostsリスト中のサーバ"%s"のエントリと, 接続先のホスト鍵の種類が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
 DLG_DIFFERENTTYPEKEY_WARNING2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=サーバ側のホスト鍵指紋:
 DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
