@@ -73,6 +73,7 @@ LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, W
 // kernel32.dll
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 HWND (WINAPI *pGetConsoleWindow)(void);
 
 // gdi32.lib
@@ -202,6 +203,7 @@ static const APIInfo Lists_kernel32[] = {
 #ifndef UNICODE_API_DISABLE
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
+	{ "OutputDebugStringW", (void **)&pOutputDebugStringW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
@@ -269,6 +271,7 @@ void WinCompatInit()
 		pGetWindowTextLengthW = NULL;
 		pShell_NotifyIconW = NULL;
 		pGetFileAttributesW = NULL;
+		pOutputDebugStringW = NULL;
 		pDragQueryFileW = NULL;
 	}
 

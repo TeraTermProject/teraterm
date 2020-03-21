@@ -120,6 +120,7 @@ extern LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwN
 #endif
 extern LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc,
 										  HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 
 void WinCompatInit();
 

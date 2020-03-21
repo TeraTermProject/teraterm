@@ -545,3 +545,14 @@ LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wPar
 	}
 	return CallWindowProcA(lpPrevWndFunc, hWnd, Msg, wParam, lParam);
 }
+
+void _OutputDebugStringW(LPCWSTR lpOutputString)
+{
+	if (pOutputDebugStringW != NULL) {
+		return pOutputDebugStringW(lpOutputString);
+	}
+
+	char *strA = ToCharW(lpOutputString);
+	OutputDebugStringA(strA);
+	free(strA);
+}

@@ -94,7 +94,6 @@ typedef struct {
 BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
 BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
-DWORD _GetFileAttributesW(LPCWSTR lpFileName);
 LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 LRESULT _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
@@ -110,6 +109,10 @@ int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
 int _GetWindowTextLengthW(HWND hWnd);
 LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+
+// kernel32.dll
+DWORD _GetFileAttributesW(LPCWSTR lpFileName);
+void _OutputDebugStringW(LPCWSTR lpOutputString);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);

@@ -84,7 +84,7 @@ void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *de
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
 DllExport void OutputDebugPrintf(const char *fmt, ...);
-DllExport void OutputDebugPrintfW(const wchar_t *fmt, ...);
+void OutputDebugPrintfW(const wchar_t *fmt, ...);
 DllExport DWORD get_OPENFILENAME_SIZEA();
 DllExport DWORD get_OPENFILENAME_SIZEW();
 DllExport BOOL IsWindows95();

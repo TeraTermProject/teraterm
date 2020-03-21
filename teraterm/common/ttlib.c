@@ -1133,18 +1133,6 @@ void OutputDebugPrintf(const char *fmt, ...)
 	OutputDebugStringA(tmp);
 }
 
-#if UNICODE_API // defined(UNICODE)
-void OutputDebugPrintfW(const wchar_t *fmt, ...)
-{
-	wchar_t tmp[1024];
-	va_list arg;
-	va_start(arg, fmt);
-	_vsnwprintf_s(tmp, _countof(tmp), _TRUNCATE, fmt, arg);
-	va_end(arg);
-	OutputDebugStringW(tmp);
-}
-#endif
-
 #if (_MSC_VER < 1800)
 BOOL vercmp(
 	DWORD cond_val,

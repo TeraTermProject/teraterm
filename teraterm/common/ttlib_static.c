@@ -43,6 +43,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "compat_win.h"
+#include "layer_for_unicode.h"
 
 #include "../teraterm/unicode_test.h"
 
@@ -277,6 +278,16 @@ int GetMonitorDpiFromWindow(HWND hWnd)
 		pGetDpiForMonitor(hMonitor, 0 /*0=MDT_EFFECTIVE_DPI*/, &dpiX, &dpiY);
 		return (int)dpiY;
 	}
+}
+
+void OutputDebugPrintfW(const wchar_t *fmt, ...)
+{
+	wchar_t tmp[1024];
+	va_list arg;
+	va_start(arg, fmt);
+	_vsnwprintf_s(tmp, _countof(tmp), _TRUNCATE, fmt, arg);
+	va_end(arg);
+	_OutputDebugStringW(tmp);
 }
 
 /* vim: set ts=4 sw=4 ff=dos : */
