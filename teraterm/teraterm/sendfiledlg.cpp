@@ -1,3 +1,30 @@
+/*
+ * (C) 2020 TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <windows.h>
 #include <stdio.h>
@@ -15,6 +42,7 @@
 #include "helpid.h"
 #include "codeconv.h"
 #include "ttftypes.h"		// for TitSendFile
+#include "asprintf.h"
 
 #include "sendfiledlg.h"
 
@@ -160,24 +188,15 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		case WM_COMMAND:
 			switch (wp) {
 				case IDOK | (BN_CLICKED << 16): {
-					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, WM_GETTEXTLENGTH, 0, 0);
-					len++;  // for '\0'
-					wchar_t *strW = (wchar_t *)malloc(sizeof(wchar_t) * len);
-					if (strW != NULL) {
-						_GetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, strW, (int)len);
-						strW[len - 1] = '\0';
-					}
+					wchar_t *strW = AllocControlTextW(GetDlgItem(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT));
 
 					const DWORD attr = _GetFileAttributesW(strW);
 					if (attr == INVALID_FILE_ATTRIBUTES || attr & FILE_ATTRIBUTE_DIRECTORY) {
-						wchar_t caption[MAX_UIMSG];
-						wchar_t message[MAX_UIMSG];
-
-						get_lang_msgW("MSG_TT_ERROR", caption, _countof(caption), L"Tera Term: Error",
-									  data->UILanguageFile);
-						get_lang_msgW("MSG_CANTOPEN_FILE_ERROR", message, _countof(message), L"Cannot open file",
-									  data->UILanguageFile);
-						_MessageBoxW(hDlgWnd, message, caption, MB_TASKMODAL | MB_ICONEXCLAMATION);
+						static const TTMessageBoxInfoW mbinfo = {
+							"Tera Term",
+							"MSG_TT_ERROR", L"Tera Term: Error",
+							"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file" };
+						TTMessageBoxW(hDlgWnd, &mbinfo, MB_TASKMODAL | MB_ICONEXCLAMATION, data->UILanguageFile);
 
 						free(strW);
 
@@ -210,40 +229,38 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					return TRUE;
 
 				case IDC_SENDFILE_FILENAME_BUTTON | (BN_CLICKED << 16): {
-					char TempDir[MAX_PATH];
-					GetCurrentDirectoryA(sizeof(TempDir), TempDir);
+					wchar_t TempDir[MAX_PATH];
+					_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-					char title[40];
-					char uimsg[MAX_UIMSG];
-					get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile,
-								 data->UILanguageFile);
-					strcpy_s(title, "Tera Term: ");
-					strncat_s(title, _countof(title), uimsg, _TRUNCATE);
+#define TitSendFileW L"Send file"
+					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSendFileW, data->UILanguageFile);
+					wchar_t *title;
+					aswprintf(&title, L"Tera Term: %s", uimsg);
+					free(uimsg);
+					uimsg = NULL;
 
 					size_t filter_len;
 					wchar_t *filterW = GetCommonDialogFilterW(data->filesend_filter, data->UILanguageFile, &filter_len);
-					char *filterA = _WideCharToMultiByte(filterW, filter_len, CP_ACP, NULL);
-					free(filterW);
 
-					char filename[MAX_PATH];
+					wchar_t filename[MAX_PATH];
 					filename[0] = 0;
-					OPENFILENAME ofn = {};
-					ofn.lStructSize = get_OPENFILENAME_SIZE();
+					OPENFILENAMEW ofn = {};
+					ofn.lStructSize = get_OPENFILENAME_SIZEW();
 					ofn.hwndOwner = hDlgWnd;
 					ofn.lpstrFile = filename;
-					ofn.nMaxFile = sizeof(filename);
 					ofn.nMaxFile = MAX_PATH;
-					ofn.lpstrFilter = filterA;
+					ofn.lpstrFilter = filterW;
 					ofn.nFilterIndex = 0;
 					ofn.lpstrTitle = title;
 					ofn.Flags = OFN_FILEMUSTEXIST | OFN_SHOWHELP | OFN_HIDEREADONLY;
-					BOOL Ok = GetOpenFileNameA(&ofn);
-					free(filterA);
+					BOOL Ok = _GetOpenFileNameW(&ofn);
+					free(filterW);
+					free(title);
 
-					SetCurrentDirectoryA(TempDir);
+					_SetCurrentDirectoryW(TempDir);
 
 					if (Ok) {
-						SetDlgItemTextA(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
+						_SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
 						PostMessage(hDlgWnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hDlgWnd, IDOK), TRUE);
 					}
 
