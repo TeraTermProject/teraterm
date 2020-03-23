@@ -148,6 +148,7 @@
     <ClCompile Include="layer_for_unicode.cpp" />
     <ClCompile Include="layer_for_unicode_comctl32.cpp" />
     <ClCompile Include="ttlib_static.c" />
+    <ClCompile Include="ttlib_static_cpp.cpp" />
     <ClCompile Include="win16api.c" />
   </ItemGroup>
   <ItemGroup>

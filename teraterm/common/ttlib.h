@@ -67,7 +67,7 @@ void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
 void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName, int destlen);
 void RestoreNewLine(PCHAR Text);
-void RestoreNewLineW(wchar_t *Text);
+size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int far *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
@@ -146,6 +146,17 @@ enum serial_port_conf {
 	COM_STOPBIT,
 	COM_FLOWCTRL,
 };
+
+typedef struct {
+	const char *section;			// セクション名
+	const char *title_key;			// タイトル(NULLのとき、title_default を常に使用)
+	const wchar_t *title_default;	//   lng ファイルに見つからなかったとき使用
+	const char *message_key;		// メッセージ
+	const wchar_t *message_default;	//   lng ファイルに見つからなかったとき使用
+} TTMessageBoxInfoW;
+
+int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const char *UILanguageFile, ...);
+wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const char *UILanguageFile);
 
 #ifdef __cplusplus
 }

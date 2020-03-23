@@ -10,12 +10,8 @@ add_library(
   compat_win.cpp
   compat_win.h
   dlglib.c
-  dlglib.c
-  dlglib.h
   dlglib.h
   dlglib_cpp.cpp
-  dlglib_cpp.cpp
-  dlglib_tmpl.cpp
   dlglib_tmpl.cpp
   dllutil.cpp
   dllutil.h
@@ -24,7 +20,6 @@ add_library(
   getcontent.cpp
   getcontent.h
   i18n.h
-  i18n_static.c
   i18n_static.c
   layer_for_unicode.cpp
   layer_for_unicode.h
@@ -37,6 +32,7 @@ add_library(
   tmfc_property.cpp
   ttlib.h
   ttlib_static.c
+  ttlib_static_cpp.cpp
   win16api.c
   win16api.h
   )

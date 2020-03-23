@@ -80,7 +80,7 @@ void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextI
 {
 	UINT ADDSTRING;
 	UINT SETCURSEL;
-	int i;
+	size_t i;
 	char ClassName[32];
 	int r = GetClassNameA(GetDlgItem(hDlg, nIDDlgItem), ClassName, _countof(ClassName));
 	assert(r != 0);

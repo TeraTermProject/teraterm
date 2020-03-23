@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,9 @@
 #include <stdio.h> /* for _snprintf() */
 #include <time.h>
 #include <locale.h>
+
+#include "ttlib.h"
+#include "codeconv.h"
 
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
@@ -288,7 +291,8 @@ error:
 
 void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 {
-	char ErrMsg[21+256];
+	char ErrMsg[21 + 256];
+	wchar_t ErrMsgW[21 + 256];
 	char P[50+256];
 
 	MSG Msg;
@@ -296,8 +300,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	char pname[NI_MAXSERV];
 
 	BOOL InvalidHost;
-
-	char uimsg[MAX_UIMSG];
 
 	// ホスト名が名前付きパイプかどうかを調べる。
 	if (ts->PortType == IdTCPIP) {
@@ -373,9 +375,15 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			}
 			if (! LoadWinsock()) {
 				if (cv->NoMsg==0) {
-					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-					get_lang_msg("MSG_WINSOCK_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot use winsock", ts->UILanguageFile);
-					MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+						"MSG_WINSOCK_ERROR", L"Cannot use winsock",
+					};
+					TTMessageBoxW(
+						cv->HWin,
+						&info, (MB_TASKMODAL | MB_ICONEXCLAMATION),
+						ts->UILanguageFile);
 				}
 				InvalidHost = TRUE;
 			}
@@ -429,9 +437,13 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 			if (InvalidHost) {
 				if (cv->NoMsg==0) {
-					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-					get_lang_msg("MSG_INVALID_HOST_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Invalid host", ts->UILanguageFile);
-					MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+						"MSG_INVALID_HOST_ERROR", L"Invalid host"
+					};
+					TTMessageBoxW(
+						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
 				}
 				goto BreakSC;
 			}
@@ -457,26 +469,34 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			cv->ComID = PCreateFile(P, GENERIC_READ | GENERIC_WRITE, 0, NULL,
 			                        OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				DWORD err = GetLastError();
-
-				switch (err) {
-				case ERROR_FILE_NOT_FOUND:
-					get_lang_msg("MSG_CANTOPEN_ERROR_NOTFOUND", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Not found.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
-					break;
-				case ERROR_ACCESS_DENIED:
-					get_lang_msg("MSG_CANTOPEN_ERROR_DENIED", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Access denied.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
-					break;
-				default:
-					get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. (0x%08x)", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4], err);
-					break;
-				}
-
 				if (cv->NoMsg==0) {
-					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-					MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+					DWORD err = GetLastError();
+					wchar_t *format;
+					wchar_t *PW = ToWcharA(&P[4]);
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+					};
+
+					switch (err) {
+					case ERROR_FILE_NOT_FOUND:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR_NOTFOUND", L"Cannot open %s. Not found.", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW);
+						break;
+					case ERROR_ACCESS_DENIED:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR_DENIED", L"Cannot open %s. Access denied.", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW);
+						break;
+					default:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR", L"Cannot open %s. (0x%08x)", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW, err);
+						break;
+					}
+					free(format);
+					free(PW);
+
+					TTMessageBoxW(
+						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile, ErrMsgW);
 				}
 				InvalidHost = TRUE;
 			}
@@ -503,9 +523,13 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			InvalidHost = (cv->ComID == INVALID_HANDLE_VALUE);
 			if (InvalidHost) {
 				if (cv->NoMsg==0) {
-					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-					get_lang_msg("MSG_CANTOPEN_FILE_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open file", ts->UILanguageFile);
-					MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+						"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file"
+					};
+					TTMessageBoxW(
+						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
 				}
 			}
 			else {
@@ -523,15 +547,18 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 			// 名前付きパイプが正しい書式かをチェックする。
 			if (CheckNamedPipeFormat(P, strlen(P)) < 0) {
+				static const TTMessageBoxInfoW info = {
+					"Tera Term",
+					"MSG_TT_ERROR", L"Tera Term: Error",
+				};
 				InvalidHost = TRUE;
 
-				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE,
-					"Invalid pipe name (%d)\n\n"
-					"A valid pipe name has the form\n"
-					"\"\\\\<ServerName>\\pipe\\<PipeName>\"",
+				_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE,
+					L"Invalid pipe name (%d)\n\n"
+					L"A valid pipe name has the form\n"
+					L"\"\\\\<ServerName>\\pipe\\<PipeName>\"",
 					GetLastError());
-				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-				MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+				TTMessageBoxW(cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile, ErrMsgW);
 				break;
 			}
 
@@ -539,30 +566,38 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			                        0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
 			                        NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				DWORD err = GetLastError();
-
-				switch (err) {
-				case ERROR_FILE_NOT_FOUND:
-					get_lang_msg("MSG_CANTOPEN_ERROR_NOTFOUND", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Not found.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
-					break;
-				case ERROR_ACCESS_DENIED:
-					get_lang_msg("MSG_CANTOPEN_ERROR_DENIED", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Access denied.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
-					break;
-				case ERROR_PIPE_BUSY:
-					get_lang_msg("MSG_CANTOPEN_ERROR_PIPEBUSY", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Pipe is busy.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
-					break;
-				default:
-					get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. (0x%08x)", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P, err);
-					break;
-				}
-
 				if (cv->NoMsg==0) {
-					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-					MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+					DWORD err = GetLastError();
+					wchar_t *format;
+					wchar_t* PW = ToWcharA(&P[4]);
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+					};
+
+					switch (err) {
+					case ERROR_FILE_NOT_FOUND:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR_NOTFOUND", L"Cannot open %s. Not found.", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW);
+						break;
+					case ERROR_ACCESS_DENIED:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR_DENIED", L"Cannot open %s. Access denied.", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW);
+						break;
+					case ERROR_PIPE_BUSY:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR_PIPEBUSY", L"Cannot open %s. Pipe is busy.", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW);
+						break;
+					default:
+						format = TTGetLangStrW("Tera Term", "MSG_CANTOPEN_ERROR", L"Cannot open %s. (0x%08x)", ts->UILanguageFile);
+						_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, format, PW, err);
+						break;
+					}
+					free(format);
+					free(PW);
+
+					TTMessageBoxW(
+						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile, ErrMsgW);
 				}
 				InvalidHost = TRUE;
 			}
@@ -664,8 +699,9 @@ void CommThread(void *arg)
 void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 {
 	char ErrMsg[31];
+	wchar_t ErrMsgW[31];
 	char Temp[20];
-	char uimsg[MAX_UIMSG];
+	wchar_t UIMsgW[MAX_UIMSG];
 
 	if (! cv->Open ) {
 		return;
@@ -684,20 +720,20 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			ErrMsg[0] = 0;
 			switch (HIWORD(lParam)) {
 				case WSAECONNREFUSED:
-					get_lang_msg("MSG_COMM_REFUSE_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Connection refused", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, "%s", ts->UIMsg);
+					get_lang_msgW("MSG_COMM_REFUSE_ERROR", UIMsgW, _countof(UIMsgW), L"Connection refused", ts->UILanguageFile);
+					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
 					break;
 				case WSAENETUNREACH:
-					get_lang_msg("MSG_COMM_REACH_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Network cannot be reached", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, "%s", ts->UIMsg);
+					get_lang_msgW("MSG_COMM_REACH_ERROR", UIMsgW, _countof(UIMsgW), L"Network cannot be reached", ts->UILanguageFile);
+					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
 					break;
 				case WSAETIMEDOUT:
-					get_lang_msg("MSG_COMM_CONNECT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Connection timed out", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, "%s", ts->UIMsg);
+					get_lang_msgW("MSG_COMM_CONNECT_ERROR", UIMsgW, _countof(UIMsgW), L"Connection timed out", ts->UILanguageFile);
+					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
 					break;
 				default:
-					get_lang_msg("MSG_COMM_TIMEOUT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot connect the host", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, "%s", ts->UIMsg);
+					get_lang_msgW("MSG_COMM_TIMEOUT_ERROR", UIMsgW, _countof(UIMsgW), L"Cannot connect the host", ts->UILanguageFile);
+					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
 			}
 			if (HIWORD(lParam)>0) {
 				/* connect() failed */
@@ -719,8 +755,15 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 					/* trying with all protocol family are failed */
 					if (cv->NoMsg==0)
 					{
-						get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-						MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+						static const TTMessageBoxInfoW info = {
+							"Tera Term",
+							"MSG_TT_ERROR", L"Tera Term: Error",
+							NULL, NULL
+						};
+						TTMessageBoxW(
+							cv->HWin,
+							&info, (MB_TASKMODAL | MB_ICONEXCLAMATION),
+							ts->UILanguageFile, ErrMsgW);
 					}
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RetryWithOtherProtocol = FALSE;
@@ -746,9 +789,12 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 			/* create the receiver thread */
 			if (_beginthread(CommThread,0,cv) == -1) {
-				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-				get_lang_msg("MSG_TT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Can't create thread", ts->UILanguageFile);
-				MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+				static const TTMessageBoxInfoW info = {
+					"Tera Term",
+					"MSG_TT_ERROR", L"Tera Term: Error",
+					"MSG_TT_ERROR", L"Can't create thread"
+				};
+				TTMessageBoxW(cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
 			}
 			break;
 
@@ -769,9 +815,12 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 			/* create the receiver thread */
 			if (_beginthread(NamedPipeThread,0,cv) == -1) {
-				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-				get_lang_msg("MSG_TT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Can't create thread", ts->UILanguageFile);
-				MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+				static const TTMessageBoxInfoW info = {
+					"Tera Term",
+					"MSG_TT_ERROR", L"Tera Term: Error",
+					"MSG_TT_ERROR", L"Can't create thread"
+				};
+				TTMessageBoxW(cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
 			}
 			break;
 	}

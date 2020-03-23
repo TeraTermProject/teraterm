@@ -807,10 +807,16 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
-void RestoreNewLineW(wchar_t *Text)
+/**
+ *	エスケープ文字を処理する
+ *	\\,\n,\t,\0 を置き換える
+ *	@return		文字数（L'\0'を含む)
+ */
+size_t RestoreNewLineW(wchar_t *Text)
 {
-	int i, j=0;
-	int size= wcslen(Text);
+	size_t i;
+	int j=0;
+	size_t size= wcslen(Text);
 	wchar_t *buf = (wchar_t *)_alloca((size+1) * sizeof(wchar_t));
 
 	memset(buf, 0, (size+1) * sizeof(wchar_t));
@@ -844,7 +850,9 @@ void RestoreNewLineW(wchar_t *Text)
 		}
 	}
 	/* use memcpy to copy with '\0' */
-	memcpy(Text, buf, size * sizeof(wchar_t));
+	j++;	// 文字列長
+	memcpy(Text, buf, j * sizeof(wchar_t));
+	return j;
 }
 
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)

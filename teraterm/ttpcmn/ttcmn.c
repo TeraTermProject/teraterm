@@ -140,14 +140,16 @@ void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 	char path[1024];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-	char uimsg[MAX_UIMSG];
 	int ret;
 
-	get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg),
-		"This option takes effect the next time a session is started.\n"
-		"Are you sure that you want to relaunch Tera Term?"
-		, ts->UILanguageFile);
-	ret = MessageBox(hwnd, uimsg, "Tera Term: Configuration Warning", MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+	static const TTMessageBoxInfoW info = {
+		"Tera Term",
+		NULL, L"Tera Term: Configuration Warning",
+		"MSG_TT_TAKE_EFFECT",
+		L"This option takes effect the next time a session is started.\n"
+		L"Are you sure that you want to relaunch Tera Term?"
+	};
+	ret = TTMessageBoxW(hwnd, &info, MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2, ts->UILanguageFile);
 	if (ret != IDYES)
 		return;
 
@@ -1184,11 +1186,11 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	HWin = GetDesktopWindow();
 	if (_HtmlHelpW(HWin, HelpFN, Command, Data) == NULL) {
 		// ƒwƒ‹ƒv‚ªŠJ‚¯‚È‚©‚Á‚½
-		wchar_t buf[MAX_PATH];
-		get_lang_msgW("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
-					  L"Can't open HTML help file(%s).", UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
-		_MessageBoxW(HWin, buf, L"Tera Term: HTML help", MB_OK | MB_ICONERROR);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			NULL, L"Tera Term: HTML help",
+			"MSG_OPENHELP_ERROR", L"Can't open HTML help file(%s)." };
+		TTMessageBoxW(HWin, &info, MB_OK | MB_ICONERROR, UILanguageFile, HelpFN);
 		return;
 	}
 }

@@ -35,12 +35,13 @@
 
 /**
  *	GetI18nStr() の unicode版
- *	@param	buf_len		文字数(\0含む)
+ *	@param[in]	buf_len		文字数(\0含む)
+ *	@reterm		バッファの文字数(L'\0'を含む)
  */
-DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
-								  const char *iniFile)
+DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
+									const char *iniFile)
 {
-	DWORD size;
+	size_t size;
 	if (pGetPrivateProfileStringW != NULL) {
 		wchar_t sectionW[64];
 		wchar_t keyW[128];
@@ -48,6 +49,8 @@ DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t 
 		MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
 		MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
 		MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
+		// The return value is the number of characters copied to the buffer,
+		// not including the terminating null character.
 		size = pGetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
 		if (size == 0 && def == NULL) {
 			buf[0] = 0;
@@ -63,7 +66,8 @@ DllExport void WINAPI GetI18nStrW(const char *section, const char *key, wchar_t 
 		}
 		MultiByteToWideChar(CP_ACP, 0, tmp, -1, buf, buf_len);
 	}
-	RestoreNewLineW(buf);
+	size = RestoreNewLineW(buf);
+	return size;
 }
 
 /**
