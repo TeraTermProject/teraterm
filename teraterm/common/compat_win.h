@@ -121,6 +121,9 @@ extern LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwN
 extern LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc,
 										  HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
+extern DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
+extern BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
+extern BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW Arg1);
 
 void WinCompatInit();
 

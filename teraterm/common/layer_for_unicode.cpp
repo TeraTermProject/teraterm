@@ -556,3 +556,28 @@ void _OutputDebugStringW(LPCWSTR lpOutputString)
 	OutputDebugStringA(strA);
 	free(strA);
 }
+
+DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
+{
+	if (pGetCurrentDirectoryW != NULL) {
+		return pGetCurrentDirectoryW(nBufferLength, lpBuffer);
+	}
+	char dir[MAX_PATH];
+	DWORD len = GetCurrentDirectoryA(_countof(dir), dir);
+	wchar_t *strW = ToWcharA(dir);
+	wcsncpy_s(lpBuffer, nBufferLength, strW, _TRUNCATE);
+	free(strW);
+	DWORD r =  (DWORD)wcslen(lpBuffer);
+	return r;
+}
+
+BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName)
+{
+	if (pSetCurrentDirectoryW != NULL) {
+		return pSetCurrentDirectoryW(lpPathName);
+	}
+	char *strA = ToCharW(lpPathName);
+	BOOL r = SetCurrentDirectoryA(strA);
+	free(strA);
+	return r;
+}

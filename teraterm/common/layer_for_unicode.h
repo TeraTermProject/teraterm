@@ -35,6 +35,7 @@
 #pragma once
 
 #include <windows.h>
+#include <commdlg.h>	// for _GetOpenFileNameW()
 
 #ifdef __cplusplus
 extern "C" {
@@ -112,6 +113,8 @@ LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wPar
 
 // kernel32.dll
 DWORD _GetFileAttributesW(LPCWSTR lpFileName);
+DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer);
+BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName);
 void _OutputDebugStringW(LPCWSTR lpOutputString);
 
 // gdi32.lib
@@ -124,6 +127,9 @@ BOOL _RemoveFontResourceExW(LPCWSTR name, DWORD fl, PVOID pdv);
 HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
 INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
+
+// Comdlg32.lib
+BOOL _GetOpenFileNameW(LPOPENFILENAMEW Arg1);
 
 // shell32.lib
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);

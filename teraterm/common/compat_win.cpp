@@ -42,8 +42,6 @@ ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
 HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
  HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
 LRESULT (WINAPI *pDefWindowProcW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
-INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
 LRESULT (WINAPI *pSendMessageW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
@@ -69,6 +67,8 @@ LONG (WINAPI *pSetWindowLongW)(HWND hWnd, int nIndex, LONG dwNewLong);
 LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 #endif
 LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
+BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 
 // kernel32.dll
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
@@ -100,6 +100,13 @@ int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
 // shell32
 UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 BOOL (WINAPI *pShell_NotifyIconW)(DWORD dwMessage, NOTIFYICONDATAW *lpData);
+
+// comctl32
+HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
+INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
+
+// comdlg32
+BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW Arg1);
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -204,6 +211,8 @@ static const APIInfo Lists_kernel32[] = {
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
 	{ "OutputDebugStringW", (void **)&pOutputDebugStringW },
+	{ "GetCurrentDirectoryW", (void **)&pGetCurrentDirectoryW },
+	{ "SetCurrentDirectoryW", (void **)&pSetCurrentDirectoryW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
@@ -233,6 +242,15 @@ static const APIInfo Lists_hhctrl[] = {
 	{},
 };
 
+static const APIInfo Lists_comdlg32[] = {
+#ifndef UNICODE_API_DISABLE
+	{ "GetOpenFileNameW", (void **)&pGetOpenFileNameW },
+#endif
+	{},
+};
+
+
+
 static const DllInfo DllInfos[] = {
 	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -242,6 +260,7 @@ static const DllInfo DllInfos[] = {
 	{ _T("shell32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
 	{ _T("Comctl32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{ _T("hhctrl.ocx"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_hhctrl },
+	{ _T("comdlg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comdlg32 },
 	{},
 };
 
@@ -273,6 +292,9 @@ void WinCompatInit()
 		pGetFileAttributesW = NULL;
 		pOutputDebugStringW = NULL;
 		pDragQueryFileW = NULL;
+		pGetCurrentDirectoryW = NULL;
+		pSetCurrentDirectoryW = NULL;
+		pGetOpenFileNameW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

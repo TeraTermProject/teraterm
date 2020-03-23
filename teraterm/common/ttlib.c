@@ -1516,6 +1516,16 @@ DWORD get_OPENFILENAME_SIZE()
 	return OPENFILENAME_SIZE_VERSION_400A;
 }
 
+// OPENFILENAMEW.lStructSize ‚É‘ã“ü‚·‚é’l
+DWORD get_OPENFILENAME_SIZEW()
+{
+	if (IsWindows2000OrLater()) {
+		return sizeof(OPENFILENAMEW);
+	}
+//	return OPENFILENAME_SIZE_VERSION_400W;
+	return CDSIZEOF_STRUCT(OPENFILENAMEW,lpTemplateName);
+}
+
 // convert table for KanjiCodeID and ListID
 // cf. KanjiList,KanjiListSend
 //     KoreanList,KoreanListSend

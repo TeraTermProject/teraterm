@@ -95,3 +95,48 @@ INT_PTR _PropertySheetW(PROPSHEETHEADERW *psh)
 	return retval;
 }
 
+static char *ConvertFilter(const wchar_t *filterW)
+{
+	if (filterW == NULL) {
+		return NULL;
+	}
+	size_t len = 0;
+	for(;;) {
+		if (filterW[len] == 0 && filterW[len + 1] == 0) {
+			len++;
+			break;
+		}
+		len++;
+	}
+	len++;
+	char *filterA = (char *)malloc(len);
+	::WideCharToMultiByte(CP_ACP, 0, filterW, (int)len, filterA, (int)len, NULL, NULL);
+	return filterA;
+}
+
+BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
+{
+	if (pGetOpenFileNameW != NULL) {
+		return pGetOpenFileNameW(ofnW);
+	}
+
+	char fileA[MAX_PATH];
+	WideCharToMultiByte(CP_ACP, 0, ofnW->lpstrFile, -1, fileA, _countof(fileA), NULL,NULL);
+
+	OPENFILENAMEA ofnA;
+	memset(&ofnA, 0, sizeof(ofnA));
+	ofnA.lStructSize = OPENFILENAME_SIZE_VERSION_400A;
+	ofnA.hwndOwner = ofnW->hwndOwner;
+	ofnA.lpstrFilter = ConvertFilter(ofnW->lpstrFilter);
+	ofnA.lpstrFile = fileA;
+	ofnA.nMaxFile = _countof(fileA);
+	ofnA.lpstrTitle = ToCharW(ofnW->lpstrTitle);
+	ofnA.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	BOOL result = GetOpenFileNameA(&ofnA);
+	if (result) {
+		MultiByteToWideChar(CP_ACP, 0, fileA, _countof(fileA), ofnW->lpstrFile, ofnW->nMaxFile);
+	}
+	free((void *)ofnA.lpstrFilter);
+	free((void *)ofnA.lpstrTitle);
+	return result;
+}
