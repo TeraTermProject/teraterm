@@ -54,6 +54,8 @@
 #include "debug_pp.h"
 #include "tipwin.h"
 #include "i18n.h"
+#include "codeconv.h"
+#include "layer_for_unicode.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -499,8 +501,6 @@ void CCopypastePropPageDlg::OnInitDialog()
 
 BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	char uimsg[MAX_UIMSG];
-
 	switch (wParam) {
 		case IDC_DISABLE_PASTE_RBUTTON | (BN_CLICKED << 16):
 			EnableDlgItem(IDC_CONFIRM_PASTE_RBUTTON,
@@ -519,23 +519,28 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDC_CONFIRM_STRING_FILE_PATH | (BN_CLICKED << 16):
 			{
-				OPENFILENAMEA ofn;
+				wchar_t fileW[_countof(ts.ConfirmChangePasteStringFile)];
+				MultiByteToWideChar(CP_ACP, 0, ts.ConfirmChangePasteStringFile, -1, fileW, _countof(fileW));
+
+				OPENFILENAMEW ofn;
 
 				memset(&ofn, 0, sizeof(ofn));
-				ofn.lStructSize = get_OPENFILENAME_SIZEA();
+				ofn.lStructSize = get_OPENFILENAME_SIZEW();
 				ofn.hwndOwner = GetSafeHwnd();
-				get_lang_msg("FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
-				             "txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
-				ofn.lpstrFilter = ts.UIMsg;
-				ofn.lpstrFile = ts.ConfirmChangePasteStringFile;
-				ofn.nMaxFile = sizeof(ts.ConfirmChangePasteStringFile);
-				get_lang_msg("FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", uimsg, sizeof(uimsg),
-				             "Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
-				ofn.lpstrTitle = uimsg;
+				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", L"txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
+				ofn.lpstrFile = fileW;
+				ofn.nMaxFile = _countof(fileW);
+				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				if (GetOpenFileNameA(&ofn) != 0) {
+				BOOL ok = _GetOpenFileNameW(&ofn);
+				if (ok) {
+					char *file = ToCharW(fileW);
+					strncpy_s(ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile), file, _TRUNCATE);
+					free(file);
 					SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
 				}
+				free((void *)ofn.lpstrFilter);
+				free((void *)ofn.lpstrTitle);
 			}
 			return TRUE;
 	}
@@ -938,20 +943,21 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_BGIMG_BUTTON | (BN_CLICKED << 16):
 			// 背景画像をダイアログで指定する。
 			{
-				OPENFILENAMEA ofn;
-				char szFile[MAX_PATH];
+				OPENFILENAMEW ofn;
+				wchar_t szFile[MAX_PATH];
 
 				memset(&ofn, 0, sizeof(ofn));
 				memset(szFile, 0, sizeof(szFile));
-				ofn.lStructSize = get_OPENFILENAME_SIZEA();
+				ofn.lStructSize = get_OPENFILENAME_SIZEW();
 				ofn.hwndOwner = GetSafeHwnd();
-				ofn.lpstrFilter = "Image Files(*.jpg;*.jpeg;*.bmp)\0*.jpg;*.jpeg;*.bmp\0All Files(*.*)\0*.*\0";
+				ofn.lpstrFilter = L"Image Files(*.jpg;*.jpeg;*.bmp)\0*.jpg;*.jpeg;*.bmp\0All Files(*.*)\0*.*\0";
 				ofn.lpstrFile = szFile;
 				ofn.nMaxFile = _countof(szFile);
-				ofn.lpstrTitle = "select image file";
+				ofn.lpstrTitle = L"select image file";
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				if (GetOpenFileNameA(&ofn) != 0) {
-					SetDlgItemTextA(IDC_BGIMG_EDIT, szFile);
+				BOOL ok = _GetOpenFileNameW(&ofn);
+				if (ok) {
+					SetDlgItemTextW(IDC_BGIMG_EDIT, szFile);
 				}
 			}
 			return TRUE;
@@ -1386,28 +1392,31 @@ void CLogPropPageDlg::OnInitDialog()
 
 BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	char uimsg[MAX_UIMSG];
-
 	switch (wParam) {
 		case IDC_VIEWLOG_PATH | (BN_CLICKED << 16):
 			{
-				OPENFILENAMEA ofn;
+				wchar_t fileW[_countof(ts.ViewlogEditor)];
+				MultiByteToWideChar(CP_ACP, 0, ts.ViewlogEditor, -1, fileW, _countof(fileW));
 
-				ZeroMemory(&ofn, sizeof(ofn));
-				ofn.lStructSize = get_OPENFILENAME_SIZEA();
+				OPENFILENAMEW ofn;
+
+				memset(&ofn, 0, sizeof(ofn));
+				ofn.lStructSize = get_OPENFILENAME_SIZEW();
 				ofn.hwndOwner = GetSafeHwnd();
-				get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
-				             "exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
-				ofn.lpstrFilter = ts.UIMsg;
-				ofn.lpstrFile = ts.ViewlogEditor;
-				ofn.nMaxFile = sizeof(ts.ViewlogEditor);
-				get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_TITLE", uimsg, sizeof(uimsg),
-				             "Choose a executing file with launching logging file", ts.UILanguageFile);
-				ofn.lpstrTitle = uimsg;
+				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_FILTER", L"exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
+				ofn.lpstrFile = fileW;
+				ofn.nMaxFile = _countof(fileW);
+				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", ts.UILanguageFile);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				if (GetOpenFileNameA(&ofn) != 0) {
+				BOOL ok = _GetOpenFileNameW(&ofn);
+				if (ok) {
+					char *file = ToCharW(fileW);
+					strncpy_s(ts.ViewlogEditor, sizeof(ts.ViewlogEditor), file, _TRUNCATE);
+					free(file);
 					SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 				}
+				free((void *)ofn.lpstrFilter);
+				free((void *)ofn.lpstrTitle);
 			}
 			return TRUE;
 
@@ -1481,8 +1490,6 @@ void CLogPropPageDlg::OnOK()
 	char buf[80], buf2[80];
 	time_t time_local;
 	struct tm *tm_local;
-	TCHAR uimsg[MAX_UIMSG];
-	TCHAR uimsg2[MAX_UIMSG];
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
@@ -1490,10 +1497,11 @@ void CLogPropPageDlg::OnOK()
 	// Log Default File Name (2006.8.28 maya)
 	GetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, buf, sizeof(buf));
 	if (isInvalidStrftimeChar(buf)) {
-		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
-		get_lang_msgT("MSG_LOGFILE_INVALID_CHAR_ERROR", uimsg2, _countof(uimsg2),
-		              _T("Invalid character is included in log file name."), ts.UILanguageFile);
-		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name." };
+		TTMessageBoxW(m_hWnd, &info, MB_ICONEXCLAMATION, ts.UILanguageFile);
 		return;
 	}
 
@@ -1502,17 +1510,19 @@ void CLogPropPageDlg::OnOK()
 	tm_local = localtime(&time_local);
 	// 時刻文字列に変換
 	if (strlen(buf) != 0 && strftime(buf2, sizeof(buf2), buf, tm_local) == 0) {
-		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
-		get_lang_msgT("MSG_LOGFILE_TOOLONG_ERROR", uimsg2, _countof(uimsg2),
-					  _T("The log file name is too long."), ts.UILanguageFile);
-		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_LOGFILE_TOOLONG_ERROR", L"The log file name is too long." };
+		TTMessageBoxW(m_hWnd, &info, MB_ICONEXCLAMATION, ts.UILanguageFile);
 		return;
 	}
 	if (isInvalidFileNameChar(buf2)) {
-		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
-		get_lang_msgT("MSG_LOGFILE_INVALID_CHAR_ERROR", uimsg2, _countof(uimsg2),
-					  _T("Invalid character is included in log file name."), ts.UILanguageFile);
-		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name." };
+		TTMessageBoxW(m_hWnd, &info, MB_ICONEXCLAMATION, ts.UILanguageFile);
 		return;
 	}
 	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);
