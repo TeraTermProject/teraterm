@@ -46,6 +46,8 @@
 
 #include "sendfiledlg.h"
 
+#define TitSendFileW L"Send file"	// TODO ttftype.h内にANSI版がある
+
 /**
  *	GetOpenFileName(), GetSaveFileName() 用フィルタ文字列取得
  *
@@ -144,13 +146,13 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		{0, "FILEDLG_TRANS_TITLE_SENDFILE"},
 		{IDC_SENDFILE_FILENAME_TITLE, "DLG_SENDFILE_FILENAME_TITLE"},
 		{IDC_SENDFILE_CHECK_BINARY, "DLG_FOPT_BINARY"},
-		{IDC_SENDFILE_DELAYTYPE_LABEL, "test"},
-		{IDC_SENDFILE_SEND_SIZE_LABEL, "test"},
-		{IDC_SENDFILE_DELAYTIME_LABEL, "test"},
+		{IDC_SENDFILE_DELAYTYPE_LABEL, "DLG_SENDFILE_DELAYTYPE_TITLE"},
+		{IDC_SENDFILE_SEND_SIZE_LABEL, "DLG_SENDFILE_SEND_SIZE_TITLE"},
+		{IDC_SENDFILE_DELAYTIME_LABEL, "DLG_SENDFILE_DELAYTIME_TITLE"},
 		{IDCANCEL, "BTN_CANCEL"},
 		{IDOK, "BTN_OK"},
 	};
-	static const I18nTextInfo l[] = {
+	static const I18nTextInfo delaytype_list[] = {
 		{"DLG_SENDFILE_DELAYTYPE_NO_DELAY", L"no delay"},
 		{"DLG_SENDFILE_DELAYTYPE_PER_CHAR", L"per charactor"},
 		{"DLG_SENDFILE_DELAYTYPE_PER_LINE", L"per line"},
@@ -169,7 +171,8 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
-			SetI18nList("TeraTerm", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, l, _countof(l), data->UILanguageFile, 0);
+			SetI18nList("TeraTerm", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
+						data->UILanguageFile, 0);
 
 			for (i = 0; i < _countof(send_size_list); i++) {
 				char buf[32];
@@ -232,7 +235,6 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					wchar_t TempDir[MAX_PATH];
 					_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-#define TitSendFileW L"Send file"
 					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSendFileW, data->UILanguageFile);
 					wchar_t *title;
 					aswprintf(&title, L"Tera Term: %s", uimsg);
