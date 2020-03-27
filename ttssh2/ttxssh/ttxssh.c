@@ -58,7 +58,6 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <winsock2.h>
-static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 
 #include <lmcons.h>
 
@@ -1291,6 +1290,35 @@ LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	return CallWindowProc(OrigHostnameEditProc, dlg, msg, wParam, lParam);
 }
 
+/**
+ *	リストの横幅を拡張する(元の幅より狭くなることはない)
+ *	@param[in]	dlg		ダイアログのハンドル
+ *	@param[in]	ID		コンボボックスのID
+ */
+static void ExpandCBWidth(HWND dlg, int ID)
+{
+	HWND hCtrlWnd = GetDlgItem(dlg, ID);
+	int count = (int)SendMessage(hCtrlWnd, CB_GETCOUNT, 0, 0);
+	HFONT hFont = (HFONT)SendMessage(hCtrlWnd, WM_GETFONT, 0, 0);
+	int i, max_width = 0;
+	HDC TmpDC = GetDC(hCtrlWnd);
+	hFont = (HFONT)SelectObject(TmpDC, hFont);
+	for (i=0; i<count; i++) {
+		SIZE s;
+		int len = (int)SendMessage(hCtrlWnd, CB_GETLBTEXTLEN, i, 0);
+		char *lbl = (char *)calloc(len+1, sizeof(char));
+		SendMessage(hCtrlWnd, CB_GETLBTEXT, i, (LPARAM)lbl);
+		GetTextExtentPoint32(TmpDC, lbl, len, &s);
+		if (s.cx > max_width)
+			max_width = s.cx;
+		free(lbl);
+	}
+	max_width += GetSystemMetrics(SM_CXVSCROLL);	// スクロールバーの幅も足し込んでおく
+	SendMessage(hCtrlWnd, CB_SETDROPPEDWIDTH, max_width, 0);
+	SelectObject(TmpDC, hFont);
+	ReleaseDC(hCtrlWnd, TmpDC);
+}
+
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 								   LPARAM lParam)
 {
@@ -1310,6 +1338,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
 	static char *ssh_version[] = {"SSH1", "SSH2", NULL};
+	static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 	PGetHNRec GetHNRec;
 	char EntName[128];
 	char TempHost[HostNameMaxLength + 1];
@@ -1482,6 +1511,8 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SetFocus(hwnd);
 		}
 
+		ExpandCBWidth(dlg, IDC_HOSTNAME);
+		ExpandCBWidth(dlg, IDC_HOSTCOM);
 		CenterWindow(dlg, GetParent(dlg));
 
 		// SetFocus()でフォーカスをあわせた場合、FALSEを返す必要がある。
@@ -1497,7 +1528,6 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			if (GetHNRec != NULL) {
 				if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
 					BOOL Ok;
-					char afstr[BUFSIZ];
 					i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
 					if (!Ok) {
 						// TODO IDC_HOSTTCPPORTは数値しか入力できない、不要?
@@ -1510,13 +1540,10 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 						return TRUE;
 					}
 					GetHNRec->TCPPort = i;
-#define getaf(str) \
-((strcmp((str), "IPv6") == 0) ? AF_INET6 : \
- ((strcmp((str), "IPv4") == 0) ? AF_INET : AF_UNSPEC))
-					memset(afstr, 0, sizeof(afstr));
-					GetDlgItemText(dlg, IDC_HOSTTCPPROTOCOL, afstr,
-					               sizeof(afstr));
-					GetHNRec->ProtocolFamily = getaf(afstr);
+					i = (int)SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_GETCURSEL, 0, 0);
+					GetHNRec->ProtocolFamily =
+						i == 0 ? AF_UNSPEC :
+						i == 1 ? AF_INET6 : AF_INET;
 					GetHNRec->PortType = IdTCPIP;
 					GetDlgItemText(dlg, IDC_HOSTNAME, GetHNRec->HostName,
 					               HostNameMaxLength);
@@ -1528,13 +1555,8 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 						pvar->hostdlg_Enabled = TRUE;
 
 						// check SSH protocol version
-						memset(afstr, 0, sizeof(afstr));
-						GetDlgItemText(dlg, IDC_SSH_VERSION, afstr, sizeof(afstr));
-						if (_stricmp(afstr, "SSH1") == 0) {
-							pvar->settings.ssh_protocol_version = 1;
-						} else {
-							pvar->settings.ssh_protocol_version = 2;
-						}
+						i = (int)SendDlgItemMessage(dlg, IDC_SSH_VERSION, CB_GETCURSEL, 0, 0);
+						pvar->settings.ssh_protocol_version = (i == 0) ? 1 : 2;
 					}
 					else {	// IDC_HOSTOTHER
 						GetHNRec->Telnet = FALSE;
@@ -1622,28 +1644,6 @@ hostssh_enabled:
 				SetDlgItemInt(dlg, IDC_HOSTTCPPORT, 22, FALSE);
 			}
 			return TRUE;
-
-		case IDC_HOSTCOM:
-			if(HIWORD(wParam) == CBN_DROPDOWN) {
-				HWND hostcom = GetDlgItem(dlg, IDC_HOSTCOM);
-				int count = SendMessage(hostcom, CB_GETCOUNT, 0, 0);
-				int i, len, max_len = 0;
-				char *lbl;
-				HDC TmpDC = GetDC(hostcom);
-				SIZE s;
-				for (i=0; i<count; i++) {
-					len = SendMessage(hostcom, CB_GETLBTEXTLEN, i, 0);
-					lbl = (char *)calloc(len+1, sizeof(char));
-					SendMessage(hostcom, CB_GETLBTEXT, i, (LPARAM)lbl);
-					GetTextExtentPoint32(TmpDC, lbl, len, &s);
-					if (s.cx > max_len)
-						max_len = s.cx;
-					free(lbl);
-				}
-				SendMessage(hostcom, CB_SETDROPPEDWIDTH,
-							max_len + GetSystemMetrics(SM_CXVSCROLL), 0);
-			}
-			break;
 
 		case IDC_HOSTHELP:
 			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpFileNewConnection, 0);
