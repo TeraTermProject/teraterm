@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,19 +61,22 @@ INT_PTR CMsgDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 
 BOOL CMsgDlg::OnInitDialog()
 {
-	static const DlgTextInfo TextInfosOk[] = {
-		{ IDOK, "BTN_OK" },
-	};
-	static const DlgTextInfo TextInfosYesNo[] = {
-		{ IDOK, "BTN_YES" },
-		{ IDCANCEL, "BTN_NO" },
-	};
 	RECT R;
 	HWND HOk;
 
+	// IDOK のデフォルト "OK", 表示
+	// IDCANCEL のデフォルト "No", 非表示
 	if (YesNoFlag) {
+		static const DlgTextInfo TextInfosYesNo[] = {
+			{ IDOK, "BTN_YES" },
+			{ IDCANCEL, "BTN_NO" },
+		};
+		SetDlgItemTextA(IDOK, "Yes");	// lng ファイルなし対策
 		SetDlgTexts(m_hWnd, TextInfosYesNo, _countof(TextInfosYesNo), UILanguageFile);
 	} else {
+		static const DlgTextInfo TextInfosOk[] = {
+			{ IDOK, "BTN_OK" },
+		};
 		SetDlgTexts(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFile);
 	}
 
