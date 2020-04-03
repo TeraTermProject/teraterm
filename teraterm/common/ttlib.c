@@ -1319,6 +1319,9 @@ ULONGLONG _myVerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask
 			result = dwlConditionMask & ~mask;
 			result |= op << (7 * 3);
 			break;
+		default:
+			result = 0;
+			break;
 	}
 
 	return result;
