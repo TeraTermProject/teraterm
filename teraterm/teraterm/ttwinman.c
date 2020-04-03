@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -94,6 +94,10 @@ void ChangeTitle()
 	{
 		wchar_t *title = ToWcharA(ts.Title);
 		wchar_t *title_remote = ToWcharA(cv.TitleRemote);
+		if (title_remote == NULL) {
+			// TODO cv.TitleRemote Ç™ strncpy_s() Ç≈ïsê≥Ç»ï∂éöÇ™ä‹Ç‹ÇÍÇΩÇ∆Ç´ NULL Ç™ï‘ÇÈ
+			title_remote = _wcsdup(L"-");
+		}
 		if (Connecting || !cv.Ready || wcslen(title_remote) == 0) {
 			wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
 			wcsncpy_s(TempTitle, _countof(TempTitle), title, _TRUNCATE);
