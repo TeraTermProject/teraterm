@@ -29,6 +29,8 @@
 
 /* TERATERM.EXE, Printing routines */
 
+#include "buffer.h"		// for TCharAttr
+
 #ifdef __cplusplus
 extern "C" {
 #endif

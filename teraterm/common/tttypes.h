@@ -68,45 +68,6 @@ typedef enum {
 #define IdKanji    2
 #define IdSpecial  3
 
-  /* Character attribute bit masks */
-#define AttrDefault       0x00
-#define AttrDefaultFG     0x00
-#define AttrDefaultBG     0x00
-#define AttrBold          0x01
-#define AttrUnder         0x02
-#define AttrSpecial       0x04
-#define AttrFontMask      0x07
-#define AttrBlink         0x08
-#define AttrReverse       0x10
-#define AttrLineContinued 0x20 /* valid only at the beggining or end of a line */
-/* begin - ishizaki */
-#define AttrURL           0x40
-/* end - ishizaki */
-#define AttrKanji         0x80		// 1=ëSäp(2cell)/0=îºäp(1cell)
-#if UNICODE_INTERNAL_BUFF
-#define AttrPadding       0x100		// 1=padding(2cellÇÃéüÇÃ1cell or çsññ)
-#endif
-  /* Color attribute bit masks */
-#define Attr2Fore         0x01
-#define Attr2Back         0x02
-#define AttrSgrMask       (AttrBold | AttrUnder | AttrBlink | AttrReverse)
-#define AttrColorMask     (AttrBold | AttrBlink | AttrReverse)
-#define Attr2ColorMask    (Attr2Fore | Attr2Back)
-
-#define Attr2Protect      0x04
-
-typedef struct {
-	BYTE Attr;
-	BYTE Attr2;
-#if UNICODE_INTERNAL_BUFF
-	WORD AttrEx;
-#endif
-	BYTE Fore;
-	BYTE Back;
-} TCharAttr;
-
-typedef TCharAttr *PCharAttr;
-
   /* Color codes */
 #define IdBack    0
 #define IdRed     1
