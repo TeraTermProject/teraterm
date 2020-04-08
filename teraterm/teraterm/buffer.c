@@ -2047,6 +2047,65 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 #endif
 
 /**
+ *	1セル分をwchar_t文字列に展開する
+ *	@param[in]		b			1セル分の文字情報へのポインタ
+ *	@param[in,out]	buf			文字列展開先 NULLの場合は展開されない
+ *	@param[in]		buf_size	bufの文字数 NULLの場合は参照されない
+ *	@retrun			文字数
+ */
+static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, BOOL *too_samll)
+{
+	size_t len;
+
+	if (IsBuffPadding(b)) {
+		if (too_samll != NULL) {
+			*too_samll = FALSE;
+		}
+		return 0;
+	}
+
+	// 長さを測る
+	len = 0;
+	if (b->wc2[1] == 0) {
+		// サロゲートペアではない
+		len++;
+	} else {
+		// サロゲートペア
+		len += 2;
+	}
+	// コンビネーション
+	len += b->CombinationCharCount16;
+
+	if (buf == NULL) {
+		// 長さだけを返す
+		return len;
+	}
+
+	// バッファに収まる?
+	if (len > buf_size) {
+		// バッファに収まらない
+		if (too_samll != NULL) {
+			*too_samll = TRUE;
+		}
+		return 0;
+	}
+	if (too_samll != NULL) {
+		*too_samll = FALSE;
+	}
+
+	// 展開していく
+	*buf++ = b->wc2[0];
+	if (b->wc2[1] != 0) {
+		*buf++ = b->wc2[1];
+	}
+	if (b->CombinationCharCount16 != 0) {
+		memcpy(buf, b->pCombinationChars16, b->CombinationCharCount16 * sizeof(wchar_t));
+	}
+
+	return len;
+}
+
+/**
  *	(x,y) の1文字が strと同一か調べる
  *		*注 1文字が複数のwchar_tから構成されている
  *
@@ -6114,6 +6173,50 @@ int BuffGetCurrentLineData(char *buf, int bufsize)
 	return (CursorX);
 }
 
+/**
+ * Sy行の一行を文字列にして返す
+ *
+ * @param[in]	Sy			Sy行の1行を返す
+ * @param[in]	*Cx			文字の位置(カーソルなどの位置), NULLのとき無効
+ * @param[out]	*Cx			左端からの文字数(先頭からカーソル位置までの文字数)
+ * @param[out]	*lenght		文字数(ターミネータ含む)
+ */
+wchar_t *BuffGetLineStrW(int Sy, int *cx, size_t *lenght)
+{
+	size_t total_len = 0;
+	size_t i = 0;
+	LONG Ptr = GetLinePtr(PageStart + Sy);
+	buff_char_t* b = &CodeBuffW[Ptr];
+	int x;
+	int cx_pos = cx != NULL ? *cx : 0;
+	int cx_char_count = 0;
+	size_t idx;
+	wchar_t *result;
+	for(x = 0; x < NumOfColumns; x++) {
+		size_t len;
+		if (x == cx_pos) {
+			if (cx != NULL) {
+				*cx = (int)total_len;
+			}
+		}
+		len = expand_wchar(b + x, NULL, 0, NULL);
+		total_len += len;
+	}
+	total_len++;
+	result = (wchar_t *)malloc(total_len * sizeof(wchar_t));
+	idx = 0;
+	for(x = 0; x < NumOfColumns; x++) {
+		wchar_t *p = &result[idx];
+		size_t len = expand_wchar(b + x, p, total_len - idx, NULL);
+		idx += len;
+	}
+	result[idx] = 0;
+	if (lenght != NULL) {
+		*lenght = total_len;
+	}
+	return result;
+}
+
 // 全バッファから指定した行を返す。
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize)
 {
@@ -6342,6 +6445,14 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		str_ptr = realloc(str_ptr, sizeof(wchar_t) * str_len);
 		wcscat_s(str_ptr, str_len, str2_ptr);
 		free(str2_ptr);
+	}
+#endif
+
+#if 0
+	{
+		wchar_t *p = BuffGetCurrentLineDataW(ScreenY, NULL, NULL);
+		OutputDebugPrintfW(L"BuffGetCurrentLineDataW(%d)='%s'\n", Yw, p);
+		free(p);
 	}
 #endif
 

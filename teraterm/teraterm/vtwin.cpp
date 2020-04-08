@@ -3177,32 +3177,65 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 
 	if (lParam == 0)
 	{  // 1回目の呼び出し サイズだけを返す
-		char buf[512];			// 参照文字列を受け取るバッファ
-		size_t str_len_count;
-		int cx;
-//		assert(IsWindowUnicode(hWnd) == FALSE);		// TODO UNICODE/ANSI切り替え
+		if(IsWindowUnicode(hWnd) == FALSE) {
+			// ANSI版
+			char buf[512];			// 参照文字列を受け取るバッファ
+			size_t str_len_count;
+			int cx;
 
-		// 参照文字列取得、1行取り出す
-		{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
-			int x;
-			int len;
-			cx = BuffGetCurrentLineData(buf, sizeof(buf));
-			len = cx;
-			for (x=cx; x < NumOfColumns; x++) {
-				const char c = buf[x];
-				if (c != 0 && c != 0x20) {
-					len = x+1;
+			// 参照文字列取得、1行取り出す
+			{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
+				int x;
+				int len;
+				cx = BuffGetCurrentLineData(buf, sizeof(buf));
+				len = cx;
+				for (x=cx; x < NumOfColumns; x++) {
+					const char c = buf[x];
+					if (c != 0 && c != 0x20) {
+						len = x+1;
+					}
 				}
+				str_len_count = len;
 			}
-			str_len_count = len;
-		}
 
-		// IMEに返す構造体を作成する
-		if (pReconvPtrSave != NULL) {
-			free(pReconvPtrSave);
+			// IMEに返す構造体を作成する
+			if (pReconvPtrSave != NULL) {
+				free(pReconvPtrSave);
+			}
+			pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStA(
+				hWnd, buf, str_len_count, cx, &ReconvSizeSave);
 		}
-		pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStA(
-			hWnd, buf, str_len_count, cx, &ReconvSizeSave);
+		else {
+			// UNICODE版
+			size_t str_len_count;
+			int cx;
+			wchar_t *strW;
+
+			// 参照文字列取得、1行取り出す
+			{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
+				int x;
+				size_t len = 0;
+				cx = CursorX;
+				strW = BuffGetLineStrW(CursorY, &cx, &len);
+				len = cx;
+				for (x=cx; x < NumOfColumns; x++) {
+					const wchar_t c = strW[x];
+					if (c == 0 || c == 0x20) {
+						len = x;
+						break;
+					}
+				}
+				str_len_count = len;
+			}
+
+			// IMEに返す構造体を作成する
+			if (pReconvPtrSave != NULL) {
+				free(pReconvPtrSave);
+			}
+			pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStW(
+				hWnd, strW, str_len_count, cx, &ReconvSizeSave);
+			free(strW);
+		}
 
 		// 1回目はサイズだけを返す
 		result = ReconvSizeSave;
@@ -3211,8 +3244,12 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 		// 2回目の呼び出し 構造体を渡す
 		if (pReconvPtrSave != NULL) {
 			RECONVERTSTRING *pReconv = (RECONVERTSTRING*)lParam;
-			memcpy(pReconv, pReconvPtrSave, ReconvSizeSave);
-			result = ReconvSizeSave;
+			result = 0;
+			if (pReconv->dwSize >= ReconvSizeSave) {
+				// 1回目のサイズが確保されてきているはず
+				memcpy(pReconv, pReconvPtrSave, ReconvSizeSave);
+				result = ReconvSizeSave;
+			}
 			free(pReconvPtrSave);
 			pReconvPtrSave = NULL;
 			ReconvSizeSave = 0;
@@ -3221,11 +3258,6 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 			result = 0;
 		}
 	}
-
-#if 0
-	OutputDebugPrintf("WM_IME_REQUEST,IMR_DOCUMENTFEED lp=%p LRESULT %d\n",
-		lParam, result);
-#endif
 
 	return result;
 }

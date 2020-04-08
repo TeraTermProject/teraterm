@@ -148,7 +148,8 @@ void BuffSelectiveEraseBox(int XStart, int YStart, int XEnd, int YEnd);
 void BuffScrollLeft(int count);
 void BuffScrollRight(int count);
 int BuffGetCurrentLineData(char *buf, int bufsize);
-int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
+wchar_t *BuffGetLineStrW(int Sy, int *cx, size_t *length);
+int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);		// from filesys.cpp
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
 wchar_t *BuffGetCharInfo(int Xw, int Yw);
 void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr);
