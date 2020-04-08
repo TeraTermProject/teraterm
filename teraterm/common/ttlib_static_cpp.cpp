@@ -1,5 +1,33 @@
+/*
+ * Copyright (C) 2020 TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <windows.h>
+#include <stdio.h>
 #include <string.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
@@ -73,4 +101,87 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const ch
 	free(message);
 
 	return r;
+}
+
+
+// from ttxssh
+static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int byte_cnt)
+{
+	int i, c;
+	char tmp[128];
+
+	buf[0] = 0;
+
+	/* 先頭のアドレス表示 */
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%08X : ", addr);
+	strncat_s(buf, buflen, tmp, _TRUNCATE);
+
+	/* バイナリ表示（4バイトごとに空白を挿入）*/
+	for (i = 0; i < byte_cnt; i++) {
+		if (i > 0 && i % 4 == 0) {
+			strncat_s(buf, buflen, " ", _TRUNCATE);
+		}
+
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02X", bytes[i]);
+		strncat_s(buf, buflen, tmp, _TRUNCATE);
+	}
+
+	/* ASCII表示部分までの空白を補う */
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "   %*s%*s", (16 - byte_cnt) * 2 + 1, " ", (16 - byte_cnt + 3) / 4, " ");
+	strncat_s(buf, buflen, tmp, _TRUNCATE);
+
+	/* ASCII表示 */
+	for (i = 0; i < byte_cnt; i++) {
+		c = bytes[i];
+		if (isprint(c)) {
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%c", c);
+			strncat_s(buf, buflen, tmp, _TRUNCATE);
+		}
+		else {
+			strncat_s(buf, buflen, ".", _TRUNCATE);
+		}
+	}
+}
+
+void DebugHexDump(void (*f)(const char *s), const void *data_, size_t len)
+{
+	const char *data = (char *)data_;
+	char buff[4096];
+	int c, addr;
+	int bytes[16], *ptr;
+	int byte_cnt;
+	int i;
+
+	addr = 0;
+	byte_cnt = 0;
+	ptr = bytes;
+	for (i = 0; i < len; i++) {
+		c = data[i];
+		*ptr++ = c & 0xff;
+		byte_cnt++;
+
+		if (byte_cnt == 16) {
+			format_line_hexdump(buff, sizeof(buff), addr, bytes, byte_cnt);
+			f(buff);
+
+			addr += 16;
+			byte_cnt = 0;
+			ptr = bytes;
+		}
+	}
+
+	if (byte_cnt > 0) {
+		format_line_hexdump(buff, sizeof(buff), addr, bytes, byte_cnt);
+		f(buff);
+	}
+}
+
+static void OutputDebugHexDumpSub(const char *s)
+{
+	OutputDebugPrintf("%s\n", s);
+}
+
+void OutputDebugHexDump(const void *data, size_t len)
+{
+	DebugHexDump(OutputDebugHexDumpSub, data, len);
 }
