@@ -2300,7 +2300,7 @@ void CVTWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 	}
 }
 
-int CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
+LRESULT CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 {
 	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT)) { //disable mouse event for text selection
 		IgnoreRelease = TRUE;
@@ -6457,7 +6457,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnIMENotify(wp, lp);
 		break;
 	case WM_IME_REQUEST:
-		OnIMERequest(wp, lp);
+		retval = OnIMERequest(wp, lp);
 		break;
 	case WM_WINDOWPOSCHANGING:
 		OnWindowPosChanging(wp, lp);

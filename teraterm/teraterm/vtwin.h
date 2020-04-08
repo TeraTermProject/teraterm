@@ -113,7 +113,7 @@ protected:
 	void OnLButtonUp(WPARAM nFlags, POINTS point);
 	void OnMButtonDown(WPARAM nFlags, POINTS point);
 	void OnMButtonUp(WPARAM nFlags, POINTS point);
-	int OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message);
+	LRESULT OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message);
 	void OnMouseMove(WPARAM nFlags, POINTS point);
 	void OnMove(int x, int y);
 	BOOL OnMouseWheel(UINT nFlags, short zDelta, POINTS pt);
