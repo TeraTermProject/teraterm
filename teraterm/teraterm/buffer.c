@@ -43,7 +43,6 @@
 #include "ttwinman.h"
 #include "teraprn.h"
 #include "vtdisp.h"
-#include "clipboar.h"
 #include "telnet.h"
 #include "ttplug.h" /* TTPLUG */
 #include "codeconv.h"
@@ -2252,8 +2251,13 @@ static wchar_t *ConvertTable(const wchar_t *src, size_t src_len, size_t *str_len
 }
 
 
+/**
+ *	クリップボード用文字列取得
+ *	@return		文字列
+ *				使用後は free() すること
+ */
 #if UNICODE_INTERNAL_BUFF
-void BuffCBCopyUnicode(BOOL Table)
+wchar_t *BuffCBCopyUnicode(BOOL Table)
 {
 	wchar_t *str_ptr;
 	size_t str_len;
@@ -2270,11 +2274,7 @@ void BuffCBCopyUnicode(BOOL Table)
 		str_ptr = table_ptr;
 		str_len = table_len;
 	}
-	OutputDebugPrintfW(L"BuffCBCopyUnicode()\n"
-					   L"%d, '%s'\n", str_len, str_ptr);
-
-	CBSetTextW(HVTWin, str_ptr, 0);
-	free(str_ptr);
+	return str_ptr;
 }
 #endif
 
@@ -5141,9 +5141,10 @@ end:
 	UnlockBuffer();
 }
 
-void BuffEndSelect()
+wchar_t *BuffEndSelect()
 //  End text selection by mouse button up
 {
+	wchar_t *retval = NULL;
 	if (!Selecting) {
 		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
 			SelectEnd = SelectStart;
@@ -5152,7 +5153,7 @@ void BuffEndSelect()
 			ChangeSelectRegion();
 			UnlockBuffer();
 			Selected = FALSE;
-			return;
+			return NULL;
 		}
 		SelectStart = SelectStartTmp;
 	}
@@ -5193,13 +5194,14 @@ void BuffEndSelect()
 		if (ts.AutoTextCopy>0) {
 			LockBuffer();
 #if UNICODE_INTERNAL_BUFF
-			BuffCBCopyUnicode(FALSE);
+			retval = BuffCBCopyUnicode(FALSE);
 #else
 			BuffCBCopy(FALSE);
 #endif
 			UnlockBuffer();
 		}
 	}
+	return retval;
 }
 
 void BuffChangeWinSize(int Nx, int Ny)

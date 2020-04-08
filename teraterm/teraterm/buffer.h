@@ -99,7 +99,7 @@ void BuffCopyBox(int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int Src
 void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 void BuffCBCopy(BOOL Table);
-void BuffCBCopyUnicode(BOOL Table);
+wchar_t *BuffCBCopyUnicode(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
@@ -121,7 +121,7 @@ void BuffTplClk(int Yw);
 void BuffSeveralPagesSelect(int Xw, int Yw);
 void BuffStartSelect(int Xw, int Yw, BOOL Box);
 void BuffChangeSelect(int Xw, int Yw, int NClick);
-void BuffEndSelect();
+wchar_t *BuffEndSelect();
 void BuffChangeWinSize(int Nx, int Ny);
 void BuffChangeTerminalSize(int Nx, int Ny);
 void ChangeWin();

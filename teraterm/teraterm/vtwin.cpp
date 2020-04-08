@@ -841,7 +841,10 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	// バッファが選択状態だったら、選択内容がクリップボードに
 	// コピーされてしまう問題を修正 (2007.12.6 maya)
 	if (!disableBuffEndSelect) {
-		BuffEndSelect();
+		wchar_t *strW = BuffEndSelect();
+		if (strW != NULL) {
+			CBSetTextW(HVTWin, strW, 0);
+		}
 	}
 
 	if (Paste) {
@@ -4385,7 +4388,9 @@ void CVTWindow::OnEditCopy()
 {
 	// copy selected text to clipboard
 #if	UNICODE_INTERNAL_BUFF
-	BuffCBCopyUnicode(FALSE);
+	wchar_t *strW = BuffCBCopyUnicode(FALSE);
+	CBSetTextW(HVTWin, strW, 0);
+	free(strW);
 #else
 	BuffCBCopy(FALSE);
 #endif
@@ -4395,7 +4400,9 @@ void CVTWindow::OnEditCopyTable()
 {
 	// copy selected text to clipboard in Excel format
 #if	UNICODE_INTERNAL_BUFF
-	BuffCBCopyUnicode(TRUE);
+	wchar_t *strW = BuffCBCopyUnicode(TRUE);
+	CBSetTextW(HVTWin, strW, 0);
+	free(strW);
 #else
 	BuffCBCopy(TRUE);
 #endif
