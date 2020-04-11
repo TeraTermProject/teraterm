@@ -139,8 +139,8 @@ BOOL _GetSaveFileNameW(LPOPENFILENAMEW ofnW);
 // shell32.lib
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData);
-PIDLIST_ABSOLUTE _SHBrowseForFolderW(LPBROWSEINFOW lpbi);
-BOOL _SHGetPathFromIDListW(PCIDLIST_ABSOLUTE pidl, LPWSTR pszPath);
+LPITEMIDLIST _SHBrowseForFolderW(LPBROWSEINFOW lpbi);
+BOOL _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath);
 
 HWND _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
 								 HWND hWndParent, DLGPROC lpDialogFunc,

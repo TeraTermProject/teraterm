@@ -582,7 +582,7 @@ BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName)
 	return r;
 }
 
-PIDLIST_ABSOLUTE _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
+LPITEMIDLIST _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
 {
 	if (pSHBrowseForFolderW != NULL) {
 		return pSHBrowseForFolderW(lpbi);
@@ -596,14 +596,14 @@ PIDLIST_ABSOLUTE _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
 	biA.ulFlags = lpbi->ulFlags;
 	biA.lpfn = lpbi->lpfn;
 	biA.lParam = lpbi->lParam;
-	PIDLIST_ABSOLUTE pidlBrowse = SHBrowseForFolderA(&biA);
+	LPITEMIDLIST pidlBrowse = SHBrowseForFolderA(&biA);
 	free(biA.pszDisplayName);
 	free((void *)biA.lpszTitle);
 
 	return pidlBrowse;
 }
 
-BOOL _SHGetPathFromIDListW(PCIDLIST_ABSOLUTE pidl, LPWSTR pszPath)
+BOOL _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath)
 {
 	if (pSHGetPathFromIDListW != NULL) {
 		return pSHGetPathFromIDListW(pidl, pszPath);

@@ -131,8 +131,8 @@ extern DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKe
 extern BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
 
 // shlobj_core.h
-extern PIDLIST_ABSOLUTE (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
-extern BOOL (WINAPI *pSHGetPathFromIDListW)(PCIDLIST_ABSOLUTE pidl, LPWSTR pszPath);
+extern LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
+extern BOOL (WINAPI *pSHGetPathFromIDListW)(LPITEMIDLIST pidl, LPWSTR pszPath);
 
 void WinCompatInit();
 

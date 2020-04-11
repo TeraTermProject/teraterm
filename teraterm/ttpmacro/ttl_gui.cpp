@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <crtdbg.h>
 #include <string.h>
+#include <errno.h>
 #include "ttmdlg.h"
 #include "ttmparse.h"
 #include "ttmlib.h"
