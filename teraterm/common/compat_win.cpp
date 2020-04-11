@@ -100,6 +100,8 @@ int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
 // shell32
 UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 BOOL (WINAPI *pShell_NotifyIconW)(DWORD dwMessage, NOTIFYICONDATAW *lpData);
+PIDLIST_ABSOLUTE (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
+BOOL (WINAPI *pSHGetPathFromIDListW)(PCIDLIST_ABSOLUTE pidl, LPWSTR pszPath);
 
 // comctl32
 HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
@@ -223,6 +225,8 @@ static const APIInfo Lists_shell32[] = {
 #ifndef UNICODE_API_DISABLE
 	{ "DragQueryFileW", (void **)&pDragQueryFileW },
 	{ "Shell_NotifyIconW", (void **)&pShell_NotifyIconW },
+	{ "SHBrowseForFolderW", (void **)&pSHBrowseForFolderW },
+	{ "SHGetPathFromIDListW", (void **)&pSHGetPathFromIDListW },
 #endif
 	{},
 };

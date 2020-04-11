@@ -36,6 +36,7 @@
 #pragma once
 
 #include <windows.h>
+#include <shlobj.h>	// for _SHBrowseForFolderW()
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,6 +126,10 @@ extern DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffe
 extern BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 extern BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
 extern BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
+
+// shlobj_core.h
+extern PIDLIST_ABSOLUTE (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
+extern BOOL (WINAPI *pSHGetPathFromIDListW)(PCIDLIST_ABSOLUTE pidl, LPWSTR pszPath);
 
 void WinCompatInit();
 
