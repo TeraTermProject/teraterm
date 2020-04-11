@@ -161,8 +161,8 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 	::MoveWindow(HEdit,(WW-EW)/2-4,TH+BH,EW,EH,TRUE);
 	::MoveWindow(HOk,(TW-BW)/2,TH+EH+BH*3/2,BW,BH,TRUE);
 
-	if (PaswdFlag) {
-		SendDlgItemMessage(IDC_INPEDIT,EM_SETPASSWORDCHAR,(UINT)'*',0);
+	if (!PaswdFlag) {
+		SendDlgItemMessage(IDC_INPEDIT,EM_SETPASSWORDCHAR, 0, 0);
 	}
 
 	SendDlgItemMessage(IDC_INPEDIT, EM_LIMITTEXT, MaxStrLen, 0);
