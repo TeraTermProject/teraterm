@@ -29,7 +29,6 @@
 // ListDlg.cpp : ŽÀ‘•ƒtƒ@ƒCƒ‹
 //
 
-#include <tchar.h>
 #include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"
@@ -72,7 +71,7 @@ void CListDlg::InitList(HWND HList)
 		SIZE size;
 		int ListWidth;
 		SendDlgItemMessageW(IDC_LISTBOX, LB_ADDSTRING, 0, (LPARAM)(*p));
-		GetTextExtentPoint32W(DC, *p, wcslen(*p), &size);
+		GetTextExtentPoint32W(DC, *p, (int)wcslen(*p), &size);
 		ListWidth = size.cx;
 		if (ListWidth > ListMaxWidth) {
 			ListMaxWidth = ListWidth;

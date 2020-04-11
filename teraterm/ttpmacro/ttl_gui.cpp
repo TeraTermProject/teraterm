@@ -294,7 +294,7 @@ WORD TTLGetPassword()
 	GetAbsPath(Str,sizeof(Str));
 
 	_GetPrivateProfileStringW(L"Password", (wc)Str2, L"",
-							  Temp, _countof(Temp), wc::fromUtf8(Str));
+							  Temp, _countof(Temp), (wc)Str);
 	if (Temp[0]==0) // password not exist
 	{
 		wchar_t input_string[MaxStrLen];

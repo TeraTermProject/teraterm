@@ -31,7 +31,6 @@
 
 #include <windowsx.h>
 #include <stdio.h>
-#include <tchar.h>
 #include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"

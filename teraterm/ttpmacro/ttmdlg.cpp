@@ -37,7 +37,6 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <tchar.h>
 #include <assert.h>
 
 #include "teraterm.h"
