@@ -49,6 +49,7 @@
 #include "ttl.h"
 #include "ttl_gui.h"
 #include "codeconv.h"
+#include "layer_for_unicode.h"
 
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
@@ -230,15 +231,13 @@ WORD TTLFilenameBox()
 	TStrVal Str1;
 	WORD Err, ValType;
 	TVarId VarId;
-	OPENFILENAME ofn;
-	TCHAR uimsg[MAX_UIMSG];
 	BOOL SaveFlag = FALSE;
 	TStrVal InitDir = "";
-	tc InitDirT;
+	wc InitDirT;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
-	tc Str1T = tc::fromUtf8(Str1);
+	wc Str1T = tc::fromUtf8(Str1);
 
 	if (Err!=0) return Err;
 
@@ -261,15 +260,17 @@ WORD TTLFilenameBox()
 
 	SetInputStr("");
 	if (CheckVar("inputstr", &ValType, &VarId) && (ValType==TypString)) {
-		TCHAR filename[MaxStrLen];
+		wchar_t uimsg[MAX_UIMSG];
+		OPENFILENAMEW ofn;
+		wchar_t filename[MaxStrLen];
 		filename[0] = 0;
 		memset(&ofn, 0, sizeof(ofn));
-		ofn.lStructSize     = get_OPENFILENAME_SIZE();
+		ofn.lStructSize     = get_OPENFILENAME_SIZEW();
 		ofn.hwndOwner       = GetHWND();
 		ofn.lpstrTitle      = Str1T;
 		ofn.lpstrFile       = filename;
 		ofn.nMaxFile        = _countof(filename);
-		get_lang_msgT("FILEDLG_ALL_FILTER", uimsg, _countof(uimsg), _T("All(*.*)\\0*.*\\0\\0"), UILanguageFile);
+		get_lang_msgW("FILEDLG_ALL_FILTER", uimsg, _countof(uimsg), L"All(*.*)\\0*.*\\0\\0", UILanguageFile);
 		ofn.lpstrFilter     = uimsg;
 		ofn.lpstrInitialDir = NULL;
 		if (strlen(InitDir) > 0) {
@@ -279,17 +280,17 @@ WORD TTLFilenameBox()
 		BOOL ret;
 		if (SaveFlag) {
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-			ret = GetSaveFileName(&ofn);
+			ret = _GetSaveFileNameW(&ofn);
 		}
 		else {
 			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-			ret = GetOpenFileName(&ofn);
+			ret = _GetOpenFileNameW(&ofn);
 		}
 
-		const char *filenameU8 = ToU8T(filename);
+		char *filenameU8 = ToU8W(filename);
 		char *dest = StrVarPtr(VarId);
 		strcpy(dest, filenameU8);
-		free((void *)filenameU8);
+		free(filenameU8);
 
 		SetResult(ret);
 	}

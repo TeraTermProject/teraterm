@@ -71,7 +71,7 @@ void CListDlg::InitList(HWND HList)
 	while (*p) {
 		SIZE size;
 		int ListWidth;
-		SendDlgItemMessage(IDC_LISTBOX, LB_ADDSTRING, 0, (LPARAM)(*p));
+		SendDlgItemMessageW(IDC_LISTBOX, LB_ADDSTRING, 0, (LPARAM)(*p));
 		GetTextExtentPoint32W(DC, *p, wcslen(*p), &size);
 		ListWidth = size.cx;
 		if (ListWidth > ListMaxWidth) {
