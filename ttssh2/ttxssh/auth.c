@@ -739,46 +739,6 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	return TRUE;
 }
 
-/**
- *	クリップボードからANSI文字列を取得する
- *	文字列長が必要なときはstrlen()すること
- *	@param	hWnd
- *	@param	emtpy	TRUEのときクリップボードを空にする
- *	@retval	文字列へのポインタ 使用後free()すること
- *			文字がない(またはエラー時)はNULL
- */
-char *GetClipboardTextA(HWND hWnd, BOOL empty)
-{
-	HGLOBAL hGlobal;
-	const char *lpStr;
-	size_t length;
-	char *pool;
-
-    OpenClipboard(hWnd);
-    hGlobal = (HGLOBAL)GetClipboardData(CF_TEXT);
-    if (hGlobal == NULL) {
-        CloseClipboard();
-		return NULL;
-    }
-    lpStr = (const char *)GlobalLock(hGlobal);
-	length = GlobalSize(hGlobal);
-	if (length == 0) {
-		pool = NULL;
-	} else {
-		pool = (char *)malloc(length + 1);	// +1 for terminator
-		memcpy(pool, lpStr, length);
-		pool[length] = '\0';
-	}
-	GlobalUnlock(hGlobal);
-	if (empty) {
-		EmptyClipboard();
-	}
-	CloseClipboard();
-
-	return pool;
-}
-
-
 static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 									  LPARAM lParam)
 {
