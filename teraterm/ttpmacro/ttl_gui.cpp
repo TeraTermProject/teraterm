@@ -275,7 +275,7 @@ WORD TTLFilenameBox()
 WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2;
-	TCHAR Temp[512];
+	wchar_t Temp[512];
 	WORD Err;
 	TVarId VarId;
 	int result = 0;  /* failure */
@@ -293,8 +293,8 @@ WORD TTLGetPassword()
 
 	GetAbsPath(Str,sizeof(Str));
 
-	GetPrivateProfileString(_T("Password"),(tc)Str2,_T(""),
-							Temp,_countof(Temp), tc::fromUtf8(Str));
+	_GetPrivateProfileStringW(L"Password", (wc)Str2, L"",
+							  Temp, _countof(Temp), wc::fromUtf8(Str));
 	if (Temp[0]==0) // password not exist
 	{
 		wchar_t input_string[MaxStrLen];
@@ -304,7 +304,7 @@ WORD TTLGetPassword()
 		if (Temp2[0]!=0) {
 			char TempA[512];
 			Encrypt(Temp2, TempA);
-			if (WritePrivateProfileString(_T("Password"), (tc)Str2, (tc)TempA, tc::fromUtf8(Str)) != 0) {
+			if (_WritePrivateProfileStringW(L"Password", (wc)Str2, (wc)TempA, wc::fromUtf8(Str)) != 0) {
 				result = 1;  /* success */
 			}
 		}
