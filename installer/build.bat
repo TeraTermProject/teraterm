@@ -165,14 +165,14 @@ pushd ..\libs
 CALL buildall.bat
 popd
 
+
+rem "rebuild"を指定しない場合、svnversion.h を更新する。
+if not exist ..\teraterm\ttpdlg\svnversion.h goto create_svnversion_h
 if "%BUILD%" == "rebuild" goto build
 
-rem "rebuild"を指定しない場合、SVNリビジョンを更新する。
-if exist ..\teraterm\release\svnrev.exe goto svnrev
-devenv /build release %TERATERMSLN% /project svnrev /projectconfig release
-
-:svnrev
-..\teraterm\release\svnrev.exe ..\libs\svn\bin\svnversion.exe .. ..\teraterm\ttpdlg\svnversion.h
+del ..\teraterm\ttpdlg\svnversion.h
+:create_svnversion_h
+call ..\svnrev_perl\svnrev.bat
 
 :build
 devenv /%BUILD% release %TERATERMSLN%

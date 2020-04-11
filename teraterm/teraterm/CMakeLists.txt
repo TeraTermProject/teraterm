@@ -76,8 +76,7 @@ add_executable(
   tt-version.rc
   teraterm_manifest.rc
   #
-  svnversion.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
+#  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
   #
   unicode_test.h
   unicode.h
@@ -217,17 +216,16 @@ target_link_libraries(
   #
   gdi32
   comctl32
-  comctl32
   ws2_32
   imagehlp
   delayimp
   uuid
   )
 
-####
-configure_file(
-  svnversion.h.in
-  ../ttpdlg/svnversion.h @ONLY)
+add_dependencies(
+  teraterm
+  svnversion_h
+  )
 
 install(
   TARGETS teraterm

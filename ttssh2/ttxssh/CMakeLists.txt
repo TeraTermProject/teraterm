@@ -174,3 +174,9 @@ install(
   RUNTIME
   DESTINATION .
   )
+
+####
+# ソースツリー内に生成ファイルが存在していたら削除する
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
+  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
+endif()

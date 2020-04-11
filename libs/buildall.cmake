@@ -15,10 +15,12 @@ endif()
 
 # install tools
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-  message("perl")
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -P perl.cmake
-    )
+  if(NOT EXISTS c:/Strawberry/perl/bin/perl.exe)
+    message("perl")
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -P perl.cmake
+      )
+  endif()
 endif()
 
 # build

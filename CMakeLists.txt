@@ -12,11 +12,6 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-if(NOT DEFINED SNAPSHOT_DIR)
-  string(TIMESTAMP SNAPSHOT_DIR "snapshot-%Y%m%d_%H%M%S")
-endif()
-set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
-
 # _WIN32_WINNT_WIN10 0x0a00
 set(_WIN32_WINNT "0x0a00")
 if(MSVC)
@@ -113,7 +108,38 @@ configure_file(
   @ONLY)
 message("revision=\"${SVNVERSION}\"")
 
-####
+### tool
+# perl
+if (MSVC OR ("$ENV{MSYSTEM}" MATCHES "MINGW"))
+  find_program(
+    PERL perl.exe
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/libs/perl/perl/bin
+    HINTS c:/Strawberry/perl/bin
+    HINTS c:/Perl64/bin
+    HINTS c:/Perl/bin
+    HINTS c:/cygwin/usr/bin
+    HINTS c:/cygwin64/usr/bin
+    )
+else()
+  set(PERL "perl")
+endif()
+message("perl=${PERL}")
+
+if(NOT $ENV{USER})
+  set(USER $ENV{USER})
+elseif(NOT $ENV{USERNAME})
+  set(USER $ENV{USERNAME})
+else()
+  set(USER "NONAME")
+endif()
+ 
+if(NOT DEFINED SNAPSHOT_DIR)
+  string(TIMESTAMP SNAPSHOT_DIR "snapshot-r${SVNVERSION}-%Y%m%d_%H%M%S-${USER}")
+endif()
+set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
+
+### subdirectories
+add_subdirectory(svnrev_perl)
 add_subdirectory(teraterm)
 add_subdirectory(ttpmenu)
 add_subdirectory(TTProxy)
@@ -124,12 +150,3 @@ if(${ENABLE_TTXSAMPLES})
 endif()
 add_subdirectory(installer)
 add_subdirectory(doc)
-
-####
-# ソースツリー内に生成ファイルが存在していたら削除する
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
-  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
-endif()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
-  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
-endif()

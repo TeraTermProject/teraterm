@@ -1,3 +1,5 @@
+call svnrev_perl\svnrev.bat
+call svnrev_perl\sourcetree_info.bat
 if "%GENERATOR%" == "Visual Studio 8 2005" (
   cd libs
   call getcmake.bat nopause
@@ -38,6 +40,8 @@ cd ..
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 cd %BUILD_DIR%
 if exist cmakecache.txt del cmakecache.txt
+set ZIP_FILE=snapshot-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%.zip
+set SNAPSHOT_DIR=snapshot-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%
 "%CMAKE_COMMAND%" .. -G "%GENERATOR%" %CMAKE_OPTION_GENERATE% -DSNAPSHOT_DIR=%SNAPSHOT_DIR%
 "%CMAKE_COMMAND%" --build . --target install %CMAKE_OPTION_BUILD%
 "%CMAKE_COMMAND%" -E tar "cvf" %ZIP_FILE% --format=zip %SNAPSHOT_DIR%

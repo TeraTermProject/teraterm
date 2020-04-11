@@ -92,10 +92,6 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
-    <PreBuildEvent>
-      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
-      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -137,10 +133,6 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
-    <PreBuildEvent>
-      <Message>creating "$(ProjectDir)..\ttpdlg\svnversion.h"</Message>
-      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)..\ttpdlg\svnversion.h"</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\ttlib.c" />
@@ -253,11 +245,11 @@
     <ClInclude Include="unicode.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\svnrev_perl\svnrev_perl.v16.vcxproj">
+      <Project>{53db5f02-7f9e-4e29-9751-b0dac6a8eeba}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\common\common_static.v16.vcxproj">
       <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\svnrev\svnrev.v16.vcxproj">
-      <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v16.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
