@@ -41,7 +41,7 @@ add_executable(
   ttmmain.h
   ttmmsg.h
   ttmonig.h
-  ttmparse.c
+  ttmparse.cpp
   ttmparse.h
   wait4all.c
   wait4all.h

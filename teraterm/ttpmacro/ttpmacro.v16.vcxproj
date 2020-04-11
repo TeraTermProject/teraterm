@@ -144,7 +144,7 @@
     <ClCompile Include="ttmenc.c" />
     <ClCompile Include="ttmlib.c" />
     <ClCompile Include="ttmmain.cpp" />
-    <ClCompile Include="ttmparse.c" />
+    <ClCompile Include="ttmparse.cpp" />
     <ClCompile Include="wait4all.c" />
   </ItemGroup>
   <ItemGroup>

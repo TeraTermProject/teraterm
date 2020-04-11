@@ -58,9 +58,6 @@
     <ClCompile Include="ttmlib.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
-    <ClCompile Include="ttmparse.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="wait4all.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -68,6 +65,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ttl_gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttmparse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

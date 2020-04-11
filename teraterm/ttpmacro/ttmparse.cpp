@@ -109,7 +109,26 @@ BOOL InitVar()
 
 void EndVar()
 {
-	// TODO Variables ‚ğ‚·‚×‚Ä free ‚·‚é
+	Variable_t *v = Variables;
+	for (;v != &Variables[VariableCount]; v++) {
+		free(v->Name);
+		switch (v->Type) {
+		case TypeString:
+			free(v->Value.Str);
+			break;
+		case TypeIntArray:
+			free(v->Value.IntAry.val);
+			break;
+		case TypeStrArray:
+			free(v->Value.StrAry.val);
+			break;
+		default:
+			break;
+		}
+	}
+	free(Variables);
+	Variables = NULL;
+	VariableCount = 0;
 }
 
 void DispErr(WORD Err)
@@ -848,7 +867,7 @@ BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
 
 static Variable_t *NewVar(const char *name, VariableType_t type)
 {
-	Variable_t *new_v = realloc(Variables, sizeof(Variable_t) * (VariableCount + 1));
+	Variable_t *new_v = (Variable_t * )realloc(Variables, sizeof(Variable_t) * (VariableCount + 1));
 	if (new_v == NULL) {
 		// TODO ƒƒ‚ƒŠ‚ª‚È‚¢
 		return NULL;
@@ -856,7 +875,7 @@ static Variable_t *NewVar(const char *name, VariableType_t type)
 	Variables = new_v;
 	Variable_t *v = &Variables[VariableCount];
 	VariableCount++;
-	v->Name = strdup(name);
+	v->Name = _strdup(name);
 	v->Type = type;
 	return v;
 }
@@ -871,7 +890,7 @@ BOOL NewIntVar(const char *Name, int InitVal)
 BOOL NewStrVar(const char *Name, const char *InitVal)
 {
 	Variable_t *v = NewVar(Name, TypeString);
-	v->Value.Str = strdup(InitVal);
+	v->Value.Str = _strdup(InitVal);
 	return TRUE;
 }
 
@@ -879,7 +898,7 @@ int NewIntAryVar(const char *Name, int size)
 {
 	Variable_t *v = NewVar(Name, TypeIntArray);
 	TIntAry *intAry = &v->Value.IntAry;
-	int *array = calloc(size, sizeof(int));
+	int *array = (int *)calloc(size, sizeof(int));
 	if (array == NULL) {
 		return ErrFewMemory;
 	}
@@ -892,7 +911,7 @@ int NewStrAryVar(const char *Name, int size)
 {
 	Variable_t *v = NewVar(Name, TypeStrArray);
 	TStrAry *strAry = &v->Value.StrAry;
-	char **array = calloc(size, sizeof(char *));
+	char **array = (char **)calloc(size, sizeof(char *));
 	if (array == NULL) {
 		return ErrFewMemory;
 	}
@@ -936,7 +955,7 @@ void DelLabVar(WORD ILevel)
 		}
 		v++;
 	}
-	Variables = realloc(Variables, sizeof(Variable_t) * VariableCount);
+	Variables = (Variable_t *)realloc(Variables, sizeof(Variable_t) * VariableCount);
 }
 
 void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level)
@@ -1757,13 +1776,13 @@ void SetStrVal(TVarId VarId, const char *Str)
 		Variable_t *v = &Variables[(VarId>>16)-1];
 		char **str = &v->Value.StrAry.val[VarId & 0xffff];
 		free(*str);
-		*str = strdup(Str);
+		*str = _strdup(Str);
 	}
 	else {
 		Variable_t *v = &Variables[VarId];
 		char **str = &v->Value.Str;
 		free(*str);
-		*str = strdup(Str);
+		*str = _strdup(Str);
 	}
 }
 
