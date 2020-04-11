@@ -57,9 +57,6 @@
 // for _findXXXX() functions
 #include <io.h>
 
-// for _ismbblead
-#include <mbctype.h>
-
 #include "ttl.h"
 #include "SFMT.h"
 
@@ -4479,7 +4476,6 @@ WORD TTLStrScan()
 {
 	WORD Err;
 	TStrVal Str1, Str2;
-	unsigned char *p;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -4493,8 +4489,9 @@ WORD TTLStrScan()
 		return Err;
 	}
 
-	if ((p = _mbsstr((unsigned char *)Str1, (unsigned char *)Str2)) != NULL) {
-		SetResult(p - (unsigned char *)Str1 + 1);
+	char *p = strstr(Str1, Str2);
+	if (p != NULL) {
+		SetResult(p - Str1 + 1);
 	}
 	else {
 		SetResult(0);
@@ -5003,10 +5000,6 @@ WORD TTLToLower()
 	if (Err!=0) return Err;
 
 	while (Str[i] != 0) {
-		if(_ismbblead(Str[i])) {
-			i = i + 2;
-			continue;
-		}
 		if (Str[i] >= 'A' && Str[i] <= 'Z') {
 			Str[i] = Str[i] + 0x20;
 		}
@@ -5033,10 +5026,6 @@ WORD TTLToUpper()
 	if (Err!=0) return Err;
 
 	while (Str[i] != 0) {
-		if(_ismbblead(Str[i])) {
-			i = i + 2;
-			continue;
-		}
 		if (Str[i] >= 'a' && Str[i] <= 'z') {
 			Str[i] = Str[i] - 0x20;
 		}

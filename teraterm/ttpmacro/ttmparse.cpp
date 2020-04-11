@@ -1698,12 +1698,20 @@ void GetIntVar(PVarId VarId, LPWORD Err)
 		*Err = ErrSyntax;
 }
 
+/**
+ *	文字列を取得する
+ *	@param	Str	文字列へのポインタ (MaxStrLen byte の領域が必要)
+ */
 void GetStrVal(PCHAR Str, LPWORD Err)
 {
 	UpdateLineParsePtr();
 	GetStrVal2(Str, Err, FALSE);
 }
 
+/**
+ *	文字列を取得する
+ *	@param	Str	文字列へのポインタ (MaxStrLen byte の領域が必要)
+ */
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 {
 	WORD VarType;
