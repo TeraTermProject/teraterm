@@ -614,3 +614,45 @@ BOOL _SHGetPathFromIDListW(PCIDLIST_ABSOLUTE pidl, LPWSTR pszPath)
 	::MultiByteToWideChar(CP_ACP, 0, pathA, -1, pszPath, MAX_PATH);
 	return r;
 }
+
+DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName)
+{
+	if (pGetPrivateProfileStringW != NULL) {
+		return pGetPrivateProfileStringW(lpAppName, lpKeyName, lpDefault,
+										 lpReturnedString, nSize, lpFileName);
+	}
+
+	char *buf = (char* )malloc(nSize);
+	char *appA = ToCharW(lpAppName);
+	char *keyA = ToCharW(lpKeyName);
+	char *defA = ToCharW(lpDefault);
+	char *fileA = ToCharW(lpFileName);
+	DWORD r = GetPrivateProfileStringA(appA, keyA, defA, buf, nSize, fileA);
+	::MultiByteToWideChar(CP_ACP, 0, buf, -1, lpReturnedString, nSize);
+	r = (DWORD)wcslen(lpReturnedString);
+	free(appA);
+	free(keyA);
+	free(defA);
+	free(fileA);
+	free(buf);
+	return r;
+}
+
+BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName)
+{
+	if (pWritePrivateProfileStringW != NULL) {
+		return pWritePrivateProfileStringW(lpAppName, lpKeyName, lpString, lpFileName);
+	}
+
+	char *appA = ToCharW(lpAppName);
+	char *keyA = ToCharW(lpKeyName);
+	char *strA = ToCharW(lpString);
+	char *fileA = ToCharW(lpFileName);
+	BOOL r = WritePrivateProfileStringA(appA, keyA, strA, fileA);
+	free(appA);
+	free(keyA);
+	free(strA);
+	free(fileA);
+	return r;
+}

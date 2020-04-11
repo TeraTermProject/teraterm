@@ -72,9 +72,11 @@ BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 
 // kernel32.dll
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
-DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault, LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 HWND (WINAPI *pGetConsoleWindow)(void);
+DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpString, LPCWSTR lpFileName);
 
 // gdi32.lib
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -212,10 +214,11 @@ static const APIInfo Lists_Shcore[] = {
 static const APIInfo Lists_kernel32[] = {
 #ifndef UNICODE_API_DISABLE
 	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
-	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
 	{ "OutputDebugStringW", (void **)&pOutputDebugStringW },
 	{ "GetCurrentDirectoryW", (void **)&pGetCurrentDirectoryW },
 	{ "SetCurrentDirectoryW", (void **)&pSetCurrentDirectoryW },
+	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
+	{ "WritePrivateProfileStringW", (void **)&pWritePrivateProfileStringW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},

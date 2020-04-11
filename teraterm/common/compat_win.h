@@ -126,6 +126,9 @@ extern DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffe
 extern BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 extern BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
 extern BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
+extern DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+extern BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
 
 // shlobj_core.h
 extern PIDLIST_ABSOLUTE (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);

@@ -117,6 +117,9 @@ DWORD _GetFileAttributesW(LPCWSTR lpFileName);
 DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer);
 BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName);
 void _OutputDebugStringW(LPCWSTR lpOutputString);
+DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
+BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);
