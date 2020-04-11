@@ -83,6 +83,7 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
+BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg);
 DllExport void OutputDebugPrintf(const char *fmt, ...);
 void OutputDebugPrintfW(const wchar_t *fmt, ...);
 void OutputDebugHexDump(const void *data, size_t len);
@@ -128,14 +129,12 @@ int SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const cha
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 int GetMonitorDpiFromWindow(HWND hWnd);
 
-#if defined(_UNICODE)
-#define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)
-#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
-#define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEW()
-#else
-#define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolder(p1, p2, p3, p4, p5)
-#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
+
+#if defined(_UNICODE)
+#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
+#else
+#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
 #endif
 
 /*

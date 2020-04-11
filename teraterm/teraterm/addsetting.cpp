@@ -1422,15 +1422,15 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDC_DEFAULTPATH_PUSH | (BN_CLICKED << 16):
 			// ログディレクトリの選択ダイアログ
-			get_lang_msg("FILEDLG_SELECT_LOGDIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Select log folder", ts.UILanguageFile);
 			{
-				char buf[MAX_PATH];
-				char buf2[MAX_PATH];
-				GetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, buf, sizeof(buf));
-				if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
-					SetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, buf2);
+				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFile);
+				wchar_t buf[MAX_PATH];
+				wchar_t buf2[MAX_PATH];
+				GetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, buf, _countof(buf));
+				if (doSelectFolderW(GetSafeHwnd(), buf2, _countof(buf2), buf, title)) {
+					SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, buf2);
 				}
+				free(title);
 			}
 
 			return TRUE;
@@ -1659,17 +1659,17 @@ void CCygwinPropPageDlg::OnInitDialog()
 
 BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	char buf[MAX_PATH], buf2[MAX_PATH];
+	wchar_t buf[MAX_PATH], buf2[MAX_PATH];
 
 	switch (wParam) {
 		case IDC_SELECT_FILE | (BN_CLICKED << 16):
 			// Cygwin install ディレクトリの選択ダイアログ
-			get_lang_msg("DIRDLG_CYGTERM_DIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Select Cygwin directory", ts.UILanguageFile);
-			GetDlgItemTextA(IDC_CYGWIN_PATH, buf, sizeof(buf));
-			if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
-				SetDlgItemTextA(IDC_CYGWIN_PATH, buf2);
+			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", ts.UILanguageFile);
+			GetDlgItemTextW(IDC_CYGWIN_PATH, buf, _countof(buf));
+			if (doSelectFolderW(GetSafeHwnd(), buf2, _countof(buf2), buf, title)) {
+				SetDlgItemTextW(IDC_CYGWIN_PATH, buf2);
 			}
+			free(title);
 			return TRUE;
 	}
 

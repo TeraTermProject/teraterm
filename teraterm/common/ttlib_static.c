@@ -290,4 +290,56 @@ void OutputDebugPrintfW(const wchar_t *fmt, ...)
 	_OutputDebugStringW(tmp);
 }
 
+static int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
+{
+	if(uMsg == BFFM_INITIALIZED) {
+		SendMessage(hwnd, BFFM_SETSELECTION, (WPARAM)TRUE, lpData);
+	}
+	return 0;
+}
+
+BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg)
+{
+	BROWSEINFOW     bi;
+	LPITEMIDLIST    pidlRoot;      // ブラウズのルートPIDL
+	LPITEMIDLIST    pidlBrowse;    // ユーザーが選択したPIDL
+	wchar_t buf[MAX_PATH];
+	BOOL ret = FALSE;
+
+	// ダイアログ表示時のルートフォルダのPIDLを取得
+	// ※以下はデスクトップをルートとしている。デスクトップをルートとする
+	//   場合は、単に bi.pidlRoot に０を設定するだけでもよい。その他の特
+	//   殊フォルダをルートとする事もできる。詳細はSHGetSpecialFolderLoca
+	//   tionのヘルプを参照の事。
+	if (!SUCCEEDED(SHGetSpecialFolderLocation(hWnd, CSIDL_DESKTOP, &pidlRoot))) {
+		return FALSE;
+	}
+
+	// BROWSEINFO構造体の初期値設定
+	// ※BROWSEINFO構造体の各メンバの詳細説明もヘルプを参照
+	bi.hwndOwner = hWnd;
+	bi.pidlRoot = pidlRoot;
+	bi.pszDisplayName = buf;
+	bi.lpszTitle = msg;
+	bi.ulFlags = 0;
+	bi.lpfn = setDefaultFolder;
+	bi.lParam = (LPARAM)def;
+	// フォルダ選択ダイアログの表示
+	pidlBrowse = _SHBrowseForFolderW(&bi);
+	if (pidlBrowse != NULL) {
+		// PIDL形式の戻り値のファイルシステムのパスに変換
+		if (_SHGetPathFromIDListW(pidlBrowse, buf)) {
+			// 取得成功
+			wcsncpy_s(path, pathlen, buf, _TRUNCATE);
+			ret = TRUE;
+		}
+		// SHBrowseForFolderの戻り値PIDLを解放
+		CoTaskMemFree(pidlBrowse);
+	}
+	// クリーンアップ処理
+	CoTaskMemFree(pidlRoot);
+
+	return ret;
+}
+
 /* vim: set ts=4 sw=4 ff=dos : */

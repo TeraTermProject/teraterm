@@ -422,9 +422,9 @@ WORD TTLDirnameBox()
 	if (CheckVar("inputstr", &ValType, &VarId) &&
 	    (ValType == TypString)) {
 		BringupWindow(GetHWND());
-		TCHAR buf[MAX_PATH];
-		if (doSelectFolderT(GetHWND(), buf, _countof(buf), tc::fromUtf8(InitDir), tc::fromUtf8(Title))) {
-			const char *bufU8 = ToU8T(buf);
+		wchar_t buf[MAX_PATH];
+		if (doSelectFolderW(GetHWND(), buf, _countof(buf), wc::fromUtf8(InitDir), wc::fromUtf8(Title))) {
+			const char *bufU8 = ToU8W(buf);
 			SetInputStr((PCHAR)bufU8);
 			free((void *)bufU8);
 			ret = 1;
