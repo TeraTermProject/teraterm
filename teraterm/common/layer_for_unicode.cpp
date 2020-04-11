@@ -563,7 +563,7 @@ DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
 		return pGetCurrentDirectoryW(nBufferLength, lpBuffer);
 	}
 	char dir[MAX_PATH];
-	DWORD len = GetCurrentDirectoryA(_countof(dir), dir);
+	GetCurrentDirectoryA(_countof(dir), dir);
 	wchar_t *strW = ToWcharA(dir);
 	wcsncpy_s(lpBuffer, nBufferLength, strW, _TRUNCATE);
 	free(strW);
