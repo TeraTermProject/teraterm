@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,18 +37,18 @@
 class CInpDlg : public CMacroDlgBase
 {
 public:
-	CInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Title,
-	        const TCHAR *Default, BOOL Paswd,
+	CInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Title,
+	        const wchar_t *Default, BOOL Paswd,
 	        int x, int y);
 	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 
 private:
 	enum { IDD = IDD_INPDLG };
 
-	TCHAR *InputStr;
-	const TCHAR *TextStr;
-	const TCHAR *TitleStr;
-	const TCHAR *DefaultStr;
+	wchar_t *InputStr;
+	const wchar_t *TextStr;
+	const wchar_t *TitleStr;
+	const wchar_t *DefaultStr;
 	BOOL PaswdFlag;
 	int init_WW, TW, TH, BH, BW, EW, EH;
 	SIZE s;

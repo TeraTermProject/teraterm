@@ -40,8 +40,8 @@
 #include "inpdlg.h"
 
 // CInpDlg dialog
-CInpDlg::CInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Title,
-                 const TCHAR *Default, BOOL Paswd,
+CInpDlg::CInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Title,
+                 const wchar_t *Default, BOOL Paswd,
                  int x, int y)
 {
 	InputStr = Input;
@@ -68,11 +68,11 @@ BOOL CInpDlg::OnInitDialog()
 	HWND HEdit, HOk;
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
-	SetWindowText(TitleStr);
-	SetDlgItemText(IDC_INPTEXT,TextStr);
-	SetDlgItemText(IDC_INPEDIT,DefaultStr);
+	SetWindowTextW(TitleStr);
+	SetDlgItemTextW(IDC_INPTEXT,TextStr);
+	SetDlgItemTextW(IDC_INPEDIT,DefaultStr);
 
-	CalcTextExtent(GetDlgItem(IDC_INPTEXT), NULL, TextStr, &s);
+	CalcTextExtentW(GetDlgItem(IDC_INPTEXT), NULL, TextStr, &s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 
@@ -99,7 +99,7 @@ BOOL CInpDlg::OnInitDialog()
 
 BOOL CInpDlg::OnOK()
 {
-	GetDlgItemText(IDC_INPEDIT,InputStr,MaxStrLen-1);
+	GetDlgItemTextW(IDC_INPEDIT,InputStr,MaxStrLen-1);
 	EndDialog(IDOK);
 	return TRUE;
 }

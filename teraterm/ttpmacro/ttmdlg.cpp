@@ -221,8 +221,8 @@ void SetDlgPos(int x, int y)
 	}
 }
 
-void OpenInpDlg(TCHAR *Buff, const TCHAR *Text, const TCHAR *Caption,
-                const TCHAR *Default, BOOL Paswd)
+void OpenInpDlg(wchar_t *Buff, const wchar_t *Text, const wchar_t *Caption,
+                const wchar_t *Default, BOOL Paswd)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
