@@ -9,19 +9,18 @@ call test_inputbox
 call test_passwordbox
 call test_statusbox
 call test_macrodialogbox
-type = 1
 call test_listbox
-type = 2
-call test_listbox
+call test_filenamebox
+call test_dirnamebox
 messagebox "finish all tests" "test"
 end
 
 ;;;;;;;;;;;;;;;;
 ;;; messagebox
 :test_messagebox
-s = "messagebox test\nthis is basic test\n3 lines"
+s = "メッセージボックス\nthis is basic test\n3 행"
 strspecial s
-messagebox s "test messagebox"
+messagebox s "メッセージボックス"
 messagebox "finish messagebox test" "test messagebox"
 return
 
@@ -43,7 +42,7 @@ return
 yes = 0
 no = 0
 while ((yes == 0) or (no == 0))
-	yesnobox "push yes or no" "test yesnobox"
+	yesnobox "push 是的(yes) or 没有(no)" "test yesnobox"
 	if result == 1 yes = yes + 1
 	if result == 0 no = no + 1
 	sprintf "yes=%d no=%d" yes no
@@ -63,9 +62,9 @@ return
 s = "default string"
 match = 0
 while match == 0
-	inputbox "input `ok` to finish" "test inputbox" s
+	inputbox "入力 `ok` to finish" "test inputbox" s
 	s = inputstr
-	sprintf "input string is `%s`" s
+	sprintf "入力文字列 は `%s`" s
 	messagebox inputstr "test inputbox"
 	strmatch s "^ok$"
 	match = result
@@ -80,9 +79,9 @@ return
 :test_passwordbox
 match = 0
 while match == 0
-	passwordbox "input `password` to finish" "test passwordbox"
+	passwordbox "`password` と入力すると終了" "test passwordbox"
 	s = inputstr
-	sprintf "input string is `%s`" s
+	sprintf "入力文字列 は `%s`" s
 	messagebox inputstr "test inputbox"
 	strmatch s "^password$"
 	match = result
@@ -98,7 +97,7 @@ return
 ;;;		messagebox
 :test_statusbox
 call test_statusbox_centerwindow
-call test_statusbox_setdlgpos
+;call test_statusbox_setdlgpos
 return
 
 ; 表示されていない→表示する 時 センタリングされる
@@ -203,21 +202,19 @@ return
 ;;;		messagebox
 :test_listbox
 N = 7
-if type == 1 then
-   intdim done N
-   strdim strs N
-   strdim srcs N
-endif
+intdim done N
+strdim strs N
+strdim srcs N
 for i 0 N-1
 	done[i] = 0
 next
-srcs[0] = "No man should understand where his dreams come from, Data. (Soong to Data, Birthright pt. 1)"
-srcs[1] = "The Advocate will refrain from making her opponent disappear. (Data to Ardra, Devil's Due)"
-srcs[2] = "He's comparing the Enterprise to a cruise ship? (Picard, The Neutral Zone)"
-srcs[3] = "What's the first rule of acquisition?"
-srcs[4] = "Once you have their money, you never give it back."
-srcs[5] = "Don't thank me, I already regret it. (Odo)"
-srcs[6] = "How long can two people talk about nothing? (Deanna, Starship Mine) "
+srcs[0] = "本気の失敗には価値がある"
+srcs[1] = "俺の敵は　だいたい俺です"
+srcs[2] = "ちょっとだけ無理なことに挑戦してこーぜ"
+srcs[3] = "リーダーというのはやはり安心と興奮を同時にくれる"
+srcs[4] = "”止まる”も”進む”もコントロールするのはお前だ"
+srcs[5] = "どっちが楽しいかで決めなさい。"
+srcs[6] = "悩むなら、なってから悩みなさい"
 done_all = 0
 done_cancel = 0
 prev = 0
@@ -239,11 +236,6 @@ while ((done_all == 0) or (done_cancel == 0))
 	else
 		msg = "push `cancel`"
 	endif
-	if type == 2 then
-		strconcat msg "==================================================================================================="
-		strconcat msg "\n=\n=\n"
-		strspecial msg
-	endif
 	listbox msg "test listbox" strs prev
 	if result < 0 then
 		done_cancel = 1
@@ -264,6 +256,31 @@ while ((done_all == 0) or (done_cancel == 0))
 	next
 endwhile
 messagebox "finish listbox test" "test listbox"
+return
+
+;;;;;;;;;;;;;;;;
+;;; filenamebox
+;;; - Dependence
+;;;		messagebox
+:test_filenamebox
+filenamebox "ファイルを選んでください(load)" 0 "c:\"
+sprintf2 s "result %d inputstr %s" result inputstr
+messagebox s "test fienamebox"
+filenamebox "ファイルを選んでください(save)" 1 "c:\windows"
+sprintf2 s "result %d inputstr %s" result inputstr
+messagebox s "test fienamebox"
+messagebox "finish filenaebox test" "test filenamebox"
+return
+
+;;;;;;;;;;;;;;;;
+;;; dirnamebox
+;;; - Dependence
+;;;		messagebox
+:test_dirnamebox
+dirnamebox "whereディレクトリ" "c:\"
+sprintf2 s "result %d inputstr %s" result inputstr
+messagebox s "test fienamebox"
+messagebox "finish dirnamebox test" "test dirnambox"
 return
 
 
