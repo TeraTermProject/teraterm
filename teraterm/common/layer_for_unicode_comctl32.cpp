@@ -114,12 +114,8 @@ static char *ConvertFilter(const wchar_t *filterW)
 	return filterA;
 }
 
-BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
+static BOOL GetOpenSaveFileNameA(BOOL (WINAPI *fn)(LPOPENFILENAMEA ofnA), LPOPENFILENAMEW ofnW)
 {
-	if (pGetOpenFileNameW != NULL) {
-		return pGetOpenFileNameW(ofnW);
-	}
-
 	char fileA[MAX_PATH];
 	WideCharToMultiByte(CP_ACP, 0, ofnW->lpstrFile, -1, fileA, _countof(fileA), NULL,NULL);
 
@@ -131,12 +127,30 @@ BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
 	ofnA.lpstrFile = fileA;
 	ofnA.nMaxFile = _countof(fileA);
 	ofnA.lpstrTitle = ToCharW(ofnW->lpstrTitle);
-	ofnA.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	BOOL result = GetOpenFileNameA(&ofnA);
+	ofnA.Flags = ofnW->Flags;
+	BOOL result = fn(&ofnA);
 	if (result) {
 		MultiByteToWideChar(CP_ACP, 0, fileA, _countof(fileA), ofnW->lpstrFile, ofnW->nMaxFile);
 	}
 	free((void *)ofnA.lpstrFilter);
 	free((void *)ofnA.lpstrTitle);
 	return result;
+}
+
+BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
+{
+	if (pGetOpenFileNameW != NULL) {
+		return pGetOpenFileNameW(ofnW);
+	}
+
+	return GetOpenSaveFileNameA(GetOpenFileNameA, ofnW);
+}
+
+BOOL _GetSaveFileNameW(LPOPENFILENAMEW ofnW)
+{
+	if (pGetSaveFileNameW != NULL) {
+		return pGetSaveFileNameW(ofnW);
+	}
+
+	return GetOpenSaveFileNameA(GetSaveFileNameA, ofnW);
 }

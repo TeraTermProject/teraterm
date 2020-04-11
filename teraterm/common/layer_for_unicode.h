@@ -129,7 +129,8 @@ INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
 
 // Comdlg32.lib
-BOOL _GetOpenFileNameW(LPOPENFILENAMEW Arg1);
+BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW);
+BOOL _GetSaveFileNameW(LPOPENFILENAMEW ofnW);
 
 // shell32.lib
 UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);

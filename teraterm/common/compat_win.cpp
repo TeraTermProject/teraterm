@@ -106,7 +106,8 @@ HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSh
 INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
 
 // comdlg32
-BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW Arg1);
+BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
+BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -245,6 +246,7 @@ static const APIInfo Lists_hhctrl[] = {
 static const APIInfo Lists_comdlg32[] = {
 #ifndef UNICODE_API_DISABLE
 	{ "GetOpenFileNameW", (void **)&pGetOpenFileNameW },
+	{ "GetSaveFileNameW", (void **)&pGetSaveFileNameW },
 #endif
 	{},
 };

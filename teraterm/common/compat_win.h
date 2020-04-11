@@ -123,7 +123,8 @@ extern LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc,
 extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 extern DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
 extern BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
-extern BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW Arg1);
+extern BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
+extern BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
 
 void WinCompatInit();
 
