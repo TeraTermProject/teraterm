@@ -129,6 +129,11 @@ extern BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
 extern DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 extern BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
+extern BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+									  LPSECURITY_ATTRIBUTES lpProcessAttributes,
+									  LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+									  DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+									  LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
 // shlobj_core.h
 extern LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);

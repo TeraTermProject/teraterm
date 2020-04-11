@@ -77,6 +77,11 @@ HWND (WINAPI *pGetConsoleWindow)(void);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpString, LPCWSTR lpFileName);
+BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+							   LPSECURITY_ATTRIBUTES lpProcessAttributes,
+							   LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+							   DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+							   LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
 // gdi32.lib
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -219,6 +224,7 @@ static const APIInfo Lists_kernel32[] = {
 	{ "SetCurrentDirectoryW", (void **)&pSetCurrentDirectoryW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
 	{ "WritePrivateProfileStringW", (void **)&pWritePrivateProfileStringW },
+	{ "CreateProcessW", (void **)&pCreateProcessW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
@@ -304,6 +310,9 @@ void WinCompatInit()
 		pGetCurrentDirectoryW = NULL;
 		pSetCurrentDirectoryW = NULL;
 		pGetOpenFileNameW = NULL;
+		pSHBrowseForFolderW = NULL;
+		pSHGetPathFromIDListW = NULL;
+		pCreateProcessW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

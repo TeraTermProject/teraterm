@@ -120,6 +120,11 @@ void _OutputDebugStringW(LPCWSTR lpOutputString);
 DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
+BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+					 LPSECURITY_ATTRIBUTES lpProcessAttributes,
+					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+					 DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+					 LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);

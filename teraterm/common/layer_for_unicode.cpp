@@ -656,3 +656,37 @@ BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpS
 	free(fileA);
 	return r;
 }
+
+BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+					 LPSECURITY_ATTRIBUTES lpProcessAttributes,
+					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+					 DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+					 LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+{
+	if (pCreateProcessW != NULL) {
+		return pCreateProcessW(lpApplicationName, lpCommandLine,
+							   lpProcessAttributes,
+							   lpThreadAttributes,  bInheritHandles,
+							   dwCreationFlags,  lpEnvironment,  lpCurrentDirectory,
+							   lpStartupInfo,  lpProcessInformation);
+	}
+
+	// Žæ‚è‡‚¦‚¸Attl.cpp‚ÅŽg‚Á‚Ä‚¢‚é•ª‚¾‚¯
+	STARTUPINFOA suiA;
+	memset(&suiA, 0, sizeof(suiA));
+	suiA.cb = lpStartupInfo->cb;
+	suiA.wShowWindow = lpStartupInfo->wShowWindow;
+	suiA.dwFlags = suiA.dwFlags;
+
+	char *appA = ToCharW(lpApplicationName);
+	char *cmdA = ToCharW(lpCommandLine);
+	char *curA = ToCharW(lpCurrentDirectory);
+	BOOL r =
+		CreateProcessA(appA, cmdA, lpProcessAttributes, lpThreadAttributes, bInheritHandles,
+					   dwCreationFlags, lpEnvironment, curA, &suiA, lpProcessInformation);
+	free(appA);
+	free(cmdA);
+	free(curA);
+
+	return r;
+}
