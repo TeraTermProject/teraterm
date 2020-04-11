@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 TeraTerm Project
+ * Copyright (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1260,6 +1260,142 @@ void tc::copy(const tc &obj)
 }
 
 void tc::move(tc &obj)
+{
+	if (this != &obj) {
+		if (tstr_ != NULL) {
+			free(tstr_);
+		}
+		tstr_ = obj.tstr_;
+		obj.tstr_ = NULL;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+wc::wc()
+{
+	tstr_ = NULL;
+}
+
+wc::wc(const char *strA)
+{
+	tstr_ = NULL;
+	assign(strA, CP_ACP);
+}
+
+wc::wc(const char *strA, int code_page)
+{
+	tstr_ = NULL;
+	assign(strA, code_page);
+}
+
+wc::wc(const wchar_t *strW)
+{
+	tstr_ = NULL;
+	assign(strW);
+}
+
+wc::wc(const wc &obj)
+{
+	tstr_ = NULL;
+	copy(obj);
+}
+
+#if defined(MOVE_CONSTRUCTOR_ENABLE)
+wc::wc(wc &&obj) noexcept
+{
+	tstr_ = NULL;
+	move(obj);
+}
+#endif
+
+
+wc::~wc()
+{
+	if (tstr_ != NULL) {
+		free(tstr_);
+	}
+}
+
+wc& wc::operator=(const char *strA)
+{
+	assign(strA, CP_ACP);
+	return *this;
+}
+
+wc& wc::operator=(const wchar_t *strW)
+{
+	assign(strW);
+	return *this;
+}
+
+wc &wc::operator=(const wc &obj)
+{
+	copy(obj);
+	return *this;
+}
+
+#if defined(MOVE_CONSTRUCTOR_ENABLE)
+wc& wc::operator=(wc &&obj) noexcept
+{
+	move(obj);
+	return *this;
+}
+#endif
+
+wc wc::fromUtf8(const char *strU8)
+{
+	wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
+	wc _wc = strW;
+	free(strW);
+	return _wc;
+}
+
+// voidなしが一般的と思われるが、
+// VS2005でリンクエラーが出てしまうため void 追加
+wc::operator const wchar_t *(void) const
+{
+	return cstr();
+}
+
+const wchar_t *wc::cstr() const
+{
+	if (tstr_ == NULL) {
+		return L"";
+	}
+	return tstr_;
+}
+
+void wc::assign(const char *strA, int code_page)
+{
+	if (tstr_ != NULL) {
+		free(tstr_);
+	}
+	wchar_t *strW = _MultiByteToWideChar(strA, 0, code_page, NULL);
+	if (strW != NULL) {
+		tstr_ = strW;
+	} else {
+		tstr_ = NULL;
+	}
+}
+
+void wc::assign(const wchar_t *strW)
+{
+	if (tstr_ != NULL) {
+		free(tstr_);
+	}
+	tstr_ = _wcsdup(strW);
+}
+
+void wc::copy(const wc &obj)
+{
+	if (tstr_ != NULL) {
+		free(tstr_);
+	}
+	tstr_ = _wcsdup(obj.tstr_);
+}
+
+void wc::move(wc &obj)
 {
 	if (this != &obj) {
 		if (tstr_ != NULL) {

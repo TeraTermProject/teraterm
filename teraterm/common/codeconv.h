@@ -150,4 +150,35 @@ private:
 	void copy(const tc &obj);
 	void move(tc &obj);
 };
+
+class wc
+{
+public:
+	wc();
+	wc(const char *strA);
+	wc(const char *strA, int code_page);
+	wc(const wchar_t *strW);
+	wc(const wc &obj);
+#if defined(MOVE_CONSTRUCTOR_ENABLE)
+	wc(wc &&obj) noexcept;
+#endif
+	~wc();
+	wc& operator=(const char *strA);
+	wc& operator=(const wchar_t *strW);
+	wc& operator=(const wc &obj);
+#if defined(MOVE_CONSTRUCTOR_ENABLE)
+	wc& operator=(wc &&obj) noexcept;
+#endif
+	static wc fromUtf8(const char *strU8);
+	operator const wchar_t *() const;
+	const wchar_t *cstr() const;
+	operator const char *() const;
+//	const char *cstr() const;
+private:
+	wchar_t *tstr_;
+	void assign(const char *strA, int code_page);
+	void assign(const wchar_t *strW);
+	void copy(const wc &obj);
+	void move(wc &obj);
+};
 #endif
