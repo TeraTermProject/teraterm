@@ -237,7 +237,7 @@ WORD TTLFilenameBox()
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
-	wc Str1T = tc::fromUtf8(Str1);
+	wc Str1T = wc::fromUtf8(Str1);
 
 	if (Err!=0) return Err;
 
@@ -489,7 +489,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		return (ret);
 	}
 	else if (BoxId==IdStatusBox) {
-		OpenStatDlg(tc::fromUtf8(Str1),tc::fromUtf8(Str2));
+		OpenStatDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2));
 
 	} else if (BoxId==IdListBox) {
 		//  リストボックスの選択肢を取得する。

@@ -44,7 +44,7 @@ void OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
                 const wchar_t *Default, BOOL Paswd);
 int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
 int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo);
-void OpenStatDlg(const TCHAR *Text, const TCHAR *Caption);
+void OpenStatDlg(const wchar_t *Text, const wchar_t *Caption);
 void CloseStatDlg();
 void BringupStatDlg();
 

@@ -246,7 +246,7 @@ int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo)
 	return MsgDlg.DoModal(hInst, hWndParent);
 }
 
-void OpenStatDlg(const TCHAR *Text, const TCHAR *Caption)
+void OpenStatDlg(const wchar_t *Text, const wchar_t *Caption)
 {
 	if (StatDlg==NULL) {
 		HINSTANCE hInst = GetInstance();

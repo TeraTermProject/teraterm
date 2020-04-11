@@ -43,7 +43,7 @@
 
 // CStatDlg dialog
 
-BOOL CStatDlg::Create(HINSTANCE hInst, const TCHAR *Text, const TCHAR *Title, int x, int y)
+BOOL CStatDlg::Create(HINSTANCE hInst, const wchar_t *Text, const wchar_t *Title, int x, int y)
 {
 	TextStr = Text;
 	TitleStr = Title;
@@ -52,12 +52,12 @@ BOOL CStatDlg::Create(HINSTANCE hInst, const TCHAR *Text, const TCHAR *Title, in
 	return TTCDialog::Create(hInst, NULL, CStatDlg::IDD);
 }
 
-void CStatDlg::Update(const TCHAR *Text, const TCHAR *Title, int x, int y)
+void CStatDlg::Update(const wchar_t *Text, const wchar_t *Title, int x, int y)
 {
 	RECT R;
 
 	if (Title!=NULL) {
-		SetWindowText(Title);
+		SetWindowTextW(Title);
 		TitleStr = Title;
 	}
 
@@ -70,12 +70,12 @@ void CStatDlg::Update(const TCHAR *Text, const TCHAR *Title, int x, int y)
 	if (Text!=NULL) {
 		SIZE textSize;
 		HWND hWnd = GetDlgItem(IDC_STATTEXT);
-		CalcTextExtent(hWnd, NULL, Text, &textSize);
+		CalcTextExtentW(hWnd, NULL, Text, &textSize);
 		TW = textSize.cx + textSize.cx/10;	// (cx * (1+0.1)) ?
 		TH = textSize.cy;
 		s = textSize;			// TODO s!?
 
-		SetDlgItemText(IDC_STATTEXT,Text);
+		SetDlgItemTextW(IDC_STATTEXT,Text);
 		TextStr = Text;
 	}
 
