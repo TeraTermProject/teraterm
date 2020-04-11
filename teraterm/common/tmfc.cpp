@@ -525,7 +525,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 		dlgproc = nullptr;
 	}
 	pseudoPtr = this;
-	HWND hWnd = ::CreateDialogIndirectParam(
+	HWND hWnd = _CreateDialogIndirectParamW(
 		hInstance, lpTemplate, hParent,
 		dlgproc, (LPARAM)this);
 	pseudoPtr = nullptr;
