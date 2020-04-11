@@ -67,6 +67,7 @@
 #include "win16api.h"
 #include "ttl_gui.h"
 #include "codeconv.h"
+#include "layer_for_unicode.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -1017,7 +1018,7 @@ WORD TTLExec()
 	int wait = 0;
 	DWORD ret;
 	WORD Err;
-	STARTUPINFO sui;
+	STARTUPINFOW sui;
 	PROCESS_INFORMATION pi;
 	BOOL bRet;
 
@@ -1060,17 +1061,18 @@ WORD TTLExec()
 
 	if (Err!=0) return Err;
 
-	memset(&sui, 0, sizeof(STARTUPINFO));
+	memset(&sui, 0, sizeof(sui));
 	sui.cb = sizeof(STARTUPINFO);
 	sui.wShowWindow = mode;
 	sui.dwFlags = STARTF_USESHOWWINDOW;
-	tc StrT = tc::fromUtf8(Str);
-	tc CurDirT = tc::fromUtf8(CurDir);
-	LPTSTR StrT_NC = (TCHAR *)(const TCHAR *)StrT;
-	if (CurDir[0] == 0)
-		bRet = CreateProcess(NULL, StrT_NC, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
-	else
-		bRet = CreateProcess(NULL, StrT_NC, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDirT, &sui, &pi);
+	wc StrW = wc::fromUtf8(Str);
+	wc CurDirW = wc::fromUtf8(CurDir);
+	const wchar_t *pStrW = StrW;
+	const wchar_t *pCurdirW = NULL;
+	if (CurDir[0] != 0) {
+		pCurdirW = CurDirW;
+	}
+	bRet = _CreateProcessW(NULL, (LPWSTR)pStrW, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, pCurdirW, &sui, &pi);
 	if (bRet == FALSE) {
 		// é¿çsÇ≈Ç´Ç»Ç©Ç¡ÇΩèÍçáÅAresultÇ…-1Çï‘Ç∑
 		SetResult(-1);
