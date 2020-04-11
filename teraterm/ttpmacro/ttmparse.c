@@ -68,37 +68,6 @@ typedef struct {
 	WORD level;
 } TLab;
 
-#if 0
-// 変数の個数を128->256、ラベルの個数を256->512へ拡張した。(2006.2.1 yutaka)
-// 変数の個数を、InitTTL で作っているシステム変数の分だけ追加した。(2006.7.26 maya)
-#define MaxNumOfIntVar (LONG)(256+4)
-#define MaxNumOfStrVar (LONG)(256+20)
-#define MaxNumOfLabVar (LONG)512
-#define MaxNumOfIntAryVar (LONG)256
-#define MaxNumOfStrAryVar (LONG)256
-
-#define IntVarIdOff (LONG)0
-#define StrVarIdOff (IntVarIdOff+MaxNumOfIntVar)
-#define LabVarIdOff (StrVarIdOff+MaxNumOfStrVar)
-#define IntAryVarIdOff (LabVarIdOff+MaxNumOfLabVar)
-#define StrAryVarIdOff (IntAryVarIdOff+MaxNumOfIntAryVar)
-#define MaxNumOfName (MaxNumOfIntVar+MaxNumOfStrVar+MaxNumOfLabVar+MaxNumOfIntAryVar+MaxNumOfStrAryVar)
-#define NameBuffLen MaxNumOfName*MaxNameLen
-#define StrBuffLen MaxNumOfStrVar*MaxStrLen
-
-static int IntVal[MaxNumOfIntVar];
-static BINT LabVal[MaxNumOfLabVar];
-static BYTE LabLevel[MaxNumOfLabVar];
-static TIntAry IntAryVal[MaxNumOfIntAryVar];
-static TStrAry StrAryVal[MaxNumOfStrAryVar];
-
-static HANDLE HNameBuff;
-static PCHAR NameBuff;
-static HANDLE HStrBuff;
-static PCHAR StrBuff;
-static WORD IntVarCount, StrVarCount, LabVarCount, IntAryVarCount, StrAryVarCount;
-#endif
-
 typedef enum {
 	TypeUnknown = TypUnknown,
 	TypeInteger = TypInteger,
@@ -133,33 +102,13 @@ static void UpdateLineParsePtr(void)
 
 BOOL InitVar()
 {
-#if 0
-	HNameBuff = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,NameBuffLen);
-	if (HNameBuff==NULL) return FALSE;
-	NameBuff = NULL;
-
-	HStrBuff = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,StrBuffLen);
-	if (HStrBuff==NULL) return FALSE;
-	StrBuff = NULL;
-
-	IntVarCount = 0;
-	LabVarCount = 0;
-	StrVarCount = 0;
-	return TRUE;
-#else
 	Variables = NULL;
 	VariableCount = 0;
 	return TRUE;
-#endif
 }
 
 void EndVar()
 {
-#if 0
-	UnlockVar();
-	GlobalFree(HNameBuff);
-	GlobalFree(HStrBuff);
-#endif
 	// TODO Variables をすべて free する
 }
 
@@ -209,30 +158,10 @@ void DispErr(WORD Err)
 
 void LockVar()
 {
-#if 0
-	if (NameBuff==NULL)
-		NameBuff = GlobalLock(HNameBuff);
-	if (NameBuff==NULL)
-		PostQuitMessage(0);
-
-	if (StrBuff==NULL)
-		StrBuff = GlobalLock(HStrBuff);
-	if (StrBuff==NULL)
-		PostQuitMessage(0);
-#endif
 }
 
 void UnlockVar()
 {
-#if 0
-	if (NameBuff!=NULL)
-		GlobalUnlock(HNameBuff);
-	NameBuff = NULL;
-
-	if (StrBuff!=NULL)
-		GlobalUnlock(HStrBuff);
-	StrBuff = NULL;
-#endif
 }
 
 BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
@@ -903,59 +832,6 @@ BOOL GetNumber(int far *Num)
 
 BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
 {
-#if 0
-	int i;
-	long P;
-
-	*VarType = TypUnknown;
-
-	for (i=0; i<IntVarCount; i++) {
-		P = (i + IntVarIdOff) * MaxNameLen;
-		if (_stricmp(&NameBuff[P], Name) == 0) {
-			*VarType = TypInteger;
-			*VarId = (TVarId)i;
-			return TRUE;
-		}
-	}
-
-	for (i=0; i<StrVarCount; i++) {
-		P = (i + StrVarIdOff) * MaxNameLen;
-		if (_stricmp(&NameBuff[P], Name) == 0) {
-			*VarType = TypString;
-			*VarId = i;
-			return TRUE;
-		}
-	}
-
-	for (i=0; i<LabVarCount; i++) {
-		P = (i + LabVarIdOff) * MaxNameLen;
-		if (_stricmp(&NameBuff[P], Name) == 0) {
-			*VarType = TypLabel;
-			*VarId = i;
-			return TRUE;
-		}
-	}
-
-	for (i=0; i<IntAryVarCount; i++) {
-		P = (i + IntAryVarIdOff) * MaxNameLen;
-		if (_stricmp(&NameBuff[P], Name) == 0) {
-			*VarType = TypIntArray;
-			*VarId = i;
-			return TRUE;
-		}
-	}
-
-	for (i=0; i<StrAryVarCount; i++) {
-		P = (i + StrAryVarIdOff) * MaxNameLen;
-		if (_stricmp(&NameBuff[P], Name) == 0) {
-			*VarType = TypStrArray;
-			*VarId = i;
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-#else
 	int i;
 	const Variable_t *v = Variables;
 	for (i = 0; i < VariableCount; v++,i++) {
@@ -968,7 +844,6 @@ BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
 	*VarType = TypUnknown;
 	*VarId = 0;
 	return FALSE;
-#endif
 }
 
 static Variable_t *NewVar(const char *name, VariableType_t type)
@@ -988,57 +863,20 @@ static Variable_t *NewVar(const char *name, VariableType_t type)
 
 BOOL NewIntVar(const char *Name, int InitVal)
 {
-#if 0
-	long P;
-
-	if (IntVarCount>=MaxNumOfIntVar) return FALSE;
-	P = (IntVarIdOff+IntVarCount)*MaxNameLen;
-	strncpy_s(&NameBuff[P],MaxNameLen,Name,_TRUNCATE);
-	IntVal[IntVarCount] = InitVal;
-	IntVarCount++;
-	return TRUE;
-#else
 	Variable_t *v = NewVar(Name, TypeInteger);
 	v->Value.Int = InitVal;
 	return TRUE;
-#endif
 }
 
 BOOL NewStrVar(const char *Name, const char *InitVal)
 {
-#if 0
-	long P;
-
-	if (StrVarCount>=MaxNumOfStrVar) return FALSE;
-	P = (StrVarIdOff+StrVarCount)*MaxNameLen;
-	strncpy_s(&NameBuff[P],MaxNameLen,Name,_TRUNCATE);
-	P = StrVarCount*MaxStrLen;
-	strncpy_s(&StrBuff[P],MaxStrLen,InitVal,_TRUNCATE);
-	StrVarCount++;
-	return TRUE;
-#else
 	Variable_t *v = NewVar(Name, TypeString);
 	v->Value.Str = strdup(InitVal);
 	return TRUE;
-#endif
 }
 
 int NewIntAryVar(const char *Name, int size)
 {
-#if 0
-	long P;
-	if (IntAryVarCount >= MaxNumOfIntAryVar) return ErrTooManyVar;
-	if (size <= 0 || size > 65536) return ErrOutOfRange;
-
-	if ((IntAryVal[IntAryVarCount].val = calloc(size, sizeof(int))) == NULL) return ErrFewMemory;
-	IntAryVal[IntAryVarCount].size = size;
-
-	P = (IntAryVarIdOff + IntAryVarCount) * MaxNameLen;
-	strncpy_s(&NameBuff[P], MaxNameLen, Name, _TRUNCATE);
-
-	IntAryVarCount++;
-	return 0;
-#else
 	Variable_t *v = NewVar(Name, TypeIntArray);
 	TIntAry *intAry = &v->Value.IntAry;
 	int *array = calloc(size, sizeof(int));
@@ -1048,25 +886,10 @@ int NewIntAryVar(const char *Name, int size)
 	intAry->val = array;
 	intAry->size = size;
 	return 0;
-#endif
 }
 
 int NewStrAryVar(const char *Name, int size)
 {
-#if 0
-	long P;
-	if (StrAryVarCount >= MaxNumOfStrAryVar) return ErrTooManyVar;
-	if (size <= 0 || size > 65536) return ErrOutOfRange;
-
-	if ((StrAryVal[StrAryVarCount].val = calloc(size, sizeof(TStrVal))) == NULL) return ErrFewMemory;
-	StrAryVal[StrAryVarCount].size = size;
-
-	P = (StrAryVarIdOff + StrAryVarCount) * MaxNameLen;
-	strncpy_s(&NameBuff[P], MaxNameLen, Name, _TRUNCATE);
-
-	StrAryVarCount++;
-	return 0;
-#else
 	Variable_t *v = NewVar(Name, TypeStrArray);
 	TStrAry *strAry = &v->Value.StrAry;
 	char **array = calloc(size, sizeof(char *));
@@ -1076,37 +899,19 @@ int NewStrAryVar(const char *Name, int size)
 	strAry->val = array;
 	strAry->size = size;
 	return 0;
-#endif
 }
 
 BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel)
 {
-#if 0
-	long P;
-
-	if (LabVarCount>=MaxNumOfLabVar) return FALSE;
-
-	P = (LabVarIdOff+LabVarCount)*MaxNameLen;
-	strncpy_s(&(NameBuff[P]),MaxNameLen,Name,_TRUNCATE);
-	LabVal[LabVarCount] = InitVal;
-	LabLevel[LabVarCount] = LOBYTE(ILevel);
-	LabVarCount++;
-	return TRUE;
-#else
 	Variable_t *v = NewVar(Name, TypeLabel);
 	TLab *lab = &v->Value.Lab;
 	lab->val = InitVal;
 	lab->level = ILevel;
 	return TRUE;
-#endif
 }
 
 void DelLabVar(WORD ILevel)
 {
-#if 0
-	while ((LabVarCount>0) && (LabLevel[LabVarCount-1]>=ILevel))
-		LabVarCount--;
-#else
 	Variable_t *v = Variables;
 	for (;;) {
 		if (v == &Variables[VariableCount]) {
@@ -1132,19 +937,13 @@ void DelLabVar(WORD ILevel)
 		v++;
 	}
 	Variables = realloc(Variables, sizeof(Variable_t) * VariableCount);
-#endif
 }
 
 void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level)
 {
-#if 0
-	*Ptr = LabVal[ILabel];
-	*Level = (WORD)LabLevel[ILabel];
-#else
 	Variable_t *v = &Variables[ILabel];
 	*Ptr = v->Value.Lab.val;
 	*Level = v->Value.Lab.level;
-#endif
 }
 
 /*
@@ -1181,28 +980,17 @@ BOOL GetFactor(LPWORD ValType, int far *Val, LPWORD Err)
 		}
 		else if (CheckVar(Name, ValType, &VarId)) {
 			switch (*ValType) {
-#if 0
-				case TypInteger: *Val = IntVal[VarId]; break;
-#else
 				case TypInteger:
 					*Val = Variables[VarId].Value.Int;
 					break;
-#endif
 				case TypString: *Val = VarId; break;
 				case TypIntArray:
 					if (GetIndex(&Index, Err)) {
-#if 0
-						if (Index >= 0 && Index < IntAryVal[VarId].size) {
-							*Val = IntAryVal[VarId].val[Index];
-							*ValType = TypInteger;
-						}
-#else
 						TIntAry *intAry = &Variables[VarId].Value.IntAry;
 						if (Index >= 0 && Index < intAry->size) {
 							*Val = intAry->val[Index];
 							*ValType = TypInteger;
 						}
-#endif
 						else {
 							*Err = ErrOutOfRange;
 						}
@@ -1831,14 +1619,6 @@ void GetIntVal(int far *Val, LPWORD Err)
 
 void SetIntVal(TVarId VarId, int Val)
 {
-#if 0
-	if (VarId >> 16) {
-		IntAryVal[(VarId>>16)-1].val[VarId & 0xffff] = Val;
-	}
-	else {
-		IntVal[VarId] = Val;
-	}
-#else
 	if (VarId >> 16) {
 		Variable_t *v = &Variables[(VarId>>16)-1];
 		int *int_val = &v->Value.IntAry.val[VarId & 0xffff];
@@ -1848,19 +1628,10 @@ void SetIntVal(TVarId VarId, int Val)
 		Variable_t *v = &Variables[VarId];
 		v->Value.Int = Val;
 	}
-#endif
 }
 
 int CopyIntVal(TVarId VarId)
 {
-#if 0
-	if (VarId >> 16) {
-		return IntAryVal[(VarId>>16)-1].val[VarId & 0xffff];
-	}
-	else {
-		return IntVal[VarId];
-	}
-#else
 	Variable_t *v;
 	if (VarId >> 16) {
 		v = &Variables[(VarId>>16)-1];
@@ -1870,7 +1641,6 @@ int CopyIntVal(TVarId VarId)
 		v = &Variables[VarId];
 		return v->Value.Int;
 	}
-#endif
 }
 
 void GetIntVar(PVarId VarId, LPWORD Err)
@@ -1983,11 +1753,6 @@ void GetStrVar(PVarId VarId, LPWORD Err)
 
 void SetStrVal(TVarId VarId, const char *Str)
 {
-#if 0
-	// StrBuf の運用上 MaxStrLen が正しいサイズなのでサイズを固定
-	// (2007.6.23 maya)
-	strncpy_s(StrVarPtr(VarId), MaxStrLen, Str, _TRUNCATE);
-#else
 	if (VarId >> 16) {
 		Variable_t *v = &Variables[(VarId>>16)-1];
 		char **str = &v->Value.StrAry.val[VarId & 0xffff];
@@ -2000,19 +1765,10 @@ void SetStrVal(TVarId VarId, const char *Str)
 		free(*str);
 		*str = strdup(Str);
 	}
-#endif
 }
 
 const char *StrVarPtr(TVarId VarId)
 {
-#if 0
-	if (VarId >> 16) {
-		return StrAryVal[(VarId>>16)-1].val[VarId & 0xffff];
-	}
-	else {
-		return &StrBuff[VarId*MaxStrLen];
-	}
-#else
 	Variable_t *v;
 	if (VarId >> 16) {
 		v = &Variables[(VarId>>16)-1];
@@ -2022,7 +1778,6 @@ const char *StrVarPtr(TVarId VarId)
 		v = &Variables[VarId];
 		return v->Value.Str;
 	}
-#endif
 }
 
 // for ifdefined (2006.9.23 maya)
@@ -2042,14 +1797,6 @@ void GetVarType(LPWORD ValType, int far *Val, LPWORD Err)
 			switch (*ValType) {
 				case TypIntArray:
 					if (GetIndex(&Index, Err)) {
-#if 0
-						if (Index >= 0 && Index < IntAryVal[VarId].size) {
-							*ValType = TypInteger;
-						}
-						else {
-							*ValType = TypUnknown;
-						}
-#else
 						TIntAry *intAry = &Variables[VarId].Value.IntAry;
 						if (Index >= 0 && Index < intAry->size) {
 							*ValType = TypInteger;
@@ -2057,7 +1804,6 @@ void GetVarType(LPWORD ValType, int far *Val, LPWORD Err)
 						else {
 							*ValType = TypUnknown;
 						}
-#endif
 					}
 					break;
 				case TypStrArray:
@@ -2104,14 +1850,6 @@ BOOL GetIndex(int *Index, LPWORD Err)
 
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err)
 {
-#if 0
-	if (Index < 0 || Index >= IntAryVal[VarId].size) {
-		*Err = ErrOutOfRange;
-		return -1;
-	}
-	*Err = 0;
-	return ((VarId+1) << 16) | Index;
-#else
 	TIntAry *intAry = &Variables[VarId].Value.IntAry;
 	if (Index < 0 || Index >= intAry->size) {
 		*Err = ErrOutOfRange;
@@ -2119,19 +1857,10 @@ TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err)
 	}
 	*Err = 0;
 	return ((VarId+1) << 16) | Index;
-#endif
 }
 
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
 {
-#if 0
-	if (Index < 0 || Index >= StrAryVal[VarId].size) {
-		*Err = ErrOutOfRange;
-		return -1;
-	}
-	*Err = 0;
-	return ((VarId+1) << 16) | Index;
-#else
 	TStrAry *strAry = &Variables[VarId].Value.StrAry;
 	if (Index < 0 || Index >= strAry->size) {
 		*Err = ErrOutOfRange;
@@ -2139,7 +1868,6 @@ TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
 	}
 	*Err = 0;
 	return ((VarId+1) << 16) | Index;
-#endif
 }
 
 void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err)
@@ -2192,20 +1920,12 @@ void SetStrValInArray(TVarId VarId, int Index, PCHAR Str, LPWORD Err)
 
 int GetIntAryVarSize(TVarId VarId)
 {
-#if 0
-	return IntAryVal[VarId].size;
-#else
 	TIntAry *intAry = &Variables[VarId].Value.IntAry;
 	return intAry->size;
-#endif
 }
 
 int GetStrAryVarSize(TVarId VarId)
 {
-#if 0
-	return StrAryVal[VarId].size;
-#else
 	TIntAry *strAry = &Variables[VarId].Value.IntAry;
 	return strAry->size;
-#endif
 }
