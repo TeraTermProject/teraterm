@@ -48,7 +48,7 @@ BOOL InitTTL(HWND HWin);
 void EndTTL();
 void Exec();
 void SetMatchStr(PCHAR Str);
-void SetGroupMatchStr(int no, PCHAR Str);
+void SetGroupMatchStr(int no, const char *Str);
 void SetInputStr(const char *Str);
 void SetResult(int ResultCode);
 BOOL CheckTimeout();

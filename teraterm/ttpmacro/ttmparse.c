@@ -1004,7 +1004,7 @@ BOOL NewIntVar(const char *Name, int InitVal)
 #endif
 }
 
-BOOL NewStrVar(const char *Name, PCHAR InitVal)
+BOOL NewStrVar(const char *Name, const char *InitVal)
 {
 #if 0
 	long P;
@@ -2003,7 +2003,7 @@ void SetStrVal(TVarId VarId, const char *Str)
 #endif
 }
 
-PCHAR StrVarPtr(TVarId VarId)
+const char *StrVarPtr(TVarId VarId)
 {
 #if 0
 	if (VarId >> 16) {
@@ -2156,7 +2156,7 @@ void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err)
 	}
 }
 
-void GetAryVarByName(PVarId VarId, PCHAR Name, WORD VarType, LPWORD Err)
+void GetAryVarByName(PVarId VarId, const char *Name, WORD VarType, LPWORD Err)
 {
 	WORD typ;
 

@@ -360,7 +360,7 @@ void DDEOut1Byte(BYTE B)
 	}
 }
 
-void DDEOut(PCHAR B)
+void DDEOut(const char *B)
 {
 	while (*B) {
 		if (OutLen >= OutBufSize - 1)
@@ -473,7 +473,7 @@ void ClearWait()
 	RegexActionType = REGEX_NONE; // regex disabled
 }
 
-void SetWait(int Index, PCHAR Str)
+void SetWait(int Index, const char *Str)
 {
 	if (PWaitStr[Index-1])
 		free(PWaitStr[Index-1]);

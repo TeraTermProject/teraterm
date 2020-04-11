@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-BOOL EncSeparate(PCHAR Str, int far *i, LPBYTE b)
+BOOL EncSeparate(const char *Str, int far *i, LPBYTE b)
 {
 	int cptr, bptr;
 	unsigned int d;
@@ -81,7 +81,7 @@ BYTE EncCharacterize(BYTE c, LPBYTE b)
 	return d;
 }
 
-void Encrypt(PCHAR InStr, PCHAR OutStr)
+void Encrypt(const char *InStr, PCHAR OutStr)
 {
 	int i, j;
 	BYTE b, r, r2;

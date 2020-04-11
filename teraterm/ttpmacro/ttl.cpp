@@ -2385,7 +2385,7 @@ WORD TTLSetPassword()
 	char Temp[512];
 	WORD Err;
 	TVarId VarId;
-	PCHAR VarStr;
+	const char *VarStr;
 	int result = 0;  /* failure */
 
 	Err = 0;
@@ -2470,7 +2470,9 @@ WORD TTLGetSpecialFolder()
 		return Err;
 	}
 
-	result = GetSpecialFolder(StrVarPtr(VarId), sizeof(TStrVal), type);
+	char folder[MaxStrLen];
+	result = GetSpecialFolder(folder, sizeof(folder), type);
+	SetStrVal(VarId, folder);
 	SetResult(result);
 
 	return Err;
@@ -2483,7 +2485,7 @@ WORD TTLGetTime(WORD mode)
 	TStrVal Str1, Str2, tzStr;
 	time_t time1;
 	struct tm *ptm;
-	char *format;
+	const char *format;
 	BOOL set_result;
 	const char *tz = NULL;
 	char tz_copy[128]; 
@@ -3610,7 +3612,7 @@ WORD TTLSend()
  * src に含まれる 0x01 を 0x01 0x02 に置き換えて dst にコピーする。
  * TStrVal には 0x00 が含まれる事が無い(終端と区別できない)ので 0x00 は考慮する必要なし。
  */
-static void AddBroadcastString(char *dst, int dstlen, char *src)
+static void AddBroadcastString(char *dst, int dstlen, const char *src)
 {
 	int i;
 
@@ -4390,7 +4392,11 @@ WORD TTLStrConcat()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	strncat_s(StrVarPtr(VarId),MaxStrLen,Str,_TRUNCATE);
+	char dest[MaxStrLen];
+	const char *src = StrVarPtr(VarId);
+	strcpy_s(dest, MaxStrLen, src);
+	strncat_s(dest, MaxStrLen, Str, _TRUNCATE);
+	SetStrVal(VarId, dest);
 	return Err;
 }
 
@@ -4414,8 +4420,10 @@ WORD TTLStrCopy()
 	SrcLen = strlen(Str)-From+1;
 	if (Len > SrcLen) Len = SrcLen;
 	if (Len < 0) Len = 0;
-	memcpy(StrVarPtr(VarId),&(Str[From-1]),Len);
-	StrVarPtr(VarId)[Len] = 0;
+	char dest[MaxStrLen];
+	memcpy(dest,&(Str[From-1]),Len);
+	dest[Len] = 0;
+	SetStrVal(VarId, dest);
 	return Err;
 }
 
@@ -4531,7 +4539,9 @@ WORD TTLStrInsert()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	srcptr = StrVarPtr(VarId);
+	char dest[MaxStrLen];
+	strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
+	srcptr = dest;
 	srclen = strlen(srcptr);
 	if (Index <= 0 || Index > srclen+1) {
 		Err = ErrSyntax;
@@ -4543,6 +4553,7 @@ WORD TTLStrInsert()
 	if (Err!=0) return Err;
 
 	insert_string(srcptr, Index, Str);
+	SetStrVal(VarId, dest);
 
 	return Err;
 }
@@ -4597,7 +4608,9 @@ WORD TTLStrRemove()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	srcptr = StrVarPtr(VarId);
+	char dest[MaxStrLen];
+	strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
+	srcptr = dest;
 	srclen = strlen(srcptr);
 	if (Len <=0 || Index <= 0 || (Index-1 + Len) > srclen) {
 		Err = ErrSyntax;
@@ -4605,6 +4618,7 @@ WORD TTLStrRemove()
 	if (Err!=0) return Err;
 
 	remove_string(srcptr, Index, Len);
+	SetStrVal(VarId, dest);
 
 	return Err;
 }
@@ -4616,7 +4630,8 @@ WORD TTLStrReplace()
 	TStrVal oldstr;
 	TStrVal newstr;
 	TStrVal tmpstr;
-	char *srcptr, *matchptr;
+	const char *srcptr;
+	const char *matchptr;
 	char *p;
 	int srclen, oldlen, matchlen;
 	int pos, ret;
@@ -4670,9 +4685,11 @@ WORD TTLStrReplace()
 		goto error;
 	}
 
-	strncpy_s(srcptr, MaxStrLen, tmpstr, pos + ret);
-	strncat_s(srcptr, MaxStrLen, newstr, _TRUNCATE);
-	strncat_s(srcptr, MaxStrLen, tmpstr + pos + ret + matchlen, _TRUNCATE);
+	char dest[MaxStrLen];
+	strncpy_s(dest, sizeof(dest), tmpstr, pos + ret);
+	strncat_s(dest, sizeof(dest), newstr, _TRUNCATE);
+	strncat_s(dest, sizeof(dest), tmpstr + pos + ret + matchlen, _TRUNCATE);
+	SetStrVal(VarId, dest);
 
 	result = 1;
 
@@ -4703,7 +4720,10 @@ WORD TTLStrSpecial()
 		SetStrVal(VarId, srcstr);
 	}
 	else { // strspecial strvar
-		RestoreNewLine(StrVarPtr(VarId));
+		char dest[MaxStrLen];
+		strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
+		RestoreNewLine(dest);
+		SetStrVal(VarId, dest);
 	}
 
 	return Err;
@@ -4727,7 +4747,9 @@ WORD TTLStrTrim()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	srcptr = StrVarPtr(VarId);
+	char dest[MaxStrLen];
+	strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
+	srcptr = dest;
 	srclen = strlen(srcptr);
 
 	// 削除する文字のテーブルを作る。
@@ -4760,6 +4782,7 @@ WORD TTLStrTrim()
 	// 次に、先頭から削る。
 	remove_string(srcptr, 1, start);
 
+	SetStrVal(VarId, dest);
 	return Err;
 }
 
@@ -4889,7 +4912,8 @@ WORD TTLStrJoin()
 	int srclen;
 	int i;
 	BOOL ary = FALSE;
-	char *srcptr, *p;
+	char *srcptr;
+	const char *p;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -4919,7 +4943,9 @@ WORD TTLStrJoin()
 	if (!ary && (maxvar < 1 || maxvar > MAXVARNUM) )
 		return ErrSyntax;
 
-	srcptr = StrVarPtr(VarId);
+	char dest[MaxStrLen];
+	strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
+	srcptr = dest;
 	srclen = strlen(srcptr);
 
 	srcptr[0] = '\0';
@@ -4940,6 +4966,7 @@ WORD TTLStrJoin()
 			}
 		}
 	}
+	SetStrVal(VarId, dest);
 
 	return Err;
 #undef MAXVARNUM
@@ -4986,7 +5013,7 @@ WORD TTLToLower()
 		i++;
 	}
 
-	strncpy_s(StrVarPtr(VarId), MaxStrLen, Str, _TRUNCATE);
+	SetStrVal(VarId, Str);
 	return Err;
 }
 
@@ -5016,7 +5043,7 @@ WORD TTLToUpper()
 		i++;
 	}
 
-	strncpy_s(StrVarPtr(VarId), MaxStrLen, Str, _TRUNCATE);
+	SetStrVal(VarId, Str);
 	return Err;
 }
 
@@ -5977,10 +6004,9 @@ int ExecCmnd()
 						case TypString:
 							if (StrConst)
 								SetStrVal(VarId,Str);
-							else
-							// StrVarPtr の返り値が TStrVal のポインタであることを期待してサイズを固定
-							// (2007.6.23 maya)
-								strncpy_s(StrVarPtr(VarId),MaxStrLen,StrVarPtr((TVarId)Val),_TRUNCATE);
+							else {
+								SetStrVal(VarId, StrVarPtr((TVarId)Val));
+							}
 						break;
 						default:
 							Err = ErrSyntax;
@@ -6052,12 +6078,12 @@ void SetMatchStr(PCHAR Str)
 
 // 正規表現でグループマッチした文字列を記録する
 // (2005.10.15 yutaka)
-void SetGroupMatchStr(int no, PCHAR Str)
+void SetGroupMatchStr(int no, const char *Str)
 {
 	WORD VarType;
 	TVarId VarId;
 	char buf[128];
-	char *p;
+	const char *p;
 
 	if (Str == NULL)
 		p = "";

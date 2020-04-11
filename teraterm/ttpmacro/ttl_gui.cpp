@@ -184,8 +184,7 @@ WORD TTLFilenameBox()
 		}
 
 		char *filenameU8 = ToU8W(filename);
-		char *dest = StrVarPtr(VarId);
-		strcpy(dest, filenameU8);
+		SetStrVal(VarId, filenameU8);
 		free(filenameU8);
 
 		SetResult(ret);
@@ -285,9 +284,9 @@ WORD TTLInputBox(BOOL Paswd)
 	if (CheckVar("inputstr",&ValType,&VarId) && (ValType==TypString)) {
 		wchar_t input_string[MaxStrLen];
 		OpenInpDlg(input_string,wc::fromUtf8(Str1),wc::fromUtf8(Str2),wc::fromUtf8(Str3),Paswd);
-		char *output = StrVarPtr(VarId);
-		size_t str_len = MaxStrLen;
-		WideCharToUTF8(input_string, NULL, output, &str_len);
+		char *u8 = ToU8W(input_string);
+		SetStrVal(VarId, u8);
+		free(u8);
 	}
 	return Err;
 }
