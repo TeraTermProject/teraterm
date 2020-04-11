@@ -19,8 +19,10 @@ add_executable(
   statdlg.cpp
   statdlg.h
   macrodlgbase.h
-  ttl.c
+  ttl.cpp
   ttl.h
+  ttl_gui.cpp
+  ttl_gui.h
   ttm_res.h
   ttmacro.cpp
   ttmacro.h

@@ -37,12 +37,13 @@
 #include "ttmlib.h"
 #include "tmfc.h"
 #include "tttypes.h"
+#include "ttmacro.h"
 
 #include "statdlg.h"
 
 // CStatDlg dialog
 
-BOOL CStatDlg::Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y)
+BOOL CStatDlg::Create(HINSTANCE hInst, const TCHAR *Text, const TCHAR *Title, int x, int y)
 {
 	TextStr = Text;
 	TitleStr = Title;
@@ -51,7 +52,7 @@ BOOL CStatDlg::Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y)
 	return TTCDialog::Create(hInst, NULL, CStatDlg::IDD);
 }
 
-void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
+void CStatDlg::Update(const TCHAR *Text, const TCHAR *Title, int x, int y)
 {
 	RECT R;
 
@@ -213,6 +214,12 @@ void CStatDlg::Bringup()
 	BringupWindow(m_hWnd);
 }
 
+/**
+ * MFC‚ÌCWnd‚Ì‰B‚êƒƒ“ƒoŠÖ”
+ *	‚±‚ÌŠÖ”‚ªFALSE‚ğ•Ô‚·‚Æ
+ *	CDialog::OnInitDialog()Œã‚É
+ *	CWnd::CenterWindow() ‚ªŒÄ‚Ño‚³‚ê‚È‚¢
+ */
 BOOL CStatDlg::CheckAutoCenter()
 {
 	// CenterWindow() is called when x=0 && y=0

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,6 +68,8 @@
 #include <iptypes.h>
 #include <iphlpapi.h>
 #include "win16api.h"
+#include "ttl_gui.h"
+#include "codeconv.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -448,6 +450,7 @@ WORD TTLCall()
 	return Err;
 }
 
+#if 0
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
 {
@@ -575,7 +578,9 @@ WORD TTLClipb2Var()
 
 	return Err;
 }
+#endif
 
+#if 0
 // add 'var2clipb' (2006.9.17 maya)
 WORD TTLVar2Clipb()
 {
@@ -621,6 +626,7 @@ WORD TTLVar2Clipb()
 
 	return Err;
 }
+#endif
 
 WORD TTLCloseSBox()
 {
@@ -833,6 +839,7 @@ WORD TTLDoChecksum(enum checksum_type type)
 	WORD Err;
 	TVarId VarId;
 	DWORD cksum;
+	unsigned char *p;
 
 	Err = 0;
 	GetIntVar(&VarId, &Err);
@@ -841,22 +848,23 @@ WORD TTLDoChecksum(enum checksum_type type)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
+	p = (unsigned char *)Str;
 
 	switch (type) {
 		case CHECKSUM8:
-			cksum = checksum8(strlen(Str), Str);
+			cksum = checksum8(strlen(Str), p);
 			break;
 		case CHECKSUM16:
-			cksum = checksum16(strlen(Str), Str);
+			cksum = checksum16(strlen(Str), p);
 			break;
 		case CHECKSUM32:
-			cksum = checksum32(strlen(Str), Str);
+			cksum = checksum32(strlen(Str), p);
 			break;
 		case CRC16:
-			cksum = crc16(strlen(Str), Str);
+			cksum = crc16(strlen(Str), p);
 			break;
 		case CRC32:
-			cksum = crc32(strlen(Str), Str);
+			cksum = crc32(strlen(Str), p);
 			break;
 		default:
 			cksum = 0;
@@ -1187,7 +1195,8 @@ WORD TTLExec()
 {
 	TStrVal Str,Str2, CurDir;
 	int mode = SW_SHOW;
-	int wait = 0, ret;
+	int wait = 0;
+	DWORD ret;
 	WORD Err;
 	STARTUPINFO sui;
 	PROCESS_INFORMATION pi;
@@ -1236,10 +1245,13 @@ WORD TTLExec()
 	sui.cb = sizeof(STARTUPINFO);
 	sui.wShowWindow = mode;
 	sui.dwFlags = STARTF_USESHOWWINDOW;
+	tc StrT = tc::fromUtf8(Str);
+	tc CurDirT = tc::fromUtf8(CurDir);
+	LPTSTR StrT_NC = (TCHAR *)(const TCHAR *)StrT;
 	if (CurDir[0] == 0)
-		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+		bRet = CreateProcess(NULL, StrT_NC, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
 	else
-		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDir, &sui, &pi);
+		bRet = CreateProcess(NULL, StrT_NC, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDirT, &sui, &pi);
 	if (bRet == FALSE) {
 		// é¿çsÇ≈Ç´Ç»Ç©Ç¡ÇΩèÍçáÅAresultÇ…-1Çï‘Ç∑
 		SetResult(-1);
@@ -1534,6 +1546,7 @@ WORD TTLFileMarkPtr()
 	return Err;
 }
 
+#if 0
 // add 'filenamebox' (2007.9.13 maya)
 WORD TTLFilenameBox()
 {
@@ -1594,6 +1607,7 @@ WORD TTLFilenameBox()
 	}
 	return Err;
 }
+#endif
 
 WORD TTLFileOpen()
 {
@@ -1654,6 +1668,7 @@ WORD TTLFileLock()
 	WORD Err;
 	HANDLE FH;
 	int fhi;
+	int timeoutI;
 	DWORD timeout;
 	int result;
 	BOOL ret;
@@ -1666,9 +1681,10 @@ WORD TTLFileLock()
 
 	timeout = -1;  // ñ≥å¿ëÂ
 	if (CheckParameterGiven()) {
-		GetIntVal(&timeout, &Err);
+		GetIntVal(&timeoutI, &Err);
 		if (Err!=0) return Err;
 	}
+	timeout = timeoutI * 1000;
 
 	result = 1;  // error
 	dwStart = GetTickCount();
@@ -2603,7 +2619,7 @@ WORD TTLGetIPv6Addr()
 	return Err;
 }
 
-
+#if 0
 WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2;
@@ -2647,6 +2663,7 @@ WORD TTLGetPassword()
 	SetResult(result);  // ê¨å˜â¬î€Çê›íËÇ∑ÇÈÅB
 	return Err;
 }
+#endif
 
 // setpassword 'password.dat' 'mypassword' passowrd
 WORD TTLSetPassword()
@@ -3066,6 +3083,7 @@ WORD TTLInclude()
 	return Err;
 }
 
+#if 0
 WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
@@ -3111,6 +3129,7 @@ WORD TTLInputBox(BOOL Paswd)
 		OpenInpDlg(StrVarPtr(VarId),Str1,Str2,Str3,Paswd);
 	return Err;
 }
+#endif
 
 WORD TTLInt2Str()
 {
@@ -3421,6 +3440,7 @@ WORD TTLDirname()
 	return Err;
 }
 
+#if 0
 WORD TTLDirnameBox()
 {
 	TStrVal Title;
@@ -3460,18 +3480,20 @@ WORD TTLDirnameBox()
 	return Err;
 }
 
+#if 0
 #define IdMsgBox 1
 #define IdYesNoBox 2
 #define IdStatusBox 3
 #define IdListBox 4
 #define LISTBOX_ITEM_NUM 10
+#endif
 
 int MessageCommand(int BoxId, LPWORD Err)
 {
 	TStrVal Str1, Str2;
 	int sp = 0;
 	int ret;
-	char **s;
+	TCHAR **s;
 	int i, ary_size;
 	int sel = 0;
 	TVarId VarId, VarId2;
@@ -3530,7 +3552,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 			sel = 0;
 		}
 
-		s = (char **)calloc(ary_size + 1, sizeof(char *));
+		s = (TCHAR **)calloc(ary_size + 1, sizeof(char *));
 		if (s == NULL) {
 			*Err = ErrFewMemory;
 			return -1;
@@ -3585,6 +3607,7 @@ WORD TTLMessageBox()
 	MessageCommand(IdMsgBox, &Err);
 	return Err;
 }
+#endif
 
 WORD TTLNext()
 {
@@ -4063,7 +4086,13 @@ WORD TTLSend()
 		if (GetString(Str,&Err))
 		{
 			if (Err!=0) return Err;
+#if 0
 			DDEOut(Str);
+#else
+			const char *StrA = ToCharU8(Str);
+			DDEOut((PCHAR)StrA);
+			free((void *)StrA);
+#endif
 		}
 		else if (GetExpression(&ValType,&Val,&Err))
 		{
@@ -4513,12 +4542,12 @@ WORD TTLSprintf(int getvar)
 	//                       width------------------
 	//                                     precision--------------------
 
-	r = onig_new(&reg, pattern, pattern + strlen(pattern),
+	r = onig_new(&reg, pattern, pattern + strlen((char *)pattern),
 	             ONIG_OPTION_NONE, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT,
 	             &einfo);
 	if (r != ONIG_NORMAL) {
 		char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-		onig_error_code_to_str(s, r, &einfo);
+		onig_error_code_to_str((OnigUChar *)s, r, &einfo);
 		fprintf(stderr, "ERROR: %s\n", s);
 		SetResult(-1);
 		goto exit2;
@@ -4751,6 +4780,7 @@ exit2:
 	return Err;
 }
 
+#if 0
 WORD TTLStatusBox()
 {
 	WORD Err;
@@ -4758,6 +4788,7 @@ WORD TTLStatusBox()
 	MessageCommand(IdStatusBox, &Err);
 	return Err;
 }
+#endif
 
 WORD TTLStr2Code()
 {
@@ -4954,7 +4985,7 @@ WORD TTLStrScan()
 {
 	WORD Err;
 	TStrVal Str1, Str2;
-	char *p;
+	unsigned char *p;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -4968,8 +4999,8 @@ WORD TTLStrScan()
 		return Err;
 	}
 
-	if ((p = _mbsstr(Str1, Str2)) != NULL) {
-		SetResult(p - Str1 + 1);
+	if ((p = _mbsstr((unsigned char *)Str1, (unsigned char *)Str2)) != NULL) {
+		SetResult(p - (unsigned char *)Str1 + 1);
 	}
 	else {
 		SetResult(0);
@@ -5829,6 +5860,7 @@ WORD TTLXmodemSend()
 	return SendCmnd(CmdXmodemSend,IdTTLWaitCmndResult);
 }
 
+#if 0
 WORD TTLYesNoBox()
 {
 	WORD Err;
@@ -5843,6 +5875,7 @@ WORD TTLYesNoBox()
 	SetResult(YesNo);
 	return Err;
 }
+#endif
 
 WORD TTLZmodemSend()
 {

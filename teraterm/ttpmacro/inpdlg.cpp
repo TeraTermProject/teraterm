@@ -40,8 +40,8 @@
 #include "inpdlg.h"
 
 // CInpDlg dialog
-CInpDlg::CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
-                 PCHAR Default, BOOL Paswd,
+CInpDlg::CInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Title,
+                 const TCHAR *Default, BOOL Paswd,
                  int x, int y)
 {
 	InputStr = Input;

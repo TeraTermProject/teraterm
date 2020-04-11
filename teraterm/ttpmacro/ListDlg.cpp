@@ -29,6 +29,7 @@
 // ListDlg.cpp : 実装ファイル
 //
 
+#include <tchar.h>
 #include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"
@@ -37,12 +38,13 @@
 #include "tttypes.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
+#include "ttmacro.h"
 
 #include "ListDlg.h"
 
 // CListDlg ダイアログ
 
-CListDlg::CListDlg(const PCHAR Text, const PCHAR Caption, const CHAR **Lists, int Selected, int x, int y)
+CListDlg::CListDlg(const TCHAR *Text, const TCHAR *Caption, TCHAR **Lists, int Selected, int x, int y)
 {
 	m_Text = Text;
 	m_Caption = Caption;
@@ -59,7 +61,7 @@ INT_PTR CListDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 
 void CListDlg::InitList(HWND HList)
 {
-	const char **p;
+	TCHAR **p;
 	int ListMaxWidth = 0;
 	int ListCount = 0;
 	HDC DC = ::GetDC(HList);

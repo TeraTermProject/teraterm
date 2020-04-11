@@ -37,6 +37,7 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <tchar.h>
 #include <assert.h>
 
 #include "teraterm.h"
@@ -50,6 +51,7 @@
 #include "statdlg.h"
 #include "ListDlg.h"
 #include "ttmlib.h"
+#include "ttmdlg.h"
 #include "ttmacro.h"
 
 #include "ttmdlg.h"
@@ -85,7 +87,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	SleepFlag = FALSE;
 	*IOption = FALSE;
 	*VOption = FALSE;
-	Param = GetCommandLine();
+	Param = GetCommandLineA();
 
 	ParamsSize = 50;
 	Params = (char **)malloc(sizeof(char*) * ParamsSize);
@@ -219,8 +221,8 @@ void SetDlgPos(int x, int y)
 	}
 }
 
-void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
-                PCHAR Default, BOOL Paswd)
+void OpenInpDlg(TCHAR *Buff, const TCHAR *Text, const TCHAR *Caption,
+                const TCHAR *Default, BOOL Paswd)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
@@ -228,7 +230,7 @@ void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
 	InpDlg.DoModal(hInst, hWndParent);
 }
 
-int OpenErrDlg(const char *Msg, PCHAR Line, int lineno, int start, int end, PCHAR FileName)
+int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
@@ -236,7 +238,7 @@ int OpenErrDlg(const char *Msg, PCHAR Line, int lineno, int start, int end, PCHA
 	return ErrDlg.DoModal(hInst, hWndParent);
 }
 
-int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo)
+int OpenMsgDlg(const TCHAR *Text, const TCHAR *Caption, BOOL YesNo)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
@@ -244,7 +246,7 @@ int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo)
 	return MsgDlg.DoModal(hInst, hWndParent);
 }
 
-void OpenStatDlg(PCHAR Text, PCHAR Caption)
+void OpenStatDlg(const TCHAR *Text, const TCHAR *Caption)
 {
 	if (StatDlg==NULL) {
 		HINSTANCE hInst = GetInstance();
@@ -281,7 +283,7 @@ void BringupStatDlg()
  * @retval -1		cancelボタン
  * @retval -2		closeボタン
  */
-int OpenListDlg(PCHAR Text, PCHAR Caption, const CHAR **Lists, int Selected)
+int OpenListDlg(const TCHAR *Text, const TCHAR *Caption, TCHAR **Lists, int Selected)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();

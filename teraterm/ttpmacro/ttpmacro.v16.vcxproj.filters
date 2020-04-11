@@ -43,9 +43,6 @@
     <ClCompile Include="ttmmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ttl.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\ttlib.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -66,6 +63,12 @@
     </ClCompile>
     <ClCompile Include="wait4all.c">
       <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttl_gui.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +145,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\layer_for_unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttl_gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

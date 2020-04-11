@@ -135,7 +135,8 @@
     <ClCompile Include="inpdlg.cpp" />
     <ClCompile Include="msgdlg.cpp" />
     <ClCompile Include="statdlg.cpp" />
-    <ClCompile Include="ttl.c" />
+    <ClCompile Include="ttl.cpp" />
+    <ClCompile Include="ttl_gui.cpp" />
     <ClCompile Include="ttmacro.cpp" />
     <ClCompile Include="ttmbuff.c" />
     <ClCompile Include="ttmdde.c" />
@@ -162,6 +163,7 @@
     <ClInclude Include="msgdlg.h" />
     <ClInclude Include="statdlg.h" />
     <ClInclude Include="ttl.h" />
+    <ClInclude Include="ttl_gui.h" />
     <ClInclude Include="ttm_res.h" />
     <ClInclude Include="ttmacro.h" />
     <ClInclude Include="ttmbuff.h" />

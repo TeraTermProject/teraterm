@@ -34,12 +34,13 @@
 class CStatDlg : public CMacroDlgBase
 {
 public:
-	BOOL Create(HINSTANCE hInst, PCHAR Text, PCHAR Title, int x, int y);
-	void Update(PCHAR Text, PCHAR Title, int x, int y);
+	BOOL Create(HINSTANCE hInst, const TCHAR *Text, const TCHAR *Title, int x, int y);
+	void Update(const TCHAR *Text, const TCHAR *Title, int x, int y);
 	void Bringup();
 	enum { IDD = IDD_STATDLG };
 private:
-	PCHAR TextStr, TitleStr;
+	const TCHAR *TextStr;
+	const TCHAR *TitleStr;
 	int  init_WW, TW, TH;
 	SIZE s;
 

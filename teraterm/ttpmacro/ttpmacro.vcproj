@@ -232,6 +232,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ttl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ttl_gui.cpp"
+				>
+			</File>
+			<File
 				RelativePath="ttmacro.cpp"
 				>
 			</File>
@@ -400,10 +408,6 @@
 			Name="Source Files (C)"
 			Filter="c"
 			>
-			<File
-				RelativePath="ttl.c"
-				>
-			</File>
 			<File
 				RelativePath="..\common\ttlib.c"
 				>
