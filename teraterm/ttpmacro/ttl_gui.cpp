@@ -31,7 +31,9 @@
 
 #include "teraterm.h"
 #include <stdlib.h>
+#define _CRTDBG_MAP_ALLOC
 #include <stdio.h>
+#include <crtdbg.h>
 #include <string.h>
 #include <mbstring.h>
 #include <time.h>
@@ -50,6 +52,7 @@
 #include "ttl_gui.h"
 #include "codeconv.h"
 #include "layer_for_unicode.h"
+#include "ttlib.h"
 
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
@@ -184,43 +187,15 @@ WORD TTLVar2Clipb()
 {
 	WORD Err;
 	TStrVal Str;
-	HGLOBAL hText;
-	LPSTR clipbText;
-	int wide_len;
-	HGLOBAL wide_hText;
-	LPWSTR wide_buf;
 
 	Err = 0;
 	GetStrVal(Str,&Err);
 	if (Err!=0) return Err;
 
-	hText = GlobalAlloc(GHND, sizeof(Str));
-	clipbText = (LPSTR)GlobalLock(hText);
-	strncpy_s(clipbText, sizeof(Str), Str, _TRUNCATE);
-	GlobalUnlock(hText);
-
-	wide_len = MultiByteToWideChar(CP_ACP, 0, clipbText, -1, NULL, 0);
-	wide_hText = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
-	if (wide_hText) {
-		wide_buf = (LPWSTR)GlobalLock(wide_hText);
-		MultiByteToWideChar(CP_ACP, 0, clipbText, -1, wide_buf, wide_len);
-		GlobalUnlock(wide_hText);
-	}
-
-	if (OpenClipboard(NULL) == 0) {
-		SetResult(0);
-	}
-	else {
-		EmptyClipboard();
-		SetClipboardData(CF_TEXT, hText);
-
-		if (wide_buf) {
-			SetClipboardData(CF_UNICODETEXT, wide_hText);
-		}
-
-		CloseClipboard();
-		SetResult(1);
-	}
+	BOOL r = CBSetTextW(NULL, wc::fromUtf8(Str), 0);
+	// 0 == クリップボードを開けなかった
+	// 1 == クリップボードへのコピーに成功した
+	SetResult(r ? 1 : 0);
 
 	return Err;
 }
