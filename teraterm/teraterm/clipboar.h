@@ -41,7 +41,6 @@ extern "C" {
 PCHAR CBOpen(LONG MemSize);
 void CBClose(void);
 #endif
-BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
 
 void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);

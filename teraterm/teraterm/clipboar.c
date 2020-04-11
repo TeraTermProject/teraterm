@@ -1200,61 +1200,6 @@ void CBEndPaste()
 	_CrtCheckMemory();
 }
 
-/**
- *	クリップボードにテキストをセットする
- *	str_w	クリップボードにセットする文字列へのポインタ
- *			NULLのときクリップボードを空にする(str_lenは参照されない)
- *	str_len	文字列長
- *			0のとき文字列長が自動で算出される
- */
-BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
-{
-	HGLOBAL CBCopyWideHandle;
-
-	if (str_w == NULL) {
-		str_len = 0;
-	} else {
-		if (str_len == 0)
-			str_len = wcslen(str_w);
-	}
-
-	if (!OpenClipboard(hWnd)) {
-		return FALSE;
-	}
-
-	EmptyClipboard();
-	if (str_len == 0) {
-		CloseClipboard();
-		return TRUE;
-	}
-
-	{
-		// 文字列をコピー、最後のL'\0'も含める
-		wchar_t *CBCopyWidePtr;
-		const size_t alloc_bytes = (str_len + 1) * sizeof(wchar_t);
-		CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, alloc_bytes);
-		if (CBCopyWideHandle == NULL) {
-			CloseClipboard();
-			return FALSE;
-		}
-		CBCopyWidePtr = (wchar_t *)GlobalLock(CBCopyWideHandle);
-		if (CBCopyWidePtr == NULL) {
-			CloseClipboard();
-			return FALSE;
-		}
-		memcpy(CBCopyWidePtr, str_w, alloc_bytes - sizeof(wchar_t));
-		CBCopyWidePtr[str_len] = L'\0';
-		GlobalUnlock(CBCopyWideHandle);
-	}
-
-	SetClipboardData(CF_UNICODETEXT, CBCopyWideHandle);
-
-	// TODO 9x系では自動でCF_TEXTにセットされないらしい?
-	CloseClipboard();
-
-	return TRUE;
-}
-
 #if 0
 BOOL CBSetClipboard(HWND owner, HGLOBAL hMem)
 {

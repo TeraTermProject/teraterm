@@ -162,6 +162,7 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const ch
 wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const char *UILanguageFile);
 wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty);
 char *GetClipboardTextA(HWND hWnd, BOOL empty);
+BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
 
 #ifdef __cplusplus
 }
