@@ -901,7 +901,7 @@ BOOL GetNumber(int far *Num)
 	return TRUE;
 }
 
-BOOL CheckVar(PCHAR Name, LPWORD VarType, PVarId VarId)
+BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
 {
 #if 0
 	int i;
@@ -986,7 +986,7 @@ static Variable_t *NewVar(const char *name, VariableType_t type)
 	return v;
 }
 
-BOOL NewIntVar(PCHAR Name, int InitVal)
+BOOL NewIntVar(const char *Name, int InitVal)
 {
 #if 0
 	long P;
@@ -1004,7 +1004,7 @@ BOOL NewIntVar(PCHAR Name, int InitVal)
 #endif
 }
 
-BOOL NewStrVar(PCHAR Name, PCHAR InitVal)
+BOOL NewStrVar(const char *Name, PCHAR InitVal)
 {
 #if 0
 	long P;
@@ -1023,7 +1023,7 @@ BOOL NewStrVar(PCHAR Name, PCHAR InitVal)
 #endif
 }
 
-int NewIntAryVar(PCHAR Name, int size)
+int NewIntAryVar(const char *Name, int size)
 {
 #if 0
 	long P;
@@ -1051,7 +1051,7 @@ int NewIntAryVar(PCHAR Name, int size)
 #endif
 }
 
-int NewStrAryVar(PCHAR Name, int size)
+int NewStrAryVar(const char *Name, int size)
 {
 #if 0
 	long P;
@@ -1079,7 +1079,7 @@ int NewStrAryVar(PCHAR Name, int size)
 #endif
 }
 
-BOOL NewLabVar(PCHAR Name, BINT InitVal, WORD ILevel)
+BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel)
 {
 #if 0
 	long P;
