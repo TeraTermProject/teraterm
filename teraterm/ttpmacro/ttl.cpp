@@ -4623,19 +4623,17 @@ WORD TTLStrRemove()
 WORD TTLStrReplace()
 {
 	WORD Err, VarType;
-	TVarId VarId;
+	TVarId DestVarId;
 	TStrVal oldstr;
 	TStrVal newstr;
 	TStrVal tmpstr;
-	const char *srcptr;
-	const char *matchptr;
 	char *p;
 	int srclen, oldlen, matchlen;
 	int pos, ret;
 	int result = 0;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVar(&DestVarId,&Err);
 	GetIntVal(&pos,&Err);
 	GetStrVal(oldstr,&Err);
 	GetStrVal(newstr,&Err);
@@ -4643,7 +4641,7 @@ WORD TTLStrReplace()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	srcptr = StrVarPtr(VarId);
+	const char *srcptr = StrVarPtr(DestVarId);
 	srclen = strlen(srcptr);
 
 	if (pos > srclen || pos <= 0) {
@@ -4673,9 +4671,10 @@ WORD TTLStrReplace()
 	}
 	ret--;
 
-	if (CheckVar("matchstr",&VarType,&VarId) &&
+	TVarId MatchVarId;
+	if (CheckVar("matchstr",&VarType,&MatchVarId) &&
 		(VarType==TypString)) {
-		matchptr = StrVarPtr(VarId);
+		const char *matchptr = StrVarPtr(MatchVarId);
 		matchlen = strlen(matchptr);
 	} else {
 		result = 0;
@@ -4686,7 +4685,7 @@ WORD TTLStrReplace()
 	strncpy_s(dest, sizeof(dest), tmpstr, pos + ret);
 	strncat_s(dest, sizeof(dest), newstr, _TRUNCATE);
 	strncat_s(dest, sizeof(dest), tmpstr + pos + ret + matchlen, _TRUNCATE);
-	SetStrVal(VarId, dest);
+	SetStrVal(DestVarId, dest);
 
 	result = 1;
 

@@ -55,7 +55,7 @@ TStrVal Wait2Str;
 BOOL Wait2Found;
 
 OnigOptionType RegexOpt = ONIG_OPTION_NONE;
-OnigEncoding RegexEnc = ONIG_ENCODING_ASCII;
+OnigEncoding RegexEnc = ONIG_ENCODING_UTF8;
 OnigSyntaxType *RegexSyntax = ONIG_SYNTAX_RUBY;
 
 #define ServiceName "TERATERM"
