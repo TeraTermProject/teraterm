@@ -101,7 +101,57 @@ void CalcTextExtent(HWND hWnd, HFONT hFont, const char *Text, LPSIZE s)
 			Temp[0] = 0x20;
 			Temp[1] = 0;
 		}
-		dwExt = GetTabbedTextExtent(DC,Temp,strlen(Temp),0,NULL);
+		dwExt = GetTabbedTextExtent(DC,Temp, (int)strlen(Temp),0,NULL);
+		s->cx = LOWORD(dwExt);
+		s->cy = HIWORD(dwExt);
+		if (s->cx > W) W = s->cx;
+		H = H + s->cy;
+		if (Text[i]!=0)
+		{
+			i++;
+			if ((Text[i]==0x0a) &&
+				(Text[i-1]==0x0d))
+				i++;
+		}
+	} while (Text[i]!=0);
+	if ((i-i0 == 0) && (H > s->cy)) H = H - s->cy;
+	s->cx = W;
+	s->cy = H;
+	if (prevFont != NULL) {
+		SelectObject(DC, prevFont);
+	}
+	ReleaseDC(hWnd, DC);
+}
+
+void CalcTextExtentW(HWND hWnd, HFONT hFont, const wchar_t *Text, LPSIZE s)
+{
+	HDC DC = GetDC(hWnd);
+	int W, H, i, i0;
+	wchar_t Temp[512];
+	DWORD dwExt;
+	HFONT prevFont;
+	if (hFont == NULL) {
+		hFont = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
+	}
+	prevFont = (HFONT)SelectObject(DC, hFont);
+
+	W = 0;
+	H = 0;
+	i = 0;
+	do {
+		i0 = i;
+		while ((Text[i]!=0) &&
+			   (Text[i]!=0x0d) &&
+			   (Text[i]!=0x0a))
+			i++;
+		memcpy(Temp,&Text[i0],sizeof(wchar_t) * (i-i0));
+		Temp[i-i0] = 0;
+		if (Temp[0]==0)
+		{
+			Temp[0] = 0x20;
+			Temp[1] = 0;
+		}
+		dwExt = GetTabbedTextExtentW(DC,Temp,(int)wcslen(Temp),0,NULL);
 		s->cx = LOWORD(dwExt);
 		s->cy = HIWORD(dwExt);
 		if (s->cx > W) W = s->cx;

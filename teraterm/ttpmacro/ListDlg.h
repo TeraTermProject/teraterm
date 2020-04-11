@@ -34,15 +34,15 @@
 class CListDlg : public CMacroDlgBase
 {
 public:
-	CListDlg(const TCHAR *Text, const TCHAR *Caption, TCHAR **Lists, int Selected, int x, int y);
+	CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y);
 	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 	int m_SelectItem;
 
 private:
 	enum { IDD = IDD_LISTDLG };
-	const TCHAR *m_Text;
-	const TCHAR *m_Caption;
-	TCHAR **m_Lists;
+	const wchar_t *m_Text;
+	const wchar_t *m_Caption;
+	wchar_t **m_Lists;
 	int m_Selected;
 	int init_WW, TW, TH, BH, BW, LW, LH;
 	SIZE s;

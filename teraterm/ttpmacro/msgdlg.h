@@ -36,14 +36,14 @@
 class CMsgDlg : public CMacroDlgBase
 {
 public:
-	CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo, int x, int y);
+	CMsgDlg(const wchar_t *Text, const wchar_t *Title, BOOL YesNo, int x, int y);
 	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 
 private:
 	enum { IDD = IDD_MSGDLG };
 
-	const TCHAR *TextStr;
-	const TCHAR *TitleStr;
+	const wchar_t *TextStr;
+	const wchar_t *TitleStr;
 	BOOL YesNoFlag;
 	int  init_WW, TW, TH, BH, BW;
 	SIZE s;

@@ -43,12 +43,12 @@ void SetDlgPos(int x, int y);
 void OpenInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Caption,
                 const TCHAR *Default, BOOL Paswd);
 int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
-int OpenMsgDlg(const TCHAR *Text, const TCHAR *Caption, BOOL YesNo);
+int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo);
 void OpenStatDlg(const TCHAR *Text, const TCHAR *Caption);
 void CloseStatDlg();
 void BringupStatDlg();
 
-int OpenListDlg(const TCHAR *Text, const TCHAR *Caption, TCHAR **Lists, int Selected);
+int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected);
 
 extern char HomeDir[MAX_PATH];
 extern char FileName[MAX_PATH];

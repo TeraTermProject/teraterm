@@ -44,7 +44,7 @@
 
 // CMsgDlg dialog
 
-CMsgDlg::CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo,
+CMsgDlg::CMsgDlg(const wchar_t *Text, const wchar_t *Title, BOOL YesNo,
                  int x, int y)
 {
 	TextStr = Text;
@@ -80,9 +80,9 @@ BOOL CMsgDlg::OnInitDialog()
 		SetDlgTexts(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFile);
 	}
 
-	SetWindowText(TitleStr);
-	SetDlgItemText(IDC_MSGTEXT,TextStr);
-	CalcTextExtent(GetDlgItem(IDC_MSGTEXT), NULL, TextStr, &s);
+	SetWindowTextW(TitleStr);
+	SetDlgItemTextW(IDC_MSGTEXT,TextStr);
+	CalcTextExtentW(GetDlgItem(IDC_MSGTEXT), NULL, TextStr, &s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 

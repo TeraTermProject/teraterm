@@ -238,7 +238,7 @@ int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end
 	return ErrDlg.DoModal(hInst, hWndParent);
 }
 
-int OpenMsgDlg(const TCHAR *Text, const TCHAR *Caption, BOOL YesNo)
+int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
@@ -283,7 +283,7 @@ void BringupStatDlg()
  * @retval -1		cancelボタン
  * @retval -2		closeボタン
  */
-int OpenListDlg(const TCHAR *Text, const TCHAR *Caption, TCHAR **Lists, int Selected)
+int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
