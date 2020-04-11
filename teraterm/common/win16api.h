@@ -4,7 +4,9 @@
 extern "C" {
 #endif
 
+HANDLE win16_lcreatW(const wchar_t *FileName, int iAttribute);
 HANDLE win16_lcreat(const char *FileName, int iAttribute);
+HANDLE win16_lopenW(const wchar_t *FileName, int iReadWrite);
 HANDLE win16_lopen(const char *FileName, int iReadWrite);
 void win16_lclose(HANDLE hFile);
 UINT win16_lread(HANDLE hFile, void *buf, UINT uBytes);

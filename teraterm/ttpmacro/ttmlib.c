@@ -37,6 +37,7 @@
 
 #include "compat_win.h"
 #include "ttmlib.h"
+#include "codeconv.h"
 
 static char CurrentDir[MAXPATHLEN];
 
@@ -178,15 +179,23 @@ void TTMGetDir(PCHAR Dir, int destlen)
   strncpy_s(Dir, destlen, CurrentDir, _TRUNCATE);
 }
 
-void TTMSetDir(PCHAR Dir)
+void TTMSetDir(const char *Dir)
 {
-  char Temp[MAXPATHLEN];
-
-  _getcwd(Temp,sizeof(Temp));
-  _chdir(CurrentDir);
-  _chdir(Dir);
-  _getcwd(CurrentDir,sizeof(CurrentDir));
-  _chdir(Temp);
+	wchar_t Temp[MAX_PATH];
+	wchar_t CurrentDirW[MAX_PATH];
+	wchar_t *pCurrentDirW = ToWcharU8(CurrentDir);
+	wchar_t *DirW = ToWcharU8(Dir);
+	char *pCurrentDirU8;
+	GetCurrentDirectoryW(_countof(Temp), Temp);
+	SetCurrentDirectoryW(pCurrentDirW);
+	SetCurrentDirectoryW(DirW);
+	GetCurrentDirectoryW(_countof(CurrentDirW), CurrentDirW);
+	pCurrentDirU8 = ToU8W(CurrentDirW);
+	strncpy_s(CurrentDir, _countof(CurrentDir), pCurrentDirU8, _TRUNCATE);
+	SetCurrentDirectoryW(Temp);
+	free(pCurrentDirW);
+	free(DirW);
+	free(pCurrentDirU8);
 }
 
 BOOL GetAbsPath(PCHAR FName, int destlen)

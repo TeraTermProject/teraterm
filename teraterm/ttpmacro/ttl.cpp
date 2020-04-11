@@ -54,9 +54,6 @@
 #include <sys/stat.h>
 #include <share.h>
 
-// for _findXXXX() functions
-#include <io.h>
-
 #include "ttl.h"
 #include "SFMT.h"
 
@@ -90,11 +87,16 @@ int ExitCode = 0;
 
 // for "FindXXXX" commands
 #define NumDirHandle 8
-static intptr_t DirHandle[NumDirHandle] = {-1,-1, -1, -1, -1, -1, -1, -1};
+static HANDLE DirHandle[NumDirHandle];
 /* for "FileMarkPtr" and "FileSeekBack" commands */
 #define NumFHandle 16
 static HANDLE FHandle[NumFHandle];
 static long FPointer[NumFHandle];
+
+#undef	_lcreat
+#define _lcreat(p1,p2)		win16_lcreatW(p1,p2)
+#undef	_lopen
+#define	_lopen(p1,p2)		win16_lopenW(p1,p2)
 
 // forward declaration
 int ExecCmnd();
@@ -218,7 +220,7 @@ BOOL InitTTL(HWND HWin)
 	EndIfFlag = 0;
 
 	for (i=0; i<NumDirHandle; i++)
-		DirHandle[i] = -1L;
+		DirHandle[i] = INVALID_HANDLE_VALUE;
 	HandleInit();
 
 	if (! InitBuff(FileName))
@@ -253,9 +255,9 @@ void EndTTL()
 
 	for (i=0; i<NumDirHandle; i++)
 	{
-		if (DirHandle[i]!=-1L)
-			_findclose(DirHandle[i]);
-		DirHandle[i] = -1L;
+		if (DirHandle[i] != INVALID_HANDLE_VALUE)
+			FindClose(DirHandle[i]);
+		DirHandle[i] = INVALID_HANDLE_VALUE;
 	}
 
 	UnlockVar();
@@ -1210,16 +1212,18 @@ WORD TTLFileConcat()
 		return Err;
 	}
 
-	FH1 = _lopen(FName1,OF_WRITE);
+	wc FName1W = wc::fromUtf8(FName1);
+	FH1 = _lopen(FName1W,OF_WRITE);
 	if (FH1 == INVALID_HANDLE_VALUE)
-		FH1 = _lcreat(FName1,0);
+		FH1 = _lcreat(FName1W,0);
 	if (FH1 == INVALID_HANDLE_VALUE) {
 		SetResult(3);
 		return Err;
 	}
 	_llseek(FH1,0,2);
 
-	FH2 = _lopen(FName2,OF_READ);
+	wc FName2W = wc::fromUtf8(FName2);
+	FH2 = _lopen(FName2W,OF_READ);
 	if (FH2 != INVALID_HANDLE_VALUE)
 	{
 		do {
@@ -1267,7 +1271,7 @@ WORD TTLFileCopy()
 		return Err;
 	}
 
-	ret = CopyFile(FName1, FName2, FALSE);
+	ret = CopyFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2), FALSE);
 	if (ret == 0) {
 		SetResult(-4);
 		return Err;
@@ -1301,7 +1305,8 @@ WORD TTLFileCreate()
 		SetResult(-1);
 		return Err;
 	}
-	FH = _lcreat(FName,0);
+	wc FNameW = wc::fromUtf8(FName);
+	FH = _lcreat(FNameW,0);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
 	}
@@ -1335,8 +1340,8 @@ WORD TTLFileDelete()
 		SetResult(-1);
 		return Err;
 	}
-	
-	if (remove(FName) != 0) {
+
+	if (DeleteFileW(wc::fromUtf8(FName)) != 0) {
 		SetResult(-1);
 	}
 	else {
@@ -1394,13 +1399,14 @@ WORD TTLFileOpen()
 		return Err;
 	}
 
+	wc FNameW = wc::fromUtf8(FName);
 	if (ReadonlyFlag) {
-		FH = _lopen(FName,OF_READ);
+		FH = _lopen(FNameW,OF_READ);
 	}
 	else {
-		FH = _lopen(FName,OF_READWRITE);
+		FH = _lopen(FNameW,OF_READWRITE);
 		if (FH == INVALID_HANDLE_VALUE)
-			FH = _lcreat(FName,0);
+			FH = _lcreat(FNameW,0);
 	}
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
@@ -1622,7 +1628,7 @@ WORD TTLFileRename()
 		SetResult(-2);
 		return Err;
 	}
-	if (rename(FName1,FName2) != 0) {
+	if (MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) != 0) {
 		// リネームに失敗したら、エラーで返す。
 		SetResult(-3);
 		return Err;
@@ -1645,7 +1651,9 @@ WORD TTLFileSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	if (DoesFileExist(FName))
+	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
+	if (attr != INVALID_FILE_ATTRIBUTES)
+		// exists file or folder
 		SetResult(1);
 	else
 		SetResult(0);
@@ -1688,15 +1696,24 @@ WORD TTLFileSeekBack()
 	return Err;
 }
 
+/*
+ * FILETIME -> time_t
+ */
+static time_t FileTimeToUnixTime(const FILETIME *ft)
+{
+	// FILETIME start 1601-01-01 00:00:00 , 100ns
+	// Unix epoch     1970-01-01 00:00:00 , 1sec
+	static const unsigned long long unix_epoch_offset = 116444736000000000LL;
+
+	unsigned long long ll = ((unsigned long long)ft->dwHighDateTime << 32) + ft->dwLowDateTime;
+	return (time_t)((ll - 116444736000000000) / 10000000);
+}
+
 WORD TTLFileStat()
 {
 	WORD Err;
-	TVarId SizeVarId, TimeVarId, DrvVarId;
-	TStrVal FName, TimeStr, DrvStr;
-	struct _stat st;
-	int ret;
+	TStrVal FName;
 	int result = -1;
-	struct tm *tmp;
 
 	Err = 0;
 	GetStrVal(FName,&Err);
@@ -1709,29 +1726,57 @@ WORD TTLFileStat()
 		goto end;
 	}
 
-	ret = _stat(FName, &st);
-	if (ret != 0) {
+	HANDLE hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+							   FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
 	}
 
-	if (CheckParameterGiven()) { 
-		GetIntVar(&SizeVarId,&Err);
-		if (Err!=0) return Err;
-		SetIntVal(SizeVarId, st.st_size);
+	DWORD file_size_hi;
+	DWORD file_size_low;
+	file_size_low = GetFileSize(hFile, &file_size_hi);
+	if (file_size_low == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
+		CloseHandle(hFile);
+		goto end;
 	}
 
-	if (CheckParameterGiven()) { 
+	unsigned long long file_size = ((unsigned long long)file_size_hi << 32) + file_size_low;
+	FILETIME last_write_time;
+	if (GetFileTime(hFile, NULL, &last_write_time, NULL) == FALSE) {
+		CloseHandle(hFile);
+		goto end;
+	}
+	CloseHandle(hFile);
+
+	if (CheckParameterGiven()) {
+		TVarId SizeVarId;
+		GetIntVar(&SizeVarId,&Err);
+		if (Err!=0) return Err;
+		SetIntVal(SizeVarId, (int)file_size);
+	}
+
+	if (CheckParameterGiven()) {
+		TVarId TimeVarId;
 		GetStrVar(&TimeVarId,&Err);
 		if (Err!=0) return Err;
-		tmp = localtime(&st.st_mtime);
+		time_t st_mtime = FileTimeToUnixTime(&last_write_time); // 最終修正時刻
+		struct tm* tmp = localtime(&st_mtime);
+		char TimeStr[128];
 		strftime(TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", tmp);
 		SetStrVal(TimeVarId, TimeStr);
 	}
 
-	if (CheckParameterGiven()) { 
+	if (CheckParameterGiven()) {
+		TVarId DrvVarId;
 		GetStrVar(&DrvVarId,&Err);
 		if (Err!=0) return Err;
-		_snprintf_s(DrvStr, sizeof(DrvStr), _TRUNCATE, "%c", st.st_dev + 'A');
+		char DrvStr[2];
+		char d = FName[0];
+		DrvStr[0] =
+			(d >= 'a' && d <= 'z') ? d - 'a' + 'A' :
+			(d >= 'A' && d <= 'Z') ? d :
+			'?';
+		DrvStr[1] = 0;
 		SetStrVal(DrvVarId, DrvStr);
 	}
 
@@ -1844,14 +1889,14 @@ WORD TTLFileStrSeek2()
 
 WORD TTLFileTruncate()
 {
-	WORD Err;
+	WORD Err = 0;
 	TStrVal FName;
 	int result = -1;
 	int TruncByte;
-	int fh = -1;
-	int ret;
+	BOOL r;
+	HANDLE hFile;
+	DWORD pos_low;
 
-	Err = 0;
 	GetStrVal(FName,&Err);
 	if ((Err==0) &&
 	    (strlen(FName)==0))
@@ -1862,33 +1907,39 @@ WORD TTLFileTruncate()
 		goto end;
 	}
 
-	if (CheckParameterGiven()) { 
+	if (CheckParameterGiven()) {
 		GetIntVal(&TruncByte,&Err);
 		if (Err!=0) return Err;
 	} else {
 		Err = ErrSyntax;
 		goto end;
 	}
+	Err = 0;
 
-	// ファイルを指定したサイズで切り詰める。
-	ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
-	if (ret != 0) {
+	// ファイルオープン、存在しない場合は新規作成
+	hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
 	}
-	ret = _chsize_s(fh, TruncByte);
-	if (ret != 0) {
-		goto end;
+
+	// ファイルを指定したサイズにする、
+	// 拡張した場合、拡張部分の内容は未定義
+	pos_low = SetFilePointer(hFile, TruncByte, NULL, FILE_BEGIN );
+	if (pos_low == INVALID_SET_FILE_POINTER) {
+		goto end_close;
+	}
+	r = SetEndOfFile(hFile);
+	if (r == FALSE) {
+		goto end_close;
 	}
 
 	result = 0;
 	Err = 0;
 
+end_close:
+	CloseHandle( hFile );
 end:
 	SetResult(result);
-
-	if (fh != -1)
-		_close(fh);
-
 	return Err;
 }
 
@@ -1946,10 +1997,10 @@ WORD TTLFindClose()
 	if (Err!=0) return Err;
 
 	if ((DH>=0) && (DH<NumDirHandle) &&
-	    (DirHandle[DH]!=-1L))
+	    (DirHandle[DH]!= INVALID_HANDLE_VALUE))
 	{
-		_findclose(DirHandle[DH]);
-		DirHandle[DH] = -1L;
+		FindClose(DirHandle[DH]);
+		DirHandle[DH] = INVALID_HANDLE_VALUE;
 	}
 	return Err;
 }
@@ -1960,7 +2011,7 @@ WORD TTLFindFirst()
 	WORD Err;
 	TStrVal Dir;
 	int i;
-	struct _finddata_t data;
+	WIN32_FIND_DATAW data;
 
 	Err = 0;
 	GetIntVar(&DH,&Err);
@@ -1974,13 +2025,13 @@ WORD TTLFindFirst()
 	GetAbsPath(Dir,sizeof(Dir));
 	i = 0;
 	while ((i<NumDirHandle) &&
-	       (DirHandle[i]!=-1L))
+	       (DirHandle[i]!= INVALID_HANDLE_VALUE))
 		i++;
 	if (i<NumDirHandle)
 	{
-		DirHandle[i] = _findfirst(Dir,&data);
-		if (DirHandle[i]!=-1L)
-			SetStrVal(Name,data.name);
+		DirHandle[i] = FindFirstFileW(wc::fromUtf8(Dir),&data);
+		if (DirHandle[i]!= INVALID_HANDLE_VALUE)
+			SetStrVal(Name,(u8)data.cFileName);
 		else
 			i = -1;
 	}
@@ -2003,7 +2054,7 @@ WORD TTLFindNext()
 	TVarId Name;
 	WORD Err;
 	int DH;
-	struct _finddata_t data;
+	WIN32_FIND_DATAW data;
 
 	Err = 0;
 	GetIntVal(&DH,&Err);
@@ -2013,10 +2064,10 @@ WORD TTLFindNext()
 	if (Err!=0) return Err;
 
 	if ((DH>=0) && (DH<NumDirHandle) &&
-	    (DirHandle[DH]!=-1L) &&
-	    (_findnext(DirHandle[DH],&data)==0))
+	    (DirHandle[DH]!= INVALID_HANDLE_VALUE) &&
+	    (FindNextFileW(DirHandle[DH],&data) != FALSE))
 	{
-		SetStrVal(Name,data.name);
+		SetStrVal(Name,(u8)data.cFileName);
 		SetResult(1);
 	}
 	else {
@@ -2054,7 +2105,7 @@ WORD TTLFolderCreate()
 		return Err;
 	}
 
-	if (CreateDirectory(FName, NULL) == 0) {
+	if (CreateDirectoryW(wc::fromUtf8(FName), NULL) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2083,7 +2134,7 @@ WORD TTLFolderDelete()
 		return Err;
 	}
 
-	if (RemoveDirectory(FName) == 0) {
+	if (RemoveDirectoryW(wc::fromUtf8(FName)) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2105,7 +2156,8 @@ WORD TTLFolderSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	if (DoesFolderExist(FName)) {
+	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
+	if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		SetResult(1);
 	}
 	else {
@@ -2204,7 +2256,7 @@ WORD TTLGetFileAttr()
 	if (Err!=0) return Err;
 
 	GetAbsPath(Filename, sizeof(Filename));
-	SetResult(GetFileAttributes(Filename));
+	SetResult(GetFileAttributesW(wc::fromUtf8(Filename)));
 
 	return Err;
 }
@@ -3913,7 +3965,7 @@ WORD TTLSetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	if (SetFileAttributes(Filename, attributes) == 0) {
+	if (SetFileAttributesW(wc::fromUtf8(Filename), attributes) == 0) {
 		SetResult(0);
 	}
 	else {

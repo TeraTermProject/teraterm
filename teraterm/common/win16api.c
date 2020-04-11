@@ -2,6 +2,23 @@
 #include <assert.h>
 
 /**
+ *	win16_lcreat() の wchar_t版
+ *	@param[in]	iAttribute	teratermでは0しか使用しない
+ *	@retval 	handle
+ *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) オープンできなかった
+ *				(実際のAPIはHFILE_ERROR((HFILE)-1)を返す)
+ */
+HANDLE win16_lcreatW(const wchar_t *FileName, int iAttribute)
+{
+	HANDLE handle;
+	assert(iAttribute == 0);
+	handle = CreateFileW(FileName,
+						 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+						 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	return handle;
+}
+
+/**
  *	@param[in]	iAttribute	teratermでは0しか使用しない
  *	@retval 	handle
  *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) オープンできなかった
@@ -14,6 +31,42 @@ HANDLE win16_lcreat(const char *FileName, int iAttribute)
 	handle = CreateFileA(FileName,
 						 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
 						 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	return handle;
+}
+
+/**
+ *	win16_lopen() の wchar_t 版
+ *	@retval 	handle
+ *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) オープンできなかった
+ *				(実際のAPIはHFILE_ERROR((HFILE)-1)を返す)
+ */
+HANDLE win16_lopenW(const wchar_t *FileName, int iReadWrite)
+{
+	HANDLE handle;
+	switch(iReadWrite) {
+	case OF_READ:
+		// read only
+		handle = CreateFileW(FileName,
+							 GENERIC_READ, FILE_SHARE_READ, NULL,
+							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		break;
+	case OF_WRITE:
+		// write
+		handle = CreateFileW(FileName,
+							 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		break;
+	case OF_READWRITE:
+		// read/write (teratermではttpmacro/ttl.c内の1箇所のみで使用されている
+		handle = CreateFileW(FileName,
+							 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		break;
+	default:
+		assert(FALSE);
+		handle = INVALID_HANDLE_VALUE;
+		break;
+	}
 	return handle;
 }
 
