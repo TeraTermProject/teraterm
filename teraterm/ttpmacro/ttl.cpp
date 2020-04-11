@@ -1559,7 +1559,7 @@ WORD TTLFileRead()
 	int i, c;
 	int ReadByte;   // 読み込むバイト数
 	TStrVal Str;
-	BOOL EndFile, EndLine;
+	BOOL EndFile;
 	BYTE b;
 
 	Err = 0;
@@ -1573,7 +1573,6 @@ WORD TTLFileRead()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	EndLine = FALSE;
 	EndFile = FALSE;
 	for (i = 0 ; i < ReadByte ; i++) {
 		c = _lread(FH,&b,1);
@@ -1585,7 +1584,7 @@ WORD TTLFileRead()
 		{
 			Str[i] = b;
 		}
-	} 
+	}
 
 	if (EndFile)
 		SetResult(1);
@@ -1714,6 +1713,9 @@ WORD TTLFileStat()
 	WORD Err;
 	TStrVal FName;
 	int result = -1;
+	HANDLE hFile;
+	unsigned long long file_size;
+	time_t st_mtime;
 
 	Err = 0;
 	GetStrVal(FName,&Err);
@@ -1726,25 +1728,30 @@ WORD TTLFileStat()
 		goto end;
 	}
 
-	HANDLE hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+	hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
 							   FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
 	}
 
-	DWORD file_size_hi;
-	DWORD file_size_low;
-	file_size_low = GetFileSize(hFile, &file_size_hi);
-	if (file_size_low == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
-		CloseHandle(hFile);
-		goto end;
+	{
+		DWORD file_size_hi;
+		DWORD file_size_low;
+		file_size_low = GetFileSize(hFile, &file_size_hi);
+		if (file_size_low == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
+			CloseHandle(hFile);
+			goto end;
+		}
+		file_size = ((unsigned long long)file_size_hi << 32) + file_size_low;
 	}
 
-	unsigned long long file_size = ((unsigned long long)file_size_hi << 32) + file_size_low;
-	FILETIME last_write_time;
-	if (GetFileTime(hFile, NULL, &last_write_time, NULL) == FALSE) {
-		CloseHandle(hFile);
-		goto end;
+	{
+		FILETIME last_write_time;
+		if (GetFileTime(hFile, NULL, &last_write_time, NULL) == FALSE) {
+			CloseHandle(hFile);
+			goto end;
+		}
+		st_mtime = FileTimeToUnixTime(&last_write_time); // 最終修正時刻
 	}
 	CloseHandle(hFile);
 
@@ -1759,7 +1766,6 @@ WORD TTLFileStat()
 		TVarId TimeVarId;
 		GetStrVar(&TimeVarId,&Err);
 		if (Err!=0) return Err;
-		time_t st_mtime = FileTimeToUnixTime(&last_write_time); // 最終修正時刻
 		struct tm* tmp = localtime(&st_mtime);
 		char TimeStr[128];
 		strftime(TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", tmp);
@@ -4959,7 +4965,6 @@ WORD TTLStrJoin()
 	TVarId VarId;
 	WORD VarType;
 	int maxvar;
-	int srclen;
 	int i;
 	BOOL ary = FALSE;
 	char *srcptr;
@@ -4996,7 +5001,6 @@ WORD TTLStrJoin()
 	char dest[MaxStrLen];
 	strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
 	srcptr = dest;
-	srclen = strlen(srcptr);
 
 	srcptr[0] = '\0';
 	if (ary) {
