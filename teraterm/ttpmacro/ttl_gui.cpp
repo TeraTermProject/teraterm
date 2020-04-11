@@ -35,18 +35,12 @@
 #include <stdio.h>
 #include <crtdbg.h>
 #include <string.h>
-#include <mbstring.h>
-#include <time.h>
-#include <errno.h>
 #include "ttmdlg.h"
-#include "ttmbuff.h"
 #include "ttmparse.h"
-#include "ttmdde.h"
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
 #include "tttypes.h"
-#include "ttmonig.h"
 #include "ttmacro.h"
 #include "ttl.h"
 #include "ttl_gui.h"
@@ -59,17 +53,9 @@ WORD TTLClipb2Var()
 {
 	WORD Err;
 	TVarId VarId;
-	HGLOBAL hText;
-	LPSTR clipbText;
-	char buf[MaxStrLen];
-	int Num = 0;
-	char *newbuff;
 	static char *cbbuff;
-	static int cbbuffsize, cblen;
-	HANDLE wide_hText;
-	LPWSTR wide_buf;
-	int mb_len;
-	UINT Cf;
+	static int cblen;
+	int Num = 0;
 
 	Err = 0;
 	GetStrVar(&VarId, &Err);
@@ -85,89 +71,24 @@ WORD TTLClipb2Var()
 	if (Err!=0) return Err;
 
 	if (Num == 0) {
-		if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
-			Cf = CF_UNICODETEXT;
+		if (cbbuff != NULL) {
+			free(cbbuff);
+			cbbuff = NULL;
 		}
-		else if (IsClipboardFormatAvailable(CF_TEXT)) {
-			Cf = CF_TEXT;
-		}
-		else {
+		wchar_t *cbbuffW = GetClipboardTextW(NULL, FALSE);
+		if (cbbuffW == NULL) {
+			// クリップボードを開けなかった。またはテキストデータではなかった。
 			cblen = 0;
 			SetResult(0);
-			return Err;
+			return 0;
 		}
-		if (OpenClipboard(NULL) == 0) {
-			cblen = 0;
-			SetResult(0);
-			return Err;
-		}
-
-		if (Cf == CF_UNICODETEXT) {
-			wide_hText = GetClipboardData(CF_UNICODETEXT);
-			if (wide_hText != NULL) {
-				wide_buf = (LPWSTR)GlobalLock(wide_hText);
-				mb_len = WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, NULL, 0, NULL, NULL);
-				hText = GlobalAlloc(GMEM_MOVEABLE, sizeof(CHAR) * mb_len);
-				clipbText = (LPSTR)GlobalLock(hText);
-				if (hText != NULL) {
-					WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, clipbText, mb_len, NULL, NULL);
-
-					cblen = strlen(clipbText);
-					if (cbbuffsize <= cblen) {
-						if ((newbuff = (char *)realloc(cbbuff, cblen + 1)) == NULL) {
-							// realloc failed. fall back to old mode.
-							cblen = 0;
-							strncpy_s(buf,sizeof(buf),clipbText,_TRUNCATE);
-							GlobalUnlock(hText);
-							CloseClipboard();
-							SetStrVal(VarId, buf);
-							SetResult(3);
-							return Err;
-						}
-						cbbuff = newbuff;
-						cbbuffsize = cblen + 1;
-					}
-					strncpy_s(cbbuff, cbbuffsize, clipbText, _TRUNCATE);
-
-					GlobalUnlock(hText);
-					GlobalFree(hText);
-				}
-				GlobalUnlock(wide_hText);
-			}
-			else {
-				cblen = 0;
-			}
-		}
-		else if (Cf == CF_TEXT) {
-			hText = GetClipboardData(CF_TEXT);
-			if (hText != NULL) {
-				clipbText = (LPSTR)GlobalLock(hText);
-				cblen = strlen(clipbText);
-				if (cbbuffsize <= cblen) {
-					if ((newbuff = (char *)realloc(cbbuff, cblen + 1)) == NULL) {
-						// realloc failed. fall back to old mode.
-						cblen = 0;
-						strncpy_s(buf,sizeof(buf),clipbText,_TRUNCATE);
-						GlobalUnlock(hText);
-						CloseClipboard();
-						SetStrVal(VarId, buf);
-						SetResult(3);
-						return Err;
-					}
-					cbbuff = newbuff;
-					cbbuffsize = cblen + 1;
-				}
-				strncpy_s(cbbuff, cbbuffsize, clipbText, _TRUNCATE);
-				GlobalUnlock(hText);
-			}
-			else {
-				cblen = 0;
-			}
-		}
-		CloseClipboard();
+		cbbuff = ToU8W(cbbuffW);
+		free(cbbuffW);
+		cblen = 0;
 	}
 
 	if (cbbuff != NULL && Num >= 0 && Num * (MaxStrLen - 1) < cblen) {
+		char buf[MaxStrLen];
 		if (strncpy_s(buf ,sizeof(buf), cbbuff + Num * (MaxStrLen-1), _TRUNCATE) == STRUNCATE)
 			SetResult(2); // Copied string is truncated.
 		else {
