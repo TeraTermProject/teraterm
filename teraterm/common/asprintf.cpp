@@ -27,7 +27,9 @@
  */
 
 #include <stdio.h>
+#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
+#include <crtdbg.h>
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
