@@ -163,6 +163,7 @@ wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def,
 wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty);
 char *GetClipboardTextA(HWND hWnd, BOOL empty);
 BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
+void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemID, const char *text, BOOL before);
 
 #ifdef __cplusplus
 }

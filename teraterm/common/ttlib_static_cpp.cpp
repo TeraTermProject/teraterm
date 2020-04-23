@@ -34,7 +34,7 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
-
+#include <assert.h>
 
 #include "i18n.h"
 #include "layer_for_unicode.h"
@@ -313,12 +313,11 @@ void DebugHexDump(void (*f)(const char *s), const void *data_, size_t len)
 	int c, addr;
 	int bytes[16], *ptr;
 	int byte_cnt;
-	int i;
 
 	addr = 0;
 	byte_cnt = 0;
 	ptr = bytes;
-	for (i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		c = data[i];
 		*ptr++ = c & 0xff;
 		byte_cnt++;
@@ -349,3 +348,30 @@ void OutputDebugHexDump(const void *data, size_t len)
 	DebugHexDump(OutputDebugHexDumpSub, data, len);
 }
 
+/**
+ *	メニューを追加する
+ *	InsertMenuA() とほぼ同じ動作
+ *	before引数を FALSE にすると次の項目に追加できる
+ *
+ *	@param[in]	hMenu			メニューハンドル (InsertMenuA() の第1引数)
+ *	@param[in]	targetItemID	このIDのメニューの前又は後ろにメニューを追加 (InsertMenuA() の第2引数)
+ *	@param[in]	flags			メニューflag (InsertMenuA() の第3引数)
+ *	@param[in]	newItemID		メニューID (InsertMenuA() の第4引数)
+ *	@param[in]	text			メニュー文字列 (InsertMenuA() の第5引数)
+ *	@param[in]	before			TRUE/FALSE 前に追加/後ろに追加 (TRUEのとき InsertMenuA() と同じ動作)
+ */
+void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemID, const char *text, BOOL before)
+{
+	assert((flags & MF_BYPOSITION) == 0);
+	for (int i = GetMenuItemCount(hMenu) - 1; i >= 0; i--) {
+		HMENU submenu = GetSubMenu(hMenu, i);
+
+		for (int j = GetMenuItemCount(submenu) - 1; j >= 0; j--) {
+			if (GetMenuItemID(submenu, j) == targetItemID) {
+				const UINT position = (before == FALSE) ? j + 1 : j;
+				InsertMenuA(submenu, position, MF_BYPOSITION | flags, newItemID, text);
+				return;
+			}
+		}
+	}
+}

@@ -1,3 +1,30 @@
+/*
+ * Copyright (C) 2020 TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -184,43 +211,17 @@ static void WINAPI TTXInit(PTTSet ts, PComVar cv)
 	pvar->cv = cv;
 }
 
-/**
- *	メニューを追加する
- *
- *	@param[in]	menu			メニューハンドル
- *	@param[in]	beforeItemID	このIDのメニューの前にメニューを追加
- *	@param[in]	flags			メニューflag (InsertMenuの第3引数)
- *	@param[in]	newItemID		メニューID (InsertMenuの第4引数)
- *	@param[in]	text			メニュー文字列 (InsertMenuの第5引数)
- *
- *	TODO: ttlibに移動
- */
-static void insertMenuBeforeItem(HMENU menu, WORD beforeItemID, WORD flags,
-                                 WORD newItemID, char *text)
-{
-	int i, j;
-
-	for (i = GetMenuItemCount(menu) - 1; i >= 0; i--) {
-		HMENU submenu = GetSubMenu(menu, i);
-
-		for (j = GetMenuItemCount(submenu) - 1; j >= 0; j--) {
-			if (GetMenuItemID(submenu, j) == beforeItemID) {
-				InsertMenu(submenu, j, MF_BYPOSITION | flags, newItemID, text);
-				return;
-			}
-		}
-	}
-}
-
 static void WINAPI TTXModifyMenu(HMENU menu)
 {
 	static const DlgTextInfo MenuTextInfo[] = {
 		{ ID_MENUITEM, "MENU_CHECKUPDATE" },
 	};
-	const UINT ID_HELP_ABOUT = 50990;
+	const UINT ID_HELP_INDEX2 = 50910;
+
 	const char *UILanguageFile = pvar->ts->UILanguageFile;
 
-	insertMenuBeforeItem(menu, ID_HELP_ABOUT, MF_ENABLED, ID_MENUITEM, "Check &Update...");
+	TTInsertMenuItemA(menu, ID_HELP_INDEX2, MF_ENABLED, ID_MENUITEM, "Check &Update...", FALSE);
+	TTInsertMenuItemA(menu, ID_HELP_INDEX2, MF_SEPARATOR, 0, NULL, FALSE);
 
 	SetI18nMenuStrs("TTXCheckUpdate", menu, MenuTextInfo, _countof(MenuTextInfo), UILanguageFile);
 }
@@ -267,7 +268,7 @@ BOOL __declspec(dllexport) WINAPI TTXBind(WORD Version, TTXExports *exports)
 		return FALSE;
 	}
 #endif
-	
+
 	size = sizeof(Exports) - sizeof(exports->size);
 	if ((int)size > exports->size) {
 		size = exports->size;
