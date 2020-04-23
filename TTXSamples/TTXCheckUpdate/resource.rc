@@ -44,25 +44,35 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+#endif    // “ú–{Œê (“ú–{) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// ‰pŒê resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_DIALOG1 DIALOGEX 0, 0, 253, 218
+IDD_CHECK_UPDATE_DIALOG DIALOGEX 0, 0, 253, 218
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Check Update"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,196,197,50,14
-    LTEXT           "version",IDC_STATIC,7,9,24,8
-    COMBOBOX        IDC_COMBO1,19,23,113,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Version",IDC_VERSION_LABEL,7,9,239,8
+    COMBOBOX        IDC_VERSION_DROPDOWN,19,23,148,121,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "url",IDC_STATIC,7,42,29,8
-    EDITTEXT        IDC_EDIT2,19,52,225,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    PUSHBUTTON      "Open",IDC_BUTTON2,19,72,50,14
+    EDITTEXT        IDC_URL_EDIT,19,52,227,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "&Open",IDC_OPEN,19,72,50,14
     LTEXT           "detail",IDC_STATIC,7,93,18,8
-    EDITTEXT        IDC_EDIT1,19,106,226,86,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_DETAIL_EDIT,19,106,227,86,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
 END
 
 
@@ -74,7 +84,7 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_DIALOG1, DIALOG
+    IDD_CHECK_UPDATE_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 246
@@ -91,12 +101,12 @@ END
 // AFX_DIALOG_LAYOUT
 //
 
-IDD_DIALOG1 AFX_DIALOG_LAYOUT
+IDD_CHECK_UPDATE_DIALOG AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
 
-#endif    // “ú–{Œê (“ú–{) resources
+#endif    // ‰pŒê resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -27,20 +27,11 @@
     <ClCompile Include="parse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="getcontent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="../../teraterm/common/ttlib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="../../libs/cJSON/cJSON.c">
       <Filter>cJSON</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="getcontent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\teraterm\common&quot;;&quot;$(SolutionDir)..\teraterm\teraterm&quot;;&quot;$(SolutionDir)..\libs\cJSON&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\teraterm\common&quot;;&quot;$(SolutionDir)..\teraterm\teraterm&quot;;&quot;$(SolutionDir)..\teraterm\ttpdlg&quot;;&quot;$(SolutionDir)..\libs\cJSON&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CJSON_HIDE_SYMBOLS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\common_static.lib&quot; &quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot; Wininet.lib user32.lib"
+				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\common_static.lib&quot; &quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot; wininet.lib user32.lib gdi32.lib shell32.lib ole32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\teraterm\common&quot;;&quot;$(SolutionDir)..\teraterm\teraterm&quot;;&quot;$(SolutionDir)..\libs\cJSON&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\teraterm\common&quot;;&quot;$(SolutionDir)..\teraterm\teraterm&quot;;&quot;$(SolutionDir)..\teraterm\ttpdlg&quot;;&quot;$(SolutionDir)..\libs\cJSON&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CJSON_HIDE_SYMBOLS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\common_static.lib&quot; &quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot; Wininet.lib user32.lib"
+				AdditionalDependencies="&quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\common_static.lib&quot; &quot;$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib&quot; wininet.lib user32.lib gdi32.lib shell32.lib ole32.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"

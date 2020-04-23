@@ -43,6 +43,7 @@ target_compile_definitions(
 target_include_directories(
   TTXCheckUpdate
   PRIVATE
+  ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/ttpdlg     # for svnversion.h
   ../../libs/cJSON
   ../../teraterm/teraterm
   ../../teraterm/common
