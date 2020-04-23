@@ -168,19 +168,36 @@ static void set_auth_options_status(HWND dlg, int controlID)
 	BOOL TIS_enabled = controlID == IDC_SSHUSETIS;
 	BOOL PAGEANT_enabled = controlID == IDC_SSHUSEPAGEANT;
 	int i;
+	static const int password_item_ids[] = {
+		IDC_SSHPASSWORDCAPTION,
+		IDC_SSHPASSWORD,
+		IDC_SSHPASSWORD_OPTION,
+	};
+	static const int rsa_item_ids[] = {
+		IDC_RSAFILENAMELABEL,
+		IDC_RSAFILENAME,
+		IDC_CHOOSERSAFILE,
+	};
+	static const int rhosts_item_ids[] = {
+		IDC_LOCALUSERNAMELABEL,
+		IDC_LOCALUSERNAME,
+		IDC_HOSTRSAFILENAMELABEL,
+		IDC_HOSTRSAFILENAME,
+		IDC_CHOOSEHOSTRSAFILE,
+	};
 
 	CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, controlID);
 
-	EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), (!TIS_enabled && !PAGEANT_enabled));
-	EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), (!TIS_enabled && !PAGEANT_enabled));
-	EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), (!TIS_enabled && !PAGEANT_enabled));
-
-	for (i = IDC_CHOOSERSAFILE; i <= IDC_RSAFILENAME; i++) {
-		EnableWindow(GetDlgItem(dlg, i), RSA_enabled);
+	for (i = 0; i < _countof(password_item_ids); i++) {
+		EnableWindow(GetDlgItem(dlg, password_item_ids[i]), (!TIS_enabled && !PAGEANT_enabled));
 	}
 
-	for (i = IDC_LOCALUSERNAMELABEL; i <= IDC_HOSTRSAFILENAME; i++) {
-		EnableWindow(GetDlgItem(dlg, i), rhosts_enabled);
+	for (i = 0; i < _countof(rsa_item_ids); i++) {
+		EnableWindow(GetDlgItem(dlg, rsa_item_ids[i]), RSA_enabled);
+	}
+
+	for (i = 0; i < _countof(rhosts_item_ids); i++) {
+		EnableWindow(GetDlgItem(dlg, rhosts_item_ids[i]), rhosts_enabled);
 	}
 }
 
