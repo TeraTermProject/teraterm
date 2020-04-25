@@ -125,7 +125,10 @@ static void TrimTrailingNLW(wchar_t *src)
 	}
 }
 
-
+/**
+ *	改行コードを CR+LF に変換する
+ *	@return 変換された文字列
+ */
 static wchar_t *NormalizeLineBreakW(const wchar_t *src_)
 {
 	const wchar_t *src = src_;
@@ -159,7 +162,6 @@ static wchar_t *NormalizeLineBreakW(const wchar_t *src_)
 	src = src_ + len - 1;
 	dest = dest_top + need_len;
 	*dest-- = '\0';
-	len = need_len;
 
 	while (len > 0 && dest_top <= dest) {
 		if (*src == LF) {
@@ -170,12 +172,7 @@ static wchar_t *NormalizeLineBreakW(const wchar_t *src_)
 			}
 			if (*src != CR) {
 				*dest-- = CR;
-				if (dest <= dest_top) {
-					break;
-				}
-				else {
-					continue;
-				}
+				continue;
 			}
 		}
 		else if (*src == CR) {
