@@ -370,6 +370,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	}
 
 	if (!CheckClipboardContentW(HWin, str_w, AddCR, &str_w_edited)) {
+		free(str_w);
 		CBEndPaste();
 		return;
 	}
