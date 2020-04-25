@@ -37,10 +37,6 @@ extern "C" {
 
 /* prototypes */
 
-#if !UNICODE_INTERNAL_BUFF
-PCHAR CBOpen(LONG MemSize);
-void CBClose(void);
-#endif
 
 void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
