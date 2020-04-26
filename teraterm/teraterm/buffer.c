@@ -97,14 +97,19 @@ static PCHAR AttrBuff;  /* Attribute buffer */
 static PCHAR AttrBuff2; /* Color attr buffer */
 static PCHAR AttrBuffFG; /* Foreground color attr buffer */
 static PCHAR AttrBuffBG; /* Background color attr buffer */
+#define ATR 0
+#if ATR
 static PCHAR CodeLine;
 static PCHAR AttrLine;
 static PCHAR AttrLine2;
 static PCHAR AttrLineFG;
 static PCHAR AttrLineBG;
 #if UNICODE_INTERNAL_BUFF
-static buff_char_t *CodeBuffW;
 static buff_char_t *CodeLineW;
+#endif
+#endif
+#if UNICODE_INTERNAL_BUFF
+static buff_char_t *CodeBuffW;
 #endif
 static LONG LinePtr;
 static LONG BufferSize;
@@ -294,6 +299,8 @@ static LONG PrevLinePtr(LONG Ptr)
 
 static BOOL ChangeBuffer(int Nx, int Ny)
 {
+//	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+//	PCHAR CodeLine = &CodeBuff[LinePtr];
 	LONG NewSize;
 	int NxCopy, NyCopy, i;
 	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
@@ -447,6 +454,7 @@ static BOOL ChangeBuffer(int Nx, int Ny)
 
 	LinePtr = 0;
 	if (LockOld>0) {
+#if ATR
 		CodeLine = CodeBuff;
 #if UNICODE_INTERNAL_BUFF
 		CodeLineW = CodeBuffW;
@@ -455,6 +463,7 @@ static BOOL ChangeBuffer(int Nx, int Ny)
 		AttrLine2 = AttrBuff2;
 		AttrLineFG = AttrBuffFG;
 		AttrLineBG = AttrBuffBG;
+#endif
 	}
 	else {
 		;
@@ -518,6 +527,7 @@ void InitBuffer()
 static void NewLine(int Line)
 {
 	LinePtr = GetLinePtr(Line);
+#if ATR
 	CodeLine = &CodeBuff[LinePtr];
 	AttrLine = &AttrBuff[LinePtr];
 	AttrLine2 = &AttrBuff2[LinePtr];
@@ -525,6 +535,7 @@ static void NewLine(int Line)
 	AttrLineBG = &AttrBuffBG[LinePtr];
 #if UNICODE_INTERNAL_BUFF
 	CodeLineW = &CodeBuffW[LinePtr];
+#endif
 #endif
 }
 
@@ -734,9 +745,11 @@ void BuffScroll(int Count, int Bottom)
 	NewLine(PageStart+CursorY);
 }
 
-void NextLine()
+#if 0
+static void NextLine()
 {
 	LinePtr = NextLinePtr(LinePtr);
+#if ATR
 	CodeLine = &CodeBuff[LinePtr];
 	AttrLine = &AttrBuff[LinePtr];
 	AttrLine2 = &AttrBuff2[LinePtr];
@@ -745,11 +758,15 @@ void NextLine()
 #if UNICODE_INTERNAL_BUFF
 	CodeLineW = &CodeBuffW[LinePtr];
 #endif
+#endif
 }
+#endif
 
-void PrevLine()
+#if 0
+static void PrevLine()
 {
 	LinePtr = PrevLinePtr(LinePtr);
+#if ATR
 	CodeLine = &CodeBuff[LinePtr];
 	AttrLine = &AttrBuff[LinePtr];
 	AttrLine2 = &AttrBuff2[LinePtr];
@@ -758,7 +775,9 @@ void PrevLine()
 #if UNICODE_INTERNAL_BUFF
 	CodeLineW = &CodeBuffW[LinePtr];
 #endif
+#endif
 }
+#endif
 
 // If cursor is on left/right half of a Kanji, erase it.
 //   LR: left(0)/right(1) flag
@@ -767,6 +786,15 @@ void PrevLine()
 static void EraseKanji(int LR)
 {
 #if UNICODE_INTERNAL_BUFF
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
+
 	buff_char_t *p;
 	int bx;
 	if (CursorX < LR) {
@@ -857,6 +885,14 @@ void EraseKanjiOnLRMargin(LONG ptr, int count)
 #if UNICODE_INTERNAL_BUFF
 void BuffInsertSpace(int Count)
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	int MoveLen;
 	int extr = 0;
 	int sx;
@@ -1100,6 +1136,14 @@ void BuffEraseCharsInLine(int XStart, int Count)
 //  XStart: start position of erasing
 //  Count: number of characters to be erased
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	BOOL LineContinued=FALSE;
 
 	if (ts.EnableContinuedLineCopy && XStart == 0 && (AttrLine[0] & AttrLineContinued)) {
@@ -1188,6 +1232,14 @@ void BuffDeleteLines(int Count, int YEnd)
 #if UNICODE_INTERNAL_BUFF
 void BuffDeleteChars(int Count)
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	int MoveLen;
 	int extr = 0;
 	buff_char_t *b;
@@ -1301,6 +1353,14 @@ void BuffDeleteChars(int Count)
 #if UNICODE_INTERNAL_BUFF
 void BuffEraseChars(int Count)
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	int extr = 0;
 	int sx = CursorX;
 	buff_char_t *b;
@@ -2600,6 +2660,9 @@ void BuffDumpCurrentLine(BYTE TERM)
 //	= LF or VT or FF
 {
 	int i, j;
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+#endif
 
 	i = NumOfColumns;
 	while ((i>0) && (CodeLine[i-1]==0x20)) {
@@ -2643,6 +2706,13 @@ static BOOL isURLchar(unsigned int u32)
 
 static void markURL(int x)
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+//	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+#endif
 	LONG PrevCharPtr;
 	CHAR PrevCharAttr, PrevCharCode;
 
@@ -2828,6 +2898,13 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 //   Attr: attributes
 //   Insert: Insert flag
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+#endif
 	int XStart, LineEnd, MoveLen;
 	int extr = 0;
 
@@ -3177,6 +3254,13 @@ static void mark_url_line_w(int cur_x, int cur_y)
  */
 static void mark_url_w(int cur_x, int cur_y)
 {
+#if !ATR
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+//	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	buff_char_t *b = &CodeLineW[cur_x];
 	const char32_t u32 = b->u32;
 	int x = cur_x;
@@ -3405,6 +3489,14 @@ BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32)
 #if UNICODE_INTERNAL_BUFF
 int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	BYTE b1, b2;
 	int move_x = 0;
 	static BOOL show_str_change = FALSE;
@@ -4175,6 +4267,12 @@ void MoveRight()
 
 void BuffSetCaretWidth()
 {
+#if !ATR
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+//	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+#endif
 	BOOL DW;
 
 	/* check whether cursor on a DBCS character */
@@ -5708,6 +5806,12 @@ void ShowStatusLine(int Show)
 
 void BuffLineContinued(BOOL mode)
 {
+#if !ATR
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+//	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+#endif
 	if (ts.EnableContinuedLineCopy) {
 		if (mode) {
 			AttrLine[0] |= AttrLineContinued;
@@ -5860,6 +5964,12 @@ void BuffDiscardSavedScreen()
 void BuffSelectedEraseCurToEnd()
 // Erase characters from cursor to the end of screen
 {
+#if !ATR
+//	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+#endif
 	LONG TmpPtr;
 	int offset;
 	int i, j, YEnd;
@@ -5896,6 +6006,12 @@ void BuffSelectedEraseCurToEnd()
 void BuffSelectedEraseHomeToCur()
 // Erase characters from home to cursor
 {
+#if !ATR
+//	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+#endif
 	LONG TmpPtr;
 	int offset;
 	int i, j, YHome;
@@ -5997,6 +6113,14 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 //  XStart: start position of erasing
 //  Count: number of characters to be erased
 {
+#if !ATR
+	PCHAR CodeLine = &CodeBuff[LinePtr];
+	PCHAR AttrLine = &AttrBuff[LinePtr];
+	PCHAR AttrLine2 = &AttrBuff2[LinePtr];
+//	PCHAR AttrLineFG = &AttrBuffFG[LinePtr];
+//	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
+	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
+#endif
 	int i;
 	BOOL LineContinued=FALSE;
 
