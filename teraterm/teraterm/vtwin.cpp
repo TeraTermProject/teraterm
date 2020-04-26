@@ -644,7 +644,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 
 	/* Initialize scroll buffer */
-	InitBuffer();
+	InitBuffer(IsWindowsNTKernel() ? TRUE : FALSE);
 
 	InitDisp();
 

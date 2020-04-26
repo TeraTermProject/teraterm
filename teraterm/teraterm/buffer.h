@@ -73,7 +73,7 @@ typedef struct {
 
 typedef TCharAttr *PCharAttr;
 
-void InitBuffer();
+void InitBuffer(BOOL use_unicode_api);
 void LockBuffer();
 void UnlockBuffer();
 void FreeBuffer();

@@ -107,6 +107,7 @@ static POINT DblClkStart, DblClkEnd;
 // •`‰æ
 static int StrChangeStart;	// •`‰æŠJn X (Y=CursorY)
 static int StrChangeCount;	// •`‰æƒLƒƒƒ‰ƒNƒ^”(”¼Šp’PˆÊ),0‚Ì‚Æ‚«•`‰æ‚·‚é‚à‚Ì‚ª‚È‚¢
+static BOOL UseUnicodeApi;
 
 static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
 
@@ -458,9 +459,11 @@ allocate_error:
 	return FALSE;
 }
 
-void InitBuffer()
+void InitBuffer(BOOL use_unicode_api)
 {
 	int Ny;
+
+	UseUnicodeApi = use_unicode_api;
 
 	/* setup terminal */
 	NumOfColumns = ts.TerminalWidth;
@@ -3190,11 +3193,12 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 #endif
 
 			DispSetupDC(CurAttr, CurSelected);
-#if UNICODE_DISPLAY
-			DispStrW(bufW, bufWW, lenW, Y, &X);
-#else
-			DispStr(bufA, lenA, Y, &X);
-#endif
+			if (UseUnicodeApi) {
+				DispStrW(bufW, bufWW, lenW, Y, &X);
+			}
+			else {
+				DispStr(bufA, lenA, Y, &X);
+			}
 
 			lenA = 0;
 			lenW = 0;
