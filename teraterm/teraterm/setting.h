@@ -36,11 +36,13 @@ public:
 	BOOL CodePopupEnable;
 	WORD CodePopupKey1;
 	WORD CodePopupKey2;
+	BOOL UseUnicodeApi;
 	CUnicodeDebugParam()
 	{
 		CodePopupEnable = TRUE;
 		CodePopupKey1 = VK_CONTROL;
 		CodePopupKey2 = VK_CONTROL;
+		UseUnicodeApi = FALSE;
 	}
 };
 

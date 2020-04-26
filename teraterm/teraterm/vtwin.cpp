@@ -645,7 +645,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 
 	/* Initialize scroll buffer */
-	InitBuffer(IsWindowsNTKernel() ? TRUE : FALSE);
+	UnicodeDebugParam.UseUnicodeApi = IsWindowsNTKernel() ? TRUE : FALSE;
+	InitBuffer(UnicodeDebugParam.UseUnicodeApi);
 
 	InitDisp();
 
@@ -4529,6 +4530,7 @@ void CVTWindow::OnEditCancelSelection()
 // (2008.5.12 maya) changed to PropertySheet
 void CVTWindow::OnExternalSetup()
 {
+	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
@@ -4543,6 +4545,9 @@ void CVTWindow::OnExternalSetup()
 		DispSetNearestColors(IdBack, IdFore+8, NULL);
 		ChangeWin();
 		ChangeFont();
+		if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
+			BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
+		}
 	}
 }
 

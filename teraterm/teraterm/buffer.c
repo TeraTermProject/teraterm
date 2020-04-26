@@ -5447,3 +5447,8 @@ TCharAttr BuffGetCursorCharAttr(int x, int y)
 
 	return Attr;
 }
+
+void BuffSetDispAPI(BOOL unicode)
+{
+	UseUnicodeApi = unicode;
+}

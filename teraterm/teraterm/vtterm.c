@@ -57,6 +57,7 @@
 #include "ttime.h"
 #include "clipboar.h"
 #include "codeconv.h"
+#include "unicode.h"
 
 #include "vtterm.h"
 

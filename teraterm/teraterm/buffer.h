@@ -154,6 +154,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw);
 void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr);
 TCharAttr BuffGetCursorCharAttr(int x, int y);
 BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32);
+void BuffSetDispAPI(BOOL unicode);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
