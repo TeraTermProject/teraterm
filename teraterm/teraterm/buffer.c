@@ -5373,11 +5373,14 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 				  L"attrBack  0x%02x\n"
 				  L"WidthProperty %s(%hc)\n"
 				  L"Half %s\n"
-				  L"Padding %s\n",
+				  L"Padding %s\n"
+				  L"Emoji %s\n",
 				  b->fg, b->bg,
 				  width_property, b->WidthProperty,
 				  (b->HalfWidth ? L"TRUE" : L"FALSE"),
-				  (b->Padding ? L"TRUE" : L"FALSE"));
+				  (b->Padding ? L"TRUE" : L"FALSE"),
+				  (b->Emoji ? L"TRUE" : L"FALSE")
+			);
 
 		attr_str = NULL;
 		awcscat(&attr_str, attr1_str);
