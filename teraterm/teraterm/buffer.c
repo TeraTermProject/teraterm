@@ -342,13 +342,8 @@ static void GetPosFromPtr(const buff_char_t *b, int *bx, int *by)
 
 static BOOL ChangeBuffer(int Nx, int Ny)
 {
-//	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
-//	PCHAR CodeLine = &CodeBuff[LinePtr];
 	LONG NewSize;
 	int NxCopy, NyCopy, i;
-//	PCHAR CodeDest;
-//	PCHAR AttrDest, AttrDest2;
-//	PCHAR AttrDestFG, AttrDestBG;
 	LONG SrcPtr, DestPtr;
 	WORD LockOld;
 	buff_char_t *CodeDestW;
