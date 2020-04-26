@@ -2603,7 +2603,7 @@ static wchar_t *GetWCS(const buff_char_t *b)
 	p = strW;
 	*p++ = b->wc2[0];
 	if (b->wc2[1] != 0) {
-		*p++ = b->wc2[0];
+		*p++ = b->wc2[1];
 	}
 	for (i=0; i<b->CombinationCharCount16; i++) {
 		*p++ = b->pCombinationChars16[i];
@@ -5261,7 +5261,7 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 static void awcscat(wchar_t **dest, const wchar_t *add)
 {
 	if (*dest == NULL) {
-		*dest = wcsdup(add);
+		*dest = _wcsdup(add);
 		return;
 	}
 	else {
@@ -5292,7 +5292,9 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	wchar_t *pos_str;
 	wchar_t *attr_str;
 	wchar_t *ansi_str;
-    wchar_t *unicode_str;
+    wchar_t *unicode_char_str;
+    wchar_t *unicode_utf16_str;
+    wchar_t *unicode_utf32_str;
 
 	DispConvWinToScreen(Xw, Yw, &X, &ScreenY, &Right);
 	Y = PageStart + ScreenY;
@@ -5307,7 +5309,6 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		Y = BuffEnd - 1;
 
 	TmpPtr = GetLinePtr(Y);
-	LockBuffer();
 	b = &CodeBuffW[TmpPtr+X];
 
 	aswprintf(&pos_str,
@@ -5315,18 +5316,20 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 			  X, ScreenY, Y,
 			  Xw, Yw);
 
+	// アトリビュート
 	{
-		const unsigned char attr = b->attr;
-		wchar_t *attr1_1_str;
+		wchar_t *attr1_attr_str;
 		wchar_t *attr1_str;
 		wchar_t *attr2_str;
+		wchar_t *attr2_attr_str;
 		wchar_t *width_property;
 
-		if (attr == 0) {
-			attr1_1_str = _wcsdup(L"");
+		if (b->attr == 0) {
+			attr1_attr_str = _wcsdup(L"");
 		} else {
-			aswprintf(&attr1_1_str,
-					  L"(%S%S%S%S%S%S%S%S)",
+			const unsigned char attr = b->attr;
+			aswprintf(&attr1_attr_str,
+					  L"\n (%S%S%S%S%S%S%S%S)",
 					  (attr & AttrBold) != 0 ? "AttrBold " : "",
 					  (attr & AttrUnder) != 0 ? "AttrUnder " : "",
 					  (attr & AttrSpecial) != 0 ? "AttrSpecial ": "",
@@ -5337,11 +5340,24 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 					  (attr & AttrKanji) != 0 ? "AttrKanji ": "");
 		}
 
+		if (b->attr2 == 0) {
+			attr2_attr_str = _wcsdup(L"");
+		} else {
+			const unsigned char attr2 = b->attr2;
+			aswprintf(&attr2_attr_str,
+					  L"\n (%S%S%S)",
+					  (attr2 & Attr2Fore) != 0 ? "Attr2Fore " : "",
+					  (attr2 & Attr2Back) != 0 ? "Attr2Back " : "",
+					  (attr2 & Attr2Protect) != 0 ? "Attr2Protect ": "");
+		}
+
 		aswprintf(&attr1_str,
-				  L"attr      0x%02x%s%s\n"
-				  L"attr2     0x%02x\n",
-				  attr, (attr != 0) ? L"\n " : L"", attr1_1_str,
-				  (unsigned char)CodeBuffW[TmpPtr+X].attr2);
+				  L"attr      0x%02x%s\n"
+				  L"attr2     0x%02x%s\n",
+				  b->attr, attr1_attr_str,
+				  b->attr2, attr2_attr_str);
+		free(attr1_attr_str);
+		free(attr2_attr_str);
 
 		width_property =
 			b->WidthProperty == 'F' ? L"Fullwidth" :
@@ -5363,8 +5379,6 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 				  (b->HalfWidth ? L"TRUE" : L"FALSE"),
 				  (b->Padding ? L"TRUE" : L"FALSE"));
 
-		free(attr1_1_str);
-
 		attr_str = NULL;
 		awcscat(&attr_str, attr1_str);
 		awcscat(&attr_str, attr2_str);
@@ -5372,6 +5386,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		free(attr2_str);
 	}
 
+	// ANSI
 	{
 		unsigned char mb[4];
 		unsigned short c = b->ansi_char;
@@ -5394,41 +5409,74 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 				  L" 0x%04x\n", mb, c);
 	}
 
+	// Unicode 文字
 	{
 		wchar_t *wcs = GetWCS(b);
-		wchar_t *codes_ptr;
-		int i;
-		size_t codes_len = 20 + 12 * (b->CombinationCharCount16 + 1);
-		codes_ptr = malloc(sizeof(wchar_t) * codes_len);
-		_snwprintf_s(codes_ptr, codes_len, _TRUNCATE,
-					 L"unicode:\n"
-					 L" '%s'\n"
-					 L" U+%06x",
-					 wcs,
-					 b->u32);
-		for (i=0; i<b->CombinationCharCount32; i++) {
-			wchar_t *code_str;
-			aswprintf(&code_str, L" U+%06x", b->pCombinationChars16[i]);
-			wcscat_s(codes_ptr, codes_len, L"\n");
-			wcscat_s(codes_ptr, codes_len, code_str);
-			free(code_str);
-		}
+		aswprintf(&unicode_char_str,
+				  L"Unicode char:\n"
+				  L" '%s'\n", wcs);
 		free(wcs);
-		unicode_str = codes_ptr;
 	}
 
-	UnlockBuffer();
+	// Unicode UTF-16 文字コード
+	{
+		wchar_t *codes_ptr = NULL;
+		wchar_t *code_str;
+		int i;
+
+		aswprintf(&code_str,
+				  L"Unicode UTF-16:\n"
+				  L" 0x%04x\n",
+				  b->wc2[0]);
+		awcscat(&codes_ptr, code_str);
+		free(code_str);
+		if (b->wc2[1] != 0 ) {
+			wchar_t buf[32];
+			swprintf(buf, _countof(buf), L" 0x%04x\n", b->wc2[1]);
+			awcscat(&codes_ptr, buf);
+		}
+		for (i=0; i<b->CombinationCharCount16; i++) {
+			wchar_t buf[32];
+			swprintf(buf, _countof(buf), L" 0x%04x\n", b->pCombinationChars16[i]);
+			awcscat(&codes_ptr, buf);
+		}
+		unicode_utf16_str = codes_ptr;
+	}
+
+	// Unicode UTF-32 文字コード
+	{
+		wchar_t *codes_ptr = NULL;
+		wchar_t *code_str;
+		int i;
+
+		aswprintf(&code_str,
+				  L"Unicode UTF-32:\n"
+				  L" U+%06X\n",
+				  b->u32);
+		awcscat(&codes_ptr, code_str);
+		free(code_str);
+		for (i=0; i<b->CombinationCharCount32; i++) {
+			wchar_t buf[32];
+			swprintf(buf, _countof(buf), L" U+%06X\n", b->pCombinationChars32[i]);
+			awcscat(&codes_ptr, buf);
+		}
+		unicode_utf32_str = codes_ptr;
+	}
 
 	str_ptr = NULL;
 	awcscat(&str_ptr, pos_str);
 	awcscat(&str_ptr, attr_str);
 	awcscat(&str_ptr, ansi_str);
-	awcscat(&str_ptr, unicode_str);
+	awcscat(&str_ptr, unicode_char_str);
+	awcscat(&str_ptr, unicode_utf16_str);
+	awcscat(&str_ptr, unicode_utf32_str);
 	free(pos_str);
 	free(attr_str);
 	free(ansi_str);
-	free(unicode_str);
-	awcscat(&str_ptr, L"\n\nPress shift for sending to clipboard");
+	free(unicode_char_str);
+	free(unicode_utf16_str);
+	free(unicode_utf32_str);
+	awcscat(&str_ptr, L"\nPress shift for sending to clipboard");
 	return str_ptr;
 }
 

@@ -39,7 +39,11 @@ public:
 	BOOL UseUnicodeApi;
 	CUnicodeDebugParam()
 	{
+#if _DEBUG
 		CodePopupEnable = TRUE;
+#else
+		CodePopupEnable = FALSE;
+#endif
 		CodePopupKey1 = VK_CONTROL;
 		CodePopupKey2 = VK_CONTROL;
 		UseUnicodeApi = FALSE;
