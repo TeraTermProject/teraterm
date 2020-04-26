@@ -2614,12 +2614,15 @@ static wchar_t *GetWCS(const buff_char_t *b)
 
 /**
  *	(x,y)にu32を入れるとき、結合するか?
+ *  @param[in]		wrap		TRUE wrap中
  *	@param[in,out]	combine		TRUE/FALSE	文字コード的には結合する/しない
  *								NULL 結果を返さない
- *	@return	結合する前の文字へのポインタ(1 or 2セル前)
+ *	@return	結合する文字へのポインタ
+ *								1 or 2セル前
+ *								現在のセル (x が行末で wrap == TRUE 時)
  *	@return	NULL	結合しない
  */
-static buff_char_t *IsCombiningChar(int x, int y, unsigned int u32, BOOL *combine)
+static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, BOOL *combine)
 {
 	buff_char_t *p = NULL;  // NULLのとき、前の文字はない
 	LONG LinePtr = GetLinePtr(PageStart+y);
@@ -2634,7 +2637,14 @@ static buff_char_t *IsCombiningChar(int x, int y, unsigned int u32, BOOL *combin
 		*combine = combine_char;
 	}
 
-	if (x >= 1 && !IsBuffPadding(&CodeLineW[x - 1])) {
+	if (x == NumOfColumns - 1 && wrap) {
+		// 現在位置に結合する
+		p = &CodeLineW[x];
+		if (IsBuffPadding(p)){
+			p--;
+		}
+	}
+	else if (x >= 1 && !IsBuffPadding(&CodeLineW[x - 1])) {
 		// 1セル前
 		p = &CodeLineW[x - 1];
 	}
@@ -2663,7 +2673,7 @@ static buff_char_t *IsCombiningChar(int x, int y, unsigned int u32, BOOL *combin
 
 BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32)
 {
-	buff_char_t *p = IsCombiningChar(x, y, u32, NULL);
+	buff_char_t *p = IsCombiningChar(x, y, Wrap, u32, NULL);
 	return p != NULL;
 }
 
@@ -2745,7 +2755,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 
 	// 結合文字?
 	CombiningChar = FALSE;
-	p = IsCombiningChar(CursorX, CursorY, u32, &CombiningChar);
+	p = IsCombiningChar(CursorX, CursorY, Wrap, u32, &CombiningChar);
 	if (p != NULL || CombiningChar == TRUE) {
 		// 結合する
 		move_x = 0;  // カーソル移動量=0
