@@ -1713,10 +1713,10 @@ static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, 
  */
 static size_t MatchOneStringPtr(const buff_char_t *b, const wchar_t *str, size_t len)
 {
+	int match_pos = 0;
 	if (len == 0) {
 		return 0;
 	}
-	int match_pos = 0;
 	if (b->wc2[1] == 0) {
 		// サロゲートペアではない
 		if (str[match_pos] != b->wc2[0]) {
@@ -1788,12 +1788,13 @@ static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineCo
 	}
 	GetPosFromPtr(b, &x, &y);
 	for(;;) {
+		size_t match_len;
 		if (IsBuffPadding(b)) {
 			b++;
 			continue;
 		}
 		// 1文字同一か調べる
-		size_t match_len = MatchOneString(x, y, str, len);
+		match_len = MatchOneString(x, y, str, len);
 		if (match_len == 0) {
 			result = FALSE;
 			break;
@@ -2107,10 +2108,11 @@ void BuffPrint(BOOL ScrollRegion)
 				const buff_char_t *b = &CodeBuffW[TmpPtr + i];
 
 				for (k = 0; k < count; b++,k++) {
+					unsigned short c;
 					if (IsBuffPadding(b)) {
 						continue;
 					}
-					unsigned short c = b->ansi_char;
+					c = b->ansi_char;
 					*p++ = (c & 0xff);
 					if (c >= 0x100) {
 						*p++ = ((c >> 8) & 0xff);
@@ -2673,6 +2675,9 @@ BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32)
  */
 static unsigned short ConvertACPChar(const buff_char_t *b)
 {
+	char *strA;
+	unsigned short chA;
+	size_t lenA;
 	size_t pool_lenW = 128;
 	wchar_t *strW = (wchar_t *)malloc(pool_lenW * sizeof(wchar_t));
 	BOOL too_small = FALSE;
@@ -2699,9 +2704,8 @@ static unsigned short ConvertACPChar(const buff_char_t *b)
 			strW[1] = 0;
 		}
 	}
-	size_t lenA;
-	char *strA = _WideCharToMultiByte(strW, lenW, CP_ACP, &lenA);
-	unsigned short chA = *(unsigned char *)strA;
+	strA = _WideCharToMultiByte(strW, lenW, CP_ACP, &lenA);
+	chA = *(unsigned char *)strA;
 	if (!IsDBCSLeadByte((BYTE)chA)) {
 		// 1byte文字
 		chA = strA[0];
@@ -5188,11 +5192,12 @@ int BuffGetAnyLineData(int offset_y, char *buf, int bufsize)
 	copysize = min(NumOfColumns, bufsize - 1);
 	idx = 0;
 	for (i = 0; i<copysize; i++) {
+		unsigned short c;
 		buff_char_t *b = &CodeBuffW[Ptr];
 		if (IsBuffPadding(b)) {
 			continue;
 		}
-		unsigned short c = b->ansi_char;
+		c = b->ansi_char;
 		buf[idx++] = c & 0xff;
 		if (c >= 0x100) {
 			buf[idx++] = (c >> 8) & 0xff;
@@ -5275,7 +5280,10 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	BOOL Right;
 	wchar_t *str_ptr;
 	const buff_char_t *b;
-
+	wchar_t *pos_str;
+	wchar_t *attr_str;
+	wchar_t *ansi_str;
+    wchar_t *unicode_str;
 
 	DispConvWinToScreen(Xw, Yw, &X, &ScreenY, &Right);
 	Y = PageStart + ScreenY;
@@ -5293,13 +5301,11 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	LockBuffer();
 	b = &CodeBuffW[TmpPtr+X];
 
-	wchar_t *pos_str;
 	aswprintf(&pos_str,
 			  L"ch(%d,%d(%d)) px(%d,%d)\n",
 			  X, ScreenY, Y,
 			  Xw, Yw);
 
-	wchar_t *attr_str;
 	{
 		const unsigned char attr = b->attr;
 		wchar_t *attr1_1_str;
@@ -5357,7 +5363,6 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		free(attr2_str);
 	}
 
-	wchar_t *ansi_str;
 	{
 		unsigned char mb[4];
 		unsigned short c = b->ansi_char;
@@ -5380,7 +5385,6 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 				  L" 0x%04x\n", mb, c);
 	}
 
-    wchar_t *unicode_str;
 	{
 		wchar_t *wcs = GetWCS(b);
 		wchar_t *codes_ptr;
