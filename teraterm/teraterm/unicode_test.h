@@ -14,23 +14,3 @@
 #define UNICODE_API				1	// UNICODE APIを許可
 #define	UNICODE_DEBUG			1	// デバグ用機能enable
 #define	UNICODE_DEBUG_CARET_OFF	0	// カーソル点滅系を止めるデバグ用
-
-#ifdef __cplusplus
-
-class CUnicodeDebugParam
-{
-public:
-	BOOL CodePopupEnable;
-	WORD CodePopupKey1;
-	WORD CodePopupKey2;
-	CUnicodeDebugParam()
-	{
-		CodePopupEnable = FALSE;
-		CodePopupKey1 = VK_CONTROL;
-		CodePopupKey2 = VK_CONTROL;
-	}
-};
-
-extern CUnicodeDebugParam UnicodeDebugParam;
-
-#endif

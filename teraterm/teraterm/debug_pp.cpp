@@ -37,6 +37,7 @@
 #include "unicode_test.h"
 #include "dlglib.h"
 #include "compat_win.h"
+#include "setting.h"
 
 CDebugPropPage::CDebugPropPage(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, IDD_TABSHEET_DEBUG, sheet)

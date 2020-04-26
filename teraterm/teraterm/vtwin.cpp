@@ -94,6 +94,7 @@
 #include "layer_for_unicode.h"
 #include "sendmem.h"
 #include "sendfiledlg.h"
+#include "setting.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
