@@ -57,9 +57,7 @@ typedef enum {
 	IdTalkCB = 1,
 	IdTalkFile = 2,
 	IdTalkQuiet = 3,
-#if UNICODE_INTERNAL_BUFF
 	IdTalkSendMem,
-#endif
 } IdTalk;
 
   /* Character sets */
