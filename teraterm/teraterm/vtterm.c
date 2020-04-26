@@ -657,6 +657,7 @@ void RepeatChar(BYTE b, int count)
 	}
 	else
 		CharAttrTmp.Attr |= CharAttr.Attr;
+	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 
 	CharAttrWrap = CharAttrTmp;
 	CharAttrWrap.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
