@@ -64,7 +64,6 @@
 
 void ParseFirst(BYTE b);
 
-#define MAPSIZE(x) (sizeof(x)/sizeof((x)[0]))
 #define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
 
   /* Parsing modes */
@@ -5712,59 +5711,6 @@ static void ParseASCII(BYTE b)
 	}
 }
 
-//
-// Unicode Combining Character Support
-//
-#include "uni_combining.map"
-
-static unsigned short GetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code,
-										 const combining_map_t *table, int tmax)
-{
-	unsigned short result = 0;
-	int i;
-
-	for (i = start_index ; i < tmax ; i++) {
-		if (table[i].first_code != first_code) { // 1文字目が異なるなら、以降はもう調べなくてよい。
-			break;
-		}
-
-		if (table[i].second_code == code) {
-			result = table[i].precomposed;
-			break;
-		}
-	}
-
-	return (result);
-}
-
-static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map_t *table, int tmax)
-{
-	int low, mid, high;
-	int index = -1;
-
-	low = 0;
-	high = tmax - 1;
-
-	// binary search
-	while (low < high) {
-		mid = (low + high) / 2;
-		if (table[mid].first_code < code) {
-			low = mid + 1;
-		} else {
-			high = mid;
-		}
-	}
-
-	if (table[low].first_code == code) {
-		while (low >= 0 && table[low].first_code == code) {
-			index = low;
-			low--;
-		}
-	}
-
-	return (index);
-}
-
 // unicode(UTF-32,wchar_t)をバッファへ書き込む
 // TODO @@
 #if UNICODE_INTERNAL_BUFF
@@ -6067,9 +6013,8 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 
 		if (proc_combining == 1) {
 			if (can_combining == 0) {
-				if ((first_code_index = GetIndexOfCombiningFirstCode(
-						code, mapCombiningToPrecomposed, MAPSIZE(mapCombiningToPrecomposed)
-						)) != -1) {
+				first_code_index = UnicodeGetIndexOfCombiningFirstCode(code);
+				if (first_code_index != -1) {
 					can_combining = 1;
 					first_code = code;
 					count = 0;
@@ -6077,16 +6022,14 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 				}
 			} else {
 				can_combining = 0;
-				cset = GetPrecomposedChar(first_code_index, first_code, code, mapCombiningToPrecomposed, MAPSIZE(mapCombiningToPrecomposed));
+				cset = UnicodeGetPrecomposedChar(first_code_index, first_code, code);
 				if (cset != 0) { // success
 					code = cset;
 
 				} else { // error
 					// 2つめの文字が半濁点の1文字目に相当する場合は、再度検索を続ける。(2005.10.15 yutaka)
-					if ((first_code_index = GetIndexOfCombiningFirstCode(
-							code, mapCombiningToPrecomposed, MAPSIZE(mapCombiningToPrecomposed)
-							)) != -1) {
-
+					first_code_index = UnicodeGetIndexOfCombiningFirstCode(code);
+					if (first_code_index != -1) {
 						// 1つめの文字はそのまま出力する
 						UnicodeToCP932(first_code);
 

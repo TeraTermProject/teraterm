@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 TeraTerm Project
+ * Copyright (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,13 @@
 extern "C" {
 #endif
 
+unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code);
+int UnicodeGetIndexOfCombiningFirstCode(unsigned short code);
 char UnicodeGetWidthProperty(unsigned long u32);
 int UnicodeIsCombiningCharacter(unsigned long u32);
 int UnicodeIsVariationSelector(unsigned long u32);
 int UnicodeIsEmoji(unsigned long u32);
+unsigned short UnicodeCombining(unsigned short first_code, unsigned short code);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 TeraTerm Project
+ * Copyright (C) 2019-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma warning(push, 0)
 #include <stdlib.h>
 #include <stdio.h>
-#pragma warning(pop)
 
 #include "unicode.h"
 
@@ -191,3 +189,76 @@ int main(int, char *[])
 	return 0;
 }
 #endif
+
+//
+// Unicode Combining Character Support
+//
+#include "uni_combining.map"
+
+unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code)
+{
+	const combining_map_t *table = mapCombiningToPrecomposed;
+	int tmax = _countof(mapCombiningToPrecomposed);
+	unsigned short result = 0;
+	int i;
+
+	for (i = start_index ; i < tmax ; i++) {
+		if (table[i].first_code != first_code) { // 1文字目が異なるなら、以降はもう調べなくてよい。
+			break;
+		}
+
+		if (table[i].second_code == code) {
+			result = table[i].precomposed;
+			break;
+		}
+	}
+
+	return (result);
+}
+
+int UnicodeGetIndexOfCombiningFirstCode(unsigned short code)
+{
+	const combining_map_t *table = mapCombiningToPrecomposed;
+	int tmax = _countof(mapCombiningToPrecomposed);
+	int low, mid, high;
+	int index = -1;
+
+	low = 0;
+	high = tmax - 1;
+
+	// binary search
+	while (low < high) {
+		mid = (low + high) / 2;
+		if (table[mid].first_code < code) {
+			low = mid + 1;
+		} else {
+			high = mid;
+		}
+	}
+
+	if (table[low].first_code == code) {
+		while (low >= 0 && table[low].first_code == code) {
+			index = low;
+			low--;
+		}
+	}
+
+	return (index);
+}
+
+/**
+ *	Unicodeの結合処理を行う
+ *	@param[in]	first_code
+ *	@param[in]	code
+ *	@retval		0		結合できない
+ *	@retval		以外	結合したUnicode
+ */
+unsigned short UnicodeCombining(unsigned short first_code, unsigned short code)
+{
+	int first_code_index = UnicodeGetIndexOfCombiningFirstCode(first_code);
+	if (first_code_index == -1) {
+		return 0;
+	}
+	unsigned short cset = UnicodeGetPrecomposedChar(first_code_index, first_code, code);
+	return cset;
+}

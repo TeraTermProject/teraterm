@@ -171,6 +171,26 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 	case 2:
 		break;
 	}
+
+	if (u32 < 0x80) {
+		p->ansi_char = (unsigned short)u32;
+	}
+	else {
+		char strA[4];
+		size_t lenA = UTF32ToMBCP(u32, CP_ACP, strA, sizeof(strA));
+		switch (lenA) {
+			case 0:
+			default:
+				p->ansi_char = 0;
+				break;
+			case 1:
+				p->ansi_char = (unsigned char)strA[0];
+				break;
+			case 2:
+				p->ansi_char = (unsigned char)strA[1] | ((unsigned char)strA[0] << 8);
+				break;
+		}
+	}
 }
 
 static void BuffSetChar3(buff_char_t *buff, char32_t u32, unsigned char fg, unsigned char bg, char property)
@@ -1955,6 +1975,9 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
  *								FALSE	文字を展開できた
  *	@retrun			文字数		出力文字数
  *								0のとき、文字出力なし
+ *
+ *	TODO
+ *		GetWCS() と同じ?
  */
 static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, BOOL *too_samll)
 {
@@ -3125,6 +3148,14 @@ static void mark_url_w(int cur_x, int cur_y)
 	}
 }
 
+/**
+ *	1セル分をwchar_t文字列に展開する
+ *	@param[in]		b			1セル分の文字情報へのポインタ
+ *	@retval			展開した文字列
+ *
+ *	TODO
+ *		expand_wchar() と同じ?
+ */
 static wchar_t *GetWCS(const buff_char_t *b)
 {
 	size_t len = (b->wc2[1] == 0) ? 2 : 3;
@@ -3201,7 +3232,11 @@ BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32)
 	return p != NULL;
 }
 
-static unsigned short ConverACPChar(const buff_char_t *b)
+/**
+ *	Unicodeから ANSI に変換する
+ *		結合文字(combining character)も行う
+ */
+static unsigned short ConvertACPChar(const buff_char_t *b)
 {
 	size_t pool_lenW = 128;
 	wchar_t *strW = (wchar_t *)malloc(pool_lenW * sizeof(wchar_t));
@@ -3212,16 +3247,33 @@ static unsigned short ConverACPChar(const buff_char_t *b)
 		expand_wchar(b, strW, lenW, &too_small);
 	}
 
+	if (lenW >= 2) {
+		// WideCharToMultiByte() では結合処理は行われない
+		// 自力で結合処理を行う。ただし、最初の2文字だけ
+		//	 例1:
+		//		U+307B(ほ) + U+309A(゜) は
+		//		Shift jis の 0x82d9(ほ) と 0x814b(゜) に変換され
+		//		0x82db(ぽ) には変換されない
+		//		予め U+307D(ぽ)に正規化しておく
+		//	 例2:
+		//		U+0061 U+0302 -> U+00E2 (latin small letter a with circumflex) (a+^)
+		unsigned short c = UnicodeCombining(strW[0], strW[1]);
+		if (c != 0) {
+			// 結合できた
+			strW[0] = c;
+			strW[1] = 0;
+		}
+	}
 	size_t lenA;
 	char *strA = _WideCharToMultiByte(strW, lenW, CP_ACP, &lenA);
-	unsigned short chA = *strA;
-	if (!IsDBCSLeadByte((BYTE)(*strA))) {
+	unsigned short chA = *(unsigned char *)strA;
+	if (!IsDBCSLeadByte((BYTE)chA)) {
 		// 1byte文字
 		chA = strA[0];
 	}
 	else {
 		// 2byte文字
-		chA = strA[0] | (strA[1] << 8);
+		chA = (chA << 8) | ((unsigned char)strA[1]);
 	}
 	free(strA);
 	free(strW);
@@ -3246,7 +3298,6 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 //	PCHAR AttrLineBG = &AttrBuffBG[LinePtr];
 	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
 #endif
-	BYTE b1, b2;
 	int move_x = 0;
 	static BOOL show_str_change = FALSE;
 	buff_char_t *p;
@@ -3254,6 +3305,8 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 
 	assert(Attr.Attr == (Attr.AttrEx & 0xff));
 
+#if 0
+	BYTE b1, b2;
 	// TODO 入力文字を CP932 に変換しておく、廃止予定
 	if (u32 < 0x80) {
 		b1 = (BYTE)u32;
@@ -3277,6 +3330,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			ret = 2;
 		}
 	}
+#endif
 
 #if 0
 	OutputDebugPrintfW(L"BuffPutUnicode(U+%06x,(%d,%d)\n", u32, CursorX, CursorY);
@@ -3328,6 +3382,9 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				StrChangeStart = CursorX - StrChangeCount;
 			}
 		}
+
+		// ANSI文字コードを更新
+		p->ansi_char = ConvertACPChar(p);
 	}
 	else {
 		char width_property;
@@ -3682,7 +3739,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		if (count == 0) {
 			// 最初の1文字目
 			int ptr = TmpPtr + istart + count;
-			if (b->u32 == 0) {	// TODO IsBuffPadding()
+			if (IsBuffPadding(b)) {
 				// 最初に表示しようとした文字が全角の右だった場合
 				ptr--;
 			}
@@ -3696,15 +3753,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			CurSelected = CheckSelect(istart+count,SY);
 		}
 
-		ansi_char = CodeBuffW[TmpPtr + istart + count].ansi_char;
-		bufA[lenA] = ansi_char & 0xff;
-		lenA++;
-		if (ansi_char > 0x100) {
-			bufA[lenA] = ansi_char & 0xff;
-			lenA++;
-		}
-
-		if (b->u32 == 0) {	// TODO IsBuffPadding()
+		if (IsBuffPadding(b)) {
 			// 全角の次の文字,処理不要
 		} else {
 			if (count == 0) {
@@ -3756,6 +3805,18 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 				lenW += b->CombinationCharCount16;
 				DrawFlag = TRUE;	// コンビネーションがある場合はすぐ描画
 			}
+
+			ansi_char = CodeBuffW[TmpPtr + istart + count].ansi_char;
+			if (ansi_char < 0x100) {
+				bufA[lenA] = ansi_char & 0xff;
+				lenA++;
+			}
+			else {
+				bufA[lenA] = (ansi_char >> 8) & 0xff;
+				lenA++;
+				bufA[lenA] = ansi_char & 0xff;
+				lenA++;
+			}
 		}
 
 		// 最後までスキャンした?
@@ -3776,7 +3837,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 #endif
 
 			DispSetupDC(CurAttr, CurSelected);
-#if UNICODE_INTERNAL_BUFF && UNICODE_DISPLAY
+#if UNICODE_DISPLAY
 			DispStrW(bufW, bufWW, lenW, Y, &X);
 #else
 			DispStr(bufA, lenA, Y, &X);
@@ -3801,11 +3862,12 @@ void BuffUpdateRect
 //   XEnd: x position of the lower-right corner (last character)
 //   YEnd: y position
 {
-	int i, j;
+//	int i;
+	int j;
 	int IStart, IEnd;
 	int X, Y;
 	LONG TmpPtr;
-	TCharAttr TempAttr;
+//	TCharAttr TempAttr;
 	BOOL TempSel, Caret;
 
 	if (XStart >= WinOrgX+WinWidth) {
@@ -3841,7 +3903,7 @@ void BuffUpdateRect
 					  XEnd - XStart + 1, YEnd - YStart + 1);
 #endif
 
-	TempAttr = DefCharAttr;
+//	TempAttr = DefCharAttr;
 	TempSel = FALSE;
 
 	Caret = IsCaretOn();
@@ -3861,7 +3923,7 @@ void BuffUpdateRect
 
 		X = (IStart-WinOrgX)*FontWidth;
 
-		i = IStart;
+//		i = IStart;
 		BuffDrawLineI(X, Y, j, IStart, IEnd);
 		Y = Y + FontHeight;
 		TmpPtr = NextLinePtr(TmpPtr);
@@ -5855,12 +5917,10 @@ int BuffGetCurrentLineData(char *buf, int bufsize)
 wchar_t *BuffGetLineStrW(int Sy, int *cx, size_t *lenght)
 {
 	size_t total_len = 0;
-	size_t i = 0;
 	LONG Ptr = GetLinePtr(PageStart + Sy);
 	buff_char_t* b = &CodeBuffW[Ptr];
 	int x;
 	int cx_pos = cx != NULL ? *cx : 0;
-	int cx_char_count = 0;
 	size_t idx;
 	wchar_t *result;
 	for(x = 0; x < NumOfColumns; x++) {
@@ -5954,11 +6014,34 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 }
 
 /**
+ *	文字列を連結する
+ *	@param[in]	dest	mallocされた領域
+ *						*dest == NULLの場合は新たな領域が確保される
+ *						不要になったら free() すること
+ *	@param[in]	add		連結される文字列
+ */
+static void awcscat(wchar_t **dest, const wchar_t *add)
+{
+	if (*dest == NULL) {
+		*dest = wcsdup(add);
+		return;
+	}
+	else {
+		size_t dest_len = wcslen(*dest);
+		size_t add_len = wcslen(add);
+		size_t new_len = dest_len + add_len + 1;
+		wchar_t *new_dest = realloc(*dest, sizeof(wchar_t ) * new_len);
+		wcscat(new_dest, add);
+		*dest = new_dest;
+	}
+}
+
+/**
  *	指定位置の文字情報を文字列で返す
  *	デバグ用途
  *
- *	@param	Xw, Yw	ウィンドウ上のX,Y(pixel),マウスポインタの位置
- *	@reterm	文字列(不要になったらfree()すること)
+ *	@param		Xw, Yw	ウィンドウ上のX,Y(pixel),マウスポインタの位置
+ *	@return		文字列(不要になったらfree()すること)
  */
 wchar_t *BuffGetCharInfo(int Xw, int Yw)
 {
@@ -5966,12 +6049,9 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	int ScreenY;
 	LONG TmpPtr;
 	BOOL Right;
-	unsigned char c;
-	char cs[4];
 	wchar_t *str_ptr;
-	size_t str_len;
-	unsigned char mb[2];
-	wchar_t *mb_str;
+	const buff_char_t *b;
+
 
 	DispConvWinToScreen(Xw, Yw, &X, &ScreenY, &Right);
 	Y = PageStart + ScreenY;
@@ -5987,67 +6067,27 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 
 	TmpPtr = GetLinePtr(Y);
 	LockBuffer();
+	b = &CodeBuffW[TmpPtr+X];
 
-	c = (unsigned char)CodeBuffW[TmpPtr+X].ansi_char;
-	if (c < 0x20) {
-		cs[0] = '.';
-		cs[1] = 0;
-		mb[0] = c;
-		mb[1] = 0;
-	} else if ((CodeBuffW[TmpPtr+X].attr & AttrKanji) == 0) {
-		// not DBCS(?TODO)
-		if (_ismbblead(c)) {
-			cs[0] = '*';
-			cs[1] = 0;
-		}
-		else {
-			cs[0] = c;
-			cs[1] = 0;
-		}
-		mb[0] = c;
-		mb[1] = 0;
-	} else {
-		if (X+1 < NumOfColumns) {
-			char c2 = (CodeBuffW[TmpPtr+X].ansi_char >> 8);
-			if (_ismbblead(c) && _ismbbtrail(c2)) {
-				cs[0] = c;
-				cs[1] = c2;
-				cs[2] = 0;
-				mb[0] = c;
-				mb[1] = c2;
-			} else {
-				cs[0] = '*';
-				cs[1] = 0;
-				mb[0] = c;
-				mb[1] = 0;
-			}
-		} else {
-			// 一番右端
-			mb[0] = c;
-			mb[1] = 0;
-			if (_ismbblead(c)) {
-				cs[0] = '*';
-				cs[1] = 0;
-			} else {
-				cs[0] = c;
-				cs[1] = 0;
-			}
-		}
-	}
+	wchar_t *pos_str;
+	aswprintf(&pos_str,
+			  L"ch(%d,%d(%d)) px(%d,%d)\n",
+			  X, ScreenY, Y,
+			  Xw, Yw);
 
-	if (mb[1] == 0) {
-		aswprintf(&mb_str, L"0x%02x", mb[0]);
-	} else {
-		aswprintf(&mb_str, L"0x%02x%02x", mb[0], mb[1]);
-	}
+	wchar_t *attr_str;
 	{
-		const unsigned char attr = CodeBuffW[TmpPtr+X].attr;
-		wchar_t *attr_str;
+		const unsigned char attr = b->attr;
+		wchar_t *attr1_1_str;
+		wchar_t *attr1_str;
+		wchar_t *attr2_str;
+		wchar_t *width_property;
+
 		if (attr == 0) {
-			attr_str = _wcsdup(L"");
+			attr1_1_str = _wcsdup(L"");
 		} else {
-			aswprintf(&attr_str,
-					  L"(%S%S%S%S%S%S%S%S)\n",
+			aswprintf(&attr1_1_str,
+					  L"(%S%S%S%S%S%S%S%S)",
 					  (attr & AttrBold) != 0 ? "AttrBold " : "",
 					  (attr & AttrUnder) != 0 ? "AttrUnder " : "",
 					  (attr & AttrSpecial) != 0 ? "AttrSpecial ": "",
@@ -6055,52 +6095,14 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 					  (attr & AttrReverse) != 0 ? "AttrReverse ": "",
 					  (attr & AttrLineContinued) != 0 ? "AttrLineContinued ": "",
 					  (attr & AttrURL) != 0 ? "AttrURL ": "",
-					  (attr & AttrKanji) != 0 ? "AttrKanji ": ""
-				);
+					  (attr & AttrKanji) != 0 ? "AttrKanji ": "");
 		}
-		str_len =
-			aswprintf(&str_ptr,
-					  L"ch(%d,%d(%d)) px(%d,%d)\n"
-					  L"attr      0x%02x%s%s\n"
-					  L"attr2     0x%02x\n"
-//					  L"attrFore  0x%02x\n"
-//					  L"attrBack  0x%02x\n"
-//					  L"CodeLine  %s('%hs')",
-					  L"CodeLine  %s",
-					  X, ScreenY, Y,
-					  Xw, Yw,
-					  attr, (attr != 0) ? L"\n " : L"", attr_str,
-					  (unsigned char)CodeBuffW[TmpPtr+X].attr2,
-//					  (unsigned char)AttrBuffFG[TmpPtr+X],
-//					  (unsigned char)AttrBuffBG[TmpPtr+X],
-//					  mb_str, cs
-					  mb_str
-				);
-		free(attr_str);
-	}
-	free(mb_str);
 
-	{
-		const buff_char_t *b = &CodeBuffW[TmpPtr+X];
-		wchar_t *wcs = GetWCS(b);
-		wchar_t *codes_ptr;
-		wchar_t *str2_ptr;
-		size_t str2_len;
-		int i;
-		wchar_t *width_property;
-
-		{
-			size_t codes_len = 10 * (b->CombinationCharCount16 + 1);
-			codes_ptr = malloc(sizeof(wchar_t) * codes_len);
-			_snwprintf_s(codes_ptr, codes_len, _TRUNCATE, L"U+%06x", b->u32);
-			for (i=0; i<b->CombinationCharCount32; i++) {
-				wchar_t *code_str;
-				aswprintf(&code_str, L"U+%06x", b->pCombinationChars16[i]);
-				wcscat_s(codes_ptr, codes_len, L"\n");
-				wcscat_s(codes_ptr, codes_len, code_str);
-				free(code_str);
-			}
-		}
+		aswprintf(&attr1_str,
+				  L"attr      0x%02x%s%s\n"
+				  L"attr2     0x%02x\n",
+				  attr, (attr != 0) ? L"\n " : L"", attr1_1_str,
+				  (unsigned char)CodeBuffW[TmpPtr+X].attr2);
 
 		width_property =
 			b->WidthProperty == 'F' ? L"Fullwidth" :
@@ -6111,42 +6113,86 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 			b->WidthProperty == 'N' ? L"Neutral" :
 			L"?";
 
-		str2_len = aswprintf(&str2_ptr,
-							 L"\n"
-							 L"attrFore  0x%02x\n"
-							 L"attrBack  0x%02x\n"
-							 L"\n"
-							 L"%s\n"
-							 L"'%s'\n"
-							 L"WidthProperty %s\n"
-							 L"Half %s\n"
-							 L"Padding %s",
-							 b->fg, b->bg,
-							 codes_ptr,
-							 wcs,
-							 width_property,
-							 (b->HalfWidth ? L"TRUE" : L"FALSE"),
-							 (b->Padding ? L"TRUE" : L"FALSE")
-			);
-		free(codes_ptr);
-		free(wcs);
+		aswprintf(&attr2_str,
+				  L"attrFore  0x%02x\n"
+				  L"attrBack  0x%02x\n"
+				  L"WidthProperty %s(%hc)\n"
+				  L"Half %s\n"
+				  L"Padding %s\n",
+				  b->fg, b->bg,
+				  width_property, b->WidthProperty, 
+				  (b->HalfWidth ? L"TRUE" : L"FALSE"),
+				  (b->Padding ? L"TRUE" : L"FALSE"));
 
-		str_len = str_len + str2_len - 1;	// -1 = remove one '\0'
-		str_ptr = realloc(str_ptr, sizeof(wchar_t) * str_len);
-		wcscat_s(str_ptr, str_len, str2_ptr);
-		free(str2_ptr);
+		free(attr1_1_str);
+
+		attr_str = NULL;
+		awcscat(&attr_str, attr1_str);
+		awcscat(&attr_str, attr2_str);
+		free(attr1_str);
+		free(attr2_str);
 	}
 
-#if 0
+	wchar_t *ansi_str;
 	{
-		wchar_t *p = BuffGetCurrentLineDataW(ScreenY, NULL, NULL);
-		OutputDebugPrintfW(L"BuffGetCurrentLineDataW(%d)='%s'\n", Yw, p);
-		free(p);
+		unsigned char mb[4];
+		unsigned short c = b->ansi_char;
+		if (c == 0) {
+			mb[0] = 0;
+		}
+		else if (c < 0x100) {
+			mb[0] = c < 0x20 ? '.' : (c & 0xff);
+			mb[1] = 0;
+		}
+		else {
+			mb[0] = ((c >> 8) & 0xff);
+			mb[1] = (c & 0xff);
+			mb[2] = 0;
+		}
+
+		aswprintf(&ansi_str,
+				  L"ansi:\n"
+				  L" '%hs'\n"
+				  L" 0x%04x\n", mb, c);
 	}
-#endif
+
+    wchar_t *unicode_str;
+	{
+		wchar_t *wcs = GetWCS(b);
+		wchar_t *codes_ptr;
+		int i;
+		size_t codes_len = 20 + 12 * (b->CombinationCharCount16 + 1);
+		codes_ptr = malloc(sizeof(wchar_t) * codes_len);
+		_snwprintf_s(codes_ptr, codes_len, _TRUNCATE,
+					 L"unicode:\n"
+					 L" '%s'\n"
+					 L" U+%06x",
+					 wcs,
+					 b->u32);
+		for (i=0; i<b->CombinationCharCount32; i++) {
+			wchar_t *code_str;
+			aswprintf(&code_str, L" U+%06x", b->pCombinationChars16[i]);
+			wcscat_s(codes_ptr, codes_len, L"\n");
+			wcscat_s(codes_ptr, codes_len, code_str);
+			free(code_str);
+		}
+		free(wcs);
+		unicode_str = codes_ptr;
+	}
 
 	UnlockBuffer();
 
+
+	str_ptr = NULL;
+	awcscat(&str_ptr, pos_str);
+	awcscat(&str_ptr, attr_str);
+	awcscat(&str_ptr, ansi_str);
+	awcscat(&str_ptr, unicode_str);
+	free(pos_str);
+	free(attr_str);
+	free(ansi_str);
+	free(unicode_str);
+	awcscat(&str_ptr, L"\n\nPress shift for sending to clipboard");
 	return str_ptr;
 }
 

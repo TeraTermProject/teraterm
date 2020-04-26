@@ -2156,6 +2156,10 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		wchar_t *buf = BuffGetCharInfo(pos.x, pos.y);
 		CBSetTextW(HVTWin, buf, 0);
 		free(buf);
+		MessageBeep(MB_OK);
+		TipWinDestroy(TipWinCodeDebug);
+		TipWinCodeDebug = NULL;
+		CtrlKeyState = 0;
 	}
 #endif
 	switch (KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff)) {
