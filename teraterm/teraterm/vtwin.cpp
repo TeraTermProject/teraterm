@@ -6268,6 +6268,19 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 		const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+		{	// スクロールバーが表示されている場合は、
+			// スクリーンサイズ(クライアントエリアのサイズ)に追加する
+			int min_pos;
+			int max_pos;
+			GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				ScreenWidth += GetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
+			}
+			GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				ScreenHeight += GetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
+			}
+		}
 		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
 		if (pAdjustWindowRectExForDpi != NULL) {
 			// Windows 10, version 1607+
