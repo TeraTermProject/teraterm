@@ -25,7 +25,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Create $(ProjectDir)..\teraterm\ttpdlg\svnversion.h"
-				CommandLine="$(ProjectDir)svnrev.bat"
+				CommandLine="&quot;$(ProjectDir)svnrev.bat&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Create $(ProjectDir)..\teraterm\ttpdlg\svnversion.h"
-				CommandLine="$(ProjectDir)svnrev.bat"
+				CommandLine="&quot;$(ProjectDir)svnrev.bat&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
