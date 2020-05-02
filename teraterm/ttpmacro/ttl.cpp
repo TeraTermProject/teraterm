@@ -1271,7 +1271,7 @@ WORD TTLFileCopy()
 		return Err;
 	}
 
-	ret = CopyFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2), FALSE);
+	ret = _CopyFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2), FALSE);
 	if (ret == 0) {
 		SetResult(-4);
 		return Err;
@@ -1341,7 +1341,7 @@ WORD TTLFileDelete()
 		return Err;
 	}
 
-	if (DeleteFileW(wc::fromUtf8(FName)) != 0) {
+	if (_DeleteFileW(wc::fromUtf8(FName)) != 0) {
 		SetResult(-1);
 	}
 	else {
@@ -1728,7 +1728,7 @@ WORD TTLFileStat()
 		goto end;
 	}
 
-	hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+	hFile = _CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
 							   FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
@@ -1923,7 +1923,7 @@ WORD TTLFileTruncate()
 	Err = 0;
 
 	// ファイルオープン、存在しない場合は新規作成
-	hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	hFile = _CreateFileW(wc::fromUtf8(FName), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
 	}
@@ -2035,7 +2035,7 @@ WORD TTLFindFirst()
 		i++;
 	if (i<NumDirHandle)
 	{
-		DirHandle[i] = FindFirstFileW(wc::fromUtf8(Dir),&data);
+		DirHandle[i] = _FindFirstFileW(wc::fromUtf8(Dir),&data);
 		if (DirHandle[i]!= INVALID_HANDLE_VALUE)
 			SetStrVal(Name,(u8)data.cFileName);
 		else
@@ -2071,7 +2071,7 @@ WORD TTLFindNext()
 
 	if ((DH>=0) && (DH<NumDirHandle) &&
 	    (DirHandle[DH]!= INVALID_HANDLE_VALUE) &&
-	    (FindNextFileW(DirHandle[DH],&data) != FALSE))
+	    (_FindNextFileW(DirHandle[DH],&data) != FALSE))
 	{
 		SetStrVal(Name,(u8)data.cFileName);
 		SetResult(1);
@@ -2140,7 +2140,7 @@ WORD TTLFolderDelete()
 		return Err;
 	}
 
-	if (RemoveDirectoryW(wc::fromUtf8(FName)) == 0) {
+	if (_RemoveDirectoryW(wc::fromUtf8(FName)) == 0) {
 		SetResult(2);
 	}
 	else {

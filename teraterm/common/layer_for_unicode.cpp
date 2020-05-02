@@ -690,3 +690,41 @@ BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 
 	return r;
 }
+
+BOOL _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists)
+{
+	return CopyFileW(lpExistingFileName, lpNewFileName, bFailIfExists);
+}
+
+BOOL _DeleteFileW(LPCWSTR lpFileName)
+{
+	return DeleteFileW(lpFileName);
+}
+
+BOOL _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName)
+{
+	return MoveFileW(lpExistingFileName, lpNewFileName);
+}
+
+HANDLE _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+					LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
+					HANDLE hTemplateFile)
+{
+	return CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+					   dwFlagsAndAttributes, hTemplateFile);
+}
+
+HANDLE _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData)
+{
+	return FindFirstFileW(lpFileName, lpFindFileData);
+}
+
+BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData)
+{
+	return FindNextFileW(hFindFile, lpFindFileData);
+}
+
+BOOL _RemoveDirectoryW(LPCWSTR lpPathName)
+{
+	return RemoveDirectoryW(lpPathName);
+}

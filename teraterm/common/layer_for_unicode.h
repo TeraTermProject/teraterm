@@ -125,6 +125,15 @@ BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
 					 DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
 					 LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
+BOOL _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists);
+BOOL _DeleteFileW(LPCWSTR lpFileName);
+BOOL _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName);
+HANDLE _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+					LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
+					HANDLE hTemplateFile);
+HANDLE _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
+BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
+BOOL _RemoveDirectoryW(LPCWSTR lpPathName);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);
