@@ -134,6 +134,7 @@ extern BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpComman
 									  LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
 									  DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
 									  LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
+extern int (WINAPI *pGetSystemMetricsForDpi)(int  nIndex, UINT dpi);
 
 // shlobj_core.h
 extern LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);

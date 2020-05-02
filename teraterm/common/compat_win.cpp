@@ -70,6 +70,9 @@ LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, W
 DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
 BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 
+// user32
+int (WINAPI *pGetSystemMetricsForDpi)(int nIndex, UINT dpi);
+
 // kernel32.dll
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
@@ -83,7 +86,7 @@ BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 							   DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
 							   LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
-// gdi32.lib
+// gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
 BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 
@@ -195,6 +198,7 @@ static const APIInfo Lists_user32[] = {
 	{ "MonitorFromPoint", (void **)&pMonitorFromPoint },
 	{ "MonitorFromRect", (void **)&pMonitorFromRect },
 	{ "GetMonitorInfoA", (void **)&pGetMonitorInfoA },
+	{ "GetSystemMetricsForDpi", (void **)&pGetSystemMetricsForDpi },
 	{},
 };
 
