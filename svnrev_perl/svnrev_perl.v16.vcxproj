@@ -116,7 +116,7 @@
       <Outputs>$(ProjectDir)..\teraterm\ttpdlg\svnversion.h</Outputs>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>$(ProjectDir)svnrev.bat</Command>
+      <Command>"$(ProjectDir)svnrev.bat"</Command>
       <Message>Create $(ProjectDir)..\teraterm\ttpdlg\svnversion.h</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -152,7 +152,7 @@
       <Outputs>$(ProjectDir)..\teraterm\ttpdlg\svnversion.h</Outputs>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>$(ProjectDir)svnrev.bat</Command>
+      <Command>"$(ProjectDir)svnrev.bat"</Command>
       <Message>Create $(ProjectDir)..\teraterm\ttpdlg\svnversion.h</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
