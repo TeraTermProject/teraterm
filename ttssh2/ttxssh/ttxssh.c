@@ -1290,35 +1290,6 @@ LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	return CallWindowProc(OrigHostnameEditProc, dlg, msg, wParam, lParam);
 }
 
-/**
- *	リストの横幅を拡張する(元の幅より狭くなることはない)
- *	@param[in]	dlg		ダイアログのハンドル
- *	@param[in]	ID		コンボボックスのID
- */
-static void ExpandCBWidth(HWND dlg, int ID)
-{
-	HWND hCtrlWnd = GetDlgItem(dlg, ID);
-	int count = (int)SendMessage(hCtrlWnd, CB_GETCOUNT, 0, 0);
-	HFONT hFont = (HFONT)SendMessage(hCtrlWnd, WM_GETFONT, 0, 0);
-	int i, max_width = 0;
-	HDC TmpDC = GetDC(hCtrlWnd);
-	hFont = (HFONT)SelectObject(TmpDC, hFont);
-	for (i=0; i<count; i++) {
-		SIZE s;
-		int len = (int)SendMessage(hCtrlWnd, CB_GETLBTEXTLEN, i, 0);
-		char *lbl = (char *)calloc(len+1, sizeof(char));
-		SendMessage(hCtrlWnd, CB_GETLBTEXT, i, (LPARAM)lbl);
-		GetTextExtentPoint32(TmpDC, lbl, len, &s);
-		if (s.cx > max_width)
-			max_width = s.cx;
-		free(lbl);
-	}
-	max_width += GetSystemMetrics(SM_CXVSCROLL);	// スクロールバーの幅も足し込んでおく
-	SendMessage(hCtrlWnd, CB_SETDROPPEDWIDTH, max_width, 0);
-	SelectObject(TmpDC, hFont);
-	ReleaseDC(hCtrlWnd, TmpDC);
-}
-
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 								   LPARAM lParam)
 {

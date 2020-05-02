@@ -100,6 +100,7 @@ int GetFontPointFromPixel(HWND hWnd, int pixel);
 int GetFontPixelFromPoint(HWND hWnd, int point);
 wchar_t *AllocControlTextW(HWND hWnd);
 char *AllocControlTextA(HWND hWnd);
+void ExpandCBWidth(HWND dlg, int ID);
 
 #ifdef __cplusplus
 }
