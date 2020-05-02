@@ -44,7 +44,7 @@ extern const mouse_cursor_t MouseCursor[];
 class CGeneralPropPageDlg : public TTCPropertyPage
 {
 public:
-	CGeneralPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet);
+	CGeneralPropPageDlg(HINSTANCE inst);
 	virtual ~CGeneralPropPageDlg();
 private:
 	void OnInitDialog();
@@ -57,7 +57,7 @@ private:
 class CSequencePropPageDlg : public TTCPropertyPage
 {
 public:
-	CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet);
+	CSequencePropPageDlg(HINSTANCE inst);
 	virtual ~CSequencePropPageDlg();
 private:
 	void OnInitDialog();
@@ -71,7 +71,7 @@ private:
 class CCopypastePropPageDlg : public TTCPropertyPage
 {
 public:
-	CCopypastePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet);
+	CCopypastePropPageDlg(HINSTANCE inst);
 	virtual ~CCopypastePropPageDlg();
 private:
 	void OnInitDialog();
@@ -85,7 +85,7 @@ private:
 class CVisualPropPageDlg : public TTCPropertyPage
 {
 public:
-	CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet);
+	CVisualPropPageDlg(HINSTANCE inst);
 	virtual ~CVisualPropPageDlg();
 private:
 	void OnInitDialog();
@@ -103,7 +103,7 @@ private:
 class CLogPropPageDlg : public TTCPropertyPage
 {
 public:
-	CLogPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet);
+	CLogPropPageDlg(HINSTANCE inst);
 	virtual ~CLogPropPageDlg();
 private:
 	void OnInitDialog();
@@ -117,7 +117,7 @@ private:
 class CCygwinPropPageDlg : public TTCPropertyPage
 {
 public:
-	CCygwinPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet);
+	CCygwinPropPageDlg(HINSTANCE inst);
 	virtual ~CCygwinPropPageDlg();
 private:
 	void OnInitDialog();
@@ -129,14 +129,20 @@ private:
 };
 
 // Property Sheet
-class CAddSettingPropSheetDlg : public TTCPropertySheet
+class CAddSettingPropSheetDlg
 {
 public:
 	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
 	virtual ~CAddSettingPropSheetDlg();
+	INT_PTR DoModal();
 
 private:
-	void OnInitDialog();
+	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
+
+	PROPSHEETHEADERW m_psh;
+	HWND m_hWnd;
+	HWND m_hParentWnd;
+	HINSTANCE m_hInst;
 
 	int m_PageCount;
 	HPROPSHEETPAGE hPsp[7];

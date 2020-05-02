@@ -83,8 +83,8 @@ void CVisualPropPageDlg::SetupRGBbox(int index)
 
 // CGeneralPropPageDlg ダイアログ
 
-CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD, sheet)
+CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
+	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD)
 {
 	wchar_t UIMsg[MAX_UIMSG];
 	get_lang_msgW("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
@@ -211,8 +211,8 @@ void CGeneralPropPageDlg::OnHelp()
 
 // CSequencePropPageDlg ダイアログ
 
-CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, CSequencePropPageDlg::IDD, sheet)
+CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst)
+	: TTCPropertyPage(inst, CSequencePropPageDlg::IDD)
 {
 	wchar_t UIMsg[MAX_UIMSG];
 	get_lang_msgW("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
@@ -410,8 +410,8 @@ void CSequencePropPageDlg::OnHelp()
 
 // CCopypastePropPageDlg ダイアログ
 
-CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, CCopypastePropPageDlg::IDD, sheet)
+CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst)
+	: TTCPropertyPage(inst, CCopypastePropPageDlg::IDD)
 {
 	wchar_t UIMsg[MAX_UIMSG];
 	get_lang_msgW("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
@@ -621,8 +621,8 @@ void CCopypastePropPageDlg::OnHelp()
 
 // CVisualPropPageDlg ダイアログ
 
-CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, CVisualPropPageDlg::IDD, sheet)
+CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst)
+	: TTCPropertyPage(inst, CVisualPropPageDlg::IDD)
 {
 	wchar_t UIMsg[MAX_UIMSG];
 	get_lang_msgW("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
@@ -1245,8 +1245,8 @@ void CVisualPropPageDlg::OnHelp()
 
 // CLogPropPageDlg ダイアログ
 
-CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, CLogPropPageDlg::IDD, sheet)
+CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst)
+	: TTCPropertyPage(inst, CLogPropPageDlg::IDD)
 {
 	wchar_t UIMsg[MAX_UIMSG];
 	get_lang_msgW("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
@@ -1610,8 +1610,8 @@ void CLogPropPageDlg::OnHelp()
 
 // CCygwinPropPageDlg ダイアログ
 
-CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, CCygwinPropPageDlg::IDD, sheet)
+CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst)
+	: TTCPropertyPage(inst, CCygwinPropPageDlg::IDD)
 {
 	wchar_t UIMsg[MAX_UIMSG];
 	get_lang_msgW("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
@@ -1705,21 +1705,67 @@ void CCygwinPropPageDlg::OnHelp()
 	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
 }
 
-// CAddSettingPropSheetDlg
-CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
-	HINSTANCE hInstance, HWND hParentWnd) :
-	TTCPropertySheet(hInstance, hParentWnd)
+//////////////////////////////////////////////////////////////////////////////
+
+#define REWRITE_TEMPLATE	1
+// quick hack :-(
+static HINSTANCE ghInstance;
+static class CAddSettingPropSheetDlg *gTTCPS;
+
+int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 {
+	switch (msg) {
+	case PSCB_PRECREATE:
+	{
+#if defined(REWRITE_TEMPLATE)
+		// テンプレートの内容を書き換える
+		// http://home.att.ne.jp/banana/akatsuki/doc/atlwtl/atlwtl15-01/index.html
+		size_t PrevTemplSize;
+		size_t NewTemplSize;
+		DLGTEMPLATE *NewTempl =
+			TTGetNewDlgTemplate(ghInstance, (DLGTEMPLATE *)lp,
+								&PrevTemplSize, &NewTemplSize);
+		NewTempl->style &= ~DS_CONTEXTHELP;		// check DLGTEMPLATEEX
+		memcpy((void *)lp, NewTempl, NewTemplSize);
+		free(NewTempl);
+#endif
+		break;
+	}
+	case PSCB_INITIALIZED:
+	{
+		CAddSettingPropSheetDlg *self = gTTCPS;
+		self->m_hWnd = hWnd;
+		CenterWindow(hWnd, self->m_hParentWnd);
+		break;
+	}
+	}
+	return 0;
+}
+
+// CAddSettingPropSheetDlg
+CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd)
+{
+	m_hInst = hInstance;
+	m_hWnd = 0;
+	m_hParentWnd = hParentWnd;
+	memset(&m_psh, 0, sizeof(m_psh));
+	m_psh.dwSize = sizeof(m_psh);
+	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS
+	//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
+	m_psh.hwndParent = hParentWnd;
+	m_psh.hInstance = hInstance;
+	m_psh.pfnCallback = PropSheetProc;
+
 	int i = 0;
-	m_Page[i++] = new CGeneralPropPageDlg(hInstance, this);
-	m_Page[i++] = new CSequencePropPageDlg(hInstance, this);
-	m_Page[i++] = new CCopypastePropPageDlg(hInstance, this);
-	m_Page[i++] = new CVisualPropPageDlg(hInstance, this);
-	m_Page[i++] = new CLogPropPageDlg(hInstance, this);
-	m_Page[i++] = new CCygwinPropPageDlg(hInstance, this);
+	m_Page[i++] = new CGeneralPropPageDlg(hInstance);
+	m_Page[i++] = new CSequencePropPageDlg(hInstance);
+	m_Page[i++] = new CCopypastePropPageDlg(hInstance);
+	m_Page[i++] = new CVisualPropPageDlg(hInstance);
+	m_Page[i++] = new CLogPropPageDlg(hInstance);
+	m_Page[i++] = new CCygwinPropPageDlg(hInstance);
 	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
 		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
-		m_Page[i++] = new CDebugPropPage(hInstance, this);
+		m_Page[i++] = new CDebugPropPage(hInstance);
 	}
 	m_PageCount = i;
 
@@ -1744,8 +1790,10 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 	}
 }
 
-void CAddSettingPropSheetDlg::OnInitDialog()
+INT_PTR CAddSettingPropSheetDlg::DoModal()
 {
-	TTCPropertySheet::OnInitDialog();
-	CenterWindow(m_hWnd, m_hParentWnd);
+	ghInstance = m_hInst;
+	gTTCPS = this;
+	return _PropertySheetW(&m_psh);
 }
+

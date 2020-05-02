@@ -39,8 +39,8 @@
 #include "compat_win.h"
 #include "setting.h"
 
-CDebugPropPage::CDebugPropPage(HINSTANCE inst, TTCPropertySheet *sheet)
-	: TTCPropertyPage(inst, IDD_TABSHEET_DEBUG, sheet)
+CDebugPropPage::CDebugPropPage(HINSTANCE inst)
+	: TTCPropertyPage(inst, IDD_TABSHEET_DEBUG)
 {
 }
 

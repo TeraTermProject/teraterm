@@ -146,24 +146,10 @@ private:
 	static TTCDialog *pseudoPtr;
 };
 
-class TTCPropertySheet
-{
-public:
-	TTCPropertySheet(HINSTANCE hInstance, HWND hParentWnd);
-	virtual ~TTCPropertySheet();
-	virtual void OnInitDialog();
-	INT_PTR DoModal();
-	PROPSHEETHEADERW m_psh;
-	HWND m_hWnd;
-	HWND m_hParentWnd;
-	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
-	HINSTANCE m_hInst;
-};
-
 class TTCPropertyPage : public TTCWnd
 {
 public:
-	TTCPropertyPage(HINSTANCE inst, int id, TTCPropertySheet *sheet);
+	TTCPropertyPage(HINSTANCE inst, int id);
 	virtual ~TTCPropertyPage();
 	virtual void OnInitDialog();
 	virtual void OnOK();
@@ -177,6 +163,5 @@ protected:
 private:
 	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static UINT CALLBACK PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp);
-	TTCPropertySheet *m_pSheet;
 };
 

@@ -34,7 +34,7 @@
 class CDebugPropPage : public TTCPropertyPage
 {
 public:
-	CDebugPropPage(HINSTANCE inst, TTCPropertySheet *sheet);
+	CDebugPropPage(HINSTANCE inst);
 	virtual ~CDebugPropPage();
 private:
 	void OnInitDialog();
