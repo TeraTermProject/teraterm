@@ -57,7 +57,7 @@ typedef unsigned long char32_t;		// C++11
 typedef struct {
 	char32_t u32;
 	char32_t u32_last;
-	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' (•¶š‚Ì‘®«)
+	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' or 'n'(Narrow) or 'N'(Neutual) (•¶š‚Ì‘®«)
 	char HalfWidth;					// TRUE/FALSE = ”¼Šp/‘SŠp (•\¦‚·‚é‚Æ‚«‚Ì•¶š•)
 	char Padding;					// TRUE = ‘SŠp‚ÌŸ‚Ì‹l‚ß•¨ or s––‚Ì‹l‚ß•¨
 	char Emoji;						// TRUE = ŠG•¶š
@@ -2209,12 +2209,13 @@ static BOOL BuffIsHalfWidthFromPropery(char width_property)
 	}
 }
 
-static BOOL BuffIsHalfWidthFromCode(TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
+static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
 {
 	*width_property = UnicodeGetWidthProperty(u32);
 	*emoji = (char)UnicodeIsEmoji(u32);
 	if (*emoji) {
-		if (ts_->Language == IdJapanese) {
+		//if (ts_->Language == IdJapanese) {
+		if (ts_->UnicodeAmbiguousAsWide) {
 			// ‘SŠp
 			return FALSE;
 		} else {
@@ -2475,9 +2476,6 @@ static void mark_url_w(int cur_x, int cur_y)
 		// Œ»İx‚ªˆê”Ô‰E?
 		if ((cur_y + 1) < NumOfLines) {
 			if ((CodeLineW[x].attr & AttrLineContinued) != 0) {
-				if ((cur_y + 1) == 24) {
-					int a = 0;
-				}
 				const LONG TmpPtr = GetLinePtr(PageStart + cur_y + 1);
 				if ((CodeLineW[TmpPtr + NumOfColumns - 1].attr & AttrURL) != 0) {
 					next = TRUE;
@@ -3158,7 +3156,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 				bufW[lenW] = b->wc2[1];
 				bufWW[lenW] = '0';
 				lenW++;
-//				DrawFlag = TRUE;	// ‚·‚®‚É•`‰æ‚·‚é
 			}
 			if (b->CombinationCharCount16 != 0)
 			{
@@ -3182,6 +3179,10 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 				lenA++;
 				bufA[lenA] = ansi_char & 0xff;
 				lenA++;
+			}
+
+			if (b->WidthProperty == 'A' || b->WidthProperty == 'N') {
+				DrawFlag = TRUE;
 			}
 		}
 

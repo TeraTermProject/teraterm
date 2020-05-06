@@ -2241,6 +2241,9 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ReadFont3("Tera Term", "DlgFont", NULL, FName,
 			  ts->DialogFontName, sizeof(ts->DialogFontName),
 			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
+
+	// UnicodeÝ’è
+	ts->UnicodeAmbiguousAsWide = GetOnOff(Section, "UnicodeAmbiguousWide", FName, TRUE);
 }
 
 void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -3563,6 +3566,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 				ts->DialogFontPoint,
 				ts->DialogFontCharSet);
 	WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, FName);
+
+	// UnicodeÝ’è
+	WriteOnOff(Section, "UnicodeAmbiguousWide", FName, ts->UnicodeAmbiguousAsWide);
 }
 
 #define VTEditor "VT editor keypad"

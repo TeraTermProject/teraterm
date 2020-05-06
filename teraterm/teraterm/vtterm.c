@@ -63,7 +63,7 @@
 
 #include "unicode_test.h"
 
-void ParseFirst(BYTE b);
+static void ParseFirst(BYTE b);
 
 #define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
 
@@ -921,23 +921,40 @@ static void PutKanji(BYTE b)
 		// codepage一覧
 		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
 		unsigned long u32 = 0;
-		if (ts.Language == IdKorean && ts.CodePage == 51949) {
-#if 0
-			unsigned char buf[2];
-			int ret;
-			wchar_t wchar;
-			buf[0] = Kanji >> 8;
-			buf[1] = Kanji & 0xff;
-			ret = MultiByteToWideChar(51949, MB_ERR_INVALID_CHARS, (char *)buf, 2, &wchar, 1);
-			u32 = wchar;
-#endif
-			u32 = MBCP_UTF32(Kanji, ts.CodePage);
-		} else if (ts.Language == IdJapanese && ts.CodePage == 932) {
+		switch (ts.Language) {
+		case IdJapanese:
 			// ここに来た時点でCP932になっている
-			//} else if (ts.KanjiCode == IdSJIS || ts.KanjiCode == IdEUC || ts.KanjiCode == IdJIS) {
 			u32 = CP932ToUTF32(Kanji);
-		} else {
+			break;
+		case IdKorean:
+			if (ts.KanjiCode == IdKoreanCP51949) {
+				// CP51949
+				u32 = MBCP_UTF32(Kanji, 51949);
+			}
+			else {
+				assert(FALSE);
+				goto default_;
+			}
+			break;
+		case IdChinese:
+			if (ts.KanjiCode == IdCnGB2312) {
+				// CP936 GB2312
+				u32 = MBCP_UTF32(Kanji, 936);
+			}
+			else if (ts.KanjiCode == IdCnBig5) {
+				// CP950 Big5
+				u32 = MBCP_UTF32(Kanji, 950);
+			}
+			else {
+				assert(FALSE);
+				goto default_;
+			}
+			break;
+		default:
+		default_:
+			assert(FALSE);
 			u32 = MBCP_UTF32(Kanji, ts.CodePage);
+			break;
 		}
 		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
@@ -5391,27 +5408,109 @@ void CANSeen(BYTE b)
 }
 
 /**
- *	dbcsの1byte目チェック?
+ *	IsDBCSLeadByteEx() とほぼ同じ
+ *	ismbblead() の拡張
+ */
+int __ismbblead(BYTE b, int code_page)
+{
+	switch (code_page) {
+		case 932:
+			// 日本語 shift jis
+			if (((0x81 <= b) && (b <= 0x9f)) || ((0xe0 <= b) && (b <= 0xfc))) {
+				return TRUE;
+			}
+			return FALSE;
+		case 51949:
+			// Korean CP51949
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 936:
+			// CP936 GB2312
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 950:
+			// CP950 Big5
+			if (((0xA1 <= b) && (b <= 0xc6)) || ((0xc9 <= b) && (b <= 0xf9))) {
+				return TRUE;
+			}
+			return FALSE;
+		default:
+			break;
+	}
+	return FALSE;
+}
+
+/**
+ *	ismbbtrail() の拡張
+ */
+int __ismbbtrail(BYTE b, int code_page)
+{
+	switch (code_page) {
+		case 932:
+			if (((0x40 <= b) && (b <= 0x7E)) || ((0x80 <= b) && (b <= 0xFC))) {
+				return TRUE;
+			}
+			return FALSE;
+		case 51949:
+			// Korean CP51949
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 936:
+			// CP936 GB2312
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 950:
+			// CP950 Big5
+			if (((0x40 <= b) && (b <= 0x7e)) || ((0xa1 <= b) && (b <= 0xfe))) {
+				return TRUE;
+			}
+			return FALSE;
+		default:
+			break;
+	}
+	return FALSE;
+}
+
+/**
+ *	1byte目チェック
+ */
+static BOOL CheckFirstByte(BYTE b, int lang, int kanji_code)
+{
+	switch (lang) {
+		case IdKorean:
+			return __ismbblead(b, 51949);
+		case IdChinese:
+			if (kanji_code == IdCnGB2312) {
+				return __ismbblead(b, 936);
+			}
+			else if (ts.KanjiCode == IdCnBig5) {
+				return __ismbblead(b, 950);
+			}
+			break;
+		default:
+			assert(FALSE);
+			break;
+	}
+	assert(FALSE);
+	return FALSE;
+}
+
+/**
+ *	ts.Language == IdJapanese 時
+ *	1byte目チェック
  */
 static BOOL CheckKanji(BYTE b)
 {
 	BOOL Check;
 
-#if UNICODE_INTERNAL_BUFF
-	if (ts.CodePage != 932) {
-		// TODO ちゃんとチェックする
-		// IsDBCSLeadByteEx() が妥当?
-		if (ts.CodePage == 936) {
-			// chs
-			return ((0x81 <= b) && (b <= 0xfe));
-		}
-		if (ts.CodePage == 950) {
-			// cht
-			return ((0x88 <= b) && (b <= 0xfe));
-		}
-
-	}
-#endif
 	if (ts.Language!=IdJapanese)
 		return FALSE;
 
@@ -5444,24 +5543,6 @@ static BOOL CheckKanji(BYTE b)
 	}
 	else {
 		Check = FALSE;
-	}
-
-	return Check;
-}
-
-BOOL CheckKorean(BYTE b)
-{
-	BOOL Check;
-	if (ts.Language!=IdKorean)
-		return FALSE;
-
-	if (ts.KanjiCode == IdSJIS) {
-		if ((0xA1<=b) && (b<=0xFE)) {
-			Check = TRUE;
-		}
-		else {
-			Check = FALSE;
-		}
 	}
 
 	return Check;
@@ -5617,7 +5698,7 @@ static BOOL ParseFirstJP(BYTE b)
 	return TRUE;
 }
 
-BOOL ParseFirstKR(BYTE b)
+static BOOL ParseFirstKR(BYTE b)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
 {
@@ -5640,7 +5721,70 @@ BOOL ParseFirstKR(BYTE b)
 		}
 	}
 
-	if ((!KanjiIn) && CheckKorean(b)) {
+	if ((!KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
+		Kanji = b << 8;
+		KanjiIn = TRUE;
+		return TRUE;
+	}
+
+	if (b<=US) {
+		ParseControl(b);
+	}
+	else if (b==0x20) {
+		PutChar(b);
+	}
+	else if ((b>=0x21) && (b<=0x7E)) {
+//		if (Gn[Glr[0]] == IdKatakana) {
+//			b = b | 0x80;
+//		}
+		PutChar(b);
+	}
+	else if (b==0x7f) {
+		return TRUE;
+	}
+	else if ((0x80<=b) && (b<=0x9F)) {
+		ParseControl(b);
+	}
+	else if (b==0xA0) {
+		PutChar(0x20);
+	}
+	else if ((b>=0xA1) && (b<=0xFE)) {
+		if (Gn[Glr[1]] == IdASCII) {
+			b = b & 0x7f;
+		}
+		PutChar(b);
+	}
+	else {
+		PutChar(b);
+	}
+
+	return TRUE;
+}
+
+static BOOL ParseFirstCn(BYTE b)
+// returns TRUE if b is processed
+//  (actually allways returns TRUE)
+{
+	if (KanjiIn) {
+		// TODO
+		if ((0x40<=b) && (b<=0x7e) ||
+		    (0xa1<=b) && (b<=0xFE))
+		{
+			PutKanji(b);
+			KanjiIn = FALSE;
+			return TRUE;
+		}
+		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
+			KanjiIn = FALSE;
+		}
+		else if ((b==CR) && Wrap) {
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+			Wrap = FALSE;
+		}
+	}
+
+	if ((!KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
 		Kanji = b << 8;
 		KanjiIn = TRUE;
 		return TRUE;
@@ -6099,7 +6243,7 @@ static BOOL ParseFirstRus(BYTE b)
 	return FALSE;
 }
 
-void ParseFirst(BYTE b)
+static void ParseFirst(BYTE b)
 {
 	switch (ts.Language) {
 	  case IdUtf8:
@@ -6144,9 +6288,14 @@ void ParseFirst(BYTE b)
 		}
 		break;
 
-
 	  case IdRussian:
 		if (ParseFirstRus(b)) {
+			return;
+		}
+		break;
+
+	case IdChinese:
+		if (ParseFirstCn(b)) {
 			return;
 		}
 		break;

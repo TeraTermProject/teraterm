@@ -101,8 +101,6 @@ DllExport BOOL HasMultiMonitorSupport();
 DllExport BOOL HasGetAdaptersAddresses();
 DllExport BOOL HasDnsQuery();
 DllExport BOOL HasBalloonTipSupport();
-int KanjiCode2List(int lang, int kcode);
-int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
 DllExport char *mctimelocal(char *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);

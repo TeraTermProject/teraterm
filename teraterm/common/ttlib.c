@@ -1529,53 +1529,28 @@ DWORD get_OPENFILENAME_SIZEW()
 	return CDSIZEOF_STRUCT(OPENFILENAMEW,lpTemplateName);
 }
 
-// convert table for KanjiCodeID and ListID
-// cf. KanjiList,KanjiListSend
-//     KoreanList,KoreanListSend
-//     Utf8List,Utf8ListSend
-//     IdSJIS, IdEUC, IdJIS, IdUTF8, IdUTF8m
-//     IdEnglish, IdJapanese, IdRussian, IdKorean, IdUtf8
-/* KanjiCode2List(Language,KanjiCodeID) returns ListID */
-int KanjiCode2List(int lang, int kcode)
-{
-	int Table[5][5] = {
-		{1, 2, 3, 4, 5}, /* English (dummy) */
-		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
-		{1, 2, 3, 4, 5}, /* Russian (dummy) */
-		{1, 1, 1, 2, 3}, /* Korean */
-		{1, 1, 1, 1, 2}, /* Utf8 */
-	};
-	lang--;
-	kcode--;
-	return Table[lang][kcode];
-}
-/* List2KanjiCode(Language,ListID) returns KanjiCodeID */
-int List2KanjiCode(int lang, int list)
-{
-	int Table[5][5] = {
-		{1, 2, 3, 4, 5}, /* English (dummy) */
-		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
-		{1, 2, 3, 4, 5}, /* Russian (dummy) */
-		{1, 4, 5, 1, 1}, /* Korean */
-		{4, 5, 4, 4, 4}, /* Utf8 */
-	};
-	lang--;
-	list--;
-	if (list < 0) {
-		list = 0;
-	}
-	return Table[lang][list];
-}
-/* KanjiCodeTranslate(Language(dest), KanjiCodeID(source)) returns KanjiCodeID */
+/**
+ *	KanjiCodeTranslate(Language(dest), KanjiCodeID(source)) returns KanjiCodeID
+ *	@param[in]	lang (IdEnglish, IdJapanese, IdRussian, ...)
+ *	@param[in]	kcode (IdSJIS, IdEUC, ... IdKOI8 ... )
+ *	@return		langに存在する漢字コードを返す
+ *
+ *	langに存在しない漢字コードを使用しないようこの関数を使用する
+ *		- iniファイルの読み込み時
+ *		- 設定でlangを切り替えた時
+ */
 int KanjiCodeTranslate(int lang, int kcode)
 {
-	int Table[5][5] = {
+	static const int Table[][5] = {
 		{1, 2, 3, 4, 5}, /* to English (dummy) */
 		{1, 2, 3, 4, 5}, /* to Japanese(dummy) */
 		{1, 2, 3, 4, 5}, /* to Russian (dummy) */
 		{1, 1, 1, 4, 5}, /* to Korean */
 		{4, 4, 4, 4, 5}, /* to Utf8 */
+		{1, 2, 2, 2, 2}, /* to Chinese */
 	};
+	if (lang < 1 || lang > IdLangMax) lang = 1;
+	if (kcode < 1 || kcode > 5) kcode = 1;
 	lang--;
 	kcode--;
 	return Table[lang][kcode];

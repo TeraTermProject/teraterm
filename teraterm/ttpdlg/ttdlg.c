@@ -122,6 +122,45 @@ static PCHAR BaudList[] =
 	 "14400","19200","38400","57600","115200",
 	 "230400", "460800", "921600", NULL};
 
+// convert table for KanjiCodeID and ListID
+// cf. KanjiList,KanjiListSend
+//     KoreanList,KoreanListSend
+//     Utf8List,Utf8ListSend
+//     IdSJIS, IdEUC, IdJIS, IdUTF8, IdUTF8m
+//     IdEnglish, IdJapanese, IdRussian, IdKorean, IdUtf8
+/* KanjiCode2List(Language,KanjiCodeID) returns ListID */
+static int KanjiCode2List(int lang, int kcode)
+{
+	int Table[5][5] = {
+		{1, 2, 3, 4, 5}, /* English (dummy) */
+		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
+		{1, 2, 3, 4, 5}, /* Russian (dummy) */
+		{1, 1, 1, 2, 3}, /* Korean */
+		{1, 1, 1, 1, 2}, /* Utf8 */
+	};
+	lang--;
+	kcode--;
+	return Table[lang][kcode];
+}
+
+/* List2KanjiCode(Language,ListID) returns KanjiCodeID */
+static int List2KanjiCode(int lang, int list)
+{
+	int Table[5][5] = {
+		{1, 2, 3, 4, 5}, /* English (dummy) */
+		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
+		{1, 2, 3, 4, 5}, /* Russian (dummy) */
+		{1, 4, 5, 1, 1}, /* Korean */
+		{4, 5, 4, 4, 4}, /* Utf8 */
+	};
+	lang--;
+	list--;
+	if (list < 0) {
+		list = 0;
+	}
+	return Table[lang][list];
+}
+
 /*
  * COMƒ|[ƒg‚ÉŠÖ‚·‚éÚ×î•ñ
  */
