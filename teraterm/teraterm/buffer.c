@@ -2472,11 +2472,16 @@ static void mark_url_w(int cur_x, int cur_y)
 
 	// 1つ後ろのセルがURL?
 	if (x == NumOfColumns - 1) {
-		// 一番右
-		if ((CodeLineW[x].attr & AttrLineContinued) != 0) {
-			const LONG TmpPtr = GetLinePtr(PageStart + cur_y + 1);
-			if ((CodeLineW[TmpPtr + NumOfColumns - 1].attr & AttrURL) != 0) {
-				next = TRUE;
+		// 現在xが一番右?
+		if ((cur_y + 1) < NumOfLines) {
+			if ((CodeLineW[x].attr & AttrLineContinued) != 0) {
+				if ((cur_y + 1) == 24) {
+					int a = 0;
+				}
+				const LONG TmpPtr = GetLinePtr(PageStart + cur_y + 1);
+				if ((CodeLineW[TmpPtr + NumOfColumns - 1].attr & AttrURL) != 0) {
+					next = TRUE;
+				}
 			}
 		}
 	}
@@ -2491,7 +2496,7 @@ static void mark_url_w(int cur_x, int cur_y)
 			if (isURLchar(u32)) {
 				// URLにはさまれていて、URLになりえるキャラクタ
 				int ptr = GetLinePtr(PageStart + cur_y) + cur_x;
-				CodeLineW[ptr].attr |= AttrURL;
+				CodeBuffW[ptr].attr |= AttrURL;
 				return;
 			}
 			// 1line検査
