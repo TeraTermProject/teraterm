@@ -1627,7 +1627,7 @@ WORD TTLFileRename()
 		SetResult(-2);
 		return Err;
 	}
-	if (MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) != 0) {
+	if (_MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) != 0) {
 		// リネームに失敗したら、エラーで返す。
 		SetResult(-3);
 		return Err;
@@ -1650,7 +1650,7 @@ WORD TTLFileSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
+	DWORD attr = _GetFileAttributesW(wc::fromUtf8(FName));
 	if (attr != INVALID_FILE_ATTRIBUTES)
 		// exists file or folder
 		SetResult(1);
@@ -2162,7 +2162,7 @@ WORD TTLFolderSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
+	DWORD attr = _GetFileAttributesW(wc::fromUtf8(FName));
 	if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		SetResult(1);
 	}
@@ -2262,7 +2262,7 @@ WORD TTLGetFileAttr()
 	if (Err!=0) return Err;
 
 	GetAbsPath(Filename, sizeof(Filename));
-	SetResult(GetFileAttributesW(wc::fromUtf8(Filename)));
+	SetResult(_GetFileAttributesW(wc::fromUtf8(Filename)));
 
 	return Err;
 }
