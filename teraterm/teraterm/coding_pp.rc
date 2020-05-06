@@ -1,0 +1,107 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "coding_pp_res.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winresrc.h>
+#define IDC_STATIC -1
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TABSHEET_CODING DIALOGEX 0, 0, 323, 276
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Coding"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Language:",IDC_GENLANGLABEL,10,116,52,10,NOT WS_VISIBLE
+    GROUPBOX        "Coding (r&eceive)",IDC_TERMKANJILABEL,5,31,95,55
+    COMBOBOX        IDC_TERMKANJI,10,47,80,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Hal&f-width kana",IDC_TERMKANA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,64,87,17
+    GROUPBOX        "Coding (tra&nsmit)",IDC_TERMKANJISENDLABEL,103,31,211,55
+    COMBOBOX        IDC_TERMKANJISEND,110,47,75,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Half-wi&dth kana",IDC_TERMKANASEND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,110,64,76,17
+    CONTROL         "Kanji-i&n:",IDC_TERMKINTEXT,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,198,49,64,15
+    COMBOBOX        IDC_TERMKIN,267,47,43,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_TERMKOUT,267,66,43,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_GENLANG,69,115,93,81,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Kanji-&out:",IDC_TERMKOUTTEXT,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,198,67,64,12
+    CONTROL         "&Treat ambiguous characters as wide",IDC_AMBIGUOUS_AS_WIDE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,90,254,17
+    CONTROL         "&Use same code",IDC_USE_SAME_CODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,8,254,17
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "coding_pp_res.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TABSHEET_CODING, DIALOG
+    BEGIN
+        VERTGUIDE, 10
+        VERTGUIDE, 110
+        VERTGUIDE, 198
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

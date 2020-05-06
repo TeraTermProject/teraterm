@@ -15,6 +15,10 @@ add_executable(
   buffer.h
   clipboar.c
   clipboar.h
+  coding_pp.cpp
+  coding_pp.h
+  coding_pp.rc
+  coding_pp_res.h
   commlib.c
   commlib.h
   dnddlg.cpp

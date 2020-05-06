@@ -135,6 +135,9 @@
     <ClCompile Include="sendfiledlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coding_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -177,6 +180,9 @@
     </ResourceCompile>
     <ResourceCompile Include="teraterm_manifest.rc">
       <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="coding_pp.rc">
+      <Filter>dialog</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +341,12 @@
     </ClInclude>
     <ClInclude Include="sendfiledlg.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coding_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="coding_pp.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4548,6 +4548,9 @@ void CVTWindow::OnExternalSetup()
 		if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
 			BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
 		}
+
+		// コーディングタブで設定が変化したときコールする必要がある
+		SetupTerm();
 	}
 }
 

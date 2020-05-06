@@ -56,6 +56,7 @@
 #include "i18n.h"
 #include "codeconv.h"
 #include "layer_for_unicode.h"
+#include "coding_pp.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1709,8 +1710,8 @@ void CCygwinPropPageDlg::OnHelp()
 
 #define REWRITE_TEMPLATE	1
 // quick hack :-(
-static HINSTANCE ghInstance;
-static class CAddSettingPropSheetDlg *gTTCPS;
+HINSTANCE CAddSettingPropSheetDlg::ghInstance;
+class CAddSettingPropSheetDlg *CAddSettingPropSheetDlg::gTTCPS;
 
 int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 {
@@ -1750,12 +1751,13 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	m_hParentWnd = hParentWnd;
 	memset(&m_psh, 0, sizeof(m_psh));
 	m_psh.dwSize = sizeof(m_psh);
-	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS
+	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;
 	//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
 	m_psh.hwndParent = hParentWnd;
 	m_psh.hInstance = hInstance;
 	m_psh.pfnCallback = PropSheetProc;
 
+	// CPP,tmfcのTTCPropertyPage派生クラスから生成
 	int i = 0;
 	m_Page[i++] = new CGeneralPropPageDlg(hInstance);
 	m_Page[i++] = new CSequencePropPageDlg(hInstance);
@@ -1767,11 +1769,14 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
 		m_Page[i++] = new CDebugPropPage(hInstance);
 	}
-	m_PageCount = i;
-
-	for (i = 0; i < m_PageCount; i++) {
+	m_PageCountCPP = i;
+	for (i = 0; i < m_PageCountCPP; i++) {
 		hPsp[i] = m_Page[i]->CreatePropertySheetPage();
 	}
+
+	// TTCPropertyPage を使用しない PropertyPage
+	hPsp[m_PageCountCPP+0] = CodingPageCreate(hInstance, &ts);
+	m_PageCount = m_PageCountCPP+ 1;
 
 	m_psh.nPages = m_PageCount;
 	m_psh.phpage = hPsp;
@@ -1785,7 +1790,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 {
 	free((void*)m_psh.pszCaption);
-	for (int i = 0; i < m_PageCount; i++) {
+	for (int i = 0; i < m_PageCountCPP; i++) {
 		delete m_Page[i];
 	}
 }

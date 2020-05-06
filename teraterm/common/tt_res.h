@@ -27,6 +27,7 @@
 #define IDI_VT_3D                       125
 #define IDD_TABSHEET_DEBUG              126
 #define IDD_SENDFILEDLG                 127
+#define IDD_TABSHEET_CODING             128
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -355,7 +356,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        128
+#define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         52031
 #define _APS_NEXT_CONTROL_VALUE         2607
 #define _APS_NEXT_SYMED_VALUE           101

@@ -139,6 +139,7 @@
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
+    <ClCompile Include="coding_pp.cpp" />
     <ClCompile Include="commlib.c" />
     <ClCompile Include="dnddlg.cpp" />
     <ClCompile Include="filesys.cpp" />
@@ -170,6 +171,8 @@
     <ClInclude Include="../ttpdlg/dlg_res.h" />
     <ClCompile Include="../ttpdlg/ttdlg.c" />
     <ClInclude Include="../ttpdlg/ttdlg.h" />
+    <ClInclude Include="coding_pp.h" />
+    <ClInclude Include="coding_pp_res.h" />
     <ClInclude Include="sendfiledlg.h" />
     <ClInclude Include="sendmem.h" />
     <ClCompile Include="sendmem.cpp" />
@@ -192,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
+    <ResourceCompile Include="coding_pp.rc" />
     <ResourceCompile Include="debug_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="tt-version.rc" />

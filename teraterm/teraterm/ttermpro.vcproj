@@ -547,6 +547,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\coding_pp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\coding_pp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\coding_pp.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\coding_pp_res.h"
+				>
+			</File>
+			<File
 				RelativePath="debug_pp.cpp"
 				>
 			</File>
