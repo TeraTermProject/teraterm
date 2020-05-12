@@ -75,6 +75,7 @@ static const struct {
 struct CodingPPData {
 	TTTSet *pts;
 	const char *UILanguageFile;
+	DLGTEMPLATE *dlg_templ;
 };
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -92,20 +93,17 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{IDC_TERMKOUTTEXT, "DLG_TERM_KOUT"},
 	};
 	CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
-	TTTSet *ts = DlgData == NULL ? NULL : DlgData->pts;
-	WORD w;
-	int i;
 
 	switch (msg) {
 		case WM_INITDIALOG: {
 			DlgData = (CodingPPData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
-			ts = DlgData->pts;
+			const TTTSet *ts = DlgData->pts;
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)DlgData);
 			SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), DlgData->pts->UILanguageFile);
 
 			int recv_index = 0;
 			int send_index = 0;
-			for (i = 0; i < _countof(KanjiList); i++) {
+			for (int i = 0; i < _countof(KanjiList); i++) {
 				int id = KanjiList[i].lang * 100 + KanjiList[i].coding;
 				int index =
 					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)KanjiList[i].CodeName);
@@ -158,6 +156,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
+					TTTSet *ts = DlgData->pts;
+
 					ts->JIS7KatakanaSend = 0;
 					ts->JIS7Katakana = 0;
 					ts->KanjiIn = 0;
@@ -180,10 +180,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						if (coding == IdJIS) {
 							ts->JIS7Katakana = (IsDlgButtonChecked(hWnd, IDC_TERMKANA) == BST_CHECKED);
 							ts->JIS7KatakanaSend = (IsDlgButtonChecked(hWnd, IDC_TERMKANASEND) == BST_CHECKED);
-							if ((w = (WORD)GetCurSel(hWnd, IDC_TERMKIN)) > 0) {
+							WORD w = (WORD)GetCurSel(hWnd, IDC_TERMKIN);
+							if (w > 0) {
 								ts->KanjiIn = w;
 							}
-							if ((w = (WORD)GetCurSel(hWnd, IDC_TERMKOUT)) > 0) {
+							w = (WORD)GetCurSel(hWnd, IDC_TERMKOUT);
+							if (w > 0) {
 								ts->KanjiOut = w;
 							}
 						}
@@ -252,7 +254,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 					int id = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
 					if (id == IdJapanese * 100 + IdJIS) {
-					//if (id % 100 == IdJIS) {
 						EnableDlgItem(hWnd, IDC_TERMKANASEND, IDC_TERMKOUT);
 					}
 					else {
@@ -270,6 +271,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 		}
 		case WM_DESTROY: {
+			free(DlgData->dlg_templ);
 			free(DlgData);
 			SetWindowLongPtr(hWnd, DWLP_USER, NULL);
 			break;
@@ -285,7 +287,7 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	// 注 common/tt_res.h と coding_pp_res.h で値を一致させること
 	int id = IDD_TABSHEET_CODING;
 
-	CodingPPData *Param = (CodingPPData *)malloc(sizeof(CodingPPData));
+	CodingPPData *Param = (CodingPPData *)calloc(sizeof(CodingPPData), 1);
 	Param->UILanguageFile = pts->UILanguageFile;
 	Param->pts = pts;
 
@@ -296,19 +298,15 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	psp.pResource = Param->dlg_templ;
 #endif
-#if defined(_MSC_VER)
-	psp.pszTitle = _wcsdup(L"コーディング");		// TODO lng ファイルに入れる
-#else
-	psp.pszTitle = _wcsdup(L"coding");
-#endif
+	psp.pszTitle = L"coding";		// TODO lng ファイルに入れる
 	psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 
 	psp.pfnDlgProc = Proc;
 	psp.lParam = (LPARAM)Param;
 
 	HPROPSHEETPAGE hpsp = _CreatePropertySheetPageW(&psp);
-	free((void *)psp.pszTitle);
 	return hpsp;
 }
