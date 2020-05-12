@@ -26,23 +26,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct
-{
-	BOOL CodePopupEnable;
-	WORD CodePopupKey1;
-	WORD CodePopupKey2;
-	BOOL UseUnicodeApi;
-	int CodePageForANSIDraw;
-} UnicodeDebugParam_t;
-
-extern UnicodeDebugParam_t UnicodeDebugParam;
+HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts);
 
 #ifdef __cplusplus
 }
 #endif
+
+

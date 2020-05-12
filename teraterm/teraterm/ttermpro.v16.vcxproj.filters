@@ -138,6 +138,9 @@
     <ClCompile Include="coding_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="font_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -182,6 +185,9 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="coding_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="font_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -346,6 +352,12 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="coding_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="font_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="font_pp_res.h">
       <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>

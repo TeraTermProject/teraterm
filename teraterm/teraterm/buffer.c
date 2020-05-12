@@ -178,12 +178,21 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 			switch (lenA) {
 			case 0:
 			default:
+#if 1
+				if (half_width) {
+					p->ansi_char = '?';
+				}
+				else {
+					p->ansi_char = (('?' << 8) | '_');
+				}
+#else
 				if (ts.UnknownUnicodeCharaAsWide) {
 					p->ansi_char = (('?' << 8) | '?');
 				}
 				else {
 					p->ansi_char = '?';
 				}
+#endif
 				break;
 			case 1:
 				p->ansi_char = (unsigned char)strA[0];
@@ -5533,9 +5542,9 @@ void BuffSetDispAPI(BOOL unicode)
 	UseUnicodeApi = unicode;
 }
 
-void BuffSetDispCodePage(int CodePage)
+void BuffSetDispCodePage(int code_page)
 {
-	CodePage = CodePage;
+	CodePage = code_page;
 }
 
 int BuffGetDispCodePage(void)

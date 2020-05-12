@@ -57,6 +57,7 @@
 #include "codeconv.h"
 #include "layer_for_unicode.h"
 #include "coding_pp.h"
+#include "font_pp.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1776,7 +1777,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 
 	// TTCPropertyPage ‚ðŽg—p‚µ‚È‚¢ PropertyPage
 	hPsp[m_PageCountCPP+0] = CodingPageCreate(hInstance, &ts);
-	m_PageCount = m_PageCountCPP+ 1;
+	hPsp[m_PageCountCPP+1] = FontPageCreate(hInstance, &ts);
+	m_PageCount = m_PageCountCPP + 2;
 
 	m_psh.nPages = m_PageCount;
 	m_psh.phpage = hPsp;

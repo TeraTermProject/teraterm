@@ -84,9 +84,6 @@ void CDebugPropPage::OnInitDialog()
 		}
 	}
 	SetDlgItemTextA(IDC_DEBUG_CONSOLE_BUTTON, caption);
-
-	// use unicode API
-	SetCheck(IDC_DEBUG_USE_UNICODE_API, UnicodeDebugParam.UseUnicodeApi);
 }
 
 BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM)
@@ -131,6 +128,4 @@ void CDebugPropPage::OnOK()
 	UnicodeDebugParam.CodePopupKey1 = key_list[i].key_code;
 	i = GetCurSel(IDC_DEBUG_POPUP_KEY2);
 	UnicodeDebugParam.CodePopupKey2 = key_list[i].key_code;
-
-	UnicodeDebugParam.UseUnicodeApi = GetCheck(IDC_DEBUG_USE_UNICODE_API);
 }

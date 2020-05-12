@@ -28,6 +28,7 @@
 #define IDD_TABSHEET_DEBUG              126
 #define IDD_SENDFILEDLG                 127
 #define IDD_TABSHEET_CODING             128
+#define IDD_TABSHEET_FONT               129
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -257,7 +258,6 @@
 #define IDC_SENDFILE_SEND_SIZE_LABEL    2603
 #define IDC_SENDFILE_DELAYTIME_LABEL    2604
 #define IDC_SENDFILE_DELAYTIME_EDIT     2605
-#define IDC_DEBUG_USE_UNICODE_API       2606
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -358,7 +358,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2607
+#define _APS_NEXT_CONTROL_VALUE         2606
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -147,7 +147,7 @@ private:
 	HINSTANCE m_hInst;
 
 	int m_PageCount;
-	HPROPSHEETPAGE hPsp[8];
+	HPROPSHEETPAGE hPsp[9];
 
 	int m_PageCountCPP;
 	TTCPropertyPage *m_Page[7];

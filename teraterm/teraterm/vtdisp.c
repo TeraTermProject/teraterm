@@ -44,6 +44,7 @@
 #include <olectl.h>
 
 #include "unicode_test.h"
+#include "setting.h"
 
 #define CurWidth 2
 
@@ -3498,7 +3499,7 @@ void DispSetupFontDlg()
   ts.VTFontSize.y = VTlf.lfHeight;
   ts.VTFontCharSet = VTlf.lfCharSet;
 
-  ts.CodePage = GetCodePageFromFontCharSet(VTlf.lfCharSet);
+  UnicodeDebugParam.CodePageForANSIDraw = GetCodePageFromFontCharSet(VTlf.lfCharSet);
 
   ChangeFont();
 

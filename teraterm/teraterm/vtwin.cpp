@@ -126,9 +126,7 @@ static int AutoDisconnectedPort = -1;
 #define WM_IME_COMPOSITION              0x010F
 #endif
 
-#if UNICODE_INTERNAL_BUFF
-CUnicodeDebugParam UnicodeDebugParam;
-#endif
+UnicodeDebugParam_t UnicodeDebugParam;
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -645,10 +643,23 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	TipWinCodeDebug = NULL;
 #endif
 
+	// UnicodeDebugParam
+	{
+#if _DEBUG
+		UnicodeDebugParam.CodePopupEnable = TRUE;
+#else
+		UnicodeDebugParam.CodePopupEnable = FALSE;
+#endif
+		UnicodeDebugParam.CodePopupKey1 = VK_CONTROL;
+		UnicodeDebugParam.CodePopupKey2 = VK_CONTROL;
+		UnicodeDebugParam.UseUnicodeApi = FALSE;
+        UnicodeDebugParam.CodePageForANSIDraw = 932;
+	}
+
 	/* Initialize scroll buffer */
 	UnicodeDebugParam.UseUnicodeApi = IsWindowsNTKernel() ? TRUE : FALSE;
 	InitBuffer(UnicodeDebugParam.UseUnicodeApi);
-	BuffSetDispCodePage(932);
+	BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 
 	InitDisp();
 
@@ -4635,7 +4646,8 @@ void CVTWindow::OnSetupFont()
 {
 	HelpId = HlpSetupFont;
 	DispSetupFontDlg();
-	BuffSetDispCodePage(ts.CodePage);	// ANSI表示用のコードページを設定する
+	// ANSI表示用のコードページを設定する
+	BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 }
 
 static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)

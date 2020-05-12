@@ -25,6 +25,10 @@ add_executable(
   dnddlg.h
   filesys.cpp
   filesys.h
+  font_pp.cpp
+  font_pp.h
+  font_pp.rc
+  font_pp_res.h
   ftdlg.cpp
   ftdlg.h
   keyboard.c

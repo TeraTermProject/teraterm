@@ -1,0 +1,127 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "font_pp_res.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "font_pp_res.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TABSHEET_FONT DIALOGEX 0, 0, 309, 267
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_SYSMENU
+CAPTION "表示/フォント"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_VTFONT_EDIT,19,27,148,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "変更",IDC_VTFONT_CHOOSE,177,27,50,14
+    CONTROL         "ANSI API",IDC_VTFONT_ANSI,"Button",BS_AUTORADIOBUTTON,31,66,45,10
+    CONTROL         "Unicode API",IDC_VTFONT_UNICODE,"Button",BS_AUTORADIOBUTTON,31,110,55,10
+    EDITTEXT        IDC_VTFONT_PAGECODE_EDIT,44,92,40,12,ES_AUTOHSCROLL
+    LTEXT           "表示用文字変換コードページ",IDC_VTFONT_PAGECODE_LABEL,43,81,95,8
+    LTEXT           "フォント品質",IDC_STATIC,19,129,39,8
+    CONTROL         "OSで非表示のフォントもフォントダイアログの一覧に表示する",IDC_LIST_HIDDEN_FONTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,194,200,10
+    COMBOBOX        IDC_FONT_QUALITY,30,141,87,69,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "文字描画で使用するAPI",IDC_STATIC,19,50,80,8
+    CONTROL         "プロポーショナルフォントもフォントダイアログの一覧に表示する",IDC_LIST_PRO_FONTS,
+                    "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,209,203,10
+    LTEXT           "ターミナルフォント",IDC_STATIC,7,7,115,8
+    LTEXT           "ダイアログフォント",IDC_STATIC,7,162,115,8
+    EDITTEXT        IDC_DLGFONT_EDIT,19,175,148,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "変更",IDC_DLGFONT_CHOOSE,177,175,50,14
+    PUSHBUTTON      "デフォルト",IDC_DLGFONT_DEFAULT,231,175,50,14
+    LTEXT           "文字間スペース",IDC_STATIC,187,51,115,8,WS_DISABLED
+    EDITTEXT        IDC_SPACE_TOP,224,68,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_SPACE_BOTTOM,224,87,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_SPACE_LEFT,224,105,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_SPACE_RIGHT,224,123,40,14,ES_AUTOHSCROLL | WS_DISABLED
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TABSHEET_FONT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 260
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_TABSHEET_FONT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
