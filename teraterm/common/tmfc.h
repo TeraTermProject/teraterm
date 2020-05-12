@@ -162,6 +162,5 @@ protected:
 	PROPSHEETPAGEW_V1 m_psp;
 private:
 	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
-	static UINT CALLBACK PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp);
 };
 

@@ -94,11 +94,6 @@ void TTCPropertyPage::OnHelp()
 {
 }
 
-UINT CALLBACK TTCPropertyPage::PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp)
-{
-	return 0;
-}
-
 INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	TTCPropertyPage *self = (TTCPropertyPage *)::GetWindowLongPtr(hDlgWnd, DWLP_USER);
