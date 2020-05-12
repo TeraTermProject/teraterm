@@ -58,6 +58,7 @@
 #include <ws2tcpip.h>
 #include "ttplug.h"  /* TTPLUG */
 #include "teraterml.h"
+#include "buffer.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -647,6 +648,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/* Initialize scroll buffer */
 	UnicodeDebugParam.UseUnicodeApi = IsWindowsNTKernel() ? TRUE : FALSE;
 	InitBuffer(UnicodeDebugParam.UseUnicodeApi);
+	BuffSetDispCodePage(932);
 
 	InitDisp();
 
@@ -4633,6 +4635,7 @@ void CVTWindow::OnSetupFont()
 {
 	HelpId = HlpSetupFont;
 	DispSetupFontDlg();
+	BuffSetDispCodePage(ts.CodePage);	// ANSI表示用のコードページを設定する
 }
 
 static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)

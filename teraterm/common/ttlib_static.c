@@ -36,7 +36,6 @@
 #include <stdio.h>
 #include <shlobj.h>
 #include <ctype.h>
-#include <mbctype.h>	// for _ismbblead
 #include <assert.h>
 
 #include "teraterm_conf.h"

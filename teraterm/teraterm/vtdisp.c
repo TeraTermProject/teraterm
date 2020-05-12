@@ -3454,6 +3454,31 @@ void DispVScroll(int Func, int Pos)
 
 //-------------- end of scrolling functions --------
 
+/**
+ *	フォントのCharSet(LOGFONT.charlfCharSet)から
+ *	表示に妥当なCodePageを得る
+ */
+static int GetCodePageFromFontCharSet(BYTE char_set)
+{
+	static const struct {
+		BYTE CharSet;	// LOGFONT.lfCharSet
+		int CodePage;
+	} table[] = {
+		{ SHIFTJIS_CHARSET,  	932 },
+		{ HANGUL_CHARSET,		51949 },
+		{ GB2312_CHARSET,	 	936 },
+		{ CHINESEBIG5_CHARSET,	950 },
+		{ RUSSIAN_CHARSET,		1251 },
+	};
+	int i;
+	for (i = 0; i < _countof(table); i++) {
+		if (table[i].CharSet == char_set) {
+			return table[i].CodePage;
+		}
+	}
+	return CP_ACP;
+}
+
 void DispSetupFontDlg()
 //  Popup the Setup Font dialogbox and
 //  reset window
@@ -3472,6 +3497,8 @@ void DispSetupFontDlg()
   ts.VTFontSize.x = VTlf.lfWidth;
   ts.VTFontSize.y = VTlf.lfHeight;
   ts.VTFontCharSet = VTlf.lfCharSet;
+
+  ts.CodePage = GetCodePageFromFontCharSet(VTlf.lfCharSet);
 
   ChangeFont();
 

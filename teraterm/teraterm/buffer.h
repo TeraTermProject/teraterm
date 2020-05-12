@@ -155,6 +155,8 @@ void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr);
 TCharAttr BuffGetCursorCharAttr(int x, int y);
 BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32);
 void BuffSetDispAPI(BOOL unicode);
+void BuffSetDispCodePage(int CodePage);
+int BuffGetDispCodePage(void);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;

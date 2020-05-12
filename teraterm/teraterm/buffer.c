@@ -117,6 +117,9 @@ static char *SaveBuff = NULL;
 static int SaveBuffX;
 static int SaveBuffY;
 
+// ANSI•\Ž¦—p‚É•ÏŠ·‚·‚é‚Æ‚«‚ÌCodePage
+static int CodePage = 932;
+
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
 
 static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL half_width, char emoji)
@@ -163,12 +166,24 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 		p->ansi_char = (unsigned short)u32;
 	}
 	else {
-		char strA[4];
-		size_t lenA = UTF32ToMBCP(u32, CP_ACP, strA, sizeof(strA));
-		switch (lenA) {
+		if (u32 == 0x203e && CodePage == 932) {
+			// U+203e OVERLINE “Á•Êˆ—
+			//	 U+203e‚Í0x7e'~'‚É•ÏŠ·
+			//p->ansi_char = 0x7e7e;
+			p->ansi_char = 0x7e;
+		}
+		else {
+			char strA[4];
+			size_t lenA = UTF32ToMBCP(u32, CodePage, strA, sizeof(strA));
+			switch (lenA) {
 			case 0:
 			default:
-				p->ansi_char = 0;
+				if (ts.UnknownUnicodeCharaAsWide) {
+					p->ansi_char = (('?' << 8) | '?');
+				}
+				else {
+					p->ansi_char = '?';
+				}
 				break;
 			case 1:
 				p->ansi_char = (unsigned char)strA[0];
@@ -176,6 +191,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 			case 2:
 				p->ansi_char = (unsigned char)strA[1] | ((unsigned char)strA[0] << 8);
 				break;
+			}
 		}
 	}
 }
@@ -2212,6 +2228,7 @@ static BOOL BuffIsHalfWidthFromPropery(char width_property)
 static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
 {
 	*width_property = UnicodeGetWidthProperty(u32);
+#if 1
 	*emoji = (char)UnicodeIsEmoji(u32);
 	if (*emoji) {
 		//if (ts_->Language == IdJapanese) {
@@ -2225,6 +2242,7 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 			return TRUE;
 		}
 	}
+#endif
 	return BuffIsHalfWidthFromPropery(*width_property);
 }
 
@@ -2715,7 +2733,7 @@ static unsigned short ConvertACPChar(const buff_char_t *b)
 			strW[1] = 0;
 		}
 	}
-	strA = _WideCharToMultiByte(strW, lenW, CP_ACP, &lenA);
+	strA = _WideCharToMultiByte(strW, lenW, CodePage, &lenA);
 	chA = *(unsigned char *)strA;
 	if (!IsDBCSLeadByte((BYTE)chA)) {
 		// 1byte•¶Žš
@@ -5513,4 +5531,14 @@ TCharAttr BuffGetCursorCharAttr(int x, int y)
 void BuffSetDispAPI(BOOL unicode)
 {
 	UseUnicodeApi = unicode;
+}
+
+void BuffSetDispCodePage(int CodePage)
+{
+	CodePage = CodePage;
+}
+
+int BuffGetDispCodePage(void)
+{
+	return CodePage;
 }
