@@ -292,7 +292,12 @@ void OutputDebugPrintfW(const wchar_t *fmt, ...)
 static int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
 	if(uMsg == BFFM_INITIALIZED) {
-		SendMessage(hwnd, BFFM_SETSELECTION, (WPARAM)TRUE, lpData);
+		if (pSHBrowseForFolderW == NULL) {
+			SendMessageA(hwnd, BFFM_SETSELECTIONA, (WPARAM)TRUE, lpData);
+		}
+		else {
+			SendMessageW(hwnd, BFFM_SETSELECTIONW, (WPARAM)TRUE, lpData);
+		}
 	}
 	return 0;
 }
