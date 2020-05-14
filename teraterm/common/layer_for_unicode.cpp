@@ -33,6 +33,12 @@
  */
 
 #include <windows.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <assert.h>
 
 #include "codeconv.h"
 #include "compat_win.h"
@@ -693,38 +699,103 @@ BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 
 BOOL _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists)
 {
-	return CopyFileW(lpExistingFileName, lpNewFileName, bFailIfExists);
+	if (pCopyFileW != NULL) {
+		return pCopyFileW(lpExistingFileName, lpNewFileName, bFailIfExists);
+	}
+	char *lpExistingFileNameA = ToCharW(lpExistingFileName);
+	char *lpNewFileNameA = ToCharW(lpNewFileName);
+	BOOL r = CopyFileA(lpExistingFileNameA, lpNewFileNameA, bFailIfExists);
+	free(lpExistingFileNameA);
+	free(lpNewFileNameA);
+	return r;
 }
 
 BOOL _DeleteFileW(LPCWSTR lpFileName)
 {
-	return DeleteFileW(lpFileName);
+	if (pDeleteFileW != NULL) {
+		return pDeleteFileW(lpFileName);
+	}
+	char *lpFileNameA = ToCharW(lpFileName);
+	BOOL r = DeleteFileA(lpFileNameA);
+	free(lpFileNameA);
+	return r;
 }
 
 BOOL _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName)
 {
-	return MoveFileW(lpExistingFileName, lpNewFileName);
+	if (pMoveFileW != NULL) {
+		return pMoveFileW(lpExistingFileName, lpNewFileName);
+	}
+	char *lpExistingFileNameA = ToCharW(lpExistingFileName);
+	char *lpNewFileNameA = ToCharW(lpNewFileName);
+	BOOL r = MoveFileA(lpExistingFileNameA, lpNewFileNameA);
+	free(lpExistingFileNameA);
+	free(lpNewFileNameA);
+	return r;
 }
 
 HANDLE _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 					LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
 					HANDLE hTemplateFile)
 {
-	return CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
-					   dwFlagsAndAttributes, hTemplateFile);
+	if (pCreateFileW != NULL) {
+		return pCreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+							dwFlagsAndAttributes, hTemplateFile);
+	}
+
+	char *lpFileNameA = ToCharW(lpFileName);
+	HANDLE handle = CreateFileA(lpFileNameA, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+								dwFlagsAndAttributes, hTemplateFile);
+	free(lpFileNameA);
+	return handle;
+}
+
+static void FindDataAW(const WIN32_FIND_DATAA *a, WIN32_FIND_DATAW *w)
+{
+	w->dwFileAttributes = a->dwFileAttributes;
+	w->ftCreationTime = a->ftCreationTime;
+	w->ftLastAccessTime = a->ftLastAccessTime;
+	w->ftLastWriteTime = a->ftLastWriteTime;
+	w->nFileSizeHigh = a->nFileSizeHigh;
+	w->nFileSizeLow = a->nFileSizeLow;
+	w->dwReserved0 = a->dwReserved0;
+	w->dwReserved1 = a->dwReserved1;
+	::MultiByteToWideChar(CP_ACP, 0, a->cFileName, _countof(a->cFileName), w->cFileName, _countof(w->cFileName));
+	::MultiByteToWideChar(CP_ACP, 0, a->cAlternateFileName, _countof(a->cAlternateFileName), w->cAlternateFileName, _countof(w->cAlternateFileName));
 }
 
 HANDLE _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData)
 {
-	return FindFirstFileW(lpFileName, lpFindFileData);
+	if (pFindFirstFileW != NULL) {
+		return pFindFirstFileW(lpFileName, lpFindFileData);
+	}
+
+	WIN32_FIND_DATAA find_file_data;
+	char *lpFileNameA = ToCharW(lpFileName);
+	HANDLE handle = FindFirstFileA(lpFileNameA, &find_file_data);
+	free(lpFileNameA);
+	FindDataAW(&find_file_data, lpFindFileData);
+	return handle;
 }
 
 BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData)
 {
-	return FindNextFileW(hFindFile, lpFindFileData);
+	if (pFindNextFileW != NULL) {
+		return pFindNextFileW(hFindFile, lpFindFileData);
+	}
+	WIN32_FIND_DATAA find_file_data;
+	BOOL r = FindNextFileA(hFindFile, &find_file_data);
+	FindDataAW(&find_file_data, lpFindFileData);
+	return r;
 }
 
 BOOL _RemoveDirectoryW(LPCWSTR lpPathName)
 {
-	return RemoveDirectoryW(lpPathName);
+	if (pRemoveDirectoryW != NULL) {
+		return pRemoveDirectoryW(lpPathName);
+	}
+	char *lpPathNameA = ToCharW(lpPathName);
+	BOOL r = RemoveDirectoryA(lpPathNameA);
+	free(lpPathNameA);
+	return r;
 }

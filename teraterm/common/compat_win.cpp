@@ -73,7 +73,7 @@ BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 // user32
 int (WINAPI *pGetSystemMetricsForDpi)(int nIndex, UINT dpi);
 
-// kernel32.dll
+// kernel32
 DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 HWND (WINAPI *pGetConsoleWindow)(void);
@@ -85,6 +85,15 @@ BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 							   LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
 							   DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
 							   LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
+BOOL (WINAPI *pCopyFileW)(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists);
+BOOL (WINAPI *pDeleteFileW)(LPCWSTR lpFileName);
+BOOL (WINAPI *pMoveFileW)(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName);
+HANDLE (WINAPI *pCreateFileW)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+							  LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
+							  DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+HANDLE (WINAPI *pFindFirstFileW)(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
+BOOL (WINAPI *pFindNextFileW)(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
+BOOL(WINAPI *pRemoveDirectoryW)(LPCWSTR lpPathName);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -229,6 +238,13 @@ static const APIInfo Lists_kernel32[] = {
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
 	{ "WritePrivateProfileStringW", (void **)&pWritePrivateProfileStringW },
 	{ "CreateProcessW", (void **)&pCreateProcessW },
+	{ "CopyFileW", (void **)&pCopyFileW },
+	{ "DeleteFileW", (void **)&pDeleteFileW },
+	{ "MoveFileW", (void **)&pMoveFileW },
+	{ "CreateFileW", (void **)&pCreateFileW },
+	{ "FindFirstFileW", (void **)&pFindFirstFileW },
+	{ "FindNextFileW", (void **)&pFindNextFileW },
+	{ "RemoveDirectoryW", (void **)&pRemoveDirectoryW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
@@ -317,6 +333,13 @@ void WinCompatInit()
 		pSHBrowseForFolderW = NULL;
 		pSHGetPathFromIDListW = NULL;
 		pCreateProcessW = NULL;
+		pCopyFileW = NULL;
+		pDeleteFileW = NULL;
+		pMoveFileW = NULL;
+		pCreateFileW = NULL;
+		pFindFirstFileW = NULL;
+		pFindNextFileW = NULL;
+		pRemoveDirectoryW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù
