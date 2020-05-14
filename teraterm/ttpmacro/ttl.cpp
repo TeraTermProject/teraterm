@@ -253,11 +253,13 @@ void EndTTL()
 
 	CloseStatDlg();
 
-	for (i=0; i<NumDirHandle; i++)
-	{
-		if (DirHandle[i] != INVALID_HANDLE_VALUE)
-			FindClose(DirHandle[i]);
-		DirHandle[i] = INVALID_HANDLE_VALUE;
+	if (DirHandle[0] != 0) {	// InitTTL() ‚³‚ê‚¸‚É EndTTL() Žž‘Îô
+		for (i=0; i<NumDirHandle; i++)
+		{
+			if (DirHandle[i] != INVALID_HANDLE_VALUE)
+				FindClose(DirHandle[i]);
+			DirHandle[i] = INVALID_HANDLE_VALUE;
+		}
 	}
 
 	UnlockVar();
