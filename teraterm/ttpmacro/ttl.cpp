@@ -93,11 +93,6 @@ static HANDLE DirHandle[NumDirHandle];
 static HANDLE FHandle[NumFHandle];
 static long FPointer[NumFHandle];
 
-#undef	_lcreat
-#define _lcreat(p1,p2)		win16_lcreatW(p1,p2)
-#undef	_lopen
-#define	_lopen(p1,p2)		win16_lopenW(p1,p2)
-
 // forward declaration
 int ExecCmnd();
 
@@ -1183,10 +1178,7 @@ WORD TTLFileClose()
 WORD TTLFileConcat()
 {
 	WORD Err;
-	HANDLE FH1, FH2;
-	int c;
 	TStrVal FName1, FName2;
-	BYTE buf[1024];
 
 	Err = 0;
 	GetStrVal(FName1,&Err);
@@ -1215,29 +1207,45 @@ WORD TTLFileConcat()
 	}
 
 	wc FName1W = wc::fromUtf8(FName1);
-	FH1 = _lopen(FName1W,OF_WRITE);
-	if (FH1 == INVALID_HANDLE_VALUE)
-		FH1 = _lcreat(FName1W,0);
+	HANDLE FH1 = _CreateFileW(FName1W,
+							  GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+							  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH1 == INVALID_HANDLE_VALUE) {
 		SetResult(3);
 		return Err;
 	}
-	_llseek(FH1,0,2);
+	SetFilePointer(FH1, 0, NULL, FILE_END);
 
+	int result = 0;
 	wc FName2W = wc::fromUtf8(FName2);
-	FH2 = _lopen(FName2W,OF_READ);
+	HANDLE FH2 = _CreateFileW(FName2W,
+							  GENERIC_READ, FILE_SHARE_READ, NULL,
+							  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH2 != INVALID_HANDLE_VALUE)
 	{
+		DWORD c;
+		BYTE buf[13];
 		do {
-			c = _lread(FH2,&(buf[0]),sizeof(buf));
-			if (c>0)
-				_lwrite(FH1,&(buf[0]),c);
+			BOOL Result = ReadFile(FH2, buf, sizeof(buf), &c, NULL);
+			if (Result == FALSE) {
+				// 0バイト読み込みのときは TRUE が返る
+				result = -4;
+				break;
+			}
+			if (c > 0) {
+				DWORD NumberOfBytesWritten;
+				Result = WriteFile(FH1, buf, c, &NumberOfBytesWritten, NULL);
+				if (Result == FALSE || c != NumberOfBytesWritten) {
+					result = -5;
+					break;
+				}
+			}
 		} while (c >= sizeof(buf));
-		_lclose(FH2);
+		CloseHandle(FH2);
 	}
-	_lclose(FH1);
+	CloseHandle(FH1);
 
-	SetResult(0);
+	SetResult(result);
 	return Err;
 }
 
@@ -1308,7 +1316,9 @@ WORD TTLFileCreate()
 		return Err;
 	}
 	wc FNameW = wc::fromUtf8(FName);
-	FH = _lcreat(FNameW,0);
+	FH = _CreateFileW(FNameW,
+					  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+					  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
 	}
@@ -1403,12 +1413,16 @@ WORD TTLFileOpen()
 
 	wc FNameW = wc::fromUtf8(FName);
 	if (ReadonlyFlag) {
-		FH = _lopen(FNameW,OF_READ);
+		FH = _CreateFileW(FNameW,
+						  GENERIC_READ, FILE_SHARE_READ, NULL,
+						  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	else {
-		FH = _lopen(FNameW,OF_READWRITE);
-		if (FH == INVALID_HANDLE_VALUE)
-			FH = _lcreat(FNameW,0);
+		// ファイルをオープンする、
+		// 存在しない場合は作成した後オープンする
+		FH = _CreateFileW(FNameW,
+						  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+						  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
@@ -1417,12 +1431,12 @@ WORD TTLFileOpen()
 	fhi = HandlePut(FH);
 	if (fhi == -1) {
 		SetIntVal(VarId, -1);
-		_lclose(FH);
+		CloseHandle(FH);
 		return Err;
 	}
 	SetIntVal(VarId, fhi);
 	if (Append!=0) {
-		_llseek(FH, 0, 2/*FILE_END*/);
+		SetFilePointer(FH, 0, NULL, FILE_END);
 	}
 	return 0;	// no error
 }
