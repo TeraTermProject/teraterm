@@ -247,7 +247,7 @@ static void CenterCommonDialog(HWND hDlg)
 }
 
 /* Hook function for file name dialog box */
-static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static UINT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD BinFlag, TsFlag;
@@ -438,7 +438,7 @@ static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	return FALSE;
 }
 
-static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
+static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
 
 BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
@@ -522,7 +522,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 
-		ofn.lpfnHook = (LPOFNHOOKPROC)(&LogFnHook);
+		ofn.lpfnHook = LogFnHook;
 		optl = *Option;
 		ofn.lCustData = (LPARAM)&optl;
 		break;
@@ -585,7 +585,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	return Ok;
 }
 
-static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	LPWORD pw;
@@ -976,7 +976,7 @@ void WINAPI SetFileVar(PFileVar fv)
 }
 
 /* Hook function for XMODEM file name dialog box */
-static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD Hi, Lo;
@@ -1184,7 +1184,7 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 	ofn.Flags |= OFN_SHOWHELP;
 	ofn.lCustData = (LPARAM)&opt;
 	ofn.lpstrTitle = fv->DlgCaption;
-	ofn.lpfnHook = (LPOFNHOOKPROC)(&XFnHook);
+	ofn.lpfnHook = XFnHook;
 	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_XOPT);
 	ofn.hInstance = hInst;
 
