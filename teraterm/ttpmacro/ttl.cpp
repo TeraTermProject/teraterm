@@ -3987,10 +3987,18 @@ WORD TTLSetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
+	if (!GetAbsPath(Filename,sizeof(Filename))) {
+		// é∏îs
+		SetResult(0);
+		return Err;
+	}
+
 	if (SetFileAttributesW(wc::fromUtf8(Filename), attributes) == 0) {
+		// é∏îs
 		SetResult(0);
 	}
 	else {
+		// ê¨å˜
 		SetResult(1);
 	}
 
