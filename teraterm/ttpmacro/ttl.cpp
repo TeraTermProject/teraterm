@@ -1353,7 +1353,7 @@ WORD TTLFileDelete()
 		return Err;
 	}
 
-	if (_DeleteFileW(wc::fromUtf8(FName)) != 0) {
+	if (_DeleteFileW(wc::fromUtf8(FName)) == 0) {
 		SetResult(-1);
 	}
 	else {
