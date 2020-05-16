@@ -1643,7 +1643,7 @@ WORD TTLFileRename()
 		SetResult(-2);
 		return Err;
 	}
-	if (_MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) != 0) {
+	if (_MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) == 0) {
 		// リネームに失敗したら、エラーで返す。
 		SetResult(-3);
 		return Err;
