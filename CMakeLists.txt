@@ -132,9 +132,13 @@ elseif(NOT $ENV{USERNAME})
 else()
   set(USER "NONAME")
 endif()
- 
+
 if(NOT DEFINED SNAPSHOT_DIR)
-  string(TIMESTAMP SNAPSHOT_DIR "snapshot-r${SVNVERSION}-%Y%m%d_%H%M%S-${USER}")
+  if(DEFINED SVNVERSION)
+    string(TIMESTAMP SNAPSHOT_DIR "snapshot-r${SVNVERSION}-%Y%m%d_%H%M%S-${USER}")
+  else()
+    string(TIMESTAMP SNAPSHOT_DIR "snapshot-unknown-%Y%m%d_%H%M%S-${USER}")
+  endif()
 endif()
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
 
