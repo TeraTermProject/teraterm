@@ -35,9 +35,7 @@
 #include <windows.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
-#include <mbstring.h>
 #include <assert.h>
-#include <errno.h>
 
 #include "tttypes.h"
 #include "ttwinman.h"
@@ -723,7 +721,7 @@ static void EraseKanji(int LR)
 	}
 }
 
-void EraseKanjiOnLRMargin(LONG ptr, int count)
+static void EraseKanjiOnLRMargin(LONG ptr, int count)
 {
 	int i;
 	LONG pos;
@@ -1484,6 +1482,7 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 	BuffUpdateRect(0, YStart, NumOfColumns-1, YEnd);
 }
 
+// TODO rename
 static int LeftHalfOfDBCS(LONG Line, int CharPtr)
 // If CharPtr is on the right half of a DBCS character,
 // return pointer to the left half
@@ -2377,10 +2376,12 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	// 行末を探す
 	ex = NumOfColumns - 1;
 	ey = cur_y;
-	TmpPtr = GetLinePtr(PageStart + ey);
-	while ((CodeBuffW[TmpPtr + NumOfColumns - 1].attr & AttrLineContinued) != 0) {
-		ey++;
-		TmpPtr = NextLinePtr(TmpPtr);
+	if (cur_y < NumOfLines - 1) {
+		TmpPtr = GetLinePtr(PageStart + ey);
+		while ((CodeBuffW[TmpPtr + NumOfColumns - 1].attr & AttrLineContinued) != 0) {
+			ey++;
+			TmpPtr = NextLinePtr(TmpPtr);
+		}
 	}
 	b = &CodeBuffW[TmpPtr + ex];
 	for (;;) {
@@ -2438,6 +2439,9 @@ static void mark_url_line_w(int cur_x, int cur_y)
 
 		// 次のセルへ
 		if (sx_i == NumOfColumns - 1) {
+			if (sy_i == NumOfLines - 1) {
+				break;
+			}
 			sx_i = 0;
 			sy_i++;
 		}
@@ -2465,7 +2469,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 }
 
 /**
- *	カーソル位置からURL強調を行う
+ *	(cur_x, cur_y)位置からURL強調を行う
  */
 static void mark_url_w(int cur_x, int cur_y)
 {
@@ -2546,11 +2550,12 @@ static void mark_url_w(int cur_x, int cur_y)
 	}
 
 	// '/' が入力されたら調べ始める
-	if (u32 == '/') {
-		if (!MatchString(x - 2, PageStart + CursorY, L"://", TRUE)) {
-			// "://" の一部ではない
-			return;
-		}
+	if (u32 != '/') {
+		return;
+	}
+	if (!MatchString(x - 2, PageStart + CursorY, L"://", TRUE)) {
+		// "://" の一部ではない
+		return;
 	}
 
 	// 本格的に探す
@@ -2595,7 +2600,7 @@ static void mark_url_w(int cur_x, int cur_y)
 		int xx = sx;
 		size_t left = len + 1;
 		while (left > 0) {
-			CodeLineW[TmpPtr + xx].attr |= AttrURL;
+			CodeBuffW[TmpPtr + xx].attr |= AttrURL;
 			xx++;
 			if (xx == NumOfColumns) {
 				int draw_x = sx;
