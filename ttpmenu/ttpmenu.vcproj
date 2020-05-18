@@ -69,9 +69,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib user32.lib gdi32.lib comdlg32.lib Advapi32.lib Shell32.lib Ole32.lib"
+				AdditionalDependencies="common_static.lib odbc32.lib odbccp32.lib comctl32.lib version.lib user32.lib gdi32.lib comdlg32.lib Advapi32.lib Shell32.lib Ole32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -158,9 +159,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib user32.lib gdi32.lib comdlg32.lib Advapi32.lib Shell32.lib Ole32.lib"
+				AdditionalDependencies="common_static.lib odbc32.lib odbccp32.lib comctl32.lib version.lib user32.lib gdi32.lib comdlg32.lib Advapi32.lib Shell32.lib Ole32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="$(SolutionDir)..\teraterm\$(ConfigurationName)"
 				DelayLoadDLLs="user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -196,11 +198,15 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\teraterm\common\codeconv.cpp"
+			RelativePath="..\teraterm\common\codeconv.h"
 			>
 		</File>
 		<File
-			RelativePath="..\teraterm\common\codeconv.h"
+			RelativePath="..\teraterm\common\compat_win.h"
+			>
+		</File>
+		<File
+			RelativePath="..\teraterm\common\dllutil.h"
 			>
 		</File>
 		<File
@@ -300,22 +306,6 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\teraterm\common\compat_win.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\teraterm\common\compat_win.h"
-			>
-		</File>
-		<File
-			RelativePath="..\teraterm\common\dllutil.h"
-			>
-		</File>
-		<File
-			RelativePath="..\teraterm\common\dllutil.cpp"
-			>
 		</File>
 	</Files>
 	<Globals>

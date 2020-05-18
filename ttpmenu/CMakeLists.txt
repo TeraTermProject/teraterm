@@ -8,11 +8,8 @@ set(COMMON_SRC
   ../teraterm/common/i18n.h
   ../teraterm/common/i18n.c
   ../teraterm/common/codeconv.h
-  ../teraterm/common/codeconv.cpp
   ../teraterm/common/compat_win.h
-  ../teraterm/common/compat_win.cpp
   ../teraterm/common/dllutil.h
-  ../teraterm/common/dllutil.cpp
   )
 
 source_group(
@@ -48,6 +45,8 @@ add_executable(
 
 target_link_libraries(
   ttpmenu
+  PRIVATE
+  common_static
   version
   comctl32
   user32
