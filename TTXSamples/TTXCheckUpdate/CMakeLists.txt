@@ -58,6 +58,11 @@ target_link_libraries(
   wininet.lib
   )
 
+add_dependencies(
+  TTXCheckUpdate
+  svnversion_h
+  )
+
 install(
   TARGETS TTXCheckUpdate
   RUNTIME
