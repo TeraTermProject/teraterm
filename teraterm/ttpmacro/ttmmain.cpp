@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -352,17 +352,17 @@ BOOL CCtrlWindow::OnCancel()
 
 BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	char uimsg[MAX_UIMSG];
+	wchar_t uimsg[MAX_UIMSG];
 
 	switch (LOWORD(wParam)) {
 	case IDC_CTRLPAUSESTART:
 		if (Pause) {
-			get_lang_msg("BTN_PAUSE", uimsg, sizeof(uimsg),  "Pau&se", UILanguageFile);
-			SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
+			get_lang_msgW("BTN_PAUSE", uimsg, _countof(uimsg),  L"Pau&se", UILanguageFile);
+			SetDlgItemTextW(IDC_CTRLPAUSESTART, uimsg);
 		}
 		else {
-			get_lang_msg("BTN_START", uimsg, sizeof(uimsg),  "&Start", UILanguageFile);
-			SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
+			get_lang_msgW("BTN_START", uimsg, _countof(uimsg),  L"&Start", UILanguageFile);
+			SetDlgItemTextW(IDC_CTRLPAUSESTART, uimsg);
 		}
 		Pause = ! Pause;
 		return TRUE;
