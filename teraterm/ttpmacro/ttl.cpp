@@ -3657,13 +3657,7 @@ WORD TTLSend()
 		if (GetString(Str,&Err))
 		{
 			if (Err!=0) return Err;
-#if 0
 			DDEOut(Str);
-#else
-			const char *StrA = ToCharU8(Str);
-			DDEOut((PCHAR)StrA);
-			free((void *)StrA);
-#endif
 		}
 		else if (GetExpression(&ValType,&Val,&Err))
 		{

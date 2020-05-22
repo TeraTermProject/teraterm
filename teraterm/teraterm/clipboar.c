@@ -309,16 +309,10 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
  *
  *	@param	str_w	文字列へのポインタ
  *					malloc()されたバッファ、送信完了時に自動でfree()される
- *	@param	str_len	文字長(wchar_t単位)
- *					0 の場合は L'\0' まで
  */
-static void CBSendStart(wchar_t *str_w, size_t str_len)
+static void CBSendStart(wchar_t *str_w)
 {
-	SendMem *sm;
-	if (str_len == 0) {
-		str_len = wcslen(str_w);
-	}
-	sm = SendMemTextW(str_w, str_len);
+	SendMem *sm = SendMemTextW(str_w, 0);
 	if (sm == NULL)
 		return;
 	if (ts.PasteDelayPerLine == 0) {
@@ -405,7 +399,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	CBSendStart(str_w, 0);
+	CBSendStart(str_w);
 }
 
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
@@ -474,7 +468,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	free(str_b64);
 
 	// 貼り付けの準備が正常に出来た
-	CBSendStart(str_w, 0);
+	CBSendStart(str_w);
 
 	return;
 

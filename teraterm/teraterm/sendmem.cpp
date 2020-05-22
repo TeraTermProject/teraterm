@@ -65,7 +65,7 @@ typedef struct SendMemTag {
 	size_t send_len;	   // 送信データサイズ
 	SendMemType type;
 	BOOL local_echo_enable;
-	BOOL send_enable;
+	BOOL send_host_enable;
 	DWORD delay_per_line;  // (ms)
 	DWORD delay_per_char;
 	DWORD delay_per_sendsize;
@@ -233,6 +233,40 @@ static void GetInBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 }
 
 /**
+ *	バッファの空きサイズを調べる
+ */
+static size_t GetBufferFreeSpece(sendmem_work_t *p)
+{
+	size_t buff_len = 0;
+
+	// 送信バッファの空きサイズ
+	if (p->send_host_enable) {
+		size_t out_buff_free;
+		GetOutBuffInfo(p->cv_, NULL, &out_buff_free);
+		buff_len = out_buff_free;
+	}
+
+	if (p->local_echo_enable) {
+		// 受信バッファの空きサイズ
+		size_t in_buff_free;
+		GetInBuffInfo(p->cv_, NULL, &in_buff_free);
+
+		if (p->send_host_enable) {
+			// 送信+ローカルエコーの場合
+			if (buff_len > in_buff_free) {
+				// バッファの小さい方に合わせる
+				buff_len = in_buff_free;
+			}
+		}
+		else {
+			// ローカルエコーだけの場合
+			buff_len = in_buff_free;
+		}
+	}
+	return buff_len;
+}
+
+/**
  * 送信
  */
 void SendMemContinuously(void)
@@ -272,21 +306,8 @@ void SendMemContinuously(void)
 		}
 	}
 
-	// 送信できるバッファサイズ
-	size_t buff_len;
-	{
-		size_t out_buff_free;
-		GetOutBuffInfo(p->cv_, NULL, &out_buff_free);
-		buff_len = out_buff_free;
-		if (p->local_echo_enable) {
-			// ローカルエコーが必要な場合は、入力バッファも考慮
-			size_t in_buff_free;
-			GetInBuffInfo(p->cv_, NULL, &in_buff_free);
-			if (buff_len > in_buff_free) {
-				buff_len = in_buff_free;
-			}
-		}
-	}
+	// 送信できるバッファサイズ(バッファの空きサイズ)
+	size_t buff_len = GetBufferFreeSpece(p);
 	if (buff_len == 0) {
 		// バッファに空きがない
 		return;
@@ -350,19 +371,21 @@ void SendMemContinuously(void)
 	const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
 	p->send_index += send_len;
 	p->send_left -= send_len;
-	size_t sended_len;
 	if (p->type == SendMemTypeBinary) {
-		sended_len = CommBinaryBuffOut(p->cv_, (PCHAR)send_ptr, (int)send_len);
+		if (p->send_host_enable) {
+			CommBinaryBuffOut(p->cv_, (PCHAR)send_ptr, (int)send_len);
+		}
 		if (p->local_echo_enable) {
 			CommTextEcho(p->cv_, (PCHAR)send_ptr, (int)send_len);
 		}
 	}
 	else {
-		sended_len = CommTextOutW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
+		if (p->send_host_enable) {
+			CommTextOutW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
+		}
 		if (p->local_echo_enable) {
 			CommTextEchoW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
 		}
-		sended_len *= sizeof(wchar_t);
 	}
 
 	// ダイアログ更新
@@ -382,12 +405,16 @@ void SendMemContinuously(void)
 }
 
 /*
- *	改行コードをLF(0x0a)だけにする
+ *	文字列の改行コードをCR(0x0d)だけにする
  *
- *	@param [in]	*src		文字列へのポインタ
- *	@param [in] *len		入力文字列長(0のとき内部で文字列長を測る)
- *	@param [out] *len		出力文字列長
+ *	@param [in]	*src		入力文字列へのポインタ
+ *	@param [in] *len		入力文字列長(0のとき内部で文字列長を測る,L'\0'も変換される)
+ *	@param [out] *len		出力文字列長(入力文字列の最後のL'\0'も含む)
  *	@return					変換後文字列(mallocされた領域)
+ *
+ *		入力文字列長の指定がある時
+ *			入力文字列の途中で L'\0' が見つかったら、そこで変換を終了する
+ *			見つからないときは入力文字数分変換(最後にL'\0'は付加されない)
  */
 static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 {
@@ -397,6 +424,7 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 	}
 	wchar_t *dest_top = (wchar_t *)malloc(sizeof(wchar_t) * src_len);
 	if (dest_top == NULL) {
+		*len = 0;
 		return NULL;
 	}
 
@@ -406,18 +434,28 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 	const wchar_t *p = src;
 	const wchar_t *p_end = src + src_len;
 	wchar_t *dest = dest_top;
-	while (p < p_end) {
+	while (p <= p_end) {
 		wchar_t c = *p++;
 		if (c == CR) {
 			if (*p == LF) {
-				// CR+LF -> LF
+				// CR+LF -> CR
 				p++;
-				*dest++ = LF;
+				*dest++ = CR;
 			} else {
-				// CR -> LF
-				*dest++ = LF;
+				// CR -> CR
+				*dest++ = CR;
 			}
-		} else {
+		}
+		else if (c == LF) {
+			// LF -> CR
+			*dest++ = CR;
+		}
+		else if (c == 0) {
+			// EOSを見つけたときは打ち切る
+			*dest++ = 0;
+			break;
+		}
+		else {
 			*dest++ = c;
 		}
 	}
@@ -445,6 +483,7 @@ static SendMem *SendMemInit_()
 
 	p->type = SendMemTypeBinary;
 	p->local_echo_enable = FALSE;
+	p->send_host_enable = TRUE;
 	p->delay_type = SENDMEM_DELAYTYPE_NO_DELAY;
 	p->send_size_max = 0;
 	p->delay_per_char = 0;  // (ms)
@@ -463,8 +502,9 @@ static SendMem *SendMemInit_()
  *
  *	@param	ptr		データへポインタ(malloc()された領域)
  *					送信後(中断後)、自動的にfree()される
- *	@param	len		文字列長(wchar_t単位)
- *					0 の場合は L'\0' まで
+ *	@param	len		文字数(wchar_t単位)
+ *					L'\0' は送信されない
+ *					0 の場合は L'\0' の前まで  (wcslen(str_w))
  */
 SendMem *SendMemTextW(wchar_t *str, size_t len)
 {
@@ -474,12 +514,30 @@ SendMem *SendMemTextW(wchar_t *str, size_t len)
 	}
 
 	if (len == 0) {
+		// L'\0' は送信しないので +1 は不要
 		len = wcslen(str);
 	}
 
 	// 改行コードを調整しておく
 	size_t new_len = len;
-	p->send_ptr = (BYTE *)NormalizeLineBreak((wchar_t *)str, &new_len);
+	wchar_t *new_str = NormalizeLineBreak((wchar_t *)str, &new_len);
+	if (new_str == NULL || new_len == 0) {
+		// 変換できなかった?(変換長さ0?)
+		if (new_str != NULL) {
+			free(new_str);
+		}
+		SendMemFinish(p);
+		return NULL;
+	}
+	if (new_str[new_len-1] == 0) {
+		// remove EOS
+		new_len--;
+		if (new_len == 0){
+			SendMemFinish(p);
+			return NULL;
+		}
+	}
+	p->send_ptr = (BYTE *)new_str;
 	p->send_len = new_len * sizeof(wchar_t);
 	free(str);
 	p->type = SendMemTypeTextLF;
@@ -507,9 +565,26 @@ SendMem *SendMemBinary(void *ptr, size_t len)
 	return p;
 }
 
+/**
+ *	ローカルエコー
+ *
+ *	@param	echo	FALSE	エコーしない(デフォルト)
+ *					TRUE	エコーする
+ */
 void SendMemInitEcho(SendMem *sm, BOOL echo)
 {
 	sm->local_echo_enable = echo;
+}
+
+/**
+ *	ホスト(接続先)へ送信する
+ *
+ *	@param	send_host	TRUE	送信する(デフォルト)
+ *						FALSE	送信しない
+ */
+void SendMemInitSend(SendMem *sm, BOOL send_host)
+{
+	sm->send_host_enable = send_host;
 }
 
 void SendMemInitDelay(SendMem *sm, SendMemDelayType type, DWORD delay_tick, size_t send_max)

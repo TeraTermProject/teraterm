@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2019 TeraTerm Project
+ * (C) 2004-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,15 +36,15 @@
 #include "ttwinman.h"
 #include "ttftypes.h"
 #include "filesys.h"
-#include "clipboar.h"
 #include "ttsetup.h"
 #include "telnet.h"
 #include "ttlib.h"
 #include "keyboard.h"
-
 #include "ttdde.h"
 #include "ttddecmnd.h"
 #include "commlib.h"
+#include "sendmem.h"
+#include "codeconv.h"
 
 #include "vtwin.h"
 
@@ -310,7 +310,17 @@ HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 
 	DataPtr = DdeAccessData(Data,&DataSize);
 	if (DataPtr==NULL) return DDE_FNOTPROCESSED;
-	CBStartSend(DataPtr, DataSize, FALSE);
+	{
+		wchar_t *strW = ToWcharU8(DataPtr);
+		if (strW != NULL) {
+			SendMem *sm = SendMemTextW(strW, 0);
+			if (sm != NULL) {
+				SendMemInitEcho(sm, FALSE);
+				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
+				SendMemStart(sm);
+			}
+		}
+	}
 	DdeUnaccessData(Data);
 	if (TalkStatus==IdTalkCB)
 		return (HDDEDATA)DDE_FACK;
@@ -975,9 +985,18 @@ scp_rcv_error:
 		SetMulticastName(ParamFileName);
 		break;
 
-	case CmdDispStr:
-		CBStartSend(ParamFileName, sizeof(ParamFileName), TRUE);
+	case CmdDispStr: {
+		wchar_t *strW = ToWcharU8(ParamFileName);
+		if (strW != NULL) {
+			SendMem *sm = SendMemTextW(strW, 0);
+			if (sm != NULL) {
+				SendMemInitEcho(sm, TRUE);
+				SendMemInitSend(sm, FALSE);
+				SendMemStart(sm);
+			}
+		}
 		break;
+	}
 
 	case CmdLogInfo:
 		if (LogVar) {

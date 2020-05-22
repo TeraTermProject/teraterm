@@ -45,6 +45,7 @@ typedef enum {
 SendMem *SendMemTextW(wchar_t *ptr, size_t len);
 SendMem *SendMemBinary(void *ptr, size_t len);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
+void SendMemInitSend(SendMem *sm, BOOL echo_only);
 void SendMemInitDelay(SendMem *sm, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max);
 void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile);
 void SendMemInitDialogCaption(SendMem *sm, const wchar_t *caption);
