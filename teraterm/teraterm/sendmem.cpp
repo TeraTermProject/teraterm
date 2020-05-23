@@ -434,7 +434,7 @@ static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
 	const wchar_t *p = src;
 	const wchar_t *p_end = src + src_len;
 	wchar_t *dest = dest_top;
-	while (p <= p_end) {
+	while (p < p_end) {
 		wchar_t c = *p++;
 		if (c == CR) {
 			if (*p == LF) {
