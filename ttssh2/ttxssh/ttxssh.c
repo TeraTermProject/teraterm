@@ -1183,113 +1183,6 @@ static void enable_dlg_items(HWND dlg, int from, int to, BOOL enabled)
 	}
 }
 
-// C-p/C-n/C-b/C-f/C-a/C-e をサポート (2007.9.5 maya)
-// C-d/C-k をサポート (2007.10.3 yutaka)
-// ドロップダウンの中のエディットコントロールを
-// サブクラス化するためのウインドウプロシージャ
-WNDPROC OrigHostnameEditProc; // Original window procedure
-LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
-                                  WPARAM wParam, LPARAM lParam)
-{
-	HWND parent;
-	int  max, select, len;
-	char *str, *orgstr;
-
-	switch (msg) {
-		// キーが押されたのを検知する
-		case WM_KEYDOWN:
-			if (GetKeyState(VK_CONTROL) < 0) {
-				switch (wParam) {
-					case 0x50: // Ctrl+p ... up
-						parent = GetParent(dlg);
-						select = SendMessage(parent, CB_GETCURSEL, 0, 0);
-						if (select > 0) {
-							PostMessage(parent, CB_SETCURSEL, select - 1, 0);
-						}
-						return 0;
-					case 0x4e: // Ctrl+n ... down
-						parent = GetParent(dlg);
-						max = SendMessage(parent, CB_GETCOUNT, 0, 0);
-						select = SendMessage(parent, CB_GETCURSEL, 0, 0);
-						if (select < max - 1) {
-							PostMessage(parent, CB_SETCURSEL, select + 1, 0);
-						}
-						return 0;
-					case 0x42: // Ctrl+b ... left
-						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
-						PostMessage(dlg, EM_SETSEL, select-1, select-1);
-						return 0;
-					case 0x46: // Ctrl+f ... right
-						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
-						max = GetWindowTextLength(dlg) ;
-						PostMessage(dlg, EM_SETSEL, select+1, select+1);
-						return 0;
-					case 0x41: // Ctrl+a ... home
-						PostMessage(dlg, EM_SETSEL, 0, 0);
-						return 0;
-					case 0x45: // Ctrl+e ... end
-						max = GetWindowTextLength(dlg) ;
-						PostMessage(dlg, EM_SETSEL, max, max);
-						return 0;
-
-					case 0x44: // Ctrl+d
-					case 0x4b: // Ctrl+k
-					case 0x55: // Ctrl+u
-						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
-						max = GetWindowTextLength(dlg);
-						max++; // '\0'
-						orgstr = str = malloc(max);
-						if (str != NULL) {
-							len = GetWindowText(dlg, str, max);
-							if (select >= 0 && select < len) {
-								if (wParam == 0x44) { // カーソル配下の文字のみを削除する
-									memmove(&str[select], &str[select + 1], len - select - 1);
-									str[len - 1] = '\0';
-
-								} else if (wParam == 0x4b) { // カーソルから行末まで削除する
-									str[select] = '\0';
-
-								}
-							}
-
-							if (wParam == 0x55) { // カーソルより左側をすべて消す
-								if (select >= len) {
-									str[0] = '\0';
-								} else {
-									str = &str[select];
-								}
-								select = 0;
-							}
-
-							SetWindowText(dlg, str);
-							SendMessage(dlg, EM_SETSEL, select, select);
-							free(orgstr);
-							return 0;
-						}
-						break;
-				}
-			}
-			break;
-
-		// 上のキーを押した結果送られる文字で音が鳴るので捨てる
-		case WM_CHAR:
-			switch (wParam) {
-				case 0x01:
-				case 0x02:
-				case 0x04:
-				case 0x05:
-				case 0x06:
-				case 0x0b:
-				case 0x0e:
-				case 0x10:
-				case 0x15:
-					return 0;
-			}
-	}
-
-	return CallWindowProc(OrigHostnameEditProc, dlg, msg, wParam, lParam);
-}
-
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 								   LPARAM lParam)
 {
@@ -1359,11 +1252,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 
-		// C-n/C-p のためにサブクラス化 (2007.9.4 maya)
-		hwndHostname = GetDlgItem(dlg, IDC_HOSTNAME);
-		hwndHostnameEdit = GetWindow(hwndHostname, GW_CHILD);
-		OrigHostnameEditProc = (WNDPROC)GetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC);
-		SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
+		SetEditboxSubclass(dlg, IDC_HOSTNAME, TRUE);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
 		                 pvar->settings.Enabled ? IDC_HOSTSSH : GetHNRec->
@@ -1555,12 +1444,10 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 					}
 				}
 			}
-			SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)OrigHostnameEditProc);
 			EndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:
-			SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)OrigHostnameEditProc);
 			EndDialog(dlg, 0);
 			return TRUE;
 

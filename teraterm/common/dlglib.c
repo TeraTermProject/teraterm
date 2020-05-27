@@ -240,6 +240,7 @@ typedef struct {
 // C-d/C-k をサポート (2007.10.3 yutaka)
 // ドロップダウンの中のエディットコントロールを
 // サブクラス化するためのウインドウプロシージャ
+// TODO サロゲートペア文字の場合の処理
 static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
 {
@@ -349,17 +350,17 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 			break;
 	}
 
-	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
+	_SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
-	Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
+	Result = _CallWindowProcW(data->OrigProc, dlg, msg, wParam, lParam);
 	data->OrigProc = (WNDPROC)GetWindowLongPtr(dlg, GWLP_WNDPROC);
 	data->OrigUser = GetWindowLongPtr(dlg, GWLP_USERDATA);
-	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
+	_SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data);
 
 	switch (msg) {
 		case WM_NCDESTROY:
-			SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
+			_SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 			SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
 			free(data);
 			break;
@@ -368,7 +369,13 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	return Result;
 }
 
-// C-n/C-p のためにサブクラス化
+/**
+ *	エディットボックス/コンボボックスのキー操作を emacs 風にする
+ *		C-n/C-p のためにサブクラス化
+ *	@praram		hDlg		ダイアログ
+ *	@praram		nID			emacs風にするエディットボックス または コンボボックス
+ *	@param		comboBox	TRUE = nIDがコンボボックス
+ */
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 {
 	EditSubclassData *data;
@@ -377,10 +384,10 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 		hWndEdit = GetWindow(hWndEdit, GW_CHILD);
 	}
 	data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
-	data->OrigProc = (WNDPROC)GetWindowLongPtr(hWndEdit, GWLP_WNDPROC);
+	data->OrigProc = (WNDPROC)GetWindowLongPtrW(hWndEdit, GWLP_WNDPROC);
 	data->OrigUser = (LONG_PTR)GetWindowLongPtr(hWndEdit, GWLP_USERDATA);
 	data->ComboBox = ComboBox;
-	SetWindowLongPtr(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
+	_SetWindowLongPtrW(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
 }
 
