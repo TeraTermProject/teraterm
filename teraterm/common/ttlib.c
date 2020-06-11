@@ -1670,7 +1670,7 @@ char *strelapsed(DWORD start_time)
 	days = delta / 24;
 
 	_snprintf_s(strtime, sizeof(strtime), _TRUNCATE,
-		"%d %02d:%02d:%02d.%04d",
+		"%d %02d:%02d:%02d.%03d",
 		days, hours, minutes, seconds, msecs);
 
 	return strtime;
