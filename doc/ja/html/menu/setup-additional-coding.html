@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Additional settings / "coding" タブ ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings / "coding" タブ ([Setup] メニュー)</h1>
+
+    <dl>
+      <dt>Ambiguous Characters width</dt>
+      <dd>
+	    1 Cell または 2 Cell を選択。
+      </dd>
+
+      <dt>Override Emoji Characters width</dt>
+      <dd>
+	    文字が絵文字のとき、文字属性を無視して文字幅を設定する場合チェックする<br>
+        1 Cell または 2 Cell を選択。
+      </dd>
+    </dl>
+
+    <h2>East_Asian_Width特性とセル数について</h2>
+
+    <p>
+      East Asian Width(東アジアの文字幅)として、
+      各文字には特性が割り当てられています。
+    </p>
+
+    <p>
+      この特性は5種類存在し、各々の文字幅が決められています。
+    </p>
+
+    <p>
+      また、文字幅の解釈には次の2種類があります。
+      <ol>
+        <li>東アジアの従来文字コードの文脈の場合</li>
+        <li>東アジア以外の従来文字コードの文脈の場合</li>
+      </ol>
+    </p>
+
+    <p>
+      これを表にすると次のようになります。
+    </p>
+
+<pre>
+cells数(2=全角/1=半角)
+|                   | 東アジアの           | 東アジア以外の       |
+| 特性              | 従来文字コードの文脈 | 従来文字コードの文脈 |
+| F(Fullwidth,全角) | 2                    | 2                    |
+| H(Halfwidth,半角) | 1                    | 1                    |
+| W(Wide,広)        | 2                    | 2                    |
+| Na(Narrow,狭)     | 1                    | 1                    |
+| A(Ambiguous,曖昧) | 2                    | 1                    |
+| N(Neutral,中立)   | 1                    | 1                    |
+</pre>
+
+    <p>
+      CJK環境では、Ambiguousの場合に文字幅を2 cellにしたほうが自然です。
+    </p>
+
+    <p>
+      Neutralは東アジアの組版には通常出現しない事になっていますが、
+      絵文字がこの領域に入っています。
+    </p>
+
+    <p>
+      East Asian Width の特性とは別に、各文字には絵文字属性があります。
+      (Tera TermではコードポイントU+0080未満は絵文字として扱いません)
+    </p>
+
+    <p>
+      CJK環境では従来の文字コードで1byteでは表現できない場合は
+      2cellで扱うほうが自然です。
+      Tera termではEast Asian Widthを無視して2 cellとして扱うことができるよう設定が可能です。
+    </p>
+
+    <p>
+      また、日本語フォントでは絵文字は2cellでデザインされていることが多いと思われます。
+    </p>
+
+  </body>
+</html>

@@ -40,6 +40,7 @@
 #include "compat_win.h"
 #include "setting.h"
 #include "layer_for_unicode.h"
+#include "helpid.h"
 
 #include "coding_pp.h"
 
@@ -224,10 +225,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 					break;
 				}
-				case PSN_HELP:
-					MessageBox(hWnd, "Tera Term", "not implimented",
-							   MB_OK | MB_ICONEXCLAMATION);
+				case PSN_HELP: {
+					HWND vtwin = GetParent(hWnd);
+					vtwin = GetParent(vtwin);
+					PostMessage(vtwin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCoding, 0);
 					break;
+				}
 				default:
 					break;
 			}
@@ -325,7 +328,7 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pResource = Param->dlg_templ;
 #endif
 	psp.pszTitle = L"coding";		// TODO lng ƒtƒ@ƒCƒ‹‚É“ü‚ê‚é
-	psp.dwFlags |= (PSP_USETITLE /*| PSP_HASHELP */);
+	psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 
 	psp.pfnDlgProc = Proc;
 	psp.lParam = (LPARAM)Param;

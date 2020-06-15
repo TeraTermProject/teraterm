@@ -336,6 +336,11 @@
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Additional settings/coding">
+				<param name="Local" value="html\menu\setup-additional-coding.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Save setup">
 				<param name="Local" value="html\menu\setup-save.html">
 				<param name="ImageNumber" value="11">
