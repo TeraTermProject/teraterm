@@ -2,7 +2,7 @@
 # unicodeの絵文字
 
 - unicode.orgにある 絵文字データ に基づいて絵文字のコード
-  https://unicode.org/Public/emoji/12.0/emoji-data.txt
+  https://unicode.org/Public/emoji/12.1/emoji-data.txt
 - 絵文字を判定するテーブルを作成する
 
 # テーブルの作り方
@@ -18,7 +18,7 @@
 
 ## original data
 
-https://unicode.org/Public/emoji/12.0/emoji-data.txt
+https://unicode.org/Public/emoji/12.1/emoji-data.txt
 
   # emoji-data.txt
   # Date: 2019-01-15, 12:10:05 GMT
