@@ -345,7 +345,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	CBEchoOnly = FALSE;
 
 	str_w = GetClipboardTextW(HWin, FALSE);
-	if (str_w == NULL) {
+	if (str_w == NULL || !IsTextW(str_w, 0)) {
 		// クリップボードから文字列を取得できなかった
 		CBEndPaste();
 		return;
@@ -419,7 +419,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	CBEchoOnly = FALSE;
 
 	str_w = GetClipboardTextW(HWin, FALSE);
-	if (str_w == NULL) {
+	if (str_w == NULL || !IsTextW(str_w, 0)) {
 		// クリップボードから文字列を取得できなかった
 		goto error;
 	}

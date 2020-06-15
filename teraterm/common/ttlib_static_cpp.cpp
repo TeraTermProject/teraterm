@@ -104,6 +104,44 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const ch
 }
 
 /**
+ *	strがテキストかどうかチェック
+ *
+ *	@param[in]	str		テストする文字
+ *	@param[in]	len		テストするテキスト長(L'\0'は含まない)
+ *						0のときL'\0'の前までテストする
+ *	@retval		TRUE	テキストと思われる(長さ0のときも含む)
+ *				FALSE	テキストではない
+ *
+ *	検査するデータ内に0x20未満のテキストには出てこない文字があれば
+ *	バイナリと判断
+ *	IsTextUnicode() のほうが良いか？
+ */
+BOOL IsTextW(const wchar_t *str, size_t len)
+{
+	if (len == 0) {
+		len = wcslen(str);
+		if (len == 0) {
+			return TRUE;
+		}
+	}
+
+	BOOL result = TRUE;
+	while(len-- > 0) {
+		wchar_t c = *str++;
+		if (c >= 0x20) {
+			continue;
+		}
+		if ((7 <= c && c <= 0x0d) || c == 0x1b) {
+			/* \a, \b, \t, \n, \v, \f, \r, \e */
+			continue;
+		}
+		result = FALSE;
+		break;
+	}
+	return result;
+}
+
+/**
  *	クリップボードからwchar_t文字列を取得する
  *	文字列長が必要なときはwcslen()すること
  *	@param	hWnd

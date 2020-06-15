@@ -162,6 +162,7 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty);
 char *GetClipboardTextA(HWND hWnd, BOOL empty);
 BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);
 void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemID, const char *text, BOOL before);
+BOOL IsTextW(const wchar_t *str, size_t len);
 
 #ifdef __cplusplus
 }
