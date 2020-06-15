@@ -2243,7 +2243,15 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
 
 	// UnicodeÝ’è
-	ts->UnicodeAmbiguousAsWide = GetOnOff(Section, "UnicodeAmbiguousWide", FName, TRUE);
+	ts->UnicodeAmbiguousWidth = GetPrivateProfileInt(Section, "UnicodeAmbiguousWidth", 1, FName);
+	if (ts->UnicodeAmbiguousWidth < 1 || 2 < ts->UnicodeAmbiguousWidth) {
+		ts->UnicodeAmbiguousWidth = 1;
+	}
+	ts->UnicodeEmojiOverride = GetOnOff(Section, "UnicodeEmojiOverride", FName, FALSE);
+	ts->UnicodeEmojiWidth = GetPrivateProfileInt(Section, "UnicodeEmojiWidth", 1, FName);
+	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
+		ts->UnicodeEmojiWidth = 1;
+	}
 }
 
 void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -3568,7 +3576,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, FName);
 
 	// UnicodeÝ’è
-	WriteOnOff(Section, "UnicodeAmbiguousWide", FName, ts->UnicodeAmbiguousAsWide);
+	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
+	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
+	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
 }
 
 #define VTEditor "VT editor keypad"

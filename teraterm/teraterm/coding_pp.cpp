@@ -49,6 +49,7 @@
 static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
 static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
 static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
+static const char *CellWidthList[] = { "1 Cell", "2 Cell", NULL };
 
 static const struct {
 	int lang;
@@ -88,7 +89,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{IDC_TERMKANA, "DLG_TERM_KANA"},
 		{IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND"},
 		//		{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
-		{IDC_TERMKANASEND, "DLG_TERMK_KANASEND"},
+		{IDC_TERMKANASEND, "DLG_TERM_KANASEND"},
 		{IDC_TERMKINTEXT, "DLG_TERM_KIN"},
 		{IDC_TERMKOUTTEXT, "DLG_TERM_KOUT"},
 	};
@@ -147,8 +148,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				SetDropDownList(hWnd, IDC_TERMKOUT, KanjiOutList, ts->KanjiOut);
 			}
 
-			// ambiguous characters as wide
-			CheckDlgButton(hWnd, IDC_AMBIGUOUS_AS_WIDE, ts->UnicodeAmbiguousAsWide ? BST_CHECKED : BST_UNCHECKED);
+			// characters as wide
+			SetDropDownList(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CellWidthList, ts->UnicodeAmbiguousWidth == 1 ? 1 : 2);
+			CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, ts->UnicodeEmojiOverride ? BST_CHECKED : BST_UNCHECKED);
+			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
+			EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), ts->UnicodeEmojiOverride);
 
 			return TRUE;
 		}
@@ -213,8 +217,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					coding = id % 100;
 					ts->KanjiCodeSend = coding;
 
-					// ambiguous characters as wide
-					ts->UnicodeAmbiguousAsWide = IsDlgButtonChecked(hWnd, IDC_AMBIGUOUS_AS_WIDE);
+					// characters as wide
+					ts->UnicodeAmbiguousWidth = (BYTE)GetCurSel(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO);
+					ts->UnicodeEmojiOverride = (BYTE)IsDlgButtonChecked(hWnd, IDC_EMOJI_WIDTH_CHECK);
+					ts->UnicodeEmojiWidth = (BYTE)GetCurSel(hWnd, IDC_EMOJI_WIDTH_COMBO);
 
 					break;
 				}
@@ -239,8 +245,17 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					else {
 						DisableDlgItem(hWnd, IDC_TERMKANA, IDC_TERMKANA);
 					}
-					if (id / 100 == IdJapanese) {
-						CheckDlgButton(hWnd, IDC_AMBIGUOUS_AS_WIDE, BST_CHECKED);
+					if ((id / 100) == IdChinese || (id / 100) == IdJapanese || (id / 100) == IdKorean) {
+						// CJK
+						SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
+						CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
+						EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), TRUE);
+						SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
+					}
+					else {
+						CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
+						SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 0, 0);
+						EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), FALSE);
 					}
 
 					if (IsDlgButtonChecked(hWnd, IDC_USE_SAME_CODE) == BST_CHECKED) {
@@ -266,6 +281,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case IDC_USE_SAME_CODE | (BN_CLICKED << 16): {
 					BOOL enable = (IsDlgButtonChecked(hWnd, IDC_USE_SAME_CODE) == BST_CHECKED) ? FALSE : TRUE;
 					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), enable);
+					break;
+				}
+				case IDC_EMOJI_WIDTH_CHECK | (BN_CLICKED << 16): {
+					BOOL enable = (IsDlgButtonChecked(hWnd, IDC_EMOJI_WIDTH_CHECK) == BST_CHECKED) ? TRUE : FALSE;
+					EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), enable);
+					break;
 				}
 				default:
 					break;

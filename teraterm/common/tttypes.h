@@ -679,7 +679,9 @@ struct tttset {
 	int ConfigVersion;
 	int RunningVersion;
 	DWORD SelectStartDelay;
-	WORD UnicodeAmbiguousAsWide;
+	BYTE UnicodeAmbiguousWidth;
+	BYTE UnicodeEmojiOverride;
+	BYTE UnicodeEmojiWidth;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

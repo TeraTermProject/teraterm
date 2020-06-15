@@ -10,13 +10,15 @@
 #define IDC_TERMKIN                     105
 #define IDC_TERMKOUTTEXT                106
 #define IDC_TERMKOUT                    107
-#define IDC_AMBIGUOUS_AS_WIDE           108
 #define IDC_USE_SAME_CODE               109
 #define IDC_GENLANGLABEL                110
 #define IDC_GENLANG                     111
 #define IDC_TERMKANJILABEL              112
 #define IDC_TERMKANJISENDLABEL          113
 #define IDD_TABSHEET_CODING             128
+#define IDC_AMBIGUOUS_WIDTH_COMBO       2607
+#define IDC_EMOJI_WIDTH_CHECK           2608
+#define IDC_EMOJI_WIDTH_COMBO           2609
 
 // Next default values for new objects
 // 
@@ -25,7 +27,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        115
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2607
+#define _APS_NEXT_CONTROL_VALUE         2609
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

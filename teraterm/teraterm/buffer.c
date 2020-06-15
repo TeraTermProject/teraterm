@@ -2213,7 +2213,7 @@ static BOOL isURLchar(unsigned int u32)
 	return url_char[u32] == 0 ? FALSE : TRUE;
 }
 
-static BOOL BuffIsHalfWidthFromPropery(char width_property)
+static BOOL BuffIsHalfWidthFromPropery(const TTTSet *ts_, char width_property)
 {
 	switch (width_property) {
 	case 'H':	// Halfwidth
@@ -2222,7 +2222,7 @@ static BOOL BuffIsHalfWidthFromPropery(char width_property)
 	default:
 		return TRUE;
 	case 'A':	// Ambiguous 曖昧
-		if (ts.Language == IdJapanese) {
+		if (ts_->UnicodeAmbiguousWidth == 2) {
 			// 全角として扱う
 			return FALSE;
 		}
@@ -2236,22 +2236,22 @@ static BOOL BuffIsHalfWidthFromPropery(char width_property)
 static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *width_property, char *emoji)
 {
 	*width_property = UnicodeGetWidthProperty(u32);
-#if 1
 	*emoji = (char)UnicodeIsEmoji(u32);
-	if (*emoji) {
-		//if (ts_->Language == IdJapanese) {
-		if (ts_->UnicodeAmbiguousAsWide) {
-			// 全角
-			return FALSE;
-		} else {
-			if (u32 >= 0x1f000) {
+	if (ts_->UnicodeEmojiOverride) {
+		if (*emoji) {
+			// 絵文字だった場合
+			if (ts_->UnicodeEmojiWidth == 2) {
+				// 全角
 				return FALSE;
+			} else {
+				if (u32 >= 0x1f000) {
+					return FALSE;
+				}
+				return TRUE;
 			}
-			return TRUE;
 		}
 	}
-#endif
-	return BuffIsHalfWidthFromPropery(*width_property);
+	return BuffIsHalfWidthFromPropery(ts_, *width_property);
 }
 
 /**
@@ -2819,7 +2819,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			}
 			else {
 				// カーソルが1セル又は、2セルの左側
-				if (!BuffIsHalfWidthFromPropery(p->WidthProperty)) {
+				if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
 					// 1つ前の文字が2セル
 					StrChangeCount = 2;
 				}
