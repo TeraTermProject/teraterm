@@ -330,11 +330,12 @@ void SendMemContinuously(void)
 		// 1ライン送信
 		need_delay = TRUE;
 
-		// 1行取り出し(改行コードは 0x0a に正規化されている)
+		// 1行取り出し(改行コードは NormalizeLineBreak() で CR(0x0d) に正規化されている)
 		const wchar_t *line_top = (wchar_t *)&p->send_ptr[p->send_index];
-		const wchar_t *line_end = wcsnchr(line_top, p->send_left, 0x0a);
+		const size_t send_left_char = p->send_left / sizeof(wchar_t);
+		const wchar_t *line_end = wcsnchr(line_top, send_left_char, CR);
 		if (line_end != NULL) {
-			// 0x0a まで送信
+			// CR まで送信
 			send_len = ((line_end - line_top) + 1) * sizeof(wchar_t);
 		}
 		else {
@@ -369,6 +370,7 @@ void SendMemContinuously(void)
 
 	// 送信する
 	const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
+	assert(send_len <= p->send_left);
 	p->send_index += send_len;
 	p->send_left -= send_len;
 	if (p->type == SendMemTypeBinary) {
