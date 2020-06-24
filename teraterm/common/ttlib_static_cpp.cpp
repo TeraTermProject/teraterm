@@ -156,6 +156,7 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	size_t str_w_len;
 	HGLOBAL TmpHandle;
 
+	// TODO GetPriorityClipboardFormat()
 	if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
 		Cf = CF_UNICODETEXT;
 	}
@@ -164,6 +165,9 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	}
 	else if (IsClipboardFormatAvailable(CF_OEMTEXT)) {
 		Cf = CF_OEMTEXT;
+	}
+	else if (IsClipboardFormatAvailable(CF_HDROP)) {
+		Cf = CF_HDROP;
 	}
 	else {
 		return NULL;
@@ -176,7 +180,33 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	if (TmpHandle == NULL) {
 		return NULL;
 	}
-	if (Cf == CF_UNICODETEXT) {
+	if (Cf == CF_HDROP) {
+		HDROP hDrop = (HDROP)TmpHandle;
+		UINT count = _DragQueryFileW(hDrop, (UINT)-1, NULL, 0);
+
+		// text length
+		size_t length = 0;
+		for (UINT i = 0; i < count; i++) {
+			const UINT l = _DragQueryFileW(hDrop, i, NULL, 0);
+			if (l == 0) {
+				continue;
+			}
+			length += (l + 1);
+		}
+
+		// filename
+		str_w = (wchar_t *)malloc(length * sizeof(wchar_t));
+		wchar_t *p = str_w;
+		for (UINT i = 0; i < count; i++) {
+			const UINT l = _DragQueryFileW(hDrop, i, p, (UINT)(length - (p - str_w)));
+			if (l == 0) {
+				continue;
+			}
+			p += l;
+			*p++ = (i + 1 == count) ? L'\0' : '\n';
+		}
+	}
+	else if (Cf == CF_UNICODETEXT) {
 		const wchar_t *str_cb = (wchar_t *)GlobalLock(TmpHandle);
 		if (str_cb != NULL) {
 			size_t str_cb_len = GlobalSize(TmpHandle);	// bytes
