@@ -827,3 +827,13 @@ DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer
 	return r;
 }
 
+HMODULE _LoadLibraryW(LPCWSTR lpLibFileName)
+{
+	if (pLoadLibraryW != NULL) {
+		return pLoadLibraryW(lpLibFileName);
+	}
+	char *LibFileNameA = ToCharW(lpLibFileName);
+	HMODULE r = LoadLibraryA(LibFileNameA);
+	free(LibFileNameA);
+	return r;
+}

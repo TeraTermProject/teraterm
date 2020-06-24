@@ -155,6 +155,7 @@ extern HANDLE (WINAPI *pFindFirstFileW)(LPCWSTR lpFileName, LPWIN32_FIND_DATAW l
 extern BOOL (WINAPI *pFindNextFileW)(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
 extern BOOL (WINAPI *pRemoveDirectoryW)(LPCWSTR lpPathName);
 extern DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
+extern HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
 
 // shlobj_core.h
 extern LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
