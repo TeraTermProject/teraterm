@@ -135,6 +135,13 @@ target_sources(
   ../ttpcmn/sjis2uni.map
   )
 
+target_sources(
+  teraterm
+  PRIVATE
+  ../susie_plugin/libsusieplugin.cpp
+  ../susie_plugin/libsusieplugin.h
+)
+
 source_group(
   "table_datas"
   REGULAR_EXPRESSION
@@ -182,6 +189,7 @@ target_include_directories(
   ../ttpfile
   ../ttpdlg
   ../ttpcmn
+  ../susie_plugin
   ${ONIGURUMA_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg     # for svnversion.h
   ${SFMT_INCLUDE_DIRS}

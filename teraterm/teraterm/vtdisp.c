@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,21 +30,20 @@
 /* TERATERM.EXE, VT terminal display routines */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "string.h"
+#include <string.h>
+#include <olectl.h>
 
 #include "ttwinman.h"
 #include "ttime.h"
 #include "ttdialog.h"
 #include "ttcommon.h"
 #include "compat_win.h"
-
-#include "vtdisp.h"
-
-#include <locale.h>
-#include <olectl.h>
-
 #include "unicode_test.h"
 #include "setting.h"
+#include "codeconv.h"
+#include "libsusieplugin.h"
+
+#include "vtdisp.h"
 
 #define CurWidth 2
 
@@ -171,8 +170,6 @@ static int  BGReverseTextAlpha;
 static int  BGUseAlphaBlendAPI;
 BOOL BGNoFrame;
 static BOOL BGFastSizeMove;
-
-static char BGSPIPath[MAX_PATH];
 
 static COLORREF BGVTColor[2];
 static COLORREF BGVTBoldColor[2];
@@ -429,60 +426,7 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
   strncat_s(filename,destlen,fd.cFileName,_TRUNCATE);
 }
 
-BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long sizeFile,HLOCAL *hbuf,HLOCAL *hbmi)
-{
-  HINSTANCE hSPI;
-  char spiVersion[8];
-  int (PASCAL *SPI_IsSupported)(LPSTR,DWORD);
-  int (PASCAL *SPI_GetPicture)(LPSTR,long,unsigned int,HANDLE *,HANDLE *,FARPROC,long);
-  int (PASCAL *SPI_GetPluginInfo)(int,LPSTR,int);
-  int ret;
-
-  ret  = FALSE;
-  hSPI = NULL;
-
-  //SPI をロード
-  hSPI = LoadLibrary(nameSPI);
-
-  if(!hSPI)
-    goto error;
-
-  SPI_GetPluginInfo = (void *)GetProcAddress(hSPI,"GetPluginInfo");
-  SPI_IsSupported   = (void *)GetProcAddress(hSPI,"IsSupported");
-  SPI_GetPicture    = (void *)GetProcAddress(hSPI,"GetPicture");
-
-  if(!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture)
-    goto error;
-
-  //バージョンチェック
-  SPI_GetPluginInfo(0,spiVersion,8);
-
-  if(spiVersion[2] != 'I' || spiVersion[3] != 'N')
-    goto error;
-
-#if !defined(_M_X64)
-  if(!(SPI_IsSupported)(nameFile,(unsigned long)bufFile))
-    goto error;
-#else
-  // TODO ポインタを unsigned long に変換している
-  // 64bit版Susie Plug-in が存在する?
-  goto error;
-#endif
-
-  if((SPI_GetPicture)(bufFile,sizeFile,1,hbmi,hbuf,NULL,0))
-    goto error;
-
-  ret = TRUE;
-
-  error :
-
-  if(hSPI)
-    FreeLibrary(hSPI);
-
-  return ret;
-}
-
-BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
+static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
 {
   int    bmiSize;
   DWORD  writtenByte;
@@ -529,6 +473,29 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
   return TRUE;
 }
 
+static BOOL LoadWithSPI(const char *src, const char *spi_path, const char *out)
+{
+	HANDLE hbmi;
+	HANDLE hbuf;
+	BOOL r;
+	wchar_t *spi_pathW = ToWcharA(spi_path);
+	wchar_t *srcW = ToWcharA(src);
+
+	r = SusieLoadPicture(srcW, spi_pathW, &hbmi, &hbuf);
+	free(spi_pathW);
+	free(srcW);
+	if (r == FALSE) {
+		return FALSE;
+	}
+
+	SaveBitmapFile(out, hbuf, hbmi);
+
+	LocalFree(hbmi);
+	LocalFree(hbuf);
+
+	return TRUE;
+}
+
 static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BLENDFUNCTION bf)
 {
   HDC hdcDestWork,hdcSrcWork;
@@ -564,110 +531,24 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 }
 
 // 画像読み込み関係
-
 static void BGPreloadPicture(BGSrc *src)
 {
-  char  spiPath[MAX_PATH];
-  char  filespec[MAX_PATH];
-  char *filePart;
-  int   fileSize;
-  DWORD readByte;
-  unsigned char *fileBuf;
-
   HBITMAP hbm;
-  HANDLE  hPictureFile;
-  HANDLE  hFind;
-  WIN32_FIND_DATA fd;
+  char *load_file = src->file;
+  const char *spi_path = ts.EtermLookfeel.BGSPIPath;
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("Preload Picture : %s\n",src->file);
-  #endif
-
-  //ファイルを読み込む
-  hPictureFile = CreateFile(src->file,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-
-  if(hPictureFile == INVALID_HANDLE_VALUE)
-    return;
-
-  fileSize = GetFileSize(hPictureFile,0);
-
-  //最低 2kb は確保 (Susie plugin の仕様より)
-  fileBuf  = GlobalAlloc(GPTR,fileSize + 2048);
-
-  //頭の 2kb は０で初期化
-  ZeroMemory(fileBuf,2048);
-
-  ReadFile(hPictureFile,fileBuf,fileSize,&readByte,0);
-
-  CloseHandle(hPictureFile);
-
-  // SPIPath を絶対パスに変換
-  if(!GetFullPathName(BGSPIPath,MAX_PATH,filespec,&filePart))
-    return;
-
-  //プラグインを当たっていく
-  hFind = FindFirstFile(filespec,&fd);
-
-  if(hFind != INVALID_HANDLE_VALUE && filePart)
-  {
-    //ディレクトリ取得
-    ExtractDirName(filespec, spiPath);
-    AppendSlash(spiPath, sizeof(spiPath));
-
-    do{
-      HLOCAL hbuf,hbmi;
-      BITMAPINFO *pbmi;
-      char       *pbuf;
-      char spiFileName[MAX_PATH];
-	  const char *ext;
-
-      if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        continue;
-	  ext = strrchr(fd.cFileName, '.');
-	  if (ext == NULL) {
-		  // 拡張子がないファイル?
-		  continue;
-	  }
-	  if (strcmp(ext, ".dll") != 0 && strcmp(ext, ".spi") != 0) {
-		  // .dll or .spi 以外のファイル
-		  continue;
-	  }
-
-      strncpy_s(spiFileName, sizeof(spiFileName), spiPath, _TRUNCATE);
-      strncat_s(spiFileName, sizeof(spiFileName), fd.cFileName, _TRUNCATE);
-
-      if(LoadPictureWithSPI(spiFileName,src->file,fileBuf,fileSize,&hbuf,&hbmi))
-      {
-        pbuf = LocalLock(hbuf);
-        pbmi = LocalLock(hbmi);
-
-        SaveBitmapFile(src->fileTmp,pbuf,pbmi);
-
-        LocalUnlock(hbmi);
-        LocalUnlock(hbuf);
-
-        LocalFree(hbmi);
-        LocalFree(hbuf);
-
-        strncpy_s(src->file, sizeof(src->file),src->fileTmp, _TRUNCATE);
-
-        break;
-      }
-    }while(FindNextFile(hFind,&fd));
-
-    FindClose(hFind);
+  if (LoadWithSPI(src->file, spi_path, src->fileTmp) == TRUE) {
+	  load_file = src->fileTmp;
   }
-
-  GlobalFree(fileBuf);
 
   if (IsLoadImageOnlyEnabled()) {
     //画像をビットマップとして読み込み
-    hbm = LoadImage(0,src->file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+    hbm = LoadImage(0,load_file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 
   } else {
 	  // Susie pluginで読み込めないJPEGファイルが存在した場合、
 	  // OLE を利用して読む。
-    hbm = GetBitmapHandle(src->file);
+    hbm = GetBitmapHandle(load_file);
 
   }
 
@@ -1481,13 +1362,14 @@ void BGDestruct(void)
 /*
  * Eterm lookfeel機能による初期化処理
  *
- * initialize_once: 
+ * initialize_once:
  *    TRUE: Tera Termの起動時
  *    FALSE: Tera Termの起動時以外
  */
 void BGInitialize(BOOL initialize_once)
 {
   char path[MAX_PATH],config_file[MAX_PATH],tempPath[MAX_PATH];
+  char BGSPIPath[MAX_PATH];
 
   ZeroMemory(path, sizeof(path));
   ZeroMemory(config_file, sizeof(config_file));
@@ -1577,11 +1459,6 @@ void BGInitialize(BOOL initialize_once)
   BGFastSizeMove = ts.EtermLookfeel.BGFastSizeMove;
   BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
 
-#if 0
-  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
-  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
-#endif
-
   //テンポラリーファイル名を生成
   GetTempPath(MAX_PATH,tempPath);
   GetTempFileName(tempPath,"ttAK",0,BGDest.fileTmp);
@@ -1641,10 +1518,6 @@ void BGInitialize(BOOL initialize_once)
 
     SetCurrentDirectory(prevDir);
   }
-
-  //SPI のパスを整形
-  AppendSlash(BGSPIPath,sizeof(BGSPIPath));
-  strncat_s(BGSPIPath,sizeof(BGSPIPath),"*",_TRUNCATE);
 
   //壁紙 or 背景をプリロード
   BGPreloadSrc(&BGDest);
