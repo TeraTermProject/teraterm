@@ -799,3 +799,31 @@ BOOL _RemoveDirectoryW(LPCWSTR lpPathName)
 	free(lpPathNameA);
 	return r;
 }
+
+DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart)
+{
+	if (pGetFullPathNameW != NULL) {
+		return pGetFullPathNameW(lpFileName, nBufferLength, lpBuffer, lpFilePart);
+	}
+
+	char *filenameA = ToCharW(lpFileName);
+	char bufA[MAX_PATH];
+	char *filepartA;
+	DWORD r = GetFullPathNameA(filenameA, sizeof(bufA), bufA, &filepartA);
+	if (r == 0) {
+		// error
+		free(filenameA);
+		return 0;
+	}
+	wchar_t *bufW = ToWcharA(bufA);
+	r = wcslen(bufW);	// 必要なバッファサイズを返す('\0'含まない)
+	wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
+	if (lpFilePart != NULL) {
+		*lpFilePart = lpBuffer + (filepartA - filenameA) * sizeof(wchar_t);
+	}
+	free(filenameA);
+	free(bufW);
+
+	return r;
+}
+
