@@ -1,0 +1,4 @@
+EXPORTS
+ GetPluginInfo
+ IsSupported
+ GetPicture
