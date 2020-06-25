@@ -1,0 +1,34 @@
+; Ticket #40507 確認用マクロ
+;
+; 適当なUnix系OSに接続した状態でこのマクロを実行する。
+;
+
+; ホスト側での CR -> NL 変換を無効にした状態で hexdump を実行する。
+; 出力に干渉するので echo back も無効にしている。
+sendln "stty -echo -icrnl; hexdump -C; stty echo icrnl"
+
+; ホスト側に ruby が有った場合は以下の方が見やすいかもしれない。
+;sendln 'stty -echo -icrnl; cat | ruby -ne '"'"'puts $_.gsub(/\n/,"<LF>\n").gsub(/\r/,"<CR>\n")'"'"'; stty echo icrnl'
+
+pause 1
+
+send "send cr"
+send $0D
+
+send "send lf"
+send $0A
+
+send "end"
+send $4 $4
+end
+
+; 正しい出力:
+; % stty -echo -icrnl; hexdump -C; stty echo icrnl
+; 00000000  73 65 6e 64 20 63 72 0d  73 65 6e 64 20 6c 66 0a  |send cr.send lf.|
+; 00000010  65 6e 64                                          |end|
+; 00000013
+;
+; ruby 使用時:
+; send cr<CR>
+; send lf<LF>
+; end
