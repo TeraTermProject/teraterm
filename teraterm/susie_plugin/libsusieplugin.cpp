@@ -58,11 +58,26 @@
  *	画像ファイル名はプラグイン内で多分使用されない
  *	プラグイン内でファイルは扱わないので Unicode化はokと思われる
  */
-BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigned char *bufFile, long sizeFile, HLOCAL *hbuf,
+BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigned char *bufFile, size_t sizeFile, HLOCAL *hbuf,
 						HLOCAL *hbmi)
 {
+	// 画像ファイルのファイル名部分を取り出す
+	const wchar_t *image_base = wcsrchr(nameFile, L'\\');
+	if (image_base != NULL) {
+		image_base++;
+	}
+	else {
+		image_base = wcsrchr(nameFile, L'/');
+		if (image_base != NULL) {
+			image_base++;
+		}
+		else {
+			image_base = nameFile;
+		}
+	}
+
 	char nameFileA[MAX_PATH];
-	WideCharToMultiByte(CP_ACP, 0, nameFile, -1, nameFileA, _countof(nameFileA), NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, image_base, -1, nameFileA, _countof(nameFileA), NULL, NULL);
 
 	HINSTANCE hSPI;
 	char spiVersion[8];
@@ -77,9 +92,9 @@ BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigne
 
 	// SPI をロード
 	hSPI = LoadLibraryW(nameSPI);
-
-	if (!hSPI)
-		goto error;
+	if (!hSPI) {
+		return FALSE;
+	}
 
 	FARPROC *p = (FARPROC *)&SPI_GetPluginInfo;
 	*p = GetProcAddress(hSPI, "GetPluginInfo");
@@ -113,6 +128,54 @@ error:
 	return ret;
 }
 
+static unsigned char *LoadImageFile(const wchar_t *image_file, size_t *file_size)
+{
+	HANDLE hPictureFile = CreateFileW(image_file, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hPictureFile == INVALID_HANDLE_VALUE) {
+		*file_size = 0;
+		return FALSE;
+	}
+	DWORD fileSize = GetFileSize(hPictureFile, 0);
+	if (fileSize < 2 * 1024) {
+		//最低 2kb は確保 (Susie plugin の仕様より)
+		fileSize = 2 * 1024;
+	}
+	unsigned char *fileBuf = (unsigned char *)malloc(fileSize);
+	memset(fileBuf, 0, 2*1024);	//頭の 2kb は 0 で初期化
+	DWORD readByte;
+	ReadFile(hPictureFile, fileBuf, fileSize, &readByte, 0);
+	CloseHandle(hPictureFile);
+
+	*file_size = fileSize;
+	return fileBuf;
+}
+
+static wchar_t *NormalizePath(const wchar_t *path)
+{
+	size_t len = GetFullPathNameW(path, 0, NULL, NULL);		// include L'\0'
+	if (len == 0) {
+		return NULL;
+	}
+	wchar_t *normalized_path = (wchar_t *)malloc(sizeof(wchar_t) * len);
+	len = GetFullPathNameW(path, (DWORD)len, normalized_path, NULL);
+	if (len == 0) {
+		free(normalized_path);
+		return NULL;
+	}
+	wchar_t *p = wcsrchr(normalized_path, L'\\');
+	if (p != NULL) {
+		if (*(p + 1) == 0) {
+			*p = 0;		// delete last '\\'
+		}
+	}
+	DWORD attr = GetFileAttributesW(normalized_path);
+	if (attr == INVALID_FILE_ATTRIBUTES || (attr & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+		free(normalized_path);
+		return NULL;
+	}
+	return normalized_path;
+}
+
 /**
  *	Susieプラグインを使って画像ファイルをロードする
  *	指定フォルダ内のプラグインを使ってロードを試みる
@@ -132,77 +195,63 @@ BOOL SusieLoadPicture(const wchar_t *image_file, const wchar_t *spi_path, HANDLE
 	*pHBInfo = NULL;
 	*pHBm = NULL;
 
-	//ファイルを読み込む
-	HANDLE hPictureFile = CreateFileW(image_file, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hPictureFile == INVALID_HANDLE_VALUE) {
+	size_t file_size;
+	unsigned char *file_ptr = LoadImageFile(image_file, &file_size);
+	if (file_ptr == NULL) {
 		return FALSE;
 	}
-	DWORD fileSize = GetFileSize(hPictureFile, 0);
-	if (fileSize < 2 * 1024) {
-		//最低 2kb は確保 (Susie plugin の仕様より)
-		fileSize = 2 * 1024;
-	}
-	unsigned char *fileBuf = (unsigned char *)malloc(fileSize);
-	memset(fileBuf, 0, 2*1024);	//頭の 2kb は 0 で初期化
-	DWORD readByte;
-	ReadFile(hPictureFile, fileBuf, fileSize, &readByte, 0);
-	CloseHandle(hPictureFile);
 
 	// spi_path を絶対パスに変換
-	wchar_t spi_path_full[MAX_PATH];
-	if (!GetFullPathNameW(spi_path, _countof(spi_path_full), spi_path_full, NULL)) {
-		goto finish;
+	wchar_t *spi_path_full = NormalizePath(spi_path);
+	if (spi_path_full == NULL) {
+		free(file_ptr);
+		return FALSE;
 	}
-	wchar_t *p = wcsrchr(spi_path_full, L'\\');
-	if (p != NULL) {
-		if (*(p + 1) == 0) {
-			*p = 0;		// delete last '\\'
-		}
-	}
-	DWORD attr = GetFileAttributesW(spi_path_full);
-	if (attr == INVALID_FILE_ATTRIBUTES || (attr & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-		goto finish;
-	}
+	const size_t spi_path_full_len = wcslen(spi_path_full);
 
-	wchar_t spi_path_mask[MAX_PATH];
-	wcsncpy_s(spi_path_mask, _countof(spi_path_mask), spi_path_full, _TRUNCATE);
-	wcsncat_s(spi_path_mask, _countof(spi_path_mask), L"\\*.*", _TRUNCATE);
+	// mask作成
+	const size_t spi_path_mask_len = spi_path_full_len + 4 + 1;
+	wchar_t *spi_path_mask = (wchar_t *)malloc(spi_path_mask_len * sizeof(wchar_t));
+	wcsncpy_s(spi_path_mask, spi_path_mask_len, spi_path_full, _TRUNCATE);
+	wcsncat_s(spi_path_mask, spi_path_mask_len, L"\\*.*", _TRUNCATE);
 
 	//プラグインを当たっていく
 	WIN32_FIND_DATAW fd;
 	HANDLE hFind = FindFirstFileW(spi_path_mask, &fd);
-	if (hFind == INVALID_HANDLE_VALUE) {
-		goto finish;
+	if (hFind != INVALID_HANDLE_VALUE) {
+		const size_t spiFileNameLen = spi_path_full_len + 1 + _countof(fd.cFileName);
+		wchar_t *spiFileName = (wchar_t *)malloc(spiFileNameLen * sizeof(wchar_t));
+		do {
+			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				continue;
+			const wchar_t *ext = wcsrchr(fd.cFileName, L'.');
+			if (ext == NULL) {
+				// 拡張子がないファイル?
+				continue;
+			}
+			if (wcscmp(ext, L".dll") != 0 && wcscmp(ext, PLUGIN_EXT) != 0) {
+				// .dll or .spi(or sph) 以外のファイル
+				continue;
+			}
+
+			wcsncpy_s(spiFileName, spiFileNameLen, spi_path_full, _TRUNCATE);
+			wcsncat_s(spiFileName, spiFileNameLen, L"\\", _TRUNCATE);
+			wcsncat_s(spiFileName, spiFileNameLen, fd.cFileName, _TRUNCATE);
+
+			HLOCAL hbuf, hbmi;
+			if (LoadPictureWithSPI(spiFileName, image_file, file_ptr, file_size, &hbuf, &hbmi)) {
+				*pHBInfo = hbmi;
+				*pHBm = hbuf;
+				result = TRUE;
+				break;
+			}
+		} while (FindNextFileW(hFind, &fd));
+		free(spiFileName);
+		FindClose(hFind);
 	}
-	do {
-		if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			continue;
-		const wchar_t *ext = wcsrchr(fd.cFileName, L'.');
-		if (ext == NULL) {
-			// 拡張子がないファイル?
-			continue;
-		}
-		if (wcscmp(ext, L".dll") != 0 && wcscmp(ext, PLUGIN_EXT) != 0) {
-			// .dll or .spi(or sph) 以外のファイル
-			continue;
-		}
 
-		wchar_t spiFileName[MAX_PATH];
-		wcsncpy_s(spiFileName, _countof(spiFileName), spi_path_full, _TRUNCATE);
-		wcsncat_s(spiFileName, _countof(spiFileName), L"\\", _TRUNCATE);
-		wcsncat_s(spiFileName, _countof(spiFileName), fd.cFileName, _TRUNCATE);
-
-		HLOCAL hbuf, hbmi;
-		if (LoadPictureWithSPI(spiFileName, image_file, fileBuf, fileSize, &hbuf, &hbmi)) {
-			*pHBInfo = hbmi;
-			*pHBm = hbuf;
-			result = TRUE;
-			break;
-		}
-	} while (FindNextFileW(hFind, &fd));
-	FindClose(hFind);
-
-finish:
-	free(fileBuf);
+	free(spi_path_full);
+	free(spi_path_mask);
+	free(file_ptr);
 	return result;
 }
