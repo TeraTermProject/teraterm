@@ -54,7 +54,3 @@ void TermSendEndBracket(void);
 }
 #endif
 
-extern int BracketStartLen;
-extern int BracketEndLen;
-extern char BracketStart[];
-extern char BracketEnd[];

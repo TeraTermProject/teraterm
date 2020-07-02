@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ BOOL NewFileVar(PFileVar *FV);
 void FreeFileVar(PFileVar *FV);
 
 BOOL LogStart();
-void Log1Byte(BYTE b);
+void LogPut1(BYTE b);
 void LogToFile();
 BOOL CreateLogBuf();
 void FreeLogBuf();
@@ -108,4 +108,3 @@ void CommentLogToFile(char *buf, int size);
 #ifdef __cplusplus
 }
 #endif
-

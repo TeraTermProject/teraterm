@@ -40,7 +40,6 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <tchar.h>
 #include <assert.h>
 
 #include "buffer.h"
@@ -109,14 +108,14 @@ static BOOL LRMarginMode;
 static BOOL RectangleMode;
 static BOOL BracketedPaste;
 
-char BracketStart[] = "\033[200~";
-char BracketEnd[] = "\033[201~";
-int BracketStartLen = (sizeof(BracketStart)-1);
-int BracketEndLen = (sizeof(BracketEnd)-1);
+static char BracketStart[] = "\033[200~";
+static char BracketEnd[] = "\033[201~";
+static int BracketStartLen = (sizeof(BracketStart)-1);
+static int BracketEndLen = (sizeof(BracketEnd)-1);
 
 static int VTlevel;
 
-BOOL AcceptWheelToCursor;
+static BOOL AcceptWheelToCursor;
 
 // save/restore cursor
 typedef struct {
@@ -129,16 +128,16 @@ typedef struct {
 typedef TStatusBuff *PStatusBuff;
 
 // currently only used for AUTO CR/LF receive mode
-BYTE PrevCharacter;
-BOOL PrevCRorLFGeneratedCRLF;	  // indicates that previous CR or LF really generated a CR+LF
+static BYTE PrevCharacter;
+static BOOL PrevCRorLFGeneratedCRLF;	  // indicates that previous CR or LF really generated a CR+LF
 
-BYTE LastPutCharacter;
+static BYTE LastPutCharacter;
 
 // status buffer for main screen & status line
 static TStatusBuff SBuff1, SBuff2, SBuff3;
 
 static BOOL ESCFlag, JustAfterESC;
-static BOOL KanjiIn;
+static BOOL KanjiIn;				// TRUE = MBCSの1byte目を受信している
 static BOOL EUCkanaIn, EUCsupIn;
 static int  EUCcount;
 static BOOL Special;
@@ -158,7 +157,7 @@ typedef struct tstack {
 	struct tstack *next;
 } TStack;
 typedef TStack *PTStack;
-PTStack TitleStack = NULL;
+static PTStack TitleStack = NULL;
 
 /* user defined keys */
 static BOOL WaitKeyId, WaitHi;
@@ -214,10 +213,13 @@ static DWORD BeepOverUsedCount = 0;
 
 static _locale_t CLocale = NULL;
 
-#if UNICODE_INTERNAL_BUFF
-// 内部コード unicode版
-static void UnicodeToCP932(unsigned int code);
-#endif
+typedef struct {
+	BOOL log_cr_hold;
+	int log_code;
+	int log_cr_type;
+} vtterm_work_t;
+
+static vtterm_work_t vtterm_work;
 
 void ClearParams()
 {
@@ -356,6 +358,13 @@ void ResetTerminal() /*reset variables but don't update screen */
 	BeepSuppressTime = BeepStartTime - ts.BeepSuppressTime * 1000;
 	BeepStartTime -= (ts.BeepOverUsedTime * 1000);
 	BeepOverUsedCount = ts.BeepOverUsedCount;
+
+	{
+		vtterm_work_t *vtterm = &vtterm_work;
+		vtterm->log_cr_hold = FALSE;
+		vtterm->log_code = 0;
+		vtterm->log_cr_type = 0;
+	}
 }
 
 void ResetCharSet()
@@ -440,6 +449,123 @@ void MoveToMainScreen()
 	Wrap = MainWrap;
 	DispEnableCaret(MainCursor);
 	MoveCursor(MainX, MainY); // move to main screen
+}
+
+static void Log1Byte(BYTE b)
+{
+	LogPut1(b);
+}
+
+static void Log1UTF32(vtterm_work_t *vtterm, unsigned int u32)
+{
+	switch(vtterm->log_code) {
+	default:
+	case 0: {
+		// UTF-8
+		char u8[4];
+		size_t u8_len = UTF32ToUTF8(u32, u8, _countof(u8));
+		size_t i;
+		for (i = 0; i < u8_len; i++) {
+			Log1Byte(u8[i]);
+		}
+		break;
+	}
+	case 1:
+	case 2: {
+		// UTF-16
+		wchar_t u16[2];
+		size_t u16_len = UTF32ToUTF16(u32, u16, _countof(u16));
+		size_t i;
+		for (i = 0; i < u16_len; i++) {
+			if (vtterm->log_code == 1) {
+				// UTF-16LE
+				Log1Byte(u16[i] & 0xff);
+				Log1Byte((u16[i] >> 8) & 0xff);
+			}
+			else {
+				// UTF-16BE
+				Log1Byte(u16[i] & 0xff);
+				Log1Byte((u16[i] >> 8) & 0xff);
+			}
+		}
+	}
+	}
+}
+
+static void Log1NewLine(vtterm_work_t *vtterm)
+{
+	switch(vtterm->log_cr_type) {
+	case 0:
+		// CR + LF
+		Log1UTF32(vtterm, CR);
+		Log1UTF32(vtterm, LF);
+		break;
+	case 1:
+		// CR
+		Log1UTF32(vtterm, CR);
+		break;
+	case 2:
+		// LF
+		Log1UTF32(vtterm, LF);
+		break;
+	}
+}
+
+static void OutputLogUTF32(unsigned int u32)
+{
+	vtterm_work_t *vtterm = &vtterm_work;
+
+	if (cv.HLogBuf == 0) {
+		// ログは取っていない, 何もしない
+		return;
+	}
+
+	// 改行コードをチェック
+	//		CR hold		入力	改行出力	CR hold 変更
+	//		------------+-------+-----------+------------
+	//		なし		CR		0			セットする
+	//		なし		LF		1			変化なし
+	//		なし		その他	0			変化なし
+	//		あり		CR		1			変化なし(ホールドしたまま)
+	//		あり		LF		1			クリアする
+	//		あり		その他	1			クリアする
+	if (vtterm->log_cr_hold == FALSE) {
+		if (u32 == CR) {
+			vtterm->log_cr_hold = TRUE;
+			return;
+		}
+		else if (u32 == LF) {
+			Log1NewLine(vtterm);
+			return;
+		}
+		else {
+			// 改行特になし
+		}
+	}
+	else {
+		if (u32 == CR) {
+			Log1NewLine(vtterm);
+			return;
+		}
+		else if (u32 == LF) {
+			vtterm->log_cr_hold = FALSE;
+			Log1NewLine(vtterm);
+			return;
+		}
+		else {
+			vtterm->log_cr_hold = FALSE;
+			Log1NewLine(vtterm);
+		}
+	}
+
+	Log1UTF32(vtterm, u32);
+}
+
+static void OutputLogByte(BYTE b)
+{
+	if (cv.HLogBuf!=0) {
+		OutputLogUTF32(b);
+	}
 }
 
 void MoveToStatusLine()
@@ -561,19 +687,19 @@ void BackSpace()
 	if (CursorX == CursorLeftM || CursorX == 0) {
 		if (CursorY > 0 && (ts.TermFlag & TF_BACKWRAP)) {
 			MoveCursor(CursorRightM, CursorY-1);
-			if (cv.HLogBuf!=0 && !ts.LogTypePlainText) Log1Byte(BS);
+			if (cv.HLogBuf!=0 && !ts.LogTypePlainText) OutputLogByte(BS);
 		}
 	}
 	else if (CursorX > 0) {
 		MoveCursor(CursorX-1, CursorY);
-		if (cv.HLogBuf!=0 && !ts.LogTypePlainText) Log1Byte(BS);
+		if (cv.HLogBuf!=0 && !ts.LogTypePlainText) OutputLogByte(BS);
 	}
 }
 
 static void CarriageReturn(BOOL logFlag)
 {
 	if (!ts.EnableContinuedLineCopy || logFlag)
-		if (cv.HLogBuf!=0) Log1Byte(CR);
+		if (cv.HLogBuf!=0) OutputLogByte(CR);
 
 	if (RelativeOrgMode || CursorX > CursorLeftM)
 		MoveCursor(CursorLeftM, CursorY);
@@ -591,7 +717,7 @@ static void LineFeed(BYTE b, BOOL logFlag)
 		BuffDumpCurrentLine(b);
 
 	if (!ts.EnableContinuedLineCopy || logFlag)
-		if (cv.HLogBuf!=0) Log1Byte(LF);
+		if (cv.HLogBuf!=0) OutputLogByte(LF);
 
 	if (CursorY < CursorBottom)
 		MoveCursor(CursorX,CursorY+1);
@@ -617,7 +743,7 @@ void Tab()
 		Wrap = FALSE;
 	}
 	CursorForwardTab(1, AutoWrapMode);
-	if (cv.HLogBuf!=0) Log1Byte(HT);
+	if (cv.HLogBuf!=0) OutputLogByte(HT);
 }
 
 void RepeatChar(BYTE b, int count)
@@ -681,7 +807,7 @@ void RepeatChar(BYTE b, int count)
 	}
 }
 
-void PutChar(BYTE b)
+static void PutChar(BYTE b)
 {
 	BOOL SpecialNew;
 	TCharAttr CharAttrTmp;
@@ -718,10 +844,10 @@ void PutChar(BYTE b)
 			if (__isascii(b) && !isprint(b)) {
 				// ASCII文字で、非表示な文字はログ採取しない。
 			} else {
-				Log1Byte(b);
+				OutputLogByte(b);
 			}
 		} else {
-			Log1Byte(b);
+			OutputLogByte(b);
 		}
 	}
 
@@ -814,12 +940,12 @@ static void PutDecSp(BYTE b)
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
 	}
 
-	if (cv.HLogBuf!=0) Log1Byte(b);
+	if (cv.HLogBuf!=0) OutputLogByte(b);
 /*
 	if (ts.LogTypePlainText && __isascii(b) && !isprint(b)) {
 		// ASCII文字で、非表示な文字はログ採取しない。
 	} else {
-		if (cv.HLogBuf!=0) Log1Byte(b);
+		if (cv.HLogBuf!=0) OutputLogByte(b);
 	}
  */
 
@@ -845,6 +971,9 @@ static void PutDecSp(BYTE b)
 	}
 }
 
+/**
+ *	mbcsを出力
+ */
 static void PutKanji(BYTE b)
 {
 	int LineEnd;
@@ -907,8 +1036,8 @@ static void PutKanji(BYTE b)
 	Wrap = FALSE;
 
 	if (cv.HLogBuf!=0) {
-		Log1Byte(HIBYTE(Kanji));
-		Log1Byte(LOBYTE(Kanji));
+		OutputLogByte(HIBYTE(Kanji));
+		OutputLogByte(LOBYTE(Kanji));
 	}
 
 	if (Special) {
@@ -4960,7 +5089,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 	}
 }
 
-void XsProcClipboard(PCHAR buff)
+static void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
 	char *p, *cbbuff, hdr[20], notify_buff[256], notify_title[MAX_UIMSG];
@@ -5118,7 +5247,7 @@ static void ConvertToCP932(char *str, int destlen)
 	}
 }
 
-void XSequence(BYTE b)
+static void XSequence(BYTE b)
 {
 	static char *StrBuff = NULL;
 	static unsigned int StrLen = 0, StrBuffSize = 0;
@@ -5408,6 +5537,156 @@ void CANSeen(BYTE b)
 }
 
 /**
+ *	unicode(UTF-32,wchar_t)をバッファへ書き込む
+ *	ログにも書き込む
+ *
+ *	元は UnicodeToCP932() だった
+ *
+ *	PutChar() の UTF-32版
+ */
+static void PutU32(unsigned int code)
+{
+	unsigned short cset;
+	int LineEnd;
+
+	TCharAttr CharAttrTmp;
+	CharAttrTmp = CharAttr;
+	if (code <= US) {
+		// U+0000 .. U+001f
+		// C0制御文字, C0 Coontrols
+		ParseControl(code);
+		return;
+	} else if ((0x80<=code) && (code<=0x9F)) {
+		// U+0080 .. u+009f
+		// C1制御文字, C1 Controls
+		ParseControl(code);
+		return;
+	}
+
+	{
+		int r;
+		BOOL is_update;
+
+		// UnicodeからDEC特殊文字へのマッピング
+		if (ts.UnicodeDecSpMapping) {
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				code = cset & 0xff;
+				CharAttrTmp.Attr |= AttrSpecial;
+			}
+		}
+
+		if ((CharAttrTmp.Attr & AttrSpecial) == 0) {
+			if (Special) {
+				UpdateStr();
+				Special = FALSE;
+			}
+		} else {
+			if (!Special) {
+				UpdateStr();
+				Special = TRUE;
+			}
+		}
+
+		if (CursorX > CursorRightM)
+			LineEnd = NumOfColumns - 1;
+		else
+			LineEnd = CursorRightM;
+
+		// Wrap処理、カーソル移動
+		if (Wrap) {
+			// 現在 Wrap 状態
+			if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
+				// 文字コードが結合文字ではない = カーソルが移動する
+
+				// カーソル位置に行継続アトリビュートを追加
+				TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+				t.Attr |= AttrLineContinued;
+				t.AttrEx = t.Attr;
+				BuffSetCursorCharAttr(CursorX, CursorY, t);
+
+				// 行継続アトリビュートをつける
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+
+				// 次の行の行頭へ
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+		}
+
+		// バッファに文字を入れる
+		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
+		//		エラー時はカーソル位置を検討する
+		is_update = FALSE;
+		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+	retry:
+		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
+		if (r == -1) {
+			// 文字全角で行末、入力できない
+
+			if (AutoWrapMode) {
+				// 自動改行
+				// 、wrap処理
+				CharAttrTmp = CharAttr;
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
+				// AutoWrapMode
+				// ts.EnableContinuedLineCopy
+				//if (CursorX != LineEnd){
+				//&& BuffIsHalfWidthFromCode(&ts, code)) {
+
+				// full width出力が半分出力にならないように0x20を出力
+				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
+				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
+
+				// 次の行の行頭へ
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+			else {
+				// 行頭に戻す
+				CursorX = 0;
+			}
+
+			//CharAttrTmp.Attr &= ~AttrLineContinued;
+			goto retry;
+		}
+		else if (r == 0) {
+			// カーソルの移動なし,結合文字,合字など
+			// Wrap は変化しない
+			UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
+		} else if (r == 1) {
+			// 半角(1セル)
+			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+				Wrap = FALSE;
+			}
+		} else if (r == 2) {
+			// 全角(2セル)
+			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
+				MoveRight();	// 全角の右側にカーソル移動
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+				MoveRight();
+				Wrap = FALSE;
+			}
+		}
+		else {
+			assert(FALSE);
+		}
+	}
+
+	// ログを出力
+	OutputLogUTF32(code);
+}
+
+/**
  *	IsDBCSLeadByteEx() とほぼ同じ
  *	ismbblead() の拡張
  */
@@ -5613,7 +5892,7 @@ static BOOL ParseFirstJP(BYTE b)
 			{
 				// bはsjisの半角カタカナ
 				unsigned long u32 = CP932ToUTF32(b);
-				UnicodeToCP932(u32);
+				PutU32(u32);
 			}
 			return TRUE;
 #endif
@@ -5679,7 +5958,7 @@ static BOOL ParseFirstJP(BYTE b)
 #if UNICODE_INTERNAL_BUFF
 			// bはsjisの半角カタカナ
 			unsigned long u32 = CP932ToUTF32(b);
-			UnicodeToCP932(u32);
+			PutU32(u32);
 #else
 			PutChar(b);	// katakana
 #endif
@@ -5856,216 +6135,6 @@ static void ParseASCII(BYTE b)
 	}
 }
 
-// unicode(UTF-32,wchar_t)をバッファへ書き込む
-// TODO @@
-#if UNICODE_INTERNAL_BUFF
-// 内部コード unicode版
-static void UnicodeToCP932(unsigned int code)
-{
-	unsigned short cset;
-	int LineEnd;
-
-	TCharAttr CharAttrTmp;
-	CharAttrTmp = CharAttr;
-	if (code <= US) {
-		// C0
-		ParseControl(code);
-#if 0
-	} else if ((0x80<=code) && (code<=0x9F)) {
-		// C1
-		ParseControl(code);
-	} else if (code < 0x20) {
-		PutChar(code);
-#endif
-#if 0
-	} else if (code <= 0xff) {
-		PutChar(code);
-#endif
-	} else {
-		int r;
-		BOOL is_update;
-
-		// UnicodeからDEC特殊文字へのマッピング
-		if (ts.UnicodeDecSpMapping) {
-			cset = UTF32ToDecSp(code);
-			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-				code = cset & 0xff;
-				CharAttrTmp.Attr |= AttrSpecial;
-			}
-		}
-
-		if ((CharAttrTmp.Attr & AttrSpecial) == 0) {
-			if (Special) {
-				UpdateStr();
-				Special = FALSE;
-			}
-		} else {
-			if (!Special) {
-				UpdateStr();
-				Special = TRUE;
-			}
-		}
-
-		if (CursorX > CursorRightM)
-			LineEnd = NumOfColumns - 1;
-		else
-			LineEnd = CursorRightM;
-
-		// Wrap処理、カーソル移動
-		if (Wrap) {
-			// 現在 Wrap 状態
-			if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
-				// 文字コードが結合文字ではない = カーソルが移動する
-
-				// カーソル位置に行継続アトリビュートを追加
-				TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
-				t.Attr |= AttrLineContinued;
-				t.AttrEx = t.Attr;
-				BuffSetCursorCharAttr(CursorX, CursorY, t);
-
-				// 行継続アトリビュートをつける
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-
-				// 次の行の行頭へ
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-		}
-
-		// バッファに文字を入れる
-		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
-		//		エラー時はカーソル位置を検討する
-		is_update = FALSE;
-		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-	retry:
-		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
-		if (r == -1) {
-			// 文字全角で行末、入力できない
-
-			if (AutoWrapMode) {
-				// 自動改行
-				// 、wrap処理
-				CharAttrTmp = CharAttr;
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
-				// AutoWrapMode
-				// ts.EnableContinuedLineCopy
-				//if (CursorX != LineEnd){
-				//&& BuffIsHalfWidthFromCode(&ts, code)) {
-
-				// full width出力が半分出力にならないように0x20を出力
-				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
-				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
-
-				// 次の行の行頭へ
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-			else {
-				// 行頭に戻す
-				CursorX = 0;
-			}
-
-			//CharAttrTmp.Attr &= ~AttrLineContinued;
-			goto retry;
-		}
-		else if (r == 0) {
-			// カーソルの移動なし,結合文字,合字など
-			// Wrap は変化しない
-			UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
-		} else if (r == 1) {
-			// 半角(1セル)
-			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
-				UpdateStr();
-				Wrap = AutoWrapMode;
-			} else {
-				MoveRight();
-				Wrap = FALSE;
-			}
-		} else if (r == 2) {
-			// 全角(2セル)
-			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
-				MoveRight();	// 全角の右側にカーソル移動
-				UpdateStr();
-				Wrap = AutoWrapMode;
-			} else {
-				MoveRight();
-				MoveRight();
-				Wrap = FALSE;
-			}
-		}
-		else {
-			assert(FALSE);
-		}
-	}
-}
-
-#else
-
-// unicode(UTF-32)をバッファ(t.CodePage)へ書き込む
-static void UnicodeToCP932(unsigned int code)
-{
-	size_t mblen;
-	char mbchar[2];
-
-	// UnicodeからDEC特殊文字へのマッピング
-	if (ts.UnicodeDecSpMapping) {
-		unsigned short cset;
-		cset = UTF32ToDecSp(code);
-		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-			PutDecSp(cset & 0xff);
-			return;
-		}
-	}
-
-	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
-	mblen = UTF32ToMBCP(code, ts.CodePage, mbchar, 2);
-#if 1	// U+203e OVERLINE 特別処理
-	if (code == 0x203e && ts.CodePage == 932) {
-		// U+203eは0x7e'~'に変換される
-		// 無理やり漢字出力する
-		mbchar[0] = 0;			// この0のため、クリップボードに文字列がうまく入らない
-		mbchar[1] = 0x7e;
-		mblen = 2;
-	}
-#endif
-	switch (mblen) {
-	case 0:
-		PutChar('?');
-		if (ts.UnknownUnicodeCharaAsWide) {
-			PutChar('?');
-		}
-		break;
-	case 1:
-		PutChar(mbchar[0]);
-		break;
-	case 2:
-	default:
-		Kanji = mbchar[0] << 8;
-		PutKanji(mbchar[1]);
-		break;
-	}
-}
-
-#endif
-
-// UTF-8で受信データを処理する(sub)
-#if UNICODE_INTERNAL_BUFF
-static BOOL ParseFirstUTF8Sub(BYTE b)
-{
-	if (b<=US)
-		ParseControl(b);
-	else if ((b>=0x20) && (b<=0x7E))
-		PutChar(b);
-	else if ((b>=0x80) && (b<=0x9F))
-		ParseControl(b);
-	else if (b>=0xA0)
-		PutChar(b);
-	return TRUE;
-}
-#endif
-
 // UTF-8で受信データを処理する
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
@@ -6089,24 +6158,14 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 		// 1バイト目がC1制御文字(0x80-0x9f)の場合も同様。
 		if (count == 0 || count == 1) {
 			if (proc_combining == 1 && can_combining == 1) {
-				UnicodeToCP932(first_code);
+				PutU32(first_code);
 				can_combining = 0;
 			}
 
 			if (count == 1) {
-//#if UNICODE_INTERNAL_BUFF
-#if 0
-				ParseFirstUTF8Sub(buf[0]);
-#else
 				ParseASCII(buf[0]);
-#endif
 			}
-//#if UNICODE_INTERNAL_BUFF
-#if 0
-			ParseFirstUTF8Sub(b);
-#else
 			ParseASCII(b);
-#endif
 			count = 0;  // reset counter
 			return TRUE;
 		}
@@ -6122,14 +6181,14 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 		if ((buf[1] & 0xc0) == 0x80) {
 
 			if (proc_combining == 1 && can_combining == 1) {
-				UnicodeToCP932(first_code);
+				PutU32(first_code);
 				can_combining = 0;
 			}
 
 			code = ((buf[0] & 0x1f) << 6);
 			code |= ((buf[1] & 0x3f));
 
-			UnicodeToCP932(code);
+			PutU32(code);
 		}
 		else {
 			ParseASCII(buf[0]);
@@ -6176,7 +6235,7 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 					first_code_index = UnicodeGetIndexOfCombiningFirstCode(code);
 					if (first_code_index != -1) {
 						// 1つめの文字はそのまま出力する
-						UnicodeToCP932(first_code);
+						PutU32(first_code);
 
 						can_combining = 1;
 						first_code = code;
@@ -6184,15 +6243,15 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 						return (TRUE);
 					}
 
-					UnicodeToCP932(first_code);
-					UnicodeToCP932(code);
+					PutU32(first_code);
+					PutU32(code);
 					count = 0;
 					return (TRUE);
 				}
 			}
 		}
 
-		UnicodeToCP932(code);
+		PutU32(code);
 
 skip:
 		count = 0;
@@ -6213,7 +6272,7 @@ skip:
 		code |= ((buf[2] & 0x3f) << 6);
 		code |= (buf[3] & 0x3f);
 
-		UnicodeToCP932(code);
+		PutU32(code);
 		count = 0;
 		return TRUE;
 	} else {

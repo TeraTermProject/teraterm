@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,6 @@ PFileVar FileVar = NULL;
 static PCHAR ProtoVar = NULL;
 static int ProtoId;
 
-static BYTE LogLast = 0;
 BOOL FileLog = FALSE;
 BOOL BinLog = FALSE;
 BOOL DDELog = FALSE;
@@ -751,7 +750,6 @@ BOOL LogStart()
 
 void LogPut1(BYTE b)
 {
-	LogLast = b;
 	cv.LogBuf[cv.LogPtr] = b;
 	cv.LogPtr++;
 	if (cv.LogPtr>=InBuffSize)
@@ -789,18 +787,6 @@ void LogPut1(BYTE b)
 		// (2006.12.26 yutaka)
 		cv.DStart = cv.LogPtr;
 	}
-}
-
-void Log1Byte(BYTE b)
-{
-	if (b==0x0d)
-	{
-		LogLast = b;
-		return;
-	}
-	if ((b==0x0a) && (LogLast==0x0d))
-		LogPut1(0x0d);
-	LogPut1(b);
 }
 
 static BOOL Get1(PCHAR Buf, int *Start, int *Count, PBYTE b)
