@@ -1130,28 +1130,3 @@ typedef TComVar *PComVar;
 #define MAXNWIN 256
 #define MAXCOMPORT 4096
 #define MAXHOSTLIST 500
-
-/* shared memory */
-typedef struct {
-	size_t size_tmap;		/* sizeof TMap */
-	size_t size_tttset;		/* sizeof TTTSet */
-	/* Setup information from "teraterm.ini" */
-	TTTSet ts;
-	/* Key code map from "keyboard.def" */
-	TKeyMap km;
-	// Window list
-	int NWin;
-	HWND WinList[MAXNWIN];
-	/* COM port use flag
-	 *           bit 8  7  6  5  4  3  2  1
-	 * char[0] : COM 8  7  6  5  4  3  2  1
-	 * char[1] : COM16 15 14 13 12 11 10  9 ...
-	 */
-	unsigned char ComFlag[(MAXCOMPORT-1)/CHAR_BIT+1];
-	/* Previous window rect (Tera Term 4.78 or later) */
-	WINDOWPLACEMENT WinPrevRect[MAXNWIN];
-	BOOL WinUndoFlag;
-	int WinUndoStyle;
-} TMap;
-typedef TMap *PMap;
-
