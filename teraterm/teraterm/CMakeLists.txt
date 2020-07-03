@@ -11,6 +11,8 @@ add_executable(
   teraterm WIN32
   addsetting.cpp
   addsetting.h
+  broadcast.cpp
+  broadcast.h
   buffer.c
   buffer.h
   clipboar.c

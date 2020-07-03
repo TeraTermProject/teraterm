@@ -138,6 +138,7 @@
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\susie_plugin\libsusieplugin.cpp" />
     <ClCompile Include="addsetting.cpp" />
+    <ClCompile Include="broadcast.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="coding_pp.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="../ttpdlg/ttdlg.c" />
     <ClInclude Include="../ttpdlg/ttdlg.h" />
     <ClInclude Include="..\susie_plugin\libsusieplugin.h" />
+    <ClInclude Include="broadcast.h" />
     <ClInclude Include="coding_pp.h" />
     <ClInclude Include="coding_pp_res.h" />
     <ClInclude Include="font_pp.h" />

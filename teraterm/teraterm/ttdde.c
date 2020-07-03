@@ -45,8 +45,7 @@
 #include "commlib.h"
 #include "sendmem.h"
 #include "codeconv.h"
-
-#include "vtwin.h"
+#include "broadcast.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"

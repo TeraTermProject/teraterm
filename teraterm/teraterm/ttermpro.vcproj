@@ -209,6 +209,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\broadcast.cpp"
+				>
+			</File>
+			<File
 				RelativePath="filesys.cpp"
 				>
 			</File>
@@ -374,6 +378,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\broadcast.h"
+				>
+			</File>
 			<File
 				RelativePath=".\buffer.h"
 				>

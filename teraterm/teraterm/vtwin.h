@@ -241,15 +241,3 @@ private:
 	void CodePopup(int client_x, int client_y);
 };
 #endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen);
-void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buflen);
-void SetMulticastName(char *name);
-
-#ifdef __cplusplus
-}
-#endif
