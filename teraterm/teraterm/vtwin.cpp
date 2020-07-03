@@ -1680,6 +1680,24 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
+LRESULT CVTWindow::OnUniChar(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam == UNICODE_NOCHAR) {
+		// このメッセージをサポートしているかテストできるようにするため
+		return TRUE;
+	}
+
+	char32_t u32 = (char32_t)wParam;
+	wchar_t strW[2];
+	size_t u16_len = UTF32ToUTF16(u32, strW, _countof(strW));
+	CommTextOutW(&cv, strW, u16_len);
+	if (ts.LocalEcho > 0) {
+		CommTextEchoW(&cv, strW, u16_len);
+	}
+
+	return FALSE;
+}
+
 /* copy from ttset.c*/
 static void WriteInt2(const char *Sect, const char *Key, const char *FName, int i1, int i2)
 {
@@ -5722,6 +5740,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_CHAR:
 		OnChar(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_UNICHAR:
+		retval = OnUniChar(wp, lp);
 		break;
 	case WM_CLOSE:
 		OnClose();

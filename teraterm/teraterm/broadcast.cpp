@@ -51,7 +51,8 @@
 #include "layer_for_unicode.h"
 #include "codeconv.h"
 #include "sendmem.h"
-//#include "clipboar.h"
+//#include "clipboar.h"		// TODO 消す
+#include "ttime.h"
 
 #include "broadcast.h"
 
@@ -99,8 +100,8 @@ static void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
 	do {
 		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Command%d", i);
-		GetPrivateProfileString("BroadcastCommands",EntName,"",
-		                        Command,sizeof(Command), historyfile);
+		GetPrivateProfileStringA("BroadcastCommands",EntName,"",
+								 Command,sizeof(Command), historyfile);
 		if (strlen(Command) > 0) {
 			SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
 			                   0, (LPARAM)Command);
@@ -114,6 +115,12 @@ static void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_SETCURSEL,0,0);
 }
 
+BOOL IsUnicharSupport(HWND hwnd)
+{
+	LRESULT r = SendMessage(hwnd, WM_UNICHAR, UNICODE_NOCHAR, 0);
+	return (BOOL)r;
+}
+
 // ドロップダウンの中のエディットコントロールを
 // サブクラス化するためのウインドウプロシージャ
 static WNDPROC OrigBroadcastEditProc; // Original window procedure
@@ -123,9 +130,11 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 {
 	char buf[1024];
 	int len;
+	static BOOL ime_mode = FALSE;
 
 	switch (msg) {
 		case WM_CREATE:
+			ime_mode = FALSE;
 			break;
 
 		case WM_DESTROY:
@@ -148,7 +157,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 		case WM_KEYUP:
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
-			{
+			if (ime_mode == FALSE) {
 				int i;
 				HWND hd;
 				int count;
@@ -167,18 +176,63 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 						}
 					}
 				}
+				return FALSE;
 			}
 			break;
 
 		case WM_CHAR:
 			// 入力した文字がIDC_COMMAND_EDITに残らないように捨てる
-			return FALSE;
+			if (ime_mode == FALSE) {
+				return FALSE;
+			}
+			break;
 
+		case WM_IME_NOTIFY:
+			switch (wParam) {
+				case IMN_SETOPENSTATUS:
+					// IMEのOn/Offを取得する
+					ime_mode = GetIMEOpenStatus(dlg);
+			}
+			break;
+
+		case WM_IME_COMPOSITION: {
+			if (CanUseIME()) {
+				size_t len;
+				const wchar_t *lpstr = GetConvStringW(dlg, lParam, &len);
+				if (lpstr != NULL) {
+					char32_t *strU32 = ToU32W(lpstr);
+					int count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+					for (int i = 0 ; i < count ; i++) {
+						if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+							HWND hwnd = GetNthWin(i);
+							if (hwnd != NULL) {
+								BOOL support_unichar = IsUnicharSupport(hwnd);
+								if (!support_unichar) {
+									for (size_t j = 0; j < len; j++) {
+										::PostMessageW(hwnd, WM_CHAR, lpstr[j], 1);
+									}
+								}
+								else {
+									const char32_t *p = strU32;
+									while (*p != 0) {
+										::PostMessageW(hwnd, WM_UNICHAR, *p, 1);
+										p++;
+									}
+								}
+							}
+						}
+					}
+					free((void *)lpstr);
+					free(strU32);
+					return FALSE;
+				}
+			}
+			break;
+		}
 		default:
-			return _CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
+			break;
 	}
-
-	return FALSE;
+	return _CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
 static void UpdateBroadcastWindowList(HWND hWnd)

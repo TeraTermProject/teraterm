@@ -98,6 +98,7 @@ protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
 	void OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags);
+	LRESULT OnUniChar(WPARAM wParam, LPARAM lParam);
 	void OnClose();
 	void OnAllClose();
 	void OnDestroy();
