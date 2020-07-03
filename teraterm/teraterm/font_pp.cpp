@@ -88,7 +88,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	return FALSE;
 }
 
-static void SetupDlgFont(HWND hWnd, FontPPData *dlg_data)
+static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 {
 	const TTTSet *ts = dlg_data->pts;
 
@@ -109,6 +109,7 @@ static void SetupDlgFont(HWND hWnd, FontPPData *dlg_data)
 	cf.hInstance = dlg_data->hInst;
 	cf.lCustData = (LPARAM)dlg_data;
 	BOOL result = ChooseFontA(&cf);
+	return result;
 }
 
 static void EnableCodePage(HWND hWnd, BOOL enable)
@@ -185,6 +186,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendDlgItemMessage(hWnd, IDC_FONT_QUALITY, CB_SETCURSEL, cur, 0);
 
 			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
+
+			break;
 		}
 		case WM_NOTIFY: {
 			NMHDR *nmhdr = (NMHDR *)lp;
@@ -226,8 +229,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 			case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):
-				SetupDlgFont(hWnd, dlg_data);
-				SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
+				if (ChooseDlgFont(hWnd, dlg_data) != FALSE) {
+					SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
+				}
 				break;
 
 			case IDC_DLGFONT_DEFAULT | (BN_CLICKED << 16): {
