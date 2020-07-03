@@ -816,7 +816,7 @@ DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer
 		return 0;
 	}
 	wchar_t *bufW = ToWcharA(bufA);
-	r = wcslen(bufW);	// 必要なバッファサイズを返す('\0'含まない)
+	r = (DWORD)wcslen(bufW);	// 必要なバッファサイズを返す('\0'含まない)
 	wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
 	if (lpFilePart != NULL) {
 		*lpFilePart = lpBuffer + (filepartA - filenameA) * sizeof(wchar_t);
