@@ -732,6 +732,71 @@ void WideCharToMBCP(const wchar_t *wstr_ptr, size_t *wstr_len, char *mb_ptr, siz
 				 utf32_to_mb);
 }
 
+/**
+ *	wchar_t文字列をUTF32文字列へ変換
+ *
+ *	@param[in]		*wstr_ptr	wchar_t文字列
+ *	@param[in,out]	*wstr_len	wchar_t文字列長
+ *								NULLまたは*wstr_len==0のとき自動(L'\0'でターミネートすること)
+ *								NULL以外のとき入力した文字数を返す
+ *	@param[in]		*u32_ptr	変換した文字列を収納するポインタ
+ *								(NULLのとき変換せずに文字数をカウントする)
+ *	@param[in,out]	*u32_len	変換した文字列を収納できるサイズ,byte数,
+ *								変換したマルチバイト文字列の長さを返す
+ *								L'\0'を変換したら'\0'も含む
+ *								u32_ptrがNULLのときでも長さは返す
+ */
+void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
+					 char32_t *u32_ptr, size_t *u32_len_)
+{
+	size_t wstr_len;
+	size_t u32_len;
+	size_t u32_out = 0;
+	size_t wstr_in = 0;
+
+	assert(wstr_ptr != NULL);
+	if (u32_ptr == NULL) {
+		// 変換文字列を書き出さない
+		u32_len = 4;		// 1文字4byteには収まるはず
+	} else {
+		u32_len = *u32_len_;
+	}
+	if (wstr_len_ == NULL || *wstr_len_ == 0) {
+		wstr_len = (int)wcslen(wstr_ptr) + 1;
+	} else {
+		wstr_len = *wstr_len_;
+	}
+
+	while(u32_len > 0 && wstr_len > 0) {
+		char32_t u32;
+		unsigned int u32_;
+		size_t wb_in = UTF16ToUTF32(wstr_ptr, wstr_len, &u32_);
+		u32 = u32_;
+		if (wb_in == 0) {
+			// 変換できない場合、1文字消費して'?'出力
+			wstr_len -= 1;
+			wstr_in += 1;
+			wstr_ptr++;
+			u32 = '?';
+		}
+		else {
+			wstr_len -= wb_in;
+			wstr_in += wb_in;
+			wstr_ptr += wb_in;
+		}
+		if (u32_ptr != NULL) {
+			*u32_ptr++ = u32;
+			u32_len--;
+		}
+		u32_out++;
+	}
+
+	if (wstr_len_ != NULL) {
+		*wstr_len_ = wstr_in;
+	}
+	*u32_len_ = u32_out;
+}
+
 // MultiByteToWideCharのUTF8特化版
 int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_len_)
 {
@@ -865,6 +930,48 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 }
 
 /**
+ *	wchar_t文字列をUTF-32文字列へ変換
+ *	変換できない文字は '?' で出力する
+ *
+ *	@param[in]	*wstr_ptr	wchar_t文字列
+ *	@param[in]	wstr_len	wchar_t文字列長(0のとき自動、自動のときはL'\0'でターミネートすること)
+ *	@param[out]	*u32_len_	変換した文字列長,byte数,'\0'を変換したら'\0'も含む
+ *							(NULLのとき文字列長を返さない)
+ *	@retval		UTF-32文字列へのポインタ(NULLの時変換エラー)
+ *				使用後 free() すること
+ */
+char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32_len_)
+{
+	const DWORD flags = 0;
+	if (u32_len_ != NULL) {
+		*u32_len_ = 0;
+	}
+	if (wstr_len == 0) {
+		wstr_len = wcslen(wstr_ptr) + 1;
+	}
+    size_t u32_len;
+	size_t wl = wstr_len;
+	WideCharToUTF32(wstr_ptr, &wl, NULL, &u32_len);
+	if (u32_len == 0) {
+		return NULL;
+	}
+	char32_t *u32_ptr = (char32_t *)malloc(u32_len * 4);
+	if (u32_ptr == NULL) {
+		return NULL;
+	}
+	WideCharToUTF32(wstr_ptr, &wl, u32_ptr, &u32_len);
+	if (u32_len == 0) {
+		free(u32_ptr);
+		return NULL;
+	}
+	if (u32_len_ != NULL) {
+		// 変換した文字列数(byte数)を返す
+		*u32_len_ = u32_len;
+	}
+    return u32_ptr;
+}
+
+/**
  *	マルチバイト文字列をwchar_t文字列へ変換
  *	@param[in]	*str_ptr	mb(char)文字列
  *	@param[in]	str_len		mb(char)文字列長(0のとき自動、自動のときは'\0'でターミネートすること)
@@ -987,6 +1094,12 @@ char *ToU8A(const char *strA)
 	char *strU8 = _WideCharToMultiByte(strW, 0, CP_UTF8, NULL);
 	free(strW);
 	return strU8;
+}
+
+char32_t *ToU32W(const wchar_t *strW)
+{
+	char32_t *strU32 = _WideCharToUTF32(strW, NULL, NULL);
+	return strU32;
 }
 
 //////////////////////////////////////////////////////////////////////////////

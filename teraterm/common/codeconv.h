@@ -54,10 +54,13 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 // MultiByteToWideChar() wrappers
 void WideCharToUTF8(const wchar_t *wstr_ptr, size_t *wstr_len, char *u8_ptr, size_t *u8_len);
 void WideCharToCP932(const wchar_t *wstr_ptr, size_t *wstr_len, char *cp932_ptr, size_t *cp932_len);
+void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
+					 char32_t *u32_ptr, size_t *u32_len_);
 int UTF8ToWideChar(const char *u8_ptr, int u8_len, wchar_t *wstr_ptr, int wstr_len);
 
 // API wrappers
 char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_);
+char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32_len_);
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_);
 
 // convinience funcs  (for windows api params)
@@ -69,6 +72,7 @@ wchar_t *ToWcharW(const wchar_t *strW);
 wchar_t *ToWcharU8(const char *strU8);
 char *ToU8A(const char *strA);
 char *ToU8W(const wchar_t *strW);
+char32_t *ToU32W(const wchar_t *strW);
 
 #if defined(_UNICODE)
 #define ToTcharA(s)		ToWcharA(s)
