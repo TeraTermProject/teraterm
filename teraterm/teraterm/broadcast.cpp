@@ -41,23 +41,54 @@
 #include <string.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <wchar.h>	// for wmemcpy_s()
 
 #include "ttsetup.h"
 #include "keyboard.h"	// for ShiftKey() ControlKey()
 #include "ttlib.h"
 #include "dlglib.h"
 #include "tt_res.h"
-#include "clipboar.h"
+#include "layer_for_unicode.h"
+#include "codeconv.h"
+#include "sendmem.h"
+//#include "clipboar.h"
 
 #include "broadcast.h"
 
 
 // WM_COPYDATAによるプロセス間通信の種別 (2005.1.22 yutaka)
-#define IPC_BROADCAST_COMMAND 1      // 全端末へ送信
-#define IPC_MULTICAST_COMMAND 2      // 任意の端末群へ送信
+#define IPC_BROADCAST_COMMAND 1		// 全端末へ送信
+#define IPC_MULTICAST_COMMAND 2		// 任意の端末群へ送信
+
+/*
+ * COPYDATASTRUCT
+ *
+ * dwData
+ *  IPC_BROADCAST_COMMAND
+ * lpData
+ *  +--------------+--+
+ *  |string        |\0|
+ *  +--------------+--+
+ *  <-------------->
+ * cbData
+ *  strlen(string) + 1
+ *	(wcslen(string) + 1) * sizeof(wchar_t)
+ *  bufの直後には \0 は付かない
+ *
+ * dwData
+ *  IPC_MULTICAST_COMMAND
+ * lpData
+ *  +------+--------------+--+
+ *  |name\0|string        |\0|
+ *  +------+--------------+--+
+ *  <--------------------->
+ * cbData
+ *  strlen(string) + 1 + strlen(string)
+ *	(wcslen(name) + 1 + wcslen(string)) * sizeof(wchar_t)
+ *  bufの直後には \0 は付かない
+ */
 
 #define BROADCAST_LOGFILE "broadcast.log"
-
 
 static void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
 {
@@ -127,7 +158,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 					SendMessage(dlg, EM_SETSEL, 0, 0);
 				}
 
-				count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+				count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 				for (i = 0 ; i < count ; i++) {
 					if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
 						hd = GetNthWin(i);
@@ -144,7 +175,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			return FALSE;
 
 		default:
-			return CallWindowProc(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
+			return _CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 	}
 
 	return FALSE;
@@ -170,38 +201,87 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 	}
 }
 
+static COPYDATASTRUCT *BuildBroadcastCDSW(const wchar_t *buf)
+{
+	COPYDATASTRUCT *cds = (COPYDATASTRUCT *)malloc(sizeof(COPYDATASTRUCT));
+	size_t buflen = wcslen(buf);
+
+	cds->dwData = IPC_BROADCAST_COMMAND;
+	cds->cbData = (DWORD)(buflen * sizeof(wchar_t));	// '\0' は含まない
+	cds->lpData = (void *)buf;
+
+	return cds;
+}
+
+static COPYDATASTRUCT *BuildMulticastCDSW(const wchar_t *name, const wchar_t *buf)
+{
+	size_t buflen = wcslen(buf);
+	size_t nlen = wcslen(name) + 1;
+	size_t msglen = nlen + buflen;
+	wchar_t *msg = (wchar_t *)malloc(msglen * sizeof(wchar_t));
+	if (msg == NULL) {
+		return NULL;
+	}
+	wcscpy_s(msg, msglen, name);
+	wmemcpy_s(msg + nlen, msglen - nlen, buf, buflen);
+
+	COPYDATASTRUCT *cds = (COPYDATASTRUCT *)malloc(sizeof(COPYDATASTRUCT));
+	if (cds == NULL) {
+		free(msg);
+		return NULL;
+	}
+	cds->dwData = IPC_MULTICAST_COMMAND;
+	cds->cbData = (DWORD)(msglen * sizeof(wchar_t));
+	cds->lpData = msg;
+
+	return cds;
+}
+
 /*
  * ダイアログで選択されたウィンドウのみ、もしくは親ウィンドウのみに送るブロードキャストモード。
  * リアルタイムモードが off の時に利用される。
  */
-static void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_only, char *buf, int buflen)
+static void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_only, const wchar_t *buf)
 {
-	int i;
-	int count;
-	HWND hd;
-	COPYDATASTRUCT cds;
-
-	ZeroMemory(&cds, sizeof(cds));
-	cds.dwData = IPC_BROADCAST_COMMAND;
-	cds.cbData = buflen;
-	cds.lpData = buf;
+	COPYDATASTRUCT *cds = BuildBroadcastCDSW(buf);
 
 	if (parent_only) {
 		// 親ウィンドウのみに WM_COPYDATA メッセージを送る
-		SendMessage(GetParent(hWnd), WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
+		SendMessage(GetParent(hWnd), WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)cds);
 	}
 	else {
 		// ダイアログで選択されたウィンドウにメッセージを送る
-		count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
-		for (i = 0 ; i < count ; i++) {
+		int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+		for (int i = 0 ; i < count ; i++) {
 			// リストボックスで選択されているか
 			if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
-				if ((hd = GetNthWin(i)) != NULL) {
+				HWND hd = GetNthWin(i);
+				if (hd != NULL) {
 					// WM_COPYDATAを使って、プロセス間通信を行う。
-					SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
+					SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)cds);
 				}
 			}
 		}
+	}
+
+	free(cds);
+}
+
+/**
+ * 全 Tera Term へCOPYDATASTRUCTを送信する
+ *	@param[in]	hWnd	送信元
+ *	@param[in]	cds		COPYDATASTRUCT
+ */
+static void SendCDS(HWND hWnd, const COPYDATASTRUCT *cds)
+{
+	int count = GetRegisteredWindowCount();
+	for (int i = 0 ; i < count ; i++) {
+		HWND hd = GetNthWin(i);
+		if (hd == NULL) {
+			break;
+		}
+		// WM_COPYDATAを使って、プロセス間通信を行う。
+		SendMessage(hd, WM_COPYDATA, (WPARAM)hWnd, (LPARAM)cds);
 	}
 }
 
@@ -209,96 +289,72 @@ static void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_on
  * 全 Tera Term へメッセージを送信するブロードキャストモード。
  * "sendbroadcast"マクロコマンドからのみ利用される。
  */
-void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
+void SendBroadcastMessage(HWND HVTWin, HWND hWnd, const wchar_t *buf)
 {
-	int i, count;
-	HWND hd;
-	COPYDATASTRUCT cds;
-
-	ZeroMemory(&cds, sizeof(cds));
-	cds.dwData = IPC_BROADCAST_COMMAND;
-	cds.cbData = buflen;
-	cds.lpData = buf;
-
-	count = GetRegisteredWindowCount();
-
-	// 全 Tera Term へメッセージを送る。
-	for (i = 0 ; i < count ; i++) {
-		if ((hd = GetNthWin(i)) == NULL) {
-			break;
-		}
-		// WM_COPYDATAを使って、プロセス間通信を行う。
-		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
-	}
+	COPYDATASTRUCT *cds = BuildBroadcastCDSW(buf);
+	SendCDS(HVTWin, cds);
+	free(cds);
 }
 
+static COPYDATASTRUCT *BuildMulticastCopyData(const char *name, const char *buf)
+{
+	size_t buflen = strlen(buf);
+	size_t nlen = strlen(name) + 1;
+	size_t msglen = nlen + buflen;
+	char *msg = (char *)malloc(msglen);
+	if (msg == NULL) {
+		return NULL;
+	}
+	strcpy_s(msg, msglen, name);
+	memcpy_s(msg + nlen, msglen - nlen, buf, buflen);
+
+	COPYDATASTRUCT *cds = (COPYDATASTRUCT *)malloc(sizeof(COPYDATASTRUCT));
+	if (cds == NULL) {
+		free(msg);
+		return NULL;
+	}
+	cds->dwData = IPC_MULTICAST_COMMAND;
+	cds->cbData = (DWORD)msglen;
+	cds->lpData = msg;
+
+	return cds;
+}
 
 /*
  * 任意の Tera Term 群へメッセージを送信するマルチキャストモード。厳密には、
  * ブロードキャスト送信を行い、受信側でメッセージを取捨選択する。
  * "sendmulticast"マクロコマンドからのみ利用される。
  */
-void SendMulticastMessage(HWND hVTWin_, HWND hWnd, char *name, char *buf, int buflen)
+void SendMulticastMessage(HWND HVTWin_, HWND hWnd, const wchar_t *name, const wchar_t *buf)
 {
-	int i, count;
-	HWND hd;
-	COPYDATASTRUCT cds;
-	char *msg = NULL;
-	int msglen, nlen;
-
-	/* 送信メッセージを構築する。
-	 *
-	 * msg
-	 * +------+--------------+--+
-	 * |name\0|buf           |\0|
-	 * +------+--------------+--+
-	 * <--------------------->
-	 * msglen = strlen(name) + 1 + buflen
-	 * bufの直後には \0 は付かない。
-	 */
-	nlen = strlen(name) + 1;
-	msglen = nlen + buflen;
-	if ((msg = (char *)malloc(msglen)) == NULL) {
-		return;
-	}
-	strcpy_s(msg, msglen, name);
-	memcpy_s(msg + nlen, msglen - nlen, buf, buflen);
-
-	ZeroMemory(&cds, sizeof(cds));
-	cds.dwData = IPC_MULTICAST_COMMAND;
-	cds.cbData = msglen;
-	cds.lpData = msg;
-
-	count = GetRegisteredWindowCount();
-
-	// すべてのTera Termにメッセージとデータを送る
-	for (i = 0 ; i < count ; i++) {
-		if ((hd = GetNthWin(i)) == NULL) {
-			break;
-		}
-
-		// WM_COPYDATAを使って、プロセス間通信を行う。
-		SendMessage(hd, WM_COPYDATA, (WPARAM)hVTWin_, (LPARAM)&cds);
-	}
-
-	free(msg);
+	COPYDATASTRUCT *cdsW = BuildMulticastCDSW(name, buf);
+	SendCDS(HVTWin_, cdsW);
+	free(cdsW->lpData);
+	free(cdsW);
 }
 
-void SetMulticastName(char *name)
+void SetMulticastName(const wchar_t *name)
 {
-	strncpy_s(ts.MulticastName, sizeof(ts.MulticastName), name, _TRUNCATE);
+	// TODO MulticastName を wchar_t 化
+	char *nameA = ToCharW(name);
+	strncpy_s(ts.MulticastName, sizeof(ts.MulticastName), nameA, _TRUNCATE);
+	free(nameA);
 }
 
-static int CompareMulticastName(char *name)
+static int CompareMulticastName(const wchar_t *name)
 {
-	return strcmp(ts.MulticastName, name);
+	// TODO MulticastName を wchar_t 化
+	wchar_t *MulticastNameW = ToWcharA(ts.MulticastName);
+	int result = wcscmp(MulticastNameW, name);
+	free(MulticastNameW);
+	return result;
 }
 
 //
 // すべてのターミナルへ同一コマンドを送信するモードレスダイアログの表示
 // (2005.1.22 yutaka)
 //
-static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_BROADCAST_TITLE" },
@@ -309,8 +365,6 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
 		{ IDCANCEL, "BTN_CLOSE" },
 	};
-	char buf[256 + 3];
-	UINT ret;
 	LRESULT checked;
 	LRESULT history;
 	char historyfile[MAX_PATH];
@@ -355,8 +409,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// サブクラス化させてリアルタイムモードにする (2008.1.21 yutaka)
 			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-			OrigBroadcastEditProc = (WNDPROC)GetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC);
-			SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
+			OrigBroadcastEditProc = (WNDPROC)_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
@@ -431,8 +484,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					// new handler
 					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-					OrigBroadcastEditProc = (WNDPROC)GetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC);
-					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
+					OrigBroadcastEditProc = (WNDPROC)_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -443,7 +495,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
 					// restore old handler
-					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
+					_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
@@ -459,66 +511,68 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			switch (LOWORD(wp)) {
 				case IDOK:
 					{
-						memset(buf, 0, sizeof(buf));
+						wchar_t buf[256 + 3];
+						//memset(buf, 0, sizeof(buf));
 
 						// realtime modeの場合、Enter keyのみ送る。
 						// cf. http://logmett.com/forum/viewtopic.php?f=8&t=1601
 						// (2011.3.14 hirata)
 						checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
 						if (checked & BST_CHECKED) { // checkあり
-							strncpy_s(buf, sizeof(buf), "\n", _TRUNCATE);
-							SetDlgItemText(hWnd, IDC_COMMAND_EDIT, "");
-							goto skip;
-						}
-
-						ret = GetDlgItemText(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
-						if (ret == 0) { // error
-							memset(buf, 0, sizeof(buf));
-						}
-
-						// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
-						history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
-						if (history) {
-							GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
-							if (LoadTTSET()) {
-								(*AddValueToList)(historyfile, buf, "BroadcastCommands", "Command",
-								                  ts.MaxBroadcatHistory);
-								FreeTTSET();
-							}
-							ApplyBroadCastCommandHisotry(hWnd, historyfile);
-							ts.BroadcastCommandHistory = TRUE;
+							wcsncpy_s(buf, _countof(buf), L"\n", _TRUNCATE);
+							SetDlgItemTextA(hWnd, IDC_COMMAND_EDIT, "");
 						}
 						else {
-							ts.BroadcastCommandHistory = FALSE;
-						}
-						checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
-						if (checked & BST_CHECKED) { // 改行コードあり
-							if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-								strncat_s(buf, sizeof(buf), "\r\n", _TRUNCATE);
+							UINT ret = _GetDlgItemTextW(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
+							if (ret == 0) { // error
+								memset(buf, 0, sizeof(buf));
+							}
 
-							} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-								strncat_s(buf, sizeof(buf), "\r", _TRUNCATE);
+							// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
+							history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
+							if (history) {
+								GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
+								if (LoadTTSET()) {
+									char *bufA = ToCharW(buf);	// TODO wchar_t 対応
+									(*AddValueToList)(historyfile, bufA, "BroadcastCommands", "Command",
+													  ts.MaxBroadcatHistory);
+									free(bufA);
+									FreeTTSET();
+								}
+								ApplyBroadCastCommandHisotry(hWnd, historyfile);
+								ts.BroadcastCommandHistory = TRUE;
+							}
+							else {
+								ts.BroadcastCommandHistory = FALSE;
+							}
+							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
+							if (checked & BST_CHECKED) { // 改行コードあり
+								if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
+									wcsncat_s(buf, _countof(buf), L"\r\n", _TRUNCATE);
 
-							} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_LF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-								strncat_s(buf, sizeof(buf), "\n", _TRUNCATE);
+								} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_GETCHECK, 0, 0) & BST_CHECKED) {
+									wcsncat_s(buf, _countof(buf), L"\r", _TRUNCATE);
 
-							} else {
-								strncat_s(buf, sizeof(buf), "\r", _TRUNCATE);
+								} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_LF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
+									wcsncat_s(buf, _countof(buf), L"\n", _TRUNCATE);
 
+								} else {
+									wcsncat_s(buf, _countof(buf), L"\r", _TRUNCATE);
+
+								}
 							}
 						}
 
-skip:;
 						// 337: 2007/03/20 チェックされていたら親ウィンドウにのみ送信
 						checked = SendMessage(GetDlgItem(hWnd, IDC_PARENT_ONLY), BM_GETCHECK, 0, 0);
 
-						SendBroadcastMessageToSelected(HVTWin, hWnd, checked, buf, strlen(buf));
+						SendBroadcastMessageToSelected(HVTWin, hWnd, (int)checked, buf);
 					}
 
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
 					// 破棄されないので、以下の「ウィンドウプロシージャ戻し」は不要と思われる。(yutaka)
 #if 0
-					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
+					_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 #endif
 
 					//EndDialog(hDlgWnd, IDOK);
@@ -684,8 +738,14 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 		goto activate;
 	}
 
+	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+
+	// CreateDialogW() で生成したダイアログは、
+	// エディットボックスにIMEからの入力が化けることがある (20/05/27,Windows10 64bit)
+	//   ペーストはok
 	hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
-							 hWnd, (DLGPROC)BroadcastCommandDlgProc);
+							 hWnd, BroadcastCommandDlgProc);
 
 	if (hDlgWnd == NULL) {
 		return;
@@ -705,39 +765,49 @@ activate:;
 	::ShowWindow(hDlgWnd, SW_SHOW);
 }
 
-BOOL BroadCastReceive(COPYDATASTRUCT *cds)
+BOOL BroadCastReceive(const COPYDATASTRUCT *cds)
 {
-	char *buf, *msg, *name;
-	int buflen, msglen, nlen;
-	int sending = 0;
+	wchar_t *strW_ptr;
+	size_t strW_len = 0;
 
-	msglen = cds->cbData;
-	msg = (char *)cds->lpData;
-	if (cds->dwData == IPC_BROADCAST_COMMAND) {
-		buf = msg;
-		buflen = msglen;
-		sending = 1;
-
-	} else if (cds->dwData == IPC_MULTICAST_COMMAND) {
-		name = msg;
-		nlen = strlen(name) + 1;
-		buf = msg + nlen;
-		buflen = msglen - nlen;
+	switch (cds->dwData) {
+	case IPC_BROADCAST_COMMAND: {
+		strW_len = cds->cbData / sizeof(wchar_t);
+		strW_ptr = (wchar_t *)malloc((strW_len + 1) * sizeof(wchar_t));
+		wmemcpy_s(strW_ptr, strW_len, (wchar_t *)cds->lpData, strW_len);
+		strW_ptr[strW_len] = 0;		// 念の為
+		break;
+	}
+	case IPC_MULTICAST_COMMAND: {
+		wchar_t *name = (wchar_t *)cds->lpData;
 
 		// マルチキャスト名をチェックする
-		if (CompareMulticastName(name) == 0) {  // 同じ
-			sending = 1;
+		if (CompareMulticastName(name) != 0) {
+			// 名前が異なっているので何もしない
+			return TRUE;
 		}
+
+		// マルチキャスト名の次の文字列を取得
+		size_t nlen = wcslen(name);
+		strW_len = cds->cbData  / sizeof(wchar_t) - nlen - 1;	// -1 = name の '\0'
+		strW_ptr = (wchar_t *)malloc((strW_len + 1) * sizeof(wchar_t));
+		wmemcpy_s(strW_ptr, strW_len, (wchar_t *)cds->lpData + nlen + 1, strW_len);
+		strW_ptr[strW_len] = 0;		// 念の為
+		break;
 	}
 
-	if (sending) {
-		// 端末へ文字列を送り込む
-		// DDE通信に使う関数に変更。(2006.2.7 yutaka)
-		CBStartSend(buf, buflen, FALSE);
-		// 送信データがある場合は送信する
-		if (TalkStatus == IdTalkCB) {
-			CBSend();
-		}
+	default:
+		// 知らないメッセージの場合
+		return TRUE;
 	}
-	return 1;
+
+	// 端末へ文字列を送り込む
+	SendMem *sm = SendMemTextW(strW_ptr, strW_len);
+	if (sm != NULL) {
+		SendMemInitEcho(sm, FALSE);
+		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
+		SendMemStart(sm);
+	}
+
+	return TRUE;
 }

@@ -35,10 +35,10 @@
 extern "C" {
 #endif
 
-void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen);
-void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buflen);
-void SetMulticastName(char *name);
-BOOL BroadCastReceive(COPYDATASTRUCT *cds);
+void SendBroadcastMessage(HWND HVTWin, HWND hWnd, const wchar_t *buf);
+void SendMulticastMessage(HWND HVTWin, HWND hWnd, const wchar_t *name, const wchar_t *buf);
+void SetMulticastName(const wchar_t *name);
+BOOL BroadCastReceive(const COPYDATASTRUCT *cds);
 void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd);
 
 #ifdef __cplusplus

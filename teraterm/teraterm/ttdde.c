@@ -972,17 +972,36 @@ scp_rcv_error:
 		}
 		break;
 
-	case CmdSendBroadcast: // 'sendbroadcast'
-		SendBroadcastMessage(HVTWin, HVTWin, ParamFileName, strlen(ParamFileName));
+	case CmdSendBroadcast: { // 'sendbroadcast'
+		wchar_t *strW = ToWcharU8(ParamFileName);
+		if (strW != NULL) {
+			SendBroadcastMessage(HVTWin, HVTWin, strW);
+			free(strW);
+		}
 		break;
+	}
 
-	case CmdSendMulticast: // 'sendmulticast'
-		SendMulticastMessage(HVTWin, HVTWin, ParamFileName, ParamSecondFileName, strlen(ParamSecondFileName));
+	case CmdSendMulticast: {
+		// 'sendmulticast'
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		wchar_t *ParamSecondFileNameW = ToWcharU8(ParamSecondFileName);
+		if (ParamFileNameW != NULL && ParamSecondFileNameW != NULL) {
+			SendMulticastMessage(HVTWin, HVTWin, ParamFileNameW, ParamSecondFileNameW);
+		}
+		free(ParamFileNameW);
+		free(ParamSecondFileNameW);
 		break;
+	}
 
-	case CmdSetMulticastName: // 'setmulticastname'
-		SetMulticastName(ParamFileName);
+	case CmdSetMulticastName: {
+		// 'setmulticastname'
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		if (ParamFileNameW != NULL) {
+			SetMulticastName(ParamFileNameW);
+			free(ParamFileNameW);
+		}
 		break;
+	}
 
 	case CmdDispStr: {
 		wchar_t *strW = ToWcharU8(ParamFileName);
