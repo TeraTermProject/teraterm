@@ -249,11 +249,6 @@ static BOOL OnIdle(LONG lCount)
 	return (Busy>0);
 }
 
-BOOL CallOnIdle(LONG lCount)
-{
-	return OnIdle(lCount);
-}
-
 static HWND main_window;
 HWND GetHWND()
 {

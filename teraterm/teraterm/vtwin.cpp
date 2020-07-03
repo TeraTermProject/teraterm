@@ -5920,6 +5920,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnChangeTitle(wp, lp);
 		break;
 	case WM_COPYDATA:
+		SetTimer(m_hWnd, IdPasteDelayTimer, 0, NULL);  // idleˆ—‚ğ“®ì‚³‚¹‚é‚½‚ß
 		OnReceiveIpcMessage(wp, lp);
 		break;
 	case WM_USER_NONCONFIRM_CLOSE:
