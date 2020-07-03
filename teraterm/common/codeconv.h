@@ -29,6 +29,7 @@
 #pragma once
 
 #include <tchar.h>
+#include "ttcstd.h"
 
 #ifdef __cplusplus
 extern "C" {

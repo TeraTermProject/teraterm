@@ -48,8 +48,7 @@
 #include "buffer.h"
 #include "unicode_test.h"
 #include "asprintf.h"
-
-typedef unsigned long char32_t;		// C++11
+#include "ttcstd.h"
 
 // バッファ内の半角1文字分の情報
 typedef struct {

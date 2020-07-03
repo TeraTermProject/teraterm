@@ -41,15 +41,10 @@
 #endif
 #include "codemap.h"
 #include "codeconv.h"
+#include "ttcstd.h"
 
 // cp932変換時、Windows API より Tera Term の変換テーブルを優先する
 //#define PRIORITY_CP932_TABLE
-
-#if defined(_MSC_VER) && (_MSC_VER < 1600)
-typedef unsigned char	uint8_t;
-typedef unsigned short  uint16_t;
-typedef unsigned int	uint32_t;
-#endif
 
 /*
  *	見つからない場合は 0 を返す
