@@ -102,6 +102,8 @@
    "protocols" range. */
 #define ORDER 2500
 
+HANDLE hInst; /* Instance handle of TTXSSH.DLL */
+
 static HICON SecureLargeIcon = NULL;
 static HICON SecureSmallIcon = NULL;
 static HICON SecureNotifyIcon = NULL;
