@@ -140,7 +140,7 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 				          hostname + start, _TRUNCATE);
 			}
 			i++;
-			// don't break here
+			/* don't break here */	/* Falls through. */
 
 		case 3:
 			request->from_port = parse_port(argv[i], request->from_port_name,

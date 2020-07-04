@@ -1153,6 +1153,7 @@ canceled:
 		default:
 			return FALSE;
 		}
+		return FALSE;
 
 	case WM_DESTROY:
 		if (hIconDropdown != NULL) {

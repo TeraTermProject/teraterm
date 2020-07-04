@@ -1096,6 +1096,7 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 				default:
 					return FALSE;
 			}
+			return TRUE;
 
 		case WM_USER_CONSOLE:
 			SendDlgItemMessage(hDlgWnd, IDC_SFTP_CONSOLE, EM_REPLACESEL, 0, (LPARAM) lp);
