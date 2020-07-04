@@ -36,7 +36,9 @@ typedef unsigned int	uint32_t;
 #endif
 
 // unicode
-#if !defined(__cplusplus) || (defined(_MSC_VER) && (_MSC_VER < 1926))
+#if !defined(__cplusplus) || (defined(_MSC_VER) && (_MSC_VER < 1600))
+// VS2010‚©‚ç‘¶Ý
+//  from https://cpprefjp.github.io/implementation-status.html
 typedef unsigned long char32_t;		// C++11 for UTF-32
 typedef wchar_t char16_t;			// C++11 for UTF-16
 #endif
