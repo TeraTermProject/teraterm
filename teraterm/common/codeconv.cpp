@@ -937,7 +937,6 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
  */
 char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32_len_)
 {
-	const DWORD flags = 0;
 	if (u32_len_ != NULL) {
 		*u32_len_ = 0;
 	}
@@ -1093,7 +1092,7 @@ char *ToU8A(const char *strA)
 
 char32_t *ToU32W(const wchar_t *strW)
 {
-	char32_t *strU32 = _WideCharToUTF32(strW, NULL, NULL);
+	char32_t *strU32 = _WideCharToUTF32(strW, 0, NULL);
 	return strU32;
 }
 
