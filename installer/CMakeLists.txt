@@ -13,27 +13,17 @@ install(
   RENAME KEYBOARD.CNF
   )
 
-if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
-  find_program(
-    PERL perl
-    )
-else()
-  # CYGWIN / Active Perl
-  find_program(
-    PERL perl.exe
-    HINTS c:/Perl64/bin
-    HINTS c:/Perl/bin
-    HINTS c:/cygwin/usr/bin
-    HINTS c:/cygwin64/usr/bin
-    )
-endif()
-
 add_custom_target(
-  teraterm_ini ALL
+  teraterm_ini
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/release/TERATERM.INI
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/setini.pl
   COMMENT Generate "${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI"
+  )
+
+set_target_properties(
+  teraterm_ini
+  PROPERTIES FOLDER installer
   )
 
 add_custom_command(
@@ -41,6 +31,7 @@ add_custom_command(
   COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/setini.pl ${CMAKE_CURRENT_SOURCE_DIR}/release/TERATERM.INI > "${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI"
   )
 
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_CURRENT_BINARY_DIR} --target teraterm_ini)")
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI
   DESTINATION .
@@ -49,7 +40,7 @@ install(
 set(RELEASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/release)
 
 add_custom_target(
-  lang_conv ALL
+  lang_conv
   DEPENDS
     ${RELEASE_DIR}/lang_utf16le/Default.lng
     ${RELEASE_DIR}/lang_utf16le/English.lng
@@ -79,6 +70,11 @@ add_custom_target(
     ${RELEASE_DIR}/lang_utf8/Russian.lng
     "${RELEASE_DIR}/lang_utf8/Simplified Chinese.lng"
     "${RELEASE_DIR}/lang_utf8/Traditional Chinese.lng"
+  )
+
+set_target_properties(
+  lang_conv
+  PROPERTIES FOLDER installer
   )
 
 add_custom_command(
@@ -130,9 +126,8 @@ add_custom_command(
 if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
   # Visual Studio 2017以上の時
   add_custom_target(
-    lang_copy ALL
+    lang_copy
     DEPENDS
-      lang_conv
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/Default.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/English.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/French.lng"
@@ -171,6 +166,10 @@ if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
       "${RELEASE_DIR}/lang/Simplified Chinese.lng"
       "${RELEASE_DIR}/lang/Traditional Chinese.lng"
     )
+  set_target_properties(
+	lang_copy
+	PROPERTIES FOLDER installer
+	)
   add_custom_command(
     OUTPUT
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/Default.lng"
@@ -197,9 +196,8 @@ if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
 elseif(MINGW)
   # MinGW
   add_custom_target(
-    lang_copy ALL
+    lang_copy
     DEPENDS
-      lang_conv
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/Default.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/English.lng"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/French.lng"
@@ -238,6 +236,10 @@ elseif(MINGW)
       "${RELEASE_DIR}/lang/Simplified Chinese.lng"
       "${RELEASE_DIR}/lang/Traditional Chinese.lng"
     )
+  set_target_properties(
+	lang_copy
+	PROPERTIES FOLDER installer
+	)
   add_custom_command(
     OUTPUT
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/Default.lng"

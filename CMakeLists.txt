@@ -121,7 +121,9 @@ if (MSVC OR ("$ENV{MSYSTEM}" MATCHES "MINGW"))
     HINTS c:/cygwin64/usr/bin
     )
 else()
-  set(PERL "perl")
+  find_program(
+    PERL perl
+    )
 endif()
 message("perl=${PERL}")
 
