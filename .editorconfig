@@ -16,11 +16,14 @@ indent_style = space
 [*.md]
 end_of_line = crlf
 charset = utf-8-bom
+indent_style = space
 
 [CMakeLists.txt]
 end_of_line = crlf
 charset = utf-8-bom
+indent_style = space
 
 [*.cmake]
 end_of_line = crlf
 charset = utf-8-bom
+indent_style = space

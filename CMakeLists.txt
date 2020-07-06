@@ -110,7 +110,7 @@ message("revision=\"${SVNVERSION}\"")
 
 ### tool
 # perl
-if (MSVC OR ("$ENV{MSYSTEM}" MATCHES "MINGW"))
+if (MSVC OR (MINGW AND (EXISTS "c:/windows")))
   find_program(
     PERL perl.exe
     HINTS ${CMAKE_CURRENT_SOURCE_DIR}/libs/perl/perl/bin

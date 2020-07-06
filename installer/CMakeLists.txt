@@ -1,18 +1,4 @@
 ﻿
-install(
-  DIRECTORY release/
-  DESTINATION .
-  PATTERN *~ EXCLUDE
-  PATTERN TERATERM.INI EXCLUDE
-  PATTERN lang_utf8 EXCLUDE
-  )
-
-install(
-  FILES release/EDITOR.CNF
-  DESTINATION .
-  RENAME KEYBOARD.CNF
-  )
-
 add_custom_target(
   teraterm_ini
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI
@@ -76,6 +62,8 @@ set_target_properties(
   lang_conv
   PROPERTIES FOLDER installer
   )
+
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_CURRENT_BINARY_DIR} --target lang_conv)")
 
 add_custom_command(
   OUTPUT
@@ -167,9 +155,9 @@ if(MSVC AND ("${MSVC_VERSION}" GREATER_EQUAL "1910"))
       "${RELEASE_DIR}/lang/Traditional Chinese.lng"
     )
   set_target_properties(
-	lang_copy
-	PROPERTIES FOLDER installer
-	)
+    lang_copy
+    PROPERTIES FOLDER installer
+    )
   add_custom_command(
     OUTPUT
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/lang/Default.lng"
@@ -237,9 +225,9 @@ elseif(MINGW)
       "${RELEASE_DIR}/lang/Traditional Chinese.lng"
     )
   set_target_properties(
-	lang_copy
-	PROPERTIES FOLDER installer
-	)
+    lang_copy
+    PROPERTIES FOLDER installer
+    )
   add_custom_command(
     OUTPUT
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lang/Default.lng"
@@ -264,3 +252,17 @@ elseif(MINGW)
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${RELEASE_DIR}/lang_utf16le ${CMAKE_BINARY_DIR}/lang_utf16le
     )
 endif()
+
+install(
+  DIRECTORY release/
+  DESTINATION .
+  PATTERN *~ EXCLUDE
+  PATTERN TERATERM.INI EXCLUDE
+  PATTERN lang_utf8 EXCLUDE
+  )
+
+install(
+  FILES release/EDITOR.CNF
+  DESTINATION .
+  RENAME KEYBOARD.CNF
+  )

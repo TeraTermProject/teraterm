@@ -1,4 +1,4 @@
-﻿if (MSVC OR ("$ENV{MSYSTEM}" MATCHES "MINGW"))
+﻿if (MSVC OR MINGW)
   find_program(
     HHC hhc.exe
     HINTS "C:/Program Files (x86)/HTML Help Workshop"
@@ -9,6 +9,7 @@
 else()
   set(HHC "HHC-NOTFOUND")
 endif()
+message("hhc=${HHC}")
 
 if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFOUND"))
   file(
@@ -107,9 +108,9 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFO
 else()
 
   # chmが存在したらコピーする
-  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ja/teraterm.chm)
+  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm)
     install(
-      FILES ${CMAKE_CURRENT_SOURCE_DIR}/ja/teraterm.chm
+      FILES ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm
       DESTINATION .
       )
   endif()
