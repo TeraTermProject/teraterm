@@ -78,7 +78,7 @@ static void LoadSpecialFont()
 		return;
 	}
 
-	if (GetModuleFileNameW(NULL, TSpecialFont, _countof(TSpecialFont)) == 0) {
+	if (_GetModuleFileNameW(NULL, TSpecialFont, _countof(TSpecialFont)) == 0) {
 		AddFontFlag = FALSE;
 		return;
 	}
