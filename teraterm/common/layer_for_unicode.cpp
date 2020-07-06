@@ -837,3 +837,18 @@ HMODULE _LoadLibraryW(LPCWSTR lpLibFileName)
 	free(LibFileNameA);
 	return r;
 }
+
+DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
+{
+	if (pGetModuleFileNameW != NULL) {
+		return pGetModuleFileNameW(hModule, lpFilename, nSize);
+	}
+
+	char filenameA[MAX_PATH];
+	DWORD r = GetModuleFileNameA(hModule, filenameA, sizeof(filenameA));
+	wchar_t *bufW = ToWcharA(filenameA);
+	wcsncpy_s(lpFilename, nSize, bufW, _TRUNCATE);
+	r = (DWORD)wcslen(lpFilename);
+	free(bufW);
+	return r;
+}

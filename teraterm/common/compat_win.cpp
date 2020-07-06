@@ -96,6 +96,7 @@ BOOL (WINAPI *pFindNextFileW)(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileDat
 BOOL (WINAPI *pRemoveDirectoryW)(LPCWSTR lpPathName);
 DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
 HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
+DWORD (WINAPI *pGetModuleFileNameW)(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -249,6 +250,7 @@ static const APIInfo Lists_kernel32[] = {
 	{ "RemoveDirectoryW", (void **)&pRemoveDirectoryW },
 	{ "GetFullPathNameW", (void **)&pGetFullPathNameW },
 	{ "LoadLibraryW", (void **)&pLoadLibraryW },
+	{ "GetModuleFileNameW", (void **)&pGetModuleFileNameW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
@@ -344,6 +346,7 @@ void WinCompatInit()
 		pFindFirstFileW = NULL;
 		pFindNextFileW = NULL;
 		pRemoveDirectoryW = NULL;
+		pGetModuleFileNameW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

@@ -136,6 +136,7 @@ BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
 BOOL _RemoveDirectoryW(LPCWSTR lpPathName);
 DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
 HMODULE _LoadLibraryW(LPCWSTR lpLibFileName);
+DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);
