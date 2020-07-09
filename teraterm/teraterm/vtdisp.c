@@ -2730,12 +2730,14 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 	const BOOL draw_bg_enable = FALSE;
 #endif
 
+#if 0
 	{
 		char b[128];
 		memcpy(b, Buff, Count);
 		b[Count] = 0;
 		OutputDebugPrintf("(%d,%d)'%s'\n", *X, Y, b);
 	}
+#endif
 
 #if !UNICODE_INTERNAL_BUFF
 	if ((ts.Language==IdRussian) &&
@@ -2794,9 +2796,11 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 #endif
 }
 
-// DispStr() ÇÃ wchar_tî≈
-// TODO: ç°ÇÃÇ∆Ç±ÇÎ ExtTextOutW() ÇíºåƒÇ—
-#if defined(UNICODE_DISPLAY)
+/**
+ *	DispStr() ÇÃ wchar_tî≈
+ *		Windows 95 Ç…Ç‡ ExtTextOutW() ÇÕë∂ç›Ç∑ÇÈÇ™
+ *		ìÆçÏÇ™àŸÇ»ÇÈÇÊÇ§Çæ
+ */
 void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
 {
 #ifdef ALPHABLEND_TYPE2
@@ -2892,7 +2896,6 @@ void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int*
 
 	*X += dx3 *FontWidth;
 }
-#endif
 
 void DispEraseCurToEnd(int YEnd)
 {

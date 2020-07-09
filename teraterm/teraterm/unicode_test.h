@@ -8,7 +8,6 @@
 #pragma once
 
 #define	UNICODE_INTERNAL_BUFF	1	// 1 = 内部バッファunicode化
-#define UNICODE_DISPLAY			1	// 0/1 = DispStr()/DispStrW()
 
 // UNICODE_INTERNAL_BUFFの影響を受けない
 #define UNICODE_API				1	// UNICODE APIを許可
