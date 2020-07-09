@@ -266,3 +266,23 @@ install(
   DESTINATION .
   RENAME KEYBOARD.CNF
   )
+
+# cygterm
+install(
+  FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm.exe
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm.cfg
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cyglaunch.exe
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm+.tar.gz
+  DESTINATION .
+)
+install(
+  FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm.exe
+  DESTINATION ./cygterm+-i686
+  )
+install(
+  FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm+-x86_64/cygterm.exe
+  DESTINATION ./cygterm+-x86_64
+  )
