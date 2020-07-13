@@ -217,7 +217,12 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			ChangeButton(! Pause);
 			return TRUE;
 		case IDC_TRANSHELP:
-			::PostMessage(fv->HMainWin,WM_USER_DLGHELP2,HlpFileSend,0);
+			if (fv->OpId == OpLog) {
+				::PostMessage(fv->HMainWin, WM_USER_DLGHELP2, HlpFileLog, 0);
+			}
+			else {
+				::PostMessage(fv->HMainWin, WM_USER_DLGHELP2, HlpFileSend, 0);
+			}
 			return TRUE;
 		default:
 			return (TTCDialog::OnCommand(wParam,lParam));
