@@ -1605,7 +1605,7 @@ void CLogPropPageDlg::OnOK()
 
 void CLogPropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalLog, 0);
 }
 
 /////////////////////////////

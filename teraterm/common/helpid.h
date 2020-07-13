@@ -157,6 +157,7 @@
 #define HlpMenuSetupTcpip                   43011
 #define HlpMenuSetupAdditional              43012
 #define HlpMenuSetupAdditionalCoding        43020
+#define HlpMenuSetupAdditionalLog           43021
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

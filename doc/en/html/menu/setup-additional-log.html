@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Additional settings ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings / "Log" タブ ([Setup] メニュー) </h1>
+
+    <dl>
+      <dt id="ViewlogEditor">View log editor</dt>
+      <dd>
+	ログを表示するエディタを指定します。
+      </dd>
+
+      <dt id="LogDefaultName">Default log file name(strftime format)</dt>
+      <dd>
+	標準のログファイル名を指定します。strftime の書式が使用できます。
+<pre>
+書式:
+&amp;h      ホスト名。未接続の場合は空。
+&amp;p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
+&amp;u      ログオン中のユーザ名。
+%a      曜日の省略形。
+%A      曜日の正式名。
+%b      月の省略形。
+%B      月の正式名。
+%c      ロケールに対応する日付と時刻の表現。
+%d      10 進数で表す月の日付 (01 ～ 31)。
+%H      24 時間表記の時間 (00 ～ 23)。
+%I      12 時間表記の時間 (01 ～ 12)。
+%j      10 進数で表す年初からの日数 (001 ～ 366)。
+%m      10 進数で表す月 (01 ～ 12)。
+%M      10 進数で表す分 (00 ～ 59)。
+%p      現在のロケールの午前/午後。
+%S      10 進数で表す秒 (00 ～ 59)。
+%U      10 進数で表す週の通し番号。日曜日を週の最初の日とする (00 ～ 53)。
+%w      10 進数で表す曜日 (0 ～ 6、日曜日が 0)。
+%W      10 進数で表す週の通し番号。月曜日を週の最初の日とする (00 ～ 53)。
+%x      現在のロケールの日付表現。
+%X      現在のロケールの時刻表現。
+%y      10 進数で表す西暦の下 2 桁 (00 ～ 99)。
+%Y      10 進数で表す 4 桁の西暦。
+%z, %Z  レジストリの設定に応じて、タイム ゾーンの名前または省略形を指定します。
+	タイム ゾーンが不明な場合は指定しません。
+%%      パーセント記号。
+</pre>
+      </dd>
+
+      <dt id="LogDefaultPath">Default log save folder</dt>
+      <dd>
+	    <p>標準のログ保存先を指定します。
+
+        <p>指定がない場合は、teraterm.ini の [Tera Term] セクション FileDir で指定された
+          環境変数を展開されたのフォルダを使用します。
+          (文字列に環境変数が含まれていると展開されます)
+
+        <p>設定されていない場合は、OSのダウンロードフォルダが使用します。
+
+        <p>使用できない場合は、ttermpro.exeのフォルダが使用します。
+
+      </dd>
+
+      <dt id="LogAutoStart">Auto start logging</dt>
+      <dd>
+	接続時に自動的にログ採取を開始する機能を有効にします。ログファイル名には、標準のログファイル名が使用されます。<br>
+	<a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションが指定されていると、当該機能は無効化されます。
+      </dd>
+
+      <dt id="LogRotate">Log Rotate</dt>
+      <dd>
+	ログのローテートを有効にします。ローテートされたログファイルには、拡張子に .1, .2, .3 … と付与されます。
+	<dl>
+	  <dt id="LogRotateSize">Size</dt>
+	  <dd>
+	    ログをローテートさせる上限サイズを設定します。単位に"KB", "MB"を指定することもできます。
+	  </dd>
+
+	  <dt id="LogRotateStep">Rotate</dt>
+	  <dd>
+	    ログをローテートさせる世代数を設定します。"0"の場合は、世代管理をしません。
+	  </dd>
+	</dl>
+      </dd>
+
+      <dt id="LogOption">Log option</dt>
+      <dd>
+	ログファイルの種別を設定します。
+	<dl>
+	  <dt id="LogBinary">Binary</dt>
+	  <dd>
+	    ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
+	    選択しない場合は、漢字コード、改行文字は変換され、
+	    エスケープシーケンスは取り除かれてから書き込まれます。
+	  </dd>
+
+	  <dt id="LogAppend">Append</dt>
+	  <dd>
+	    すでに存在するファイルに追加して書き込みたい場合は選択してください。
+	    選択しない場合は上書きされます。
+	  </dd>
+
+	  <dt id="LogTypePlainText">Plain text</dt>
+	  <dd>
+	    ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
+	    ※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+	  </dd>
+
+	  <dt id="LogHideDialog">Hide dialog</dt>
+	  <dd>
+	    ログ転送のダイアログを表示したくない場合は選択してください。
+	  </dd>
+
+	  <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
+	  <dd>
+	    現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
+	  </dd>
+
+	  <dt id="LogTimestamp">Timestamp</dt>
+	  <dd>
+	    ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
+	    タイムスタンプの種別として以下が選択できます。
+	    <dl id="LogTimestampType">
+	      <dt>Local Time</dt>
+	      <dd>
+		ローカルタイムでの日時を記録します。
+	      </dd>
+
+	      <dt>UTC</dt>
+	      <dd>
+		UTC での日時を記録します。
+	      </dd>
+
+	      <dt>Elapsed Time (Logging)</dt>
+	      <dd>
+		ログ取得開始からの経過時間を記録します。
+	      </dd>
+
+	      <dt>Elapsed Time (Connection)</dt>
+	      <dd>
+		接続開始からの経過時間を記録します。
+	      </dd>
+	    </dl>
+	    Local Time, UTC での日時のフォーマットは <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> の設定に従います。<br>
+	    Elapsed Time (Logging), Elapsed Time (Connection) では LogTimestampFormat の設定は無視されます。<br>
+	    ※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+	  </dd>
+	</dl>
+      </dd>
+    </dl>
+
+  </body>
+</html>
