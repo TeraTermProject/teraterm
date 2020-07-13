@@ -38,7 +38,6 @@ class CProtoDlg : public TTCDialog
 public:
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet pts);
 
-	enum { IDD = IDD_PROTDLG };
 protected:
 	virtual BOOL OnCancel();
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);

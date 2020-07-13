@@ -62,10 +62,10 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	Pause = FALSE;
 	hwnd = GetForegroundWindow();
 	if (fv->OpId == OpLog) { // parent window is desktop
-		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), CFileTransDlg::IDD);
+		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), IDD_FILETRANSDLG);
 	}
 	else { // parent window is VT window
-		Ok = TTCDialog::Create(hInstance, NULL, CFileTransDlg::IDD);
+		Ok = TTCDialog::Create(hInstance, NULL, IDD_FILETRANSDLG);
 	}
 
 	if (!fv->HideDialog) {

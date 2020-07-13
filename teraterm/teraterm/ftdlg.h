@@ -46,8 +46,6 @@ public:
 	void ChangeButton(BOOL PauseFlag);
 	void RefreshNum();
 
-	enum { IDD = IDD_FILETRANSDLG };
-
 private:
 //protected:
 	virtual BOOL OnCancel();

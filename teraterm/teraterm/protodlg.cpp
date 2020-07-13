@@ -44,7 +44,7 @@ BOOL CProtoDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet p
 	m_pts = pts;
 	fv = pfv;
 
-	BOOL Ok = TTCDialog::Create(hInstance, hParent, CProtoDlg::IDD);
+	BOOL Ok = TTCDialog::Create(hInstance, hParent, IDD_PROTDLG);
 	fv->HWin = GetSafeHwnd();
 
 	return Ok;
