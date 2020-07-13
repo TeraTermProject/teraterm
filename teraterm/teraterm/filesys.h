@@ -56,7 +56,7 @@ typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
   (char *file);
 
 extern PGetSetupFname GetSetupFname;
-extern PGetTransFname GetTransFname;
+//extern PGetTransFname GetTransFname;
 extern PGetMultiFname GetMultiFname;
 extern PGetGetFname GetGetFname;
 extern PSetFileVar SetFileVar;
@@ -74,7 +74,6 @@ void ShowFTDlg(WORD OpId);
 BOOL NewFileVar(PFileVar *FV);
 void FreeFileVar(PFileVar *FV);
 
-BOOL LogStart();
 void LogPut1(BYTE b);
 void LogToFile();
 BOOL CreateLogBuf();
@@ -99,11 +98,24 @@ void ZMODEMStart(int mode);
 void BPStart(int mode);
 void QVStart(int mode);
 
-extern PFileVar LogVar, SendVar, FileVar;
+extern PFileVar SendVar, FileVar;
 extern BOOL FileLog, BinLog, DDELog;
 
+
+// log
 void logfile_lock_initialize(void);
-void CommentLogToFile(char *buf, int size);
+void LogRotateSize(size_t size);
+void LogRotateRotate(int step);
+void LogRotateHalt(void);
+void LogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
+void LogClose();
+BOOL LogOpen(const char *fname);
+BOOL LogIsOpend();
+void LogWriteStr(const char *str);
+void LogInfo(char *param_ptr, size_t param_len);
+const char *LogGetFilename();
+BOOL LogOpenDialog(char **filename);
+char *LogGetLogFilename(const char *log_filename);
 
 #ifdef __cplusplus
 }

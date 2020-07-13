@@ -160,6 +160,10 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 		if (Ok)
 			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN),Name, _TRUNCATE);
 		break;
+	default:
+		assert(FALSE);
+		Ok = FALSE;
+		break;
 	}
 
 #if defined(_DEBUG)
@@ -176,266 +180,12 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 	return Ok;
 }
 
-static void SetLogFlags(HWND Dialog)
-{
-	LPLONG pl;
-	WORD BinFlag, val;
-	long opt = 0;
-
-	pl = (LPLONG)GetWindowLongPtr(Dialog, DWLP_USER);
-	if (pl) {
-		GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
-		if (BinFlag) {
-			opt |= LOGDLG_BINARY;
-		}
-
-		GetRB(Dialog, &val, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
-		if (val) {
-			opt |= LOGDLG_APPEND;
-		}
-
-		if (!BinFlag) {
-			GetRB(Dialog, &val, IDC_PLAINTEXT, IDC_PLAINTEXT);
-			if (val) {
-				opt |= LOGDLG_PLAINTEXT;
-			}
-
-			GetRB(Dialog, &val, IDC_TIMESTAMP, IDC_TIMESTAMP);
-			if (val) {
-				opt |= LOGDLG_TIMESTAMP;
-			}
-		}
-
-		GetRB(Dialog, &val, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
-		if (val) {
-			opt |= LOGDLG_HIDEDIALOG;
-		}
-
-		GetRB(Dialog, &val, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
-		if (val) {
-			opt |= LOGDLG_INCSCRBUFF;
-		}
-
-		switch (GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1) {
-		case TIMESTAMP_LOCAL:
-			// nothing to do
-			break;
-		case TIMESTAMP_UTC:
-			opt |= LOGDLG_UTC;
-			break;
-		case TIMESTAMP_ELAPSED_LOGSTART:
-			opt |= LOGDLG_ELAPSED;
-			break;
-		case TIMESTAMP_ELAPSED_CONNECTED:
-			opt |= LOGDLG_ELAPSED | LOGDLG_ELAPSEDCON;
-			break;
-		default:
-			// not reached
-			break;
-		}
-
-		*pl = opt;
-	}
-}
-
 /* ダイアログを中央に移動する */
 static void CenterCommonDialog(HWND hDlg)
 {
 	/* hDlgの親がダイアログのウィンドウハンドル */
 	HWND hWndDlgRoot = GetParent(hDlg);
 	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
-}
-
-/* Hook function for file name dialog box */
-static UINT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	LPOPENFILENAME ofn;
-	WORD BinFlag, TsFlag;
-	LPLONG pl;
-	long opt;
-	LPOFNOTIFY notify;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font;
-	int tstype;
-
-	switch (Message) {
-	case WM_INITDIALOG:
-		ofn = (LPOPENFILENAME)lParam;
-		pl = (LPLONG)(ofn->lCustData);
-		opt = *pl;
-		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
-
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgFoptFont, UILanguageFile)) {
-			SendDlgItemMessage(Dialog, IDC_FOPT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_FOPTBIN, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_FOPTAPPEND, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_PLAINTEXT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_HIDEDIALOG, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_ALLBUFF_INFIRST, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TIMESTAMP, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgFoptFont = NULL;
-		}
-
-		GetDlgItemText(Dialog, IDC_FOPT, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_FOPT, uimsg);
-		GetDlgItemText(Dialog, IDC_FOPTBIN, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_BINARY", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_FOPTBIN, uimsg);
-		GetDlgItemText(Dialog, IDC_FOPTAPPEND, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_APPEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_FOPTAPPEND, uimsg);
-		GetDlgItemText(Dialog, IDC_PLAINTEXT, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_PLAIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_PLAINTEXT, uimsg);
-		GetDlgItemText(Dialog, IDC_HIDEDIALOG, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_HIDEDIALOG", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_HIDEDIALOG, uimsg);
-		GetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_ALLBUFFINFIRST", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg);
-		GetDlgItemText(Dialog, IDC_TIMESTAMP, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_TIMESTAMP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TIMESTAMP, uimsg);
-
-		get_lang_msg("DLG_FOPT_TIMESTAMP_LOCAL", uimsg, sizeof(uimsg), "Local Time", UILanguageFile);
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
-		get_lang_msg("DLG_FOPT_TIMESTAMP_UTC", uimsg, sizeof(uimsg), "UTC", UILanguageFile);
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
-		get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", uimsg, sizeof(uimsg), "Elapsed Time (Logging)", UILanguageFile);
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
-		get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", uimsg, sizeof(uimsg), "Elapsed Time (Connection)", UILanguageFile);
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
-
-		// Binary チェックボックス
-		BinFlag = CheckFlag(opt, LOGDLG_BINARY);
-		SetRB(Dialog, BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
-
-		// Append チェックボックス
-		ShowDlgItem(Dialog, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
-		if (opt & LOGDLG_APPEND) {
-			SetRB(Dialog, 1, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
-		}
-
-		// Plain Text チェックボックス
-		ShowDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		if (BinFlag) {
-			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		}
-		else if (opt & LOGDLG_PLAINTEXT) {
-			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		}
-
-		// Hide dialogチェックボックス (2008.1.30 maya)
-		ShowDlgItem(Dialog, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
-		if (opt & LOGDLG_HIDEDIALOG) {
-			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
-		}
-
-		// Include screen bufferチェックボックス (2013.9.29 yutaka)
-		ShowDlgItem(Dialog, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
-		if (opt & LOGDLG_INCSCRBUFF) {
-			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
-		}
-
-		// timestampチェックボックス (2006.7.23 maya)
-		TsFlag = FALSE;
-		ShowDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		if (BinFlag) {
-			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-		else if (opt & LOGDLG_TIMESTAMP) {
-			TsFlag = TRUE;
-			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-
-		// timestamp 種別
-		ShowDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-		if (opt & LOGDLG_ELAPSED) {
-			// 経過時間
-			if (opt & LOGDLG_ELAPSEDCON) {
-				tstype = TIMESTAMP_ELAPSED_CONNECTED;
-			}
-			else {
-				tstype = TIMESTAMP_ELAPSED_LOGSTART;
-			}
-		}
-		else {
-			// 日時形式
-			if (opt & LOGDLG_UTC) {
-				tstype = TIMESTAMP_UTC;
-			}
-			else {
-				tstype = TIMESTAMP_LOCAL;
-			}
-		}
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
-		if (BinFlag || !TsFlag) {
-			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-		}
-
-		CenterCommonDialog(Dialog);
-
-		return TRUE;
-
-	case WM_COMMAND: // for old style dialog
-		switch (LOWORD(wParam)) {
-		case IDOK:
-			SetLogFlags(Dialog);
-
-			if (DlgFoptFont != NULL) {
-				DeleteObject(DlgFoptFont);
-			}
-			break;
-		case IDCANCEL:
-			if (DlgFoptFont != NULL) {
-				DeleteObject(DlgFoptFont);
-			}
-			break;
-		case IDC_FOPTBIN:
-			GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
-			if (BinFlag) {
-				DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
-				DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-				break; // BinFlag が on の時は Fall Through しない
-			}
-			else {
-				EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
-			}
-			// FALLTHROUGH -- BinFlag が off の時は Timestamp 種別の有効/無効を設定する
-		case IDC_TIMESTAMP:
-			GetRB(Dialog, &TsFlag, IDC_TIMESTAMP, IDC_TIMESTAMP);
-			if (TsFlag) {
-				EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-			}
-			else {
-				DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-			}
-			break;
-		}
-		break;
-	case WM_NOTIFY:	// for Explorer-style dialog
-		notify = (LPOFNOTIFY)lParam;
-		switch (notify->hdr.code) {
-		case CDN_FILEOK:
-			SetLogFlags(Dialog);
-
-			if (DlgFoptFont != NULL) {
-				DeleteObject(DlgFoptFont);
-			}
-			break;
-		}
-		break;
-	}
-	return FALSE;
 }
 
 static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -445,7 +195,9 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*3], *pf;
 	OPENFILENAME ofn;
+#if 0
 	LONG optl;
+#endif
 	WORD optw;
 	char TempDir[MAXPATHLEN];
 	BOOL Ok;
@@ -471,10 +223,12 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 			pf = pf + strlen(pf) + 1;
 		}
 		break;
+#if 0
 	case GTF_LOG:
 		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
 		break;
+#endif
 	case GTF_BP:
 		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
@@ -502,6 +256,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	ofn.lpstrFile = fv->FullName;
 	ofn.nMaxFile = sizeof(fv->FullName);
 
+#if 0
 	if (FuncId == GTF_LOG) {
 		DWORD logdir = GetFileAttributes(fv->LogDefaultPath);
 		// ログ保存の場合は初期フォルダを決め打ちしないようにする。(2007.8.24 yutaka)
@@ -512,11 +267,14 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 		else {
 			ofn.lpstrInitialDir = NULL;
 		}
-	} else {
+	} else
+#endif
+	{
 		ofn.lpstrInitialDir = CurDir;
 	}
 
 	switch (FuncId) {
+#if 0
 	case GTF_LOG:
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
@@ -526,6 +284,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 		optl = *Option;
 		ofn.lCustData = (LPARAM)&optl;
 		break;
+#endif
 	case GTF_SEND:
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
@@ -542,6 +301,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 
 	ofn.Flags |= OFN_SHOWHELP;
 
+#if 0
 	if (FuncId != GTF_LOG) {
 		// フィルタがワイルドカードではなく、そのファイルが存在する場合
 		// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
@@ -556,21 +316,27 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 			}
 		}
 	}
+#endif
 	ofn.lpstrTitle = fv->DlgCaption;
 
 	ofn.hInstance = hInst;
 
 	// loggingの場合、オープンダイアログをセーブダイアログへ変更 (2005.1.6 yutaka)
+#if 0
 	if (FuncId == GTF_LOG) {
 		Ok = GetSaveFileName(&ofn);
-	} else {
+	} else
+#endif
+	{
 		Ok = GetOpenFileName(&ofn);
 	}
 
 	if (Ok) {
+#if 0
 		if (FuncId==GTF_LOG)
 			*Option = optl;
 		else
+#endif
 			*Option = (long)optw;
 
 		fv->DirLen = ofn.nFileOffset;

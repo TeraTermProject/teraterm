@@ -10,7 +10,6 @@
 #define IDI_TTERM_CLASSIC               103
 #define IDI_VT_CLASSIC                  104
 #define IDI_CYGTERM                     105
-#define IDD_COMMENT_DIALOG              110
 #define IDD_EXTERNAL_SETUP              111
 #define IDD_TABSHEET_GENERAL            111
 #define IDD_BROADCAST_DIALOG            112
@@ -30,7 +29,6 @@
 #define IDD_TABSHEET_CODING             128
 #define IDD_TABSHEET_FONT               129
 #define IDR_TEKMENU                     1000
-#define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
 #define IDC_FULLPATH_LABEL              1002
 #define IDC_LINECOPY                    1003

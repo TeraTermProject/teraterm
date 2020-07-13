@@ -37,7 +37,7 @@
 
 /* GetTransFname function id */
 #define GTF_SEND 0 /* Send file */
-#define GTF_LOG  1 /* Log */
+//#define GTF_LOG  1 /* Log */
 #define GTF_BP   2 /* B-Plus Send */
 
 /* GetMultiFname function id */

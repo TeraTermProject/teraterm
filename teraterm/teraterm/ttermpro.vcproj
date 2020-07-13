@@ -254,6 +254,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\filesys_log.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\filesys_log_res.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\tek.ico"
 				>
 			</File>

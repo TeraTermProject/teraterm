@@ -31,11 +31,13 @@
 #include <stdio.h>
 #include <io.h>
 #include <process.h>
+#include <windows.h>
+#include <htmlhelp.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
-#include "tt_res.h"
 #include "ftdlg.h"
 #include "protodlg.h"
 #include "ttwinman.h"
@@ -46,20 +48,20 @@
 #include "dlglib.h"
 #include "vtterm.h"
 #include "win16api.h"
+#include "ftlib.h"
+#include "buffer.h"
+#include "helpid.h"
+#include "layer_for_unicode.h"
 
 #include "filesys.h"
-#include "ftlib.h"
-
-#include "buffer.h"
-
-#include <io.h>
-#include <process.h>
+#include "tt_res.h"
+#include "filesys_log_res.h"
 
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
 #define FS_BRACKET_END   2
 
-PFileVar LogVar = NULL;
+static PFileVar LogVar = NULL;
 PFileVar SendVar = NULL;
 PFileVar FileVar = NULL;
 static PCHAR ProtoVar = NULL;
@@ -93,7 +95,7 @@ static HMODULE HTTFILE = NULL;
 static int TTFILECount = 0;
 
 PGetSetupFname GetSetupFname;
-PGetTransFname GetTransFname;
+static PGetTransFname GetTransFname;
 PGetMultiFname GetMultiFname;
 PGetGetFname GetGetFname;
 PSetFileVar SetFileVar;
@@ -350,9 +352,13 @@ void FreeFileVar(PFileVar *fv)
 	}
 }
 
-// &h をホスト名に置換 (2007.5.14)
-// &p をTCPポート番号に置換 (2009.6.12)
-void ConvertLogname(char *c, int destlen)
+/**
+ *	ファイル名文字列の置き換え
+ *		&h	ホスト名に置換 (2007.5.14)
+ *		&p	TCPポート番号に置換 (2009.6.12)
+ *		&u	ログオン中のユーザ名
+ */
+static void ConvertLogname(char *c, int destlen)
 {
 	char buf[MAXPATHLEN], buf2[MAXPATHLEN], *p = c;
 	char tmphost[1024];
@@ -410,7 +416,7 @@ void ConvertLogname(char *c, int destlen)
 	strncpy_s(c, destlen, buf, _TRUNCATE);
 }
 
-void FixLogOption()
+static void FixLogOption()
 {
 	if (ts.LogBinary) {
 		ts.LogTypePlainText = false;
@@ -423,7 +429,6 @@ void FixLogOption()
 static void CloseFileSync(PFileVar ptr)
 {
 	BOOL ret;
-	DWORD code;
 
 	if (!ptr->FileOpen)
 		return;
@@ -436,7 +441,7 @@ static void CloseFileSync(PFileVar ptr)
 			WaitForSingleObject(ptr->LogThread, INFINITE);
 		}
 		else {
-			code = GetLastError();
+			//DWORD code = GetLastError();
 		}
 		CloseHandle(ptr->LogThread);
 		ptr->LogThread = INVALID_HANDLE_VALUE;
@@ -480,138 +485,335 @@ end:
 	return (0);
 }
 
-
-BOOL LogStart()
+/**
+ *	ダイアログの内容を ts に書き戻し
+ *
+ *	TODO
+ *		ダイアログで設定した値は一時的なもので
+ *		設定を上書きするのは良くないのではないだろうか?
+ */
+static void SetLogFlags(HWND Dialog)
 {
-	LONG Option;
-	char *logdir;
+	WORD BinFlag, val;
+
+	GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
+	ts.LogBinary = BinFlag;
+
+	GetRB(Dialog, &val, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
+	ts.Append = val;
+
+	if (!BinFlag) {
+		GetRB(Dialog, &val, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		ts.LogTypePlainText = val;
+
+		GetRB(Dialog, &val, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		ts.LogTimestamp = val;
+	}
+
+	GetRB(Dialog, &val, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
+	ts.LogHideDialog = val;
+
+	GetRB(Dialog, &val, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
+	ts.LogAllBuffIncludedInFirst = val;
+
+	ts.LogTimestampType = (GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1);
+}
+
+/**
+ *	ログファイルチェック
+ *
+ *	@param[in]	filename
+ *	@param[out]	exist	TURE/FALSE
+ *	@param[out]	bom		0	no BOM (or file not exist)
+ *						1	UTF-8
+ *						2	UTF-16LE
+ *						3	UTF-16BE
+ */
+static void CheckLogFile(const char *filename, BOOL *exist, int *bom)
+{
+	// ファイルが存在する?
+	DWORD logdir = GetFileAttributes(filename);
+	if ((logdir != INVALID_FILE_ATTRIBUTES) && ((logdir & FILE_ATTRIBUTE_DIRECTORY) == 0)) {
+		// ファイルがあった , アペンドするつもり
+		*exist = TRUE;
+
+		// BOM有り/無しチェック
+		FILE *fp = fopen(filename, "rb");
+		unsigned char tmp[4];
+		size_t l = fread(tmp, 1, sizeof(tmp), fp);
+		fclose(fp);
+		if (l < 2) {
+			*bom = 0;
+		} else if (l >= 2 && tmp[0] == 0xff && tmp[1] == 0xfe) {
+			// UTF-16LE
+			*bom = 2;
+		} else if (l >= 2 && tmp[0] == 0xfe && tmp[1] == 0xff) {
+			// UTF-16BE
+			*bom = 3;
+		} else if (l >= 3 && tmp[0] == 0xef && tmp[1] == 0xbb && tmp[2] == 0xbf) {
+			// UTF-8
+			*bom = 1;
+		} else {
+			*bom = 0;
+		}
+	}
+	else {
+		// ファイルがない、新規
+		*exist = FALSE;
+		*bom = 0;
+	}
+}
+
+static void CheckLogFile(HWND Dialog, const char *filename)
+{
+	BOOL exist;
+	int bom;
+	CheckLogFile(filename, &exist, &bom);
+	if (exist) {
+		// ファイルが存在する -> アペンドするつもり?
+		CheckDlgButton(Dialog, IDC_FOPTAPPEND, BST_CHECKED);
+		if (bom != 0) {
+			// BOM有り
+			CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
+		}
+		else {
+			// BOMなし
+			CheckDlgButton(Dialog, IDC_BOM, BST_UNCHECKED);
+		}
+	}
+	else {
+		// ファイルがない、新規
+		CheckDlgButton(Dialog, IDC_FOPTAPPEND, BST_UNCHECKED);
+		CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
+	}
+}
+
+typedef struct {
+	char *filename;
+	BOOL append;
+	BOOL bom;
+} LogDlgData_t;
+
+static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_TABSHEET_TITLE_LOG" },
+		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
+		{ IDC_FOPTAPPEND, "DLG_FOPT_APPEND" },
+		{ IDC_PLAINTEXT, "DLG_FOPT_PLAIN" },
+		{ IDC_HIDEDIALOG, "DLG_FOPT_HIDEDIALOG" },
+		{ IDC_ALLBUFF_INFIRST, "DLG_FOPT_ALLBUFFINFIRST" },
+		{ IDC_TIMESTAMP, "DLG_FOPT_TIMESTAMP" },
+	};
+	static const I18nTextInfo timestamp_list[] = {
+		{ "DLG_FOPT_TIMESTAMP_LOCAL", L"Local Time" },
+		{ "DLG_FOPT_TIMESTAMP_UTC", L"UTC" },
+		{ "DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", L"Elapsed Time (Logging)" },
+		{ "DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", L"Elapsed Time (Connection)" },
+	};
+	const char *UILanguageFile = ts.UILanguageFile;
+	LogDlgData_t *data = (LogDlgData_t *)GetWindowLongPtr(Dialog, DWLP_USER);
+
+	if (Message == 	RegisterWindowMessage(HELPMSGSTRING)) {
+		// コモンダイアログからのヘルプメッセージを付け替える
+		Message = WM_COMMAND;
+		wParam = IDHELP;
+	}
+	switch (Message) {
+	case WM_INITDIALOG: {
+		data = (LogDlgData_t *)lParam;
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)data);
+		::DragAcceptFiles(Dialog, TRUE);
+
+		SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+		SetI18nList("Tera Term", Dialog, IDC_TIMESTAMPTYPE, timestamp_list, _countof(timestamp_list),
+					UILanguageFile, 0);
+
+		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-8");
+		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
+
+		SetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, data->filename);
+		free(data->filename);
+		data->filename = NULL;
+
+		// Binary/Text チェックボックス
+		if (ts.LogBinary) {
+			SendDlgItemMessage(Dialog, IDC_FOPTBIN, BM_SETCHECK, BST_CHECKED, 0);
+		}
+		else {
+			SendDlgItemMessage(Dialog, IDC_FOPTTEXT, BM_SETCHECK, BST_CHECKED, 0);
+		}
+
+		// Append チェックボックス
+		if (ts.Append) {
+			SetRB(Dialog, 1, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
+		}
+
+		// Plain Text チェックボックス
+		if (ts.LogBinary) {
+			// Binaryフラグが有効なときはチェックできない
+			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		}
+		else if (ts.LogTypePlainText) {
+			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		}
+
+		// Hide dialogチェックボックス (2008.1.30 maya)
+		if (ts.LogHideDialog) {
+			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
+		}
+
+		// Include screen bufferチェックボックス (2013.9.29 yutaka)
+		if (ts.LogAllBuffIncludedInFirst) {
+			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
+		}
+
+		// timestampチェックボックス (2006.7.23 maya)
+		if (ts.LogBinary) {
+			// Binaryフラグが有効なときはチェックできない
+			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		}
+		else if (ts.LogTimestamp) {
+			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		}
+
+		// timestamp 種別
+		int tstype = ts.LogTimestampType == TIMESTAMP_LOCAL ? 0 :
+				ts.LogTimestampType == TIMESTAMP_UTC ? 1 :
+				ts.LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
+				ts.LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
+		if (ts.LogBinary || !ts.LogTimestamp) {
+			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+		}
+
+		CenterWindow(Dialog, GetParent(Dialog));
+
+		return TRUE;
+	}
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			char filename[MAX_PATH];
+			GetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
+			data->filename = _strdup(filename);
+			data->append = IsDlgButtonChecked(Dialog, IDC_FOPTAPPEND) == BST_CHECKED;
+			data->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
+			SetLogFlags(Dialog);
+			EndDialog(Dialog, IDOK);
+			break;
+		}
+		case IDCANCEL:
+			EndDialog(Dialog, IDCANCEL);
+			break;
+		case IDHELP:
+			OpenHelp(HH_HELP_CONTEXT, HlpFileLog, ts.UILanguageFile);
+			break;
+		case IDC_FOPT_FILENAME_BUTTON: {
+			/* save current dir */
+			wchar_t curdir[MAXPATHLEN];
+			_GetCurrentDirectoryW(_countof(curdir), curdir);
+
+			char fname[MAX_PATH];
+			GetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
+
+			char FNFilter[128*3];
+			get_lang_msg("FILEDLG_ALL_FILTER", FNFilter, sizeof(FNFilter), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
+
+			char caption[MAX_PATH];
+			char uimsg[MAX_UIMSG];
+			get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, UILanguageFile);
+			strncpy_s(caption, sizeof(caption),"Tera Term: ", _TRUNCATE);
+			strncat_s(caption, sizeof(caption), uimsg, _TRUNCATE);
+
+			OPENFILENAME ofn = {};
+			ofn.lStructSize = get_OPENFILENAME_SIZEA();
+			//ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING;
+			ofn.Flags |= OFN_SHOWHELP;
+			ofn.Flags |= OFN_NOCHANGEDIR;		// うまく動作しない環境もあるようだ
+			ofn.hwndOwner = Dialog;
+			ofn.lpstrFilter = FNFilter;
+			ofn.nFilterIndex = 1;
+			ofn.lpstrFile = fname;
+			ofn.nMaxFile = sizeof(fname);
+			ofn.lpstrTitle = caption;
+			BOOL Ok = GetSaveFileName(&ofn);
+			if (Ok) {
+				SetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+			}
+
+			/* restore dir */
+			_SetCurrentDirectoryW(curdir);
+
+			break;
+		}
+		case IDC_FOPTBIN:
+			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
+			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
+			break;
+		case IDC_FOPTTEXT:
+			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
+			EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
+			// FALLTHROUGH -- BinFlag が off の時は Timestamp 種別の有効/無効を設定する
+		case IDC_TIMESTAMP:
+			if (IsDlgButtonChecked(Dialog, IDC_TIMESTAMP) == BST_CHECKED) {
+				EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+			}
+			else {
+				DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+			}
+			break;
+		case IDC_FOPT_FILENAME_EDIT:
+			if (HIWORD(wParam) == EN_CHANGE){
+				char filename[MAX_PATH];
+				GetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
+				CheckLogFile(Dialog, filename);
+			}
+			break;
+		}
+		break;
+	case WM_DROPFILES: {
+		// 複数ドロップされても最初の1つだけを扱う
+		HDROP hDrop = (HDROP)wParam;
+		const UINT len = _DragQueryFileW(hDrop, 0, NULL, 0);
+		if (len == 0) {
+			DragFinish(hDrop);
+			return TRUE;
+		}
+		wchar_t *filename = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
+		_DragQueryFileW(hDrop, 0, filename, len + 1);
+		filename[len] = '\0';
+		_SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename);
+		SendDlgItemMessage(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, len, len);
+		free(filename);
+		DragFinish(hDrop);
+		return TRUE;
+	}
+	}
+	return FALSE;
+}
+
+static BOOL LogStart()
+{
 	unsigned tid;
-	DWORD ofs, size, written_size;
-	char buf[512];
-	const char *crlf = "\r\n";
-	DWORD crlf_len = 2;
-	char FileDirExpanded[MAX_PATH];
 
 	if ((FileLog) || (BinLog)) return FALSE;
 
-	if (! LoadTTFILE()) return FALSE;
-	if (! NewFileVar(&LogVar))
-	{
-		FreeTTFILE();
-		return FALSE;
-	}
-	LogVar->OpId = OpLog;
-
-	if (strlen(ts.LogDefaultPath) > 0) {
-		logdir = ts.LogDefaultPath;
-	}
-	else if (strlen(ts.FileDir) > 0) {
-		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-		logdir = FileDirExpanded;
-	}
-	else {
-		logdir = ts.HomeDir;
-	}
+	assert(LogVar != NULL);
 
 	if (strlen(&(LogVar->FullName[LogVar->DirLen]))==0) {
-		Option = 0;
-		if (ts.LogBinary) {
-			Option |= LOGDLG_BINARY;
-		}
-		if (ts.Append) {
-			Option |= LOGDLG_APPEND;
-		}
-		if (ts.LogTypePlainText) {
-			Option |= LOGDLG_PLAINTEXT;
-		}
-		if (ts.LogTimestamp) {
-			Option |= LOGDLG_TIMESTAMP;
-		}
-		if (ts.LogHideDialog) {
-			Option |= LOGDLG_HIDEDIALOG;
-		}
-		if (ts.LogAllBuffIncludedInFirst) {
-			Option |= LOGDLG_INCSCRBUFF;
-		}
-
-		switch (ts.LogTimestampType) {
-		case TIMESTAMP_LOCAL:
-			// nothing to do
-			break;
-		case TIMESTAMP_UTC:
-			Option |= LOGDLG_UTC;
-			break;
-		case TIMESTAMP_ELAPSED_LOGSTART:
-			Option |= LOGDLG_ELAPSED;
-			break;
-		case TIMESTAMP_ELAPSED_CONNECTED:
-			Option |= LOGDLG_ELAPSED | LOGDLG_ELAPSEDCON;
-			break;
-		default:
-			// not reached
-			break;
-		}
-
-		// ログのデフォルトファイル名を設定 (2006.8.28 maya)
-		strncat_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogDefaultName, _TRUNCATE);
-		ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-		ConvertLogname(LogVar->FullName, sizeof(LogVar->FullName));
-
-		strncpy_s(LogVar->LogDefaultPath, sizeof(LogVar->LogDefaultPath), ts.LogDefaultPath, _TRUNCATE);
-		if (! (*GetTransFname)(LogVar, logdir, GTF_LOG, &Option)) {
-			FreeFileVar(&LogVar);
-			FreeTTFILE();
-			return FALSE;
-		}
-
-		ts.LogBinary = CheckFlag(Option, LOGDLG_BINARY);
-			CheckFlag(Option, LOGDLG_BINARY);
-		ts.Append =
-			CheckFlag(Option, LOGDLG_APPEND);
-		ts.LogTypePlainText =
-			CheckFlag(Option, LOGDLG_PLAINTEXT);
-		ts.LogTimestamp =
-			CheckFlag(Option, LOGDLG_TIMESTAMP);
-		ts.LogHideDialog =
-			CheckFlag(Option, LOGDLG_HIDEDIALOG);
-		ts.LogAllBuffIncludedInFirst =
-			CheckFlag(Option, LOGDLG_INCSCRBUFF);
-
-		if (Option & LOGDLG_ELAPSED) {
-			// 経過時間
-			if (Option & LOGDLG_ELAPSEDCON) {
-				ts.LogTimestampType = TIMESTAMP_ELAPSED_CONNECTED;
-			}
-			else {
-				ts.LogTimestampType = TIMESTAMP_ELAPSED_LOGSTART;
-			}
-		}
-		else {
-			// 日時形式
-			if (Option & LOGDLG_UTC) {
-				ts.LogTimestampType = TIMESTAMP_UTC;
-			}
-			else {
-				ts.LogTimestampType = TIMESTAMP_LOCAL;
-			}
-		}
+		// ファイル名が設定されていない
+		return FALSE;
 	}
-	else {
-		// LogVar->DirLen = 0 だとここに来る
-		// フルパス・相対パスともに LogVar->FullName に入れておく必要がある
-		char FileName[MAX_PATH];
 
-		// フルパス化
-		strncpy_s(FileName, sizeof(FileName), LogVar->FullName, _TRUNCATE);
-		ConvFName(logdir, FileName, sizeof(FileName), "", LogVar->FullName, sizeof(LogVar->FullName));
+	if (! LoadTTFILE()) return FALSE;
 
-		ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-		ConvertLogname(LogVar->FullName, sizeof(LogVar->FullName));
-
-		(*SetFileVar)(LogVar);
-
-		FixLogOption();
-	}
+	LogVar->OpId = OpLog;
+	(*SetFileVar)(LogVar);
+	FixLogOption();
 
 	if (ts.LogBinary > 0)
 	{
@@ -690,7 +892,7 @@ BOOL LogStart()
 	// 最初のファイルが設定したサイズでローテートしない問題の修正。
 	// (2016.4.9 yutaka)
 	if (LogVar->RotateMode != ROTATE_NONE) {
-		size = GetFileSize(LogVar->FileHandle, NULL);
+		DWORD size = GetFileSize(LogVar->FileHandle, NULL);
 		if (size != -1)
 			LogVar->ByteCount = size;
 	}
@@ -721,6 +923,10 @@ BOOL LogStart()
 	// ログ採取を開始する。
 	// (2013.9.29 yutaka)
 	if (ts.LogAllBuffIncludedInFirst) {
+		DWORD ofs, size, written_size;
+		char buf[512];
+		const char *crlf = "\r\n";
+		DWORD crlf_len = 2;
 		for (ofs = 0 ;  ; ofs++ ) {
 			// 1つの行を取得する。文字だけなので、エスケープシーケンスは含まれない。
 			size = BuffGetAnyLineData(ofs, buf, sizeof(buf));
@@ -820,7 +1026,7 @@ static inline void logfile_unlock(void)
 }
 
  // コメントをログへ追加する
-void CommentLogToFile(char *buf, int size)
+static void CommentLogToFile(char *buf, int size)
 {
 	DWORD wrote;
 
@@ -1469,6 +1675,10 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 		case PROTO_QV:
 			vsize = sizeof(TQVVar);
 			break;
+		default:
+			vsize = 0;
+			assert(FALSE);
+			break;
 	}
 	ProtoVar = (PCHAR)malloc(vsize);
 	if (ProtoVar==NULL)
@@ -1909,4 +2119,227 @@ void QVStart(int mode)
 
 	if (! OpenProtoDlg(FileVar,PROTO_QV,mode,0,0))
 		ProtoEnd();
+}
+
+/**
+ *	ログローテートの設定
+ *	ログのサイズが<size>バイトを超えていれば、ローテーションするよう設定する
+ */
+void LogRotateSize(size_t size)
+{
+	if (LogVar == NULL) {
+		return;
+	}
+	LogVar->RotateMode = ROTATE_SIZE;
+	LogVar->RotateSize = size;
+}
+
+/**
+ *	ログローテートの設定
+ *	ログファイルの世代を設定する
+ */
+void LogRotateRotate(int step)
+{
+	if (LogVar == NULL) {
+		return;
+	}
+	LogVar->RotateStep = step;
+}
+
+/**
+ *	ログローテートの設定
+ *	ローテーションを停止
+ */
+void LogRotateHalt(void)
+{
+	if (LogVar == NULL) {
+		return;
+	}
+	LogVar->RotateMode = ROTATE_NONE;
+	LogVar->RotateSize = 0;
+	LogVar->RotateStep = 0;
+}
+
+static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_COMMENT_TITLE" },
+		{ IDOK, "BTN_OK" }
+	};
+	char buf[256];
+	UINT ret;
+
+	switch (msg) {
+		case WM_INITDIALOG:
+			//SetDlgItemText(hDlgWnd, IDC_EDIT_COMMENT, "サンプル");
+			// エディットコントロールにフォーカスをあてる
+			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
+			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+			return FALSE;
+
+		case WM_COMMAND:
+			switch (LOWORD(wp)) {
+				case IDOK:
+					memset(buf, 0, sizeof(buf));
+					ret = GetDlgItemTextA(hDlgWnd, IDC_EDIT_COMMENT, buf, sizeof(buf) - 1);
+					if (ret > 0) { // テキスト取得成功
+						//buf[sizeof(buf) - 1] = '\0';  // null-terminate
+						CommentLogToFile(buf, ret);
+					}
+					TTEndDialog(hDlgWnd, IDOK);
+					break;
+				default:
+					return FALSE;
+			}
+			break;
+		case WM_CLOSE:
+			TTEndDialog(hDlgWnd, 0);
+			return TRUE;
+
+		default:
+			return FALSE;
+	}
+	return TRUE;
+}
+
+void LogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
+{
+	// ログファイルへコメントを追加する (2004.8.6 yutaka)
+	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
+				HVTWin, OnCommentDlgProc);
+}
+
+void LogClose()
+{
+	if (LogVar != NULL)
+		FileTransEnd(OpLog);
+}
+
+BOOL LogOpen(const char *fname)
+{
+	BOOL ret;
+
+	if ((LogVar==NULL) && !NewFileVar(&LogVar)) {
+		return FALSE;
+	}
+
+	LogVar->DirLen = 0;
+	LogVar->NoMsg = TRUE;
+	strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), fname, _TRUNCATE);
+	ret = LogStart();
+	return ret;
+}
+
+BOOL LogIsOpend()
+{
+	// LogVar->FileOpen
+	return LogVar != NULL;
+}
+
+void LogWriteStr(const char *str)
+{
+	if (LogVar != NULL)
+	{
+		DWORD wrote;
+		size_t len = strlen(str);
+		WriteFile(LogVar->FileHandle, str, len, &wrote, NULL);
+		LogVar->ByteCount =
+			LogVar->ByteCount + len;
+		FLogRefreshNum();
+	}
+}
+
+void LogInfo(char *param_ptr, size_t param_len)
+{
+	if (LogVar) {
+		param_ptr[0] = '0'
+			+ (ts.LogBinary != 0)
+			+ ((ts.Append != 0) << 1)
+			+ ((ts.LogTypePlainText != 0) << 2)
+			+ ((ts.LogTimestamp != 0) << 3)
+			+ ((ts.LogHideDialog != 0) << 4);
+		strncpy_s(param_ptr + 1, param_len - 1, LogVar->FullName, _TRUNCATE);
+	}
+	else {
+		param_ptr[0] = '0' - 1;
+		param_ptr[1] = 0;
+	}
+}
+
+/**
+ *	現在のログファイル名を取得
+ */
+const char *LogGetFilename()
+{
+	if (LogVar == NULL) {
+		return NULL;
+	}
+	return LogVar->FullName;
+}
+
+/**
+ *	ログダイアログを開く
+ *	@retval	TRUE	[ok] が押された
+ *	@retval	FALSE	キャンセルされた
+ *	@param[in,out]	filename	OK時、ファイル名、不要になったらfree()すること
+ */
+BOOL LogOpenDialog(char **filename)
+{
+	LogDlgData_t *data = (LogDlgData_t *)calloc(sizeof(LogDlgData_t), 1);
+	data->filename = LogGetLogFilename(NULL);
+	INT_PTR ret = TTDialogBoxParam(
+		hInst, MAKEINTRESOURCE(IDD_LOGDLG),
+		HVTWin, LogFnHook, (LPARAM)data);
+	if (ret == IDOK) {
+		*filename = data->filename;
+	}
+	free(data);
+	return ret == IDOK ? TRUE : FALSE;
+}
+
+/**
+ *	ログファイル名を取得
+ *	ログファイル名用の修飾を行う
+ *	- strftime() と同じ日付展開
+ *	- 設定されたログファイルフォルダを追加
+ *	- ホスト名,ポート番号展開
+ *
+ *	@param[in]	log_filename	ファイル名(相対/絶対どちらでもok)
+ *								NULLの場合デフォルトファイル名となる
+ *								strftime形式ok
+ *	@return						フルパスファイル名
+ *								不要になったら free() すること
+ */
+char *LogGetLogFilename(const char *log_filename)
+{
+	// フォルダ
+	char FileDirExpanded[MAX_PATH];
+	char *logdir;
+	if (strlen(ts.LogDefaultPath) > 0) {
+		logdir = ts.LogDefaultPath;
+	}
+	else if (strlen(ts.FileDir) > 0) {
+		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+		logdir = FileDirExpanded;
+	}
+	else {
+		logdir = ts.HomeDir;
+	}
+
+	// 元となるファイル名
+	char base_name[MAX_PATH];
+	if (log_filename == NULL) {
+		strncpy_s(base_name, _countof(base_name), ts.LogDefaultName, _TRUNCATE);
+	}
+	else {
+		strncpy_s(base_name, _countof(base_name), log_filename, _TRUNCATE);
+	}
+
+	// フルパス化
+	char full_path[MAX_PATH];
+	ConvFName(logdir, base_name, sizeof(base_name), "", full_path, sizeof(full_path));
+	ParseStrftimeFileName(full_path, sizeof(full_path));
+	ConvertLogname(full_path, sizeof(full_path));
+
+	return _strdup(full_path);
 }

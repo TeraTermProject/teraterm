@@ -178,6 +178,7 @@
     <ClInclude Include="broadcast.h" />
     <ClInclude Include="coding_pp.h" />
     <ClInclude Include="coding_pp_res.h" />
+    <ClInclude Include="filesys_log_res.h" />
     <ClInclude Include="font_pp.h" />
     <ClInclude Include="font_pp_res.h" />
     <ClInclude Include="sendfiledlg.h" />
@@ -204,6 +205,7 @@
     <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
     <ResourceCompile Include="coding_pp.rc" />
     <ResourceCompile Include="debug_pp.rc" />
+    <ResourceCompile Include="filesys_log.rc" />
     <ResourceCompile Include="font_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="tt-version.rc" />

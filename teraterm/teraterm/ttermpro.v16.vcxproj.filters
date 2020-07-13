@@ -196,6 +196,9 @@
     <ResourceCompile Include="font_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="filesys_log.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sizetip.h">
@@ -371,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="broadcast.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filesys_log_res.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -27,6 +27,8 @@ add_executable(
   dnddlg.h
   filesys.cpp
   filesys.h
+  filesys_log.rc
+  filesys_log_res.h
   font_pp.cpp
   font_pp.h
   font_pp.rc

@@ -194,6 +194,7 @@ typedef enum {
 
 // LogDialog Option
 #define LOGDLG_BINARY          1
+#if 0	// TODOè¡Ç∑
 #define LOGDLG_APPEND          (1 << 1)
 #define LOGDLG_PLAINTEXT       (1 << 2)
 #define LOGDLG_TIMESTAMP       (1 << 3)
@@ -207,6 +208,7 @@ typedef enum {
  * LOGDLG_ELAPSEDCON == 1 => ê⁄ë±äJénÇ©ÇÁ
  */
 #define LOGDLG_ELAPSEDCON      LOGDLG_UTC
+#endif
 
 // Log Timestamp Type
 enum LogTimestampType {
@@ -216,7 +218,7 @@ enum LogTimestampType {
     TIMESTAMP_ELAPSED_CONNECTED
 };
 
-// log flags (used in ts.LogFlag) 
+// log flags (used in ts.LogFlag)
 #define LOG_TEL 1
 #define LOG_KMT 2
 #define LOG_X   4
@@ -822,7 +824,7 @@ typedef struct tttset TTTSet, *PTTSet;
 typedef struct {
 	PCHAR SetupFN; // setup file name
 	WORD PortType; // TCPIP/Serial
-	PCHAR HostName; // host name 
+	PCHAR HostName; // host name
 	WORD Telnet; // non-zero: enable telnet
 	WORD TelPort; // default TCP port# for telnet
 	WORD TCPPort; // TCP port #

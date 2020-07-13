@@ -1247,7 +1247,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		EnableMenuItem(FileMenu,ID_FILE_LOGMEIN,MF_BYCOMMAND | MF_ENABLED);
 
 		// XXX: この位置にしないと、logがグレイにならない。 (2005.2.1 yutaka)
-		if (LogVar!=NULL) { // ログ採取モードの場合
+		if (LogIsOpend()) { // ログ採取モードの場合
 			EnableMenuItem(FileMenu,ID_FILE_LOG,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_ENABLED);
@@ -3572,16 +3572,16 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	/* Auto start logging (2007.5.31 maya) */
-	if (ts.LogAutoStart && ts.LogFN[0]==0) {
-		strncpy_s(ts.LogFN, sizeof(ts.LogFN), ts.LogDefaultName, _TRUNCATE);
-	}
-	/* ログ採取が有効で開始していなければ開始する (2006.9.18 maya) */
-	if ((ts.LogFN[0]!=0) && (LogVar==NULL) && NewFileVar(&LogVar)) {
-		LogVar->DirLen = 0;
-		strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogFN, _TRUNCATE);
-		HelpId = HlpFileLog;
-		LogStart();
+	/* Auto start logging or /L= option */
+	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
+		if (ts.LogFN[0] == 0) {
+			char *filename = LogGetLogFilename(NULL);
+			strncpy_s(ts.LogFN, sizeof(ts.LogFN), filename, _TRUNCATE);
+			free(filename);
+		}
+		if (ts.LogFN[0]!=0) {
+			LogOpen(ts.LogFN);
+		}
 	}
 
 	if ((ts.PortType==IdTCPIP) &&
@@ -4135,73 +4135,31 @@ void CVTWindow::OnLogMeInLaunch()
 
 void CVTWindow::OnFileLog()
 {
-	HelpId = HlpFileLog;
-	LogStart();
-}
-
-
-static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_COMMENT_TITLE" },
-		{ IDOK, "BTN_OK" }
-	};
-	char buf[256];
-	UINT ret;
-
-	switch (msg) {
-		case WM_INITDIALOG:
-			//SetDlgItemText(hDlgWnd, IDC_EDIT_COMMENT, "サンプル");
-			// エディットコントロールにフォーカスをあてる
-			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
-			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
-			return FALSE;
-
-		case WM_COMMAND:
-			switch (LOWORD(wp)) {
-				case IDOK:
-					memset(buf, 0, sizeof(buf));
-					ret = GetDlgItemTextA(hDlgWnd, IDC_EDIT_COMMENT, buf, sizeof(buf) - 1);
-					if (ret > 0) { // テキスト取得成功
-						//buf[sizeof(buf) - 1] = '\0';  // null-terminate
-						CommentLogToFile(buf, ret);
-					}
-					TTEndDialog(hDlgWnd, IDOK);
-					break;
-				default:
-					return FALSE;
-			}
-			break;
-		case WM_CLOSE:
-			TTEndDialog(hDlgWnd, 0);
-			return TRUE;
-
-		default:
-			return FALSE;
+	char *filename;
+	BOOL r = LogOpenDialog(&filename);
+	if (r) {
+		LogOpen(filename);
+		free(filename);
 	}
-	return TRUE;
 }
 
 void CVTWindow::OnCommentToLog()
 {
-	// ログファイルへコメントを追加する (2004.8.6 yutaka)
-	TTDialogBox(m_hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
-				HVTWin, (DLGPROC)OnCommentDlgProc);
+	LogAddCommentDlg(m_hInst, HVTWin);
 }
 
 // ログの閲覧 (2005.1.29 yutaka)
 void CVTWindow::OnViewLog()
 {
 	char command[MAX_PATH*2+3]; // command "filename"
-	char *file;
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
-	if (LogVar == NULL || !LogVar->FileOpen) {
+	if(!LogIsOpend()) {
 		return;
 	}
 
-	file = LogVar->FullName;
+	const char *file = LogGetFilename();
 
 	memset(&si, 0, sizeof(si));
 	GetStartupInfo(&si);
@@ -4760,12 +4718,12 @@ void CVTWindow::OnSetupSerialPort()
 	FreeTTDLG();
 
 	if (Ok && ts.ComPort > 0) {
-		/* 
+		/*
 		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
 		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
 		 */
 		if ( cv.Ready && (cv.PortType != IdSerial) ) {
-			_snprintf_s(Command, sizeof(Command), 
+			_snprintf_s(Command, sizeof(Command),
 				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
 				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
 
@@ -6040,5 +5998,3 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	return retval;
 }
-
-

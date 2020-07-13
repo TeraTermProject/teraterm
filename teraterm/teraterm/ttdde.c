@@ -516,53 +516,43 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdLoadKeyMap,0);
 		break;
 
-	case CmdLogRotate:
-		if (LogVar != NULL) {
-			char *p = ParamFileName;
-			int s;
+	case CmdLogRotate: {
+		char *p = ParamFileName;
+		int s;
 
-			if (strncmp(p, "size", 4) == 0) {
-				s = atoi(&p[5]);
-				LogVar->RotateMode = ROTATE_SIZE;
-				LogVar->RotateSize = s;
+		if (strncmp(p, "size", 4) == 0) {
+			s = atoi(&p[5]);
+			LogRotateSize(s);
 
-			} else if (strncmp(p, "rotate", 6) == 0) {
-				s = atoi(&p[7]);
-				LogVar->RotateStep = s;
+		} else if (strncmp(p, "rotate", 6) == 0) {
+			s = atoi(&p[7]);
+			LogRotateRotate(s);
 
-			} else if (strncmp(p, "halt", 4) == 0) {
-				LogVar->RotateMode = ROTATE_NONE;
-				LogVar->RotateSize = 0;
-				LogVar->RotateStep = 0;
-			}
+		} else if (strncmp(p, "halt", 4) == 0) {
+			LogRotateHalt();
 		}
 		break;
+	}
 
 	case CmdLogAutoClose:
 		AutoLogClose = (ParamBinaryFlag!=0);
 		break;
 
 	case CmdLogClose:
-		if (LogVar != NULL) FileTransEnd(OpLog);
+		LogClose();
 		break;
 	case CmdLogOpen:
-		if ((LogVar==NULL) && NewFileVar(&LogVar))
-		{
-			BOOL ret;
-			LogVar->DirLen = 0;
-			LogVar->NoMsg = TRUE;
-			strncpy_s(LogVar->FullName, sizeof(LogVar->FullName),ParamFileName, _TRUNCATE);
-			ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-			ret = LogStart();
-			if (ret) {
-				strncpy_s(ParamFileName, sizeof(ParamFileName),"1", _TRUNCATE);
-			}
-			else {
-				strncpy_s(ParamFileName, sizeof(ParamFileName),"0", _TRUNCATE);
-			}
-		}
-		else
+		if (LogIsOpend()) {
 			return DDE_FNOTPROCESSED;
+		}
+		else {
+			char *ParamFileNameA = ToCharU8(ParamFileName);
+			char *log_filenameA = LogGetLogFilename(ParamFileNameA);
+			BOOL ret = LogOpen(log_filenameA);
+			free(log_filenameA);
+			free(ParamFileNameA);
+			strncpy_s(ParamFileName, sizeof(ParamFileName), ret ? "1" : "0", _TRUNCATE);
+		}
 		break;
 	case CmdLogPause:
 		FLogChangeButton(TRUE);
@@ -571,14 +561,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		FLogChangeButton(FALSE);
 		break;
 	case CmdLogWrite:
-		if (LogVar != NULL)
-		{
-			DWORD wrote;
-			WriteFile(LogVar->FileHandle, ParamFileName, strlen(ParamFileName), &wrote, NULL);
-			LogVar->ByteCount =
-				LogVar->ByteCount + strlen(ParamFileName);
-			FLogRefreshNum();
-		}
+		LogWriteStr(ParamFileName);
 		break;
 	case CmdQVRecv:
 		if ((FileVar==NULL) && NewFileVar(&FileVar))
@@ -893,7 +876,7 @@ scp_rcv_error:
 
 		val = atoi(ParamFileName);
 		switch(val) {
-			case 1: // Xon/Xoff 
+			case 1: // Xon/Xoff
 			case 2: // RTS/CTS
 			case 3: // none
 			case 4: // DSR/DTR
@@ -1017,19 +1000,7 @@ scp_rcv_error:
 	}
 
 	case CmdLogInfo:
-		if (LogVar) {
-			ParamFileName[0] = '0'
-				+ (ts.LogBinary != 0)
-				+ ((ts.Append != 0) << 1)
-				+ ((ts.LogTypePlainText != 0) << 2)
-				+ ((ts.LogTimestamp != 0) << 3)
-				+ ((ts.LogHideDialog != 0) << 4);
-			strncpy_s(ParamFileName+1, sizeof(ParamFileName)-1, LogVar->FullName, _TRUNCATE);
-		}
-		else {
-			ParamFileName[0] = '0' - 1;
-			ParamFileName[1] = 0;
-		}
+		LogInfo(ParamFileName, sizeof(ParamFileName) - 1);
 		break;
 
 	default:
@@ -1103,7 +1074,7 @@ HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 		case XTYP_DISCONNECT:
 			// マクロ終了時、ログ採取を自動的に停止する。(2013.6.24 yutaka)
 			if (AutoLogClose) {
-				if (LogVar != NULL) FileTransEnd(OpLog);
+				LogClose();
 				AutoLogClose = FALSE;
 			}
 			ConvH = 0;
