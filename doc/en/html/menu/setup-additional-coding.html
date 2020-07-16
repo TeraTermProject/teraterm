@@ -11,7 +11,53 @@
   <body>
     <h1>Additional settings / "coding" tab ([Setup] menu)</h1>
 
-    empty
+    <dl>
+      <dt>Ambiguous Characters width</dt>
+      <dd>
+	    1 Cell または 2 Cell を選択。
+      </dd>
+
+      <dt>Override Emoji Characters width</dt>
+      <dd>
+	    文字が絵文字のとき、文字属性を無視して文字幅を設定する場合チェックする<br>
+        1 Cell または 2 Cell を選択。
+      </dd>
+    </dl>
+
+    <h2>East_Asian_Width特性とセル数について</h2>
+
+    <p>
+      East Asian Width(東アジアの文字幅)として、
+      各文字には特性が割り当てられています。
+    </p>
+
+    <p>
+      この特性は5種類存在し、各々の文字幅が決められています。
+    </p>
+
+    <p>
+      また、文字幅の解釈には次の2種類があります。
+      <ol>
+        <li>東アジアの従来文字コードの文脈の場合</li>
+        <li>東アジア以外の従来文字コードの文脈の場合</li>
+      </ol>
+    </p>
+
+    <p>
+      これを表にすると次のようになります。
+    </p>
+
+<pre>
+cells数(2=全角/1=半角)
+|                   | 東アジアの           | 東アジア以外の       |
+| 特性              | 従来文字コードの文脈 | 従来文字コードの文脈 |
+| F(Fullwidth,全角) | 2                    | 2                    |
+| H(Halfwidth,半角) | 1                    | 1                    |
+| W(Wide,広)        | 2                    | 2                    |
+| Na(Narrow,狭)     | 1                    | 1                    |
+| A(Ambiguous,曖昧) | 2                    | 1                    |
+| N(Neutral,中立)   | 1                    | 1                    |
+</pre>
 
   </body>
 </html>

@@ -3,51 +3,51 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-    <title>Additional settings ([Setup] メニュー)</title>
+    <title>Additional settings ([Setup] Menu)</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
 
   <body>
-    <h1>Additional settings / "Log" タブ ([Setup] メニュー) </h1>
+    <h1>Additional settings / "Log" Tab ([Setup] Menu) </h1>
 
     <dl>
       <dt id="ViewlogEditor">View log editor</dt>
       <dd>
-	ログを表示するエディタを指定します。
+	Specify the editor that is used for display log file
       </dd>
 
       <dt id="LogDefaultName">Default log file name(strftime format)</dt>
       <dd>
-	標準のログファイル名を指定します。strftime の書式が使用できます。
+	Specify default log file name. It can include a format of strftime.
 <pre>
-書式:
-&amp;h      ホスト名。未接続の場合は空。
-&amp;p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
-&amp;u      ログオン中のユーザ名。
-%a      曜日の省略形。
-%A      曜日の正式名。
-%b      月の省略形。
-%B      月の正式名。
-%c      ロケールに対応する日付と時刻の表現。
-%d      10 進数で表す月の日付 (01 ～ 31)。
-%H      24 時間表記の時間 (00 ～ 23)。
-%I      12 時間表記の時間 (01 ～ 12)。
-%j      10 進数で表す年初からの日数 (001 ～ 366)。
-%m      10 進数で表す月 (01 ～ 12)。
-%M      10 進数で表す分 (00 ～ 59)。
-%p      現在のロケールの午前/午後。
-%S      10 進数で表す秒 (00 ～ 59)。
-%U      10 進数で表す週の通し番号。日曜日を週の最初の日とする (00 ～ 53)。
-%w      10 進数で表す曜日 (0 ～ 6、日曜日が 0)。
-%W      10 進数で表す週の通し番号。月曜日を週の最初の日とする (00 ～ 53)。
-%x      現在のロケールの日付表現。
-%X      現在のロケールの時刻表現。
-%y      10 進数で表す西暦の下 2 桁 (00 ～ 99)。
-%Y      10 進数で表す 4 桁の西暦。
-%z, %Z  レジストリの設定に応じて、タイム ゾーンの名前または省略形を指定します。
-	タイム ゾーンが不明な場合は指定しません。
-%%      パーセント記号。
+SYNOPSIS:
+&amp;h      Host name(or empty when not connecting)
+&amp;p      TCP port number(or empty when not connecting, not TCP connection)
+&amp;u      Logon user name
+%a      Abbreviated weekday name
+%A      Full weekday name
+%b      Abbreviated month name
+%B      Full month name
+%c      Date and time representation appropriate for locale
+%d      Day of month as decimal number (01 - 31)
+%H      Hour in 24-hour format (00 - 23)
+%I      Hour in 12-hour format (01 - 12)
+%j      Day of year as decimal number (001 - 366)
+%m      Month as decimal number (01 - 12)
+%M      Minute as decimal number (00 -  59)
+%p      Current locale's A.M./P.M. indicator for 12-hour clock
+%S      Second as decimal number (00 - 59)
+%U      Week of year as decimal number, with Sunday as first day of week (00 - 53)
+%w      Weekday as decimal number (0 - 6; Sunday is 0)
+%W      Week of year as decimal number, with Monday as first day of week (00 - 53)
+%x      Date representation for current locale
+%X      Time representation for current locale
+%y      Year without century, as decimal number (00 - 99)
+%Y      Year with century, as decimal number
+%z, %Z  Either the time-zone name or time zone abbreviation, depending on registry settings;
+	no characters if time zone is unknown
+%%      Percent sign
 </pre>
       </dd>
 
@@ -67,87 +67,90 @@
 
       <dt id="LogAutoStart">Auto start logging</dt>
       <dd>
-	接続時に自動的にログ採取を開始する機能を有効にします。ログファイル名には、標準のログファイル名が使用されます。<br>
-	<a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションが指定されていると、当該機能は無効化されます。
+	Start logging automatically when connecting. Default Log File Name is used for log file name.<br>
+	When the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line is specified, this feature is always disabled.
       </dd>
 
       <dt id="LogRotate">Log Rotate</dt>
       <dd>
-	ログのローテートを有効にします。ローテートされたログファイルには、拡張子に .1, .2, .3 … と付与されます。
+	The log rotation is enabled. The extension of the rotated file is added .1, .2, .3 etc.
 	<dl>
 	  <dt id="LogRotateSize">Size</dt>
 	  <dd>
-	    ログをローテートさせる上限サイズを設定します。単位に"KB", "MB"を指定することもできます。
+	    The log file is rotated when it grows bigger than Size bytes. If the size is followed by KB,
+	    the size is assumed to be in kilobytes. If the MB is used, the size is in megabytes.
 	  </dd>
 
 	  <dt id="LogRotateStep">Rotate</dt>
 	  <dd>
-	    ログをローテートさせる世代数を設定します。"0"の場合は、世代管理をしません。
+	    The log file is rotated Rotate times before being removed. If the Rotate is 0,
+	    the old version is not removed rather than rotated.
 	  </dd>
 	</dl>
       </dd>
 
       <dt id="LogOption">Log option</dt>
       <dd>
-	ログファイルの種別を設定します。
+	Specify the log type.
 	<dl>
 	  <dt id="LogBinary">Binary</dt>
 	  <dd>
-	    ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
-	    選択しない場合は、漢字コード、改行文字は変換され、
-	    エスケープシーケンスは取り除かれてから書き込まれます。
+	    If you select this option, received characters are written without
+	    any modifications. Otherwise, new-line codes are converted and
+	    escape sequences are stripped out.
 	  </dd>
 
 	  <dt id="LogAppend">Append</dt>
 	  <dd>
-	    すでに存在するファイルに追加して書き込みたい場合は選択してください。
-	    選択しない場合は上書きされます。
+	    If you select this option and the specified log file already exists,
+	    received characters are appended to the file. Otherwise, the file is
+	    overwritten.
 	  </dd>
 
 	  <dt id="LogTypePlainText">Plain text</dt>
 	  <dd>
-	    ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
-	    ※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+	    If you select this option, ASCII non-printable characters are not written.<br>
+	    NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
 	  </dd>
 
 	  <dt id="LogHideDialog">Hide dialog</dt>
 	  <dd>
-	    ログ転送のダイアログを表示したくない場合は選択してください。
+	    If you select this option, "Log" dialog box is not displayed.
 	  </dd>
 
 	  <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
 	  <dd>
-	    現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
+	    If you select this option, the logging starts after current all buffer is written into a log file.
 	  </dd>
 
 	  <dt id="LogTimestamp">Timestamp</dt>
 	  <dd>
-	    ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
-	    タイムスタンプの種別として以下が選択できます。
+	    If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
+	    The timestamp type can be selected from following.
 	    <dl id="LogTimestampType">
 	      <dt>Local Time</dt>
 	      <dd>
-		ローカルタイムでの日時を記録します。
+		Record the time in local time.
 	      </dd>
 
 	      <dt>UTC</dt>
 	      <dd>
-		UTC での日時を記録します。
+		Record the time in UTC.
 	      </dd>
 
 	      <dt>Elapsed Time (Logging)</dt>
 	      <dd>
-		ログ取得開始からの経過時間を記録します。
+		Record the elapsed time from the start of logging.
 	      </dd>
 
 	      <dt>Elapsed Time (Connection)</dt>
 	      <dd>
-		接続開始からの経過時間を記録します。
+		Record the elapsed time from the start of connection.
 	      </dd>
 	    </dl>
-	    Local Time, UTC での日時のフォーマットは <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> の設定に従います。<br>
-	    Elapsed Time (Logging), Elapsed Time (Connection) では LogTimestampFormat の設定は無視されます。<br>
-	    ※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+	    The timestamp format is specified with <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> when the timestamp type is "Local Time" and "UTC".<br>
+	    The LogTimestampFormat is ignored when the timestamp type is "Elapsed Time (Logging)" or "Elapsed Time (Connection)".<br>
+	    NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
 	  </dd>
 	</dl>
       </dd>
