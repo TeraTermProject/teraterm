@@ -96,8 +96,8 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFO
     teratermj_chm
     PROPERTIES FOLDER doc)
 
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_CURRENT_BINARY_DIR} --target teraterm_chm)")
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_CURRENT_BINARY_DIR} --target teratermj_chm)")
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_BINARY_DIR} --target teraterm_chm)")
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_BINARY_DIR} --target teratermj_chm)")
   install(
     FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm

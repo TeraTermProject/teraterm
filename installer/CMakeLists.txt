@@ -17,7 +17,7 @@ add_custom_command(
   COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/setini.pl ${CMAKE_CURRENT_SOURCE_DIR}/release/TERATERM.INI > "${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI"
   )
 
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_CURRENT_BINARY_DIR} --target teraterm_ini)")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_BINARY_DIR} --target teraterm_ini)")
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/TERATERM.INI
   DESTINATION .
@@ -63,7 +63,7 @@ set_target_properties(
   PROPERTIES FOLDER installer
   )
 
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_CURRENT_BINARY_DIR} --target lang_conv)")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_BINARY_DIR} --target lang_conv)")
 
 add_custom_command(
   OUTPUT
