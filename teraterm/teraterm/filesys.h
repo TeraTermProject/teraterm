@@ -62,7 +62,7 @@ extern PGetGetFname GetGetFname;
 extern PSetFileVar SetFileVar;
 extern PGetXFname GetXFname;
 extern PProtoInit ProtoInit;
-extern PProtoParse ProtoParse;
+//extern PProtoParse ProtoParse;
 extern PProtoTimeOutProc ProtoTimeOutProc;
 extern PProtoCancel ProtoCancel;
 extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;
@@ -70,7 +70,7 @@ extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 
 BOOL LoadTTFILE();
 BOOL FreeTTFILE();
-void ShowFTDlg(WORD OpId);
+//void ShowFTDlg(WORD OpId);
 BOOL NewFileVar(PFileVar *FV);
 void FreeFileVar(PFileVar *FV);
 
@@ -83,9 +83,10 @@ void FreeBinBuf();
 
 void FileSendStart();
 void FileSend();
-void FLogChangeButton(BOOL Pause);
-void FLogRefreshNum();
+//void FLogChangeButton(BOOL Pause);
+void FLogPause(BOOL Pause);
 void FileTransEnd(WORD OpId);
+void FileTransPause(WORD OpId, BOOL Pause);
 
 void ProtoEnd();
 int ProtoDlgParse();
@@ -116,6 +117,9 @@ void LogInfo(char *param_ptr, size_t param_len);
 const char *LogGetFilename();
 BOOL LogOpenDialog(char **filename);
 char *LogGetLogFilename(const char *log_filename);
+BOOL FLogIsPause(void);
+void FLogWindow(int nCmdShow);
+void FLogShowDlg(void);
 
 #ifdef __cplusplus
 }

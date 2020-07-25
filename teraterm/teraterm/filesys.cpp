@@ -89,8 +89,6 @@ static char BracketEndStr[] = "\033[201~";
 
 static BOOL FSend = FALSE;
 
-HWND HWndLog = NULL; //steven add
-
 static HMODULE HTTFILE = NULL;
 static int TTFILECount = 0;
 
@@ -101,7 +99,7 @@ PGetGetFname GetGetFname;
 PSetFileVar SetFileVar;
 PGetXFname GetXFname;
 PProtoInit ProtoInit;
-PProtoParse ProtoParse;
+static PProtoParse ProtoParse;
 PProtoTimeOutProc ProtoTimeOutProc;
 PProtoCancel ProtoCancel;
 PTTFILESetUILanguageFile TTFILESetUILanguageFile;
@@ -266,6 +264,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	fv->StartTime = 0;
 	fv->ProgStat = 0;
+	cv.FilePause &= ~fv->OpId;
 
 	if (fv->OpId != OpLog) {
 		fv->HideDialog = ts.FTHideDialog;
@@ -275,9 +274,6 @@ static BOOL OpenFTDlg(PFileVar fv)
 	{
 		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
 		FTDlg->RefreshNum();
-		if (fv->OpId == OpLog) {
-			HWndLog = FTDlg->m_hWnd; // steven add
-		}
 	}
 
 	if (fv->OpId==OpLog)
@@ -286,16 +282,11 @@ static BOOL OpenFTDlg(PFileVar fv)
 		SendDlg = FTDlg; /* File send */
 
 	fv->StartTime = GetTickCount();
-	if (fv->OpId == OpSendFile) {
-		HWND HFTDlg = FTDlg->GetSafeHwnd();
-		InitDlgProgress(HFTDlg, IDC_TRANSPROGRESS, &fv->ProgStat);
-		ShowWindow(GetDlgItem(HFTDlg, IDC_TRANS_ELAPSED), SW_SHOW);
-	}
 
 	return (FTDlg!=NULL);
 }
 
-void ShowFTDlg(WORD OpId)
+static void ShowFTDlg(WORD OpId)
 {
 	if (OpId == OpLog) {
 		if (FLogDlg != NULL) {
@@ -1173,7 +1164,7 @@ void LogToFile()
 		WriteBufLen = 0;
 		WriteBuf = (PCHAR)malloc(WriteBufMax);
 		while (Get1(Buf,&Start,&Count,&b)) {
-			if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
+			if (!FLogIsPause() && (! cv.ProtoFlag))
 			{
 				tmp[0] = 0;
 				if ( ts.LogTimestamp && eLineEnd ) {
@@ -1229,7 +1220,7 @@ void LogToFile()
 
 		while (Get1(Buf,&Start,&Count,&b))
 		{
-			if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
+			if (!FLogIsPause() && (! cv.ProtoFlag))
 			{
 				if ( ts.LogTimestamp && eLineEnd ) {
 					char *strtime = NULL;
@@ -1279,7 +1270,7 @@ void LogToFile()
 		cv.BStart = Start;
 		cv.BCount = Count;
 	}
-	if (((cv.FilePause & OpLog) !=0) || cv.ProtoFlag) return;
+	if (FLogIsPause() || cv.ProtoFlag) return;
 	if (FLogDlg!=NULL)
 		FLogDlg->RefreshNum();
 
@@ -1430,7 +1421,6 @@ void FileTransEnd(WORD OpId)
 		{
 			FLogDlg->DestroyWindow();
 			FLogDlg = NULL;
-			HWndLog = NULL; // steven add
 		}
 		FreeFileVar(&LogVar);
 		FreeLogBuf();
@@ -1452,6 +1442,16 @@ void FileTransEnd(WORD OpId)
 	}
 
 	EndDdeCmnd(0);
+}
+
+void FileTransPause(WORD OpId, BOOL Pause)
+{
+	if (Pause) {
+		cv.FilePause |= OpId;
+	}
+	else {
+		cv.FilePause &= ~OpId;
+	}
 }
 
 int FSOut1(BYTE b)
@@ -1637,19 +1637,18 @@ void FileSend()
 	FileTransEnd(OpSendFile);
 }
 
-void FLogChangeButton(BOOL Pause)
+/**
+ *	ログをポーズする
+ *	元は FLogChangeButton() だった
+ */
+void FLogPause(BOOL Pause)
 {
 	if (FLogDlg!=NULL)
 		FLogDlg->ChangeButton(Pause);
+	FileTransPause(OpLog, Pause);
 }
 
-void FLogRefreshNum()
-{
-	if (FLogDlg!=NULL)
-		FLogDlg->RefreshNum();
-}
-
-BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
+static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	int vsize;
 	PProtoDlg pd;
@@ -1724,7 +1723,7 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 	return TRUE;
 }
 
-void CloseProtoDlg()
+static void CloseProtoDlg()
 {
 	if (PtDlg!=NULL)
 	{
@@ -1746,7 +1745,7 @@ void CloseProtoDlg()
 	}
 }
 
-BOOL ProtoStart()
+static BOOL ProtoStart()
 {
 	if (cv.ProtoFlag)
 		return FALSE;
@@ -1790,6 +1789,13 @@ void ProtoEnd()
 	FreeFileVar(&FileVar);
 }
 
+/**
+ *	OnIdle()#teraterm.cppからコールされる
+ *		cv.ProtoFlag が 0 以外のとき
+ *	@retval		0		continue
+ *				1/2		ActiveWin(グローバル変数)の値(IdVT=1/IdTek=2)
+ *				注 今のところ捨てられている
+ */
 int ProtoDlgParse()
 {
 	int P;
@@ -2245,7 +2251,8 @@ void LogWriteStr(const char *str)
 		WriteFile(LogVar->FileHandle, str, len, &wrote, NULL);
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
-		FLogRefreshNum();
+		if (FLogDlg!=NULL)
+			FLogDlg->RefreshNum();
 	}
 }
 
@@ -2342,4 +2349,27 @@ char *LogGetLogFilename(const char *log_filename)
 	ConvertLogname(full_path, sizeof(full_path));
 
 	return _strdup(full_path);
+}
+
+BOOL FLogIsPause()
+{
+	return ((cv.FilePause & OpLog) !=0);
+}
+
+void FLogWindow(int nCmdShow)
+{
+	if (FLogDlg == NULL)
+		return;
+
+	HWND HWndLog = FLogDlg->m_hWnd;
+	ShowWindow(HWndLog, nCmdShow);
+	if (nCmdShow == SW_RESTORE) {
+		// 拡張スタイル WS_EX_NOACTIVATE 状態を解除する
+		SetForegroundWindow(HWndLog);
+	}
+}
+
+void FLogShowDlg(void)
+{
+	ShowFTDlg(OpLog);
 }

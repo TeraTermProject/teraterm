@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2019 TeraTerm Project
+ * (C) 2007-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <windows.h>
 #include <commctrl.h>
-#include <tchar.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -44,6 +43,7 @@
 #include "ftdlg.h"
 #include "teraterml.h"
 #include "helpid.h"
+#include "filesys.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
@@ -55,9 +55,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	HWND hwnd;
 
 	fv = pfv;
-	cv = pcv;
-	cv->FilePause &= ~fv->OpId;
-	ts = pts;
+	UILanguageFile = pts->UILanguageFile;
 
 	Pause = FALSE;
 	hwnd = GetForegroundWindow();
@@ -66,6 +64,10 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	}
 	else { // parent window is VT window
 		Ok = TTCDialog::Create(hInstance, NULL, IDD_FILETRANSDLG);
+	}
+	if (fv->OpId == OpSendFile) {
+		InitDlgProgress(m_hWnd, IDC_TRANSPROGRESS, &fv->ProgStat);
+		::ShowWindow(GetDlgItem(IDC_TRANS_ELAPSED), SW_SHOW);
 	}
 
 	if (!fv->HideDialog) {
@@ -86,18 +88,23 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	return Ok;
 }
 
+/**
+ *	テキストの変更のみ
+ */
 void CFileTransDlg::ChangeButton(BOOL PauseFlag)
 {
 	Pause = PauseFlag;
 	if (Pause) {
-		get_lang_msg("DLG_FILETRANS_START", ts->UIMsg, sizeof(ts->UIMsg), "&Start", ts->UILanguageFile);
-		SetDlgItemText(IDC_TRANSPAUSESTART, ts->UIMsg);
-		cv->FilePause |= fv->OpId;
+		static const DlgTextInfo TextInfos[] = {
+			{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_START" },
+		};
+		SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	}
 	else {
-		get_lang_msg("DLG_FILETRANS_PAUSE", ts->UIMsg, sizeof(ts->UIMsg), "Pau&se", ts->UILanguageFile);
-		SetDlgItemText(IDC_TRANSPAUSESTART, ts->UIMsg);
-		cv->FilePause &= ~fv->OpId;
+		static const DlgTextInfo TextInfos[] = {
+			{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_PAUSE" },
+		};
+		SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	}
 }
 
@@ -179,7 +186,7 @@ BOOL CFileTransDlg::OnInitDialog()
 	// ログファイルはフルパス表示にする(2004.8.6 yutaka)
 	SetDlgItemText(IDC_EDIT_FULLPATH, &(fv->FullName[0]));
 
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts->UILanguageFile);
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
@@ -203,18 +210,17 @@ BOOL CFileTransDlg::OnInitDialog()
 
 BOOL CFileTransDlg::OnCancel( )
 {
-	::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
+	//::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
+	FileTransEnd(fv->OpId);
 	return TRUE;
 }
 
 BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam)) {
-		case IDCANCEL:
-			::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
-			return TRUE;
 		case IDC_TRANSPAUSESTART:
 			ChangeButton(! Pause);
+			FileTransPause(fv->OpId, Pause);
 			return TRUE;
 		case IDC_TRANSHELP:
 			if (fv->OpId == OpLog) {

@@ -121,7 +121,7 @@ static void init()
 static BOOL OnIdle(LONG lCount)
 {
 	static int Busy = 2;
-	int Change, nx, ny;
+	int nx, ny;
 	BOOL Size;
 
 	if (lCount==0) Busy = 2;
@@ -151,6 +151,7 @@ static BOOL OnIdle(LONG lCount)
 			}
 		}
 		else {
+			int Change;
 			if (cv.ProtoFlag) Change = ProtoDlgParse();
 			else {
 				switch (ActiveWin) {

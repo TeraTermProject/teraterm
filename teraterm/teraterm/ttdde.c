@@ -555,10 +555,10 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 	case CmdLogPause:
-		FLogChangeButton(TRUE);
+		FLogPause(TRUE);
 		break;
 	case CmdLogStart:
-		FLogChangeButton(FALSE);
+		FLogPause(FALSE);
 		break;
 	case CmdLogWrite:
 		LogWriteStr(ParamFileName);
@@ -640,25 +640,13 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdCtrlCloseTEK,0);
 			break;
 		case '6': //steven add
-			if (HWndLog == NULL)
-				break;
-			else
-				ShowWindow(HWndLog, SW_HIDE);
+			FLogWindow(SW_HIDE);
 			break;
 		case '7': //steven add
-			if (HWndLog == NULL)
-				break;
-			else
-				ShowWindow(HWndLog, SW_MINIMIZE);
+			FLogWindow(SW_MINIMIZE);
 			break;
 		case '8': //steven add
-			if (HWndLog == NULL)
-				break;
-			else {
-				ShowWindow(HWndLog, SW_RESTORE);
-				// ägí£ÉXÉ^ÉCÉã WS_EX_NOACTIVATE èÛë‘ÇâèúÇ∑ÇÈ
-				SetForegroundWindow(HWndLog);
-			}
+			FLogWindow(SW_RESTORE);
 			break;
 		}
 		break;

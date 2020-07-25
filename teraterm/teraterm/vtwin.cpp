@@ -1254,7 +1254,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_STOPLOG, MF_BYCOMMAND | MF_ENABLED);
-			if (cv.FilePause & OpLog) {
+			if (FLogIsPause()) {
 				CheckMenuItem(FileMenu,ID_FILE_PAUSELOG, MF_BYCOMMAND | MF_CHECKED);
 			}
 			else {
@@ -3693,11 +3693,13 @@ LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+#if 0
 LRESULT CVTWindow::OnFileTransEnd(WPARAM wParam, LPARAM lParam)
 {
 	FileTransEnd(wParam);
 	return 0;
 }
+#endif
 
 LRESULT CVTWindow::OnGetSerialNo(WPARAM wParam, LPARAM lParam)
 {
@@ -4183,17 +4185,16 @@ void CVTWindow::OnViewLog()
 	}
 }
 
-
 // 隠しているログダイアログを表示する (2008.2.3 maya)
 void CVTWindow::OnShowLogDialog()
 {
-	ShowFTDlg(OpLog);
+	FLogShowDlg();
 }
 
 // ログ取得を中断/再開する
 void CVTWindow::OnPauseLog()
 {
-	FLogChangeButton(!(cv.FilePause & OpLog));
+	FLogPause(FLogIsPause() ? FALSE : TRUE);
 }
 
 // ログ取得を終了する
@@ -5862,9 +5863,11 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_USER_DLGHELP2:
 		OnDlgHelp(wp, lp);
 		break;
+#if 0
 	case WM_USER_FTCANCEL:
 		OnFileTransEnd(wp, lp);
 		break;
+#endif
 	case WM_USER_GETSERIALNO:
 		retval = OnGetSerialNo(wp, lp);
 		break;
