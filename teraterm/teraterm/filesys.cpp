@@ -52,9 +52,11 @@
 #include "buffer.h"
 #include "helpid.h"
 #include "layer_for_unicode.h"
+#include "layer_for_unicode_crt.h"
+#include "codeconv.h"
 
 #include "filesys.h"
-#include "tt_res.h"
+//#include "tt_res.h"
 #include "filesys_log_res.h"
 
 #define FS_BRACKET_NONE  0
@@ -129,7 +131,7 @@ enum enumLineEnd {
 	Line_FileHead = 2,
 };
 
-enum enumLineEnd eLineEnd = Line_LineHead;
+static enum enumLineEnd eLineEnd = Line_LineHead;
 
 
 // 遅延書き込み用スレッドのメッセージ
@@ -519,77 +521,116 @@ static void SetLogFlags(HWND Dialog)
  *						2	UTF-16LE
  *						3	UTF-16BE
  */
-static void CheckLogFile(const char *filename, BOOL *exist, int *bom)
+static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
 {
+	*exist = FALSE;
+	*bom = 0;
+
 	// ファイルが存在する?
-	DWORD logdir = GetFileAttributes(filename);
+	DWORD logdir = _GetFileAttributesW(filename);
 	if ((logdir != INVALID_FILE_ATTRIBUTES) && ((logdir & FILE_ATTRIBUTE_DIRECTORY) == 0)) {
-		// ファイルがあった , アペンドするつもり
+		// ファイルがあった
 		*exist = TRUE;
 
 		// BOM有り/無しチェック
-		FILE *fp = fopen(filename, "rb");
-		unsigned char tmp[4];
-		size_t l = fread(tmp, 1, sizeof(tmp), fp);
-		fclose(fp);
-		if (l < 2) {
-			*bom = 0;
-		} else if (l >= 2 && tmp[0] == 0xff && tmp[1] == 0xfe) {
-			// UTF-16LE
-			*bom = 2;
-		} else if (l >= 2 && tmp[0] == 0xfe && tmp[1] == 0xff) {
-			// UTF-16BE
-			*bom = 3;
-		} else if (l >= 3 && tmp[0] == 0xef && tmp[1] == 0xbb && tmp[2] == 0xbf) {
-			// UTF-8
-			*bom = 1;
-		} else {
-			*bom = 0;
+		FILE *fp = __wfopen(filename, L"rb");
+		if (fp != NULL) {
+			unsigned char tmp[4];
+			size_t l = fread(tmp, 1, sizeof(tmp), fp);
+			fclose(fp);
+			if (l < 2) {
+				*bom = 0;
+			} else if (l >= 2 && tmp[0] == 0xff && tmp[1] == 0xfe) {
+				// UTF-16LE
+				*bom = 2;
+			} else if (l >= 2 && tmp[0] == 0xfe && tmp[1] == 0xff) {
+				// UTF-16BE
+				*bom = 3;
+			} else if (l >= 3 && tmp[0] == 0xef && tmp[1] == 0xbb && tmp[2] == 0xbf) {
+				// UTF-8
+				*bom = 1;
+			} else {
+				*bom = 0;
+			}
 		}
-	}
-	else {
-		// ファイルがない、新規
-		*exist = FALSE;
-		*bom = 0;
-	}
-}
-
-static void CheckLogFile(HWND Dialog, const char *filename)
-{
-	BOOL exist;
-	int bom;
-	CheckLogFile(filename, &exist, &bom);
-	if (exist) {
-		// ファイルが存在する -> アペンドするつもり?
-		CheckDlgButton(Dialog, IDC_FOPTAPPEND, BST_CHECKED);
-		if (bom != 0) {
-			// BOM有り
-			CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
-		}
-		else {
-			// BOMなし
-			CheckDlgButton(Dialog, IDC_BOM, BST_UNCHECKED);
-		}
-	}
-	else {
-		// ファイルがない、新規
-		CheckDlgButton(Dialog, IDC_FOPTAPPEND, BST_UNCHECKED);
-		CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
 	}
 }
 
 typedef struct {
-	char *filename;
-	BOOL append;
-	BOOL bom;
-} LogDlgData_t;
+	FLogDlgInfo_t *info;
+	// work
+	BOOL file_exist;
+	int current_bom;
+	TTTSet *pts;
+} LogDlgWork_t;
+
+static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
+{
+	if (work->file_exist) {
+		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), TRUE);
+	}
+	else {
+		// ファイルがない -> 新規
+		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), FALSE);
+		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
+	}
+
+	if (work->file_exist && IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED) {
+		// ファイルが存在する && append
+		int bom = work->current_bom;
+		if (bom != 0) {
+			// BOM有り
+			CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
+			int cur =
+				bom == 1 ? 0 :
+				bom == 2 ? 1 :
+				bom == 3 ? 2 : 0;
+			SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, cur, 0);
+		}
+		else {
+			// BOMなし
+			CheckDlgButton(Dialog, IDC_BOM, BST_UNCHECKED);
+			SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
+		}
+		if (IsDlgButtonChecked(Dialog, IDC_FOPTTEXT) == BST_CHECKED) {
+			EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
+			if (bom != 0) {
+				// BOM有り
+				EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
+			}
+			else {
+				// BOMなし
+				EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
+			}
+		}
+	}
+	else {
+		// ファイルがない、新規
+		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
+		CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
+		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
+		if (IsDlgButtonChecked(Dialog, IDC_FOPTTEXT) == BST_CHECKED) {
+			EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
+		}
+	}
+}
+
+static void CheckLogFile(HWND Dialog, const wchar_t *filename, LogDlgWork_t *work)
+{
+	BOOL exist;
+	int bom;
+	CheckLogFile(filename, &exist, &bom);
+	work->file_exist = exist;
+	work->current_bom = bom;
+	ArrangeControls(Dialog, work);
+}
 
 static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_TABSHEET_TITLE_LOG" },
 		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
-		{ IDC_FOPTAPPEND, "DLG_FOPT_APPEND" },
+//		{ IDC_FOPTAPPEND, "DLG_FOPT_APPEND" },
 		{ IDC_PLAINTEXT, "DLG_FOPT_PLAIN" },
 		{ IDC_HIDEDIALOG, "DLG_FOPT_HIDEDIALOG" },
 		{ IDC_ALLBUFF_INFIRST, "DLG_FOPT_ALLBUFFINFIRST" },
@@ -601,8 +642,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", L"Elapsed Time (Logging)" },
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", L"Elapsed Time (Connection)" },
 	};
-	const char *UILanguageFile = ts.UILanguageFile;
-	LogDlgData_t *data = (LogDlgData_t *)GetWindowLongPtr(Dialog, DWLP_USER);
+	LogDlgWork_t *work = (LogDlgWork_t *)GetWindowLongPtr(Dialog, DWLP_USER);
 
 	if (Message == 	RegisterWindowMessage(HELPMSGSTRING)) {
 		// コモンダイアログからのヘルプメッセージを付け替える
@@ -611,8 +651,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	}
 	switch (Message) {
 	case WM_INITDIALOG: {
-		data = (LogDlgData_t *)lParam;
-		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)data);
+		work = (LogDlgWork_t *)lParam;
+		TTTSet *pts = work->pts;
+		const char *UILanguageFile = pts->UILanguageFile;
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)work);
 		::DragAcceptFiles(Dialog, TRUE);
 
 		SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
@@ -620,60 +662,56 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					UILanguageFile, 0);
 
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-8");
+		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16LE");
+		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16BE");
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
 
-		SetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, data->filename);
-		free(data->filename);
-		data->filename = NULL;
+		_SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
+		work->info->filename = NULL;
 
 		// Binary/Text チェックボックス
-		if (ts.LogBinary) {
-			SendDlgItemMessage(Dialog, IDC_FOPTBIN, BM_SETCHECK, BST_CHECKED, 0);
+		if (pts->LogBinary) {
+			CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTBIN);
 		}
 		else {
-			SendDlgItemMessage(Dialog, IDC_FOPTTEXT, BM_SETCHECK, BST_CHECKED, 0);
-		}
-
-		// Append チェックボックス
-		if (ts.Append) {
-			SetRB(Dialog, 1, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
+			CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTTEXT);
 		}
 
 		// Plain Text チェックボックス
-		if (ts.LogBinary) {
+		if (pts->LogBinary) {
 			// Binaryフラグが有効なときはチェックできない
 			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		}
-		else if (ts.LogTypePlainText) {
+		else if (pts->LogTypePlainText) {
 			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		}
 
 		// Hide dialogチェックボックス (2008.1.30 maya)
-		if (ts.LogHideDialog) {
+		if (pts->LogHideDialog) {
 			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
 		}
 
 		// Include screen bufferチェックボックス (2013.9.29 yutaka)
-		if (ts.LogAllBuffIncludedInFirst) {
+		if (pts->LogAllBuffIncludedInFirst) {
 			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 		}
 
 		// timestampチェックボックス (2006.7.23 maya)
-		if (ts.LogBinary) {
+		if (pts->LogBinary) {
 			// Binaryフラグが有効なときはチェックできない
 			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		}
-		else if (ts.LogTimestamp) {
+		else if (pts->LogTimestamp) {
 			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		}
 
 		// timestamp 種別
-		int tstype = ts.LogTimestampType == TIMESTAMP_LOCAL ? 0 :
-				ts.LogTimestampType == TIMESTAMP_UTC ? 1 :
-				ts.LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
-				ts.LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
+		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
+				pts->LogTimestampType == TIMESTAMP_UTC ? 1 :
+				pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
+				pts->LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
 		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
-		if (ts.LogBinary || !ts.LogTimestamp) {
+		if (pts->LogBinary || !pts->LogTimestamp) {
 			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		}
 
@@ -685,11 +723,12 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			char filename[MAX_PATH];
-			GetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
-			data->filename = _strdup(filename);
-			data->append = IsDlgButtonChecked(Dialog, IDC_FOPTAPPEND) == BST_CHECKED;
-			data->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
+			wchar_t filename[MAX_PATH];
+			_GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
+			work->info->filename = _wcsdup(filename);
+			work->info->append = IsDlgButtonChecked(Dialog, IDC_FOPTAPPEND) == BST_CHECKED;
+			work->info->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
+			work->info->code = (int)SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_GETCURSEL, 0, 0);
 			SetLogFlags(Dialog);
 			EndDialog(Dialog, IDOK);
 			break;
@@ -698,27 +737,29 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			EndDialog(Dialog, IDCANCEL);
 			break;
 		case IDHELP:
-			OpenHelp(HH_HELP_CONTEXT, HlpFileLog, ts.UILanguageFile);
+			OpenHelp(HH_HELP_CONTEXT, HlpFileLog, work->pts->UILanguageFile);
 			break;
 		case IDC_FOPT_FILENAME_BUTTON: {
 			/* save current dir */
+			const char *UILanguageFile = work->pts->UILanguageFile;
 			wchar_t curdir[MAXPATHLEN];
 			_GetCurrentDirectoryW(_countof(curdir), curdir);
 
-			char fname[MAX_PATH];
-			GetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
+			wchar_t fname[MAX_PATH];
+			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
 
-			char FNFilter[128*3];
-			get_lang_msg("FILEDLG_ALL_FILTER", FNFilter, sizeof(FNFilter), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
+			wchar_t FNFilter[128*3];
+			get_lang_msgW("FILEDLG_ALL_FILTER", FNFilter, sizeof(FNFilter), L"All(*.*)\\0*.*\\0\\0", UILanguageFile);
 
-			char caption[MAX_PATH];
-			char uimsg[MAX_UIMSG];
-			get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, UILanguageFile);
-			strncpy_s(caption, sizeof(caption),"Tera Term: ", _TRUNCATE);
-			strncat_s(caption, sizeof(caption), uimsg, _TRUNCATE);
+			wchar_t caption[MAX_PATH];
+			wchar_t uimsg[MAX_UIMSG];
+#define TitLogW      L"Log"
+			get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLogW, UILanguageFile);
+			wcsncpy_s(caption, _countof(caption), L"Tera Term: ", _TRUNCATE);
+			wcsncat_s(caption, _countof(caption), uimsg, _TRUNCATE);
 
-			OPENFILENAME ofn = {};
-			ofn.lStructSize = get_OPENFILENAME_SIZEA();
+			OPENFILENAMEW ofn = {};
+			ofn.lStructSize = get_OPENFILENAME_SIZEW();
 			//ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING;
 			ofn.Flags |= OFN_SHOWHELP;
@@ -727,11 +768,11 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.lpstrFilter = FNFilter;
 			ofn.nFilterIndex = 1;
 			ofn.lpstrFile = fname;
-			ofn.nMaxFile = sizeof(fname);
+			ofn.nMaxFile = _countof(fname);
 			ofn.lpstrTitle = caption;
-			BOOL Ok = GetSaveFileName(&ofn);
+			BOOL Ok = GetSaveFileNameW(&ofn);
 			if (Ok) {
-				SetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
 			}
 
 			/* restore dir */
@@ -740,12 +781,13 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		}
 		case IDC_FOPTBIN:
+			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
+			EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
 			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
 			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
 			break;
 		case IDC_FOPTTEXT:
-			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
+			ArrangeControls(Dialog, work);
 			EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
 			// FALLTHROUGH -- BinFlag が off の時は Timestamp 種別の有効/無効を設定する
 		case IDC_TIMESTAMP:
@@ -758,10 +800,21 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		case IDC_FOPT_FILENAME_EDIT:
 			if (HIWORD(wParam) == EN_CHANGE){
-				char filename[MAX_PATH];
-				GetDlgItemTextA(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
-				CheckLogFile(Dialog, filename);
+				wchar_t filename[MAX_PATH];
+				GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
+				CheckLogFile(Dialog, filename, work);
 			}
+			break;
+		case IDC_NEW_OVERWRITE:
+			if (IsDlgButtonChecked(Dialog, IDC_FOPTTEXT) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
+				EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
+				CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
+				SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
+			}
+			break;
+		case IDC_APPEND:
+			ArrangeControls(Dialog, work);
 			break;
 		}
 		break;
@@ -776,6 +829,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		wchar_t *filename = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
 		_DragQueryFileW(hDrop, 0, filename, len + 1);
 		filename[len] = '\0';
+		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
 		_SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename);
 		SendDlgItemMessage(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, len, len);
 		free(filename);
@@ -2261,21 +2315,27 @@ const char *FLogGetFilename()
 
 /**
  *	ログダイアログを開く
+ *	@param[in,out]	info.filename	ファイル名初期値
+ *									OK時、ファイル名、不要になったらfree()すること
  *	@retval	TRUE	[ok] が押された
  *	@retval	FALSE	キャンセルされた
- *	@param[in,out]	filename	OK時、ファイル名、不要になったらfree()すること
  */
-BOOL FLogOpenDialog(char **filename)
+BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
 {
-	LogDlgData_t *data = (LogDlgData_t *)calloc(sizeof(LogDlgData_t), 1);
-	data->filename = FLogGetLogFilename(NULL);
+	LogDlgWork_t *work = (LogDlgWork_t *)calloc(sizeof(LogDlgWork_t), 1);
+	char *filenameA = ToCharW(info->filename);
+	char *srcfnameA = FLogGetLogFilename(filenameA);
+	wchar_t *srcfnameW = ToWcharA(srcfnameA);
+	free(filenameA);
+	free(srcfnameA);
+	work->info = info;
+	work->info->filename = srcfnameW;
+	work->pts = &ts;
 	INT_PTR ret = TTDialogBoxParam(
 		hInst, MAKEINTRESOURCE(IDD_LOGDLG),
-		HVTWin, LogFnHook, (LPARAM)data);
-	if (ret == IDOK) {
-		*filename = data->filename;
-	}
-	free(data);
+		hWnd, LogFnHook, (LPARAM)work);
+	free(srcfnameW);
+	free(work);
 	return ret == IDOK ? TRUE : FALSE;
 }
 

@@ -634,6 +634,49 @@ static BOOL NeedsOutputBufs(void)
 	return cv.HLogBuf != 0 || DDELog;
 }
 
+void TermLogSetCode(int code)
+{
+	vtterm_work_t *vtterm = &vtterm_work;
+	vtterm->log_code = code;
+}
+
+void TermLogOutputBOM(void)
+{
+	vtterm_work_t *vtterm = &vtterm_work;
+	BOOL needs_unlock = FALSE;
+
+	if ((cv.HLogBuf!=NULL) && (cv.LogBuf==NULL)) {
+		cv.LogBuf = (PCHAR)GlobalLock(cv.HLogBuf);
+		needs_unlock = TRUE;
+	}
+
+	switch (vtterm->log_code) {
+	case 0:
+		// UTF-8
+		LogPut1(0xef);
+		LogPut1(0xbb);
+		LogPut1(0xbf);
+		break;
+	case 1:
+		// UTF-16LE
+		LogPut1(0xfe);
+		LogPut1(0xff);
+		break;
+	case 2:
+		// UTF-16BE
+		LogPut1(0xff);
+		LogPut1(0xfe);
+		break;
+	default:
+		break;
+	}
+
+	if (needs_unlock) {
+		GlobalUnlock(cv.HLogBuf);
+		cv.LogBuf = NULL;
+	}
+}
+
 void MoveToStatusLine()
 {
 	MainX = CursorX;

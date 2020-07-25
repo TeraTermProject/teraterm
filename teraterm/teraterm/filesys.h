@@ -103,6 +103,12 @@ extern PFileVar SendVar, FileVar;
 extern BOOL FileLog, BinLog;
 
 // log
+typedef struct {
+	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
+	BOOL append;			// TRUE/FALSE = append/new(overwrite)
+	BOOL bom;				// TRUE = BOMあり
+	int code;				// 0/1/2 = UTF-8/UTF-16LE/UTF-16BE
+} FLogDlgInfo_t;
 void logfile_lock_initialize(void);
 void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
@@ -114,7 +120,7 @@ BOOL FLogIsOpend(void);
 void FLogWriteStr(const char *str);
 void FLogInfo(char *param_ptr, size_t param_len);
 const char *FLogGetFilename(void);
-BOOL FLogOpenDialog(char **filename);
+BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
 char *FLogGetLogFilename(const char *log_filename);
 BOOL FLogIsPause(void);
 void FLogWindow(int nCmdShow);

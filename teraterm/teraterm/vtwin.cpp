@@ -4136,11 +4136,24 @@ void CVTWindow::OnLogMeInLaunch()
 
 void CVTWindow::OnFileLog()
 {
-	char *filename;
-	BOOL r = FLogOpenDialog(&filename);
+	FLogDlgInfo_t info;
+	info.filename = NULL;
+	BOOL r = FLogOpenDialog(hInst, m_hWnd, &info);
 	if (r) {
-		FLogOpen(filename);
-		free(filename);
+		if (!info.append) {
+			// ÉtÉ@ÉCÉãçÌèú
+			_DeleteFileW(info.filename);
+		}
+		TermLogSetCode(info.code);
+		char *filenameA = ToCharW(info.filename);
+		free(info.filename);
+		BOOL r = FLogOpen(filenameA);
+		if (r != FALSE) {
+			if (info.bom) {
+				TermLogOutputBOM();
+			}
+		}
+		free(filenameA);
 	}
 }
 

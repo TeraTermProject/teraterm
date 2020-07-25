@@ -158,10 +158,9 @@ WORD TTLFilenameBox()
 	SetInputStr("");
 	if (CheckVar("inputstr", &ValType, &VarId) && (ValType==TypString)) {
 		wchar_t uimsg[MAX_UIMSG];
-		OPENFILENAMEW ofn;
-		wchar_t filename[MaxStrLen];
+		OPENFILENAMEW ofn = {};
+		wchar_t filename[MAX_PATH];
 		filename[0] = 0;
-		memset(&ofn, 0, sizeof(ofn));
 		ofn.lStructSize     = get_OPENFILENAME_SIZEW();
 		ofn.hwndOwner       = GetHWND();
 		ofn.lpstrTitle      = Str1T;
@@ -419,7 +418,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 			return -1;
 		}
 
-		// return 
+		// return
 		//   0à»è„: ëIëçÄñ⁄
 		//   -1: ÉLÉÉÉìÉZÉã
 		//	 -2: close
@@ -482,4 +481,3 @@ WORD TTLYesNoBox()
 	SetResult(YesNo);
 	return Err;
 }
-

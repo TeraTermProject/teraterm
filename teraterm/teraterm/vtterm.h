@@ -49,8 +49,9 @@ void ChangeTerminalID();
 void TermPasteString(char *str, int len);
 void TermSendStartBracket(void);
 void TermSendEndBracket(void);
+void TermLogSetCode(int code);
+void TermLogOutputBOM(void);
 
 #ifdef __cplusplus
 }
 #endif
-

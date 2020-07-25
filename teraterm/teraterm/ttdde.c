@@ -275,7 +275,6 @@ int DDEGetCount(void)
 static HDDEDATA AcceptRequest(HSZ ItemHSz)
 {
 	BYTE b;
-	BOOL Unlock;
 	HDDEDATA DH;
 	LPSTR DP;
 	int i;
