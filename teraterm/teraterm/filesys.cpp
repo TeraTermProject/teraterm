@@ -69,7 +69,6 @@ static int ProtoId;
 
 BOOL FileLog = FALSE;
 BOOL BinLog = FALSE;
-BOOL DDELog = FALSE;
 static BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
 static BYTE FileByte;
 
@@ -964,26 +963,6 @@ void LogPut1(BYTE b)
 	}
 	else
 		cv.LCount = 0;
-
-	if (DDELog)
-	{
-		if (cv.DCount>=InBuffSize)
-		{
-			cv.DCount = InBuffSize;
-			cv.DStart = cv.LogPtr;
-		}
-		else
-			cv.DCount++;
-	}
-	else {
-		cv.DCount = 0;
-		// ログ採取中にマクロがストールする問題への修正。
-		// ログ採取中に一度マクロを止めると、バッファのインデックスが同期取れなくなり、
-		// 再度マクロを流しても正しいデータが送れないのが原因。
-		// マクロを停止させた状態でもインデックスの同期を取るようにした。
-		// (2006.12.26 yutaka)
-		cv.DStart = cv.LogPtr;
-	}
 }
 
 static BOOL Get1(PCHAR Buf, int *Start, int *Count, PBYTE b)
@@ -1288,15 +1267,13 @@ BOOL CreateLogBuf(void)
 		cv.LogPtr = 0;
 		cv.LStart = 0;
 		cv.LCount = 0;
-		cv.DStart = 0;
-		cv.DCount = 0;
 	}
 	return (cv.HLogBuf!=NULL);
 }
 
 void FreeLogBuf(void)
 {
-	if ((cv.HLogBuf==NULL) || FileLog || DDELog)
+	if ((cv.HLogBuf==NULL) || FileLog)
 		return;
 	if (cv.LogBuf!=NULL)
 		GlobalUnlock(cv.HLogBuf);
@@ -1306,8 +1283,6 @@ void FreeLogBuf(void)
 	cv.LogPtr = 0;
 	cv.LStart = 0;
 	cv.LCount = 0;
-	cv.DStart = 0;
-	cv.DCount = 0;
 }
 
 BOOL CreateBinBuf(void)

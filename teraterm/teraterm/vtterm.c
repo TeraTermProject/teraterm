@@ -57,6 +57,7 @@
 #include "clipboar.h"
 #include "codeconv.h"
 #include "unicode.h"
+#include "ttdde.h"
 
 #include "vtterm.h"
 
@@ -454,6 +455,7 @@ void MoveToMainScreen()
 static void Log1Byte(BYTE b)
 {
 	LogPut1(b);
+	DDEPut1(b);
 }
 
 static void Log1UTF32(vtterm_work_t *vtterm, unsigned int u32)
@@ -6380,6 +6382,12 @@ int VTParse()
 {
 	BYTE b;
 	int c;
+
+	if (DDELog && DDEGetCount() >= InBuffSize - 10) {
+		/* バッファに余裕がない場合 */
+		Sleep(1);
+		return 0;
+	}
 
 	c = CommRead1Byte(&cv,&b);
 

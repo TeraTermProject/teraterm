@@ -121,7 +121,7 @@ void Put1Byte(BYTE b)
 	if (is_wait4all_enabled()) {
 		put_macro_1byte(b);
 		return;
-	} 
+	}
 
 	RingBuf[RBufPtr] = b;
 	RBufPtr++;
@@ -141,7 +141,7 @@ BOOL Read1Byte(LPBYTE b)
 {
 	if (is_wait4all_enabled()) {
 		return read_macro_1byte(macro_shmem_index, b);
-	} 
+	}
 
 	if (RBufCount<=0) {
 		return FALSE;
@@ -199,8 +199,8 @@ HDDEDATA AcceptData(HDDEDATA ItemHSz, HDDEDATA Data)
 }
 
 // CallBack Procedure for DDEML
-HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
-  HSZ hsz1, HSZ hsz2, HDDEDATA Data, DWORD Data1, DWORD Data2)
+static HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
+  HSZ hsz1, HSZ hsz2, HDDEDATA Data, ULONG_PTR Data1, ULONG_PTR Data2)
 {
 	if (Inst==0) {
 		return 0;
@@ -266,7 +266,7 @@ BOOL InitDDE(HWND HWin)
 		WaitCount[i] = 0;
 	}
 
-	if (DdeInitialize(&Inst, (PFNCALLBACK)DdeCallbackProc,
+	if (DdeInitialize(&Inst, DdeCallbackProc,
 	                  APPCMD_CLIENTONLY |
 	                  CBF_SKIP_REGISTRATIONS |
 	                  CBF_SKIP_UNREGISTRATIONS,0)
@@ -480,7 +480,7 @@ void SetWait(int Index, const char *Str)
 
 	PWaitStr[Index-1] = _strdup(Str);
 
-	if (PWaitStr[Index-1]) 
+	if (PWaitStr[Index-1])
 		WaitStrLen[Index-1] = strlen(Str);
 	else
 		WaitStrLen[Index-1] = 0;
@@ -661,10 +661,10 @@ int FindRegexString(void)
 }
 
 
-// 'wait': 
+// 'wait':
 // ttmacro process sleeps to wait specified word(s).
-// 
-// 'waitregex': 
+//
+// 'waitregex':
 // ttmacro process sleeps to wait specified word(s) with regular expression.
 //
 // add 'waitregex' command (2005.10.5 yutaka)
@@ -1049,7 +1049,7 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 	SendCmnd(OpId,0);
 	Data = DdeClientTransaction(NULL,0,ConvH,Item2,CF_OEMTEXT,XTYP_REQUEST,5000,NULL);
 	if (Data == 0) {
-		// トランザクションを開始できないときはエラーとする。(2016.10.22 yutaka) 
+		// トランザクションを開始できないときはエラーとする。(2016.10.22 yutaka)
 		return 0;
 	}
 	DataPtr = (PCHAR)DdeAccessData(Data,NULL);

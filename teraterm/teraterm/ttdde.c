@@ -53,8 +53,9 @@
 
 #define MaxStrLen (LONG)512
 
+BOOL DDELog = FALSE;		// macro (DDE) が有効かどうかを示す
 char TopicName[21] = "";
-HCONV ConvH = 0;
+static HCONV ConvH = 0;
 BOOL AdvFlag = FALSE;
 BOOL CloseTT = FALSE;
 
@@ -80,6 +81,51 @@ static WORD ParamXmodemOpt;
 static char ParamSecondFileName[MaxStrLen];
 
 static BOOL AutoLogClose = FALSE;
+
+static char *cv_LogBuf;
+static int cv_LogPtr;
+static int cv_DStart;
+static int cv_DCount;
+
+/**
+ *	マクロへの送信バッファへ1byteつみこむ
+ *		バッファフルの時は古いものから捨てられる
+ */
+void DDEPut1(BYTE b)
+{
+	if (!DDELog) {
+		return;
+	}
+
+	cv_LogBuf[cv_LogPtr] = b;
+	cv_LogPtr++;
+	if (cv_LogPtr >= InBuffSize)
+		cv_LogPtr = cv_LogPtr - InBuffSize;
+
+	if (cv_DCount >= InBuffSize)
+	{
+		cv_DCount = InBuffSize;
+		cv_DStart = cv_LogPtr;
+	}
+}
+
+static BOOL DDECreateBuf(void)
+{
+	cv_LogBuf = (char *)malloc(InBuffSize);
+	if (cv_LogBuf == NULL) {
+		return FALSE;
+	}
+	cv_LogPtr = 0;
+	cv_DStart = 0;
+	cv_DCount = 0;
+	return TRUE;
+}
+
+static void DDEFreeBuf(void)
+{
+	free(cv_LogBuf);
+	cv_LogBuf = NULL;
+}
 
 static void BringupMacroWindow(BOOL flash_flag)
 {
@@ -186,29 +232,29 @@ HDDEDATA WildConnect(HSZ ServiceHsz, HSZ TopicHsz, UINT ClipFmt)
 		return 0;
 }
 
-BOOL DDEGet1(LPBYTE b)
+static BOOL DDEGet1(LPBYTE b)
 {
-	if (cv.DCount <= 0) return FALSE;
-	*b = ((LPSTR)cv.LogBuf)[cv.DStart];
-	cv.DStart++;
-	if (cv.DStart>=InBuffSize)
-		cv.DStart = cv.DStart-InBuffSize;
-	cv.DCount--;
+	if (cv_DCount <= 0) return FALSE;
+	*b = ((LPSTR)cv_LogBuf)[cv_DStart];
+	cv_DStart++;
+	if (cv_DStart>=InBuffSize)
+		cv_DStart = cv_DStart-InBuffSize;
+	cv_DCount--;
 	return TRUE;
 }
 
-LONG DDEGetDataLen()
+static LONG DDEGetDataLen()
 {
 	BYTE b;
 	LONG Len;
 	int Start, Count;
 
-	Len = cv.DCount;
-	Start = cv.DStart;
-	Count = cv.DCount;
+	Len = cv_DCount;
+	Start = cv_DStart;
+	Count = cv_DCount;
 	while (Count>0)
 	{
-		b = ((LPSTR)cv.LogBuf)[Start];
+		b = ((LPSTR)cv_LogBuf)[Start];
 		if ((b==0x00) || (b==0x01)) Len++;
 		Start++;
 		if (Start>=InBuffSize) Start = Start-InBuffSize;
@@ -218,7 +264,15 @@ LONG DDEGetDataLen()
 	return Len;
 }
 
-HDDEDATA AcceptRequest(HSZ ItemHSz)
+/**
+ *	送信バッファに残っているデータ数取得
+ */
+int DDEGetCount(void)
+{
+	return cv_DCount;
+}
+
+static HDDEDATA AcceptRequest(HSZ ItemHSz)
 {
 	BYTE b;
 	BOOL Unlock;
@@ -234,16 +288,6 @@ HDDEDATA AcceptRequest(HSZ ItemHSz)
 		                         Item2,CF_OEMTEXT,0);
 	else if (DdeCmpStringHandles(ItemHSz, Item) == 0) // item "DATA"
 	{
-		if (cv.HLogBuf==0) return 0;
-
-		if (cv.LogBuf==NULL)
-		{
-			Unlock = TRUE;
-			cv.LogBuf = GlobalLock(cv.HLogBuf);
-			if (cv.LogBuf == NULL) return 0;
-		}
-		else Unlock = FALSE;
-
 		Len = DDEGetDataLen();
 		if ((SyncMode) &&
 		    (SyncFreeSpace<Len))
@@ -275,12 +319,6 @@ HDDEDATA AcceptRequest(HSZ ItemHSz)
 			DP[i] = 0;
 			DdeUnaccessData(DH);
 		}
-
-		if (Unlock)
-		{
-			GlobalUnlock(cv.HLogBuf);
-			cv.LogBuf = NULL;
-		}
 	}
 	else
 		return 0;
@@ -288,8 +326,8 @@ HDDEDATA AcceptRequest(HSZ ItemHSz)
 	return DH;
 }
 
-HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
-                    HDDEDATA Data)
+static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
+						   HDDEDATA Data)
 {
 	LPSTR DataPtr;
 	DWORD DataSize;
@@ -327,7 +365,7 @@ HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 		return DDE_FNOTPROCESSED;
 }
 
-WORD HexStr2Word(PCHAR Str)
+static WORD HexStr2Word(PCHAR Str)
 {
 	int i;
 	BYTE b;
@@ -344,7 +382,7 @@ WORD HexStr2Word(PCHAR Str)
 	return w;
 }
 
-HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
+static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
 	char Command[MaxStrLen + 1];
 	int i;
@@ -997,9 +1035,9 @@ scp_rcv_error:
 	return (HDDEDATA)DDE_FACK;
 }
 
-HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
-                                  HSZ HSz1, HSZ HSz2, HDDEDATA Data,
-                                  DWORD Data1, DWORD Data2)
+static HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
+										 HSZ HSz1, HSZ HSz2, HDDEDATA Data,
+										 ULONG_PTR Data1, ULONG_PTR Data2)
 {
 	HDDEDATA Result;
 
@@ -1083,7 +1121,7 @@ BOOL InitDDE()
 
 	Ok = TRUE;
 
-	if (DdeInitialize(&Inst,(PFNCALLBACK)DdeCallbackProc,0,0) == DMLERR_NO_ERROR)
+	if (DdeInitialize(&Inst,DdeCallbackProc,0,0) == DMLERR_NO_ERROR)
 	{
 		Service= DdeCreateStringHandle(Inst, ServiceName, CP_WINANSI);
 		Topic  = DdeCreateStringHandle(Inst, TopicName, CP_WINANSI);
@@ -1102,7 +1140,7 @@ BOOL InitDDE()
 
 	if (Ok)
 	{
-		Ok = CreateLogBuf();
+		Ok = DDECreateBuf();
 		if (Ok) DDELog = TRUE;
 	}
 
@@ -1154,7 +1192,7 @@ void EndDDE()
 	AdvFlag = FALSE;
 
 	DDELog = FALSE;
-	FreeLogBuf();
+	DDEFreeBuf();
 	cv.NoMsg = 0;
 }
 
@@ -1162,7 +1200,7 @@ void DDEAdv()
 {
 	if ((ConvH==0) ||
 	    (! AdvFlag) ||
-	    (cv.DCount==0))
+	    (DDEGetCount() == 0))
 		return;
 
 	if ((! SyncMode) ||

@@ -39,6 +39,7 @@
 #include "ttlib.h"
 #include "ttfileio.h"
 #include "ttplug.h" /* TTPLUG */
+#include "ttdde.h"
 
 #include "commlib.h"
 #include <winsock2.h>
@@ -142,8 +143,8 @@ void CommInit(PComVar cv)
 	cv->BinPtr = 0;
 	cv->BStart = 0;
 	cv->BCount = 0;
-	cv->DStart = 0;
-	cv->DCount = 0;
+//	cv->DStart = 0;
+//	cv->DCount = 0;
 	cv->BinSkip = 0;
 	cv->FilePause = 0;
 	cv->ProtoFlag = FALSE;
@@ -836,13 +837,14 @@ BOOL CommCanClose(PComVar cv)
 	if (cv->InBuffCount>0) {
 		return FALSE;
 	}
-	if ((cv->HLogBuf!=NULL) &&
-	    ((cv->LCount>0) ||
-	     (cv->DCount>0))) {
+	if ((cv->HLogBuf!=NULL) && (cv->LCount>0)) {
 		return FALSE;
 	}
 	if ((cv->HBinBuf!=NULL) &&
 	    (cv->BCount>0)) {
+		return FALSE;
+	}
+	if (DDELog && DDEGetCount() > 0) {
 		return FALSE;
 	}
 	return TRUE;
@@ -1235,8 +1237,8 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 	}
 	if ((cv->PortType==IdTCPIP) ||
 	    (cv->PortType==IdSerial) &&
-			(!(ts->Flow == IdFlowHard || ts->Flow == IdFlowHardDsrDtr)) 
-			) { 
+			(!(ts->Flow == IdFlowHard || ts->Flow == IdFlowHardDsrDtr))
+			) {
 		if (Lock) {
 			b = XOFF;
 		}

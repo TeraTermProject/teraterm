@@ -1075,10 +1075,11 @@ typedef struct {
 	HANDLE HLogBuf;
 	PCHAR LogBuf;
 	int LogPtr, LStart, LCount;
-	/* Binary log & DDE */
+	/* Binary log */
 	HANDLE HBinBuf;
 	PCHAR BinBuf;
-	int BinPtr, BStart, BCount, DStart, DCount;
+	int BinPtr, BStart, BCount;
+	int reserve_0[2];		// DStart, DCount;
 	int BinSkip;
 	WORD FilePause;
 	BOOL ProtoFlag;

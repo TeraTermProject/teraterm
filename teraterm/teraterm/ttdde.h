@@ -28,25 +28,28 @@
  */
 
 /* TERATERM.EXE, DDE routines */
-#include <ddeml.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void SetTopic();
-BOOL InitDDE();
-void SendDDEReady();
-void EndDDE();
-void DDEAdv();
+void SetTopic(void);
+BOOL InitDDE(void);
+void SendDDEReady(void);
+void EndDDE(void);
+void DDEAdv(void);
 void EndDdeCmnd(int Result);
 void SetDdeComReady(WORD Ready);
 void RunMacro(PCHAR FName, BOOL Startup);
 
 extern char TopicName[21];
-extern HCONV ConvH;
 extern BOOL AdvFlag;
 extern BOOL CloseTT;
+
+// DDE buffer
+extern BOOL DDELog;
+void DDEPut1(BYTE b);
+int DDEGetCount(void);
 
 #ifdef __cplusplus
 }

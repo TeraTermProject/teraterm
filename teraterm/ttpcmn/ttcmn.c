@@ -1397,9 +1397,7 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 		return 0;
 	}
 
-	if ((cv->HLogBuf!=NULL) &&
-	    ((cv->LCount>=InBuffSize-10) ||
-	     (cv->DCount>=InBuffSize-10))) {
+	if ((cv->HLogBuf!=NULL) && (cv->LCount>=InBuffSize-10)) {
 		// 自分のバッファに余裕がない場合は、CPUスケジューリングを他に回し、
 		// CPUがストールするの防ぐ。
 		// (2006.10.13 yutaka)
@@ -2693,7 +2691,7 @@ cleanup:
 
 
 /*
- * 
+ *
  * [return]
  *   1以上   アプリが使用可能なCOMポートの総数
  *   0       アプリが使用可能なCOMポートがない

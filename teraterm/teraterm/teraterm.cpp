@@ -195,9 +195,6 @@ static BOOL OnIdle(LONG lCount)
 			if (FileLog) {
 				LogToFile();
 			}
-			if (DDELog && AdvFlag) {
-				DDEAdv();
-			}
 			GlobalUnlock(cv.HLogBuf);
 			cv.LogBuf = NULL;
 		}
@@ -209,6 +206,9 @@ static BOOL OnIdle(LONG lCount)
 			}
 			GlobalUnlock(cv.HBinBuf);
 			cv.BinBuf = NULL;
+		}
+		if (DDELog && AdvFlag) {
+			DDEAdv();
 		}
 
 		/* Talker */
@@ -227,7 +227,7 @@ static BOOL OnIdle(LONG lCount)
 		}
 
 		/* Receiver */
-		if (DDELog && cv.DCount >0) {
+		if (DDELog && DDEGetCount() > 0) {
 			// ログバッファがまだDDEクライアントへ送られていない場合は、
 			// TCPパケットの受信を行わない。
 			// 連続して受信を行うと、ログバッファがラウンドロビンにより未送信のデータを
@@ -240,7 +240,7 @@ static BOOL OnIdle(LONG lCount)
 	}
 
 	if (cv.Ready &&
-	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || (cv.LCount>0) || (cv.BCount>0) || (cv.DCount>0)) ) {
+	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || (cv.LCount>0) || (cv.BCount>0) || (DDEGetCount()>0)) ) {
 		Busy = 2;
 	}
 	else {

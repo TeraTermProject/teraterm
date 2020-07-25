@@ -100,8 +100,7 @@ void BPStart(int mode);
 void QVStart(int mode);
 
 extern PFileVar SendVar, FileVar;
-extern BOOL FileLog, BinLog, DDELog;
-
+extern BOOL FileLog, BinLog;
 
 // log
 void logfile_lock_initialize(void);

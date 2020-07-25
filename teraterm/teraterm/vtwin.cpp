@@ -1365,7 +1365,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(ControlMenu,ID_CONTROL_CLOSETEK,MF_BYCOMMAND | MF_ENABLED);
 		}
 
-		if ((ConvH!=0) || (FileVar!=NULL)) {
+		if (DDELog || (FileVar!=NULL)) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(ControlMenu,ID_CONTROL_SHOW_MACRO,MF_BYCOMMAND | MF_ENABLED);
 		}
@@ -3629,14 +3629,13 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	if (DDELog || FileLog) {
+	if (DDELog) {
+		EndDDE();
+	}
+
+	if (FileLog) {
 		if (! CreateLogBuf()) {
-			if (DDELog) {
-				EndDDE();
-			}
-			if (FileLog) {
-				FileTransEnd(OpLog);
-			}
+			FileTransEnd(OpLog);
 		}
 	}
 
