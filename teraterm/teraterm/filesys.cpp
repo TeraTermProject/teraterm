@@ -139,7 +139,7 @@ enum enumLineEnd eLineEnd = Line_LineHead;
 static void CloseFileSync(PFileVar ptr);
 
 
-BOOL LoadTTFILE()
+BOOL LoadTTFILE(void)
 {
 	BOOL Err;
 
@@ -237,7 +237,7 @@ BOOL LoadTTFILE()
 	}
 }
 
-BOOL FreeTTFILE()
+BOOL FreeTTFILE(void)
 {
 	if (TTFILECount==0)
 		return FALSE;
@@ -407,7 +407,7 @@ static void ConvertLogname(char *c, int destlen)
 	strncpy_s(c, destlen, buf, _TRUNCATE);
 }
 
-static void FixLogOption()
+static void FixLogOption(void)
 {
 	if (ts.LogBinary) {
 		ts.LogTypePlainText = false;
@@ -787,7 +787,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	return FALSE;
 }
 
-static BOOL LogStart()
+static BOOL LogStart(void)
 {
 	unsigned tid;
 
@@ -1127,7 +1127,7 @@ static void LogRotate(void)
 
 }
 
-void LogToFile()
+void LogToFile(void)
 {
 	PCHAR Buf;
 	int Start, Count;
@@ -1279,7 +1279,7 @@ void LogToFile()
 
 }
 
-BOOL CreateLogBuf()
+BOOL CreateLogBuf(void)
 {
 	if (cv.HLogBuf==NULL)
 	{
@@ -1294,7 +1294,7 @@ BOOL CreateLogBuf()
 	return (cv.HLogBuf!=NULL);
 }
 
-void FreeLogBuf()
+void FreeLogBuf(void)
 {
 	if ((cv.HLogBuf==NULL) || FileLog || DDELog)
 		return;
@@ -1310,7 +1310,7 @@ void FreeLogBuf()
 	cv.DCount = 0;
 }
 
-BOOL CreateBinBuf()
+BOOL CreateBinBuf(void)
 {
 	if (cv.HBinBuf==NULL)
 	{
@@ -1323,7 +1323,7 @@ BOOL CreateBinBuf()
 	return (cv.HBinBuf!=NULL);
 }
 
-void FreeBinBuf()
+void FreeBinBuf(void)
 {
 	if ((cv.HBinBuf==NULL) || BinLog)
 		return;
@@ -1337,7 +1337,7 @@ void FreeBinBuf()
 	cv.BCount = 0;
 }
 
-void FileSendStart()
+void FileSendStart(void)
 {
 	LONG Option = 0;
 
@@ -1477,7 +1477,7 @@ int FSEcho1(BYTE b)
 // - FileBracketMode == false
 // - cv.TelFlag == false
 // - ts.LocalEcho == 0
-void FileSendBinayBoost()
+void FileSendBinayBoost(void)
 {
 	WORD c, fc;
 	LONG BCOld;
@@ -1533,7 +1533,7 @@ void FileSendBinayBoost()
 	FileTransEnd(OpSendFile);
 }
 
-void FileSend()
+void FileSend(void)
 {
 	WORD c, fc;
 	LONG BCOld;
@@ -1723,7 +1723,7 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 	return TRUE;
 }
 
-static void CloseProtoDlg()
+static void CloseProtoDlg(void)
 {
 	if (PtDlg!=NULL)
 	{
@@ -1745,7 +1745,7 @@ static void CloseProtoDlg()
 	}
 }
 
-static BOOL ProtoStart()
+static BOOL ProtoStart(void)
 {
 	if (cv.ProtoFlag)
 		return FALSE;
@@ -1768,7 +1768,7 @@ static BOOL ProtoStart()
 	return TRUE;
 }
 
-void ProtoEnd()
+void ProtoEnd(void)
 {
 	if (! cv.ProtoFlag)
 		return;
@@ -1796,7 +1796,7 @@ void ProtoEnd()
  *				1/2		ActiveWin(グローバル変数)の値(IdVT=1/IdTek=2)
  *				注 今のところ捨てられている
  */
-int ProtoDlgParse()
+int ProtoDlgParse(void)
 {
 	int P;
 
@@ -1813,13 +1813,13 @@ int ProtoDlgParse()
 	return P;
 }
 
-void ProtoDlgTimeOut()
+void ProtoDlgTimeOut(void)
 {
 	if (PtDlg!=NULL)
 		(*ProtoTimeOutProc)(ProtoId,FileVar,ProtoVar,&cv);
 }
 
-void ProtoDlgCancel()
+void ProtoDlgCancel(void)
 {
 	if ((PtDlg!=NULL) &&
 	    (*ProtoCancel)(ProtoId,FileVar,ProtoVar,&cv))
@@ -2131,7 +2131,7 @@ void QVStart(int mode)
  *	ログローテートの設定
  *	ログのサイズが<size>バイトを超えていれば、ローテーションするよう設定する
  */
-void LogRotateSize(size_t size)
+void FLogRotateSize(size_t size)
 {
 	if (LogVar == NULL) {
 		return;
@@ -2144,7 +2144,7 @@ void LogRotateSize(size_t size)
  *	ログローテートの設定
  *	ログファイルの世代を設定する
  */
-void LogRotateRotate(int step)
+void FLogRotateRotate(int step)
 {
 	if (LogVar == NULL) {
 		return;
@@ -2156,7 +2156,7 @@ void LogRotateRotate(int step)
  *	ログローテートの設定
  *	ローテーションを停止
  */
-void LogRotateHalt(void)
+void FLogRotateHalt(void)
 {
 	if (LogVar == NULL) {
 		return;
@@ -2208,20 +2208,20 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 	return TRUE;
 }
 
-void LogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
+void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 {
 	// ログファイルへコメントを追加する (2004.8.6 yutaka)
 	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
 				HVTWin, OnCommentDlgProc);
 }
 
-void LogClose()
+void FLogClose(void)
 {
 	if (LogVar != NULL)
 		FileTransEnd(OpLog);
 }
 
-BOOL LogOpen(const char *fname)
+BOOL FLogOpen(const char *fname)
 {
 	BOOL ret;
 
@@ -2236,13 +2236,13 @@ BOOL LogOpen(const char *fname)
 	return ret;
 }
 
-BOOL LogIsOpend()
+BOOL FLogIsOpend(void)
 {
 	// LogVar->FileOpen
 	return LogVar != NULL;
 }
 
-void LogWriteStr(const char *str)
+void FLogWriteStr(const char *str)
 {
 	if (LogVar != NULL)
 	{
@@ -2256,7 +2256,7 @@ void LogWriteStr(const char *str)
 	}
 }
 
-void LogInfo(char *param_ptr, size_t param_len)
+void FLogInfo(char *param_ptr, size_t param_len)
 {
 	if (LogVar) {
 		param_ptr[0] = '0'
@@ -2276,7 +2276,7 @@ void LogInfo(char *param_ptr, size_t param_len)
 /**
  *	現在のログファイル名を取得
  */
-const char *LogGetFilename()
+const char *FLogGetFilename()
 {
 	if (LogVar == NULL) {
 		return NULL;
@@ -2290,10 +2290,10 @@ const char *LogGetFilename()
  *	@retval	FALSE	キャンセルされた
  *	@param[in,out]	filename	OK時、ファイル名、不要になったらfree()すること
  */
-BOOL LogOpenDialog(char **filename)
+BOOL FLogOpenDialog(char **filename)
 {
 	LogDlgData_t *data = (LogDlgData_t *)calloc(sizeof(LogDlgData_t), 1);
-	data->filename = LogGetLogFilename(NULL);
+	data->filename = FLogGetLogFilename(NULL);
 	INT_PTR ret = TTDialogBoxParam(
 		hInst, MAKEINTRESOURCE(IDD_LOGDLG),
 		HVTWin, LogFnHook, (LPARAM)data);
@@ -2317,7 +2317,7 @@ BOOL LogOpenDialog(char **filename)
  *	@return						フルパスファイル名
  *								不要になったら free() すること
  */
-char *LogGetLogFilename(const char *log_filename)
+char *FLogGetLogFilename(const char *log_filename)
 {
 	// フォルダ
 	char FileDirExpanded[MAX_PATH];

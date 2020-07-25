@@ -522,14 +522,14 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 
 		if (strncmp(p, "size", 4) == 0) {
 			s = atoi(&p[5]);
-			LogRotateSize(s);
+			FLogRotateSize(s);
 
 		} else if (strncmp(p, "rotate", 6) == 0) {
 			s = atoi(&p[7]);
-			LogRotateRotate(s);
+			FLogRotateRotate(s);
 
 		} else if (strncmp(p, "halt", 4) == 0) {
-			LogRotateHalt();
+			FLogRotateHalt();
 		}
 		break;
 	}
@@ -539,16 +539,16 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 
 	case CmdLogClose:
-		LogClose();
+		FLogClose();
 		break;
 	case CmdLogOpen:
-		if (LogIsOpend()) {
+		if (FLogIsOpend()) {
 			return DDE_FNOTPROCESSED;
 		}
 		else {
 			char *ParamFileNameA = ToCharU8(ParamFileName);
-			char *log_filenameA = LogGetLogFilename(ParamFileNameA);
-			BOOL ret = LogOpen(log_filenameA);
+			char *log_filenameA = FLogGetLogFilename(ParamFileNameA);
+			BOOL ret = FLogOpen(log_filenameA);
 			free(log_filenameA);
 			free(ParamFileNameA);
 			strncpy_s(ParamFileName, sizeof(ParamFileName), ret ? "1" : "0", _TRUNCATE);
@@ -561,7 +561,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		FLogPause(FALSE);
 		break;
 	case CmdLogWrite:
-		LogWriteStr(ParamFileName);
+		FLogWriteStr(ParamFileName);
 		break;
 	case CmdQVRecv:
 		if ((FileVar==NULL) && NewFileVar(&FileVar))
@@ -988,7 +988,7 @@ scp_rcv_error:
 	}
 
 	case CmdLogInfo:
-		LogInfo(ParamFileName, sizeof(ParamFileName) - 1);
+		FLogInfo(ParamFileName, sizeof(ParamFileName) - 1);
 		break;
 
 	default:
@@ -1062,7 +1062,7 @@ HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 		case XTYP_DISCONNECT:
 			// マクロ終了時、ログ採取を自動的に停止する。(2013.6.24 yutaka)
 			if (AutoLogClose) {
-				LogClose();
+				FLogClose();
 				AutoLogClose = FALSE;
 			}
 			ConvH = 0;

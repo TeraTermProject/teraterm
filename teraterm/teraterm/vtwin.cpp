@@ -1247,7 +1247,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		EnableMenuItem(FileMenu,ID_FILE_LOGMEIN,MF_BYCOMMAND | MF_ENABLED);
 
 		// XXX: この位置にしないと、logがグレイにならない。 (2005.2.1 yutaka)
-		if (LogIsOpend()) { // ログ採取モードの場合
+		if (FLogIsOpend()) { // ログ採取モードの場合
 			EnableMenuItem(FileMenu,ID_FILE_LOG,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_ENABLED);
@@ -3575,12 +3575,12 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	/* Auto start logging or /L= option */
 	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
 		if (ts.LogFN[0] == 0) {
-			char *filename = LogGetLogFilename(NULL);
+			char *filename = FLogGetLogFilename(NULL);
 			strncpy_s(ts.LogFN, sizeof(ts.LogFN), filename, _TRUNCATE);
 			free(filename);
 		}
 		if (ts.LogFN[0]!=0) {
-			LogOpen(ts.LogFN);
+			FLogOpen(ts.LogFN);
 		}
 	}
 
@@ -4138,16 +4138,16 @@ void CVTWindow::OnLogMeInLaunch()
 void CVTWindow::OnFileLog()
 {
 	char *filename;
-	BOOL r = LogOpenDialog(&filename);
+	BOOL r = FLogOpenDialog(&filename);
 	if (r) {
-		LogOpen(filename);
+		FLogOpen(filename);
 		free(filename);
 	}
 }
 
 void CVTWindow::OnCommentToLog()
 {
-	LogAddCommentDlg(m_hInst, HVTWin);
+	FLogAddCommentDlg(m_hInst, HVTWin);
 }
 
 // ログの閲覧 (2005.1.29 yutaka)
@@ -4157,11 +4157,11 @@ void CVTWindow::OnViewLog()
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
-	if(!LogIsOpend()) {
+	if(!FLogIsOpend()) {
 		return;
 	}
 
-	const char *file = LogGetFilename();
+	const char *file = FLogGetFilename();
 
 	memset(&si, 0, sizeof(si));
 	GetStartupInfo(&si);
