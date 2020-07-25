@@ -452,24 +452,65 @@ void MoveToMainScreen()
 	MoveCursor(MainX, MainY); // move to main screen
 }
 
-static void Log1Byte(BYTE b)
+/*
+ *	ログに1キャラクタ(BYTE)出力
+ */
+static void Log1Char(vtterm_work_t *vtterm, char c)
 {
-	LogPut1(b);
-	DDEPut1(b);
+	switch (vtterm->log_code) {
+	case 0:
+	default:
+		// UTF-8
+		LogPut1(c);
+		break;
+	case 1:
+		// UTF-16LE
+		LogPut1(c);
+		LogPut1(0);
+		break;
+	case 2:
+		// UTF-16LE
+		LogPut1(0);
+		LogPut1(c);
+		break;
+	}
 }
 
-static void Log1UTF32(vtterm_work_t *vtterm, unsigned int u32)
+/**
+ *	1キャラクタ(unsigned int, char32_t)をログ(or/and macro送信バッファ)へ出力
+ *	New Line 以外
+ */
+static void OutputLogUTF32WONL(vtterm_work_t *vtterm, unsigned int u32)
 {
-	switch(vtterm->log_code) {
-	default:
-	case 0: {
-		// UTF-8
-		char u8[4];
-		size_t u8_len = UTF32ToUTF8(u32, u8, _countof(u8));
-		size_t i;
+	size_t i;
+	BOOL log_available = (cv.HLogBuf != 0);
+
+	if (!DDELog && !log_available) {
+		// ログにも macro にも出力不要
+		return;
+	}
+
+	// UTF-8 で出力する Log or/and macro
+	if (DDELog || (log_available && vtterm->log_code == 0)) {
+		char u8_buf[4];
+		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
 		for (i = 0; i < u8_len; i++) {
-			Log1Byte(u8[i]);
+			BYTE b = u8_buf[i];
+			if (DDELog)
+				DDEPut1(b);
+			if (log_available && vtterm->log_code == 0)
+				LogPut1(b);
 		}
+	}
+
+	if (!log_available) {
+		// ログには出力しない(macro出力だけだった)
+		return;
+	}
+
+	switch(vtterm->log_code) {
+	case 0: {
+		// UTF-8, 出力済み
 		break;
 	}
 	case 1:
@@ -481,63 +522,76 @@ static void Log1UTF32(vtterm_work_t *vtterm, unsigned int u32)
 		for (i = 0; i < u16_len; i++) {
 			if (vtterm->log_code == 1) {
 				// UTF-16LE
-				Log1Byte(u16[i] & 0xff);
-				Log1Byte((u16[i] >> 8) & 0xff);
+				LogPut1(u16[i] & 0xff);
+				LogPut1((u16[i] >> 8) & 0xff);
 			}
 			else {
 				// UTF-16BE
-				Log1Byte(u16[i] & 0xff);
-				Log1Byte((u16[i] >> 8) & 0xff);
+				LogPut1(u16[i] & 0xff);
+				LogPut1((u16[i] >> 8) & 0xff);
 			}
 		}
 	}
 	}
 }
 
-static void Log1NewLine(vtterm_work_t *vtterm)
+/**
+ *	改行をログ(or/and macro送信バッファ)へ出力
+ *	ログには設定された改行コードを出力
+ *	macro用には CR+LF を出力
+ */
+static void OutputLogNewLine(vtterm_work_t *vtterm)
 {
-	switch(vtterm->log_cr_type) {
-	case 0:
-		// CR + LF
-		Log1UTF32(vtterm, CR);
-		Log1UTF32(vtterm, LF);
-		break;
-	case 1:
-		// CR
-		Log1UTF32(vtterm, CR);
-		break;
-	case 2:
-		// LF
-		Log1UTF32(vtterm, LF);
-		break;
+	// ログ出力
+	if (cv.HLogBuf != 0) {
+		// ログは取っている
+		switch(vtterm->log_cr_type) {
+		case 0:
+			// CR + LF
+			Log1Char(vtterm, CR);
+			Log1Char(vtterm, LF);
+			break;
+		case 1:
+			// CR
+			Log1Char(vtterm, CR);
+			break;
+		case 2:
+			// LF
+			Log1Char(vtterm, LF);
+			break;
+		}
 	}
+
+	// マクロ出力
+	DDEPut1(CR);
+	DDEPut1(LF);
 }
 
+/**
+ *	1キャラクタ(unsigned int, char32_t)をログ(or/and macro送信バッファ)へ出力
+ */
 static void OutputLogUTF32(unsigned int u32)
 {
 	vtterm_work_t *vtterm = &vtterm_work;
 
-	if (cv.HLogBuf == 0) {
-		// ログは取っていない, 何もしない
-		return;
-	}
-
-	// 改行コードをチェック
-	//		CR hold		入力	改行出力	CR hold 変更
-	//		------------+-------+-----------+------------
-	//		なし		CR		0			セットする
-	//		なし		LF		1			変化なし
-	//		なし		その他	0			変化なし
-	//		あり		CR		1			変化なし(ホールドしたまま)
-	//		あり		LF		1			クリアする
-	//		あり		その他	1			クリアする
+   	// 入力が改行(CR or LF)の場合、
+	// 改行の種類(CR or LF or CR+LF)を自動で判定して
+	// OutputLogNewLine() で改行を出力する
+	//		入力    CR hold     改行出力   	CR hold 変更
+   	// 		+-------+-----------+-----------+------------
+	//		CR      なし        しない		セットする
+	//		LF      なし        する		変化なし
+	//		その他  なし        しない		変化なし
+	//		CR      あり        する		変化なし(ホールドしたまま)
+	//		LF      あり        する		クリアする
+	//		その他  あり        する		クリアする
 	if (vtterm->log_cr_hold == FALSE) {
 		if (u32 == CR) {
 			vtterm->log_cr_hold = TRUE;
 			return;
 		}
 		else if (u32 == LF) {
-			Log1NewLine(vtterm);
+			OutputLogNewLine(vtterm);
 			return;
 		}
 		else {
@@ -546,28 +600,38 @@ static void OutputLogUTF32(unsigned int u32)
 	}
 	else {
 		if (u32 == CR) {
-			Log1NewLine(vtterm);
+			OutputLogNewLine(vtterm);
 			return;
 		}
 		else if (u32 == LF) {
 			vtterm->log_cr_hold = FALSE;
-			Log1NewLine(vtterm);
+			OutputLogNewLine(vtterm);
 			return;
 		}
 		else {
 			vtterm->log_cr_hold = FALSE;
-			Log1NewLine(vtterm);
+			OutputLogNewLine(vtterm);
 		}
 	}
 
-	Log1UTF32(vtterm, u32);
+	// 改行以外を出力
+	OutputLogUTF32WONL(vtterm, u32);
 }
 
+/**
+ *	1キャラクタ(BYTE)をログ(or/and macro送信バッファ)へ出力
+ */
 static void OutputLogByte(BYTE b)
 {
-	if (cv.HLogBuf!=0) {
-		OutputLogUTF32(b);
-	}
+	OutputLogUTF32(b);
+}
+
+/**
+ *	ログ(or/and Macro送信バッファ)出力の必要があるか?
+ */
+static BOOL NeedsOutputBufs(void)
+{
+	return cv.HLogBuf != 0 || DDELog;
 }
 
 void MoveToStatusLine()
@@ -689,19 +753,19 @@ void BackSpace()
 	if (CursorX == CursorLeftM || CursorX == 0) {
 		if (CursorY > 0 && (ts.TermFlag & TF_BACKWRAP)) {
 			MoveCursor(CursorRightM, CursorY-1);
-			if (cv.HLogBuf!=0 && !ts.LogTypePlainText) OutputLogByte(BS);
+			if (NeedsOutputBufs() && !ts.LogTypePlainText) OutputLogByte(BS);
 		}
 	}
 	else if (CursorX > 0) {
 		MoveCursor(CursorX-1, CursorY);
-		if (cv.HLogBuf!=0 && !ts.LogTypePlainText) OutputLogByte(BS);
+		if (NeedsOutputBufs() && !ts.LogTypePlainText) OutputLogByte(BS);
 	}
 }
 
 static void CarriageReturn(BOOL logFlag)
 {
 	if (!ts.EnableContinuedLineCopy || logFlag)
-		if (cv.HLogBuf!=0) OutputLogByte(CR);
+		if (NeedsOutputBufs()) OutputLogByte(CR);
 
 	if (RelativeOrgMode || CursorX > CursorLeftM)
 		MoveCursor(CursorLeftM, CursorY);
@@ -719,7 +783,7 @@ static void LineFeed(BYTE b, BOOL logFlag)
 		BuffDumpCurrentLine(b);
 
 	if (!ts.EnableContinuedLineCopy || logFlag)
-		if (cv.HLogBuf!=0) OutputLogByte(LF);
+		if (NeedsOutputBufs()) OutputLogByte(LF);
 
 	if (CursorY < CursorBottom)
 		MoveCursor(CursorX,CursorY+1);
@@ -745,7 +809,7 @@ void Tab()
 		Wrap = FALSE;
 	}
 	CursorForwardTab(1, AutoWrapMode);
-	if (cv.HLogBuf!=0) OutputLogByte(HT);
+	if (NeedsOutputBufs()) OutputLogByte(HT);
 }
 
 void RepeatChar(BYTE b, int count)
@@ -840,7 +904,7 @@ static void PutChar(BYTE b)
 #endif
 	}
 
-	if (cv.HLogBuf !=0) {
+	if (NeedsOutputBufs()) {
 		// (2005.2.20 yutaka)
 		if (ts.LogTypePlainText) {
 			if (__isascii(b) && !isprint(b)) {
@@ -942,12 +1006,12 @@ static void PutDecSp(BYTE b)
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
 	}
 
-	if (cv.HLogBuf!=0) OutputLogByte(b);
+	if (NeedsOutputBufs()) OutputLogByte(b);
 /*
 	if (ts.LogTypePlainText && __isascii(b) && !isprint(b)) {
 		// ASCII文字で、非表示な文字はログ採取しない。
 	} else {
-		if (cv.HLogBuf!=0) OutputLogByte(b);
+		if (NeedsOutputBufs()) OutputLogByte(b);
 	}
  */
 
@@ -1037,7 +1101,7 @@ static void PutKanji(BYTE b)
 
 	Wrap = FALSE;
 
-	if (cv.HLogBuf!=0) {
+	if (NeedsOutputBufs()) {
 		OutputLogByte(HIBYTE(Kanji));
 		OutputLogByte(LOBYTE(Kanji));
 	}
