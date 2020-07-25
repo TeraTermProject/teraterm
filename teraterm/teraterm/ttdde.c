@@ -67,7 +67,7 @@ static HSZ Item = 0;
 static HSZ Item2 = 0;
 static HWND HWndDdeCli = NULL;
 
-static StartupFlag = FALSE;
+static BOOL StartupFlag = FALSE;
 
 // for sync mode
 static BOOL SyncMode = FALSE;
@@ -331,7 +331,7 @@ WORD HexStr2Word(PCHAR Str)
 {
 	int i;
 	BYTE b;
-	WORD w;
+	WORD w = 0;
 
 	for (i=0; i<=3; i++)
 	{
@@ -383,7 +383,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		if (ParamXmodemOpt==0) ParamXmodemOpt = 1;
 		break;
 	case CmdSetSync:
-		if (sscanf(&(Command[1]),"%u",&SyncFreeSpace)!=1)
+		if (sscanf(&(Command[1]),"%lu",&SyncFreeSpace)!=1)
 			SyncFreeSpace = 0;
 		SyncMode = (SyncFreeSpace>0);
 		SyncRecv = TRUE;
