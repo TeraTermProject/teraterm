@@ -24,6 +24,8 @@ add_library(
   layer_for_unicode.cpp
   layer_for_unicode.h
   layer_for_unicode_comctl32.cpp
+  layer_for_unicode_crt.h
+  layer_for_unicode_crt.cpp
   tipwin.cpp
   tipwin.h
   tmfc.cpp

@@ -136,6 +136,7 @@
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
     <ClCompile Include="fileread.cpp" />
+    <ClCompile Include="layer_for_unicode_crt.cpp" />
     <ClCompile Include="tipwin.cpp" />
     <ClCompile Include="tmfc.cpp" />
     <ClCompile Include="tmfc_frame.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="asprintf.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
+    <ClInclude Include="layer_for_unicode_crt.h" />
     <ClInclude Include="tipwin.h" />
     <ClInclude Include="tmfc.h" />
     <ClInclude Include="compat_win.h" />
