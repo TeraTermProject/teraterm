@@ -861,8 +861,7 @@ INPUT_ENCODING         = CP932
 FILE_PATTERNS          = *.c \
                          *.cc \
                          *.cpp \
-                         *.h \
-                         *.md
+                         *.h
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
