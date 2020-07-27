@@ -168,7 +168,6 @@
 #define IDC_FN_STATIC                   1095
 #define IDC_RECVFILE                    1096
 #define IDC_RECV                        1097
-#define IDC_BUTTON1                     1098
 #define IDC_SFTP_TEST                   1098
 #define IDC_DUMMY_LINE                  1099
 #define IDC_LOCALUSERNAMELABEL          1100
