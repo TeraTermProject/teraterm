@@ -20,7 +20,7 @@ GetOptions(
 
 if (-d "$source_root/.svn") {
 	# svn infoを実行、出力をすべて取り込む
-	if (!open(my $FD, "-|", "$svn info $source_root 2>&1")) {
+	if (!open(my $FD, "-|", "\"$svn\" info $source_root 2>&1")) {
 		# svn が実行できない
 		print "'$svn' can not execute\n";
 	}
