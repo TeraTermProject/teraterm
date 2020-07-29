@@ -10,9 +10,11 @@
 #define IDI_TTERM_CLASSIC               103
 #define IDI_VT_CLASSIC                  104
 #define IDI_CYGTERM                     105
+#define IDD_COMMENT_DIALOG              110
 #define IDD_EXTERNAL_SETUP              111
 #define IDD_TABSHEET_GENERAL            111
 #define IDD_BROADCAST_DIALOG            112
+#define IDD_LOGDLG                      115
 #define IDD_TABSHEET_VISUAL             116
 #define IDD_TABSHEET_LOG                117
 #define IDD_TABSHEET_CYGWIN             118
@@ -350,7 +352,7 @@
 #define ID_FILE_TERATERMMENU            52006
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

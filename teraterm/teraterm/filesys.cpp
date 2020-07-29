@@ -55,9 +55,9 @@
 #include "layer_for_unicode_crt.h"
 #include "codeconv.h"
 
-#include "filesys.h"
-//#include "tt_res.h"
 #include "filesys_log_res.h"
+
+#include "filesys.h"
 
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
@@ -491,7 +491,7 @@ static void SetLogFlags(HWND Dialog)
 	GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
 	ts.LogBinary = BinFlag;
 
-	GetRB(Dialog, &val, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
+	GetRB(Dialog, &val, IDC_APPEND, IDC_APPEND);
 	ts.Append = val;
 
 	if (!BinFlag) {
@@ -568,6 +568,9 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 {
 	if (work->file_exist) {
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), TRUE);
+		if (work->pts->Append > 0) {
+			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
+		}
 	}
 	else {
 		// ファイルがない -> 新規
@@ -605,7 +608,7 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 		}
 	}
 	else {
-		// ファイルがない、新規
+		// ファイルがない 又は appendではない(上書き)
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 		CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
@@ -630,7 +633,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_TABSHEET_TITLE_LOG" },
 		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
-//		{ IDC_FOPTAPPEND, "DLG_FOPT_APPEND" },
+		{ IDC_APPEND, "DLG_FOPT_APPEND" },
 		{ IDC_PLAINTEXT, "DLG_FOPT_PLAIN" },
 		{ IDC_HIDEDIALOG, "DLG_FOPT_HIDEDIALOG" },
 		{ IDC_ALLBUFF_INFIRST, "DLG_FOPT_ALLBUFFINFIRST" },
@@ -726,7 +729,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			wchar_t filename[MAX_PATH];
 			_GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
 			work->info->filename = _wcsdup(filename);
-			work->info->append = IsDlgButtonChecked(Dialog, IDC_FOPTAPPEND) == BST_CHECKED;
+			work->info->append = IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED;
 			work->info->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
 			work->info->code = (int)SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_GETCURSEL, 0, 0);
 			SetLogFlags(Dialog);
