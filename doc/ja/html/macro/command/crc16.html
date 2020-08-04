@@ -14,7 +14,7 @@
 <h1>crc16, crc16file</h1>
 
 <p>
-CRC-16-IBMを計算する。
+CRC-16-CCITTを計算する。
 </p>
 
 <pre class="macro-syntax">
@@ -28,7 +28,7 @@ crc16file &lt;intvar&gt; &lt;filename&gt;
 引数の文字列およびファイルからCRC(Cyclic Redundancy Checking)を計算する。多項式（右回り）は以下のとおり。
 <br><br>
 
-0xA001 (x<sup>16</sup>+x<sup>15</sup>+x<sup>2</sup>+x<sup>0</sup>)
+10001000000100001 (x<sup>16</sup>+x<sup>12</sup>+x<sup>5</sup>+x<sup>0</sup>)
 <br><br>
 
 計算結果は intvar 変数に数値として格納される。<br>
@@ -40,8 +40,8 @@ CRCアルゴリズムの実装（C言語）を以下に示す。
 <code>
 static unsigned int crc16(int n, unsigned char c[])
 {
+#define CRC16POLY1  0x1021U
 #define CRC16POLY2  0x8408U  /* 左右逆転 */
-
 	int i, j;
 	unsigned long r;
 

@@ -14,7 +14,7 @@
 <h1>crc16, crc16file</h1>
 
 <p>
-Calculates the CRC-16-IBM of a string or a file.
+Calculates the CRC-16-CCITT of a string or a file.
 </p>
 
 <pre class="macro-syntax">
@@ -28,7 +28,7 @@ crc16file &lt;intvar&gt; &lt;filename&gt;
 This macro function calculates the CRC(Cyclic Redundancy Checking) of a string or a file. The polynomial expression(right rotation) is as follows:
 <br><br>
 
-0xA001 (x<sup>16</sup>+x<sup>15</sup>+x<sup>2</sup>+x<sup>0</sup>)
+10001000000100001 (x<sup>16</sup>+x<sup>12</sup>+x<sup>5</sup>+x<sup>0</sup>)
 <br><br>
 
 The calculated value stores the variable "intvar" as mathematical value.<br>
@@ -40,8 +40,8 @@ The CRC algorithm implementation by C language is as follows:
 <code>
 static unsigned int crc16(int n, unsigned char c[])
 {
+#define CRC16POLY1  0x1021U
 #define CRC16POLY2  0x8408U  /* left-right reversal */
-
 	int i, j;
 	unsigned long r;
 
@@ -60,19 +60,19 @@ static unsigned int crc16(int n, unsigned char c[])
 <h2>Example</h2>
 
 <pre class="macro-example">
-str = 'this is a test string to be crc16ed'
+str = 'this is a test string to be CRC16ed'
 crc16 crc str
 
-; Display crc16 result asHEX
+; Display CRC16 result asHEX
 sprintf '0x%08X' crc
-messagebox inputstr 'crc16 = '
+messagebox inputstr 'CRC16 = '
 
 crc16file crc 'foo.bin'
 if result = -1 then
-    messagebox 'file open error' 'crc16 = '
+    messagebox 'file open error' 'CRC16 = '
 else
     sprintf '0x%08X' crc
-    messagebox inputstr 'crc16 = '
+    messagebox inputstr 'CRC16 = '
 endif
 </pre>
 

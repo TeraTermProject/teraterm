@@ -39,10 +39,10 @@ The CRC algorithm implementation by C language is as follows:
 This algorithm is often used as the Ethernet FCS(Frame Check Sequence).
 <pre>
 <code>
-#define CRCPOLY2 0xEDB88320UL  /* left-right reversal */
-
-static unsigned long crc2(int n, unsigned char c[])
+static unsigned long crc32(int n, unsigned char c[])
 {
+#define CRC32POLY1 0x04C11DB7UL
+#define CRC32POLY2 0xEDB88320UL  /* left-right reversal */
 	int i, j;
 	unsigned long r;
 
@@ -50,7 +50,7 @@ static unsigned long crc2(int n, unsigned char c[])
 	for (i = 0; i &lt; n; i++) {
 		r ^= c[i];
 		for (j = 0; j &lt; CHAR_BIT; j++)
-			if (r &amp; 1) r = (r &gt;&gt; 1) ^ CRCPOLY2;
+			if (r &amp; 1) r = (r &gt;&gt; 1) ^ CRC32POLY2;
 			else       r &gt;&gt;= 1;
 	}
 	return r ^ 0xFFFFFFFFUL;
