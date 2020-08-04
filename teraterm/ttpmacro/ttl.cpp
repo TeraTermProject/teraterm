@@ -635,7 +635,7 @@ static unsigned int crc16(int n, unsigned char c[])
 static unsigned long crc32(int n, unsigned char c[])
 {
 #define CRC32POLY1 0x04C11DB7UL
-	/* x^{32}+x^{26}+x^{23}+x^{22}+x^{16}+x^{12}+x^{11]+
+	/* x^{32}+x^{26}+x^{23}+x^{22}+x^{16}+x^{12}+x^{11}+
 	   x^{10}+x^8+x^7+x^5+x^4+x^2+x^1+1 */
 #define CRC32POLY2 0xEDB88320UL  /* ç∂âEãtì] */
 	int i, j;

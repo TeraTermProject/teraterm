@@ -38,10 +38,10 @@ crc32file でファイルが開けなかった場合は、システム変数 result に -1 が格納される
 CRCアルゴリズムの実装（C言語）を以下に示す。このアルゴリズムは、EthernetのFCS(Frame Check Sequence)に適用されている。
 <pre>
 <code>
-#define CRCPOLY2 0xEDB88320UL  /* 左右逆転 */
-
-static unsigned long crc2(int n, unsigned char c[])
+static unsigned long crc32(int n, unsigned char c[])
 {
+#define CRC32POLY1 0x04C11DB7UL
+#define CRC32POLY2 0xEDB88320UL  /* 左右逆転 */
 	int i, j;
 	unsigned long r;
 
@@ -49,7 +49,7 @@ static unsigned long crc2(int n, unsigned char c[])
 	for (i = 0; i &lt; n; i++) {
 		r ^= c[i];
 		for (j = 0; j &lt; CHAR_BIT; j++)
-			if (r &amp; 1) r = (r &gt;&gt; 1) ^ CRCPOLY2;
+			if (r &amp; 1) r = (r &gt;&gt; 1) ^ CRC32POLY2;
 			else       r &gt;&gt;= 1;
 	}
 	return r ^ 0xFFFFFFFFUL;
