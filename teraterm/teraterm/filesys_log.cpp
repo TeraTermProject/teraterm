@@ -121,6 +121,7 @@ static void LogBinSkip(int add);
 static BOOL CreateLogBuf(void);
 static BOOL CreateBinBuf(void);
 void LogPut1(BYTE b);
+static void OutputStr(const wchar_t *str);
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
@@ -1201,11 +1202,9 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 		{ 0, "DLG_COMMENT_TITLE" },
 		{ IDOK, "BTN_OK" }
 	};
-	UINT ret;
 
 	switch (msg) {
 		case WM_INITDIALOG:
-			//SetDlgItemText(hDlgWnd, IDC_EDIT_COMMENT, "サンプル");
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
@@ -1215,9 +1214,9 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 			switch (LOWORD(wp)) {
 				case IDOK: {
 					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
-					wchar_t *buf = (wchar_t *)malloc((len + 1) * sizeof(wchar_t));
+					len += 1;
+					wchar_t *buf = (wchar_t *)malloc(len * sizeof(wchar_t));
 					_GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, len);
-					buf[len] = '\0';  // null-terminate
 					FLogWriteStr(buf);
 					FLogWriteStr(L"\n");		// TODO 改行コード
 					free(buf);
@@ -1228,6 +1227,7 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 					return FALSE;
 			}
 			break;
+
 		case WM_CLOSE:
 			TTEndDialog(hDlgWnd, 0);
 			return TRUE;
@@ -1314,6 +1314,7 @@ BOOL FLogIsOpendBin(void)
 void FLogWriteStr(const wchar_t *str)
 {
 	if (LogVar != NULL) {
+#if 0
 		DWORD wrote;
 		size_t len = wcslen(str)  * sizeof(wchar_t);
 		logfile_lock();
@@ -1323,6 +1324,8 @@ void FLogWriteStr(const wchar_t *str)
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
 		LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
+#endif
+		OutputStr(str);
 	}
 }
 
@@ -1618,4 +1621,32 @@ void FLogSetCode(int code)
 {
 	PFileVar fv = LogVar;
 	fv->log_code = code;
+}
+
+static void OutputStr(const wchar_t *str)
+{
+	size_t len;
+
+	assert(str != NULL);
+
+	len = wcslen(str);
+	while(*str != 0) {
+		unsigned int u32;
+		size_t u16_len = UTF16ToUTF32(str, len, &u32);
+		switch (u16_len) {
+		case 0:
+		default:
+			// 変換できない
+			str++;
+			len--;
+			break;
+		case 1:
+		case 2: {
+			FLogPutUTF32(u32);
+			str += u16_len;
+			len -= u16_len;
+			break;
+		}
+		}
+	}
 }
