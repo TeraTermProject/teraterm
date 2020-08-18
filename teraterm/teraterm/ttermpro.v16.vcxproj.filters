@@ -150,6 +150,9 @@
     <ClCompile Include="filesys_log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="checkeol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -380,6 +383,9 @@
     </ClInclude>
     <ClInclude Include="filesys_log_res.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="checkeol.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

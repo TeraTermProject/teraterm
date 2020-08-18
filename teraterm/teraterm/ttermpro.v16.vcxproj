@@ -140,6 +140,7 @@
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="broadcast.cpp" />
     <ClCompile Include="buffer.c" />
+    <ClCompile Include="checkeol.cpp" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="coding_pp.cpp" />
     <ClCompile Include="commlib.c" />
@@ -177,6 +178,7 @@
     <ClInclude Include="../ttpdlg/ttdlg.h" />
     <ClInclude Include="..\susie_plugin\libsusieplugin.h" />
     <ClInclude Include="broadcast.h" />
+    <ClInclude Include="checkeol.h" />
     <ClInclude Include="coding_pp.h" />
     <ClInclude Include="coding_pp_res.h" />
     <ClInclude Include="filesys_log_res.h" />

@@ -15,6 +15,8 @@ add_executable(
   broadcast.h
   buffer.c
   buffer.h
+  checkeol.cpp
+  checkeol.h
   clipboar.c
   clipboar.h
   coding_pp.cpp
