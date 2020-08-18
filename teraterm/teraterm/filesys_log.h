@@ -33,6 +33,12 @@
 extern "C" {
 #endif
 
+/**
+ * ログバッファの最低空きサイズ
+ *	"[YYYY-MM-DD HH:MM:SS.000]" の文字が入る程度
+ */
+#define FILESYS_LOG_FREE_SPACE	(30*2)
+
 // log
 typedef struct {
 	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること

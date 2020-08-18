@@ -6367,7 +6367,7 @@ static int CommRead1Byte_(PComVar cv, LPBYTE b)
 		return 0;
 	}
 
-	if (FLogIsOpend() && FLogGetFreeCount() < 10) {
+	if (FLogIsOpend() && FLogGetFreeCount() < FILESYS_LOG_FREE_SPACE) {
 		// 自分のバッファに余裕がない場合は、CPUスケジューリングを他に回し、
 		// CPUがストールするの防ぐ。
 		// (2006.10.13 yutaka)

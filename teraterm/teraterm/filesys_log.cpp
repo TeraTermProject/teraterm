@@ -920,7 +920,7 @@ static void LogRotate(void)
 	logfile_unlock();
 }
 
-static char *TimeStampStr()
+static wchar_t *TimeStampStr()
 {
 	char *strtime = NULL;
 	switch (ts.LogTimestampType) {
@@ -945,8 +945,7 @@ static char *TimeStampStr()
 	strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
 	strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
 
-	return strdup(tmp);
-//	return ToWcharA(tmp);
+	return ToWcharA(tmp);
 }
 
 /**
@@ -957,7 +956,6 @@ static void LogToFile(void)
 	PCHAR Buf;
 	int Start, Count;
 	BYTE b;
-	PFileVar fv = LogVar;
 
 	if (FileLog)
 	{
@@ -992,23 +990,6 @@ static void LogToFile(void)
 		if (WriteBufLen >= (WriteBufMax*4/5)) {
 			WriteBufMax *= 2;
 			WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
-		}
-
-		// add time stamp string
-		if ( ts.LogTimestamp && fv->eLineEnd ) {
-			char *strtime = TimeStampStr();
-			size_t len = strlen(strtime);
-			memcpy(&WriteBuf[WriteBufLen], strtime, len);
-			free(strtime);
-			WriteBufLen += len;
-		}
-
-		/* 2007.05.24 Gentaro */
-		if( b == 0x0a ){
-			fv->eLineEnd = Line_LineHead; /* set endmark*/
-		}
-		else {
-			fv->eLineEnd = Line_Other; /* clear endmark*/
 		}
 
 		WriteBuf[WriteBufLen++] = b;
@@ -1280,17 +1261,6 @@ BOOL FLogIsOpendBin(void)
 void FLogWriteStr(const wchar_t *str)
 {
 	if (LogVar != NULL) {
-#if 0
-		DWORD wrote;
-		size_t len = wcslen(str)  * sizeof(wchar_t);
-		logfile_lock();
-		WriteFile(LogVar->FileHandle, str, len, &wrote, NULL);
-		LogVar->eLineEnd = Line_LineHead;
-		logfile_unlock();
-		LogVar->ByteCount =
-			LogVar->ByteCount + len;
-		LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
-#endif
 		OutputStr(str);
 	}
 }
@@ -1508,8 +1478,6 @@ void FLogWriteFile(void)
 		if (BinLog) {
 			LogToFile();
 		}
-//		GlobalUnlock(cv_HBinBuf);
-//		cv_BinBuf = NULL;
 	}
 }
 
@@ -1522,6 +1490,13 @@ void FLogPutUTF32(unsigned int u32)
 	if (!log_available) {
 		// ƒƒO‚É‚Ío—Í‚µ‚È‚¢
 		return;
+	}
+
+	if (ts.LogTimestamp && fv->eLineEnd) {
+		fv->eLineEnd = Line_Other; /* clear endmark*/
+		wchar_t* strtime = TimeStampStr();
+		FLogWriteStr(strtime);
+		free(strtime);
 	}
 
 	switch(fv->log_code) {
@@ -1555,29 +1530,39 @@ void FLogPutUTF32(unsigned int u32)
 		}
 	}
 	}
+
+	if (u32 == 0x0a) {
+		fv->eLineEnd = Line_LineHead; /* set endmark*/
+	}
 }
 
 void FLogOutputBOM(void)
 {
 	PFileVar fv = LogVar;
+	DWORD wrote;
 
 	switch(fv->log_code) {
-	case 0:
+	case 0: {
 		// UTF-8
-		LogPut1(0xef);
-		LogPut1(0xbb);
-		LogPut1(0xbf);
+		const char *bom = "\xef\xbb\xbf";
+		WriteFile(LogVar->FileHandle, bom, 3, &wrote, NULL);
+		LogVar->ByteCount += 3;
 		break;
-	case 1:
+	}
+	case 1: {
 		// UTF-16LE
-		LogPut1(0xff);
-		LogPut1(0xfe);
+		const char *bom = "\xff\xfe";
+		WriteFile(LogVar->FileHandle, bom, 2, &wrote, NULL);
+		LogVar->ByteCount += 2;
 		break;
-	case 2:
+	}
+	case 2: {
 		// UTF-16BE
-		LogPut1(0xfe);
-		LogPut1(0xff);
+		const char *bom = "\xfe\xff";
+		WriteFile(LogVar->FileHandle, bom, 2, &wrote, NULL);
+		LogVar->ByteCount += 2;
 		break;
+	}
 	default:
 		break;
 	}
