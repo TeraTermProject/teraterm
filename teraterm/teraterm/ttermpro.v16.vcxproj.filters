@@ -147,6 +147,9 @@
     <ClCompile Include="broadcast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="filesys_log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">

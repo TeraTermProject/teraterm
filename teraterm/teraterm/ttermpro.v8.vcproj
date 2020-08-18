@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\filesys_log.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\susie_plugin\libsusieplugin.cpp"
 				>
 			</File>

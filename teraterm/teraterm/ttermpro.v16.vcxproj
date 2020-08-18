@@ -145,6 +145,7 @@
     <ClCompile Include="commlib.c" />
     <ClCompile Include="dnddlg.cpp" />
     <ClCompile Include="filesys.cpp" />
+    <ClCompile Include="filesys_log.cpp" />
     <ClCompile Include="font_pp.cpp" />
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="keyboard.c" />

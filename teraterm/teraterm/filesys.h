@@ -74,17 +74,8 @@ BOOL FreeTTFILE(void);
 BOOL NewFileVar(PFileVar *FV);
 void FreeFileVar(PFileVar *FV);
 
-void LogPut1(BYTE b);
-void LogToFile(void);
-BOOL CreateLogBuf(void);
-void FreeLogBuf(void);
-BOOL CreateBinBuf(void);
-void FreeBinBuf(void);
-
 void FileSendStart(void);
 void FileSend(void);
-//void FLogChangeButton(BOOL Pause);
-void FLogPause(BOOL Pause);
 void FileTransEnd(WORD OpId);
 void FileTransPause(WORD OpId, BOOL Pause);
 
@@ -100,7 +91,6 @@ void BPStart(int mode);
 void QVStart(int mode);
 
 extern PFileVar SendVar, FileVar;
-extern BOOL FileLog, BinLog;
 
 // log
 typedef struct {
@@ -109,7 +99,15 @@ typedef struct {
 	BOOL bom;				// TRUE = BOM‚ ‚è
 	int code;				// 0/1/2 = UTF-8/UTF-16LE/UTF-16BE
 } FLogDlgInfo_t;
+extern BOOL FileLog, BinLog;
 void logfile_lock_initialize(void);
+void LogPut1(BYTE b);
+void LogToFile(void);
+BOOL CreateLogBuf(void);
+void FreeLogBuf(void);
+BOOL CreateBinBuf(void);
+void FreeBinBuf(void);
+void FLogPause(BOOL Pause);
 void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
 void FLogRotateHalt(void);
