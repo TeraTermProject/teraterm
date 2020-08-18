@@ -194,21 +194,6 @@ typedef enum {
 
 // LogDialog Option
 #define LOGDLG_BINARY          1
-#if 0	// TODO消す
-#define LOGDLG_APPEND          (1 << 1)
-#define LOGDLG_PLAINTEXT       (1 << 2)
-#define LOGDLG_TIMESTAMP       (1 << 3)
-#define LOGDLG_HIDEDIALOG      (1 << 4)
-#define LOGDLG_INCSCRBUFF      (1 << 5)
-#define LOGDLG_UTC             (1 << 6)
-#define LOGDLG_ELAPSED         (1 << 7)
-/*
- * ELAPSED TIME の時は LOGDLG_UTC を経過時間の基準を表すフラグとする
- * LOGDLG_ELAPSEDCON == 0 => ログ開始から
- * LOGDLG_ELAPSEDCON == 1 => 接続開始から
- */
-#define LOGDLG_ELAPSEDCON      LOGDLG_UTC
-#endif
 
 // Log Timestamp Type
 enum LogTimestampType {

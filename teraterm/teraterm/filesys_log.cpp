@@ -71,7 +71,6 @@ enum enumLineEnd {
 
 typedef struct {
 	wchar_t *FullName;
-	wchar_t *FileName;
 
 	HANDLE FileHandle;
 	LONG FileSize, ByteCount;
@@ -141,7 +140,7 @@ static BOOL OpenFTDlg_(PFileVar fv)
 	info.UILanguageFile = ts.UILanguageFile;
 	info.OpId = OpLog;
 	info.DlgCaption = DlgCaption;
-	info.FileName = fv->FileName;
+	info.FileName = NULL;
 	info.FullName = fv->FullName;
 	info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
@@ -691,7 +690,6 @@ static BOOL LogStart(const wchar_t *fname)
 	PFileVar fv = LogVar;
 
 	fv->FullName = _wcsdup(fname);
-	fv->FileName = NULL;
 	FixLogOption();
 
 	if (ts.LogBinary > 0)
@@ -1163,7 +1161,7 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
 					len += 1;
 					wchar_t *buf = (wchar_t *)malloc(len * sizeof(wchar_t));
-					_GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, len);
+					_GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, (int)len);
 					FLogWriteStr(buf);
 					FLogWriteStr(L"\n");		// TODO 改行コード
 					free(buf);
