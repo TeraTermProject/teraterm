@@ -114,7 +114,7 @@ static void Log1Bin(BYTE b);
 static void LogBinSkip(int add);
 static BOOL CreateLogBuf(void);
 static BOOL CreateBinBuf(void);
-
+void LogPut1(BYTE b);
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
@@ -852,30 +852,6 @@ static inline void logfile_unlock(void)
 	LeaveCriticalSection(&g_filelog_lock);
 }
 
- // コメントをログへ追加する
-static void CommentLogToFile(char *buf, int size)
-{
-	DWORD wrote;
-
-	if (LogVar == NULL) {
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_COMMENT_LOG_OPEN_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "It is not opened by the log file yet.", ts.UILanguageFile);
-		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK|MB_ICONEXCLAMATION);
-		return;
-	}
-
-	logfile_lock();
-	WriteFile(LogVar->FileHandle, buf, size, &wrote, NULL);
-	WriteFile(LogVar->FileHandle, "\r\n", 2, &wrote, NULL); // 改行
-	/* Set Line End Flag
-		2007.05.24 Gentaro
-	*/
-	LogVar->eLineEnd = Line_LineHead;
-	logfile_unlock();
-}
-
 // ログをローテートする。
 // (2013.3.21 yutaka)
 static void LogRotate(void)
@@ -1244,13 +1220,13 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 		case WM_COMMAND:
 			switch (LOWORD(wp)) {
 				case IDOK: {
-					char buf[256];
-					memset(buf, 0, sizeof(buf));
-					ret = GetDlgItemTextA(hDlgWnd, IDC_EDIT_COMMENT, buf, sizeof(buf) - 1);
-					if (ret > 0) { // テキスト取得成功
-						//buf[sizeof(buf) - 1] = '\0';  // null-terminate
-						CommentLogToFile(buf, ret);
-					}
+					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
+					wchar_t *buf = (wchar_t *)malloc((len + 1) * sizeof(wchar_t));
+					_GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, len);
+					buf[len] = '\0';  // null-terminate
+					FLogWriteStr(buf);
+					FLogWriteStr(L"\n");		// TODO 改行コード
+					free(buf);
 					TTEndDialog(hDlgWnd, IDOK);
 					break;
 				}
@@ -1268,9 +1244,14 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 	return TRUE;
 }
 
+/**
+ * ログファイルへコメントを追加する (2004.8.6 yutaka)
+ */
 void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 {
-	// ログファイルへコメントを追加する (2004.8.6 yutaka)
+	if (LogVar == NULL) {
+		return;
+	}
 	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
 				HVTWin, OnCommentDlgProc);
 }
@@ -1336,13 +1317,15 @@ BOOL FLogIsOpendBin(void)
 	return LogVar != NULL && BinLog;
 }
 
-void FLogWriteStr(const char *str)
+void FLogWriteStr(const wchar_t *str)
 {
-	if (LogVar != NULL)
-	{
+	if (LogVar != NULL) {
 		DWORD wrote;
-		size_t len = strlen(str);
+		size_t len = wcslen(str)  * sizeof(wchar_t);
+		logfile_lock();
 		WriteFile(LogVar->FileHandle, str, len, &wrote, NULL);
+		LogVar->eLineEnd = Line_LineHead;
+		logfile_unlock();
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
 		LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
@@ -1562,7 +1545,7 @@ void FLogPutUTF32(unsigned int u32)
 	BOOL log_available = (cv.HLogBuf != 0);
 
 	if (!log_available) {
-		// ログには出力しない(macro出力だけだった)
+		// ログには出力しない
 		return;
 	}
 

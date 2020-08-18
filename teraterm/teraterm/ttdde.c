@@ -597,9 +597,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdLogStart:
 		FLogPause(FALSE);
 		break;
-	case CmdLogWrite:
-		FLogWriteStr(ParamFileName);
+	case CmdLogWrite: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		FLogWriteStr(ParamFileNameW);
+		free(ParamFileNameW);
 		break;
+	}
 	case CmdQVRecv:
 		if ((FileVar==NULL) && NewFileVar(&FileVar))
 		{

@@ -40,26 +40,28 @@ typedef struct {
 	BOOL bom;				// TRUE = BOM‚ ‚è
 	int code;				// 0/1/2 = UTF-8/UTF-16LE/UTF-16BE
 } FLogDlgInfo_t;
+BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
+void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
+wchar_t *FLogGetLogFilename(const wchar_t *log_filename);
+
 void logfile_lock_initialize(void);
 void FLogPause(BOOL Pause);
 void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
 void FLogRotateHalt(void);
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
 void FLogClose(void);
 BOOL FLogOpen(const wchar_t *fname);
 BOOL FLogIsOpend(void);
 BOOL FLogIsOpendText(void);
 BOOL FLogIsOpendBin(void);
-void FLogWriteStr(const char *str);
+void FLogWriteStr(const wchar_t *str);
 void FLogInfo(char *param_ptr, size_t param_len);
 const wchar_t *FLogGetFilename(void);
-BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
-wchar_t *FLogGetLogFilename(const wchar_t *log_filename);
 BOOL FLogIsPause(void);
 void FLogWindow(int nCmdShow);
 void FLogShowDlg(void);
 int FLogGetCount(void);
+int FLogGetFreeCount(void);
 void FLogWriteFile(void);
 void FLogPutUTF32(unsigned int u32);
 void FLogSetCode(int code);
