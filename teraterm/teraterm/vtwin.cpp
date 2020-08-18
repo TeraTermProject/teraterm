@@ -97,6 +97,7 @@
 #include "sendfiledlg.h"
 #include "setting.h"
 #include "broadcast.h"
+#include "asprintf.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -3575,12 +3576,16 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	/* Auto start logging or /L= option */
 	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
 		if (ts.LogFN[0] == 0) {
-			char *filename = FLogGetLogFilename(NULL);
-			strncpy_s(ts.LogFN, sizeof(ts.LogFN), filename, _TRUNCATE);
-			free(filename);
+			wchar_t *filenameW = FLogGetLogFilename(NULL);
+			char *filenameA = ToCharW(filenameW);
+			strncpy_s(ts.LogFN, sizeof(ts.LogFN), filenameA, _TRUNCATE);
+			free(filenameA);
+			free(filenameW);
 		}
 		if (ts.LogFN[0]!=0) {
-			FLogOpen(ts.LogFN);
+			wchar_t *fnW = ToWcharA(ts.LogFN);
+			FLogOpen(fnW);
+			free(fnW);
 		}
 	}
 
@@ -4124,20 +4129,28 @@ void CVTWindow::OnFileLog()
 	info.filename = NULL;
 	BOOL r = FLogOpenDialog(hInst, m_hWnd, &info);
 	if (r) {
+		const wchar_t *filename = info.filename;
 		if (!info.append) {
 			// ファイル削除
-			_DeleteFileW(info.filename);
+			_DeleteFileW(filename);
 		}
 		TermLogSetCode(info.code);
-		char *filenameA = ToCharW(info.filename);
-		free(info.filename);
-		BOOL r = FLogOpen(filenameA);
+		BOOL r = FLogOpen(filename);
 		if (r != FALSE) {
 			if (info.bom) {
 				TermLogOutputBOM();
 			}
 		}
-		free(filenameA);
+		else {
+			// ログできない
+			static const TTMessageBoxInfoW mbinfo = {
+				"Tera Term",
+				NULL, L"Tera Term: File open error",
+				NULL, L"Can not create a `%s' file."
+			};
+			TTMessageBoxW(m_hWnd, &mbinfo, MB_OK | MB_ICONERROR, ts.UILanguageFile, filename);
+		}
+		free(info.filename);
 	}
 }
 
@@ -4149,32 +4162,35 @@ void CVTWindow::OnCommentToLog()
 // ログの閲覧 (2005.1.29 yutaka)
 void CVTWindow::OnViewLog()
 {
-	char command[MAX_PATH*2+3]; // command "filename"
-	STARTUPINFO si;
+	STARTUPINFOW si;
 	PROCESS_INFORMATION pi;
 
 	if(!FLogIsOpend()) {
 		return;
 	}
 
-	const char *file = FLogGetFilename();
+	const wchar_t *filename = FLogGetFilename();
 
 	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
+	GetStartupInfoW(&si);
 	memset(&pi, 0, sizeof(pi));
 
-	_snprintf_s(command, sizeof(command), _TRUNCATE, "\"%s\" \"%s\"", ts.ViewlogEditor, file);
+	wchar_t *command;
+	wchar_t *ViewlogEditor = ToWcharA(ts.ViewlogEditor);
+	aswprintf(&command, L"\"%s\" \"%s\"", ViewlogEditor, filename);
+	free(ViewlogEditor);
 
-	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
-		wchar_t buf[80];
-		wchar_t uimsgW[MAX_UIMSG];
-		wchar_t uimsgW2[MAX_UIMSG];
-		get_lang_msgW("MSG_ERROR", uimsgW, _countof(uimsgW), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("MSG_VIEW_LOGFILE_ERROR", uimsgW2, _countof(uimsgW2),
-					  L"Can't view logging file. (%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsgW2, GetLastError());
-		_MessageBoxW(NULL, buf, uimsgW, MB_OK | MB_ICONWARNING);
+	BOOL r = _CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
+							 NULL, NULL, &si, &pi);
+	free(command);
+	if (r == 0) {
+		DWORD error = GetLastError();
+		static const TTMessageBoxInfoW mbinfo = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_VIEW_LOGFILE_ERROR", L"Can't view logging file. (%d)"
+		};
+		TTMessageBoxW(m_hWnd, &mbinfo, MB_OK | MB_ICONWARNING, ts.UILanguageFile, error);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);

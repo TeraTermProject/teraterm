@@ -583,11 +583,11 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		}
 		else {
-			char *ParamFileNameA = ToCharU8(ParamFileName);
-			char *log_filenameA = FLogGetLogFilename(ParamFileNameA);
-			BOOL ret = FLogOpen(log_filenameA);
-			free(log_filenameA);
-			free(ParamFileNameA);
+			wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+			wchar_t *log_filenameW = FLogGetLogFilename(ParamFileNameW);
+			BOOL ret = FLogOpen(log_filenameW);
+			free(log_filenameW);
+			free(ParamFileNameW);
 			strncpy_s(ParamFileName, sizeof(ParamFileName), ret ? "1" : "0", _TRUNCATE);
 		}
 		break;

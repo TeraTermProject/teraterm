@@ -44,6 +44,7 @@
 #include "teraterml.h"
 #include "helpid.h"
 #include "filesys.h"
+#include "codeconv.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
@@ -73,9 +74,9 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
 
 	UILanguageFile = info->UILanguageFile;
 	OpId = info->OpId;
-	DlgCaption = _strdup(info->DlgCaption);
-	FileName = _strdup(info->FileName);
-	FullName = _strdup(info->FullName);
+	DlgCaption = _wcsdup(info->DlgCaption);
+	FileName = _wcsdup(info->FileName);
+	FullName = _wcsdup(info->FullName);
 	HideDialog = info->HideDialog;
 	HMainWin = info->HMainWin;
 
@@ -123,14 +124,17 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar fv, PComV
 
 	info.UILanguageFile = pts->UILanguageFile;
 	info.OpId = fv->OpId;
-	info.DlgCaption = _strdup(fv->DlgCaption);
-	info.FileName = _strdup(&fv->FullName[fv->DirLen]);
-	info.FullName = _strdup(fv->FullName);
+	info.DlgCaption = ToWcharA(fv->DlgCaption);
+	info.FileName = ToWcharA(&fv->FullName[fv->DirLen]);
+	info.FullName = ToWcharA(fv->FullName);
 	info.HideDialog = fv->HideDialog;
 	info.HMainWin = fv->HMainWin;
 	BOOL r = Create(hInstance, &info);
 	fv->HWin = m_hWnd;
 	fv->ProgStat = ProgStat;
+	free(info.DlgCaption);
+	free(info.FileName);
+	free(info.FullName);
 	return r;
 }
 
@@ -234,9 +238,9 @@ BOOL CFileTransDlg::OnInitDialog()
 		ModifyStyleEx(0, WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
 	}
 
-	SetWindowText(DlgCaption);
-	SetDlgItemText(IDC_TRANSFNAME, FileName);
-	SetDlgItemText(IDC_EDIT_FULLPATH, FullName);
+	SetWindowTextW(DlgCaption);
+	SetDlgItemTextW(IDC_TRANSFNAME, FileName);
+	SetDlgItemTextW(IDC_EDIT_FULLPATH, FullName);
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 

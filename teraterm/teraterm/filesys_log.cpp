@@ -50,24 +50,19 @@
 #include "layer_for_unicode.h"
 #include "layer_for_unicode_crt.h"
 #include "codeconv.h"
+#include "asprintf.h"
 
 #include "filesys_log_res.h"
 #include "filesys.h"
 
 typedef struct {
-  char FullName[MAX_PATH];
-  int DirLen;
+  wchar_t *FullName;
+  wchar_t *FileName;
 
   BOOL FileOpen;
   HANDLE FileHandle;
   LONG FileSize, ByteCount;
   BOOL OverWrite;
-
-  BOOL Success;
-  BOOL NoMsg;
-
-  char LogDefaultPath[MAX_PATH];
-  BOOL HideDialog;
 
   DWORD StartTime;
 
@@ -116,41 +111,32 @@ static PFileTransDlg FLogDlg = NULL;
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
-	PFileTransDlg FTDlg;
-
-	FTDlg = new CFileTransDlg();
-
-	fv->StartTime = 0;
-	cv.FilePause &= ~OpLog;
-
-	if (ts.LogHideDialog)
-		fv->HideDialog = TRUE;
-
-	if (FTDlg!=NULL)
-	{
-		char DlgCaption[40];
-		strncpy_s(DlgCaption, _countof(DlgCaption),"Tera Term: ", _TRUNCATE);
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, ts.UILanguageFile);
-		strncat_s(DlgCaption, _countof(DlgCaption), uimsg, _TRUNCATE);
-
-		CFileTransDlgInfo info;
-		info.UILanguageFile = ts.UILanguageFile;
-		info.OpId = OpLog;
-		info.DlgCaption = DlgCaption;
-		info.FileName = &fv->FullName[fv->DirLen];
-		info.FullName = fv->FullName;
-		info.HideDialog = fv->HideDialog;
-		info.HMainWin = HVTWin;
-		FTDlg->Create(hInst, &info);
-		FTDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
+	PFileTransDlg FTDlg = new CFileTransDlg();
+	if (FTDlg == NULL) {
+		return FALSE;
 	}
 
-	FLogDlg = FTDlg; /* Log */
+	wchar_t *DlgCaption;
+	wchar_t uimsg[MAX_UIMSG];
+#define TitLogW      L"Log"
+	get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLogW, ts.UILanguageFile);
+	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 
-	fv->StartTime = GetTickCount();
+	CFileTransDlgInfo info;
+	info.UILanguageFile = ts.UILanguageFile;
+	info.OpId = OpLog;
+	info.DlgCaption = DlgCaption;
+	info.FileName = fv->FileName;
+	info.FullName = fv->FullName;
+	info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
+	info.HMainWin = HVTWin;
+	FTDlg->Create(hInst, &info);
+	FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
 
-	return (FTDlg!=NULL);
+	FLogDlg = FTDlg;
+
+	free(DlgCaption);
+	return TRUE;
 }
 
 /**
@@ -652,22 +638,24 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	return FALSE;
 }
 
-static BOOL LogStart(const char *fname)
+static BOOL LogStart(const wchar_t *fname)
 {
 	unsigned tid;
 
-	strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), fname, _TRUNCATE);
+	LogVar->FullName = _wcsdup(fname);
 
 	if (! LoadTTFILE()) return FALSE;
 
-	//(*SetFileVar)(LogVar);
-	{
-		int i;
-		char c;
-		PFileVar fv = LogVar;
-		GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
-		c = fv->FullName[fv->DirLen];
-		if (c=='\\'||c=='/') fv->DirLen++;
+	PFileVar fv = LogVar;
+	wchar_t *p = wcsrchr(fv->FullName, L'\\');
+	if (p == NULL) {
+		p = wcsrchr(fv->FullName, L'/');
+	}
+	if (p == NULL) {
+		fv->FileName = _wcsdup(fv->FullName);
+	}
+	else {
+		fv->FileName = _wcsdup(p++);
 	}
 	FixLogOption();
 
@@ -702,8 +690,8 @@ static BOOL LogStart(const char *fname)
 		if (!ts.LogLockExclusive) {
 			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 		}
-		LogVar->FileHandle = CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-		                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+										  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (LogVar->FileHandle != INVALID_HANDLE_VALUE){
 			SetFilePointer(LogVar->FileHandle, 0, NULL, FILE_END);
 			/* 2007.05.24 Gentaro
@@ -718,20 +706,12 @@ static BOOL LogStart(const char *fname)
 		if (!ts.LogLockExclusive) {
 			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 		}
-		LogVar->FileHandle = CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-		                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+										  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	LogVar->FileOpen = (LogVar->FileHandle != INVALID_HANDLE_VALUE);
 	if (! LogVar->FileOpen)
 	{
-		char msg[128];
-
-		// ファイルオープンエラー時のメッセージ表示を追加した。(2008.7.9 yutaka)
-		if (LogVar->NoMsg == FALSE) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Can not create a `%s' file. (%d)", LogVar->FullName, GetLastError());
-			MessageBox(NULL, msg, "Tera Term: File open error", MB_OK | MB_ICONERROR);
-		}
-
 		FileTransEnd_();
 		return FALSE;
 	}
@@ -755,6 +735,9 @@ static BOOL LogStart(const char *fname)
 		FileTransEnd_();
 		return FALSE;
 	}
+
+	cv.FilePause &= ~OpLog;
+	LogVar->StartTime = GetTickCount();
 
 	// 遅延書き込み用スレッドを起こす。
 	// (2013.4.19 yutaka)
@@ -901,8 +884,6 @@ static void CommentLogToFile(char *buf, int size)
 static void LogRotate(void)
 {
 	int loopmax = 10000;  // XXX
-	char filename[1024];
-	char newfile[1024], oldfile[1024];
 	int i, k;
 	int dwShareMode = FILE_SHARE_READ;
 	unsigned tid;
@@ -933,8 +914,11 @@ static void LogRotate(void)
 		loopmax = LogVar->RotateStep;
 
 	for (i = 1 ; i <= loopmax ; i++) {
-		_snprintf_s(filename, sizeof(filename), _TRUNCATE, "%s.%d", LogVar->FullName, i);
-		if (_access_s(filename, 0) != 0)
+		wchar_t *filename;
+		aswprintf(&filename, L"%s.%d", LogVar->FullName, i);
+		DWORD attr = _GetFileAttributesW(filename);
+		free(filename);
+		if ((attr != INVALID_FILE_ATTRIBUTES) && ((attr & FILE_ATTRIBUTE_DIRECTORY) == 0))
 			break;
 	}
 	if (i > loopmax) {
@@ -944,23 +928,27 @@ static void LogRotate(void)
 
 	// 別ファイルにリネーム。
 	for (k = i-1 ; k >= 0 ; k--) {
+		wchar_t *oldfile;
 		if (k == 0)
-			strncpy_s(oldfile, sizeof(oldfile), LogVar->FullName, _TRUNCATE);
+			oldfile = _wcsdup(LogVar->FullName);
 		else
-			_snprintf_s(oldfile, sizeof(oldfile), _TRUNCATE, "%s.%d", LogVar->FullName, k);
-		_snprintf_s(newfile, sizeof(newfile), _TRUNCATE, "%s.%d", LogVar->FullName, k+1);
-		remove(newfile);
-		if (rename(oldfile, newfile) != 0) {
+			aswprintf(&oldfile, L"%s.%d", LogVar->FullName, k);
+		wchar_t *newfile;
+		aswprintf(&newfile, L"%s.%d", LogVar->FullName, k+1);
+		_DeleteFileW(newfile);
+		if (_MoveFileW(oldfile, newfile) == 0) {
 			OutputDebugPrintf("%s: rename %d\n", __FUNCTION__, errno);
 		}
+		free(oldfile);
+		free(newfile);
 	}
 
 	// 再オープン
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
-	LogVar->FileHandle = CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-	                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+									  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	// 遅延書き込み用スレッドを起こす。
 	// (2013.4.19 yutaka)
@@ -1131,7 +1119,6 @@ static void LogToFile(void)
 	}
 	if (FLogIsPause() || cv.ProtoFlag) return;
 	if (FLogDlg!=NULL)
-		//FLogDlg->RefreshNum(LogVar);
 		FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
 
 
@@ -1209,6 +1196,8 @@ static void FileTransEnd_(void)
 	if (LogVar != NULL)
 	{
 		CloseFileSync(LogVar);
+		free(LogVar->FullName);
+		free(LogVar->FileName);
 		free(LogVar);
 		LogVar = NULL;
 	}
@@ -1224,6 +1213,9 @@ static void FileTransEnd_(void)
  */
 void FLogPause(BOOL Pause)
 {
+	if (LogVar == NULL) {
+		return;
+	}
 	if (FLogDlg!=NULL)
 		FLogDlg->ChangeButton(Pause);
 	FileTransPause(OpLog, Pause);
@@ -1334,7 +1326,7 @@ void FLogClose(void)
  *	FLogGetLogFilename() や FLogOpenDialog() で
  *	ファイル名を取得できる。
  */
-BOOL FLogOpen(const char *fname)
+BOOL FLogOpen(const wchar_t *fname)
 {
 	BOOL ret;
 
@@ -1353,12 +1345,6 @@ BOOL FLogOpen(const char *fname)
 
 	fv->FileOpen = FALSE;
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
-	fv->Success = FALSE;
-	fv->NoMsg = FALSE;
-	fv->HideDialog = FALSE;
-
-	LogVar->DirLen = 0;
-	LogVar->NoMsg = TRUE;
 
 	ret = LogStart(fname);
 	return ret;
@@ -1380,7 +1366,6 @@ void FLogWriteStr(const char *str)
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
 		if (FLogDlg!=NULL)
-			//FLogDlg->RefreshNum(LogVar);
 			FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
 	}
 }
@@ -1394,7 +1379,9 @@ void FLogInfo(char *param_ptr, size_t param_len)
 			+ ((ts.LogTypePlainText != 0) << 2)
 			+ ((ts.LogTimestamp != 0) << 3)
 			+ ((ts.LogHideDialog != 0) << 4);
-		strncpy_s(param_ptr + 1, param_len - 1, LogVar->FullName, _TRUNCATE);
+		char *filenameU8 = ToU8W(LogVar->FullName);
+		strncpy_s(param_ptr + 1, param_len - 1, filenameU8, _TRUNCATE);
+		free(filenameU8);
 	}
 	else {
 		param_ptr[0] = '0' - 1;
@@ -1405,7 +1392,7 @@ void FLogInfo(char *param_ptr, size_t param_len)
 /**
  *	現在のログファイル名を取得
  */
-const char *FLogGetFilename()
+const wchar_t *FLogGetFilename(void)
 {
 	if (LogVar == NULL) {
 		return NULL;
@@ -1423,11 +1410,7 @@ const char *FLogGetFilename()
 BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
 {
 	LogDlgWork_t *work = (LogDlgWork_t *)calloc(sizeof(LogDlgWork_t), 1);
-	char *filenameA = ToCharW(info->filename);
-	char *srcfnameA = FLogGetLogFilename(filenameA);
-	wchar_t *srcfnameW = ToWcharA(srcfnameA);
-	free(filenameA);
-	free(srcfnameA);
+	wchar_t *srcfnameW = FLogGetLogFilename(info->filename);
 	work->info = info;
 	work->info->filename = srcfnameW;
 	work->pts = &ts;
@@ -1452,11 +1435,11 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
  *	@return						フルパスファイル名
  *								不要になったら free() すること
  */
-char *FLogGetLogFilename(const char *log_filename)
+wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 {
 	// フォルダ
 	char FileDirExpanded[MAX_PATH];
-	char *logdir;
+	const char *logdir;
 	if (strlen(ts.LogDefaultPath) > 0) {
 		logdir = ts.LogDefaultPath;
 	}
@@ -1474,7 +1457,9 @@ char *FLogGetLogFilename(const char *log_filename)
 		strncpy_s(base_name, _countof(base_name), ts.LogDefaultName, _TRUNCATE);
 	}
 	else {
-		strncpy_s(base_name, _countof(base_name), log_filename, _TRUNCATE);
+		char *filenameA = ToCharW(log_filename);
+		strncpy_s(base_name, _countof(base_name), filenameA, _TRUNCATE);
+		free(filenameA);
 	}
 
 	// フルパス化
@@ -1483,7 +1468,7 @@ char *FLogGetLogFilename(const char *log_filename)
 	ParseStrftimeFileName(full_path, sizeof(full_path));
 	ConvertLogname(full_path, sizeof(full_path));
 
-	return _strdup(full_path);
+	return ToWcharA(full_path);
 }
 
 BOOL FLogIsPause()

@@ -37,9 +37,9 @@
 typedef struct {
 	const char *UILanguageFile;
 	WORD OpId;
-	char *DlgCaption;
-	char *FileName;
-	char *FullName;
+	wchar_t *DlgCaption;
+	wchar_t *FileName;
+	wchar_t *FullName;
 	BOOL HideDialog;
 	HWND HMainWin;
 } CFileTransDlgInfo;
@@ -70,9 +70,9 @@ private:
 	WORD OpId;
 	int ProgStat;	// プログレスバーの進捗が戻らないよう記憶しておく
 	BOOL HideDialog;
-	char *DlgCaption;
-	char *FileName;
-	char *FullName;
+	wchar_t *DlgCaption;
+	wchar_t *FileName;
+	wchar_t *FullName;
 	HWND HMainWin;
 };
 

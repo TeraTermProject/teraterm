@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2019 TeraTerm Project
+ * (C) 2006-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ extern "C" {
 #define DllExport __declspec(dllexport)
 #endif
 
-BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos);
+BOOL GetFileNamePos(const char *PathName, int far *DirLen, int far *FNPos);
 DllExport BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
 DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 void FitFileName(PCHAR FileName, int destlen, const char *DefExt);
@@ -65,7 +65,7 @@ DllExport void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 int isInvalidStrftimeChar(PCHAR FName);
 void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
-void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName, int destlen);
+void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt, PCHAR FName, int destlen);
 void RestoreNewLine(PCHAR Text);
 size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
@@ -139,7 +139,7 @@ int GetMonitorDpiFromWindow(HWND hWnd);
  * シリアルポート関連の設定定義
  */
 enum serial_port_conf {
-	COM_DATABIT, 
+	COM_DATABIT,
 	COM_PARITY,
 	COM_STOPBIT,
 	COM_FLOWCTRL,

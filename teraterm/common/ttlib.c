@@ -50,7 +50,7 @@
 
                 dwMajorVersion   dwMinorVersion    dwPlatformId
 Windows95       4                0                 VER_PLATFORM_WIN32_WINDOWS
-Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS 
+Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS
 WindowsMe       4                90                VER_PLATFORM_WIN32_WINDOWS
 WindowsNT4.0    4                0                 VER_PLATFORM_WIN32_NT
 Windows2000     5                0                 VER_PLATFORM_WIN32_NT
@@ -80,7 +80,7 @@ static char *invalidFileNameStrings[] = {
 	"AUX", "CLOCK$", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
 	"CON", "CONFIG$", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
 	"NUL", "PRN",
-	".", "..", 
+	".", "..",
 	NULL
 };
 
@@ -215,10 +215,13 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 	return len;
 }
 
-BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos)
+BOOL GetFileNamePos(const char *PathName, int far *DirLen, int far *FNPos)
 {
 	BYTE b;
-	LPTSTR Ptr, DirPtr, FNPtr, PtrOld;
+	const char *Ptr;
+	const char *DirPtr;
+	const char *FNPtr;
+	const char *PtrOld;
 
 	*DirLen = 0;
 	*FNPos = 0;
@@ -749,7 +752,7 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 	}
 }
 
-void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName, int destlen)
+void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt, PCHAR FName, int destlen)
 {
 	// destlen = sizeof FName
 	int DirLen, FNPos;
@@ -898,7 +901,7 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 	if (sscanf_s(T, "%d", &v) != 1) {
 		v = defval;
 	}
-	
+
 	return v;
 }
 
@@ -1043,7 +1046,7 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
-	
+
 	/* Get LanguageFile name */
 	GetPrivateProfileString("Tera Term", entry, "off",
 	                        Temp, sizeof(Temp), SetupFName);
@@ -1113,9 +1116,9 @@ BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const c
 	bi.ulFlags = 0;
 	bi.lpfn = setDefaultFolder;
 	bi.lParam = (LPARAM)def;
-	// フォルダ選択ダイアログの表示 
+	// フォルダ選択ダイアログの表示
 	pidlBrowse = SHBrowseForFolderA(&bi);
-	if (pidlBrowse != NULL) {  
+	if (pidlBrowse != NULL) {
 		// PIDL形式の戻り値のファイルシステムのパスに変換
 		if (SHGetPathFromIDListA(pidlBrowse, buf)) {
 			// 取得成功
