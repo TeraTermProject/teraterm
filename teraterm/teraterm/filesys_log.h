@@ -33,8 +33,6 @@
 extern "C" {
 #endif
 
-//extern BOOL FileLog, BinLog;
-
 // log
 typedef struct {
 	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
@@ -43,7 +41,6 @@ typedef struct {
 	int code;				// 0/1/2 = UTF-8/UTF-16LE/UTF-16BE
 } FLogDlgInfo_t;
 void logfile_lock_initialize(void);
-void LogPut1(BYTE b);
 void FLogPause(BOOL Pause);
 void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
@@ -52,6 +49,8 @@ void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
 void FLogClose(void);
 BOOL FLogOpen(const wchar_t *fname);
 BOOL FLogIsOpend(void);
+BOOL FLogIsOpendText(void);
+BOOL FLogIsOpendBin(void);
 void FLogWriteStr(const char *str);
 void FLogInfo(char *param_ptr, size_t param_len);
 const wchar_t *FLogGetFilename(void);
@@ -62,6 +61,10 @@ void FLogWindow(int nCmdShow);
 void FLogShowDlg(void);
 int FLogGetCount(void);
 void FLogWriteFile(void);
+void FLogPutUTF32(unsigned int u32);
+void FLogSetCode(int code);
+void FLogOutputBOM(void);
+//void LogPut1(BYTE b);
 
 #ifdef __cplusplus
 }

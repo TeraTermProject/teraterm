@@ -4135,11 +4135,13 @@ void CVTWindow::OnFileLog()
 			// ÉtÉ@ÉCÉãçÌèú
 			_DeleteFileW(filename);
 		}
-		TermLogSetCode(info.code);
 		BOOL r = FLogOpen(filename);
 		if (r != FALSE) {
-			if (info.bom) {
-				TermLogOutputBOM();
+			if (FLogIsOpendText()) {
+				FLogSetCode(info.code);
+				if (info.bom) {
+					FLogOutputBOM();
+				}
 			}
 		}
 		else {

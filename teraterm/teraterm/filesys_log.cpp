@@ -92,6 +92,9 @@ typedef struct {
 	BOOL IsPause;
 
 	PFileTransDlg FLogDlg;
+
+	int log_code;
+
 } TFileVar_;
 typedef TFileVar_ *PFileVar_;
 
@@ -1308,6 +1311,7 @@ BOOL FLogOpen(const wchar_t *fname)
 	fv->FileHandle = INVALID_HANDLE_VALUE;
 	fv->LogThread = INVALID_HANDLE_VALUE;
 	fv->eLineEnd = Line_LineHead;
+	fv->log_code = 0;	// UTF-8
 
 	ret = LogStart(fname);
 	if (ret == FALSE) {
@@ -1320,6 +1324,16 @@ BOOL FLogOpen(const wchar_t *fname)
 BOOL FLogIsOpend(void)
 {
 	return LogVar != NULL;
+}
+
+BOOL FLogIsOpendText(void)
+{
+	return LogVar != NULL && FileLog;
+}
+
+BOOL FLogIsOpendBin(void)
+{
+	return LogVar != NULL && BinLog;
 }
 
 void FLogWriteStr(const char *str)
@@ -1539,4 +1553,91 @@ void FLogWriteFile(void)
 		GlobalUnlock(cv.HBinBuf);
 		cv.BinBuf = NULL;
 	}
+}
+
+void FLogPutUTF32(unsigned int u32)
+{
+	PFileVar fv = LogVar;
+	size_t i;
+	BOOL log_available = (cv.HLogBuf != 0);
+
+	if (!log_available) {
+		// ƒƒO‚É‚Ío—Í‚µ‚È‚¢(macroo—Í‚¾‚¯‚¾‚Á‚½)
+		return;
+	}
+
+	switch(fv->log_code) {
+	case 0: {
+		// UTF-8
+		char u8_buf[4];
+		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
+		for (i = 0; i < u8_len; i++) {
+			BYTE b = u8_buf[i];
+			LogPut1(b);
+		}
+		break;
+	}
+	case 1:
+	case 2: {
+		// UTF-16
+		wchar_t u16[2];
+		size_t u16_len = UTF32ToUTF16(u32, u16, _countof(u16));
+		size_t i;
+		for (i = 0; i < u16_len; i++) {
+			if (fv->log_code == 1) {
+				// UTF-16LE
+				LogPut1(u16[i] & 0xff);
+				LogPut1((u16[i] >> 8) & 0xff);
+			}
+			else {
+				// UTF-16BE
+				LogPut1((u16[i] >> 8) & 0xff);
+				LogPut1(u16[i] & 0xff);
+			}
+		}
+	}
+	}
+}
+
+void FLogOutputBOM(void)
+{
+	PFileVar fv = LogVar;
+	BOOL needs_unlock = FALSE;
+
+	if ((cv.HLogBuf!=NULL) && (cv.LogBuf==NULL)) {
+		cv.LogBuf = (PCHAR)GlobalLock(cv.HLogBuf);
+		needs_unlock = TRUE;
+	}
+
+	switch(fv->log_code) {
+	case 0:
+		// UTF-8
+		LogPut1(0xef);
+		LogPut1(0xbb);
+		LogPut1(0xbf);
+		break;
+	case 1:
+		// UTF-16LE
+		LogPut1(0xfe);
+		LogPut1(0xff);
+		break;
+	case 2:
+		// UTF-16BE
+		LogPut1(0xff);
+		LogPut1(0xfe);
+		break;
+	default:
+		break;
+	}
+
+	if (needs_unlock) {
+		GlobalUnlock(cv.HLogBuf);
+		cv.LogBuf = NULL;
+	}
+}
+
+void FLogSetCode(int code)
+{
+	PFileVar fv = LogVar;
+	fv->log_code = code;
 }

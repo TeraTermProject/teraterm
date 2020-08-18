@@ -58,6 +58,7 @@
 #include "codeconv.h"
 #include "unicode.h"
 #include "ttdde.h"
+#include "checkeol.h"
 
 #include "vtterm.h"
 
@@ -215,8 +216,7 @@ static DWORD BeepOverUsedCount = 0;
 static _locale_t CLocale = NULL;
 
 typedef struct {
-	BOOL log_cr_hold;
-	int log_code;
+	CheckEOLData_t *eol;
 	int log_cr_type;
 } vtterm_work_t;
 
@@ -362,8 +362,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	{
 		vtterm_work_t *vtterm = &vtterm_work;
-		vtterm->log_cr_hold = FALSE;
-		vtterm->log_code = 0;
+		vtterm->eol = CheckEOLCreate();
 		vtterm->log_cr_type = 0;
 	}
 }
@@ -452,119 +451,43 @@ void MoveToMainScreen()
 	MoveCursor(MainX, MainY); // move to main screen
 }
 
-/*
- *	ログに1キャラクタ(BYTE)出力
- */
-static void Log1Char(vtterm_work_t *vtterm, char c)
-{
-	switch (vtterm->log_code) {
-	case 0:
-	default:
-		// UTF-8
-		LogPut1(c);
-		break;
-	case 1:
-		// UTF-16LE
-		LogPut1(c);
-		LogPut1(0);
-		break;
-	case 2:
-		// UTF-16LE
-		LogPut1(0);
-		LogPut1(c);
-		break;
-	}
-}
-
 /**
- *	1キャラクタ(unsigned int, char32_t)をログ(or/and macro送信バッファ)へ出力
- *	New Line 以外
+ *	1キャラクタ(unsigned int, char32_t)をmacroへ出力
  */
-static void OutputLogUTF32WONL(vtterm_work_t *vtterm, unsigned int u32)
+static void DDEPut1U32(unsigned int u32)
 {
-	size_t i;
-	BOOL log_available = (cv.HLogBuf != 0);
-
-	if (!DDELog && !log_available) {
-		// ログにも macro にも出力不要
-		return;
-	}
-
-	// UTF-8 で出力する Log or/and macro
-	if (DDELog || (log_available && vtterm->log_code == 0)) {
+	if (DDELog) {
+		// UTF-8 で出力する
 		char u8_buf[4];
 		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
+		size_t i;
 		for (i = 0; i < u8_len; i++) {
 			BYTE b = u8_buf[i];
-			if (DDELog)
-				DDEPut1(b);
-			if (log_available && vtterm->log_code == 0)
-				LogPut1(b);
+			DDEPut1(b);
 		}
-	}
-
-	if (!log_available) {
-		// ログには出力しない(macro出力だけだった)
-		return;
-	}
-
-	switch(vtterm->log_code) {
-	case 0: {
-		// UTF-8, 出力済み
-		break;
-	}
-	case 1:
-	case 2: {
-		// UTF-16
-		wchar_t u16[2];
-		size_t u16_len = UTF32ToUTF16(u32, u16, _countof(u16));
-		size_t i;
-		for (i = 0; i < u16_len; i++) {
-			if (vtterm->log_code == 1) {
-				// UTF-16LE
-				LogPut1(u16[i] & 0xff);
-				LogPut1((u16[i] >> 8) & 0xff);
-			}
-			else {
-				// UTF-16BE
-				LogPut1(u16[i] & 0xff);
-				LogPut1((u16[i] >> 8) & 0xff);
-			}
-		}
-	}
 	}
 }
 
 /**
- *	改行をログ(or/and macro送信バッファ)へ出力
- *	ログには設定された改行コードを出力
- *	macro用には CR+LF を出力
+ *	ログへ設定された改行コードを出力
  */
 static void OutputLogNewLine(vtterm_work_t *vtterm)
 {
-	// ログ出力
-	if (cv.HLogBuf != 0) {
-		// ログは取っている
-		switch(vtterm->log_cr_type) {
-		case 0:
-			// CR + LF
-			Log1Char(vtterm, CR);
-			Log1Char(vtterm, LF);
-			break;
-		case 1:
-			// CR
-			Log1Char(vtterm, CR);
-			break;
-		case 2:
-			// LF
-			Log1Char(vtterm, LF);
-			break;
-		}
+	switch(vtterm->log_cr_type) {
+	case 0:
+		// CR + LF
+		FLogPutUTF32(CR);
+		FLogPutUTF32(LF);
+		break;
+	case 1:
+		// CR
+		FLogPutUTF32(CR);
+		break;
+	case 2:
+		// LF
+		FLogPutUTF32(LF);
+		break;
 	}
-
-	// マクロ出力
-	DDEPut1(CR);
-	DDEPut1(LF);
 }
 
 /**
@@ -572,50 +495,35 @@ static void OutputLogNewLine(vtterm_work_t *vtterm)
  */
 static void OutputLogUTF32(unsigned int u32)
 {
+	if (!FLogIsOpend() && !DDELog) {
+		return;
+	}
 	vtterm_work_t *vtterm = &vtterm_work;
 
-   	// 入力が改行(CR or LF)の場合、
-	// 改行の種類(CR or LF or CR+LF)を自動で判定して
-	// OutputLogNewLine() で改行を出力する
-	//		入力    CR hold     改行出力   	CR hold 変更
-   	// 		+-------+-----------+-----------+------------
-	//		CR      なし        しない		セットする
-	//		LF      なし        する		変化なし
-	//		その他  なし        しない		変化なし
-	//		CR      あり        する		変化なし(ホールドしたまま)
-	//		LF      あり        する		クリアする
-	//		その他  あり        する		クリアする
-	if (vtterm->log_cr_hold == FALSE) {
-		if (u32 == CR) {
-			vtterm->log_cr_hold = TRUE;
-			return;
-		}
-		else if (u32 == LF) {
-			OutputLogNewLine(vtterm);
-			return;
-		}
-		else {
-			// 改行特になし
-		}
-	}
-	else {
-		if (u32 == CR) {
-			OutputLogNewLine(vtterm);
-			return;
-		}
-		else if (u32 == LF) {
-			vtterm->log_cr_hold = FALSE;
-			OutputLogNewLine(vtterm);
-			return;
-		}
-		else {
-			vtterm->log_cr_hold = FALSE;
+	CheckEOLRet r = CheckEOLCheck(vtterm->eol, u32);
+	if ((r & CheckEOLOutputEOL) != 0) {
+		// ログ、改行を出力
+		if (FLogIsOpend()) {
 			OutputLogNewLine(vtterm);
 		}
-	}
 
-	// 改行以外を出力
-	OutputLogUTF32WONL(vtterm, u32);
+		// マクロ、改行を出力
+		if (DDELog) {
+			DDEPut1(CR);
+			DDEPut1(LF);
+		}
+	}
+	if ((r & CheckEOLOutputChar) != 0) {
+		// ログ、u32を出力
+		if (FLogIsOpend()) {
+			FLogPutUTF32(u32);
+		}
+
+		// マクロ、u32を出力
+		if (DDELog) {
+			DDEPut1U32(u32);
+		}
+	}
 }
 
 /**
@@ -632,49 +540,6 @@ static void OutputLogByte(BYTE b)
 static BOOL NeedsOutputBufs(void)
 {
 	return cv.HLogBuf != 0 || DDELog;
-}
-
-void TermLogSetCode(int code)
-{
-	vtterm_work_t *vtterm = &vtterm_work;
-	vtterm->log_code = code;
-}
-
-void TermLogOutputBOM(void)
-{
-	vtterm_work_t *vtterm = &vtterm_work;
-	BOOL needs_unlock = FALSE;
-
-	if ((cv.HLogBuf!=NULL) && (cv.LogBuf==NULL)) {
-		cv.LogBuf = (PCHAR)GlobalLock(cv.HLogBuf);
-		needs_unlock = TRUE;
-	}
-
-	switch (vtterm->log_code) {
-	case 0:
-		// UTF-8
-		LogPut1(0xef);
-		LogPut1(0xbb);
-		LogPut1(0xbf);
-		break;
-	case 1:
-		// UTF-16LE
-		LogPut1(0xfe);
-		LogPut1(0xff);
-		break;
-	case 2:
-		// UTF-16BE
-		LogPut1(0xff);
-		LogPut1(0xfe);
-		break;
-	default:
-		break;
-	}
-
-	if (needs_unlock) {
-		GlobalUnlock(cv.HLogBuf);
-		cv.LogBuf = NULL;
-	}
 }
 
 void MoveToStatusLine()
