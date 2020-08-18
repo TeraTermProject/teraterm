@@ -34,17 +34,27 @@
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
+typedef struct {
+	const char *UILanguageFile;
+	WORD OpId;
+	char *DlgCaption;
+	char *FileName;
+	char *FullName;
+	BOOL HideDialog;
+	HWND HMainWin;
+} CFileTransDlgInfo;
+
 class CFileTransDlg : public TTCDialog
 {
 public:
-	CFileTransDlg() {
-		SmallIcon = NULL;
-		BigIcon = NULL;
-	}
+	CFileTransDlg();
+	~CFileTransDlg();
 
+	BOOL Create(HINSTANCE hInstance, CFileTransDlgInfo *info);
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts);
 	void ChangeButton(BOOL PauseFlag);
-	void RefreshNum();
+	void RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount);
+	void RefreshNum(TFileVar *fv);
 
 private:
 	virtual BOOL OnCancel();
@@ -53,11 +63,17 @@ private:
 	virtual BOOL OnInitDialog();
 
 private:
-	PFileVar fv;
 	BOOL Pause;
 	HANDLE SmallIcon;
 	HANDLE BigIcon;
 	const char *UILanguageFile;
+	WORD OpId;
+	int ProgStat;	// プログレスバーの進捗が戻らないよう記憶しておく
+	BOOL HideDialog;
+	char *DlgCaption;
+	char *FileName;
+	char *FullName;
+	HWND HMainWin;
 };
 
 typedef CFileTransDlg *PFileTransDlg;

@@ -48,32 +48,63 @@
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
-BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts)
+CFileTransDlg::CFileTransDlg()
+{
+	SmallIcon = NULL;
+	BigIcon = NULL;
+	DlgCaption = NULL;
+	FileName = NULL;
+	FullName = NULL;
+	ProgStat = 0;
+}
+
+CFileTransDlg::~CFileTransDlg()
+{
+	free(DlgCaption);
+	free(FileName);
+	free(FullName);
+}
+
+BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
 {
 	BOOL Ok;
 	int fuLoad = LR_DEFAULTCOLOR;
 	HWND hwnd;
 
-	fv = pfv;
-	UILanguageFile = pts->UILanguageFile;
+	UILanguageFile = info->UILanguageFile;
+	OpId = info->OpId;
+	DlgCaption = _strdup(info->DlgCaption);
+	FileName = _strdup(info->FileName);
+	FullName = _strdup(info->FullName);
+	HideDialog = info->HideDialog;
+	HMainWin = info->HMainWin;
 
 	Pause = FALSE;
 	hwnd = GetForegroundWindow();
-	if (fv->OpId == OpLog) { // parent window is desktop
+	if (OpId == OpLog) { // parent window is desktop
 		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), IDD_FILETRANSDLG);
 	}
 	else { // parent window is VT window
 		Ok = TTCDialog::Create(hInstance, NULL, IDD_FILETRANSDLG);
 	}
-	if (fv->OpId == OpSendFile) {
-		InitDlgProgress(m_hWnd, IDC_TRANSPROGRESS, &fv->ProgStat);
+	if (OpId == OpSendFile) {
+		HWND HProg = ::GetDlgItem(m_hWnd, IDC_TRANSPROGRESS);
+
+		ProgStat = 0;
+
+		::SendMessage(HProg, PBM_SETRANGE, (WPARAM)0, MAKELPARAM(0, 100));
+		::SendMessage(HProg, PBM_SETSTEP, (WPARAM)1, 0);
+		::SendMessage(HProg, PBM_SETPOS, (WPARAM)0, 0);
+
+		::ShowWindow(HProg, SW_SHOW);
+
 		::ShowWindow(GetDlgItem(IDC_TRANS_ELAPSED), SW_SHOW);
 	}
 
-	if (!fv->HideDialog) {
+	if (!HideDialog) {
 		// Visible = False のダイアログを表示する
 		ShowWindow(SW_SHOWNORMAL);
-		if (fv->OpId == OpLog) {
+		if (OpId == OpLog) {
 			ShowWindow(SW_MINIMIZE);
 		}
 	}
@@ -83,9 +114,24 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 		::SetForegroundWindow(hwnd);
 	}
 
-	fv->HWin = GetSafeHwnd();
-
 	return Ok;
+}
+
+BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar fv, PComVar pcv, PTTSet pts)
+{
+	CFileTransDlgInfo info;
+
+	info.UILanguageFile = pts->UILanguageFile;
+	info.OpId = fv->OpId;
+	info.DlgCaption = _strdup(fv->DlgCaption);
+	info.FileName = _strdup(&fv->FullName[fv->DirLen]);
+	info.FullName = _strdup(fv->FullName);
+	info.HideDialog = fv->HideDialog;
+	info.HMainWin = fv->HMainWin;
+	BOOL r = Create(hInstance, &info);
+	fv->HWin = m_hWnd;
+	fv->ProgStat = ProgStat;
+	return r;
 }
 
 /**
@@ -108,7 +154,7 @@ void CFileTransDlg::ChangeButton(BOOL PauseFlag)
 	}
 }
 
-void CFileTransDlg::RefreshNum()
+void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
 {
 	char NumStr[24];
 	double rate;
@@ -116,15 +162,15 @@ void CFileTransDlg::RefreshNum()
 	static DWORD prev_elapsed;
 	DWORD elapsed;
 
-	if (fv->OpId == OpSendFile) {
-		if (fv->StartTime == 0) {
+	if (OpId == OpSendFile) {
+		if (StartTime == 0) {
 			SetDlgItemText(IDC_TRANS_ETIME, "0:00");
 			prev_elapsed = 0;
 		}
 		else {
-			elapsed = (GetTickCount() - fv->StartTime) / 1000;
+			elapsed = (GetTickCount() - StartTime) / 1000;
 			if (elapsed != prev_elapsed && elapsed != 0) {
-				rate2 = fv->ByteCount / elapsed;
+				rate2 = ByteCount / elapsed;
 				if (rate2 < 1200) {
 					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate2);
 				}
@@ -138,20 +184,28 @@ void CFileTransDlg::RefreshNum()
 				prev_elapsed = elapsed;
 			}
 		}
-	}
 
-	if (fv->OpId == OpSendFile && fv->FileSize > 0) {
-		rate = 100.0 * (double)fv->ByteCount / (double)fv->FileSize;
-		if (fv->ProgStat < (int)rate) {
-			fv->ProgStat = (int)rate;
-			SendDlgItemMessage(IDC_TRANSPROGRESS, PBM_SETPOS, (WPARAM)fv->ProgStat, 0);
+		if (FileSize > 0) {
+			rate = 100.0 * (double)ByteCount / (double)FileSize;
+			if (ProgStat < (int)rate) {
+				ProgStat = (int)rate;
+				SendDlgItemMessage(IDC_TRANSPROGRESS, PBM_SETPOS, (WPARAM)ProgStat, 0);
+			}
+			_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%u (%3.1f%%)",ByteCount, rate);
 		}
-		_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%u (%3.1f%%)",fv->ByteCount, rate);
+		SetDlgItemText(IDC_TRANSBYTES, NumStr);
 	}
 	else {
-		_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%u",fv->ByteCount);
+		_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%u",ByteCount);
+		SetDlgItemText(IDC_TRANSBYTES, NumStr);
 	}
-	SetDlgItemText(IDC_TRANSBYTES, NumStr);
+}
+
+void CFileTransDlg::RefreshNum(TFileVar *fv)
+{
+	ProgStat = fv->ProgStat;
+	RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
+	fv->ProgStat = ProgStat;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -171,7 +225,7 @@ BOOL CFileTransDlg::OnInitDialog()
 
 	int fuLoad = LR_DEFAULTCOLOR;
 
-	if (fv->HideDialog) {
+	if (HideDialog) {
 		// Visible = False でもフォアグラウンドに来てしまうので、そうならない
 		// ように拡張スタイル WS_EX_NOACTIVATE を指定する。
 		// (Windows 2000 以上で有効)
@@ -180,11 +234,9 @@ BOOL CFileTransDlg::OnInitDialog()
 		ModifyStyleEx(0, WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
 	}
 
-	SetWindowText(fv->DlgCaption);
-	SetDlgItemText(IDC_TRANSFNAME, &(fv->FullName[fv->DirLen]));
-
-	// ログファイルはフルパス表示にする(2004.8.6 yutaka)
-	SetDlgItemText(IDC_EDIT_FULLPATH, &(fv->FullName[0]));
+	SetWindowText(DlgCaption);
+	SetDlgItemText(IDC_TRANSFNAME, FileName);
+	SetDlgItemText(IDC_EDIT_FULLPATH, FullName);
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -210,8 +262,7 @@ BOOL CFileTransDlg::OnInitDialog()
 
 BOOL CFileTransDlg::OnCancel( )
 {
-	//::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
-	FileTransEnd(fv->OpId);
+	FileTransEnd(OpId);
 	return TRUE;
 }
 
@@ -220,14 +271,14 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam)) {
 		case IDC_TRANSPAUSESTART:
 			ChangeButton(! Pause);
-			FileTransPause(fv->OpId, Pause);
+			FileTransPause(OpId, Pause);
 			return TRUE;
 		case IDC_TRANSHELP:
-			if (fv->OpId == OpLog) {
-				::PostMessage(fv->HMainWin, WM_USER_DLGHELP2, HlpFileLog, 0);
+			if (OpId == OpLog) {
+				::PostMessage(HMainWin, WM_USER_DLGHELP2, HlpFileLog, 0);
 			}
 			else {
-				::PostMessage(fv->HMainWin, WM_USER_DLGHELP2, HlpFileSend, 0);
+				::PostMessage(HMainWin, WM_USER_DLGHELP2, HlpFileSend, 0);
 			}
 			return TRUE;
 		default:

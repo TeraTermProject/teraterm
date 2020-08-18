@@ -247,7 +247,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	if (FTDlg!=NULL)
 	{
 		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
-		FTDlg->RefreshNum();
+		FTDlg->RefreshNum(fv);
 	}
 
 	SendDlg = FTDlg; /* File send */
@@ -477,12 +477,12 @@ static void FileSendBinayBoost(void)
 			if (FileRetrySend)
 			{
 				if (SendVar->ByteCount != BCOld)
-					SendDlg->RefreshNum();
+					SendDlg->RefreshNum(SendVar);
 				return;
 			}
 		}
 		FileDlgRefresh = SendVar->ByteCount;
-		SendDlg->RefreshNum();
+		SendDlg->RefreshNum(SendVar);
 		BCOld = SendVar->ByteCount;
 		if (fc != 0)
 			return;
@@ -573,7 +573,7 @@ void FileSend(void)
 			if (FileRetrySend)
 			{
 				if (SendVar->ByteCount != BCOld)
-					SendDlg->RefreshNum();
+					SendDlg->RefreshNum(SendVar);
 				return;
 			}
 			if (ts.LocalEcho>0)
@@ -585,7 +585,7 @@ void FileSend(void)
 			}
 		}
 		if ((fc==0) || ((SendVar->ByteCount % 100 == 0) && (FileBracketPtr == 0))) {
-			SendDlg->RefreshNum();
+			SendDlg->RefreshNum(SendVar);
 			BCOld = SendVar->ByteCount;
 			if (fc!=0)
 				return;

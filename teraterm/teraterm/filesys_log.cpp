@@ -153,7 +153,7 @@ static BOOL OpenFTDlg_(PFileVar fv)
 	if (FTDlg!=NULL)
 	{
 		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
-		FTDlg->RefreshNum();
+		FTDlg->RefreshNum(fv);
 	}
 
 //	if (fv->OpId==OpLog)
@@ -1192,7 +1192,7 @@ void LogToFile(void)
 	}
 	if (FLogIsPause() || cv.ProtoFlag) return;
 	if (FLogDlg!=NULL)
-		FLogDlg->RefreshNum();
+		FLogDlg->RefreshNum(LogVar);
 
 	// ログ・ローテート
 	LogRotate();
@@ -1428,7 +1428,7 @@ void FLogWriteStr(const char *str)
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
 		if (FLogDlg!=NULL)
-			FLogDlg->RefreshNum();
+			FLogDlg->RefreshNum(LogVar);
 	}
 }
 
