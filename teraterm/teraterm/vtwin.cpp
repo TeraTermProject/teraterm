@@ -3585,7 +3585,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 		}
 		if (ts.LogFN[0]!=0) {
 			wchar_t *fnW = ToWcharA(ts.LogFN);
-			FLogOpen(fnW);
+			FLogOpen(fnW, LOG_UTF8, FALSE);
 			free(fnW);
 		}
 	}
@@ -4135,13 +4135,9 @@ void CVTWindow::OnFileLog()
 			// ファイル削除
 			_DeleteFileW(filename);
 		}
-		BOOL r = FLogOpen(filename);
+		BOOL r = FLogOpen(filename, info.code, info.bom);
 		if (r != FALSE) {
 			if (FLogIsOpendText()) {
-				FLogSetCode(info.code);
-				if (info.bom) {
-					FLogOutputBOM();
-				}
 				// 現在バッファにあるデータをすべて書き出してから、
 				// ログ採取を開始する。
 				// (2013.9.29 yutaka)

@@ -92,7 +92,8 @@ typedef struct {
 
 	PFileTransDlg FLogDlg;
 
-	int log_code;
+	LogCode_t log_code;
+	BOOL bom;
 
 } TFileVar_;
 typedef TFileVar_ *PFileVar_;
@@ -122,6 +123,7 @@ static BOOL CreateBinBuf(void);
 void LogPut1(BYTE b);
 static void OutputStr(const wchar_t *str);
 static void LogToFile(void);
+static void FLogOutputBOM(void);
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
@@ -340,7 +342,7 @@ static void SetLogFlags(HWND Dialog)
 	GetRB(Dialog, &val, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 	ts.LogAllBuffIncludedInFirst = val;
 
-	ts.LogTimestampType = (GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1);
+	ts.LogTimestampType = (WORD)(GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1);
 }
 
 /**
@@ -563,7 +565,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			work->info->filename = _wcsdup(filename);
 			work->info->append = IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED;
 			work->info->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
-			work->info->code = (int)SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_GETCURSEL, 0, 0);
+			work->info->code = (LogCode_t)SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_GETCURSEL, 0, 0);
 			SetLogFlags(Dialog);
 			EndDialog(Dialog, IDOK);
 			break;
@@ -727,6 +729,12 @@ static BOOL LogStart(const wchar_t *fname)
 		   a newline is inserted before the first timestamp.
 		*/
 		fv->eLineEnd = Line_FileHead;
+	}
+	else {
+		// 追記ではない(新規)場合は BOM を出力する
+		if (fv->bom) {
+			FLogOutputBOM();
+		}
 	}
 
 	// Log rotate configuration
@@ -911,6 +919,9 @@ static void LogRotate(void)
 
 	// 再オープン
 	OpenLogFile(LogVar);
+	if (LogVar->bom) {
+		FLogOutputBOM();
+	}
 	if (ts.DeferredLogWriteMode) {
 		StartThread(LogVar);
 	}
@@ -1112,7 +1123,7 @@ void FLogRotateSize(size_t size)
 		return;
 	}
 	LogVar->RotateMode = ROTATE_SIZE;
-	LogVar->RotateSize = size;
+	LogVar->RotateSize = (LONG)size;
 }
 
 /**
@@ -1212,7 +1223,7 @@ void FLogClose(void)
  *	FLogGetLogFilename() や FLogOpenDialog() で
  *	ファイル名を取得できる。
  */
-BOOL FLogOpen(const wchar_t *fname)
+BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 {
 	BOOL ret;
 
@@ -1231,8 +1242,9 @@ BOOL FLogOpen(const wchar_t *fname)
 	fv->FileHandle = INVALID_HANDLE_VALUE;
 	fv->LogThread = INVALID_HANDLE_VALUE;
 	fv->eLineEnd = Line_LineHead;
-	fv->log_code = 0;	// UTF-8
 
+	fv->log_code = code;
+	fv->bom = bom;
 	ret = LogStart(fname);
 	if (ret == FALSE) {
 		FileTransEnd_();
@@ -1490,7 +1502,9 @@ void FLogPutUTF32(unsigned int u32)
 		return;
 	}
 
+	// 行頭か?(改行を出力した直後)
 	if (ts.LogTimestamp && fv->eLineEnd) {
+		// タイムスタンプを出力
 		fv->eLineEnd = Line_Other; /* clear endmark*/
 		wchar_t* strtime = TimeStampStr();
 		FLogWriteStr(strtime);
@@ -1498,7 +1512,7 @@ void FLogPutUTF32(unsigned int u32)
 	}
 
 	switch(fv->log_code) {
-	case 0: {
+	case LOG_UTF8: {
 		// UTF-8
 		char u8_buf[4];
 		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
@@ -1508,14 +1522,14 @@ void FLogPutUTF32(unsigned int u32)
 		}
 		break;
 	}
-	case 1:
-	case 2: {
+	case LOG_UTF16LE:
+	case LOG_UTF16BE: {
 		// UTF-16
 		wchar_t u16[2];
 		size_t u16_len = UTF32ToUTF16(u32, u16, _countof(u16));
 		size_t i;
 		for (i = 0; i < u16_len; i++) {
-			if (fv->log_code == 1) {
+			if (fv->log_code == LOG_UTF16LE) {
 				// UTF-16LE
 				LogPut1(u16[i] & 0xff);
 				LogPut1((u16[i] >> 8) & 0xff);
@@ -1534,7 +1548,7 @@ void FLogPutUTF32(unsigned int u32)
 	}
 }
 
-void FLogOutputBOM(void)
+static void FLogOutputBOM(void)
 {
 	PFileVar fv = LogVar;
 	DWORD wrote;
@@ -1564,12 +1578,6 @@ void FLogOutputBOM(void)
 	default:
 		break;
 	}
-}
-
-void FLogSetCode(int code)
-{
-	PFileVar fv = LogVar;
-	fv->log_code = code;
 }
 
 static void OutputStr(const wchar_t *str)

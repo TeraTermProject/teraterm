@@ -39,12 +39,19 @@ extern "C" {
  */
 #define FILESYS_LOG_FREE_SPACE	(30*2)
 
+// logファイルの文字コード
+typedef enum LogCode {
+	LOG_UTF8,
+	LOG_UTF16LE,
+	LOG_UTF16BE,
+} LogCode_t;
+
 // log
 typedef struct {
 	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
 	BOOL append;			// TRUE/FALSE = append/new(overwrite)
 	BOOL bom;				// TRUE = BOMあり
-	int code;				// 0/1/2 = UTF-8/UTF-16LE/UTF-16BE
+	LogCode_t code;
 } FLogDlgInfo_t;
 BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
 void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
@@ -56,7 +63,7 @@ void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
 void FLogRotateHalt(void);
 void FLogClose(void);
-BOOL FLogOpen(const wchar_t *fname);
+BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom);
 BOOL FLogIsOpend(void);
 BOOL FLogIsOpendText(void);
 BOOL FLogIsOpendBin(void);
@@ -70,9 +77,6 @@ int FLogGetCount(void);
 int FLogGetFreeCount(void);
 void FLogWriteFile(void);
 void FLogPutUTF32(unsigned int u32);
-void FLogSetCode(int code);
-void FLogOutputBOM(void);
-//void LogPut1(BYTE b);
 void FLogOutputAllBuffer(void);
 
 #ifdef __cplusplus

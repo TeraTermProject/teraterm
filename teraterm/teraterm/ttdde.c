@@ -585,7 +585,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		else {
 			wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
 			wchar_t *log_filenameW = FLogGetLogFilename(ParamFileNameW);
-			BOOL ret = FLogOpen(log_filenameW);
+			BOOL ret = FLogOpen(log_filenameW, LOG_UTF8, FALSE);
 			free(log_filenameW);
 			free(ParamFileNameW);
 			strncpy_s(ParamFileName, sizeof(ParamFileName), ret ? "1" : "0", _TRUNCATE);
