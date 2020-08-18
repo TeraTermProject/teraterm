@@ -54,7 +54,6 @@
 #include "filesys_log_res.h"
 #include "filesys.h"
 
-#if 0
 typedef struct {
   HWND HMainWin;
   HWND HWin;
@@ -107,7 +106,6 @@ typedef TFileVar_ *PFileVar_;
 
 #define PFileVar PFileVar_
 #define TFileVar TFileVar_
-#endif
 
 static PFileVar LogVar = NULL;
 
@@ -152,8 +150,16 @@ static BOOL OpenFTDlg_(PFileVar fv)
 
 	if (FTDlg!=NULL)
 	{
-		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
-		FTDlg->RefreshNum(fv);
+		CFileTransDlgInfo info;
+		info.UILanguageFile = ts.UILanguageFile;
+		info.OpId = fv->OpId;
+		info.DlgCaption = fv->DlgCaption;
+		info.FileName = &fv->FullName[fv->DirLen];
+		info.FullName = fv->FullName;
+		info.HideDialog = fv->HideDialog;
+		info.HMainWin = fv->HMainWin;
+		FTDlg->Create(hInst, &info);
+		FTDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
 	}
 
 //	if (fv->OpId==OpLog)
@@ -743,7 +749,19 @@ static BOOL LogStart(void)
 	if (! LoadTTFILE()) return FALSE;
 
 	LogVar->OpId = OpLog;
-	(*SetFileVar)(LogVar);
+	//(*SetFileVar)(LogVar);
+	{
+		int i;
+		char c;
+		PFileVar fv = LogVar;
+		GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
+		c = fv->FullName[fv->DirLen];
+		if (c=='\\'||c=='/') fv->DirLen++;
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		char uimsg[MAX_UIMSG];
+		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, ts.UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	}
 	FixLogOption();
 
 	if (ts.LogBinary > 0)
@@ -1192,7 +1210,9 @@ void LogToFile(void)
 	}
 	if (FLogIsPause() || cv.ProtoFlag) return;
 	if (FLogDlg!=NULL)
-		FLogDlg->RefreshNum(LogVar);
+		//FLogDlg->RefreshNum(LogVar);
+		FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
+
 
 	// ログ・ローテート
 	LogRotate();
@@ -1428,7 +1448,8 @@ void FLogWriteStr(const char *str)
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
 		if (FLogDlg!=NULL)
-			FLogDlg->RefreshNum(LogVar);
+			//FLogDlg->RefreshNum(LogVar);
+			FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
 	}
 }
 

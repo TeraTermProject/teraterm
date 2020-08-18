@@ -132,16 +132,15 @@ typedef struct {
 
   DWORD StartTime;
 
-  // log rotate
-  int RotateMode;  //  enum rotate_mode RotateMode;
-  LONG RotateSize;
-  int RotateStep;
+  int reserve_1;
+  LONG reserve_2;
+  int reserve_3;
 
-  HANDLE LogThread;
-  DWORD LogThreadId;
+  HANDLE reserve_4;
+  DWORD reserve_5;
 
   DWORD FileMtime;
-  HANDLE LogThreadEvent;
+  HANDLE reserve_6;
 } TFileVar;
 typedef TFileVar far *PFileVar;
 
