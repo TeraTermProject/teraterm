@@ -781,7 +781,7 @@ static BOOL LogStart(const wchar_t *fname)
  */
 void FLogOutputAllBuffer(void)
 {
-	DWORD ofs, written_size;
+	DWORD ofs;
 	int size;
 	wchar_t buf[512];
 	for (ofs = 0 ;  ; ofs++ ) {
@@ -920,6 +920,35 @@ static void LogRotate(void)
 	logfile_unlock();
 }
 
+static char *TimeStampStr()
+{
+	char *strtime = NULL;
+	switch (ts.LogTimestampType) {
+	case TIMESTAMP_LOCAL:
+	default:
+		strtime = mctimelocal(ts.LogTimestampFormat, FALSE);
+		break;
+	case TIMESTAMP_UTC:
+		strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
+		break;
+	case TIMESTAMP_ELAPSED_LOGSTART:
+		strtime = strelapsed(LogVar->StartTime);
+		break;
+	case TIMESTAMP_ELAPSED_CONNECTED:
+		strtime = strelapsed(cv.ConnectedTime);
+		break;
+	}
+
+	char tmp[128];
+	tmp[0] = 0;
+	strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
+	strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
+	strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
+
+	return strdup(tmp);
+//	return ToWcharA(tmp);
+}
+
 /**
  * バッファ内のログをファイルへ書き込む
  */
@@ -928,10 +957,6 @@ static void LogToFile(void)
 	PCHAR Buf;
 	int Start, Count;
 	BYTE b;
-	PCHAR WriteBuf;
-	DWORD WriteBufMax, WriteBufLen;
-	CHAR tmp[128];
-	DWORD wrote;
 	PFileVar fv = LogVar;
 
 	if (FileLog)
@@ -955,104 +980,52 @@ static void LogToFile(void)
 	// ロックを取る(2004.8.6 yutaka)
 	logfile_lock();
 
-	if (ts.DeferredLogWriteMode) {
-		WriteBufMax = 8192;
-		WriteBufLen = 0;
-		WriteBuf = (PCHAR)malloc(WriteBufMax);
-		while (Get1(Buf,&Start,&Count,&b)) {
-			if (!FLogIsPause() && (! cv.ProtoFlag))
-			{
-				tmp[0] = 0;
-				if ( ts.LogTimestamp && fv->eLineEnd ) {
-					char *strtime = NULL;
-
-					switch (ts.LogTimestampType) {
-					case TIMESTAMP_LOCAL:
-						strtime = mctimelocal(ts.LogTimestampFormat, FALSE);
-						break;
-					case TIMESTAMP_UTC:
-						strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
-						break;
-					case TIMESTAMP_ELAPSED_LOGSTART:
-						strtime = strelapsed(LogVar->StartTime);
-						break;
-					case TIMESTAMP_ELAPSED_CONNECTED:
-						strtime = strelapsed(cv.ConnectedTime);
-						break;
-					}
-
-					/* 2007.05.24 Gentaro */
-					if(fv->eLineEnd == Line_FileHead ){
-						strncat_s(tmp, sizeof(tmp), "\r\n", _TRUNCATE);
-					}
-					strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
-					strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
-					strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
-				}
-
-				/* 2007.05.24 Gentaro */
-				if( b == 0x0a ){
-					fv->eLineEnd = Line_LineHead; /* set endmark*/
-				}
-				else {
-					fv->eLineEnd = Line_Other; /* clear endmark*/
-				}
-
-				if (WriteBufLen >= (WriteBufMax*4/5)) {
-					WriteBufMax *= 2;
-					WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
-				}
-				memcpy(&WriteBuf[WriteBufLen], tmp, strlen(tmp));
-				WriteBufLen += strlen(tmp);
-				WriteBuf[WriteBufLen++] = b;
-
-				(LogVar->ByteCount)++;
-			}
+	// 書き込みデータを作成する
+	DWORD WriteBufMax = 8192;
+	DWORD WriteBufLen = 0;
+	PCHAR WriteBuf = (PCHAR)malloc(WriteBufMax);
+	while (Get1(Buf,&Start,&Count,&b)) {
+		if (FLogIsPause() || (cv.ProtoFlag)) {
+			continue;
 		}
 
-		PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
-
-	} else {
-
-		while (Get1(Buf,&Start,&Count,&b))
-		{
-			if (!FLogIsPause() && (! cv.ProtoFlag))
-			{
-				if ( ts.LogTimestamp && fv->eLineEnd ) {
-					char *strtime = NULL;
-
-					switch (ts.LogTimestampType) {
-					case TIMESTAMP_LOCAL:
-						strtime = mctimelocal(ts.LogTimestampFormat, FALSE);
-						break;
-					case TIMESTAMP_UTC:
-						strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
-						break;
-					case TIMESTAMP_ELAPSED_LOGSTART:
-						strtime = strelapsed(LogVar->StartTime);
-						break;
-					case TIMESTAMP_ELAPSED_CONNECTED:
-						strtime = strelapsed(cv.ConnectedTime);
-						break;
-					}
-					WriteFile(LogVar->FileHandle, "[", 1, &wrote, NULL);
-					WriteFile(LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
-					WriteFile(LogVar->FileHandle, "] ", 2, &wrote, NULL);
-				}
-
-				/* 2007.05.24 Gentaro */
-				if( b == 0x0a ){
-					fv->eLineEnd = Line_LineHead; /* set endmark*/
-				}
-				else {
-					fv->eLineEnd = Line_Other; /* clear endmark*/
-				}
-
-				WriteFile(LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
-				(LogVar->ByteCount)++;
-			}
+		if (WriteBufLen >= (WriteBufMax*4/5)) {
+			WriteBufMax *= 2;
+			WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
 		}
 
+		// add time stamp string
+		if ( ts.LogTimestamp && fv->eLineEnd ) {
+			char *strtime = TimeStampStr();
+			size_t len = strlen(strtime);
+			memcpy(&WriteBuf[WriteBufLen], strtime, len);
+			free(strtime);
+			WriteBufLen += len;
+		}
+
+		/* 2007.05.24 Gentaro */
+		if( b == 0x0a ){
+			fv->eLineEnd = Line_LineHead; /* set endmark*/
+		}
+		else {
+			fv->eLineEnd = Line_Other; /* clear endmark*/
+		}
+
+		WriteBuf[WriteBufLen++] = b;
+
+		(LogVar->ByteCount)++;
+	}
+
+	// 書き込み
+	if (WriteBufLen > 0) {
+		if (ts.DeferredLogWriteMode) {
+			PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
+		}
+		else {
+			DWORD wrote;
+			WriteFile(LogVar->FileHandle, WriteBuf, WriteBufLen, &wrote, NULL);
+			free(WriteBuf);
+		}
 	}
 
 	logfile_unlock();
