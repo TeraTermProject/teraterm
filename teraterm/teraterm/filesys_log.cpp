@@ -59,26 +59,39 @@
 #include "filesys_log_res.h"
 #include "filesys_log.h"
 
+/*
+   Line Head flag for timestamping
+   2007.05.24 Gentaro
+*/
+enum enumLineEnd {
+	Line_Other = 0,
+	Line_LineHead = 1,
+	Line_FileHead = 2,
+};
+
 typedef struct {
-  wchar_t *FullName;
-  wchar_t *FileName;
+	wchar_t *FullName;
+	wchar_t *FileName;
 
-  BOOL FileOpen;
-  HANDLE FileHandle;
-  LONG FileSize, ByteCount;
+	HANDLE FileHandle;
+	LONG FileSize, ByteCount;
 
-  DWORD StartTime;
+	DWORD StartTime;
 
-  // log rotate
-  int RotateMode;  //  enum rotate_mode RotateMode;
-  LONG RotateSize;
-  int RotateStep;
+	enum enumLineEnd eLineEnd;
 
-  HANDLE LogThread;
-  DWORD LogThreadId;
-  HANDLE LogThreadEvent;
+	// log rotate
+	int RotateMode;  //  enum rotate_mode RotateMode;
+	LONG RotateSize;
+	int RotateStep;
 
-  BOOL IsPause;
+	HANDLE LogThread;
+	DWORD LogThreadId;
+	HANDLE LogThreadEvent;
+
+	BOOL IsPause;
+
+	PFileTransDlg FLogDlg;
 } TFileVar_;
 typedef TFileVar_ *PFileVar_;
 
@@ -90,19 +103,6 @@ static PFileVar LogVar = NULL;
 static BOOL FileLog = FALSE;
 static BOOL BinLog = FALSE;
 
-/*
-   Line Head flag for timestamping
-   2007.05.24 Gentaro
-*/
-enum enumLineEnd {
-	Line_Other = 0,
-	Line_LineHead = 1,
-	Line_FileHead = 2,
-};
-
-static enum enumLineEnd eLineEnd = Line_LineHead;
-
-
 // 遅延書き込み用スレッドのメッセージ
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
 
@@ -112,7 +112,6 @@ static void LogBinSkip(int add);
 static BOOL CreateLogBuf(void);
 static BOOL CreateBinBuf(void);
 
-static PFileTransDlg FLogDlg = NULL;
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
@@ -138,7 +137,7 @@ static BOOL OpenFTDlg_(PFileVar fv)
 	FTDlg->Create(hInst, &info);
 	FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
 
-	FLogDlg = FTDlg;
+	fv->FLogDlg = FTDlg;
 
 	free(DlgCaption);
 	return TRUE;
@@ -222,8 +221,9 @@ static void CloseFileSync(PFileVar ptr)
 {
 	BOOL ret;
 
-	if (!ptr->FileOpen)
+	if (ptr->FileHandle == INVALID_HANDLE_VALUE) {
 		return;
+	}
 
 	if (ptr->LogThread != INVALID_HANDLE_VALUE) {
 		// スレッドの終了待ち
@@ -239,6 +239,7 @@ static void CloseFileSync(PFileVar ptr)
 		ptr->LogThread = INVALID_HANDLE_VALUE;
 	}
 	CloseHandle(ptr->FileHandle);
+	ptr->FileHandle = INVALID_HANDLE_VALUE;
 }
 
 // 遅延書き込み用スレッド
@@ -275,6 +276,27 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 end:
 	_endthreadex(0);
 	return (0);
+}
+
+// 遅延書き込み用スレッドを起こす。
+// (2013.4.19 yutaka)
+// DeferredLogWriteThread スレッドが起床して、スレッドキューが作成されるより前に、
+// ログファイルのクローズ(CloseFileSync)が行われると、エンキューが失敗し、デッドロック
+// するという問題を修正した。
+// スレッド間の同期を行うため、名前なしイベントオブジェクトを使って、スレッドキューの
+// 作成まで待ち合わせするようにした。名前付きイベントオブジェクトを使う場合は、
+// システム(Windows OS)上でユニークな名前にする必要がある。
+// (2016.9.23 yutaka)
+static void StartThread(PFileVar fv)
+{
+	unsigned tid;
+	fv->LogThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	fv->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, fv, 0, &tid);
+	fv->LogThreadId = tid;
+	if (fv->LogThreadEvent != NULL) {
+		WaitForSingleObject(fv->LogThreadEvent, INFINITE);
+		CloseHandle(fv->LogThreadEvent);
+	}
 }
 
 /**
@@ -643,13 +665,22 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	return FALSE;
 }
 
+static void OpenLogFile(PFileVar fv)
+{
+	int dwShareMode = FILE_SHARE_READ;
+	if (!ts.LogLockExclusive) {
+		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	}
+	LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+									  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+}
+
 static BOOL LogStart(const wchar_t *fname)
 {
-	unsigned tid;
-
-	LogVar->FullName = _wcsdup(fname);
-
 	PFileVar fv = LogVar;
+
+	fv->FullName = _wcsdup(fname);
+
 	wchar_t *p = wcsrchr(fv->FullName, L'\\');
 	if (p == NULL) {
 		p = wcsrchr(fv->FullName, L'/');
@@ -658,7 +689,7 @@ static BOOL LogStart(const wchar_t *fname)
 		fv->FileName = _wcsdup(fv->FullName);
 	}
 	else {
-		fv->FileName = _wcsdup(p++);
+		fv->FileName = _wcsdup(p + 1);
 	}
 	FixLogOption();
 
@@ -668,7 +699,6 @@ static BOOL LogStart(const wchar_t *fname)
 		FileLog = FALSE;
 		if (! CreateBinBuf())
 		{
-			FileTransEnd_();
 			return FALSE;
 		}
 	}
@@ -677,48 +707,28 @@ static BOOL LogStart(const wchar_t *fname)
 		FileLog = TRUE;
 		if (! CreateLogBuf())
 		{
-			FileTransEnd_();
 			return FALSE;
 		}
 	}
 	cv.LStart = cv.LogPtr;
 	cv.LCount = 0;
 
-	/* 2007.05.24 Gentaro */
-	eLineEnd = Line_LineHead;
-
-	if (ts.Append > 0)
-	{
-		int dwShareMode = FILE_SHARE_READ;
-		if (!ts.LogLockExclusive) {
-			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-		}
-		LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-										  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (LogVar->FileHandle != INVALID_HANDLE_VALUE){
-			SetFilePointer(LogVar->FileHandle, 0, NULL, FILE_END);
-			/* 2007.05.24 Gentaro
-				If log file already exists,
-				a newline is inserted before the first timestamp.
-			*/
-			eLineEnd = Line_FileHead;
-		}
-	}
-	else {
-		int dwShareMode = FILE_SHARE_READ;
-		if (!ts.LogLockExclusive) {
-			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-		}
-		LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-										  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	}
-	LogVar->FileOpen = (LogVar->FileHandle != INVALID_HANDLE_VALUE);
-	if (! LogVar->FileOpen)
-	{
-		FileTransEnd_();
+	OpenLogFile(fv);
+	if (LogVar->FileHandle == INVALID_HANDLE_VALUE) {
 		return FALSE;
 	}
-	LogVar->ByteCount = 0;
+
+	/* 2007.05.24 Gentaro */
+	fv->eLineEnd = Line_LineHead;
+	if (ts.Append > 0)
+	{
+		SetFilePointer(LogVar->FileHandle, 0, NULL, FILE_END);
+		/* 2007.05.24 Gentaro
+		   If log file already exists,
+		   a newline is inserted before the first timestamp.
+		*/
+		fv->eLineEnd = Line_FileHead;
+	}
 
 	// Log rotate configuration
 	LogVar->RotateMode = ts.LogRotate;
@@ -730,33 +740,24 @@ static BOOL LogStart(const wchar_t *fname)
 	// (2016.4.9 yutaka)
 	if (LogVar->RotateMode != ROTATE_NONE) {
 		DWORD size = GetFileSize(LogVar->FileHandle, NULL);
-		if (size != -1)
-			LogVar->ByteCount = size;
+		if (size == -1) {
+			return FALSE;
+		}
+		LogVar->ByteCount = size;
+	}
+	else {
+		LogVar->ByteCount = 0;
 	}
 
 	if (! OpenFTDlg_(LogVar)) {
-		FileTransEnd_();
 		return FALSE;
 	}
 
 	LogVar->IsPause = FALSE;
 	LogVar->StartTime = GetTickCount();
 
-	// 遅延書き込み用スレッドを起こす。
-	// (2013.4.19 yutaka)
-	// DeferredLogWriteThread スレッドが起床して、スレッドキューが作成されるより前に、
-	// ログファイルのクローズ(CloseFileSync)が行われると、エンキューが失敗し、デッドロック
-	// するという問題を修正した。
-	// スレッド間の同期を行うため、名前なしイベントオブジェクトを使って、スレッドキューの
-	// 作成まで待ち合わせするようにした。名前付きイベントオブジェクトを使う場合は、
-	// システム(Windows OS)上でユニークな名前にする必要がある。
-	// (2016.9.23 yutaka)
-	LogVar->LogThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
-	LogVar->LogThreadId = tid;
-	if (LogVar->LogThreadEvent != NULL) {
-		WaitForSingleObject(LogVar->LogThreadEvent, INFINITE);
-		CloseHandle(LogVar->LogThreadEvent);
+	if (ts.DeferredLogWriteMode) {
+		StartThread(LogVar);
 	}
 
 	// 現在バッファにあるデータをすべて書き出してから、
@@ -863,7 +864,7 @@ static void CommentLogToFile(char *buf, int size)
 {
 	DWORD wrote;
 
-	if (LogVar == NULL || !LogVar->FileOpen) {
+	if (LogVar == NULL) {
 		char uimsg[MAX_UIMSG];
 		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
 		get_lang_msg("MSG_COMMENT_LOG_OPEN_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
@@ -878,7 +879,7 @@ static void CommentLogToFile(char *buf, int size)
 	/* Set Line End Flag
 		2007.05.24 Gentaro
 	*/
-	eLineEnd = Line_LineHead;
+	LogVar->eLineEnd = Line_LineHead;
 	logfile_unlock();
 }
 
@@ -888,10 +889,6 @@ static void LogRotate(void)
 {
 	int loopmax = 10000;  // XXX
 	int i, k;
-	int dwShareMode = FILE_SHARE_READ;
-	unsigned tid;
-
-	if (! LogVar->FileOpen) return;
 
 	if (LogVar->RotateMode == ROTATE_NONE)
 		return;
@@ -910,7 +907,6 @@ static void LogRotate(void)
 
 	// いったん今のファイルをクローズして、別名のファイルをオープンする。
 	CloseFileSync(LogVar);
-	//_lclose(LogVar->FileHandle);
 
 	// 世代ローテーションのステップ数の指定があるか
 	if (LogVar->RotateStep > 0)
@@ -921,7 +917,7 @@ static void LogRotate(void)
 		aswprintf(&filename, L"%s.%d", LogVar->FullName, i);
 		DWORD attr = _GetFileAttributesW(filename);
 		free(filename);
-		if ((attr != INVALID_FILE_ATTRIBUTES) && ((attr & FILE_ATTRIBUTE_DIRECTORY) == 0))
+		if (attr == INVALID_FILE_ATTRIBUTES)
 			break;
 	}
 	if (i > loopmax) {
@@ -947,31 +943,12 @@ static void LogRotate(void)
 	}
 
 	// 再オープン
-	if (!ts.LogLockExclusive) {
-		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-	}
-	LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-									  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	// 遅延書き込み用スレッドを起こす。
-	// (2013.4.19 yutaka)
-	// DeferredLogWriteThread スレッドが起床して、スレッドキューが作成されるより前に、
-	// ログファイルのクローズ(CloseFileSync)が行われると、エンキューが失敗し、デッドロック
-	// するという問題を修正した。
-	// スレッド間の同期を行うため、名前なしイベントオブジェクトを使って、スレッドキューの
-	// 作成まで待ち合わせするようにした。名前付きイベントオブジェクトを使う場合は、
-	// システム(Windows OS)上でユニークな名前にする必要がある。
-	// (2016.9.26 yutaka)
-	LogVar->LogThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
-	LogVar->LogThreadId = tid;
-	if (LogVar->LogThreadEvent != NULL) {
-		WaitForSingleObject(LogVar->LogThreadEvent, INFINITE);
-		CloseHandle(LogVar->LogThreadEvent);
+	OpenLogFile(LogVar);
+	if (ts.DeferredLogWriteMode) {
+		StartThread(LogVar);
 	}
 
 	logfile_unlock();
-
 }
 
 /**
@@ -986,8 +963,8 @@ static void LogToFile(void)
 	DWORD WriteBufMax, WriteBufLen;
 	CHAR tmp[128];
 	DWORD wrote;
+	PFileVar fv = LogVar;
 
-	if (! LogVar->FileOpen) return;
 	if (FileLog)
 	{
 		Buf = cv.LogBuf;
@@ -1017,7 +994,7 @@ static void LogToFile(void)
 			if (!FLogIsPause() && (! cv.ProtoFlag))
 			{
 				tmp[0] = 0;
-				if ( ts.LogTimestamp && eLineEnd ) {
+				if ( ts.LogTimestamp && fv->eLineEnd ) {
 					char *strtime = NULL;
 
 					switch (ts.LogTimestampType) {
@@ -1036,7 +1013,7 @@ static void LogToFile(void)
 					}
 
 					/* 2007.05.24 Gentaro */
-					if( eLineEnd == Line_FileHead ){
+					if(fv->eLineEnd == Line_FileHead ){
 						strncat_s(tmp, sizeof(tmp), "\r\n", _TRUNCATE);
 					}
 					strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
@@ -1046,10 +1023,10 @@ static void LogToFile(void)
 
 				/* 2007.05.24 Gentaro */
 				if( b == 0x0a ){
-					eLineEnd = Line_LineHead; /* set endmark*/
+					fv->eLineEnd = Line_LineHead; /* set endmark*/
 				}
 				else {
-					eLineEnd = Line_Other; /* clear endmark*/
+					fv->eLineEnd = Line_Other; /* clear endmark*/
 				}
 
 				if (WriteBufLen >= (WriteBufMax*4/5)) {
@@ -1072,7 +1049,7 @@ static void LogToFile(void)
 		{
 			if (!FLogIsPause() && (! cv.ProtoFlag))
 			{
-				if ( ts.LogTimestamp && eLineEnd ) {
+				if ( ts.LogTimestamp && fv->eLineEnd ) {
 					char *strtime = NULL;
 
 					switch (ts.LogTimestampType) {
@@ -1096,10 +1073,10 @@ static void LogToFile(void)
 
 				/* 2007.05.24 Gentaro */
 				if( b == 0x0a ){
-					eLineEnd = Line_LineHead; /* set endmark*/
+					fv->eLineEnd = Line_LineHead; /* set endmark*/
 				}
 				else {
-					eLineEnd = Line_Other; /* clear endmark*/
+					fv->eLineEnd = Line_Other; /* clear endmark*/
 				}
 
 				WriteFile(LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
@@ -1121,13 +1098,11 @@ static void LogToFile(void)
 		cv.BCount = Count;
 	}
 	if (FLogIsPause() || cv.ProtoFlag) return;
-	if (FLogDlg!=NULL)
-		FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
+	LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
 
 
 	// ログ・ローテート
 	LogRotate();
-
 }
 
 static BOOL CreateLogBuf(void)
@@ -1194,8 +1169,8 @@ static void FileTransEnd_(void)
 	cv.Log1Byte = NULL;
 	cv.Log1Bin = NULL;
 	cv.LogBinSkip = NULL;
-	if (FLogDlg!=NULL)
-	{
+	PFileTransDlg FLogDlg = LogVar->FLogDlg;
+	if (FLogDlg != NULL) {
 		FLogDlg->DestroyWindow();
 		FLogDlg = NULL;
 	}
@@ -1215,7 +1190,7 @@ void FLogPause(BOOL Pause)
 		return;
 	}
 	LogVar->IsPause = Pause;
-	FLogDlg->ChangeButton(Pause);
+	LogVar->FLogDlg->ChangeButton(Pause);
 }
 
 /**
@@ -1263,7 +1238,6 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 		{ 0, "DLG_COMMENT_TITLE" },
 		{ IDOK, "BTN_OK" }
 	};
-	char buf[256];
 	UINT ret;
 
 	switch (msg) {
@@ -1276,7 +1250,8 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 
 		case WM_COMMAND:
 			switch (LOWORD(wp)) {
-				case IDOK:
+				case IDOK: {
+					char buf[256];
 					memset(buf, 0, sizeof(buf));
 					ret = GetDlgItemTextA(hDlgWnd, IDC_EDIT_COMMENT, buf, sizeof(buf) - 1);
 					if (ret > 0) { // テキスト取得成功
@@ -1285,6 +1260,7 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 					}
 					TTEndDialog(hDlgWnd, IDOK);
 					break;
+				}
 				default:
 					return FALSE;
 			}
@@ -1339,16 +1315,20 @@ BOOL FLogOpen(const wchar_t *fname)
 	}
 	LogVar = fv;
 	memset(fv, 0, sizeof(TFileVar));
-
-	fv->FileOpen = FALSE;
+	fv->FileHandle = INVALID_HANDLE_VALUE;
+	fv->LogThread = INVALID_HANDLE_VALUE;
+	fv->eLineEnd = Line_LineHead;
 
 	ret = LogStart(fname);
+	if (ret == FALSE) {
+		FileTransEnd_();
+	}
+
 	return ret;
 }
 
 BOOL FLogIsOpend(void)
 {
-	// LogVar->FileOpen
 	return LogVar != NULL;
 }
 
@@ -1361,8 +1341,7 @@ void FLogWriteStr(const char *str)
 		WriteFile(LogVar->FileHandle, str, len, &wrote, NULL);
 		LogVar->ByteCount =
 			LogVar->ByteCount + len;
-		if (FLogDlg!=NULL)
-			FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
+		LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
 	}
 }
 
@@ -1480,10 +1459,8 @@ void FLogWindow(int nCmdShow)
 	if (LogVar == NULL) {
 		return;
 	}
-	if (FLogDlg == NULL)
-		return;
 
-	HWND HWndLog = FLogDlg->m_hWnd;
+	HWND HWndLog = LogVar->FLogDlg->m_hWnd;
 	ShowWindow(HWndLog, nCmdShow);
 	if (nCmdShow == SW_RESTORE) {
 		// 拡張スタイル WS_EX_NOACTIVATE 状態を解除する
@@ -1496,10 +1473,9 @@ void FLogShowDlg(void)
 	if (LogVar == NULL) {
 		return;
 	}
-	if (FLogDlg != NULL) {
-		FLogDlg->ShowWindow(SW_SHOWNORMAL);
-		SetForegroundWindow(FLogDlg->GetSafeHwnd());
-	}
+	HWND HWndLog = LogVar->FLogDlg->m_hWnd;
+	ShowWindow(HWndLog, SW_SHOWNORMAL);
+	SetForegroundWindow(HWndLog);
 }
 
 /**
