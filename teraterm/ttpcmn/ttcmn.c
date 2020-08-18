@@ -1346,6 +1346,13 @@ int WINAPI CommReadRawByte(PComVar cv, LPBYTE b)
 	}
 }
 
+static void LogBinSkip(PComVar cv, int add)
+{
+	if (cv->LogBinSkip != NULL) {
+		cv->LogBinSkip(add);
+	}
+}
+
 void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 {
 	if ( ! cv->Ready ) {
@@ -1361,31 +1368,13 @@ void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 	cv->InBuff[cv->InPtr] = b;
 	cv->InBuffCount++;
 
-	if (cv->HBinBuf!=0 ) {
-		cv->BinSkip++;
-	}
+	LogBinSkip(cv, 1);
 }
 
-void Log1Bin(PComVar cv, BYTE b)
+static void Log1Bin(PComVar cv, BYTE b)
 {
-	if (((cv->FilePause & OpLog)!=0) || cv->ProtoFlag) {
-		return;
-	}
-	if (cv->BinSkip > 0) {
-		cv->BinSkip--;
-		return;
-	}
-	cv->BinBuf[cv->BinPtr] = b;
-	cv->BinPtr++;
-	if (cv->BinPtr>=InBuffSize) {
-		cv->BinPtr = cv->BinPtr-InBuffSize;
-	}
-	if (cv->BCount>=InBuffSize) {
-		cv->BCount = InBuffSize;
-		cv->BStart = cv->BinPtr;
-	}
-	else {
-		cv->BCount++;
+	if (cv->Log1Bin != NULL) {
+		cv->Log1Bin(b);
 	}
 }
 
@@ -1394,19 +1383,6 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 	int c;
 
 	if ( ! cv->Ready ) {
-		return 0;
-	}
-
-	if ((cv->HLogBuf!=NULL) && (cv->LCount>=InBuffSize-10)) {
-		// 自分のバッファに余裕がない場合は、CPUスケジューリングを他に回し、
-		// CPUがストールするの防ぐ。
-		// (2006.10.13 yutaka)
-		Sleep(1);
-		return 0;
-	}
-
-	if ((cv->HBinBuf!=NULL) &&
-	    (cv->BCount>=InBuffSize-10)) {
 		return 0;
 	}
 
@@ -1430,9 +1406,7 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 			if ( *b != 0xFF ) {
 				cv->TelMode = TRUE;
 				CommInsert1Byte(cv,*b);
-				if ( cv->HBinBuf!=0 ) {
-					cv->BinSkip--;
-				}
+				LogBinSkip(cv, -1);
 				c = 0;
 			}
 		}
@@ -1450,7 +1424,7 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 		}
 	}
 
-	if ( (c==1) && (cv->HBinBuf!=0) ) {
+	if (c == 1) {
 		Log1Bin(cv, *b);
 	}
 

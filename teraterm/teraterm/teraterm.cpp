@@ -190,23 +190,8 @@ static BOOL OnIdle(LONG lCount)
 			}
 		}
 
-		if (cv.LogBuf!=NULL)
-		{
-			if (FileLog) {
-				LogToFile();
-			}
-			GlobalUnlock(cv.HLogBuf);
-			cv.LogBuf = NULL;
-		}
+		FLogWriteFile();
 
-		if (cv.BinBuf!=NULL)
-		{
-			if (BinLog) {
-				LogToFile();
-			}
-			GlobalUnlock(cv.HBinBuf);
-			cv.BinBuf = NULL;
-		}
 		if (DDELog && AdvFlag) {
 			DDEAdv();
 		}
@@ -240,7 +225,7 @@ static BOOL OnIdle(LONG lCount)
 	}
 
 	if (cv.Ready &&
-	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || (cv.LCount>0) || (cv.BCount>0) || (DDEGetCount()>0)) ) {
+	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || FLogGetCount() > 0 || (DDEGetCount()>0)) ) {
 		Busy = 2;
 	}
 	else {

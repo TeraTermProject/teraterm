@@ -102,11 +102,6 @@ typedef struct {
 extern BOOL FileLog, BinLog;
 void logfile_lock_initialize(void);
 void LogPut1(BYTE b);
-void LogToFile(void);
-BOOL CreateLogBuf(void);
-void FreeLogBuf(void);
-BOOL CreateBinBuf(void);
-void FreeBinBuf(void);
 void FLogPause(BOOL Pause);
 void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
@@ -123,6 +118,8 @@ char *FLogGetLogFilename(const char *log_filename);
 BOOL FLogIsPause(void);
 void FLogWindow(int nCmdShow);
 void FLogShowDlg(void);
+int FLogGetCount(void);
+void FLogWriteFile(void);
 
 #ifdef __cplusplus
 }

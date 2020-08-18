@@ -3629,22 +3629,6 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	if (DDELog) {
-		EndDDE();
-	}
-
-	if (FileLog) {
-		if (! CreateLogBuf()) {
-			FileTransEnd(OpLog);
-		}
-	}
-
-	if (BinLog) {
-		if (! CreateBinBuf()) {
-			FileTransEnd(OpLog);
-		}
-	}
-
 	SetDdeComReady(1);
 
 	return 0;

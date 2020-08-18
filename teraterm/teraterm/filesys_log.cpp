@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, file transfer routines */
+/* TERATERM.EXE, log routines */
 #include <stdio.h>
 #include <io.h>
 #include <process.h>
@@ -55,39 +55,19 @@
 #include "filesys.h"
 
 typedef struct {
-  HWND HMainWin;
-  HWND HWin;
-  WORD OpId;
-  char DlgCaption[40];
-
   char FullName[MAX_PATH];
   int DirLen;
-
-  int NumFname, FNCount;
-  HANDLE FnStrMemHandle;
-  PCHAR FnStrMem;
-  int FnPtr;
 
   BOOL FileOpen;
   HANDLE FileHandle;
   LONG FileSize, ByteCount;
   BOOL OverWrite;
 
-  BOOL LogFlag;
-  HANDLE LogFile;
-  WORD LogState;
-  WORD LogCount;
-
   BOOL Success;
   BOOL NoMsg;
 
   char LogDefaultPath[MAX_PATH];
   BOOL HideDialog;
-
-  BYTE LogLineBuf[16];
-  int FlushLogLineBuf;
-
-  int ProgStat;
 
   DWORD StartTime;
 
@@ -98,8 +78,6 @@ typedef struct {
 
   HANDLE LogThread;
   DWORD LogThreadId;
-
-  DWORD FileMtime;
   HANDLE LogThreadEvent;
 } TFileVar_;
 typedef TFileVar_ *PFileVar_;
@@ -128,9 +106,11 @@ static enum enumLineEnd eLineEnd = Line_LineHead;
 // 遅延書き込み用スレッドのメッセージ
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
 
-static void CloseFileSync(PFileVar ptr);
-static void FileTransEnd_(WORD OpId);
-
+static void FileTransEnd_(void);
+static void Log1Bin(BYTE b);
+static void LogBinSkip(int add);
+static BOOL CreateLogBuf(void);
+static BOOL CreateBinBuf(void);
 
 static PFileTransDlg FLogDlg = NULL;
 
@@ -141,97 +121,36 @@ static BOOL OpenFTDlg_(PFileVar fv)
 	FTDlg = new CFileTransDlg();
 
 	fv->StartTime = 0;
-	fv->ProgStat = 0;
-	cv.FilePause &= ~fv->OpId;
+	cv.FilePause &= ~OpLog;
 
-	if (fv->OpId != OpLog) {
-		fv->HideDialog = ts.FTHideDialog;
-	}
+	if (ts.LogHideDialog)
+		fv->HideDialog = TRUE;
 
 	if (FTDlg!=NULL)
 	{
+		char DlgCaption[40];
+		strncpy_s(DlgCaption, _countof(DlgCaption),"Tera Term: ", _TRUNCATE);
+		char uimsg[MAX_UIMSG];
+		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, ts.UILanguageFile);
+		strncat_s(DlgCaption, _countof(DlgCaption), uimsg, _TRUNCATE);
+
 		CFileTransDlgInfo info;
 		info.UILanguageFile = ts.UILanguageFile;
-		info.OpId = fv->OpId;
-		info.DlgCaption = fv->DlgCaption;
+		info.OpId = OpLog;
+		info.DlgCaption = DlgCaption;
 		info.FileName = &fv->FullName[fv->DirLen];
 		info.FullName = fv->FullName;
 		info.HideDialog = fv->HideDialog;
-		info.HMainWin = fv->HMainWin;
+		info.HMainWin = HVTWin;
 		FTDlg->Create(hInst, &info);
 		FTDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
 	}
 
-//	if (fv->OpId==OpLog)
-		FLogDlg = FTDlg; /* Log */
-#if 0
-	else
-		SendDlg = FTDlg; /* File send */
-#endif
+	FLogDlg = FTDlg; /* Log */
 
 	fv->StartTime = GetTickCount();
 
 	return (FTDlg!=NULL);
-}
-
-static void ShowFTDlg(WORD OpId)
-{
-//	if (OpId == OpLog)
-	{
-		if (FLogDlg != NULL) {
-			FLogDlg->ShowWindow(SW_SHOWNORMAL);
-			SetForegroundWindow(FLogDlg->GetSafeHwnd());
-		}
-	}
-#if 0
-	else {
-		if (SendDlg != NULL) {
-			SendDlg->ShowWindow(SW_SHOWNORMAL);
-			SetForegroundWindow(SendDlg->GetSafeHwnd());
-		}
-	}
-#endif
-}
-
-static BOOL NewFileVar_(PFileVar *fv)
-{
-	if ((*fv)==NULL)
-	{
-		*fv = (PFileVar)malloc(sizeof(TFileVar));
-		if ((*fv)!=NULL)
-		{
-			char FileDirExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			memset(*fv, 0, sizeof(TFileVar));
-			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName), FileDirExpanded, _TRUNCATE);
-			AppendSlash((*fv)->FullName,sizeof((*fv)->FullName));
-			(*fv)->DirLen = strlen((*fv)->FullName);
-			(*fv)->FileOpen = FALSE;
-			(*fv)->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
-			(*fv)->HMainWin = HVTWin;
-			(*fv)->Success = FALSE;
-			(*fv)->NoMsg = FALSE;
-			(*fv)->HideDialog = FALSE;
-		}
-	}
-
-	return ((*fv)!=NULL);
-}
-
-static void FreeFileVar_(PFileVar *fv)
-{
-	if ((*fv)!=NULL)
-	{
-		CloseFileSync(*fv);
-		//if ((*fv)->FileOpen) _lclose((*fv)->FileHandle);
-		if ((*fv)->FnStrMemHandle != 0)
-		{
-			GlobalUnlock((*fv)->FnStrMemHandle);
-			GlobalFree((*fv)->FnStrMemHandle);
-		}
-		free(*fv);
-		*fv = NULL;
-	}
 }
 
 /**
@@ -733,22 +652,14 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	return FALSE;
 }
 
-static BOOL LogStart(void)
+static BOOL LogStart(const char *fname)
 {
 	unsigned tid;
 
-	if ((FileLog) || (BinLog)) return FALSE;
-
-	assert(LogVar != NULL);
-
-	if (strlen(&(LogVar->FullName[LogVar->DirLen]))==0) {
-		// ファイル名が設定されていない
-		return FALSE;
-	}
+	strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), fname, _TRUNCATE);
 
 	if (! LoadTTFILE()) return FALSE;
 
-	LogVar->OpId = OpLog;
 	//(*SetFileVar)(LogVar);
 	{
 		int i;
@@ -757,10 +668,6 @@ static BOOL LogStart(void)
 		GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
 		c = fv->FullName[fv->DirLen];
 		if (c=='\\'||c=='/') fv->DirLen++;
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, ts.UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
 	}
 	FixLogOption();
 
@@ -770,7 +677,7 @@ static BOOL LogStart(void)
 		FileLog = FALSE;
 		if (! CreateBinBuf())
 		{
-			FileTransEnd_(OpLog);
+			FileTransEnd_();
 			return FALSE;
 		}
 	}
@@ -779,14 +686,12 @@ static BOOL LogStart(void)
 		FileLog = TRUE;
 		if (! CreateLogBuf())
 		{
-			FileTransEnd_(OpLog);
+			FileTransEnd_();
 			return FALSE;
 		}
 	}
 	cv.LStart = cv.LogPtr;
 	cv.LCount = 0;
-	if (ts.LogHideDialog)
-		LogVar->HideDialog = 1;
 
 	/* 2007.05.24 Gentaro */
 	eLineEnd = Line_LineHead;
@@ -827,7 +732,7 @@ static BOOL LogStart(void)
 			MessageBox(NULL, msg, "Tera Term: File open error", MB_OK | MB_ICONERROR);
 		}
 
-		FileTransEnd_(OpLog);
+		FileTransEnd_();
 		return FALSE;
 	}
 	LogVar->ByteCount = 0;
@@ -847,7 +752,7 @@ static BOOL LogStart(void)
 	}
 
 	if (! OpenFTDlg_(LogVar)) {
-		FileTransEnd_(OpLog);
+		FileTransEnd_();
 		return FALSE;
 	}
 
@@ -900,9 +805,22 @@ static BOOL LogStart(void)
 		}
 	}
 
+	if (FileLog) {
+		cv.Log1Byte = LogPut1;
+	}
+	if (BinLog) {
+		cv.Log1Bin = Log1Bin;
+		cv.LogBinSkip = LogBinSkip;
+	}
+
 	return TRUE;
 }
 
+/**
+ * ログへ1byte書き込み
+ *		バッファへ書き込まれる
+ *		実際の書き込みは LogToFile() で行われる
+ */
 void LogPut1(BYTE b)
 {
 	cv.LogBuf[cv.LogPtr] = b;
@@ -1065,7 +983,10 @@ static void LogRotate(void)
 
 }
 
-void LogToFile(void)
+/**
+ * バッファ内のログをファイルへ書き込む
+ */
+static void LogToFile(void)
 {
 	PCHAR Buf;
 	int Start, Count;
@@ -1219,7 +1140,7 @@ void LogToFile(void)
 
 }
 
-BOOL CreateLogBuf(void)
+static BOOL CreateLogBuf(void)
 {
 	if (cv.HLogBuf==NULL)
 	{
@@ -1232,7 +1153,7 @@ BOOL CreateLogBuf(void)
 	return (cv.HLogBuf!=NULL);
 }
 
-void FreeLogBuf(void)
+static void FreeLogBuf(void)
 {
 	if ((cv.HLogBuf==NULL) || FileLog)
 		return;
@@ -1246,7 +1167,7 @@ void FreeLogBuf(void)
 	cv.LCount = 0;
 }
 
-BOOL CreateBinBuf(void)
+static BOOL CreateBinBuf(void)
 {
 	if (cv.HBinBuf==NULL)
 	{
@@ -1259,7 +1180,7 @@ BOOL CreateBinBuf(void)
 	return (cv.HBinBuf!=NULL);
 }
 
-void FreeBinBuf(void)
+static void FreeBinBuf(void)
 {
 	if ((cv.HBinBuf==NULL) || BinLog)
 		return;
@@ -1273,42 +1194,27 @@ void FreeBinBuf(void)
 	cv.BCount = 0;
 }
 
-static void FileTransEnd_(WORD OpId)
-/* OpId = 0: close Log and FileSend
-      OpLog: close Log
- OpSendFile: close FileSend */
+static void FileTransEnd_(void)
 {
-	if (((OpId==0) || (OpId==OpLog)) && (FileLog || BinLog))
+	FileLog = FALSE;
+	BinLog = FALSE;
+	cv.Log1Byte = NULL;
+	cv.Log1Bin = NULL;
+	cv.LogBinSkip = NULL;
+	if (FLogDlg!=NULL)
 	{
-		FileLog = FALSE;
-		BinLog = FALSE;
-		if (FLogDlg!=NULL)
-		{
-			FLogDlg->DestroyWindow();
-			FLogDlg = NULL;
-		}
-		FreeFileVar_(&LogVar);
-		FreeLogBuf();
-		FreeBinBuf();
-		FreeTTFILE();
+		FLogDlg->DestroyWindow();
+		FLogDlg = NULL;
 	}
-
-#if 0
-	if (((OpId==0) || (OpId==OpSendFile)) && FSend)
+	if (LogVar != NULL)
 	{
-		FSend = FALSE;
-		TalkStatus = IdTalkKeyb;
-		if (SendDlg!=NULL)
-		{
-			SendDlg->DestroyWindow();
-			SendDlg = NULL;
-		}
-		FreeFileVar_(&SendVar);
-		FreeTTFILE();
+		CloseFileSync(LogVar);
+		free(LogVar);
+		LogVar = NULL;
 	}
-#endif
-
-//	EndDdeCmnd(0);
+	FreeLogBuf();
+	FreeBinBuf();
+	FreeTTFILE();
 }
 
 
@@ -1413,10 +1319,21 @@ void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 
 void FLogClose(void)
 {
-	if (LogVar != NULL)
-		FileTransEnd_(OpLog);
+	if (LogVar == NULL) {
+		return;
+	}
+
+	FileTransEnd_();
 }
 
+/**
+ *	ログをオープンする
+ *	@param[in]	fname	ログファイル名, CreateFile()に渡される
+ *
+ *	ログファイル名はstrftimeの展開などは行われない。
+ *	FLogGetLogFilename() や FLogOpenDialog() で
+ *	ファイル名を取得できる。
+ */
 BOOL FLogOpen(const char *fname)
 {
 	BOOL ret;
@@ -1424,11 +1341,26 @@ BOOL FLogOpen(const char *fname)
 	if (LogVar != NULL) {
 		return FALSE;
 	}
+	if ((FileLog) || (BinLog)) return FALSE;
+
+	//
+	PFileVar fv = (PFileVar)malloc(sizeof(TFileVar));
+	if (fv == NULL) {
+		return FALSE;
+	}
+	LogVar = fv;
+	memset(fv, 0, sizeof(TFileVar));
+
+	fv->FileOpen = FALSE;
+	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
+	fv->Success = FALSE;
+	fv->NoMsg = FALSE;
+	fv->HideDialog = FALSE;
 
 	LogVar->DirLen = 0;
 	LogVar->NoMsg = TRUE;
-	strncpy_s(LogVar->FullName, sizeof(LogVar->FullName), fname, _TRUNCATE);
-	ret = LogStart();
+
+	ret = LogStart(fname);
 	return ret;
 }
 
@@ -1574,5 +1506,81 @@ void FLogWindow(int nCmdShow)
 
 void FLogShowDlg(void)
 {
-	ShowFTDlg(OpLog);
+	if (FLogDlg != NULL) {
+		FLogDlg->ShowWindow(SW_SHOWNORMAL);
+		SetForegroundWindow(FLogDlg->GetSafeHwnd());
+	}
+}
+
+/**
+ * ログへ1byte書き込み
+ *		LogPut1() と違う?
+ */
+//void Log1Bin(PComVar cv, BYTE b)
+static void Log1Bin(BYTE b)
+{
+	if (((cv.FilePause & OpLog)!=0) || cv.ProtoFlag) {
+		return;
+	}
+	if (cv.BinSkip > 0) {
+		cv.BinSkip--;
+		return;
+	}
+	cv.BinBuf[cv.BinPtr] = b;
+	cv.BinPtr++;
+	if (cv.BinPtr>=InBuffSize) {
+		cv.BinPtr = cv.BinPtr-InBuffSize;
+	}
+	if (cv.BCount>=InBuffSize) {
+		cv.BCount = InBuffSize;
+		cv.BStart = cv.BinPtr;
+	}
+	else {
+		cv.BCount++;
+	}
+}
+
+static void LogBinSkip(int add)
+{
+	if (cv.HBinBuf!=0 ) {
+		cv.BinSkip += add;
+	}
+}
+
+/**
+ *	ログバッファに溜まっているデータのバイト数を返す
+ */
+int FLogGetCount(void)
+{
+	if (FileLog) {
+		return cv.LCount;
+	}
+	if (BinLog) {
+		return cv.BCount;
+	}
+	return 0;
+}
+
+/**
+ * バッファ内のログをファイルへ書き込む
+ */
+void FLogWriteFile(void)
+{
+	if (cv.LogBuf!=NULL)
+	{
+		if (FileLog) {
+			LogToFile();
+		}
+		GlobalUnlock(cv.HLogBuf);
+		cv.LogBuf = NULL;
+	}
+
+	if (cv.BinBuf!=NULL)
+	{
+		if (BinLog) {
+			LogToFile();
+		}
+		GlobalUnlock(cv.HBinBuf);
+		cv.BinBuf = NULL;
+	}
 }

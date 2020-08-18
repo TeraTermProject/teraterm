@@ -6496,6 +6496,14 @@ int VTParse()
 		return 0;
 	}
 
+	if (FLogGetCount() >= InBuffSize - 10) {
+		// 自分のバッファに余裕がない場合は、CPUスケジューリングを他に回し、
+		// CPUがストールするの防ぐ。
+		// (2006.10.13 yutaka)
+		Sleep(1);
+		return 0;
+	}
+
 	c = CommRead1Byte(&cv,&b);
 
 	if (c==0) return 0;
