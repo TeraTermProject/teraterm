@@ -73,6 +73,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git/svn")
   # git-svn
   find_package(Git)
   if(Git_FOUND)
+    message("git=${GIT_EXECUTABLE}")
     execute_process(
       COMMAND ${GIT_EXECUTABLE} svn log --oneline -1
       RESULT_VARIABLE rv

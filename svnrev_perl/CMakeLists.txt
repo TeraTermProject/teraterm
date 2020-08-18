@@ -9,7 +9,7 @@ add_custom_target(
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/../teraterm/ttpdlg/svnversion.h
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/../teraterm/ttpdlg/
-  COMMAND ${PERL} svnrev.pl --svn ${Subversion_SVN_EXECUTABLE} --git ${GIT_EXECUTABLE} --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_CURRENT_BINARY_DIR}/../teraterm/ttpdlg/svnversion.h
+  COMMAND ${PERL} svnrev.pl --svn \"${Subversion_SVN_EXECUTABLE}\" --git \"${GIT_EXECUTABLE}\" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_CURRENT_BINARY_DIR}/../teraterm/ttpdlg/svnversion.h
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 

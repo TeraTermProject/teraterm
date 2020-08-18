@@ -52,10 +52,10 @@ if (-d "$source_root/.svn") {
 	}
 }
 elsif(-d "$source_root/.git") {
-	my $branch = `$git rev-parse --abbrev-ref HEAD`;
+	my $branch = `\"$git\" rev-parse --abbrev-ref HEAD`;
 	if ($branch eq '') {
 		# git が実行できない
-		print "'$git' can not execute\n";
+		print "\"$git\" can not execute\n";
 	}
 	else {
 		$branch =~ s/[\r\n]$//g;
@@ -64,7 +64,7 @@ elsif(-d "$source_root/.git") {
 
 		if (-d "$source_root/.git/svn") {
 			# use git svn log
-			my $revision = `$git svn log --oneline -1 2>&1`;
+			my $revision = `\"$git\" svn log --oneline -1`;
 			$revision =~ s/^r(\d+).*$/$1/;
 			$svninfo{'Revision'} = $1;
 		}
