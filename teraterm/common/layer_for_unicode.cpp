@@ -677,12 +677,25 @@ BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 							   lpStartupInfo,  lpProcessInformation);
 	}
 
-	// Žæ‚è‡‚¦‚¸Attl.cpp‚ÅŽg‚Á‚Ä‚¢‚é•ª‚¾‚¯
-	STARTUPINFOA suiA;
-	memset(&suiA, 0, sizeof(suiA));
-	suiA.cb = lpStartupInfo->cb;
+	STARTUPINFOA suiA = {};
+	suiA.cb = sizeof(suiA);
+	suiA.lpReserved = NULL;
+	suiA.lpDesktop = ToCharW(lpStartupInfo->lpDesktop);
+	suiA.lpTitle = ToCharW(lpStartupInfo->lpTitle);
+	suiA.dwX = lpStartupInfo->dwX;
+	suiA.dwY = lpStartupInfo->dwY;
+	suiA.dwXSize = lpStartupInfo->dwXSize;
+	suiA.dwYSize = lpStartupInfo->dwYSize;
+	suiA.dwXCountChars = lpStartupInfo->dwXCountChars;
+	suiA.dwYCountChars = lpStartupInfo->dwYCountChars;
+	suiA.dwFillAttribute = lpStartupInfo->dwFillAttribute;
+	suiA.dwFlags = lpStartupInfo->dwFlags;
 	suiA.wShowWindow = lpStartupInfo->wShowWindow;
-	suiA.dwFlags = suiA.dwFlags;
+	suiA.cbReserved2 = lpStartupInfo->cbReserved2;
+	suiA.lpReserved2 = lpStartupInfo->lpReserved2;
+	suiA.hStdInput = lpStartupInfo->hStdInput;
+	suiA.hStdOutput = lpStartupInfo->hStdOutput;
+	suiA.hStdError = lpStartupInfo->hStdError;
 
 	char *appA = ToCharW(lpApplicationName);
 	char *cmdA = ToCharW(lpCommandLine);
@@ -693,6 +706,8 @@ BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 	free(appA);
 	free(cmdA);
 	free(curA);
+	free(suiA.lpDesktop);
+	free(suiA.lpTitle);
 
 	return r;
 }
