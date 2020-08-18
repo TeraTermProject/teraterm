@@ -4634,7 +4634,7 @@ void CVTWindow::OnSetupFont()
 	BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 }
 
-static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if (Message == WM_INITDIALOG) {
 		wchar_t uimsg[MAX_UIMSG];
@@ -4676,7 +4676,7 @@ void CVTWindow::OnSetupDlgFont()
 	if (IsWindows7OrLater() && ts.ListHiddenFonts) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
-	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
+	cf.lpfnHook = TFontHook;
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = m_hInst;
 	HelpId = HlpSetupFont;
