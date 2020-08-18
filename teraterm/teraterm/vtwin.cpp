@@ -4142,6 +4142,12 @@ void CVTWindow::OnFileLog()
 				if (info.bom) {
 					FLogOutputBOM();
 				}
+				// 現在バッファにあるデータをすべて書き出してから、
+				// ログ採取を開始する。
+				// (2013.9.29 yutaka)
+				if (ts.LogAllBuffIncludedInFirst) {
+					FLogOutputAllBuffer();
+				}
 			}
 		}
 		else {

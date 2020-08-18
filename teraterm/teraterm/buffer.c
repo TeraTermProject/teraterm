@@ -1704,7 +1704,7 @@ static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, 
 		if (too_samll != NULL) {
 			*too_samll = TRUE;
 		}
-		return 0;
+		return len;
 	}
 	if (too_samll != NULL) {
 		*too_samll = FALSE;
@@ -5256,6 +5256,53 @@ int BuffGetAnyLineData(int offset_y, char *buf, int bufsize)
 	return (copysize);
 }
 
+/**
+ * 全バッファから指定した行を返す。
+ * filesys_log.cpp で使用される
+ *
+ * @param[in]	offset_y	取得する行(0...)
+ * @param[in]	bufsize		文字数
+ * @return		文字数
+ *				-1	最終行以降を指定
+ */
+int BuffGetAnyLineDataW(int offset_y, wchar_t *buf, size_t bufsize)
+{
+	LONG Ptr;
+	size_t copysize;
+	size_t i;
+	size_t idx;
+	size_t left;
+	buff_char_t *b;
+
+	if (offset_y >= BuffEnd)
+		return -1;
+
+	memset(buf, 0, bufsize * sizeof(wchar_t));
+	copysize = min(NumOfColumns, bufsize - 1);
+	Ptr = GetLinePtr(offset_y);
+	b = &CodeBuffW[Ptr];
+	idx = 0;
+	left = copysize;
+	for (i = 0; i<copysize; i++) {
+		BOOL too_small;
+		size_t len;
+		if (IsBuffPadding(b)) {
+			continue;
+		}
+		len = expand_wchar(b, &buf[idx], left, &too_small);
+		if (too_small) {
+			break;
+		}
+		idx += len;
+		left -= len;
+		b++;
+		if (idx >= bufsize - 1) {
+			break;
+		}
+	}
+
+	return (int)idx;
+}
 
 BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 {

@@ -67,6 +67,7 @@ void FLogPutUTF32(unsigned int u32);
 void FLogSetCode(int code);
 void FLogOutputBOM(void);
 //void LogPut1(BYTE b);
+void FLogOutputAllBuffer(void);
 
 #ifdef __cplusplus
 }

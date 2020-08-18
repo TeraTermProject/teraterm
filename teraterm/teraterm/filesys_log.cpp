@@ -122,6 +122,7 @@ static BOOL CreateLogBuf(void);
 static BOOL CreateBinBuf(void);
 void LogPut1(BYTE b);
 static void OutputStr(const wchar_t *str);
+static void LogToFile(void);
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
@@ -760,38 +761,6 @@ static BOOL LogStart(const wchar_t *fname)
 		StartThread(LogVar);
 	}
 
-	// 現在バッファにあるデータをすべて書き出してから、
-	// ログ採取を開始する。
-	// (2013.9.29 yutaka)
-	if (ts.LogAllBuffIncludedInFirst) {
-		DWORD ofs, size, written_size;
-		char buf[512];
-		const char *crlf = "\r\n";
-		DWORD crlf_len = 2;
-		for (ofs = 0 ;  ; ofs++ ) {
-			// 1つの行を取得する。文字だけなので、エスケープシーケンスは含まれない。
-			size = BuffGetAnyLineData(ofs, buf, sizeof(buf));
-			if (size == -1)
-				break;
-
-#if 0
-			if (ts.DeferredLogWriteMode) { // 遅延書き込み
-				char *pbuf = (char *)malloc(size + 2);
-				memcpy(pbuf, buf, size);
-				pbuf[size] = '\r';
-				pbuf[size+1] = '\n';
-				Sleep(1);  // スレッドキューが作られるように、コンテキストスイッチを促す。
-				PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)pbuf, size + 2);
-			} else { // 直書き。ネットワーク経由だと遅い。
-#endif
-				WriteFile(LogVar->FileHandle, buf, size, &written_size, NULL);
-				WriteFile(LogVar->FileHandle, crlf, crlf_len, &written_size, NULL);
-#if 0
-			}
-#endif
-		}
-	}
-
 	if (FileLog) {
 		cv.Log1Byte = LogPut1;
 	}
@@ -801,6 +770,30 @@ static BOOL LogStart(const wchar_t *fname)
 	}
 
 	return TRUE;
+}
+
+/**
+ * 現在バッファにあるデータをすべてログに書き出す
+ * (2013.9.29 yutaka)
+ *
+ *	TODO
+ *		1行の長さ
+ */
+void FLogOutputAllBuffer(void)
+{
+	DWORD ofs, written_size;
+	int size;
+	wchar_t buf[512];
+	for (ofs = 0 ;  ; ofs++ ) {
+		// 1つの行を取得する。文字だけなので、エスケープシーケンスは含まれない。
+		size = BuffGetAnyLineDataW(ofs, buf, _countof(buf));
+		if (size == -1)
+			break;
+
+		OutputStr(buf);
+		OutputStr(L"\r\n");
+		LogToFile();
+	}
 }
 
 /**
@@ -1604,13 +1597,13 @@ void FLogOutputBOM(void)
 		break;
 	case 1:
 		// UTF-16LE
-		LogPut1(0xfe);
 		LogPut1(0xff);
+		LogPut1(0xfe);
 		break;
 	case 2:
 		// UTF-16BE
-		LogPut1(0xff);
 		LogPut1(0xfe);
+		LogPut1(0xff);
 		break;
 	default:
 		break;
