@@ -680,17 +680,7 @@ static BOOL LogStart(const wchar_t *fname)
 	PFileVar fv = LogVar;
 
 	fv->FullName = _wcsdup(fname);
-
-	wchar_t *p = wcsrchr(fv->FullName, L'\\');
-	if (p == NULL) {
-		p = wcsrchr(fv->FullName, L'/');
-	}
-	if (p == NULL) {
-		fv->FileName = _wcsdup(fv->FullName);
-	}
-	else {
-		fv->FileName = _wcsdup(p + 1);
-	}
+	fv->FileName = NULL;
 	FixLogOption();
 
 	if (ts.LogBinary > 0)

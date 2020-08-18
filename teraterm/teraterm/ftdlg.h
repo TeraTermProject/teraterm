@@ -38,8 +38,8 @@ typedef struct {
 	const char *UILanguageFile;
 	WORD OpId;
 	wchar_t *DlgCaption;
-	wchar_t *FileName;
 	wchar_t *FullName;
+	wchar_t *FileName;		// NULLのとき、FullNameからファイル名を作成する
 	BOOL HideDialog;
 	HWND HMainWin;
 } CFileTransDlgInfo;

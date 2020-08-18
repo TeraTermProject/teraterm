@@ -75,8 +75,23 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
 	UILanguageFile = info->UILanguageFile;
 	OpId = info->OpId;
 	DlgCaption = _wcsdup(info->DlgCaption);
-	FileName = _wcsdup(info->FileName);
 	FullName = _wcsdup(info->FullName);
+	if (info->FileName != NULL) {
+		FileName = _wcsdup(info->FileName);
+	}
+	else {
+		const wchar_t *fullname = info->FullName;
+		const wchar_t *p = wcsrchr(fullname, L'\\');
+		if (p == NULL) {
+			p = wcsrchr(fullname, L'/');
+		}
+		if (p == NULL) {
+			FileName = _wcsdup(fullname);
+		}
+		else {
+			FileName = _wcsdup(p + 1);
+		}
+	}
 	HideDialog = info->HideDialog;
 	HMainWin = info->HMainWin;
 
