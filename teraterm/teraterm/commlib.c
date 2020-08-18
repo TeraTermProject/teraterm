@@ -48,6 +48,7 @@
 #include <time.h>
 #include <locale.h>
 
+#include "filesys_log.h"
 #include "ttlib.h"
 #include "codeconv.h"
 
@@ -133,19 +134,6 @@ void CommInit(PComVar cv)
 	cv->Ready = FALSE;
 
 // log-buffer variables
-	cv->HLogBuf = 0;
-	cv->HBinBuf = 0;
-	cv->LogBuf = NULL;
-	cv->BinBuf = NULL;
-	cv->LogPtr = 0;
-	cv->LStart = 0;
-	cv->LCount = 0;
-	cv->BinPtr = 0;
-	cv->BStart = 0;
-	cv->BCount = 0;
-//	cv->DStart = 0;
-//	cv->DCount = 0;
-	cv->BinSkip = 0;
 	cv->FilePause = 0;
 	cv->ProtoFlag = FALSE;
 /* message flag */
@@ -837,11 +825,7 @@ BOOL CommCanClose(PComVar cv)
 	if (cv->InBuffCount>0) {
 		return FALSE;
 	}
-	if ((cv->HLogBuf!=NULL) && (cv->LCount>0)) {
-		return FALSE;
-	}
-	if ((cv->HBinBuf!=NULL) &&
-	    (cv->BCount>0)) {
+	if (FLogIsOpend() && FLogGetCount() > 0) {
 		return FALSE;
 	}
 	if (DDELog && DDEGetCount() > 0) {

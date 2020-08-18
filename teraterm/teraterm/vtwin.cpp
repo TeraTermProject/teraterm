@@ -4159,6 +4159,15 @@ void CVTWindow::OnFileLog()
 
 void CVTWindow::OnCommentToLog()
 {
+	if (!FLogIsOpendText()) {
+		// ‘I‘ð‚Å‚«‚È‚¢‚Ì‚ÅŒÄ‚Î‚ê‚È‚¢‚Í‚¸
+		char uimsg[MAX_UIMSG];
+		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
+		get_lang_msg("MSG_COMMENT_LOG_OPEN_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
+		             "It is not opened by the log file yet.", ts.UILanguageFile);
+		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK|MB_ICONEXCLAMATION);
+		return;
+	}
 	FLogAddCommentDlg(m_hInst, HVTWin);
 }
 

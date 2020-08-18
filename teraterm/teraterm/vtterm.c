@@ -216,7 +216,7 @@ static DWORD BeepOverUsedCount = 0;
 static _locale_t CLocale = NULL;
 
 typedef struct {
-	CheckEOLData_t *eol;
+	CheckEOLData_t *check_eol;
 	int log_cr_type;
 } vtterm_work_t;
 
@@ -362,7 +362,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	{
 		vtterm_work_t *vtterm = &vtterm_work;
-		vtterm->eol = CheckEOLCreate();
+		vtterm->check_eol = CheckEOLCreate();
 		vtterm->log_cr_type = 0;
 	}
 }
@@ -495,15 +495,17 @@ static void OutputLogNewLine(vtterm_work_t *vtterm)
  */
 static void OutputLogUTF32(unsigned int u32)
 {
-	if (!FLogIsOpend() && !DDELog) {
+	vtterm_work_t *vtterm;
+	CheckEOLRet r;
+
+	if (!FLogIsOpendText() && !DDELog) {
 		return;
 	}
-	vtterm_work_t *vtterm = &vtterm_work;
-
-	CheckEOLRet r = CheckEOLCheck(vtterm->eol, u32);
+	vtterm = &vtterm_work;
+	r = CheckEOLCheck(vtterm->check_eol, u32);
 	if ((r & CheckEOLOutputEOL) != 0) {
 		// ログ、改行を出力
-		if (FLogIsOpend()) {
+		if (FLogIsOpendText()) {
 			OutputLogNewLine(vtterm);
 		}
 
@@ -515,7 +517,7 @@ static void OutputLogUTF32(unsigned int u32)
 	}
 	if ((r & CheckEOLOutputChar) != 0) {
 		// ログ、u32を出力
-		if (FLogIsOpend()) {
+		if (FLogIsOpendText()) {
 			FLogPutUTF32(u32);
 		}
 
@@ -539,7 +541,7 @@ static void OutputLogByte(BYTE b)
  */
 static BOOL NeedsOutputBufs(void)
 {
-	return cv.HLogBuf != 0 || DDELog;
+	return FLogIsOpendText() || DDELog;
 }
 
 void MoveToStatusLine()
@@ -6350,18 +6352,22 @@ static void ParseFirst(BYTE b)
 		PutChar(b);
 }
 
-int VTParse()
+/**
+ *	1byteよみだし
+ *	ただし次の場合、読み出しを行わない
+ *		- macro送信バッファに余裕がない
+ *		- ログバッファに余裕がない
+ *
+ */
+static int CommRead1Byte_(PComVar cv, LPBYTE b)
 {
-	BYTE b;
-	int c;
-
 	if (DDELog && DDEGetCount() >= InBuffSize - 10) {
 		/* バッファに余裕がない場合 */
 		Sleep(1);
 		return 0;
 	}
 
-	if (FLogGetCount() >= InBuffSize - 10) {
+	if (FLogIsOpend() && FLogGetFreeCount() < 10) {
 		// 自分のバッファに余裕がない場合は、CPUスケジューリングを他に回し、
 		// CPUがストールするの防ぐ。
 		// (2006.10.13 yutaka)
@@ -6369,7 +6375,15 @@ int VTParse()
 		return 0;
 	}
 
-	c = CommRead1Byte(&cv,&b);
+	return CommRead1Byte(cv, b);
+}
+
+int VTParse()
+{
+	BYTE b;
+	int c;
+
+	c = CommRead1Byte_(&cv,&b);
 
 	if (c==0) return 0;
 
@@ -6443,7 +6457,7 @@ int VTParse()
 		}
 
 		if (ChangeEmu==0)
-			c = CommRead1Byte(&cv,&b);
+			c = CommRead1Byte_(&cv,&b);
 	}
 
 	BuffUpdateScroll();

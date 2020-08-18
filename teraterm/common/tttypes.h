@@ -1072,15 +1072,15 @@ typedef struct {
 	BOOL TelAutoDetect; /* TTPLUG */
 
 	/* Text log */
-	HANDLE HLogBuf;
-	PCHAR LogBuf;
-	int LogPtr, LStart, LCount;
+	HANDLE reserve_2;		// HLogBuf;
+	PCHAR reserve_4;		// LogBuf;
+	int reserve_5[3];		// LogPtr, LStart, LCount;
 	/* Binary log */
-	HANDLE HBinBuf;
-	PCHAR BinBuf;
-	int BinPtr, BStart, BCount;
-	int reserve_0[2];		// DStart, DCount;
-	int BinSkip;
+	HANDLE reserve_3;		// HBinBuf;
+	PCHAR reserve_6;		// BinBuf;
+	int reserve_7[3];		// BinPtr, BStart, BCount;
+	int reserve_1[2];		// DStart, DCount;
+	int reserve_8;			// BinSkip;
 	WORD FilePause;
 	BOOL ProtoFlag;
 	/* message flag */

@@ -132,12 +132,6 @@ static BOOL OnIdle(LONG lCount)
 		CommSend(&cv);
 
 		/* Parser */
-		if ((cv.HLogBuf!=NULL) && (cv.LogBuf==NULL))
-			cv.LogBuf = (PCHAR)GlobalLock(cv.HLogBuf);
-
-		if ((cv.HBinBuf!=NULL) && (cv.BinBuf==NULL))
-			cv.BinBuf = (PCHAR)GlobalLock(cv.HBinBuf);
-
 		if ((TelStatus==TelIdle) && cv.TelMode)
 			TelStatus = TelIAC;
 
