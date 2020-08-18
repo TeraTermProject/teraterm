@@ -83,12 +83,12 @@ echo Unknown Visual Studio version
 exit /b
 
 :vs2005
-set TERATERMSLN=..\teraterm\ttermpro.sln
-set TTSSHSLN=..\ttssh2\ttssh.sln
-set TTPROXYSLN=..\TTProxy\TTProxy.sln
-set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.sln
-set TTPMENUSLN=..\ttpmenu\ttpmenu.sln
-set TTXSAMPLESLN=..\TTXSamples\TTXSamples.sln
+set TERATERMSLN=..\teraterm\ttermpro.v8.sln
+set TTSSHSLN=..\ttssh2\ttssh.v8.sln
+set TTPROXYSLN=..\TTProxy\TTProxy.v8.sln
+set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v8.sln
+set TTPMENUSLN=..\ttpmenu\ttpmenu.v8.sln
+set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v8.sln
 goto vsend
 
 :vs2008

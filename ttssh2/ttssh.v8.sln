@@ -1,18 +1,18 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matcher", "matcher\matcher.vcproj", "{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matcher", "matcher\matcher.v8.vcproj", "{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttssh", "ttssh\ttssh.vcproj", "{3D8EF809-7131-4AB2-B442-032A8F49DE33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttssh", "ttssh\ttssh.v8.vcproj", "{3D8EF809-7131-4AB2-B442-032A8F49DE33}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttxssh", "ttxssh\ttxssh.vcproj", "{5638BB89-44E3-4D55-BA98-A01142B4223E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttxssh", "ttxssh\ttxssh.v8.vcproj", "{5638BB89-44E3-4D55-BA98-A01142B4223E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{61EB955F-2794-4607-860F-0AA296FA58BD} = {61EB955F-2794-4607-860F-0AA296FA58BD}
 		{98CA1284-8F6C-4791-BF57-7E5FAD33744E} = {98CA1284-8F6C-4791-BF57-7E5FAD33744E}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "putty", "putty\putty.vcproj", "{98CA1284-8F6C-4791-BF57-7E5FAD33744E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "putty", "putty\putty.v8.vcproj", "{98CA1284-8F6C-4791-BF57-7E5FAD33744E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "puttyrev", "puttyrev\puttyrev.vcproj", "{61EB955F-2794-4607-860F-0AA296FA58BD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "puttyrev", "puttyrev\puttyrev.v8.vcproj", "{61EB955F-2794-4607-860F-0AA296FA58BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
