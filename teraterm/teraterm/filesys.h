@@ -27,6 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 /* TERATERM.EXE, file transfer routines */
 #ifdef __cplusplus
 extern "C" {
@@ -92,35 +94,8 @@ void QVStart(int mode);
 
 extern PFileVar SendVar, FileVar;
 
-// log
-typedef struct {
-	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
-	BOOL append;			// TRUE/FALSE = append/new(overwrite)
-	BOOL bom;				// TRUE = BOMあり
-	int code;				// 0/1/2 = UTF-8/UTF-16LE/UTF-16BE
-} FLogDlgInfo_t;
-extern BOOL FileLog, BinLog;
-void logfile_lock_initialize(void);
-void LogPut1(BYTE b);
-void FLogPause(BOOL Pause);
-void FLogRotateSize(size_t size);
-void FLogRotateRotate(int step);
-void FLogRotateHalt(void);
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
-void FLogClose(void);
-BOOL FLogOpen(const wchar_t *fname);
-BOOL FLogIsOpend(void);
-void FLogWriteStr(const char *str);
-void FLogInfo(char *param_ptr, size_t param_len);
-const wchar_t *FLogGetFilename(void);
-BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
-wchar_t *FLogGetLogFilename(const wchar_t *log_filename);
-BOOL FLogIsPause(void);
-void FLogWindow(int nCmdShow);
-void FLogShowDlg(void);
-int FLogGetCount(void);
-void FLogWriteFile(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "filesys_log.h"

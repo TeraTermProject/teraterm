@@ -266,7 +266,12 @@ BOOL CFileTransDlg::OnInitDialog()
 
 BOOL CFileTransDlg::OnCancel( )
 {
-	FileTransEnd(OpId);
+	if (OpId == OpLog) {
+		FLogClose();
+	}
+	else {
+		FileTransEnd(OpId);
+	}
 	return TRUE;
 }
 
@@ -275,7 +280,12 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam)) {
 		case IDC_TRANSPAUSESTART:
 			ChangeButton(! Pause);
-			FileTransPause(OpId, Pause);
+			if (OpId == OpLog) {
+				FLogPause(Pause);
+			}
+			else {
+				FileTransPause(OpId, Pause);
+			}
 			return TRUE;
 		case IDC_TRANSHELP:
 			if (OpId == OpLog) {

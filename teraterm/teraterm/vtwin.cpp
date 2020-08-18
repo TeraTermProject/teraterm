@@ -1740,6 +1740,7 @@ void CVTWindow::OnClose()
 		}
 	}
 
+	FLogClose();
 	FileTransEnd(0);
 	ProtoEnd();
 
@@ -4212,7 +4213,7 @@ void CVTWindow::OnPauseLog()
 // ƒƒOæ“¾‚ğI—¹‚·‚é
 void CVTWindow::OnStopLog()
 {
-	FileTransEnd(OpLog);
+	FLogClose();
 }
 
 // ƒƒO‚ÌÄ¶ (2006.12.13 yutaka)

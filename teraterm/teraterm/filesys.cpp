@@ -381,9 +381,10 @@ void FileTransEnd(WORD OpId)
       OpLog: close Log
  OpSendFile: close FileSend */
 {
-	if (((OpId==0) || (OpId==OpLog)) && (FileLog || BinLog))
-	{
-		FLogClose();
+	if ((OpId==0) || (OpId==OpLog)) {
+		if (FLogIsOpend()) {
+			FLogClose();
+		}
 	}
 
 	if (((OpId==0) || (OpId==OpSendFile)) && FSend)

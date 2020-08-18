@@ -28,7 +28,11 @@
 
 /* TERATERM.EXE, log routines */
 #include <stdio.h>
-#include <io.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
+#include <crtdbg.h>
 #include <process.h>
 #include <windows.h>
 #include <htmlhelp.h>
@@ -53,7 +57,7 @@
 #include "asprintf.h"
 
 #include "filesys_log_res.h"
-#include "filesys.h"
+#include "filesys_log.h"
 
 typedef struct {
   wchar_t *FullName;
@@ -62,7 +66,6 @@ typedef struct {
   BOOL FileOpen;
   HANDLE FileHandle;
   LONG FileSize, ByteCount;
-  BOOL OverWrite;
 
   DWORD StartTime;
 
@@ -74,6 +77,8 @@ typedef struct {
   HANDLE LogThread;
   DWORD LogThreadId;
   HANDLE LogThreadEvent;
+
+  BOOL IsPause;
 } TFileVar_;
 typedef TFileVar_ *PFileVar_;
 
@@ -82,8 +87,8 @@ typedef TFileVar_ *PFileVar_;
 
 static PFileVar LogVar = NULL;
 
-BOOL FileLog = FALSE;
-BOOL BinLog = FALSE;
+static BOOL FileLog = FALSE;
+static BOOL BinLog = FALSE;
 
 /*
    Line Head flag for timestamping
@@ -644,8 +649,6 @@ static BOOL LogStart(const wchar_t *fname)
 
 	LogVar->FullName = _wcsdup(fname);
 
-	if (! LoadTTFILE()) return FALSE;
-
 	PFileVar fv = LogVar;
 	wchar_t *p = wcsrchr(fv->FullName, L'\\');
 	if (p == NULL) {
@@ -736,7 +739,7 @@ static BOOL LogStart(const wchar_t *fname)
 		return FALSE;
 	}
 
-	cv.FilePause &= ~OpLog;
+	LogVar->IsPause = FALSE;
 	LogVar->StartTime = GetTickCount();
 
 	// 遅延書き込み用スレッドを起こす。
@@ -1183,6 +1186,9 @@ static void FreeBinBuf(void)
 
 static void FileTransEnd_(void)
 {
+	if (LogVar == NULL) {
+		return;
+	}
 	FileLog = FALSE;
 	BinLog = FALSE;
 	cv.Log1Byte = NULL;
@@ -1193,32 +1199,23 @@ static void FileTransEnd_(void)
 		FLogDlg->DestroyWindow();
 		FLogDlg = NULL;
 	}
-	if (LogVar != NULL)
-	{
-		CloseFileSync(LogVar);
-		free(LogVar->FullName);
-		free(LogVar->FileName);
-		free(LogVar);
-		LogVar = NULL;
-	}
+	CloseFileSync(LogVar);
 	FreeLogBuf();
 	FreeBinBuf();
-	FreeTTFILE();
+	free(LogVar);
+	LogVar = NULL;
 }
-
 
 /**
  *	ログをポーズする
- *	元は FLogChangeButton() だった
  */
 void FLogPause(BOOL Pause)
 {
 	if (LogVar == NULL) {
 		return;
 	}
-	if (FLogDlg!=NULL)
-		FLogDlg->ChangeButton(Pause);
-	FileTransPause(OpLog, Pause);
+	LogVar->IsPause = Pause;
+	FLogDlg->ChangeButton(Pause);
 }
 
 /**
@@ -1344,7 +1341,6 @@ BOOL FLogOpen(const wchar_t *fname)
 	memset(fv, 0, sizeof(TFileVar));
 
 	fv->FileOpen = FALSE;
-	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
 
 	ret = LogStart(fname);
 	return ret;
@@ -1473,11 +1469,17 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 
 BOOL FLogIsPause()
 {
-	return ((cv.FilePause & OpLog) !=0);
+	if (LogVar == NULL) {
+		return FALSE;
+	}
+	return LogVar->IsPause;
 }
 
 void FLogWindow(int nCmdShow)
 {
+	if (LogVar == NULL) {
+		return;
+	}
 	if (FLogDlg == NULL)
 		return;
 
@@ -1491,6 +1493,9 @@ void FLogWindow(int nCmdShow)
 
 void FLogShowDlg(void)
 {
+	if (LogVar == NULL) {
+		return;
+	}
 	if (FLogDlg != NULL) {
 		FLogDlg->ShowWindow(SW_SHOWNORMAL);
 		SetForegroundWindow(FLogDlg->GetSafeHwnd());
@@ -1504,7 +1509,7 @@ void FLogShowDlg(void)
 //void Log1Bin(PComVar cv, BYTE b)
 static void Log1Bin(BYTE b)
 {
-	if (((cv.FilePause & OpLog)!=0) || cv.ProtoFlag) {
+	if (LogVar->IsPause || cv.ProtoFlag) {
 		return;
 	}
 	if (cv.BinSkip > 0) {
