@@ -32,11 +32,9 @@
 #include "teraterm_conf.h"
 
 #include <stdio.h>
-#include <tchar.h>
 #include <windows.h>
 #include <commctrl.h>
 #include <time.h>
-#include <tchar.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
