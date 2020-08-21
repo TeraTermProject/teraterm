@@ -406,66 +406,6 @@ void SendMemContinuously(void)
 	}
 }
 
-/*
- *	文字列の改行コードをCR(0x0d)だけにする
- *
- *	@param [in]	*src		入力文字列へのポインタ
- *	@param [in] *len		入力文字列長(0のとき内部で文字列長を測る,L'\0'も変換される)
- *	@param [out] *len		出力文字列長(入力文字列の最後のL'\0'も含む)
- *	@return					変換後文字列(mallocされた領域)
- *
- *		入力文字列長の指定がある時
- *			入力文字列の途中で L'\0' が見つかったら、そこで変換を終了する
- *			見つからないときは入力文字数分変換(最後にL'\0'は付加されない)
- */
-static wchar_t *NormalizeLineBreak(const wchar_t *src, size_t *len)
-{
-	size_t src_len = *len;
-	if (src_len == 0) {
-		src_len = wcslen(src) + 1;
-	}
-	wchar_t *dest_top = (wchar_t *)malloc(sizeof(wchar_t) * src_len);
-	if (dest_top == NULL) {
-		*len = 0;
-		return NULL;
-	}
-
-	// CR+LF -> LF
-	// CR    -> LF
-	// LF    -> LF (変換不要)
-	const wchar_t *p = src;
-	const wchar_t *p_end = src + src_len;
-	wchar_t *dest = dest_top;
-	while (p < p_end) {
-		wchar_t c = *p++;
-		if (c == CR) {
-			if (*p == LF) {
-				// CR+LF -> CR
-				p++;
-				*dest++ = CR;
-			} else {
-				// CR -> CR
-				*dest++ = CR;
-			}
-		}
-		else if (c == LF) {
-			// LF -> CR
-			*dest++ = CR;
-		}
-		else if (c == 0) {
-			// EOSを見つけたときは打ち切る
-			*dest++ = 0;
-			break;
-		}
-		else {
-			*dest++ = c;
-		}
-	}
-
-	*len = dest - dest_top;
-	return dest_top;
-}
-
 /**
  *	初期化
  */
@@ -522,7 +462,7 @@ SendMem *SendMemTextW(wchar_t *str, size_t len)
 
 	// 改行コードを調整しておく
 	size_t new_len = len;
-	wchar_t *new_str = NormalizeLineBreak((wchar_t *)str, &new_len);
+	wchar_t *new_str = NormalizeLineBreakCR((wchar_t *)str, &new_len);
 	if (new_str == NULL || new_len == 0) {
 		// 変換できなかった?(変換長さ0?)
 		if (new_str != NULL) {

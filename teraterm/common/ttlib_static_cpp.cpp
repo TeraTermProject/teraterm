@@ -443,3 +443,137 @@ void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemI
 		}
 	}
 }
+
+/*
+ *	文字列の改行コードをCR(0x0d)だけにする
+ *
+ *	@param [in]	*src	入力文字列へのポインタ
+ *	@param [in] *len	入力文字列長
+ *						NULL または 0 のとき内部で文字列長を測るこの時L'\0'は必須
+ *	@param [out] *len	出力文字列長(wcslen()と同じ)
+ *						NULL のとき出力されない
+ *	@return				変換後文字列(malloc()された領域,free()すること)
+ *						NULL メモリが確保できなかった
+ *
+ *		入力文字列長の指定がある時
+ *			入力文字列の途中で L'\0' が見つかったら、そこで変換を終了する
+ *			見つからないときは入力文字数分変換(最後にL'\0'は付加されない)
+ */
+wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len)
+{
+#define CR   0x0D
+#define LF   0x0A
+	size_t src_len = 0;
+	if (len != NULL) {
+		src_len = *len;
+	}
+	if (src_len == 0) {
+		src_len = wcslen(src) + 1;
+	}
+	wchar_t *dest_top = (wchar_t *)malloc(sizeof(wchar_t) * src_len);
+	if (dest_top == NULL) {
+		*len = 0;
+		return NULL;
+	}
+
+	const wchar_t *p = src;
+	const wchar_t *p_end = src + src_len;
+	wchar_t *dest = dest_top;
+	BOOL find_eos = FALSE;
+	while (p < p_end) {
+		wchar_t c = *p++;
+		if (c == CR) {
+			if (*p == LF) {
+				// CR+LF -> CR
+				p++;
+				*dest++ = CR;
+			} else {
+				// CR -> CR
+				*dest++ = CR;
+			}
+		}
+		else if (c == LF) {
+			// LF -> CR
+			*dest++ = CR;
+		}
+		else if (c == 0) {
+			// EOSを見つけたときは打ち切る
+			*dest++ = 0;
+			find_eos = TRUE;
+			break;
+		}
+		else {
+			*dest++ = c;
+		}
+	}
+
+	if (len != NULL) {
+		*len = dest - dest_top;
+		if (find_eos) {
+			*len = *len - 1;
+		}
+	}
+	return dest_top;
+}
+
+/**
+ *	改行コードを CR+LF に変換する
+ *	@return 変換された文字列
+ */
+wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_)
+{
+	const wchar_t *src = src_;
+	wchar_t *dest_top;
+	wchar_t *dest;
+	size_t len, need_len, alloc_len;
+
+	// 貼り付けデータの長さ(len)、および正規化後のデータの長さ(need_len)のカウント
+	for (len=0, need_len=0, src=src_; *src != '\0'; src++, len++, need_len++) {
+		if (*src == CR) {
+			need_len++;
+			if (*(src+1) == LF) {
+				len++;
+				src++;
+			}
+		}
+		else if (*src == LF) {
+			need_len++;
+		}
+	}
+
+	// 正規化後もデータ長が変わらない => 正規化は必要なし
+	if (need_len == len) {
+		dest = _wcsdup(src_);
+		return dest;
+	}
+	alloc_len = need_len + 1;
+
+	dest_top = (wchar_t *)malloc(sizeof(wchar_t) * alloc_len);
+
+	src = src_ + len - 1;
+	dest = dest_top + need_len;
+	*dest-- = '\0';
+
+	while (len > 0 && dest_top <= dest) {
+		if (*src == LF) {
+			*dest-- = *src--;
+			if (--len == 0) {
+				*dest = CR;
+				break;
+			}
+			if (*src != CR) {
+				*dest-- = CR;
+				continue;
+			}
+		}
+		else if (*src == CR) {
+			*dest-- = LF;
+			if (src == dest)
+				break;
+		}
+		*dest-- = *src--;
+		len--;
+	}
+
+	return dest_top;
+}

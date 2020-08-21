@@ -126,68 +126,6 @@ static void TrimTrailingNLW(wchar_t *src)
 }
 
 /**
- *	改行コードを CR+LF に変換する
- *	@return 変換された文字列
- */
-static wchar_t *NormalizeLineBreakW(const wchar_t *src_)
-{
-	const wchar_t *src = src_;
-	wchar_t *dest_top;
-	wchar_t *dest;
-	size_t len, need_len, alloc_len;
-
-	// 貼り付けデータの長さ(len)、および正規化後のデータの長さ(need_len)のカウント
-	for (len=0, need_len=0, src=src_; *src != '\0'; src++, len++, need_len++) {
-		if (*src == CR) {
-			need_len++;
-			if (*(src+1) == LF) {
-				len++;
-				src++;
-			}
-		}
-		else if (*src == LF) {
-			need_len++;
-		}
-	}
-
-	// 正規化後もデータ長が変わらない => 正規化は必要なし
-	if (need_len == len) {
-		dest = _wcsdup(src_);
-		return dest;
-	}
-	alloc_len = need_len + 1;
-
-	dest_top = (wchar_t *)malloc(sizeof(wchar_t) * alloc_len);
-
-	src = src_ + len - 1;
-	dest = dest_top + need_len;
-	*dest-- = '\0';
-
-	while (len > 0 && dest_top <= dest) {
-		if (*src == LF) {
-			*dest-- = *src--;
-			if (--len == 0) {
-				*dest = CR;
-				break;
-			}
-			if (*src != CR) {
-				*dest-- = CR;
-				continue;
-			}
-		}
-		else if (*src == CR) {
-			*dest-- = LF;
-			if (src == dest)
-				break;
-		}
-		*dest-- = *src--;
-		len--;
-	}
-
-	return dest_top;
-}
-
-/**
  * ファイルに定義された文字列が、textに含まれるかを調べる。
  * 見つかれば TRUEを返す
  */
@@ -357,8 +295,8 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	}
 
 	{
-		// 改行を正規化
-		wchar_t *dest = NormalizeLineBreakW(str_w);
+		// 改行を CR+LF に正規化、ダイアログで改行を正しく表示するため
+		wchar_t *dest = NormalizeLineBreakCRLF(str_w);
 		free(str_w);
 		str_w = dest;
 	}
