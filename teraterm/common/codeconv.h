@@ -64,6 +64,10 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32_len_);
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_);
 
+// UTF-16
+int IsHighSurrogate(wchar_t u16);
+int IsLowSurrogate(wchar_t u16);
+
 // convinience funcs  (for windows api params)
 char *ToCharA(const char *strA);
 char *ToCharW(const wchar_t *strW);

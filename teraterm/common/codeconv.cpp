@@ -75,12 +75,12 @@ static unsigned short _ConvertUnicode(unsigned short code, const codemap_t *tabl
 	return (result);
 }
 
-static int IsHighSurrogate(wchar_t u16)
+int IsHighSurrogate(wchar_t u16)
 {
 	return 0xd800 <= u16 && u16 < 0xdc00;
 }
 
-static int IsLowSurrogate(wchar_t u16)
+int IsLowSurrogate(wchar_t u16)
 {
 	return 0xdc00 <= u16 && u16 < 0xe000;
 }
