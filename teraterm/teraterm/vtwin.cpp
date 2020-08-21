@@ -2037,7 +2037,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 
 			PasteString(&cv, FileName, escape);
 			if (DropListCount > 1 && i < DropListCount - 1) {
-				const wchar_t *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? L"\n" : L" ";
+				// 改行(CR,0x0d) または スペース
+				const wchar_t *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? L"\x0d" : L" ";
 				PasteString(&cv, separator, false);
 			}
 
