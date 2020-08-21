@@ -79,7 +79,7 @@ static void *LoadRawFile(FILE *fp, size_t *_len, BOOL terminate)
 	fgetpos(fp, &pos);
     fseek(fp, 0L, SEEK_SET);
 	size_t len = (size_t)pos;
-	size_t alloc_len = terminate ? len + 2 : len;
+	size_t alloc_len = terminate ? len + 3 : len;
 	char *buf = (char *)malloc(alloc_len);
 	if (buf == NULL) {
 		return NULL;
@@ -92,6 +92,7 @@ static void *LoadRawFile(FILE *fp, size_t *_len, BOOL terminate)
 	if (terminate) {
 		buf[len] = 0;
 		buf[len+1] = 0;		// UTF-16ëŒçÙ
+		buf[len+2] = 0;		// âÛÇÍÇΩUTF-16ÉtÉ@ÉCÉãëŒçÙ(ó· ff fe 30)
 	}
 	*_len = alloc_len;
 	return buf;
