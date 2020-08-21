@@ -18,6 +18,9 @@ send $0D
 send "send lf"
 send $0A
 
+send "send crlf"
+send $0D $0A
+
 send "end"
 send $4 $4
 end
@@ -25,10 +28,12 @@ end
 ; ³‚µ‚¢o—Í:
 ; % stty -echo -icrnl; hexdump -C; stty echo icrnl
 ; 00000000  73 65 6e 64 20 63 72 0d  73 65 6e 64 20 6c 66 0a  |send cr.send lf.|
-; 00000010  65 6e 64                                          |end|
-; 00000013
+; 00000010  73 65 6e 64 20 63 72 6c  66 0d 0a 65 6e 64        |send crlf..end|
+; 0000001e
 ;
 ; ruby g—p:
 ; send cr<CR>
 ; send lf<LF>
+; send crlf<CR>
+; <LF>
 ; end

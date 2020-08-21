@@ -3857,14 +3857,13 @@ WORD TTLSendKCode()
 WORD TTLSendLn()
 {
 	WORD Err;
-	char Str[3];
+	char Str[2];
 
 	Err = TTLSend();
 	if (Err==0)
 	{
 		Str[0] = 0x0D;
-		Str[1] = 0x0A;
-		Str[2] = 0;
+		Str[1] = 0;
 		if (Linked)
 			DDEOut(Str);
 		else
