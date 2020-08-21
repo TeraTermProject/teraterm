@@ -1093,10 +1093,13 @@ static void FileTransEnd_(void)
 	if (FLogDlg != NULL) {
 		FLogDlg->DestroyWindow();
 		FLogDlg = NULL;
+		LogVar->FLogDlg = NULL;
 	}
 	CloseFileSync(LogVar);
 	FreeLogBuf();
 	FreeBinBuf();
+	free(LogVar->FullName);
+	LogVar->FullName = NULL;
 	free(LogVar);
 	LogVar = NULL;
 }
