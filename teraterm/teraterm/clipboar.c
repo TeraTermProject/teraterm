@@ -251,8 +251,10 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 static void CBSendStart(wchar_t *str_w)
 {
 	SendMem *sm = SendMemTextW(str_w, 0);
-	if (sm == NULL)
+	if (sm == NULL) {
+		free(str_w);
 		return;
+	}
 	if (ts.PasteDelayPerLine == 0) {
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 	}
@@ -317,6 +319,13 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = realloc(str_w, sizeof(wchar_t) * str_len);
 		str_w[str_len-2] = L'\r';
 		str_w[str_len-1] = 0;
+	}
+
+	{
+		// â¸çsÇ CR ÇÃÇ›Ç…ê≥ãKâª
+		wchar_t *dest = NormalizeLineBreakCR(str_w, 0);
+		free(str_w);
+		str_w = dest;
 	}
 
 	if (Bracketed) {
@@ -595,4 +604,3 @@ void CBEndPaste()
 	CBInsertDelay = FALSE;
 	_CrtCheckMemory();
 }
-

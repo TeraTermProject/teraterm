@@ -36,15 +36,16 @@
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "ftdlg_lite.h"
+#include "checkeol.h"
 
 #include "ttwinman.h"		// for ts
+#include "codeconv.h"
 
 #define	SENDMEM_USE_OLD_API	0
 
 #if SENDMEM_USE_OLD_API
 #include "ttftypes.h"		// for TFileVar
 #include "filesys.h"		// for SendVar
-#include "codeconv.h"		// for ToCharW()
 #else
 #include "fileread.h"
 #endif
@@ -52,8 +53,7 @@
 #include "sendmem.h"
 
 typedef enum {
-	SendMemTypeTextLF,		// wchar_t 0x0a
-//	SendMemTypeTextCRLF,	// wchar_t 0x0d + 0x0a
+	SendMemTypeText,
 	SendMemTypeBinary,
 } SendMemType;
 
@@ -70,7 +70,7 @@ typedef struct SendMemTag {
 	DWORD delay_per_char;
 	DWORD delay_per_sendsize;
 	DWORD delay_tick;
-	size_t send_size_max;
+	size_t send_size_max;	// 送信サイズディレイ、送信サイズ
 	SendMemDelayType delay_type;
 	HWND hWnd;	 // タイマーを受けるwindow
 	int timer_id;  // タイマーID
@@ -90,6 +90,7 @@ typedef struct SendMemTag {
 	//
 	PComVar cv_;
 	BOOL pause;
+	CheckEOLData_t *ceol;
 } SendMem;
 
 typedef SendMem sendmem_work_t;
@@ -323,57 +324,83 @@ void SendMemContinuously(void)
 			send_len = 1;
 		}
 		else {
-			send_len = sizeof(wchar_t);
+			const wchar_t *send_ptr = (wchar_t *)&p->send_ptr[p->send_index];
+			if (!IsHighSurrogate(*send_ptr)) {
+				send_len = sizeof(wchar_t);
+			}
+			else {
+				if (IsLowSurrogate(*(send_ptr + 1))) {
+					send_len = 2 * sizeof(wchar_t);
+				}
+				else {
+					// TODO, サロゲートペアになっていない文字
+					send_len = sizeof(wchar_t);
+				}
+			}
 		}
 	}
 	else if (p->delay_per_line > 0) {
 		// 1ライン送信
 		need_delay = TRUE;
 
-		// 1行取り出し(改行コードは NormalizeLineBreak() で CR(0x0d) に正規化されている)
 		const wchar_t *line_top = (wchar_t *)&p->send_ptr[p->send_index];
 		const size_t send_left_char = p->send_left / sizeof(wchar_t);
-		const wchar_t *line_end = wcsnchr(line_top, send_left_char, CR);
-		if (line_end != NULL) {
-			// CR まで送信
-			send_len = ((line_end - line_top) + 1) * sizeof(wchar_t);
+		BOOL eos = TRUE;
+
+		// 改行を探す
+		const wchar_t *s = line_top;
+		for (size_t i = 0; i < send_left_char; ++i) {
+			const wchar_t c = *s;
+			CheckEOLRet r = CheckEOLCheck(p->ceol, c);
+			if ((r & CheckEOLOutputEOL) != 0) {
+				// 改行が見つかった
+				if ((r & CheckEOLOutputChar) != 0) {
+					// 改行の次の文字まで進んだ
+					s--;
+				}
+				eos = FALSE;
+				break;
+			}
+			s++;
+		}
+
+		// 送信文字数
+		if (eos == FALSE) {
+			// 改行まで送信
+			send_len = (s - line_top + 1) * sizeof(wchar_t);
 		}
 		else {
-			// 改行見つからず、最後まで送信
+			// 改行が見つからなかった、最後まで送信
 			send_len = p->send_left;
 		}
 
-		// 1行が送信バッファより大きい
+		// 送信文字数が送信バッファより大きい
 		if (buff_len < send_len) {
 			// 送信バッファ長まで切り詰める
 			send_len = buff_len;
+			CheckEOLClear(p->ceol);
 			return;
 		}
 	}
-	else {
+	else if (p->send_size_max != 0) {
+		// 送信サイズ上限
 		send_len = p->send_left;
-		if (p->send_size_max == 0) {
-			// 全力送信
-			send_len = p->send_left;
-			if (buff_len < send_len) {
-				send_len = buff_len;
-			}
+		if (send_len > p->send_size_max) {
+			need_delay = TRUE;
+			send_len = p->send_size_max;
 		}
-		else {
-			// 送信サイズ上限
-			if (send_len > p->send_size_max) {
-				need_delay = TRUE;
-				send_len = p->send_size_max;
-			}
+	}
+	else {
+		// 全力送信
+		send_len = p->send_left;
+		if (buff_len < send_len) {
+			send_len = buff_len;
 		}
 	}
 
 	// 送信する
-	const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
-	assert(send_len <= p->send_left);
-	p->send_index += send_len;
-	p->send_left -= send_len;
 	if (p->type == SendMemTypeBinary) {
+		const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
 		if (p->send_host_enable) {
 			CommBinaryBuffOut(p->cv_, (PCHAR)send_ptr, (int)send_len);
 		}
@@ -382,13 +409,20 @@ void SendMemContinuously(void)
 		}
 	}
 	else {
+		const wchar_t *str_ptr = (wchar_t *)&p->send_ptr[p->send_index];
+		int str_len = (int)(send_len / sizeof(wchar_t));
 		if (p->send_host_enable) {
-			CommTextOutW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
+			CommTextOutW(p->cv_, str_ptr, str_len);
 		}
 		if (p->local_echo_enable) {
-			CommTextEchoW(p->cv_, (wchar_t *)send_ptr, (int)(send_len / sizeof(wchar_t)));
+			CommTextEchoW(p->cv_, str_ptr, str_len);
 		}
 	}
+
+	// 送信分先にすすめる
+	assert(send_len <= p->send_left);
+	p->send_index += send_len;
+	p->send_left -= send_len;
 
 	// ダイアログ更新
 	if (p->dlg != NULL) {
@@ -435,18 +469,21 @@ static SendMem *SendMemInit_()
 	p->hWnd = HVTWin;		// delay時に使用するタイマー用
 	p->timer_id = IdPasteDelayTimer;
 	p->hWndParent_ = NULL;
+	p->ceol = CheckEOLCreate();
 	return p;
 }
 
 /**
  *	メモリにあるテキストを送信する
- *	データは送信終了後にfree()される
+ *	テキストは送信終了後にfree()される
+ *  文字の変換は行われない
+ *	CRは下の層で送信時に設定した改行コードに変換される
+ *  LFはそのまま送信される
  *
- *	@param	ptr		データへポインタ(malloc()された領域)
+ *	@param	str		テキストへポインタ(malloc()された領域)
  *					送信後(中断後)、自動的にfree()される
  *	@param	len		文字数(wchar_t単位)
  *					L'\0' は送信されない
- *					0 の場合は L'\0' の前まで  (wcslen(str_w))
  */
 SendMem *SendMemTextW(wchar_t *str, size_t len)
 {
@@ -460,29 +497,17 @@ SendMem *SendMemTextW(wchar_t *str, size_t len)
 		len = wcslen(str);
 	}
 
-	// 改行コードを調整しておく
-	size_t new_len = len;
-	wchar_t *new_str = NormalizeLineBreakCR((wchar_t *)str, &new_len);
-	if (new_str == NULL || new_len == 0) {
-		// 変換できなかった?(変換長さ0?)
-		if (new_str != NULL) {
-			free(new_str);
-		}
-		SendMemFinish(p);
-		return NULL;
-	}
-	if (new_str[new_len-1] == 0) {
-		// remove EOS
-		new_len--;
-		if (new_len == 0){
+	// remove EOS
+	if (str[len-1] == 0) {
+		len--;
+		if (len == 0){
 			SendMemFinish(p);
 			return NULL;
 		}
 	}
-	p->send_ptr = (BYTE *)new_str;
-	p->send_len = new_len * sizeof(wchar_t);
-	free(str);
-	p->type = SendMemTypeTextLF;
+	p->send_ptr = (BYTE *)str;
+	p->send_len = len * sizeof(wchar_t);
+	p->type = SendMemTypeText;
 	return p;
 }
 
@@ -597,12 +622,16 @@ BOOL SendMemStart(SendMem *sm)
 
 void SendMemFinish(SendMem *sm)
 {
+	CheckEOLDestroy(sm->ceol);
+	sm->ceol = NULL;
 	free(sm->UILanguageFile);
 	free(sm);
 }
 
 /**
- *	ファイルを送信する
+ *	テキストファイルを送信する
+ *	文字コード,改行コードは適切に変換される
+ *
  *	@param[in]	filename	ファイル名
  *	@param[in]	binary		FALSE	text file
  *							TRUE	binary file
@@ -637,6 +666,12 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 		if (str_ptr == NULL) {
 			return FALSE;
 		}
+
+		// 改行を CR のみに正規化
+		wchar_t *dest = NormalizeLineBreakCR(str_ptr, &str_len);
+		free(str_ptr);
+		str_ptr = dest;
+
 		sm = SendMemTextW(str_ptr, str_len);
 	}
 	else {
