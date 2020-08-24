@@ -145,6 +145,11 @@ static int AutoDisconnectedPort = -1;
 #define WM_IME_COMPOSITION              0x010F
 #endif
 
+static BOOL SendScpDoing;
+static TCHAR **DropListsSendScp;
+static int DropListCountSendScp;
+static int DropListsSendScpIndex;
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
@@ -1977,7 +1982,9 @@ static void PasteString(PComVar cv, const char *str, bool escape)
 static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
 {
 	typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
+	typedef int (CALLBACK *PSSH_scp_sending_status)(void);
 	static PSSH_start_scp func = NULL;
+	static PSSH_scp_sending_status func_status = NULL;
 	static HMODULE h = NULL;
 	char msg[128];
 
@@ -1996,12 +2003,31 @@ static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
 			goto scp_send_error;
 		}
 	}
-
-	for (int i = 0; i < FileCount; i++) {
-		const char *FileName = Filenames[i];
-		func((char *)FileName, ts.ScpSendDir);
+	if (func_status == NULL) {
+		func_status = (PSSH_scp_sending_status)GetProcAddress(h, "TTXScpSendingStatus");
+		if (func_status == NULL) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetProcAddress(\"TTXScpSendingStatus\")) %d", GetLastError());
+			goto scp_send_error;
+		}
 	}
+
+	if (SendScpDoing) {
+		if (func_status()) {
+			return false;
+		} else {
+			DropListsSendScpIndex++;
+		}
+	}
+
+	func(Filenames[0], ts.ScpSendDir);
+
 	return true;
+}
+
+static void StartSendScpTimer(void)
+{
+	DropListsSendScpIndex = 0;
+	SetTimer(HVTWin, IdScpSendingTimer, 100, NULL);
 }
 
 void CVTWindow::DropListFree()
@@ -2186,14 +2212,43 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		}
 		case DROP_TYPE_SCP:
 		{
-			// send by scp
-			char **FileNames = &DropLists[i];
-			int FileCount = DoSameProcess ? DropListCount - i : 1;
-			if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
+			// すでにSCP送信中なら何もしない。
+			if (SendScpDoing) {
+				// do nothing.
 				goto finish;
+
+			} else {
+				// 一括送信の場合はタイマー処理を行うことで、連続送信による
+				// エラーが起こらないようにする。
+				if (DoSameProcess) {
+					int j;
+
+					DropListCountSendScp = DropListCount - i;
+					DropListsSendScp = (char **)malloc(sizeof(char *) * DropListCountSendScp);
+
+					for (j = 0 ; j < DropListCountSendScp ; j++) {
+						DropListsSendScp[j] = _strdup(DropLists[j]);
+					}
+					SendScpDoing = TRUE;
+
+					StartSendScpTimer();
+					goto finish;
+
+				} else {
+					// send by scp
+					char **FileNames = &DropLists[i];
+					int FileCount = 1;
+					if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
+						goto finish;
+					}
+					i += FileCount - 1;
+					break;
+
+				}
+
 			}
-			i += FileCount - 1;
-			break;
+
+
 		}
 		}
 	}
@@ -2920,6 +2975,33 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			cv.s = INVALID_SOCKET;  /* ソケット無効の印を付ける。(2010.8.6 yutaka) */
 			//::PostMessage(HVTWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 		}
+	}
+	else if (nIDEvent == IdScpSendingTimer) {
+		char **FileNames;
+		int FileCount;
+		int j;
+
+		if (DropListsSendScpIndex >= DropListCountSendScp) {
+			::KillTimer(HVTWin, IdScpSendingTimer);
+
+			for (j = 0 ; j < DropListCountSendScp; j++) {
+				free(DropListsSendScp[j]);
+				DropListsSendScp[j] = NULL;
+			}
+			free(DropListsSendScp);
+			DropListCountSendScp = 0;
+
+			SendScpDoing = FALSE;
+
+		} else {
+			FileNames = &DropListsSendScp[DropListsSendScpIndex];
+			FileCount = DropListCountSendScp;
+
+			SendScp(FileNames, FileCount, ts.ScpSendDir);
+
+		}
+
+		return;
 	}
 
 	::KillTimer(HVTWin, nIDEvent);

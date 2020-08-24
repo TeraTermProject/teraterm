@@ -3953,6 +3953,11 @@ __declspec(dllexport) int CALLBACK TTXScpSendfile(char *filename, char *dstfile)
 	return SSH_start_scp(pvar, filename, dstfile);
 }
 
+__declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
+{
+	return SSH_scp_sending_status();
+}
+
 __declspec(dllexport) int CALLBACK TTXScpReceivefile(char *remotefile, char *localfile)
 {
 	return SSH_scp_transaction(pvar, remotefile, localfile, FROMREMOTE);
