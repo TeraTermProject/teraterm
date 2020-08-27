@@ -5,7 +5,7 @@ set cmdopt2=--binary --backup -p0
 set cmdopt1=--dry-run %cmdopt2%
 
 rem
-echo OpenSSL 1.1.1にパッチが適用されているかを確認します...
+echo OpenSSL 1.1.1gにパッチが適用されているかを確認します...
 echo.
 rem
 
@@ -20,13 +20,13 @@ rem パッチの適用有無をチェック
 
 :patch1
 rem freeaddrinfo/getnameinfo/getaddrinfo API(WindowsXP以降)依存除去のため
-findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
+findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_local.h
 if ERRORLEVEL 1 goto fail1
 goto patch2
 :fail1
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
-%folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
+%folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch2.txt
+%folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch2.txt
 popd
 
 :patch2
