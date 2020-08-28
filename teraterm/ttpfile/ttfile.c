@@ -195,9 +195,6 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*3], *pf;
 	OPENFILENAME ofn;
-#if 0
-	LONG optl;
-#endif
 	WORD optw;
 	char TempDir[MAXPATHLEN];
 	BOOL Ok;
@@ -223,12 +220,6 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 			pf = pf + strlen(pf) + 1;
 		}
 		break;
-#if 0
-	case GTF_LOG:
-		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-#endif
 	case GTF_BP:
 		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
@@ -255,36 +246,9 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = fv->FullName;
 	ofn.nMaxFile = sizeof(fv->FullName);
-
-#if 0
-	if (FuncId == GTF_LOG) {
-		DWORD logdir = GetFileAttributes(fv->LogDefaultPath);
-		// ログ保存の場合は初期フォルダを決め打ちしないようにする。(2007.8.24 yutaka)
-		if (logdir != INVALID_FILE_ATTRIBUTES && logdir & FILE_ATTRIBUTE_DIRECTORY) {
-			// LogDefaultPathが存在するなら、そこを初期フォルダにする。(2007.11.30 maya)
-			ofn.lpstrInitialDir = fv->LogDefaultPath;
-		}
-		else {
-			ofn.lpstrInitialDir = NULL;
-		}
-	} else
-#endif
-	{
-		ofn.lpstrInitialDir = CurDir;
-	}
+	ofn.lpstrInitialDir = CurDir;
 
 	switch (FuncId) {
-#if 0
-	case GTF_LOG:
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
-		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
-
-		ofn.lpfnHook = LogFnHook;
-		optl = *Option;
-		ofn.lCustData = (LPARAM)&optl;
-		break;
-#endif
 	case GTF_SEND:
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
@@ -301,43 +265,14 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 
 	ofn.Flags |= OFN_SHOWHELP;
 
-#if 0
-	if (FuncId != GTF_LOG) {
-		// フィルタがワイルドカードではなく、そのファイルが存在する場合
-		// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
-		if (strlen(FileSendFilter) > 0 &&
-		    !isInvalidFileNameChar(FileSendFilter)) {
-			char file[MAX_PATH];
-			strncpy_s(file, sizeof(file), CurDir, _TRUNCATE);
-			AppendSlash(file, sizeof(file));
-			strncat_s(file, sizeof(file), FileSendFilter, _TRUNCATE);
-			if (_access(file, 0) == 0) {
-				strncpy_s(fv->FullName, sizeof(fv->FullName), FileSendFilter, _TRUNCATE);
-			}
-		}
-	}
-#endif
 	ofn.lpstrTitle = fv->DlgCaption;
 
 	ofn.hInstance = hInst;
 
-	// loggingの場合、オープンダイアログをセーブダイアログへ変更 (2005.1.6 yutaka)
-#if 0
-	if (FuncId == GTF_LOG) {
-		Ok = GetSaveFileName(&ofn);
-	} else
-#endif
-	{
-		Ok = GetOpenFileName(&ofn);
-	}
+	Ok = GetOpenFileName(&ofn);
 
 	if (Ok) {
-#if 0
-		if (FuncId==GTF_LOG)
-			*Option = optl;
-		else
-#endif
-			*Option = (long)optw;
+		*Option = (long)optw;
 
 		fv->DirLen = ofn.nFileOffset;
 
