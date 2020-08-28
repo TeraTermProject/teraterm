@@ -353,10 +353,13 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 
 static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	static const DlgTextInfo text_info[] = {
+		{ IDC_FOPT, "DLG_FOPT" },
+		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
+	};
 	LPOPENFILENAME ofn;
 	LPWORD pw;
 	LPOFNOTIFY notify;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
 
@@ -379,12 +382,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 			DlgFoptFont = NULL;
 		}
 
-		GetDlgItemText(Dialog, IDC_FOPT, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_FOPT, uimsg);
-		GetDlgItemText(Dialog, IDC_FOPTBIN, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_BINARY", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_FOPTBIN, uimsg);
+		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
 
 		SetRB(Dialog,*pw & 1,IDC_FOPTBIN,IDC_FOPTBIN);
 
@@ -508,7 +506,7 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	if (FuncId==GMF_Z) {
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 		ofn.lCustData = (LPARAM)Option;
-		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
+		ofn.lpfnHook = TransFnHook;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 	} else if (FuncId==GMF_Y) {
 		// TODO: YMODEM
@@ -744,11 +742,17 @@ void WINAPI SetFileVar(PFileVar fv)
 /* Hook function for XMODEM file name dialog box */
 static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	static const DlgTextInfo text_info[] = {
+		{ IDC_XOPT, "DLG_XOPT" },
+		{ IDC_XOPTCHECK, "DLG_XOPT_CHECKSUM" },
+		{ IDC_XOPTCRC, "DLG_XOPT_CRC" },
+		{ IDC_XOPT1K, "DLG_XOPT_1K" },
+		{ IDC_XOPTBIN, "DLG_XOPT_BINARY" },
+	};
 	LPOPENFILENAME ofn;
 	WORD Hi, Lo;
 	LPLONG pl;
 	LPOFNOTIFY notify;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
 
@@ -771,21 +775,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			DlgXoptFont = NULL;
 		}
 
-		GetDlgItemText(Dialog, IDC_XOPT, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_XOPT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_XOPT, uimsg);
-		GetDlgItemText(Dialog, IDC_XOPTCHECK, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_XOPT_CHECKSUM", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_XOPTCHECK, uimsg);
-		GetDlgItemText(Dialog, IDC_XOPTCRC, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_XOPT_CRC", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_XOPTCRC, uimsg);
-		GetDlgItemText(Dialog, IDC_XOPT1K, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_XOPT_1K", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_XOPT1K, uimsg);
-		GetDlgItemText(Dialog, IDC_XOPTBIN, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_XOPT_BINARY", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_XOPTBIN, uimsg);
+		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
 
 		if (LOWORD(*pl)==0xFFFF) { // Send
 			ShowDlgItem(Dialog, IDC_XOPT1K, IDC_XOPT1K);
