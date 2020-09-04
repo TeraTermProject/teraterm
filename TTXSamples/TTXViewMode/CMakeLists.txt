@@ -46,3 +46,9 @@ target_link_libraries(
   #
   gdi32
   )
+
+install(
+  TARGETS TTXViewMode
+  RUNTIME
+  DESTINATION .
+  )

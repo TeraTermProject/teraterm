@@ -43,3 +43,9 @@ set_target_properties(
   PROPERTIES
   PREFIX ""
   )
+
+install(
+  TARGETS TTXttyrec TTXttyplay
+  RUNTIME
+  DESTINATION .
+  )

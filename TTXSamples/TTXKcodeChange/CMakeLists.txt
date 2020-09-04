@@ -23,3 +23,9 @@ set_target_properties(
   PROPERTIES
   PREFIX ""
   )
+
+install(
+  TARGETS TTXKcodeChange
+  RUNTIME
+  DESTINATION .
+  )

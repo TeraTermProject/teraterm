@@ -34,4 +34,8 @@ target_link_libraries(
   delayimp
   )
 
-
+install(
+  TARGETS TTXResizeMenu
+  RUNTIME
+  DESTINATION .
+  )

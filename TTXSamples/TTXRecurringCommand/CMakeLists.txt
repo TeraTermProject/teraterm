@@ -44,3 +44,9 @@ target_link_libraries(
   #
   gdi32
   )
+
+install(
+  TARGETS TTXRecurringCommand
+  RUNTIME
+  DESTINATION .
+  )

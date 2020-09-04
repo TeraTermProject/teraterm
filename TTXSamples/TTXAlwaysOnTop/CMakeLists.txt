@@ -29,4 +29,8 @@ target_link_libraries(
   ttpcmn
   )
 
-
+install(
+  TARGETS TTXAlwaysOnTop
+  RUNTIME
+  DESTINATION .
+  )
