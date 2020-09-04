@@ -1,4 +1,3 @@
-#pragma comment(lib, "version.lib")
 
 #include <windows.h>
 #include <stdio.h>
@@ -105,28 +104,28 @@ int __stdcall CygwinVersion(char *dll, int *major, int *minor)
 	LPVOID lpBuf;
 	UINT uLen;
 	VS_FIXEDFILEINFO *pFileInfo;
-	
+
 	dwSize = GetFileVersionInfoSize(dll, &dwHandle);
 	if (dwSize == 0) {
 		return 0;
 	}
-	
+
 	lpBuf = malloc(dwSize);
 	if (!GetFileVersionInfo(dll, dwHandle, dwSize, lpBuf)) {
 		free(lpBuf);
 		return 0;
 	}
-	
+
 	if (!VerQueryValue(lpBuf, "\\", (LPVOID*)&pFileInfo, &uLen)) {
 		free(lpBuf);
 		return 0;
 	}
-	
+
 	*major = HIWORD(pFileInfo->dwFileVersionMS);
 	*minor = LOWORD(pFileInfo->dwFileVersionMS);
-	
+
 	free(lpBuf);
-	
+
 	return 1;
 }
 
@@ -138,7 +137,7 @@ int main(void)
 	int file_len = sizeof(file);
 	int version_major, version_minor;
 	int res;
-	
+
 	printf("FindCygwinPath()\n");
 	res = FindCygwinPath("", file, file_len);
 	printf("  result => %d\n", res);
@@ -148,7 +147,7 @@ int main(void)
 	}
 	printf("  Cygwin directory => %s\n", file);
 	printf("\n");
-	
+
 	printf("PortableExecutableMachine()\n");
 	strncat_s(file, sizeof(file), "\\bin\\cygwin1.dll", _TRUNCATE);
 	printf("  Cygwin DLL => %s\n", file);
@@ -167,7 +166,7 @@ int main(void)
 			break;
 	}
 	printf("\n");
-	
+
 	printf("CygwinVersion()\n");
 	printf("  Cygwin DLL => %s\n", file);
 	res = CygwinVersion(file, &version_major, &version_minor);
@@ -179,7 +178,7 @@ int main(void)
 	printf("  version_major => %d\n", version_major);
 	printf("  version_minor => %d\n", version_minor);
 	printf("\n");
-	
+
 	return 0;
 }
 #else
