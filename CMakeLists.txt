@@ -103,10 +103,6 @@ else()
   # build without svn,git?
   #set(SVNVERSION "0000")
 endif()
-configure_file(
-  version_info.h.in
-  version_info.h
-  @ONLY)
 message("revision=\"${SVNVERSION}\"")
 
 ### tool
@@ -144,6 +140,12 @@ if(NOT DEFINED SNAPSHOT_DIR)
   endif()
 endif()
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
+
+### create buildinfo.txt
+configure_file(
+  buildinfo.txt.in
+  buildinfo.txt
+  @ONLY)
 
 ### subdirectories
 add_subdirectory(svnrev_perl)

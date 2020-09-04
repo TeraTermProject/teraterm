@@ -98,3 +98,4 @@ cache:
 
 artifacts:
   - path: build\%ZIP_FILE%
+  - path: build\buildinfo.txt
