@@ -98,4 +98,5 @@ cache:
 
 artifacts:
   - path: build\%ZIP_FILE%
+  - path: build\%SETUP_FILE%.exe
   - path: build\buildinfo.txt

@@ -290,3 +290,64 @@ if ((EXISTS "C:/cygwin64/bin") OR (EXISTS "C:/cygwin/bin"))
     DESTINATION ./cygterm+-x86_64
     )
 endif()
+
+# Inno Setup
+#  Create setup.exe
+find_program(
+  ISCC ISCC.exe
+  HINTS "C:/Program Files (x86)/Inno Setup 6/"
+  HINTS "C:/Program Files (x86)/Inno Setup 5/"
+  HINTS "C:/Program Files/Inno Setup 6/"
+  HINTS "C:/Program Files/Inno Setup 5/"
+  HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 6"
+  HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 5"
+  )
+message("ISCC=${ISCC}")
+
+if(MINGW)
+  add_custom_target(
+    inno_setup
+    COMMAND "${CMAKE_COMMAND}" -E echo "inno setup can not create setup.exe on mingw"
+    )
+elseif("${ISCC}" STREQUAL "ISCC-NOTFOUND")
+  add_custom_target(
+    inno_setup
+    COMMAND "${CMAKE_COMMAND}" -E echo "inno setup not found"
+    )
+else()
+  add_subdirectory(cygtool)
+
+  configure_file(
+    teraterm_cmake.iss.in teraterm_cmake.iss
+    NEWLINE_STYLE CRLF
+    )
+
+  set(ISCC_OPTION "/DOUTPUT_FILENAME=${SETUP_EXE}")
+  if (SETUP_RELEASE)
+    list(APPEND ISCC_OPTION "/DSETUP_RELEASE=1")
+  endif()
+  add_custom_target(
+    inno_setup
+#    COMMAND "${CMAKE_COMMAND}" --build . --target install
+    COMMAND "${CMAKE_COMMAND}" -E echo "${ISCC} ${ISCC_OPTION} teraterm_cmake.iss"
+    COMMAND "${ISCC}" ${ISCC_OPTION} teraterm_cmake.iss
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
+    )
+endif()
+set_target_properties(
+  inno_setup
+  PROPERTIES FOLDER installer
+  )
+
+# zip
+add_custom_target(
+  zip
+#  COMMAND "${CMAKE_COMMAND}" --build . --target install
+  COMMAND "${CMAKE_COMMAND}" -E tar cvf ${SETUP_ZIP} --format=zip ${CMAKE_INSTALL_PREFIX}
+  WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+  )
+
+set_target_properties(
+  zip
+  PROPERTIES FOLDER installer
+  )

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.11)
 
 project(teraterm_all)
 
+option(SETUP_RELEASE "build setup.exe for release" OFF)
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(MORE_WARNING "stronger warning" OFF)
 
@@ -68,7 +69,6 @@ elseif(MINGW)
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
 endif()
 
-### create version_info.h
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git/svn")
   # git-svn
   find_package(Git)
@@ -132,14 +132,35 @@ else()
   set(USER "NONAME")
 endif()
 
+# ソースツリー内に生成ファイルが存在していたら削除する
+if(EXISTS "${CMAKE_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
+  file(REMOVE "${CMAKE_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
+endif()
+
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake")
+  execute_process(
+    COMMAND ${PERL} svnrev.pl --svn \"${Subversion_SVN_EXECUTABLE}\" --git \"${GIT_EXECUTABLE}\" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_CURRENT_BINARY_DIR}/../teraterm/ttpdlg/svnversion.h --cmake ${CMAKE_BINARY_DIR}/build_config.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/svnrev_perl
+    )
+endif()
+include(${CMAKE_BINARY_DIR}/build_config.cmake)
+message("revision=\"${SVNVERSION}\"")
+
+if(DEFINED SVNVERSION)
+  set(REVISION_TIME_USER "r${SVNVERSION}-${BUILD_TIME}-${USER}")
+else()
+  set(REVISION_TIME_USER "unknown-${BUILD_TIME}-${USER}")
+endif()
 if(NOT DEFINED SNAPSHOT_DIR)
-  if(DEFINED SVNVERSION)
-    string(TIMESTAMP SNAPSHOT_DIR "snapshot-r${SVNVERSION}-%Y%m%d_%H%M%S-${USER}")
-  else()
-    string(TIMESTAMP SNAPSHOT_DIR "snapshot-unknown-%Y%m%d_%H%M%S-${USER}")
-  endif()
+  set(SNAPSHOT_DIR "snapshot-${REVISION_TIME_USER}")
 endif()
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
+if(NOT DEFINED SETUP_EXE)
+  set(SETUP_EXE "teraterm-${REVISION_TIME_USER}")
+endif()
+if(NOT DEFINED SETUP_ZIP)
+  set(SETUP_ZIP "teraterm-${REVISION_TIME_USER}.zip")
+endif()
 
 ### create buildinfo.txt
 configure_file(
@@ -161,3 +182,4 @@ add_subdirectory(installer)
 add_subdirectory(doc)
 add_subdirectory(doc_internal)
 add_subdirectory(tools)
+

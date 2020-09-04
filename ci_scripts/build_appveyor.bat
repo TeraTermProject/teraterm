@@ -41,8 +41,12 @@ if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 cd %BUILD_DIR%
 if exist cmakecache.txt del cmakecache.txt
 set ZIP_FILE=snapshot-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%.zip
+set SETUP_FILE=snapshot-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%
 set SNAPSHOT_DIR=snapshot-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%
-"%CMAKE_COMMAND%" .. -G "%GENERATOR%" %CMAKE_OPTION_GENERATE% -DSNAPSHOT_DIR=%SNAPSHOT_DIR%
+"%CMAKE_COMMAND%" .. -G "%GENERATOR%" %CMAKE_OPTION_GENERATE% -DSNAPSHOT_DIR=%SNAPSHOT_DIR% -DSETUP_ZIP=%ZIP_FILE% -DSETUP_EXE=%SETUP_FILE% -DSETUP_RELEASE=%RELEASE%
 "%CMAKE_COMMAND%" --build . --target install %CMAKE_OPTION_BUILD%
-"%CMAKE_COMMAND%" -E tar "cvf" %ZIP_FILE% --format=zip %SNAPSHOT_DIR%
+"%CMAKE_COMMAND%" --build . --target zip
+if NOT "%COMPILER%" == "mingw" if NOT "%COMPILER%" == "mingw_x64" (
+  "%CMAKE_COMMAND%" --build . --target inno_setup
+)
 cd ..
