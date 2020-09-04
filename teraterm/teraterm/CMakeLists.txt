@@ -91,7 +91,7 @@ add_executable(
   tt-version.rc
   teraterm_manifest.rc
   #
-#  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
   #
   unicode_test.h
   unicode.h
@@ -243,11 +243,6 @@ target_link_libraries(
   imagehlp
   delayimp
   uuid
-  )
-
-add_dependencies(
-  teraterm
-  svnversion_h
   )
 
 install(

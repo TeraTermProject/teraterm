@@ -322,9 +322,8 @@ else()
     NEWLINE_STYLE CRLF
     )
 
-  set(ISCC_OPTION "/DOUTPUT_FILENAME=${SETUP_EXE}")
-  if (SETUP_RELEASE)
-    list(APPEND ISCC_OPTION "/DSETUP_RELEASE=1")
+  if (RELEASE)
+    set(ISCC_OPTION "/DSETUP_RELEASE=1")
   endif()
   add_custom_target(
     inno_setup

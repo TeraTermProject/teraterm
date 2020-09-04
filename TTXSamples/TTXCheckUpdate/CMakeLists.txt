@@ -16,6 +16,7 @@ add_library(
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/dlglib.h
   ../../teraterm/common/getcontent.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/ttpdlg/svnversion.h
   )
 
 source_group(
@@ -56,11 +57,6 @@ target_link_libraries(
   ttpcmn
   #
   wininet.lib
-  )
-
-add_dependencies(
-  TTXCheckUpdate
-  svnversion_h
   )
 
 install(

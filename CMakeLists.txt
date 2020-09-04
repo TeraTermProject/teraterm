@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.11)
 
 project(teraterm_all)
 
-option(SETUP_RELEASE "build setup.exe for release" OFF)
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(MORE_WARNING "stronger warning" OFF)
 
@@ -69,42 +68,6 @@ elseif(MINGW)
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
 endif()
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/.git/svn")
-  # git-svn
-  find_package(Git)
-  if(Git_FOUND)
-    message("git=${GIT_EXECUTABLE}")
-    execute_process(
-      COMMAND ${GIT_EXECUTABLE} svn log --oneline -1
-      RESULT_VARIABLE rv
-      OUTPUT_VARIABLE ov
-      ERROR_QUIET)
-    if(${rv})
-      message("git svn error? please check git svn")
-    else()
-      string(REGEX MATCH "[0-9]+" SVNVERSION "${ov}")
-    endif()
-  endif()
-elseif(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
-  # svn
-  find_package(Subversion)
-  if(SUBVERSION_FOUND)
-    if("CMAKE_COMMAND=${CMAKE_COMMAND}" MATCHES "msys")
-      # svn on msys
-      file(TO_NATIVE_PATH ${CMAKE_SOURCE_DIR} MSYS_CMAKE_SOURCE_DIR)
-      string(REGEX REPLACE "^([a-zA-Z]):/" "/\\1/" MSYS_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-      Subversion_WC_INFO(${MSYS_CMAKE_SOURCE_DIR} TT)
-    else()
-      Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TT)
-    endif()
-    set(SVNVERSION "${TT_WC_REVISION}")
-  endif()
-else()
-  # build without svn,git?
-  #set(SVNVERSION "0000")
-endif()
-message("revision=\"${SVNVERSION}\"")
-
 ### tool
 # perl
 if (MSVC OR (MINGW AND (EXISTS "c:/windows")))
@@ -123,6 +86,16 @@ else()
     )
 endif()
 message("perl=${PERL}")
+# svn / git-svn
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git/svn")
+  # git-svn
+  find_package(Git)
+  message("git=${GIT_EXECUTABLE}")
+elseif(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+  # svn
+  find_package(Subversion)
+  message("svn=${Subversion_SVN_EXECUTABLE}")
+endif()
 
 if(NOT $ENV{USER})
   set(USER $ENV{USER})
@@ -138,8 +111,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
 endif()
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake")
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/teraterm/ttpdlg)
   execute_process(
-    COMMAND ${PERL} svnrev.pl --svn \"${Subversion_SVN_EXECUTABLE}\" --git \"${GIT_EXECUTABLE}\" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_CURRENT_BINARY_DIR}/../teraterm/ttpdlg/svnversion.h --cmake ${CMAKE_BINARY_DIR}/build_config.cmake
+    COMMAND ${PERL} svnrev.pl --svn \"${Subversion_SVN_EXECUTABLE}\" --git \"${GIT_EXECUTABLE}\" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_BINARY_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${CMAKE_BINARY_DIR}/build_config.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/svnrev_perl
     )
 endif()
@@ -147,19 +121,28 @@ include(${CMAKE_BINARY_DIR}/build_config.cmake)
 message("revision=\"${SVNVERSION}\"")
 
 if(DEFINED SVNVERSION)
-  set(REVISION_TIME_USER "r${SVNVERSION}-${BUILD_TIME}-${USER}")
+  set(REVISION_TIME_USER "r${SVNVERSION}-${DATE}_${TIME}-${USER}")
 else()
-  set(REVISION_TIME_USER "unknown-${BUILD_TIME}-${USER}")
+  set(REVISION_TIME_USER "unknown-${DATE}_${TIME}-${USER}")
 endif()
 if(NOT DEFINED SNAPSHOT_DIR)
   set(SNAPSHOT_DIR "snapshot-${REVISION_TIME_USER}")
 endif()
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
 if(NOT DEFINED SETUP_EXE)
-  set(SETUP_EXE "teraterm-${REVISION_TIME_USER}")
+  # not need ".exe"
+  if(RELEASE)
+    set(SETUP_EXE "teraterm-${VERSION}")
+  else()
+    set(SETUP_EXE "teraterm-${VERSION}-${REVISION_TIME_USER}")
+  endif()
 endif()
 if(NOT DEFINED SETUP_ZIP)
-  set(SETUP_ZIP "teraterm-${REVISION_TIME_USER}.zip")
+  if(RELEASE)
+    set(SETUP_ZIP "teraterm-${VERSION}.zip")
+  else()
+    set(SETUP_ZIP "teraterm-${VERSION}-${REVISION_TIME_USER}.zip")
+  endif()
 endif()
 
 ### create buildinfo.txt
@@ -169,7 +152,6 @@ configure_file(
   @ONLY)
 
 ### subdirectories
-add_subdirectory(svnrev_perl)
 add_subdirectory(teraterm)
 add_subdirectory(ttpmenu)
 add_subdirectory(TTProxy)
