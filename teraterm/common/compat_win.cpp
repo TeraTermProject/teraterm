@@ -1,5 +1,5 @@
 /*
- * (C) 20018-2019 TeraTerm Project
+ * (C) 20018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

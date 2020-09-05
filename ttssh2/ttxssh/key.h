@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 TeraTerm Project
+ * (C) 2011-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
