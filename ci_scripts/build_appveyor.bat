@@ -1,7 +1,7 @@
 call svnrev_perl\svnrev.bat
 call svnrev_perl\sourcetree_info.bat
 if "%GENERATOR%" == "Visual Studio 8 2005" (
-  cd libs
+  cd buildtools
   call getcmake.bat nopause
   cd ..
 )
@@ -32,9 +32,10 @@ if not exist openssl11_%COMPILER% (
   "%CMAKE_COMMAND%" -DCMAKE_GENERATOR="%GENERATOR%" %CMAKE_OPTION_LIBS% -P buildall.cmake
   if exist build rmdir /s /q build
   if exist download rmdir /s /q download
-  if exist perl\c rmdir /s /q perl\c
   if exist openssl_%COMPILER%\html rmdir /s /q openssl_%COMPILER%\html
   if exist openssl_%COMPILER%_debug\html rmdir /s /q openssl_%COMPILER%_debug\html
+  if exist ..\buildtools\perl\c rmdir /s /q ..\buildtools\perl\c
+  if exist ..\buildtools\download rmdir /s /q ..\buildtools\download
 )
 cd ..
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%

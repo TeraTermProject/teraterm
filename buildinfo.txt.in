@@ -56,5 +56,7 @@ git
   @GIT_EXECUTABLE@
 ISCC(inno setup)
   @ISCC@
+HHC(help compiler)
+  @HHC@
 
 see CMakeCache.txt for more details

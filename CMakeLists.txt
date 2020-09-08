@@ -73,7 +73,7 @@ endif()
 if (MSVC OR (MINGW AND (EXISTS "c:/windows")))
   find_program(
     PERL perl.exe
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/libs/perl/perl/bin
+    HINTS ${CMAKE_SOURCE_DIR}/buildtools/perl/perl/bin
     HINTS c:/Strawberry/perl/bin
     HINTS c:/Perl64/bin
     HINTS c:/Perl/bin
@@ -87,8 +87,8 @@ else()
 endif()
 message("perl=${PERL}")
 # svn / git-svn
-if(EXISTS "${CMAKE_SOURCE_DIR}/.git/svn")
-  # git-svn
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  # git (git-svn)
   find_package(Git)
   message("git=${GIT_EXECUTABLE}")
 elseif(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
@@ -145,12 +145,6 @@ if(NOT DEFINED SETUP_ZIP)
   endif()
 endif()
 
-### create buildinfo.txt
-configure_file(
-  buildinfo.txt.in
-  buildinfo.txt
-  @ONLY)
-
 ### subdirectories
 add_subdirectory(teraterm)
 add_subdirectory(ttpmenu)
@@ -165,3 +159,8 @@ add_subdirectory(doc)
 add_subdirectory(doc_internal)
 add_subdirectory(tools)
 
+### create buildinfo.txt
+configure_file(
+  buildinfo.txt.in
+  buildinfo.txt
+  @ONLY)

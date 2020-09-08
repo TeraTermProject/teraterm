@@ -96,7 +96,7 @@ elseif("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   # Active/Strawberry Perl
   find_program(
     PERL perl.exe
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/perl/perl/bin
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../buildtools/perl/perl/bin
     HINTS c:/Perl64/bin
     HINTS c:/Perl/bin
     HINTS c:/Strawberry/perl/bin

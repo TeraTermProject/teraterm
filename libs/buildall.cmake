@@ -19,6 +19,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     message("perl")
     execute_process(
       COMMAND ${CMAKE_COMMAND} -P perl.cmake
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../buildtools
       )
   endif()
 endif()

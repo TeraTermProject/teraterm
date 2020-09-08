@@ -10,7 +10,7 @@
   - 実行できない場合もヘッダファイルは作成されます
 - perlを実行できるようパスを設定する
   - libs/perl があれば利用します
-    - libs/getperl.bat をダブルクリックすると
+    - buildtools/getperl.bat をダブルクリックすると
       strawberry perl を libs/perl に展開します
 
 # ヘッダの作成方法

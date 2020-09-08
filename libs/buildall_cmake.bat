@@ -55,10 +55,10 @@ pause
 exit
 
 :cmake_3_11_4
-set CMAKE=%~dp0cmake-3.11.4-win32-x86\bin\cmake.exe
-echo 1. 自分のcmake.exeを使用する(PATHを通してある)
+set CMAKE=%~dp0..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe
+echo 1. PATH上のcmake.exeを使用する
 echo 2. VS2005でも使用できるcmake使用する
-echo    (必要なら自動でダウンロードして、このフォルダにインストールする)
+echo    (必要なら自動でダウンロードして、このbuildtools/にインストールする)
 if exist %CMAKE% echo    インストール済み(%CMAKE%)
 
 set /p no="select no "
@@ -71,7 +71,7 @@ goto finish_cmake
 
 :download
 if exist %CMAKE% goto finish_cmake
-call getcmake.bat
+call ..\buildtools\getcmake.bat
 
 :finish_cmake
 exit /b

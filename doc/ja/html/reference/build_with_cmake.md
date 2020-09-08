@@ -27,8 +27,8 @@
 
     mkdir build_vs2005
     cd build_vs2005
-    ..\libs\cmake-3.11.4-win32-x86\bin\cmake.exe .. -G "Visual Studio 8 2005"
-    ..\libs\cmake-3.11.4-win32-x86\bin\cmake.exe --build . --config release
+    ..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe .. -G "Visual Studio 8 2005"
+    ..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe --build . --config release
 
 - `-G` オプションの後ろは使用する Visual Studio のバージョンに合わせて調整します
 - sln ファイルが生成されるので Visual Studio で開くことができます

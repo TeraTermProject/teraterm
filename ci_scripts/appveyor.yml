@@ -95,6 +95,7 @@ build_script:
 
 cache:
   - libs
+  - buildtools
 
 artifacts:
   - path: build\%ZIP_FILE%
