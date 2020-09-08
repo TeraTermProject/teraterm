@@ -295,6 +295,7 @@ endif()
 #  Create setup.exe
 find_program(
   ISCC ISCC.exe
+  HINTS "${CMAKE_SOURCE_DIR}/buildtools/innosetup6/bin"
   HINTS "C:/Program Files (x86)/Inno Setup 6/"
   HINTS "C:/Program Files (x86)/Inno Setup 5/"
   HINTS "C:/Program Files/Inno Setup 6/"
