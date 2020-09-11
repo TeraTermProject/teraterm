@@ -1,0 +1,4 @@
+﻿# tool info
+#
+svn="C:\Program Files\TortoiseSVN\bin\svn.exe"
+git="C:\Program Files\Git\bin\git.exe"

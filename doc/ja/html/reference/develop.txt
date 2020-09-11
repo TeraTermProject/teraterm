@@ -46,11 +46,15 @@
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - その他
   Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
-  ActivePerl 5.10 以上
-    OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
+  ActivePerl 5.10 以上 または Strawberry perl 5.30.1.1 以上
+    ビルド過程で使用します
+    - OpenSSL のコンパイル(必須)
+    - ドキュメントファイルの文字コード・改行コード変換(必須)
+    - リビジョン番号取得 (perlがない場合リビジョン番号を取得せずにビルドします)
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
-    ソースのチェックアウトに使った svn と互換性のあるバージョン。
-    libs\svn へ解凍します。("svnversion.exe" が libs\svn\bin に配置されるようにしてください)
+    リビジョン番号取得時に使用します
+    svnrev_perl/toolinfo.txt に svn.exe のフルパスを記述いてください。
+    詳しくは svnrev_perl/readme.md を参照ください
 
 
 ■ ライブラリ

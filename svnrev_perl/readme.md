@@ -2,16 +2,21 @@
 
 - svn(又は git)の情報からヘッダファイルとバッチファイルを作成する
   - `../teraterm/ttpdlg/svnversion.h`
-  - `svnversion.bat`
+  - `sourcetree_info.bat`
 
 ## 準備
 
-- svn(又は git)を実行できるようパスを設定する
-  - 実行できない場合もヘッダファイルは作成されます
-- perlを実行できるようパスを設定する
-  - libs/perl があれば利用します
-    - buildtools/getperl.bat をダブルクリックすると
-      strawberry perl を libs/perl に展開します
+- perl を実行できるようにしておく
+  - perl が実行できるよう環境変数 PATH を設定する
+  - または、../buildtools/libs/perl があれば使用する
+    - ../buildtools/getperl.bat をダブルクリックすると
+      strawberry perl が buildtools/perl に展開される
+  - または、いくつかのメジャーなperlを探して見つければ使用する
+  - perl が見つからない場合は svnversion.default.h が使用される
+- svn(又は git)を実行できるようにする
+  - svn が実行できるよう環境変数 PATH を設定する
+  - または、toolinfo.txt にツールのパスを書いておく
+  - ツールが実行できない場合もヘッダファイルは作成されます
 
 # ヘッダの作成方法
 
@@ -36,3 +41,5 @@
   - svnコマンドのパス
 - --git
   - gitコマンドのパス
+
+オプションが toolinfo.txt より優先されます

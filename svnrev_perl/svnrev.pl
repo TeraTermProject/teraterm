@@ -1,6 +1,7 @@
 ﻿use utf8;
 use Getopt::Long 'GetOptions';
 use POSIX 'strftime';
+binmode STDOUT, ':encoding(utf8)';
 
 $version = "5.0";
 $svn = "svn";
@@ -14,17 +15,44 @@ $time = strftime "%H%M%S", localtime;
 $verbose = 0;
 $script_name = $0;
 
+sub read_toolinfo {
+	my $info = "toolinfo.txt";
+	if (!-f $info) {
+		return;
+	}
+	open(my $FD, "<:utf8:crlf", $info);
+	while (my $l = <$FD>) {
+		chomp $l;
+		$str =~ s/^\x{FEFF}//;	# remove BOM
+		if ($l =~ /^#/) {
+			next;
+		}
+		if ($l =~ /^svn=\s*(.*)$/) {
+			$svn = $1;
+		}
+		if ($l =~ /^git=\s*(.*)$/) {
+			$git = $1;
+		}
+	}
+	close($FD);
+}
+
+&read_toolinfo();
+
 GetOptions(
 	'root=s' => \$source_root,
 	'svn=s' => \$svn,
 	'git=s' => \$git,
 	'header=s' => \$out_header,
 	'bat=s' => \$out_bat,
-	'cmake=s' => \$out_cmake
+	'cmake=s' => \$out_cmake,
+	'verbose' => \$verbose
 );
 
 $git =~ s/"//g;
+$git =~ s/\\/\//g;
 $svn =~ s/"//g;
+$svn =~ s/\\/\//g;
 
 if ($verbose != 0) {
 	print "root=$source_root\n";
