@@ -1,6 +1,8 @@
 @echo off
 
-set folder=openssl_patch
+rem cmdfolder は、patch を実行する .. から見た相対パス
+set cmdfolder=openssl_patch
+
 set cmdopt2=--binary --backup -p0
 set cmdopt1=--dry-run %cmdopt2%
 
@@ -10,13 +12,21 @@ echo.
 rem
 
 rem パッチコマンドの存在チェック
-set patchcmd="patch.exe"
-if exist %patchcmd% (goto cmd_true) else goto cmd_false
+rem ..\%cmdfolder%\patch.exe, PATHが通っているpatch の優先順
+pushd ..
+set patchcmd="%cmdfolder%\patch.exe"
+if exist %patchcmd% (
+    popd
+    goto cmd_true
+)
+popd
+
+set patchcmd=patch
+%patchcmd% -v
+if %errorlevel% == 0 (goto cmd_true) else goto cmd_false
 
 :cmd_true
 
-
-rem パッチの適用有無をチェック
 
 :patch1
 rem freeaddrinfo/getnameinfo/getaddrinfo API(WindowsXP以降)依存除去のため
@@ -25,8 +35,8 @@ if ERRORLEVEL 1 goto fail1
 goto patch2
 :fail1
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch2.txt
-%folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch2.txt
+%patchcmd% %cmdopt1% < %folder%\ws2_32_dll_patch2.txt
+%patchcmd% %cmdopt2% < %folder%\ws2_32_dll_patch2.txt
 popd
 
 :patch2
@@ -44,8 +54,8 @@ rem if ERRORLEVEL 1 goto fail5
 rem goto patch6
 rem :fail5
 rem pushd ..
-rem %folder%\patch %cmdopt1% < %folder%\RAND_bytes.txt
-rem %folder%\patch %cmdopt2% < %folder%\RAND_bytes.txt
+rem %patchcmd% %cmdopt1% < %folder%\RAND_bytes.txt
+rem %patchcmd% %cmdopt2% < %folder%\RAND_bytes.txt
 rem popd
 
 
@@ -56,8 +66,8 @@ if ERRORLEVEL 1 goto fail6
 goto patch7
 :fail6
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\atomic_api.txt
-%folder%\patch %cmdopt2% < %folder%\atomic_api.txt
+%patchcmd% %cmdopt1% < %folder%\atomic_api.txt
+%patchcmd% %cmdopt2% < %folder%\atomic_api.txt
 popd
 
 
@@ -69,8 +79,8 @@ if ERRORLEVEL 1 goto fail7
 goto patch8
 :fail7
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW2.txt
-%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW2.txt
+%patchcmd% %cmdopt1% < %folder%\CryptAcquireContextW2.txt
+%patchcmd% %cmdopt2% < %folder%\CryptAcquireContextW2.txt
 popd
 
 
@@ -85,8 +95,8 @@ goto patch9
 :fail8
 pushd ..
 copy /b openssl\crypto\threads_win.c.orig openssl\crypto\threads_win.c.orig2
-%folder%\patch %cmdopt1% < %folder%\atomic_api_win95.txt
-%folder%\patch %cmdopt2% < %folder%\atomic_api_win95.txt
+%patchcmd% %cmdopt1% < %folder%\atomic_api_win95.txt
+%patchcmd% %cmdopt2% < %folder%\atomic_api_win95.txt
 popd
 
 
@@ -99,8 +109,8 @@ goto patch10
 :fail9
 pushd ..
 copy /b openssl\crypto\rand\rand_win.c.orig openssl\crypto\rand\rand_win.c.orig2
-%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW_win95.txt
-%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW_win95.txt
+%patchcmd% %cmdopt1% < %folder%\CryptAcquireContextW_win95.txt
+%patchcmd% %cmdopt2% < %folder%\CryptAcquireContextW_win95.txt
 popd
 
 
@@ -128,9 +138,9 @@ if "%ANS%"=="y" (
 goto end
 
 :cmd_false
-echo パッチコマンド %patchcmd% が見つかりません
-echo 下記サイトからダウンロードしてください
-echo http://geoffair.net/projects/patch.htm
+echo パッチコマンドが見つかりません
+echo 下記サイトからダウンロードして、..\%cmdfolder% に patch.exe を配置してください
+echo https://github.com/git-for-windows/git/releases/latest
 echo.
 goto patchfail
 

@@ -47,6 +47,9 @@
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     Use the compatible version for check-outed svn version.
     Extract into libs\svn. ("svnversion.exe" is located in libs\svn\bin directory.)
+  Patch
+    PATH の通ったところに patch がない場合は、libs\openssl_patch に "patch.exe" が配置されるようにしてください。
+    https://gitforwindows.org/ (https://github.com/git-for-windows/git/releases/latest) からであれば、Git-x.xx.x-xx-bit.tar.bz2 をダウンロードして展開し、usr\bin 内の patch.exe, msys-gcc_s-1.dll, msys-2.0.dll をコピーします。
 
 
 * Libraries
