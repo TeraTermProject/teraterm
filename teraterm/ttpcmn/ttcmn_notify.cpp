@@ -38,7 +38,6 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include "ttcommon.h"
 #include "codeconv.h"
 #include "layer_for_unicode.h"

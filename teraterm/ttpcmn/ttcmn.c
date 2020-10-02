@@ -49,7 +49,6 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include "ttlib.h"
 #include "compat_w95.h"
 #include "tt_res.h"
