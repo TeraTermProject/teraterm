@@ -465,6 +465,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
+						NULL, NULL
 					};
 
 					switch (err) {
@@ -539,6 +540,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
 					"MSG_TT_ERROR", L"Tera Term: Error",
+					NULL, NULL
 				};
 				InvalidHost = TRUE;
 
@@ -562,6 +564,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
+						NULL, NULL
 					};
 
 					switch (err) {
