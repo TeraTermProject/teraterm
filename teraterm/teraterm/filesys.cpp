@@ -376,6 +376,24 @@ void FileSendStart(void)
 		FileTransEnd(OpSendFile);
 }
 
+BOOL FileSendStart2(const char *filename, int binary)
+{
+	if (SendVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&SendVar)) {
+		return FALSE;
+	}
+
+	SendVar->DirLen = 0;
+	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), filename, _TRUNCATE);
+	ts.TransBin = binary;
+	SendVar->NoMsg = TRUE;
+	FileSendStart();
+
+	return TRUE;
+}
+
 void FileTransEnd(WORD OpId)
 /* OpId = 0: close Log and FileSend
       OpLog: close Log
@@ -835,6 +853,64 @@ void KermitStart(int mode)
 		ProtoEnd();
 }
 
+BOOL KermitStartSend(const char *filename)
+{
+	if (FileVar !=NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+	FileVar->NumFname = 1;
+	FileVar->NoMsg = TRUE;
+	KermitStart(IdKmtSend);
+
+	return TRUE;
+}
+
+BOOL KermitGet(const char *filename)
+{
+	if (FileVar !=NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+	FileVar->NumFname = 1;
+	FileVar->NoMsg = TRUE;
+	KermitStart(IdKmtGet);
+
+	return TRUE;
+}
+
+BOOL KermitStartRecive(void)
+{
+	if (FileVar !=NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->NoMsg = TRUE;
+	KermitStart(IdKmtReceive);
+
+	return TRUE;
+}
+
+BOOL KermitFinish(void)
+{
+	if (FileVar !=NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->NoMsg = TRUE;
+	KermitStart(IdKmtFinish);
+
+	return TRUE;
+}
+
 void XMODEMStart(int mode)
 {
 	LONG Option;
@@ -922,6 +998,70 @@ void XMODEMStart(int mode)
 		ProtoEnd();
 }
 
+BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt)
+{
+	if (FileVar !=NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),fiename, _TRUNCATE);
+	if (IsXopt1k(ts.XmodemOpt)) {
+		if (IsXoptCRC(ParamXmodemOpt)) {
+			// CRC
+			ts.XmodemOpt = Xopt1kCRC;
+		}
+		else {	// Checksum
+			ts.XmodemOpt = Xopt1kCksum;
+		}
+	}
+	else {
+		if (IsXoptCRC(ParamXmodemOpt)) {
+			ts.XmodemOpt = XoptCRC;
+		}
+		else {
+			ts.XmodemOpt = XoptCheck;
+		}
+	}
+	ts.XmodemBin = ParamBinaryFlag;
+	FileVar->NoMsg = TRUE;
+	XMODEMStart(IdXReceive);
+
+	return TRUE;
+}
+
+BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt)
+{
+	if (FileVar !=NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName), fiename, _TRUNCATE);
+	if (IsXoptCRC(ts.XmodemOpt)) {
+		if (IsXopt1k(ParamXmodemOpt)) {
+			ts.XmodemOpt = Xopt1kCRC;
+		}
+		else {
+			ts.XmodemOpt = XoptCRC;
+		}
+	}
+	else {
+		if (IsXopt1k(ParamXmodemOpt)) {
+			ts.XmodemOpt = Xopt1kCksum;
+		}
+		else {
+			ts.XmodemOpt = XoptCheck;
+		}
+	}
+	FileVar->NoMsg = TRUE;
+	XMODEMStart(IdXSend);
+
+	return TRUE;
+}
+
 void YMODEMStart(int mode)
 {
 	WORD Opt;
@@ -967,6 +1107,36 @@ void YMODEMStart(int mode)
 		ProtoEnd();
 }
 
+BOOL YMODEMStartReceive()
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+	FileVar->NoMsg = TRUE;
+	YMODEMStart(IdYReceive);
+	return TRUE;
+}
+
+BOOL YMODEMStartSend(const char *fiename)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),fiename, _TRUNCATE);
+	FileVar->NumFname = 1;
+	FileVar->NoMsg = TRUE;
+	YMODEMStart(IdYSend);
+	return TRUE;
+}
+
 void ZMODEMStart(int mode)
 {
 	WORD Opt;
@@ -1008,6 +1178,41 @@ void ZMODEMStart(int mode)
 		ProtoEnd();
 }
 
+BOOL ZMODEMStartReceive(void)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+
+	FileVar->NoMsg = TRUE;
+	ZMODEMStart(IdZReceive);
+
+	return TRUE;
+}
+
+BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),fiename, _TRUNCATE);
+	FileVar->NumFname = 1;
+	ts.XmodemBin = ParamBinaryFlag;
+	FileVar->NoMsg = TRUE;
+
+	ZMODEMStart(IdZSend);
+
+	return TRUE;
+}
+
 void BPStart(int mode)
 {
 	LONG Option = 0;
@@ -1041,6 +1246,37 @@ void BPStart(int mode)
 
 	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0))
 		ProtoEnd();
+}
+
+BOOL BPSendStart(const char *filename)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName), filename, _TRUNCATE);
+	FileVar->NumFname = 1;
+	FileVar->NoMsg = TRUE;
+	BPStart(IdBPSend);
+
+	return TRUE;
+}
+
+BOOL BPStartReceive(void)
+{
+	if (FileVar != NULL)
+		return FALSE;
+	if (!NewFileVar(&FileVar))
+		return FALSE;
+
+	FileVar->NoMsg = TRUE;
+	BPStart(IdBPReceive);
+
+	return TRUE;
 }
 
 void QVStart(int mode)
@@ -1079,6 +1315,38 @@ void QVStart(int mode)
 		ProtoEnd();
 }
 
+BOOL QVStartReceive(void)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+
+	FileVar->NoMsg = TRUE;
+	QVStart(IdQVReceive);
+
+	return TRUE;
+}
+
+BOOL QVStartSend(const char *filename)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar(&FileVar)) {
+		return FALSE;
+	}
+
+	FileVar->DirLen = 0;
+	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+	FileVar->NumFname = 1;
+	FileVar->NoMsg = TRUE;
+	QVStart(IdQVSend);
+
+	return TRUE;
+}
 
 BOOL IsSendVarNULL()
 {

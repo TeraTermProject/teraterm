@@ -72,12 +72,13 @@ extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 
 BOOL LoadTTFILE(void);
 BOOL FreeTTFILE(void);
-BOOL NewFileVar(PFileVar *FV);
-void FreeFileVar(PFileVar *FV);
+//BOOL NewFileVar(PFileVar *FV);
+//void FreeFileVar(PFileVar *FV);
 BOOL IsSendVarNULL();
 BOOL IsFileVarNULL();
 
 void FileSendStart(void);
+BOOL FileSendStart2(const char *filename, int binary);
 void FileSend(void);
 void FileTransEnd(WORD OpId);
 void FileTransPause(WORD OpId, BOOL Pause);
@@ -87,11 +88,25 @@ int ProtoDlgParse(void);
 void ProtoDlgTimeOut(void);
 void ProtoDlgCancel(void);
 void KermitStart(int mode);
+BOOL KermitStartSend(const char *filename);
+BOOL KermitGet(const char *filename);
+BOOL KermitStartRecive(void);
+BOOL KermitFinish(void);
 void XMODEMStart(int mode);
+BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt);
+BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt);
 void YMODEMStart(int mode);
+BOOL YMODEMStartReceive(void);
+BOOL YMODEMStartSend(const char *fiename);
 void ZMODEMStart(int mode);
+BOOL ZMODEMStartReceive(void);
+BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag);
 void BPStart(int mode);
+BOOL BPSendStart(const char *filename);
+BOOL BPStartReceive(void);
 void QVStart(int mode);
+BOOL QVStartReceive(void);
+BOOL QVStartSend(const char *filename);
 
 extern PFileVar SendVar, FileVar;
 

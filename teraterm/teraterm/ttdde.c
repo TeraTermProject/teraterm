@@ -426,24 +426,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		SyncRecv = TRUE;
 		break;
 	case CmdBPlusRecv:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->NoMsg = TRUE;
+		if (BPStartReceive()) {
 			DdeCmnd = TRUE;
-			BPStart(IdBPReceive);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdBPlusSend:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			FileVar->NumFname = 1;
-			FileVar->NoMsg = TRUE;
+		if (!BPSendStart(ParamFileName)) {
 			DdeCmnd = TRUE;
-			BPStart(IdBPSend);
 		}
 		else
 			return DDE_FNOTPROCESSED;
@@ -516,34 +507,30 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 	case CmdKmtFinish:
-	case CmdKmtRecv:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->NoMsg = TRUE;
+		if (KermitFinish()) {
 			DdeCmnd = TRUE;
-			if (Command[0]==CmdKmtFinish)
-				i = IdKmtFinish;
-			else
-				i = IdKmtReceive;
-			KermitStart(i);
+		}
+		else {
+			return DDE_FNOTPROCESSED;
+		}
+		break;
+	case CmdKmtRecv:
+		if (KermitStartRecive()) {
+			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdKmtGet:
-	case CmdKmtSend:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			FileVar->NumFname = 1;
-			FileVar->NoMsg = TRUE;
+		if (KermitGet(ParamFileName)) {
 			DdeCmnd = TRUE;
-			if (Command[0]==CmdKmtGet)
-				i = IdKmtGet;
-			else
-				i = IdKmtSend;
-			KermitStart(i);
+		}
+		else
+			return DDE_FNOTPROCESSED;
+		break;
+	case CmdKmtSend:
+		if (KermitStartSend(ParamFileName)) {
+			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
@@ -604,24 +591,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	}
 	case CmdQVRecv:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->NoMsg = TRUE;
+		if (QVStartReceive()) {
 			DdeCmnd = TRUE;
-			QVStart(IdQVReceive);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdQVSend:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			FileVar->NumFname = 1;
-			FileVar->NoMsg = TRUE;
+		if (QVStartSend(ParamFileName)) {
 			DdeCmnd = TRUE;
-			QVStart(IdQVSend);
 		}
 		else
 			return DDE_FNOTPROCESSED;
@@ -634,14 +612,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdBreak,0);
 		break;
 	case CmdSendFile:
-		if ((SendVar==NULL) && NewFileVar(&SendVar))
-		{
-			SendVar->DirLen = 0;
-			strncpy_s(SendVar->FullName, sizeof(SendVar->FullName),ParamFileName, _TRUNCATE);
-			ts.TransBin = ParamBinaryFlag;
-			SendVar->NoMsg = TRUE;
+		if (FileSendStart2(ParamFileName, ParamBinaryFlag)) {
 			DdeCmnd = TRUE;
-			FileSendStart();
 		}
 		else
 			return DDE_FNOTPROCESSED;
@@ -691,108 +663,45 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 	case CmdXmodemRecv:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			if (IsXopt1k(ts.XmodemOpt)) {
-				if (IsXoptCRC(ParamXmodemOpt)) {
-					// CRC
-					ts.XmodemOpt = Xopt1kCRC;
-				}
-				else {	// Checksum
-					ts.XmodemOpt = Xopt1kCksum;
-				}
-			}
-			else {
-				if (IsXoptCRC(ParamXmodemOpt)) {
-					ts.XmodemOpt = XoptCRC;
-				}
-				else {
-					ts.XmodemOpt = XoptCheck;
-				}
-			}
-			ts.XmodemBin = ParamBinaryFlag;
-			FileVar->NoMsg = TRUE;
+		if (XMODEMStartSend(ParamFileName, ParamXmodemOpt)) {
 			DdeCmnd = TRUE;
-			XMODEMStart(IdXReceive);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdXmodemSend:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			if (IsXoptCRC(ts.XmodemOpt)) {
-				if (IsXopt1k(ParamXmodemOpt)) {
-					ts.XmodemOpt = Xopt1kCRC;
-				}
-				else {
-					ts.XmodemOpt = XoptCRC;
-				}
-			}
-			else {
-				if (IsXopt1k(ParamXmodemOpt)) {
-					ts.XmodemOpt = Xopt1kCksum;
-				}
-				else {
-					ts.XmodemOpt = XoptCheck;
-				}
-			}
-			FileVar->NoMsg = TRUE;
+		if (XMODEMStartReceive(ParamFileName, ParamBinaryFlag, ParamXmodemOpt)) {
 			DdeCmnd = TRUE;
-			XMODEMStart(IdXSend);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdZmodemRecv:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->NoMsg = TRUE;
+		if (ZMODEMStartReceive()) {
 			DdeCmnd = TRUE;
-			ZMODEMStart(IdZReceive);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdZmodemSend:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			FileVar->NumFname = 1;
-			ts.XmodemBin = ParamBinaryFlag;
-			FileVar->NoMsg = TRUE;
+		if (ZMODEMStartSend(ParamFileName, ParamBinaryFlag)) {
 			DdeCmnd = TRUE;
-			ZMODEMStart(IdZSend);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 
 	case CmdYmodemRecv:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
+		if (YMODEMStartReceive())
 		{
-			FileVar->NoMsg = TRUE;
 			DdeCmnd = TRUE;
-			YMODEMStart(IdYReceive);
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdYmodemSend:
-		if ((FileVar==NULL) && NewFileVar(&FileVar))
-		{
-			FileVar->DirLen = 0;
-			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			FileVar->NumFname = 1;
-			//ts.XmodemBin = ParamBinaryFlag;
-			FileVar->NoMsg = TRUE;
+		if (YMODEMStartSend(ParamFileName)) {
 			DdeCmnd = TRUE;
-			YMODEMStart(IdYSend);
 		}
 		else
 			return DDE_FNOTPROCESSED;
