@@ -1078,3 +1078,14 @@ void QVStart(int mode)
 	if (! OpenProtoDlg(FileVar,PROTO_QV,mode,0,0))
 		ProtoEnd();
 }
+
+
+BOOL IsSendVarNULL()
+{
+	return SendVar == NULL;
+}
+
+BOOL IsFileVarNULL()
+{
+	return FileVar == NULL;
+}

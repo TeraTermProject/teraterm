@@ -927,7 +927,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		(ts.PasteFlag & CPF_CONFIRM_RBUTTON) != 0 &&
 		cv.Ready &&
 		!mousereport &&
-		(SendVar==NULL) && (FileVar==NULL) &&
+		IsSendVarNULL() && IsFileVarNULL() &&
 		(cv.PortType!=IdFile) &&
 		(IsClipboardFormatAvailable(CF_TEXT) ||
 		 IsClipboardFormatAvailable(CF_OEMTEXT))) {
@@ -1221,8 +1221,8 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			}
 		}
 
-		if ( (! cv.Ready) || (SendVar!=NULL) ||
-		     (FileVar!=NULL) || (cv.PortType==IdFile) ) {
+		if ( (! cv.Ready) || (!IsSendVarNULL()) ||
+		     (!IsFileVarNULL()) || (cv.PortType==IdFile) ) {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_GRAYED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_GRAYED);
@@ -1305,7 +1305,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(EditMenu,ID_EDIT_COPYTABLE,MF_BYCOMMAND | MF_GRAYED);
 		}
 		if (cv.Ready &&
-		    (SendVar==NULL) && (FileVar==NULL) &&
+		    IsSendVarNULL() && IsFileVarNULL() &&
 		    (cv.PortType!=IdFile) &&
 		    (IsClipboardFormatAvailable(CF_TEXT) ||
 		    IsClipboardFormatAvailable(CF_OEMTEXT))) {
@@ -1323,7 +1323,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		 * (ID_SETUP_SERIALPORT)のメニューが選択できないようになっていたが、
 		 * このガードを外し、シリアルポート設定ダイアログから新しい接続ができるようにする。
 		 */
-		if ((SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
+		if (!IsSendVarNULL() || !IsFileVarNULL() || Connecting) {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 		else {
@@ -1333,7 +1333,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	else if (SubMenu == ControlMenu)
 	{
 		if (cv.Ready &&
-		    (SendVar==NULL) && (FileVar==NULL)) {
+		    IsSendVarNULL() && IsFileVarNULL()) {
 			if (ts.DisableMenuSendBreak) {
 				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_GRAYED);
 			}
@@ -1352,7 +1352,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		if (cv.Ready && cv.TelFlag && (FileVar==NULL)) {
+		if (cv.Ready && cv.TelFlag && IsFileVarNULL()) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_AREYOUTHERE,MF_BYCOMMAND | MF_ENABLED);
 		}
 		else {
@@ -1366,7 +1366,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(ControlMenu,ID_CONTROL_CLOSETEK,MF_BYCOMMAND | MF_ENABLED);
 		}
 
-		if (DDELog || (FileVar!=NULL)) {
+		if (DDELog || !IsFileVarNULL()) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(ControlMenu,ID_CONTROL_SHOW_MACRO,MF_BYCOMMAND | MF_ENABLED);
 		}
@@ -2068,7 +2068,7 @@ finish:
 void CVTWindow::OnDropFiles(HDROP hDropInfo)
 {
 	::SetForegroundWindow(HVTWin);
-	if (cv.Ready && SendVar==NULL)
+	if (cv.Ready && IsSendVarNULL())
 	{
 		const UINT ShowDialog =
 			((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) ? 1 : 0;

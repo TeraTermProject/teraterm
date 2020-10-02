@@ -72,9 +72,10 @@ extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 
 BOOL LoadTTFILE(void);
 BOOL FreeTTFILE(void);
-//void ShowFTDlg(WORD OpId);
 BOOL NewFileVar(PFileVar *FV);
 void FreeFileVar(PFileVar *FV);
+BOOL IsSendVarNULL();
+BOOL IsFileVarNULL();
 
 void FileSendStart(void);
 void FileSend(void);
