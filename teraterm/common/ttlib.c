@@ -1064,7 +1064,7 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
 }
 
-int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
+int get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
 {
 	if (GetI18nLogfont("Tera Term", key, logfont,
 	                   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
