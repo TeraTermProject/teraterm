@@ -195,6 +195,12 @@ typedef enum {
 // LogDialog Option
 #define LOGDLG_BINARY          1
 
+// log rotate mode
+enum rotate_mode {
+	ROTATE_NONE,
+	ROTATE_SIZE
+};
+
 // Log Timestamp Type
 enum LogTimestampType {
     TIMESTAMP_LOCAL,

@@ -44,7 +44,6 @@
 #include "tttypes.h"
 #include "ttwinman.h"	// for ts
 #include "ttcommon.h"
-#include "ttftypes.h"
 #include "dlglib.h"
 #include "compat_win.h"
 #include "helpid.h"
@@ -322,7 +321,7 @@ BOOL CSequencePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IDC_ACCEPT_MOUSE_EVENT_TRACKING | (BN_CLICKED << 16):
-			EnableDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL, 
+			EnableDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL,
 						  GetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING) ? TRUE : FALSE);
 			return TRUE;
 	}
@@ -1111,7 +1110,7 @@ void CVisualPropPageDlg::OnOK()
 	GetDlgItemTextA(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
 		int i = atoi(buf);
-		ts.AlphaBlendInactive = 
+		ts.AlphaBlendInactive =
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
@@ -1132,7 +1131,7 @@ void CVisualPropPageDlg::OnOK()
 	GetDlgItemTextA(IDC_EDIT_BGIMG_BRIGHTNESS, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
 		int i = atoi(buf);
-		ts.BGImgBrightness = 
+		ts.BGImgBrightness =
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
@@ -1801,4 +1800,3 @@ INT_PTR CAddSettingPropSheetDlg::DoModal()
 	gTTCPS = this;
 	return _PropertySheetW(&m_psh);
 }
-

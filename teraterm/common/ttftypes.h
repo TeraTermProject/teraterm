@@ -89,12 +89,6 @@
 #define TitQVRcv    "Quick-VAN Receive"
 #define TitQVSend   "Quick-VAN Send"
 
-// log rotate mode
-enum rotate_mode {
-	ROTATE_NONE,
-	ROTATE_SIZE
-};
-
 typedef struct {
   HWND HMainWin;
   HWND HWin;
