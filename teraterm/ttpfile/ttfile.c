@@ -512,10 +512,16 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 
 static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	static const DlgTextInfo text_info[] = {
+		{ 0, "DLG_GETFN_TITLE" },
+		{ IDC_FILENAME, "DLG_GETFN_FILENAME" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDC_GETFNHELP, "BTN_HELP" },
+	};
 	PFileVar fv;
 	char TempFull[MAX_PATH];
 	int i, j;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
 
@@ -538,21 +544,7 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			DlgGetfnFont = NULL;
 		}
 
-		GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_GETFN_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetWindowText(Dialog, uimsg);
-		GetDlgItemText(Dialog, IDC_FILENAME, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_GETFN_FILENAME", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_FILENAME, uimsg);
-		GetDlgItemText(Dialog, IDOK, uimsg2, sizeof(uimsg2));
-		get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDOK, uimsg);
-		GetDlgItemText(Dialog, IDCANCEL, uimsg2, sizeof(uimsg2));
-		get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDCANCEL, uimsg);
-		GetDlgItemText(Dialog, IDC_GETFNHELP, uimsg2, sizeof(uimsg2));
-		get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_GETFNHELP, uimsg);
+		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
 
 		return TRUE;
 
