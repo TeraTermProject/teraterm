@@ -59,7 +59,7 @@ void uint2str(UINT i, PCHAR Str, int destlen, int len);
 #ifdef WIN32
 void QuoteFName(PCHAR FName);
 #endif
-int isInvalidFileNameChar(PCHAR FName);
+int isInvalidFileNameChar(const char *FName);
 #define deleteInvalidFileNameChar(name) replaceInvalidFileNameChar(name, 0)
 DllExport void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 int isInvalidStrftimeChar(PCHAR FName);

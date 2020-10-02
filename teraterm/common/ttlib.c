@@ -531,7 +531,7 @@ void QuoteFName(PCHAR FName)
 }
 
 // ファイル名に使用できない文字が含まれているか確かめる (2006.8.28 maya)
-int isInvalidFileNameChar(PCHAR FName)
+int isInvalidFileNameChar(const char *FName)
 {
 	int i, len;
 	char **p, c;
