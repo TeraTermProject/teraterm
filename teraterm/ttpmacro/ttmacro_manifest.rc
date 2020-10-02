@@ -1,2 +1,2 @@
-#include "winuser.h"
+#include "winuser.rh"
 1 RT_MANIFEST ttmacro.manifest
