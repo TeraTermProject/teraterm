@@ -29,14 +29,19 @@
 
 /* TERATERM.EXE, file-transfer-protocol dialog box */
 #include "tmfc.h"
-#include "tttypes.h"
 
 // CProtoDlg dialog
+
+typedef struct {
+	const char *UILanguageFile;
+	HWND HMainWin;
+} CProtoDlgInfo;
+
 class CProtoDlg : public TTCDialog
 {
 
 public:
-	BOOL Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet pts);
+	BOOL Create(HINSTANCE hInstance, HWND hParent, const CProtoDlgInfo *info);
 
 protected:
 	virtual BOOL OnCancel();
@@ -44,8 +49,8 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PostNcDestroy();
 private:
-	PFileVar fv;
-	TTTSet *m_pts;
+	const char *UILanguageFile;
+	HWND HMainWin;
 };
 
 typedef CProtoDlg *PProtoDlg;

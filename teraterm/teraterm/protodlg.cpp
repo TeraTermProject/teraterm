@@ -31,7 +31,7 @@
 #include "teraterm.h"
 #include "tt_res.h"
 #include "tttypes.h"
-#include "ttftypes.h"
+//#include "ttftypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "protodlg.h"
@@ -39,16 +39,15 @@
 /////////////////////////////////////////////////////////////////////////////
 // CProtoDlg dialog
 
-BOOL CProtoDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet pts)
+BOOL CProtoDlg::Create(HINSTANCE hInstance, HWND hParent, const CProtoDlgInfo *info)
 {
-	m_pts = pts;
-	fv = pfv;
+	UILanguageFile = info->UILanguageFile;
+	HMainWin = info->HMainWin;
 
 	BOOL Ok = TTCDialog::Create(hInstance, hParent, IDD_PROTDLG);
-	fv->HWin = GetSafeHwnd();
-
 	return Ok;
 }
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CProtoDlg message handler
@@ -63,14 +62,14 @@ BOOL CProtoDlg::OnInitDialog()
 		{ IDC_PROT_ELAPSED, "DLG_PROT_ELAPSED" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), m_pts->UILanguageFile);
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	return TRUE;
 }
 
 
 BOOL CProtoDlg::OnCancel()
 {
-	::PostMessage(fv->HMainWin,WM_USER_PROTOCANCEL,0,0);
+	::PostMessage(HMainWin,WM_USER_PROTOCANCEL,0,0);
 	return TRUE;
 }
 
@@ -78,7 +77,7 @@ BOOL CProtoDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam)) {
 		case IDCANCEL:
-			::PostMessage(fv->HMainWin,WM_USER_PROTOCANCEL,0,0);
+			::PostMessage(HMainWin,WM_USER_PROTOCANCEL,0,0);
 			return TRUE;
 		default:
 			return (TTCDialog::OnCommand(wParam,lParam));

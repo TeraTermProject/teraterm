@@ -663,7 +663,11 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 		ProtoVar = NULL;
 		return FALSE;
 	}
-	pd->Create(hInst, HVTWin, fv, &ts);
+	CProtoDlgInfo info;
+	info.UILanguageFile = ts.UILanguageFile;
+	info.HMainWin = fv->HMainWin;
+	pd->Create(hInst, HVTWin, &info);
+	fv->HWin = pd->m_hWnd;
 
 	(*ProtoInit)(ProtoId,FileVar,ProtoVar,&cv,&ts);
 
