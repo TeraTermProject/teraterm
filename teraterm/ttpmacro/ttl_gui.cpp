@@ -48,6 +48,7 @@
 #include "codeconv.h"
 #include "layer_for_unicode.h"
 #include "ttlib.h"
+#include "dlglib.h"
 
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
@@ -157,7 +158,8 @@ WORD TTLFilenameBox()
 
 	SetInputStr("");
 	if (CheckVar("inputstr", &ValType, &VarId) && (ValType==TypString)) {
-		wchar_t uimsg[MAX_UIMSG];
+		wchar_t *FNFilter = GetCommonDialogFilterW(NULL, UILanguageFile);
+
 		OPENFILENAMEW ofn = {};
 		wchar_t filename[MAX_PATH];
 		filename[0] = 0;
@@ -166,8 +168,7 @@ WORD TTLFilenameBox()
 		ofn.lpstrTitle      = Str1T;
 		ofn.lpstrFile       = filename;
 		ofn.nMaxFile        = _countof(filename);
-		get_lang_msgW("FILEDLG_ALL_FILTER", uimsg, _countof(uimsg), L"All(*.*)\\0*.*\\0\\0", UILanguageFile);
-		ofn.lpstrFilter     = uimsg;
+		ofn.lpstrFilter     = FNFilter;
 		ofn.lpstrInitialDir = NULL;
 		if (strlen(InitDir) > 0) {
 			ofn.lpstrInitialDir = InitDirT;
@@ -182,7 +183,7 @@ WORD TTLFilenameBox()
 			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 			ret = _GetOpenFileNameW(&ofn);
 		}
-
+		free(FNFilter);
 		char *filenameU8 = ToU8W(filename);
 		SetStrVal(VarId, filenameU8);
 		free(filenameU8);

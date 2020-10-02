@@ -39,4 +39,3 @@ LONG UpdateCRC32(BYTE b, LONG CRC);
 void FTLog1Byte(PFileVar fv, BYTE b);
 void FTSetTimeOut(PFileVar fv, int T);
 BOOL FTCreateFile(PFileVar fv);
-void GetFileSendFilter(PCHAR dest, PCHAR src, int size);

@@ -193,9 +193,9 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];
-	char FNFilter[sizeof(FileSendFilter)*3], *pf;
+	char *FNFilter;
 	OPENFILENAME ofn;
-	WORD optw;
+	WORD optw = 0;
 	char TempDir[MAXPATHLEN];
 	BOOL Ok;
 	char FileName[MAX_PATH];
@@ -203,40 +203,23 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	/* save current dir */
 	_getcwd(TempDir,sizeof(TempDir));
 
-	memset(FNFilter, 0, sizeof(FNFilter));  /* Set up for double null at end */
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 
 	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	pf = FNFilter;
 	switch (FuncId) {
 	case GTF_SEND:
 		get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		if (strlen(FileSendFilter) > 0) {
-			get_lang_msg("FILEDLG_USER_FILTER_NAME", uimsg, sizeof(uimsg), "User define", UILanguageFile);
-			_snprintf_s(FNFilter, sizeof(FNFilter), _TRUNCATE, "%s(%s)", uimsg, FileSendFilter);
-			pf = pf + strlen(FNFilter) + 1;
-			strncpy_s(pf, sizeof(FNFilter)-(pf - FNFilter) ,FileSendFilter, _TRUNCATE);
-			pf = pf + strlen(pf) + 1;
-		}
 		break;
 	case GTF_BP:
 		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		if (strlen(FileSendFilter) > 0) {
-			get_lang_msg("FILEDLG_USER_FILTER_NAME", uimsg, sizeof(uimsg), "User define", UILanguageFile);
-			_snprintf_s(FNFilter, sizeof(FNFilter), _TRUNCATE, "%s(%s)", uimsg, FileSendFilter);
-			pf = pf + strlen(FNFilter) + 1;
-			strncpy_s(pf, sizeof(FNFilter)-(pf - FNFilter) ,FileSendFilter, _TRUNCATE);
-			pf = pf + strlen(pf) + 1;
-		}
 		break;
-	default: return FALSE;
+	default:
+		return FALSE;
 	}
 
-	get_lang_msg("FILEDLG_ALL_FILTER", uimsg, sizeof(uimsg), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
-	// \0\0 で終わる必要があるので 2 バイト
-	memcpy(pf, uimsg, sizeof(FNFilter) - (pf - FNFilter + 2));
+	FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
 
 	ExtractFileName(fv->FullName, FileName ,sizeof(FileName));
 	strncpy_s(fv->FullName, sizeof(fv->FullName), FileName, _TRUNCATE);
@@ -270,6 +253,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 	ofn.hInstance = hInst;
 
 	Ok = GetOpenFileName(&ofn);
+	free(FNFilter);
 
 	if (Ok) {
 		*Option = (long)optw;
@@ -362,13 +346,11 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 {
 	int i, len;
 	char uimsg[MAX_UIMSG];
-	char FNFilter[sizeof(FileSendFilter)*2+128], *pf;
+	char *FNFilter;
 	OPENFILENAME ofn;
 	char TempDir[MAXPATHLEN];
 	BOOL Ok;
 	char defaultFName[MAX_PATH];
-
-	memset(FNFilter, 0, sizeof(FNFilter));  /* Set up for double null at end */
 
 	/* save current dir */
 	_getcwd(TempDir,sizeof(TempDir));
@@ -376,7 +358,6 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	fv->NumFname = 0;
 
 	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	pf = FNFilter;
 	switch (FuncId) {
 	case GMF_KERMIT:
 		get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
@@ -397,13 +378,6 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	default:
 		return FALSE;
 	}
-	if (strlen(FileSendFilter) > 0) {
-		get_lang_msg("FILEDLG_USER_FILTER_NAME", uimsg, sizeof(uimsg), "User define", UILanguageFile);
-		_snprintf_s(FNFilter, sizeof(FNFilter), _TRUNCATE, "%s(%s)", uimsg, FileSendFilter);
-		pf = pf + strlen(FNFilter) + 1;
-		strncpy_s(pf, sizeof(FNFilter)-(pf - FNFilter) ,FileSendFilter, _TRUNCATE);
-		pf = pf + strlen(pf) + 1;
-	}
 
 	/* moemory should be zero-initialized */
 	fv->FnStrMemHandle = GlobalAlloc(GHND, FnStrMemSize);
@@ -421,9 +395,7 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 		}
 	}
 
-	get_lang_msg("FILEDLG_ALL_FILTER", uimsg, sizeof(uimsg), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
-	// \0\0 で終わる必要があるので 2 バイト
-	memcpy(pf, uimsg, sizeof(FNFilter) - (pf - FNFilter + 2));
+	FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
 
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
@@ -464,6 +436,8 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	}
 
 	Ok = GetOpenFileName(&ofn);
+	free(FNFilter);
+
 	if (Ok) {
 		/* count number of file names */
 		len = strlen(fv->FnStrMem);
@@ -798,23 +772,19 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
 {
 	char uimsg[MAX_UIMSG];
-	char FNFilter[sizeof(FileSendFilter)*2+128], *pf;
+	char *FNFilter;
 	OPENFILENAME ofn;
 	LONG opt;
 	char TempDir[MAXPATHLEN];
 	BOOL Ok;
 
-	memset(FNFilter, 0, sizeof(FNFilter));  /* Set up for double null at end */
-
 	/* save current dir */
 	_getcwd(TempDir,sizeof(TempDir));
 
 	fv->FullName[0] = 0;
-	memset(FNFilter, 0, sizeof(FNFilter));  /* Set up for double null at end */
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 
 	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	pf = FNFilter;
 	if (Receive) {
 		get_lang_msg("FILEDLG_TRANS_TITLE_XRCV", uimsg, sizeof(uimsg), TitXRcv, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
@@ -822,15 +792,12 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 	else {
 		get_lang_msg("FILEDLG_TRANS_TITLE_XSEND", uimsg, sizeof(uimsg), TitXSend, UILanguageFile);
 		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		if (strlen(FileSendFilter) > 0) {
-			get_lang_msg("FILEDLG_USER_FILTER_NAME", uimsg, sizeof(uimsg), "User define", UILanguageFile);
-			_snprintf_s(FNFilter, sizeof(FNFilter), _TRUNCATE, "%s(%s)", uimsg, FileSendFilter);
-			pf = pf + strlen(FNFilter) + 1;
-			strncpy_s(pf, sizeof(FNFilter)-(pf - FNFilter) ,FileSendFilter, _TRUNCATE);
-			pf = pf + strlen(pf) + 1;
+	}
 
-			// フィルタがワイルドカードではなく、そのファイルが存在する場合
-			// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
+	// フィルタがワイルドカードではなく、そのファイルが存在する場合
+	// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
+	if (!Receive) {
+		if (strlen(FileSendFilter) > 0) {
 			if (!isInvalidFileNameChar(FileSendFilter)) {
 				char file[MAX_PATH];
 				strncpy_s(file, sizeof(file), CurDir, _TRUNCATE);
@@ -843,9 +810,7 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 		}
 	}
 
-	get_lang_msg("FILEDLG_ALL_FILTER", uimsg, sizeof(uimsg), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
-	// \0\0 で終わる必要があるので 2 バイト
-	memcpy(pf, uimsg, sizeof(FNFilter) - (pf - FNFilter + 2));
+	FNFilter = GetCommonDialogFilterA(Receive == TRUE ? NULL : FileSendFilter, UILanguageFile);
 
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = HWin;
@@ -878,6 +843,7 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 	else {
 		Ok = GetSaveFileName(&ofn);
 	}
+	free(FNFilter);
 
 	if (Ok) {
 		fv->DirLen = ofn.nFileOffset;

@@ -585,8 +585,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			wchar_t fname[MAX_PATH];
 			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
 
-			wchar_t FNFilter[128*3];
-			get_lang_msgW("FILEDLG_ALL_FILTER", FNFilter, sizeof(FNFilter), L"All(*.*)\\0*.*\\0\\0", UILanguageFile);
+			wchar_t *FNFilter = GetCommonDialogFilterW(NULL, UILanguageFile);
 
 			wchar_t caption[MAX_PATH];
 			wchar_t uimsg[MAX_UIMSG];
@@ -608,6 +607,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.nMaxFile = _countof(fname);
 			ofn.lpstrTitle = caption;
 			BOOL Ok = GetSaveFileNameW(&ofn);
+			free(FNFilter);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
 			}

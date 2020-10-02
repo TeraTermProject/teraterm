@@ -48,98 +48,6 @@
 
 #define TitSendFileW L"Send file"	// TODO ttftype.h内にANSI版がある
 
-/**
- *	GetOpenFileName(), GetSaveFileName() 用フィルタ文字列取得
- *
- *	@param[in]	user_filter_mask	ユーザーフィルタ文字列
- *									"*.txt", "*.txt;*.log" など
- *									NULLのとき使用しない
- *	@param[in]	UILanguageFile
- *	@param[out]	len					生成した文字列長(wchar_t単位)
- *									NULLのときは返さない
- *	@retval		"User define(*.txt)\0*.txt\0All(*.*)\0*.*\0" など
- *				終端は "\0\0" となる
- */
-static wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile, size_t *len)
-{
-	// "ユーザ定義(*.txt)\0*.txt"
-	wchar_t *user_filter_str = NULL;
-	size_t user_filter_len = 0;
-	if (user_filter_mask != NULL && user_filter_mask[0] != 0) {
-		wchar_t user_filter_name[MAX_UIMSG];
-		get_lang_msgW("FILEDLG_USER_FILTER_NAME", user_filter_name, sizeof(user_filter_name), L"User define",
-					 UILanguageFile);
-		size_t user_filter_name_len = wcslen(user_filter_name);
-		wchar_t *user_filter_maskW = ToWcharA(user_filter_mask);
-		size_t user_filter_mask_len = wcslen(user_filter_maskW);
-		user_filter_len = user_filter_name_len + 1 + user_filter_mask_len + 1 + 1 + user_filter_mask_len + 1;
-		user_filter_str = (wchar_t *)malloc(user_filter_len * sizeof(wchar_t));
-		wchar_t *p = user_filter_str;
-		wmemcpy(p, user_filter_name, user_filter_name_len);
-		p += user_filter_name_len;
-		*p++ = '(';
-		wmemcpy(p, user_filter_maskW, user_filter_mask_len);
-		p += user_filter_mask_len;
-		*p++ = ')';
-		*p++ = '\0';
-		wmemcpy(p, user_filter_maskW, user_filter_mask_len);
-		p += user_filter_mask_len;
-		*p++ = '\0';
-		free(user_filter_maskW);
-	}
-
-	// "すべてのファイル(*.*)\0*.*"
-	wchar_t all_filter_str[MAX_UIMSG];
-	get_lang_msgW("FILEDLG_ALL_FILTER", all_filter_str, _countof(all_filter_str), L"All(*.*)\\0*.*", UILanguageFile);
-	size_t all_filter_len;
-	{
-		size_t all_filter_title_len = wcsnlen(all_filter_str, _countof(all_filter_str));
-		if (all_filter_title_len == 0 || all_filter_title_len == _countof(all_filter_str)) {
-			all_filter_str[0] = 0;
-			all_filter_len = 0;
-		} else {
-			size_t all_filter_mask_max = _countof(all_filter_str) - all_filter_title_len - 1;
-			size_t all_filter_mask_len = wcsnlen(all_filter_str + all_filter_title_len + 1, all_filter_mask_max);
-			if (all_filter_mask_len == 0 || all_filter_mask_len == _countof(all_filter_str)) {
-				all_filter_str[0] = 0;
-				all_filter_len = 0;
-			} else {
-				all_filter_len = all_filter_title_len + 1 + all_filter_mask_len + 1;
-			}
-		}
-	}
-
-	// フィルタ文字列を作る
-	size_t filter_len = user_filter_len + all_filter_len;
-	wchar_t* filter_str;
-	if (filter_len != 0) {
-		filter_len++;
-		filter_str = (wchar_t*)malloc(filter_len * sizeof(wchar_t));
-		wchar_t *p = filter_str;
-		if (user_filter_len != 0) {
-			wmemcpy(p, user_filter_str, user_filter_len);
-			p += user_filter_len;
-		}
-		wmemcpy(p, all_filter_str, all_filter_len);
-		p += all_filter_len;
-		*p = '\0';
-	} else {
-		filter_len = 2;
-		filter_str = (wchar_t*)malloc(filter_len * sizeof(wchar_t));
-		filter_str[0] = 0;
-		filter_str[1] = 0;
-	}
-
-	if (user_filter_len != 0) {
-		free(user_filter_str);
-	}
-
-	if (len != NULL) {
-		*len = filter_len;
-	}
-	return filter_str;
-}
-
 static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -241,9 +149,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					free(uimsg);
 					uimsg = NULL;
 
-					size_t filter_len;
-					wchar_t *filterW = GetCommonDialogFilterW(data->filesend_filter, data->UILanguageFile, &filter_len);
-
+					wchar_t *filterW = GetCommonDialogFilterW(data->filesend_filter, data->UILanguageFile);
 					wchar_t filename[MAX_PATH];
 					filename[0] = 0;
 					OPENFILENAMEW ofn = {};
