@@ -637,23 +637,16 @@ void SendMemFinish(SendMem *sm)
  *							TRUE	binary file
  */
 #if SENDMEM_USE_OLD_API
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary)
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
 {
-	if (SendVar != NULL) {
-		return FALSE;
-	}
-	if (!NewFileVar(&SendVar)) {
-		return FALSE;
-	}
+	(void)delay_type;
+	(void)delay_tick;
+	(void)send_max;
 
 	char *FileNameA = ToCharW(filename);
-	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileNameA, _TRUNCATE);
+	BOOL r = FileSendStart2(FileNameA, binary == FALSE ? 0 : 1);
 	free(FileNameA);
-
-	SendVar->DirLen = 0;
-	ts.TransBin = binary == FALSE ? 0 : 1;
-	FileSendStart();
-	return TRUE;
+	return r;
 }
 #else
 BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
