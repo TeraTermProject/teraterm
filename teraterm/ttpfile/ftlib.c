@@ -205,7 +205,7 @@ BOOL FTCreateFile(PFileVar fv)
     strncpy_s(fv->FullName, sizeof(fv->FullName),Temp, _TRUNCATE);
   }
   fv->FileHandle = _lcreat(fv->FullName,0);
-  fv->FileOpen = fv->FileHandle>0;
+  fv->FileOpen = (fv->FileHandle != INVALID_HANDLE_VALUE);
   if (! fv->FileOpen && ! fv->NoMsg)
     MessageBox(fv->HMainWin,"Cannot create file",
 	       "Tera Term: Error",MB_ICONEXCLAMATION);
