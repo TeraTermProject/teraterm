@@ -264,16 +264,38 @@
   リリースの方法について以下に示します。
 
   0. RC 作成時にバージョンを一つインクリメントする。
-     一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため(cf. TT_FILEMAPNAME 定義)。
+     一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため、このタイミングとする(cf. TT_FILEMAPNAME 定義)。
      - teraterm\common\tt-version.h
      - ttssh2\ttxssh\ttxssh-version.h
-     - ttpmenu.rc // 変更時のみ
-     - TTProxy.rc // 変更時のみ
-     - ttxkanjimenu.rc // 変更時のみ
-     - teraterm.iss
+     - ttpmenu\ttpmenu.rc // 変更時のみ
+     - TTProxy\TTProxy.rc // 変更時のみ
+     - TTXKanjiMenu\ttxkanjimenu.rc // 変更時のみ
+     - installer\teraterm.iss
        AppVer を上げ、"RC" を追加
        snapshot を コメントアウト
        バッチファイルの呼び出しを修正
+     この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする。
+     - teraterm\keycode\keycode-version.rc // VERSIONINFO
+     - teraterm\teraterm\tt-version.rc // VERSIONINFO
+     - teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO
+     - teraterm\ttpdlg\ttpdlg.rc // dialog
+     - teraterm\ttpfile\ttpfile-version.rc // VERSIONINFO
+     - teraterm\ttpmacro\ttm-version.rc // VERSIONINFO
+     - teraterm\ttpset\ttpset-version.rc // VERSIONINFO
+     - teraterm\ttptek\ttptek-version.rc // VERSIONINFO
+     - ttssh2\ttxssh\ttxssh.rc // dialog
+     - ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO
+     - ttpmenu\ttpmenu.rc // dialog, VERSIONINFO
+     - TTProxy\TTProxy.rc // dialog, VERSIONINFO(en), VERSIONINFO(ja)
+     - TTXKanjiMenu\ttxkanjimenu.rc // VERSIONINFO
+     - installer\teraterm.iss
+     - installer\release\license.txt // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu
+     - doc\en\html\index.html
+     - doc\en\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu
+     - doc\en\html\macro\index.html
+     - doc\ja\html\index.html
+     - doc\ja\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu
+     - doc\ja\html\macro\index.html
 
   1. 依存ライブラリ、ツール、インポート元の最新版をチェックする。
      Visual Studio

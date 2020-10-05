@@ -264,15 +264,38 @@ Example: adding a TTSSH menu under File menu
   To release Tera Term installation package is shown in the following step:
 
   0. Increment the version while RC release process.
+     The binary is released for test in this timing. Prevent that old and new binary have same version number.
      - teraterm\common\tt-version.h
      - ttssh2\ttxssh\ttxssh-version.h
-     - ttpmenu.rc // only modifying
-     - TTProxy.rc // only modifying
-     - ttxkanjimenu.rc // only modifying
-     - teraterm.iss
+     - ttpmenu\ttpmenu.rc // only modifying
+     - TTProxy\TTProxy.rc // only modifying
+     - TTXKanjiMenu\ttxkanjimenu.rc // only modifying
+     - installer\teraterm.iss
        version up AppVer and add "RC"
        comment out snapshot
        change called batch files
+     Increment the year of last publication of copyright notice if it is first release in this year.
+     - teraterm\keycode\keycode-version.rc // VERSIONINFO
+     - teraterm\teraterm\tt-version.rc // VERSIONINFO
+     - teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO
+     - teraterm\ttpdlg\ttpdlg.rc // dialog
+     - teraterm\ttpfile\ttpfile-version.rc // VERSIONINFO
+     - teraterm\ttpmacro\ttm-version.rc // VERSIONINFO
+     - teraterm\ttpset\ttpset-version.rc // VERSIONINFO
+     - teraterm\ttptek\ttptek-version.rc // VERSIONINFO
+     - ttssh2\ttxssh\ttxssh.rc // dialog
+     - ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO
+     - ttpmenu\ttpmenu.rc // dialog, VERSIONINFO
+     - TTProxy\TTProxy.rc // dialog, VERSIONINFO(en), VERSIONINFO(ja)
+     - TTXKanjiMenu\ttxkanjimenu.rc // VERSIONINFO
+     - installer\teraterm.iss
+     - installer\release\license.txt // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu
+     - doc\en\html\index.html
+     - doc\en\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu
+     - doc\en\html\macro\index.html
+     - doc\ja\html\index.html
+     - doc\ja\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu
+     - doc\ja\html\macro\index.html
 
   1. Check latest libraries and tools.
      Visual Studio
