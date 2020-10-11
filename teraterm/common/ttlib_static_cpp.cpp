@@ -577,3 +577,40 @@ wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_)
 
 	return dest_top;
 }
+
+unsigned long long GetFSize64H(HANDLE hFile)
+{
+	DWORD file_size_hi;
+	DWORD file_size_low;
+	file_size_low = GetFileSize(hFile, &file_size_hi);
+	if (file_size_low == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
+		// error
+		return 0;
+	}
+	unsigned long long file_size = ((unsigned long long)file_size_hi << 32) + file_size_low;
+	return file_size;
+}
+
+unsigned long long GetFSize64W(const wchar_t *FName)
+{
+	HANDLE hFile = _CreateFileW(FName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+								FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return 0;
+	}
+	unsigned long long file_size = GetFSize64H(hFile);
+	CloseHandle(hFile);
+	return file_size;
+}
+
+unsigned long long GetFSize64A(const char *FName)
+{
+	HANDLE hFile = CreateFileA(FName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+							   FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return 0;
+	}
+	unsigned long long file_size = GetFSize64H(hFile);
+	CloseHandle(hFile);
+	return file_size;
+}
