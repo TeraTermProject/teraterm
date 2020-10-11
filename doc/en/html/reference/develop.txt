@@ -68,6 +68,7 @@
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
+- cJSON 1.7.14 (https://github.com/DaveGamble/cJSON/)
 
 
 * Notice for SVN committer
@@ -164,6 +165,9 @@ Example: adding a TTSSH menu under File menu
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
      (3) Move 'libs' directory on the command prompt. And run buildSFMT.bat.
      (4) Modify version information in libs/SFMT/SFMT_version_for_teraterm.h if necessary.
+
+  6. cJSON (used by TTXCheckUpdate plugin)
+     (1) Extract cJSON source into libs/cJSON directory.
 
 
 * How to build Tera Term

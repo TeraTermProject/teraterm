@@ -63,7 +63,7 @@
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html)
-
+- cJSON 1.7.14 (https://github.com/DaveGamble/cJSON/)
 
 ■ SVN コミッターへの注意
 - SVN リポジトリは一般向けとは違い、以下の通りです。
@@ -163,6 +163,8 @@
      (3) コマンドプロンプト上から libs ディレクトリに移動し、buildSFMT.bat を実行する。
      (4) 必要に応じて libs/SFMT/SFMT_version_for_teraterm.h のバージョン番号を修正する。
 
+  6. cJSON (used by TTXCheckUpdate plugin)
+     (1) cJSON のソースを libs/cJSON の中に展開する。
 
 ■ Tera Termのビルド方法
   Tera Termのビルド方法について以下に示します。
