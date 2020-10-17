@@ -387,10 +387,10 @@ void YCancel(PFileVar fv, PYVar yv, PComVar cv)
 void YTimeOutProc(PFileVar fv, PYVar yv, PComVar cv)
 {
 	switch (yv->YMode) {
-	case IdXSend:
+	case IdYSend:
 		yv->YMode = 0; // quit
 		break;
-	case IdXReceive:
+	case IdYReceive:
 		if ((yv->PktNum == 0) && yv->PktNumOffset == 0) 
 			YSendNAK(fv,yv,cv);
 		else
