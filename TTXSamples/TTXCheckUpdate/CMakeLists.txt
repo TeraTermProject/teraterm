@@ -39,7 +39,17 @@ set_target_properties(
 target_compile_definitions(
   TTXCheckUpdate
   PRIVATE
-  -D CJSON_HIDE_SYMBOLS)
+  -D CJSON_HIDE_SYMBOLS
+  )
+
+if(MSVC_VERSION STREQUAL 1400)
+  # VS2005 special define
+  set_source_files_properties(
+    ../../libs/cJSON/cJSON.c
+    PROPERTIES
+    COMPILE_FLAGS "-D NAN=0"
+    )
+endif()
 
 target_include_directories(
   TTXCheckUpdate

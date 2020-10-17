@@ -195,6 +195,22 @@
 			<File
 				RelativePath="..\..\libs\cJSON\cJSON.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="CJSON_HIDE_SYMBOLS;NAN=0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="CJSON_HIDE_SYMBOLS;NAN=0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\libs\cJSON\cJSON.h"
