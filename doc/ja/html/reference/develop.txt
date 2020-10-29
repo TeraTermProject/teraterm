@@ -291,9 +291,6 @@
        http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html
      CygTerm
        https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index.html
-     LogMeTT
-       http://logmett.com/logmett-freeware
-       http://logmett.com/ttleditor
 
   2. ドキュメントを確認する。
      - ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。
@@ -336,14 +333,8 @@
 
   11. スナップショットを削除する。
 
-  12. フォーラムに告知する。
-      - Announcements http://logmett.com/support-forums/5
-        Announcements に新規投稿する。種類は Announcement。
-        一つ前の Announcement の種類を Normal に変更する。
-        Announcement は三個残すことになっているので、三つ前の Announcement を削除する。
-
-  13. Twitter に告知する。
+  12. Twitter に告知する。
       https://twitter.com/Tera_Term
       リリース告知をツイートして固定する。
 
-  14. Chocolatey の登録を更新
+  13. Chocolatey の登録を更新
