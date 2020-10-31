@@ -33,6 +33,7 @@
   */
 
 #include <windows.h>
+#include <assert.h>
 
 #include "codeconv.h"
 #include "compat_win.h"
@@ -100,17 +101,18 @@ static char *ConvertFilter(const wchar_t *filterW)
 	if (filterW == NULL) {
 		return NULL;
 	}
-	size_t len = 0;
+	size_t lenW = 0;
 	for(;;) {
-		if (filterW[len] == 0 && filterW[len + 1] == 0) {
-			len++;
+		if (filterW[lenW] == 0 && filterW[lenW + 1] == 0) {
+			lenW++;
 			break;
 		}
-		len++;
+		lenW++;
 	}
-	len++;
-	char *filterA = (char *)malloc(len);
-	::WideCharToMultiByte(CP_ACP, 0, filterW, (int)len, filterA, (int)len, NULL, NULL);
+	lenW++;
+	size_t lenA = lenW * 2;		// x2‚ÌŒ©ž‚Ý
+	char *filterA = (char *)malloc(lenA);
+	::WideCharToMultiByte(CP_ACP, 0, filterW, (int)lenW, filterA, (int)lenA, NULL, NULL);
 	return filterA;
 }
 
@@ -124,14 +126,25 @@ static BOOL GetOpenSaveFileNameA(BOOL (WINAPI *fn)(LPOPENFILENAMEA ofnA), LPOPEN
 	ofnA.lStructSize = OPENFILENAME_SIZE_VERSION_400A;
 	ofnA.hwndOwner = ofnW->hwndOwner;
 	ofnA.lpstrFilter = ConvertFilter(ofnW->lpstrFilter);
+	ofnA.nFilterIndex = ofnW->nFilterIndex;
 	ofnA.lpstrFile = fileA;
 	ofnA.nMaxFile = _countof(fileA);
 	ofnA.lpstrTitle = ToCharW(ofnW->lpstrTitle);
 	ofnA.Flags = ofnW->Flags;
+	ofnA.lCustData = ofnW->lCustData;
+	ofnA.lpfnHook = ofnW->lpfnHook;
+	ofnA.lpTemplateName = (LPCSTR)ofnW->lpTemplateName;
+	ofnA.hInstance = ofnW->hInstance;
 	BOOL result = fn(&ofnA);
 	if (result) {
 		MultiByteToWideChar(CP_ACP, 0, fileA, _countof(fileA), ofnW->lpstrFile, ofnW->nMaxFile);
 	}
+#if _DEBUG
+	else {
+		DWORD err = CommDlgExtendedError();
+		assert(err == 0);
+	}
+#endif
 	free((void *)ofnA.lpstrFilter);
 	free((void *)ofnA.lpstrTitle);
 	return result;
