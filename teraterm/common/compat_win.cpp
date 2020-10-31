@@ -97,6 +97,7 @@ BOOL (WINAPI *pRemoveDirectoryW)(LPCWSTR lpPathName);
 DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
 HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
 DWORD (WINAPI *pGetModuleFileNameW)(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
+DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -251,6 +252,7 @@ static const APIInfo Lists_kernel32[] = {
 	{ "GetFullPathNameW", (void **)&pGetFullPathNameW },
 	{ "LoadLibraryW", (void **)&pLoadLibraryW },
 	{ "GetModuleFileNameW", (void **)&pGetModuleFileNameW },
+	{ "ExpandEnvironmentStringsW", (void **)&pExpandEnvironmentStringsW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},

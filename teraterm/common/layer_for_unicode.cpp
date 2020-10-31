@@ -867,3 +867,20 @@ DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 	free(bufW);
 	return r;
 }
+
+DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
+{
+	if (pExpandEnvironmentStringsW != NULL) {
+		return pExpandEnvironmentStringsW(lpSrc, lpDst, nSize);
+	}
+
+	char *srcA = ToCharW(lpSrc);
+	char dstA[MAX_PATH];	// MAX_PATH?
+	DWORD r = ExpandEnvironmentStringsA(srcA, dstA, sizeof(dstA));
+	wchar_t *dstW = ToWcharA(dstA);
+	wcsncpy_s(lpDst, nSize, dstW, _TRUNCATE);
+	r = (DWORD)wcslen(dstW);
+	free(srcA);
+	free(dstW);
+	return r;
+}

@@ -137,6 +137,7 @@ BOOL _RemoveDirectoryW(LPCWSTR lpPathName);
 DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
 HMODULE _LoadLibraryW(LPCWSTR lpLibFileName);
 DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
+DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);
