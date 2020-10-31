@@ -606,7 +606,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.lpstrFile = fname;
 			ofn.nMaxFile = _countof(fname);
 			ofn.lpstrTitle = caption;
-			BOOL Ok = GetSaveFileNameW(&ofn);
+			BOOL Ok = _GetSaveFileNameW(&ofn);
 			free(FNFilter);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
