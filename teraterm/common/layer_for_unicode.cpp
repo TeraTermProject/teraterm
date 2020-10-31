@@ -831,10 +831,16 @@ DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer
 		return 0;
 	}
 	wchar_t *bufW = ToWcharA(bufA);
-	r = (DWORD)wcslen(bufW);	// 必要なバッファサイズを返す('\0'含まない)
-	wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
-	if (lpFilePart != NULL) {
-		*lpFilePart = lpBuffer + (filepartA - filenameA) * sizeof(wchar_t);
+	r = (DWORD)wcslen(bufW);
+	if (nBufferLength == 0 || lpBuffer == NULL) {
+		// 必要な文字数を返す('\0'含む)
+		r = r + 1;
+	} else {
+		// パスをコピーして、文字列長を返す('\0'含まない)
+		wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
+		if (lpFilePart != NULL) {
+			*lpFilePart = lpBuffer + (filepartA - filenameA) * sizeof(wchar_t);
+		}
 	}
 	free(filenameA);
 	free(bufW);
