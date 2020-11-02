@@ -42,8 +42,8 @@ target_compile_definitions(
   -D CJSON_HIDE_SYMBOLS
   )
 
-if(MSVC_VERSION STREQUAL 1400)
-  # VS2005 special define
+if(MSVC_VERSION STRLESS 1600)
+  # VS2005(1400),2008(1500) (<2010(1600)) special define
   set_source_files_properties(
     ../../libs/cJSON/cJSON.c
     PROPERTIES
