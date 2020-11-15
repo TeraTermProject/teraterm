@@ -736,8 +736,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdKanjiOutJ 2
 #define IdKanjiOutH 3
 
-// ‰¡•‚ÌÅ‘å’l‚ğ300‚©‚ç500‚É•ÏX (2008.2.15 maya)
-#define TermWidthMax  500
+#define TermWidthMax  1000
 #define TermHeightMax 500
 
   /* Cursor shapes */
