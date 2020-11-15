@@ -2415,7 +2415,8 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	{
 	int sx_i = sx;
 	int sy_i = sy;
-	for (;;) {
+	int i;
+	for (i=0; i<1000000; i++) {
 		int sx_match_s, sx_match_e;
 		int sy_match_s, sy_match_e;
 		BOOL match;
