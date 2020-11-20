@@ -63,7 +63,7 @@
 
 
 * Libraries
-- Oniguruma 6.9.3 (https://github.com/kkos/oniguruma)
+- Oniguruma 6.9.6 (https://github.com/kkos/oniguruma)
 - OpenSSL 1.1.1d (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
