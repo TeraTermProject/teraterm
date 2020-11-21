@@ -538,7 +538,7 @@ LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
 	if (pSetWindowLongPtrW != NULL) {
 		return pSetWindowLongPtrW(hWnd, nIndex, dwNewLong);
 	}
-	return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
+	return SetWindowLongPtrA(hWnd, nIndex, dwNewLong);
 #else
 	return _SetWindowLongW(hWnd, nIndex, dwNewLong);
 #endif

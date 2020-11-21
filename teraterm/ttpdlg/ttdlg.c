@@ -1902,7 +1902,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			SendDlgItemMessage(Dialog, IDC_HOSTNAME, CB_SETCURSEL,0,0);
 
-			SetEditboxSubclass(Dialog, IDC_HOSTNAME, TRUE);
+			SetEditboxEmacsKeybind(Dialog, IDC_HOSTNAME);
 
 			SetRB(Dialog,GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPORT, EM_LIMITTEXT,5,0);

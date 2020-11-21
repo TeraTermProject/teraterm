@@ -1,5 +1,5 @@
 /*
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -111,7 +111,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH_NOTE), FALSE);
 		}
-		SetEditboxSubclass(hDlgWnd, IDC_SCP_PATH, FALSE);
+		SetEditboxEmacsKeybind(hDlgWnd, IDC_SCP_PATH);
 
 		// Send File
 		if (Param->DropType == DROP_TYPE_SEND_FILE_BINARY) {

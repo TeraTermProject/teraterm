@@ -1207,7 +1207,6 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 	PGetHNRec GetHNRec;
 	char EntName[128];
-	char TempHost[HostNameMaxLength + 1];
 	WORD i, j, w;
 	WORD ComPortTable[MAXCOMPORT];
 	static char *ComPortDesc[MAXCOMPORT];
@@ -1235,26 +1234,30 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			)
 			GetHNRec->PortType = IdTCPIP;
 
-		strncpy_s(EntName, sizeof(EntName), "Host", _TRUNCATE);
-
-		i = 1;
-		do {
-			_snprintf_s(&EntName[4], sizeof(EntName)-4, _TRUNCATE, "%d", i);
-			GetPrivateProfileString("Hosts", EntName, "",
-			                        TempHost, sizeof(TempHost),
-			                        GetHNRec->SetupFN);
-			if (strlen(TempHost) > 0)
-				SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_ADDSTRING,
-				                   0, (LPARAM) TempHost);
-			i++;
-		} while (i <= MAXHOSTLIST);
+		{
+			wchar_t *SetupFnW = ToWcharA(GetHNRec->SetupFN);
+			i = 1;
+			do {
+				wchar_t EntNameW[128];
+				wchar_t TempHostW[HostNameMaxLength + 1];
+				_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
+				GetPrivateProfileStringW(L"Hosts", EntNameW, L"",
+										 TempHostW, _countof(TempHostW),
+										 SetupFnW);
+				if (TempHostW[0] != 0)
+					SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
+										0, (LPARAM) TempHostW);
+				i++;
+			} while (i <= MAXHOSTLIST);
+			free(SetupFnW);
+		}
 
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
 		                   HostNameMaxLength - 1, 0);
 
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 
-		SetEditboxSubclass(dlg, IDC_HOSTNAME, TRUE);
+		SetEditboxEmacsKeybind(dlg, IDC_HOSTNAME);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
 		                 pvar->settings.Enabled ? IDC_HOSTSSH : GetHNRec->

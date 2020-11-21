@@ -49,7 +49,7 @@ void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel);
 void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
-void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
+void SetEditboxEmacsKeybind(HWND hDlg, int nID);
 
 #if defined(_UNICODE)
 #define SetDropDownListT(p1, p2, p3, p4)	SetDropDownListW(p1, p2, p3, p4)
