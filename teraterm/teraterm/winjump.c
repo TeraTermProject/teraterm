@@ -19,7 +19,7 @@
  */
 
 /*
- * Copyright (C) 2011-2017 TeraTerm Project
+ * Copyright (C) 2011-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -451,7 +451,6 @@ static IShellLink *make_shell_link(const char *appname,
 	//void *psettings_tmp;
 	IPropertyStore *pPS;
 	PROPVARIANT pv;
-	int len;
 	HRESULT result;
 
 	/* Retrieve path to executable. */
@@ -459,6 +458,7 @@ static IShellLink *make_shell_link(const char *appname,
 		GetModuleFileName(NULL, tt_path, sizeof(tt_path) - 1);
 
 	if (appname) {
+		size_t len;
 		tmp_ptr = strrchr(tt_path, '\\');
 		len = (tmp_ptr - tt_path) + strlen(appname) + 2;
 		app_path = malloc(len);
@@ -477,24 +477,32 @@ static IShellLink *make_shell_link(const char *appname,
 
 	/* Set path, parameters, icon and description. */
 	result = ret->lpVtbl->SetPath(ret, app_path);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("SetPath failed. (%ld)\n", result);
+#endif
 
 	param_string = _strdup(sessionname);
 	result = ret->lpVtbl->SetArguments(ret, param_string);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("SetArguments failed. (%ld)\n", result);
+#endif
 	free(param_string);
 
 	desc_string = _strdup("Connect to Tera Term session");
 	result = ret->lpVtbl->SetDescription(ret, desc_string);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("SetDescription failed. (%ld)\n", result);
+#endif
 	free(desc_string);
 
 	result = ret->lpVtbl->SetIconLocation(ret, app_path, 0);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("SetIconLocation failed. (%ld)\n", result);
+#endif
 
 	/* To set the link title, we require the property store of the link. */
 	if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret, COMPTR(IPropertyStore, &pPS)))) {
@@ -502,15 +510,21 @@ static IShellLink *make_shell_link(const char *appname,
 		pv.vt = VT_LPSTR;
 		pv.pszVal = _strdup(sessionname);
 		result = pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
+#if _DEBUG
 		if (result != S_OK)
 			OutputDebugPrintf("SetValue failed. (%ld)\n", result);
+#endif
 		free(pv.pszVal);
 		result = pPS->lpVtbl->Commit(pPS);
+#if _DEBUG
 		if (result != S_OK)
 			OutputDebugPrintf("Commit failed. (%ld)\n", result);
+#endif
 		result = pPS->lpVtbl->Release(pPS);
+#if _DEBUG
 		if (result != S_OK)
 			OutputDebugPrintf("Release shell link failed. (%ld)\n", result);
+#endif
 	}
 
 	free(app_path);
@@ -583,7 +597,9 @@ static void update_jumplist_from_registry(void)
 			break;
 		}
 
+#if _DEBUG
 		OutputDebugPrintf("%s\n", piterator);
+#endif
 		link = make_shell_link(NULL, piterator);
 		if (link) {
 			UINT j;
@@ -605,20 +621,26 @@ static void update_jumplist_from_registry(void)
 						found = TRUE;
 					}
 					result = rlink->lpVtbl->Release(rlink);
+#if _DEBUG
 					if (result != S_OK)
 						OutputDebugPrintf("Release rlink failed. (%ld)\n", result);
+#endif
 				}
 			}
 
 			if (!found) {
 				result = collection->lpVtbl->AddObject(collection, (IUnknown *)link);
+#if _DEBUG
 				if (result != S_OK)
 					OutputDebugPrintf("AddObject link failed. (%ld)\n", result);
+#endif
 			}
 
 			result = link->lpVtbl->Release(link);
+#if _DEBUG
 			if (result != S_OK)
 				OutputDebugPrintf("Release link failed. (%ld)\n", result);
+#endif
 			link = NULL;
 		}
 	}
@@ -632,8 +654,10 @@ static void update_jumplist_from_registry(void)
 		goto cleanup;
 
 	result = pCDL->lpVtbl->AppendCategory(pCDL, L"Recent Sessions", array);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("AppendCategory array failed. (%ld)\n", result);
+#endif
 
 	/*
 	 * Create an object collection to form the 'Tasks' category on the
@@ -653,20 +677,26 @@ static void update_jumplist_from_registry(void)
 		goto cleanup;
 
 	result = pCDL->lpVtbl->AddUserTasks(pCDL, array);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("AddUserTasks array failed. (0x%x)\n", result);
+#endif
 
 	/*
 	 * Now we can clean up the array and collection variables, so as
 	 * to be able to reuse them.
 	 */
 	result = array->lpVtbl->Release(array);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("Release array failed. (%ld)\n", result);
+#endif
 	array = NULL;
 	result = collection->lpVtbl->Release(collection);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("Release collection failed. (%ld)\n", result);
+#endif
 	collection = NULL;
 
 	/*
@@ -687,28 +717,36 @@ static void update_jumplist_from_registry(void)
 		goto cleanup;
 
 	result = pCDL->lpVtbl->AddUserTasks(pCDL, array);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("AddUserTasks array2 failed. (0x%x)\n", result);
+#endif
 
 	/*
 	 * Now we can clean up the array and collection variables, so as
 	 * to be able to reuse them.
 	 */
 	result = array->lpVtbl->Release(array);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("Release array2 failed. (%ld)\n", result);
+#endif
 	array = NULL;
 	result = collection->lpVtbl->Release(collection);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("Release collection2 failed. (%ld)\n", result);
+#endif
 	collection = NULL;
 
 	/*
 	 * Commit the jump list.
 	 */
 	result = pCDL->lpVtbl->CommitList(pCDL);
+#if _DEBUG
 	if (result != S_OK)
 		OutputDebugPrintf("CommitList failed. (%ld)\n", result);
+#endif
 	need_abort = FALSE;
 
 	/*
