@@ -58,10 +58,10 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "onig-6.9.3")
+set(SRC_DIR_BASE "onig-6.9.6")
 set(SRC_ARC "${SRC_DIR_BASE}.tar.gz")
-set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.3/${SRC_ARC}")
-set(SRC_ARC_HASH_SHA1 f2bde879bb7334a1b0d7b5553a851a8d6374f28b)
+set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.6/${SRC_ARC}")
+set(SRC_ARC_HASH_SHA1 390188ca6d7d37157a6b4e4b015f1dacd2dfe2a6)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/oniguruma")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src")
