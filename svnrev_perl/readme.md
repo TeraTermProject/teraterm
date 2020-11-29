@@ -3,6 +3,7 @@
 - svn(又は git)の情報からヘッダファイルとバッチファイルを作成する
   - `../teraterm/ttpdlg/svnversion.h`
   - `sourcetree_info.bat`
+  - buildフォルダの `build_config.cmake` (cmake時のみ)
 
 ## 準備
 
@@ -16,7 +17,7 @@
 - svn(又は git)を実行できるようにする
   - svn が実行できるよう環境変数 PATH を設定する
   - または、toolinfo.txt にツールのパスを書いておく
-  - ツールが実行できない場合もヘッダファイルは作成されます
+  - ツールが実行できない場合もヘッダファイルは作成される
 
 # ヘッダの作成方法
 
@@ -25,8 +26,8 @@
 - Windows の場合
   - svnrev.bat をダブルクリックでヘッダが作成される
 - cmake の場合
-  - buildフォルダで次のように実行する
-  - `cmake --build . --target svnversion_h`
+  - ビルド用のファイルをジェネレート時に自動で生成される
+  - build フォルダの build_config.cmake を削除してビルドすると再生成される
 - コマンドラインで直接実行する場合
   - `perl svnrev.pl --root .. --header ../teraterm/ttpdlg/svnversion.h`
 
@@ -42,4 +43,4 @@
 - --git
   - gitコマンドのパス
 
-オプションが toolinfo.txt より優先されます
+オプションが toolinfo.txt より優先される
