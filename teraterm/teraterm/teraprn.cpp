@@ -38,7 +38,7 @@
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
-#include "win16api.h"
+//#include "win16api.h"
 
 #include "tt_res.h"
 #include "tmfc.h"
@@ -65,7 +65,7 @@ static BOOL Printing = FALSE;
 static BOOL PrintAbortFlag = FALSE;
 
 /* pass-thru printing */
-static char PrnFName[MAX_PATH];
+static wchar_t PrnFName[MAX_PATH];
 static HANDLE HPrnFile = INVALID_HANDLE_VALUE;
 static char PrnBuff[TermWidthMax];
 static int PrnBuffCount = 0;
@@ -472,31 +472,33 @@ void VTPrintEnd()
 /* printer emulation routines */
 void OpenPrnFile()
 {
-	char Temp[MAX_PATH];
-
-	KillTimer(HVTWin,IdPrnStartTimer);
+	KillTimer(HVTWin, IdPrnStartTimer);
 	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		return;
 	}
 	if (PrnFName[0] == 0) {
-		GetTempPathA(sizeof(Temp),Temp);
-		if (GetTempFileNameA(Temp,"tmp",0,PrnFName)==0) {
+		wchar_t Temp[MAX_PATH];
+		GetTempPathW(_countof(Temp), Temp);
+		if (GetTempFileNameW(Temp, L"tmp", 0, PrnFName) == 0) {
 			return;
 		}
-		HPrnFile = _lcreat(PrnFName,0);
+		HPrnFile =
+			CreateFileW(PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	else {
-		HPrnFile = _lopen(PrnFName,OF_WRITE);
+		HPrnFile =
+			CreateFileW(PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (HPrnFile == INVALID_HANDLE_VALUE) {
-			HPrnFile = _lcreat(PrnFName,0);
+			HPrnFile = CreateFileW(PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
+								   FILE_ATTRIBUTE_NORMAL, NULL);
 		}
 	}
 	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		_llseek(HPrnFile,0,2);
+		SetFilePointer(HPrnFile, 0, NULL, FILE_END);
 	}
 }
 
-void PrintFile()
+static void PrintFile(void)
 {
 	char Buff[256];
 	BOOL CRFlag = FALSE;
@@ -504,13 +506,21 @@ void PrintFile()
 	BYTE b;
 
 	if (VTPrintInit(IdPrnFile)==IdPrnFile) {
-		HPrnFile = _lopen(PrnFName,OF_READ);
+		HPrnFile = CreateFileW(PrnFName,
+							   GENERIC_READ, FILE_SHARE_READ, NULL,
+							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
 		if (HPrnFile != INVALID_HANDLE_VALUE) {
 			do {
 				i = 0;
 				do {
-					c = _lread(HPrnFile,&b,1);
-					if (c==1) {
+					DWORD NumberOfBytesRead;
+					BOOL r = ReadFile(HPrnFile, &b, 1, &NumberOfBytesRead, NULL);
+					c = 0;
+					if (r) {
+						c = NumberOfBytesRead;
+					}
+					if (c == 1) {
 						switch (b) {
 							case HT:
 								memset(&(Buff[i]),0x20,8);
@@ -551,22 +561,22 @@ void PrintFile()
 				}
 				CRFlag = (b==CR);
 			} while (c>0);
-			_lclose(HPrnFile);
+			CloseHandle(HPrnFile);
 		}
-		HPrnFile = 0;
+		HPrnFile = INVALID_HANDLE_VALUE;
 		VTPrintEnd();
 	}
-	remove(PrnFName);
+	DeleteFileW(PrnFName);
 	PrnFName[0] = 0;
 }
 
-void PrintFileDirect()
+static void PrintFileDirect(void)
 {
 	HWND hParent;
 
 	PrnAbortDlg = new CPrnAbortDlg();
 	if (PrnAbortDlg==NULL) {
-		remove(PrnFName);
+		DeleteFileW(PrnFName);
 		PrnFName[0] = 0;
 		return;
 	}
@@ -579,7 +589,9 @@ void PrintFileDirect()
 	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
-	HPrnFile = _lopen(PrnFName,OF_READ);
+	HPrnFile = CreateFileW(PrnFName,
+						   GENERIC_READ, FILE_SHARE_READ, NULL,
+						   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	PrintAbortFlag = (HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);
 	PrnBuffCount = 0;
 	SetTimer(HVTWin,IdPrnProcTimer,0,NULL);
@@ -600,7 +612,12 @@ void PrnFileDirectProc()
 	if (!PrintAbortFlag && (HPrnFile != INVALID_HANDLE_VALUE)) {
 		do {
 			if (PrnBuffCount==0) {
-				PrnBuffCount = _lread(HPrnFile,PrnBuff,1);
+				PrnBuffCount = 0;
+				DWORD NumberOfBytesRead;
+				BOOL r = ReadFile(HPrnFile, PrnBuff, 1, &NumberOfBytesRead, NULL);
+				if (r) {
+					PrnBuffCount = NumberOfBytesRead;
+				}
 				if (ts.Language==IdRussian) {
 					RussConvStr(ts.RussClient,ts.RussPrint,PrnBuff,PrnBuffCount);
 				}
@@ -620,11 +637,11 @@ void PrnFileDirectProc()
 		} while (c>0);
 	}
 	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		_lclose(HPrnFile);
+		CloseHandle(HPrnFile);
 	}
 	HPrnFile = INVALID_HANDLE_VALUE;
 	PrnClose();
-	remove(PrnFName);
+	DeleteFileW(PrnFName);
 	PrnFName[0] = 0;
 	if (PrnAbortDlg!=NULL) {
 		PrnAbortDlg->DestroyWindow();
@@ -653,7 +670,7 @@ void ClosePrnFile()
 {
 	PrnBuffCount = 0;
 	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		_lclose(HPrnFile);
+		CloseHandle(HPrnFile);
 	}
 	HPrnFile = INVALID_HANDLE_VALUE;
 	SetTimer(HVTWin,IdPrnStartTimer,ts.PassThruDelay*1000,NULL);
@@ -672,7 +689,8 @@ void WriteToPrnFile(BYTE b, BOOL Write)
 	}
 
 	if (Write) {
-		_lwrite(HPrnFile,PrnBuff,PrnBuffCount);
+		DWORD NumberOfBytesWritten;
+		WriteFile(HPrnFile, PrnBuff, PrnBuffCount, &NumberOfBytesWritten, NULL);
 		PrnBuffCount = 0;
 	}
 	if ((b==0) && ! Write) {
