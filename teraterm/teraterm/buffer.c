@@ -118,6 +118,7 @@ static int SaveBuffY;
 static int CodePage = 932;
 
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
+static void BuffDrawLineIPrn(int SY, int IStart, int IEnd);
 
 static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL half_width, char emoji)
 {
@@ -2030,8 +2031,8 @@ void BuffPrint(BOOL ScrollRegion)
 {
 	int Id;
 	POINT PrintStart, PrintEnd;
-	TCharAttr CurAttr, TempAttr;
-	int i, j, count;
+	TCharAttr TempAttr;
+	int j;
 	int IStart, IEnd;
 	LONG TmpPtr;
 
@@ -2091,58 +2092,7 @@ void BuffPrint(BOOL ScrollRegion)
 			IEnd = NumOfColumns - 1;
 		}
 
-		while ((IEnd>=IStart) &&
-		       (CodeBuffW[TmpPtr+IEnd].u32 == 0x20) &&
-		       (CodeBuffW[TmpPtr+IEnd].attr==AttrDefault) &&
-		       (CodeBuffW[TmpPtr+IEnd].attr2==AttrDefault)) {
-			IEnd--;
-		}
-
-		i = IStart;
-		while (i <= IEnd) {
-			CurAttr.Attr = CodeBuffW[TmpPtr+i].attr & ~ AttrKanji;
-			CurAttr.Attr2 = CodeBuffW[TmpPtr+i].attr2;
-			CurAttr.Fore = CodeBuffW[TmpPtr+i].fg;
-			CurAttr.Back = CodeBuffW[TmpPtr+i].bg;
-
-			count = 1;
-			while ((i+count <= IEnd) &&
-			       (CurAttr.Attr == (CodeBuffW[TmpPtr+i+count].attr & ~ AttrKanji)) &&
-			       (CurAttr.Attr2 == CodeBuffW[TmpPtr+i+count].attr2) &&
-				   (CurAttr.Fore == CodeBuffW[TmpPtr+i].fg) &&
-				   (CurAttr.Back == CodeBuffW[TmpPtr+i].bg) ||
-			       (i+count<NumOfColumns) &&
-			       ((CodeBuffW[TmpPtr+i+count-1].attr & AttrKanji) != 0)) {
-				count++;
-			}
-
-			if (TCharAttrCmp(CurAttr, TempAttr) != 0) {
-				PrnSetAttr(CurAttr);
-				TempAttr = CurAttr;
-			}
-
-			// TODO とりあえず ANSI で実装
-			{
-				char bufA[TermWidthMax+1];
-				int k;
-				char *p = bufA;
-				const buff_char_t *b = &CodeBuffW[TmpPtr + i];
-
-				for (k = 0; k < count; b++,k++) {
-					unsigned short c;
-					if (IsBuffPadding(b)) {
-						continue;
-					}
-					c = b->ansi_char;
-					*p++ = (c & 0xff);
-					if (c >= 0x100) {
-						*p++ = ((c >> 8) & 0xff);
-					}
-				}
-				PrnOutText(bufA, count);
-				i = i+count;
-			}
-		}
+		BuffDrawLineIPrn(j, IStart, IEnd);
 		PrnNewLine();
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
@@ -3083,16 +3033,21 @@ static BOOL CheckSelect(int x, int y)
 /**
  *	1行描画
  *
- *	@param	DrawX,Y			Clint領域描画位置(pixel)
  *	@param	SY				スクリーン上の位置(Charactor)  !バッファ上の位置
  *							PageStart + YStart など
  *	@param	IStart,IEnd		スクリーン上の位置(Charactor)
  *							指定した間を描画する
+ *  @param	disp_strW()		wchar_t 文字を描画用関数 (Unicode用)
+ *  @param	disp_strA()		char 文字を描画用関数 (ANSI用)
+ *  @param	disp_setup_dc()	アトリビュート設定関数
+ *	@param	data			disp_strW(A)() に渡されるデータ
  */
-static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
+void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
+					  void (*disp_strW)(const wchar_t *bufW, const char *width_info, int count, void *data),
+					  void (*disp_strA)(const char *buf, int count, void *data),
+					  void (*disp_setup_dc)(TCharAttr Attr, BOOL Reverse),
+					  void *data)
 {
-	int X = DrawX;
-	int Y = DrawY;
 	const LONG TmpPtr = GetLinePtr(SY);
 	int istart = IStart;
 	char bufA[TermWidthMax+1];
@@ -3108,23 +3063,6 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 #if 0
 	OutputDebugPrintf("BuffDrawLineI(%d,%d, %d,%d-%d)\n", DrawX, DrawY, SY, IStart, IEnd);
 #endif
-	{
-		// カーソル位置、表示開始位置から描画位置がわかるはず
-		int X2 = IStart;
-		int Y2 = SY - PageStart;
-		if (! IsLineVisible(&X2, &Y2)) {
-			// 描画不要行
-			//assert(FALSE);
-			return;
-		}
-		if (X != -1 && Y != -1) {
-			assert(X == X2 && Y == Y2);
-		}
-		else {
-			X = X2;
-			Y = Y2;
-		}
-	}
 	if (IEnd >= NumOfColumns) {
 		IEnd = NumOfColumns - 1;
 	}
@@ -3140,7 +3078,8 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			// 最初の1文字目
 			int ptr = TmpPtr + istart + count;
 			if (IsBuffPadding(b)) {
-				// 最初に表示しようとした文字が全角の右だった場合
+				// 最初に表示しようとした文字が2cellの右側だった場合
+				// assert(FALSE);
 				ptr--;
 			}
 			CurAttr.Attr = CodeBuffW[ptr].attr & ~ AttrKanji;
@@ -3152,7 +3091,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		}
 
 		if (IsBuffPadding(b)) {
-			// 全角の次の文字,処理不要
+			// 2cellの次の文字,処理不要
 		} else {
 			if (count == 0) {
 				// 最初の1文字目
@@ -3235,12 +3174,12 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
 
-			DispSetupDC(CurAttr, CurSelected);
+			disp_setup_dc(CurAttr, CurSelected);
 			if (UseUnicodeApi) {
-				DispStrW(bufW, bufWW, lenW, Y, &X);
+				disp_strW(bufW, bufWW, lenW, data);
 			}
 			else {
-				DispStr(bufA, lenA, Y, &X);
+				disp_strA(bufA, lenA, data);
 			}
 
 			lenA = 0;
@@ -3252,6 +3191,89 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 			count++;
 		}
 	}
+}
+
+typedef struct {
+	int draw_x;
+	int draw_y;
+} disp_data_t;
+
+static void l_disp_strW(const wchar_t *bufW, const char *width_info, int count, void *data_)
+{
+	disp_data_t *data = (disp_data_t *)data_;
+	int x = data->draw_x;
+	int y = data->draw_y;
+	DispStrW(bufW, width_info, count, y, &x);
+	data->draw_x = x;
+}
+
+static void l_disp_strA(const char *buf, int count, void *data_)
+{
+	disp_data_t *data = (disp_data_t *)data_;
+	int x = data->draw_x;
+	int y = data->draw_y;
+	DispStr(buf, count, y, &x);
+	data->draw_x = x;
+}
+
+/**
+ *	1行描画 画面用
+ *
+ *	@param	DrawX,Y			Clint領域描画位置(pixel)
+ *	@param	SY				スクリーン上の位置(Charactor)  !バッファ上の位置
+ *							PageStart + YStart など
+ *	@param	IStart,IEnd		スクリーン上の位置(Charactor)
+ *							指定した間を描画する
+ */
+static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
+{
+	int X = DrawX;
+	int Y = DrawY;
+	{
+		// カーソル位置、表示開始位置から描画位置がわかるはず
+		int X2 = IStart;
+		int Y2 = SY - PageStart;
+		if (! IsLineVisible(&X2, &Y2)) {
+			// 描画不要行
+			//assert(FALSE);
+			return;
+		}
+		if (X != -1 && Y != -1) {
+			assert(X == X2 && Y == Y2);
+		}
+		else {
+			X = X2;
+			Y = Y2;
+		}
+	}
+	if (IEnd >= NumOfColumns) {
+		IEnd = NumOfColumns - 1;
+	}
+
+	{
+		disp_data_t data;
+		data.draw_x = X;
+		data.draw_y = Y;
+
+		BuffGetDrawInfoW(SY, IStart, IEnd, l_disp_strW, l_disp_strA, DispSetupDC, &data);
+	}
+}
+
+/**
+ *	1行描画 プリンタ用
+ *
+ *	@param	SY				スクリーン上の位置(Charactor)  !バッファ上の位置
+ *							PageStart + YStart など
+ *	@param	IStart,IEnd		スクリーン上の位置(Charactor)
+ *							指定した間を描画する
+ */
+static void BuffDrawLineIPrn(int SY, int IStart, int IEnd)
+{
+	if (IEnd >= NumOfColumns) {
+		IEnd = NumOfColumns - 1;
+	}
+
+	BuffGetDrawInfoW(SY, IStart, IEnd, PrnOutTextW, PrnOutText, PrnSetupDC, NULL);
 }
 
 void BuffUpdateRect
@@ -5279,7 +5301,7 @@ int BuffGetAnyLineDataW(int offset_y, wchar_t *buf, size_t bufsize)
 		return -1;
 
 	memset(buf, 0, bufsize * sizeof(wchar_t));
-	copysize = min(NumOfColumns, bufsize - 1);
+	copysize = min((size_t)NumOfColumns, bufsize - 1);
 	Ptr = GetLinePtr(offset_y);
 	b = &CodeBuffW[Ptr];
 	idx = 0;

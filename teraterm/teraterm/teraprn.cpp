@@ -38,7 +38,7 @@
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
-//#include "win16api.h"
+#include "vtdisp.h"
 
 #include "tt_res.h"
 #include "tmfc.h"
@@ -58,7 +58,6 @@ static int PrnFW, PrnFH;
 static RECT Margin;
 static COLORREF White, Black;
 static int PrnX, PrnY;
-static int PrnDx[256];
 static TCharAttr PrnAttr;
 
 static BOOL Printing = FALSE;
@@ -72,6 +71,8 @@ static int PrnBuffCount = 0;
 
 static CPrnAbortDlg *PrnAbortDlg;
 static HWND HPrnAbortDlg;
+
+static void PrnSetAttr(TCharAttr Attr);
 
 /* Print Abortion Call Back Function */
 static BOOL CALLBACK PrnAbortProc(HDC PDC, int Code)
@@ -204,13 +205,7 @@ int VTPrintInit(int PrnFlag)
 	TEXTMETRIC Metrics;
 	POINT PPI, PPI2;
 	HDC DC;
-	int i;
-	TCharAttr TempAttr = {
-		AttrDefault,
-		AttrDefault,
-		AttrDefaultFG,
-		AttrDefaultBG
-	};
+	TCharAttr TempAttr = DefCharAttr;
 	LOGFONTA Prnlf;
 
 	Sel = (PrnFlag & IdPrnSelectedText)!=0;
@@ -327,9 +322,6 @@ int VTPrintInit(int PrnFlag)
 
 	Black = RGB(0,0,0);
 	White = RGB(255,255,255);
-	for (i = 0 ; i <= 255 ; i++) {
-		PrnDx[i] = PrnFW;
-	}
 	PrnSetAttr(TempAttr);
 
 	PrnY = Margin.top;
@@ -349,7 +341,7 @@ int VTPrintInit(int PrnFlag)
 	}
 }
 
-void PrnSetAttr(TCharAttr Attr)
+static void PrnSetAttr(TCharAttr Attr)
 //  Set text attribute of printing
 //
 {
@@ -366,79 +358,51 @@ void PrnSetAttr(TCharAttr Attr)
 	}
 }
 
-void PrnOutText(PCHAR Buff, int Count)
-//  Print out text
-//    Buff: points text buffer
-//    Count: number of characters to be printed
+void PrnSetupDC(TCharAttr Attr, BOOL reverse)
 {
-	int i;
-	RECT RText;
-	PCHAR Ptr, Ptr1, Ptr2;
-	char Buff2[256];
+	(void)reverse;
+	PrnSetAttr(Attr);
+}
 
-	if (Count<=0) {
-		return;
+/**
+ *  Print out text
+ *    Buff: points text buffer
+ *    Count: number of characters to be printed
+ */
+void PrnOutText(const char *StrA, int Count, void *data)
+{
+	if (PrnX+PrnFW > Margin.right) {
+		/* new line */
+		PrnX = Margin.left;
+		PrnY = PrnY + PrnFH;
 	}
-	if (Count>(sizeof(Buff2)-1)) {
-		Count=sizeof(Buff2)-1;
-	}
-	memcpy(Buff2,Buff,Count);
-	Buff2[Count] = 0;
-	Ptr = Buff2;
-
-	if (ts.Language==IdRussian) {
-		if (ts.PrnFont[0]==0) {
-			RussConvStr(ts.RussClient,ts.RussFont,Buff2,Count);
-		}
-		else {
-			RussConvStr(ts.RussClient,ts.RussPrint,Buff2,Count);
-		}
+	if (PrnY+PrnFH > Margin.bottom) {
+		/* next page */
+		EndPage(PrintDC);
+		StartPage(PrintDC);
+		PrnSetAttr(PrnAttr);
+		PrnY = Margin.top;
 	}
 
-	do {
-		if (PrnX+PrnFW > Margin.right) {
-			/* new line */
-			PrnX = Margin.left;
-			PrnY = PrnY + PrnFH;
-		}
-		if (PrnY+PrnFH > Margin.bottom) {
-			/* next page */
-			EndPage(PrintDC);
-			StartPage(PrintDC);
-			PrnSetAttr(PrnAttr);
-			PrnY = Margin.top;
-		}
+	DrawStrA(PrintDC, NULL, StrA, Count, PrnFW, PrnFH, PrnY, &PrnX);
+}
 
-		i = (Margin.right-PrnX) / PrnFW;
-		if (i==0) {
-			i=1;
-		}
-		if (i>Count) {
-			i=Count;
-		}
+void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data)
+{
+	if (PrnX+PrnFW > Margin.right) {
+		/* new line */
+		PrnX = Margin.left;
+		PrnY = PrnY + PrnFH;
+	}
+	if (PrnY+PrnFH > Margin.bottom) {
+		/* next page */
+		EndPage(PrintDC);
+		StartPage(PrintDC);
+		PrnSetAttr(PrnAttr);
+		PrnY = Margin.top;
+	}
 
-		if (i<Count) {
-			Ptr2 = Ptr;
-			do {
-				Ptr1 = Ptr2;
-				Ptr2 = CharNextA(Ptr1);
-			} while ((Ptr2!=NULL) && ((Ptr2-Ptr)<=i));
-			i = Ptr1-Ptr;
-			if (i<=0) {
-				i=1;
-			}
-		}
-
-		RText.left = PrnX;
-		RText.right = PrnX + i*PrnFW;
-		RText.top = PrnY;
-		RText.bottom = PrnY+PrnFH;
-		ExtTextOutA(PrintDC,PrnX,PrnY,6,&RText,Ptr,i,&PrnDx[0]);
-		PrnX = RText.right;
-		Count=Count-i;
-		Ptr = Ptr + i;
-	} while (Count>0);
-
+	DrawStrW(PrintDC, NULL, StrW, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
 }
 
 void PrnNewLine()
@@ -548,7 +512,7 @@ static void PrintFile(void)
 					}
 				} while ((c>0) && (! CRFlag));
 				if (i>0) {
-					PrnOutText(Buff, i);
+					PrnOutText(Buff, i, NULL);
 				}
 				if (CRFlag) {
 					PrnX = Margin.left;

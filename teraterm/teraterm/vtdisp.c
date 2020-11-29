@@ -46,6 +46,7 @@
 #include "vtdisp.h"
 
 #define CurWidth 2
+// #define DRAW_RED_BOX	1
 
 static const BYTE DefaultColorTable[256][3] = {
   {  0,  0,  0}, {255,  0,  0}, {  0,255,  0}, {255,255,  0}, {  0,  0,255}, {255,  0,255}, {  0,255,255}, {255,255,255},  //   0 -   7
@@ -107,7 +108,6 @@ static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
 static COLORREF ANSIColor[256];
-static int Dx[TermWidthMax];
 
 // caret variables
 static int CaretStatus;
@@ -1963,9 +1963,6 @@ void ChangeFont()
 		VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
 		VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
 	}
-
-	for (i = 0 ; i < TermWidthMax; i++)
-		Dx[i] = FontWidth;
 }
 
 void ResetIME()
@@ -2716,185 +2713,191 @@ static void DrawTextBGImage(HDC hdcBGBuffer, int X, int Y, int width, int height
 	}
 }
 
-// Display a string
-//   Buff: points the string
-//   Y: vertical position in window cordinate
-//  *X: horizontal position
-// Return:
-//  *X: horizontal position shifted by the width of the string
-void DispStr(PCHAR Buff, int Count, int Y, int* X)
+// draw red box for debug
+#if DRAW_RED_BOX
+static void DrawRedBox(HDC DC, int sx, int sy, int width, int height)
 {
-#ifdef ALPHABLEND_TYPE2
-	const BOOL draw_bg_enable = BGEnable;
-#else
-	const BOOL draw_bg_enable = FALSE;
+	HPEN red_pen = CreatePen(PS_SOLID, 0, RGB(0xff, 0, 0));
+	HGDIOBJ old_pen = SelectObject(DC, red_pen);
+	MoveToEx(DC, sx, sy, NULL);
+	LineTo(DC, sx + width, sy);
+	LineTo(DC, sx + width, sy + height);
+	LineTo(DC, sx, sy + height);
+	LineTo(DC, sx, sy);
+	MoveToEx(DC, sx, sy, NULL);
+	LineTo(DC, sx + width, sy + height);
+	MoveToEx(DC, sx + width, sy, NULL);
+	LineTo(DC, sx, sy + height);
+	SelectObject(DC, old_pen);
+	DeleteObject(red_pen);
+}
 #endif
 
-#if 0
-	{
-		char b[128];
-		memcpy(b, Buff, Count);
-		b[Count] = 0;
-		OutputDebugPrintf("(%d,%d)'%s'\n", *X, Y, b);
+/**
+ *	1s•`‰æ ANSI
+ */
+void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int font_height, int Y, int *X)
+{
+	int Dx[TermWidthMax];
+	int i;
+	int width;
+	int height;
+
+	for (i = 0; i < Count; i++) {
+		Dx[i] = font_width;
 	}
-#endif
 
-#if !UNICODE_INTERNAL_BUFF
-	if ((ts.Language==IdRussian) &&
-		(ts.RussClient!=ts.RussFont))
-		RussConvStr(ts.RussClient,ts.RussFont,Buff,Count);
-#endif
-
-	if(!draw_bg_enable)
-	{
+	// ƒeƒLƒXƒg•`‰æ—Ìˆæ
+	width = Count * font_width;
+	height = font_height;
+	if (BGDC == NULL) {
 		RECT RText;
-		RText.top = Y;
-		RText.bottom = Y+FontHeight;
-		RText.left = *X;
-		RText.right = *X + Count*FontWidth;
+		SetRect(&RText, *X, Y, *X + width, Y + height);
 
-		ExtTextOutA(VTDC,*X+ts.FontDX,Y+ts.FontDY,
-					ETO_CLIPPED | ETO_OPAQUE,
-					&RText,Buff,Count,&Dx[0]);
+		ExtTextOutA(DC, *X + ts.FontDX, Y + ts.FontDY, ETO_CLIPPED | ETO_OPAQUE, &RText, StrA, Count, &Dx[0]);
 	}
-#ifdef ALPHABLEND_TYPE2
 	else {
 		HFONT hPrevFont;
-		RECT  rect;
-		int   eto_options;
-		const int width  = Count*FontWidth;
-		const int height = FontHeight;
-		SetRect(&rect,0,0,width,height);
+		RECT rect;
+		int eto_options;
 
-		//hdcBGBuffer ‚Ì‘®«‚ðÝ’è
-		hPrevFont = SelectObject(hdcBGBuffer,GetCurrentObject(VTDC,OBJ_FONT));
-		SetTextColor(hdcBGBuffer,GetTextColor(VTDC));
-		SetBkColor(hdcBGBuffer,GetBkColor(VTDC));
+		SetRect(&rect, 0, 0, 0 + width, 0 + height);
+
+		// BGDC ‚Ì‘®«‚ðÝ’è
+		hPrevFont = SelectObject(BGDC, GetCurrentObject(DC, OBJ_FONT));
+		SetTextColor(BGDC, GetTextColor(DC));
+		SetBkColor(BGDC, GetBkColor(DC));
 
 		// •¶Žš‚Ì”wŒi‚ð•`‰æ
-		DrawTextBGImage(hdcBGBuffer, *X, Y, width, height);
+		DrawTextBGImage(BGDC, *X, Y, width, height);
 
 		// •¶Žš‚ð•`‰æ
 		eto_options = ETO_CLIPPED;
-		if(BGReverseText == TRUE && BGReverseTextAlpha < 255) {
+		if (BGReverseText == TRUE && BGReverseTextAlpha < 255) {
 			eto_options |= ETO_OPAQUE;
 		}
-		ExtTextOutA(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect,Buff,Count,&Dx[0]);
+		ExtTextOutA(BGDC, ts.FontDX, ts.FontDY, eto_options, &rect, StrA, Count, &Dx[0]);
 
 		// Window‚É“\‚è•t‚¯
-		BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
+		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 
-		SelectObject(hdcBGBuffer,hPrevFont);
+		SelectObject(BGDC, hPrevFont);
 	}
+
+#if DRAW_RED_BOX
+	DrawRedBox(DC, *X, Y, width, height);
 #endif
 
-	*X += Count*FontWidth;
+	*X += width;
+}
 
-#if !UNICODE_INTERNAL_BUFF
-	if ((ts.Language==IdRussian) && (ts.RussClient!=ts.RussFont))
-		RussConvStr(ts.RussFont,ts.RussClient,Buff,Count);
+/**
+ *	1s•`‰æ Unicode
+ *		Windows 95 ‚É‚à ExtTextOutW() ‚Í‘¶Ý‚·‚é‚ª
+ *		“®ì‚ªˆÙ‚È‚é‚æ‚¤‚¾
+ *		TODO •¶ŽšŠÔ‚É‘Î‰ž‚µ‚Ä‚¢‚È‚¢?
+ */
+void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count, int font_width, int font_height,
+			  int Y, int *X)
+{
+	int Dx[TermWidthMax];
+	int HalfCharCount = 0;
+	int i;
+	int width;
+	int height;
+
+	for (i = 0; i < Count; i++) {
+		if (WidthInfo[i] == 'H') {
+			HalfCharCount++;
+			Dx[i] = font_width;
+		}
+		else if (WidthInfo[i] == '0') {
+			if (i == 0) {
+				Dx[i] = 0;
+			}
+			else {
+				Dx[i] = Dx[i - 1];
+				Dx[i - 1] = 0;
+			}
+		}
+		else {
+			HalfCharCount += 2;
+			Dx[i] = font_width * 2;
+		}
+	}
+
+	// ƒeƒLƒXƒg•`‰æ—Ìˆæ
+	width = HalfCharCount * font_width;
+	height = font_height;
+	if (BGDC == NULL) {
+		RECT RText;
+		SetRect(&RText, *X, Y, *X + width, Y + height);
+
+		ExtTextOutW(DC, *X + ts.FontDX, Y + ts.FontDY, ETO_CLIPPED | ETO_OPAQUE, &RText, StrW, Count, &Dx[0]);
+	}
+	else {
+		HFONT hPrevFont;
+		RECT rect;
+		int eto_options;
+
+		SetRect(&rect, 0, 0, 0 + width, 0 + height);
+
+		// BGDC ‚Ì‘®«‚ðÝ’è
+		hPrevFont = SelectObject(BGDC, GetCurrentObject(DC, OBJ_FONT));
+		SetTextColor(BGDC, GetTextColor(DC));
+		SetBkColor(BGDC, GetBkColor(DC));
+
+		// •¶Žš‚Ì”wŒi‚ð•`‰æ
+		DrawTextBGImage(BGDC, *X, Y, width, height);
+
+		// •¶Žš‚ð•`‰æ
+		eto_options = ETO_CLIPPED;
+		if (BGReverseText == TRUE && BGReverseTextAlpha < 255) {
+			eto_options |= ETO_OPAQUE;
+		}
+		ExtTextOutW(BGDC, ts.FontDX, ts.FontDY, eto_options, &rect, StrW, Count, &Dx[0]);
+
+		// Window‚É“\‚è•t‚¯
+		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
+
+		SelectObject(BGDC, hPrevFont);
+	}
+
+#if DRAW_RED_BOX
+	DrawRedBox(DC, *X, Y, width, height);
 #endif
+
+	*X += width;
+}
+
+/**
+ *	Display a string
+ *	@param   	Buff	points the string
+ *	@param   	Y		vertical position in window cordinate
+ *  @param[in]	*X		horizontal position
+ *  @param[out]	*X		horizontal position shifted by the width of the string
+ */
+void DispStr(const char *Buff, int Count, int Y, int* X)
+{
+#ifdef ALPHABLEND_TYPE2
+	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
+#else
+	HDC BGDC = NULL;
+#endif
+	DrawStrA(VTDC, BGDC, Buff, Count, FontWidth, FontHeight, Y, X);
 }
 
 /**
  *	DispStr() ‚Ì wchar_t”Å
- *		Windows 95 ‚É‚à ExtTextOutW() ‚Í‘¶Ý‚·‚é‚ª
- *		“®ì‚ªˆÙ‚È‚é‚æ‚¤‚¾
  */
 void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
 {
 #ifdef ALPHABLEND_TYPE2
-	const BOOL draw_bg_enable = BGEnable;
+	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
 #else
-	const BOOL draw_bg_enable = FALSE;
+	HDC BGDC = NULL;
 #endif
-
-#if 0
-	{
-		wchar_t b[TermWidthMax];
-		memcpy(b, StrW, Count*sizeof(wchar_t));
-		b[Count] = 0;
-		OutputDebugPrintfW(L"(%d,%d)'%s'\n", *X, Y, b);
-		OutputDebugPrintfW(L"       '%hs'\n", WidthInfo);
-	}
-#endif
-
-	int Dx2[TermWidthMax];
-	int dx3 = 0;
-	int HalfCharCount = 0;
-	int i;
-	for(i=0; i<Count; i++) {
-		if (WidthInfo[i] == 'H') {
-			HalfCharCount++;
-			dx3++;
-			Dx2[i] = FontWidth;
-		} else if (WidthInfo[i] == '0') {
-			if (i == 0) {
-				Dx2[i] = 0;
-			} else {
-				Dx2[i] = Dx2[i-1];
-				Dx2[i-1] = 0;
-			}
-		} else {
-			HalfCharCount += 2;
-			Dx2[i] = FontWidth * 2;
-			dx3 += 2;
-		}
-	}
-
-	if(!draw_bg_enable)
-	{
-		RECT RText;
-		RText.top = Y;
-		RText.bottom = Y+FontHeight;
-		RText.left = *X;
-		RText.right = *X + HalfCharCount * FontWidth;
-		RText.right = *X + dx3 * FontWidth;
-
-#if 0
-		ExtTextOutW(VTDC, *X + ts.FontDX, Y + ts.FontDY,
-			ETO_CLIPPED | ETO_OPAQUE,
-			&RText, Buff, Count, &Dx[0]);
-#endif
-		ExtTextOutW(VTDC, *X + ts.FontDX, Y + ts.FontDY,
-			ETO_CLIPPED | ETO_OPAQUE,
-			&RText, StrW, Count, &Dx2[0]);
-	}
-#ifdef ALPHABLEND_TYPE2
-	else {
-		HFONT hPrevFont;
-		RECT  rect;
-		int   eto_options;
-		const int width  = Count*FontWidth*2;
-		const int height = FontHeight;
-		SetRect(&rect,0,0,width,height);
-
-		//hdcBGBuffer ‚Ì‘®«‚ðÝ’è
-		hPrevFont = SelectObject(hdcBGBuffer,GetCurrentObject(VTDC,OBJ_FONT));
-		SetTextColor(hdcBGBuffer,GetTextColor(VTDC));
-		SetBkColor(hdcBGBuffer,GetBkColor(VTDC));
-
-		// •¶Žš‚Ì”wŒi‚ð•`‰æ
-		DrawTextBGImage(hdcBGBuffer, *X, Y, width, height);
-
-		// •¶Žš‚ð•`‰æ
-		eto_options = ETO_CLIPPED;
-		if(BGReverseText == TRUE && BGReverseTextAlpha < 255) {
-			eto_options |= ETO_OPAQUE;
-		}
-#if 0
-		ExtTextOutW(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect, StrW,Count,&Dx[0]);
-#endif
-		ExtTextOutW(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect, StrW,Count,&Dx2[0]);
-
-		// Window‚É“\‚è•t‚¯
-		BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
-
-		SelectObject(hdcBGBuffer,hPrevFont);
-	}
-#endif
-
-	*X += dx3 *FontWidth;
+	DrawStrW(VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
 }
 
 void DispEraseCurToEnd(int YEnd)

@@ -47,8 +47,9 @@ void PrnStop();
 #define IdPrnFile 8
 
 int VTPrintInit(int PrnFlag);
-void PrnSetAttr(TCharAttr Attr);
-void PrnOutText(PCHAR Buff, int Count);
+void PrnSetupDC(TCharAttr Attr, BOOL reverse);
+void PrnOutText(const char *Buff, int Count, void *data);
+void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
 void PrnNewLine();
 void VTPrintEnd();
 
@@ -61,4 +62,3 @@ void WriteToPrnFile(BYTE b, BOOL Write);
 #ifdef __cplusplus
 }
 #endif
-
