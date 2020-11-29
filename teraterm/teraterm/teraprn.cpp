@@ -52,10 +52,7 @@
 #endif
 #endif
 
-static PRINTDLG PrnDlg;
-
 static HDC PrintDC;
-static LOGFONTA Prnlf;
 static HFONT PrnFont[AttrFontMask+1];
 static int PrnFW, PrnFH;
 static RECT Margin;
@@ -105,8 +102,8 @@ static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPA
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
 	/* initialize PrnDlg record */
-	memset(&PrnDlg, 0, sizeof(PRINTDLG));
-	PrnDlg.lStructSize = sizeof(PRINTDLG);
+	PRINTDLGW PrnDlg = {};
+	PrnDlg.lStructSize = sizeof(PrnDlg);
 	PrnDlg.hwndOwner = HWin;
 	PrnDlg.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_SHOWHELP | PD_ENABLEPRINTHOOK;
 	if (! *Sel) {
@@ -122,15 +119,14 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	PrnDlg.lpfnPrintHook = PrintHookProc;
 
 	/* 'Print' dialog box */
-	if (! PrintDlg(&PrnDlg)) {
+	if (! PrintDlgW(&PrnDlg)) {
 		return NULL; /* if 'Cancel' button clicked, exit */
 	}
 	if (PrnDlg.hDC == NULL) {
 		return NULL;
 	}
-	PrintDC = PrnDlg.hDC;
 	*Sel = (PrnDlg.Flags & PD_SELECTION) != 0;
-	return PrintDC;
+	return PrnDlg.hDC;
 }
 
 BOOL PrnStart(LPSTR DocumentName)
@@ -215,13 +211,11 @@ int VTPrintInit(int PrnFlag)
 		AttrDefaultFG,
 		AttrDefaultBG
 	};
+	LOGFONTA Prnlf;
 
 	Sel = (PrnFlag & IdPrnSelectedText)!=0;
-	if (PrnBox(HVTWin,&Sel)==NULL) {
-		return (IdPrnCancel);
-	}
-
-	if (PrintDC==0) {
+	PrintDC = PrnBox(HVTWin,&Sel);
+	if (PrintDC == NULL) {
 		return (IdPrnCancel);
 	}
 
