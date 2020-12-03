@@ -7,3 +7,14 @@
   - https://ja.osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/uni_combining.map?root=ttssh2&view=log
   - r6514 にて hfs_plus.map -> uni_combining.map
 - 現在はこのスクリプトの出力をそのまま使用していない
+
+## 入力ファイル
+
+- 現在の入手先
+  - https://developer.apple.com/library/archive/technotes/tn/tn1150table.html
+
+- 以前
+  - スクリプト作成当時
+    - UNICODE DECOMPOSITION TABLE.htm
+  - 移動
+    - http://developer.apple.com/technotes/tn/tn1150table.html
