@@ -9,18 +9,10 @@
 3. ファイルの入れ替えや編集を行う
 4. 個別の画像から ico ファイルを生成する
 
-
-- ツールの準備 icotool
-- icoファイルから複数のpngを抽出
-- 複数のpngから1つのicoファイルを合成
-
 ## 準備
 
 - icotoolを使える状態にする
-- cygwin では icoutils パッケージに入っている
-- linux では icoutils パッケージに入っている
-  - `apt-get install icoutils`
-- windows用も存在する
+  - icotool についてを参照
 
 ## icoファイルからpngの抽出
 
@@ -33,3 +25,21 @@
 - pngファイルからicoファイルが合成される
 - icoファイルはこのフォルダに作成される
 - 必要に応じて../*.icoと入れ替えを行う
+
+## ico ファイルについて
+
+- [プロジェクトページのアイコンについて](https://osdn.net/projects/ttssh2/wiki/%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3)
+- *注意点* Visual Studio 2005 では png形式は扱えない
+  - bmp形式にしておく必要がある
+
+## icotool について
+
+- https://www.nongnu.org/icoutils/
+- icoファイルから複数のpngを抽出
+- 複数のpngから1つのicoファイルを合成
+- windows用
+  - https://www.cybercircuits.co.nz/web/blog/icoutils-0-32-3-for-windows
+- cygwin では icoutils パッケージに入っている
+- linux では icoutils パッケージに入っている
+  - `apt-get install icoutils`
+
