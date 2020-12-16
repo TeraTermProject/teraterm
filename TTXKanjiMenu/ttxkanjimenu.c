@@ -1,7 +1,7 @@
 /*
  * TTX KanjiMenu Plugin
  *    Copyright (C) 2007 Sunao HARA (naoh@nagoya-u.jp)
- *    (C) 2007-2020 TeraTerm Project
+ *    (C) 2007- TeraTerm Project
  */
 
 //// ORIGINAL SOURCE CODE: ttxtest.c

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) S.Hayakawa NTT-IT 1998-2002
- * (C) 2002-2020 TeraTerm Project
+ * (C) 2002- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

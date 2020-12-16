@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2020, Robert O'Callahan
- * (C) 2004-2020 TeraTerm Project
+ * (C) 2004- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
