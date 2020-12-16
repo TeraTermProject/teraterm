@@ -1,7 +1,7 @@
 //
 // Cygterm launcher
 //
-// (C) 2007-2013 TeraTerm Project
+// (C) 2007- TeraTerm Project
 //   https://ttssh2.osdn.jp/
 //
 // [How to compile]
