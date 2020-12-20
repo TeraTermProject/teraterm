@@ -95,7 +95,7 @@ typedef struct _TInstVar *PTInstVar;
 #define _Printf_format_string_
 #endif
 
-HANDLE hInst; /* Instance handle of TTXSSH.DLL */
+extern HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 
 #define ID_SSHSCPMENU       52110
 #define ID_SSHSETUPMENU     52310
