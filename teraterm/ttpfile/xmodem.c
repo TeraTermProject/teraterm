@@ -218,7 +218,7 @@ static BOOL XCheckPacket(PXVar xv)
 				(LOBYTE(Check) == xv->PktIn[xv->DataLen + 4]));
 }
 
-void XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	PXVar xv = fv->data;
 	fv->LogFlag = ((ts->LogFlag & LOG_X) != 0);
@@ -228,10 +228,19 @@ void XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	fv->LogCount = 0;
 
 	fv->FileSize = 0;
-	if ((xv->XMode == IdXSend) && fv->FileOpen) {
+	if (xv->XMode == IdXSend) {
+		fv->FileHandle = _lopen(fv->FullName,OF_READ);
+		if (fv->FileHandle == INVALID_HANDLE_VALUE) {
+			return FALSE;
+		}
+		fv->FileOpen = TRUE;
 		fv->FileSize = fv->GetFSize(fv, fv->FullName);
 		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
+		fv->FileHandle = _lcreat(fv->FullName,0);
+		if (fv->FileHandle == INVALID_HANDLE_VALUE) {
+			return FALSE;
+		}
 		fv->ProgStat = -1;
 	}
 	fv->StartTime = GetTickCount();
@@ -289,6 +298,8 @@ void XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		XSendNAK(fv, xv, cv);
 		break;
 	}
+
+	return TRUE;
 }
 
 void XCancel(PFileVarProto fv, PComVar cv)
@@ -644,6 +655,12 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
+static void Destroy(PFileVarProto fv)
+{
+	free(fv->data);
+	fv->data = NULL;
+}
+
 BOOL XCreate(PFileVarProto fv)
 {
 	PXVar xv;
@@ -654,6 +671,7 @@ BOOL XCreate(PFileVarProto fv)
 	memset(xv, 0, sizeof(*xv));
 	fv->data = xv;
 
+	fv->Destroy = Destroy;
 	fv->Init = XInit;
 	fv->Parse = XParse;
 	fv->TimeOutProc = XTimeOutProc;

@@ -41,11 +41,6 @@ enum {
 
 /* prototypes */
 BOOL YCreate(PFileVarProto fv);
-#if 1
-void YInit(PFileVarProto fv, PComVar cv, PTTSet ts);
-void YCancel(PFileVarProto fv, PComVar cv);
-void YTimeOutProc(PFileVarProto fv, PComVar cv);
-#endif
 
 #ifdef __cplusplus
 }

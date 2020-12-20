@@ -614,3 +614,14 @@ unsigned long long GetFSize64A(const char *FName)
 	CloseHandle(hFile);
 	return file_size;
 }
+
+// Append a slash to the end of a path name
+void AppendSlashW(wchar_t *Path, size_t destlen)
+{
+	size_t len = wcslen(Path);
+	if (len > 0) {
+		if (Path[len - 1] != L'\\') {
+			wcsncat_s(Path,destlen,L"\\",_TRUNCATE);
+		}
+	}
+}

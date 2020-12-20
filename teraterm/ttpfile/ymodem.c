@@ -96,7 +96,9 @@ typedef TYVar *PYVar;
 #define XnakNAK 1
 #define XnakC 2
 
-int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
+static void YCancel(PFileVarProto fv, PComVar cv);
+
+static int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 {
 	if (CommRead1Byte(cv,b) == 0)
 		return 0;
@@ -120,7 +122,7 @@ int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
+static int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
 {
 	int i, j;
 
@@ -334,14 +336,14 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	yv->LastMessage = 0;
 }
 
-void YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	char inistr[MAX_PATH + 10];
 	PYVar yv = fv->data;
 
 	if (yv->YMode == IdYSend) {
 		if (!GetNextFname(fv)) {
-			return;
+			return FALSE;
 		}
 	}
 
@@ -420,9 +422,11 @@ void YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 		break;
 	}
+
+	return TRUE;
 }
 
-void YCancel(PFileVarProto fv, PComVar cv)
+static void YCancel(PFileVarProto fv, PComVar cv)
 {
 	// five cancels & five backspaces per spec
 	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
@@ -1120,6 +1124,12 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
+static void Destroy(PFileVarProto fv)
+{
+	free(fv->data);
+	fv->data = NULL;
+}
+
 BOOL YCreate(PFileVarProto fv)
 {
 	PYVar pv;
@@ -1130,6 +1140,7 @@ BOOL YCreate(PFileVarProto fv)
 	memset(pv, 0, sizeof(*pv));
 	fv->data = pv;
 
+	fv->Destroy = Destroy;
 	fv->Init = YInit;
 	fv->Parse = YParse;
 	fv->TimeOutProc = YTimeOutProc;

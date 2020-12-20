@@ -53,6 +53,7 @@
 #include <io.h>
 #include <assert.h>
 
+#if 0
 void _ProtoInit(int Proto, PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
@@ -76,6 +77,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PComVar cv, PTTSet ts)
 		break;
 	}
 }
+#endif
 
 BOOL _ProtoParse(int Proto, PFileVarProto fv, PComVar cv)
 {

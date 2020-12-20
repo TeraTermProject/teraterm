@@ -129,7 +129,7 @@ void BPDispMode(PFileVarProto fv, PBPVar bv)
   SetWindowText(fv->HWin,fv->DlgCaption);
 }
 
-void BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
   int i;
   PBPVar bv = fv->data;
@@ -204,6 +204,7 @@ void BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   fv->LogState = 0;
   fv->LogCount = 0;
 
+  return TRUE;
 }
 
 int BPRead1Byte(PFileVarProto fv, PBPVar bv, PComVar cv, LPBYTE b)
@@ -970,6 +971,12 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
+static void Destroy(PFileVarProto fv)
+{
+	free(fv->data);
+	fv->data = NULL;
+}
+
 BOOL BPCreate(PFileVarProto fv)
 {
 	PBPVar bv;
@@ -980,6 +987,7 @@ BOOL BPCreate(PFileVarProto fv)
 	memset(bv, 0, sizeof(*bv));
 	fv->data = bv;
 
+	fv->Destroy = Destroy;
 	fv->Init = BPInit;
 	fv->Parse = BPParse;
 	fv->TimeOutProc = BPTimeOutProc;

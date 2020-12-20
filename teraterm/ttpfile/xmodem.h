@@ -42,12 +42,6 @@ enum {
 };
 
 BOOL XCreate(PFileVarProto fv);
-#if 0
-void XInit(PFileVarProto fv, PComVar cv, PTTSet ts);
-void XCancel(PFileVarProto fv, PComVar cv);
-void XTimeOutProc(PFileVarProto fv, PComVar cv);
-BOOL XParse(PFileVarProto fv, PComVar cv);
-#endif
 
 #ifdef __cplusplus
 }

@@ -1169,31 +1169,9 @@ void KmtSendFinish(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	kv->KmtState = Finish;
 }
 
-void KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
-	char uimsg[MAX_UIMSG];
 	PKmtVar kv = fv->data;
-	UILanguageFile = ts->UILanguageFile;
-
-	strncpy_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Tera Term: Kermit ",_TRUNCATE);
-	switch (kv->KmtMode) {
-	case IdKmtSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case IdKmtReceive:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTRCV", uimsg, sizeof(uimsg), TitKmtRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case IdKmtGet:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTGET", uimsg, sizeof(uimsg), TitKmtGet, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case IdKmtFinish:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTFIN", uimsg, sizeof(uimsg), TitKmtFin, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	}
 
 	SetWindowText(fv->HWin,fv->DlgCaption);
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, "Kermit");
@@ -1281,6 +1259,8 @@ void KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		KmtSendInitPkt(fv,kv,cv,'I');
 		break;
 	}
+
+	return TRUE;
 }
 
 void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
@@ -1643,6 +1623,12 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
+static void Destroy(PFileVarProto fv)
+{
+	free(fv->data);
+	fv->data = NULL;
+}
+
 BOOL KmtCreate(PFileVarProto fv)
 {
 	PKmtVar kv;
@@ -1653,6 +1639,7 @@ BOOL KmtCreate(PFileVarProto fv)
 	memset(kv, 0, sizeof(*kv));
 	fv->data = kv;
 
+	fv->Destroy = Destroy;
 	fv->Init = KmtInit;
 	fv->Parse = KmtReadPacket;
 	fv->TimeOutProc = KmtTimeOutProc;

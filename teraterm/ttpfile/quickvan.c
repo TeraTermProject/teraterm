@@ -161,7 +161,7 @@ void QVSendACK(PFileVarProto fv, PQVVar qv, PComVar cv)
   qv->QVState = QV_Close;
 }
 
-void QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+BOOL QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
   char uimsg[MAX_UIMSG];
   PQVVar qv = fv->data;
@@ -211,6 +211,8 @@ void QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
       QVSendNAK(fv,qv,cv);
       break;
   }
+
+  return TRUE;
 }
 
 void QVCancel(PFileVarProto fv, PComVar cv)
@@ -1319,6 +1321,12 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
+static void Destroy(PFileVarProto fv)
+{
+	free(fv->data);
+	fv->data = NULL;
+}
+
 BOOL QVCreate(PFileVarProto fv)
 {
 	PQVVar qv = malloc(sizeof(*qv));
@@ -1328,6 +1336,7 @@ BOOL QVCreate(PFileVarProto fv)
 	memset(qv, 0, sizeof(*qv));
 	fv->data = qv;
 
+	fv->Destroy = Destroy;
 	fv->Init = QVInit;
 	fv->Parse = QVParse;
 	fv->TimeOutProc = QVTimeOutProc;

@@ -68,11 +68,12 @@ typedef struct FileVarProto {
 	DWORD FileMtime;
 
 	// protocol entrys, data
-	void (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
+	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
 	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
 	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
 	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
 	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
+	void (*Destroy)(struct FileVarProto *fv);
 	void *data;
 
 	// file I/O

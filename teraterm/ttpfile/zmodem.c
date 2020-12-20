@@ -692,7 +692,8 @@ void ZSendDataDat(PFileVarProto fv, PZVar zv)
 	add_sendbuf("%s: ", __FUNCTION__);
 }
 
-void ZInit(PFileVarProto fv, PComVar cv, PTTSet ts) {
+BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+{
 	int Max;
 	char uimsg[MAX_UIMSG];
 	const char *UILanguageFile = ts->UILanguageFile;
@@ -808,6 +809,8 @@ void ZInit(PFileVarProto fv, PComVar cv, PTTSet ts) {
 		ZSendRQInit(fv, zv, cv);
 		break;
 	}
+
+	return TRUE;
 }
 
 void ZTimeOutProc(PFileVarProto fv, PComVar cv)
@@ -1497,6 +1500,12 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
+static void Destroy(PFileVarProto fv)
+{
+	free(fv->data);
+	fv->data = NULL;
+}
+
 BOOL ZCreate(PFileVarProto fv)
 {
 	PZVar zv;
@@ -1507,6 +1516,7 @@ BOOL ZCreate(PFileVarProto fv)
 	memset(zv, 0, sizeof(*zv));
 	fv->data = zv;
 
+	fv->Destroy = Destroy;
 	fv->Init = ZInit;
 	fv->Parse = ZParse;
 	fv->TimeOutProc = ZTimeOutProc;

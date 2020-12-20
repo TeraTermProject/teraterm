@@ -40,12 +40,6 @@ enum {
 
 /* prototypes */
 BOOL ZCreate(PFileVarProto fv);
-#if 0
-void ZInit(PFileVarProto fv, PComVar cv, PTTSet ts);
-void ZTimeOutProc(PFileVarProto fv, PComVar cv);
-BOOL ZParse(PFileVarProto fv, PComVar cv);
-void ZCancel(PFileVarProto fv, PComVar cv);
-#endif
 
 #ifdef __cplusplus
 }

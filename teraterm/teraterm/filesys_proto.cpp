@@ -28,8 +28,6 @@
 
 /* TERATERM.EXE, file transfer routines */
 #include <stdio.h>
-#include <io.h>
-#include <process.h>
 #include <windows.h>
 #include <htmlhelp.h>
 #include <assert.h>
@@ -37,7 +35,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
-#include "ftdlg.h"
 #include "protodlg.h"
 #include "ttwinman.h"
 #include "commlib.h"
@@ -46,12 +43,10 @@
 #include "ttlib.h"
 #include "dlglib.h"
 #include "vtterm.h"
-#include "win16api.h"
 #include "ftlib.h"
 #include "buffer.h"
 #include "helpid.h"
 #include "layer_for_unicode.h"
-#include "layer_for_unicode_crt.h"
 #include "codeconv.h"
 
 #include "filesys_log_res.h"
@@ -187,19 +182,26 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	return TRUE;
 }
 
-static void FreeFileVar_(PFileVarProto *fv)
+static void FreeFileVar_(PFileVarProto *pfv)
 {
-	if ((*fv)!=NULL)
-	{
-		if ((*fv)->FileOpen) CloseHandle((*fv)->FileHandle);
-		if ((*fv)->FnStrMemHandle != 0)
-		{
-			GlobalUnlock((*fv)->FnStrMemHandle);
-			GlobalFree((*fv)->FnStrMemHandle);
-		}
-		free(*fv);
-		*fv = NULL;
+	PFileVarProto fv = *pfv;
+	if (fv == NULL) {
+		return;
 	}
+
+	if (fv->Destroy != NULL) {
+		fv->Destroy(fv);
+	}
+
+	if (fv->FileOpen) CloseHandle(fv->FileHandle);
+	if (fv->FnStrMemHandle != 0)
+	{
+		GlobalUnlock(fv->FnStrMemHandle);
+		GlobalFree(fv->FnStrMemHandle);
+	}
+	free(fv);
+
+	*pfv = NULL;
 }
 
 static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
@@ -269,7 +271,12 @@ static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WOR
 	pd->Create(hInst, HVTWin, &info);
 	fv->HWin = pd->m_hWnd;
 
-	_ProtoInit(ProtoId,FileVar,&cv,&ts);
+	BOOL r = fv->Init(fv, &cv, &ts);
+	if (r == FALSE) {
+		fv->Destroy(fv);
+		return FALSE;
+	}
+	SetWindowText(fv->HWin, fv->DlgCaption);
 
 	PtDlg = pd;
 	return TRUE;
@@ -475,32 +482,68 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv)
+/**
+ *	ダイアログのデフォルトファイル名を返す
+ *		フィルタ(ts.FileSendFilter)がワイルドカードではなく、
+ *		そのファイルが存在する場合
+ *		デフォルトのファイル名として返す
+ *
+ * @param[in]	path		ファイルが存在するか調べるパス
+ *							(lpstrInitialDir に設定されるパス)
+ * @retval		NULL		デフォルトファイル名なし
+ * @retval		NULL以外	デフォルトファイル(不要になったらfree()すること)
+ */
+static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 {
-	LONG opt;
-	const char *FileSendFilter = ts.FileSendFilter;
-	const char *UILanguageFile = ts.UILanguageFile;
+	const char *FileSendFilterA = ts.FileSendFilter;
+	if (strlen(FileSendFilterA) == 0) {
+		return NULL;
+	}
 
+	// フィルタがワイルドカードではなく、そのファイルが存在する場合
+	// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
+	wchar_t *filename = NULL;
+	if (!isInvalidFileNameChar(FileSendFilterA)) {
+		wchar_t file[MAX_PATH];
+		wcsncpy_s(file, _countof(file), path, _TRUNCATE);
+		AppendSlashW(file, _countof(file));
+		wchar_t *FileSendFilterW = ToWcharA(FileSendFilterA);
+		wcsncat_s(file, _countof(file), FileSendFilterW, _TRUNCATE);
+		DWORD attr = _GetFileAttributesW(file);
+		if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+			// ファイルが存在する
+			filename = _wcsdup(file);
+		}
+		free(FileSendFilterW);
+	}
+
+	return filename;
+}
+
+static char *GetCommonDialogDefaultFilenameA(const char *path)
+{
+	wchar_t *pathW = ToWcharA(path);
+	wchar_t *fileW = GetCommonDialogDefaultFilenameW(pathW);
+	char *fileA = ToCharW(fileW);
+	free(pathW);
+	free(fileW);
+	return fileA;
+}
+
+static BOOL _GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Option, PFileVarProto fv)
+{
 	char FileDirExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 	PCHAR CurDir = FileDirExpanded;
 
-	char *FNFilter = GetCommonDialogFilterA(!Receive ? FileSendFilter : NULL, UILanguageFile);
+	char *FNFilter = GetCommonDialogFilterA(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
 
 	fv->FullName[0] = 0;
 	if (!Receive) {
-		if (strlen(FileSendFilter) > 0) {
-			// フィルタがワイルドカードではなく、そのファイルが存在する場合
-			// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
-			if (!isInvalidFileNameChar(FileSendFilter)) {
-				char file[MAX_PATH];
-				strncpy_s(file, sizeof(file), CurDir, _TRUNCATE);
-				AppendSlash(file, sizeof(file));
-				strncat_s(file, sizeof(file), FileSendFilter, _TRUNCATE);
-				if (_access(file, 0) == 0) {
-					strncpy_s(fv->FullName, sizeof(fv->FullName), FileSendFilter, _TRUNCATE);
-				}
-			}
+		char *default_filename = GetCommonDialogDefaultFilenameA(CurDir);
+		if (default_filename != NULL) {
+			strncpy_s(fv->FullName, _countof(fv->FullName), default_filename, _TRUNCATE);
+			free(default_filename);
 		}
 	}
 
@@ -510,9 +553,9 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv)
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = fv->FullName;
-	ofn.nMaxFile = sizeof(fv->FullName);
+	ofn.nMaxFile = _countof(fv->FullName);
 	ofn.lpstrInitialDir = CurDir;
-	opt = *Option;
+	LONG opt = *Option;
 	if (! Receive)
 	{
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -524,13 +567,13 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv)
 	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.Flags |= OFN_SHOWHELP;
 	ofn.lCustData = (LPARAM)&opt;
-	ofn.lpstrTitle = fv->DlgCaption;
+	ofn.lpstrTitle = caption;
 	ofn.lpfnHook = XFnHook;
 	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_XOPT);
 	ofn.hInstance = hInst;
 
 	/* save current dir */
-	wchar_t TempDir[MAXPATHLEN];
+	wchar_t TempDir[MAX_PATH];
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 	BOOL Ok;
 	if (!Receive)
@@ -540,13 +583,12 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv)
 	else {
 		Ok = GetSaveFileName(&ofn);
 	}
+	free(FNFilter);
 	_SetCurrentDirectoryW(TempDir);
 
 	if (Ok) {
 		fv->DirLen = ofn.nFileOffset;
 		fv->FnPtr = ofn.nFileOffset;
-		memcpy(CurDir,fv->FullName,fv->DirLen-1);
-		CurDir[fv->DirLen-1] = 0;
 
 		if (Receive)
 			*Option = opt;
@@ -737,12 +779,9 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 
 static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 {
-	int i, len;
-	char *FNFilter;
 	OPENFILENAME ofn;
-	wchar_t TempDir[MAXPATHLEN];
+	wchar_t TempDir[MAX_PATH];
 	BOOL Ok;
-	char defaultFName[MAX_PATH];
 	const char *FileSendFilter = ts.FileSendFilter;
 	const char *UILanguageFile = ts.UILanguageFile;
 
@@ -771,7 +810,13 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 		}
 	}
 
-	FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
+	char *FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
+
+	char *default_filename = GetCommonDialogDefaultFilenameA(CurDir);
+	if (default_filename != NULL) {
+		strncpy_s(fv->FnStrMem, _countof(fv->FullName), default_filename, _TRUNCATE);
+		free(default_filename);
+	}
 
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
@@ -798,23 +843,11 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 
 	ofn.hInstance = hInst;
 
-	// フィルタがワイルドカードではなく、そのファイルが存在する場合
-	// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
-	if (strlen(FileSendFilter) > 0 && !isInvalidFileNameChar(FileSendFilter)) {
-		char file[MAX_PATH];
-		strncpy_s(file, sizeof(file), CurDir, _TRUNCATE);
-		AppendSlash(file, sizeof(file));
-		strncat_s(file, sizeof(file), FileSendFilter, _TRUNCATE);
-		if (_access(file, 0) == 0) {
-			strncpy_s(defaultFName, sizeof(defaultFName), FileSendFilter, _TRUNCATE);
-			ofn.lpstrFile = defaultFName;
-		}
-	}
-
 	Ok = GetOpenFileName(&ofn);
 	free(FNFilter);
 
 	if (Ok) {
+		int i, len;
 		/* count number of file names */
 		len = strlen(fv->FnStrMem);
 		i = 0;
@@ -1032,7 +1065,7 @@ void XMODEMStart(int mode)
 	{
 		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
 		if (! _GetXFname(FileVar->HMainWin,
-						 mode==IdXReceive,&Option,FileVar))
+						 mode==IdXReceive, fv->DlgCaption, &Option,FileVar))
 		{
 			ProtoEnd();
 			return;
@@ -1079,25 +1112,14 @@ void XMODEMStart(int mode)
 	else
 		_SetFileVar(FileVar);
 
-	if (mode==IdXReceive)
-		FileVar->FileHandle = _lcreat(FileVar->FullName,0);
-	else
-		FileVar->FileHandle = _lopen(FileVar->FullName,OF_READ);
-
-	FileVar->FileOpen = FileVar->FileHandle != INVALID_HANDLE_VALUE;
-	if (! FileVar->FileOpen)
-	{
-		ProtoEnd();
-		return;
-	}
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
 	cv.DelayFlag = FALSE;
 
-	if (! OpenProtoDlg(FileVar,PROTO_XM,mode,
-	                   ts.XmodemOpt,ts.XmodemBin))
+	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, ts.XmodemOpt,ts.XmodemBin)) {
 		ProtoEnd();
+	}
 }
 
 BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt)
@@ -1339,7 +1361,7 @@ BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
 
 static BOOL _GetTransFname(PFileVarProto fv, const char *DlgCaption)
 {
-	wchar_t TempDir[MAXPATHLEN];
+	wchar_t TempDir[MAX_PATH];
 	char FileName[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
 
