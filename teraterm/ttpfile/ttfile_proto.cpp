@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2019 TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_QV:
-		QVInit(fv,(PQVVar)pv,cv,ts);
+		fv->Init(fv,cv,ts);
 		break;
 	}
 }
@@ -99,14 +99,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_QV:
-		switch (((PQVVar)pv)->QVMode) {
-		case IdQVReceive:
-			Ok = QVReadPacket(fv,(PQVVar)pv,cv);
-			break;
-		case IdQVSend:
-			Ok = QVSendPacket(fv,(PQVVar)pv,cv);
-			break;
-		}
+		Ok = fv->Parse(fv,cv);
 		break;
 	}
 	return Ok;
@@ -131,7 +124,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->TimeOutProc(fv, cv);
 		break;
 	case PROTO_QV:
-		QVTimeOutProc(fv,(PQVVar)pv,cv);
+		fv->TimeOutProc(fv,cv);
 		break;
 	}
 }
@@ -155,7 +148,7 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->Cancel(fv, cv);
 		break;
 	case PROTO_QV:
-		QVCancel(fv,(PQVVar)pv,cv);
+		fv->Cancel(fv,cv);
 		break;
 	}
 	return TRUE;

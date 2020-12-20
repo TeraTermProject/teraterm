@@ -68,6 +68,7 @@
 #include "ymodem.h"
 #include "zmodem.h"
 #include "bplus.h"
+#include "quickvan.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -774,7 +775,9 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			vsize = 0;
 			break;
 		case PROTO_QV:
-			vsize = sizeof(TQVVar);
+//			vsize = sizeof(TQVVar);
+			QVCreate(fv);
+			vsize = 0;
 			break;
 		default:
 			vsize = 0;
@@ -830,7 +833,10 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
+#if 0
 			((PQVVar)ProtoVar)->QVMode = Mode;
+#endif
+			_ProtoSetOpt(fv, QUICKVAN_MODE, Mode);
 			break;
 	}
 
@@ -861,9 +867,12 @@ static void CloseProtoDlg(void)
 		PtDlg = NULL;
 
 		::KillTimer(FileVar->HMainWin,IdProtoTimer);
-		if ((ProtoId==PROTO_QV) &&
-		    (((PQVVar)ProtoVar)->QVMode==IdQVSend))
-			CommTextOut(&cv,"\015",1);
+		{	// Quick-VAN special code
+			//if ((ProtoId==PROTO_QV) &&
+			//    (((PQVVar)ProtoVar)->QVMode==IdQVSend))
+			if (FileVar->OpId == OpQVSend)
+				CommTextOut(&cv,"\015",1);
+		}
 		if (FileVar->LogFlag)
 			CloseHandle(FileVar->LogFile);
 		FileVar->LogFile = 0;

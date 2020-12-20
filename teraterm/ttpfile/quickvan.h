@@ -33,12 +33,20 @@
 extern "C" {
 #endif
 
+enum {
+	QUICKVAN_MODE,
+};
+
 /* prototypes */
-void QVInit(PFileVarProto fv, PQVVar qv, PComVar cv, PTTSet ts);
-void QVCancel(PFileVarProto fv, PQVVar qv, PComVar cv);
-void QVTimeOutProc(PFileVarProto fv, PQVVar qv, PComVar cv);
-BOOL QVReadPacket(PFileVarProto fv, PQVVar qv, PComVar cv);
-BOOL QVSendPacket(PFileVarProto fv, PQVVar qv, PComVar cv);
+BOOL QVCreate(PFileVarProto fv);
+#if 0
+void QVInit(PFileVarProto fv, PComVar cv, PTTSet ts);
+void QVCancel(PFileVarProto fv, PComVar cv);
+void QVTimeOutProc(PFileVarProto fv, PComVar cv);
+BOOL QVParse(PFileVarProto fv, PComVar cv);
+#endif
+//BOOL QVReadPacket(PFileVarProto fv, PQVVar qv, PComVar cv);
+//BOOL QVSendPacket(PFileVarProto fv, PQVVar qv, PComVar cv);
 
 #ifdef __cplusplus
 }

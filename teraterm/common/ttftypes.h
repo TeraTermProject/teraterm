@@ -319,6 +319,7 @@ typedef TBPVar far *PBPVar;
 
 #endif
 
+#if 0
 /* Quick-VAN */
 typedef struct {
   BYTE PktIn[142], PktOut[142];
@@ -363,3 +364,5 @@ typedef TQVVar far *PQVVar;
 
 #define QVpktSTX 5
 #define QVpktCR 6
+
+#endif
