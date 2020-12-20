@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2020 TeraTerm Project
+ * (C) 2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,6 +57,7 @@
 #include "filesys_log_res.h"
 
 #include "filesys.h"
+#include "ttfile_proto.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -700,7 +700,7 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 	pd->Create(hInst, HVTWin, &info);
 	fv->HWin = pd->m_hWnd;
 
-	(*ProtoInit)(ProtoId,FileVar,ProtoVar,&cv,&ts);
+	_ProtoInit(ProtoId,FileVar,ProtoVar,&cv,&ts);
 
 	PtDlg = pd;
 	return TRUE;
@@ -1006,7 +1006,7 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	if ((*ProtoParse)(ProtoId,FileVar,ProtoVar,&cv))
+	if (_ProtoParse(ProtoId,FileVar,ProtoVar,&cv))
 		P = 0; /* continue */
 	else {
 		CommSend(&cv);
@@ -1018,13 +1018,13 @@ int ProtoDlgParse(void)
 void ProtoDlgTimeOut(void)
 {
 	if (PtDlg!=NULL)
-		(*ProtoTimeOutProc)(ProtoId,FileVar,ProtoVar,&cv);
+		_ProtoTimeOutProc(ProtoId,FileVar,ProtoVar,&cv);
 }
 
 void ProtoDlgCancel(void)
 {
 	if ((PtDlg!=NULL) &&
-	    (*ProtoCancel)(ProtoId,FileVar,ProtoVar,&cv))
+	    _ProtoCancel(ProtoId,FileVar,ProtoVar,&cv))
 		ProtoEnd();
 }
 

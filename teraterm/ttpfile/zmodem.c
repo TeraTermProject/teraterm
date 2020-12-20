@@ -121,6 +121,7 @@
 
 static char recvbuf[LOGBUFSIZE];
 static char sendbuf[LOGBUFSIZE];
+static const char *UILanguageFile;
 
 static void add_recvbuf(char *fmt, ...)
 {
@@ -646,6 +647,7 @@ void ZSendDataDat(PFileVar fv, PZVar zv)
 void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 	int Max;
 	char uimsg[MAX_UIMSG];
+	UILanguageFile = ts->UILanguageFile;
 
 	zv->CtlEsc = ((ts->FTFlag & FT_ZESCCTL) != 0);
 	zv->MaxDataLen = ts->ZmodemDataLen;

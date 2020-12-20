@@ -76,6 +76,8 @@
 /* MARK [LEN+SEQ+TYPE+LENX1+LENX2+HCHECK] DATA CHECK */
 #define LONGPKT_HEADNUM 6
 
+static const char *UILanguageFile;
+
 BYTE KmtNum(BYTE b);
 
 
@@ -142,7 +144,7 @@ static void KmtOutputCommonLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 			char *p = &buf[4];
 			char t[32];
 
-			_snprintf_s(str, sizeof(str), _TRUNCATE, 
+			_snprintf_s(str, sizeof(str), _TRUNCATE,
 				"  Data: MAXL=%d TIME=%d NPAD=%d PADC=%x EOL=%x QCTL=%c ",
 				KmtNum(p[0]), KmtNum(p[1]), KmtNum(p[2]), p[3]^0x40, p[4], p[5]
 				);
@@ -1116,6 +1118,7 @@ void KmtInit
 (PFileVar fv, PKmtVar kv, PComVar cv, PTTSet ts)
 {
 	char uimsg[MAX_UIMSG];
+	UILanguageFile = ts->UILanguageFile;
 
 	strncpy_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Tera Term: Kermit ",_TRUNCATE);
 	switch (kv->KmtMode) {
@@ -1168,8 +1171,8 @@ void KmtInit
 	kv->KmtMy.CHKT = DefCHKT;
 	kv->KmtMy.REPT = MyREPT;
 
-	/* CAPAS: a capability of Kermit 
-	 * (2012/1/22 yutaka) 
+	/* CAPAS: a capability of Kermit
+	 * (2012/1/22 yutaka)
 	 */
 	kv->KmtMy.CAPAS = 0x00;
 #ifdef KERMIT_CAPAS
@@ -1199,11 +1202,11 @@ void KmtInit
 		fv->LogCount = 0;
 		fv->LogState = 0;
 		fv->FlushLogLineBuf = 0;
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KERMIT %s start: %s\n", 
-			kv->KmtMode == IdKmtSend ? "Send" : 
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KERMIT %s start: %s\n",
+			kv->KmtMode == IdKmtSend ? "Send" :
 			kv->KmtMode == IdKmtReceive ? "Receive" :
 			kv->KmtMode == IdKmtGet ? "Get" : "Finish",
-			ctime_str 
+			ctime_str
 			);
 		_lwrite(fv->LogFile, buf, strlen(buf));
 	}
@@ -1334,7 +1337,7 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 				GetPkt = (kv->PktInCount==0);
 #endif
 				if (GetPkt) kv->PktReadMode = WaitMark;
-				break;  
+				break;
 			}
 
 		if (! GetPkt) c = CommRead1Byte(cv,&b);
@@ -1422,7 +1425,7 @@ read_end:
 			if (PktNumNew==kv->PktNum)
 				KmtSendPacket(fv,kv,cv);
 			else if (PktNumNew==kv->PktNum+1) {
-				if (kv->KmtMy.CAPAS & KMT_CAP_FILATTR) 
+				if (kv->KmtMy.CAPAS & KMT_CAP_FILATTR)
 					KmtSendNextData(fv,kv,cv);
 				else
 					KmtSendNextData(fv,kv,cv);

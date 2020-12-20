@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)susie_plugin"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\libs\SFMT&quot;;&quot;$(SolutionDir)..\libs\oniguruma\src&quot;;&quot;$(SolutionDir)teraterm&quot;;&quot;$(SolutionDir)common&quot;;&quot;$(SolutionDir)ttpfile&quot;;&quot;$(SolutionDir)ttpdlg&quot;;&quot;$(SolutionDir)ttpcmn&quot;;&quot;$(SolutionDir)susie_plugin&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
 				BrowseInformation="0"
@@ -141,7 +141,7 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)susie_plugin"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\libs\SFMT&quot;;&quot;$(SolutionDir)..\libs\oniguruma\src&quot;;&quot;$(SolutionDir)teraterm&quot;;&quot;$(SolutionDir)common&quot;;&quot;$(SolutionDir)ttpfile&quot;;&quot;$(SolutionDir)ttpdlg&quot;;&quot;$(SolutionDir)ttpcmn&quot;;&quot;$(SolutionDir)susie_plugin&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -692,6 +692,78 @@
 			</File>
 			<File
 				RelativePath="unicode.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ttpfile"
+			>
+			<File
+				RelativePath="..\ttpfile\bplus.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\bplus.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\file_res.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\ftlib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\ftlib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\kermit.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\kermit.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\quickvan.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\quickvan.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\ttfile_proto.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\ttfile_proto.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\xmodem.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\xmodem.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\ymodem.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\ymodem.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\zmodem.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\zmodem.h"
 				>
 			</File>
 		</Filter>

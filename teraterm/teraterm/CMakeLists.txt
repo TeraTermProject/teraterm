@@ -176,6 +176,32 @@ source_group(
   REGULAR_EXPRESSION
   "..\/ttpdlg\/")
 
+target_sources(
+  teraterm
+  PRIVATE
+  ../ttpfile/bplus.c
+  ../ttpfile/bplus.h
+  ../ttpfile/ftlib.c
+  ../ttpfile/ftlib.h
+  ../ttpfile/kermit.c
+  ../ttpfile/kermit.h
+  ../ttpfile/quickvan.c
+  ../ttpfile/quickvan.h
+  ../ttpfile/ttfile_proto.cpp
+  ../ttpfile/ttfile_proto.h
+  ../ttpfile/xmodem.c
+  ../ttpfile/xmodem.h
+  ../ttpfile/ymodem.c
+  ../ttpfile/ymodem.h
+  ../ttpfile/zmodem.c
+  ../ttpfile/zmodem.h
+)
+
+source_group(
+  "ttpfile"
+  REGULAR_EXPRESSION
+  "..\/ttpfile\/")
+
 if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll /MANIFEST:NO")
   if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
@@ -193,6 +219,8 @@ set_target_properties(
 target_include_directories(
   teraterm
   PRIVATE
+  .
+  ../teraterm
   ../common
   ../ttpfile
   ../ttpdlg
@@ -232,7 +260,7 @@ target_link_libraries(
   teraterm
   common_static
   ttpcmn
-  ttpfile
+  #ttpfile
   ttpset
   ttptek
   ${ONIGURUMA_LIB}

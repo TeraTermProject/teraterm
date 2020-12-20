@@ -68,10 +68,12 @@ extern PGetGetFname GetGetFname;
 extern PSetFileVar SetFileVar;
 extern PGetXFname GetXFname;
 #endif
+#if 0
 extern PProtoInit ProtoInit;
 extern PProtoParse ProtoParse;
 extern PProtoTimeOutProc ProtoTimeOutProc;
 extern PProtoCancel ProtoCancel;
+#endif
 #if 0
 extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;
 extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;

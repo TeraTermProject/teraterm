@@ -611,7 +611,8 @@ void BPParseTPacket(PFileVar fv, PBPVar bv)
 	{
 	  /* if file not found, ask user new file name */
 	  fv->FullName[fv->DirLen] = 0;
-	  if (! GetTransFname(fv, NULL, GTF_BP, (PLONG)&i)) 
+	  //if (! GetTransFname(fv, NULL, GTF_BP, (PLONG)&i))
+	  if (FALSE)
 	  {
 	    BPSendFailure(bv,'E');
 	    return;
@@ -818,7 +819,7 @@ BOOL BPParse(PFileVar fv, PBPVar bv, PComVar cv)
 		  /* CCITT CRC-16/32 are not supported */
 		  bv->CheckCalc = 0;
 		  bv->CheckCount = 1;
-		  break;   
+		  break;
 	      }
 	      break;
 	    default:

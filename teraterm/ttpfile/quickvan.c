@@ -55,6 +55,8 @@
 #define NAK 0x15
 #define CAN 0x18
 
+static const char *UILanguageFile;
+
 int QVRead1Byte(PFileVar fv, PQVVar qv, PComVar cv, LPBYTE b)
 {
   if (CommRead1Byte(cv,b) == 0)
@@ -116,6 +118,7 @@ void QVInit
   (PFileVar fv, PQVVar qv, PComVar cv, PTTSet ts)
 {
   char uimsg[MAX_UIMSG];
+  UILanguageFile = ts->UILanguageFile;
 
   qv->WinSize = ts->QVWinSize;
   fv->LogFlag = ((ts->LogFlag & LOG_QV)!=0);
@@ -333,7 +336,7 @@ BOOL QVParseSINIT(PFileVar fv, PQVVar qv)
 	WS = WS*10 + (WORD)n;
 	if (WS < qv->WinSize)
 	  qv->WinSize = WS;
-	break; 
+	break;
     }
   }
   qv->AValue = qv->WinSize / 2;
@@ -402,7 +405,7 @@ BOOL QVParseVFILE(PFileVar fv, PQVVar qv)
   /* year */
   if (QVGetNum2(qv,&i,&w))
   {
-    qv->Year = w * 100; 
+    qv->Year = w * 100;
     if (QVGetNum2(qv,&i,&w))
       qv->Year = qv->Year + w;
     else
@@ -595,7 +598,7 @@ BOOL QVReadPacket(PFileVar fv, PQVVar qv, PComVar cv)
 	  else {
 	    qv->PktState =QVpktSOH;
 	    QVSendVNAK(fv,qv);
-	  }  
+	  }
 	}
 	else if ((qv->QVState==QV_RecvDataRetry) &&
 		 ((b ^ qv->PktIn[1]) == 0xff))
@@ -730,7 +733,7 @@ void QVSetPacket(PQVVar qv, BYTE Num, BYTE Typ)
   qv->PktOut[131] = qv->CheckSum;
   qv->PktOutLen = 132;
   qv->PktOutCount = 132;
-  qv->PktOutPtr = 0;   
+  qv->PktOutPtr = 0;
 }
 
 void QVSendSINIT(PFileVar fv, PQVVar qv)
@@ -782,7 +785,7 @@ void QVSendEOT(PFileVar fv, PQVVar qv, PComVar cv)
 void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
 {
   int i, j;
-  struct stat stbuf; 
+  struct stat stbuf;
   struct tm tmbuf;
   char fullname_upper[MAX_PATH];
 
@@ -1180,7 +1183,7 @@ BOOL QVSendPacket(PFileVar fv, PQVVar qv, PComVar cv)
 		qv->WinEnd = qv->FileEnd;
 	      qv->EnqFlag = FALSE;
 	      qv->RetryCount = 10;
-	      qv->QVState = QV_SendDataRetry;		   
+	      qv->QVState = QV_SendDataRetry;
 	    }
 	    break;
 	}

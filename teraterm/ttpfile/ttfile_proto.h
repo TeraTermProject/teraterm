@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,15 +26,15 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, routines for file transfer protocol */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//extern char UILanguageFile[MAX_PATH];
+void _ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts);
+BOOL _ProtoParse(int Proto, PFileVar fv, PCHAR pv, PComVar cv);
+void _ProtoTimeOutProc(int Proto, PFileVar fv, PCHAR pv, PComVar cv);
+BOOL _ProtoCancel(int Proto, PFileVar fv, PCHAR pv, PComVar cv);
 
-void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
-void FTConvFName(PCHAR FName);
-BOOL GetNextFname(PFileVar fv);
-WORD UpdateCRC(BYTE b, WORD CRC);
-LONG UpdateCRC32(BYTE b, LONG CRC);
-void FTLog1Byte(PFileVar fv, BYTE b);
-void FTSetTimeOut(PFileVar fv, int T);
-BOOL FTCreateFile(PFileVar fv);
+#ifdef __cplusplus
+}
+#endif
