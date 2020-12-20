@@ -1246,50 +1246,86 @@ BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
 	return TRUE;
 }
 
-void YMODEMStart(int mode)
+BOOL YMODEMStartReceive(BOOL macro)
 {
-	WORD Opt;
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts.UILanguageFile;
-
-	if (! ProtoStart())
-		return;
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
 
 	TFileVarProto *fv = FileVar;
 
-	if (mode==IdYSend)
-	{
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
 
-		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
-		// TODO: "Yopt1K", "YoptG", "YoptSingle"を区別したいならば、IDD_FOPTを拡張する必要あり。
-		Opt = Yopt1K;
-		FileVar->OpId = OpYSend;
-		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-		{
-			if (! _GetMultiFname(fv->HMainWin, GMF_Y, fv->DlgCaption, &Opt) ||
-			    (FileVar->NumFname==0))
-			{
-				ProtoEnd();
-				return;
-			}
-			//ts.XmodemBin = Opt;
+	if (! ProtoStart())
+		return FALSE;
+
+	FileVar->OpId = OpYRcv;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_YRCV", uimsg, sizeof(uimsg), TitYRcv, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	// ファイル転送時のオプションは"Yopt1K"に決め打ち。
+	WORD Opt = Yopt1K;
+	_SetFileVar(FileVar);
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_YM,IdYReceive,Opt,0))
+		ProtoEnd();
+
+	return TRUE;
+}
+
+BOOL YMODEMStartSend(const char *filename)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
+
+	if (! ProtoStart())
+		return FALSE;
+
+	TFileVarProto *fv = FileVar;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	// ファイル転送時のオプションは"Yopt1K"に決め打ち。
+	// TODO: "Yopt1K", "YoptG", "YoptSingle"を区別したいならば、IDD_FOPTを拡張する必要あり。
+	WORD Opt = Yopt1K;
+	FileVar->OpId = OpYSend;
+	if (filename == NULL) {
+		char **filenames = _GetMultiFname(fv->HMainWin, GMF_Y, fv->DlgCaption, &Opt);
+		if (filenames == NULL) {
+			ProtoEnd();
+			return FALSE;
 		}
-		else
-		_SetFileVar(FileVar);
+		//ts.XmodemBin = Opt;
+		fv->FileNames = filenames;
 	}
 	else {
-		FileVar->OpId = OpYRcv;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_YRCV", uimsg, sizeof(uimsg), TitYRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
-		Opt = Yopt1K;
-		_SetFileVar(FileVar);
+		fv->FileNames = MakeStrArrayFromStr(filename);
+		FileVar->DirLen = 0;
+		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+		FileVar->NumFname = 1;
+		FileVar->NoMsg = TRUE;
 	}
 
 	TalkStatus = IdTalkQuiet;
@@ -1297,37 +1333,9 @@ void YMODEMStart(int mode)
 	/* disable transmit delay (serial port) */
 	cv.DelayFlag = FALSE;
 
-	if (! OpenProtoDlg(FileVar,PROTO_YM,mode,Opt,0))
+	if (! OpenProtoDlg(FileVar,PROTO_YM, IdYSend,Opt,0))
 		ProtoEnd();
-}
 
-BOOL YMODEMStartReceive()
-{
-	if (FileVar != NULL) {
-		return FALSE;
-	}
-	if (!NewFileVar_(&FileVar)) {
-		return FALSE;
-	}
-	FileVar->NoMsg = TRUE;
-	YMODEMStart(IdYReceive);
-	return TRUE;
-}
-
-BOOL YMODEMStartSend(const char *fiename)
-{
-	if (FileVar != NULL) {
-		return FALSE;
-	}
-	if (!NewFileVar_(&FileVar)) {
-		return FALSE;
-	}
-
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),fiename, _TRUNCATE);
-	FileVar->NumFname = 1;
-	FileVar->NoMsg = TRUE;
-	YMODEMStart(IdYSend);
 	return TRUE;
 }
 

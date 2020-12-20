@@ -696,7 +696,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 
 	case CmdYmodemRecv:
-		if (YMODEMStartReceive())
+		if (YMODEMStartReceive(TRUE))
 		{
 			DdeCmnd = TRUE;
 		}

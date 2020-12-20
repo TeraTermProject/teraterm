@@ -141,7 +141,7 @@ static int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
+static void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
 {
 	char Tmp[21];
 
@@ -171,7 +171,7 @@ void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, Tmp);
 }
 
-void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
+static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 {
 	BYTE b;
 	int t;
@@ -212,7 +212,7 @@ void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 	FTSetTimeOut(fv,t);
 }
 
-void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
+static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 {
 	BYTE b;
 	int t;
@@ -254,7 +254,7 @@ void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 	FTSetTimeOut(fv,t);
 }
 
-WORD YCalcCheck(PYVar yv, const PCHAR PktBuf, const WORD len)
+static WORD YCalcCheck(PYVar yv, const PCHAR PktBuf, const WORD len)
 {
 	int i;
 	WORD Check;
@@ -278,7 +278,7 @@ WORD YCalcCheck(PYVar yv, const PCHAR PktBuf, const WORD len)
 	}
 }
 
-BOOL YCheckPacket(PYVar yv, const WORD len)
+static BOOL YCheckPacket(PYVar yv, const WORD len)
 {
 	WORD Check;
 
@@ -316,7 +316,7 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 		fv->ProgStat = -1;
 	}
 	fv->StartTime = GetTickCount();
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
+	fv->SetDlgProtoFileName(fv, fv->FullName);
 
 	yv->PktNumOffset = 0;
 	yv->PktNum = 0;
@@ -330,9 +330,8 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	yv->LastMessage = 0;
 }
 
-BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
-	char inistr[MAX_PATH + 10];
 	PYVar yv = fv->data;
 
 	if (yv->YMode == IdYSend) {
@@ -347,8 +346,6 @@ BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		log->Open(log, "YMODEM.LOG");
 		log->LogState = 0;
 	}
-
-	SetWindowText(fv->HWin, fv->DlgCaption);
 
 	initialize_file_info(fv, yv);
 
@@ -397,6 +394,7 @@ BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		// ファイル送信開始前に、"rb ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		//strcpy(ts->YModemRcvCommand, "rb");
 		if (ts->YModemRcvCommand[0] != '\0') {
+			char inistr[MAX_PATH + 10];
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s\015",
 			            ts->YModemRcvCommand);
 			YWrite(fv,yv,cv, inistr , strlen(inistr));
@@ -431,7 +429,7 @@ static void YCancel(PFileVarProto fv, PComVar cv)
 	yv->YMode = 0; // quit
 }
 
-void YTimeOutProc(PFileVarProto fv, PComVar cv)
+static void YTimeOutProc(PFileVarProto fv, PComVar cv)
 {
 	PYVar yv = fv->data;
 	switch (yv->YMode) {
@@ -456,7 +454,7 @@ void YTimeOutProc(PFileVarProto fv, PComVar cv)
 //
 // return TRUE: ファイル受信中
 //        FALSE: 受信完了
-BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
+static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 {
 	BYTE b, d;
 	int i, c, nak;
@@ -623,9 +621,9 @@ BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		memset(p, 0, yv->__DataLen + 1);
 		memcpy(p, &(yv->PktIn[3]), yv->__DataLen);
 		name = p;
-		strncpy_s(&(fv->FullName[fv->DirLen]),
-		          sizeof(fv->FullName) - fv->DirLen, name,
-		          _TRUNCATE);
+
+		strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
+		strncat_s(fv->FullName, _countof(fv->FullName), name, _TRUNCATE);
 		if (!FTCreateFile(fv)) {
 			free(p);
 			return FALSE;
@@ -692,7 +690,7 @@ BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 }
 
 // ファイル送信(local-to-remote)時に、YMODEMサーバからデータが送られてきたときに呼び出される。
-BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
+static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 {
 	// If current buffer is empty.
 	if (0 == yv->PktBufCount)
@@ -906,6 +904,7 @@ BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				size_t idx;
 				// TODO: remove magic number.
 				BYTE buf[1024 + 10];
+				int FnPos;
 
 				// 128 bytes for the first packet.
 				current_packet_size = SOH_DATALEN;
@@ -915,8 +914,9 @@ BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				// Timestamp.
 				fv->FileMtime = GetFMtime(fv->FullName);
 
-				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s",
-				                  &(fv->FullName[fv->DirLen]));
+				GetFileNamePos(fv->FullName, NULL, &FnPos);
+				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", &(fv->FullName[FnPos]));
+
 				// NULL-terminated string.
 				buf[ret] = 0x00;
 				total = ret + 1;
@@ -1084,7 +1084,7 @@ BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	return TRUE;
 }
 
-BOOL YParse(PFileVarProto fv, PComVar cv)
+static BOOL YParse(PFileVarProto fv, PComVar cv)
 {
 	PYVar pv = fv->data;
 	switch (pv->YMode) {
@@ -1109,7 +1109,7 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 		return 0;
 	}
 	case YMODEM_OPT: {
-		WORD Opt1 = va_arg(ap, WORD);
+		WORD Opt1 = va_arg(ap, int);
 		pv->YOpt = Opt1;
 		return 0;
 	}

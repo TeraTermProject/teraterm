@@ -4346,13 +4346,13 @@ void CVTWindow::OnFileXSend()
 void CVTWindow::OnFileYRcv()
 {
 	HelpId = HlpFileYmodemRecv;
-	YMODEMStart(IdYReceive);
+	YMODEMStartReceive(FALSE);
 }
 
 void CVTWindow::OnFileYSend()
 {
 	HelpId = HlpFileYmodemSend;
-	YMODEMStart(IdYSend);
+	YMODEMStartSend(NULL);
 }
 
 void CVTWindow::OnFileZRcv()
