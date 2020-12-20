@@ -457,7 +457,7 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen)
 	return j;
 }
 
-BOOL DoesFileExist(PCHAR FName)
+BOOL DoesFileExist(const char *FName)
 {
 	// check if a file exists or not
 	// フォルダまたはファイルがあれば TRUE を返す
@@ -466,7 +466,7 @@ BOOL DoesFileExist(PCHAR FName)
 	return (_stat(FName,&st)==0);
 }
 
-BOOL DoesFolderExist(PCHAR FName)
+BOOL DoesFolderExist(const char *FName)
 {
 	// check if a folder exists or not
 	// マクロ互換性のため
@@ -487,7 +487,7 @@ BOOL DoesFolderExist(PCHAR FName)
 	}
 }
 
-long GetFSize(PCHAR FName)
+long GetFSize(const char *FName)
 {
 	struct _stat st;
 
@@ -497,7 +497,7 @@ long GetFSize(PCHAR FName)
 	return (long)st.st_size;
 }
 
-long GetFMtime(PCHAR FName)
+long GetFMtime(const char *FName)
 {
 	struct _stat st;
 
@@ -507,7 +507,7 @@ long GetFMtime(PCHAR FName)
 	return (long)st.st_mtime;
 }
 
-BOOL SetFMtime(PCHAR FName, DWORD mtime)
+BOOL SetFMtime(const char *FName, DWORD mtime)
 {
 	struct _utimbuf filetime;
 
