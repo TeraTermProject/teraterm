@@ -866,7 +866,7 @@ static void ZParseRInit(PFileVarProto fv, PZVar zv)
 		}
 	}
 
-	filename = GetNextFname(fv);
+	filename = fv->GetNextFname(fv);
 	if (filename == NULL) {
 		zv->ZState = Z_SendFIN;
 		ZSendFIN(zv);

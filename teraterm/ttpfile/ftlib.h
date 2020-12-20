@@ -29,14 +29,10 @@
 
 /* TTFILE.DLL, routines for file transfer protocol */
 
-#include "filesys_proto.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
-char *GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
 

@@ -132,6 +132,25 @@ static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
 	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, CurProgStat);
 }
 
+/**
+ *	ファイル名を取得
+ *
+ *	@return		ファイル名
+ *				NULLのとき次のファイルはない
+ *				不要になったら free() すること
+ */
+static char *GetNextFname(PFileVarProto fv)
+{
+	char *f = fv->FileNames[fv->FNCount];
+	if (f == NULL) {
+		/* no more file name */
+		return NULL;
+	}
+	fv->FNCount++;
+	f = _strdup(f);
+	return f;
+}
+
 static void FTSetTimeOut(PFileVarProto fv, int T)
 {
 	KillTimer(fv->HMainWin, IdProtoTimer);
@@ -164,6 +183,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	fv->file = FilesysCreateWin32();
 
+	fv->GetNextFname = GetNextFname;
 	fv->FTSetTimeOut = FTSetTimeOut;
 
 	fv->InitDlgProgress = _InitDlgProgress;

@@ -228,7 +228,7 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		log->LogState = 0;
 	}
 
-	xv->FullName = GetNextFname(fv);
+	xv->FullName = fv->GetNextFname(fv);
 	if (xv->XMode == IdXSend) {
 		fv->FileOpen = file->OpenRead(file, xv->FullName);
 		if (fv->FileOpen == FALSE) {

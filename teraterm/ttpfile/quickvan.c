@@ -858,7 +858,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   TFileIO *file = fv->file;
   char *filename;
 
-  filename = GetNextFname(fv);
+  filename = fv->GetNextFname(fv);
   if (filename == NULL)
   {
     QVSendEOT(fv,qv,cv);

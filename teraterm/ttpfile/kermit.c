@@ -1051,7 +1051,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	BOOL r;
 	char *filename;
 
-	filename = GetNextFname(fv);
+	filename = fv->GetNextFname(fv);
 	if (filename == NULL)
 	{
 		KmtSendEOTPacket(fv,kv,cv);

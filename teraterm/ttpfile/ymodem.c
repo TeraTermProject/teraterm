@@ -337,7 +337,7 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	PYVar yv = fv->data;
 
 	if (yv->YMode == IdYSend) {
-		char *filename = GetNextFname(fv);
+		char *filename = fv->GetNextFname(fv);
 		if (filename == NULL) {
 			return FALSE;
 		}
@@ -746,7 +746,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					yv->SendEot = 0;
 
 					// 送信ファイルが残っていない場合は、「全てのファイルを転送終了」を通知する。
-					filename = GetNextFname(fv);
+					filename = fv->GetNextFname(fv);
 					if (filename == NULL)
 					{
 						// If it is the last file.

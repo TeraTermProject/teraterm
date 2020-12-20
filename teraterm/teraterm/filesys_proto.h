@@ -62,6 +62,7 @@ typedef struct FileVarProto {
 	DWORD FileMtime;
 
 	// services
+	char *(*GetNextFname)(struct FileVarProto *fv);
 	void (*FTSetTimeOut)(struct FileVarProto *fv, int T);
 
 	// protocol entrys, data

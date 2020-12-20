@@ -29,6 +29,9 @@
 
 /* TTFILE.DLL, ZMODEM protocol */
 
+#pragma once
+#include "filesys_proto.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
