@@ -611,13 +611,17 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSendBreak:
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdBreak,0);
 		break;
-	case CmdSendFile:
-		if (FileSendStart2(ParamFileName, ParamBinaryFlag)) {
+	case CmdSendFile: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		BOOL r = FileSendStart(ParamFileNameW, ParamBinaryFlag);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
+	}
 	case CmdSendKCode:
 		w = HexStr2Word(ParamFileName);
 		c = HexStr2Word(&ParamFileName[4]);

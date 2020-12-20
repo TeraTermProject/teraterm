@@ -4290,7 +4290,7 @@ void CVTWindow::OnFileSend()
 #if 1
 	// file send same as teraterm 4
 	HelpId = HlpFileSend;
-	FileSendStart();
+	FileSendStart(NULL, 0);
 #else
 	// new file send
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,

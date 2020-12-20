@@ -643,9 +643,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 	(void)delay_tick;
 	(void)send_max;
 
-	char *FileNameA = ToCharW(filename);
-	BOOL r = FileSendStart2(FileNameA, binary == FALSE ? 0 : 1);
-	free(FileNameA);
+	BOOL r = FileSendStart(filename, binary == FALSE ? 0 : 1);
 	return r;
 }
 #else

@@ -37,8 +37,7 @@ extern "C" {
 BOOL IsSendVarNULL(void);
 BOOL IsFileVarNULL(void);
 
-void FileSendStart(void);
-BOOL FileSendStart2(const char *filename, int binary);
+BOOL FileSendStart(const wchar_t *filename, int binary);
 void FileSend(void);
 void FileSendEnd(void);
 void FileSendPause(BOOL Pause);

@@ -49,22 +49,19 @@
 #include "helpid.h"
 #include "layer_for_unicode.h"
 #include "codeconv.h"
+#include "asprintf.h"
 
 #include "filesys_log_res.h"
 
 #include "filesys.h"
 
 typedef struct {
-	HWND HMainWin;
-	HWND HWin;
-	char DlgCaption[40];
+	wchar_t *DlgCaption;
 
-	char *FullName;
+	wchar_t *FullName;
 
 	HANDLE FileHandle;
 	LONG FileSize, ByteCount;
-
-	int ProgStat;
 
 	DWORD StartTime;
 	BOOL FilePause;
@@ -104,8 +101,6 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	FTDlg = new CFileTransDlg();
 
-	fv->StartTime = 0;
-	fv->ProgStat = 0;
 	fv->FilePause = FALSE;
 
 	if (FTDlg!=NULL)
@@ -113,15 +108,13 @@ static BOOL OpenFTDlg(PFileVar fv)
 		CFileTransDlg::Info info;
 		info.UILanguageFile = ts.UILanguageFile;
 		info.OpId = CFileTransDlg::OpSendFile;
-		info.DlgCaption = ToWcharA(fv->DlgCaption);
+		info.DlgCaption = fv->DlgCaption;
 		info.FileName = NULL;
-		info.FullName = ToWcharA(fv->FullName);
+		info.FullName = fv->FullName;
 		info.HideDialog = FALSE;
 		info.HMainWin = HVTWin;
 		FTDlg->Create(hInst, &info);
 		FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
-		free(info.DlgCaption);
-		free(info.FullName);
 	}
 
 	SendDlg = FTDlg; /* File send */
@@ -153,7 +146,6 @@ static BOOL NewFileVar(PFileVar *pfv)
 	}
 	memset(fv, 0, sizeof(TFileVar));
 	fv->FileHandle = INVALID_HANDLE_VALUE;
-	fv->HMainWin = HVTWin;
 
 	*pfv = fv;
 	return TRUE;
@@ -168,10 +160,14 @@ static void FreeFileVar(PFileVar *pfv)
 	PFileVar fv = *pfv;
 	if (fv->FileHandle != INVALID_HANDLE_VALUE) {
 		CloseHandle(fv->FileHandle);
+		fv->FileHandle = INVALID_HANDLE_VALUE;
 	}
 	if (fv->FullName != NULL) {
 		free(fv->FullName);
+		fv->FullName = NULL;
 	}
+	free(fv->DlgCaption);
+	fv->DlgCaption = NULL;
 	free(fv);
 	*pfv = NULL;
 }
@@ -258,34 +254,36 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 	return FALSE;
 }
 
-static char *_GetTransFname(HWND hWnd, const char *caption, LPLONG Option)
+static wchar_t *_GetTransFname(HWND hWnd, const wchar_t *caption, LPLONG Option)
 {
 	WORD optw;
 	wchar_t TempDir[MAX_PATH];
-	char FileName[MAX_PATH];
+	wchar_t FileName[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	char FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-	PCHAR CurDir = FileDirExpanded;
+	wchar_t FileDirExpanded[MAX_PATH];
+	wchar_t *FileDir = ToWcharA(ts.FileDir);
+	_ExpandEnvironmentStringsW(FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	wchar_t *CurDir = FileDirExpanded;
+	free(FileDir);
 
-	char *FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
-
-	OPENFILENAME ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	wchar_t *FNFilter = GetCommonDialogFilterW(ts.FileSendFilter, UILanguageFile);
+	FileName[0] = 0;
+	OPENFILENAMEW ofn = {};
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = FileName;
-	ofn.nMaxFile = sizeof(FileName);
+	ofn.nMaxFile = _countof(FileName);
 	ofn.lpstrInitialDir = CurDir;
 
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
-	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
+	ofn.lpTemplateName = MAKEINTRESOURCEW(IDD_FOPT);
 
 	ofn.lpfnHook = TransFnHook;
 	optw = (WORD)*Option;
@@ -297,7 +295,7 @@ static char *_GetTransFname(HWND hWnd, const char *caption, LPLONG Option)
 
 	ofn.hInstance = hInst;
 
-	BOOL Ok = GetOpenFileName(&ofn);
+	BOOL Ok = _GetOpenFileNameW(&ofn);
 	free(FNFilter);
 
 	if (Ok) {
@@ -306,60 +304,63 @@ static char *_GetTransFname(HWND hWnd, const char *caption, LPLONG Option)
 	/* restore dir */
 	_SetCurrentDirectoryW(TempDir);
 
-	char *ret = NULL;
+	wchar_t *ret = NULL;
 	if (Ok) {
-		ret = _strdup(FileName);
+		ret = _wcsdup(FileName);
 	}
 	return ret;
 }
 
-void FileSendStart(void)
+BOOL FileSendStart(const wchar_t *filename, int binary)
 {
-	if (! cv.Ready || FSend) return;
+	if (SendVar != NULL) {
+		return FALSE;
+	}
+	if (! cv.Ready || FSend) {
+		return FALSE;
+	}
 	if (cv.ProtoFlag)
 	{
 		FreeFileVar(&SendVar);
-		return;
+		return FALSE;
 	}
-
-	if (SendVar == NULL) {
-		if (! NewFileVar(&SendVar)) {
-			return;
-		}
+	if (!NewFileVar(&SendVar)) {
+		return FALSE;
 	}
 
 	FSend = TRUE;
 	PFileVar fv = SendVar;
 
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts.UILanguageFile;
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
-	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	wchar_t uimsg[MAX_UIMSG];
+	get_lang_msgW("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, _countof(uimsg), L"Send file", ts.UILanguageFile);
+	aswprintf(&(fv->DlgCaption), L"Tera Term: %s", uimsg);
 
-	if (SendVar->FullName == NULL) {
-		// ファイルが設定されていない場合
+	if (filename != NULL) {
+		SendVar->FullName = _wcsdup(filename);
+		ts.TransBin = binary;
+	}
+	else {
+		// ファイルが指定されていない場合
 		LONG Option = 0;
 		if (ts.TransBin)
 			Option |= LOGDLG_BINARY;
-		char *filename = _GetTransFname(fv->HMainWin, fv->DlgCaption, &Option);
+		wchar_t *filename = _GetTransFname(HVTWin, fv->DlgCaption, &Option);
 		if (filename == NULL) {
 			FileSendEnd();
-			return;
+			return FALSE;
 		}
 		SendVar->FullName = filename;
-		free(filename);
 		ts.TransBin = CheckFlag(Option, LOGDLG_BINARY);
 	}
 
-	SendVar->FileHandle = CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
-	                                 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	SendVar->FileHandle = _CreateFileW(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
+									   OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	if (SendVar->FileHandle == INVALID_HANDLE_VALUE) {
 		FileSendEnd();
-		return;
+		return FALSE;
 	}
 	SendVar->ByteCount = 0;
-	SendVar->FileSize = GetFSize(SendVar->FullName);
+	SendVar->FileSize = (LONG)GetFSize64H(SendVar->FileHandle);
 
 	TalkStatus = IdTalkFile;
 	FileRetrySend = FALSE;
@@ -380,22 +381,10 @@ void FileSendStart(void)
 		BinaryMode = ts.TransBin;
 	}
 
-	if (! OpenFTDlg(SendVar))
+	if (! OpenFTDlg(SendVar)) {
 		FileSendEnd();
-}
-
-BOOL FileSendStart2(const char *filename, int binary)
-{
-	if (SendVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&SendVar)) {
-		return FALSE;
-	}
-
-	SendVar->FullName = _strdup(filename);
-	ts.TransBin = binary;
-	FileSendStart();
 
 	return TRUE;
 }
