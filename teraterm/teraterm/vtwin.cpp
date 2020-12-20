@@ -4287,10 +4287,12 @@ void CVTWindow::OnReplayLog()
 
 void CVTWindow::OnFileSend()
 {
-#if !UNICODE_INTERNAL_BUFF
+#if 1
+	// file send same as teraterm 4
 	HelpId = HlpFileSend;
 	FileSendStart();
 #else
+	// new file send
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	sendfiledlgdata data;

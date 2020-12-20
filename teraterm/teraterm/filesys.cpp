@@ -55,19 +55,18 @@
 #include "filesys.h"
 
 typedef struct {
-  HWND HMainWin;
-  HWND HWin;
-  char DlgCaption[40];
+	HWND HMainWin;
+	HWND HWin;
+	char DlgCaption[40];
 
-  char FullName[MAX_PATH];
-  int DirLen;
+	char *FullName;
 
-  HANDLE FileHandle;
-  LONG FileSize, ByteCount;
+	HANDLE FileHandle;
+	LONG FileSize, ByteCount;
 
-  int ProgStat;
+	int ProgStat;
 
-  DWORD StartTime;
+	DWORD StartTime;
 } TFileVar;
 typedef TFileVar *PFileVar;
 
@@ -141,37 +140,39 @@ static void ShowFTDlg(WORD OpId)
 }
 #endif
 
-static BOOL NewFileVar(PFileVar *fv)
+static BOOL NewFileVar(PFileVar *pfv)
 {
-	if ((*fv)==NULL)
-	{
-		*fv = (PFileVar)malloc(sizeof(TFileVar));
-		if ((*fv)!=NULL)
-		{
-			char FileDirExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			memset(*fv, 0, sizeof(TFileVar));
-			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName), FileDirExpanded, _TRUNCATE);
-			AppendSlash((*fv)->FullName,sizeof((*fv)->FullName));
-			(*fv)->DirLen = strlen((*fv)->FullName);
-			(*fv)->FileHandle = INVALID_HANDLE_VALUE;
-			(*fv)->HMainWin = HVTWin;
-		}
+	if ((*pfv) != NULL) {
+		return TRUE;
 	}
 
-	return ((*fv)!=NULL);
+	PFileVar fv = (PFileVar)malloc(sizeof(TFileVar));
+	if (fv == NULL) {
+		return FALSE;
+	}
+	memset(fv, 0, sizeof(TFileVar));
+	fv->FileHandle = INVALID_HANDLE_VALUE;
+	fv->HMainWin = HVTWin;
+
+	*pfv = fv;
+	return TRUE;
 }
 
-static void FreeFileVar(PFileVar *fv)
+static void FreeFileVar(PFileVar *pfv)
 {
-	if ((*fv)!=NULL)
-	{
-		if ((*fv)->FileHandle != INVALID_HANDLE_VALUE) {
-			CloseHandle((*fv)->FileHandle);
-		}
-		free(*fv);
-		*fv = NULL;
+	if ((*pfv)==NULL) {
+		return;
 	}
+
+	PFileVar fv = *pfv;
+	if (fv->FileHandle != INVALID_HANDLE_VALUE) {
+		CloseHandle(fv->FileHandle);
+	}
+	if (fv->FullName != NULL) {
+		free(fv->FullName);
+	}
+	free(fv);
+	*pfv = NULL;
 }
 
 /* ダイアログを中央に移動する */
@@ -256,83 +257,59 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 	return FALSE;
 }
 
-static BOOL _GetTransFname(PFileVar fv, PCHAR CurDir, LPLONG Option)
+static char *_GetTransFname(HWND hWnd, const char *caption, LPLONG Option)
 {
-	char uimsg[MAX_UIMSG];
-	char *FNFilter;
-	OPENFILENAME ofn;
 	WORD optw;
-	wchar_t TempDir[MAXPATHLEN];
-	BOOL Ok;
+	wchar_t TempDir[MAX_PATH];
 	char FileName[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	memset(&ofn, 0, sizeof(OPENFILENAME));
+	char FileDirExpanded[MAX_PATH];
+	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	PCHAR CurDir = FileDirExpanded;
 
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
-	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	char *FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
 
-	FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
-
-	ExtractFileName(fv->FullName, FileName ,sizeof(FileName));
-	strncpy_s(fv->FullName, sizeof(fv->FullName), FileName, _TRUNCATE);
+	OPENFILENAME ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
-	ofn.hwndOwner   = fv->HMainWin;
+	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = fv->FullName;
-	ofn.nMaxFile = sizeof(fv->FullName);
+	ofn.lpstrFile = FileName;
+	ofn.nMaxFile = sizeof(FileName);
 	ofn.lpstrInitialDir = CurDir;
 
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 
-	ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
+	ofn.lpfnHook = TransFnHook;
 	optw = (WORD)*Option;
 	ofn.lCustData = (LPARAM)&optw;
 
 	ofn.Flags |= OFN_SHOWHELP;
 
-	ofn.lpstrTitle = fv->DlgCaption;
+	ofn.lpstrTitle = caption;
 
 	ofn.hInstance = hInst;
 
-	Ok = GetOpenFileName(&ofn);
+	BOOL Ok = GetOpenFileName(&ofn);
 	free(FNFilter);
 
 	if (Ok) {
 		*Option = (long)optw;
-
-		fv->DirLen = ofn.nFileOffset;
-
-		if (CurDir!=NULL) {
-			memcpy(CurDir,fv->FullName,fv->DirLen-1);
-			CurDir[fv->DirLen-1] = 0;
-		}
 	}
 	/* restore dir */
 	_SetCurrentDirectoryW(TempDir);
-	return Ok;
-}
 
-static void _SetFileVar(PFileVar fv)
-{
-	int i;
-	char uimsg[MAX_UIMSG];
-	char c;
-	const char *UILanguageFile = ts.UILanguageFile;
-
-	GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
-	c = fv->FullName[fv->DirLen];
-	if (c=='\\'||c=='/') fv->DirLen++;
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
-	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	char *ret = NULL;
+	if (Ok) {
+		ret = _strdup(FileName);
+	}
+	return ret;
 }
 
 void FileSendStart(void)
@@ -344,28 +321,35 @@ void FileSendStart(void)
 		return;
 	}
 
-	if (! NewFileVar(&SendVar))
-	{
-		return;
+	if (SendVar == NULL) {
+		if (! NewFileVar(&SendVar)) {
+			return;
+		}
 	}
 
 	FSend = TRUE;
+	PFileVar fv = SendVar;
 
-	if (strlen(&(SendVar->FullName[SendVar->DirLen])) == 0) {
-		char FileDirExpanded[MAX_PATH];
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (SendVar->FullName == NULL) {
+		// ファイルが設定されていない場合
 		LONG Option = 0;
-		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		if (ts.TransBin)
 			Option |= LOGDLG_BINARY;
-		SendVar->FullName[0] = 0;
-		if (! _GetTransFname(SendVar, FileDirExpanded, &Option)) {
+		char *filename = _GetTransFname(fv->HMainWin, fv->DlgCaption, &Option);
+		if (filename == NULL) {
 			FileSendEnd();
 			return;
 		}
+		SendVar->FullName = filename;
+		free(filename);
 		ts.TransBin = CheckFlag(Option, LOGDLG_BINARY);
 	}
-	else
-		_SetFileVar(SendVar);
 
 	SendVar->FileHandle = CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
 	                                 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
@@ -408,8 +392,7 @@ BOOL FileSendStart2(const char *filename, int binary)
 		return FALSE;
 	}
 
-	SendVar->DirLen = 0;
-	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), filename, _TRUNCATE);
+	SendVar->FullName = _strdup(filename);
 	ts.TransBin = binary;
 	FileSendStart();
 
