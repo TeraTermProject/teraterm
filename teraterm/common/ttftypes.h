@@ -89,6 +89,7 @@
 #define TitQVRcv    "Quick-VAN Receive"
 #define TitQVSend   "Quick-VAN Send"
 
+#if 0
 typedef struct {
   HWND HMainWin;
   HWND HWin;
@@ -137,6 +138,7 @@ typedef struct {
   HANDLE reserve_6;
 } TFileVar;
 typedef TFileVar far *PFileVar;
+#endif
 
 typedef struct {
 	int MAXL;

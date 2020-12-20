@@ -37,6 +37,7 @@
 #include <string.h>
 #include "win16api.h"
 
+#include "ftlib.h"
 #include "tt_res.h"
 
 void FTConvFName(PCHAR FName)

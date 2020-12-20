@@ -58,12 +58,13 @@
 #include "filesys_log_res.h"
 
 #include "filesys.h"
+#include "filesys_send.h"
 
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
 #define FS_BRACKET_END   2
 
-PFileVar SendVar = NULL;
+static PFileVar SendVar = NULL;
 //PFileVar FileVar = NULL;
 //static PCHAR ProtoVar = NULL;
 //static int ProtoId;

@@ -121,7 +121,9 @@ void QVStart(int mode);
 BOOL QVStartReceive(void);
 BOOL QVStartSend(const char *filename);
 
+#if 0
 extern PFileVar SendVar, FileVar;
+#endif
 
 #ifdef __cplusplus
 }

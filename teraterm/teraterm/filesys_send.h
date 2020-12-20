@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,25 +26,53 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, routines for file transfer protocol */
+#pragma once
 
-#include "filesys_send.h"
+typedef struct {
+  HWND HMainWin;
+  HWND HWin;
+  WORD OpId;
+  char DlgCaption[40];
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+  char FullName[MAX_PATH];
+  int DirLen;
 
-//extern char UILanguageFile[MAX_PATH];
+  int NumFname, FNCount;
+  HANDLE FnStrMemHandle;
+  PCHAR FnStrMem;
+  int FnPtr;
 
-void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
-void FTConvFName(PCHAR FName);
-BOOL GetNextFname(PFileVar fv);
-WORD UpdateCRC(BYTE b, WORD CRC);
-LONG UpdateCRC32(BYTE b, LONG CRC);
-void FTLog1Byte(PFileVar fv, BYTE b);
-void FTSetTimeOut(PFileVar fv, int T);
-BOOL FTCreateFile(PFileVar fv);
+  BOOL FileOpen;
+  HANDLE FileHandle;
+  LONG FileSize, ByteCount;
+  BOOL OverWrite;
 
-#ifdef __cplusplus
-}
-#endif
+  BOOL LogFlag;
+  HANDLE LogFile;
+  WORD LogState;
+  WORD LogCount;
+
+  BOOL Success;
+  BOOL NoMsg;
+
+  char LogDefaultPath[MAX_PATH];
+  BOOL HideDialog;
+
+  BYTE LogLineBuf[16];
+  int FlushLogLineBuf;
+
+  int ProgStat;
+
+  DWORD StartTime;
+
+  int reserve_1;
+  LONG reserve_2;
+  int reserve_3;
+
+  HANDLE reserve_4;
+  DWORD reserve_5;
+
+  DWORD FileMtime;
+  HANDLE reserve_6;
+} TFileVar;
+typedef TFileVar *PFileVar;
