@@ -772,6 +772,225 @@ void ProtoEnd(void)
 	FreeFileVar_(&FileVar);
 }
 
+/* ダイアログを中央に移動する */
+static void CenterCommonDialog(HWND hDlg)
+{
+	/* hDlgの親がダイアログのウィンドウハンドル */
+	HWND hWndDlgRoot = GetParent(hDlg);
+	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
+}
+
+//static char FileSendFilter[128];
+static HFONT DlgXoptFont;
+
+/* Hook function for XMODEM file name dialog box */
+static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	static const DlgTextInfo text_info[] = {
+		{ IDC_XOPT, "DLG_XOPT" },
+		{ IDC_XOPTCHECK, "DLG_XOPT_CHECKSUM" },
+		{ IDC_XOPTCRC, "DLG_XOPT_CRC" },
+		{ IDC_XOPT1K, "DLG_XOPT_1K" },
+		{ IDC_XOPTBIN, "DLG_XOPT_BINARY" },
+	};
+	LPOPENFILENAME ofn;
+	WORD Hi, Lo;
+	LPLONG pl;
+	LPOFNOTIFY notify;
+	LOGFONT logfont;
+	HFONT font;
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	switch (Message) {
+	case WM_INITDIALOG:
+		ofn = (LPOPENFILENAME)lParam;
+		pl = (LPLONG)ofn->lCustData;
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
+
+		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgXoptFont, UILanguageFile)) {
+			SendDlgItemMessage(Dialog, IDC_XOPT, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPTCHECK, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPTCRC, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPT1K, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPTBIN, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+		}
+		else {
+			DlgXoptFont = NULL;
+		}
+
+		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
+
+		if (LOWORD(*pl)==0xFFFF) { // Send
+			ShowDlgItem(Dialog, IDC_XOPT1K, IDC_XOPT1K);
+			Hi = 0;
+			if (HIWORD(*pl) == Xopt1kCRC || HIWORD(*pl) == Xopt1kCksum) {
+				Hi = 1;
+			}
+			SetRB(Dialog, Hi, IDC_XOPT1K, IDC_XOPT1K);
+		}
+		else { // Recv
+			ShowDlgItem(Dialog, IDC_XOPTCHECK, IDC_XOPTCRC);
+			Hi = HIWORD(*pl);
+			if (Hi == Xopt1kCRC) {
+				Hi = XoptCRC;
+			}
+			else if (Hi == Xopt1kCksum) {
+				Hi = XoptCheck;
+			}
+			SetRB(Dialog, Hi, IDC_XOPTCHECK, IDC_XOPTCRC);
+
+			ShowDlgItem(Dialog,IDC_XOPTBIN,IDC_XOPTBIN);
+			SetRB(Dialog,LOWORD(*pl),IDC_XOPTBIN,IDC_XOPTBIN);
+		}
+		CenterCommonDialog(Dialog);
+		return TRUE;
+	case WM_COMMAND: // for old style dialog
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			pl = (LPLONG)GetWindowLongPtr(Dialog,DWLP_USER);
+			if (pl!=NULL)
+			{
+				if (LOWORD(*pl)==0xFFFF) { // Send
+					Lo = 0xFFFF;
+
+					GetRB(Dialog, &Hi, IDC_XOPT1K, IDC_XOPT1K);
+					if (Hi > 0) { // force CRC if 1K
+						Hi = Xopt1kCRC;
+					}
+					else {
+						Hi = XoptCRC;
+					}
+				}
+				else { // Recv
+					GetRB(Dialog, &Lo, IDC_XOPTBIN, IDC_XOPTBIN);
+					GetRB(Dialog, &Hi, IDC_XOPTCHECK, IDC_XOPTCRC);
+				}
+				*pl = MAKELONG(Lo,Hi);
+			}
+			if (DlgXoptFont != NULL) {
+				DeleteObject(DlgXoptFont);
+			}
+			break;
+		case IDCANCEL:
+			if (DlgXoptFont != NULL) {
+				DeleteObject(DlgXoptFont);
+			}
+			break;
+		}
+		break;
+	case WM_NOTIFY:	// for Explorer-style dialog
+		notify = (LPOFNOTIFY)lParam;
+		switch (notify->hdr.code) {
+		case CDN_FILEOK:
+			pl = (LPLONG)GetWindowLongPtr(Dialog,DWLP_USER);
+			if (pl!=NULL) {
+				if (LOWORD(*pl) == 0xFFFF) { // Send
+					Lo = 0xFFFF;
+
+					GetRB(Dialog, &Hi, IDC_XOPT1K, IDC_XOPT1K);
+					if (Hi > 0) { // force CRC if 1K
+						Hi = Xopt1kCRC;
+					}
+					else {
+						Hi = XoptCRC;
+					}
+				}
+				else { // Recv
+					GetRB(Dialog, &Lo, IDC_XOPTBIN, IDC_XOPTBIN);
+					GetRB(Dialog, &Hi, IDC_XOPTCHECK, IDC_XOPTCRC);
+				}
+				*pl = MAKELONG(Lo, Hi);
+			}
+			if (DlgXoptFont != NULL) {
+				DeleteObject(DlgXoptFont);
+			}
+			break;
+		}
+		break;
+	}
+	return FALSE;
+}
+
+static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
+{
+	LONG opt;
+	BOOL Ok;
+	const char *FileSendFilter = ts.FileSendFilter;
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	char *FNFilter = GetCommonDialogFilterA(!Receive ? FileSendFilter : NULL, UILanguageFile);
+
+	fv->FullName[0] = 0;
+	if (!Receive) {
+		if (strlen(FileSendFilter) > 0) {
+			// フィルタがワイルドカードではなく、そのファイルが存在する場合
+			// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
+			if (!isInvalidFileNameChar(FileSendFilter)) {
+				char file[MAX_PATH];
+				strncpy_s(file, sizeof(file), CurDir, _TRUNCATE);
+				AppendSlash(file, sizeof(file));
+				strncat_s(file, sizeof(file), FileSendFilter, _TRUNCATE);
+				if (_access(file, 0) == 0) {
+					strncpy_s(fv->FullName, sizeof(fv->FullName), FileSendFilter, _TRUNCATE);
+				}
+			}
+		}
+	}
+
+	OPENFILENAME ofn = {};
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.hwndOwner   = HWin;
+	ofn.lpstrFilter = FNFilter;
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = fv->FullName;
+	ofn.nMaxFile = sizeof(fv->FullName);
+	ofn.lpstrInitialDir = CurDir;
+	opt = *Option;
+	if (! Receive)
+	{
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		opt = opt | 0xFFFF;
+	}
+	else {
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+	}
+	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
+	ofn.Flags |= OFN_SHOWHELP;
+	ofn.lCustData = (LPARAM)&opt;
+	ofn.lpstrTitle = fv->DlgCaption;
+	ofn.lpfnHook = XFnHook;
+	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_XOPT);
+	ofn.hInstance = hInst;
+
+	/* save current dir */
+	wchar_t TempDir[MAXPATHLEN];
+	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	if (!Receive)
+	{
+		Ok = GetOpenFileName(&ofn);
+	}
+	else {
+		Ok = GetSaveFileName(&ofn);
+	}
+	_SetCurrentDirectoryW(TempDir);
+
+	if (Ok) {
+		fv->DirLen = ofn.nFileOffset;
+		fv->FnPtr = ofn.nFileOffset;
+		memcpy(CurDir,fv->FullName,fv->DirLen-1);
+		CurDir[fv->DirLen-1] = 0;
+
+		if (Receive)
+			*Option = opt;
+		else
+			*Option = MAKELONG(LOWORD(*Option),HIWORD(opt));
+	}
+
+	return Ok;
+}
+
 /**
  *	OnIdle()#teraterm.cppからコールされる
  *		cv.ProtoFlag が 0 以外のとき
@@ -809,6 +1028,362 @@ void ProtoDlgCancel(void)
 		ProtoEnd();
 }
 
+static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	static const DlgTextInfo text_info[] = {
+		{ 0, "DLG_GETFN_TITLE" },
+		{ IDC_FILENAME, "DLG_GETFN_FILENAME" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDC_GETFNHELP, "BTN_HELP" },
+	};
+	PFileVar fv;
+	char TempFull[MAX_PATH];
+	int i, j;
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	switch (Message) {
+	case WM_INITDIALOG:
+		fv = (PFileVar)lParam;
+		SetWindowLongPtr(Dialog, DWLP_USER, lParam);
+		SendDlgItemMessage(Dialog, IDC_GETFN, EM_LIMITTEXT, sizeof(TempFull)-1,0);
+		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
+		return TRUE;
+
+	case WM_COMMAND:
+		fv = (PFileVar)GetWindowLongPtr(Dialog,DWLP_USER);
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			if (fv!=NULL) {
+				GetDlgItemText(Dialog, IDC_GETFN, TempFull, sizeof(TempFull));
+				if (strlen(TempFull)==0) return TRUE;
+				GetFileNamePos(TempFull,&i,&j);
+				FitFileName(&(TempFull[j]),sizeof(TempFull) - j, NULL);
+				strncat_s(fv->FullName,sizeof(fv->FullName),&(TempFull[j]),_TRUNCATE);
+			}
+			EndDialog(Dialog, 1);
+			return TRUE;
+		case IDCANCEL:
+			EndDialog(Dialog, 0);
+			return TRUE;
+		case IDC_GETFNHELP:
+			if (fv!=NULL) {
+				// 呼び出し元がヘルプIDを準備する
+				PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
+			}
+			break;
+		}
+	}
+	return FALSE;
+}
+
+static BOOL _GetGetFname(HWND HWin, PFileVar fv, PTTSet ts)
+{
+	SetDialogFont(ts->DialogFontName, ts->DialogFontPoint, ts->DialogFontCharSet,
+				  ts->UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	return (BOOL)TTDialogBoxParam(hInst,
+								  MAKEINTRESOURCE(IDD_GETFNDLG),
+								  HWin, GetFnDlg, (LPARAM)fv);
+}
+
+static HFONT DlgFoptFont;
+
+static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	static const DlgTextInfo text_info[] = {
+		{ IDC_FOPT, "DLG_FOPT" },
+		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
+	};
+	LPOPENFILENAME ofn;
+	LPWORD pw;
+	LPOFNOTIFY notify;
+	LOGFONT logfont;
+	HFONT font;
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	switch (Message) {
+	case WM_INITDIALOG:
+		ofn = (LPOPENFILENAME)lParam;
+		pw = (LPWORD)ofn->lCustData;
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
+
+		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgFoptFont, UILanguageFile)) {
+			SendDlgItemMessage(Dialog, IDC_FOPT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_FOPTBIN, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_FOPTAPPEND, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_PLAINTEXT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_TIMESTAMP, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+		}
+		else {
+			DlgFoptFont = NULL;
+		}
+
+		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
+
+		SetRB(Dialog,*pw & 1,IDC_FOPTBIN,IDC_FOPTBIN);
+
+		CenterCommonDialog(Dialog);
+
+		return TRUE;
+	case WM_COMMAND: // for old style dialog
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
+			if (pw!=NULL)
+				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
+			}
+			break;
+		case IDCANCEL:
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
+			}
+			break;
+		}
+		break;
+	case WM_NOTIFY: // for Explorer-style dialog
+		notify = (LPOFNOTIFY)lParam;
+		switch (notify->hdr.code) {
+		case CDN_FILEOK:
+			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
+			if (pw!=NULL)
+				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
+			}
+			break;
+		}
+		break;
+	}
+	return FALSE;
+}
+
+static BOOL _GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
+{
+	int i, len;
+	char uimsg[MAX_UIMSG];
+	char *FNFilter;
+	OPENFILENAME ofn;
+	wchar_t TempDir[MAXPATHLEN];
+	BOOL Ok;
+	char defaultFName[MAX_PATH];
+	const char *FileSendFilter = ts.FileSendFilter;
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	/* save current dir */
+	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+
+	fv->NumFname = 0;
+
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	switch (FuncId) {
+	case GMF_KERMIT:
+		get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case GMF_Z:
+		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case GMF_QV:
+		get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case GMF_Y:
+		get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	default:
+		return FALSE;
+	}
+
+	/* moemory should be zero-initialized */
+	fv->FnStrMemHandle = GlobalAlloc(GHND, FnStrMemSize);
+	if (fv->FnStrMemHandle == NULL) {
+		MessageBeep(0);
+		return FALSE;
+	}
+	else {
+		fv->FnStrMem = (char *)GlobalLock(fv->FnStrMemHandle);
+		if (fv->FnStrMem == NULL) {
+			GlobalFree(fv->FnStrMemHandle);
+			fv->FnStrMemHandle = 0;
+			MessageBeep(0);
+			return FALSE;
+		}
+	}
+
+	FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
+
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.hwndOwner   = fv->HMainWin;
+	ofn.lpstrFilter = FNFilter;
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = fv->FnStrMem;
+	ofn.nMaxFile = FnStrMemSize;
+	ofn.lpstrTitle= fv->DlgCaption;
+	ofn.lpstrInitialDir = CurDir;
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.Flags |= OFN_ALLOWMULTISELECT | OFN_EXPLORER;
+	ofn.Flags |= OFN_SHOWHELP;
+	ofn.lCustData = 0;
+	if (FuncId==GMF_Z) {
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
+		ofn.lCustData = (LPARAM)Option;
+		ofn.lpfnHook = TransFnHook;
+		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
+	} else if (FuncId==GMF_Y) {
+		// TODO: YMODEM
+
+	}
+
+	ofn.hInstance = hInst;
+
+	// フィルタがワイルドカードではなく、そのファイルが存在する場合
+	// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
+	if (strlen(FileSendFilter) > 0 && !isInvalidFileNameChar(FileSendFilter)) {
+		char file[MAX_PATH];
+		strncpy_s(file, sizeof(file), CurDir, _TRUNCATE);
+		AppendSlash(file, sizeof(file));
+		strncat_s(file, sizeof(file), FileSendFilter, _TRUNCATE);
+		if (_access(file, 0) == 0) {
+			strncpy_s(defaultFName, sizeof(defaultFName), FileSendFilter, _TRUNCATE);
+			ofn.lpstrFile = defaultFName;
+		}
+	}
+
+	Ok = GetOpenFileName(&ofn);
+	free(FNFilter);
+
+	if (Ok) {
+		/* count number of file names */
+		len = strlen(fv->FnStrMem);
+		i = 0;
+		while (len>0) {
+			i = i + len + 1;
+			fv->NumFname++;
+			len = strlen(&fv->FnStrMem[i]);
+		}
+
+		fv->NumFname--;
+
+		if (fv->NumFname<1) { // single selection
+			fv->NumFname = 1;
+			fv->DirLen = ofn.nFileOffset;
+			strncpy_s(fv->FullName, sizeof(fv->FullName),fv->FnStrMem, _TRUNCATE);
+			fv->FnPtr = 0;
+		}
+		else { // multiple selection
+			strncpy_s(fv->FullName, sizeof(fv->FullName),fv->FnStrMem, _TRUNCATE);
+			AppendSlash(fv->FullName,sizeof(fv->FullName));
+			fv->DirLen = strlen(fv->FullName);
+			fv->FnPtr = strlen(fv->FnStrMem)+1;
+		}
+
+		memcpy(CurDir,fv->FullName,fv->DirLen);
+		CurDir[fv->DirLen] = 0;
+		if ((fv->DirLen>3) &&
+		    (CurDir[fv->DirLen-1]=='\\'))
+			CurDir[fv->DirLen-1] = 0;
+
+		fv->FNCount = 0;
+	}
+
+	GlobalUnlock(fv->FnStrMemHandle);
+	if (! Ok) {
+		GlobalFree(fv->FnStrMemHandle);
+		fv->FnStrMemHandle = NULL;
+	}
+
+	/* restore dir */
+	_SetCurrentDirectoryW(TempDir);
+
+	return Ok;
+}
+
+static void _SetFileVar(PFileVar fv)
+{
+	int i;
+	char uimsg[MAX_UIMSG];
+	char c;
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
+	c = fv->FullName[fv->DirLen];
+	if (c=='\\'||c=='/') fv->DirLen++;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	switch (fv->OpId) {
+	case OpLog:
+		get_lang_msg("FILEDLG_TRANS_TITLE_LOG", uimsg, sizeof(uimsg), TitLog, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpSendFile:
+		get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpKmtRcv:
+		get_lang_msg("FILEDLG_TRANS_TITLE_KMTRCV", uimsg, sizeof(uimsg), TitKmtRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpKmtGet:
+		get_lang_msg("FILEDLG_TRANS_TITLE_KMTGET", uimsg, sizeof(uimsg), TitKmtGet, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpKmtSend:
+		get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpKmtFin:
+		get_lang_msg("FILEDLG_TRANS_TITLE_KMTFIN", uimsg, sizeof(uimsg), TitKmtFin, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpXRcv:
+		get_lang_msg("FILEDLG_TRANS_TITLE_XRCV", uimsg, sizeof(uimsg), TitXRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpXSend:
+		get_lang_msg("FILEDLG_TRANS_TITLE_XSEND", uimsg, sizeof(uimsg), TitXSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpYRcv:
+		get_lang_msg("FILEDLG_TRANS_TITLE_YRCV", uimsg, sizeof(uimsg), TitYRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpYSend:
+		get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpZRcv:
+		get_lang_msg("FILEDLG_TRANS_TITLE_ZRCV", uimsg, sizeof(uimsg), TitZRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpZSend:
+		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpBPRcv:
+		get_lang_msg("FILEDLG_TRANS_TITLE_BPRCV", uimsg, sizeof(uimsg), TitBPRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpBPSend:
+		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpQVRcv:
+		get_lang_msg("FILEDLG_TRANS_TITLE_QVRCV", uimsg, sizeof(uimsg), TitQVRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case OpQVSend:
+		get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	}
+}
+
 void KermitStart(int mode)
 {
 	WORD w;
@@ -823,7 +1398,7 @@ void KermitStart(int mode)
 			{
 				char FileDirExpanded[MAX_PATH];
 				ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-				if (!(*GetMultiFname)(FileVar, FileDirExpanded, GMF_KERMIT, &w) ||
+				if (!_GetMultiFname(FileVar, FileDirExpanded, GMF_KERMIT, &w) ||
 				    (FileVar->NumFname==0))
 				{
 					ProtoEnd();
@@ -831,7 +1406,7 @@ void KermitStart(int mode)
 				}
 			}
 			else
-				(*SetFileVar)(FileVar);
+				_SetFileVar(FileVar);
 			break;
 		case IdKmtReceive:
 			FileVar->OpId = OpKmtRcv;
@@ -840,7 +1415,7 @@ void KermitStart(int mode)
 			FileVar->OpId = OpKmtSend;
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				if (! (*GetGetFname)(FileVar->HMainWin,FileVar, &ts) ||
+				if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) ||
 				    (strlen(FileVar->FullName)==0))
 				{
 					ProtoEnd();
@@ -848,7 +1423,7 @@ void KermitStart(int mode)
 				}
 			}
 			else
-				(*SetFileVar)(FileVar);
+				_SetFileVar(FileVar);
 			break;
 		case IdKmtFinish:
 			FileVar->OpId = OpKmtFin;
@@ -942,8 +1517,8 @@ void XMODEMStart(int mode)
 		char FileDirExpanded[MAX_PATH];
 		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
-		if (! (*GetXFname)(FileVar->HMainWin,
-		                   mode==IdXReceive,&Option,FileVar,FileDirExpanded))
+		if (! _GetXFname(FileVar->HMainWin,
+						 mode==IdXReceive,&Option,FileVar,FileDirExpanded))
 		{
 			ProtoEnd();
 			return;
@@ -988,7 +1563,7 @@ void XMODEMStart(int mode)
 		}
 	}
 	else
-		(*SetFileVar)(FileVar);
+		_SetFileVar(FileVar);
 
 	if (mode==IdXReceive)
 		FileVar->FileHandle = _lcreat(FileVar->FullName,0);
@@ -1093,7 +1668,7 @@ void YMODEMStart(int mode)
 		FileVar->OpId = OpYSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_Y,&Opt) ||
+			if (! _GetMultiFname(FileVar,FileDirExpanded,GMF_Y,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1102,13 +1677,13 @@ void YMODEMStart(int mode)
 			//ts.XmodemBin = Opt;
 		}
 		else
-		(*SetFileVar)(FileVar);
+		_SetFileVar(FileVar);
 	}
 	else {
 		FileVar->OpId = OpYRcv;
 		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 		Opt = Yopt1K;
-		(*SetFileVar)(FileVar);
+		_SetFileVar(FileVar);
 	}
 
 	TalkStatus = IdTalkQuiet;
@@ -1165,7 +1740,7 @@ void ZMODEMStart(int mode)
 		{
 			char FileDirExpanded[MAX_PATH];
 			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_Z,&Opt) ||
+			if (! _GetMultiFname(FileVar,FileDirExpanded,GMF_Z,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				if (mode == IdZAutoS) {
@@ -1177,7 +1752,7 @@ void ZMODEMStart(int mode)
 			ts.XmodemBin = Opt;
 		}
 		else
-		(*SetFileVar)(FileVar);
+		_SetFileVar(FileVar);
 	}
 	else /* IdZReceive or IdZAutoR */
 		FileVar->OpId = OpZRcv;
@@ -1226,6 +1801,87 @@ BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
 	return TRUE;
 }
 
+static BOOL _GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
+{
+	char uimsg[MAX_UIMSG];
+	char *FNFilter;
+	OPENFILENAME ofn;
+	WORD optw;
+	wchar_t TempDir[MAXPATHLEN];
+	BOOL Ok;
+	char FileName[MAX_PATH];
+	const char *UILanguageFile = ts.UILanguageFile;
+
+	/* save current dir */
+	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	switch (FuncId) {
+	case GTF_SEND:
+		get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	case GTF_BP:
+		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		break;
+	default:
+		return FALSE;
+	}
+
+	FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
+
+	ExtractFileName(fv->FullName, FileName ,sizeof(FileName));
+	strncpy_s(fv->FullName, sizeof(fv->FullName), FileName, _TRUNCATE);
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.hwndOwner   = fv->HMainWin;
+	ofn.lpstrFilter = FNFilter;
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = fv->FullName;
+	ofn.nMaxFile = sizeof(fv->FullName);
+	ofn.lpstrInitialDir = CurDir;
+
+	switch (FuncId) {
+	case GTF_SEND:
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
+		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
+
+		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
+		optw = (WORD)*Option;
+		ofn.lCustData = (LPARAM)&optw;
+		break;
+	case GTF_BP:
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		break;
+	}
+
+	ofn.Flags |= OFN_SHOWHELP;
+
+	ofn.lpstrTitle = fv->DlgCaption;
+
+	ofn.hInstance = hInst;
+
+	Ok = GetOpenFileName(&ofn);
+	free(FNFilter);
+
+	if (Ok) {
+		*Option = (long)optw;
+
+		fv->DirLen = ofn.nFileOffset;
+
+		if (CurDir!=NULL) {
+			memcpy(CurDir,fv->FullName,fv->DirLen-1);
+			CurDir[fv->DirLen-1] = 0;
+		}
+	}
+	/* restore dir */
+	_SetCurrentDirectoryW(TempDir);
+	return Ok;
+}
+
 void BPStart(int mode)
 {
 	LONG Option = 0;
@@ -1240,14 +1896,14 @@ void BPStart(int mode)
 			char FileDirExpanded[MAX_PATH];
 			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 			FileVar->FullName[0] = 0;
-			if (! (*GetTransFname)(FileVar, FileDirExpanded, GTF_BP, &Option))
+			if (! _GetTransFname(FileVar, FileDirExpanded, GTF_BP, &Option))
 			{
 				ProtoEnd();
 				return;
 			}
 		}
 		else
-			(*SetFileVar)(FileVar);
+			_SetFileVar(FileVar);
 	}
 	else /* IdBPReceive or IdBPAuto */
 		FileVar->OpId = OpBPRcv;
@@ -1306,7 +1962,7 @@ void QVStart(int mode)
 		{
 			char FileDirExpanded[MAX_PATH];
 			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			if (! (*GetMultiFname)(FileVar,FileDirExpanded,GMF_QV, &W) ||
+			if (! _GetMultiFname(FileVar,FileDirExpanded,GMF_QV, &W) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1314,7 +1970,7 @@ void QVStart(int mode)
 			}
 		}
 		else
-			(*SetFileVar)(FileVar);
+			_SetFileVar(FileVar);
 	}
 	else
 		FileVar->OpId = OpQVRcv;

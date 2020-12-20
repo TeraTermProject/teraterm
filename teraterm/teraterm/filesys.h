@@ -33,6 +33,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#if 0
 typedef BOOL (PASCAL *PGetSetupFname)
   (HWND HWin, WORD FuncId, PTTSet ts);
 typedef BOOL (PASCAL *PGetTransFname)
@@ -44,6 +46,7 @@ typedef BOOL (PASCAL *PGetGetFname)
 typedef void (PASCAL *PSetFileVar) (PFileVar fv);
 typedef BOOL (PASCAL *PGetXFname)
   (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir);
+#endif
 typedef void (PASCAL *PProtoInit)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts);
 typedef BOOL (PASCAL *PProtoParse)
@@ -57,18 +60,22 @@ typedef BOOL (PASCAL *PTTFILESetUILanguageFile)
 typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
   (char *file);
 
+#if 0
 extern PGetSetupFname GetSetupFname;
 extern PGetTransFname GetTransFname;
 extern PGetMultiFname GetMultiFname;
 extern PGetGetFname GetGetFname;
 extern PSetFileVar SetFileVar;
 extern PGetXFname GetXFname;
+#endif
 extern PProtoInit ProtoInit;
 extern PProtoParse ProtoParse;
 extern PProtoTimeOutProc ProtoTimeOutProc;
 extern PProtoCancel ProtoCancel;
+#if 0
 extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;
 extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
+#endif
 
 BOOL LoadTTFILE(void);
 BOOL FreeTTFILE(void);

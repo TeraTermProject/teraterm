@@ -4820,6 +4820,124 @@ void CVTWindow::OnSetupGeneral()
 	FreeTTDLG();
 }
 
+static BOOL _GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
+{
+	int i, j;
+	OPENFILENAME ofn;
+	char uimsg[MAX_UIMSG];
+
+	//  char FNameFilter[HostNameMaxLength + 1]; // 81(yutaka)
+	char FNameFilter[81]; // 81(yutaka)
+	wchar_t TempDir[MAXPATHLEN];
+	char Dir[MAXPATHLEN];
+	char Name[MAX_PATH];
+	BOOL Ok;
+	const char *UILanguageFile = ts->UILanguageFile;
+
+	/* save current dir */
+	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+
+	/* File name filter */
+	memset(FNameFilter, 0, sizeof(FNameFilter));
+	if (FuncId==GSF_LOADKEY) {
+		get_lang_msg("FILEDLG_KEYBOARD_FILTER", uimsg, sizeof(uimsg), "keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFile);
+		memcpy(FNameFilter, uimsg, sizeof(FNameFilter));
+	}
+	else {
+		get_lang_msg("FILEDLG_SETUP_FILTER", uimsg, sizeof(uimsg), "setup files (*.ini)\\0*.ini\\0\\0", UILanguageFile);
+		memcpy(FNameFilter, uimsg, sizeof(FNameFilter));
+	}
+
+	/* OPENFILENAME record */
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.hwndOwner   = HWin;
+	ofn.lpstrFile   = Name;
+	ofn.nMaxFile    = sizeof(Name);
+	ofn.lpstrFilter = FNameFilter;
+	ofn.nFilterIndex = 1;
+	ofn.hInstance = hInst;
+
+	if (FuncId==GSF_LOADKEY) {
+		ofn.lpstrDefExt = "cnf";
+		GetFileNamePos(ts->KeyCnfFN,&i,&j);
+		strncpy_s(Name, sizeof(Name),&(ts->KeyCnfFN[j]), _TRUNCATE);
+		memcpy(Dir,ts->KeyCnfFN,i);
+		Dir[i] = 0;
+
+		if ((strlen(Name)==0) || (_stricmp(Name,"KEYBOARD.CNF")==0))
+			strncpy_s(Name, sizeof(Name),"KEYBOARD.CNF", _TRUNCATE);
+	}
+	else {
+		ofn.lpstrDefExt = "ini";
+		GetFileNamePos(ts->SetupFName,&i,&j);
+		strncpy_s(Name, sizeof(Name),&(ts->SetupFName[j]), _TRUNCATE);
+		memcpy(Dir,ts->SetupFName,i);
+		Dir[i] = 0;
+
+		if ((strlen(Name)==0) || (_stricmp(Name,"TERATERM.INI")==0))
+			strncpy_s(Name, sizeof(Name),"TERATERM.INI", _TRUNCATE);
+	}
+
+	if (strlen(Dir)==0)
+		strncpy_s(Dir, sizeof(Dir),ts->HomeDir, _TRUNCATE);
+
+	SetCurrentDirectoryA(Dir);
+
+	switch (FuncId) {
+	case GSF_SAVE:
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_SHOWHELP;
+		// 初期ファイルディレクトリをプログラム本体がある箇所に固定する (2005.1.6 yutaka)
+		// 読み込まれたteraterm.iniがあるディレクトリに固定する。
+		// これにより、/F= で指定された位置に保存されるようになる。(2005.1.26 yutaka)
+		// Windows Vista ではファイル名まで指定すると NULL と同じ挙動をするようなので、
+		// ファイル名を含まない形でディレクトリを指定するようにした。(2006.9.16 maya)
+//		ofn.lpstrInitialDir = __argv[0];
+//		ofn.lpstrInitialDir = ts->SetupFName;
+		ofn.lpstrInitialDir = Dir;
+		get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Save setup", UILanguageFile);
+		ofn.lpstrTitle = uimsg;
+		Ok = GetSaveFileName(&ofn);
+		if (Ok)
+			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName),Name, _TRUNCATE);
+		break;
+	case GSF_RESTORE:
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
+		get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Restore setup", UILanguageFile);
+		ofn.lpstrTitle = uimsg;
+		Ok = GetOpenFileName(&ofn);
+		if (Ok)
+			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName),Name, _TRUNCATE);
+		break;
+	case GSF_LOADKEY:
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
+		get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Load key map", UILanguageFile);
+		ofn.lpstrTitle = uimsg;
+		Ok = GetOpenFileName(&ofn);
+		if (Ok)
+			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN),Name, _TRUNCATE);
+		break;
+	default:
+		assert(FALSE);
+		Ok = FALSE;
+		break;
+	}
+
+#if defined(_DEBUG)
+	if (!Ok) {
+		DWORD Err = GetLastError();
+		DWORD DlgErr = CommDlgExtendedError();
+		assert(Err == 0 && DlgErr == 0);
+	}
+#endif
+
+	/* restore dir */
+	_SetCurrentDirectoryW(TempDir);
+
+	return Ok;
+}
+
 void CVTWindow::OnSetupSave()
 {
 	BOOL Ok;
@@ -4827,12 +4945,8 @@ void CVTWindow::OnSetupSave()
 	int ret;
 
 	strncpy_s(TmpSetupFN, sizeof(TmpSetupFN),ts.SetupFName, _TRUNCATE);
-	if (! LoadTTFILE()) {
-		return;
-	}
 	HelpId = HlpSetupSave;
-	Ok = (*GetSetupFname)(HVTWin,GSF_SAVE,&ts);
-	FreeTTFILE();
+	Ok = _GetSetupFname(HVTWin,GSF_SAVE,&ts);
 	if (! Ok) {
 		return;
 	}
@@ -4891,7 +5005,7 @@ void CVTWindow::OnSetupRestore()
 	if (! LoadTTFILE()) {
 		return;
 	}
-	Ok = (*GetSetupFname)(HVTWin,GSF_RESTORE,&ts);
+	Ok = _GetSetupFname(HVTWin,GSF_RESTORE,&ts);
 	FreeTTFILE();
 	if (Ok) {
 		RestoreSetup();
@@ -5381,7 +5495,7 @@ void CVTWindow::OnSetupLoadKeyMap()
 	if (! LoadTTFILE()) {
 		return;
 	}
-	Ok = (*GetSetupFname)(HVTWin,GSF_LOADKEY,&ts);
+	Ok = _GetSetupFname(HVTWin,GSF_LOADKEY,&ts);
 	FreeTTFILE();
 	if (! Ok) {
 		return;
