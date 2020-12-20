@@ -45,7 +45,6 @@
 /* TTFILE.DLL, ZMODEM protocol */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include <stdio.h>
 #include <stdarg.h>
 

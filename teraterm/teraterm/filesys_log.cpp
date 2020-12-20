@@ -40,7 +40,6 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include "ftdlg.h"
 #include "ttwinman.h"
 #include "commlib.h"
@@ -59,6 +58,8 @@
 #include "filesys_log_res.h"
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
+
+#define TitLog      L"Log"
 
 /*
    Line Head flag for timestamping
@@ -135,8 +136,7 @@ static BOOL OpenFTDlg_(PFileVar fv)
 
 	wchar_t *DlgCaption;
 	wchar_t uimsg[MAX_UIMSG];
-#define TitLogW      L"Log"
-	get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLogW, ts.UILanguageFile);
+	get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLog, ts.UILanguageFile);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 
 	CFileTransDlg::Info info;
@@ -590,8 +590,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			wchar_t caption[MAX_PATH];
 			wchar_t uimsg[MAX_UIMSG];
-#define TitLogW      L"Log"
-			get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLogW, UILanguageFile);
+			get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLog, UILanguageFile);
 			wcsncpy_s(caption, _countof(caption), L"Tera Term: ", _TRUNCATE);
 			wcsncat_s(caption, _countof(caption), uimsg, _TRUNCATE);
 

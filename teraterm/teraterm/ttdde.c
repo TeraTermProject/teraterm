@@ -34,7 +34,6 @@
 #include <string.h>
 #include <ddeml.h>
 #include "ttwinman.h"
-#include "ttftypes.h"
 #include "filesys.h"
 #include "ttsetup.h"
 #include "telnet.h"

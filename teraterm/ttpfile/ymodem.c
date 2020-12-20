@@ -35,7 +35,6 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 
 #include "tt_res.h"
 #include "ttcommon.h"

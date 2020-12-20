@@ -30,7 +30,6 @@
 /* TTFILE.DLL, B-Plus protocol */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include <string.h>
 #include "tt_res.h"
 

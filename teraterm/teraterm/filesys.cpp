@@ -37,7 +37,6 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include "ftdlg.h"
 #include "ttwinman.h"
 #include "commlib.h"

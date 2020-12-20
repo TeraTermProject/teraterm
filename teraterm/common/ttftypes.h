@@ -36,6 +36,3 @@
 #define PROTO_BP  4
 #define PROTO_QV  5
 #define PROTO_YM  6
-
-#define TitLog      "Log"
-#define TitSendFile "Send file"

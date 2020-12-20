@@ -41,12 +41,11 @@
 #include "tttypes.h"		// for WM_USER_DLGHELP2
 #include "helpid.h"
 #include "codeconv.h"
-#include "ttftypes.h"		// for TitSendFile
 #include "asprintf.h"
 
 #include "sendfiledlg.h"
 
-#define TitSendFileW L"Send file"	// TODO ttftype.h“à‚ÉANSI”Å‚ª‚ ‚é
+#define TitSendFile L"Send file"
 
 static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -143,7 +142,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					wchar_t TempDir[MAX_PATH];
 					_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSendFileW, data->UILanguageFile);
+					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSendFile, data->UILanguageFile);
 					wchar_t *title;
 					aswprintf(&title, L"Tera Term: %s", uimsg);
 					free(uimsg);

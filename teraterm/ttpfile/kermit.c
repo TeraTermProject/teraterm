@@ -30,7 +30,6 @@
 /* TTFILE.DLL, Kermit protocol */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include <stdio.h>
 #include <time.h>
 #include <string.h>

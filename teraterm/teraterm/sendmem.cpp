@@ -44,8 +44,7 @@
 #define	SENDMEM_USE_OLD_API	1
 
 #if SENDMEM_USE_OLD_API
-#include "ttftypes.h"		// for TFileVar
-#include "filesys.h"		// for SendVar
+#include "filesys.h"		// for FileSendStart()
 #else
 #include "fileread.h"
 #endif

@@ -49,7 +49,6 @@
 #include "vtdisp.h"
 #include "keyboard.h"
 #include "ttlib.h"
-#include "ttftypes.h"
 #include "filesys.h"
 #include "teraprn.h"
 #include "telnet.h"
