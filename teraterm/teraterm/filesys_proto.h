@@ -29,14 +29,15 @@
 #pragma once
 
 typedef struct FileVarProto {
+	// protosys_proto.cpp内のみ使用
+	WORD OpId;
+
 	HWND HMainWin;
 	HWND HWin;
-	WORD OpId;
 	char DlgCaption[40];
 
 	// 送受信時ワーク
 	char FullName[MAX_PATH];	// read/writeするファイル名(各プロトコル内で書き換えすることあり)
-//	int DirLen;
 
 	// 送信ファイル名配列
 	//	フルパスのファイル名配列(一番最後はNULL)

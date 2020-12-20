@@ -65,6 +65,21 @@
 #include "bplus.h"
 #include "quickvan.h"
 
+#define OpKmtRcv   3
+#define OpKmtGet   4
+#define OpKmtSend  5
+#define OpKmtFin   6
+#define OpXRcv     7
+#define OpXSend    8
+#define OpZRcv     9
+#define OpZSend    10
+#define OpBPRcv    11
+#define OpBPSend   12
+#define OpQVRcv    13
+#define OpQVSend   14
+#define OpYRcv     15
+#define OpYSend    16
+
 static PFileVarProto FileVar = NULL;
 static int ProtoId;
 
@@ -132,11 +147,6 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
 	AppendSlash(FileDirExpanded, _countof(FileDirExpanded));
 	fv->RecievePath = _strdup(FileDirExpanded);
-
-	// 受信フォルダを fv->FullName に設定しておく
-	// fv->FullName[fv->DirLen] からファイル名を設定するとフルパスになる
-	strncpy_s(fv->FullName, sizeof(fv->FullName), FileDirExpanded, _TRUNCATE);
-	// fv->DirLen = strlen(fv->FullName);
 
 	fv->FileOpen = FALSE;
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
@@ -659,9 +669,6 @@ static char **_GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Op
 
 	char **ret = NULL;
 	if (Ok) {
-		//fv->DirLen = ofn.nFileOffset;
-		//fv->FnPtr = ofn.nFileOffset;
-
 		if (Receive)
 			*Option = opt;
 		else
@@ -920,18 +927,6 @@ static char **_GetMultiFname(HWND hWnd, WORD FuncId, const char *caption, LPWORD
 	return ret;
 }
 
-#if 0
-static void _SetFileVar(PFileVarProto fv)
-{
-	int i;
-	char c;
-
-	GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
-	c = fv->FullName[fv->DirLen];
-	if (c=='\\'||c=='/') fv->DirLen++;
-}
-#endif
-
 static void KermitStart(int mode)
 {
 	if (! ProtoStart())
@@ -1014,8 +1009,6 @@ BOOL KermitGet(const char *filename)
 	else {
 		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
 		FileVar->NoMsg = TRUE;
-//		FileVar->DirLen = 0;
-//		_SetFileVar(FileVar);
 	}
 	KermitStart(IdKmtGet);
 
@@ -1656,11 +1649,11 @@ BOOL QVStartSend(const char *filename)
 			ProtoEnd();
 			return FALSE;
 		}
+		fv->FileNames = filenames;
 	}
 	else {
-		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+		fv->FileNames = MakeStrArrayFromStr(filename);
 		FileVar->NoMsg = TRUE;
-//		FileVar->DirLen = 0;
 	}
 
 	TalkStatus = IdTalkQuiet;

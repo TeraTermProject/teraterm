@@ -54,8 +54,6 @@ void FTConvFName(PCHAR FName)
 
 BOOL GetNextFname(PFileVarProto fv)
 {
-	int i;
-
 	const char *f = fv->FileNames[fv->FNCount];
 	if (f == NULL) {
 		return FALSE; /* no more file name */
@@ -63,9 +61,6 @@ BOOL GetNextFname(PFileVarProto fv)
 	fv->FNCount++;
 
 	strncpy_s(fv->FullName, sizeof(fv->FullName), f, _TRUNCATE);
-//	GetFileNamePos(fv->FullName, &(fv->DirLen), &i);
-//	fv->DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
-
 	return TRUE;
 }
 

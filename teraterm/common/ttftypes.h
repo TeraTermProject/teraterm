@@ -37,23 +37,6 @@
 #define PROTO_QV  5
 #define PROTO_YM  6
 
-//#define OpLog      1
-//#define OpSendFile 2
-#define OpKmtRcv   3
-#define OpKmtGet   4
-#define OpKmtSend  5
-#define OpKmtFin   6
-#define OpXRcv     7
-#define OpXSend    8
-#define OpZRcv     9
-#define OpZSend    10
-#define OpBPRcv    11
-#define OpBPSend   12
-#define OpQVRcv    13
-#define OpQVSend   14
-#define OpYRcv     15
-#define OpYSend    16
-
 #define TitLog      "Log"
 #define TitSendFile "Send file"
 #define TitKmtRcv   "Kermit Receive"
