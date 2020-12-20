@@ -51,10 +51,14 @@ public:
 	~CFileTransDlg();
 
 	BOOL Create(HINSTANCE hInstance, CFileTransDlgInfo *info);
+#if 0
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts);
+#endif
 	void ChangeButton(BOOL PauseFlag);
 	void RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount);
+#if 0
 	void RefreshNum(TFileVar *fv);
+#endif
 
 private:
 	virtual BOOL OnCancel();

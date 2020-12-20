@@ -256,8 +256,20 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	if (FTDlg!=NULL)
 	{
-		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
-		FTDlg->RefreshNum(fv);
+		CFileTransDlgInfo info;
+		info.UILanguageFile = ts.UILanguageFile;
+		info.OpId = OpSendFile;
+		info.DlgCaption = ToWcharA(fv->DlgCaption);
+		info.FileName = NULL;
+		info.FullName = ToWcharA(fv->FullName);
+		info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
+		info.HMainWin = HVTWin;
+		//FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
+		FTDlg->Create(hInst, &info);
+		//FTDlg->RefreshNum(fv);
+		FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
+		free(info.DlgCaption);
+		free(info.FullName);
 	}
 
 	SendDlg = FTDlg; /* File send */
@@ -753,13 +765,16 @@ static void FileSendBinayBoost(void)
 			SendVar->ByteCount = SendVar->ByteCount + c;
 			if (FileRetrySend)
 			{
-				if (SendVar->ByteCount != BCOld)
-					SendDlg->RefreshNum(SendVar);
+				if (SendVar->ByteCount != BCOld) {
+					//SendDlg->RefreshNum(SendVar);
+					SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
+				}
 				return;
 			}
 		}
 		FileDlgRefresh = SendVar->ByteCount;
-		SendDlg->RefreshNum(SendVar);
+		//SendDlg->RefreshNum(SendVar);
+		SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
 		BCOld = SendVar->ByteCount;
 		if (fc != 0)
 			return;
@@ -849,8 +864,10 @@ void FileSend(void)
 			FileRetrySend = (c==0);
 			if (FileRetrySend)
 			{
-				if (SendVar->ByteCount != BCOld)
-					SendDlg->RefreshNum(SendVar);
+				if (SendVar->ByteCount != BCOld) {
+					//SendDlg->RefreshNum(SendVar);
+					SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
+				}
 				return;
 			}
 			if (ts.LocalEcho>0)
@@ -862,7 +879,8 @@ void FileSend(void)
 			}
 		}
 		if ((fc==0) || ((SendVar->ByteCount % 100 == 0) && (FileBracketPtr == 0))) {
-			SendDlg->RefreshNum(SendVar);
+			//SendDlg->RefreshNum(SendVar);
+			SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
 			BCOld = SendVar->ByteCount;
 			if (fc!=0)
 				return;

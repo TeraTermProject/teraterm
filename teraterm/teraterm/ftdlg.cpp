@@ -133,6 +133,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
 	return Ok;
 }
 
+#if 0
 BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar fv, PComVar pcv, PTTSet pts)
 {
 	CFileTransDlgInfo info;
@@ -152,6 +153,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar fv, PComV
 	free(info.FullName);
 	return r;
 }
+#endif
 
 /**
  *	テキストの変更のみ
@@ -220,12 +222,14 @@ void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
 	}
 }
 
+#if 0
 void CFileTransDlg::RefreshNum(TFileVar *fv)
 {
 	ProgStat = fv->ProgStat;
 	RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
 	fv->ProgStat = ProgStat;
 }
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg message handler
