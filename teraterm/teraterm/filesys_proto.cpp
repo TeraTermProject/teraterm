@@ -63,8 +63,9 @@
 #define PFileVar	PFileVarProto
 #endif
 #include "tt_res.h"
-#include "xmodem.h"
 #include "kermit.h"
+#include "xmodem.h"
+#include "ymodem.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -756,7 +757,9 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			vsize = 0;
 			break;
 		case PROTO_YM:
-			vsize = sizeof(TYVar);
+//			vsize = sizeof(TYVar);
+			YCreate(fv);
+			vsize = 0;
 			break;
 		case PROTO_ZM:
 			vsize = sizeof(TZVar);
@@ -799,8 +802,12 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
+#if 0
 			((PYVar)ProtoVar)->YMode = Mode;
 			((PYVar)ProtoVar)->YOpt = Opt1;
+#endif
+			_ProtoSetOpt(fv, YMODEM_MODE, Mode);
+			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
 			((PZVar)ProtoVar)->BinFlag = (Opt1 & 1) != 0;

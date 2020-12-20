@@ -34,12 +34,18 @@
 extern "C" {
 #endif
 
+enum {
+	YMODEM_MODE,
+	YMODEM_OPT,
+};
+
 /* prototypes */
-void YInit(PFileVarProto fv, PYVar yv, PComVar cv, PTTSet ts);
-void YCancel(PFileVarProto fv, PYVar yv, PComVar cv);
-void YTimeOutProc(PFileVarProto fv, PYVar yv, PComVar cv);
-BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv);
-BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv);
+BOOL YCreate(PFileVarProto fv);
+#if 1
+void YInit(PFileVarProto fv, PComVar cv, PTTSet ts);
+void YCancel(PFileVarProto fv, PComVar cv);
+void YTimeOutProc(PFileVarProto fv, PComVar cv);
+#endif
 
 #ifdef __cplusplus
 }

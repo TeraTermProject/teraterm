@@ -176,6 +176,7 @@ typedef TXVar far *PXVar;
 #define XnakC 2
 #endif
 
+#if 0
 /* YMODEM */
 typedef struct {
   BYTE PktIn[1030], PktOut[1030];
@@ -213,6 +214,7 @@ typedef TYVar far *PYVar;
 #define YnakC 1
 #define YnakG 2
 
+#endif
 
 /* ZMODEM */
 typedef struct {

@@ -46,6 +46,43 @@
 
 #include "ymodem.h"
 
+/* YMODEM */
+typedef struct {
+  BYTE PktIn[1030], PktOut[1030];
+  int PktBufCount, PktBufPtr;
+  BYTE PktNum, PktNumSent;
+  int PktNumOffset;
+  int PktReadMode;
+  WORD YMode, YOpt, TextFlag;
+  WORD NAKMode;
+  int NAKCount;
+  WORD __DataLen, CheckLen;
+  BOOL CRRecv;
+  int TOutShort;
+  int TOutLong;
+  int TOutInit;
+  int TOutInitCRC;
+  int TOutVLong;
+  int SendFileInfo;
+  int SendEot;
+  int LastSendEot;
+  WORD DataLen;
+  BYTE LastMessage;
+  BOOL RecvFilesize;
+} TYVar;
+typedef TYVar *PYVar;
+
+  /* YMODEM states */
+#define YpktSOH 0x01
+#define YpktSTX 0x02
+#define YpktEOT 0x04
+#define YpktACK 0x06
+#define YpktNAK 0x15
+#define YpktCAN 0x18
+
+#define YnakC 1
+#define YnakG 2
+
 // データ転送サイズ。YMODEMでは 128 or 1024 byte をサポートする。
 #define SOH_DATALEN	128
 #define STX_DATALEN	1024
@@ -156,7 +193,7 @@ void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 			yv->NAKCount = 9;
 		}
 		else {
-			YCancel(fv,yv,cv);
+			YCancel(fv,cv);
 			return;
 		}
 	}
@@ -197,7 +234,7 @@ void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 			yv->NAKCount = 9;
 		}
 		else {
-			YCancel(fv,yv,cv);
+			YCancel(fv,cv);
 			return;
 		}
 	}
@@ -297,9 +334,10 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	yv->LastMessage = 0;
 }
 
-void YInit(PFileVarProto fv, PYVar yv, PComVar cv, PTTSet ts)
+void YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	char inistr[MAX_PATH + 10];
+	PYVar yv = fv->data;
 
 	if (yv->YMode == IdYSend) {
 		if (!GetNextFname(fv)) {
@@ -384,17 +422,19 @@ void YInit(PFileVarProto fv, PYVar yv, PComVar cv, PTTSet ts)
 	}
 }
 
-void YCancel(PFileVarProto fv, PYVar yv, PComVar cv)
+void YCancel(PFileVarProto fv, PComVar cv)
 {
 	// five cancels & five backspaces per spec
 	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
+	PYVar yv = fv->data;
 
 	YWrite(fv,yv,cv, (PCHAR)&cancel, sizeof(cancel));
 	yv->YMode = 0; // quit
 }
 
-void YTimeOutProc(PFileVarProto fv, PYVar yv, PComVar cv)
+void YTimeOutProc(PFileVarProto fv, PComVar cv)
 {
+	PYVar yv = fv->data;
 	switch (yv->YMode) {
 	case IdYSend:
 		yv->YMode = 0; // quit
@@ -553,7 +593,7 @@ BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	d = yv->PktIn[1] - yv->PktNum;
 	if (d>1)
 	{
-		YCancel(fv,yv,cv);
+		YCancel(fv,cv);
 		return FALSE;
 	}
 
@@ -1043,6 +1083,58 @@ BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		              fv->ByteCount, fv->FileSize, &fv->ProgStat);
 		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 	}
+
+	return TRUE;
+}
+
+BOOL YParse(PFileVarProto fv, PComVar cv)
+{
+	PYVar pv = fv->data;
+	switch (pv->YMode) {
+	case IdYReceive:
+		return YReadPacket(fv,pv,cv);
+		break;
+	case IdYSend:
+		return YSendPacket(fv,pv,cv);
+		break;
+	default:
+		return FALSE;
+	}
+}
+
+static int SetOptV(PFileVarProto fv, int request, va_list ap)
+{
+	PYVar pv = fv->data;
+	switch(request) {
+	case YMODEM_MODE: {
+		int Mode = va_arg(ap, int);
+		pv->YMode = Mode;
+		return 0;
+	}
+	case YMODEM_OPT: {
+		WORD Opt1 = va_arg(ap, WORD);
+		pv->YOpt = Opt1;
+		return 0;
+	}
+	}
+	return -1;
+}
+
+BOOL YCreate(PFileVarProto fv)
+{
+	PYVar pv;
+	pv = malloc(sizeof(TYVar));
+	if (pv == NULL) {
+		return FALSE;
+	}
+	memset(pv, 0, sizeof(*pv));
+	fv->data = pv;
+
+	fv->Init = YInit;
+	fv->Parse = YParse;
+	fv->TimeOutProc = YTimeOutProc;
+	fv->Cancel = YCancel;
+	fv->SetOptV = SetOptV;
 
 	return TRUE;
 }

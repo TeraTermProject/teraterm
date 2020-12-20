@@ -63,7 +63,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_YM:
-		YInit(fv,(PYVar)pv,cv,ts);
+		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_ZM:
 		ZInit(fv,(PZVar)pv,cv,ts);
@@ -90,14 +90,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_YM:
-		switch (((PYVar)pv)->YMode) {
-		case IdYReceive:
-			Ok = YReadPacket(fv,(PYVar)pv,cv);
-			break;
-		case IdYSend:
-			Ok = YSendPacket(fv,(PYVar)pv,cv);
-			break;
-		}
+		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_ZM:
 		Ok = ZParse(fv,(PZVar)pv,cv);
@@ -129,7 +122,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->TimeOutProc(fv,cv);
 		break;
 	case PROTO_YM:
-		YTimeOutProc(fv,(PYVar)pv,cv);
+		fv->TimeOutProc(fv,cv);
 		break;
 	case PROTO_ZM:
 		ZTimeOutProc(fv,(PZVar)pv,cv);
@@ -153,7 +146,7 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->Cancel(fv,cv);
 		break;
 	case PROTO_YM:
-		YCancel(fv, (PYVar)pv,cv);
+		fv->Cancel(fv,cv);
 		break;
 	case PROTO_ZM:
 		ZCancel((PZVar)pv);
