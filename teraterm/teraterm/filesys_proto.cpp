@@ -98,9 +98,6 @@
 
 static PFileVarProto FileVar = NULL;
 static int ProtoId;
-
-extern BOOL FSend;
-
 static PProtoDlg PtDlg = NULL;
 static BOOL cv_ProtoFlag = FALSE;
 
@@ -365,8 +362,8 @@ static BOOL ProtoStart(void)
 {
 	if (cv_ProtoFlag)
 		return FALSE;
-	if (FSend)
-	{
+	if (FileSnedIsSending())
+	{	// ファイル送信中
 		FreeFileVar_(&FileVar);
 		return FALSE;
 	}

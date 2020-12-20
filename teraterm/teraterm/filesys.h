@@ -36,7 +36,7 @@ extern "C" {
 
 // filesys.cpp
 BOOL IsSendVarNULL(void);
-
+BOOL FileSnedIsSending(void);
 BOOL FileSendStart(const wchar_t *filename, int binary);
 void FileSend(void);
 void FileSendEnd(void);

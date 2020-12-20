@@ -90,7 +90,7 @@ static int FileBracketPtr = 0;
 static char BracketStartStr[] = "\033[200~";
 static char BracketEndStr[] = "\033[201~";
 
-BOOL FSend = FALSE;
+static BOOL FSend = FALSE;
 
 static PFileTransDlg SendDlg = NULL;
 
@@ -603,4 +603,12 @@ void FileSend(void)
 BOOL IsSendVarNULL()
 {
 	return SendVar == NULL;
+}
+
+/**
+ * TODO: IsSendVarNULL() ‚Æ‚Ìˆá‚¢‚Í?
+ */
+BOOL FileSnedIsSending(void)
+{
+	return FSend;
 }
