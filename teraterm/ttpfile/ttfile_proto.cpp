@@ -69,7 +69,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_BP:
-		BPInit(fv,(PBPVar)pv,cv,ts);
+		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_QV:
 		QVInit(fv,(PQVVar)pv,cv,ts);
@@ -96,7 +96,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_BP:
-		Ok = BPParse(fv,(PBPVar)pv,cv);
+		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_QV:
 		switch (((PQVVar)pv)->QVMode) {
@@ -128,7 +128,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->TimeOutProc(fv, cv);
 		break;
 	case PROTO_BP:
-		BPTimeOutProc(fv,(PBPVar)pv,cv);
+		fv->TimeOutProc(fv, cv);
 		break;
 	case PROTO_QV:
 		QVTimeOutProc(fv,(PQVVar)pv,cv);
@@ -152,10 +152,7 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->Cancel(fv, cv);
 		break;
 	case PROTO_BP:
-		if (((PBPVar)pv)->BPState != BP_Failure) {
-			BPCancel((PBPVar)pv);
-			return FALSE;
-		}
+		fv->Cancel(fv, cv);
 		break;
 	case PROTO_QV:
 		QVCancel(fv,(PQVVar)pv,cv);

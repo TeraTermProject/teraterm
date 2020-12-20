@@ -33,11 +33,18 @@
 extern "C" {
 #endif
 
+enum {
+	BPLUS_MODE,
+};
+
 /* prototypes */
-void BPInit(PFileVarProto fv, PBPVar bv, PComVar cv, PTTSet ts);
-void BPTimeOutProc(PFileVarProto fv, PBPVar bv, PComVar cv);
-BOOL BPParse(PFileVarProto fv, PBPVar bv, PComVar cv);
-void BPCancel(PBPVar bv);
+BOOL BPCreate(PFileVarProto fv);
+#if 0
+void BPInit(PFileVarProto fv, PComVar cv, PTTSet ts);
+void BPTimeOutProc(PFileVarProto fv, PComVar cv);
+BOOL BPParse(PFileVarProto fv, PComVar cv);
+void BPCancel(PFileVarProto fv, PComVar cv);
+#endif
 
 #ifdef __cplusplus
 }

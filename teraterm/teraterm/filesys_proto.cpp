@@ -67,6 +67,7 @@
 #include "xmodem.h"
 #include "ymodem.h"
 #include "zmodem.h"
+#include "bplus.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -768,7 +769,9 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			vsize = 0;
 			break;
 		case PROTO_BP:
-			vsize = sizeof(TBPVar);
+//			vsize = sizeof(TBPVar);
+			BPCreate(fv);
+			vsize = 0;
 			break;
 		case PROTO_QV:
 			vsize = sizeof(TQVVar);
@@ -821,7 +824,10 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
+#if 0
 			((PBPVar)ProtoVar)->BPMode = Mode;
+#endif
+			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
 			((PQVVar)ProtoVar)->QVMode = Mode;

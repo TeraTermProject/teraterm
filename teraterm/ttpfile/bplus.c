@@ -40,8 +40,61 @@
 #include "ttlib.h"
 #include "win16api.h"
 
+#include "bplus.h"
+
 /* proto type */
 //BOOL PASCAL GetTransFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPLONG Option);
+
+/* B Plus */
+typedef struct {
+  BYTE WS;
+  BYTE WR;
+  BYTE B_S;
+  BYTE CM;
+  BYTE DQ;
+  BYTE TL;
+  BYTE Q[8];
+  BYTE DR;
+  BYTE UR;
+  BYTE FI;
+} TBPParam;
+
+
+typedef struct {
+  BYTE PktIn[2066], PktOut[2066];
+  int PktInCount, CheckCount;
+  int PktOutLen, PktOutCount, PktOutPtr;
+  LONG Check, CheckCalc;
+  BYTE PktNum, PktNumSent;
+  int PktNumOffset;
+  int PktSize;
+  WORD BPMode, BPState, BPPktState;
+  BOOL GetPacket, EnqSent;
+  BYTE MaxBS, CM;
+  BOOL Quoted;
+  int TimeOut;
+  BOOL CtlEsc;
+  BYTE Q[8];
+} TBPVar;
+typedef TBPVar far *PBPVar;
+
+  /* B Plus states */
+#define BP_Init      1
+#define BP_RecvFile  2
+#define BP_RecvData  3
+#define BP_SendFile  4
+#define BP_SendData  5
+#define BP_SendClose 6
+#define BP_Failure   7
+#define BP_Close     8
+#define BP_AutoFile  9
+
+  /* B Plus packet states */
+#define BP_PktGetDLE   1
+#define BP_PktDLESeen  2
+#define BP_PktGetData  3
+#define BP_PktGetCheck 4
+#define BP_PktSending  5
 
 #define BPTimeOut 10
 #define BPTimeOutTCPIP 0
@@ -76,10 +129,10 @@ void BPDispMode(PFileVarProto fv, PBPVar bv)
   SetWindowText(fv->HWin,fv->DlgCaption);
 }
 
-void BPInit
-  (PFileVarProto fv, PBPVar bv, PComVar cv, PTTSet ts)
+void BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
   int i;
+  PBPVar bv = fv->data;
 
   if (bv->BPMode==IdBPAuto)
   {
@@ -191,8 +244,9 @@ int BPWrite(PFileVarProto fv, PBPVar bv, PComVar cv, PCHAR B, int C)
   return i;
 }
 
-void BPTimeOutProc(PFileVarProto fv, PBPVar bv, PComVar cv)
+void BPTimeOutProc(PFileVarProto fv, PComVar cv)
 {
+  PBPVar bv = fv->data;
   BPWrite(fv,bv,cv,"\005\005",2); /* two ENQ */
   FTSetTimeOut(fv,bv->TimeOut);
   bv->EnqSent = TRUE;
@@ -742,10 +796,11 @@ void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
       *b = *b + 0x20;
   }
 
-BOOL BPParse(PFileVarProto fv, PBPVar bv, PComVar cv)
+BOOL BPParse(PFileVarProto fv, PComVar cv)
 {
   int c;
   BYTE b;
+  PBPVar bv = fv->data;
 
   do {
 
@@ -893,9 +948,43 @@ BOOL BPParse(PFileVarProto fv, PBPVar bv, PComVar cv)
   return TRUE;
 }
 
-void BPCancel(PBPVar bv)
+void BPCancel(PFileVarProto fv, PComVar cv)
 {
-  if ((bv->BPState != BP_Failure) &&
-      (bv->BPState != BP_Close))
-    BPSendFailure(bv,'A');
+	PBPVar bv = fv->data;
+	(void)cv;
+	if ((bv->BPState != BP_Failure) &&
+		(bv->BPState != BP_Close))
+		BPSendFailure(bv,'A');
+}
+
+static int SetOptV(PFileVarProto fv, int request, va_list ap)
+{
+	PBPVar bv = fv->data;
+	switch(request) {
+	case BPLUS_MODE: {
+		int Mode = va_arg(ap, int);
+		bv->BPMode = Mode;
+		return 0;
+	}
+	}
+	return -1;
+}
+
+BOOL BPCreate(PFileVarProto fv)
+{
+	PBPVar bv;
+	bv = malloc(sizeof(*bv));
+	if (bv == NULL) {
+		return FALSE;
+	}
+	memset(bv, 0, sizeof(*bv));
+	fv->data = bv;
+
+	fv->Init = BPInit;
+	fv->Parse = BPParse;
+	fv->TimeOutProc = BPTimeOutProc;
+	fv->Cancel = BPCancel;
+	fv->SetOptV = SetOptV;
+
+	return TRUE;
 }

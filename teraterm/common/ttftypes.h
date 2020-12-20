@@ -265,6 +265,7 @@ typedef TZVar far *PZVar;
 #define Z_PktGetCRC 8
 #endif
 
+#if 0
 /* B Plus */
 typedef struct {
   BYTE WS;
@@ -315,6 +316,8 @@ typedef TBPVar far *PBPVar;
 #define BP_PktGetData  3
 #define BP_PktGetCheck 4
 #define BP_PktSending  5
+
+#endif
 
 /* Quick-VAN */
 typedef struct {
