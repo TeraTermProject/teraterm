@@ -303,7 +303,7 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				FLogPause(Pause);
 			}
 			else {
-				FileTransPause(OpId, Pause);
+				FileSendPause(Pause);
 			}
 			return TRUE;
 		case IDC_TRANSHELP:

@@ -67,6 +67,7 @@ typedef struct {
 	int ProgStat;
 
 	DWORD StartTime;
+	BOOL FilePause;
 } TFileVar;
 typedef TFileVar *PFileVar;
 
@@ -105,7 +106,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	fv->StartTime = 0;
 	fv->ProgStat = 0;
-	cv.FilePause &= ~(OpSendFile);
+	fv->FilePause = FALSE;
 
 	if (FTDlg!=NULL)
 	{
@@ -415,13 +416,14 @@ void FileSendEnd(void)
 	EndDdeCmnd(0);
 }
 
-void FileTransPause(WORD OpId, BOOL Pause)
+void FileSendPause(BOOL Pause)
 {
+	PFileVar fv = SendVar;
 	if (Pause) {
-		cv.FilePause |= OpId;
+		fv->FilePause = TRUE;
 	}
 	else {
-		cv.FilePause &= ~OpId;
+		fv->FilePause = FALSE;
 	}
 }
 
@@ -453,9 +455,9 @@ static void FileSendBinayBoost(void)
 	WORD c, fc;
 	LONG BCOld;
 	DWORD read_bytes;
+	PFileVar fv = SendVar;
 
-	if ((SendDlg == NULL) ||
-		((cv.FilePause & OpSendFile) != 0))
+	if ((SendDlg == NULL) || (fv->FilePause == TRUE))
 		return;
 
 	BCOld = SendVar->ByteCount;
@@ -510,6 +512,7 @@ void FileSend(void)
 	WORD c, fc;
 	LONG BCOld;
 	DWORD read_bytes;
+	PFileVar fv = SendVar;
 
 	if (cv.PortType == IdSerial && ts.FileSendHighSpeedMode &&
 	    BinaryMode && !FileBracketMode && !cv.TelFlag &&
@@ -517,8 +520,7 @@ void FileSend(void)
 		return FileSendBinayBoost();
 	}
 
-	if ((SendDlg==NULL) ||
-	    ((cv.FilePause & OpSendFile) !=0))
+	if ((SendDlg == NULL) || (fv->FilePause == TRUE))
 		return;
 
 	BCOld = SendVar->ByteCount;

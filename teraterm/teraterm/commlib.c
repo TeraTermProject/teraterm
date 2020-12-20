@@ -134,7 +134,6 @@ void CommInit(PComVar cv)
 	cv->Ready = FALSE;
 
 // log-buffer variables
-	cv->FilePause = 0;
 	cv->ProtoFlag = FALSE;
 /* message flag */
 	cv->NoMsg = 0;

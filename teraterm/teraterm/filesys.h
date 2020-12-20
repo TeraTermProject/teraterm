@@ -41,7 +41,7 @@ void FileSendStart(void);
 BOOL FileSendStart2(const char *filename, int binary);
 void FileSend(void);
 void FileSendEnd(void);
-void FileTransPause(WORD OpId, BOOL Pause);
+void FileSendPause(BOOL Pause);
 
 void ProtoEnd(void);
 int ProtoDlgParse(void);

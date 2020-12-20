@@ -1071,7 +1071,7 @@ typedef struct {
 	int reserve_7[3];		// BinPtr, BStart, BCount;
 	int reserve_1[2];		// DStart, DCount;
 	int reserve_8;			// BinSkip;
-	WORD FilePause;
+	WORD reserve_9;			// FilePause;
 	BOOL ProtoFlag;
 	/* message flag */
 	WORD NoMsg;
