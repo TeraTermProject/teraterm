@@ -1051,7 +1051,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		return TRUE;
 	}
 
-	if (_stati64(fv->FullName, &st) == 0) {
+	if (fv->stat(fv->FullName, &st) == 0) {
 		kv->FileAttrFlag = KMT_ATTR_TIME | KMT_ATTR_MODE | KMT_ATTR_SIZE | KMT_ATTR_TYPE;
 		kv->FileType = FALSE; // Binary
 		kv->FileTime = st.st_mtime;
@@ -1587,7 +1587,7 @@ read_end:
 				memset(&utm, 0, sizeof(utm));
 				utm.actime  = kv->FileTime;
 				utm.modtime = kv->FileTime;
-				_utime(fv->FullName, &utm);
+				fv->utime(fv->FullName, &utm);
 			}
 		}
 	}

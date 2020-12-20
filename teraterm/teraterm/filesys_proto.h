@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <sys/types.h>	// for struct utimbuf
+
 typedef struct FileVarProto {
 	// protosys_proto.cpp“à‚Ì‚ÝŽg—p
 	WORD OpId;
@@ -71,16 +73,20 @@ typedef struct FileVarProto {
 	void (*Destroy)(struct FileVarProto *fv);
 	void *data;
 
-	// file I/O
-	BOOL (*OpenRead)(struct FileVarProto *fv, const char *filenameU8);
-	BOOL (*OpenWrite)(struct FileVarProto *fv, const char *filenameU8);
+	// file I/O, Filename related functions
+	BOOL (*OpenRead)(struct FileVarProto *fv, const char *filename);
+	BOOL (*OpenWrite)(struct FileVarProto *fv, const char *filename);
 	size_t (*ReadFile)(struct FileVarProto *fv, void *buf, size_t bytes);
 	size_t (*WriteFile)(struct FileVarProto *fv, const void *buf, size_t bytes);
 	void (*Close)(struct FileVarProto *fv);
-	size_t (*GetFSize)(struct FileVarProto *fv, const char *filenameU8);
 	int (*Seek)(struct FileVarProto *fv, size_t offset);
 	void (*FileSysDestroy)(struct FileVarProto *fv);
 	HANDLE FileHandle;
+	//
+	size_t (*GetFSize)(struct FileVarProto *fv, const char *filename);
+	int (*utime)(const char *filename, struct _utimbuf* const _Time);
+	int (*stat)(const char *filename, struct _stati64* _Stat);
+	BOOL (*SetFilenameEncodeUTF8)(BOOL utf8);
 
 	// UI
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);

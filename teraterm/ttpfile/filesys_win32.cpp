@@ -27,6 +27,9 @@
  */
 
 #include <windows.h>
+#include <sys/stat.h>
+#include <sys/utime.h>
+
 #include "tttypes.h"
 #include "codeconv.h"
 
@@ -91,12 +94,12 @@ static void _Close(TFileVarProto *fv)
 
 /**
  *	ファイルのファイルサイズを取得
- *	@param[in]	filenameU8		ファイル名(UTF-8)
+ *	@param[in]	filename		ファイル名(UTF-8)
  *	@retval		ファイルサイズ
  */
-static size_t _GetFSize(struct FileVarProto *fv, const char *filenameU8)
+static size_t _GetFSize(struct FileVarProto *fv, const char *filename)
 {
-	size_t file_size = GetFSize64W(wc::fromUtf8(filenameU8));
+	size_t file_size = GetFSize64W(wc::fromUtf8(filename));
 	return file_size;
 }
 
@@ -104,7 +107,7 @@ static size_t _GetFSize(struct FileVarProto *fv, const char *filenameU8)
  *	@retval	0	ok
  *	@retval	-1	error
  * TODO size_t 以上のファイルの扱い
- * 
+ *
  */
 static int Seek(struct FileVarProto *fv, size_t offset)
 {
@@ -124,6 +127,16 @@ static int Seek(struct FileVarProto *fv, size_t offset)
 	return 0;
 }
 
+static int _stat(const char *filename, struct _stati64* _Stat)
+{
+	return _stati64(filename, _Stat);
+}
+
+static int __utime(const char *filename, struct _utimbuf* const _Time)
+{
+	return _utime(filename, _Time);
+}
+
 static void FileSysDestroy(TFileVarProto *fv)
 {
 	fv->Close(fv);
@@ -137,7 +150,9 @@ void FilesysCreate(TFileVarProto *fv)
 	fv->ReadFile = _ReadFile;
 	fv->WriteFile = _WriteFile;
 	fv->Close = _Close;
-	fv->GetFSize = _GetFSize;
 	fv->Seek = Seek;
+	fv->GetFSize = _GetFSize;
+	fv->utime = _utime;
+	fv->stat = _stat;
 	fv->FileSysDestroy = FileSysDestroy;
 }
