@@ -34,31 +34,30 @@
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
-typedef struct {
-	const char *UILanguageFile;
-	WORD OpId;
-	wchar_t *DlgCaption;
-	wchar_t *FullName;
-	wchar_t *FileName;		// NULLのとき、FullNameからファイル名を作成する
-	BOOL HideDialog;
-	HWND HMainWin;
-} CFileTransDlgInfo;
-
 class CFileTransDlg : public TTCDialog
 {
 public:
+	enum Op {
+		OpLog,
+		OpSendFile
+	};
+
+	struct Info {
+		const char *UILanguageFile;
+		Op OpId;
+		wchar_t *DlgCaption;
+		wchar_t *FullName;
+		wchar_t *FileName;		// NULLのとき、FullNameからファイル名を作成する
+		BOOL HideDialog;
+		HWND HMainWin;
+	};
+
 	CFileTransDlg();
 	~CFileTransDlg();
 
-	BOOL Create(HINSTANCE hInstance, CFileTransDlgInfo *info);
-#if 0
-	BOOL Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts);
-#endif
+	BOOL Create(HINSTANCE hInstance, Info *info);
 	void ChangeButton(BOOL PauseFlag);
 	void RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount);
-#if 0
-	void RefreshNum(TFileVar *fv);
-#endif
 
 private:
 	virtual BOOL OnCancel();

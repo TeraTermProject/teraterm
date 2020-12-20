@@ -37,8 +37,8 @@
 #define PROTO_QV  5
 #define PROTO_YM  6
 
-#define OpLog      1
-#define OpSendFile 2
+//#define OpLog      1
+//#define OpSendFile 2
 #define OpKmtRcv   3
 #define OpKmtGet   4
 #define OpKmtSend  5

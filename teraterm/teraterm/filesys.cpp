@@ -110,9 +110,9 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	if (FTDlg!=NULL)
 	{
-		CFileTransDlgInfo info;
+		CFileTransDlg::Info info;
 		info.UILanguageFile = ts.UILanguageFile;
-		info.OpId = OpSendFile;
+		info.OpId = CFileTransDlg::OpSendFile;
 		info.DlgCaption = ToWcharA(fv->DlgCaption);
 		info.FileName = NULL;
 		info.FullName = ToWcharA(fv->FullName);

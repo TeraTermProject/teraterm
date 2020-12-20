@@ -138,9 +138,9 @@ static BOOL OpenFTDlg_(PFileVar fv)
 	get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLogW, ts.UILanguageFile);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 
-	CFileTransDlgInfo info;
+	CFileTransDlg::Info info;
 	info.UILanguageFile = ts.UILanguageFile;
-	info.OpId = OpLog;
+	info.OpId = CFileTransDlg::OpLog;
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;
 	info.FullName = fv->FullName;

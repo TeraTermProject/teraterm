@@ -66,7 +66,7 @@ CFileTransDlg::~CFileTransDlg()
 	free(FullName);
 }
 
-BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
+BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 {
 	BOOL Ok;
 	int fuLoad = LR_DEFAULTCOLOR;
@@ -132,28 +132,6 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
 
 	return Ok;
 }
-
-#if 0
-BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar fv, PComVar pcv, PTTSet pts)
-{
-	CFileTransDlgInfo info;
-
-	info.UILanguageFile = pts->UILanguageFile;
-	info.OpId = fv->OpId;
-	info.DlgCaption = ToWcharA(fv->DlgCaption);
-	info.FileName = ToWcharA(&fv->FullName[fv->DirLen]);
-	info.FullName = ToWcharA(fv->FullName);
-	info.HideDialog = fv->HideDialog;
-	info.HMainWin = fv->HMainWin;
-	BOOL r = Create(hInstance, &info);
-	fv->HWin = m_hWnd;
-	fv->ProgStat = ProgStat;
-	free(info.DlgCaption);
-	free(info.FileName);
-	free(info.FullName);
-	return r;
-}
-#endif
 
 /**
  *	テキストの変更のみ
@@ -221,15 +199,6 @@ void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
 		SetDlgItemText(IDC_TRANSBYTES, NumStr);
 	}
 }
-
-#if 0
-void CFileTransDlg::RefreshNum(TFileVar *fv)
-{
-	ProgStat = fv->ProgStat;
-	RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
-	fv->ProgStat = ProgStat;
-}
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg message handler
