@@ -40,9 +40,6 @@ void FTConvFName(PCHAR FName);
 BOOL GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
-#if 1
-void FTLog1Byte(PFileVarProto fv, BYTE b);
-#endif
 void FTSetTimeOut(PFileVarProto fv, int T);
 BOOL FTCreateFile(PFileVarProto fv);
 

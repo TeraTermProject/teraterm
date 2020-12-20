@@ -101,62 +101,6 @@ LONG UpdateCRC32(BYTE b, LONG CRC)
   return CRC;
 }
 
-#if 1
-void FTLog1Byte(PFileVarProto fv, BYTE b)
-{
-  char d[3];
-
-  if (fv->FlushLogLineBuf) {
-	  int rest = 16 - fv->LogCount;
-	  int i;
-
-	  for (i = 0 ; i < rest ; i++)
-		 _lwrite(fv->LogFile,"   ", 3);
-  }
-
-  if (fv->LogCount == 16 || fv->FlushLogLineBuf)
-  {
-	  int i;
-
-      // ASCII•\Ž¦‚ð’Ç‰Á (2008.6.3 yutaka)
-	  _lwrite(fv->LogFile,"    ", 4);
-	  for (i = 0 ; i < fv->LogCount ; i++) {
-		  char ch[5];
-		  if (isprint(fv->LogLineBuf[i])) {
-			  _snprintf_s(ch, sizeof(ch), _TRUNCATE, "%c", fv->LogLineBuf[i]);
-			  _lwrite(fv->LogFile, ch, 1);
-
-		  } else {
-			  _lwrite(fv->LogFile, ".", 1);
-
-		  }
-
-	  }
-
-    fv->LogCount = 0;
-    _lwrite(fv->LogFile,"\015\012",2);
-
-	if (fv->FlushLogLineBuf)
-		return;
-  }
-
-  if (b<=0x9f)
-    d[0] = (b >> 4) + 0x30;
-  else
-    d[0] = (b >> 4) + 0x37;
-
-  if ((b & 0x0f) <= 0x9)
-    d[1] = (b & 0x0F) + 0x30;
-  else
-    d[1] = (b & 0x0F) + 0x37;
-
-  d[2] = 0x20;
-  _lwrite(fv->LogFile,d,3);
-  fv->LogLineBuf[fv->LogCount] = b;    // add (2008.6.3 yutaka)
-  fv->LogCount++;
-}
-#endif
-
 void FTSetTimeOut(PFileVarProto fv, int T)
 {
   KillTimer(fv->HMainWin, IdProtoTimer);
