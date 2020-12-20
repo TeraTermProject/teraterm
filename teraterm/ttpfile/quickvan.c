@@ -418,18 +418,20 @@ static BOOL QVGetNum2(PQVVar qv, int *i, LPWORD w)
 
 static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
 {
-  int i, j;
+  TFileIO *file = fv->file;
+  int i;
   WORD w;
   BYTE b;
+  char *filename;
 
   if ((qv->QVState != QV_RecvInit2) &&
       (qv->QVState != QV_RecvNext))
     return TRUE;
 
   /* file name */
-  GetFileNamePos(&(qv->PktIn[5]),&i,&j);
-  strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
-  strncat_s(fv->FullName, _countof(fv->FullName), &(qv->PktIn[5+j]), _TRUNCATE);
+  filename = file->GetRecieveFilename(file, &(qv->PktIn[5]), FALSE, fv->RecievePath, !fv->OverWrite);
+  strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
+  free(filename);
   /* file open */
   if (! FTCreateFile(fv)) return FALSE;
   /* file size */
@@ -828,10 +830,9 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   int i, j;
   struct stat stbuf;
   struct tm tmbuf;
-  char fullname_upper[MAX_PATH];
   BOOL r;
-  int FnPos;
   TFileIO *file = fv->file;
+  char *filename;
 
   if (! GetNextFname(fv))
   {
@@ -867,15 +868,13 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   i = 3;
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */
-  fv->SetDlgProtoFileName(fv, fv->FullName);
-  GetFileNamePos(fv->FullName, NULL, &FnPos);
-  strncpy_s(fullname_upper, _countof(fullname_upper), &(fv->FullName[FnPos]), _TRUNCATE);
-  _strupr_s(fullname_upper, sizeof(fullname_upper));
-  FTConvFName(fullname_upper);  // replace ' ' by '_' in FName
-  strncpy_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,fullname_upper,_TRUNCATE);
+  fv->SetDlgProtoFileName(fv, qv->FullName);
+  filename = file->GetSendFilename(file, qv->FullName, FALSE, TRUE, TRUE);
+  strncpy_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,filename,_TRUNCATE);
   i = strlen(&(qv->PktOut[i])) + i;
   qv->PktOut[i] = 0;
   i++;
+  free(filename);
   /* file size */
   _snprintf_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,_TRUNCATE,"%u",fv->FileSize);
   i = strlen(&(qv->PktOut[i])) + i;

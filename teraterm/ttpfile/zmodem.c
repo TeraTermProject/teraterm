@@ -560,8 +560,8 @@ static void ZSendFileHdr(PZVar zv)
 static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 {
 	int i, j;
-	int FNPos;
 	TFileIO *file = fv->file;
+	char *filename;
 
 	if (!fv->FileOpen) {
 		ZSendCancel(zv);
@@ -570,9 +570,8 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, fv->FullName);
 
 	/* file name */
-	GetFileNamePos(fv->FullName, NULL, &FNPos);
-	strncpy_s(zv->PktOut, sizeof(zv->PktOut), &(fv->FullName[FNPos]), _TRUNCATE);
-	FTConvFName(zv->PktOut);	// replace ' ' by '_' in FName
+	filename = file->GetSendFilename(file, zv->FullName, FALSE, TRUE, FALSE);
+	strncpy_s(zv->PktOut, sizeof(zv->PktOut), filename, _TRUNCATE);
 	zv->PktOutCount = strlen(zv->PktOut);
 	zv->CRC = 0;
 	for (i = 0; i <= zv->PktOutCount - 1; i++)
@@ -622,7 +621,8 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	add_sendbuf("%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
 		__FUNCTION__,
 		zv->TxHdr[ZF0], zv->TxHdr[ZF1],zv->TxHdr[ZF2],
-		&(fv->FullName[FNPos]), fv->FileSize);
+		filename, fv->FileSize);
+	free(filename);
 }
 
 static void ZSendDataHdr(PZVar zv)
@@ -1046,7 +1046,8 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	long modtime;
 	int mode;
 	int ret;
-	int FnPos;
+	TFileIO* file = fv->file;
+	char *filename;
 
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
 		return FALSE;
@@ -1057,9 +1058,9 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	/* file name */
 	zv->PktIn[zv->PktInPtr] = 0;	/* for safety */
 
-	GetFileNamePos(zv->PktIn, NULL, &FnPos);
-	strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
-	strncat_s(fv->FullName, _countof(fv->FullName), &(zv->PktIn[FnPos]), _TRUNCATE);
+	filename = file->GetRecieveFilename(file, zv->PktIn, FALSE, fv->RecievePath, !fv->OverWrite);
+	strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
+	free(filename);
 	/* file open */
 	if (!FTCreateFile(fv))
 		return FALSE;

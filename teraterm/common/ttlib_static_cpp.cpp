@@ -625,3 +625,57 @@ void AppendSlashW(wchar_t *Path, size_t destlen)
 		}
 	}
 }
+
+/**
+ *	ファイル名(パス名)を解析する
+ *	GetFileNamePos() の UTF-8版
+ *
+ *	@param[in]	PathName	ファイル名、フルパス
+ *	@param[out]	DirLen		末尾のスラッシュを含むディレクトリパス長
+ *							NULLのとき値を返さない
+ *	@param[out]	FNPos		ファイル名へのindex
+ *							&PathName[FNPos] がファイル名
+ *							NULLのとき値を返さない
+ *	@retval		FALSE		PathNameが不正
+ */
+BOOL GetFileNamePosU8(const char *PathName, int *DirLen, int *FNPos)
+{
+	BYTE b;
+	const char *Ptr;
+	const char *DirPtr;
+	const char *FNPtr;
+	const char *PtrOld;
+
+	if (DirLen != NULL) *DirLen = 0;
+	if (FNPos != NULL) *FNPos = 0;
+
+	if (PathName==NULL)
+		return FALSE;
+
+	if ((strlen(PathName)>=2) && (PathName[1]==':'))
+		Ptr = &PathName[2];
+	else
+		Ptr = PathName;
+	if (Ptr[0]=='\\' || Ptr[0]=='/')
+		Ptr++;
+
+	DirPtr = Ptr;
+	FNPtr = Ptr;
+	while (Ptr[0]!=0) {
+		b = Ptr[0];
+		PtrOld = Ptr;
+		Ptr++;
+		switch (b) {
+			case ':':
+				return FALSE;
+			case '/':	/* FALLTHROUGH */
+			case '\\':
+				DirPtr = PtrOld;
+				FNPtr = Ptr;
+				break;
+		}
+	}
+	if (DirLen != NULL) *DirLen = DirPtr-PathName;
+	if (FNPos != NULL) *FNPos = FNPtr-PathName;
+	return TRUE;
+}

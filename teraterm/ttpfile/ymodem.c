@@ -618,14 +618,16 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		int ret;
 		BYTE *p;
 		char *name, *nameend;
+		char *filename;
 
 		p = (BYTE *)malloc(yv->__DataLen + 1);
 		memset(p, 0, yv->__DataLen + 1);
 		memcpy(p, &(yv->PktIn[3]), yv->__DataLen);
 		name = p;
 
-		strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
-		strncat_s(fv->FullName, _countof(fv->FullName), name, _TRUNCATE);
+		filename = file->GetRecieveFilename(file, name, FALSE, fv->RecievePath, !fv->OverWrite);
+		strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
+		free(filename);
 		if (!FTCreateFile(fv)) {
 			free(p);
 			return FALSE;
@@ -906,7 +908,8 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				size_t idx;
 				// TODO: remove magic number.
 				BYTE buf[1024 + 10];
-				int FnPos;
+				TFileIO *file = fv->file;
+				char *filename;
 
 				// 128 bytes for the first packet.
 				current_packet_size = SOH_DATALEN;
@@ -914,10 +917,11 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->PktOut[0] = SOH;
 
 				// Timestamp.
-				fv->FileMtime = GetFMtime(fv->FullName);
+				fv->FileMtime = file->GetFMtime(file, fv->FullName);
 
-				GetFileNamePos(fv->FullName, NULL, &FnPos);
-				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", &(fv->FullName[FnPos]));
+				filename = file->GetSendFilename(file, yv->FullName, FALSE, FALSE, FALSE);
+				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", filename);
+				free(filename);
 
 				// NULL-terminated string.
 				buf[ret] = 0x00;

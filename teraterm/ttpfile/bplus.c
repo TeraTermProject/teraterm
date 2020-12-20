@@ -579,8 +579,8 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
   BYTE b;
 //  char Temp[HostNameMaxLength + 1]; // 81(yutaka)
   char Temp[81]; // 81(yutaka)
-  int FnPos;
   TFileIO *fileio = fv->file;
+  char *filename;
 
   switch (bv->PktIn[2]) {
     case 'C': /* Close */
@@ -616,9 +616,10 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
       }
       Temp[j] = 0;
 
-      strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
-      GetFileNamePos(Temp,NULL,&FnPos);
-      strncat_s(fv->FullName, _countof(fv->FullName), &(Temp[FnPos]), _TRUNCATE);
+      filename = fileio->GetRecieveFilename(fileio, fv->RecievePath, FALSE, Temp, !fv->OverWrite);
+      strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
+      free(filename);
+
       /* file open */
       if (! FTCreateFile(fv))
       {
@@ -663,10 +664,9 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 	}
 	Temp[j] = 0;
 
-	GetFileNamePos(Temp,NULL,&FnPos);
-	FitFileName(&(Temp[FnPos]),sizeof(Temp) - FnPos,NULL);
-	strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
-	strncat_s(fv->FullName, _countof(fv->FullName), &(Temp[FnPos]), _TRUNCATE);
+	filename = fileio->GetRecieveFilename(fileio, Temp, FALSE, fv->RecievePath, !fv->OverWrite);
+	strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
+	free(filename);
 
 	/* file open */
 	if (! BPOpenFileToBeSent(fv))

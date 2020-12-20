@@ -281,13 +281,13 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 		// ファイル送信開始前に、"rx ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		if (ts->XModemRcvCommand[0] != '\0') {
+			TFileIO *file = fv->file;
 			char inistr[MAX_PATH + 10];
-			int i, j;
-			GetFileNamePos(fv->FullName,&i,&j);
+			char *filename = file->GetSendFilename(file, xv->FullName, FALSE, TRUE, FALSE);
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s %s\015",
-						ts->XModemRcvCommand, &(fv->FullName[j]));
-			FTConvFName(inistr + strlen(ts->XModemRcvCommand) + 1);
+						ts->XModemRcvCommand, filename);
 			XWrite(fv, xv, cv, inistr, strlen(inistr));
+			free(filename);
 		}
 
 		FTSetTimeOut(fv, xv->TOutVLong);

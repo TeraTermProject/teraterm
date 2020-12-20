@@ -27,8 +27,10 @@
  */
 
 #include <windows.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/utime.h>
+#include <assert.h>
 
 #include "filesys_io.h"
 #include "filesys_win32.h"
@@ -36,16 +38,17 @@
 #include "tttypes.h"
 #include "layer_for_unicode.h"
 #include "codeconv.h"
+#include "ftlib.h"
 
 typedef struct FileIOWin32 {
 	HANDLE FileHandle;
-	BOOL utf32;
+	BOOL utf8;
 } TFileIOWin32;
 
 static wc GetFilenameW(TFileIOWin32 *data, const char *filename)
 {
 	wc filenameW;
-	if (data->utf32) {
+	if (data->utf8) {
 		filenameW = wc::fromUtf8(filename);
 	}
 	else {
@@ -89,8 +92,9 @@ static size_t _ReadFile(TFileIO *fv, void *buf, size_t bytes)
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
 	HANDLE hFile = data->FileHandle;
 	DWORD NumberOfBytesRead;
-	BOOL Result = ReadFile(hFile, buf, (UINT)bytes, &NumberOfBytesRead, NULL);
-	if (Result == FALSE) {
+	BOOL result = ReadFile(hFile, buf, (UINT)bytes, &NumberOfBytesRead, NULL);
+	assert(result != 0);
+	if (result == 0) {
 		return 0;
 	}
 	return NumberOfBytesRead;
@@ -103,7 +107,8 @@ static size_t _WriteFile(TFileIO *fv, const void *buf, size_t bytes)
 	DWORD NumberOfBytesWritten;
 	UINT length = (UINT)bytes;
 	BOOL result = WriteFile(hFile, buf, length, &NumberOfBytesWritten, NULL);
-	if (result == FALSE) {
+	assert(result != 0);
+	if (result == 0) {
 		return 0;
 	}
 	return NumberOfBytesWritten;
@@ -170,6 +175,194 @@ static int __utime(TFileIO *fv, const char *filename, struct _utimbuf* const _Ti
 	return _wutime(filenameW, _Time);
 }
 
+// replace ' ' by '_' in FName
+static void FTConvFName(PCHAR FName)
+{
+	int i;
+
+	i = 0;
+	while (FName[i]!=0)
+	{
+		if (FName[i]==' ')
+			FName[i] = '_';
+		i++;
+	}
+}
+
+/**
+ *	送信用ファイル名作成
+ *	fullname(fullpath)からファイル名を取り出して必要な変換を行う
+ *	Windowsファイル名から送信に適したファイル名に変換する
+ *
+ *	@param[in]	fullname	Tera Termが送信するファイル UTF8(となる予定)
+ *	@param[in]	utf8		出力ファイル名のエンコード
+ *							TRUEのとき、UTF-8
+ *							FALSEのとき、ANSI
+ *	@retval		ファイル名 (UTF-8 or ANSI)
+ *				不要になったら free() する
+ */
+static char *GetSendFilename(TFileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper)
+{
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	int FnPos;
+	char *filename;
+	if (data->utf8) {
+		GetFileNamePosU8(fullname, NULL, &FnPos);
+		if (utf8) {
+			// UTF8 -> UTF8
+			filename = _strdup(fullname + FnPos);
+		}
+		else {
+			// UTF8 -> ANSI
+			filename = ToCharU8(fullname + FnPos);
+		}
+	}
+	else {
+		GetFileNamePos(fullname, NULL, &FnPos);
+		if (utf8) {
+			// ANSI -> UTF8
+			filename = ToU8A(fullname + FnPos);
+		}
+		else {
+			// ANSI -> ANSI
+			filename = _strdup(fullname + FnPos);
+		}
+	}
+	if (space) {
+		// replace ' ' by '_' in filename
+		FTConvFName(filename);
+	}
+	if (upper) {
+		_strupr(filename);
+	}
+	return filename;
+}
+
+static char *CreateFilenameWithNumber(const char *fullpath, int n)
+{
+	int FnPos;
+	char Num[11];
+
+	size_t len = strlen(fullpath) + sizeof(Num);
+	char *new_name = (char *)malloc(len);
+
+//	GetFileNamePos(fullpath, NULL, &FnPos);
+	GetFileNamePosU8(fullpath, NULL, &FnPos);
+
+	_snprintf_s(Num,sizeof(Num),_TRUNCATE,"%u",n);
+	size_t num_len = strlen(Num);
+
+	const char *filename = &fullpath[FnPos];
+	size_t filename_len = strlen(filename);
+	const char *ext = strrchr(filename, '.');
+	if (ext == NULL) {
+		// 拡張子なし
+		char *d = new_name;
+		memcpy(d, fullpath, FnPos + filename_len);
+		d += FnPos + filename_len;
+		memcpy(d, Num, num_len);
+		d += num_len;
+		*d = 0;
+	}
+	else {
+		// 拡張子あり
+		size_t ext_len = strlen(ext);
+		size_t base_len = filename_len - ext_len;
+
+		char *d = new_name;
+		memcpy(d, fullpath, FnPos + base_len);
+		d += FnPos + base_len;
+		memcpy(d, Num, num_len);
+		d += num_len;
+		memcpy(d, ext, ext_len);
+		d += ext_len;
+		*d = 0;
+	}
+	return new_name;
+}
+
+static char *CreateUniqueFilename(const char *fullpath)
+{
+	int i = 1;
+	while(1) {
+		char *filename = CreateFilenameWithNumber(fullpath, i);
+		if (!DoesFileExist(filename)) {
+			return filename;
+		}
+		free(filename);
+		i++;
+	}
+}
+
+/**
+ *	受信用ファイル名作成
+ *	fullnameから必要な変換を行う
+ *	送られてきたファイル名がANSIかUTF8かは
+ *	通信先やプロトコルによると思われる
+ *	受信したファイル名からWindowsに適したファイル名に変換する
+ *
+ *	@param[in]	filename	通信で送られてきたファイル名, 入力ファイル名
+ *	@param[in]	utf8		入力ファイル名のエンコード
+ *							TRUEのとき、UTF-8
+ *							FALSEのとき、ANSI
+ *	@param[in]	path		受信フォルダ ファイル名の前に付加される UTF-8
+ *							NULLのとき付加されない
+ *	@param[in]	unique		TRUEのとき
+ *							ファイルが存在したときファイル名の後ろに数字を追加する
+ *	@retval		ファイル名 UTF-8
+ *				不要になったら free() する
+ */
+static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
+{
+	char* new_name;
+	if (utf8) {
+		// UTF8 -> UTF8
+		int FnPos;
+		GetFileNamePosU8(filename, NULL, &FnPos);
+		new_name = _strdup(&filename[FnPos]);
+	}
+	else {
+		// ANSI -> UTF8
+		int FnPos;
+		GetFileNamePos(filename, NULL, &FnPos);
+		new_name = ToU8A(&filename[FnPos]);
+	}
+	size_t len = strlen(new_name) + 1;
+	FitFileName(new_name, len, NULL);
+	replaceInvalidFileNameChar(new_name, '_');
+
+	// to fullpath
+	char *full;
+	if (path == NULL) {
+		full = new_name;
+	}
+	else {
+		size_t full_len = len + strlen(path);
+		full = (char *)malloc(full_len);
+		strcpy(full, path);
+		strcat(full, new_name);
+	}
+
+	// to unique
+	if (unique) {
+		char *filename = CreateUniqueFilename(full);
+		free(full);
+		full = filename;
+	}
+
+	return full;
+}
+
+static long GetFMtime(TFileIO *fv, const char *FName)
+{
+	struct _stat st;
+
+	if (_stat(FName,&st)==-1) {
+		return 0;
+	}
+	return (long)st.st_mtime;
+}
+
 static void FileSysDestroy(TFileIO *fv)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
@@ -186,7 +379,7 @@ TFileIO *FilesysCreateWin32(void)
 		return NULL;
 	}
 	data->FileHandle = INVALID_HANDLE_VALUE;
-	data->utf32 = FALSE;
+	data->utf8 = TRUE;
 	TFileIO *fv = (TFileIO *)calloc(sizeof(TFileIO), 1);
 	if (fv == NULL) {
 		free(data);
@@ -203,5 +396,8 @@ TFileIO *FilesysCreateWin32(void)
 	fv->utime = __utime;
 	fv->stat = __stat;
 	fv->FileSysDestroy = FileSysDestroy;
+	fv->GetSendFilename = GetSendFilename;
+	fv->GetRecieveFilename = GetRecieveFilename;
+	fv->GetFMtime = GetFMtime;
 	return fv;
 }

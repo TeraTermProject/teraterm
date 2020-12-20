@@ -1048,7 +1048,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	TFileIO *file = fv->file;
 	struct _stati64 st;
 	BOOL r;
-	int FnPos;
+	char *filename;
 
 	if (! GetNextFname(fv))
 	{
@@ -1094,12 +1094,12 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	KmtIncPacketNum(kv);
-	GetFileNamePos(fv->FullName, NULL, &FnPos);
-	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[FnPos]),_TRUNCATE); // put FName
-	FTConvFName(&(kv->PktOut[4]));  // replace ' ' by '_' in FName
+	filename = file->GetSendFilename(file, kv->FullName, FALSE, TRUE, FALSE);
+	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4, filename,_TRUNCATE); // put FName
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'F',
-	strlen(&(fv->FullName[FnPos])));
+				  strlen(filename));
 	KmtSendPacket(fv,kv,cv);
+	free(filename);
 
 	kv->RepeatCount = 0;
 	kv->NextByteFlag = FALSE;
@@ -1150,19 +1150,23 @@ static BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 static void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
-	int FnPos;
+	TFileIO *file = fv->file;
+	char *filename;
+	const size_t filename_len_max = kv->KmtYour.MAXL - kv->KmtMy.CHKT - 4;
+
 	kv->PktNum = 0;
 	kv->PktNumOffset = 0;
 
-	GetFileNamePos(fv->FullName, NULL, &FnPos);
-	if ((signed int)strlen(&(fv->FullName[FnPos])) >=
-		kv->KmtYour.MAXL - kv->KmtMy.CHKT - 4)
-		fv->FullName[FnPos +kv->KmtYour.MAXL-kv->KmtMy.CHKT-4] = 0;
+	filename = file->GetRecieveFilename(file, fv->FullName, FALSE, NULL, FALSE);
+	if (strlen(filename) >= filename_len_max) {
+		filename[filename_len_max] = 0;
+	}
 
-	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[FnPos]),_TRUNCATE);
+	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,filename,_TRUNCATE);
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'R',
-		strlen(&(fv->FullName[FnPos])));
+		strlen(filename));
 	KmtSendPacket(fv,kv,cv);
+	free(filename);
 
 	kv->KmtState = GetInit;
 }
@@ -1431,15 +1435,16 @@ read_end:
 		if ((kv->KmtState==ReceiveFile) ||
 			(kv->KmtState==GetInit))
 		{
-			int FnPos;
+			TFileIO *file = fv->file;
+			char *filename;
 			kv->KmtMode = IdKmtReceive;
 
 			Len = sizeof(FNBuff);
 			KmtDecode(fv,kv,FNBuff,&Len);
 			FNBuff[Len] = 0;
-			GetFileNamePos(FNBuff,NULL,&FnPos);
-			strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
-			strncat_s(fv->FullName, _countof(fv->FullName), &FNBuff[FnPos], _TRUNCATE);
+			filename = file->GetRecieveFilename(file, FNBuff, FALSE, fv->RecievePath, !fv->OverWrite);
+			strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
+			free(filename);
 			/* file open */
 			if (! FTCreateFile(fv)) return FALSE;
 			kv->KmtState = ReceiveData;

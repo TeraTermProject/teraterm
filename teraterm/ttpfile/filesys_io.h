@@ -31,6 +31,7 @@
 #include <sys/types.h>	// for struct utimbuf
 #include <sys/stat.h>
 #include <sys/utime.h>
+#include <windows.h>	// for BOOL
 
 typedef struct FileIO {
 	// file I/O, Filename related functions
@@ -45,6 +46,9 @@ typedef struct FileIO {
 	size_t (*GetFSize)(struct FileIO *fv, const char *filename);
 	int (*utime)(struct FileIO *fv, const char *filename, struct _utimbuf* const _Time);
 	int (*stat)(struct FileIO *fv, const char *filename, struct _stati64* _Stat);
+	char *(*GetSendFilename)(struct FileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper);
+	char *(*GetRecieveFilename)(struct FileIO *fv, const char* filename, BOOL utf8, const char *path, BOOL unique);
+	long (*GetFMtime)(struct FileIO *fv, const char *fullname);
 	//
 	BOOL (*SetFilenameEncodeUTF8)(struct FileIO *fv, BOOL utf8);
 	//
