@@ -181,7 +181,7 @@ static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 	}
 	XWrite(fv, xv, cv, &b, 1);
 	xv->PktReadMode = XpktSOH;
-	FTSetTimeOut(fv, t);
+	fv->FTSetTimeOut(fv, t);
 }
 
 static WORD XCalcCheck(PXVar xv, PCHAR PktBuf)
@@ -291,7 +291,7 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			free(filename);
 		}
 
-		FTSetTimeOut(fv, xv->TOutVLong);
+		fv->FTSetTimeOut(fv, xv->TOutVLong);
 		break;
 	case IdXReceive:
 		XSendNAK(fv, xv, cv);
@@ -343,7 +343,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 					XSetOpt(fv, xv, XoptCRC);
 				else if (xv->XOpt == Xopt1kCksum)
 					XSetOpt(fv, xv, XoptCheck);
-				FTSetTimeOut(fv, xv->TOutShort);
+				fv->FTSetTimeOut(fv, xv->TOutShort);
 				break;
 			case STX:
 				xv->PktIn[0] = b;
@@ -352,7 +352,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 					XSetOpt(fv, xv, Xopt1kCRC);
 				else if (xv->XOpt == XoptCheck)
 					XSetOpt(fv, xv, Xopt1kCksum);
-				FTSetTimeOut(fv, xv->TOutShort);
+				fv->FTSetTimeOut(fv, xv->TOutShort);
 				break;
 			case EOT:
 				b = ACK;
@@ -381,7 +381,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 		case XpktBLK:
 			xv->PktIn[1] = b;
 			xv->PktReadMode = XpktBLK2;
-			FTSetTimeOut(fv, xv->TOutShort);
+			fv->FTSetTimeOut(fv, xv->TOutShort);
 			break;
 		case XpktBLK2:
 			xv->PktIn[2] = b;
@@ -389,7 +389,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 				xv->PktBufPtr = 3;
 				xv->PktBufCount = xv->DataLen + xv->CheckLen;
 				xv->PktReadMode = XpktDATA;
-				FTSetTimeOut(fv, xv->TOutShort);
+				fv->FTSetTimeOut(fv, xv->TOutShort);
 			} else
 				XSendNAK(fv, xv, cv);
 			break;
@@ -399,10 +399,10 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 			xv->PktBufCount--;
 			GetPkt = xv->PktBufCount == 0;
 			if (GetPkt) {
-				FTSetTimeOut(fv, xv->TOutLong);
+				fv->FTSetTimeOut(fv, xv->TOutLong);
 				xv->PktReadMode = XpktSOH;
 			} else
-				FTSetTimeOut(fv, xv->TOutShort);
+				fv->FTSetTimeOut(fv, xv->TOutShort);
 			break;
 		}
 	}
@@ -467,7 +467,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 	fv->SetDlgByteCount(fv, fv->ByteCount);
 	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
-	FTSetTimeOut(fv, xv->TOutLong);
+	fv->FTSetTimeOut(fv, xv->TOutLong);
 
 	return TRUE;
 }
@@ -534,7 +534,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 			xv->CANCount = 0;
 		}
 		// reset timeout timer
-		FTSetTimeOut(fv, xv->TOutVLong);
+		fv->FTSetTimeOut(fv, xv->TOutVLong);
 
 		do {
 			i = XRead1Byte(fv, xv, cv, &b);

@@ -307,8 +307,8 @@ static char *CreateUniqueFilename(const char *fullpath)
  *							FALSEのとき、ANSI
  *	@param[in]	path		受信フォルダ ファイル名の前に付加される UTF-8
  *							NULLのとき付加されない
- *	@param[in]	unique		TRUEのとき
- *							ファイルが存在したときファイル名の後ろに数字を追加する
+ *	@param[in]	unique		TRUEのとき、すでにファイルが存在しているかチェックする
+ *							ファイルが存在したとき、ファイル名の後ろに数字を追加する
  *	@retval		ファイル名 UTF-8
  *				不要になったら free() する
  */

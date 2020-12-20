@@ -346,7 +346,7 @@ static void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	if (kv->KmtYour.EOL > 0)
 		CommBinaryOut(cv,&(kv->KmtYour.EOL), 1);
 
-	FTSetTimeOut(fv,kv->KmtYour.TIME);
+	fv->FTSetTimeOut(fv,kv->KmtYour.TIME);
 }
 
 static void KmtMakePacket(PFileVarProto fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataLen)
@@ -1262,7 +1262,7 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		break;
 	case IdKmtReceive:
 		kv->KmtState = ReceiveInit;
-		FTSetTimeOut(fv,kv->KmtYour.TIME);
+		fv->FTSetTimeOut(fv,kv->KmtYour.TIME);
 		break;
 	case IdKmtGet:
 		KmtSendInitPkt(fv,kv,cv,'I');

@@ -77,13 +77,6 @@ LONG UpdateCRC32(BYTE b, LONG CRC)
   return CRC;
 }
 
-void FTSetTimeOut(PFileVarProto fv, int T)
-{
-  KillTimer(fv->HMainWin, IdProtoTimer);
-  if (T==0) return;
-  SetTimer(fv->HMainWin, IdProtoTimer, T*1000, NULL);
-}
-
 //
 // プロトコル用ログ
 //

@@ -132,6 +132,13 @@ static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
 	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, CurProgStat);
 }
 
+static void FTSetTimeOut(PFileVarProto fv, int T)
+{
+	KillTimer(fv->HMainWin, IdProtoTimer);
+	if (T==0) return;
+	SetTimer(fv->HMainWin, IdProtoTimer, T*1000, NULL);
+}
+
 static BOOL NewFileVar_(PFileVarProto *pfv)
 {
 	if (*pfv != NULL) {
@@ -156,6 +163,8 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->HideDialog = FALSE;
 
 	fv->file = FilesysCreateWin32();
+
+	fv->FTSetTimeOut = FTSetTimeOut;
 
 	fv->InitDlgProgress = _InitDlgProgress;
 	fv->SetDlgTime = _SetDlgTime;

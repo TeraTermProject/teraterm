@@ -209,7 +209,7 @@ static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 	}
 	YWrite(fv,yv,cv,&b,1);
 	yv->PktReadMode = XpktSOH;
-	FTSetTimeOut(fv,t);
+	fv->FTSetTimeOut(fv,t);
 }
 
 static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
@@ -251,7 +251,7 @@ static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 	}
 	YWrite(fv,yv,cv,&b,1);
 	yv->PktReadMode = XpktSOH;
-	FTSetTimeOut(fv,t);
+	fv->FTSetTimeOut(fv,t);
 }
 
 static WORD YCalcCheck(PYVar yv, const PCHAR PktBuf, const WORD len)
@@ -401,7 +401,7 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			YWrite(fv,yv,cv, inistr , strlen(inistr));
 		}
 
-		FTSetTimeOut(fv, yv->TOutVLong);
+		fv->FTSetTimeOut(fv, yv->TOutVLong);
 		break;
 
 	case IdYReceive:
@@ -500,14 +500,14 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->PktIn[0] = b;
 				yv->PktReadMode = XpktBLK;
 				yv->__DataLen = SOH_DATALEN;
-				FTSetTimeOut(fv,yv->TOutShort);
+				fv->FTSetTimeOut(fv,yv->TOutShort);
 			}
 			else if (b==STX)
 			{
 				yv->PktIn[0] = b;
 				yv->PktReadMode = XpktBLK;
 				yv->__DataLen = STX_DATALEN;
-				FTSetTimeOut(fv,yv->TOutShort);
+				fv->FTSetTimeOut(fv,yv->TOutShort);
 			}
 			else if (b==EOT)
 			{
@@ -547,7 +547,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		case XpktBLK:
 			yv->PktIn[1] = b;
 			yv->PktReadMode = XpktBLK2;
-			FTSetTimeOut(fv,yv->TOutShort);
+			fv->FTSetTimeOut(fv,yv->TOutShort);
 			break;
 		case XpktBLK2:
 			nak = 1;
@@ -565,7 +565,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->PktBufPtr = 3;
 				yv->PktBufCount = yv->__DataLen + yv->CheckLen;
 				yv->PktReadMode = XpktDATA;
-				FTSetTimeOut(fv,yv->TOutShort);
+				fv->FTSetTimeOut(fv,yv->TOutShort);
 			}
 			else
 				YSendNAK(fv,yv,cv);
@@ -577,11 +577,11 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			GetPkt = yv->PktBufCount==0;
 			if (GetPkt)
 			{
-				FTSetTimeOut(fv,yv->TOutLong);
+				fv->FTSetTimeOut(fv,yv->TOutLong);
 				yv->PktReadMode = XpktSOH;
 			}
 			else
-				FTSetTimeOut(fv,yv->TOutShort);
+				fv->FTSetTimeOut(fv,yv->TOutShort);
 			break;
 		}
 
@@ -712,7 +712,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
-	FTSetTimeOut(fv,yv->TOutLong);
+	fv->FTSetTimeOut(fv,yv->TOutLong);
 
 	return TRUE;
 }
@@ -837,7 +837,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		}
 
 		// reset timeout timer
-		FTSetTimeOut(fv, yv->TOutVLong);
+		fv->FTSetTimeOut(fv, yv->TOutVLong);
 #if 0
 		// 後続のサーバからのデータを読み捨てる。
 		do

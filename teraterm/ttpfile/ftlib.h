@@ -39,7 +39,6 @@ void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
 BOOL GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
-void FTSetTimeOut(PFileVarProto fv, int T);
 
 typedef struct ProtoLog {
 	// public

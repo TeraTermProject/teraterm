@@ -253,7 +253,7 @@ static void BPTimeOutProc(PFileVarProto fv, PComVar cv)
 {
   PBPVar bv = fv->data;
   BPWrite(fv,bv,cv,"\005\005",2); /* two ENQ */
-  FTSetTimeOut(fv,bv->TimeOut);
+  fv->FTSetTimeOut(fv,bv->TimeOut);
   bv->EnqSent = TRUE;
 }
 
@@ -771,7 +771,7 @@ static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
   b = (b - 0x30) % 10;
   if (bv->EnqSent)
   {
-    FTSetTimeOut(fv,0);
+    fv->FTSetTimeOut(fv,0);
     bv->EnqSent = FALSE;
     if ((bv->PktOutLen>0) && (b==bv->PktNum)) /* Resend packet */
     {
@@ -788,7 +788,7 @@ static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
   else
     return;
 
-  FTSetTimeOut(fv,0);
+  fv->FTSetTimeOut(fv,0);
   bv->PktNum = b;
   if (b==0)
     bv->PktNumOffset = bv->PktNumOffset + 10;
@@ -855,7 +855,7 @@ static BOOL BPParse(PFileVarProto fv, PComVar cv)
       if (cv->OutBuffCount==0)
       {
 	bv->BPPktState = BP_PktGetDLE;
-	FTSetTimeOut(fv,bv->TimeOut);
+	fv->FTSetTimeOut(fv,bv->TimeOut);
       }
       else
 	return TRUE;
@@ -883,7 +883,7 @@ static BOOL BPParse(PFileVarProto fv, PComVar cv)
 	      break;
 	    case 0x15: /* NAK */
 	      BPWrite(fv,bv,cv,"\005\005",2); /* two ENQs */
-	      FTSetTimeOut(fv,bv->TimeOut);
+	      fv->FTSetTimeOut(fv,bv->TimeOut);
 	      bv->EnqSent = TRUE;
 	      break;
 	  }

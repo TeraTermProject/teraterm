@@ -456,7 +456,7 @@ static void ZSendRInit(PFileVarProto fv, PZVar zv)
 	if (zv->CtlEsc)
 		zv->TxHdr[ZF0] = zv->TxHdr[ZF0] | ESCCTL;
 	ZShHdr(zv, ZRINIT);
-	FTSetTimeOut(fv, zv->TOutInit);
+	fv->FTSetTimeOut(fv, zv->TOutInit);
 }
 
 static void ZSendRQInit(PFileVarProto fv, PZVar zv, PComVar cv)
@@ -469,14 +469,14 @@ static void ZSendRPOS(PFileVarProto fv, PZVar zv)
 {
 	ZStoHdr(zv, zv->Pos);
 	ZShHdr(zv, ZRPOS);
-	FTSetTimeOut(fv, zv->TimeOut);
+	fv->FTSetTimeOut(fv, zv->TimeOut);
 }
 
 static void ZSendACK(PFileVarProto fv, PZVar zv)
 {
 	ZStoHdr(zv, 0);
 	ZShHdr(zv, ZACK);
-	FTSetTimeOut(fv, zv->TimeOut);
+	fv->FTSetTimeOut(fv, zv->TimeOut);
 }
 
 static void ZSendNAK(PZVar zv)
@@ -917,7 +917,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 	case ZSINIT:
 		zv->ZPktState = Z_PktGetData;
 		if (zv->ZState == Z_RecvInit)
-			FTSetTimeOut(fv, zv->TOutInit);
+			fv->FTSetTimeOut(fv, zv->TOutInit);
 		break;
 	case ZACK:
 		switch (zv->ZState) {
@@ -939,7 +939,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 		zv->ZPktState = Z_PktGetData;
 		if ((zv->ZState == Z_RecvInit) || (zv->ZState == Z_RecvInit2)) {
 			zv->BinFlag = zv->RxHdr[ZF0] != ZCNL;
-			FTSetTimeOut(fv, zv->TOutInit);
+			fv->FTSetTimeOut(fv, zv->TOutInit);
 		}
 		break;
 	case ZSKIP:
@@ -980,7 +980,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 			zv->ZState = Z_RecvFIN;
 			ZSendFIN(zv);
 			zv->CanCount = 2;
-			FTSetTimeOut(fv, zv->TOutFin);
+			fv->FTSetTimeOut(fv, zv->TOutFin);
 		} else {
 			zv->ZState = Z_End;
 			ZWrite(fv, zv, cv, "OO", 2);
@@ -1005,7 +1005,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 			ZSendRPOS(fv, zv);
 			return;
 		} else {
-			FTSetTimeOut(fv, zv->TimeOut);
+			fv->FTSetTimeOut(fv, zv->TimeOut);
 			zv->ZPktState = Z_PktGetData;
 		}
 		break;
@@ -1076,7 +1076,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
 		return FALSE;
 	/* kill timer */
-	FTSetTimeOut(fv, 0);
+	fv->FTSetTimeOut(fv, 0);
 	zv->CRRecv = FALSE;
 
 	/* file name */
@@ -1119,7 +1119,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, GetTickCount(), fv->ByteCount);
 
 	/* set timeout for data */
-	FTSetTimeOut(fv, zv->TimeOut);
+	fv->FTSetTimeOut(fv, zv->TimeOut);
 	return TRUE;
 }
 
@@ -1132,7 +1132,7 @@ static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 	if (zv->ZState != Z_RecvData)
 		return FALSE;
 	/* kill timer */
-	FTSetTimeOut(fv, 0);
+	fv->FTSetTimeOut(fv, 0);
 
 	if (zv->BinFlag)
 		file->WriteFile(file, zv->PktIn, zv->PktInPtr);
@@ -1157,7 +1157,7 @@ static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	/* set timeout for data */
-	FTSetTimeOut(fv, zv->TimeOut);
+	fv->FTSetTimeOut(fv, zv->TimeOut);
 	return TRUE;
 }
 
