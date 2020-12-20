@@ -57,7 +57,11 @@
 #include "filesys_log_res.h"
 
 #include "filesys.h"
+#if 1
+#include "filesys_proto.h"
 #include "ttfile_proto.h"
+#define PFileVar	PFileVarProto
+#endif
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -279,12 +283,12 @@ static BOOL NewFileVar_(PFileVar *fv)
 {
 	if ((*fv)==NULL)
 	{
-		*fv = (PFileVar)malloc(sizeof(TFileVar));
+		*fv = (PFileVar)malloc(sizeof(TFileVarProto));
 		if ((*fv)!=NULL)
 		{
 			char FileDirExpanded[MAX_PATH];
 			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			memset(*fv, 0, sizeof(TFileVar));
+			memset(*fv, 0, sizeof(*fv));
 			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName), FileDirExpanded, _TRUNCATE);
 			AppendSlash((*fv)->FullName,sizeof((*fv)->FullName));
 			(*fv)->DirLen = strlen((*fv)->FullName);

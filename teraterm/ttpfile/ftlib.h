@@ -29,7 +29,7 @@
 
 /* TTFILE.DLL, routines for file transfer protocol */
 
-#include "filesys_send.h"
+#include "filesys_proto.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,12 +39,12 @@ extern "C" {
 
 void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
 void FTConvFName(PCHAR FName);
-BOOL GetNextFname(PFileVar fv);
+BOOL GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
-void FTLog1Byte(PFileVar fv, BYTE b);
-void FTSetTimeOut(PFileVar fv, int T);
-BOOL FTCreateFile(PFileVar fv);
+void FTLog1Byte(PFileVarProto fv, BYTE b);
+void FTSetTimeOut(PFileVarProto fv, int T);
+BOOL FTCreateFile(PFileVarProto fv);
 
 #ifdef __cplusplus
 }

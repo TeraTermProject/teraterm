@@ -29,18 +29,19 @@
 
 /* TTFILE.DLL, Kermit protocol */
 
+#include "filesys_proto.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* prototypes */
-void KmtInit
-  (PFileVar fv, PKmtVar kv, PComVar cv, PTTSet ts);
-void KmtTimeOutProc(PFileVar fv, PKmtVar kv, PComVar cv);
+void KmtInit(PFileVarProto fv, PKmtVar kv, PComVar cv, PTTSet ts);
+void KmtTimeOutProc(PFileVarProto fv, PKmtVar kv, PComVar cv);
 BOOL KmtReadPacket
-  (PFileVar fv,  PKmtVar kv, PComVar cv);
+  (PFileVarProto fv,  PKmtVar kv, PComVar cv);
 void KmtCancel
-  (PFileVar fv, PKmtVar kv, PComVar cv);
+  (PFileVarProto fv, PKmtVar kv, PComVar cv);
 
 #ifdef __cplusplus
 }

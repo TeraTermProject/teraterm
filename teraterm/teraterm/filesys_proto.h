@@ -26,17 +26,54 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "filesys_proto.h"
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef struct FileVarProto {
+  HWND HMainWin;
+  HWND HWin;
+  WORD OpId;
+  char DlgCaption[40];
 
-void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts);
-BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv);
-void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv);
-BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv);
+  char FullName[MAX_PATH];
+  int DirLen;
 
-#ifdef __cplusplus
-}
-#endif
+  int NumFname, FNCount;
+  HANDLE FnStrMemHandle;
+  PCHAR FnStrMem;
+  int FnPtr;
+
+  BOOL FileOpen;
+  HANDLE FileHandle;
+  LONG FileSize, ByteCount;
+  BOOL OverWrite;
+
+  BOOL LogFlag;
+  HANDLE LogFile;
+  WORD LogState;
+  WORD LogCount;
+
+  BOOL Success;
+  BOOL NoMsg;
+
+  char LogDefaultPath[MAX_PATH];
+  BOOL HideDialog;
+
+  BYTE LogLineBuf[16];
+  int FlushLogLineBuf;
+
+  int ProgStat;
+
+  DWORD StartTime;
+
+  int reserve_1;
+  LONG reserve_2;
+  int reserve_3;
+
+  HANDLE reserve_4;
+  DWORD reserve_5;
+
+  DWORD FileMtime;
+  HANDLE reserve_6;
+
+} TFileVarProto;
+typedef TFileVarProto *PFileVarProto;

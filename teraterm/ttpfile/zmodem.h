@@ -34,10 +34,9 @@ extern "C" {
 #endif
 
 /* prototypes */
-void ZInit
-  (PFileVar fv, PZVar zv, PComVar cv, PTTSet ts);
-void ZTimeOutProc(PFileVar fv, PZVar zv, PComVar cv);
-BOOL ZParse(PFileVar fv, PZVar zv, PComVar cv);
+void ZInit(PFileVarProto fv, PZVar zv, PComVar cv, PTTSet ts);
+void ZTimeOutProc(PFileVarProto fv, PZVar zv, PComVar cv);
+BOOL ZParse(PFileVarProto fv, PZVar zv, PComVar cv);
 void ZCancel(PZVar zv);
 
 #ifdef __cplusplus

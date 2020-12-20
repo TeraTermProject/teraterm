@@ -28,17 +28,18 @@
 
 /* TTFILE.DLL, YMODEM protocol */
 
+#include "filesys_proto.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* prototypes */
-void YInit
-  (PFileVar fv, PYVar yv, PComVar cv, PTTSet ts);
-void YCancel(PFileVar fv, PYVar yv, PComVar cv);
-void YTimeOutProc(PFileVar fv, PYVar yv, PComVar cv);
-BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv);
-BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv);
+void YInit(PFileVarProto fv, PYVar yv, PComVar cv, PTTSet ts);
+void YCancel(PFileVarProto fv, PYVar yv, PComVar cv);
+void YTimeOutProc(PFileVarProto fv, PYVar yv, PComVar cv);
+BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv);
+BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv);
 
 #ifdef __cplusplus
 }

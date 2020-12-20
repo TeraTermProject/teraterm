@@ -34,12 +34,11 @@ extern "C" {
 #endif
 
 /* prototypes */
-void QVInit
-  (PFileVar fv, PQVVar qv, PComVar cv, PTTSet ts);
-void QVCancel(PFileVar fv, PQVVar qv, PComVar cv);
-void QVTimeOutProc(PFileVar fv, PQVVar qv, PComVar cv);
-BOOL QVReadPacket(PFileVar fv, PQVVar qv, PComVar cv);
-BOOL QVSendPacket(PFileVar fv, PQVVar qv, PComVar cv);
+void QVInit(PFileVarProto fv, PQVVar qv, PComVar cv, PTTSet ts);
+void QVCancel(PFileVarProto fv, PQVVar qv, PComVar cv);
+void QVTimeOutProc(PFileVarProto fv, PQVVar qv, PComVar cv);
+BOOL QVReadPacket(PFileVarProto fv, PQVVar qv, PComVar cv);
+BOOL QVSendPacket(PFileVarProto fv, PQVVar qv, PComVar cv);
 
 #ifdef __cplusplus
 }

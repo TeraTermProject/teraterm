@@ -57,7 +57,7 @@
 
 static const char *UILanguageFile;
 
-int QVRead1Byte(PFileVar fv, PQVVar qv, PComVar cv, LPBYTE b)
+int QVRead1Byte(PFileVarProto fv, PQVVar qv, PComVar cv, LPBYTE b)
 {
   if (CommRead1Byte(cv,b) == 0)
     return 0;
@@ -75,7 +75,7 @@ int QVRead1Byte(PFileVar fv, PQVVar qv, PComVar cv, LPBYTE b)
   return 1;
 }
 
-int QVWrite(PFileVar fv, PQVVar qv, PComVar cv, PCHAR B, int C)
+int QVWrite(PFileVarProto fv, PQVVar qv, PComVar cv, PCHAR B, int C)
 {
   int i, j;
 
@@ -95,7 +95,7 @@ int QVWrite(PFileVar fv, PQVVar qv, PComVar cv, PCHAR B, int C)
   return i;
 }
 
-void QVSendNAK(PFileVar fv, PQVVar qv, PComVar cv)
+void QVSendNAK(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   BYTE b;
 
@@ -104,7 +104,7 @@ void QVSendNAK(PFileVar fv, PQVVar qv, PComVar cv)
   FTSetTimeOut(fv,TimeOutRecv);
 }
 
-void QVSendACK(PFileVar fv, PQVVar qv, PComVar cv)
+void QVSendACK(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   BYTE b;
 
@@ -115,7 +115,7 @@ void QVSendACK(PFileVar fv, PQVVar qv, PComVar cv)
 }
 
 void QVInit
-  (PFileVar fv, PQVVar qv, PComVar cv, PTTSet ts)
+  (PFileVarProto fv, PQVVar qv, PComVar cv, PTTSet ts)
 {
   char uimsg[MAX_UIMSG];
   UILanguageFile = ts->UILanguageFile;
@@ -166,7 +166,7 @@ void QVInit
   }
 }
 
-void QVCancel(PFileVar fv, PQVVar qv, PComVar cv)
+void QVCancel(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   BYTE b;
 
@@ -193,7 +193,7 @@ void QVCancel(PFileVar fv, PQVVar qv, PComVar cv)
   qv->QVState = QV_Cancel;
 }
 
-BOOL QVCountRetry(PFileVar fv, PQVVar qv, PComVar cv)
+BOOL QVCountRetry(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   qv->RetryCount--;
   if (qv->RetryCount<=0)
@@ -205,7 +205,7 @@ BOOL QVCountRetry(PFileVar fv, PQVVar qv, PComVar cv)
     return FALSE;
 }
 
-void QVResendPacket(PFileVar fv, PQVVar qv)
+void QVResendPacket(PFileVarProto fv, PQVVar qv)
 {
 
   qv->PktOutCount = qv->PktOutLen;
@@ -234,7 +234,7 @@ void QVSetResPacket(PQVVar qv, BYTE Typ, BYTE Num, int DataLen)
   qv->PktOutPtr = 0;
 }
 
-void QVSendVACK(PFileVar fv, PQVVar qv, BYTE Seq)
+void QVSendVACK(PFileVarProto fv, PQVVar qv, BYTE Seq)
 {
   FTSetTimeOut(fv,TimeOutRecv);
   qv->RetryCount = 10;
@@ -243,7 +243,7 @@ void QVSendVACK(PFileVar fv, PQVVar qv, BYTE Seq)
     QVSetResPacket(qv,'A',Seq,0);
 }
 
-void QVSendVNAK(PFileVar fv, PQVVar qv)
+void QVSendVNAK(PFileVarProto fv, PQVVar qv)
 {
   FTSetTimeOut(fv,TimeOutRecv);
   QVSetResPacket(qv,'N',LOBYTE(qv->SeqNum+1),0);
@@ -254,7 +254,7 @@ void QVSendVNAK(PFileVar fv, PQVVar qv)
   }
 }
 
-void QVSendVSTAT(PFileVar fv, PQVVar qv)
+void QVSendVSTAT(PFileVarProto fv, PQVVar qv)
 {
   FTSetTimeOut(fv,TimeOutRecv);
   qv->PktOut[3] = 0x30;
@@ -263,7 +263,7 @@ void QVSendVSTAT(PFileVar fv, PQVVar qv)
   qv->QVState = QV_RecvNext;
 }
 
-void QVTimeOutProc(PFileVar fv, PQVVar qv, PComVar cv)
+void QVTimeOutProc(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   if ((qv->QVState==QV_Cancel) ||
       (qv->QVState==QV_RecvEOT))
@@ -309,7 +309,7 @@ void QVTimeOutProc(PFileVar fv, PQVVar qv, PComVar cv)
   }
 }
 
-BOOL QVParseSINIT(PFileVar fv, PQVVar qv)
+BOOL QVParseSINIT(PFileVarProto fv, PQVVar qv)
 {
   int i;
   BYTE b, n;
@@ -378,7 +378,7 @@ BOOL QVParseSINIT(PFileVar fv, PQVVar qv)
     return Ok;
   }
 
-BOOL QVParseVFILE(PFileVar fv, PQVVar qv)
+BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
 {
   int i, j;
   WORD w;
@@ -440,7 +440,7 @@ BOOL QVParseVFILE(PFileVar fv, PQVVar qv)
   return TRUE;
 }
 
-BOOL QVParseVENQ(PFileVar fv, PQVVar qv)
+BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
 {
   struct tm time;
   struct utimbuf timebuf;
@@ -492,7 +492,7 @@ BOOL QVParseVENQ(PFileVar fv, PQVVar qv)
   return TRUE;
 }
 
-void QVWriteToFile(PFileVar fv, PQVVar qv)
+void QVWriteToFile(PFileVarProto fv, PQVVar qv)
 {
   int C;
 
@@ -524,7 +524,7 @@ BOOL QVCheckWindow8(PQVVar qv, WORD w0, WORD w1, BYTE b, LPWORD  w)
   return FALSE;
 }
 
-BOOL QVReadPacket(PFileVar fv, PQVVar qv, PComVar cv)
+BOOL QVReadPacket(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   BYTE b;
   WORD w0, w1, w;
@@ -736,7 +736,7 @@ void QVSetPacket(PQVVar qv, BYTE Num, BYTE Typ)
   qv->PktOutPtr = 0;
 }
 
-void QVSendSINIT(PFileVar fv, PQVVar qv)
+void QVSendSINIT(PFileVarProto fv, PQVVar qv)
 {
   int i;
 
@@ -755,7 +755,7 @@ void QVSendSINIT(PFileVar fv, PQVVar qv)
   FTSetTimeOut(fv,TimeOutSend);
 }
 
-void QVSendEOT(PFileVar fv, PQVVar qv, PComVar cv)
+void QVSendEOT(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   BYTE b;
 
@@ -782,7 +782,7 @@ void QVSendEOT(PFileVar fv, PQVVar qv, PComVar cv)
     (*i)++;
   }
 
-void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
+void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   int i, j;
   struct stat stbuf;
@@ -861,7 +861,7 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
   FTSetTimeOut(fv,TimeOutSend);
 }
 
-void QVSendVDATA(PFileVar fv, PQVVar qv)
+void QVSendVDATA(PFileVarProto fv, PQVVar qv)
 {
   int i, C;
   LONG Pos;
@@ -911,7 +911,7 @@ void QVSendVDATA(PFileVar fv, PQVVar qv)
 
 }
 
-void QVParseRINIT(PFileVar fv, PQVVar qv, PComVar cv)
+void QVParseRINIT(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   int i;
   BYTE b, n;
@@ -952,7 +952,7 @@ void QVParseRINIT(PFileVar fv, PQVVar qv, PComVar cv)
   QVSendVFILE(fv,qv,cv);
 }
 
-void QVParseVRPOS(PFileVar fv, PQVVar qv, PComVar cv)
+void QVParseVRPOS(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   int i;
   BYTE b;
@@ -998,7 +998,7 @@ BOOL QVCheckWindow7(PQVVar qv, WORD w0, WORD w1, BYTE b, LPWORD w)
   return FALSE;
 }
 
-void QVParseVACK(PFileVar fv, PQVVar qv)
+void QVParseVACK(PFileVarProto fv, PQVVar qv)
 {
   WORD w;
 
@@ -1017,7 +1017,7 @@ void QVParseVACK(PFileVar fv, PQVVar qv)
   }
 }
 
-void QVParseVNAK(PFileVar fv, PQVVar qv, PComVar cv)
+void QVParseVNAK(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   WORD w;
 
@@ -1048,7 +1048,7 @@ void QVParseVNAK(PFileVar fv, PQVVar qv, PComVar cv)
   }
 }
 
-void QVParseVSTAT(PFileVar fv, PQVVar qv, PComVar cv)
+void QVParseVSTAT(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
 
   if (qv->EnqFlag && (qv->PktIn[3]==0x30))
@@ -1064,7 +1064,7 @@ void QVParseVSTAT(PFileVar fv, PQVVar qv, PComVar cv)
     QVCancel(fv,qv,cv);
 }
 
-BOOL QVSendPacket(PFileVar fv, PQVVar qv, PComVar cv)
+BOOL QVSendPacket(PFileVarProto fv, PQVVar qv, PComVar cv)
 {
   BYTE b;
   int c, i;

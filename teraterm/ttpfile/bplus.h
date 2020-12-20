@@ -34,10 +34,9 @@ extern "C" {
 #endif
 
 /* prototypes */
-void BPInit
-  (PFileVar fv, PBPVar bv, PComVar cv, PTTSet ts);
-void BPTimeOutProc(PFileVar fv, PBPVar bv, PComVar cv);
-BOOL BPParse(PFileVar fv, PBPVar bv, PComVar cv);
+void BPInit(PFileVarProto fv, PBPVar bv, PComVar cv, PTTSet ts);
+void BPTimeOutProc(PFileVarProto fv, PBPVar bv, PComVar cv);
+BOOL BPParse(PFileVarProto fv, PBPVar bv, PComVar cv);
 void BPCancel(PBPVar bv);
 
 #ifdef __cplusplus

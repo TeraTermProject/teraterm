@@ -44,7 +44,7 @@
 #include "bplus.h"
 #include "quickvan.h"
 
-#include "filesys.h"
+#include "filesys_proto.h"
 #include "ttfile_proto.h"
 
 #include <stdlib.h>
@@ -52,7 +52,7 @@
 #include <io.h>
 #include <assert.h>
 
-void _ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
+void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -76,7 +76,7 @@ void _ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
 	}
 }
 
-BOOL _ProtoParse(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 {
 	BOOL Ok;
 
@@ -86,14 +86,7 @@ BOOL _ProtoParse(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 		Ok = KmtReadPacket(fv,(PKmtVar)pv,cv);
 		break;
 	case PROTO_XM:
-		switch (((PXVar)pv)->XMode) {
-		case IdXReceive:
-			Ok = XReadPacket(fv,(PXVar)pv,cv);
-			break;
-		case IdXSend:
-			Ok = XSendPacket(fv,(PXVar)pv,cv);
-			break;
-		}
+		Ok = XParse(fv, (PXVar)pv, cv);
 		break;
 	case PROTO_YM:
 		switch (((PYVar)pv)->YMode) {
@@ -125,7 +118,7 @@ BOOL _ProtoParse(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 	return Ok;
 }
 
-void _ProtoTimeOutProc(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -149,7 +142,7 @@ void _ProtoTimeOutProc(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 	}
 }
 
-BOOL _ProtoCancel(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -163,7 +156,7 @@ BOOL _ProtoCancel(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 		break;
 	case PROTO_ZM:
 		ZCancel((PZVar)pv);
-		break;
+		break;		
 	case PROTO_BP:
 		if (((PBPVar)pv)->BPState != BP_Failure) {
 			BPCancel((PBPVar)pv);

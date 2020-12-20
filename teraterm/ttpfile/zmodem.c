@@ -32,13 +32,13 @@
  　"B"の直後の二桁が Header Type を示す。
 
 2A 2A 18 42 30 31 30 30 30 30 30 30 32 33 62 65     **.B0100000023be
-35 30 0D 8A 11 
+35 30 0D 8A 11
    ↓
 2A 2A 18 42 30 31 30 30 30 30 30 30 32 33 62 65     **.B0100000023be
-^^^^^^^^ZPAD+ZPAD+ZDLE 
+^^^^^^^^ZPAD+ZPAD+ZDLE
          ^^ZHEX
             ^^^^ZRINIT（2桁で表す）
-35 30 0D 8A 11 
+35 30 0D 8A 11
 ^^^^^CRC
  */
 
@@ -135,7 +135,7 @@ static void add_recvbuf(char *fmt, ...)
 }
 
 
-static void show_recvbuf(PFileVar fv)
+static void show_recvbuf(PFileVarProto fv)
 {
 	char *s;
 
@@ -157,7 +157,7 @@ static void add_sendbuf(char *fmt, ...)
 	va_end(arg);
 }
 
-static void show_sendbuf(PFileVar fv)
+static void show_sendbuf(PFileVarProto fv)
 {
 	char *s;
 
@@ -199,7 +199,7 @@ static char *hdrtype_name(int type)
 		return NULL;
 }
 
-int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
+int ZRead1Byte(PFileVarProto fv, PZVar zv, PComVar cv, LPBYTE b)
 {
 	char *s;
 
@@ -228,7 +228,7 @@ int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-int ZWrite(PFileVar fv, PZVar zv, PComVar cv, PCHAR B, int C)
+int ZWrite(PFileVarProto fv, PZVar zv, PComVar cv, PCHAR B, int C)
 {
 	int i, j;
 	char *s;
@@ -404,7 +404,7 @@ LONG ZRclHdr(PZVar zv)
 	return ((L << 8) + (BYTE) (zv->RxHdr[ZP0]));
 }
 
-void ZSendRInit(PFileVar fv, PZVar zv)
+void ZSendRInit(PFileVarProto fv, PZVar zv)
 {
 	zv->Pos = 0;
 	ZStoHdr(zv, 0);
@@ -415,20 +415,20 @@ void ZSendRInit(PFileVar fv, PZVar zv)
 	FTSetTimeOut(fv, zv->TOutInit);
 }
 
-void ZSendRQInit(PFileVar fv, PZVar zv, PComVar cv)
+void ZSendRQInit(PFileVarProto fv, PZVar zv, PComVar cv)
 {
 	ZStoHdr(zv, 0);
 	ZShHdr(zv, ZRQINIT);
 }
 
-void ZSendRPOS(PFileVar fv, PZVar zv)
+void ZSendRPOS(PFileVarProto fv, PZVar zv)
 {
 	ZStoHdr(zv, zv->Pos);
 	ZShHdr(zv, ZRPOS);
 	FTSetTimeOut(fv, zv->TimeOut);
 }
 
-void ZSendACK(PFileVar fv, PZVar zv)
+void ZSendACK(PFileVarProto fv, PZVar zv)
 {
 	ZStoHdr(zv, 0);
 	ZShHdr(zv, ZACK);
@@ -513,7 +513,7 @@ void ZSendFileHdr(PZVar zv)
 	zv->ZState = Z_SendFileHdr;
 }
 
-void ZSendFileDat(PFileVar fv, PZVar zv)
+void ZSendFileDat(PFileVarProto fv, PZVar zv)
 {
 	int i, j;
 
@@ -586,7 +586,7 @@ void ZSendDataHdr(PZVar zv)
 	zv->ZState = Z_SendDataHdr;
 }
 
-void ZSendDataDat(PFileVar fv, PZVar zv)
+void ZSendDataDat(PFileVarProto fv, PZVar zv)
 {
 	int c;
 	BYTE b;
@@ -644,7 +644,7 @@ void ZSendDataDat(PFileVar fv, PZVar zv)
 	add_sendbuf("%s: ", __FUNCTION__);
 }
 
-void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
+void ZInit(PFileVarProto fv, PZVar zv, PComVar cv, PTTSet ts) {
 	int Max;
 	char uimsg[MAX_UIMSG];
 	UILanguageFile = ts->UILanguageFile;
@@ -761,7 +761,7 @@ void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 	}
 }
 
-void ZTimeOutProc(PFileVar fv, PZVar zv, PComVar cv)
+void ZTimeOutProc(PFileVarProto fv, PZVar zv, PComVar cv)
 {
 	switch (zv->ZState) {
 	case Z_RecvInit:
@@ -779,7 +779,7 @@ void ZTimeOutProc(PFileVar fv, PZVar zv, PComVar cv)
 	}
 }
 
-BOOL ZCheckHdr(PFileVar fv, PZVar zv)
+BOOL ZCheckHdr(PFileVarProto fv, PZVar zv)
 {
 	int i;
 	BOOL Ok;
@@ -813,7 +813,7 @@ BOOL ZCheckHdr(PFileVar fv, PZVar zv)
 	return Ok;
 }
 
-void ZParseRInit(PFileVar fv, PZVar zv)
+void ZParseRInit(PFileVarProto fv, PZVar zv)
 {
 	int Max;
 
@@ -868,7 +868,7 @@ BOOL ZParseSInit(PZVar zv)
 	return TRUE;
 }
 
-void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
+void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 {
 	add_recvbuf("%s: RxType %s ", __FUNCTION__, hdrtype_name(zv->RxType));
 
@@ -1004,7 +1004,7 @@ void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 	zv->PktInCount = 0;
 }
 
-BOOL ZParseFile(PFileVar fv, PZVar zv)
+BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 {
 	BYTE b;
 	int i, j;
@@ -1064,7 +1064,7 @@ BOOL ZParseFile(PFileVar fv, PZVar zv)
 	return TRUE;
 }
 
-BOOL ZWriteData(PFileVar fv, PZVar zv)
+BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 {
 	int i;
 	BYTE b;
@@ -1101,7 +1101,7 @@ BOOL ZWriteData(PFileVar fv, PZVar zv)
 	return TRUE;
 }
 
-void ZCheckData(PFileVar fv, PZVar zv)
+void ZCheckData(PFileVarProto fv, PZVar zv)
 {
 	BOOL Ok;
 
@@ -1173,7 +1173,7 @@ void ZCheckData(PFileVar fv, PZVar zv)
 	}
 }
 
-BOOL ZParse(PFileVar fv, PZVar zv, PComVar cv)
+BOOL ZParse(PFileVarProto fv, PZVar zv, PComVar cv)
 {
 	BYTE b;
 	int c;

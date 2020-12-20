@@ -53,7 +53,7 @@ void FTConvFName(PCHAR FName)
   }
 }
 
-BOOL GetNextFname(PFileVar fv)
+BOOL GetNextFname(PFileVarProto fv)
 {
   /* next file name exists? */
 
@@ -101,7 +101,7 @@ LONG UpdateCRC32(BYTE b, LONG CRC)
   return CRC;
 }
 
-void FTLog1Byte(PFileVar fv, BYTE b)
+void FTLog1Byte(PFileVarProto fv, BYTE b)
 {
   char d[3];
 
@@ -155,7 +155,7 @@ void FTLog1Byte(PFileVar fv, BYTE b)
   fv->LogCount++;
 }
 
-void FTSetTimeOut(PFileVar fv, int T)
+void FTSetTimeOut(PFileVarProto fv, int T)
 {
   KillTimer(fv->HMainWin, IdProtoTimer);
   if (T==0) return;
@@ -181,7 +181,7 @@ void AddNum(PCHAR FName, int n)
   memcpy(&FName[k+dLen-strlen(Num)],Num,strlen(Num));
 }
 
-BOOL FTCreateFile(PFileVar fv)
+BOOL FTCreateFile(PFileVarProto fv)
 {
   int i;
   char Temp[MAX_PATH];

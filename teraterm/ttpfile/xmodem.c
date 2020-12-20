@@ -42,7 +42,7 @@
 
 #include "xmodem.h"
 
-int XRead1Byte(PFileVar fv, PXVar xv, PComVar cv, LPBYTE b)
+int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 {
 	if (CommRead1Byte(cv, b) == 0)
 		return 0;
@@ -63,7 +63,7 @@ int XRead1Byte(PFileVar fv, PXVar xv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-int XWrite(PFileVar fv, PXVar xv, PComVar cv, PCHAR B, int C)
+int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
 {
 	int i, j;
 
@@ -85,7 +85,7 @@ int XWrite(PFileVar fv, PXVar xv, PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-void XSetOpt(PFileVar fv, PXVar xv, WORD Opt)
+void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 {
 	char Tmp[21];
 
@@ -117,7 +117,7 @@ void XSetOpt(PFileVar fv, PXVar xv, WORD Opt)
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, Tmp);
 }
 
-void XSendNAK(PFileVar fv, PXVar xv, PComVar cv)
+void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 {
 	BYTE b;
 	int t;
@@ -184,9 +184,8 @@ BOOL XCheckPacket(PXVar xv)
 				(LOBYTE(Check) == xv->PktIn[xv->DataLen + 4]));
 }
 
-void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
-	char inistr[MAX_PATH + 10];
-
+void XInit(PFileVarProto fv, PXVar xv, PComVar cv, PTTSet ts)
+{
 	fv->LogFlag = ((ts->LogFlag & LOG_X) != 0);
 	if (fv->LogFlag)
 		fv->LogFile = _lcreat("XMODEM.LOG", 0);
@@ -242,6 +241,7 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 
 		// ファイル送信開始前に、"rx ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		if (ts->XModemRcvCommand[0] != '\0') {
+			char inistr[MAX_PATH + 10];
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s %s\015",
 						ts->XModemRcvCommand, &(fv->FullName[fv->DirLen]));
 			FTConvFName(inistr + strlen(ts->XModemRcvCommand) + 1);
@@ -256,7 +256,7 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 	}
 }
 
-void XCancel(PFileVar fv, PXVar xv, PComVar cv)
+void XCancel(PFileVarProto fv, PXVar xv, PComVar cv)
 {
 	// five cancels & five backspaces per spec
 	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
@@ -265,7 +265,7 @@ void XCancel(PFileVar fv, PXVar xv, PComVar cv)
 	xv->XMode = 0;				// quit
 }
 
-void XTimeOutProc(PFileVar fv, PXVar xv, PComVar cv)
+void XTimeOutProc(PFileVarProto fv, PXVar xv, PComVar cv)
 {
 	switch (xv->XMode) {
 	case IdXSend:
@@ -277,7 +277,7 @@ void XTimeOutProc(PFileVar fv, PXVar xv, PComVar cv)
 	}
 }
 
-BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
+BOOL XReadPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 {
 	BYTE b, d;
 	int i, c;
@@ -423,7 +423,7 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 	return TRUE;
 }
 
-BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
+BOOL XSendPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 {
 	BYTE b;
 	int i;
@@ -568,4 +568,16 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 	}
 
 	return TRUE;
+}
+
+BOOL XParse(PFileVarProto fv, PXVar xv, PComVar cv)
+{
+	switch (xv->XMode) {
+	case IdXReceive:
+		return XReadPacket(fv, xv, cv);
+	case IdXSend:
+		return XSendPacket(fv, xv, cv);
+	default:
+		return FALSE;
+	}
 }
