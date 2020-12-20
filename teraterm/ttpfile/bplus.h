@@ -33,6 +33,11 @@
 extern "C" {
 #endif
 
+  /* B-Plus function id */
+#define IdBPReceive 1
+#define IdBPSend    2
+#define IdBPAuto    3
+
 enum {
 	BPLUS_MODE,
 };

@@ -35,6 +35,10 @@
 extern "C" {
 #endif
 
+  /* XMODEM function id */
+#define IdXReceive 1
+#define IdXSend    2
+
 enum {
 	XMODEM_MODE,
 	XMODEM_OPT,

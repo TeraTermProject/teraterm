@@ -1012,7 +1012,6 @@ BOOL KermitGet(const char *filename)
 	else {
 		FileVar->DirLen = 0;
 		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
-		FileVar->NumFname = 1;
 		FileVar->NoMsg = TRUE;
 		_SetFileVar(FileVar);
 	}
@@ -1530,10 +1529,6 @@ BOOL BPStartSend(const char *filename)
 		fv->FileNames = filenames;
 	}
 	else {
-		FileVar->DirLen = 0;
-		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName), filename, _TRUNCATE);
-		FileVar->NumFname = 1;
-		FileVar->NoMsg = TRUE;
 		fv->FileNames = MakeStrArrayFromStr(filename);
 		fv->NoMsg = TRUE;
 	}
@@ -1663,7 +1658,6 @@ BOOL QVStartSend(const char *filename)
 	else {
 		FileVar->DirLen = 0;
 		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
-		FileVar->NumFname = 1;
 		FileVar->NoMsg = TRUE;
 	}
 

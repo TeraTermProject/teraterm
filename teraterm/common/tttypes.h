@@ -97,35 +97,6 @@ typedef enum {
 #define CS_UNSPEC          0xffffffff
 #define CS_ALL             CS_UNSPEC
 
-  /* Kermit function id */
-#define IdKmtReceive 1
-#define IdKmtGet     2
-#define IdKmtSend    3
-#define IdKmtFinish  4
-
-  /* XMODEM function id */
-#define IdXReceive 1
-#define IdXSend    2
-
-  /* YMODEM function id */
-#define IdYReceive 1
-#define IdYSend    2
-
-  /* ZMODEM function id */
-#define IdZReceive 1
-#define IdZSend    2
-#define IdZAutoR   3
-#define IdZAutoS   4
-
-  /* B-Plus function id */
-#define IdBPReceive 1
-#define IdBPSend    2
-#define IdBPAuto    3
-
-  /* Quick-VAN function id */
-#define IdQVReceive 1
-#define IdQVSend    2
-
 #define HostNameMaxLength 1024
 //#define HostNameMaxLength 80
 #define ProtocolFamilyMaxLength 80

@@ -33,6 +33,12 @@
 extern "C" {
 #endif
 
+  /* ZMODEM function id */
+#define IdZReceive 1
+#define IdZSend    2
+#define IdZAutoR   3
+#define IdZAutoS   4
+
 enum {
 	ZMODEM_MODE,
 	ZMODEM_BINFLAG,

@@ -38,15 +38,10 @@ typedef struct FileVarProto {
 	char FullName[MAX_PATH];	// read/writeするファイル名(各プロトコル内で書き換えすることあり)
 	int DirLen;
 
-	// 複数ファイル選択できるプロトコルで使用
+	// 送信ファイル名配列
 	//	フルパスのファイル名配列(一番最後はNULL)
 	char **FileNames;
 	int FNCount;		// 送信中ファイル名配列index(0...)
-	int NumFname;		// ファイル数(使用していない?)
-
-//	HANDLE FnStrMemHandle;
-//	PCHAR FnStrMem;
-//	int FnPtr;
 
 	// 受信
 	char *RecievePath;		// 受信フォルダ(終端にパスセパレータ'\\'が付加されている)
@@ -58,7 +53,6 @@ typedef struct FileVarProto {
 	BOOL Success;
 	BOOL NoMsg;
 
-//	char LogDefaultPath[MAX_PATH];
 	BOOL HideDialog;
 
 	int ProgStat;

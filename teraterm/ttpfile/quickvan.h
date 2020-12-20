@@ -33,6 +33,10 @@
 extern "C" {
 #endif
 
+  /* Quick-VAN function id */
+#define IdQVReceive 1
+#define IdQVSend    2
+
 enum {
 	QUICKVAN_MODE,
 };

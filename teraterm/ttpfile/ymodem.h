@@ -34,6 +34,10 @@
 extern "C" {
 #endif
 
+  /* YMODEM function id */
+#define IdYReceive 1
+#define IdYSend    2
+
 enum {
 	YMODEM_MODE,
 	YMODEM_OPT,

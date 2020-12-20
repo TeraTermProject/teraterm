@@ -108,7 +108,7 @@ static int Seek(struct FileVarProto *fv, size_t offset)
 {
 	LONG lo = (LONG)((offset >> 0) & 0xffffffff);
 	LONG hi = (LONG)((offset >> 32) & 0xffffffff);
-	DWORD pos = SetFilePointer(fv->FileHandle, lo, &hi, 0);
+	SetFilePointer(fv->FileHandle, lo, &hi, 0);
 	if (GetLastError() != 0) {
 		return -1;
 	}
@@ -122,6 +122,7 @@ static void FileSysDestroy(TFileVarProto *fv)
 
 void FilesysCreate(TFileVarProto *fv)
 {
+	fv->FileHandle = INVALID_HANDLE_VALUE;
 	fv->OpenRead = _OpenRead;
 	fv->OpenWrite = _OpenWrite;
 	fv->ReadFile = _ReadFile;

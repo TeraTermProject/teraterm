@@ -35,6 +35,12 @@
 extern "C" {
 #endif
 
+  /* Kermit function id */
+#define IdKmtReceive 1
+#define IdKmtGet     2
+#define IdKmtSend    3
+#define IdKmtFinish  4
+
 enum {
 	KMT_MODE
 };
