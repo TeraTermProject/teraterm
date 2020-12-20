@@ -46,20 +46,20 @@ void ProtoEnd(void);
 int ProtoDlgParse(void);
 void ProtoDlgTimeOut(void);
 void ProtoDlgCancel(void);
-BOOL KermitStartSend(const char *filename);
-BOOL KermitGet(const char *filename);
+BOOL KermitStartSend(const wchar_t *filename);
+BOOL KermitGet(const wchar_t *filename);
 BOOL KermitStartRecive(BOOL macro);
 BOOL KermitFinish(BOOL macro);
-BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt);
-BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt);
+BOOL XMODEMStartReceive(const wchar_t *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt);
+BOOL XMODEMStartSend(const wchar_t *fiename, WORD ParamXmodemOpt);
 BOOL YMODEMStartReceive(BOOL macro);
-BOOL YMODEMStartSend(const char *fiename);
+BOOL YMODEMStartSend(const wchar_t *fiename);
 BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart);
-BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag, BOOL autostart);
-BOOL BPStartSend(const char *filename);
+BOOL ZMODEMStartSend(const wchar_t *fiename, WORD ParamBinaryFlag, BOOL autostart);
+BOOL BPStartSend(const wchar_t *filename);
 BOOL BPStartReceive(BOOL macro, BOOL autostart);
 BOOL QVStartReceive(BOOL macro);
-BOOL QVStartSend(const char *filename);
+BOOL QVStartSend(const wchar_t *filename);
 
 #ifdef __cplusplus
 }

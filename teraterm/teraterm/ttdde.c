@@ -386,6 +386,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	char Command[MaxStrLen + 1];
 	int i;
 	WORD w, c;
+	wchar_t *ParamFileNameW;
+	BOOL r;
 
 	memset(Command, 0, sizeof(Command));
 
@@ -433,7 +435,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdBPlusSend:
-		if (!BPStartSend(ParamFileName)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = BPStartSend(ParamFileNameW);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
@@ -522,14 +527,20 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdKmtGet:
-		if (KermitGet(ParamFileName)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = KermitGet(ParamFileNameW);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdKmtSend:
-		if (KermitStartSend(ParamFileName)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = KermitStartSend(ParamFileNameW);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
@@ -598,7 +609,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdQVSend:
-		if (QVStartSend(ParamFileName)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = QVStartSend(ParamFileNameW);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
@@ -667,14 +681,20 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 	case CmdXmodemRecv:
-		if (XMODEMStartSend(ParamFileName, ParamXmodemOpt)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = XMODEMStartSend(ParamFileNameW, ParamXmodemOpt);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdXmodemSend:
-		if (XMODEMStartReceive(ParamFileName, ParamBinaryFlag, ParamXmodemOpt)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = XMODEMStartReceive(ParamFileNameW, ParamBinaryFlag, ParamXmodemOpt);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
@@ -688,7 +708,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdZmodemSend:
-		if (ZMODEMStartSend(ParamFileName, ParamBinaryFlag, FALSE)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = ZMODEMStartSend(ParamFileNameW, ParamBinaryFlag, FALSE);
+		free(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else
@@ -704,7 +727,9 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdYmodemSend:
-		if (YMODEMStartSend(ParamFileName)) {
+		ParamFileNameW = ToWcharU8(ParamFileName);
+		r = YMODEMStartSend(ParamFileNameW);
+		if (r) {
 			DdeCmnd = TRUE;
 		}
 		else

@@ -31,6 +31,9 @@
 #include <windows.h>
 #include <htmlhelp.h>
 #include <assert.h>
+#include <stdlib.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -125,19 +128,23 @@ static void _SetDlgProtoText(struct FileVarProto *fv, const char *text)
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, text);
 }
 
-static void _SetDlgProtoFileName(struct FileVarProto *fv, const char *text)
+static void _SetDlgProtoFileName(struct FileVarProto *fv, const char *filename)
 {
+	if (filename == NULL) {
+		SetDlgItemTextA(fv->HWin, IDC_PROTOFNAME, "");
+		return;
+	}
 	// ファイル名(最後のパスセパレータから後ろを表示)
-	const char *s = text;
-	const char *p = strrchr(text, '\\');
+	const char *s = filename;
+	const char *p = strrchr(filename, '\\');
 	if (p == NULL) {
-		p = strrchr(text, '/');
+		p = strrchr(filename, '/');
 	}
 	if (p != NULL) {
 		s = p + 1;
 	}
 	assert(fv->HWin != NULL);
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, s);
+	_SetDlgItemTextW(fv->HWin, IDC_PROTOFNAME, wc::fromUtf8(s));
 }
 
 static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
@@ -148,20 +155,20 @@ static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
 /**
  *	ファイル名を取得
  *
- *	@return		ファイル名
+ *	@return		ファイル名 UTF-8
  *				NULLのとき次のファイルはない
  *				不要になったら free() すること
  */
 static char *GetNextFname(PFileVarProto fv)
 {
-	char *f = fv->FileNames[fv->FNCount];
+	wchar_t *f = fv->FileNames[fv->FNCount];
 	if (f == NULL) {
 		/* no more file name */
 		return NULL;
 	}
 	fv->FNCount++;
-	f = _strdup(f);
-	return f;
+	char *u8 = ToU8W(f);
+	return u8;
 }
 
 /**
@@ -172,7 +179,7 @@ static char *GetNextFname(PFileVarProto fv)
  */
 static char *GetRecievePath(struct FileVarProto *fv)
 {
-	return _strdup(fv->RecievePath);
+	return ToU8W(fv->RecievePath);
 }
 
 static void FTSetTimeOut(PFileVarProto fv, int T)
@@ -188,7 +195,7 @@ static void SetDialogCation(struct FileVarProto *fv, const char *key, const wcha
 	wchar_t uimsg[MAX_UIMSG];
 	wchar_t caption[MAX_UIMSG];
 	wcsncpy_s(caption, _countof(caption), L"Tera Term: ", _TRUNCATE);
-	get_lang_msgW(key, uimsg, sizeof(uimsg), default_caption, UILanguageFile);
+	get_lang_msgW(key, uimsg, _countof(uimsg), default_caption, UILanguageFile);
 	wcsncat_s(caption, _countof(caption), uimsg, _TRUNCATE);
 	free((void *)fv->DlgCaption);
 	fv->DlgCaption = _wcsdup(caption);
@@ -205,10 +212,10 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	memset(fv, 0, sizeof(*fv));
 
 	// 受信フォルダ
-	char FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
-	AppendSlash(FileDirExpanded, _countof(FileDirExpanded));
-	fv->RecievePath = _strdup(FileDirExpanded);
+	wchar_t FileDirExpanded[MAX_PATH];
+	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	AppendSlashW(FileDirExpanded, _countof(FileDirExpanded));
+	fv->RecievePath = _wcsdup(FileDirExpanded);
 
 	fv->FileOpen = FALSE;
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
@@ -401,8 +408,6 @@ static void CenterCommonDialog(HWND hDlg)
 	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
 }
 
-static HFONT DlgXoptFont;
-
 /* Hook function for XMODEM file name dialog box */
 static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -413,17 +418,18 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDC_XOPT1K, "DLG_XOPT_1K" },
 		{ IDC_XOPTBIN, "DLG_XOPT_BINARY" },
 	};
-	LPOPENFILENAME ofn;
+	LPOPENFILENAMEW ofn;
 	WORD Hi, Lo;
 	LPLONG pl;
 	LPOFNOTIFY notify;
 	LOGFONT logfont;
 	HFONT font;
 	const char *UILanguageFile = ts.UILanguageFile;
+	static HFONT DlgXoptFont;
 
 	switch (Message) {
 	case WM_INITDIALOG:
-		ofn = (LPOPENFILENAME)lParam;
+		ofn = (LPOPENFILENAMEW)lParam;
 		pl = (LPLONG)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
 
@@ -571,38 +577,29 @@ static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 	return filename;
 }
 
-static char *GetCommonDialogDefaultFilenameA(const char *path)
-{
-	wchar_t *pathW = ToWcharA(path);
-	wchar_t *fileW = GetCommonDialogDefaultFilenameW(pathW);
-	char *fileA = ToCharW(fileW);
-	free(pathW);
-	free(fileW);
-	return fileA;
-}
-
-char **MakeStrArrayFromArray(char **strs)
+wchar_t **MakeStrArrayFromArray(wchar_t **strs)
 {
 	// 数を数える
 	size_t strs_count = 0;
 	size_t strs_len = 0;
 	while(1) {
-		const char *f = strs[strs_count];
+		const wchar_t *f = strs[strs_count];
 		if (f == NULL) {
 			break;
 		}
 		strs_count++;
-		size_t len = strlen(f) + 1;	// len = 1 when "\0"
+		size_t len = wcslen(f) + 1;	// len = 1 when "\0"
 		strs_len += len;
 	}
 
 	// 1領域に保存
 	size_t ptrs_len = sizeof(char *) * (strs_count + 1);
-	char *pool = (char *)malloc(ptrs_len + strs_len);
-	char **ptrs = (char **)pool;
-	char *strpool = pool + ptrs_len;
+	char *pool = (char *)malloc(ptrs_len + strs_len * sizeof(wchar_t));
+	wchar_t **ptrs = (wchar_t **)pool;
+	wchar_t *strpool = (wchar_t *)(pool + ptrs_len);
 	for (int i = 0 ; i < strs_count; i++) {
-		size_t len = strlen(strs[i]) + 1;
+		size_t len = wcslen(strs[i]) + 1;
+		len = len * sizeof(wchar_t);
 		memcpy(strpool, strs[i], len);
 		ptrs[i] = strpool;
 		strpool += len;
@@ -611,25 +608,25 @@ char **MakeStrArrayFromArray(char **strs)
 	return ptrs;
 }
 
-char **MakeStrArrayFromStr(const char *str)
+wchar_t **MakeStrArrayFromStr(const wchar_t *str)
 {
-	const char *strs[2];
+	const wchar_t *strs[2];
 	strs[0] = str;
 	strs[1] = NULL;
-	char **ret = MakeStrArrayFromArray((char **)strs);
+	wchar_t **ret = MakeStrArrayFromArray((wchar_t **)strs);
 	return ret;
 }
 
-char **MakeFileArrayMultiSelect(const char *lpstrFile)
+wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 {
 	// 数を数える
 	size_t file_count = 0;
-	const char *p = lpstrFile;
-	const char *path = p;
-	size_t len = strlen(p);
+	const wchar_t *p = lpstrFile;
+	const wchar_t *path = p;
+	size_t len = wcslen(p);
 	p += len + 1;
 	while(1) {
-		len = strlen(p);
+		len = wcslen(p);
 		if (len == 0) {
 			break;
 		}
@@ -643,20 +640,20 @@ char **MakeFileArrayMultiSelect(const char *lpstrFile)
 	}
 
 	// パス + ファイル名 一覧作成
-	size_t ptr_len = sizeof(char *) * (file_count + 1);
-	char **filenames = (char **)malloc(ptr_len);
-	len = strlen(path);
+	size_t ptr_len = sizeof(wchar_t *) * (file_count + 1);
+	wchar_t **filenames = (wchar_t **)malloc(ptr_len);
+	len = wcslen(path);
 	p = path + (len + 1);
 	size_t filelen_sum = 0;
 	for (int i = 0 ; i < file_count; i++) {
-		size_t filelen = asprintf(&filenames[i], "%s\\%s", path, p);
+		size_t filelen = aswprintf(&filenames[i], L"%s\\%s", path, p);
 		filelen_sum += filelen + 1;
-		len = strlen(p);
+		len = wcslen(p);
 		p += len + 1;
 	}
 	filenames[file_count] = NULL;
 
-	char **ret = MakeStrArrayFromArray(filenames);
+	wchar_t **ret = MakeStrArrayFromArray(filenames);
 
 	for (int i = 0 ; i < file_count; i++) {
 		free(filenames[i]);
@@ -665,25 +662,25 @@ char **MakeFileArrayMultiSelect(const char *lpstrFile)
 	return ret;
 }
 
-static char **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
+static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
-	char FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-	PCHAR CurDir = FileDirExpanded;
+	wchar_t FileDirExpanded[MAX_PATH];
+	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	wchar_t *CurDir = FileDirExpanded;
 
-	char *FNFilter = GetCommonDialogFilterA(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
+	wchar_t *FNFilter = GetCommonDialogFilterW(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
 
-	char FullName[MAX_PATH];
+	wchar_t FullName[MAX_PATH];
 	FullName[0] = 0;
 	if (!Receive) {
-		char *default_filename = GetCommonDialogDefaultFilenameA(CurDir);
+		wchar_t *default_filename = GetCommonDialogDefaultFilenameW(CurDir);
 		if (default_filename != NULL) {
-			strncpy_s(FullName, _countof(FullName), default_filename, _TRUNCATE);
+			wcsncpy_s(FullName, _countof(FullName), default_filename, _TRUNCATE);
 			free(default_filename);
 		}
 	}
 
-	OPENFILENAME ofn = {};
+	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFilter = FNFilter;
@@ -703,9 +700,9 @@ static char **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG
 	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.Flags |= OFN_SHOWHELP;
 	ofn.lCustData = (LPARAM)&opt;
-	ofn.lpstrTitle = ToCharW(caption);
+	ofn.lpstrTitle = caption;
 	ofn.lpfnHook = XFnHook;
-	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_XOPT);
+	ofn.lpTemplateName = MAKEINTRESOURCEW(IDD_XOPT);
 	ofn.hInstance = hInst;
 
 	/* save current dir */
@@ -714,16 +711,15 @@ static char **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG
 	BOOL Ok;
 	if (!Receive)
 	{
-		Ok = GetOpenFileName(&ofn);
+		Ok = _GetOpenFileNameW(&ofn);
 	}
 	else {
-		Ok = GetSaveFileName(&ofn);
+		Ok = _GetSaveFileNameW(&ofn);
 	}
 	free(FNFilter);
-	free((void *)ofn.lpstrTitle);
 	_SetCurrentDirectoryW(TempDir);
 
-	char **ret = NULL;
+	wchar_t **ret = NULL;
 	if (Ok) {
 		if (Receive)
 			*Option = opt;
@@ -783,7 +779,7 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDC_GETFNHELP, "BTN_HELP" },
 	};
 	PFileVarProto fv;
-	char TempFull[MAX_PATH];
+	wchar_t TempFull[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	switch (Message) {
@@ -799,15 +795,12 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			if (fv!=NULL) {
-				GetDlgItemText(Dialog, IDC_GETFN, TempFull, sizeof(TempFull));
-				if (strlen(TempFull)==0) {
+				_GetDlgItemTextW(Dialog, IDC_GETFN, TempFull, _countof(TempFull));
+				if (wcslen(TempFull)==0) {
 					fv->FileNames = NULL;
 					return TRUE;
 				}
-				int FnPos;
-				GetFileNamePos(TempFull, NULL, &FnPos);
-				FitFileName(&(TempFull[FnPos]),sizeof(TempFull) - FnPos, NULL);
-				fv->FileNames = MakeStrArrayFromStr(&(TempFull[FnPos]));
+				fv->FileNames = MakeStrArrayFromStr(TempFull);
 			}
 			EndDialog(Dialog, 1);
 			return TRUE;
@@ -834,24 +827,22 @@ static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet ts)
 								  HWin, GetFnDlg, (LPARAM)fv);
 }
 
-static HFONT DlgFoptFont;
-
 static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo text_info[] = {
 		{ IDC_FOPT, "DLG_FOPT" },
 		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
 	};
-	LPOPENFILENAME ofn;
 	LPWORD pw;
 	LPOFNOTIFY notify;
 	LOGFONT logfont;
 	HFONT font;
-	const char *UILanguageFile = ts.UILanguageFile;
+	static HFONT DlgFoptFont;
 
 	switch (Message) {
-	case WM_INITDIALOG:
-		ofn = (LPOPENFILENAME)lParam;
+	case WM_INITDIALOG: {
+		const char *UILanguageFile = ts.UILanguageFile;
+		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
 		pw = (LPWORD)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
 
@@ -875,6 +866,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 		CenterCommonDialog(Dialog);
 
 		return TRUE;
+	}
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -916,43 +908,43 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 #define GMF_Y  3     /* YMODEM Send */
 
 
-static char **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, LPWORD Option)
+static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, LPWORD Option)
 {
 #define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
 	const char *FileSendFilter = ts.FileSendFilter;
 	const char *UILanguageFile = ts.UILanguageFile;
 
-	char FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-	PCHAR CurDir = FileDirExpanded;
+	wchar_t FileDirExpanded[MAX_PATH];
+	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	char *FnStrMem = (char *)malloc(FnStrMemSize);
+	wchar_t *FnStrMem = (wchar_t *)malloc(FnStrMemSize * sizeof(wchar_t));
 	if (FnStrMem == NULL) {
 		MessageBeep(0);
 		return FALSE;
 	}
 	FnStrMem[0] = 0;
 
-	char *FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
+	wchar_t *FNFilter = GetCommonDialogFilterW(FileSendFilter, UILanguageFile);
 
-	char *default_filename = GetCommonDialogDefaultFilenameA(CurDir);
+	wchar_t *default_filename = GetCommonDialogDefaultFilenameW(CurDir);
 	if (default_filename != NULL) {
-		strncpy_s(FnStrMem, FnStrMemSize / sizeof(char), default_filename, _TRUNCATE);
+		wcsncpy_s(FnStrMem, FnStrMemSize, default_filename, _TRUNCATE);
 		free(default_filename);
 	}
 
-	OPENFILENAME ofn = {};
+	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = FnStrMem;
-	ofn.nMaxFile = FnStrMemSize / sizeof(char);
-	ofn.lpstrTitle= ToCharW(caption);
+	ofn.nMaxFile = FnStrMemSize;
+	ofn.lpstrTitle= caption;
 	ofn.lpstrInitialDir = CurDir;
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.Flags |= OFN_ALLOWMULTISELECT | OFN_EXPLORER;
@@ -962,7 +954,7 @@ static char **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, LPW
 		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
 		ofn.lCustData = (LPARAM)Option;
 		ofn.lpfnHook = TransFnHook;
-		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
+		ofn.lpTemplateName = MAKEINTRESOURCEW(IDD_FOPT);
 	} else if (FuncId==GMF_Y) {
 		// TODO: YMODEM
 
@@ -970,11 +962,10 @@ static char **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, LPW
 
 	ofn.hInstance = hInst;
 
-	BOOL Ok = GetOpenFileName(&ofn);
+	BOOL Ok = _GetOpenFileNameW(&ofn);
 	free(FNFilter);
-	free((void *)ofn.lpstrTitle);
 
-	char **ret = NULL;
+	wchar_t **ret = NULL;
 	if (Ok) {
 		// multiple selection
 		ret = MakeFileArrayMultiSelect(FnStrMem);
@@ -1006,7 +997,7 @@ static void KermitStart(int mode)
  *
  *	@param[in]	filename			受信ファイル名(NULLのとき、ダイアログで選択する)
  */
-BOOL KermitStartSend(const char *filename)
+BOOL KermitStartSend(const wchar_t *filename)
 {
 	if (FileVar !=NULL)
 		return FALSE;
@@ -1020,7 +1011,7 @@ BOOL KermitStartSend(const char *filename)
 
 	if (filename == NULL) {
 		WORD w = 0;
-		char **filenames = _GetMultiFname(fv->HMainWin, GMF_KERMIT, fv->DlgCaption, &w);
+		wchar_t **filenames = _GetMultiFname(fv->HMainWin, GMF_KERMIT, fv->DlgCaption, &w);
 		if (filenames == NULL) {
 			FreeFileVar_(&FileVar);
 			return FALSE;
@@ -1039,7 +1030,7 @@ BOOL KermitStartSend(const char *filename)
 /**
  *	Kermit 受信
  */
-BOOL KermitGet(const char *filename)
+BOOL KermitGet(const wchar_t *filename)
 {
 	if (FileVar !=NULL)
 		return FALSE;
@@ -1121,7 +1112,7 @@ BOOL KermitFinish(BOOL macro)
  *	@param[in]	ParamBinaryFlag
  *	@param[in]	ParamXmodemOpt
  */
-BOOL XMODEMStartReceive(const char *filename, WORD ParamBinaryFlag, WORD ParamXmodemOpt)
+BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD ParamXmodemOpt)
 {
 	if (FileVar !=NULL)
 		return FALSE;
@@ -1135,7 +1126,7 @@ BOOL XMODEMStartReceive(const char *filename, WORD ParamBinaryFlag, WORD ParamXm
 
 	if (filename == NULL) {
 		LONG Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
-		char **filenames = _GetXFname(HVTWin, TRUE, fv->DlgCaption, &Option);
+		wchar_t **filenames = _GetXFname(HVTWin, TRUE, fv->DlgCaption, &Option);
 		if (filenames == NULL) {
 			FreeFileVar_(&FileVar);
 			return FALSE;
@@ -1207,7 +1198,7 @@ BOOL XMODEMStartReceive(const char *filename, WORD ParamBinaryFlag, WORD ParamXm
  *	@param[in]	filename			送信ファイル名(NULLのとき、ダイアログで選択する)
  *	@param[in]	ParamXmodemOpt
  */
-BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
+BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 {
 	if (FileVar !=NULL)
 		return FALSE;
@@ -1221,7 +1212,7 @@ BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
 
 	if (filename == NULL) {
 		LONG Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
-		char **filenames = _GetXFname(HVTWin, FALSE, fv->DlgCaption, &Option);
+		wchar_t **filenames = _GetXFname(HVTWin, FALSE, fv->DlgCaption, &Option);
 		if (filenames == NULL) {
 			FreeFileVar_(&FileVar);
 			return FALSE;
@@ -1333,7 +1324,7 @@ BOOL YMODEMStartReceive(BOOL macro)
  *
  *	@param[in]	filename			送信ファイル名(NULLのとき、ダイアログで選択する)
  */
-BOOL YMODEMStartSend(const char *filename)
+BOOL YMODEMStartSend(const wchar_t *filename)
 {
 	if (FileVar != NULL) {
 		return FALSE;
@@ -1354,7 +1345,7 @@ BOOL YMODEMStartSend(const char *filename)
 	WORD Opt = Yopt1K;
 	FileVar->OpId = OpYSend;
 	if (filename == NULL) {
-		char **filenames = _GetMultiFname(fv->HMainWin, GMF_Y, fv->DlgCaption, &Opt);
+		wchar_t **filenames = _GetMultiFname(fv->HMainWin, GMF_Y, fv->DlgCaption, &Opt);
 		if (filenames == NULL) {
 			ProtoEnd();
 			return FALSE;
@@ -1431,7 +1422,7 @@ BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart)
  *	@param[in]	ParamBinaryFlag		binary mode
  *	@param[in]	autostart			TUREのとき自動スタート
  */
-BOOL ZMODEMStartSend(const char *filename, WORD ParamBinaryFlag, BOOL autostart)
+BOOL ZMODEMStartSend(const wchar_t *filename, WORD ParamBinaryFlag, BOOL autostart)
 {
 	if (FileVar != NULL) {
 		return FALSE;
@@ -1452,7 +1443,7 @@ BOOL ZMODEMStartSend(const char *filename, WORD ParamBinaryFlag, BOOL autostart)
 	WORD Opt = ts.XmodemBin;
 	FileVar->OpId = OpZSend;
 	if (filename == NULL) {
-		char **filenames = _GetMultiFname(fv->HMainWin, GMF_Z, fv->DlgCaption, &Opt);
+		wchar_t **filenames = _GetMultiFname(fv->HMainWin, GMF_Z, fv->DlgCaption, &Opt);
 		if (filenames == NULL) {
 			if (mode == IdZAutoS) {
 				CommRawOut(&cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
@@ -1482,22 +1473,22 @@ BOOL ZMODEMStartSend(const char *filename, WORD ParamBinaryFlag, BOOL autostart)
 	return TRUE;
 }
 
-static char **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
+static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 {
 	wchar_t TempDir[MAX_PATH];
-	char FileName[MAX_PATH];
+	wchar_t FileName[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
 
-	char FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-	PCHAR CurDir = FileDirExpanded;
+	wchar_t FileDirExpanded[MAX_PATH];
+	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	char *FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
+	wchar_t *FNFilter = GetCommonDialogFilterW(ts.FileSendFilter, UILanguageFile);
 
-	OPENFILENAME ofn = {};
+	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
@@ -1506,14 +1497,13 @@ static char **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	ofn.nMaxFile = _countof(FileName);
 	ofn.lpstrInitialDir = CurDir;
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-	ofn.lpstrTitle = ToCharW(DlgCaption);
+	ofn.lpstrTitle = DlgCaption;
 	ofn.hInstance = hInst;
 
-	BOOL Ok = GetOpenFileName(&ofn);
+	BOOL Ok = _GetOpenFileNameW(&ofn);
 	free(FNFilter);
-	free((void *)ofn.lpstrTitle);
 
-	char **ret = NULL;
+	wchar_t **ret = NULL;
 	if (Ok) {
 		ret = MakeStrArrayFromStr(FileName);
 	}
@@ -1522,7 +1512,7 @@ static char **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	return ret;
 }
 
-BOOL BPStartSend(const char *filename)
+BOOL BPStartSend(const wchar_t *filename)
 {
 	if (FileVar != NULL) {
 		return FALSE;
@@ -1540,7 +1530,7 @@ BOOL BPStartSend(const char *filename)
 		return FALSE;
 
 	if (filename == NULL) {
-		char **filenames = _GetTransFname(fv->HMainWin, FileVar->DlgCaption);
+		wchar_t **filenames = _GetTransFname(fv->HMainWin, FileVar->DlgCaption);
 		if (filenames == NULL) {
 			ProtoEnd();
 			return FALSE;
@@ -1636,7 +1626,7 @@ BOOL QVStartReceive(BOOL macro)
 	return TRUE;
 }
 
-BOOL QVStartSend(const char *filename)
+BOOL QVStartSend(const wchar_t *filename)
 {
 	if (FileVar != NULL) {
 		return FALSE;
@@ -1656,7 +1646,7 @@ BOOL QVStartSend(const char *filename)
 
 	if (filename == NULL) {
 		WORD Opt;
-		char **filenames = _GetMultiFname(fv->HMainWin, GMF_QV, fv->DlgCaption, &Opt);
+		wchar_t **filenames = _GetMultiFname(fv->HMainWin, GMF_QV, fv->DlgCaption, &Opt);
 		if (filenames == NULL) {
 			ProtoEnd();
 			return FALSE;

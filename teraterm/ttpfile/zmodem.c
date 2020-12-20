@@ -568,7 +568,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 		ZSendCancel(zv);
 		return;
 	}
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, zv->FullName);
+	fv->SetDlgProtoFileName(fv, zv->FullName);
 
 	/* file name */
 	filename = file->GetSendFilename(file, zv->FullName, FALSE, TRUE, FALSE);

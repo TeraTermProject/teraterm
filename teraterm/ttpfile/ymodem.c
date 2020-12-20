@@ -673,7 +673,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			}
 		}
 
-		SetDlgItemText(fv->HWin, IDC_PROTOFNAME, name);
+		fv->SetDlgProtoFileName(fv, name);
 
 		yv->SendFileInfo = 1;
 

@@ -40,11 +40,11 @@ typedef struct FileVarProto {
 
 	// 送信ファイル名配列
 	//	フルパスのファイル名配列(一番最後はNULL)
-	char **FileNames;
+	wchar_t **FileNames;
 	int FNCount;		// 送信中ファイル名配列index(0...)
 
 	// 受信
-	char *RecievePath;		// 受信フォルダ(終端にパスセパレータ'\\'が付加されている)
+	wchar_t *RecievePath;		// 受信フォルダ(終端にパスセパレータ'\\'が付加されている)
 
 	// ↑protosys_proto.cpp内のみ使用
 
