@@ -57,11 +57,8 @@
 #include "filesys_log_res.h"
 
 #include "filesys.h"
-#if 1
 #include "filesys_proto.h"
 #include "ttfile_proto.h"
-#define PFileVar	PFileVarProto
-#endif
 #include "tt_res.h"
 #include "kermit.h"
 #include "xmodem.h"
@@ -70,221 +67,12 @@
 #include "bplus.h"
 #include "quickvan.h"
 
-#if 0
-#define FS_BRACKET_NONE  0
-#define FS_BRACKET_START 1
-#define FS_BRACKET_END   2
-#endif
-
-//PFileVar SendVar = NULL;
-PFileVar FileVar = NULL;
-static PCHAR ProtoVar = NULL;
+static PFileVarProto FileVar = NULL;
 static int ProtoId;
-
-#if 0
-static BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
-static BYTE FileByte;
-
-#define FILE_SEND_BUF_SIZE  8192
-struct FileSendHandler {
-	CHAR buf[FILE_SEND_BUF_SIZE];
-	int pos;
-	int end;
-};
-static struct FileSendHandler FileSendHandler;
-static int FileDlgRefresh;
-
-static int FileBracketMode = FS_BRACKET_NONE;
-static int FileBracketPtr = 0;
-static char BracketStartStr[] = "\033[200~";
-static char BracketEndStr[] = "\033[201~";
-#endif
 
 extern BOOL FSend;
 
-#if 0
-static HMODULE HTTFILE = NULL;
-static int TTFILECount = 0;
-
-PGetSetupFname GetSetupFname;
-PGetTransFname GetTransFname;
-PGetMultiFname GetMultiFname;
-PGetGetFname GetGetFname;
-PSetFileVar SetFileVar;
-PGetXFname GetXFname;
-PProtoInit ProtoInit;
-PProtoParse ProtoParse;
-PProtoTimeOutProc ProtoTimeOutProc;
-PProtoCancel ProtoCancel;
-PTTFILESetUILanguageFile TTFILESetUILanguageFile;
-PTTFILESetFileSendFilter TTFILESetFileSendFilter;
-#endif
-
-#define IdGetSetupFname  1
-#define IdGetTransFname  2
-#define IdGetMultiFname  3
-#define IdGetGetFname	 4
-#define IdSetFileVar	 5
-#define IdGetXFname	 6
-
-#define IdProtoInit	 7
-#define IdProtoParse	 8
-#define IdProtoTimeOutProc 9
-#define IdProtoCancel	 10
-
-#define IdTTFILESetUILanguageFile 11
-#define IdTTFILESetFileSendFilter 12
-
-#if 0
-BOOL LoadTTFILE(void)
-{
-	BOOL Err;
-
-	if (HTTFILE != NULL)
-	{
-		TTFILECount++;
-		return TRUE;
-	}
-	else
-		TTFILECount = 0;
-
-	HTTFILE = LoadHomeDLL("TTPFILE.DLL");
-	if (HTTFILE == NULL)
-		return FALSE;
-
-	Err = FALSE;
-
-	GetSetupFname = (PGetSetupFname)GetProcAddress(HTTFILE,
-	                                               MAKEINTRESOURCE(IdGetSetupFname));
-	if (GetSetupFname==NULL)
-		Err = TRUE;
-
-	GetTransFname = (PGetTransFname)GetProcAddress(HTTFILE,
-	                                               MAKEINTRESOURCE(IdGetTransFname));
-	if (GetTransFname==NULL)
-		Err = TRUE;
-
-	GetMultiFname = (PGetMultiFname)GetProcAddress(HTTFILE,
-	                                               MAKEINTRESOURCE(IdGetMultiFname));
-	if (GetMultiFname==NULL)
-		Err = TRUE;
-
-	GetGetFname = (PGetGetFname)GetProcAddress(HTTFILE,
-	                                           MAKEINTRESOURCE(IdGetGetFname));
-	if (GetGetFname==NULL)
-		Err = TRUE;
-
-	SetFileVar = (PSetFileVar)GetProcAddress(HTTFILE,
-	                                         MAKEINTRESOURCE(IdSetFileVar));
-	if (SetFileVar==NULL)
-		Err = TRUE;
-
-	GetXFname = (PGetXFname)GetProcAddress(HTTFILE,
-	                                       MAKEINTRESOURCE(IdGetXFname));
-	if (GetXFname==NULL)
-		Err = TRUE;
-
-	ProtoInit = (PProtoInit)GetProcAddress(HTTFILE,
-	                                       MAKEINTRESOURCE(IdProtoInit));
-	if (ProtoInit==NULL)
-		Err = TRUE;
-
-	ProtoParse = (PProtoParse)GetProcAddress(HTTFILE,
-	                                         MAKEINTRESOURCE(IdProtoParse));
-	if (ProtoParse==NULL)
-		Err = TRUE;
-
-	ProtoTimeOutProc = (PProtoTimeOutProc)GetProcAddress(HTTFILE,
-	                                                     MAKEINTRESOURCE(IdProtoTimeOutProc));
-	if (ProtoTimeOutProc==NULL)
-		Err = TRUE;
-
-	ProtoCancel = (PProtoCancel)GetProcAddress(HTTFILE,
-	                                           MAKEINTRESOURCE(IdProtoCancel));
-	if (ProtoCancel==NULL)
-		Err = TRUE;
-
-	TTFILESetUILanguageFile = (PTTFILESetUILanguageFile)GetProcAddress(HTTFILE,
-	                                                                   MAKEINTRESOURCE(IdTTFILESetUILanguageFile));
-	if (TTFILESetUILanguageFile==NULL) {
-		Err = TRUE;
-	}
-	else {
-		TTFILESetUILanguageFile(ts.UILanguageFile);
-	}
-
-	TTFILESetFileSendFilter = (PTTFILESetFileSendFilter)GetProcAddress(HTTFILE,
-	                                                                   MAKEINTRESOURCE(IdTTFILESetFileSendFilter));
-	if (TTFILESetFileSendFilter==NULL) {
-		Err = TRUE;
-	}
-	else {
-		TTFILESetFileSendFilter(ts.FileSendFilter);
-	}
-
-	if (Err)
-	{
-		FreeLibrary(HTTFILE);
-		HTTFILE = NULL;
-		return FALSE;
-	}
-	else {
-		TTFILECount = 1;
-		return TRUE;
-	}
-}
-
-BOOL FreeTTFILE(void)
-{
-	if (TTFILECount==0)
-		return FALSE;
-	TTFILECount--;
-	if (TTFILECount>0)
-		return TRUE;
-	if (HTTFILE!=NULL)
-	{
-		FreeLibrary(HTTFILE);
-		HTTFILE = NULL;
-	}
-	return TRUE;
-}
-#endif
-
-//static PFileTransDlg SendDlg = NULL;
 static PProtoDlg PtDlg = NULL;
-
-#if 0
-static BOOL OpenFTDlg(PFileVar fv)
-{
-	PFileTransDlg FTDlg;
-
-	FTDlg = new CFileTransDlg();
-
-	fv->StartTime = 0;
-	fv->ProgStat = 0;
-	cv.FilePause &= ~fv->OpId;
-
-	if (FTDlg!=NULL)
-	{
-		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
-		FTDlg->RefreshNum(fv);
-	}
-
-	SendDlg = FTDlg; /* File send */
-
-	fv->StartTime = GetTickCount();
-
-	return (FTDlg!=NULL);
-}
-
-static void ShowFTDlg(WORD OpId)
-{
-	if (SendDlg != NULL) {
-		SendDlg->ShowWindow(SW_SHOWNORMAL);
-		SetForegroundWindow(SendDlg->GetSafeHwnd());
-	}
-}
-#endif
 
 static size_t _ReadFile(TFileVarProto *fv, void *buf, size_t bytes)
 {
@@ -377,7 +165,7 @@ static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
 	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, CurProgStat);
 }
 
-static BOOL NewFileVar_(PFileVar *pfv)
+static BOOL NewFileVar_(PFileVarProto *pfv)
 {
 	TFileVarProto *fv = (TFileVarProto *)malloc(sizeof(TFileVarProto));
 	if (fv == NULL)
@@ -414,7 +202,7 @@ static BOOL NewFileVar_(PFileVar *pfv)
 	return TRUE;
 }
 
-static void FreeFileVar_(PFileVar *fv)
+static void FreeFileVar_(PFileVarProto *fv)
 {
 	if ((*fv)!=NULL)
 	{
@@ -429,413 +217,58 @@ static void FreeFileVar_(PFileVar *fv)
 	}
 }
 
-#if 0
-void FileSendStart(void)
+static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
-	LONG Option = 0;
-
-	if (! cv.Ready || FSend) return;
-	if (cv.ProtoFlag)
-	{
-		FreeFileVar(&SendVar);
-		return;
-	}
-
-	if (! LoadTTFILE())
-		return;
-	if (! NewFileVar(&SendVar))
-	{
-		FreeTTFILE();
-		return;
-	}
-	SendVar->OpId = OpSendFile;
-
-	FSend = TRUE;
-
-	if (strlen(&(SendVar->FullName[SendVar->DirLen])) == 0) {
-		char FileDirExpanded[MAX_PATH];
-		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-		if (ts.TransBin)
-			Option |= LOGDLG_BINARY;
-		SendVar->FullName[0] = 0;
-		if (! (*GetTransFname)(SendVar, FileDirExpanded, GTF_SEND, &Option)) {
-			FileTransEnd(OpSendFile);
-			return;
-		}
-		ts.TransBin = CheckFlag(Option, LOGDLG_BINARY);
-	}
-	else
-		(*SetFileVar)(SendVar);
-
-	SendVar->FileHandle = CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
-	                                 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-	SendVar->FileOpen = (SendVar->FileHandle != INVALID_HANDLE_VALUE);
-	if (! SendVar->FileOpen)
-	{
-		FileTransEnd(OpSendFile);
-		return;
-	}
-	SendVar->ByteCount = 0;
-	SendVar->FileSize = GetFSize(SendVar->FullName);
-
-	TalkStatus = IdTalkFile;
-	FileRetrySend = FALSE;
-	FileRetryEcho = FALSE;
-	FileCRSend = FALSE;
-	FileReadEOF = FALSE;
-	FileSendHandler.pos = 0;
-	FileSendHandler.end = 0;
-	FileDlgRefresh = 0;
-
-	if (BracketedPasteMode()) {
-		FileBracketMode = FS_BRACKET_START;
-		FileBracketPtr = 0;
-		BinaryMode = TRUE;
-	}
-	else {
-		FileBracketMode = FS_BRACKET_NONE;
-		BinaryMode = ts.TransBin;
-	}
-
-	if (! OpenFTDlg(SendVar))
-		FileTransEnd(OpSendFile);
-}
-
-BOOL FileSendStart2(const char *filename, int binary)
-{
-	if (SendVar != NULL) {
-		return FALSE;
-	}
-	if (!NewFileVar(&SendVar)) {
-		return FALSE;
-	}
-
-	SendVar->DirLen = 0;
-	strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), filename, _TRUNCATE);
-	ts.TransBin = binary;
-	SendVar->NoMsg = TRUE;
-	FileSendStart();
-
-	return TRUE;
-}
-
-void FileTransEnd(WORD OpId)
-/* OpId = 0: close Log and FileSend
-      OpLog: close Log
- OpSendFile: close FileSend */
-{
-	if ((OpId==0) || (OpId==OpLog)) {
-		if (FLogIsOpend()) {
-			FLogClose();
-		}
-	}
-
-	if (((OpId==0) || (OpId==OpSendFile)) && FSend)
-	{
-		FSend = FALSE;
-		TalkStatus = IdTalkKeyb;
-		if (SendDlg!=NULL)
-		{
-			SendDlg->DestroyWindow();
-			SendDlg = NULL;
-		}
-		FreeFileVar(&SendVar);
-		FreeTTFILE();
-	}
-
-	EndDdeCmnd(0);
-}
-
-void FileTransPause(WORD OpId, BOOL Pause)
-{
-	if (Pause) {
-		cv.FilePause |= OpId;
-	}
-	else {
-		cv.FilePause &= ~OpId;
-	}
-}
-
-int FSOut1(BYTE b)
-{
-	if (BinaryMode)
-		return CommBinaryOut(&cv,(PCHAR)&b,1);
-	else if ((b>=0x20) || (b==0x09) || (b==0x0A) || (b==0x0D))
-		return CommTextOut(&cv,(PCHAR)&b,1);
-	else
-		return 1;
-}
-
-int FSEcho1(BYTE b)
-{
-	if (BinaryMode)
-		return CommBinaryEcho(&cv,(PCHAR)&b,1);
-	else
-		return CommTextEcho(&cv,(PCHAR)&b,1);
-}
-
-// ˆÈ‰º‚ÌŽž‚Í‚±‚¿‚ç‚ÌŠÖ”‚ðŽg‚¤
-// - BinaryMode == true
-// - FileBracketMode == false
-// - cv.TelFlag == false
-// - ts.LocalEcho == 0
-static void FileSendBinayBoost(void)
-{
-	WORD c, fc;
-	LONG BCOld;
-	DWORD read_bytes;
-
-	if ((SendDlg == NULL) ||
-		((cv.FilePause & OpSendFile) != 0))
-		return;
-
-	BCOld = SendVar->ByteCount;
-
-	if (FileRetrySend)
-	{
-		c = CommRawOut(&cv, &(FileSendHandler.buf[FileSendHandler.pos]),
-			FileSendHandler.end - FileSendHandler.pos);
-		FileSendHandler.pos += c;
-		FileRetrySend = (FileSendHandler.end != FileSendHandler.pos);
-		if (FileRetrySend)
-			return;
-	}
-
-	do {
-		if (FileSendHandler.pos == FileSendHandler.end) {
-			ReadFile(SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
-			fc = LOWORD(read_bytes);
-			FileSendHandler.pos = 0;
-			FileSendHandler.end = fc;
-		} else {
-			fc = FileSendHandler.end - FileSendHandler.end;
-		}
-
-		if (fc != 0)
-		{
-			c = CommRawOut(&cv, &(FileSendHandler.buf[FileSendHandler.pos]),
-				FileSendHandler.end - FileSendHandler.pos);
-			FileSendHandler.pos += c;
-			FileRetrySend = (FileSendHandler.end != FileSendHandler.pos);
-			SendVar->ByteCount = SendVar->ByteCount + c;
-			if (FileRetrySend)
-			{
-				if (SendVar->ByteCount != BCOld)
-					SendDlg->RefreshNum(SendVar);
-				return;
-			}
-		}
-		FileDlgRefresh = SendVar->ByteCount;
-		SendDlg->RefreshNum(SendVar);
-		BCOld = SendVar->ByteCount;
-		if (fc != 0)
-			return;
-	} while (fc != 0);
-
-	FileTransEnd(OpSendFile);
-}
-
-void FileSend(void)
-{
-	WORD c, fc;
-	LONG BCOld;
-	DWORD read_bytes;
-
-	if (cv.PortType == IdSerial && ts.FileSendHighSpeedMode &&
-	    BinaryMode && !FileBracketMode && !cv.TelFlag &&
-	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
-		return FileSendBinayBoost();
-	}
-
-	if ((SendDlg==NULL) ||
-	    ((cv.FilePause & OpSendFile) !=0))
-		return;
-
-	BCOld = SendVar->ByteCount;
-
-	if (FileRetrySend)
-	{
-		FileRetryEcho = (ts.LocalEcho>0);
-		c = FSOut1(FileByte);
-		FileRetrySend = (c==0);
-		if (FileRetrySend)
-			return;
-	}
-
-	if (FileRetryEcho)
-	{
-		c = FSEcho1(FileByte);
-		FileRetryEcho = (c==0);
-		if (FileRetryEcho)
-			return;
-	}
-
-	do {
-		if (FileBracketMode == FS_BRACKET_START) {
-			FileByte = BracketStartStr[FileBracketPtr++];
-			fc = 1;
-
-			if (FileBracketPtr >= sizeof(BracketStartStr) - 1) {
-				FileBracketMode = FS_BRACKET_END;
-				FileBracketPtr = 0;
-				BinaryMode = ts.TransBin;
-			}
-		}
-		else if (! FileReadEOF) {
-			ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
-			fc = LOWORD(read_bytes);
-			SendVar->ByteCount = SendVar->ByteCount + fc;
-
-			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
-				ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
-				fc = LOWORD(read_bytes);
-				SendVar->ByteCount = SendVar->ByteCount + fc;
-			}
-		}
-		else {
-			fc = 0;
-		}
-
-		if (fc == 0 && FileBracketMode == FS_BRACKET_END) {
-			FileReadEOF = TRUE;
-			FileByte = BracketEndStr[FileBracketPtr++];
-			fc = 1;
-			BinaryMode = TRUE;
-
-			if (FileBracketPtr >= sizeof(BracketEndStr) - 1) {
-				FileBracketMode = FS_BRACKET_NONE;
-				FileBracketPtr = 0;
-			}
-		}
-
-
-		if (fc!=0)
-		{
-			c = FSOut1(FileByte);
-			FileCRSend = (ts.TransBin==0) && (FileByte==0x0D);
-			FileRetrySend = (c==0);
-			if (FileRetrySend)
-			{
-				if (SendVar->ByteCount != BCOld)
-					SendDlg->RefreshNum(SendVar);
-				return;
-			}
-			if (ts.LocalEcho>0)
-			{
-				c = FSEcho1(FileByte);
-				FileRetryEcho = (c==0);
-				if (FileRetryEcho)
-					return;
-			}
-		}
-		if ((fc==0) || ((SendVar->ByteCount % 100 == 0) && (FileBracketPtr == 0))) {
-			SendDlg->RefreshNum(SendVar);
-			BCOld = SendVar->ByteCount;
-			if (fc!=0)
-				return;
-		}
-	} while (fc!=0);
-
-	FileTransEnd(OpSendFile);
-}
-#endif
-
-
-static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
-{
-	int vsize;
 	PProtoDlg pd;
 
 	ProtoId = IdProto;
 
 	switch (ProtoId) {
 		case PROTO_KMT:
-//			vsize = sizeof(TKmtVar);
 			KmtCreate(fv);
-			vsize = 0;
 			break;
 		case PROTO_XM:
-//			vsize = sizeof(TXVar);
 			XCreate(fv);
-			vsize = 0;
 			break;
 		case PROTO_YM:
-//			vsize = sizeof(TYVar);
 			YCreate(fv);
-			vsize = 0;
 			break;
 		case PROTO_ZM:
-//			vsize = sizeof(TZVar);
 			ZCreate(fv);
-			vsize = 0;
 			break;
 		case PROTO_BP:
-//			vsize = sizeof(TBPVar);
 			BPCreate(fv);
-			vsize = 0;
 			break;
 		case PROTO_QV:
-//			vsize = sizeof(TQVVar);
 			QVCreate(fv);
-			vsize = 0;
 			break;
 		default:
-			vsize = 0;
 			assert(FALSE);
-			break;
-	}
-	if (vsize == 0) {
-		ProtoVar = NULL;
-	}
-	else {
-		ProtoVar = (PCHAR)malloc(vsize);
-		if (ProtoVar==NULL)
 			return FALSE;
+			break;
 	}
 
 	switch (ProtoId) {
 		case PROTO_KMT:
-#if 0
-			((PKmtVar)ProtoVar)->KmtMode = Mode;
-#endif
 			_ProtoSetOpt(fv, KMT_MODE, Mode);
 			break;
 		case PROTO_XM:
-#if 0
-			((PXVar)ProtoVar)->XMode = Mode;
-			((PXVar)ProtoVar)->XOpt = Opt1;
-			((PXVar)ProtoVar)->TextFlag = 1 - (Opt2 & 1);
-#endif
 			_ProtoSetOpt(fv, XMODEM_MODE, Mode);
 			_ProtoSetOpt(fv, XMODEM_OPT, Opt1);
 			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
-#if 0
-			((PYVar)ProtoVar)->YMode = Mode;
-			((PYVar)ProtoVar)->YOpt = Opt1;
-#endif
 			_ProtoSetOpt(fv, YMODEM_MODE, Mode);
 			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
-#if 0
-			((PZVar)ProtoVar)->BinFlag = (Opt1 & 1) != 0;
-			((PZVar)ProtoVar)->ZMode = Mode;
-#endif
 			_ProtoSetOpt(fv, ZMODEM_MODE, Mode);
 			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
-#if 0
-			((PBPVar)ProtoVar)->BPMode = Mode;
-#endif
 			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
-#if 0
-			((PQVVar)ProtoVar)->QVMode = Mode;
-#endif
 			_ProtoSetOpt(fv, QUICKVAN_MODE, Mode);
 			break;
 	}
@@ -843,8 +276,6 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 	pd = new CProtoDlg();
 	if (pd==NULL)
 	{
-		free(ProtoVar);
-		ProtoVar = NULL;
 		return FALSE;
 	}
 	CProtoDlgInfo info;
@@ -853,7 +284,7 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 	pd->Create(hInst, HVTWin, &info);
 	fv->HWin = pd->m_hWnd;
 
-	_ProtoInit(ProtoId,FileVar,ProtoVar,&cv,&ts);
+	_ProtoInit(ProtoId,FileVar,&cv,&ts);
 
 	PtDlg = pd;
 	return TRUE;
@@ -876,11 +307,6 @@ static void CloseProtoDlg(void)
 		if (FileVar->LogFlag)
 			CloseHandle(FileVar->LogFile);
 		FileVar->LogFile = 0;
-		if (ProtoVar!=NULL)
-		{
-			free(ProtoVar);
-			ProtoVar = NULL;
-		}
 	}
 }
 
@@ -894,17 +320,10 @@ static BOOL ProtoStart(void)
 		return FALSE;
 	}
 
-#if 0
-	if (! LoadTTFILE())
-		return FALSE;
-#endif
 	NewFileVar_(&FileVar);
 
 	if (FileVar==NULL)
 	{
-#if 0
-		FreeTTFILE();
-#endif
 		return FALSE;
 	}
 	cv.ProtoFlag = TRUE;
@@ -928,9 +347,6 @@ void ProtoEnd(void)
 	else
 		EndDdeCmnd(0);
 
-#if 0
-	FreeTTFILE();
-#endif
 	FreeFileVar_(&FileVar);
 }
 
@@ -942,7 +358,6 @@ static void CenterCommonDialog(HWND hDlg)
 	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
 }
 
-//static char FileSendFilter[128];
 static HFONT DlgXoptFont;
 
 /* Hook function for XMODEM file name dialog box */
@@ -1075,7 +490,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
+static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv, PCHAR CurDir)
 {
 	LONG opt;
 	BOOL Ok;
@@ -1168,7 +583,7 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	if (_ProtoParse(ProtoId,FileVar,ProtoVar,&cv))
+	if (_ProtoParse(ProtoId,FileVar,&cv))
 		P = 0; /* continue */
 	else {
 		CommSend(&cv);
@@ -1180,13 +595,13 @@ int ProtoDlgParse(void)
 void ProtoDlgTimeOut(void)
 {
 	if (PtDlg!=NULL)
-		_ProtoTimeOutProc(ProtoId,FileVar,ProtoVar,&cv);
+		_ProtoTimeOutProc(ProtoId,FileVar,&cv);
 }
 
 void ProtoDlgCancel(void)
 {
 	if ((PtDlg!=NULL) &&
-	    _ProtoCancel(ProtoId,FileVar,ProtoVar,&cv))
+	    _ProtoCancel(ProtoId,FileVar,&cv))
 		ProtoEnd();
 }
 
@@ -1199,21 +614,21 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_GETFNHELP, "BTN_HELP" },
 	};
-	PFileVar fv;
+	PFileVarProto fv;
 	char TempFull[MAX_PATH];
 	int i, j;
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	switch (Message) {
 	case WM_INITDIALOG:
-		fv = (PFileVar)lParam;
+		fv = (PFileVarProto)lParam;
 		SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 		SendDlgItemMessage(Dialog, IDC_GETFN, EM_LIMITTEXT, sizeof(TempFull)-1,0);
 		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
 		return TRUE;
 
 	case WM_COMMAND:
-		fv = (PFileVar)GetWindowLongPtr(Dialog,DWLP_USER);
+		fv = (PFileVarProto)GetWindowLongPtr(Dialog,DWLP_USER);
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			if (fv!=NULL) {
@@ -1239,7 +654,7 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static BOOL _GetGetFname(HWND HWin, PFileVar fv, PTTSet ts)
+static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet ts)
 {
 	SetDialogFont(ts->DialogFontName, ts->DialogFontPoint, ts->DialogFontCharSet,
 				  ts->UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
@@ -1331,7 +746,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 
 #define FnStrMemSize 4096
 
-static BOOL _GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
+static BOOL _GetMultiFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 {
 	int i, len;
 	char uimsg[MAX_UIMSG];
@@ -1475,7 +890,7 @@ static BOOL _GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option
 	return Ok;
 }
 
-static void _SetFileVar(PFileVar fv)
+static void _SetFileVar(PFileVarProto fv)
 {
 	int i;
 	char uimsg[MAX_UIMSG];
@@ -1975,7 +1390,7 @@ BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
 #define GTF_SEND 0 /* Send file */
 #define GTF_BP   2 /* B-Plus Send */
 
-static BOOL _GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
+static BOOL _GetTransFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];
 	char *FNFilter;
@@ -2190,13 +1605,6 @@ BOOL QVStartSend(const char *filename)
 
 	return TRUE;
 }
-
-#if 0
-BOOL IsSendVarNULL()
-{
-	return SendVar == NULL;
-}
-#endif
 
 BOOL IsFileVarNULL()
 {

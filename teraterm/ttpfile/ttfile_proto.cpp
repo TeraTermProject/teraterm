@@ -53,7 +53,7 @@
 #include <io.h>
 #include <assert.h>
 
-void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
+void _ProtoInit(int Proto, PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -77,7 +77,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 	}
 }
 
-BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
+BOOL _ProtoParse(int Proto, PFileVarProto fv, PComVar cv)
 {
 	BOOL Ok;
 
@@ -105,7 +105,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 	return Ok;
 }
 
-void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
+void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -129,7 +129,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 	}
 }
 
-BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
+BOOL _ProtoCancel(int Proto, PFileVarProto fv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:

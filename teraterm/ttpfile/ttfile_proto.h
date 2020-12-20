@@ -32,10 +32,10 @@
 extern "C" {
 #endif
 
-void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts);
-BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv);
-void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv);
-BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv);
+void _ProtoInit(int Proto, PFileVarProto fv, PComVar cv, PTTSet ts);
+BOOL _ProtoParse(int Proto, PFileVarProto fv, PComVar cv);
+void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PComVar cv);
+BOOL _ProtoCancel(int Proto, PFileVarProto fv, PComVar cv);
 int _ProtoSetOpt(PFileVarProto fv, int request, ...);
 
 #ifdef __cplusplus
