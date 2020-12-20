@@ -1554,7 +1554,7 @@ void BGInitialize(BOOL initialize_once)
   // Tera Termの起動時のみに初期化する。
   if (initialize_once) {
 	  // Tera Term起動時に一度だけ読む。
-	  ts.EtermLookfeel.BGIgnoreThemeFile = BGGetOnOff("BGIgnoreThemeFile", FALSE ,ts.SetupFName);
+	  ts.EtermLookfeel_BGIgnoreThemeFile = BGGetOnOff("BGIgnoreThemeFile", FALSE ,ts.SetupFName);
   }
 
   if(!BGEnable)
@@ -1615,7 +1615,7 @@ void BGInitialize(BOOL initialize_once)
   // ImageFile.INIではない場合はランダムに選ぶ。
   if (strstr(path, BG_THEME_IMAGEFILE_NAME) == NULL) {
 	  // テーマファイルを無視する場合は空にする。
-	  if (ts.EtermLookfeel.BGIgnoreThemeFile) {
+	  if (ts.EtermLookfeel_BGIgnoreThemeFile) {
 		ZeroMemory(config_file, sizeof(config_file));
 	  }
   }

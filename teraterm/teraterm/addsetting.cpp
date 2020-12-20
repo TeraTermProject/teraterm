@@ -723,7 +723,7 @@ void CVisualPropPageDlg::OnInitDialog()
 		SetCheck(IDC_BGIMG_CHECK, BST_UNCHECKED);
 	}
 	// テーマファイルを無視する場合は壁紙と混合しない。
-	if (ts.EtermLookfeel.BGIgnoreThemeFile) {
+	if (ts.EtermLookfeel_BGIgnoreThemeFile) {
 		SetCheck(IDC_MIXED_THEME_FILE, BST_UNCHECKED);
 	} else {
 		SetCheck(IDC_MIXED_THEME_FILE, BST_CHECKED);
@@ -1164,10 +1164,10 @@ void CVisualPropPageDlg::OnOK()
 		}
 		if (GetCheck(IDC_MIXED_THEME_FILE)) {
 			// 壁紙と混合の場合、デフォルトに戻しておく。
-			ts.EtermLookfeel.BGIgnoreThemeFile = FALSE;
+			ts.EtermLookfeel_BGIgnoreThemeFile = FALSE;
 		} else {
 			// テーマファイルを無視する。
-			ts.EtermLookfeel.BGIgnoreThemeFile = TRUE;
+			ts.EtermLookfeel_BGIgnoreThemeFile = TRUE;
 		}
 
 	} else {

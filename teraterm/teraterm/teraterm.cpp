@@ -315,7 +315,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	(void)nCmdShow;
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
+#ifdef _M_IX86
+	{
+		// TTTSet(struct tttset)に新しいメンバーを追加するときは後ろに追加する
+		//		TTTSetを参照するプラグインとの互換性を保つため
+		const size_t ts_offset_dialogfont_r8106 = 10176;
+		const size_t ts_size_r9033 = 10196;
+		size_t ts_size = sizeof(ts);
+		size_t ts_offset_dialogfont = offsetof(ts, DialogFontCharSet);
+		if (ts_size != ts_size_r9033 || ts_offset_dialogfont != ts_offset_dialogfont_r8106) {
+			MessageBoxA(NULL, "Check struct tttset size", "Tera Term", MB_OK | MB_ICONERROR);
+			return 0;
+		}
+	}
+#endif // _M_IX86
+#endif // _DEBUG
 	init();
 	GetHtmlHelpAdr();
 	if (pHtmlHelp != NULL) {

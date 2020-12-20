@@ -406,7 +406,7 @@ typedef struct {
 	int BGNoCopyBits;
 	int BGNoFrame;
 	char BGThemeFile[MAX_PATH];
-	int BGIgnoreThemeFile;
+	// int BGIgnoreThemeFile;	// tttset ‚ÉˆÚ“®
 } eterm_lookfeel_t;
 
 typedef struct cygterm {
@@ -709,6 +709,7 @@ struct tttset {
 	int ConfigVersion;
 	int RunningVersion;
 	DWORD SelectStartDelay;
+	int EtermLookfeel_BGIgnoreThemeFile;	// eterm_lookfeel_t ‚Ìƒƒ“ƒo[‚¾‚Á‚½
 };
 
 typedef struct tttset TTTSet, *PTTSet;
