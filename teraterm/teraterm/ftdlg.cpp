@@ -73,7 +73,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlgInfo *info)
 	HWND hwnd;
 
 	UILanguageFile = info->UILanguageFile;
-	OpId = info->OpId;
+	OpId = info->OpId;	// OpLog or OpSendFile ‚Ì‚Ý
 	DlgCaption = _wcsdup(info->DlgCaption);
 	FullName = _wcsdup(info->FullName);
 	if (info->FileName != NULL) {
@@ -289,7 +289,7 @@ BOOL CFileTransDlg::OnCancel( )
 		FLogClose();
 	}
 	else {
-		FileTransEnd(OpId);
+		FileSendEnd();
 	}
 	return TRUE;
 }

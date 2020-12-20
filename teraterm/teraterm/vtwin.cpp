@@ -1740,7 +1740,7 @@ void CVTWindow::OnClose()
 	}
 
 	FLogClose();
-	FileTransEnd(0);
+	FileSendEnd();
 	ProtoEnd();
 
 	SaveVTPos();

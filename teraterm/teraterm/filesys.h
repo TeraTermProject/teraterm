@@ -34,66 +34,13 @@
 extern "C" {
 #endif
 
-#if 0
-typedef BOOL (PASCAL *PGetSetupFname)
-  (HWND HWin, WORD FuncId, PTTSet ts);
-typedef BOOL (PASCAL *PGetTransFname)
-  (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option);
-typedef BOOL (PASCAL *PGetMultiFname)
-  (PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option);
-typedef BOOL (PASCAL *PGetGetFname)
-  (HWND HWin, PFileVar fv, PTTSet ts);
-typedef void (PASCAL *PSetFileVar) (PFileVar fv);
-typedef BOOL (PASCAL *PGetXFname)
-  (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir);
-#endif
-#if 0
-typedef void (PASCAL *PProtoInit)
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts);
-typedef BOOL (PASCAL *PProtoParse)
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
-typedef void (PASCAL *PProtoTimeOutProc)
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
-typedef BOOL (PASCAL *PProtoCancel)
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
-typedef BOOL (PASCAL *PTTFILESetUILanguageFile)
-  (char *file);
-typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
-  (char *file);
-#endif
-
-#if 0
-extern PGetSetupFname GetSetupFname;
-extern PGetTransFname GetTransFname;
-extern PGetMultiFname GetMultiFname;
-extern PGetGetFname GetGetFname;
-extern PSetFileVar SetFileVar;
-extern PGetXFname GetXFname;
-#endif
-#if 0
-extern PProtoInit ProtoInit;
-extern PProtoParse ProtoParse;
-extern PProtoTimeOutProc ProtoTimeOutProc;
-extern PProtoCancel ProtoCancel;
-#endif
-#if 0
-extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;
-extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
-#endif
-
-#if 0
-BOOL LoadTTFILE(void);
-BOOL FreeTTFILE(void);
-#endif
-//BOOL NewFileVar(PFileVar *FV);
-//void FreeFileVar(PFileVar *FV);
-BOOL IsSendVarNULL();
-BOOL IsFileVarNULL();
+BOOL IsSendVarNULL(void);
+BOOL IsFileVarNULL(void);
 
 void FileSendStart(void);
 BOOL FileSendStart2(const char *filename, int binary);
 void FileSend(void);
-void FileTransEnd(WORD OpId);
+void FileSendEnd(void);
 void FileTransPause(WORD OpId, BOOL Pause);
 
 void ProtoEnd(void);
@@ -120,10 +67,6 @@ BOOL BPStartReceive(void);
 void QVStart(int mode);
 BOOL QVStartReceive(void);
 BOOL QVStartSend(const char *filename);
-
-#if 0
-extern PFileVar SendVar, FileVar;
-#endif
 
 #ifdef __cplusplus
 }
