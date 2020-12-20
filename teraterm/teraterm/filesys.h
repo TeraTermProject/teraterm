@@ -58,8 +58,7 @@ BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart);
 BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag, BOOL autostart);
 BOOL BPStartSend(const char *filename);
 BOOL BPStartReceive(BOOL macro, BOOL autostart);
-void QVStart(int mode);
-BOOL QVStartReceive(void);
+BOOL QVStartReceive(BOOL macro);
 BOOL QVStartSend(const char *filename);
 
 #ifdef __cplusplus

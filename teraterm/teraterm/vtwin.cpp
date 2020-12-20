@@ -4379,13 +4379,13 @@ void CVTWindow::OnFileBPSend()
 
 void CVTWindow::OnFileQVRcv()
 {
-	QVStart(IdQVReceive);
+	QVStartReceive(FALSE);
 }
 
 void CVTWindow::OnFileQVSend()
 {
 	HelpId = HlpFileQVSend;
-	QVStart(IdQVSend);
+	QVStartSend(NULL);
 }
 
 void CVTWindow::OnFileChangeDir()

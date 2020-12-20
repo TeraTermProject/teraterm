@@ -1286,8 +1286,10 @@ BOOL YMODEMStartReceive(BOOL macro)
 	/* disable transmit delay (serial port) */
 	cv.DelayFlag = FALSE;
 
-	if (! OpenProtoDlg(FileVar,PROTO_YM,IdYReceive,Opt,0))
+	if (! OpenProtoDlg(FileVar,PROTO_YM,IdYReceive,Opt,0)) {
 		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1340,8 +1342,10 @@ BOOL YMODEMStartSend(const char *filename)
 	/* disable transmit delay (serial port) */
 	cv.DelayFlag = FALSE;
 
-	if (! OpenProtoDlg(FileVar,PROTO_YM, IdYSend,Opt,0))
+	if (! OpenProtoDlg(FileVar,PROTO_YM, IdYSend,Opt,0)) {
 		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1386,8 +1390,10 @@ BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart)
 	cv.DelayFlag = FALSE;
 
 	WORD Opt = 0;
-	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0))
+	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0)) {
 		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1446,8 +1452,10 @@ BOOL ZMODEMStartSend(const char *filename, WORD ParamBinaryFlag, BOOL autostart)
 	/* disable transmit delay (serial port) */
 	cv.DelayFlag = FALSE;
 
-	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0))
+	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0)) {
 		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1537,6 +1545,7 @@ BOOL BPStartSend(const char *filename)
 
 	if (! OpenProtoDlg(FileVar,PROTO_BP, IdBPSend,0,0)) {
 		ProtoEnd();
+		return FALSE;
 	}
 
 	return TRUE;
@@ -1573,60 +1582,15 @@ BOOL BPStartReceive(BOOL macro, BOOL autostart)
 	/* disable transmit delay (serial port) */
 	cv.DelayFlag = FALSE;
 
-	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0))
+	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0)) {
 		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
 
-void QVStart(int mode)
-{
-	WORD W;
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts.UILanguageFile;
-
-	if (! ProtoStart())
-		return;
-
-	TFileVarProto *fv = FileVar;
-
-	if (mode==IdQVSend)
-	{
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-		FileVar->OpId = OpQVSend;
-		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-		{
-			if (! _GetMultiFname(fv->HMainWin, GMF_QV, fv->DlgCaption, &W) ||
-			    (FileVar->NumFname==0))
-			{
-				ProtoEnd();
-				return;
-			}
-		}
-		else
-			_SetFileVar(FileVar);
-	}
-	else {
-		FileVar->OpId = OpQVRcv;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_QVRCV", uimsg, sizeof(uimsg), TitQVRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-	}
-
-	TalkStatus = IdTalkQuiet;
-
-	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
-
-	if (! OpenProtoDlg(FileVar,PROTO_QV,mode,0,0))
-		ProtoEnd();
-}
-
-BOOL QVStartReceive(void)
+BOOL QVStartReceive(BOOL macro)
 {
 	if (FileVar != NULL) {
 		return FALSE;
@@ -1635,8 +1599,33 @@ BOOL QVStartReceive(void)
 		return FALSE;
 	}
 
-	FileVar->NoMsg = TRUE;
-	QVStart(IdQVReceive);
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
+	int mode = IdQVReceive;
+
+	if (! ProtoStart())
+		return FALSE;
+
+	TFileVarProto *fv = FileVar;
+
+	FileVar->OpId = OpQVRcv;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_QVRCV", uimsg, sizeof(uimsg), TitQVRcv, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_QV,mode,0,0)) {
+		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1650,11 +1639,43 @@ BOOL QVStartSend(const char *filename)
 		return FALSE;
 	}
 
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
-	FileVar->NumFname = 1;
-	FileVar->NoMsg = TRUE;
-	QVStart(IdQVSend);
+	TFileVarProto *fv = FileVar;
+
+	if (! ProtoStart())
+		return FALSE;
+
+	FileVar->OpId = OpQVSend;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (filename == NULL) {
+		WORD Opt;
+		char **filenames = _GetMultiFname(fv->HMainWin, GMF_QV, fv->DlgCaption, &Opt);
+		if (filenames == NULL) {
+			ProtoEnd();
+			return FALSE;
+		}
+	}
+	else {
+		FileVar->DirLen = 0;
+		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+		FileVar->NumFname = 1;
+		FileVar->NoMsg = TRUE;
+	}
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_QV,IdQVSend,0,0)) {
+		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }

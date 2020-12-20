@@ -591,7 +591,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	}
 	case CmdQVRecv:
-		if (QVStartReceive()) {
+		if (QVStartReceive(TRUE)) {
 			DdeCmnd = TRUE;
 		}
 		else
