@@ -34,6 +34,7 @@
 #include <crtdbg.h>
 #include <windows.h>
 #include <htmlhelp.h>
+#include <stddef.h>		// for offsetof()
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -322,7 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		const size_t ts_offset_dialogfont_r8106 = 10176;
 		const size_t ts_size_r9033 = 10196;
 		size_t ts_size = sizeof(ts);
-		size_t ts_offset_dialogfont = offsetof(ts, DialogFontCharSet);
+		size_t ts_offset_dialogfont = offsetof(tttset, DialogFontCharSet);
 		if (ts_size != ts_size_r9033 || ts_offset_dialogfont != ts_offset_dialogfont_r8106) {
 			MessageBoxA(NULL, "Check struct tttset size", "Tera Term", MB_OK | MB_ICONERROR);
 			return 0;
