@@ -29,51 +29,65 @@
 #pragma once
 
 typedef struct FileVarProto {
-  HWND HMainWin;
-  HWND HWin;
-  WORD OpId;
-  char DlgCaption[40];
+	HWND HMainWin;
+	HWND HWin;
+	WORD OpId;
+	char DlgCaption[40];
 
-  char FullName[MAX_PATH];
-  int DirLen;
+	char FullName[MAX_PATH];
+	int DirLen;
 
-  int NumFname, FNCount;
-  HANDLE FnStrMemHandle;
-  PCHAR FnStrMem;
-  int FnPtr;
+	int NumFname, FNCount;
+	HANDLE FnStrMemHandle;
+	PCHAR FnStrMem;
+	int FnPtr;
 
-  BOOL FileOpen;
-  HANDLE FileHandle;
-  LONG FileSize, ByteCount;
-  BOOL OverWrite;
+	BOOL FileOpen;
+	HANDLE FileHandle;
+	LONG FileSize, ByteCount;
+	BOOL OverWrite;
 
-  BOOL LogFlag;
-  HANDLE LogFile;
-  WORD LogState;
-  WORD LogCount;
+	BOOL LogFlag;
+	HANDLE LogFile;
+	WORD LogState;
+	WORD LogCount;
 
-  BOOL Success;
-  BOOL NoMsg;
+	BOOL Success;
+	BOOL NoMsg;
 
-  char LogDefaultPath[MAX_PATH];
-  BOOL HideDialog;
+	char LogDefaultPath[MAX_PATH];
+	BOOL HideDialog;
 
-  BYTE LogLineBuf[16];
-  int FlushLogLineBuf;
+	BYTE LogLineBuf[16];
+	int FlushLogLineBuf;
 
-  int ProgStat;
+	int ProgStat;
 
-  DWORD StartTime;
+	DWORD StartTime;
 
-  int reserve_1;
-  LONG reserve_2;
-  int reserve_3;
+	DWORD FileMtime;
 
-  HANDLE reserve_4;
-  DWORD reserve_5;
+	// protocol entrys, data
+	void (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
+	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
+	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
+	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
+	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
+	void *data;
 
-  DWORD FileMtime;
-  HANDLE reserve_6;
+	// file I/O
+	size_t (*ReadFile)(struct FileVarProto *fv, void *buf, size_t bytes);
+	size_t (*WriteFile)(struct FileVarProto *fv, const void *buf, size_t bytes);
+	void (*Close)(struct FileVarProto *fv);
+	size_t (*GetFSize)(struct FileVarProto *fv, const char *filenameU8);
 
+	// UI
+	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
+	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);
+	void (*SetDlgPaketNum)(struct FileVarProto *fv, LONG Num);
+	void (*SetDlgByteCount)(struct FileVarProto *fv, LONG Num);
+	void (*SetDlgPercent)(struct FileVarProto *fv, LONG a, LONG b, int *p);
+	void (*SetDlgProtoText)(struct FileVarProto *fv, const char *text);
+	void (*SetDlgProtoFileName)(struct FileVarProto *fv, const char *text);
 } TFileVarProto;
 typedef TFileVarProto *PFileVarProto;

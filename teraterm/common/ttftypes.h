@@ -89,57 +89,6 @@
 #define TitQVRcv    "Quick-VAN Receive"
 #define TitQVSend   "Quick-VAN Send"
 
-#if 0
-typedef struct {
-  HWND HMainWin;
-  HWND HWin;
-  WORD OpId;
-  char DlgCaption[40];
-
-  char FullName[MAX_PATH];
-  int DirLen;
-
-  int NumFname, FNCount;
-  HANDLE FnStrMemHandle;
-  PCHAR FnStrMem;
-  int FnPtr;
-
-  BOOL FileOpen;
-  HANDLE FileHandle;
-  LONG FileSize, ByteCount;
-  BOOL OverWrite;
-
-  BOOL LogFlag;
-  HANDLE LogFile;
-  WORD LogState;
-  WORD LogCount;
-
-  BOOL Success;
-  BOOL NoMsg;
-
-  char LogDefaultPath[MAX_PATH];
-  BOOL HideDialog;
-
-  BYTE LogLineBuf[16];
-  int FlushLogLineBuf;
-
-  int ProgStat;
-
-  DWORD StartTime;
-
-  int reserve_1;
-  LONG reserve_2;
-  int reserve_3;
-
-  HANDLE reserve_4;
-  DWORD reserve_5;
-
-  DWORD FileMtime;
-  HANDLE reserve_6;
-} TFileVar;
-typedef TFileVar far *PFileVar;
-#endif
-
 typedef struct {
 	int MAXL;
 	BYTE TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT,CAPAS,WINDO,MAXLX1,MAXLX2;
@@ -193,6 +142,7 @@ typedef TKmtVar far *PKmtVar;
 #define GetInit 10
 #define Finish 11
 
+#if 0
 /* XMODEM */
 typedef struct {
   BYTE PktIn[1030], PktOut[1030];
@@ -222,7 +172,7 @@ typedef TXVar far *PXVar;
 
 #define XnakNAK 1
 #define XnakC 2
-
+#endif
 
 /* YMODEM */
 typedef struct {

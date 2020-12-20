@@ -50,6 +50,15 @@
 #define SOH_DATALEN	128
 #define STX_DATALEN	1024
 
+  /* XMODEM states */
+#define XpktSOH 1
+#define XpktBLK 2
+#define XpktBLK2 3
+#define XpktDATA 4
+
+#define XnakNAK 1
+#define XnakC 2
+
 int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 {
 	if (CommRead1Byte(cv,b) == 0)

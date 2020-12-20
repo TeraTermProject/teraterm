@@ -62,6 +62,8 @@
 #include "ttfile_proto.h"
 #define PFileVar	PFileVarProto
 #endif
+#include "tt_res.h"
+#include "xmodem.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -279,29 +281,132 @@ static void ShowFTDlg(WORD OpId)
 }
 #endif
 
-static BOOL NewFileVar_(PFileVar *fv)
+static size_t _ReadFile(TFileVarProto *fv, void *buf, size_t bytes)
 {
-	if ((*fv)==NULL)
-	{
-		*fv = (PFileVar)malloc(sizeof(TFileVarProto));
-		if ((*fv)!=NULL)
-		{
-			char FileDirExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			memset(*fv, 0, sizeof(*fv));
-			strncpy_s((*fv)->FullName, sizeof((*fv)->FullName), FileDirExpanded, _TRUNCATE);
-			AppendSlash((*fv)->FullName,sizeof((*fv)->FullName));
-			(*fv)->DirLen = strlen((*fv)->FullName);
-			(*fv)->FileOpen = FALSE;
-			(*fv)->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
-			(*fv)->HMainWin = HVTWin;
-			(*fv)->Success = FALSE;
-			(*fv)->NoMsg = FALSE;
-			(*fv)->HideDialog = FALSE;
-		}
+	HANDLE hFile = fv->FileHandle;
+	DWORD NumberOfBytesRead;
+	BOOL Result = ReadFile(hFile, buf, (UINT)bytes, &NumberOfBytesRead, NULL);
+	if (Result == FALSE) {
+		return 0;
+	}
+	return NumberOfBytesRead;
+}
+
+static size_t _WriteFile(TFileVarProto *fv, const void *buf, size_t bytes)
+{
+	HANDLE hFile = fv->FileHandle;
+	DWORD NumberOfBytesWritten;
+	UINT length = (UINT)bytes;
+	BOOL result = WriteFile(hFile, buf, length, &NumberOfBytesWritten, NULL);
+	if (result == FALSE) {
+		return 0;
+	}
+	return NumberOfBytesWritten;
+}
+
+static void _Close(TFileVarProto *fv)
+{
+	HANDLE hFile = fv->FileHandle;
+	CloseHandle(hFile);
+	fv->FileHandle = 0;
+}
+
+/**
+ *	ファイルのファイルサイズを取得
+ *	@param[in]	filenameU8		ファイル名(UTF-8)
+ *	@retval		ファイルサイズ
+ */
+static size_t _GetFSize(struct FileVarProto *fv, const char *filenameU8)
+{
+	HANDLE h = _CreateFileW(wc::fromUtf8(filenameU8), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+							FILE_ATTRIBUTE_NORMAL, NULL);
+	if (h == INVALID_HANDLE_VALUE) {
+		return 0;
 	}
 
-	return ((*fv)!=NULL);
+	DWORD file_size_hi;
+	DWORD file_size_low;
+	file_size_low = GetFileSize(h, &file_size_hi);
+	if (file_size_low == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
+		CloseHandle(h);
+		return 0;
+	}
+	CloseHandle(h);
+
+	unsigned long long file_size = ((unsigned long long)file_size_hi << 32) + file_size_low;
+	return file_size;
+}
+
+static void _SetDlgTime(TFileVarProto *fv, DWORD elapsed, int bytes)
+{
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+}
+
+static void _SetDlgPaketNum(struct FileVarProto *fv, LONG Num)
+{
+	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, Num);
+}
+
+static void _SetDlgByteCount(struct FileVarProto *fv, LONG Num)
+{
+	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, Num);
+}
+
+static void _SetDlgPercent(struct FileVarProto *fv, LONG a, LONG b, int *p)
+{
+	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS, a, b, p);
+}
+
+static void _SetDlgProtoText(struct FileVarProto *fv, const char *text)
+{
+	SetDlgItemText(fv->HWin, IDC_PROTOPROT, text);
+}
+
+static void _SetDlgProtoFileName(struct FileVarProto *fv, const char *text)
+{
+	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, text);
+}
+
+static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
+{
+	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, CurProgStat);
+}
+
+static BOOL NewFileVar_(PFileVar *pfv)
+{
+	TFileVarProto *fv = (TFileVarProto *)malloc(sizeof(TFileVarProto));
+	if (fv == NULL)
+		return FALSE;
+	memset(fv, 0, sizeof(*fv));
+
+	char FileDirExpanded[MAX_PATH];
+	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	strncpy_s(fv->FullName, sizeof(fv->FullName), FileDirExpanded, _TRUNCATE);
+	AppendSlash(fv->FullName,sizeof(fv->FullName));
+
+	fv->DirLen = strlen(fv->FullName);
+	fv->FileOpen = FALSE;
+	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
+	fv->HMainWin = HVTWin;
+	fv->Success = FALSE;
+	fv->NoMsg = FALSE;
+	fv->HideDialog = FALSE;
+
+	fv->ReadFile = _ReadFile;
+	fv->WriteFile = _WriteFile;
+	fv->Close = _Close;
+	fv->GetFSize = _GetFSize;
+
+	fv->InitDlgProgress = _InitDlgProgress;
+	fv->SetDlgTime = _SetDlgTime;
+	fv->SetDlgPaketNum = _SetDlgPaketNum;
+	fv->SetDlgByteCount = _SetDlgByteCount;
+	fv->SetDlgPercent = _SetDlgPercent;
+	fv->SetDlgProtoText = _SetDlgProtoText;
+	fv->SetDlgProtoFileName = _SetDlgProtoFileName;
+
+	*pfv = fv;
+	return TRUE;
 }
 
 static void FreeFileVar_(PFileVar *fv)
@@ -643,7 +748,9 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			vsize = sizeof(TKmtVar);
 			break;
 		case PROTO_XM:
-			vsize = sizeof(TXVar);
+//			vsize = sizeof(TXVar);
+			XCreate(fv);
+			vsize = 0;
 			break;
 		case PROTO_YM:
 			vsize = sizeof(TYVar);
@@ -662,18 +769,28 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			assert(FALSE);
 			break;
 	}
-	ProtoVar = (PCHAR)malloc(vsize);
-	if (ProtoVar==NULL)
-		return FALSE;
+	if (vsize == 0) {
+		ProtoVar = NULL;
+	}
+	else {
+		ProtoVar = (PCHAR)malloc(vsize);
+		if (ProtoVar==NULL)
+			return FALSE;
+	}
 
 	switch (ProtoId) {
 		case PROTO_KMT:
 			((PKmtVar)ProtoVar)->KmtMode = Mode;
 			break;
 		case PROTO_XM:
+#if 0
 			((PXVar)ProtoVar)->XMode = Mode;
 			((PXVar)ProtoVar)->XOpt = Opt1;
 			((PXVar)ProtoVar)->TextFlag = 1 - (Opt2 & 1);
+#endif
+			_ProtoSetOpt(fv, XMODEM_MODE, Mode);
+			_ProtoSetOpt(fv, XMODEM_OPT, Opt1);
+			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
 			((PYVar)ProtoVar)->YMode = Mode;

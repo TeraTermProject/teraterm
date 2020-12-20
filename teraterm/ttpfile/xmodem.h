@@ -35,11 +35,19 @@
 extern "C" {
 #endif
 
-/* prototypes */
-void XInit(PFileVarProto fv, PXVar xv, PComVar cv, PTTSet ts);
-void XCancel(PFileVarProto fv, PXVar xv, PComVar cv);
-void XTimeOutProc(PFileVarProto fv, PXVar xv, PComVar cv);
-BOOL XParse(PFileVarProto fv, PXVar xv, PComVar cv);
+enum {
+	XMODEM_MODE,
+	XMODEM_OPT,
+	XMODEM_TEXT_FLAG,
+};
+
+BOOL XCreate(PFileVarProto fv);
+#if 0
+void XInit(PFileVarProto fv, PComVar cv, PTTSet ts);
+void XCancel(PFileVarProto fv, PComVar cv);
+void XTimeOutProc(PFileVarProto fv, PComVar cv);
+BOOL XParse(PFileVarProto fv, PComVar cv);
+#endif
 
 #ifdef __cplusplus
 }

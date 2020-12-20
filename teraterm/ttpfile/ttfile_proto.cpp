@@ -1,5 +1,6 @@
 /*
- * (C) 2020 TeraTerm Project
+ * Copyright (C) 1994-1998 T. Teranishi
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +60,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 		KmtInit(fv,(PKmtVar)pv,cv,ts);
 		break;
 	case PROTO_XM:
-		XInit(fv,(PXVar)pv,cv,ts);
+		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_YM:
 		YInit(fv,(PYVar)pv,cv,ts);
@@ -86,7 +87,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		Ok = KmtReadPacket(fv,(PKmtVar)pv,cv);
 		break;
 	case PROTO_XM:
-		Ok = XParse(fv, (PXVar)pv, cv);
+		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_YM:
 		switch (((PYVar)pv)->YMode) {
@@ -125,7 +126,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		KmtTimeOutProc(fv,(PKmtVar)pv,cv);
 		break;
 	case PROTO_XM:
-		XTimeOutProc(fv,(PXVar)pv,cv);
+		fv->TimeOutProc(fv,cv);
 		break;
 	case PROTO_YM:
 		YTimeOutProc(fv,(PYVar)pv,cv);
@@ -149,14 +150,14 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		KmtCancel(fv,(PKmtVar)pv,cv);
 		break;
 	case PROTO_XM:
-		XCancel(fv,(PXVar)pv,cv);
+		fv->Cancel(fv,cv);
 		break;
 	case PROTO_YM:
 		YCancel(fv, (PYVar)pv,cv);
 		break;
 	case PROTO_ZM:
 		ZCancel((PZVar)pv);
-		break;		
+		break;
 	case PROTO_BP:
 		if (((PBPVar)pv)->BPState != BP_Failure) {
 			BPCancel((PBPVar)pv);
@@ -168,4 +169,13 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		break;
 	}
 	return TRUE;
+}
+
+int _ProtoSetOpt(PFileVarProto fv, int request, ...)
+{
+	va_list ap;
+	va_start(ap, request);
+	int r = fv->SetOptV(fv, request, ap);
+	va_end(ap);
+	return r;
 }

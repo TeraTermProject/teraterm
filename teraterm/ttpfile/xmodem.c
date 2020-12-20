@@ -30,19 +30,53 @@
 /* TTFILE.DLL, XMODEM protocol */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include <stdio.h>
 
-#include "tt_res.h"
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "ftlib.h"
-#include "dlglib.h"
 #include "win16api.h"
 
 #include "xmodem.h"
 
-int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
+/* XMODEM */
+typedef struct {
+  BYTE PktIn[1030], PktOut[1030];
+  int PktBufCount, PktBufPtr;
+  BYTE PktNum, PktNumSent;
+  int PktNumOffset;
+  int PktReadMode;
+  WORD XMode, XOpt, TextFlag;
+  WORD NAKMode;
+  int NAKCount;
+  WORD DataLen, CheckLen;
+  BOOL CRRecv;
+  int TOutShort;
+  int TOutLong;
+  int TOutInit;
+  int TOutInitCRC;
+  int TOutVLong;
+  int CANCount;
+} TXVar;
+typedef TXVar far *PXVar;
+
+/* prototypes */
+
+/* XMODEM states */
+#define XpktSOH 1
+#define XpktBLK 2
+#define XpktBLK2 3
+#define XpktDATA 4
+
+#define XnakNAK 1
+#define XnakC 2
+
+BOOL XParse(PFileVarProto fv, PComVar cv);
+void XTimeOutProc(PFileVarProto fv, PComVar cv);
+void XCancel(PFileVarProto fv, PComVar cv);
+static int SetOptV(PFileVarProto fv, int request, va_list ap);
+
+static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 {
 	if (CommRead1Byte(cv, b) == 0)
 		return 0;
@@ -63,7 +97,7 @@ int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
+static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
 {
 	int i, j;
 
@@ -85,7 +119,7 @@ int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
+static void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 {
 	char Tmp[21];
 
@@ -114,10 +148,10 @@ void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 		xv->CheckLen = 1;
 		break;
 	}
-	SetDlgItemText(fv->HWin, IDC_PROTOPROT, Tmp);
+	fv->SetDlgProtoText(fv, Tmp);
 }
 
-void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
+static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 {
 	BYTE b;
 	int t;
@@ -133,7 +167,7 @@ void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 			xv->NAKMode = XnakNAK;
 			xv->NAKCount = 9;
 		} else {
-			XCancel(fv, xv, cv);
+			XCancel(fv, cv);
 			return;
 		}
 	}
@@ -153,7 +187,7 @@ void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 	FTSetTimeOut(fv, t);
 }
 
-WORD XCalcCheck(PXVar xv, PCHAR PktBuf)
+static WORD XCalcCheck(PXVar xv, PCHAR PktBuf)
 {
 	int i;
 	WORD Check;
@@ -172,7 +206,7 @@ WORD XCalcCheck(PXVar xv, PCHAR PktBuf)
 	}
 }
 
-BOOL XCheckPacket(PXVar xv)
+static BOOL XCheckPacket(PXVar xv)
 {
 	WORD Check;
 
@@ -184,8 +218,9 @@ BOOL XCheckPacket(PXVar xv)
 				(LOBYTE(Check) == xv->PktIn[xv->DataLen + 4]));
 }
 
-void XInit(PFileVarProto fv, PXVar xv, PComVar cv, PTTSet ts)
+void XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
+	PXVar xv = fv->data;
 	fv->LogFlag = ((ts->LogFlag & LOG_X) != 0);
 	if (fv->LogFlag)
 		fv->LogFile = _lcreat("XMODEM.LOG", 0);
@@ -194,15 +229,15 @@ void XInit(PFileVarProto fv, PXVar xv, PComVar cv, PTTSet ts)
 
 	fv->FileSize = 0;
 	if ((xv->XMode == IdXSend) && fv->FileOpen) {
-		fv->FileSize = GetFSize(fv->FullName);
-		InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+		fv->FileSize = fv->GetFSize(fv, fv->FullName);
+		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
 		fv->ProgStat = -1;
 	}
 	fv->StartTime = GetTickCount();
 
 	SetWindowText(fv->HWin, fv->DlgCaption);
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
+	fv->SetDlgProtoFileName(fv, &(fv->FullName[fv->DirLen]));
 
 	xv->PktNumOffset = 0;
 	xv->PktNum = 0;
@@ -256,8 +291,9 @@ void XInit(PFileVarProto fv, PXVar xv, PComVar cv, PTTSet ts)
 	}
 }
 
-void XCancel(PFileVarProto fv, PXVar xv, PComVar cv)
+void XCancel(PFileVarProto fv, PComVar cv)
 {
+	PXVar xv = fv->data;
 	// five cancels & five backspaces per spec
 	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
@@ -265,8 +301,9 @@ void XCancel(PFileVarProto fv, PXVar xv, PComVar cv)
 	xv->XMode = 0;				// quit
 }
 
-void XTimeOutProc(PFileVarProto fv, PXVar xv, PComVar cv)
+void XTimeOutProc(PFileVarProto fv, PComVar cv)
 {
+	PXVar xv = fv->data;
 	switch (xv->XMode) {
 	case IdXSend:
 		xv->XMode = 0;			// quit
@@ -277,8 +314,9 @@ void XTimeOutProc(PFileVarProto fv, PXVar xv, PComVar cv)
 	}
 }
 
-BOOL XReadPacket(PFileVarProto fv, PXVar xv, PComVar cv)
+static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 {
+	PXVar xv = fv->data;
 	BYTE b, d;
 	int i, c;
 	BOOL GetPkt = FALSE;
@@ -379,7 +417,7 @@ BOOL XReadPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 
 	d = xv->PktIn[1] - xv->PktNum;
 	if (d > 1) {
-		XCancel(fv, xv, cv);
+		XCancel(fv, cv);
 		return FALSE;
 	}
 
@@ -404,27 +442,28 @@ BOOL XReadPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 		for (i = 0; i <= c - 1; i++) {
 			b = xv->PktIn[3 + i];
 			if ((b == LF) && (!xv->CRRecv))
-				_lwrite(fv->FileHandle, "\015", 1);
+				fv->WriteFile(fv, "\015", 1);
 			if (xv->CRRecv && (b != LF))
-				_lwrite(fv->FileHandle, "\012", 1);
+				fv->WriteFile(fv, "\012", 1);
 			xv->CRRecv = b == CR;
-			_lwrite(fv->FileHandle, &b, 1);
+			fv->WriteFile(fv, &b, 1);
 	} else
-		_lwrite(fv->FileHandle, &(xv->PktIn[3]), c);
+		fv->WriteFile(fv, &(xv->PktIn[3]), c);
 
 	fv->ByteCount = fv->ByteCount + c;
 
-	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, xv->PktNumOffset + xv->PktNum);
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgPaketNum(fv, xv->PktNumOffset + xv->PktNum);
+	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	FTSetTimeOut(fv, xv->TOutLong);
 
 	return TRUE;
 }
 
-BOOL XSendPacket(PFileVarProto fv, PXVar xv, PComVar cv)
+static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 {
+	PXVar xv = fv->data;
 	BYTE b;
 	int i;
 	BOOL SendFlag;
@@ -501,7 +540,7 @@ BOOL XSendPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 
 			i = 1;
 			while ((i <= xv->DataLen) && fv->FileOpen &&
-				   (_lread(fv->FileHandle, &b, 1) == 1)) {
+				   (fv->ReadFile(fv, &b, 1) == 1)) {
 				xv->PktOut[2 + i] = b;
 				i++;
 				fv->ByteCount++;
@@ -523,7 +562,7 @@ BOOL XSendPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 				xv->PktBufCount = 3 + xv->DataLen + xv->CheckLen;
 			} else {			/* send EOT */
 				if (fv->FileOpen) {
-					_lclose(fv->FileHandle);
+					fv->Close(fv);
 					fv->FileHandle = 0;
 					fv->FileOpen = FALSE;
 				}
@@ -556,28 +595,70 @@ BOOL XSendPacket(PFileVarProto fv, PXVar xv, PComVar cv)
 
 	if (xv->PktBufCount == 0) {
 		if (xv->PktNumSent == 0) {
-			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, xv->PktNumOffset + 256);
+			fv->SetDlgPaketNum(fv, xv->PktNumOffset + 256);
 		}
 		else {
-			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, xv->PktNumOffset + xv->PktNumSent);
+			fv->SetDlgPaketNum(fv, xv->PktNumOffset + xv->PktNumSent);
 		}
-		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-		              fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+		fv->SetDlgByteCount(fv, fv->ByteCount);
+		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	}
 
 	return TRUE;
 }
 
-BOOL XParse(PFileVarProto fv, PXVar xv, PComVar cv)
+BOOL XParse(PFileVarProto fv, PComVar cv)
 {
+	PXVar xv = fv->data;
 	switch (xv->XMode) {
 	case IdXReceive:
-		return XReadPacket(fv, xv, cv);
+		return XReadPacket(fv,cv);
 	case IdXSend:
-		return XSendPacket(fv, xv, cv);
+		return XSendPacket(fv,cv);
 	default:
 		return FALSE;
 	}
+}
+
+static int SetOptV(PFileVarProto fv, int request, va_list ap)
+{
+	PXVar xv = fv->data;
+	switch(request) {
+	case XMODEM_MODE: {
+		int Mode = va_arg(ap, int);
+		xv->XMode = Mode;
+		return 0;
+	}
+	case XMODEM_OPT: {
+		WORD Opt1 = va_arg(ap, WORD);
+		xv->XOpt = Opt1;
+		return 0;
+	}
+	case XMODEM_TEXT_FLAG: {
+		WORD Opt2 = va_arg(ap, WORD);
+		xv->TextFlag = 1 - (Opt2 & 1);
+		return 0;
+	}
+	}
+	return -1;
+}
+
+BOOL XCreate(PFileVarProto fv)
+{
+	PXVar xv;
+	xv = malloc(sizeof(TXVar));
+	if (xv == NULL) {
+		return FALSE;
+	}
+	memset(xv, 0, sizeof(*xv));
+	fv->data = xv;
+
+	fv->Init = XInit;
+	fv->Parse = XParse;
+	fv->TimeOutProc = XTimeOutProc;
+	fv->Cancel = XCancel;
+	fv->SetOptV = SetOptV;
+
+	return TRUE;
 }
