@@ -60,6 +60,55 @@
 #include "ttlib.h"
 #include "win16api.h"
 
+#include "zmodem.h"
+
+/* ZMODEM */
+typedef struct {
+  BYTE RxHdr[4], TxHdr[4];
+  BYTE RxType, TERM;
+  BYTE PktIn[1032], PktOut[1032];
+  int PktInPtr, PktOutPtr;
+  int PktInCount, PktOutCount;
+  int PktInLen;
+  BOOL BinFlag;
+  BOOL Sending;
+  int ZMode, ZState, ZPktState;
+  int MaxDataLen, TimeOut, CanCount;
+  BOOL CtlEsc, CRC32, HexLo, Quoted, CRRecv;
+  WORD CRC;
+  LONG CRC3, Pos, LastPos, WinSize;
+  BYTE LastSent;
+  int TOutInit;
+  int TOutFin;
+} TZVar;
+typedef TZVar far *PZVar;
+
+#define Z_RecvInit 1
+#define Z_RecvInit2 2
+#define Z_RecvData 3
+#define Z_RecvFIN  4
+#define Z_SendInit 5
+#define Z_SendInitHdr 6
+#define Z_SendInitDat 7
+#define Z_SendFileHdr 8
+#define Z_SendFileDat 9
+#define Z_SendDataHdr 10
+#define Z_SendDataDat 11
+#define Z_SendDataDat2 12
+#define Z_SendEOF  13
+#define Z_SendFIN  14
+#define Z_Cancel   15
+#define Z_End      16
+
+#define Z_PktGetPAD 1
+#define Z_PktGetDLE 2
+#define Z_PktHdrFrm 3
+#define Z_PktGetBin 4
+#define Z_PktGetHex 5
+#define Z_PktGetHexEOL 6
+#define Z_PktGetData 7
+#define Z_PktGetCRC 8
+
 #define ZPAD   '*'
 #define ZDLE   0x18
 #define ZDLEE  0x58
@@ -643,10 +692,11 @@ void ZSendDataDat(PFileVarProto fv, PZVar zv)
 	add_sendbuf("%s: ", __FUNCTION__);
 }
 
-void ZInit(PFileVarProto fv, PZVar zv, PComVar cv, PTTSet ts) {
+void ZInit(PFileVarProto fv, PComVar cv, PTTSet ts) {
 	int Max;
 	char uimsg[MAX_UIMSG];
 	const char *UILanguageFile = ts->UILanguageFile;
+	PZVar zv = fv->data;
 
 	zv->CtlEsc = ((ts->FTFlag & FT_ZESCCTL) != 0);
 	zv->MaxDataLen = ts->ZmodemDataLen;
@@ -760,8 +810,9 @@ void ZInit(PFileVarProto fv, PZVar zv, PComVar cv, PTTSet ts) {
 	}
 }
 
-void ZTimeOutProc(PFileVarProto fv, PZVar zv, PComVar cv)
+void ZTimeOutProc(PFileVarProto fv, PComVar cv)
 {
+	PZVar zv = fv->data;
 	switch (zv->ZState) {
 	case Z_RecvInit:
 		ZSendRInit(fv, zv);
@@ -1172,8 +1223,9 @@ void ZCheckData(PFileVarProto fv, PZVar zv)
 	}
 }
 
-BOOL ZParse(PFileVarProto fv, PZVar zv, PComVar cv)
+BOOL ZParse(PFileVarProto fv, PComVar cv)
 {
+	PZVar zv = fv->data;
 	BYTE b;
 	int c;
 
@@ -1420,7 +1472,46 @@ BOOL ZParse(PFileVarProto fv, PZVar zv, PComVar cv)
 	return TRUE;
 }
 
-void ZCancel(PZVar zv)
+void ZCancel(PFileVarProto fv, PComVar cv)
 {
+	PZVar zv = fv->data;
+	(void)cv;
 	ZSendCancel(zv);
+}
+
+static int SetOptV(PFileVarProto fv, int request, va_list ap)
+{
+	PZVar zv = fv->data;
+	switch(request) {
+	case ZMODEM_MODE: {
+		int Mode = va_arg(ap, int);
+		zv->ZMode = Mode;
+		return 0;
+	}
+	case ZMODEM_BINFLAG: {
+		BOOL BinFlag = va_arg(ap, BOOL);
+		zv->BinFlag = BinFlag;
+		return 0;
+	}
+	}
+	return -1;
+}
+
+BOOL ZCreate(PFileVarProto fv)
+{
+	PZVar zv;
+	zv = malloc(sizeof(TZVar));
+	if (zv == NULL) {
+		return FALSE;
+	}
+	memset(zv, 0, sizeof(*zv));
+	fv->data = zv;
+
+	fv->Init = ZInit;
+	fv->Parse = ZParse;
+	fv->TimeOutProc = ZTimeOutProc;
+	fv->Cancel = ZCancel;
+	fv->SetOptV = SetOptV;
+
+	return TRUE;
 }

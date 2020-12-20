@@ -33,11 +33,19 @@
 extern "C" {
 #endif
 
+enum {
+	ZMODEM_MODE,
+	ZMODEM_BINFLAG,
+};
+
 /* prototypes */
-void ZInit(PFileVarProto fv, PZVar zv, PComVar cv, PTTSet ts);
-void ZTimeOutProc(PFileVarProto fv, PZVar zv, PComVar cv);
-BOOL ZParse(PFileVarProto fv, PZVar zv, PComVar cv);
-void ZCancel(PZVar zv);
+BOOL ZCreate(PFileVarProto fv);
+#if 0
+void ZInit(PFileVarProto fv, PComVar cv, PTTSet ts);
+void ZTimeOutProc(PFileVarProto fv, PComVar cv);
+BOOL ZParse(PFileVarProto fv, PComVar cv);
+void ZCancel(PFileVarProto fv, PComVar cv);
+#endif
 
 #ifdef __cplusplus
 }

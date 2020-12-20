@@ -216,6 +216,7 @@ typedef TYVar far *PYVar;
 
 #endif
 
+#if 0
 /* ZMODEM */
 typedef struct {
   BYTE RxHdr[4], TxHdr[4];
@@ -262,6 +263,7 @@ typedef TZVar far *PZVar;
 #define Z_PktGetHexEOL 6
 #define Z_PktGetData 7
 #define Z_PktGetCRC 8
+#endif
 
 /* B Plus */
 typedef struct {

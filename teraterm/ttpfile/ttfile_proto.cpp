@@ -66,7 +66,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_ZM:
-		ZInit(fv,(PZVar)pv,cv,ts);
+		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_BP:
 		BPInit(fv,(PBPVar)pv,cv,ts);
@@ -93,7 +93,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_ZM:
-		Ok = ZParse(fv,(PZVar)pv,cv);
+		Ok = fv->Parse(fv, cv);
 		break;
 	case PROTO_BP:
 		Ok = BPParse(fv,(PBPVar)pv,cv);
@@ -125,7 +125,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->TimeOutProc(fv,cv);
 		break;
 	case PROTO_ZM:
-		ZTimeOutProc(fv,(PZVar)pv,cv);
+		fv->TimeOutProc(fv, cv);
 		break;
 	case PROTO_BP:
 		BPTimeOutProc(fv,(PBPVar)pv,cv);
@@ -149,7 +149,7 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 		fv->Cancel(fv,cv);
 		break;
 	case PROTO_ZM:
-		ZCancel((PZVar)pv);
+		fv->Cancel(fv, cv);
 		break;
 	case PROTO_BP:
 		if (((PBPVar)pv)->BPState != BP_Failure) {

@@ -66,6 +66,7 @@
 #include "kermit.h"
 #include "xmodem.h"
 #include "ymodem.h"
+#include "zmodem.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -762,7 +763,9 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			vsize = 0;
 			break;
 		case PROTO_ZM:
-			vsize = sizeof(TZVar);
+//			vsize = sizeof(TZVar);
+			ZCreate(fv);
+			vsize = 0;
 			break;
 		case PROTO_BP:
 			vsize = sizeof(TBPVar);
@@ -810,8 +813,12 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
+#if 0
 			((PZVar)ProtoVar)->BinFlag = (Opt1 & 1) != 0;
 			((PZVar)ProtoVar)->ZMode = Mode;
+#endif
+			_ProtoSetOpt(fv, ZMODEM_MODE, Mode);
+			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
 			((PBPVar)ProtoVar)->BPMode = Mode;
