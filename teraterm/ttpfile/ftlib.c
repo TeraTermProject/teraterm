@@ -63,8 +63,8 @@ BOOL GetNextFname(PFileVarProto fv)
 	fv->FNCount++;
 
 	strncpy_s(fv->FullName, sizeof(fv->FullName), f, _TRUNCATE);
-	GetFileNamePos(fv->FullName, &(fv->DirLen), &i);
-	fv->DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
+//	GetFileNamePos(fv->FullName, &(fv->DirLen), &i);
+//	fv->DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
 
 	return TRUE;
 }
@@ -102,7 +102,7 @@ void FTSetTimeOut(PFileVarProto fv, int T)
   SetTimer(fv->HMainWin, IdProtoTimer, T*1000, NULL);
 }
 
-void AddNum(PCHAR FName, int n)
+static void AddNum(PCHAR FName, int n)
 {
   char Num[11];
   int i, j, k, dLen;
@@ -125,14 +125,18 @@ BOOL FTCreateFile(PFileVarProto fv)
 {
   int i;
   char Temp[MAX_PATH];
+  int DirLen;
 
-  replaceInvalidFileNameChar(&(fv->FullName[fv->DirLen]), '_');
+  GetFileNamePos(fv->FullName, &DirLen, &i);
+  DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
 
-  if (fv->FullName[fv->DirLen] == 0) {
-    strncpy_s(&(fv->FullName[fv->DirLen]), sizeof(fv->FullName) - fv->DirLen, "noname", _TRUNCATE);
+  replaceInvalidFileNameChar(&(fv->FullName[DirLen]), '_');
+
+  if (fv->FullName[DirLen] == 0) {
+    strncpy_s(&(fv->FullName[DirLen]), sizeof(fv->FullName) - DirLen, "noname", _TRUNCATE);
   }
 
-  FitFileName(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,NULL);
+  FitFileName(&(fv->FullName[DirLen]),sizeof(fv->FullName) - DirLen,NULL);
   if (! fv->OverWrite)
   {
     i = 0;
@@ -149,7 +153,7 @@ BOOL FTCreateFile(PFileVarProto fv)
   if (! fv->FileOpen && ! fv->NoMsg)
     MessageBox(fv->HMainWin,"Cannot create file",
 	       "Tera Term: Error",MB_ICONEXCLAMATION);
-  SetDlgItemText(fv->HWin, IDC_PROTOFNAME,&(fv->FullName[fv->DirLen]));
+  fv->SetDlgProtoFileName(fv, fv->FullName);
   fv->ByteCount = 0;
   fv->FileSize = 0;
 

@@ -136,7 +136,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	// 受信フォルダを fv->FullName に設定しておく
 	// fv->FullName[fv->DirLen] からファイル名を設定するとフルパスになる
 	strncpy_s(fv->FullName, sizeof(fv->FullName), FileDirExpanded, _TRUNCATE);
-	fv->DirLen = strlen(fv->FullName);
+	// fv->DirLen = strlen(fv->FullName);
 
 	fv->FileOpen = FALSE;
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
@@ -920,6 +920,7 @@ static char **_GetMultiFname(HWND hWnd, WORD FuncId, const char *caption, LPWORD
 	return ret;
 }
 
+#if 0
 static void _SetFileVar(PFileVarProto fv)
 {
 	int i;
@@ -929,6 +930,7 @@ static void _SetFileVar(PFileVarProto fv)
 	c = fv->FullName[fv->DirLen];
 	if (c=='\\'||c=='/') fv->DirLen++;
 }
+#endif
 
 static void KermitStart(int mode)
 {
@@ -1010,10 +1012,10 @@ BOOL KermitGet(const char *filename)
 		}
 	}
 	else {
-		FileVar->DirLen = 0;
 		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
 		FileVar->NoMsg = TRUE;
-		_SetFileVar(FileVar);
+//		FileVar->DirLen = 0;
+//		_SetFileVar(FileVar);
 	}
 	KermitStart(IdKmtGet);
 
@@ -1278,7 +1280,7 @@ BOOL YMODEMStartReceive(BOOL macro)
 
 	// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 	WORD Opt = Yopt1K;
-	_SetFileVar(FileVar);
+//	_SetFileVar(FileVar);
 
 	TalkStatus = IdTalkQuiet;
 
@@ -1656,9 +1658,9 @@ BOOL QVStartSend(const char *filename)
 		}
 	}
 	else {
-		FileVar->DirLen = 0;
 		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
 		FileVar->NoMsg = TRUE;
+//		FileVar->DirLen = 0;
 	}
 
 	TalkStatus = IdTalkQuiet;

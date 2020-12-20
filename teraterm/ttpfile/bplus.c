@@ -104,12 +104,12 @@ static BOOL BPOpenFileToBeSent(PFileVarProto fv)
   BOOL r;
 
   if (fv->FileOpen) return TRUE;
-  if (strlen(&(fv->FullName[fv->DirLen]))==0) return FALSE;
+  if (fv->FullName[0]==0) return FALSE;
 
   r = fv->OpenRead(fv, fv->FullName);
   fv->FileOpen = r;
   if (r == TRUE) {
-    SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
+    fv->SetDlgProtoFileName(fv, fv->FullName);
     fv->FileSize = fv->GetFSize(fv, fv->FullName);
   }
   return fv->FileOpen;
@@ -577,6 +577,7 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
   BYTE b;
 //  char Temp[HostNameMaxLength + 1]; // 81(yutaka)
   char Temp[81]; // 81(yutaka)
+  int FnPos;
 
   switch (bv->PktIn[2]) {
     case 'C': /* Close */
@@ -612,8 +613,9 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
       }
       Temp[j] = 0;
 
-      GetFileNamePos(Temp,&i,&j);
-	  strncpy_s(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,&(Temp[j]),_TRUNCATE);
+      strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
+      GetFileNamePos(Temp,NULL,&FnPos);
+      strncat_s(fv->FullName, _countof(fv->FullName), &(Temp[FnPos]), _TRUNCATE);
       /* file open */
       if (! FTCreateFile(fv))
       {
@@ -658,16 +660,20 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 	}
 	Temp[j] = 0;
 
-	GetFileNamePos(Temp,&i,&j);
-	FitFileName(&(Temp[j]),sizeof(Temp) - j,NULL);
-	strncpy_s(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,
-		&(Temp[j]),_TRUNCATE);
+	GetFileNamePos(Temp,NULL,&FnPos);
+	FitFileName(&(Temp[FnPos]),sizeof(Temp) - FnPos,NULL);
+	strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
+	strncat_s(fv->FullName, _countof(fv->FullName), &(Temp[FnPos]), _TRUNCATE);
 
 	/* file open */
 	if (! BPOpenFileToBeSent(fv))
 	{
 	  /* if file not found, ask user new file name */
-	  fv->FullName[fv->DirLen] = 0;
+	  fv->FullName[0] = 0;
+
+	  // ダイアログを開いてファイル名をユーザーに指定してもらう
+	  // この位置で行うのは適切でないと思われるため
+	  // [cancel]を押したときと同様の動作とした
 	  //if (! GetTransFname(fv, NULL, GTF_BP, (PLONG)&i))
 	  if (FALSE)
 	  {

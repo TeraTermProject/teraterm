@@ -41,7 +41,7 @@ extern "C" {
 #define DllExport __declspec(dllexport)
 #endif
 
-BOOL GetFileNamePos(const char *PathName, int far *DirLen, int far *FNPos);
+BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos);
 DllExport BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
 DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 void FitFileName(PCHAR FileName, int destlen, const char *DefExt);

@@ -215,7 +215,19 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 	return len;
 }
 
-BOOL GetFileNamePos(const char *PathName, int far *DirLen, int far *FNPos)
+/**
+ *	ファイル名(パス名)を解析する
+ *	_splitpathのパスとファイル名だけ版
+ *
+ *	@param[in]	PathName	ファイル名、フルパス
+ *	@param[out]	DirLen		末尾のスラッシュを含むディレクトリパス長
+ *							NULLのとき値を返さない
+ *	@param[out]	FNPos		ファイル名へのindex
+ *							&PathName[FNPos] がファイル名
+ *							NULLのとき値を返さない
+ *	@retval		FALSE		PathNameが不正
+ */
+BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos)
 {
 	BYTE b;
 	const char *Ptr;
@@ -223,8 +235,9 @@ BOOL GetFileNamePos(const char *PathName, int far *DirLen, int far *FNPos)
 	const char *FNPtr;
 	const char *PtrOld;
 
-	*DirLen = 0;
-	*FNPos = 0;
+	if (DirLen != NULL) *DirLen = 0;
+	if (FNPos != NULL) *FNPos = 0;
+
 	if (PathName==NULL)
 		return FALSE;
 
@@ -251,8 +264,8 @@ BOOL GetFileNamePos(const char *PathName, int far *DirLen, int far *FNPos)
 				break;
 		}
 	}
-	*DirLen = DirPtr-PathName;
-	*FNPos = FNPtr-PathName;
+	if (DirLen != NULL) *DirLen = DirPtr-PathName;
+	if (FNPos != NULL) *FNPos = FNPtr-PathName;
 	return TRUE;
 }
 

@@ -560,16 +560,17 @@ static void ZSendFileHdr(PZVar zv)
 static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 {
 	int i, j;
+	int FNPos;
 
 	if (!fv->FileOpen) {
 		ZSendCancel(zv);
 		return;
 	}
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
+	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, fv->FullName);
 
 	/* file name */
-	strncpy_s(zv->PktOut, sizeof(zv->PktOut), &(fv->FullName[fv->DirLen]),
-			  _TRUNCATE);
+	GetFileNamePos(fv->FullName, NULL, &FNPos);
+	strncpy_s(zv->PktOut, sizeof(zv->PktOut), &(fv->FullName[FNPos]), _TRUNCATE);
 	FTConvFName(zv->PktOut);	// replace ' ' by '_' in FName
 	zv->PktOutCount = strlen(zv->PktOut);
 	zv->CRC = 0;
@@ -620,7 +621,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	add_sendbuf("%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
 		__FUNCTION__,
 		zv->TxHdr[ZF0], zv->TxHdr[ZF1],zv->TxHdr[ZF2],
-		&(fv->FullName[fv->DirLen]), fv->FileSize);
+		&(fv->FullName[FNPos]), fv->FileSize);
 }
 
 static void ZSendDataHdr(PZVar zv)
@@ -691,8 +692,6 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	int Max;
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts->UILanguageFile;
 	PZVar zv = fv->data;
 
 	zv->CtlEsc = ((ts->FTFlag & FT_ZESCCTL) != 0);
@@ -714,24 +713,6 @@ static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		CommInsert1Byte(cv, ZPAD);
 	}
 
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption), "Tera Term: ",
-			  _TRUNCATE);
-	switch (zv->ZMode) {
-	case IdZSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg),
-					 TitZSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg,
-				  _TRUNCATE);
-		break;
-	case IdZReceive:
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZRCV", uimsg, sizeof(uimsg),
-					 TitZRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg,
-				  _TRUNCATE);
-		break;
-	}
-
-	SetWindowText(fv->HWin, fv->DlgCaption);
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, "ZMODEM");
 
 	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
@@ -1056,11 +1037,12 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 {
 	BYTE b;
-	int i, j;
+	int i;
 	char *p;
 	long modtime;
 	int mode;
 	int ret;
+	int FnPos;
 
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
 		return FALSE;
@@ -1071,10 +1053,9 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	/* file name */
 	zv->PktIn[zv->PktInPtr] = 0;	/* for safety */
 
-	GetFileNamePos(zv->PktIn, &i, &j);
-	strncpy_s(&(fv->FullName[fv->DirLen]),
-			  sizeof(fv->FullName) - fv->DirLen, &(zv->PktIn[j]),
-			  _TRUNCATE);
+	GetFileNamePos(zv->PktIn, NULL, &FnPos);
+	strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
+	strncat_s(fv->FullName, _countof(fv->FullName), &(zv->PktIn[FnPos]), _TRUNCATE);
 	/* file open */
 	if (!FTCreateFile(fv))
 		return FALSE;
