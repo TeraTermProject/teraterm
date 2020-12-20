@@ -44,7 +44,62 @@
 #include "ftlib.h"
 #include "win16api.h"
 
+#include "kermit.h"
+
 #define KERMIT_CAPAS
+
+typedef struct {
+	int MAXL;
+	BYTE TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT,CAPAS,WINDO,MAXLX1,MAXLX2;
+} KermitParam;
+
+#define	KMT_DATAMAX		4000
+#define	KMT_PKTMAX		(KMT_DATAMAX + 32)
+#define	KMT_PKTQUE		4
+
+typedef struct {
+  BYTE PktIn[KMT_PKTMAX], PktOut[KMT_PKTMAX];
+  int PktInPtr;
+  int PktInLen, PktInCount;
+  int PktNum, PktNumOffset;
+  int PktReadMode;
+  int KmtMode, KmtState;
+  BOOL Quote8, RepeatFlag;
+  char ByteStr[6];
+  BOOL NextByteFlag;
+  int RepeatCount;
+  BYTE NextSeq;
+  BYTE NextByte;
+  KermitParam KmtMy, KmtYour;
+  int PktOutCount, PktInLongPacketLen;
+  int FileAttrFlag;
+  BOOL FileType;
+  time_t FileTime;
+  int FileMode;
+  LONGLONG FileSize;
+} TKmtVar;
+typedef TKmtVar far *PKmtVar;
+
+  /* Kermit states */
+#define WaitMark  0
+#define WaitLen   1
+#define WaitCheck 2
+
+#define Unknown 0
+#define SendInit 1
+#define SendFile 2
+#define SendData 3
+#define SendEOF 4
+#define SendEOT 5
+#define SendFileAttr 6
+
+#define ReceiveInit 6
+#define ReceiveFile 7
+#define ReceiveData 8
+
+#define ServerInit 9
+#define GetInit 10
+#define Finish 11
 
 /* kermit parameters */
 #define MaxNum 94
@@ -1114,10 +1169,10 @@ void KmtSendFinish(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	kv->KmtState = Finish;
 }
 
-void KmtInit
-(PFileVarProto fv, PKmtVar kv, PComVar cv, PTTSet ts)
+void KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	char uimsg[MAX_UIMSG];
+	PKmtVar kv = fv->data;
 	UILanguageFile = ts->UILanguageFile;
 
 	strncpy_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Tera Term: Kermit ",_TRUNCATE);
@@ -1228,8 +1283,9 @@ void KmtInit
 	}
 }
 
-void KmtTimeOutProc(PFileVarProto fv, PKmtVar kv, PComVar cv)
+void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
 {
+	PKmtVar kv = fv->data;
 	switch (kv->KmtState) {
 	case SendInit:
 		KmtSendPacket(fv,kv,cv);
@@ -1267,13 +1323,14 @@ void KmtTimeOutProc(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 }
 
-BOOL KmtReadPacket(PFileVarProto fv,  PKmtVar kv, PComVar cv)
+BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 {
 	BYTE b;
 	int c, PktNumNew;
 	BOOL GetPkt;
 	char FNBuff[50];
 	int i, j, Len;
+	PKmtVar kv = fv->data;
 
 	c = CommRead1Byte(cv,&b);
 
@@ -1563,11 +1620,44 @@ read_end:
 	return TRUE;
 }
 
-void KmtCancel(PFileVarProto fv, PKmtVar kv, PComVar cv)
+void KmtCancel(PFileVarProto fv, PComVar cv)
 {
+	PKmtVar kv = fv->data;
 	KmtIncPacketNum(kv);
 	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,"Cancel",_TRUNCATE);
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'E',
 		strlen(&(kv->PktOut[4])));
 	KmtSendPacket(fv,kv,cv);
+}
+
+static int SetOptV(PFileVarProto fv, int request, va_list ap)
+{
+	PKmtVar kv = fv->data;
+	switch(request) {
+	case KMT_MODE: {
+		int Mode = va_arg(ap, int);
+		kv->KmtMode = Mode;
+		return 0;
+	}
+	}
+	return -1;
+}
+
+BOOL KmtCreate(PFileVarProto fv)
+{
+	PKmtVar kv;
+	kv = malloc(sizeof(TKmtVar));
+	if (kv == NULL) {
+		return FALSE;
+	}
+	memset(kv, 0, sizeof(*kv));
+	fv->data = kv;
+
+	fv->Init = KmtInit;
+	fv->Parse = KmtReadPacket;
+	fv->TimeOutProc = KmtTimeOutProc;
+	fv->Cancel = KmtCancel;
+	fv->SetOptV = SetOptV;
+
+	return TRUE;
 }

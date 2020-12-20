@@ -57,7 +57,7 @@ void _ProtoInit(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
 	case PROTO_KMT:
-		KmtInit(fv,(PKmtVar)pv,cv,ts);
+		fv->Init(fv,cv,ts);
 		break;
 	case PROTO_XM:
 		fv->Init(fv,cv,ts);
@@ -84,7 +84,7 @@ BOOL _ProtoParse(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 	Ok = FALSE;
 	switch (Proto) {
 	case PROTO_KMT:
-		Ok = KmtReadPacket(fv,(PKmtVar)pv,cv);
+		Ok = fv->Parse(fv,cv);
 		break;
 	case PROTO_XM:
 		Ok = fv->Parse(fv, cv);
@@ -123,7 +123,7 @@ void _ProtoTimeOutProc(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
-		KmtTimeOutProc(fv,(PKmtVar)pv,cv);
+		fv->TimeOutProc(fv,cv);
 		break;
 	case PROTO_XM:
 		fv->TimeOutProc(fv,cv);
@@ -147,7 +147,7 @@ BOOL _ProtoCancel(int Proto, PFileVarProto fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
-		KmtCancel(fv,(PKmtVar)pv,cv);
+		fv->Cancel(fv,cv);
 		break;
 	case PROTO_XM:
 		fv->Cancel(fv,cv);

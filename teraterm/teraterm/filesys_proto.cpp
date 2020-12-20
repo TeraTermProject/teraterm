@@ -64,6 +64,7 @@
 #endif
 #include "tt_res.h"
 #include "xmodem.h"
+#include "kermit.h"
 
 #if 0
 #define FS_BRACKET_NONE  0
@@ -745,7 +746,9 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 
 	switch (ProtoId) {
 		case PROTO_KMT:
-			vsize = sizeof(TKmtVar);
+//			vsize = sizeof(TKmtVar);
+			KmtCreate(fv);
+			vsize = 0;
 			break;
 		case PROTO_XM:
 //			vsize = sizeof(TXVar);
@@ -780,7 +783,10 @@ static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt
 
 	switch (ProtoId) {
 		case PROTO_KMT:
+#if 0
 			((PKmtVar)ProtoVar)->KmtMode = Mode;
+#endif
+			_ProtoSetOpt(fv, KMT_MODE, Mode);
 			break;
 		case PROTO_XM:
 #if 0

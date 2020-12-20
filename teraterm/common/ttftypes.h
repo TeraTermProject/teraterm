@@ -89,6 +89,7 @@
 #define TitQVRcv    "Quick-VAN Receive"
 #define TitQVSend   "Quick-VAN Send"
 
+#if 0
 typedef struct {
 	int MAXL;
 	BYTE TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT,CAPAS,WINDO,MAXLX1,MAXLX2;
@@ -141,6 +142,7 @@ typedef TKmtVar far *PKmtVar;
 #define ServerInit 9
 #define GetInit 10
 #define Finish 11
+#endif
 
 #if 0
 /* XMODEM */

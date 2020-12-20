@@ -35,13 +35,18 @@
 extern "C" {
 #endif
 
+enum {
+	KMT_MODE
+};
+
 /* prototypes */
-void KmtInit(PFileVarProto fv, PKmtVar kv, PComVar cv, PTTSet ts);
-void KmtTimeOutProc(PFileVarProto fv, PKmtVar kv, PComVar cv);
-BOOL KmtReadPacket
-  (PFileVarProto fv,  PKmtVar kv, PComVar cv);
-void KmtCancel
-  (PFileVarProto fv, PKmtVar kv, PComVar cv);
+BOOL KmtCreate(PFileVarProto fv);
+#if 0
+void KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts);
+void KmtTimeOutProc(PFileVarProto fv, PComVar cv);
+BOOL KmtReadPacket(PFileVarProto fv, PComVar cv);
+void KmtCancel(PFileVarProto fv, PComVar cv);
+#endif
 
 #ifdef __cplusplus
 }
