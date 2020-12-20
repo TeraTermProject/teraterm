@@ -4311,24 +4311,24 @@ void CVTWindow::OnFileSend()
 
 void CVTWindow::OnFileKermitRcv()
 {
-	KermitStart(IdKmtReceive);
+	KermitStartRecive(FALSE);
 }
 
 void CVTWindow::OnFileKermitGet()
 {
 	HelpId = HlpFileKmtGet;
-	KermitStart(IdKmtGet);
+	KermitGet(NULL);
 }
 
 void CVTWindow::OnFileKermitSend()
 {
 	HelpId = HlpFileKmtSend;
-	KermitStart(IdKmtSend);
+	KermitStartSend(NULL);
 }
 
 void CVTWindow::OnFileKermitFinish()
 {
-	KermitStart(IdKmtFinish);
+	KermitFinish(FALSE);
 }
 
 void CVTWindow::OnFileXRcv()

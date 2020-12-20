@@ -136,8 +136,8 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	// 受信フォルダを fv->FullName に設定しておく
 	// fv->FullName[fv->DirLen] からファイル名を設定するとフルパスになる
 	strncpy_s(fv->FullName, sizeof(fv->FullName), FileDirExpanded, _TRUNCATE);
-
 	fv->DirLen = strlen(fv->FullName);
+
 	fv->FileOpen = FALSE;
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
 	fv->HMainWin = HVTWin;
@@ -930,76 +930,11 @@ static void _SetFileVar(PFileVarProto fv)
 	if (c=='\\'||c=='/') fv->DirLen++;
 }
 
-void KermitStart(int mode)
+static void KermitStart(int mode)
 {
-	WORD w;
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts.UILanguageFile;
-
 	if (! ProtoStart())
 		return;
 
-	TFileVarProto *fv = FileVar;
-
-	switch (mode) {
-		case IdKmtSend:
-			FileVar->OpId = OpKmtSend;
-
-			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-			get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
-			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-			{
-				if (!_GetMultiFname(fv->HMainWin, GMF_KERMIT, fv->DlgCaption, &w) ||
-				    (FileVar->NumFname==0))
-				{
-					ProtoEnd();
-					return;
-				}
-			}
-			else
-				_SetFileVar(FileVar);
-			break;
-		case IdKmtReceive:
-			FileVar->OpId = OpKmtRcv;
-
-			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-			get_lang_msg("FILEDLG_TRANS_TITLE_KMTRCV", uimsg, sizeof(uimsg), TitKmtRcv, UILanguageFile);
-			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-			break;
-		case IdKmtGet:
-			FileVar->OpId = OpKmtSend;
-
-			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-			get_lang_msg("FILEDLG_TRANS_TITLE_KMTGET", uimsg, sizeof(uimsg), TitKmtGet, UILanguageFile);
-			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-			{
-				if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) ||
-				    (strlen(FileVar->FullName)==0))
-				{
-					ProtoEnd();
-					return;
-				}
-			}
-			else
-				_SetFileVar(FileVar);
-			break;
-		case IdKmtFinish:
-			FileVar->OpId = OpKmtFin;
-
-			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-			get_lang_msg("FILEDLG_TRANS_TITLE_KMTFIN", uimsg, sizeof(uimsg), TitKmtFin, UILanguageFile);
-			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-			break;
-		default:
-			ProtoEnd();
-			return;
-	}
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
@@ -1009,22 +944,49 @@ void KermitStart(int mode)
 		ProtoEnd();
 }
 
+/**
+ *	Kermit 送信
+ *
+ *	@param[in]	filename			受信ファイル名(NULLのとき、ダイアログで選択する)
+ */
 BOOL KermitStartSend(const char *filename)
 {
 	if (FileVar !=NULL)
 		return FALSE;
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
+	TFileVarProto *fv = FileVar;
 
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
-	FileVar->NumFname = 1;
-	FileVar->NoMsg = TRUE;
+	FileVar->OpId = OpKmtSend;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (filename == NULL) {
+		WORD w = 0;
+		char **filenames = _GetMultiFname(fv->HMainWin, GMF_KERMIT, fv->DlgCaption, &w);
+		if (filenames == NULL) {
+			FreeFileVar_(&FileVar);
+			return FALSE;
+		}
+		fv->FileNames = filenames;
+	}
+	else {
+		fv->FileNames = MakeStrArrayFromStr(filename);
+		FileVar->NoMsg = TRUE;
+	}
+//	GetNextFname(fv);
 	KermitStart(IdKmtSend);
 
 	return TRUE;
 }
 
+/**
+ *	Kermit 受信
+ */
 BOOL KermitGet(const char *filename)
 {
 	if (FileVar !=NULL)
@@ -1032,36 +994,84 @@ BOOL KermitGet(const char *filename)
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
-	FileVar->NumFname = 1;
-	FileVar->NoMsg = TRUE;
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpKmtSend;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_KMTGET", uimsg, sizeof(uimsg), TitKmtGet, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (filename == NULL) {
+		if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) || (strlen(FileVar->FullName)==0)) {
+			FreeFileVar_(&FileVar);
+			return FALSE;
+		}
+	}
+	else {
+		FileVar->DirLen = 0;
+		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+		FileVar->NumFname = 1;
+		FileVar->NoMsg = TRUE;
+		_SetFileVar(FileVar);
+	}
 	KermitStart(IdKmtGet);
 
 	return TRUE;
 }
 
-BOOL KermitStartRecive(void)
+/**
+ *	Kermit 受信
+ */
+BOOL KermitStartRecive(BOOL macro)
 {
 	if (FileVar !=NULL)
 		return FALSE;
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
-	FileVar->NoMsg = TRUE;
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpKmtRcv;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_KMTRCV", uimsg, sizeof(uimsg), TitKmtRcv, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (macro) {
+		// マクロから
+		FileVar->NoMsg = TRUE;
+	}
 	KermitStart(IdKmtReceive);
 
 	return TRUE;
 }
 
-BOOL KermitFinish(void)
+/**
+ *	Kermit finish
+ */
+BOOL KermitFinish(BOOL macro)
 {
 	if (FileVar !=NULL)
 		return FALSE;
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
-	FileVar->NoMsg = TRUE;
+	TFileVarProto *fv = FileVar;
+
+	FileVar->OpId = OpKmtFin;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_KMTFIN", uimsg, sizeof(uimsg), TitKmtFin, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
 	KermitStart(IdKmtFinish);
 
 	return TRUE;

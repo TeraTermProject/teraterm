@@ -34,13 +34,16 @@ typedef struct FileVarProto {
 	WORD OpId;
 	char DlgCaption[40];
 
-	char FullName[MAX_PATH];
+	// 送受信時ワーク
+	char FullName[MAX_PATH];	// read/writeするファイル名(各プロトコル内で書き換えすることあり)
 	int DirLen;
 
+	// 複数ファイル選択できるプロトコルで使用
+	//	フルパスのファイル名配列(一番最後はNULL)
 	char **FileNames;
+	int FNCount;		// 送信中ファイル名配列index(0...)
+	int NumFname;		// ファイル数(使用していない?)
 
-	int NumFname;
-	int FNCount;
 //	HANDLE FnStrMemHandle;
 //	PCHAR FnStrMem;
 //	int FnPtr;

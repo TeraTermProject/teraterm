@@ -507,7 +507,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 	case CmdKmtFinish:
-		if (KermitFinish()) {
+		if (KermitFinish(TRUE)) {
 			DdeCmnd = TRUE;
 		}
 		else {
@@ -515,7 +515,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 	case CmdKmtRecv:
-		if (KermitStartRecive()) {
+		if (KermitStartRecive(TRUE)) {
 			DdeCmnd = TRUE;
 		}
 		else

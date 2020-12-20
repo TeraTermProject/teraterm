@@ -133,7 +133,7 @@ typedef TKmtVar far *PKmtVar;
 
 static const char *UILanguageFile;
 
-BYTE KmtNum(BYTE b);
+static BYTE KmtNum(BYTE b);
 
 
 static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
@@ -276,17 +276,17 @@ static void KmtStringLog(PFileVarProto fv, PKmtVar kv, char *fmt, ...)
 	}
 }
 
-BYTE KmtNum(BYTE b)
+static BYTE KmtNum(BYTE b)
 {
 	return (b - 32);
 }
 
-BYTE KmtChar(BYTE b)
+static BYTE KmtChar(BYTE b)
 {
 	return (b+32);
 }
 
-void KmtCalcCheck(WORD Sum, BYTE CHKT, PCHAR Check)
+static void KmtCalcCheck(WORD Sum, BYTE CHKT, PCHAR Check)
 {
 	switch (CHKT) {
 	case 1:
@@ -315,7 +315,7 @@ static int KmtCheckSumType1(BYTE *buf, int len)
 	return (check);
 }
 
-void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	int C;
 
@@ -349,7 +349,7 @@ void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	FTSetTimeOut(fv,kv->KmtYour.TIME);
 }
 
-void KmtMakePacket(PFileVarProto fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataLen)
+static void KmtMakePacket(PFileVarProto fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataLen)
 {
 	int i, nlen, headnum;
 	WORD Sum;
@@ -392,7 +392,7 @@ void KmtMakePacket(PFileVarProto fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int 
 }
 
 
-void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktType)
+static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktType)
 {
 	int NParam;
 
@@ -435,13 +435,13 @@ void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktType)
 	}
 }
 
-void KmtSendNack(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE SeqChar)
+static void KmtSendNack(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE SeqChar)
 {
 	KmtMakePacket(fv,kv,KmtNum(SeqChar),'N',0);
 	KmtSendPacket(fv,kv,cv);
 }
 
-int KmtCalcPktNum(PKmtVar kv, BYTE b)
+static int KmtCalcPktNum(PKmtVar kv, BYTE b)
 {
 	int n;
 
@@ -451,7 +451,7 @@ int KmtCalcPktNum(PKmtVar kv, BYTE b)
 	return n;
 }
 
-BOOL KmtCheckPacket(PKmtVar kv)
+static BOOL KmtCheckPacket(PKmtVar kv)
 {
 	int i, len;
 	WORD Sum;
@@ -484,13 +484,13 @@ BOOL KmtCheckPacket(PKmtVar kv)
 	return TRUE;
 }
 
-BOOL KmtCheckQuote(BYTE b)
+static BOOL KmtCheckQuote(BYTE b)
 {
 	return (((b>0x20) && (b<0x3f)) ||
 		((b>0x5F) && (b<0x7f)));
 }
 
-void KmtParseInit(PKmtVar kv, BOOL AckFlag)
+static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 {
 	int i, NParam, off, cap, maxlen;
 	BYTE b, n;
@@ -639,7 +639,7 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 	}
 }
 
-void KmtSendAck(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendAck(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	if (kv->PktIn[3]=='S') /* Send-Init packet */
 	{
@@ -652,7 +652,7 @@ void KmtSendAck(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 }
 
-void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
+static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 {
 	int i, j, DataLen, BuffPtr, off;
 	BYTE b, b2;
@@ -729,12 +729,10 @@ void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 
 static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 {
-	int DataLen, BuffPtr, off, c, n, j;
+	int DataLen, off, c, n, j;
 	BYTE *p, *q;
 	char str[256];
 	struct tm tm;
-
-	BuffPtr = 0;
 
 	if (kv->PktInLen == 0) {  /* Long Packet */
 		DataLen = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
@@ -869,7 +867,7 @@ static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffL
 
 }
 
-BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
+static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 {
 	BYTE b, b2, b7;
 	int Len;
@@ -953,14 +951,14 @@ BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 	return TRUE;
 }
 
-void KmtIncPacketNum(PKmtVar kv)
+static void KmtIncPacketNum(PKmtVar kv)
 {
 	kv->PktNum++;
 	if (kv->PktNum >= kv->PktNumOffset+64)
 		kv->PktNumOffset = kv->PktNumOffset + 64;
 }
 
-void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	/* close file */
 	if (fv->FileOpen)
@@ -975,7 +973,7 @@ void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	kv->KmtState = SendEOF;
 }
 
-void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	int DataLen, DataLenNew, maxlen;
 	BOOL NextFlag;
@@ -1032,7 +1030,7 @@ void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 }
 
-void KmtSendEOTPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendEOTPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	KmtIncPacketNum(kv);
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'B',0);
@@ -1041,11 +1039,11 @@ void KmtSendEOTPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	kv->KmtState = SendEOT;
 }
 
-BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	struct _stati64 st;
 	BOOL r;
+	int FnPos;
 
 	if (! GetNextFname(fv))
 	{
@@ -1070,6 +1068,7 @@ BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	{
 		if (! fv->NoMsg)
 		{
+			char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 			get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
 			get_lang_msg("MSG_CANTOPEN_FILE_ERROR", uimsg, sizeof(uimsg), "Cannot open file", UILanguageFile);
 			MessageBox(fv->HWin,uimsg,uimsg,MB_ICONEXCLAMATION);
@@ -1083,17 +1082,18 @@ BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	fv->ProgStat = 0;
 	fv->StartTime = GetTickCount();
 
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
+	fv->SetDlgProtoFileName(fv, fv->FullName);
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 		fv->ByteCount, fv->FileSize, &fv->ProgStat);
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	KmtIncPacketNum(kv);
-	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[fv->DirLen]),_TRUNCATE); // put FName
+	GetFileNamePos(fv->FullName, NULL, &FnPos);
+	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[FnPos]),_TRUNCATE); // put FName
 	FTConvFName(&(kv->PktOut[4]));  // replace ' ' by '_' in FName
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'F',
-		strlen(&(fv->FullName[fv->DirLen])));
+	strlen(&(fv->FullName[FnPos])));
 	KmtSendPacket(fv,kv,cv);
 
 	kv->RepeatCount = 0;
@@ -1102,7 +1102,7 @@ BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	return TRUE;
 }
 
-BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	char buf[512], s[128];
 	char t[64];
@@ -1143,24 +1143,26 @@ BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	return TRUE;
 }
 
-void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
+	int FnPos;
 	kv->PktNum = 0;
 	kv->PktNumOffset = 0;
 
-	if ((signed int)strlen(&(fv->FullName[fv->DirLen])) >=
+	GetFileNamePos(fv->FullName, NULL, &FnPos);
+	if ((signed int)strlen(&(fv->FullName[FnPos])) >=
 		kv->KmtYour.MAXL - kv->KmtMy.CHKT - 4)
-		fv->FullName[fv->DirLen+kv->KmtYour.MAXL-kv->KmtMy.CHKT-4] = 0;
+		fv->FullName[FnPos +kv->KmtYour.MAXL-kv->KmtMy.CHKT-4] = 0;
 
-	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[fv->DirLen]),_TRUNCATE);
+	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[FnPos]),_TRUNCATE);
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'R',
-		strlen(&(fv->FullName[fv->DirLen])));
+		strlen(&(fv->FullName[FnPos])));
 	KmtSendPacket(fv,kv,cv);
 
 	kv->KmtState = GetInit;
 }
 
-void KmtSendFinish(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendFinish(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	kv->PktNum = 0;
 	kv->PktNumOffset = 0;
@@ -1176,7 +1178,6 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	PKmtVar kv = fv->data;
 
-	SetWindowText(fv->HWin,fv->DlgCaption);
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, "Kermit");
 
 	if (kv->KmtMode == IdKmtSend) {
@@ -1265,7 +1266,7 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	return TRUE;
 }
 
-void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
+static void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
 {
 	PKmtVar kv = fv->data;
 	switch (kv->KmtState) {
@@ -1305,13 +1306,13 @@ void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
 	}
 }
 
-BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
+static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 {
 	BYTE b;
 	int c, PktNumNew;
 	BOOL GetPkt;
 	char FNBuff[50];
-	int i, j, Len;
+	int Len;
 	PKmtVar kv = fv->data;
 
 	c = CommRead1Byte(cv,&b);
@@ -1425,13 +1426,15 @@ read_end:
 		if ((kv->KmtState==ReceiveFile) ||
 			(kv->KmtState==GetInit))
 		{
+			int FnPos;
 			kv->KmtMode = IdKmtReceive;
 
 			Len = sizeof(FNBuff);
 			KmtDecode(fv,kv,FNBuff,&Len);
 			FNBuff[Len] = 0;
-			GetFileNamePos(FNBuff,&i,&j);
-			strncpy_s(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,&FNBuff[j],_TRUNCATE);
+			GetFileNamePos(FNBuff,NULL,&FnPos);
+			strncpy_s(fv->FullName, _countof(fv->FullName), fv->RecievePath, _TRUNCATE);
+			strncat_s(fv->FullName, _countof(fv->FullName), &FNBuff[FnPos], _TRUNCATE);
 			/* file open */
 			if (! FTCreateFile(fv)) return FALSE;
 			kv->KmtState = ReceiveData;
@@ -1602,7 +1605,7 @@ read_end:
 	return TRUE;
 }
 
-void KmtCancel(PFileVarProto fv, PComVar cv)
+static void KmtCancel(PFileVarProto fv, PComVar cv)
 {
 	PKmtVar kv = fv->data;
 	KmtIncPacketNum(kv);
