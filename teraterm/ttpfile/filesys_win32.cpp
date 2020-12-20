@@ -103,11 +103,20 @@ static size_t _GetFSize(struct FileVarProto *fv, const char *filenameU8)
 /**
  *	@retval	0	ok
  *	@retval	-1	error
+ * TODO size_t ˆÈã‚Ìƒtƒ@ƒCƒ‹‚Ìˆµ‚¢
+ * 
  */
 static int Seek(struct FileVarProto *fv, size_t offset)
 {
+#if _M_X64
+	// sizeof(size_t) == 8
 	LONG lo = (LONG)((offset >> 0) & 0xffffffff);
 	LONG hi = (LONG)((offset >> 32) & 0xffffffff);
+#else
+	// sizeof(size_t) == 4
+	LONG lo = (LONG)((offset >> 0) & 0xffffffff);
+	LONG hi = 0;
+#endif
 	SetFilePointer(fv->FileHandle, lo, &hi, 0);
 	if (GetLastError() != 0) {
 		return -1;
