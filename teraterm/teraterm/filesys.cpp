@@ -410,6 +410,10 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 	return FALSE;
 }
 
+/* GetTransFname function id */
+#define GTF_SEND 0 /* Send file */
+#define GTF_BP   2 /* B-Plus Send */
+
 static BOOL _GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];

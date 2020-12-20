@@ -1323,6 +1323,14 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 	return FALSE;
 }
 
+/* GetMultiFname function id */
+#define GMF_KERMIT 0 /* Kermit Send */
+#define GMF_Z  1     /* ZMODEM Send */
+#define GMF_QV 2     /* Quick-VAN Send */
+#define GMF_Y  3     /* YMODEM Send */
+
+#define FnStrMemSize 4096
+
 static BOOL _GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 {
 	int i, len;
@@ -1962,6 +1970,10 @@ BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
 
 	return TRUE;
 }
+
+/* GetTransFname function id */
+#define GTF_SEND 0 /* Send file */
+#define GTF_BP   2 /* B-Plus Send */
 
 static BOOL _GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {

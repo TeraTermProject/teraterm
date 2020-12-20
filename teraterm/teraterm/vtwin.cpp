@@ -45,7 +45,6 @@
 #include "ttime.h"
 #include "commlib.h"
 #include "clipboar.h"
-#include "ttftypes.h"
 #include "filesys.h"
 #include "telnet.h"
 #include "tektypes.h"
@@ -4821,6 +4820,11 @@ void CVTWindow::OnSetupGeneral()
 	}
 	FreeTTDLG();
 }
+
+/* GetSetupFname function id */
+#define GSF_SAVE	0 // Save setup
+#define GSF_RESTORE	1 // Restore setup
+#define GSF_LOADKEY	2 // Load key map
 
 static BOOL _GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 {

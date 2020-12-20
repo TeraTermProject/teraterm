@@ -44,7 +44,6 @@
 #include "vtterm.h"
 #include "vtwin.h"
 #include "clipboar.h"
-#include "ttftypes.h"
 #include "filesys.h"
 #include "telnet.h"
 #include "tektypes.h"
@@ -56,10 +55,7 @@
 #include "compat_w95.h"
 #include "dlglib.h"
 #include "teraterml.h"
-#include "unicode_test.h"
-#if UNICODE_INTERNAL_BUFF
 #include "sendmem.h"
-#endif
 #include "layer_for_unicode.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
