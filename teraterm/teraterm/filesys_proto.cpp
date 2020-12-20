@@ -111,22 +111,7 @@ static void _Close(TFileVarProto *fv)
  */
 static size_t _GetFSize(struct FileVarProto *fv, const char *filenameU8)
 {
-	HANDLE h = _CreateFileW(wc::fromUtf8(filenameU8), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-							FILE_ATTRIBUTE_NORMAL, NULL);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
-	}
-
-	DWORD file_size_hi;
-	DWORD file_size_low;
-	file_size_low = GetFileSize(h, &file_size_hi);
-	if (file_size_low == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
-		CloseHandle(h);
-		return 0;
-	}
-	CloseHandle(h);
-
-	unsigned long long file_size = ((unsigned long long)file_size_hi << 32) + file_size_low;
+	size_t file_size = GetFSize64W(wc::fromUtf8(filenameU8));
 	return file_size;
 }
 
@@ -490,12 +475,15 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv, PCHAR CurDir)
+static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv)
 {
 	LONG opt;
-	BOOL Ok;
 	const char *FileSendFilter = ts.FileSendFilter;
 	const char *UILanguageFile = ts.UILanguageFile;
+
+	char FileDirExpanded[MAX_PATH];
+	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	PCHAR CurDir = FileDirExpanded;
 
 	char *FNFilter = GetCommonDialogFilterA(!Receive ? FileSendFilter : NULL, UILanguageFile);
 
@@ -544,6 +532,7 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVarProto fv,
 	/* save current dir */
 	wchar_t TempDir[MAXPATHLEN];
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	BOOL Ok;
 	if (!Receive)
 	{
 		Ok = GetOpenFileName(&ofn);
@@ -746,10 +735,9 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 
 #define FnStrMemSize 4096
 
-static BOOL _GetMultiFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
+static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 {
 	int i, len;
-	char uimsg[MAX_UIMSG];
 	char *FNFilter;
 	OPENFILENAME ofn;
 	wchar_t TempDir[MAXPATHLEN];
@@ -758,32 +746,14 @@ static BOOL _GetMultiFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPWORD O
 	const char *FileSendFilter = ts.FileSendFilter;
 	const char *UILanguageFile = ts.UILanguageFile;
 
+	char FileDirExpanded[MAX_PATH];
+	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	PCHAR CurDir = FileDirExpanded;
+
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
 	fv->NumFname = 0;
-
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	switch (FuncId) {
-	case GMF_KERMIT:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case GMF_Z:
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case GMF_QV:
-		get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case GMF_Y:
-		get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	default:
-		return FALSE;
-	}
 
 	/* moemory should be zero-initialized */
 	fv->FnStrMemHandle = GlobalAlloc(GHND, FnStrMemSize);
@@ -869,12 +839,6 @@ static BOOL _GetMultiFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPWORD O
 			fv->FnPtr = strlen(fv->FnStrMem)+1;
 		}
 
-		memcpy(CurDir,fv->FullName,fv->DirLen);
-		CurDir[fv->DirLen] = 0;
-		if ((fv->DirLen>3) &&
-		    (CurDir[fv->DirLen-1]=='\\'))
-			CurDir[fv->DirLen-1] = 0;
-
 		fv->FNCount = 0;
 	}
 
@@ -893,89 +857,35 @@ static BOOL _GetMultiFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPWORD O
 static void _SetFileVar(PFileVarProto fv)
 {
 	int i;
-	char uimsg[MAX_UIMSG];
 	char c;
-	const char *UILanguageFile = ts.UILanguageFile;
 
 	GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
 	c = fv->FullName[fv->DirLen];
 	if (c=='\\'||c=='/') fv->DirLen++;
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	switch (fv->OpId) {
-	case OpKmtRcv:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTRCV", uimsg, sizeof(uimsg), TitKmtRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpKmtGet:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTGET", uimsg, sizeof(uimsg), TitKmtGet, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpKmtSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpKmtFin:
-		get_lang_msg("FILEDLG_TRANS_TITLE_KMTFIN", uimsg, sizeof(uimsg), TitKmtFin, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpXRcv:
-		get_lang_msg("FILEDLG_TRANS_TITLE_XRCV", uimsg, sizeof(uimsg), TitXRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpXSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_XSEND", uimsg, sizeof(uimsg), TitXSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpYRcv:
-		get_lang_msg("FILEDLG_TRANS_TITLE_YRCV", uimsg, sizeof(uimsg), TitYRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpYSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpZRcv:
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZRCV", uimsg, sizeof(uimsg), TitZRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpZSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpBPRcv:
-		get_lang_msg("FILEDLG_TRANS_TITLE_BPRCV", uimsg, sizeof(uimsg), TitBPRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpBPSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpQVRcv:
-		get_lang_msg("FILEDLG_TRANS_TITLE_QVRCV", uimsg, sizeof(uimsg), TitQVRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case OpQVSend:
-		get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	}
 }
 
 void KermitStart(int mode)
 {
 	WORD w;
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
 
 	if (! ProtoStart())
 		return;
 
+	TFileVarProto *fv = FileVar;
+
 	switch (mode) {
 		case IdKmtSend:
 			FileVar->OpId = OpKmtSend;
+
+			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+			get_lang_msg("FILEDLG_TRANS_TITLE_KMTSEND", uimsg, sizeof(uimsg), TitKmtSend, UILanguageFile);
+			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				char FileDirExpanded[MAX_PATH];
-				ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-				if (!_GetMultiFname(FileVar, FileDirExpanded, GMF_KERMIT, &w) ||
+				if (!_GetMultiFname(FileVar, GMF_KERMIT, &w) ||
 				    (FileVar->NumFname==0))
 				{
 					ProtoEnd();
@@ -987,9 +897,19 @@ void KermitStart(int mode)
 			break;
 		case IdKmtReceive:
 			FileVar->OpId = OpKmtRcv;
+
+			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+			get_lang_msg("FILEDLG_TRANS_TITLE_KMTRCV", uimsg, sizeof(uimsg), TitKmtRcv, UILanguageFile);
+			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 			break;
 		case IdKmtGet:
 			FileVar->OpId = OpKmtSend;
+
+			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+			get_lang_msg("FILEDLG_TRANS_TITLE_KMTGET", uimsg, sizeof(uimsg), TitKmtGet, UILanguageFile);
+			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
 				if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) ||
@@ -1004,6 +924,11 @@ void KermitStart(int mode)
 			break;
 		case IdKmtFinish:
 			FileVar->OpId = OpKmtFin;
+
+			strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+			get_lang_msg("FILEDLG_TRANS_TITLE_KMTFIN", uimsg, sizeof(uimsg), TitKmtFin, UILanguageFile);
+			strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 			break;
 		default:
 			ProtoEnd();
@@ -1080,22 +1005,34 @@ void XMODEMStart(int mode)
 {
 	LONG Option;
 	int tmp;
+	const char *UILanguageFile = ts.UILanguageFile;
+	char uimsg[MAX_UIMSG];
 
 	if (! ProtoStart())
 		return;
 
-	if (mode==IdXReceive)
+	TFileVarProto *fv = FileVar;
+
+	if (mode==IdXReceive) {
 		FileVar->OpId = OpXRcv;
-	else
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_XRCV", uimsg, sizeof(uimsg), TitXRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	}
+	else {
 		FileVar->OpId = OpXSend;
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_XSEND", uimsg, sizeof(uimsg), TitXSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	}
 
 	if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 	{
-		char FileDirExpanded[MAX_PATH];
-		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
 		if (! _GetXFname(FileVar->HMainWin,
-						 mode==IdXReceive,&Option,FileVar,FileDirExpanded))
+						 mode==IdXReceive,&Option,FileVar))
 		{
 			ProtoEnd();
 			return;
@@ -1230,14 +1167,19 @@ BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt)
 void YMODEMStart(int mode)
 {
 	WORD Opt;
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
 
 	if (! ProtoStart())
 		return;
 
+	TFileVarProto *fv = FileVar;
+
 	if (mode==IdYSend)
 	{
-		char FileDirExpanded[MAX_PATH];
-		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_YSEND", uimsg, sizeof(uimsg), TitYSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
 
 		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 		// TODO: "Yopt1K", "YoptG", "YoptSingle"を区別したいならば、IDD_FOPTを拡張する必要あり。
@@ -1245,7 +1187,7 @@ void YMODEMStart(int mode)
 		FileVar->OpId = OpYSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! _GetMultiFname(FileVar,FileDirExpanded,GMF_Y,&Opt) ||
+			if (! _GetMultiFname(FileVar, GMF_Y,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1258,6 +1200,11 @@ void YMODEMStart(int mode)
 	}
 	else {
 		FileVar->OpId = OpYRcv;
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_YRCV", uimsg, sizeof(uimsg), TitYRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 		Opt = Yopt1K;
 		_SetFileVar(FileVar);
@@ -1305,19 +1252,25 @@ BOOL YMODEMStartSend(const char *fiename)
 void ZMODEMStart(int mode)
 {
 	WORD Opt;
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
 
 	if (! ProtoStart())
 		return;
 
+	TFileVarProto *fv = FileVar;
+
 	if (mode == IdZSend || mode == IdZAutoS)
 	{
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 		Opt = ts.XmodemBin;
 		FileVar->OpId = OpZSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			char FileDirExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			if (! _GetMultiFname(FileVar,FileDirExpanded,GMF_Z,&Opt) ||
+			if (! _GetMultiFname(FileVar, GMF_Z,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				if (mode == IdZAutoS) {
@@ -1331,8 +1284,14 @@ void ZMODEMStart(int mode)
 		else
 		_SetFileVar(FileVar);
 	}
-	else /* IdZReceive or IdZAutoR */
+	else {
+		/* IdZReceive or IdZAutoR */
 		FileVar->OpId = OpZRcv;
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_ZRCV", uimsg, sizeof(uimsg), TitZRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	}
 
 	TalkStatus = IdTalkQuiet;
 
@@ -1378,44 +1337,25 @@ BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
 	return TRUE;
 }
 
-/* GetTransFname function id */
-#define GTF_SEND 0 /* Send file */
-#define GTF_BP   2 /* B-Plus Send */
-
-static BOOL _GetTransFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
+static BOOL _GetTransFname(PFileVarProto fv, const char *DlgCaption)
 {
-	char uimsg[MAX_UIMSG];
-	char *FNFilter;
-	OPENFILENAME ofn;
-	WORD optw;
 	wchar_t TempDir[MAXPATHLEN];
-	BOOL Ok;
 	char FileName[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
+
+	char FileDirExpanded[MAX_PATH];
+	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	PCHAR CurDir = FileDirExpanded;
 
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-
-	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-	switch (FuncId) {
-	case GTF_SEND:
-		get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, sizeof(uimsg), TitSendFile, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	case GTF_BP:
-		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-		break;
-	default:
-		return FALSE;
-	}
-
-	FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
+	char *FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
 
 	ExtractFileName(fv->FullName, FileName ,sizeof(FileName));
 	strncpy_s(fv->FullName, sizeof(fv->FullName), FileName, _TRUNCATE);
+
+	OPENFILENAME ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = fv->HMainWin;
 	ofn.lpstrFilter = FNFilter;
@@ -1424,39 +1364,19 @@ static BOOL _GetTransFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPLONG O
 	ofn.nMaxFile = sizeof(fv->FullName);
 	ofn.lpstrInitialDir = CurDir;
 
-	switch (FuncId) {
-	case GTF_SEND:
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
-		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
-
-		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
-		optw = (WORD)*Option;
-		ofn.lCustData = (LPARAM)&optw;
-		break;
-	case GTF_BP:
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-		break;
-	}
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 
 	ofn.Flags |= OFN_SHOWHELP;
 
-	ofn.lpstrTitle = fv->DlgCaption;
+	ofn.lpstrTitle = DlgCaption;
 
 	ofn.hInstance = hInst;
 
-	Ok = GetOpenFileName(&ofn);
+	BOOL Ok = GetOpenFileName(&ofn);
 	free(FNFilter);
 
 	if (Ok) {
-		*Option = (long)optw;
-
 		fv->DirLen = ofn.nFileOffset;
-
-		if (CurDir!=NULL) {
-			memcpy(CurDir,fv->FullName,fv->DirLen-1);
-			CurDir[fv->DirLen-1] = 0;
-		}
 	}
 	/* restore dir */
 	_SetCurrentDirectoryW(TempDir);
@@ -1465,19 +1385,26 @@ static BOOL _GetTransFname(PFileVarProto fv, PCHAR CurDir, WORD FuncId, LPLONG O
 
 void BPStart(int mode)
 {
-	LONG Option = 0;
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
 
 	if (! ProtoStart())
 		return;
+
+	TFileVarProto *fv = FileVar;
+
 	if (mode==IdBPSend)
 	{
 		FileVar->OpId = OpBPSend;
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			char FileDirExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 			FileVar->FullName[0] = 0;
-			if (! _GetTransFname(FileVar, FileDirExpanded, GTF_BP, &Option))
+			if (! _GetTransFname(FileVar, FileVar->DlgCaption))
 			{
 				ProtoEnd();
 				return;
@@ -1486,8 +1413,14 @@ void BPStart(int mode)
 		else
 			_SetFileVar(FileVar);
 	}
-	else /* IdBPReceive or IdBPAuto */
+	else {
+		/* IdBPReceive or IdBPAuto */
 		FileVar->OpId = OpBPRcv;
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_BPRCV", uimsg, sizeof(uimsg), TitBPRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	}
 
 	TalkStatus = IdTalkQuiet;
 
@@ -1532,18 +1465,24 @@ BOOL BPStartReceive(void)
 void QVStart(int mode)
 {
 	WORD W;
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
 
 	if (! ProtoStart())
 		return;
 
+	TFileVarProto *fv = FileVar;
+
 	if (mode==IdQVSend)
 	{
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_QVSEND", uimsg, sizeof(uimsg), TitQVSend, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
 		FileVar->OpId = OpQVSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			char FileDirExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			if (! _GetMultiFname(FileVar,FileDirExpanded,GMF_QV, &W) ||
+			if (! _GetMultiFname(FileVar, GMF_QV, &W) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1553,8 +1492,13 @@ void QVStart(int mode)
 		else
 			_SetFileVar(FileVar);
 	}
-	else
+	else {
 		FileVar->OpId = OpQVRcv;
+
+		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+		get_lang_msg("FILEDLG_TRANS_TITLE_QVRCV", uimsg, sizeof(uimsg), TitQVRcv, UILanguageFile);
+		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	}
 
 	TalkStatus = IdTalkQuiet;
 
