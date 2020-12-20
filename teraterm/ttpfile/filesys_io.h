@@ -28,7 +28,25 @@
 
 #pragma once
 
-#include "filesys_io.h"
-#include "filesys_win32.h"
+#include <sys/types.h>	// for struct utimbuf
+#include <sys/stat.h>
+#include <sys/utime.h>
 
-TFileIO *FilesysCreateWin32(void);
+typedef struct FileIO {
+	// file I/O, Filename related functions
+	BOOL (*OpenRead)(struct FileIO *fv, const char *filename);
+	BOOL (*OpenWrite)(struct FileIO *fv, const char *filename);
+	size_t (*ReadFile)(struct FileIO *fv, void *buf, size_t bytes);
+	size_t (*WriteFile)(struct FileIO *fv, const void *buf, size_t bytes);
+	void (*Close)(struct FileIO *fv);
+	int (*Seek)(struct FileIO *fv, size_t offset);
+	void (*FileSysDestroy)(struct FileIO *fv);
+	//
+	size_t (*GetFSize)(struct FileIO *fv, const char *filename);
+	int (*utime)(struct FileIO *fv, const char *filename, struct _utimbuf* const _Time);
+	int (*stat)(struct FileIO *fv, const char *filename, struct _stati64* _Stat);
+	//
+	BOOL (*SetFilenameEncodeUTF8)(struct FileIO *fv, BOOL utf8);
+	//
+	void *data;
+} TFileIO;

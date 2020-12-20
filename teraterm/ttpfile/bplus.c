@@ -102,15 +102,16 @@ typedef TBPVar far *PBPVar;
 static BOOL BPOpenFileToBeSent(PFileVarProto fv)
 {
   BOOL r;
+  TFileIO *fileio = fv->file;
 
   if (fv->FileOpen) return TRUE;
   if (fv->FullName[0]==0) return FALSE;
 
-  r = fv->OpenRead(fv, fv->FullName);
+  r = fileio->OpenRead(fileio, fv->FullName);
   fv->FileOpen = r;
   if (r == TRUE) {
     fv->SetDlgProtoFileName(fv, fv->FullName);
-    fv->FileSize = fv->GetFSize(fv, fv->FullName);
+    fv->FileSize = fileio->GetFSize(fileio, fv->FullName);
   }
   return fv->FileOpen;
 }
@@ -504,19 +505,20 @@ static void BPSendNPacket(PFileVarProto fv, PBPVar bv)
 {
   int i, c;
   BYTE b;
+  TFileIO *fileio = fv->file;
 
   i = 4;
   c = 1;
   while ((i-4 < bv->PktSize-1) && (c>0))
   {
-    c = fv->ReadFile(fv, &b, 1);
+    c = fileio->ReadFile(fileio, &b, 1);
     if (c==1)
       BPPut1Byte(bv,b,&i);
     fv->ByteCount = fv->ByteCount + c;
   }
   if (c==0)
   {
-    fv->Close(fv);
+    fileio->Close(fileio);
     fv->FileOpen = FALSE;
   }
   i = i - 4;
@@ -578,12 +580,13 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 //  char Temp[HostNameMaxLength + 1]; // 81(yutaka)
   char Temp[81]; // 81(yutaka)
   int FnPos;
+  TFileIO *fileio = fv->file;
 
   switch (bv->PktIn[2]) {
     case 'C': /* Close */
       if (fv->FileOpen)
       {
-	fv->Close(fv);
+	fileio->Close(fileio);
 	fv->FileOpen = FALSE;
       }
       fv->Success = TRUE;
@@ -699,6 +702,7 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 
 static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 {
+  TFileIO *fileio = fv->file;
   bv->GetPacket = FALSE;
   /* Packet type */
 
@@ -724,7 +728,7 @@ static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 	BPSendFailure(bv,'E');
 	return;
       }
-      fv->WriteFile(fv, &(bv->PktIn[2]), bv->PktInCount-2);
+      fileio->WriteFile(fileio, &(bv->PktIn[2]), bv->PktInCount-2);
       fv->ByteCount = fv->ByteCount +
 		      bv->PktInCount - 2;
       SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);

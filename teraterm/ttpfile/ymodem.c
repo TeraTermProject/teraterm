@@ -293,16 +293,17 @@ static BOOL YCheckPacket(PYVar yv, const WORD len)
 
 static void initialize_file_info(PFileVarProto fv, PYVar yv)
 {
+	TFileIO *file = fv->file;
 	if (yv->YMode == IdYSend) {
 		if (fv->FileOpen) {
-			fv->Close(fv);
+			file->Close(file);
 
 			if (fv->FileMtime > 0) {
 				SetFMtime(fv->FullName, fv->FileMtime);
 			}
 		}
-		fv->FileOpen = fv->OpenRead(fv, fv->FullName);
-		fv->FileSize = fv->GetFSize(fv, fv->FullName);
+		fv->FileOpen = file->OpenRead(file, fv->FullName);
+		fv->FileSize = file->GetFSize(file, fv->FullName);
 	} else {
 		fv->FileOpen = FALSE;
 		fv->FileSize = 0;
@@ -459,6 +460,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	BYTE b, d;
 	int i, c, nak;
 	BOOL GetPkt;
+	TFileIO *file = fv->file;
 
 	c = YRead1Byte(fv,yv,cv,&b);
 
@@ -487,7 +489,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			{
 				// EOTが来たら、1つのファイル受信が完了したことを示す。
 				if (fv->FileOpen) {
-					fv->Close(fv);
+					file->Close(file);
 					fv->FileOpen = FALSE;
 
 					if (fv->FileMtime > 0) {
@@ -669,14 +671,14 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		{
 			b = yv->PktIn[3+i];
 			if ((b==LF) && (! yv->CRRecv))
-				fv->WriteFile(fv,"\015",1);
+				file->WriteFile(file,"\015",1);
 			if (yv->CRRecv && (b!=LF))
-				fv->WriteFile(fv,"\012",1);
+				file->WriteFile(file,"\012",1);
 			yv->CRRecv = b==CR;
-			fv->WriteFile(fv,&b,1);
+			file->WriteFile(file,&b,1);
 		}
 	else
-		fv->WriteFile(fv, &(yv->PktIn[3]), c);
+		file->WriteFile(file, &(yv->PktIn[3]), c);
 
 	fv->ByteCount = fv->ByteCount + c;
 
@@ -950,13 +952,14 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 			else
 			{
+				TFileIO *file = fv->file;
 				BYTE fsym = 0;
 				size_t idx = 1;
 
 				yv->__DataLen = current_packet_size;
 
 				while ((idx <= current_packet_size) && fv->FileOpen &&
-				       (1 == fv->ReadFile(fv, &fsym, 1)))
+				       (1 == file->ReadFile(file, &fsym, 1)))
 				{
 					// TODO: remove magic number.
 					yv->PktOut[2 + idx] = fsym;
@@ -970,7 +973,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					// Close file handle.
 					if (fv->FileOpen)
 					{
-						fv->Close(fv);
+						file->Close(file);
 						fv->FileOpen = FALSE;
 					}
 

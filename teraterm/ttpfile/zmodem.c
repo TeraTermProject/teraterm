@@ -561,6 +561,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 {
 	int i, j;
 	int FNPos;
+	TFileIO *file = fv->file;
 
 	if (!fv->FileOpen) {
 		ZSendCancel(zv);
@@ -579,7 +580,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	ZPutBin(zv, &(zv->PktOutCount), 0);
 	zv->CRC = UpdateCRC(0, zv->CRC);
 	/* file size */
-	fv->FileSize = fv->GetFSize(fv, fv->FullName);
+	fv->FileSize = file->GetFSize(file, fv->FullName);
 
 	/* timestamp */
 	fv->FileMtime = GetFMtime(fv->FullName);
@@ -635,6 +636,7 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 {
 	int c;
 	BYTE b;
+	TFileIO *file = fv->file;
 
 	if (zv->Pos >= fv->FileSize) {
 		zv->Pos = fv->FileSize;
@@ -645,12 +647,12 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 	fv->ByteCount = zv->Pos;
 
 	if (fv->FileOpen && (zv->Pos < fv->FileSize))
-		fv->Seek(fv, zv->Pos);
+		file->Seek(file, zv->Pos);
 
 	zv->CRC = 0;
 	zv->PktOutCount = 0;
 	do {
-		c = fv->ReadFile(fv, &b, 1);
+		c = file->ReadFile(file, &b, 1);
 		if (c > 0) {
 			ZPutBin(zv, &(zv->PktOutCount), b);
 			zv->CRC = UpdateCRC(b, zv->CRC);
@@ -847,13 +849,14 @@ static BOOL ZCheckHdr(PFileVarProto fv, PZVar zv)
 static void ZParseRInit(PFileVarProto fv, PZVar zv)
 {
 	int Max;
+	TFileIO *file = fv->file;
 
 	if ((zv->ZState != Z_SendInit) && (zv->ZState != Z_SendEOF))
 		return;
 
 	if (fv->FileOpen)			// close previous file
 	{
-		fv->Close(fv);
+		file->Close(file);
 		fv->FileOpen = FALSE;
 
 		if (fv->FileMtime > 0) {
@@ -868,7 +871,7 @@ static void ZParseRInit(PFileVarProto fv, PZVar zv)
 	}
 
 	/* file open */
-	fv->FileOpen = fv->OpenRead(fv, fv->FullName);
+	fv->FileOpen = file->OpenRead(file, fv->FullName);
 
 	if (zv->CtlEsc) {
 		if ((zv->RxHdr[ZF0] & ESCCTL) == 0) {
@@ -900,6 +903,7 @@ static BOOL ZParseSInit(PZVar zv)
 
 static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 {
+	TFileIO *file = fv->file;
 	add_recvbuf("%s: RxType %s ", __FUNCTION__, hdrtype_name(zv->RxType));
 
 	switch (zv->RxType) {
@@ -940,7 +944,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 		break;
 	case ZSKIP:
 		if (fv->FileOpen) {
-			fv->Close(fv);
+			file->Close(file);
 			// サーバ側に存在するファイルを送信しようとすると、ZParseRInit()で二重closeになるため、
 			// ここでフラグを落としておく。 (2007.12.20 yutaka)
 			fv->FileOpen = FALSE;
@@ -1013,9 +1017,9 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 			if (fv->FileOpen) {
 				if (zv->CRRecv) {
 					zv->CRRecv = FALSE;
-					fv->WriteFile(fv, "\012", 1);
+					file->WriteFile(file, "\012", 1);
 				}
-				fv->Close(fv);
+				file->Close(file);
 				fv->FileOpen = FALSE;
 
 				if (fv->FileMtime > 0) {
@@ -1096,6 +1100,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 
 static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 {
+	TFileIO *file = fv->file;
 	int i;
 	BYTE b;
 
@@ -1105,16 +1110,16 @@ static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 	FTSetTimeOut(fv, 0);
 
 	if (zv->BinFlag)
-		fv->WriteFile(fv, zv->PktIn, zv->PktInPtr);
+		file->WriteFile(file, zv->PktIn, zv->PktInPtr);
 	else
 		for (i = 0; i <= zv->PktInPtr - 1; i++) {
 			b = zv->PktIn[i];
 			if ((b == 0x0A) && (!zv->CRRecv))
-				fv->WriteFile(fv, "\015", 1);
+				file->WriteFile(file, "\015", 1);
 			if (zv->CRRecv && (b != 0x0A))
-				fv->WriteFile(fv, "\012", 1);
+				file->WriteFile(file, "\012", 1);
 			zv->CRRecv = b == 0x0D;
-			fv->WriteFile(fv, &b, 1);
+			file->WriteFile(file, &b, 1);
 		}
 
 	fv->ByteCount = fv->ByteCount + zv->PktInPtr;

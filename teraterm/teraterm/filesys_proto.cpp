@@ -155,7 +155,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->NoMsg = FALSE;
 	fv->HideDialog = FALSE;
 
-	FilesysCreate(fv);
+	fv->file = FilesysCreateWin32();
 
 	fv->InitDlgProgress = _InitDlgProgress;
 	fv->SetDlgTime = _SetDlgTime;
@@ -180,24 +180,10 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		fv->Destroy(fv);
 	}
 
-	if (fv->FileOpen) {
-		fv->Close(fv);
-		fv->FileOpen = FALSE;
-	}
-#if 0
-	if (fv->FnStrMem != NULL) {
-		free(fv->FnStrMem);
-	}
-	if (fv->FnStrMemHandle != 0)
-	{
-		GlobalUnlock(fv->FnStrMemHandle);
-		GlobalFree(fv->FnStrMemHandle);
-	}
-#endif
 	if (fv->FileNames != NULL) {
 		free(fv->FileNames);
 	}
-	fv->FileSysDestroy(fv);
+	fv->file->FileSysDestroy(fv->file);
 	free(fv);
 
 	*pfv = NULL;

@@ -30,40 +30,64 @@
 #include <sys/stat.h>
 #include <sys/utime.h>
 
-#include "tttypes.h"
-#include "codeconv.h"
-
+#include "filesys_io.h"
 #include "filesys_win32.h"
 
-static BOOL _OpenRead(TFileVarProto *fv, const char *filename)
+#include "tttypes.h"
+#include "layer_for_unicode.h"
+#include "codeconv.h"
+
+typedef struct FileIOWin32 {
+	HANDLE FileHandle;
+	BOOL utf32;
+} TFileIOWin32;
+
+static wc GetFilenameW(TFileIOWin32 *data, const char *filename)
 {
-	HANDLE hFile = CreateFileA(filename,
+	wc filenameW;
+	if (data->utf32) {
+		filenameW = wc::fromUtf8(filename);
+	}
+	else {
+		filenameW = wc(filename);
+	}
+	return filenameW;
+}
+
+static BOOL _OpenRead(TFileIO *fv, const char *filename)
+{
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wc filenameW = GetFilenameW(data, filename);
+	HANDLE hFile = _CreateFileW(filenameW,
 							   GENERIC_READ, FILE_SHARE_READ, NULL,
 							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
-		fv->FileHandle = INVALID_HANDLE_VALUE;
+		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;
 	}
-	fv->FileHandle = hFile;
+	data->FileHandle = hFile;
 	return TRUE;
 }
 
-static BOOL _OpenWrite(TFileVarProto *fv, const char *filename)
+static BOOL _OpenWrite(TFileIO *fv, const char *filename)
 {
-	HANDLE hFile = CreateFileA(filename,
-							   GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-							   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wc filenameW = GetFilenameW(data, filename);
+	HANDLE hFile = _CreateFileW(filenameW,
+								GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+								CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
-		fv->FileHandle = INVALID_HANDLE_VALUE;
+		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;
 	}
-	fv->FileHandle = hFile;
+	data->FileHandle = hFile;
 	return TRUE;
 }
 
-static size_t _ReadFile(TFileVarProto *fv, void *buf, size_t bytes)
+static size_t _ReadFile(TFileIO *fv, void *buf, size_t bytes)
 {
-	HANDLE hFile = fv->FileHandle;
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	HANDLE hFile = data->FileHandle;
 	DWORD NumberOfBytesRead;
 	BOOL Result = ReadFile(hFile, buf, (UINT)bytes, &NumberOfBytesRead, NULL);
 	if (Result == FALSE) {
@@ -72,9 +96,10 @@ static size_t _ReadFile(TFileVarProto *fv, void *buf, size_t bytes)
 	return NumberOfBytesRead;
 }
 
-static size_t _WriteFile(TFileVarProto *fv, const void *buf, size_t bytes)
+static size_t _WriteFile(TFileIO *fv, const void *buf, size_t bytes)
 {
-	HANDLE hFile = fv->FileHandle;
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	HANDLE hFile = data->FileHandle;
 	DWORD NumberOfBytesWritten;
 	UINT length = (UINT)bytes;
 	BOOL result = WriteFile(hFile, buf, length, &NumberOfBytesWritten, NULL);
@@ -84,11 +109,12 @@ static size_t _WriteFile(TFileVarProto *fv, const void *buf, size_t bytes)
 	return NumberOfBytesWritten;
 }
 
-static void _Close(TFileVarProto *fv)
+static void _Close(TFileIO *fv)
 {
-	if (fv->FileHandle != INVALID_HANDLE_VALUE) {
-		CloseHandle(fv->FileHandle);
-		fv->FileHandle = INVALID_HANDLE_VALUE;
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	if (data->FileHandle != INVALID_HANDLE_VALUE) {
+		CloseHandle(data->FileHandle);
+		data->FileHandle = INVALID_HANDLE_VALUE;
 	}
 }
 
@@ -97,9 +123,11 @@ static void _Close(TFileVarProto *fv)
  *	@param[in]	filename		ファイル名(UTF-8)
  *	@retval		ファイルサイズ
  */
-static size_t _GetFSize(struct FileVarProto *fv, const char *filename)
+static size_t _GetFSize(TFileIO *fv, const char *filename)
 {
-	size_t file_size = GetFSize64W(wc::fromUtf8(filename));
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wc filenameW = GetFilenameW(data, filename);
+	size_t file_size = GetFSize64W(filenameW);
 	return file_size;
 }
 
@@ -109,8 +137,9 @@ static size_t _GetFSize(struct FileVarProto *fv, const char *filename)
  * TODO size_t 以上のファイルの扱い
  *
  */
-static int Seek(struct FileVarProto *fv, size_t offset)
+static int Seek(TFileIO *fv, size_t offset)
 {
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
 #if _M_X64
 	// sizeof(size_t) == 8
 	LONG lo = (LONG)((offset >> 0) & 0xffffffff);
@@ -120,31 +149,50 @@ static int Seek(struct FileVarProto *fv, size_t offset)
 	LONG lo = (LONG)((offset >> 0) & 0xffffffff);
 	LONG hi = 0;
 #endif
-	SetFilePointer(fv->FileHandle, lo, &hi, 0);
+	SetFilePointer(data->FileHandle, lo, &hi, 0);
 	if (GetLastError() != 0) {
 		return -1;
 	}
 	return 0;
 }
 
-static int _stat(const char *filename, struct _stati64* _Stat)
+static int __stat(TFileIO *fv, const char *filename, struct _stati64* _Stat)
 {
-	return _stati64(filename, _Stat);
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wc filenameW = GetFilenameW(data, filename);
+	return _wstati64(filenameW, _Stat);
 }
 
-static int __utime(const char *filename, struct _utimbuf* const _Time)
+static int __utime(TFileIO *fv, const char *filename, struct _utimbuf* const _Time)
 {
-	return _utime(filename, _Time);
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wc filenameW = GetFilenameW(data, filename);
+	return _wutime(filenameW, _Time);
 }
 
-static void FileSysDestroy(TFileVarProto *fv)
+static void FileSysDestroy(TFileIO *fv)
 {
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
 	fv->Close(fv);
+	free(data);
+	fv->data = NULL;
+	free(fv);
 }
 
-void FilesysCreate(TFileVarProto *fv)
+TFileIO *FilesysCreateWin32(void)
 {
-	fv->FileHandle = INVALID_HANDLE_VALUE;
+	TFileIOWin32 *data = (TFileIOWin32 *)calloc(sizeof(TFileIOWin32), 1);
+	if (data == NULL) {
+		return NULL;
+	}
+	data->FileHandle = INVALID_HANDLE_VALUE;
+	data->utf32 = FALSE;
+	TFileIO *fv = (TFileIO *)calloc(sizeof(TFileIO), 1);
+	if (fv == NULL) {
+		free(data);
+		return NULL;
+	}
+	fv->data = data;
 	fv->OpenRead = _OpenRead;
 	fv->OpenWrite = _OpenWrite;
 	fv->ReadFile = _ReadFile;
@@ -152,7 +200,8 @@ void FilesysCreate(TFileVarProto *fv)
 	fv->Close = _Close;
 	fv->Seek = Seek;
 	fv->GetFSize = _GetFSize;
-	fv->utime = _utime;
-	fv->stat = _stat;
+	fv->utime = __utime;
+	fv->stat = __stat;
 	fv->FileSysDestroy = FileSysDestroy;
+	return fv;
 }

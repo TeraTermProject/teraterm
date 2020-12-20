@@ -121,6 +121,7 @@ BOOL FTCreateFile(PFileVarProto fv)
   int i;
   char Temp[MAX_PATH];
   int DirLen;
+  TFileIO *file = fv->file;
 
   GetFileNamePos(fv->FullName, &DirLen, &i);
   DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
@@ -144,7 +145,7 @@ BOOL FTCreateFile(PFileVarProto fv)
     }
     strncpy_s(fv->FullName, sizeof(fv->FullName),Temp, _TRUNCATE);
   }
-  fv->FileOpen = fv->OpenWrite(fv, fv->FullName);
+  fv->FileOpen = file->OpenWrite(file, fv->FullName);
   if (! fv->FileOpen && ! fv->NoMsg)
     MessageBox(fv->HMainWin,"Cannot create file",
 	       "Tera Term: Error",MB_ICONEXCLAMATION);

@@ -481,6 +481,7 @@ static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
 
 static BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
 {
+  TFileIO *file = fv->file;
   struct tm time;
   struct utimbuf timebuf;
 
@@ -494,7 +495,7 @@ static BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
     {
       if (fv->FileOpen)
       {
-	fv->Close(fv);
+	file->Close(file);
 	fv->FileOpen = FALSE;
 	/* set file date & time */
 	if ((qv->Year >= 1900) && (qv->Hour < 24))
@@ -533,13 +534,14 @@ static BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
 
 static void QVWriteToFile(PFileVarProto fv, PQVVar qv)
 {
+  TFileIO *file = fv->file;
   int C;
 
   if (fv->FileSize - fv->ByteCount < 128)
     C = fv->FileSize - fv->ByteCount;
   else
     C = 128;
-  fv->WriteFile(fv,&(qv->PktIn[3]),C);
+  file->WriteFile(file,&(qv->PktIn[3]),C);
   fv->ByteCount = fv->ByteCount + C;
 
   SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, qv->SeqNum);
@@ -829,6 +831,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   char fullname_upper[MAX_PATH];
   BOOL r;
   int FnPos;
+  TFileIO *file = fv->file;
 
   if (! GetNextFname(fv))
   {
@@ -837,7 +840,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   }
 
   /* find file and get file info */
-  fv->FileSize = fv->GetFSize(fv, fv->FullName);
+  fv->FileSize = file->GetFSize(file, fv->FullName);
   if (fv->FileSize>0)
   {
     qv->FileEnd = (WORD)(fv->FileSize >> 7);
@@ -850,7 +853,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   }
 
   /* file open */
-  r = fv->OpenRead(fv, fv->FullName);
+  r = file->OpenRead(file, fv->FullName);
   fv->FileOpen = r;
   if (! fv->FileOpen)
   {
@@ -907,6 +910,7 @@ static void QVSendVDATA(PFileVarProto fv, PQVVar qv)
 {
   int i, C;
   LONG Pos;
+  TFileIO *file = fv->file;
 
   if ((qv->QVState != QV_SendData) &&
       (qv->QVState != QV_SendDataRetry))
@@ -923,8 +927,8 @@ static void QVSendVDATA(PFileVarProto fv, PQVVar qv)
     else
       C = 128;
     /* read data from file */
-	fv->Seek(fv, Pos);
-    fv->ReadFile(fv,&(qv->PktOut[3]),C);
+	file->Seek(file, Pos);
+    file->ReadFile(file,&(qv->PktOut[3]),C);
     fv->ByteCount = Pos + (LONG)C;
     SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, qv->SeqSent);
     SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
@@ -1095,8 +1099,9 @@ static void QVParseVSTAT(PFileVarProto fv, PQVVar qv, PComVar cv)
 
   if (qv->EnqFlag && (qv->PktIn[3]==0x30))
   {
+	TFileIO *file = fv->file;
     if (fv->FileOpen)
-      fv->Close(fv);
+      file->Close(file);
     fv->FileOpen = FALSE;
     qv->EnqFlag = FALSE;
     qv->RetryCount = 10;

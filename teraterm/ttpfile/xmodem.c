@@ -217,6 +217,7 @@ static BOOL XCheckPacket(PXVar xv)
 
 BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
+	TFileIO *file = fv->file;
 	PXVar xv = fv->data;
 	BOOL LogFlag = ((ts->LogFlag & LOG_X) != 0);
 	if (LogFlag) {
@@ -228,14 +229,14 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	fv->FileSize = 0;
 	if (xv->XMode == IdXSend) {
-		fv->FileOpen = fv->OpenRead(fv, fv->FullName);
+		fv->FileOpen = file->OpenRead(file, fv->FullName);
 		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
-		fv->FileSize = fv->GetFSize(fv, fv->FullName);
+		fv->FileSize = file->GetFSize(file, fv->FullName);
 		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
-		fv->FileOpen = fv->OpenWrite(fv, fv->FullName);
+		fv->FileOpen = file->OpenWrite(file, fv->FullName);
 		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
@@ -328,6 +329,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 	BYTE b, d;
 	int i, c;
 	BOOL GetPkt = FALSE;
+	TFileIO *file = fv->file;
 
 	for (c=XRead1Byte(fv, xv, cv, &b); (c > 0) && !GetPkt; c=XRead1Byte(fv, xv, cv, &b)) {
 		switch (xv->PktReadMode) {
@@ -450,13 +452,13 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 		for (i = 0; i <= c - 1; i++) {
 			b = xv->PktIn[3 + i];
 			if ((b == LF) && (!xv->CRRecv))
-				fv->WriteFile(fv, "\015", 1);
+				file->WriteFile(file, "\015", 1);
 			if (xv->CRRecv && (b != LF))
-				fv->WriteFile(fv, "\012", 1);
+				file->WriteFile(file, "\012", 1);
 			xv->CRRecv = b == CR;
-			fv->WriteFile(fv, &b, 1);
+			file->WriteFile(file, &b, 1);
 	} else
-		fv->WriteFile(fv, &(xv->PktIn[3]), c);
+		file->WriteFile(file, &(xv->PktIn[3]), c);
 
 	fv->ByteCount = fv->ByteCount + c;
 
@@ -538,6 +540,8 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 		} while (i != 0);
 
 		if (xv->PktNumSent == xv->PktNum) {	/* make a new packet */
+			TFileIO *file = fv->file;
+
 			xv->PktNumSent++;
 			if (xv->DataLen == 128)
 				xv->PktOut[0] = SOH;
@@ -548,7 +552,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 
 			i = 1;
 			while ((i <= xv->DataLen) && fv->FileOpen &&
-				   (fv->ReadFile(fv, &b, 1) == 1)) {
+				   (file->ReadFile(file, &b, 1) == 1)) {
 				xv->PktOut[2 + i] = b;
 				i++;
 				fv->ByteCount++;
@@ -570,7 +574,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				xv->PktBufCount = 3 + xv->DataLen + xv->CheckLen;
 			} else {			/* send EOT */
 				if (fv->FileOpen) {
-					fv->Close(fv);
+					file->Close(file);
 					fv->FileOpen = FALSE;
 				}
 				xv->PktOut[0] = EOT;

@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <sys/types.h>	// for struct utimbuf
+#include "filesys_io.h"
 
 typedef struct FileVarProto {
 	// protosys_proto.cpp“à‚Ì‚ÝŽg—p
@@ -73,21 +73,6 @@ typedef struct FileVarProto {
 	void (*Destroy)(struct FileVarProto *fv);
 	void *data;
 
-	// file I/O, Filename related functions
-	BOOL (*OpenRead)(struct FileVarProto *fv, const char *filename);
-	BOOL (*OpenWrite)(struct FileVarProto *fv, const char *filename);
-	size_t (*ReadFile)(struct FileVarProto *fv, void *buf, size_t bytes);
-	size_t (*WriteFile)(struct FileVarProto *fv, const void *buf, size_t bytes);
-	void (*Close)(struct FileVarProto *fv);
-	int (*Seek)(struct FileVarProto *fv, size_t offset);
-	void (*FileSysDestroy)(struct FileVarProto *fv);
-	HANDLE FileHandle;
-	//
-	size_t (*GetFSize)(struct FileVarProto *fv, const char *filename);
-	int (*utime)(const char *filename, struct _utimbuf* const _Time);
-	int (*stat)(const char *filename, struct _stati64* _Stat);
-	BOOL (*SetFilenameEncodeUTF8)(BOOL utf8);
-
 	// UI
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
 	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);
@@ -96,5 +81,7 @@ typedef struct FileVarProto {
 	void (*SetDlgPercent)(struct FileVarProto *fv, LONG a, LONG b, int *p);
 	void (*SetDlgProtoText)(struct FileVarProto *fv, const char *text);
 	void (*SetDlgProtoFileName)(struct FileVarProto *fv, const char *text);
+
+	TFileIO *file;
 } TFileVarProto;
 typedef TFileVarProto *PFileVarProto;

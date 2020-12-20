@@ -182,6 +182,7 @@ target_sources(
   PRIVATE
   ../ttpfile/bplus.c
   ../ttpfile/bplus.h
+  ../ttpfile/filesys_io.h
   ../ttpfile/filesys_win32.cpp
   ../ttpfile/filesys_win32.h
   ../ttpfile/ftlib.c

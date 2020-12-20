@@ -703,9 +703,10 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 			if (kv->Quote8 && BINflag) b = b ^ 0x80;
 			for (j = 1 ; j <= kv->RepeatCount ; j++)
 			{
-				if (Buff==NULL) /* write to file */
-					fv->WriteFile(fv,&b,1);
-				else /* write to buffer */
+				if (Buff==NULL) { /* write to file */
+					TFileIO *fileio = fv->file;
+					fileio->WriteFile(fileio,&b,1);
+				} else /* write to buffer */
 					if (BuffPtr < *BuffLen)
 					{
 						Buff[BuffPtr] = b;
@@ -872,6 +873,7 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 	BYTE b, b2, b7;
 	int Len;
 	char TempStr[4];
+	TFileIO *file = fv->file;
 
 	if ((kv->RepeatCount>0) && (strlen(kv->ByteStr)>0))
 	{
@@ -884,7 +886,7 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 		b = kv->NextByte;
 		kv->NextByteFlag = FALSE;
 	}
-	else if (fv->ReadFile(fv,&b,1)==0)
+	else if (file->ReadFile(file,&b,1)==0)
 		return FALSE;
 	else fv->ByteCount++;
 
@@ -921,7 +923,7 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 	TempStr[Len] = 0;
 
 	kv->RepeatCount = 1;
-	if (fv->ReadFile(fv,&(kv->NextByte),1)==1)
+	if (file->ReadFile(file,&(kv->NextByte),1)==1)
 	{
 		fv->ByteCount++;
 		kv->NextByteFlag = TRUE;
@@ -931,7 +933,7 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 		(kv->NextByte==b) && (kv->RepeatCount<94))
 	{
 		kv->RepeatCount++;
-		if (fv->ReadFile(fv,&(kv->NextByte),1)==0)
+		if (file->ReadFile(file,&(kv->NextByte),1)==0)
 			kv->NextByteFlag = FALSE;
 		else fv->ByteCount++;
 	}
@@ -961,8 +963,10 @@ static void KmtIncPacketNum(PKmtVar kv)
 static void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	/* close file */
-	if (fv->FileOpen)
-		fv->Close(fv);
+	if (fv->FileOpen) {
+		TFileIO *file = fv->file;
+		file->Close(file);
+	}
 	fv->FileOpen = FALSE;
 
 	KmtIncPacketNum(kv);
@@ -1041,6 +1045,7 @@ static void KmtSendEOTPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
+	TFileIO *file = fv->file;
 	struct _stati64 st;
 	BOOL r;
 	int FnPos;
@@ -1051,7 +1056,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		return TRUE;
 	}
 
-	if (fv->stat(fv->FullName, &st) == 0) {
+	if (file->stat(file, fv->FullName, &st) == 0) {
 		kv->FileAttrFlag = KMT_ATTR_TIME | KMT_ATTR_MODE | KMT_ATTR_SIZE | KMT_ATTR_TYPE;
 		kv->FileType = FALSE; // Binary
 		kv->FileTime = st.st_mtime;
@@ -1062,7 +1067,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 
 	/* file open */
-	r = fv->OpenRead(fv, fv->FullName);
+	r = file->OpenRead(file, fv->FullName);
 	fv->FileOpen = r;
 	if (! fv->FileOpen)
 	{
@@ -1076,7 +1081,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		return FALSE;
 	}
 	else
-		fv->FileSize = fv->GetFSize(fv, fv->FullName);
+		fv->FileSize = file->GetFSize(file, fv->FullName);
 
 	fv->ByteCount = 0;
 	fv->ProgStat = 0;
@@ -1577,7 +1582,8 @@ read_end:
 	case 'Z':
 		if (kv->KmtState == ReceiveData)
 		{
-			if (fv->FileOpen) fv->Close(fv);
+			TFileIO *file = fv->file;
+			if (fv->FileOpen) file->Close(file);
 			fv->FileOpen = FALSE;
 			kv->KmtState = ReceiveFile;
 
@@ -1587,7 +1593,7 @@ read_end:
 				memset(&utm, 0, sizeof(utm));
 				utm.actime  = kv->FileTime;
 				utm.modtime = kv->FileTime;
-				fv->utime(fv->FullName, &utm);
+				file->utime(file, fv->FullName, &utm);
 			}
 		}
 	}
