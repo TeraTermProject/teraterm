@@ -243,9 +243,6 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	}
 	fv->StartTime = GetTickCount();
 
-	SetWindowText(fv->HWin, fv->DlgCaption);
-	fv->SetDlgProtoFileName(fv, &(fv->FullName[fv->DirLen]));
-
 	xv->PktNumOffset = 0;
 	xv->PktNum = 0;
 	xv->PktNumSent = 0;
@@ -284,8 +281,10 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		// ファイル送信開始前に、"rx ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		if (ts->XModemRcvCommand[0] != '\0') {
 			char inistr[MAX_PATH + 10];
+			int i, j;
+			GetFileNamePos(fv->FullName,&i,&j);
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s %s\015",
-						ts->XModemRcvCommand, &(fv->FullName[fv->DirLen]));
+						ts->XModemRcvCommand, &(fv->FullName[j]));
 			FTConvFName(inistr + strlen(ts->XModemRcvCommand) + 1);
 			XWrite(fv, xv, cv, inistr, strlen(inistr));
 		}
@@ -639,13 +638,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 		return 0;
 	}
 	case XMODEM_OPT: {
-		WORD Opt1 = va_arg(ap, WORD);
+		WORD Opt1 = va_arg(ap, int);
 		xv->XOpt = Opt1;
 		return 0;
 	}
 	case XMODEM_TEXT_FLAG: {
-		WORD Opt2 = va_arg(ap, WORD);
-		xv->TextFlag = 1 - (Opt2 & 1);
+		WORD Opt2 = va_arg(ap, int);
+		xv->TextFlag = Opt2;
 		return 0;
 	}
 	}

@@ -4334,13 +4334,13 @@ void CVTWindow::OnFileKermitFinish()
 void CVTWindow::OnFileXRcv()
 {
 	HelpId = HlpFileXmodemRecv;
-	XMODEMStart(IdXReceive);
+	XMODEMStartReceive(NULL, 0, 0);
 }
 
 void CVTWindow::OnFileXSend()
 {
 	HelpId = HlpFileXmodemSend;
-	XMODEMStart(IdXSend);
+	XMODEMStartSend(NULL, 0);
 }
 
 void CVTWindow::OnFileYRcv()

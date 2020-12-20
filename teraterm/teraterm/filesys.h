@@ -51,7 +51,6 @@ BOOL KermitStartSend(const char *filename);
 BOOL KermitGet(const char *filename);
 BOOL KermitStartRecive(void);
 BOOL KermitFinish(void);
-void XMODEMStart(int mode);
 BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt);
 BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt);
 void YMODEMStart(int mode);

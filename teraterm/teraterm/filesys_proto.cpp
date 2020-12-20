@@ -99,7 +99,17 @@ static void _SetDlgProtoText(struct FileVarProto *fv, const char *text)
 
 static void _SetDlgProtoFileName(struct FileVarProto *fv, const char *text)
 {
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, text);
+	// ファイル名(最後のパスセパレータから後ろを表示)
+	const char *s = text;
+	const char *p = strrchr(text, '\\');
+	if (p == NULL) {
+		p = strrchr(text, '/');
+	}
+	if (p != NULL) {
+		s = p + 1;
+	}
+	assert(fv->HWin != NULL);
+	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, s);
 }
 
 static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
@@ -109,6 +119,9 @@ static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
 
 static BOOL NewFileVar_(PFileVarProto *pfv)
 {
+	if (*pfv != NULL) {
+		return TRUE;
+	}
 	TFileVarProto *fv = (TFileVarProto *)malloc(sizeof(TFileVarProto));
 	if (fv == NULL)
 		return FALSE;
@@ -528,6 +541,15 @@ char **MakeStrArrayFromArray(char **strs)
 	return ptrs;
 }
 
+char **MakeStrArrayFromStr(const char *str)
+{
+	const char *strs[2];
+	strs[0] = str;
+	strs[1] = NULL;
+	char **ret = MakeStrArrayFromArray((char **)strs);
+	return ret;
+}
+
 char **MakeFileArrayMultiSelect(const char *lpstrFile)
 {
 	// 数を数える
@@ -543,6 +565,11 @@ char **MakeFileArrayMultiSelect(const char *lpstrFile)
 		}
 		p += len + 1;
 		file_count++;
+	}
+
+	if (file_count == 0) {
+		// 1つだけ選択されていた
+		return MakeStrArrayFromStr(lpstrFile);
 	}
 
 	// パス + ファイル名 一覧作成
@@ -565,15 +592,6 @@ char **MakeFileArrayMultiSelect(const char *lpstrFile)
 		free(filenames[i]);
 	}
 
-	return ret;
-}
-
-char **MakeFileArrayFromStr(char *str)
-{
-	char *strs[2];
-	strs[0] = str;
-	strs[1] = NULL;
-	char **ret = MakeStrArrayFromArray(strs);
 	return ret;
 }
 
@@ -644,7 +662,7 @@ static char **_GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Op
 		else
 			*Option = MAKELONG(LOWORD(*Option),HIWORD(opt));
 
-		ret = MakeFileArrayFromStr(FullName);
+		ret = MakeStrArrayFromStr(FullName);
 	}
 
 	return ret;
@@ -826,13 +844,11 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 #define GMF_QV 2     /* Quick-VAN Send */
 #define GMF_Y  3     /* YMODEM Send */
 
-#define FnStrMemSize 4096
 
 static char **_GetMultiFname(HWND hWnd, WORD FuncId, const char *caption, LPWORD Option)
 {
-	OPENFILENAME ofn;
+#define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
-	BOOL Ok;
 	const char *FileSendFilter = ts.FileSendFilter;
 	const char *UILanguageFile = ts.UILanguageFile;
 
@@ -858,7 +874,7 @@ static char **_GetMultiFname(HWND hWnd, WORD FuncId, const char *caption, LPWORD
 		free(default_filename);
 	}
 
-	memset(&ofn, 0, sizeof(OPENFILENAME));
+	OPENFILENAME ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
@@ -883,72 +899,14 @@ static char **_GetMultiFname(HWND hWnd, WORD FuncId, const char *caption, LPWORD
 
 	ofn.hInstance = hInst;
 
-	Ok = GetOpenFileName(&ofn);
+	BOOL Ok = GetOpenFileName(&ofn);
 	free(FNFilter);
 
-	char **ret;
+	char **ret = NULL;
 	if (Ok) {
-		int i, len;
-		int NumFname = 0;
-		/* count number of file names */
-		len = strlen(FnStrMem);
-		i = 0;
-		while (len>0) {
-			i = i + len + 1;
-			NumFname++;
-			len = strlen(&FnStrMem[i]);
-		}
-
-		NumFname--;
-
-		if (NumFname<1) {
-			// single selection
-			ret = MakeFileArrayFromStr(FnStrMem);
-		}
-		else {
-			// multiple selection
-			ret = MakeFileArrayMultiSelect(FnStrMem);
-		}
-#if 0
-		if (fv->NumFname<1) { // single selection
-			fv->NumFname = 1;
-			fv->DirLen = ofn.nFileOffset;
-			strncpy_s(fv->FullName, sizeof(fv->FullName),fv->FnStrMem, _TRUNCATE);
-			fv->FnPtr = 0;
-		}
-		else { // multiple selection
-			strncpy_s(fv->FullName, sizeof(fv->FullName),fv->FnStrMem, _TRUNCATE);
-			AppendSlash(fv->FullName,sizeof(fv->FullName));
-			fv->DirLen = strlen(fv->FullName);
-			fv->FnPtr = strlen(fv->FnStrMem)+1;
-			file_array = MakeFileArrayMultiSelect(fv->FnStrMem);
-
-			{
-				int a = 0;
-			}
-		}
-#endif
-
-//		fv->FNCount = 0;
+		// multiple selection
+		ret = MakeFileArrayMultiSelect(FnStrMem);
 	}
-	else {
-		ret = NULL;
-	}
-
-#if 0
-	GlobalUnlock(fv->FnStrMemHandle);
-	if (! Ok) {
-		GlobalFree(fv->FnStrMemHandle);
-		fv->FnStrMemHandle = NULL;
-	}
-#endif
-
-#if 0
-	if (! Ok) {
-		free(fv->FnStrMem);
-		fv->FnStrMem = NULL;
-	}
-#endif
 	free(FnStrMem);
 
 	/* restore dir */
@@ -1104,85 +1062,10 @@ BOOL KermitFinish(void)
 	return TRUE;
 }
 
-void XMODEMStart(int mode)
+static void XMODEMStart(int mode)
 {
-	LONG Option;
-	int tmp;
-	const char *UILanguageFile = ts.UILanguageFile;
-	char uimsg[MAX_UIMSG];
-
 	if (! ProtoStart())
 		return;
-
-	TFileVarProto *fv = FileVar;
-
-	if (mode==IdXReceive) {
-		FileVar->OpId = OpXRcv;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_XRCV", uimsg, sizeof(uimsg), TitXRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-	}
-	else {
-		FileVar->OpId = OpXSend;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_XSEND", uimsg, sizeof(uimsg), TitXSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-	}
-
-	if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-	{
-		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
-		char **filenames = _GetXFname(FileVar->HMainWin,
-									  mode==IdXReceive, fv->DlgCaption, &Option);
-		if (filenames == NULL) {
-			ProtoEnd();
-			return;
-		}
-		fv->FileNames = filenames;
-		GetNextFname(fv);
-		tmp = HIWORD(Option);
-		if (mode == IdXReceive) {
-			if (IsXoptCRC(tmp)) {
-				if (IsXopt1k(ts.XmodemOpt)) {
-					ts.XmodemOpt = Xopt1kCRC;
-				}
-				else {
-					ts.XmodemOpt = XoptCRC;
-				}
-			}
-			else {
-				if (IsXopt1k(ts.XmodemOpt)) {
-					ts.XmodemOpt = Xopt1kCksum;
-				}
-				else {
-					ts.XmodemOpt = XoptCheck;
-				}
-			}
-			ts.XmodemBin = LOWORD(Option);
-		}
-		else {
-			if (IsXopt1k(tmp)) {
-				if (IsXoptCRC(ts.XmodemOpt)) {
-					ts.XmodemOpt = Xopt1kCRC;
-				}
-				else {
-					ts.XmodemOpt = Xopt1kCksum;
-				}
-			}
-			else {
-				if (IsXoptCRC(ts.XmodemOpt)) {
-					ts.XmodemOpt = XoptCRC;
-				}
-				else {
-					ts.XmodemOpt = XoptCheck;
-				}
-			}
-		}
-	}
-	else
-		_SetFileVar(FileVar);
 
 	TalkStatus = IdTalkQuiet;
 
@@ -1194,66 +1077,156 @@ void XMODEMStart(int mode)
 	}
 }
 
-BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmodemOpt)
+/**
+ *	XMODEM受信
+ *
+ *	@param[in]	filename			受信ファイル名(NULLのとき、ダイアログで選択する)
+ *	@param[in]	ParamBinaryFlag
+ *	@param[in]	ParamXmodemOpt
+ */
+BOOL XMODEMStartReceive(const char *filename, WORD ParamBinaryFlag, WORD ParamXmodemOpt)
 {
 	if (FileVar !=NULL)
 		return FALSE;
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),fiename, _TRUNCATE);
-	if (IsXopt1k(ts.XmodemOpt)) {
-		if (IsXoptCRC(ParamXmodemOpt)) {
-			// CRC
-			ts.XmodemOpt = Xopt1kCRC;
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpXRcv;
+
+	const char *UILanguageFile = ts.UILanguageFile;
+	char uimsg[MAX_UIMSG];
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_XRCV", uimsg, sizeof(uimsg), TitXRcv, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (filename == NULL) {
+		LONG Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
+		char **filenames = _GetXFname(HVTWin, TRUE, fv->DlgCaption, &Option);
+		if (filenames == NULL) {
+			FreeFileVar_(&FileVar);
+			return FALSE;
 		}
-		else {	// Checksum
-			ts.XmodemOpt = Xopt1kCksum;
-		}
-	}
-	else {
-		if (IsXoptCRC(ParamXmodemOpt)) {
-			ts.XmodemOpt = XoptCRC;
+		fv->FileNames = filenames;
+		int tmp = HIWORD(Option);
+		if (IsXoptCRC(tmp)) {
+			if (IsXopt1k(ts.XmodemOpt)) {
+				ts.XmodemOpt = Xopt1kCRC;
+			}
+			else {
+				ts.XmodemOpt = XoptCRC;
+			}
 		}
 		else {
-			ts.XmodemOpt = XoptCheck;
+			if (IsXopt1k(ts.XmodemOpt)) {
+				ts.XmodemOpt = Xopt1kCksum;
+			}
+			else {
+				ts.XmodemOpt = XoptCheck;
+			}
 		}
+		ts.XmodemBin = LOWORD(Option);
 	}
-	ts.XmodemBin = ParamBinaryFlag;
-	FileVar->NoMsg = TRUE;
+	else {
+		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsXopt1k(ts.XmodemOpt)) {
+			if (IsXoptCRC(ParamXmodemOpt)) {
+				// CRC
+				ts.XmodemOpt = Xopt1kCRC;
+			}
+			else {	// Checksum
+				ts.XmodemOpt = Xopt1kCksum;
+			}
+		}
+		else {
+			if (IsXoptCRC(ParamXmodemOpt)) {
+				ts.XmodemOpt = XoptCRC;
+			}
+			else {
+				ts.XmodemOpt = XoptCheck;
+			}
+		}
+		ts.XmodemBin = ParamBinaryFlag;
+		FileVar->NoMsg = TRUE;
+	}
+	GetNextFname(fv);
 	XMODEMStart(IdXReceive);
+	fv->SetDlgProtoFileName(fv, fv->FullName);
 
 	return TRUE;
 }
 
-BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt)
+/**
+ *	XMODEM送信
+ *
+ *	@param[in]	filename			送信ファイル名(NULLのとき、ダイアログで選択する)
+ *	@param[in]	ParamXmodemOpt
+ */
+BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
 {
 	if (FileVar !=NULL)
 		return FALSE;
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName), fiename, _TRUNCATE);
-	if (IsXoptCRC(ts.XmodemOpt)) {
-		if (IsXopt1k(ParamXmodemOpt)) {
-			ts.XmodemOpt = Xopt1kCRC;
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpXSend;
+
+	const char *UILanguageFile = ts.UILanguageFile;
+	char uimsg[MAX_UIMSG];
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_XSEND", uimsg, sizeof(uimsg), TitXSend, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (filename == NULL) {
+		LONG Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
+		char **filenames = _GetXFname(HVTWin, FALSE, fv->DlgCaption, &Option);
+		if (filenames == NULL) {
+			FreeFileVar_(&FileVar);
+			return FALSE;
+		}
+		fv->FileNames = filenames;
+		int tmp = HIWORD(Option);
+		if (IsXopt1k(tmp)) {
+			if (IsXoptCRC(ts.XmodemOpt)) {
+				ts.XmodemOpt = Xopt1kCRC;
+			}
+			else {
+				ts.XmodemOpt = Xopt1kCksum;
+			}
 		}
 		else {
-			ts.XmodemOpt = XoptCRC;
+			if (IsXoptCRC(ts.XmodemOpt)) {
+				ts.XmodemOpt = XoptCRC;
+			}
+			else {
+				ts.XmodemOpt = XoptCheck;
+			}
 		}
 	}
 	else {
-		if (IsXopt1k(ParamXmodemOpt)) {
-			ts.XmodemOpt = Xopt1kCksum;
+		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsXoptCRC(ts.XmodemOpt)) {
+			if (IsXopt1k(ParamXmodemOpt)) {
+				ts.XmodemOpt = Xopt1kCRC;
+			}
+			else {
+				ts.XmodemOpt = XoptCRC;
+			}
 		}
 		else {
-			ts.XmodemOpt = XoptCheck;
+			if (IsXopt1k(ParamXmodemOpt)) {
+				ts.XmodemOpt = Xopt1kCksum;
+			}
+			else {
+				ts.XmodemOpt = XoptCheck;
+			}
 		}
+		FileVar->NoMsg = TRUE;
 	}
-	FileVar->NoMsg = TRUE;
+	GetNextFname(fv);
 	XMODEMStart(IdXSend);
+	fv->SetDlgProtoFileName(fv, fv->FullName);
 
 	return TRUE;
 }
