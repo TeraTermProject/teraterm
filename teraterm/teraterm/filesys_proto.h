@@ -37,10 +37,13 @@ typedef struct FileVarProto {
 	char FullName[MAX_PATH];
 	int DirLen;
 
-	int NumFname, FNCount;
+	char **FileNames;
+
+	int NumFname;
+	int FNCount;
 //	HANDLE FnStrMemHandle;
-	PCHAR FnStrMem;
-	int FnPtr;
+//	PCHAR FnStrMem;
+//	int FnPtr;
 
 	BOOL FileOpen;
 	LONG FileSize, ByteCount;

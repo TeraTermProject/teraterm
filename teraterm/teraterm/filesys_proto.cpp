@@ -48,6 +48,7 @@
 #include "helpid.h"
 #include "layer_for_unicode.h"
 #include "codeconv.h"
+#include "asprintf.h"
 
 #include "filesys_log_res.h"
 
@@ -155,16 +156,19 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		fv->Close(fv);
 		fv->FileOpen = FALSE;
 	}
+#if 0
 	if (fv->FnStrMem != NULL) {
 		free(fv->FnStrMem);
 	}
-#if 0
 	if (fv->FnStrMemHandle != 0)
 	{
 		GlobalUnlock(fv->FnStrMemHandle);
 		GlobalFree(fv->FnStrMemHandle);
 	}
 #endif
+	if (fv->FileNames != NULL) {
+		free(fv->FileNames);
+	}
 	fv->FileSysDestroy(fv);
 	free(fv);
 
@@ -494,7 +498,86 @@ static char *GetCommonDialogDefaultFilenameA(const char *path)
 	return fileA;
 }
 
-static BOOL _GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Option, PFileVarProto fv)
+char **MakeStrArrayFromArray(char **strs)
+{
+	// 数を数える
+	size_t strs_count = 0;
+	size_t strs_len = 0;
+	while(1) {
+		const char *f = strs[strs_count];
+		if (f == NULL) {
+			break;
+		}
+		strs_count++;
+		size_t len = strlen(f) + 1;	// len = 1 when "\0"
+		strs_len += len;
+	}
+
+	// 1領域に保存
+	size_t ptrs_len = sizeof(char *) * (strs_count + 1);
+	char *pool = (char *)malloc(ptrs_len + strs_len);
+	char **ptrs = (char **)pool;
+	char *strpool = pool + ptrs_len;
+	for (int i = 0 ; i < strs_count; i++) {
+		size_t len = strlen(strs[i]) + 1;
+		memcpy(strpool, strs[i], len);
+		ptrs[i] = strpool;
+		strpool += len;
+	}
+	ptrs[strs_count] = NULL;
+	return ptrs;
+}
+
+char **MakeFileArrayMultiSelect(const char *lpstrFile)
+{
+	// 数を数える
+	size_t file_count = 0;
+	const char *p = lpstrFile;
+	const char *path = p;
+	size_t len = strlen(p);
+	p += len + 1;
+	while(1) {
+		len = strlen(p);
+		if (len == 0) {
+			break;
+		}
+		p += len + 1;
+		file_count++;
+	}
+
+	// パス + ファイル名 一覧作成
+	size_t ptr_len = sizeof(char *) * (file_count + 1);
+	char **filenames = (char **)malloc(ptr_len);
+	len = strlen(path);
+	p = path + (len + 1);
+	size_t filelen_sum = 0;
+	for (int i = 0 ; i < file_count; i++) {
+		size_t filelen = asprintf(&filenames[i], "%s\\%s", path, p);
+		filelen_sum += filelen + 1;
+		len = strlen(p);
+		p += len + 1;
+	}
+	filenames[file_count] = NULL;
+
+	char **ret = MakeStrArrayFromArray(filenames);
+
+	for (int i = 0 ; i < file_count; i++) {
+		free(filenames[i]);
+	}
+
+	return ret;
+}
+
+char **MakeFileArrayFromStr(char *str)
+{
+	char *strs[2];
+	strs[0] = str;
+	strs[1] = NULL;
+	char **ret = MakeStrArrayFromArray(strs);
+	return ret;
+}
+
+static char **_GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Option)
 {
 	char FileDirExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
@@ -502,11 +585,12 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Opti
 
 	char *FNFilter = GetCommonDialogFilterA(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
 
-	fv->FullName[0] = 0;
+	char FullName[MAX_PATH];
+	FullName[0] = 0;
 	if (!Receive) {
 		char *default_filename = GetCommonDialogDefaultFilenameA(CurDir);
 		if (default_filename != NULL) {
-			strncpy_s(fv->FullName, _countof(fv->FullName), default_filename, _TRUNCATE);
+			strncpy_s(FullName, _countof(FullName), default_filename, _TRUNCATE);
 			free(default_filename);
 		}
 	}
@@ -516,8 +600,8 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Opti
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = fv->FullName;
-	ofn.nMaxFile = _countof(fv->FullName);
+	ofn.lpstrFile = FullName;
+	ofn.nMaxFile = _countof(FullName);
 	ofn.lpstrInitialDir = CurDir;
 	LONG opt = *Option;
 	if (! Receive)
@@ -550,17 +634,20 @@ static BOOL _GetXFname(HWND HWin, BOOL Receive, const char *caption, LPLONG Opti
 	free(FNFilter);
 	_SetCurrentDirectoryW(TempDir);
 
+	char **ret = NULL;
 	if (Ok) {
-		fv->DirLen = ofn.nFileOffset;
-		fv->FnPtr = ofn.nFileOffset;
+		//fv->DirLen = ofn.nFileOffset;
+		//fv->FnPtr = ofn.nFileOffset;
 
 		if (Receive)
 			*Option = opt;
 		else
 			*Option = MAKELONG(LOWORD(*Option),HIWORD(opt));
+
+		ret = MakeFileArrayFromStr(FullName);
 	}
 
-	return Ok;
+	return ret;
 }
 
 /**
@@ -741,7 +828,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 
 #define FnStrMemSize 4096
 
-static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
+static char **_GetMultiFname(HWND hWnd, WORD FuncId, const char *caption, LPWORD Option)
 {
 	OPENFILENAME ofn;
 	wchar_t TempDir[MAX_PATH];
@@ -756,48 +843,29 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	fv->NumFname = 0;
-
-	/* moemory should be zero-initialized */
-#if 0
-	fv->FnStrMemHandle = GlobalAlloc(GHND, FnStrMemSize);
-	if (fv->FnStrMemHandle == NULL) {
+	char *FnStrMem = (char *)malloc(FnStrMemSize);
+	if (FnStrMem == NULL) {
 		MessageBeep(0);
 		return FALSE;
 	}
-	else {
-		fv->FnStrMem = (char *)GlobalLock(fv->FnStrMemHandle);
-		if (fv->FnStrMem == NULL) {
-			GlobalFree(fv->FnStrMemHandle);
-			fv->FnStrMemHandle = 0;
-			MessageBeep(0);
-			return FALSE;
-		}
-	}
-#endif
-
-	fv->FnStrMem = (char *)malloc(FnStrMemSize);
-	if (fv->FnStrMem == NULL) {
-		MessageBeep(0);
-		return FALSE;
-	}
+	FnStrMem[0] = 0;
 
 	char *FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
 
 	char *default_filename = GetCommonDialogDefaultFilenameA(CurDir);
 	if (default_filename != NULL) {
-		strncpy_s(fv->FnStrMem, _countof(fv->FullName), default_filename, _TRUNCATE);
+		strncpy_s(FnStrMem, FnStrMemSize / sizeof(char), default_filename, _TRUNCATE);
 		free(default_filename);
 	}
 
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
-	ofn.hwndOwner   = fv->HMainWin;
+	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = fv->FnStrMem;
-	ofn.nMaxFile = FnStrMemSize;
-	ofn.lpstrTitle= fv->DlgCaption;
+	ofn.lpstrFile = FnStrMem;
+	ofn.nMaxFile = FnStrMemSize / sizeof(char);
+	ofn.lpstrTitle= caption;
 	ofn.lpstrInitialDir = CurDir;
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.Flags |= OFN_ALLOWMULTISELECT | OFN_EXPLORER;
@@ -818,19 +886,30 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 	Ok = GetOpenFileName(&ofn);
 	free(FNFilter);
 
+	char **ret;
 	if (Ok) {
 		int i, len;
+		int NumFname = 0;
 		/* count number of file names */
-		len = strlen(fv->FnStrMem);
+		len = strlen(FnStrMem);
 		i = 0;
 		while (len>0) {
 			i = i + len + 1;
-			fv->NumFname++;
-			len = strlen(&fv->FnStrMem[i]);
+			NumFname++;
+			len = strlen(&FnStrMem[i]);
 		}
 
-		fv->NumFname--;
+		NumFname--;
 
+		if (NumFname<1) {
+			// single selection
+			ret = MakeFileArrayFromStr(FnStrMem);
+		}
+		else {
+			// multiple selection
+			ret = MakeFileArrayMultiSelect(FnStrMem);
+		}
+#if 0
 		if (fv->NumFname<1) { // single selection
 			fv->NumFname = 1;
 			fv->DirLen = ofn.nFileOffset;
@@ -842,9 +921,18 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 			AppendSlash(fv->FullName,sizeof(fv->FullName));
 			fv->DirLen = strlen(fv->FullName);
 			fv->FnPtr = strlen(fv->FnStrMem)+1;
-		}
+			file_array = MakeFileArrayMultiSelect(fv->FnStrMem);
 
-		fv->FNCount = 0;
+			{
+				int a = 0;
+			}
+		}
+#endif
+
+//		fv->FNCount = 0;
+	}
+	else {
+		ret = NULL;
 	}
 
 #if 0
@@ -854,15 +942,19 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 		fv->FnStrMemHandle = NULL;
 	}
 #endif
+
+#if 0
 	if (! Ok) {
 		free(fv->FnStrMem);
 		fv->FnStrMem = NULL;
 	}
+#endif
+	free(FnStrMem);
 
 	/* restore dir */
 	_SetCurrentDirectoryW(TempDir);
 
-	return Ok;
+	return ret;
 }
 
 static void _SetFileVar(PFileVarProto fv)
@@ -896,7 +988,7 @@ void KermitStart(int mode)
 
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				if (!_GetMultiFname(FileVar, GMF_KERMIT, &w) ||
+				if (!_GetMultiFname(fv->HMainWin, GMF_KERMIT, fv->DlgCaption, &w) ||
 				    (FileVar->NumFname==0))
 				{
 					ProtoEnd();
@@ -1042,12 +1134,14 @@ void XMODEMStart(int mode)
 	if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 	{
 		Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
-		if (! _GetXFname(FileVar->HMainWin,
-						 mode==IdXReceive, fv->DlgCaption, &Option,FileVar))
-		{
+		char **filenames = _GetXFname(FileVar->HMainWin,
+									  mode==IdXReceive, fv->DlgCaption, &Option);
+		if (filenames == NULL) {
 			ProtoEnd();
 			return;
 		}
+		fv->FileNames = filenames;
+		GetNextFname(fv);
 		tmp = HIWORD(Option);
 		if (mode == IdXReceive) {
 			if (IsXoptCRC(tmp)) {
@@ -1187,7 +1281,7 @@ void YMODEMStart(int mode)
 		FileVar->OpId = OpYSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! _GetMultiFname(FileVar, GMF_Y,&Opt) ||
+			if (! _GetMultiFname(fv->HMainWin, GMF_Y, fv->DlgCaption, &Opt) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();
@@ -1270,15 +1364,16 @@ void ZMODEMStart(int mode)
 		FileVar->OpId = OpZSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! _GetMultiFname(FileVar, GMF_Z,&Opt) ||
-			    (FileVar->NumFname==0))
-			{
+			char **filenames = _GetMultiFname(fv->HMainWin, GMF_Z, fv->DlgCaption, &Opt);
+			if (filenames == NUL) {
 				if (mode == IdZAutoS) {
 					CommRawOut(&cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
 				}
 				ProtoEnd();
 				return;
 			}
+			fv->FileNames = filenames;
+			GetNextFname(fv);
 			ts.XmodemBin = Opt;
 		}
 		else
@@ -1482,7 +1577,7 @@ void QVStart(int mode)
 		FileVar->OpId = OpQVSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
-			if (! _GetMultiFname(FileVar, GMF_QV, &W) ||
+			if (! _GetMultiFname(fv->HMainWin, GMF_QV, fv->DlgCaption, &W) ||
 			    (FileVar->NumFname==0))
 			{
 				ProtoEnd();

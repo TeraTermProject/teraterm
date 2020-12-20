@@ -54,25 +54,20 @@ void FTConvFName(PCHAR FName)
 
 BOOL GetNextFname(PFileVarProto fv)
 {
-  /* next file name exists? */
+	int i;
 
-  if (fv->FNCount >= fv->NumFname)
-    return FALSE; /* no more file name */
+	const char *f = fv->FileNames[fv->FNCount];
+	if (f == NULL) {
+		return FALSE; /* no more file name */
+	}
+	fv->FNCount++;
 
-  fv->FNCount++;
-  if (fv->NumFname==1) return TRUE;
+	strncpy_s(fv->FullName, sizeof(fv->FullName), f, _TRUNCATE);
+	GetFileNamePos(fv->FullName, &(fv->DirLen), &i);
+	fv->DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
 
-//  GlobalLock(fv->FnStrMemHandle);
-
-  strncpy_s(&fv->FullName[fv->DirLen],sizeof(fv->FullName) - fv->DirLen,
-    &fv->FnStrMem[fv->FnPtr],_TRUNCATE);
-  fv->FnPtr = fv->FnPtr + strlen(&fv->FnStrMem[fv->FnPtr]) + 1;
-
-//  GlobalUnlock(fv->FnStrMemHandle);
-
-  return TRUE;
+	return TRUE;
 }
-
 
 WORD UpdateCRC(BYTE b, WORD CRC)
 {
