@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
-BOOL GetNextFname(PFileVarProto fv);
+char *GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
 

@@ -75,6 +75,7 @@ typedef struct {
   BOOL CtlEsc;
   BYTE Q[8];
 	TProtoLog *log;
+	const char *FullName;		// Windows上のファイル名 UTF-8
 } TBPVar;
 typedef TBPVar far *PBPVar;
 
@@ -103,15 +104,16 @@ static BOOL BPOpenFileToBeSent(PFileVarProto fv)
 {
   BOOL r;
   TFileIO *fileio = fv->file;
+  PBPVar bv = fv->data;
 
   if (fv->FileOpen) return TRUE;
-  if (fv->FullName[0]==0) return FALSE;
+  if (bv->FullName == NULL) return FALSE;
 
-  r = fileio->OpenRead(fileio, fv->FullName);
+  r = fileio->OpenRead(fileio, bv->FullName);
   fv->FileOpen = r;
   if (r == TRUE) {
-    fv->SetDlgProtoFileName(fv, fv->FullName);
-    fv->FileSize = fileio->GetFSize(fileio, fv->FullName);
+    fv->SetDlgProtoFileName(fv, bv->FullName);
+    fv->FileSize = fileio->GetFSize(fileio, bv->FullName);
   }
   return fv->FileOpen;
 }
@@ -575,9 +577,10 @@ static   int BPGet1(PBPVar bv, int *i, LPBYTE b)
 static BOOL FTCreateFile(PFileVarProto fv)
 {
 	TFileIO *file = fv->file;
+	PBPVar bv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, fv->FullName);
-	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	fv->SetDlgProtoFileName(fv, bv->FullName);
+	fv->FileOpen = file->OpenWrite(file, bv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
@@ -603,7 +606,6 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 //  char Temp[HostNameMaxLength + 1]; // 81(yutaka)
   char Temp[81]; // 81(yutaka)
   TFileIO *fileio = fv->file;
-  char *filename;
 
   switch (bv->PktIn[2]) {
     case 'C': /* Close */
@@ -639,9 +641,9 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
       }
       Temp[j] = 0;
 
-      filename = fileio->GetRecieveFilename(fileio, fv->RecievePath, FALSE, Temp, !fv->OverWrite);
-      strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
-      free(filename);
+      free((void *)bv->FullName);
+      bv->FullName = fileio->GetRecieveFilename(fileio, fv->RecievePath, FALSE, Temp, !fv->OverWrite);
+
 
       /* file open */
       if (! FTCreateFile(fv))
@@ -687,15 +689,17 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 	}
 	Temp[j] = 0;
 
-	filename = fileio->GetRecieveFilename(fileio, Temp, FALSE, fv->RecievePath, !fv->OverWrite);
-	strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
-	free(filename);
+	free((void *)bv->FullName);
+	bv->FullName = fileio->GetRecieveFilename(fileio, Temp, FALSE, fv->RecievePath, !fv->OverWrite);
 
 	/* file open */
 	if (! BPOpenFileToBeSent(fv))
 	{
+	  PBPVar bv = fv->data;
+
 	  /* if file not found, ask user new file name */
-	  fv->FullName[0] = 0;
+	  free((void *)bv->FullName);
+	  bv->FullName = NULL;
 
 	  // ダイアログを開いてファイル名をユーザーに指定してもらう
 	  // この位置で行うのは適切でないと思われるため
@@ -1015,6 +1019,8 @@ static void Destroy(PFileVarProto fv)
 		log->Destory(log);
 		bv->log = NULL;
 	}
+	free((void *)bv->FullName);
+	bv->FullName = NULL;
 	free(bv);
 	fv->data = NULL;
 }

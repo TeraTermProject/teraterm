@@ -38,9 +38,6 @@ typedef struct FileVarProto {
 	HWND HWin;
 	char DlgCaption[40];
 
-	// 送受信時ワーク
-	char FullName[MAX_PATH];	// read/writeするファイル名(各プロトコル内で書き換えすることあり)
-
 	// 送信ファイル名配列
 	//	フルパスのファイル名配列(一番最後はNULL)
 	char **FileNames;

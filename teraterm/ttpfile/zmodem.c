@@ -80,6 +80,7 @@ typedef struct {
   int TOutInit;
   int TOutFin;
 	TProtoLog *log;
+	const char *FullName;		// Windows上のファイル名 UTF-8
 } TZVar;
 typedef TZVar far *PZVar;
 
@@ -567,7 +568,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 		ZSendCancel(zv);
 		return;
 	}
-	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, fv->FullName);
+	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, zv->FullName);
 
 	/* file name */
 	filename = file->GetSendFilename(file, zv->FullName, FALSE, TRUE, FALSE);
@@ -579,10 +580,10 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	ZPutBin(zv, &(zv->PktOutCount), 0);
 	zv->CRC = UpdateCRC(0, zv->CRC);
 	/* file size */
-	fv->FileSize = file->GetFSize(file, fv->FullName);
+	fv->FileSize = file->GetFSize(file, zv->FullName);
 
 	/* timestamp */
-	fv->FileMtime = GetFMtime(fv->FullName);
+	fv->FileMtime = file->GetFMtime(file, zv->FullName);
 
 	// ファイルのタイムスタンプとパーミッションも送るようにした。(2007.12.20 maya, yutaka)
 	_snprintf_s(&(zv->PktOut[zv->PktOutCount]),
@@ -850,6 +851,7 @@ static void ZParseRInit(PFileVarProto fv, PZVar zv)
 {
 	int Max;
 	TFileIO *file = fv->file;
+	char *filename;
 
 	if ((zv->ZState != Z_SendInit) && (zv->ZState != Z_SendEOF))
 		return;
@@ -860,18 +862,21 @@ static void ZParseRInit(PFileVarProto fv, PZVar zv)
 		fv->FileOpen = FALSE;
 
 		if (fv->FileMtime > 0) {
-			SetFMtime(fv->FullName, fv->FileMtime);
+			file->SetFMtime(file, zv->FullName, fv->FileMtime);
 		}
 	}
 
-	if (!GetNextFname(fv)) {
+	filename = GetNextFname(fv);
+	if (filename == NULL) {
 		zv->ZState = Z_SendFIN;
 		ZSendFIN(zv);
 		return;
 	}
+	free((void *)zv->FullName);
+	zv->FullName = filename;
 
 	/* file open */
-	fv->FileOpen = file->OpenRead(file, fv->FullName);
+	fv->FileOpen = file->OpenRead(file, zv->FullName);
 
 	if (zv->CtlEsc) {
 		if ((zv->RxHdr[ZF0] & ESCCTL) == 0) {
@@ -1023,7 +1028,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 				fv->FileOpen = FALSE;
 
 				if (fv->FileMtime > 0) {
-					SetFMtime(fv->FullName, fv->FileMtime);
+					file->SetFMtime(file, zv->FullName, fv->FileMtime);
 				}
 			}
 			zv->ZState = Z_RecvInit;
@@ -1041,9 +1046,10 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 static BOOL FTCreateFile(PFileVarProto fv)
 {
 	TFileIO *file = fv->file;
+	PZVar zv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, fv->FullName);
-	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	fv->SetDlgProtoFileName(fv, zv->FullName);
+	fv->FileOpen = file->OpenWrite(file, zv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
@@ -1071,7 +1077,6 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	int mode;
 	int ret;
 	TFileIO* file = fv->file;
-	char *filename;
 
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
 		return FALSE;
@@ -1082,9 +1087,8 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	/* file name */
 	zv->PktIn[zv->PktInPtr] = 0;	/* for safety */
 
-	filename = file->GetRecieveFilename(file, zv->PktIn, FALSE, fv->RecievePath, !fv->OverWrite);
-	strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
-	free(filename);
+	free((void *)zv->FullName);
+	zv->FullName = file->GetRecieveFilename(file, zv->PktIn, FALSE, fv->RecievePath, !fv->OverWrite);
 	/* file open */
 	if (!FTCreateFile(fv))
 		return FALSE;
@@ -1515,6 +1519,8 @@ static void Destroy(PFileVarProto fv)
 		log->Destory(log);
 		zv->log = NULL;
 	}
+	free((void *)zv->FullName);
+	zv->FullName = NULL;
 	free(zv);
 	fv->data = NULL;
 }

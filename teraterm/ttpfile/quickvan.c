@@ -62,6 +62,7 @@ typedef struct {
   BOOL EnqFlag;
   BYTE CheckSum;
 	TProtoLog *log;
+	const char *FullName;	// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 } TQVVar;
 typedef TQVVar far *PQVVar;
 
@@ -419,9 +420,10 @@ static BOOL QVGetNum2(PQVVar qv, int *i, LPWORD w)
 static BOOL FTCreateFile(PFileVarProto fv)
 {
 	TFileIO *file = fv->file;
+	PQVVar qv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, fv->FullName);
-	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	fv->SetDlgProtoFileName(fv, qv->FullName);
+	fv->FileOpen = file->OpenWrite(file, qv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
@@ -446,16 +448,14 @@ static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
   int i;
   WORD w;
   BYTE b;
-  char *filename;
 
   if ((qv->QVState != QV_RecvInit2) &&
       (qv->QVState != QV_RecvNext))
     return TRUE;
 
   /* file name */
-  filename = file->GetRecieveFilename(file, &(qv->PktIn[5]), FALSE, fv->RecievePath, !fv->OverWrite);
-  strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
-  free(filename);
+  free((void *)qv->FullName);
+  qv->FullName = file->GetRecieveFilename(file, &(qv->PktIn[5]), FALSE, fv->RecievePath, !fv->OverWrite);
   /* file open */
   if (! FTCreateFile(fv)) return FALSE;
   /* file size */
@@ -537,7 +537,7 @@ static BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
 	  time.tm_isdst = 0;
 	  timebuf.actime = mktime(&time);
 	  timebuf.modtime = timebuf.actime;
-	  utime(fv->FullName,&timebuf);
+	  utime(qv->FullName,&timebuf);
 	}
       }
       QVSendVSTAT(fv,qv);
@@ -858,14 +858,17 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   TFileIO *file = fv->file;
   char *filename;
 
-  if (! GetNextFname(fv))
+  filename = GetNextFname(fv);
+  if (filename == NULL)
   {
     QVSendEOT(fv,qv,cv);
     return;
   }
+  free((void *)qv->FullName);
+  qv->FullName = filename;
 
   /* find file and get file info */
-  fv->FileSize = file->GetFSize(file, fv->FullName);
+  fv->FileSize = file->GetFSize(file, qv->FullName);
   if (fv->FileSize>0)
   {
     qv->FileEnd = (WORD)(fv->FileSize >> 7);
@@ -878,7 +881,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   }
 
   /* file open */
-  r = file->OpenRead(file, fv->FullName);
+  r = file->OpenRead(file, qv->FullName);
   fv->FileOpen = r;
   if (! fv->FileOpen)
   {
@@ -905,7 +908,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   qv->PktOut[i] = 0;
   i++;
   /* date */
-  stat(fv->FullName,&stbuf);
+  stat(qv->FullName,&stbuf);
   localtime_s(&tmbuf, &stbuf.st_mtime);
 
   QVPutNum2(qv,(WORD)((tmbuf.tm_year+1900) / 100),&i);
@@ -1348,6 +1351,8 @@ static void Destroy(PFileVarProto fv)
 		log->Destory(log);
 		qv->log = NULL;
 	}
+	free((void *)qv->FullName);
+	qv->FullName = NULL;
 	free(qv);
 	fv->data = NULL;
 }

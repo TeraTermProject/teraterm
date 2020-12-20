@@ -69,6 +69,7 @@ typedef struct {
   BYTE LastMessage;
   BOOL RecvFilesize;
 	TProtoLog *log;
+	const char *FullName;		// Windows上のファイル名 UTF-8
 } TYVar;
 typedef TYVar *PYVar;
 
@@ -299,11 +300,11 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 			file->Close(file);
 
 			if (fv->FileMtime > 0) {
-				SetFMtime(fv->FullName, fv->FileMtime);
+				file->SetFMtime(file, yv->FullName, fv->FileMtime);
 			}
 		}
-		fv->FileOpen = file->OpenRead(file, fv->FullName);
-		fv->FileSize = file->GetFSize(file, fv->FullName);
+		fv->FileOpen = file->OpenRead(file, yv->FullName);
+		fv->FileSize = file->GetFSize(file, yv->FullName);
 	} else {
 		fv->FileOpen = FALSE;
 		fv->FileSize = 0;
@@ -317,7 +318,7 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 		fv->ProgStat = -1;
 	}
 	fv->StartTime = GetTickCount();
-	fv->SetDlgProtoFileName(fv, fv->FullName);
+	fv->SetDlgProtoFileName(fv, yv->FullName);
 
 	yv->PktNumOffset = 0;
 	yv->PktNum = 0;
@@ -336,9 +337,11 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	PYVar yv = fv->data;
 
 	if (yv->YMode == IdYSend) {
-		if (!GetNextFname(fv)) {
+		char *filename = GetNextFname(fv);
+		if (filename == NULL) {
 			return FALSE;
 		}
+		yv->FullName = filename;
 	}
 
 	if ((ts->LogFlag & LOG_Y)!=0) {
@@ -449,9 +452,10 @@ static void YTimeOutProc(PFileVarProto fv, PComVar cv)
 static BOOL FTCreateFile(PFileVarProto fv)
 {
 	TFileIO *file = fv->file;
+	PYVar yv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, fv->FullName);
-	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	fv->SetDlgProtoFileName(fv, yv->FullName);
+	fv->FileOpen = file->OpenWrite(file, yv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
@@ -517,7 +521,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					fv->FileOpen = FALSE;
 
 					if (fv->FileMtime > 0) {
-						SetFMtime(fv->FullName, fv->FileMtime);
+						file->SetFMtime(file, yv->FullName, fv->FileMtime);
 					}
 
 					// 1回目のEOTに対してNAKを返す
@@ -642,16 +646,14 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		int ret;
 		BYTE *p;
 		char *name, *nameend;
-		char *filename;
 
 		p = (BYTE *)malloc(yv->__DataLen + 1);
 		memset(p, 0, yv->__DataLen + 1);
 		memcpy(p, &(yv->PktIn[3]), yv->__DataLen);
 		name = p;
 
-		filename = file->GetRecieveFilename(file, name, FALSE, fv->RecievePath, !fv->OverWrite);
-		strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
-		free(filename);
+		free((void *)yv->FullName);
+		yv->FullName = file->GetRecieveFilename(file, name, FALSE, fv->RecievePath, !fv->OverWrite);
 		if (!FTCreateFile(fv)) {
 			free(p);
 			return FALSE;
@@ -739,11 +741,13 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				// If we already send EOT, ACK means that client confirms it.
 				if (yv->SendEot)
 				{
+					char *filename;
 					// Reset the flag.
 					yv->SendEot = 0;
 
 					// 送信ファイルが残っていない場合は、「全てのファイルを転送終了」を通知する。
-					if (!GetNextFname(fv))
+					filename = GetNextFname(fv);
+					if (filename == NULL)
 					{
 						// If it is the last file.
 						yv->LastSendEot = 1;
@@ -752,6 +756,8 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					else
 					{
 						// Process with next file.
+						free((void *)yv->FullName);
+						yv->FullName = filename;
 						initialize_file_info(fv, yv);
 					}
 				}
@@ -941,7 +947,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->PktOut[0] = SOH;
 
 				// Timestamp.
-				fv->FileMtime = file->GetFMtime(file, fv->FullName);
+				fv->FileMtime = file->GetFMtime(file, yv->FullName);
 
 				filename = file->GetSendFilename(file, yv->FullName, FALSE, FALSE, FALSE);
 				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", filename);
@@ -1156,6 +1162,8 @@ static void Destroy(PFileVarProto fv)
 		log->Destory(log);
 		yv->log = NULL;
 	}
+	free((void *)yv->FullName);
+	yv->FullName = NULL;
 	free(yv);
 	fv->data = NULL;
 }

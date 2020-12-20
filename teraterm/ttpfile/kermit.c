@@ -77,6 +77,7 @@ typedef struct {
   int FileMode;
   LONGLONG FileSize;
 	TProtoLog *log;
+	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 } TKmtVar;
 typedef TKmtVar far *PKmtVar;
 
@@ -1050,13 +1051,16 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	BOOL r;
 	char *filename;
 
-	if (! GetNextFname(fv))
+	filename = GetNextFname(fv);
+	if (filename == NULL)
 	{
 		KmtSendEOTPacket(fv,kv,cv);
 		return TRUE;
 	}
+	free((void *)kv->FullName);
+	kv->FullName = filename;
 
-	if (file->stat(file, fv->FullName, &st) == 0) {
+	if (file->stat(file, kv->FullName, &st) == 0) {
 		kv->FileAttrFlag = KMT_ATTR_TIME | KMT_ATTR_MODE | KMT_ATTR_SIZE | KMT_ATTR_TYPE;
 		kv->FileType = FALSE; // Binary
 		kv->FileTime = st.st_mtime;
@@ -1067,7 +1071,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 
 	/* file open */
-	r = file->OpenRead(file, fv->FullName);
+	r = file->OpenRead(file, kv->FullName);
 	fv->FileOpen = r;
 	if (! fv->FileOpen)
 	{
@@ -1081,13 +1085,13 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		return FALSE;
 	}
 	else
-		fv->FileSize = file->GetFSize(file, fv->FullName);
+		fv->FileSize = file->GetFSize(file, kv->FullName);
 
 	fv->ByteCount = 0;
 	fv->ProgStat = 0;
 	fv->StartTime = GetTickCount();
 
-	fv->SetDlgProtoFileName(fv, fv->FullName);
+	fv->SetDlgProtoFileName(fv, kv->FullName);
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 		fv->ByteCount, fv->FileSize, &fv->ProgStat);
@@ -1157,7 +1161,7 @@ static void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	kv->PktNum = 0;
 	kv->PktNumOffset = 0;
 
-	filename = file->GetRecieveFilename(file, fv->FullName, FALSE, NULL, FALSE);
+	filename = file->GetRecieveFilename(file, kv->FullName, FALSE, NULL, FALSE);
 	if (strlen(filename) >= filename_len_max) {
 		filename[filename_len_max] = 0;
 	}
@@ -1317,10 +1321,11 @@ static void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
 
 static BOOL FTCreateFile(PFileVarProto fv)
 {
+	PKmtVar kv = fv->data;
 	TFileIO *file = fv->file;
 
-	fv->SetDlgProtoFileName(fv, fv->FullName);
-	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	fv->SetDlgProtoFileName(fv, kv->FullName);
+	fv->FileOpen = file->OpenWrite(file, kv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
@@ -1460,15 +1465,15 @@ read_end:
 			(kv->KmtState==GetInit))
 		{
 			TFileIO *file = fv->file;
-			char *filename;
 			kv->KmtMode = IdKmtReceive;
+
+			free((void *)kv->FullName);
+			kv->FullName = NULL;
 
 			Len = sizeof(FNBuff);
 			KmtDecode(fv,kv,FNBuff,&Len);
 			FNBuff[Len] = 0;
-			filename = file->GetRecieveFilename(file, FNBuff, FALSE, fv->RecievePath, !fv->OverWrite);
-			strncpy_s(fv->FullName, _countof(fv->FullName), filename, _TRUNCATE);
-			free(filename);
+			kv->FullName = file->GetRecieveFilename(file, FNBuff, FALSE, fv->RecievePath, !fv->OverWrite);
 			/* file open */
 			if (! FTCreateFile(fv)) return FALSE;
 			kv->KmtState = ReceiveData;
@@ -1622,7 +1627,7 @@ read_end:
 				memset(&utm, 0, sizeof(utm));
 				utm.actime  = kv->FileTime;
 				utm.modtime = kv->FileTime;
-				file->utime(file, fv->FullName, &utm);
+				file->utime(file, kv->FullName, &utm);
 			}
 		}
 	}
@@ -1671,6 +1676,8 @@ static void Destroy(PFileVarProto fv)
 		log->Destory(log);
 		kv->log = NULL;
 	}
+	free((void *)kv->FullName);
+	kv->FullName = NULL;
 	free(kv);
 	fv->data = NULL;
 }

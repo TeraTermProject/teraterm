@@ -723,7 +723,6 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	};
 	PFileVarProto fv;
 	char TempFull[MAX_PATH];
-	int i, j;
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	switch (Message) {
@@ -740,10 +739,14 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case IDOK:
 			if (fv!=NULL) {
 				GetDlgItemText(Dialog, IDC_GETFN, TempFull, sizeof(TempFull));
-				if (strlen(TempFull)==0) return TRUE;
-				GetFileNamePos(TempFull,&i,&j);
-				FitFileName(&(TempFull[j]),sizeof(TempFull) - j, NULL);
-				strncat_s(fv->FullName,sizeof(fv->FullName),&(TempFull[j]),_TRUNCATE);
+				if (strlen(TempFull)==0) {
+					fv->FileNames = NULL;
+					return TRUE;
+				}
+				int FnPos;
+				GetFileNamePos(TempFull, NULL, &FnPos);
+				FitFileName(&(TempFull[FnPos]),sizeof(TempFull) - FnPos, NULL);
+				fv->FileNames = MakeStrArrayFromStr(&(TempFull[FnPos]));
 			}
 			EndDialog(Dialog, 1);
 			return TRUE;
@@ -995,13 +998,13 @@ BOOL KermitGet(const char *filename)
 	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
 
 	if (filename == NULL) {
-		if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) || (strlen(FileVar->FullName)==0)) {
+		if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) || FileVar->FileNames == NULL) {
 			FreeFileVar_(&FileVar);
 			return FALSE;
 		}
 	}
 	else {
-		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
+		FileVar->FileNames = MakeStrArrayFromStr(filename);
 		FileVar->NoMsg = TRUE;
 	}
 	KermitStart(IdKmtGet);
@@ -1063,21 +1066,6 @@ BOOL KermitFinish(BOOL macro)
 	KermitStart(IdKmtFinish);
 
 	return TRUE;
-}
-
-static void XMODEMStart(int mode)
-{
-	if (! ProtoStart())
-		return;
-
-	TalkStatus = IdTalkQuiet;
-
-	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
-
-	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, ts.XmodemOpt,ts.XmodemBin)) {
-		ProtoEnd();
-	}
 }
 
 /**
@@ -1152,8 +1140,21 @@ BOOL XMODEMStartReceive(const char *filename, WORD ParamBinaryFlag, WORD ParamXm
 		ts.XmodemBin = ParamBinaryFlag;
 		FileVar->NoMsg = TRUE;
 	}
-	XMODEMStart(IdXReceive);
-	fv->SetDlgProtoFileName(fv, fv->FullName);
+
+	if (! ProtoStart()) {
+		return FALSE;
+	}
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	int mode = IdXReceive;
+	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, ts.XmodemOpt,ts.XmodemBin)) {
+		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1226,8 +1227,21 @@ BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
 		}
 		FileVar->NoMsg = TRUE;
 	}
-	XMODEMStart(IdXSend);
-	fv->SetDlgProtoFileName(fv, fv->FullName);
+
+	if (! ProtoStart()) {
+		return FALSE;
+	}
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	int mode = IdXSend;
+	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, ts.XmodemOpt,ts.XmodemBin)) {
+		ProtoEnd();
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1507,7 +1521,6 @@ BOOL BPStartSend(const char *filename)
 		return FALSE;
 
 	if (filename == NULL) {
-		FileVar->FullName[0] = 0;
 		char **filenames = _GetTransFname(fv->HMainWin, FileVar->DlgCaption);
 		if (filenames == NULL) {
 			ProtoEnd();

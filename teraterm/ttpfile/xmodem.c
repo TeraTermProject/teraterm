@@ -57,6 +57,7 @@ typedef struct {
   int TOutVLong;
   int CANCount;
 	TProtoLog *log;
+	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 } TXVar;
 typedef TXVar far *PXVar;
 
@@ -227,22 +228,23 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		log->LogState = 0;
 	}
 
-	GetNextFname(fv);
-	fv->FileSize = 0;
+	xv->FullName = GetNextFname(fv);
 	if (xv->XMode == IdXSend) {
-		fv->FileOpen = file->OpenRead(file, fv->FullName);
+		fv->FileOpen = file->OpenRead(file, xv->FullName);
 		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
-		fv->FileSize = file->GetFSize(file, fv->FullName);
+		fv->FileSize = file->GetFSize(file, xv->FullName);
 		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
-		fv->FileOpen = file->OpenWrite(file, fv->FullName);
+		fv->FileOpen = file->OpenWrite(file, xv->FullName);
 		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
+		fv->FileSize = 0;
 		fv->ProgStat = -1;
 	}
+	fv->SetDlgProtoFileName(fv, xv->FullName);
 	fv->StartTime = GetTickCount();
 
 	xv->PktNumOffset = 0;
@@ -664,6 +666,8 @@ static void Destroy(PFileVarProto fv)
 		log->Destory(log);
 		xv->log = NULL;
 	}
+	free((void*)xv->FullName);
+	xv->FullName = NULL;
 	free(xv);
 	fv->data = NULL;
 }

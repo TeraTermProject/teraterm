@@ -39,16 +39,23 @@
 #include "ftlib.h"
 #include "tt_res.h"
 
-BOOL GetNextFname(PFileVarProto fv)
+/**
+ *	ファイル名を取得
+ *
+ *	@return		ファイル名
+ *				NULLのとき次のファイルはない
+ *				不要になったら free() すること
+ */
+char *GetNextFname(PFileVarProto fv)
 {
-	const char *f = fv->FileNames[fv->FNCount];
+	char *f = fv->FileNames[fv->FNCount];
 	if (f == NULL) {
-		return FALSE; /* no more file name */
+		/* no more file name */
+		return NULL;
 	}
 	fv->FNCount++;
-
-	strncpy_s(fv->FullName, sizeof(fv->FullName), f, _TRUNCATE);
-	return TRUE;
+	f = _strdup(f);
+	return f;
 }
 
 WORD UpdateCRC(BYTE b, WORD CRC)

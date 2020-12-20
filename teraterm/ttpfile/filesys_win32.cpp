@@ -363,6 +363,15 @@ static long GetFMtime(TFileIO *fv, const char *FName)
 	return (long)st.st_mtime;
 }
 
+static BOOL _SetFMtime(TFileIO *fv, const char *FName, DWORD mtime)
+{
+	struct _utimbuf filetime;
+
+	filetime.actime = mtime;
+	filetime.modtime = mtime;
+	return _utime(FName, &filetime);
+}
+
 static void FileSysDestroy(TFileIO *fv)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
@@ -399,5 +408,6 @@ TFileIO *FilesysCreateWin32(void)
 	fv->GetSendFilename = GetSendFilename;
 	fv->GetRecieveFilename = GetRecieveFilename;
 	fv->GetFMtime = GetFMtime;
+	fv->SetFMtime = _SetFMtime;
 	return fv;
 }
