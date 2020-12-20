@@ -47,19 +47,20 @@ typedef struct FileVarProto {
 	LONG FileSize, ByteCount;
 	BOOL OverWrite;
 
+#if 1
 	BOOL LogFlag;
 	HANDLE LogFile;
 	WORD LogState;
 	WORD LogCount;
+	BYTE LogLineBuf[16];
+	int FlushLogLineBuf;
+#endif
 
 	BOOL Success;
 	BOOL NoMsg;
 
-	char LogDefaultPath[MAX_PATH];
+//	char LogDefaultPath[MAX_PATH];
 	BOOL HideDialog;
-
-	BYTE LogLineBuf[16];
-	int FlushLogLineBuf;
 
 	int ProgStat;
 

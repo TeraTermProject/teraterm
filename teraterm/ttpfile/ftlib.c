@@ -101,6 +101,7 @@ LONG UpdateCRC32(BYTE b, LONG CRC)
   return CRC;
 }
 
+#if 1
 void FTLog1Byte(PFileVarProto fv, BYTE b)
 {
   char d[3];
@@ -154,6 +155,7 @@ void FTLog1Byte(PFileVarProto fv, BYTE b)
   fv->LogLineBuf[fv->LogCount] = b;    // add (2008.6.3 yutaka)
   fv->LogCount++;
 }
+#endif
 
 void FTSetTimeOut(PFileVarProto fv, int T)
 {
@@ -221,4 +223,116 @@ BOOL FTCreateFile(PFileVarProto fv)
   fv->StartTime = GetTickCount();
 
   return fv->FileOpen;
+}
+
+//
+// プロトコル用ログ
+//
+
+static BOOL Open(TProtoLog *pv, const char *file)
+{
+	pv->LogFile = _lcreat(file, 0);
+	pv->LogCount = 0;
+	pv->LogState = 0;
+	return pv->LogFile == INVALID_HANDLE_VALUE ? FALSE : TRUE;
+}
+
+static void Close(TProtoLog *pv)
+{
+	if (pv->LogFile != INVALID_HANDLE_VALUE) {
+		if (pv->LogCount > 0) {
+			pv->DumpFlush(pv);
+		}
+		CloseHandle(pv->LogFile);
+		pv->LogFile = INVALID_HANDLE_VALUE;
+	}
+}
+
+static size_t WriteRawData(struct ProtoLog *pv, const void *data, size_t len)
+{
+	size_t r = _lwrite(pv->LogFile, data, len);
+	return r;
+}
+
+static size_t WriteStr(TProtoLog *pv, const char *str)
+{
+	size_t len = strlen(str);
+	size_t r = WriteRawData(pv, str, len);
+	return r;
+}
+
+static void DumpByte(TProtoLog *pv, BYTE b)
+{
+	char d[3];
+
+	if (pv->LogCount == _countof(pv->LogLineBuf)) {
+		pv->DumpFlush(pv);
+	}
+
+	if (b<=0x9f)
+		d[0] = (b >> 4) + 0x30;
+	else
+		d[0] = (b >> 4) + 0x37;
+
+	if ((b & 0x0f) <= 0x9)
+		d[1] = (b & 0x0F) + 0x30;
+	else
+		d[1] = (b & 0x0F) + 0x37;
+
+	d[2] = 0x20;
+	_lwrite(pv->LogFile,d,3);
+	pv->LogLineBuf[pv->LogCount] = b;    // add (2008.6.3 yutaka)
+	pv->LogCount++;
+}
+
+static void DumpFlush(TProtoLog *pv)
+{
+	int rest = 16 - pv->LogCount;
+	int i;
+
+	for (i = 0 ; i < rest ; i++)
+		_lwrite(pv->LogFile,"   ", 3);
+
+	// ASCII表示を追加 (2008.6.3 yutaka)
+	_lwrite(pv->LogFile,"    ", 4);
+	for (i = 0 ; i < pv->LogCount ; i++) {
+		char ch[5];
+		if (isprint(pv->LogLineBuf[i])) {
+			_snprintf_s(ch, sizeof(ch), _TRUNCATE, "%c", pv->LogLineBuf[i]);
+			_lwrite(pv->LogFile, ch, 1);
+
+		} else {
+			_lwrite(pv->LogFile, ".", 1);
+
+		}
+
+	}
+
+	pv->LogCount = 0;
+	_lwrite(pv->LogFile,"\015\012",2);
+}
+
+static void ProtoLogDestroy(TProtoLog *pv)
+{
+	pv->Close(pv);
+	free(pv);
+}
+
+TProtoLog *ProtoLogCreate()
+{
+	TProtoLog *pv = (TProtoLog *)malloc(sizeof(TProtoLog));
+	if (pv == NULL) {
+		return NULL;
+	}
+
+	memset(pv, 0, sizeof(TProtoLog));
+	pv->Open = Open;
+	pv->Close = Close;
+	pv->WriteStr = WriteStr;
+	pv->DumpByte = DumpByte;
+	pv->DumpFlush = DumpFlush;
+	pv->WriteRaw = WriteRawData;
+	pv->Destory = ProtoLogDestroy;
+	pv->LogFile = INVALID_HANDLE_VALUE;
+	return pv;
 }

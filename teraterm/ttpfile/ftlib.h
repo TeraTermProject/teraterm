@@ -35,16 +35,34 @@
 extern "C" {
 #endif
 
-//extern char UILanguageFile[MAX_PATH];
-
 void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
 void FTConvFName(PCHAR FName);
 BOOL GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
+#if 1
 void FTLog1Byte(PFileVarProto fv, BYTE b);
+#endif
 void FTSetTimeOut(PFileVarProto fv, int T);
 BOOL FTCreateFile(PFileVarProto fv);
+
+typedef struct ProtoLog {
+	// public
+	WORD LogState;	// é©óRÇ…égÇ¡ÇƒÇ‡ó«Ç¢ïœêî
+	BOOL (*Open)(struct ProtoLog *pv, const char *file);
+	void (*Close)(struct ProtoLog *pv);
+	size_t (*WriteRaw)(struct ProtoLog *pv, const void *data, size_t len);
+	size_t (*WriteStr)(struct ProtoLog *pv, const char *str);
+	void (*DumpByte)(struct ProtoLog *pv, BYTE b);
+	void (*DumpFlush)(struct ProtoLog *pv);
+	void (*Destory)(struct ProtoLog *pv);
+	// private
+	HANDLE LogFile;
+	WORD LogCount;
+	BYTE LogLineBuf[16];
+} TProtoLog;
+
+TProtoLog *ProtoLogCreate(void);
 
 #ifdef __cplusplus
 }

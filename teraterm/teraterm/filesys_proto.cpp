@@ -296,9 +296,6 @@ static void CloseProtoDlg(void)
 			if (FileVar->OpId == OpQVSend)
 				CommTextOut(&cv,"\015",1);
 		}
-		if (FileVar->LogFlag)
-			CloseHandle(FileVar->LogFile);
-		FileVar->LogFile = 0;
 	}
 }
 
@@ -1273,7 +1270,7 @@ BOOL YMODEMStartSend(const char *fiename)
 
 void ZMODEMStart(int mode)
 {
-	WORD Opt;
+	WORD Opt = 0; // TODO Žg‚Á‚Ä‚¢‚È‚¢
 	char uimsg[MAX_UIMSG];
 	const char *UILanguageFile = ts.UILanguageFile;
 
