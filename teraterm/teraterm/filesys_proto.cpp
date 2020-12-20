@@ -127,10 +127,15 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 		return FALSE;
 	memset(fv, 0, sizeof(*fv));
 
+	// 受信フォルダ
 	char FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	AppendSlash(FileDirExpanded, _countof(FileDirExpanded));
+	fv->RecievePath = _strdup(FileDirExpanded);
+
+	// 受信フォルダを fv->FullName に設定しておく
+	// fv->FullName[fv->DirLen] からファイル名を設定するとフルパスになる
 	strncpy_s(fv->FullName, sizeof(fv->FullName), FileDirExpanded, _TRUNCATE);
-	AppendSlash(fv->FullName,sizeof(fv->FullName));
 
 	fv->DirLen = strlen(fv->FullName);
 	fv->FileOpen = FALSE;

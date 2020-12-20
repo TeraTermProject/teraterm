@@ -45,6 +45,9 @@ typedef struct FileVarProto {
 //	PCHAR FnStrMem;
 //	int FnPtr;
 
+	// 受信
+	char *RecievePath;		// 受信フォルダ(終端にパスセパレータ'\\'が付加されている)
+
 	BOOL FileOpen;
 	LONG FileSize, ByteCount;
 	BOOL OverWrite;
