@@ -58,6 +58,7 @@
 
 #include "filesys_log_res.h"
 #include "filesys_log.h"
+#include "filesys.h"  // for ProtoGetProtoFlag()
 
 /*
    Line Head flag for timestamping
@@ -992,7 +993,7 @@ static void LogToFile(void)
 	DWORD WriteBufLen = 0;
 	PCHAR WriteBuf = (PCHAR)malloc(WriteBufMax);
 	while (Get1(Buf,&Start,&Count,&b)) {
-		if (FLogIsPause() || (cv.ProtoFlag)) {
+		if (FLogIsPause() || ProtoGetProtoFlag()) {
 			continue;
 		}
 
@@ -1029,7 +1030,7 @@ static void LogToFile(void)
 		cv_BStart = Start;
 		cv_BCount = Count;
 	}
-	if (FLogIsPause() || cv.ProtoFlag) return;
+	if (FLogIsPause() || ProtoGetProtoFlag()) return;
 	LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
 
 
@@ -1418,7 +1419,7 @@ void FLogShowDlg(void)
 //void Log1Bin(PComVar cv, BYTE b)
 static void Log1Bin(BYTE b)
 {
-	if (LogVar->IsPause || cv.ProtoFlag) {
+	if (LogVar->IsPause || ProtoGetProtoFlag()) {
 		return;
 	}
 	if (cv_BinSkip > 0) {

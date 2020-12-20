@@ -142,7 +142,7 @@ static BOOL OnIdle(LONG lCount)
 		}
 		else {
 			int Change;
-			if (cv.ProtoFlag) Change = ProtoDlgParse();
+			if (ProtoGetProtoFlag()) Change = ProtoDlgParse();
 			else {
 				switch (ActiveWin) {
 				case IdVT:

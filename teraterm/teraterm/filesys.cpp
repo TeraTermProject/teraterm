@@ -319,7 +319,7 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 	if (! cv.Ready || FSend) {
 		return FALSE;
 	}
-	if (cv.ProtoFlag)
+	if (ProtoGetProtoFlag())
 	{
 		FreeFileVar(&SendVar);
 		return FALSE;

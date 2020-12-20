@@ -34,14 +34,17 @@
 extern "C" {
 #endif
 
+// filesys.cpp
 BOOL IsSendVarNULL(void);
-BOOL IsFileVarNULL(void);
 
 BOOL FileSendStart(const wchar_t *filename, int binary);
 void FileSend(void);
 void FileSendEnd(void);
 void FileSendPause(BOOL Pause);
 
+// filesys_proto.cpp
+BOOL ProtoGetProtoFlag(void);
+BOOL IsFileVarNULL(void);
 void ProtoEnd(void);
 int ProtoDlgParse(void);
 void ProtoDlgTimeOut(void);

@@ -102,6 +102,7 @@ static int ProtoId;
 extern BOOL FSend;
 
 static PProtoDlg PtDlg = NULL;
+static BOOL cv_ProtoFlag = FALSE;
 
 static void _SetDlgTime(TFileVarProto *fv, DWORD elapsed, int bytes)
 {
@@ -362,7 +363,7 @@ static void CloseProtoDlg(void)
 
 static BOOL ProtoStart(void)
 {
-	if (cv.ProtoFlag)
+	if (cv_ProtoFlag)
 		return FALSE;
 	if (FSend)
 	{
@@ -376,15 +377,15 @@ static BOOL ProtoStart(void)
 	{
 		return FALSE;
 	}
-	cv.ProtoFlag = TRUE;
+	cv_ProtoFlag = TRUE;
 	return TRUE;
 }
 
 void ProtoEnd(void)
 {
-	if (! cv.ProtoFlag)
+	if (! cv_ProtoFlag)
 		return;
-	cv.ProtoFlag = FALSE;
+	cv_ProtoFlag = FALSE;
 
 	/* Enable transmit delay (serial port) */
 	cv.DelayFlag = TRUE;
@@ -734,7 +735,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 
 /**
  *	OnIdle()#teraterm.cppからコールされる
- *		cv.ProtoFlag が 0 以外のとき
+ *		cv_ProtoFlag が 0 以外のとき
  *	@retval		0		continue
  *				1/2		ActiveWin(グローバル変数)の値(IdVT=1/IdTek=2)
  *				注 今のところ捨てられている
@@ -1674,4 +1675,9 @@ BOOL QVStartSend(const wchar_t *filename)
 BOOL IsFileVarNULL()
 {
 	return FileVar == NULL;
+}
+
+BOOL ProtoGetProtoFlag(void)
+{
+	return cv_ProtoFlag;
 }

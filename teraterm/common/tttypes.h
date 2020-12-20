@@ -1043,7 +1043,7 @@ typedef struct {
 	int reserve_1[2];		// DStart, DCount;
 	int reserve_8;			// BinSkip;
 	WORD reserve_9;			// FilePause;
-	BOOL ProtoFlag;
+	BOOL reserve_10;		// ProtoFlag;
 	/* message flag */
 	WORD NoMsg;
 	/* if TRUE, teraterm trys to connect other protocol family */
