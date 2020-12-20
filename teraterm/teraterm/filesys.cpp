@@ -98,12 +98,14 @@ PGetGetFname GetGetFname;
 PSetFileVar SetFileVar;
 PGetXFname GetXFname;
 #endif
+#if 0
 PProtoInit ProtoInit;
 PProtoParse ProtoParse;
 PProtoTimeOutProc ProtoTimeOutProc;
 PProtoCancel ProtoCancel;
 PTTFILESetUILanguageFile TTFILESetUILanguageFile;
 PTTFILESetFileSendFilter TTFILESetFileSendFilter;
+#endif
 
 #if 0
 #define IdGetSetupFname  1
@@ -122,6 +124,7 @@ PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 #define IdTTFILESetUILanguageFile 11
 #define IdTTFILESetFileSendFilter 12
 
+#if 0
 BOOL LoadTTFILE(void)
 {
 	BOOL Err;
@@ -236,6 +239,7 @@ BOOL FreeTTFILE(void)
 	}
 	return TRUE;
 }
+#endif
 
 static PFileTransDlg SendDlg = NULL;
 //static PProtoDlg PtDlg = NULL;
@@ -564,11 +568,15 @@ void FileSendStart(void)
 		return;
 	}
 
+#if 0
 	if (! LoadTTFILE())
 		return;
+#endif
 	if (! NewFileVar(&SendVar))
 	{
+#if 0
 		FreeTTFILE();
+#endif
 		return;
 	}
 	SendVar->OpId = OpSendFile;
@@ -663,7 +671,9 @@ void FileTransEnd(WORD OpId)
 			SendDlg = NULL;
 		}
 		FreeFileVar(&SendVar);
+#if 0
 		FreeTTFILE();
+#endif
 	}
 
 	EndDdeCmnd(0);

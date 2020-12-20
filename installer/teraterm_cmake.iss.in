@@ -64,7 +64,6 @@ Name: {app}\lang; Components: TeraTerm
 [Files]
 Source: @CMAKE_INSTALL_PREFIX@/ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: @CMAKE_INSTALL_PREFIX@/ttpfile.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\TERATERM.INI; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify

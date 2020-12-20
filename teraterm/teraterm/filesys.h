@@ -47,6 +47,7 @@ typedef void (PASCAL *PSetFileVar) (PFileVar fv);
 typedef BOOL (PASCAL *PGetXFname)
   (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir);
 #endif
+#if 0
 typedef void (PASCAL *PProtoInit)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts);
 typedef BOOL (PASCAL *PProtoParse)
@@ -59,6 +60,7 @@ typedef BOOL (PASCAL *PTTFILESetUILanguageFile)
   (char *file);
 typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
   (char *file);
+#endif
 
 #if 0
 extern PGetSetupFname GetSetupFname;
@@ -79,8 +81,10 @@ extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;
 extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 #endif
 
+#if 0
 BOOL LoadTTFILE(void);
 BOOL FreeTTFILE(void);
+#endif
 //BOOL NewFileVar(PFileVar *FV);
 //void FreeFileVar(PFileVar *FV);
 BOOL IsSendVarNULL();

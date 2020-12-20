@@ -1799,8 +1799,10 @@ void CVTWindow::OnDestroy()
 	while (FreeTTDLG());
 #endif
 
+#if 0
 	do { }
 	while (FreeTTFILE());
+#endif
 
 	if (HTEKWin != NULL) {
 		::DestroyWindow(HTEKWin);
@@ -5002,11 +5004,15 @@ void CVTWindow::OnSetupRestore()
 	BOOL Ok;
 
 	HelpId = HlpSetupRestore;
+#if 0
 	if (! LoadTTFILE()) {
 		return;
 	}
+#endif
 	Ok = _GetSetupFname(HVTWin,GSF_RESTORE,&ts);
+#if 0
 	FreeTTFILE();
+#endif
 	if (Ok) {
 		RestoreSetup();
 	}
@@ -5492,11 +5498,15 @@ void CVTWindow::OnSetupLoadKeyMap()
 	BOOL Ok;
 
 	HelpId = HlpSetupLoadKeyMap;
+#if 0
 	if (! LoadTTFILE()) {
 		return;
 	}
+#endif
 	Ok = _GetSetupFname(HVTWin,GSF_LOADKEY,&ts);
+#if 0
 	FreeTTFILE();
+#endif
 	if (! Ok) {
 		return;
 	}

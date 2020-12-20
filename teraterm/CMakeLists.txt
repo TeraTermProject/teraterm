@@ -4,11 +4,6 @@ set_target_properties(
   ttpcmn
   PROPERTIES FOLDER teraterm)
 
-add_subdirectory(ttpfile)
-set_target_properties(
-  ttpfile
-  PROPERTIES FOLDER teraterm)
-
 add_subdirectory(ttpset)
 set_target_properties(
   ttpset

@@ -738,13 +738,17 @@ static BOOL ProtoStart(void)
 		return FALSE;
 	}
 
+#if 0
 	if (! LoadTTFILE())
 		return FALSE;
+#endif
 	NewFileVar_(&FileVar);
 
 	if (FileVar==NULL)
 	{
+#if 0
 		FreeTTFILE();
+#endif
 		return FALSE;
 	}
 	cv.ProtoFlag = TRUE;
@@ -768,7 +772,9 @@ void ProtoEnd(void)
 	else
 		EndDdeCmnd(0);
 
+#if 0
 	FreeTTFILE();
+#endif
 	FreeFileVar_(&FileVar);
 }
 
