@@ -827,7 +827,7 @@ void KermitStart(int mode)
 			FileVar->OpId = OpKmtSend;
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				if (! (*GetGetFname)(FileVar->HMainWin,FileVar) ||
+				if (! (*GetGetFname)(FileVar->HMainWin,FileVar, &ts) ||
 				    (strlen(FileVar->FullName)==0))
 				{
 					ProtoEnd();

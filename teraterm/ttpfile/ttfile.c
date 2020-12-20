@@ -58,7 +58,6 @@ static HANDLE hInst;
 
 static HFONT DlgFoptFont;
 static HFONT DlgXoptFont;
-static HFONT DlgGetfnFont;
 
 char UILanguageFile[MAX_PATH];
 char FileSendFilter[128];
@@ -496,30 +495,13 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	PFileVar fv;
 	char TempFull[MAX_PATH];
 	int i, j;
-	LOGFONT logfont;
-	HFONT font;
 
 	switch (Message) {
 	case WM_INITDIALOG:
 		fv = (PFileVar)lParam;
 		SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 		SendDlgItemMessage(Dialog, IDC_GETFN, EM_LIMITTEXT, sizeof(TempFull)-1,0);
-
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_SYSTEM_FONT", Dialog, &logfont, &DlgGetfnFont, UILanguageFile)) {
-			SendDlgItemMessage(Dialog, IDC_FILENAME, WM_SETFONT, (WPARAM)DlgGetfnFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_GETFN, WM_SETFONT, (WPARAM)DlgGetfnFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgGetfnFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDCANCEL, WM_SETFONT, (WPARAM)DlgGetfnFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_GETFNHELP, WM_SETFONT, (WPARAM)DlgGetfnFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgGetfnFont = NULL;
-		}
-
 		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
-
 		return TRUE;
 
 	case WM_COMMAND:
@@ -534,15 +516,9 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				strncat_s(fv->FullName,sizeof(fv->FullName),&(TempFull[j]),_TRUNCATE);
 			}
 			EndDialog(Dialog, 1);
-			if (DlgGetfnFont != NULL) {
-				DeleteObject(DlgGetfnFont);
-			}
 			return TRUE;
 		case IDCANCEL:
 			EndDialog(Dialog, 0);
-			if (DlgGetfnFont != NULL) {
-				DeleteObject(DlgGetfnFont);
-			}
 			return TRUE;
 		case IDC_GETFNHELP:
 			if (fv!=NULL) {
@@ -555,11 +531,13 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-BOOL WINAPI GetGetFname(HWND HWin, PFileVar fv)
+BOOL WINAPI GetGetFname(HWND HWin, PFileVar fv, PTTSet ts)
 {
-	return (BOOL)DialogBoxParam(hInst,
-	                            MAKEINTRESOURCE(IDD_GETFNDLG),
-	                            HWin, GetFnDlg, (LPARAM)fv);
+	SetDialogFont(ts->DialogFontName, ts->DialogFontPoint, ts->DialogFontCharSet,
+				  ts->UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	return (BOOL)TTDialogBoxParam(hInst,
+								  MAKEINTRESOURCE(IDD_GETFNDLG),
+								  HWin, GetFnDlg, (LPARAM)fv);
 }
 
 void WINAPI SetFileVar(PFileVar fv)

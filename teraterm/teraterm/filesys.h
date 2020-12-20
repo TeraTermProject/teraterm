@@ -40,7 +40,7 @@ typedef BOOL (PASCAL *PGetTransFname)
 typedef BOOL (PASCAL *PGetMultiFname)
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option);
 typedef BOOL (PASCAL *PGetGetFname)
-  (HWND HWin, PFileVar fv);
+  (HWND HWin, PFileVar fv, PTTSet ts);
 typedef void (PASCAL *PSetFileVar) (PFileVar fv);
 typedef BOOL (PASCAL *PGetXFname)
   (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir);
