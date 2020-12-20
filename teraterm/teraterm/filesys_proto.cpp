@@ -961,7 +961,6 @@ BOOL KermitStartSend(const char *filename)
 		fv->FileNames = MakeStrArrayFromStr(filename);
 		FileVar->NoMsg = TRUE;
 	}
-//	GetNextFname(fv);
 	KermitStart(IdKmtSend);
 
 	return TRUE;
@@ -1144,7 +1143,6 @@ BOOL XMODEMStartReceive(const char *filename, WORD ParamBinaryFlag, WORD ParamXm
 		ts.XmodemBin = ParamBinaryFlag;
 		FileVar->NoMsg = TRUE;
 	}
-	GetNextFname(fv);
 	XMODEMStart(IdXReceive);
 	fv->SetDlgProtoFileName(fv, fv->FullName);
 
@@ -1219,7 +1217,6 @@ BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
 		}
 		FileVar->NoMsg = TRUE;
 	}
-	GetNextFname(fv);
 	XMODEMStart(IdXSend);
 	fv->SetDlgProtoFileName(fv, fv->FullName);
 

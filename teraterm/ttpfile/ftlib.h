@@ -36,12 +36,10 @@ extern "C" {
 #endif
 
 void GetLongFName(PCHAR FullName, PCHAR LongName, int destlen);
-void FTConvFName(PCHAR FName);
 BOOL GetNextFname(PFileVarProto fv);
 WORD UpdateCRC(BYTE b, WORD CRC);
 LONG UpdateCRC32(BYTE b, LONG CRC);
 void FTSetTimeOut(PFileVarProto fv, int T);
-BOOL FTCreateFile(PFileVarProto fv);
 
 typedef struct ProtoLog {
 	// public

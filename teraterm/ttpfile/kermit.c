@@ -1315,6 +1315,30 @@ static void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
 	}
 }
 
+static BOOL FTCreateFile(PFileVarProto fv)
+{
+	TFileIO *file = fv->file;
+
+	fv->SetDlgProtoFileName(fv, fv->FullName);
+	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	if (! fv->FileOpen) {
+		if (fv->NoMsg) {
+			MessageBox(fv->HMainWin,"Cannot create file",
+					   "Tera Term: Error",MB_ICONEXCLAMATION);
+		}
+		return FALSE;
+	}
+
+	fv->ByteCount = 0;
+	fv->FileSize = 0;
+	if (fv->ProgStat != -1) {
+		fv->ProgStat = 0;
+	}
+	fv->StartTime = GetTickCount();
+
+	return TRUE;
+}
+
 static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 {
 	BYTE b;

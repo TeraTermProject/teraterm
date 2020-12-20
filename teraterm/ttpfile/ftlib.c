@@ -39,19 +39,6 @@
 #include "ftlib.h"
 #include "tt_res.h"
 
-void FTConvFName(PCHAR FName)
-{ // replace ' ' by '_' in FName
-  int i;
-
-  i = 0;
-  while (FName[i]!=0)
-  {
-    if (FName[i]==' ')
-      FName[i] = '_';
-    i++;
-  }
-}
-
 BOOL GetNextFname(PFileVarProto fv)
 {
 	const char *f = fv->FileNames[fv->FNCount];
@@ -95,71 +82,6 @@ void FTSetTimeOut(PFileVarProto fv, int T)
   KillTimer(fv->HMainWin, IdProtoTimer);
   if (T==0) return;
   SetTimer(fv->HMainWin, IdProtoTimer, T*1000, NULL);
-}
-
-static void AddNum(PCHAR FName, int n)
-{
-  char Num[11];
-  int i, j, k, dLen;
-
-  _snprintf_s(Num,sizeof(Num),_TRUNCATE,"%u",n);
-  GetFileNamePos(FName,&i,&j);
-  k = strlen(FName);
-  while ((k>j) && (FName[k]!='.'))
-    k--;
-  if (FName[k]!='.') k = strlen(FName);
-  dLen = strlen(Num);
-
-  if (strlen(FName)+dLen > MAX_PATH - 1)
-    dLen = MAX_PATH - 1 - strlen(FName);
-  memmove(&FName[k+dLen],&FName[k],strlen(FName)-k+1);
-  memcpy(&FName[k+dLen-strlen(Num)],Num,strlen(Num));
-}
-
-BOOL FTCreateFile(PFileVarProto fv)
-{
-  int i;
-  char Temp[MAX_PATH];
-  int DirLen;
-  TFileIO *file = fv->file;
-
-  GetFileNamePos(fv->FullName, &DirLen, &i);
-  DirLen++;	// ˆê”ÔÅŒã‚Ì '\\' ‚ðŽw‚µ‚Ä‚¢‚é‚Ì‚Å +1 ‚µ‚Ä‚¨‚­
-
-  replaceInvalidFileNameChar(&(fv->FullName[DirLen]), '_');
-
-  if (fv->FullName[DirLen] == 0) {
-    strncpy_s(&(fv->FullName[DirLen]), sizeof(fv->FullName) - DirLen, "noname", _TRUNCATE);
-  }
-
-  FitFileName(&(fv->FullName[DirLen]),sizeof(fv->FullName) - DirLen,NULL);
-  if (! fv->OverWrite)
-  {
-    i = 0;
-    strncpy_s(Temp, sizeof(Temp),fv->FullName, _TRUNCATE);
-    while (DoesFileExist(Temp))
-    {
-      i++;
-      strncpy_s(Temp, sizeof(Temp),fv->FullName, _TRUNCATE);
-      AddNum(Temp,i);
-    }
-    strncpy_s(fv->FullName, sizeof(fv->FullName),Temp, _TRUNCATE);
-  }
-  fv->FileOpen = file->OpenWrite(file, fv->FullName);
-  if (! fv->FileOpen && ! fv->NoMsg)
-    MessageBox(fv->HMainWin,"Cannot create file",
-	       "Tera Term: Error",MB_ICONEXCLAMATION);
-  fv->SetDlgProtoFileName(fv, fv->FullName);
-  fv->ByteCount = 0;
-  fv->FileSize = 0;
-
-  if (fv->ProgStat != -1) {
-    fv->ProgStat = 0;
-  }
-
-  fv->StartTime = GetTickCount();
-
-  return fv->FileOpen;
 }
 
 //

@@ -572,6 +572,29 @@ static   int BPGet1(PBPVar bv, int *i, LPBYTE b)
 	return 0;
 }
 
+static BOOL FTCreateFile(PFileVarProto fv)
+{
+	TFileIO *file = fv->file;
+
+	fv->SetDlgProtoFileName(fv, fv->FullName);
+	fv->FileOpen = file->OpenWrite(file, fv->FullName);
+	if (! fv->FileOpen) {
+		if (fv->NoMsg) {
+			MessageBox(fv->HMainWin,"Cannot create file",
+					   "Tera Term: Error",MB_ICONEXCLAMATION);
+		}
+		return FALSE;
+	}
+
+	fv->ByteCount = 0;
+	fv->FileSize = 0;
+	if (fv->ProgStat != -1) {
+		fv->ProgStat = 0;
+	}
+	fv->StartTime = GetTickCount();
+
+	return TRUE;
+}
 
 static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 {
