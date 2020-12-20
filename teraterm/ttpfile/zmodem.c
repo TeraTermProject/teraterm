@@ -58,7 +58,6 @@
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
-#include "win16api.h"
 
 #include "zmodem.h"
 
@@ -579,7 +578,7 @@ void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	ZPutBin(zv, &(zv->PktOutCount), 0);
 	zv->CRC = UpdateCRC(0, zv->CRC);
 	/* file size */
-	fv->FileSize = GetFSize(fv->FullName);
+	fv->FileSize = fv->GetFSize(fv, fv->FullName);
 
 	/* timestamp */
 	fv->FileMtime = GetFMtime(fv->FullName);
@@ -645,12 +644,12 @@ void ZSendDataDat(PFileVarProto fv, PZVar zv)
 	fv->ByteCount = zv->Pos;
 
 	if (fv->FileOpen && (zv->Pos < fv->FileSize))
-		_llseek(fv->FileHandle, zv->Pos, 0);
+		fv->Seek(fv, zv->Pos);
 
 	zv->CRC = 0;
 	zv->PktOutCount = 0;
 	do {
-		c = _lread(fv->FileHandle, &b, 1);
+		c = fv->ReadFile(fv, &b, 1);
 		if (c > 0) {
 			ZPutBin(zv, &(zv->PktOutCount), b);
 			zv->CRC = UpdateCRC(b, zv->CRC);
@@ -873,7 +872,7 @@ void ZParseRInit(PFileVarProto fv, PZVar zv)
 
 	if (fv->FileOpen)			// close previous file
 	{
-		_lclose(fv->FileHandle);
+		fv->Close(fv);
 		fv->FileOpen = FALSE;
 
 		if (fv->FileMtime > 0) {
@@ -888,8 +887,7 @@ void ZParseRInit(PFileVarProto fv, PZVar zv)
 	}
 
 	/* file open */
-	fv->FileHandle = _lopen(fv->FullName, OF_READ);
-	fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
+	fv->FileOpen = fv->OpenRead(fv, fv->FullName);
 
 	if (zv->CtlEsc) {
 		if ((zv->RxHdr[ZF0] & ESCCTL) == 0) {
@@ -961,7 +959,7 @@ void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 		break;
 	case ZSKIP:
 		if (fv->FileOpen) {
-			_lclose(fv->FileHandle);
+			fv->Close(fv);
 			// サーバ側に存在するファイルを送信しようとすると、ZParseRInit()で二重closeになるため、
 			// ここでフラグを落としておく。 (2007.12.20 yutaka)
 			fv->FileOpen = FALSE;
@@ -1034,9 +1032,9 @@ void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 			if (fv->FileOpen) {
 				if (zv->CRRecv) {
 					zv->CRRecv = FALSE;
-					_lwrite(fv->FileHandle, "\012", 1);
+					fv->WriteFile(fv, "\012", 1);
 				}
-				_lclose(fv->FileHandle);
+				fv->Close(fv);
 				fv->FileOpen = FALSE;
 
 				if (fv->FileMtime > 0) {
@@ -1126,16 +1124,16 @@ BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 	FTSetTimeOut(fv, 0);
 
 	if (zv->BinFlag)
-		_lwrite(fv->FileHandle, zv->PktIn, zv->PktInPtr);
+		fv->WriteFile(fv, zv->PktIn, zv->PktInPtr);
 	else
 		for (i = 0; i <= zv->PktInPtr - 1; i++) {
 			b = zv->PktIn[i];
 			if ((b == 0x0A) && (!zv->CRRecv))
-				_lwrite(fv->FileHandle, "\015", 1);
+				fv->WriteFile(fv, "\015", 1);
 			if (zv->CRRecv && (b != 0x0A))
-				_lwrite(fv->FileHandle, "\012", 1);
+				fv->WriteFile(fv, "\012", 1);
 			zv->CRRecv = b == 0x0D;
-			_lwrite(fv->FileHandle, &b, 1);
+			fv->WriteFile(fv, &b, 1);
 		}
 
 	fv->ByteCount = fv->ByteCount + zv->PktInPtr;

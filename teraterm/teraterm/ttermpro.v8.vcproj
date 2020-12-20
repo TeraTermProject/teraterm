@@ -711,6 +711,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\ttpfile\filesys_win32.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\filesys_win32.h"
+				>
+			</File>
+			<File
 				RelativePath="..\ttpfile\ftlib.c"
 				>
 			</File>

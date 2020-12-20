@@ -38,7 +38,6 @@
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
-#include "win16api.h"
 
 #include "bplus.h"
 
@@ -102,15 +101,16 @@ typedef TBPVar far *PBPVar;
 
 BOOL BPOpenFileToBeSent(PFileVarProto fv)
 {
+  BOOL r;
+
   if (fv->FileOpen) return TRUE;
   if (strlen(&(fv->FullName[fv->DirLen]))==0) return FALSE;
 
-  fv->FileHandle = _lopen(fv->FullName,OF_READ);
-  fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
-  if (fv->FileOpen)
-  {
+  r = fv->OpenRead(fv, fv->FullName);
+  fv->FileOpen = r;
+  if (r == TRUE) {
     SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
-    fv->FileSize = GetFSize(fv->FullName);
+    fv->FileSize = fv->GetFSize(fv, fv->FullName);
   }
   return fv->FileOpen;
 }
@@ -508,14 +508,14 @@ void BPSendNPacket(PFileVarProto fv, PBPVar bv)
   c = 1;
   while ((i-4 < bv->PktSize-1) && (c>0))
   {
-    c = _lread(fv->FileHandle,&b,1);
+    c = fv->ReadFile(fv, &b, 1);
     if (c==1)
       BPPut1Byte(bv,b,&i);
     fv->ByteCount = fv->ByteCount + c;
   }
   if (c==0)
   {
-    _lclose(fv->FileHandle);
+    fv->Close(fv);
     fv->FileOpen = FALSE;
   }
   i = i - 4;
@@ -581,7 +581,7 @@ void BPParseTPacket(PFileVarProto fv, PBPVar bv)
     case 'C': /* Close */
       if (fv->FileOpen)
       {
-	_lclose(fv->FileHandle);
+	fv->Close(fv);
 	fv->FileOpen = FALSE;
       }
       fv->Success = TRUE;
@@ -717,7 +717,7 @@ void BPParsePacket(PFileVarProto fv, PBPVar bv)
 	BPSendFailure(bv,'E');
 	return;
       }
-      _lwrite(fv->FileHandle,&(bv->PktIn[2]),bv->PktInCount-2);
+      fv->WriteFile(fv, &(bv->PktIn[2]), bv->PktInCount-2);
       fv->ByteCount = fv->ByteCount +
 		      bv->PktInCount - 2;
       SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);

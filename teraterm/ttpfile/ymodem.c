@@ -36,7 +36,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
-#include "win16api.h"
 
 #include "tt_res.h"
 #include "ttcommon.h"
@@ -296,21 +295,20 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 {
 	if (yv->YMode == IdYSend) {
 		if (fv->FileOpen) {
-			_lclose(fv->FileHandle);
+			fv->Close(fv);
 
 			if (fv->FileMtime > 0) {
 				SetFMtime(fv->FullName, fv->FileMtime);
 			}
 		}
-		fv->FileHandle = _lopen(fv->FullName,OF_READ);
-		fv->FileSize = GetFSize(fv->FullName);
+		fv->FileOpen = fv->OpenRead(fv, fv->FullName);
+		fv->FileSize = fv->GetFSize(fv, fv->FullName);
 	} else {
-		fv->FileHandle = INVALID_HANDLE_VALUE;
+		fv->FileOpen = FALSE;
 		fv->FileSize = 0;
 		fv->FileMtime = 0;
 		yv->RecvFilesize = FALSE;
 	}
-	fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
 
 	if (yv->YMode == IdYSend) {
 		InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
@@ -491,9 +489,8 @@ BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			{
 				// EOTが来たら、1つのファイル受信が完了したことを示す。
 				if (fv->FileOpen) {
-					fv->FileOpen = 0;
-					_lclose(fv->FileHandle);
-					fv->FileHandle = INVALID_HANDLE_VALUE;
+					fv->Close(fv);
+					fv->FileOpen = FALSE;
 
 					if (fv->FileMtime > 0) {
 						SetFMtime(fv->FullName, fv->FileMtime);
@@ -674,14 +671,14 @@ BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		{
 			b = yv->PktIn[3+i];
 			if ((b==LF) && (! yv->CRRecv))
-				_lwrite(fv->FileHandle,"\015",1);
+				fv->WriteFile(fv,"\015",1);
 			if (yv->CRRecv && (b!=LF))
-				_lwrite(fv->FileHandle,"\012",1);
+				fv->WriteFile(fv,"\012",1);
 			yv->CRRecv = b==CR;
-			_lwrite(fv->FileHandle,&b,1);
+			fv->WriteFile(fv,&b,1);
 		}
 	else
-		_lwrite(fv->FileHandle, &(yv->PktIn[3]), c);
+		fv->WriteFile(fv, &(yv->PktIn[3]), c);
 
 	fv->ByteCount = fv->ByteCount + c;
 
@@ -959,7 +956,7 @@ BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->__DataLen = current_packet_size;
 
 				while ((idx <= current_packet_size) && fv->FileOpen &&
-				       (1 == _lread(fv->FileHandle, &fsym, 1)))
+				       (1 == fv->ReadFile(fv, &fsym, 1)))
 				{
 					// TODO: remove magic number.
 					yv->PktOut[2 + idx] = fsym;
@@ -973,8 +970,7 @@ BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					// Close file handle.
 					if (fv->FileOpen)
 					{
-						_lclose(fv->FileHandle);
-						fv->FileHandle = 0;
+						fv->Close(fv);
 						fv->FileOpen = FALSE;
 					}
 

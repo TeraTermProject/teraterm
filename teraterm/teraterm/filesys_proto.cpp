@@ -55,6 +55,8 @@
 #include "filesys_proto.h"
 #include "ttfile_proto.h"
 #include "tt_res.h"
+#include "filesys_win32.h"
+
 #include "kermit.h"
 #include "xmodem.h"
 #include "ymodem.h"
@@ -68,47 +70,6 @@ static int ProtoId;
 extern BOOL FSend;
 
 static PProtoDlg PtDlg = NULL;
-
-static size_t _ReadFile(TFileVarProto *fv, void *buf, size_t bytes)
-{
-	HANDLE hFile = fv->FileHandle;
-	DWORD NumberOfBytesRead;
-	BOOL Result = ReadFile(hFile, buf, (UINT)bytes, &NumberOfBytesRead, NULL);
-	if (Result == FALSE) {
-		return 0;
-	}
-	return NumberOfBytesRead;
-}
-
-static size_t _WriteFile(TFileVarProto *fv, const void *buf, size_t bytes)
-{
-	HANDLE hFile = fv->FileHandle;
-	DWORD NumberOfBytesWritten;
-	UINT length = (UINT)bytes;
-	BOOL result = WriteFile(hFile, buf, length, &NumberOfBytesWritten, NULL);
-	if (result == FALSE) {
-		return 0;
-	}
-	return NumberOfBytesWritten;
-}
-
-static void _Close(TFileVarProto *fv)
-{
-	HANDLE hFile = fv->FileHandle;
-	CloseHandle(hFile);
-	fv->FileHandle = 0;
-}
-
-/**
- *	ファイルのファイルサイズを取得
- *	@param[in]	filenameU8		ファイル名(UTF-8)
- *	@retval		ファイルサイズ
- */
-static size_t _GetFSize(struct FileVarProto *fv, const char *filenameU8)
-{
-	size_t file_size = GetFSize64W(wc::fromUtf8(filenameU8));
-	return file_size;
-}
 
 static void _SetDlgTime(TFileVarProto *fv, DWORD elapsed, int bytes)
 {
@@ -165,10 +126,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->NoMsg = FALSE;
 	fv->HideDialog = FALSE;
 
-	fv->ReadFile = _ReadFile;
-	fv->WriteFile = _WriteFile;
-	fv->Close = _Close;
-	fv->GetFSize = _GetFSize;
+	FilesysCreate(fv);
 
 	fv->InitDlgProgress = _InitDlgProgress;
 	fv->SetDlgTime = _SetDlgTime;
@@ -193,12 +151,16 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		fv->Destroy(fv);
 	}
 
-	if (fv->FileOpen) CloseHandle(fv->FileHandle);
+	if (fv->FileOpen) {
+		fv->Close(fv);
+		fv->FileOpen = FALSE;
+	}
 	if (fv->FnStrMemHandle != 0)
 	{
 		GlobalUnlock(fv->FnStrMemHandle);
 		GlobalFree(fv->FnStrMemHandle);
 	}
+	fv->FileSysDestroy(fv);
 	free(fv);
 
 	*pfv = NULL;

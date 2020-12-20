@@ -35,7 +35,6 @@
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "ftlib.h"
-#include "win16api.h"
 
 #include "xmodem.h"
 
@@ -229,16 +228,15 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	fv->FileSize = 0;
 	if (xv->XMode == IdXSend) {
-		fv->FileHandle = _lopen(fv->FullName,OF_READ);
-		if (fv->FileHandle == INVALID_HANDLE_VALUE) {
+		fv->FileOpen = fv->OpenRead(fv, fv->FullName);
+		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
-		fv->FileOpen = TRUE;
 		fv->FileSize = fv->GetFSize(fv, fv->FullName);
 		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
-		fv->FileHandle = _lcreat(fv->FullName,0);
-		if (fv->FileHandle == INVALID_HANDLE_VALUE) {
+		fv->FileOpen = fv->OpenWrite(fv, fv->FullName);
+		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
 		fv->ProgStat = -1;
@@ -574,7 +572,6 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 			} else {			/* send EOT */
 				if (fv->FileOpen) {
 					fv->Close(fv);
-					fv->FileHandle = 0;
 					fv->FileOpen = FALSE;
 				}
 				xv->PktOut[0] = EOT;

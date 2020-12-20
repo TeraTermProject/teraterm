@@ -43,7 +43,6 @@ typedef struct FileVarProto {
 	int FnPtr;
 
 	BOOL FileOpen;
-	HANDLE FileHandle;
 	LONG FileSize, ByteCount;
 	BOOL OverWrite;
 
@@ -69,10 +68,15 @@ typedef struct FileVarProto {
 	void *data;
 
 	// file I/O
+	BOOL (*OpenRead)(struct FileVarProto *fv, const char *filenameU8);
+	BOOL (*OpenWrite)(struct FileVarProto *fv, const char *filenameU8);
 	size_t (*ReadFile)(struct FileVarProto *fv, void *buf, size_t bytes);
 	size_t (*WriteFile)(struct FileVarProto *fv, const void *buf, size_t bytes);
 	void (*Close)(struct FileVarProto *fv);
 	size_t (*GetFSize)(struct FileVarProto *fv, const char *filenameU8);
+	int (*Seek)(struct FileVarProto *fv, size_t offset);
+	void (*FileSysDestroy)(struct FileVarProto *fv);
+	HANDLE FileHandle;
 
 	// UI
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);

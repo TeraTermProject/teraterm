@@ -35,7 +35,6 @@
 #include "ttlib.h"
 #include <stdio.h>
 #include <string.h>
-#include "win16api.h"
 
 #include "ftlib.h"
 #include "tt_res.h"
@@ -151,8 +150,7 @@ BOOL FTCreateFile(PFileVarProto fv)
     }
     strncpy_s(fv->FullName, sizeof(fv->FullName),Temp, _TRUNCATE);
   }
-  fv->FileHandle = _lcreat(fv->FullName,0);
-  fv->FileOpen = (fv->FileHandle != INVALID_HANDLE_VALUE);
+  fv->FileOpen = fv->OpenWrite(fv, fv->FullName);
   if (! fv->FileOpen && ! fv->NoMsg)
     MessageBox(fv->HMainWin,"Cannot create file",
 	       "Tera Term: Error",MB_ICONEXCLAMATION);
@@ -175,7 +173,9 @@ BOOL FTCreateFile(PFileVarProto fv)
 
 static BOOL Open(TProtoLog *pv, const char *file)
 {
-	pv->LogFile = _lcreat(file, 0);
+	pv->LogFile = CreateFileA(file,
+							  GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+							  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	pv->LogCount = 0;
 	pv->LogState = 0;
 	return pv->LogFile == INVALID_HANDLE_VALUE ? FALSE : TRUE;
@@ -194,8 +194,12 @@ static void Close(TProtoLog *pv)
 
 static size_t WriteRawData(struct ProtoLog *pv, const void *data, size_t len)
 {
-	size_t r = _lwrite(pv->LogFile, data, len);
-	return r;
+	DWORD NumberOfBytesWritten;
+	BOOL result = WriteFile(pv->LogFile, data, len, &NumberOfBytesWritten, NULL);
+	if (result == FALSE) {
+		return 0;
+	}
+	return NumberOfBytesWritten;
 }
 
 static size_t WriteStr(TProtoLog *pv, const char *str)
@@ -224,7 +228,7 @@ static void DumpByte(TProtoLog *pv, BYTE b)
 		d[1] = (b & 0x0F) + 0x37;
 
 	d[2] = 0x20;
-	_lwrite(pv->LogFile,d,3);
+	pv->WriteRaw(pv,d,3);
 	pv->LogLineBuf[pv->LogCount] = b;    // add (2008.6.3 yutaka)
 	pv->LogCount++;
 }
@@ -235,25 +239,25 @@ static void DumpFlush(TProtoLog *pv)
 	int i;
 
 	for (i = 0 ; i < rest ; i++)
-		_lwrite(pv->LogFile,"   ", 3);
+		pv->WriteRaw(pv,"   ", 3);
 
 	// ASCII•\Ž¦‚ð’Ç‰Á (2008.6.3 yutaka)
-	_lwrite(pv->LogFile,"    ", 4);
+	pv->WriteRaw(pv,"    ", 4);
 	for (i = 0 ; i < pv->LogCount ; i++) {
 		char ch[5];
 		if (isprint(pv->LogLineBuf[i])) {
 			_snprintf_s(ch, sizeof(ch), _TRUNCATE, "%c", pv->LogLineBuf[i]);
-			_lwrite(pv->LogFile, ch, 1);
+			pv->WriteRaw(pv, ch, 1);
 
 		} else {
-			_lwrite(pv->LogFile, ".", 1);
+			pv->WriteRaw(pv, ".", 1);
 
 		}
 
 	}
 
 	pv->LogCount = 0;
-	_lwrite(pv->LogFile,"\015\012",2);
+	pv->WriteRaw(pv,"\015\012",2);
 }
 
 static void ProtoLogDestroy(TProtoLog *pv)

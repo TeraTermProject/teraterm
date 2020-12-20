@@ -42,7 +42,6 @@
 #include "ftlib.h"
 #include "ttlib.h"
 #include "ttcommon.h"
-#include "win16api.h"
 
 #include "quickvan.h"
 
@@ -505,7 +504,7 @@ BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
     {
       if (fv->FileOpen)
       {
-	_lclose(fv->FileHandle);
+	fv->Close(fv);
 	fv->FileOpen = FALSE;
 	/* set file date & time */
 	if ((qv->Year >= 1900) && (qv->Hour < 24))
@@ -550,7 +549,7 @@ void QVWriteToFile(PFileVarProto fv, PQVVar qv)
     C = fv->FileSize - fv->ByteCount;
   else
     C = 128;
-  _lwrite(fv->FileHandle,&(qv->PktIn[3]),C);
+  fv->WriteFile(fv,&(qv->PktIn[3]),C);
   fv->ByteCount = fv->ByteCount + C;
 
   SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, qv->SeqNum);
@@ -838,6 +837,7 @@ void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   struct stat stbuf;
   struct tm tmbuf;
   char fullname_upper[MAX_PATH];
+  BOOL r;
 
   if (! GetNextFname(fv))
   {
@@ -846,7 +846,7 @@ void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   }
 
   /* find file and get file info */
-  fv->FileSize = GetFSize(fv->FullName);
+  fv->FileSize = fv->GetFSize(fv, fv->FullName);
   if (fv->FileSize>0)
   {
     qv->FileEnd = (WORD)(fv->FileSize >> 7);
@@ -859,8 +859,8 @@ void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   }
 
   /* file open */
-  fv->FileHandle = _lopen(fv->FullName,OF_READ);
-  fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
+  r = fv->OpenRead(fv, fv->FullName);
+  fv->FileOpen = r;
   if (! fv->FileOpen)
   {
     QVCancel(fv,cv);
@@ -931,8 +931,8 @@ void QVSendVDATA(PFileVarProto fv, PQVVar qv)
     else
       C = 128;
     /* read data from file */
-    _llseek(fv->FileHandle,Pos,0);
-    _lread(fv->FileHandle,&(qv->PktOut[3]),C);
+	fv->Seek(fv, Pos);
+    fv->ReadFile(fv,&(qv->PktOut[3]),C);
     fv->ByteCount = Pos + (LONG)C;
     SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, qv->SeqSent);
     SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
@@ -1104,7 +1104,7 @@ void QVParseVSTAT(PFileVarProto fv, PQVVar qv, PComVar cv)
   if (qv->EnqFlag && (qv->PktIn[3]==0x30))
   {
     if (fv->FileOpen)
-      _lclose(fv->FileHandle);
+      fv->Close(fv);
     fv->FileOpen = FALSE;
     qv->EnqFlag = FALSE;
     qv->RetryCount = 10;

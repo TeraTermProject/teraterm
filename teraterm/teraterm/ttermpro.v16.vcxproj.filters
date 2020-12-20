@@ -22,6 +22,9 @@
     <Filter Include="ttpdlg">
       <UniqueIdentifier>{1cdaec4a-75c1-4600-b434-45286f5bec80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ffpfile">
+      <UniqueIdentifier>{0494dec4-73a6-4271-9dfa-ad4b61e2b62c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filesys.cpp">
@@ -152,6 +155,36 @@
     </ClCompile>
     <ClCompile Include="checkeol.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\bplus.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\ftlib.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\kermit.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\quickvan.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\ttfile_proto.cpp">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\xmodem.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\ymodem.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\zmodem.c">
+      <Filter>ffpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="filesys_proto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\filesys_win32.cpp">
+      <Filter>ffpfile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -386,6 +419,36 @@
     </ClInclude>
     <ClInclude Include="checkeol.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\bplus.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\ftlib.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\kermit.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\quickvan.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\ttfile_proto.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\xmodem.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\ymodem.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\zmodem.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\file_res.h">
+      <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\filesys_win32.h">
+      <Filter>ffpfile</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

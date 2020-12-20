@@ -138,6 +138,7 @@
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\susie_plugin\libsusieplugin.cpp" />
     <ClCompile Include="..\ttpfile\bplus.c" />
+    <ClCompile Include="..\ttpfile\filesys_win32.cpp" />
     <ClCompile Include="..\ttpfile\ftlib.c" />
     <ClCompile Include="..\ttpfile\kermit.c" />
     <ClCompile Include="..\ttpfile\quickvan.c" />
@@ -187,6 +188,7 @@
     <ClInclude Include="../ttpdlg/ttdlg.h" />
     <ClInclude Include="..\susie_plugin\libsusieplugin.h" />
     <ClInclude Include="..\ttpfile\bplus.h" />
+    <ClInclude Include="..\ttpfile\filesys_win32.h" />
     <ClInclude Include="..\ttpfile\file_res.h" />
     <ClInclude Include="..\ttpfile\ftlib.h" />
     <ClInclude Include="..\ttpfile\kermit.h" />

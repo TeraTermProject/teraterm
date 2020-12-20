@@ -42,7 +42,6 @@
 #include "ttlib.h"
 #include "dlglib.h"
 #include "ftlib.h"
-#include "win16api.h"
 
 #include "kermit.h"
 
@@ -705,7 +704,7 @@ void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 			for (j = 1 ; j <= kv->RepeatCount ; j++)
 			{
 				if (Buff==NULL) /* write to file */
-					_lwrite(fv->FileHandle,&b,1);
+					fv->WriteFile(fv,&b,1);
 				else /* write to buffer */
 					if (BuffPtr < *BuffLen)
 					{
@@ -887,7 +886,7 @@ BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 		b = kv->NextByte;
 		kv->NextByteFlag = FALSE;
 	}
-	else if (_lread(fv->FileHandle,&b,1)==0)
+	else if (fv->ReadFile(fv,&b,1)==0)
 		return FALSE;
 	else fv->ByteCount++;
 
@@ -924,7 +923,7 @@ BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 	TempStr[Len] = 0;
 
 	kv->RepeatCount = 1;
-	if (_lread(fv->FileHandle,&(kv->NextByte),1)==1)
+	if (fv->ReadFile(fv,&(kv->NextByte),1)==1)
 	{
 		fv->ByteCount++;
 		kv->NextByteFlag = TRUE;
@@ -934,7 +933,7 @@ BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 		(kv->NextByte==b) && (kv->RepeatCount<94))
 	{
 		kv->RepeatCount++;
-		if (_lread(fv->FileHandle,&(kv->NextByte),1)==0)
+		if (fv->ReadFile(fv,&(kv->NextByte),1)==0)
 			kv->NextByteFlag = FALSE;
 		else fv->ByteCount++;
 	}
@@ -965,7 +964,7 @@ void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	/* close file */
 	if (fv->FileOpen)
-		_lclose(fv->FileHandle);
+		fv->Close(fv);
 	fv->FileOpen = FALSE;
 
 	KmtIncPacketNum(kv);
@@ -1046,6 +1045,7 @@ BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	struct _stati64 st;
+	BOOL r;
 
 	if (! GetNextFname(fv))
 	{
@@ -1064,8 +1064,8 @@ BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 
 	/* file open */
-	fv->FileHandle = _lopen(fv->FullName,OF_READ);
-	fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
+	r = fv->OpenRead(fv, fv->FullName);
+	fv->FileOpen = r;
 	if (! fv->FileOpen)
 	{
 		if (! fv->NoMsg)
@@ -1077,7 +1077,7 @@ BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		return FALSE;
 	}
 	else
-		fv->FileSize = GetFSize(fv->FullName);
+		fv->FileSize = fv->GetFSize(fv, fv->FullName);
 
 	fv->ByteCount = 0;
 	fv->ProgStat = 0;
@@ -1574,7 +1574,7 @@ read_end:
 	case 'Z':
 		if (kv->KmtState == ReceiveData)
 		{
-			if (fv->FileOpen) _lclose(fv->FileHandle);
+			if (fv->FileOpen) fv->Close(fv);
 			fv->FileOpen = FALSE;
 			kv->KmtState = ReceiveFile;
 
