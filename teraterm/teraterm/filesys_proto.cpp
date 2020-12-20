@@ -57,7 +57,6 @@
 
 #include "filesys.h"
 #include "filesys_proto.h"
-#include "ttfile_proto.h"
 #include "tt_res.h"
 #include "filesys_win32.h"
 
@@ -261,6 +260,15 @@ static void FreeFileVar_(PFileVarProto *pfv)
 	free(fv);
 
 	*pfv = NULL;
+}
+
+static int _ProtoSetOpt(PFileVarProto fv, int request, ...)
+{
+	va_list ap;
+	va_start(ap, request);
+	int r = fv->SetOptV(fv, request, ap);
+	va_end(ap);
+	return r;
 }
 
 static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
@@ -745,7 +753,8 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	if (_ProtoParse(ProtoId,FileVar,&cv))
+	PFileVarProto fv = FileVar;
+	if (fv->Parse(fv, &cv))
 		P = 0; /* continue */
 	else {
 		CommSend(&cv);
@@ -756,15 +765,19 @@ int ProtoDlgParse(void)
 
 void ProtoDlgTimeOut(void)
 {
-	if (PtDlg!=NULL)
-		_ProtoTimeOutProc(ProtoId,FileVar,&cv);
+	if (PtDlg!=NULL) {
+		PFileVarProto fv = FileVar;
+		fv->TimeOutProc(fv, &cv);
+	}
 }
 
 void ProtoDlgCancel(void)
 {
-	if ((PtDlg!=NULL) &&
-	    _ProtoCancel(ProtoId,FileVar,&cv))
+	if (PtDlg!=NULL) {
+		PFileVarProto fv = FileVar;
+		fv->Cancel(fv, &cv);
 		ProtoEnd();
+	}
 }
 
 static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)

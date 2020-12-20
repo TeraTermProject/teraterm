@@ -743,14 +743,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ttpfile\ttfile_proto.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\ttpfile\ttfile_proto.h"
-				>
-			</File>
-			<File
 				RelativePath="..\ttpfile\xmodem.c"
 				>
 			</File>

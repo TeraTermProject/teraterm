@@ -142,7 +142,6 @@
     <ClCompile Include="..\ttpfile\ftlib.c" />
     <ClCompile Include="..\ttpfile\kermit.c" />
     <ClCompile Include="..\ttpfile\quickvan.c" />
-    <ClCompile Include="..\ttpfile\ttfile_proto.cpp" />
     <ClCompile Include="..\ttpfile\xmodem.c" />
     <ClCompile Include="..\ttpfile\ymodem.c" />
     <ClCompile Include="..\ttpfile\zmodem.c" />
@@ -193,7 +192,6 @@
     <ClInclude Include="..\ttpfile\ftlib.h" />
     <ClInclude Include="..\ttpfile\kermit.h" />
     <ClInclude Include="..\ttpfile\quickvan.h" />
-    <ClInclude Include="..\ttpfile\ttfile_proto.h" />
     <ClInclude Include="..\ttpfile\xmodem.h" />
     <ClInclude Include="..\ttpfile\ymodem.h" />
     <ClInclude Include="..\ttpfile\zmodem.h" />

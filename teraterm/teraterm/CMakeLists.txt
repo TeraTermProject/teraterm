@@ -191,8 +191,6 @@ target_sources(
   ../ttpfile/kermit.h
   ../ttpfile/quickvan.c
   ../ttpfile/quickvan.h
-  ../ttpfile/ttfile_proto.cpp
-  ../ttpfile/ttfile_proto.h
   ../ttpfile/xmodem.c
   ../ttpfile/xmodem.h
   ../ttpfile/ymodem.c

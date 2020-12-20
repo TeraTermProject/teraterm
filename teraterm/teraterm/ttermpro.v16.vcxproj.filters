@@ -168,9 +168,6 @@
     <ClCompile Include="..\ttpfile\quickvan.c">
       <Filter>ffpfile</Filter>
     </ClCompile>
-    <ClCompile Include="..\ttpfile\ttfile_proto.cpp">
-      <Filter>ffpfile</Filter>
-    </ClCompile>
     <ClCompile Include="..\ttpfile\xmodem.c">
       <Filter>ffpfile</Filter>
     </ClCompile>
@@ -430,9 +427,6 @@
       <Filter>ffpfile</Filter>
     </ClInclude>
     <ClInclude Include="..\ttpfile\quickvan.h">
-      <Filter>ffpfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ttpfile\ttfile_proto.h">
       <Filter>ffpfile</Filter>
     </ClInclude>
     <ClInclude Include="..\ttpfile\xmodem.h">
