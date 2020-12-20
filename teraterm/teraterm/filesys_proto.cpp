@@ -151,6 +151,17 @@ static char *GetNextFname(PFileVarProto fv)
 	return f;
 }
 
+/**
+ *	ダウンロードパスを取得
+ *
+ *	@return		受信フォルダ(終端にパスセパレータ'\\'が付加されている)
+ *				不要になったら free() すること
+ */
+static char *GetRecievePath(struct FileVarProto *fv)
+{
+	return _strdup(fv->RecievePath);
+}
+
 static void FTSetTimeOut(PFileVarProto fv, int T)
 {
 	KillTimer(fv->HMainWin, IdProtoTimer);
@@ -184,6 +195,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->file = FilesysCreateWin32();
 
 	fv->GetNextFname = GetNextFname;
+	fv->GetRecievePath = GetRecievePath;
 	fv->FTSetTimeOut = FTSetTimeOut;
 
 	fv->InitDlgProgress = _InitDlgProgress;

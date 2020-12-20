@@ -1077,6 +1077,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	int mode;
 	int ret;
 	TFileIO* file = fv->file;
+	char *RecievePath;
 
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
 		return FALSE;
@@ -1087,8 +1088,11 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	/* file name */
 	zv->PktIn[zv->PktInPtr] = 0;	/* for safety */
 
+	RecievePath = fv->GetRecievePath(fv);
 	free((void *)zv->FullName);
-	zv->FullName = file->GetRecieveFilename(file, zv->PktIn, FALSE, fv->RecievePath, !fv->OverWrite);
+	zv->FullName = file->GetRecieveFilename(file, zv->PktIn, FALSE, RecievePath, !fv->OverWrite);
+	free(RecievePath);
+
 	/* file open */
 	if (!FTCreateFile(fv))
 		return FALSE;

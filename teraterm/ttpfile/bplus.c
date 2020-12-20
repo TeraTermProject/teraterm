@@ -606,6 +606,7 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 //  char Temp[HostNameMaxLength + 1]; // 81(yutaka)
   char Temp[81]; // 81(yutaka)
   TFileIO *fileio = fv->file;
+  char *RecievePath;
 
   switch (bv->PktIn[2]) {
     case 'C': /* Close */
@@ -641,8 +642,10 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
       }
       Temp[j] = 0;
 
+      RecievePath = fv->GetRecievePath(fv);
       free((void *)bv->FullName);
-      bv->FullName = fileio->GetRecieveFilename(fileio, fv->RecievePath, FALSE, Temp, !fv->OverWrite);
+      bv->FullName = fileio->GetRecieveFilename(fileio, RecievePath, FALSE, Temp, !fv->OverWrite);
+      free(RecievePath);
 
 
       /* file open */
@@ -689,8 +692,10 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 	}
 	Temp[j] = 0;
 
+	RecievePath = fv->GetRecievePath(fv);
 	free((void *)bv->FullName);
-	bv->FullName = fileio->GetRecieveFilename(fileio, Temp, FALSE, fv->RecievePath, !fv->OverWrite);
+	bv->FullName = fileio->GetRecieveFilename(fileio, Temp, FALSE, RecievePath, !fv->OverWrite);
+	free(RecievePath);
 
 	/* file open */
 	if (! BPOpenFileToBeSent(fv))

@@ -1465,6 +1465,7 @@ read_end:
 			(kv->KmtState==GetInit))
 		{
 			TFileIO *file = fv->file;
+			char *RecievePath;
 			kv->KmtMode = IdKmtReceive;
 
 			free((void *)kv->FullName);
@@ -1473,7 +1474,9 @@ read_end:
 			Len = sizeof(FNBuff);
 			KmtDecode(fv,kv,FNBuff,&Len);
 			FNBuff[Len] = 0;
-			kv->FullName = file->GetRecieveFilename(file, FNBuff, FALSE, fv->RecievePath, !fv->OverWrite);
+			RecievePath = fv->GetRecievePath(fv);
+			kv->FullName = file->GetRecieveFilename(file, FNBuff, FALSE, RecievePath, !fv->OverWrite);
+			free(RecievePath);
 			/* file open */
 			if (! FTCreateFile(fv)) return FALSE;
 			kv->KmtState = ReceiveData;

@@ -448,14 +448,17 @@ static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
   int i;
   WORD w;
   BYTE b;
+  char *RecievePath;
 
   if ((qv->QVState != QV_RecvInit2) &&
       (qv->QVState != QV_RecvNext))
     return TRUE;
 
   /* file name */
+  RecievePath = fv->GetRecievePath(fv);
   free((void *)qv->FullName);
-  qv->FullName = file->GetRecieveFilename(file, &(qv->PktIn[5]), FALSE, fv->RecievePath, !fv->OverWrite);
+  qv->FullName = file->GetRecieveFilename(file, &(qv->PktIn[5]), FALSE, RecievePath, !fv->OverWrite);
+  free(RecievePath);
   /* file open */
   if (! FTCreateFile(fv)) return FALSE;
   /* file size */

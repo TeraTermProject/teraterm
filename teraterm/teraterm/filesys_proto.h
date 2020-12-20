@@ -31,7 +31,7 @@
 #include "filesys_io.h"
 
 typedef struct FileVarProto {
-	// protosys_proto.cpp内のみ使用
+	// ↓protosys_proto.cpp内のみ使用
 	WORD OpId;
 
 	HWND HMainWin;
@@ -46,6 +46,9 @@ typedef struct FileVarProto {
 	// 受信
 	char *RecievePath;		// 受信フォルダ(終端にパスセパレータ'\\'が付加されている)
 
+	// ↑protosys_proto.cpp内のみ使用
+
+	// ↓各プロトコルで使用するワーク
 	BOOL FileOpen;
 	LONG FileSize, ByteCount;
 	BOOL OverWrite;
@@ -60,9 +63,11 @@ typedef struct FileVarProto {
 	DWORD StartTime;
 
 	DWORD FileMtime;
+	// ↑各プロトコルで使用するワーク
 
 	// services
 	char *(*GetNextFname)(struct FileVarProto *fv);
+	char *(*GetRecievePath)(struct FileVarProto *fv);
 	void (*FTSetTimeOut)(struct FileVarProto *fv, int T);
 
 	// protocol entrys, data

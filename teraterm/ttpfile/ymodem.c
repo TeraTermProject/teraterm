@@ -646,14 +646,17 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		int ret;
 		BYTE *p;
 		char *name, *nameend;
+		char *RecievePath;
 
 		p = (BYTE *)malloc(yv->__DataLen + 1);
 		memset(p, 0, yv->__DataLen + 1);
 		memcpy(p, &(yv->PktIn[3]), yv->__DataLen);
 		name = p;
 
+		RecievePath = fv->GetRecievePath(fv);
 		free((void *)yv->FullName);
-		yv->FullName = file->GetRecieveFilename(file, name, FALSE, fv->RecievePath, !fv->OverWrite);
+		yv->FullName = file->GetRecieveFilename(file, name, FALSE, RecievePath, !fv->OverWrite);
+		free(RecievePath);
 		if (!FTCreateFile(fv)) {
 			free(p);
 			return FALSE;
