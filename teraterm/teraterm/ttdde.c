@@ -426,14 +426,14 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		SyncRecv = TRUE;
 		break;
 	case CmdBPlusRecv:
-		if (BPStartReceive()) {
+		if (BPStartReceive(TRUE, FALSE)) {
 			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdBPlusSend:
-		if (!BPSendStart(ParamFileName)) {
+		if (!BPStartSend(ParamFileName)) {
 			DdeCmnd = TRUE;
 		}
 		else

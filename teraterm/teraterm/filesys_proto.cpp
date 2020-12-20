@@ -1452,7 +1452,7 @@ BOOL ZMODEMStartSend(const char *filename, WORD ParamBinaryFlag, BOOL autostart)
 	return TRUE;
 }
 
-static BOOL _GetTransFname(PFileVarProto fv, const char *DlgCaption)
+static char **_GetTransFname(HWND hWnd, const char *DlgCaption)
 {
 	wchar_t TempDir[MAX_PATH];
 	char FileName[MAX_PATH];
@@ -1467,86 +1467,31 @@ static BOOL _GetTransFname(PFileVarProto fv, const char *DlgCaption)
 
 	char *FNFilter = GetCommonDialogFilterA(ts.FileSendFilter, UILanguageFile);
 
-	ExtractFileName(fv->FullName, FileName ,sizeof(FileName));
-	strncpy_s(fv->FullName, sizeof(fv->FullName), FileName, _TRUNCATE);
-
 	OPENFILENAME ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
-	ofn.hwndOwner   = fv->HMainWin;
+	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = fv->FullName;
-	ofn.nMaxFile = sizeof(fv->FullName);
+	ofn.lpstrFile = FileName;
+	ofn.nMaxFile = _countof(FileName);
 	ofn.lpstrInitialDir = CurDir;
-
-	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-
-	ofn.Flags |= OFN_SHOWHELP;
-
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
 	ofn.lpstrTitle = DlgCaption;
-
 	ofn.hInstance = hInst;
 
 	BOOL Ok = GetOpenFileName(&ofn);
 	free(FNFilter);
 
+	char **ret = NULL;
 	if (Ok) {
-		fv->DirLen = ofn.nFileOffset;
+		ret = MakeStrArrayFromStr(FileName);
 	}
 	/* restore dir */
 	_SetCurrentDirectoryW(TempDir);
-	return Ok;
+	return ret;
 }
 
-void BPStart(int mode)
-{
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts.UILanguageFile;
-
-	if (! ProtoStart())
-		return;
-
-	TFileVarProto *fv = FileVar;
-
-	if (mode==IdBPSend)
-	{
-		FileVar->OpId = OpBPSend;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-
-		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-		{
-			FileVar->FullName[0] = 0;
-			if (! _GetTransFname(FileVar, FileVar->DlgCaption))
-			{
-				ProtoEnd();
-				return;
-			}
-		}
-		else
-			_SetFileVar(FileVar);
-	}
-	else {
-		/* IdBPReceive or IdBPAuto */
-		FileVar->OpId = OpBPRcv;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_BPRCV", uimsg, sizeof(uimsg), TitBPRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
-	}
-
-	TalkStatus = IdTalkQuiet;
-
-	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
-
-	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0))
-		ProtoEnd();
-}
-
-BOOL BPSendStart(const char *filename)
+BOOL BPStartSend(const char *filename)
 {
 	if (FileVar != NULL) {
 		return FALSE;
@@ -1555,24 +1500,81 @@ BOOL BPSendStart(const char *filename)
 		return FALSE;
 	}
 
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName), filename, _TRUNCATE);
-	FileVar->NumFname = 1;
-	FileVar->NoMsg = TRUE;
-	BPStart(IdBPSend);
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpBPSend;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_BPSEND", uimsg, sizeof(uimsg), TitBPSend, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	if (! ProtoStart())
+		return FALSE;
+
+	if (filename == NULL) {
+		FileVar->FullName[0] = 0;
+		char **filenames = _GetTransFname(fv->HMainWin, FileVar->DlgCaption);
+		if (filenames == NULL) {
+			ProtoEnd();
+			return FALSE;
+		}
+		fv->FileNames = filenames;
+	}
+	else {
+		FileVar->DirLen = 0;
+		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName), filename, _TRUNCATE);
+		FileVar->NumFname = 1;
+		FileVar->NoMsg = TRUE;
+		fv->FileNames = MakeStrArrayFromStr(filename);
+		fv->NoMsg = TRUE;
+	}
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_BP, IdBPSend,0,0)) {
+		ProtoEnd();
+	}
 
 	return TRUE;
 }
 
-BOOL BPStartReceive(void)
+BOOL BPStartReceive(BOOL macro, BOOL autostart)
 {
 	if (FileVar != NULL)
 		return FALSE;
 	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
-	FileVar->NoMsg = TRUE;
-	BPStart(IdBPReceive);
+	TFileVarProto *fv = FileVar;
+	int mode = autostart ? IdBPAuto : IdBPReceive;
+
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
+
+	if (! ProtoStart())
+		return FALSE;
+
+	/* IdBPReceive or IdBPAuto */
+	FileVar->OpId = OpBPRcv;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_BPRCV", uimsg, sizeof(uimsg), TitBPRcv, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0))
+		ProtoEnd();
 
 	return TRUE;
 }

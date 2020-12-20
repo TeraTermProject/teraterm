@@ -99,7 +99,7 @@ typedef TBPVar far *PBPVar;
 #define BPTimeOut 10
 #define BPTimeOutTCPIP 0
 
-BOOL BPOpenFileToBeSent(PFileVarProto fv)
+static BOOL BPOpenFileToBeSent(PFileVarProto fv)
 {
   BOOL r;
 
@@ -115,7 +115,7 @@ BOOL BPOpenFileToBeSent(PFileVarProto fv)
   return fv->FileOpen;
 }
 
-void BPDispMode(PFileVarProto fv, PBPVar bv)
+static void BPDispMode(PFileVarProto fv, PBPVar bv)
 {
   strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: B-Plus ", _TRUNCATE);
   switch (bv->BPMode) {
@@ -123,6 +123,7 @@ void BPDispMode(PFileVarProto fv, PBPVar bv)
       strncat_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Send",_TRUNCATE);
       break;
     case IdBPReceive:
+    case IdBPAuto:
       strncat_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Receive",_TRUNCATE);
       break;
   }
@@ -209,7 +210,7 @@ static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   return TRUE;
 }
 
-int BPRead1Byte(PFileVarProto fv, PBPVar bv, PComVar cv, LPBYTE b)
+static int BPRead1Byte(PFileVarProto fv, PBPVar bv, PComVar cv, LPBYTE b)
 {
   if (CommRead1Byte(cv,b) == 0)
     return 0;
@@ -227,7 +228,7 @@ int BPRead1Byte(PFileVarProto fv, PBPVar bv, PComVar cv, LPBYTE b)
   return 1;
 }
 
-int BPWrite(PFileVarProto fv, PBPVar bv, PComVar cv, PCHAR B, int C)
+static int BPWrite(PFileVarProto fv, PBPVar bv, PComVar cv, PCHAR B, int C)
 {
   int i, j;
 
@@ -247,7 +248,7 @@ int BPWrite(PFileVarProto fv, PBPVar bv, PComVar cv, PCHAR B, int C)
   return i;
 }
 
-void BPTimeOutProc(PFileVarProto fv, PComVar cv)
+static void BPTimeOutProc(PFileVarProto fv, PComVar cv)
 {
   PBPVar bv = fv->data;
   BPWrite(fv,bv,cv,"\005\005",2); /* two ENQ */
@@ -255,7 +256,7 @@ void BPTimeOutProc(PFileVarProto fv, PComVar cv)
   bv->EnqSent = TRUE;
 }
 
-void BPUpdateCheck(PBPVar bv, BYTE b)
+static void BPUpdateCheck(PBPVar bv, BYTE b)
 {
   WORD w;
 
@@ -279,7 +280,7 @@ void BPUpdateCheck(PBPVar bv, BYTE b)
   }
 }
 
-void BPSendACK(PFileVarProto fv, PBPVar bv, PComVar cv)
+static void BPSendACK(PFileVarProto fv, PBPVar bv, PComVar cv)
 {
   char Temp[2];
 
@@ -293,7 +294,7 @@ void BPSendACK(PFileVarProto fv, PBPVar bv, PComVar cv)
   bv->BPPktState = BP_PktGetDLE;
 }
 
-void BPSendNAK(PFileVarProto fv, PBPVar bv, PComVar cv)
+static void BPSendNAK(PFileVarProto fv, PBPVar bv, PComVar cv)
 {
   if ((bv->BPState != BP_Failure) &&
       (bv->BPState != BP_Close))
@@ -301,7 +302,7 @@ void BPSendNAK(PFileVarProto fv, PBPVar bv, PComVar cv)
   bv->BPPktState = BP_PktGetDLE;
 }
 
-void BPPut1Byte(PBPVar bv, BYTE b, int *OutPtr)
+static void BPPut1Byte(PBPVar bv, BYTE b, int *OutPtr)
 {
   int Iq;
   BYTE Mq;
@@ -329,7 +330,7 @@ void BPPut1Byte(PBPVar bv, BYTE b, int *OutPtr)
   (*OutPtr)++;
 }
 
-void BPMakePacket(PBPVar bv, BYTE PktType, int DataLen)
+static void BPMakePacket(PBPVar bv, BYTE PktType, int DataLen)
 {
   int i;
   BYTE b;
@@ -386,7 +387,7 @@ void BPMakePacket(PBPVar bv, BYTE PktType, int DataLen)
   bv->BPPktState = BP_PktSending;
 }
 
-void BPSendFailure(PBPVar bv, BYTE b)
+static void BPSendFailure(PBPVar bv, BYTE b)
 {
   int i;
 
@@ -397,7 +398,7 @@ void BPSendFailure(PBPVar bv, BYTE b)
   bv->BPState = BP_Failure;
 }
 
-void BPSendInit(PBPVar bv)
+static void BPSendInit(PBPVar bv)
 {
   BYTE b;
   int i, Count;
@@ -488,7 +489,7 @@ void BPSendInit(PBPVar bv)
     bv->Q[i] = Param.Q[i];
 }
 
-void BPSendTCPacket(PBPVar bv)
+static void BPSendTCPacket(PBPVar bv)
 {
   int i;
 
@@ -499,7 +500,7 @@ void BPSendTCPacket(PBPVar bv)
   bv->BPState = BP_SendClose;
 }
 
-void BPSendNPacket(PFileVarProto fv, PBPVar bv)
+static void BPSendNPacket(PFileVarProto fv, PBPVar bv)
 {
   int i, c;
   BYTE b;
@@ -528,7 +529,7 @@ void BPSendNPacket(PFileVarProto fv, PBPVar bv)
   SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 }
 
-void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
+static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
 {
   if (bv->Check != bv->CheckCalc)
   {
@@ -558,19 +559,19 @@ void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
   bv->GetPacket = TRUE;
 }
 
-  int BPGet1(PBPVar bv, int *i, LPBYTE b)
-  {
-    if (*i < bv->PktInCount)
-    {
-      *b = bv->PktIn[*i];
-      (*i)++;
-      return 1;
-    }
-    return 0;
-  }
+static   int BPGet1(PBPVar bv, int *i, LPBYTE b)
+{
+	if (*i < bv->PktInCount)
+	{
+		*b = bv->PktIn[*i];
+		(*i)++;
+		return 1;
+	}
+	return 0;
+}
 
 
-void BPParseTPacket(PFileVarProto fv, PBPVar bv)
+static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 {
   int i, j, c;
   BYTE b;
@@ -690,7 +691,7 @@ void BPParseTPacket(PFileVarProto fv, PBPVar bv)
   }
 }
 
-void BPParsePacket(PFileVarProto fv, PBPVar bv)
+static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 {
   bv->GetPacket = FALSE;
   /* Packet type */
@@ -732,7 +733,7 @@ void BPParsePacket(PFileVarProto fv, PBPVar bv)
   }
 }
 
-void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
+static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
 {
   b = (b - 0x30) % 10;
   if (bv->EnqSent)
@@ -791,15 +792,15 @@ void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
   SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, bv->PktNum + bv->PktNumOffset);
 }
 
-  void BPDequote(LPBYTE b)
-  {
-    if ((*b>=0x40) && (*b<=0x5f))
-      *b = *b - 0x40;
-    else if ((*b>=0x60) && (*b<=0x7f))
-      *b = *b + 0x20;
-  }
+static void BPDequote(LPBYTE b)
+{
+	if ((*b>=0x40) && (*b<=0x5f))
+		*b = *b - 0x40;
+	else if ((*b>=0x60) && (*b<=0x7f))
+		*b = *b + 0x20;
+}
 
-BOOL BPParse(PFileVarProto fv, PComVar cv)
+static BOOL BPParse(PFileVarProto fv, PComVar cv)
 {
   int c;
   BYTE b;
@@ -951,7 +952,7 @@ BOOL BPParse(PFileVarProto fv, PComVar cv)
   return TRUE;
 }
 
-void BPCancel(PFileVarProto fv, PComVar cv)
+static void BPCancel(PFileVarProto fv, PComVar cv)
 {
 	PBPVar bv = fv->data;
 	(void)cv;

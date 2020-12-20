@@ -4368,13 +4368,13 @@ void CVTWindow::OnFileZSend()
 
 void CVTWindow::OnFileBPRcv()
 {
-	BPStart(IdBPReceive);
+	BPStartReceive(TRUE, TRUE);
 }
 
 void CVTWindow::OnFileBPSend()
 {
 	HelpId = HlpFileBPlusSend;
-	BPStart(IdBPSend);
+	BPStartSend(NULL);
 }
 
 void CVTWindow::OnFileQVRcv()

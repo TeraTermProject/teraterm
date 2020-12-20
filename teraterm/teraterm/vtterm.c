@@ -5475,7 +5475,7 @@ void DLESeen(BYTE b)
 {
 	ParseMode = ModeFirst;
 	if (((ts.FTFlag & FT_BPAUTO)!=0) && (b=='B'))
-		BPStart(IdBPAuto); /* Auto B-Plus activation */
+		BPStartReceive(FALSE, TRUE); /* Auto B-Plus activation */
 	ChangeEmu = -1;
 }
 
