@@ -681,14 +681,14 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdZmodemRecv:
-		if (ZMODEMStartReceive()) {
+		if (ZMODEMStartReceive(TRUE, FALSE)) {
 			DdeCmnd = TRUE;
 		}
 		else
 			return DDE_FNOTPROCESSED;
 		break;
 	case CmdZmodemSend:
-		if (ZMODEMStartSend(ParamFileName, ParamBinaryFlag)) {
+		if (ZMODEMStartSend(ParamFileName, ParamBinaryFlag, FALSE)) {
 			DdeCmnd = TRUE;
 		}
 		else

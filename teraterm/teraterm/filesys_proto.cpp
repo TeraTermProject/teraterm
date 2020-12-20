@@ -1246,6 +1246,11 @@ BOOL XMODEMStartSend(const char *filename, WORD ParamXmodemOpt)
 	return TRUE;
 }
 
+/**
+ *	YMODEM受信
+ *
+ *	@param[in]	macro	TUREのときマクロから呼ばれた
+ */
 BOOL YMODEMStartReceive(BOOL macro)
 {
 	if (FileVar != NULL) {
@@ -1287,6 +1292,11 @@ BOOL YMODEMStartReceive(BOOL macro)
 	return TRUE;
 }
 
+/**
+ *	YMODEM送信
+ *
+ *	@param[in]	filename			送信ファイル名(NULLのとき、ダイアログで選択する)
+ */
 BOOL YMODEMStartSend(const char *filename)
 {
 	if (FileVar != NULL) {
@@ -1322,9 +1332,6 @@ BOOL YMODEMStartSend(const char *filename)
 	}
 	else {
 		fv->FileNames = MakeStrArrayFromStr(filename);
-		FileVar->DirLen = 0;
-		strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),filename, _TRUNCATE);
-		FileVar->NumFname = 1;
 		FileVar->NoMsg = TRUE;
 	}
 
@@ -1339,49 +1346,99 @@ BOOL YMODEMStartSend(const char *filename)
 	return TRUE;
 }
 
-void ZMODEMStart(int mode)
+/**
+ *	ZMODEM受信
+ *
+ *	@param[in]	macro		TUREのときマクロから呼ばれた
+ *	@param[in]	autostart	TUREのとき自動スタート
+ */
+BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart)
 {
-	WORD Opt = 0; // TODO 使っていない
-	char uimsg[MAX_UIMSG];
-	const char *UILanguageFile = ts.UILanguageFile;
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
+
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
+	int mode = autostart ? IdZAutoR : IdZReceive;
 
 	if (! ProtoStart())
-		return;
+		return FALSE;
 
 	TFileVarProto *fv = FileVar;
 
-	if (mode == IdZSend || mode == IdZAutoS)
-	{
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+	/* IdZReceive or IdZAutoR */
+	FileVar->OpId = OpZRcv;
 
-		Opt = ts.XmodemBin;
-		FileVar->OpId = OpZSend;
-		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
-		{
-			char **filenames = _GetMultiFname(fv->HMainWin, GMF_Z, fv->DlgCaption, &Opt);
-			if (filenames == NUL) {
-				if (mode == IdZAutoS) {
-					CommRawOut(&cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
-				}
-				ProtoEnd();
-				return;
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_ZRCV", uimsg, sizeof(uimsg), TitZRcv, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	WORD Opt = 0;
+	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0))
+		ProtoEnd();
+
+	return TRUE;
+}
+
+/**
+ *	ZMODEM送信
+ *
+ *	@param[in]	filename			送信ファイル名(NULLのとき、ダイアログで選択する)
+ *	@param[in]	ParamBinaryFlag		binary mode
+ *	@param[in]	autostart			TUREのとき自動スタート
+ */
+BOOL ZMODEMStartSend(const char *filename, WORD ParamBinaryFlag, BOOL autostart)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
+
+	int mode = autostart ? IdZAutoS : IdZSend;
+
+	if (! ProtoStart())
+		return FALSE;
+
+	TFileVarProto *fv = FileVar;
+
+	char uimsg[MAX_UIMSG];
+	const char *UILanguageFile = ts.UILanguageFile;
+	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
+	get_lang_msg("FILEDLG_TRANS_TITLE_ZSEND", uimsg, sizeof(uimsg), TitZSend, UILanguageFile);
+	strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+
+	WORD Opt = ts.XmodemBin;
+	FileVar->OpId = OpZSend;
+	if (filename == NULL) {
+		char **filenames = _GetMultiFname(fv->HMainWin, GMF_Z, fv->DlgCaption, &Opt);
+		if (filenames == NULL) {
+			if (mode == IdZAutoS) {
+				CommRawOut(&cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
 			}
-			fv->FileNames = filenames;
-			GetNextFname(fv);
-			ts.XmodemBin = Opt;
+			ProtoEnd();
+			return FALSE;
 		}
-		else
-		_SetFileVar(FileVar);
+		fv->FileNames = filenames;
+		ts.XmodemBin = Opt;
 	}
 	else {
-		/* IdZReceive or IdZAutoR */
-		FileVar->OpId = OpZRcv;
-
-		strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
-		get_lang_msg("FILEDLG_TRANS_TITLE_ZRCV", uimsg, sizeof(uimsg), TitZRcv, UILanguageFile);
-		strncat_s(fv->DlgCaption, sizeof(fv->DlgCaption), uimsg, _TRUNCATE);
+		fv->FileNames = MakeStrArrayFromStr(filename);
+		ts.XmodemBin = ParamBinaryFlag;
+		FileVar->NoMsg = TRUE;
 	}
 
 	TalkStatus = IdTalkQuiet;
@@ -1391,39 +1448,6 @@ void ZMODEMStart(int mode)
 
 	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0))
 		ProtoEnd();
-}
-
-BOOL ZMODEMStartReceive(void)
-{
-	if (FileVar != NULL) {
-		return FALSE;
-	}
-	if (!NewFileVar_(&FileVar)) {
-		return FALSE;
-	}
-
-	FileVar->NoMsg = TRUE;
-	ZMODEMStart(IdZReceive);
-
-	return TRUE;
-}
-
-BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
-{
-	if (FileVar != NULL) {
-		return FALSE;
-	}
-	if (!NewFileVar_(&FileVar)) {
-		return FALSE;
-	}
-
-	FileVar->DirLen = 0;
-	strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),fiename, _TRUNCATE);
-	FileVar->NumFname = 1;
-	ts.XmodemBin = ParamBinaryFlag;
-	FileVar->NoMsg = TRUE;
-
-	ZMODEMStart(IdZSend);
 
 	return TRUE;
 }

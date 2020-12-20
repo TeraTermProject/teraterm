@@ -5494,11 +5494,11 @@ void CANSeen(BYTE b)
 			if (state == 2) {
 				if (b =='0') { // ZRQINIT
 					/* Auto ZMODEM activation (Receive) */
-					ZMODEMStart(IdZAutoR);
+					ZMODEMStartReceive(FALSE, TRUE);
 				}
 				else if (b == '1') { // ZRINIT
 					/* Auto ZMODEM activation (Send) */
-					ZMODEMStart(IdZAutoS);
+					ZMODEMStartSend(NULL, 0, TRUE);
 				}
 			}
 			ParseMode = ModeFirst;

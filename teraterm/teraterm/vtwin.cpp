@@ -4357,13 +4357,13 @@ void CVTWindow::OnFileYSend()
 
 void CVTWindow::OnFileZRcv()
 {
-	ZMODEMStart(IdZReceive);
+	ZMODEMStartReceive(FALSE, FALSE);
 }
 
 void CVTWindow::OnFileZSend()
 {
 	HelpId = HlpFileZmodemSend;
-	ZMODEMStart(IdZSend);
+	ZMODEMStartSend(NULL, 0, FALSE);
 }
 
 void CVTWindow::OnFileBPRcv()

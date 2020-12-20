@@ -54,9 +54,8 @@ BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmo
 BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt);
 BOOL YMODEMStartReceive(BOOL macro);
 BOOL YMODEMStartSend(const char *fiename);
-void ZMODEMStart(int mode);
-BOOL ZMODEMStartReceive(void);
-BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag);
+BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart);
+BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag, BOOL autostart);
 void BPStart(int mode);
 BOOL BPSendStart(const char *filename);
 BOOL BPStartReceive(void);
