@@ -36,6 +36,9 @@
 extern "C" {
 #endif
 
+#define TitBPRcv    L"B-Plus Receive"
+#define TitBPSend   L"B-Plus Send"
+
   /* B-Plus function id */
 #define IdBPReceive 1
 #define IdBPSend    2

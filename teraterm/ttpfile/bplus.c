@@ -38,6 +38,7 @@
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "layer_for_unicode.h"
 
 #include "bplus.h"
 
@@ -118,20 +119,20 @@ static BOOL BPOpenFileToBeSent(PFileVarProto fv)
   return fv->FileOpen;
 }
 
+// ’ÊM’†‚ÉŽóM/‘—M‚ªØ‚è‘Ö‚í‚é?
 static void BPDispMode(PFileVarProto fv, PBPVar bv)
 {
-  strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: B-Plus ", _TRUNCATE);
-  switch (bv->BPMode) {
+	switch (bv->BPMode) {
     case IdBPSend:
-      strncat_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Send",_TRUNCATE);
-      break;
+		fv->SetDialogCation(fv, "FILEDLG_TRANS_TITLE_BPSEND", TitBPSend);
+		break;
     case IdBPReceive:
     case IdBPAuto:
-      strncat_s(fv->DlgCaption,sizeof(fv->DlgCaption),"Receive",_TRUNCATE);
-      break;
-  }
+		fv->SetDialogCation(fv, "FILEDLG_TRANS_TITLE_BPRCV", TitBPRcv);
+		break;
+	}
 
-  SetWindowText(fv->HWin,fv->DlgCaption);
+	_SetWindowTextW(fv->HWin,fv->DlgCaption);
 }
 
 static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)

@@ -36,7 +36,7 @@ typedef struct FileVarProto {
 
 	HWND HMainWin;
 	HWND HWin;
-	char DlgCaption[40];
+	wchar_t *DlgCaption;
 
 	// 送信ファイル名配列
 	//	フルパスのファイル名配列(一番最後はNULL)
@@ -69,6 +69,7 @@ typedef struct FileVarProto {
 	char *(*GetNextFname)(struct FileVarProto *fv);
 	char *(*GetRecievePath)(struct FileVarProto *fv);
 	void (*FTSetTimeOut)(struct FileVarProto *fv, int T);
+	void (*SetDialogCation)(struct FileVarProto *fv, const char *key, const wchar_t *default_caption);
 
 	// protocol entrys, data
 	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
