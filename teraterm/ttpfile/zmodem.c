@@ -80,6 +80,7 @@ typedef struct {
   BYTE LastSent;
   int TOutInit;
   int TOutFin;
+	TProtoLog *log;
 } TZVar;
 typedef TZVar far *PZVar;
 
@@ -183,13 +184,13 @@ static void add_recvbuf(char *fmt, ...)
 }
 
 
-static void show_recvbuf(PFileVarProto fv)
+static void show_recvbuf(TProtoLog* log)
 {
 	char *s;
 
 	s = recvbuf;
 	strncat_s(recvbuf, sizeof(recvbuf), "\015\012", _TRUNCATE);
-	_lwrite(fv->LogFile, s, strlen(s));
+	log->WriteRaw(log, s, strlen(s));
 
 	memset(recvbuf, 0, sizeof(recvbuf));
 }
@@ -205,13 +206,13 @@ static void add_sendbuf(char *fmt, ...)
 	va_end(arg);
 }
 
-static void show_sendbuf(PFileVarProto fv)
+static void show_sendbuf(TProtoLog* log)
 {
 	char *s;
 
 	s = sendbuf;
 	strncat_s(sendbuf, sizeof(sendbuf), "\015\012", _TRUNCATE);
-	_lwrite(fv->LogFile, s, strlen(s));
+	log->WriteRaw(log, s, strlen(s));
 
 	memset(sendbuf, 0, sizeof(sendbuf));
 }
@@ -254,21 +255,19 @@ int ZRead1Byte(PFileVarProto fv, PZVar zv, PComVar cv, LPBYTE b)
 	if (CommRead1Byte(cv, b) == 0)
 		return 0;
 
-	if (fv->LogFlag) {
-		if (fv->LogState == 0) {
+	if (zv->log != NULL) {
+		TProtoLog *log = zv->log;
+		if (log->LogState == 0) {
 			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv, 0);
-			fv->FlushLogLineBuf = 0;
+			log->DumpFlush(log);
 
-			show_sendbuf(fv);
+			show_sendbuf(log);
 
-			fv->LogState = 1;
-			fv->LogCount = 0;
+			log->LogState = 1;
 			s = "\015\012<<< Received\015\012";
-			_lwrite(fv->LogFile, s, strlen(s));
+			log->WriteRaw(log, s, strlen(s));
 		}
-		FTLog1Byte(fv, *b);
+		log->DumpByte(log, *b);
 	}
 	/* ignore 0x11, 0x13, 0x81 and 0x83 */
 	if (((*b & 0x7F) == 0x11) || ((*b & 0x7F) == 0x13))
@@ -283,22 +282,20 @@ int ZWrite(PFileVarProto fv, PZVar zv, PComVar cv, PCHAR B, int C)
 
 	i = CommBinaryOut(cv, B, C);
 
-	if (fv->LogFlag && (i > 0)) {
-		if (fv->LogState != 0) {
+	if (zv->log != NULL && (i > 0)) {
+		TProtoLog* log = zv->log;
+		if (log->LogState != 0) {
 			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv, 0);
-			fv->FlushLogLineBuf = 0;
+			log->DumpFlush(log);
 
-			show_recvbuf(fv);
+			show_recvbuf(log);
 
-			fv->LogState = 0;
-			fv->LogCount = 0;
+			log->LogState = 0;
 			s = "\015\012Sending >>>\015\012";
-			_lwrite(fv->LogFile, s, strlen(s));
+			log->WriteRaw(log, s, strlen(s));
 		}
 		for (j = 0; j <= i - 1; j++)
-			FTLog1Byte(fv, B[j]);
+			log->DumpByte(log, B[j]);
 	}
 	return i;
 }
@@ -702,7 +699,6 @@ BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	zv->CtlEsc = ((ts->FTFlag & FT_ZESCCTL) != 0);
 	zv->MaxDataLen = ts->ZmodemDataLen;
 	zv->WinSize = ts->ZmodemWinSize;
-	fv->LogFlag = ((ts->LogFlag & LOG_Z) != 0);
 
 	if (zv->ZMode == IdZAutoR || zv->ZMode == IdZAutoS) {
 		if (zv->ZMode == IdZAutoR) {
@@ -786,10 +782,12 @@ BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	if (zv->MaxDataLen > Max)
 		zv->MaxDataLen = Max;
 
-	if (fv->LogFlag)
-		fv->LogFile = _lcreat("ZMODEM.LOG", 0);
-	fv->LogState = 0;
-	fv->LogCount = 0;
+	if ((ts->LogFlag & LOG_Z) != 0) {
+		TProtoLog* log = ProtoLogCreate();
+		zv->log = log;
+		log->Open(log, "ZMODEM.LOG");
+		log->LogState = 0;
+	}
 
 	switch (zv->ZMode) {
 	case IdZReceive:
@@ -1502,7 +1500,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 
 static void Destroy(PFileVarProto fv)
 {
-	free(fv->data);
+	PZVar zv = fv->data;
+	if (zv->log != NULL) {
+		TProtoLog* log = zv->log;
+		log->Destory(log);
+		zv->log = NULL;
+	}
+	free(zv);
 	fv->data = NULL;
 }
 

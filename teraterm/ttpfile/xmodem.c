@@ -57,6 +57,7 @@ typedef struct {
   int TOutInitCRC;
   int TOutVLong;
   int CANCount;
+	TProtoLog *log;
 } TXVar;
 typedef TXVar far *PXVar;
 
@@ -81,18 +82,17 @@ static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 	if (CommRead1Byte(cv, b) == 0)
 		return 0;
 
-	if (fv->LogFlag) {
-		if (fv->LogState == 0) {
-			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv, 0);
-			fv->FlushLogLineBuf = 0;
+	if (xv->log != NULL) {
+		TProtoLog *log = xv->log;
 
-			fv->LogState = 1;
-			fv->LogCount = 0;
-			_lwrite(fv->LogFile, "\015\012<<<\015\012", 7);
+		if (log->LogState == 0) {
+			// 残りのASCII表示を行う
+			log->DumpFlush(log);
+
+			log->LogState = 1;
+			log->WriteRaw(log, "\015\012<<<\015\012", 7);
 		}
-		FTLog1Byte(fv, *b);
+		log->DumpByte(log, *b);
 	}
 	return 1;
 }
@@ -102,19 +102,17 @@ static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
 	int i, j;
 
 	i = CommBinaryOut(cv, B, C);
-	if (fv->LogFlag && (i > 0)) {
-		if (fv->LogState != 0) {
+	if (xv->log != NULL && (i > 0)) {
+		TProtoLog* log = xv->log;
+		if (log->LogState != 0) {
 			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv, 0);
-			fv->FlushLogLineBuf = 0;
+			log->DumpFlush(log);
 
-			fv->LogState = 0;
-			fv->LogCount = 0;
-			_lwrite(fv->LogFile, "\015\012>>>\015\012", 7);
+			log->LogState = 0;
+			log->WriteRaw(log, "\015\012>>>\015\012", 7);
 		}
 		for (j = 0; j <= i - 1; j++)
-			FTLog1Byte(fv, B[j]);
+			log->DumpByte(log, B[j]);
 	}
 	return i;
 }
@@ -221,11 +219,13 @@ static BOOL XCheckPacket(PXVar xv)
 BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	PXVar xv = fv->data;
-	fv->LogFlag = ((ts->LogFlag & LOG_X) != 0);
-	if (fv->LogFlag)
-		fv->LogFile = _lcreat("XMODEM.LOG", 0);
-	fv->LogState = 0;
-	fv->LogCount = 0;
+	BOOL LogFlag = ((ts->LogFlag & LOG_X) != 0);
+	if (LogFlag) {
+		TProtoLog* log = ProtoLogCreate();
+		xv->log = log;
+		log->Open(log, "XMODEM.LOG");
+		log->LogState = 0;
+	}
 
 	fv->FileSize = 0;
 	if (xv->XMode == IdXSend) {
@@ -657,7 +657,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 
 static void Destroy(PFileVarProto fv)
 {
-	free(fv->data);
+	PXVar xv = fv->data;
+	if (xv->log != NULL) {
+		TProtoLog* log = xv->log;
+		log->Destory(log);
+		xv->log = NULL;
+	}
+	free(xv);
 	fv->data = NULL;
 }
 
@@ -677,6 +683,8 @@ BOOL XCreate(PFileVarProto fv)
 	fv->TimeOutProc = XTimeOutProc;
 	fv->Cancel = XCancel;
 	fv->SetOptV = SetOptV;
+
+	xv->log = ProtoLogCreate();
 
 	return TRUE;
 }

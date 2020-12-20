@@ -39,12 +39,6 @@ enum {
 
 /* prototypes */
 BOOL BPCreate(PFileVarProto fv);
-#if 0
-void BPInit(PFileVarProto fv, PComVar cv, PTTSet ts);
-void BPTimeOutProc(PFileVarProto fv, PComVar cv);
-BOOL BPParse(PFileVarProto fv, PComVar cv);
-void BPCancel(PFileVarProto fv, PComVar cv);
-#endif
 
 #ifdef __cplusplus
 }

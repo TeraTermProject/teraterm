@@ -77,6 +77,7 @@ typedef struct {
   time_t FileTime;
   int FileMode;
   LONGLONG FileSize;
+	TProtoLog *log;
 } TKmtVar;
 typedef TKmtVar far *PKmtVar;
 
@@ -138,17 +139,16 @@ BYTE KmtNum(BYTE b);
 
 static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 {
+	TProtoLog* log = kv->log;
 	int i, datalen, n;
 	char str[128];
 	char type, *s;
 
 	for (i = 0 ; i < len ; i++)
-		FTLog1Byte(fv, buf[i]);
+		log->DumpByte(log, buf[i]);
 
 	// 残りのASCII表示を行う
-	fv->FlushLogLineBuf = 1;
-	FTLog1Byte(fv, 0);
-	fv->FlushLogLineBuf = 0;
+	log->DumpFlush(log);
 
 	/* パケットを人間に分かりやすく表示する。
 	Packet Format
@@ -192,7 +192,7 @@ static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 
 		_snprintf_s(str, sizeof(str), _TRUNCATE, "MARK=%x LEN=%d SEQ#=%d TYPE=%s DATA_LEN=%d\n",
 			buf[0], n, KmtNum(buf[2]), s, datalen);
-		_lwrite(fv->LogFile, str, strlen(str));
+		log->WriteRaw(log, str, strlen(str));
 
 		// Initial Connection
 		if (type == 'S' && datalen >= 6) {
@@ -234,8 +234,8 @@ static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 				strncat_s(str, sizeof(str), t, _TRUNCATE);
 			}
 
-			_lwrite(fv->LogFile, str, strlen(str));
-			_lwrite(fv->LogFile, "\015\012", 2);
+			log->WriteRaw(log, str, strlen(str));
+			log->WriteRaw(log, "\015\012", 2);
 
 		}
 	}
@@ -243,18 +243,20 @@ static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 
 static void KmtReadLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 {
-	if (fv->LogFlag && (len>0))
+	if (kv->log != NULL && (len>0))
 	{
-		_lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+		TProtoLog* log = kv->log;
+		log->WriteRaw(log, "\015\012<<<\015\012",7);
 		KmtOutputCommonLog(fv, kv, buf, len);
 	}
 }
 
 static void KmtWriteLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 {
-	if (fv->LogFlag && (len>0))
+	if (kv->log != NULL && (len>0))
 	{
-		_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+		TProtoLog* log = kv->log;
+		log->WriteRaw(log, "\015\012>>>\015\012",7);
 		KmtOutputCommonLog(fv, kv, buf, len);
 	}
 }
@@ -265,12 +267,13 @@ static void KmtStringLog(PFileVarProto fv, PKmtVar kv, char *fmt, ...)
 	int len;
 	va_list arg;
 
-	if (fv->LogFlag) {
+	if (kv->log != NULL) {
+		TProtoLog* log = kv->log;
 		va_start(arg, fmt);
 		len = _vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
 		va_end(arg);
-		_lwrite(fv->LogFile, tmp, len);
-		_lwrite(fv->LogFile,"\015\012",2);
+		log->WriteRaw(log, tmp, len);
+		log->WriteRaw(log, "\015\012", 2);
 	}
 }
 
@@ -329,12 +332,12 @@ void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 #endif
 	CommBinaryOut(cv,&kv->PktOut[0], C);
 
-	if (fv->LogFlag)
-	{
+	if (kv->log != NULL) {
 #if 0
-		_lwrite(fv->LogFile,"> ",2);
-		_lwrite(fv->LogFile,&(kv->PktOut[1]),C-1);
-		_lwrite(fv->LogFile,"\015\012",2);
+		TProtoLog* log = kv->log;
+		log->WriteRaw(log, "> ",2);
+		log->WriteRaw(log, &(kv->PktOut[1]),C-1);
+		log->WriteRaw(log, "\015\012",2);
 #else
 		KmtWriteLog(fv, kv, &(kv->PktOut[0]), C);
 #endif
@@ -1224,24 +1227,23 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	kv->PktNumOffset = 0;
 	kv->PktNum = 0;
 
-	fv->LogFlag = ((ts->LogFlag & LOG_KMT)!=0);
-	if (fv->LogFlag) {
+	if ((ts->LogFlag & LOG_KMT)!=0) {
+		TProtoLog* log = ProtoLogCreate();
 		char buf[128];
 		char ctime_str[128];
 		time_t tm = time(NULL);
 		ctime_s(ctime_str, sizeof(ctime_str), &tm);
 
-		fv->LogFile = _lcreat("KERMIT.LOG",0);
-		fv->LogCount = 0;
-		fv->LogState = 0;
-		fv->FlushLogLineBuf = 0;
+		kv->log = log;
+		log->Open(log, "KERMIT.LOG");
+		log->LogState = 0;
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KERMIT %s start: %s\n",
 			kv->KmtMode == IdKmtSend ? "Send" :
 			kv->KmtMode == IdKmtReceive ? "Receive" :
 			kv->KmtMode == IdKmtGet ? "Get" : "Finish",
 			ctime_str
 			);
-		_lwrite(fv->LogFile, buf, strlen(buf));
+		log->WriteRaw(log, buf, strlen(buf));
 	}
 
 	switch (kv->KmtMode) {
@@ -1383,7 +1385,7 @@ BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 read_end:
 	if (! GetPkt) return TRUE;
 
-	if (fv->LogFlag)
+	if (kv->log != NULL)
 	{
 #ifdef KERMIT_CAPAS
 		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInCount);
@@ -1625,7 +1627,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 
 static void Destroy(PFileVarProto fv)
 {
-	free(fv->data);
+	PKmtVar kv = fv->data;
+	if (kv->log != NULL) {
+		TProtoLog* log = kv->log;
+		log->Destory(log);
+		kv->log = NULL;
+	}
+	free(kv);
 	fv->data = NULL;
 }
 

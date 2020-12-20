@@ -69,6 +69,7 @@ typedef struct {
   WORD DataLen;
   BYTE LastMessage;
   BOOL RecvFilesize;
+	TProtoLog *log;
 } TYVar;
 typedef TYVar *PYVar;
 
@@ -103,21 +104,18 @@ static int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 	if (CommRead1Byte(cv,b) == 0)
 		return 0;
 
-	if (fv->LogFlag)
+	if (yv->log != NULL)
 	{
-		if (fv->LogState==0)
+		TProtoLog *log = yv->log;
+		if (log->LogState==0)
 		{
 			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv,0);
-			fv->FlushLogLineBuf = 0;
+			log->DumpFlush(log);
 
-			fv->LogState = 1;
-			fv->LogCount = 0;
-			fv->FlushLogLineBuf = 0;
-			_lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+			log->LogState = 1;
+			log->WriteRaw(log, "\015\012<<<\015\012", 7);
 		}
-		FTLog1Byte(fv,*b);
+		log->DumpByte(log, *b);
 	}
 	return 1;
 }
@@ -127,21 +125,19 @@ static int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
 	int i, j;
 
 	i = CommBinaryOut(cv,B,C);
-	if (fv->LogFlag && (i>0))
+	if (yv->log != NULL && (i>0))
 	{
-		if (fv->LogState != 0)
+		TProtoLog* log = yv->log;
+		if (log->LogState != 0)
 		{
 			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv,0);
-			fv->FlushLogLineBuf = 0;
+			log->DumpFlush(log);
 
-			fv->LogState = 0;
-			fv->LogCount = 0;
-			_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+			log->LogState = 0;
+			log->WriteRaw(log, "\015\012>>>\015\012", 7);
 		}
 		for (j=0 ; j <= i-1 ; j++)
-			FTLog1Byte(fv,B[j]);
+			log->DumpByte(log, B[j]);
 	}
 	return i;
 }
@@ -347,11 +343,12 @@ BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		}
 	}
 
-	fv->LogFlag = ((ts->LogFlag & LOG_Y)!=0);
-	if (fv->LogFlag)
-		fv->LogFile = _lcreat("YMODEM.LOG",0);
-	fv->LogState = 0;
-	fv->LogCount = 0;
+	if ((ts->LogFlag & LOG_Y)!=0) {
+		TProtoLog* log = ProtoLogCreate();
+		yv->log = log;
+		log->Open(log, "YMODEM.LOG");
+		log->LogState = 0;
+	}
 
 	SetWindowText(fv->HWin, fv->DlgCaption);
 
@@ -383,7 +380,7 @@ BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		yv->NAKCount = 10;
 	}
 
-	if (fv->LogFlag) {
+	if (yv->log != NULL) {
 		char buf[128];
 		char ctime_str[128];
 		time_t tm = time(NULL);
@@ -392,7 +389,7 @@ BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "YMODEM %s start: %s\n",
 		            yv->YMode == IdYSend ? "Send" : "Recv",
 		            ctime_str);
-		_lwrite(fv->LogFile, buf, strlen(buf));
+		yv->log->WriteRaw(yv->log, buf, strlen(buf));
 	}
 
 	switch (yv->YMode) {
@@ -1126,7 +1123,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 
 static void Destroy(PFileVarProto fv)
 {
-	free(fv->data);
+	PYVar yv = fv->data;
+	if (yv->log != NULL) {
+		TProtoLog* log = yv->log;
+		log->Destory(log);
+		yv->log = NULL;
+	}
+	free(yv);
 	fv->data = NULL;
 }
 

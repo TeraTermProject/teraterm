@@ -62,6 +62,7 @@ typedef struct {
   WORD SeqSent, WinEnd, FileEnd;
   BOOL EnqFlag;
   BYTE CheckSum;
+	TProtoLog *log;
 } TQVVar;
 typedef TQVVar far *PQVVar;
 
@@ -109,15 +110,14 @@ int QVRead1Byte(PFileVarProto fv, PQVVar qv, PComVar cv, LPBYTE b)
   if (CommRead1Byte(cv,b) == 0)
     return 0;
 
-  if (fv->LogFlag)
-  {
-    if (fv->LogState!=1)
+  if (qv->log != NULL) {
+	TProtoLog *log = qv->log;
+    if (log->LogState!=1)
     {
-      fv->LogState = 1;
-      fv->LogCount = 0;
-      _lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+		log->LogState = 1;
+		log->WriteRaw(log, "\015\012<<<\015\012", 7);
     }
-    FTLog1Byte(fv,*b);
+    log->DumpByte(log, *b);
   }
   return 1;
 }
@@ -128,16 +128,14 @@ int QVWrite(PFileVarProto fv, PQVVar qv, PComVar cv, PCHAR B, int C)
 
   i = CommBinaryOut(cv,B,C);
 
-  if (fv->LogFlag && (i>0))
-  {
-    if (fv->LogState != 0)
-    {
-      fv->LogState = 0;
-      fv->LogCount = 0;
-      _lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+  if (qv->log != NULL && (i>0)) {
+	  TProtoLog* log = qv->log;
+	  if (log->LogState != 0) {
+		  log->LogState = 0;
+		  log->WriteRaw(log, "\015\012>>>\015\012", 7);
     }
     for (j=0 ; j <= i-1 ; j++)
-      FTLog1Byte(fv,B[j]);
+      log->DumpByte(log, B[j]);
   }
   return i;
 }
@@ -168,12 +166,13 @@ BOOL QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   UILanguageFile = ts->UILanguageFile;
 
   qv->WinSize = ts->QVWinSize;
-  fv->LogFlag = ((ts->LogFlag & LOG_QV)!=0);
 
-  if (fv->LogFlag)
-    fv->LogFile = _lcreat("QUICKVAN.LOG",0);
-  fv->LogState = 2;
-  fv->LogCount = 0;
+  if ((ts->LogFlag & LOG_QV)!=0) {
+	  TProtoLog* log = ProtoLogCreate();
+	  qv->log = log;
+	  log->Open(log, "QUICKVAN.LOG");
+	  log->LogState = 2;
+  }
 
   fv->FileOpen = FALSE;
   fv->ByteCount = 0;
@@ -1323,7 +1322,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 
 static void Destroy(PFileVarProto fv)
 {
-	free(fv->data);
+	PQVVar qv = fv->data;
+	if (qv->log != NULL) {
+		TProtoLog* log = qv->log;
+		log->Destory(log);
+		qv->log = NULL;
+	}
+	free(qv);
 	fv->data = NULL;
 }
 

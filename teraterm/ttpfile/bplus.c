@@ -75,6 +75,7 @@ typedef struct {
   int TimeOut;
   BOOL CtlEsc;
   BYTE Q[8];
+	TProtoLog *log;
 } TBPVar;
 typedef TBPVar far *PBPVar;
 
@@ -198,11 +199,12 @@ static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
     }
   }
 
-  fv->LogFlag = ((ts->LogFlag & LOG_BP)!=0);
-  if (fv->LogFlag)
-    fv->LogFile = _lcreat("BPLUS.LOG",0);
-  fv->LogState = 0;
-  fv->LogCount = 0;
+  if ((ts->LogFlag & LOG_BP)!=0) {
+	  TProtoLog* log = ProtoLogCreate();
+	  bv->log = log;
+	  log->Open(log, "BPLUS.LOG");
+	  log->LogState = 0;
+  }
 
   return TRUE;
 }
@@ -212,15 +214,15 @@ int BPRead1Byte(PFileVarProto fv, PBPVar bv, PComVar cv, LPBYTE b)
   if (CommRead1Byte(cv,b) == 0)
     return 0;
 
-  if (fv->LogFlag)
+  if (bv->log != NULL)
   {
-    if (fv->LogState==0)
+	TProtoLog *log = bv->log;
+    if (log->LogState==0)
     {
-      fv->LogState = 1;
-      fv->LogCount = 0;
-      _lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+		log->LogState = 1;
+		log->WriteRaw(log, "\015\012<<<\015\012", 7);
     }
-    FTLog1Byte(fv,*b);
+    log->DumpByte(log, *b);
   }
   return 1;
 }
@@ -231,16 +233,16 @@ int BPWrite(PFileVarProto fv, PBPVar bv, PComVar cv, PCHAR B, int C)
 
   i = CommBinaryOut(cv,B,C);
 
-  if (fv->LogFlag && (i>0))
+  if (bv->log != NULL && (i>0))
   {
-    if (fv->LogState != 0)
+	  TProtoLog* log = bv->log;
+	  if (log->LogState != 0)
     {
-      fv->LogState = 0;
-      fv->LogCount = 0;
-      _lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+		  log->LogState = 0;
+		  log->WriteRaw(log,"\015\012>>>\015\012",7);
     }
     for (j=0 ; j <= i-1 ; j++)
-      FTLog1Byte(fv,B[j]);
+      log->DumpByte(log,B[j]);
   }
   return i;
 }
@@ -973,7 +975,13 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 
 static void Destroy(PFileVarProto fv)
 {
-	free(fv->data);
+	PBPVar bv = fv->data;
+	if (bv->log != NULL) {
+		TProtoLog* log = bv->log;
+		log->Destory(log);
+		bv->log = NULL;
+	}
+	free(bv);
 	fv->data = NULL;
 }
 
