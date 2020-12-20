@@ -37,7 +37,6 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttftypes.h"
 #include "protodlg.h"
 #include "ttwinman.h"
 #include "commlib.h"
@@ -81,6 +80,13 @@
 #define OpQVSend   14
 #define OpYRcv     15
 #define OpYSend    16
+
+#define PROTO_KMT 1
+#define PROTO_XM  2
+#define PROTO_ZM  3
+#define PROTO_BP  4
+#define PROTO_QV  5
+#define PROTO_YM  6
 
 #define TitKmtRcv   L"Kermit Receive"
 #define TitKmtGet   L"Kermit Get"

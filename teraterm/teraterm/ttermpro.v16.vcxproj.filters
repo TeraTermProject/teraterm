@@ -252,9 +252,6 @@
     <ClInclude Include="ttwinman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\ttftypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="teklib.h">
       <Filter>Header Files</Filter>
     </ClInclude>

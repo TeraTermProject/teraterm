@@ -12,7 +12,6 @@ set(COMMON_SRC
   ../common/servicenames.c
   ../common/servicenames.h
   ../common/tt-version.h
-  ../common/ttftypes.h
   ../common/ttcommon.h
   ../common/tt_res.h
   ../common/codeconv.h

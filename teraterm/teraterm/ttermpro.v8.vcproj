@@ -499,10 +499,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\ttftypes.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ttime.h"
 				>
 			</File>

@@ -121,7 +121,6 @@ target_sources(
   ../common/ttddecmnd.h
   ../common/tttypes.h
   ../common/tektypes.h
-  ../common/ttftypes.h
   ../common/ttplugin.h
   ../common/tt-version.h
   ../common/teraterm.h
