@@ -58,13 +58,13 @@ typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
   (char *file);
 
 extern PGetSetupFname GetSetupFname;
-//extern PGetTransFname GetTransFname;
+extern PGetTransFname GetTransFname;
 extern PGetMultiFname GetMultiFname;
 extern PGetGetFname GetGetFname;
 extern PSetFileVar SetFileVar;
 extern PGetXFname GetXFname;
 extern PProtoInit ProtoInit;
-//extern PProtoParse ProtoParse;
+extern PProtoParse ProtoParse;
 extern PProtoTimeOutProc ProtoTimeOutProc;
 extern PProtoCancel ProtoCancel;
 extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;

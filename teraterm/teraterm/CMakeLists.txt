@@ -32,6 +32,7 @@ add_executable(
   filesys_log.cpp
   filesys_log.rc
   filesys_log_res.h
+  filesys_proto.cpp
   font_pp.cpp
   font_pp.h
   font_pp.rc

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005- TeraTerm Project
+ * (C) 2005-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,15 +59,18 @@
 
 #include "filesys.h"
 
+#if 0
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
 #define FS_BRACKET_END   2
+#endif
 
-PFileVar SendVar = NULL;
-//PFileVar FileVar = NULL;
-//static PCHAR ProtoVar = NULL;
-//static int ProtoId;
+//PFileVar SendVar = NULL;
+PFileVar FileVar = NULL;
+static PCHAR ProtoVar = NULL;
+static int ProtoId;
 
+#if 0
 static BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
 static BYTE FileByte;
 
@@ -84,9 +87,11 @@ static int FileBracketMode = FS_BRACKET_NONE;
 static int FileBracketPtr = 0;
 static char BracketStartStr[] = "\033[200~";
 static char BracketEndStr[] = "\033[201~";
+#endif
 
-BOOL FSend = FALSE;
+extern BOOL FSend;
 
+#if 0
 static HMODULE HTTFILE = NULL;
 static int TTFILECount = 0;
 
@@ -102,6 +107,7 @@ PProtoTimeOutProc ProtoTimeOutProc;
 PProtoCancel ProtoCancel;
 PTTFILESetUILanguageFile TTFILESetUILanguageFile;
 PTTFILESetFileSendFilter TTFILESetFileSendFilter;
+#endif
 
 #define IdGetSetupFname  1
 #define IdGetTransFname  2
@@ -118,6 +124,7 @@ PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 #define IdTTFILESetUILanguageFile 11
 #define IdTTFILESetFileSendFilter 12
 
+#if 0
 BOOL LoadTTFILE(void)
 {
 	BOOL Err;
@@ -230,10 +237,12 @@ BOOL FreeTTFILE(void)
 	}
 	return TRUE;
 }
+#endif
 
-static PFileTransDlg SendDlg = NULL;
-//static PProtoDlg PtDlg = NULL;
+//static PFileTransDlg SendDlg = NULL;
+static PProtoDlg PtDlg = NULL;
 
+#if 0
 static BOOL OpenFTDlg(PFileVar fv)
 {
 	PFileTransDlg FTDlg;
@@ -264,8 +273,9 @@ static void ShowFTDlg(WORD OpId)
 		SetForegroundWindow(SendDlg->GetSafeHwnd());
 	}
 }
+#endif
 
-static BOOL NewFileVar(PFileVar *fv)
+static BOOL NewFileVar_(PFileVar *fv)
 {
 	if ((*fv)==NULL)
 	{
@@ -290,7 +300,7 @@ static BOOL NewFileVar(PFileVar *fv)
 	return ((*fv)!=NULL);
 }
 
-static void FreeFileVar(PFileVar *fv)
+static void FreeFileVar_(PFileVar *fv)
 {
 	if ((*fv)!=NULL)
 	{
@@ -305,6 +315,7 @@ static void FreeFileVar(PFileVar *fv)
 	}
 }
 
+#if 0
 void FileSendStart(void)
 {
 	LONG Option = 0;
@@ -613,8 +624,9 @@ void FileSend(void)
 
 	FileTransEnd(OpSendFile);
 }
+#endif
 
-#if 0
+
 static BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	int vsize;
@@ -722,13 +734,13 @@ static BOOL ProtoStart(void)
 		return FALSE;
 	if (FSend)
 	{
-		FreeFileVar(&FileVar);
+		FreeFileVar_(&FileVar);
 		return FALSE;
 	}
 
 	if (! LoadTTFILE())
 		return FALSE;
-	NewFileVar(&FileVar);
+	NewFileVar_(&FileVar);
 
 	if (FileVar==NULL)
 	{
@@ -757,7 +769,7 @@ void ProtoEnd(void)
 		EndDdeCmnd(0);
 
 	FreeTTFILE();
-	FreeFileVar(&FileVar);
+	FreeFileVar_(&FileVar);
 }
 
 /**
@@ -858,7 +870,7 @@ BOOL KermitStartSend(const char *filename)
 {
 	if (FileVar !=NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->DirLen = 0;
@@ -874,7 +886,7 @@ BOOL KermitGet(const char *filename)
 {
 	if (FileVar !=NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->DirLen = 0;
@@ -890,7 +902,7 @@ BOOL KermitStartRecive(void)
 {
 	if (FileVar !=NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->NoMsg = TRUE;
@@ -903,7 +915,7 @@ BOOL KermitFinish(void)
 {
 	if (FileVar !=NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->NoMsg = TRUE;
@@ -1003,7 +1015,7 @@ BOOL XMODEMStartReceive(const char *fiename, WORD ParamBinaryFlag, WORD ParamXmo
 {
 	if (FileVar !=NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->DirLen = 0;
@@ -1036,7 +1048,7 @@ BOOL XMODEMStartSend(const char *fiename, WORD ParamXmodemOpt)
 {
 	if (FileVar !=NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->DirLen = 0;
@@ -1113,7 +1125,7 @@ BOOL YMODEMStartReceive()
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 	FileVar->NoMsg = TRUE;
@@ -1126,7 +1138,7 @@ BOOL YMODEMStartSend(const char *fiename)
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 
@@ -1184,7 +1196,7 @@ BOOL ZMODEMStartReceive(void)
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 
@@ -1199,7 +1211,7 @@ BOOL ZMODEMStartSend(const char *fiename, WORD ParamBinaryFlag)
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 
@@ -1254,7 +1266,7 @@ BOOL BPSendStart(const char *filename)
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 
@@ -1271,7 +1283,7 @@ BOOL BPStartReceive(void)
 {
 	if (FileVar != NULL)
 		return FALSE;
-	if (!NewFileVar(&FileVar))
+	if (!NewFileVar_(&FileVar))
 		return FALSE;
 
 	FileVar->NoMsg = TRUE;
@@ -1321,7 +1333,7 @@ BOOL QVStartReceive(void)
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 
@@ -1336,7 +1348,7 @@ BOOL QVStartSend(const char *filename)
 	if (FileVar != NULL) {
 		return FALSE;
 	}
-	if (!NewFileVar(&FileVar)) {
+	if (!NewFileVar_(&FileVar)) {
 		return FALSE;
 	}
 
@@ -1348,16 +1360,15 @@ BOOL QVStartSend(const char *filename)
 
 	return TRUE;
 }
-#endif
 
+#if 0
 BOOL IsSendVarNULL()
 {
 	return SendVar == NULL;
 }
+#endif
 
-#if 0
 BOOL IsFileVarNULL()
 {
 	return FileVar == NULL;
 }
-#endif

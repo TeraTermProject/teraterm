@@ -225,6 +225,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\filesys_proto.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\susie_plugin\libsusieplugin.cpp"
 				>
 			</File>
