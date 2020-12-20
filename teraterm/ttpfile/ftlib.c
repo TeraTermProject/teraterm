@@ -62,13 +62,13 @@ BOOL GetNextFname(PFileVarProto fv)
   fv->FNCount++;
   if (fv->NumFname==1) return TRUE;
 
-  GlobalLock(fv->FnStrMemHandle);
+//  GlobalLock(fv->FnStrMemHandle);
 
   strncpy_s(&fv->FullName[fv->DirLen],sizeof(fv->FullName) - fv->DirLen,
     &fv->FnStrMem[fv->FnPtr],_TRUNCATE);
   fv->FnPtr = fv->FnPtr + strlen(&fv->FnStrMem[fv->FnPtr]) + 1;
 
-  GlobalUnlock(fv->FnStrMemHandle);
+//  GlobalUnlock(fv->FnStrMemHandle);
 
   return TRUE;
 }

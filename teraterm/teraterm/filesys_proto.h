@@ -38,7 +38,7 @@ typedef struct FileVarProto {
 	int DirLen;
 
 	int NumFname, FNCount;
-	HANDLE FnStrMemHandle;
+//	HANDLE FnStrMemHandle;
 	PCHAR FnStrMem;
 	int FnPtr;
 

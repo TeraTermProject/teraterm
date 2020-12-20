@@ -155,11 +155,16 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		fv->Close(fv);
 		fv->FileOpen = FALSE;
 	}
+	if (fv->FnStrMem != NULL) {
+		free(fv->FnStrMem);
+	}
+#if 0
 	if (fv->FnStrMemHandle != 0)
 	{
 		GlobalUnlock(fv->FnStrMemHandle);
 		GlobalFree(fv->FnStrMemHandle);
 	}
+#endif
 	fv->FileSysDestroy(fv);
 	free(fv);
 
@@ -754,6 +759,7 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 	fv->NumFname = 0;
 
 	/* moemory should be zero-initialized */
+#if 0
 	fv->FnStrMemHandle = GlobalAlloc(GHND, FnStrMemSize);
 	if (fv->FnStrMemHandle == NULL) {
 		MessageBeep(0);
@@ -767,6 +773,13 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 			MessageBeep(0);
 			return FALSE;
 		}
+	}
+#endif
+
+	fv->FnStrMem = (char *)malloc(FnStrMemSize);
+	if (fv->FnStrMem == NULL) {
+		MessageBeep(0);
+		return FALSE;
 	}
 
 	char *FNFilter = GetCommonDialogFilterA(FileSendFilter, UILanguageFile);
@@ -834,10 +847,16 @@ static BOOL _GetMultiFname(PFileVarProto fv, WORD FuncId, LPWORD Option)
 		fv->FNCount = 0;
 	}
 
+#if 0
 	GlobalUnlock(fv->FnStrMemHandle);
 	if (! Ok) {
 		GlobalFree(fv->FnStrMemHandle);
 		fv->FnStrMemHandle = NULL;
+	}
+#endif
+	if (! Ok) {
+		free(fv->FnStrMem);
+		fv->FnStrMem = NULL;
 	}
 
 	/* restore dir */
