@@ -1065,7 +1065,7 @@ private:
         ProxyInfo proxy;
         SettingDialog():lock(false) {
         }
-
+		
         int open(HWND owner) {
             return Dialog::open(instance().resource_module, IDD_SETTING, owner);
         }
@@ -1243,7 +1243,7 @@ private:
                     if (WSAGetLastError() != WSAEWOULDBLOCK) {
                         return SOCKET_ERROR;
                     }
-                    // no break
+                    /* FALLTHROUGH */ // no break
                 case 0:
                     end = dst;                              /* end of stream */
                     break;

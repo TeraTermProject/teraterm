@@ -242,9 +242,7 @@ public:
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
 	int indexOf(char chr, size_t from)const {
-		if (from < 0)
-			from = 0;
-		else if (from >= length())
+		if (from >= length())
 			return -1;
 		const char* found = strchr(string + from, chr);
 		if (found == NULL)
@@ -267,9 +265,7 @@ public:
 	//	文字列の見つかったインデックス。見つからなければ-1。
 	// 
 	int indexOf(const char* str, size_t from)const {
-		if (from < 0)
-			from = 0;
-		else if (from >= length())
+		if (from >= length())
 			return -1;
 		const char* found = strstr(string + from, str);
 		if (found == NULL)
@@ -360,7 +356,7 @@ public:
 	// 返値:
 	//	指定の位置にある文字。
 	char charAt(size_t index)const {
-		return index >= 0 && index < length() ? string[index] : '\0';
+		return index < length() ? string[index] : '\0';
 	}
 	// 指定の文字を指定の文字に置き換えます。
 	// 引数:
