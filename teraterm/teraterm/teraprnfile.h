@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008- TeraTerm Project
+ * (C) 2020- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,31 +26,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, Printing routines */
-
-#include "buffer.h"		// for TCharAttr
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* prototypes */
-HDC PrnBox(HWND HWin, PBOOL Sel);
-BOOL PrnStart(LPSTR DocumentName);
-void PrnStop();
+typedef struct PrintFileTag PrintFile;
 
-#define IdPrnCancel 0
-#define IdPrnScreen 1
-#define IdPrnSelectedText 2
-#define IdPrnScrollRegion 4
-#define IdPrnFile 8
-
-int VTPrintInit(int PrnFlag);
-void PrnSetupDC(TCharAttr Attr, BOOL reverse);
-void PrnOutText(const char *Buff, int Count, void *data);
-void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
-void PrnNewLine();
-void VTPrintEnd();
+PrintFile *OpenPrnFile(void);
+void PrnFileDirectProc(PrintFile *handle);
+void PrnFileStart(PrintFile *handle);
+void ClosePrnFile(PrintFile *handle, void (*finish_callback)(PrintFile *handle));
+void WriteToPrnFileUTF32(PrintFile *handle, unsigned int u32, BOOL Write);
+void WriteToPrnFile(PrintFile *handle, BYTE b, BOOL Write);
+void PrnFinish(PrintFile *handle);
 
 #ifdef __cplusplus
 }

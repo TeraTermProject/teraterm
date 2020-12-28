@@ -589,7 +589,7 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
  * @param[in]		u32			変換元UTF-32
  * @param[in]		code_page	変換先codepage
  * @param[in,out]	mb_ptr		変換先文字列出力先(NULLのとき出力しない)
- * @param[in]		mb_len		CP932出力先文字数(文字数,sizeof(wchar_t)*wstr_len bytes)
+ * @param[in]		mb_len		変換先出力先文字数(文字数,mb_len bytes)
  * @retval			出力したmultibyte文字数(byte数)
  *					0=エラー(変換できなかった)
  */

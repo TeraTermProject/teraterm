@@ -191,6 +191,7 @@ static BOOL PrintEX = TRUE; // printing extent
 static BOOL AutoPrintMode = FALSE;
 static BOOL PrinterMode = FALSE;
 static BOOL DirectPrn = FALSE;
+PrintFile *PrintFile_;
 
 /* User key */
 static BYTE NewKeyStr[FuncKeyStrMax];
@@ -491,38 +492,60 @@ static void OutputLogNewLine(vtterm_work_t *vtterm)
 
 /**
  *	1キャラクタ(unsigned int, char32_t)をログ(or/and macro送信バッファ)へ出力
+ *		出力先
+ *			ログファイル
+ *			macro送信バッファ(DDEPut1())
+ *			プリント用
  */
 static void OutputLogUTF32(unsigned int u32)
 {
 	vtterm_work_t *vtterm;
 	CheckEOLRet r;
 
-	if (!FLogIsOpendText() && !DDELog) {
+	if (!FLogIsOpendText() && !DDELog && !PrinterMode) {
 		return;
 	}
 	vtterm = &vtterm_work;
 	r = CheckEOLCheck(vtterm->check_eol, u32);
-	if ((r & CheckEOLOutputEOL) != 0) {
-		// ログ、改行を出力
-		if (FLogIsOpendText()) {
+
+	// ログ
+	if (FLogIsOpendText()) {
+		if ((r & CheckEOLOutputEOL) != 0) {
+			// 改行を出力
 			OutputLogNewLine(vtterm);
 		}
 
-		// マクロ、改行を出力
-		if (DDELog) {
+		if ((r & CheckEOLOutputChar) != 0) {
+			// u32を出力
+			FLogPutUTF32(u32);
+		}
+	}
+
+	// マクロ出力
+	if (DDELog) {
+		if ((r & CheckEOLOutputEOL) != 0) {
+			// 改行を出力
 			DDEPut1(CR);
 			DDEPut1(LF);
 		}
+
+		// u32を出力
+		if ((r & CheckEOLOutputChar) != 0) {
+			DDEPut1U32(u32);
+		}
 	}
-	if ((r & CheckEOLOutputChar) != 0) {
-		// ログ、u32を出力
-		if (FLogIsOpendText()) {
-			FLogPutUTF32(u32);
+
+	// プリント
+	if (PrinterMode) {
+		if ((r & CheckEOLOutputEOL) != 0) {
+			// 改行を出力
+			WriteToPrnFile(PrintFile_, CR,TRUE);
+			WriteToPrnFile(PrintFile_, LF,TRUE);
 		}
 
-		// マクロ、u32を出力
-		if (DDELog) {
-			DDEPut1U32(u32);
+		// u32を出力
+		if ((r & CheckEOLOutputChar) != 0) {
+			WriteToPrnFileUTF32(PrintFile_, u32, TRUE);
 		}
 	}
 }
@@ -689,7 +712,7 @@ static void LineFeed(BYTE b, BOOL logFlag)
 	/* for auto print mode */
 	if ((AutoPrintMode) &&
 		(b>=LF) && (b<=FF))
-		BuffDumpCurrentLine(b);
+		BuffDumpCurrentLine(PrintFile_, b);
 
 	if (!ts.EnableContinuedLineCopy || logFlag)
 		if (NeedsOutputBufs()) OutputLogByte(LF);
@@ -792,7 +815,7 @@ static void PutChar(BYTE b)
 	LastPutCharacter = b;
 
 	if (PrinterMode) { // printer mode
-		WriteToPrnFile(b,TRUE);
+		WriteToPrnFile(PrintFile_, b,TRUE);
 		return;
 	}
 
@@ -905,7 +928,7 @@ static void PutDecSp(BYTE b)
 	CharAttrTmp = CharAttr;
 
 	if (PrinterMode) { // printer mode
-		WriteToPrnFile(b, TRUE);
+		WriteToPrnFile(PrintFile_, b, TRUE);
 		return;
 	}
 
@@ -958,8 +981,8 @@ static void PutKanji(BYTE b)
 	Kanji = Kanji + b;
 
 	if (PrinterMode && DirectPrn) {
-		WriteToPrnFile(HIBYTE(Kanji),FALSE);
-		WriteToPrnFile(LOBYTE(Kanji),TRUE);
+		WriteToPrnFile(PrintFile_, HIBYTE(Kanji),FALSE);
+		WriteToPrnFile(PrintFile_, LOBYTE(Kanji),TRUE);
 		return;
 	}
 
@@ -967,8 +990,8 @@ static void PutKanji(BYTE b)
 		Kanji = JIS2SJIS((WORD)(Kanji & 0x7f7f));
 
 	if (PrinterMode) { // printer mode
-		WriteToPrnFile(HIBYTE(Kanji),FALSE);
-		WriteToPrnFile(LOBYTE(Kanji),TRUE);
+		WriteToPrnFile(PrintFile_, HIBYTE(Kanji),FALSE);
+		WriteToPrnFile(PrintFile_, LOBYTE(Kanji),TRUE);
 		return;
 	}
 
@@ -1169,7 +1192,7 @@ static void PrnParseControl(BYTE b) // printer mode
 		ICount = 0;
 		JustAfterESC = TRUE;
 		ParseMode = ModeESC;
-		WriteToPrnFile(0, TRUE); // flush prn buff
+		WriteToPrnFile(PrintFile_, 0, TRUE); // flush prn buff
 		return;
 	case CSI:
 		if (! Accept8BitCtrl) {
@@ -1179,12 +1202,12 @@ static void PrnParseControl(BYTE b) // printer mode
 		ClearParams();
 		FirstPrm = TRUE;
 		ParseMode = ModeCSI;
-		WriteToPrnFile(0, TRUE); // flush prn buff
-		WriteToPrnFile(b, FALSE);
+		WriteToPrnFile(PrintFile_, 0, TRUE); // flush prn buff
+		WriteToPrnFile(PrintFile_, b, FALSE);
 		return;
 	}
 	/* send the uninterpreted character to printer */
-	WriteToPrnFile(b, TRUE);
+	WriteToPrnFile(PrintFile_, b, TRUE);
 }
 
 static void ParseControl(BYTE b)
@@ -1603,8 +1626,8 @@ void PrnParseEscape(BYTE b) // printer mode
 		case '[': /* CSI */
 			ClearParams();
 			FirstPrm = TRUE;
-			WriteToPrnFile(ESC,FALSE);
-			WriteToPrnFile('[',FALSE);
+			WriteToPrnFile(PrintFile_, ESC,FALSE);
+			WriteToPrnFile(PrintFile_, '[',FALSE);
 			ParseMode = ModeCSI;
 			return;
 		} /* end of case Icount=0 */
@@ -1642,10 +1665,10 @@ void PrnParseEscape(BYTE b) // printer mode
 		break;
 	}
 	// send the uninterpreted sequence to printer
-	WriteToPrnFile(ESC,FALSE);
+	WriteToPrnFile(PrintFile_, ESC,FALSE);
 	for (i=1; i<=ICount; i++)
-		WriteToPrnFile(IntChar[i],FALSE);
-	WriteToPrnFile(b,TRUE);
+		WriteToPrnFile(PrintFile_, IntChar[i],FALSE);
+	WriteToPrnFile(PrintFile_, b,TRUE);
 }
 
 void ParseEscape(BYTE b) /* b is the final char */
@@ -2271,7 +2294,7 @@ void CS_i_Mode()		// MC
 	  case 5:
 		if (ts.TermFlag&TF_PRINTERCTRL) {
 			if (! AutoPrintMode)
-				OpenPrnFile();
+				PrintFile_ = OpenPrnFile();
 			DirectPrn = (ts.PrnDev[0]!=0);
 			PrinterMode = TRUE;
 		}
@@ -3259,21 +3282,28 @@ void CSQ_h_Mode() // DECSET
 	}
 }
 
+static void PrintFileFinish(PrintFile *handle)
+{
+	PrnFinish(handle);
+	PrintFile_ = NULL;
+}
+
 void CSQ_i_Mode()		// DECMC
 {
 	switch (Param[1]) {
 	  case 1:
 		if (ts.TermFlag&TF_PRINTERCTRL) {
-			OpenPrnFile();
-			BuffDumpCurrentLine(LF);
-			if (! AutoPrintMode)
-				ClosePrnFile();
+			PrintFile_ = OpenPrnFile();
+			BuffDumpCurrentLine(PrintFile_, LF);
+			if (! AutoPrintMode) {
+				ClosePrnFile(PrintFile_, PrintFileFinish);
+			}
 		}
 		break;
 	  /* auto print mode off */
 	  case 4:
 		if (AutoPrintMode) {
-			ClosePrnFile();
+			ClosePrnFile(PrintFile_, PrintFileFinish);
 			AutoPrintMode = FALSE;
 		}
 		break;
@@ -3281,7 +3311,7 @@ void CSQ_i_Mode()		// DECMC
 	  case 5:
 		if (ts.TermFlag&TF_PRINTERCTRL) {
 			if (! AutoPrintMode) {
-				OpenPrnFile();
+				PrintFile_ = OpenPrnFile();
 				AutoPrintMode = TRUE;
 			}
 		}
@@ -4183,9 +4213,10 @@ void PrnParseCS(BYTE b) // printer mode
 				if (Param[1]==4) {
 					PrinterMode = FALSE;
 					// clear prn buff
-					WriteToPrnFile(0,FALSE);
-					if (! AutoPrintMode)
-						ClosePrnFile();
+					WriteToPrnFile(PrintFile_, 0,FALSE);
+					if (! AutoPrintMode) {
+						ClosePrnFile(PrintFile_, PrintFileFinish);
+					}
 					return;
 				}
 				break;
@@ -4197,7 +4228,7 @@ void PrnParseCS(BYTE b) // printer mode
 	  case 1: break;
 	} /* of case Icount */
 
-	WriteToPrnFile(b,TRUE);
+	WriteToPrnFile(PrintFile_, b,TRUE);
 }
 
 void ParseCS(BYTE b) /* b is the final char */
@@ -4311,7 +4342,7 @@ void ControlSequence(BYTE b)
 		ParseCS(b); /* terminate char */
 	else {
 		if (PrinterMode)
-			WriteToPrnFile(b,FALSE);
+			WriteToPrnFile(PrintFile_, b,FALSE);
 
 		if ((b>=0x20) && (b<=0x2F)) { /* intermediate char */
 			if (ICount<IntCharMax) ICount++;

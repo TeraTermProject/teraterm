@@ -97,6 +97,7 @@
 #include "setting.h"
 #include "broadcast.h"
 #include "asprintf.h"
+#include "teraprn.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -122,6 +123,7 @@ static int AutoDisconnectedPort = -1;
 #endif
 
 UnicodeDebugParam_t UnicodeDebugParam;
+extern "C" PrintFile *PrintFile_;
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -2914,10 +2916,10 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			}
 			break;
 		case IdPrnStartTimer:
-			PrnFileStart();
+			PrnFileStart(PrintFile_);
 			break;
 		case IdPrnProcTimer:
-			PrnFileDirectProc();
+			PrnFileDirectProc(PrintFile_);
 			break;
 	}
 }

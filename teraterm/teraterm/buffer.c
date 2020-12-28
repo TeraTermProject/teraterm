@@ -2106,7 +2106,7 @@ void BuffPrint(BOOL ScrollRegion)
 //   HFile: file handle
 //   TERM: terminator character
 //	= LF or VT or FF
-void BuffDumpCurrentLine(BYTE TERM)
+void BuffDumpCurrentLine(PrintFile *handle, BYTE TERM)
 {
 	int i, j;
 	buff_char_t *b = &CodeBuffW[LinePtr];
@@ -2127,12 +2127,12 @@ void BuffDumpCurrentLine(BYTE TERM)
 	}
 	p = bufA;
 	for (j=0; j<i; j++) {
-		WriteToPrnFile(bufA[j],FALSE);
+		WriteToPrnFile(handle, bufA[j],FALSE);
 	}
-	WriteToPrnFile(0,TRUE);
+	WriteToPrnFile(handle, 0,TRUE);
 	if ((TERM>=LF) && (TERM<=FF)) {
-		WriteToPrnFile(0x0d,FALSE);
-		WriteToPrnFile(TERM,TRUE);
+		WriteToPrnFile(handle, 0x0d,FALSE);
+		WriteToPrnFile(handle, TERM,TRUE);
 	}
 }
 

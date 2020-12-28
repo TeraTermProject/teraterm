@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "teraprnfile.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -100,7 +102,7 @@ void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr att
 void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask);
 wchar_t *BuffCBCopyUnicode(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);
-void BuffDumpCurrentLine(BYTE TERM);
+void BuffDumpCurrentLine(PrintFile *handle, BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
 void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert);
 int BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);

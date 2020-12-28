@@ -32,12 +32,15 @@
 #include "tttypes.h"
 #include <commdlg.h>
 #include <stdio.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
 
 #include "ttwinman.h"
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "codeconv.h"
 #include "vtdisp.h"
 
 #include "tt_res.h"
@@ -62,12 +65,6 @@ static TCharAttr PrnAttr;
 
 static BOOL Printing = FALSE;
 static BOOL PrintAbortFlag = FALSE;
-
-/* pass-thru printing */
-static wchar_t PrnFName[MAX_PATH];
-static HANDLE HPrnFile = INVALID_HANDLE_VALUE;
-static char PrnBuff[TermWidthMax];
-static int PrnBuffCount = 0;
 
 static CPrnAbortDlg *PrnAbortDlg;
 static HWND HPrnAbortDlg;
@@ -433,64 +430,94 @@ void VTPrintEnd()
 	return;
 }
 
+/* pass-thru printing */
+typedef struct PrintFileTag {
+	wchar_t *PrnFName;
+	HANDLE HPrnFile;
+	unsigned int PrnBuff[TermWidthMax*2];
+	int PrnBuffCount;
+	void (*FinishCallback)(PrintFile *handle);
+} PrintFile;
+
 /* printer emulation routines */
-void OpenPrnFile()
+PrintFile *OpenPrnFile(void)
 {
+	PrintFile *p = (PrintFile *)calloc(sizeof(PrintFile),1 );
+	if (p == NULL) {
+		return NULL;
+	}
+
 	KillTimer(HVTWin, IdPrnStartTimer);
-	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		return;
+
+	wchar_t TempPath[MAX_PATH];
+	GetTempPathW(_countof(TempPath), TempPath);
+	wchar_t Temp[MAX_PATH];
+	if (GetTempFileNameW(TempPath, L"tmp", 0, Temp) == 0) {
+		free(p);
+		return NULL;
 	}
-	if (PrnFName[0] == 0) {
-		wchar_t Temp[MAX_PATH];
-		GetTempPathW(_countof(Temp), Temp);
-		if (GetTempFileNameW(Temp, L"tmp", 0, PrnFName) == 0) {
-			return;
-		}
-		HPrnFile =
-			CreateFileW(PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	p->PrnFName = _wcsdup(Temp);
+
+	HANDLE h = CreateFileW(p->PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (h == INVALID_HANDLE_VALUE) {
+		free(p);
+		return NULL;
 	}
-	else {
-		HPrnFile =
-			CreateFileW(PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (HPrnFile == INVALID_HANDLE_VALUE) {
-			HPrnFile = CreateFileW(PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
-								   FILE_ATTRIBUTE_NORMAL, NULL);
-		}
-	}
-	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		SetFilePointer(HPrnFile, 0, NULL, FILE_END);
-	}
+	SetFilePointer(h, 0, NULL, FILE_END);
+	p->HPrnFile = h;
+
+	return p;
 }
 
-static void PrintFile(void)
+static void DeletePrintFile(PrintFile *handle)
 {
-	char Buff[256];
-	BOOL CRFlag = FALSE;
-	int c, i;
-	BYTE b;
+	if (handle->PrnFName == NULL) {
+		return;
+	}
+	DeleteFileW(handle->PrnFName);
+	free(handle->PrnFName);
+	handle->PrnFName = NULL;
+}
 
+void PrnFinish(PrintFile *handle)
+{
+	DeletePrintFile(handle);
+	free(handle);
+}
+
+/**
+ *	印字用に保存していたファイルから印字する
+ */
+static void PrintFile_(PrintFile *handle)
+{
 	if (VTPrintInit(IdPrnFile)==IdPrnFile) {
-		HPrnFile = CreateFileW(PrnFName,
-							   GENERIC_READ, FILE_SHARE_READ, NULL,
-							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		HANDLE HPrnFile = CreateFileW(handle->PrnFName,
+									  GENERIC_READ, FILE_SHARE_READ, NULL,
+									  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		if (HPrnFile != INVALID_HANDLE_VALUE) {
+			char BuffA[TermWidthMax];
+			size_t len_a;
+			wchar_t BuffW[TermWidthMax];
+			size_t len_w;
+			BOOL CRFlag = FALSE;
+			int c;
+			unsigned int u32;
 			do {
-				i = 0;
+				len_a = 0;
+				len_w = 0;
 				do {
 					DWORD NumberOfBytesRead;
-					BOOL r = ReadFile(HPrnFile, &b, 1, &NumberOfBytesRead, NULL);
-					c = 0;
-					if (r) {
-						c = NumberOfBytesRead;
+					BOOL r = ReadFile(HPrnFile, &u32, sizeof(u32), &NumberOfBytesRead, NULL);
+					if (r == TRUE && NumberOfBytesRead != 0) {
+						// 印字継続
+						c = 1;
+					}
+					else {
+						c = 0;
 					}
 					if (c == 1) {
-						switch (b) {
-							case HT:
-								memset(&(Buff[i]),0x20,8);
-								i = i + 8;
-								CRFlag = FALSE;
-								break;
+						switch (u32) {
 							case LF:
 								CRFlag = ! CRFlag;
 								break;
@@ -498,50 +525,59 @@ static void PrintFile(void)
 							case CR:
 								CRFlag = TRUE;
 								break;
+#if 0
+							case HT:
+								memset(&(Buff[i]),0x20,8);
+								i = i + 8;
+								CRFlag = FALSE;
+								break;
+#endif
 							default:
-								if (b >= 0x20) {
-									Buff[i] = b;
-									i++;
+								if (u32 >= 0x20) {
+									int codepage = CP_ACP;	// 印刷用コードページ
+									size_t out_len = UTF32ToUTF16(u32, &BuffW[len_w], _countof(BuffW) - len_w);
+									len_w += out_len;
+									out_len = UTF32ToMBCP(u32, codepage, &BuffA[len_a], _countof(BuffA) - len_a);
+									len_a += out_len;
 								}
 								CRFlag = FALSE;
 								break;
 						}
 					}
-					if (i>=(sizeof(Buff)-7)) {
+					if (len_w >= (_countof(BuffW)-7)) {
 						CRFlag=TRUE;
 					}
 				} while ((c>0) && (! CRFlag));
-				if (i>0) {
-					PrnOutText(Buff, i, NULL);
+				if (len_a >0) {
+					PrnOutText(BuffA, len_a, NULL);
+					//PrnOutTextW(BuffW, NULL, len_w, NULL);
 				}
 				if (CRFlag) {
 					PrnX = Margin.left;
-					if ((b==FF) && (ts.PrnConvFF==0)) { // new page
+					if ((u32==FF) && (ts.PrnConvFF==0)) { // new page
 						PrnY = Margin.bottom;
 					}
 					else { // new line
 						PrnY = PrnY + PrnFH;
 					}
 				}
-				CRFlag = (b==CR);
+				CRFlag = (u32==CR);
 			} while (c>0);
 			CloseHandle(HPrnFile);
 		}
 		HPrnFile = INVALID_HANDLE_VALUE;
 		VTPrintEnd();
 	}
-	DeleteFileW(PrnFName);
-	PrnFName[0] = 0;
+	handle->FinishCallback(handle);
 }
 
-static void PrintFileDirect(void)
+static void PrintFileDirect(PrintFile *handle)
 {
 	HWND hParent;
 
 	PrnAbortDlg = new CPrnAbortDlg();
 	if (PrnAbortDlg==NULL) {
-		DeleteFileW(PrnFName);
-		PrnFName[0] = 0;
+		DeletePrintFile(handle);
 		return;
 	}
 	if (ActiveWin==IdVT) {
@@ -553,18 +589,17 @@ static void PrintFileDirect(void)
 	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
-	HPrnFile = CreateFileW(PrnFName,
-						   GENERIC_READ, FILE_SHARE_READ, NULL,
-						   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	PrintAbortFlag = (HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);
-	PrnBuffCount = 0;
+	handle->HPrnFile = CreateFileW(handle->PrnFName,
+								   GENERIC_READ, FILE_SHARE_READ, NULL,
+								   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	PrintAbortFlag = (handle->HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);
+	handle->PrnBuffCount = 0;
 	SetTimer(HVTWin,IdPrnProcTimer,0,NULL);
 }
 
-void PrnFileDirectProc()
+void PrnFileDirectProc(PrintFile *handle)
 {
-	int c;
-
+	HANDLE HPrnFile = handle->HPrnFile;
 	if (HPrnFile==INVALID_HANDLE_VALUE) {
 		return;
 	}
@@ -574,90 +609,108 @@ void PrnFileDirectProc()
 		PrnCancel();
 	}
 	if (!PrintAbortFlag && (HPrnFile != INVALID_HANDLE_VALUE)) {
+		int c;
 		do {
-			if (PrnBuffCount==0) {
-				PrnBuffCount = 0;
+			if (handle->PrnBuffCount==0) {
+				handle->PrnBuffCount = 0;
 				DWORD NumberOfBytesRead;
-				BOOL r = ReadFile(HPrnFile, PrnBuff, 1, &NumberOfBytesRead, NULL);
+				BOOL r = ReadFile(HPrnFile, handle->PrnBuff, sizeof(handle->PrnBuff[0]), &NumberOfBytesRead, NULL);
 				if (r) {
-					PrnBuffCount = NumberOfBytesRead;
-				}
-				if (ts.Language==IdRussian) {
-					RussConvStr(ts.RussClient,ts.RussPrint,PrnBuff,PrnBuffCount);
+					handle->PrnBuffCount = NumberOfBytesRead;
 				}
 			}
 
-			if (PrnBuffCount==1) {
-				c = PrnWrite(PrnBuff,1);
+			if (handle->PrnBuffCount != 0) {
+				// UTF-32
+				unsigned int u32 = handle->PrnBuff[0];
+				int codepage = CP_ACP;	// 印刷用コードページ
+				char str[5];
+				size_t out_len = UTF32ToMBCP(u32, codepage, str, _countof(str));
+				c = PrnWrite(str, out_len);
 				if (c==0) {
 					SetTimer(HVTWin,IdPrnProcTimer,10,NULL);
 					return;
 				}
-				PrnBuffCount = 0;
+				handle->PrnBuffCount = 0;
 			}
 			else {
 				c = 0;
 			}
 		} while (c>0);
 	}
-	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(HPrnFile);
-	}
-	HPrnFile = INVALID_HANDLE_VALUE;
 	PrnClose();
-	DeleteFileW(PrnFName);
-	PrnFName[0] = 0;
+
 	if (PrnAbortDlg!=NULL) {
 		PrnAbortDlg->DestroyWindow();
 		PrnAbortDlg = NULL;
 		HPrnAbortDlg = NULL;
 	}
+
+	handle->FinishCallback(handle);
 }
 
-void PrnFileStart()
+/**
+ * タイマー時間が経過、印字を開始する
+ *		ClosePrnFile() の SetTimer(IdPrnStartTimer) がトリガ
+ */
+void PrnFileStart(PrintFile *handle)
 {
-	if (HPrnFile != INVALID_HANDLE_VALUE) {
+	if (handle->HPrnFile != INVALID_HANDLE_VALUE) {
 		return;
 	}
-	if (PrnFName[0]==0) {
+	if (handle->PrnFName == NULL) {
 		return;
 	}
 	if (ts.PrnDev[0]!=0) {
-		PrintFileDirect(); // send file directry to printer port
+		PrintFileDirect(handle); // send file directry to printer port
 	}
 	else { // print file by using Windows API
-		PrintFile();
+		PrintFile_(handle);
 	}
 }
 
-void ClosePrnFile()
+/**
+ * プリント用ファイルの書き込みを終了
+ * プリントを開始タイマーをセットする
+ */
+void ClosePrnFile(PrintFile *handle, void (*finish_callback)(PrintFile *handle))
 {
-	PrnBuffCount = 0;
-	if (HPrnFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(HPrnFile);
+	PrintFile *p = handle;
+	p->PrnBuffCount = 0;
+	p->FinishCallback = finish_callback;
+	if (p->HPrnFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(p->HPrnFile);
+		p->HPrnFile = INVALID_HANDLE_VALUE;
 	}
-	HPrnFile = INVALID_HANDLE_VALUE;
 	SetTimer(HVTWin,IdPrnStartTimer,ts.PassThruDelay*1000,NULL);
 }
 
-void WriteToPrnFile(BYTE b, BOOL Write)
-//  (b,Write) =
-//    (0,FALSE): clear buffer
-//    (0,TRUE):  write buffer to file
-//    (b,FALSE): put b in buff
-//    (b,TRUE):  put b in buff and
-//		 write buffer to file
+/**
+ *  (b,Write) =
+ *    (0,FALSE): clear buffer
+ *    (0,TRUE):  write buffer to file
+ *    (b,FALSE): put b in buff
+ *    (b,TRUE):  put b in buff and
+ *		 write buffer to file
+ */
+void WriteToPrnFileUTF32(PrintFile *handle, unsigned int u32, BOOL Write)
 {
-	if ((b>0) && (PrnBuffCount<sizeof(PrnBuff))) {
-		PrnBuff[PrnBuffCount++] = b;
+	PrintFile *p = handle;
+	if ((u32 > 0) && p->PrnBuffCount < _countof(p->PrnBuff)) {
+		p->PrnBuff[p->PrnBuffCount++] = u32;
 	}
 
 	if (Write) {
 		DWORD NumberOfBytesWritten;
-		WriteFile(HPrnFile, PrnBuff, PrnBuffCount, &NumberOfBytesWritten, NULL);
-		PrnBuffCount = 0;
+		WriteFile(p->HPrnFile, p->PrnBuff, sizeof(p->PrnBuff[0]) * p->PrnBuffCount, &NumberOfBytesWritten, NULL);
+		p->PrnBuffCount = 0;
 	}
-	if ((b==0) && ! Write) {
-		PrnBuffCount = 0;
+	if ((u32 == 0) && !Write) {
+		p->PrnBuffCount = 0;
 	}
+}
+
+void WriteToPrnFile(PrintFile *handle, BYTE b, BOOL Write)
+{
+	WriteToPrnFileUTF32(handle, b, Write);
 }
