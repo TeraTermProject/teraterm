@@ -32,7 +32,6 @@
 #include "tttypes.h"
 #include <stdio.h>
 #include <string.h>
-#include <mbstring.h>
 #include <locale.h>
 #include <ctype.h>
 #if !defined(_CRTDBG_MAP_ALLOC)

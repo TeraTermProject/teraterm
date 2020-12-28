@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <mbstring.h>
 #include <time.h>
 #include <errno.h>
 #include "tt-version.h"
@@ -1481,7 +1480,7 @@ WORD TTLFileLock()
 	return Err;
 }
 
-// Format: fileunlock <file handle> 
+// Format: fileunlock <file handle>
 // (2012.4.19 yutaka)
 WORD TTLFileUnLock()
 {
@@ -2340,7 +2339,7 @@ WORD TTLGetIPv4Addr()
 	if (WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, info, sizeof(info), &socknum, NULL, NULL) != SOCKET_ERROR) {
 		n = socknum / sizeof(info[0]);
 		for (i = 0 ; i < n ; i++) {
-			if ((info[i].iiFlags & IFF_UP) == 0) 
+			if ((info[i].iiFlags & IFF_UP) == 0)
 				continue;
 			if ((info[i].iiFlags & IFF_LOOPBACK) != 0)
 				continue;
@@ -2471,7 +2470,7 @@ WORD TTLSetPassword()
 	if (Err!=0) return Err;
 
 	// 文字列が空の場合はエラーとする。
-	if (FileNameStr[0]==0 || 
+	if (FileNameStr[0]==0 ||
 	    KeyStr[0]==0 ||
 	    VarStr[0]==0)   // "getpassword"同様、空パスワードも許可しない。
 		Err = ErrSyntax;
@@ -2482,7 +2481,7 @@ WORD TTLSetPassword()
 	// パスワードを暗号化する。
 	Encrypt(VarStr, Temp);
 
-	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0) 
+	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0)
 		result = 1;  /* success */
 
 	SetResult(result);  // 成功可否を設定する。
@@ -2495,7 +2494,7 @@ WORD TTLIsPassword()
 	TStrVal FileNameStr, KeyStr;
 	char Temp[512];
 	WORD Err;
-	int result = 0; 
+	int result = 0;
 
 	Err = 0;
 	GetStrVal(FileNameStr, &Err);   // ファイル名
@@ -2505,7 +2504,7 @@ WORD TTLIsPassword()
 	if (Err!=0) return Err;
 
 	// 文字列が空の場合はエラーとする。
-	if (FileNameStr[0]==0 || 
+	if (FileNameStr[0]==0 ||
 	    KeyStr[0]==0)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2516,9 +2515,9 @@ WORD TTLIsPassword()
 	GetPrivateProfileString("Password", KeyStr,"",
 	                        Temp, sizeof(Temp), FileNameStr);
 	if (Temp[0] == 0) { // password not exist
-		result = 0; 
+		result = 0;
 	} else {
-		result = 1; 
+		result = 1;
 	}
 
 	SetResult(result);  // 成功可否を設定する。
@@ -2561,7 +2560,7 @@ WORD TTLGetTime(WORD mode)
 	const char *format;
 	BOOL set_result;
 	const char *tz = NULL;
-	char tz_copy[128]; 
+	char tz_copy[128];
 
 	// Save timezone
 	tz = getenv("TZ");
@@ -2897,7 +2896,7 @@ WORD TTLInt2Str()
 // logrotate rotate num
 // logrotate halt
 //
-WORD TTLLogRotate() 
+WORD TTLLogRotate()
 {
 	WORD Err;
 	char Str[MaxStrLen];
@@ -2953,7 +2952,7 @@ WORD TTLLogRotate()
 	} else if (strcmp(Str, "halt") == 0) {
 		Err = 0;
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", Str);
-	} 
+	}
 	if (Err!=0) return Err;
 
 	SetFile(buf);
@@ -2962,7 +2961,7 @@ WORD TTLLogRotate()
 	return Err;
 }
 
-WORD TTLLogInfo() 
+WORD TTLLogInfo()
 {
 	WORD Err;
 	TVarId VarId;
@@ -3233,7 +3232,7 @@ WORD TTLMilliPause()
 
 // add 'random' command
 // SYNOPSIS: random <intvar> <value>
-// DESCRIPTION: 
+// DESCRIPTION:
 // This command generates the random value from 0 to <value> and
 // stores the value to <intvar>.
 // (2006.2.11 yutaka)
@@ -3747,7 +3746,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 					}
 					strncat_s(buff, bufflen, tmp, _TRUNCATE);
 					break;
-				case TypString: 
+				case TypString:
 					AddBroadcastString(buff, bufflen, StrVarPtr((TVarId)Val));
 					break;
 				default:
@@ -4536,7 +4535,7 @@ WORD TTLStrMatch()
 
 	ret = FindRegexStringOne(Str2, strlen(Str2), Str1, strlen(Str1));
 	if (ret > 0) { // matched
-		result = ret; 
+		result = ret;
 	} else {
 		result = 0;
 	}
@@ -4651,7 +4650,7 @@ static void remove_string(char *str, int index, int len)
 			 <-->len
 	   XXXXXX****YYY
 	        ^index(np)
-			     ^np+len 
+			     ^np+len
 				 <-->srclen - len - index
 		    ↓
 	   XXXXXXYYY
@@ -4833,16 +4832,16 @@ WORD TTLStrTrim()
 
 	// 文字列の先頭から検索する
 	for (i = 0 ; i < srclen ; i++) {
-		if (table[srcptr[i]] == 0) 
+		if (table[srcptr[i]] == 0)
 			break;
 	}
 	// 削除されない有効な文字列の始まり。
 	// すべて削除対象となる場合は、start == srclen 。
-	start = i;  
+	start = i;
 
 	// 文字列の末尾から検索する
 	for (i = srclen - 1 ; i >= 0 ; i--) {
-		if (table[srcptr[i]] == 0) 
+		if (table[srcptr[i]] == 0)
 			break;
 	}
 	// 削除されない有効な文字列の終わり。
@@ -4917,7 +4916,7 @@ WORD TTLStrSplit()
 		tok[i] = strtok_s(NULL, delimchars, &last);
 		if (tok[i] == NULL)
 			break;
-	} 
+	}
 #else
 	/* strtokを使うと、連続した区切りが1つに丸められるため、自前でポインタを
 	 * たどる。ただし、区切り文字は1つのみとする。
@@ -4928,7 +4927,7 @@ WORD TTLStrSplit()
 		if (i >= maxvar)
 			goto end;
 	}
-	
+
 	for (p = strtok_s(p, delimchars, &last); p != NULL ; p = strtok_s(NULL, delimchars, &last) ) {
 		tok[i++] = p;
 		if (i >= maxvar)
@@ -5225,7 +5224,7 @@ WORD TTLWait4all(BOOL Ln)
 
 // 'waitregex'(wait regular expression): wait command with regular expression
 //
-// This command has almost same function of 'wait' command. Additionally 'waitregex' can search 
+// This command has almost same function of 'wait' command. Additionally 'waitregex' can search
 // the keyword with regular expression. Tera Term uses a regex library that is called 'Oniguruma'.
 // cf. http://www.geocities.jp/kosako3/oniguruma/
 //
@@ -5474,7 +5473,7 @@ WORD TTLYmodemSend()
 	return SendCmnd(CmdYmodemSend,IdTTLWaitCmndResult);
 }
 
-// SYNOPSIS: 
+// SYNOPSIS:
 //   scpsend "c:\usr\sample.chm" "doc/sample.chm"
 //   scpsend "c:\usr\sample.chm"
 WORD TTLScpSend()
@@ -5506,7 +5505,7 @@ WORD TTLScpSend()
 	return SendCmnd(CmdScpSend, 0);
 }
 
-// SYNOPSIS: 
+// SYNOPSIS:
 //   scprecv "foo.txt"
 //   scprecv "src/foo.txt" "c:\foo.txt"
 WORD TTLScpRecv()
@@ -5633,7 +5632,7 @@ int ExecCmnd()
 		return Err;
 	}
 
-	if (Result) 
+	if (Result)
 		switch (WId) {
 		case RsvBasename:
 			Err = TTLBasename(); break;
@@ -6091,7 +6090,7 @@ int ExecCmnd()
 						else
 							E = NewStrVar(Cmnd,StrVarPtr((TVarId)Val));
 						break;
-					default: 
+					default:
 						E = FALSE;
 					}
 					if (! E) Err = ErrTooManyVar;

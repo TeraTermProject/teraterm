@@ -29,7 +29,6 @@
 
 // TTCMN.DLL character code conversion
 
-#include <mbstring.h>
 #include <locale.h>
 #include "teraterm.h"
 #include "tttypes.h"
@@ -426,7 +425,7 @@ static const BYTE cpconv[4][4][128] =
 
 static int RussIdToIndex(int id)
 {
-	return 
+	return
 		id == IdWindows ? 0:
 		id == IdKOI8 ? 1:
 		id == Id866 ? 2:
