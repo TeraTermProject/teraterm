@@ -2299,8 +2299,13 @@ static BOOL mark_url_w_sub(int sx_s, int sx_e, int sy_s, int sy_e, int *sx_match
 	return TRUE;
 }
 
-// cur_x	カーソル位置
-// cur_y	カーソル位置(!バッファ位置)
+/**
+ *	カーソル位置の文字列をURL強調する
+ *	この関数がコールされたとき、カーソル位置の1つ前はURL強調されている
+ *
+ *	@param cur_x	カーソル位置
+ *	@param cur_y	カーソル位置(!バッファ位置)
+ */
 static void mark_url_line_w(int cur_x, int cur_y)
 {
 	int sx;
@@ -2310,22 +2315,22 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	LONG TmpPtr;
 	const buff_char_t *b;
 
-	// 行頭を探す
-	sx = 0;
-	sy = cur_y;
-	TmpPtr = GetLinePtr(PageStart + sy);
-	while ((CodeBuffW[TmpPtr].attr & AttrLineContinued) != 0) {
-		if (sy == 0) {
+	// URL強調の先頭を探す
+	TmpPtr = GetLinePtr(PageStart + cur_y) + cur_x - 1;
+	while ((CodeBuffW[TmpPtr].attr & AttrURL) != 0) {
+		if (TmpPtr == 0) {
 			break;
 		}
-		sy--;
-		sx = 0;
-		TmpPtr = PrevLinePtr(TmpPtr);
+		TmpPtr--;
 	}
+	TmpPtr++;
+	GetPosFromPtr(&CodeBuffW[TmpPtr], &sx, &sy);
+	sy = sy - PageStart;
+
 	// 行末を探す
 	ex = NumOfColumns - 1;
 	ey = cur_y;
-	if (cur_y < NumOfLines - 1) {
+	if (cur_y <= NumOfLines - 1) {
 		TmpPtr = GetLinePtr(PageStart + ey);
 		while ((CodeBuffW[TmpPtr + NumOfColumns - 1].attr & AttrLineContinued) != 0) {
 			ey++;
@@ -2371,7 +2376,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		int sy_match_s, sy_match_e;
 		BOOL match;
 
-		if (sx_i >= ex && sy_i >= ey) {
+		if ((sy_i > ey) || (sy_i == ey && sx_i >= ex)) {
 			break;
 		}
 
