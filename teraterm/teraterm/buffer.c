@@ -2356,7 +2356,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 			if (y == sy) {
 				sx_i = sx;
 			}
-			else if (y == ey) {
+			if (y == ey) {
 				ex_i = ex;
 			}
 			TmpPtr = GetLinePtr(PageStart + y);
