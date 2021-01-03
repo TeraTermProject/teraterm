@@ -38,10 +38,10 @@ sub read_mapfile {
 	open(FP, $file) || die "error"; 
 	while ($line = <FP>) {
 #		print "$line\n";
-		if ($line =~ m|<P>0x(....)</P>|) {
+		if ($line =~ m|<P>0x(....)</p>|) {
 			$illegal = hex($1);
 		}
-		if ($line =~ m|<P>0x(....) 0x(....)</P>|) {
+		if ($line =~ m|<P>0x(....) 0x(....)</p>|) {
 			$first = hex($1);
 			$second = hex($2);
 

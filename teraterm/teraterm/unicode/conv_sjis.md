@@ -13,3 +13,10 @@
   - ftp://ftp.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/SHIFTJIS.TXT
 - 作成当時
   - SHIFTJIS_TXT.htm
+
+## 使い方
+
+```
+wget ftp://ftp.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/SHIFTJIS.TXT
+perl conv_sjis.pl > uni2sjis.map
+```

@@ -18,3 +18,11 @@
     - UNICODE DECOMPOSITION TABLE.htm
   - 移動
     - http://developer.apple.com/technotes/tn/tn1150table.html
+
+## 使い方
+
+```
+wget https://developer.apple.com/library/archive/technotes/tn/tn1150table.html
+mv tn1150table.html "UNICODE DECOMPOSITION TABLE.htm"
+perl conv_combining.pl > uni_combining.map
+```
