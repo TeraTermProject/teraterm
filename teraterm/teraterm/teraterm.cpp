@@ -52,7 +52,6 @@
 #include "keyboard.h"
 #include "dllutil.h"
 #include "compat_win.h"
-#include "compat_w95.h"
 #include "dlglib.h"
 #include "teraterml.h"
 #include "sendmem.h"

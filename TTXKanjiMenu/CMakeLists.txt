@@ -1,40 +1,46 @@
-﻿project(ttxkanjimenu)
+﻿set(PACKAGE_NAME "ttxkanjimenu")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
-set(SRC
+add_library(
+  ${PACKAGE_NAME} SHARED
   resource.h
   ttxkanjimenu.c
   ttxkanjimenu.rc
   )
 
-include_directories(
-  ../teraterm/teraterm
-  ../teraterm/common
-  ../libs/openssl/inc32
-  .
-  )
-
-add_library(
-  ttxkanjimenu SHARED
-  ${SRC}
-  )
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif()
 
 set_target_properties(
-  ttxkanjimenu
+  ${PACKAGE_NAME}
   PROPERTIES
   PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+  )
+
+target_include_directories(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../teraterm/teraterm
+  ../teraterm/common
   )
 
 target_link_libraries(
-  ttxkanjimenu
+  ${PACKAGE_NAME}
+  PRIVATE
   ttpcmn
-  #
-  ws2_32
   )
 
 install(
-  TARGETS ttxkanjimenu
+  TARGETS ${PACKAGE_NAME}
   RUNTIME
   DESTINATION .
   )

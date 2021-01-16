@@ -1,10 +1,38 @@
-﻿project(ttproxy)
+﻿set(PACKAGE_NAME "ttproxy")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
 
-set(COMMON_SRC
+add_library(
+  ${PACKAGE_NAME} SHARED
+  Hooker.h
+  Logger.h
+  ProxyWSockHook.h
+  resource.h
+  SSLLIB.h
+  SSLSocket.h
+  StdAfx.cpp
+  StdAfx.h
+  TTProxy.cpp
+  TTProxy.h
+  TTProxy.rc
+  TTX.def
+  )
+
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../teraterm/common/ttlib.h
   ../teraterm/common/i18n.h
   ../teraterm/common/ttplugin.h
@@ -17,13 +45,15 @@ set(COMMON_SRC
   ../teraterm/teraterm/ttsetup.h
   ../teraterm/teraterm/ttwsk.h
   )
+
 source_group(
   "common"
-  FILES
-  ${COMMON_SRC}
-  )
+  REGULAR_EXPRESSION
+  "teraterm\/common\/")
 
-set(YCL_SRC
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
   YCL/include/YCL/Array.h
   YCL/include/YCL/ComboBoxCtrl.h
   YCL/include/YCL/common.h
@@ -46,28 +76,22 @@ set(YCL_SRC
   YCL/include/YCL/Vector.h
   YCL/include/YCL/Window.h
   )
+
 source_group(
   "YCL"
-  FILES
-  ${YCL_SRC}
+  REGULAR_EXPRESSION
+  "YCL\/include\/")
+
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
-set(SRC
-  Hooker.h
-  Logger.h
-  ProxyWSockHook.h
-  resource.h
-  SSLLIB.h
-  SSLSocket.h
-  StdAfx.cpp
-  StdAfx.h
-  TTProxy.cpp
-  TTProxy.h
-  TTProxy.rc
-  TTX.def
-  )
-
-include_directories(
+target_include_directories(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../teraterm/teraterm
   ../teraterm/common
   YCL/include
@@ -75,22 +99,8 @@ include_directories(
   .
   )
 
-add_library(
-  ttproxy SHARED
-  ${SRC}
-  ${COMMON_SRC}
-  ${YCL_SRC}
-  )
-
-set_target_properties(
-  ttproxy
-  PROPERTIES
-  PREFIX ""
-  OUTPUT_NAME "TTXProxy"
-  )
-
 target_link_libraries(
-  ttproxy
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -102,7 +112,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS ttproxy
+  TARGETS ${PACKAGE_NAME}
   RUNTIME
   DESTINATION .
   )

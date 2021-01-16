@@ -33,4 +33,3 @@ add_subdirectory(common)
 set_target_properties(
   common_static
   PROPERTIES FOLDER teraterm)
-

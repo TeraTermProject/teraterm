@@ -297,9 +297,6 @@
     <ClInclude Include="vtdisp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\compat_w95.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dnddlg.h">
       <Filter>dialog</Filter>
     </ClInclude>

@@ -9,8 +9,6 @@
 #include <windows.h>
 #include "dlglib.h"
 
-#include "compat_w95.h"
-
 #define ORDER 4000
 #define ID_MENU_VIEWMODE 55200
 #define ID_MENU_SETPASS  55210
@@ -137,7 +135,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
   pvar->SetupMenu = GetSetupMenu(menu);
   pvar->ControlMenu = GetControlMenu(menu);
 
-  InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETPASS, "&ViewMode password"); 
+  InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETPASS, "&ViewMode password");
   if (pvar->enable) flag |= MF_CHECKED;
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag,  ID_MENU_VIEWMODE, "&View mode");
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR,  0, NULL);
@@ -154,7 +152,7 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 
 static LRESULT CALLBACK ViewModeInputPass(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
   char password[50];
-  
+
   switch (msg) {
     case WM_INITDIALOG:
       CenterWindow(dlg, GetParent(dlg));
@@ -300,7 +298,7 @@ BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   return TRUE;
 }
 
-BOOL WINAPI DllMain(HANDLE hInstance, 
+BOOL WINAPI DllMain(HANDLE hInstance,
 		    ULONG ul_reason_for_call,
 		    LPVOID lpReserved)
 {
@@ -313,7 +311,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       hInst = hInstance;
       pvar = &InstVar;
       break;

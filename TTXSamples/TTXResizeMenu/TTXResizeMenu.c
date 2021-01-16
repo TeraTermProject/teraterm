@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "compat_w95.h"
 #include "compat_win.h"
 
 #define ORDER 5900
@@ -352,7 +351,6 @@ BOOL WINAPI DllMain(HANDLE hInstance, ULONG ul_reason, LPVOID lpReserved)
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       hInst = hInstance;
       pvar = &InstVar;
       break;

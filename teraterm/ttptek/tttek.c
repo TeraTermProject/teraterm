@@ -37,10 +37,8 @@
 
 #include "ttcommon.h"
 
-#include "compat_w95.h"
-
 #undef DllExport
-#define DllExport __declspec(dllexport) 
+#define DllExport __declspec(dllexport)
 
 #include "tekesc.h"
 #include "tttek.h"
@@ -176,7 +174,7 @@ void SwitchRubberBand(PTEKVar tk, PTTSet ts, BOOL OnFlag)
   SelectObject(tk->MemDC,OldMemBrush);
   SetROP2(tk->MemDC,OldMemRop);
   SelectObject(tk->MemDC,tk->MemPen);
-  DeleteObject(TempPen);     
+  DeleteObject(TempPen);
 
   tk->RubberBand = OnFlag;
 }
@@ -277,7 +275,7 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   GetTextMetrics(TempDC, &Metrics);
   tk->FW[0] = Metrics.tmAveCharWidth;
   tk->FH[0] = Metrics.tmHeight;
- 
+
   if (! tk->ScaleFont)
   {
     tk->ScreenHeight = tk->FH[0]*35;
@@ -559,13 +557,13 @@ void PASCAL TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
     if (tk->SelectStart.x > tk->SelectEnd.x)
     {
       X = tk->SelectEnd.x;
-      tk->SelectEnd.x = tk->SelectStart.x; 
+      tk->SelectEnd.x = tk->SelectStart.x;
       tk->SelectStart.x = X;
     }
     if (tk->SelectStart.y > tk->SelectEnd.y)
     {
       X = tk->SelectEnd.y;
-      tk->SelectEnd.y = tk->SelectStart.y; 
+      tk->SelectEnd.y = tk->SelectStart.y;
       tk->SelectStart.y = X;
     }
     tk->Select = TRUE;
@@ -681,7 +679,7 @@ void PASCAL TEKCMCopy(PTEKVar tk, PTTSet ts)
   /* copy selected area to clipboard */
   CopyToClipboard(tk, ts, x, y,
     abs(tk->SelectEnd.x - tk->SelectStart.x),
-    abs(tk->SelectEnd.y - tk->SelectStart.y));                          
+    abs(tk->SelectEnd.y - tk->SelectStart.y));
 }
 
 void PASCAL TEKCMCopyScreen(PTEKVar tk, PTTSet ts)
@@ -924,12 +922,12 @@ void PASCAL TEKEnd(PTEKVar tk)
   if (tk->MemBackGround != NULL) DeleteObject(tk->MemBackGround);
 }
 
-BOOL WINAPI DllMain(HANDLE hInstance, 
+BOOL WINAPI DllMain(HANDLE hInstance,
                     ULONG ul_reason_for_call,
 					LPVOID lpReserved)
 {
   hInst = hInstance;
-  switch( ul_reason_for_call ) { 
+  switch( ul_reason_for_call ) {
   case DLL_THREAD_ATTACH:
      /* do thread initialization */
     break;
@@ -938,7 +936,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
     break;
   case DLL_PROCESS_ATTACH:
      /* do process initialization */
-     DoCover_IsDebuggerPresent();
     break;
   case DLL_PROCESS_DETACH:
     /* do process cleanup */

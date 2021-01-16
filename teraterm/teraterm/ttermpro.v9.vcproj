@@ -418,10 +418,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\compat_w95.h"
-				>
-			</File>
-			<File
 				RelativePath=".\filesys.h"
 				>
 			</File>

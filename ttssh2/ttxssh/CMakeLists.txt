@@ -1,6 +1,6 @@
-﻿project(ttxssh)
+﻿set(PACKAGE_NAME "ttxssh")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
@@ -10,11 +10,11 @@ if (MSVC)
 endif()
 
 add_library(
-  ttxssh SHARED
+  ${PACKAGE_NAME} SHARED
   )
 
 target_sources(
-  ttxssh
+  ${PACKAGE_NAME}
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
   ../matcher/matcher.c
@@ -82,7 +82,7 @@ target_sources(
   )
 
 target_sources(
-  ttxssh
+  ${PACKAGE_NAME}
   PRIVATE
   ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
   ../../teraterm/common/ttcommon.h
@@ -103,8 +103,18 @@ source_group(
   REGULAR_EXPRESSION
   "teraterm\/common\/")
 
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
 target_include_directories(
-  ttxssh
+  ${PACKAGE_NAME}
   PRIVATE
   ../../teraterm/teraterm
   ../../teraterm/common
@@ -115,19 +125,28 @@ target_include_directories(
 )
 
 set_target_properties(
-  ttxssh
+  ${PACKAGE_NAME}
   PROPERTIES
   PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_compile_definitions(
-  ttxssh
+  ${PACKAGE_NAME}
   PRIVATE
   $<$<CONFIG:Debug>:_CRTDBG_MAP_ALLOC>
   )
 
+if(MINGW)
+  target_link_options(
+    ttxssh
+    PRIVATE
+    -Wl,-Map=ttxssh.map,-cref
+    )
+endif()
+
 target_link_libraries(
-  ttxssh
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   libputty

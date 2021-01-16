@@ -37,7 +37,6 @@
 #include "ttplugin.h"
 
 #include "codeconv.h"
-#include "compat_w95.h"
 #include "dlglib.h"
 #include "i18n.h"
 #include "layer_for_unicode.h"
@@ -319,7 +318,6 @@ BOOL WINAPI DllMain(HANDLE hInstance, ULONG ul_reason_for_call, LPVOID lpReserve
 			break;
 		case DLL_PROCESS_ATTACH:
 			/* do process initialization */
-			DoCover_IsDebuggerPresent();
 			pvar = &InstVar;
 			pvar->hInst = hInstance;
 			break;

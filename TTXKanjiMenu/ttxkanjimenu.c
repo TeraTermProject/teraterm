@@ -22,8 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "compat_w95.h"
-
 #define IniSection "TTXKanjiMenu"
 #define ORDER 5000
 
@@ -616,7 +614,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			break;
 		case DLL_PROCESS_ATTACH:
 			/* do process initialization */
-			DoCover_IsDebuggerPresent();
 			hInst = hInstance;
 			pvar = &InstVar;
 			break;

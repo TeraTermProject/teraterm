@@ -1,8 +1,30 @@
-﻿project(ttptek)
+﻿set(PACKAGE_NAME "ttptek")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
-set(COMMON_SRC
+add_library(
+  ${PACKAGE_NAME} SHARED
+  tekesc.c
+  tekesc.h
+  ttptek.def
+  ttptek-version.rc
+  tttek.h
+  tttek.c
+  )
+
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../common/tttypes.h
   ../common/i18n.h
   ../common/ttlib.c
@@ -12,39 +34,32 @@ set(COMMON_SRC
 
 source_group(
   "common"
-  FILES
-  ${COMMON_SRC}
+  REGULAR_EXPRESSION
+  "..\/common\/"
   )
 
-set(SRC
-  tekesc.c
-  tekesc.h
-  ttptek.def
-  ttptek-version.rc
-  tttek.h
-  tttek.c
-  ${COMMON_SRC}
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
-include_directories(
+target_include_directories(
+  ${PACKAGE_NAME}
+  PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
-  )
-
-add_library(
-  ttptek SHARED
-  ${SRC}
   )
 
 if(MINGW)
   set_target_properties(
-    ttptek
+    ${PACKAGE_NAME}
     PROPERTIES PREFIX ""
     SUFFIX ".dll"
     )
 endif()
 
 target_link_libraries(
-  ttptek
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -54,7 +69,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS ttptek
+  TARGETS ${PACKAGE_NAME}
   RUNTIME
   DESTINATION .
   )

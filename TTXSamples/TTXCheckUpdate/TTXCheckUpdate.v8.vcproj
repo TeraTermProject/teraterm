@@ -218,6 +218,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\teraterm\common\compat_w95_vs2005.c"
+			>
+		</File>
+		<File
 			RelativePath=".\parse.cpp"
 			>
 		</File>

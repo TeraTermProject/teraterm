@@ -1,6 +1,6 @@
 /* Tera Term extension mechanism
    Robert O'Callahan (roc+tt@cs.cmu.edu)
-   
+
    Tera Term by Takashi Teranishi (teranishi@rikaxp.riken.go.jp)
 */
 
@@ -23,7 +23,7 @@
    Make sure you set the structure alignment option in the project to
    8 bytes (for Win32) or 2 bytes (for Win16), to be compatible with the
    standard Tera Term binary.
-   
+
    You must add the Tera Term "common" directory to your include path
    to find the following 3 include files:
 */
@@ -42,8 +42,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "compat_w95.h"
 
 /* When you build this extension, it should be called TTXTEST.DLL. To try it
    out, copy it into the directory containing Tera Term. Currently, in order
@@ -89,7 +87,7 @@ static TInstVar InstVar;
    and modifying their fields in some of the functions below. You'll have to
    look at the Tera Term source code to see what the fields do and how and
    when they're used.
-   
+
    This is called when Tera Term starts up, so don't do too much work in here
    or you will slow down the startup process even if your extension is not
    going to be used.
@@ -110,10 +108,10 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
    something there for you to use!
 
    For example:
-   
+
    [in TTXOpenTCP]
    ... saved_connect = hooks->Pconnect; hooks->Pconnect = my_connect; ...
-   
+
    [in my_connect]
    ... saved_connect(...); ...
    [don't call the real connect!]
@@ -151,7 +149,7 @@ static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
    a hooked function. When you replace a dialog box, the new dialog box should
    do everything that the original dialog box did, plus any extra controls
    that you want. You'll probably have to copy the code from TTDLG to do this.
-   
+
    If multiple extensions want to replace the same dialog box, the one with
    the highest load order number (see below) wins. For this reason, when
    writing an extension, you should look at the extensions that already exist
@@ -227,7 +225,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
   printf("TTXModifyMenu %d\n", ORDER);
 
   pvar->SetupMenu = GetSubMenu(menu,2);
-  AppendMenu(pvar->SetupMenu,MF_SEPARATOR,0,NULL); 
+  AppendMenu(pvar->SetupMenu,MF_SEPARATOR,0,NULL);
   if (pvar->ts->Debug>0) flag |= MF_CHECKED;
   AppendMenu(pvar->SetupMenu,flag, ID_MENUITEM,"&Debug mode");
 }
@@ -277,7 +275,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
     else {
       pvar->ts->Debug=0;
       CheckMenuItem(pvar->SetupMenu,ID_MENUITEM,MF_BYCOMMAND | MF_UNCHECKED);
-    } 
+    }
     return 1;
   }
   return 0;
@@ -310,10 +308,10 @@ static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
    have put something there for you to use!
 
    For example:
-   
+
    [in TTXOpenFile]
    ... saved_createfile = hooks->PCreateFile; hooks->PCreateFile = my_createfile; ...
-   
+
    [in my_createfile]
    ... saved_createfile(...); ...
    [don't call the real CreateFile!]
@@ -410,7 +408,7 @@ static TTXExports Exports = {
 
    (In a similar way, we can run old extensions with new versions of Tera Term.
    The main program initialises its exports record to zeroes before it calls
-   TTXBind. This means that any data we don't copy in there is NULL, so any 
+   TTXBind. This means that any data we don't copy in there is NULL, so any
    extra functions that have been added since this extension was compiled
    will automatically be NULL and thus get default behaviour.)
 */
@@ -428,7 +426,7 @@ BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   return TRUE;
 }
 
-BOOL WINAPI DllMain(HANDLE hInstance, 
+BOOL WINAPI DllMain(HANDLE hInstance,
 		    ULONG ul_reason_for_call,
 		    LPVOID lpReserved)
 {
@@ -441,7 +439,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       hInst = hInstance;
       pvar = &InstVar;
       break;

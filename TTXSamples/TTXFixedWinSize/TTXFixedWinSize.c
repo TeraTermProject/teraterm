@@ -6,8 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "compat_w95.h"
-
 #define WIDTH 80
 #define HEIGHT 24
 
@@ -119,7 +117,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       hInst = hInstance;
       pvar = &InstVar;
       break;

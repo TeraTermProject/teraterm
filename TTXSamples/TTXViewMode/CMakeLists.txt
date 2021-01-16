@@ -1,45 +1,50 @@
-﻿project(TTXViewMode)
+﻿set(PACKAGE_NAME "TTXViewMode")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
-set(COMMON_SRC
-  ../../teraterm/common/dlglib.h
-  )
-
-source_group(
-  "common"
-  FILES
-  ${COMMON_SRC}
-  )
-
-set(SRC
+add_library(
+  ${PACKAGE_NAME} SHARED
   resource.h
   TTXViewMode.c
   TTXViewMode.h
   TTXViewMode.rc
   ReadMe.txt
   ReadMe-ja.txt
+  ../../teraterm/common/dlglib.h
   )
 
-include_directories(
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
+source_group(
+  "common"
+  REGULAR_EXPRESSION
+  "teraterm\/common\/"
+  )
+
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+  )
+
+target_include_directories(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../../teraterm/teraterm
   ../../teraterm/common
   )
 
-add_library(
-  TTXViewMode SHARED
-  ${SRC}
-  ${COMMON_SRC}
-  )
-
-set_target_properties(
-  TTXViewMode
-  PROPERTIES
-  PREFIX ""
-  )
-
 target_link_libraries(
-  TTXViewMode
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -48,7 +53,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS TTXViewMode
+  TARGETS ${PACKAGE_NAME}
   RUNTIME
   DESTINATION .
   )

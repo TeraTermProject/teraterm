@@ -1,9 +1,10 @@
-﻿project(keycode)
+﻿set(PACKAGE_NAME "keycode")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
+
 
 add_executable(
-  keycode WIN32
+  ${PACKAGE_NAME} WIN32
   keycode.c
   keycode.ico
   keycode-version.rc
@@ -11,26 +12,37 @@ add_executable(
   kc_res.h
   )
 
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+  )
+
 target_include_directories(
-  keycode
+  ${PACKAGE_NAME}
   PRIVATE
   ../common
   )
 
 if(MSVC)
   target_compile_options(
-    keycode
+    ${PACKAGE_NAME}
     PRIVATE
     /W4
     )
 endif()
 
-target_compile_options(
-  keycode
-  PRIVATE
-  )
-
 install(
-  TARGETS keycode
+  TARGETS ${PACKAGE_NAME}
   DESTINATION .
   )

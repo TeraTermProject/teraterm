@@ -35,7 +35,6 @@
 #include <commctrl.h>
 
 #include "teraterm.h"
-#include "compat_w95.h"
 #include "compat_win.h"
 #include "ttmdlg.h"
 #include "tmfc.h"

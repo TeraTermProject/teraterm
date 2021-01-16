@@ -213,7 +213,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\codeconv.h" />
-    <ClInclude Include="..\common\compat_w95.h" />
     <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\layer_for_unicode.h" />

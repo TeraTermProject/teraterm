@@ -37,8 +37,6 @@
 #include "kc_res.h"
 #define ClassName _T("KeyCodeWin32")
 
-#include "compat_w95.h"
-
 // Prototypes
 LRESULT WINAPI MainWndProc( HWND, UINT, WPARAM, LPARAM );
 
@@ -64,7 +62,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	pSetDefDllDir setDefDllDir;
 
 	(void)lpszCmdLine;
-	DoCover_IsDebuggerPresent();
 
 	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		FARPROC func_ptr = GetProcAddress(module, "SetDefaultDllDirectories");

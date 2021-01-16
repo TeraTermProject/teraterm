@@ -1,14 +1,14 @@
-﻿project(teraterm)
+﻿set(PACKAGE_NAME "teraterm")
+
+project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
 set(ENABLE_DEBUG_INFO 1)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
-
 add_executable(
-  teraterm WIN32
+  ${PACKAGE_NAME} WIN32
   addsetting.cpp
   addsetting.h
   broadcast.cpp
@@ -116,7 +116,7 @@ add_executable(
   )
 
 target_sources(
-  teraterm
+  ${PACKAGE_NAME}
   PRIVATE
   ../common/tt_res.h
   ../common/ttcommon.h
@@ -131,7 +131,6 @@ target_sources(
   ../common/dlglib.h
   ../common/win16api.h
   ../common/codemap.h
-  ../common/compat_w95.h
   ../common/compat_win.h
   ../common/tmfc.h
   ../common/i18n.h
@@ -146,7 +145,7 @@ target_sources(
   )
 
 target_sources(
-  teraterm
+  ${PACKAGE_NAME}
   PRIVATE
   ../susie_plugin/libsusieplugin.cpp
   ../susie_plugin/libsusieplugin.h
@@ -165,7 +164,7 @@ source_group(
   )
 
 target_sources(
-  teraterm
+  ${PACKAGE_NAME}
   PRIVATE
   ../ttpdlg/dlg_res.h
   ../ttpdlg/ttdlg.c
@@ -179,7 +178,7 @@ source_group(
   "..\/ttpdlg\/")
 
 target_sources(
-  teraterm
+  ${PACKAGE_NAME}
   PRIVATE
   ../ttpfile/bplus.c
   ../ttpfile/bplus.h
@@ -205,6 +204,16 @@ source_group(
   REGULAR_EXPRESSION
   "..\/ttpfile\/")
 
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
 if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll /MANIFEST:NO")
   if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
@@ -214,13 +223,14 @@ if (MSVC)
 endif()
 
 set_target_properties(
-  teraterm
+  ${PACKAGE_NAME}
   PROPERTIES
   OUTPUT_NAME "ttermpro"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  teraterm
+  ${PACKAGE_NAME}
   PRIVATE
   .
   ../teraterm
@@ -236,7 +246,7 @@ target_include_directories(
 
 if(MINGW)
   target_include_directories(
-    teraterm
+    ${PACKAGE_NAME}
     PRIVATE
     .
     )
@@ -244,23 +254,29 @@ endif()
 
 if(MSVC AND ENABLE_DEBUG_INFO)
   target_compile_options(
-	teraterm
-	PRIVATE
+    ${PACKAGE_NAME}
+    PRIVATE
     $<$<CONFIG:Release>:/Zi>
     )
   if(${CMAKE_VERSION} VERSION_GREATER "3.13")
-	target_link_options(
-	  teraterm
-	  PRIVATE
-	  /DEBUG:FULL
-	  /pdbaltpath:ttermpro.pdb
-	  /map
-	  )
+    target_link_options(
+      ${PACKAGE_NAME}
+      PRIVATE
+      /DEBUG:FULL
+      /pdbaltpath:ttermpro.pdb
+      /map
+      )
   endif()
+elseif(MINGW)
+  target_link_options(
+    ${PACKAGE_NAME}
+    PRIVATE
+    -Wl,-Map=ttermpro.map,-cref
+    )
 endif()
 
 target_link_libraries(
-  teraterm
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -279,7 +295,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS teraterm
+  TARGETS ${PACKAGE_NAME}
   DESTINATION .
   )
 if(MSVC AND ENABLE_DEBUG_INFO AND (${CMAKE_VERSION} VERSION_GREATER "3.13"))

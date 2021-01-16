@@ -50,7 +50,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
-#include "compat_w95.h"
 #include "tt_res.h"
 #include "codeconv.h"
 #include "compat_win.h"
@@ -2857,7 +2856,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			break;
 		case DLL_PROCESS_ATTACH:
 			/* do process initialization */
-			DoCover_IsDebuggerPresent();
 			hInst = hInstance;
 			if (OpenSharedMemory(&FirstInstance) == FALSE) {
 				// dllロード失敗、teratermが起動しない

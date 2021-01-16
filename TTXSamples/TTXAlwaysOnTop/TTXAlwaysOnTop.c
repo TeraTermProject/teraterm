@@ -9,8 +9,6 @@
 #include <string.h>
 #include <windows.h>
 
-#include "compat_w95.h"
-
 #define IniSection "TTXAlwaysOnTop"
 
 #define ORDER 5800
@@ -157,7 +155,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		break;
 	case DLL_PROCESS_ATTACH:
 		/* do process initialization */
-		DoCover_IsDebuggerPresent();
 		hInst = hInstance;
 		pvar = &InstVar;
 		break;

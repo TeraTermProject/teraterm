@@ -12,8 +12,6 @@
 
 #include "gettimeofday.h"
 
-#include "compat_w95.h"
-
 #define ORDER 6001
 #define ID_MENU_REPLAY 55302
 #define ID_MENU_AGAIN  55303
@@ -78,7 +76,7 @@ void RestoreOLDTitle() {
 
 void ChangeTitleStatus() {
   char tbuff[TitleBuffSize];
-  
+
   _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, "Speed: %d, Pause: %s", pvar->speed, pvar->pause ? "ON": "OFF");
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
   pvar->ChangeTitle = TRUE;
@@ -447,7 +445,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			ofn.lpstrDefExt = "tty";
 			// ofn.lpstrTitle = "";
 			ofn.Flags = OFN_FILEMUSTEXIST;
-			
+
 			if (GetOpenFileName(&ofn)) {
 				pvar->ReplaceHostDlg = TRUE;
 				// Call New-Connection dialog
@@ -535,7 +533,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			break;
 		case DLL_PROCESS_ATTACH:
 			/* do process initialization */
-			DoCover_IsDebuggerPresent();
 			hInst = hInstance;
 			pvar = &InstVar;
 			break;

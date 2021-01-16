@@ -1,9 +1,9 @@
-﻿project(TTXCheckUpdate)
+﻿set(PACKAGE_NAME "TTXCheckUpdate")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
 add_library(
-  TTXCheckUpdate SHARED
+  ${PACKAGE_NAME} SHARED
   ttxcheckupdate.c
   parse.h
   parse.cpp
@@ -19,6 +19,16 @@ add_library(
   ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/ttpdlg/svnversion.h
   )
 
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif()
+
 source_group(
   "common"
   REGULAR_EXPRESSION
@@ -30,10 +40,12 @@ source_group(
   REGULAR_EXPRESSION
   "..\/..\/libs\/cJSON\/"
   )
+
 set_target_properties(
-  TTXCheckUpdate
+  ${PACKAGE_NAME}
   PROPERTIES
   PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_compile_definitions(
@@ -52,7 +64,7 @@ if(MSVC_VERSION STRLESS 1600)
 endif()
 
 target_include_directories(
-  TTXCheckUpdate
+  ${PACKAGE_NAME}
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/ttpdlg     # for svnversion.h
   ../../libs/cJSON
@@ -61,7 +73,7 @@ target_include_directories(
 )
 
 target_link_libraries(
-  TTXCheckUpdate
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -70,7 +82,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS TTXCheckUpdate
+  TARGETS ${PACKAGE_NAME}
   RUNTIME
   DESTINATION .
   )

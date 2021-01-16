@@ -10,8 +10,6 @@
 #include "i18n.h"
 #include "dlglib.h"
 
-#include "compat_w95.h"
-
 #define ORDER 4000
 
 #define MINIMUM_INTERVAL 1
@@ -626,7 +624,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		break;
 	  case DLL_PROCESS_ATTACH:
 		/* do process initialization */
-		DoCover_IsDebuggerPresent();
 		hInst = hInstance;
 		pvar = &InstVar;
 		break;

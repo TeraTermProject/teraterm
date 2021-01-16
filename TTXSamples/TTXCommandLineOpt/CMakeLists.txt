@@ -1,32 +1,41 @@
-﻿project(TTXCommandLineOpt)
+﻿set(PACKAGE_NAME "TTXCommandLineOpt")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
-set(SRC
+add_library(
+  ${PACKAGE_NAME} SHARED
   TTXCommandLineOpt.c
   ReadMe.txt
   ReadMe-ja.txt
   )
 
-include_directories(
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif()
+
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+  )
+
+target_include_directories(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../../teraterm/teraterm
   ../../teraterm/common
   )
 
-add_library(
-  TTXCommandLineOpt SHARED
-  ${SRC}
-  )
-
-set_target_properties(
-  TTXCommandLineOpt
-  PROPERTIES
-  PREFIX ""
-  )
-
 target_link_libraries(
-  TTXCommandLineOpt
+  ${PACKAGE_NAME}
+  PRIVATE
   ttpcmn
   )
-
 

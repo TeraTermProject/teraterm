@@ -1,8 +1,36 @@
-﻿project(ttpcmn)
+﻿set(PACKAGE_NAME "ttpcmn")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project(${PACKAGE_NAME})
 
-set(COMMON_SRC
+add_library(
+  ${PACKAGE_NAME}
+  SHARED
+  language.c
+  language.h
+  ttcmn.c
+  ttcmn_notify.cpp
+  comportinfo.cpp
+  comportinfo.h
+  comportinfo.cpp
+  devpkey_teraterm.h
+  ttpcmn-version.rc
+  ttpcmn.def
+  ${COMMON_SRC}
+  )
+
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../common/teraterm.h
   ../common/tttypes.h
   ../common/i18n.h
@@ -21,55 +49,38 @@ set(COMMON_SRC
 
 source_group(
   "common"
-  FILES
-  ${COMMON_SRC}
+  REGULAR_EXPRESSION
+  "..\/common\/"
   )
 
-set(SRC
-  language.c
-  language.h
-  ttcmn.c
-  ttcmn_notify.cpp
-  comportinfo.cpp
-  comportinfo.h
-  comportinfo.cpp
-  devpkey_teraterm.h
-  ttpcmn-version.rc
-  ttpcmn.def
-  ${COMMON_SRC}
-  )
-
-include_directories(
-  ../common
-  ../ttpfile
-  .
-  )
 
 if (MSVC)
   set(CMAKE_SHARED_LINKER_FLAGS
     "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:setupapi.dll /DELAYLOAD:user32.dll")
 endif()
 
-add_library(
-  ttpcmn
-  SHARED
-  ${SRC}
-  )
-
 target_compile_definitions(
   ttpcmn
   PRIVATE -DTTPCMN_DLL
   )
-if(MINGW)
-  set_target_properties(
-    ttpcmn
-    PROPERTIES PREFIX ""
-    SUFFIX ".dll"
-    )
-endif()
+
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+  )
+
+target_include_directories(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../common
+  ../ttpfile
+  .
+  )
 
 target_link_libraries(
-  ttpcmn
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ole32
@@ -78,7 +89,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS ttpcmn
+  TARGETS ${PACKAGE_NAME}
   RUNTIME
   DESTINATION .
   )

@@ -413,6 +413,10 @@
 			Filter="c"
 			>
 			<File
+				RelativePath="..\common\compat_w95_vs2005.c"
+				>
+			</File>
+			<File
 				RelativePath="..\common\ttlib.c"
 				>
 			</File>

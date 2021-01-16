@@ -1,12 +1,12 @@
-﻿project(ttpmacro)
+﻿set(PACKAGE_NAME "ttpmacro")
+
+project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
-
 add_executable(
-  ttpmacro WIN32
+  ${PACKAGE_NAME} WIN32
   ttm_res.h
   errdlg.cpp
   errdlg.h
@@ -51,8 +51,18 @@ add_executable(
   ttmacro_manifest.rc
   )
 
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
 target_sources(
-  ttpmacro
+  ${PACKAGE_NAME}
   PRIVATE
   ../common/teraterm.h
   ../common/ttcommon.h
@@ -63,7 +73,6 @@ target_sources(
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/tmfc.h
-  ../common/compat_w95.h
   ../common/compat_win.h
   ../common/win16api.h
   ../common/codeconv.h
@@ -77,8 +86,14 @@ source_group(
   "..\/common\/"
   )
 
+set_target_properties(
+  ${PACKAGE_NAME}
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+  )
+
 target_include_directories(
-  ttpmacro
+  ${PACKAGE_NAME}
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   ${ONIGURUMA_INCLUDE_DIRS}
@@ -90,7 +105,7 @@ if (MSVC)
 endif()
 
 target_link_libraries(
-  ttpmacro
+  ${PACKAGE_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -106,6 +121,6 @@ target_link_libraries(
   )
 
 install(
-  TARGETS ttpmacro
+  TARGETS ${PACKAGE_NAME}
   DESTINATION .
   )

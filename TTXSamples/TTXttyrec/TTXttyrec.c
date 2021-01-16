@@ -11,8 +11,6 @@
 
 #include "gettimeofday.h"
 
-#include "compat_w95.h"
-
 #define ORDER 6000
 #define ID_MENUITEM 55301
 
@@ -289,7 +287,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       hInst = hInstance;
       pvar = &InstVar;
       break;

@@ -2,8 +2,6 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "compat_w95.h"
-
 int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
 {
 	char file[MAX_PATH], *filename;
@@ -195,7 +193,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       break;
     case DLL_PROCESS_DETACH:
       /* do process cleanup */

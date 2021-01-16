@@ -42,8 +42,6 @@
 #include "tt_res.h"
 #include "servicenames.h"
 
-#include "compat_w95.h"
-
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
 
@@ -4479,7 +4477,6 @@ BOOL WINAPI DllMain(HANDLE hInst,
 		break;
 	case DLL_PROCESS_ATTACH:
 		/* do process initialization */
-		DoCover_IsDebuggerPresent();
 		break;
 	case DLL_PROCESS_DETACH:
 		/* do process cleanup */

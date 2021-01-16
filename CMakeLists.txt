@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.11)
 
 project(teraterm_all)
 
+if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
+  set(SUPPORT_OLD_WINDOWS_DEFAULT ON)
+else()
+  set(SUPPORT_OLD_WINDOWS_DEFAULT OFF)
+endif()
+
+option(SUPPORT_OLD_WINDOWS "windows 95 support" ${SUPPORT_OLD_WINDOWS_DEFAULT})
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(MORE_WARNING "stronger warning" OFF)
 
@@ -66,6 +73,10 @@ elseif(MINGW)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
+endif()
+
+if(SUPPORT_OLD_WINDOWS)
+  message("SUPPORT_OLD_WINDOWS=ON")
 endif()
 
 ### tool

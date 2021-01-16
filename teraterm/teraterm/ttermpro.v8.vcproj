@@ -334,6 +334,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\compat_w95_vs2005.c"
+				>
+			</File>
+			<File
 				RelativePath="keyboard.c"
 				>
 			</File>
@@ -420,10 +424,6 @@
 			</File>
 			<File
 				RelativePath=".\commlib.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\compat_w95.h"
 				>
 			</File>
 			<File

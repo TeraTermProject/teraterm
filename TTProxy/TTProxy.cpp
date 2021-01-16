@@ -7,8 +7,6 @@
 
 #include "TTProxy.h"
 
-#include "compat_w95.h"
-
 static HINSTANCE myInstance = NULL;
 
 namespace yebisuya {
@@ -35,4 +33,3 @@ extern "C" __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE instance, DWORD r
 	}
 	return FALSE;
 }
-

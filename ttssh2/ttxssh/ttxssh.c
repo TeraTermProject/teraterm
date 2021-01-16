@@ -81,7 +81,6 @@
 
 #include "sftp.h"
 
-#include "compat_w95.h"
 #include "compat_win.h"
 #include "layer_for_unicode.h"
 #include "codeconv.h"
@@ -5217,7 +5216,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		// リーク時のブロック番号を元にブレークを仕掛けるには、以下のようにする。
 		//_CrtSetBreakAlloc(3228);
 #endif
-		DoCover_IsDebuggerPresent();
 		DisableThreadLibraryCalls(hInstance);
 		hInst = hInstance;
 		pvar = &InstVar;

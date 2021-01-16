@@ -10,8 +10,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#include "compat_w95.h"
-
 #define ORDER 4800
 
 #define IdModeFirst   0
@@ -182,7 +180,7 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
       case IdModeProc:
         buff[(blen<InBuffSize)?blen:InBuffSize-1] = '\0';
 	p = buff;
-	
+
 	for (p=buff, func=0; isdigit(*p); p++) {
 	  func = func * 10 + *p - '0';
 	}
@@ -405,7 +403,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
       break;
     case DLL_PROCESS_ATTACH:
       /* do process initialization */
-      DoCover_IsDebuggerPresent();
       hInst = hInstance;
       pvar = &InstVar;
       break;
