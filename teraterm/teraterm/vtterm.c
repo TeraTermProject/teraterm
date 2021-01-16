@@ -6427,7 +6427,7 @@ int VTParse()
 	LockBuffer();
 
 	while ((c>0) && (ChangeEmu==0)) {
-#if UNICODE_DEBUG
+#if defined(DEBUG_DUMP_INPUTCODE)
 		{
 			static DWORD prev_tick;
 			DWORD now = GetTickCount();

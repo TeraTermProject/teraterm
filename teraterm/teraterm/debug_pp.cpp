@@ -34,7 +34,7 @@
 #include "tt_res.h"
 #include "debug_pp.h"
 #include "../common/tt_res.h"
-#include "unicode_test.h"
+#include "ttdebug.h"
 #include "dlglib.h"
 #include "compat_win.h"
 #include "setting.h"
@@ -93,14 +93,8 @@ BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM)
 			const char *caption;
 			HWND hWnd = pGetConsoleWindow();
 			if (hWnd == NULL) {
-				FILE *fp;
-				AllocConsole();
-				freopen_s(&fp, "CONOUT$", "w", stdout);
-				freopen_s(&fp, "CONOUT$", "w", stderr);
+				DebugConsoleOpen();
 				caption = "Hide console window";
-				hWnd = pGetConsoleWindow();
-				HMENU hmenu = GetSystemMenu(hWnd, FALSE);
-				RemoveMenu(hmenu, SC_CLOSE, MF_BYCOMMAND);
 			}
 			else {
 				if (::IsWindowVisible(hWnd)) {

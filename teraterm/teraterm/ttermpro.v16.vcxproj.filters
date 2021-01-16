@@ -183,6 +183,9 @@
     <ClCompile Include="..\ttpfile\filesys_win32.cpp">
       <Filter>ffpfile</Filter>
     </ClCompile>
+    <ClCompile Include="ttdebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -440,6 +443,9 @@
     </ClInclude>
     <ClInclude Include="..\ttpfile\filesys_win32.h">
       <Filter>ffpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="ttdebug.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

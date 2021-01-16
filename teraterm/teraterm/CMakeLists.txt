@@ -60,6 +60,8 @@ add_executable(
   teraterml.h
   ttdde.c
   ttdde.h
+  ttdebug.cpp
+  ttdebug.h
   ttdialog.c
   ttdialog.h
   ttfileio.c
@@ -259,6 +261,7 @@ endif()
 
 target_link_libraries(
   teraterm
+  PRIVATE
   common_static
   ttpcmn
   #ttpfile

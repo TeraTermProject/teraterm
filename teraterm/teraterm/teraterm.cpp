@@ -57,6 +57,7 @@
 #include "teraterml.h"
 #include "sendmem.h"
 #include "layer_for_unicode.h"
+#include "ttdebug.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -110,7 +111,11 @@ static void init()
 {
 	DLLInit();
 	WinCompatInit();
+	DebugSetException();
 	LoadSpecialFont();
+#if defined(DEBUG_OPEN_CONSOLE_AT_STARTUP)
+	DebugConsoleOpen();
+#endif
 }
 
 // Tera Term main engine

@@ -249,6 +249,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ttdebug.cpp"
+				>
+			</File>
+			<File
 				RelativePath="vtwin.cpp"
 				>
 			</File>
@@ -492,6 +496,10 @@
 			</File>
 			<File
 				RelativePath="..\common\ttddecmnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttdebug.h"
 				>
 			</File>
 			<File

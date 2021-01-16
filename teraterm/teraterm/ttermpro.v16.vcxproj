@@ -169,6 +169,7 @@
     <ClCompile Include="teraprn.cpp" />
     <ClCompile Include="teraterm.cpp" />
     <ClCompile Include="ttdde.c" />
+    <ClCompile Include="ttdebug.cpp" />
     <ClCompile Include="ttdialog.c" />
     <ClCompile Include="ttfileio.c" />
     <ClCompile Include="ttime.c" />
@@ -266,6 +267,7 @@
     <ClInclude Include="telnet.h" />
     <ClInclude Include="teraprn.h" />
     <ClInclude Include="ttdde.h" />
+    <ClInclude Include="ttdebug.h" />
     <ClInclude Include="ttdialog.h" />
     <ClInclude Include="ttfileio.h" />
     <ClInclude Include="ttime.h" />
