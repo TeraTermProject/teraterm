@@ -6,7 +6,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
 
 if (MSVC)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:dnsapi.dll")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:user32.dll")
 endif()
 
 add_library(
@@ -136,7 +136,6 @@ target_link_libraries(
   ${OPENSSL_LIB}
   #
   ws2_32
-  dnsapi
   gdi32
   comdlg32
   delayimp
