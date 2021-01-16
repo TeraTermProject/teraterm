@@ -1,5 +1,5 @@
 /*
- * (C) 2011- TeraTerm Project
+ * (C) 2018-2020 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,43 +26,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __TTSSH_DNS_H
-#define __TTSSH_DNS_H
+#pragma once
 
-#define DNS_TYPE_SSHFP	44
+#include <windns.h>
 
-enum sshfp_types {
-        SSHFP_KEY_RESERVED = 0,  // RFC4255
-        SSHFP_KEY_RSA = 1,       // RFC4255
-        SSHFP_KEY_DSA = 2,       // RFC4255
-        SSHFP_KEY_ECDSA = 3,     // RFC6594
-        SSHFP_KEY_ED25519 = 4    // RFC7479
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-enum sshfp_hashes {
-        SSHFP_HASH_RESERVED = 0, // RFC4255
-        SSHFP_HASH_SHA1 = 1,     // RFC4255
-        SSHFP_HASH_SHA256 = 2    // RFC6594
-};
+// windns
+extern DNS_STATUS (WINAPI *pDnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PVOID pExtra, PDNS_RECORD *ppQueryResults, PVOID *pReserved);
+extern VOID (WINAPI *pDnsFree)(PVOID pData, DNS_FREE_TYPE FreeType);
 
-enum verifydns_result {
-	DNS_VERIFY_NONE,
-	DNS_VERIFY_NOTFOUND,
-	DNS_VERIFY_MATCH,
-	DNS_VERIFY_MISMATCH,
-	DNS_VERIFY_DIFFERENTTYPE,
-	DNS_VERIFY_AUTH_MATCH,
-	DNS_VERIFY_AUTH_MISMATCH,
-	DNS_VERIFY_AUTH_DIFFERENTTYPE
-};
-
-typedef struct {
-	BYTE Algorithm;
-	BYTE DigestType;
-	BYTE Digest[1];
-} DNS_SSHFP_DATA, *PDNS_SSHFP_DATA;
-
-int is_numeric_hostname(const char *hostname);
-int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key);
-
-#endif //  __TTSSH_DNS_H
+#ifdef __cplusplus
+}
+#endif

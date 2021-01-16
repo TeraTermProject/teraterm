@@ -30,7 +30,10 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include <windns.h>
+
 #include "compat_win.h"
+#include "compat_windns.h"
 
 #include "dllutil.h"
 #include "ttlib.h"
@@ -133,6 +136,10 @@ INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointe
 // comdlg32
 BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
 BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
+
+// dnsapi
+DNS_STATUS (WINAPI *pDnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PVOID pExtra, PDNS_RECORD *ppQueryResults, PVOID *pReserved);
+VOID (WINAPI *pDnsFree)(PVOID pData, DNS_FREE_TYPE FreeType);
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -292,7 +299,11 @@ static const APIInfo Lists_comdlg32[] = {
 	{},
 };
 
-
+static const APIInfo Lists_dnsapi[] = {
+	{ "DnsQuery_A", (void **)&pDnsQuery_A },
+	{ "DnsFree", (void **)&pDnsFree },
+	{},
+};
 
 static const DllInfo DllInfos[] = {
 	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
@@ -304,6 +315,7 @@ static const DllInfo DllInfos[] = {
 	{ _T("Comctl32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{ _T("hhctrl.ocx"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_hhctrl },
 	{ _T("comdlg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comdlg32 },
+	{ _T("dnsapi.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dnsapi },
 	{},
 };
 
