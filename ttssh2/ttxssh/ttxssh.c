@@ -1238,12 +1238,12 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 				wchar_t EntNameW[128];
 				wchar_t TempHostW[HostNameMaxLength + 1];
 				_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
-				GetPrivateProfileStringW(L"Hosts", EntNameW, L"",
-										 TempHostW, _countof(TempHostW),
-										 SetupFnW);
+				_GetPrivateProfileStringW(L"Hosts", EntNameW, L"",
+										  TempHostW, _countof(TempHostW),
+										  SetupFnW);
 				if (TempHostW[0] != 0)
-					SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
-										0, (LPARAM) TempHostW);
+					_SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
+										 0, (LPARAM) TempHostW);
 				i++;
 			} while (i <= MAXHOSTLIST);
 			free(SetupFnW);
