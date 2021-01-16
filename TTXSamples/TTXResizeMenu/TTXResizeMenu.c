@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "compat_w95.h"
+#include "compat_win.h"
 
 #define ORDER 5900
 #define SECTION "Resize Menu"
@@ -50,9 +51,9 @@ BOOL GetMonitorSizeByChar(int *width, int *height) {
     HMONITOR hm;
     MONITORINFO mi;
 
-    hm = MonitorFromWindow(pvar->cv->HWin, MONITOR_DEFAULTTONEAREST);
+    hm = pMonitorFromWindow(pvar->cv->HWin, MONITOR_DEFAULTTONEAREST);
 	mi.cbSize = sizeof(MONITORINFO);
-    if (! GetMonitorInfo(hm, &mi)) {
+    if (! pGetMonitorInfoA(hm, &mi)) {
       return FALSE;
     }
     rc_dsk = mi.rcWork;

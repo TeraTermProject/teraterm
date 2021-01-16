@@ -65,7 +65,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\common_static.lib;$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -83,7 +83,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\common_static.lib;$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
