@@ -1626,6 +1626,12 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 	return outlen;
 }
 
+static int __isleadbyte_l(int d, PComVar cv)
+{
+	int CodePage = *cv->CodePage;
+	return IsDBCSLeadByteEx(CodePage, d);
+}
+
 //
 // MBCSから各種漢字コードへ変換して出力する。
 //
@@ -1682,7 +1688,7 @@ static int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
-		else if (_isleadbyte_l(d, cv->locale)) {
+		else if (__isleadbyte_l(d, cv)) {
 			KanjiFlagNew = TRUE;
 			cv->SendKanjiFirst = d;
 			SendCodeNew = IdKanji;
@@ -2369,7 +2375,7 @@ static int WINAPI TextEchoMBCS(PComVar cv, PCHAR B, int C)
 				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
-		else if (_isleadbyte_l(d, cv->locale)) {
+		else if (__isleadbyte_l(d, cv)) {
 			KanjiFlagNew = TRUE;
 			cv->EchoKanjiFirst = d;
 			EchoCodeNew = IdKanji;
