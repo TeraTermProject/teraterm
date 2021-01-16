@@ -121,15 +121,21 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	char msg[3072], buf[256];
 	HMODULE h, h2;
 	char imagehlp_dll[MAX_PATH];
+	BOOL (WINAPI *pSymGetLineFromAddr)(HANDLE hProcess, DWORD dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE Line);
 
 	// Windows98/Me/NT4では動かないためスキップする。(2007.10.9 yutaka)
 	GetSystemDirectory(imagehlp_dll, sizeof(imagehlp_dll));
 	strncat_s(imagehlp_dll, sizeof(imagehlp_dll), "\\imagehlp.dll", _TRUNCATE);
 	h2 = LoadLibrary(imagehlp_dll);
-	if (((h = GetModuleHandle(imagehlp_dll)) == NULL) ||
-		(GetProcAddress(h, "SymGetLineFromAddr") == NULL)) {
-			FreeLibrary(h2);
-			goto error;
+	h = GetModuleHandle(imagehlp_dll);
+	if (h == NULL) {
+		FreeLibrary(h2);
+		goto error;
+	}
+	*(void **)&pSymGetLineFromAddr = (void *)GetProcAddress(h, "SymGetLineFromAddr");
+	if (pSymGetLineFromAddr == NULL) {
+		FreeLibrary(h2);
+		goto error;
 	}
 	FreeLibrary(h2);
 
@@ -235,7 +241,7 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 		// ファイル名と行番号の取得
 		ZeroMemory( &(ih_line), sizeof(ih_line) );
 		ih_line.SizeOfStruct = sizeof(ih_line);
-		bResult = SymGetLineFromAddr( hProcess, sf.AddrPC.Offset, &Disp, &ih_line );
+		bResult = pSymGetLineFromAddr( hProcess, sf.AddrPC.Offset, &Disp, &ih_line );
 		if (bResult)
 		{
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%lu", ih_line.FileName, ih_line.LineNumber );
