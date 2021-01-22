@@ -643,6 +643,8 @@ BOOL LogStart()
 
 	if (ts.Append > 0)
 	{
+		// LogLockExclusive が有効な場合にまったく共有しないと、
+		// 書き込み中のログファイルを他のエディタで開けないため
 		int dwShareMode = FILE_SHARE_READ;
 		if (!ts.LogLockExclusive) {
 			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -659,6 +661,8 @@ BOOL LogStart()
 		}
 	}
 	else {
+		// LogLockExclusive が有効な場合にまったく共有しないと、
+		// 書き込み中のログファイルを他のエディタで開けないため
 		int dwShareMode = FILE_SHARE_READ;
 		if (!ts.LogLockExclusive) {
 			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -865,6 +869,8 @@ static void LogRotate(void)
 	char filename[1024];
 	char newfile[1024], oldfile[1024];
 	int i, k;
+	// LogLockExclusive が有効な場合にまったく共有しないと、
+	// 書き込み中のログファイルを他のエディタで開けないため
 	int dwShareMode = FILE_SHARE_READ;
 	unsigned tid;
 

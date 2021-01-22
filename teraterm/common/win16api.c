@@ -2,6 +2,12 @@
 #include <assert.h>
 
 /**
+ * Win16 API の _lcreat, _lopen はロックしないので、
+ * 互換性のため CreateFile() の dwShareMode には
+ * FILE_SHARE_READ | FILE_SHARE_WRITE を指定する。
+ */
+
+ /**
  *	@param[in]	iAttribute	teratermでは0しか使用しない
  *	@retval 	handle
  *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) オープンできなかった
@@ -12,7 +18,7 @@ HANDLE win16_lcreat(const char *FileName, int iAttribute)
 	HANDLE handle;
 	assert(iAttribute == 0);
 	handle = CreateFileA(FileName,
-						 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+						 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 						 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	return handle;
 }
@@ -29,19 +35,19 @@ HANDLE win16_lopen(const char *FileName, int iReadWrite)
 	case OF_READ:
 		// read only
 		handle = CreateFileA(FileName,
-							 GENERIC_READ, FILE_SHARE_READ, NULL,
+							 GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		break;
 	case OF_WRITE:
 		// write
 		handle = CreateFileA(FileName,
-							 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+							 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		break;
 	case OF_READWRITE:
 		// read/write (teratermではttpmacro/ttl.c内の1箇所のみで使用されている
 		handle = CreateFileA(FileName,
-							 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+							 GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		break;
 	default:
