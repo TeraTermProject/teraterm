@@ -679,6 +679,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 static void OpenLogFile(PFileVar fv)
 {
+	// LogLockExclusive が有効な場合にまったく共有しないと、
+	// 書き込み中のログファイルを他のエディタで開けないため
 	int dwShareMode = FILE_SHARE_READ;
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;

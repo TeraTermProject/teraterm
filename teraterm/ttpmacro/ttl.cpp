@@ -1207,7 +1207,7 @@ WORD TTLFileConcat()
 
 	wc FName1W = wc::fromUtf8(FName1);
 	HANDLE FH1 = _CreateFileW(FName1W,
-							  GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+							  GENERIC_WRITE, 0, NULL,
 							  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH1 == INVALID_HANDLE_VALUE) {
 		SetResult(3);
@@ -1315,8 +1315,10 @@ WORD TTLFileCreate()
 		return Err;
 	}
 	wc FNameW = wc::fromUtf8(FName);
+	// TTL のファイルハンドルは filelock でロックするので、
+	// dwShareMode での共有モードは Read/Write とも有効にする。
 	FH = _CreateFileW(FNameW,
-					  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+					  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 					  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
@@ -1417,10 +1419,12 @@ WORD TTLFileOpen()
 						  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	else {
-		// ファイルをオープンする、
-		// 存在しない場合は作成した後オープンする
+		// ファイルをオープンする。
+		// 存在しない場合は作成した後オープンする。
+		// TTL のファイルハンドルは filelock でロックするので、
+		// dwShareMode での共有モードは Read/Write とも有効にする。
 		FH = _CreateFileW(FNameW,
-						  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+						  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 						  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	if (FH == INVALID_HANDLE_VALUE) {

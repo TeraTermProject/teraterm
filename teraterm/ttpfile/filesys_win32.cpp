@@ -77,7 +77,7 @@ static BOOL _OpenWrite(TFileIO *fv, const char *filename)
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
 	wc filenameW = GetFilenameW(data, filename);
 	HANDLE hFile = _CreateFileW(filenameW,
-								GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+								GENERIC_WRITE, 0, NULL,
 								CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		data->FileHandle = INVALID_HANDLE_VALUE;
