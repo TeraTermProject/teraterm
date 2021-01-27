@@ -79,7 +79,7 @@ ssh_ctr_inc(unsigned char *ctr, unsigned int len)
 // AES
 //============================================================================
 static int
-ssh_aes_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, unsigned int len)
+ssh_aes_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, size_t len)
 {
 	struct ssh_aes_ctr_ctx *c;
 	unsigned int n = 0;
@@ -153,7 +153,7 @@ evp_aes_128_ctr(void)
 // Triple-DES
 //============================================================================
 static int
-ssh_des3_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, unsigned int len)
+ssh_des3_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, size_t len)
 {
 	struct ssh_des3_ctr_ctx *c;
 	unsigned int n = 0;
@@ -232,7 +232,7 @@ evp_des3_ctr(void)
 // Blowfish
 //============================================================================
 static int
-ssh_bf_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, unsigned int len)
+ssh_bf_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, size_t len)
 {
 	struct ssh_blowfish_ctr_ctx *c;
 	unsigned int n = 0;
@@ -326,7 +326,7 @@ evp_bf_ctr(void)
 // CAST-128
 //============================================================================
 static int
-ssh_cast5_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, unsigned int len)
+ssh_cast5_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, size_t len)
 {
 	struct ssh_cast5_ctr_ctx *c;
 	unsigned int n = 0;
@@ -420,7 +420,7 @@ evp_cast5_ctr(void)
 // Camellia
 //============================================================================
 static int
-ssh_camellia_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, unsigned int len)
+ssh_camellia_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, size_t len)
 {
 	struct ssh_camellia_ctr_ctx *c;
 	unsigned int n = 0;
