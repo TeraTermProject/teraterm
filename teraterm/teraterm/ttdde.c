@@ -329,6 +329,7 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 {
 	LPSTR DataPtr;
 	DWORD DataSize;
+	HDDEDATA result;
 
 	// 連続してXTYP_POKEがクライアント（マクロ）から送られてくると、サーバ（本体）側がまだ
 	// コマンドの貼り付けを行っていない場合、TalkStatusは IdTalkCB になので、DDE_FNOTPROCESSEDを
@@ -343,9 +344,9 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 
 	if (DdeCmpStringHandles(ItemHSz, Item) != 0) return DDE_FNOTPROCESSED;
 
+	result = (HDDEDATA)DDE_FNOTPROCESSED;
 	DataPtr = DdeAccessData(Data,&DataSize);
-	if (DataPtr==NULL) return DDE_FNOTPROCESSED;
-	{
+	if (DataPtr != NULL) {
 		wchar_t *strW = ToWcharU8(DataPtr);
 		if (strW != NULL) {
 			SendMem *sm = SendMemTextW(strW, 0);
@@ -353,14 +354,12 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 				SendMemInitEcho(sm, FALSE);
 				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 				SendMemStart(sm);
+				result = (HDDEDATA)DDE_FACK;
 			}
 		}
 	}
 	DdeUnaccessData(Data);
-	if (TalkStatus==IdTalkCB)
-		return (HDDEDATA)DDE_FACK;
-	else
-		return DDE_FNOTPROCESSED;
+	return result;
 }
 
 static WORD HexStr2Word(PCHAR Str)
@@ -1174,7 +1173,6 @@ void RunMacro(PCHAR FName, BOOL Startup)
 //		  made after the link to TT(P)MACRO is established.
 {
 	PROCESS_INFORMATION pi;
-	int i;
 	char Cmnd[MAX_PATH+36]; // "TTPMACRO /D="(12) + TopicName(20) + " "(1) + MAX_PATH + " /S"(3)
 	STARTUPINFO si;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
@@ -1193,6 +1191,7 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	strncat_s(Cmnd,sizeof(Cmnd),TopicName,_TRUNCATE);
 	if (FName!=NULL)
 	{
+		size_t i;
 		strncat_s(Cmnd,sizeof(Cmnd)," ",_TRUNCATE);
 		i = strlen(Cmnd);
 		strncat_s(Cmnd,sizeof(Cmnd),FName,_TRUNCATE);
