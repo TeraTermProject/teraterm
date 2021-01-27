@@ -5396,9 +5396,6 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 		SendMemContinuously();
 	}
 #endif
-	if (TalkStatus == IdTalkCB) {
-		CBSend();
-	}
 	// 送信可能な状態でなければエラー
 	if (TalkStatus != IdTalkKeyb) {
 		return 0;

@@ -192,9 +192,6 @@ static BOOL OnIdle(LONG lCount)
 
 		/* Talker */
 		switch (TalkStatus) {
-		case IdTalkCB:
-			CBSend();
-			break; /* clip board */
 		case IdTalkFile:
 			FileSend();
 			break; /* file */

@@ -54,7 +54,6 @@
   /* Talker mode */
 typedef enum {
 	IdTalkKeyb = 0,
-	IdTalkCB = 1,
 	IdTalkFile = 2,
 	IdTalkQuiet = 3,
 	IdTalkSendMem,

@@ -30,88 +30,24 @@
 /* TERATERM.EXE, Clipboard routines */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "vtdisp.h"
-#include "vtterm.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <commctrl.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #include <wchar.h>
 
 #include "ttwinman.h"
-#include "ttcommon.h"
 #include "ttlib.h"
-#include "dlglib.h"
 #include "codeconv.h"
 
 #include "clipboar.h"
-#include "tt_res.h"
 #include "fileread.h"
 #include "sendmem.h"
 #include "clipboarddlg.h"
 
-// for clipboard paste
-static HGLOBAL CBMemHandle = NULL;
-static PCHAR CBMemPtr = NULL;
-static LONG CBMemPtr2 = 0;
-static BYTE CBByte;
-static BOOL CBRetrySend;
-static BOOL CBRetryEcho;
-static BOOL CBSendCR;
-static BOOL CBEchoOnly;
-static BOOL CBInsertDelay = FALSE;
-
 static const wchar_t BracketStartW[] = L"\033[200~";
 static const wchar_t BracketEndW[] = L"\033[201~";
-
-static void CBEcho(void);
-
-/**
- * 文字列送信
- * 次のところから使用されている
- *  - DDE(TTL)
- *	- ブロードキャスト
- */
-void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
-{
-	if (! cv.Ready) {
-		return;
-	}
-	if (TalkStatus!=IdTalkKeyb) {
-		return;
-	}
-
-	CBEchoOnly = EchoOnly;
-
-	if (CBMemHandle) {
-		GlobalFree(CBMemHandle);
-	}
-	CBMemHandle = NULL;
-	CBMemPtr = NULL;
-	CBMemPtr2 = 0;
-
-	CBInsertDelay = FALSE;
-
-	CBRetrySend = FALSE;
-	CBRetryEcho = FALSE;
-	CBSendCR = FALSE;
-
-	if ((CBMemHandle = GlobalAlloc(GHND, DataSize+1)) != NULL) {
-		if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
-			memcpy(CBMemPtr, DataPtr, DataSize);
-			// WM_COPYDATA で送られて来たデータは NUL Terminate されていないので NUL を付加する
-			CBMemPtr[DataSize] = 0;
-			GlobalUnlock(CBMemHandle);
-			CBMemPtr=NULL;
-			TalkStatus=IdTalkCB;
-		}
-	}
-	if (TalkStatus != IdTalkCB) {
-		CBEndPaste();
-	}
-}
 
 static void TrimTrailingNLW(wchar_t *src)
 {
@@ -271,7 +207,6 @@ static void CBSendStart(wchar_t *str_w)
 
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
-//	unsigned int StrLen = 0;
 	wchar_t *str_w;
 	wchar_t *str_w_edited;
 
@@ -282,12 +217,9 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		return;
 	}
 
-	CBEchoOnly = FALSE;
-
 	str_w = GetClipboardTextW(HWin, FALSE);
 	if (str_w == NULL || !IsTextW(str_w, 0)) {
 		// クリップボードから文字列を取得できなかった
-		CBEndPaste();
 		return;
 	}
 
@@ -305,7 +237,6 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 	if (!CheckClipboardContentW(HWin, str_w, AddCR, &str_w_edited)) {
 		free(str_w);
-		CBEndPaste();
 		return;
 	}
 	if (str_w_edited != NULL) {
@@ -362,8 +293,6 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	if (TalkStatus!=IdTalkKeyb) {
 		return;
 	}
-
-	CBEchoOnly = FALSE;
 
 	str_w = GetClipboardTextW(HWin, FALSE);
 	if (str_w == NULL || !IsTextW(str_w, 0)) {
@@ -423,184 +352,5 @@ error:
 	free(str_w);
 	free(str_mb);
 	free(str_b64);
-	CBEndPaste();
 	return;
-}
-
-// この関数はクリップボードおよびDDEデータを端末へ送り込む。
-//
-// CBMemHandleハンドルはグローバル変数なので、この関数が終了するまでは、
-// 次のクリップボードおよびDDEデータを処理することはできない（破棄される可能性あり）。
-// また、データ列で null-terminate されていることを前提としているため、後続のデータ列は
-// 無視される。
-// (2006.11.6 yutaka)
-void CBSend()
-{
-	int c;
-	BOOL EndFlag;
-	static DWORD lastcr;
-	DWORD now;
-
-	if (CBMemHandle==NULL) {
-		return;
-	}
-
-	if (CBEchoOnly) {
-		CBEcho();
-		return;
-	}
-
-	if (CBInsertDelay) {
-		now = GetTickCount();
-		if (now - lastcr < (DWORD)ts.PasteDelayPerLine) {
-			return;
-		}
-	}
-
-	if (CBRetrySend) {
-		CBRetryEcho = (ts.LocalEcho>0);
-		c = CommTextOut(&cv,(PCHAR)&CBByte,1);
-		CBRetrySend = (c==0);
-		if (CBRetrySend) {
-			return;
-		}
-	}
-
-	if (CBRetryEcho) {
-		c = CommTextEcho(&cv,(PCHAR)&CBByte,1);
-		CBRetryEcho = (c==0);
-		if (CBRetryEcho) {
-			return;
-		}
-	}
-
-	CBMemPtr = GlobalLock(CBMemHandle);
-	if (CBMemPtr==NULL) {
-		return;
-	}
-
-	do {
-		if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
-			CBMemPtr2++;
-			// added PasteDelayPerLine (2009.4.12 maya)
-			if (CBInsertDelay) {
-				lastcr = now;
-				CBSendCR = FALSE;
-				SetTimer(HVTWin, IdPasteDelayTimer, ts.PasteDelayPerLine, NULL);
-				break;
-			}
-		}
-
-		EndFlag = (CBMemPtr[CBMemPtr2]==0);
-		if (! EndFlag) {
-			CBByte = CBMemPtr[CBMemPtr2];
-			CBMemPtr2++;
-// Decoding characters which are encoded by MACRO
-//   to support NUL character sending
-//
-//  [encoded character] --> [decoded character]
-//         01 01        -->     00
-//         01 02        -->     01
-			if (CBByte==0x01) { /* 0x01 from MACRO */
-				CBByte = CBMemPtr[CBMemPtr2];
-				CBMemPtr2++;
-				CBByte = CBByte - 1; // character just after 0x01
-			}
-		}
-		else {
-			CBEndPaste();
-			return;
-		}
-
-		if (! EndFlag) {
-			c = CommTextOut(&cv,(PCHAR)&CBByte,1);
-			CBSendCR = (CBByte==0x0D);
-			CBRetrySend = (c==0);
-			if ((! CBRetrySend) &&
-			    (ts.LocalEcho>0)) {
-				c = CommTextEcho(&cv,(PCHAR)&CBByte,1);
-				CBRetryEcho = (c==0);
-			}
-		}
-		else {
-			c=0;
-		}
-	}
-	while (c>0);
-
-	if (CBMemPtr!=NULL) {
-		GlobalUnlock(CBMemHandle);
-		CBMemPtr=NULL;
-	}
-}
-
-static void CBEcho()
-{
-	if (CBMemHandle==NULL) {
-		return;
-	}
-
-	if (CBRetryEcho && CommTextEcho(&cv,(PCHAR)&CBByte,1) == 0) {
-		return;
-	}
-
-	if ((CBMemPtr = GlobalLock(CBMemHandle)) == NULL) {
-		return;
-	}
-
-	do {
-		if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
-			CBMemPtr2++;
-		}
-
-		if (CBMemPtr[CBMemPtr2] == 0) {
-			CBRetryEcho = FALSE;
-			CBEndPaste();
-			return;
-		}
-
-		CBByte = CBMemPtr[CBMemPtr2];
-		CBMemPtr2++;
-
-		// Decoding characters which are encoded by MACRO
-		//   to support NUL character sending
-		//
-		//  [encoded character] --> [decoded character]
-		//         01 01        -->     00
-		//         01 02        -->     01
-		if (CBByte==0x01) { /* 0x01 from MACRO */
-			CBByte = CBMemPtr[CBMemPtr2];
-			CBMemPtr2++;
-			CBByte = CBByte - 1; // character just after 0x01
-		}
-
-		CBSendCR = (CBByte==0x0D);
-
-	} while (CommTextEcho(&cv,(PCHAR)&CBByte,1) > 0);
-
-	CBRetryEcho = TRUE;
-
-	if (CBMemHandle != NULL) {
-		GlobalUnlock(CBMemHandle);
-		CBMemPtr=NULL;
-	}
-}
-
-void CBEndPaste()
-{
-	TalkStatus = IdTalkKeyb;
-
-	if (CBMemHandle!=NULL) {
-		if (CBMemPtr!=NULL) {
-			GlobalUnlock(CBMemHandle);
-		}
-		GlobalFree(CBMemHandle);
-	}
-
-	CBMemHandle = NULL;
-	CBMemPtr = NULL;
-	CBMemPtr2 = 0;
-	CBEchoOnly = FALSE;
-	CBInsertDelay = FALSE;
-	_CrtCheckMemory();
 }

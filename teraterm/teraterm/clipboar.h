@@ -38,11 +38,8 @@ extern "C" {
 /* prototypes */
 
 
-void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly);
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);
-void CBSend(void);
-void CBEndPaste(void);
 
 
 #ifdef __cplusplus
