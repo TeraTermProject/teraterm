@@ -111,6 +111,20 @@ if(SUPPORT_OLD_WINDOWS)
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
+  if(MINGW)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/libmingw/tlssup.c
+      )
+    target_link_libraries(
+      ${PACKAGE_NAME}
+      PRIVATE
+      -Wl,--whole-archive
+      mingw_msvcrt
+      -Wl,--no-whole-archive
+      )
+  endif()
 endif(SUPPORT_OLD_WINDOWS)
 
 target_include_directories(

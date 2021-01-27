@@ -17,7 +17,14 @@ if(SUPPORT_OLD_WINDOWS)
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
-endif()
+  if(MINGW)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/libmingw/tlssup.c
+      )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
 
 set_target_properties(
   ${PACKAGE_NAME}

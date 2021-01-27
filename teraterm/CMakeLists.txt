@@ -33,3 +33,10 @@ add_subdirectory(common)
 set_target_properties(
   common_static
   PROPERTIES FOLDER teraterm)
+
+if(SUPPORT_OLD_WINDOWS AND MINGW)
+  add_subdirectory(libmingw)
+  set_target_properties(
+    mingw_msvcrt
+    PROPERTIES FOLDER teraterm)
+endif()

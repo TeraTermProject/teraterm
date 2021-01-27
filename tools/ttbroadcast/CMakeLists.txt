@@ -28,6 +28,7 @@ target_compile_definitions(
 target_link_libraries(
   ttbroadcast
   PRIVATE
+  ttpcmn
   common_static
   )
 

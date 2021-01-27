@@ -17,6 +17,20 @@ if(SUPPORT_OLD_WINDOWS)
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
+  if(MINGW)
+    target_sources(
+      TTXttyplay
+      PRIVATE
+      ../../teraterm/libmingw/tlssup.c
+      )
+    target_link_libraries(
+      TTXttyplay
+      PRIVATE
+      -Wl,--whole-archive
+      mingw_msvcrt
+      -Wl,--no-whole-archive
+      )
+  endif()
 endif(SUPPORT_OLD_WINDOWS)
 
 target_include_directories(
@@ -49,6 +63,20 @@ if(SUPPORT_OLD_WINDOWS)
       TTXttyrec
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
+      )
+  endif()
+  if(MINGW)
+    target_sources(
+      TTXttyrec
+      PRIVATE
+      ../../teraterm/libmingw/tlssup.c
+      )
+    target_link_libraries(
+      TTXttyrec
+      PRIVATE
+      -Wl,--whole-archive
+      mingw_msvcrt
+      -Wl,--no-whole-archive
       )
   endif()
 endif(SUPPORT_OLD_WINDOWS)
