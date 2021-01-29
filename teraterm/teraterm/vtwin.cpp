@@ -1431,6 +1431,11 @@ void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 	}
 }
 
+/**
+ *	キーボードから1文字入力
+ *	@param	nChar	UTF-16 char(wchar_t)	IsWindowUnicode() == TRUE 時
+ *					ANSI char(char)			IsWindowUnicode() == FALSE 時
+ */
 void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 	unsigned int i;
@@ -1444,30 +1449,34 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-#if UNICODE_INTERNAL_BUFF
+	wchar_t u16;
+	if (IsWindowUnicode(HVTWin) == TRUE) {
+		// 入力は UTF-16
+		u16 = (wchar_t)nChar;
+	} else {
+		// 入力は ANSI, ANSI(ACP) -> UTF-32 -> UTF-16
+		char mb_str[1];
+		unsigned int u32;
+		mb_str[0] = (char)nChar;
+		size_t u32_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
+		if (u32_len == 0) {
+			return;
+		}
+		wchar_t u16_str[2];
+		size_t u16_len = UTF32ToUTF16(u32, u16_str, _countof(u16_str));
+		if (u16_len == 0) {
+			return;
+		}
+		u16 = u16_str[0];
+	}
+
+	// バッファへ出力、画面へ出力
 	for (i=1 ; i<=nRepCnt ; i++) {
-		wchar_t u16 = nChar;
 		CommTextOutW(&cv,&u16,1);
 		if (ts.LocalEcho>0) {
 			CommTextEchoW(&cv,&u16,1);
 		}
 	}
-#else
-	{
-		char Code = nChar;
-		if ((ts.Language==IdRussian) &&
-			((BYTE)Code>=128)) {
-			Code = (char)RussConv(ts.RussKeyb,ts.RussClient,(BYTE)Code);
-		}
-
-		for (i=1 ; i<=nRepCnt ; i++) {
-			CommTextOut(&cv,&Code,1);
-			if (ts.LocalEcho>0) {
-				CommTextEcho(&cv,&Code,1);
-			}
-		}
-	}
-#endif
 
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
