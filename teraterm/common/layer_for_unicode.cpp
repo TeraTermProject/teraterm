@@ -544,6 +544,26 @@ LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
 #endif
 }
 
+LONG _GetWindowLongW(HWND hWnd, int nIndex)
+{
+	if (pGetWindowLongW != NULL) {
+		return pGetWindowLongW(hWnd, nIndex);
+	}
+	return GetWindowLongA(hWnd, nIndex);
+}
+
+LONG_PTR _GetWindowLongPtrW(HWND hWnd, int nIndex)
+{
+#ifdef _WIN64
+	if (pGetWindowLongPtrW != NULL) {
+		return pGetWindowLongPtrW(hWnd, nIndex);
+	}
+	return GetWindowLongPtrA(hWnd, nIndex);
+#else
+	return _GetWindowLongW(hWnd, nIndex);
+#endif
+}
+
 LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (pCallWindowProcW != NULL) {

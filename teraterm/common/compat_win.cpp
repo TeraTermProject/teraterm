@@ -66,8 +66,10 @@ HWND (WINAPI *pCreateDialogIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW 
 										   HWND hWndParent, DLGPROC lpDialogFunc,
 										   LPARAM dwInitParam);
 LONG (WINAPI *pSetWindowLongW)(HWND hWnd, int nIndex, LONG dwNewLong);
+LONG (WINAPI *pGetWindowLongW)(HWND hWnd, int nIndex);
 #ifdef _WIN64
 LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
+LONG_PTR (WINAPI *pGetWindowLongPtrW)(HWND hWnd, int nIndex);
 #endif
 LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
@@ -208,8 +210,10 @@ static const APIInfo Lists_user32[] = {
 	{ "GetWindowTextW", (void **)&pGetWindowTextW },
 	{ "GetWindowTextLengthW", (void **)&pGetWindowTextLengthW },
 	{ "SetWindowLongW", (void **)&pSetWindowLongW },
+	{ "GetWindowLongW", (void **)&pGetWindowLongW },
 #ifdef _WIN64
 	{ "SetWindowLongPtrW", (void **)&pSetWindowLongPtrW },
+	{ "GetWindowLongPtrW", (void **)&pGetWindowLongPtrW },
 #endif
 	{ "CallWindowProcW", (void **)&pCallWindowProcW },
 #endif
