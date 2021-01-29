@@ -434,7 +434,7 @@ void SetEditboxEmacsKeybind(HWND hDlg, int nID)
 		IsCombobox = TRUE;
 	}
 	data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
-	data->OrigProc = (WNDPROC)GetWindowLongPtrW(hWndEdit, GWLP_WNDPROC);
+	data->OrigProc = (WNDPROC)_GetWindowLongPtrW(hWndEdit, GWLP_WNDPROC);
 	data->OrigUser = (LONG_PTR)GetWindowLongPtr(hWndEdit, GWLP_USERDATA);
 	data->IsComboBox = IsCombobox;
 	_SetWindowLongPtrW(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
