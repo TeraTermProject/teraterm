@@ -45,9 +45,63 @@
 
 #include "sendfiledlg.h"
 
+typedef struct tagTipWinData {
+	HWND hDlg;
+	HWND hTip;
+} TipWin2;
+
+static TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
+{
+	HINSTANCE hInst = hInstance;
+	if (hInstance == NULL) {
+		hInst = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE);
+	}
+
+	HWND hTip = CreateWindowExW(NULL, TOOLTIPS_CLASSW, NULL,
+								WS_POPUP |TTS_ALWAYSTIP | TTS_BALLOON,
+								CW_USEDEFAULT, CW_USEDEFAULT,
+								CW_USEDEFAULT, CW_USEDEFAULT,
+								hDlg, NULL,
+								hInst, NULL);
+	if (hTip == NULL) {
+		return NULL;
+	}
+	SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, INT_MAX);
+
+	TipWin2 *tWin = (TipWin2 *)calloc(sizeof(TipWin2), 1);
+	if (tWin == NULL) {
+		return NULL;
+	}
+	tWin->hTip = hTip;
+	tWin->hDlg = hDlg;
+
+	return tWin;
+}
+
+static void TipWin2Destroy(TipWin2 *tWin)
+{
+	DestroyWindow(tWin->hTip);
+	tWin->hTip = NULL;
+	free(tWin);
+}
+
+static BOOL TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text)
+{
+	TOOLINFOW toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = tWin->hDlg;
+	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;	// TTF_IDISHWND があればrectは参照されない
+	toolInfo.uId = (UINT_PTR)GetDlgItem(tWin->hDlg, id);
+	toolInfo.lpszText = (LPWSTR)text;	// text は SendMessage() 時に存在すれば良い
+	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
+
+	return TRUE;
+}
+
 typedef struct {
 	sendfiledlgdata *create_param;
 	// work
+	TipWin2 *tip;
 	UINT MsgDlgHelp;
 } SendFileDlgWork_t;
 
@@ -60,6 +114,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		{IDC_SENDFILE_DELAYTYPE_LABEL, "DLG_SENDFILE_DELAYTYPE_TITLE"},
 		{IDC_SENDFILE_SEND_SIZE_LABEL, "DLG_SENDFILE_SEND_SIZE_TITLE"},
 		{IDC_SENDFILE_DELAYTIME_LABEL, "DLG_SENDFILE_DELAYTIME_TITLE"},
+		{IDC_SENDFILE_CHECK_4, "DLG_SENDFILE_TERATERM4"},
 		{IDCANCEL, "BTN_CANCEL"},
 		{IDOK, "BTN_OK"},
 	};
@@ -84,7 +139,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
-			SetI18nList("TeraTerm", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
+			SetI18nList("Tera Term", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
 						data->UILanguageFile, 0);
 
 			for (size_t i = 0; i < _countof(send_size_list); i++) {
@@ -99,7 +154,23 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT), FALSE);
 
+			TipWin2 *tip = TipWin2Create(NULL, hDlgWnd);
+			work->tip = tip;
+			wchar_t *text = TTGetLangStrW("Tera Term", "DLG_SENDFILE_TERATERM4_TOOLTIP", NULL, data->UILanguageFile);
+			if (text != NULL) {
+				TipWin2SetTextW(tip, IDC_SENDFILE_CHECK_4, text);
+				free(text);
+			}
+			//TipWin2SetTextW(tip, IDC_SENDFILE_FILENAME_EDIT, L"ファイル名を入れる"); // test
+			//TipWin2SetTextW(tip, IDC_SENDFILE_FILENAME_BUTTON, L"ファイル選択"); // test
+
 			return TRUE;
+		}
+		case WM_DESTROY: {
+			TipWin2Destroy(work->tip);
+			work->tip = NULL;
+			free(work);
+			return FALSE;
 		}
 		case WM_COMMAND:
 			switch (wp) {
