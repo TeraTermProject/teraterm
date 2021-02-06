@@ -34,7 +34,6 @@
 #include <string.h>
 #include <ddeml.h>
 #include "ttwinman.h"
-#include "filesys.h"
 #include "ttsetup.h"
 #include "telnet.h"
 #include "ttlib.h"
@@ -45,6 +44,9 @@
 #include "sendmem.h"
 #include "codeconv.h"
 #include "broadcast.h"
+
+#include "filesys.h"
+#include "sendmem.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -625,7 +627,13 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdSendFile: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+#if 0
+		// Tera Term 4 と同じ方法で送信
 		BOOL r = FileSendStart(ParamFileNameW, ParamBinaryFlag);
+#else
+		// 5 で追加した方法で送信
+		BOOL r = SendMemSendFile(ParamFileNameW, ParamBinaryFlag, 0, 0, 0);
+#endif
 		free(ParamFileNameW);
 		if (r) {
 			DdeCmnd = TRUE;

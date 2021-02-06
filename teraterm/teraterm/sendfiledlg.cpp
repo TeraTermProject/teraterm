@@ -45,7 +45,11 @@
 
 #include "sendfiledlg.h"
 
-#define TitSendFile L"Send file"
+typedef struct {
+	sendfiledlgdata *create_param;
+	// work
+	UINT MsgDlgHelp;
+} SendFileDlgWork_t;
 
 static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -66,14 +70,16 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		{"DLG_SENDFILE_DELAYTYPE_PER_SENDSIZE", L"per sendsize"},
 	};
 	static const int send_size_list[] = {16, 256, 4 * 1024};
-	sendfiledlgdata *data = (sendfiledlgdata *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
-	int i;
+	SendFileDlgWork_t *work = (SendFileDlgWork_t *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
+	sendfiledlgdata *data = work != NULL ? work->create_param : NULL;
 
 	switch (msg) {
-		case WM_INITDIALOG:
+		case WM_INITDIALOG: {
+			work = (SendFileDlgWork_t *)calloc(sizeof(*work), 1);
+			SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)work);
 			data = (sendfiledlgdata *)lp;
-			data->MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
-			SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)data);
+			work->create_param = data;
+			work->MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 			::DragAcceptFiles(hDlgWnd, TRUE);
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
@@ -81,7 +87,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			SetI18nList("TeraTerm", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
 						data->UILanguageFile, 0);
 
-			for (i = 0; i < _countof(send_size_list); i++) {
+			for (size_t i = 0; i < _countof(send_size_list); i++) {
 				char buf[32];
 				sprintf(buf, "%d", send_size_list[i]);
 				SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)buf);
@@ -94,7 +100,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT), FALSE);
 
 			return TRUE;
-
+		}
 		case WM_COMMAND:
 			switch (wp) {
 				case IDOK | (BN_CLICKED << 16): {
@@ -124,6 +130,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					data->delay_type = (int)SendDlgItemMessage(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETCURSEL, 0, 0);
 					data->delay_tick = GetDlgItemInt(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT, NULL, FALSE);
 					data->send_size = GetDlgItemInt(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, NULL, FALSE);
+					data->method_4 = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_4);
 
 					TTEndDialog(hDlgWnd, IDOK);
 					return TRUE;
@@ -142,7 +149,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					wchar_t TempDir[MAX_PATH];
 					_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSendFile, data->UILanguageFile);
+					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFile);
 					wchar_t *title;
 					aswprintf(&title, L"Tera Term: %s", uimsg);
 					free(uimsg);
@@ -184,7 +191,6 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				default:
 					return FALSE;
 			}
-			return FALSE;
 
 		case WM_DROPFILES: {
 			// 複数ドロップされても最初の1つだけを扱う
@@ -206,7 +212,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			return TRUE;
 		}
 		default:
-			if (data != NULL && msg == data->MsgDlgHelp) {
+			if (work != NULL && msg == work->MsgDlgHelp) {
 				// コモンダイアログでヘルプボタンが押された
 				PostMessage(GetParent(hDlgWnd), WM_USER_DLGHELP2, HlpMenuFileSendfile, 0);
 				return TRUE;
@@ -218,6 +224,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 {
 	INT_PTR ret;
+	data->method_4 = FALSE;
 	ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_SENDFILEDLG), hWndParent, SendFileDlgProc, (LPARAM)data);
 	return ret;
 }

@@ -43,8 +43,7 @@ typedef struct {
 	int delay_type;
 	DWORD delay_tick;
 	size_t send_size;
-	// work
-	WORD MsgDlgHelp;
+	BOOL method_4;			// Tera Term 4 のルーチンを使用する
 } sendfiledlgdata;
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data);
@@ -52,4 +51,3 @@ INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 #ifdef __cplusplus
 }
 #endif
-

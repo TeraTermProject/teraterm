@@ -56,12 +56,10 @@ void SendMemFinish(SendMem *sm);
 // idleÇ©ÇÁÇÃëóêMópAPI
 void SendMemContinuously(void);
 
-#ifdef __cplusplus
-}
-#endif
+// convenient function
+BOOL SendMemPasteString(wchar_t *str);
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max);
 
 #ifdef __cplusplus
-// convenient function
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type = SENDMEM_DELAYTYPE_NO_DELAY, DWORD delay_tick = 0, size_t send_max = 0);
-BOOL SendMemPasteString(wchar_t *str);
+}
 #endif

@@ -5206,7 +5206,7 @@ static void ConvertToCP932(char *str, int destlen)
 	unsigned char b;
 	WORD word;
 
-	if (_stricmp(ts.Locale, DEFAULT_LOCALE) == 0) {
+	if (ts.CodePage == 932) {
 		for (i = 0 ; i < len ; i++) {
 			b = str[i];
 			if (IS_SJIS(b) || IS_EUC(b)) {

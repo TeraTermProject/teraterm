@@ -1827,10 +1827,10 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 			// cancel
 			break;
 		case DROP_TYPE_SEND_FILE:
-			SendMemSendFile(FileName, FALSE);
+			SendMemSendFile(FileName, FALSE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 			break;
 		case DROP_TYPE_SEND_FILE_BINARY:
-			SendMemSendFile(FileName, TRUE);
+			SendMemSendFile(FileName, TRUE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 			break;
 		case DROP_TYPE_PASTE_FILENAME:
 		{
@@ -4089,11 +4089,6 @@ void CVTWindow::OnReplayLog()
 
 void CVTWindow::OnFileSend()
 {
-#if 1
-	// file send same as teraterm 4
-	HelpId = HlpFileSend;
-	FileSendStart(NULL, 0);
-#else
 	// new file send
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
@@ -4106,9 +4101,15 @@ void CVTWindow::OnFileSend()
 	}
 
 	wchar_t *filename = data.filename;
-	SendMemSendFile(filename, data.binary, (SendMemDelayType)data.delay_type, data.delay_tick, data.send_size);
+	if (!data.method_4) {
+		SendMemSendFile(filename, data.binary, (SendMemDelayType)data.delay_type, data.delay_tick, data.send_size);
+	}
+	else {
+		// file send same as teraterm 4
+		HelpId = HlpFileSend;
+		FileSendStart(filename, 0);
+	}
 	free(filename);
-#endif
 }
 
 void CVTWindow::OnFileKermitRcv()

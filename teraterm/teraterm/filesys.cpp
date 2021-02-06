@@ -29,11 +29,7 @@
 
 /* TERATERM.EXE, file transfer routines */
 #include <stdio.h>
-#include <io.h>
-#include <process.h>
 #include <windows.h>
-#include <htmlhelp.h>
-#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -42,21 +38,13 @@
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttdde.h"
-#include "ttlib.h"
-#include "dlglib.h"
 #include "vtterm.h"
-#include "helpid.h"
 #include "layer_for_unicode.h"
-#include "codeconv.h"
 #include "asprintf.h"
-
-#include "filesys_log_res.h"
 
 #include "filesys.h"
 
 typedef struct {
-	wchar_t *DlgCaption;
-
 	wchar_t *FullName;
 
 	HANDLE FileHandle;
@@ -67,9 +55,11 @@ typedef struct {
 } TFileVar;
 typedef TFileVar *PFileVar;
 
-#define FS_BRACKET_NONE  0
-#define FS_BRACKET_START 1
-#define FS_BRACKET_END   2
+typedef enum {
+	FS_BRACKET_NONE,
+	FS_BRACKET_START,
+	FS_BRACKET_END,
+} FileBracketMode_t;
 
 static PFileVar SendVar = NULL;
 
@@ -85,7 +75,7 @@ struct FileSendHandler {
 static struct FileSendHandler FileSendHandler;
 static int FileDlgRefresh;
 
-static int FileBracketMode = FS_BRACKET_NONE;
+static FileBracketMode_t FileBracketMode = FS_BRACKET_NONE;
 static int FileBracketPtr = 0;
 static char BracketStartStr[] = "\033[200~";
 static char BracketEndStr[] = "\033[201~";
@@ -99,28 +89,34 @@ static BOOL OpenFTDlg(PFileVar fv)
 	PFileTransDlg FTDlg;
 
 	FTDlg = new CFileTransDlg();
-
-	fv->FilePause = FALSE;
-
-	if (FTDlg!=NULL)
-	{
-		CFileTransDlg::Info info;
-		info.UILanguageFile = ts.UILanguageFile;
-		info.OpId = CFileTransDlg::OpSendFile;
-		info.DlgCaption = fv->DlgCaption;
-		info.FileName = NULL;
-		info.FullName = fv->FullName;
-		info.HideDialog = FALSE;
-		info.HMainWin = HVTWin;
-		FTDlg->Create(hInst, &info);
-		FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
+	if (FTDlg == NULL) {
+		return FALSE;
 	}
 
+	wchar_t *DlgCaption;
+	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", ts.UILanguageFile);
+	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
+	free(uimsg);
+
+	CFileTransDlg::Info info;
+	info.UILanguageFile = ts.UILanguageFile;
+	info.OpId = CFileTransDlg::OpSendFile;
+	info.DlgCaption = DlgCaption;
+	info.FileName = NULL;
+	info.FullName = fv->FullName;
+	info.HideDialog = FALSE;
+	info.HMainWin = HVTWin;
+
+	FTDlg->Create(hInst, &info);
+	FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
+
+	free(DlgCaption);
+
+	fv->FilePause = FALSE;
+	fv->StartTime = GetTickCount();
 	SendDlg = FTDlg; /* File send */
 
-	fv->StartTime = GetTickCount();
-
-	return (FTDlg!=NULL);
+	return TRUE;
 }
 
 #if 0
@@ -165,157 +161,22 @@ static void FreeFileVar(PFileVar *pfv)
 		free(fv->FullName);
 		fv->FullName = NULL;
 	}
-	free(fv->DlgCaption);
-	fv->DlgCaption = NULL;
 	free(fv);
 	*pfv = NULL;
 }
 
-/* ダイアログを中央に移動する */
-static void CenterCommonDialog(HWND hDlg)
-{
-	/* hDlgの親がダイアログのウィンドウハンドル */
-	HWND hWndDlgRoot = GetParent(hDlg);
-	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
-}
-
-static HFONT DlgFoptFont;
-static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	static const DlgTextInfo text_info[] = {
-		{ IDC_FOPT, "DLG_FOPT" },
-		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
-	};
-	LPOPENFILENAME ofn;
-	LPWORD pw;
-	LPOFNOTIFY notify;
-	LOGFONT logfont;
-	HFONT font;
-	const char *UILanguageFile = ts.UILanguageFile;
-
-	switch (Message) {
-	case WM_INITDIALOG:
-		ofn = (LPOPENFILENAME)lParam;
-		pw = (LPWORD)ofn->lCustData;
-		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
-
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgFoptFont, UILanguageFile)) {
-			SendDlgItemMessage(Dialog, IDC_FOPT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_FOPTBIN, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_FOPTAPPEND, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_PLAINTEXT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TIMESTAMP, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgFoptFont = NULL;
-		}
-
-		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
-
-		SetRB(Dialog,*pw & 1,IDC_FOPTBIN,IDC_FOPTBIN);
-
-		CenterCommonDialog(Dialog);
-
-		return TRUE;
-	case WM_COMMAND: // for old style dialog
-		switch (LOWORD(wParam)) {
-		case IDOK:
-			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
-			if (pw!=NULL)
-				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
-			if (DlgFoptFont != NULL) {
-				DeleteObject(DlgFoptFont);
-			}
-			break;
-		case IDCANCEL:
-			if (DlgFoptFont != NULL) {
-				DeleteObject(DlgFoptFont);
-			}
-			break;
-		}
-		break;
-	case WM_NOTIFY: // for Explorer-style dialog
-		notify = (LPOFNOTIFY)lParam;
-		switch (notify->hdr.code) {
-		case CDN_FILEOK:
-			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
-			if (pw!=NULL)
-				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
-			if (DlgFoptFont != NULL) {
-				DeleteObject(DlgFoptFont);
-			}
-			break;
-		}
-		break;
-	}
-	return FALSE;
-}
-
-static wchar_t *_GetTransFname(HWND hWnd, const wchar_t *caption, LPLONG Option)
-{
-	WORD optw;
-	wchar_t TempDir[MAX_PATH];
-	wchar_t FileName[MAX_PATH];
-	const char *UILanguageFile = ts.UILanguageFile;
-
-	/* save current dir */
-	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
-
-	wchar_t FileDirExpanded[MAX_PATH];
-	wchar_t *FileDir = ToWcharA(ts.FileDir);
-	_ExpandEnvironmentStringsW(FileDir, FileDirExpanded, _countof(FileDirExpanded));
-	wchar_t *CurDir = FileDirExpanded;
-	free(FileDir);
-
-	wchar_t *FNFilter = GetCommonDialogFilterW(ts.FileSendFilter, UILanguageFile);
-	FileName[0] = 0;
-	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZEW();
-	ofn.hwndOwner   = hWnd;
-	ofn.lpstrFilter = FNFilter;
-	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = FileName;
-	ofn.nMaxFile = _countof(FileName);
-	ofn.lpstrInitialDir = CurDir;
-
-	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER | OFN_ENABLESIZING;
-	ofn.lpTemplateName = MAKEINTRESOURCEW(IDD_FOPT);
-
-	ofn.lpfnHook = TransFnHook;
-	optw = (WORD)*Option;
-	ofn.lCustData = (LPARAM)&optw;
-
-	ofn.Flags |= OFN_SHOWHELP;
-
-	ofn.lpstrTitle = caption;
-
-	ofn.hInstance = hInst;
-
-	BOOL Ok = _GetOpenFileNameW(&ofn);
-	free(FNFilter);
-
-	if (Ok) {
-		*Option = (long)optw;
-	}
-	/* restore dir */
-	_SetCurrentDirectoryW(TempDir);
-
-	wchar_t *ret = NULL;
-	if (Ok) {
-		ret = _wcsdup(FileName);
-	}
-	return ret;
-}
-
+/**
+ *	ファイル送信
+ */
 BOOL FileSendStart(const wchar_t *filename, int binary)
 {
 	if (SendVar != NULL) {
 		return FALSE;
 	}
 	if (! cv.Ready || FSend) {
+		return FALSE;
+	}
+	if (filename == NULL) {
 		return FALSE;
 	}
 	if (ProtoGetProtoFlag())
@@ -330,27 +191,8 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 	FSend = TRUE;
 	PFileVar fv = SendVar;
 
-	wchar_t uimsg[MAX_UIMSG];
-	get_lang_msgW("FILEDLG_TRANS_TITLE_SENDFILE", uimsg, _countof(uimsg), L"Send file", ts.UILanguageFile);
-	aswprintf(&(fv->DlgCaption), L"Tera Term: %s", uimsg);
-
-	if (filename != NULL) {
-		SendVar->FullName = _wcsdup(filename);
-		ts.TransBin = binary;
-	}
-	else {
-		// ファイルが指定されていない場合
-		LONG Option = 0;
-		if (ts.TransBin)
-			Option |= LOGDLG_BINARY;
-		wchar_t *filename = _GetTransFname(HVTWin, fv->DlgCaption, &Option);
-		if (filename == NULL) {
-			FileSendEnd();
-			return FALSE;
-		}
-		SendVar->FullName = filename;
-		ts.TransBin = CheckFlag(Option, LOGDLG_BINARY);
-	}
+	SendVar->FullName = _wcsdup(filename);
+	ts.TransBin = binary;
 
 	SendVar->FileHandle = _CreateFileW(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
 									   OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
@@ -435,7 +277,7 @@ static int FSEcho1(BYTE b)
 
 // 以下の時はこちらの関数を使う
 // - BinaryMode == true
-// - FileBracketMode == false
+// - FileBracketMode == FS_BRACKET_NONE
 // - cv.TelFlag == false
 // - ts.LocalEcho == 0
 static void FileSendBinayBoost(void)
@@ -499,11 +341,10 @@ void FileSend(void)
 {
 	WORD c, fc;
 	LONG BCOld;
-	DWORD read_bytes;
 	PFileVar fv = SendVar;
 
 	if (cv.PortType == IdSerial && ts.FileSendHighSpeedMode &&
-	    BinaryMode && !FileBracketMode && !cv.TelFlag &&
+	    BinaryMode && FileBracketMode == FS_BRACKET_NONE && !cv.TelFlag &&
 	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
 		return FileSendBinayBoost();
 	}
@@ -542,6 +383,7 @@ void FileSend(void)
 			}
 		}
 		else if (! FileReadEOF) {
+			DWORD read_bytes;
 			ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
 			SendVar->ByteCount = SendVar->ByteCount + fc;

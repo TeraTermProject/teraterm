@@ -41,7 +41,7 @@
 #include "ttwinman.h"		// for ts
 #include "codeconv.h"
 
-#define	SENDMEM_USE_OLD_API	1
+#define	SENDMEM_USE_OLD_API	0
 
 #if SENDMEM_USE_OLD_API
 #include "filesys.h"		// for FileSendStart()
