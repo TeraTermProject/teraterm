@@ -3685,7 +3685,7 @@ void CVTWindow::OnDuplicateSession()
 	fopen_s(&fp, cygterm_cfg, "r");
 	if (fp != NULL) {
 		while (fgets(buf, sizeof(buf), fp) != NULL) {
-			int len = strlen(buf);
+			size_t len = strlen(buf);
 
 			if (buf[len - 1] == '\n')
 				buf[len - 1] = '\0';
@@ -3781,7 +3781,7 @@ void CVTWindow::OnCygwinConnection()
 {
 	char file[MAX_PATH], *filename;
 	char c, *envptr, *envbuff=NULL;
-	int envbufflen;
+	size_t envbufflen;
 	const char *exename = "cygterm.exe";
 	char cygterm[MAX_PATH];
 	STARTUPINFO si;
@@ -4244,25 +4244,17 @@ void CVTWindow::OnFileExit()
 void CVTWindow::OnEditCopy()
 {
 	// copy selected text to clipboard
-#if	UNICODE_INTERNAL_BUFF
 	wchar_t *strW = BuffCBCopyUnicode(FALSE);
 	CBSetTextW(HVTWin, strW, 0);
 	free(strW);
-#else
-	BuffCBCopy(FALSE);
-#endif
 }
 
 void CVTWindow::OnEditCopyTable()
 {
 	// copy selected text to clipboard in Excel format
-#if	UNICODE_INTERNAL_BUFF
 	wchar_t *strW = BuffCBCopyUnicode(TRUE);
 	CBSetTextW(HVTWin, strW, 0);
 	free(strW);
-#else
-	BuffCBCopy(TRUE);
-#endif
 }
 
 void CVTWindow::OnEditPaste()
@@ -5400,17 +5392,16 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 
 	// 未送信データがある場合は先に送信する
 	// データ量が多い場合は送信しきれない可能性がある
-#if	UNICODE_INTERNAL_BUFF
 	if (TalkStatus == IdTalkSendMem) {
-		SendMemContinuously();
+		SendMemContinuously();	// TODO 必要?
 	}
-#endif
+
 	// 送信可能な状態でなければエラー
 	if (TalkStatus != IdTalkKeyb) {
 		return 0;
 	}
 
-	COPYDATASTRUCT *cds = (COPYDATASTRUCT *)lParam;
+	const COPYDATASTRUCT *cds = (COPYDATASTRUCT *)lParam;
 	BroadCastReceive(cds);
 
 	return 1; // 送信できた場合は1を返す
