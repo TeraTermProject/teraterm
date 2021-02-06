@@ -336,8 +336,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->TelCRSend = FALSE;
 	cv->TelCRSendEcho = FALSE;
 	cv->TelAutoDetect = ts->TelAutoDetect; /* TTPLUG */
-	cv->Locale = ts->Locale;
-	cv->locale = _create_locale(LC_ALL, cv->Locale);
 	cv->CodePage = &ts->CodePage;
 	cv->ConnetingTimeout = &ts->ConnectingTimeout;
 	cv->LastSendTime = time(NULL);
@@ -900,8 +898,6 @@ void CommClose(PComVar cv)
 	}
 	cv->ComID = INVALID_HANDLE_VALUE;
 	cv->PortType = 0;
-
-	_free_locale(cv->locale);
 }
 
 void CommProcRRQ(PComVar cv)

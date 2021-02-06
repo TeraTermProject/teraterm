@@ -1281,8 +1281,6 @@ void CVTWindow::SetupTerm()
 		if (cv.TelFlag && (ts.TelEcho>0)) {
 			TelChangeEcho();
 		}
-		_free_locale(cv.locale);
-		cv.locale = _create_locale(LC_ALL, cv.Locale);
 	}
 
 	if ((ts.TerminalWidth!=NumOfColumns) ||

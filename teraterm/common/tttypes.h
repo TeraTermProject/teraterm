@@ -1049,7 +1049,7 @@ typedef struct {
 	BOOL RetryWithOtherProtocol;
 	struct addrinfo * res0;
 	struct addrinfo * res;
-	char *Locale;
+	char *reserve_11;	// Locale
 	int *CodePage;
 	int *ConnetingTimeout;
 
@@ -1062,7 +1062,7 @@ typedef struct {
 	BOOL Flush;
 
 	BOOL TelLineMode;
-	_locale_t locale;
+	void *reserve_12;	// _locale_t locale
 	BOOL VirtualStoreEnabled;
 
 	void *NotifyIcon;
