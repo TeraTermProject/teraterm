@@ -1653,7 +1653,8 @@ static void PasteString(PComVar cv, const wchar_t *str, bool escape)
 		EscapeFilename(str, tmpbuf);
 	}
 
-	SendMemPasteString(tmpbuf);
+	size_t len = wcslen(tmpbuf);
+	TermPasteString(tmpbuf, len);
 }
 
 /* 入力はファイルのみ(フォルダは含まれない) */
