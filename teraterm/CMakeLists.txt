@@ -28,6 +28,9 @@ add_subdirectory(keycode)
 set_target_properties(
   keycode
   PROPERTIES FOLDER teraterm)
+set_target_properties(
+  keycodeW
+  PROPERTIES FOLDER teraterm)
 
 add_subdirectory(common)
 set_target_properties(
