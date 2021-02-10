@@ -139,7 +139,7 @@ void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen)
   FuncKeyLen[NewKeyId] = NewKeyLen;
 }
 
-int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeType, WORD ModStat) {
+static int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeType, WORD ModStat) {
   BOOL Single, Control, Shift;
   int CodeLength = 0;
 
@@ -634,7 +634,6 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 {
   WORD Key;
   MSG M;
-  BYTE KeyState[256];
   int i;
   int CodeCount;
   int CodeLength;
@@ -746,6 +745,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 
   if (VKey==VK_NUMLOCK) {
     /* keep NumLock LED status */
+    BYTE KeyState[256];
     GetKeyboardState((PBYTE)KeyState);
     KeyState[VK_NUMLOCK] = KeyState[VK_NUMLOCK] ^ 1;
     SetKeyboardState((PBYTE)KeyState);
@@ -933,3 +933,10 @@ void EndKeyboard()
   if (KeyMap != NULL)
     free(KeyMap);
 }
+
+/*
+ * Local Variables:
+ * tab-width: 8
+ * c-basic-offset: 2
+ * End:
+ */

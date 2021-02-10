@@ -385,7 +385,6 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
 	char Command[MaxStrLen + 1];
 	int i;
-	WORD w, c;
 	wchar_t *ParamFileNameW;
 	BOOL r;
 
@@ -642,11 +641,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	}
-	case CmdSendKCode:
-		w = HexStr2Word(ParamFileName);
-		c = HexStr2Word(&ParamFileName[4]);
+	case CmdSendKCode: {
+		WORD w = HexStr2Word(ParamFileName);
+		WORD c = HexStr2Word(&ParamFileName[4]);
 		PostMessage(HVTWin,WM_USER_KEYCODE,w,(LPARAM)c);
 		break;
+	}
 	case CmdSetEcho:
 		ts.LocalEcho = ParamBinaryFlag;
 		if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
