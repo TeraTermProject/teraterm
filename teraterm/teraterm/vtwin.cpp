@@ -2544,10 +2544,6 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 
 void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	char e = ESC;
-	char Code;
-	unsigned int i;
-
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	// ALT + xを押下すると WM_SYSCHAR が飛んでくる。
 	// ALT + Enterでウィンドウの最大化 (2005.4.24 yutaka)
@@ -2561,30 +2557,43 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 #endif
 
 	if (MetaKey(ts.MetaKey)) {
-		if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) return;
-		Code = nChar;
-		for (i=1 ; i<=nRepCnt ; i++) {
+		if (!KeybEnabled || (TalkStatus != IdTalkKeyb))
+			return;
+		char Code = nChar;
+		wchar_t u16;
+		if (ts.Meta8Bit != IdMeta8BitRaw) {
+			const char mb_str[2] = {(char)nChar | 0x80, 0};
+			unsigned int u32;
+			size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
+			if (mb_len == 0) {
+				return;
+			}
+			u16 = (wchar_t)u32;
+		}
+		for (unsigned int i = 1; i <= nRepCnt; i++) {
 			switch (ts.Meta8Bit) {
-			  case IdMeta8BitRaw:
-				Code |= 0x80;
-				CommBinaryBuffOut(&cv, &Code, 1);
-				if (ts.LocalEcho) {
-					CommBinaryEcho(&cv, &Code, 1);
-				}
-				break;
-			  case IdMeta8BitText:
-				Code |= 0x80;
-				CommTextOut(&cv, &Code, 1);
-				if (ts.LocalEcho) {
-					CommTextEcho(&cv, &Code, 1);
-				}
-				break;
-			  default:
-				CommTextOut(&cv, &e, 1);
-				CommTextOut(&cv, &Code, 1);
-				if (ts.LocalEcho) {
-					CommTextEcho(&cv, &e, 1);
-					CommTextEcho(&cv, &Code, 1);
+				case IdMeta8BitRaw:
+					Code |= 0x80;
+					CommBinaryBuffOut(&cv, &Code, 1);
+					if (ts.LocalEcho) {
+						CommBinaryEcho(&cv, &Code, 1);
+					}
+					break;
+				case IdMeta8BitText:
+					Code |= 0x80;
+					CommTextOutW(&cv, &u16, 1);
+					if (ts.LocalEcho) {
+						CommTextEchoW(&cv, &u16, 1);
+					}
+					break;
+				default: {
+					const wchar_t e = ESC;
+					CommTextOutW(&cv, &e, 1);
+					CommTextOutW(&cv, &u16, 1);
+					if (ts.LocalEcho) {
+						CommTextEchoW(&cv, &e, 1);
+						CommTextEchoW(&cv, &u16, 1);
+					}
 				}
 			}
 		}
