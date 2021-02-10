@@ -1452,20 +1452,15 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		// 入力は UTF-16
 		u16 = (wchar_t)nChar;
 	} else {
-		// 入力は ANSI, ANSI(ACP) -> UTF-32 -> UTF-16
-		char mb_str[1];
+		// 入力は ANSI
+		//		ANSI(ACP) -> UTF-32 -> UTF-16
+		const char mb_str[2] = {(char)nChar, 0};
 		unsigned int u32;
-		mb_str[0] = (char)nChar;
-		size_t u32_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
-		if (u32_len == 0) {
+		size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
+		if (mb_len == 0) {
 			return;
 		}
-		wchar_t u16_str[2];
-		size_t u16_len = UTF32ToUTF16(u32, u16_str, _countof(u16_str));
-		if (u16_len == 0) {
-			return;
-		}
-		u16 = u16_str[0];
+		u16 = (wchar_t)u32;
 	}
 
 	// バッファへ出力、画面へ出力
@@ -1947,9 +1942,6 @@ void CVTWindow::OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu)
 
 void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	BYTE KeyState[256];
-	MSG M;
-
 #if UNICODE_DEBUG
 	if (UnicodeDebugParam.CodePopupEnable)
 	{
@@ -2012,11 +2004,14 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 	if (MetaKey(ts.MetaKey) && (nFlags & 0x2000) != 0)
 	{
+		BYTE KeyState[256];
+		MSG M;
+
 		PeekMessage((LPMSG)&M,HVTWin,WM_CHAR,WM_CHAR,PM_REMOVE);
 		/* for Ctrl+Alt+Key combination */
-		GetKeyboardState((PBYTE)KeyState);
+		GetKeyboardState(KeyState);
 		KeyState[VK_MENU] = 0;
-		SetKeyboardState((PBYTE)KeyState);
+		SetKeyboardState(KeyState);
 		M.hwnd = HVTWin;
 		M.message = WM_KEYDOWN;
 		M.wParam = nChar;

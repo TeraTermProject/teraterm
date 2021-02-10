@@ -45,8 +45,8 @@
 #include "ttlib.h"
 #include <htmlhelp.h>
 #include "dlglib.h"
-#include <tchar.h>
 #include "layer_for_unicode.h"
+#include "codeconv.h"
 
 #define TEKClassName L"TEKWin32"
 
@@ -250,24 +250,43 @@ void CTEKWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 	}
 }
 
+/**
+ *	キーボードから1文字入力
+ *	@param	nChar	UTF-16 char(wchar_t)	IsWindowUnicode() == TRUE 時
+ *					ANSI char(char)			IsWindowUnicode() == FALSE 時
+ */
 void CTEKWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	unsigned int i;
-	char Code;
 
 	if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) {
 		return;
 	}
-	Code = nChar;
+
+	wchar_t u16;
+	if (IsWindowUnicode(HTEKWin) == TRUE) {
+		// 入力は UTF-16
+		u16 = (wchar_t)nChar;
+	} else {
+		// 入力は ANSI
+		//		ANSI(ACP) -> UTF-32 -> UTF-16
+		const char mb_str[2] = {(char)nChar, 0};
+		unsigned int u32;
+		size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
+		if (mb_len == 0) {
+			return;
+		}
+		u16 = (wchar_t)u32;
+	}
 
 	if (tk.GIN) {
-		TEKReportGIN(&tk,&ts,&cv,Code);
+		char Code = (char)nChar;
+		TEKReportGIN(&tk, &ts, &cv, Code);
 	}
 	else {
-		for (i=1 ; i<=nRepCnt ; i++) {
-			CommTextOut(&cv,&Code,1);
-			if (ts.LocalEcho>0) {
-				CommTextEcho(&cv,&Code,1);
+		for (unsigned int i = 1; i <= nRepCnt; i++) {
+			CommTextOutW(&cv, &u16, 1);
+			if (ts.LocalEcho > 0) {
+				CommTextEchoW(&cv, &u16, 1);
 			}
 		}
 	}
@@ -636,7 +655,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 LRESULT CTEKWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
-	OpenHelp(HH_HELP_CONTEXT, HelpId, ts.UILanguageFile);
+	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
 	return 0;
 }
 
@@ -906,6 +925,6 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		retval = DefWindowProc(msg, wp, lp);
 		break;
 	}
-				
+
 	return retval;
 }
