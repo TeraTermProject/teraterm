@@ -367,7 +367,7 @@ static void CloseProtoDlg(void)
 			//if ((ProtoId==PROTO_QV) &&
 			//    (((PQVVar)ProtoVar)->QVMode==IdQVSend))
 			if (FileVar->OpId == OpQVSend)
-				CommTextOut(&cv,"\015",1);
+				CommBinaryOut(&cv,"\015",1);
 		}
 	}
 }
