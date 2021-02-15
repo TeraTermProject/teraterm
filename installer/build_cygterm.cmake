@@ -18,4 +18,8 @@ set(ENV{PATH} ${CYGWIN_PATH})
 execute_process(
   COMMAND make all
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../cygterm
+  RESULT_VARIABLE rv
   )
+if(NOT rv STREQUAL "0")
+  message(FATAL_ERROR "cygterm build error")
+endif()
