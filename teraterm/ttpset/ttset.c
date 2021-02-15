@@ -3585,7 +3585,7 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 #define XFunction "X function keys"
 #define ShortCut "Shortcut keys"
 
-void GetInt(PKeyMap KeyMap, int KeyId, PCHAR Sect, PCHAR Key, PCHAR FName)
+static void GetInt(PKeyMap KeyMap, int KeyId, const char *Sect, const char *Key, const char *FName)
 {
 	char Temp[11];
 	WORD Num;

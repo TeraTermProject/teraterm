@@ -679,3 +679,56 @@ BOOL GetFileNamePosU8(const char *PathName, int *DirLen, int *FNPos)
 	if (FNPos != NULL) *FNPos = FNPtr-PathName;
 	return TRUE;
 }
+
+/**
+ *	ファイル名(パス名)を解析する
+ *	GetFileNamePos() の wchar_t版
+ *
+ *	@param[in]	PathName	ファイル名、フルパス
+ *	@param[out]	DirLen		末尾のスラッシュを含むディレクトリパス長
+ *							NULLのとき値を返さない
+ *	@param[out]	FNPos		ファイル名へのindex
+ *							&PathName[FNPos] がファイル名
+ *							NULLのとき値を返さない
+ *	@retval		FALSE		PathNameが不正
+ */
+BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos)
+{
+	const wchar_t *Ptr;
+	const wchar_t *DirPtr;
+	const wchar_t *FNPtr;
+	const wchar_t *PtrOld;
+
+	if (DirLen != NULL) *DirLen = 0;
+	if (FNPos != NULL) *FNPos = 0;
+
+	if (PathName==NULL)
+		return FALSE;
+
+	if ((wcslen(PathName)>=2) && (PathName[1]==L':'))
+		Ptr = &PathName[2];
+	else
+		Ptr = PathName;
+	if (Ptr[0]=='\\' || Ptr[0]=='/')
+		Ptr++;
+
+	DirPtr = Ptr;
+	FNPtr = Ptr;
+	while (Ptr[0]!=0) {
+		wchar_t b = Ptr[0];
+		PtrOld = Ptr;
+		Ptr++;
+		switch (b) {
+			case L':':
+				return FALSE;
+			case L'/':	/* FALLTHROUGH */
+			case L'\\':
+				DirPtr = PtrOld;
+				FNPtr = Ptr;
+				break;
+		}
+	}
+	if (DirLen != NULL) *DirLen = DirPtr-PathName;
+	if (FNPos != NULL) *FNPos = FNPtr-PathName;
+	return TRUE;
+}

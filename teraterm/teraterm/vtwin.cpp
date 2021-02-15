@@ -4623,78 +4623,84 @@ void CVTWindow::OnSetupGeneral()
 	FreeTTDLG();
 }
 
-/* GetSetupFname function id */
-#define GSF_SAVE	0 // Save setup
-#define GSF_RESTORE	1 // Restore setup
-#define GSF_LOADKEY	2 // Load key map
-
-static BOOL _GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
+static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const char *iniFile)
 {
-	int i, j;
-	OPENFILENAME ofn;
-	char uimsg[MAX_UIMSG];
+	return TTGetLangStrW("Tera Term", key, def, iniFile);
+}
 
-	//  char FNameFilter[HostNameMaxLength + 1]; // 81(yutaka)
-	char FNameFilter[81]; // 81(yutaka)
-	wchar_t TempDir[MAXPATHLEN];
-	char Dir[MAXPATHLEN];
-	char Name[MAX_PATH];
-	BOOL Ok;
+/* GetSetupFname function id */
+typedef enum {
+	GSF_SAVE,		// Save setup
+	GSF_RESTORE,	// Restore setup
+	GSF_LOADKEY,	// Load key map
+} GetSetupFnameFuncId;
+
+static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
+{
+	wchar_t *FNameFilter;
+	wchar_t TempDir[MAX_PATH];
+	wchar_t DirW[MAX_PATH];
+	wchar_t NameW[MAX_PATH];
 	const char *UILanguageFile = ts->UILanguageFile;
 
 	/* save current dir */
 	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
 	/* File name filter */
-	memset(FNameFilter, 0, sizeof(FNameFilter));
 	if (FuncId==GSF_LOADKEY) {
-		get_lang_msg("FILEDLG_KEYBOARD_FILTER", uimsg, sizeof(uimsg), "keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFile);
-		memcpy(FNameFilter, uimsg, sizeof(FNameFilter));
+		FNameFilter = _get_lang_msg("FILEDLG_KEYBOARD_FILTER", L"keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFile);
 	}
 	else {
-		get_lang_msg("FILEDLG_SETUP_FILTER", uimsg, sizeof(uimsg), "setup files (*.ini)\\0*.ini\\0\\0", UILanguageFile);
-		memcpy(FNameFilter, uimsg, sizeof(FNameFilter));
+		FNameFilter = _get_lang_msg("FILEDLG_SETUP_FILTER", L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFile);
 	}
 
-	/* OPENFILENAME record */
-	memset(&ofn, 0, sizeof(OPENFILENAME));
+	if (FuncId==GSF_LOADKEY) {
+		size_t i, j;
+		wchar_t *KeyCnfFNW = ToWcharA(ts->KeyCnfFN);
+		GetFileNamePosW(KeyCnfFNW,&i,&j);
+		wcsncpy_s(NameW, _countof(NameW),&KeyCnfFNW[j], _TRUNCATE);
+		memcpy(DirW, KeyCnfFNW, sizeof(wchar_t) * i);
+		DirW[i] = 0;
 
+		if ((wcslen(NameW) == 0) || (_wcsicmp(NameW, L"KEYBOARD.CNF") == 0)) {
+			wcsncpy_s(NameW, _countof(NameW),L"KEYBOARD.CNF", _TRUNCATE);
+		}
+	}
+	else {
+		size_t i, j;
+		wchar_t *SetupFNameW = ToWcharA(ts->SetupFName);
+		GetFileNamePosW(SetupFNameW,&i,&j);
+		wcsncpy_s(NameW, _countof(NameW),&SetupFNameW[j], _TRUNCATE);
+		memcpy(DirW, SetupFNameW, sizeof(wchar_t) * i);
+		DirW[i] = 0;
+
+		if ((wcslen(NameW) == 0) || (_wcsicmp(NameW, L"TERATERM.INI") == 0)) {
+			wcsncpy_s(NameW, _countof(NameW), L"TERATERM.INI", _TRUNCATE);
+		}
+	}
+
+	if (wcslen(DirW) == 0) {
+		wchar_t *HomeDirW = ToWcharA(ts->HomeDir);
+		wcsncpy_s(DirW, _countof(DirW), HomeDirW, _TRUNCATE);
+		free(HomeDirW);
+	}
+
+	SetCurrentDirectoryW(DirW);
+
+	/* OPENFILENAME record */
+	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = HWin;
-	ofn.lpstrFile   = Name;
-	ofn.nMaxFile    = sizeof(Name);
+	ofn.lpstrFile   = NameW;
+	ofn.nMaxFile    = sizeof(NameW);
 	ofn.lpstrFilter = FNameFilter;
 	ofn.nFilterIndex = 1;
 	ofn.hInstance = hInst;
 
-	if (FuncId==GSF_LOADKEY) {
-		ofn.lpstrDefExt = "cnf";
-		GetFileNamePos(ts->KeyCnfFN,&i,&j);
-		strncpy_s(Name, sizeof(Name),&(ts->KeyCnfFN[j]), _TRUNCATE);
-		memcpy(Dir,ts->KeyCnfFN,i);
-		Dir[i] = 0;
-
-		if ((strlen(Name)==0) || (_stricmp(Name,"KEYBOARD.CNF")==0))
-			strncpy_s(Name, sizeof(Name),"KEYBOARD.CNF", _TRUNCATE);
-	}
-	else {
-		ofn.lpstrDefExt = "ini";
-		GetFileNamePos(ts->SetupFName,&i,&j);
-		strncpy_s(Name, sizeof(Name),&(ts->SetupFName[j]), _TRUNCATE);
-		memcpy(Dir,ts->SetupFName,i);
-		Dir[i] = 0;
-
-		if ((strlen(Name)==0) || (_stricmp(Name,"TERATERM.INI")==0))
-			strncpy_s(Name, sizeof(Name),"TERATERM.INI", _TRUNCATE);
-	}
-
-	if (strlen(Dir)==0)
-		strncpy_s(Dir, sizeof(Dir),ts->HomeDir, _TRUNCATE);
-
-	SetCurrentDirectoryA(Dir);
-
+	BOOL Ok;
 	switch (FuncId) {
 	case GSF_SAVE:
+		ofn.lpstrDefExt = L"ini";
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_SHOWHELP;
 		// 初期ファイルディレクトリをプログラム本体がある箇所に固定する (2005.1.6 yutaka)
 		// 読み込まれたteraterm.iniがあるディレクトリに固定する。
@@ -4703,28 +4709,36 @@ static BOOL _GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 		// ファイル名を含まない形でディレクトリを指定するようにした。(2006.9.16 maya)
 //		ofn.lpstrInitialDir = __argv[0];
 //		ofn.lpstrInitialDir = ts->SetupFName;
-		ofn.lpstrInitialDir = Dir;
-		get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Save setup", UILanguageFile);
-		ofn.lpstrTitle = uimsg;
-		Ok = GetSaveFileName(&ofn);
-		if (Ok)
-			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName),Name, _TRUNCATE);
+		ofn.lpstrInitialDir = DirW;
+		ofn.lpstrTitle = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", L"Tera Term: Save setup", UILanguageFile);
+		Ok = _GetSaveFileNameW(&ofn);
+		if (Ok) {
+			char *Name = ToCharW(NameW);
+			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
+			free(Name);
+		}
 		break;
 	case GSF_RESTORE:
+		ofn.lpstrDefExt = L"ini";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Restore setup", UILanguageFile);
-		ofn.lpstrTitle = uimsg;
-		Ok = GetOpenFileName(&ofn);
-		if (Ok)
-			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName),Name, _TRUNCATE);
+		ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFile);
+		Ok = _GetOpenFileNameW(&ofn);
+		if (Ok) {
+			char *Name = ToCharW(NameW);
+			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
+			free(Name);
+		}
 		break;
 	case GSF_LOADKEY:
+		ofn.lpstrDefExt = L"cnf";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", uimsg, sizeof(uimsg), "Tera Term: Load key map", UILanguageFile);
-		ofn.lpstrTitle = uimsg;
-		Ok = GetOpenFileName(&ofn);
-		if (Ok)
-			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN),Name, _TRUNCATE);
+		ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFile);
+		Ok = _GetOpenFileNameW(&ofn);
+		if (Ok) {
+			char *Name = ToCharW(NameW);
+			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), Name, _TRUNCATE);
+			free(Name);
+		}
 		break;
 	default:
 		assert(FALSE);
@@ -4739,6 +4753,9 @@ static BOOL _GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 		assert(Err == 0 && DlgErr == 0);
 	}
 #endif
+
+	free(FNameFilter);
+	free((void *)ofn.lpstrTitle);
 
 	/* restore dir */
 	_SetCurrentDirectoryW(TempDir);
