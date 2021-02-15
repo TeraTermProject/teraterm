@@ -35,18 +35,19 @@
 buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
 
     1. Visual Studio 16 2019
-    2. Visual Studio 15 2017
-    3. Visual Studio 14 2015
-    4. Visual Studio 12 2013
-    5. Visual Studio 11 2012
-    6. Visual Studio 10 2010
-    7. Visual Studio 9 2008
-    8. Visual Studio 8 2005
+    2. Visual Studio 16 2019 x64
+    3. Visual Studio 15 2017
+    4. Visual Studio 14 2015
+    5. Visual Studio 12 2013
+    6. Visual Studio 11 2012
+    7. Visual Studio 10 2010
+    8. Visual Studio 9 2008
+    9. Visual Studio 8 2005
     select no
 
 VS2005を選択した場合、
-このバッチファイルから cmake 3.11.4 をダウンロードして `libs\cmake-3.11.4-win32-x86` に
-インストールできます。
+このバッチファイルから cmake 3.11.4 をダウンロードして `buildtools\libs\cmake-3.11.4-win32-x86` に
+展開されます。
 
 ### cmakeを使用する場合
 
@@ -54,18 +55,14 @@ Visual Studio 2019 x86 の場合
 
     cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildall.cmake
 
-Visual Studio 2017 x86 の場合
+Visual Studio 2019 x64 の場合
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildall.cmake
-
-Visual Studio 2017 x64 の場合
-
-    cmake -DCMAKE_GENERATOR="Visual Studio 15 2017 Win64" -P buildall.cmake`
+    cmake -DCMAKE_GENERATOR="Visual Studio 15 2019" -DARCHITECTURE=x64 -P buildall.cmake`
 
 Visual Studio 2005の場合は、cmakeのバージョン3.11.4以前を使用
-(cmake が libs\cmake-3.11.4-win32-x86 にインストールしてある場合)
+(cmake が buildtools\cmake-3.11.4-win32-x86 にインストールしてある場合)
 
-    libs\cmake-3.11.4-win32-x86\bin\cmake.exe" -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
+    ..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe" -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
 
 ## MinGW 共通
 
@@ -78,6 +75,7 @@ Visual Studio 2005の場合は、cmakeのバージョン3.11.4以前を使用
 ## 生成されるライブラリフォルダ
 
 - 次のフォルダにライブラリの `*.h` , `*.lib` が生成される
+    - `cJSON`
 	- `oniguruma_{compiler}`
 	- `openssl_{compiler}`
 	- `putty`
