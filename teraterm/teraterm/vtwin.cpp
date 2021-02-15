@@ -2163,7 +2163,7 @@ void CVTWindow::CodePopup(int client_x, int client_y)
 void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 {
 	int i;
-	BOOL mousereport;
+	BOOL mousereport = FALSE;
 
 #if UNICODE_DEBUG
 	if (TipWinCodeDebug != NULL) {
