@@ -1,4 +1,4 @@
-﻿set(PACKAGE_NAME "ttproxy")
+﻿set(PACKAGE_NAME "TTXProxy")
 
 project(${PACKAGE_NAME})
 
