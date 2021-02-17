@@ -66,7 +66,7 @@
 
 ■ SVN コミッターへの注意
 - SVN リポジトリは一般向けとは違い、以下の通りです。
-  svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk
+  svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable
 
 - ファイルを別のディレクトリで編集しないでください。
   コミットしたときに別の人の修正を削除してしまうことがあります。
@@ -335,8 +335,8 @@
      - インストールおよび実行をテストする。
 
   5. SVN のタグを作成する。
-     タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。
-     svn copy -m "Release 4.82" svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_82
+     タグ名は「teraterm-バージョン」。たとえば、v4.106ならば"teraterm-4_106"。
+     svn copy -m "Release 4.106" svn+ssh://svn.osdn.net/svnroot/ttssh2/4-stable svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
 
   6. リリース用のタグでチェックアウトし直す。
 

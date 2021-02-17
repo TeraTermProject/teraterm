@@ -62,7 +62,7 @@
 
 * Notice for SVN committer
 - SVN repository for committer is the following:
-  svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk
+  svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable
 
 - Should not edit checkout file in copying directory.
   The other modification code may be deleted in SVN server when you commit checkout file. Also, fix it carefully when the conflicting occurs.
@@ -322,8 +322,8 @@ Example: adding a TTSSH menu under File menu
      - Test Tera Term installation and evaluate it.
 
   5. Create SVN tag.
-     The naming rule is `teraterm-version'(ex. teraterm-4_82).
-     svn copy -m "Release 4.82" svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_82
+     The naming rule is `teraterm-version'(ex. teraterm-4_106).
+     svn copy -m "Release 4.106" svn+ssh://svn.osdn.net/svnroot/ttssh2/4-stable svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
 
   6. Re-checkout from svn tag.
 
