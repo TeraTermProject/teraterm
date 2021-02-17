@@ -53,7 +53,7 @@
     libs\svn へ解凍します。("svnversion.exe" が libs\svn\bin に配置されるようにしてください)
   Patch
     PATH の通ったところに patch がない場合は、libs\openssl_patch に "patch.exe" が配置されるようにしてください。
-    https://gitforwindows.org/ (https://github.com/git-for-windows/git/releases/latest) からであれば、Git-x.xx.x-xx-bit.tar.bz2 をダウンロードして展開し、usr\bin 内の patch.exe, msys-gcc_s-1.dll, msys-2.0.dll をコピーします。
+    https://gitforwindows.org/ (https://github.com/git-for-windows/git/releases/latest) からであれば、Git-x.xx.x-32-bit.tar.bz2 をダウンロードして展開し、usr\bin 内の patch.exe, msys-gcc_s-1.dll, msys-2.0.dll をコピーします。
 
 
 ■ ライブラリ

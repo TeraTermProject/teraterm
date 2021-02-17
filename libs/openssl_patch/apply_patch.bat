@@ -1,20 +1,16 @@
 @echo off
 
-rem cmdfolder は、patch を実行する .. から見た相対パス
-set cmdfolder=openssl_patch
+rem folder は、patch を実行する .. から見た相対パス
+set folder=openssl_patch
 
 set cmdopt2=--binary --backup -p0
 set cmdopt1=--dry-run %cmdopt2%
 
-rem
-echo OpenSSL 1.1.1gにパッチが適用されているかを確認します...
-echo.
-rem
 
 rem パッチコマンドの存在チェック
-rem ..\%cmdfolder%\patch.exe, PATHが通っているpatch の優先順
+rem ..\%folder%\patch.exe, PATHが通っているpatch の優先順
 pushd ..
-set patchcmd="%cmdfolder%\patch.exe"
+set patchcmd="%folder%\patch.exe"
 if exist %patchcmd% (
     popd
     goto cmd_true
@@ -114,14 +110,33 @@ copy /b openssl\crypto\rand\rand_win.c.orig openssl\crypto\rand\rand_win.c.orig2
 popd
 
 
-
 :patch10
+
+
+:patch_main_conf
+rem 設定ファイルのバックアップを取る
+if not exist "..\openssl\Configurations\10-main.conf.orig" (
+    copy /y ..\openssl\Configurations\10-main.conf ..\openssl\Configurations\10-main.conf.orig
+)
+
+rem VS2005だと警告エラーでコンパイルが止まる問題への処置
+perl -e "open(IN,'..\openssl\Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
+move conf.tmp ..\openssl\Configurations/10-main.conf
+
+rem GetModuleHandleExW API(WindowsXP以降)依存除去のため
+perl -e "open(IN,'..\openssl\Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
+move conf.tmp ..\openssl\Configurations/10-main.conf
+
+rem Debug buildのwarning LNK4099対策(Workaround)
+perl -e "open(IN,'..\openssl\Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/Zi|/Z7|;s|/WX||;print $_;}close(IN);" > conf.tmp
+move conf.tmp ..\openssl\Configurations/10-main.conf
 
 
 :patch_end
 echo "パッチは適用されています"
 timeout 5
 goto end
+
 
 :patchfail
 echo "パッチが適用されていないようです"
@@ -139,7 +154,8 @@ goto end
 
 :cmd_false
 echo パッチコマンドが見つかりません
-echo 下記サイトからダウンロードして、..\%cmdfolder% に patch.exe を配置してください
+echo 下記サイトからダウンロードして、..\%folder% に Git-x.xx.x-32-bit.tar.bz2 内の
+echo patch.exe, msys-gcc_s-1.dll, msys-2.0.dll を配置してください
 echo https://github.com/git-for-windows/git/releases/latest
 echo.
 goto patchfail

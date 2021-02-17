@@ -1,31 +1,23 @@
-
-rem OpenSSLのビルドへ移行
+rem OpenSSLのビルド
 
 cd openssl
 
-if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
 
-rem パッチ適用チェック
+rem Visual Studio 2005 の場合はパッチを適用
+set CL_VER=
+for /f "delims=" %%o in ('cl 2^>^&1') do set CL_VER=%%o & goto end_clver_chk
+:end_clver_chk
+
+echo %CL_VER% | find "Compiler Version 14" >nul
+if ERRORLEVEL 1 goto patch_end
 pushd ..\openssl_patch
-call check_patch.bat
+call apply_patch.bat
 popd
 
+:patch_end
 
-rem 設定ファイルのバックアップを取る
-copy /y Configurations\10-main.conf Configurations\10-main.conf.orig
 
-rem VS2005だと警告エラーでコンパイルが止まる問題への処置
-perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
-move conf.tmp Configurations/10-main.conf
-
-rem GetModuleHandleExW API(WindowsXP以降)依存除去のため
-perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
-move conf.tmp Configurations/10-main.conf
-
-rem Debug buildのwarning LNK4099対策(Workaround)
-perl -e "open(IN,'Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/Zi|/Z7|;s|/WX||;print $_;}close(IN);" > conf.tmp
-move conf.tmp Configurations/10-main.conf
-
+if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
 perl Configure no-asm no-async no-shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
 perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
 if exist "makefile.dbg" del makefile.dbg
