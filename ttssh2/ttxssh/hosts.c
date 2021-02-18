@@ -1371,7 +1371,9 @@ static void delete_different_key(PTInstVar pvar)
 		Key key; // known_hostsに登録されている鍵
 		int length;
 		char filename[MAX_PATH];
+#if _MSC_VER < 1900 // less than VSC2015(VC14.0)
 		char tmp[L_tmpnam];
+#endif
 		int fd;
 		int amount_written = 0;
 		int close_result;
@@ -1379,9 +1381,13 @@ static void delete_different_key(PTInstVar pvar)
 		char buf[FILENAME_MAX];
 
 		// 書き込み一時ファイルを開く
+#if _MSC_VER < 1900 // less than VSC2015(VC14.0)
 		_getcwd(filename, sizeof(filename));
-		tmpnam_s(tmp,sizeof(tmp));
+		tmpnam_s(tmp, sizeof(tmp));
 		strcat_s(filename, sizeof(filename), tmp);
+#else // VSC2015(VC14.0) or later
+		tmpnam_s(filename, sizeof(filename));
+#endif
 		fd = _open(filename,
 		          _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
 		          _S_IREAD | _S_IWRITE);
@@ -1560,7 +1566,9 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		Key key; // known_hostsに登録されている鍵
 		int length;
 		char filename[MAX_PATH];
+#if _MSC_VER < 1900 // less than VSC2015(VC14.0)
 		char tmp[L_tmpnam];
+#endif
 		int fd;
 		int amount_written = 0;
 		int close_result;
@@ -1568,9 +1576,13 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		char buf[FILENAME_MAX];
 
 		// 書き込み一時ファイルを開く
+#if _MSC_VER < 1900 // less than VSC2015(VC14.0)
 		_getcwd(filename, sizeof(filename));
 		tmpnam_s(tmp, sizeof(tmp));
 		strcat_s(filename, sizeof(filename), tmp);
+#else // VSC2015(VC14.0) or later
+		tmpnam_s(filename, sizeof(filename));
+#endif
 		fd = _open(filename,
 			_O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
 			_S_IREAD | _S_IWRITE);
