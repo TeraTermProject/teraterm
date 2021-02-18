@@ -336,7 +336,7 @@
 
   5. SVN のタグを作成する。
      タグ名は「teraterm-バージョン」。たとえば、v4.106ならば"teraterm-4_106"。
-     svn copy -m "Release 4.106" svn+ssh://svn.osdn.net/svnroot/ttssh2/4-stable svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
+     svn copy -m "Release 4.106" svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
 
   6. リリース用のタグでチェックアウトし直す。
 
