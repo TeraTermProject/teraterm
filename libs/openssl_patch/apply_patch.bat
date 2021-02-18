@@ -1,32 +1,38 @@
 @echo off
 
+rem folder は、patch を実行する .. から見た相対パス
 set folder=openssl_patch
+
 set cmdopt2=--binary --backup -p0
 set cmdopt1=--dry-run %cmdopt2%
 
-rem
-echo OpenSSL 1.1.1にパッチが適用されているかを確認します...
-echo.
-rem
 
 rem パッチコマンドの存在チェック
-set patchcmd="patch.exe"
-if exist %patchcmd% (goto cmd_true) else goto cmd_false
+rem ..\%folder%\patch.exe, PATHが通っているpatch の優先順
+pushd ..
+set patchcmd="%folder%\patch.exe"
+if exist %patchcmd% (
+    popd
+    goto cmd_true
+)
+popd
+
+set patchcmd=patch
+%patchcmd% -v
+if %errorlevel% == 0 (goto cmd_true) else goto cmd_false
 
 :cmd_true
 
 
-rem パッチの適用有無をチェック
-
 :patch1
 rem freeaddrinfo/getnameinfo/getaddrinfo API(WindowsXP以降)依存除去のため
-findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_lcl.h
+findstr /c:"# undef AI_PASSIVE" ..\openssl\crypto\bio\bio_local.h
 if ERRORLEVEL 1 goto fail1
 goto patch2
 :fail1
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\ws2_32_dll_patch.txt
-%folder%\patch %cmdopt2% < %folder%\ws2_32_dll_patch.txt
+%patchcmd% %cmdopt1% < %folder%\ws2_32_dll_patch2.txt
+%patchcmd% %cmdopt2% < %folder%\ws2_32_dll_patch2.txt
 popd
 
 :patch2
@@ -44,8 +50,8 @@ rem if ERRORLEVEL 1 goto fail5
 rem goto patch6
 rem :fail5
 rem pushd ..
-rem %folder%\patch %cmdopt1% < %folder%\RAND_bytes.txt
-rem %folder%\patch %cmdopt2% < %folder%\RAND_bytes.txt
+rem %patchcmd% %cmdopt1% < %folder%\RAND_bytes.txt
+rem %patchcmd% %cmdopt2% < %folder%\RAND_bytes.txt
 rem popd
 
 
@@ -56,8 +62,8 @@ if ERRORLEVEL 1 goto fail6
 goto patch7
 :fail6
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\atomic_api.txt
-%folder%\patch %cmdopt2% < %folder%\atomic_api.txt
+%patchcmd% %cmdopt1% < %folder%\atomic_api.txt
+%patchcmd% %cmdopt2% < %folder%\atomic_api.txt
 popd
 
 
@@ -69,8 +75,8 @@ if ERRORLEVEL 1 goto fail7
 goto patch8
 :fail7
 pushd ..
-%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW2.txt
-%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW2.txt
+%patchcmd% %cmdopt1% < %folder%\CryptAcquireContextW2.txt
+%patchcmd% %cmdopt2% < %folder%\CryptAcquireContextW2.txt
 popd
 
 
@@ -85,8 +91,8 @@ goto patch9
 :fail8
 pushd ..
 copy /b openssl\crypto\threads_win.c.orig openssl\crypto\threads_win.c.orig2
-%folder%\patch %cmdopt1% < %folder%\atomic_api_win95.txt
-%folder%\patch %cmdopt2% < %folder%\atomic_api_win95.txt
+%patchcmd% %cmdopt1% < %folder%\atomic_api_win95.txt
+%patchcmd% %cmdopt2% < %folder%\atomic_api_win95.txt
 popd
 
 
@@ -99,19 +105,38 @@ goto patch10
 :fail9
 pushd ..
 copy /b openssl\crypto\rand\rand_win.c.orig openssl\crypto\rand\rand_win.c.orig2
-%folder%\patch %cmdopt1% < %folder%\CryptAcquireContextW_win95.txt
-%folder%\patch %cmdopt2% < %folder%\CryptAcquireContextW_win95.txt
+%patchcmd% %cmdopt1% < %folder%\CryptAcquireContextW_win95.txt
+%patchcmd% %cmdopt2% < %folder%\CryptAcquireContextW_win95.txt
 popd
 
 
-
 :patch10
+
+
+:patch_main_conf
+rem 設定ファイルのバックアップを取る
+if not exist "..\openssl\Configurations\10-main.conf.orig" (
+    copy /y ..\openssl\Configurations\10-main.conf ..\openssl\Configurations\10-main.conf.orig
+)
+
+rem VS2005だと警告エラーでコンパイルが止まる問題への処置
+perl -e "open(IN,'..\openssl\Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/W3|/W1|;s|/WX||;print $_;}close(IN);" > conf.tmp
+move conf.tmp ..\openssl\Configurations/10-main.conf
+
+rem GetModuleHandleExW API(WindowsXP以降)依存除去のため
+perl -e "open(IN,'..\openssl\Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|(dso_scheme(.+)"win32")|#$1|;print $_;}close(IN);" > conf.tmp
+move conf.tmp ..\openssl\Configurations/10-main.conf
+
+rem Debug buildのwarning LNK4099対策(Workaround)
+perl -e "open(IN,'..\openssl\Configurations/10-main.conf');binmode(STDOUT);while(<IN>){s|/Zi|/Z7|;s|/WX||;print $_;}close(IN);" > conf.tmp
+move conf.tmp ..\openssl\Configurations/10-main.conf
 
 
 :patch_end
 echo "パッチは適用されています"
 timeout 5
 goto end
+
 
 :patchfail
 echo "パッチが適用されていないようです"
@@ -128,9 +153,10 @@ if "%ANS%"=="y" (
 goto end
 
 :cmd_false
-echo パッチコマンド %patchcmd% が見つかりません
-echo 下記サイトからダウンロードしてください
-echo http://geoffair.net/projects/patch.htm
+echo パッチコマンドが見つかりません
+echo 下記サイトからダウンロードして、..\%folder% に Git-x.xx.x-32-bit.tar.bz2 内の
+echo patch.exe, msys-gcc_s-1.dll, msys-2.0.dll を配置してください
+echo https://github.com/git-for-windows/git/releases/latest
 echo.
 goto patchfail
 
