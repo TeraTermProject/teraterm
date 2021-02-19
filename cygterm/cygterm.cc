@@ -380,7 +380,7 @@ void load_cfg()
     }
 }
 
-BOOL quote_cut(char *dst, size_t len, char *src) {
+void quote_cut(char *dst, size_t len, char *src) {
 	while (*src && len > 1) {
 		if (*src != '"') {
 			*dst++ = *src;
