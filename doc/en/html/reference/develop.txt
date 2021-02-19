@@ -48,8 +48,10 @@
     Use the compatible version for check-outed svn version.
     Extract into libs\svn. ("svnversion.exe" is located in libs\svn\bin directory.)
   Patch
-    PATH の通ったところに patch がない場合は、libs\openssl_patch に "patch.exe" が配置されるようにしてください。
-    https://gitforwindows.org/ (https://github.com/git-for-windows/git/releases/latest) からであれば、Git-x.xx.x-32-bit.tar.bz2 をダウンロードして展開し、usr\bin 内の patch.exe, msys-gcc_s-1.dll, msys-2.0.dll をコピーします。
+    When the patch command is not found in the path, please put the "patch.exe" into the libs\openssl_patch directory.
+    Please download the Git-x.xx.x-32-bit.tar.bz2 from 
+    https://gitforwindows.org/ (https://github.com/git-for-windows/git/releases/latest). Next, extract the file and copy the  patch.exe, msys-gcc_s-1.dll, msys-2.0.dll of usr\bin directory.
+   
 
 
 * Libraries
