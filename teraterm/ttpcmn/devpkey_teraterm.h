@@ -32,7 +32,7 @@
  * Visual Studio 2005でビルドを通すためには下記の定義が必要。
  * Visual Studio 2019では不要。
  */
-#if _MSC_VER == 1400
+#if _MSC_VER == 1400 && !defined(DEVPROPKEY_DEFINED)
 typedef ULONG DEVPROPTYPE, *PDEVPROPTYPE;
 
 typedef GUID  DEVPROPGUID, *PDEVPROPGUID;
