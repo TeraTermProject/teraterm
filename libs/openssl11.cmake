@@ -3,6 +3,8 @@
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P openssl11.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P openssl11.cmake
 
+option(APPLY_PATCH "patch for windows 95 support" ON)
+
 ####
 if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL ""))
   if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
@@ -129,43 +131,52 @@ if(NOT EXISTS ${SRC_DIR}/README)
     WORKING_DIRECTORY ${EXTRACT_DIR}
     )
 
-  # patch
-  find_program(
-    PATCH patch
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch
-    )
-  set(PATCH_OPT --binary --backup -p1)
-  message(PATCH=${PATCH})
-  execute_process(
-    COMMAND ${PATCH} ${PATCH_OPT}
-    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/vs2005.patch
-    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
-    )
-  execute_process(
-    COMMAND ${PATCH} ${PATCH_OPT}
-    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/ws2_32_dll_patch.txt
-    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
-    )
-  execute_process(
-    COMMAND ${PATCH} ${PATCH_OPT}
-    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/atomic_api.txt
-    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
-    )
-  execute_process(
-    COMMAND ${PATCH} ${PATCH_OPT}
-    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/CryptAcquireContextW2.txt
-    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
-    )
-  execute_process(
-    COMMAND ${PATCH} ${PATCH_OPT}
-    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/atomic_api_win95.txt
-    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
-    )
-  execute_process(
-    COMMAND ${PATCH} ${PATCH_OPT}
-    INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/CryptAcquireContextW_win95.txt
-    WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
-    )
+  if(APPLY_PATCH)
+    find_program(
+      PATCH patch
+      HINTS "${CMAKE_CURRENT_LIST_DIR}/openssl_patch"
+      HINTS "${CMAKE_CURRENT_LIST_DIR}/../buildtools/perl/c/bin"
+      HINTS "C:/Program Files/Git/usr/bin"
+      HINTS c:/cygwin64/usr/bin
+      HINTS c:/cygwin/usr/bin
+      HINTS c:/msys64/usr/bin
+      )
+    message(PATCH=${PATCH})
+    set(PATCH_OPT --binary --backup -p1)
+    if(NOT PATCH)
+      message(FATAL_ERROR "patch not found")
+    endif()
+    execute_process(
+      COMMAND ${PATCH} ${PATCH_OPT}
+      INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/vs2005.patch
+      WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+      )
+    execute_process(
+      COMMAND ${PATCH} ${PATCH_OPT}
+      INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/ws2_32_dll_patch.txt
+      WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+      )
+    execute_process(
+      COMMAND ${PATCH} ${PATCH_OPT}
+      INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/atomic_api.txt
+      WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+      )
+    execute_process(
+      COMMAND ${PATCH} ${PATCH_OPT}
+      INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/CryptAcquireContextW2.txt
+      WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+      )
+    execute_process(
+      COMMAND ${PATCH} ${PATCH_OPT}
+      INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/atomic_api_win95.txt
+      WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+      )
+    execute_process(
+      COMMAND ${PATCH} ${PATCH_OPT}
+      INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openssl_patch/CryptAcquireContextW_win95.txt
+      WORKING_DIRECTORY ${EXTRACT_DIR}/${SRC_DIR_BASE}
+      )
+  endif(APPLY_PATCH)
 
 endif()
 
