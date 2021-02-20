@@ -1636,7 +1636,7 @@ static void EscapeFilename(const wchar_t *src, wchar_t *dest)
 	*d = '\0'; // null-terminate
 }
 
-static void PasteString(PComVar cv, const wchar_t *str, bool escape)
+static wchar_t *GetPasteString(const wchar_t *str, bool escape)
 {
 	wchar_t *tmpbuf;
 	if (!escape) {
@@ -1647,9 +1647,7 @@ static void PasteString(PComVar cv, const wchar_t *str, bool escape)
 		tmpbuf = (wchar_t *)malloc(len);
 		EscapeFilename(str, tmpbuf);
 	}
-
-	size_t len = wcslen(tmpbuf);
-	TermPasteString(tmpbuf, len);
+	return tmpbuf;
 }
 
 /* 入力はファイルのみ(フォルダは含まれない) */
@@ -1834,11 +1832,16 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 
 			TermSendStartBracket();
 
-			PasteString(&cv, FileName, escape);
+			wchar_t *str = GetPasteString(FileName, escape);
+			TermPasteStringNoBracket(str, wcslen(str));
+			free(str);
 			if (DropListCount > 1 && i < DropListCount - 1) {
-				// 改行(CR,0x0d) または スペース
-				const wchar_t *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? L"\x0d" : L" ";
-				PasteString(&cv, separator, false);
+				if (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) {
+					TermPasteStringNoBracket(L"\x0d", 1);	// 改行(CR,0x0d)
+				}
+				else {
+					TermPasteStringNoBracket(L" ", 1);		// space
+				}
 			}
 
 			TermSendEndBracket();

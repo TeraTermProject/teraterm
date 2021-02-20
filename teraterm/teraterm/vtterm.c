@@ -6881,13 +6881,18 @@ void ChangeTerminalID() {
 	}
 }
 
-void TermPasteString(const wchar_t *str, size_t len)
+void TermPasteStringNoBracket(const wchar_t *str, size_t len)
 {
-	TermSendStartBracket();
 	CommTextOutW(&cv, str, len);
 	if (ts.LocalEcho) {
 		CommTextEchoW(&cv, str, len);
 	}
+}
+
+void TermPasteString(const wchar_t *str, size_t len)
+{
+	TermSendStartBracket();
+	TermPasteStringNoBracket(str, len);
 	TermSendEndBracket();
 }
 

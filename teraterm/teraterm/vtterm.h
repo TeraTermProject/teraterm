@@ -46,6 +46,7 @@ BOOL BracketedPasteMode();
 BOOL WheelToCursorMode();
 void EndTerm();
 void ChangeTerminalID();
+void TermPasteStringNoBracket(const wchar_t *str, size_t len);
 void TermPasteString(const wchar_t *str, size_t len);
 void TermSendStartBracket(void);
 void TermSendEndBracket(void);
