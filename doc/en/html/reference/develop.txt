@@ -41,7 +41,7 @@
   Inno Setup Preprocessor
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - others
-  Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
+  Cygwin the latest version(because CygTerm+ supports Vista or later from v4.105)
   ActivePerl 5.10 or later version
     converts character-code and return-code of documents for building OpenSSL.
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
@@ -217,9 +217,7 @@ Example: adding a TTSSH menu under File menu
 * How to build CygTerm
   To build CygTerm source code is shown in the following step:
 
-   1. Install Cygwin(http://www.cygwin.com/win-9x.html) to your PC.
-      Note: 1.7.x doesn't support Windows 9x. Use version 1.5.x.
-            1.5.x doesn't seem support Windows 7. But a binary that is compiled by 1.5.x can execute in 1.7.x environment.
+   1. Install Cygwin(https://www.cygwin.com/) to your PC.
    2. Launch Cygwin shell and go to cygterm directory.
       # cd cygterm
    3. Compile Cygterm.
@@ -318,32 +316,63 @@ Example: adding a TTSSH menu under File menu
 
      Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
 
-  4. Evaluate executable program file.
+  4. When CygTerm+ is changed from previous version, please build the software with 64bit Cygwin and replace cygterm\cygterm+-x86_64\cygterm.exe.
+
+  5. Evaluate executable program file.
      - Make installer package
        Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
      - Test Tera Term installation and evaluate it.
 
-  5. Create SVN tag.
+  6. Create SVN tag.
      The naming rule is `teraterm-version'(ex. teraterm-4_106).
      svn copy -m "Release 4.106" svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
 
-  6. Re-checkout from svn tag.
+  7. Re-checkout from svn tag.
 
-  7. Make installer package
-     Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
+  8. Make installer package
+     - Edit "teraterm\installer\teraterm.iss"
+       #define AppVer "4.???"
+       ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+       
+       [InnoIDE_PreCompile]
+       Name: makechm.bat
+       ;Name: build.bat
+       Name: build.bat; Parameters: rebuild
 
-  8. Update OSDN project site.
+       [InnoIDE_PostCompile]
+       Name: makearchive.bat; Parameters: release
+
+       [PreCompile]
+       Name: makechm.bat
+       ;Name: build.bat
+       Name: build.bat; Parameters: rebuild
+
+       [PostCompile]
+       Name: makearchive.bat; Parameters: release
+
+       [_ISToolPreCompile]
+       Name: makechm.bat
+       ;Name: build.bat
+       Name: build.bat; Parameters: rebuild
+
+       [_ISToolPostCompile]
+       Name: makearchive.bat; Parameters: release   
+     
+  
+     - Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
+
+  9. Update OSDN project site.
      - Add new release.
      - Submit news.
 
-  9. Announce release to mailing list(in Japan).
+  10. Announce release to mailing list(in Japan).
 
-  10. Update OSDN project home page.
+  11. Update OSDN project home page.
 
-  11. Delete snapshots.
+  12. Delete snapshots.
 
-  12. Announce release to Twitter.
+  13. Announce release to Twitter.
       https://twitter.com/Tera_Term
       Post release announcement and pin.
 
-  13. Update Chocolatey
+  14. Update Chocolatey
