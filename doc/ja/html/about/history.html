@@ -3290,7 +3290,8 @@
       <li>ユーザ認証が完了した直後にVTウィンドウのサイズを変更すると、サーバから切断される問題を修正した。</li>
       <li>SSH認証ダイアログで一部のコントロールが常に有効になっていた</li>
       <li>D&DによるSCP送信で、多数のファイルを一括送信するとエラーになる問題を修正した。</li>
-      <li>Windows Vista以降でVirtual Storeが有効の場合、Host key rotationで元々あったホスト鍵を削除してしまう問題を修正した。</li>
+      <li>Windows Vista以降でVirtual Storeが有効の場合でかつHost key rotationが有効の場合、known_hostsから元々あったホスト鍵を削除してしまう問題を修正した。</li>
+      <li>Windows Vista以降でVirtual Storeが有効の場合、ホスト鍵の種類が同じで、鍵の内容が異なるときに、known_hostsからの鍵削除ができない問題を修正した。</li>
     </ul>
   </li>
 

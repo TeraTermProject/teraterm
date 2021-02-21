@@ -1371,41 +1371,30 @@ static void delete_different_key(PTInstVar pvar)
 		Key key; // known_hostsに登録されている鍵
 		int length;
 		char filename[MAX_PATH];
-#if _MSC_VER < 1900 // less than VSC2015(VC14.0)
-		char tmp[L_tmpnam];
-#endif
 		int fd;
 		int amount_written = 0;
 		int close_result;
 		int data_index = 0;
-		char buf[FILENAME_MAX];
+		char *newfiledata = NULL;
+		int ret;
+		struct _stat fileStat;
+		long newFilePos = 0, totalSize;
 
-		// 書き込み一時ファイルを開く
-#if _MSC_VER < 1900 // less than VSC2015(VC14.0)
-		_getcwd(filename, sizeof(filename));
-		tmpnam_s(tmp, sizeof(tmp));
-		strcat_s(filename, sizeof(filename), tmp);
-#else // VSC2015(VC14.0) or later
-		tmpnam_s(filename, sizeof(filename));
-#endif
-		fd = _open(filename,
-		          _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
-		          _S_IREAD | _S_IWRITE);
-
-		if (fd == -1) {
-			if (errno == EACCES) {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
-				                  "An error occurred while trying to write the host key.\n"
-				                  "You do not have permission to write to the known-hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
-			} else {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-				                  "An error occurred while trying to write the host key.\n"
-				                  "The host key could not be written.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
-			}
-			return;
+		// known_hostsファイルサイズを取得する。
+		get_teraterm_dir_relative_name(filename, sizeof(filename), name);
+		ret = _stat(filename, &fileStat);
+		if (ret != 0) {
+			// error
+			goto error;
 		}
+		// ファイルデータのメモリを確保する。
+		totalSize = fileStat.st_size;
+		newfiledata = malloc(totalSize);
+		if (newfiledata == NULL) {
+			// error
+			goto error;
+		}
+
 
 		// ファイルから読み込む
 		memset(&key, 0, sizeof(key));
@@ -1510,39 +1499,65 @@ static void delete_different_key(PTInstVar pvar)
 			// 書き込み処理
 			if (do_write) {
 				length = pvar->hosts_state.file_data_index - data_index;
-				amount_written =
-					_write(fd, pvar->hosts_state.file_data + data_index,
-					       length);
 
-				if (amount_written != length) {
-					goto error1;
-				}
+				if ((newFilePos + length) >= totalSize) {
+					UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+						"An error occurred while trying to write the host key.\n"
+						"The host key could not be written.");
+					notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+					goto error;
+				}		
+
+				memcpy(newfiledata + newFilePos, 
+					pvar->hosts_state.file_data + data_index,
+					length);
+				newFilePos += length;
+
 			}
 			data_index = pvar->hosts_state.file_data_index;
 		} while (1); // 最後まで読む
-
-error1:
-		close_result = _close(fd);
-		if (amount_written != length || close_result == -1) {
-			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-			                  "An error occurred while trying to write the host key.\n"
-			                  "The host key could not be written.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
-			goto error2;
-		}
-
-		// 書き込み一時ファイルからリネーム
-		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
-		_unlink(buf);
-		rename(filename, buf);
-
-error2:
-		_unlink(filename);
 
 		finish_read_host_files(pvar, 0);
 
 		// 最後にメモリを解放しておく。
 		key_init(&key);
+
+		// known_hostsファイルに新しいファイルデータで上書きする。
+		fd = _open(filename,
+			_O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
+			_S_IREAD | _S_IWRITE);
+
+		if (fd == -1) {
+			if (errno == EACCES) {
+				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
+					"An error occurred while trying to write the host key.\n"
+					"You do not have permission to write to the known-hosts file.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
+			else {
+				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+					"An error occurred while trying to write the host key.\n"
+					"The host key could not be written.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
+			goto error;
+		}
+
+		amount_written = _write(fd, newfiledata, newFilePos);
+		close_result = _close(fd);
+		if (amount_written != newFilePos || close_result == -1) {
+			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+				"An error occurred while trying to write the host key.\n"
+				"The host key could not be written.");
+			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			goto error;
+		}		
+
+error:
+		if (newfiledata) {
+			free(newfiledata);
+		}
+
 	}
 }
 
