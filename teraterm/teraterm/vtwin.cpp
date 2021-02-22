@@ -2562,16 +2562,28 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	if (MetaKey(ts.MetaKey)) {
 		if (!KeybEnabled || (TalkStatus != IdTalkKeyb))
 			return;
+
 		char Code = nChar;
 		wchar_t u16;
-		if (ts.Meta8Bit != IdMeta8BitRaw) {
-			const char mb_str[2] = {(char)nChar | 0x80, 0};
-			unsigned int u32;
-			size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
-			if (mb_len == 0) {
-				return;
+		switch (ts.Meta8Bit) {
+		case IdMeta8BitRaw:
+			Code = nChar;
+			break;
+		default:
+			if (IsWindowUnicode(HVTWin) == TRUE) {
+				u16 = nChar;
 			}
-			u16 = (wchar_t)u32;
+			else {
+				if (ts.Meta8Bit != IdMeta8BitRaw) {
+					const char mb_str[2] = {(char)nChar, 0};
+					unsigned int u32;
+					size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
+					if (mb_len == 0) {
+						return;
+					}
+					u16 = (wchar_t)u32;
+				}
+			}
 		}
 		for (unsigned int i = 1; i <= nRepCnt; i++) {
 			switch (ts.Meta8Bit) {
@@ -2583,7 +2595,7 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 					}
 					break;
 				case IdMeta8BitText:
-					Code |= 0x80;
+					u16 |= 0x80;
 					CommTextOutW(&cv, &u16, 1);
 					if (ts.LocalEcho) {
 						CommTextEchoW(&cv, &u16, 1);
