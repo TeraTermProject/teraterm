@@ -60,10 +60,10 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "openssl-1.1.1d")
-set(SRC_ARC "openssl-1.1.1d.tar.gz")
-set(SRC_URL "https://www.openssl.org/source/openssl-1.1.1d.tar.gz")
-set(SRC_ARC_HASH_SHA256 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2)
+set(SRC_DIR_BASE "openssl-1.1.1j")
+set(SRC_ARC "openssl-1.1.1j.tar.gz")
+set(SRC_URL "https://www.openssl.org/source/openssl-1.1.1j.tar.gz")
+set(SRC_ARC_HASH_SHA256 aaf2fcb575cdf6491b98ab4829abf78a3dec8402b8b81efc8f23c00d443981bf)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/openssl")
 
@@ -98,7 +98,7 @@ elseif("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   # Active/Strawberry Perl
   find_program(
     PERL perl.exe
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../buildtools/perl/perl/bin
+    HINTS ${CMAKE_CURRENT_LIST_DIR}/../buildtools/perl/perl/bin
     HINTS c:/Perl64/bin
     HINTS c:/Perl/bin
     HINTS c:/Strawberry/perl/bin
