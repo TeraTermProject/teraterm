@@ -2,8 +2,7 @@
 
 ## [uni_combining.map](../uni_combining.map)
 
-- [conv_combining.md](conv_combining.md)
-- ANSIに変換する前に使用
+- NFDで分解されている文字を結合するために使用
 ```
 		// WideCharToMultiByte() では結合処理は行われない
 		// 自力で結合処理を行う。ただし、最初の2文字だけ
@@ -13,11 +12,17 @@
 		//		0x82db(ぽ) には変換されない
 		//		予め U+307D(ぽ)に正規化しておく
 ```
+- [conv_combining.md](conv_combining.md)
 
 ## [uni2sjis.map](../uni2sjis.map)
 
 - UnicodeからShift JISに変換するために使用
 - [conv_sjis.md](conv_sjis.md)
+
+## sjis2uni.map はソースツリーに存在しない
+
+- Shift JISからUnicodeからに変換できると思われるが、使用されていない
+- [conv_uni.md](conv_uni.md)
 
 ## [unisym2decsp.map](../unisym2decsp.map)
 
