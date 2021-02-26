@@ -1821,7 +1821,7 @@ void YMODEMStart(int mode)
 
 void ZMODEMStart(int mode)
 {
-	WORD Opt;
+	WORD Opt = 0;
 
 	if (! ProtoStart())
 		return;
