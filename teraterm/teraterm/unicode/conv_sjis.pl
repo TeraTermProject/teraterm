@@ -3,7 +3,7 @@
 # Unicodeをキーとして昇順にソートする
 #
 
-$file = 'SHIFTJIS_TXT.htm';
+$file = 'SHIFTJIS.TXT';
 
 &read_mapfile($file);
 exit();
