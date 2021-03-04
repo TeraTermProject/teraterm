@@ -566,10 +566,10 @@ BOOL ManageWMNotify_Config(LPARAM lParam)
 		lpttt	= (LPTOOLTIPTEXT) lParam;
 		switch (idCtrl) {
 		case BUTTON_SET:
-			lpttt->lpszText	= "Regist";
+			lpttt->lpszText	= "Register";
 			return TRUE; 
 		case BUTTON_DELETE:
-			lpttt->lpszText	= "Delete";
+			lpttt->lpszText	= "Unregister";
 			return TRUE; 
 		case BUTTON_ETC:
 			lpttt->lpszText	= "Configure";
