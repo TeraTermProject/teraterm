@@ -26,23 +26,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// for comportinfo_test
-//#define TEST_FOR_NT
-//#define TEST_FOR_9X
-
 #include <windows.h>
 #include <devguid.h>
 #include <setupapi.h>
-#include <tchar.h>
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "devpkey_teraterm.h"
 #include "ttlib.h"
 #include "codeconv.h"
 
-#define DllExport __declspec(dllexport)
 #include "comportinfo.h"
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
@@ -80,6 +75,18 @@ static BOOL IsWindows9X()
 	return !IsWindowsNTKernel();
 }
 
+static wchar_t *ToWcharA(const char *strA_ptr, size_t strA_len)
+{
+	size_t strW_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
+										  strA_ptr, (int)strA_len,
+										  NULL, 0);
+	wchar_t *strW_ptr = (wchar_t*)malloc(sizeof(wchar_t) * strW_len);
+	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
+						strA_ptr, (int)strA_len,
+						strW_ptr, (int)strW_len);
+	return strW_ptr;
+}
+
 /**
  *	ポート名を取得
  */
@@ -106,34 +113,34 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 		// 9x系ではうまく動作しない
 		r = pRegQueryValueExW(hKey, L"PortName", 0,
 			&dwType, NULL, &byte_len);
-		port_name = (wchar_t* )malloc(byte_len);
-		r = pRegQueryValueExW(hKey, L"PortName", 0,
-								&dwType, (LPBYTE)port_name, &byte_len);
+		if (r != ERROR_FILE_NOT_FOUND) {
+			port_name = (wchar_t*)malloc(byte_len);
+			r = pRegQueryValueExW(hKey, L"PortName", 0,
+				&dwType, (LPBYTE)port_name, &byte_len);
+		}
 	} else {
 		r = RegQueryValueExA(hKey, "PortName", 0,
 								&dwType, (LPBYTE)NULL, &byte_len);
-		char *port_name_a = (char *)malloc(byte_len);
-		r = RegQueryValueExA(hKey, "PortName", 0,
-								&dwType, (LPBYTE)port_name_a, &byte_len);
-		if (r == ERROR_SUCCESS) {
-			size_t len_w = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
-											   port_name_a, byte_len,
-											   NULL, 0);
-			port_name = (wchar_t *)malloc(sizeof(wchar_t) * len_w);
-			MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
-								port_name_a, byte_len,
-								port_name, (int)len_w);
+		if (r != ERROR_FILE_NOT_FOUND) {
+			char* port_name_a = (char*)malloc(byte_len);
+			r = RegQueryValueExA(hKey, "PortName", 0,
+				&dwType, (LPBYTE)port_name_a, &byte_len);
+			if (r == ERROR_SUCCESS) {
+				port_name = ToWcharA(port_name_a, byte_len);
+			}
+			free(port_name_a);
 		}
-		free(port_name_a);
 	}
-	RegCloseKey(hKey);
-	if (r != ERROR_SUCCESS) {
+	if (r == ERROR_SUCCESS) {
+		RegCloseKey(hKey);
+		*str = port_name;
+		return TRUE;
+	}
+	else {
 		free(port_name);
 		*str = NULL;
 		return FALSE;
 	}
-	*str = port_name;
-	return TRUE;
 }
 
 /**
@@ -143,40 +150,31 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
  * HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Class\{GUID}\0000
  *
  */
-static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, const char *lang,
-							wchar_t **friendly_name, wchar_t **str)
+static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
+							wchar_t **friendly_name, wchar_t **prop_str)
 {
-	const char *FriendlyNameString = "FRIENDLY_NAME";
-	const char *DriverDateString = "DRIVER_DATE";
 	typedef struct {
-		const wchar_t *name;  // 本関数内で使う
-		const char *key;      // 本関数内で使う
-		const DEVPROPKEY *PropertyKey; // レジストリ取得に使うのはこれのみ
-		DWORD Property;       // 未使用
+		const wchar_t *name;
+		const DEVPROPKEY *PropertyKey;	// for SetupDiGetDeviceProperty() Vista+
+		DWORD Property;					// for SetupDiGetDeviceRegistryProperty() 2000+
 	} list_t;
 	static const list_t list[] = {
 		{ L"Device Friendly Name",
-		  FriendlyNameString,
 		  &DEVPKEY_Device_FriendlyName,
 		  SPDRP_FRIENDLYNAME },
 		{ L"Device Instance ID",
-		  "DEVICE_INSTANCE_ID",
 		  &DEVPKEY_Device_InstanceId,
 		  SPDRP_MAXIMUM_PROPERTY },
 		{ L"Device Manufacturer",
-		  "DEVICE_MANUFACTURER",
 		  &DEVPKEY_Device_Manufacturer,
 		  SPDRP_MFG },
 		{ L"Provider Name",
-		  "PROVIDER_NAME",
 		  &DEVPKEY_Device_DriverProvider,
 		  SPDRP_MAXIMUM_PROPERTY },
 		{ L"Driver Date",
-		  DriverDateString,
 		  &DEVPKEY_Device_DriverDate,
 		  SPDRP_MAXIMUM_PROPERTY },
 		{ L"Driver Version",
-		  "DRIVER_VERSION",
 		  &DEVPKEY_Device_DriverVersion,
 		  SPDRP_MAXIMUM_PROPERTY },
 	};
@@ -189,61 +187,85 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, 
 			GetModuleHandleA("Setupapi.dll"),
 			"SetupDiGetDeviceRegistryPropertyW");
 
-	wchar_t *s = _wcsdup(L"");
-	size_t len = 0;
+	*friendly_name = NULL;
+	*prop_str = NULL;
+	wchar_t *p_ptr = NULL;
+	size_t p_len = 0;
 	for (size_t i = 0; i < _countof(list); i++) {
 		const list_t *p = &list[i];
 		BOOL r;
-		wchar_t *str_prop = NULL;
-		DWORD size;
+		wchar_t *prop = NULL;
 
 		if (pSetupDiGetDevicePropertyW != NULL) {
+			// vista以上はすべてここに入る
 			DEVPROPTYPE ulPropertyType;
-			pSetupDiGetDevicePropertyW(hDevInfo, DeviceInfoData, p->PropertyKey,
-									   &ulPropertyType, NULL, 0, &size, 0);
-			str_prop = (wchar_t *)malloc(size);
+			DWORD size;
 			r = pSetupDiGetDevicePropertyW(hDevInfo, DeviceInfoData, p->PropertyKey,
-										   &ulPropertyType, (PBYTE)str_prop, size, &size, 0);
+										   &ulPropertyType, NULL, 0, &size, 0);
+			if (r == FALSE && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+				BYTE *buf = (BYTE *)malloc(size);
+
+				r = pSetupDiGetDevicePropertyW(hDevInfo, DeviceInfoData, p->PropertyKey,
+											   &ulPropertyType, buf, size, &size, 0);
+				if (ulPropertyType == DEVPROP_TYPE_STRING) {
+					// 文字列なのでそのまま
+					prop = (wchar_t *)buf;
+				} else if (ulPropertyType ==  DEVPROP_TYPE_FILETIME) {
+					// buf = FILETIME 構造体の8バイト
+					SYSTEMTIME stFileTime = {};
+					FileTimeToSystemTime((FILETIME *)buf , &stFileTime);
+					int wbuflen = 64;
+					int buflen = sizeof(wchar_t) * wbuflen;
+					prop = (wchar_t *)malloc(buflen);
+					_snwprintf_s(prop, wbuflen, _TRUNCATE, L"%d-%d-%d",
+								 stFileTime.wMonth, stFileTime.wDay, stFileTime.wYear
+						);
+					free(buf);
+				}
+				else {
+					assert(FALSE);
+				}
+			}
 		} else if (p->PropertyKey == &DEVPKEY_Device_InstanceId) {
 			// InstanceIdはA系で決め打ち
 			DWORD len_a;
-			SetupDiGetDeviceInstanceIdA(hDevInfo,
-										DeviceInfoData,
-										NULL, 0,
-										&len_a);
-			char *str_instance_a = (char *)malloc(len_a);
 			r = SetupDiGetDeviceInstanceIdA(hDevInfo,
 											DeviceInfoData,
-											str_instance_a, len_a,
+											NULL, 0,
 											&len_a);
-			if (r != FALSE) {
-				int len_w = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
+			if (r == FALSE && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+				char *str_instance_a = (char *)malloc(len_a);
+				r = SetupDiGetDeviceInstanceIdA(hDevInfo,
+												DeviceInfoData,
 												str_instance_a, len_a,
-												NULL, 0);
-				str_prop = (wchar_t *)malloc(sizeof(wchar_t) * len_w);
-				MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
-									str_instance_a, len_a,
-									str_prop, (int)len_w);
+												&len_a);
+				if (r != FALSE) {
+					prop = ToWcharA(str_instance_a, len_a);
+				}
+				free(str_instance_a);
 			}
-			free(str_instance_a);
 		} else if (p->Property == SPDRP_MAXIMUM_PROPERTY) {
+			// SetupDiGetDeviceRegistryProperty() 系には存在しないプロパティ
 			r = FALSE;
 		} else if (pSetupDiGetDeviceRegistryPropertyW != NULL && !IsWindows9X()) {
 			// 9x系ではうまく動作しない
 			DWORD dwPropType;
+			DWORD size;
 			r = pSetupDiGetDeviceRegistryPropertyW(hDevInfo,
 												   DeviceInfoData,
 												   p->Property,
 												   &dwPropType,
 												   NULL, 0,
 												   &size);
-			str_prop = (wchar_t *)malloc(size);
-			r = pSetupDiGetDeviceRegistryPropertyW(hDevInfo,
-												   DeviceInfoData,
-												   p->Property,
-												   &dwPropType,
-												   (LPBYTE)str_prop, size,
-												   &size);
+			if (r == FALSE) {
+				prop = (wchar_t *)malloc(size);
+				r = pSetupDiGetDeviceRegistryPropertyW(hDevInfo,
+													   DeviceInfoData,
+													   p->Property,
+													   &dwPropType,
+													   (LPBYTE)prop, size,
+													   &size);
+			}
 		} else {
 			DWORD dwPropType;
 			DWORD len_a;
@@ -253,71 +275,53 @@ static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, 
 												  &dwPropType,
 												  NULL, 0,
 												  &len_a);
-			char *str_prop_a = (char *)malloc(len_a);
-			r = SetupDiGetDeviceRegistryPropertyA(hDevInfo,
-												  DeviceInfoData,
-												  p->Property,
-												  &dwPropType,
-												  (PBYTE)str_prop_a, len_a,
-												  &len_a);
 			if (r != FALSE) {
-				int len_w = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
-												str_prop_a, len_a,
-												NULL, 0);
-				str_prop = (wchar_t *)malloc(sizeof(wchar_t) * len_w);
-				MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
-									str_prop_a, len_a,
-									str_prop, (int)len_w);
-			}
-			free(str_prop_a);
-		}
-		if (r != FALSE) {
-			/* Driver Dateは DEVPROP_TYPE_FILETIME であるため、
-			 * FILETIME 構造体の8バイトで返るため、SYSTEMTIME に変換する。
-			 */
-			if (strcmp(list[i].key, DriverDateString) == 0) {
-				FILETIME ftFileTime;
-				SYSTEMTIME stFileTime;
-				int wbuflen = 64;
-				int buflen = sizeof(wchar_t) * wbuflen;
-
-				ZeroMemory(&ftFileTime, sizeof(FILETIME));
-				if (sizeof(ftFileTime) >= size) {
-					// str_propはsizeバイト
-					memcpy(&ftFileTime, str_prop, size);  
+				char *prop_a = (char *)malloc(len_a);
+				r = SetupDiGetDeviceRegistryPropertyA(hDevInfo,
+													  DeviceInfoData,
+													  p->Property,
+													  &dwPropType,
+													  (PBYTE)prop_a, len_a,
+													  &len_a);
+				if (r != FALSE) {
+					prop = ToWcharA(prop_a, len_a);
 				}
-				ZeroMemory(&stFileTime, sizeof(SYSTEMTIME));
-				FileTimeToSystemTime(&ftFileTime , &stFileTime);
-				str_prop = (wchar_t *)realloc(str_prop, buflen);
-				_snwprintf_s(str_prop, wbuflen, _TRUNCATE, L"%d-%d-%d",
-					stFileTime.wMonth, stFileTime.wDay, stFileTime.wYear				
-					);
+				free(prop_a);
 			}
-
-			size_t name_len = wcslen(p->name);
-			size_t prop_len = wcslen(str_prop);
-			len = len + (name_len + (i==0?1:2) + 2 + 2 + prop_len);
-			s = (wchar_t *)realloc(s, sizeof(wchar_t) * len);
-			if (i != 0) 
-				wcscat_s(s, len, L"\r\n");
-			wcscat_s(s, len, p->name);
-			wcscat_s(s, len, L": ");
-			wcscat_s(s, len, str_prop);
 		}
 
-		if (strcmp(list[i].key, FriendlyNameString) == 0) {
-			// str_propのメモリは ComPortInfoFree() で解放される。
-			*friendly_name = str_prop;
+		// prop
+		if (r != FALSE && prop != NULL) {
+			if (i == 0) {
+				// フレンドリーネームのみ
+				*friendly_name = prop;
+			}
 
-		} else {
-			// s にコピーしたのでstr_propのメモリは不要となる。
-			if (str_prop != NULL) {
-				free(str_prop);
+			// フレンドリーネームも含めたすべてのプロパティ
+			const size_t name_len = wcslen(p->name);
+			const size_t prop_len = wcslen(prop);
+
+			if (p_len == 0) {
+				p_len = p_len + (name_len + 2 + prop_len + 1);
+				p_ptr = (wchar_t *)malloc(sizeof(wchar_t) * p_len);
+				p_ptr[0] = L'\0';
+			}
+			else {
+				p_len = p_len + (2 + name_len + 2 + prop_len);
+				p_ptr = (wchar_t *)realloc(p_ptr, sizeof(wchar_t) * p_len);
+				wcscat_s(p_ptr, p_len, L"\r\n");
+			}
+			wcscat_s(p_ptr, p_len, p->name);
+			wcscat_s(p_ptr, p_len, L": ");
+			wcscat_s(p_ptr, p_len, prop);
+
+			if (i != 0) {
+				free(prop);
 			}
 		}
 	}
 
-	*str = s;
+	*prop_str = p_ptr;
 }
 
 /* 配列ソート用 */
@@ -335,14 +339,38 @@ static int sort_sub(const void *a_, const void *b_)
 }
 
 /**
- *	comポートの情報を取得する
- *
- *	@param[out]	count	 	情報数(0のときcomポートなし)
- *	@return		情報へのポインタ(配列)、ポート番号の小さい順
- *				NULLのときcomポートなし
- *				使用後ComPortInfoFree()を呼ぶこと
+ *	実際にデバイスをオープンすることでcomポート検出
  */
-ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
+static ComPortInfo_t *ComPortInfoGetByCreatefile(int *count)
+{
+	const int ComPortMax = 256;
+	int comport_count = 0;
+	ComPortInfo_t *comport_infos = NULL;
+	for (int i = 1; i <= ComPortMax; i++) {
+		char buf[12];  // \\.\COMxxxx + NULL
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "\\\\.\\COM%d", i);
+		HANDLE h = CreateFileA(buf, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+		if (h != INVALID_HANDLE_VALUE) {
+			CloseHandle(h);
+
+			comport_count++;
+			comport_infos = (ComPortInfo_t *)realloc(comport_infos, sizeof(ComPortInfo_t) * comport_count);
+
+			ComPortInfo_t *p = &comport_infos[comport_count - 1];
+			wchar_t com_name[12];
+			_snwprintf_s(com_name, _countof(com_name), _TRUNCATE, L"COM%d", i);
+			p->port_name = _wcsdup(com_name);  // COMポート名
+			p->port_no = i;  // COMポート番号
+			p->friendly_name = NULL;
+			p->property = NULL;
+		}
+	}
+
+	*count = comport_count;
+	return comport_infos;
+}
+
+static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 {
 	int comport_count = 0;
 	ComPortInfo_t *comport_infos = NULL;
@@ -351,18 +379,17 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
 	// List all connected serial devices
 	HDEVINFO hDevInfo = SetupDiGetClassDevsA(pClassGuid, NULL, NULL, DIGCF_PRESENT | DIGCF_PROFILE);
 	if (hDevInfo == INVALID_HANDLE_VALUE) {
-		*count = 0;
 		return NULL;
 	}
 
 	// Find the ones that are driverless
 	for (int i = 0; ; i++) {
-		SP_DEVINFO_DATA DeviceInfoData;
+		SP_DEVINFO_DATA DeviceInfoData = {};
 		DeviceInfoData.cbSize = sizeof (DeviceInfoData);
-		if (!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData))
+		if (!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData)) {
 			break;
+		}
 
-		// ポート名取得 ("COM1"など)
 		wchar_t *port_name;
 		if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {
 			continue;
@@ -375,7 +402,7 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
 		// 情報取得
 		wchar_t *str_friendly_name = NULL;
 		wchar_t *str_prop = NULL;
-		GetComPropartys(hDevInfo, &DeviceInfoData, lang, &str_friendly_name, &str_prop);
+		GetComPropartys(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
 
 		comport_count++;
 		comport_infos = (ComPortInfo_t *)realloc(comport_infos,
@@ -385,21 +412,6 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
 		p->port_no = port_no;  // COMポート番号
 		p->friendly_name = str_friendly_name;  // Device Description
 		p->property = str_prop;  // 全詳細情報
-
-#if 0
-		{
-		char *a, *b, *c;
-		a = ToCharW(p->port_name);
-		b = ToCharW(p->friendly_name);
-		c = ToCharW(p->property);
-		OutputDebugPrintf("%s: [%s] [%d] [%s] [%s]\n", __FUNCTION__,
-			a, p->port_no, b, c
-			);
-		free(a);
-		free(b);
-		free(c);
-		}
-#endif
 	}
 
 	/* ポート名順に並べる */
@@ -409,7 +421,42 @@ ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang)
 	return comport_infos;
 }
 
-void WINAPI ComPortInfoFree(ComPortInfo_t *info, int count)
+/**
+ *	comポートの情報を取得する
+ *
+ *	@param[out]	count		情報数(0のときcomポートなし)
+ *	@return		情報へのポインタ(配列)、ポート番号の小さい順
+ *				NULLのときcomポートなし
+ *				使用後ComPortInfoFree()を呼ぶこと
+ */
+ComPortInfo_t *ComPortInfoGet(int *count, const char *lang)
+{
+	OSVERSIONINFO osvi;
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	bool is_setupapi_supported = true;
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
+		// Windows 95
+		is_setupapi_supported = false;
+	}
+	else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) {
+		// Windows NT4.0
+		is_setupapi_supported = false;
+	}
+
+	if (is_setupapi_supported) {
+		return ComPortInfoGetByGetSetupAPI(count);
+	}
+	else {
+		// setupapi の動作が今一つのOSのとき
+		return ComPortInfoGetByCreatefile(count);
+	}
+}
+
+/**
+ *	comポートの情報をメモリを破棄する
+ */
+void ComPortInfoFree(ComPortInfo_t *info, int count)
 {
 	for (int i=0; i< count; i++) {
 		ComPortInfo_t *p = &info[i];

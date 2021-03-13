@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="asprintf.cpp" />
+    <ClCompile Include="comportinfo.cpp" />
     <ClCompile Include="dlglib.c" />
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
@@ -154,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asprintf.h" />
+    <ClInclude Include="comportinfo.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
     <ClInclude Include="layer_for_unicode_crt.h" />

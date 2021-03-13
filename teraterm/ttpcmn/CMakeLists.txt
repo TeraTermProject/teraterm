@@ -9,10 +9,7 @@ add_library(
   language.h
   ttcmn.c
   ttcmn_notify.cpp
-  comportinfo.cpp
-  comportinfo.h
-  comportinfo.cpp
-  devpkey_teraterm.h
+  ttcmn_cominfo.c
   ttpcmn-version.rc
   ttpcmn.def
   ${COMMON_SRC}

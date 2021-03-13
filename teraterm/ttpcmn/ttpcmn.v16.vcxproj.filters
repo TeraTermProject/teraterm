@@ -31,13 +31,13 @@
     <ClCompile Include="..\common\ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="comportinfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ttcmn_notify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\i18n.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttcmn_cominfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,9 +56,6 @@
     </ClInclude>
     <ClInclude Include="devpkey_teraterm.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="comportinfo.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\compat_win.h">
       <Filter>Header Files</Filter>

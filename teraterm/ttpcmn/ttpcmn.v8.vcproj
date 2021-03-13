@@ -211,10 +211,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\comportinfo.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\common\i18n.c"
 				>
 			</File>
@@ -228,6 +224,10 @@
 			</File>
 			<File
 				RelativePath="ttcmn.c"
+				>
+			</File>
+			<File
+				RelativePath=".\ttcmn_cominfo.c"
 				>
 			</File>
 			<File
@@ -245,10 +245,6 @@
 			>
 			<File
 				RelativePath="..\common\compat_win.h"
-				>
-			</File>
-			<File
-				RelativePath=".\comportinfo.h"
 				>
 			</File>
 			<File

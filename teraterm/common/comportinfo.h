@@ -28,25 +28,19 @@
 
 #pragma once
 
-#include <windows.h>	// for WORD
-
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#if !defined(DllExport)
-#define DllExport __declspec(dllimport)
 #endif
 
 typedef struct {
 	wchar_t *port_name;			// É|Å[Égñº
 	int port_no;				// 0..128(9x)/255(xp)
-	wchar_t *friendly_name;
-	wchar_t *property;
+	wchar_t *friendly_name;		// ë∂ç›ÇµÇ»Ç¢èÍçáÇÕ NULL
+	wchar_t *property;			// ë∂ç›ÇµÇ»Ç¢èÍçáÇÕ NULL
 } ComPortInfo_t;
 
-DllExport ComPortInfo_t * WINAPI ComPortInfoGet(int *count, const char *lang);
-DllExport void WINAPI ComPortInfoFree(ComPortInfo_t *info, int count);
+ComPortInfo_t *ComPortInfoGet(int *count, const char *lang);
+void ComPortInfoFree(ComPortInfo_t *info, int count);
 
 #ifdef __cplusplus
 }

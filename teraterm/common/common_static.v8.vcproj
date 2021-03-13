@@ -189,6 +189,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\comportinfo.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\comportinfo.h"
 			>
 		</File>

@@ -1,7 +1,9 @@
-﻿project(teraterm)
+﻿set(PACKAGE_NAME "common_static")
+
+project(${PACKAGE_NAME})
 
 add_library(
-  common_static
+  ${PACKAGE_NAME}
   STATIC
   asprintf.cpp
   asprintf.h
@@ -9,6 +11,8 @@ add_library(
   codeconv.h
   compat_win.cpp
   compat_win.h
+  comportinfo.cpp
+  comportinfo.h
   dlglib.c
   dlglib.h
   dlglib_cpp.cpp
@@ -40,7 +44,13 @@ add_library(
   )
 
 target_include_directories(
-  common_static
+  ${PACKAGE_NAME}
   PRIVATE
   .
+  )
+
+target_link_libraries(
+  ${PACKAGE_NAME}
+  PUBLIC
+  setupapi
   )

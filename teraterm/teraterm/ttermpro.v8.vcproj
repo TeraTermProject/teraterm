@@ -71,7 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comctl32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib"
+				AdditionalDependencies="onig_sd.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib setupapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
@@ -164,7 +164,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comctl32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib"
+				AdditionalDependencies="onig_s.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib setupapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
