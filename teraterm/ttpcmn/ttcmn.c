@@ -2679,15 +2679,21 @@ cleanup:
 int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc)
 {
 	HMODULE h;
-	TCHAR   devicesBuff[65535];
-	TCHAR   *p;
+	char   *devicesBuff;
+	char   *p;
 	int     comports = 0;
 	int     i, j, min;
 	WORD    s;
+	size_t buf_size = 65535;
+
+	devicesBuff = malloc(buf_size);
+	if (devicesBuff == NULL) {
+		return 0;
+	}
 
 	if (((h = GetModuleHandle("kernel32.dll")) != NULL) &&
 	    (GetProcAddress(h, "QueryDosDeviceA") != NULL) &&
-	    (QueryDosDevice(NULL, devicesBuff, 65535) != 0)) {
+	    (QueryDosDevice(NULL, devicesBuff, buf_size) != 0)) {
 		p = devicesBuff;
 		while (*p != '\0') {
 			if (strncmp(p, "COM", 3) == 0 && p[3] != '\0') {
@@ -2728,6 +2734,8 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 #endif
 	}
 
+	free(devicesBuff);
+
 	ListupSerialPort(ComPortTable, comports, ComPortDesc, ComPortMax);
 
 	return comports;
@@ -2736,7 +2744,7 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 int WINAPI CheckComPort(WORD ComPort)
 {
 	HMODULE h;
-	TCHAR   devicesBuff[65535];
+	char *devicesBuff;
 	char    com_str[64];
 	BOOL bRet;
 	GUID ClassGuid[1];
@@ -2744,6 +2752,7 @@ int WINAPI CheckComPort(WORD ComPort)
 	HDEVINFO DeviceInfoSet = NULL;
 	SP_DEVINFO_DATA DeviceInfoData;
 	int found = 0;
+	size_t buf_size = 65535;
 
 	_snprintf_s(com_str, sizeof(com_str), _TRUNCATE, "COM%d", ComPort);
 
@@ -2752,8 +2761,14 @@ int WINAPI CheckComPort(WORD ComPort)
 		return -1;
 	}
 
-	if (QueryDosDevice(com_str, devicesBuff, 65535) == 0) {
+	devicesBuff = malloc(buf_size);
+	if (devicesBuff == NULL) {
+		return -1;
+	}
+
+	if (QueryDosDevice(com_str, devicesBuff, buf_size) == 0) {
 		DWORD err = GetLastError();
+		free(devicesBuff);
 		if (err == ERROR_FILE_NOT_FOUND) {
 			/* NOT FOUND */
 			return 0;
@@ -2765,11 +2780,13 @@ int WINAPI CheckComPort(WORD ComPort)
 	/* QueryDosDeviceで切断を検知できない環境があるでさらにチェック */
 	bRet = SetupDiClassGuidsFromName(_T("PORTS"), (LPGUID) & ClassGuid, 1, &dwRequiredSize);
 	if (bRet == FALSE) {
+		free(devicesBuff);
 		return -1;
 	}
 
 	DeviceInfoSet = SetupDiGetClassDevs(&ClassGuid[0], NULL, NULL, DIGCF_PRESENT | DIGCF_PROFILE);
 	if (DeviceInfoSet == NULL) {
+		free(devicesBuff);
 		return -1;
 	}
 
@@ -2799,6 +2816,7 @@ int WINAPI CheckComPort(WORD ComPort)
 
 	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
 
+	free(devicesBuff);
 	return found;
 }
 
