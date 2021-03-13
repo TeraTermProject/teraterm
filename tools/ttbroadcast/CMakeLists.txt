@@ -1,11 +1,13 @@
-﻿project(ttbroadcast)
+﻿set(PACKAGE_NAME "ttbroadcast")
+
+project(${PACKAGE_NAME})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 add_executable(
-  ttbroadcast
-  getopt_mb_uni_src/getopt.c
-  getopt_mb_uni_src/getopt.h
+  ${PACKAGE_NAME}
+  ../libs/getopt_mb_uni_src/getopt.c
+  ../libs/getopt_mb_uni_src/getopt.h
   main.cpp
   #
   ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common/asprintf.h
@@ -13,20 +15,20 @@ add_executable(
   )
 
 target_include_directories(
-  ttbroadcast
+  ${PACKAGE_NAME}
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common
-  ${CMAKE_CURRENT_SOURCE_DIR}/getopt_mb_uni_src
+  ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
   )
 
 target_compile_definitions(
-  ttbroadcast
+  ${PACKAGE_NAME}
   PRIVATE
   STATIC_GETOPT
   )
 
 target_link_libraries(
-  ttbroadcast
+  ${PACKAGE_NAME}
   PRIVATE
   ttpcmn
   common_static
@@ -34,7 +36,7 @@ target_link_libraries(
 
 if(MINGW)
   target_link_options(
-    ttbroadcast
+    ${PACKAGE_NAME}
     PRIVATE
     -municode
     )
