@@ -88,7 +88,7 @@ elseif(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
   find_package(Subversion)
   if(SUBVERSION_FOUND)
     Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TT)
-    set(SVNVERSION "${TT_WC_REVISION}")
+    set(SVNVERSION "${TT_WC_LAST_CHANGED_REV}")
   endif()
 else()
   # build without svn,git?
