@@ -79,7 +79,7 @@ if (-d "$source_root/.svn" && $svn ne "") {
 		# 必要な情報を取り込む
 		my @text = split(/[\r\n]+/, $text);
 		foreach my $l (@text) {
-			if ($l =~ /Revision: (\d+)/) {
+			if ($l =~ /Last Changed Rev: (\d+)/) {
 				$svninfo{'Revision'} = $1;
 			} elsif ($l =~ /Relative URL: (.+)$/) {
 				my $url = $1;
