@@ -38,8 +38,6 @@ extern "C" {
 #define DllExport __declspec(dllimport)
 #endif
 
-DllExport int PASCAL DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc);
-DllExport int PASCAL CheckComPort(WORD ComPort);
 DllExport void PASCAL CopyShmemToTTSet(PTTSet ts);
 DllExport void PASCAL CopyTTSetToShmem(PTTSet ts);
 DllExport BOOL PASCAL StartTeraTerm(PTTSet ts);
@@ -102,9 +100,9 @@ DllExport HICON PASCAL GetCustomNotifyIcon(void);
 #define NotifyWarnMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 2)
 #define NotifyErrorMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 3)
 
-#include "../ttpcmn/language.h"
-
 #ifdef __cplusplus
 }
 #endif
 
+#include "../ttpcmn/language.h"
+#include "../ttpcmn/ttcmn_cominfo.h"

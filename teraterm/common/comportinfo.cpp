@@ -431,9 +431,9 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
  */
 ComPortInfo_t *ComPortInfoGet(int *count, const char *lang)
 {
-	OSVERSIONINFO osvi;
+	OSVERSIONINFOA osvi;
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
+	GetVersionExA(&osvi);
 	bool is_setupapi_supported = true;
 	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
 		// Windows 95

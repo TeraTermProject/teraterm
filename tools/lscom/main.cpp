@@ -32,11 +32,9 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
-extern "C" {
-int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc);
-}
-
 #include "comportinfo.h"
+#define DllExport __declspec(dllexport)
+#include "ttcmn_cominfo.h"
 
 #include "getopt.h"
 
@@ -159,8 +157,6 @@ int wmain(int argc, wchar_t *argv[])
 #endif
 	setlocale(LC_ALL, "");
 
-	int no_newline = 0;
-	int multicast = 0;
 	bool querydosdevice = false;
 	bool flag_DetectComPorts = false;
 	bool flag_fopen = false;

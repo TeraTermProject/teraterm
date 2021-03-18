@@ -31,6 +31,9 @@
 #include "codeconv.h"
 #include "comportinfo.h"
 
+#define DllExport __declspec(dllexport)
+#include "ttcmn_cominfo.h"
+
 /**
  *	COMポートを列挙
  *
@@ -49,12 +52,23 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 {
 	int count;
 	int i;
+
+	// 以前確保した分を開放する
+	for (i = 0; i < ComPortMax; i++) {
+		free(ComPortDesc[i]);
+		ComPortDesc[i] = NULL;
+	}
+
 	ComPortInfo_t *port_info = ComPortInfoGet(&count, NULL);
 	const ComPortInfo_t *p = port_info;
 	for (i = 0; i < count; i++) {
 		ComPortTable[i] = p->port_no;
 		ComPortDesc[i] = ToCharW(p->friendly_name);
 		p++;
+		if (i == ComPortMax - 1) {
+			// テーブルをあふれる
+			break;
+		}
 	}
 
 	ComPortInfoFree(port_info, count);

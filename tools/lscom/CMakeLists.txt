@@ -9,6 +9,7 @@ add_executable(
   main.cpp
   iswindowsntkernel.c
   #
+  ../../teraterm/ttpcmn/ttcmn_cominfo.h
   ../../teraterm/ttpcmn/ttcmn_cominfo.c
   #
   ../libs/getopt_mb_uni_src/getopt.c
@@ -33,7 +34,6 @@ target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
   common_static
-  #ttpcmn
   #
   #setupapi
   )
