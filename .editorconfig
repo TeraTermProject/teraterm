@@ -27,3 +27,9 @@ indent_style = space
 end_of_line = crlf
 charset = utf-8-bom
 indent_style = space
+
+[*.pl]
+end_of_line = crlf
+charset = utf-8-bom
+indent_style = tab
+indent_size = 4
