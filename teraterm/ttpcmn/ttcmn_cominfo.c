@@ -52,6 +52,8 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 {
 	int count;
 	int i;
+	ComPortInfo_t *port_info;
+	const ComPortInfo_t *p;
 
 	// ˆÈ‘OŠm•Û‚µ‚½•ª‚ðŠJ•ú‚·‚é
 	for (i = 0; i < ComPortMax; i++) {
@@ -59,8 +61,8 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 		ComPortDesc[i] = NULL;
 	}
 
-	ComPortInfo_t *port_info = ComPortInfoGet(&count, NULL);
-	const ComPortInfo_t *p = port_info;
+	port_info = ComPortInfoGet(&count, NULL);
+	p = port_info;
 	for (i = 0; i < count; i++) {
 		ComPortTable[i] = p->port_no;
 		ComPortDesc[i] = ToCharW(p->friendly_name);

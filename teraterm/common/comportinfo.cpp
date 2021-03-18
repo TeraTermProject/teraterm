@@ -34,11 +34,47 @@
 #include <crtdbg.h>
 #include <assert.h>
 
-#include "devpkey_teraterm.h"
 #include "ttlib.h"
 #include "codeconv.h"
 
 #include "comportinfo.h"
+
+/*
+ *	devpkey.h がある環境?
+ *		HAS_DEVPKEY_H が define される
+ */
+#if	(_MSC_VER > 1400) || defined(__MINGW32__)
+
+// VS2019のとき(VS2005より大きいとしている)
+// MinGW(32&64bit)のとき
+#define HAS_DEVPKEY_H	1
+
+#else // _MSC_VER > 1400
+
+// VS2008のとき
+#if defined(_INC_SDKDDKVER)
+
+// VS2008 + SDK 7.0ではないとき(SDK 7.1のとき)
+//   SDK 7.0 の場合は sdkddkver.h が include されていない
+#define HAS_DEVPKEY_H	1
+
+#endif  //  defined(_INC_SDKDDKVER)
+#endif  // _MSC_VER == 1400
+
+/*
+ *	devpkey.h の include
+ */
+#if defined(HAS_DEVPKEY_H)
+
+#define INITGUID
+#include "devpkey.h"
+
+#else //  defined(HAS_DEVPKEY_H)
+
+#include "devpkey_teraterm.h"
+
+#endif //  defined(HAS_DEVPKEY_H)
+
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
@@ -431,6 +467,11 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
  */
 ComPortInfo_t *ComPortInfoGet(int *count, const char *lang)
 {
+#if defined(_MSC_VER) && _MSC_VER > 1400
+	// VS2005よりあたらしい場合は 9x で起動しないバイナリとなる
+	const bool is_setupapi_supported = true;
+#else
+	// VS2005 or MinGW
 	OSVERSIONINFOA osvi;
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionExA(&osvi);
@@ -443,6 +484,7 @@ ComPortInfo_t *ComPortInfoGet(int *count, const char *lang)
 		// Windows NT4.0
 		is_setupapi_supported = false;
 	}
+#endif
 
 	if (is_setupapi_supported) {
 		return ComPortInfoGetByGetSetupAPI(count);

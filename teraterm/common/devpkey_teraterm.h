@@ -28,12 +28,14 @@
 
 #pragma once
 
-/*
- * Visual Studio 2005でビルドを通すためには下記の定義が必要。
- * Visual Studio 2019では不要。
- */
-#if _MSC_VER == 1400 && !defined(DEVPROPKEY_DEFINED)
+// このファイルはVS2005の時だけ参照される
+#if defined(__MINGW32__) || _MSC_VER != 1400
+#error check file dependency
+#endif
+
 typedef ULONG DEVPROPTYPE, *PDEVPROPTYPE;
+#define DEVPROP_TYPE_FILETIME                   0x00000010  // file time (FILETIME)
+#define DEVPROP_TYPE_STRING                     0x00000012  // null-terminated string
 
 typedef GUID  DEVPROPGUID, *PDEVPROPGUID;
 typedef ULONG DEVPROPID,   *PDEVPROPID;
@@ -42,9 +44,8 @@ typedef struct _DEVPROPKEY {
     DEVPROPGUID fmtid;
     DEVPROPID   pid;
 } DEVPROPKEY, *PDEVPROPKEY;
-#endif
 
-#undef DEFINE_DEVPROPKEY
+
 #define DEFINE_DEVPROPKEY(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8, pid) EXTERN_C const DEVPROPKEY DECLSPEC_SELECTANY name = { { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }, pid }
 
 /*
@@ -57,4 +58,3 @@ DEFINE_DEVPROPKEY(DEVPKEY_Device_Manufacturer,           0xa45c254e, 0xdf1c, 0x4
 DEFINE_DEVPROPKEY(DEVPKEY_Device_DriverProvider,           0xa8b865dd, 0x2e3d, 0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 9);     // DEVPROP_TYPE_STRING
 DEFINE_DEVPROPKEY(DEVPKEY_Device_DriverDate,               0xa8b865dd, 0x2e3d, 0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 2);     // DEVPROP_TYPE_FILETIME
 DEFINE_DEVPROPKEY(DEVPKEY_Device_DriverVersion,            0xa8b865dd, 0x2e3d, 0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);     // DEVPROP_TYPE_STRING
-
