@@ -1146,7 +1146,7 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 static PCHAR DataList[] = {"7 bit","8 bit",NULL};
 static PCHAR ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
-static PCHAR StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
+static PCHAR StopList[] = {"1 bit", "2 bit", NULL};
 static PCHAR FlowList[] = {"Xon/Xoff", "RTS/CTS", "DSR/DTR", "none", NULL};
 static int g_deltaSumSerialDlg = 0;        // マウスホイールのDelta累積用
 static WNDPROC g_defSerialDlgEditWndProc;  // Edit Controlのサブクラス化用
