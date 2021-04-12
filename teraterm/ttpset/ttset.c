@@ -89,7 +89,6 @@ static id_str_pair_t serial_conf_parity[] = {
 
 static id_str_pair_t serial_conf_stopbit[] = {
 	{IdStopBit1, "1"},
-	{IdStopBit15, "1.5"},
 	{IdStopBit2, "2"},
 	{IDENDMARK, NULL},
 };

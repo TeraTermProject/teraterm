@@ -770,9 +770,8 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdDataBit7 1
 #define IdDataBit8 2
   /* Stop bit ID */
-#define IdStopBit1  1
-#define IdStopBit15 2
-#define IdStopBit2  3
+#define IdStopBit1 1
+#define IdStopBit2 2
   /* Flow control ID */
 #define IdFlowX 1
 #define IdFlowHard 2    // RTS/CTS(hardware flow)

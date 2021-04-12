@@ -235,9 +235,6 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 		case IdStopBit1:
 			dcb.StopBits = ONESTOPBIT;
 			break;
-		case IdStopBit15:
-			dcb.StopBits = ONE5STOPBITS;
-			break;
 		case IdStopBit2:
 			dcb.StopBits = TWOSTOPBITS;
 			break;
