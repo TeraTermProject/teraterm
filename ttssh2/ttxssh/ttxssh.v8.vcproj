@@ -240,6 +240,10 @@
 				>
 			</File>
 			<File
+				RelativePath="comp.h"
+				>
+			</File>
+			<File
 				RelativePath="config.h"
 				>
 			</File>
@@ -284,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath="hostkey.h"
+				>
+			</File>
+			<File
 				RelativePath="hosts.h"
 				>
 			</File>
@@ -300,6 +308,10 @@
 				>
 			</File>
 			<File
+				RelativePath="mac.h"
+				>
+			</File>
+			<File
 				RelativePath="pkt.h"
 				>
 			</File>
@@ -313,6 +325,10 @@
 			</File>
 			<File
 				RelativePath="ssh.h"
+				>
+			</File>
+			<File
+				RelativePath="ssherr.h"
 				>
 			</File>
 			<File
@@ -352,11 +368,23 @@
 				>
 			</File>
 			<File
+				RelativePath="cipher.c"
+				>
+			</File>
+			<File
+				RelativePath="cipher-3des1.c"
+				>
+			</File>
+			<File
 				RelativePath="cipher-ctr.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\teraterm\common\codeconv.cpp"
+				>
+			</File>
+			<File
+				RelativePath="comp.c"
 				>
 			</File>
 			<File
@@ -428,6 +456,10 @@
 				>
 			</File>
 			<File
+				RelativePath="hostkey.c"
+				>
+			</File>
+			<File
 				RelativePath="hosts.c"
 				>
 			</File>
@@ -444,6 +476,10 @@
 				>
 			</File>
 			<File
+				RelativePath="mac.c"
+				>
+			</File>
+			<File
 				RelativePath="..\matcher\matcher.c"
 				>
 			</File>
@@ -457,6 +493,10 @@
 			</File>
 			<File
 				RelativePath="ssh.c"
+				>
+			</File>
+			<File
+				RelativePath="ssherr.c"
 				>
 			</File>
 			<File

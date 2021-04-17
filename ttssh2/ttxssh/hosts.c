@@ -485,7 +485,7 @@ static int check_host_key(PTInstVar pvar, char *hostname,
 			}
 			index += (p - cp);  // setup index
 			*p = '\0';
-			key_type = get_keytype_from_name(cp);
+			key_type = get_hostkey_type_from_name(cp);
 			*p = ' ';
 
 			index += eat_spaces(data + index);  // update index
@@ -763,7 +763,7 @@ static int parse_hostkey_file(PTInstVar pvar, char *hostname,
 			}
 			index += (p - cp);  // setup index
 			*p = '\0';
-			ktype = get_keytype_from_name(cp);
+			ktype = get_hostkey_type_from_name(cp);
 			*p = ' ';
 
 			index += eat_spaces(data + index);  // update index
@@ -1117,13 +1117,13 @@ static char *format_host_key(PTInstVar pvar)
 			if (pvar->ssh_state.tcpport == 22) {
 				_snprintf_s(result, msize, _TRUNCATE, "%s %s %s\r\n",
 				            pvar->hosts_state.prefetched_hostname, 
-				            get_sshname_from_key(key),
+				            get_ssh2_hostkey_type_name_from_key(key),
 				            uu);
 			} else {
 				_snprintf_s(result, msize, _TRUNCATE, "[%s]:%d %s %s\r\n",
 				            pvar->hosts_state.prefetched_hostname,
 				            pvar->ssh_state.tcpport,
-				            get_sshname_from_key(key),
+				            get_ssh2_hostkey_type_name_from_key(key),
 				            uu);
 			}
 		}
@@ -1213,14 +1213,14 @@ static char *format_specified_host_key(Key *key, char *hostname, unsigned short 
 			if (tcpport == 22) {
 				_snprintf_s(result, msize, _TRUNCATE, "%s %s %s\r\n",
 					hostname,
-					get_sshname_from_key(key),
+					get_ssh2_hostkey_type_name_from_key(key),
 					uu);
 			}
 			else {
 				_snprintf_s(result, msize, _TRUNCATE, "[%s]:%d %s %s\r\n",
 					hostname,
 					tcpport,
-					get_sshname_from_key(key),
+					get_ssh2_hostkey_type_name_from_key(key),
 					uu);
 			}
 		}

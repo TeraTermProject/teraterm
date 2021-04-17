@@ -74,6 +74,11 @@ typedef struct _TInstVar *PTInstVar;
 #include "ssh.h"
 #include "auth.h"
 #include "crypt.h"
+#include "cipher.h"
+#include "comp.h"
+#include "kex.h"
+#include "hostkey.h"
+#include "key.h"
 #include "hosts.h"
 #include "fwd.h"
 
@@ -268,8 +273,8 @@ typedef struct _TInstVar {
 	buffer_t *peer_kex;
 	kex_algorithm kex_type; // KEX algorithm
 	ssh_keytype hostkey_type;
-	SSH2Cipher *ciphers[MODE_MAX];
-	SSH2Mac *macs[MODE_MAX];
+	const struct ssh2cipher *ciphers[MODE_MAX];
+	const struct SSH2Mac *macs[MODE_MAX];
 	compression_type ctos_compression;
 	compression_type stoc_compression;
 	int we_need;

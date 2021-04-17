@@ -379,7 +379,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
 	unsigned int check1, check2, m1len, m2len; 
 	int dlen, i;
-	SSH2Cipher *cipher;
+	const struct ssh2cipher *cipher;
 	size_t authlen;
 	EVP_CIPHER_CTX *cipher_ctx = NULL;
 	int ret;
@@ -982,9 +982,9 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 
 	macdata = buffer_init();
 
-	len = strlen(get_ssh_keytype_name(result->type));
+	len = strlen(get_ssh2_hostkey_type_name(result->type));
 	buffer_put_int(macdata, len);
-	buffer_append(macdata, get_ssh_keytype_name(result->type), len);
+	buffer_append(macdata, get_ssh2_hostkey_type_name(result->type), len);
 	len = strlen(encname);
 	buffer_put_int(macdata, len);
 	buffer_append(macdata, encname, len);

@@ -94,7 +94,7 @@ static void password_wnd_proc_close_tooltip(TPasswordControlData *data)
 }
 
 static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
-										  WPARAM wParam, LPARAM lParam)
+                                          WPARAM wParam, LPARAM lParam)
 {
 	LRESULT result;
 	TPasswordControlData *data = (TPasswordControlData *)GetWindowLongPtr(control, GWLP_USERDATA);
@@ -797,7 +797,7 @@ char *GetClipboardTextA(HWND hWnd, BOOL empty)
 
 
 static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-									  LPARAM lParam)
+                                      LPARAM lParam)
 {
 	const int IDC_TIMER1 = 300; // 自動ログインが有効なとき
 	const int IDC_TIMER2 = 301; // サポートされているメソッドを自動チェック(CheckAuthListFirst)
@@ -1406,7 +1406,7 @@ static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 }
 
 static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-									 LPARAM lParam)
+                                     LPARAM lParam)
 {
 	PTInstVar pvar;
 
@@ -1618,7 +1618,7 @@ static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
 }
 
 static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
-											  WPARAM wParam, LPARAM lParam)
+                                              WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
 
@@ -1811,7 +1811,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				s[key_len] = '\0';
 				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
-				            ssh_key_type(get_keytype_from_name(s)));
+				            ssh_key_type(get_hostkey_type_from_name(s)));
 				strncat_s(dest, len, buf, _TRUNCATE);
 
 				free(s);

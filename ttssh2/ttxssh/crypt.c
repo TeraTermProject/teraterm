@@ -75,8 +75,6 @@
 static unsigned char *encbuff = NULL;
 static unsigned int encbufflen = 0;
 
-static char *get_cipher_name(int cipher);
-
 static void crc_update(uint32 *a, uint32 b)
 {
 	b ^= *a;
@@ -296,9 +294,9 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	memcpy(data+aadlen, encbuff, bytes);
 
 	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
-		return FALSE;
-	else
-		return TRUE;
+		goto err;
+
+	return TRUE;
 
 err:
 	UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
@@ -802,13 +800,13 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 			pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
 		}
 		else {
-			pvar->crypt_state.sender_cipher = pvar->ciphers[MODE_OUT]->id;
+			pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
 		}
 		if (pvar->ciphers[MODE_IN] == NULL) {
 			pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
 		}
 		else {
-			pvar->crypt_state.receiver_cipher = pvar->ciphers[MODE_IN]->id;
+			pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
 		}
 	}
 
@@ -1046,98 +1044,12 @@ static void cBlowfish_init(char *session_key,
 	SecureZeroMemory(state->ivec, 8);
 }
 
-
-//
-// SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì‰Šú‰»
-//
-void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
-                      const u_char *key, u_int keylen,
-                      const u_char *iv, u_int ivlen,
-                      int encrypt,
-                      const EVP_CIPHER *type,
-                      int discard_len,
-                      unsigned int authlen,
-                      PTInstVar pvar)
-{
-	int klen;
-	char tmp[80];
-	unsigned char *junk = NULL, *discard = NULL;
-
-	EVP_CIPHER_CTX_reset(evp);
-	if (EVP_CipherInit(evp, type, NULL, NULL, (encrypt == CIPHER_ENCRYPT)) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-
-	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IVLEN, ivlen, NULL)) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-	if (EVP_CipherInit(evp, NULL, NULL, (u_char *)iv, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-
-	klen = EVP_CIPHER_CTX_key_length(evp);
-	if (klen > 0 && keylen != klen) {
-		if (EVP_CIPHER_CTX_set_key_length(evp, keylen) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
-			notify_fatal_error(pvar, tmp, TRUE);
-			return;
-		}
-	}
-	if (EVP_CipherInit(evp, NULL, (u_char *)key, NULL, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-
-	if (discard_len > 0) {
-		junk = malloc(discard_len);
-		discard = malloc(discard_len);
-		if (junk == NULL || discard == NULL ||
-		    EVP_Cipher(evp, discard, junk, discard_len) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
-			notify_fatal_error(pvar, tmp, TRUE);
-		}
-		else {
-			SecureZeroMemory(discard, discard_len);
-		}
-		free(junk);
-		free(discard);
-	}
-}
-
-//
-// SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì”jŠü
-//
-void cipher_free_SSH2(EVP_CIPHER_CTX *evp)
-{
-	EVP_CIPHER_CTX_free(evp);
-}
-
-
 BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 {
 	struct Enc *enc;
 	char *encryption_key = pvar->crypt_state.sender_cipher_key;
 	char *decryption_key = pvar->crypt_state.receiver_cipher_key;
-	SSH2Cipher *cipher;
+	const struct ssh2cipher *cipher;
 	BOOL isOK = TRUE;
 
 	if (sender_flag) {
@@ -1260,71 +1172,6 @@ void CRYPT_init(PTInstVar pvar)
 	pvar->crypt_state.detect_attack_statics.h = NULL;
 	pvar->crypt_state.detect_attack_statics.n =
 		HASH_MINSIZE / HASH_ENTRYSIZE;
-}
-
-static char *get_cipher_name(int cipher)
-{
-	switch (cipher) {
-	case SSH_CIPHER_NONE:
-		return "None";
-	case SSH_CIPHER_3DES:
-		return "3DES (168 key bits)";
-	case SSH_CIPHER_DES:
-		return "DES (56 key bits)";
-	case SSH_CIPHER_BLOWFISH:
-		return "Blowfish (256 key bits)";
-
-	// SSH2 
-	case SSH2_CIPHER_3DES_CBC:
-		return "3des-cbc";
-	case SSH2_CIPHER_AES128_CBC:
-		return "aes128-cbc";
-	case SSH2_CIPHER_AES192_CBC:
-		return "aes192-cbc";
-	case SSH2_CIPHER_AES256_CBC:
-		return "aes256-cbc";
-	case SSH2_CIPHER_BLOWFISH_CBC:
-		return "blowfish-cbc";
-	case SSH2_CIPHER_AES128_CTR:
-		return "aes128-ctr";
-	case SSH2_CIPHER_AES192_CTR:
-		return "aes192-ctr";
-	case SSH2_CIPHER_AES256_CTR:
-		return "aes256-ctr";
-	case SSH2_CIPHER_ARCFOUR:
-		return "arcfour";
-	case SSH2_CIPHER_ARCFOUR128:
-		return "arcfour128";
-	case SSH2_CIPHER_ARCFOUR256:
-		return "arcfour256";
-	case SSH2_CIPHER_CAST128_CBC:
-		return "cast-128-cbc";
-	case SSH2_CIPHER_3DES_CTR:
-		return "3des-ctr";
-	case SSH2_CIPHER_BLOWFISH_CTR:
-		return "blowfish-ctr";
-	case SSH2_CIPHER_CAST128_CTR:
-		return "cast-128-ctr";
-	case SSH2_CIPHER_CAMELLIA128_CBC:
-		return "camellia128-cbc";
-	case SSH2_CIPHER_CAMELLIA192_CBC:
-		return "camellia192-cbc";
-	case SSH2_CIPHER_CAMELLIA256_CBC:
-		return "camellia256-cbc";
-	case SSH2_CIPHER_CAMELLIA128_CTR:
-		return "camellia128-ctr";
-	case SSH2_CIPHER_CAMELLIA192_CTR:
-		return "camellia192-ctr";
-	case SSH2_CIPHER_CAMELLIA256_CTR:
-		return "camellia256-ctr";
-	case SSH2_CIPHER_AES128_GCM:
-		return "aes128-gcm@openssh.com";
-	case SSH2_CIPHER_AES256_GCM:
-		return "aes256-gcm@openssh.com";
-
-	default:
-		return "Unknown";
-	}
 }
 
 void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)

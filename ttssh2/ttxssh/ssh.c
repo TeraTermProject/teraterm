@@ -4339,239 +4339,6 @@ SSHKeys current_keys[MODE_MAX];
 #define write_buffer_file(buf,len) do_write_buffer_file(buf,len,__FILE__,__LINE__)
 
 
-//
-// general
-//
-
-int get_cipher_block_size(SSH2Cipher *cipher)
-{
-	int blocksize = 0;
-	
-	if (cipher) {
-		blocksize = cipher->block_size;
-	}
-
-	return max(blocksize, 8);
-}
-
-int get_cipher_key_len(SSH2Cipher *cipher)
-{
-	if (cipher) {
-		return cipher->key_len;
-	}
-	else {
-		return 0;
-	}
-}
-
-int get_cipher_discard_len(SSH2Cipher *cipher)
-{
-	if (cipher) {
-		return cipher->discard_len;
-	}
-	else {
-		return 0;
-	}
-}
-
-int get_cipher_iv_len(SSH2Cipher *cipher)
-{
-	if (cipher) {
-		if (cipher->iv_len != 0) {
-			return cipher->iv_len;
-		}
-		else {
-			return cipher->block_size;
-		}
-	}
-	else {
-		return 8; // block_size
-	}
-}
-
-int get_cipher_auth_len(SSH2Cipher *cipher)
-{
-	if (cipher) {
-		return cipher->auth_len;
-	}
-	else {
-		return 0;
-	}
-}
-
-// 暗号アルゴリズム名から検索する。
-SSH2Cipher *get_cipher_by_name(char *name)
-{
-	SSH2Cipher *ptr = ssh2_ciphers;
-
-	if (name == NULL || name[0] == '\0')
-		return NULL;
-
-	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, name) == 0) {
-			return ptr;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return NULL;
-}
-
-static char * get_cipher_string(SSH2Cipher *cipher)
-{
-	if (cipher) {
-		return cipher->name;
-	}
-	else {
-		return "unknown";
-	}
-}
-
-const EVP_CIPHER* get_cipher_EVP_CIPHER(SSH2Cipher *cipher)
-{
-	if (cipher) {
-		return cipher->func();
-	}
-	else {
-		return EVP_enc_null();
-	}
-}
-
-char* get_kex_algorithm_name(kex_algorithm kextype)
-{
-	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
-
-	while (ptr->name != NULL) {
-		if (kextype == ptr->kextype) {
-			return ptr->name;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return "unknown";
-}
-
-const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
-{
-	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
-
-	while (ptr->name != NULL) {
-		if (kextype == ptr->kextype) {
-			return ptr->evp_md();
-		}
-		ptr++;
-	}
-
-	// not found.
-	return EVP_md_null();
-}
-
-SSH2Mac *get_ssh2_mac(SSH2MacId id)
-{
-	SSH2Mac *ptr = ssh2_macs;
-
-	while (ptr->name != NULL) {
-		if (ptr->id == id) {
-			return ptr;
-		}
-		ptr++;
-	}
-
-	return NULL;
-}
-
-char* get_ssh2_mac_name(SSH2Mac *mac)
-{
-	if (mac) {
-		return mac->name;
-	}
-	else {
-		return "unknown";
-	}
-}
-
-char* get_ssh2_mac_name_by_id(SSH2MacId id)
-{
-	return get_ssh2_mac_name(get_ssh2_mac(id));
-}
-
-const EVP_MD* get_ssh2_mac_EVP_MD(SSH2Mac *mac)
-{
-	if (mac) {
-		return mac->evp_md();
-	}
-	else {
-		return EVP_md_null();
-	}
-}
-
-int get_ssh2_mac_truncatebits(SSH2Mac *mac)
-{
-	if (mac) {
-		return mac->truncatebits;
-	}
-	else {
-		return 0;
-	}
-}
-
-int get_ssh2_mac_etm(SSH2Mac *mac)
-{
-	if (mac) {
-		return mac->etm;
-	}
-	else {
-		return 0;
-	}
-}
-
-char* get_ssh2_comp_name(compression_type type)
-{
-	ssh2_comp_t *ptr = ssh2_comps;
-
-	while (ptr->name != NULL) {
-		if (type == ptr->type) {
-			return ptr->name;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return "unknown";
-}
-
-char* get_ssh_keytype_name(ssh_keytype type)
-{
-	ssh2_host_key_t *ptr = ssh2_host_key;
-
-	while (ptr->name != NULL) {
-		if (type == ptr->type) {
-			return ptr->name;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return "ssh-unknown";
-}
-
-char* get_digest_algorithm_name(digest_algorithm id)
-{
-	ssh_digest_t *ptr = ssh_digests;
-
-	while (ptr->name != NULL) {
-		if (id == ptr->id) {
-			return ptr->name;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return "unknown";
-}
-
 static void do_write_buffer_file(void *buf, int len, char *file, int lineno)
 {
 	FILE *fp;
@@ -4597,248 +4364,6 @@ void SSH2_packet_start(buffer_t *msg, unsigned char type)
 	buf[len - 1] = type;
 	buffer_clear(msg);
 	buffer_append(msg, buf, len);
-}
-
-// the caller is normalize_cipher_order()
-void SSH2_update_cipher_myproposal(PTInstVar pvar)
-{
-	static char buf[512]; // TODO: malloc()にすべき
-	int cipher;
-	int len, i;
-	char *c_str;
-
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
-	if (pvar->socket != INVALID_SOCKET) {
-		return;
-	}
-
-	// 暗号アルゴリズム優先順位に応じて、myproposal[]を書き換える。(2004.11.6 yutaka)
-	buf[0] = '\0';
-	for (i = 0 ; pvar->settings.CipherOrder[i] != 0 ; i++) {
-		cipher = pvar->settings.CipherOrder[i] - '0';
-		if (cipher == 0) // disabled line
-			break;
-		switch (cipher) {
-			case SSH2_CIPHER_3DES_CBC:
-				c_str = "3des-cbc,";
-				break;
-			case SSH2_CIPHER_3DES_CTR:
-				c_str = "3des-ctr,";
-				break;
-			case SSH2_CIPHER_BLOWFISH_CBC:
-				c_str = "blowfish-cbc,";
-				break;
-			case SSH2_CIPHER_BLOWFISH_CTR:
-				c_str = "blowfish-ctr,";
-				break;
-			case SSH2_CIPHER_AES128_CBC:
-				c_str = "aes128-cbc,";
-				break;
-			case SSH2_CIPHER_AES192_CBC:
-				c_str = "aes192-cbc,";
-				break;
-			case SSH2_CIPHER_AES256_CBC:
-				c_str = "aes256-cbc,";
-				break;
-			case SSH2_CIPHER_AES128_CTR:
-				c_str = "aes128-ctr,";
-				break;
-			case SSH2_CIPHER_AES192_CTR:
-				c_str = "aes192-ctr,";
-				break;
-			case SSH2_CIPHER_AES256_CTR:
-				c_str = "aes256-ctr,";
-				break;
-			case SSH2_CIPHER_ARCFOUR:
-				c_str = "arcfour,";
-				break;
-			case SSH2_CIPHER_ARCFOUR128:
-				c_str = "arcfour128,";
-				break;
-			case SSH2_CIPHER_ARCFOUR256:
-				c_str = "arcfour256,";
-				break;
-			case SSH2_CIPHER_CAST128_CBC:
-				c_str = "cast128-cbc,";
-				break;
-			case SSH2_CIPHER_CAST128_CTR:
-				c_str = "cast128-ctr,";
-				break;
-#ifdef WITH_CAMELLIA_PRIVATE
-			case SSH2_CIPHER_CAMELLIA128_CBC:
-				c_str = "camellia128-cbc,camellia128-cbc@openssh.org,";
-				break;
-			case SSH2_CIPHER_CAMELLIA192_CBC:
-				c_str = "camellia192-cbc,camellia192-cbc@openssh.org,";
-				break;
-			case SSH2_CIPHER_CAMELLIA256_CBC:
-				c_str = "camellia256-cbc,camellia256-cbc@openssh.org,";
-				break;
-			case SSH2_CIPHER_CAMELLIA128_CTR:
-				c_str = "camellia128-ctr,camellia128-ctr@openssh.org,";
-				break;
-			case SSH2_CIPHER_CAMELLIA192_CTR:
-				c_str = "camellia192-ctr,camellia192-ctr@openssh.org,";
-				break;
-			case SSH2_CIPHER_CAMELLIA256_CTR:
-				c_str = "camellia256-ctr,camellia256-ctr@openssh.org,";
-				break;
-#endif // WITH_CAMELLIA_PRIVATE
-			case SSH2_CIPHER_CAMELLIA128_CBC:
-				c_str = "camellia128-cbc,";
-				break;
-			case SSH2_CIPHER_CAMELLIA192_CBC:
-				c_str = "camellia192-cbc,";
-				break;
-			case SSH2_CIPHER_CAMELLIA256_CBC:
-				c_str = "camellia256-cbc,";
-				break;
-			case SSH2_CIPHER_CAMELLIA128_CTR:
-				c_str = "camellia128-ctr,";
-				break;
-			case SSH2_CIPHER_CAMELLIA192_CTR:
-				c_str = "camellia192-ctr,";
-				break;
-			case SSH2_CIPHER_CAMELLIA256_CTR:
-				c_str = "camellia256-ctr,";
-				break;
-			case SSH2_CIPHER_AES128_GCM:
-				c_str = "aes128-gcm@openssh.com,";
-				break;
-			case SSH2_CIPHER_AES256_GCM:
-				c_str = "aes256-gcm@openssh.com,";
-				break;
-			default:
-				continue;
-		}
-		strncat_s(buf, sizeof(buf), c_str, _TRUNCATE);
-	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
-	myproposal[PROPOSAL_ENC_ALGS_CTOS] = buf;  // Client To Server
-	myproposal[PROPOSAL_ENC_ALGS_STOC] = buf;  // Server To Client
-}
-
-
-void SSH2_update_compression_myproposal(PTInstVar pvar)
-{
-	static char buf[128]; // TODO: malloc()にすべき
-	int index;
-	int len, i;
-
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
-	if (pvar->socket != INVALID_SOCKET) {
-		return;
-	}
-
-	// 圧縮レベルに応じて、myproposal[]を書き換える。(2005.7.9 yutaka)
-	buf[0] = '\0';
-	for (i = 0 ; pvar->settings.CompOrder[i] != 0 ; i++) {
-		index = pvar->settings.CompOrder[i] - '0';
-		if (index == COMP_NONE) // disabled line
-			break;
-		strncat_s(buf, sizeof(buf), get_ssh2_comp_name(index), _TRUNCATE);
-		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
-	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
-
-	// 圧縮指定がない場合は、圧縮レベルを無条件にゼロにする。
-	if (buf[0] == '\0') {
-		pvar->settings.CompressionLevel = 0;
-	}
-
-	if (pvar->settings.CompressionLevel == 0) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, get_ssh2_comp_name(COMP_NOCOMP));
-	}
-	if (buf[0] != '\0') {
-		myproposal[PROPOSAL_COMP_ALGS_CTOS] = buf;  // Client To Server
-		myproposal[PROPOSAL_COMP_ALGS_STOC] = buf;  // Server To Client
-	}
-}
-
-// KEXアルゴリズム優先順位に応じて、myproposal[]を書き換える。
-// (2011.2.28 yutaka)
-void SSH2_update_kex_myproposal(PTInstVar pvar)
-{
-	static char buf[512]; // TODO: malloc()にすべき
-	int index;
-	int len, i;
-
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
-	if (pvar->socket != INVALID_SOCKET) {
-		return;
-	}
-
-	buf[0] = '\0';
-	for (i = 0 ; pvar->settings.KexOrder[i] != 0 ; i++) {
-		index = pvar->settings.KexOrder[i] - '0';
-		if (index == KEX_DH_NONE) // disabled line
-			break;
-		strncat_s(buf, sizeof(buf), get_kex_algorithm_name(index), _TRUNCATE);
-		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
-	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
-	myproposal[PROPOSAL_KEX_ALGS] = buf; 
-}
-
-// Host Keyアルゴリズム優先順位に応じて、myproposal[]を書き換える。
-// (2011.2.28 yutaka)
-void SSH2_update_host_key_myproposal(PTInstVar pvar)
-{
-	static char buf[256]; // TODO: malloc()にすべき
-	int index;
-	int len, i;
-
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
-	if (pvar->socket != INVALID_SOCKET) {
-		return;
-	}
-
-	buf[0] = '\0';
-	for (i = 0 ; pvar->settings.HostKeyOrder[i] != 0 ; i++) {
-		index = pvar->settings.HostKeyOrder[i] - '0';
-		if (index == KEY_NONE) // disabled line
-			break;
-		strncat_s(buf, sizeof(buf), get_ssh_keytype_name(index), _TRUNCATE);
-		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
-	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
-	myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = buf; 
-}
-
-// HMACアルゴリズム優先順位に応じて、myproposal[]を書き換える。
-// (2011.2.28 yutaka)
-void SSH2_update_hmac_myproposal(PTInstVar pvar)
-{
-	static char buf[256]; // TODO: malloc()にすべき
-	int index;
-	int len, i;
-
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
-	if (pvar->socket != INVALID_SOCKET) {
-		return;
-	}
-
-	buf[0] = '\0';
-	for (i = 0 ; pvar->settings.MacOrder[i] != 0 ; i++) {
-		index = pvar->settings.MacOrder[i] - '0';
-		if (index == HMAC_NONE) // disabled line
-			break;
-		strncat_s(buf, sizeof(buf), get_ssh2_mac_name_by_id(index), _TRUNCATE);
-		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
-	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
-	myproposal[PROPOSAL_MAC_ALGS_CTOS] = buf; 
-	myproposal[PROPOSAL_MAC_ALGS_STOC] = buf; 
 }
 
 // クライアントからサーバへのキー交換開始要求
@@ -4920,10 +4445,98 @@ void SSH2_send_kexinit(PTInstVar pvar)
 }
 
 
-static void choose_SSH2_proposal(char *server_proposal,
-                                 char *my_proposal,
-                                 char *dest,
-                                 int dest_len)
+void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
+{
+	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
+	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
+	int i, j, k=-1;
+
+	memset(listed, 0, sizeof(listed));
+	memset(allowed, 0, sizeof(allowed));
+
+	// 許可されている文字のリストを作る。
+	for (i = 0; i < default_strings_len ; i++) {
+		allowed[default_strings[i]] = 1;
+	}
+
+	// 指定された文字列を走査し、許可されていない文字、重複する文字は削除する。
+	// 
+	// ex. (i=5 の文字を削除する)
+	// i=012345
+	//   >:=9<87;A@?B3026(\0)
+	//         i+1
+	//         <------------>
+	//       ↓
+	//   >:=9<7;A@?B3026(\0)
+	//         
+	for (i = 0; buf[i] != 0; i++) {
+		int num = buf[i] - '0';
+
+		if (num < 0 || num > default_strings_len
+			|| !allowed[num]
+			|| listed[num]) {
+			memmove(buf + i, buf + i + 1, strlen(buf + i + 1) + 1);
+			i--;
+		} else {
+			listed[num] = 1;
+		}
+
+		// disabled lineがあれば、位置を覚えておく。
+		if (num == 0) {
+			k = i;
+		}
+	}
+
+	// 指定されていない文字があれば、disabled lineの直前に挿入する。
+	// 
+	// ex. (Zを挿入する)
+	//                k
+	//   >:=9<87;A@?B3026(\0)
+	//                 k+1
+	//                 <---->
+	//       ↓       k
+	//   >:=9<87;A@?B30026(\0)
+	//       ↓        k
+	//   >:=9<87;A@?B3Z026(\0)
+	//       
+	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
+		int num = default_strings[j];
+
+		if (!listed[num] && k >= 0) {
+			int copylen = strlen(buf + k + 1) + 1;
+
+			memmove(buf + k + 1, buf + k, copylen);
+			buf[k + 1 + copylen] = '\0';   // 終端を忘れずに付ける。
+			buf[k] = num + '0';
+			k++;
+			i++;
+		}
+	}
+	if (k < 0) {
+		j = 0;
+	}
+	else {
+		j++;
+	}
+
+	// disabled lineが存在しない場合は、そのまま末尾に追加する。
+	for (; j < default_strings_len ; j++) {
+		int num = default_strings[j];
+
+		if (!listed[num]) {
+			buf[i] = num + '0';
+			listed[num] = 1;
+			i++;
+		}
+	}
+
+	buf[i] = 0;
+}
+
+void choose_SSH2_proposal(char *server_proposal,
+                          char *my_proposal,
+                          char *dest,
+                          int dest_len)
 {
 	char tmp_cli[1024], *ptr_cli, *ctc_cli;
 	char tmp_svr[1024], *ptr_svr, *ctc_svr;
@@ -4952,87 +4565,14 @@ found:
 	}
 }
 
-static kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal)
-{
-	kex_algorithm type = KEX_DH_UNKNOWN;
-	char str_kextype[40];
-	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
-
-	choose_SSH2_proposal(server_proposal, my_proposal, str_kextype, sizeof(str_kextype));
-
-	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, str_kextype) == 0) {
-			type = ptr->kextype;
-			break;
-		}
-		ptr++;
-	}
-
-	return (type);
-}
-
-static SSH2Cipher *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
-{
-	char str_cipher[32];
-	SSH2Cipher *ptr = ssh2_ciphers;
-
-	choose_SSH2_proposal(server_proposal, my_proposal, str_cipher, sizeof(str_cipher));
-	return get_cipher_by_name(str_cipher);
-}
-
-
-static SSH2Mac *choose_SSH2_mac_algorithm(char *server_proposal, char *my_proposal)
-{
-	char str_hmac[64];
-	SSH2Mac *ptr = ssh2_macs;
-
-	choose_SSH2_proposal(server_proposal, my_proposal, str_hmac, sizeof(str_hmac));
-
-	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, str_hmac) == 0) {
-			return ptr;
-		}
-		ptr++;
-	}
-
-	return (NULL);
-}
-
-
-static compression_type choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
-{
-	compression_type type = COMP_UNKNOWN;
-	char str_comp[20];
-	ssh2_comp_t *ptr = ssh2_comps;
-
-	// OpenSSH 4.3では遅延パケット圧縮("zlib@openssh.com")が新規追加されているため、
-	// マッチしないように修正した。
-	// 現Tera Termでは遅延パケット圧縮は将来的にサポートする予定。
-	// (2006.6.14 yutaka)
-	// 遅延パケット圧縮に対応。
-	// (2006.6.23 maya)
-
-	choose_SSH2_proposal(server_proposal, my_proposal, str_comp, sizeof(str_comp));
-
-	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, str_comp) == 0) {
-			type = ptr->type;
-			break;
-		}
-		ptr++;
-	}
-
-	return (type);
-}
-
 // 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する。
 static void choose_SSH2_key_maxlength(PTInstVar pvar)
 {
 	int mode, val;
 	unsigned int need = 0;
 	const EVP_MD *md;
-	SSH2Cipher *cipher;
-	SSH2Mac *mac;
+	const struct ssh2cipher *cipher;
+	const struct SSH2Mac *mac;
 
 	for (mode = 0; mode < MODE_MAX; mode++) {
 		cipher = pvar->ciphers[mode];
@@ -5097,7 +4637,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	int len, size;
 	char *msg = NULL;
 	char tmp[1024+512];
-	char str_keytype[20];
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
 
@@ -5181,15 +4720,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
 
-	pvar->hostkey_type = KEY_UNSPEC;
-	choose_SSH2_proposal(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS], str_keytype, sizeof(str_keytype));
-	if (strlen(str_keytype) == 0) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown host KEY type: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
-	}
-	pvar->hostkey_type = get_keytype_from_name(str_keytype);
+	pvar->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
 	if (pvar->hostkey_type == KEY_UNSPEC) {
 		strncpy_s(tmp, sizeof(tmp), "unknown host KEY type: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
@@ -5255,7 +4786,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
 
-	if (pvar->ciphers[MODE_OUT]->auth_len > 0) {
+	if (get_cipher_auth_len(pvar->ciphers[MODE_OUT]) > 0) {
 		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (client to server)");
 		pvar->macs[MODE_OUT] = get_ssh2_mac(HMAC_IMPLICIT);
 	}
@@ -5283,7 +4814,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
 
-	if (pvar->ciphers[MODE_IN]->auth_len > 0) {
+	if (get_cipher_auth_len(pvar->ciphers[MODE_IN]) > 0) {
 		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (server to client)");
 		pvar->macs[MODE_IN] = get_ssh2_mac(HMAC_IMPLICIT);
 	}
@@ -5400,7 +4931,7 @@ skip:
 		get_kex_algorithm_name(pvar->kex_type));
 
 	logprintf(LOG_LEVEL_VERBOSE, "server host key algorithm: %s",
-		get_ssh_keytype_name(pvar->hostkey_type));
+		get_ssh2_hostkey_type_name(pvar->hostkey_type));
 
 	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm client to server: %s",
 		get_cipher_string(pvar->ciphers[MODE_OUT]));
@@ -6028,7 +5559,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6130,7 +5661,7 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6293,7 +5824,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6402,7 +5933,7 @@ BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6566,7 +6097,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6674,7 +6205,7 @@ BOOL handle_SSH2_ecdh_kex_reply_after_known_hosts(PTInstVar pvar)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -7091,7 +6622,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = "publickey";
 		buffer_put_string(signbuf, s, strlen(s));
 		buffer_put_char(signbuf, 1); // true
-		s = get_sshname_from_key(keypair); // key typeに応じた文字列を得る
+		s = get_ssh2_hostkey_type_name_from_key(keypair); // key typeに応じた文字列を得る
 		buffer_put_string(signbuf, s, strlen(s));
 		s = buffer_ptr(blob);
 		buffer_append_length(signbuf, s, bloblen);
@@ -7109,7 +6640,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = "publickey";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 1); // true
-		s = get_sshname_from_key(keypair); // key typeに応じた文字列を得る
+		s = get_ssh2_hostkey_type_name_from_key(keypair); // key typeに応じた文字列を得る
 		buffer_put_string(msg, s, strlen(s));
 		s = buffer_ptr(blob);
 		buffer_append_length(msg, s, bloblen);
