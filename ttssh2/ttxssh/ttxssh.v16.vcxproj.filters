@@ -19,6 +19,9 @@
     <ClCompile Include="cipher-3des1.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cipher-chachapoly-libcrypto.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cipher-ctr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,6 +94,9 @@
     <ClCompile Include="pkt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="poly1305.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="sftp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,6 +165,9 @@
     <ClInclude Include="cipher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cipher-chachapoly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -211,6 +220,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pkt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="poly1305.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sftp.h">

@@ -155,6 +155,7 @@
     <ClCompile Include="chacha.c" />
     <ClCompile Include="cipher.c" />
     <ClCompile Include="cipher-3des1.c" />
+    <ClCompile Include="cipher-chachapoly-libcrypto.c" />
     <ClCompile Include="cipher-ctr.c" />
     <ClCompile Include="comp.c" />
     <ClCompile Include="crypt.c" />
@@ -178,6 +179,7 @@
     <ClCompile Include="keyfiles.c" />
     <ClCompile Include="mac.c" />
     <ClCompile Include="pkt.c" />
+    <ClCompile Include="poly1305.c" />
     <ClCompile Include="sftp.c" />
     <ClCompile Include="ssh.c" />
     <ClCompile Include="ssherr.c" />
@@ -192,6 +194,7 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="chacha.h" />
     <ClInclude Include="cipher.h" />
+    <ClInclude Include="cipher-chachapoly.h" />
     <ClInclude Include="comp.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="crypt.h" />
@@ -211,6 +214,7 @@
     <ClInclude Include="keyfiles.h" />
     <ClInclude Include="mac.h" />
     <ClInclude Include="pkt.h" />
+    <ClInclude Include="poly1305.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="sftp.h" />
     <ClInclude Include="ssh.h" />

@@ -236,6 +236,10 @@
 				>
 			</File>
 			<File
+				RelativePath="cipher-chachapoly.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\teraterm\common\codeconv.h"
 				>
 			</File>
@@ -316,6 +320,10 @@
 				>
 			</File>
 			<File
+				RelativePath="poly1305.h"
+				>
+			</File>
+			<File
 				RelativePath="resource.h"
 				>
 			</File>
@@ -373,6 +381,10 @@
 			</File>
 			<File
 				RelativePath="cipher-3des1.c"
+				>
+			</File>
+			<File
+				RelativePath="cipher-chachapoly-libcrypto.c"
 				>
 			</File>
 			<File
@@ -485,6 +497,10 @@
 			</File>
 			<File
 				RelativePath="pkt.c"
+				>
+			</File>
+			<File
+				RelativePath="poly1305.c"
 				>
 			</File>
 			<File
