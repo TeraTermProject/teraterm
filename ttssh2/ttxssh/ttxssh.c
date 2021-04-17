@@ -161,10 +161,10 @@ static void init_TTSSH(PTInstVar pvar)
 	FWDUI_init(pvar);
 
 	ssh_heartbeat_lock_initialize();
-
-	pvar->evpcip[MODE_IN] = EVP_CIPHER_CTX_new();
-	pvar->evpcip[MODE_OUT] = EVP_CIPHER_CTX_new();
-	/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
+	
+	pvar->cc[MODE_IN] = NULL;
+	pvar->cc[MODE_OUT] = NULL;
+	// メモリ確保は CRYPT_start_encryption の先の cipher_init_SSH2 に移動
 }
 
 static void uninit_TTSSH(PTInstVar pvar)
@@ -197,8 +197,12 @@ static void uninit_TTSSH(PTInstVar pvar)
 
 	ssh_heartbeat_lock_finalize();
 
-	cipher_free_SSH2(pvar->evpcip[MODE_IN]);
-	cipher_free_SSH2(pvar->evpcip[MODE_OUT]);
+	cipher_free_SSH2(pvar->cc[MODE_IN]);
+	cipher_free_SSH2(pvar->cc[MODE_OUT]);
+
+	// CloseTCP と TTXEnd から 2 回呼ばれる場合があるため、2重 free しないように NULL をセットしておく
+	pvar->cc[MODE_IN] = NULL;
+	pvar->cc[MODE_OUT] = NULL;
 }
 
 static void PASCAL TTXInit(PTTSet ts, PComVar cv)
@@ -3643,7 +3647,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	int blocksize, keylen, ivlen, authlen, i, n; 
 	unsigned char *key = NULL, salt[SALT_LEN];
 	char *kdfname = KDFNAME;
-	EVP_CIPHER_CTX *cipher_ctx = NULL;
+	struct sshcipher_ctx *cc = NULL;
 	Key keyblob;
 	unsigned char *cp = NULL;
 	unsigned int len, check;
@@ -3654,8 +3658,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	kdf = buffer_init();
 	encoded = buffer_init();
 	blob = buffer_init();
-	cipher_ctx = EVP_CIPHER_CTX_new();
-	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL || cipher_ctx == NULL)
+	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
 		goto ed25519_error;
 
 	if (passphrase == NULL || !strlen(passphrase)) {
@@ -3682,8 +3685,8 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
-	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT,
-	                 get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
+	cipher = get_cipher_by_name(ciphername);
+	cipher_init_SSH2(&cc, cipher, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
@@ -3726,12 +3729,12 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 
 	/* encrypt */
 	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
-	if (EVP_Cipher(cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
+	if (EVP_Cipher(cc->evp, cp, buffer_ptr(b), buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);
 		//goto error;
 	}
-	cipher_free_SSH2(cipher_ctx);
+	cipher_free_SSH2(cc);
 
 	len = 2 * buffer_len(encoded);
 	cp = malloc(len);
@@ -4397,7 +4400,8 @@ public_error:
 				MD5_CTX md;
 				unsigned char digest[16];
 				char *passphrase = buf;
-				EVP_CIPHER_CTX *cipher_ctx = NULL;
+				const struct ssh2cipher *cipher = NULL;
+				struct sshcipher_ctx *cc = NULL;
 				FILE *fp;
 				char wrapped[4096];
 				BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
@@ -4405,7 +4409,7 @@ public_error:
 				if (passphrase[0] == '\0') { // passphrase is empty
 					cipher_num = SSH_CIPHER_NONE;
 				} else {
-					cipher_num = SSH_CIPHER_3DES; // 3DES-CBC
+					cipher_num = SSH_CIPHER_3DES; // 3DES
 				}
 
 				b = buffer_init();
@@ -4416,9 +4420,6 @@ public_error:
 					buffer_free(b);
 					break;
 				}
-
-				cipher_ctx = EVP_CIPHER_CTX_new();
-				/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
 
 				// set random value
 				rnd = arc4random();
@@ -4469,9 +4470,11 @@ public_error:
 				MD5_Update(&md, (const unsigned char *)passphrase, strlen(passphrase));
 				MD5_Final(digest, &md);
 				if (cipher_num == SSH_CIPHER_NONE) {
-					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, 0, pvar);
+					cipher = get_cipher_by_name("none");
+					cipher_init_SSH2(&cc, cipher, digest, 16, NULL, 0, CIPHER_ENCRYPT, pvar);
 				} else {
-					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, evp_ssh1_3des(), 0, 0, pvar);
+					cipher = get_cipher_by_name("3des");
+					cipher_init_SSH2(&cc, cipher, digest, 16, NULL, 0, CIPHER_ENCRYPT, pvar);
 				}
 				len = buffer_len(b);
 				if (len % 8) { // fatal error
@@ -4483,7 +4486,7 @@ public_error:
 					goto error;
 				}
 
-				if (EVP_Cipher(cipher_ctx, wrapped, buffer_ptr(b), len) == 0) {
+				if (EVP_Cipher(cc->evp, wrapped, buffer_ptr(b), len) == 0) {
 					goto error;
 				}
 
@@ -4506,7 +4509,7 @@ public_error:
 error:;
 				buffer_free(b);
 				buffer_free(enc);
-				cipher_free_SSH2(cipher_ctx);
+				cipher_free_SSH2(cc);
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);

@@ -122,16 +122,13 @@ void normalize_cipher_order(char *buf);
 const struct ssh2cipher *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal);
 void SSH2_update_cipher_myproposal(PTInstVar pvar);
 
-void cipher_init_SSH2(
-	EVP_CIPHER_CTX *evp,
+int cipher_init_SSH2(
+	struct sshcipher_ctx **ccp, const struct ssh2cipher *cipher,
 	const u_char *key, u_int keylen,
 	const u_char *iv, u_int ivlen,
-	int encrypt,
-	const EVP_CIPHER *type,
-	int discard_len,
-	unsigned int authlen,
+	int do_encrypt,
 	PTInstVar pvar
 );
-void cipher_free_SSH2(EVP_CIPHER_CTX *evp);
+void cipher_free_SSH2(struct sshcipher_ctx *cc);
 
 #endif				/* CIPHER_H */

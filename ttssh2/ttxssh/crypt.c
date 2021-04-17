@@ -204,7 +204,7 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_OUT];
+	struct sshcipher_ctx *cc = pvar->cc[MODE_OUT];
 
 	if (bytes == 0)
 		return TRUE;
@@ -225,21 +225,21 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		encbufflen = bytes;
 	}
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
 		goto err;
 
-	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
+	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	if (EVP_Cipher(evp, encbuff, data+aadlen, bytes) < 0)
+	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
 	memcpy(data+aadlen, encbuff, bytes);
 
-	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
+	if (EVP_Cipher(cc->evp, NULL, NULL, 0) < 0)
 		goto err;
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_GET_TAG, authlen, data+aadlen+bytes))
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_GET_TAG, authlen, data+aadlen+bytes))
 		goto err;
 
 	return TRUE;
@@ -258,7 +258,7 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_IN];
+	struct sshcipher_ctx *cc = pvar->cc[MODE_OUT];
 
 	if (bytes == 0)
 		return TRUE;
@@ -279,21 +279,21 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		encbufflen = bytes;
 	}
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
 		goto err;
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_TAG, authlen, data+aadlen+bytes))
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_SET_TAG, authlen, data+aadlen+bytes))
 		goto err;
 
-	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
+	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	if (EVP_Cipher(evp, encbuff, data+aadlen, bytes) < 0)
+	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
 	memcpy(data+aadlen, encbuff, bytes);
 
-	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
+	if (EVP_Cipher(cc->evp, NULL, NULL, 0) < 0)
 		goto err;
 
 	return TRUE;
@@ -336,7 +336,7 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 		encbufflen = bytes;
 	}
 
-	if (EVP_Cipher(pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->cc[MODE_OUT]->evp, encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher));
@@ -372,7 +372,7 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 		encbufflen = bytes;
 	}
 
-	if (EVP_Cipher(pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->cc[MODE_IN]->evp, encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher));
@@ -1083,15 +1083,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_OUT];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
-				                 enc->key, get_cipher_key_len(cipher),
-				                 enc->iv, get_cipher_iv_len(cipher),
+				cipher_init_SSH2(&pvar->cc[MODE_OUT], cipher,
+				                 enc->key, enc->key_len,
+				                 enc->iv, enc->iv_len,
 				                 CIPHER_ENCRYPT,
-				                 get_cipher_EVP_CIPHER(cipher),
-				                 get_cipher_discard_len(cipher),
-				                 get_cipher_auth_len(cipher),
 				                 pvar);
-
 				pvar->crypt_state.encrypt = crypt_SSH2_encrypt;
 			}
 			else {
@@ -1131,15 +1127,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_IN];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(pvar->evpcip[MODE_IN],
-				                 enc->key, get_cipher_key_len(cipher),
-				                 enc->iv, get_cipher_iv_len(cipher),
+				cipher_init_SSH2(&pvar->cc[MODE_IN], cipher,
+				                 enc->key, enc->key_len,
+				                 enc->iv, enc->iv_len,
 				                 CIPHER_DECRYPT,
-				                 get_cipher_EVP_CIPHER(cipher),
-				                 get_cipher_discard_len(cipher),
-				                 get_cipher_auth_len(cipher),
 				                 pvar);
-
 				pvar->crypt_state.decrypt = crypt_SSH2_decrypt;
 			}
 			else {

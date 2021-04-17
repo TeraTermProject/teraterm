@@ -70,7 +70,8 @@ static const struct ssh2cipher ssh2_ciphers[] = {
 #endif // WITH_CAMELLIA_PRIVATE
 	{SSH2_CIPHER_AES128_GCM,      "aes128-gcm@openssh.com",      16, 16, 0, 12, 16, EVP_aes_128_gcm}, // not RFC5647, PROTOCOL of OpenSSH
 	{SSH2_CIPHER_AES256_GCM,      "aes256-gcm@openssh.com",      16, 32, 0, 12, 16, EVP_aes_256_gcm}, // not RFC5647, PROTOCOL of OpenSSH
-	{SSH_CIPHER_NONE,             NULL,               0,  0,    0, 0, 0, NULL},
+	{SSH_CIPHER_NONE,             "none",             8,  0,    0, 0, 0, EVP_enc_null},         // for no passphrase key file
+	{SSH_CIPHER_3DES,             "3des",             8, 16,    0, 0, 0, evp_ssh1_3des},        // for RSA1 key file
 };
 
 
@@ -488,71 +489,123 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 //
 // SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì‰Šú‰»
 //
-void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
-                      const u_char *key, u_int keylen,
-                      const u_char *iv, u_int ivlen,
-                      int do_encrypt,
-                      const EVP_CIPHER *type,
-                      int discard_len,
-                      unsigned int authlen,
-                      PTInstVar pvar)
+int cipher_init_SSH2(
+	struct sshcipher_ctx **ccp, const struct ssh2cipher *cipher,
+	const u_char *key, u_int keylen,
+	const u_char *iv, u_int ivlen,
+	int do_encrypt,
+	PTInstVar pvar)
 {
+	struct sshcipher_ctx *cc = NULL;
+	int ret = SSH_ERR_INTERNAL_ERROR;
+	const EVP_CIPHER *type;
 	int klen;
 	unsigned char *junk = NULL, *discard = NULL;
 	char tmp[80];
 
-	EVP_CIPHER_CTX_reset(evp);
-	
-	if (EVP_CipherInit(evp, type, NULL, (u_char *)iv, (do_encrypt == CIPHER_ENCRYPT)) == 0) {
+	*ccp = NULL;
+	if ((cc = calloc(sizeof(*cc), 1)) == NULL) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
 		notify_fatal_error(pvar, tmp, TRUE);
-		return;
+		return SSH_ERR_ALLOC_FAIL;
 	}
-	if (authlen &&
-	    !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
+
+	if (keylen < cipher->key_len) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
 		notify_fatal_error(pvar, tmp, TRUE);
-		return;
+		ret = SSH_ERR_INVALID_ARGUMENT;
+		goto out;
 	}
-	klen = EVP_CIPHER_CTX_key_length(evp);
-	if (klen > 0 && keylen != (u_int)klen) {
-		if (EVP_CIPHER_CTX_set_key_length(evp, keylen) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
-			notify_fatal_error(pvar, tmp, TRUE);
-			return;
-		}
+	if (iv != NULL && ivlen < get_cipher_iv_len(cipher)) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
+		notify_fatal_error(pvar, tmp, TRUE);
+		ret = SSH_ERR_INVALID_ARGUMENT;
+		goto out;
 	}
-	if (EVP_CipherInit(evp, NULL, (u_char *)key, NULL, -1) == 0) {
+
+	cc->cipher = cipher;
+	type = (*cipher->func)();
+	if ((cc->evp = EVP_CIPHER_CTX_new()) == NULL) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
 		notify_fatal_error(pvar, tmp, TRUE);
-		return;
+		ret = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	if (EVP_CipherInit(cc->evp, type, NULL, (u_char *)iv, (do_encrypt == CIPHER_ENCRYPT)) == 0) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
+		notify_fatal_error(pvar, tmp, TRUE);
+		ret = SSH_ERR_LIBCRYPTO_ERROR;
+		goto out;
+	}
+	if (get_cipher_auth_len(cipher) &&
+	    !EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
+		notify_fatal_error(pvar, tmp, TRUE);
+		ret = SSH_ERR_LIBCRYPTO_ERROR;
+		goto out;
+	}
+	klen = EVP_CIPHER_CTX_key_length(cc->evp);
+	if (klen > 0 && keylen != (u_int)klen) {
+		if (EVP_CIPHER_CTX_set_key_length(cc->evp, keylen) == 0) {
+			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
+			notify_fatal_error(pvar, tmp, TRUE);
+			ret = SSH_ERR_LIBCRYPTO_ERROR;
+			goto out;
+		}
+	}
+	if (EVP_CipherInit(cc->evp, NULL, (u_char *)key, NULL, -1) == 0) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 8);
+		notify_fatal_error(pvar, tmp, TRUE);
+		ret = SSH_ERR_LIBCRYPTO_ERROR;
+		goto out;
 	}
 
-	if (discard_len > 0) {
-		junk = malloc(discard_len);
-		discard = malloc(discard_len);
+	if (cipher->discard_len > 0) {
+		junk = malloc(cipher->discard_len);
+		discard = malloc(cipher->discard_len);
 		if (junk == NULL || discard == NULL ||
-		    EVP_Cipher(evp, discard, junk, discard_len) == 0) {
+		    EVP_Cipher(cc->evp, discard, junk, cipher->discard_len) == 0) {
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 9);
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {
-			SecureZeroMemory(discard, discard_len);
+			SecureZeroMemory(discard, cipher->discard_len);
 		}
 		free(junk);
 		free(discard);
 	}
+	ret = 0;
+
+out:
+	if (ret == 0) {
+		*ccp = cc;
+	}
+	else {
+		if (cc != NULL) {
+			EVP_CIPHER_CTX_free(cc->evp);
+			SecureZeroMemory(cc, sizeof(*cc));
+		}
+	}
+	return ret;
 }
 
 //
 // SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì”jŠü
 ///
-void cipher_free_SSH2(EVP_CIPHER_CTX *evp)
+void cipher_free_SSH2(struct sshcipher_ctx *cc)
 {
-	EVP_CIPHER_CTX_free(evp);
+	if (cc == NULL)
+		return;
+	EVP_CIPHER_CTX_free(cc->evp);
+	cc->evp = NULL;
+	SecureZeroMemory(cc, sizeof(*cc));
 }
