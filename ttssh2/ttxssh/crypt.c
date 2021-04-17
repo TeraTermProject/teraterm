@@ -489,8 +489,8 @@ static BIGNUM *get_bignum(unsigned char *bytes)
 
 // make_key()を fingerprint 生成でも利用するので、staticを削除。(2006.3.27 yutaka)
 RSA *make_key(PTInstVar pvar,
-                  int bits, unsigned char *exp,
-                  unsigned char *mod)
+              int bits, unsigned char *exp,
+              unsigned char *mod)
 {
 	RSA *key = RSA_new();
 	BIGNUM *e = NULL, *n = NULL;
@@ -665,7 +665,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 // ※本関数は SSH2 でのみ使用される。
 // (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
-	char *data, int len, char *MAC)
+                               char *data, int len, char *MAC)
 {
 	HMAC_CTX *c = NULL;
 	unsigned char m[EVP_MAX_MD_SIZE];
@@ -685,7 +685,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 
 	if ((u_int)mac->mac_len > sizeof(m)) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
-			mac->mac_len, sizeof(m), sequence_number, len);
+		          mac->mac_len, sizeof(m), sequence_number, len);
 		goto error;
 	}
 
@@ -1003,7 +1003,7 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 		       SSH_RSA_CHALLENGE_LENGTH, SSH_RSA_CHALLENGE_LENGTH);
 	} else {
 		SecureZeroMemory(decrypted_challenge,
-		       SSH_RSA_CHALLENGE_LENGTH - decrypted_challenge_len);
+		                 SSH_RSA_CHALLENGE_LENGTH - decrypted_challenge_len);
 		memcpy(decrypted_challenge + SSH_RSA_CHALLENGE_LENGTH -
 		       decrypted_challenge_len, challenge,
 		       decrypted_challenge_len);
@@ -1063,7 +1063,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 	char tmp[80];
 	unsigned char *junk = NULL, *discard = NULL;
 
-	EVP_CIPHER_CTX_init(evp);
+	EVP_CIPHER_CTX_reset(evp);
 	if (EVP_CipherInit(evp, type, NULL, NULL, (encrypt == CIPHER_ENCRYPT)) == 0) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
@@ -1126,9 +1126,9 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 //
 // SSH2用アルゴリズムの破棄
 //
-void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp)
+void cipher_free_SSH2(EVP_CIPHER_CTX *evp)
 {
-	EVP_CIPHER_CTX_cleanup(evp);
+	EVP_CIPHER_CTX_free(evp);
 }
 
 
@@ -1392,18 +1392,18 @@ void CRYPT_end(PTInstVar pvar)
 
 	if (pvar->crypt_state.detect_attack_statics.h != NULL) {
 		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h, 
-		       pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
+		                 pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
 		free(pvar->crypt_state.detect_attack_statics.h);
 	}
 
 	SecureZeroMemory(pvar->crypt_state.sender_cipher_key,
-	       sizeof(pvar->crypt_state.sender_cipher_key));
+	                 sizeof(pvar->crypt_state.sender_cipher_key));
 	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key, 
-	       sizeof(pvar->crypt_state.receiver_cipher_key));
+	                 sizeof(pvar->crypt_state.receiver_cipher_key));
 	SecureZeroMemory(pvar->crypt_state.server_cookie, 
-	       sizeof(pvar->crypt_state.server_cookie));
+	                 sizeof(pvar->crypt_state.server_cookie));
 	SecureZeroMemory(pvar->crypt_state.client_cookie, 
-	       sizeof(pvar->crypt_state.client_cookie));
+	                 sizeof(pvar->crypt_state.client_cookie));
 	SecureZeroMemory(&pvar->crypt_state.enc, sizeof(pvar->crypt_state.enc));
 	SecureZeroMemory(&pvar->crypt_state.dec, sizeof(pvar->crypt_state.dec));
 }
@@ -1453,7 +1453,7 @@ int CRYPT_passphrase_decrypt(int cipher, char *passphrase,
 			SecureZeroMemory(state.ivec, 8);
 			flip_endianness(buf, bytes);
 			BF_cbc_encrypt(buf, buf, bytes, &state.k, state.ivec,
-						   BF_DECRYPT);
+			               BF_DECRYPT);
 			flip_endianness(buf, bytes);
 			break;
 		}

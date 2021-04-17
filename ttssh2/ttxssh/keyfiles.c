@@ -354,12 +354,12 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 // bcrypt KDF 形式で読む
 // based on key_parse_private2() @ OpenSSH 6.5
 static Key *read_SSH2_private2_key(PTInstVar pvar,
-                           FILE * fp,
-                           char * passphrase,
-                           BOOL * invalid_passphrase,
-                           BOOL is_auto_login,
-                           char *errmsg,
-                           int errmsg_len)
+                                   FILE * fp,
+                                   char * passphrase,
+                                   BOOL * invalid_passphrase,
+                                   BOOL is_auto_login,
+                                   char *errmsg,
+                                   int errmsg_len)
 {
 	/* (A) 
 	 * buffer_consume系関数を使う場合は、buffer_lenとbuffer_ptrが使えないので、
@@ -553,13 +553,11 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// 復号化
 	cp = buffer_append_space(b, len);
 	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
-		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
+	                 get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	ret = EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len);
 	if (ret == 0) {
-		cipher_cleanup_SSH2(cipher_ctx);
 		goto error;
 	}
-	cipher_cleanup_SSH2(cipher_ctx);
 	buffer_consume(copy_consumed, len);
 
 	if (buffer_remain_len(copy_consumed) != 0) {
@@ -607,6 +605,7 @@ error:
 	buffer_free(kdf);
 	buffer_free(encoded);
 	buffer_free(copy_consumed);
+	cipher_free_SSH2(cipher_ctx);
 
 	free(ciphername);
 	free(kdfname);
@@ -614,10 +613,6 @@ error:
 	free(key);
 	free(salt);
 	free(comment);
-
-	if (cipher_ctx) {
-		EVP_CIPHER_CTX_free(cipher_ctx);
-	}
 
 	// KDF ではなかった
 	if (keyfmt == NULL) {
@@ -943,7 +938,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		}
 
 		cipher_ctx = EVP_CIPHER_CTX_new();
-		if (ctx == NULL) {
+		if (cipher_ctx == NULL) {
 			EVP_MD_CTX_free(ctx);
 			goto error;
 		}
@@ -970,15 +965,13 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
-			cipher_cleanup_SSH2(cipher_ctx);
-			EVP_CIPHER_CTX_free(cipher_ctx);
+			cipher_free_SSH2(cipher_ctx);
 			goto error;
 		}
 		buffer_clear(prikey);
 		buffer_append(prikey, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(cipher_ctx);
-		EVP_CIPHER_CTX_free(cipher_ctx);
+		cipher_free_SSH2(cipher_ctx);
 	}
 
 	// verity MAC
@@ -1541,14 +1534,12 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		ret = EVP_Cipher(cipher_ctx, decrypted, blob->buf + blob->offset, len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
-			cipher_cleanup_SSH2(cipher_ctx);
-			EVP_CIPHER_CTX_free(cipher_ctx);
+			cipher_free_SSH2(cipher_ctx);
 			goto error;
 		}
 		buffer_append(blob2, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(cipher_ctx);
-		EVP_CIPHER_CTX_free(cipher_ctx);
+		cipher_free_SSH2(cipher_ctx);
 
 		*invalid_passphrase = TRUE;
 	}

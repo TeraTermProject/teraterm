@@ -89,16 +89,16 @@ int	 cipher_get_keycontext(const CipherContext *, u_char *);
 void	 cipher_set_keycontext(CipherContext *, u_char *);
 
 void cipher_init_SSH2(
-		EVP_CIPHER_CTX *evp,
-		const u_char *key, u_int keylen,
-		const u_char *iv, u_int ivlen,
-		int encrypt,
-		const EVP_CIPHER *type,
-		int discard_len,
-		unsigned int authlen,
-		PTInstVar pvar
+	EVP_CIPHER_CTX *evp,
+	const u_char *key, u_int keylen,
+	const u_char *iv, u_int ivlen,
+	int encrypt,
+	const EVP_CIPHER *type,
+	int discard_len,
+	unsigned int authlen,
+	PTInstVar pvar
 );
 
-void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp);
+void cipher_free_SSH2(EVP_CIPHER_CTX *evp);
 
 #endif				/* CIPHER_H */

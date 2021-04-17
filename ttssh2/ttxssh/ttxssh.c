@@ -191,8 +191,8 @@ static void uninit_TTSSH(PTInstVar pvar)
 
 	ssh_heartbeat_lock_finalize();
 
-	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_IN]);
-	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_OUT]);
+	cipher_free_SSH2(pvar->evpcip[MODE_IN]);
+	cipher_free_SSH2(pvar->evpcip[MODE_OUT]);
 }
 
 static void PASCAL TTXInit(PTTSet ts, PComVar cv)
@@ -645,8 +645,8 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	// Remember password (2006.8.5 yutaka)
 	WritePrivateProfileString("TTSSH", "RememberPassword",
-	    settings->remember_password ? "1" : "0",
-	    fileName);
+	                          settings->remember_password ? "1" : "0",
+	                          fileName);
 
 	// 初回の認証ダイアログでサポートされているメソッドをチェックし、
 	// 無効なメソッドをグレイアウトする (2007.9.24 maya)
@@ -1146,9 +1146,9 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 		FWDUI_open(pvar);
 
 		// 設定を myproposal に反映するのは、接続直前のここだけ。 (2006.6.26 maya)
-		SSH2_update_cipher_myproposal(pvar);
 		SSH2_update_kex_myproposal(pvar);
 		SSH2_update_host_key_myproposal(pvar);
+		SSH2_update_cipher_myproposal(pvar);
 		SSH2_update_hmac_myproposal(pvar);
 		SSH2_update_compression_myproposal(pvar);
 	}
@@ -1652,13 +1652,13 @@ hostssh_enabled:
 static void UTIL_SetDialogFont()
 {
 	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-				  pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
+	              pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
 }
 
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 {
 	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-				  pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
+	              pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
 	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
 	                             parent, TTXHostDlg, (LPARAM)rec);
 }
@@ -2706,9 +2706,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.KexOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_KEX_BORDER", pvar,
-							  "<KEXs below this line are disabled>");
+			                  "<KEXs below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_kex_algorithm_name(index);
@@ -2727,9 +2727,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.HostKeyOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
-							  "<Host Keys below this line are disabled>");
+			                  "<Host Keys below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_ssh_keytype_name(index);
@@ -2748,9 +2748,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.MacOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_MAC_BORDER", pvar,
-							  "<MACs below this line are disabled>");
+			                  "<MACs below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_ssh2_mac_name_by_id(index);
@@ -2769,9 +2769,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.CompOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_COMP_BORDER", pvar,
-							  "<Compression methods below this line are disabled>");
+			                  "<Compression methods below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_ssh2_comp_name(index);
@@ -3216,7 +3216,7 @@ static void choose_read_only_file(HWND dlg)
 }
 
 static INT_PTR CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
-									LPARAM lParam)
+                                    LPARAM lParam)
 {
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -3585,9 +3585,6 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 		else
 			k1 += 16;
 	}
-	EVP_CIPHER_CTX_init(c->k1);
-	EVP_CIPHER_CTX_init(c->k2);
-	EVP_CIPHER_CTX_init(c->k3);
 	if (EVP_CipherInit(c->k1, EVP_des_cbc(), k1, NULL, enc) == 0 ||
 		EVP_CipherInit(c->k2, EVP_des_cbc(), k2, NULL, !enc) == 0 ||
 		EVP_CipherInit(c->k3, EVP_des_cbc(), k3, NULL, enc) == 0) {
@@ -3622,9 +3619,9 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh1_3des_ctx *c;
 
 	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		EVP_CIPHER_CTX_cleanup(c->k1);
-		EVP_CIPHER_CTX_cleanup(c->k2);
-		EVP_CIPHER_CTX_cleanup(c->k3);
+		EVP_CIPHER_CTX_free(c->k1);
+		EVP_CIPHER_CTX_free(c->k2);
+		EVP_CIPHER_CTX_free(c->k3);
 		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
@@ -4083,8 +4080,8 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
-	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
-		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
+	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT,
+	                 get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
@@ -4132,7 +4129,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 		//free(decrypted);
 		//goto error;
 	}
-	cipher_cleanup_SSH2(cipher_ctx);
+	cipher_free_SSH2(cipher_ctx);
 
 	len = 2 * buffer_len(encoded);
 	cp = malloc(len);
@@ -4182,14 +4179,10 @@ ed25519_error:
 	buffer_free(kdf);
 	buffer_free(encoded);
 	buffer_free(blob);
-
-	if (cipher_ctx) {
-		EVP_CIPHER_CTX_free(cipher_ctx);
-	}
 }
 
 static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
-										LPARAM lParam)
+                                        LPARAM lParam)
 {
 	static ssh_keytype key_type;
 	static int saved_key_bits;
@@ -4891,9 +4884,6 @@ public_error:
 				if (EVP_Cipher(cipher_ctx, wrapped, buffer_ptr(b), len) == 0) {
 					goto error;
 				}
-				if (EVP_CIPHER_CTX_cleanup(cipher_ctx) == 0) {
-					goto error;
-				}
 
 				buffer_append(enc, wrapped, len);
 
@@ -4914,14 +4904,12 @@ public_error:
 error:;
 				buffer_free(b);
 				buffer_free(enc);
-				if (cipher_ctx) {
-					EVP_CIPHER_CTX_free(cipher_ctx);
-				}
+				cipher_free_SSH2(cipher_ctx);
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
 
-			} else { // SSH2 RSA, DSA, ECDSA			
+			} else { // SSH2 RSA, DSA, ECDSA
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
@@ -5082,7 +5070,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			pvar->showing_err = TRUE;
 			pvar->err_msg = NULL;
 			MessageBox(NULL, msg, "TTSSH",
-					   MB_TASKMODAL | MB_ICONEXCLAMATION);
+			           MB_TASKMODAL | MB_ICONEXCLAMATION);
 			free(msg);
 			pvar->showing_err = FALSE;
 
