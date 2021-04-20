@@ -1,13 +1,21 @@
-# gettimeの不具合を検出する
-#
-# - Visual Studio 2005 のCランタイムに不具合がある
-#   - 修正パッチが適応されている場合は問題は発生しない
-# - 不具合がある場合、実際の時刻とより1時間進んだ値を返す
-# - 環境変数 TZの内容、localtime() の呼び出し方によって発生
-# - ビルドした Tera Term に問題がないかチェックする
-#
-# ticket #41952
-# https://ja.osdn.net/projects/ttssh2/ticket/41952
+; gettimeの不具合を検出する
+;
+; - Visual Studio 2005 のCランタイムに不具合がある
+;   - 修正パッチが適応されている場合は問題は発生しない
+; - 不具合がある場合、実際の時刻とより1時間進んだ値を返す
+; - 環境変数 TZの内容、localtime() の呼び出し方によって発生
+; - ビルドした Tera Term に問題がないかチェックする
+;
+; ticket #41952
+; https://ja.osdn.net/projects/ttssh2/ticket/41952
+
+exitcode_only = 0
+if paramcnt == 2 then
+    strcompare params[2] "exitcode_only"
+    if result == 0 then
+       exitcode_only = 1
+    endif
+endif
 
 tz2="UTC"
 gettime tm2 "%Y/%m/%d %H:%M:%S" tz2
@@ -19,7 +27,12 @@ gettime tm3 "%Y/%m/%d %H:%M:%S" tz3
 
 strcompare tm2 tm3
 if result <> 0 then
-    messagebox "getdate has problem!" "tera term"
+    setexitcode 0;
+    msg = "getdate has problem!"
 else
-    messagebox "no problem" "tera term"
+    setexitcode 1;
+    msg = "no problem"
+endif
+if exitcode_only == 0 then
+    messagebox msg "tera term"
 endif
