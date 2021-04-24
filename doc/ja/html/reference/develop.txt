@@ -3,7 +3,9 @@
   Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro / Windows 10 Pro
 - Tera Term Project でリリースに使用しているコンパイラ
 -- Visual Studio 2005 SP1 (Standard Edition 以上)
-   Microsoft Visual Studio 2005 Service Pack 1 MFC セキュリティ更新プログラム
+   Service Pack 1 (VS80sp1-KB926602-X86-JPN.exe)
+   Microsoft Visual Studio 2005 Service Pack 1 MFC セキュリティ更新プログラム (VS80sp1-KB2538218-v2-X86-INTL.exe)
+   Windows Vista 以上でビルドする場合は、Visual Studio 2005 Service Pack 1 Update for Windows Vista (VS80sp1-KB932236-X86-JPN.exe)
    Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
    注: Visual Studio 2005 Standard Editionでは、OpenSSL のビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
        SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
@@ -15,12 +17,14 @@
    - SDK 7.0
      - Windows Server 2003 R2 Platform SDK
        (= Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
+       (5.2.3790.2075.51.PlatformSDK_Svr2003R2_rtm.img)
      - Microsoftのサイトからは入手不可能(2019/04/07時点)
    - SDK 7.1
      - Microsoft Windows SDK for Windows 7 and .NET Framework 4
+       (GRMSDK_EN_DVD.iso)
      - Windows95でも動作するバイナリをビルド可能
-     - Visual Studio 2005で利用するにはKB949009が必要
-       - KB949009はMicrosoftのサイトから入手不可能
+     - Visual Studio 2005で利用するにはKB949009(VS80sp1-KB949009-X86-INTL.exe)かKB980422(VS80sp1-KB980422-x86-INTL.exe)が必要
+       - KB949009,KB980422はMicrosoftのサイトから入手不可能
 -- Visual Studio 2008 SP1 (Standard Edition 以上)
    注: コンパイルされた実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
 -- Visual Studio 2010 SP1 (Professional Edition 以上)
@@ -29,7 +33,7 @@
    注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
        Windows Vista, XP をサポートするには v110_xp を指定してください。
 -- Visual Studio Community 2013 Update 5
-   MFC MBCS DLL アドオン
+   MFC MBCS DLL アドオン (vc_mbcsmfc.exe)
    注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
        Windows Vista, XP をサポートするには v120_xp を指定してください。
 -- Visual Studio Community 2015 Update 3
