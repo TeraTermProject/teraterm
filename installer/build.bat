@@ -76,7 +76,26 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v8.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v8.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v8.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v8.sln
-goto vsend
+
+rem VS2005にSP1が適用されているかをチェックする
+cl /? 2>&1 | findstr /C:"14.00.50727.762"
+echo %errorlevel%
+
+if %errorlevel% == 0 (
+	goto vsend
+) else (
+	echo "VS2005にSP1が適用されていないようです"
+	set /P ANS2005="続行しますか？(y/n)"
+	if "%ANS2005%"=="y" (
+		goto vsend
+	) else if "%ANS2005%"=="n" (
+	  echo "バッチファイルを終了します"
+	  exit /b
+	) else (
+	  exit /b
+	)
+)
+
 
 :vs2008
 set TERATERMSLN=..\teraterm\ttermpro.v9.sln
