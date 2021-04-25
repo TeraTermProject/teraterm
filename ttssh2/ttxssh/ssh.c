@@ -931,6 +931,7 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsign
  *   data - ssh パケットの先頭を指すポインタ
  *   len - パケット長 (先頭のパケット長領域(4バイト)を除いた値)
  *   aadlen - 暗号化されていないが認証の対象となっているデータの長さ
+ *            chacha20-poly1305 では暗号化されるパケット長部分の長さ
  *   authlen - 認証データ(AEAD tag)長
  */
 
@@ -1175,8 +1176,9 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		CRYPT_encrypt(pvar, data + 4, data_length - 4);
 	} else { //for SSH2(yutaka)
 		unsigned int block_size = CRYPT_get_encryption_block_size(pvar);
+		unsigned int packet_length;
 		unsigned int encryption_size;
-		unsigned int padding;
+		unsigned int padding_size;
 		BOOL ret;
 		struct Mac *mac = &pvar->ssh2_keys[MODE_OUT].mac;
 		struct Enc *enc = &pvar->ssh2_keys[MODE_OUT].enc;
@@ -1189,7 +1191,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		         <--ignore---> ^^^^^^^^    <---- payload --->
 		                       packet length
 
-		                                ^^padding
+		                                ^^padding_size
 
 		                       <---------------------------->
 		                          SSH2 sending data on TCP
@@ -1238,32 +1240,37 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		}
 
 		if (mac && mac->etm || authlen > 0) {
-			// 暗号化対象では無いが、MAC の対象となる部分の長さ
+			// 暗号化対象ではないが、MAC の対象となるパケット長部分の長さ
+			// または chacha20-poly1305 で暗号化されるパケット長部分の長さ
+			// cf. PKT_recv 内のコメント
 			aadlen = 4;
 		}
 
-		encryption_size = 4 - aadlen + 1 + len;
-		padding = block_size - (encryption_size % block_size);
-		if (padding < 4)
-			padding += block_size;
-		encryption_size += padding;
-		set_uint32(data, encryption_size - 4 + aadlen);
-		data[4] = (unsigned char) padding;
+		packet_length = 1 + len; // パディング長のサイズ + ペイロード長
+		encryption_size = 4 + packet_length - aadlen; // パケット長のサイズ + packet_length - addlen
+		padding_size = block_size - (encryption_size % block_size);
+		if (padding_size < 4)
+			padding_size += block_size;
+		packet_length += padding_size;
+		encryption_size += padding_size;
+		set_uint32(data, packet_length);
+		data[4] = (unsigned char) padding_size;
 		if (msg) {
 			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
-			buffer_append_space(msg, padding + EVP_MAX_MD_SIZE);
+			buffer_append_space(msg, padding_size + EVP_MAX_MD_SIZE);
 			// realloc()されると、ポインタが変わる可能性があるので、再度取り直す。
 			data = buffer_ptr(msg);
 		}
 
-		CRYPT_set_random_data(pvar, data + 5 + len, padding);
+		CRYPT_set_random_data(pvar, data + 5 + len, padding_size);
 
 		if (authlen > 0) {
+			// パケット暗号化と MAC の計算
 			CRYPT_encrypt_aead(pvar, data, encryption_size, aadlen, authlen);
 			maclen = authlen;
 		}
 		else if (aadlen) {
-			// パケット暗号化
+			// パケット暗号化（aadlenより後ろだけ）
 			CRYPT_encrypt(pvar, data + aadlen, encryption_size);
 
 			// EtM では暗号化後に MAC を計算する
@@ -1274,7 +1281,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			}
 		}
 		else {
-			// E&M では先に MAC を計算する
+			// E&M では暗号化前に MAC を計算する
 			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
 			                             data, encryption_size, data + encryption_size);
 			if (ret) {
@@ -1288,9 +1295,12 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		data_length = encryption_size + aadlen + maclen;
 
 		logprintf(150,
-				  "%s: built packet info: aadlen:%d, enclen:%d, padlen:%d, datalen:%d, maclen:%d, mode:%s",
-				  __FUNCTION__,
-				  aadlen, encryption_size, padding, data_length, maclen, aadlen ? "EtM" : "E&M");
+		          "%s: built packet info: "
+		          "aadlen:%d, enclen:%d, padlen:%d, datalen:%d, maclen:%d, "
+		          "Encrypt Mode:%s, MAC mode:%s",
+		          __FUNCTION__,
+		          aadlen, encryption_size, padding_size, data_length, maclen,
+		          authlen ? "AEAD" : "not AEAD", aadlen ? "EtM" : "E&M");
 	}
 
 	send_packet_blocking(pvar, data, data_length);
@@ -6398,6 +6408,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	                       | 1 << SSH2_CIPHER_CAMELLIA256_CTR
 	                       | 1 << SSH2_CIPHER_AES128_GCM
 	                       | 1 << SSH2_CIPHER_AES256_GCM
+	                       | 1 << SSH2_CIPHER_CHACHAPOLY
 	);
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);

@@ -43,6 +43,8 @@ typedef unsigned int u_int;
 typedef unsigned char u_char;
 
 #include <openssl/evp.h>
+#include "cipher-chachapoly.h"
+
 /*
  * Cipher types for SSH-1.  New types can be added, but old types should not
  * be removed for compatibility.  The maximum allowed value is 31.
@@ -95,12 +97,16 @@ struct ssh2cipher {
 struct sshcipher_ctx {
 	// TTSSH では SSH_CIPHER_NONE が無効なので、plaintext は使用されない
 	// int	plaintext;
+	
 	// TTSSH では CRYPT_encrypt_aead(), CRYPT_decrypt_aead() が別れていて encrypt で切り替えないので使用されない
 	// int	encrypt;
+	
 	EVP_CIPHER_CTX *evp;
-	// struct chachapoly_ctx *cp_ctx;
+	struct chachapoly_ctx *cp_ctx;
+	
 	// OpenSSH で ifndef WITH_OPENSSL の時に使用されるものなので、ac_ctx は使用されない
 	// aesctr_ctx ac_ctx; /* XXX union with evp? */
+	
 	// OpenSSH では const struct sshcipher *cipher;
 	const struct ssh2cipher *cipher;
 };

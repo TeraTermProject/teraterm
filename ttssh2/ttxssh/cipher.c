@@ -70,6 +70,7 @@ static const struct ssh2cipher ssh2_ciphers[] = {
 #endif // WITH_CAMELLIA_PRIVATE
 	{SSH2_CIPHER_AES128_GCM,      "aes128-gcm@openssh.com",      16, 16, 0, 12, 16, EVP_aes_128_gcm}, // not RFC5647, PROTOCOL of OpenSSH
 	{SSH2_CIPHER_AES256_GCM,      "aes256-gcm@openssh.com",      16, 32, 0, 12, 16, EVP_aes_256_gcm}, // not RFC5647, PROTOCOL of OpenSSH
+	{SSH2_CIPHER_CHACHAPOLY,      "chacha20-poly1305@openssh.com",  8, 64, 0, 0, 16, EVP_enc_null},
 	{SSH_CIPHER_NONE,             "none",             8,  0,    0, 0, 0, EVP_enc_null},         // for no passphrase key file
 	{SSH_CIPHER_3DES,             "3des",             8, 16,    0, 0, 0, evp_ssh1_3des},        // for RSA1 key file
 };
@@ -119,7 +120,7 @@ u_int get_cipher_discard_len(const struct ssh2cipher *cipher)
 u_int get_cipher_iv_len(const struct ssh2cipher *cipher)
 {
 	if (cipher) {
-		if (cipher->iv_len != 0) {
+		if (cipher->iv_len != 0 || cipher->id != SSH2_CIPHER_CHACHAPOLY) {
 			return cipher->iv_len;
 		}
 		else {
@@ -240,6 +241,8 @@ char *get_cipher_name(int cipher_id)
 		return "aes128-gcm@openssh.com";
 	case SSH2_CIPHER_AES256_GCM:
 		return "aes256-gcm@openssh.com";
+	case SSH2_CIPHER_CHACHAPOLY:
+		return "chacha20-poly1305@openssh.com(SSH2)";
 
 	default:
 		return "Unknown";
@@ -308,6 +311,8 @@ char *get_listbox_cipher_name(int cipher_id, PTInstVar pvar)
 		return "aes128-gcm@openssh.com(SSH2)";
 	case SSH2_CIPHER_AES256_GCM:
 		return "aes256-gcm@openssh.com(SSH2)";
+	case SSH2_CIPHER_CHACHAPOLY:
+		return "chacha20-poly1305@openssh.com(SSH2)";
 
 	default:
 		return NULL;
@@ -325,6 +330,7 @@ void normalize_cipher_order(char *buf)
 	static char default_strings[] = {
 		SSH2_CIPHER_AES256_GCM,
 		SSH2_CIPHER_CAMELLIA256_CTR,
+		SSH2_CIPHER_CHACHAPOLY,
 		SSH2_CIPHER_AES256_CTR,
 		SSH2_CIPHER_CAMELLIA256_CBC,
 		SSH2_CIPHER_AES256_CBC,
@@ -473,6 +479,9 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 			case SSH2_CIPHER_AES256_GCM:
 				c_str = "aes256-gcm@openssh.com,";
 				break;
+			case SSH2_CIPHER_CHACHAPOLY:
+				c_str = "chacha20-poly1305@openssh.com,";
+				break;
 			default:
 				continue;
 		}
@@ -527,17 +536,27 @@ int cipher_init_SSH2(
 	}
 
 	cc->cipher = cipher;
+	if (cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		cc->cp_ctx = chachapoly_new(key, keylen);
+		ret = cc->cp_ctx != NULL ? 0 : SSH_ERR_INVALID_ARGUMENT;
+		if (ret == SSH_ERR_INVALID_ARGUMENT) {
+			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
+			notify_fatal_error(pvar, tmp, TRUE);
+		}
+		goto out;
+	}
 	type = (*cipher->func)();
 	if ((cc->evp = EVP_CIPHER_CTX_new()) == NULL) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
 	if (EVP_CipherInit(cc->evp, type, NULL, (u_char *)iv, (do_encrypt == CIPHER_ENCRYPT)) == 0) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
@@ -545,7 +564,7 @@ int cipher_init_SSH2(
 	if (get_cipher_auth_len(cipher) &&
 	    !EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
@@ -554,7 +573,7 @@ int cipher_init_SSH2(
 	if (klen > 0 && keylen != (u_int)klen) {
 		if (EVP_CIPHER_CTX_set_key_length(cc->evp, keylen) == 0) {
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 8);
 			notify_fatal_error(pvar, tmp, TRUE);
 			ret = SSH_ERR_LIBCRYPTO_ERROR;
 			goto out;
@@ -562,7 +581,7 @@ int cipher_init_SSH2(
 	}
 	if (EVP_CipherInit(cc->evp, NULL, (u_char *)key, NULL, -1) == 0) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 8);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 9);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
@@ -574,7 +593,7 @@ int cipher_init_SSH2(
 		if (junk == NULL || discard == NULL ||
 		    EVP_Cipher(cc->evp, discard, junk, cipher->discard_len) == 0) {
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 9);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 10);
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {
@@ -605,6 +624,10 @@ void cipher_free_SSH2(struct sshcipher_ctx *cc)
 {
 	if (cc == NULL)
 		return;
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		chachapoly_free(cc->cp_ctx);
+		cc->cp_ctx = NULL;
+	}
 	EVP_CIPHER_CTX_free(cc->evp);
 	cc->evp = NULL;
 	SecureZeroMemory(cc, sizeof(*cc));

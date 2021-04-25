@@ -205,6 +205,7 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned char lastiv[1];
 	char tmp[80];
 	struct sshcipher_ctx *cc = pvar->cc[MODE_OUT];
+	unsigned int newbuff_len = bytes;
 
 	if (bytes == 0)
 		return TRUE;
@@ -218,11 +219,26 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return FALSE;
 	}
 
-	if (bytes > encbufflen) {
-		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		// chacha20-poly1305 では aadlen も暗号化の対象
+		//   aadlen と bytes は別々に暗号化される
+		// chachapoly_crypt の中で認証データ(AEAD tag)も生成される
+		newbuff_len += aadlen + authlen;
+	}
+	if (newbuff_len > encbufflen) {
+		if ((newbuff = realloc(encbuff, newbuff_len)) == NULL)
 			goto err;
 		encbuff = newbuff;
-		encbufflen = bytes;
+		encbufflen = newbuff_len;
+	}
+
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		if (chachapoly_crypt(cc->cp_ctx, pvar->ssh_state.sender_sequence_number,
+		                     encbuff, data, bytes, aadlen, authlen, 1) != 0) {
+			goto err;
+		}
+		memcpy(data, encbuff, aadlen + bytes + authlen);
+		return TRUE;
 	}
 
 	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
@@ -231,6 +247,7 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
+	// AES-GCM では aadlen を暗号化しないので、その先だけ暗号化する
 	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
@@ -258,7 +275,8 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	struct sshcipher_ctx *cc = pvar->cc[MODE_OUT];
+	struct sshcipher_ctx *cc = pvar->cc[MODE_IN];
+	unsigned int newbuff_len = bytes;
 
 	if (bytes == 0)
 		return TRUE;
@@ -272,11 +290,24 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return FALSE;
 	}
 
-	if (bytes > encbufflen) {
-		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		// chacha20-poly1305 では aadlen も暗号化されている
+		newbuff_len += aadlen;
+	}
+	if (newbuff_len > encbufflen) {
+		if ((newbuff = realloc(encbuff, newbuff_len)) == NULL)
 			goto err;
 		encbuff = newbuff;
-		encbufflen = bytes;
+		encbufflen = newbuff_len;
+	}
+
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		if (chachapoly_crypt(cc->cp_ctx, pvar->ssh_state.receiver_sequence_number,
+		                     encbuff, data, bytes, aadlen, authlen, 0) != 0) {
+			goto err;
+		}
+		memcpy(data, encbuff, aadlen + bytes);
+		return TRUE;
 	}
 
 	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
@@ -288,6 +319,7 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
+	// AES-GCM では aadlen を暗号化しないので、その先だけ復号する
 	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
@@ -593,6 +625,7 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
 		            | (1 << SSH2_CIPHER_AES128_GCM)
 		            | (1 << SSH2_CIPHER_AES256_GCM)
+		            | (1 << SSH2_CIPHER_CHACHAPOLY)
 		);
 	}
 
