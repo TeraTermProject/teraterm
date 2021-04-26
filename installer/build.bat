@@ -83,17 +83,17 @@ echo %errorlevel%
 
 if %errorlevel% == 0 (
 	goto vsend
+) 
+
+echo "VS2005にSP1が適用されていないようです"
+set /P ANS2005="続行しますか？(y/n)"
+if "%ANS2005%"=="y" (
+	goto vsend
+) else if "%ANS2005%"=="n" (
+  echo "バッチファイルを終了します"
+  exit /b
 ) else (
-	echo "VS2005にSP1が適用されていないようです"
-	set /P ANS2005="続行しますか？(y/n)"
-	if "%ANS2005%"=="y" (
-		goto vsend
-	) else if "%ANS2005%"=="n" (
-	  echo "バッチファイルを終了します"
-	  exit /b
-	) else (
-	  exit /b
-	)
+  exit /b
 )
 
 
