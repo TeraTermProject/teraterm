@@ -2,9 +2,11 @@
 ;
 ; - Visual Studio 2005 のCランタイムに不具合がある
 ;   - 修正パッチが適応されている場合は問題は発生しない
+;     - 次のパッチを適応することで不具合が解消されるのを確認した
+;     - Visual Studio 2005 Service Pack 1 (VS80sp1-KB926602-X86-JPN.exe)
 ; - 不具合がある場合、実際の時刻とより1時間進んだ値を返す
 ; - 環境変数 TZの内容、localtime() の呼び出し方によって発生
-; - ビルドした Tera Term に問題がないかチェックする
+; - このマクロは gettime の動作に問題がないかをチェックためのもの
 ;
 ; ticket #41952
 ; https://ja.osdn.net/projects/ttssh2/ticket/41952
