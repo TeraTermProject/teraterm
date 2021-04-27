@@ -31,15 +31,18 @@
 #include "tttypes.h"
 #include "ttlib.h"
 
+#define _CRTDBG_MAP_ALLOC
 // #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <crtdbg.h>
 /* for _findXXXX() functions */
 #include <io.h>
 #include "ttwinman.h"
 #include "ttplugin.h"
 #include "ttplug.h"
+#include "codeconv.h"
 
 #define MAXNUMEXTENSIONS 32
 static HANDLE LibHandle[MAXNUMEXTENSIONS];
@@ -58,69 +61,73 @@ static int compareOrder(const void * e1, const void * e2) {
   return (*exports1)->loadOrder - (*exports2)->loadOrder;
 }
 
-static void loadExtension(ExtensionList * * extensions, char const * fileName) {
-  char buf[1024];
-  DWORD err;
-  char uimsg[MAX_UIMSG];
-  const char *sub_message;
+static void loadExtension(ExtensionList **extensions, wchar_t const *fileName)
+{
+	DWORD err;
+	const wchar_t *sub_message;
+	HMODULE hPlugin;
 
-  if (NumExtensions>=MAXNUMEXTENSIONS) return;
-  LibHandle[NumExtensions] = LoadLibrary(fileName);
-  if (LibHandle[NumExtensions] != NULL) {
+	if (NumExtensions >= MAXNUMEXTENSIONS)
+		return;
+	hPlugin = LoadLibraryW(fileName);
+	if (hPlugin != NULL) {
+		TTXBindProc bind = NULL;
 #if defined(_MSC_VER)
-    const char *TTXBIND = "_TTXBind@8";
+		if (bind == NULL)
+			bind = (TTXBindProc)GetProcAddress(hPlugin, "_TTXBind@8");
 #else
-    const char *TTXBIND = "TTXBind@8";
+		if (bind == NULL)
+			bind = (TTXBindProc)GetProcAddress(hPlugin, "TTXBind@8");
 #endif
-    TTXBindProc bind = (TTXBindProc)GetProcAddress(LibHandle[NumExtensions], TTXBIND);
-    if (bind==NULL)
-      bind = (TTXBindProc)GetProcAddress(LibHandle[NumExtensions], "TTXBind");
-    if (bind != NULL) {
-      ExtensionList * newExtension =
-        (ExtensionList *)malloc(sizeof(ExtensionList));
+		if (bind == NULL)
+			bind = (TTXBindProc)GetProcAddress(hPlugin, "TTXBind");
+		if (bind != NULL) {
+			ExtensionList *newExtension = (ExtensionList *)malloc(sizeof(ExtensionList));
 
-      newExtension->exports = (TTXExports *)malloc(sizeof(TTXExports));
-      memset(newExtension->exports, 0, sizeof(TTXExports));
-      newExtension->exports->size = sizeof(TTXExports);
-      if (bind(TTVERSION,(TTXExports *)newExtension->exports)) {
-        newExtension->next = *extensions;
-        *extensions = newExtension;
-        NumExtensions++;
-        return;
-      } else {
-	free(newExtension->exports);
-	free(newExtension);
-      }
-    }
-    FreeLibrary(LibHandle[NumExtensions]);
-  }
+			newExtension->exports = (TTXExports *)malloc(sizeof(TTXExports));
+			memset(newExtension->exports, 0, sizeof(TTXExports));
+			newExtension->exports->size = sizeof(TTXExports);
+			if (bind(TTVERSION, newExtension->exports)) {
+				newExtension->next = *extensions;
+				*extensions = newExtension;
+				LibHandle[NumExtensions] = hPlugin;
+				NumExtensions++;
+				return;
+			}
+			else {
+				free(newExtension->exports);
+				free(newExtension);
+			}
+		}
+		FreeLibrary(LibHandle[NumExtensions]);
+	}
 
-  err = GetLastError();
-#if 0
-  switch(err) {
-  case 31:
-	  sub_message = "Unresolved dll entry";
-	  break;
-  case 1114:
-	  sub_message = "tls entry exists";
-	  break;
-  case 2:
-	  sub_message = "Reject load by plugin";
-	  break;
-  default:
-	  sub_message = "unknown";
-	  break;
-  }
-#endif
-  // 言語ファイルによるメッセージの国際化を行っているが、この時点では設定が
-  // まだ読み込まれていない為、メッセージが英語のままとなる。要検討。
-  get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts.UILanguageFile);
-  get_lang_msg("MSG_LOAD_EXT_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Cannot load extension %s (%d)", ts.UILanguageFile);
-  _snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, fileName, err);
-  MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONEXCLAMATION);
+	err = GetLastError();
+	switch (err) {
+		case 31:
+			sub_message = L"Unresolved dll entry";
+			break;
+		case 1114:
+			sub_message = L"tls entry exists";
+			break;
+		case 2:
+			sub_message = L"rejected by plugin";
+			break;
+		case 193:
+			sub_message = L"invalid dll image";
+			break;
+		default:
+			sub_message = L"unknown";
+			break;
+	}
+	// 言語ファイルによるメッセージの国際化を行っているが、この時点では設定が
+	// まだ読み込まれていない為、メッセージが英語のままとなる。要検討。
+	static const TTMessageBoxInfoW info = {"Tera Term", "MSG_TT_ERROR", L"Tera Term: Error", "MSG_LOAD_EXT_ERROR",
+										   L"Cannot load extension %s (%d, %s)"};
+	TTMessageBoxW(NULL, &info, MB_OK | MB_ICONEXCLAMATION, ts.UILanguageFile, fileName, err, sub_message);
 }
 
-void PASCAL TTXInit(PTTSet ts, PComVar cv) {
+void PASCAL TTXInit(PTTSet ts_, PComVar cv_) {
   ExtensionList * extensionList = NULL;
   int i;
 
@@ -131,13 +138,16 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv) {
     struct _finddata_t searchData;
 	intptr_t searchHandle;
 
-    _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts->HomeDir);
+    _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts_->HomeDir);
 
     searchHandle = _findfirst(buf, &searchData);
     if (searchHandle != -1L) {
       do {
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\%s", ts->HomeDir, searchData.name);
-	loadExtension(&extensionList, buf);
+			wchar_t *bufW;
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\%s", ts_->HomeDir, searchData.name);
+			bufW = ToWcharA(buf);
+			loadExtension(&extensionList, bufW);
+			free(bufW);
       } while (_findnext(searchHandle, &searchData)==0);
       _findclose(searchHandle);
     }
@@ -158,7 +168,7 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 
     for (i = 0; i < NumExtensions; i++) {
       if (Extensions[i]->TTXInit != NULL) {
-        Extensions[i]->TTXInit(ts, cv);
+        Extensions[i]->TTXInit(ts_, cv_);
       }
     }
   }
