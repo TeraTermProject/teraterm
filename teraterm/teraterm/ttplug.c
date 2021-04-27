@@ -32,17 +32,16 @@
 #include "ttlib.h"
 
 #define _CRTDBG_MAP_ALLOC
-// #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <crtdbg.h>
-/* for _findXXXX() functions */
-#include <io.h>
 #include "ttwinman.h"
 #include "ttplugin.h"
-#include "ttplug.h"
 #include "codeconv.h"
+#include "asprintf.h"
+
+#include "ttplug.h"
 
 #define MAXNUMEXTENSIONS 32
 static HANDLE LibHandle[MAXNUMEXTENSIONS];
@@ -127,51 +126,49 @@ static void loadExtension(ExtensionList **extensions, wchar_t const *fileName)
 	TTMessageBoxW(NULL, &info, MB_OK | MB_ICONEXCLAMATION, ts.UILanguageFile, fileName, err, sub_message);
 }
 
-void PASCAL TTXInit(PTTSet ts_, PComVar cv_) {
-  ExtensionList * extensionList = NULL;
-  int i;
+void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
+{
+	ExtensionList * extensionList = NULL;
+	int i;
+	wchar_t *load_mask;
+	WIN32_FIND_DATAW fd;
+	HANDLE hFind;
+	wchar_t *HomeDirW = ToWcharA(ts_->HomeDir);
 
-  // 環境変数の設定有無に関わらず、TTXを有効にする。
-  //if (getenv("TERATERM_EXTENSIONS") != NULL) {
-  if (1) {
-    char buf[1024];
-    struct _finddata_t searchData;
-	intptr_t searchHandle;
+	aswprintf(&load_mask, L"%s\\TTX*.DLL", HomeDirW);
 
-    _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts_->HomeDir);
+	hFind = FindFirstFileW(load_mask, &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			wchar_t *filename;
+			aswprintf(&filename, L"%s\\%s", HomeDirW, fd.cFileName);
+			loadExtension(&extensionList, filename);
+			free(filename);
+		} while (FindNextFileW(hFind, &fd));
+		FindClose(hFind);
+	}
+	free(load_mask);
+	free(HomeDirW);
 
-    searchHandle = _findfirst(buf, &searchData);
-    if (searchHandle != -1L) {
-      do {
-			wchar_t *bufW;
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\%s", ts_->HomeDir, searchData.name);
-			bufW = ToWcharA(buf);
-			loadExtension(&extensionList, bufW);
-			free(bufW);
-      } while (_findnext(searchHandle, &searchData)==0);
-      _findclose(searchHandle);
-    }
+	if (NumExtensions==0) return;
 
-    if (NumExtensions==0) return;
+	Extensions = (TTXExports * *)malloc(sizeof(TTXExports *)*NumExtensions);
+	for (i = 0; i < NumExtensions; i++) {
+		ExtensionList * old;
 
-    Extensions = (TTXExports * *)malloc(sizeof(TTXExports *)*NumExtensions);
-    for (i = 0; i < NumExtensions; i++) {
-      ExtensionList * old;
+		Extensions[i] = extensionList->exports;
+		old = extensionList;
+		extensionList = extensionList->next;
+		free(old);
+	}
 
-      Extensions[i] = extensionList->exports;
-      old = extensionList;
-      extensionList = extensionList->next;
-      free(old);
-    }
+	qsort(Extensions, NumExtensions, sizeof(Extensions[0]), compareOrder);
 
-    qsort(Extensions, NumExtensions, sizeof(Extensions[0]), compareOrder);
-
-    for (i = 0; i < NumExtensions; i++) {
-      if (Extensions[i]->TTXInit != NULL) {
-        Extensions[i]->TTXInit(ts_, cv_);
-      }
-    }
-  }
+	for (i = 0; i < NumExtensions; i++) {
+		if (Extensions[i]->TTXInit != NULL) {
+			Extensions[i]->TTXInit(ts_, cv_);
+		}
+	}
 }
 
 static void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
