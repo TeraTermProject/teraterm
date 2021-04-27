@@ -40,12 +40,6 @@
 #include "ttwinman.h"
 #include "ttplugin.h"
 #include "ttplug.h"
-#undef TTXOpenTCP
-#undef TTXCloseTCP
-#undef TTXOpenFile
-#undef TTXCloseFile
-#undef TTXGetUIHooks
-#undef TTXGetSetupHooks
 
 #define MAXNUMEXTENSIONS 32
 static HANDLE LibHandle[MAXNUMEXTENSIONS];
@@ -170,7 +164,7 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   }
 }
 
-void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
+static void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -180,7 +174,21 @@ void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
+void PASCAL TTXOpenTCP(void)
+{
+	do {
+		static TTXSockHooks SockHooks = {
+			&Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
+			&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
+			&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
+			&PWSACancelAsyncRequest, &PWSAGetLastError,
+			/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
+		};
+		TTXInternalOpenTCP(&SockHooks);
+	} while (0);
+}
+
+static void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -190,7 +198,21 @@ void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
+void PASCAL TTXCloseTCP(void)
+{
+	do {
+		static TTXSockHooks SockHooks = {
+			&Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
+			&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
+			&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
+			&PWSACancelAsyncRequest, &PWSAGetLastError,
+			/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
+		};
+		TTXInternalCloseTCP(&SockHooks);
+	} while (0);
+}
+
+static void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -200,7 +222,17 @@ void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
+void PASCAL TTXOpenFile(void)
+{
+	do {
+		static TTXFileHooks FileHooks = {
+			&PCreateFile, &PCloseFile, &PReadFile, &PWriteFile
+		};
+		TTXInternalOpenFile(&FileHooks);
+	} while (0);
+}
+
+static void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -210,7 +242,17 @@ void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
+void PASCAL TTXCloseFile(void)
+{
+	do {
+		static TTXFileHooks FileHooks = {
+			&PCreateFile, &PCloseFile, &PReadFile, &PWriteFile
+		};
+		TTXInternalCloseFile(&FileHooks);
+	} while (0);
+}
+
+static void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -220,7 +262,19 @@ void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
+void PASCAL TTXGetUIHooks(void)
+{
+	do {
+		static TTXUIHooks UIHooks = {
+			&SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort,
+			&SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,
+			&ChooseFontDlg, &SetupGeneral, &WindowWindow
+		};
+		TTXInternalGetUIHooks(&UIHooks);
+	} while (0);
+}
+
+static void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -228,6 +282,17 @@ void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
       Extensions[i]->TTXGetSetupHooks(hooks);
     }
   }
+}
+
+void PASCAL TTXGetSetupHooks(void)
+{
+	do {
+		static TTXSetupHooks SetupHooks = {
+			&ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,
+			&AddHostToList, &ParseParam
+		};
+		TTXInternalGetSetupHooks(&SetupHooks);
+	} while (0);
 }
 
 void PASCAL TTXSetWinSize(int rows, int cols) {

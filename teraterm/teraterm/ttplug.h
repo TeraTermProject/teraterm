@@ -34,8 +34,6 @@
 extern "C" {
 #endif
 
-#include "ttplugin.h"
-
 /* This function initializes the extensions and is called at the beginning
    of the program. */
 void PASCAL TTXInit(PTTSet ts, PComVar cv);
@@ -43,79 +41,26 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv);
 /* This function is called when a TCP connection is about to be opened.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks);
-#define TTXOpenTCP()                                             \
-  do {                                                           \
-    static TTXSockHooks SockHooks = {                            \
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   \
-      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     \
-      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       \
-      &PWSACancelAsyncRequest, &PWSAGetLastError,                \
-      /* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo  \
-    };                                                           \
-    TTXInternalOpenTCP(&SockHooks);                              \
-  } while (0)
+void PASCAL TTXOpenTCP(void);
 
 /* This function is called when a TCP connection has been closed.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks);
-#define TTXCloseTCP()                                            \
-  do {                                                           \
-    static TTXSockHooks SockHooks = {                            \
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   \
-      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     \
-      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       \
-      &PWSACancelAsyncRequest, &PWSAGetLastError,                \
-      /* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo  \
-    };                                                           \
-    TTXInternalCloseTCP(&SockHooks);                             \
-  } while (0)
+void PASCAL TTXCloseTCP(void);
 
-void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks);
-#define TTXOpenFile()                                            \
-  do {                                                           \
-    static TTXFileHooks FileHooks = {                            \
-      &PCreateFile, &PCloseFile, &PReadFile, &PWriteFile         \
-    };                                                           \
-    TTXInternalOpenFile(&FileHooks);                             \
-  } while (0)
+void PASCAL TTXOpenFile(void);
 
-void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks);
-#define TTXCloseFile()                                           \
-  do {                                                           \
-    static TTXFileHooks FileHooks = {                            \
-      &PCreateFile, &PCloseFile, &PReadFile, &PWriteFile         \
-    };                                                           \
-    TTXInternalCloseFile(&FileHooks);                            \
-  } while (0)
+void PASCAL TTXCloseFile(void);
 
 /* This function is called after the TTDLG DLL has been loaded.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks);
-#define TTXGetUIHooks()                                            \
-  do {                                                             \
-    static TTXUIHooks UIHooks = {                                  \
-      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, \
-      &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,   \
-      &ChooseFontDlg, &SetupGeneral, &WindowWindow                 \
-    };                                                             \
-    TTXInternalGetUIHooks(&UIHooks);                               \
-  } while (0)
+void PASCAL TTXGetUIHooks(void);
 
 /* This function is called after the TTSET DLL has been loaded.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks);
-#define TTXGetSetupHooks()                                            \
-  do {                                                                \
-    static TTXSetupHooks SetupHooks = {                               \
-      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,   \
-      &AddHostToList, &ParseParam                                     \
-    };                                                                \
-    TTXInternalGetSetupHooks(&SetupHooks);                            \
-  } while (0)
+void PASCAL TTXGetSetupHooks(void);
 
 /* This function is called when the window size has changed. */
 void PASCAL TTXSetWinSize(int rows, int cols);
