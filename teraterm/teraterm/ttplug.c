@@ -43,15 +43,14 @@
 
 #include "ttplug.h"
 
-#define MAXNUMEXTENSIONS 32
-static HANDLE LibHandle[MAXNUMEXTENSIONS];
 static int NumExtensions = 0;
-static TTXExports * * Extensions;
 
 typedef struct _ExtensionList {
-  TTXExports * exports;
-  struct _ExtensionList * next;
+	TTXExports * exports;
+	HANDLE LibHandle;
 } ExtensionList;
+
+static ExtensionList *Extensions;
 
 static int compareOrder(const void * e1, const void * e2) {
   TTXExports * * exports1 = (TTXExports * *)e1;
@@ -60,14 +59,12 @@ static int compareOrder(const void * e1, const void * e2) {
   return (*exports1)->loadOrder - (*exports2)->loadOrder;
 }
 
-static void loadExtension(ExtensionList **extensions, wchar_t const *fileName)
+static void loadExtension(wchar_t const *fileName)
 {
 	DWORD err;
 	const wchar_t *sub_message;
 	HMODULE hPlugin;
 
-	if (NumExtensions >= MAXNUMEXTENSIONS)
-		return;
 	hPlugin = LoadLibraryW(fileName);
 	if (hPlugin != NULL) {
 		TTXBindProc bind = NULL;
@@ -81,24 +78,34 @@ static void loadExtension(ExtensionList **extensions, wchar_t const *fileName)
 		if (bind == NULL)
 			bind = (TTXBindProc)GetProcAddress(hPlugin, "TTXBind");
 		if (bind != NULL) {
-			ExtensionList *newExtension = (ExtensionList *)malloc(sizeof(ExtensionList));
+			TTXExports * exports = (TTXExports *)malloc(sizeof(TTXExports));
+			if (exports == NULL) {
+				return;
+			}
+			memset(exports, 0, sizeof(TTXExports));
+			exports->size = sizeof(TTXExports);
 
-			newExtension->exports = (TTXExports *)malloc(sizeof(TTXExports));
-			memset(newExtension->exports, 0, sizeof(TTXExports));
-			newExtension->exports->size = sizeof(TTXExports);
-			if (bind(TTVERSION, newExtension->exports)) {
-				newExtension->next = *extensions;
-				*extensions = newExtension;
-				LibHandle[NumExtensions] = hPlugin;
+			if (bind(TTVERSION, exports)) {
+				ExtensionList *newExtension;
+				ExtensionList *extensions = (ExtensionList *)realloc(Extensions, sizeof(ExtensionList) * (NumExtensions + 1));
+				if (extensions == NULL) {
+					free(exports);
+					FreeLibrary(hPlugin);
+					return;
+				}
+				Extensions = extensions;
+				newExtension = &extensions[NumExtensions];
 				NumExtensions++;
+
+				newExtension->exports = exports;
+				newExtension->LibHandle = hPlugin;
 				return;
 			}
 			else {
-				free(newExtension->exports);
-				free(newExtension);
+				free(exports);
 			}
 		}
-		FreeLibrary(LibHandle[NumExtensions]);
+		FreeLibrary(hPlugin);
 	}
 
 	err = GetLastError();
@@ -128,7 +135,6 @@ static void loadExtension(ExtensionList **extensions, wchar_t const *fileName)
 
 void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 {
-	ExtensionList * extensionList = NULL;
 	int i;
 	wchar_t *load_mask;
 	WIN32_FIND_DATAW fd;
@@ -142,7 +148,7 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 		do {
 			wchar_t *filename;
 			aswprintf(&filename, L"%s\\%s", HomeDirW, fd.cFileName);
-			loadExtension(&extensionList, filename);
+			loadExtension(filename);
 			free(filename);
 		} while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
@@ -152,21 +158,11 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 
 	if (NumExtensions==0) return;
 
-	Extensions = (TTXExports * *)malloc(sizeof(TTXExports *)*NumExtensions);
-	for (i = 0; i < NumExtensions; i++) {
-		ExtensionList * old;
-
-		Extensions[i] = extensionList->exports;
-		old = extensionList;
-		extensionList = extensionList->next;
-		free(old);
-	}
-
 	qsort(Extensions, NumExtensions, sizeof(Extensions[0]), compareOrder);
 
 	for (i = 0; i < NumExtensions; i++) {
-		if (Extensions[i]->TTXInit != NULL) {
-			Extensions[i]->TTXInit(ts_, cv_);
+		if (Extensions[i].exports->TTXInit != NULL) {
+			Extensions[i].exports->TTXInit(ts_, cv_);
 		}
 	}
 }
@@ -175,139 +171,127 @@ static void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXOpenTCP != NULL) {
-      Extensions[i]->TTXOpenTCP(hooks);
+    if (Extensions[i].exports->TTXOpenTCP != NULL) {
+      Extensions[i].exports->TTXOpenTCP(hooks);
     }
   }
 }
 
 void PASCAL TTXOpenTCP(void)
 {
-	do {
-		static TTXSockHooks SockHooks = {
-			&Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
-			&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
-			&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
-			&PWSACancelAsyncRequest, &PWSAGetLastError,
-			/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
-		};
-		TTXInternalOpenTCP(&SockHooks);
-	} while (0);
+	static TTXSockHooks SockHooks = {
+		&Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
+		&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
+		&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
+		&PWSACancelAsyncRequest, &PWSAGetLastError,
+		/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
+	};
+	TTXInternalOpenTCP(&SockHooks);
 }
 
 static void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
-    if (Extensions[i]->TTXCloseTCP != NULL) {
-      Extensions[i]->TTXCloseTCP(hooks);
+    if (Extensions[i].exports->TTXCloseTCP != NULL) {
+      Extensions[i].exports->TTXCloseTCP(hooks);
     }
   }
 }
 
 void PASCAL TTXCloseTCP(void)
 {
-	do {
-		static TTXSockHooks SockHooks = {
-			&Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
-			&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
-			&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
-			&PWSACancelAsyncRequest, &PWSAGetLastError,
-			/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
-		};
-		TTXInternalCloseTCP(&SockHooks);
-	} while (0);
+	static TTXSockHooks SockHooks = {
+		&Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
+		&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
+		&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
+		&PWSACancelAsyncRequest, &PWSAGetLastError,
+		/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
+	};
+	TTXInternalCloseTCP(&SockHooks);
 }
 
 static void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXOpenFile != NULL) {
-      Extensions[i]->TTXOpenFile(hooks);
+    if (Extensions[i].exports->TTXOpenFile != NULL) {
+      Extensions[i].exports->TTXOpenFile(hooks);
     }
   }
 }
 
 void PASCAL TTXOpenFile(void)
 {
-	do {
-		static TTXFileHooks FileHooks = {
-			&PCreateFile, &PCloseFile, &PReadFile, &PWriteFile
-		};
-		TTXInternalOpenFile(&FileHooks);
-	} while (0);
+	static TTXFileHooks FileHooks = {
+		&PCreateFile, &PCloseFile, &PReadFile, &PWriteFile
+	};
+	TTXInternalOpenFile(&FileHooks);
 }
 
 static void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
-    if (Extensions[i]->TTXCloseFile != NULL) {
-      Extensions[i]->TTXCloseFile(hooks);
+    if (Extensions[i].exports->TTXCloseFile != NULL) {
+      Extensions[i].exports->TTXCloseFile(hooks);
     }
   }
 }
 
 void PASCAL TTXCloseFile(void)
 {
-	do {
-		static TTXFileHooks FileHooks = {
-			&PCreateFile, &PCloseFile, &PReadFile, &PWriteFile
-		};
-		TTXInternalCloseFile(&FileHooks);
-	} while (0);
+	static TTXFileHooks FileHooks = {
+		&PCreateFile, &PCloseFile, &PReadFile, &PWriteFile
+	};
+	TTXInternalCloseFile(&FileHooks);
 }
 
 static void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXGetUIHooks != NULL) {
-      Extensions[i]->TTXGetUIHooks(hooks);
+    if (Extensions[i].exports->TTXGetUIHooks != NULL) {
+      Extensions[i].exports->TTXGetUIHooks(hooks);
     }
   }
 }
 
 void PASCAL TTXGetUIHooks(void)
 {
-	do {
-		static TTXUIHooks UIHooks = {
-			&SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort,
-			&SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,
-			&ChooseFontDlg, &SetupGeneral, &WindowWindow
-		};
-		TTXInternalGetUIHooks(&UIHooks);
-	} while (0);
+	static TTXUIHooks UIHooks = {
+		&SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort,
+		&SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,
+		&ChooseFontDlg, &SetupGeneral, &WindowWindow
+	};
+	TTXInternalGetUIHooks(&UIHooks);
 }
 
 static void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
-    if (Extensions[i]->TTXGetSetupHooks != NULL) {
-      Extensions[i]->TTXGetSetupHooks(hooks);
+    if (Extensions[i].exports->TTXGetSetupHooks != NULL) {
+      Extensions[i].exports->TTXGetSetupHooks(hooks);
     }
   }
 }
 
 void PASCAL TTXGetSetupHooks(void)
 {
-	do {
-		static TTXSetupHooks SetupHooks = {
-			&ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,
-			&AddHostToList, &ParseParam
-		};
-		TTXInternalGetSetupHooks(&SetupHooks);
-	} while (0);
+	static TTXSetupHooks SetupHooks = {
+		&ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,
+		&AddHostToList, &ParseParam
+	};
+	TTXInternalGetSetupHooks(&SetupHooks);
 }
 
 void PASCAL TTXSetWinSize(int rows, int cols) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXSetWinSize != NULL) {
-      Extensions[i]->TTXSetWinSize(rows, cols);
+    if (Extensions[i].exports->TTXSetWinSize != NULL) {
+      Extensions[i].exports->TTXSetWinSize(rows, cols);
     }
   }
 }
@@ -316,8 +300,8 @@ void PASCAL TTXModifyMenu(HMENU menu) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXModifyMenu != NULL) {
-      Extensions[i]->TTXModifyMenu(menu);
+    if (Extensions[i].exports->TTXModifyMenu != NULL) {
+      Extensions[i].exports->TTXModifyMenu(menu);
     }
   }
 }
@@ -326,8 +310,8 @@ void PASCAL TTXModifyPopupMenu(HMENU menu) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXModifyPopupMenu != NULL) {
-      Extensions[i]->TTXModifyPopupMenu(menu);
+    if (Extensions[i].exports->TTXModifyPopupMenu != NULL) {
+      Extensions[i].exports->TTXModifyPopupMenu(menu);
     }
   }
 }
@@ -336,8 +320,8 @@ BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
-    if (Extensions[i]->TTXProcessCommand != NULL) {
-      if (Extensions[i]->TTXProcessCommand(hWin,cmd)) {
+    if (Extensions[i].exports->TTXProcessCommand != NULL) {
+      if (Extensions[i].exports->TTXProcessCommand(hWin,cmd)) {
         return TRUE;
       }
     }
@@ -346,34 +330,35 @@ BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   return FALSE;
 }
 
-void PASCAL TTXEnd(void) {
-  int i;
+void PASCAL TTXEnd(void)
+{
+	int i;
 
-  if (NumExtensions==0) return;
+	if (NumExtensions == 0)
+		return;
 
-  for (i = NumExtensions - 1; i >= 0; i--) {
-    if (Extensions[i]->TTXEnd != NULL) {
-      Extensions[i]->TTXEnd();
-    }
-  }
+	for (i = NumExtensions - 1; i >= 0; i--) {
+		if (Extensions[i].exports->TTXEnd != NULL) {
+			Extensions[i].exports->TTXEnd();
+		}
+	}
 
-  for (i=0; i<NumExtensions; i++)
-    FreeLibrary(LibHandle[i]);
+	for (i = 0; i < NumExtensions; i++) {
+		free(Extensions[i].exports);
+		FreeLibrary(Extensions[i].LibHandle);
+	}
 
-  for (i = 0; i < NumExtensions; i++) {
-	  free(Extensions[i]);
-  }
-
-  free(Extensions);
-  NumExtensions = 0;
+	free(Extensions);
+	Extensions = NULL;
+	NumExtensions = 0;
 }
 
 void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i]->TTXSetCommandLine != NULL) {
-      Extensions[i]->TTXSetCommandLine(cmd, cmdlen, rec);
+    if (Extensions[i].exports->TTXSetCommandLine != NULL) {
+      Extensions[i].exports->TTXSetCommandLine(cmd, cmdlen, rec);
     }
   }
 }
