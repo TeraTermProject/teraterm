@@ -27,6 +27,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <winsock2.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
@@ -68,15 +69,16 @@ static void loadExtension(wchar_t const *fileName)
 	hPlugin = LoadLibraryW(fileName);
 	if (hPlugin != NULL) {
 		TTXBindProc bind = NULL;
+		FARPROC *pbind = (FARPROC *)&bind;
 #if defined(_MSC_VER)
 		if (bind == NULL)
-			bind = (TTXBindProc)GetProcAddress(hPlugin, "_TTXBind@8");
+			*pbind = GetProcAddress(hPlugin, "_TTXBind@8");
 #else
 		if (bind == NULL)
-			bind = (TTXBindProc)GetProcAddress(hPlugin, "TTXBind@8");
+			*pbind = GetProcAddress(hPlugin, "TTXBind@8");
 #endif
 		if (bind == NULL)
-			bind = (TTXBindProc)GetProcAddress(hPlugin, "TTXBind");
+			*pbind = GetProcAddress(hPlugin, "TTXBind");
 		if (bind != NULL) {
 			TTXExports * exports = (TTXExports *)malloc(sizeof(TTXExports));
 			if (exports == NULL) {
