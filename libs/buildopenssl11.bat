@@ -43,4 +43,15 @@ move libssl* out32
 move apps\openssl.exe out32
 :build_end
 
+@echo off
+if not exist out32\openssl.exe (
+	echo ================================================================
+	echo crypt32.lib がリンクできずにバイナリが作成できていません。
+	echo Platform SDKが導入されていない可能性があります。
+	echo ================================================================
+) else (
+	echo OpenSSLのビルドが正常終了しました。
+)
+@echo on
+
 cd ..
