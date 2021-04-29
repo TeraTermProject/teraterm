@@ -183,40 +183,6 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			struct Enc *enc = &pvar->ssh2_keys[MODE_IN].enc;
 			int authlen = 0, aadlen = 0;
 
-			/*
-			 *                      |          | lead 4 bytes are encrypted | aadlen |
-			 * Encryption type
-			 *   enc->auth_len >  0 | AEAD     | AES-GCM ... no             | 4      |     (2)
-			 *                      |          | chacha20-poly1305 ... yes  | 4      | (1) (2)
-			 *   enc->auth_len == 0 | not AEAD | depends on MAC type        | <-     |
-			 * MAC type
-			 *   mac->etm == true   | EtM      | no                         | 4      |
-			 *   mac->etm == false  | E&M      | yes                        | 0      |
-			 * (1) aadlen is 4, but lead 4 bytes are encrypted separately from main part.
-			 * (2) implicit MAC type is EtM
-			 */
-
-			if (enc && enc->auth_len > 0) {
-				authlen = enc->auth_len;
-			}
-
-			/*
-			 * aadlen: Additional Authenticated Data Length
-			 *   - 暗号化しないが MAC や AEAD での認証の対象となるデータの長さ
-			 *     または AEAD の chacha20-poly1305 で暗号化されるパケット長部分の長さ
-			 *
-			 * EtM 方式の MAC や、AEAD の AES-GCM ではパケットの先頭のパケット長部分は
-			 * 暗号化されておらず認証のみが行われる。
-			 * AEAD の chacha20-poly1305 ではパケット長部分は暗号化されているが、
-			 * 続く部分とは別々に暗号化されている。
-			 * パケット長は uint32 (4バイト) で格納されている。
-			 * 通常の MAC 方式 (E&M) で、かつ AEAD でない暗号方式ではパケット長部分も暗号化
-			 * されるので aadlen は 0 となる。
-			 */
-			if (SSHv2(pvar) && ((mac && mac->etm) || authlen > 0)) {
-				aadlen = 4;
-			}
-
 			if (SSHv2(pvar)) {
 				/*
 				 * pktsize
@@ -230,11 +196,44 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				 * の長さを含まない。
 				 * cf. RFC 4253 6. Binary Packet Protocol
 				 */
+
+				if (enc && enc->auth_len > 0) {
+					authlen = enc->auth_len;
+				}
+
+				/*
+				 *                      |          | lead 4 bytes are encrypted | aadlen |
+				 * Encryption type
+				 *   enc->auth_len >  0 | AEAD     | AES-GCM ... no             | 4      |     (2)
+				 *                      |          | chacha20-poly1305 ... yes  | 4      | (1) (2)
+				 *   enc->auth_len == 0 | not AEAD | depends on MAC type        | <-     |
+				 * MAC type
+				 *   mac->etm == true   | EtM      | no                         | 4      |
+				 *   mac->etm == false  | E&M      | yes                        | 0      |
+				 * (1) lead 4 bytes are encrypted separately from main part.
+				 * (2) implicit MAC type of AEAD is EtM
+				 */
+				/*
+				 * aadlen: Additional Authenticated Data Length
+				 *   MAC の対象となるデータと一緒に暗号化されない、"MAC の対象となるデータの長さ"のサイズ
+				 *   この部分は packet_length で、uint32 (4バイト)
+				 * 
+				 * - 通常の MAC 方式 (E&M) ではパケット長部分が一緒に暗号化されるので aadlen は 0 となる。
+				 * - EtM 方式の MAC や AEAD の AES-GCM では、パケット長部分が暗号化されないので
+				 * aadlen は 4 となる。
+				 * - AEAD の chacha20-poly1305 ではパケット長部分が暗号化されるが、MAC の対象となるデータ
+				 * とは別に暗号化されるので aadlen は 4 となる。
+				 * 
+				 */
+				if ((mac && mac->etm) || authlen > 0) {
+					aadlen = 4;
+				}
+
 				if (authlen > 0 &&
 				    pvar->cc[MODE_IN]->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
 					/*
-					 * AEAD の chacha20-poly1305 ではパケット長部分も暗号化されている。
-					 * この処理では長さを取得するが、data は暗号化されたままとなる。
+					 * AEAD の chacha20-poly1305 ではパケット長部分が別に暗号化されている。
+					 * この処理は長さを取得するが、data は暗号化されたままとなる。
 					 */
 					chachapoly_get_length(pvar->cc[MODE_IN]->cp_ctx, &pktsize,
 					                      pvar->ssh_state.receiver_sequence_number,
@@ -285,7 +284,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				else {
 					// SSH2 ではこの時点では padding 長部分が復号されていない場合があるので、
 					// padding 長は渡さずに、必要になった時に内部で取得する。
-					SSH2_handle_packet(pvar, data, pktsize, aadlen, enc->auth_len);
+					SSH2_handle_packet(pvar, data, pktsize, aadlen, authlen);
 				}
 
 				pvar->pkt_state.predecrypted_packet = FALSE;
