@@ -1,0 +1,15 @@
+image: Ubuntu2004
+
+build: off
+
+init:
+  - sudo apt-get -y install cmake perl subversion g++-mingw-w64
+
+cache:
+  - libs
+
+build_script:
+  - cmake -P ci_scripts/build_local_appveyor_mingw.cmake
+
+artifacts:
+  - path: build*/*.zip
