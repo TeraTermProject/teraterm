@@ -28,7 +28,6 @@
 
 // vtwin‚©‚ç•ª—£
 
-#include "teraterm_conf.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttcommon.h"

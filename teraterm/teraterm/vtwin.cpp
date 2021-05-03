@@ -30,7 +30,13 @@
 
 /* TERATERM.EXE, VT window */
 
-#include "teraterm_conf.h"
+// SDK7.0‚Ìê‡AWIN32_IE‚ª“KØ‚É’è‹`‚³‚ê‚È‚¢
+#if _MSC_VER == 1400	// VS2005‚Ìê‡‚Ì‚İ
+#if !defined(_WIN32_IE)
+#define	_WIN32_IE 0x0501
+#endif
+#endif
+
 #include "teraterm.h"
 #include "tttypes.h"
 
@@ -65,16 +71,17 @@
 #include <crtdbg.h>
 #include <string.h>
 #include <locale.h>
-
-#include <shlobj.h>
 #include <io.h>
 #include <errno.h>
 
+#include <shlobj.h>
+#include <windows.h>
 #include <windowsx.h>
 #include <imm.h>
 #include <dbt.h>
 #include <assert.h>
 #include <wchar.h>
+#include <htmlhelp.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -83,7 +90,6 @@
 #include "sizetip.h"
 #include "dnddlg.h"
 #include "tekwin.h"
-#include <htmlhelp.h>
 #include "compat_win.h"
 #include "unicode_test.h"
 #if UNICODE_DEBUG

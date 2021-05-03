@@ -9,3 +9,7 @@ build*/
 /GTAGS
 /GPATH
 /GRTAGS
+*.ncb
+*.suo
+*.user
+*.map

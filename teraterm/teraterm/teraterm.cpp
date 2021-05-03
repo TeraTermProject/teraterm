@@ -29,11 +29,8 @@
 
 /* TERATERM.EXE, main */
 
-#include "teraterm_conf.h"
-
 #include <stdio.h>
 #include <crtdbg.h>
-#include <io.h>			// for access()
 #include <windows.h>
 #include <htmlhelp.h>
 #include "teraterm.h"

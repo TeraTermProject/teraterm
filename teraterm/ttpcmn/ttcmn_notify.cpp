@@ -28,7 +28,14 @@
 
 /* TTCMN.DLL, notify icon */
 
-#define _WIN32_IE 0x0600
+// SDK7.0‚Ìê‡AWIN32_IE‚ª“KØ‚É’è‹`‚³‚ê‚È‚¢
+#if _MSC_VER == 1400	// VS2005‚Ìê‡‚Ì‚İ
+#if !defined(_WIN32_IE)
+#define	_WIN32_IE 0x0501
+//#define _WIN32_IE 0x0600
+#endif
+#endif
+
 #include <string.h>
 #include <windows.h>
 #include <wchar.h>

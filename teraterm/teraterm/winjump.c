@@ -46,8 +46,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "teraterm_conf.h"
-
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>
@@ -58,6 +56,13 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <initguid.h>
+#if defined(__MINGW32__) || defined(_INC_SDKDDKVER)
+#define HAS_PROPKEY_H 1
+#endif
+#if defined(HAS_PROPKEY_H)
+#include <propkey.h>
+#endif
 
 #include "winjump.h"
 #include "teraterm.h"
@@ -81,15 +86,13 @@ typedef struct _tagpropertykey {
 #define _REFPROPVARIANT_DEFINED
 typedef PROPVARIANT *REFPROPVARIANT;
 #endif
-/* MinGW doesn't define this yet: */
-#ifndef _PROPVARIANTINIT_DEFINED_
-#define _PROPVARIANTINIT_DEFINED_
-#define PropVariantInit(pvar) memset((pvar),0,sizeof(PROPVARIANT))
-#endif
 
 #ifndef __ICustomDestinationList_INTERFACE_DEFINED__
-#define __ICustomDestinationList_INTERFACE_DEFINED__
-// #if !(_MSC_VER >= 1600)  // VC2010(VC10.0) or later
+
+static const IID IID_ICustomDestinationList = {
+    0x6332debf, 0x87b5, 0x4670, {0x90,0xc0,0x5e,0x57,0xb4,0x08,0xa4,0x9e}
+};
+
 typedef struct ICustomDestinationListVtbl {
     HRESULT ( __stdcall *QueryInterface ) (
         /* [in] ICustomDestinationList*/ void *This,
@@ -149,7 +152,11 @@ typedef struct ICustomDestinationList
 #endif
 
 #ifndef __IObjectArray_INTERFACE_DEFINED__
-#define __IObjectArray_INTERFACE_DEFINED__
+
+static const IID IID_IObjectArray = {
+    0x92ca9dcd, 0x5622, 0x4bba, {0xa8,0x05,0x5e,0x9f,0x54,0x1b,0xd8,0xc9}
+};
+
 typedef struct IObjectArrayVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -331,8 +338,11 @@ typedef struct IObjectCollection
 #endif
 
 #ifndef __IPropertyStore_INTERFACE_DEFINED__
-#define __IPropertyStore_INTERFACE_DEFINED__
-// #if !(_MSC_VER >= 1500)  // VC2008(VC9.0) or later
+
+static const IID IID_IPropertyStore = {
+    0x886d8eeb, 0x8cf2, 0x4446, {0x8d,0x02,0xcd,0xba,0x1d,0xbd,0xcf,0x99}
+};
+
 typedef struct IPropertyStoreVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -375,7 +385,7 @@ typedef struct IPropertyStore
 } IPropertyStore;
 #endif
 
-#if !defined(__MINGW32__)
+#if !defined(__MINGW32__) && !defined(__ShellCoreObjects_LIBRARY_DEFINED__)
 static const CLSID CLSID_DestinationList = {
     0x77f10cf0, 0x3db5, 0x4966, {0xb5,0x20,0xb7,0xc5,0x4f,0xd3,0x5e,0xd6}
 };
@@ -392,23 +402,13 @@ static const IID IID_IShellLink = {
     0x000214ee, 0x0000, 0x0000, {0xc0,0x00,0x00,0x00,0x00,0x00,0x00,0x46}
 };
 #endif
-#if (_WIN32_WINNT < 0x0601)		// _WIN32_WINNT_WIN7
-static const IID IID_ICustomDestinationList = {
-    0x6332debf, 0x87b5, 0x4670, {0x90,0xc0,0x5e,0x57,0xb4,0x08,0xa4,0x9e}
-};
-#endif
-#if !defined(__MINGW32__)
-static const IID IID_IObjectArray = {
-    0x92ca9dcd, 0x5622, 0x4bba, {0xa8,0x05,0x5e,0x9f,0x54,0x1b,0xd8,0xc9}
-};
-static const IID IID_IPropertyStore = {
-    0x886d8eeb, 0x8cf2, 0x4446, {0x8d,0x02,0xcd,0xba,0x1d,0xbd,0xcf,0x99}
-};
-#endif
+
+#if !defined(HAS_PROPKEY_H)
 static const PROPERTYKEY PKEY_Title = {
     {0xf29f85e0, 0x4ff9, 0x1068, {0xab,0x91,0x08,0x00,0x2b,0x27,0xb3,0xd9}},
     0x00000002
 };
+#endif
 
 /* Type-checking macro to provide arguments for CoCreateInstance() etc.
  * The pointer arithmetic is a compile-time pointer type check that 'obj'

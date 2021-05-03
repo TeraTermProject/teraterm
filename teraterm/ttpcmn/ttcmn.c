@@ -27,10 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _WIN32_IE
-#define _WIN32_IE 0x501
-#endif
-
 /* TTCMN.DLL, main */
 #include <direct.h>
 #include <string.h>

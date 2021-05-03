@@ -130,9 +130,11 @@ static void loadExtension(wchar_t const *fileName)
 	}
 	// 言語ファイルによるメッセージの国際化を行っているが、この時点では設定が
 	// まだ読み込まれていない為、メッセージが英語のままとなる。要検討。
-	static const TTMessageBoxInfoW info = {"Tera Term", "MSG_TT_ERROR", L"Tera Term: Error", "MSG_LOAD_EXT_ERROR",
-										   L"Cannot load extension %s (%d, %s)"};
-	TTMessageBoxW(NULL, &info, MB_OK | MB_ICONEXCLAMATION, ts.UILanguageFile, fileName, err, sub_message);
+	{
+		static const TTMessageBoxInfoW info = {"Tera Term", "MSG_TT_ERROR", L"Tera Term: Error", "MSG_LOAD_EXT_ERROR",
+			L"Cannot load extension %s (%d, %s)"};
+		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONEXCLAMATION, ts.UILanguageFile, fileName, err, sub_message);
+	}
 }
 
 void PASCAL TTXInit(PTTSet ts_, PComVar cv_)

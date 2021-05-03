@@ -27,7 +27,6 @@
  */
 
 /* TERATERM.EXE, file transfer dialog box lite */
-#include "teraterm_conf.h"
 
 #include <stdio.h>
 #include <windows.h>

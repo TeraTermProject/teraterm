@@ -38,7 +38,6 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "teraterm_conf.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "compat_win.h"
