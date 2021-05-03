@@ -28,8 +28,11 @@
 
 #pragma once
 
-// このファイルはVS2005の時だけ参照される
-#if defined(__MINGW32__) || _MSC_VER != 1400
+// このファイルはあたらしいコンパイラ環境では不要
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#error check file dependency
+#endif
+#if defined(__MINGW32__) && __MINGW64_VERSION_MAJOR >= 8
 #error check file dependency
 #endif
 
@@ -40,12 +43,16 @@ typedef ULONG DEVPROPTYPE, *PDEVPROPTYPE;
 typedef GUID  DEVPROPGUID, *PDEVPROPGUID;
 typedef ULONG DEVPROPID,   *PDEVPROPID;
 
+#if defined(_MSC_VER)
 typedef struct _DEVPROPKEY {
     DEVPROPGUID fmtid;
     DEVPROPID   pid;
 } DEVPROPKEY, *PDEVPROPKEY;
+#endif
 
-
+#if defined(__MINGW32__)
+#undef DEFINE_DEVPROPKEY
+#endif
 #define DEFINE_DEVPROPKEY(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8, pid) EXTERN_C const DEVPROPKEY DECLSPEC_SELECTANY name = { { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }, pid }
 
 /*

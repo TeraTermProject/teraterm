@@ -43,10 +43,10 @@
  *	devpkey.h ‚ª‚ ‚éŠÂ‹«?
  *		HAS_DEVPKEY_H ‚ª define ‚³‚ê‚é
  */
-#if	(_MSC_VER > 1400) || defined(__MINGW32__)
+#if	defined(_MSC_VER)
+#if	(_MSC_VER > 1400)
 
 // VS2019‚Ì‚Æ‚«(VS2005‚æ‚è‘å‚«‚¢‚Æ‚µ‚Ä‚¢‚é)
-// MinGW(32&64bit)‚Ì‚Æ‚«
 #define HAS_DEVPKEY_H	1
 
 #else // _MSC_VER > 1400
@@ -59,7 +59,15 @@
 #define HAS_DEVPKEY_H	1
 
 #endif  //  defined(_INC_SDKDDKVER)
-#endif  // _MSC_VER == 1400
+#endif
+#elif defined(__MINGW32__)
+
+#if	__MINGW64_VERSION_MAJOR >= 8
+// mingw64 8+ ‚Ì‚Æ‚«
+#define HAS_DEVPKEY_H	1
+#endif
+
+#endif  // defined(_MSC_VER)
 
 /*
  *	devpkey.h ‚Ì include
