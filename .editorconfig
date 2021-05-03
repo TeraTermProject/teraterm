@@ -18,15 +18,11 @@ end_of_line = crlf
 charset = utf-8-bom
 indent_style = space
 
-[CMakeLists.txt]
+[{CMakeLists.txt,*.cmake}]
 end_of_line = crlf
 charset = utf-8-bom
 indent_style = space
-
-[*.cmake]
-end_of_line = crlf
-charset = utf-8-bom
-indent_style = space
+indent_size = 2
 
 [*.pl]
 end_of_line = crlf
