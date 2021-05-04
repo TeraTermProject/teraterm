@@ -50,7 +50,7 @@ goto vs2019
 
 :novs
 echo "Can't find Visual Studio"
-exit /b
+goto fail
 
 :vsinstdir
 rem Visual Studioのバージョン判別
@@ -67,7 +67,7 @@ if /I %VSCMNDIR% EQU "%VS150COMNTOOLS%" goto vs2017
 if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
 
 echo Unknown Visual Studio version
-exit /b
+goto fail
 
 :vs2005
 set TERATERMSLN=..\teraterm\ttermpro.v8.sln
@@ -82,18 +82,16 @@ cl /? 2>&1 | findstr /C:"14.00.50727.762"
 echo %errorlevel%
 
 if %errorlevel% == 0 (
-	goto vsend
-) 
+    goto vsend
+)
 
 echo "VS2005にSP1が適用されていないようです"
 set /P ANS2005="続行しますか？(y/n)"
 if "%ANS2005%"=="y" (
-	goto vsend
-) else if "%ANS2005%"=="n" (
-  echo "バッチファイルを終了します"
-  exit /b
+    goto vsend
 ) else (
-  exit /b
+    echo "build.bat を終了します"
+    goto fail
 )
 
 
@@ -169,6 +167,10 @@ pushd %~dp0
 rem ライブラリをコンパイル
 pushd ..\libs
 CALL buildall.bat
+if ERRORLEVEL 1 (
+    echo "build.bat を終了します"
+    goto fail
+)
 popd
 
 if "%BUILD%" == "rebuild" goto build

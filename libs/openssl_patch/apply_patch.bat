@@ -134,7 +134,6 @@ move conf.tmp ..\openssl\Configurations/10-main.conf
 
 :patch_end
 echo "パッチは適用されています"
-timeout 5
 goto end
 
 
@@ -142,15 +141,13 @@ goto end
 echo "パッチが適用されていないようです"
 set /P ANS="続行しますか？(y/n)"
 if "%ANS%"=="y" (
-  goto end
+    goto end
 ) else if "%ANS%"=="n" (
-  echo "バッチファイルを終了します"
-  exit /b
-) else (
-  goto fail
+    echo "apply_patch.bat を終了します"
+    exit /b 1
 )
-
 goto end
+
 
 :cmd_false
 echo パッチコマンドが見つかりません
@@ -160,7 +157,6 @@ echo https://github.com/git-for-windows/git/releases/latest
 echo.
 goto patchfail
 
+
 :end
 @echo on
-
-
