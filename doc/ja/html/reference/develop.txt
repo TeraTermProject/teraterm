@@ -8,10 +8,9 @@
    Windows Vista 以上でビルドする場合は、Visual Studio 2005 Service Pack 1 Update for Windows Vista (VS80sp1-KB932236-X86-JPN.exe)
    Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
    注: Visual Studio 2005 Standard Editionでは、OpenSSL のビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
-       SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
+       Platform SDK の INCLUDE, LIB ディレクトリが優先されるよう、C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat の INCLUDE および LIB の先頭に追記します。
        例: INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
            LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
-           修正バッチファイル C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat
 - サポートされているコンパイラ
 -- Visual Studio 2005 (Express EditionはTera Term 4.103から対応)
    - SDK 7.0
@@ -44,13 +43,6 @@
        Windows Vista, XP をサポートするには v141_xp を指定してください。
 -- Visual Studio Community 2019
    注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
-- バッチファイルからビルドするために
-  Visual Studio のコマンドプロンプトからバッチファイルを実行するか、以下のように環境変数を設定してください。
-  使用したいバージョンの Visual Studio の "(x86) Native Tools Command Prompt" を実行し、コンパイラのパスに関係する PATH と VSINSTALLDIR 変数を環境変数に登録してください。
-  例: INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
-      LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
-      PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
-      VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
 - インストーラ
   Inno Setup 5.6.1 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor
