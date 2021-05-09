@@ -34,7 +34,7 @@ ECHO "バージョンファイルが見つかりました"
 GOTO END
 
 :FILE_FALSE
-ECHO "バージョンファイルが見つかりないので新規作成します"
+ECHO "バージョンファイルが見つからないので新規作成します"
 echo #define SFMT_VERSION "Unknown" > %filename%
 GOTO END
 

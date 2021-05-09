@@ -63,7 +63,7 @@ echo 例
 echo VS160COMNTOOLS=c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\
 @echo on
 pause
-exit /b
+goto fail
 
 :vsinstdir
 rem Visual Studioのバージョン判別
@@ -80,7 +80,7 @@ if /I %VSCMNDIR% EQU "%VS150COMNTOOLS%" goto vs2017
 if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
 
 echo Unknown Visual Studio version
-exit /b
+goto fail
 
 :vs2005
 set TERATERMSLN=..\teraterm\ttermpro.v8.sln
@@ -89,7 +89,24 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v8.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v8.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v8.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v8.sln
-goto vsend
+
+rem VS2005にSP1が適用されているかをチェックする
+cl /? 2>&1 | findstr /C:"14.00.50727.762"
+echo %errorlevel%
+
+if %errorlevel% == 0 (
+    goto vsend
+)
+
+echo "VS2005にSP1が適用されていないようです"
+set /P ANS2005="続行しますか？(y/n)"
+if "%ANS2005%"=="y" (
+    goto vsend
+) else (
+    echo "build.bat を終了します"
+    goto fail
+)
+
 
 :vs2008
 set TERATERMSLN=..\teraterm\ttermpro.v9.sln
@@ -163,6 +180,10 @@ pushd %~dp0
 rem ライブラリをコンパイル
 pushd ..\libs
 CALL buildall.bat
+if ERRORLEVEL 1 (
+    echo "build.bat を終了します"
+    goto fail
+)
 popd
 
 
