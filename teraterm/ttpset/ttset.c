@@ -41,6 +41,7 @@
 #include "ttlib.h"
 #include "tt_res.h"
 #include "servicenames.h"
+#include "codeconv.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -48,6 +49,7 @@
 #ifndef CLEARTYPE_QUALITY
 #define CLEARTYPE_QUALITY 5
 #endif
+#define INI_FILE_IS_UNICODE	1
 
 #define Section "Tera Term"
 
@@ -151,6 +153,91 @@ int WINAPI SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHA
 error:
 	return (ret);
 }
+
+/**
+ *	GetPrivateProfileStringA() のファイル名だけが wchar_t 版
+ */
+DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const char* defA, char *strA, DWORD size, const wchar_t *filenameW)
+{
+	DWORD lenA;
+	wchar_t *appW = ToWcharA(appA);
+	wchar_t *keyW = ToWcharA(keyA);
+	wchar_t *defW = ToWcharA(defA);
+	DWORD lenW_max = size;
+	wchar_t *strW = malloc(sizeof(wchar_t) * lenW_max);
+	DWORD lenW = GetPrivateProfileStringW(appW, keyW, defW, strW, lenW_max, filenameW);
+	free(appW);
+	free(keyW);
+	free(defW);
+	if (lenW == 0) {
+		free(strW);
+		*strA = '\0';
+		return 0;
+	}
+	if (lenW < lenW_max) {
+		lenW++;	// for L'\0'
+	}
+	lenA = WideCharToMultiByte(CP_ACP, 0, strW, lenW, strA, size, NULL, NULL);
+	// GetPrivateProfileStringW() の戻り値は '\0' を含まない文字列長
+	// WideCharToMultiByte() の戻り値は '\0' を含む文字列長
+	if (lenW != 0 && strA[lenA-1] == 0) {
+		lenA--;
+	}
+	return lenA;
+}
+
+/**
+ *	WritePrivateProfileStringA() のファイル名だけが wchar_t 版
+ */
+BOOL WritePrivateProfileStringAFileW(const char *appA, const char *keyA, const char *strA, const wchar_t *filenameW)
+{
+	wchar_t *appW = ToWcharA(appA);
+	wchar_t *keyW = ToWcharA(keyA);
+	wchar_t *strW = ToWcharA(strA);
+	BOOL r = WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+	free(appW);
+	free(keyW);
+	free(strW);
+	return r;
+}
+
+/**
+ *	GetPrivateProfileIntFileA() のファイル名だけが wchar_t 版
+ */
+UINT GetPrivateProfileIntFileW(const char *appA, const char *keyA, int def, const wchar_t *filenameW)
+{
+	wchar_t *appW = ToWcharA(appA);
+	wchar_t *keyW = ToWcharA(keyA);
+	UINT r = GetPrivateProfileIntW(appW, keyW, def, filenameW);
+	free(appW);
+	free(keyW);
+	return r;
+}
+
+/**
+ *	WritePrivateProfileInt() のファイル名だけが wchar_t 版
+ */
+BOOL WritePrivateProfileIntFileW(const char *appA, const char *keyA, int val, const wchar_t *filenameW)
+{
+	wchar_t strW[MAX_PATH];
+	wchar_t *appW = ToWcharA(appA);
+	wchar_t *keyW = ToWcharA(keyA);
+	BOOL r;
+	_snwprintf_s(strW, _countof(strW), _TRUNCATE, L"%d", val);
+	r = WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+	free(appW);
+	free(keyW);
+	return r;
+}
+
+#if INI_FILE_IS_UNICODE
+#undef GetPrivateProfileInt
+#undef GetPrivateProfileString
+#define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntFileW(p1, p2, p3, p4)
+#define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
+#define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
+#define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
+#endif
 
 /*
  * シリアルポート関連の設定
@@ -298,7 +385,11 @@ void IconId2IconName(char *name, int len, int id) {
 	strncpy_s(name, len, icon, _TRUNCATE);
 }
 
-WORD GetOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, BOOL Default)
+#if INI_FILE_IS_UNICODE
+static WORD GetOnOff(PCHAR Sect, PCHAR Key, const wchar_t *FName, BOOL Default)
+#else
+static WORD GetOnOff(PCHAR Sect, PCHAR Key, const char *FName, BOOL Default)
+#endif
 {
 	char Temp[4];
 	GetPrivateProfileString(Sect, Key, "", Temp, sizeof(Temp), FName);
@@ -316,59 +407,85 @@ WORD GetOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, BOOL Default)
 	}
 }
 
-void WriteOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, WORD Flag)
+#if INI_FILE_IS_UNICODE
+void WriteOnOff(PCHAR Sect, PCHAR Key, const wchar_t *FName, WORD Flag)
+#else
+void WriteOnOff(PCHAR Sect, PCHAR Key, const char *FName, WORD Flag)
+#endif
 {
-	char Temp[4];
-
-	if (Flag != 0)
-		strncpy_s(Temp, sizeof(Temp), "on", _TRUNCATE);
-	else
-		strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	const char *on_off = (Flag != 0) ? "on" : "off";
+	WritePrivateProfileStringA(Sect, Key, on_off, FName);
 }
 
-void WriteInt(PCHAR Sect, PCHAR Key, PCHAR FName, int i)
+#if INI_FILE_IS_UNICODE
+void WriteInt(PCHAR Sect, PCHAR Key, const wchar_t *FName, int i)
+#else
+void WriteInt(PCHAR Sect, PCHAR Key, const char *FName, int i)
+#endif
 {
 	char Temp[15];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", i);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
-void WriteUint(PCHAR Sect, PCHAR Key, PCHAR FName, UINT i)
+#if INI_FILE_IS_UNICODE
+void WriteUint(PCHAR Sect, PCHAR Key, const wchar_t *FName, UINT i)
+#else
+void WriteUint(PCHAR Sect, PCHAR Key, const char *FName, UINT i)
+#endif
 {
 	char Temp[15];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%u", i);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
-void WriteInt2(PCHAR Sect, PCHAR Key, PCHAR FName, int i1, int i2)
+#if INI_FILE_IS_UNICODE
+void WriteInt2(PCHAR Sect, PCHAR Key, const wchar_t *FName, int i1, int i2)
+#else
+void WriteInt2(PCHAR Sect, PCHAR Key, const char *FName, int i1, int i2)
+#endif
 {
 	char Temp[32];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d", i1, i2);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
-void WriteInt4(PCHAR Sect, PCHAR Key, PCHAR FName,
+#if INI_FILE_IS_UNICODE
+void WriteInt4(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 			   int i1, int i2, int i3, int i4)
+#else
+void WriteInt4(PCHAR Sect, PCHAR Key, const char *FName,
+			   int i1, int i2, int i3, int i4)
+#endif
 {
 	char Temp[64];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d,%d,%d",
 	            i1, i2, i3, i4);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
-void WriteInt6(PCHAR Sect, PCHAR Key, PCHAR FName,
+#if INI_FILE_IS_UNICODE
+void WriteInt6(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 			   int i1, int i2, int i3, int i4, int i5, int i6)
+#else
+void WriteInt6(PCHAR Sect, PCHAR Key, const char *FName,
+			   int i1, int i2, int i3, int i4, int i5, int i6)
+#endif
 {
 	char Temp[96];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d,%d,%d,%d,%d",
 	            i1, i2,i3, i4, i5, i6);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
 // フォント情報書き込み、4パラメータ版
-static void WriteFont(PCHAR Sect, PCHAR Key, PCHAR FName,
+#if INI_FILE_IS_UNICODE
+static void WriteFont(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 					  PCHAR Name, int x, int y, int charset)
+#else
+static void WriteFont(PCHAR Sect, PCHAR Key, const char *FName,
+					  PCHAR Name, int x, int y, int charset)
+#endif
 {
 	char Temp[80];
 	if (Name[0] != 0)
@@ -376,13 +493,19 @@ static void WriteFont(PCHAR Sect, PCHAR Key, PCHAR FName,
 		            Name, x, y, charset);
 	else
 		Temp[0] = 0;
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
 // フォント情報読み込み、4パラメータ版
+#if INI_FILE_IS_UNICODE
+static void ReadFont(
+	const char *Sect, const char *Key, const char *Default, const wchar_t *FName,
+	char *FontName, size_t FontNameLen, POINT *FontSize, int *FontCharSet)
+#else
 static void ReadFont(
 	const char *Sect, const char *Key, const char *Default, const char *FName,
 	char *FontName, size_t FontNameLen, POINT *FontSize, int *FontCharSet)
+#endif
 {
 	char Temp[MAX_PATH];
 	GetPrivateProfileString(Sect, Key, Default,
@@ -403,9 +526,15 @@ static void ReadFont(
 }
 
 // フォント情報読み込み、3パラメータ版
+#if INI_FILE_IS_UNICODE
+static void ReadFont3(
+	const char *Sect, const char *Key, const char *Default, const wchar_t *FName,
+	char *FontName, size_t FontNameLen, int *FontPoint, int *FontCharSet)
+#else
 static void ReadFont3(
 	const char *Sect, const char *Key, const char *Default, const char *FName,
 	char *FontName, size_t FontNameLen, int *FontPoint, int *FontCharSet)
+#endif
 {
 	char Temp[MAX_PATH];
 	GetPrivateProfileString(Sect, Key, Default,
@@ -454,7 +583,7 @@ static void ReadCygtermConfFile(PTTSet ts)
 	fp = fopen(cfg, "r");
 	if (fp != NULL) {
 		while (fgets(buf, sizeof(buf), fp) != NULL) {
-			int len = strlen(buf);
+			size_t len = strlen(buf);
 
 			if (buf[len - 1] == '\n')
 				buf[len - 1] = '\0';
@@ -532,7 +661,7 @@ static void WriteCygtermConfFile(PTTSet ts)
 	char uimsg[MAX_UIMSG];
 	cygterm_t settings;
 	char *line[CYGTERM_FILE_MAXLINE];
-	int i, linenum, len;
+	int i, linenum;
 
 	// Cygwin設定が変更されていない場合は、ファイルを書き込まない。
 	if (ts->CygtermSettings.update_flag == FALSE)
@@ -557,7 +686,7 @@ static void WriteCygtermConfFile(PTTSet ts)
 	if (fp) {
 		i = 0;
 		while (fgets(buf, sizeof(buf), fp) != NULL) {
-			len = strlen(buf);
+			size_t len = strlen(buf);
 			if (buf[len - 1] == '\n')
 				buf[len - 1] = '\0';
 			if (i < CYGTERM_FILE_MAXLINE)
@@ -704,11 +833,16 @@ static void WriteCygtermConfFile(PTTSet ts)
 
 }
 
-void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
+void PASCAL ReadIniFile(PCHAR FNameA, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
 	char Temp[MAX_PATH], Temp2[MAX_PATH], *p;
+#if	INI_FILE_IS_UNICODE
+	const wchar_t *FName = ToWcharA(FNameA);
+#else
+	const char *FName = FNameA;
+#endif
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -2249,15 +2383,24 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = 1;
 	}
+
+#if	INI_FILE_IS_UNICODE
+	free((void *)FName);
+#endif
 }
 
-void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
+void PASCAL WriteIniFile(PCHAR FNameA, PTTSet ts)
 {
 	int i;
 	char Temp[MAX_PATH];
 	char buf[20];
 	int ret;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], msg[MAX_UIMSG];
+#if	INI_FILE_IS_UNICODE
+	const wchar_t *FName = ToWcharA(FNameA);
+#else
+	const char *FName = FNameA;
+#endif
 
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
@@ -3173,10 +3316,18 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           ts->EtermLookfeel.BGNoFrame);
 	WritePrivateProfileString(ETERM_SECTION, "BGThemeFile",
 	                          ts->EtermLookfeel.BGThemeFile, FName);
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s\\%s", ts->HomeDir, BG_THEME_IMAGEFILE);
-	WritePrivateProfileString(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, Temp);
-	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, Temp, ts->BGImgBrightness);
-	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, Temp, ts->BGImgBrightness);
+	{
+#if	INI_FILE_IS_UNICODE
+		wchar_t TempW[MAX_PATH];
+		_snwprintf_s(TempW, _countof(TempW), _TRUNCATE, L"%hs\\%hs", ts->HomeDir, BG_THEME_IMAGEFILE);
+#else
+		char TempW[MAX_PATH];
+		_snprintf_s(TempW, _countof(TempW), _TRUNCATE, "%s\\%s", ts->HomeDir, BG_THEME_IMAGEFILE);
+#endif
+		WritePrivateProfileStringA(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, TempW);
+		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, TempW, ts->BGImgBrightness);
+		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, TempW, ts->BGImgBrightness);
+	}
 	WriteOnOff(ETERM_SECTION, "BGIgnoreThemeFile", FName,
 		ts->EtermLookfeel.BGIgnoreThemeFile);
 
@@ -3576,6 +3727,10 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
+
+#if	INI_FILE_IS_UNICODE
+	free((void *)FName);
+#endif
 }
 
 #define VTEditor "VT editor keypad"
@@ -3584,7 +3739,11 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 #define XFunction "X function keys"
 #define ShortCut "Shortcut keys"
 
+#if	INI_FILE_IS_UNICODE
+static void GetInt(PKeyMap KeyMap, int KeyId, const char *Sect, const char *Key, const wchar_t *FName)
+#else
 static void GetInt(PKeyMap KeyMap, int KeyId, const char *Sect, const char *Key, const char *FName)
+#endif
 {
 	char Temp[11];
 	WORD Num;
@@ -3601,11 +3760,16 @@ static void GetInt(PKeyMap KeyMap, int KeyId, const char *Sect, const char *Key,
 }
 
 void PASCAL ReadKeyboardCnf
-	(PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning) {
+	(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning) {
 	int i, j, Ptr;
 	char EntName[7];
 	char TempStr[221];
 	char KStr[201];
+#if	INI_FILE_IS_UNICODE
+	const wchar_t *FName = ToWcharA(FNameA);
+#else
+	const char *FName = FNameA;
+#endif
 
 	// clear key map
 	for (i = 0; i <= IdKeyMax - 1; i++)
@@ -3851,17 +4015,33 @@ void PASCAL ReadKeyboardCnf
 					}
 					KeyMap->Map[i] = 0xFFFF;
 				}
+
+#if	INI_FILE_IS_UNICODE
+	free((void *)FName);
+#endif
 }
 
-void PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
+void PASCAL CopySerialList(PCHAR IniSrcA, PCHAR IniDestA, PCHAR section,
                                PCHAR key, int MaxList)
 {
 	int i, j;
 	char EntName[10], EntName2[10];
 	char TempHost[HostNameMaxLength + 1];
+#if	INI_FILE_IS_UNICODE
+	const wchar_t *IniSrc = ToWcharA(IniSrcA);
+	const wchar_t *IniDest = ToWcharA(IniDestA);
+#else
+	const char *IniSrc = IniSrcA;
+	const char *IniDest = IniDestA;
+#endif
 
+#if	INI_FILE_IS_UNICODE
+	if (_wcsicmp(IniSrc, IniDest) == 0)
+		return;
+#else
 	if (_stricmp(IniSrc, IniDest) == 0)
 		return;
+#endif
 
 	WritePrivateProfileString(section, NULL, NULL, IniDest);
 
@@ -3886,7 +4066,7 @@ void PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
 	WritePrivateProfileString(NULL, NULL, NULL, IniDest);
 }
 
-void PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
+void PASCAL AddValueToList(PCHAR FNameA, PCHAR Host, PCHAR section,
                                PCHAR key, int MaxList)
 {
 	HANDLE MemH;
@@ -3894,6 +4074,11 @@ void PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
 	char EntName[13];
 	int i, j, Len;
 	BOOL Update;
+#if	INI_FILE_IS_UNICODE
+	wchar_t *FName = ToWcharA(FNameA);
+#else
+	char *FName = FNameA;
+#endif
 
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
@@ -3910,9 +4095,9 @@ void PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
 			_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "%s%i", key, i);
 
 			/* Get a hostname */
-			GetPrivateProfileString(section, EntName, "",
-			                        &MemP[j], HostNameMaxLength + 1,
-			                        FName);
+			GetPrivateProfileStringA(section, EntName, "",
+									 &MemP[j], HostNameMaxLength + 1,
+									 FName);
 			Len = strlen(&MemP[j]);
 			if (_stricmp(&MemP[j], Host) == 0) {
 				if (i == 1)
@@ -3925,7 +4110,7 @@ void PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
 		} while ((i <= MaxList) && Update);
 
 		if (Update) {
-			WritePrivateProfileString(section, NULL, NULL, FName);
+			WritePrivateProfileStringA(section, NULL, NULL, FName);
 
 			j = 0;
 			i = 1;
@@ -3933,8 +4118,8 @@ void PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
 				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "%s%i", key, i);
 
 				if (MemP[j] != 0)
-					WritePrivateProfileString(section, EntName, &MemP[j],
-					                          FName);
+					WritePrivateProfileStringA(section, EntName, &MemP[j],
+											   FName);
 				j = j + strlen(&MemP[j]) + 1;
 				i++;
 			} while ((i <= MaxList) && (MemP[j] != 0));
@@ -4045,7 +4230,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 			if (*s == ']') {
 				/* found IPv6 raw address */
 				/* triming [ ] */
-				int len = strlen(HostStr);
+				size_t len = strlen(HostStr);
 				char *lastptr = &HostStr[len - 1];
 				memmove(HostStr, HostStr + 1, len - 1);
 				s = s - 1;
