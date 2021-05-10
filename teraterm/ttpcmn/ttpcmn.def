@@ -1,7 +1,5 @@
 EXPORTS
   StartTeraTerm @1
-  GetKeyCode @4
-  GetKeyStr @5
   SetCOMFlag @44
   ClearCOMFlag @45
   CheckCOMFlag @46

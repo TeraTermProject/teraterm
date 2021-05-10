@@ -45,7 +45,8 @@
 #include "keyboard.h"
 
 BOOL AutoRepeatMode;
-BOOL AppliKeyMode, AppliCursorMode;
+BOOL AppliKeyMode;
+BOOL AppliCursorMode;
 int AppliEscapeMode;
 BOOL Send8BitMode;
 BYTE DebugFlag = DEBUG_FLAG_NONE;
@@ -117,6 +118,657 @@ void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen)
 
   memcpy(&FuncKeyStr[NewKeyId][0], NewKeyStr, NewKeyLen);
   FuncKeyLen[NewKeyId] = NewKeyLen;
+}
+
+static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
+		      BOOL AppliKeyMode_, BOOL AppliCursorMode_,
+		      BOOL Send8BitMode_, PCHAR KeyStr, int destlen,
+		      LPINT Len, LPWORD Type)
+{
+	MSG Msg;
+	char Temp[201];
+
+	*Type = IdBinary;  // key type
+	*Len = 0;
+	switch (KeyCode) {
+		case IdUp:
+			if (Send8BitMode_) {
+				*Len = 2;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\217A",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\233A",_TRUNCATE);
+			} else {
+				*Len = 3;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\033OA",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\033[A",_TRUNCATE);
+			}
+			break;
+		case IdDown:
+			if (Send8BitMode_) {
+				*Len = 2;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\217B",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\233B",_TRUNCATE);
+			} else {
+				*Len = 3;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\033OB",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\033[B",_TRUNCATE);
+			}
+			break;
+		case IdRight:
+			if (Send8BitMode_) {
+				*Len = 2;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\217C",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\233C",_TRUNCATE);
+			} else {
+				*Len = 3;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\033OC",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\033[C",_TRUNCATE);
+			}
+			break;
+		case IdLeft:
+			if (Send8BitMode_) {
+				*Len = 2;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\217D",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\233D",_TRUNCATE);
+			} else {
+				*Len = 3;
+				if (AppliCursorMode_)
+					strncpy_s(KeyStr,destlen,"\033OD",_TRUNCATE);
+				else
+					strncpy_s(KeyStr,destlen,"\033[D",_TRUNCATE);
+			}
+			break;
+		case Id0:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217p",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Op",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '0';
+			}
+			break;
+		case Id1:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217q",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Oq",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '1';
+			}
+			break;
+		case Id2:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217r",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Or",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '2';
+			}
+			break;
+		case Id3:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217s",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Os",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '3';
+			}
+			break;
+		case Id4:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217t",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ot",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '4';
+			}
+			break;
+		case Id5:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217u",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ou",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '5';
+			}
+			break;
+		case Id6:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217v",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ov",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '6';
+			}
+			break;
+		case Id7:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217w",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ow",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '7';
+			}
+			break;
+		case Id8:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217x",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ox",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '8';
+			}
+			break;
+		case Id9:
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217y",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Oy",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '9';
+			}
+			break;
+		case IdMinus: /* numeric pad - key (DEC) */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217m",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Om",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '-';
+			}
+			break;
+		case IdComma: /* numeric pad , key (DEC) */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217l",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ol",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = ',';
+			}
+			break;
+		case IdPeriod: /* numeric pad . key */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217n",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033On",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '.';
+			}
+			break;
+		case IdEnter: /* numeric pad enter key */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217M",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033OM",_TRUNCATE);
+				}
+			}
+			else {
+				*Type = IdText; // do new-line conversion
+				*Len = 1;
+				KeyStr[0] = 0x0D;
+			}
+			break;
+		case IdSlash: /* numeric pad slash key */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217o",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Oo",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '/';
+			}
+			break;
+		case IdAsterisk: /* numeric pad asterisk key */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217j",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Oj",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '*';
+			}
+			break;
+		case IdPlus: /* numeric pad plus key */
+			if (AppliKeyMode_) {
+				if (Send8BitMode_) {
+					*Len = 2;
+					strncpy_s(KeyStr,destlen,"\217k",_TRUNCATE);
+				} else {
+					*Len = 3;
+					strncpy_s(KeyStr,destlen,"\033Ok",_TRUNCATE);
+				}
+			}
+			else {
+				*Len = 1;
+				KeyStr[0] = '+';
+			}
+			break;
+		case IdPF1: /* DEC Key: PF1 */
+			if (Send8BitMode_) {
+				*Len = 2;
+				strncpy_s(KeyStr,destlen,"\217P",_TRUNCATE);
+			} else {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\033OP",_TRUNCATE);
+			}
+			break;
+		case IdPF2: /* DEC Key: PF2 */
+			if (Send8BitMode_) {
+				*Len = 2;
+				strncpy_s(KeyStr,destlen,"\217Q",_TRUNCATE);
+			} else {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\033OQ",_TRUNCATE);
+			}
+			break;
+		case IdPF3: /* DEC Key: PF3 */
+			if (Send8BitMode_) {
+				*Len = 2;
+				strncpy_s(KeyStr,destlen,"\217R",_TRUNCATE);
+			} else {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\033OR",_TRUNCATE);
+			}
+			break;
+		case IdPF4: /* DEC Key: PF4 */
+			if (Send8BitMode_) {
+				*Len = 2;
+				strncpy_s(KeyStr,destlen,"\217S",_TRUNCATE);
+			} else {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\033OS",_TRUNCATE);
+			}
+			break;
+		case IdFind: /* DEC Key: Find */
+			if (Send8BitMode_) {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\2331~",_TRUNCATE);
+			} else {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\033[1~",_TRUNCATE);
+			}
+			break;
+		case IdInsert: /* DEC Key: Insert Here */
+			if (Send8BitMode_) {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\2332~",_TRUNCATE);
+			} else {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\033[2~",_TRUNCATE);
+			}
+			break;
+		case IdRemove: /* DEC Key: Remove */
+			if (Send8BitMode_) {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\2333~",_TRUNCATE);
+			} else {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\033[3~",_TRUNCATE);
+			}
+			break;
+		case IdSelect: /* DEC Key: Select */
+			if (Send8BitMode_) {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\2334~",_TRUNCATE);
+			} else {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\033[4~",_TRUNCATE);
+			}
+			break;
+		case IdPrev: /* DEC Key: Prev */
+			if (Send8BitMode_) {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\2335~",_TRUNCATE);
+			} else {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\033[5~",_TRUNCATE);
+			}
+			break;
+		case IdNext: /* DEC Key: Next */
+			if (Send8BitMode_) {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\2336~",_TRUNCATE);
+			} else {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\033[6~",_TRUNCATE);
+			}
+			break;
+		case IdF6: /* DEC Key: F6 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23317~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[17~",_TRUNCATE);
+			}
+			break;
+		case IdF7: /* DEC Key: F7 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23318~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[18~",_TRUNCATE);
+			}
+			break;
+		case IdF8: /* DEC Key: F8 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23319~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[19~",_TRUNCATE);
+			}
+			break;
+		case IdF9: /* DEC Key: F9 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23320~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[20~",_TRUNCATE);
+			}
+			break;
+		case IdF10: /* DEC Key: F10 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23321~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[21~",_TRUNCATE);
+			}
+			break;
+		case IdF11: /* DEC Key: F11 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23323~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[23~",_TRUNCATE);
+			}
+			break;
+		case IdF12: /* DEC Key: F12 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23324~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[24~",_TRUNCATE);
+			}
+			break;
+		case IdF13: /* DEC Key: F13 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23325~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[25~",_TRUNCATE);
+			}
+			break;
+		case IdF14: /* DEC Key: F14 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23326~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[26~",_TRUNCATE);
+			}
+			break;
+		case IdHelp: /* DEC Key: Help */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23328~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[28~",_TRUNCATE);
+			}
+			break;
+		case IdDo: /* DEC Key: Do */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23329~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[29~",_TRUNCATE);
+			}
+			break;
+		case IdF17: /* DEC Key: F17 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23331~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[31~",_TRUNCATE);
+			}
+			break;
+		case IdF18: /* DEC Key: F18 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23332~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[32~",_TRUNCATE);
+			}
+			break;
+		case IdF19: /* DEC Key: F19 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23333~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[33~",_TRUNCATE);
+			}
+			break;
+		case IdF20: /* DEC Key: F20 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23334~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[34~",_TRUNCATE);
+			}
+			break;
+		case IdXF1: /* XTERM F1 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23311~",_TRUNCATE);
+			} else {
+				*Len = 5;
+
+				strncpy_s(KeyStr,destlen,"\033[11~",_TRUNCATE);
+			}
+			break;
+		case IdXF2: /* XTERM F2 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23312~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[12~",_TRUNCATE);
+			}
+			break;
+		case IdXF3: /* XTERM F3 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23313~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[13~",_TRUNCATE);
+			}
+			break;
+		case IdXF4: /* XTERM F4 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23314~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[14~",_TRUNCATE);
+			}
+			break;
+		case IdXF5: /* XTERM F5 */
+			if (Send8BitMode_) {
+				*Len = 4;
+				strncpy_s(KeyStr,destlen,"\23315~",_TRUNCATE);
+			} else {
+				*Len = 5;
+				strncpy_s(KeyStr,destlen,"\033[15~",_TRUNCATE);
+			}
+			break;
+		case IdXBackTab: /* XTERM Back Tab */
+			if (Send8BitMode_) {
+				*Len = 2;
+				strncpy_s(KeyStr,destlen,"\233Z",_TRUNCATE);
+			} else {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\033[Z",_TRUNCATE);
+			}
+			break;
+		case IdHold:
+		case IdPrint:
+		case IdBreak:
+		case IdCmdEditCopy:
+		case IdCmdEditPaste:
+		case IdCmdEditPasteCR:
+		case IdCmdEditCLS:
+		case IdCmdEditCLB:
+		case IdCmdCtrlOpenTEK:
+		case IdCmdCtrlCloseTEK:
+		case IdCmdLineUp:
+		case IdCmdLineDown:
+		case IdCmdPageUp:
+		case IdCmdPageDown:
+		case IdCmdBuffTop:
+		case IdCmdBuffBottom:
+		case IdCmdNextWin:
+		case IdCmdPrevWin:
+		case IdCmdNextSWin:
+		case IdCmdPrevSWin:
+		case IdCmdLocalEcho:
+		case IdCmdScrollLock:
+			PostMessage(HWin,WM_USER_ACCELCOMMAND,KeyCode,0);
+			break;
+		default:
+			if ((KeyCode >= IdUser1) && (KeyCode <= IdKeyMax)) {
+				*Type = (WORD)(*KeyMap_).UserKeyType[KeyCode-IdUser1]; // key type
+				*Len = KeyMap_->UserKeyLen[KeyCode-IdUser1];
+				memcpy(Temp,
+					   &KeyMap_->UserKeyStr[KeyMap_->UserKeyPtr[KeyCode-IdUser1]],
+					   *Len);
+				Temp[*Len] = 0;
+				if ((*Type==IdBinary) || (*Type==IdText))
+					*Len = Hex2Str(Temp,KeyStr,destlen);
+				else
+					strncpy_s(KeyStr,destlen,Temp,_TRUNCATE);
+			}
+			else
+				return;
+	}
+	/* remove WM_CHAR message for used keycode */
+	PeekMessage(&Msg,HWin, WM_CHAR, WM_CHAR,PM_REMOVE);
 }
 
 static int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeType, WORD ModStat) {
@@ -610,7 +1262,24 @@ static int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *
   return CodeLength;
 }
 
-int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
+/* Key scan code -> Tera Term key code */
+static WORD GetKeyCode(PKeyMap KeyMap_, WORD Scan)
+{
+	WORD Key;
+
+	Key = IdKeyMax;
+	while ((Key > 0) && (KeyMap_->Map[Key - 1] != Scan)) {
+		Key--;
+	}
+	return Key;
+}
+
+/**
+ *	@param	VKey	virtual-key code
+ *	@param	count	The value is the number of times the keystroke
+ *	@param	Scan	The scan code. The value depends on the OEM
+ */
+KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 {
   WORD Key;
   MSG M;

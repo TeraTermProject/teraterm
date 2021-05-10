@@ -148,17 +148,3 @@ typedef struct {
 	BYTE UserKeyType[NumOfUserKey];
 } TKeyMap;
 typedef TKeyMap *PKeyMap;
-
-#if !defined(DllExport)
-#define DllExport __declspec(dllexport)
-#endif
-
-#if 1
-DllExport WORD PASCAL GetKeyCode(PKeyMap KeyMap, WORD Scan);
-DllExport void PASCAL GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
-                          BOOL AppliKeyMode, BOOL AppliCursorMode,
-                          BOOL Send8BitMode, PCHAR KeyStr,
-                          int destlen, LPINT Len, LPWORD Type);
-#endif
-
-#undef DllExport

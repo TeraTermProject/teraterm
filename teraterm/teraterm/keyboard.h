@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2021- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,11 @@ extern "C" {
 #endif
 
 /* KeyDown return type */
-#define KEYDOWN_COMMOUT	1	/* リモートに送信（BS Enter Spaceなど） */
-#define KEYDOWN_CONTROL	2	/* Ctrl,Shiftなど */
-#define KEYDOWN_OTHER	0	/* その他 */
+typedef enum {
+	KEYDOWN_OTHER,		/* その他 */
+	KEYDOWN_COMMOUT,	/* リモートに送信（BS Enter Spaceなど） */
+	KEYDOWN_CONTROL,	/* Ctrl,Shiftなど */
+} KeyDownResult;
 
 #define DEBUG_FLAG_NONE  0
 #define DEBUG_FLAG_NORM  1
@@ -46,7 +48,7 @@ extern "C" {
 void SetKeyMap();
 void ClearUserKey();
 void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen);
-int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan);
+KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan);
 void KeyCodeSend(WORD KCode, WORD Count);
 void KeyUp(WORD VKey);
 BOOL ShiftKey();
