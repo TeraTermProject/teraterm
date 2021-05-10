@@ -42,9 +42,7 @@ DllExport void PASCAL CopyShmemToTTSet(PTTSet ts);
 DllExport void PASCAL CopyTTSetToShmem(PTTSet ts);
 DllExport BOOL PASCAL StartTeraTerm(PTTSet ts);
 DllExport void PASCAL RestartTeraTerm(HWND hwnd, PTTSet ts);
-DllExport void PASCAL ChangeDefaultSet(PTTSet ts, PKeyMap km);
-DllExport void PASCAL GetDefaultSet(PTTSet ts);
-// void PASCAL LoadDefaultSet(PCHAR SetupFName);
+
 DllExport WORD PASCAL GetKeyCode(PKeyMap KeyMap, WORD Scan);
 DllExport void PASCAL GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
                           BOOL AppliKeyMode, BOOL AppliCursorMode,

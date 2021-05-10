@@ -320,10 +320,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DWORD Style;
 	char *Param;
 	int CmdShow;
-#ifdef SHARED_KEYMAP
-	char Temp[MAX_PATH];
-	PKeyMap tempkm;
-#endif
 	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
@@ -340,26 +336,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
 			(*ReadIniFile)(ts.SetupFName, &ts);
-#ifdef SHARED_KEYMAP
-			/* read keycode map from "keyboard.cnf" */
-			tempkm = (PKeyMap)malloc(sizeof(TKeyMap));
-			if (tempkm!=NULL) {
-				strncpy_s(Temp, sizeof(Temp), ts.HomeDir, _TRUNCATE);
-				AppendSlash(Temp,sizeof(Temp));
-				strncat_s(Temp,sizeof(Temp),"KEYBOARD.CNF",_TRUNCATE);
-				(*ReadKeyboardCnf)(Temp,tempkm,TRUE);
-			}
-#endif
 			FreeTTSET();
-#ifdef SHARED_KEYMAP
-			/* store default sets in TTCMN */
-#if 0
-			ChangeDefaultSet(&ts,tempkm);
-#else
-			ChangeDefaultSet(NULL,tempkm);
-#endif
-			if (tempkm!=NULL) free(tempkm);
-#endif
 		}
 		else {
 			abort();
@@ -370,23 +347,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
 			(*ReadIniFile)(ts.SetupFName, &ts);
-#ifdef SHARED_KEYMAP
-			/* read keycode map from "keyboard.cnf" */
-			tempkm = (PKeyMap)malloc(sizeof(TKeyMap));
-			if (tempkm!=NULL) {
-				strncpy_s(Temp, sizeof(Temp), ts.HomeDir, _TRUNCATE);
-				AppendSlash(Temp,sizeof(Temp));
-				strncat_s(Temp,sizeof(Temp),"KEYBOARD.CNF",_TRUNCATE);
-				(*ReadKeyboardCnf)(Temp,tempkm,TRUE);
-			}
-#endif
 			FreeTTSET();
-#ifdef SHARED_KEYMAP
-			/* store default sets in TTCMN */
-			if (tempkm!=NULL) {
-				free(tempkm);
-			}
-#endif
 		}
 		else {
 			abort();
@@ -1263,10 +1224,6 @@ void CVTWindow::RestoreSetup()
 		(*ReadIniFile)(ts.SetupFName,&ts);
 	}
 	FreeTTSET();
-
-#if 0
-	ChangeDefaultSet(&ts,NULL);
-#endif
 
 	ResetSetup();
 }
@@ -4838,9 +4795,6 @@ void CVTWindow::OnSetupSave()
 #endif
 	}
 
-#if 0
-	ChangeDefaultSet(&ts,NULL);
-#endif
 }
 
 void CVTWindow::OnSetupRestore()

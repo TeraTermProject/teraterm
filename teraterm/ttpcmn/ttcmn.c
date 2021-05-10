@@ -59,8 +59,6 @@ typedef struct {
 	size_t size_tttset;		/* sizeof TTTSet */
 	/* Setup information from "teraterm.ini" */
 	TTTSet ts;
-	/* Key code map from "keyboard.def" */
-	TKeyMap km;
 	// Window list
 	int NWin;
 	HWND WinList[MAXNWIN];
@@ -186,31 +184,11 @@ void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 	}
 }
 
-void WINAPI ChangeDefaultSet(PTTSet ts, PKeyMap km)
-{
-	if ((ts!=NULL) &&
-		(_stricmp(ts->SetupFName, pm->ts.SetupFName) == 0)) {
-		memcpy(&(pm->ts),ts,sizeof(TTTSet));
-	}
-	if (km!=NULL) {
-		memcpy(&(pm->km),km,sizeof(TKeyMap));
-	}
-}
-
-void WINAPI GetDefaultSet(PTTSet ts)
-{
-	memcpy(ts,&(pm->ts),sizeof(TTTSet));
-}
-
-
 /* Key scan code -> Tera Term key code */
 WORD WINAPI GetKeyCode(PKeyMap KeyMap, WORD Scan)
 {
 	WORD Key;
 
-	if (KeyMap==NULL) {
-		KeyMap = &(pm->km);
-	}
 	Key = IdKeyMax;
 	while ((Key>0) && (KeyMap->Map[Key-1] != Scan)) {
 		Key--;
@@ -225,10 +203,6 @@ void WINAPI GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 {
 	MSG Msg;
 	char Temp[201];
-
-	if (KeyMap==NULL) {
-		KeyMap = &(pm->km);
-	}
 
 	*Type = IdBinary;  // key type
 	*Len = 0;

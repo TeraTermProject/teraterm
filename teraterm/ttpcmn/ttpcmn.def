@@ -1,7 +1,5 @@
 EXPORTS
   StartTeraTerm @1
-  ChangeDefaultSet @2
-  GetDefaultSet @3
   GetKeyCode @4
   GetKeyStr @5
   SetCOMFlag @44
