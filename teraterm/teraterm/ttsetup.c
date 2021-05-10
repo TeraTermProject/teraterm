@@ -30,6 +30,7 @@
 /* TERATERM.EXE, TTSET interface */
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_key.h"
 
 #include "ttsetup.h"
 #include "ttplug.h" /* TTPLUG */

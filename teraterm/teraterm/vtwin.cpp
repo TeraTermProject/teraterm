@@ -39,6 +39,7 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_key.h"
 
 #include "ttcommon.h"
 #include "ttwinman.h"

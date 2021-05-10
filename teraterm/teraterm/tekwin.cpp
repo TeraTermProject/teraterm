@@ -31,6 +31,7 @@
 #include <windowsx.h>
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_key.h"
 #include "tektypes.h"
 #include "teklib.h"
 #include "ttwinman.h"

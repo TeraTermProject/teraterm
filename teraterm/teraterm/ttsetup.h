@@ -30,6 +30,7 @@
 #pragma once
 
 #include "ttlib.h"
+#include "tttypes_key.h"
 
 /* TERATERM.EXE, TTSET interface */
 #ifdef __cplusplus

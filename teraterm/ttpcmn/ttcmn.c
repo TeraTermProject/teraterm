@@ -38,6 +38,7 @@
 #include <assert.h>
 #include <crtdbg.h>
 
+#include "tttypes_key.h"
 #define DllExport __declspec(dllexport)
 #include "language.h"
 #undef DllExport

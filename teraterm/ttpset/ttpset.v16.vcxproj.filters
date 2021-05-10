@@ -25,6 +25,9 @@
     <ClCompile Include="ttset.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ttset_keyboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\teraterm.h">

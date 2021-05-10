@@ -219,6 +219,10 @@
 				RelativePath="ttset.c"
 				>
 			</File>
+			<File
+				RelativePath=".\ttset_keyboard.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "tttypes_key.h"
 #include "ttlib.h"
 #include "ttsetup.h"
 #include "ttcommon.h"

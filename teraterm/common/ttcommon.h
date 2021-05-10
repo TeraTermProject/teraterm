@@ -43,12 +43,6 @@ DllExport void PASCAL CopyTTSetToShmem(PTTSet ts);
 DllExport BOOL PASCAL StartTeraTerm(PTTSet ts);
 DllExport void PASCAL RestartTeraTerm(HWND hwnd, PTTSet ts);
 
-DllExport WORD PASCAL GetKeyCode(PKeyMap KeyMap, WORD Scan);
-DllExport void PASCAL GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
-                          BOOL AppliKeyMode, BOOL AppliCursorMode,
-                          BOOL Send8BitMode, PCHAR KeyStr,
-                          int destlen, LPINT Len, LPWORD Type);
-
 DllExport void PASCAL SetCOMFlag(int com);
 DllExport void PASCAL ClearCOMFlag(int com);
 DllExport int PASCAL CheckCOMFlag(int com);

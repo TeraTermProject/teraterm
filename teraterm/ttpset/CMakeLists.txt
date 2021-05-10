@@ -5,6 +5,7 @@ project(${PACKAGE_NAME})
 add_library(
   ${PACKAGE_NAME} SHARED
   ttset.c
+  ttset_keyboard.c
   ttpset-version.rc
   ttpset.def
   )

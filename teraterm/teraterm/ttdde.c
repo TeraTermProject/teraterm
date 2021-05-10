@@ -30,6 +30,7 @@
 /* TERATERM.EXE, DDE routines */
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_key.h"
 #include <stdio.h>
 #include <string.h>
 #include <ddeml.h>
