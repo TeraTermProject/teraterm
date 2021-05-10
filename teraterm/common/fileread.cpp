@@ -32,7 +32,6 @@
 #include <stdint.h>
 #endif
 #include <windows.h>
-#include <tchar.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
