@@ -29,7 +29,7 @@
 #pragma once
 
 // このファイルはあたらしいコンパイラ環境では不要
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER > 1400
 #error check file dependency
 #endif
 #if defined(__MINGW32__) && __MINGW64_VERSION_MAJOR >= 8
