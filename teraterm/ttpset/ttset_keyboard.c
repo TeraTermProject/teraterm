@@ -33,7 +33,7 @@
 #include <string.h>
 #include "ttlib.h"
 #include "codeconv.h"
-#include "tttypes_key.h"
+#include "../teraterm/keyboard_i.h"
 
 #define INI_FILE_IS_UNICODE 1
 

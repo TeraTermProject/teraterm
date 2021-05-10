@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2021- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,49 +28,21 @@
 
 #pragma once
 
-#include "ttlib.h"
+#define KeyStrMax 1023
 
-/* TERATERM.EXE, TTSET interface */
-#ifdef __cplusplus
-extern "C" {
-#endif
+// (user) key type IDs
+#define IdBinary  0  // transmit text without any modification
+#define IdText    1  // transmit text with new-line & DBCS conversions
+#define IdMacro   2  // activate macro
+#define IdCommand 3  // post a WM_COMMAND message
 
-// ReadKeyboardCnf ÇÃà¯êîÇÃå^
-// é¿ç€ÇÃå^ÇÕ tttypes_key.h Ç include
+struct TKeyMap_st {
+	WORD Map[IdKeyMax];
+	/* user key str position/length in buffer */
+	int UserKeyPtr[NumOfUserKey], UserKeyLen[NumOfUserKey];
+	BYTE UserKeyStr[KeyStrMax+1];
+	/* user key type */
+	BYTE UserKeyType[NumOfUserKey];
+};
 typedef struct TKeyMap_st *PKeyMap;
-
-typedef void (PASCAL *PReadIniFile)
-  (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PWriteIniFile)
-  (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PReadKeyboardCnf)
-  (PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
-typedef void (PASCAL *PCopyHostList)
-  (PCHAR IniSrc, PCHAR IniDest);
-typedef void (PASCAL *PAddHostToList)
-  (PCHAR FName, PCHAR Host);
-typedef void (PASCAL *PParseParam)
-  (PCHAR Param, PTTSet ts, PCHAR DDETopic);
-typedef void (PASCAL *PCopySerialList)
-  (PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
-typedef void (PASCAL *PAddValueToList)
-  (PCHAR FName, PCHAR Host, PCHAR section, PCHAR key, int MaxList);
-
-extern PReadIniFile ReadIniFile;
-extern PWriteIniFile WriteIniFile;
-extern PReadKeyboardCnf ReadKeyboardCnf;
-extern PCopyHostList CopyHostList;
-extern PAddHostToList AddHostToList;
-extern PParseParam ParseParam;
-extern PCopySerialList CopySerialList;
-extern PAddValueToList AddValueToList;
-
-/* proto types */
-BOOL LoadTTSET();
-void FreeTTSET();
-
-#ifdef __cplusplus
-}
-#endif
-
-#include "../ttpset/ttset.h"
+typedef struct TKeyMap_st TKeyMap;

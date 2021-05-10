@@ -43,6 +43,7 @@
 #include "ttdde.h"
 
 #include "keyboard.h"
+#include "keyboard_i.h"
 
 BOOL AutoRepeatMode;
 BOOL AppliKeyMode;

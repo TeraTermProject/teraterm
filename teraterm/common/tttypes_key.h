@@ -130,21 +130,3 @@
 #define IdCmdDisconnect   1000
 #define IdCmdLoadKeyMap   1001
 #define IdCmdRestoreSetup 1002
-
-#define KeyStrMax 1023
-
-// (user) key type IDs
-#define IdBinary  0  // transmit text without any modification
-#define IdText    1  // transmit text with new-line & DBCS conversions
-#define IdMacro   2  // activate macro
-#define IdCommand 3  // post a WM_COMMAND message
-
-typedef struct {
-	WORD Map[IdKeyMax];
-	/* user key str position/length in buffer */
-	int UserKeyPtr[NumOfUserKey], UserKeyLen[NumOfUserKey];
-	BYTE UserKeyStr[KeyStrMax+1];
-	/* user key type */
-	BYTE UserKeyType[NumOfUserKey];
-} TKeyMap;
-typedef TKeyMap *PKeyMap;
