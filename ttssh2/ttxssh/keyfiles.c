@@ -810,6 +810,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	int i, len, len2;
 	char *encname = NULL, *comment = NULL, *private_mac = NULL;
 	buffer_t *pubkey = NULL, *prikey = NULL;
+	const struct ssh2cipher *cipher = NULL;
+	struct sshcipher_ctx *cc = NULL;
 
 	result = (Key *)malloc(sizeof(Key));
 	ZeroMemory(result, sizeof(Key)); 
@@ -817,9 +819,6 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	result->rsa = NULL;
 	result->dsa = NULL;
 	result->ecdsa = NULL;
-
-	const struct ssh2cipher *cipher = NULL;
-	struct sshcipher_ctx *cc = NULL;
 
 	pubkey = buffer_init();
 	prikey = buffer_init();
@@ -1390,6 +1389,8 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	int encflag;
 	char *encname = NULL;
 	buffer_t *blob = NULL, *blob2 = NULL;
+	const struct ssh2cipher *cipher = NULL;
+	struct sshcipher_ctx *cc = NULL;
 
 	result = (Key *)malloc(sizeof(Key));
 	ZeroMemory(result, sizeof(Key)); 
@@ -1400,9 +1401,6 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 
 	blob = buffer_init();
 	blob2 = buffer_init();
-
-	const struct ssh2cipher *cipher = NULL;
-	struct sshcipher_ctx *cc = NULL;
 
 	// parse keyfile & decode blob
 	{
