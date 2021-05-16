@@ -9,6 +9,9 @@
 
 // #include "includes.h"
 
+// for Visual Studio 2005
+#pragma warning(disable : 4244)
+
 #include <sys/types.h>
 #ifdef HAVE_STDINT_H
 # include <stdint.h>

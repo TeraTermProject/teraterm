@@ -18,6 +18,9 @@
 
 /* $OpenBSD: cipher-chachapoly-libcrypto.c,v 1.1 2020/04/03 04:32:21 djm Exp $ */
 
+// for Visual Studio 2005
+#pragma warning(disable : 4244)
+
 #include <sys/types.h>
 
 #include <stdarg.h> /* needed for log.h */
