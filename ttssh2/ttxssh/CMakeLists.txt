@@ -26,8 +26,14 @@ target_sources(
   buffer.h
   chacha.c
   chacha.h
-  cipher.h
+  cipher-3des1.c
+  cipher-chachapoly-libcrypto.c
+  cipher-chachapoly.h
   cipher-ctr.c
+  cipher.c
+  cipher.h
+  comp.c
+  comp.h
   config.h
   crypt.c
   crypt.h
@@ -47,12 +53,14 @@ target_sources(
   ed25519_sc25519.c
   ed25519_sc25519.h
   ed25519_verify.c
-  fwd.c
-  fwd.h
   fwd-socks.c
   fwd-socks.h
+  fwd.c
+  fwd.h
   fwdui.c
   fwdui.h
+  hostkey.c
+  hostkey.h
   hosts.c
   hosts.h
   kex.c
@@ -61,19 +69,25 @@ target_sources(
   key.h
   keyfiles.c
   keyfiles.h
+  mac.c
+  mac.h
   pkt.c
   pkt.h
+  poly1305.c
+  poly1305.h
   resource.h
   sftp.c
   sftp.h
   ssh.c
   ssh.h
+  ssherr.c
+  ssherr.h
+  ttxssh-version.h
+  ttxssh-version.rc
   ttxssh.c
   ttxssh.def
   ttxssh.h
   ttxssh.rc
-  ttxssh-version.h
-  ttxssh-version.rc
   util.c
   util.h
   x11util.c
