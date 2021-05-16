@@ -120,7 +120,7 @@ u_int get_cipher_discard_len(const struct ssh2cipher *cipher)
 u_int get_cipher_iv_len(const struct ssh2cipher *cipher)
 {
 	if (cipher) {
-		if (cipher->iv_len != 0 || cipher->id != SSH2_CIPHER_CHACHAPOLY) {
+		if (cipher->iv_len != 0 || cipher->id == SSH2_CIPHER_CHACHAPOLY) {
 			return cipher->iv_len;
 		}
 		else {
