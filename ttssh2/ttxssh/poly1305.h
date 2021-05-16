@@ -10,9 +10,9 @@
 #ifndef POLY1305_H
 #define POLY1305_H
 
+#include <stdio.h>
 #include <sys/types.h>
 typedef unsigned char u_char;
-typedef unsigned int size_t;
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
 typedef unsigned long long uint64_t;
