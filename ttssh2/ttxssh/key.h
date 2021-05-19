@@ -44,11 +44,9 @@ unsigned char *duplicate_ED25519_PK(unsigned char *src);
 BOOL key_copy(Key *dest, Key *src);
 
 char *key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_length);
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep, digest_algorithm dgst_alg);
+char *key_fingerprint(Key *key, fp_rep dgst_rep, digest_algorithm dgst_alg);
 
 const char *ssh_key_type(ssh_keytype type);
-char *get_sshname_from_key(Key *key);
-ssh_keytype get_keytype_from_name(char *name);
 char *curve_keytype_to_name(ssh_keytype type);
 ssh_keytype key_curve_name_to_keytype(char *name);
 
@@ -74,4 +72,4 @@ int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public);
 
 int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen);
 
-#endif
+#endif /* __KEY_H_ */

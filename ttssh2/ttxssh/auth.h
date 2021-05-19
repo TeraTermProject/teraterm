@@ -41,7 +41,7 @@ typedef struct {
   SSHAuthMethod method;
   char *password;
   char *rhosts_client_user;
-  struct Key *key_pair;
+  Key *key_pair;
 } AUTHCred;
 
 typedef enum { GENERIC_AUTH_MODE, TIS_AUTH_MODE } AuthMode;

@@ -78,6 +78,9 @@ static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 #include "buffer.h"
 #include "cipher.h"
 #include "key.h"
+#include "kex.h"
+#include "mac.h"
+#include "comp.h"
 #include "dlglib.h"
 
 #include "sftp.h"
@@ -86,6 +89,9 @@ static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 #include "compat_win.h"
 
 #include "libputty.h"
+
+// from cipher-3des.c
+extern const EVP_CIPHER* evp_ssh1_3des(void);
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
@@ -155,10 +161,10 @@ static void init_TTSSH(PTInstVar pvar)
 	FWDUI_init(pvar);
 
 	ssh_heartbeat_lock_initialize();
-
-	pvar->evpcip[MODE_IN] = EVP_CIPHER_CTX_new();
-	pvar->evpcip[MODE_OUT] = EVP_CIPHER_CTX_new();
-	/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
+	
+	pvar->cc[MODE_IN] = NULL;
+	pvar->cc[MODE_OUT] = NULL;
+	// メモリ確保は CRYPT_start_encryption の先の cipher_init_SSH2 に移動
 }
 
 static void uninit_TTSSH(PTInstVar pvar)
@@ -191,8 +197,12 @@ static void uninit_TTSSH(PTInstVar pvar)
 
 	ssh_heartbeat_lock_finalize();
 
-	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_IN]);
-	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_OUT]);
+	cipher_free_SSH2(pvar->cc[MODE_IN]);
+	cipher_free_SSH2(pvar->cc[MODE_OUT]);
+
+	// CloseTCP と TTXEnd から 2 回呼ばれる場合があるため、2重 free しないように NULL をセットしておく
+	pvar->cc[MODE_IN] = NULL;
+	pvar->cc[MODE_OUT] = NULL;
 }
 
 static void PASCAL TTXInit(PTTSet ts, PComVar cv)
@@ -206,208 +216,6 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv)
 
 	init_TTSSH(pvar);
 }
-
-static void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
-{
-	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
-	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
-	int i, j, k=-1;
-
-	memset(listed, 0, sizeof(listed));
-	memset(allowed, 0, sizeof(allowed));
-
-	// 許可されている文字のリストを作る。
-	for (i = 0; i < default_strings_len ; i++) {
-		allowed[default_strings[i]] = 1;
-	}
-
-	// 指定された文字列を走査し、許可されていない文字、重複する文字は削除する。
-	// 
-	// ex. (i=5 の文字を削除する)
-	// i=012345
-	//   >:=9<87;A@?B3026(\0)
-	//         i+1
-	//         <------------>
-	//       ↓
-	//   >:=9<7;A@?B3026(\0)
-	//         
-	for (i = 0; buf[i] != 0; i++) {
-		int num = buf[i] - '0';
-
-		if (num < 0 || num > default_strings_len
-			|| !allowed[num]
-			|| listed[num]) {
-			memmove(buf + i, buf + i + 1, strlen(buf + i + 1) + 1);
-			i--;
-		} else {
-			listed[num] = 1;
-		}
-
-		// disabled lineがあれば、位置を覚えておく。
-		if (num == 0) {
-			k = i;
-		}
-	}
-
-	// 指定されていない文字があれば、disabled lineの直前に挿入する。
-	// 
-	// ex. (Zを挿入する)
-	//                k
-	//   >:=9<87;A@?B3026(\0)
-	//                 k+1
-	//                 <---->
-	//       ↓       k
-	//   >:=9<87;A@?B30026(\0)
-	//       ↓        k
-	//   >:=9<87;A@?B3Z026(\0)
-	//       
-	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
-		int num = default_strings[j];
-
-		if (!listed[num] && k >= 0) {
-			int copylen = strlen(buf + k + 1) + 1;
-
-			memmove(buf + k + 1, buf + k, copylen);
-			buf[k + 1 + copylen] = '\0';   // 終端を忘れずに付ける。
-			buf[k] = num + '0';
-			k++;
-			i++;
-		}
-	}
-	if (k < 0) {
-		j = 0;
-	}
-	else {
-		j++;
-	}
-
-	// disabled lineが存在しない場合は、そのまま末尾に追加する。
-	for (; j < default_strings_len ; j++) {
-		int num = default_strings[j];
-
-		if (!listed[num]) {
-			buf[i] = num + '0';
-			listed[num] = 1;
-			i++;
-		}
-	}
-
-	buf[i] = 0;
-}
-
-/*
- * Remove unsupported cipher or duplicated cipher.
- * Add unspecified ciphers at the end of list.
- */
-static void normalize_cipher_order(char *buf)
-{
-	/* SSH_CIPHER_NONE means that all ciphers below that one are disabled.
-	   We *never* allow no encryption. */
-	static char default_strings[] = {
-		SSH2_CIPHER_AES256_GCM,
-		SSH2_CIPHER_CAMELLIA256_CTR,
-		SSH2_CIPHER_AES256_CTR,
-		SSH2_CIPHER_CAMELLIA256_CBC,
-		SSH2_CIPHER_AES256_CBC,
-		SSH2_CIPHER_CAMELLIA192_CTR,
-		SSH2_CIPHER_AES192_CTR,
-		SSH2_CIPHER_CAMELLIA192_CBC,
-		SSH2_CIPHER_AES192_CBC,
-		SSH2_CIPHER_AES128_GCM,
-		SSH2_CIPHER_CAMELLIA128_CTR,
-		SSH2_CIPHER_AES128_CTR,
-		SSH2_CIPHER_CAMELLIA128_CBC,
-		SSH2_CIPHER_AES128_CBC,
-		SSH2_CIPHER_3DES_CTR,
-		SSH2_CIPHER_3DES_CBC,
-		SSH2_CIPHER_BLOWFISH_CTR,
-		SSH2_CIPHER_BLOWFISH_CBC,
-		SSH2_CIPHER_CAST128_CTR,
-		SSH2_CIPHER_CAST128_CBC,
-		SSH_CIPHER_3DES,
-		SSH_CIPHER_NONE,
-		SSH2_CIPHER_ARCFOUR256,
-		SSH2_CIPHER_ARCFOUR128,
-		SSH2_CIPHER_ARCFOUR,
-		SSH_CIPHER_BLOWFISH,
-		SSH_CIPHER_DES,
-		0, 0, 0 // Dummy for SSH_CIPHER_IDEA, SSH_CIPHER_TSS, SSH_CIPHER_RC4
-	};
-
-	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
-}
-
-static void normalize_kex_order(char *buf)
-{
-	static char default_strings[] = {
-		KEX_ECDH_SHA2_256,
-		KEX_ECDH_SHA2_384,
-		KEX_ECDH_SHA2_521,
-		KEX_DH_GRP18_SHA512,
-		KEX_DH_GRP16_SHA512,
-		KEX_DH_GRP14_SHA256,
-		KEX_DH_GEX_SHA256,
-		KEX_DH_GEX_SHA1,
-		KEX_DH_GRP14_SHA1,
-		KEX_DH_GRP1_SHA1,
-		KEX_DH_NONE,
-	};
-
-	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
-}
-
-static void normalize_host_key_order(char *buf)
-{
-	static char default_strings[] = {
-		KEY_ECDSA256,
-		KEY_ECDSA384,
-		KEY_ECDSA521,
-		KEY_ED25519,
-		KEY_RSA,
-		KEY_DSA,
-		KEY_NONE,
-	};
-
-	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
-}
-
-static void normalize_mac_order(char *buf)
-{
-	static char default_strings[] = {
-		HMAC_SHA2_512_EtM,
-		HMAC_SHA2_256_EtM,
-		HMAC_SHA1_EtM,
-		HMAC_SHA2_512,
-		HMAC_SHA2_256,
-		HMAC_SHA1,
-		HMAC_RIPEMD160_EtM,
-		HMAC_RIPEMD160,
-		HMAC_MD5_EtM,
-		HMAC_MD5,
-		HMAC_NONE,
-		HMAC_SHA1_96_EtM,
-		HMAC_MD5_96_EtM,
-		HMAC_SHA1_96,
-		HMAC_MD5_96,
-		0, // Dummy for HMAC_SHA2_512_96,
-		0, // Dummy for HMAC_SHA2_256_96,
-	};
-
-	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
-}
-
-static void normalize_comp_order(char *buf)
-{
-	static char default_strings[] = {
-		COMP_DELAYED,
-		COMP_ZLIB,
-		COMP_NOCOMP,
-		COMP_NONE,
-	};
-
-	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
-}
-
 
 /* Remove local settings from the shared memory block. */
 static void clear_local_settings(PTInstVar pvar)
@@ -645,8 +453,8 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	// Remember password (2006.8.5 yutaka)
 	WritePrivateProfileString("TTSSH", "RememberPassword",
-	    settings->remember_password ? "1" : "0",
-	    fileName);
+	                          settings->remember_password ? "1" : "0",
+	                          fileName);
 
 	// 初回の認証ダイアログでサポートされているメソッドをチェックし、
 	// 無効なメソッドをグレイアウトする (2007.9.24 maya)
@@ -1145,10 +953,10 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 		HOSTS_open(pvar);
 		FWDUI_open(pvar);
 
-		// 設定を myproposal に反映するのは、接続直前のここだけ。 (2006.6.26 maya)
-		SSH2_update_cipher_myproposal(pvar);
+		// 設定を myproposal に反映するのは、接続直前のここだけ。
 		SSH2_update_kex_myproposal(pvar);
 		SSH2_update_host_key_myproposal(pvar);
+		SSH2_update_cipher_myproposal(pvar);
 		SSH2_update_hmac_myproposal(pvar);
 		SSH2_update_compression_myproposal(pvar);
 	}
@@ -1652,13 +1460,13 @@ hostssh_enabled:
 static void UTIL_SetDialogFont()
 {
 	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-				  pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
+	              pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
 }
 
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 {
 	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-				  pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
+	              pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
 	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
 	                             parent, TTXHostDlg, (LPARAM)rec);
 }
@@ -2292,7 +2100,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msg("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh_keytype_name(pvar->hostkey_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_type_name(pvar->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
@@ -2531,73 +2339,6 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 	return FALSE;
 }
 
-static char *get_cipher_name(int cipher)
-{
-	switch (cipher) {
-	case SSH_CIPHER_NONE:
-		UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_BORDER", pvar,
-		                  "<ciphers below this line are disabled>");
-		return pvar->ts->UIMsg;
-	case SSH_CIPHER_3DES:
-		return "3DES(SSH1)";
-	case SSH_CIPHER_DES:
-		return "DES(SSH1)";
-	case SSH_CIPHER_BLOWFISH:
-		return "Blowfish(SSH1)";
-
-	// for SSH2(yutaka)
-	case SSH2_CIPHER_AES128_CBC:
-		return "aes128-cbc(SSH2)";
-	case SSH2_CIPHER_AES192_CBC:
-		return "aes192-cbc(SSH2)";
-	case SSH2_CIPHER_AES256_CBC:
-		return "aes256-cbc(SSH2)";
-	case SSH2_CIPHER_3DES_CBC:
-		return "3des-cbc(SSH2)";
-	case SSH2_CIPHER_BLOWFISH_CBC:
-		return "blowfish-cbc(SSH2)";
-	case SSH2_CIPHER_AES128_CTR:
-		return "aes128-ctr(SSH2)";
-	case SSH2_CIPHER_AES192_CTR:
-		return "aes192-ctr(SSH2)";
-	case SSH2_CIPHER_AES256_CTR:
-		return "aes256-ctr(SSH2)";
-	case SSH2_CIPHER_ARCFOUR:
-		return "arcfour(SSH2)";
-	case SSH2_CIPHER_ARCFOUR128:
-		return "arcfour128(SSH2)";
-	case SSH2_CIPHER_ARCFOUR256:
-		return "arcfour256(SSH2)";
-	case SSH2_CIPHER_CAST128_CBC:
-		return "cast128-cbc(SSH2)";
-	case SSH2_CIPHER_3DES_CTR:
-		return "3des-ctr(SSH2)";
-	case SSH2_CIPHER_BLOWFISH_CTR:
-		return "blowfish-ctr(SSH2)";
-	case SSH2_CIPHER_CAST128_CTR:
-		return "cast128-ctr(SSH2)";
-	case SSH2_CIPHER_CAMELLIA128_CBC:
-		return "camellia128-cbc(SSH2)";
-	case SSH2_CIPHER_CAMELLIA192_CBC:
-		return "camellia192-cbc(SSH2)";
-	case SSH2_CIPHER_CAMELLIA256_CBC:
-		return "camellia256-cbc(SSH2)";
-	case SSH2_CIPHER_CAMELLIA128_CTR:
-		return "camellia128-ctr(SSH2)";
-	case SSH2_CIPHER_CAMELLIA192_CTR:
-		return "camellia192-ctr(SSH2)";
-	case SSH2_CIPHER_CAMELLIA256_CTR:
-		return "camellia256-ctr(SSH2)";
-	case SSH2_CIPHER_AES128_GCM:
-		return "aes128-gcm@openssh.com(SSH2)";
-	case SSH2_CIPHER_AES256_GCM:
-		return "aes256-gcm@openssh.com(SSH2)";
-
-	default:
-		return NULL;
-	}
-}
-
 static void set_move_button_status(HWND dlg, int type, int up, int down)
 {
 	HWND cipherControl = GetDlgItem(dlg, type);
@@ -2690,7 +2431,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 	for (i = 0; pvar->settings.CipherOrder[i] != 0; i++) {
 		int cipher = pvar->settings.CipherOrder[i] - '0';
-		char *name = get_cipher_name(cipher);
+		char *name = get_listbox_cipher_name(cipher, pvar);
 
 		if (name != NULL) {
 			SendMessage(cipherControl, LB_ADDSTRING, 0, (LPARAM) name);
@@ -2706,9 +2447,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.KexOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_KEX_BORDER", pvar,
-							  "<KEXs below this line are disabled>");
+			                  "<KEXs below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_kex_algorithm_name(index);
@@ -2727,12 +2468,12 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.HostKeyOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
-							  "<Host Keys below this line are disabled>");
+			                  "<Host Keys below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
-			name = get_ssh_keytype_name(index);
+			name = get_ssh2_hostkey_type_name(index);
 		}
 
 		if (name != NULL) {
@@ -2748,9 +2489,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.MacOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_MAC_BORDER", pvar,
-							  "<MACs below this line are disabled>");
+			                  "<MACs below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_ssh2_mac_name_by_id(index);
@@ -2769,9 +2510,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		int index = pvar->settings.CompOrder[i] - '0';
 		char *name = NULL;
 
-		if (index == 0)	{
+		if (index == 0) {
 			UTIL_get_lang_msg("DLG_SSHSETUP_COMP_BORDER", pvar,
-							  "<Compression methods below this line are disabled>");
+			                  "<Compression methods below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_ssh2_comp_name(index);
@@ -2941,7 +2682,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 			buf[0] = 0;
 			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
 			for (j = 0; j <= SSH_CIPHER_MAX; j++) {
-				char *cipher_name = get_cipher_name(j);
+				char *cipher_name = get_listbox_cipher_name(j, pvar);
 				if (cipher_name != NULL && strcmp(buf, cipher_name) == 0) {
 					break;
 				}
@@ -2995,7 +2736,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
 			for (j = 0;
 				j <= KEY_MAX
-				 && strcmp(buf, get_ssh_keytype_name(j)) != 0; j++) {
+				 && strcmp(buf, get_ssh2_hostkey_type_name(j)) != 0; j++) {
 			}
 			if (j <= KEY_MAX) {
 				buf2[buf2index] = '0' + j;
@@ -3216,7 +2957,7 @@ static void choose_read_only_file(HWND dlg)
 }
 
 static INT_PTR CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
-									LPARAM lParam)
+                                    LPARAM lParam)
 {
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -3537,144 +3278,6 @@ error:
 	return FALSE;
 }
 
-
-//
-// SSH1 3DES
-//
-/*
- * This is used by SSH1:
- *
- * What kind of triple DES are these 2 routines?
- *
- * Why is there a redundant initialization vector?
- *
- * If only iv3 was used, then, this would till effect have been
- * outer-cbc. However, there is also a private iv1 == iv2 which
- * perhaps makes differential analysis easier. On the other hand, the
- * private iv1 probably makes the CRC-32 attack ineffective. This is a
- * result of that there is no longer any known iv1 to use when
- * choosing the X block.
- */
-struct ssh1_3des_ctx
-{
-	EVP_CIPHER_CTX  *k1, *k2, *k3;
-};
-
-static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *iv, int enc)
-{
-	struct ssh1_3des_ctx *c;
-	u_char *k1, *k2, *k3;
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) == NULL) {
-		c = malloc(sizeof(*c));
-		c->k1 = EVP_CIPHER_CTX_new();
-		c->k2 = EVP_CIPHER_CTX_new();
-		c->k3 = EVP_CIPHER_CTX_new();
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
-		EVP_CIPHER_CTX_set_app_data(ctx, c);
-	}
-	if (key == NULL)
-		return (1);
-	if (enc == -1)
-		enc = EVP_CIPHER_CTX_encrypting(ctx); // ctx->encrypt
-	k1 = k2 = k3 = (u_char *) key;
-	k2 += 8;
-	if (EVP_CIPHER_CTX_key_length(ctx) >= 16+8) {
-		if (enc)
-			k3 += 16;
-		else
-			k1 += 16;
-	}
-	EVP_CIPHER_CTX_init(c->k1);
-	EVP_CIPHER_CTX_init(c->k2);
-	EVP_CIPHER_CTX_init(c->k3);
-	if (EVP_CipherInit(c->k1, EVP_des_cbc(), k1, NULL, enc) == 0 ||
-		EVP_CipherInit(c->k2, EVP_des_cbc(), k2, NULL, !enc) == 0 ||
-		EVP_CipherInit(c->k3, EVP_des_cbc(), k3, NULL, enc) == 0) {
-			EVP_CIPHER_CTX_free(c->k1);
-			EVP_CIPHER_CTX_free(c->k2);
-			EVP_CIPHER_CTX_free(c->k3);
-			SecureZeroMemory(c, sizeof(*c));
-			free(c);
-			EVP_CIPHER_CTX_set_app_data(ctx, NULL);
-			return (0);
-	}
-	return (1);
-}
-
-static int ssh1_3des_cbc(EVP_CIPHER_CTX *ctx, u_char *dest, const u_char *src, u_int len)
-{
-	struct ssh1_3des_ctx *c;
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) == NULL) {
-		//error("ssh1_3des_cbc: no context");
-		return (0);
-	}
-	if (EVP_Cipher(c->k1, dest, (u_char *)src, len) == 0 ||
-		EVP_Cipher(c->k2, dest, dest, len) == 0 ||
-		EVP_Cipher(c->k3, dest, dest, len) == 0)
-		return (0);
-	return (1);
-}
-
-static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
-{
-	struct ssh1_3des_ctx *c;
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		EVP_CIPHER_CTX_cleanup(c->k1);
-		EVP_CIPHER_CTX_cleanup(c->k2);
-		EVP_CIPHER_CTX_cleanup(c->k3);
-		SecureZeroMemory(c, sizeof(*c));
-		free(c);
-		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
-	}
-	return (1);
-}
-
-// 下記関数は未使用。
-void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
-{
-	struct ssh1_3des_ctx *c;
-
-	if (len != 24)
-		//fatal("%s: bad 3des iv length: %d", __func__, len);
-		;
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(evp)) == NULL)
-		//fatal("%s: no 3des context", __func__);
-		;
-
-	if (doset) {
-		//debug3("%s: Installed 3DES IV", __func__);
-		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k1), iv, 8);
-		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k2), iv + 8, 8);
-		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k3), iv + 16, 8);
-	} else {
-		//debug3("%s: Copying 3DES IV", __func__);
-		memcpy(iv, EVP_CIPHER_CTX_iv(c->k1), 8);
-		memcpy(iv + 8, EVP_CIPHER_CTX_iv(c->k2), 8);
-		memcpy(iv + 16, EVP_CIPHER_CTX_iv(c->k3), 8);
-	}
-}
-
-const EVP_CIPHER *evp_ssh1_3des(void)
-{
-	static EVP_CIPHER *p = NULL;
-
-	if (p == NULL) {
-		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/8, /*key_len*/16);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
-	}
-	if (p) {
-		EVP_CIPHER_meth_set_iv_length(p, 0);
-		EVP_CIPHER_meth_set_init(p, ssh1_3des_init);
-		EVP_CIPHER_meth_set_cleanup(p, ssh1_3des_cleanup);
-		EVP_CIPHER_meth_set_do_cipher(p, ssh1_3des_cbc);
-		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH);
-	}
-	return (p);
-}
 
 static void ssh_make_comment(char *comment, int maxlen)
 {
@@ -4035,7 +3638,7 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
 static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
-	SSH2Cipher *cipher = NULL;
+	const struct ssh2cipher *cipher = NULL;
 	char *ciphername = DEFAULT_CIPHERNAME;
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;
@@ -4044,7 +3647,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	int blocksize, keylen, ivlen, authlen, i, n; 
 	unsigned char *key = NULL, salt[SALT_LEN];
 	char *kdfname = KDFNAME;
-	EVP_CIPHER_CTX *cipher_ctx = NULL;
+	struct sshcipher_ctx *cc = NULL;
 	Key keyblob;
 	unsigned char *cp = NULL;
 	unsigned int len, check;
@@ -4055,8 +3658,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	kdf = buffer_init();
 	encoded = buffer_init();
 	blob = buffer_init();
-	cipher_ctx = EVP_CIPHER_CTX_new();
-	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL || cipher_ctx == NULL)
+	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
 		goto ed25519_error;
 
 	if (passphrase == NULL || !strlen(passphrase)) {
@@ -4083,8 +3685,8 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
-	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
-		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
+	cipher = get_cipher_by_name(ciphername);
+	cipher_init_SSH2(&cc, cipher, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
@@ -4127,12 +3729,12 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 
 	/* encrypt */
 	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
-	if (EVP_Cipher(cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
+	if (EVP_Cipher(cc->evp, cp, buffer_ptr(b), buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);
 		//goto error;
 	}
-	cipher_cleanup_SSH2(cipher_ctx);
+	cipher_free_SSH2(cc);
 
 	len = 2 * buffer_len(encoded);
 	cp = malloc(len);
@@ -4182,14 +3784,10 @@ ed25519_error:
 	buffer_free(kdf);
 	buffer_free(encoded);
 	buffer_free(blob);
-
-	if (cipher_ctx) {
-		EVP_CIPHER_CTX_free(cipher_ctx);
-	}
 }
 
 static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
-										LPARAM lParam)
+                                        LPARAM lParam)
 {
 	static ssh_keytype key_type;
 	static int saved_key_bits;
@@ -4637,7 +4235,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				case KEY_ECDSA256: // ECDSA
 				case KEY_ECDSA384:
 				case KEY_ECDSA521:
-					keyname = get_ssh_keytype_name(public_key.type);
+					keyname = get_ssh2_hostkey_type_name(public_key.type);
 					buffer_put_string(b, keyname, strlen(keyname));
 					s = curve_keytype_to_name(public_key.type);
 					buffer_put_string(b, s, strlen(s));
@@ -4646,7 +4244,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					break;
 
 				case KEY_ED25519:
-					keyname = get_ssh_keytype_name(public_key.type);
+					keyname = get_ssh2_hostkey_type_name(public_key.type);
 					buffer_put_cstring(b, keyname);
 					buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ);
 					break;
@@ -4802,7 +4400,8 @@ public_error:
 				MD5_CTX md;
 				unsigned char digest[16];
 				char *passphrase = buf;
-				EVP_CIPHER_CTX *cipher_ctx = NULL;
+				const struct ssh2cipher *cipher = NULL;
+				struct sshcipher_ctx *cc = NULL;
 				FILE *fp;
 				char wrapped[4096];
 				BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
@@ -4810,7 +4409,7 @@ public_error:
 				if (passphrase[0] == '\0') { // passphrase is empty
 					cipher_num = SSH_CIPHER_NONE;
 				} else {
-					cipher_num = SSH_CIPHER_3DES; // 3DES-CBC
+					cipher_num = SSH_CIPHER_3DES; // 3DES
 				}
 
 				b = buffer_init();
@@ -4821,9 +4420,6 @@ public_error:
 					buffer_free(b);
 					break;
 				}
-
-				cipher_ctx = EVP_CIPHER_CTX_new();
-				/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335で処置予定) ***/
 
 				// set random value
 				rnd = arc4random();
@@ -4874,9 +4470,11 @@ public_error:
 				MD5_Update(&md, (const unsigned char *)passphrase, strlen(passphrase));
 				MD5_Final(digest, &md);
 				if (cipher_num == SSH_CIPHER_NONE) {
-					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, 0, pvar);
+					cipher = get_cipher_by_name("none");
+					cipher_init_SSH2(&cc, cipher, digest, 16, NULL, 0, CIPHER_ENCRYPT, pvar);
 				} else {
-					cipher_init_SSH2(cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, evp_ssh1_3des(), 0, 0, pvar);
+					cipher = get_cipher_by_name("3des");
+					cipher_init_SSH2(&cc, cipher, digest, 16, NULL, 0, CIPHER_ENCRYPT, pvar);
 				}
 				len = buffer_len(b);
 				if (len % 8) { // fatal error
@@ -4888,10 +4486,7 @@ public_error:
 					goto error;
 				}
 
-				if (EVP_Cipher(cipher_ctx, wrapped, buffer_ptr(b), len) == 0) {
-					goto error;
-				}
-				if (EVP_CIPHER_CTX_cleanup(cipher_ctx) == 0) {
+				if (EVP_Cipher(cc->evp, wrapped, buffer_ptr(b), len) == 0) {
 					goto error;
 				}
 
@@ -4914,14 +4509,12 @@ public_error:
 error:;
 				buffer_free(b);
 				buffer_free(enc);
-				if (cipher_ctx) {
-					EVP_CIPHER_CTX_free(cipher_ctx);
-				}
+				cipher_free_SSH2(cc);
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
 
-			} else { // SSH2 RSA, DSA, ECDSA			
+			} else { // SSH2 RSA, DSA, ECDSA
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
@@ -5082,7 +4675,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			pvar->showing_err = TRUE;
 			pvar->err_msg = NULL;
 			MessageBox(NULL, msg, "TTSSH",
-					   MB_TASKMODAL | MB_ICONEXCLAMATION);
+			           MB_TASKMODAL | MB_ICONEXCLAMATION);
 			free(msg);
 			pvar->showing_err = FALSE;
 

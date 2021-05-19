@@ -1,4 +1,6 @@
-/*	$OpenBSD: cipher.h,v 1.34 2003/11/10 16:23:41 jakob Exp $	*/
+/* Imported from OpenSSH-8.5p1, TeraTerm Project */
+
+/* $OpenBSD: cipher.h,v 1.44 2014/01/25 10:12:50 dtucker Exp $ */
 
 /*
  * Author: Tatu Ylonen <ylo@cs.hut.fi>
@@ -37,7 +39,12 @@
 #ifndef CIPHER_H
 #define CIPHER_H
 
+typedef unsigned int u_int;
+typedef unsigned char u_char;
+
 #include <openssl/evp.h>
+#include "cipher-chachapoly.h"
+
 /*
  * Cipher types for SSH-1.  New types can be added, but old types should not
  * be removed for compatibility.  The maximum allowed value is 31.
@@ -45,60 +52,89 @@
 #define SSH_CIPHER_SSH2		-3
 #define SSH_CIPHER_ILLEGAL	-2	/* No valid cipher selected. */
 #define SSH_CIPHER_NOT_SET	-1	/* None selected (invalid number). */
-#define SSH_CIPHER_NONE		0	/* no encryption */
-#define SSH_CIPHER_IDEA		1	/* IDEA CFB */
-#define SSH_CIPHER_DES		2	/* DES CBC */
-#define SSH_CIPHER_3DES		3	/* 3DES CBC */
-#define SSH_CIPHER_BROKEN_TSS	4	/* TRI's Simple Stream encryption CBC */
-#define SSH_CIPHER_BROKEN_RC4	5	/* Alleged RC4 */
-#define SSH_CIPHER_BLOWFISH	6
-#define SSH_CIPHER_RESERVED	7
+//#define SSH_CIPHER_NONE		0	/* no encryption */
+//#define SSH_CIPHER_IDEA		1	/* IDEA CFB */
+//#define SSH_CIPHER_DES		2	/* DES CBC */
+//#define SSH_CIPHER_3DES		3	/* 3DES CBC */
+//#define SSH_CIPHER_BROKEN_TSS	4	/* TRI's Simple Stream encryption CBC */
+//#define SSH_CIPHER_BROKEN_RC4	5	/* Alleged RC4 */
+//#define SSH_CIPHER_BLOWFISH	6
+//#define SSH_CIPHER_RESERVED	7
 
 #define CIPHER_ENCRYPT		1
 #define CIPHER_DECRYPT		0
 
-typedef struct Cipher Cipher;
-typedef struct CipherContext CipherContext;
 
-struct Cipher;
-struct CipherContext {
-	int	plaintext;
-	EVP_CIPHER_CTX *evp;
-	Cipher *cipher;
+typedef enum {
+	// SSH1
+	SSH_CIPHER_NONE, SSH_CIPHER_IDEA, SSH_CIPHER_DES, SSH_CIPHER_3DES,
+	SSH_CIPHER_TSS, SSH_CIPHER_RC4, SSH_CIPHER_BLOWFISH,
+	// SSH2
+	SSH2_CIPHER_3DES_CBC, SSH2_CIPHER_AES128_CBC,
+	SSH2_CIPHER_AES192_CBC, SSH2_CIPHER_AES256_CBC,
+	SSH2_CIPHER_BLOWFISH_CBC, SSH2_CIPHER_AES128_CTR,
+	SSH2_CIPHER_AES192_CTR, SSH2_CIPHER_AES256_CTR,
+	SSH2_CIPHER_ARCFOUR, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR256,
+	SSH2_CIPHER_CAST128_CBC,
+	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
+	SSH2_CIPHER_CAMELLIA128_CBC, SSH2_CIPHER_CAMELLIA192_CBC, SSH2_CIPHER_CAMELLIA256_CBC,
+	SSH2_CIPHER_CAMELLIA128_CTR, SSH2_CIPHER_CAMELLIA192_CTR, SSH2_CIPHER_CAMELLIA256_CTR,
+	SSH2_CIPHER_AES128_GCM, SSH2_CIPHER_AES256_GCM, SSH2_CIPHER_CHACHAPOLY,
+	SSH_CIPHER_MAX = SSH2_CIPHER_CHACHAPOLY,
+} SSHCipherId;
+
+struct ssh2cipher {
+	SSHCipherId id;
+	char *name;
+	u_int block_size;
+	u_int key_len;
+	u_int discard_len;
+	u_int iv_len;
+	u_int auth_len;
+	const EVP_CIPHER *(*func)(void);
 };
 
-u_int	 cipher_mask_ssh1(int);
-Cipher	*cipher_by_name(const char *);
-Cipher	*cipher_by_number(int);
-int	 cipher_number(const char *);
-char	*cipher_name(int);
-int	 ciphers_valid(const char *);
-void	 cipher_init(CipherContext *, Cipher *, const u_char *, u_int,
-    const u_char *, u_int, int);
-void	 cipher_crypt(CipherContext *, u_char *, const u_char *, u_int);
-void	 cipher_cleanup(CipherContext *);
-void	 cipher_set_key_string(CipherContext *, Cipher *, const char *, int);
-u_int	 cipher_blocksize(const Cipher *);
-u_int	 cipher_keylen(const Cipher *);
+struct sshcipher_ctx {
+	// TTSSH では SSH_CIPHER_NONE が無効なので、plaintext は使用されない
+	// int	plaintext;
+	
+	// TTSSH では CRYPT_encrypt_aead(), CRYPT_decrypt_aead() が別れていて encrypt で切り替えないので使用されない
+	// int	encrypt;
+	
+	EVP_CIPHER_CTX *evp;
+	struct chachapoly_ctx *cp_ctx;
+	
+	// OpenSSH で ifndef WITH_OPENSSL の時に使用されるものなので、ac_ctx は使用されない
+	// aesctr_ctx ac_ctx; /* XXX union with evp? */
+	
+	// OpenSSH では const struct sshcipher *cipher;
+	const struct ssh2cipher *cipher;
+};
 
-u_int	 cipher_get_number(const Cipher *);
-void	 cipher_get_keyiv(CipherContext *, u_char *, u_int);
-void	 cipher_set_keyiv(CipherContext *, u_char *);
-int	 cipher_get_keyiv_len(const CipherContext *);
-int	 cipher_get_keycontext(const CipherContext *, u_char *);
-void	 cipher_set_keycontext(CipherContext *, u_char *);
 
-void cipher_init_SSH2(
-		EVP_CIPHER_CTX *evp,
-		const u_char *key, u_int keylen,
-		const u_char *iv, u_int ivlen,
-		int encrypt,
-		const EVP_CIPHER *type,
-		int discard_len,
-		unsigned int authlen,
-		PTInstVar pvar
+int get_cipher_id(const struct ssh2cipher *cipher);
+u_int get_cipher_block_size(const struct ssh2cipher *cipher);
+u_int get_cipher_key_len(const struct ssh2cipher *cipher);
+u_int get_cipher_discard_len(const struct ssh2cipher *cipher);
+u_int get_cipher_iv_len(const struct ssh2cipher *cipher);
+u_int get_cipher_auth_len(const struct ssh2cipher *cipher);
+const EVP_CIPHER *get_cipher_EVP_CIPHER(const struct ssh2cipher *cipher);
+char *get_cipher_string(const struct ssh2cipher *cipher);
+const struct ssh2cipher* get_cipher_by_name(char *name);
+char *get_cipher_name(int cipher_id);
+char *get_listbox_cipher_name(int cipher_id, PTInstVar pvar);
+
+void normalize_cipher_order(char *buf);
+const struct ssh2cipher *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal);
+void SSH2_update_cipher_myproposal(PTInstVar pvar);
+
+int cipher_init_SSH2(
+	struct sshcipher_ctx **ccp, const struct ssh2cipher *cipher,
+	const u_char *key, u_int keylen,
+	const u_char *iv, u_int ivlen,
+	int do_encrypt,
+	PTInstVar pvar
 );
-
-void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp);
+void cipher_free_SSH2(struct sshcipher_ctx *cc);
 
 #endif				/* CIPHER_H */
