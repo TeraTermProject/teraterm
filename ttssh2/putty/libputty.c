@@ -28,6 +28,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * putty プロジェクトは
+ * - PuTTY のソースファイル (プロジェクトに読み込むファイルは最小限)
+ * - libputty.c/h 
+ *   PuTTY の機能を利用するインターフェース
+ *   PuTTY のソースファイルから必要な関数のみをコピー
+ * から静的ライブラリ libputty.lib を生成し、TTXSSH からリンクされて利用される。
+ * そのため、TTXSSH 側の定義は持ち込まない。
+ */
+
 #include <windows.h>
 #include <assert.h>
 

@@ -65,7 +65,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;$(SolutionDir)argon2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -112,7 +112,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;$(SolutionDir)argon2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -172,6 +172,7 @@
     <ClCompile Include="kex.c" />
     <ClCompile Include="key.c" />
     <ClCompile Include="keyfiles.c" />
+    <ClCompile Include="keyfiles-putty.c" />
     <ClCompile Include="mac.c" />
     <ClCompile Include="pkt.c" />
     <ClCompile Include="poly1305.c" />
@@ -211,6 +212,7 @@
     <ClInclude Include="kex.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="keyfiles.h" />
+    <ClInclude Include="keyfiles-putty.h" />
     <ClInclude Include="mac.h" />
     <ClInclude Include="pkt.h" />
     <ClInclude Include="poly1305.h" />
@@ -233,6 +235,10 @@
     <ResourceCompile Include="ttxssh.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\argon2\argon2.v16.vcxproj">
+      <Project>{d33c59b8-e227-47d2-8f80-eda3e28bf995}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\puttyrev\puttyrev.v16.vcxproj">
       <Project>{61eb955f-2794-4607-860f-0aa296fa58bd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

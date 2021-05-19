@@ -85,6 +85,9 @@
     <ClCompile Include="keyfiles.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="keyfiles-putty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="mac.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -214,6 +217,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keyfiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keyfiles-putty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mac.h">

@@ -82,6 +82,7 @@
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
 - cJSON 1.7.14 (https://github.com/DaveGamble/cJSON/)
+- The reference C implementation of Argon2 20190702 (https://github.com/P-H-C/phc-winner-argon2)
 
 
 * Notice for SVN committer
@@ -155,7 +156,7 @@ Example: adding a TTSSH menu under File menu
 
 * How to build Libraries
   1. PuTTY (used by TTSSH)
-     (1) Extract putty source into libs/putty directory.
+     (1) Extract PuTTY source into libs/putty directory.
 
   2. Oniguruma (used by Tera Term Macro)
      (1) Extract oniguruma source into libs/oniguruma directory.
@@ -181,6 +182,9 @@ Example: adding a TTSSH menu under File menu
 
   6. cJSON (used by TTXCheckUpdate plugin)
      (1) Extract cJSON source into libs/cJSON directory.
+
+  7. The reference C implementation of Argon2 (used by TTSSH)
+     (1) Extract argon2 source into libs/argon2 directory.
 
 
 * How to build Tera Term

@@ -18,6 +18,8 @@ set REF_J=ja\html\reference
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_J%\zlib-LICENSE.txt      -l unix
 %TOSJIS% -i ..\libs\cJSON\LICENSE       -o %REF_J%\cJSON-LICENSE.txt     -l crlf
 %TOSJIS% -i ..\libs\cJSON\LICENSE       -o %REF_E%\cJSON-LICENSE.txt     -l crlf
+%TOSJIS% -i ..\libs\argon2\LICENSE      -o %REF_E%\argon2-LICENSE.txt    -l unix
+%TOSJIS% -i ..\libs\argon2\LICENSE      -o %REF_J%\argon2-LICENSE.txt    -l unix
 
 perl -C0 -pe "s/^\xef\xbb\xbf//" ja/html/reference/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl > ja/html/reference/build_with_cmake_utf8.html
 %TOSJIS% -i ja/html/reference/build_with_cmake_utf8.html -o ja/html/reference/build_with_cmake.html  -c utf8
