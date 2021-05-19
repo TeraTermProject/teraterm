@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ab6de084-0bb8-45ae-bf67-583bc1c7f28d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File">
+      <UniqueIdentifier>{7be7b0e1-cba8-4d3d-bbfd-a06bf605c2a9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\argon2\src\blake2\blake2-impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\blake2\blake2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\blake2\blamka-round-opt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\blake2\blamka-round-ref.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\ref.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\argon2\src\thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="argon2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\argon2\src\argon2.c">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\argon2\src\blake2\blake2b.c">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\argon2\src\core.c">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\argon2\src\encoding.c">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\argon2\src\ref.c">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\argon2\src\thread.c">
+      <Filter>Source File</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

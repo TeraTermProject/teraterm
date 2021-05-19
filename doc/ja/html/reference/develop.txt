@@ -65,6 +65,7 @@
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html)
+- The reference C implementation of Argon2 20190702 (https://github.com/P-H-C/phc-winner-argon2)
 
 
 ■ SVN コミッターへの注意
@@ -141,7 +142,8 @@
 
 ■ ライブラリのビルド方法
   1. PuTTY (used by TTSSH)
-     (1) putty のソースを libs/putty の中に展開する。
+     (1) PuTTY のソースを libs/putty の中に展開する。
+     * ttssh ソリューション配下の putty プロジェクトにより必要な機能のみが静的ライブラリ化され、ttxssh.dll にリンクされるため、展開するだけでよい。
 
   2. Oniguruma (used by Tera Term Macro)
      (1) oniguruma のソースを libs/oniguruma の中に展開する。
@@ -164,6 +166,10 @@
      (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
      (3) コマンドプロンプト上から libs ディレクトリに移動し、buildSFMT.bat を実行する。
      (4) 必要に応じて libs/SFMT/SFMT_version_for_teraterm.h のバージョン番号を修正する。
+
+  6. The reference C implementation of Argon2 (used by TTSSH)
+     (1) argon2 のソースを libs/argon2 の中に展開する。
+     * argon2 リファレンス実装には静的ライブラリを生成するプロジェクトファイルが含まれていない。ttssh ソリューション配下の argon2 プロジェクトにより静的ライブラリが生成され、ttxssh.dll にリンクされるため、展開するだけでよい。
 
 
 ■ Tera Termのビルド方法

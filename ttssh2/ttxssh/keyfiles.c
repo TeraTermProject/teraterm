@@ -34,7 +34,10 @@ See LICENSE.TXT for the license.
 
 #include "ttxssh.h"
 #include "keyfiles.h"
+#include "keyfiles-putty.h"
 #include "key.h"
+#include "hostkey.h"
+#include "argon2.h"
 
 #include <io.h>
 #include <fcntl.h>
@@ -729,7 +732,6 @@ error:
  * Private-Lines: 1
  * Base64...
  * Private-MAC: Base16...
- * Private-Hash: Base16... (PuTTY-User-Key-File-1) ???
  * 
  * for "ssh-rsa", it will be composed of
  *
@@ -804,14 +806,16 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
                                  char *errmsg,
                                  int errmsg_len)
 {
+	char header[40], *b = NULL, *encryption = NULL, *comment = NULL, *mac = NULL;
 	Key *result = NULL;
-	EVP_PKEY *pk = NULL;
-	unsigned long err = 0;
-	int i, len, len2;
-	char *encname = NULL, *comment = NULL, *private_mac = NULL;
-	buffer_t *pubkey = NULL, *prikey = NULL;
-	const struct ssh2cipher *cipher = NULL;
-	struct sshcipher_ctx *cc = NULL;
+	buffer_t *public_blob = NULL, *private_blob = NULL, *cipher_mac_keys_blob = NULL;
+	unsigned char *cipherkey = NULL, *cipheriv = NULL, *mackey = NULL;
+	unsigned int cipherkey_len, cipheriv_len, mackey_len;
+	buffer_t *passphrase_salt = buffer_init();
+	const struct ssh2cipher *ciphertype;
+	int lines, len;
+	ppk_argon2_parameters params;
+	unsigned fmt_version = 0;
 
 	result = (Key *)malloc(sizeof(Key));
 	ZeroMemory(result, sizeof(Key)); 
@@ -820,272 +824,314 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	result->dsa = NULL;
 	result->ecdsa = NULL;
 
-	pubkey = buffer_init();
-	prikey = buffer_init();
+	// version and algorithm-name
+	if (!ppk_read_header(fp, header)) {
+		strncpy_s(errmsg, errmsg_len, "no header line found in key file", _TRUNCATE);
+		goto error;
+	}
+	if (0 == strcmp(header, "PuTTY-User-Key-File-3")) {
+		fmt_version = 3;
+	}
+	else if (0 == strcmp(header, "PuTTY-User-Key-File-2")) {
+		fmt_version = 2;
+	}
+	else if (0 == strcmp(header, "PuTTY-User-Key-File-1")) {
+		strncpy_s(errmsg, errmsg_len, "PuTTY key format too old", _TRUNCATE);
+		goto error;
+	}
+	else if (0 == strncmp(header, "PuTTY-User-Key-File-", 20)) {
+		strncpy_s(errmsg, errmsg_len, "PuTTY key format too new", _TRUNCATE);
+		goto error;
+	}
+	if ((b = ppk_read_body(fp)) == NULL) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if (0 == strcmp(b, "ssh-dss")) {
+		result->type = KEY_DSA;
+	}
+	else if (0 == strcmp(b, "ssh-rsa")) {
+		result->type = KEY_RSA;
+	}
+	else if (0 == strcmp(b, "ecdsa-sha2-nistp256")) {
+		result->type = KEY_ECDSA256;
+	}
+	else if (0 == strcmp(b, "ecdsa-sha2-nistp384")) {
+		result->type = KEY_ECDSA384;
+	}
+	else if (0 == strcmp(b, "ecdsa-sha2-nistp521")) {
+		result->type = KEY_ECDSA521;
+	}
+	else if (0 == strcmp(b, "ssh-ed25519")) {
+		result->type = KEY_ED25519;
+	}
+	else {
+		strncpy_s(errmsg, errmsg_len, "unsupported key algorithm", _TRUNCATE);
+		free(b);
+		goto error;
+	}
+	free(b);
 
-	// parse keyfile & decode blob
-	{
-	char line[200], buf[100];
-	BIO *bmem, *b64, *chain;
-	while (fgets(line, sizeof(line), fp) != NULL) {
-		if (strncmp(line, "PuTTY-User-Key-File-2: ", strlen("PuTTY-User-Key-File-2: ")) == 0) {
-			if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ssh-dss", strlen("ssh-dss")) == 0) {
-				result->type = KEY_DSA;
-			}
-			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ssh-rsa", strlen("ssh-rsa")) == 0) {
-				result->type = KEY_RSA;
-			}
-			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ecdsa-sha2-nistp256", strlen("ecdsa-sha2-nistp256")) == 0) {
-				result->type = KEY_ECDSA256;
-			}
-			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ecdsa-sha2-nistp384", strlen("ecdsa-sha2-nistp384")) == 0) {
-				result->type = KEY_ECDSA384;
-			}
-			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ecdsa-sha2-nistp521", strlen("ecdsa-sha2-nistp521")) == 0) {
-				result->type = KEY_ECDSA521;
-			}
-			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ssh-ed25519", strlen("ssh-ed25519")) == 0) {
-				result->type = KEY_ED25519;
-			}
-			else {
-				strncpy_s(errmsg, errmsg_len, "not a PuTTY SSH-2 private key", _TRUNCATE);
-				goto error;
-			}
-		}
-		else if (strncmp(line, "Encryption: ", strlen("Encryption: ")) == 0) {
-			len = strlen(line + strlen("Encryption: "));
-			encname = (char *)malloc(len); // trim \n
-			strncpy_s(encname, len, line + strlen("Encryption: "), _TRUNCATE);
-			if (strcmp(encname, "aes256-cbc") == 0) {
-				// NOP
-			}
-			else if (strcmp(encname, "none") == 0) {
-				// NOP
-			}
-			else {
-				strncpy_s(errmsg, errmsg_len, "unknown encryption type", _TRUNCATE);
-				goto error;
-			}
-		}
-		else if (strncmp(line, "Comment: ", strlen("Comment: ")) == 0) {
-			len = strlen(line + strlen("Comment: "));
-			comment = (char *)malloc(len); // trim \n
-			strncpy_s(comment, len, line + strlen("Comment: "), _TRUNCATE);
-		}
-		else if (strncmp(line, "Private-MAC: ", strlen("Private-MAC: ")) == 0) {
-			len = strlen(line + strlen("Private-MAC: "));
-			private_mac = (char *)malloc(len); // trim \n
-			strncpy_s(private_mac, len, line + strlen("Private-MAC: "), _TRUNCATE);
-		}
-		else if (strncmp(line, "Private-HASH: ", strlen("Private-HASH: ")) == 0) {
-			strncpy_s(errmsg, errmsg_len, "not a PuTTY SSH-2 private key", _TRUNCATE);
+	// encryption-type
+	if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Encryption")) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if ((encryption = ppk_read_body(fp)) == NULL) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if (strcmp(encryption, "aes256-cbc") == 0) {
+		ciphertype = get_cipher_by_name(encryption);
+	}
+	else if (strcmp(encryption, "none") == 0) {
+		ciphertype = get_cipher_by_name(encryption);
+	}
+	else {
+		strncpy_s(errmsg, errmsg_len, "unknown encryption type", _TRUNCATE);
+		goto error;
+	}
+
+	// key-comment-string
+	if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Comment")) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if ((comment = ppk_read_body(fp)) == NULL) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+
+	// public key
+	if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Public-Lines")) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if ((b = ppk_read_body(fp)) == NULL) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		free(b);
+		goto error;
+	}
+	lines = atoi(b);
+	free(b);
+	public_blob = buffer_init();
+	if (!ppk_read_blob(fp, lines, public_blob)) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+
+	if (fmt_version >= 3 && ciphertype->key_len != 0) {
+		size_t i;
+
+		// argon2-flavour
+		if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Key-Derivation")) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
 			goto error;
 		}
-		else if (strncmp(line, "Public-Lines: ", strlen("Public-Lines: ")) == 0) {
-			len = atoi(line + strlen("Public-Lines: "));
-			b64 = BIO_new(BIO_f_base64());
-			bmem = BIO_new(BIO_s_mem());
-			for (i=0; i<len && fgets(line, sizeof(line), fp)!=NULL; i++) {
-				BIO_write(bmem, line, strlen(line));
-			}
-			BIO_flush(bmem);
-			chain = BIO_push(b64, bmem);
-			BIO_set_mem_eof_return(chain, 0);
-			while ((len2 = BIO_read(chain, buf, sizeof(buf))) > 0) {
-				buffer_append(pubkey, buf, len2);
-			}
-			BIO_free_all(chain);
+		if ((b = ppk_read_body(fp)) == NULL) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			free(b);
+			goto error;
 		}
-		else if (strncmp(line, "Private-Lines: ", strlen("Private-Lines: ")) == 0) {
-			len = atoi(line + strlen("Private-Lines: "));
-			b64 = BIO_new(BIO_f_base64());
-			bmem = BIO_new(BIO_s_mem());
-			for (i=0; i<len && fgets(line, sizeof(line), fp)!=NULL; i++) {
-				BIO_write(bmem, line, strlen(line));
-			}
-			BIO_flush(bmem);
-			chain = BIO_push(b64, bmem);
-			BIO_set_mem_eof_return(chain, 0);
-			while ((len2 = BIO_read(chain, buf, sizeof(buf))) > 0) {
-				buffer_append(prikey, buf, len2);
-			}
-			BIO_free_all(chain);
+		if (!strcmp(b, "Argon2d")) {
+			params.type = Argon2_d;
+		}
+		else if (!strcmp(b, "Argon2i")) {
+			params.type = Argon2_i;
+		}
+		else if (!strcmp(b, "Argon2id")) {
+			params.type = Argon2_id;
 		}
 		else {
-			strncpy_s(errmsg, errmsg_len, "not a PuTTY SSH-2 private key", _TRUNCATE);
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			free(b);
 			goto error;
 		}
-	}
+		free(b);
+
+		if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Argon2-Memory")) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			goto error;
+		}
+		if ((b = ppk_read_body(fp)) == NULL) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			free(b);
+			goto error;
+		}
+		if (!str_to_uint32_t(b, &params.argon2_mem)) {
+			free(b);
+			goto error;
+		}
+		free(b);
+
+		if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Argon2-Passes")) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			goto error;
+		}
+		if ((b = ppk_read_body(fp)) == NULL) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			free(b);
+			goto error;
+		}
+		if (!str_to_uint32_t(b, &params.argon2_passes)) {
+			free(b);
+			goto error;
+		}
+		free(b);
+
+		if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Argon2-Parallelism")) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			goto error;
+		}
+		if ((b = ppk_read_body(fp)) == NULL) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			free(b);
+			goto error;
+		}
+		if (!str_to_uint32_t(b, &params.argon2_parallelism)) {
+			free(b);
+			goto error;
+		}
+		free(b);
+
+		if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Argon2-Salt")) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			goto error;
+		}
+		if ((b = ppk_read_body(fp)) == NULL) {
+			strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+			free(b);
+			goto error;
+		}
+		for (i = 0; b[i]; i += 2) {
+			if (isxdigit((unsigned char)b[i]) && b[i+1] &&
+			    isxdigit((unsigned char)b[i+1])) {
+				char s[3];
+				s[0] = b[i];
+				s[1] = b[i+1];
+				s[2] = '\0';
+				buffer_put_char(passphrase_salt, strtoul(s, NULL, 16));
+			}
+			else {
+				strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+				free(b);
+				goto error;
+			}
+		}
+		params.salt = buffer_ptr(passphrase_salt);
+		params.saltlen = buffer_len(passphrase_salt);
+		free(b);
 	}
 
-	if (result->type == KEY_NONE || strlen(encname) == 0 || buffer_len(pubkey) == 0 || buffer_len(prikey) == 0) {
+	// private key
+	if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Private-Lines")) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if ((b = ppk_read_body(fp)) == NULL) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		free(b);
+		goto error;
+	}
+	lines = atoi(b);
+	free(b);
+	private_blob = buffer_init();
+	if (!ppk_read_blob(fp, lines, private_blob)) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+
+	// hex-mac-data
+	if (!ppk_read_header(fp, header) || 0 != strcmp(header, "Private-MAC")) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+	if ((mac = ppk_read_body(fp)) == NULL) {
+		strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
+		goto error;
+	}
+
+	fclose(fp);
+
+	if (result->type == KEY_NONE || strlen(encryption) == 0 || buffer_len(public_blob) == 0 || buffer_len(private_blob) == 0) {
 		strncpy_s(errmsg, errmsg_len, "key file format error", _TRUNCATE);
 		goto error;
 	}
 
-	// decrypt prikey with aes256-cbc
-	if (strcmp(encname, "aes256-cbc") == 0) {
-		const EVP_MD *md = EVP_sha1();
-		EVP_MD_CTX *ctx = NULL;
-		unsigned char key[40], iv[32];
-		EVP_CIPHER_CTX *cipher_ctx = NULL;
+	// derive key, iv, mackey
+	cipher_mac_keys_blob = buffer_init();
+	ssh2_ppk_derive_keys(fmt_version, ciphertype,
+	                     passphrase,
+	                     cipher_mac_keys_blob,
+	                     &cipherkey, &cipherkey_len,
+	                     &cipheriv, &cipheriv_len,
+	                     &mackey, &mackey_len,
+	                     &params);
+
+	// decrypt priate key with aes256-cbc
+	if (strcmp(encryption, "aes256-cbc") == 0) {
+		struct sshcipher_ctx *cc = NULL;
 		char *decrypted = NULL;
 		int ret;
 
-		ctx = EVP_MD_CTX_new();
-		if (ctx == NULL) {
-			goto error;
-		}
-
-		cipher_ctx = EVP_CIPHER_CTX_new();
-		if (cipher_ctx == NULL) {
-			EVP_MD_CTX_free(ctx);
-			goto error;
-		}
-
-		EVP_DigestInit(ctx, md);
-		EVP_DigestUpdate(ctx, "\0\0\0\0", 4);
-		EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
-		EVP_DigestFinal(ctx, key, &len);
-
-		EVP_DigestInit(ctx, md);
-		EVP_DigestUpdate(ctx, "\0\0\0\1", 4);
-		EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
-		EVP_DigestFinal(ctx, key + 20, &len);
-
-		EVP_MD_CTX_free(ctx);
-
-		memset(iv, 0, sizeof(iv));
-
 		// decrypt
-		cipher = get_cipher_by_name("aes256-cbc");
-		cipher_init_SSH2(&cc, cipher, key, 32, iv, 16, CIPHER_DECRYPT, pvar);
-		len = buffer_len(prikey);
+		ciphertype = get_cipher_by_name("aes256-cbc");
+		cipher_init_SSH2(&cc, ciphertype, cipherkey, 32, cipheriv, 16, CIPHER_DECRYPT, pvar);
+		len = buffer_len(private_blob);
 		decrypted = (char *)malloc(len);
-		ret = EVP_Cipher(cc->evp, decrypted, prikey->buf, len);
+		ret = EVP_Cipher(cc->evp, decrypted, private_blob->buf, len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
 			cipher_free_SSH2(cc);
 			goto error;
 		}
-		buffer_clear(prikey);
-		buffer_append(prikey, decrypted, len);
+		buffer_clear(private_blob);
+		buffer_append(private_blob, decrypted, len);
 		free(decrypted);
 		cipher_free_SSH2(cc);
 	}
 
 	// verity MAC
 	{
-	char realmac[41];
-	unsigned char binary[20];
-	buffer_t *macdata;
-
-	macdata = buffer_init();
-
-	len = strlen(get_ssh2_hostkey_type_name(result->type));
-	buffer_put_int(macdata, len);
-	buffer_append(macdata, get_ssh2_hostkey_type_name(result->type), len);
-	len = strlen(encname);
-	buffer_put_int(macdata, len);
-	buffer_append(macdata, encname, len);
-	len = strlen(comment);
-	buffer_put_int(macdata, len);
-	buffer_append(macdata, comment, len);
-	buffer_put_int(macdata, pubkey->len);
-	buffer_append(macdata, pubkey->buf, pubkey->len);
-	buffer_put_int(macdata, prikey->len);
-	buffer_append(macdata, prikey->buf, prikey->len);
-	
-	if (private_mac != NULL) {
-		unsigned char mackey[20];
-		char header[] = "putty-private-key-file-mac-key";
-		const EVP_MD *md = EVP_sha1();
-		EVP_MD_CTX *ctx = NULL;
-
-		ctx = EVP_MD_CTX_new();
-		if (ctx == NULL) {
-			goto error;
-		}
-
-		EVP_DigestInit(ctx, md);
-		EVP_DigestUpdate(ctx, header, sizeof(header)-1);
-		len = strlen(passphrase);
-		if (strcmp(encname, "aes256-cbc") == 0 && len > 0) {
-			EVP_DigestUpdate(ctx, passphrase, len);
-		}
-		EVP_DigestFinal(ctx, mackey, &len);
-		EVP_MD_CTX_free(ctx);
-
-		//hmac_sha1_simple(mackey, sizeof(mackey), macdata->buf, macdata->len, binary);
-		{
-		EVP_MD_CTX *ctx[2] = {0, 0};
-		unsigned char intermediate[20];
-		unsigned char foo[64];
+		unsigned char binary[32];
+		char realmac[sizeof(binary) * 2 + 1];
+		const EVP_MD *md;
+		buffer_t *macdata;
 		int i;
 
-		ctx[0] = EVP_MD_CTX_new();
-		if (ctx[0] == NULL) {
-			goto error;
-		}
-		ctx[1] = EVP_MD_CTX_new();
-		if (ctx[1] == NULL) {
-			EVP_MD_CTX_free(ctx[0]);
-			goto error;
-		}
+		macdata = buffer_init();
+		buffer_put_cstring(macdata, get_ssh2_hostkey_type_name(result->type));
+		buffer_put_cstring(macdata, encryption);
+		buffer_put_cstring(macdata, comment);
+		buffer_put_string(macdata, public_blob->buf, public_blob->len);
+		buffer_put_string(macdata, private_blob->buf, private_blob->len);
 
-		memset(foo, 0x36, sizeof(foo));
-		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
-			foo[i] ^= mackey[i];
-		}
-		EVP_DigestInit(ctx[0], md);
-		EVP_DigestUpdate(ctx[0], foo, sizeof(foo));
-
-		memset(foo, 0x5C, sizeof(foo));
-		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
-			foo[i] ^= mackey[i];
-		}
-		EVP_DigestInit(ctx[1], md);
-		EVP_DigestUpdate(ctx[1], foo, sizeof(foo));
-
-		memset(foo, 0, sizeof(foo));
-
-		EVP_DigestUpdate(ctx[0], macdata->buf, macdata->len);
-		EVP_DigestFinal(ctx[0], intermediate, &len);
-
-		EVP_DigestUpdate(ctx[1], intermediate, sizeof(intermediate));
-		EVP_DigestFinal(ctx[1], binary, &len);
-
-		EVP_MD_CTX_free(ctx[0]);
-		EVP_MD_CTX_free(ctx[1]);
-		}
-
-		memset(mackey, 0, sizeof(mackey));
-		
-	}
-	else {
-		strncpy_s(errmsg, errmsg_len, "key file format error", _TRUNCATE);
-		buffer_free(macdata);
-		goto error;
-	}
-
-	buffer_free(macdata);
-
-	for (i=0; i<20; i++) {
-		sprintf(realmac + 2*i, "%02x", binary[i]);
-	}
-
-	if (strcmp(private_mac, realmac) != 0) {
-		if (strcmp(encname, "aes256-cbc") == 0) {
-			strncpy_s(errmsg, errmsg_len, "wrong passphrase", _TRUNCATE);
-			*invalid_passphrase = TRUE;
-			goto error;
+		if (fmt_version == 2) {
+			md = EVP_sha1();
 		}
 		else {
-			strncpy_s(errmsg, errmsg_len, "MAC verify failed", _TRUNCATE);
-			goto error;
+			md = EVP_sha256();
 		}
-	}
+		mac_simple(md, (unsigned char *)mackey, mackey_len, macdata->buf, macdata->len, binary);
+
+		buffer_free(macdata);
+
+		for (i=0; i<EVP_MD_size(md); i++) {
+			sprintf(realmac + 2*i, "%02x", binary[i]);
+		}
+
+		if (strcmp(mac, realmac) != 0) {
+			if (ciphertype->key_len > 0) {
+				strncpy_s(errmsg, errmsg_len, "wrong passphrase", _TRUNCATE);
+				*invalid_passphrase = TRUE;
+				goto error;
+			}
+			else {
+				strncpy_s(errmsg, errmsg_len, "MAC verify failed", _TRUNCATE);
+				goto error;
+			}
+		}
 	}
 
 	switch (result->type) {
@@ -1094,8 +1140,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		char *pubkey_type, *pub, *pri;
 		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
-		pub = pubkey->buf;
-		pri = prikey->buf;
+		pub = public_blob->buf;
+		pri = private_blob->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if (strcmp(pubkey_type, "ssh-rsa") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
@@ -1143,8 +1189,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		char *pubkey_type, *pub, *pri;
 		BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
-		pub = pubkey->buf;
-		pri = prikey->buf;
+		pub = public_blob->buf;
+		pri = private_blob->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if (strcmp(pubkey_type, "ssh-dss") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
@@ -1195,8 +1241,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		BIGNUM *exponent = NULL;
 		EC_POINT *q = NULL;
 
-		pub = pubkey->buf;
-		pri = prikey->buf;
+		pub = public_blob->buf;
+		pri = private_blob->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if ((result->type == KEY_ECDSA256 && strcmp(pubkey_type, "ecdsa-sha2-nistp256") != 0) ||
 		    (result->type == KEY_ECDSA384 && strcmp(pubkey_type, "ecdsa-sha2-nistp384") != 0) ||
@@ -1250,8 +1296,8 @@ ecdsa_error:
 		char *pubkey_type, *pub, *pri;
 		unsigned int pklen, sklen;
 		char *sk;
-		pub = pubkey->buf;
-		pri = prikey->buf;
+		pub = public_blob->buf;
+		pri = private_blob->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if (strcmp(pubkey_type, "ssh-ed25519") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
@@ -1281,46 +1327,42 @@ ecdsa_error:
 		break;
 	}
 
-	fclose(fp);
-
-	if (encname != NULL)
-		free(encname);
-
+	if (encryption != NULL)
+		free(encryption);
 	if (comment != NULL)
 		free(comment);
-
-	if (pubkey != NULL)
-		buffer_free(pubkey);
-
-	if (prikey != NULL)
-		buffer_free(prikey);
-
-	if (private_mac != NULL)
-		free(private_mac);
+	if (mac != NULL)
+		free(mac);
+	if (public_blob != NULL)
+		buffer_free(public_blob);
+	if (private_blob != NULL)
+		buffer_free(private_blob);
+	if (cipher_mac_keys_blob != NULL)
+		buffer_free(cipher_mac_keys_blob);
+	if (passphrase_salt != NULL)
+		buffer_free(passphrase_salt);
 
 	return (result);
 
 error:
 	if (result != NULL)
 		key_free(result);
-
 	if (fp != NULL)
 		fclose(fp);
-
-	if (encname != NULL)
-		free(encname);
-
+	if (encryption != NULL)
+		free(encryption);
 	if (comment != NULL)
 		free(comment);
-
-	if (pubkey != NULL)
-		buffer_free(pubkey);
-
-	if (prikey != NULL)
-		buffer_free(prikey);
-
-	if (private_mac != NULL)
-		free(private_mac);
+	if (mac != NULL)
+		free(mac);
+	if (public_blob != NULL)
+		buffer_free(public_blob);
+	if (private_blob != NULL)
+		buffer_free(private_blob);
+	if (cipher_mac_keys_blob != NULL)
+		buffer_free(cipher_mac_keys_blob);
+	if (passphrase_salt != NULL)
+		buffer_free(passphrase_salt);
 
 	return (NULL);
 }

@@ -63,6 +63,7 @@
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
+- The reference C implementation of Argon2 20190702 (https://github.com/P-H-C/phc-winner-argon2)
 
 
 * Notice for SVN committer
@@ -136,7 +137,7 @@ Example: adding a TTSSH menu under File menu
 
 * How to build Libraries
   1. PuTTY (used by TTSSH)
-     (1) Extract putty source into libs/putty directory.
+     (1) Extract PuTTY source into libs/putty directory.
 
   2. Oniguruma (used by Tera Term Macro)
      (1) Extract oniguruma source into libs/oniguruma directory.
@@ -159,6 +160,9 @@ Example: adding a TTSSH menu under File menu
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
      (3) Move 'libs' directory on the command prompt. And run buildSFMT.bat.
      (4) Modify version information in libs/SFMT/SFMT_version_for_teraterm.h if necessary.
+
+  6. The reference C implementation of Argon2 (used by TTSSH)
+     (1) Extract argon2 source into libs/argon2 directory.
 
 
 * How to build Tera Term

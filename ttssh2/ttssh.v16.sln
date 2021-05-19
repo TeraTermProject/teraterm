@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
+# Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matcher", "matcher\matcher.v16.vcxproj", "{C4B19BFB-8068-4EF2-A3A1-4EC4C40BE7F1}"
@@ -11,6 +11,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "putty", "putty\putty.v16.vcxproj", "{98CA1284-8F6C-4791-BF57-7E5FAD33744E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "puttyrev", "puttyrev\puttyrev.v16.vcxproj", "{61EB955F-2794-4607-860F-0AA296FA58BD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "argon2", "argon2\argon2.v16.vcxproj", "{D33C59B8-E227-47D2-8F80-EDA3E28BF995}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{61EB955F-2794-4607-860F-0AA296FA58BD}.Debug|Win32.Build.0 = Debug|Win32
 		{61EB955F-2794-4607-860F-0AA296FA58BD}.Release|Win32.ActiveCfg = Release|Win32
 		{61EB955F-2794-4607-860F-0AA296FA58BD}.Release|Win32.Build.0 = Release|Win32
+		{D33C59B8-E227-47D2-8F80-EDA3E28BF995}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D33C59B8-E227-47D2-8F80-EDA3E28BF995}.Debug|Win32.Build.0 = Debug|Win32
+		{D33C59B8-E227-47D2-8F80-EDA3E28BF995}.Release|Win32.ActiveCfg = Release|Win32
+		{D33C59B8-E227-47D2-8F80-EDA3E28BF995}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

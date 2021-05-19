@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;$(SolutionDir)argon2;$(SolutionDir)argon2\compat"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRTDBG_MAP_ALLOC"
 				RuntimeLibrary="1"
 				EnableFunctionLevelLinking="true"
@@ -146,7 +146,7 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty;$(SolutionDir)argon2;$(SolutionDir)argon2\compat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -309,6 +309,10 @@
 			</File>
 			<File
 				RelativePath="keyfiles.h"
+				>
+			</File>
+			<File
+				RelativePath="keyfiles-putty.h"
 				>
 			</File>
 			<File
@@ -485,6 +489,10 @@
 			</File>
 			<File
 				RelativePath="keyfiles.c"
+				>
+			</File>
+			<File
+				RelativePath="keyfiles-putty.c"
 				>
 			</File>
 			<File
