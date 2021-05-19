@@ -29,7 +29,139 @@
 #include "ttxssh.h"
 #include "kex.h"
 
+
+char *myproposal[PROPOSAL_MAX] = {
+	KEX_DEFAULT_KEX,
+	KEX_DEFAULT_PK_ALG,
+	KEX_DEFAULT_ENCRYPT,
+	KEX_DEFAULT_ENCRYPT,
+	KEX_DEFAULT_MAC,
+	KEX_DEFAULT_MAC,
+	KEX_DEFAULT_COMP,
+	KEX_DEFAULT_COMP,
+	KEX_DEFAULT_LANG,
+	KEX_DEFAULT_LANG,
+};
+
+struct ssh2_kex_algorithm_t {
+	kex_algorithm kextype;
+	char *name;
+	const EVP_MD *(*evp_md)(void);
+};
+
+static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
+	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},   // RFC4253
+	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},   // RFC4253
+	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},   // RFC4419
+	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256}, // RFC4419
+	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256}, // RFC5656
+	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384}, // RFC5656
+	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512}, // RFC5656
+	{KEX_DH_GRP14_SHA256, "diffie-hellman-group14-sha256",      EVP_sha256}, // RFC8268
+	{KEX_DH_GRP16_SHA512, "diffie-hellman-group16-sha512",      EVP_sha512}, // RFC8268
+	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      EVP_sha512}, // RFC8268
+	{KEX_DH_NONE      , NULL,                                   NULL},
+};
+
+
 extern SSHKeys current_keys[MODE_MAX];
+
+
+char* get_kex_algorithm_name(kex_algorithm kextype)
+{
+	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
+
+	while (ptr->name != NULL) {
+		if (kextype == ptr->kextype) {
+			return ptr->name;
+		}
+		ptr++;
+	}
+
+	// not found.
+	return "unknown";
+}
+
+const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
+{
+	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
+
+	while (ptr->name != NULL) {
+		if (kextype == ptr->kextype) {
+			return ptr->evp_md();
+		}
+		ptr++;
+	}
+
+	// not found.
+	return EVP_md_null();
+}
+
+void normalize_kex_order(char *buf)
+{
+	static char default_strings[] = {
+		KEX_ECDH_SHA2_256,
+		KEX_ECDH_SHA2_384,
+		KEX_ECDH_SHA2_521,
+		KEX_DH_GRP18_SHA512,
+		KEX_DH_GRP16_SHA512,
+		KEX_DH_GRP14_SHA256,
+		KEX_DH_GEX_SHA256,
+		KEX_DH_GEX_SHA1,
+		KEX_DH_GRP14_SHA1,
+		KEX_DH_GRP1_SHA1,
+		KEX_DH_NONE,
+	};
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
+}
+
+kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal)
+{
+	kex_algorithm type = KEX_DH_UNKNOWN;
+	char str_kextype[40];
+	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
+
+	choose_SSH2_proposal(server_proposal, my_proposal, str_kextype, sizeof(str_kextype));
+
+	while (ptr->name != NULL) {
+		if (strcmp(ptr->name, str_kextype) == 0) {
+			type = ptr->kextype;
+			break;
+		}
+		ptr++;
+	}
+
+	return (type);
+}
+
+// KEXアルゴリズム優先順位に応じて、myproposal[]を書き換える。
+// (2011.2.28 yutaka)
+void SSH2_update_kex_myproposal(PTInstVar pvar)
+{
+	static char buf[512]; // TODO: malloc()にすべき
+	int index;
+	int len, i;
+
+	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
+	if (pvar->socket != INVALID_SOCKET) {
+		return;
+	}
+
+	buf[0] = '\0';
+	for (i = 0 ; pvar->settings.KexOrder[i] != 0 ; i++) {
+		index = pvar->settings.KexOrder[i] - '0';
+		if (index == KEX_DH_NONE) // disabled line
+			break;
+		strncat_s(buf, sizeof(buf), get_kex_algorithm_name(index), _TRUNCATE);
+		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
+	}
+	len = strlen(buf);
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
+	myproposal[PROPOSAL_KEX_ALGS] = buf; 
+}
+
 
 static DH *dh_new_group_asc(const char *gen, const char *modulus)
 {

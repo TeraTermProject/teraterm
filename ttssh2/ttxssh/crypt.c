@@ -75,8 +75,6 @@
 static unsigned char *encbuff = NULL;
 static unsigned int encbufflen = 0;
 
-static char *get_cipher_name(int cipher);
-
 static void crc_update(uint32 *a, uint32 b)
 {
 	b ^= *a;
@@ -206,7 +204,8 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_OUT];
+	struct sshcipher_ctx *cc = pvar->cc[MODE_OUT];
+	unsigned int newbuff_len = bytes;
 
 	if (bytes == 0)
 		return TRUE;
@@ -220,28 +219,44 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return FALSE;
 	}
 
-	if (bytes > encbufflen) {
-		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		// chacha20-poly1305 では aadlen も暗号化の対象
+		//   aadlen と bytes は別々に暗号化される
+		// chachapoly_crypt の中で認証データ(AEAD tag)も生成される
+		newbuff_len += aadlen + authlen;
+	}
+	if (newbuff_len > encbufflen) {
+		if ((newbuff = realloc(encbuff, newbuff_len)) == NULL)
 			goto err;
 		encbuff = newbuff;
-		encbufflen = bytes;
+		encbufflen = newbuff_len;
 	}
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		if (chachapoly_crypt(cc->cp_ctx, pvar->ssh_state.sender_sequence_number,
+		                     encbuff, data, bytes, aadlen, authlen, 1) != 0) {
+			goto err;
+		}
+		memcpy(data, encbuff, aadlen + bytes + authlen);
+		return TRUE;
+	}
+
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
 		goto err;
 
-	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
+	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	if (EVP_Cipher(evp, encbuff, data+aadlen, bytes) < 0)
+	// AES-GCM では aadlen を暗号化しないので、その先だけ暗号化する
+	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
 	memcpy(data+aadlen, encbuff, bytes);
 
-	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
+	if (EVP_Cipher(cc->evp, NULL, NULL, 0) < 0)
 		goto err;
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_GET_TAG, authlen, data+aadlen+bytes))
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_GET_TAG, authlen, data+aadlen+bytes))
 		goto err;
 
 	return TRUE;
@@ -260,7 +275,8 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
-	EVP_CIPHER_CTX *evp = pvar->evpcip[MODE_IN];
+	struct sshcipher_ctx *cc = pvar->cc[MODE_IN];
+	unsigned int newbuff_len = bytes;
 
 	if (bytes == 0)
 		return TRUE;
@@ -274,31 +290,45 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return FALSE;
 	}
 
-	if (bytes > encbufflen) {
-		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		// chacha20-poly1305 では aadlen も暗号化されている
+		newbuff_len += aadlen;
+	}
+	if (newbuff_len > encbufflen) {
+		if ((newbuff = realloc(encbuff, newbuff_len)) == NULL)
 			goto err;
 		encbuff = newbuff;
-		encbufflen = bytes;
+		encbufflen = newbuff_len;
 	}
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
+	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+		if (chachapoly_crypt(cc->cp_ctx, pvar->ssh_state.receiver_sequence_number,
+		                     encbuff, data, bytes, aadlen, authlen, 0) != 0) {
+			goto err;
+		}
+		memcpy(data, encbuff, aadlen + bytes);
+		return TRUE;
+	}
+
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
 		goto err;
 
-	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_TAG, authlen, data+aadlen+bytes))
+	if (!EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_SET_TAG, authlen, data+aadlen+bytes))
 		goto err;
 
-	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
+	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	if (EVP_Cipher(evp, encbuff, data+aadlen, bytes) < 0)
+	// AES-GCM では aadlen を暗号化しないので、その先だけ復号する
+	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
 	memcpy(data+aadlen, encbuff, bytes);
 
-	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
-		return FALSE;
-	else
-		return TRUE;
+	if (EVP_Cipher(cc->evp, NULL, NULL, 0) < 0)
+		goto err;
+
+	return TRUE;
 
 err:
 	UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
@@ -338,7 +368,7 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 		encbufflen = bytes;
 	}
 
-	if (EVP_Cipher(pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->cc[MODE_OUT]->evp, encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher));
@@ -374,7 +404,7 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 		encbufflen = bytes;
 	}
 
-	if (EVP_Cipher(pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->cc[MODE_IN]->evp, encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher));
@@ -489,8 +519,8 @@ static BIGNUM *get_bignum(unsigned char *bytes)
 
 // make_key()を fingerprint 生成でも利用するので、staticを削除。(2006.3.27 yutaka)
 RSA *make_key(PTInstVar pvar,
-                  int bits, unsigned char *exp,
-                  unsigned char *mod)
+              int bits, unsigned char *exp,
+              unsigned char *mod)
 {
 	RSA *key = RSA_new();
 	BIGNUM *e = NULL, *n = NULL;
@@ -595,6 +625,7 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
 		            | (1 << SSH2_CIPHER_AES128_GCM)
 		            | (1 << SSH2_CIPHER_AES256_GCM)
+		            | (1 << SSH2_CIPHER_CHACHAPOLY)
 		);
 	}
 
@@ -665,7 +696,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 // ※本関数は SSH2 でのみ使用される。
 // (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
-	char *data, int len, char *MAC)
+                               char *data, int len, char *MAC)
 {
 	HMAC_CTX *c = NULL;
 	unsigned char m[EVP_MAX_MD_SIZE];
@@ -685,7 +716,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 
 	if ((u_int)mac->mac_len > sizeof(m)) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
-			mac->mac_len, sizeof(m), sequence_number, len);
+		          mac->mac_len, sizeof(m), sequence_number, len);
 		goto error;
 	}
 
@@ -802,13 +833,13 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 			pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
 		}
 		else {
-			pvar->crypt_state.sender_cipher = pvar->ciphers[MODE_OUT]->id;
+			pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
 		}
 		if (pvar->ciphers[MODE_IN] == NULL) {
 			pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
 		}
 		else {
-			pvar->crypt_state.receiver_cipher = pvar->ciphers[MODE_IN]->id;
+			pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
 		}
 	}
 
@@ -1003,7 +1034,7 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 		       SSH_RSA_CHALLENGE_LENGTH, SSH_RSA_CHALLENGE_LENGTH);
 	} else {
 		SecureZeroMemory(decrypted_challenge,
-		       SSH_RSA_CHALLENGE_LENGTH - decrypted_challenge_len);
+		                 SSH_RSA_CHALLENGE_LENGTH - decrypted_challenge_len);
 		memcpy(decrypted_challenge + SSH_RSA_CHALLENGE_LENGTH -
 		       decrypted_challenge_len, challenge,
 		       decrypted_challenge_len);
@@ -1046,98 +1077,12 @@ static void cBlowfish_init(char *session_key,
 	SecureZeroMemory(state->ivec, 8);
 }
 
-
-//
-// SSH2用アルゴリズムの初期化
-//
-void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
-                      const u_char *key, u_int keylen,
-                      const u_char *iv, u_int ivlen,
-                      int encrypt,
-                      const EVP_CIPHER *type,
-                      int discard_len,
-                      unsigned int authlen,
-                      PTInstVar pvar)
-{
-	int klen;
-	char tmp[80];
-	unsigned char *junk = NULL, *discard = NULL;
-
-	EVP_CIPHER_CTX_init(evp);
-	if (EVP_CipherInit(evp, type, NULL, NULL, (encrypt == CIPHER_ENCRYPT)) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-
-	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IVLEN, ivlen, NULL)) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-	if (EVP_CipherInit(evp, NULL, NULL, (u_char *)iv, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-
-	klen = EVP_CIPHER_CTX_key_length(evp);
-	if (klen > 0 && keylen != klen) {
-		if (EVP_CIPHER_CTX_set_key_length(evp, keylen) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
-			notify_fatal_error(pvar, tmp, TRUE);
-			return;
-		}
-	}
-	if (EVP_CipherInit(evp, NULL, (u_char *)key, NULL, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
-		notify_fatal_error(pvar, tmp, TRUE);
-		return;
-	}
-
-	if (discard_len > 0) {
-		junk = malloc(discard_len);
-		discard = malloc(discard_len);
-		if (junk == NULL || discard == NULL ||
-		    EVP_Cipher(evp, discard, junk, discard_len) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
-			notify_fatal_error(pvar, tmp, TRUE);
-		}
-		else {
-			SecureZeroMemory(discard, discard_len);
-		}
-		free(junk);
-		free(discard);
-	}
-}
-
-//
-// SSH2用アルゴリズムの破棄
-//
-void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp)
-{
-	EVP_CIPHER_CTX_cleanup(evp);
-}
-
-
 BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 {
 	struct Enc *enc;
 	char *encryption_key = pvar->crypt_state.sender_cipher_key;
 	char *decryption_key = pvar->crypt_state.receiver_cipher_key;
-	const SSH2Cipher *cipher;
+	const struct ssh2cipher *cipher;
 	BOOL isOK = TRUE;
 
 	if (sender_flag) {
@@ -1171,15 +1116,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_OUT];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
-				                 enc->key, get_cipher_key_len(cipher),
-				                 enc->iv, get_cipher_iv_len(cipher),
+				cipher_init_SSH2(&pvar->cc[MODE_OUT], cipher,
+				                 enc->key, enc->key_len,
+				                 enc->iv, enc->iv_len,
 				                 CIPHER_ENCRYPT,
-				                 get_cipher_EVP_CIPHER(cipher),
-				                 get_cipher_discard_len(cipher),
-				                 get_cipher_auth_len(cipher),
 				                 pvar);
-
 				pvar->crypt_state.encrypt = crypt_SSH2_encrypt;
 			}
 			else {
@@ -1219,15 +1160,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			cipher = pvar->ciphers[MODE_IN];
 			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(pvar->evpcip[MODE_IN],
-				                 enc->key, get_cipher_key_len(cipher),
-				                 enc->iv, get_cipher_iv_len(cipher),
+				cipher_init_SSH2(&pvar->cc[MODE_IN], cipher,
+				                 enc->key, enc->key_len,
+				                 enc->iv, enc->iv_len,
 				                 CIPHER_DECRYPT,
-				                 get_cipher_EVP_CIPHER(cipher),
-				                 get_cipher_discard_len(cipher),
-				                 get_cipher_auth_len(cipher),
 				                 pvar);
-
 				pvar->crypt_state.decrypt = crypt_SSH2_decrypt;
 			}
 			else {
@@ -1260,71 +1197,6 @@ void CRYPT_init(PTInstVar pvar)
 	pvar->crypt_state.detect_attack_statics.h = NULL;
 	pvar->crypt_state.detect_attack_statics.n =
 		HASH_MINSIZE / HASH_ENTRYSIZE;
-}
-
-static char *get_cipher_name(int cipher)
-{
-	switch (cipher) {
-	case SSH_CIPHER_NONE:
-		return "None";
-	case SSH_CIPHER_3DES:
-		return "3DES (168 key bits)";
-	case SSH_CIPHER_DES:
-		return "DES (56 key bits)";
-	case SSH_CIPHER_BLOWFISH:
-		return "Blowfish (256 key bits)";
-
-	// SSH2 
-	case SSH2_CIPHER_3DES_CBC:
-		return "3des-cbc";
-	case SSH2_CIPHER_AES128_CBC:
-		return "aes128-cbc";
-	case SSH2_CIPHER_AES192_CBC:
-		return "aes192-cbc";
-	case SSH2_CIPHER_AES256_CBC:
-		return "aes256-cbc";
-	case SSH2_CIPHER_BLOWFISH_CBC:
-		return "blowfish-cbc";
-	case SSH2_CIPHER_AES128_CTR:
-		return "aes128-ctr";
-	case SSH2_CIPHER_AES192_CTR:
-		return "aes192-ctr";
-	case SSH2_CIPHER_AES256_CTR:
-		return "aes256-ctr";
-	case SSH2_CIPHER_ARCFOUR:
-		return "arcfour";
-	case SSH2_CIPHER_ARCFOUR128:
-		return "arcfour128";
-	case SSH2_CIPHER_ARCFOUR256:
-		return "arcfour256";
-	case SSH2_CIPHER_CAST128_CBC:
-		return "cast-128-cbc";
-	case SSH2_CIPHER_3DES_CTR:
-		return "3des-ctr";
-	case SSH2_CIPHER_BLOWFISH_CTR:
-		return "blowfish-ctr";
-	case SSH2_CIPHER_CAST128_CTR:
-		return "cast-128-ctr";
-	case SSH2_CIPHER_CAMELLIA128_CBC:
-		return "camellia128-cbc";
-	case SSH2_CIPHER_CAMELLIA192_CBC:
-		return "camellia192-cbc";
-	case SSH2_CIPHER_CAMELLIA256_CBC:
-		return "camellia256-cbc";
-	case SSH2_CIPHER_CAMELLIA128_CTR:
-		return "camellia128-ctr";
-	case SSH2_CIPHER_CAMELLIA192_CTR:
-		return "camellia192-ctr";
-	case SSH2_CIPHER_CAMELLIA256_CTR:
-		return "camellia256-ctr";
-	case SSH2_CIPHER_AES128_GCM:
-		return "aes128-gcm@openssh.com";
-	case SSH2_CIPHER_AES256_GCM:
-		return "aes256-gcm@openssh.com";
-
-	default:
-		return "Unknown";
-	}
 }
 
 void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)
@@ -1392,18 +1264,18 @@ void CRYPT_end(PTInstVar pvar)
 
 	if (pvar->crypt_state.detect_attack_statics.h != NULL) {
 		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h, 
-		       pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
+		                 pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
 		free(pvar->crypt_state.detect_attack_statics.h);
 	}
 
 	SecureZeroMemory(pvar->crypt_state.sender_cipher_key,
-	       sizeof(pvar->crypt_state.sender_cipher_key));
+	                 sizeof(pvar->crypt_state.sender_cipher_key));
 	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key, 
-	       sizeof(pvar->crypt_state.receiver_cipher_key));
+	                 sizeof(pvar->crypt_state.receiver_cipher_key));
 	SecureZeroMemory(pvar->crypt_state.server_cookie, 
-	       sizeof(pvar->crypt_state.server_cookie));
+	                 sizeof(pvar->crypt_state.server_cookie));
 	SecureZeroMemory(pvar->crypt_state.client_cookie, 
-	       sizeof(pvar->crypt_state.client_cookie));
+	                 sizeof(pvar->crypt_state.client_cookie));
 	SecureZeroMemory(&pvar->crypt_state.enc, sizeof(pvar->crypt_state.enc));
 	SecureZeroMemory(&pvar->crypt_state.dec, sizeof(pvar->crypt_state.dec));
 }
@@ -1453,7 +1325,7 @@ int CRYPT_passphrase_decrypt(int cipher, char *passphrase,
 			SecureZeroMemory(state.ivec, 8);
 			flip_endianness(buf, bytes);
 			BF_cbc_encrypt(buf, buf, bytes, &state.k, state.ivec,
-						   BF_DECRYPT);
+			               BF_DECRYPT);
 			flip_endianness(buf, bytes);
 			break;
 		}

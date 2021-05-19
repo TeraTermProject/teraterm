@@ -392,7 +392,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
-	if (strncmp(get_ssh_keytype_name(keytype), ptr, len) != 0) {
+	if (strncmp(get_ssh2_hostkey_type_name(keytype), ptr, len) != 0) {
 		ret = -3;
 		goto error;
 	}
@@ -448,7 +448,7 @@ error:
 }
 
 static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen, 
-							  unsigned char *data, unsigned int datalen)
+                              unsigned char *data, unsigned int datalen)
 {
 	buffer_t *b;
 	char *ktype = NULL;
@@ -979,7 +979,7 @@ key_fingerprint_randomart(const char *alg, u_char *dgst_raw, u_int dgst_raw_len,
 //
 // fingerprint（指紋：ホスト公開鍵のハッシュ）を生成する
 //
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep, digest_algorithm dgst_alg)
+char *key_fingerprint(Key *key, fp_rep dgst_rep, digest_algorithm dgst_alg)
 {
 	char *retval = NULL, *alg;
 	unsigned char *dgst_raw;
@@ -1240,42 +1240,6 @@ void key_init(Key *key)
 	}
 }
 
-//
-// キーから文字列を返却する
-//
-char *get_sshname_from_key(Key *key)
-{
-	return get_ssh_keytype_name(key->type);
-}
-
-//
-// キー文字列から種別を判定する
-//
-ssh_keytype get_keytype_from_name(char *name)
-{
-	if (strcmp(name, "rsa1") == 0) {
-		return KEY_RSA1;
-	} else if (strcmp(name, "rsa") == 0) {
-		return KEY_RSA;
-	} else if (strcmp(name, "dsa") == 0) {
-		return KEY_DSA;
-	} else if (strcmp(name, "ssh-rsa") == 0) {
-		return KEY_RSA;
-	} else if (strcmp(name, "ssh-dss") == 0) {
-		return KEY_DSA;
-	} else if (strcmp(name, "ecdsa-sha2-nistp256") == 0) {
-		return KEY_ECDSA256;
-	} else if (strcmp(name, "ecdsa-sha2-nistp384") == 0) {
-		return KEY_ECDSA384;
-	} else if (strcmp(name, "ecdsa-sha2-nistp521") == 0) {
-		return KEY_ECDSA521;
-	} else if (strcmp(name, "ssh-ed25519") == 0) {
-		return KEY_ED25519;
-	}
-	return KEY_UNSPEC;
-}
-
-
 ssh_keytype key_curve_name_to_keytype(char *name)
 {
 	if (strcmp(name, "nistp256") == 0) {
@@ -1318,7 +1282,7 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 	BIGNUM *p, *q, *g, *pub_key;
 
 	b = buffer_init();
-	sshname = get_sshname_from_key(key);
+	sshname = get_ssh2_hostkey_type_name_from_key(key);
 
 	switch (key->type) {
 	case KEY_RSA:
@@ -1411,7 +1375,7 @@ Key *key_from_blob(char *data, int blen)
 	key[keynamelen] = 0;
 	data += keynamelen;
 
-	type = get_keytype_from_name(key);
+	type = get_hostkey_type_from_name(key);
 
 	switch (type) {
 	case KEY_RSA: // RSA key
@@ -1618,7 +1582,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		}
 
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_append_length(msg, sig, slen);
 		len = buffer_len(msg);
@@ -1676,7 +1640,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		DSA_SIG_free(sig);
 
 		// setting
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_append_length(msg, sigblob, sizeof(sigblob));
 		len = buffer_len(msg);
@@ -1735,7 +1699,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		buffer_put_bignum2(buf2, bs);
 		ECDSA_SIG_free(sig);
 
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_string(msg, buffer_ptr(buf2), buffer_len(buf2));
 		buffer_free(buf2);
@@ -1791,7 +1755,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 
 	switch (keypair->type) {
 	case KEY_RSA: // RSA
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		RSA_get0_key(keypair->rsa, &n, &e, NULL);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_bignum2(msg, e); // 公開指数
@@ -1800,7 +1764,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	case KEY_DSA: // DSA
 		DSA_get0_pqg(keypair->dsa, &p, &q, &g);
 		DSA_get0_key(keypair->dsa, &pub_key, NULL);
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_bignum2(msg, p); // 素数
 		buffer_put_bignum2(msg, q); // (p-1)の素因数
@@ -1810,7 +1774,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		tmp = curve_keytype_to_name(keypair->type);
 		buffer_put_string(msg, tmp, strlen(tmp));
@@ -1818,7 +1782,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 		                        EC_KEY_get0_public_key(keypair->ecdsa));
 		break;
 	case KEY_ED25519:
-		s = get_sshname_from_key(keypair);
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_cstring(msg, s);
 		buffer_put_string(msg, keypair->ed25519_pk, ED25519_PK_SZ);
 		break;
@@ -1890,7 +1854,7 @@ void key_private_serialize(Key *key, buffer_t *b)
 	BIGNUM *e, *n, *d, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
 	
-	s = get_sshname_from_key(key);
+	s = get_ssh2_hostkey_type_name_from_key(key);
 	buffer_put_cstring(b, s);
 
 	switch (key->type) {
@@ -1978,7 +1942,7 @@ Key *key_private_deserialize(buffer_t *blob)
 	type_name = buffer_get_string_msg(blob, NULL);
 	if (type_name == NULL)
 		goto error;
-	type = get_keytype_from_name(type_name);
+	type = get_hostkey_type_from_name(type_name);
 
 	k = key_new_private(type);
 
@@ -2242,7 +2206,8 @@ static int check_hostkey_algorithm(PTInstVar pvar, Key *key)
 		if (index == KEY_NONE) // disabled line
 			break;
 
-		if (strcmp(get_sshname_from_key(key), get_ssh_keytype_name(index)) == 0)
+		if (strcmp(get_ssh2_hostkey_type_name_from_key(key),
+		           get_ssh2_hostkey_type_name(index)) == 0)
 			return 1;
 	}
 
@@ -2314,7 +2279,7 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				fp = key_fingerprint(ctx->keys[i], SSH_FP_BASE64, SSH_DIGEST_SHA256);
 				break;
 			}
-			strncat_s(buf, buf_len, get_sshname_from_key(ctx->keys[i]), _TRUNCATE);
+			strncat_s(buf, buf_len, get_ssh2_hostkey_type_name_from_key(ctx->keys[i]), _TRUNCATE);
 			strncat_s(buf, buf_len, " ", _TRUNCATE);
 			if (fp != NULL) {
 				strncat_s(buf, buf_len, fp, _TRUNCATE);
@@ -2342,7 +2307,7 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_BASE64, SSH_DIGEST_SHA256);
 				break;
 			}
-			strncat_s(buf, buf_len, get_sshname_from_key(ctx->old_keys[i]), _TRUNCATE);
+			strncat_s(buf, buf_len, get_ssh2_hostkey_type_name_from_key(ctx->old_keys[i]), _TRUNCATE);
 			strncat_s(buf, buf_len, " ", _TRUNCATE);
 			if (fp != NULL) {
 				strncat_s(buf, buf_len, fp, _TRUNCATE);
@@ -2557,7 +2522,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		if (ret != 1) {
 			logprintf(LOG_LEVEL_ERROR,
 				"server gave bad signature for %s key %u",
-				get_sshname_from_key(ctx->keys[i]), i);
+				get_ssh2_hostkey_type_name_from_key(ctx->keys[i]), i);
 			goto error;
 		}
 		ndone++;
@@ -2628,13 +2593,14 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		blob = NULL;
 
 		fp = key_fingerprint(key, SSH_FP_HEX, SSH_DIGEST_MD5);
-		logprintf(LOG_LEVEL_VERBOSE, "Received %s host key %s", get_sshname_from_key(key), fp);
+		logprintf(LOG_LEVEL_VERBOSE, "Received %s host key %s",
+		          get_ssh2_hostkey_type_name_from_key(key), fp);
 		free(fp);
 
 		// 許可されたホストキーアルゴリズムかをチェックする。
 		if (check_hostkey_algorithm(pvar, key) == 0) {
 			logprintf(LOG_LEVEL_VERBOSE, "%s host key is not permitted by ts.HostKeyOrder",
-				get_sshname_from_key(key));
+			          get_ssh2_hostkey_type_name_from_key(key));
 			continue;
 		}
 
@@ -2644,7 +2610,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (HOSTS_compare_public_key(key, ctx->keys[i]) == 1) {
 				logprintf(LOG_LEVEL_ERROR, "Received duplicated %s host key",
-					get_sshname_from_key(key));
+				          get_ssh2_hostkey_type_name_from_key(key));
 				goto error;
 			}
 		}

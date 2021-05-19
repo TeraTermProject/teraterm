@@ -40,6 +40,10 @@ See LICENSE.TXT for the license.
 
 #include "buffer.h"
 #include "config.h"
+#include "cipher.h"
+#include "hostkey.h"
+#include "mac.h"
+#include "comp.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -80,24 +84,6 @@ typedef enum {
 	SSH_SMSG_AUTH_TIS_CHALLENGE, SSH_CMSG_AUTH_TIS_RESPONSE,
 	SSH_CMSG_AUTH_KERBEROS, SSH_SMSG_AUTH_KERBEROS_RESPONSE
 } SSHMessage;
-
-typedef enum {
-	// SSH1
-	SSH_CIPHER_NONE, SSH_CIPHER_IDEA, SSH_CIPHER_DES, SSH_CIPHER_3DES,
-	SSH_CIPHER_TSS, SSH_CIPHER_RC4, SSH_CIPHER_BLOWFISH,
-	// SSH2
-	SSH2_CIPHER_3DES_CBC, SSH2_CIPHER_AES128_CBC,
-	SSH2_CIPHER_AES192_CBC, SSH2_CIPHER_AES256_CBC,
-	SSH2_CIPHER_BLOWFISH_CBC, SSH2_CIPHER_AES128_CTR,
-	SSH2_CIPHER_AES192_CTR, SSH2_CIPHER_AES256_CTR,
-	SSH2_CIPHER_ARCFOUR, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR256,
-	SSH2_CIPHER_CAST128_CBC,
-	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
-	SSH2_CIPHER_CAMELLIA128_CBC, SSH2_CIPHER_CAMELLIA192_CBC, SSH2_CIPHER_CAMELLIA256_CBC,
-	SSH2_CIPHER_CAMELLIA128_CTR, SSH2_CIPHER_CAMELLIA192_CTR, SSH2_CIPHER_CAMELLIA256_CTR,
-	SSH2_CIPHER_AES128_GCM, SSH2_CIPHER_AES256_GCM,
-	SSH_CIPHER_MAX = SSH2_CIPHER_AES256_GCM,
-} SSHCipherId;
 
 typedef enum {
 	SSH_AUTH_NONE, SSH_AUTH_RHOSTS, SSH_AUTH_RSA, SSH_AUTH_PASSWORD,
@@ -298,33 +284,6 @@ typedef enum {
 } SSH2TTYMode;
 
 
-// クライアントからサーバへの提案事項
-enum kex_init_proposals {
-	PROPOSAL_KEX_ALGS,
-	PROPOSAL_SERVER_HOST_KEY_ALGS,
-	PROPOSAL_ENC_ALGS_CTOS,
-	PROPOSAL_ENC_ALGS_STOC,
-	PROPOSAL_MAC_ALGS_CTOS,
-	PROPOSAL_MAC_ALGS_STOC,
-	PROPOSAL_COMP_ALGS_CTOS,
-	PROPOSAL_COMP_ALGS_STOC,
-	PROPOSAL_LANG_CTOS,
-	PROPOSAL_LANG_STOC,
-	PROPOSAL_MAX
-};
-
-typedef enum {
-	KEY_NONE,
-	KEY_RSA1,
-	KEY_RSA,
-	KEY_DSA,
-	KEY_ECDSA256,
-	KEY_ECDSA384,
-	KEY_ECDSA521,
-	KEY_ED25519,
-	KEY_UNSPEC,
-	KEY_MAX = KEY_UNSPEC,
-} ssh_keytype;
 #define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ED25519)
 
 /* Minimum modulus size (n) for RSA keys. */
@@ -337,73 +296,6 @@ typedef enum {
 #define SSH_KEYGEN_MINIMUM_ROUNDS       1
 #define SSH_KEYGEN_MAXIMUM_ROUNDS INT_MAX
 
-
-typedef struct ssh2_cipher {
-	SSHCipherId id;
-	char *name;
-	int block_size;
-	int key_len;
-	int discard_len;
-	int iv_len;
-	int auth_len;
-	const EVP_CIPHER *(*func)(void);
-} SSH2Cipher;
-
-typedef enum {
-	KEX_DH_NONE,       /* disabled line */
-	KEX_DH_GRP1_SHA1,
-	KEX_DH_GRP14_SHA1,
-	KEX_DH_GEX_SHA1,
-	KEX_DH_GEX_SHA256,
-	KEX_ECDH_SHA2_256,
-	KEX_ECDH_SHA2_384,
-	KEX_ECDH_SHA2_521,
-	KEX_DH_GRP14_SHA256,
-	KEX_DH_GRP16_SHA512,
-	KEX_DH_GRP18_SHA512,
-	KEX_DH_UNKNOWN,
-	KEX_DH_MAX = KEX_DH_UNKNOWN,
-} kex_algorithm;
-
-typedef enum {
-	HMAC_NONE,      /* disabled line */
-	HMAC_SHA1,
-	HMAC_MD5,
-	HMAC_SHA1_96,
-	HMAC_MD5_96,
-	HMAC_RIPEMD160,
-	HMAC_SHA2_256,
-	HMAC_SHA2_256_96,
-	HMAC_SHA2_512,
-	HMAC_SHA2_512_96,
-	HMAC_SHA1_EtM,
-	HMAC_MD5_EtM,
-	HMAC_SHA1_96_EtM,
-	HMAC_MD5_96_EtM,
-	HMAC_RIPEMD160_EtM,
-	HMAC_SHA2_256_EtM,
-	HMAC_SHA2_512_EtM,
-	HMAC_IMPLICIT,
-	HMAC_UNKNOWN,
-	HMAC_MAX = HMAC_UNKNOWN,
-} SSH2MacId;
-
-typedef struct ssh2_mac {
-	SSH2MacId id;
-	char *name;
-	const EVP_MD *(*evp_md)(void);
-	int truncatebits;
-	int etm;
-} SSH2Mac;
-
-typedef enum {
-	COMP_NONE,      /* disabled line */
-	COMP_NOCOMP,
-	COMP_ZLIB,
-	COMP_DELAYED,
-	COMP_UNKNOWN,
-	COMP_MAX = COMP_UNKNOWN,
-} compression_type;
 
 struct Enc {
 	u_char          *key;
@@ -465,30 +357,6 @@ typedef struct Key {
 	int bcrypt_kdf;
 } Key;
 
-// fingerprintの種別
-enum fp_rep {
-	SSH_FP_DEFAULT = 0,
-	SSH_FP_HEX,
-	SSH_FP_BASE64,
-	SSH_FP_BUBBLEBABBLE,
-	SSH_FP_RANDOMART
-};
-/*
-enum fp_type {
-	SSH_FP_MD5,
-	SSH_FP_SHA1,
-	SSH_FP_SHA256
-};
-*/
-typedef enum {
-	SSH_DIGEST_MD5,
-	SSH_DIGEST_RIPEMD160,
-	SSH_DIGEST_SHA1,
-	SSH_DIGEST_SHA256,
-	SSH_DIGEST_SHA384,
-	SSH_DIGEST_SHA512,
-	SSH_DIGEST_MAX,
-} digest_algorithm;
 
 enum scp_dir {
 	TOREMOTE, FROMREMOTE,
@@ -630,23 +498,6 @@ void SSH2_send_kexinit(PTInstVar pvar);
 BOOL do_SSH2_userauth(PTInstVar pvar);
 BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
-int get_cipher_block_size(const SSH2Cipher *cipher);
-int get_cipher_key_len(const SSH2Cipher *cipher);
-int get_cipher_iv_len(const SSH2Cipher *cipher);
-int get_cipher_auth_len(const SSH2Cipher *cipher);
-const SSH2Cipher *get_cipher_by_name(char *name);
-char* get_kex_algorithm_name(kex_algorithm kextype);
-const EVP_CIPHER* get_cipher_EVP_CIPHER(const SSH2Cipher *cipher);
-const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
-const SSH2Mac *get_ssh2_mac(SSH2MacId id);
-char* get_ssh2_mac_name(const SSH2Mac *mac);
-const char* get_ssh2_mac_name_by_id(SSH2MacId id);
-const EVP_MD* get_ssh2_mac_EVP_MD(const SSH2Mac *mac);
-int get_ssh2_mac_truncatebits(const SSH2Mac *mac);
-char* get_ssh2_comp_name(compression_type type);
-char* get_ssh_keytype_name(ssh_keytype type);
-char* get_digest_algorithm_name(digest_algorithm id);
-int get_cipher_discard_len(const SSH2Cipher *cipher);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);
@@ -657,11 +508,6 @@ BOOL handle_SSH2_userauth_msg60(PTInstVar pvar);
 BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar);
 BOOL handle_SSH2_userauth_pkok(PTInstVar pvar);
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar);
-void SSH2_update_compression_myproposal(PTInstVar pvar);
-void SSH2_update_cipher_myproposal(PTInstVar pvar);
-void SSH2_update_kex_myproposal(PTInstVar pvar);
-void SSH2_update_host_key_myproposal(PTInstVar pvar);
-void SSH2_update_hmac_myproposal(PTInstVar pvar);
 int SSH_notify_break_signal(PTInstVar pvar);
 
 ///
@@ -749,6 +595,8 @@ unsigned char *begin_send_packet(PTInstVar pvar, int type, int len);
 void finish_send_packet_special(PTInstVar pvar, int skip_compress);
 void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry);
 Channel_t* ssh2_local_channel_lookup(int local_num);
+void normalize_generic_order(char *buf, char default_strings[], int default_strings_len);
+void choose_SSH2_proposal(char* server_proposal, char* my_proposal,char* dest, int dest_len);
 
 #define finish_send_packet(pvar) finish_send_packet_special((pvar), 0)
 #define get_payload_uint32(pvar, offset) get_uint32_MSBfirst((pvar)->ssh_state.payload + (offset))
@@ -797,4 +645,4 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar);
 BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar);
 BOOL handle_SSH2_ecdh_kex_reply_after_known_hosts(PTInstVar pvar);
 
-#endif
+#endif /* __SSH_H */

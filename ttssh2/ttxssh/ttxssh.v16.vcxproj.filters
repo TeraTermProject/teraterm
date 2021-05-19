@@ -13,7 +13,19 @@
     <ClCompile Include="chacha.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cipher.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cipher-3des1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cipher-chachapoly-libcrypto.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cipher-ctr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="comp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="crypt.c">
@@ -58,6 +70,9 @@
     <ClCompile Include="fwdui.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hostkey.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="hosts.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -70,16 +85,25 @@
     <ClCompile Include="keyfiles.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\matcher\matcher.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pkt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="poly1305.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="sftp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ssh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ssherr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ttxssh.c">
@@ -141,7 +165,13 @@
     <ClInclude Include="cipher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cipher-chachapoly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="comp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="crypt.h">
@@ -171,6 +201,9 @@
     <ClInclude Include="fwdui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="hostkey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="hosts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -183,13 +216,22 @@
     <ClInclude Include="keyfiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mac.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="pkt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="poly1305.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sftp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ssh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ssherr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util.h">

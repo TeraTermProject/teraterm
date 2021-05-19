@@ -371,12 +371,12 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 // bcrypt KDF 形式で読む
 // based on key_parse_private2() @ OpenSSH 6.5
 static Key *read_SSH2_private2_key(PTInstVar pvar,
-                           FILE * fp,
-                           char * passphrase,
-                           BOOL * invalid_passphrase,
-                           BOOL is_auto_login,
-                           char *errmsg,
-                           int errmsg_len)
+                                   FILE * fp,
+                                   char * passphrase,
+                                   BOOL * invalid_passphrase,
+                                   BOOL is_auto_login,
+                                   char *errmsg,
+                                   int errmsg_len)
 {
 	/* (A) 
 	 * buffer_consume系関数を使う場合は、buffer_lenとbuffer_ptrが使えないので、
@@ -396,9 +396,9 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
 	unsigned int check1, check2, m1len, m2len; 
 	int dlen, i;
-	const SSH2Cipher *cipher;
+	const struct ssh2cipher *cipher;
 	size_t authlen;
-	EVP_CIPHER_CTX *cipher_ctx = NULL;
+	struct sshcipher_ctx *cc = NULL;
 	int ret;
 
 	blob = buffer_init();
@@ -406,9 +406,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	kdf = buffer_init();
 	encoded = buffer_init();
 	copy_consumed = buffer_init();
-	cipher_ctx = EVP_CIPHER_CTX_new();
 
-	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL || cipher_ctx == NULL)
+	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL)
 		goto error;
 
 	// ファイルをすべて読み込む
@@ -569,14 +568,11 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	// 復号化
 	cp = buffer_append_space(b, len);
-	cipher_init_SSH2(cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
-		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
-	ret = EVP_Cipher(cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len);
+	cipher_init_SSH2(&cc, cipher, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, pvar);
+	ret = EVP_Cipher(cc->evp, cp, buffer_tail_ptr(copy_consumed), len);
 	if (ret == 0) {
-		cipher_cleanup_SSH2(cipher_ctx);
 		goto error;
 	}
-	cipher_cleanup_SSH2(cipher_ctx);
 	buffer_consume(copy_consumed, len);
 
 	if (buffer_remain_len(copy_consumed) != 0) {
@@ -624,6 +620,7 @@ error:
 	buffer_free(kdf);
 	buffer_free(encoded);
 	buffer_free(copy_consumed);
+	cipher_free_SSH2(cc);
 
 	free(ciphername);
 	free(kdfname);
@@ -631,10 +628,6 @@ error:
 	free(key);
 	free(salt);
 	free(comment);
-
-	if (cipher_ctx) {
-		EVP_CIPHER_CTX_free(cipher_ctx);
-	}
 
 	// KDF ではなかった
 	if (keyfmt == NULL) {
@@ -834,6 +827,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	int i, len, len2;
 	char *encname = NULL, *comment = NULL, *private_mac = NULL;
 	buffer_t *pubkey = NULL, *prikey = NULL;
+	const struct ssh2cipher *cipher = NULL;
+	struct sshcipher_ctx *cc = NULL;
 
 	result = (Key *)malloc(sizeof(Key));
 	ZeroMemory(result, sizeof(Key)); 
@@ -960,7 +955,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		}
 
 		cipher_ctx = EVP_CIPHER_CTX_new();
-		if (ctx == NULL) {
+		if (cipher_ctx == NULL) {
 			EVP_MD_CTX_free(ctx);
 			goto error;
 		}
@@ -980,22 +975,21 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
+		cipher = get_cipher_by_name("aes256-cbc");
+		cipher_init_SSH2(&cc, cipher, key, 32, iv, 16, CIPHER_DECRYPT, pvar);
 		len = buffer_len(prikey);
 		decrypted = (char *)malloc(len);
-		ret = EVP_Cipher(cipher_ctx, decrypted, prikey->buf, len);
+		ret = EVP_Cipher(cc->evp, decrypted, prikey->buf, len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
-			cipher_cleanup_SSH2(cipher_ctx);
-			EVP_CIPHER_CTX_free(cipher_ctx);
+			cipher_free_SSH2(cc);
 			goto error;
 		}
 		buffer_clear(prikey);
 		buffer_append(prikey, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(cipher_ctx);
-		EVP_CIPHER_CTX_free(cipher_ctx);
+		cipher_free_SSH2(cc);
 	}
 
 	// verity MAC
@@ -1006,9 +1000,9 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 
 	macdata = buffer_init();
 
-	len = strlen(get_ssh_keytype_name(result->type));
+	len = strlen(get_ssh2_hostkey_type_name(result->type));
 	buffer_put_int(macdata, len);
-	buffer_append(macdata, get_ssh_keytype_name(result->type), len);
+	buffer_append(macdata, get_ssh2_hostkey_type_name(result->type), len);
 	len = strlen(encname);
 	buffer_put_int(macdata, len);
 	buffer_append(macdata, encname, len);
@@ -1412,6 +1406,8 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	int encflag;
 	char *encname = NULL;
 	buffer_t *blob = NULL, *blob2 = NULL;
+	const struct ssh2cipher *cipher = NULL;
+	struct sshcipher_ctx *cc = NULL;
 
 	result = (Key *)malloc(sizeof(Key));
 	ZeroMemory(result, sizeof(Key)); 
@@ -1553,19 +1549,18 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
+		cipher = get_cipher_by_name("3des-cbc");
+		cipher_init_SSH2(&cc, cipher, key, 24, iv, 8, CIPHER_DECRYPT, pvar);
 		decrypted = (char *)malloc(len);
-		ret = EVP_Cipher(cipher_ctx, decrypted, blob->buf + blob->offset, len);
+		ret = EVP_Cipher(cc->evp, decrypted, blob->buf + blob->offset, len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
-			cipher_cleanup_SSH2(cipher_ctx);
-			EVP_CIPHER_CTX_free(cipher_ctx);
+			cipher_free_SSH2(cc);
 			goto error;
 		}
 		buffer_append(blob2, decrypted, len);
 		free(decrypted);
-		cipher_cleanup_SSH2(cipher_ctx);
-		EVP_CIPHER_CTX_free(cipher_ctx);
+		cipher_free_SSH2(cc);
 
 		*invalid_passphrase = TRUE;
 	}

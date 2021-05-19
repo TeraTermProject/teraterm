@@ -236,6 +236,10 @@
 				>
 			</File>
 			<File
+				RelativePath="cipher-chachapoly.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\teraterm\common\codeconv.h"
 				>
 			</File>
@@ -245,6 +249,10 @@
 			</File>
 			<File
 				RelativePath="..\..\teraterm\common\compat_win.h"
+				>
+			</File>
+			<File
+				RelativePath="comp.h"
 				>
 			</File>
 			<File
@@ -296,6 +304,10 @@
 				>
 			</File>
 			<File
+				RelativePath="hostkey.h"
+				>
+			</File>
+			<File
 				RelativePath="hosts.h"
 				>
 			</File>
@@ -316,7 +328,15 @@
 				>
 			</File>
 			<File
+				RelativePath="mac.h"
+				>
+			</File>
+			<File
 				RelativePath="pkt.h"
+				>
+			</File>
+			<File
+				RelativePath="poly1305.h"
 				>
 			</File>
 			<File
@@ -329,6 +349,10 @@
 			</File>
 			<File
 				RelativePath="ssh.h"
+				>
+			</File>
+			<File
+				RelativePath="ssherr.h"
 				>
 			</File>
 			<File
@@ -368,11 +392,27 @@
 				>
 			</File>
 			<File
+				RelativePath="cipher.c"
+				>
+			</File>
+			<File
+				RelativePath="cipher-3des1.c"
+				>
+			</File>
+			<File
+				RelativePath="cipher-chachapoly-libcrypto.c"
+				>
+			</File>
+			<File
 				RelativePath="cipher-ctr.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\teraterm\common\compat_w95_vs2005.c"
+				>
+			</File>
+			<File
+				RelativePath="comp.c"
 				>
 			</File>
 			<File
@@ -432,6 +472,10 @@
 				>
 			</File>
 			<File
+				RelativePath="hostkey.c"
+				>
+			</File>
+			<File
 				RelativePath="hosts.c"
 				>
 			</File>
@@ -448,6 +492,10 @@
 				>
 			</File>
 			<File
+				RelativePath="mac.c"
+				>
+			</File>
+			<File
 				RelativePath="..\matcher\matcher.c"
 				>
 			</File>
@@ -456,11 +504,19 @@
 				>
 			</File>
 			<File
+				RelativePath="poly1305.c"
+				>
+			</File>
+			<File
 				RelativePath="sftp.c"
 				>
 			</File>
 			<File
 				RelativePath="ssh.c"
+				>
+			</File>
+			<File
+				RelativePath="ssherr.c"
 				>
 			</File>
 			<File

@@ -26,7 +26,58 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef KEX_H
+#define KEX_H
+
 #include "ttxssh.h"
+
+// クライアントからサーバへの提案事項
+enum kex_init_proposals {
+	PROPOSAL_KEX_ALGS,
+	PROPOSAL_SERVER_HOST_KEY_ALGS,
+	PROPOSAL_ENC_ALGS_CTOS,
+	PROPOSAL_ENC_ALGS_STOC,
+	PROPOSAL_MAC_ALGS_CTOS,
+	PROPOSAL_MAC_ALGS_STOC,
+	PROPOSAL_COMP_ALGS_CTOS,
+	PROPOSAL_COMP_ALGS_STOC,
+	PROPOSAL_LANG_CTOS,
+	PROPOSAL_LANG_STOC,
+	PROPOSAL_MAX
+};
+
+#define KEX_DEFAULT_KEX     ""
+#define KEX_DEFAULT_PK_ALG  ""
+#define KEX_DEFAULT_ENCRYPT ""
+#define KEX_DEFAULT_MAC     ""
+#define KEX_DEFAULT_COMP    ""
+#define KEX_DEFAULT_LANG    ""
+
+extern char *myproposal[PROPOSAL_MAX];
+
+typedef enum {
+	KEX_DH_NONE,       /* disabled line */
+	KEX_DH_GRP1_SHA1,
+	KEX_DH_GRP14_SHA1,
+	KEX_DH_GEX_SHA1,
+	KEX_DH_GEX_SHA256,
+	KEX_ECDH_SHA2_256,
+	KEX_ECDH_SHA2_384,
+	KEX_ECDH_SHA2_521,
+	KEX_DH_GRP14_SHA256,
+	KEX_DH_GRP16_SHA512,
+	KEX_DH_GRP18_SHA512,
+	KEX_DH_UNKNOWN,
+	KEX_DH_MAX = KEX_DH_UNKNOWN,
+} kex_algorithm;
+
+char* get_kex_algorithm_name(kex_algorithm kextype);
+const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
+
+void normalize_kex_order(char *buf);
+kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal);
+void SSH2_update_kex_myproposal(PTInstVar pvar);
+
 
 // SSH_MSG_KEY_DH_GEX_REQUEST での min, n, max がとり得る範囲の上限/下限 (RFC 4419)
 #define GEX_GRP_LIMIT_MIN   1024
@@ -85,3 +136,5 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secret,
                      char *session_id, int session_id_len);
+
+#endif				/* KEX_H */

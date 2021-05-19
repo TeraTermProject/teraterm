@@ -176,64 +176,115 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 		}
 		else if (pvar->pkt_state.seen_server_ID && pvar->pkt_state.datalen >= SSH_get_min_packet_size(pvar)) {
 			char *data = pvar->pkt_state.buf + pvar->pkt_state.datastart;
-			uint32 padding;
-			uint32 pktsize;
+			uint32 padding_size = 0;
+			uint32 pktsize = 0;
 			uint32 total_packet_size;
 			struct Mac *mac = &pvar->ssh2_keys[MODE_IN].mac;
 			struct Enc *enc = &pvar->ssh2_keys[MODE_IN].enc;
-			int aadlen;
+			int authlen = 0, aadlen = 0;
 
-			/*
-			 * aadlen: Additional Authenticated Data Length
-			 *   - 暗号化しないが MAC や AEAD での認証の対象となるデータの長さ
-			 *
-			 * EtM 方式の MAC や、AEAD な暗号ではパケットの先頭のパケット長部分は暗号化されず
-			 * 認証のみが行われる。パケット長は uint32 (4バイト) で格納されている。
-			 * 通常の MAC 方式 (E&M) で、かつ AEAD でない暗号方式ではパケット長部分も暗号化
-			 * されるので aadlen は 0 となる。
-			 */
-			if (SSHv2(pvar) && ((mac && mac->etm) || (enc && enc->auth_len > 0))) {
-				aadlen = 4;
+			if (SSHv2(pvar)) {
+				/*
+				 * pktsize
+				 *   uint32   packet_length
+				 * は
+				 *   byte     padding_length
+				 *   byte[n1] payload; n1 = packet_length - padding_length - 1
+				 *   byte[n2] random padding; n2 = padding_length
+				 * の長さの合計で
+				 *   byte[m]  mac (Message Authentication Code - MAC); m = mac_length
+				 * の長さを含まない。
+				 * cf. RFC 4253 6. Binary Packet Protocol
+				 */
+
+				if (enc && enc->auth_len > 0) {
+					authlen = enc->auth_len;
+				}
+
+				/*
+				 *                      |          | lead 4 bytes are encrypted | aadlen |
+				 * Encryption type
+				 *   enc->auth_len >  0 | AEAD     | AES-GCM ... no             | 4      |     (2)
+				 *                      |          | chacha20-poly1305 ... yes  | 4      | (1) (2)
+				 *   enc->auth_len == 0 | not AEAD | depends on MAC type        | <-     |
+				 * MAC type
+				 *   mac->etm == true   | EtM      | no                         | 4      |
+				 *   mac->etm == false  | E&M      | yes                        | 0      |
+				 * (1) lead 4 bytes are encrypted separately from main part.
+				 * (2) implicit MAC type of AEAD is EtM
+				 */
+				/*
+				 * aadlen: Additional Authenticated Data Length
+				 *   MAC の対象となるデータと一緒に暗号化されない、"MAC の対象となるデータの長さ"のサイズ
+				 *   この部分は packet_length で、uint32 (4バイト)
+				 * 
+				 * - 通常の MAC 方式 (E&M) ではパケット長部分が一緒に暗号化されるので aadlen は 0 となる。
+				 * - EtM 方式の MAC や AEAD の AES-GCM では、パケット長部分が暗号化されないので
+				 * aadlen は 4 となる。
+				 * - AEAD の chacha20-poly1305 ではパケット長部分が暗号化されるが、MAC の対象となるデータ
+				 * とは別に暗号化されるので aadlen は 4 となる。
+				 * 
+				 */
+				if ((mac && mac->etm) || authlen > 0) {
+					aadlen = 4;
+				}
+
+				if (authlen > 0 &&
+				    pvar->cc[MODE_IN]->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
+					/*
+					 * AEAD の chacha20-poly1305 ではパケット長部分が別に暗号化されている。
+					 * この処理は長さを取得するが、data は暗号化されたままとなる。
+					 */
+					chachapoly_get_length(pvar->cc[MODE_IN]->cp_ctx, &pktsize,
+					                      pvar->ssh_state.receiver_sequence_number,
+					                      data, pvar->pkt_state.datalen);
+				}
+				else if (authlen == 0 &&
+				         aadlen == 0 &&
+				         !pvar->pkt_state.predecrypted_packet && aadlen == 0) {
+					/*
+					 * AEAD でなく E&M (aadlen が 0) の時は、暗号化されているパケット長を
+					 * 知る必要が有るため、先頭の 1 ブロックだけ事前に復号する。
+					 */
+					SSH_predecrypt_packet(pvar, data);
+					pvar->pkt_state.predecrypted_packet = TRUE;
+
+					pktsize = get_uint32_MSBfirst(data);
+				}
+				else {
+					/*
+					 * EtM 方式の MAC や、AEAD で AES-GCM のときなどはそのまま読める。
+					 */
+					pktsize = get_uint32_MSBfirst(data);
+				}
 			}
 			else {
-				aadlen = 0;
+				pktsize = get_uint32_MSBfirst(data);
 			}
-
-			/*
-			 * aadlen が 0 の時はパケット長部分が暗号化されている。パケット全体を受信してから
-			 * 後段の処理を行う為にパケット長を知る必要が有る為、先頭の 1 ブロックを復号する。
-			 */
-			if (SSHv2(pvar) && !pvar->pkt_state.predecrypted_packet && aadlen == 0) {
-				SSH_predecrypt_packet(pvar, data);
-				pvar->pkt_state.predecrypted_packet = TRUE;
-			}
-
-			// パケットの先頭に uint32 (4バイト) のパケット長が来る
-			pktsize = get_uint32_MSBfirst(data);
 
 			if (SSHv1(pvar)) {
 				// SSH1 ではパケット長の値には padding の長さが含まれていない。
 				// また padding の長さの情報もパケット上には無いので、パケット長の値から計算する。
-				padding = 8 - (pktsize % 8);
+				padding_size = 8 - (pktsize % 8);
 
-				// 以降の処理は pktsize に padding の値が含まれている事が前提となっている。
-				pktsize += padding;
+				// 以降の処理は pktsize に padding_size の値が含まれている事が前提となっている。
+				pktsize += padding_size;
 			}
 
-			// パケット(TCPペイロード)の全体のサイズは、SSHペイロード+4（+MAC）となる。
-			// +4は、SSHペイロードのサイズを格納している部分（int型）。
-			total_packet_size = pktsize + 4 + SSH_get_authdata_size(pvar, MODE_IN);
+			// パケット(TCPペイロード)の全体のサイズは、
+			// 4（パケット長のサイズ）+パケット長（+MACのサイズ）となる。
+			total_packet_size = 4 + pktsize + SSH_get_authdata_size(pvar, MODE_IN);
 
 			if (total_packet_size <= pvar->pkt_state.datalen) {
 				// 受信済みデータが十分有る場合はパケットの実処理を行う
 				if (SSHv1(pvar)) {
 					// SSH1 は EtM 非対応 (そもそも MAC ではなく CRC を使う)
-					SSH1_handle_packet(pvar, data, pktsize, padding);
+					SSH1_handle_packet(pvar, data, pktsize, padding_size);
 				}
 				else {
 					// SSH2 ではこの時点では padding 長部分が復号されていない場合があるので、
 					// padding 長は渡さずに、必要になった時に内部で取得する。
-					SSH2_handle_packet(pvar, data, pktsize, aadlen, enc->auth_len);
+					SSH2_handle_packet(pvar, data, pktsize, aadlen, authlen);
 				}
 
 				pvar->pkt_state.predecrypted_packet = FALSE;
