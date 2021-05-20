@@ -69,6 +69,8 @@ target_sources(
   key.h
   keyfiles.c
   keyfiles.h
+  keyfiles-putty.c
+  keyfiles-putty.h
   mac.c
   mac.h
   pkt.c
@@ -179,6 +181,7 @@ target_link_libraries(
   common_static
   libputty
   ttpcmn
+  argon2
   ${ZLIB_LIB}
   ${OPENSSL_LIB}
   #

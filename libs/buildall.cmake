@@ -49,4 +49,9 @@ message("cJSON")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -P cJSON.cmake
   )
+message("argon2")
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -P argon2.cmake
+  )
+
 message("done buildall.cmake")
