@@ -164,10 +164,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libs\argon2\src\ref.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libs\argon2\src\thread.h"
 				>
 			</File>

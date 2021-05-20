@@ -76,7 +76,6 @@
     <ClInclude Include="..\..\libs\argon2\src\blake2\blamka-round-ref.h" />
     <ClInclude Include="..\..\libs\argon2\src\core.h" />
     <ClInclude Include="..\..\libs\argon2\src\encoding.h" />
-    <ClInclude Include="..\..\libs\argon2\src\ref.h" />
     <ClInclude Include="..\..\libs\argon2\src\thread.h" />
     <ClInclude Include="argon2.h" />
   </ItemGroup>
