@@ -39,4 +39,9 @@ message("openssl 1.1")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl11.cmake
   )
+message("argon2")
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -P argon2.cmake
+  )
+
 message("done buildall.cmake")
