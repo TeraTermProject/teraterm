@@ -98,7 +98,6 @@ int __stdcall CygwinVersion(char *dll, int *major, int *minor)
 {
 	DWORD dwSize;
 	DWORD dwHandle;
-	DWORD dwLen;
 	LPVOID lpBuf;
 	UINT uLen;
 	VS_FIXEDFILEINFO *pFileInfo;
