@@ -13,8 +13,8 @@ if ERRORLEVEL 1 goto patch_end
 pushd ..\openssl_patch
 call apply_patch.bat
 if ERRORLEVEL 1 (
-    echo "buildopenssl11.bat を終了します"
-    exit /b 1
+    popd
+    goto fail
 )
 popd
 
@@ -52,21 +52,27 @@ rem Visual Studio 2005 の場合は 2003 R2 Platform SDK の導入を確認する
 echo %CL_VER% | find "Compiler Version 14" >nul
 if ERRORLEVEL 1 goto end
 @echo off
-if not exist out32\openssl.exe (
-    echo crypt32.lib がリンクできずにバイナリが作成できていません。
-    echo Platform SDKが導入されていない可能性があります。
-    set /P ANS2003SDK="続行しますか？(y/n)"
-    if "%ANS2003SDK%"=="y" (
-        goto end
-    ) else (
-        echo "buildopenssl11.bat を終了します"
-        exit /b 1
-    )
-) else (
+if exist out32\openssl.exe (
     echo OpenSSLのビルドが正常終了しました。
+    goto end
 )
-@echo on
-
+echo crypt32.lib がリンクできずにバイナリが作成できていません。
+echo Platform SDKが導入されていない可能性があります。
+set /P ANS2003SDK="続行しますか？(y/n)"
+if "%ANS2003SDK%"=="y" (
+    goto end
+) else (
+    goto fail
+)
 
 :end
 cd ..
+@echo on
+exit /b 0
+
+
+:fail
+cd ..
+echo "buildopenssl11.bat を終了します"
+@echo on
+exit /b 1
