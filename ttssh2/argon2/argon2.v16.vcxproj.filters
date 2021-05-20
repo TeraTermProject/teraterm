@@ -27,9 +27,6 @@
     <ClInclude Include="..\..\libs\argon2\src\encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\argon2\src\ref.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\argon2\src\thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
