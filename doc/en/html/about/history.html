@@ -35,26 +35,25 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>Increased max width of window from 500 to 1000 chars.</li>
       <li>Serial port connection
         <ul>
           <li>Removed the 1.5 stop bit in the serial port setup.</li>
           <li>Removed the "1.5" name from the StopBit entry in the teraterm.ini file.</li>
         </ul></li>
-      <li>Increased max width of window from 500 to 1000 chars.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>Fixed memory leak when tool tip is shown. This bug was introduced in 4.103.</li>
-      <li>Fixed support for IME feedback back and forth function. This bug was introduced in 4.103.</li>
-      <li>Fixed desktop images can not be displayed on background other than main display. This bug was introduced in 4.103.</li>
-      <li>Fixed an application fault occurs when VT Window and HtmlHelp Windows are closed at same time.</li>
       <li>The elapsed time style timestamp in the log is incorrect.</li>
+      <li>Fixed support for IME feedback back and forth function. This bug was introduced in 4.103.</li>
+      <li>Fixed an application fault occurs when VT Window and HtmlHelp Windows are closed at same time.</li>
+      <li>Fixed desktop images can not be displayed on background other than main display. This bug was introduced in 4.101.</li>
+      <li>Fixed memory leak when tool tip is shown. This bug was introduced in 4.103.</li>
       <li>MACRO: the <a href="../macro/command/yesnobox.html">yesnobox</a> command shows "OK" instead of "yes" without language file. This bug was introduced in 4.103.</li>
       <li>MACRO: The file handle opened by <a href="../macro/command/filecreate.html">filecreate</a>, <a href="../macro/command/fileopen.html">fileopen</a> marco command is locking. </li>
-       <li>MACRO: When the <a href="../macro/command/getdate.html">getdate</a>, <a href="../macro/command/gettime.html">gettime</a> command is executed with timezone parameter, valid time may not be returned. Build mistaken in 4.105.</li>
-    </ul>
+      <li>MACRO: When the <a href="../macro/command/getdate.html">getdate</a>, <a href="../macro/command/gettime.html">gettime</a> command is executed with timezone parameter, valid time may not be returned. Build mistaken in 4.105.</li>
     </ul>
   </li>
 
@@ -3289,12 +3288,12 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>When system memory is insufficient, invalid signature may be used as correct one well with signature verification by the host key at the time of key exchange.</li>
-      <li>When you resize the VT window or send a break signal immediately after user authentication was completed, connection is closed by server.</li>
-      <li>A part of control is always enabled on SSH authentication dialog.</li>
-      <li>When many files are sent in a batch by using D&D's SCP sending, an error occurs.</li>
       <li>When the Virtual Store is enabled on Windows Vista or later and the Host key rotation is enabled,  the original host key is accidentally deleted from known_hosts file.</li>
       <li>When the Virtual Store is enabled on Windows Vista or later and the host key type is same but key contents is different,  the host key can not be deleted from known_hosts file.</li>
+      <li>When many files are sent in a batch by using D&D's SCP sending, an error occurs.</li>
+      <li>When you resize the VT window or send a break signal immediately after user authentication was completed, connection is closed by server.</li>
+      <li>When system memory is insufficient, invalid signature may be used as correct one well with signature verification by the host key at the time of key exchange.</li>
+      <li>A part of control is always enabled on SSH authentication dialog.</li>
     </ul>
   </li>
 
