@@ -404,7 +404,7 @@ void SendMemContinuously(void)
 			CommBinaryBuffOut(p->cv_, (PCHAR)send_ptr, (int)send_len);
 		}
 		if (p->local_echo_enable) {
-			CommTextEcho(p->cv_, (PCHAR)send_ptr, (int)send_len);
+			CommBinaryEcho(p->cv_, (PCHAR)send_ptr, (int)send_len);
 		}
 	}
 	else {
