@@ -607,6 +607,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="cJSON ライセンス">
+			<param name="Local" value="html\reference\cJSON-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="開発者向け">
 			<param name="Local" value="html\reference\develop.txt">
 			<param name="ImageNumber" value="11">
