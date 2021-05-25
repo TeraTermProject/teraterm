@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+﻿#!/usr/bin/perl -w
 
 require 5.8.0;
 use strict;
@@ -21,13 +21,21 @@ if (!(defined($in) && defined($out))) {
 	die "Usage: $0 --in file --out file [ --coding input_encoding ] [ --lf line_format ]\n";
 }
 
-open (IN,  "<:$lf:encoding($coding)",   $in);
+my $IN;
+if ($in eq "-") {
+	binmode STDIN, ":$lf:encoding($coding)";
+	$IN = *STDIN;
+} else {
+	open ($IN,  "<:$lf:encoding($coding)",   $in);
+}
 open (OUT, '>:crlf:encoding(shiftjis)', $out);
-while (<IN>) {
+while (<$IN>) {
 	print OUT $_;
 }
 close OUT;
-close IN;
+close $IN;
 
-my(@filestat) = stat $in;
-utime $filestat[8], $filestat[9], $out;
+if ($in ne "-") {
+	my(@filestat) = stat $in;
+	utime $filestat[8], $filestat[9], $out;
+}

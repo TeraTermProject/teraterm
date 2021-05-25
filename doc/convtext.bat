@@ -16,17 +16,13 @@ set REF_J=ja\html\reference
 %TOSJIS% -i ..\cygterm\COPYING          -o %REF_J%\CygTerm+-LICENSE.txt  -l unix
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_E%\zlib-LICENSE.txt      -l unix
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_J%\zlib-LICENSE.txt      -l unix
-%TOSJIS% -i ..\libs\cJSON\LICENSE       -o %REF_J%\cJSON-LICENSE.txt     -l crlf
 %TOSJIS% -i ..\libs\cJSON\LICENSE       -o %REF_E%\cJSON-LICENSE.txt     -l crlf
+%TOSJIS% -i ..\libs\cJSON\LICENSE       -o %REF_J%\cJSON-LICENSE.txt     -l crlf
 %TOSJIS% -i ..\libs\argon2\LICENSE      -o %REF_E%\argon2-LICENSE.txt    -l unix
 %TOSJIS% -i ..\libs\argon2\LICENSE      -o %REF_J%\argon2-LICENSE.txt    -l unix
 
-perl -C0 -pe "s/^\xef\xbb\xbf//" ja/html/reference/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl > ja/html/reference/build_with_cmake_utf8.html
-%TOSJIS% -i ja/html/reference/build_with_cmake_utf8.html -o ja/html/reference/build_with_cmake.html  -c utf8
-perl -C0 -pe "s/^\xef\xbb\xbf//" en/html/reference/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl > en/html/reference/build_with_cmake_utf8.html
-%TOSJIS% -i en/html/reference/build_with_cmake_utf8.html -o en/html/reference/build_with_cmake.html  -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_J%/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_J%/build_with_cmake.html -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_E%/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_E%/build_with_cmake.html -c utf8
 
-perl -C0 -pe "s/^\xef\xbb\xbf//" ja/html/reference/build_library_with_cmake.md | perl Markdown_1.0.1/Markdown.pl > ja/html/reference/build_library_with_cmake_utf8.html
-%TOSJIS% -i ja/html/reference/build_library_with_cmake_utf8.html -o ja/html/reference/build_library_with_cmake.html  -c utf8
-perl -C0 -pe "s/^\xef\xbb\xbf//" en/html/reference/build_library_with_cmake.md | perl Markdown_1.0.1/Markdown.pl > en/html/reference/build_library_with_cmake_utf8.html
-%TOSJIS% -i en/html/reference/build_library_with_cmake_utf8.html -o en/html/reference/build_library_with_cmake.html  -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_J%/build_library_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_J%/build_library_with_cmake.html -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_E%/build_library_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_E%/build_library_with_cmake.html -c utf8
