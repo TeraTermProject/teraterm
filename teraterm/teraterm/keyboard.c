@@ -55,10 +55,10 @@ BYTE DebugFlag = DEBUG_FLAG_NONE;
 static char FuncKeyStr[NumOfUDK][FuncKeyStrMax];
 static int FuncKeyLen[NumOfUDK];
 
-  /*keyboard status*/
+/*keyboard status*/
 static int PreviousKey;
 
-  /*key code map*/
+/*key code map*/
 static PKeyMap KeyMap = NULL;
 
 // Ctrl-\ support for NEC-PC98
@@ -70,61 +70,58 @@ static short VKBackslash;
 
 void SetKeyMap()
 {
-  char TempDir[MAXPATHLEN];
-  char TempName[MAX_PATH];
+	char TempDir[MAXPATHLEN];
+	char TempName[MAX_PATH];
 
-  ExtractFileName(ts.KeyCnfFN,TempName,sizeof(TempName));
-  ExtractDirName(ts.KeyCnfFN,TempDir);
-  if (TempDir[0]==0)
-    strncpy_s(TempDir, sizeof(TempDir),ts.HomeDir, _TRUNCATE);
-  FitFileName(TempName,sizeof(TempName),".CNF");
+	ExtractFileName(ts.KeyCnfFN, TempName, sizeof(TempName));
+	ExtractDirName(ts.KeyCnfFN, TempDir);
+	if (TempDir[0] == 0)
+		strncpy_s(TempDir, sizeof(TempDir), ts.HomeDir, _TRUNCATE);
+	FitFileName(TempName, sizeof(TempName), ".CNF");
 
-  strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN),TempDir, _TRUNCATE);
-  AppendSlash(ts.KeyCnfFN,sizeof(ts.KeyCnfFN));
-  strncat_s(ts.KeyCnfFN,sizeof(ts.KeyCnfFN),TempName,_TRUNCATE);
+	strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN), TempDir, _TRUNCATE);
+	AppendSlash(ts.KeyCnfFN, sizeof(ts.KeyCnfFN));
+	strncat_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN), TempName, _TRUNCATE);
 
-  if ( KeyMap==NULL )
-    KeyMap = (PKeyMap)malloc(sizeof(TKeyMap));
-  if ( KeyMap!=NULL )
-  {
-    if ( LoadTTSET() )
-      (*ReadKeyboardCnf)(ts.KeyCnfFN, KeyMap, TRUE);
-    FreeTTSET();
-  }
+	if (KeyMap == NULL)
+		KeyMap = (PKeyMap)malloc(sizeof(TKeyMap));
+	if (KeyMap != NULL) {
+		if (LoadTTSET())
+			(*ReadKeyboardCnf)(ts.KeyCnfFN, KeyMap, TRUE);
+		FreeTTSET();
+	}
 }
 
 void ClearUserKey()
 {
-  int i;
+	int i;
 
-  i = 0;
-  while (i < NumOfUDK)
-    FuncKeyLen[i++] = 0;
+	i = 0;
+	while (i < NumOfUDK) FuncKeyLen[i++] = 0;
 }
 
 void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen)
 {
-  if ((NewKeyLen==0) || (NewKeyLen>FuncKeyStrMax)) return;
+	if ((NewKeyLen == 0) || (NewKeyLen > FuncKeyStrMax))
+		return;
 
-  if ((NewKeyId>=17) && (NewKeyId<=21))
-    NewKeyId = NewKeyId-17;
-  else if ((NewKeyId>=23) && (NewKeyId<=26))
-    NewKeyId = NewKeyId-18;
-  else if ((NewKeyId>=28) && (NewKeyId<=29))
-    NewKeyId = NewKeyId-19;
-  else if ((NewKeyId>=31) && (NewKeyId<=34))
-    NewKeyId = NewKeyId-20;
-  else
-    return;
+	if ((NewKeyId >= 17) && (NewKeyId <= 21))
+		NewKeyId = NewKeyId - 17;
+	else if ((NewKeyId >= 23) && (NewKeyId <= 26))
+		NewKeyId = NewKeyId - 18;
+	else if ((NewKeyId >= 28) && (NewKeyId <= 29))
+		NewKeyId = NewKeyId - 19;
+	else if ((NewKeyId >= 31) && (NewKeyId <= 34))
+		NewKeyId = NewKeyId - 20;
+	else
+		return;
 
-  memcpy(&FuncKeyStr[NewKeyId][0], NewKeyStr, NewKeyLen);
-  FuncKeyLen[NewKeyId] = NewKeyLen;
+	memcpy(&FuncKeyStr[NewKeyId][0], NewKeyStr, NewKeyLen);
+	FuncKeyLen[NewKeyId] = NewKeyLen;
 }
 
-static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
-		      BOOL AppliKeyMode_, BOOL AppliCursorMode_,
-		      BOOL Send8BitMode_, PCHAR KeyStr, int destlen,
-		      LPINT Len, LPWORD Type)
+static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMode_, BOOL AppliCursorMode_,
+					  BOOL Send8BitMode_, PCHAR KeyStr, int destlen, LPINT Len, LPWORD Type)
 {
 	MSG Msg;
 	char Temp[201];
@@ -136,70 +133,75 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\217A",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\217A", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\233A",_TRUNCATE);
-			} else {
+					strncpy_s(KeyStr, destlen, "\233A", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\033OA",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033OA", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\033[A",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033[A", _TRUNCATE);
 			}
 			break;
 		case IdDown:
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\217B",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\217B", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\233B",_TRUNCATE);
-			} else {
+					strncpy_s(KeyStr, destlen, "\233B", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\033OB",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033OB", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\033[B",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033[B", _TRUNCATE);
 			}
 			break;
 		case IdRight:
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\217C",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\217C", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\233C",_TRUNCATE);
-			} else {
+					strncpy_s(KeyStr, destlen, "\233C", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\033OC",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033OC", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\033[C",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033[C", _TRUNCATE);
 			}
 			break;
 		case IdLeft:
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\217D",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\217D", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\233D",_TRUNCATE);
-			} else {
+					strncpy_s(KeyStr, destlen, "\233D", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr,destlen,"\033OD",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033OD", _TRUNCATE);
 				else
-					strncpy_s(KeyStr,destlen,"\033[D",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033[D", _TRUNCATE);
 			}
 			break;
 		case Id0:
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217p",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217p", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Op",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Op", _TRUNCATE);
 				}
 			}
 			else {
@@ -211,10 +213,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217q",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217q", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Oq",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Oq", _TRUNCATE);
 				}
 			}
 			else {
@@ -226,10 +229,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217r",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217r", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Or",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Or", _TRUNCATE);
 				}
 			}
 			else {
@@ -241,10 +245,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217s",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217s", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Os",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Os", _TRUNCATE);
 				}
 			}
 			else {
@@ -256,10 +261,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217t",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217t", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ot",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ot", _TRUNCATE);
 				}
 			}
 			else {
@@ -271,10 +277,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217u",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217u", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ou",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ou", _TRUNCATE);
 				}
 			}
 			else {
@@ -286,10 +293,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217v",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217v", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ov",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ov", _TRUNCATE);
 				}
 			}
 			else {
@@ -301,10 +309,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217w",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217w", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ow",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ow", _TRUNCATE);
 				}
 			}
 			else {
@@ -316,10 +325,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217x",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217x", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ox",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ox", _TRUNCATE);
 				}
 			}
 			else {
@@ -331,10 +341,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217y",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217y", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Oy",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Oy", _TRUNCATE);
 				}
 			}
 			else {
@@ -346,10 +357,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217m",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217m", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Om",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Om", _TRUNCATE);
 				}
 			}
 			else {
@@ -361,10 +373,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217l",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217l", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ol",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ol", _TRUNCATE);
 				}
 			}
 			else {
@@ -376,10 +389,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217n",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217n", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033On",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033On", _TRUNCATE);
 				}
 			}
 			else {
@@ -391,14 +405,15 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217M",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217M", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033OM",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033OM", _TRUNCATE);
 				}
 			}
 			else {
-				*Type = IdText; // do new-line conversion
+				*Type = IdText;	 // do new-line conversion
 				*Len = 1;
 				KeyStr[0] = 0x0D;
 			}
@@ -407,10 +422,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217o",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217o", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Oo",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Oo", _TRUNCATE);
 				}
 			}
 			else {
@@ -422,10 +438,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217j",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217j", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Oj",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Oj", _TRUNCATE);
 				}
 			}
 			else {
@@ -437,10 +454,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr,destlen,"\217k",_TRUNCATE);
-				} else {
+					strncpy_s(KeyStr, destlen, "\217k", _TRUNCATE);
+				}
+				else {
 					*Len = 3;
-					strncpy_s(KeyStr,destlen,"\033Ok",_TRUNCATE);
+					strncpy_s(KeyStr, destlen, "\033Ok", _TRUNCATE);
 				}
 			}
 			else {
@@ -451,281 +469,312 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 		case IdPF1: /* DEC Key: PF1 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr,destlen,"\217P",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\217P", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\033OP",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033OP", _TRUNCATE);
 			}
 			break;
 		case IdPF2: /* DEC Key: PF2 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr,destlen,"\217Q",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\217Q", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\033OQ",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033OQ", _TRUNCATE);
 			}
 			break;
 		case IdPF3: /* DEC Key: PF3 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr,destlen,"\217R",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\217R", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\033OR",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033OR", _TRUNCATE);
 			}
 			break;
 		case IdPF4: /* DEC Key: PF4 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr,destlen,"\217S",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\217S", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\033OS",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033OS", _TRUNCATE);
 			}
 			break;
 		case IdFind: /* DEC Key: Find */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\2331~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\2331~", _TRUNCATE);
+			}
+			else {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\033[1~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[1~", _TRUNCATE);
 			}
 			break;
 		case IdInsert: /* DEC Key: Insert Here */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\2332~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\2332~", _TRUNCATE);
+			}
+			else {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\033[2~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[2~", _TRUNCATE);
 			}
 			break;
 		case IdRemove: /* DEC Key: Remove */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\2333~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\2333~", _TRUNCATE);
+			}
+			else {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\033[3~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[3~", _TRUNCATE);
 			}
 			break;
 		case IdSelect: /* DEC Key: Select */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\2334~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\2334~", _TRUNCATE);
+			}
+			else {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\033[4~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[4~", _TRUNCATE);
 			}
 			break;
 		case IdPrev: /* DEC Key: Prev */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\2335~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\2335~", _TRUNCATE);
+			}
+			else {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\033[5~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[5~", _TRUNCATE);
 			}
 			break;
 		case IdNext: /* DEC Key: Next */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\2336~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\2336~", _TRUNCATE);
+			}
+			else {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\033[6~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[6~", _TRUNCATE);
 			}
 			break;
 		case IdF6: /* DEC Key: F6 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23317~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23317~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[17~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[17~", _TRUNCATE);
 			}
 			break;
 		case IdF7: /* DEC Key: F7 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23318~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23318~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[18~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[18~", _TRUNCATE);
 			}
 			break;
 		case IdF8: /* DEC Key: F8 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23319~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23319~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[19~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[19~", _TRUNCATE);
 			}
 			break;
 		case IdF9: /* DEC Key: F9 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23320~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23320~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[20~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[20~", _TRUNCATE);
 			}
 			break;
 		case IdF10: /* DEC Key: F10 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23321~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23321~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[21~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[21~", _TRUNCATE);
 			}
 			break;
 		case IdF11: /* DEC Key: F11 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23323~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23323~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[23~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[23~", _TRUNCATE);
 			}
 			break;
 		case IdF12: /* DEC Key: F12 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23324~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23324~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[24~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[24~", _TRUNCATE);
 			}
 			break;
 		case IdF13: /* DEC Key: F13 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23325~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23325~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[25~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[25~", _TRUNCATE);
 			}
 			break;
 		case IdF14: /* DEC Key: F14 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23326~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23326~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[26~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[26~", _TRUNCATE);
 			}
 			break;
 		case IdHelp: /* DEC Key: Help */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23328~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23328~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[28~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[28~", _TRUNCATE);
 			}
 			break;
 		case IdDo: /* DEC Key: Do */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23329~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23329~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[29~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[29~", _TRUNCATE);
 			}
 			break;
 		case IdF17: /* DEC Key: F17 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23331~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23331~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[31~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[31~", _TRUNCATE);
 			}
 			break;
 		case IdF18: /* DEC Key: F18 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23332~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23332~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[32~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[32~", _TRUNCATE);
 			}
 			break;
 		case IdF19: /* DEC Key: F19 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23333~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23333~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[33~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[33~", _TRUNCATE);
 			}
 			break;
 		case IdF20: /* DEC Key: F20 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23334~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23334~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[34~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[34~", _TRUNCATE);
 			}
 			break;
 		case IdXF1: /* XTERM F1 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23311~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23311~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
 
-				strncpy_s(KeyStr,destlen,"\033[11~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[11~", _TRUNCATE);
 			}
 			break;
 		case IdXF2: /* XTERM F2 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23312~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23312~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[12~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[12~", _TRUNCATE);
 			}
 			break;
 		case IdXF3: /* XTERM F3 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23313~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23313~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[13~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[13~", _TRUNCATE);
 			}
 			break;
 		case IdXF4: /* XTERM F4 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23314~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23314~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[14~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[14~", _TRUNCATE);
 			}
 			break;
 		case IdXF5: /* XTERM F5 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr,destlen,"\23315~",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\23315~", _TRUNCATE);
+			}
+			else {
 				*Len = 5;
-				strncpy_s(KeyStr,destlen,"\033[15~",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[15~", _TRUNCATE);
 			}
 			break;
 		case IdXBackTab: /* XTERM Back Tab */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr,destlen,"\233Z",_TRUNCATE);
-			} else {
+				strncpy_s(KeyStr, destlen, "\233Z", _TRUNCATE);
+			}
+			else {
 				*Len = 3;
-				strncpy_s(KeyStr,destlen,"\033[Z",_TRUNCATE);
+				strncpy_s(KeyStr, destlen, "\033[Z", _TRUNCATE);
 			}
 			break;
 		case IdHold:
@@ -750,517 +799,458 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode,
 		case IdCmdPrevSWin:
 		case IdCmdLocalEcho:
 		case IdCmdScrollLock:
-			PostMessage(HWin,WM_USER_ACCELCOMMAND,KeyCode,0);
+			PostMessage(HWin, WM_USER_ACCELCOMMAND, KeyCode, 0);
 			break;
 		default:
 			if ((KeyCode >= IdUser1) && (KeyCode <= IdKeyMax)) {
-				*Type = (WORD)(*KeyMap_).UserKeyType[KeyCode-IdUser1]; // key type
-				*Len = KeyMap_->UserKeyLen[KeyCode-IdUser1];
-				memcpy(Temp,
-					   &KeyMap_->UserKeyStr[KeyMap_->UserKeyPtr[KeyCode-IdUser1]],
-					   *Len);
+				*Type = (WORD)(*KeyMap_).UserKeyType[KeyCode - IdUser1];  // key type
+				*Len = KeyMap_->UserKeyLen[KeyCode - IdUser1];
+				memcpy(Temp, &KeyMap_->UserKeyStr[KeyMap_->UserKeyPtr[KeyCode - IdUser1]], *Len);
 				Temp[*Len] = 0;
-				if ((*Type==IdBinary) || (*Type==IdText))
-					*Len = Hex2Str(Temp,KeyStr,destlen);
+				if ((*Type == IdBinary) || (*Type == IdText))
+					*Len = Hex2Str(Temp, KeyStr, destlen);
 				else
-					strncpy_s(KeyStr,destlen,Temp,_TRUNCATE);
+					strncpy_s(KeyStr, destlen, Temp, _TRUNCATE);
 			}
 			else
 				return;
 	}
 	/* remove WM_CHAR message for used keycode */
-	PeekMessage(&Msg,HWin, WM_CHAR, WM_CHAR,PM_REMOVE);
+	PeekMessage(&Msg, HWin, WM_CHAR, WM_CHAR, PM_REMOVE);
 }
 
-static int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeType, WORD ModStat) {
-  BOOL Single, Control, Shift;
-  int CodeLength = 0;
+static int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeType, WORD ModStat)
+{
+	BOOL Single, Control, Shift;
+	int CodeLength = 0;
 
-  Single = FALSE;
-  Shift = FALSE;
-  Control = FALSE;
-  switch (ModStat) {
-    case 0: Single = TRUE; break;
-    case 2: Shift = TRUE; break;
-    case 4: Control = TRUE; break;
-  }
+	Single = FALSE;
+	Shift = FALSE;
+	Control = FALSE;
+	switch (ModStat) {
+		case 0:
+			Single = TRUE;
+			break;
+		case 2:
+			Shift = TRUE;
+			break;
+		case 4:
+			Control = TRUE;
+			break;
+	}
 
-  switch (VKey) {
-    case VK_BACK:
-      if (Control)
-      {
-	CodeLength = 1;
-	if (ts.BSKey==IdDEL)
-	  Code[0] = 0x08;
-	else
-	  Code[0] = 0x7F;
-      }
-      else if (Single)
-      {
-	CodeLength = 1;
-	if (ts.BSKey==IdDEL)
-	  Code[0] = 0x7F;
-	else
-	  Code[0] = 0x08;
-      }
-      break;
-    case VK_RETURN: /* CR Key */
-      if (Single)
-      {
-	*CodeType = IdText; // do new-line conversion
-	CodeLength = 1;
-	Code[0] = 0x0D;
-      }
-      break;
-    case VK_ESCAPE: // Escape Key
-      if (Single) {
-	switch (AppliEscapeMode) {
-	case 1:
-	  CodeLength = 3;
-	  Code[0] = 0x1B;
-	  Code[1] = 'O';
-	  Code[2] = '[';
-	  break;
-	case 2:
-	  CodeLength = 2;
-	  Code[0] = 0x1B;
-	  Code[1] = 0x1B;
-	  break;
-	case 3:
-	  CodeLength = 2;
-	  Code[0] = 0x1B;
-	  Code[1] = 0x00;
-	  break;
-	case 4:
-	  CodeLength = 8;
-	  Code[0] = 0x1B;
-	  Code[1] = 0x1B;
-	  Code[2] = '[';
-	  Code[3] = '=';
-	  Code[4] = '2';
-	  Code[5] = '7';
-	  Code[6] = '%';
-	  Code[7] = '~';
-	  break;
+	switch (VKey) {
+		case VK_BACK:
+			if (Control) {
+				CodeLength = 1;
+				if (ts.BSKey == IdDEL)
+					Code[0] = 0x08;
+				else
+					Code[0] = 0x7F;
+			}
+			else if (Single) {
+				CodeLength = 1;
+				if (ts.BSKey == IdDEL)
+					Code[0] = 0x7F;
+				else
+					Code[0] = 0x08;
+			}
+			break;
+		case VK_RETURN: /* CR Key */
+			if (Single) {
+				*CodeType = IdText;	 // do new-line conversion
+				CodeLength = 1;
+				Code[0] = 0x0D;
+			}
+			break;
+		case VK_ESCAPE:	 // Escape Key
+			if (Single) {
+				switch (AppliEscapeMode) {
+					case 1:
+						CodeLength = 3;
+						Code[0] = 0x1B;
+						Code[1] = 'O';
+						Code[2] = '[';
+						break;
+					case 2:
+						CodeLength = 2;
+						Code[0] = 0x1B;
+						Code[1] = 0x1B;
+						break;
+					case 3:
+						CodeLength = 2;
+						Code[0] = 0x1B;
+						Code[1] = 0x00;
+						break;
+					case 4:
+						CodeLength = 8;
+						Code[0] = 0x1B;
+						Code[1] = 0x1B;
+						Code[2] = '[';
+						Code[3] = '=';
+						Code[4] = '2';
+						Code[5] = '7';
+						Code[6] = '%';
+						Code[7] = '~';
+						break;
+				}
+			}
+			break;
+		case VK_SPACE:
+			if (Control) {	// Ctrl-Space -> NUL
+				CodeLength = 1;
+				Code[0] = 0;
+			}
+			break;
+		case VK_DELETE:
+			if (Single) {
+				if (ts.DelKey > 0) {  // DEL character
+					CodeLength = 1;
+					Code[0] = 0x7f;
+				}
+				else if (!ts.StrictKeyMapping) {
+					GetKeyStr(HWin, KeyMap, IdRemove, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_UP:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdUp, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_DOWN:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdDown, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_RIGHT:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdRight, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_LEFT:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdLeft, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_INSERT:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdInsert, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_HOME:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdFind, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_END:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdSelect, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_PRIOR:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdPrev, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_NEXT:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdNext, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F1:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdXF1, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F2:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdXF2, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F3:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdXF3, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdF13, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F4:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdXF4, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdF14, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F5:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdXF5, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdHelp, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F6:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdF6, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdDo, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F7:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdF7, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdF17, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F8:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdF8, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdF18, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F9:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdF9, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdF19, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F10:
+			if (!ts.StrictKeyMapping) {
+				if (Single) {
+					GetKeyStr(HWin, KeyMap, IdF10, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+				else if (Shift) {
+					GetKeyStr(HWin, KeyMap, IdF20, AppliKeyMode && !ts.DisableAppKeypad,
+							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+							  CodeType);
+				}
+			}
+			break;
+		case VK_F11:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF11, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F12:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF12, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F13:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF13, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F14:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF14, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F15:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdHelp, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F16:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdDo, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F17:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF17, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F18:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF18, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F19:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF19, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case VK_F20:
+			if (Single && !ts.StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF20, AppliKeyMode && !ts.DisableAppKeypad,
+						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			}
+			break;
+		case '2':
+			//  case VK_OEM_3: /* @ (106-JP Keyboard) */
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-2 -> NUL
+				CodeLength = 1;
+				Code[0] = 0;
+			}
+			break;
+		case '3':
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-3 -> ESC
+				switch (AppliEscapeMode) {
+					case 1:
+						CodeLength = 3;
+						Code[0] = 0x1B;
+						Code[1] = 'O';
+						Code[2] = '[';
+						break;
+					case 2:
+						CodeLength = 2;
+						Code[0] = 0x1B;
+						Code[1] = 0x1B;
+						break;
+					case 3:
+						CodeLength = 2;
+						Code[0] = 0x1B;
+						Code[1] = 0x00;
+						break;
+					case 4:
+						CodeLength = 8;
+						Code[0] = 0x1B;
+						Code[1] = 0x1B;
+						Code[2] = '[';
+						Code[3] = '=';
+						Code[4] = '2';
+						Code[5] = '7';
+						Code[6] = '%';
+						Code[7] = '~';
+						break;
+					default:
+						CodeLength = 1;
+						Code[0] = 0x1b;
+						break;
+				}
+			}
+			break;
+		case '4':
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-4 -> FS
+				CodeLength = 1;
+				Code[0] = 0x1c;
+			}
+			break;
+		case '5':
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-5 -> GS
+				CodeLength = 1;
+				Code[0] = 0x1d;
+			}
+			break;
+		case '6':
+			//  case VK_OEM_7: /* ^ (106-JP Keyboard) */
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-6 -> RS
+				CodeLength = 1;
+				Code[0] = 0x1e;
+			}
+			break;
+		case '7':
+		case VK_OEM_2: /* / (101/106-JP Keyboard) */
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-7 -> US
+				CodeLength = 1;
+				Code[0] = 0x1f;
+			}
+			break;
+		case '8':
+			if (Control && !ts.StrictKeyMapping) {
+				// Ctrl-8 -> DEL
+				CodeLength = 1;
+				Code[0] = 0x7f;
+			}
+			break;
+		case VK_OEM_102:
+			if (Control && Shift && !ts.StrictKeyMapping) {
+				// Shift-Ctrl-_ (102RT/106-JP Keyboard)
+				CodeLength = 1;
+				Code[0] = 0x7f;
+			}
+			break;
+		default:
+			if ((VKey == VKBackslash) && Control) {	 // Ctrl-\ support for NEC-PC98
+				CodeLength = 1;
+				Code[0] = 0x1c;
+			}
 	}
-      }
-      break;
-    case VK_SPACE:
-      if (Control)
-      { // Ctrl-Space -> NUL
-	CodeLength = 1;
-	Code[0] = 0;
-      }
-      break;
-    case VK_DELETE:
-      if (Single) {
-	if (ts.DelKey > 0) { // DEL character
-	  CodeLength = 1;
-	  Code[0] = 0x7f;
-	}
-	else if (!ts.StrictKeyMapping) {
-	  GetKeyStr(HWin, KeyMap, IdRemove,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_UP:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdUp,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_DOWN:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdDown,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_RIGHT:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdRight,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_LEFT:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdLeft,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_INSERT:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdInsert,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_HOME:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdFind,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_END:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdSelect,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_PRIOR:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdPrev,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_NEXT:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdNext,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F1:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdXF1,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F2:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdXF2,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F3:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdXF3,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdF13,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F4:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdXF4,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdF14,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F5:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdXF5,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdHelp,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F6:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdF6,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdDo,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F7:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdF7,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdF17,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F8:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdF8,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdF18,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F9:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdF9,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdF19,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F10:
-      if (!ts.StrictKeyMapping) {
-	if (Single) {
-	  GetKeyStr(HWin, KeyMap, IdF10,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-	else if (Shift) {
-	  GetKeyStr(HWin, KeyMap, IdF20,
-	            AppliKeyMode && ! ts.DisableAppKeypad,
-	            AppliCursorMode && ! ts.DisableAppCursor,
-	            Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-	}
-      }
-      break;
-    case VK_F11:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF11,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F12:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF12,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F13:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF13,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F14:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF14,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F15:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdHelp,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F16:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdDo,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F17:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF17,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F18:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF18,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F19:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF19,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case VK_F20:
-      if (Single && !ts.StrictKeyMapping) {
-	GetKeyStr(HWin, KeyMap, IdF20,
-	          AppliKeyMode && ! ts.DisableAppKeypad,
-	          AppliCursorMode && ! ts.DisableAppCursor,
-	          Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
-      }
-      break;
-    case '2':
-//  case VK_OEM_3: /* @ (106-JP Keyboard) */
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-2 -> NUL
-	CodeLength = 1;
-	Code[0] = 0;
-      }
-      break;
-    case '3':
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-3 -> ESC
-	switch (AppliEscapeMode) {
-	case 1:
-	  CodeLength = 3;
-	  Code[0] = 0x1B;
-	  Code[1] = 'O';
-	  Code[2] = '[';
-	  break;
-	case 2:
-	  CodeLength = 2;
-	  Code[0] = 0x1B;
-	  Code[1] = 0x1B;
-	  break;
-	case 3:
-	  CodeLength = 2;
-	  Code[0] = 0x1B;
-	  Code[1] = 0x00;
-	  break;
-	case 4:
-	  CodeLength = 8;
-	  Code[0] = 0x1B;
-	  Code[1] = 0x1B;
-	  Code[2] = '[';
-	  Code[3] = '=';
-	  Code[4] = '2';
-	  Code[5] = '7';
-	  Code[6] = '%';
-	  Code[7] = '~';
-	  break;
-	default:
-	  CodeLength = 1;
-	  Code[0] = 0x1b;
-	  break;
-	}
-      }
-      break;
-    case '4':
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-4 -> FS
-	CodeLength = 1;
-	Code[0] = 0x1c;
-      }
-      break;
-    case '5':
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-5 -> GS
-	CodeLength = 1;
-	Code[0] = 0x1d;
-      }
-      break;
-    case '6':
-//  case VK_OEM_7: /* ^ (106-JP Keyboard) */
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-6 -> RS
-	CodeLength = 1;
-	Code[0] = 0x1e;
-      }
-      break;
-    case '7':
-    case VK_OEM_2: /* / (101/106-JP Keyboard) */
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-7 -> US
-	CodeLength = 1;
-	Code[0] = 0x1f;
-      }
-      break;
-    case '8':
-      if (Control && !ts.StrictKeyMapping) {
-	// Ctrl-8 -> DEL
-	CodeLength = 1;
-	Code[0] = 0x7f;
-      }
-      break;
-    case VK_OEM_102:
-      if (Control && Shift && !ts.StrictKeyMapping) {
-	// Shift-Ctrl-_ (102RT/106-JP Keyboard)
-	CodeLength = 1;
-	Code[0] = 0x7f;
-      }
-      break;
-    default:
-      if ((VKey==VKBackslash) && Control)
-      { // Ctrl-\ support for NEC-PC98
-	CodeLength = 1;
-	Code[0] = 0x1c;
-      }
-  }
 
-  return CodeLength;
+	return CodeLength;
 }
 
 /* Key scan code -> Tera Term key code */
@@ -1282,311 +1272,291 @@ static WORD GetKeyCode(PKeyMap KeyMap_, WORD Scan)
  */
 KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 {
-  WORD Key;
-  MSG M;
-  int i;
-  int CodeCount;
-  int CodeLength;
-  char Code[MAXPATHLEN];
-  WORD CodeType;
-  WORD wId;
-  WORD ModStat;
+	WORD Key;
+	MSG M;
+	int i;
+	int CodeCount;
+	int CodeLength;
+	char Code[MAXPATHLEN];
+	WORD CodeType;
+	WORD wId;
+	WORD ModStat;
 
-  if (VKey==VK_PROCESSKEY) return KEYDOWN_CONTROL;
+	if (VKey == VK_PROCESSKEY)
+		return KEYDOWN_CONTROL;
 
-  if ((VKey==VK_SHIFT) ||
-      (VKey==VK_CONTROL) ||
-      (VKey==VK_MENU)) return KEYDOWN_CONTROL;
+	if ((VKey == VK_SHIFT) || (VKey == VK_CONTROL) || (VKey == VK_MENU))
+		return KEYDOWN_CONTROL;
 
-  /* debug mode */
-  if (ts.Debug && (VKey == VK_ESCAPE) && ShiftKey()) {
-    MessageBeep(0);
-    do {
-      DebugFlag = (DebugFlag+1)%DEBUG_FLAG_MAXD;
-    } while (DebugFlag != DEBUG_FLAG_NONE && !((ts.DebugModes >> (DebugFlag-1)) & 1));
-    CodeCount = 0;
-    PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
-    return KEYDOWN_CONTROL;
-  }
-
-  if (! AutoRepeatMode && (PreviousKey==VKey)) {
-    PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
-    return KEYDOWN_CONTROL;
-  }
-
-  PreviousKey = VKey;
-
-  if (Scan==0)
-    Scan = MapVirtualKey(VKey,0);
-
-  ModStat = 0;
-  if (ShiftKey()) {
-    Scan |= 0x200;
-    ModStat = 2;
-  }
-
-  if (ControlKey()) {
-    Scan |= 0x400;
-    ModStat |= 4;
-  }
-
-  if (AltKey()) {
-    Scan |= 0x800;
-    if (!MetaKey(ts.MetaKey)) {
-      ModStat |= 16;
-    }
-  }
-
-  CodeCount = Count;
-  CodeLength = 0;
-  if (cv.TelLineMode) {
-    CodeType = IdText;
-  }
-  else {
-    CodeType = IdBinary;
-  }
-
-  /* exclude numeric keypad "." (scan code:83) */
-  if ((VKey!=VK_DELETE) || (ts.DelKey==0) || (Scan==83))
-    /* Windows keycode -> Tera Term keycode */
-    Key = GetKeyCode(KeyMap,Scan);
-  else
-    Key = 0;
-
-  if (Key==0) {
-    CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, ModStat);
-
-    if (MetaKey(ts.MetaKey) && (CodeLength==1)) {
-      switch (ts.Meta8Bit) {
-        case IdMeta8BitRaw:
-	  Code[0] |= 0x80;
-	  CodeType = IdBinary;
-	  break;
-        case IdMeta8BitText:
-	  Code[0] |= 0x80;
-	  CodeType = IdText;
-	  break;
-	default:
-          Code[1] = Code[0];
-          Code[0] = 0x1b;
-          CodeLength = 2;
-      }
-      PeekMessage((LPMSG)&M,HWin,WM_SYSCHAR,WM_SYSCHAR,PM_REMOVE);
-    }
-  }
-  else {
-    if (MetaKey(ts.MetaKey)) {
-      PeekMessage((LPMSG)&M,HWin,WM_SYSCHAR,WM_SYSCHAR,PM_REMOVE);
-    }
-
-    if ((IdUDK6<=Key) && (Key<=IdUDK20) && (FuncKeyLen[Key-IdUDK6]>0)) {
-      memcpy(Code,&FuncKeyStr[Key-IdUDK6][0],FuncKeyLen[Key-IdUDK6]);
-      CodeLength = FuncKeyLen[Key-IdUDK6];
-      CodeType = IdBinary;
-    }
-    else
-      GetKeyStr(HWin,KeyMap,Key,
-                AppliKeyMode && ! ts.DisableAppKeypad,
-                AppliCursorMode && ! ts.DisableAppCursor,
-                Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
-  }
-
-  if (CodeLength==0) return KEYDOWN_OTHER;
-
-  if (VKey==VK_NUMLOCK) {
-    /* keep NumLock LED status */
-    BYTE KeyState[256];
-    GetKeyboardState((PBYTE)KeyState);
-    KeyState[VK_NUMLOCK] = KeyState[VK_NUMLOCK] ^ 1;
-    SetKeyboardState((PBYTE)KeyState);
-  }
-
-  PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
-
-  if (KeybEnabled) {
-    switch (CodeType) {
-      case IdBinary:
-	if (TalkStatus==IdTalkKeyb) {
-	  for (i = 1 ; i <= CodeCount ; i++) {
-	    CommBinaryBuffOut(&cv,Code,CodeLength);
-	    if (ts.LocalEcho>0)
-	      CommBinaryEcho(&cv,Code,CodeLength);
-	  }
+	/* debug mode */
+	if (ts.Debug && (VKey == VK_ESCAPE) && ShiftKey()) {
+		MessageBeep(0);
+		do {
+			DebugFlag = (DebugFlag + 1) % DEBUG_FLAG_MAXD;
+		} while (DebugFlag != DEBUG_FLAG_NONE && !((ts.DebugModes >> (DebugFlag - 1)) & 1));
+		CodeCount = 0;
+		PeekMessage((LPMSG)&M, HWin, WM_CHAR, WM_CHAR, PM_REMOVE);
+		return KEYDOWN_CONTROL;
 	}
-	break;
-      case IdText:
-	if (TalkStatus==IdTalkKeyb) {
-	  for (i = 1 ; i <= CodeCount ; i++) {
-	    if (ts.LocalEcho>0)
-	      CommTextEcho(&cv,Code,CodeLength);
-	    CommTextOut(&cv,Code,CodeLength);
-	  }
+
+	if (!AutoRepeatMode && (PreviousKey == VKey)) {
+		PeekMessage((LPMSG)&M, HWin, WM_CHAR, WM_CHAR, PM_REMOVE);
+		return KEYDOWN_CONTROL;
 	}
-	break;
-      case IdMacro:
-	Code[CodeLength] = 0;
-	RunMacro(Code,FALSE);
-	break;
-      case IdCommand:
-	Code[CodeLength] = 0;
-	if (sscanf(Code, "%hd", &wId) == 1)
-	  PostMessage(HWin,WM_COMMAND,MAKELONG(wId,0),0);
-	break;
-    }
-  }
-  return (CodeType == IdBinary || CodeType == IdText)? KEYDOWN_COMMOUT: KEYDOWN_CONTROL;
+
+	PreviousKey = VKey;
+
+	if (Scan == 0)
+		Scan = MapVirtualKey(VKey, 0);
+
+	ModStat = 0;
+	if (ShiftKey()) {
+		Scan |= 0x200;
+		ModStat = 2;
+	}
+
+	if (ControlKey()) {
+		Scan |= 0x400;
+		ModStat |= 4;
+	}
+
+	if (AltKey()) {
+		Scan |= 0x800;
+		if (!MetaKey(ts.MetaKey)) {
+			ModStat |= 16;
+		}
+	}
+
+	CodeCount = Count;
+	CodeLength = 0;
+	if (cv.TelLineMode) {
+		CodeType = IdText;
+	}
+	else {
+		CodeType = IdBinary;
+	}
+
+	/* exclude numeric keypad "." (scan code:83) */
+	if ((VKey != VK_DELETE) || (ts.DelKey == 0) || (Scan == 83))
+		/* Windows keycode -> Tera Term keycode */
+		Key = GetKeyCode(KeyMap, Scan);
+	else
+		Key = 0;
+
+	if (Key == 0) {
+		CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, ModStat);
+
+		if (MetaKey(ts.MetaKey) && (CodeLength == 1)) {
+			switch (ts.Meta8Bit) {
+				case IdMeta8BitRaw:
+					Code[0] |= 0x80;
+					CodeType = IdBinary;
+					break;
+				case IdMeta8BitText:
+					Code[0] |= 0x80;
+					CodeType = IdText;
+					break;
+				default:
+					Code[1] = Code[0];
+					Code[0] = 0x1b;
+					CodeLength = 2;
+			}
+			PeekMessage((LPMSG)&M, HWin, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE);
+		}
+	}
+	else {
+		if (MetaKey(ts.MetaKey)) {
+			PeekMessage((LPMSG)&M, HWin, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE);
+		}
+
+		if ((IdUDK6 <= Key) && (Key <= IdUDK20) && (FuncKeyLen[Key - IdUDK6] > 0)) {
+			memcpy(Code, &FuncKeyStr[Key - IdUDK6][0], FuncKeyLen[Key - IdUDK6]);
+			CodeLength = FuncKeyLen[Key - IdUDK6];
+			CodeType = IdBinary;
+		}
+		else
+			GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !ts.DisableAppKeypad, AppliCursorMode && !ts.DisableAppCursor,
+					  Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
+	}
+
+	if (CodeLength == 0)
+		return KEYDOWN_OTHER;
+
+	if (VKey == VK_NUMLOCK) {
+		/* keep NumLock LED status */
+		BYTE KeyState[256];
+		GetKeyboardState((PBYTE)KeyState);
+		KeyState[VK_NUMLOCK] = KeyState[VK_NUMLOCK] ^ 1;
+		SetKeyboardState((PBYTE)KeyState);
+	}
+
+	PeekMessage((LPMSG)&M, HWin, WM_CHAR, WM_CHAR, PM_REMOVE);
+
+	if (KeybEnabled) {
+		switch (CodeType) {
+			case IdBinary:
+				if (TalkStatus == IdTalkKeyb) {
+					for (i = 1; i <= CodeCount; i++) {
+						CommBinaryBuffOut(&cv, Code, CodeLength);
+						if (ts.LocalEcho > 0)
+							CommBinaryEcho(&cv, Code, CodeLength);
+					}
+				}
+				break;
+			case IdText:
+				if (TalkStatus == IdTalkKeyb) {
+					for (i = 1; i <= CodeCount; i++) {
+						if (ts.LocalEcho > 0)
+							CommTextEcho(&cv, Code, CodeLength);
+						CommTextOut(&cv, Code, CodeLength);
+					}
+				}
+				break;
+			case IdMacro:
+				Code[CodeLength] = 0;
+				RunMacro(Code, FALSE);
+				break;
+			case IdCommand:
+				Code[CodeLength] = 0;
+				if (sscanf(Code, "%hd", &wId) == 1)
+					PostMessage(HWin, WM_COMMAND, MAKELONG(wId, 0), 0);
+				break;
+		}
+	}
+	return (CodeType == IdBinary || CodeType == IdText) ? KEYDOWN_COMMOUT : KEYDOWN_CONTROL;
 }
 
 void KeyCodeSend(WORD KCode, WORD Count)
 {
-  WORD Key;
-  int i, CodeLength;
-  char Code[MAXPATHLEN];
-  WORD CodeType;
-  WORD Scan, VKey, State;
-  DWORD dw;
-  BOOL Ok;
-  HWND HWin;
+	WORD Key;
+	int i, CodeLength;
+	char Code[MAXPATHLEN];
+	WORD CodeType;
+	WORD Scan, VKey, State;
+	DWORD dw;
+	BOOL Ok;
+	HWND HWin;
 
-  if (ActiveWin==IdTEK)
-    HWin = HTEKWin;
-  else
-    HWin = HVTWin;
+	if (ActiveWin == IdTEK)
+		HWin = HTEKWin;
+	else
+		HWin = HVTWin;
 
-  CodeLength = 0;
-  CodeType = IdBinary;
-  Key = GetKeyCode(KeyMap,KCode);
-  if (Key==0)
-  {
-    Scan = KCode & 0x1FF;
-    VKey = MapVirtualKey(Scan,1);
-    State = 0;
-    if ((KCode & 512) != 0)
-    { /* shift */
-      State = State | 2; /* bit 1 */
-    }
+	CodeLength = 0;
+	CodeType = IdBinary;
+	Key = GetKeyCode(KeyMap, KCode);
+	if (Key == 0) {
+		Scan = KCode & 0x1FF;
+		VKey = MapVirtualKey(Scan, 1);
+		State = 0;
+		if ((KCode & 512) != 0) { /* shift */
+			State = State | 2;	  /* bit 1 */
+		}
 
-    if ((KCode & 1024) != 0)
-    { /* control */
-      State = State | 4; /* bit 2 */
-    }
+		if ((KCode & 1024) != 0) { /* control */
+			State = State | 4;	   /* bit 2 */
+		}
 
-    if ((KCode & 2048) != 0)
-    { /* alt */
-      State = State | 16; /* bit 4 */
-    }
+		if ((KCode & 2048) != 0) { /* alt */
+			State = State | 16;	   /* bit 4 */
+		}
 
-    CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, State);
+		CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, State);
 
-    if (CodeLength==0)
-    {
-      i = -1;
-      do {
-	i++;
-	dw = OemKeyScan((WORD)i);
-	Ok = (LOWORD(dw)==Scan) &&
-	     (HIWORD(dw)==State);
-      } while ((i<255) && ! Ok);
-      if (Ok)
-      {
-	CodeType = IdText;
-	CodeLength = 1;
-	Code[0] = (char)i;
-      }
-    }
-  }
-  else if ((IdUDK6<=Key) && (Key<=IdUDK20) &&
-	   (FuncKeyLen[Key-IdUDK6]>0))
-  {
-    memcpy(Code,&FuncKeyStr[Key-IdUDK6][0],FuncKeyLen[Key-IdUDK6]);
-    CodeLength = FuncKeyLen[Key-IdUDK6];
-    CodeType = IdBinary;
-  }
-  else
-    GetKeyStr(HWin,KeyMap,Key,
-              AppliKeyMode && ! ts.DisableAppKeypad,
-              AppliCursorMode && ! ts.DisableAppCursor,
-              Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
-
-  if (CodeLength==0) return;
-  if (TalkStatus==IdTalkKeyb)
-  {
-    switch (CodeType) {
-      case IdBinary:
-	for (i = 1 ; i <= Count ; i++)
-	{
-	  CommBinaryBuffOut(&cv,Code,CodeLength);
-	  if (ts.LocalEcho>0)
-	    CommBinaryEcho(&cv,Code,CodeLength);
+		if (CodeLength == 0) {
+			i = -1;
+			do {
+				i++;
+				dw = OemKeyScan((WORD)i);
+				Ok = (LOWORD(dw) == Scan) && (HIWORD(dw) == State);
+			} while ((i < 255) && !Ok);
+			if (Ok) {
+				CodeType = IdText;
+				CodeLength = 1;
+				Code[0] = (char)i;
+			}
+		}
 	}
-	break;
-      case IdText:
-	for (i = 1 ; i <= Count ; i++)
-	{
-	  if (ts.LocalEcho>0)
-	    CommTextEcho(&cv,Code,CodeLength);
-	  CommTextOut(&cv,Code,CodeLength);
+	else if ((IdUDK6 <= Key) && (Key <= IdUDK20) && (FuncKeyLen[Key - IdUDK6] > 0)) {
+		memcpy(Code, &FuncKeyStr[Key - IdUDK6][0], FuncKeyLen[Key - IdUDK6]);
+		CodeLength = FuncKeyLen[Key - IdUDK6];
+		CodeType = IdBinary;
 	}
-	break;
-      case IdMacro:
-	Code[CodeLength] = 0;
-	RunMacro(Code,FALSE);
-	break;
-    }
-  }
+	else
+		GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !ts.DisableAppKeypad, AppliCursorMode && !ts.DisableAppCursor,
+				  Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
+
+	if (CodeLength == 0)
+		return;
+	if (TalkStatus == IdTalkKeyb) {
+		switch (CodeType) {
+			case IdBinary:
+				for (i = 1; i <= Count; i++) {
+					CommBinaryBuffOut(&cv, Code, CodeLength);
+					if (ts.LocalEcho > 0)
+						CommBinaryEcho(&cv, Code, CodeLength);
+				}
+				break;
+			case IdText:
+				for (i = 1; i <= Count; i++) {
+					if (ts.LocalEcho > 0)
+						CommTextEcho(&cv, Code, CodeLength);
+					CommTextOut(&cv, Code, CodeLength);
+				}
+				break;
+			case IdMacro:
+				Code[CodeLength] = 0;
+				RunMacro(Code, FALSE);
+				break;
+		}
+	}
 }
 
 void KeyUp(WORD VKey)
 {
-  if (PreviousKey == VKey) PreviousKey = 0;
+	if (PreviousKey == VKey)
+		PreviousKey = 0;
 }
 
 BOOL ShiftKey()
 {
-  return ((GetAsyncKeyState(VK_SHIFT) & 0xFFFFFF80) != 0);
+	return ((GetAsyncKeyState(VK_SHIFT) & 0xFFFFFF80) != 0);
 }
 
 BOOL ControlKey()
 {
-  return ((GetAsyncKeyState(VK_CONTROL) & 0xFFFFFF80) != 0);
+	return ((GetAsyncKeyState(VK_CONTROL) & 0xFFFFFF80) != 0);
 }
 
 BOOL AltKey()
 {
-  return ((GetAsyncKeyState(VK_MENU) & 0xFFFFFF80) != 0);
+	return ((GetAsyncKeyState(VK_MENU) & 0xFFFFFF80) != 0);
 }
 
 BOOL MetaKey(int mode)
 {
-  switch (mode) {
-  case IdMetaOn:
-    return ((GetAsyncKeyState(VK_MENU) & 0xFFFFFF80) != 0);
-  case IdMetaLeft:
-    return ((GetAsyncKeyState(VK_LMENU) & 0xFFFFFF80) != 0);
-  case IdMetaRight:
-    return ((GetAsyncKeyState(VK_RMENU) & 0xFFFFFF80) != 0);
-  default:
-    return FALSE;
-  }
+	switch (mode) {
+		case IdMetaOn:
+			return ((GetAsyncKeyState(VK_MENU) & 0xFFFFFF80) != 0);
+		case IdMetaLeft:
+			return ((GetAsyncKeyState(VK_LMENU) & 0xFFFFFF80) != 0);
+		case IdMetaRight:
+			return ((GetAsyncKeyState(VK_RMENU) & 0xFFFFFF80) != 0);
+		default:
+			return FALSE;
+	}
 }
 
 void InitKeyboard()
 {
-  KeyMap = NULL;
-  ClearUserKey();
-  PreviousKey = 0;
-  VKBackslash = LOBYTE(VkKeyScan('\\'));
+	KeyMap = NULL;
+	ClearUserKey();
+	PreviousKey = 0;
+	VKBackslash = LOBYTE(VkKeyScan('\\'));
 }
 
 void EndKeyboard()
 {
-  if (KeyMap != NULL)
-    free(KeyMap);
+	if (KeyMap != NULL)
+		free(KeyMap);
 }
-
-/*
- * Local Variables:
- * tab-width: 8
- * c-basic-offset: 2
- * End:
- */
