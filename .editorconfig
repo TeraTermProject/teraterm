@@ -1,5 +1,9 @@
 root = true
 
+[*]
+indent_style = tab
+indent_size = 4
+
 [*.{cpp,c,h}]
 indent_style = tab
 indent_size = 4
@@ -27,5 +31,11 @@ indent_size = 2
 [*.pl]
 end_of_line = crlf
 charset = utf-8-bom
+indent_style = tab
+indent_size = 4
+
+[*.txt]
+end_of_line = crlf
+charset = cp932
 indent_style = tab
 indent_size = 4
