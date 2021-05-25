@@ -92,7 +92,7 @@
 			<param name="Name" value="キーボード">
 			<param name="Local" value="html\usage\keyboard.html">
 			<param name="ImageNumber" value="11">
-			</OBJECT>
+		     </OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="マウス">
 			<param name="Local" value="html\usage\mouse.html">
@@ -524,10 +524,17 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="キーボード設定ファイル">
+			<param name="Name" value="キーボード設定ファイル概要">
 			<param name="Local" value="html\setup\keyboard.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+			<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="キーボード設定ファイル詳細">
+				<param name="Local" value="html\reference\keyboard_cfg.html">
+				<param name="ImageNumber" value="11">
+			</OBJECT>
+			</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="TTSSH known_hosts ファイル">
 			<param name="Local" value="html\setup\knownfiles.html">
@@ -552,6 +559,11 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Keycode">
 			<param name="Local" value="html\reference\keycode.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="menu id">
+			<param name="Local" value="html\reference\menu_id.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

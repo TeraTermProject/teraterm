@@ -23,6 +23,9 @@ set REF_J=ja\html\reference
 
 perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_J%/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_J%/build_with_cmake.html -c utf8
 perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_E%/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_E%/build_with_cmake.html -c utf8
-
 perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_J%/build_library_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_J%/build_library_with_cmake.html -c utf8
 perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_E%/build_library_with_cmake.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_E%/build_library_with_cmake.html -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_J%/keyboard_cfg.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_J%/keyboard_cfg.html -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_E%/keyboard_cfg.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_E%/keyboard_cfg.html -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_J%/menu_id.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_J%/menu_id.html -c utf8
+perl -C0 -pe "s/^\xef\xbb\xbf//" %REF_E%/menu_id.md | perl Markdown_1.0.1/Markdown.pl | %TOSJIS% -i - -o %REF_E%/menu_id.html -c utf8
