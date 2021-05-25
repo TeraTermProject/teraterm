@@ -732,3 +732,65 @@ BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos)
 	if (FNPos != NULL) *FNPos = FNPtr-PathName;
 	return TRUE;
 }
+
+/**
+ *	ConvHexCharW() ‚Ì wchar_t ”Å
+ */
+BYTE ConvHexCharW(wchar_t b)
+{
+	if ((b>='0') && (b<='9')) {
+		return (b - 0x30);
+	}
+	else if ((b>='A') && (b<='F')) {
+		return (b - 0x37);
+	}
+	else if ((b>='a') && (b<='f')) {
+		return (b - 0x57);
+	}
+	else {
+		return 0;
+	}
+}
+
+/**
+ *	Hwx2Str() ‚Ì wchar_t ”Å
+ */
+int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
+{
+	wchar_t b, c;
+	size_t i, imax, j;
+
+	j = 0;
+	imax = wcslen(Hex);
+	i = 0;
+	while ((i < imax) && (j<MaxLen)) {
+		b = Hex[i];
+		if (b=='$') {
+			i++;
+			if (i < imax) {
+				c = Hex[i];
+			}
+			else {
+				c = 0x30;
+			}
+			b = ConvHexCharW(c) << 4;
+			i++;
+			if (i < imax) {
+				c = (BYTE)Hex[i];
+			}
+			else {
+				c = 0x30;
+			}
+			b = b + ConvHexCharW(c);
+		};
+
+		Str[j] = b;
+		j++;
+		i++;
+	}
+	if (j<MaxLen) {
+		Str[j] = 0;
+	}
+
+	return (int)j;
+}

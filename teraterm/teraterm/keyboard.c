@@ -31,9 +31,11 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
+#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <crtdbg.h>
 
 #include "tttypes_key.h"
 #include "ttlib.h"
@@ -41,6 +43,7 @@
 #include "ttcommon.h"
 #include "ttwinman.h"
 #include "ttdde.h"
+#include "codeconv.h"
 
 #include "keyboard.h"
 #include "keyboard_i.h"
@@ -68,6 +71,45 @@ static short VKBackslash;
 #define VK_PROCESSKEY 0xE5
 #endif
 
+static void FreeUserKey(PKeyMap KeyMap_)
+{
+	int i;
+	UserKey_t *p;
+
+	if (KeyMap_->UserKeyData == NULL) {
+		KeyMap_->UserKeyCount = 0;
+		return;
+	}
+
+	p = KeyMap_->UserKeyData;
+	for (i = 0; i < KeyMap_->UserKeyCount; i++) {
+		free(p->ptr);
+		p++;
+	}
+	free(KeyMap_->UserKeyData);
+	KeyMap_->UserKeyData = NULL;
+	KeyMap_->UserKeyCount = 0;
+}
+
+/**
+ *	必要ならKeyMap を確保、初期化する
+ */
+static void InitKeyMap()
+{
+	int i;
+
+	if (KeyMap == NULL) {
+		KeyMap = (PKeyMap)calloc(sizeof(TKeyMap), 1);
+		if (KeyMap == NULL) {
+			return;
+		}
+	}
+	for (i = 0; i <= IdKeyMax - 1; i++)
+		KeyMap->Map[i] = 0xFFFF;
+
+	FreeUserKey(KeyMap);
+}
+
 void SetKeyMap()
 {
 	char TempDir[MAXPATHLEN];
@@ -83,13 +125,14 @@ void SetKeyMap()
 	AppendSlash(ts.KeyCnfFN, sizeof(ts.KeyCnfFN));
 	strncat_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN), TempName, _TRUNCATE);
 
-	if (KeyMap == NULL)
-		KeyMap = (PKeyMap)malloc(sizeof(TKeyMap));
-	if (KeyMap != NULL) {
-		if (LoadTTSET())
-			(*ReadKeyboardCnf)(ts.KeyCnfFN, KeyMap, TRUE);
-		FreeTTSET();
+	InitKeyMap();
+	if (KeyMap == NULL) {
+		return;
 	}
+
+	if (LoadTTSET())
+		(*ReadKeyboardCnf)(ts.KeyCnfFN, KeyMap, TRUE);
+	FreeTTSET();
 }
 
 void ClearUserKey()
@@ -120,11 +163,10 @@ void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen)
 	FuncKeyLen[NewKeyId] = NewKeyLen;
 }
 
-static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMode_, BOOL AppliCursorMode_,
-					  BOOL Send8BitMode_, PCHAR KeyStr, int destlen, LPINT Len, LPWORD Type)
+static void GetKeyStr(HWND HWin, const PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMode_, BOOL AppliCursorMode_,
+					  BOOL Send8BitMode_, wchar_t *KeyStr, size_t destlen, size_t *Len, UserKeyType_t *Type)
 {
 	MSG Msg;
-	char Temp[201];
 
 	*Type = IdBinary;  // key type
 	*Len = 0;
@@ -133,75 +175,75 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\217A", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217A", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\233A", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\233A", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\033OA", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033OA", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\033[A", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033[A", _TRUNCATE);
 			}
 			break;
 		case IdDown:
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\217B", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217B", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\233B", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\233B", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\033OB", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033OB", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\033[B", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033[B", _TRUNCATE);
 			}
 			break;
 		case IdRight:
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\217C", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217C", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\233C", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\233C", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\033OC", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033OC", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\033[C", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033[C", _TRUNCATE);
 			}
 			break;
 		case IdLeft:
 			if (Send8BitMode_) {
 				*Len = 2;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\217D", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217D", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\233D", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\233D", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
 				if (AppliCursorMode_)
-					strncpy_s(KeyStr, destlen, "\033OD", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033OD", _TRUNCATE);
 				else
-					strncpy_s(KeyStr, destlen, "\033[D", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033[D", _TRUNCATE);
 			}
 			break;
 		case Id0:
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217p", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217p", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Op", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Op", _TRUNCATE);
 				}
 			}
 			else {
@@ -213,11 +255,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217q", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217q", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Oq", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Oq", _TRUNCATE);
 				}
 			}
 			else {
@@ -229,11 +271,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217r", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217r", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Or", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Or", _TRUNCATE);
 				}
 			}
 			else {
@@ -245,11 +287,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217s", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217s", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Os", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Os", _TRUNCATE);
 				}
 			}
 			else {
@@ -261,11 +303,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217t", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217t", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ot", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ot", _TRUNCATE);
 				}
 			}
 			else {
@@ -277,11 +319,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217u", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217u", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ou", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ou", _TRUNCATE);
 				}
 			}
 			else {
@@ -293,11 +335,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217v", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217v", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ov", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ov", _TRUNCATE);
 				}
 			}
 			else {
@@ -309,11 +351,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217w", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217w", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ow", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ow", _TRUNCATE);
 				}
 			}
 			else {
@@ -325,11 +367,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217x", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217x", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ox", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ox", _TRUNCATE);
 				}
 			}
 			else {
@@ -341,11 +383,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217y", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217y", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Oy", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Oy", _TRUNCATE);
 				}
 			}
 			else {
@@ -357,11 +399,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217m", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217m", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Om", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Om", _TRUNCATE);
 				}
 			}
 			else {
@@ -373,11 +415,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217l", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217l", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ol", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ol", _TRUNCATE);
 				}
 			}
 			else {
@@ -389,11 +431,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217n", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217n", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033On", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033On", _TRUNCATE);
 				}
 			}
 			else {
@@ -405,11 +447,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217M", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217M", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033OM", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033OM", _TRUNCATE);
 				}
 			}
 			else {
@@ -422,11 +464,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217o", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217o", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Oo", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Oo", _TRUNCATE);
 				}
 			}
 			else {
@@ -438,11 +480,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217j", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217j", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Oj", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Oj", _TRUNCATE);
 				}
 			}
 			else {
@@ -454,11 +496,11 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			if (AppliKeyMode_) {
 				if (Send8BitMode_) {
 					*Len = 2;
-					strncpy_s(KeyStr, destlen, "\217k", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\217k", _TRUNCATE);
 				}
 				else {
 					*Len = 3;
-					strncpy_s(KeyStr, destlen, "\033Ok", _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, L"\033Ok", _TRUNCATE);
 				}
 			}
 			else {
@@ -469,312 +511,312 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 		case IdPF1: /* DEC Key: PF1 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr, destlen, "\217P", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\217P", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\033OP", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033OP", _TRUNCATE);
 			}
 			break;
 		case IdPF2: /* DEC Key: PF2 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr, destlen, "\217Q", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\217Q", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\033OQ", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033OQ", _TRUNCATE);
 			}
 			break;
 		case IdPF3: /* DEC Key: PF3 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr, destlen, "\217R", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\217R", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\033OR", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033OR", _TRUNCATE);
 			}
 			break;
 		case IdPF4: /* DEC Key: PF4 */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr, destlen, "\217S", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\217S", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\033OS", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033OS", _TRUNCATE);
 			}
 			break;
 		case IdFind: /* DEC Key: Find */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\2331~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\2331~", _TRUNCATE);
 			}
 			else {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\033[1~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[1~", _TRUNCATE);
 			}
 			break;
 		case IdInsert: /* DEC Key: Insert Here */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\2332~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\2332~", _TRUNCATE);
 			}
 			else {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\033[2~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[2~", _TRUNCATE);
 			}
 			break;
 		case IdRemove: /* DEC Key: Remove */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\2333~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\2333~", _TRUNCATE);
 			}
 			else {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\033[3~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[3~", _TRUNCATE);
 			}
 			break;
 		case IdSelect: /* DEC Key: Select */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\2334~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\2334~", _TRUNCATE);
 			}
 			else {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\033[4~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[4~", _TRUNCATE);
 			}
 			break;
 		case IdPrev: /* DEC Key: Prev */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\2335~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\2335~", _TRUNCATE);
 			}
 			else {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\033[5~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[5~", _TRUNCATE);
 			}
 			break;
 		case IdNext: /* DEC Key: Next */
 			if (Send8BitMode_) {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\2336~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\2336~", _TRUNCATE);
 			}
 			else {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\033[6~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[6~", _TRUNCATE);
 			}
 			break;
 		case IdF6: /* DEC Key: F6 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23317~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23317~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[17~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[17~", _TRUNCATE);
 			}
 			break;
 		case IdF7: /* DEC Key: F7 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23318~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23318~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[18~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[18~", _TRUNCATE);
 			}
 			break;
 		case IdF8: /* DEC Key: F8 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23319~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23319~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[19~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[19~", _TRUNCATE);
 			}
 			break;
 		case IdF9: /* DEC Key: F9 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23320~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23320~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[20~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[20~", _TRUNCATE);
 			}
 			break;
 		case IdF10: /* DEC Key: F10 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23321~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23321~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[21~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[21~", _TRUNCATE);
 			}
 			break;
 		case IdF11: /* DEC Key: F11 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23323~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23323~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[23~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[23~", _TRUNCATE);
 			}
 			break;
 		case IdF12: /* DEC Key: F12 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23324~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23324~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[24~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[24~", _TRUNCATE);
 			}
 			break;
 		case IdF13: /* DEC Key: F13 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23325~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23325~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[25~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[25~", _TRUNCATE);
 			}
 			break;
 		case IdF14: /* DEC Key: F14 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23326~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23326~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[26~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[26~", _TRUNCATE);
 			}
 			break;
 		case IdHelp: /* DEC Key: Help */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23328~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23328~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[28~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[28~", _TRUNCATE);
 			}
 			break;
 		case IdDo: /* DEC Key: Do */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23329~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23329~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[29~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[29~", _TRUNCATE);
 			}
 			break;
 		case IdF17: /* DEC Key: F17 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23331~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23331~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[31~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[31~", _TRUNCATE);
 			}
 			break;
 		case IdF18: /* DEC Key: F18 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23332~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23332~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[32~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[32~", _TRUNCATE);
 			}
 			break;
 		case IdF19: /* DEC Key: F19 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23333~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23333~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[33~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[33~", _TRUNCATE);
 			}
 			break;
 		case IdF20: /* DEC Key: F20 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23334~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23334~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[34~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[34~", _TRUNCATE);
 			}
 			break;
 		case IdXF1: /* XTERM F1 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23311~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23311~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
 
-				strncpy_s(KeyStr, destlen, "\033[11~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[11~", _TRUNCATE);
 			}
 			break;
 		case IdXF2: /* XTERM F2 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23312~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23312~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[12~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[12~", _TRUNCATE);
 			}
 			break;
 		case IdXF3: /* XTERM F3 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23313~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23313~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[13~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[13~", _TRUNCATE);
 			}
 			break;
 		case IdXF4: /* XTERM F4 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23314~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23314~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[14~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[14~", _TRUNCATE);
 			}
 			break;
 		case IdXF5: /* XTERM F5 */
 			if (Send8BitMode_) {
 				*Len = 4;
-				strncpy_s(KeyStr, destlen, "\23315~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\23315~", _TRUNCATE);
 			}
 			else {
 				*Len = 5;
-				strncpy_s(KeyStr, destlen, "\033[15~", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[15~", _TRUNCATE);
 			}
 			break;
 		case IdXBackTab: /* XTERM Back Tab */
 			if (Send8BitMode_) {
 				*Len = 2;
-				strncpy_s(KeyStr, destlen, "\233Z", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\233Z", _TRUNCATE);
 			}
 			else {
 				*Len = 3;
-				strncpy_s(KeyStr, destlen, "\033[Z", _TRUNCATE);
+				wcsncpy_s(KeyStr, destlen, L"\033[Z", _TRUNCATE);
 			}
 			break;
 		case IdHold:
@@ -803,14 +845,27 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 			break;
 		default:
 			if ((KeyCode >= IdUser1) && (KeyCode <= IdKeyMax)) {
-				*Type = (WORD)(*KeyMap_).UserKeyType[KeyCode - IdUser1];  // key type
-				*Len = KeyMap_->UserKeyLen[KeyCode - IdUser1];
-				memcpy(Temp, &KeyMap_->UserKeyStr[KeyMap_->UserKeyPtr[KeyCode - IdUser1]], *Len);
-				Temp[*Len] = 0;
+				//
+				UserKey_t *p = KeyMap_->UserKeyData;
+				int i;
+				wchar_t *s;
+				for (i = 0; i < KeyMap_->UserKeyCount; i++) {
+					if (p->ttkeycode == KeyCode) {
+						break;
+					}
+					p++;
+				}
+				if (i == KeyMap_->UserKeyCount){
+					// ユーザーキーに設定がない
+					return;
+				}
+				*Type = p->type;
+				s = p->ptr;
+				*Len = p->len;
 				if ((*Type == IdBinary) || (*Type == IdText))
-					*Len = Hex2Str(Temp, KeyStr, destlen);
+					*Len = Hex2StrW(s, KeyStr, destlen);
 				else
-					strncpy_s(KeyStr, destlen, Temp, _TRUNCATE);
+					wcsncpy_s(KeyStr, destlen, s, _TRUNCATE);
 			}
 			else
 				return;
@@ -819,10 +874,10 @@ static void GetKeyStr(HWND HWin, PKeyMap KeyMap_, WORD KeyCode, BOOL AppliKeyMod
 	PeekMessage(&Msg, HWin, WM_CHAR, WM_CHAR, PM_REMOVE);
 }
 
-static int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeType, WORD ModStat)
+static size_t VKey2KeyStr(WORD VKey, HWND HWin, wchar_t *Code, size_t CodeSize, UserKeyType_t *CodeType, WORD ModStat)
 {
 	BOOL Single, Control, Shift;
-	int CodeLength = 0;
+	size_t CodeLength = 0;
 
 	Single = FALSE;
 	Shift = FALSE;
@@ -1265,6 +1320,35 @@ static WORD GetKeyCode(PKeyMap KeyMap_, WORD Scan)
 	return Key;
 }
 
+static void SendBinary(const wchar_t *strW, size_t len, size_t repeat)
+{
+	unsigned char *strA = malloc(len + 1);
+	unsigned char *p = strA;
+	size_t i;
+	for (i = 0; i < len + 1; i++) {
+		wchar_t w;
+		unsigned char c;
+		w = strW[i];
+		c = w < 256 ? (unsigned char)w : 0xff;
+		*p++ = c;
+	}
+
+	for (i = 1; i <= repeat; i++) {
+		CommBinaryBuffOut(&cv, strA, len);
+		if (ts.LocalEcho > 0)
+			CommBinaryEcho(&cv, strA, len);
+	}
+
+	free(strA);
+}
+
+static void RunMacroW(const wchar_t *FNameW, BOOL Startup)
+{
+	char *fname = ToCharW(FNameW);
+	RunMacro(fname, Startup);
+	free(fname);
+}
+
 /**
  *	@param	VKey	virtual-key code
  *	@param	count	The value is the number of times the keystroke
@@ -1276,10 +1360,9 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 	MSG M;
 	int i;
 	int CodeCount;
-	int CodeLength;
-	char Code[MAXPATHLEN];
-	WORD CodeType;
-	WORD wId;
+	size_t CodeLength;
+	wchar_t Code[MAXPATHLEN];
+	UserKeyType_t CodeType;
 	WORD ModStat;
 
 	if (VKey == VK_PROCESSKEY)
@@ -1344,7 +1427,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 		Key = 0;
 
 	if (Key == 0) {
-		CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, ModStat);
+		CodeLength = VKey2KeyStr(VKey, HWin, Code, _countof(Code), &CodeType, ModStat);
 
 		if (MetaKey(ts.MetaKey) && (CodeLength == 1)) {
 			switch (ts.Meta8Bit) {
@@ -1376,7 +1459,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 		}
 		else
 			GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !ts.DisableAppKeypad, AppliCursorMode && !ts.DisableAppCursor,
-					  Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
+					  Send8BitMode, Code, _countof(Code), &CodeLength, &CodeType);
 	}
 
 	if (CodeLength == 0)
@@ -1396,31 +1479,29 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 		switch (CodeType) {
 			case IdBinary:
 				if (TalkStatus == IdTalkKeyb) {
-					for (i = 1; i <= CodeCount; i++) {
-						CommBinaryBuffOut(&cv, Code, CodeLength);
-						if (ts.LocalEcho > 0)
-							CommBinaryEcho(&cv, Code, CodeLength);
-					}
+					SendBinary(Code, CodeLength, CodeCount);
 				}
 				break;
 			case IdText:
 				if (TalkStatus == IdTalkKeyb) {
 					for (i = 1; i <= CodeCount; i++) {
 						if (ts.LocalEcho > 0)
-							CommTextEcho(&cv, Code, CodeLength);
-						CommTextOut(&cv, Code, CodeLength);
+							CommTextEchoW(&cv, Code, CodeLength);
+						CommTextOutW(&cv, Code, CodeLength);
 					}
 				}
 				break;
 			case IdMacro:
 				Code[CodeLength] = 0;
-				RunMacro(Code, FALSE);
+				RunMacroW(Code, FALSE);
 				break;
-			case IdCommand:
+			case IdCommand: {
+				WORD wId;
 				Code[CodeLength] = 0;
-				if (sscanf(Code, "%hd", &wId) == 1)
+				if (swscanf(Code, L"%hd", &wId) == 1)
 					PostMessage(HWin, WM_COMMAND, MAKELONG(wId, 0), 0);
 				break;
+			}
 		}
 	}
 	return (CodeType == IdBinary || CodeType == IdText) ? KEYDOWN_COMMOUT : KEYDOWN_CONTROL;
@@ -1429,9 +1510,10 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 void KeyCodeSend(WORD KCode, WORD Count)
 {
 	WORD Key;
-	int i, CodeLength;
-	char Code[MAXPATHLEN];
-	WORD CodeType;
+	int i;
+	size_t CodeLength;
+	wchar_t Code[MAXPATHLEN];
+	UserKeyType_t CodeType;
 	WORD Scan, VKey, State;
 	DWORD dw;
 	BOOL Ok;
@@ -1461,7 +1543,7 @@ void KeyCodeSend(WORD KCode, WORD Count)
 			State = State | 16;	   /* bit 4 */
 		}
 
-		CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, State);
+		CodeLength = VKey2KeyStr(VKey, HWin, Code, _countof(Code), &CodeType, State);
 
 		if (CodeLength == 0) {
 			i = -1;
@@ -1484,29 +1566,25 @@ void KeyCodeSend(WORD KCode, WORD Count)
 	}
 	else
 		GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !ts.DisableAppKeypad, AppliCursorMode && !ts.DisableAppCursor,
-				  Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
+				  Send8BitMode, Code, _countof(Code), &CodeLength, &CodeType);
 
 	if (CodeLength == 0)
 		return;
 	if (TalkStatus == IdTalkKeyb) {
 		switch (CodeType) {
 			case IdBinary:
-				for (i = 1; i <= Count; i++) {
-					CommBinaryBuffOut(&cv, Code, CodeLength);
-					if (ts.LocalEcho > 0)
-						CommBinaryEcho(&cv, Code, CodeLength);
-				}
+				SendBinary(Code, CodeLength, Count);
 				break;
 			case IdText:
 				for (i = 1; i <= Count; i++) {
 					if (ts.LocalEcho > 0)
-						CommTextEcho(&cv, Code, CodeLength);
-					CommTextOut(&cv, Code, CodeLength);
+						CommTextEchoW(&cv, Code, CodeLength);
+					CommTextOutW(&cv, Code, CodeLength);
 				}
 				break;
 			case IdMacro:
 				Code[CodeLength] = 0;
-				RunMacro(Code, FALSE);
+				RunMacroW(Code, FALSE);
 				break;
 		}
 	}
@@ -1557,6 +1635,10 @@ void InitKeyboard()
 
 void EndKeyboard()
 {
-	if (KeyMap != NULL)
-		free(KeyMap);
+	if (KeyMap == NULL)
+		return;
+
+	FreeUserKey(KeyMap);
+	free(KeyMap);
+	KeyMap = NULL;
 }

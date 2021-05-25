@@ -29,8 +29,11 @@
 
 #include "teraterm.h"
 #include "tttypes_key.h"
+#define _CRTDBG_MAP_ALLOC
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <crtdbg.h>
 #include "ttlib.h"
 #include "codeconv.h"
 #include "../teraterm/keyboard_i.h"
@@ -43,50 +46,91 @@
 #define XFunction "X function keys"
 #define ShortCut "Shortcut keys"
 
-extern DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const char* defA, char *strA, DWORD size, const wchar_t *filenameW);
-#undef GetPrivateProfileString
-#define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-
-#if	INI_FILE_IS_UNICODE
-static void GetInt(PKeyMap KeyMap, int KeyId, const char *Sect, const char *Key, const wchar_t *FName)
-#else
-static void GetInt(PKeyMap KeyMap, int KeyId, const char *Sect, const char *Key, const char *FName)
-#endif
+static void GetInt(PKeyMap KeyMap, int KeyId, const char *SectA, const char *KeyA, const wchar_t *FName)
 {
-	char Temp[11];
+	wchar_t Temp[11];
 	WORD Num;
-
-	GetPrivateProfileString(Sect, Key, "", Temp, sizeof(Temp), FName);
+	wchar_t *SectW = ToWcharA(SectA);
+	wchar_t *KeyW = ToWcharA(KeyA);
+	GetPrivateProfileStringW(SectW, KeyW, L"", Temp, _countof(Temp), FName);
+	free(SectW);
+	free(KeyW);
 	if (Temp[0] == 0)
 		Num = 0xFFFF;
-	else if (_stricmp(Temp, "off") == 0)
+	else if (_wcsicmp(Temp, L"off") == 0)
 		Num = 0xFFFF;
-	else if (sscanf(Temp, "%hd", &Num) != 1)
+	else if (swscanf(Temp, L"%hd", &Num) != 1)
 		Num = 0xFFFF;
 
 	KeyMap->Map[KeyId - 1] = Num;
 }
 
-void PASCAL ReadKeyboardCnf(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
+static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
 {
-	int i, j, Ptr;
-	char EntName[7];
-	char TempStr[221];
-	char KStr[201];
+	int i;
+
+	for (i = 0; i < NumOfUserKey; i++) {
+		const int ttkeycode = IdUser1 + i;	// tera term key code
+		wchar_t EntName[7];
+		wchar_t TempStr[256];
+		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"User%d", i + 1);
+		GetPrivateProfileStringW(L"User keys", EntName, L"",
+								 TempStr, _countof(TempStr), FName);
+		if (TempStr[0] == 0) {
+			continue;
+		}
+
+		if(_wcsnicmp(TempStr, L"off", 3) == 0) {
+			KeyMap->Map[ttkeycode - 1] = 0xFFFF;
+			continue;
+		}
+
+		{
+			int keycode;
+			int type;
+			wchar_t str[256];
+			int r;
+			r = swscanf_s(TempStr, L"%d,%d,%[^\n]", &keycode, &type, &str, (unsigned)_countof(str));
+			if (r != 3) {
+				continue;
+			}
+
+			{
+				UserKey_t *UserKeyData;
+				const int UserKeyCount = KeyMap->UserKeyCount;
+				UserKey_t *p;
+
+				UserKeyData = (UserKey_t *)realloc(KeyMap->UserKeyData, sizeof(UserKey_t) * (UserKeyCount + 1));
+				p = UserKeyData + UserKeyCount;
+				p->ptr = _wcsdup(str);
+				p->len = wcslen(p->ptr);
+				p->type = type;
+				p->keycode = keycode;
+				p->ttkeycode = ttkeycode;
+
+				KeyMap->UserKeyData = UserKeyData;
+				KeyMap->UserKeyCount++;
+
+				KeyMap->Map[ttkeycode - 1] = keycode;
+			}
+		}
+	}
+}
+
+/**
+ *	keyboard.cnf を読み込む
+ *		このファイルは ttermpro.exe にリンクされている
+ *		ttpset.dll ttste_keyboard_entry.c の ReadKeyboardCnf() からここがコールされる
+ *		KeyMap は初期化済み
+ */
+__declspec(dllexport) void WINAPI ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
+{
+	int i, j;
 #if	INI_FILE_IS_UNICODE
 	const wchar_t *FName = ToWcharA(FNameA);
 #else
 	const char *FName = FNameA;
 #endif
-
-	// clear key map
-	for (i = 0; i <= IdKeyMax - 1; i++)
-		KeyMap->Map[i] = 0xFFFF;
-	for (i = 0; i <= NumOfUserKey - 1; i++) {
-		KeyMap->UserKeyPtr[i] = 0;
-		KeyMap->UserKeyLen[i] = 0;
-	}
 
 	// VT editor keypad
 	GetInt(KeyMap, IdUp, VTEditor, "Up", FName);
@@ -272,49 +316,14 @@ void PASCAL ReadKeyboardCnf(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
 
 	GetInt(KeyMap, IdCmdScrollLock, ShortCut, "ScrollLock", FName);
 
-	/* user keys */
-
-	Ptr = 0;
-
-	i = IdUser1;
-	do {
-		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "User%d", i - IdUser1 + 1);
-		GetPrivateProfileString("User keys", EntName, "",
-								TempStr, sizeof(TempStr), FName);
-		if (strlen(TempStr) > 0) {
-			/* scan code */
-			GetNthString(TempStr, 1, sizeof(KStr), KStr);
-			if (_stricmp(KStr, "off") == 0)
-				KeyMap->Map[i - 1] = 0xFFFF;
-			else {
-				GetNthNum(TempStr, 1, &j);
-				KeyMap->Map[i - 1] = (WORD) j;
-			}
-			/* conversion flag */
-			GetNthNum(TempStr, 2, &j);
-			KeyMap->UserKeyType[i - IdUser1] = (BYTE) j;
-			/* key string */
-/*	GetNthString(TempStr,3,sizeof(KStr),KStr); */
-			KeyMap->UserKeyPtr[i - IdUser1] = Ptr;
-/*	KeyMap->UserKeyLen[i-IdUser1] =
-	Hex2Str(KStr,&(KeyMap->UserKeyStr[Ptr]),KeyStrMax-Ptr+1);
-*/
-			GetNthString(TempStr, 3, KeyStrMax - Ptr + 1,
-			             &(KeyMap->UserKeyStr[Ptr]));
-			KeyMap->UserKeyLen[i - IdUser1] =
-				strlen(&(KeyMap->UserKeyStr[Ptr]));
-			Ptr = Ptr + KeyMap->UserKeyLen[i - IdUser1];
-		}
-
-		i++;
-	}
-	while ((i <= IdKeyMax) && (strlen(TempStr) > 0) && (Ptr <= KeyStrMax));
+	ReadUserkeysSection(FName, KeyMap);
 
 	for (j = 1; j <= IdKeyMax - 1; j++)
 		if (KeyMap->Map[j] != 0xFFFF)
 			for (i = 0; i <= j - 1; i++)
 				if (KeyMap->Map[i] == KeyMap->Map[j]) {
 					if (ShowWarning) {
+						char TempStr[128];
 						_snprintf_s(TempStr, sizeof(TempStr), _TRUNCATE,
 						            "Keycode %d is used more than once",
 						            KeyMap->Map[j]);

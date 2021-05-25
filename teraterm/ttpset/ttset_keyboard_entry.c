@@ -26,33 +26,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <windows.h>
 
-#include "tttypes_key.h"
+#include "teraterm.h"
+#include "dllutil.h"
+#include "../teraterm/keyboard_i.h"
 
- // (user) key type IDs
-typedef enum {
-	IdBinary = 0,  // transmit text without any modification
-	IdText = 1,	   // transmit text with new-line & DBCS conversions
-	IdMacro = 2,   // activate macro
-	IdCommand = 3  // post a WM_COMMAND message
-} UserKeyType_t;
+void PASCAL ReadKeyboardCnf(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
+{
+	void (*ReadKeyboardCnfExe)(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning);
+	DWORD r = DLLGetApiAddress("ttermpro.exe", DLL_LOAD_LIBRARY_CURRENT, "ReadKeyboardCnfExe", (void **)&ReadKeyboardCnfExe);
+	if (r != NO_ERROR) {
+		return;
+	}
 
-/* user key data */
-typedef struct {
-	int keycode;
-	int ttkeycode;
-	UserKeyType_t type;
-	wchar_t *ptr;
-	size_t len;
-} UserKey_t;
-
-struct TKeyMap_st {
-	WORD Map[IdKeyMax];
-
-	/* user key data */
-	UserKey_t *UserKeyData;
-	int UserKeyCount;
-};
-typedef struct TKeyMap_st *PKeyMap;
-typedef struct TKeyMap_st TKeyMap;
+	ReadKeyboardCnfExe(FNameA, KeyMap, ShowWarning);
+}

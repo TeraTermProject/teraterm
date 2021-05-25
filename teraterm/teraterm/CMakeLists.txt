@@ -42,6 +42,7 @@ add_executable(
   ftdlg.h
   keyboard.c
   keyboard.h
+  ../ttpset/ttset_keyboard.c
   prnabort.cpp
   prnabort.h
   protodlg.cpp

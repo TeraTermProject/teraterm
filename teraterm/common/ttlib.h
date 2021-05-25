@@ -53,6 +53,7 @@ void DeleteSlash(PCHAR Path);
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP);
 BYTE ConvHexChar(BYTE b);
 int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen);
+int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen);
 BOOL DoesFileExist(const char *FName);
 BOOL DoesFolderExist(const char *FName);
 long GetFSize(const char *FName);
