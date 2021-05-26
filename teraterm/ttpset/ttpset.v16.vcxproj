@@ -133,7 +133,7 @@
   <ItemGroup>
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="ttset.c" />
-    <ClCompile Include="ttset_keyboard.c" />
+    <ClCompile Include="ttset_keyboard_entry.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\teraterm.h" />

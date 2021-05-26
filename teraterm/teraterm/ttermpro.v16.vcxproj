@@ -145,6 +145,7 @@
     <ClCompile Include="..\ttpfile\xmodem.c" />
     <ClCompile Include="..\ttpfile\ymodem.c" />
     <ClCompile Include="..\ttpfile\zmodem.c" />
+    <ClCompile Include="..\ttpset\ttset_keyboard.c" />
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="broadcast.cpp" />
     <ClCompile Include="buffer.c" />

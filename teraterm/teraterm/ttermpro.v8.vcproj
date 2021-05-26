@@ -374,6 +374,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\ttpset\ttset_keyboard.c"
+				>
+			</File>
+			<File
 				RelativePath="ttsetup.c"
 				>
 			</File>

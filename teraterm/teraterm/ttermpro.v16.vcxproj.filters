@@ -186,6 +186,9 @@
     <ClCompile Include="ttdebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ttpset\ttset_keyboard.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">

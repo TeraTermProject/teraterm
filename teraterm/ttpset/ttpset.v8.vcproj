@@ -220,7 +220,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ttset_keyboard.c"
+				RelativePath=".\ttset_keyboard_entry.c"
 				>
 			</File>
 		</Filter>
