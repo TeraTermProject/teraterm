@@ -123,7 +123,7 @@ static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
  *		ttpset.dll ttste_keyboard_entry.c ‚Ì ReadKeyboardCnf() ‚©‚ç‚±‚±‚ªƒR[ƒ‹‚³‚ê‚é
  *		KeyMap ‚Í‰Šú‰»Ï‚İ
  */
-__declspec(dllexport) void WINAPI ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
+__declspec(dllexport) void ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
 {
 	int i, j;
 #if	INI_FILE_IS_UNICODE
