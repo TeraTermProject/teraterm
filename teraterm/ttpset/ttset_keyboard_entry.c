@@ -35,7 +35,7 @@
 void PASCAL ReadKeyboardCnf(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
 {
 	void (*ReadKeyboardCnfExe)(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning);
-	DWORD r = DLLGetApiAddress("ttermpro.exe", DLL_LOAD_LIBRARY_CURRENT, "ReadKeyboardCnfExe", (void **)&ReadKeyboardCnfExe);
+	DWORD r = DLLGetApiAddress(L"ttermpro.exe", DLL_LOAD_LIBRARY_CURRENT, "ReadKeyboardCnfExe", (void **)&ReadKeyboardCnfExe);
 	if (r != NO_ERROR) {
 		return;
 	}

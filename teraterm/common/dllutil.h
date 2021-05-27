@@ -47,7 +47,7 @@ typedef struct {
 } APIInfo;
 
 typedef struct {
-	const TCHAR *DllName;
+	const wchar_t *DllName;
 	DLLLoadFlag LoadFlag;
 	DLLFuncFlag FuncFlag;
 	const APIInfo *APIInfoPtr;
@@ -56,9 +56,9 @@ typedef struct {
 void DLLInit();
 void DLLExit();
 void DLLGetApiAddressFromLists(const DllInfo *dllInfos);
-DWORD DLLGetApiAddressFromList(const TCHAR *dllPath, DLLLoadFlag LoadFlag,
+DWORD DLLGetApiAddressFromList(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
 							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo);
-DWORD DLLGetApiAddress(const TCHAR *dllPath, DLLLoadFlag LoadFlag,
+DWORD DLLGetApiAddress(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
 					   const char *ApiName, void **pFunc);
 
 #ifdef __cplusplus
