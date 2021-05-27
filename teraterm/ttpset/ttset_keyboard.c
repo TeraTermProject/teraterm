@@ -38,31 +38,147 @@
 #include "codeconv.h"
 #include "../teraterm/keyboard_i.h"
 
-#define INI_FILE_IS_UNICODE 1
+typedef struct {
+	int key_id;
+	const wchar_t *key_str;
+} keymap_list_t;
 
-#define VTEditor "VT editor keypad"
-#define VTNumeric "VT numeric keypad"
-#define VTFunction "VT function keys"
-#define XFunction "X function keys"
-#define ShortCut "Shortcut keys"
-
-static void GetInt(PKeyMap KeyMap, int KeyId, const char *SectA, const char *KeyA, const wchar_t *FName)
+static void ReadList(PKeyMap KeyMap, const wchar_t *section, const keymap_list_t *list, size_t count, const wchar_t *FName)
 {
-	wchar_t Temp[11];
-	WORD Num;
-	wchar_t *SectW = ToWcharA(SectA);
-	wchar_t *KeyW = ToWcharA(KeyA);
-	GetPrivateProfileStringW(SectW, KeyW, L"", Temp, _countof(Temp), FName);
-	free(SectW);
-	free(KeyW);
-	if (Temp[0] == 0)
-		Num = 0xFFFF;
-	else if (_wcsicmp(Temp, L"off") == 0)
-		Num = 0xFFFF;
-	else if (swscanf(Temp, L"%hd", &Num) != 1)
-		Num = 0xFFFF;
+	size_t i;
+	const keymap_list_t *p = list;
+	for (i = 0; i < count; i++) {
+		wchar_t Temp[11];
+		WORD Num;
+		GetPrivateProfileStringW(section, p->key_str, L"", Temp, _countof(Temp), FName);
+		if (Temp[0] == 0)
+			Num = 0xFFFF;
+		else if (_wcsicmp(Temp, L"off") == 0)
+			Num = 0xFFFF;
+		else if (swscanf(Temp, L"%hd", &Num) != 1)
+			Num = 0xFFFF;
 
-	KeyMap->Map[KeyId - 1] = Num;
+		KeyMap->Map[p->key_id - 1] = Num;
+	}
+}
+
+static void ReadKeyboardMap(PKeyMap KeyMap, const wchar_t* FName)
+{
+	static const keymap_list_t vteditor_list[] = {
+		// VT editor keypad
+		{ IdUp, L"Up" },
+		{ IdDown, L"Down" },
+		{ IdRight, L"Right" },
+		{ IdLeft, L"Left" },
+		{ IdFind, L"Find" },
+		{ IdInsert, L"Insert" },
+		{ IdRemove, L"Remove" },
+		{ IdSelect, L"Select" },
+		{ IdPrev, L"Prev" },
+		{ IdNext, L"Next" },
+	};
+
+	static const keymap_list_t vtnumeric_list[] = {
+		// VT numeric keypad
+		{ Id0, L"Num0" },
+		{ Id1, L"Num1" },
+		{ Id2, L"Num2" },
+		{ Id3, L"Num3" },
+		{ Id4, L"Num4" },
+		{ Id5, L"Num5" },
+		{ Id6, L"Num6" },
+		{ Id7, L"Num7" },
+		{ Id8, L"Num8" },
+		{ Id9, L"Num9" },
+		{ IdMinus, L"NumMinus" },
+		{ IdComma, L"NumComma" },
+		{ IdPeriod, L"NumPeriod" },
+		{ IdEnter, L"NumEnter" },
+		{ IdSlash, L"NumSlash" },
+		{ IdAsterisk, L"NumAsterisk" },
+		{ IdPlus, L"NumPlus" },
+		{ IdPF1, L"PF1" },
+		{ IdPF2, L"PF2" },
+		{ IdPF3, L"PF3" },
+		{ IdPF4, L"PF4" },
+	};
+
+	static const keymap_list_t vtfunction_list[] = {
+		// VT function keys
+		{ IdHold, L"Hold" },
+		{ IdPrint, L"Print" },
+		{ IdBreak, L"Break" },
+		{ IdF6, L"F6" },
+		{ IdF7, L"F7" },
+		{ IdF8, L"F8" },
+		{ IdF9, L"F9" },
+		{ IdF10, L"F10" },
+		{ IdF11, L"F11" },
+		{ IdF12, L"F12" },
+		{ IdF13, L"F13" },
+		{ IdF14, L"F14" },
+		{ IdHelp, L"Help" },
+		{ IdDo, L"Do" },
+		{ IdF17, L"F17" },
+		{ IdF18, L"F18" },
+		{ IdF19, L"F19" },
+		{ IdF20, L"F20" },
+
+		// UDK
+		{ IdUDK6, L"UDK6" },
+		{ IdUDK7, L"UDK7" },
+		{ IdUDK8, L"UDK8" },
+		{ IdUDK9, L"UDK9" },
+		{ IdUDK10, L"UDK10" },
+		{ IdUDK11, L"UDK11" },
+		{ IdUDK12, L"UDK12" },
+		{ IdUDK13, L"UDK13" },
+		{ IdUDK14, L"UDK14" },
+		{ IdUDK15, L"UDK15" },
+		{ IdUDK16, L"UDK16" },
+		{ IdUDK17, L"UDK17" },
+		{ IdUDK18, L"UDK18" },
+		{ IdUDK19, L"UDK19" },
+	};
+
+	static const keymap_list_t xterm_list[] = {
+		// XTERM function / extended keys
+		{ IdXF1, L"XF1" },
+		{ IdXF2, L"XF2" },
+		{ IdXF3, L"XF3" },
+		{ IdXF4, L"XF4" },
+		{ IdXF5, L"XF5" },
+		{ IdXBackTab, L"XBackTab" },
+	};
+
+	static const keymap_list_t shortcut_list[] = {
+		// accelerator keys
+		{ IdCmdEditCopy, L"EditCopy" },
+		{ IdCmdEditPaste, L"EditPaste" },
+		{ IdCmdEditPasteCR, L"EditPasteCR" },
+		{ IdCmdEditCLS, L"EditCLS" },
+		{ IdCmdEditCLB, L"EditCLB" },
+		{ IdCmdCtrlOpenTEK, L"ControlOpenTEK" },
+		{ IdCmdCtrlCloseTEK, L"ControlCloseTEK" },
+		{ IdCmdLineUp, L"LineUp" },
+		{ IdCmdLineDown, L"LineDown" },
+		{ IdCmdPageUp, L"PageUp" },
+		{ IdCmdPageDown, L"PageDown" },
+		{ IdCmdBuffTop, L"BuffTop" },
+		{ IdCmdBuffBottom, L"BuffBottom" },
+		{ IdCmdNextWin, L"NextWin" },
+		{ IdCmdPrevWin, L"PrevWin" },
+		{ IdCmdNextSWin, L"NextShownWin" },
+		{ IdCmdPrevSWin, L"PrevShownWin" },
+		{ IdCmdLocalEcho, L"LocalEcho" },
+		{ IdCmdScrollLock, L"ScrollLock" },
+	};
+
+	ReadList(KeyMap, L"VT editor keypad", vteditor_list, _countof(vteditor_list), FName);
+	ReadList(KeyMap, L"VT numeric keypad", vtnumeric_list, _countof(vtnumeric_list), FName);
+	ReadList(KeyMap, L"VT function keys", vtfunction_list, _countof(vtfunction_list), FName);
+	ReadList(KeyMap, L"X function keys", xterm_list, _countof(xterm_list), FName);
+	ReadList(KeyMap, L"Shortcut keys", shortcut_list, _countof(shortcut_list), FName);
 }
 
 static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
@@ -111,7 +227,7 @@ static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
 				KeyMap->UserKeyData = UserKeyData;
 				KeyMap->UserKeyCount++;
 
-				KeyMap->Map[ttkeycode - 1] = keycode;
+				KeyMap->Map[ttkeycode - 1] = (WORD)keycode;
 			}
 		}
 	}
@@ -126,198 +242,12 @@ static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
 __declspec(dllexport) void ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
 {
 	int i, j;
-#if	INI_FILE_IS_UNICODE
 	const wchar_t *FName = ToWcharA(FNameA);
-#else
-	const char *FName = FNameA;
-#endif
 
-	// VT editor keypad
-	GetInt(KeyMap, IdUp, VTEditor, "Up", FName);
-
-	GetInt(KeyMap, IdDown, VTEditor, "Down", FName);
-
-	GetInt(KeyMap, IdRight, VTEditor, "Right", FName);
-
-	GetInt(KeyMap, IdLeft, VTEditor, "Left", FName);
-
-	GetInt(KeyMap, IdFind, VTEditor, "Find", FName);
-
-	GetInt(KeyMap, IdInsert, VTEditor, "Insert", FName);
-
-	GetInt(KeyMap, IdRemove, VTEditor, "Remove", FName);
-
-	GetInt(KeyMap, IdSelect, VTEditor, "Select", FName);
-
-	GetInt(KeyMap, IdPrev, VTEditor, "Prev", FName);
-
-	GetInt(KeyMap, IdNext, VTEditor, "Next", FName);
-
-	// VT numeric keypad
-	GetInt(KeyMap, Id0, VTNumeric, "Num0", FName);
-
-	GetInt(KeyMap, Id1, VTNumeric, "Num1", FName);
-
-	GetInt(KeyMap, Id2, VTNumeric, "Num2", FName);
-
-	GetInt(KeyMap, Id3, VTNumeric, "Num3", FName);
-
-	GetInt(KeyMap, Id4, VTNumeric, "Num4", FName);
-
-	GetInt(KeyMap, Id5, VTNumeric, "Num5", FName);
-
-	GetInt(KeyMap, Id6, VTNumeric, "Num6", FName);
-
-	GetInt(KeyMap, Id7, VTNumeric, "Num7", FName);
-
-	GetInt(KeyMap, Id8, VTNumeric, "Num8", FName);
-
-	GetInt(KeyMap, Id9, VTNumeric, "Num9", FName);
-
-	GetInt(KeyMap, IdMinus, VTNumeric, "NumMinus", FName);
-
-	GetInt(KeyMap, IdComma, VTNumeric, "NumComma", FName);
-
-	GetInt(KeyMap, IdPeriod, VTNumeric, "NumPeriod", FName);
-
-	GetInt(KeyMap, IdEnter, VTNumeric, "NumEnter", FName);
-
-	GetInt(KeyMap, IdSlash, VTNumeric, "NumSlash", FName);
-
-	GetInt(KeyMap, IdAsterisk, VTNumeric, "NumAsterisk", FName);
-
-	GetInt(KeyMap, IdPlus, VTNumeric, "NumPlus", FName);
-
-	GetInt(KeyMap, IdPF1, VTNumeric, "PF1", FName);
-
-	GetInt(KeyMap, IdPF2, VTNumeric, "PF2", FName);
-
-	GetInt(KeyMap, IdPF3, VTNumeric, "PF3", FName);
-
-	GetInt(KeyMap, IdPF4, VTNumeric, "PF4", FName);
-
-	// VT function keys
-	GetInt(KeyMap, IdHold, VTFunction, "Hold", FName);
-
-	GetInt(KeyMap, IdPrint, VTFunction, "Print", FName);
-
-	GetInt(KeyMap, IdBreak, VTFunction, "Break", FName);
-
-	GetInt(KeyMap, IdF6, VTFunction, "F6", FName);
-
-	GetInt(KeyMap, IdF7, VTFunction, "F7", FName);
-
-	GetInt(KeyMap, IdF8, VTFunction, "F8", FName);
-
-	GetInt(KeyMap, IdF9, VTFunction, "F9", FName);
-
-	GetInt(KeyMap, IdF10, VTFunction, "F10", FName);
-
-	GetInt(KeyMap, IdF11, VTFunction, "F11", FName);
-
-	GetInt(KeyMap, IdF12, VTFunction, "F12", FName);
-
-	GetInt(KeyMap, IdF13, VTFunction, "F13", FName);
-
-	GetInt(KeyMap, IdF14, VTFunction, "F14", FName);
-
-	GetInt(KeyMap, IdHelp, VTFunction, "Help", FName);
-
-	GetInt(KeyMap, IdDo, VTFunction, "Do", FName);
-
-	GetInt(KeyMap, IdF17, VTFunction, "F17", FName);
-
-	GetInt(KeyMap, IdF18, VTFunction, "F18", FName);
-
-	GetInt(KeyMap, IdF19, VTFunction, "F19", FName);
-
-	GetInt(KeyMap, IdF20, VTFunction, "F20", FName);
-
-	// UDK
-	GetInt(KeyMap, IdUDK6, VTFunction, "UDK6", FName);
-
-	GetInt(KeyMap, IdUDK7, VTFunction, "UDK7", FName);
-
-	GetInt(KeyMap, IdUDK8, VTFunction, "UDK8", FName);
-
-	GetInt(KeyMap, IdUDK9, VTFunction, "UDK9", FName);
-
-	GetInt(KeyMap, IdUDK10, VTFunction, "UDK10", FName);
-
-	GetInt(KeyMap, IdUDK11, VTFunction, "UDK11", FName);
-
-	GetInt(KeyMap, IdUDK12, VTFunction, "UDK12", FName);
-
-	GetInt(KeyMap, IdUDK13, VTFunction, "UDK13", FName);
-
-	GetInt(KeyMap, IdUDK14, VTFunction, "UDK14", FName);
-
-	GetInt(KeyMap, IdUDK15, VTFunction, "UDK15", FName);
-
-	GetInt(KeyMap, IdUDK16, VTFunction, "UDK16", FName);
-
-	GetInt(KeyMap, IdUDK17, VTFunction, "UDK17", FName);
-
-	GetInt(KeyMap, IdUDK18, VTFunction, "UDK18", FName);
-
-	GetInt(KeyMap, IdUDK19, VTFunction, "UDK19", FName);
-
-	GetInt(KeyMap, IdUDK20, VTFunction, "UDK20", FName);
-
-	// XTERM function / extended keys
-	GetInt(KeyMap, IdXF1, XFunction, "XF1", FName);
-
-	GetInt(KeyMap, IdXF2, XFunction, "XF2", FName);
-
-	GetInt(KeyMap, IdXF3, XFunction, "XF3", FName);
-
-	GetInt(KeyMap, IdXF4, XFunction, "XF4", FName);
-
-	GetInt(KeyMap, IdXF5, XFunction, "XF5", FName);
-
-	GetInt(KeyMap, IdXBackTab, XFunction, "XBackTab", FName);
-
-	// accelerator keys
-	GetInt(KeyMap, IdCmdEditCopy, ShortCut, "EditCopy", FName);
-
-	GetInt(KeyMap, IdCmdEditPaste, ShortCut, "EditPaste", FName);
-
-	GetInt(KeyMap, IdCmdEditPasteCR, ShortCut, "EditPasteCR", FName);
-
-	GetInt(KeyMap, IdCmdEditCLS, ShortCut, "EditCLS", FName);
-
-	GetInt(KeyMap, IdCmdEditCLB, ShortCut, "EditCLB", FName);
-
-	GetInt(KeyMap, IdCmdCtrlOpenTEK, ShortCut, "ControlOpenTEK", FName);
-
-	GetInt(KeyMap, IdCmdCtrlCloseTEK, ShortCut, "ControlCloseTEK", FName);
-
-	GetInt(KeyMap, IdCmdLineUp, ShortCut, "LineUp", FName);
-
-	GetInt(KeyMap, IdCmdLineDown, ShortCut, "LineDown", FName);
-
-	GetInt(KeyMap, IdCmdPageUp, ShortCut, "PageUp", FName);
-
-	GetInt(KeyMap, IdCmdPageDown, ShortCut, "PageDown", FName);
-
-	GetInt(KeyMap, IdCmdBuffTop, ShortCut, "BuffTop", FName);
-
-	GetInt(KeyMap, IdCmdBuffBottom, ShortCut, "BuffBottom", FName);
-
-	GetInt(KeyMap, IdCmdNextWin, ShortCut, "NextWin", FName);
-
-	GetInt(KeyMap, IdCmdPrevWin, ShortCut, "PrevWin", FName);
-
-	GetInt(KeyMap, IdCmdNextSWin, ShortCut, "NextShownWin", FName);
-
-	GetInt(KeyMap, IdCmdPrevSWin, ShortCut, "PrevShownWin", FName);
-
-	GetInt(KeyMap, IdCmdLocalEcho, ShortCut, "LocalEcho", FName);
-
-	GetInt(KeyMap, IdCmdScrollLock, ShortCut, "ScrollLock", FName);
-
+	ReadKeyboardMap(KeyMap, FName);
 	ReadUserkeysSection(FName, KeyMap);
 
+	// 重複チェック
 	for (j = 1; j <= IdKeyMax - 1; j++)
 		if (KeyMap->Map[j] != 0xFFFF)
 			for (i = 0; i <= j - 1; i++)
@@ -327,14 +257,12 @@ __declspec(dllexport) void ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL
 						_snprintf_s(TempStr, sizeof(TempStr), _TRUNCATE,
 						            "Keycode %d is used more than once",
 						            KeyMap->Map[j]);
-						MessageBox(0, TempStr,
-						           "Tera Term: Error in keyboard setup file",
-						           MB_ICONEXCLAMATION);
+						MessageBoxA(NULL, TempStr,
+									"Tera Term: Error in keyboard setup file",
+									MB_ICONEXCLAMATION);
 					}
 					KeyMap->Map[i] = 0xFFFF;
 				}
 
-#if	INI_FILE_IS_UNICODE
 	free((void *)FName);
-#endif
 }
