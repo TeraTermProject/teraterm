@@ -42,11 +42,11 @@ public:
 private:
 	enum { IDD = IDD_ERRDLG };
 
-	const TCHAR *MsgStr;
-	const TCHAR *LineStr;
+	const wchar_t *MsgStr;
+	const wchar_t *LineStr;
 	int LineNo;
 	int StartPos, EndPos;
-	const TCHAR *MacroFileName;
+	const wchar_t *MacroFileName;
 
 	virtual BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wp, LPARAM lp);

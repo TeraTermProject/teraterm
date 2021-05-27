@@ -192,11 +192,11 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 	SetDlgMenuTexts(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
-		TCHAR uimsg[MAX_UIMSG];
+		wchar_t uimsg[MAX_UIMSG];
 		WinMenu = CreatePopupMenu();
-		get_lang_msgT("TEKMENU_WINDOW", uimsg, _countof(uimsg), _T("&Window"), ts.UILanguageFile);
-		::InsertMenu(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-		             (UINT_PTR)WinMenu, uimsg);
+		get_lang_msgW("TEKMENU_WINDOW", uimsg, _countof(uimsg), L"&Window", ts.UILanguageFile);
+		::InsertMenuW(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+					  (UINT_PTR)WinMenu, uimsg);
 	}
 }
 
@@ -592,12 +592,12 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	if ((MainMenu!=NULL) &&
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
-			TCHAR uimsg[MAX_UIMSG];
+			wchar_t uimsg[MAX_UIMSG];
 			WinMenu = CreatePopupMenu();
-			get_lang_msgT("TEKMENU_WINDOW", uimsg, _countof(uimsg), _T("&Window"), ts.UILanguageFile);
-			::InsertMenu(MainMenu,4,
-			             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			             (UINT_PTR)WinMenu, uimsg);
+			get_lang_msgW("TEKMENU_WINDOW", uimsg, _countof(uimsg), L"&Window", ts.UILanguageFile);
+			::InsertMenuW(MainMenu,4,
+						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+						  (UINT_PTR)WinMenu, uimsg);
 		}
 		else {
 			RemoveMenu(MainMenu,4,MF_BYPOSITION);
@@ -609,11 +609,11 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 	::GetSystemMenu(tk.HWin,TRUE);
 	if ((! Show) && ((ts.MenuFlag & MF_NOSHOWMENU)==0)) {
-		TCHAR uimsg[MAX_UIMSG];
+		wchar_t uimsg[MAX_UIMSG];
 		SysMenu = ::GetSystemMenu(tk.HWin,FALSE);
-		AppendMenu(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msgT("TEKMENU_SHOW_MENUBAR", uimsg, _countof(uimsg), _T("Show menu &bar"), ts.UILanguageFile);
-		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
+		AppendMenuW(SysMenu, MF_SEPARATOR, 0, NULL);
+		get_lang_msgW("TEKMENU_SHOW_MENUBAR", uimsg, _countof(uimsg), L"Show menu &bar", ts.UILanguageFile);
+		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 	}
 	return 0;
 }
@@ -644,11 +644,11 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 	if ((ts.HideTitle==0) && (MainMenu==NULL) &&
 	    ((ts.MenuFlag & MF_NOSHOWMENU) == 0)) {
-		TCHAR uimsg[MAX_UIMSG];
+		wchar_t uimsg[MAX_UIMSG];
 		SysMenu = ::GetSystemMenu(HTEKWin,FALSE);
-		AppendMenu(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msgT("TEKMENU_SHOW_MENUBAR", uimsg, _countof(uimsg), _T("Show menu &bar"), ts.UILanguageFile);
-		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
+		AppendMenuW(SysMenu, MF_SEPARATOR, 0, NULL);
+		get_lang_msgW("TEKMENU_SHOW_MENUBAR", uimsg, _countof(uimsg), L"Show menu &bar", ts.UILanguageFile);
+		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 	}
 	return 0;
 }

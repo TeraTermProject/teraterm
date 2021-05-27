@@ -4895,7 +4895,7 @@ static BOOL openDirectoryWithExplorer(const wchar_t *path)
 				::ZeroMemory(&si, sizeof(si));
 				si.cbSize = sizeof(si);
 				si.fMask = SEE_MASK_IDLIST;
-				si.lpVerb = _T("open");
+				si.lpVerb = "open";
 				si.lpIDList = pIDL;
 				si.nShow = SW_SHOWNORMAL;
 				::ShellExecuteEx(&si);

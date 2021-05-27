@@ -1211,25 +1211,25 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
 		{ IDOK, "DLG_SERIAL_OK_RESET" },
 	};
 	int ret = 0;
-	TCHAR uimsg[MAX_UIMSG];
+	const char *ok_text;
 
 	if ( cv.Ready && (cv.PortType != IdSerial) ) {
 		ret = SetDlgTexts(dlg, TextInfoNewConnection, _countof(TextInfoNewConnection), UILanguageFile);
-		strncpy_s(uimsg, sizeof(uimsg), "Connect with &New window", _TRUNCATE);
+		ok_text = "Connect with &New window";
 
 	} else {
 		if (cv.Open) {
 			if (portno != cv.ComPort) {
 				ret = SetDlgTexts(dlg, TextInfoCloseNewOpen, _countof(TextInfoCloseNewOpen), UILanguageFile);
-				strncpy_s(uimsg, sizeof(uimsg), "Close and &New open", _TRUNCATE);
+				ok_text = "Close and &New open";
 			} else {
 				ret = SetDlgTexts(dlg, TextInfoResetSetting, _countof(TextInfoResetSetting), UILanguageFile);
-				strncpy_s(uimsg, sizeof(uimsg), "&New setting", _TRUNCATE);
+				ok_text = "&New setting";
 			}
 
 		} else {
 			ret = SetDlgTexts(dlg, TextInfoNewOpen, _countof(TextInfoNewOpen), UILanguageFile);
-			strncpy_s(uimsg, sizeof(uimsg), "&New open", _TRUNCATE);
+			ok_text = "&New open";
 		}
 	}
 
@@ -1237,7 +1237,7 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
 	 * デフォルトテキストをセットする。
 	 */
 	if (ret <= 0) {
-		SetDlgItemText(dlg, IDOK, uimsg);
+		SetDlgItemTextA(dlg, IDOK, ok_text);
 	}
 }
 
@@ -1248,8 +1248,7 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
 static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 {
 	int i;
-	ComPortInfo_t *p;
-	char *strA;
+	const ComPortInfo_t *p;
 
 	for (i = 0 ; i < ComPortInfoCount ; i++) {
 		p = &ComPortInfoPtr[i];
@@ -1259,9 +1258,7 @@ static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 	if (i >= ComPortInfoCount)  // 該当するCOMポートが見つからなかった
 		return;
 
-	strA = ToCharW(p->property);
-	SetDlgItemTextA(dlg, IDC_SERIALTEXT, strA);
-	free(strA);
+	SetDlgItemTextW(dlg, IDC_SERIALTEXT, p->property);
 }
 
 /*
@@ -1316,14 +1313,13 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 	int w, h;
 	int cx, cy;
 	RECT wr;
-	TCHAR str[128], uimsg[MAX_UIMSG];
+	wchar_t uimsg[MAX_UIMSG];
 	PTTSet ts;
 
 	switch (msg) {
 		case WM_MOUSEMOVE:
 			ts = (PTTSet)GetWindowLongPtr(GetParent(hWnd) ,DWLP_USER);
-			get_lang_msg("DLG_SERIAL_SPEED_TOOLTIP", uimsg, sizeof(uimsg), "You can directly specify a number", ts->UILanguageFile);
-			_stprintf_s(str, _countof(str), _T(uimsg));
+			get_lang_msgW("DLG_SERIAL_SPEED_TOOLTIP", uimsg, _countof(uimsg), L"You can directly specify a number", ts->UILanguageFile);
 
 			// Combo-boxの左上座標を求める
 			GetWindowRect(hWnd, &wr);
@@ -1331,7 +1327,7 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 			pt.y = wr.top;
 
 			// 文字列の縦横サイズを取得する
-			TipWinGetTextWidthHeight(hWnd, str, &w, &h);
+			TipWinGetTextWidthHeightW(hWnd, uimsg, &w, &h);
 
 			cx = pt.x;
 			cy = pt.y - (h + TIP_WIN_FRAME_WIDTH * 6);
@@ -1344,7 +1340,7 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 			if (!TipWinIsVisible(g_SerialDlgSpeedTip))
 				TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
 
-			TipWinSetTextA(g_SerialDlgSpeedTip, str);
+			TipWinSetTextW(g_SerialDlgSpeedTip, uimsg);
 			TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
 			TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
 

@@ -88,8 +88,8 @@ static HINSTANCE hInst;
 static PMap pm;
 
 static HANDLE HMap = NULL;
-#define VTCLASSNAME _T("VTWin32")
-#define TEKCLASSNAME _T("TEKWin32")
+#define VTCLASSNAME "VTWin32"
+#define TEKCLASSNAME "TEKWin32"
 
 enum window_style {
 	WIN_CASCADE,

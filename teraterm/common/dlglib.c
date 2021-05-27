@@ -110,11 +110,11 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
 
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num)
 {
-	TCHAR Temp[16];
+	wchar_t Temp[16];
 
 	/* In Win16, SetDlgItemInt can not be used to display long integer. */
-	_sntprintf_s(Temp, _countof(Temp), _TRUNCATE, _T("%d"), Num);
-	SetDlgItemText(HDlg,id_Item,Temp);
+	_snwprintf_s(Temp, _countof(Temp), _TRUNCATE, L"%d", Num);
+	SetDlgItemTextW(HDlg,id_Item,Temp);
 }
 
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
@@ -137,7 +137,7 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	// —Ž‚¿‚é–â‘è‚Ö‚Ì‘ÎˆB(2005.3.18 yutaka)
 	// cf. http://sourceforge.jp/tracker/index.php?func=detail&aid=5713&group_id=1412&atid=5333
 	double Num;
-	TCHAR NumStr[10];
+	wchar_t NumStr[10];
 
 	if (b==0) {
 		Num = 100.0;
@@ -145,8 +145,8 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	else {
 		Num = 100.0 * (double)a / (double)b;
 	}
-	_sntprintf_s(NumStr, _countof(NumStr),_TRUNCATE,_T("%3.1f%%"),Num);
-	SetDlgItemText(HDlg, id_Item, NumStr);
+	_snwprintf_s(NumStr, _countof(NumStr),_TRUNCATE,L"%3.1f%%",Num);
+	SetDlgItemTextW(HDlg, id_Item, NumStr);
 
 	if (id_Progress != 0 && p != NULL && *p >= 0 && (double)*p < Num) {
 		*p = (int)Num;
@@ -158,13 +158,13 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 {
 	static int prev_elapsed;
 	int elapsed, rate;
-	TCHAR buff[64];
+	wchar_t buff[64];
 
 	elapsed = (GetTickCount() - stime) / 1000;
 
 	if (elapsed == 0) {
 		prev_elapsed = 0;
-		SetDlgItemText(HDlg, id_Item, _T("0:00"));
+		SetDlgItemTextW(HDlg, id_Item, L"0:00");
 		return;
 	}
 
@@ -175,16 +175,16 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 
 	rate = bytes / elapsed;
 	if (rate < 1200) {
-		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%dBytes/s)"), elapsed / 60, elapsed % 60, rate);
+		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate);
 	}
 	else if (rate < 1200000) {
-		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dKB/s)"), elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
+		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
 	}
 	else {
-		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dMB/s)"), elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100);
+		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100);
 	}
 
-	SetDlgItemText(HDlg, id_Item, buff);
+	SetDlgItemTextW(HDlg, id_Item, buff);
 }
 
 void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel)
