@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <tchar.h>
 #include "ttcstd.h"
 
 #ifdef __cplusplus
@@ -79,20 +78,6 @@ char *ToU8A(const char *strA);
 char *ToU8W(const wchar_t *strW);
 char32_t *ToU32W(const wchar_t *strW);
 
-#if defined(_UNICODE)
-#define ToTcharA(s)		ToWcharA(s)
-#define ToTcharW(s)		ToWcharW(s)
-#define ToTcharU8(s)	ToWcharU8(s)
-#define ToCharT(s)		ToCharW(s)
-#define ToU8T(s)		ToU8W(s)
-#else
-#define ToTcharA(s)		ToCharA(s)
-#define ToTcharW(s)		ToCharW(s)
-#define ToTcharU8(s)	ToCharU8(s)
-#define ToCharT(s)		ToCharA(s)
-#define ToU8T(s)		ToU8A(s)
-#endif
-
 #ifdef __cplusplus
 }
 #endif
@@ -129,35 +114,6 @@ private:
 	void assign(const wchar_t *strW);
 	void copy(const u8 &obj);
 	void move(u8 &obj);
-};
-
-class tc
-{
-public:
-	tc();
-	tc(const char *strA);
-	tc(const char *strA, int code_page);
-	tc(const wchar_t *strW);
-	tc(const tc &obj);
-#if defined(MOVE_CONSTRUCTOR_ENABLE)
-	tc(tc &&obj) noexcept;
-#endif
-	~tc();
-	tc& operator=(const char *strA);
-	tc& operator=(const wchar_t *strW);
-	tc& operator=(const tc &obj);
-#if defined(MOVE_CONSTRUCTOR_ENABLE)
-	tc& operator=(tc &&obj) noexcept;
-#endif
-	static tc fromUtf8(const char *strU8);
-	operator const TCHAR *() const;
-	const TCHAR *cstr() const;
-private:
-	TCHAR *tstr_;
-	void assign(const char *strA, int code_page);
-	void assign(const wchar_t *strW);
-	void copy(const tc &obj);
-	void move(tc &obj);
 };
 
 class wc
