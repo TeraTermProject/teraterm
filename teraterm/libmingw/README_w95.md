@@ -63,7 +63,7 @@ libmsvcrt-oss01204.o:
   - GCC では __thread
 - LoadLibrary()で使用するdll(Tera Termの場合、プラグイン)では利用で問題があった
   - exe と同時にロードするdllはok
-  - Windows 7以降からok
+  - Windows Vista / Server 2008 以降からok、それ以前では問題がある
   - [スレッド固有記憶領域を持つ DLLを LoadLibrary すると異常動作する問題](http://seclan.dll.jp/dtdiary/2011/dt20110818.htm)
 - Windowsではexe(PE32)内.tlsセクションを利用して、スレッドローカル変数の処理を行う
   - スレッドコールバックテーブル

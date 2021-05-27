@@ -20,12 +20,14 @@
   - "%zd" など新しいフォーマット指定子
     - 古い Visual Studio(msvcrt.dll) の printf()系ではサポートしていない
   - L"%s" と "%s" の動作の違い
-    - msvcrtでは %s は char, L"%s" は wchar_t
+    - msvcrtでは "%s" は char, L"%s" は wchar_t を引数とする
+    - MinGWでは "%s", L"%s" とも char, "%ls" は wchar_t を引数とする
 - 特に指定していないと MinGW の printf()系(stdio)を使用する
 - このため Visual Studio と動作が異なってしまう
 - `__USE_MINGW_ANSI_STDIO` マクロので切り替えることができる
-  - 1 のとき mingw の stdio (デフォルト)
+  - 1 のとき mingw の stdio (mingwのデフォルト)
   - 0 のとき msvcrt
 - 参考URL
   - [printf の %lf について](https://ja.stackoverflow.com/questions/34013/printf-%E3%81%AE-lf-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
-
+- Visual Studio 2015 以降
+  - `_CRT_STDIO_ISO_WIDE_SPECIFIERS` を使用すると C99 に準拠するらしい
