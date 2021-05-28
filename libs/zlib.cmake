@@ -76,8 +76,8 @@ endif()
 if(NOT EXISTS ${SRC_DIR}/README)
 
   file(DOWNLOAD
-	${SRC_URL}
-	${DOWN_DIR}/${SRC_ARC}
+    ${SRC_URL}
+    ${DOWN_DIR}/${SRC_ARC}
     EXPECTED_HASH SHA256=${SRC_ARC_HASH_SHA256}
     SHOW_PROGRESS
     )
@@ -89,6 +89,12 @@ if(NOT EXISTS ${SRC_DIR}/README)
     WORKING_DIRECTORY ${EXTRACT_DIR}
     )
 
+  file(COPY
+    ${SRC_DIR}/README
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
+  file(RENAME
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/README
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/zlib-LICENSE.txt)
 endif()
 
 ########################################

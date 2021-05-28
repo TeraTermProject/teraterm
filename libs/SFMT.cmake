@@ -90,6 +90,13 @@ if(NOT EXISTS ${SRC_DIR}/README.txt)
     COMMAND ${CMAKE_COMMAND} -E tar "xvf" ${DOWN_DIR}/${SRC_ARC}
     WORKING_DIRECTORY ${EXTRACT_DIR}
     )
+
+  file(COPY
+    ${SRC_DIR}/LICENSE.txt
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
+  file(RENAME
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/LICENSE.txt
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/SFMT-LICENSE.txt)
 endif()
 
 ########################################

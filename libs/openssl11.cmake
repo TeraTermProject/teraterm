@@ -131,6 +131,14 @@ if(NOT EXISTS ${SRC_DIR}/README)
     WORKING_DIRECTORY ${EXTRACT_DIR}
     )
 
+  file(COPY
+    ${SRC_DIR}/LICENSE
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help
+    )
+  file(RENAME
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/LICENSE
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/OpenSSL-LICENSE.txt)
+
   if(APPLY_PATCH)
     find_program(
       PATCH patch
