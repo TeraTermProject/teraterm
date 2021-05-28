@@ -26,7 +26,7 @@ if ($in eq "-") {
 	binmode STDIN, ":$lf:encoding($coding)";
 	$IN = *STDIN;
 } else {
-	open ($IN,  "<:$lf:encoding($coding)",   $in);
+	open ($IN,  "<:$lf:encoding($coding)",   $in) or die("error :$! $in");
 }
 open (OUT, '>:crlf:encoding(shiftjis)', $out);
 while (<$IN>) {
