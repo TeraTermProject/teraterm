@@ -56,6 +56,7 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFO
     COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/OpenSSL-LICENSE.txt   -o en/html/reference/OpenSSL-LICENSE.txt   -l unix
     COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/PuTTY-LICENSE.txt     -o en/html/reference/PuTTY-LICENSE.txt     -l crlf
     COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/SFMT-LICENSE.txt      -o en/html/reference/SFMT-LICENSE.txt      -l unix
+    COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/cJSON-LICENSE.txt     -o en/html/reference/cJSON-LICENSE.txt     -l unix
     COMMAND ${PERL} ../installer/2sjis.pl -i ../cygterm/COPYING                     -o en/html/reference/CygTerm+-LICENSE.txt  -l unix
     COMMAND ${PERL} ../installer/copy-zliblicense.pl -i ../libs/doc_help/zlib-LICENSE.txt -o en/html/reference/zlib-LICENSE.txt -l unix
     COMMAND ${PERL} -C0 -pe "s/^\\xef\\xbb\\xbf//" en/html/reference/build_with_cmake.md > en/html/reference/build_with_cmake_no_bom.md
@@ -83,6 +84,7 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFO
     COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/OpenSSL-LICENSE.txt   -o ja/html/reference/OpenSSL-LICENSE.txt   -l unix
     COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/PuTTY-LICENSE.txt     -o ja/html/reference/PuTTY-LICENSE.txt     -l crlf
     COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/SFMT-LICENSE.txt      -o ja/html/reference/SFMT-LICENSE.txt      -l unix
+    COMMAND ${PERL} ../installer/2sjis.pl -i ../libs/doc_help/cJSON-LICENSE.txt     -o ja/html/reference/cJSON-LICENSE.txt     -l unix
     COMMAND ${PERL} ../installer/2sjis.pl -i ../cygterm/COPYING          -o ja/html/reference/CygTerm+-LICENSE.txt  -l unix
     COMMAND ${PERL} ../installer/copy-zliblicense.pl -i ../libs/zlib/README -o ja/html/reference/zlib-LICENSE.txt   -l unix
     COMMAND ${PERL} -C0 -pe "s/^\\xef\\xbb\\xbf//" ja/html/reference/build_with_cmake.md > ja/html/reference/build_with_cmake_no_bom.md
