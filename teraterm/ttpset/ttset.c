@@ -38,6 +38,10 @@
 #include <direct.h>
 #include <ctype.h>
 #include <errno.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "ttlib.h"
 #include "tt_res.h"
 #include "servicenames.h"
@@ -183,6 +187,7 @@ DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const ch
 	if (lenW != 0 && strA[lenA-1] == 0) {
 		lenA--;
 	}
+	free(strW);
 	return lenA;
 }
 
@@ -4373,6 +4378,9 @@ BOOL WINAPI DllMain(HANDLE hInst,
 		break;
 	case DLL_PROCESS_ATTACH:
 		/* do process initialization */
+#ifdef _DEBUG
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 		break;
 	case DLL_PROCESS_DETACH:
 		/* do process cleanup */
