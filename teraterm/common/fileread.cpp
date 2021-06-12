@@ -37,31 +37,13 @@
 
 #include "codeconv.h"
 #include "ttlib.h"
+#include "layer_for_unicode_crt.h"
 
 #include "fileread.h"
 
 #if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef unsigned char uint8_t;
 #endif
-
-static void __wfopen_s(FILE **fp, wchar_t const* filename, wchar_t const* mode)
-{
-	if (IsWindowsNTKernel()) {
-		// 多分内部で CreateFileW() を使用している
-		// NTでのみ使用する
-		_wfopen_s(fp, filename, mode);
-		if (fp != NULL) {
-			return;
-		}
-		// 念の為 ANSI でもオープンする
-	}
-	// ANSI でオープン
-	char *filenameA = ToCharW(filename);
-	char *modeA = ToCharW(mode);
-	fopen_s(fp, filenameA, modeA);
-	free(filenameA);
-	free(modeA);
-}
 
 /**
  *	ファイルをメモリに読み込む

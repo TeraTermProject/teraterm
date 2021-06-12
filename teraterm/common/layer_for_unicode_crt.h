@@ -35,6 +35,7 @@ extern "C" {
 #endif
 
 FILE *__wfopen(const wchar_t *fname, const wchar_t *mode);
+void __wfopen_s(FILE **fp, wchar_t const* filename, wchar_t const* mode);
 
 #ifdef __cplusplus
 }

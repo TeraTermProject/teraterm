@@ -29,12 +29,12 @@
 #include <stdlib.h>
 
 #include "codeconv.h"
+#include "ttlib.h"
 
 #include "layer_for_unicode_crt.h"
 
 /**
- *	fopen の wchar_t, char 両対応版
- *		TODO __wfopen_s()#fileread.cpp もこのファイルに移動する
+ *	fopen の wchar_t版
  */
 FILE *__wfopen(const wchar_t *fname, const wchar_t *mode)
 {
@@ -48,4 +48,23 @@ FILE *__wfopen(const wchar_t *fname, const wchar_t *mode)
 	free(fnameA);
 	free(modeA);
 	return fp;
+}
+
+void __wfopen_s(FILE **fp, wchar_t const* filename, wchar_t const* mode)
+{
+	if (IsWindowsNTKernel()) {
+		// 多分内部で CreateFileW() を使用している
+		// NTでのみ使用する
+		_wfopen_s(fp, filename, mode);
+		if (fp != NULL) {
+			return;
+		}
+		// 念の為 ANSI でもオープンする
+	}
+	// ANSI でオープン
+	char *filenameA = ToCharW(filename);
+	char *modeA = ToCharW(mode);
+	fopen_s(fp, filenameA, modeA);
+	free(filenameA);
+	free(modeA);
 }
