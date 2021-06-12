@@ -98,7 +98,7 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	HandleListCount++;
 	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t)*HandleListCount);
 	p = &HandleList[i];
-	p->dllName = wcsdup(dllName);
+	p->dllName = _wcsdup(dllName);
 	p->handle = module;
 	p->LoadFlag = LoadFlag;
 	p->refCount = 1;
