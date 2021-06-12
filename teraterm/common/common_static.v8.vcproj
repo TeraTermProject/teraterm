@@ -312,6 +312,14 @@
 			RelativePath=".\win16api.h"
 			>
 		</File>
+		<File
+			RelativePath=".\win32helper.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\win32helper.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

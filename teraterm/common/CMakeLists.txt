@@ -41,6 +41,8 @@ add_library(
   ttlib_static_cpp.cpp
   win16api.c
   win16api.h
+  win32helper.cpp
+  win32helper.h
   )
 
 target_include_directories(
