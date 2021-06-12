@@ -38,6 +38,9 @@
 #include	"resource.h"
 
 #include	"ttlib.h"
+#include	"codeconv.h"
+#include	"win32helper.h"
+
 
 // UTF-8 TeraTermでは、デフォルトインストール先を下記に変更した。(2004.12.2 yutaka)
 // さらに、デフォルトインストール先はカレントディレクトリに変更。(2004.12.14 yutaka)
@@ -2636,6 +2639,37 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetTaskTray(hWnd, NIM_ADD);
 
 	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+static void GetUILanguageFile(char *buf, int buflen)
+{
+	wchar_t *HomeDirW;
+	wchar_t *Temp;
+	wchar_t *SetupFName;
+	wchar_t *fullpath;
+	char *fullpathA;
+
+	/* Get home directory */
+	HomeDirW = GetHomeDirW(NULL);
+
+	/* Get SetupFName */
+	SetupFName = GetDefaultSetupFNameW(HomeDirW);
+
+	/* Get LanguageFile name */
+	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", NULL, SetupFName, &Temp);
+	if (Temp == NULL) {
+		Temp = _wcsdup(L"lang\\Default.lng");
+	}
+
+	fullpath = GetUILanguageFileFullW(HomeDirW, Temp);
+	fullpathA = ToCharW(fullpath);
+	free(HomeDirW);
+	free(SetupFName);
+	free(Temp);
+	free(fullpath);
+
+	strcpy_s(buf, buflen, fullpathA);
+	free(fullpathA);
 }
 
 /* ==========================================================================

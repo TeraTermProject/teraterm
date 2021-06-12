@@ -35,10 +35,13 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <wchar.h>
 
 #include "i18n.h"
 #include "layer_for_unicode.h"
 #include "asprintf.h"
+#include "win32helper.h"
+#include "codeconv.h"
 
 #include "ttlib.h"
 
@@ -793,4 +796,117 @@ int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
 	}
 
 	return (int)j;
+}
+
+/**
+ *	ExtractDirName() の wchar_t 版
+ */
+wchar_t *ExtractDirNameW(const wchar_t *PathName)
+{
+	size_t i;
+	wchar_t *DirName = _wcsdup(PathName);
+	if (!GetFileNamePosW(DirName, &i, NULL))
+		return NULL;
+	DirName[i] = 0;
+	return DirName;
+}
+
+/*
+ * Get home(exe,dll) directory
+ *
+ * @param[in]		hInst		WinMain()の HINSTANCE または NULL
+ * @return			HomeDir
+ */
+wchar_t *GetHomeDirW(HINSTANCE hInst)
+{
+	wchar_t *TempW;
+	wchar_t *dir;
+	DWORD error = hGetModuleFileNameW(NULL, &TempW);
+	if (error != 0) {
+		// パスの取得に失敗した。致命的、abort() する。
+		abort();
+		// ここでreturnしてもプラグイン(ttpset.dll)のロードに失敗してabort()する
+	}
+	dir = ExtractDirNameW(TempW);
+	free(TempW);
+	return dir;
+}
+
+/*
+ *	UILanguageFileのフルパスを取得する
+ *
+ *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
+ *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
+ *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
+ *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス
+ */
+wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguageFileRel)
+{
+	wchar_t *fullpath;
+	size_t size = wcslen(HomeDir) + 1 + wcslen(UILanguageFileRel) + 1;
+	wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
+	wcscpy(rel, HomeDir);
+	wcscat(rel, L"\\");
+	wcscat(rel, UILanguageFileRel);
+	hGetFullPathNameW(rel, &fullpath, NULL);
+	free(rel);
+	return fullpath;
+}
+
+/**
+ *	設定ファイルのフルパスを取得する
+ *	GetDefaultFName() の wchar_t版
+ *
+ *	@param[in]	home	ttermpro.exe 等の実行ファイルのあるフォルダ
+ *						My Documents にファイルがあった場合は使用されない
+ *	@param[in]	file	設定ファイル名
+ *	@return		フルパス
+ */
+wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
+{
+	// My Documents に file がある場合、
+	// それを読み込むようにした。(2007.2.18 maya)
+	wchar_t MyDoc[MAX_PATH];
+	LPITEMIDLIST pidl;
+
+	IMalloc *pmalloc;
+	SHGetMalloc(&pmalloc);
+	if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == S_OK) {
+		SHGetPathFromIDListW(pidl, MyDoc);
+		pmalloc->Free(pidl);
+		pmalloc->Release();
+	}
+	else {
+		pmalloc->Release();
+		MyDoc[0] = 0;
+	}
+
+	if (MyDoc[0] != 0) {
+		// My Documents に file があるか?
+		size_t destlen = (wcslen(MyDoc) + wcslen(file) + 1 + 1) * sizeof(wchar_t);
+		wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * destlen);
+		wcscpy(dest, MyDoc);
+		AppendSlashW(dest,destlen);
+		wcsncat_s(dest, destlen, file, _TRUNCATE);
+		if (GetFileAttributesW(dest) != INVALID_FILE_ATTRIBUTES) {
+			// My Documents の設定ファイル
+			return dest;
+		}
+		free(dest);
+	}
+
+	size_t destlen = (wcslen(home) + wcslen(file) + 1 + 1) * sizeof(wchar_t);
+	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * destlen);
+	wcscpy(dest, home);
+	AppendSlashW(dest,destlen);
+	wcsncat_s(dest, destlen, file, _TRUNCATE);
+	return dest;
+}
+
+// デフォルトの TERATERM.INI のフルパスを取得
+wchar_t *GetDefaultSetupFNameW(const wchar_t *home)
+{
+	const wchar_t *ini = L"TERATERM.INI";
+	wchar_t *buf = GetDefaultFNameW(home, ini);
+	return buf;
 }

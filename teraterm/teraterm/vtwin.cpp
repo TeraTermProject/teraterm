@@ -3364,17 +3364,12 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 
 	/* Auto start logging or /L= option */
 	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
-		if (ts.LogFN[0] == 0) {
-			wchar_t *filenameW = FLogGetLogFilename(NULL);
-			char *filenameA = ToCharW(filenameW);
-			strncpy_s(ts.LogFN, sizeof(ts.LogFN), filenameA, _TRUNCATE);
-			free(filenameA);
-			free(filenameW);
+		if (ts.LogFN == NULL || ts.LogFN[0] == 0) {
+			ts.LogFNW = FLogGetLogFilename(NULL);
+			WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
 		}
 		if (ts.LogFN[0]!=0) {
-			wchar_t *fnW = ToWcharA(ts.LogFN);
-			FLogOpen(fnW, LOG_UTF8, FALSE);
-			free(fnW);
+			FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
 		}
 	}
 

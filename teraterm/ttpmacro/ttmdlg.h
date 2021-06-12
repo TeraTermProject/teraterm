@@ -51,6 +51,7 @@ void BringupStatDlg();
 int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected);
 
 extern char HomeDir[MAX_PATH];
+extern wchar_t *HomeDirW;
 extern char FileName[MAX_PATH];
 extern char TopicName[11];
 extern char ShortName[MAX_PATH];

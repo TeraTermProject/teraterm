@@ -56,6 +56,7 @@
 #include "ttmdlg.h"
 
 char HomeDir[MAX_PATH];
+wchar_t *HomeDirW;
 char FileName[MAX_PATH];
 char TopicName[11];
 char ShortName[MAX_PATH];
@@ -293,4 +294,3 @@ int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, in
 	}
 	return r == IDCANCEL ? -1 : -2;
 }
-

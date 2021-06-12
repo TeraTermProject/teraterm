@@ -110,7 +110,6 @@ void WINAPI CopyTTSetToShmem(PTTSet ts)
 	memcpy(&pm->ts, ts, sizeof(TTTSet));
 }
 
-
 BOOL WINAPI StartTeraTerm(PTTSet ts)
 {
 	if (FirstInstance) {
@@ -129,14 +128,16 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 
 	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
 	// 起動時には、共有メモリの HomeDir と SetupFName は空になる
-	/* Get home directory */
-	GetHomeDir(hInst, ts->HomeDir, sizeof(ts->HomeDir));
-	_chdir(ts->HomeDir);
-	GetDefaultSetupFName(ts->HomeDir, ts->SetupFName, sizeof(ts->SetupFName));
+	/* Get home directory (ttermpro.exeのフォルダ) */
+	ts->HomeDirW = GetHomeDirW(hInst);
+	WideCharToACP_t(ts->HomeDirW, ts->HomeDir, _countof(ts->HomeDir));
+	SetCurrentDirectoryW(ts->HomeDirW);
 
-	strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), ts->HomeDir, _TRUNCATE);
-	AppendSlash(ts->KeyCnfFN, sizeof(ts->KeyCnfFN));
-	strncat_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), "KEYBOARD.CNF", _TRUNCATE);
+	ts->SetupFNameW = GetDefaultSetupFNameW(ts->HomeDirW);
+	WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+
+	ts->KeyCnfFNW = GetDefaultFNameW(ts->HomeDirW, L"KEYBOARD.CNF");
+	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 
 	if (FirstInstance) {
 		FirstInstance = FALSE;

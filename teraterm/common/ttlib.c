@@ -42,6 +42,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "compat_win.h"
+#include "codeconv.h"
 
 #include "../teraterm/unicode_test.h"
 
@@ -982,32 +983,6 @@ homedir:
 }
 
 /*
- * Get home(exe,dll) directory
- * @param[in]		hInst		WinMain()の HINSTANCE または NULL
- * @param[in,out]	HomeDir
- * @param[out]		HomeDirLen
- */
-void GetHomeDir(HINSTANCE hInst, char *HomeDir, size_t HomeDirLen)
-{
-	char Temp[MAX_PATH];
-	DWORD result = GetModuleFileName(NULL,Temp,sizeof(Temp));
-	if (result == 0 || result == _countof(Temp)) {
-		// パスの取得に失敗した。致命的、abort() する。
-		abort();
-		// ここでreturnしてもプラグイン(ttpset.dll)のロードに失敗してabort()する
-	}
-	ExtractDirName(Temp, Temp);
-	strncpy_s(HomeDir, HomeDirLen, Temp, _TRUNCATE);
-}
-
-// デフォルトの TERATERM.INI のフルパスを ttpmacro からも
-// 取得するために追加した。(2007.2.18 maya)
-void GetDefaultSetupFName(const char *home, char *dest, int destlen)
-{
-	GetDefaultFName(home, "TERATERM.INI", dest, destlen);
-}
-
-/*
  *	UILanguageFileのフルパスを取得する
  *
  *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
@@ -1027,43 +1002,30 @@ void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
 	SetCurrentDirectory(CurDir);
 }
 
-void GetUILanguageFile(char *buf, int buflen)
-{
-	char HomeDir[MAX_PATH];
-	char Temp[MAX_PATH];
-	char SetupFName[MAX_PATH];
-
-	/* Get home directory */
-	GetHomeDir(NULL, HomeDir, sizeof(HomeDir));
-
-	/* Get SetupFName */
-	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
-
-	/* Get LanguageFile name */
-	GetPrivateProfileString("Tera Term", "UILanguageFile", "lang\\Default.lng",
-	                        Temp, sizeof(Temp), SetupFName);
-
-	GetUILanguageFileFull(HomeDir, Temp, buf, buflen);
-}
-
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 {
-	char HomeDir[MAX_PATH];
-	char Temp[MAX_PATH];
-	char SetupFName[MAX_PATH];
+	wchar_t *HomeDirW;
+	wchar_t Temp[MAX_PATH];
+	wchar_t *SetupFName;
+	wchar_t *entryW = ToWcharA(entry);
+	char * TempA;
 
 	/* Get home directory */
-	GetHomeDir(NULL, HomeDir, sizeof(HomeDir));
+	HomeDirW = GetHomeDirW(NULL);
 
 	/* Get SetupFName */
-	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
+	SetupFName = GetDefaultSetupFNameW(HomeDirW);
 
 	/* Get LanguageFile name */
-	GetPrivateProfileString("Tera Term", entry, "off",
-	                        Temp, sizeof(Temp), SetupFName);
+	GetPrivateProfileStringW(L"Tera Term", entryW, L"off",
+	                        Temp, _countof(Temp), SetupFName);
 
-	strncpy_s(buf, buflen, Temp, _TRUNCATE);
+	TempA = ToCharW(Temp);
+	strncpy_s(buf, buflen, TempA, _TRUNCATE);
+	free(HomeDirW);
+	free(SetupFName);
+	free(TempA);
 }
 
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)

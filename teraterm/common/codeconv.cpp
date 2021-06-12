@@ -1026,6 +1026,36 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 	return wstr_ptr;
 }
 
+/**
+ *	WideCharToMultiByte() の TRUNCATE + CP_ACP 版
+ *	wchar_t のパス,ファイル名を char に変換するときに使用
+ *
+ *	@param[in]		wstr_ptr	wchar_t の文字列
+ *	@param[in,out]	mb_ptr		char 文字列出力先ptr
+ *	@param[in]		mb_len		char 文字列出力先サイズ
+ */
+void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len)
+{
+	const DWORD flags = 0;
+	size_t out_len = WideCharToMultiByte(CP_ACP, flags, wstr_ptr, -1, mb_ptr, mb_len, NULL, NULL);
+	if (out_len == 0) {
+		// 変換失敗
+		DWORD err = GetLastError();
+		if (err == ERROR_INSUFFICIENT_BUFFER) {
+			// wstr_ptr の長さを -1 で指定して、mb_len が不足しているとき
+			// バッファいっぱいに変換は行われている
+			mb_ptr[mb_len - 1] = 0;
+		}
+		else {
+			mb_ptr[0] = 0;
+		}
+	}
+	else if (out_len == mb_len) {
+		// TRUNCATE
+		mb_ptr[mb_len - 1] = 0;
+	}
+}
+
 char *ToCharW(const wchar_t *strW)
 {
 	if (strW == NULL) return NULL;

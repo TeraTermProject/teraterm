@@ -362,7 +362,7 @@ typedef struct cygterm {
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
-	char HomeDir[MAXPATHLEN];
+	char HomeDir[MAXPATHLEN];		// ttermpro.exe のあるフォルダ
 
 	/* Setup file name */
 	char SetupFName[MAX_PATH];
@@ -526,7 +526,7 @@ struct tttset {
 #ifdef USE_NORMAL_BGCOLOR
 	WORD UseNormalBGColor;
 #endif
-	char UILanguageFile[MAX_PATH];
+	char UILanguageFile[MAX_PATH];			// 絶対パス
 	char UIMsg[MAX_UIMSG];
 	WORD BroadcastCommandHistory;
 	WORD AcceptBroadcast;		// 337: 2007/03/20
@@ -539,7 +539,7 @@ struct tttset {
 	WORD DisableAppCursor;
 	WORD ClearComBuffOnOpen;
 	WORD Send8BitCtrl;
-	char UILanguageFile_ini[MAX_PATH];
+	char UILanguageFile_ini[MAX_PATH];		// 相対パス,iniファイルの中身
 	WORD SelectOnlyByLButton;
 	WORD TelAutoDetect;
 	char XModemRcvCommand[MAX_PATH];
@@ -647,6 +647,13 @@ struct tttset {
 	BYTE UnicodeAmbiguousWidth;
 	BYTE UnicodeEmojiOverride;
 	BYTE UnicodeEmojiWidth;
+	wchar_t *HomeDirW;		// ttermpro.exe のあるフォルダ
+	wchar_t *SetupFNameW;
+	wchar_t *KeyCnfFNW;
+	wchar_t *LogFNW;
+	wchar_t *MacroFNW;
+	wchar_t *UILanguageFileW;			// 絶対パス
+	wchar_t *UILanguageFileW_ini;		// 相対パス,iniファイルの中身
 };
 
 typedef struct tttset TTTSet, *PTTSet;

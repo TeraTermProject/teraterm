@@ -46,6 +46,7 @@
 #include "tt_res.h"
 #include "servicenames.h"
 #include "codeconv.h"
+#include "win32helper.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -56,6 +57,7 @@
 #define INI_FILE_IS_UNICODE	1
 
 #define Section "Tera Term"
+#define SectionW L"Tera Term"
 
 #define MaxStrLen (LONG)512
 
@@ -1698,8 +1700,8 @@ void PASCAL ReadIniFile(PCHAR FNameA, PTTSet ts)
 		GetPrivateProfileInt(Section, "SendBreakTime", 1000, FName);
 
 	/* Startup macro -- special option */
-	GetPrivateProfileString(Section, "StartupMacro", "",
-	                        ts->MacroFN, sizeof(ts->MacroFN), FName);
+	hGetPrivateProfileStringW(SectionW, L"StartupMacro", L"", FName, &ts->MacroFNW);
+	WideCharToACP_t(ts->MacroFNW, ts->MacroFN, sizeof(ts->MacroFN));
 
 	/* TEK GIN Mouse keycode -- special option */
 	ts->GINMouseCode =
@@ -1901,12 +1903,16 @@ void PASCAL ReadIniFile(PCHAR FNameA, PTTSet ts)
 	strncpy_s(ts->Locale, sizeof(ts->Locale), Temp, _TRUNCATE);
 
 	// UI language message file (‘Š‘ÎƒpƒX)
-	GetPrivateProfileString(Section, "UILanguageFile", "lang\\Default.lng",
-	                        ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), FName);
+	hGetPrivateProfileStringW(SectionW, L"UILanguageFile", NULL, FName, &ts->UILanguageFileW_ini);
+	if (ts->UILanguageFileW_ini == NULL) {
+		ts->UILanguageFileW_ini = wcsdup(L"lang\\Default.lng");
+	}
+	WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
 	// UI language message file (full path)
-	GetUILanguageFileFull(ts->HomeDir, ts->UILanguageFile_ini,
-						  ts->UILanguageFile, sizeof(ts->UILanguageFile));
+	ts->UILanguageFileW = GetUILanguageFileFullW(ts->HomeDirW, ts->UILanguageFileW_ini);
+	WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
+
 
 	// Broadcast Command History (2007.3.3 maya)
 	ts->BroadcastCommandHistory =

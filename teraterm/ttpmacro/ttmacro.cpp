@@ -40,6 +40,7 @@
 #include "tmfc.h"
 #include "dlglib.h"
 #include "dllutil.h"
+#include "codeconv.h"
 
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -53,7 +54,8 @@
 #endif
 
 char UILanguageFile[MAX_PATH];
-static char SetupFName[MAX_PATH];
+static wchar_t *SetupFNameW;
+static char *SetupFName;
 static HWND CtrlWnd;
 static HINSTANCE hInst;
 
@@ -75,8 +77,12 @@ static void init()
 	char UILanguageFileRel[MAX_PATH];
 	LOGFONTA logfont;
 
-	GetHomeDir(hInst, HomeDir, sizeof(HomeDir));
-	GetDefaultFName(HomeDir, "TERATERM.INI", SetupFName, sizeof(SetupFName));
+	HomeDirW = GetHomeDirW(hInst);
+	char *HomeDirA = ToCharW(HomeDirW);
+	strcpy_s(HomeDir, sizeof(HomeDir), HomeDirA);
+	free(HomeDirA);
+	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
+	SetupFName = ToCharW(SetupFNameW);
 	GetPrivateProfileString("Tera Term", "UILanguageFile", "lang\\Default.lng",
 	                        UILanguageFileRel, sizeof(UILanguageFileRel), SetupFName);
 	GetUILanguageFileFull(HomeDir, UILanguageFileRel,

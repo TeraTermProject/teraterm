@@ -53,6 +53,7 @@
 #include "codeconv.h"
 #include "helpid.h"
 #include "layer_for_unicode.h"
+#include "asprintf.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -3015,11 +3016,11 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (1 <= w && w <= uilist_count && w != langui_sel) {
-							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
-								"%s\\%s", get_lang_folder(), LangUIList[w - 1]);
+							aswprintf(&ts->UILanguageFileW_ini, L"%hs\\%hs", get_lang_folder(), LangUIList[w - 1]);
+							WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
-							GetUILanguageFileFull(ts->HomeDir, ts->UILanguageFile_ini,
-												  ts->UILanguageFile, sizeof(ts->UILanguageFile));
+							ts->UILanguageFileW = GetUILanguageFileFullW(ts->HomeDirW, ts->UILanguageFileW_ini);
+							WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFileW));
 
 							// タイトルの更新を行う。(2014.2.23 yutaka)
 							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
