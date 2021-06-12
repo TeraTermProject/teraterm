@@ -58,6 +58,7 @@ void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
 					 char32_t *u32_ptr, size_t *u32_len_);
 int UTF8ToWideChar(const char *u8_ptr, int u8_len, wchar_t *wstr_ptr, int wstr_len);
 void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len);
+size_t ACPToWideChar_t(const char *str_ptr, wchar_t *wstr_ptr, size_t wstr_len);
 
 // API wrappers
 char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_);

@@ -683,6 +683,22 @@ BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpS
 	return r;
 }
 
+UINT _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName)
+{
+	if (pGetPrivateProfileIntW != NULL) {
+		return pGetPrivateProfileIntW(lpAppName, lpKeyName, nDefault, lpFileName);
+	}
+
+	char *appA = ToCharW(lpAppName);
+	char *keyA = ToCharW(lpKeyName);
+	char *fileA = ToCharW(lpFileName);
+	UINT r = GetPrivateProfileIntA(appA, keyA, nDefault, fileA);
+	free(appA);
+	free(keyA);
+	free(fileA);
+	return r;
+}
+
 BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 					 LPSECURITY_ATTRIBUTES lpProcessAttributes,
 					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
@@ -887,11 +903,11 @@ DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 
 	char filenameA[MAX_PATH];
 	DWORD r = GetModuleFileNameA(hModule, filenameA, sizeof(filenameA));
-	wchar_t *bufW = ToWcharA(filenameA);
-	wcsncpy_s(lpFilename, nSize, bufW, _TRUNCATE);
-	r = (DWORD)wcslen(lpFilename);
-	free(bufW);
-	return r;
+	if (r == 0) {
+		return 0;
+	}
+	DWORD wlen = ACPToWideChar_t(filenameA, lpFilename, nSize);
+	return wlen - 1;	// not including the terminating null character
 }
 
 DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
@@ -908,5 +924,55 @@ DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
 	r = (DWORD)wcslen(dstW);
 	free(srcA);
 	free(dstW);
+	return r;
+}
+
+HMODULE _GetModuleHandleW(LPCWSTR lpModuleName)
+{
+	char *lpStringA = ToCharW(lpModuleName);
+	HMODULE h = GetModuleHandleA(lpStringA);
+	free(lpStringA);
+	return h;
+}
+
+UINT _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize)
+{
+	char buf[MAX_PATH];
+	UINT r = GetSystemDirectoryA(buf, _countof(buf));
+	if (r == 0) {
+		return 0;
+	}
+	size_t wlen = ACPToWideChar_t(buf, lpBuffer, uSize);
+	return wlen - 1;	// not including the terminating null character
+}
+
+DWORD _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer)
+{
+	if (pGetTempPathW != NULL) {
+		return pGetTempPathW(nBufferLength, lpBuffer);
+	}
+
+	char buf[MAX_PATH];
+	DWORD r = GetTempPathA(_countof(buf), buf);
+	if (r == 0) {
+		return 0;
+	}
+	size_t wlen = ACPToWideChar_t(buf, lpBuffer, nBufferLength);
+	return wlen - 1;	// not including the terminating null character
+}
+
+UINT _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName)
+{
+	if (pGetTempFileNameW != NULL) {
+		return pGetTempFileNameW(lpPathName, lpPrefixString, uUnique, lpTempFileName);
+	}
+
+	char buf[MAX_PATH];
+	char *lpPathNameA = ToCharW(lpPathName);
+	char *lpPrefixStringA = ToCharW(lpPrefixString);
+	UINT r = GetTempFileNameA(lpPathNameA, lpPrefixStringA, uUnique, buf);
+	ACPToWideChar_t(buf, lpTempFileName, MAX_PATH);
+	free(lpPathNameA);
+	free(lpPrefixStringA);
 	return r;
 }

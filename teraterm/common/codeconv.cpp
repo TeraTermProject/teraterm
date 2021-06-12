@@ -1056,6 +1056,27 @@ void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len)
 	}
 }
 
+/**
+ *	MultiByteToWideChar() の TRUNCATE + CP_ACP 版
+ *	wchar_t のパス,ファイル名を char に変換するときに使用
+ *
+ *	@param[in]		str_ptr		char の文字列
+ *	@param[in,out]	wstr_ptr	wchar_t 文字列出力先ptr
+ *	@param[in]		wstr_len	wchar_t 文字列出力先文字数
+ *	@return			変換した文字数(L'^0'含む), wcslen(wstr_ptr) + 1
+ */
+size_t ACPToWideChar_t(const char *str_ptr, wchar_t *wstr_ptr, size_t wstr_len)
+{
+	const DWORD flags = 0;
+	size_t out_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
+										 str_ptr, -1,
+										 wstr_ptr, wstr_len);
+	if (out_len == wstr_len) {
+		wstr_ptr[wstr_len-1] = 0;
+	}
+	return out_len;
+}
+
 char *ToCharW(const wchar_t *strW)
 {
 	if (strW == NULL) return NULL;

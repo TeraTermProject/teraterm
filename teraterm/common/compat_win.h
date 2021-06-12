@@ -79,8 +79,6 @@ extern LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Ms
 extern BOOL(WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 extern int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
 extern BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
-extern DWORD(WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
-												LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 extern UINT(WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 extern BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 extern BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
@@ -128,6 +126,7 @@ extern BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
 extern DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 extern BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
+extern UINT (WINAPI *pGetPrivateProfileIntW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
 extern BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 									  LPSECURITY_ATTRIBUTES lpProcessAttributes,
 									  LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
@@ -160,6 +159,8 @@ extern DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength
 extern HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
 extern DWORD (WINAPI *pGetModuleFileNameW)(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 extern DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
+extern DWORD (WINAPI *pGetTempPathW)(DWORD nBufferLength, LPWSTR lpBuffer);
+extern UINT (WINAPI *pGetTempFileNameW)(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 
 // shlobj_core.h
 extern LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);

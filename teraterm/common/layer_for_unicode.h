@@ -121,6 +121,7 @@ void _OutputDebugStringW(LPCWSTR lpOutputString);
 DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
+UINT _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
 BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 					 LPSECURITY_ATTRIBUTES lpProcessAttributes,
 					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
@@ -139,6 +140,10 @@ DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer
 HMODULE _LoadLibraryW(LPCWSTR lpLibFileName);
 DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
+HMODULE _GetModuleHandleW(LPCWSTR lpModuleName);
+UINT _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize);
+DWORD _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
+UINT _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);

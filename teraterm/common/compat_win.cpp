@@ -38,7 +38,7 @@
 #include "ttlib.h"
 
 // for debug
-//#define UNICODE_API_DISABLE	1
+#define UNICODE_API_DISABLE	1
 
 ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
 HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
@@ -84,6 +84,7 @@ HWND (WINAPI *pGetConsoleWindow)(void);
 DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
 BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpString, LPCWSTR lpFileName);
+UINT (WINAPI *pGetPrivateProfileIntW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
 BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 							   LPSECURITY_ATTRIBUTES lpProcessAttributes,
 							   LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
@@ -102,6 +103,8 @@ DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength, LPWST
 HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
 DWORD (WINAPI *pGetModuleFileNameW)(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
+DWORD (WINAPI *pGetTempPathW)(DWORD nBufferLength, LPWSTR lpBuffer);
+UINT (WINAPI *pGetTempFileNameW)(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -251,6 +254,7 @@ static const APIInfo Lists_kernel32[] = {
 	{ "SetCurrentDirectoryW", (void **)&pSetCurrentDirectoryW },
 	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
 	{ "WritePrivateProfileStringW", (void **)&pWritePrivateProfileStringW },
+	{ "GetPrivateProfileIntW", (void **)&pGetPrivateProfileIntW },
 	{ "CreateProcessW", (void **)&pCreateProcessW },
 	{ "CopyFileW", (void **)&pCopyFileW },
 	{ "DeleteFileW", (void **)&pDeleteFileW },
@@ -263,6 +267,8 @@ static const APIInfo Lists_kernel32[] = {
 	{ "LoadLibraryW", (void **)&pLoadLibraryW },
 	{ "GetModuleFileNameW", (void **)&pGetModuleFileNameW },
 	{ "ExpandEnvironmentStringsW", (void **)&pExpandEnvironmentStringsW },
+	{ "GetTempPathW", (void **)&pGetTempPathW },
+	{ "GetTempFileNameW", (void **)&pGetTempFileNameW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{},
@@ -363,7 +369,11 @@ void WinCompatInit()
 		pFindFirstFileW = NULL;
 		pFindNextFileW = NULL;
 		pRemoveDirectoryW = NULL;
+		pGetPrivateProfileIntW = NULL;
 		pGetModuleFileNameW = NULL;
+		pLoadLibraryW = NULL;
+		pGetTempPathW = NULL;
+		pGetTempFileNameW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù
