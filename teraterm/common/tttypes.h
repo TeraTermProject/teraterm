@@ -340,6 +340,7 @@ typedef struct {
 	int BGNoFrame;
 	char BGThemeFile[MAX_PATH];
 	int BGIgnoreThemeFile;
+	char reserve[20];
 } eterm_lookfeel_t;
 
 typedef struct cygterm {
@@ -354,6 +355,7 @@ typedef struct cygterm {
 	BOOL login_shell;
 	BOOL home_chdir;
 	BOOL agent_proxy;
+	char reserve[20];
 } cygterm_t;
 
 /* TTTSet */
