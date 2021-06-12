@@ -22,12 +22,6 @@ end_of_line = crlf
 charset = utf-8-bom
 indent_style = space
 
-[{CMakeLists.txt,*.cmake}]
-end_of_line = crlf
-charset = utf-8-bom
-indent_style = space
-indent_size = 2
-
 [*.pl]
 end_of_line = crlf
 charset = utf-8-bom
@@ -39,3 +33,9 @@ end_of_line = crlf
 charset = cp932
 indent_style = tab
 indent_size = 4
+
+[{CMakeLists.txt,*.cmake}]
+end_of_line = crlf
+charset = utf-8-bom
+indent_style = space
+indent_size = 2
