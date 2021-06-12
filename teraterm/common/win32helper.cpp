@@ -31,6 +31,8 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
+#include "layer_for_unicode.h"
+
 #include "win32helper.h"
 
 /**
@@ -51,7 +53,7 @@ DWORD hGetModuleFileNameW(HMODULE hModule, wchar_t **buf)
 	}
 
 	for(;;) {
-		DWORD r = GetModuleFileNameW(hModule, b, (DWORD)size);
+		DWORD r = _GetModuleFileNameW(hModule, b, (DWORD)size);
 		if (r == 0) {
 			// ä÷êîÇ™é∏îs
 			error = GetLastError();
@@ -99,7 +101,7 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 	}
 	b[0] = 0;
 	for(;;) {
-		DWORD r = GetPrivateProfileStringW(section, key, def, b, (DWORD)size, ini);
+		DWORD r = _GetPrivateProfileStringW(section, key, def, b, (DWORD)size, ini);
 		if (r == 0 || b[0] == L'\0') {
 			// éüÇÃèÍçáÇ±Ç±Ç…ì¸ÇÈ
 			//   iniÇ…'key='Ç∆ãLèq ("="ÇÃå„Ç…âΩÇ‡èëÇ¢ÇƒÇ¢Ç»Ç¢)
@@ -141,7 +143,7 @@ error_return:
  */
 DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t **filepart)
 {
-	size_t len = GetFullPathNameW(lpFileName, 0, NULL, NULL);		// include L'\0'
+	size_t len = _GetFullPathNameW(lpFileName, 0, NULL, NULL);		// include L'\0'
 	if (len == 0) {
 		*fullpath = NULL;
 		*filepart = NULL;
@@ -149,7 +151,7 @@ DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t *
 	}
 	wchar_t *path = (wchar_t *)malloc(sizeof(wchar_t) * len);
 	wchar_t *file;
-	len = GetFullPathNameW(lpFileName, (DWORD)len, path, &file);
+	len = _GetFullPathNameW(lpFileName, (DWORD)len, path, &file);
 	if (len == 0) {
 		free(path);
 		return GetLastError();

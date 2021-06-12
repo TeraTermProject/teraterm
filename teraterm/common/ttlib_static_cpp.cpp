@@ -872,7 +872,7 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 	IMalloc *pmalloc;
 	SHGetMalloc(&pmalloc);
 	if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == S_OK) {
-		SHGetPathFromIDListW(pidl, MyDoc);
+		_SHGetPathFromIDListW(pidl, MyDoc);
 		pmalloc->Free(pidl);
 		pmalloc->Release();
 	}
@@ -888,7 +888,7 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 		wcscpy(dest, MyDoc);
 		AppendSlashW(dest,destlen);
 		wcsncat_s(dest, destlen, file, _TRUNCATE);
-		if (GetFileAttributesW(dest) != INVALID_FILE_ATTRIBUTES) {
+		if (_GetFileAttributesW(dest) != INVALID_FILE_ATTRIBUTES) {
 			// My Documents ÇÃê›íËÉtÉ@ÉCÉã
 			return dest;
 		}

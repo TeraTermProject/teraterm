@@ -38,6 +38,7 @@
 #include "compat_win.h"
 #include "ttmlib.h"
 #include "codeconv.h"
+#include "layer_for_unicode.h"
 
 static char CurrentDir[MAXPATHLEN];
 
@@ -186,13 +187,13 @@ void TTMSetDir(const char *Dir)
 	wchar_t *pCurrentDirW = ToWcharU8(CurrentDir);
 	wchar_t *DirW = ToWcharU8(Dir);
 	char *pCurrentDirU8;
-	GetCurrentDirectoryW(_countof(Temp), Temp);
-	SetCurrentDirectoryW(pCurrentDirW);
-	SetCurrentDirectoryW(DirW);
-	GetCurrentDirectoryW(_countof(CurrentDirW), CurrentDirW);
+	_GetCurrentDirectoryW(_countof(Temp), Temp);
+	_SetCurrentDirectoryW(pCurrentDirW);
+	_SetCurrentDirectoryW(DirW);
+	_GetCurrentDirectoryW(_countof(CurrentDirW), CurrentDirW);
 	pCurrentDirU8 = ToU8W(CurrentDirW);
 	strncpy_s(CurrentDir, _countof(CurrentDir), pCurrentDirU8, _TRUNCATE);
-	SetCurrentDirectoryW(Temp);
+	_SetCurrentDirectoryW(Temp);
 	free(pCurrentDirW);
 	free(DirW);
 	free(pCurrentDirU8);

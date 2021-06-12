@@ -43,6 +43,7 @@
 #include "tttypes.h"
 #include "compat_win.h"
 #include "codeconv.h"
+#include "layer_for_unicode.h"
 
 #include "../teraterm/unicode_test.h"
 
@@ -1018,8 +1019,8 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	SetupFName = GetDefaultSetupFNameW(HomeDirW);
 
 	/* Get LanguageFile name */
-	GetPrivateProfileStringW(L"Tera Term", entryW, L"off",
-	                        Temp, _countof(Temp), SetupFName);
+	_GetPrivateProfileStringW(L"Tera Term", entryW, L"off",
+							  Temp, _countof(Temp), SetupFName);
 
 	TempA = ToCharW(Temp);
 	strncpy_s(buf, buflen, TempA, _TRUNCATE);

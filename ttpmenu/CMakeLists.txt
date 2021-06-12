@@ -30,9 +30,8 @@ target_sources(
 
 source_group(
   "common"
-  FILES
-  ${COMMON_SRC}
-  )
+  REGULAR_EXPRESSION
+  "teraterm\/common\/")
 
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)

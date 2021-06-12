@@ -4659,7 +4659,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		free(HomeDirW);
 	}
 
-	SetCurrentDirectoryW(DirW);
+	_SetCurrentDirectoryW(DirW);
 
 	/* OPENFILENAME record */
 	OPENFILENAMEW ofn = {};

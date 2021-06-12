@@ -41,6 +41,7 @@
 #include "ttplugin.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "layer_for_unicode.h"
 
 #include "ttplug.h"
 
@@ -66,7 +67,7 @@ static void loadExtension(wchar_t const *fileName)
 	const wchar_t *sub_message;
 	HMODULE hPlugin;
 
-	hPlugin = LoadLibraryW(fileName);
+	hPlugin = _LoadLibraryW(fileName);
 	if (hPlugin != NULL) {
 		TTXBindProc bind = NULL;
 		FARPROC *pbind = (FARPROC *)&bind;
@@ -147,14 +148,14 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 
 	aswprintf(&load_mask, L"%s\\TTX*.DLL", HomeDirW);
 
-	hFind = FindFirstFileW(load_mask, &fd);
+	hFind = _FindFirstFileW(load_mask, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			wchar_t *filename;
 			aswprintf(&filename, L"%s\\%s", HomeDirW, fd.cFileName);
 			loadExtension(filename);
 			free(filename);
-		} while (FindNextFileW(hFind, &fd));
+		} while (_FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}
 	free(load_mask);

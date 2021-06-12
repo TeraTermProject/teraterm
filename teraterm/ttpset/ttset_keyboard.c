@@ -36,6 +36,7 @@
 #include <crtdbg.h>
 #include "ttlib.h"
 #include "codeconv.h"
+#include "layer_for_unicode.h"
 #include "../teraterm/keyboard_i.h"
 
 typedef struct {
@@ -50,7 +51,7 @@ static void ReadList(PKeyMap KeyMap, const wchar_t *section, const keymap_list_t
 	for (i = 0; i < count; i++) {
 		wchar_t Temp[11];
 		WORD Num;
-		GetPrivateProfileStringW(section, p->key_str, L"", Temp, _countof(Temp), FName);
+		_GetPrivateProfileStringW(section, p->key_str, L"", Temp, _countof(Temp), FName);
 		if (Temp[0] == 0)
 			Num = 0xFFFF;
 		else if (_wcsicmp(Temp, L"off") == 0)
@@ -190,8 +191,8 @@ static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
 		wchar_t EntName[7];
 		wchar_t TempStr[256];
 		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"User%d", i + 1);
-		GetPrivateProfileStringW(L"User keys", EntName, L"",
-								 TempStr, _countof(TempStr), FName);
+		_GetPrivateProfileStringW(L"User keys", EntName, L"",
+								  TempStr, _countof(TempStr), FName);
 		if (TempStr[0] == 0) {
 			continue;
 		}
