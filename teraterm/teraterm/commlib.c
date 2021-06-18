@@ -307,9 +307,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->ComID = INVALID_HANDLE_VALUE;
 	cv->CanSend = TRUE;
 	cv->RRQ = FALSE;
-	cv->SendKanjiFlag = FALSE;
 	cv->SendCode = IdASCII;
-	cv->EchoKanjiFlag = FALSE;
 	cv->EchoCode = IdASCII;
 	cv->Language = ts->Language;
 	cv->CRSend = ts->CRSend;
@@ -320,7 +318,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->KanjiIn = ts->KanjiIn;
 	cv->KanjiOut = ts->KanjiOut;
 	cv->RussHost = ts->RussHost;
-	cv->RussClient = ts->RussClient;
 	cv->DelayFlag = TRUE;
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;

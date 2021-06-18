@@ -891,12 +891,12 @@ typedef struct {
 	HANDLE ComID;
 	BOOL CanSend, RRQ;
 
-	BOOL SendKanjiFlag;
-	BOOL EchoKanjiFlag;
+	BOOL reserve_SendKanjiFlag;
+	BOOL reserve_EchoKanjiFlag;
 	int SendCode;
 	int EchoCode;
-	BYTE SendKanjiFirst;
-	BYTE EchoKanjiFirst;
+	BYTE reserve_SendKanjiFirst;
+	BYTE reserve_EchoKanjiFirst;
 
 	/* from VTSet */
 	WORD Language;
@@ -909,7 +909,7 @@ typedef struct {
 	WORD KanjiIn;
 	WORD KanjiOut;
 	WORD RussHost;
-	WORD RussClient;
+	WORD reserve_RussClient;
 	/* from PortSet */
 	WORD DelayPerChar;
 	WORD DelayPerLine;

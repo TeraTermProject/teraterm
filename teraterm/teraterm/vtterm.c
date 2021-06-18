@@ -388,9 +388,7 @@ void ResetCharSet()
 		Glr[0] = 0;
 		Glr[1] = 0;
 		cv.SendCode = IdASCII;
-		cv.SendKanjiFlag = FALSE;
 		cv.EchoCode = IdASCII;
-		cv.EchoKanjiFlag = FALSE;
 	}
 	/* Kanji flag */
 	KanjiIn = FALSE;

@@ -69,10 +69,8 @@ DllExport void PASCAL CommInsert1Byte(PComVar cv, BYTE b);
 DllExport int PASCAL CommRawOut(PComVar cv, PCHAR B, int C);
 DllExport int PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C);
 DllExport int PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
-DllExport int PASCAL CommTextOut(PComVar cv, PCHAR B, int C);
 DllExport int PASCAL CommTextOutW(PComVar cv, const wchar_t *B, int C);
 DllExport int PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
-DllExport int PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);
 DllExport int PASCAL CommTextEchoW(PComVar cv, const wchar_t *B, int C);
 
 DllExport void PASCAL CreateNotifyIcon(PComVar cv);

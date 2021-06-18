@@ -1239,7 +1239,6 @@ void CVTWindow::SetupTerm()
 
 	// for russian mode
 	cv.RussHost = ts.RussHost;
-	cv.RussClient = ts.RussClient;
 
 	if (cv.Ready) {
 		if (cv.TelFlag && (ts.TelEcho>0)) {
