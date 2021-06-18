@@ -41,19 +41,9 @@
 #include "vtterm.h"
 #include "layer_for_unicode.h"
 #include "asprintf.h"
+#include "codeconv.h"
 
 #include "filesys.h"
-
-typedef struct {
-	wchar_t *FullName;
-
-	HANDLE FileHandle;
-	LONG FileSize, ByteCount;
-
-	DWORD StartTime;
-	BOOL FilePause;
-} TFileVar;
-typedef TFileVar *PFileVar;
 
 typedef enum {
 	FS_BRACKET_NONE,
@@ -61,28 +51,42 @@ typedef enum {
 	FS_BRACKET_END,
 } FileBracketMode_t;
 
-static PFileVar SendVar = NULL;
-
-static BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
-static BYTE FileByte;
-
 #define FILE_SEND_BUF_SIZE  8192
 struct FileSendHandler {
 	CHAR buf[FILE_SEND_BUF_SIZE];
 	int pos;
 	int end;
 };
-static struct FileSendHandler FileSendHandler;
-static int FileDlgRefresh;
 
-static FileBracketMode_t FileBracketMode = FS_BRACKET_NONE;
-static int FileBracketPtr = 0;
-static char BracketStartStr[] = "\033[200~";
-static char BracketEndStr[] = "\033[201~";
+typedef struct {
+	wchar_t *FullName;
 
+	HANDLE FileHandle;
+	LONG FileSize; // uint64_t FileSize;  TODO
+	LONG ByteCount; // uint64_t ByteCount;
+
+	DWORD StartTime;
+	BOOL FilePause;
+
+	BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
+
+	FileBracketMode_t FileBracketMode;
+	int FileBracketPtr;
+
+	PFileTransDlg SendDlg;
+	int FileDlgRefresh;		// ?
+
+	wchar_t SendChar;
+
+	struct FileSendHandler FileSendHandler;
+} TFileVar;
+typedef TFileVar *PFileVar;
+
+static PFileVar SendVar = NULL;
 static BOOL FSend = FALSE;
 
-static PFileTransDlg SendDlg = NULL;
+static const char BracketStartStr[] = "\033[200~";
+static const char BracketEndStr[] = "\033[201~";
 
 static BOOL OpenFTDlg(PFileVar fv)
 {
@@ -114,7 +118,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	fv->FilePause = FALSE;
 	fv->StartTime = GetTickCount();
-	SendDlg = FTDlg; /* File send */
+	fv->SendDlg = FTDlg; /* File send */
 
 	return TRUE;
 }
@@ -122,9 +126,9 @@ static BOOL OpenFTDlg(PFileVar fv)
 #if 0
 static void ShowFTDlg(WORD OpId)
 {
-	if (SendDlg != NULL) {
-		SendDlg->ShowWindow(SW_SHOWNORMAL);
-		SetForegroundWindow(SendDlg->GetSafeHwnd());
+	if (fv->SendDlg != NULL) {
+		fv->SendDlg->ShowWindow(SW_SHOWNORMAL);
+		SetForegroundWindow(fv->SendDlg->GetSafeHwnd());
 	}
 }
 #endif
@@ -201,25 +205,25 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 		return FALSE;
 	}
 	SendVar->ByteCount = 0;
-	SendVar->FileSize = (LONG)GetFSize64H(SendVar->FileHandle);
+	SendVar->FileSize = GetFSize64H(SendVar->FileHandle);
 
 	TalkStatus = IdTalkFile;
-	FileRetrySend = FALSE;
-	FileRetryEcho = FALSE;
-	FileCRSend = FALSE;
-	FileReadEOF = FALSE;
-	FileSendHandler.pos = 0;
-	FileSendHandler.end = 0;
-	FileDlgRefresh = 0;
+	fv->FileRetrySend = FALSE;
+	fv->FileRetryEcho = FALSE;
+	fv->FileCRSend = FALSE;
+	fv->FileReadEOF = FALSE;
+	fv->FileSendHandler.pos = 0;
+	fv->FileSendHandler.end = 0;
+	fv->FileDlgRefresh = 0;
 
 	if (BracketedPasteMode()) {
-		FileBracketMode = FS_BRACKET_START;
-		FileBracketPtr = 0;
-		BinaryMode = TRUE;
+		fv->FileBracketMode = FS_BRACKET_START;
+		fv->FileBracketPtr = 0;
+		fv->BinaryMode = TRUE;
 	}
 	else {
-		FileBracketMode = FS_BRACKET_NONE;
-		BinaryMode = ts.TransBin;
+		fv->FileBracketMode = FS_BRACKET_NONE;
+		fv->BinaryMode = ts.TransBin;
 	}
 
 	if (! OpenFTDlg(SendVar)) {
@@ -233,12 +237,13 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 void FileSendEnd(void)
 {
 	if (FSend) {
+		PFileVar fv = SendVar;
 		FSend = FALSE;
 		TalkStatus = IdTalkKeyb;
-		if (SendDlg!=NULL)
+		if (fv->SendDlg!=NULL)
 		{
-			SendDlg->DestroyWindow();
-			SendDlg = NULL;
+			fv->SendDlg->DestroyWindow();
+			fv->SendDlg = NULL;
 		}
 		FreeFileVar(&SendVar);
 	}
@@ -257,22 +262,31 @@ void FileSendPause(BOOL Pause)
 	}
 }
 
-static int FSOut1(BYTE b)
+static int FSOut1(PFileVar fv)
 {
-	if (BinaryMode)
-		return CommBinaryOut(&cv,(PCHAR)&b,1);
-	else if ((b>=0x20) || (b==0x09) || (b==0x0A) || (b==0x0D))
-		return CommTextOut(&cv,(PCHAR)&b,1);
-	else
-		return 1;
+	if (fv->BinaryMode) {
+		BYTE b = (BYTE)fv->SendChar;
+		return CommBinaryOut(&cv, (PCHAR)&b, 1);
+	}
+	else {
+		wchar_t wc = fv->SendChar;
+		if ((wc >= 0x20) || (wc == 0x09) || (wc == 0x0A) || (wc == 0x0D)) {
+			return CommTextOutW(&cv, &wc, 1);
+		}
+		else {
+			return 1;
+		}
+	}
 }
 
-static int FSEcho1(BYTE b)
+static int FSEcho1(PFileVar fv)
 {
-	if (BinaryMode)
+	if (fv->BinaryMode) {
+		BYTE b = (BYTE)fv->SendChar;
 		return CommBinaryEcho(&cv,(PCHAR)&b,1);
-	else
-		return CommTextEcho(&cv,(PCHAR)&b,1);
+	} else {
+		return CommTextEchoW(&cv, &fv->SendChar, 1);
+	}
 }
 
 // 以下の時はこちらの関数を使う
@@ -287,48 +301,48 @@ static void FileSendBinayBoost(void)
 	DWORD read_bytes;
 	PFileVar fv = SendVar;
 
-	if ((SendDlg == NULL) || (fv->FilePause == TRUE))
+	if ((fv->SendDlg == NULL) || (fv->FilePause == TRUE))
 		return;
 
 	BCOld = SendVar->ByteCount;
 
-	if (FileRetrySend)
+	if (fv->FileRetrySend)
 	{
-		c = CommRawOut(&cv, &(FileSendHandler.buf[FileSendHandler.pos]),
-			FileSendHandler.end - FileSendHandler.pos);
-		FileSendHandler.pos += c;
-		FileRetrySend = (FileSendHandler.end != FileSendHandler.pos);
-		if (FileRetrySend)
+		c = CommRawOut(&cv, &(fv->FileSendHandler.buf[fv->FileSendHandler.pos]),
+			fv->FileSendHandler.end - fv->FileSendHandler.pos);
+		fv->FileSendHandler.pos += c;
+		fv->FileRetrySend = (fv->FileSendHandler.end != fv->FileSendHandler.pos);
+		if (fv->FileRetrySend)
 			return;
 	}
 
 	do {
-		if (FileSendHandler.pos == FileSendHandler.end) {
-			ReadFile(SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
+		if (fv->FileSendHandler.pos == fv->FileSendHandler.end) {
+			ReadFile(SendVar->FileHandle, &(fv->FileSendHandler.buf[0]), sizeof(fv->FileSendHandler.buf), &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
-			FileSendHandler.pos = 0;
-			FileSendHandler.end = fc;
+			fv->FileSendHandler.pos = 0;
+			fv->FileSendHandler.end = fc;
 		} else {
-			fc = FileSendHandler.end - FileSendHandler.end;
+			fc = fv->FileSendHandler.end - fv->FileSendHandler.end;
 		}
 
 		if (fc != 0)
 		{
-			c = CommRawOut(&cv, &(FileSendHandler.buf[FileSendHandler.pos]),
-				FileSendHandler.end - FileSendHandler.pos);
-			FileSendHandler.pos += c;
-			FileRetrySend = (FileSendHandler.end != FileSendHandler.pos);
+			c = CommRawOut(&cv, &(fv->FileSendHandler.buf[fv->FileSendHandler.pos]),
+				fv->FileSendHandler.end - fv->FileSendHandler.pos);
+			fv->FileSendHandler.pos += c;
+			fv->FileRetrySend = (fv->FileSendHandler.end != fv->FileSendHandler.pos);
 			SendVar->ByteCount = SendVar->ByteCount + c;
-			if (FileRetrySend)
+			if (fv->FileRetrySend)
 			{
 				if (SendVar->ByteCount != BCOld) {
-					SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
+					fv->SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
 				}
 				return;
 			}
 		}
-		FileDlgRefresh = SendVar->ByteCount;
-		SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
+		fv->FileDlgRefresh = SendVar->ByteCount;
+		fv->SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
 		BCOld = SendVar->ByteCount;
 		if (fc != 0)
 			return;
@@ -344,95 +358,113 @@ void FileSend(void)
 	PFileVar fv = SendVar;
 
 	if (cv.PortType == IdSerial && ts.FileSendHighSpeedMode &&
-	    BinaryMode && FileBracketMode == FS_BRACKET_NONE && !cv.TelFlag &&
+		fv->BinaryMode && fv->FileBracketMode == FS_BRACKET_NONE && !cv.TelFlag &&
 	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
 		return FileSendBinayBoost();
 	}
 
-	if ((SendDlg == NULL) || (fv->FilePause == TRUE))
+	if ((fv->SendDlg == NULL) || (fv->FilePause == TRUE))
 		return;
 
 	BCOld = SendVar->ByteCount;
 
-	if (FileRetrySend)
+	if (fv->FileRetrySend)
 	{
-		FileRetryEcho = (ts.LocalEcho>0);
-		c = FSOut1(FileByte);
-		FileRetrySend = (c==0);
-		if (FileRetrySend)
+		fv->FileRetryEcho = (ts.LocalEcho>0);
+		c = FSOut1(fv);
+		fv->FileRetrySend = (c==0);
+		if (fv->FileRetrySend)
 			return;
 	}
 
-	if (FileRetryEcho)
+	if (fv->FileRetryEcho)
 	{
-		c = FSEcho1(FileByte);
-		FileRetryEcho = (c==0);
-		if (FileRetryEcho)
+		c = FSEcho1(fv);
+		fv->FileRetryEcho = (c==0);
+		if (fv->FileRetryEcho)
 			return;
 	}
 
 	do {
-		if (FileBracketMode == FS_BRACKET_START) {
-			FileByte = BracketStartStr[FileBracketPtr++];
+		if (fv->FileBracketMode == FS_BRACKET_START) {
+			fv->SendChar = BracketStartStr[fv->FileBracketPtr++];
 			fc = 1;
 
-			if (FileBracketPtr >= sizeof(BracketStartStr) - 1) {
-				FileBracketMode = FS_BRACKET_END;
-				FileBracketPtr = 0;
-				BinaryMode = ts.TransBin;
+			if (fv->FileBracketPtr >= sizeof(BracketStartStr) - 1) {
+				fv->FileBracketMode = FS_BRACKET_END;
+				fv->FileBracketPtr = 0;
+				fv->BinaryMode = ts.TransBin;
 			}
 		}
-		else if (! FileReadEOF) {
+		else if (!fv->FileReadEOF) {
 			DWORD read_bytes;
+			BYTE FileByte;
 			ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
 			SendVar->ByteCount = SendVar->ByteCount + fc;
 
-			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
+			if (FileByte==0x0A && fc == 1 && fv->FileCRSend) {
+				// CR を送った直後 0x0A だった -> ファイルから1バイト読む
 				ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 				fc = LOWORD(read_bytes);
 				SendVar->ByteCount = SendVar->ByteCount + fc;
+			}
+
+			if (IsDBCSLeadByte(FileByte)) {
+				// DBCSの1byte目だった -> ファイルから1バイト読んで Unicode とする
+				char dbcs[2];
+				dbcs[0] = FileByte;
+
+				ReadFile(SendVar->FileHandle, &dbcs[1], 1, &read_bytes ,NULL);
+				fc = LOWORD(read_bytes);
+				SendVar->ByteCount = SendVar->ByteCount + fc;
+
+				unsigned int u32;
+				MBCPToUTF32(dbcs, 2, CP_ACP, &u32);
+				fv->SendChar = u32;
+			} else {
+				fv->SendChar = FileByte;
 			}
 		}
 		else {
 			fc = 0;
 		}
 
-		if (fc == 0 && FileBracketMode == FS_BRACKET_END) {
-			FileReadEOF = TRUE;
-			FileByte = BracketEndStr[FileBracketPtr++];
+		if (fc == 0 && fv->FileBracketMode == FS_BRACKET_END) {
+			fv->FileReadEOF = TRUE;
+			fv->SendChar = BracketEndStr[fv->FileBracketPtr++];
 			fc = 1;
-			BinaryMode = TRUE;
+			fv->BinaryMode = TRUE;
 
-			if (FileBracketPtr >= sizeof(BracketEndStr) - 1) {
-				FileBracketMode = FS_BRACKET_NONE;
-				FileBracketPtr = 0;
+			if (fv->FileBracketPtr >= sizeof(BracketEndStr) - 1) {
+				fv->FileBracketMode = FS_BRACKET_NONE;
+				fv->FileBracketPtr = 0;
 			}
 		}
 
 
 		if (fc!=0)
 		{
-			c = FSOut1(FileByte);
-			FileCRSend = (ts.TransBin==0) && (FileByte==0x0D);
-			FileRetrySend = (c==0);
-			if (FileRetrySend)
+			c = FSOut1(fv);
+			fv->FileCRSend = (ts.TransBin == 0) && (fv->SendChar == 0x0D);
+			fv->FileRetrySend = (c == 0);
+			if (fv->FileRetrySend)
 			{
 				if (SendVar->ByteCount != BCOld) {
-					SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
+					fv->SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
 				}
 				return;
 			}
 			if (ts.LocalEcho>0)
 			{
-				c = FSEcho1(FileByte);
-				FileRetryEcho = (c==0);
-				if (FileRetryEcho)
+				c = FSEcho1(fv);
+				fv->FileRetryEcho = (c==0);
+				if (fv->FileRetryEcho)
 					return;
 			}
 		}
-		if ((fc==0) || ((SendVar->ByteCount % 100 == 0) && (FileBracketPtr == 0))) {
-			SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
+		if ((fc==0) || ((SendVar->ByteCount % 100 == 0) && (fv->FileBracketPtr == 0))) {
+			fv->SendDlg->RefreshNum(SendVar->StartTime, SendVar->FileSize, SendVar->ByteCount);
 			BCOld = SendVar->ByteCount;
 			if (fc!=0)
 				return;

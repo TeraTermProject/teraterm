@@ -546,7 +546,7 @@ MSG_INI_WRITE_ERROR=iniファイルに書き込みができません
 
 ; sendfile
 DLG_SENDFILE_TERATERM4=Tera Term 4と同じ方法で送信
-DLG_SENDFILE_TERATERM4_TOOLTIP=Tera Term 4の場合\n・ファイルから読み込みながら送信する\n・テキストファイルのエンコードは自動判定されない\nTera Term 5の場合\n・ファイルをメモリに読み込んでから送信する\n・テキストファイルのエンコードは自動判定される
+DLG_SENDFILE_TERATERM4_TOOLTIP=Tera Term 4の場合\n・ファイルから読み込みながら送信する\n・テキストファイルはACPとして読み込み,エンコードは自動判定されない\nTera Term 5の場合\n・ファイルをメモリに読み込んでから送信する\n・テキストファイルのエンコードは自動判定される
 
 [TTSSH]
 ; font

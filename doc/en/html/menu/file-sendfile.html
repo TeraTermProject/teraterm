@@ -18,7 +18,24 @@
     <dl>
       <dt>File Name</dt>
       <dd>
-	Enter or select the file name of an existing file.
+	送信するファイルのファイル名を入力または選択してください。
+	すでに存在するファイルでなければなりません。<br>
+    ダイアログにファイルをドロップすることでファイル名を入力することもできます。
+      </dd>
+
+      <dt>Tera Term 4 と同じ方法で送信</dt>
+      <dd>
+          <dl>
+              <dt>Tera Term 4 と同じ方法(チェックを入れたとき)</dt>
+              <dd>
+                  ファイルから読み込みながら送信します。<br>
+                  テキストファイルはACPとして読み込み、エンコードは自動判定されません。<br>
+              </dd>
+              <dt>チェックを外した時</dt>
+              <dd>
+                  ファイルをメモリに読み込んでから送信します。<br>
+                  テキストファイルのエンコードは自動判定します。
+              </dd>
       </dd>
 
       <dt>Binary</dt>
@@ -27,7 +44,106 @@
 	modifications. Otherwise, new-line codes are converted and control
 	characters (except TAB, LF and CR) are stripped out.
       </dd>
+
+      <dt>delay type</dt>
+      <dd>
+        <dl>
+          <dt>no delay</dt>
+          <dd>
+            ディレイ処理なし
+          </dd>
+
+          <dt>per charactor</dt>
+          <dd>
+            1文字毎にディレイ処理を行う
+          </dd>
+
+          <dt>per line</dt>
+          <dd>
+            1行毎にディレイ処理を行う
+          </dd>
+
+          <dt>per sendsize</dt>
+          <dd>
+            指定送信文字毎にディレイ処理を行う
+          </dd>
+        </dl>
+
+      </dd>
+
+      <dt>send size</dt>
+      <dd>
+        送信サイズ(delay typeが per sendsizeのとき有効)
+      </dd>
+
+      <dt>delay time(ms)</dt>
+      <dd>
+        ディレイ時間
+      </dd>
     </dl>
+
+    <h3>送信サイズ</h3>
+
+    <p>
+      Tera Termの通信相手の受信バッファサイズと処理速度を考慮することで、
+      指定した送信サイズ毎にディレイを入れることで、
+      1キャラクタ毎、1行毎にディレイを入れるより効率的にファイル送信を行うことができます。
+    </p>
+
+    <p>
+      送信データのドロップは次のところで発生することが考えられます。
+    </p>
+
+    <pre>
+                     s1            s2                 s3                s4                         program
+Tera Term ---> Tera Term内  ---> Windows ---> (sshd,telnet,pipe) ---> OS,driver      ---> 擬似端末(pty) + シェル,その他コマンド
+               送信バッファ                   (serial          )      UARTチップなど      組込プログラム等
+               受信バッファ <---         <---                    <---                <---
+                     r1            r2                 r3                r4
+    </pre>
+
+    <dl>
+      <dt>s1 Tera Term内の送信バッファ</dt>
+      <dd>
+        可能性は低いでしょう。<br>
+        送信バッファの空きサイズを見ながらデータを詰めていきます。</dd>
+      <dt>s2 Windows</dt>
+      <dd>
+        可能性は低いでしょう。<br>
+        使用するハードウェア、ドライバのバージョンによってはBSoDを含めて様々な不具合が発生することがあります。<br>
+        Tera Termのシリアルポート設定ではドライバの詳細を見ることができます。
+      </dd>
+      <dt>s3 送信路</dt>
+      <dd>
+        serialの場合エラー時の再送処理はありません。データにエラーが発生するとドロップします。<br>
+        TCP/IP, pipeの場合は可能性は低いと思われます。
+      </dd>
+      <dt>s4 OS,UARTチップ</dt>
+      <dd>
+        PC(CPU)の処理能力を超えたデータの受信(programがOSやチップから受信データを引き取らない場合)等で、
+        OS(ドライバ)、UARTチップの受信バッファがオーバーフローしてドロップします。<br>
+        フロー制御等はOS(ドライバ)が行うかprogramが行うかは実装によります。<br>
+        TCP/IPではフロー制御,エラー時の再送が行われ、多くの場合OS内のプロトコルスタックがこれらの処理を行います。<br>
+        シリアルではフロー制御の有無はユーザーが決めることができ、オーバーフローなどエラー時の再送は行われません。
+      </dd>
+      <dt>program</dt>
+      <dd>
+        プログラム内の受信バッファオーバーフローなどでドロップします。<br>
+        仮想端末(pty)ではバッファが溢れそうになると0x07(BEL)が送られ、Tera Termでベルがなります。
+      </dd>
+    </dl>
+
+    主なUARTチップ、ドライバの受信バッファサイズ
+    <pre>
+      8250 UART                 受信バッファなし
+      16550 UART                16 Byte FIFO
+      FT232R                    256 Byte receive buffer
+      TTY drive(Linux 2.6.26)   4KB  (<a href="../reference/sourcecode.html#ttssh">TTSSHによるSSHの設計と実装/疑似端末のしくみ</a>)
+    </pre>
+
+    <p>
+      送信データのエコーが返ってこない場合は受信データがどこかでドロップしていることも考えられます。
+    </p>
 
     <h2>"Send file" dialog box (displayed while sending)</h2>
     <dl>
