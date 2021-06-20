@@ -1228,9 +1228,9 @@ void CVTWindow::RestoreSetup()
 /* called by the [Setup] Terminal command */
 void CVTWindow::SetupTerm()
 {
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+//	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		ResetCharSet();
-	}
+//	}
 	cv.CRSend = ts.CRSend;
 
 	// for russian mode

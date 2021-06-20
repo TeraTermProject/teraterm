@@ -329,7 +329,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->TelCRSend = FALSE;
 	cv->TelCRSendEcho = FALSE;
 	cv->TelAutoDetect = ts->TelAutoDetect; /* TTPLUG */
-	cv->CodePage = &ts->CodePage;
 	cv->ConnetingTimeout = &ts->ConnectingTimeout;
 	cv->LastSendTime = time(NULL);
 	cv->LineModeBuffCount = 0;

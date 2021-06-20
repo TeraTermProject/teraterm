@@ -1110,7 +1110,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 		size_t utf8_len = sizeof(TempStr);
 		utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
 		TempLen += utf8_len;
-	} else if (cv->Language == IdJapanese && *cv->CodePage == 932) {
+	} else if (cv->Language == IdJapanese) {
 		// 日本語
 		// まず CP932(SJIS) に変換してから出力
 		char mb_char[2];
@@ -1197,11 +1197,28 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 			b = RussConv(IdWindows, cv->RussHost, mb_char[0]);
 		}
 		TempStr[TempLen++] = b;
-	} else if (cv->Language == IdKorean && *cv->CodePage == 51949) {
-		/* CP51949に変換して出力 */
+	} else if (cv->Language == IdKorean || cv->Language == IdChinese) {
+		int code_page;
 		char mb_char[2];
-		size_t mb_len = sizeof(mb_char);
-		mb_len = UTF32ToMBCP(u32, 51949, mb_char, mb_len);
+		size_t mb_len;
+		if (cv->Language == IdKorean) {
+			code_page = 51949;
+		} else if (cv->Language == IdChinese) {
+			switch (states->KanjiCode) {
+			case IdCnGB2312:
+				code_page = 936;
+				break;
+			case IdCnBig5:
+				code_page = 950;
+				break;
+			default:
+				assert(FALSE);
+				break;
+			}
+		}
+		/* code_page に変換して出力 */
+		mb_len = sizeof(mb_char);
+		mb_len = UTF32ToMBCP(u32, code_page, mb_char, mb_len);
 		if (mb_len == 0) {
 			TempStr[TempLen++] = '?';
 		}
@@ -1214,19 +1231,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 	} else if (cv->Language == IdEnglish) {
 		TempStr[TempLen++] = u32;
 	} else {
-		// CodePageで変換
-		char mb_char[2];
-		size_t mb_len = sizeof(mb_char);
-		mb_len = UTF32ToMBCP(u32, *cv->CodePage, mb_char, mb_len);
-		if (mb_len == 0) {
-			TempStr[TempLen++] = '?';
-		}
-		else if (mb_len == 1) {
-			TempStr[TempLen++] = mb_char[0];
-		} else  {
-			TempStr[TempLen++] = mb_char[0];
-			TempStr[TempLen++] = mb_char[1];
-		}
+		assert(FALSE);
 	}
 
 	*TempLen_ = TempLen;
@@ -1401,6 +1406,9 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			break;
 		case DLL_PROCESS_ATTACH:
 			/* do process initialization */
+#ifdef _DEBUG
+			_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 			hInst = hInstance;
 			if (OpenSharedMemory(&FirstInstance) == FALSE) {
 				// dllロード失敗、teratermが起動しない

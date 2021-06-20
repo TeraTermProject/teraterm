@@ -938,7 +938,7 @@ typedef struct {
 	struct addrinfo * res0;
 	struct addrinfo * res;
 	char *reserve_11;	// Locale
-	int *CodePage;
+	int *reserve_CodePage;
 	int *ConnetingTimeout;
 
 	time_t LastSendTime;
