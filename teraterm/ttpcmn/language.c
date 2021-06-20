@@ -29,7 +29,6 @@
 
 // TTCMN.DLL character code conversion
 
-#include <locale.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "codemap.h"

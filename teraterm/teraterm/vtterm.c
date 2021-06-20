@@ -368,7 +368,6 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 void ResetCharSet()
 {
-	char *result;
 	if (ts.Language==IdJapanese) {
 		Gn[0] = IdASCII;
 		Gn[1] = IdKatakana;
@@ -407,24 +406,15 @@ void ResetCharSet()
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
 
-	// ロケールの設定
-	// wctomb のため
-	result = setlocale(LC_ALL, ts.Locale);
-    if (result == NULL) {
-		// おかしなLocale文字列がセットされている?
-		// defaultをセットしておく
-		strcpy(ts.Locale, DEFAULT_LOCALE);
-		result = setlocale(LC_ALL, ts.Locale);
-	}
-	// 英語版Windowsでは、ts.Localeがデフォルトの"japanese"だった場合、
-	// setlocaleが NULL を返すため、Tera Termの起動時に落ちる。strrchrの
-	// 第1引数にはNULLが指定できないため。
-	// setlocale に成功した時はコードページを設定し、失敗した時は
-	// ANSIコードページを設定する。
-	if (result)
-		ts.CodePage = atoi(strrchr(result, '.')+1);
-	else
-		ts.CodePage = GetACP();
+	// ロケールの設定(削除した) TODO: 削除
+	//		従来は wctomb()系のためにsetlocale()を使用していたが
+	//		現在は wctomb()系は使用しなくなった。
+	//		ts.Locale[] から setlocale() の戻り値を得て
+	//		そこからコードページをts.CodePage に取得していた。
+	//
+	//		ts.CodePage の値は cv.CodePage に引き継がれて
+	//		CommTextOut(),CommTextEcho()@ttcmn.c で使用される
+	ts.CodePage = GetACP();
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)

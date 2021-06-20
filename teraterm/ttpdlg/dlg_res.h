@@ -120,7 +120,6 @@
 #define IDC_HOSTTCPPROTOCOLLABEL        1019
 #define IDC_HOSTTCPPROTOCOL             1020
 #define IDC_LOCALE_BOX                  1022
-#define IDC_LOCALE_EDIT                 1024
 #define IDC_TT_VERSION                  1027
 #define IDC_AUTHOR_URL                  1028
 #define IDC_FORUM_LABEL                 1029
@@ -158,7 +157,6 @@
 #define IDC_TERMIDLABEL                 1061
 #define IDC_TERMKANJILABEL              1062
 #define IDC_TERMKANJISENDLABEL          1063
-#define IDC_LOCALE_LABEL                1064
 #define IDC_TERMRUSSCHARSET             1065
 #define IDC_TERMRUSSHOSTLABEL           1066
 #define IDC_TERMRUSSCLIENTLABEL         1067

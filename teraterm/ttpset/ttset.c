@@ -1898,11 +1898,6 @@ void PASCAL ReadIniFile(PCHAR FNameA, PTTSet ts)
 	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
 	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
 
-	// Locale for UTF-8
-	GetPrivateProfileString(Section, "Locale ", DEFAULT_LOCALE,
-	                        Temp, sizeof(Temp), FName);
-	strncpy_s(ts->Locale, sizeof(ts->Locale), Temp, _TRUNCATE);
-
 	// UI language message file (‘Š‘ÎƒpƒX)
 	hGetPrivateProfileStringW(SectionW, L"UILanguageFile", NULL, FName, &ts->UILanguageFileW_ini);
 	if (ts->UILanguageFileW_ini == NULL) {
@@ -2637,7 +2632,6 @@ void PASCAL WriteIniFile(PCHAR FNameA, PTTSet ts)
 	                          ts->CygwinDirectory, FName);
 	WritePrivateProfileString(Section, "ViewlogEditor", ts->ViewlogEditor,
 	                          FName);
-	WritePrivateProfileString(Section, "Locale", ts->Locale, FName);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';

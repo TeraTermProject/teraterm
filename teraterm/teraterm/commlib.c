@@ -46,7 +46,6 @@
 #include <ws2tcpip.h>
 #include <stdio.h> /* for _snprintf() */
 #include <time.h>
-#include <locale.h>
 
 #include "filesys_log.h"
 #include "ttlib.h"

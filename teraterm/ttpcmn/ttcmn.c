@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <windows.h>
 #include <setupapi.h>
-#include <locale.h>
 #include <htmlhelp.h>
 #include <assert.h>
 #include <crtdbg.h>

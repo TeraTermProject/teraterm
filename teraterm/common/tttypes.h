@@ -30,7 +30,6 @@
 /* Constants and types for Tera Term */
 #pragma once
 
-#include <locale.h>
 #include "teraterm.h"
 #include "tt-version.h"
 #include "../teraterm/unicode_test.h"
@@ -508,8 +507,7 @@ struct tttset {
 	BYTE AlphaBlendInactive;
 	BYTE reserve_0[2];				// –¢Žg—p
 	char CygwinDirectory[MAX_PATH];
-#define DEFAULT_LOCALE "japanese"
-	char Locale[80];
+	char reserve_Locale[80];
 	int CodePage;
 	int DuplicateSession;
 	char ViewlogEditor[MAX_PATH];

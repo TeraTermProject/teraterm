@@ -71,7 +71,6 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <string.h>
-#include <locale.h>
 #include <io.h>
 #include <errno.h>
 
@@ -475,9 +474,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	logfile_lock_initialize();
 	SetMouseCursor(ts.MouseCursorName);
-	// ÉçÉPÅ[ÉãÇÃê›íË
-	// wctomb ÇÃÇΩÇﬂ
-	setlocale(LC_ALL, ts.Locale);
 
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI

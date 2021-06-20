@@ -204,7 +204,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
 					{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 					{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
-					{ IDC_LOCALE_LABEL, "DLG_TERM_LOCALE" },
 				};
 				SetDlgTexts(Dialog, TextInfosJp, _countof(TextInfosJp), UILanguageFile);
 			}
@@ -221,7 +220,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				static const DlgTextInfo TextInfosKo[] = {
 					{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
 					{ IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND" },
-					{ IDC_LOCALE_LABEL, "DLG_TERM_LOCALE" },
 				};
 				SetDlgTexts(Dialog, TextInfosKo, _countof(TextInfosKo), UILanguageFile);
 			}
@@ -287,10 +285,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				else {
 					SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList,ts->KanjiOut);
 				}
-
-				// ロケール用テキストボックス
-				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
-				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 			}
 			else if (ts->Language==IdRussian) {
 				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
@@ -304,18 +298,10 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			else if (ts->Language==IdKorean) { // HKS
 				SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, KanjiCode2List(ts->Language,ts->KanjiCode));
 				SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
-
-				// ロケール用テキストボックス
-				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
-				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 			}
 			else if (ts->Language==IdUtf8) {
 				SetDropDownList(Dialog, IDC_TERMKANJI, Utf8List, KanjiCode2List(ts->Language,ts->KanjiCode));
 				SetDropDownList(Dialog, IDC_TERMKANJISEND, Utf8ListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
-
-				// ロケール用テキストボックス
-				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
-				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 			}
 			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
@@ -392,8 +378,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKOUT)) > 0) {
 								ts->KanjiOut = w;
 							}
-
-							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
 						}
 						else if (ts->Language==IdRussian) {
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST)) > 0) {
@@ -419,8 +403,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 							ts->JIS7Katakana=0;
 							ts->KanjiIn = 0;
 							ts->KanjiOut = 0;
-
-							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
 						}
 
 					}

@@ -409,7 +409,6 @@ DLG_TERM_KANJISEND=Kan&ji (transmit)
 DLG_TERM_KANASEND=Half-wi&dth kana
 DLG_TERM_KIN=Kanji-i&n:
 DLG_TERM_KOUT=Kanji-&out:
-DLG_TERM_LOCALE=locale:
 DLG_TERM_RUSSCHARSET=Zeichensatz
 DLG_TERM_RUSSHOST=H&ost:
 DLG_TERM_RUSSCLIENT=&Client:
