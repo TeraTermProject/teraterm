@@ -405,16 +405,6 @@ void ResetCharSet()
 	cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
-
-	// ロケールの設定(削除した) TODO: 削除
-	//		従来は wctomb()系のためにsetlocale()を使用していたが
-	//		現在は wctomb()系は使用しなくなった。
-	//		ts.Locale[] から setlocale() の戻り値を得て
-	//		そこからコードページをts.CodePage に取得していた。
-	//
-	//		ts.CodePage の値は cv.CodePage に引き継がれて
-	//		CommTextOut(),CommTextEcho()@ttcmn.c で使用される
-	ts.CodePage = GetACP();
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
@@ -1047,7 +1037,6 @@ static void PutKanji(BYTE b)
 			}
 			else {
 				assert(FALSE);
-				goto default_;
 			}
 			break;
 		case IdChinese:
@@ -1061,13 +1050,10 @@ static void PutKanji(BYTE b)
 			}
 			else {
 				assert(FALSE);
-				goto default_;
 			}
 			break;
 		default:
-		default_:
 			assert(FALSE);
-			u32 = MBCP_UTF32(Kanji, ts.CodePage);
 			break;
 		}
 		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
@@ -5194,7 +5180,7 @@ static void ConvertToCP932(char *str, int destlen)
 	unsigned char b;
 	WORD word;
 
-	if (ts.CodePage == 932) {
+	if (ts.Language == IdJapanese) {
 		for (i = 0 ; i < len ; i++) {
 			b = str[i];
 			if (IS_SJIS(b) || IS_EUC(b)) {

@@ -508,7 +508,7 @@ struct tttset {
 	BYTE reserve_0[2];				// –¢Žg—p
 	char CygwinDirectory[MAX_PATH];
 	char reserve_Locale[80];
-	int CodePage;
+	int reserve_CodePage;
 	int DuplicateSession;
 	char ViewlogEditor[MAX_PATH];
 	WORD LogTypePlainText;
