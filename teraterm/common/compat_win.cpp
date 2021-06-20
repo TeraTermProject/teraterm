@@ -38,7 +38,7 @@
 #include "ttlib.h"
 
 // for debug
-#define UNICODE_API_DISABLE	1
+//#define UNICODE_API_DISABLE	1
 
 ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
 HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
