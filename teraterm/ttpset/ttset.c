@@ -1901,7 +1901,7 @@ void PASCAL ReadIniFile(PCHAR FNameA, PTTSet ts)
 	// UI language message file (‘Š‘ÎƒpƒX)
 	hGetPrivateProfileStringW(SectionW, L"UILanguageFile", NULL, FName, &ts->UILanguageFileW_ini);
 	if (ts->UILanguageFileW_ini == NULL) {
-		ts->UILanguageFileW_ini = wcsdup(L"lang\\Default.lng");
+		ts->UILanguageFileW_ini = _wcsdup(L"lang\\Default.lng");
 	}
 	WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 

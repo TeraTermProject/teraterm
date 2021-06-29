@@ -369,9 +369,11 @@ void WinCompatInit()
 		pFindFirstFileW = NULL;
 		pFindNextFileW = NULL;
 		pRemoveDirectoryW = NULL;
+		pGetFullPathNameW = NULL;
 		pGetPrivateProfileIntW = NULL;
 		pGetModuleFileNameW = NULL;
 		pLoadLibraryW = NULL;
+		pExpandEnvironmentStringsW = NULL;
 		pGetTempPathW = NULL;
 		pGetTempFileNameW = NULL;
 	}
