@@ -176,6 +176,16 @@ static errno_t inner_sscanf_s(const char *buffer, const char *format, ...)
 	return r;
 }
 
+static errno_t inner_swscanf_s(const wchar_t *buffer, const wchar_t *format, ...)
+{
+	int r;
+	va_list ap;
+	va_start(ap, format);
+	r = vswscanf(buffer, format, ap);
+	va_end(ap);
+	return r;
+}
+
 static errno_t inner_strcat_s(char *strDestination, size_t numberOfElements, const char *strSource)
 {
 	size_t dest_len = strlen(strDestination);
@@ -388,6 +398,7 @@ void *_imp___snwprintf_s = (void *)inner_snwprintf_s;
 void *_imp__swprintf_s = (void *)inner_swprintf_s;
 void *_imp___vscprintf = (void *)inner_vscprintf;
 void *_imp__sscanf_s = (void *)inner_sscanf_s;
+void *_imp__swscanf_s = (void *)inner_swscanf_s;
 
 void *_imp__strcat_s = (void *)inner_strcat_s;
 void *_imp__wcscat_s = (void *)inner_wcscat_s;
