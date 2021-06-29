@@ -147,8 +147,6 @@ UINT _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique,
 // gdi32.lib
 int _AddFontResourceW(LPCWSTR lpFileName);
 BOOL _RemoveFontResourceW(LPCWSTR lpFileName);
-int _AddFontResourceExW(LPCWSTR name, DWORD fl, PVOID res);
-BOOL _RemoveFontResourceExW(LPCWSTR name, DWORD fl, PVOID pdv);
 
 // Comctl32.lib
 HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);

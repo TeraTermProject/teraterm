@@ -417,24 +417,6 @@ BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewIt
 	return result;
 }
 
-int  _AddFontResourceExW(LPCWSTR name, DWORD fl, PVOID res)
-{
-	if (pAddFontResourceExW != NULL) {
-		/* Windows 2000à»ç~ÇÕégÇ¶ÇÈÇÕÇ∏ */
-		return pAddFontResourceExW(name, fl, res);
-	}
-	return 0;
-}
-
-BOOL _RemoveFontResourceExW(LPCWSTR name, DWORD fl, PVOID pdv)
-{
-	if (pRemoveFontResourceExW != NULL) {
-		/* Windows 2000à»ç~ÇÕégÇ¶ÇÈÇÕÇ∏ */
-		return pRemoveFontResourceExW(name, fl, pdv);
-	}
-	return FALSE;
-}
-
 int _AddFontResourceW(LPCWSTR lpFileName)
 {
 	char *filenameA = ToCharW(lpFileName);

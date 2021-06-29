@@ -80,7 +80,10 @@ static void LoadSpecialFont()
 
 	// teraterm.exeのみで有効なフォントとなる。
 	// removeしなくても終了するとOSからなくなる
-	int r = _AddFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
+	int r = 0;
+	if (pAddFontResourceExW != NULL) {
+		r = pAddFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
+	}
 	if (r == 0) {
 		// AddFontResourceEx() が使えなかった
 		// システム全体で使えるフォントとなる
@@ -97,7 +100,10 @@ static void UnloadSpecialFont()
 	if (!AddFontFlag) {
 		return;
 	}
-	int r = _RemoveFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
+	int r = 0;
+	if (pRemoveFontResourceExW != NULL) {
+		r = pRemoveFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
+	}
 	if (r == 0) {
 		_RemoveFontResourceW(TSpecialFont);
 	}
