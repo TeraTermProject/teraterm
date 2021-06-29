@@ -406,20 +406,6 @@ BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem,
 	return result;
 }
 
-HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData)
-{
-	if (pHtmlHelpW != NULL) {
-		return pHtmlHelpW(hwndCaller, pszFile, uCommand, dwData);
-	}
-	if (pHtmlHelpA != NULL) {
-		char *fileA = ToCharW(pszFile);
-		HWND result = pHtmlHelpA(hwndCaller, fileA, uCommand, dwData);
-		free(fileA);
-		return result;
-	}
-	return NULL;
-}
-
 BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
 {
 	if (pAppendMenuW != NULL) {

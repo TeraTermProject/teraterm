@@ -36,6 +36,7 @@
 
 #include "dllutil.h"
 #include "ttlib.h"
+#include "codeconv.h"
 
 // for debug
 //#define UNICODE_API_DISABLE	1
@@ -110,9 +111,9 @@ UINT (WINAPI *pGetTempFileNameW)(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UIN
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
 BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 
-// htmlhelp.ocx
-HWND (WINAPI *pHtmlHelpW)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
-HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+// htmlhelp.dll (hhctrl.ocx)
+static HWND (WINAPI *pHtmlHelpW)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+static HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
 BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
@@ -382,4 +383,21 @@ void WinCompatInit()
 	if (pGetConsoleWindow == NULL) {
 		pGetConsoleWindow = GetConsoleWindowLocal;
 	}
+}
+
+HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData)
+{
+	if (pHtmlHelpW != NULL) {
+		return pHtmlHelpW(hwndCaller, pszFile, uCommand, dwData);
+	}
+
+	if (pHtmlHelpA != NULL) {
+		char *fileA = ToCharW(pszFile);
+		HWND r = pHtmlHelpA(hwndCaller, fileA, uCommand, dwData);
+		free(fileA);
+		return r;
+	}
+
+	// error
+	return NULL;
 }
