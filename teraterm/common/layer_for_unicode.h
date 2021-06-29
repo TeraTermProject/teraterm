@@ -108,6 +108,8 @@ BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem,
 BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
 int _GetWindowTextLengthW(HWND hWnd);
+LONG _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong);
+LONG _GetWindowLongW(HWND hWnd, int nIndex);
 LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 LONG_PTR _GetWindowLongPtrW(HWND hWnd, int nIndex);
 LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
