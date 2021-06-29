@@ -48,7 +48,6 @@
 #include "ftlib.h"
 #include "buffer.h"
 #include "helpid.h"
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 #include "asprintf.h"
 
@@ -147,7 +146,7 @@ static void _SetDlgProtoFileName(struct FileVarProto *fv, const char *filename)
 		s = p + 1;
 	}
 	assert(fv->HWin != NULL);
-	_SetDlgItemTextW(fv->HWin, IDC_PROTOFNAME, wc::fromUtf8(s));
+	SetDlgItemTextW(fv->HWin, IDC_PROTOFNAME, wc::fromUtf8(s));
 }
 
 static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
@@ -216,7 +215,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	// 受信フォルダ
 	wchar_t FileDirExpanded[MAX_PATH];
-	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
 	AppendSlashW(FileDirExpanded, _countof(FileDirExpanded));
 	fv->RecievePath = _wcsdup(FileDirExpanded);
 
@@ -349,7 +348,7 @@ static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WOR
 		fv->Destroy(fv);
 		return FALSE;
 	}
-	_SetWindowTextW(fv->HWin, fv->DlgCaption);
+	SetWindowTextW(fv->HWin, fv->DlgCaption);
 
 	PtDlg = pd;
 	return TRUE;
@@ -578,7 +577,7 @@ static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 		AppendSlashW(file, _countof(file));
 		wchar_t *FileSendFilterW = ToWcharA(FileSendFilterA);
 		wcsncat_s(file, _countof(file), FileSendFilterW, _TRUNCATE);
-		DWORD attr = _GetFileAttributesW(file);
+		DWORD attr = GetFileAttributesW(file);
 		if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 			// ファイルが存在する
 			filename = _wcsdup(file);
@@ -677,7 +676,7 @@ wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
 	wchar_t FileDirExpanded[MAX_PATH];
-	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	wchar_t *FNFilter = GetCommonDialogFilterW(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
@@ -719,17 +718,17 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 
 	/* save current dir */
 	wchar_t TempDir[MAX_PATH];
-	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	GetCurrentDirectoryW(_countof(TempDir), TempDir);
 	BOOL Ok;
 	if (!Receive)
 	{
-		Ok = _GetOpenFileNameW(&ofn);
+		Ok = GetOpenFileNameW(&ofn);
 	}
 	else {
-		Ok = _GetSaveFileNameW(&ofn);
+		Ok = GetSaveFileNameW(&ofn);
 	}
 	free(FNFilter);
-	_SetCurrentDirectoryW(TempDir);
+	SetCurrentDirectoryW(TempDir);
 
 	wchar_t **ret = NULL;
 	if (Ok) {
@@ -812,7 +811,7 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			if (fv!=NULL) {
-				_GetDlgItemTextW(Dialog, IDC_GETFN, TempFull, _countof(TempFull));
+				GetDlgItemTextW(Dialog, IDC_GETFN, TempFull, _countof(TempFull));
 				if (wcslen(TempFull)==0) {
 					fv->FileNames = NULL;
 					return TRUE;
@@ -933,11 +932,11 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	wchar_t FileDirExpanded[MAX_PATH];
-	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */
-	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
 	wchar_t *FnStrMem = (wchar_t *)malloc(FnStrMemSize * sizeof(wchar_t));
 	if (FnStrMem == NULL) {
@@ -979,7 +978,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 
 	ofn.hInstance = hInst;
 
-	BOOL Ok = _GetOpenFileNameW(&ofn);
+	BOOL Ok = GetOpenFileNameW(&ofn);
 	free(FNFilter);
 
 	wchar_t **ret = NULL;
@@ -990,7 +989,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	free(FnStrMem);
 
 	/* restore dir */
-	_SetCurrentDirectoryW(TempDir);
+	SetCurrentDirectoryW(TempDir);
 
 	return ret;
 }
@@ -1497,11 +1496,11 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	wchar_t FileDirExpanded[MAX_PATH];
-	_ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */
-	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
 	wchar_t *FNFilter = GetCommonDialogFilterW(ts.FileSendFilter, UILanguageFile);
 
@@ -1517,7 +1516,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	ofn.lpstrTitle = DlgCaption;
 	ofn.hInstance = hInst;
 
-	BOOL Ok = _GetOpenFileNameW(&ofn);
+	BOOL Ok = GetOpenFileNameW(&ofn);
 	free(FNFilter);
 
 	wchar_t **ret = NULL;
@@ -1525,7 +1524,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 		ret = MakeStrArrayFromStr(FileName);
 	}
 	/* restore dir */
-	_SetCurrentDirectoryW(TempDir);
+	SetCurrentDirectoryW(TempDir);
 	return ret;
 }
 

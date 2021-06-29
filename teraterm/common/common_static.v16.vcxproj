@@ -147,8 +147,6 @@
     <ClCompile Include="dllutil.cpp" />
     <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="i18n_static.c" />
-    <ClCompile Include="layer_for_unicode.cpp" />
-    <ClCompile Include="layer_for_unicode_comctl32.cpp" />
     <ClCompile Include="ttlib_static.c" />
     <ClCompile Include="ttlib_static_cpp.cpp" />
     <ClCompile Include="win16api.c" />
@@ -167,7 +165,6 @@
     <ClInclude Include="i18n.h" />
     <ClInclude Include="codeconv.h" />
     <ClInclude Include="getcontent.h" />
-    <ClInclude Include="layer_for_unicode.h" />
     <ClInclude Include="ttlib.h" />
     <ClInclude Include="win16api.h" />
     <ClInclude Include="win32helper.h" />

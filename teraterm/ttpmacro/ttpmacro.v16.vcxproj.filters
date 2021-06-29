@@ -144,9 +144,6 @@
     <ClInclude Include="..\common\dllutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\layer_for_unicode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ttl_gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -217,7 +217,6 @@
     <ClInclude Include="..\common\codeconv.h" />
     <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
-    <ClInclude Include="..\common\layer_for_unicode.h" />
     <ClInclude Include="..\common\tektypes.h" />
     <ClInclude Include="..\common\teraterm.h" />
     <ClInclude Include="..\common\tipwin.h" />

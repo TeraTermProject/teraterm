@@ -17,7 +17,6 @@ using namespace yebisuya;
 
 #include "ttlib.h"
 #include "i18n.h"
-#include "layer_for_unicode.h"
 
 extern char UILanguageFile[MAX_PATH];
 
@@ -1065,7 +1064,7 @@ private:
         ProxyInfo proxy;
         SettingDialog():lock(false) {
         }
-		
+
         int open(HWND owner) {
             return Dialog::open(instance().resource_module, IDD_SETTING, owner);
         }
@@ -1095,7 +1094,7 @@ private:
                                L"YebisuyaHompo");
             UTIL_get_lang_msgW("DLG_ABOUT_HOMEPAGE", uimsg3, sizeof(uimsg3),
                                L"TTProxy home page");
-            _GetDlgItemTextW(hWnd, IDC_VERSION, buf, _countof(buf));
+            GetDlgItemTextW(hWnd, IDC_VERSION, buf, _countof(buf));
             len = wcslen(buf) + 50;
             buf2 = (wchar_t *)_alloca(sizeof(wchar_t) * len);
             if (buf2 == NULL) {
@@ -1106,7 +1105,7 @@ private:
             if (n == 4) {
                 swprintf_s(buf2, len, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
             }
-            _SetDlgItemTextW(hWnd, IDC_VERSION, (n == 4) ? buf2 : buf);
+            SetDlgItemTextW(hWnd, IDC_VERSION, (n == 4) ? buf2 : buf);
 
             CenterWindow(hWnd, GetParent());
 
@@ -1164,7 +1163,7 @@ private:
 	 *
 	 * return:
 	 *    1以上   受信データ数(byte)。sizeより小さい場合もある。
-	 *    -1      SOCKET_ERROR 
+	 *    -1      SOCKET_ERROR
 	 */
 	int recieveFromSocketTimeout(SOCKET s, unsigned char* buffer, int size, int timeout) {
         int ready = 0;
@@ -1291,7 +1290,7 @@ private:
             strcpy_s(auth, authlen + 1, proxy.user);
             auth[userlen] = ':';
             strcpy_s(auth + userlen + 1, passlen + 1, proxy.pass);
-        
+
             /* make base64 string */
             while (*src != '\0') {
                 data = (data << 8) | *src++;
@@ -1306,7 +1305,7 @@ private:
                 *dst++ = base64_table[0x3F & (data << (6 - bits))];
                 encodedlen--;
             }
-            while (encodedlen-- > 0) { 
+            while (encodedlen-- > 0) {
                 *dst++ = '=';
             }
             *dst = '\0';
@@ -1343,7 +1342,7 @@ private:
 			default:
                 UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", tmp, sizeof(tmp),
                                   "Proxy prevent this connection!");
-				_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, "%s(HTTP: status code %d)", 
+				_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, "%s(HTTP: status code %d)",
 					tmp, status_code);
                 break;
             }
@@ -1430,9 +1429,9 @@ private:
             ptr += len;
 
             /* send it and get answer */
-            if (sendToSocket(s, buf, ptr - buf) == SOCKET_ERROR) 
+            if (sendToSocket(s, buf, ptr - buf) == SOCKET_ERROR)
                 return SOCKET_ERROR;
-            if (recieveFromSocket(s, buf, 2) == SOCKET_ERROR) 
+            if (recieveFromSocket(s, buf, 2) == SOCKET_ERROR)
                 return SOCKET_ERROR;
 
             /* check status */
@@ -1498,9 +1497,9 @@ private:
         if (recieveFromSocket(s, buf, 4) == SOCKET_ERROR)
             return SOCKET_ERROR;
 		/* SOCKSリクエストに対するリプライ
-		   
+
 		   buf[0] VER  protocol version: X'05'
-		   buf[1] REP  Reply field: 
+		   buf[1] REP  Reply field:
  				 o  X'00' succeeded
 				 o  X'01' general SOCKS server failure
 				 o  X'02' connection not allowed by ruleset
@@ -1517,7 +1516,7 @@ private:
 				 o  DOMAINNAME: X'03'
 				 o  IP V6 address: X'04'
 		   buf[4:N] BND.ADDR       server bound address
-		   buf[N+1] BND.PORT       server bound port in network octet order 
+		   buf[N+1] BND.PORT       server bound port in network octet order
 		 */
         if (buf[0] != SOCKS5_VERSION || buf[1] != SOCKS5_REP_SUCCEEDED) {   /* check reply code */
 			char tmp[MAX_UIMSG + 32];
@@ -1525,7 +1524,7 @@ private:
 			UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
                               "Proxy prevent this connection!");
 			// リプライ情報を追記してメッセージ表示する。
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS5:VER %u REP %u ATYP %u)", 
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS5:VER %u REP %u ATYP %u)",
 				uimsg, buf[0], buf[1], buf[3]);
 			return setError(s, tmp);
         }
@@ -1566,7 +1565,7 @@ private:
     int begin_relay_socks4(ProxyInfo& proxy, String realhost, unsigned short realport, SOCKET s) {
         unsigned char buf[256], *ptr;
 
-        /* make connect request packet 
+        /* make connect request packet
            protocol v4:
              VN:1, CD:1, PORT:2, ADDR:4, USER:n, NULL:1
            protocol v4a:
@@ -1624,7 +1623,7 @@ private:
             return SOCKET_ERROR;
         }
 		/* SOCKS4の返答パケット
-		 
+
 		  buf[0] VN 常に0
 		  buf[1] CD
 		           90 request granted
@@ -1655,7 +1654,7 @@ private:
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS4:VN %u CD %u)", uimsg, buf[0], buf[1]);
             return setError(s, tmp);
         }
-    
+
         /* Conguraturation, connected via SOCKS4 server! */
         return 0;
     }

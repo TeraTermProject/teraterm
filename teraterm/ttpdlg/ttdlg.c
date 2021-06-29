@@ -52,7 +52,6 @@
 #include "comportinfo.h"
 #include "codeconv.h"
 #include "helpid.h"
-#include "layer_for_unicode.h"
 #include "asprintf.h"
 
 // Oniguruma: Regular expression library
@@ -614,7 +613,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			if (ts->VTFlag>0) {
 				get_lang_msgW("DLG_WIN_PCBOLD16", uimsg, _countof(uimsg), L"&16 Colors (PC style)", UILanguageFile);
-				_SetDlgItemTextW(Dialog, IDC_WINCOLOREMU,uimsg);
+				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU,uimsg);
 				SetRB(Dialog, (ts->ColorFlag&CF_PCBOLD16)!=0, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
 				SetRB(Dialog, (ts->ColorFlag&CF_AIXTERM16)!=0, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
 				SetRB(Dialog, (ts->ColorFlag&CF_XTERM256)!=0,IDC_WINXTERM256,IDC_WINXTERM256);
@@ -691,13 +690,13 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
 				get_lang_msgW("DLG_WIN_NORMAL", uimsg, _countof(uimsg), L"Normal", UILanguageFile);
-				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
 				get_lang_msgW("DLG_WIN_BOLD", uimsg, _countof(uimsg), L"Bold", UILanguageFile);
-				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
 				get_lang_msgW("DLG_WIN_BLINK", uimsg, _countof(uimsg), L"Blink", UILanguageFile);
-				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
 				get_lang_msgW("DLG_WIN_REVERSEATTR", uimsg, _countof(uimsg), L"Reverse", UILanguageFile);
-				_SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
+				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
 				/* begin - ishizaki */
 				SendDlgItemMessageA(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)"URL");
 				/* end - ishizaki */

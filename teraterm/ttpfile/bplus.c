@@ -37,7 +37,6 @@
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
-#include "layer_for_unicode.h"
 
 #include "bplus.h"
 
@@ -131,7 +130,7 @@ static void BPDispMode(PFileVarProto fv, PBPVar bv)
 		break;
 	}
 
-	_SetWindowTextW(fv->HWin,fv->DlgCaption);
+	SetWindowTextW(fv->HWin,fv->DlgCaption);
 }
 
 static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)

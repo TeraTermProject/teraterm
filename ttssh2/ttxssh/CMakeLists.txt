@@ -105,7 +105,6 @@ target_sources(
   ../../teraterm/common/servicenames.h
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/tipwin.h
-  ../../teraterm/common/layer_for_unicode.h
   ../../teraterm/common/compat_win.h
   ../../teraterm/common/dllutil.h
   )

@@ -328,10 +328,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\teraterm\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
 				RelativePath="mac.h"
 				>
 			</File>

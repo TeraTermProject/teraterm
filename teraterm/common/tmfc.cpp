@@ -36,7 +36,6 @@
 #include "dlglib.h"
 #include "ttlib.h"
 #include "compat_win.h"
-#include "layer_for_unicode.h"
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
@@ -67,7 +66,7 @@ HWND TTCWnd::GetDlgItem(int id)
 
 LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
-	return ::_SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
+	return ::SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
 }
 
 LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
@@ -77,7 +76,7 @@ LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
 
 void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
 {
-	_GetDlgItemTextW(m_hWnd, id, buf, (int)size);
+	::GetDlgItemTextW(m_hWnd, id, buf, (int)size);
 }
 
 void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
@@ -87,7 +86,7 @@ void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
 
 void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
 {
-	_SetDlgItemTextW(m_hWnd, id, str);
+	::SetDlgItemTextW(m_hWnd, id, str);
 }
 
 void TTCWnd::SetDlgItemTextA(int id, const char *str)
@@ -162,7 +161,7 @@ void TTCWnd::ShowWindow(int nCmdShow)
 
 void TTCWnd::SetWindowTextW(const wchar_t *str)
 {
-	_SetWindowTextW(m_hWnd, str);
+	::SetWindowTextW(m_hWnd, str);
 }
 
 void TTCWnd::SetWindowTextA(const char *str)
@@ -525,7 +524,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 		dlgproc = nullptr;
 	}
 	pseudoPtr = this;
-	HWND hWnd = _CreateDialogIndirectParamW(
+	HWND hWnd = CreateDialogIndirectParamW(
 		hInstance, lpTemplate, hParent,
 		dlgproc, (LPARAM)this);
 	pseudoPtr = nullptr;
@@ -597,4 +596,3 @@ void TTCDialog::DestroyWindow()
 		::DestroyWindow(hWnd);
 	}
 }
-

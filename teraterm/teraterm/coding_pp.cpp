@@ -39,7 +39,6 @@
 #include "dlglib.h"
 #include "compat_win.h"
 #include "setting.h"
-#include "layer_for_unicode.h"
 #include "helpid.h"
 
 #include "coding_pp.h"
@@ -333,6 +332,6 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pfnDlgProc = Proc;
 	psp.lParam = (LPARAM)Param;
 
-	HPROPSHEETPAGE hpsp = _CreatePropertySheetPageW(&psp);
+	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&psp);
 	return hpsp;
 }

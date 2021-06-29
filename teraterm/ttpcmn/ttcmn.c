@@ -50,7 +50,6 @@
 
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
-#include "layer_for_unicode.h"
 
 /* shared memory */
 typedef struct {
@@ -332,13 +331,13 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 				get_lang_msgW("MENU_WINDOW_STACKED_UNDO", uimsg, _countof(uimsg), L"&Undo - Stacked", langFile);
 			else
 				get_lang_msgW("MENU_WINDOW_SIDEBYSIDE_UNDO", uimsg, _countof(uimsg), L"&Undo - Side by Side", langFile);
-			_AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);		// TODO UNICODE
+			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);		// TODO UNICODE
 		}
 
 	}
 	else {
 		get_lang_msgW("MENU_WINDOW_WINDOW", uimsg, _countof(uimsg), L"&Window", langFile);
-		_AppendMenuW(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
+		AppendMenuW(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
 	}
 }
 

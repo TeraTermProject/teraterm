@@ -52,7 +52,6 @@
 #include "auth.h"
 #include "helpid.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "asprintf.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
@@ -137,7 +136,7 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		break;
 	}
 
-	result = _CallWindowProcW(data->ProcOrg, control, msg, wParam, lParam);
+	result = CallWindowProcW(data->ProcOrg, control, msg, wParam, lParam);
 
 	if (msg == WM_NCDESTROY) {
 		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)data->ProcOrg);
@@ -156,8 +155,8 @@ void init_password_control(PTInstVar pvar, HWND dlg, int item, BOOL *UseControlC
 	data->pvar = pvar;
 	data->tipwin = NULL;
 	data->UseControlChar = UseControlChar;
-	_SetWindowLongPtrW(passwordControl, GWLP_WNDPROC, (LONG_PTR)password_wnd_proc);
-	_SetWindowLongPtrW(passwordControl, GWLP_USERDATA, (LONG_PTR)data);
+	SetWindowLongPtrW(passwordControl, GWLP_WNDPROC, (LONG_PTR)password_wnd_proc);
+	SetWindowLongPtrW(passwordControl, GWLP_USERDATA, (LONG_PTR)data);
 	SetFocus(passwordControl);
 }
 
@@ -208,9 +207,9 @@ static void init_auth_machine_banner(PTInstVar pvar, HWND dlg)
 	const char *host_name = SSH_get_host_name(pvar);
 	wchar_t *host_nameW = ToWcharA(host_name);
 
-	_GetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf2, _countof(buf2));
+	GetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf2, _countof(buf2));
 	aswprintf(&buf, buf2, host_nameW);
-	_SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf);
+	SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf);
 	free(host_nameW);
 	free(buf);
 }
@@ -299,9 +298,9 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		/* must be retrying a failed attempt */
 		wchar_t uimsg[MAX_UIMSG];
 		UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
-		_SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
+		SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
 		UTIL_get_lang_msgW("DLG_AUTH_TITLE_FAILED", pvar, L"Retrying SSH Authentication", uimsg);
-		_SetWindowTextW(dlg, uimsg);
+		SetWindowTextW(dlg, uimsg);
 		default_method = pvar->auth_state.failed_method;
 	}
 
@@ -540,8 +539,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			SetFocus(GetDlgItem(dlg, file_ctl_ID));
 			destroy_malloced_string(&password);
 			return FALSE;
-		} 
-		
+		}
+
 		if (SSHv1(pvar)) {
 			BOOL invalid_passphrase = FALSE;
 
@@ -1085,13 +1084,13 @@ canceled:
 					// 伏せ字 on/off を切り替える
 					HWND hWnd = GetDlgItem(dlg, IDC_SSHPASSWORD);
 					if (password_char == 0) {
-						password_char = (wchar_t)_SendMessageW(hWnd, EM_GETPASSWORDCHAR, 0, 0);
+						password_char = (wchar_t)SendMessageW(hWnd, EM_GETPASSWORDCHAR, 0, 0);
 					}
 					if (ShowPassPhrase) {
-						_SendMessageW(hWnd, EM_SETPASSWORDCHAR, 0, 0);
+						SendMessageW(hWnd, EM_SETPASSWORDCHAR, 0, 0);
 					} else {
 						if (IsWindowUnicode(hWnd)) {
-							_SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
+							SendMessageW(hWnd, EM_SETPASSWORDCHAR, (WPARAM)password_char, 0);
 						}
 						else {
 							// EM_GETPASSWORDCHAR で Unicode キャラクタが取得できても
@@ -1354,7 +1353,7 @@ static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 	if (SSHv2(pvar)) {
 		pvar->keyboard_interactive_password_input = 1;
 		handle_SSH2_userauth_inforeq(pvar);
-	} 
+	}
 
 	SSH_notify_cred(pvar);
 
@@ -1727,7 +1726,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				            "RSA");
 				strncat_s(dest, len, buf, _TRUNCATE);
 			}
-		} else { 
+		} else {
 			// SSH2:認証メソッドの判別 (2004.12.23 yutaka)
 			// keyboard-interactiveメソッドを追加 (2005.3.12 yutaka)
 			if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD ||

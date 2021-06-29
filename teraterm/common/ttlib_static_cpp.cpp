@@ -36,9 +36,9 @@
 #include <crtdbg.h>
 #include <assert.h>
 #include <wchar.h>
+#include <shlobj.h>
 
 #include "i18n.h"
-#include "layer_for_unicode.h"
 #include "asprintf.h"
 #include "win32helper.h"
 #include "codeconv.h"
@@ -98,7 +98,7 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const ch
 		free(format);
 	}
 
-	int r = _MessageBoxW(hWnd, message, title, uType);
+	int r = MessageBoxW(hWnd, message, title, uType);
 
 	free(title);
 	free(message);
@@ -185,12 +185,12 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	}
 	if (Cf == CF_HDROP) {
 		HDROP hDrop = (HDROP)TmpHandle;
-		UINT count = _DragQueryFileW(hDrop, (UINT)-1, NULL, 0);
+		UINT count = DragQueryFileW(hDrop, (UINT)-1, NULL, 0);
 
 		// text length
 		size_t length = 0;
 		for (UINT i = 0; i < count; i++) {
-			const UINT l = _DragQueryFileW(hDrop, i, NULL, 0);
+			const UINT l = DragQueryFileW(hDrop, i, NULL, 0);
 			if (l == 0) {
 				continue;
 			}
@@ -201,7 +201,7 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 		str_w = (wchar_t *)malloc(length * sizeof(wchar_t));
 		wchar_t *p = str_w;
 		for (UINT i = 0; i < count; i++) {
-			const UINT l = _DragQueryFileW(hDrop, i, p, (UINT)(length - (p - str_w)));
+			const UINT l = DragQueryFileW(hDrop, i, p, (UINT)(length - (p - str_w)));
 			if (l == 0) {
 				continue;
 			}
@@ -596,8 +596,8 @@ unsigned long long GetFSize64H(HANDLE hFile)
 
 unsigned long long GetFSize64W(const wchar_t *FName)
 {
-	HANDLE hFile = _CreateFileW(FName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-								FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileW(FName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+							   FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return 0;
 	}
@@ -872,7 +872,7 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 	IMalloc *pmalloc;
 	SHGetMalloc(&pmalloc);
 	if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == S_OK) {
-		_SHGetPathFromIDListW(pidl, MyDoc);
+		SHGetPathFromIDListW(pidl, MyDoc);
 		pmalloc->Free(pidl);
 		pmalloc->Release();
 	}
@@ -888,7 +888,7 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 		wcscpy(dest, MyDoc);
 		AppendSlashW(dest,destlen);
 		wcsncat_s(dest, destlen, file, _TRUNCATE);
-		if (_GetFileAttributesW(dest) != INVALID_FILE_ATTRIBUTES) {
+		if (GetFileAttributesW(dest) != INVALID_FILE_ATTRIBUTES) {
 			// My Documents ÇÃê›íËÉtÉ@ÉCÉã
 			return dest;
 		}

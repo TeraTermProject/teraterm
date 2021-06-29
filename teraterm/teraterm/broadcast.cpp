@@ -47,7 +47,6 @@
 #include "ttlib.h"
 #include "dlglib.h"
 #include "tt_res.h"
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 #include "sendmem.h"
 //#include "clipboar.h"		// TODO 消す
@@ -231,7 +230,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 		default:
 			break;
 	}
-	return _CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
+	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
 static void UpdateBroadcastWindowList(HWND hWnd)
@@ -462,7 +461,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// サブクラス化させてリアルタイムモードにする (2008.1.21 yutaka)
 			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-			OrigBroadcastEditProc = (WNDPROC)_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
+			OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
@@ -537,7 +536,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					// new handler
 					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-					OrigBroadcastEditProc = (WNDPROC)_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
+					OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -548,7 +547,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
 					// restore old handler
-					_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
+					SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
@@ -576,7 +575,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							SetDlgItemTextA(hWnd, IDC_COMMAND_EDIT, "");
 						}
 						else {
-							UINT ret = _GetDlgItemTextW(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
+							UINT ret = GetDlgItemTextW(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
 							if (ret == 0) { // error
 								memset(buf, 0, sizeof(buf));
 							}

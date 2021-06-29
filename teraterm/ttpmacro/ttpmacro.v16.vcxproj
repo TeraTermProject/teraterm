@@ -152,7 +152,6 @@
     <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\dllutil.h" />
-    <ClInclude Include="..\common\layer_for_unicode.h" />
     <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />

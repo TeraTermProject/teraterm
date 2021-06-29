@@ -33,8 +33,6 @@
 #endif
 #include <crtdbg.h>
 
-#include "layer_for_unicode.h"
-
 #include "dllutil.h"
 
 typedef struct {
@@ -56,7 +54,7 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	int r;
 
 	if (LoadFlag == DLL_GET_MODULE_HANDLE) {
-		module = _GetModuleHandleW(dllName);
+		module = GetModuleHandleW(dllName);
 		assert(module != NULL);
 		return module;
 	}
@@ -75,12 +73,12 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	dllPath[0] = 0;
 	switch (LoadFlag) {
 	case DLL_LOAD_LIBRARY_SYSTEM:
-		r = _GetSystemDirectoryW(dllPath, _countof(dllPath));
+		r = GetSystemDirectoryW(dllPath, _countof(dllPath));
 		assert(r != 0);
 		if (r == 0) return NULL;
 		break;
 	case DLL_LOAD_LIBRARY_CURRENT:
-		r = _GetModuleFileNameW(NULL, dllPath, _countof(dllPath));
+		r = GetModuleFileNameW(NULL, dllPath, _countof(dllPath));
 		assert(r != 0);
 		if (r == 0) return NULL;
 		*wcsrchr(dllPath, L'\\') = 0;
@@ -90,7 +88,7 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	}
 	wcscat_s(dllPath, _countof(dllPath), L"\\");
 	wcscat_s(dllPath, _countof(dllPath), dllName);
-	module = _LoadLibraryW(dllPath);
+	module = LoadLibraryW(dllPath);
 	if (module == NULL) {
 		// ë∂ç›ÇµÇ»Ç¢,dllÇ∂Ç·Ç»Ç¢?
 		return NULL;

@@ -32,12 +32,12 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <wchar.h>
+#include <commctrl.h>
 
 #include "i18n.h"
 #include "tt_res.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "layer_for_unicode.h"
 #include "tttypes.h"		// for WM_USER_DLGHELP2
 #include "helpid.h"
 #include "codeconv.h"
@@ -177,7 +177,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				case IDOK | (BN_CLICKED << 16): {
 					wchar_t *strW = AllocControlTextW(GetDlgItem(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT));
 
-					const DWORD attr = _GetFileAttributesW(strW);
+					const DWORD attr = GetFileAttributesW(strW);
 					if (attr == INVALID_FILE_ATTRIBUTES || attr & FILE_ATTRIBUTE_DIRECTORY) {
 						static const TTMessageBoxInfoW mbinfo = {
 							"Tera Term",
@@ -218,7 +218,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 				case IDC_SENDFILE_FILENAME_BUTTON | (BN_CLICKED << 16): {
 					wchar_t TempDir[MAX_PATH];
-					_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+					GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
 					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFile);
 					wchar_t *title;
@@ -238,14 +238,14 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					ofn.nFilterIndex = 0;
 					ofn.lpstrTitle = title;
 					ofn.Flags = OFN_FILEMUSTEXIST | OFN_SHOWHELP | OFN_HIDEREADONLY;
-					BOOL Ok = _GetOpenFileNameW(&ofn);
+					BOOL Ok = GetOpenFileNameW(&ofn);
 					free(filterW);
 					free(title);
 
-					_SetCurrentDirectoryW(TempDir);
+					SetCurrentDirectoryW(TempDir);
 
 					if (Ok) {
-						_SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
+						SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
 						PostMessage(hDlgWnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hDlgWnd, IDOK), TRUE);
 					}
 
@@ -266,15 +266,15 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		case WM_DROPFILES: {
 			// ï°êîÉhÉçÉbÉvÇ≥ÇÍÇƒÇ‡ç≈èâÇÃ1Ç¬ÇæÇØÇàµÇ§
 			HDROP hDrop = (HDROP)wp;
-			const UINT len = _DragQueryFileW(hDrop, 0, NULL, 0);
+			const UINT len = DragQueryFileW(hDrop, 0, NULL, 0);
 			if (len == 0) {
 				DragFinish(hDrop);
 				return TRUE;
 			}
 			wchar_t *filename = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
-			_DragQueryFileW(hDrop, 0, filename, len + 1);
+			DragQueryFileW(hDrop, 0, filename, len + 1);
 			filename[len] = '\0';
-			_SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
+			SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
 			SendDlgItemMessage(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, EM_SETSEL, len, len);
 			PostMessage(hDlgWnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hDlgWnd, IDOK), TRUE);
 

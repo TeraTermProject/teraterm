@@ -46,7 +46,6 @@
 #include "ttl.h"
 #include "ttl_gui.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "ttlib.h"
 #include "dlglib.h"
 
@@ -177,11 +176,11 @@ WORD TTLFilenameBox()
 		BOOL ret;
 		if (SaveFlag) {
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-			ret = _GetSaveFileNameW(&ofn);
+			ret = GetSaveFileNameW(&ofn);
 		}
 		else {
 			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-			ret = _GetOpenFileNameW(&ofn);
+			ret = GetOpenFileNameW(&ofn);
 		}
 		free(FNFilter);
 		char *filenameU8 = ToU8W(filename);
@@ -214,7 +213,7 @@ WORD TTLGetPassword()
 
 	GetAbsPath(Str,sizeof(Str));
 
-	_GetPrivateProfileStringW(L"Password", (wc)Str2, L"",
+	GetPrivateProfileStringW(L"Password", (wc)Str2, L"",
 							  Temp, _countof(Temp), (wc)Str);
 	if (Temp[0]==0) // password not exist
 	{
@@ -225,7 +224,7 @@ WORD TTLGetPassword()
 		if (Temp2[0]!=0) {
 			char TempA[512];
 			Encrypt(Temp2, TempA);
-			if (_WritePrivateProfileStringW(L"Password", (wc)Str2, (wc)TempA, wc::fromUtf8(Str)) != 0) {
+			if (WritePrivateProfileStringW(L"Password", (wc)Str2, (wc)TempA, wc::fromUtf8(Str)) != 0) {
 				result = 1;  /* success */
 			}
 		}

@@ -37,7 +37,6 @@
 #include "i18n.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "layer_for_unicode.h"
 
 struct DrapDropDlgParam {
 	const wchar_t *TargetFilename;
@@ -93,7 +92,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
 
 		// target file
-		_SetDlgItemTextW(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
+		SetDlgItemTextW(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
 
 		// checkbox
 		CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO,

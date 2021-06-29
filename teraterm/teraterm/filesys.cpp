@@ -39,7 +39,6 @@
 #include "ttcommon.h"
 #include "ttdde.h"
 #include "vtterm.h"
-#include "layer_for_unicode.h"
 #include "asprintf.h"
 #include "codeconv.h"
 
@@ -198,7 +197,7 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 	SendVar->FullName = _wcsdup(filename);
 	ts.TransBin = binary;
 
-	SendVar->FileHandle = _CreateFileW(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
+	SendVar->FileHandle = CreateFileW(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
 									   OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	if (SendVar->FileHandle == INVALID_HANDLE_VALUE) {
 		FileSendEnd();

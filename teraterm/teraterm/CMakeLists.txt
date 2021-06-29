@@ -138,7 +138,6 @@ target_sources(
   ../common/dllutil.h
   ../common/codeconv.h
   ../common/tipwin.h
-  ../common/layer_for_unicode.h
   #
   ../teraterm/unisym2decsp.map
   ../teraterm/uni2sjis.map
@@ -286,7 +285,6 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  #ttpfile
   ttpset
   ttptek
   ${ONIGURUMA_LIB}

@@ -41,7 +41,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "compat_win.h"
-#include "layer_for_unicode.h"
 
 #include "../teraterm/unicode_test.h"
 
@@ -285,7 +284,7 @@ void OutputDebugPrintfW(const wchar_t *fmt, ...)
 	va_start(arg, fmt);
 	_vsnwprintf_s(tmp, _countof(tmp), _TRUNCATE, fmt, arg);
 	va_end(arg);
-	_OutputDebugStringW(tmp);
+	OutputDebugStringW(tmp);
 }
 
 static int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
@@ -328,10 +327,10 @@ BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, 
 	bi.lpfn = setDefaultFolder;
 	bi.lParam = (LPARAM)def;
 	// フォルダ選択ダイアログの表示
-	pidlBrowse = _SHBrowseForFolderW(&bi);
+	pidlBrowse = SHBrowseForFolderW(&bi);
 	if (pidlBrowse != NULL) {
 		// PIDL形式の戻り値のファイルシステムのパスに変換
-		if (_SHGetPathFromIDListW(pidlBrowse, buf)) {
+		if (SHGetPathFromIDListW(pidlBrowse, buf)) {
 			// 取得成功
 			wcsncpy_s(path, pathlen, buf, _TRUNCATE);
 			ret = TRUE;

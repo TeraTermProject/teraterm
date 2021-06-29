@@ -46,7 +46,6 @@
 #include "tt_res.h"
 #include "servicenames.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "win32helper.h"
 
 #define DllExport __declspec(dllexport)
@@ -172,7 +171,7 @@ DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const ch
 	wchar_t *defW = ToWcharA(defA);
 	DWORD lenW_max = size;
 	wchar_t *strW = malloc(sizeof(wchar_t) * lenW_max);
-	DWORD lenW = _GetPrivateProfileStringW(appW, keyW, defW, strW, lenW_max, filenameW);
+	DWORD lenW = GetPrivateProfileStringW(appW, keyW, defW, strW, lenW_max, filenameW);
 	free(appW);
 	free(keyW);
 	free(defW);
@@ -202,7 +201,7 @@ BOOL WritePrivateProfileStringAFileW(const char *appA, const char *keyA, const c
 	wchar_t *appW = ToWcharA(appA);
 	wchar_t *keyW = ToWcharA(keyA);
 	wchar_t *strW = ToWcharA(strA);
-	BOOL r = _WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+	BOOL r = WritePrivateProfileStringW(appW, keyW, strW, filenameW);
 	free(appW);
 	free(keyW);
 	free(strW);
@@ -216,7 +215,7 @@ UINT GetPrivateProfileIntFileW(const char *appA, const char *keyA, int def, cons
 {
 	wchar_t *appW = ToWcharA(appA);
 	wchar_t *keyW = ToWcharA(keyA);
-	UINT r = _GetPrivateProfileIntW(appW, keyW, def, filenameW);
+	UINT r = GetPrivateProfileIntW(appW, keyW, def, filenameW);
 	free(appW);
 	free(keyW);
 	return r;

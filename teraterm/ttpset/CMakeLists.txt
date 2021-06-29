@@ -70,8 +70,6 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  #
-  gdi32
   )
 
 install(

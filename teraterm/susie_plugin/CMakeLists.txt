@@ -33,12 +33,6 @@ target_include_directories(
   .
   )
 
-target_compile_definitions(
-  spi_tester
-  PRIVATE
-  WITHOUT_TERATERM
-  )
-
 add_library(
   ttspijpeg SHARED
   plugin/spi_jpeg.cpp

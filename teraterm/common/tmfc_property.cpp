@@ -36,7 +36,6 @@
 #include <assert.h>
 #include "dlglib.h"
 #include "ttlib.h"
-#include "layer_for_unicode.h"
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
@@ -65,7 +64,7 @@ TTCPropertyPage::~TTCPropertyPage()
 
 HPROPSHEETPAGE TTCPropertyPage::CreatePropertySheetPage()
 {
-	return ::_CreatePropertySheetPageW(&m_psp);
+	return ::CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&m_psp);
 }
 
 void TTCPropertyPage::OnInitDialog()
@@ -132,4 +131,3 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 	}
 	return FALSE;
 }
-

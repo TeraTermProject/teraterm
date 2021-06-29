@@ -36,7 +36,6 @@
 #include "filesys_win32.h"
 
 #include "tttypes.h"
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 #include "ftlib.h"
 
@@ -61,7 +60,7 @@ static BOOL _OpenRead(TFileIO *fv, const char *filename)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
 	wc filenameW = GetFilenameW(data, filename);
-	HANDLE hFile = _CreateFileW(filenameW,
+	HANDLE hFile = CreateFileW(filenameW,
 							   GENERIC_READ, FILE_SHARE_READ, NULL,
 							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
@@ -76,9 +75,9 @@ static BOOL _OpenWrite(TFileIO *fv, const char *filename)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
 	wc filenameW = GetFilenameW(data, filename);
-	HANDLE hFile = _CreateFileW(filenameW,
-								GENERIC_WRITE, 0, NULL,
-								CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileW(filenameW,
+							   GENERIC_WRITE, 0, NULL,
+							   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;

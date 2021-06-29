@@ -47,28 +47,60 @@
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
+
+#if 0
+// TODO ‰½‚Æ‚©‚·‚é
+typedef struct {
+	DWORD cbSize;
+	HWND hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	HICON hIcon;
+	wchar_t	 szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	wchar_t	 szInfo[256];
+	union {
+		UINT  uTimeout;
+		UINT  uVersion;	 // used with NIM_SETVERSION, values 0, 3 and 4
+	} DUMMYUNIONNAME;
+	wchar_t	 szInfoTitle[64];
+	DWORD dwInfoFlags;
+	//GUID guidItem;		// XP+
+	//HICON hBalloonIcon;	// Vista+
+} TT_NOTIFYICONDATAW_V2;
+#endif
 
 typedef struct {
-	TT_NOTIFYICONDATAW_V2 notify_icon;
+//	TT_NOTIFYICONDATAW_V2 notify_icon;
+	NOTIFYICONDATAW notify_icon;
 	int NotifyIconShowCount;
 	HICON CustomIcon;
 } NotifyIcon;
+
+#define TT_NOTIFYICONDATAW_V2 NOTIFYICONDATAW
 
 static NotifyIcon *NotifyCreate(HWND hWnd, HICON icon, UINT msg)
 {
 	NotifyIcon *ni = (NotifyIcon *)malloc(sizeof(NotifyIcon));
 	memset(ni, 0, sizeof(*ni));
 
-	TT_NOTIFYICONDATAW_V2 *p = &ni->notify_icon;
+	NOTIFYICONDATAW *p = &ni->notify_icon;
+#if	(_MSC_VER > 1400)
+	// VS2008+
+	p->cbSize = offsetof(NOTIFYICONDATAW, guidItem);
+#else
+	// VS2005
 	p->cbSize = sizeof(*p);
+#endif
 	p->hWnd = hWnd;
 	p->uID = 1;
 	p->uFlags = NIF_ICON | NIF_MESSAGE;
 	p->uCallbackMessage = msg;
 	p->hIcon = icon;
 
-	_Shell_NotifyIconW(NIM_ADD, p);
+	Shell_NotifyIconW(NIM_ADD, p);
 
 	ni->NotifyIconShowCount = 0;
 
@@ -78,7 +110,7 @@ static NotifyIcon *NotifyCreate(HWND hWnd, HICON icon, UINT msg)
 static void NotifyDelete(NotifyIcon *ni)
 {
 	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-	_Shell_NotifyIconW(NIM_DELETE, NotifyIcon);
+	Shell_NotifyIconW(NIM_DELETE, NotifyIcon);
 	ni->NotifyIconShowCount = 0;
 }
 
@@ -88,7 +120,7 @@ static void NotifyShowIcon(NotifyIcon *ni)
 	NotifyIcon->uFlags = NIF_STATE;
 	NotifyIcon->dwState = 0;
 	NotifyIcon->dwStateMask = NIS_HIDDEN;
-	_Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
+	Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
 	ni->NotifyIconShowCount += 1;
 }
 
@@ -102,7 +134,7 @@ static void NotifyHide(NotifyIcon *ni)
 		NotifyIcon->uFlags = NIF_STATE;
 		NotifyIcon->dwState = NIS_HIDDEN;
 		NotifyIcon->dwStateMask = NIS_HIDDEN;
-		_Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
+		Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
 		ni->NotifyIconShowCount = 0;
 	}
 }
@@ -111,7 +143,7 @@ static void NotifySetVersion(NotifyIcon *ni, unsigned int ver)
 {
 	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
 	NotifyIcon->uVersion = ver;
-	_Shell_NotifyIconW(NIM_SETVERSION, NotifyIcon);
+	Shell_NotifyIconW(NIM_SETVERSION, NotifyIcon);
 }
 
 static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag)
@@ -140,7 +172,7 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 
 	wcsncpy_s(NotifyIcon->szInfo, _countof(NotifyIcon->szInfo), msg, _TRUNCATE);
 
-	_Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
+	Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
 
 	ni->NotifyIconShowCount += 1;
 }

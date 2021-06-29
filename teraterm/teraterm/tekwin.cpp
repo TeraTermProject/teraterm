@@ -46,7 +46,6 @@
 #include "ttlib.h"
 #include <htmlhelp.h>
 #include "dlglib.h"
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 
 #define TEKClassName L"TEKWin32"
@@ -86,7 +85,7 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = TEKClassName;
 
-	_RegisterClassW(&wc);
+	RegisterClassW(&wc);
 
 	if (ts.TEKPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;

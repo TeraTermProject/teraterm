@@ -51,7 +51,6 @@
 #include "tipwin.h"
 #include "i18n.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "coding_pp.h"
 #include "font_pp.h"
 
@@ -530,7 +529,7 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				ofn.nMaxFile = _countof(fileW);
 				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				BOOL ok = _GetOpenFileNameW(&ofn);
+				BOOL ok = GetOpenFileNameW(&ofn);
 				if (ok) {
 					char *file = ToCharW(fileW);
 					strncpy_s(ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile), file, _TRUNCATE);
@@ -953,7 +952,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				ofn.nMaxFile = _countof(szFile);
 				ofn.lpstrTitle = L"select image file";
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				BOOL ok = _GetOpenFileNameW(&ofn);
+				BOOL ok = GetOpenFileNameW(&ofn);
 				if (ok) {
 					SetDlgItemTextW(IDC_BGIMG_EDIT, szFile);
 				}
@@ -1406,7 +1405,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				ofn.nMaxFile = _countof(fileW);
 				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", ts.UILanguageFile);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				BOOL ok = _GetOpenFileNameW(&ofn);
+				BOOL ok = GetOpenFileNameW(&ofn);
 				if (ok) {
 					char *file = ToCharW(fileW);
 					strncpy_s(ts.ViewlogEditor, sizeof(ts.ViewlogEditor), file, _TRUNCATE);
@@ -1797,5 +1796,5 @@ INT_PTR CAddSettingPropSheetDlg::DoModal()
 {
 	ghInstance = m_hInst;
 	gTTCPS = this;
-	return _PropertySheetW(&m_psh);
+	return PropertySheetW(&m_psh);
 }

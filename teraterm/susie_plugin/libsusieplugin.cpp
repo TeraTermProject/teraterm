@@ -28,16 +28,6 @@
 
 #include "libsusieplugin.h"
 
-#if !defined(WITHOUT_TERATERM)
-#include "layer_for_unicode.h"
-#define CreateFileW _CreateFileW
-#define GetFileAttributesW _GetFileAttributesW
-#define GetFullPathNameW _GetFullPathNameW
-#define FindFirstFileW _FindFirstFileW
-#define FindNextFileW _FindNextFileW
-#define LoadLibraryW _LoadLibraryW
-#endif
-
 #if defined(_M_X64)
 #define PLUGIN_EXT	L".sph"
 #else

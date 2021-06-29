@@ -55,7 +55,6 @@ See LICENSE.TXT for the license.
 #include <memory.h>
 
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "asprintf.h"
 
 #undef DialogBoxParam
@@ -837,7 +836,7 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 
 		// 該当する鍵が見つかったら、コールバック関数を呼び出す。
 		if (key != NULL) {
-			if (callback(key, ctx) == 0) 
+			if (callback(key, ctx) == 0)
 				key_free(key);
 		}
 	}
@@ -994,11 +993,11 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 	wchar_t *hostW;
 
 	// ホスト名に置換する
-	_GetDlgItemTextW(dlg, IDC_HOSTWARNING, buf, _countof(buf));
+	GetDlgItemTextW(dlg, IDC_HOSTWARNING, buf, _countof(buf));
 	hostW = ToWcharA(pvar->hosts_state.prefetched_hostname);
 	aswprintf(&buf2, buf, hostW);
 	free(hostW);
-	_SetDlgItemTextW(dlg, IDC_HOSTWARNING, buf2);
+	SetDlgItemTextW(dlg, IDC_HOSTWARNING, buf2);
 	free(buf2);
 
 	pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
@@ -1112,7 +1111,7 @@ static char *format_host_key(PTInstVar pvar)
 			// setup
 			if (pvar->ssh_state.tcpport == 22) {
 				_snprintf_s(result, msize, _TRUNCATE, "%s %s %s\r\n",
-				            pvar->hosts_state.prefetched_hostname, 
+				            pvar->hosts_state.prefetched_hostname,
 				            get_ssh2_hostkey_type_name_from_key(key),
 				            uu);
 			} else {
@@ -1804,7 +1803,7 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-		// add host check boxにチェックをデフォルトで入れておく 
+		// add host check boxにチェックをデフォルトで入れておく
 		SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
 		CenterWindow(dlg, GetParent(dlg));
@@ -2269,7 +2268,7 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
  * 必要に応じて known_hosts ダイアログを呼び出す。
  *
  *   hostname: 接続先のホスト名
- *   tcpport: 接続先ポート番号 
+ *   tcpport: 接続先ポート番号
  *   key: サーバからの公開鍵
  *
  * return:
@@ -2290,7 +2289,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 	 && _stricmp(pvar->hosts_state.prefetched_hostname, hostname) == 0
 	 && HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key) == 1) {
 
-		 // 何もせずに戻る。		
+		 // 何もせずに戻る。
 		 return TRUE;
 	}
 
@@ -2335,7 +2334,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 
 	// "/nosecuritywarning"が指定されている場合、ダイアログを表示させずに return success する。
 	if (pvar->nocheck_known_hosts == TRUE) {
-		 // 何もせずに戻る。		
+		 // 何もせずに戻る。
 		return TRUE;
 	}
 
@@ -2370,8 +2369,8 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 
 	PostMessage(pvar->NotificationWindow, WM_COMMAND, id, 0);
 
-	logprintf(LOG_LEVEL_INFO, "Calling known_hosts dialog...(%s)", 
-		id == ID_SSHDIFFERENTKEY ? "SSHDIFFERENTKEY" : 
+	logprintf(LOG_LEVEL_INFO, "Calling known_hosts dialog...(%s)",
+		id == ID_SSHDIFFERENTKEY ? "SSHDIFFERENTKEY" :
 		id == ID_SSHDIFFERENT_TYPE_KEY ? "SSHDIFFERENT_TYPE_KEY" : "SSHUNKNOWNHOST"
 		);
 

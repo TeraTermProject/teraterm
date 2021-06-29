@@ -66,7 +66,6 @@
 
 #include "ttlib.h"		// for GetMessageboxFont()
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 
 #include "tipwin.h"
 
@@ -91,8 +90,8 @@ VOID CTipWin::CalcStrRect(VOID)
 	SelectObject(hdc, tWin->tip_font);
 	tWin->str_rect.top = 0;
 	tWin->str_rect.left = 0;
-	_DrawTextW(hdc, tWin->str, (int)tWin->str_len,
-			   &tWin->str_rect, DT_LEFT|DT_CALCRECT);
+	DrawTextW(hdc, tWin->str, (int)tWin->str_len,
+			  &tWin->str_rect, DT_LEFT|DT_CALCRECT);
 	DeleteDC(hdc);
 }
 
@@ -141,7 +140,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 					rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
 					rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
 					rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
-					_DrawTextW(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT);
+					DrawTextW(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT);
 				}
 
 				SelectObject(hdc, holdbr);
@@ -202,7 +201,7 @@ ATOM CTipWin::RegisterClass()
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = class_name;
-	return _RegisterClassW(&wc);
+	return RegisterClassW(&wc);
 }
 
 VOID CTipWin::Create(HWND pHwnd)
@@ -232,12 +231,12 @@ VOID CTipWin::Create(HWND pHwnd)
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
 	tWin->tip_font = CreateFontIndirect(&logfont);
 	tWin->tip_wnd =
-		_CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-						 class_name,
-						 NULL, WS_POPUP,
-						 0, 0,
-						 0, 0,
-						 pHwnd, NULL, hInstance, this);
+		CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
+						class_name,
+						NULL, WS_POPUP,
+						0, 0,
+						0, 0,
+						pHwnd, NULL, hInstance, this);
 	timerid = 0;
 }
 
@@ -450,7 +449,7 @@ void TipWinGetTextWidthHeightW(HWND src, const wchar_t *str, int *width, int *he
 	SelectObject(hdc, tip_font);
 	str_rect.top = 0;
 	str_rect.left = 0;
-	_DrawTextW(hdc, str, (int)str_len, &str_rect, DT_LEFT|DT_CALCRECT);
+	DrawTextW(hdc, str, (int)str_len, &str_rect, DT_LEFT|DT_CALCRECT);
 	*width = str_rect.right - str_rect.left;
 	*height = str_rect.bottom - str_rect.top;
 	DeleteDC(hdc);

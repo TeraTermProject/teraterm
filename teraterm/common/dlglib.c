@@ -42,7 +42,6 @@
 #include <crtdbg.h>
 #include <wchar.h>
 #include "ttlib.h"	// for get_lang_font()
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
@@ -262,9 +261,9 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 					case 0x50: // Ctrl+p ... up
 						if (data->IsComboBox) {
 							HWND parent = GetParent(dlg);
-							select = (DWORD)_SendMessageW(parent, CB_GETCURSEL, 0, 0);
+							select = (DWORD)SendMessageW(parent, CB_GETCURSEL, 0, 0);
 							if (select == CB_ERR) {
-								max = (DWORD)_SendMessageW(parent, CB_GETCOUNT, 0, 0);
+								max = (DWORD)SendMessageW(parent, CB_GETCOUNT, 0, 0);
 								PostMessageW(parent, CB_SETCURSEL, max - 1, 0);
 							}
 							else if (select > 0) {
@@ -276,8 +275,8 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 					case 0x4e: // Ctrl+n ... down
 						if (data->IsComboBox) {
 							HWND parent = GetParent(dlg);
-							max = (DWORD)_SendMessageW(parent, CB_GETCOUNT, 0, 0);
-							select = (DWORD)_SendMessageW(parent, CB_GETCURSEL, 0, 0);
+							max = (DWORD)SendMessageW(parent, CB_GETCOUNT, 0, 0);
+							select = (DWORD)SendMessageW(parent, CB_GETCURSEL, 0, 0);
 							if (select == CB_ERR) {
 								PostMessageW(parent, CB_SETCURSEL, 0, 0);
 							} else if (select < max - 1) {
@@ -288,16 +287,16 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						break;
 					case 0x42: {
 						// Ctrl+b ... left
-						_SendMessageW(dlg, EM_GETSEL, 0, (LPARAM)&select);
+						SendMessageW(dlg, EM_GETSEL, 0, (LPARAM)&select);
 						if (select > 0) {
 							wchar_t *str;
-							max = _GetWindowTextLengthW(dlg);
+							max = GetWindowTextLengthW(dlg);
 							max++; // '\0'
 							str = (wchar_t *)malloc(sizeof(wchar_t) * max);
 							if (str == NULL) {
 								return 0;
 							}
-							_GetWindowTextW(dlg, str, (int)max);
+							GetWindowTextW(dlg, str, (int)max);
 							select = select - 1;
 							if (IsLowSurrogate(str[select])) {
 								select = select - 1;
@@ -309,8 +308,8 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 					}
 					case 0x46: {
 						// Ctrl+f ... right
-						_SendMessageW(dlg, EM_GETSEL, 0, (LPARAM)&select);
-						max = _GetWindowTextLengthW(dlg);
+						SendMessageW(dlg, EM_GETSEL, 0, (LPARAM)&select);
+						max = GetWindowTextLengthW(dlg);
 						if (select < max) {
 							wchar_t *str;
 							max++; // '\0'
@@ -318,7 +317,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 							if (str == NULL) {
 								return 0;
 							}
-							_GetWindowTextW(dlg, str, (int)max);
+							GetWindowTextW(dlg, str, (int)max);
 							select = select + 1;
 							if (IsLowSurrogate(str[select])) {
 								select = select + 1;
@@ -332,7 +331,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						PostMessageW(dlg, EM_SETSEL, 0, 0);
 						return 0;
 					case 0x45: // Ctrl+e ... end
-						max = _GetWindowTextLengthW(dlg) ;
+						max = GetWindowTextLengthW(dlg) ;
 						PostMessageW(dlg, EM_SETSEL, max, max);
 						return 0;
 
@@ -341,12 +340,12 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 					case 0x55: {
 						// Ctrl+u
 						wchar_t *str, *orgstr;
-						_SendMessageW(dlg, EM_GETSEL, 0, (LPARAM)&select);
-						max = _GetWindowTextLengthW(dlg);
+						SendMessageW(dlg, EM_GETSEL, 0, (LPARAM)&select);
+						max = GetWindowTextLengthW(dlg);
 						max++; // '\0'
 						orgstr = str = (wchar_t *)malloc(sizeof(wchar_t) * max);
 						if (str != NULL) {
-							len = _GetWindowTextW(dlg, str, (int)max);
+							len = GetWindowTextW(dlg, str, (int)max);
 							if (select < len) {
 								if (wParam == 0x44) { // Ctrl+d カーソル配下の文字のみを削除する
 									wmemmove(&str[select], &str[select + 1], len - select - 1);
@@ -367,8 +366,8 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 								select = 0;
 							}
 
-							_SetWindowTextW(dlg, str);
-							_SendMessageW(dlg, EM_SETSEL, select, select);
+							SetWindowTextW(dlg, str);
+							SendMessageW(dlg, EM_SETSEL, select, select);
 							free(orgstr);
 							return 0;
 						}
@@ -397,17 +396,17 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 			break;
 	}
 
-	_SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
+	SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
-	Result = _CallWindowProcW(data->OrigProc, dlg, msg, wParam, lParam);
+	Result = CallWindowProcW(data->OrigProc, dlg, msg, wParam, lParam);
 	data->OrigProc = (WNDPROC)GetWindowLongPtr(dlg, GWLP_WNDPROC);
 	data->OrigUser = GetWindowLongPtr(dlg, GWLP_USERDATA);
-	_SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data);
 
 	switch (msg) {
 		case WM_NCDESTROY:
-			_SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
+			SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 			SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
 			free(data);
 			break;
@@ -434,10 +433,10 @@ void SetEditboxEmacsKeybind(HWND hDlg, int nID)
 		IsCombobox = TRUE;
 	}
 	data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
-	data->OrigProc = (WNDPROC)_GetWindowLongPtrW(hWndEdit, GWLP_WNDPROC);
+	data->OrigProc = (WNDPROC)GetWindowLongPtrW(hWndEdit, GWLP_WNDPROC);
 	data->OrigUser = (LONG_PTR)GetWindowLongPtr(hWndEdit, GWLP_USERDATA);
 	data->IsComboBox = IsCombobox;
-	_SetWindowLongPtrW(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLongPtrW(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
 }
 
@@ -505,7 +504,7 @@ wchar_t *AllocControlTextW(HWND hWnd)
 		return NULL;
 	}
 
-	_GetWindowTextW(hWnd, strW, len + 1);
+	GetWindowTextW(hWnd, strW, len + 1);
 	strW[len] = 0;
 	return strW;
 }

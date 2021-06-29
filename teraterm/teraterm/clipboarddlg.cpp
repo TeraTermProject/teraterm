@@ -41,7 +41,6 @@
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "layer_for_unicode.h"
 #include "tt_res.h"
 #include "clipboarddlg.h"
 #include "compat_win.h"
@@ -92,7 +91,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
 
 			if (data->strW_ptr != NULL) {
-				_SetDlgItemTextW(hDlgWnd, IDC_EDIT, data->strW_ptr);
+				SetDlgItemTextW(hDlgWnd, IDC_EDIT, data->strW_ptr);
 			} else {
 				SetDlgItemTextA(hDlgWnd, IDC_EDIT, data->strA_ptr);
 			}
@@ -184,11 +183,11 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				{
 					INT_PTR result = IDCANCEL;
 
-					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_EDIT, WM_GETTEXTLENGTH, 0, 0);
+					size_t len = SendDlgItemMessageW(hDlgWnd, IDC_EDIT, WM_GETTEXTLENGTH, 0, 0);
 					len++; // for '\0'
 					wchar_t *strW = (wchar_t *)malloc(sizeof(wchar_t) * len);
 					if (strW != NULL) {
-						_GetDlgItemTextW(hDlgWnd, IDC_EDIT, strW, (int)len);
+						GetDlgItemTextW(hDlgWnd, IDC_EDIT, strW, (int)len);
 						strW[len - 1] = '\0';
 						result = IDOK;
 					}

@@ -249,18 +249,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\layer_for_unicode.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\layer_for_unicode.h"
-			>
-		</File>
-		<File
-			RelativePath=".\layer_for_unicode_comctl32.cpp"
-			>
-		</File>
-		<File
 			RelativePath=".\layer_for_unicode_crt.cpp"
 			>
 		</File>

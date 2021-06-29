@@ -52,7 +52,6 @@
 #include "dlglib.h"
 #include "teraterml.h"
 #include "sendmem.h"
-#include "layer_for_unicode.h"
 #include "ttdebug.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
@@ -71,7 +70,7 @@ static void LoadSpecialFont()
 		return;
 	}
 
-	if (_GetModuleFileNameW(NULL, TSpecialFont, _countof(TSpecialFont)) == 0) {
+	if (GetModuleFileNameW(NULL, TSpecialFont, _countof(TSpecialFont)) == 0) {
 		AddFontFlag = FALSE;
 		return;
 	}
@@ -88,7 +87,7 @@ static void LoadSpecialFont()
 		// AddFontResourceEx() が使えなかった
 		// システム全体で使えるフォントとなる
 		// removeしないとOSが掴んだままとなる
-		r = _AddFontResourceW(TSpecialFont);
+		r = AddFontResourceW(TSpecialFont);
 	}
 	if (r != 0) {
 		AddFontFlag = TRUE;
@@ -105,7 +104,7 @@ static void UnloadSpecialFont()
 		r = pRemoveFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
 	}
 	if (r == 0) {
-		_RemoveFontResourceW(TSpecialFont);
+		RemoveFontResourceW(TSpecialFont);
 	}
 }
 

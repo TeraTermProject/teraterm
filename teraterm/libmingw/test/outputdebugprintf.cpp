@@ -3,7 +3,6 @@
 #include <windows.h>
 
 #include "ttlib.h"
-#include "layer_for_unicode.h"
 #include "compat_win.h"
 
 void OutputDebugPrintf(const char *fmt, ...)
@@ -23,5 +22,5 @@ void OutputDebugPrintfW(const wchar_t *fmt, ...)
 	va_start(arg, fmt);
 	_vsnwprintf_s(tmp, _countof(tmp), _TRUNCATE, fmt, arg);
 	va_end(arg);
-	_OutputDebugStringW(tmp);
+	OutputDebugStringW(tmp);
 }

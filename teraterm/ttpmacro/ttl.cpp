@@ -63,7 +63,6 @@
 #include "win16api.h"
 #include "ttl_gui.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "dllutil.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
@@ -1071,7 +1070,7 @@ WORD TTLExec()
 	if (CurDir[0] != 0) {
 		pCurdirW = CurDirW;
 	}
-	bRet = _CreateProcessW(NULL, (LPWSTR)pStrW, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, pCurdirW, &sui, &pi);
+	bRet = CreateProcessW(NULL, (LPWSTR)pStrW, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, pCurdirW, &sui, &pi);
 	if (bRet == FALSE) {
 		// 実行できなかった場合、resultに-1を返す
 		SetResult(-1);
@@ -1207,9 +1206,9 @@ WORD TTLFileConcat()
 	}
 
 	wc FName1W = wc::fromUtf8(FName1);
-	HANDLE FH1 = _CreateFileW(FName1W,
-							  GENERIC_WRITE, 0, NULL,
-							  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE FH1 = CreateFileW(FName1W,
+							 GENERIC_WRITE, 0, NULL,
+							 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH1 == INVALID_HANDLE_VALUE) {
 		SetResult(3);
 		return Err;
@@ -1218,9 +1217,9 @@ WORD TTLFileConcat()
 
 	int result = 0;
 	wc FName2W = wc::fromUtf8(FName2);
-	HANDLE FH2 = _CreateFileW(FName2W,
-							  GENERIC_READ, FILE_SHARE_READ, NULL,
-							  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE FH2 = CreateFileW(FName2W,
+							 GENERIC_READ, FILE_SHARE_READ, NULL,
+							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH2 != INVALID_HANDLE_VALUE)
 	{
 		DWORD c;
@@ -1281,7 +1280,7 @@ WORD TTLFileCopy()
 		return Err;
 	}
 
-	ret = _CopyFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2), FALSE);
+	ret = CopyFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2), FALSE);
 	if (ret == 0) {
 		SetResult(-4);
 		return Err;
@@ -1318,9 +1317,9 @@ WORD TTLFileCreate()
 	wc FNameW = wc::fromUtf8(FName);
 	// TTL のファイルハンドルは filelock でロックするので、
 	// dwShareMode での共有モードは Read/Write とも有効にする。
-	FH = _CreateFileW(FNameW,
-					  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-					  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	FH = CreateFileW(FNameW,
+					 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+					 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
 	}
@@ -1355,7 +1354,7 @@ WORD TTLFileDelete()
 		return Err;
 	}
 
-	if (_DeleteFileW(wc::fromUtf8(FName)) == 0) {
+	if (DeleteFileW(wc::fromUtf8(FName)) == 0) {
 		SetResult(-1);
 	}
 	else {
@@ -1415,18 +1414,18 @@ WORD TTLFileOpen()
 
 	wc FNameW = wc::fromUtf8(FName);
 	if (ReadonlyFlag) {
-		FH = _CreateFileW(FNameW,
-						  GENERIC_READ, FILE_SHARE_READ, NULL,
-						  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		FH = CreateFileW(FNameW,
+						 GENERIC_READ, FILE_SHARE_READ, NULL,
+						 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	else {
 		// ファイルをオープンする。
 		// 存在しない場合は作成した後オープンする。
 		// TTL のファイルハンドルは filelock でロックするので、
 		// dwShareMode での共有モードは Read/Write とも有効にする。
-		FH = _CreateFileW(FNameW,
-						  GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-						  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		FH = CreateFileW(FNameW,
+						 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+						 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
@@ -1647,7 +1646,7 @@ WORD TTLFileRename()
 		SetResult(-2);
 		return Err;
 	}
-	if (_MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) == 0) {
+	if (MoveFileW(wc::fromUtf8(FName1), wc::fromUtf8(FName2)) == 0) {
 		// リネームに失敗したら、エラーで返す。
 		SetResult(-3);
 		return Err;
@@ -1670,7 +1669,7 @@ WORD TTLFileSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	DWORD attr = _GetFileAttributesW(wc::fromUtf8(FName));
+	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
 	if (attr != INVALID_FILE_ATTRIBUTES)
 		// exists file or folder
 		SetResult(1);
@@ -1748,8 +1747,8 @@ WORD TTLFileStat()
 		goto end;
 	}
 
-	hFile = _CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-							   FILE_ATTRIBUTE_NORMAL, NULL);
+	hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+						FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
 	}
@@ -1943,7 +1942,7 @@ WORD TTLFileTruncate()
 	Err = 0;
 
 	// ファイルオープン、存在しない場合は新規作成
-	hFile = _CreateFileW(wc::fromUtf8(FName), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	hFile = CreateFileW(wc::fromUtf8(FName), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		goto end;
 	}
@@ -2055,7 +2054,7 @@ WORD TTLFindFirst()
 		i++;
 	if (i<NumDirHandle)
 	{
-		DirHandle[i] = _FindFirstFileW(wc::fromUtf8(Dir),&data);
+		DirHandle[i] = FindFirstFileW(wc::fromUtf8(Dir),&data);
 		if (DirHandle[i]!= INVALID_HANDLE_VALUE)
 			SetStrVal(Name,(u8)data.cFileName);
 		else
@@ -2091,7 +2090,7 @@ WORD TTLFindNext()
 
 	if ((DH>=0) && (DH<NumDirHandle) &&
 	    (DirHandle[DH]!= INVALID_HANDLE_VALUE) &&
-	    (_FindNextFileW(DirHandle[DH],&data) != FALSE))
+	    (FindNextFileW(DirHandle[DH],&data) != FALSE))
 	{
 		SetStrVal(Name,(u8)data.cFileName);
 		SetResult(1);
@@ -2160,7 +2159,7 @@ WORD TTLFolderDelete()
 		return Err;
 	}
 
-	if (_RemoveDirectoryW(wc::fromUtf8(FName)) == 0) {
+	if (RemoveDirectoryW(wc::fromUtf8(FName)) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2182,7 +2181,7 @@ WORD TTLFolderSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	DWORD attr = _GetFileAttributesW(wc::fromUtf8(FName));
+	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
 	if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		SetResult(1);
 	}
@@ -2282,7 +2281,7 @@ WORD TTLGetFileAttr()
 	if (Err!=0) return Err;
 
 	GetAbsPath(Filename, sizeof(Filename));
-	SetResult(_GetFileAttributesW(wc::fromUtf8(Filename)));
+	SetResult(GetFileAttributesW(wc::fromUtf8(Filename)));
 
 	return Err;
 }

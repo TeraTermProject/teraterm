@@ -50,8 +50,6 @@
 #include "ftlib.h"
 #include "buffer.h"
 #include "helpid.h"
-#include "layer_for_unicode.h"
-#include "layer_for_unicode_crt.h"
 #include "codeconv.h"
 #include "asprintf.h"
 
@@ -362,13 +360,13 @@ static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
 	*bom = 0;
 
 	// ファイルが存在する?
-	DWORD logdir = _GetFileAttributesW(filename);
+	DWORD logdir = GetFileAttributesW(filename);
 	if ((logdir != INVALID_FILE_ATTRIBUTES) && ((logdir & FILE_ATTRIBUTE_DIRECTORY) == 0)) {
 		// ファイルがあった
 		*exist = TRUE;
 
 		// BOM有り/無しチェック
-		FILE *fp = __wfopen(filename, L"rb");
+		FILE *fp = _wfopen(filename, L"rb");
 		if (fp != NULL) {
 			unsigned char tmp[4];
 			size_t l = fread(tmp, 1, sizeof(tmp), fp);
@@ -504,7 +502,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16BE");
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
 
-		_SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
+		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
 		work->info->filename = NULL;
 
 		// Binary/Text チェックボックス
@@ -562,7 +560,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			wchar_t filename[MAX_PATH];
-			_GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
+			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
 			work->info->filename = _wcsdup(filename);
 			work->info->append = IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED;
 			work->info->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
@@ -581,7 +579,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			/* save current dir */
 			const char *UILanguageFile = work->pts->UILanguageFile;
 			wchar_t curdir[MAXPATHLEN];
-			_GetCurrentDirectoryW(_countof(curdir), curdir);
+			GetCurrentDirectoryW(_countof(curdir), curdir);
 
 			wchar_t fname[MAX_PATH];
 			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
@@ -606,14 +604,14 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.lpstrFile = fname;
 			ofn.nMaxFile = _countof(fname);
 			ofn.lpstrTitle = caption;
-			BOOL Ok = _GetSaveFileNameW(&ofn);
+			BOOL Ok = GetSaveFileNameW(&ofn);
 			free(FNFilter);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
 			}
 
 			/* restore dir */
-			_SetCurrentDirectoryW(curdir);
+			SetCurrentDirectoryW(curdir);
 
 			break;
 		}
@@ -658,16 +656,16 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	case WM_DROPFILES: {
 		// 複数ドロップされても最初の1つだけを扱う
 		HDROP hDrop = (HDROP)wParam;
-		const UINT len = _DragQueryFileW(hDrop, 0, NULL, 0);
+		const UINT len = DragQueryFileW(hDrop, 0, NULL, 0);
 		if (len == 0) {
 			DragFinish(hDrop);
 			return TRUE;
 		}
 		wchar_t *filename = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
-		_DragQueryFileW(hDrop, 0, filename, len + 1);
+		DragQueryFileW(hDrop, 0, filename, len + 1);
 		filename[len] = '\0';
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
-		_SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename);
+		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename);
 		SendDlgItemMessage(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, len, len);
 		free(filename);
 		DragFinish(hDrop);
@@ -685,7 +683,7 @@ static void OpenLogFile(PFileVar fv)
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
-	LogVar->FileHandle = _CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+	LogVar->FileHandle = CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 									  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
@@ -892,7 +890,7 @@ static void LogRotate(void)
 	for (i = 1 ; i <= loopmax ; i++) {
 		wchar_t *filename;
 		aswprintf(&filename, L"%s.%d", LogVar->FullName, i);
-		DWORD attr = _GetFileAttributesW(filename);
+		DWORD attr = GetFileAttributesW(filename);
 		free(filename);
 		if (attr == INVALID_FILE_ATTRIBUTES)
 			break;
@@ -911,8 +909,8 @@ static void LogRotate(void)
 			aswprintf(&oldfile, L"%s.%d", LogVar->FullName, k);
 		wchar_t *newfile;
 		aswprintf(&newfile, L"%s.%d", LogVar->FullName, k+1);
-		_DeleteFileW(newfile);
-		if (_MoveFileW(oldfile, newfile) == 0) {
+		DeleteFileW(newfile);
+		if (MoveFileW(oldfile, newfile) == 0) {
 			OutputDebugPrintf("%s: rename %d\n", __FUNCTION__, errno);
 		}
 		free(oldfile);
@@ -1174,10 +1172,10 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 		case WM_COMMAND:
 			switch (LOWORD(wp)) {
 				case IDOK: {
-					size_t len = _SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
+					size_t len = SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
 					len += 1;
 					wchar_t *buf = (wchar_t *)malloc(len * sizeof(wchar_t));
-					_GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, (int)len);
+					GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, (int)len);
 					FLogWriteStr(buf);
 					FLogWriteStr(L"\n");		// TODO 改行コード
 					free(buf);

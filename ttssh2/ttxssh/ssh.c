@@ -34,7 +34,6 @@
 #include "key.h"
 #include "ttcommon.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -356,7 +355,7 @@ static void ssh2_channel_delete(Channel_t *c)
 
 		// SCP受信の場合のみ、SCP用リストの開放を行う。
 		// Windows9xで落ちる問題を修正した。
-		if (c->scp.dir == FROMREMOTE) 
+		if (c->scp.dir == FROMREMOTE)
 			ssh2_scp_free_packetlist(c);
 	}
 	if (c->type == TYPE_AGENT) {
@@ -529,7 +528,7 @@ void init_memdump(void)
 {
 	int i;
 
-	if (memtag_use > 0) 
+	if (memtag_use > 0)
 		return;
 
 	for (i = 0 ; i < MEMTAG_MAX ; i++) {
@@ -1192,7 +1191,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 
 		                       <---------------------------->
 		                          SSH2 sending data on TCP
-		
+
 		 NOTE:
 		   payload = type(1) + raw-data
 		   len = ssh_state.outgoing_packet_len = payload size
@@ -2678,11 +2677,11 @@ static void try_send_credentials(PTInstVar pvar)
 
 				set_uint32(outmsg, len);
 				memcpy(outmsg + 4, cred->password, len);
-				
+
 				// セッション複製時にパスワードを使い回したいので、ここでのリソース解放はやめる。
 				// socket close時にもこの関数は呼ばれているので、たぶん問題ない。(2005.4.8 yutaka)
 				//AUTH_destroy_cur_cred(pvar);
-				
+
 				enque_simple_auth_handlers(pvar);
 				break;
 			}
@@ -3795,7 +3794,7 @@ void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 loc
 		c = ssh2_local_channel_lookup(local_channel_num);
 		if (c == NULL)
 			return;
-		
+
 		SSH2_channel_input_eof(pvar, c);
 	}
 }
@@ -3947,7 +3946,7 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 			return;
 		}
 
-		// making the fake data	
+		// making the fake data
 		newlen = 2 * auth_data_len + 1;
 		newdata = malloc(newlen);
 		if (newdata == NULL)
@@ -4181,7 +4180,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 			goto error;
 		}
 	} else { // copy remote to local
-		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE); 
+		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE);
 
 		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
 			char *fn;
@@ -4236,7 +4235,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	}
 
 	// setup SCP data
-	c->scp.dir = direction;     
+	c->scp.dir = direction;
 	c->scp.state = SCP_INIT;
 
 	// session open
@@ -4484,7 +4483,7 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 	}
 
 	// 指定された文字列を走査し、許可されていない文字、重複する文字は削除する。
-	// 
+	//
 	// ex. (i=5 の文字を削除する)
 	// i=012345
 	//   >:=9<87;A@?B3026(\0)
@@ -4492,7 +4491,7 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 	//         <------------>
 	//       ↓
 	//   >:=9<7;A@?B3026(\0)
-	//         
+	//
 	for (i = 0; buf[i] != 0; i++) {
 		int num = buf[i] - '0';
 
@@ -4512,7 +4511,7 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 	}
 
 	// 指定されていない文字があれば、disabled lineの直前に挿入する。
-	// 
+	//
 	// ex. (Zを挿入する)
 	//                k
 	//   >:=9<87;A@?B3026(\0)
@@ -4522,7 +4521,7 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 	//   >:=9<87;A@?B30026(\0)
 	//       ↓        k
 	//   >:=9<87;A@?B3Z026(\0)
-	//       
+	//
 	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
 		int num = default_strings[j];
 
@@ -5259,7 +5258,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 			pvar->ts->UIMsg, pvar->kexgex_max, grp_bits);
 	}
-	
+
 	if (tmpbuf[0] != 0) {
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_TITLE", pvar,
 		                  "TTSSH: Confirm GEX group size");
@@ -5329,7 +5328,7 @@ error:;
 //
 // KEX_ECDH_SHA2_256 or KEX_ECDH_SHA2_384 or KEX_ECDH_SHA2_521
 //
- 
+
 static void SSH2_ecdh_kex_init(PTInstVar pvar)
 {
 	EC_KEY *client_key = NULL;
@@ -5779,7 +5778,7 @@ error:
 
 	clear_contents_for_known_hosts(pvar);
 
-	/* 
+	/*
 	 * SSH2_MSG_NEWKEYS を受信していたら、自分で処理を呼び出す。
 	 */
 	if (pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received) {
@@ -5816,7 +5815,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
 	int ret;
-	
+
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
 	memset(&hostkey, 0, sizeof(hostkey));
@@ -6057,7 +6056,7 @@ error:
 
 	clear_contents_for_known_hosts(pvar);
 
-	/* 
+	/*
 	 * SSH2_MSG_NEWKEYS を受信していたら、自分で処理を呼び出す。
 	 */
 	if (pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received) {
@@ -6344,7 +6343,7 @@ error:
 
 	clear_contents_for_known_hosts(pvar);
 
-	/* 
+	/*
 	 * SSH2_MSG_NEWKEYS を受信していたら、自分で処理を呼び出す。
 	 */
 	if (pvar->contents_after_known_hosts.SSH2_MSG_NEWKEYS_received) {
@@ -7202,7 +7201,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 		case 2:
 			msgW = ToWcharU8(msg);
 			if (msgW) {
-				_MessageBoxW(pvar->cv->HWin, msgW, L"Authentication Banner", MB_OK | MB_ICONINFORMATION);
+				MessageBoxW(pvar->cv->HWin, msgW, L"Authentication Banner", MB_OK | MB_ICONINFORMATION);
 				free(msgW);
 			}
 			break;
@@ -7243,14 +7242,14 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 // SSH2 メッセージ 60 番の処理関数
 //
 // SSH2 では以下のメッセージが 60 番へ重複して割り当てられている。
-// 
+//
 // * SSH2_MSG_USERAUTH_INFO_REQUEST (keyboard-interactive)
 // * SSH2_MSG_USERAUTH_PK_OK (publickey / Tera Term では Pageant 認証のみ)
 // * SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ (password)
 //
 // 現状の実装では同じメッセージ番号が存在できないので、
 // 60 番はこの関数で受け、method によって対応するハンドラ関数に振り分ける。
-// 
+//
 BOOL handle_SSH2_userauth_msg60(PTInstVar pvar)
 {
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
@@ -7337,7 +7336,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 	// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
 	if (num == 0) {
-		if (strlen(lprompt) > 0) 
+		if (strlen(lprompt) > 0)
 			MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
 	}
 
@@ -7913,7 +7912,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 // SSH2 port-forwarding においてセッションがオープンできない場合のサーバからのリプライ（失敗）
 static BOOL handle_SSH2_open_failure(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	int id;
@@ -8043,7 +8042,7 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 
 // SSH2 port-forwarding (remote -> local)に対するリプライ（成功）
 static BOOL handle_SSH2_request_success(PTInstVar pvar)
-{	
+{
 	// 必要であればログを取る。特に何もしなくてもよい。
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_REQUEST_SUCCESS was received.");
 
@@ -8054,7 +8053,7 @@ static BOOL handle_SSH2_request_success(PTInstVar pvar)
 
 // SSH2 port-forwarding (remote -> local)に対するリプライ（失敗）
 static BOOL handle_SSH2_request_failure(PTInstVar pvar)
-{	
+{
 	// 必要であればログを取る。特に何もしなくてもよい。
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_REQUEST_FAILURE was received.");
 
@@ -8064,7 +8063,7 @@ static BOOL handle_SSH2_request_failure(PTInstVar pvar)
 }
 
 static BOOL handle_SSH2_channel_success(PTInstVar pvar)
-{	
+{
 	Channel_t *c;
 #ifdef DONT_WANTCONFIRM
 	int want_reply = 0; // false
@@ -8482,7 +8481,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 	if (c->scp.state == SCP_INIT) {
 		char buf[128];
 
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "T%lu 0 %lu 0\n", 
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "T%lu 0 %lu 0\n",
 			(unsigned long)c->scp.filestat.st_mtime,  (unsigned long)c->scp.filestat.st_atime);
 
 		c->scp.state = SCP_TIMESTAMP;
@@ -8491,7 +8490,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 	} else if (c->scp.state == SCP_TIMESTAMP) {
 		char buf[128];
 
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "C0644 %lld %s\n", 
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "C0644 %lld %s\n",
 			c->scp.filestat.st_size, c->scp.localfile);
 
 		c->scp.state = SCP_FILEINFO;
@@ -8877,7 +8876,7 @@ error:
 
 
 static BOOL handle_SSH2_channel_data(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	int id;
@@ -8959,7 +8958,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 // エラーメッセージを SSH2_MSG_CHANNEL_EXTENDED_DATA で送信してくる。
 // SSH2_MSG_CHANNEL_EXTENDED_DATA を処理するようにした。(2006.10.30 maya)
 static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	int id;
@@ -9042,7 +9041,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 
 static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	int id;
@@ -9081,7 +9080,7 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 }
 
 static BOOL handle_SSH2_channel_open(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	Channel_t *c = NULL;
@@ -9209,7 +9208,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			c->remote_id = remote_id;
 			c->remote_window = remote_window;
 			c->remote_maxpacket = remote_maxpacket;
-			
+
 			SSH2_confirm_channel_open(pvar, c);
 		}
 		else {
@@ -9243,7 +9242,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 
 static BOOL handle_SSH2_channel_close(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	int id;
@@ -9395,7 +9394,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 
 
 static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
-{	
+{
 	int len;
 	char *data;
 	int id;

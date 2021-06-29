@@ -38,7 +38,6 @@
 #include "font_pp_res.h"
 #include "dlglib.h"
 #include "setting.h"
-#include "layer_for_unicode.h"
 #include "vtdisp.h"		// for DispSetupFontDlg()
 #include "buffer.h"
 #include "compat_win.h"	// for CF_INACTIVEFONTS
@@ -79,7 +78,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 		wchar_t uimsg[MAX_UIMSG];
 		get_lang_msgW("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
 					  L"\"Font style\" selection here won't affect actual font appearance.", dlg_data->UILanguageFile);
-		_SetDlgItemTextW(Dialog, stc6, uimsg);
+		SetDlgItemTextW(Dialog, stc6, uimsg);
 
 		SetFocus(GetDlgItem(Dialog,cmb1));
 
@@ -282,6 +281,6 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pfnDlgProc = Proc;
 	psp.lParam = (LPARAM)Param;
 
-	HPROPSHEETPAGE hpsp = _CreatePropertySheetPageW(&psp);
+	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
 	return hpsp;
 }

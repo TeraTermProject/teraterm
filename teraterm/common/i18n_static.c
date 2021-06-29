@@ -29,7 +29,6 @@
 #include "i18n.h"
 #include "codeconv.h"
 #include "compat_win.h"
-#include "layer_for_unicode.h"
 
 #include <assert.h>
 
@@ -109,10 +108,10 @@ void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextI
 		if (infos->key != NULL) {
 			wchar_t uimsg[MAX_UIMSG];
 			GetI18nStrW(section, infos->key, uimsg, _countof(uimsg), infos->default_text, UILanguageFile);
-			_SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)uimsg);
+			SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)uimsg);
 		}
 		else {
-			_SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)infos->default_text);
+			SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)infos->default_text);
 		}
 		infos++;
 	}

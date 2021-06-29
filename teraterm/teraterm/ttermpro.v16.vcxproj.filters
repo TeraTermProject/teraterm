@@ -375,9 +375,6 @@
     <ClInclude Include="..\common\compat_win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\layer_for_unicode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="unicode.h">
       <Filter>Header Files</Filter>
     </ClInclude>

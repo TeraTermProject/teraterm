@@ -630,14 +630,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\layer_for_unicode.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
 				RelativePath="ftdlg_lite.cpp"
 				>
 			</File>

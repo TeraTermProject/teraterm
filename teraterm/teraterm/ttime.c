@@ -40,7 +40,6 @@
 #include <imm.h>
 #include <assert.h>
 #include "asprintf.h"
-#include "layer_for_unicode.h"
 #include "ttime.h"
 
 // #define ENABLE_DUMP	1

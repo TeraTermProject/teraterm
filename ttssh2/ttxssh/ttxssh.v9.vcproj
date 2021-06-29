@@ -335,10 +335,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\teraterm\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\teraterm\common\compat_win.h"
 				>
 			</File>

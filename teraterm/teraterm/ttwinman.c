@@ -39,7 +39,6 @@
 #include "i18n.h"
 #include "commlib.h"
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 
 HWND HVTWin = NULL;
 HWND HTEKWin = NULL;
@@ -201,7 +200,7 @@ void ChangeTitle()
 	if ((ts.TitleFormat & 4)!=0) // VT
 		wcsncat_s(TempTitle,_countof(TempTitle),L" VT",_TRUNCATE);
 
-	_SetWindowTextW(HVTWin,TempTitle);
+	SetWindowTextW(HVTWin,TempTitle);
 
 	if (HTEKWin!=0)
 	{
@@ -209,7 +208,7 @@ void ChangeTitle()
 		{
 			wcsncat_s(TempTitle,_countof(TempTitle),L" TEK",_TRUNCATE);
 		}
-		_SetWindowTextW(HTEKWin,TempTitle);
+		SetWindowTextW(HTEKWin,TempTitle);
 	}
 }
 

@@ -42,7 +42,6 @@
 #include "ttlib.h"
 #include "codeconv.h"
 #include "vtdisp.h"
-#include "layer_for_unicode.h"
 
 #include "tt_res.h"
 #include "tmfc.h"
@@ -451,15 +450,15 @@ PrintFile *OpenPrnFile(void)
 	KillTimer(HVTWin, IdPrnStartTimer);
 
 	wchar_t TempPath[MAX_PATH];
-	_GetTempPathW(_countof(TempPath), TempPath);
+	GetTempPathW(_countof(TempPath), TempPath);
 	wchar_t Temp[MAX_PATH];
-	if (_GetTempFileNameW(TempPath, L"tmp", 0, Temp) == 0) {
+	if (GetTempFileNameW(TempPath, L"tmp", 0, Temp) == 0) {
 		free(p);
 		return NULL;
 	}
 	p->PrnFName = _wcsdup(Temp);
 
-	HANDLE h = _CreateFileW(p->PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE h = CreateFileW(p->PrnFName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (h == INVALID_HANDLE_VALUE) {
 		free(p);
 		return NULL;
@@ -475,7 +474,7 @@ static void DeletePrintFile(PrintFile *handle)
 	if (handle->PrnFName == NULL) {
 		return;
 	}
-	_DeleteFileW(handle->PrnFName);
+	DeleteFileW(handle->PrnFName);
 	free(handle->PrnFName);
 	handle->PrnFName = NULL;
 }
@@ -492,7 +491,7 @@ void PrnFinish(PrintFile *handle)
 static void PrintFile_(PrintFile *handle)
 {
 	if (VTPrintInit(IdPrnFile)==IdPrnFile) {
-		HANDLE HPrnFile = _CreateFileW(handle->PrnFName,
+		HANDLE HPrnFile = CreateFileW(handle->PrnFName,
 									   GENERIC_READ, FILE_SHARE_READ, NULL,
 									   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -590,7 +589,7 @@ static void PrintFileDirect(PrintFile *handle)
 	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
-	handle->HPrnFile = _CreateFileW(handle->PrnFName,
+	handle->HPrnFile = CreateFileW(handle->PrnFName,
 									GENERIC_READ, FILE_SHARE_READ, NULL,
 									OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	PrintAbortFlag = (handle->HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);

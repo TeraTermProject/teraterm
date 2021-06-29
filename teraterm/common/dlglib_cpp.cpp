@@ -38,7 +38,6 @@
 
 #include "dlglib.h"
 #include "ttlib.h"
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 
 /**
@@ -60,7 +59,7 @@ HWND TTCreateDialogIndirectParam(
 	LPARAM lParamInit)			// èâä˙âªíl
 {
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
-	HWND hDlgWnd = _CreateDialogIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, lParamInit);
+	HWND hDlgWnd = CreateDialogIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, lParamInit);
 	free(lpTemplate);
 	return hDlgWnd;
 }
@@ -102,7 +101,7 @@ INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplateName,
 						 LPARAM lParamInit)		// èâä˙âªíl
 {
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
-	INT_PTR DlgResult = _DialogBoxIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, lParamInit);
+	INT_PTR DlgResult = DialogBoxIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, lParamInit);
 	free(lpTemplate);
 	return DlgResult;
 }

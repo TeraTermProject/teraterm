@@ -386,10 +386,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\layer_for_unicode.h"
-				>
-			</File>
-			<File
 				RelativePath="..\common\dllutil.h"
 				>
 			</File>

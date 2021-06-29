@@ -187,7 +187,6 @@
     <ClInclude Include="..\..\teraterm\common\codeconv.h" />
     <ClInclude Include="..\..\teraterm\common\compat_win.h" />
     <ClInclude Include="..\..\teraterm\common\dllutil.h" />
-    <ClInclude Include="..\..\teraterm\common\layer_for_unicode.h" />
     <ClInclude Include="..\..\teraterm\common\ttlib.h" />
     <ClInclude Include="arc4random.h" />
     <ClInclude Include="auth.h" />

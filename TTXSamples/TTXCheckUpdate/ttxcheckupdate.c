@@ -39,7 +39,6 @@
 #include "codeconv.h"
 #include "dlglib.h"
 #include "i18n.h"
-#include "layer_for_unicode.h"
 #include "asprintf.h"
 #include "tt-version.h"		// for TT_VERSION_MAJOR, TT_VERSION_MINOR
 #include "svnversion.h"		// for SVNVERSION
@@ -89,11 +88,11 @@ static int SetDropdown(HWND hDlg, int running_version)
 	SetDlgItemTextA(hDlg, IDC_VERSION_LABEL, str);
 	free(str);
 
-	_SendDlgItemMessageW(hDlg, IDC_VERSION_DROPDOWN, CB_RESETCONTENT, 0, 0);
+	SendDlgItemMessageW(hDlg, IDC_VERSION_DROPDOWN, CB_RESETCONTENT, 0, 0);
 	for (i = 0; i < pvar->versions_count; i++) {
 		const version_one_t *v = &pvar->versions[i];
 		wchar_t *strW = ToWcharU8(v->version_text);
-		_SendDlgItemMessageW(hDlg, IDC_VERSION_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)strW);
+		SendDlgItemMessageW(hDlg, IDC_VERSION_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)strW);
 		free(strW);
 		if (cursor == -1 && v->version_major == version_major) {
 			cursor = (int)i;
@@ -113,7 +112,7 @@ static void SetTexts(HWND hDlg, const version_one_t *version)
 	const version_one_t *v = version;
 
 	wchar_t *strW = ToWcharU8(v->text);
-	_SetWindowTextW(GetDlgItem(hDlg, IDC_DETAIL_EDIT), strW);
+	SetWindowTextW(GetDlgItem(hDlg, IDC_DETAIL_EDIT), strW);
 	free(strW);
 
 	if (v->url == NULL) {
@@ -203,7 +202,7 @@ static void ShowDialog(HWND hWnd)
 	swprintf(agent, _countof(agent), L"%s_%d", agent_base, pvar->ts->RunningVersion);
 	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
 	if (!result_bool) {
-		_MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
+		MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
 	}
 	json_size = json_raw_size + 1;
@@ -218,7 +217,7 @@ static void ShowDialog(HWND hWnd)
 	/* json‚ðƒp[ƒX‚·‚é, versions‚Éî•ñ‚ª“ü‚é */
 	pvar->versions = ParseJson(json_ptr, &pvar->versions_count);
 	if (pvar->versions == NULL) {
-		_MessageBoxW(hWnd, L"parse error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
+		MessageBoxW(hWnd, L"parse error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
 	}
 

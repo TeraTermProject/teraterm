@@ -32,7 +32,6 @@
 #include "tmfc.h"
 #include "ttlib.h"
 #include "compat_win.h"
-#include "layer_for_unicode.h"
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1500)) || \
 	(__cplusplus <= 199711L)
@@ -102,7 +101,7 @@ BOOL TTCFrameWnd::CreateW(
 	m_hInst = hInstance;
 	m_hParentWnd = hParentWnd;
 	pseudoPtr = this;
-	HWND hWnd = _CreateWindowExW(
+	HWND hWnd = CreateWindowExW(
 		WS_EX_OVERLAPPEDWINDOW,
 		lpszClassName,
 		lpszWindowName,

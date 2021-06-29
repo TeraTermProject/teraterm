@@ -96,7 +96,6 @@
 #include "tipwin.h"
 #endif
 #include "codeconv.h"
-#include "layer_for_unicode.h"
 #include "sendmem.h"
 #include "sendfiledlg.h"
 #include "setting.h"
@@ -452,7 +451,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = VTClassName;
 
-	_RegisterClassW(&wc);
+	RegisterClassW(&wc);
 	m_hAccel = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACC));
 
 	if (ts.VTPos.x==CW_USEDEFAULT) {
@@ -950,9 +949,9 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		WinMenu = CreatePopupMenu();
 		get_lang_msgW("MENU_WINDOW", uimsg, _countof(uimsg),
 					  L"&Window", ts.UILanguageFile);
-		_InsertMenuW(hMenu, ID_HELPMENU,
-					 MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-					 (UINT_PTR)WinMenu, uimsg);
+		InsertMenuW(hMenu, ID_HELPMENU,
+					MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+					(UINT_PTR)WinMenu, uimsg);
 	}
 
 	TTXModifyMenu(hMenu); /* TTPLUG */
@@ -1488,8 +1487,8 @@ void CVTWindow::OnClose()
 		wchar_t uimsg[MAX_UIMSG];
 		get_lang_msgW("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
 					  L"Disconnect?", ts.UILanguageFile);
-		int result = _MessageBoxW(HVTWin, uimsg, L"Tera Term",
-								  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+		int result = ::MessageBoxW(HVTWin, uimsg, L"Tera Term",
+								   MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
 		if (result == IDCANCEL) {
 			return;
 		}
@@ -1511,7 +1510,7 @@ void CVTWindow::OnAllClose()
 	wchar_t uimsg[MAX_UIMSG];
 
 	get_lang_msgW("MSG_ALL_TERMINATE_CONF", uimsg, _countof(uimsg), L"Terminate ALL Tera Term(s)?", ts.UILanguageFile);
-	if (_MessageBoxW(HVTWin, uimsg, L"Tera Term", MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2) == IDCANCEL)
+	if (::MessageBoxW(HVTWin, uimsg, L"Tera Term", MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2) == IDCANCEL)
 		return;
 
 	BroadcastClosingMessage(HVTWin);
@@ -1666,7 +1665,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	int DirectoryCount = 0;
 	for (int i = 0; i < DropListCount; i++) {
 		const wchar_t *FileName = DropLists[i];
-		const DWORD attr = _GetFileAttributesW(FileName);
+		const DWORD attr = GetFileAttributesW(FileName);
 		if (attr == INVALID_FILE_ATTRIBUTES) {
 			FileCount++;
 		} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
@@ -1833,16 +1832,16 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 	{
 		const UINT ShowDialog =
 			((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) ? 1 : 0;
-		DropListCount = _DragQueryFileW(hDropInfo, -1, NULL, 0);
+		DropListCount = DragQueryFileW(hDropInfo, -1, NULL, 0);
 		DropLists = (wchar_t **)malloc(sizeof(wchar_t *) * DropListCount);
 
 		for (int i = 0; i < DropListCount; i++) {
-			const UINT cch = _DragQueryFileW(hDropInfo, i, NULL, 0);
+			const UINT cch = DragQueryFileW(hDropInfo, i, NULL, 0);
 			if (cch == 0) {
 				continue;
 			}
 			wchar_t *FileName = (wchar_t *)malloc(sizeof(wchar_t) * (cch + 1));
-			_DragQueryFileW(hDropInfo,i,FileName,cch + 1);
+			DragQueryFileW(hDropInfo,i,FileName,cch + 1);
 			FileName[cch] = '\0';
 			DropLists[i] = FileName;
 		}
@@ -3725,7 +3724,7 @@ void CVTWindow::OnDuplicateSession()
 		get_lang_msgW("MSG_EXEC_TT_ERROR", uimsg2, _countof(uimsg2),
 					  L"Can't execute Tera Term. (%d)", ts.UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
-		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3782,7 +3781,7 @@ void CVTWindow::OnCygwinConnection()
 	get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
 	get_lang_msgW("MSG_FIND_CYGTERM_DIR_ERROR", uimsg2, sizeof(uimsg2),
 				  L"Can't find Cygwin directory.", ts.UILanguageFile);
-	_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+	::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 	return;
 
 found_dll:;
@@ -3794,7 +3793,7 @@ found_dll:;
 			get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
 			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
 						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
-			_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+			::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 			free(envptr);
 			return;
 		}
@@ -3806,7 +3805,7 @@ found_dll:;
 			get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
 			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
 						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
-			_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+			::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s", file);
@@ -3831,7 +3830,7 @@ found_path:;
 		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
 		get_lang_msgW("MSG_EXEC_CYGTERM_ERROR", uimsg2, _countof(uimsg2),
 		              L"Can't execute Cygterm.", ts.UILanguageFile);
-		_MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3861,7 +3860,7 @@ void CVTWindow::OnTTMenuLaunch()
 		get_lang_msgW("MSG_EXEC_TTMENU_ERROR", uimsg2, _countof(uimsg2),
 					  L"Can't execute TeraTerm Menu. (%d)", ts.UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
-		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3894,7 +3893,7 @@ void CVTWindow::OnLogMeInLaunch()
 		get_lang_msgW("MSG_EXEC_LOGMETT_ERROR", uimsg2, _countof(uimsg2),
 					  L"Can't execute LogMeTT. (%d)", ts.UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
-		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3911,7 +3910,7 @@ void CVTWindow::OnFileLog()
 		const wchar_t *filename = info.filename;
 		if (!info.append) {
 			// ƒtƒ@ƒCƒ‹íœ
-			_DeleteFileW(filename);
+			DeleteFileW(filename);
 		}
 		BOOL r = FLogOpen(filename, info.code, info.bom);
 		if (r != FALSE) {
@@ -3972,8 +3971,8 @@ void CVTWindow::OnViewLog()
 	aswprintf(&command, L"\"%s\" \"%s\"", ViewlogEditor, filename);
 	free(ViewlogEditor);
 
-	BOOL r = _CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
-							 NULL, NULL, &si, &pi);
+	BOOL r = CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
+							NULL, NULL, &si, &pi);
 	free(command);
 	if (r == 0) {
 		DWORD error = GetLastError();
@@ -4054,7 +4053,7 @@ void CVTWindow::OnReplayLog()
 		get_lang_msgW("MSG_EXEC_TT_ERROR", uimsgW2, _countof(uimsgW2),
 		              L"Can't execute Tera Term. (%d)", ts.UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsgW2, GetLastError());
-		_MessageBoxW(NULL, buf, uimsgW, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, buf, uimsgW, MB_OK | MB_ICONWARNING);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4195,8 +4194,8 @@ void CVTWindow::Disconnect(BOOL confirm)
 		wchar_t uimsg[MAX_UIMSG];
 		get_lang_msgW("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
 					  L"Disconnect?", ts.UILanguageFile);
-		if (_MessageBoxW(HVTWin, uimsg, L"Tera Term",
-		                 MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL) {
+		if (::MessageBoxW(HVTWin, uimsg, L"Tera Term",
+						  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL) {
 			return;
 		}
 	}
@@ -4427,7 +4426,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 		wchar_t uimsg[MAX_UIMSG];
 		get_lang_msgW("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
 					  L"\"Font style\" selection here won't affect actual font appearance.", ts.UILanguageFile);
-		_SetDlgItemTextW(Dialog, stc6, uimsg);
+		SetDlgItemTextW(Dialog, stc6, uimsg);
 
 		SetFocus(GetDlgItem(Dialog,cmb1));
 
@@ -4613,7 +4612,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 	const char *UILanguageFile = ts->UILanguageFile;
 
 	/* save current dir */
-	_GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
 	/* File name filter */
 	if (FuncId==GSF_LOADKEY) {
@@ -4654,7 +4653,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		free(HomeDirW);
 	}
 
-	_SetCurrentDirectoryW(DirW);
+	SetCurrentDirectoryW(DirW);
 
 	/* OPENFILENAME record */
 	OPENFILENAMEW ofn = {};
@@ -4680,7 +4679,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 //		ofn.lpstrInitialDir = ts->SetupFName;
 		ofn.lpstrInitialDir = DirW;
 		ofn.lpstrTitle = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", L"Tera Term: Save setup", UILanguageFile);
-		Ok = _GetSaveFileNameW(&ofn);
+		Ok = GetSaveFileNameW(&ofn);
 		if (Ok) {
 			char *Name = ToCharW(NameW);
 			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
@@ -4691,7 +4690,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		ofn.lpstrDefExt = L"ini";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
 		ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFile);
-		Ok = _GetOpenFileNameW(&ofn);
+		Ok = GetOpenFileNameW(&ofn);
 		if (Ok) {
 			char *Name = ToCharW(NameW);
 			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
@@ -4702,7 +4701,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		ofn.lpstrDefExt = L"cnf";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
 		ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFile);
-		Ok = _GetOpenFileNameW(&ofn);
+		Ok = GetOpenFileNameW(&ofn);
 		if (Ok) {
 			char *Name = ToCharW(NameW);
 			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), Name, _TRUNCATE);
@@ -4727,7 +4726,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 	free((void *)ofn.lpstrTitle);
 
 	/* restore dir */
-	_SetCurrentDirectoryW(TempDir);
+	SetCurrentDirectoryW(TempDir);
 
 	return Ok;
 }
@@ -4753,7 +4752,7 @@ void CVTWindow::OnSetupSave()
 			get_lang_msgW("MSG_TT_ERROR", uimsg, _countof(uimsg), L"Tera Term: ERROR", ts.UILanguageFile);
 			get_lang_msgW("MSG_SAVESETUP_PERMISSION_ERROR", uimsg2, _countof(uimsg2),
 						  L"TERATERM.INI file doesn't have the writable permission.", ts.UILanguageFile);
-			_MessageBoxW(HVTWin, uimsg2, uimsg, MB_OK|MB_ICONEXCLAMATION);
+			::MessageBoxW(HVTWin, uimsg2, uimsg, MB_OK|MB_ICONEXCLAMATION);
 			return;
 		}
 	}
@@ -4834,7 +4833,7 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 		get_lang_msgW("DLG_SETUPDIR_NOFILE_ERROR", uimsg2, _countof(uimsg2),
 					  L"File does not exist.(%d)", ts.UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
-		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
 	}
 
@@ -4851,7 +4850,7 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 		get_lang_msgW("DLG_SETUPDIR_OPENFILE_ERROR", uimsg2, _countof(uimsg2),
 					  L"Cannot open file.(%d)", ts.UILanguageFile);
 		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
-		_MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
 	} else {
 		CloseHandle(pi.hThread);

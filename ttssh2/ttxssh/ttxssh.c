@@ -84,7 +84,6 @@
 #include "sftp.h"
 
 #include "compat_win.h"
-#include "layer_for_unicode.h"
 #include "codeconv.h"
 
 #include "libputty.h"
@@ -160,7 +159,7 @@ static void init_TTSSH(PTInstVar pvar)
 	FWDUI_init(pvar);
 
 	ssh_heartbeat_lock_initialize();
-	
+
 	pvar->cc[MODE_IN] = NULL;
 	pvar->cc[MODE_OUT] = NULL;
 	// メモリ確保は CRYPT_start_encryption の先の cipher_init_SSH2 に移動
@@ -1046,12 +1045,12 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 				wchar_t EntNameW[128];
 				wchar_t TempHostW[HostNameMaxLength + 1];
 				_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
-				_GetPrivateProfileStringW(L"Hosts", EntNameW, L"",
-										  TempHostW, _countof(TempHostW),
-										  SetupFnW);
+				GetPrivateProfileStringW(L"Hosts", EntNameW, L"",
+										 TempHostW, _countof(TempHostW),
+										 SetupFnW);
 				if (TempHostW[0] != 0)
-					_SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
-										 0, (LPARAM) TempHostW);
+					SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
+										0, (LPARAM) TempHostW);
 				i++;
 			} while (i <= MAXHOSTLIST);
 			free(SetupFnW);
@@ -2042,7 +2041,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 
 		{
 			wchar_t *strW = ToWcharU8(buf2);
-			_SetDlgItemTextW(dlg, IDC_ABOUTTEXT, strW);
+			SetDlgItemTextW(dlg, IDC_ABOUTTEXT, strW);
 			free(strW);
 		}
 	}
@@ -2158,7 +2157,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 		// Edit controlをサブクラス化する。
 		g_deltaSumAboutDlg = 0;
-		g_defAboutDlgEditWndProc = (WNDPROC)_SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
+		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
 		CenterWindow(dlg, GetParent(dlg));
 
@@ -2299,8 +2298,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		wchar_t *name = get_listbox_cipher_nameW(cipher, pvar);
 
 		if (name != NULL) {
-			int index = _SendMessageW(cipherControl, LB_ADDSTRING, 0, (LPARAM) name);
-			_SendMessageW(cipherControl, LB_SETITEMDATA, index, cipher);
+			int index = SendMessageW(cipherControl, LB_ADDSTRING, 0, (LPARAM) name);
+			SendMessageW(cipherControl, LB_SETITEMDATA, index, cipher);
 			free(name);
 		}
 	}
@@ -2316,7 +2315,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		if (index == 0) {
 			UTIL_get_lang_msgW("DLG_SSHSETUP_KEX_BORDER", pvar,
 			                   L"<KEXs below this line are disabled>", uimsg);
-			_SendMessageW(kexControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
+			SendMessageW(kexControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_kex_algorithm_name(index);
 			if (name != NULL) {
@@ -2335,7 +2334,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		if (index == 0) {
 			UTIL_get_lang_msgW("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
 			                   L"<Host Keys below this line are disabled>", uimsg);
-			_SendMessageW(hostkeyControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
+			SendMessageW(hostkeyControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_ssh2_hostkey_type_name(index);
 			if (name != NULL) {
@@ -2354,7 +2353,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		if (index == 0) {
 			UTIL_get_lang_msgW("DLG_SSHSETUP_MAC_BORDER", pvar,
 			                   L"<MACs below this line are disabled>", uimsg);
-			_SendMessageW(macControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
+			SendMessageW(macControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_ssh2_mac_name_by_id(index);
 			if (name != NULL) {
@@ -2373,7 +2372,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		if (index == 0) {
 			UTIL_get_lang_msgW("DLG_SSHSETUP_COMP_BORDER", pvar,
 			                   L"<Compression methods below this line are disabled>", uimsg);
-			_SendMessageW(compControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
+			SendMessageW(compControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
 			const char *name = get_ssh2_comp_name(index);
 			if (name != NULL) {
@@ -2435,7 +2434,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	// hostkey rotation(OpenSSH 6.8)
 	for (i = 0; i < SSH_UPDATE_HOSTKEYS_MAX; i++) {
 		UTIL_get_lang_msgW(rotationItemKey[i], pvar, rotationItem[i], uimsg);
-		_SendMessageW(hostkeyRotationControlList, CB_INSERTSTRING, i, (LPARAM)uimsg);
+		SendMessageW(hostkeyRotationControlList, CB_INSERTSTRING, i, (LPARAM)uimsg);
 	}
 	ch = pvar->settings.UpdateHostkeys;
 	if (!(ch >= 0 && ch < SSH_UPDATE_HOSTKEYS_MAX))
@@ -2535,7 +2534,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
 	buf2index = 0;
 	for (i = 0; i < count; i++) {
-		int chipher = _SendMessageW(cipherControl, LB_GETITEMDATA, i, 0);
+		int chipher = SendMessageW(cipherControl, LB_GETITEMDATA, i, 0);
 		buf2[buf2index] = '0' + chipher;
 		buf2index++;
 	}
@@ -2711,22 +2710,22 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 
 static void move_cur_sel_delta(HWND listbox, int delta)
 {
-	int curPos = (int) _SendMessageW(listbox, LB_GETCURSEL, 0, 0);
-	int maxPos = (int) _SendMessageW(listbox, LB_GETCOUNT, 0, 0) - 1;
+	int curPos = (int) SendMessageW(listbox, LB_GETCURSEL, 0, 0);
+	int maxPos = (int) SendMessageW(listbox, LB_GETCOUNT, 0, 0) - 1;
 	int newPos = curPos + delta;
 
 	if (curPos >= 0 && newPos >= 0 && newPos <= maxPos) {
 		int item_data;
 		int index;
-		size_t len = _SendMessageW(listbox, LB_GETTEXTLEN, curPos, 0);
+		size_t len = SendMessageW(listbox, LB_GETTEXTLEN, curPos, 0);
 		wchar_t *buf = malloc(sizeof(wchar_t) * (len+1));
 		buf[0] = 0;
-		_SendMessageW(listbox, LB_GETTEXT, curPos, (LPARAM) buf);
-		item_data = (int)_SendMessageW(listbox, LB_GETITEMDATA, curPos, 0);
-		_SendMessageW(listbox, LB_DELETESTRING, curPos, 0);
-		index = (int)_SendMessageW(listbox, LB_INSERTSTRING, newPos, (LPARAM)buf);
-		_SendMessageW(listbox, LB_SETITEMDATA, index, item_data);
-		_SendMessageW(listbox, LB_SETCURSEL, newPos, 0);
+		SendMessageW(listbox, LB_GETTEXT, curPos, (LPARAM) buf);
+		item_data = (int)SendMessageW(listbox, LB_GETITEMDATA, curPos, 0);
+		SendMessageW(listbox, LB_DELETESTRING, curPos, 0);
+		index = (int)SendMessageW(listbox, LB_INSERTSTRING, newPos, (LPARAM)buf);
+		SendMessageW(listbox, LB_SETITEMDATA, index, item_data);
+		SendMessageW(listbox, LB_SETCURSEL, newPos, 0);
 		free(buf);
 	}
 }

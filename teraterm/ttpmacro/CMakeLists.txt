@@ -77,7 +77,6 @@ target_sources(
   ../common/win16api.h
   ../common/codeconv.h
   ../common/dllutil.h
-  ../common/layer_for_unicode.h
   )
 
 source_group(
