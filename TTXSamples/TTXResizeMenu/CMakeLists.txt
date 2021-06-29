@@ -33,10 +33,6 @@ if(SUPPORT_OLD_WINDOWS)
   endif()
 endif(SUPPORT_OLD_WINDOWS)
 
-if (MSVC)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll")
-endif()
-
 set_target_properties(
   ${PACKAGE_NAME}
   PROPERTIES
@@ -56,7 +52,6 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  delayimp
   )
 
 install(

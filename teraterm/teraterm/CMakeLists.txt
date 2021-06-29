@@ -225,11 +225,7 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll /MANIFEST:NO")
-  if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
-    # 32bit
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll")
-  endif()
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
 endif()
 
 set_target_properties(
@@ -300,7 +296,6 @@ target_link_libraries(
   comctl32
   ws2_32
   imagehlp
-  delayimp
   uuid
   )
 

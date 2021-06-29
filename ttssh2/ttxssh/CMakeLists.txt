@@ -5,10 +5,6 @@ project(${PACKAGE_NAME})
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
 
-if (MSVC)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:user32.dll")
-endif()
-
 add_library(
   ${PACKAGE_NAME} SHARED
   )
@@ -188,7 +184,6 @@ target_link_libraries(
   ws2_32
   gdi32
   comdlg32
-  delayimp
   comctl32
   # OpenSSL が使用
   crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること

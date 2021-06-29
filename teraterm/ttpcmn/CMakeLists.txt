@@ -64,12 +64,6 @@ source_group(
   "..\/common\/"
   )
 
-
-if (MSVC)
-  set(CMAKE_SHARED_LINKER_FLAGS
-    "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:setupapi.dll /DELAYLOAD:user32.dll")
-endif()
-
 target_compile_definitions(
   ttpcmn
   PRIVATE -DTTPCMN_DLL
@@ -96,7 +90,6 @@ target_link_libraries(
   common_static
   ole32
   setupapi
-  delayimp
   )
 
 install(

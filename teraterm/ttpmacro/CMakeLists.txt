@@ -101,7 +101,7 @@ target_include_directories(
   )
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:user32.dll /MANIFEST:NO")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
 endif()
 
 target_link_libraries(
@@ -113,7 +113,6 @@ target_link_libraries(
   ${SFMT_LIB}
   #
   iphlpapi
-  delayimp
   ws2_32
   comctl32
   gdi32
