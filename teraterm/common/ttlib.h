@@ -107,7 +107,6 @@ DllExport BOOL IsWindows2000OrLater();
 DllExport BOOL IsWindowsVistaOrLater();
 DllExport BOOL IsWindows7OrLater();
 DllExport BOOL HasMultiMonitorSupport();
-DllExport BOOL HasGetAdaptersAddresses();
 DllExport BOOL HasDnsQuery();
 DllExport BOOL HasBalloonTipSupport();
 int KanjiCodeTranslate(int lang, int kcode);

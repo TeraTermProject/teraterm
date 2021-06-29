@@ -76,7 +76,6 @@ EXPORTS
   IsWindowsVistaOrLater @69
   IsWindows7OrLater @70
   HasMultiMonitorSupport @71
-  HasGetAdaptersAddresses @72
   HasDnsQuery @73
   HasBalloonTipSupport @87
   GetDownloadFolder @88

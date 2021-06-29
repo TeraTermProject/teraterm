@@ -1454,20 +1454,6 @@ BOOL HasMultiMonitorSupport()
 	return FALSE;
 }
 
-// OS が GetAdaptersAddresses をサポートしているかどうかを判別する。
-//   XP 以降は TRUE を返す
-//   2000 以降は IPv6 に対応しているが GetAdaptersAddresses がない
-BOOL HasGetAdaptersAddresses()
-{
-	HMODULE mod;
-
-	if (((mod = GetModuleHandle("iphlpapi.dll")) != NULL) &&
-		(GetProcAddress(mod, "GetAdaptersAddresses") != NULL)) {
-		return TRUE;
-	}
-	return FALSE;
-}
-
 // OS が DnsQuery をサポートしているかどうかを判別する。
 //   2000 以降は TRUE を返す
 BOOL HasDnsQuery()

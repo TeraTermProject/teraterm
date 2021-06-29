@@ -64,6 +64,7 @@
 #include "ttl_gui.h"
 #include "codeconv.h"
 #include "layer_for_unicode.h"
+#include "dllutil.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -2396,6 +2397,7 @@ WORD TTLGetIPv6Addr()
 	IP_ADAPTER_ADDRESSES addr[256];/* XXX */
 	ULONG len = sizeof(addr);
 	char ipv6str[64];
+	ULONG  (WINAPI *pGetAdaptersAddresses)(ULONG Family, ULONG Flags, PVOID Reserved, PIP_ADAPTER_ADDRESSES AdapterAddresses, PULONG SizePointer);
 
 	Err = 0;
 	GetStrAryVar(&VarId,&Err);
@@ -2404,8 +2406,11 @@ WORD TTLGetIPv6Addr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// GetAdaptersAddresses がサポートされていない OS はここで return
-	if (!HasGetAdaptersAddresses()) {
+	ret = DLLGetApiAddress(L"iphlpapi.dll", DLL_LOAD_LIBRARY_SYSTEM, "GetAdaptersAddresses", (void **)&pGetAdaptersAddresses);
+	if (ret != NO_ERROR) {
+		// GetAdaptersAddresses がサポートされていない OS はここで return
+		//   2000 以降は IPv6 に対応しているが GetAdaptersAddresses が存在しない
+		//   XP 以降は サポートされている
 		SetResult(-1);
 		SetIntVal(VarId2, 0);
 		return Err;
@@ -2415,7 +2420,7 @@ WORD TTLGetIPv6Addr()
 	arysize = GetStrAryVarSize(VarId);
 	num = 0;
 	result = 1;
-	ret = GetAdaptersAddresses(AF_INET6, 0, NULL, addr, &len);
+	ret = pGetAdaptersAddresses(AF_INET6, 0, NULL, addr, &len);
 	if (ret == ERROR_SUCCESS) {
 		IP_ADAPTER_ADDRESSES *padap = &addr[0];
 
