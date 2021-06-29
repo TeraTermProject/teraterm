@@ -37,9 +37,20 @@ set_target_properties(
   common_static
   PROPERTIES FOLDER teraterm)
 
-if(SUPPORT_OLD_WINDOWS AND MINGW)
-  add_subdirectory(libmingw)
-  set_target_properties(
-    mingw_msvcrt
-    PROPERTIES FOLDER teraterm)
+if(SUPPORT_OLD_WINDOWS)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    add_subdirectory(common/layer_for_unicode)
+    set_target_properties(
+      layer_for_unicode
+      PROPERTIES FOLDER teraterm)
+  endif()
+
+  if(MINGW)
+    add_subdirectory(libmingw)
+    set_target_properties(
+      mingw_msvcrt
+      PROPERTIES FOLDER teraterm)
+  endif(MINGW)
 endif()
+
+

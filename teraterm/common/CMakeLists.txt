@@ -25,8 +25,6 @@ add_library(
   getcontent.h
   i18n.h
   i18n_static.c
-  layer_for_unicode_crt.h
-  layer_for_unicode_crt.cpp
   tipwin.cpp
   tipwin.h
   tmfc.cpp
@@ -51,5 +49,6 @@ target_include_directories(
 target_link_libraries(
   ${PACKAGE_NAME}
   PUBLIC
+  #
   setupapi
   )

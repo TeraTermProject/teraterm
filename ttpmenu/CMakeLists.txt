@@ -34,6 +34,11 @@ source_group(
   "teraterm\/common\/")
 
 if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    layer_for_unicode
+    )
   if(MSVC)
     target_sources(
       ${PACKAGE_NAME}

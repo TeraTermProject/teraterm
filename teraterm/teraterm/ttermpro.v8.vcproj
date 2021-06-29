@@ -71,11 +71,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib setupapi.lib"
+				AdditionalDependencies="LIBCMTd.lib LIBCPMTd.lib onig_sd.lib layer_for_unicode.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib uuid.lib setupapi.lib User32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
 				GenerateManifest="false"
+				IgnoreAllDefaultLibraries="true"
 				DelayLoadDLLs="imagehlp.dll;user32.dll;shell32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -164,11 +165,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib setupapi.lib"
+				AdditionalDependencies="LIBCMT.lib LIBCPMT.lib onig_s.lib layer_for_unicode.lib comctl32.lib ws2_32.lib imagehlp.lib user32.lib gdi32.lib SHELL32.lib comdlg32.lib ole32.lib ADVAPI32.lib OleAut32.lib setupapi.lib uuid.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
 				GenerateManifest="false"
+				IgnoreAllDefaultLibraries="true"
 				DelayLoadDLLs="imagehlp.dll;user32.dll;shell32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"

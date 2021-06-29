@@ -40,7 +40,7 @@
 
 #include "layer_for_unicode.h"
 
-HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
+HPROPSHEETPAGE WINAPI _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
 {
 	if (pCreatePropertySheetPageW != NULL) {
 		return pCreatePropertySheetPageW((LPCPROPSHEETPAGEW)psp);
@@ -70,7 +70,7 @@ HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
 //		SDK: Windows Server 2003 R2 Platform SDK
 //			 (Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *psh)
-INT_PTR _PropertySheetW(PROPSHEETHEADERW *psh)
+INT_PTR WINAPI _PropertySheetW(PROPSHEETHEADERW *psh)
 {
 	if (pPropertySheetW != NULL) {
 		return pPropertySheetW((PROPSHEETHEADERW *)psh);
@@ -150,7 +150,7 @@ static BOOL GetOpenSaveFileNameA(BOOL (WINAPI *fn)(LPOPENFILENAMEA ofnA), LPOPEN
 	return result;
 }
 
-BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
+BOOL WINAPI _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
 {
 	if (pGetOpenFileNameW != NULL) {
 		return pGetOpenFileNameW(ofnW);
@@ -159,7 +159,7 @@ BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
 	return GetOpenSaveFileNameA(GetOpenFileNameA, ofnW);
 }
 
-BOOL _GetSaveFileNameW(LPOPENFILENAMEW ofnW)
+BOOL WINAPI _GetSaveFileNameW(LPOPENFILENAMEW ofnW)
 {
 	if (pGetSaveFileNameW != NULL) {
 		return pGetSaveFileNameW(ofnW);

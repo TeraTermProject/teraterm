@@ -1,0 +1,55 @@
+user32 SetWindowTextW@8
+user32 SetDlgItemTextW@12
+user32 GetDlgItemTextW@16
+user32 SendDlgItemMessageW@20
+user32 SendMessageW@16
+user32 CreateWindowExW@48
+user32 RegisterClassW@4
+user32 MessageBoxW@16
+user32 InsertMenuW@20
+user32 AppendMenuW@16
+user32 GetWindowTextW@12
+user32 GetWindowTextLengthW@4
+user32 CallWindowProcW@20
+user32 CreateDialogIndirectParamW@20
+user32 DialogBoxIndirectParamW@20
+user32 SetWindowLongW@12
+user32 GetWindowLongW@8
+
+kernel32 GetFileAttributesW@4
+kernel32 GetModuleFileNameW@12
+kernel32 SetCurrentDirectoryW@4
+kernel32 GetCurrentDirectoryW@8
+kernel32 OutputDebugStringW@4
+kernel32 GetPrivateProfileStringW@24
+kernel32 WritePrivateProfileStringW@16
+kernel32 GetPrivateProfileIntW@16
+kernel32 CreateProcessW@40
+kernel32 CopyFileW@12
+kernel32 DeleteFileW@4
+kernel32 MoveFileW@8
+kernel32 CreateFileW@28
+kernel32 FindFirstFileW@8
+kernel32 FindNextFileW@8
+kernel32 RemoveDirectoryW@4
+kernel32 GetFullPathNameW@16
+kernel32 LoadLibraryW@4
+kernel32 ExpandEnvironmentStringsW@12
+kernel32 GetModuleHandleW@4
+kernel32 GetSystemDirectoryW@8
+kernel32 GetTempPathW@8
+kernel32 GetTempFileNameW@16
+
+gdi32 AddFontResourceW@4
+gdi32 RemoveFontResourceW@4
+
+comctl32 CreatePropertySheetPageW@4
+comctl32 PropertySheetW@4
+
+comdlg32 GetOpenFileNameW@4
+comdlg32 GetSaveFileNameW@4
+
+shell32 DragQueryFileW@16
+shell32 Shell_NotifyIconW@8
+shell32 SHBrowseForFolderW@4
+shell32 SHGetPathFromIDListW@8

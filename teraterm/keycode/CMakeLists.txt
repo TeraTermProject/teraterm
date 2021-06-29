@@ -12,6 +12,11 @@ add_executable(
   )
 
 if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    layer_for_unicode
+    )
   if(MSVC)
     target_sources(
       ${PACKAGE_NAME}
@@ -60,6 +65,12 @@ add_executable(
   )
 
 if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME_2}
+    PRIVATE
+    common_static
+    layer_for_unicode
+    )
   if(MSVC)
     target_sources(
       ${PACKAGE_NAME_2}

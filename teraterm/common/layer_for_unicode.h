@@ -93,82 +93,82 @@ typedef struct {
 	//HICON hBalloonIcon;	// Vista+
 } TT_NOTIFYICONDATAW_V2;
 
-BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
-BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
-UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
-LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
-LRESULT _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
+BOOL WINAPI _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
+BOOL WINAPI _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
+UINT WINAPI _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
+LRESULT WINAPI _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
+LRESULT WINAPI _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+HWND WINAPI WINAPI _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
 							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
 							 LPVOID lpParam);
-ATOM _RegisterClassW(const WNDCLASSW *lpWndClass);
-int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
-int _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
-BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
-int _GetWindowTextLengthW(HWND hWnd);
-LONG _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong);
-LONG _GetWindowLongW(HWND hWnd, int nIndex);
-LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
-LONG_PTR _GetWindowLongPtrW(HWND hWnd, int nIndex);
-LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+ATOM WINAPI _RegisterClassW(const WNDCLASSW *lpWndClass);
+int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
+int WINAPI _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+BOOL WINAPI _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+BOOL WINAPI _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+int WINAPI _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
+int WINAPI _GetWindowTextLengthW(HWND hWnd);
+LONG WINAPI _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong);
+LONG WINAPI _GetWindowLongW(HWND hWnd, int nIndex);
+LONG_PTR WINAPI _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
+LONG_PTR WINAPI _GetWindowLongPtrW(HWND hWnd, int nIndex);
+LRESULT WINAPI _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 // kernel32.dll
-DWORD _GetFileAttributesW(LPCWSTR lpFileName);
-DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer);
-BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName);
-void _OutputDebugStringW(LPCWSTR lpOutputString);
-DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName);
+DWORD WINAPI _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer);
+BOOL WINAPI _SetCurrentDirectoryW(LPCWSTR lpPathName);
+void WINAPI _OutputDebugStringW(LPCWSTR lpOutputString);
+DWORD WINAPI _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
-BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
-UINT _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
-BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+BOOL WINAPI _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
+UINT WINAPI _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
+BOOL WINAPI _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 					 LPSECURITY_ATTRIBUTES lpProcessAttributes,
 					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
 					 DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
 					 LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
-BOOL _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists);
-BOOL _DeleteFileW(LPCWSTR lpFileName);
-BOOL _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName);
-HANDLE _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+BOOL WINAPI _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists);
+BOOL WINAPI _DeleteFileW(LPCWSTR lpFileName);
+BOOL WINAPI _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName);
+HANDLE WINAPI _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 					LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
 					HANDLE hTemplateFile);
-HANDLE _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
-BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
-BOOL _RemoveDirectoryW(LPCWSTR lpPathName);
-DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
-HMODULE _LoadLibraryW(LPCWSTR lpLibFileName);
-DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
-DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
-HMODULE _GetModuleHandleW(LPCWSTR lpModuleName);
-UINT _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize);
-DWORD _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
-UINT _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
+HANDLE WINAPI _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
+BOOL WINAPI _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
+BOOL WINAPI _RemoveDirectoryW(LPCWSTR lpPathName);
+DWORD WINAPI _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
+HMODULE WINAPI _LoadLibraryW(LPCWSTR lpLibFileName);
+DWORD WINAPI WINAPI _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
+DWORD WINAPI _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
+HMODULE WINAPI _GetModuleHandleW(LPCWSTR lpModuleName);
+UINT WINAPI _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize);
+DWORD WINAPI _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
+UINT WINAPI _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 
 // gdi32.lib
-int _AddFontResourceW(LPCWSTR lpFileName);
-BOOL _RemoveFontResourceW(LPCWSTR lpFileName);
+int WINAPI _AddFontResourceW(LPCWSTR lpFileName);
+BOOL WINAPI _RemoveFontResourceW(LPCWSTR lpFileName);
 
 // Comctl32.lib
-HPROPSHEETPAGE _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
-INT_PTR _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
-//INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
+HPROPSHEETPAGE WINAPI _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 constPropSheetPagePointer);
+INT_PTR WINAPI _PropertySheetW(PROPSHEETHEADERW *constPropSheetHeaderPointer);
+//INT_PTR WINAPI _PropertySheetW(PROPSHEETHEADERW_V1 *constPropSheetHeaderPointer);
 
 // Comdlg32.lib
-BOOL _GetOpenFileNameW(LPOPENFILENAMEW ofnW);
-BOOL _GetSaveFileNameW(LPOPENFILENAMEW ofnW);
+BOOL WINAPI _GetOpenFileNameW(LPOPENFILENAMEW ofnW);
+BOOL WINAPI _GetSaveFileNameW(LPOPENFILENAMEW ofnW);
 
 // shell32.lib
-UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
-BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData);
-LPITEMIDLIST _SHBrowseForFolderW(LPBROWSEINFOW lpbi);
-BOOL _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath);
+UINT WINAPI _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
+BOOL WINAPI _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData);
+LPITEMIDLIST WINAPI _SHBrowseForFolderW(LPBROWSEINFOW lpbi);
+BOOL WINAPI _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath);
 
-HWND _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
+HWND WINAPI _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
 								 HWND hWndParent, DLGPROC lpDialogFunc,
 								 LPARAM dwInitParam);
-INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
+INT_PTR WINAPI _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
 								 DLGPROC lpDialogFunc, LPARAM lParamInit);
 
 #ifdef __cplusplus

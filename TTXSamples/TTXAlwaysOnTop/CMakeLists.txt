@@ -10,6 +10,11 @@ add_library(
   )
 
 if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    common_static
+    )
   if(MSVC)
     target_sources(
       ${PACKAGE_NAME}

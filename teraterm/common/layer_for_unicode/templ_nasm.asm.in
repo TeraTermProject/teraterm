@@ -1,0 +1,40 @@
+;;; nasm -f win32 %SYMBOL%.asm
+
+    global __imp__%SYMBOL%@%PARAM_BYTES%
+    global %SYMBOL%
+    global _%SYMBOL%@%PARAM_BYTES%
+
+    extern __%SYMBOL%@%PARAM_BYTES%
+    extern _init_ptr
+
+    section .data
+
+    ;; pointer of %SYMBOL%(), stdcall style
+__imp__%SYMBOL%@%PARAM_BYTES%:
+    dd  init
+
+
+    section .text
+
+    ;; call api pointer initializer
+init:
+    pusha
+    push dword __imp__%SYMBOL%@%PARAM_BYTES%     ; place to save the pointer
+    push dword __%SYMBOL%@%PARAM_BYTES%          ; wrapper
+    push dword api_str
+    push dword %DLL%_dll_str
+    call _init_ptr
+    add  esp,byte 16
+    popa
+
+    ;; call api
+;%SYMBOL%:
+;_%SYMBOL%@%PARAM_BYTES%:
+    jmp [__imp__%SYMBOL%@%PARAM_BYTES%]
+
+
+    section .data
+%DLL%_dll_str:
+    dw  __utf16__("%DLL%.dll"), 0
+api_str:
+    db  "%SYMBOL%",0

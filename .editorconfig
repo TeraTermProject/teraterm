@@ -34,6 +34,14 @@ charset = cp932
 indent_style = tab
 indent_size = 4
 
+[*.asm]
+end_of_line = crlf
+charset = utf8
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
 [{CMakeLists.txt,*.cmake}]
 end_of_line = crlf
 charset = utf-8-bom

@@ -10,6 +10,11 @@ add_library(
   )
 
 if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    TTXttyplay
+    PRIVATE
+    layer_for_unicode
+    )
   if(MSVC)
     target_sources(
       TTXttyplay
@@ -58,6 +63,11 @@ add_library(
   )
 
 if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    TTXttyrec
+    PRIVATE
+    layer_for_unicode
+    )
   if(MSVC)
     target_sources(
       TTXttyrec

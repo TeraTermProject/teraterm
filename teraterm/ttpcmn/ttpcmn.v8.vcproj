@@ -71,10 +71,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ADVAPI32.lib ole32.lib setupapi.lib"
+				AdditionalDependencies="layer_for_unicode.lib User32.lib gdi32.lib SHELL32.lib ADVAPI32.lib ole32.lib setupapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="$(OutDir)"
 				ModuleDefinitionFile="$(ProjectName).def"
 				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"
@@ -162,10 +162,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="User32.lib gdi32.lib SHELL32.lib ADVAPI32.lib ole32.lib setupapi.lib"
+				AdditionalDependencies="layer_for_unicode.lib User32.lib gdi32.lib SHELL32.lib ADVAPI32.lib ole32.lib setupapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="$(OutDir)"
 				ModuleDefinitionFile="$(ProjectName).def"
 				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"

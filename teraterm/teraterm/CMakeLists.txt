@@ -206,6 +206,17 @@ source_group(
 
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
+    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+      set(CMAKE_C_STANDARD_LIBRARIES "")
+      set(CMAKE_CXX_STANDARD_LIBRARIES "")
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")
+    else()
+      target_link_options(
+        ${PACKAGE_NAME}
+        PRIVATE
+        /NODEFAULTLIB
+        )
+    endif()
     target_sources(
       ${PACKAGE_NAME}
       PRIVATE
@@ -271,6 +282,8 @@ if(MSVC AND ENABLE_DEBUG_INFO)
       /pdbaltpath:ttermpro.pdb
       /map
       )
+  else()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /map")
   endif()
 elseif(MINGW)
   target_link_options(
@@ -289,12 +302,31 @@ target_link_libraries(
   ttptek
   ${ONIGURUMA_LIB}
   ${SFMT_LIB}
-  #
-  gdi32
+  )
+
+if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    layer_for_unicode
+    )
+endif()
+
+target_link_libraries(
+  ${PACKAGE_NAME}
+  PRIVATE
+  advapi32
   comctl32
-  ws2_32
+  comdlg32
+  gdi32
   imagehlp
+  kernel32
+  ole32
+  oleaut32
+  shell32
+  user32
   uuid
+  ws2_32
   )
 
 install(

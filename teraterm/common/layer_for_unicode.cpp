@@ -60,7 +60,7 @@ public:
 
 static Initializer initializer;
 
-BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString)
+BOOL WINAPI _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString)
 {
 	if (pSetDlgItemTextW != NULL) {
 		return pSetDlgItemTextW(hDlg, nIDDlgItem, lpString);
@@ -72,7 +72,7 @@ BOOL _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString)
 	return retval;
 }
 
-UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
+UINT WINAPI _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
 {
 	if (pDragQueryFileW != NULL) {
 		return pDragQueryFileW(hDrop, iFile, lpszFile, cch);
@@ -106,7 +106,7 @@ UINT _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
 	return retval;
 }
 
-DWORD _GetFileAttributesW(LPCWSTR lpFileName)
+DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName)
 {
 	if (pGetFileAttributesW != NULL) {
 		return pGetFileAttributesW(lpFileName);
@@ -179,7 +179,7 @@ static wchar_t *SendMessageAFromW_LB_GETTEXT(HWND hWnd, WPARAM wParam, size_t *l
 	return strW;
 }
 
-int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
+int WINAPI _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
 {
 	if (pGetWindowTextW != NULL) {
 		return pGetWindowTextW(hWnd, lpString, nMaxCount);
@@ -194,7 +194,7 @@ int _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
 	return (int)(dest_len - 1);
 }
 
-int _GetWindowTextLengthW(HWND hWnd)
+int WINAPI _GetWindowTextLengthW(HWND hWnd)
 {
 	if (pGetWindowTextLengthW != NULL) {
 		return pGetWindowTextLengthW(hWnd);
@@ -257,7 +257,7 @@ static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 	return retval;
 }
 
-LRESULT _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (pSendMessageW != NULL) {
 		return pSendMessageW(hWnd, Msg, wParam, lParam);
@@ -265,7 +265,7 @@ LRESULT _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	return SendMessageAFromW(hWnd, Msg, wParam, lParam);
 }
 
-LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (pSendDlgItemMessageW != NULL) {
 		return pSendDlgItemMessageW(hDlg, nIDDlgItem, Msg, wParam, lParam);
@@ -275,8 +275,9 @@ LRESULT _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam,
 	return SendMessageAFromW(hWnd, Msg, wParam, lParam);
 }
 
-HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y,
-							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
+HWND WINAPI _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X,
+									int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
+									LPVOID lpParam)
 {
 	if (pCreateWindowExW != NULL) {
 		return pCreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu,
@@ -294,7 +295,7 @@ HWND _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName
 	return hWnd;
 }
 
-ATOM _RegisterClassW(const WNDCLASSW *lpWndClass)
+ATOM WINAPI _RegisterClassW(const WNDCLASSW *lpWndClass)
 {
 	if (pRegisterClassW != NULL) {
 		return pRegisterClassW(lpWndClass);
@@ -325,7 +326,7 @@ ATOM _RegisterClassW(const WNDCLASSW *lpWndClass)
 	return atom;
 }
 
-BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString)
+BOOL WINAPI _SetWindowTextW(HWND hWnd, LPCWSTR lpString)
 {
 	if (pSetWindowTextW != NULL) {
 		return pSetWindowTextW(hWnd, lpString);
@@ -337,7 +338,7 @@ BOOL _SetWindowTextW(HWND hWnd, LPCWSTR lpString)
 	return retval;
 }
 
-UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
+UINT WINAPI _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
 {
 	if (pGetDlgItemTextW != NULL) {
 		return pGetDlgItemTextW(hDlg, nIDDlgItem, lpString, cchMax);
@@ -366,7 +367,7 @@ UINT _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax)
  *
  *		TODO:9x系でDrawTextWが正しく動作する?
  */
-int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
+int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
 {
 	if (IsWindowsNTKernel()) {
 		return DrawTextW(hdc, lpchText, cchText, lprc, format);
@@ -380,7 +381,7 @@ int _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
 	return result;
 }
 
-int _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
+int WINAPI _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
 {
 	if (pMessageBoxW != NULL) {
 		return pMessageBoxW(hWnd, lpText, lpCaption, uType);
@@ -394,7 +395,7 @@ int _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
 	return result;
 }
 
-BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
+BOOL WINAPI _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
 {
 	if (pInsertMenuW != NULL) {
 		return pInsertMenuW(hMenu, uPosition, uFlags, uIDNewItem, lpNewItem);
@@ -406,7 +407,7 @@ BOOL _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem,
 	return result;
 }
 
-BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
+BOOL WINAPI _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
 {
 	if (pAppendMenuW != NULL) {
 		return pAppendMenuW(hMenu, uFlags, uIDNewItem, lpNewItem);
@@ -417,7 +418,7 @@ BOOL _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewIt
 	return result;
 }
 
-int _AddFontResourceW(LPCWSTR lpFileName)
+int WINAPI _AddFontResourceW(LPCWSTR lpFileName)
 {
 	char *filenameA = ToCharW(lpFileName);
 	int result = AddFontResourceA(filenameA);
@@ -425,7 +426,7 @@ int _AddFontResourceW(LPCWSTR lpFileName)
 	return result;
 }
 
-BOOL _RemoveFontResourceW(LPCWSTR lpFileName)
+BOOL WINAPI _RemoveFontResourceW(LPCWSTR lpFileName)
 {
 	char *filenameA = ToCharW(lpFileName);
 	int result = RemoveFontResourceA(filenameA);
@@ -436,7 +437,7 @@ BOOL _RemoveFontResourceW(LPCWSTR lpFileName)
 /*
  * lpData.cbSize == 952のときのみ ANSI関数で処理する
  */
-BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
+BOOL WINAPI _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 {
 	if (pShell_NotifyIconW != NULL) {
 		return pShell_NotifyIconW(dwMessage, (PNOTIFYICONDATAW)lpData);
@@ -474,7 +475,7 @@ BOOL _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 	return r;
 }
 
-HWND _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc,
+HWND WINAPI _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc,
 								 LPARAM dwInitParam)
 {
 	if (pCreateDialogIndirectParamW != NULL) {
@@ -483,7 +484,7 @@ HWND _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate
 	return CreateDialogIndirectParamA(hInstance, lpTemplate, hWndParent, lpDialogFunc, dwInitParam);
 }
 
-INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
+INT_PTR WINAPI _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
 								 DLGPROC lpDialogFunc, LPARAM lParamInit)
 {
 	if (pDialogBoxIndirectParamW != NULL) {
@@ -492,7 +493,7 @@ INT_PTR _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTem
 	return DialogBoxIndirectParamA(hInstance, hDialogTemplate, hWndParent, lpDialogFunc, lParamInit);
 }
 
-LONG _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong)
+LONG WINAPI _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong)
 {
 	if (pSetWindowLongW != NULL) {
 		return pSetWindowLongW(hWnd, nIndex, dwNewLong);
@@ -500,7 +501,7 @@ LONG _SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong)
 	return SetWindowLongA(hWnd, nIndex, dwNewLong);
 }
 
-LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
+LONG_PTR WINAPI _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
 {
 #ifdef _WIN64
 	if (pSetWindowLongPtrW != NULL) {
@@ -512,7 +513,7 @@ LONG_PTR _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong)
 #endif
 }
 
-LONG _GetWindowLongW(HWND hWnd, int nIndex)
+LONG WINAPI _GetWindowLongW(HWND hWnd, int nIndex)
 {
 	if (pGetWindowLongW != NULL) {
 		return pGetWindowLongW(hWnd, nIndex);
@@ -520,7 +521,7 @@ LONG _GetWindowLongW(HWND hWnd, int nIndex)
 	return GetWindowLongA(hWnd, nIndex);
 }
 
-LONG_PTR _GetWindowLongPtrW(HWND hWnd, int nIndex)
+LONG_PTR WINAPI _GetWindowLongPtrW(HWND hWnd, int nIndex)
 {
 #ifdef _WIN64
 	if (pGetWindowLongPtrW != NULL) {
@@ -532,7 +533,7 @@ LONG_PTR _GetWindowLongPtrW(HWND hWnd, int nIndex)
 #endif
 }
 
-LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (pCallWindowProcW != NULL) {
 		return pCallWindowProcW(lpPrevWndFunc, hWnd, Msg, wParam, lParam);
@@ -540,7 +541,7 @@ LRESULT _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wPar
 	return CallWindowProcA(lpPrevWndFunc, hWnd, Msg, wParam, lParam);
 }
 
-void _OutputDebugStringW(LPCWSTR lpOutputString)
+void WINAPI _OutputDebugStringW(LPCWSTR lpOutputString)
 {
 	if (pOutputDebugStringW != NULL) {
 		return pOutputDebugStringW(lpOutputString);
@@ -551,7 +552,7 @@ void _OutputDebugStringW(LPCWSTR lpOutputString)
 	free(strA);
 }
 
-DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
+DWORD WINAPI _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
 {
 	if (pGetCurrentDirectoryW != NULL) {
 		return pGetCurrentDirectoryW(nBufferLength, lpBuffer);
@@ -565,7 +566,7 @@ DWORD _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
 	return r;
 }
 
-BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName)
+BOOL WINAPI _SetCurrentDirectoryW(LPCWSTR lpPathName)
 {
 	if (pSetCurrentDirectoryW != NULL) {
 		return pSetCurrentDirectoryW(lpPathName);
@@ -576,7 +577,7 @@ BOOL _SetCurrentDirectoryW(LPCWSTR lpPathName)
 	return r;
 }
 
-LPITEMIDLIST _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
+LPITEMIDLIST WINAPI _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
 {
 	if (pSHBrowseForFolderW != NULL) {
 		return pSHBrowseForFolderW(lpbi);
@@ -597,7 +598,7 @@ LPITEMIDLIST _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
 	return pidlBrowse;
 }
 
-BOOL _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath)
+BOOL WINAPI _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath)
 {
 	if (pSHGetPathFromIDListW != NULL) {
 		return pSHGetPathFromIDListW(pidl, pszPath);
@@ -609,7 +610,7 @@ BOOL _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath)
 	return r;
 }
 
-DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
+DWORD WINAPI _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName)
 {
 	if (pGetPrivateProfileStringW != NULL) {
@@ -617,6 +618,9 @@ DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lp
 										 lpReturnedString, nSize, lpFileName);
 	}
 
+	if (lpDefault == NULL) {
+		lpDefault = L"";
+	}
 	char *buf = (char* )malloc(nSize);
 	char *appA = ToCharW(lpAppName);
 	char *keyA = ToCharW(lpKeyName);
@@ -633,7 +637,7 @@ DWORD _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lp
 	return r;
 }
 
-BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName)
+BOOL WINAPI _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName)
 {
 	if (pWritePrivateProfileStringW != NULL) {
 		return pWritePrivateProfileStringW(lpAppName, lpKeyName, lpString, lpFileName);
@@ -651,7 +655,7 @@ BOOL _WritePrivateProfileStringW(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpS
 	return r;
 }
 
-UINT _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName)
+UINT WINAPI _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName)
 {
 	if (pGetPrivateProfileIntW != NULL) {
 		return pGetPrivateProfileIntW(lpAppName, lpKeyName, nDefault, lpFileName);
@@ -667,7 +671,7 @@ UINT _GetPrivateProfileIntW(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, 
 	return r;
 }
 
-BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+BOOL WINAPI _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 					 LPSECURITY_ATTRIBUTES lpProcessAttributes,
 					 LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
 					 DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
@@ -716,7 +720,7 @@ BOOL _CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 	return r;
 }
 
-BOOL _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists)
+BOOL WINAPI _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists)
 {
 	if (pCopyFileW != NULL) {
 		return pCopyFileW(lpExistingFileName, lpNewFileName, bFailIfExists);
@@ -729,7 +733,7 @@ BOOL _CopyFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfE
 	return r;
 }
 
-BOOL _DeleteFileW(LPCWSTR lpFileName)
+BOOL WINAPI _DeleteFileW(LPCWSTR lpFileName)
 {
 	if (pDeleteFileW != NULL) {
 		return pDeleteFileW(lpFileName);
@@ -740,7 +744,7 @@ BOOL _DeleteFileW(LPCWSTR lpFileName)
 	return r;
 }
 
-BOOL _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName)
+BOOL WINAPI _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName)
 {
 	if (pMoveFileW != NULL) {
 		return pMoveFileW(lpExistingFileName, lpNewFileName);
@@ -753,7 +757,7 @@ BOOL _MoveFileW(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName)
 	return r;
 }
 
-HANDLE _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+HANDLE WINAPI _CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 					LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes,
 					HANDLE hTemplateFile)
 {
@@ -783,7 +787,7 @@ static void FindDataAW(const WIN32_FIND_DATAA *a, WIN32_FIND_DATAW *w)
 	::MultiByteToWideChar(CP_ACP, 0, a->cAlternateFileName, _countof(a->cAlternateFileName), w->cAlternateFileName, _countof(w->cAlternateFileName));
 }
 
-HANDLE _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData)
+HANDLE WINAPI _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData)
 {
 	if (pFindFirstFileW != NULL) {
 		return pFindFirstFileW(lpFileName, lpFindFileData);
@@ -797,7 +801,7 @@ HANDLE _FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData)
 	return handle;
 }
 
-BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData)
+BOOL WINAPI _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData)
 {
 	if (pFindNextFileW != NULL) {
 		return pFindNextFileW(hFindFile, lpFindFileData);
@@ -808,7 +812,7 @@ BOOL _FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData)
 	return r;
 }
 
-BOOL _RemoveDirectoryW(LPCWSTR lpPathName)
+BOOL WINAPI _RemoveDirectoryW(LPCWSTR lpPathName)
 {
 	if (pRemoveDirectoryW != NULL) {
 		return pRemoveDirectoryW(lpPathName);
@@ -819,40 +823,47 @@ BOOL _RemoveDirectoryW(LPCWSTR lpPathName)
 	return r;
 }
 
-DWORD _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart)
+DWORD WINAPI _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart)
 {
 	if (pGetFullPathNameW != NULL) {
 		return pGetFullPathNameW(lpFileName, nBufferLength, lpBuffer, lpFilePart);
 	}
 
-	char *filenameA = ToCharW(lpFileName);
-	char bufA[MAX_PATH];
-	char *filepartA;
-	DWORD r = GetFullPathNameA(filenameA, sizeof(bufA), bufA, &filepartA);
-	if (r == 0) {
-		// error
-		free(filenameA);
-		return 0;
-	}
-	wchar_t *bufW = ToWcharA(bufA);
-	r = (DWORD)wcslen(bufW);
 	if (nBufferLength == 0 || lpBuffer == NULL) {
-		// 必要な文字数を返す('\0'含む)
-		r = r + 1;
-	} else {
-		// パスをコピーして、文字列長を返す('\0'含まない)
-		wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
-		if (lpFilePart != NULL) {
-			*lpFilePart = lpBuffer + (filepartA - filenameA) * sizeof(wchar_t);
-		}
+		char *filenameA = ToCharW(lpFileName);
+		DWORD r = GetFullPathNameA(filenameA, 0, NULL, NULL);
+		free(filenameA);
+		return r;
 	}
-	free(filenameA);
-	free(bufW);
-
-	return r;
+	else {
+		char *filenameA = ToCharW(lpFileName);
+		char bufA[MAX_PATH];
+		char *filepartA;
+		DWORD r = GetFullPathNameA(filenameA, sizeof(bufA), bufA, &filepartA);
+		if (r == 0) {
+			// error
+			free(filenameA);
+			return 0;
+		}
+		wchar_t *bufW = ToWcharA(bufA);
+		r = (DWORD)wcslen(bufW);
+		if (nBufferLength == 0 || lpBuffer == NULL) {
+			// 必要な文字数を返す('\0'含む)
+			r = r + 1;
+		} else {
+			// パスをコピーして、文字列長を返す('\0'含まない)
+			wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
+			if (lpFilePart != NULL) {
+				*lpFilePart = lpBuffer + (filepartA - filenameA) * sizeof(wchar_t);
+			}
+		}
+		free(filenameA);
+		free(bufW);
+		return r;
+	}
 }
 
-HMODULE _LoadLibraryW(LPCWSTR lpLibFileName)
+HMODULE WINAPI _LoadLibraryW(LPCWSTR lpLibFileName)
 {
 	if (pLoadLibraryW != NULL) {
 		return pLoadLibraryW(lpLibFileName);
@@ -863,7 +874,7 @@ HMODULE _LoadLibraryW(LPCWSTR lpLibFileName)
 	return r;
 }
 
-DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
+DWORD WINAPI _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 {
 	if (pGetModuleFileNameW != NULL) {
 		return pGetModuleFileNameW(hModule, lpFilename, nSize);
@@ -878,7 +889,7 @@ DWORD _GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 	return wlen - 1;	// not including the terminating null character
 }
 
-DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
+DWORD WINAPI _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
 {
 	if (pExpandEnvironmentStringsW != NULL) {
 		return pExpandEnvironmentStringsW(lpSrc, lpDst, nSize);
@@ -895,7 +906,7 @@ DWORD _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize)
 	return r;
 }
 
-HMODULE _GetModuleHandleW(LPCWSTR lpModuleName)
+HMODULE WINAPI _GetModuleHandleW(LPCWSTR lpModuleName)
 {
 	char *lpStringA = ToCharW(lpModuleName);
 	HMODULE h = GetModuleHandleA(lpStringA);
@@ -903,7 +914,7 @@ HMODULE _GetModuleHandleW(LPCWSTR lpModuleName)
 	return h;
 }
 
-UINT _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize)
+UINT WINAPI _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize)
 {
 	char buf[MAX_PATH];
 	UINT r = GetSystemDirectoryA(buf, _countof(buf));
@@ -914,7 +925,7 @@ UINT _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize)
 	return wlen - 1;	// not including the terminating null character
 }
 
-DWORD _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer)
+DWORD WINAPI _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer)
 {
 	if (pGetTempPathW != NULL) {
 		return pGetTempPathW(nBufferLength, lpBuffer);
@@ -929,7 +940,7 @@ DWORD _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer)
 	return wlen - 1;	// not including the terminating null character
 }
 
-UINT _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName)
+UINT WINAPI _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName)
 {
 	if (pGetTempFileNameW != NULL) {
 		return pGetTempFileNameW(lpPathName, lpPrefixString, uUnique, lpTempFileName);

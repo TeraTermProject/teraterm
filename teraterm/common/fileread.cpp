@@ -37,7 +37,6 @@
 
 #include "codeconv.h"
 #include "ttlib.h"
-#include "layer_for_unicode_crt.h"
 
 #include "fileread.h"
 
@@ -100,7 +99,7 @@ static void *LoadRawFile(FILE *fp, size_t *_len)
 uint8_t *LoadFileBinary(const wchar_t *FileName, size_t *_len)
 {
 	FILE *fp;
-	__wfopen_s(&fp, FileName, L"rb");
+	_wfopen_s(&fp, FileName, L"rb");
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -254,7 +253,7 @@ wchar_t *LoadFileWW(const wchar_t *FileName, size_t *_len)
 		*_len = 0;
 	}
 	FILE *fp;
-	__wfopen_s(&fp, FileName, L"rb");
+	_wfopen_s(&fp, FileName, L"rb");
 	if (fp == NULL) {
 		return NULL;
 	}
