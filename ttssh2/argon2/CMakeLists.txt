@@ -22,7 +22,8 @@ add_library(
   ../../libs/argon2/src/thread.h
   )
 
-if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
+if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
+  # Visual Studio 2005, 2008  (1500=VS2008)
   target_sources(
     ${PACKAGE_NAME}
     PRIVATE
