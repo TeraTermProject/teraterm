@@ -195,7 +195,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfosCom, _countof(TextInfosCom), UILanguageFile);
-				if (ts->Language==IdJapanese) {
+			if (ts->Language==IdJapanese) {
 				static const DlgTextInfo TextInfosJp[] = {
 					{ IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
 					{ IDC_TERMKANA, "DLG_TERM_KANA" },
@@ -3001,7 +3001,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 							WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
 							ts->UILanguageFileW = GetUILanguageFileFullW(ts->HomeDirW, ts->UILanguageFileW_ini);
-							WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFileW));
+							WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 							// タイトルの更新を行う。(2014.2.23 yutaka)
 							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
