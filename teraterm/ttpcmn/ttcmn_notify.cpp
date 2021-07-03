@@ -47,53 +47,36 @@
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "codeconv.h"
-
-#if 0
-// TODO 何とかする
-typedef struct {
-	DWORD cbSize;
-	HWND hWnd;
-	UINT uID;
-	UINT uFlags;
-	UINT uCallbackMessage;
-	HICON hIcon;
-	wchar_t	 szTip[128];
-	DWORD dwState;
-	DWORD dwStateMask;
-	wchar_t	 szInfo[256];
-	union {
-		UINT  uTimeout;
-		UINT  uVersion;	 // used with NIM_SETVERSION, values 0, 3 and 4
-	} DUMMYUNIONNAME;
-	wchar_t	 szInfoTitle[64];
-	DWORD dwInfoFlags;
-	//GUID guidItem;		// XP+
-	//HICON hBalloonIcon;	// Vista+
-} TT_NOTIFYICONDATAW_V2;
-#endif
+#include "compat_win.h"
 
 typedef struct {
-//	TT_NOTIFYICONDATAW_V2 notify_icon;
-	NOTIFYICONDATAW notify_icon;
+	TT_NOTIFYICONDATAW_V2 notify_icon;
 	int NotifyIconShowCount;
 	HICON CustomIcon;
 } NotifyIcon;
 
-#define TT_NOTIFYICONDATAW_V2 NOTIFYICONDATAW
+/**
+ *	Shell_NotifyIconW() wrapper
+ *		- TT_NOTIFYICONDATAW_V2 は Windows 2000 以降で使用可能
+ *		- タスクトレイにバルーンを出すことができるのは 2000 以降
+ *			- NT4は使えない
+ *			- HasBalloonTipSupport() で 2000以上としている
+ *		- 必ず Unicode 版が利用可能 → 9xサポート不要?
+ *			- Windows 98,ME で利用可能?
+ *			- TT_NOTIFYICONDATAA_V2
+ */
+static BOOL Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
+{
+	return Shell_NotifyIconW(dwMessage, (NOTIFYICONDATAW*)lpData);
+}
 
 static NotifyIcon *NotifyCreate(HWND hWnd, HICON icon, UINT msg)
 {
 	NotifyIcon *ni = (NotifyIcon *)malloc(sizeof(NotifyIcon));
 	memset(ni, 0, sizeof(*ni));
 
-	NOTIFYICONDATAW *p = &ni->notify_icon;
-#if	(_MSC_VER > 1400)
-	// VS2008+
-	p->cbSize = offsetof(NOTIFYICONDATAW, guidItem);
-#else
-	// VS2005
+	TT_NOTIFYICONDATAW_V2 *p = &ni->notify_icon;
 	p->cbSize = sizeof(*p);
-#endif
 	p->hWnd = hWnd;
 	p->uID = 1;
 	p->uFlags = NIF_ICON | NIF_MESSAGE;

@@ -428,20 +428,14 @@ BOOL WINAPI _RemoveFontResourceW(LPCWSTR lpFileName)
 	return result;
 }
 
-/*
- * lpData.cbSize == 952‚Ì‚Æ‚«‚Ì‚Ý ANSIŠÖ”‚Åˆ—‚·‚é
- */
 BOOL WINAPI _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 {
-	if (pShell_NotifyIconW != NULL) {
-		return pShell_NotifyIconW(dwMessage, (PNOTIFYICONDATAW)lpData);
-	}
-
 	const TT_NOTIFYICONDATAW_V2 *w = lpData;
 	if (w->cbSize != sizeof(TT_NOTIFYICONDATAW_V2)) {
 		return FALSE;
 	}
 
+	// lpData.cbSize == 952‚Ì‚Æ‚«‚¾‚¯ ANSIŠÖ”‚Åˆ—‚·‚é
 	TT_NOTIFYICONDATAA_V2 nid;
 	TT_NOTIFYICONDATAA_V2 *p = &nid;
 	p->cbSize = sizeof(nid);

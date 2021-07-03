@@ -68,6 +68,63 @@ typedef enum MONITOR_DPI_TYPE {
 #define OPENFILENAME_SIZE_VERSION_400A	76
 #endif
 
+#if !defined(_WIN64)
+#include <pshpack1.h>
+#endif
+
+/**
+ *	NOTIFYICONDATA は define でサイズが変化する
+ *	どんな環境でも変化しないよう定義
+ *
+ * Shlwapi.dll 5.0
+ * 	Win98(ME?)+,2000+
+ */
+typedef struct {
+	DWORD cbSize;
+	HWND hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	HICON hIcon;
+	char   szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	char   szInfo[256];
+	union {
+		UINT  uTimeout;
+		UINT  uVersion;	 // used with NIM_SETVERSION, values 0, 3 and 4
+	} DUMMYUNIONNAME;
+	char   szInfoTitle[64];
+	DWORD dwInfoFlags;
+	//GUID guidItem;		// XP+ (V3)
+	//HICON hBalloonIcon;	// Vista+ (V4)
+} TT_NOTIFYICONDATAA_V2;
+
+typedef struct {
+	DWORD cbSize;
+	HWND hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	HICON hIcon;
+	wchar_t	 szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	wchar_t	 szInfo[256];
+	union {
+		UINT  uTimeout;
+		UINT  uVersion;	 // used with NIM_SETVERSION, values 0, 3 and 4
+	} DUMMYUNIONNAME;
+	wchar_t	 szInfoTitle[64];
+	DWORD dwInfoFlags;
+	//GUID guidItem;		// XP+ (V3)
+	//HICON hBalloonIcon;	// Vista+ (V4)
+} TT_NOTIFYICONDATAW_V2;
+
+#if !defined(_WIN64)
+#include <poppack.h>
+#endif
+
 extern ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
 extern HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X,
 									   int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,

@@ -30,6 +30,7 @@
 
 #include <windows.h>
 #include <windns.h>
+#include <assert.h>
 
 #include "compat_win.h"
 #include "compat_windns.h"
@@ -351,6 +352,16 @@ void WinCompatInit()
 	static BOOL done = FALSE;
 	if (done) return;
 	done = TRUE;
+
+	assert(sizeof(TT_NOTIFYICONDATAA_V2) == NOTIFYICONDATAA_V2_SIZE);
+	assert(sizeof(TT_NOTIFYICONDATAW_V2) == NOTIFYICONDATAW_V2_SIZE);
+#if defined(_WIN64)
+	assert(sizeof(TT_NOTIFYICONDATAA_V2) == 504);
+	assert(sizeof(TT_NOTIFYICONDATAW_V2) == 952);
+#else
+	assert(sizeof(TT_NOTIFYICONDATAA_V2) == 488);
+	assert(sizeof(TT_NOTIFYICONDATAW_V2) == 936);
+#endif
 
 	DLLGetApiAddressFromLists(DllInfos);
 
