@@ -35,7 +35,6 @@
 #include "compat_windns.h"
 
 #include "dllutil.h"
-#include "ttlib.h"
 #include "codeconv.h"
 
 // for debug
@@ -332,6 +331,20 @@ static const DllInfo DllInfos[] = {
 	{ L"dnsapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dnsapi },
 	{},
 };
+
+static bool IsWindowsNTKernel()
+{
+	OSVERSIONINFOA osvi;
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	GetVersionExA(&osvi);
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+		// Windows 9x
+		return false;
+	}
+	else {
+		return true;
+	}
+}
 
 void WinCompatInit()
 {

@@ -69,20 +69,21 @@ else()
     "asm")
 endif()
 
-if(${CMAKE_VERSION} VERSION_GREATER "3.12.0")
+if(MSVC AND (MSVC_VERSION GREATER_EQUAL 1900))
+  # Visual Studio 2015+  (1900=VS2015)
   target_link_libraries(
     ${PACKAGE_NAME}
     PUBLIC
     common_static
-    $<$<CONFIG:Release>:libucrt.lib libvcruntime.lib>
-    $<$<CONFIG:Debug>:libucrtd.lib libvcruntimed.lib>
+    $<$<CONFIG:Release>:libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib>
+    $<$<CONFIG:Debug>:libucrtd.lib libvcruntimed.lib libcmtd.lib libcpmtd.lib>
     )
 else()
   target_link_libraries(
     ${PACKAGE_NAME}
     PUBLIC
-    $<$<CONFIG:Release>:LIBCMT.lib LIBCPMT.lib>
-    $<$<CONFIG:Debug>:LIBCMTd.lib LIBCPMTd.lib>
+    $<$<CONFIG:Release>:libcmt.lib libcpmt.lib>
+    $<$<CONFIG:Debug>:libcmtd.lib libcpmtd.lib>
     )
 endif()
 
