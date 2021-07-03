@@ -1,3 +1,5 @@
 Makefile
 *.asm
 *.obj
+list_asm.cmake
+list_obj.cmake

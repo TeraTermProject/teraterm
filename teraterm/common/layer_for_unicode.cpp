@@ -364,15 +364,9 @@ UINT WINAPI _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cch
  *	@param[in]		cchText		•¶š”(-1‚Ì‚Æ‚«lpchText‚Ì•¶š—ñ’·)
  *	@param[in]		lprc		•\¦rect
  *	@param[in]		format
- *
- *		TODO:9xŒn‚ÅDrawTextW‚ª³‚µ‚­“®ì‚·‚é?
  */
 int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
 {
-	if (IsWindowsNTKernel()) {
-		return DrawTextW(hdc, lpchText, cchText, lprc, format);
-	}
-
 	int strW_len = (cchText == -1) ? 0 : cchText;
 	size_t strA_len;
 	char *strA = _WideCharToMultiByte(lpchText, strW_len, CP_ACP, &strA_len);

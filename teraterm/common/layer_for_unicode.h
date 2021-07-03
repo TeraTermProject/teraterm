@@ -102,7 +102,6 @@ HWND WINAPI WINAPI _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWST
 							 int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
 							 LPVOID lpParam);
 ATOM WINAPI _RegisterClassW(const WNDCLASSW *lpWndClass);
-int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
 int WINAPI _MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 BOOL WINAPI _InsertMenuW(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 BOOL WINAPI _AppendMenuW(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
@@ -113,6 +112,7 @@ LONG WINAPI _GetWindowLongW(HWND hWnd, int nIndex);
 LONG_PTR WINAPI _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 LONG_PTR WINAPI _GetWindowLongPtrW(HWND hWnd, int nIndex);
 LRESULT WINAPI _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
 
 // kernel32.dll
 DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName);

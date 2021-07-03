@@ -15,6 +15,7 @@ user32 CreateDialogIndirectParamW@20
 user32 DialogBoxIndirectParamW@20
 user32 SetWindowLongW@12
 user32 GetWindowLongW@8
+user32 DrawTextW@20
 
 kernel32 GetFileAttributesW@4
 kernel32 GetModuleFileNameW@12
