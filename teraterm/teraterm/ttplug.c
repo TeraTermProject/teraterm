@@ -143,7 +143,7 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 	wchar_t *load_mask;
 	WIN32_FIND_DATAW fd;
 	HANDLE hFind;
-	wchar_t *HomeDirW = ToWcharA(ts_->HomeDir);
+	wchar_t *HomeDirW = ts_->HomeDirW;
 
 	aswprintf(&load_mask, L"%s\\TTX*.DLL", HomeDirW);
 
@@ -158,7 +158,6 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 		FindClose(hFind);
 	}
 	free(load_mask);
-	free(HomeDirW);
 
 	if (NumExtensions==0) return;
 
