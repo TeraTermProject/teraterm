@@ -39,6 +39,7 @@
 #include "i18n.h"
 #include "commlib.h"
 #include "codeconv.h"
+#include "asprintf.h"
 
 HWND HVTWin = NULL;
 HWND HTEKWin = NULL;
@@ -252,9 +253,12 @@ void SwitchTitleBar()
     PostMessage(H2,WM_USER_CHANGETBAR,0,0);
 }
 
-HMODULE LoadHomeDLL(const char *DLLname)
+HMODULE LoadHomeDLL(const wchar_t *DLLname)
 {
-	char DLLpath[MAX_PATH];
-	_snprintf_s(DLLpath, sizeof(DLLpath), _TRUNCATE, "%s\\%s", ts.HomeDir, DLLname);
-	return LoadLibrary(DLLpath);
+	HMODULE handle;
+	wchar_t *DLLpath;
+	aswprintf(&DLLpath, L"%s\\%s", ts.HomeDirW, DLLname);
+	handle = LoadLibraryW(DLLpath);
+	free(DLLpath);
+	return handle;
 }

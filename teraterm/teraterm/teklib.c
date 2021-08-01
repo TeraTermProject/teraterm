@@ -84,7 +84,7 @@ BOOL LoadTTTEK()
   BOOL Err;
 
   if (HTTTEK != NULL) return TRUE;
-  HTTTEK = LoadHomeDLL("TTPTEK.DLL");
+  HTTTEK = LoadHomeDLL(L"TTPTEK.DLL");
   if (HTTTEK == NULL) return FALSE;
 
   Err = FALSE;

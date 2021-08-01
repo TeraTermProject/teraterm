@@ -37,7 +37,7 @@ void VTActivate();
 void ChangeTitle();
 void SwitchMenu();
 void SwitchTitleBar();
-HMODULE LoadHomeDLL(const char *DLLname);
+HMODULE LoadHomeDLL(const wchar_t *DLLname);
 
 extern HWND HVTWin;
 extern HWND HTEKWin;

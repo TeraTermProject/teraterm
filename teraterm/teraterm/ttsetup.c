@@ -62,7 +62,7 @@ BOOL LoadTTSET()
   BOOL Err;
 
   if (HTTSET != NULL) return TRUE;
-  HTTSET = LoadHomeDLL("TTPSET.DLL");
+  HTTSET = LoadHomeDLL(L"TTPSET.DLL");
   if (HTTSET == NULL) return FALSE;
 
   Err = FALSE;
