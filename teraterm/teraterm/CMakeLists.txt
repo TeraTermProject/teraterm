@@ -47,6 +47,8 @@ add_executable(
   prnabort.h
   protodlg.cpp
   protodlg.h
+  setupdirdlg.cpp
+  setupdirdlg.h
   sizetip.c
   sizetip.h
   teklib.c

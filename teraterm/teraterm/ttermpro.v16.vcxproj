@@ -161,6 +161,7 @@
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="keyboard.c" />
     <ClCompile Include="sendfiledlg.cpp" />
+    <ClCompile Include="setupdirdlg.cpp" />
     <ClCompile Include="sizetip.c" />
     <ClCompile Include="prnabort.cpp" />
     <ClCompile Include="protodlg.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="prnabort.h" />
     <ClInclude Include="protodlg.h" />
+    <ClInclude Include="setupdirdlg.h" />
     <ClInclude Include="sizetip.h" />
     <ClInclude Include="teklib.h" />
     <ClInclude Include="tekwin.h" />

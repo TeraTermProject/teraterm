@@ -189,6 +189,9 @@
     <ClCompile Include="..\ttpset\ttset_keyboard.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
+    <ClCompile Include="setupdirdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -442,6 +445,9 @@
       <Filter>ffpfile</Filter>
     </ClInclude>
     <ClInclude Include="ttdebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="setupdirdlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

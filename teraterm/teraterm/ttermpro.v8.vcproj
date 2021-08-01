@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\setupdirdlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="tekwin.cpp"
 				>
 			</File>
@@ -446,6 +450,10 @@
 			</File>
 			<File
 				RelativePath=".\sendfiledlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\setupdirdlg.h"
 				>
 			</File>
 			<File
