@@ -36,8 +36,6 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance,
 	STARTUPINFO startup_info;
 	PROCESS_INFORMATION process_info;
 
-	SetEnvironmentVariable(_TEXT("TERATERM_EXTENSIONS"), _TEXT("1"));
-
 	GetModuleFileName(NULL, buf, sizeof(buf));
 	for (i = 0; buf[i] != 0; i++) {
 		if (buf[i] ==  _TEXT('\\') || buf[i] == _TEXT('/') || buf[i] == _TEXT(':')) {

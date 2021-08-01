@@ -44,18 +44,15 @@
 #include <string.h>
 
 /* When you build this extension, it should be called TTXTEST.DLL. To try it
-   out, copy it into the directory containing Tera Term. Currently, in order
-   to use extensions with Tera Term, you have to set the environment variable
-   TERATERM_EXTENSIONS to something. So in a command shell, use
-   "set TERATERM_EXTENSIONS=1". Then use "ttermpro > dump" to run Tera Term
+   out, copy it into the directory containing Tera Term.
+   Then use "ttermpro > dump" to run Tera Term
    and save the debugging output below to the file "dump".
 
-   When TERATERM_EXTENSIONS is set, Tera Term automatically scans the
+   Tera Term automatically scans the
    directory containing it, looking for files of the form TTX*.DLL.
    It loads any that it finds. For each one that it finds, it calls TTXBind;
    see below for details.
 */
-
 
 /* This variable is used for the load order of the extension (see below for
    details). We also print it out in all the diagnostics, to make sure the
