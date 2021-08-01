@@ -4038,6 +4038,7 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				if (_stricmp(ts->SetupFName, Temp) != 0) {
 					strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Temp,
 					          _TRUNCATE);
+					ts->SetupFNameW = ToWcharA(ts->SetupFName);
 					ReadIniFile(ts->SetupFName, ts);
 				}
 			}
@@ -4146,6 +4147,7 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
 			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".CNF",
 			          ts->KeyCnfFN, sizeof(ts->KeyCnfFN));
+			ts->KeyCnfFNW = ToWcharA(ts->KeyCnfFN);
 		}
 		else if ((_strnicmp(Temp, "/KR=", 4) == 0) ||
 		         (_strnicmp(Temp, "/KT=", 4) == 0)) {	/* kanji code */
@@ -4173,6 +4175,7 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if (_strnicmp(Temp, "/L=", 3) == 0) {	/* log file */
 			strncpy_s(ts->LogFN, sizeof(ts->LogFN), &Temp[3], _TRUNCATE);
+			ts->LogFNW = ToWcharA(ts->LogFN);
 		}
 		else if (_strnicmp(Temp, "/LA=", 4) == 0) {	/* language */
 			switch (Temp[4]) {
@@ -4197,19 +4200,21 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			strncpy_s(ts->MulticastName, sizeof(ts->MulticastName), &Temp[4], _TRUNCATE);
 		}
 		else if (_strnicmp(Temp, "/M=", 3) == 0) {	/* macro filename */
-			if ((Temp[3] == 0) || (Temp[3] == '*'))
+			if ((Temp[3] == 0) || (Temp[3] == '*')) {
 				strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*",
 				          _TRUNCATE);
-			else {
+			} else {
 				strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
 				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".TTL",
 				          ts->MacroFN, sizeof(ts->MacroFN));
 			}
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
+			ts->MacroFNW = ToWcharA(ts->MacroFN);
 			ts->ComAutoConnect = FALSE;
 		}
 		else if (_stricmp(Temp, "/M") == 0) {	/* macro option without file name */
 			strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*", _TRUNCATE);
+			ts->MacroFNW = ToWcharA(ts->MacroFN);
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
 		}
