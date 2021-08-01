@@ -2821,19 +2821,19 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 }
 
 static const char *LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
-static const char **LangUIList = NULL;
-#define LANG_EXT ".lng"
+static const wchar_t **LangUIList = NULL;
+#define LANG_EXT L".lng"
 
-static const char *get_lang_folder()
+static const wchar_t *get_lang_folder()
 {
-	return (IsWindowsNTKernel()) ? "lang_utf16le" : "lang";
+	return (IsWindowsNTKernel()) ? L"lang_utf16le" : L"lang";
 }
 
 // メモリフリー
 static void free_lang_ui_list()
 {
 	if (LangUIList) {
-		const char **p = LangUIList;
+		const wchar_t **p = LangUIList;
 		while (*p) {
 			free((void *)*p);
 			p++;
@@ -2843,57 +2843,58 @@ static void free_lang_ui_list()
 	}
 }
 
-static int make_sel_lang_ui(char *HomeDir)
+static int make_sel_lang_ui(const wchar_t *HomeDir)
 {
 	int    i;
 	int    file_num;
-	char   fullpath[1024];
+	wchar_t *fullpath;
 	HANDLE hFind;
-	WIN32_FIND_DATA fd;
+	WIN32_FIND_DATAW fd;
 
 	free_lang_ui_list();
 
-	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, get_lang_folder(), LANG_EXT);
+	aswprintf(&fullpath, L"%s\\%s\\*%s", HomeDir, get_lang_folder(), LANG_EXT);
 
 	file_num = 0;
-	hFind = FindFirstFile(fullpath,&fd);
+	hFind = FindFirstFileW(fullpath, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				file_num++;
 			}
-		} while(FindNextFile(hFind,&fd));
+		} while(FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}
 
 	file_num++;  // NULL
-	LangUIList = calloc(file_num, sizeof(char *));
+	LangUIList = calloc(file_num, sizeof(wchar_t *));
 
 	i = 0;
-	hFind = FindFirstFile(fullpath,&fd);
+	hFind = FindFirstFileW(fullpath, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				LangUIList[i++] = _strdup(fd.cFileName);
+				LangUIList[i++] = wcsdup(fd.cFileName);
 			}
-		} while(FindNextFile(hFind,&fd) && i < file_num);
+		} while(FindNextFileW(hFind, &fd) && i < file_num);
 		FindClose(hFind);
 	}
 	LangUIList[i] = NULL;
+	free(fullpath);
 
 	return i;
 }
 
-static int get_sel_lang_ui(const char **list, char *selstr)
+static int get_sel_lang_ui(const wchar_t **list, const wchar_t *selstr)
 {
 	size_t n = 0;
-	const char **p = list;
+	const wchar_t **p = list;
 
 	if (selstr == NULL || selstr[0] == '\0') {
 		n = 0;  // English
 	} else {
 		while (*p) {
-			if (strstr(selstr, *p)) {
+			if (wcsstr(selstr, *p)) {
 				n = p - list;
 				break;
 			}
@@ -2953,10 +2954,17 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			}
 
 			// 最初に指定されている言語ファイルの番号を覚えておく。
-			uilist_count = make_sel_lang_ui(ts->HomeDir);
-			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFile_ini);
-			SetDropDownList(Dialog, IDC_GENLANG_UI, LangUIList, langui_sel);
-			if (LangUIList[0] == NULL) {
+			uilist_count = make_sel_lang_ui(ts->HomeDirW);
+			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFileW_ini);
+			if (LangUIList[0] != NULL) {
+				int i = 0;
+				while (LangUIList[i] != 0) {
+					SendDlgItemMessageW(Dialog, IDC_GENLANG_UI, CB_ADDSTRING, 0, (LPARAM)LangUIList[i]);
+					i++;
+				}
+				SendDlgItemMessage(Dialog, IDC_GENLANG_UI, CB_SETCURSEL, langui_sel - 1, 0);
+			}
+			else {
 				EnableWindow(GetDlgItem(Dialog, IDC_GENLANG_UI), FALSE);
 			}
 
@@ -2997,7 +3005,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (1 <= w && w <= uilist_count && w != langui_sel) {
-							aswprintf(&ts->UILanguageFileW_ini, L"%hs\\%hs", get_lang_folder(), LangUIList[w - 1]);
+							aswprintf(&ts->UILanguageFileW_ini, L"%s\\%s", get_lang_folder(), LangUIList[w - 1]);
 							WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
 							ts->UILanguageFileW = GetUILanguageFileFullW(ts->HomeDirW, ts->UILanguageFileW_ini);
