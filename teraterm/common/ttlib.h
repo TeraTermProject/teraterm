@@ -47,6 +47,7 @@ BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos);
 DllExport BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
 DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 wchar_t *ExtractDirNameW(const wchar_t *PathName);
+wchar_t *ExtractFileNameW(const wchar_t *PathName);
 void FitFileName(PCHAR FileName, int destlen, const char *DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void AppendSlashW(wchar_t *Path, size_t destlen);

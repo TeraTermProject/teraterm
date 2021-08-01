@@ -799,7 +799,24 @@ int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
 }
 
 /**
+ *	ExtractFileName() の wchar_t 版
+ *	フルパスからファイル名部分を取り出す
+ *
+ *	@return	ファイル名部分(不要になったらfree()する)
+ */
+wchar_t *ExtractFileNameW(const wchar_t *PathName)
+{
+	size_t i;
+	if (!GetFileNamePosW(PathName, NULL, &i))
+		return NULL;
+	wchar_t *filename = _wcsdup(&PathName[i]);
+	return filename;
+}
+
+/**
  *	ExtractDirName() の wchar_t 版
+ *
+ *	@return	ディレクトリ名部分(不要になったらfree()する)
  */
 wchar_t *ExtractDirNameW(const wchar_t *PathName)
 {
