@@ -143,10 +143,6 @@
 			Name="asm"
 			>
 			<File
-				RelativePath=".\AddFontResourceExW.obj"
-				>
-			</File>
-			<File
 				RelativePath=".\AddFontResourceW.obj"
 				>
 			</File>
@@ -303,10 +299,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\RemoveFontResourceExW.obj"
-				>
-			</File>
-			<File
 				RelativePath=".\RemoveFontResourceW.obj"
 				>
 			</File>
@@ -356,7 +348,19 @@
 			>
 		</File>
 		<File
+			RelativePath="..\layer_for_unicode.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\layer_for_unicode.h"
+			>
+		</File>
+		<File
 			RelativePath="..\layer_for_unicode.md"
+			>
+		</File>
+		<File
+			RelativePath="..\layer_for_unicode_comctl32.cpp"
 			>
 		</File>
 	</Files>

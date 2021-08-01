@@ -353,8 +353,13 @@ void WinCompatInit()
 	if (done) return;
 	done = TRUE;
 
+#if _WIN32_IE >= 0x600
+	// _WIN32_IE < 0x600 のとき guidItem が使用できず
+	// FIELD_OFFSET(NOTIFYICONDATAA, guidItem) などがエラーとなるので
+	// >= 0x600 のときのみ
 	assert(sizeof(TT_NOTIFYICONDATAA_V2) == NOTIFYICONDATAA_V2_SIZE);
 	assert(sizeof(TT_NOTIFYICONDATAW_V2) == NOTIFYICONDATAW_V2_SIZE);
+#endif
 #if defined(_WIN64)
 	assert(sizeof(TT_NOTIFYICONDATAA_V2) == 504);
 	assert(sizeof(TT_NOTIFYICONDATAW_V2) == 952);
