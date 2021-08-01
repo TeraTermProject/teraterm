@@ -355,11 +355,9 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
 						"MSG_WINSOCK_ERROR", L"Cannot use winsock",
+						MB_TASKMODAL | MB_ICONEXCLAMATION,
 					};
-					TTMessageBoxW(
-						cv->HWin,
-						&info, (MB_TASKMODAL | MB_ICONEXCLAMATION),
-						ts->UILanguageFile);
+					TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile);
 				}
 				InvalidHost = TRUE;
 			}
@@ -416,10 +414,10 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
-						"MSG_INVALID_HOST_ERROR", L"Invalid host"
+						"MSG_INVALID_HOST_ERROR", L"Invalid host",
+						MB_TASKMODAL | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(
-						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
+					TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile);
 				}
 				goto BreakSC;
 			}
@@ -452,7 +450,8 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
-						NULL, NULL
+						NULL, NULL,
+						MB_TASKMODAL | MB_ICONEXCLAMATION
 					};
 
 					switch (err) {
@@ -472,8 +471,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					free(format);
 					free(PW);
 
-					TTMessageBoxW(
-						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile, ErrMsgW);
+					TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile, ErrMsgW);
 				}
 				InvalidHost = TRUE;
 			}
@@ -503,10 +501,10 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
-						"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file"
+						"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file",
+						MB_TASKMODAL | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(
-						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
+					TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile);
 				}
 			}
 			else {
@@ -527,7 +525,8 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
 					"MSG_TT_ERROR", L"Tera Term: Error",
-					NULL, NULL
+					NULL, NULL,
+					MB_TASKMODAL | MB_ICONEXCLAMATION
 				};
 				InvalidHost = TRUE;
 
@@ -536,7 +535,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					L"A valid pipe name has the form\n"
 					L"\"\\\\<ServerName>\\pipe\\<PipeName>\"",
 					GetLastError());
-				TTMessageBoxW(cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile, ErrMsgW);
+				TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile, ErrMsgW);
 				break;
 			}
 
@@ -551,7 +550,8 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
-						NULL, NULL
+						NULL, NULL,
+						MB_TASKMODAL | MB_ICONEXCLAMATION
 					};
 
 					switch (err) {
@@ -575,8 +575,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					free(format);
 					free(PW);
 
-					TTMessageBoxW(
-						cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile, ErrMsgW);
+					TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile, ErrMsgW);
 				}
 				InvalidHost = TRUE;
 			}
@@ -737,12 +736,10 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 						static const TTMessageBoxInfoW info = {
 							"Tera Term",
 							"MSG_TT_ERROR", L"Tera Term: Error",
-							NULL, NULL
+							NULL, NULL,
+							MB_TASKMODAL | MB_ICONEXCLAMATION
 						};
-						TTMessageBoxW(
-							cv->HWin,
-							&info, (MB_TASKMODAL | MB_ICONEXCLAMATION),
-							ts->UILanguageFile, ErrMsgW);
+						TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile, ErrMsgW);
 					}
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RetryWithOtherProtocol = FALSE;
@@ -771,9 +768,10 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
 					"MSG_TT_ERROR", L"Tera Term: Error",
-					"MSG_TT_ERROR", L"Can't create thread"
+					"MSG_TT_ERROR", L"Can't create thread",
+					MB_TASKMODAL | MB_ICONEXCLAMATION
 				};
-				TTMessageBoxW(cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
+				TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile);
 			}
 			break;
 
@@ -797,9 +795,10 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
 					"MSG_TT_ERROR", L"Tera Term: Error",
-					"MSG_TT_ERROR", L"Can't create thread"
+					"MSG_TT_ERROR", L"Can't create thread",
+					MB_TASKMODAL | MB_ICONEXCLAMATION
 				};
-				TTMessageBoxW(cv->HWin, &info, MB_TASKMODAL | MB_ICONEXCLAMATION, ts->UILanguageFile);
+				TTMessageBoxA(cv->HWin, &info, ts->UILanguageFile);
 			}
 			break;
 	}

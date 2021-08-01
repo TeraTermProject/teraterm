@@ -61,7 +61,6 @@ wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def,
  *
  *	@param[in]	hWnd			親 window
  *	@param[in]	info			タイトル、メッセージ
- *	@param[in]	uType			MessageBoxの uType
  *	@param[in]	UILanguageFile	lngファイル
  *	@param[in]	...				フォーマット引数
  *
@@ -71,9 +70,10 @@ wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def,
  *	info.message_key, info.message_default 両方ともNULLの場合
  *		可変引数の1つ目を書式化文字列として使用する
  */
-int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const char *UILanguageFile, ...)
+int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILanguageFile, ...)
 {
 	const char *section = info->section;
+	const UINT uType = info->uType;
 	wchar_t *title;
 	if (info->title_key == NULL) {
 		title = _wcsdup(info->title_default);

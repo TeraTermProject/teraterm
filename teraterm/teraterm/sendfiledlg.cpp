@@ -182,8 +182,9 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 						static const TTMessageBoxInfoW mbinfo = {
 							"Tera Term",
 							"MSG_TT_ERROR", L"Tera Term: Error",
-							"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file" };
-						TTMessageBoxW(hDlgWnd, &mbinfo, MB_TASKMODAL | MB_ICONEXCLAMATION, data->UILanguageFile);
+							"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file",
+							MB_TASKMODAL | MB_ICONEXCLAMATION };
+						TTMessageBoxA(hDlgWnd, &mbinfo, data->UILanguageFile);
 
 						free(strW);
 

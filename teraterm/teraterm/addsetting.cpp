@@ -1497,8 +1497,9 @@ void CLogPropPageDlg::OnOK()
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name." };
-		TTMessageBoxW(m_hWnd, &info, MB_ICONEXCLAMATION, ts.UILanguageFile);
+			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
+			MB_ICONEXCLAMATION };
+		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
 		return;
 	}
 
@@ -1510,16 +1511,18 @@ void CLogPropPageDlg::OnOK()
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"MSG_LOGFILE_TOOLONG_ERROR", L"The log file name is too long." };
-		TTMessageBoxW(m_hWnd, &info, MB_ICONEXCLAMATION, ts.UILanguageFile);
+			"MSG_LOGFILE_TOOLONG_ERROR", L"The log file name is too long.",
+			MB_ICONEXCLAMATION };
+		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
 		return;
 	}
 	if (isInvalidFileNameChar(buf2)) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name." };
-		TTMessageBoxW(m_hWnd, &info, MB_ICONEXCLAMATION, ts.UILanguageFile);
+			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
+			MB_ICONEXCLAMATION };
+		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
 		return;
 	}
 	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);

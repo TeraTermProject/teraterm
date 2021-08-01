@@ -155,8 +155,10 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)" };
-		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONWARNING, UILanguageFile, no);
+			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxA(NULL, &info, UILanguageFile, no);
 
 		goto error;
 	}
@@ -175,8 +177,10 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"DLG_SETUPDIR_OPENFILE_ERROR", L"Cannot open file.(%d)" };
-		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONWARNING, UILanguageFile, no);
+			"DLG_SETUPDIR_OPENFILE_ERROR", L"Cannot open file.(%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxA(NULL, &info, UILanguageFile, no);
 
 		goto error;
 	}
@@ -210,8 +214,10 @@ static BOOL openDirectoryWithExplorer(const wchar_t *path, const char *UILanguag
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)" };
-		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONWARNING, UILanguageFile, no);
+			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxA(NULL, &info, UILanguageFile, no);
 		ret = FALSE;
 	} else if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		// フォルダを開く

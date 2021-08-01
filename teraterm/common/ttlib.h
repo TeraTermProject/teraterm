@@ -138,12 +138,6 @@ int GetMonitorDpiFromWindow(HWND hWnd);
 
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 
-#if defined(_UNICODE)
-#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
-#else
-#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
-#endif
-
 /*
  * シリアルポート関連の設定定義
  */
@@ -163,9 +157,11 @@ typedef struct {
 	const wchar_t *title_default;	//   lng ファイルに見つからなかったとき使用
 	const char *message_key;		// メッセージ
 	const wchar_t *message_default;	//   lng ファイルに見つからなかったとき使用
+	UINT uType;						// メッセージボックスのタイプ
 } TTMessageBoxInfoW;
 
-int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, UINT uType, const char *UILanguageFile, ...);
+int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILanguageFile, ...);
+int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILanguageFile, ...);
 wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const char *UILanguageFile);
 wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty);
 char *GetClipboardTextA(HWND hWnd, BOOL empty);

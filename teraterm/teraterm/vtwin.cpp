@@ -3843,9 +3843,10 @@ void CVTWindow::OnFileLog()
 			static const TTMessageBoxInfoW mbinfo = {
 				"Tera Term",
 				NULL, L"Tera Term: File open error",
-				NULL, L"Can not create a `%s' file."
+				NULL, L"Can not create a `%s' file.",
+				MB_OK | MB_ICONERROR
 			};
-			TTMessageBoxW(m_hWnd, &mbinfo, MB_OK | MB_ICONERROR, ts.UILanguageFile, filename);
+			TTMessageBoxA(m_hWnd, &mbinfo, ts.UILanguageFile, filename);
 		}
 		free(info.filename);
 	}
@@ -3894,9 +3895,10 @@ void CVTWindow::OnViewLog()
 		static const TTMessageBoxInfoW mbinfo = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
-			"MSG_VIEW_LOGFILE_ERROR", L"Can't view logging file. (%d)"
+			"MSG_VIEW_LOGFILE_ERROR", L"Can't view logging file. (%d)",
+			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(m_hWnd, &mbinfo, MB_OK | MB_ICONWARNING, ts.UILanguageFile, error);
+		TTMessageBoxA(m_hWnd, &mbinfo, ts.UILanguageFile, error);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);

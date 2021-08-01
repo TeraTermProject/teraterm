@@ -188,12 +188,14 @@ static void ShowDialog(HWND hWnd)
 	static const TTMessageBoxInfoW info = {
 		"TTXCheckUpdate",
 		NULL, L"Tera Term",
-		"MSG_CHECKUPDATE", L"Do you want to check update?\n%s" };
+		"MSG_CHECKUPDATE", L"Do you want to check update?\n%s",
+		MB_YESNO | MB_ICONEXCLAMATION
+	};
 
 	/* XVî•ñ‚ğæ“¾‚µ‚Ä‚àok? */
 	GetI18nStrW("TTXCheckUpdate", "JSON_URL", update_info_url, _countof(update_info_url), update_info_url_default,
 				UILanguageFile);
-	result_mb = TTMessageBoxW(hWnd, &info, MB_YESNO | MB_ICONEXCLAMATION, UILanguageFile, update_info_url);
+	result_mb = TTMessageBoxA(hWnd, &info, UILanguageFile, update_info_url);
 	if (result_mb == IDNO) {
 		return;
 	}

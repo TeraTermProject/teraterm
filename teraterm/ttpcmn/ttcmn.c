@@ -161,9 +161,10 @@ void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 		NULL, L"Tera Term: Configuration Warning",
 		"MSG_TT_TAKE_EFFECT",
 		L"This option takes effect the next time a session is started.\n"
-		L"Are you sure that you want to relaunch Tera Term?"
+		L"Are you sure that you want to relaunch Tera Term?",
+		MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2
 	};
-	ret = TTMessageBoxW(hwnd, &info, MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2, ts->UILanguageFile);
+	ret = TTMessageBoxA(hwnd, &info, ts->UILanguageFile);
 	if (ret != IDYES)
 		return;
 
@@ -515,8 +516,9 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			NULL, L"Tera Term: HTML help",
-			"MSG_OPENHELP_ERROR", L"Can't open HTML help file(%s)." };
-		TTMessageBoxW(HWin, &info, MB_OK | MB_ICONERROR, UILanguageFile, HelpFN);
+			"MSG_OPENHELP_ERROR", L"Can't open HTML help file(%s).",
+			MB_OK | MB_ICONERROR };
+		TTMessageBoxA(HWin, &info, UILanguageFile, HelpFN);
 	}
 	free(HelpFN);
 }

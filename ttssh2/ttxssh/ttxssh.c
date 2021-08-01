@@ -1203,9 +1203,10 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 						static const TTMessageBoxInfoW info = {
 							"TTSSH",
 							NULL, L"Tera Term",
-							"MSG_TCPPORT_NAN_ERROR", L"The TCP port must be a number."
+							"MSG_TCPPORT_NAN_ERROR", L"The TCP port must be a number.",
+							MB_OK | MB_ICONEXCLAMATION
 						};
-						TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+						TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 						return TRUE;
 					}
 					GetHNRec->TCPPort = i;
@@ -1569,9 +1570,10 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						NULL, L"TTSSH",
-						"MSG_UNKNOWN_OPTION_ERROR", L"Unrecognized command-line option: %s"
+						"MSG_UNKNOWN_OPTION_ERROR", L"Unrecognized command-line option: %s",
+						MB_OK | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(NULL, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile, option);
+					TTMessageBoxA(NULL, &info, pvar->ts->UILanguageFile, option);
 				}
 
 			// ttermpro.exe ‚Ì /T= Žw’è‚Ì—¬—p‚È‚Ì‚ÅA‘å•¶Žš‚à‹–‚· (2006.10.19 maya)
@@ -2768,9 +2770,10 @@ static int get_keys_file_name(HWND parent, char *buf, int bufsize,
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				NULL, L"TTSSH Error",
-				"MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR", L"Unable to display file dialog box: error %d"
+				"MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR", L"Unable to display file dialog box: error %d",
+				MB_OK | MB_ICONEXCLAMATION
 			};
-			TTMessageBoxW(parent, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile, err);
+			TTMessageBoxA(parent, &info, pvar->ts->UILanguageFile, err);
 		}
 
 		return 0;
@@ -3604,9 +3607,10 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 		static const TTMessageBoxInfoW info = {
 			"TTSSH",
 			"MSG_ERROR", L"ERROR",
-			"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file"
+			"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file",
+			MB_OK | MB_ICONEXCLAMATION
 		};
-		TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+		TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 		goto ed25519_error;
 	}
 	n = fwrite(buffer_ptr(blob), buffer_len(blob), 1, fp);
@@ -3614,9 +3618,10 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 		static const TTMessageBoxInfoW info = {
 			"TTSSH",
 			"MSG_ERROR", L"ERROR",
-			"MSG_SAVE_KEY_WRITEFILE_ERROR", L"Can't open key file"
+			"MSG_SAVE_KEY_WRITEFILE_ERROR", L"Can't open key file",
+			MB_OK | MB_ICONEXCLAMATION
 		};
-		TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+		TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 	}
 	fclose(fp);
 
@@ -3713,9 +3718,10 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 						static const TTMessageBoxInfoW info = {
 							"TTSSH",
 							NULL, L"Tera Term",
-							"MSG_KEYBITS_MIN_ERROR", L"The key bits is too small."
+							"MSG_KEYBITS_MIN_ERROR", L"The key bits is too small.",
+							MB_OK | MB_ICONEXCLAMATION
 						};
-						TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+						TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 						return TRUE;
 					}
 					break;
@@ -4014,9 +4020,10 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				static const TTMessageBoxInfoW info = {
 					"TTSSH",
 					"MSG_ERROR", L"ERROR",
-					"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file"
+					"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file",
+					MB_OK | MB_ICONEXCLAMATION
 				};
-				TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+				TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 				break;
 			}
 
@@ -4140,9 +4147,10 @@ public_error:
 				static const TTMessageBoxInfoW info = {
 					"TTSSH",
 					"MSG_ERROR", L"ERROR",
-					"MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR", L"Two passphrases don't match."
+					"MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR", L"Two passphrases don't match.",
+					MB_OK | MB_ICONEXCLAMATION
 				};
-				TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+				TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 				break;
 			}
 
@@ -4152,8 +4160,9 @@ public_error:
 					"TTSSH",
 					"MSG_WARNING", L"WARNING",
 					"MSG_SAVE_PRIVATEKEY_EMPTY_WARN", L"Are you sure that you want to use a empty passphrase?",
+					MB_OK | MB_ICONEXCLAMATION
 				};
-				ret = TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+				ret = TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 				if (ret == IDNO)
 					break;
 			}
@@ -4165,18 +4174,20 @@ public_error:
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						NULL, L"Tera Term",
-						"MSG_BCRYPT_ROUNDS_MIN_ERROR", L"The number of rounds is too small."
+						"MSG_BCRYPT_ROUNDS_MIN_ERROR", L"The number of rounds is too small.",
+						MB_OK | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+					TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 					break;
 				}
 				if (rounds > SSH_KEYGEN_MAXIMUM_ROUNDS) {
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						NULL, L"Tera Term",
-						"MSG_BCRYPT_ROUNDS_MAX_ERROR", L"The number of rounds is too large."
+						"MSG_BCRYPT_ROUNDS_MAX_ERROR", L"The number of rounds is too large.",
+						MB_OK | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+					TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 					break;
 				}
 			}
@@ -4349,9 +4360,10 @@ public_error:
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						"MSG_ERROR", L"ERROR",
-						"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file"
+						"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file",
+						MB_OK | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+					TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 					break;
 				}
 				fwrite(buffer_ptr(enc), buffer_len(enc), 1, fp);
@@ -4389,9 +4401,10 @@ error:;
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						"MSG_ERROR", L"ERROR",
-						"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file"
+						"MSG_SAVE_KEY_OPENFILE_ERROR", L"Can't open key file",
+						MB_OK | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+					TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 					break;
 				}
 
@@ -4412,9 +4425,10 @@ error:;
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						"MSG_ERROR", L"ERROR",
-						"MSG_SAVE_KEY_WRITEFILE_ERROR", L"Can't open key file"
+						"MSG_SAVE_KEY_WRITEFILE_ERROR", L"Can't open key file",
+						MB_OK | MB_ICONEXCLAMATION
 					};
-					TTMessageBoxW(dlg, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+					TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
 				}
 				fclose(fp);
 			}
@@ -4451,9 +4465,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
-				"MSG_CREATEWINDOW_SCP_ERROR", L"Unable to display SCP dialog box."
+				"MSG_CREATEWINDOW_SCP_ERROR", L"Unable to display SCP dialog box.",
+				MB_OK | MB_ICONEXCLAMATION
 			};
-			TTMessageBoxW(hWin, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+			TTMessageBoxA(hWin, &info, pvar->ts->UILanguageFile);
 		}
 		return 1;
 
@@ -4464,9 +4479,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
-				"MSG_CREATEWINDOW_KEYGEN_ERROR", L"Unable to display Key Generator dialog box."
+				"MSG_CREATEWINDOW_KEYGEN_ERROR", L"Unable to display Key Generator dialog box.",
+				MB_OK | MB_ICONEXCLAMATION
 			};
-			TTMessageBoxW(hWin, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+			TTMessageBoxA(hWin, &info, pvar->ts->UILanguageFile);
 		}
 		return 1;
 
@@ -4477,9 +4493,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
-				"MSG_CREATEWINDOW_ABOUT_ERROR", L"Unable to display About dialog box."
+				"MSG_CREATEWINDOW_ABOUT_ERROR", L"Unable to display About dialog box.",
+				MB_OK | MB_ICONEXCLAMATION
 			};
-			TTMessageBoxW(hWin, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+			TTMessageBoxA(hWin, &info, pvar->ts->UILanguageFile);
 		}
 		return 1;
 	case ID_SSHAUTH:
@@ -4493,9 +4510,10 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
-				"MSG_CREATEWINDOW_SETUP_ERROR", L"Unable to display TTSSH Setup dialog box."
+				"MSG_CREATEWINDOW_SETUP_ERROR", L"Unable to display TTSSH Setup dialog box.",
+				MB_OK | MB_ICONEXCLAMATION
 			};
-			TTMessageBoxW(hWin, &info, MB_OK | MB_ICONEXCLAMATION, pvar->ts->UILanguageFile);
+			TTMessageBoxA(hWin, &info, pvar->ts->UILanguageFile);
 		}
 		return 1;
 	case ID_SSHAUTHSETUPMENU:
