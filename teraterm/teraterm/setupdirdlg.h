@@ -30,5 +30,6 @@
 #pragma once
 
 #include <windows.h>
+#include "tttypes.h"
 
-void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd);
+void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TTTSet *pts);

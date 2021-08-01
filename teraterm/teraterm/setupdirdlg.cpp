@@ -26,84 +26,117 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* IPv6 modification is Copyright(C) 2000 Jun-ya Kato <kato@win6.jp> */
-
-/* TERATERM.EXE, VT window */
-
-// SDK7.0の場合、WIN32_IEが適切に定義されない
-#if _MSC_VER == 1400	// VS2005の場合のみ
-#if !defined(_WIN32_IE)
-#define	_WIN32_IE 0x0501
-#endif
-#endif
 
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tttypes_key.h"
 
 #include "ttcommon.h"
-#include "ttwinman.h"	//
-//#include "ttsetup.h"
-//#include "keyboard.h"
-//#include "buffer.h"
-//#include "vtterm.h"
-//#include "vtdisp.h"
 #include "ttdialog.h"
-//#include "ttime.h"
 #include "commlib.h"
-//#include "clipboar.h"
-//#include "filesys.h"
-//#include "telnet.h"
-//#include "tektypes.h"
-//#include "ttdde.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "helpid.h"
-//#include "teraprn.h"
-//#include <winsock2.h>
-//#include <ws2tcpip.h>
-//#include "ttplug.h"  /* TTPLUG */
-#include "teraterml.h"
-//#include "buffer.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <string.h>
-#include <io.h>
-#include <errno.h>
 
 #include <shlobj.h>
 #include <windows.h>
-#include <windowsx.h>
-//#include <imm.h>
-#include <dbt.h>
-#include <assert.h>
 #include <wchar.h>
 #include <htmlhelp.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
-//#include "addsetting.h"
-//#include "winjump.h"
-#include "sizetip.h"
-//#include "dnddlg.h"
-//#include "tekwin.h"
 #include "compat_win.h"
-//#include "unicode_test.h"
-#if UNICODE_DEBUG
-#include "tipwin.h"
-#endif
 #include "codeconv.h"
-#include "sendmem.h"
-//#include "sendfiledlg.h"
-#include "setting.h"
-//#include "broadcast.h"
 #include "asprintf.h"
-//#include "teraprn.h"
 
 #include "setupdirdlg.h"
+
+// Virtual Storeが有効であるかどうかを判別する。
+//
+// [Windows 95-XP]
+// return FALSE (always)
+//
+// [Windows Vista-10]
+// return TRUE:  Virtual Store Enabled
+//        FALSE: Virtual Store Disabled or Unknown
+//
+static BOOL GetVirtualStoreEnvironment(void)
+{
+#if _MSC_VER == 1400  // VSC2005(VC8.0)
+	typedef struct _TOKEN_ELEVATION {
+		DWORD TokenIsElevated;
+	} TOKEN_ELEVATION, *PTOKEN_ELEVATION;
+	int TokenElevation = 20;
+#endif
+	BOOL ret = FALSE;
+	int flag = 0;
+	HANDLE          hToken;
+	DWORD           dwLength;
+	TOKEN_ELEVATION tokenElevation;
+	LONG lRet;
+	HKEY hKey;
+	char lpData[256];
+	DWORD dwDataSize;
+	DWORD dwType;
+	BYTE bValue;
+
+	// Windows Vista以前は無視する。
+	if (!IsWindowsVistaOrLater())
+		goto error;
+
+	// UACが有効かどうか。
+	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
+	flag = 0;
+	lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+		TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"),
+		NULL, KEY_QUERY_VALUE, &hKey
+		);
+	if (lRet == ERROR_SUCCESS) {
+		dwDataSize = sizeof(lpData) / sizeof(lpData[0]);
+		lRet = RegQueryValueEx(
+			hKey,
+			TEXT("EnableLUA"),
+			0,
+			&dwType,
+			(LPBYTE)lpData,
+			&dwDataSize);
+		if (lRet == ERROR_SUCCESS) {
+			bValue = ((LPBYTE)lpData)[0];
+			if (bValue == 1)
+				// UACが有効の場合、Virtual Storeが働く。
+				flag = 1;
+		}
+		RegCloseKey(hKey);
+	}
+	if (flag == 0)
+		goto error;
+
+	// UACが有効時、プロセスが管理者権限に昇格しているか。
+	flag = 0;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
+		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
+			// (0は昇格していない、非0は昇格している)。
+			if (tokenElevation.TokenIsElevated == 0) {
+				// 管理者権限を持っていなければ、Virtual Storeが働く。
+				flag = 1;
+			}
+		}
+		CloseHandle(hToken);
+	}
+	if (flag == 0)
+		goto error;
+
+	ret = TRUE;
+	return (ret);
+
+error:
+	return (ret);
+}
 
 //
 // 指定したアプリケーションでファイルを開く。
@@ -111,46 +144,43 @@
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openFileWithApplication(char *pathname, char *filename, char *editor)
+static BOOL openFileWithApplication(const wchar_t *filename, const char *editor, const char *UILanguageFile)
 {
-	char command[1024];
-	char fullpath[1024];
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
+	wchar_t *commandW = NULL;
 	BOOL ret = FALSE;
-	wchar_t buf[80];
-	wchar_t uimsg[MAX_UIMSG];
-	wchar_t uimsg2[MAX_UIMSG];
 
-	SetLastError(NO_ERROR);
-
-	_snprintf_s(fullpath, sizeof(fullpath), "%s\\%s", pathname, filename);
-	if (_access(fullpath, 0) != 0) { // ファイルが存在しない
+	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
+		// ファイルが存在しない
 		DWORD no = GetLastError();
-		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("DLG_SETUPDIR_NOFILE_ERROR", uimsg2, _countof(uimsg2),
-					  L"File does not exist.(%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
-		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)" };
+		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONWARNING, UILanguageFile, no);
+
 		goto error;
 	}
 
-	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s \"%s\"", editor, fullpath);
+	aswprintf(&commandW, L"%hs \"%s\"", editor, filename);
 
+	STARTUPINFOW si;
+	PROCESS_INFORMATION pi;
 	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
+	GetStartupInfoW(&si);
 	memset(&pi, 0, sizeof(pi));
 
-	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
-		NULL, NULL, &si, &pi) == 0) { // 起動失敗
+	if (CreateProcessW(NULL, commandW, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi) == 0) {
+		// 起動失敗
 		DWORD no = GetLastError();
-		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("DLG_SETUPDIR_OPENFILE_ERROR", uimsg2, _countof(uimsg2),
-					  L"Cannot open file.(%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
-		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"DLG_SETUPDIR_OPENFILE_ERROR", L"Cannot open file.(%d)" };
+		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONWARNING, UILanguageFile, no);
+
 		goto error;
-	} else {
+	}
+	else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
 	}
@@ -158,6 +188,8 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 	ret = TRUE;
 
 error:;
+	free(commandW);
+
 	return (ret);
 }
 
@@ -167,88 +199,78 @@ error:;
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openDirectoryWithExplorer(const wchar_t *path)
+static BOOL openDirectoryWithExplorer(const wchar_t *path, const char *UILanguageFile)
 {
-	LPSHELLFOLDER pDesktopFolder;
-	LPMALLOC pMalloc;
-	LPITEMIDLIST pIDL;
-	SHELLEXECUTEINFO si;
-	BOOL ret = FALSE;
+	BOOL ret;
 
-	if (SHGetDesktopFolder(&pDesktopFolder) == S_OK) {
-		if (SHGetMalloc(&pMalloc) == S_OK) {
-			if (pDesktopFolder->ParseDisplayName(NULL, NULL, (LPWSTR)path, NULL, &pIDL, NULL) == S_OK) {
-				::ZeroMemory(&si, sizeof(si));
-				si.cbSize = sizeof(si);
-				si.fMask = SEE_MASK_IDLIST;
-				si.lpVerb = "open";
-				si.lpIDList = pIDL;
-				si.nShow = SW_SHOWNORMAL;
-				::ShellExecuteEx(&si);
-				pMalloc->Free((void *)pIDL);
-
-				ret = TRUE;
-			}
-
-			pMalloc->Release();
-		}
-		pDesktopFolder->Release();
+	const DWORD attr = GetFileAttributesW(path);
+	if (attr == INVALID_FILE_ATTRIBUTES) {
+		// ファイルが存在しない
+		DWORD no = GetLastError();
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)" };
+		TTMessageBoxW(NULL, &info, MB_OK | MB_ICONWARNING, UILanguageFile, no);
+		ret = FALSE;
+	} else if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+		// フォルダを開く
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", path, NULL, SW_NORMAL);
+		ret = h > 32 ? TRUE : FALSE;
+	} else {
+		// フォルダを開く + ファイル選択
+		wchar_t *param;
+		aswprintf(&param, L"/select,%s", path);
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", param, NULL, SW_NORMAL);
+		free(param);
+		ret = h > 32 ? TRUE : FALSE;
 	}
-
-	return (ret);
+	return ret;
 }
 
-//
-// フォルダもしくはファイルを開く。
-//
-static void openFileDirectory(char *path, char *filename, BOOL open_directory_only, char *open_editor)
+/**
+ *	フルパスファイル名を Virtual Storeパスに変換する。
+ *	@param[in]		filename			変換前のファイル名
+ *	@param[out]		vstore_filename		Virtual Storeのファイル名
+ *	@retval			TRUE	変換した
+ *					FALSE	変換しなかった(Virtual Storeに保存されていない)
+ */
+static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filename)
 {
-	if (open_directory_only) {
-		wchar_t *pathW = ToWcharA(path);
-		openDirectoryWithExplorer(pathW);
-		free(pathW);
-	}
-	else {
-		openFileWithApplication(path, filename, open_editor);
-	}
-}
+	wchar_t *path = ExtractDirNameW(filename);
+	wchar_t *file = ExtractFileNameW(filename);
 
-//
-// Virtual Storeパスに変換する。
-//
-// path: IN
-// filename: IN
-// vstore_path: OUT
-// vstore_pathlen: IN
-//
-// return TRUE: success
-//        FALSE: failure
-//
-static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, int vstore_pathlen)
-{
+	// 不要なドライブレターを除去する。
+	// ドライブレターは一文字とは限らない点に注意。(1文字では?)
+	wchar_t *path_nodrive = wcsstr(path, L":\\");
+	if (path_nodrive == NULL) {
+		// フルパスではない, VSを考慮しなくてもok
+		free(path);
+		free(file);
+		return FALSE;
+	}
+	path_nodrive++;
+
 	BOOL ret = FALSE;
-	const char *s, **p;
-	const char *virstore_env[] = {
-		"ProgramFiles",
-		"ProgramData",
-		"SystemRoot",
+	static const wchar_t* virstore_env[] = {
+		L"ProgramFiles",
+		L"ProgramData",
+		L"SystemRoot",
 		NULL
 	};
-	char shPath[1024] = "";
-	char shFullPath[1024] = "";
 	LPITEMIDLIST pidl;
 	int CSIDL;
+	wchar_t shPath[1024];
+	wchar_t *vs_file;
+	const wchar_t** p = virstore_env;
 
-	OutputDebugPrintf("[%s][%s]\n", path, filename);
-
-	if (cv.VirtualStoreEnabled == FALSE)
+	if (GetVirtualStoreEnvironment() == FALSE)
 		goto error;
 
 	// Virtual Store対象となるフォルダか。
-	p = virstore_env;
 	while (*p) {
-		s = getenv(*p);
-		if (s != NULL && strstr(path, s) != NULL) {
+		const wchar_t *s = _wgetenv(*p);
+		if (s != NULL && wcsstr(path, s) != NULL) {
 			break;
 		}
 		p++;
@@ -260,32 +282,39 @@ static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, i
 	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
 		goto error;
 	}
-	SHGetPathFromIDList(pidl, shPath);
+	SHGetPathFromIDListW(pidl, shPath);
 	CoTaskMemFree(pidl);
 
 	// Virtual Storeパスを作る。
-	strncat_s(shPath, sizeof(shPath), "\\VirtualStore", _TRUNCATE);
-
-	// 不要なドライブレターを除去する。
-	// ドライブレターは一文字とは限らない点に注意。
-	s = strstr(path, ":\\");
-	if (s != NULL) {
-		strncat_s(shPath, sizeof(shPath), s + 1, _TRUNCATE);
-	}
+	aswprintf(&vs_file, L"%s\\VirtualStore%s", shPath, path_nodrive, file);
 
 	// 最後に、Virtual Storeにファイルがあるかどうかを調べる。
-	_snprintf_s(shFullPath, sizeof(shFullPath), "%s\\%s", shPath, filename);
-	if (_access(shFullPath, 0) != 0) {
+	if (GetFileAttributesW(vs_file) == INVALID_FILE_ATTRIBUTES) {
+		free(vs_file);
 		goto error;
 	}
 
-	strncpy_s(vstore_path, vstore_pathlen, shPath, _TRUNCATE);
+	*vstore_filename = vs_file;
 
 	ret = TRUE;
-	return (ret);
+	goto epilogue;
 
 error:
-	return (ret);
+	*vstore_filename = NULL;
+	ret = FALSE;
+epilogue:
+	free(path);
+	free(file);
+	return ret;
+}
+
+static wchar_t *GetWindowTextAlloc(HWND hWnd)
+{
+	size_t length = GetWindowTextLengthW(hWnd);
+	length++;
+	wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * length);
+	GetWindowTextW(hWnd, buf, (int)length);
+	return buf;
 }
 
 static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -297,146 +326,108 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		{ IDC_CYGTERM_SETUPDIR_GROUP, "DLG_SETUPDIR_CYGTERMFILE" },
 		{ IDC_SSH_SETUPDIR_GROUP, "DLG_SETUPDIR_KNOWNHOSTSFILE" },
 	};
-	static char teratermexepath[MAX_PATH];
-	static char inipath[MAX_PATH], inifilename[MAX_PATH], inipath_vstore[1024];
-	static char keycnfpath[MAX_PATH], keycnffilename[MAX_PATH], keycnfpath_vstore[1024];
-	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH], cygtermpath_vstore[1024];
-//	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH], eterm1path_vstore[1024];
-	char temp[MAX_PATH];
-	char tmpbuf[1024];
-	typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
-	PSSH_read_known_hosts_file func = NULL;
-	HMODULE h = NULL;
-	static char hostsfilepath[MAX_PATH], hostsfilename[MAX_PATH], hostsfilepath_vstore[1024];
-	char *path_p, *filename_p;
-	BOOL open_dir, ret;
-	int button_pressed;
+	TTTSet *pts = (TTTSet *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
+	wchar_t *tmpbufW;
 	HWND hWnd;
 
 	switch (msg) {
-	case WM_INITDIALOG:
-		// I18N
-		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	case WM_INITDIALOG: {
+		BOOL ret;
+		pts = (TTTSet *)lp;
+		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pts);
 
-		if (GetModuleFileNameA(NULL, temp, sizeof(temp)) != 0) {
-			ExtractDirName(temp, teratermexepath);
-		}
+		// I18N
+		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFile);
 
 		// 設定ファイル(teraterm.ini)のパスを取得する。
 		/// (1)
-		ExtractFileName(ts.SetupFName, inifilename, sizeof(inifilename));
-		ExtractDirName(ts.SetupFName, inipath);
-		//SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, inifilename);
-		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT, ts.SetupFName);
+		SetDlgItemTextW(hDlgWnd, IDC_INI_SETUPDIR_EDIT, pts->SetupFNameW);
 		/// (2) Virutal Storeへの変換
-		memset(inipath_vstore, 0, sizeof(inipath_vstore));
-		ret = convertVirtualStore(inipath, inifilename, inipath_vstore, sizeof(inipath_vstore));
+		wchar_t *vs;
+		ret = convertVirtualStoreW(pts->SetupFNameW, &vs);
+		hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
+		EnableWindow(hWnd, ret);
+		hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
+		EnableWindow(hWnd, ret);
 		if (ret) {
-			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
-			EnableWindow(hWnd, TRUE);
-			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
-			EnableWindow(hWnd, TRUE);
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", inipath_vstore, inifilename);
-			SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, tmpbuf);
+			SetDlgItemTextW(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, vs);
+			free(vs);
 		}
 		else {
-			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
-			EnableWindow(hWnd, FALSE);
-			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
-			EnableWindow(hWnd, FALSE);
-			SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, "");
+			SetDlgItemTextA(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, "");
 		}
 
 		// 設定ファイル(KEYBOARD.CNF)のパスを取得する。
 		/// (1)
-		ExtractFileName(ts.KeyCnfFN, keycnffilename, sizeof(keycnfpath));
-		ExtractDirName(ts.KeyCnfFN, keycnfpath);
-		//SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC, keycnffilename);
-		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, ts.KeyCnfFN);
+		SetDlgItemTextW(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, pts->KeyCnfFNW);
 		/// (2) Virutal Storeへの変換
-		memset(keycnfpath_vstore, 0, sizeof(keycnfpath_vstore));
-		ret = convertVirtualStore(keycnfpath, keycnffilename, keycnfpath_vstore, sizeof(keycnfpath_vstore));
+		ret = convertVirtualStoreW(pts->KeyCnfFNW, &vs);
+		hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
+		EnableWindow(hWnd, ret);
+		hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
+		EnableWindow(hWnd, ret);
 		if (ret) {
-			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
-			EnableWindow(hWnd, TRUE);
-			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
-			EnableWindow(hWnd, TRUE);
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", keycnfpath_vstore, keycnffilename);
-			SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, tmpbuf);
+			SetDlgItemTextW(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, vs);
+			free(vs);
 		}
 		else {
-			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
-			EnableWindow(hWnd, FALSE);
-			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
-			EnableWindow(hWnd, FALSE);
-			SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, "");
+			SetDlgItemTextA(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, "");
 		}
-
 
 		// cygterm.cfg は ttermpro.exe 配下に位置する。
 		/// (1)
-		strncpy_s(cygtermfilename, sizeof(cygtermfilename), "cygterm.cfg", _TRUNCATE);
-		strncpy_s(cygtermpath, sizeof(cygtermpath), teratermexepath, _TRUNCATE);
-		//SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, cygtermfilename);
-		_snprintf_s(temp, sizeof(temp), "%s\\%s", cygtermpath, cygtermfilename);
-		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, temp);
+		aswprintf(&tmpbufW, L"%s\\cygterm.cfg", pts->HomeDirW);
+		SetDlgItemTextW(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, tmpbufW);
 		/// (2) Virutal Storeへの変換
-		memset(cygtermpath_vstore, 0, sizeof(cygtermpath_vstore));
-		ret = convertVirtualStore(cygtermpath, cygtermfilename, cygtermpath_vstore, sizeof(cygtermpath_vstore));
+		ret = convertVirtualStoreW(tmpbufW, &vs);
+		free(tmpbufW);
+		hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
+		EnableWindow(hWnd, ret);
+		hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
+		EnableWindow(hWnd, ret);
 		if (ret) {
-			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
-			EnableWindow(hWnd, TRUE);
-			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
-			EnableWindow(hWnd, TRUE);
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", cygtermpath_vstore, cygtermfilename);
-			SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, tmpbuf);
+			SetDlgItemTextW(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, vs);
+			free(vs);
 		}
 		else {
-			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
-			EnableWindow(hWnd, FALSE);
-			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
-			EnableWindow(hWnd, FALSE);
-			SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, "");
+			SetDlgItemTextA(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, "");
 		}
 
 		// ssh_known_hosts
-		if (func == NULL) {
+		{
+			typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
+			HMODULE h = NULL;
+			PSSH_read_known_hosts_file func = NULL;
 			if (((h = GetModuleHandle("ttxssh.dll")) != NULL)) {
 				func = (PSSH_read_known_hosts_file)GetProcAddress(h, "TTXReadKnownHostsFile");
 				if (func) {
+					char temp[MAX_PATH];
 					int ret = func(temp, sizeof(temp));
 					if (ret) {
 						char *s = strstr(temp, ":\\");
 
 						if (s) { // full path
-							ExtractFileName(temp, hostsfilename, sizeof(hostsfilename));
-							ExtractDirName(temp, hostsfilepath);
+							tmpbufW = ToWcharA(temp);
 						}
 						else { // relative path
-							strncpy_s(hostsfilepath, sizeof(hostsfilepath), teratermexepath, _TRUNCATE);
-							strncpy_s(hostsfilename, sizeof(hostsfilename), temp, _TRUNCATE);
-							_snprintf_s(temp, sizeof(temp), "%s\\%s", hostsfilepath, hostsfilename);
+							aswprintf(&tmpbufW, L"%s\\%hs", pts->HomeDirW, temp);
 						}
 
-						SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, temp);
+						SetDlgItemTextW(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, tmpbufW);
 
 						/// (2) Virutal Storeへの変換
-						memset(hostsfilepath_vstore, 0, sizeof(hostsfilepath_vstore));
-						ret = convertVirtualStore(hostsfilepath, hostsfilename, hostsfilepath_vstore, sizeof(hostsfilepath_vstore));
+						ret = convertVirtualStoreW(tmpbufW, &vs);
+						free(tmpbufW);
+						hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
+						EnableWindow(hWnd, ret);
+						hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
+						EnableWindow(hWnd, ret);
 						if (ret) {
-							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
-							EnableWindow(hWnd, TRUE);
-							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
-							EnableWindow(hWnd, TRUE);
-							_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", hostsfilepath_vstore, hostsfilename);
-							SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, tmpbuf);
+							SetDlgItemTextW(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, vs);
+							free(vs);
 						}
 						else {
-							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
-							EnableWindow(hWnd, FALSE);
-							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
-							EnableWindow(hWnd, FALSE);
-							SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
+							SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
 						}
 
 					}
@@ -445,7 +436,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			else {
 				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT);
 				EnableWindow(hWnd, FALSE);
-				SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, "");
+				SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, "");
 				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON);
 				EnableWindow(hWnd, FALSE);
 				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON_FILE);
@@ -454,81 +445,73 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 				EnableWindow(hWnd, FALSE);
 				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
 				EnableWindow(hWnd, FALSE);
-				SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
+				SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
 			}
 		}
 
 		return TRUE;
+	}
 
-	case WM_COMMAND:
-		button_pressed = 0;
+	case WM_COMMAND: {
+		BOOL button_pressed = FALSE;
+		BOOL open_dir = FALSE;
+		int edit;
+		int edit_vstore;
 		switch (LOWORD(wp)) {
 		case IDC_INI_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			edit = IDC_INI_SETUPDIR_EDIT;
+			edit_vstore = IDC_INI_SETUPDIR_EDIT_VSTORE;
 			open_dir = TRUE;
-			path_p = inipath;
-			if (inipath_vstore[0])
-				path_p = inipath_vstore;
-			filename_p = inifilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
+
 		case IDC_INI_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			edit = IDC_INI_SETUPDIR_EDIT;
+			edit_vstore = IDC_INI_SETUPDIR_EDIT_VSTORE;
 			open_dir = FALSE;
-			path_p = inipath;
-			if (inipath_vstore[0])
-				path_p = inipath_vstore;
-			filename_p = inifilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
 
 		case IDC_KEYCNF_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			edit = IDC_KEYCNF_SETUPDIR_EDIT;
+			edit_vstore = IDC_KEYCNF_SETUPDIR_EDIT_VSTORE;
 			open_dir = TRUE;
-			path_p = keycnfpath;
-			if (keycnfpath_vstore[0])
-				path_p = keycnfpath_vstore;
-			filename_p = keycnffilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
+
 		case IDC_KEYCNF_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			edit = IDC_KEYCNF_SETUPDIR_EDIT;
+			edit_vstore = IDC_KEYCNF_SETUPDIR_EDIT_VSTORE;
 			open_dir = FALSE;
-			path_p = keycnfpath;
-			if (keycnfpath_vstore[0])
-				path_p = keycnfpath_vstore;
-			filename_p = keycnffilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
 
 		case IDC_CYGTERM_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			edit = IDC_CYGTERM_SETUPDIR_EDIT;
+			edit_vstore = IDC_CYGTERM_SETUPDIR_EDIT_VSTORE;
 			open_dir = TRUE;
-			path_p = cygtermpath;
-			if (cygtermpath_vstore[0])
-				path_p = cygtermpath_vstore;
-			filename_p = cygtermfilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
+
 		case IDC_CYGTERM_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			edit = IDC_CYGTERM_SETUPDIR_EDIT;
+			edit_vstore = IDC_CYGTERM_SETUPDIR_EDIT_VSTORE;
 			open_dir = FALSE;
-			path_p = cygtermpath;
-			if (cygtermpath_vstore[0])
-				path_p = cygtermpath_vstore;
-			filename_p = cygtermfilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
 
 		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			edit = IDC_SSH_SETUPDIR_EDIT;
+			edit_vstore = IDC_SSH_SETUPDIR_EDIT_VSTORE;
 			open_dir = TRUE;
-			path_p = hostsfilepath;
-			if (hostsfilepath_vstore[0])
-				path_p = hostsfilepath_vstore;
-			filename_p = hostsfilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
+
 		case IDC_SSH_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			edit = IDC_SSH_SETUPDIR_EDIT;
+			edit_vstore = IDC_SSH_SETUPDIR_EDIT_VSTORE;
 			open_dir = FALSE;
-			path_p = hostsfilepath;
-			if (hostsfilepath_vstore[0])
-				path_p = hostsfilepath_vstore;
-			filename_p = hostsfilename;
-			button_pressed = 1;
+			button_pressed = TRUE;
 			break;
 
 		case IDCANCEL:
@@ -541,18 +524,35 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 
 		if (button_pressed) {
-			char *app = NULL;
+			wchar_t *filename_p;
+			if (!IsWindowEnabled(GetDlgItem(hDlgWnd, edit_vstore))) {
+				filename_p = GetWindowTextAlloc(GetDlgItem(hDlgWnd, edit));
+			} else {
+				filename_p = GetWindowTextAlloc(GetDlgItem(hDlgWnd, edit_vstore));
+			}
 
-			if (open_dir)
-				app = NULL;
-			else
-				app = ts.ViewlogEditor;
+			const char *UILanguageFile = pts->UILanguageFile;
+			if (open_dir) {
+#if 0
+				// フォルダを開く
+				wchar_t *path_p = ExtractDirNameW(filename_p);
+				openDirectoryWithExplorer(path_p, UILanguageFile);
+				free(path_p);
+#else
+				// フォルダを開いて、ファイルを選択する
+				openDirectoryWithExplorer(filename_p, UILanguageFile);
+#endif
+			}
+			else {
+				char *editor = pts->ViewlogEditor;
+				openFileWithApplication(filename_p, editor, UILanguageFile);
+			}
 
-			openFileDirectory(path_p, filename_p, open_dir, app);
+			free(filename_p);
 			return TRUE;
 		}
 		return FALSE;
-
+	}
 	case WM_CLOSE:
 		TTEndDialog(hDlgWnd, 0);
 		return TRUE;
@@ -563,8 +563,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	return TRUE;
 }
 
-void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd)
+void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TTTSet *pts)
 {
-	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
-	            hWnd, OnSetupDirectoryDlgProc);
+	TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
+					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)pts);
 }

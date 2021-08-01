@@ -951,7 +951,7 @@ typedef struct {
 
 	BOOL TelLineMode;
 	void *reserve_12;	// _locale_t locale
-	BOOL VirtualStoreEnabled;
+	BOOL reserve_13;	// VirtualStoreEnabled;
 
 	void *NotifyIcon;
 
