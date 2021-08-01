@@ -449,6 +449,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			}
 		}
 
+		CenterWindow(hDlgWnd, GetParent(hDlgWnd));
+
 		return TRUE;
 	}
 
