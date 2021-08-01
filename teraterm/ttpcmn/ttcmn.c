@@ -47,6 +47,7 @@
 #include "tt_res.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "asprintf.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
@@ -492,21 +493,19 @@ void WINAPI UndoAllWin(void) {
 
 void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 {
-	char HomeDir[MAX_PATH];
-	char Temp[MAX_PATH];
+	wchar_t Temp[MAX_PATH];
 	HWND HWin;
-	wchar_t HelpFN[MAX_PATH];
+	wchar_t *HelpFN;
 	wchar_t uimsg[MAX_UIMSG];
 	wchar_t *HomeDirW;
 
-	 /* Get home directory */
-	if (GetModuleFileNameA(NULL,Temp,_countof(Temp)) == 0) {
+	/* Get home directory  TODO ts.HomeDirW へ切り替え */
+	if (GetModuleFileNameW(NULL,Temp,_countof(Temp)) == 0) {
 		return;
 	}
-	ExtractDirName(Temp, HomeDir);
-	HomeDirW = ToWcharA(HomeDir);
+	HomeDirW = ExtractDirNameW(Temp);
 	get_lang_msgW("HELPFILE", uimsg, _countof(uimsg), L"teraterm.chm", UILanguageFile);
-	_snwprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, L"%s\\%s", HomeDirW, uimsg);
+	aswprintf(&HelpFN, L"%s\\%s", HomeDirW, uimsg);
 	free(HomeDirW);
 
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
@@ -518,8 +517,8 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 			NULL, L"Tera Term: HTML help",
 			"MSG_OPENHELP_ERROR", L"Can't open HTML help file(%s)." };
 		TTMessageBoxW(HWin, &info, MB_OK | MB_ICONERROR, UILanguageFile, HelpFN);
-		return;
 	}
+	free(HelpFN);
 }
 
 HWND WINAPI GetNthWin(int n)
