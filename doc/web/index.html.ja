@@ -31,13 +31,15 @@
 [<a href="https://ja.osdn.net/projects/ttssh2/">Project page</a>] 
 [<a href="/manual/ja/about/copyright.html">License</a>] 
 [<a href="https://ja.osdn.net/projects/ttssh2/releases/">Download</a>]  
-[<a href="/manual/ja/">Document</a>] 
 [<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
+[<a href="/manual/ja/">Document</a>] 
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
+[<a href="https://twitter.com/Tera_Term">Twitter</a>] 
 [<a href="#Source">SourceCode</a>] 
-[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users' ML</a>] 
+[<a href="#Development">Development</a>]
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">Dev ML</a>] 
 [<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-commit">Commit ML</a>] 
 <!-- [<a href="http://logmett.com/forum/index.php">Forum</a>] -->
-[<a href="#Development">Development</a>]
 </p>
 
 <p>
@@ -98,7 +100,7 @@ TeraTerm Project は、ターミナルエミュレータ Tera Term 、および 
 </p>
 
 <p>
-TeraTerm Project のためのメーリングリスト <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">TeraTerm Pro Users' ML</a> が設置されています。
+Tera Term ユーザーのためのメーリングリスト <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> が設置されています。
 </p>
 
 <!-- <p>
@@ -117,6 +119,8 @@ TeraTerm Project のためのメーリングリスト <a href="https://lists.osd
 
 
 <h2 id="Development">開発情報</h2>
+
+Tera Term 開発のためのメーリングリスト <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">ttssh2-dev</a> が設置されています。
 
 <h3>開発者募集</h3>
 <p>

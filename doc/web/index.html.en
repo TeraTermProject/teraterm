@@ -31,13 +31,15 @@
 [<a href="https://osdn.net/projects/ttssh2/">Project page</a>] 
 [<a href="/manual/en/about/copyright.html">License</a>] 
 [<a href="https://osdn.net/projects/ttssh2/releases/">Download</a>]  
-[<a href="/manual/en/">Document</a>] 
 [<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
-[<a href="#Source">SourceCode</a>] 
+[<a href="/manual/en/">Document</a>] 
 [<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
+[<a href="https://twitter.com/Tera_Term">Twitter</a>] 
+[<a href="#Source">SourceCode</a>] 
+[<a href="#Development">Development</a>]
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">Dev ML</a>] 
 [<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-commit">Commit ML</a>] 
 <!-- [<a href="http://logmett.com/forum/index.php">Forum</a>] -->
-[<a href="#Development">Development</a>]
 </p>
 
 <p>
@@ -98,7 +100,7 @@ If you have a request to Tera Term, please post to <a href="https://osdn.net/pro
 </p>
 
 <p>
-The <a href="http://www.freeml.com/teraterm">TeraTerm Pro Users' ML</a> is opened for TeraTerm Project. But this mailing list is Japanese only.
+The <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> ML is opened for Tera Term users. But this mailing list is Japanese only.
 </p>
 
 <!-- <p>
@@ -117,6 +119,8 @@ The <a href="http://logmett.com/forum/">support forum</a> is maintanced by Boris
 
 
 <h2 id="Development">Development</h2>
+
+The <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">ttssh2-dev</a> ML is opened for Tera Term development. But this mailing list is Japanese only.
 
 <h3>How to build source codes</h3>
 <p>
