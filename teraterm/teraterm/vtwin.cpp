@@ -4541,7 +4541,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 
 	if (FuncId==GSF_LOADKEY) {
 		size_t i, j;
-		wchar_t *KeyCnfFNW = ToWcharA(ts->KeyCnfFN);
+		wchar_t *KeyCnfFNW = ts->KeyCnfFNW;
 		GetFileNamePosW(KeyCnfFNW,&i,&j);
 		wcsncpy_s(NameW, _countof(NameW),&KeyCnfFNW[j], _TRUNCATE);
 		memcpy(DirW, KeyCnfFNW, sizeof(wchar_t) * i);
@@ -4553,7 +4553,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 	}
 	else {
 		size_t i, j;
-		wchar_t *SetupFNameW = ToWcharA(ts->SetupFName);
+		wchar_t *SetupFNameW = ts->SetupFNameW;
 		GetFileNamePosW(SetupFNameW,&i,&j);
 		wcsncpy_s(NameW, _countof(NameW),&SetupFNameW[j], _TRUNCATE);
 		memcpy(DirW, SetupFNameW, sizeof(wchar_t) * i);
@@ -4598,6 +4598,8 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		ofn.lpstrTitle = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", L"Tera Term: Save setup", UILanguageFile);
 		Ok = GetSaveFileNameW(&ofn);
 		if (Ok) {
+			free(ts->SetupFNameW);
+			ts->SetupFNameW = _wcsdup(NameW);
 			char *Name = ToCharW(NameW);
 			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
 			free(Name);
@@ -4609,6 +4611,8 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFile);
 		Ok = GetOpenFileNameW(&ofn);
 		if (Ok) {
+			free(ts->SetupFNameW);
+			ts->SetupFNameW = _wcsdup(NameW);
 			char *Name = ToCharW(NameW);
 			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
 			free(Name);
@@ -4620,6 +4624,8 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFile);
 		Ok = GetOpenFileNameW(&ofn);
 		if (Ok) {
+			free(ts->KeyCnfFNW);
+			ts->KeyCnfFNW = _wcsdup(NameW);
 			char *Name = ToCharW(NameW);
 			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), Name, _TRUNCATE);
 			free(Name);
@@ -4650,14 +4656,11 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 
 void CVTWindow::OnSetupSave()
 {
-	BOOL Ok;
-	char TmpSetupFN[MAX_PATH];
-	int ret;
-
-	strncpy_s(TmpSetupFN, sizeof(TmpSetupFN),ts.SetupFName, _TRUNCATE);
+	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);
 	HelpId = HlpSetupSave;
-	Ok = _GetSetupFname(HVTWin,GSF_SAVE,&ts);
+	BOOL Ok = _GetSetupFname(HVTWin,GSF_SAVE,&ts);
 	if (! Ok) {
+		free(PrevSetupFNW);
 		return;
 	}
 
@@ -4687,12 +4690,16 @@ void CVTWindow::OnSetupSave()
 		}
 #endif
 
-		CopyFile(TmpSetupFN, ts.SetupFName, TRUE);
+		CopyFileW(PrevSetupFNW, ts.SetupFNameW, TRUE);
 		/* write current setup values to file */
-		(*WriteIniFile)(ts.SetupFName,&ts);
+		(*WriteIniFile)(ts.SetupFName, &ts);
 		/* copy host list */
-		(*CopyHostList)(TmpSetupFN,ts.SetupFName);
+		char * PrevSetupFN = ToCharW(PrevSetupFNW);
+		(*CopyHostList)(PrevSetupFN, ts.SetupFName);
+		free(PrevSetupFN);
 		FreeTTSET();
+		free(PrevSetupFNW);
+		PrevSetupFNW = NULL;
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 		if (::IsZoomed(m_hWnd)) {
@@ -4701,23 +4708,12 @@ void CVTWindow::OnSetupSave()
 		}
 #endif
 	}
-
 }
 
 void CVTWindow::OnSetupRestore()
 {
-	BOOL Ok;
-
 	HelpId = HlpSetupRestore;
-#if 0
-	if (! LoadTTFILE()) {
-		return;
-	}
-#endif
-	Ok = _GetSetupFname(HVTWin,GSF_RESTORE,&ts);
-#if 0
-	FreeTTFILE();
-#endif
+	BOOL Ok = _GetSetupFname(HVTWin, GSF_RESTORE, &ts);
 	if (Ok) {
 		RestoreSetup();
 	}
@@ -4727,8 +4723,6 @@ void CVTWindow::OnSetupRestore()
 // 現在読み込まれている teraterm.ini ファイルが格納されている
 // フォルダをエクスプローラで開く。
 //
-// (2015.2.28 yutaka)
-//
 void CVTWindow::OnOpenSetupDirectory()
 {
 	SetupDirectoryDialog(m_hInst, HVTWin, &ts);
@@ -4736,18 +4730,8 @@ void CVTWindow::OnOpenSetupDirectory()
 
 void CVTWindow::OnSetupLoadKeyMap()
 {
-	BOOL Ok;
-
 	HelpId = HlpSetupLoadKeyMap;
-#if 0
-	if (! LoadTTFILE()) {
-		return;
-	}
-#endif
-	Ok = _GetSetupFname(HVTWin,GSF_LOADKEY,&ts);
-#if 0
-	FreeTTFILE();
-#endif
+	BOOL Ok = _GetSetupFname(HVTWin,GSF_LOADKEY,&ts);
 	if (! Ok) {
 		return;
 	}
