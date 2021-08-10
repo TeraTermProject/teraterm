@@ -118,7 +118,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_TITLEFMT_DISPTCPPORT, "DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT" },
 		{ IDC_TITLEFMT_DISPSERIALSPEED, "DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED" }
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 	// (1)DisableAcceleratorSendBreak
 	SetCheck(IDC_DISABLE_SENDBREAK, ts.DisableAcceleratorSendBreak);
@@ -244,7 +244,7 @@ void CSequencePropPageDlg::OnInitDialog()
 		{ IDC_CLIPBOARD_NOTIFY, "DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY" },
 		{ IDC_ACCEPT_CLEAR_SBUFF, "DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF" },
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 	const static I18nTextInfo accept_title_changing[] = {
 		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", L"off" },
@@ -442,7 +442,7 @@ void CCopypastePropPageDlg::OnInitDialog()
 		{ IDC_PASTEDELAY_LABEL2, "DLG_TAB_COPYPASTE_PASTEDELAY2" },
 		{ IDC_SELECT_ON_ACTIVATE, "DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE" }
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 	// (1)Enable continued-line copy
 	SetCheck(IDC_LINECOPY, ts.EnableContinuedLineCopy);
@@ -667,7 +667,7 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_URL_UNDERLINE, "DLG_TAB_VISUAL_URLUL" },
 		{ IDC_RESTART, "DLG_TAB_VISUAL_RESTART" },
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 	const static I18nTextInfo visual_font_quality[] = {
 		{ "DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", L"Default" },
@@ -1295,7 +1295,7 @@ void CLogPropPageDlg::OnInitDialog()
 		{ IDC_OPT_INCBUF, "DLG_FOPT_ALLBUFFINFIRST" },
 		{ IDC_OPT_TIMESTAMP, "DLG_FOPT_TIMESTAMP" },
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 	const static I18nTextInfo fopt_timestamp[] = {
 		{ "DLG_FOPT_TIMESTAMP_LOCAL", L"Local Time" },
@@ -1634,7 +1634,7 @@ void CCygwinPropPageDlg::OnInitDialog()
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_CYGWIN_PATH_LABEL, "DLG_TAB_CYGWIN_PATH" }
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 	memcpy(&settings, &ts.CygtermSettings, sizeof(cygterm_t));
 

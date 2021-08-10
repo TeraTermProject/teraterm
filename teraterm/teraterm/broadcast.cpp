@@ -476,7 +476,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			UpdateBroadcastWindowList(BroadcastWindowList);
 
 			// I18N
-			SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 			// ダイアログの初期サイズを保存
 			GetWindowRect(hWnd, &rc_dlg);

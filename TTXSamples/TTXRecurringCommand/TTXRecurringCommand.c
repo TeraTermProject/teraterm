@@ -474,7 +474,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 
 	switch (msg) {
 	  case WM_INITDIALOG:
-		SetI18nDlgStrs(SECTION, dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18nDlgStrsW(dlg, SECTION, text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 		SendMessage(GetDlgItem(dlg, IDC_ENABLE), BM_SETCHECK,
 		            pvar->enable?BST_CHECKED:BST_UNCHECKED, 0);

@@ -184,11 +184,11 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 	SetupMenu = GetSubMenu(*Menu,2);
 	HelpMenu = GetSubMenu(*Menu,4);
 
-	SetDlgMenuTexts(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTextsW(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFileW);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t uimsg[MAX_UIMSG];

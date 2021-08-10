@@ -436,6 +436,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	LOGFONT logfont;
 	HFONT font;
 	const char *UILanguageFile = ts.UILanguageFile;
+	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 	static HFONT DlgXoptFont;
 
 	switch (Message) {
@@ -457,7 +458,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			DlgXoptFont = NULL;
 		}
 
-		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
+		SetI18nDlgStrsW(Dialog, "Tera Term", text_info, _countof(text_info), UILanguageFileW);
 
 		if (LOWORD(*pl)==0xFFFF) { // Send
 			ShowDlgItem(Dialog, IDC_XOPT1K, IDC_XOPT1K);
@@ -797,13 +798,14 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	PFileVarProto fv;
 	wchar_t TempFull[MAX_PATH];
 	const char *UILanguageFile = ts.UILanguageFile;
+	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 
 	switch (Message) {
 	case WM_INITDIALOG:
 		fv = (PFileVarProto)lParam;
 		SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 		SendDlgItemMessage(Dialog, IDC_GETFN, EM_LIMITTEXT, sizeof(TempFull)-1,0);
-		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
+		SetI18nDlgStrsW(Dialog, "Tera Term", text_info, _countof(text_info), UILanguageFileW);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -858,6 +860,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 	switch (Message) {
 	case WM_INITDIALOG: {
 		const char *UILanguageFile = ts.UILanguageFile;
+		const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
 		pw = (LPWORD)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
@@ -875,7 +878,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 			DlgFoptFont = NULL;
 		}
 
-		SetI18nDlgStrs("Tera Term", Dialog, text_info, _countof(text_info), UILanguageFile);
+		SetI18nDlgStrsW(Dialog, "Tera Term", text_info, _countof(text_info), UILanguageFileW);
 
 		SetRB(Dialog,*pw & 1,IDC_FOPTBIN,IDC_FOPTBIN);
 

@@ -19,6 +19,7 @@ using namespace yebisuya;
 #include "i18n.h"
 
 extern char UILanguageFile[MAX_PATH];
+extern wchar_t *UILanguageFileW;
 
 void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 {
@@ -778,7 +779,7 @@ private:
             Dialog::onInitDialog();
 
             HWND hWnd = HWND(*this);
-			SetI18nDlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
+			SetI18nDlgStrsW(hWnd, "TTProxy", text_info, _countof(text_info), UILanguageFileW);
 
             host = GetDlgItem(IDC_HOSTNAME);
             user = GetDlgItem(IDC_USERNAME);
@@ -904,7 +905,7 @@ private:
 //              { IDCANCEL, "BTN_CANCEL" },
             };
 			HWND hWnd = HWND(*this);
-			SetI18nDlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
+			SetI18nDlgStrsW(hWnd, "TTProxy", text_info, _countof(text_info), UILanguageFileW);
 
             url  <<= GetDlgItem(IDC_URL);
             type <<= GetDlgItem(IDC_TYPE);
@@ -1086,7 +1087,7 @@ private:
                 { 0, "DLG_ABOUT_TITLE" },
                 { IDOK, "BTN_OK" },
             };
-            SetI18nDlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
+            SetI18nDlgStrsW(hWnd, "TTProxy", text_info, _countof(text_info), UILanguageFileW);
 
             UTIL_get_lang_msgW("DLG_ABOUT_EXTENSION", uimsg, sizeof(uimsg),
                                L"Tera Term proxy extension");

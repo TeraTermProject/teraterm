@@ -844,7 +844,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	ControlMenu = GetSubMenu(hMenu,ID_CONTROL);
 	HelpMenu = GetSubMenu(hMenu,ID_HELPMENU);
 
-	SetDlgMenuTexts(hMenu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTextsW(hMenu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
 
 	/* LogMeTT の存在を確認してメニューを追加する */
 	if (isLogMeTTExist()) {
@@ -853,11 +853,11 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		::InsertMenu(FileMenu, ID_FILE_PRINT2, MF_SEPARATOR, NULL, NULL);
 	}
 
-	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(ControlMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(ControlMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFileW);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t uimsg[MAX_UIMSG];
@@ -1065,7 +1065,7 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 	};
 	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_PASTEMENU));
-	SetDlgMenuTexts(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTextsW(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
 }
 
 void CVTWindow::ResetSetup()

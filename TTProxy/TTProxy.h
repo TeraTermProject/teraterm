@@ -9,6 +9,7 @@ using namespace yebisuya;
 extern "C" __declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
 
 char UILanguageFile[MAX_PATH];
+wchar_t *UILanguageFileW;
 
 class TTProxy : public DynamicLinkLibrary<TTProxy> {
 	enum {

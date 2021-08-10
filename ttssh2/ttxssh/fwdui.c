@@ -510,7 +510,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_SSHFWDSETUP_HELP, "BTN_HELP" },
 	};
-	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 	FWD_get_request_specs(pvar, requests, num_specs);
 
@@ -728,7 +728,7 @@ static void set_dir_options_status(HWND dlg)
 {
 	FWDType type_to, type_from;
 	BOOL enable_LTR, enable_RTL, enable_DYN;
-	
+
 	type_to = FWD_REMOTE_TO_LOCAL;
 	if (IsDlgButtonChecked(dlg, IDC_SSHFWDLOCALTOREMOTE)) {
 		type_to = FWD_LOCAL_TO_REMOTE;
@@ -801,7 +801,7 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:

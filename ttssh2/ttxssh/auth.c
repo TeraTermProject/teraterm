@@ -288,7 +288,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	};
 	int default_method = pvar->session_settings.DefaultAuthMethod;
 
-	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, UseControlChar);
@@ -1321,7 +1321,7 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_DISCONNECT" },
 	};
-	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, NULL);
@@ -1473,7 +1473,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		{ IDC_SSHAUTHSETUP_HELP, "BTN_HELP" },
 	};
 
-	SetI18nDlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 	switch (pvar->settings.DefaultAuthMethod) {
 	case SSH_AUTH_RSA:

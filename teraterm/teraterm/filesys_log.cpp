@@ -1166,7 +1166,7 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 		case WM_INITDIALOG:
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
-			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 			return FALSE;
 
 		case WM_COMMAND:
