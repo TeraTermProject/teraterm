@@ -43,7 +43,6 @@
 #include "codeconv.h"
 #include "compat_win.h"
 #include "dllutil.h"
-#include "ttlib.h"		// for IsWindowsNTKernel()
 
 #include "layer_for_unicode.h"
 
@@ -615,6 +614,11 @@ DWORD WINAPI _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPC
 	char *defA = ToCharW(lpDefault);
 	char *fileA = ToCharW(lpFileName);
 	DWORD r = GetPrivateProfileStringA(appA, keyA, defA, buf, nSize, fileA);
+	if (r == 0 && defA == NULL) {
+		// GetPrivateProfileStringA()の戻り値はbufにセットした文字数(終端含まず)
+		// OSのバージョンによってはdefがNULLの時、bufが未設定となることがある
+		buf[0] = 0;
+	}
 	::MultiByteToWideChar(CP_ACP, 0, buf, -1, lpReturnedString, nSize);
 	r = (DWORD)wcslen(lpReturnedString);
 	free(appA);

@@ -38,7 +38,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "common\com
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "svnrev_perl", "..\svnrev_perl\svnrev_perl.v8.vcproj", "{1D9096FC-EC94-4913-B14A-9D97AAB88E7F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "layer_for_unicode", "common\layer_for_unicode\layer_for_unicode.v8.vcproj", "{08C4EEED-92F9-4CA2-A52E-97089A889930}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "layer_for_unicode", "layer_for_unicode\layer_for_unicode.v8.vcproj", "{08C4EEED-92F9-4CA2-A52E-97089A889930}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

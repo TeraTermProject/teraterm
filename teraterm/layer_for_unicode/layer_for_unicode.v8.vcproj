@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".."
+				AdditionalIncludeDirectories="../common"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -101,7 +101,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=".."
+				AdditionalIncludeDirectories="../common"
 				RuntimeLibrary="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -348,19 +348,19 @@
 			>
 		</File>
 		<File
-			RelativePath="..\layer_for_unicode.cpp"
+			RelativePath=".\layer_for_unicode.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\layer_for_unicode.h"
+			RelativePath=".\layer_for_unicode.h"
 			>
 		</File>
 		<File
-			RelativePath="..\layer_for_unicode.md"
+			RelativePath=".\layer_for_unicode.md"
 			>
 		</File>
 		<File
-			RelativePath="..\layer_for_unicode_comctl32.cpp"
+			RelativePath=".\layer_for_unicode_comctl32.cpp"
 			>
 		</File>
 	</Files>

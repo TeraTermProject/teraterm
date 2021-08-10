@@ -7,16 +7,22 @@ project(${PACKAGE_NAME})
 add_library(
   ${PACKAGE_NAME}
   STATIC
+  ../common/codeconv.cpp
+  ../common/codeconv.h
+  ../common/compat_win.cpp
+  ../common/compat_win.h
+  ../common/dllutil.cpp
+  ../common/dllutil.h
   init_ptr.cpp
-  ../layer_for_unicode.cpp
-  ../layer_for_unicode.h
-  ../layer_for_unicode_comctl32.cpp
+  layer_for_unicode.cpp
+  layer_for_unicode.h
+  layer_for_unicode_comctl32.cpp
   )
 
 target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
-  ..
+  ../common
   )
 
 if(NOT EXISTS "list_asm.cmake")

@@ -39,7 +39,7 @@ set_target_properties(
 
 if(SUPPORT_OLD_WINDOWS)
   if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    add_subdirectory(common/layer_for_unicode)
+    add_subdirectory(layer_for_unicode)
     set_target_properties(
       layer_for_unicode
       PROPERTIES FOLDER teraterm)

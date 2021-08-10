@@ -118,7 +118,19 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  #
+  )
+
+if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    layer_for_unicode
+    )
+endif(SUPPORT_OLD_WINDOWS)
+
+target_link_libraries(
+  ${PACKAGE_NAME}
+  PRIVATE
   ws2_32
   version
   gdi32

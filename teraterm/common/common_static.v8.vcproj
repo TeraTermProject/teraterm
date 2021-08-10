@@ -249,14 +249,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\layer_for_unicode_crt.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\layer_for_unicode_crt.h"
-			>
-		</File>
-		<File
 			RelativePath=".\tipwin.cpp"
 			>
 		</File>

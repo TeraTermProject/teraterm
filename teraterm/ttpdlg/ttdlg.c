@@ -2874,7 +2874,7 @@ static int make_sel_lang_ui(const wchar_t *HomeDir)
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				LangUIList[i++] = wcsdup(fd.cFileName);
+				LangUIList[i++] = _wcsdup(fd.cFileName);
 			}
 		} while(FindNextFileW(hFind, &fd) && i < file_num);
 		FindClose(hFind);
