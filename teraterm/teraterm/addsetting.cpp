@@ -850,7 +850,7 @@ void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 static void OpacityTooltip(CTipWin* tip, HWND hDlg, int trackbar, int pos, const char *UILanguageFile)
 {
 	wchar_t uimsg[MAX_UIMSG];
-	get_lang_msgW("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), L"Opacity %.1f %%", ts.UILanguageFile);
+	get_lang_msgW("TOOLTIP_TITLEBAR_OPACITY", uimsg, _countof(uimsg), L"Opacity %.1f %%", ts.UILanguageFile);
 	wchar_t tipbuf[MAX_UIMSG];
 	swprintf_s(tipbuf, _countof(tipbuf), uimsg, (pos / 255.0) * 100);
 	RECT rc;
