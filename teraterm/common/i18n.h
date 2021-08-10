@@ -60,9 +60,27 @@ DllExport void WINAPI SetI18nMenuStrs(const char *section, HMENU hMenu,
 							  const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
 
 // i18n_static.c
+size_t GetI18nStrWW(const char *section, const char *key, const wchar_t *def, const wchar_t *iniFile, wchar_t **buf);
+size_t GetI18nStrWA(const char *section, const char *key, const wchar_t *def, const char *iniFile, wchar_t **buf);
+size_t GetI18nStrU8W(const char *section, const char *key, const char *def, const wchar_t *iniFile, char **buf);
+size_t GetI18nStrU8A(const char *section, const char *key,  const char *def, const char *iniFile, char **buf);
+
 void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile);
+
+int SetI18nDlgStrsW(HWND hDlgWnd, const char *section, const DlgTextInfo *infos, size_t infoCount,
+					const wchar_t *UILanguageFile);
+int SetI18nDlgStrsA(HWND hDlgWnd, const char *section, const DlgTextInfo *infos, size_t infoCount,
+					const char *UILanguageFile);
+void SetI18nMenuStrsW(HMENU hMenu, const char *section, const DlgTextInfo *infos, size_t infoCount,
+					  const wchar_t *UILanguageFile);
+void SetI18nMenuStrsA(HMENU hMenu, const char *section, const DlgTextInfo *infos, size_t infoCount,
+					  const char *UILanguageFile);
+void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
+				  const wchar_t *UILanguageFile, int nsel);
 void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
 				 const char *UILanguageFile, int nsel);
+int GetI18nLogfontAW(const char *section, const char *key, PLOGFONTA logfont, int ppi, const wchar_t *iniFile);
+int GetI18nLogfontAA(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
 
 #ifdef __cplusplus
 }

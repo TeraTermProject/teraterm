@@ -41,32 +41,10 @@
 DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
 									const char *iniFile)
 {
-	size_t size;
-	if (pGetPrivateProfileStringW != NULL) {
-		wchar_t sectionW[64];
-		wchar_t keyW[128];
-		wchar_t iniFileW[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
-		MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
-		MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
-		// The return value is the number of characters copied to the buffer,
-		// not including the terminating null character.
-		size = pGetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
-		if (size == 0 && def == NULL) {
-			buf[0] = 0;
-		}
-	}
-	else {
-		char tmp[MAX_UIMSG];
-		char defA[MAX_UIMSG];
-		WideCharToMultiByte(CP_ACP, 0, def, -1, defA, _countof(defA), NULL, NULL);
-		size = GetPrivateProfileStringA(section, key, defA, tmp, _countof(tmp), iniFile);
-		if (size == 0 && def == NULL) {
-			buf[0] = 0;
-		}
-		MultiByteToWideChar(CP_ACP, 0, tmp, -1, buf, buf_len);
-	}
-	size = RestoreNewLineW(buf);
+	wchar_t *str;
+	size_t size = GetI18nStrWA(section, key, def, iniFile, &str);
+	wcsncpy_s(buf, buf_len, str, _TRUNCATE);
+	free(str);
 	return size;
 }
 
@@ -79,44 +57,26 @@ DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_
  */
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
-	DWORD size = GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
-	if (size == 0 && def == NULL) {
-		// GetPrivateProfileStringA()の戻り値はbufにセットした文字数(終端含まず)
-		// OSのバージョンによってはdefがNULLの時、bufが未設定となることがある
-		buf[0] = 0;
+	wchar_t *strW;
+	wchar_t *defW = ToWcharA(def);
+	size_t size = GetI18nStrWA(section, key, defW, iniFile, &strW);
+	size_t lenA;
+	char *strA = _WideCharToMultiByte(strW, size, CP_ACP, &lenA);
+	if ((size_t)buf_len >= lenA) {
+		memcpy(buf, strA, lenA);
+	} else {
+		// バッファ不足
+		memcpy(buf, strA, buf_len);
+		buf[buf_len - 1] = '\0';
 	}
-	RestoreNewLine(buf);
+	free(defW);
+	free(strA);
+	free(strW);
 }
 
 int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
 {
-	char tmp[MAX_UIMSG];
-	char font[LF_FACESIZE];
-	int height, charset;
-	assert(iniFile[0] != '\0');
-	memset(logfont, 0, sizeof(*logfont));
-
-	GetPrivateProfileStringA(section, key, "", tmp, MAX_UIMSG, iniFile);
-	if (tmp[0] == '\0') {
-		return FALSE;
-	}
-
-	GetNthString(tmp, 1, LF_FACESIZE-1, font);
-	GetNthNum(tmp, 2, &height);
-	GetNthNum(tmp, 3, &charset);
-
-	if (font[0] != '\0') {
-		strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
-	}
-	logfont->lfCharSet = (BYTE)charset;
-	if (ppi != 0) {
-		logfont->lfHeight = MulDiv(height, -ppi, 72);
-	} else {
-		logfont->lfHeight = height;
-	}
-	logfont->lfWidth = 0;
-
-	return TRUE;
+	return GetI18nLogfontAA(section, key, logfont, ppi, iniFile);
 }
 
 /*
@@ -127,94 +87,15 @@ int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfon
  *
  */
 int WINAPI SetI18nDlgStrs(const char *section, HWND hDlgWnd,
-						 const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+						  const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
 {
-	size_t i;
-	int translatedCount = 0;
-
-	assert(hDlgWnd != NULL);
-	assert(infoCount > 0);
-	for (i = 0 ; i < infoCount; i++) {
-		const char *key = infos[i].key;
-		BOOL r = FALSE;
-		if (pGetPrivateProfileStringW == NULL) {
-			// ANSI
-			char uimsg[MAX_UIMSG];
-			GetI18nStr(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
-			if (uimsg[0] != '\0') {
-				const int nIDDlgItem = infos[i].nIDDlgItem;
-				if (nIDDlgItem == 0) {
-					r = SetWindowTextA(hDlgWnd, uimsg);
-					assert(r != 0);
-				} else {
-					r = SetDlgItemTextA(hDlgWnd, nIDDlgItem, uimsg);
-					assert(r != 0);
-				}
-			}
-		}
-		else {
-			// UNICODE
-			wchar_t uimsg[MAX_UIMSG];
-			GetI18nStrW(section, key, uimsg, _countof(uimsg), NULL, UILanguageFile);
-			if (uimsg[0] != L'\0') {
-				const int nIDDlgItem = infos[i].nIDDlgItem;
-				if (nIDDlgItem == 0) {
-					r = pSetWindowTextW(hDlgWnd, uimsg);
-					assert(r != 0);
-				} else {
-					r = pSetDlgItemTextW(hDlgWnd, nIDDlgItem, uimsg);
-					assert(r != 0);
-				}
-			}
-		}
-		if (r)
-			translatedCount++;
-	}
-
-	return (translatedCount);
+	return SetI18nDlgStrsA(hDlgWnd, section, infos, infoCount, UILanguageFile);
 }
 
 void WINAPI SetI18nMenuStrs(const char *section, HMENU hMenu, const DlgTextInfo *infos, size_t infoCount,
-						   const char *UILanguageFile)
+							const char *UILanguageFile)
 {
-	const int id_position_threshold = 1000;
-	size_t i;
-	for (i = 0; i < infoCount; i++) {
-		const int nIDDlgItem = infos[i].nIDDlgItem;
-		const char *key = infos[i].key;
-		if (pGetPrivateProfileStringW == NULL) {
-			// ANSI
-			char uimsg[MAX_UIMSG];
-			GetI18nStr(section, key, uimsg, sizeof(uimsg), NULL, UILanguageFile);
-			if (uimsg[0] != '\0') {
-				UINT uFlags = (nIDDlgItem < id_position_threshold) ? MF_BYPOSITION : MF_BYCOMMAND;
-				ModifyMenuA(hMenu, nIDDlgItem, uFlags, nIDDlgItem, uimsg);
-			}
-			else {
-				if (nIDDlgItem < id_position_threshold) {
-					// 一度ModifyMenu()しておかないとメニューの位置がずれる
-					GetMenuStringA(hMenu, nIDDlgItem, uimsg, _countof(uimsg), MF_BYPOSITION);
-					ModifyMenuA(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
-				}
-			}
-		}
-		else {
-			// UNICODE
-			wchar_t uimsg[MAX_UIMSG];
-			GetI18nStrW(section, key, uimsg, _countof(uimsg), NULL, UILanguageFile);
-			if (uimsg[0] != '\0') {
-				UINT uFlags = (nIDDlgItem < id_position_threshold) ? MF_BYPOSITION : MF_BYCOMMAND;
-				pModifyMenuW(hMenu, nIDDlgItem, uFlags, nIDDlgItem, uimsg);
-			}
-			else {
-				if (nIDDlgItem < id_position_threshold) {
-					// 一度ModifyMenu()しておかないとメニューの位置がずれる
-					pGetMenuStringW(hMenu, nIDDlgItem, uimsg, _countof(uimsg), MF_BYPOSITION);
-					pModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
-				}
-			}
-		}
-	}
+	SetI18nMenuStrsA(hMenu, section, infos, infoCount, UILanguageFile);
 }
 
 /* vim: set ts=4 sw=4 ff=dos : */

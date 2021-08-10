@@ -78,7 +78,7 @@ void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt,
 void RestoreNewLine(PCHAR Text);
 size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
-void GetNthNum(PCHAR Source, int Nth, int far *Num);
+void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
 void GetDownloadFolder(char *dest, int destlen);
 wchar_t *GetHomeDirW(HINSTANCE hInst);
@@ -132,7 +132,9 @@ void MoveWindowToDisplay(HWND hWnd);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
+int SetDlgTextsW(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const wchar_t *UILanguageFileW);
 int SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+void SetDlgMenuTextsW(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const wchar_t *UILanguageFile);
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 int GetMonitorDpiFromWindow(HWND hWnd);
 

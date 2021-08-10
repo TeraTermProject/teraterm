@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <wchar.h>
 #include <shlobj.h>
+#include <malloc.h>
 
 #include "i18n.h"
 #include "asprintf.h"
@@ -46,14 +47,54 @@
 #include "ttlib.h"
 
 /**
- *	GetI18nStrW() の動的バッファ版
+ *	MessageBoxを表示する
+ *
+ *	@param[in]	hWnd			親 window
+ *	@param[in]	info			タイトル、メッセージ
+ *	@param[in]	UILanguageFile	lngファイル
+ *	@param[in]	...				フォーマット引数
+ *
+ *	info.message を書式化文字列として、
+ *	UILanguageFileより後ろの引数を出力する
+ *
+ *	info.message_key, info.message_default 両方ともNULLの場合
+ *		可変引数の1つ目を書式化文字列として使用する
  */
-wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const char *UILanguageFile)
+int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILanguageFile, ...)
 {
-	wchar_t *buf = (wchar_t *)malloc(MAX_UIMSG * sizeof(wchar_t));
-	size_t size = GetI18nStrW(section, key, buf, MAX_UIMSG, def, UILanguageFile);
-	buf = (wchar_t *)realloc(buf, size * sizeof(wchar_t));
-	return buf;
+	const char *section = info->section;
+	const UINT uType = info->uType;
+	wchar_t *title;
+	if (info->title_key == NULL) {
+		title = _wcsdup(info->title_default);
+	}
+	else {
+		GetI18nStrWW(section, info->title_key, info->title_default, UILanguageFile, &title);
+	}
+
+	wchar_t *message = NULL;
+	if (info->message_key == NULL && info->message_default == NULL) {
+		wchar_t *format;
+		va_list ap;
+		va_start(ap, UILanguageFile);
+		format = va_arg(ap, wchar_t *);
+		vaswprintf(&message, format, ap);
+	}
+	else {
+		wchar_t *format;
+		GetI18nStrWW(section, info->message_key, info->message_default, UILanguageFile, &format);
+		va_list ap;
+		va_start(ap, UILanguageFile);
+		vaswprintf(&message, format, ap);
+		free(format);
+	}
+
+	int r = MessageBoxW(hWnd, message, title, uType);
+
+	free(title);
+	free(message);
+
+	return r;
 }
 
 /**
@@ -926,4 +967,99 @@ wchar_t *GetDefaultSetupFNameW(const wchar_t *home)
 	const wchar_t *ini = L"TERATERM.INI";
 	wchar_t *buf = GetDefaultFNameW(home, ini);
 	return buf;
+}
+
+/**
+ *	エスケープ文字を処理する
+ *	\\,\n,\t,\0 を置き換える
+ *	@return		文字数（L'\0'を含む)
+ */
+size_t RestoreNewLineW(wchar_t *Text)
+{
+	size_t i;
+	int j=0;
+	size_t size= wcslen(Text);
+	wchar_t *buf = (wchar_t *)_alloca((size+1) * sizeof(wchar_t));
+
+	memset(buf, 0, (size+1) * sizeof(wchar_t));
+	for (i=0; i<size; i++) {
+		if (Text[i] == L'\\' && i<size ) {
+			switch (Text[i+1]) {
+				case L'\\':
+					buf[j] = L'\\';
+					i++;
+					break;
+				case L'n':
+					buf[j] = L'\n';
+					i++;
+					break;
+				case L't':
+					buf[j] = L'\t';
+					i++;
+					break;
+				case L'0':
+					buf[j] = L'\0';
+					i++;
+					break;
+				default:
+					buf[j] = L'\\';
+			}
+			j++;
+		}
+		else {
+			buf[j] = Text[i];
+			j++;
+		}
+	}
+	/* use memcpy to copy with '\0' */
+	j++;	// 文字列長
+	memcpy(Text, buf, j * sizeof(wchar_t));
+	return j;
+}
+
+BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
+{
+	int i, j, k;
+
+	i = 1;
+	j = 0;
+	k = 0;
+
+	while (i<Nth && Source[j] != 0) {
+		if (Source[j++] == ',') {
+			i++;
+		}
+	}
+
+	if (i == Nth) {
+		while (Source[j] != 0 && Source[j] != ',' && k<Size-1) {
+			Dest[k++] = Source[j++];
+		}
+	}
+
+	Dest[k] = 0;
+	return (i>=Nth);
+}
+
+void GetNthNum(PCHAR Source, int Nth, int far *Num)
+{
+	char T[15];
+
+	GetNthString(Source,Nth,sizeof(T),T);
+	if (sscanf_s(T, "%d", Num) != 1) {
+		*Num = 0;
+	}
+}
+
+int GetNthNum2(PCHAR Source, int Nth, int defval)
+{
+	char T[15];
+	int v;
+
+	GetNthString(Source, Nth, sizeof(T), T);
+	if (sscanf_s(T, "%d", &v) != 1) {
+		v = defval;
+	}
+
+	return v;
 }
