@@ -1399,11 +1399,13 @@ void CVTWindow::OnClose()
 	if (cv.Ready && (cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    ! CloseTT) {
-		wchar_t uimsg[MAX_UIMSG];
-		get_lang_msgW("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
-					  L"Disconnect?", ts.UILanguageFile);
-		int result = ::MessageBoxW(HVTWin, uimsg, L"Tera Term",
-								   MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			NULL, L"Tera Term",
+			"MSG_DISCONNECT_CONF", L"Disconnect?",
+			MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2
+		};
+		int result = TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
 		if (result == IDCANCEL) {
 			return;
 		}
@@ -1421,11 +1423,14 @@ void CVTWindow::OnClose()
 void CVTWindow::OnAllClose()
 {
 	// 突然終了させると危険なので、かならずユーザに問い合わせを出すようにする。
-	// (2013.8.17 yutaka)
-	wchar_t uimsg[MAX_UIMSG];
-
-	get_lang_msgW("MSG_ALL_TERMINATE_CONF", uimsg, _countof(uimsg), L"Terminate ALL Tera Term(s)?", ts.UILanguageFile);
-	if (::MessageBoxW(HVTWin, uimsg, L"Tera Term", MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2) == IDCANCEL)
+	static const TTMessageBoxInfoW info = {
+		"Tera Term",
+		NULL, L"Tera Term",
+		"MSG_ALL_TERMINATE_CONF", L"Terminate ALL Tera Term(s)?",
+		MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2
+	};
+	int result = TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+	if (result == IDCANCEL)
 		return;
 
 	BroadcastClosingMessage(HVTWin);
@@ -3632,14 +3637,13 @@ void CVTWindow::OnDuplicateSession()
 
 	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		wchar_t buf[80];
-		wchar_t uimsg[MAX_UIMSG];
-		wchar_t uimsg2[MAX_UIMSG];
-		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("MSG_EXEC_TT_ERROR", uimsg2, _countof(uimsg2),
-					  L"Can't execute Tera Term. (%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
-		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3672,8 +3676,6 @@ void CVTWindow::OnCygwinConnection()
 	char cygterm[MAX_PATH];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-	wchar_t uimsg[MAX_UIMSG];
-	wchar_t uimsg2[MAX_UIMSG];
 
 	if (strlen(ts.CygwinDirectory) > 0) {
 		if (SearchPath(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
@@ -3693,10 +3695,15 @@ void CVTWindow::OnCygwinConnection()
 		}
 	}
 
-	get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-	get_lang_msgW("MSG_FIND_CYGTERM_DIR_ERROR", uimsg2, sizeof(uimsg2),
-				  L"Can't find Cygwin directory.", ts.UILanguageFile);
-	::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+	{
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_FIND_CYGTERM_DIR_ERROR", L"Can't find Cygwin directory.",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+	}
 	return;
 
 found_dll:;
@@ -3705,10 +3712,13 @@ found_dll:;
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
-						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
-			::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_ERROR", L"ERROR",
+				"MSG_CYGTERM_ENV_ALLOC_ERROR", L"Can't allocate memory for environment variable.",
+				MB_OK | MB_ICONWARNING
+			};
+			TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
 			free(envptr);
 			return;
 		}
@@ -3717,10 +3727,13 @@ found_dll:;
 	} else {
 		envbufflen = strlen(file) + 6; // "PATH="(5) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-			get_lang_msgW("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
-						  L"Can't allocate memory for environment variable.", ts.UILanguageFile);
-			::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_ERROR", L"ERROR",
+				"MSG_CYGTERM_ENV_ALLOC_ERROR", L"Can't allocate memory for environment variable.",
+				MB_OK | MB_ICONWARNING
+			};
+			TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s", file);
@@ -3742,10 +3755,13 @@ found_path:;
 
 	if (CreateProcess(NULL, cygterm, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("MSG_EXEC_CYGTERM_ERROR", uimsg2, _countof(uimsg2),
-		              L"Can't execute Cygterm.", ts.UILanguageFile);
-		::MessageBoxW(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_EXEC_CYGTERM_ERROR", L"Can't execute Cygterm.",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3768,14 +3784,13 @@ void CVTWindow::OnTTMenuLaunch()
 
 	if (CreateProcess(exename, NULL, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		wchar_t buf[80];
-		wchar_t uimsg[MAX_UIMSG];
-		wchar_t uimsg2[MAX_UIMSG];
-		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("MSG_EXEC_TTMENU_ERROR", uimsg2, _countof(uimsg2),
-					  L"Can't execute TeraTerm Menu. (%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
-		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_EXEC_TTMENU_ERROR", L"Can't execute TeraTerm Menu. (%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3801,14 +3816,13 @@ void CVTWindow::OnLogMeInLaunch()
 
 	if (CreateProcess(NULL, LogMeTT, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		wchar_t buf[80];
-		wchar_t uimsg[MAX_UIMSG];
-		wchar_t uimsg2[MAX_UIMSG];
-		get_lang_msgW("MSG_ERROR", uimsg, _countof(uimsg), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("MSG_EXEC_LOGMETT_ERROR", uimsg2, _countof(uimsg2),
-					  L"Can't execute LogMeTT. (%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
-		::MessageBoxW(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_EXEC_LOGMETT_ERROR", L"Can't execute LogMeTT. (%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3846,7 +3860,7 @@ void CVTWindow::OnFileLog()
 				NULL, L"Can not create a `%s' file.",
 				MB_OK | MB_ICONERROR
 			};
-			TTMessageBoxA(m_hWnd, &mbinfo, ts.UILanguageFile, filename);
+			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, filename);
 		}
 		free(info.filename);
 	}
@@ -3856,11 +3870,13 @@ void CVTWindow::OnCommentToLog()
 {
 	if (!FLogIsOpendText()) {
 		// 選択できないので呼ばれないはず
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_COMMENT_LOG_OPEN_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "It is not opened by the log file yet.", ts.UILanguageFile);
-		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK|MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_COMMENT_LOG_OPEN_ERROR", L"It is not opened by the log file yet.",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
 		return;
 	}
 	FLogAddCommentDlg(m_hInst, HVTWin);
@@ -3898,7 +3914,7 @@ void CVTWindow::OnViewLog()
 			"MSG_VIEW_LOGFILE_ERROR", L"Can't view logging file. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxA(m_hWnd, &mbinfo, ts.UILanguageFile, error);
+		TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, error);
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -3963,14 +3979,13 @@ void CVTWindow::OnReplayLog()
 
 	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		wchar_t buf[80];
-		wchar_t uimsgW[MAX_UIMSG];
-		wchar_t uimsgW2[MAX_UIMSG];
-		get_lang_msgW("MSG_ERROR", uimsgW, _countof(uimsgW), L"ERROR", ts.UILanguageFile);
-		get_lang_msgW("MSG_EXEC_TT_ERROR", uimsgW2, _countof(uimsgW2),
-		              L"Can't execute Tera Term. (%d)", ts.UILanguageFile);
-		_snwprintf_s(buf, _countof(buf), _TRUNCATE, uimsgW2, GetLastError());
-		::MessageBoxW(NULL, buf, uimsgW, MB_OK | MB_ICONWARNING);
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
 	} else {
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
@@ -4108,11 +4123,14 @@ void CVTWindow::Disconnect(BOOL confirm)
 	if ((cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    (confirm)) {
-		wchar_t uimsg[MAX_UIMSG];
-		get_lang_msgW("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
-					  L"Disconnect?", ts.UILanguageFile);
-		if (::MessageBoxW(HVTWin, uimsg, L"Tera Term",
-						  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL) {
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			NULL, L"Tera Term",
+			"MSG_DISCONNECT_CONF", L"Disconnect?",
+			MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2
+		};
+		int result = TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		if (result == IDCANCEL) {
 			return;
 		}
 	}
@@ -4664,17 +4682,19 @@ void CVTWindow::OnSetupSave()
 		return;
 	}
 
-	// 書き込みできるかの判別を追加 (2005.11.3 yutaka)
-	if ((ret = _access(ts.SetupFName, 0x02)) != 0) {
-		if (errno != ENOENT) {  // ファイルがすでに存在する場合のみエラーとする (2005.12.13 yutaka)
-			wchar_t uimsg[MAX_UIMSG];
-			wchar_t uimsg2[MAX_UIMSG];
-			get_lang_msgW("MSG_TT_ERROR", uimsg, _countof(uimsg), L"Tera Term: ERROR", ts.UILanguageFile);
-			get_lang_msgW("MSG_SAVESETUP_PERMISSION_ERROR", uimsg2, _countof(uimsg2),
-						  L"TERATERM.INI file doesn't have the writable permission.", ts.UILanguageFile);
-			::MessageBoxW(HVTWin, uimsg2, uimsg, MB_OK|MB_ICONEXCLAMATION);
-			return;
-		}
+	// 書き込みできるか?
+	const DWORD attr = GetFileAttributesW(ts.SetupFNameW);
+	if ((attr & FILE_ATTRIBUTE_DIRECTORY ) == 0 && (attr & FILE_ATTRIBUTE_READONLY) != 0) {
+		// フォルダではなく、読み取り専用だった場合
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_TT_ERROR", L"Tera Term: ERROR",
+			"MSG_SAVESETUP_PERMISSION_ERROR", L"TERATERM.INI file doesn't have the writable permission.",
+			MB_OK|MB_ICONEXCLAMATION
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		free(PrevSetupFNW);
+		return;
 	}
 
 	if (LoadTTSET())
