@@ -31,8 +31,6 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
-#include <errno.h>
-#include <string.h>
 
 #include "asprintf.h"
 
@@ -40,35 +38,33 @@
  *	領域を確保して、文字列をフォーマットして、ポインタ返す
  *	不要になったら free() すること
  *	@retval	出力文字数(終端の'\0'を含む)
- *			フォーマット文字列がおかしいときは"EILSEQ"
- *			その他エラー時は -1
+ *			エラー時は -1
  */
 int vasprintf(char **strp, const char *fmt, va_list ap)
 {
 	char *tmp_ptr = NULL;
 	size_t tmp_size = 128;
 	for(;;) {
-		int len;
-		int err;
-		tmp_ptr = (char *)realloc(tmp_ptr, tmp_size);
-		assert(tmp_ptr != NULL);
-		if (tmp_ptr == NULL) {
+		char *p = (char *)realloc(tmp_ptr, tmp_size);
+		assert(p != NULL);
+		if (p == NULL) {
+			// メモリ不足
+			free(tmp_ptr);
 			*strp = NULL;
 			return -1;
 		}
-		len = _vsnprintf_s(tmp_ptr, tmp_size, _TRUNCATE, fmt, ap);
-		if (len != -1) {
-			len++;	// +1 for '\0' (terminator)
-			tmp_ptr = (char *)realloc(tmp_ptr, len);
-			*strp = tmp_ptr;
-			return len;
+		tmp_ptr = p;
+		int len = _vsnprintf_s(tmp_ptr, tmp_size, _TRUNCATE, fmt, ap);
+		if (len == -1) {
+			// 領域不足
+			tmp_size *= 2;
+			continue;
 		}
-		err = errno;
-		if (err == EILSEQ) {
-			*strp = _strdup("EILSEQ");
-			return 7;
-		}
-		tmp_size *= 2;
+
+		len++;	// +1 for '\0' (terminator)
+		tmp_ptr = (char *)realloc(tmp_ptr, len);
+		*strp = tmp_ptr;
+		return len;
 	}
 }
 
@@ -84,23 +80,26 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 	wchar_t *tmp_ptr = NULL;
 	size_t tmp_size = 128;
 	for(;;) {
-		int len;
-		int err;
-		tmp_ptr = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * tmp_size);
-		assert(tmp_ptr != NULL);
-		len = _vsnwprintf_s(tmp_ptr, tmp_size, _TRUNCATE, fmt, ap);
-		if (len != -1) {
-			len++;	// +1 for '\0' (terminator)
-			tmp_ptr = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * len);
-			*strp = tmp_ptr;
-			return len;
+		wchar_t *p = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * tmp_size);
+		assert(p != NULL);
+		if (p == NULL) {
+			// メモリ不足
+			free(tmp_ptr);
+			*strp = NULL;
+			return -1;
 		}
-		err = errno;
-		if (err == EILSEQ) {
-			*strp = _wcsdup(L"EILSEQ");
-			return 7;
+		tmp_ptr = p;
+		int len = _vsnwprintf_s(tmp_ptr, tmp_size, _TRUNCATE, fmt, ap);
+		if (len == -1) {
+			// 領域不足
+			tmp_size *= 2;
+			continue;
 		}
-		tmp_size *= 2;
+
+		len++;	// +1 for '\0' (terminator)
+		tmp_ptr = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * len);
+		*strp = tmp_ptr;
+		return len;
 	}
 }
 
