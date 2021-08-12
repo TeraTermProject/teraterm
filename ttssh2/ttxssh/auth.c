@@ -108,10 +108,10 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			char chars[] = { (char) wParam, 0 };
 
 			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE,
-			             (LPARAM) (TCHAR *) chars);
+			             (LPARAM)chars);
 
 			if (data->tipwin == NULL) {
-				TCHAR uimsg[MAX_UIMSG];
+				char uimsg[MAX_UIMSG];
 				RECT rect;
 				PTInstVar pvar = data->pvar;
 				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
@@ -355,7 +355,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 			}
 			break;
 		case 2: {
-			TCHAR user_name[UNLEN+1];
+			char user_name[UNLEN+1];
 			DWORD len = _countof(user_name);
 			BOOL r = GetUserName(user_name, &len);
 			if (r != 0) {
@@ -769,7 +769,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	static HICON hIconDropdown;
 	static size_t username_str_len;
 	static wchar_t password_char;	// •š‚¹ŽšƒLƒƒƒ‰ƒNƒ^
-	TCHAR uimsg[MAX_UIMSG];
+	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1133,7 +1133,7 @@ canceled:
 				SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
 				goto after_user_name_set;
 			case 2: {
-				TCHAR user_name[UNLEN+1];
+				char user_name[UNLEN+1];
 				DWORD len = _countof(user_name);
 				BOOL r = GetUserName(user_name, &len);
 				if (r == 0) {
@@ -1446,10 +1446,10 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 {
 	int id;
-	TCHAR user_name[UNLEN+1];
+	char user_name[UNLEN+1];
 	DWORD len;
-	TCHAR uimsg[MAX_UIMSG];
-	TCHAR uimsg2[MAX_UIMSG];
+	char uimsg[MAX_UIMSG];
+	char uimsg2[MAX_UIMSG];
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_AUTHSETUP_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_AUTHSETUP_BANNER" },
