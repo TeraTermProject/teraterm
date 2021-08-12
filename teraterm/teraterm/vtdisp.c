@@ -1976,10 +1976,13 @@ void ResetIME()
 		if (ts.UseIME==0)
 			FreeIME(HVTWin);
 		else if (! LoadIME()) {
-			char uimsg[MAX_UIMSG];
-			get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
-			get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
-			MessageBoxA(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_TT_ERROR", L"Tera Term: Error",
+				"MSG_USE_IME_ERROR", L"Can't use IME",
+				MB_ICONEXCLAMATION
+			};
+			TTMessageBoxW(0, &info, ts.UILanguageFileW);
 			WritePrivateProfileStringA("Tera Term","IME","off",ts.SetupFName);
 			ts.UseIME = 0;
 		}

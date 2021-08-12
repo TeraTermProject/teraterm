@@ -57,6 +57,7 @@
 #include "unicode.h"
 #include "ttdde.h"
 #include "checkeol.h"
+#include "asprintf.h"
 
 #include "vtterm.h"
 
@@ -5071,7 +5072,8 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 static void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
-	char *p, *cbbuff, hdr[20], notify_buff[256], notify_title[MAX_UIMSG];
+	char *p, *cbbuff, hdr[20];
+	wchar_t *notify_buff, *notify_title;
 	HGLOBAL cbmem;
 	int wide_len;
 	HGLOBAL wide_cbmem;
@@ -5086,11 +5088,13 @@ static void XsProcClipboard(PCHAR buff)
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
 				if (ts.NotifyClipboardAccess) {
-					get_lang_msg("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
-					             "Clipboard Access", ts.UILanguageFile);
-					get_lang_msg("MSG_CBACCESS_READ", notify_buff, sizeof(notify_buff),
-					             "Remote host reads clipboard contents.", ts.UILanguageFile);
-					NotifyInfoMessage(&cv, notify_buff, notify_title);
+					GetI18nStrWW("Tera Term", "MSG_CBACCESS_TITLE",
+								 L"Clipboard Access", ts.UILanguageFileW, &notify_title);
+					GetI18nStrWW("Tera Term", "MSG_CBACCESS_READ",
+								 L"Remote host reads clipboard contents.", ts.UILanguageFileW, &notify_buff);
+					NotifyInfoMessageW(&cv, notify_buff, notify_title);
+					free(notify_title);
+					free(notify_buff);
 				}
 				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
 				if (strncat_s(hdr, sizeof(hdr), buff, p - buff) == 0) {
@@ -5098,11 +5102,13 @@ static void XsProcClipboard(PCHAR buff)
 				}
 			}
 			else if (ts.NotifyClipboardAccess) {
-				get_lang_msg("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
-				             "Rejected Clipboard Access", ts.UILanguageFile);
-				get_lang_msg("MSG_CBACCESS_READ_REJECT", notify_buff, sizeof(notify_buff),
-				             "Reject clipboard read access from remote.", ts.UILanguageFile);
-				NotifyWarnMessage(&cv, notify_buff, notify_title);
+				GetI18nStrWW("Tera Term", "MSG_CBACCESS_REJECT_TITLE",
+				             L"Rejected Clipboard Access", ts.UILanguageFileW, &notify_title);
+				GetI18nStrWW("Tera Term", "MSG_CBACCESS_READ_REJECT",
+				             L"Reject clipboard read access from remote.", ts.UILanguageFileW, &notify_buff);
+				NotifyWarnMessageW(&cv, notify_buff, notify_title);
+				free(notify_title);
+				free(notify_buff);
 			}
 		}
 		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access
@@ -5129,12 +5135,16 @@ static void XsProcClipboard(PCHAR buff)
 			GlobalUnlock(cbmem);
 
 			if (ts.NotifyClipboardAccess) {
-				get_lang_msg("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
-				             "Clipboard Access", ts.UILanguageFile);
-				get_lang_msg("MSG_CBACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg),
-				             "Remote host wirtes clipboard.", ts.UILanguageFile);
-				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "%s\n--\n%s", ts.UIMsg, cbbuff);
-				NotifyInfoMessage(&cv, notify_buff, notify_title);
+				wchar_t *buf;
+				GetI18nStrWW("Tera Term", "MSG_CBACCESS_TITLE",
+				             L"Clipboard Access", ts.UILanguageFileW, &notify_title);
+				GetI18nStrWW("Tera Term", "MSG_CBACCESS_WRITE",
+							 L"Remote host wirtes clipboard.", ts.UILanguageFileW, &buf);
+				aswprintf(&notify_buff, L"%s\n--\n%hs", buf, cbbuff);
+				NotifyInfoMessageW(&cv, notify_buff, notify_title);
+				free(buf);
+				free(notify_title);
+				free(notify_buff);
 			}
 
 			wide_len = MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, NULL, 0);
@@ -5155,11 +5165,13 @@ static void XsProcClipboard(PCHAR buff)
 			}
 		}
 		else if (ts.NotifyClipboardAccess) {
-			get_lang_msg("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
-			             "Rejected Clipboard Access", ts.UILanguageFile);
-			get_lang_msg("MSG_CBACCESS_WRITE_REJECT", notify_buff, sizeof(notify_buff),
-			             "Reject clipboard write access from remote.", ts.UILanguageFile);
-			NotifyWarnMessage(&cv, notify_buff, notify_title);
+			GetI18nStrWW("Tera Term", "MSG_CBACCESS_REJECT_TITLE",
+			             L"Rejected Clipboard Access", ts.UILanguageFileW, &notify_title);
+			GetI18nStrWW("Tera Term", "MSG_CBACCESS_WRITE_REJECT",
+						 L"Reject clipboard write access from remote.", ts.UILanguageFileW, &notify_buff);
+			NotifyWarnMessageW(&cv, notify_buff, notify_title);
+			free(notify_title);
+			free(notify_buff);
 		}
 	}
 }

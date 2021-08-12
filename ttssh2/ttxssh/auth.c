@@ -769,7 +769,6 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	static HICON hIconDropdown;
 	static size_t username_str_len;
 	static wchar_t password_char;	// 伏せ字キャラクタ
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1030,27 +1029,28 @@ canceled:
 			HWND hWndButton;
 			int result;
 			HMENU hMenu= CreatePopupMenu();
-			char *clipboard = GetClipboardTextA(dlg, FALSE);
-			GetI18nStr("TTSSH", "DLG_AUTH_PASTE_CLIPBOARD",
-					   uimsg, _countof(uimsg),
-					   "Paste from &clipboard",
-					   pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (clipboard == NULL ? MFS_DISABLED : 0), 1, uimsg);
-			GetI18nStr("ttssh", "DLG_AUTH_CLEAR_CLIPBOARD",
-					   uimsg, _countof(uimsg),
-					   "Paste from &clipboard and cl&ear clipboard",
-					   pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (clipboard == NULL ? MFS_DISABLED : 0), 2, uimsg);
-			GetI18nStr("ttssh", "DLG_AUTH_USE_CONTORL_CHARACTERS",
-					   uimsg, _countof(uimsg),
-					   "Use control charac&ters",
-					   pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING  | (UseControlChar ? MFS_CHECKED : 0), 3, uimsg);
-			GetI18nStr("ttssh", "DLG_AUTH_SHOW_PASSPHRASE",
-					   uimsg, _countof(uimsg),
-					   "&Show passphrase",
-					   pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (ShowPassPhrase ? MFS_CHECKED : 0), 4, uimsg);
+			wchar_t *clipboard = GetClipboardTextW(dlg, FALSE);
+			wchar_t *uimsg;
+			GetI18nStrWW("TTSSH", "DLG_AUTH_PASTE_CLIPBOARD",
+						 L"Paste from &clipboard",
+						 pvar->ts->UILanguageFileW, &uimsg);
+			AppendMenuW(hMenu, MF_ENABLED | MF_STRING | (clipboard == NULL ? MFS_DISABLED : 0), 1, uimsg);
+			free(uimsg);
+			GetI18nStrWW("ttssh", "DLG_AUTH_CLEAR_CLIPBOARD",
+						 L"Paste from &clipboard and cl&ear clipboard",
+						 pvar->ts->UILanguageFileW, &uimsg);
+			AppendMenuW(hMenu, MF_ENABLED | MF_STRING | (clipboard == NULL ? MFS_DISABLED : 0), 2, uimsg);
+			free(uimsg);
+			GetI18nStrWW("ttssh", "DLG_AUTH_USE_CONTORL_CHARACTERS",
+						 L"Use control charac&ters",
+						 pvar->ts->UILanguageFileW, &uimsg);
+			AppendMenuW(hMenu, MF_ENABLED | MF_STRING  | (UseControlChar ? MFS_CHECKED : 0), 3, uimsg);
+			free(uimsg);
+			GetI18nStrWW("ttssh", "DLG_AUTH_SHOW_PASSPHRASE",
+						 L"&Show passphrase",
+						 pvar->ts->UILanguageFileW, &uimsg);
+			AppendMenuW(hMenu, MF_ENABLED | MF_STRING | (ShowPassPhrase ? MFS_CHECKED : 0), 4, uimsg);
+			free(uimsg);
 			if (clipboard != NULL) {
 				free(clipboard);
 			}
@@ -1063,9 +1063,9 @@ canceled:
 			case 2: {
 				// クリップボードからペースト
 				BOOL clear_clipboard = result == 2;
-				clipboard = GetClipboardTextA(dlg, clear_clipboard);
+				clipboard = GetClipboardTextW(dlg, clear_clipboard);
 				if (clipboard != NULL) {
-					SetDlgItemTextA(dlg, IDC_SSHPASSWORD, clipboard);
+					SetDlgItemTextW(dlg, IDC_SSHPASSWORD, clipboard);
 					free(clipboard);
 					SendDlgItemMessage(dlg, IDC_SSHPASSWORD, EM_SETSEL, 0, -1);
 					SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHPASSWORD), TRUE);
@@ -1113,17 +1113,18 @@ canceled:
 			HMENU hMenu= CreatePopupMenu();
 			int result;
 			const BOOL DisableDefaultUserName = pvar->session_settings.DefaultUserName[0] == 0;
-			GetI18nStr("TTSSH", "DLG_AUTH_USE_DEFAULT_USERNAME",
-					   uimsg, _countof(uimsg),
-					   "Use &default username",
-					   pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING | (DisableDefaultUserName ? MFS_DISABLED : 0), 1,
-					   uimsg);
-			GetI18nStr("TTSSH", "DLG_AUTH_USE_LOGON_USERNAME",
-					   uimsg, _countof(uimsg),
-					   "Use &logon username",
-					   pvar->ts->UILanguageFile);
-			AppendMenu(hMenu, MF_ENABLED | MF_STRING, 2, uimsg);
+			wchar_t *uimsg;
+			GetI18nStrWW("TTSSH", "DLG_AUTH_USE_DEFAULT_USERNAME",
+						 L"Use &default username",
+						 pvar->ts->UILanguageFileW, &uimsg);
+			AppendMenuW(hMenu, MF_ENABLED | MF_STRING | (DisableDefaultUserName ? MFS_DISABLED : 0), 1,
+						uimsg);
+			free(uimsg);
+			GetI18nStrWW("TTSSH", "DLG_AUTH_USE_LOGON_USERNAME",
+						 L"Use &logon username",
+						 pvar->ts->UILanguageFileW, &uimsg);
+			AppendMenuW(hMenu, MF_ENABLED | MF_STRING, 2, uimsg);
+			free(uimsg);
 			hWndButton = GetDlgItem(dlg, IDC_USERNAME_OPTION);
 			GetWindowRect(hWndButton, &rect);
 			result = TrackPopupMenu(hMenu, TPM_RETURNCMD, rect.left, rect.bottom, 0 , hWndButton, NULL);
