@@ -2110,8 +2110,6 @@ BOOL CVTWindow::OnMouseWheel(
 		if (InTitleBar) {
 			int delta = zDelta < 0 ? -1 : 1;
 			int newAlpha = Alpha;
-			wchar_t tipbuf[32];
-			wchar_t uimsg[MAX_UIMSG];
 			POINT tippos;
 
 			newAlpha += delta * ts.MouseWheelScrollLine;
@@ -2121,8 +2119,11 @@ BOOL CVTWindow::OnMouseWheel(
 				newAlpha = 0;
 			SetWindowAlpha(newAlpha);
 
-			get_lang_msgW("TOOLTIP_TITLEBAR_OPACITY", uimsg, sizeof(uimsg), L"Opacity %.1f %%", ts.UILanguageFile);
-			_snwprintf_s(tipbuf, _countof(tipbuf), uimsg, (newAlpha / 255.0) * 100);
+			wchar_t *uimsg;
+			GetI18nStrWA("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", ts.UILanguageFile, &uimsg);
+			wchar_t *tipbuf;
+			aswprintf(&tipbuf, uimsg, (newAlpha / 255.0) * 100);
+			free(uimsg);
 
 			tippos = TipWin->GetPos();
 			if (tippos.x != pt.x ||
@@ -2137,6 +2138,8 @@ BOOL CVTWindow::OnMouseWheel(
 			if(! TipWin->IsVisible()) {
 				TipWin->SetVisible(TRUE);
 			}
+
+			free(tipbuf);
 
 			return TRUE;
 		}
