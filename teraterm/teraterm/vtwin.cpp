@@ -3953,18 +3953,14 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 // ログの再生 (2006.12.13 yutaka)
 void CVTWindow::OnReplayLog()
 {
-	OPENFILENAMEW ofn;
 	wchar_t szFile[MAX_PATH];
 	const wchar_t *exec = L"ttermpro";
-	wchar_t *filter;
-	wchar_t *title;
-
-	filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW );
-	title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
 
 	// バイナリモードで採取したログファイルを選択する
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-	memset(szFile, 0, _countof(szFile));
+	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
+	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
+	OPENFILENAMEW ofn = {};
+	szFile[0] = 0;
 	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner = HVTWin;
 	ofn.lpstrFilter = filter;
