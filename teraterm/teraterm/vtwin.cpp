@@ -548,7 +548,6 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	if ((LMR==IdLeftButton) && ControlKey() && (MainMenu==NULL) &&
 	    ((ts.MenuFlag & MF_NOPOPUP)==0)) {
 		int i, numItems;
-		char itemText[256];
 
 		InitMenu(&PopupMenu);
 
@@ -556,21 +555,22 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		numItems = GetMenuItemCount(PopupMenu);
 
 		for (i = 0; i < numItems; i++) {
+			wchar_t itemText[256];
 			HMENU submenu = GetSubMenu(PopupMenu, i);
 
 			if (submenu != NULL) {
 				InitMenuPopup(submenu);
 			}
 
-			if (GetMenuString(PopupMenu, i, itemText, sizeof(itemText), MF_BYPOSITION) != 0) {
+			if (GetMenuStringW(PopupMenu, i, itemText, _countof(itemText), MF_BYPOSITION) != 0) {
 				int state = GetMenuState(PopupMenu, i, MF_BYPOSITION) &
 				            (MF_CHECKED | MF_DISABLED | MF_GRAYED | MF_HILITE |
 				             MF_MENUBARBREAK | MF_MENUBREAK | MF_SEPARATOR);
 
-				AppendMenu(PopupBase,
-				           submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
-				           submenu != NULL ? (UINT_PTR)submenu : GetMenuItemID(PopupMenu, i),
-				           itemText);
+				AppendMenuW(PopupBase,
+							submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
+							submenu != NULL ? (UINT_PTR)submenu : GetMenuItemID(PopupMenu, i),
+							itemText);
 			}
 		}
 
@@ -605,20 +605,20 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		 IsClipboardFormatAvailable(CF_OEMTEXT))) {
 
 		int i, numItems;
-		char itemText[256];
 
 		InitPasteMenu(&PopupMenu);
 		PopupBase = CreatePopupMenu();
 		numItems = GetMenuItemCount(PopupMenu);
 
 		for (i = 0; i < numItems; i++) {
-			if (GetMenuString(PopupMenu, i, itemText, sizeof(itemText), MF_BYPOSITION) != 0) {
+			wchar_t itemText[256];
+			if (GetMenuStringW(PopupMenu, i, itemText, _countof(itemText), MF_BYPOSITION) != 0) {
 				int state = GetMenuState(PopupMenu, i, MF_BYPOSITION) &
 				            (MF_CHECKED | MF_DISABLED | MF_GRAYED | MF_HILITE |
 				             MF_MENUBARBREAK | MF_MENUBREAK | MF_SEPARATOR);
 
-				AppendMenu(PopupBase, state,
-				           GetMenuItemID(PopupMenu, i), itemText);
+				AppendMenuW(PopupBase, state,
+							GetMenuItemID(PopupMenu, i), itemText);
 			}
 		}
 
