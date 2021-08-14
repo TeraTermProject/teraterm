@@ -343,7 +343,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pts);
 
 		// I18N
-		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFile);
+		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
 
 		// 設定ファイル(teraterm.ini)のパスを取得する。
 		/// (1)

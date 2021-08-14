@@ -136,11 +136,11 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			work->create_param = data;
 			work->MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 			::DragAcceptFiles(hDlgWnd, TRUE);
-			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
+			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFileW);
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
-			SetI18nList("Tera Term", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
-						data->UILanguageFile, 0);
+			SetI18nListW("Tera Term", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
+						data->UILanguageFileW, 0);
 
 			for (size_t i = 0; i < _countof(send_size_list); i++) {
 				char buf[32];
@@ -156,7 +156,8 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 			TipWin2 *tip = TipWin2Create(NULL, hDlgWnd);
 			work->tip = tip;
-			wchar_t *text = TTGetLangStrW("Tera Term", "DLG_SENDFILE_TERATERM4_TOOLTIP", NULL, data->UILanguageFile);
+			wchar_t *text;
+			GetI18nStrWW("Tera Term", "DLG_SENDFILE_TERATERM4_TOOLTIP", NULL, data->UILanguageFileW, &text);
 			if (text != NULL) {
 				TipWin2SetTextW(tip, IDC_SENDFILE_CHECK_4, text);
 				free(text);
@@ -184,7 +185,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 							"MSG_TT_ERROR", L"Tera Term: Error",
 							"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file",
 							MB_TASKMODAL | MB_ICONEXCLAMATION };
-						TTMessageBoxA(hDlgWnd, &mbinfo, data->UILanguageFile);
+						TTMessageBoxW(hDlgWnd, &mbinfo, data->UILanguageFileW);
 
 						free(strW);
 
@@ -221,7 +222,8 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					wchar_t TempDir[MAX_PATH];
 					GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-					wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFile);
+					wchar_t *uimsg;
+					GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFileW, &uimsg);
 					wchar_t *title;
 					aswprintf(&title, L"Tera Term: %s", uimsg);
 					free(uimsg);

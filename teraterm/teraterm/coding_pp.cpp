@@ -100,7 +100,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			DlgData = (CodingPPData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			const TTTSet *ts = DlgData->pts;
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)DlgData);
-			SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), DlgData->pts->UILanguageFile);
+			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), DlgData->pts->UILanguageFileW);
 
 			int recv_index = 0;
 			int send_index = 0;

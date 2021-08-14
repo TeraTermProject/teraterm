@@ -165,7 +165,7 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	if (confirm) {
 		clipboarddlgdata dlg_data;
 		dlg_data.strW_ptr = str_w;
-		dlg_data.UILanguageFile = ts.UILanguageFile;
+		dlg_data.UILanguageFileW = ts.UILanguageFileW;
 		ret = clipboarddlg(hInst, HWin, &dlg_data);
 		*out_str_w = dlg_data.strW_edited_ptr;
 	}

@@ -489,13 +489,12 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	case WM_INITDIALOG: {
 		work = (LogDlgWork_t *)lParam;
 		TTTSet *pts = work->pts;
-		const char *UILanguageFile = pts->UILanguageFile;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)work);
 		::DragAcceptFiles(Dialog, TRUE);
 
-		SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
-		SetI18nList("Tera Term", Dialog, IDC_TIMESTAMPTYPE, timestamp_list, _countof(timestamp_list),
-					UILanguageFile, 0);
+		SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
+		SetI18nListW("Tera Term", Dialog, IDC_TIMESTAMPTYPE, timestamp_list, _countof(timestamp_list),
+					 pts->UILanguageFileW, 0);
 
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-8");
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16LE");

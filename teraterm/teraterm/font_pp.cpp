@@ -149,7 +149,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			dlg_data = (FontPPData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			ts = dlg_data->pts;
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
-			SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFile);
+			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
 			GetDlgLogFont(GetParent(hWnd), ts, &dlg_data->DlgFont);
 
@@ -175,8 +175,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				{ "DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED", L"Antialiased" },
 				{ "DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", L"ClearType" },
 			};
-			SetI18nList("Tera Term", hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
-						ts->UILanguageFile, 0);
+			SetI18nListW("Tera Term", hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
+						 ts->UILanguageFileW, 0);
 			int cur =
 				ts->FontQuality == DEFAULT_QUALITY ? 0 :
 				ts->FontQuality == NONANTIALIASED_QUALITY ? 1 :

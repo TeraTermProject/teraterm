@@ -84,10 +84,10 @@ void CVisualPropPageDlg::SetupRGBbox(int index)
 CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD)
 {
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
-				  L"General", ts.UILanguageFile);
-	m_psp.pszTitle = _wcsdup(UIMsg);
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_GENERAL",
+				 L"General", ts.UILanguageFileW, &UIMsg);
+	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -212,10 +212,10 @@ void CGeneralPropPageDlg::OnHelp()
 CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CSequencePropPageDlg::IDD)
 {
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
-				  L"Control Sequence", ts.UILanguageFile);
-	m_psp.pszTitle = _wcsdup(UIMsg);
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_SEQUENCE",
+				 L"Control Sequence", ts.UILanguageFileW, &UIMsg);
+	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -253,16 +253,16 @@ void CSequencePropPageDlg::OnInitDialog()
 		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", L"ahead" },
 		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", L"last" },
 	};
-	SetI18nList("Tera Term", m_hWnd, IDC_ACCEPT_TITLE_CHANGING, accept_title_changing, _countof(accept_title_changing),
-				ts.UILanguageFile, 0);
+	SetI18nListW("Tera Term", m_hWnd, IDC_ACCEPT_TITLE_CHANGING, accept_title_changing, _countof(accept_title_changing),
+				 ts.UILanguageFileW, 0);
 
 	const static I18nTextInfo sequence_title_report[] = {
 		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", L"ignore" },
 		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", L"accept" },
 		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", L"empty" },
 	};
-	SetI18nList("Tera Term", m_hWnd, IDC_TITLE_REPORT, sequence_title_report, _countof(sequence_title_report),
-				ts.UILanguageFile, 0);
+	SetI18nListW("Tera Term", m_hWnd, IDC_TITLE_REPORT, sequence_title_report, _countof(sequence_title_report),
+				 ts.UILanguageFileW, 0);
 
 	const static I18nTextInfo sequence_clipboard_access[] = {
 		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", L"off" },
@@ -270,8 +270,8 @@ void CSequencePropPageDlg::OnInitDialog()
 		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", L"read only" },
 		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", L"read/write" },
 	};
-	SetI18nList("Tera Term", m_hWnd, IDC_CLIPBOARD_ACCESS, sequence_clipboard_access,
-				_countof(sequence_clipboard_access), ts.UILanguageFile, 0);
+	SetI18nListW("Tera Term", m_hWnd, IDC_CLIPBOARD_ACCESS, sequence_clipboard_access,
+				 _countof(sequence_clipboard_access), ts.UILanguageFileW, 0);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.MouseEventTracking);
@@ -411,10 +411,10 @@ void CSequencePropPageDlg::OnHelp()
 CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CCopypastePropPageDlg::IDD)
 {
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
-				  L"Copy and Paste", ts.UILanguageFile);
-	m_psp.pszTitle = _wcsdup(UIMsg);
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_COPYPASTE",
+				 L"Copy and Paste", ts.UILanguageFileW, &UIMsg);
+	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -622,10 +622,10 @@ void CCopypastePropPageDlg::OnHelp()
 CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CVisualPropPageDlg::IDD)
 {
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
-				  L"Visual", ts.UILanguageFile);
-	m_psp.pszTitle = _wcsdup(UIMsg);
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_VISUAL",
+				 L"Visual", ts.UILanguageFileW, &UIMsg);
+	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 	TipWin = new CTipWin(inst);
 }
@@ -676,8 +676,8 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ "DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED", L"Antialiased" },
 		{ "DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", L"ClearType" },
 	};
-	SetI18nList("Tera Term", m_hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
-				ts.UILanguageFile, 0);
+	SetI18nListW("Tera Term", m_hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
+				 ts.UILanguageFileW, 0);
 
 	// (1)AlphaBlend
 
@@ -1248,10 +1248,10 @@ void CVisualPropPageDlg::OnHelp()
 CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CLogPropPageDlg::IDD)
 {
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
-				  L"Log", ts.UILanguageFile);
-	m_psp.pszTitle = _wcsdup(UIMsg);
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_Log",
+				 L"Log", ts.UILanguageFileW, &UIMsg);
+	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 
@@ -1306,8 +1306,8 @@ void CLogPropPageDlg::OnInitDialog()
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", L"Elapsed Time (Logging)" },
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", L"Elapsed Time (Connection)" },
 	};
-	SetI18nList("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
-				ts.UILanguageFile, 0);
+	SetI18nListW("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
+				 ts.UILanguageFileW, 0);
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
@@ -1616,10 +1616,10 @@ void CLogPropPageDlg::OnHelp()
 CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CCygwinPropPageDlg::IDD)
 {
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
-				  L"Cygwin", ts.UILanguageFile);
-	m_psp.pszTitle = _wcsdup(UIMsg);
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_CYGWIN",
+				 L"Cygwin", ts.UILanguageFileW, &UIMsg);
+	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
 

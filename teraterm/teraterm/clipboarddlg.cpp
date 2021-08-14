@@ -88,7 +88,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 		case WM_INITDIALOG:
 			data = (clipboarddlgdata *)lp;
 			SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)data);
-			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFile);
+			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFileW);
 
 			if (data->strW_ptr != NULL) {
 				SetDlgItemTextW(hDlgWnd, IDC_EDIT, data->strW_ptr);

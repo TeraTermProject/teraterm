@@ -40,7 +40,7 @@ typedef struct {
 	wchar_t *strW_edited_ptr;
 	char *strA_ptr;
 	size_t strA_len;
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFileW;
 } clipboarddlgdata;
 
 INT_PTR clipboarddlg(

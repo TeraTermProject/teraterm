@@ -570,7 +570,10 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDC_FONTBOLD, "DLG_WIN_BOLDFONT" },
 		{ IDC_WINHIDETITLE, "DLG_WIN_HIDETITLE" },
 		{ IDC_WINHIDEMENU, "DLG_WIN_HIDEMENU" },
-		{ IDC_WINCOLOREMU, "DLG_WIN_COLOREMU" },
+		{ IDC_WINCOLOREMU, "DLG_WIN_COLOREMU" },		// "Color emulation"
+#if 0
+		{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },		// "16 Colors (PC style)"
+#endif
 		{ IDC_WINAIXTERM16, "DLG_WIN_AIXTERM16" },
 		{ IDC_WINXTERM256, "DLG_WIN_XTERM256" },
 		{ IDC_WINSCROLL1, "DLG_WIN_SCROLL1" },
@@ -587,14 +590,12 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_WINHELP, "BTN_HELP" },
-		{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },		// get_lang_msg
 	};
 	PTTSet ts;
 	HWND Wnd, HRed, HGreen, HBlue;
 	int IAttr, IOffset;
 	WORD i, pos, ScrollCode, NewPos;
 	HDC DC;
-	wchar_t uimsg[MAX_UIMSG];
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -612,8 +613,11 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				DisableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
 
 			if (ts->VTFlag>0) {
-				get_lang_msgW("DLG_WIN_PCBOLD16", uimsg, _countof(uimsg), L"&16 Colors (PC style)", UILanguageFile);
-				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU,uimsg);
+				wchar_t *uimsg;
+				GetI18nStrWA("Tera Term", "DLG_WIN_PCBOLD16", L"&16 Colors (PC style)", UILanguageFile, &uimsg);
+				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU, uimsg);
+				free(uimsg);
+
 				SetRB(Dialog, (ts->ColorFlag&CF_PCBOLD16)!=0, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
 				SetRB(Dialog, (ts->ColorFlag&CF_AIXTERM16)!=0, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
 				SetRB(Dialog, (ts->ColorFlag&CF_XTERM256)!=0,IDC_WINXTERM256,IDC_WINXTERM256);
@@ -689,18 +693,18 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					}
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
-				get_lang_msgW("DLG_WIN_NORMAL", uimsg, _countof(uimsg), L"Normal", UILanguageFile);
-				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msgW("DLG_WIN_BOLD", uimsg, _countof(uimsg), L"Bold", UILanguageFile);
-				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msgW("DLG_WIN_BLINK", uimsg, _countof(uimsg), L"Blink", UILanguageFile);
-				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msgW("DLG_WIN_REVERSEATTR", uimsg, _countof(uimsg), L"Reverse", UILanguageFile);
-				SendDlgItemMessageW(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				/* begin - ishizaki */
-				SendDlgItemMessageA(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)"URL");
-				/* end - ishizaki */
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_SETCURSEL, 0,0);
+				{
+					const static I18nTextInfo infos[] = {
+						{ "DLG_WIN_NORMAL", L"Normal" },
+						{ "DLG_WIN_BOLD", L"Bold" },
+						{ "DLG_WIN_BLINK", L"Blink" },
+						{ "DLG_WIN_REVERSEATTR", L"Reverse" },
+						{ NULL, L"URL" },
+					};
+					wchar_t *UILanguageFileW = ToWcharA(UILanguageFile);
+					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), UILanguageFileW, 1);
+					free(UILanguageFileW);
+				}
 #ifdef USE_NORMAL_BGCOLOR
 				ShowDlgItem(Dialog,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 				SetRB(Dialog,ts->UseNormalBGColor,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);

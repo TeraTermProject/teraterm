@@ -199,7 +199,6 @@ void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel)
 	SendDlgItemMessage(HDlg, Id_Item, CB_SETCURSEL,nsel-1,0);
 }
 
-#if defined(UNICODE)
 void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel)
 {
 	int i;
@@ -212,7 +211,6 @@ void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel)
 	}
 	SendDlgItemMessage(HDlg, Id_Item, CB_SETCURSEL,nsel-1,0);
 }
-#endif
 
 LONG GetCurSel(HWND HDlg, int Id_Item)
 {

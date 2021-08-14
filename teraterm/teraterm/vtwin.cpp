@@ -4001,6 +4001,7 @@ void CVTWindow::OnFileSend()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	sendfiledlgdata data;
+	data.UILanguageFileW = ts.UILanguageFileW;
 	data.UILanguageFile = ts.UILanguageFile;
 	data.filesend_filter = ts.FileSendFilter;
 	INT_PTR ok = sendfiledlg(m_hInst, m_hWnd, &data);

@@ -51,7 +51,7 @@ LRESULT CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 	{
 		self = (CPrnAbortDlg *)lp;
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)self);
-		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), self->m_ts->UILanguageFile);
+		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), self->m_ts->UILanguageFileW);
 		return TRUE;
 	}
 
@@ -117,4 +117,3 @@ BOOL CPrnAbortDlg::DestroyWindow()
 	::DestroyWindow(m_hWnd);
 	return TRUE;
 }
-

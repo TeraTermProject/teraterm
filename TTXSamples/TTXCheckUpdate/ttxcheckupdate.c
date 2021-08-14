@@ -183,8 +183,8 @@ static void ShowDialog(HWND hWnd)
 	BOOL result_bool;
 	size_t json_size;
 	char *json_ptr;
-	const char *UILanguageFile = pvar->ts->UILanguageFile;
-	wchar_t update_info_url[MAX_UIMSG];
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+	wchar_t *update_info_url;
 	static const TTMessageBoxInfoW info = {
 		"TTXCheckUpdate",
 		NULL, L"Tera Term",
@@ -193,9 +193,8 @@ static void ShowDialog(HWND hWnd)
 	};
 
 	/* 更新情報を取得してもok? */
-	GetI18nStrW("TTXCheckUpdate", "JSON_URL", update_info_url, _countof(update_info_url), update_info_url_default,
-				UILanguageFile);
-	result_mb = TTMessageBoxA(hWnd, &info, UILanguageFile, update_info_url);
+	GetI18nStrWW("TTXCheckUpdate", "JSON_URL", update_info_url_default, UILanguageFileW, &update_info_url);
+	result_mb = TTMessageBoxW(hWnd, &info, UILanguageFileW, update_info_url);
 	if (result_mb == IDNO) {
 		return;
 	}
@@ -203,6 +202,7 @@ static void ShowDialog(HWND hWnd)
 	/* 更新情報取得、'\0'を追加する→ json文字列を作成 */
 	swprintf(agent, _countof(agent), L"%s_%d", agent_base, pvar->ts->RunningVersion);
 	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
+	free(update_info_url);
 	if (!result_bool) {
 		MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
 		return;
@@ -247,12 +247,12 @@ static void WINAPI TTXModifyMenu(HMENU menu)
 	};
 	const UINT ID_HELP_INDEX2 = 50910;
 
-	const char *UILanguageFile = pvar->ts->UILanguageFile;
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
 
 	TTInsertMenuItemA(menu, ID_HELP_INDEX2, MF_ENABLED, ID_MENUITEM, "Check &Update...", FALSE);
 	TTInsertMenuItemA(menu, ID_HELP_INDEX2, MF_SEPARATOR, 0, NULL, FALSE);
 
-	SetI18nMenuStrs("TTXCheckUpdate", menu, MenuTextInfo, _countof(MenuTextInfo), UILanguageFile);
+	SetI18nMenuStrsW(menu, "TTXCheckUpdate", MenuTextInfo, _countof(MenuTextInfo), UILanguageFileW);
 }
 
 static int WINAPI TTXProcessCommand(HWND hWin, WORD cmd)
