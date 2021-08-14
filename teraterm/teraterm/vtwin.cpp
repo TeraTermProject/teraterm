@@ -108,6 +108,7 @@
 //#include "Usbiodef.h"
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
+#include "win32helper.h"
 
 #define VTClassName L"VTWin32"
 
@@ -3942,46 +3943,53 @@ void CVTWindow::OnStopLog()
 	FLogClose();
 }
 
+static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t *iniFile)
+{
+	wchar_t *uimsg;
+	GetI18nStrWW("Tera Term", key, def, iniFile, &uimsg);
+	return uimsg;
+}
+
 // ログの再生 (2006.12.13 yutaka)
 void CVTWindow::OnReplayLog()
 {
-	OPENFILENAME ofn;
-	char szFile[MAX_PATH];
-	char Command[MAX_PATH] = "notepad.exe";
-	const char *exec = "ttermpro";
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-	char uimsg[MAX_UIMSG];
+	OPENFILENAMEW ofn;
+	wchar_t szFile[MAX_PATH];
+	const wchar_t *exec = L"ttermpro";
+	wchar_t *filter;
+	wchar_t *title;
+
+	filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW );
+	title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
 
 	// バイナリモードで採取したログファイルを選択する
 	memset(&ofn, 0, sizeof(OPENFILENAME));
-	memset(szFile, 0, sizeof(szFile));
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	memset(szFile, 0, _countof(szFile));
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner = HVTWin;
-	get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
-	             "all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
-	ofn.lpstrFilter = ts.UIMsg;
+	ofn.lpstrFilter = filter;
 	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = sizeof(szFile);
+	ofn.nMaxFile = _countof(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = "log";
-	get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", uimsg, sizeof(uimsg),
-	             "Select replay log file with binary mode", ts.UILanguageFile);
-	ofn.lpstrTitle = uimsg;
-	if(GetOpenFileName(&ofn) == 0)
+	ofn.lpstrDefExt = L"log";
+	ofn.lpstrTitle = title;
+	BOOL r = GetOpenFileNameW(&ofn);
+	free(filter);
+	free(title);
+	if (r == FALSE)
 		return;
 
-
 	// "/R"オプション付きでTera Termを起動する（ログが再生される）
-	_snprintf_s(Command, sizeof(Command), _TRUNCATE,
-	            "%s /R=\"%s\"", exec, szFile);
+	wchar_t *Command;
+	aswprintf(&Command, L"%s /R=\"%s\"", exec, szFile);
 
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
+	STARTUPINFOW si = {};
+	PROCESS_INFORMATION pi = {};
+	GetStartupInfoW(&si);
 
-	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
+	r = CreateProcessW(NULL, Command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+	free(Command);
+	if (r == FALSE) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -4530,11 +4538,6 @@ void CVTWindow::OnSetupGeneral()
 	FreeTTDLG();
 }
 
-static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const char *iniFile)
-{
-	return TTGetLangStrW("Tera Term", key, def, iniFile);
-}
-
 /* GetSetupFname function id */
 typedef enum {
 	GSF_SAVE,		// Save setup
@@ -4545,20 +4548,20 @@ typedef enum {
 static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 {
 	wchar_t *FNameFilter;
-	wchar_t TempDir[MAX_PATH];
-	wchar_t DirW[MAX_PATH];
+	wchar_t *TempDir;
+	wchar_t *DirW = NULL;
 	wchar_t NameW[MAX_PATH];
-	const char *UILanguageFile = ts->UILanguageFile;
+	const wchar_t *UILanguageFileW = ts->UILanguageFileW;
 
 	/* save current dir */
-	GetCurrentDirectoryW(_countof(TempDir), TempDir);
+	hGetCurrentDirectoryW(&TempDir);
 
 	/* File name filter */
 	if (FuncId==GSF_LOADKEY) {
-		FNameFilter = _get_lang_msg("FILEDLG_KEYBOARD_FILTER", L"keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFile);
+		FNameFilter = _get_lang_msg("FILEDLG_KEYBOARD_FILTER", L"keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFileW);
 	}
 	else {
-		FNameFilter = _get_lang_msg("FILEDLG_SETUP_FILTER", L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFile);
+		FNameFilter = _get_lang_msg("FILEDLG_SETUP_FILTER", L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFileW);
 	}
 
 	if (FuncId==GSF_LOADKEY) {
@@ -4566,8 +4569,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		wchar_t *KeyCnfFNW = ts->KeyCnfFNW;
 		GetFileNamePosW(KeyCnfFNW,&i,&j);
 		wcsncpy_s(NameW, _countof(NameW),&KeyCnfFNW[j], _TRUNCATE);
-		memcpy(DirW, KeyCnfFNW, sizeof(wchar_t) * i);
-		DirW[i] = 0;
+		DirW = ExtractDirNameW(KeyCnfFNW);
 
 		if ((wcslen(NameW) == 0) || (_wcsicmp(NameW, L"KEYBOARD.CNF") == 0)) {
 			wcsncpy_s(NameW, _countof(NameW),L"KEYBOARD.CNF", _TRUNCATE);
@@ -4578,25 +4580,22 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 		wchar_t *SetupFNameW = ts->SetupFNameW;
 		GetFileNamePosW(SetupFNameW,&i,&j);
 		wcsncpy_s(NameW, _countof(NameW),&SetupFNameW[j], _TRUNCATE);
-		memcpy(DirW, SetupFNameW, sizeof(wchar_t) * i);
-		DirW[i] = 0;
+		DirW = ExtractDirNameW(SetupFNameW);
 
 		if ((wcslen(NameW) == 0) || (_wcsicmp(NameW, L"TERATERM.INI") == 0)) {
 			wcsncpy_s(NameW, _countof(NameW), L"TERATERM.INI", _TRUNCATE);
 		}
 	}
 
-	if (wcslen(DirW) == 0) {
-		wchar_t *HomeDirW = ToWcharA(ts->HomeDir);
-		wcsncpy_s(DirW, _countof(DirW), HomeDirW, _TRUNCATE);
-		free(HomeDirW);
+	if (DirW == NULL) {
+		DirW = _wcsdup(ts->HomeDirW);
 	}
 
 	SetCurrentDirectoryW(DirW);
 
 	/* OPENFILENAME record */
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFile   = NameW;
 	ofn.nMaxFile    = sizeof(NameW);
@@ -4617,7 +4616,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 //		ofn.lpstrInitialDir = __argv[0];
 //		ofn.lpstrInitialDir = ts->SetupFName;
 		ofn.lpstrInitialDir = DirW;
-		ofn.lpstrTitle = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", L"Tera Term: Save setup", UILanguageFile);
+		ofn.lpstrTitle = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", L"Tera Term: Save setup", UILanguageFileW);
 		Ok = GetSaveFileNameW(&ofn);
 		if (Ok) {
 			free(ts->SetupFNameW);
@@ -4630,7 +4629,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 	case GSF_RESTORE:
 		ofn.lpstrDefExt = L"ini";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFile);
+		ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFileW);
 		Ok = GetOpenFileNameW(&ofn);
 		if (Ok) {
 			free(ts->SetupFNameW);
@@ -4643,7 +4642,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 	case GSF_LOADKEY:
 		ofn.lpstrDefExt = L"cnf";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFile);
+		ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFileW);
 		Ok = GetOpenFileNameW(&ofn);
 		if (Ok) {
 			free(ts->KeyCnfFNW);
@@ -4672,6 +4671,8 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 
 	/* restore dir */
 	SetCurrentDirectoryW(TempDir);
+	free(TempDir);
+	free(DirW);
 
 	return Ok;
 }

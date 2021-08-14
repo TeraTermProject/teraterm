@@ -160,3 +160,27 @@ DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t *
 	*fullpath = path;
 	return NO_ERROR;
 }
+
+/**
+ *	GetCurrentDirectoryW() の動的バッファ版
+ *
+ *	@param[out]	dir		フォルダ
+ *						不要になったらfree()する
+ *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
+ */
+DWORD hGetCurrentDirectoryW(wchar_t **dir)
+{
+	DWORD len = GetCurrentDirectoryW(0, NULL);
+	if (len == 0) {
+		*dir = NULL;
+		return GetLastError();
+	}
+	wchar_t *d = (wchar_t *)malloc(sizeof(wchar_t) * len);
+	DWORD r = GetCurrentDirectoryW(len, d);
+	if (len == 0) {
+		*dir = NULL;
+		return GetLastError();
+	}
+	*dir = d;
+	return 0;
+}
