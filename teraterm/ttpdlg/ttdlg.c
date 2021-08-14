@@ -3211,14 +3211,16 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 		{
 			static LPCHOOSEFONT cf;
 			PTTSet ts;
-			char uimsg[MAX_UIMSG];
+			wchar_t *uimsg;
 
 			//EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
 			cf = (LPCHOOSEFONT)lParam;
 			ts = (PTTSet)cf->lCustData;
-			get_lang_msg("DLG_CHOOSEFONT_STC6", uimsg, sizeof(uimsg),
-			             "\"Font style\" selection here won't affect actual font appearance.", ts->UILanguageFile);
-			SetDlgItemText(Dialog, stc6, uimsg);
+
+			GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", L"\"Font style\" selection here won't affect actual font appearance.",
+						 ts->UILanguageFileW, &uimsg);
+			SetDlgItemTextW(Dialog, stc6, uimsg);
+			free(uimsg);
 
 			SetFocus(GetDlgItem(Dialog,cmb1));
 
