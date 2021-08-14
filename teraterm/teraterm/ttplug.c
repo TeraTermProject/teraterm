@@ -141,9 +141,8 @@ static void loadExtension(wchar_t const *fileName)
 	}
 }
 
-void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
+static void LoadExtensions(PTTSet ts_)
 {
-	int i;
 	wchar_t *load_mask;
 	WIN32_FIND_DATAW fd;
 	HANDLE hFind;
@@ -166,6 +165,28 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 	if (NumExtensions==0) return;
 
 	qsort(Extensions, NumExtensions, sizeof(Extensions[0]), compareOrder);
+}
+
+static void UnloadExtensions()
+{
+	int i;
+	for (i = 0; i < NumExtensions; i++) {
+		free(Extensions[i].exports);
+		FreeLibrary(Extensions[i].LibHandle);
+	}
+
+	free(Extensions);
+	Extensions = NULL;
+	NumExtensions = 0;
+}
+
+void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
+{
+	int i;
+
+	LoadExtensions(ts_);
+
+	if (NumExtensions==0) return;
 
 	for (i = 0; i < NumExtensions; i++) {
 		if (Extensions[i].exports->TTXInit != NULL) {
@@ -350,14 +371,7 @@ void PASCAL TTXEnd(void)
 		}
 	}
 
-	for (i = 0; i < NumExtensions; i++) {
-		free(Extensions[i].exports);
-		FreeLibrary(Extensions[i].LibHandle);
-	}
-
-	free(Extensions);
-	Extensions = NULL;
-	NumExtensions = 0;
+	UnloadExtensions();
 }
 
 void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
