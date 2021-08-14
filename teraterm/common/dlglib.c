@@ -489,33 +489,3 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	ReleaseDC(NULL, hDC);
 	return info.found;
 }
-
-/**
- *	hWndの文字列を取得する
- *	不要になったら free() すること
- */
-wchar_t *AllocControlTextW(HWND hWnd)
-{
-	int len = GetWindowTextLength(hWnd);
-	wchar_t *strW = malloc(sizeof(wchar_t) * (len + 1));
-	if (strW == NULL) {
-		return NULL;
-	}
-
-	GetWindowTextW(hWnd, strW, len + 1);
-	strW[len] = 0;
-	return strW;
-}
-
-/**
- *	hWndの文字列を取得する
- *	不要になったら free() すること
- *	AllocControlTextW() の char版
- */
-char *AllocControlTextA(HWND hWnd)
-{
-	wchar_t *strW = AllocControlTextW(hWnd);
-	char *strA = ToCharW(strW);
-	free(strW);
-	return strA;
-}

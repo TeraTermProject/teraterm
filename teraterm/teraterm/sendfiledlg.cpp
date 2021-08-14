@@ -42,6 +42,7 @@
 #include "helpid.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 #include "sendfiledlg.h"
 
@@ -176,9 +177,9 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		case WM_COMMAND:
 			switch (wp) {
 				case IDOK | (BN_CLICKED << 16): {
-					wchar_t *strW = AllocControlTextW(GetDlgItem(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT));
-
-					const DWORD attr = GetFileAttributesW(strW);
+					wchar_t *filename;
+					hGetWindowTextW(GetDlgItem(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT), &filename);
+					const DWORD attr = GetFileAttributesW(filename);
 					if (attr == INVALID_FILE_ATTRIBUTES || attr & FILE_ATTRIBUTE_DIRECTORY) {
 						static const TTMessageBoxInfoW mbinfo = {
 							"Tera Term",
@@ -187,7 +188,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 							MB_TASKMODAL | MB_ICONEXCLAMATION };
 						TTMessageBoxW(hDlgWnd, &mbinfo, data->UILanguageFileW);
 
-						free(strW);
+						free(filename);
 
 						PostMessage(hDlgWnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT),
 									TRUE);
@@ -195,7 +196,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 						return TRUE;
 					}
 
-					data->filename = strW;
+					data->filename = filename;
 					data->binary =
 						SendMessage(GetDlgItem(hDlgWnd, IDC_SENDFILE_CHECK_BINARY), BM_GETCHECK, 0, 0) == BST_CHECKED
 							? TRUE

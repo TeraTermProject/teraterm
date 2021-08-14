@@ -53,6 +53,7 @@
 #include "helpid.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 
@@ -447,7 +448,12 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 
 static char *alloc_control_text(HWND ctl)
 {
-	return AllocControlTextA(ctl);
+	wchar_t *textW;
+	char *textA;
+	hGetWindowTextW(ctl, &textW);
+	textA = ToCharW(textW);
+	free(textW);
+	return textA;
 }
 
 static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar)

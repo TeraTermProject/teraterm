@@ -98,8 +98,6 @@ void SetDialogFont(const char *FontName, int FontHeight, int FontCharSet,
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
 int GetFontPointFromPixel(HWND hWnd, int pixel);
 int GetFontPixelFromPoint(HWND hWnd, int point);
-wchar_t *AllocControlTextW(HWND hWnd);
-char *AllocControlTextA(HWND hWnd);
 void ExpandCBWidth(HWND dlg, int ID);
 wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile);
 char *GetCommonDialogFilterA(const char *user_filter_mask, const char *UILanguageFile);

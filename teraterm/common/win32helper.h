@@ -38,6 +38,7 @@ DWORD hGetModuleFileNameW(HMODULE hModule, wchar_t **buf);
 DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, const wchar_t *def, const wchar_t *ini, wchar_t **str);
 DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t **filepart);
 DWORD hGetCurrentDirectoryW(wchar_t **dir);
+DWORD hGetWindowTextW(HWND hWnd, wchar_t **text);
 
 #ifdef __cplusplus
 }

@@ -184,3 +184,36 @@ DWORD hGetCurrentDirectoryW(wchar_t **dir)
 	*dir = d;
 	return 0;
 }
+
+/**
+ *	hWndの文字列を取得する
+ *	不要になったら free() すること
+ *
+ *	@param[out]	text	設定されている文字列
+ *						不要になったらfree()する
+ *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
+ */
+DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
+{
+	int len = GetWindowTextLength(hWnd);
+	if (len == 0) {
+		DWORD err = GetLastError();
+		if (err != 0) {
+			*text = NULL;
+			return err;
+		}
+		*text = _wcsdup(L"");
+		return 0;
+	}
+
+	wchar_t *strW = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
+	if (strW == NULL) {
+		*text = NULL;
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+
+	GetWindowTextW(hWnd, strW, len + 1);
+	strW[len] = 0;
+	*text = strW;
+	return 0;
+}
