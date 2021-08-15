@@ -250,7 +250,6 @@
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="..\common\ttplugin.h" />
     <ClInclude Include="..\common\tttypes.h" />
-    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="addsetting.h" />
     <ClInclude Include="buffer.h" />
     <ClInclude Include="clipboar.h" />

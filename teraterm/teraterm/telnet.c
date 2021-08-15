@@ -41,7 +41,6 @@
 
 #include "telnet.h"
 #include "tt_res.h"
-#include "win16api.h"
 
 int TelStatus;
 
@@ -72,6 +71,19 @@ static TelRec tr;
 static HANDLE keepalive_thread = INVALID_HANDLE_VALUE;
 static HWND keepalive_dialog = NULL;
 int nop_interval = 0;
+
+/**
+ *	@retval ‘‚«ž‚ÝƒoƒCƒg”
+ */
+static UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
+{
+	DWORD NumberOfBytesWritten;
+	BOOL result = WriteFile(hFile, buf, length, &NumberOfBytesWritten, NULL);
+	if (result == FALSE) {
+		return 0;
+	}
+	return NumberOfBytesWritten;
+}
 
 void DefaultTelRec()
 {
@@ -109,7 +121,8 @@ void InitTelnet()
 	tr.WinSize.y = ts.TerminalHeight;
 
 	if ((ts.LogFlag & LOG_TEL) != 0)
-		tr.LogFile = _lcreat("TELNET.LOG", 0);
+		tr.LogFile = CreateFileA("TELNET.LOG", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+								 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	else
 		tr.LogFile = 0;
 }
@@ -117,8 +130,8 @@ void InitTelnet()
 void EndTelnet()
 {
 	if (tr.LogFile) {
+		CloseHandle(tr.LogFile);
 		tr.LogFile = 0;
-		_lclose(tr.LogFile);
 	}
 
 	TelStopKeepAliveThread();
@@ -143,14 +156,14 @@ void TelWriteLog1(BYTE b)
 	else
 		Ch = Ch + 0x37;
 	Temp[2] = Ch;
-	_lwrite(tr.LogFile, Temp, 3);
+	win16_lwrite(tr.LogFile, Temp, 3);
 }
 
 void TelWriteLog(PCHAR Buf, int C)
 {
 	int i;
 
-	_lwrite(tr.LogFile, "\015\012>", 3);
+	win16_lwrite(tr.LogFile, "\015\012>", 3);
 	for (i = 0 ; i<= C-1 ; i++)
 		TelWriteLog1(Buf[i]);
 }
@@ -624,7 +637,7 @@ void ParseTel(BOOL *Size, int *nx, int *ny)
 	while ((c>0) && (cv.TelMode)) {
 		if (tr.LogFile) {
 			if (TelStatus==TelIAC) {
-				_lwrite(tr.LogFile, "\015\012<", 3);
+				win16_lwrite(tr.LogFile, "\015\012<", 3);
 				TelWriteLog1(0xff);
 			}
 			TelWriteLog1(b);

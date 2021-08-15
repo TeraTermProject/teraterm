@@ -560,10 +560,6 @@
 				RelativePath=".\vtwin.h"
 				>
 			</File>
-			<File
-				RelativePath="..\common\win16api.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="ttpdlg"

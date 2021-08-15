@@ -132,7 +132,6 @@ target_sources(
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/dlglib.h
-  ../common/win16api.h
   ../common/codemap.h
   ../common/compat_win.h
   ../common/tmfc.h
