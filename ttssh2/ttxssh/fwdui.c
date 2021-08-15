@@ -498,7 +498,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	FWDRequestSpec *requests =
 		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
 	int i;
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_FWD_TITLE" },
 		{ IDC_PORTFORWARD, "DLG_FWDSETUP_LIST" },
 		{ IDC_ADD, "DLG_FWDSETUP_ADD" },
@@ -785,7 +785,7 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec *spec,
 
 static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 {
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_FWD_TITLE" },
 		{ IDD_SSHFWDBANNER, "DLG_FWD_BANNER" },
 		{ IDC_SSHFWDLOCALTOREMOTE, "DLG_FWD_LOCAL_PORT" },
