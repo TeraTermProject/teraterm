@@ -50,13 +50,6 @@ void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
 void SetEditboxEmacsKeybind(HWND hDlg, int nID);
-
-#if defined(_UNICODE)
-#define SetDropDownListT(p1, p2, p3, p4)	SetDropDownListW(p1, p2, p3, p4)
-#else
-#define SetDropDownListT(p1, p2, p3, p4)	SetDropDownList(p1, p2, p3, p4)
-#endif
-
 void TTSetDlgFontA(const char *face, int height, int charset);
 void TTSetDlgFontW(const wchar_t *face, int height, int charset);
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
