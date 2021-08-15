@@ -395,6 +395,9 @@ void ParseTelWill(BYTE b)
 				break;
 			}
 			break;
+
+		default:
+			break;
 		}
 	}
 	else {
@@ -410,6 +413,8 @@ void ParseTelWill(BYTE b)
 				break;
 			case No:
 				ts.LocalEcho = 1;
+				break;
+			default:
 				break;
 			}
 		}
@@ -432,7 +437,12 @@ void ParseTelWill(BYTE b)
 		case No:
 			cv.TelBinRecv = FALSE;
 			break;
+		default:
+			break;
 		}
+		break;
+
+	default:
 		break;
 	}
 	TelStatus = TelIdle;
@@ -471,6 +481,9 @@ void ParseTelWont(BYTE b)
 				break;
 			}
 			break;
+
+		default:
+			break;
 		}
 	}
 	else {
@@ -487,6 +500,8 @@ void ParseTelWont(BYTE b)
 			case No:
 				ts.LocalEcho = 1;
 				break;
+			default:
+				break;
 			}
 		}
 		if (tr.HisOpt[ECHO].Status == Yes) {
@@ -502,7 +517,12 @@ void ParseTelWont(BYTE b)
 		case No:
 			cv.TelBinRecv = FALSE;
 			break;
+		default:
+			break;
 		}
+		break;
+
+	default:
 		break;
 	}
 	TelStatus = TelIdle;
@@ -545,6 +565,9 @@ void ParseTelDo(BYTE b)
 				break;
 			}
 			break;
+
+		default:
+			break;
 		}
 	}
 	else {
@@ -560,6 +583,8 @@ void ParseTelDo(BYTE b)
 		case No:
 			cv.TelBinSend = FALSE;
 			break;
+		default:
+			break;
 		}
 		break;
 
@@ -571,6 +596,9 @@ void ParseTelDo(BYTE b)
 	case SGA:
 		if (tr.MyOpt[SGA].Status==Yes)
 			cv.TelLineMode = FALSE;
+		break;
+
+	default:
 		break;
 	}
 	TelStatus = TelIdle;
@@ -609,6 +637,9 @@ void ParseTelDont(BYTE b)
 				break;
 			}
 			break;
+
+		default:
+			break;
 		}
 	}
 	else {
@@ -624,7 +655,12 @@ void ParseTelDont(BYTE b)
 		case No:
 			cv.TelBinSend = FALSE;
 			break;
+		default:
+			break;
 		}
+		break;
+
+	default:
 		break;
 	}
 	TelStatus = TelIdle;
@@ -685,6 +721,9 @@ void TelEnableHisOpt(BYTE b)
 			if (tr.HisOpt[b].Que==Opposite)
 				tr.HisOpt[b].Que = Empty;
 			break;
+
+		default:
+			break;
 		}
 	}
 }
@@ -706,6 +745,9 @@ void TelDisableHisOpt(BYTE b)
 		case WantYes:
 			if (tr.HisOpt[b].Que==Empty)
 				tr.HisOpt[b].Que = Opposite;
+			break;
+
+		default:
 			break;
 		}
 	}
@@ -729,6 +771,9 @@ void TelEnableMyOpt(BYTE b)
 			if (tr.MyOpt[b].Que==Opposite)
 				tr.MyOpt[b].Que = Empty;
 			break;
+
+		default:
+			break;
 		}
 	}
 }
@@ -750,6 +795,9 @@ void TelDisableMyOpt(BYTE b)
 		case WantYes:
 			if (tr.MyOpt[b].Que==Empty)
 				tr.MyOpt[b].Que = Opposite;
+			break;
+
+		default:
 			break;
 		}
 	}
