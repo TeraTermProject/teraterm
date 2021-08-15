@@ -148,7 +148,6 @@
     <ClCompile Include="i18n_static.c" />
     <ClCompile Include="ttlib_static.c" />
     <ClCompile Include="ttlib_static_cpp.cpp" />
-    <ClCompile Include="win16api.c" />
     <ClCompile Include="win32helper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,7 +163,6 @@
     <ClInclude Include="codeconv.h" />
     <ClInclude Include="getcontent.h" />
     <ClInclude Include="ttlib.h" />
-    <ClInclude Include="win16api.h" />
     <ClInclude Include="win32helper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

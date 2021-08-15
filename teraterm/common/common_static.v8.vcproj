@@ -285,14 +285,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\win16api.c"
-			>
-		</File>
-		<File
-			RelativePath=".\win16api.h"
-			>
-		</File>
-		<File
 			RelativePath=".\win32helper.cpp"
 			>
 		</File>

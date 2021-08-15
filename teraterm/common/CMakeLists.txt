@@ -34,8 +34,6 @@ add_library(
   ttlib.h
   ttlib_static.c
   ttlib_static_cpp.cpp
-  win16api.c
-  win16api.h
   win32helper.cpp
   win32helper.h
   )
