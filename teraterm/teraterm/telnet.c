@@ -70,7 +70,10 @@ static TelRec tr;
 
 static HANDLE keepalive_thread = INVALID_HANDLE_VALUE;
 static HWND keepalive_dialog = NULL;
-int nop_interval = 0;
+static int nop_interval = 0;
+
+static void TelSendNOP();
+static void TelStopKeepAliveThread();
 
 /**
  *	@retval èëÇ´çûÇ›ÉoÉCÉgêî
@@ -795,7 +798,7 @@ void TelChangeEcho()
 		TelDisableHisOpt(ECHO);
 }
 
-void TelSendNOP()
+static void TelSendNOP()
 {
 	BYTE Str[2];
 
@@ -882,7 +885,7 @@ void TelStartKeepAliveThread() {
 	}
 }
 
-void TelStopKeepAliveThread() {
+static void TelStopKeepAliveThread() {
 	if (keepalive_thread != INVALID_HANDLE_VALUE) {
 		nop_interval = 0;
 		WaitForSingleObject(keepalive_thread, INFINITE);

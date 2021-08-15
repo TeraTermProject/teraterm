@@ -110,9 +110,7 @@ void TelInformWinSize(int nx, int ny);
 void TelSendAYT();
 void TelSendBreak();
 void TelChangeEcho();
-void TelSendNOP();
 void TelStartKeepAliveThread();
-void TelStopKeepAliveThread();
 void TelUpdateKeepAliveInterval();
 
 extern int TelStatus;
