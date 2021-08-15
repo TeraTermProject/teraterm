@@ -74,7 +74,6 @@ target_sources(
   ../common/ttlib.h
   ../common/tmfc.h
   ../common/compat_win.h
-  ../common/win16api.h
   ../common/codeconv.h
   ../common/dllutil.h
   )

@@ -126,9 +126,6 @@
     <ClInclude Include="ttmparse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\win16api.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\codeconv.h">
       <Filter>Header Files</Filter>
     </ClInclude>

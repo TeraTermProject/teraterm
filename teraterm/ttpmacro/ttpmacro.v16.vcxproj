@@ -155,7 +155,6 @@
     <ClInclude Include="..\common\tmfc.h" />
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
-    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="ListDlg.h" />
     <ClInclude Include="errdlg.h" />
     <ClInclude Include="inpdlg.h" />

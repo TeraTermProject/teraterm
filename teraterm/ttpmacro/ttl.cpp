@@ -60,7 +60,6 @@
 #include <ws2tcpip.h>
 #include <iptypes.h>
 #include <iphlpapi.h>
-#include "win16api.h"
 #include "ttl_gui.h"
 #include "codeconv.h"
 #include "dllutil.h"
@@ -134,6 +133,50 @@ static HANDLE HandleGet(int fhi)
 static void HandleFree(int fhi)
 {
 	FHandle[fhi] = INVALID_HANDLE_VALUE;
+}
+
+/**
+ *	@retval 読み込みバイト数
+ */
+static UINT win16_lread(HANDLE hFile, LPVOID lpBuffer, UINT uBytes)
+{
+	DWORD NumberOfBytesRead;
+	BOOL Result = ReadFile(hFile, lpBuffer, uBytes, &NumberOfBytesRead, NULL);
+	if (Result == FALSE) {
+		return 0;
+	}
+	return NumberOfBytesRead;
+}
+
+/**
+ *	@retval 書き込みバイト数
+ */
+static UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
+{
+	DWORD NumberOfBytesWritten;
+	BOOL result = WriteFile(hFile, buf, length, &NumberOfBytesWritten, NULL);
+	if (result == FALSE) {
+		return 0;
+	}
+	return NumberOfBytesWritten;
+}
+
+/*
+ *	@param[in]	iOrigin
+ *				@arg 0(FILE_BEGIN)
+ *				@arg 1(FILE_CURRENT)
+ *				@arg 2(FILE_END)
+ *	@retval ファイル位置
+ *	@retval HFILE_ERROR((HFILE)-1)	エラー
+ *	@retval INVALID_SET_FILE_POINTER((DWORD)-1) エラー
+ */
+static LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
+{
+	DWORD pos = SetFilePointer(hFile, lOffset, NULL, iOrigin);
+	if (pos == INVALID_SET_FILE_POINTER) {
+		return HFILE_ERROR;
+	}
+	return pos;
 }
 
 BOOL InitTTL(HWND HWin)
@@ -1169,7 +1212,7 @@ WORD TTLFileClose()
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-	_lclose(FH);
+	CloseHandle(FH);
 	HandleFree(fhi);
 	return Err;
 }
@@ -1329,7 +1372,7 @@ WORD TTLFileCreate()
 	fhi = HandlePut(FH);
 	SetIntVal(VarId, fhi);
 	if (fhi == -1) {
-		_lclose(FH);
+		CloseHandle(FH);
 	}
 	return Err;
 }
@@ -1377,7 +1420,7 @@ WORD TTLFileMarkPtr()
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-	pos = _llseek(FH,0,1);	 /* mark current pos */
+	pos = win16_llseek(FH,0,1);	 /* mark current pos */
 	if (pos == INVALID_SET_FILE_POINTER) {
 		pos = 0;	// ?
 	}
@@ -1533,14 +1576,14 @@ WORD TTLFileReadln()
 	EndLine = FALSE;
 	EndFile = TRUE;
 	do {
-		c = _lread(FH, &b, 1);
+		c = win16_lread(FH, &b, 1);
 		if (c>0) EndFile = FALSE;
 		if (c==1) {
 			switch (b) {
 				case 0x0d:
-					c = _lread(FH, &b, 1);
+					c = win16_lread(FH, &b, 1);
 					if ((c==1) && (b!=0x0a))
-						_llseek(FH, -1, 1);
+						win16_llseek(FH, -1, 1);
 					EndLine = TRUE;
 					break;
 				case 0x0a: EndLine = TRUE; break;
@@ -1594,7 +1637,7 @@ WORD TTLFileRead()
 
 	EndFile = FALSE;
 	for (i = 0 ; i < ReadByte ; i++) {
-		c = _lread(FH,&b,1);
+		c = win16_lread(FH,&b,1);
 		if (c <= 0) {  // EOF
 			EndFile = TRUE;
 			break;
@@ -1693,7 +1736,7 @@ WORD TTLFileSeek()
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-	_llseek(FH,i,j);
+	win16_llseek(FH,i,j);
 	return Err;
 }
 
@@ -1710,7 +1753,7 @@ WORD TTLFileSeekBack()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 	/* move back to the marked pos */
-	_llseek(FH,FPointer[fhi],0);
+	win16_llseek(FH,FPointer[fhi],0);
 	return Err;
 }
 
@@ -1831,13 +1874,13 @@ WORD TTLFileStrSeek()
 	    ((strlen(Str)==0) || (GetFirstChar()!=0)))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-	pos = _llseek(FH,0,1);
+	pos = win16_llseek(FH,0,1);
 	if (pos == INVALID_SET_FILE_POINTER) return Err;
 
 	Len = strlen(Str);
 	i = 0;
 	do {
-		c = _lread(FH,&b,1);
+		c = win16_lread(FH,&b,1);
 		if (c==1)
 		{
 			if (b==(BYTE)Str[i])
@@ -1853,7 +1896,7 @@ WORD TTLFileStrSeek()
 		SetResult(1);
 	else {
 		SetResult(0);
-		_llseek(FH,pos,0);
+		win16_llseek(FH,pos,0);
 	}
 	return Err;
 }
@@ -1877,7 +1920,7 @@ WORD TTLFileStrSeek2()
 	    ((strlen(Str)==0) || (GetFirstChar()!=0)))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-	pos = _llseek(FH,0,1);
+	pos = win16_llseek(FH,0,1);
 	if (pos == INVALID_SET_FILE_POINTER) return Err;
 
 	Len = strlen(Str);
@@ -1885,8 +1928,8 @@ WORD TTLFileStrSeek2()
 	pos2 = pos;
 	do {
 		Last = (pos2<=0);
-		c = _lread(FH,&b,1);
-		pos2 = _llseek(FH,-2,1);
+		c = win16_lread(FH,&b,1);
+		pos2 = win16_llseek(FH,-2,1);
 		if (c==1)
 		{
 			if (b==(BYTE)Str[Len-1-i])
@@ -1903,11 +1946,11 @@ WORD TTLFileStrSeek2()
 		// INVALID_SET_FILE_POINTER になるので、
 		// ゼロオフセットになるように調整する。(2008.10.10 yutaka)
 		if (pos2 == INVALID_SET_FILE_POINTER)
-			_llseek(FH, 0, 0);
+			win16_llseek(FH, 0, 0);
 		SetResult(1);
 	} else {
 		SetResult(0);
-		_llseek(FH,pos,0);
+		win16_llseek(FH,pos,0);
 	}
 	return Err;
 }
@@ -1987,7 +2030,7 @@ WORD TTLFileWrite(BOOL addCRLF)
 		if (GetFirstChar())
 			return ErrSyntax;
 
-		_lwrite(FH, Str, strlen(Str));
+		win16_lwrite(FH, Str, strlen(Str));
 	}
 	else if (Err == ErrTypeMismatch) {
 		Err = 0;
@@ -1998,14 +2041,14 @@ WORD TTLFileWrite(BOOL addCRLF)
 			return ErrSyntax;
 
 		Str[0] = Val & 0xff;
-		_lwrite(FH, Str, 1);
+		win16_lwrite(FH, Str, 1);
 	}
 	else {
 		return Err;
 	}
 
 	if (addCRLF) {
-		_lwrite(FH,"\015\012",2);
+		win16_lwrite(FH,"\015\012",2);
 	}
 	return 0;
 }
