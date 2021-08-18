@@ -176,8 +176,9 @@ DWORD hGetCurrentDirectoryW(wchar_t **dir)
 		return GetLastError();
 	}
 	wchar_t *d = (wchar_t *)malloc(sizeof(wchar_t) * len);
-	DWORD r = GetCurrentDirectoryW(len, d);
+	len = GetCurrentDirectoryW(len, d);
 	if (len == 0) {
+		free(d);
 		*dir = NULL;
 		return GetLastError();
 	}

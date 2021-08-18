@@ -1067,7 +1067,6 @@ void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len)
  */
 size_t ACPToWideChar_t(const char *str_ptr, wchar_t *wstr_ptr, size_t wstr_len)
 {
-	const DWORD flags = 0;
 	size_t out_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
 										 str_ptr, -1,
 										 wstr_ptr, wstr_len);

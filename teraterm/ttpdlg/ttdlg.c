@@ -694,7 +694,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
 				{
-					const static I18nTextInfo infos[] = {
+					static const I18nTextInfo infos[] = {
 						{ "DLG_WIN_NORMAL", L"Normal" },
 						{ "DLG_WIN_BOLD", L"Bold" },
 						{ "DLG_WIN_BLINK", L"Blink" },

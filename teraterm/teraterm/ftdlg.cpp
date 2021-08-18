@@ -67,7 +67,6 @@ CFileTransDlg::~CFileTransDlg()
 BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 {
 	BOOL Ok;
-	int fuLoad = LR_DEFAULTCOLOR;
 	HWND hwnd;
 
 	UILanguageFile = info->UILanguageFile;

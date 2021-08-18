@@ -676,7 +676,6 @@ void CommThread(void *arg)
 
 void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 {
-	char ErrMsg[31];
 	wchar_t ErrMsgW[31];
 	char Temp[20];
 	wchar_t UIMsgW[MAX_UIMSG];
@@ -695,7 +694,6 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 	switch (cv->PortType) {
 		case IdTCPIP:
-			ErrMsg[0] = 0;
 			switch (HIWORD(lParam)) {
 				case WSAECONNREFUSED:
 					get_lang_msgW("MSG_COMM_REFUSE_ERROR", UIMsgW, _countof(UIMsgW), L"Connection refused", ts->UILanguageFile);

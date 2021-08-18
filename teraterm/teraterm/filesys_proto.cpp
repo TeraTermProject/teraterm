@@ -797,7 +797,6 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	};
 	PFileVarProto fv;
 	wchar_t TempFull[MAX_PATH];
-	const char *UILanguageFile = ts.UILanguageFile;
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 
 	switch (Message) {
