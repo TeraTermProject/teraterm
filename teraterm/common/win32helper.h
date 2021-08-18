@@ -39,6 +39,7 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t **filepart);
 DWORD hGetCurrentDirectoryW(wchar_t **dir);
 DWORD hGetWindowTextW(HWND hWnd, wchar_t **text);
+DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text);
 
 #ifdef __cplusplus
 }

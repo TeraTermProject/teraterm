@@ -42,8 +42,10 @@
 #include "ttlib.h"
 #include "dlglib.h"
 #include "tt_res.h"
-#include "clipboarddlg.h"
 #include "compat_win.h"
+#include "win32helper.h"
+
+#include "clipboarddlg.h"
 
 static void GetDesktopRectFromPoint(POINT p, RECT *rect)
 {
@@ -183,15 +185,12 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				{
 					INT_PTR result = IDCANCEL;
 
-					size_t len = SendDlgItemMessageW(hDlgWnd, IDC_EDIT, WM_GETTEXTLENGTH, 0, 0);
-					len++; // for '\0'
-					wchar_t *strW = (wchar_t *)malloc(sizeof(wchar_t) * len);
-					if (strW != NULL) {
-						GetDlgItemTextW(hDlgWnd, IDC_EDIT, strW, (int)len);
-						strW[len - 1] = '\0';
+					wchar_t *strW;
+					DWORD error = hGetDlgItemTextW(hDlgWnd, IDC_EDIT, &strW);
+					if (error == NO_ERROR) {
+						data->strW_edited_ptr = strW;
 						result = IDOK;
 					}
-					data->strW_edited_ptr = strW;
 
 					DestroyWindow(hStatus);
 					TTEndDialog(hDlgWnd, result);

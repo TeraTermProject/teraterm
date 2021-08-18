@@ -218,3 +218,9 @@ DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
 	*text = strW;
 	return 0;
 }
+
+DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	return hGetWindowTextW(hWnd, text);
+}
