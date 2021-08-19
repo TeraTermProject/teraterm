@@ -117,8 +117,8 @@ void InitTelnet()
 void EndTelnet()
 {
 	if (tr.LogFile) {
-		tr.LogFile = 0;
 		_lclose(tr.LogFile);
+		tr.LogFile = 0;
 	}
 
 	TelStopKeepAliveThread();
