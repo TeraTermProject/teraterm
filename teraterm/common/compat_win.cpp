@@ -41,17 +41,6 @@
 // for debug
 //#define UNICODE_API_DISABLE	1
 
-ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
-HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight,
- HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
-LRESULT (WINAPI *pDefWindowProcW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-LRESULT (WINAPI *pSendMessageW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
-BOOL (WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
-BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
-BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
-BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 BOOL (WINAPI *pIsValidDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
@@ -60,52 +49,18 @@ BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlph
 HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
-int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
-INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
-HWND (WINAPI *pCreateDialogIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
-										   HWND hWndParent, DLGPROC lpDialogFunc,
-										   LPARAM dwInitParam);
-LONG (WINAPI *pSetWindowLongW)(HWND hWnd, int nIndex, LONG dwNewLong);
-LONG (WINAPI *pGetWindowLongW)(HWND hWnd, int nIndex);
 #ifdef _WIN64
 LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 LONG_PTR (WINAPI *pGetWindowLongPtrW)(HWND hWnd, int nIndex);
 #endif
-LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
-BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
 
 // user32
 int (WINAPI *pGetSystemMetricsForDpi)(int nIndex, UINT dpi);
 
 // kernel32
-DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 HWND (WINAPI *pGetConsoleWindow)(void);
-DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
-										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
-BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpString, LPCWSTR lpFileName);
-UINT (WINAPI *pGetPrivateProfileIntW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
-BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
-							   LPSECURITY_ATTRIBUTES lpProcessAttributes,
-							   LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
-							   DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
-							   LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
-BOOL (WINAPI *pCopyFileW)(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists);
-BOOL (WINAPI *pDeleteFileW)(LPCWSTR lpFileName);
-BOOL (WINAPI *pMoveFileW)(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName);
-HANDLE (WINAPI *pCreateFileW)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-							  LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
-							  DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
-HANDLE (WINAPI *pFindFirstFileW)(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
-BOOL (WINAPI *pFindNextFileW)(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
-BOOL (WINAPI *pRemoveDirectoryW)(LPCWSTR lpPathName);
-DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
-HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
-DWORD (WINAPI *pGetModuleFileNameW)(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
-DWORD (WINAPI *pGetTempPathW)(DWORD nBufferLength, LPWSTR lpBuffer);
-UINT (WINAPI *pGetTempFileNameW)(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 static ULONGLONG (WINAPI *pVerSetConditionMask)(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask);
 static BOOL (WINAPI *pVerifyVersionInfoA)(LPOSVERSIONINFOEX lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
 
@@ -117,9 +72,6 @@ BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 static HWND (WINAPI *pHtmlHelpW)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 static HWND (WINAPI *pHtmlHelpA)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
-BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-
 // multi monitor Windows98+/Windows2000+
 BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
@@ -127,26 +79,22 @@ HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
 HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 
-int (WINAPI *pGetWindowTextW)(HWND hWnd, LPWSTR lpString, int nMaxCount);
-int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
-
-// shell32
-UINT (WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
-BOOL (WINAPI *pShell_NotifyIconW)(DWORD dwMessage, NOTIFYICONDATAW *lpData);
-LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
-BOOL (WINAPI *pSHGetPathFromIDListW)(LPITEMIDLIST pidl, LPWSTR pszPath);
-
-// comctl32
-HPROPSHEETPAGE (WINAPI *pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
-INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
-
-// comdlg32
-BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
-BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
-
 // dnsapi
 DNS_STATUS (WINAPI *pDnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PVOID pExtra, PDNS_RECORD *ppQueryResults, PVOID *pReserved);
 VOID (WINAPI *pDnsFree)(PVOID pData, DNS_FREE_TYPE FreeType);
+
+class Initializer {
+public:
+	Initializer() {
+		DLLInit();
+		WinCompatInit();
+	}
+	~Initializer() {
+		DLLExit();
+	}
+};
+
+static Initializer initializer;
 
 /**
  *	GetConsoleWindow() Ç∆ìØÇ∂ìÆçÏÇÇ∑ÇÈ
@@ -188,11 +136,6 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 }
 
 static const APIInfo Lists_user32[] = {
-#ifndef UNICODE_API_DISABLE
-	{ "RegisterClassW", (void **)&pRegisterClassW },
-	{ "CreateWindowExW", (void **)&pCreateWindowExW },
-	{ "DefWindowProcW", (void **)&pDefWindowProcW },
-#endif
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
 	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
@@ -200,27 +143,10 @@ static const APIInfo Lists_user32[] = {
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 #ifndef UNICODE_API_DISABLE
-	{ "SetDlgItemTextW", (void **)&pSetDlgItemTextW },
-	{ "GetDlgItemTextW", (void **)&pGetDlgItemTextW },
-	{ "SetWindowTextW", (void **)&pSetWindowTextW },
-	{ "ModifyMenuW", (void **)&pModifyMenuW },
-	{ "GetMenuStringW", (void **)&pGetMenuStringW },
-	{ "SendDlgItemMessageW", (void **)&pSendDlgItemMessageW },
-	{ "MessageBoxW", (void **)&pMessageBoxW },
-	{ "DialogBoxIndirectParamW", (void **)&pDialogBoxIndirectParamW },
-	{ "CreateDialogIndirectParamW", (void **)&pCreateDialogIndirectParamW },
-	{ "InsertMenuW", (void **)&pInsertMenuW },
-	{ "AppendMenuW", (void **)&pAppendMenuW },
-	{ "SendMessageW", (void **)&pSendMessageW },
-	{ "GetWindowTextW", (void **)&pGetWindowTextW },
-	{ "GetWindowTextLengthW", (void **)&pGetWindowTextLengthW },
-	{ "SetWindowLongW", (void **)&pSetWindowLongW },
-	{ "GetWindowLongW", (void **)&pGetWindowLongW },
 #ifdef _WIN64
 	{ "SetWindowLongPtrW", (void **)&pSetWindowLongPtrW },
 	{ "GetWindowLongPtrW", (void **)&pGetWindowLongPtrW },
 #endif
-	{ "CallWindowProcW", (void **)&pCallWindowProcW },
 #endif
 	{ "EnumDisplayMonitors", (void **)&pEnumDisplayMonitors },
 	{ "MonitorFromWindow", (void **)&pMonitorFromWindow },
@@ -251,49 +177,12 @@ static const APIInfo Lists_Shcore[] = {
 
 static const APIInfo Lists_kernel32[] = {
 #ifndef UNICODE_API_DISABLE
-	{ "GetFileAttributesW", (void **)&pGetFileAttributesW },
 	{ "OutputDebugStringW", (void **)&pOutputDebugStringW },
-	{ "GetCurrentDirectoryW", (void **)&pGetCurrentDirectoryW },
-	{ "SetCurrentDirectoryW", (void **)&pSetCurrentDirectoryW },
-	{ "GetPrivateProfileStringW", (void **)&pGetPrivateProfileStringW },
-	{ "WritePrivateProfileStringW", (void **)&pWritePrivateProfileStringW },
-	{ "GetPrivateProfileIntW", (void **)&pGetPrivateProfileIntW },
-	{ "CreateProcessW", (void **)&pCreateProcessW },
-	{ "CopyFileW", (void **)&pCopyFileW },
-	{ "DeleteFileW", (void **)&pDeleteFileW },
-	{ "MoveFileW", (void **)&pMoveFileW },
-	{ "CreateFileW", (void **)&pCreateFileW },
-	{ "FindFirstFileW", (void **)&pFindFirstFileW },
-	{ "FindNextFileW", (void **)&pFindNextFileW },
-	{ "RemoveDirectoryW", (void **)&pRemoveDirectoryW },
-	{ "GetFullPathNameW", (void **)&pGetFullPathNameW },
-	{ "LoadLibraryW", (void **)&pLoadLibraryW },
-	{ "GetModuleFileNameW", (void **)&pGetModuleFileNameW },
 	{ "ExpandEnvironmentStringsW", (void **)&pExpandEnvironmentStringsW },
-	{ "GetTempPathW", (void **)&pGetTempPathW },
-	{ "GetTempFileNameW", (void **)&pGetTempFileNameW },
 #endif
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{ "VerSetConditionMask", (void **)&pVerSetConditionMask },
 	{ "VerifyVersionInfoA", (void **)&pVerifyVersionInfoA },
-	{},
-};
-
-static const APIInfo Lists_shell32[] = {
-#ifndef UNICODE_API_DISABLE
-	{ "DragQueryFileW", (void **)&pDragQueryFileW },
-	{ "Shell_NotifyIconW", (void **)&pShell_NotifyIconW },
-	{ "SHBrowseForFolderW", (void **)&pSHBrowseForFolderW },
-	{ "SHGetPathFromIDListW", (void **)&pSHGetPathFromIDListW },
-#endif
-	{},
-};
-
-static const APIInfo Lists_comctl32[] = {
-#ifndef UNICODE_API_DISABLE
-	{ "CreatePropertySheetPageW", (void **)&pCreatePropertySheetPageW },
-	{ "PropertySheetW", (void **)&pPropertySheetW },
-#endif
 	{},
 };
 
@@ -302,14 +191,6 @@ static const APIInfo Lists_hhctrl[] = {
 	{ "HtmlHelpW", (void **)&pHtmlHelpW },
 #endif
 	{ "HtmlHelpA", (void **)&pHtmlHelpA },
-	{},
-};
-
-static const APIInfo Lists_comdlg32[] = {
-#ifndef UNICODE_API_DISABLE
-	{ "GetOpenFileNameW", (void **)&pGetOpenFileNameW },
-	{ "GetSaveFileNameW", (void **)&pGetSaveFileNameW },
-#endif
 	{},
 };
 
@@ -325,10 +206,7 @@ static const DllInfo DllInfos[] = {
 	{ L"gdi32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_gdi32 },
 	{ L"Shcore.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_Shcore },
 	{ L"kernel32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
-	{ L"shell32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
-	{ L"Comctl32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{ L"hhctrl.ocx", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_hhctrl },
-	{ L"comdlg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_comdlg32 },
 	{ L"dnsapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dnsapi },
 	{},
 };
@@ -373,43 +251,8 @@ void WinCompatInit()
 	// 9xì¡ï èàóù
 	if (!IsWindowsNTKernel()) {
 		// Windows 9x Ç…ë∂ç›ÇµÇƒÇ¢ÇÈÇ™ê≥ÇµÇ≠ìÆçÏÇµÇ»Ç¢ÇΩÇﬂñ≥å¯âªÇ∑ÇÈ
-		pGetPrivateProfileStringW = NULL;
-		pSetWindowTextW = NULL;
-		pSetDlgItemTextW = NULL;
-		pGetDlgItemTextW = NULL;
-		pDialogBoxIndirectParamW = NULL;
-		pCreateDialogIndirectParamW = NULL;
-		pCreateWindowExW = NULL;
-		pRegisterClassW = NULL;
-		pDefWindowProcW = NULL;
-		pSendMessageW = NULL;
-		pSendDlgItemMessageW = NULL;
-		pGetWindowTextW = NULL;
-		pGetWindowTextLengthW = NULL;
-		pShell_NotifyIconW = NULL;
-		pGetFileAttributesW = NULL;
 		pOutputDebugStringW = NULL;
-		pDragQueryFileW = NULL;
-		pGetCurrentDirectoryW = NULL;
-		pSetCurrentDirectoryW = NULL;
-		pGetOpenFileNameW = NULL;
-		pSHBrowseForFolderW = NULL;
-		pSHGetPathFromIDListW = NULL;
-		pCreateProcessW = NULL;
-		pCopyFileW = NULL;
-		pDeleteFileW = NULL;
-		pMoveFileW = NULL;
-		pCreateFileW = NULL;
-		pFindFirstFileW = NULL;
-		pFindNextFileW = NULL;
-		pRemoveDirectoryW = NULL;
-		pGetFullPathNameW = NULL;
-		pGetPrivateProfileIntW = NULL;
-		pGetModuleFileNameW = NULL;
-		pLoadLibraryW = NULL;
 		pExpandEnvironmentStringsW = NULL;
-		pGetTempPathW = NULL;
-		pGetTempFileNameW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù

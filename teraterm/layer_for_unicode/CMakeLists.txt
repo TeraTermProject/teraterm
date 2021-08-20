@@ -84,13 +84,15 @@ if(MSVC AND (MSVC_VERSION GREATER_EQUAL 1900))
     $<$<CONFIG:Release>:libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib>
     $<$<CONFIG:Debug>:libucrtd.lib libvcruntimed.lib libcmtd.lib libcpmtd.lib>
     )
-else()
+elseif(MSVC)
   target_link_libraries(
     ${PACKAGE_NAME}
     PUBLIC
     $<$<CONFIG:Release>:libcmt.lib libcpmt.lib>
     $<$<CONFIG:Debug>:libcmtd.lib libcpmtd.lib>
     )
+elseif(MINGW)
+else()
 endif()
 
 target_link_libraries(

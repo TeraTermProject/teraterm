@@ -42,10 +42,6 @@
 
 HPROPSHEETPAGE WINAPI _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
 {
-	if (pCreatePropertySheetPageW != NULL) {
-		return pCreatePropertySheetPageW((LPCPROPSHEETPAGEW)psp);
-	}
-
 	char *titleA = ToCharW(psp->pszTitle);
 
 	PROPSHEETPAGEA_V1 pspA;
@@ -72,10 +68,6 @@ HPROPSHEETPAGE WINAPI _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *psh)
 INT_PTR WINAPI _PropertySheetW(PROPSHEETHEADERW *psh)
 {
-	if (pPropertySheetW != NULL) {
-		return pPropertySheetW((PROPSHEETHEADERW *)psh);
-	}
-
 	char *captionA = ToCharW(psh->pszCaption);
 
 //	PROPSHEETHEADERA_V1 pshA;
@@ -152,18 +144,10 @@ static BOOL GetOpenSaveFileNameA(BOOL (WINAPI *fn)(LPOPENFILENAMEA ofnA), LPOPEN
 
 BOOL WINAPI _GetOpenFileNameW(LPOPENFILENAMEW ofnW)
 {
-	if (pGetOpenFileNameW != NULL) {
-		return pGetOpenFileNameW(ofnW);
-	}
-
 	return GetOpenSaveFileNameA(GetOpenFileNameA, ofnW);
 }
 
 BOOL WINAPI _GetSaveFileNameW(LPOPENFILENAMEW ofnW)
 {
-	if (pGetSaveFileNameW != NULL) {
-		return pGetSaveFileNameW(ofnW);
-	}
-
 	return GetOpenSaveFileNameA(GetSaveFileNameA, ofnW);
 }

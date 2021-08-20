@@ -51,7 +51,6 @@ TTCWnd::TTCWnd()
 	m_hInst = nullptr;
 	m_hAccel = nullptr;
 	m_hParentWnd = nullptr;
-	m_WindowUnicode = FALSE;
 }
 
 LRESULT TTCWnd::SendMessage(UINT msg, WPARAM wp, LPARAM lp)
@@ -260,16 +259,10 @@ BOOL TTCWnd::EndPaint(LPPAINTSTRUCT lpPaint)
 
 LRESULT TTCWnd::DefWindowProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (m_WindowUnicode && pDefWindowProcW != NULL) {
-		// Unicode API ‚ ‚è && Unicode Window
-		return pDefWindowProcW(m_hWnd, msg, wParam, lParam);
-	}
-	else {
-		return ::DefWindowProcA(m_hWnd, msg, wParam, lParam);
-	}
+	return DefWindowProcW(m_hWnd, msg, wParam, lParam);
 }
 
-////////////////////////////////////////
+////////////////////////////////////////	
 
 TTCDialog *TTCDialog::pseudoPtr;
 

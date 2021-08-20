@@ -125,20 +125,6 @@ typedef struct {
 #include <poppack.h>
 #endif
 
-extern ATOM (WINAPI *pRegisterClassW)(const WNDCLASSW *lpWndClass);
-extern HWND (WINAPI *pCreateWindowExW)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X,
-									   int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance,
-									   LPVOID lpParam);
-extern LRESULT (WINAPI *pDefWindowProcW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-extern HPROPSHEETPAGE (WINAPI * pCreatePropertySheetPageW)(LPCPROPSHEETPAGEW constPropSheetPagePointer);
-extern INT_PTR (WINAPI *pPropertySheetW)(LPCPROPSHEETHEADERW constPropSheetHeaderPointer);
-extern LRESULT (WINAPI *pSendDlgItemMessageW)(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam);
-extern BOOL(WINAPI *pModifyMenuW)(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-extern int(WINAPI *pGetMenuStringW)(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
-extern BOOL(WINAPI *pSetWindowTextW)(HWND hWnd, LPCWSTR lpString);
-extern UINT(WINAPI *pDragQueryFileW)(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
-extern BOOL (WINAPI *pSetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
-extern BOOL (WINAPI *pGetDlgItemTextW)(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
 extern BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 extern BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
@@ -151,77 +137,21 @@ extern BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BO
 extern BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 extern int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
 extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
-extern int (WINAPI *pMessageBoxW)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
-extern INT_PTR (WINAPI *pDialogBoxIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW hDialogTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
-extern HWND (WINAPI *pCreateDialogIndirectParamW)(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
-												  HWND hWndParent, DLGPROC lpDialogFunc,
-												  LPARAM dwInitParam);
-extern BOOL (WINAPI *pInsertMenuW)(HMENU hMenu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
-extern BOOL (WINAPI *pAppendMenuW)(HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 extern HMONITOR (WINAPI *pMonitorFromWindow)(HWND hwnd, DWORD dwFlags);
 extern HMONITOR (WINAPI *pMonitorFromPoint)(POINT pt, DWORD dwFlags);
 extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 extern BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
-extern LRESULT (WINAPI *pSendMessageW)(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-extern int (WINAPI *pGetWindowTextW)(HWND hWnd, LPWSTR lpString, int nMaxCount);
-extern int (WINAPI *pGetWindowTextLengthW)(HWND hWnd);
-extern BOOL (WINAPI *pShell_NotifyIconW)(DWORD dwMessage, NOTIFYICONDATAW *lpData);
-extern LONG (WINAPI *pSetWindowLongW)(HWND hWnd, int nIndex, LONG dwNewLong);
-extern LONG (WINAPI *pGetWindowLongW)(HWND hWnd, int nIndex);
 #ifdef _WIN64
 extern LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 extern LONG_PTR (WINAPI *pGetWindowLongPtrW)(HWND hWnd, int nIndex);
 #endif
-extern LRESULT (WINAPI *pCallWindowProcW)(WNDPROC lpPrevWndFunc,
-										  HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-extern DWORD (WINAPI *pGetCurrentDirectoryW)(DWORD nBufferLength, LPWSTR lpBuffer);
-extern BOOL (WINAPI *pSetCurrentDirectoryW)(LPCWSTR lpPathName);
-extern BOOL (WINAPI *pGetOpenFileNameW)(LPOPENFILENAMEW ofnW);
-extern BOOL (WINAPI *pGetSaveFileNameW)(LPOPENFILENAMEW ofnW);
-extern DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
-										 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
-extern BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
-extern UINT (WINAPI *pGetPrivateProfileIntW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, INT nDefault, LPCWSTR lpFileName);
-extern BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
-									  LPSECURITY_ATTRIBUTES lpProcessAttributes,
-									  LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
-									  DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
-									  LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 extern int (WINAPI *pGetSystemMetricsForDpi)(int  nIndex, UINT dpi);
 
 // kernel32
-extern DWORD (WINAPI *pGetFileAttributesW)(LPCWSTR lpFileName);
 extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 extern HWND (WINAPI *pGetConsoleWindow)(void);
-extern DWORD (WINAPI *pGetPrivateProfileStringW)(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
-												 LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName);
-extern BOOL (WINAPI *pWritePrivateProfileStringW)(LPCWSTR lpAppName,LPCWSTR lpKeyName,LPCWSTR lpString,LPCWSTR lpFileName);
-extern BOOL (WINAPI *pCreateProcessW)(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
-									  LPSECURITY_ATTRIBUTES lpProcessAttributes,
-									  LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
-									  DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
-									  LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
-extern BOOL (WINAPI *pCopyFileW)(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName, BOOL bFailIfExists);
-extern BOOL (WINAPI *pDeleteFileW)(LPCWSTR lpFileName);
-extern BOOL (WINAPI *pMoveFileW)(LPCWSTR lpExistingFileName, LPCWSTR lpNewFileName);
-extern HANDLE (WINAPI *pCreateFileW)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-									 LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
-									 DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
-extern HANDLE (WINAPI *pFindFirstFileW)(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
-extern BOOL (WINAPI *pFindNextFileW)(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData);
-extern BOOL (WINAPI *pRemoveDirectoryW)(LPCWSTR lpPathName);
-extern DWORD (WINAPI *pGetFullPathNameW)(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
-extern HMODULE (WINAPI *pLoadLibraryW)(LPCWSTR lpLibFileName);
-extern DWORD (WINAPI *pGetModuleFileNameW)(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
-extern DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
-extern DWORD (WINAPI *pGetTempPathW)(DWORD nBufferLength, LPWSTR lpBuffer);
-extern UINT (WINAPI *pGetTempFileNameW)(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 ULONGLONG _VerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask);
 BOOL _VerifyVersionInfoA(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
-
-// shlobj_core.h
-extern LPITEMIDLIST (WINAPI *pSHBrowseForFolderW)(LPBROWSEINFOW lpbi);
-extern BOOL (WINAPI *pSHGetPathFromIDListW)(LPITEMIDLIST pidl, LPWSTR pszPath);
 
 // htmlhelp.dll (hhctrl.ocx)
 HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);

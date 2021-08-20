@@ -118,10 +118,6 @@ BOOL TTCFrameWnd::CreateW(
 		return FALSE;
 	} else {
 		m_hWnd = hWnd;
-		if (pCreateWindowExW != NULL) {
-			// Unicode APIÇ™ë∂ç›Ç∑ÇÈ
-			m_WindowUnicode = TRUE;
-		}
 		SetWindowLongPtr(GWLP_USERDATA, (LONG_PTR)this);
 		return TRUE;
 	}

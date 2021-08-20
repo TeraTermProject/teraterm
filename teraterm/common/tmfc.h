@@ -79,8 +79,6 @@ public:
 	void SetDlgItemInt(int id, UINT val, BOOL bSigned = TRUE);
 	UINT GetDlgItemInt(int id, BOOL* lpTrans = NULL, BOOL bSigned = TRUE) const;
 	void EnableDlgItem(int id, BOOL enable);
-protected:
-	BOOL m_WindowUnicode;
 private:
 	void ModifyStyleCom(int nStyleOffset, DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 };
@@ -163,4 +161,3 @@ protected:
 private:
 	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 };
-

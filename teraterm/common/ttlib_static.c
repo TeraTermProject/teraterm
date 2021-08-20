@@ -300,11 +300,11 @@ void OutputDebugPrintfW(const wchar_t *fmt, ...)
 static int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
 	if(uMsg == BFFM_INITIALIZED) {
-		if (pSHBrowseForFolderW == NULL) {
-			SendMessageA(hwnd, BFFM_SETSELECTIONA, (WPARAM)TRUE, lpData);
-		}
-		else {
+		if (IsWindowsNTKernel()) {
 			SendMessageW(hwnd, BFFM_SETSELECTIONW, (WPARAM)TRUE, lpData);
+		} else {
+			// NT系ではないとき、Layer for unicode が使用されていると思われる
+			SendMessageA(hwnd, BFFM_SETSELECTIONA, (WPARAM)TRUE, lpData);
 		}
 	}
 	return 0;
