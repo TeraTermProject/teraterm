@@ -151,14 +151,39 @@ void GetDesktopRect(HWND hWnd, RECT *rect)
 }
 
 /**
- *	ウィンドウをディスプレイからはみ出さないように移動する
+ *	pointが存在するディスプレイのデスクトップの範囲を取得する
+ */
+static void GetDesktopRectFromPoint(const POINT *p, RECT *rect)
+{
+	if (pMonitorFromPoint == NULL) {
+		// NT4.0, 95 はマルチモニタAPIに非対応
+		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
+	}
+	else {
+		// マルチモニタがサポートされている場合
+		HMONITOR hm;
+		POINT pt;
+		MONITORINFO mi;
+
+		pt.x = p->x;
+		pt.y = p->y;
+		hm = pMonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+
+		mi.cbSize = sizeof(MONITORINFO);
+		pGetMonitorInfoA(hm, &mi);
+		*rect = mi.rcWork;
+	}
+}
+
+/**
+ *	ウィンドウを領域からはみ出さないように移動する
  *	はみ出ていない場合は移動しない
  *
  *	@param[in]	hWnd		位置を調整するウィンドウ
  */
-void MoveWindowToDisplay(HWND hWnd)
+void MoveWindowToDisplayRect(HWND hWnd, const RECT *rect)
 {
-	RECT desktop;
+	RECT desktop = *rect;
 	RECT win_rect;
 	int win_width;
 	int win_height;
@@ -193,6 +218,36 @@ void MoveWindowToDisplay(HWND hWnd)
 	if (modify) {
 		SetWindowPos(hWnd, NULL, win_x, win_y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
+}
+
+/**
+ *	ウィンドウをディスプレイからはみ出さないように移動する
+ *	ディスプレイはウィンドウが属しているディスプレイ
+ *	またいでいるときは面積の広い方
+ *	はみ出ていない場合は移動しない
+ *
+ *	@param[in]	hWnd		位置を調整するウィンドウ
+ */
+void MoveWindowToDisplay(HWND hWnd)
+{
+	RECT desktop;
+	GetDesktopRect(hWnd, &desktop);
+	MoveWindowToDisplayRect(hWnd, &desktop);
+}
+
+/**
+ *	ウィンドウをディスプレイからはみ出さないように移動する
+ *	ディスプレイはpointが属しているディスプレイ
+ *	はみ出ていない場合は移動しない
+ *
+ *	@param[in]	hWnd		位置を調整するウィンドウ
+ *	@param[in]	point		位置
+ */
+void MoveWindowToDisplayPoint(HWND hWnd, const POINT *point)
+{
+	RECT desktop;
+	GetDesktopRectFromPoint(point, &desktop);
+	MoveWindowToDisplayRect(hWnd, &desktop);
 }
 
 /**

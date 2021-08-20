@@ -166,7 +166,9 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 		clipboarddlgdata dlg_data;
 		dlg_data.strW_ptr = str_w;
 		dlg_data.UILanguageFileW = ts.UILanguageFileW;
+		dlg_data.PasteDialogSize = ts.PasteDialogSize;
 		ret = clipboarddlg(hInst, HWin, &dlg_data);
+		ts.PasteDialogSize = dlg_data.PasteDialogSize;
 		*out_str_w = dlg_data.strW_edited_ptr;
 	}
 

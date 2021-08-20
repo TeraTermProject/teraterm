@@ -47,26 +47,44 @@
 
 #include "clipboarddlg.h"
 
-static void GetDesktopRectFromPoint(POINT p, RECT *rect)
+typedef struct {
+	clipboarddlgdata *data;
+	int init_width;
+	int init_height;
+	HWND hStatus;
+	int ok2right;
+	int edit2ok;
+	int edit2bottom;
+} DlgPrivateData;
+
+static void TTGetCaretPos(HWND hDlgWnd, POINT *p)
 {
-	if (pMonitorFromPoint == NULL) {
-		// NT4.0, 95 はマルチモニタAPIに非対応
-		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
+	if (ActiveWin == IdVT) { // VT Window
+		/*
+		 * Caret off 時に GetCaretPos() で正確な場所が取れないので、
+		 * vtdisp.c 内部で管理している値から計算する
+		 */
+		int x, y;
+		DispConvScreenToWin(CursorX, CursorY, &x, &y);
+		p->x = x;
+		p->y = y;
 	}
-	else {
-		// マルチモニタがサポートされている場合
-		HMONITOR hm;
-		POINT pt;
-		MONITORINFO mi;
-
-		pt.x = p.x;
-		pt.y = p.y;
-		hm = pMonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
-
-		mi.cbSize = sizeof(MONITORINFO);
-		pGetMonitorInfoA(hm, &mi);
-		*rect = mi.rcWork;
+	else if (!GetCaretPos(p)) { // Tek Window
+		/*
+		 * Tek Window は内部管理の値を取るのが面倒なので GetCaretPos() を使う
+		 * GetCaretPos() がエラーになった場合は念のため 0, 0 を入れておく
+		 */
+		p->x = 0;
+		p->y = 0;
 	}
+
+	// x, y の両方が 0 の時は親ウィンドウの中央に移動させられるので、
+	// それを防ぐ為に x を 1 にする
+	if (p->x == 0 && p->y == 0) {
+		p->x = 1;
+	}
+
+	ClientToScreen(GetParent(hDlgWnd), p);
 }
 
 static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -76,106 +94,56 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDOK, "BTN_OK" },
 	};
-	POINT p;
-	RECT rc_dsk, rc_dlg;
-	int dlg_height, dlg_width;
-	static int ok2right, edit2ok, edit2bottom;
+	RECT rc_dlg;
 	RECT rc_edit, rc_ok, rc_cancel;
-	// for status bar
-	static HWND hStatus = NULL;
-	static int init_width, init_height;
-	clipboarddlgdata *data = (clipboarddlgdata *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
+	DlgPrivateData *pdata = (DlgPrivateData *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 
 	switch (msg) {
 		case WM_INITDIALOG:
-			data = (clipboarddlgdata *)lp;
-			SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)data);
-			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFileW);
+			pdata = (DlgPrivateData *)lp;
+			SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pdata);
+			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), pdata->data->UILanguageFileW);
 
-			if (data->strW_ptr != NULL) {
-				SetDlgItemTextW(hDlgWnd, IDC_EDIT, data->strW_ptr);
-			} else {
-				SetDlgItemTextA(hDlgWnd, IDC_EDIT, data->strA_ptr);
-			}
+			SetDlgItemTextW(hDlgWnd, IDC_EDIT, pdata->data->strW_ptr);
 
 			// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
 			InitCommonControls();
-			hStatus = CreateStatusWindow(
+			pdata->hStatus = CreateStatusWindow(
 				WS_CHILD | WS_VISIBLE |
 				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hDlgWnd, 1);
 
-			if (ActiveWin == IdVT) { // VT Window
-				/*
-				 * Caret off 時に GetCaretPos() で正確な場所が取れないので、
-				 * vtdisp.c 内部で管理している値から計算する
-				 */
-				int x, y;
-				DispConvScreenToWin(CursorX, CursorY, &x, &y);
-				p.x = x;
-				p.y = y;
-			}
-			else if (!GetCaretPos(&p)) { // Tek Window
-				/*
-				 * Tek Window は内部管理の値を取るのが面倒なので GetCaretPos() を使う
-				 * GetCaretPos() がエラーになった場合は念のため 0, 0 を入れておく
-				 */
-				p.x = 0;
-				p.y = 0;
-			}
-
-			// x, y の両方が 0 の時は親ウィンドウの中央に移動させられるので、
-			// それを防ぐ為に x を 1 にする
-			if (p.x == 0 && p.y == 0) {
-				p.x = 1;
-			}
-
-			ClientToScreen(GetParent(hDlgWnd), &p);
-
-			// キャレットが画面からはみ出しているときに貼り付けをすると
-			// 確認ウインドウが見えるところに表示されないことがある。
-			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
-			GetDesktopRectFromPoint(p, &rc_dsk);
-
+			// ダイアログのサイズ(初期値)
 			GetWindowRect(hDlgWnd, &rc_dlg);
-			dlg_height = rc_dlg.bottom-rc_dlg.top;
-			dlg_width  = rc_dlg.right-rc_dlg.left;
-			if (p.y < rc_dsk.top) {
-				p.y = rc_dsk.top;
-			}
-			else if (p.y + dlg_height > rc_dsk.bottom) {
-				p.y = rc_dsk.bottom - dlg_height;
-			}
-			if (p.x < rc_dsk.left) {
-				p.x = rc_dsk.left;
-			}
-			else if (p.x + dlg_width > rc_dsk.right) {
-				p.x = rc_dsk.right - dlg_width;
-			}
-
-			SetWindowPos(hDlgWnd, NULL, p.x, p.y,
-			             0, 0, SWP_NOSIZE | SWP_NOZORDER);
-
-			// ダイアログの初期サイズを保存
-			GetWindowRect(hDlgWnd, &rc_dlg);
-			init_width = rc_dlg.right - rc_dlg.left;
-			init_height = rc_dlg.bottom - rc_dlg.top;
+			pdata->init_width = rc_dlg.right-rc_dlg.left;
+			pdata->init_height = rc_dlg.bottom-rc_dlg.top;
 
 			// 現在サイズから必要な値を計算
 			GetClientRect(hDlgWnd,                                 &rc_dlg);
 			GetWindowRect(GetDlgItem(hDlgWnd, IDC_EDIT),           &rc_edit);
 			GetWindowRect(GetDlgItem(hDlgWnd, IDOK),               &rc_ok);
 
+			POINT p;
 			p.x = rc_dlg.right;
 			p.y = rc_dlg.bottom;
 			ClientToScreen(hDlgWnd, &p);
-			ok2right = p.x - rc_ok.left;
-			edit2bottom = p.y - rc_edit.bottom;
-			edit2ok = rc_ok.left - rc_edit.right;
+			pdata->ok2right = p.x - rc_ok.left;
+			pdata->edit2bottom = p.y - rc_edit.bottom;
+			pdata->edit2ok = rc_ok.left - rc_edit.right;
 
 			// サイズを復元
 			SetWindowPos(hDlgWnd, NULL, 0, 0,
-			             ts.PasteDialogSize.cx, ts.PasteDialogSize.cy,
+			             pdata->data->PasteDialogSize.cx, pdata->data->PasteDialogSize.cy,
 			             SWP_NOZORDER | SWP_NOMOVE);
+
+			// 位置移動
+			POINT CaretPos;
+			TTGetCaretPos(hDlgWnd, &CaretPos);
+			SetWindowPos(hDlgWnd, NULL, CaretPos.x, CaretPos.y,
+			             0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+			// 画面からはみ出さないよう移動
+			MoveWindowToDisplayPoint(hDlgWnd, &CaretPos);
+			//MoveWindowToDisplay(hDlgWnd);
 
 			return TRUE;
 
@@ -188,17 +156,15 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 					wchar_t *strW;
 					DWORD error = hGetDlgItemTextW(hDlgWnd, IDC_EDIT, &strW);
 					if (error == NO_ERROR) {
-						data->strW_edited_ptr = strW;
+						pdata->data->strW_edited_ptr = strW;
 						result = IDOK;
 					}
 
-					DestroyWindow(hStatus);
 					TTEndDialog(hDlgWnd, result);
 				}
 					break;
 
 				case IDCANCEL:
-					DestroyWindow(hStatus);
 					TTEndDialog(hDlgWnd, IDCANCEL);
 					break;
 
@@ -225,7 +191,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				p.y = rc_ok.top;
 				ScreenToClient(hDlgWnd, &p);
 				SetWindowPos(GetDlgItem(hDlgWnd, IDOK), 0,
-				             dlg_w - ok2right, p.y, 0, 0,
+				             dlg_w - pdata->ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// CANCEL
@@ -233,7 +199,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				p.y = rc_cancel.top;
 				ScreenToClient(hDlgWnd, &p);
 				SetWindowPos(GetDlgItem(hDlgWnd, IDCANCEL), 0,
-				             dlg_w - ok2right, p.y, 0, 0,
+				             dlg_w - pdata->ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// EDIT
@@ -241,28 +207,31 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				p.y = rc_edit.top;
 				ScreenToClient(hDlgWnd, &p);
 				SetWindowPos(GetDlgItem(hDlgWnd, IDC_EDIT), 0,
-				             0, 0, dlg_w - p.x - edit2ok - ok2right, dlg_h - p.y - edit2bottom,
+				             0, 0, dlg_w - p.x - pdata->edit2ok - pdata->ok2right, dlg_h - p.y - pdata->edit2bottom,
 				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// サイズを保存
 				GetWindowRect(hDlgWnd, &rc_dlg);
-				ts.PasteDialogSize.cx = rc_dlg.right - rc_dlg.left;
-				ts.PasteDialogSize.cy = rc_dlg.bottom - rc_dlg.top;
+				pdata->data->PasteDialogSize.cx = rc_dlg.right - rc_dlg.left;
+				pdata->data->PasteDialogSize.cy = rc_dlg.bottom - rc_dlg.top;
 
 				// status bar
-				SendMessage(hStatus , msg , wp , lp);
+				SendMessage(pdata->hStatus , msg , wp , lp);
 			}
 			return TRUE;
 
 		case WM_GETMINMAXINFO:
 			{
 				// ダイアログの初期サイズより小さくできないようにする
-				LPMINMAXINFO lpmmi;
-				lpmmi = (LPMINMAXINFO)lp;
-				lpmmi->ptMinTrackSize.x = init_width;
-				lpmmi->ptMinTrackSize.y = init_height;
+				LPMINMAXINFO lpmmi = (LPMINMAXINFO)lp;
+				lpmmi->ptMinTrackSize.x = pdata->init_width;
+				lpmmi->ptMinTrackSize.y = pdata->init_height;
 			}
 			return FALSE;
+
+		case WM_DESTROY:
+			DestroyWindow(pdata->hStatus);
+			return 0;
 
 		default:
 			return FALSE;
@@ -274,8 +243,11 @@ INT_PTR clipboarddlg(
 	HWND hWndParent,
 	clipboarddlgdata *data)
 {
+	DlgPrivateData *pdata = (DlgPrivateData * )calloc(sizeof(DlgPrivateData), 1);
 	INT_PTR ret;
+	pdata->data = data;
 	ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-						   hWndParent, OnClipboardDlgProc, (LPARAM)data);
+						   hWndParent, OnClipboardDlgProc, (LPARAM)pdata);
+	free(pdata);
 	return ret;
 }

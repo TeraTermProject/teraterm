@@ -129,6 +129,7 @@ DllExport void GetMessageboxFont(LOGFONTA *logfont);
 void GetDesktopRect(HWND hWnd, RECT *rect);
 void CenterWindow(HWND hWnd, HWND hWndParent);
 void MoveWindowToDisplay(HWND hWnd);
+void MoveWindowToDisplayPoint(HWND hWnd, const POINT *p);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 

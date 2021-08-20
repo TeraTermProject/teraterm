@@ -36,11 +36,10 @@ extern "C" {
 
 typedef struct {
 	const wchar_t *strW_ptr;
-	size_t strW_len;
-	wchar_t *strW_edited_ptr;
-	char *strA_ptr;
-	size_t strA_len;
+	wchar_t *strW_edited_ptr;		// ok‚ª‰Ÿ‚³‚ê‚½‚Æ‚«•Ô‚Á‚Ä‚­‚é
 	const wchar_t *UILanguageFileW;
+	TTTSet *pts;
+	SIZE PasteDialogSize;
 } clipboarddlgdata;
 
 INT_PTR clipboarddlg(
