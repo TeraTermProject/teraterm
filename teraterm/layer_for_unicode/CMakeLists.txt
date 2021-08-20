@@ -53,7 +53,7 @@ else()
   include("list_asm.cmake")
 
   if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
-    set(BUILDTOOLS_NASM ${CMAKE_CURRENT_LIST_DIR}/../../../buildtools/nasm/nasm.exe)
+    set(BUILDTOOLS_NASM ${CMAKE_CURRENT_LIST_DIR}/../../buildtools/nasm/nasm.exe)
     if(EXISTS ${BUILDTOOLS_NASM})
       set(CMAKE_ASM_NASM_COMPILER ${BUILDTOOLS_NASM})
     endif()
