@@ -40,109 +40,74 @@
 #include <imm.h>
 #include <assert.h>
 #include "asprintf.h"
+#include "dllutil.h"
 #include "ttime.h"
 
 // #define ENABLE_DUMP	1
 
-typedef LONG (WINAPI *TImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
-typedef LONG (WINAPI *TImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
-typedef HIMC (WINAPI *TImmGetContext)(HWND);
-typedef BOOL (WINAPI *TImmReleaseContext)(HWND, HIMC);
-typedef BOOL (WINAPI *TImmSetCompositionFontA)(HIMC, LPLOGFONTA);
-typedef BOOL (WINAPI *TImmSetCompositionFontW)(HIMC, LPLOGFONTW);
-typedef BOOL (WINAPI *TImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
-typedef BOOL (WINAPI *TImmGetOpenStatus)(HIMC);
-typedef BOOL (WINAPI *TImmSetOpenStatus)(HIMC, BOOL);
-
-static TImmGetCompositionStringW PImmGetCompositionStringW;
-static TImmGetCompositionStringA PImmGetCompositionStringA;
-static TImmGetContext PImmGetContext;
-static TImmReleaseContext PImmReleaseContext;
-static TImmSetCompositionFontA PImmSetCompositionFontA;
-static TImmSetCompositionFontW PImmSetCompositionFontW;
-static TImmSetCompositionWindow PImmSetCompositionWindow;
-static TImmGetOpenStatus PImmGetOpenStatus;
-static TImmSetOpenStatus PImmSetOpenStatus;
-
+static LONG (WINAPI *PImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
+static LONG (WINAPI *PImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
+static HIMC (WINAPI *PImmGetContext)(HWND);
+static BOOL (WINAPI *PImmReleaseContext)(HWND, HIMC);
+static BOOL (WINAPI *PImmSetCompositionFontA)(HIMC, LPLOGFONTA);
+static BOOL (WINAPI *PImmSetCompositionFontW)(HIMC, LPLOGFONTW);
+static BOOL (WINAPI *PImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
+static BOOL (WINAPI *PImmGetOpenStatus)(HIMC);
+static BOOL (WINAPI *PImmSetOpenStatus)(HIMC, BOOL);
 
 static HANDLE HIMEDLL = NULL;
 static LOGFONTA IMELogFontA;
 static LOGFONTW IMELogFontW;
 
+static const APIInfo imeapi[] = {
+	{ "ImmGetCompositionStringW", (void **)&PImmGetCompositionStringW },
+	{ "ImmGetCompositionStringA", (void **)&PImmGetCompositionStringA },
+	{ "ImmGetContext", (void **)&PImmGetContext },
+	{ "ImmReleaseContext", (void **)&PImmReleaseContext },
+	{ "ImmSetCompositionFontA", (void **)&PImmSetCompositionFontA },
+	{ "ImmSetCompositionFontW", (void **)&PImmSetCompositionFontW },
+	{ "ImmSetCompositionWindow", (void **)&PImmSetCompositionWindow },
+	{ "ImmGetOpenStatus", (void **)&PImmGetOpenStatus },
+	{ "ImmSetOpenStatus", (void **)&PImmSetOpenStatus },
+	{ NULL, NULL },
+};
+
 BOOL LoadIME(void)
 {
-  BOOL Err;
-  char imm32_dll[MAX_PATH];
-
-  if (HIMEDLL != NULL) return TRUE;
-
-  GetSystemDirectoryA(imm32_dll, sizeof(imm32_dll));
-  strncat_s(imm32_dll, sizeof(imm32_dll), "\\imm32.dll", _TRUNCATE);
-  HIMEDLL = LoadLibraryA(imm32_dll);
-  if (HIMEDLL == NULL)
-  {
-	return FALSE;
-  }
-
-  Err = FALSE;
-
-  PImmGetCompositionStringW = (TImmGetCompositionStringW)GetProcAddress(
-	HIMEDLL, "ImmGetCompositionStringW");
-  if (PImmGetCompositionStringW==NULL) Err = TRUE;
-
-  PImmGetCompositionStringA = (TImmGetCompositionStringA)GetProcAddress(
-	HIMEDLL, "ImmGetCompositionStringA");
-  if (PImmGetCompositionStringA==NULL) Err = TRUE;
-
-  PImmGetContext = (TImmGetContext)GetProcAddress(
-	HIMEDLL, "ImmGetContext");
-  if (PImmGetContext==NULL) Err = TRUE;
-
-  PImmReleaseContext = (TImmReleaseContext)GetProcAddress(
-	HIMEDLL, "ImmReleaseContext");
-  if (PImmReleaseContext==NULL) Err = TRUE;
-
-  PImmSetCompositionFontA = (TImmSetCompositionFontA)GetProcAddress(
-	HIMEDLL, "ImmSetCompositionFontA");
-  if (PImmSetCompositionFontA==NULL) Err = TRUE;
-
-  PImmSetCompositionFontW = (TImmSetCompositionFontW)GetProcAddress(
-	HIMEDLL, "ImmSetCompositionFontW");
-
-  PImmSetCompositionWindow = (TImmSetCompositionWindow)GetProcAddress(
-	HIMEDLL, "ImmSetCompositionWindow");
-  if (PImmSetCompositionWindow==NULL) Err = TRUE;
-
-  PImmGetOpenStatus = (TImmGetOpenStatus)GetProcAddress(
-	HIMEDLL, "ImmGetOpenStatus");
-  if (PImmGetOpenStatus==NULL) Err = TRUE;
-
-  PImmSetOpenStatus = (TImmSetOpenStatus)GetProcAddress(
-	HIMEDLL, "ImmSetOpenStatus");
-  if (PImmSetOpenStatus==NULL) Err = TRUE;
-
-  if ( Err )
-  {
-	FreeLibrary(HIMEDLL);
-	HIMEDLL = NULL;
-	return FALSE;
-  }
-
-  return TRUE;
+	HANDLE hDll;
+	DWORD error;
+	if (HIMEDLL != NULL) {
+		// 2d‰Šú‰»?
+		return TRUE;
+	}
+	error = DLLGetApiAddressFromList(L"imm32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ERROR_NOT_EXIST, imeapi, &hDll);
+	if (error == NO_ERROR) {
+		HIMEDLL = hDll;
+	}
+	return error != NO_ERROR ? FALSE : TRUE;
 }
 
 void FreeIME(HWND hWnd)
 {
-  HANDLE HTemp;
+	HANDLE HTemp;
 
-  if (HIMEDLL==NULL) return;
-  HTemp = HIMEDLL;
-  HIMEDLL = NULL;
+	if (HIMEDLL == NULL)
+		return;
+	HTemp = HIMEDLL;
+	HIMEDLL = NULL;
 
-  /* position of conv. window -> default */
-  SetConversionWindow(hWnd,-1,0);
-  Sleep(1); // for safety
-  FreeLibrary(HTemp);
+	/* position of conv. window -> default */
+	SetConversionWindow(hWnd,-1,0);
+	Sleep(1); // for safety
+
+	DLLFreeByHandle(HTemp);
+	{
+		const APIInfo *p = imeapi;
+		while(p->ApiName != NULL) {
+			*p->func = NULL;
+			p++;
+		}
+	}
 }
 
 BOOL CanUseIME(void)

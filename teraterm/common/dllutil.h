@@ -31,14 +31,14 @@ extern "C" {
 #endif
 
 typedef enum {
-	DLL_GET_MODULE_HANDLE,
-	DLL_LOAD_LIBRARY_SYSTEM,
-	DLL_LOAD_LIBRARY_CURRENT,
+	DLL_GET_MODULE_HANDLE,		// GetModuleHandleW() APIを使用する
+	DLL_LOAD_LIBRARY_SYSTEM,	// system ディレクトリから LoadLiberaryW() APIでロード
+	DLL_LOAD_LIBRARY_CURRENT,	// カレントディレクトリから LoadLiberaryW() APIでロード
 } DLLLoadFlag;
 
 typedef enum {
-	DLL_ACCEPT_NOT_EXIST,
-	DLL_ERROR_NOT_EXIST,
+	DLL_ACCEPT_NOT_EXIST,	//	見つからなくてもok
+	DLL_ERROR_NOT_EXIST,	//	見つからない場合エラー
 } DLLFuncFlag;
 
 typedef struct {
@@ -56,10 +56,12 @@ typedef struct {
 void DLLInit();
 void DLLExit();
 void DLLGetApiAddressFromLists(const DllInfo *dllInfos);
-DWORD DLLGetApiAddressFromList(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
-							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo);
-DWORD DLLGetApiAddress(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
+DWORD DLLGetApiAddressFromList(const wchar_t *fname, DLLLoadFlag LoadFlag,
+							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo, HANDLE *handle);
+DWORD DLLGetApiAddress(const wchar_t *fname, DLLLoadFlag LoadFlag,
 					   const char *ApiName, void **pFunc);
+void DLLFreeByFileName(const wchar_t *fname);
+void DLLFreeByHandle(HANDLE handle);
 
 #ifdef __cplusplus
 }

@@ -36,7 +36,7 @@
 #include "dllutil.h"
 
 typedef struct {
-	const wchar_t *dllName;
+	const wchar_t *fname;
 	DLLLoadFlag LoadFlag;
 	HMODULE handle;
 	int refCount;
@@ -45,7 +45,7 @@ typedef struct {
 static HandleList_t *HandleList;
 static int HandleListCount;
 
-static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
+static HMODULE GetHandle(const wchar_t *fname, DLLLoadFlag LoadFlag)
 {
 	wchar_t dllPath[MAX_PATH];
 	HMODULE module;
@@ -54,7 +54,7 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	int r;
 
 	if (LoadFlag == DLL_GET_MODULE_HANDLE) {
-		module = GetModuleHandleW(dllName);
+		module = GetModuleHandleW(fname);
 		assert(module != NULL);
 		return module;
 	}
@@ -62,7 +62,7 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	// 以前にロードした?
 	p = HandleList;
 	for (i = 0; i < HandleListCount; i++) {
-		if (wcscmp(p->dllName, dllName) == 0) {
+		if (wcscmp(p->fname, fname) == 0) {
 			p->refCount++;
 			return p->handle;
 		}
@@ -87,7 +87,7 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 		return NULL;
 	}
 	wcscat_s(dllPath, _countof(dllPath), L"\\");
-	wcscat_s(dllPath, _countof(dllPath), dllName);
+	wcscat_s(dllPath, _countof(dllPath), fname);
 	module = LoadLibraryW(dllPath);
 	if (module == NULL) {
 		// 存在しない,dllじゃない?
@@ -98,62 +98,95 @@ static HMODULE GetHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
 	HandleListCount++;
 	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t)*HandleListCount);
 	p = &HandleList[i];
-	p->dllName = _wcsdup(dllName);
+	p->fname = _wcsdup(fname);
 	p->handle = module;
 	p->LoadFlag = LoadFlag;
 	p->refCount = 1;
 	return module;
 }
 
-static void FreeHandle(const wchar_t *dllName, DLLLoadFlag LoadFlag)
+static void DLLFree(HandleList_t *p)
 {
-	int i;
-	HandleList_t *p;
-
-	if (LoadFlag == DLL_GET_MODULE_HANDLE) {
-		// そのまま置いておく
-		return;
-	}
-
-	// リストから削除する
-	p = HandleList;
-	for (i = 0; i < HandleListCount; i++) {
-		if (wcscmp(p->dllName, dllName) != 0) {
-			continue;
-		}
-
-		// 見つかった
-		p->refCount--;
-		if (p->refCount > 0) {
-			continue;
-		}
-
-		// free
+	if (p->LoadFlag != DLL_GET_MODULE_HANDLE) {
 		FreeLibrary(p->handle);
-		free((void *)p->dllName);
-		memcpy(p, p+1, sizeof(*p) + (HandleListCount - i - 1));
-		HandleListCount--;
-		HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t)*HandleListCount);
+	}
+	free((void *)p->fname);
+}
+
+static void DLLFreeFromList(int no)
+{
+	HandleList_t *p = &HandleList[no];
+	p->refCount--;
+	if (p->refCount > 0) {
 		return;
 	}
-	// リストに見つからなかった
+
+	// 開放する
+	DLLFree(p);
+	memcpy(p, p+1, sizeof(*p) + (HandleListCount - no - 1));
+	HandleListCount--;
+	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t)*HandleListCount);
+}
+
+/**
+ *	dllをアンロードする
+ *
+ *	@param[in]	handle
+ */
+void DLLFreeByHandle(HANDLE handle)
+{
+	// リストから探す
+	HandleList_t *p = HandleList;
+	for (int i = 0; i < HandleListCount; i++) {
+		if (p->handle == handle) {
+			// 見つかった、削除
+			DLLFreeFromList(i);
+			return;
+		}
+		p++;
+	}
+
+	// リストになかった
+}
+
+/**
+ *	dllをアンロードする
+ *
+ *	@param[in]	fname	ファイル名
+ */
+void DLLFreeByFileName(const wchar_t *fname)
+{
+	// リストから探す
+	HandleList_t *p = HandleList;
+	for (int i = 0; i < HandleListCount; i++) {
+		if (wcscmp(p->fname, fname) == 0) {
+			// 見つかった、削除
+			DLLFreeFromList(i);
+			return;
+		}
+		p++;
+	}
+
+	// リストになかった
 }
 
 /**
  * DLL内の関数へのアドレスを取得する
- * @param[in,out]	pFunc		関数へのアドレス
- *								見つからない時はNULLが代入される
+ * @param[in]		fname		DLLファイル名
  * @param[in] 		FuncFlag	関数が見つからないときの動作
  *					DLL_ACCEPT_NOT_EXIST	見つからなくてもok
  *					DLL_ERROR_NOT_EXIST		見つからない場合エラー
+ * @param[in]		ApiName		API名
+ * @param[in,out]	pFunc		関数へのアドレス
+ *								見つからない時はNULLが代入される
  * @retval	NO_ERROR				エラーなし
  * @retval	ERROR_FILE_NOT_FOUND	DLLが見つからない(不正なファイル)
  * @retval	ERROR_PROC_NOT_FOUND	関数エントリが見つからない
  */
-DWORD DLLGetApiAddress(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
+DWORD DLLGetApiAddress(const wchar_t *fname, DLLLoadFlag LoadFlag,
 					   const char *ApiName, void **pFunc)
 {
-	HMODULE hDll = GetHandle(dllPath, LoadFlag);
+	HMODULE hDll = GetHandle(fname, LoadFlag);
 	if (hDll == NULL) {
 		*pFunc = NULL;
 		return ERROR_FILE_NOT_FOUND;
@@ -168,22 +201,30 @@ DWORD DLLGetApiAddress(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
 
 /**
  * DLL内の複数の関数へのアドレスを取得する
+ * @param[in] fname		dllのファイル名
+ * @param[in] LoadFlag	dllのロード先
+ *				DLL_GET_MODULE_HANDLE,
+ *				DLL_LOAD_LIBRARY_SYSTEM,
+ *				DLL_LOAD_LIBRARY_CURRENT,
  * @param[in] FuncFlag	関数が見つからないときの動作
- *				DLL_ACCEPT_NOT_EXIST	見つからなくてもok
- *				DLL_ERROR_NOT_EXIST		見つからない場合エラー
+ * @param[out] handle	DLLハンドル
+ *				NULLのときは値を返さない
  * @retval	NO_ERROR				エラーなし
  * @retval	ERROR_FILE_NOT_FOUND	DLLが見つからない(不正なファイル)
  * @retval	ERROR_PROC_NOT_FOUND	関数エントリが見つからない
  */
-DWORD DLLGetApiAddressFromList(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
-							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo)
+DWORD DLLGetApiAddressFromList(const wchar_t *fname, DLLLoadFlag LoadFlag,
+							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo, HANDLE *handle)
 {
-	HMODULE hDll = GetHandle(dllPath, LoadFlag);
+	HMODULE hDll = GetHandle(fname, LoadFlag);
 	if (hDll == NULL) {
 		while(ApiInfo->ApiName != NULL) {
 			void **func = ApiInfo->func;
 			*func = NULL;
 			ApiInfo++;
+		}
+		if (handle != NULL) {
+			*handle = NULL;
 		}
 		return ERROR_FILE_NOT_FOUND;
 	} else {
@@ -202,6 +243,9 @@ DWORD DLLGetApiAddressFromList(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
 
 		// すべて見つかった or 見つからないAPIがあってもok
 		if (exist_all || FuncFlag == DLL_ACCEPT_NOT_EXIST) {
+			if (handle != NULL) {
+				*handle = hDll;
+			}
 			return NO_ERROR;
 		}
 
@@ -212,7 +256,10 @@ DWORD DLLGetApiAddressFromList(const wchar_t *dllPath, DLLLoadFlag LoadFlag,
 			*func = NULL;
 			p++;
 		}
-		FreeHandle(dllPath, LoadFlag);
+		DLLFreeByFileName(fname);
+		if (handle != NULL) {
+			*handle = NULL;
+		}
 		return ERROR_PROC_NOT_FOUND;
 	}
 }
@@ -223,7 +270,7 @@ void DLLGetApiAddressFromLists(const DllInfo *dllInfos)
 		DLLGetApiAddressFromList(dllInfos->DllName,
 								 dllInfos->LoadFlag,
 								 dllInfos->FuncFlag,
-								 dllInfos->APIInfoPtr);
+								 dllInfos->APIInfoPtr, NULL);
 		dllInfos++;
 	}
 }
@@ -276,10 +323,7 @@ void DLLExit()
 	}
 	for (i = 0; i < HandleListCount; i++) {
 		HandleList_t *p = &HandleList[i];
-		if (p->LoadFlag != DLL_GET_MODULE_HANDLE) {
-			FreeLibrary(p->handle);
-		}
-		free((void *)p->dllName);
+		DLLFree(p);
 	}
 	free(HandleList);
 	HandleList = NULL;
