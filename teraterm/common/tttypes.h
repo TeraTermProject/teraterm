@@ -789,6 +789,7 @@ typedef struct tttset TTTSet, *PTTSet;
 /* GetHostName dialog record */
 typedef struct {
 	PCHAR SetupFN; // setup file name
+	const wchar_t *SetupFNW;
 	WORD PortType; // TCPIP/Serial
 	PCHAR HostName; // host name
 	WORD Telnet; // non-zero: enable telnet

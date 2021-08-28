@@ -3478,6 +3478,7 @@ void CVTWindow::OnFileNewConnection()
 
 	HelpId = HlpFileNewConnection;
 	GetHNRec.SetupFN = ts.SetupFName;
+	GetHNRec.SetupFNW = ts.SetupFNameW;
 	GetHNRec.PortType = ts.PortType;
 	GetHNRec.Telnet = ts.Telnet;
 	GetHNRec.TelPort = ts.TelPort;

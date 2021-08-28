@@ -1624,7 +1624,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
 			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT,
 			                   HostNameMaxLength-1, 0);

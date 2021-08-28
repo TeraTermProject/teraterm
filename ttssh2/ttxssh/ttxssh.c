@@ -1009,8 +1009,8 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	static char *ssh_version[] = {"SSH1", "SSH2", NULL};
-	static char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
+	static const char *ssh_version[] = {"SSH1", "SSH2", NULL};
+	static const char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 	PGetHNRec GetHNRec;
 	char EntName[128];
 	WORD i, j, w;
@@ -1039,21 +1039,19 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			GetHNRec->PortType = IdTCPIP;
 
 		{
-			wchar_t *SetupFnW = ToWcharA(GetHNRec->SetupFN);
 			i = 1;
 			do {
 				wchar_t EntNameW[128];
-				wchar_t TempHostW[HostNameMaxLength + 1];
+				wchar_t *TempHostW;
 				_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
-				GetPrivateProfileStringW(L"Hosts", EntNameW, L"",
-										 TempHostW, _countof(TempHostW),
-										 SetupFnW);
-				if (TempHostW[0] != 0)
+				hGetPrivateProfileStringW(L"Hosts", EntNameW, L"", GetHNRec->SetupFNW, &TempHostW);
+				if (TempHostW[0] != 0) {
 					SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
 										0, (LPARAM) TempHostW);
+				}
+				free(TempHostW);
 				i++;
 			} while (i <= MAXHOSTLIST);
-			free(SetupFnW);
 		}
 
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
@@ -1783,6 +1781,7 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	}
 
 	free(option);
+	free(option2);
 
 	FWDUI_load_settings(pvar);
 
@@ -4835,6 +4834,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		// リーク時のブロック番号を元にブレークを仕掛けるには、以下のようにする。
 		//_CrtSetBreakAlloc(3228);
 #endif
+//		_CrtSetBreakAlloc(259);
 		DisableThreadLibraryCalls(hInstance);
 		hInst = hInstance;
 		pvar = &InstVar;
