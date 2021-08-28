@@ -1983,7 +1983,7 @@ void ResetIME()
 				MB_ICONEXCLAMATION
 			};
 			TTMessageBoxW(0, &info, ts.UILanguageFileW);
-			WritePrivateProfileStringA("Tera Term","IME","off",ts.SetupFName);
+			WritePrivateProfileStringW(L"Tera Term", L"IME", L"off", ts.SetupFNameW);
 			ts.UseIME = 0;
 		}
 

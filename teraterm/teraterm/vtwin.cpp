@@ -124,11 +124,12 @@ static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
-#ifndef WM_IME_COMPOSITION
-#define WM_IME_COMPOSITION              0x010F
-#endif
-
 UnicodeDebugParam_t UnicodeDebugParam;
+typedef struct {
+	char dbcs_lead_byte;
+} vtwin_work_t;
+static vtwin_work_t vtwin_work;
+
 extern "C" PrintFile *PrintFile_;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1327,14 +1328,38 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		u16 = (wchar_t)nChar;
 	} else {
 		// 入力は ANSI
-		//		ANSI(ACP) -> UTF-32 -> UTF-16
-		const char mb_str[2] = {(char)nChar, 0};
-		unsigned int u32;
-		size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
-		if (mb_len == 0) {
+		if (vtwin_work.dbcs_lead_byte == 0 && IsDBCSLeadByte(nChar)) {
+			// ANSI 2バイト文字の 1byte目だった
+			//	通常は WM_IME_* メッセージで処理される
+			//	次の場合ここに入ってくる
+			//		TERATERM.INI で IME=off のとき
+			//		imm32.dll がロードできなかったとき
+			vtwin_work.dbcs_lead_byte = nChar;
 			return;
 		}
-		u16 = (wchar_t)u32;
+		else {
+			// ANSI(ACP) -> UTF-32 -> UTF-16
+			char mb_str[2];
+			size_t mb_len;
+			if (vtwin_work.dbcs_lead_byte == 0) {
+				// 1バイト文字
+				mb_str[0] = (char)nChar;
+				mb_len = 1;
+			}
+			else {
+				// 2バイト文字
+				mb_str[0] = (char)vtwin_work.dbcs_lead_byte;
+				mb_str[1] = (char)nChar;
+				mb_len = 2;
+				vtwin_work.dbcs_lead_byte = 0;
+			}
+			unsigned int u32;
+			mb_len = MBCPToUTF32(mb_str, mb_len, CP_ACP, &u32);
+			if (mb_len == 0) {
+				return;
+			}
+			u16 = (wchar_t)u32;
+		}
 	}
 
 	// バッファへ出力、画面へ出力
