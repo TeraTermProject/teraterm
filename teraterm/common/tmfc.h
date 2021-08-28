@@ -90,14 +90,6 @@ public:
 	virtual ~TTCFrameWnd();
 	static TTCFrameWnd *pseudoPtr;
 	static LRESULT CALLBACK ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
-	BOOL CreateA(HINSTANCE hInstance,
-				 LPCSTR lpszClassName,
-				 LPCSTR lpszWindowName,
-				 DWORD dwStyle = WS_OVERLAPPEDWINDOW,
-				 const RECT& rect = rectDefault,
-				 HWND pParentWnd = NULL,
-				 LPCTSTR lpszMenuName = NULL,
-				 DWORD dwExStyle = 0);
 	BOOL CreateW(HINSTANCE hInstance,
 				 LPCWSTR lpszClassName,
 				 LPCWSTR lpszWindowName,

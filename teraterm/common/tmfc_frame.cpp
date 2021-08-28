@@ -53,41 +53,6 @@ TTCFrameWnd::~TTCFrameWnd()
 {
 }
 
-BOOL TTCFrameWnd::CreateA(
-	HINSTANCE hInstance,
-	LPCSTR lpszClassName,
-	LPCSTR lpszWindowName,
-	DWORD dwStyle,
-	const RECT& rect,
-	HWND hParentWnd,
-	LPCTSTR lpszMenuName,
-	DWORD dwExStyle)
-{
-	m_hInst = hInstance;
-	m_hParentWnd = hParentWnd;
-	pseudoPtr = this;
-	HWND hWnd = ::CreateWindowEx(
-		WS_EX_OVERLAPPEDWINDOW,
-		lpszClassName,
-		lpszWindowName,
-		dwStyle,
-		rect.left, rect.top,
-		rect.right - rect.left, rect.bottom - rect.top,
-		hParentWnd,
-		nullptr,
-		hInstance,
-		nullptr);
-	pseudoPtr = nullptr;
-	if (hWnd == nullptr) {
-		OutputDebugPrintf("CreateWindow %d\n", GetLastError());
-		return FALSE;
-	} else {
-		m_hWnd = hWnd;
-		SetWindowLongPtr(GWLP_USERDATA, (LONG_PTR)this);
-		return TRUE;
-	}
-}
-
 BOOL TTCFrameWnd::CreateW(
 	HINSTANCE hInstance,
 	LPCWSTR lpszClassName,

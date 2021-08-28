@@ -781,3 +781,37 @@ UINT WINAPI _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT u
 	free(lpPrefixStringA);
 	return r;
 }
+
+LRESULT WINAPI _DefWindowProcW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	return DefWindowProcA(hWnd, Msg, wParam, lParam);
+}
+
+BOOL WINAPI _ModifyMenuW(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem)
+{
+	char *lpNewItemA = ToCharW(lpNewItem);
+	BOOL r = ModifyMenuA(hMnu, uPosition, uFlags, uIDNewItem, lpNewItemA);
+	free(lpNewItemA);
+	return r;
+}
+
+int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags)
+{
+	int len = GetMenuStringA(hMenu, uIDItem, NULL, 0, flags);
+	if (len == 0) {
+		return 0;
+	}
+	len++;	// for '\0'
+	char *strA = (char* )malloc(len);
+	int r = GetMenuStringA(hMenu, uIDItem, strA, len, flags);
+	if (r == 0) {
+		free(strA);
+		return 0;
+	}
+	wchar_t *strW = ToWcharA(strA);
+	wcsncpy_s(lpString, cchMax, strW, _TRUNCATE);
+	len = wcslen(lpString);
+	free(strW);
+	free(strA);
+	return len;
+}

@@ -259,10 +259,10 @@ BOOL TTCWnd::EndPaint(LPPAINTSTRUCT lpPaint)
 
 LRESULT TTCWnd::DefWindowProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	return DefWindowProcW(m_hWnd, msg, wParam, lParam);
+	return ::DefWindowProcW(m_hWnd, msg, wParam, lParam);
 }
 
-////////////////////////////////////////	
+////////////////////////////////////////
 
 TTCDialog *TTCDialog::pseudoPtr;
 

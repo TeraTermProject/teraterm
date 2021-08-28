@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DefWindowProcW.obj"
+				>
+			</File>
+			<File
 				RelativePath=".\DeleteFileW.obj"
 				>
 			</File>
@@ -216,6 +220,10 @@
 			</File>
 			<File
 				RelativePath=".\GetFullPathNameW.obj"
+				>
+			</File>
+			<File
+				RelativePath=".\GetMenuStringW.obj"
 				>
 			</File>
 			<File
@@ -276,6 +284,10 @@
 			</File>
 			<File
 				RelativePath=".\MessageBoxW.obj"
+				>
+			</File>
+			<File
+				RelativePath=".\ModifyMenuW.obj"
 				>
 			</File>
 			<File

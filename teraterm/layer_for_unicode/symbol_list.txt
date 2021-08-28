@@ -16,6 +16,9 @@ user32 DialogBoxIndirectParamW@20
 user32 SetWindowLongW@12
 user32 GetWindowLongW@8
 user32 DrawTextW@20
+user32 DefWindowProcW@16
+user32 ModifyMenuW@20
+user32 GetMenuStringW@20
 
 kernel32 GetFileAttributesW@4
 kernel32 GetModuleFileNameW@12

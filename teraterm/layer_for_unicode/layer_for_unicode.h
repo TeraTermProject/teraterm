@@ -42,6 +42,7 @@
 extern "C" {
 #endif
 
+// user32.dll
 BOOL WINAPI _SetWindowTextW(HWND hWnd, LPCWSTR lpString);
 BOOL WINAPI _SetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPCWSTR lpString);
 UINT WINAPI _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cchMax);
@@ -62,6 +63,9 @@ LONG_PTR WINAPI _SetWindowLongPtrW(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 LONG_PTR WINAPI _GetWindowLongPtrW(HWND hWnd, int nIndex);
 LRESULT WINAPI _CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
+LRESULT WINAPI _DefWindowProcW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+BOOL WINAPI _ModifyMenuW(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
+int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
 
 // kernel32.dll
 DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName);

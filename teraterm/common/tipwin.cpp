@@ -164,7 +164,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 			break;
 	}
 
-	return DefWindowProc(hWnd, nMsg, wParam, lParam);
+	return DefWindowProcW(hWnd, nMsg, wParam, lParam);
 }
 
 CTipWin::CTipWin(HINSTANCE hInstance): hInstance(hInstance)

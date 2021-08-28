@@ -30,9 +30,13 @@
 
 #include "codeconv.h"
 
+// #define ALWAYS_ANSI	1
+
 static bool IsWindowsNTKernel(void)
 {
-#if defined(_MSC_VER) && _MSC_VER > 1400
+#if ALWAYS_ANSI
+	return false;
+#elif defined(_MSC_VER) && _MSC_VER > 1400
 	// VS2005よりあたらしい場合は、NTのみをターゲットとする
 	return true;
 #else

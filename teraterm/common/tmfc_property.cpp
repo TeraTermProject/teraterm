@@ -86,7 +86,7 @@ void TTCPropertyPage::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 
 HBRUSH TTCPropertyPage::OnCtlColor(HDC hDC, HWND hWnd)
 {
-	return (HBRUSH)::DefWindowProc(m_hWnd, WM_CTLCOLORSTATIC, (WPARAM)hDC, (LPARAM)hWnd);
+	return (HBRUSH)::DefWindowProcW(m_hWnd, WM_CTLCOLORSTATIC, (WPARAM)hDC, (LPARAM)hWnd);
 }
 
 void TTCPropertyPage::OnHelp()
