@@ -69,9 +69,3 @@ BOOL LoadTTDLG()
 
 	return TRUE;
 }
-
-BOOL FreeTTDLG()
-{
-	return TRUE;
-}
-

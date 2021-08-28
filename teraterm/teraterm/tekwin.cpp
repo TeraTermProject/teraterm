@@ -731,7 +731,6 @@ void CTEKWindow::OnSetupWindow()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupWin)(HTEKWin, &ts);
-	FreeTTDLG();
 	if (Ok) {
 		(*TEKResetWin)(&tk,&ts,OldEmu);
 		ChangeTitle();
@@ -750,7 +749,6 @@ void CTEKWindow::OnSetupFont()
 		return;
 	}
 	Ok = (*ChooseFontDlg)(HTEKWin,&tk.TEKlf,&ts);
-	FreeTTDLG();
 	if (! Ok) {
 		return;
 	}
@@ -774,7 +772,6 @@ void CTEKWindow::OnWindowWindow()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*WindowWindow)(HTEKWin,&Close);
-	FreeTTDLG();
 	if (Close) {
 		OnClose();
 	}
@@ -791,7 +788,6 @@ void CTEKWindow::OnHelpAbout()
 		return;
 	}
 	(*AboutDialog)(tk.HWin);
-	FreeTTDLG();
 }
 
 LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)

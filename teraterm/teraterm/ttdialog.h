@@ -72,7 +72,6 @@ extern PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
 
 /* proto types */
 BOOL LoadTTDLG();
-BOOL FreeTTDLG();
 
 #ifdef __cplusplus
 }

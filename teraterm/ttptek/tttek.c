@@ -789,7 +789,6 @@ void PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
 
 //  if (! LoadTTDLG()) return;
 //  Ok = (*ChooseFontDlg)(tk->HWin,&tk->TEKlf,NULL);
-//  FreeTTDLG();
 //  if (! Ok) return;
 
   strncpy_s(ts->TEKFont, sizeof(ts->TEKFont), tk->TEKlf.lfFaceName, _TRUNCATE);
@@ -883,7 +882,6 @@ void PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
   if (! LoadTTDLG()) return FALSE;
   OldEmu = ts->TEKColorEmu;
   Ok = (*SetupWin)(tk->HWin, ts);
-  FreeTTDLG();
 
   if (Ok) TEKResetWin(tk,ts,OldEmu);
   return Ok;

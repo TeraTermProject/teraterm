@@ -3373,7 +3373,6 @@ void DispSetupFontDlg()
   if (! LoadTTDLG()) return;
   SetLogFont(&VTlf, FALSE);
   Ok = ChooseFontDlg(HVTWin,&VTlf,&ts);
-  FreeTTDLG();
   if (! Ok) return;
 
   strncpy_s(ts.VTFont, sizeof(ts.VTFont),VTlf.lfFaceName, _TRUNCATE);

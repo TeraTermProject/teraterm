@@ -1494,10 +1494,6 @@ void CVTWindow::OnDestroy()
 
 	FreeIME(HVTWin);
 	FreeTTSET();
-#if 0	// freeに失敗するまでfreeし続ける
-	do { }
-	while (FreeTTDLG());
-#endif
 
 #if 0
 	do { }
@@ -3575,8 +3571,6 @@ void CVTWindow::OnFileNewConnection()
 			SetDdeComReady(0);
 		}
 	}
-
-	FreeTTDLG();
 }
 
 
@@ -4138,7 +4132,6 @@ void CVTWindow::OnFileChangeDir()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*ChangeDirectory)(HVTWin,ts.FileDir);
-	FreeTTDLG();
 }
 
 void CVTWindow::OnFilePrint()
@@ -4335,7 +4328,6 @@ void CVTWindow::OnSetupTerminal()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupTerminal)(HVTWin, &ts);
-	FreeTTDLG();
 	if (Ok) {
 		SetupTerm();
 	}
@@ -4358,7 +4350,6 @@ void CVTWindow::OnSetupWindow()
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	strncpy_s(orgTitle, sizeof(orgTitle), ts.Title, _TRUNCATE);
 	Ok = (*SetupWin)(HVTWin, &ts);
-	FreeTTDLG();
 
 	if (Ok) {
 		// Eterm lookfeelの画面情報も更新することで、リアルタイムでの背景色変更が
@@ -4460,7 +4451,6 @@ void CVTWindow::OnSetupKeyboard()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupKeyboard)(HVTWin, &ts);
-	FreeTTDLG();
 
 	if (Ok) {
 //		ResetKeypadMode(TRUE);
@@ -4482,7 +4472,6 @@ void CVTWindow::OnSetupSerialPort()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	Ok = (*SetupSerialPort)(HVTWin, &ts);
-	FreeTTDLG();
 
 	if (Ok && ts.ComPort > 0) {
 		/*
@@ -4541,7 +4530,6 @@ void CVTWindow::OnSetupTCPIP()
 	if ((*SetupTCPIP)(HVTWin, &ts)) {
 		TelUpdateKeepAliveInterval();
 	}
-	FreeTTDLG();
 }
 
 void CVTWindow::OnSetupGeneral()
@@ -4556,7 +4544,6 @@ void CVTWindow::OnSetupGeneral()
 		ResetCharSet();
 		ResetIME();
 	}
-	FreeTTDLG();
 }
 
 /* GetSetupFname function id */
@@ -4913,7 +4900,6 @@ void CVTWindow::OnWindowWindow()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*WindowWindow)(HVTWin,&Close);
-	FreeTTDLG();
 	if (Close) {
 		OnClose();
 	}
@@ -4962,7 +4948,6 @@ void CVTWindow::OnHelpAbout()
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	(*AboutDialog)(HVTWin);
-	FreeTTDLG();
 }
 
 LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
