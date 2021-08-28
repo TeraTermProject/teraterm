@@ -37,14 +37,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <crtdbg.h>
-#include "ttwinman.h"
+
 #include "ttplugin.h"
 #include "codeconv.h"
 #include "asprintf.h"
 
 #include "ttplug.h"
-
-static int NumExtensions = 0;
 
 typedef struct _ExtensionList {
 	TTXExports * exports;
@@ -52,15 +50,17 @@ typedef struct _ExtensionList {
 } ExtensionList;
 
 static ExtensionList *Extensions;
+static int NumExtensions = 0;
 
-static int compareOrder(const void * e1, const void * e2) {
-  TTXExports * * exports1 = (TTXExports * *)e1;
-  TTXExports * * exports2 = (TTXExports * *)e2;
+static int compareOrder(const void * e1, const void * e2)
+{
+	TTXExports * * exports1 = (TTXExports * *)e1;
+	TTXExports * * exports2 = (TTXExports * *)e2;
 
-  return (*exports1)->loadOrder - (*exports2)->loadOrder;
+	return (*exports1)->loadOrder - (*exports2)->loadOrder;
 }
 
-static void loadExtension(wchar_t const *fileName)
+static void loadExtension(wchar_t const *fileName, const wchar_t *UILanguageFile)
 {
 	DWORD err;
 	const wchar_t *sub_message;
@@ -137,7 +137,7 @@ static void loadExtension(wchar_t const *fileName)
 			"MSG_LOAD_EXT_ERROR", L"Cannot load extension %s (%d, %s)",
 			MB_OK | MB_ICONEXCLAMATION
 		};
-		TTMessageBoxA(NULL, &info, ts.UILanguageFile, fileName, err, sub_message);
+		TTMessageBoxW(NULL, &info, UILanguageFile, fileName, err, sub_message);
 	}
 }
 
@@ -155,7 +155,7 @@ static void LoadExtensions(PTTSet ts_)
 		do {
 			wchar_t *filename;
 			aswprintf(&filename, L"%s\\%s", HomeDirW, fd.cFileName);
-			loadExtension(filename);
+			loadExtension(filename, ts_->UILanguageFileW);
 			free(filename);
 		} while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
