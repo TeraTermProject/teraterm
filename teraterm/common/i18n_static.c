@@ -34,22 +34,30 @@
 #include "win32helper.h"
 #include "ttlib.h"
 
+/**
+ *	lngファイル(iniファイル)から文字列を取得
+ *
+ *	@param[in]		section
+ *	@param[in]		key
+ *	@param[in]		def			デフォルト文字列
+ *								NULL=未指定
+ *	@param[in]		iniFile		iniファイル
+ *	@param[in,out]	str			取得文字列
+ *								不要になったらfree()する
+ *	@return						文字数
+ *
+ *		strには必ず文字列が返ってくるので、free() が必要
+ *		(メモリがない時 str=NULL が返る)
+ */
 size_t GetI18nStrWW(const char *section, const char *key, const wchar_t *def, const wchar_t *iniFile, wchar_t **str)
 {
 	wchar_t sectionW[64];
 	wchar_t keyW[128];
-	DWORD error;
 	size_t size;
 	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
 	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
-	error = hGetPrivateProfileStringW(sectionW, keyW, def, iniFile, str);
-	if (error != NO_ERROR) {
-		*str = NULL;
-		return 0;
-	}
-	if (*str == NULL) {
-		return 0;
-	}
+	hGetPrivateProfileStringW(sectionW, keyW, def, iniFile, str);
+	assert(str != NULL);		// メモリがない時 NULL が返ってくる
 	size = RestoreNewLineW(*str);
 	return size;
 }
@@ -179,7 +187,7 @@ int SetI18nDlgStrsW(HWND hDlgWnd, const char *section, const DlgTextInfo *infos,
 	for (i = 0 ; i < infoCount; i++) {
 		wchar_t *uimsg;
 		GetI18nStrWW(section, infos[i].key, NULL, UILanguageFile, &uimsg);
-		if (uimsg != NULL) {
+		if (uimsg[0] != 0) {
 			BOOL r = FALSE;
 			const int nIDDlgItem = infos[i].nIDDlgItem;
 			if (nIDDlgItem == 0) {
@@ -189,10 +197,10 @@ int SetI18nDlgStrsW(HWND hDlgWnd, const char *section, const DlgTextInfo *infos,
 				r = SetDlgItemTextW(hDlgWnd, nIDDlgItem, uimsg);
 				assert(r != 0);
 			}
-			free(uimsg);
 			if (r)
 				translatedCount++;
 		}
+		free(uimsg);
 	}
 
 	return translatedCount;
@@ -218,10 +226,9 @@ void SetI18nMenuStrsW(HMENU hMenu, const char *section, const DlgTextInfo *infos
 		// UNICODE
 		wchar_t *uimsg;
 		GetI18nStrWW(section, key, NULL, UILanguageFile, &uimsg);
-		if (uimsg != NULL) {
+		if (uimsg[0] != 0) {
 			UINT uFlags = (nIDDlgItem < id_position_threshold) ? MF_BYPOSITION : MF_BYCOMMAND;
 			ModifyMenuW(hMenu, nIDDlgItem, uFlags, nIDDlgItem, uimsg);
-			free(uimsg);
 		}
 		else {
 			if (nIDDlgItem < id_position_threshold) {
@@ -231,6 +238,7 @@ void SetI18nMenuStrsW(HMENU hMenu, const char *section, const DlgTextInfo *infos
 				ModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, s);
 			}
 		}
+		free(uimsg);
 	}
 }
 

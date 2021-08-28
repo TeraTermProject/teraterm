@@ -31,6 +31,8 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
+#include "asprintf.h"
+
 #include "win32helper.h"
 
 /**
@@ -84,9 +86,22 @@ error_return:
 /**
  *	GetPrivateProfileStringW() の動的バッファ版
  *
- *	@param str	文字列を格納するバッファ
- *				不要になったらfree()する
+ *	@param section
+ *	@param key
+ *	@param def
+ *	@param str		文字列を格納するバッファ
+ *					不要になったらfree()する
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
+ *
+ *		次の場合 str = L"" が返る (free()すること)
+ *			keyに空が設定されている 'key='と記述 ("="の後に何も書いていない)
+ *				戻り値 NO_ERROR
+ *			keyが存在せずdef=NULL 場合
+ *				戻り値 ERROR_FILE_NOT_FOUND
+ *			GetPrivateProfileStringW() でエラーが発生した場合
+ *				戻り値 エラー値
+ *			メモリが確保できなかった場合
+ *				戻り値 ERROR_NOT_ENOUGH_MEMORY
  */
 DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, const wchar_t *def, const wchar_t *ini, wchar_t **str)
 {
@@ -101,12 +116,11 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 	for(;;) {
 		DWORD r = GetPrivateProfileStringW(section, key, def, b, (DWORD)size, ini);
 		if (r == 0 || b[0] == L'\0') {
-			// 次の場合ここに入る
-			//   iniに'key='と記述 ("="の後に何も書いていない)
-			//   iniに'key=...' が存在しない かつ def=NULL
+			DWORD error = GetLastError();
 			free(b);
-			*str = NULL;
-			return NO_ERROR;
+			*str = _wcsdup(L"");
+//			aswprintf(str, L"%s/%s\n",section, key);	// 確認用
+			return error;
 		} else if (r < size - 2) {
 			size = r + 1;
 			b = (wchar_t *)realloc(b, sizeof(wchar_t) * size);
@@ -117,7 +131,6 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 			size *= 2;
 			p = (wchar_t*)realloc(b, sizeof(wchar_t) * size);
 			if (p == NULL) {
-				free(b);
 				error = ERROR_NOT_ENOUGH_MEMORY;
 				break;
 			}

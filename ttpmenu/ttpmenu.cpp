@@ -2657,7 +2657,8 @@ static void GetUILanguageFile(char *buf, int buflen)
 
 	/* Get LanguageFile name */
 	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", NULL, SetupFName, &Temp);
-	if (Temp == NULL) {
+	if (Temp[0] == L'\0') {
+		free(Temp);
 		Temp = _wcsdup(L"lang\\Default.lng");
 	}
 
