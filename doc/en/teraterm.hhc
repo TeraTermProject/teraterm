@@ -541,13 +541,23 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of OpenSSL">
-			<param name="Local" value="html\reference\OpenSSL-LICENSE.txt">
+			<param name="Name" value="License of Oniguruma">
+			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="License of SFMT">
+			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="License of OpenSSH">
 			<param name="Local" value="html\reference\OpenSSH-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="License of OpenSSL">
+			<param name="Local" value="html\reference\OpenSSL-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -561,13 +571,8 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of Oniguruma">
-			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of SFMT">
-			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
+			<param name="Name" value="License of The reference C implementation of Argon2">
+			<param name="Local" value="html\reference\argon2-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

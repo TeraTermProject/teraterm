@@ -210,6 +210,7 @@
 #define HlpRefSFMT      80009
 #define HlpRefCygterm   80010
 #define HlpRefZlib      80011
+#define HlpRefArgon2    80012
 
 #define HlpMacro                        90000
 #define HlpMacroExec                    90001
