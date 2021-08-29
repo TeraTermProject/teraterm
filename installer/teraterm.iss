@@ -65,6 +65,7 @@ Name: {app}\theme\scale; Components: TeraTerm
 Name: {app}\theme\tile; Components: TeraTerm
 Name: {app}\plugin; Components: TeraTerm
 Name: {app}\lang; Components: TeraTerm
+Name: {app}\lang_utf16le; Components: TeraTerm
 
 [Files]
 Source: ..\teraterm\release\ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
@@ -882,7 +883,7 @@ end; // CurStepChanged
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  ini     : array[0..5] of String;
+  ini     : array[0..6] of String;
   buf     : String;
   conf    : String;
   confmsg : String;
@@ -896,9 +897,10 @@ begin
         ini[0] := '\TERATERM.INI';
         ini[1] := '\KEYBOARD.CNF';
         ini[2] := '\lang\Default.lng';
-        ini[3] := '\ssh_known_hosts';
-        ini[4] := '\cygterm.cfg';
-        ini[5] := '\broadcast.log';
+        ini[3] := '\lang_utf16le\Default.lng';
+        ini[4] := '\ssh_known_hosts';
+        ini[5] := '\cygterm.cfg';
+        ini[6] := '\broadcast.log';
 
         conf := CustomMessage('msg_del_confirm');
         app  := ExpandConstant('{app}');
@@ -913,7 +915,7 @@ begin
         if not silent then begin
 
           // delete config files
-          for i := 0 to 5 do
+          for i := 0 to 6 do
           begin
             buf := app + ini[i];
             if FileExists(buf) then begin
@@ -940,6 +942,7 @@ begin
 
         // directory is deleted only if empty
         RemoveDir(app + '\lang');
+        RemoveDir(app + '\lang_utf16le');
         RemoveDir(app);
       end;
   end;
