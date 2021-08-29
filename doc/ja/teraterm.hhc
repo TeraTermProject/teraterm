@@ -572,23 +572,8 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="OpenSSL ライセンス">
-			<param name="Local" value="html\reference\OpenSSL-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="OpenSSH ライセンス">
-			<param name="Local" value="html\reference\OpenSSH-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="zlib ライセンス">
-			<param name="Local" value="html\reference\zlib-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="PuTTY ライセンス">
-			<param name="Local" value="html\reference\PuTTY-LICENSE.txt">
+			<param name="Name" value="cJSON ライセンス">
+			<param name="Local" value="html\reference\cJSON-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -602,13 +587,33 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="CygTerm+ ライセンス">
-			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
+			<param name="Name" value="OpenSSH ライセンス">
+			<param name="Local" value="html\reference\OpenSSH-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="cJSON ライセンス">
-			<param name="Local" value="html\reference\cJSON-LICENSE.txt">
+			<param name="Name" value="OpenSSL ライセンス">
+			<param name="Local" value="html\reference\OpenSSL-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="zlib ライセンス">
+			<param name="Local" value="html\reference\zlib-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PuTTY ライセンス">
+			<param name="Local" value="html\reference\PuTTY-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="The reference C implementation of Argon2 ライセンス">
+			<param name="Local" value="html\reference\argon2-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="CygTerm+ ライセンス">
+			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
