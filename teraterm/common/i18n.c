@@ -31,6 +31,7 @@
 #include "codeconv.h"
 #include "compat_win.h"
 
+#include <wchar.h>
 #include <assert.h>
 
 /**
@@ -43,7 +44,15 @@ DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_
 {
 	wchar_t *str;
 	size_t size = GetI18nStrWA(section, key, def, iniFile, &str);
-	wcsncpy_s(buf, buf_len, str, _TRUNCATE);
+	if (size <= (size_t)buf_len) {
+		// sizeは L'\0' を含む
+		wmemcpy(buf, str, size);
+	}
+	else {
+		wmemcpy(buf, str, buf_len - 1);
+		buf[buf_len - 1] = '\0';
+		assert(("buffer too small",0));
+	}
 	free(str);
 	return size;
 }
@@ -64,10 +73,11 @@ DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf
 	char *strA = _WideCharToMultiByte(strW, size, CP_ACP, &lenA);
 	if ((size_t)buf_len >= lenA) {
 		memcpy(buf, strA, lenA);
-	} else {
-		// バッファ不足
-		memcpy(buf, strA, buf_len);
+	}
+	else {
+		memcpy(buf, strA, buf_len - 1);
 		buf[buf_len - 1] = '\0';
+		assert(("buffer too small",0));
 	}
 	free(defW);
 	free(strA);
