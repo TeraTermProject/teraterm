@@ -92,8 +92,8 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
 int GetFontPointFromPixel(HWND hWnd, int pixel);
 int GetFontPixelFromPoint(HWND hWnd, int point);
 void ExpandCBWidth(HWND dlg, int ID);
+wchar_t *GetCommonDialogFilterWW(const char *user_filter_mask, const wchar_t *UILanguageFile);
 wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile);
-char *GetCommonDialogFilterA(const char *user_filter_mask, const char *UILanguageFile);
 
 #ifdef __cplusplus
 }

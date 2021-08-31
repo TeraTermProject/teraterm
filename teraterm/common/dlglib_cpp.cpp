@@ -39,6 +39,7 @@
 #include "dlglib.h"
 #include "ttlib.h"
 #include "codeconv.h"
+#include "asprintf.h"
 
 /**
  *	EndDialog() 互換関数
@@ -226,50 +227,51 @@ void ExpandCBWidth(HWND dlg, int ID)
  *	@retval		"User define(*.txt)\0*.txt\0All(*.*)\0*.*\0" など
  *				終端は "\0\0" となる
  */
-wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile, size_t *len)
+wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t *UILanguageFile, size_t *len)
 {
 	// "ユーザ定義(*.txt)\0*.txt"
 	wchar_t *user_filter_str = NULL;
 	size_t user_filter_len = 0;
 	if (user_filter_mask != NULL && user_filter_mask[0] != 0) {
-		wchar_t user_filter_name[MAX_UIMSG];
-		GetI18nStrW("Tera Term", "FILEDLG_USER_FILTER_NAME", user_filter_name, sizeof(user_filter_name), L"User define",
-					 UILanguageFile);
+		wchar_t *user_filter_name;
+		GetI18nStrWW("Tera Term", "FILEDLG_USER_FILTER_NAME", L"User define", UILanguageFile, &user_filter_name);
 		size_t user_filter_name_len = wcslen(user_filter_name);
-		wchar_t *user_filter_maskW = ToWcharA(user_filter_mask);
-		size_t user_filter_mask_len = wcslen(user_filter_maskW);
+		size_t user_filter_mask_len = wcslen(user_filter_mask);
 		user_filter_len = user_filter_name_len + 1 + user_filter_mask_len + 1 + 1 + user_filter_mask_len + 1;
 		user_filter_str = (wchar_t *)malloc(user_filter_len * sizeof(wchar_t));
 		wchar_t *p = user_filter_str;
 		wmemcpy(p, user_filter_name, user_filter_name_len);
 		p += user_filter_name_len;
 		*p++ = '(';
-		wmemcpy(p, user_filter_maskW, user_filter_mask_len);
+		wmemcpy(p, user_filter_mask, user_filter_mask_len);
 		p += user_filter_mask_len;
 		*p++ = ')';
 		*p++ = '\0';
-		wmemcpy(p, user_filter_maskW, user_filter_mask_len);
+		wmemcpy(p, user_filter_mask, user_filter_mask_len);
 		p += user_filter_mask_len;
 		*p++ = '\0';
-		free(user_filter_maskW);
+		free(user_filter_name);
 	}
 
 	// "すべてのファイル(*.*)\0*.*"
-	wchar_t all_filter_str[MAX_UIMSG];
-	GetI18nStrW("Tera Term", "FILEDLG_ALL_FILTER", all_filter_str, _countof(all_filter_str), L"All(*.*)\\0*.*", UILanguageFile);
+	wchar_t *all_filter_str;
 	size_t all_filter_len;
+	GetI18nStrWW("Tera Term", "FILEDLG_ALL_FILTER", L"All(*.*)\\0*.*", UILanguageFile, &all_filter_str);
 	{
-		size_t all_filter_title_len = wcsnlen(all_filter_str, _countof(all_filter_str));
-		if (all_filter_title_len == 0 || all_filter_title_len == _countof(all_filter_str)) {
-			all_filter_str[0] = 0;
+		// check all_filter_str
+		size_t all_filter_title_len = wcslen(all_filter_str);
+		if (all_filter_title_len == 0) {
+			free(all_filter_str);
+			all_filter_str = NULL;
 			all_filter_len = 0;
 		} else {
-			size_t all_filter_mask_max = _countof(all_filter_str) - all_filter_title_len - 1;
-			size_t all_filter_mask_len = wcsnlen(all_filter_str + all_filter_title_len + 1, all_filter_mask_max);
-			if (all_filter_mask_len == 0 || all_filter_mask_len == _countof(all_filter_str)) {
-				all_filter_str[0] = 0;
+			size_t all_filter_mask_len = wcslen(all_filter_str + all_filter_title_len + 1);
+			if (all_filter_mask_len == 0) {
+				free(all_filter_str);
+				all_filter_str = NULL;
 				all_filter_len = 0;
 			} else {
+				// ok
 				all_filter_len = all_filter_title_len + 1 + all_filter_mask_len + 1;
 			}
 		}
@@ -299,6 +301,9 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
 	if (user_filter_len != 0) {
 		free(user_filter_str);
 	}
+	if (all_filter_len != 0) {
+		free(all_filter_str);
+	}
 
 	if (len != NULL) {
 		*len = filter_len;
@@ -307,16 +312,17 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
 	return filter_str;
 }
 
-wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile)
+wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t *UILanguageFile)
 {
-	return GetCommonDialogFilterW(user_filter_mask, UILanguageFile, NULL);
+	return GetCommonDialogFilterWW(user_filter_mask, UILanguageFile, NULL);
 }
 
-char *GetCommonDialogFilterA(const char *user_filter_mask, const char *UILanguageFile)
+wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile)
 {
-	size_t filterW_len;
-	wchar_t *filterW_ptr = GetCommonDialogFilterW(user_filter_mask, UILanguageFile, &filterW_len);
-	char *filterA_ptr = _WideCharToMultiByte(filterW_ptr, filterW_len, CP_ACP, NULL);
-	free(filterW_ptr);
-	return filterA_ptr;
+	wchar_t *UILanguageFileW = ToWcharA(UILanguageFile);
+	wchar_t * user_filter_maskW = ToWcharA(user_filter_mask);
+	wchar_t *ret = GetCommonDialogFilterWW(user_filter_maskW, UILanguageFileW);
+	free(user_filter_maskW);
+	free(UILanguageFileW);
+	return ret;
 }
