@@ -79,6 +79,9 @@ typedef struct {
 #define BuffYMax 500000
 #define BuffSizeMax (BuffYMax * 80)
 
+// 1•¶Žš‚ ‚½‚è‚Ì—ÌˆæÅ‘åƒTƒCƒY
+#define MAX_CHAR_SIZE	100
+
 // status line
 int StatusLine;	//0: none 1: shown
 /* top, bottom, left & right margin */
@@ -237,26 +240,46 @@ static void BuffAddChar(buff_char_t *buff, char32_t u32)
 	if (p->CombinationCharSize16 < p->CombinationCharCount16 + 2) {
 		size_t new_size = p->CombinationCharSize16;
 		new_size = new_size == 0 ? 5 : new_size * 2;
-		p->pCombinationChars16 = realloc(p->pCombinationChars16, sizeof(wchar_t) * new_size);
-		p->CombinationCharSize16 = (char)new_size;
+		if (new_size > MAX_CHAR_SIZE) {
+			new_size = MAX_CHAR_SIZE;
+		}
+		if (p->CombinationCharSize16 != new_size) {
+			p->pCombinationChars16 = realloc(p->pCombinationChars16, sizeof(wchar_t) * new_size);
+			p->CombinationCharSize16 = (char)new_size;
+		}
 	}
 	if (p->CombinationCharSize32 < p->CombinationCharCount32 + 2) {
 		size_t new_size = p->CombinationCharSize32;
 		new_size = new_size == 0 ? 5 : new_size * 2;
-		p->pCombinationChars32 = realloc(p->pCombinationChars32, sizeof(char32_t) * new_size);
-		p->CombinationCharSize32 = (char)new_size;
+		if (new_size > MAX_CHAR_SIZE) {
+			new_size = MAX_CHAR_SIZE;
+		}
+		if (p->CombinationCharSize32 != new_size) {
+			p->pCombinationChars32 = realloc(p->pCombinationChars32, sizeof(char32_t) * new_size);
+			p->CombinationCharSize32 = (char)new_size;
+		}
 	}
 
 	// UTF-32
-	p->u32_last = u32;
-	p->pCombinationChars32[(size_t)p->CombinationCharCount32] = u32;
-	p->CombinationCharCount32++;
+	if (p->CombinationCharCount32 < p->CombinationCharSize32) {
+		p->u32_last = u32;
+		p->pCombinationChars32[(size_t)p->CombinationCharCount32] = u32;
+		p->CombinationCharCount32++;
+	}
 
 	// UTF-16
-	{
-		wchar_t *u16 = &p->pCombinationChars16[(size_t)p->CombinationCharCount16];
-		size_t wlen = UTF32ToUTF16(u32, u16, 2);
-		p->CombinationCharCount16 += (char)wlen;
+	if (p->CombinationCharCount16 < p->CombinationCharSize16) {
+		wchar_t u16_str[2];
+		size_t wlen = UTF32ToUTF16(u32, &u16_str[0], 2);
+		if (p->CombinationCharCount16 + wlen <= p->CombinationCharSize16) {
+			size_t i = (size_t)p->CombinationCharCount16;
+			p->pCombinationChars16[i] = u16_str[0];
+			if (wlen == 2) {
+				i++;
+				p->pCombinationChars16[i] = u16_str[1];
+			}
+			p->CombinationCharCount16 += wlen;
+		}
 	}
 }
 
