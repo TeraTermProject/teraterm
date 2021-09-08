@@ -36,7 +36,7 @@
 #pragma once
 
 #include <windows.h>
-#include <shlobj.h>	// for _SHBrowseForFolderW()
+#include <imagehlp.h>	// for SymGetLineFromAddr()
 
 #ifdef __cplusplus
 extern "C" {
@@ -155,6 +155,15 @@ BOOL _VerifyVersionInfoA(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMa
 
 // htmlhelp.dll (hhctrl.ocx)
 HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+
+// imagehlp.dll
+extern BOOL (WINAPI *pSymGetLineFromAddr)(HANDLE hProcess, DWORD dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE Line);
+
+// dbghelp.dll
+extern BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
+										PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+										PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+										PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
 void WinCompatInit();
 

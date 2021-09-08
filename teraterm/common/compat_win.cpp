@@ -83,6 +83,15 @@ BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 DNS_STATUS (WINAPI *pDnsQuery_A)(PCSTR pszName, WORD wType, DWORD Options, PVOID pExtra, PDNS_RECORD *ppQueryResults, PVOID *pReserved);
 VOID (WINAPI *pDnsFree)(PVOID pData, DNS_FREE_TYPE FreeType);
 
+// imagehlp.dll
+BOOL (WINAPI *pSymGetLineFromAddr)(HANDLE hProcess, DWORD dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE Line);
+
+// dbghelp.dll
+BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
+								 PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+								 PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+								 PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
+
 class Initializer {
 public:
 	Initializer() {
@@ -200,6 +209,16 @@ static const APIInfo Lists_dnsapi[] = {
 	{},
 };
 
+static const APIInfo Lists_imagehlp[] = {
+	{ "SymGetLineFromAddr", (void **)&pSymGetLineFromAddr },
+	{},
+};
+
+static const APIInfo Lists_dbghelp[] = {
+	{ "MiniDumpWriteDump", (void **)&pMiniDumpWriteDump },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -208,6 +227,8 @@ static const DllInfo DllInfos[] = {
 	{ L"kernel32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_kernel32 },
 	{ L"hhctrl.ocx", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_hhctrl },
 	{ L"dnsapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dnsapi },
+	{ L"imagehlp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_imagehlp },
+	{ L"dbghelp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dbghelp },
 	{},
 };
 

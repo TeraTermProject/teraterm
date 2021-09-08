@@ -29,8 +29,11 @@
 #include <windows.h>
 #include <stdio.h>
 #include <imagehlp.h>
+#include <shlobj.h>	// for SHGetSpecialFolderPathW()
 
 #include "compat_win.h"
+#include "asprintf.h"
+#include "svnversion.h"	// for SVNVERSION
 
 #include "ttdebug.h"
 
@@ -106,7 +109,7 @@ static const char *GetExceptionString(DWORD exception)
 }
 
 /* 例外発生時に関数の呼び出し履歴を表示する、例外フィルタ関数 */
-static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
+static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 {
 	HGLOBAL gptr;
 	STACKFRAME sf;
@@ -119,25 +122,10 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	IMAGEHLP_LINE	ih_line;
 	int frame;
 	char msg[3072], buf[256];
-	HMODULE h, h2;
-	char imagehlp_dll[MAX_PATH];
-	BOOL (WINAPI *pSymGetLineFromAddr)(HANDLE hProcess, DWORD dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE Line);
 
-	// Windows98/Me/NT4では動かないためスキップする。(2007.10.9 yutaka)
-	GetSystemDirectory(imagehlp_dll, sizeof(imagehlp_dll));
-	strncat_s(imagehlp_dll, sizeof(imagehlp_dll), "\\imagehlp.dll", _TRUNCATE);
-	h2 = LoadLibrary(imagehlp_dll);
-	h = GetModuleHandle(imagehlp_dll);
-	if (h == NULL) {
-		FreeLibrary(h2);
-		goto error;
-	}
-	*(void **)&pSymGetLineFromAddr = (void *)GetProcAddress(h, "SymGetLineFromAddr");
 	if (pSymGetLineFromAddr == NULL) {
-		FreeLibrary(h2);
 		goto error;
 	}
-	FreeLibrary(h2);
 
 	/* シンボル情報格納用バッファの初期化 */
 	gptr = GlobalAlloc(GMEM_FIXED, 10000);
@@ -260,18 +248,98 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	::MessageBoxA(NULL, msg, "Tera Term: Application fault", MB_OK | MB_ICONEXCLAMATION);
 
 error:
-//	return (EXCEPTION_EXECUTE_HANDLER);  /* そのままプロセスを終了させる */
-	return (EXCEPTION_CONTINUE_SEARCH);  /* 引き続き［アプリケーションエラー］ポップアップメッセージボックスを呼び出す */
+	;
 }
 #endif // !defined(_M_X64 )
 
+static wchar_t *CreateDumpFilename()
+{
+	// とりあえずデスクトップに作成
+	wchar_t desktop[MAX_PATH];
+	SHGetSpecialFolderPathW(NULL, desktop, CSIDL_DESKTOPDIRECTORY, FALSE);
+
+	SYSTEMTIME local_time;
+	GetLocalTime(&local_time);
+
+	wchar_t *dump_file;
+	aswprintf(&dump_file, L"%s\\teraterm_r%04d_%04d%02d%02d-%02d%02d%02d.dmp",
+			  desktop,
+			  SVNVERSION,
+			  local_time.wYear, local_time.wMonth, local_time.wDay,
+			  local_time.wHour, local_time.wMinute, local_time.wSecond);
+
+	return dump_file;
+}
+
+static void DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pExceptionPointers)
+{
+	if (pMiniDumpWriteDump == NULL) {
+		// MiniDumpWriteDump() がサポートされていない。XPより前
+		return;
+	}
+
+	HANDLE file = CreateFileW(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE) {
+		return;
+	}
+
+	MINIDUMP_EXCEPTION_INFORMATION mdei;
+	mdei.ThreadId           = GetCurrentThreadId();
+	mdei.ExceptionPointers  = pExceptionPointers;
+	mdei.ClientPointers     = TRUE;
+
+	pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file,
+					   (MINIDUMP_TYPE)(MiniDumpNormal|MiniDumpWithHandleData), &mdei, NULL, NULL);
+
+	CloseHandle(file);
+}
+
+static BOOL DumpFile = TRUE;
+
+static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointers)
+{
+	if (DumpFile) {
+		wchar_t *fname = CreateDumpFilename();
+		if (fname != NULL) {
+			DumpMiniDump(fname, pExceptionPointers);
+			MessageBoxW(NULL, fname, L"Tera Term", MB_OK);
+			free(fname);
+		}
+		else {
+			DumpMiniDump(L"teraterm.dmp", pExceptionPointers);
+			MessageBoxW(NULL, L"dump teraterm.dmp", L"Tera Term", MB_OK);
+		}
+	}
+
+#if !defined(_M_X64)
+	ApplicationFaultHandler(pExceptionPointers);
+#endif
+
+//	return EXCEPTION_EXECUTE_HANDLER;  /* そのままプロセスを終了させる */
+	return EXCEPTION_CONTINUE_SEARCH;  /* 引き続き［アプリケーションエラー］ポップアップメッセージボックスを呼び出す */
+}
+
+void DebugTestCrash(void)
+{
+	*(int *)0 = 0;
+}
+
+static void InvalidParameterHandler(const wchar_t* /*expression*/,
+									const wchar_t* /*function*/,
+									const wchar_t* /*file*/,
+									unsigned int /*line*/,
+									uintptr_t /*pReserved*/)
+{
+	DebugTestCrash();
+}
 
 /**
  *  例外ハンドラのフック
  */
 void DebugSetException(void)
 {
-#if !defined(_M_X64)
-	SetUnhandledExceptionFilter(ApplicationFaultHandler);
-#endif
+	SetUnhandledExceptionFilter(ExceptionFilter);
+
+	// Cランタイム無効なパラメータエラーハンドラ
+	_set_invalid_parameter_handler(InvalidParameterHandler);
 }

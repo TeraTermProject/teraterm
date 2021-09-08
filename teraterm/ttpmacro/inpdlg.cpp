@@ -31,11 +31,12 @@
 
 #include "teraterm.h"
 #include "ttlib.h"
+#include "compat_win.h"
+#include "dlglib.h"
+
 #include "ttmdef.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
-#include "dlglib.h"
-#include "compat_win.h"
 
 #include "inpdlg.h"
 

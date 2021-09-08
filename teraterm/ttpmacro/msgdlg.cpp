@@ -32,13 +32,14 @@
 #include <windows.h>
 #include <windowsx.h>
 #include "teraterm.h"
+#include "tmfc.h"
+#include "dlglib.h"
+#include "compat_win.h"
+
 #include "ttlib.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
-#include "tmfc.h"
-#include "dlglib.h"
 #include "ttmdlg.h"
-#include "compat_win.h"
 
 #include "msgdlg.h"
 
@@ -182,7 +183,7 @@ BOOL CMsgDlg::OnCancel()
 }
 
 // メッセージボックスをキャンセルする(closeボタンを押す)と、マクロの終了とする。
-// (2008.8.5 yutaka)	
+// (2008.8.5 yutaka)
 BOOL CMsgDlg::OnClose()
 {
 	const int ret = MessageBoxHaltScript(m_hWnd);

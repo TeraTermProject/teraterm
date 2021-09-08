@@ -40,6 +40,7 @@ extern "C" {
 
 void DebugSetException(void);
 HWND DebugConsoleOpen(void);
+void DebugTestCrash(void);
 
 #ifdef __cplusplus
 }
