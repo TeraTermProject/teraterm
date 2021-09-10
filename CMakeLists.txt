@@ -180,6 +180,9 @@ add_subdirectory(installer)
 add_subdirectory(doc)
 add_subdirectory(doc_internal)
 add_subdirectory(tools)
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/TTXAdditional/CMakeLists.txt)
+  add_subdirectory(TTXAdditional)
+endif()
 
 ### create buildinfo.txt
 configure_file(
