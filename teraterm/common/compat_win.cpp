@@ -92,6 +92,10 @@ BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile,
 								 PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
 								 PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
+// shell32.dll
+static HRESULT (WINAPI *pSHGetKnownFolderPath)(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
+
+
 class Initializer {
 public:
 	Initializer() {
@@ -219,6 +223,11 @@ static const APIInfo Lists_dbghelp[] = {
 	{},
 };
 
+static const APIInfo Lists_shell32[] = {
+	{ "SHGetKnownFolderPath", (void **)&pSHGetKnownFolderPath },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -229,6 +238,7 @@ static const DllInfo DllInfos[] = {
 	{ L"dnsapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dnsapi },
 	{ L"imagehlp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_imagehlp },
 	{ L"dbghelp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dbghelp },
+	{ L"shell32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
 	{},
 };
 
@@ -491,4 +501,73 @@ ULONGLONG _VerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, 
 		return pVerSetConditionMask(dwlConditionMask, dwTypeBitMask, dwConditionMask);
 	}
 	return _myVerSetConditionMask(dwlConditionMask, dwTypeBitMask, dwConditionMask);
+}
+
+static BOOL GetCSIDLFromFKNOWNFOLDERID(REFKNOWNFOLDERID rfid, int *csidl)
+{
+	// TODO GetSpecialFolder() ttmlib.c をカバーできるようにする
+	static const struct {
+		REFKNOWNFOLDERID rfid;
+		int csidl;
+	} list[] = {
+		{ FOLDERID_Desktop, CSIDL_DESKTOPDIRECTORY },
+		{ FOLDERID_Documents, CSIDL_PERSONAL },	// My Documents
+		{ FOLDERID_LocalAppData, CSIDL_LOCAL_APPDATA },
+	};
+
+	for (size_t i = 0; i < _countof(list); i++) {
+		if (IsEqualGUID(rfid, list[i].rfid)) {
+			*csidl = list[i].csidl;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/**
+ *	SHGetKnownFolderPath() の互換関数
+ *
+ *	@param[out]	ppszPath	パス
+ *							CoTaskMemFree() ではなく、free() を使って開放する
+ *							エラーに関係なく free() すること
+ */
+HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath)
+{
+	if (pSHGetKnownFolderPath != NULL) {
+		// Vista+
+		wchar_t *path;
+		HRESULT r = pSHGetKnownFolderPath(rfid, dwFlags, hToken, &path);
+		*ppszPath = _wcsdup(path);
+		CoTaskMemFree(path);	// エラーに関係なく呼び出す必要あり
+		return r;
+	}
+
+	int csidl;
+	if (GetCSIDLFromFKNOWNFOLDERID(rfid, &csidl) == FALSE) {
+		*ppszPath = _wcsdup(L"");
+		return E_FAIL;
+	}
+	wchar_t path[MAX_PATH];
+#if 0
+	// SHGetSpecialFolderLocation() でカバーできる?
+	if (pSHGetSpecialFolderPathW != NULL) {
+		BOOL create = (dwFlags & KF_FLAG_CREATE) != 0 ? TRUE : FALSE;
+		BOOL r = SHGetSpecialFolderPathW(NULL, path, csidl, create);
+		if (!r) {
+			path[0] = 0;
+		}
+		*ppszPath = _wcsdup(path);
+		return r ? S_OK : E_FAIL;
+	}
+#endif
+	LPITEMIDLIST pidl;
+	HRESULT r = SHGetSpecialFolderLocation(NULL, csidl, &pidl);
+	if (r != NOERROR) {
+		*ppszPath = _wcsdup(L"");
+		return E_FAIL;
+	}
+	SHGetPathFromIDListW(pidl, path);
+	CoTaskMemFree(pidl);
+	*ppszPath = _wcsdup(path);
+	return S_OK;
 }

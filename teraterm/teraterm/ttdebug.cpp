@@ -255,8 +255,8 @@ error:
 static wchar_t *CreateDumpFilename()
 {
 	// とりあえずデスクトップに作成
-	wchar_t desktop[MAX_PATH];
-	SHGetSpecialFolderPathW(NULL, desktop, CSIDL_DESKTOPDIRECTORY, FALSE);
+	wchar_t *desktop;
+	_SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_CREATE, NULL, &desktop);
 
 	SYSTEMTIME local_time;
 	GetLocalTime(&local_time);
@@ -268,6 +268,7 @@ static wchar_t *CreateDumpFilename()
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond);
 
+	free(desktop);
 	return dump_file;
 }
 

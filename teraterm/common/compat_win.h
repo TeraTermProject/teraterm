@@ -37,6 +37,7 @@
 
 #include <windows.h>
 #include <imagehlp.h>	// for SymGetLineFromAddr()
+#include <shlobj.h>		// for SHGetKnownFolderPath()
 
 #ifdef __cplusplus
 extern "C" {
@@ -164,6 +165,26 @@ extern BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE
 										PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
 										PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
 										PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
+
+// shell32.dll
+#if !defined(NTDDI_VERSION) || (NTDDI_VERSION < NTDDI_VISTA)
+typedef GUID KNOWNFOLDERID;
+#ifdef __cplusplus
+#define REFKNOWNFOLDERID const KNOWNFOLDERID &
+#else // !__cplusplus
+#define REFKNOWNFOLDERID const KNOWNFOLDERID * const
+#endif // __cplusplus
+
+#include "ttknownfolders.h"
+
+typedef enum
+{
+	KF_FLAG_CREATE          = 0x00008000,
+} KNOWN_FOLDER_FLAG;
+
+
+#endif
+HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
 
 void WinCompatInit();
 
