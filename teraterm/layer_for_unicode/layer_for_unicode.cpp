@@ -476,16 +476,17 @@ BOOL WINAPI _SetCurrentDirectoryW(LPCWSTR lpPathName)
 
 LPITEMIDLIST WINAPI _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
 {
+	char display_name[MAX_PATH];
 	BROWSEINFOA biA;
 	biA.hwndOwner = lpbi->hwndOwner;
 	biA.pidlRoot = lpbi->pidlRoot;
-	biA.pszDisplayName = ToCharW(lpbi->pszDisplayName);
+	biA.pszDisplayName = display_name;
 	biA.lpszTitle = ToCharW(lpbi->lpszTitle);
 	biA.ulFlags = lpbi->ulFlags;
 	biA.lpfn = lpbi->lpfn;
 	biA.lParam = lpbi->lParam;
 	LPITEMIDLIST pidlBrowse = SHBrowseForFolderA(&biA);
-	free(biA.pszDisplayName);
+	ACPToWideChar_t(display_name, lpbi->pszDisplayName, MAX_PATH);
 	free((void *)biA.lpszTitle);
 
 	return pidlBrowse;
