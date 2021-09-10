@@ -80,6 +80,7 @@
 #include "mac.h"
 #include "comp.h"
 #include "dlglib.h"
+#include "win32helper.h"
 
 #include "sftp.h"
 
