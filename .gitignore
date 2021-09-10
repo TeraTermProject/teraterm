@@ -13,3 +13,4 @@ build*/
 *.suo
 *.user
 *.map
+/gtags.files
