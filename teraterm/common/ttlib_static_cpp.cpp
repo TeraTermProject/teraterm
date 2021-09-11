@@ -914,31 +914,24 @@ wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguag
 
 /**
  *	設定ファイルのフルパスを取得する
- *	GetDefaultFName() の wchar_t版
  *
  *	@param[in]	home	ttermpro.exe 等の実行ファイルのあるフォルダ
  *						My Documents にファイルがあった場合は使用されない
- *	@param[in]	file	設定ファイル名
- *	@return		フルパス
+ *	@param[in]	file	設定ファイル名(パスは含まない)
+ *	@return		フルパス (不要になったら free() すること)
+ *
+ *	- My Documents にファイルがあった場合,
+ *		- "%USERPROFILE%\My Documents\{file}"
+ *		- "%USERPROFILE%\Documents\{file}" など
+ *	- なかった場合
+ *		- "{home}\{file}"
  */
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 {
 	// My Documents に file がある場合、
 	// それを読み込むようにした。(2007.2.18 maya)
-	wchar_t MyDoc[MAX_PATH];
-	LPITEMIDLIST pidl;
-
-	IMalloc *pmalloc;
-	SHGetMalloc(&pmalloc);
-	if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == S_OK) {
-		SHGetPathFromIDListW(pidl, MyDoc);
-		pmalloc->Free(pidl);
-		pmalloc->Release();
-	}
-	else {
-		pmalloc->Release();
-		MyDoc[0] = 0;
-	}
+	wchar_t *MyDoc;
+	_SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &MyDoc);
 
 	if (MyDoc[0] != 0) {
 		// My Documents に file があるか?
@@ -947,11 +940,16 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 		wcscpy(dest, MyDoc);
 		AppendSlashW(dest,destlen);
 		wcsncat_s(dest, destlen, file, _TRUNCATE);
-		if (GetFileAttributesW(dest) != INVALID_FILE_ATTRIBUTES) {
+		DWORD r = GetFileAttributesW(dest);
+		free(MyDoc);
+		if (r != INVALID_FILE_ATTRIBUTES) {
 			// My Documents の設定ファイル
 			return dest;
 		}
 		free(dest);
+	}
+	else {
+		free(MyDoc);
 	}
 
 	size_t destlen = (wcslen(home) + wcslen(file) + 1 + 1) * sizeof(wchar_t);

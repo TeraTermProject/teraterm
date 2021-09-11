@@ -830,35 +830,13 @@ void GetDownloadFolder(char *dest, int destlen)
 
 void GetDefaultFName(const char *home, const char *file, char *dest, int destlen)
 {
-	// My Documents ‚É file ‚ª‚ ‚éê‡A
-	// ‚»‚ê‚ð“Ç‚Ýž‚Þ‚æ‚¤‚É‚µ‚½B(2007.2.18 maya)
-	char MyDoc[MAX_PATH];
-	char MyDocSetupFName[MAX_PATH];
-	LPITEMIDLIST pidl;
-
-	IMalloc *pmalloc;
-	SHGetMalloc(&pmalloc);
-	if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == S_OK) {
-		SHGetPathFromIDList(pidl, MyDoc);
-		pmalloc->lpVtbl->Free(pmalloc, pidl);
-		pmalloc->lpVtbl->Release(pmalloc);
-	}
-	else {
-		pmalloc->lpVtbl->Release(pmalloc);
-		goto homedir;
-	}
-	strncpy_s(MyDocSetupFName, sizeof(MyDocSetupFName), MyDoc, _TRUNCATE);
-	AppendSlash(MyDocSetupFName,sizeof(MyDocSetupFName));
-	strncat_s(MyDocSetupFName, sizeof(MyDocSetupFName), file, _TRUNCATE);
-	if (GetFileAttributes(MyDocSetupFName) != INVALID_FILE_ATTRIBUTES) {
-		strncpy_s(dest, destlen, MyDocSetupFName, _TRUNCATE);
-		return;
-	}
-
-homedir:
-	strncpy_s(dest, destlen, home, _TRUNCATE);
-	AppendSlash(dest,destlen);
-	strncat_s(dest, destlen, file, _TRUNCATE);
+	wchar_t *homeW = ToWcharA(home);
+	wchar_t *fileW = ToWcharA(file);
+	wchar_t *destW = GetDefaultFNameW(homeW, fileW);
+	WideCharToACP_t(destW, dest, destlen);
+	free(destW);
+	free(fileW);
+	free(homeW);
 }
 
 /*
