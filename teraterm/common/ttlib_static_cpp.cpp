@@ -43,6 +43,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 #include "ttlib.h"
 
@@ -1062,4 +1063,11 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 	}
 
 	return v;
+}
+
+wchar_t *GetDownloadFolderW(void)
+{
+	wchar_t *download;
+	_SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &download);
+	return download;
 }

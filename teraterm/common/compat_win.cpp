@@ -511,8 +511,9 @@ static BOOL GetCSIDLFromFKNOWNFOLDERID(REFKNOWNFOLDERID rfid, int *csidl)
 		int csidl;
 	} list[] = {
 		{ FOLDERID_Desktop, CSIDL_DESKTOPDIRECTORY },
-		{ FOLDERID_Documents, CSIDL_PERSONAL },	// My Documents
+		{ FOLDERID_Documents, CSIDL_MYDOCUMENTS },	// %USERPROFILE%\My Documents
 		{ FOLDERID_LocalAppData, CSIDL_LOCAL_APPDATA },
+		{ FOLDERID_Downloads, CSIDL_MYDOCUMENTS },	// %USERPROFILE%\Downloads, My Documents
 	};
 
 	for (size_t i = 0; i < _countof(list); i++) {
