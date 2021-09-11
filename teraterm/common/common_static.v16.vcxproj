@@ -146,6 +146,7 @@
     <ClCompile Include="dllutil.cpp" />
     <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="i18n_static.c" />
+    <ClCompile Include="ttknownfolders.c" />
     <ClCompile Include="ttlib_static.c" />
     <ClCompile Include="ttlib_static_cpp.cpp" />
     <ClCompile Include="win32helper.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="i18n.h" />
     <ClInclude Include="codeconv.h" />
     <ClInclude Include="getcontent.h" />
+    <ClInclude Include="ttknownfolders.h" />
     <ClInclude Include="ttlib.h" />
     <ClInclude Include="win32helper.h" />
   </ItemGroup>

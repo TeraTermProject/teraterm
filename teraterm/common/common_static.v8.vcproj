@@ -273,6 +273,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ttknownfolders.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ttknownfolders.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ttlib.h"
 			>
 		</File>
