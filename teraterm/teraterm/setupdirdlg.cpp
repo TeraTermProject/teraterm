@@ -53,6 +53,7 @@
 #include "compat_win.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "helpid.h"
 
 #include "setupdirdlg.h"
 
@@ -520,6 +521,15 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			edit_vstore = IDC_SSH_SETUPDIR_EDIT_VSTORE;
 			open_dir = FALSE;
 			button_pressed = TRUE;
+			break;
+
+		case IDHELP:
+			OpenHelp(HH_HELP_CONTEXT, HlpMenuSetupDir, pts->UILanguageFile);
+			break;
+
+		case IDOK:
+			TTEndDialog(hDlgWnd, IDOK);
+			return TRUE;
 			break;
 
 		case IDCANCEL:
