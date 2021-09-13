@@ -209,10 +209,15 @@ DWORD hGetCurrentDirectoryW(wchar_t **dir)
  */
 DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
 {
-	int len = GetWindowTextLength(hWnd);
+	// GetWindowTextLengthW() が 0 を返したとき、
+	// エラーならエラーがセットされるが、
+	// エラーではないとき(正常終了時)、エラーをクリアしない(エラーなしをセットしない)
+	// ここでエラーをクリアしておく
+	SetLastError(NO_ERROR);
+	int len = GetWindowTextLengthW(hWnd);
 	if (len == 0) {
 		DWORD err = GetLastError();
-		if (err != 0) {
+		if (err != NO_ERROR) {
 			*text = NULL;
 			return err;
 		}
