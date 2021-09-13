@@ -165,10 +165,10 @@ int WINAPI _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
 
 int WINAPI _GetWindowTextLengthW(HWND hWnd)
 {
-	size_t lenW;
+	size_t lenW;// •¶Žš—ñ’·(`\0`‚ÍŠÜ‚Ü‚È‚¢)
 	wchar_t *strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
 	free(strW);
-	return (int)(lenW - 1);
+	return (int)lenW;
 }
 
 static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
