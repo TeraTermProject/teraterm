@@ -167,7 +167,7 @@ extern BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE
 										PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
 // shell32.dll
-#if !defined(NTDDI_VERSION) || (NTDDI_VERSION < NTDDI_VISTA)
+#if !defined(NTDDI_VERSION) || !defined(NTDDI_VISTA) || (NTDDI_VERSION < NTDDI_VISTA)
 typedef GUID KNOWNFOLDERID;
 #ifdef __cplusplus
 #define REFKNOWNFOLDERID const KNOWNFOLDERID &
