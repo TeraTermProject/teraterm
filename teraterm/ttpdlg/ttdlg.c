@@ -53,6 +53,7 @@
 #include "codeconv.h"
 #include "helpid.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -2081,7 +2082,6 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	POINT D, B, S;
 	int WX, WY, WW, WH, CW, DW, DH, BW, BH, SW, SH;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	char buf[MAX_PATH], buf2[MAX_PATH];
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -2197,18 +2197,23 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					EndDialog(Dialog, 0);
 					return TRUE;
 
-				case IDC_SELECT_DIR:
-					get_lang_msg("DLG_SELECT_DIR_TITLE", uimsg, sizeof(uimsg),
-					             "Select new directory", UILanguageFile);
+				case IDC_SELECT_DIR: {
+					wchar_t uimsgW[MAX_UIMSG];
+					wchar_t *buf, *buf2;
+					get_lang_msgW("DLG_SELECT_DIR_TITLE", uimsgW, _countof(uimsgW),
+								  L"Select new directory", UILanguageFile);
 					{
-						char FileDirExpanded[MAX_PATH];
-						GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
-						ExpandEnvironmentStrings(buf, FileDirExpanded, sizeof(FileDirExpanded));
-						if (doSelectFolder(Dialog, buf2, sizeof(buf2), FileDirExpanded, uimsg)) {
-							SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+						wchar_t FileDirExpanded[MAX_PATH];
+						hGetDlgItemTextW(Dialog, IDC_DIRNEW, &buf);
+						ExpandEnvironmentStringsW(buf, FileDirExpanded, _countof(FileDirExpanded));
+						if (doSelectFolderW(Dialog, FileDirExpanded, uimsgW, &buf2)) {
+							SetDlgItemTextW(Dialog, IDC_DIRNEW, buf2);
+							free(buf2);
 						}
+						free(buf);
 					}
 					return TRUE;
+				}
 
 				case IDC_DIRHELP:
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpFileChangeDir,0);

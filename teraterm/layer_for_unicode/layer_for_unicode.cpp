@@ -171,7 +171,7 @@ int WINAPI _GetWindowTextLengthW(HWND hWnd)
 	return (int)lenW;
 }
 
-static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT retval;
 	switch(Msg) {
@@ -215,6 +215,17 @@ static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 		free(strW);
 		return dest_len - 1 < lenW ? dest_len - 1 : lenW;
 	}
+	case BFFM_SETSELECTIONW: {
+		if (wParam == TRUE) {
+			// フォルダを選択状態にする
+			char *folderA = ToCharW((wchar_t *)lParam);
+			retval = SendMessageA(hWnd, BFFM_SETSELECTIONA, wParam, (LPARAM)folderA);
+			free(folderA);
+		}
+		else {
+			retval = SendMessageA(hWnd, Msg, wParam, lParam);
+		}
+	}
 	default:
 		retval = SendMessageA(hWnd, Msg, wParam, lParam);
 		break;
@@ -222,15 +233,10 @@ static LRESULT SendMessageAFromW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 	return retval;
 }
 
-LRESULT WINAPI _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	return SendMessageAFromW(hWnd, Msg, wParam, lParam);
-}
-
 LRESULT WINAPI _SendDlgItemMessageW(HWND hDlg, int nIDDlgItem, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HWND hWnd = GetDlgItem(hDlg, nIDDlgItem);
-	return SendMessageAFromW(hWnd, Msg, wParam, lParam);
+	return _SendMessageW(hWnd, Msg, wParam, lParam);
 }
 
 HWND WINAPI _CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X,
@@ -477,7 +483,7 @@ BOOL WINAPI _SetCurrentDirectoryW(LPCWSTR lpPathName)
 LPITEMIDLIST WINAPI _SHBrowseForFolderW(LPBROWSEINFOW lpbi)
 {
 	char display_name[MAX_PATH];
-	BROWSEINFOA biA;
+	BROWSEINFOA biA = {};
 	biA.hwndOwner = lpbi->hwndOwner;
 	biA.pidlRoot = lpbi->pidlRoot;
 	biA.pszDisplayName = display_name;

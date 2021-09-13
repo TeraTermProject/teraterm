@@ -3306,13 +3306,14 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 		case IDC_RECVDIR_SELECT | (BN_CLICKED << 16):
 			{
-			char buf[MAX_PATH], buf2[MAX_PATH];
-			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(buf), (LPARAM)buf);
-			if (doSelectFolder(dlg, buf2, sizeof(buf2), buf, "Choose destination directory")) {
-				strncpy_s(recvdir, sizeof(recvdir), buf2, _TRUNCATE);
-				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
+			wchar_t *buf, *buf2;
+			hGetDlgItemTextW(dlg, IDC_RECVFILE_TO, &buf);
+			if (doSelectFolderW(dlg, buf, L"Choose destination directory", &buf2)) {
+				WideCharToACP_t(buf2, recvdir, sizeof(recvdir));
+				SetDlgItemTextA(dlg, IDC_RECVFILE_TO, recvdir);
+				free(buf2);
 			}
+			free(buf);
 			}
 			return TRUE;
 		}

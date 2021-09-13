@@ -94,7 +94,7 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 int get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
-BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg);
+BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder);
 DllExport void OutputDebugPrintf(const char *fmt, ...);
 void OutputDebugPrintfW(const wchar_t *fmt, ...);
 void OutputDebugHexDump(const void *data, size_t len);

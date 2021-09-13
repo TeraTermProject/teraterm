@@ -54,6 +54,7 @@
 #include "coding_pp.h"
 #include "font_pp.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1424,12 +1425,14 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// ログディレクトリの選択ダイアログ
 			{
 				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFile);
-				wchar_t buf[MAX_PATH];
-				wchar_t buf2[MAX_PATH];
-				GetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, buf, _countof(buf));
-				if (doSelectFolderW(GetSafeHwnd(), buf2, _countof(buf2), buf, title)) {
+				wchar_t *buf;
+				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &buf);
+				wchar_t *buf2;
+				if (doSelectFolderW(GetSafeHwnd(), buf, title, &buf2)) {
 					SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, buf2);
+					free(buf2);
 				}
+				free(buf);
 				free(title);
 			}
 
@@ -1662,16 +1665,18 @@ void CCygwinPropPageDlg::OnInitDialog()
 
 BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	wchar_t buf[MAX_PATH], buf2[MAX_PATH];
-
 	switch (wParam) {
 		case IDC_SELECT_FILE | (BN_CLICKED << 16):
 			// Cygwin install ディレクトリの選択ダイアログ
 			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", ts.UILanguageFile);
-			GetDlgItemTextW(IDC_CYGWIN_PATH, buf, _countof(buf));
-			if (doSelectFolderW(GetSafeHwnd(), buf2, _countof(buf2), buf, title)) {
-				SetDlgItemTextW(IDC_CYGWIN_PATH, buf2);
+			wchar_t *buf;
+			hGetDlgItemTextW(m_hWnd, IDC_CYGWIN_PATH, &buf);
+			wchar_t *path;
+			if (doSelectFolderW(GetSafeHwnd(), buf, title, &path)) {
+				SetDlgItemTextW(IDC_CYGWIN_PATH, path);
+				free(path);
 			}
+			free(buf);
 			free(title);
 			return TRUE;
 	}
