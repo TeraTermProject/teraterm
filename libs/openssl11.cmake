@@ -194,6 +194,14 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
     (${CMAKE_GENERATOR} MATCHES "NMake Makefiles"))
   ######################################## VS
   if(${CMAKE_GENERATOR} MATCHES "NMake Makefiles")
+  elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022")
+    find_program(
+      VCVARS32 vcvarsall.bat
+      HINTS "C:/Program Files/Microsoft Visual Studio/2022/Preview/VC/Auxiliary/Build"
+      HINTS "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build"
+      HINTS "C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Auxiliary/Build"
+      HINTS "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build"
+      )
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019")
     find_program(
       VCVARS32 vcvarsall.bat
@@ -275,7 +283,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
       "set LIB=%SDK%\\lib;%LIB%\n"
       )
   endif()
-  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019")
+  if((${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019") OR ${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022")
     if("${ARCHITECTURE}" MATCHES "x64")
       file(APPEND "${SRC_DIR}/build_cmake.bat"
         "call \"${VCVARS32_N}\" amd64\n"
