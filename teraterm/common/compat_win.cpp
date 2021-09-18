@@ -505,13 +505,26 @@ ULONGLONG _VerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, 
 
 static BOOL GetCSIDLFromFKNOWNFOLDERID(REFKNOWNFOLDERID rfid, int *csidl)
 {
-	// TODO GetSpecialFolder() ttmlib.c ÇÉJÉoÅ[Ç≈Ç´ÇÈÇÊÇ§Ç…Ç∑ÇÈ
 	static const struct {
 		REFKNOWNFOLDERID rfid;
 		int csidl;
 	} list[] = {
+		{ FOLDERID_PublicDesktop, CSIDL_COMMON_DESKTOPDIRECTORY },
+		{ FOLDERID_CommonStartMenu, CSIDL_COMMON_STARTMENU },
+		{ FOLDERID_CommonPrograms, CSIDL_COMMON_PROGRAMS },
+		{ FOLDERID_CommonStartup, CSIDL_COMMON_STARTUP },
 		{ FOLDERID_Desktop, CSIDL_DESKTOPDIRECTORY },
+		{ FOLDERID_Favorites, CSIDL_FAVORITES },
+		{ FOLDERID_Fonts, CSIDL_FONTS },
 		{ FOLDERID_Documents, CSIDL_MYDOCUMENTS },	// %USERPROFILE%\My Documents
+		{ FOLDERID_NetHood, CSIDL_NETHOOD },
+		{ FOLDERID_PrintHood, CSIDL_PRINTHOOD },
+		{ FOLDERID_Programs, CSIDL_PROGRAMS },
+		{ FOLDERID_Recent, CSIDL_RECENT },
+		{ FOLDERID_SendTo, CSIDL_SENDTO },
+		{ FOLDERID_StartMenu, CSIDL_STARTMENU },
+		{ FOLDERID_Startup, CSIDL_STARTUP },
+		{ FOLDERID_Templates, CSIDL_TEMPLATES },
 		{ FOLDERID_LocalAppData, CSIDL_LOCAL_APPDATA },
 		{ FOLDERID_Downloads, CSIDL_MYDOCUMENTS },	// %USERPROFILE%\Downloads, My Documents
 	};
