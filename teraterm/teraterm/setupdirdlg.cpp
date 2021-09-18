@@ -265,10 +265,6 @@ static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filen
 		L"SystemRoot",
 		NULL
 	};
-	LPITEMIDLIST pidl;
-	int CSIDL;
-	wchar_t shPath[1024];
-	wchar_t *vs_file;
 	const wchar_t** p = virstore_env;
 
 	if (GetVirtualStoreEnvironment() == FALSE)
@@ -285,15 +281,13 @@ static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filen
 	if (*p == NULL)
 		goto error;
 
-	CSIDL = CSIDL_LOCAL_APPDATA;
-	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
-		goto error;
-	}
-	SHGetPathFromIDListW(pidl, shPath);
-	CoTaskMemFree(pidl);
 
 	// Virtual Storeパスを作る。
-	aswprintf(&vs_file, L"%s\\VirtualStore%s", shPath, path_nodrive, file);
+	wchar_t *local_appdata;
+	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &local_appdata);
+	wchar_t *vs_file;
+	aswprintf(&vs_file, L"%s\\VirtualStore%s", local_appdata, path_nodrive, file);
+	free(local_appdata);
 
 	// 最後に、Virtual Storeにファイルがあるかどうかを調べる。
 	if (GetFileAttributesW(vs_file) == INVALID_FILE_ATTRIBUTES) {
