@@ -209,27 +209,26 @@ static int GetSpecialFolderAlloc(const char *type, char **dest)
 	typedef struct {
 		const char *name;
 		REFKNOWNFOLDERID rfid;
-		int csidl;
 	} SpFolder;
 
 	static const SpFolder spfolders[] = {
-		{ "AllUsersDesktop",   &FOLDERID_PublicDesktop, CSIDL_COMMON_DESKTOPDIRECTORY },
-		{ "AllUsersStartMenu", &FOLDERID_CommonStartMenu, CSIDL_COMMON_STARTMENU },
-		{ "AllUsersPrograms",  &FOLDERID_CommonPrograms, CSIDL_COMMON_PROGRAMS },
-		{ "AllUsersStartup",   &FOLDERID_CommonStartup, CSIDL_COMMON_STARTUP },
-		{ "Desktop",           &FOLDERID_Desktop, CSIDL_DESKTOPDIRECTORY },
-		{ "Favorites",         &FOLDERID_Favorites, CSIDL_FAVORITES },
-		{ "Fonts",             &FOLDERID_Fonts, CSIDL_FONTS },
-		{ "MyDocuments",       &FOLDERID_Documents, CSIDL_PERSONAL },
-		{ "NetHood",           &FOLDERID_NetHood, CSIDL_NETHOOD },
-		{ "PrintHood",         &FOLDERID_PrintHood, CSIDL_PRINTHOOD },
-		{ "Programs",          &FOLDERID_Programs, CSIDL_PROGRAMS },
-		{ "Recent",            &FOLDERID_Recent, CSIDL_RECENT },
-		{ "SendTo",            &FOLDERID_SendTo, CSIDL_SENDTO },
-		{ "StartMenu",         &FOLDERID_StartMenu, CSIDL_STARTMENU },
-		{ "Startup",           &FOLDERID_Startup, CSIDL_STARTUP },
-		{ "Templates",         &FOLDERID_Templates, CSIDL_TEMPLATES },
-		{ NULL,                NULL, -1}
+		{ "AllUsersDesktop",   &FOLDERID_PublicDesktop },
+		{ "AllUsersStartMenu", &FOLDERID_CommonStartMenu },
+		{ "AllUsersPrograms",  &FOLDERID_CommonPrograms },
+		{ "AllUsersStartup",   &FOLDERID_CommonStartup },
+		{ "Desktop",           &FOLDERID_Desktop },
+		{ "Favorites",         &FOLDERID_Favorites },
+		{ "Fonts",             &FOLDERID_Fonts },
+		{ "MyDocuments",       &FOLDERID_Documents },
+		{ "NetHood",           &FOLDERID_NetHood },
+		{ "PrintHood",         &FOLDERID_PrintHood },
+		{ "Programs",          &FOLDERID_Programs },
+		{ "Recent",            &FOLDERID_Recent },
+		{ "SendTo",            &FOLDERID_SendTo },
+		{ "StartMenu",         &FOLDERID_StartMenu },
+		{ "Startup",           &FOLDERID_Startup },
+		{ "Templates",         &FOLDERID_Templates },
+		{ NULL,                NULL }
 	};
 
 	const SpFolder *p;
