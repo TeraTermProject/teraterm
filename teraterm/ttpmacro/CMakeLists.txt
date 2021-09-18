@@ -109,7 +109,19 @@ target_link_libraries(
   ttpcmn
   ${ONIGURUMA_LIB}
   ${SFMT_LIB}
-  #
+  )
+
+if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    layer_for_unicode
+    )
+endif()
+
+target_link_libraries(
+  ${PACKAGE_NAME}
+  PRIVATE
   iphlpapi
   ws2_32
   comctl32
