@@ -1,0 +1,99 @@
+﻿; test for getspecialfolder
+
+filename = "getspecialfolder_result.txt"
+;filename = "getspecialfolder_result😃😁👍.txt"
+
+fileopen fd filename 1
+if fd == -1 then
+  messagebox "fileopen failure" "teraterm test"
+  exit
+endif
+
+sprintf2 msg "getspecialfolder file '%s'" filename
+messagebox msg "teraterm test"
+
+foldertype = "AllUsersDesktop"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "AllUsersStartMenu"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "AllUsersPrograms"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "AllUsersStartup"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Desktop"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Favorites"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Fonts"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "MyDocuments"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "NetHood"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "PrintHood"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Programs"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Recent"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "SendTo"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "StartMenu"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Startup"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+foldertype = "Templates"
+getspecialfolder s foldertype
+sprintf2 str "%s: %s\n" foldertype s
+strspecial str
+filewrite fd str
+
+fileclose fd
+
+messagebox "getspecialfolder finish" "teraterm test"
+
