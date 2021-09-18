@@ -44,7 +44,7 @@ void CalcTextExtentW(HWND hWnd, HFONT Font, const wchar_t *Text, LPSIZE s);
 void TTMGetDir(PCHAR Dir, int destlen);
 void TTMSetDir(const char *Dir);
 int GetAbsPath(PCHAR FName, int destlen);
-int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type);
+int GetSpecialFolder(PCHAR dest, int dest_len, const char *type);
 void BringupWindow(HWND hWnd);
 int MessageBoxHaltScript(HWND hWnd);
 

@@ -204,57 +204,56 @@ BOOL GetAbsPath(PCHAR FName, int destlen)
   return TRUE;
 }
 
-int DoGetSpecialFolder(int CSIDL, PCHAR dest, int dest_len)
-{
-	char Path[MAX_PATH] = "";
-	LPITEMIDLIST pidl;
-
-	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
-		return 0;
-	}
-
-	SHGetPathFromIDList(pidl, Path);
-	CoTaskMemFree(pidl);
-
-	strncpy_s(dest, dest_len, Path, _TRUNCATE);
-	return 1;
-}
-
-int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
+static int GetSpecialFolderAlloc(const char *type, char **dest)
 {
 	typedef struct {
-		char *name;
+		const char *name;
+		REFKNOWNFOLDERID rfid;
 		int csidl;
 	} SpFolder;
 
 	static const SpFolder spfolders[] = {
-		{ "AllUsersDesktop",   CSIDL_COMMON_DESKTOPDIRECTORY },
-		{ "AllUsersStartMenu", CSIDL_COMMON_STARTMENU },
-		{ "AllUsersPrograms",  CSIDL_COMMON_PROGRAMS },
-		{ "AllUsersStartup",   CSIDL_COMMON_STARTUP },
-		{ "Desktop",           CSIDL_DESKTOPDIRECTORY },
-		{ "Favorites",         CSIDL_FAVORITES },
-		{ "Fonts",             CSIDL_FONTS },
-		{ "MyDocuments",       CSIDL_PERSONAL },
-		{ "NetHood",           CSIDL_NETHOOD },
-		{ "PrintHood",         CSIDL_PRINTHOOD },
-		{ "Programs",          CSIDL_PROGRAMS },
-		{ "Recent",            CSIDL_RECENT },
-		{ "SendTo",            CSIDL_SENDTO },
-		{ "StartMenu",         CSIDL_STARTMENU },
-		{ "Startup",           CSIDL_STARTUP },
-		{ "Templates",         CSIDL_TEMPLATES },
-		{ NULL,                -1}
+		{ "AllUsersDesktop",   &FOLDERID_PublicDesktop, CSIDL_COMMON_DESKTOPDIRECTORY },
+		{ "AllUsersStartMenu", &FOLDERID_CommonStartMenu, CSIDL_COMMON_STARTMENU },
+		{ "AllUsersPrograms",  &FOLDERID_CommonPrograms, CSIDL_COMMON_PROGRAMS },
+		{ "AllUsersStartup",   &FOLDERID_CommonStartup, CSIDL_COMMON_STARTUP },
+		{ "Desktop",           &FOLDERID_Desktop, CSIDL_DESKTOPDIRECTORY },
+		{ "Favorites",         &FOLDERID_Favorites, CSIDL_FAVORITES },
+		{ "Fonts",             &FOLDERID_Fonts, CSIDL_FONTS },
+		{ "MyDocuments",       &FOLDERID_Documents, CSIDL_PERSONAL },
+		{ "NetHood",           &FOLDERID_NetHood, CSIDL_NETHOOD },
+		{ "PrintHood",         &FOLDERID_PrintHood, CSIDL_PRINTHOOD },
+		{ "Programs",          &FOLDERID_Programs, CSIDL_PROGRAMS },
+		{ "Recent",            &FOLDERID_Recent, CSIDL_RECENT },
+		{ "SendTo",            &FOLDERID_SendTo, CSIDL_SENDTO },
+		{ "StartMenu",         &FOLDERID_StartMenu, CSIDL_STARTMENU },
+		{ "Startup",           &FOLDERID_Startup, CSIDL_STARTUP },
+		{ "Templates",         &FOLDERID_Templates, CSIDL_TEMPLATES },
+		{ NULL,                NULL, -1}
 	};
 
 	const SpFolder *p;
 
 	for (p = spfolders; p->name != NULL; p++) {
 		if (_stricmp(type, p->name) == 0) {
-			return DoGetSpecialFolder(p->csidl, dest, dest_len);
+			wchar_t *folderW;
+			_SHGetKnownFolderPath(p->rfid, 0, NULL, &folderW);
+			*dest = ToU8W(folderW);
+			free(folderW);
+			return 1;
 		}
 	}
+	*dest = NULL;
 	return 0;
+}
+
+int GetSpecialFolder(PCHAR dest, int dest_len, const char *type)
+{
+	char *folder;
+	GetSpecialFolderAlloc(type, &folder);
+	strncpy_s(dest, dest_len, folder, _TRUNCATE);
+	free(folder);
+	return 1;
 }
 
 void BringupWindow(HWND hWnd)
