@@ -41,31 +41,6 @@
 
 static char CurrentDir[MAXPATHLEN];
 
-typedef struct {
-	char *name;
-	int csidl;
-} SpFolder;
-
-static SpFolder spfolders[] = {
-	{ "AllUsersDesktop",   CSIDL_COMMON_DESKTOPDIRECTORY },
-	{ "AllUsersStartMenu", CSIDL_COMMON_STARTMENU },
-	{ "AllUsersPrograms",  CSIDL_COMMON_PROGRAMS },
-	{ "AllUsersStartup",   CSIDL_COMMON_STARTUP },
-	{ "Desktop",           CSIDL_DESKTOPDIRECTORY },
-	{ "Favorites",         CSIDL_FAVORITES },
-	{ "Fonts",             CSIDL_FONTS },
-	{ "MyDocuments",       CSIDL_PERSONAL },
-	{ "NetHood",           CSIDL_NETHOOD },
-	{ "PrintHood",         CSIDL_PRINTHOOD },
-	{ "Programs",          CSIDL_PROGRAMS },
-	{ "Recent",            CSIDL_RECENT },
-	{ "SendTo",            CSIDL_SENDTO },
-	{ "StartMenu",         CSIDL_STARTMENU },
-	{ "Startup",           CSIDL_STARTUP },
-	{ "Templates",         CSIDL_TEMPLATES },
-	{ NULL,                -1}
-};
-
 /**
  * •¶Žš‚ð•`‰æ‚µ‚½Žž‚ÌƒTƒCƒY‚ðŽZo‚·‚é
  *	@param[in]	hWnd
@@ -247,7 +222,32 @@ int DoGetSpecialFolder(int CSIDL, PCHAR dest, int dest_len)
 
 int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
 {
-	SpFolder *p;
+	typedef struct {
+		char *name;
+		int csidl;
+	} SpFolder;
+
+	static const SpFolder spfolders[] = {
+		{ "AllUsersDesktop",   CSIDL_COMMON_DESKTOPDIRECTORY },
+		{ "AllUsersStartMenu", CSIDL_COMMON_STARTMENU },
+		{ "AllUsersPrograms",  CSIDL_COMMON_PROGRAMS },
+		{ "AllUsersStartup",   CSIDL_COMMON_STARTUP },
+		{ "Desktop",           CSIDL_DESKTOPDIRECTORY },
+		{ "Favorites",         CSIDL_FAVORITES },
+		{ "Fonts",             CSIDL_FONTS },
+		{ "MyDocuments",       CSIDL_PERSONAL },
+		{ "NetHood",           CSIDL_NETHOOD },
+		{ "PrintHood",         CSIDL_PRINTHOOD },
+		{ "Programs",          CSIDL_PROGRAMS },
+		{ "Recent",            CSIDL_RECENT },
+		{ "SendTo",            CSIDL_SENDTO },
+		{ "StartMenu",         CSIDL_STARTMENU },
+		{ "Startup",           CSIDL_STARTUP },
+		{ "Templates",         CSIDL_TEMPLATES },
+		{ NULL,                -1}
+	};
+
+	const SpFolder *p;
 
 	for (p = spfolders; p->name != NULL; p++) {
 		if (_stricmp(type, p->name) == 0) {
