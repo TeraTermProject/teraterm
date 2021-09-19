@@ -55,7 +55,6 @@
 #ifndef CLEARTYPE_QUALITY
 #define CLEARTYPE_QUALITY 5
 #endif
-#define INI_FILE_IS_UNICODE	1
 
 #define Section "Tera Term"
 #define SectionW L"Tera Term"
@@ -161,14 +160,12 @@ error:
 	return (ret);
 }
 
-#if INI_FILE_IS_UNICODE
 #undef GetPrivateProfileInt
 #undef GetPrivateProfileString
 #define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntAFileW(p1, p2, p3, p4)
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
 #define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
 #define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
-#endif
 
 /*
  * シリアルポート関連の設定
@@ -3626,40 +3623,31 @@ void PASCAL CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const 
 	WritePrivateProfileStringW(NULL, NULL, NULL, IniDest);
 }
 
-void PASCAL AddValueToList(PCHAR FNameA, PCHAR Host, PCHAR section,
-                               PCHAR key, int MaxList)
+void PASCAL AddValueToList(const wchar_t *FName, const wchar_t *Host, const wchar_t *section,
+						   const wchar_t *key, int MaxList)
 {
-	HANDLE MemH;
-	PCHAR MemP;
-	char EntName[13];
+	wchar_t *MemP;
+	wchar_t EntName[13];
 	int i, j, Len;
 	BOOL Update;
-#if	INI_FILE_IS_UNICODE
-	wchar_t *FName = ToWcharA(FNameA);
-#else
-	char *FName = FNameA;
-#endif
 
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
-	MemH = GlobalAlloc(GHND, (HostNameMaxLength + 1) * MaxList);
-	if (MemH == NULL)
-		return;
-	MemP = GlobalLock(MemH);
+	MemP = malloc((HostNameMaxLength + 1) * sizeof(wchar_t) * MaxList);
 	if (MemP != NULL) {
-		strncpy_s(MemP, (HostNameMaxLength + 1) * MaxList, Host, _TRUNCATE);
-		j = strlen(Host) + 1;
+		wcsncpy_s(MemP, (HostNameMaxLength + 1) * MaxList, Host, _TRUNCATE);
+		j = wcslen(Host) + 1;
 		i = 1;
 		Update = TRUE;
 		do {
-			_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "%s%i", key, i);
+			_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"%s%i", key, i);
 
 			/* Get a hostname */
-			GetPrivateProfileStringA(section, EntName, "",
+			GetPrivateProfileStringW(section, EntName, L"",
 									 &MemP[j], HostNameMaxLength + 1,
 									 FName);
-			Len = strlen(&MemP[j]);
-			if (_stricmp(&MemP[j], Host) == 0) {
+			Len = wcslen(&MemP[j]);
+			if (_wcsicmp(&MemP[j], Host) == 0) {
 				if (i == 1)
 					Update = FALSE;
 			}
@@ -3670,25 +3658,24 @@ void PASCAL AddValueToList(PCHAR FNameA, PCHAR Host, PCHAR section,
 		} while ((i <= MaxList) && Update);
 
 		if (Update) {
-			WritePrivateProfileStringA(section, NULL, NULL, FName);
+			WritePrivateProfileStringW(section, NULL, NULL, FName);
 
 			j = 0;
 			i = 1;
 			do {
-				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "%s%i", key, i);
+				_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"%s%i", key, i);
 
 				if (MemP[j] != 0)
-					WritePrivateProfileStringA(section, EntName, &MemP[j],
+					WritePrivateProfileStringW(section, EntName, &MemP[j],
 											   FName);
-				j = j + strlen(&MemP[j]) + 1;
+				j = j + wcslen(&MemP[j]) + 1;
 				i++;
 			} while ((i <= MaxList) && (MemP[j] != 0));
 			/* update file */
-			WritePrivateProfileString(NULL, NULL, NULL, FName);
+			WritePrivateProfileStringW(NULL, NULL, NULL, FName);
 		}
-		GlobalUnlock(MemH);
+		free(MemP);
 	}
-	GlobalFree(MemH);
 }
 
  /* copy hostlist from source IniFile to dest IniFile */
@@ -3697,9 +3684,9 @@ void PASCAL CopyHostList(const wchar_t *IniSrc, const wchar_t *IniDest)
 	CopySerialList(IniSrc, IniDest, L"Hosts", L"Host", MAXHOSTLIST);
 }
 
-void PASCAL AddHostToList(PCHAR FName, PCHAR Host)
+void PASCAL AddHostToList(const wchar_t *FName, const wchar_t *Host)
 {
-	AddValueToList(FName, Host, "Hosts", "Host", MAXHOSTLIST);
+	AddValueToList(FName, Host, L"Hosts", L"Host", MAXHOSTLIST);
 }
 #if 0
 BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)

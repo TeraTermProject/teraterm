@@ -3499,7 +3499,9 @@ void CVTWindow::OnFileNewConnection()
 	if ((*GetHostName)(HVTWin,&GetHNRec)) {
 		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 			if (ts.HistoryList) {
-				(*AddHostToList)(ts.SetupFName,GetHNRec.HostName);
+				wchar_t *HostNameW = ToWcharA(GetHNRec.HostName);
+				(*AddHostToList)(ts.SetupFNameW, HostNameW);
+				free(HostNameW);
 			}
 			if (ts.JumpList) {
 				add_session_to_jumplist(GetHNRec.HostName, GetHNRec.SetupFN);

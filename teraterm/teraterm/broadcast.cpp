@@ -87,25 +87,25 @@
  *  bufの直後には \0 は付かない
  */
 
-#define BROADCAST_LOGFILE "broadcast.log"
+#define BROADCAST_LOGFILE L"broadcast.log"
 
-static void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
+static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
 {
-	char EntName[13];
-	char Command[HostNameMaxLength+1];
+	wchar_t EntName[13];
+	wchar_t Command[HostNameMaxLength+1];
 	int i = 1;
 
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
 	do {
-		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Command%d", i);
-		GetPrivateProfileStringA("BroadcastCommands",EntName,"",
+		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"Command%d", i);
+		GetPrivateProfileStringW(L"BroadcastCommands",EntName, L"",
 								 Command,sizeof(Command), historyfile);
-		if (strlen(Command) > 0) {
-			SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
-			                   0, (LPARAM)Command);
+		if (Command[0] != 0) {
+			SendDlgItemMessageW(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
+								0, (LPARAM)Command);
 		}
 		i++;
-	} while ((i <= ts.MaxBroadcatHistory) && (strlen(Command)>0));
+	} while ((i <= ts.MaxBroadcatHistory) && (Command[0] != 0));
 
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, EM_LIMITTEXT,
 	                   HostNameMaxLength-1, 0);
@@ -419,7 +419,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	};
 	LRESULT checked;
 	LRESULT history;
-	char historyfile[MAX_PATH];
 	static HWND hwndBroadcast     = NULL; // Broadcast dropdown
 	static HWND hwndBroadcastEdit = NULL; // Edit control on Broadcast dropdown
 	// for resize
@@ -443,7 +442,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			}
 			break;
 
-		case WM_INITDIALOG:
+		case WM_INITDIALOG: {
 			// ラジオボタンのデフォルトは CR にする。
 			SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_SETCHECK, BST_CHECKED, 0);
 			// デフォルトでチェックボックスを checked 状態にする。
@@ -452,8 +451,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			if (ts.BroadcastCommandHistory) {
 				SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			}
-			GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
+			wchar_t *historyfile = GetDefaultFNameW(ts.HomeDirW, BROADCAST_LOGFILE);
 			ApplyBroadCastCommandHisotry(hWnd, historyfile);
+			free(historyfile);
 
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
@@ -512,6 +512,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
 
 			return FALSE;
+		}
 
 		case WM_COMMAND:
 			switch (wp) {
@@ -583,15 +584,14 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
 							history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
 							if (history) {
-								GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
+								wchar_t *historyfile = GetDefaultFNameW(ts.HomeDirW, BROADCAST_LOGFILE);
 								if (LoadTTSET()) {
-									char *bufA = ToCharW(buf);	// TODO wchar_t 対応
-									(*AddValueToList)(historyfile, bufA, "BroadcastCommands", "Command",
+									(*AddValueToList)(historyfile, buf, L"BroadcastCommands", L"Command",
 													  ts.MaxBroadcatHistory);
-									free(bufA);
 									FreeTTSET();
 								}
 								ApplyBroadCastCommandHisotry(hWnd, historyfile);
+								free(historyfile);
 								ts.BroadcastCommandHistory = TRUE;
 							}
 							else {
@@ -638,8 +638,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
-						GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
+						wchar_t *historyfile = GetDefaultFNameW(ts.HomeDirW, BROADCAST_LOGFILE);
 						ApplyBroadCastCommandHisotry(hWnd, historyfile);
+						free(historyfile);
 					}
 					return FALSE;
 
