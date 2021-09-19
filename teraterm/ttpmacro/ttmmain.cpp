@@ -250,7 +250,6 @@ BOOL CCtrlWindow::OnInitDialog()
 		{ IDC_CTRLPAUSESTART, "BTN_PAUSE" },
 		{ IDC_CTRLEND, "BTN_END" },
 	};
-	char Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
 	BOOL IOption, VOption;
 	int CmdShow;
 	int fuLoad = LR_DEFAULTCOLOR;
@@ -293,9 +292,10 @@ BOOL CCtrlWindow::OnInitDialog()
 	// wait4all
 	register_macro_window(GetSafeHwnd());
 
-	strncpy_s(Temp, sizeof(Temp), "MACRO - ", _TRUNCATE);
-	strncat_s(Temp, sizeof(Temp), ShortName, _TRUNCATE);
-	SetWindowText(Temp);
+	wchar_t Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
+	wcsncpy_s(Temp, _countof(Temp), L"MACRO - ", _TRUNCATE);
+	wcsncat_s(Temp, _countof(Temp), ShortName, _TRUNCATE);
+	SetWindowTextW(Temp);
 
 	// send the initialization signal to TT
 	SendCmnd(CmdInit,0);

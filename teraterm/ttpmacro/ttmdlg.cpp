@@ -57,10 +57,10 @@
 
 char HomeDir[MAX_PATH];
 wchar_t *HomeDirW;
-char FileName[MAX_PATH];
-char TopicName[11];
-char ShortName[MAX_PATH];
-char **Params = NULL;
+wchar_t FileName[MAX_PATH];
+wchar_t TopicName[11];
+wchar_t ShortName[MAX_PATH];
+wchar_t **Params = NULL;
 int ParamCnt;
 int ParamsSize;
 BOOL SleepFlag;
@@ -73,10 +73,9 @@ static CStatDlg *StatDlg = NULL;
 
 void ParseParam(PBOOL IOption, PBOOL VOption)
 {
-	int dirlen, fnpos;
-	char *Param, **ptmp;
-	char Temp[MaxStrLen];
-	PCHAR start, cur, next;
+	wchar_t *Param, **ptmp;
+	wchar_t Temp[MaxStrLen];
+	wchar_t *start, *cur, *next;
 
 	// go home directory
 	_chdir(HomeDir);
@@ -87,42 +86,42 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	SleepFlag = FALSE;
 	*IOption = FALSE;
 	*VOption = FALSE;
-	Param = GetCommandLineA();
+	Param = GetCommandLineW();
 
 	ParamsSize = 50;
-	Params = (char **)malloc(sizeof(char*) * ParamsSize);
+	Params = (wchar_t **)malloc(sizeof(wchar_t *) * ParamsSize);
 	if (Params) {
-		Params[0] = _strdup(Param);
+		Params[0] = _wcsdup(Param);
 		Params[1] = NULL;
 	}
 
 	// the first term shuld be executable filename of TTMACRO
-	start = GetParam(Temp, sizeof(Temp), Param);
+	start = GetParam(Temp, _countof(Temp), Param);
 	ParamCnt = 0;
 
 	for (cur = start; next = GetParam(Temp, sizeof(Temp), cur); cur = next) {
-		DequoteParam(Temp, sizeof(Temp), Temp);
+		DequoteParam(Temp, _countof(Temp), Temp);
 		if (ParamCnt == 0) {
-			if (_strnicmp(Temp,"/D=",3)==0) { // DDE option
-				strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);
+			if (_wcsnicmp(Temp,L"/D=",3)==0) { // DDE option
+				wcsncpy_s(TopicName, _countof(TopicName), &Temp[3], _TRUNCATE);
 				continue;
 			}
-			else if (_stricmp(Temp, "/I")==0) {
+			else if (_wcsicmp(Temp, L"/I")==0) {
 				*IOption = TRUE;
 				continue;
 			}
-			else if (_stricmp(Temp, "/S")==0) {
+			else if (_wcsicmp(Temp, L"/S")==0) {
 				SleepFlag = TRUE;
 				continue;
 			}
-			else if (_stricmp(Temp, "/V")==0) {
+			else if (_wcsicmp(Temp, L"/V")==0) {
 				*VOption = TRUE;
 				continue;
 			}
 		}
 
 		if (++ParamCnt == 1) {
-			strncpy_s(FileName, sizeof(FileName), Temp, _TRUNCATE);
+			wcsncpy_s(FileName, _countof(FileName), Temp, _TRUNCATE);
 			if (Params == NULL) {
 				break;
 			}
@@ -130,14 +129,14 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		else {
 			if (ParamsSize <= ParamCnt) {
 				ParamsSize += 10;
-				ptmp = (char **)realloc(Params, sizeof(char*) * ParamsSize);
+				ptmp = (wchar_t **)realloc(Params, sizeof(wchar_t*) * ParamsSize);
 				if (ptmp == NULL) {
 					ParamCnt--;
 					break;
 				}
 				Params = ptmp;
 			}
-			Params[ParamCnt] = _strdup(Temp);
+			Params[ParamCnt] = _wcsdup(Temp);
 		}
 	}
 
@@ -145,17 +144,18 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		FileName[0] = 0;
 	}
 	else if (FileName[0]!=0) {
-		if (GetFileNamePos(FileName, &dirlen, &fnpos)) {
-			FitFileName(&FileName[fnpos], sizeof(FileName) - fnpos, ".TTL");
-			strncpy_s(ShortName, sizeof(ShortName), &FileName[fnpos], _TRUNCATE);
+		size_t dirlen, fnpos;
+		if (GetFileNamePosW(FileName, &dirlen, &fnpos)) {
+			FitFileNameW(&FileName[fnpos], _countof(FileName) - fnpos, L".TTL");
+			wcsncpy_s(ShortName, _countof(ShortName), &FileName[fnpos], _TRUNCATE);
 			if (dirlen==0) {
-				strncpy_s(FileName, sizeof(FileName), HomeDir, _TRUNCATE);
-				AppendSlash(FileName, sizeof(FileName));
-				strncat_s(FileName, sizeof(FileName), ShortName, _TRUNCATE);
+				wcsncpy_s(FileName, _countof(FileName), HomeDirW, _TRUNCATE);
+				AppendSlashW(FileName, _countof(FileName));
+				wcsncat_s(FileName, _countof(FileName), ShortName, _TRUNCATE);
 			}
 
 			if (Params) {
-				Params[1] = _strdup(ShortName);
+				Params[1] = _wcsdup(ShortName);
 			}
 		}
 		else {
@@ -166,9 +166,9 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 
 BOOL GetFileName(HWND HWin)
 {
-	char FNFilter[31];
-	OPENFILENAME FNameRec;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+	wchar_t FNFilter[31];
+	OPENFILENAMEW FNameRec;
+	wchar_t uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 
 	if (FileName[0]!=0) {
 		return FALSE;
@@ -176,11 +176,11 @@ BOOL GetFileName(HWND HWin)
 
 	memset(FNFilter, 0, sizeof(FNFilter));
 	memset(&FNameRec, 0, sizeof(OPENFILENAME));
-	get_lang_msg("FILEDLG_OPEN_MACRO_FILTER", uimsg, sizeof(uimsg), "Macro files (*.ttl)\\0*.ttl\\0\\0", UILanguageFile);
+	get_lang_msgW("FILEDLG_OPEN_MACRO_FILTER", uimsg, sizeof(uimsg), L"Macro files (*.ttl)\\0*.ttl\\0\\0", UILanguageFile);
 	memcpy(FNFilter, uimsg, sizeof(FNFilter));
 
 	// sizeof(OPENFILENAME) ‚Å‚Í Windows98/NT ‚ÅI—¹‚µ‚Ä‚µ‚Ü‚¤‚½‚ß (2006.8.14 maya)
-	FNameRec.lStructSize = get_OPENFILENAME_SIZE();
+	FNameRec.lStructSize = get_OPENFILENAME_SIZEW();
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	FNameRec.hwndOwner = HWin;
 	FNameRec.lpstrFilter = FNFilter;
@@ -193,11 +193,11 @@ BOOL GetFileName(HWND HWin)
 	FNameRec.lpstrInitialDir = HomeDir;
 #endif
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	FNameRec.lpstrDefExt = "TTL";
-	get_lang_msg("FILEDLG_OPEN_MACRO_TITLE", uimsg2, sizeof(uimsg2), "MACRO: Open macro", UILanguageFile);
+	FNameRec.lpstrDefExt = L"TTL";
+	get_lang_msgW("FILEDLG_OPEN_MACRO_TITLE", uimsg2, sizeof(uimsg2), L"MACRO: Open macro", UILanguageFile);
 	FNameRec.lpstrTitle = uimsg2;
-	if (GetOpenFileName(&FNameRec)) {
-		strncpy_s(ShortName, sizeof(ShortName), &(FileName[FNameRec.nFileOffset]), _TRUNCATE);
+	if (GetOpenFileNameW(&FNameRec)) {
+		wcsncpy_s(ShortName, _countof(ShortName), &(FileName[FNameRec.nFileOffset]), _TRUNCATE);
 	}
 	else {
 		FileName[0] = 0;

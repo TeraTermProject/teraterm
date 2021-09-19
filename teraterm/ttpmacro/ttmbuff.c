@@ -39,6 +39,7 @@
 #include "ttmparse.h"
 #include "ttlib.h"
 #include "fileread.h"
+#include "codeconv.h"
 
 #include "ttmbuff.h"
 
@@ -122,9 +123,10 @@ int IsUpdateMacroCommand(void)
 }
 
 
-BOOL LoadMacroFile(PCHAR FileName, int IBuff)
+static BOOL LoadMacroFile(const wchar_t *FileName, int IBuff)
 {
-	char basename[MAX_PATH];
+	wchar_t basename[MAX_PATH];
+	char *basenameU8;
 	size_t Len;
 
 	if ((FileName[0]==0) || (IBuff>MAXNESTLEVEL-1)) {
@@ -134,14 +136,15 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 	// includeに成功したファイルから、ファイル名を記録する。
 	// マクロのエラーダイアログで、ファイル名を表示したいため。
 	// (2013.9.8 yutaka)
-	if (GetFileTitleA(FileName, basename, sizeof(basename)) != 0)
-		strncpy_s(basename, sizeof(basename), FileName, _TRUNCATE);
-	strncpy_s(&BuffHandleFileName[IBuff][0], MAXFILENAME, basename, _TRUNCATE);
+	if (GetFileTitleW(FileName, basename, _countof(basename)) != 0)
+		wcsncpy_s(basename, _countof(basename), FileName, _TRUNCATE);
+	basenameU8 = ToU8W(basename);
+	strncpy_s(&BuffHandleFileName[IBuff][0], MAXFILENAME, basenameU8, _TRUNCATE);
+	free(basenameU8);
 
 	BuffPtr[IBuff] = 0;
 
-//	Buff[IBuff] = LoadFileAA(FileName, &Len);
-	Buff[IBuff] = LoadFileU8A(FileName, &Len);
+	Buff[IBuff] = LoadFileU8W(FileName, &Len);
 	if (Buff[IBuff] == NULL) {
 		BuffLen[IBuff] = 0;
 		return FALSE;
@@ -344,7 +347,7 @@ BOOL RegisterLabels(int IBuff)
 	return TRUE;
 }
 
-BOOL InitBuff(PCHAR FileName)
+BOOL InitBuff(const wchar_t *FileName)
 {
 	int i;
 
@@ -435,7 +438,7 @@ WORD ReturnFromSub()
 	return 0;
 }
 
-BOOL BuffInclude(PCHAR FileName)
+BOOL BuffInclude(const wchar_t *FileName)
 {
 	if (INest>=MAXNESTLEVEL-1) {
 		return FALSE;

@@ -275,7 +275,7 @@ BOOL InitDDE(HWND HWin)
 	}
 
 	Service= DdeCreateStringHandle(Inst, ServiceName, CP_WINANSI);
-	Topic  = DdeCreateStringHandle(Inst, TopicName, CP_WINANSI);
+	Topic  = DdeCreateStringHandleW(Inst, TopicName, CP_WINANSI);
 	Item   = DdeCreateStringHandle(Inst, ItemName, CP_WINANSI);
 	Item2  = DdeCreateStringHandle(Inst, ItemName2, CP_WINANSI);
 	if ((Service==0) || (Topic==0) ||

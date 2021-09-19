@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-BOOL InitBuff(PCHAR FileName);
+BOOL InitBuff(const wchar_t *FileName);
 void CloseBuff(int IBuff);
 BOOL GetNewLine();
 // goto
@@ -42,7 +42,7 @@ void JumpToLabel(int ILabel);
 WORD CallToLabel(int ILabel);
 WORD ReturnFromSub();
 // include file
-BOOL BuffInclude(PCHAR FileName);
+BOOL BuffInclude(const wchar_t *FileName);
 BOOL ExitBuffer();
 // for ... next
 int SetForLoop();

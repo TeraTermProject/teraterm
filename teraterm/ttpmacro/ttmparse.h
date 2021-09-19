@@ -355,7 +355,7 @@ BOOL GetIndex(int *Index, LPWORD Err);
 void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err);
 void GetAryVarByName(PVarId VarId, const char *Name, WORD VarType, LPWORD Err);
 void SetIntValInArray(TVarId VarId, int Index, int Val, LPWORD Err);
-void SetStrValInArray(TVarId VarId, int Index, PCHAR Str, LPWORD Err);
+void SetStrValInArray(TVarId VarId, int Index, const char *Str, LPWORD Err);
 int GetIntAryVarSize(TVarId VarId);
 int GetStrAryVarSize(TVarId VarId);
 

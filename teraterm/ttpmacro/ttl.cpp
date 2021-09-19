@@ -182,7 +182,8 @@ static LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
 BOOL InitTTL(HWND HWin)
 {
 	int i;
-	TStrVal Dir;
+	wchar_t *DirW;
+	char *Dir;
 	TVarId ParamsVarId;
 	char tmpname[10];
 	WORD Err;
@@ -214,12 +215,12 @@ BOOL InitTTL(HWND HWin)
 	NewIntVar("paramcnt",ParamCnt);  // ファイル名も含む引数の個数 (2012.4.10 yutaka)
 
 	// 旧形式のパラメータ設定 (param1 ～ param9)
-	NewStrVar("param1", ShortName);
+	NewStrVar("param1", (u8)ShortName);
 	if (Params) {
 		for (i=2; i<=9; i++) {
 			_snprintf_s(tmpname, sizeof(tmpname), _TRUNCATE, "param%d", i);
 			if (ParamCnt >= i && Params[i] != NULL) {
-				NewStrVar(tmpname, Params[i]);
+				NewStrVar(tmpname, (u8)Params[i]);
 			}
 			else {
 				NewStrVar(tmpname, "");
@@ -233,7 +234,7 @@ BOOL InitTTL(HWND HWin)
 		GetStrAryVarByName(&ParamsVarId, "params", &Err);
 		if (Err == 0) {
 			if (ShortName[0] != 0) {
-				SetStrValInArray(ParamsVarId, 1, ShortName, &Err);
+				SetStrValInArray(ParamsVarId, 1, (u8)ShortName, &Err);
 			}
 			if (Params) {
 				for (i=0; i<=ParamCnt; i++) {
@@ -241,7 +242,7 @@ BOOL InitTTL(HWND HWin)
 						continue;
 					}
 					if (Params[i]) {
-						SetStrValInArray(ParamsVarId, i, Params[i], &Err);
+						SetStrValInArray(ParamsVarId, i, (u8)Params[i], &Err);
 						free(Params[i]);
 					}
 				}
@@ -268,8 +269,11 @@ BOOL InitTTL(HWND HWin)
 
 	UnlockVar();
 
-	ExtractDirName(FileName,Dir);
+	DirW = ExtractDirNameW(FileName);
+	Dir = ToU8W(DirW);
 	TTMSetDir(Dir);
+	free(DirW);
+	free(Dir);
 
 	if (SleepFlag)
 	{ // synchronization for startup macro
@@ -585,7 +589,7 @@ WORD TTLConnect(WORD mode)
 
 	SetResult(0);
 	// link to Tera Term
-	if (strlen(TopicName)==0)
+	if (wcslen(TopicName)==0)
 	{
 		switch (mode) {
 		case RsvConnect:
@@ -595,13 +599,15 @@ WORD TTLConnect(WORD mode)
 			strncpy_s(Cmnd, sizeof(Cmnd),CYGTERMCOMMAND, _TRUNCATE);
 			break;
 		}
+		char *TopicNameA = ToCharW(TopicName);
 		w = HIWORD(HMainWin);
-		Word2HexStr(w,TopicName);
+		Word2HexStr(w,TopicNameA);
 		w = LOWORD(HMainWin);
-		Word2HexStr(w,&(TopicName[4]));
-		strncat_s(Cmnd,sizeof(Cmnd),TopicName,_TRUNCATE);
+		Word2HexStr(w,&(TopicNameA[4]));
+		strncat_s(Cmnd,sizeof(Cmnd),TopicNameA,_TRUNCATE);
 		strncat_s(Cmnd,sizeof(Cmnd)," ",_TRUNCATE);
 		strncat_s(Cmnd,sizeof(Cmnd),Str,_TRUNCATE);
+		free(TopicNameA);
 		if (WinExec(Cmnd,SW_SHOW)<32)
 			return ErrCantConnect;
 		TTLStatus = IdTTLInitDDE;
@@ -2913,7 +2919,10 @@ WORD TTLInclude()
 		Err = ErrCantOpen;
 		return Err;
 	}
-	if (! BuffInclude(Str)) {
+	wchar_t *StrW = ToWcharU8(Str);
+	BOOL r = BuffInclude(StrW);
+	free(StrW);
+	if (!r) {
 		Err = ErrCantOpen;
 		return Err;
 	}

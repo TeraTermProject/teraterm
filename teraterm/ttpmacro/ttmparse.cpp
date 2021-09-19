@@ -1935,7 +1935,7 @@ void SetIntValInArray(TVarId VarId, int Index, int Val, LPWORD Err)
 	}
 }
 
-void SetStrValInArray(TVarId VarId, int Index, PCHAR Str, LPWORD Err)
+void SetStrValInArray(TVarId VarId, int Index, const char *Str, LPWORD Err)
 {
 	TVarId id;
 

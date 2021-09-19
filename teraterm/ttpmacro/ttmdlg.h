@@ -52,10 +52,10 @@ int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, in
 
 extern char HomeDir[MAX_PATH];
 extern wchar_t *HomeDirW;
-extern char FileName[MAX_PATH];
-extern char TopicName[11];
-extern char ShortName[MAX_PATH];
-extern char **Params;
+extern wchar_t FileName[MAX_PATH];
+extern wchar_t TopicName[11];
+extern wchar_t ShortName[MAX_PATH];
+extern wchar_t **Params;
 extern int ParamCnt;
 extern BOOL SleepFlag;
 
