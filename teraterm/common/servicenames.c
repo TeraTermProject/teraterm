@@ -379,7 +379,7 @@ static BOOL is_service_name_char(char ch)
 	return (isalnum(ch) || ch == '_' || ch == '-');
 }
 
-int PASCAL parse_port_from_buf(char * buf)
+int PASCAL parse_port_from_buf(const char * buf)
 {
 	int i;
 	char lower_buf[32];

@@ -205,6 +205,32 @@ char *LoadFileU8A(const char *FileName, size_t *_len)
 
 /**
  *	ファイルをメモリに読み込む
+ *	中身はUTF-8に変換される
+ *
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
+ */
+char *LoadFileU8W(const wchar_t *FileName, size_t *_len)
+{
+	*_len = 0;
+	FILE *fp;
+	_wfopen_s(&fp, FileName, L"rb");
+	if (fp == NULL) {
+		return NULL;
+	}
+	size_t len;
+	char *u8 = LoadFileU8(fp, &len);
+	fclose(fp);
+	if (u8 == NULL) {
+		return NULL;
+	}
+	*_len = len;
+	return u8;
+}
+
+/**
+ *	ファイルをメモリに読み込む
  *	中身はwchar_tに変換される
  *
  *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)

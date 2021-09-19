@@ -1128,3 +1128,59 @@ BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t 
 	CoTaskMemFree(pidlBrowse);
 	return TRUE;
 }
+
+/* fit a filename to the windows-filename format */
+/* FileName must contain filename part only. */
+void FitFileNameW(wchar_t *FileName, size_t destlen, const wchar_t *DefExt)
+{
+	int i, j, NumOfDots;
+	wchar_t Temp[MAX_PATH];
+	wchar_t b;
+
+	NumOfDots = 0;
+	i = 0;
+	j = 0;
+	/* filename started with a dot is illeagal */
+	if (FileName[0]==L'.') {
+		Temp[0] = L'_';  /* insert an underscore char */
+		j++;
+	}
+
+	do {
+		b = FileName[i];
+		i++;
+		if (b==L'.')
+			NumOfDots++;
+		if ((b!=0) &&
+		    (j < MAX_PATH-1)) {
+			Temp[j] = b;
+			j++;
+		}
+	} while (b!=0);
+	Temp[j] = 0;
+
+	if ((NumOfDots==0) &&
+	    (DefExt!=NULL)) {
+		/* add the default extension */
+		wcsncat_s(Temp,_countof(Temp),DefExt,_TRUNCATE);
+	}
+
+	wcsncpy_s(FileName,destlen,Temp,_TRUNCATE);
+}
+
+void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wchar_t *DefExt, wchar_t *FName, size_t destlen)
+{
+	// destlen = sizeof FName
+	size_t DirLen, FNPos;
+
+	FName[0] = 0;
+	if ( ! GetFileNamePosW(Temp,&DirLen,&FNPos) ) {
+		return;
+	}
+	FitFileNameW(&Temp[FNPos],templen - FNPos,DefExt);
+	if ( DirLen==0 ) {
+		wcsncpy_s(FName,destlen,HomeDir,_TRUNCATE);
+		AppendSlashW(FName,destlen);
+	}
+	wcsncat_s(FName,destlen,Temp,_TRUNCATE);
+}

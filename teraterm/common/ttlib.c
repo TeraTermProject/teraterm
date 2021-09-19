@@ -1247,9 +1247,9 @@ char *strelapsed(DWORD start_time)
 	return strtime;
 }
 
-PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
+wchar_t * PASCAL GetParam(wchar_t *buff, size_t size, wchar_t *param)
 {
-	int i = 0;
+	size_t i = 0;
 	BOOL quoted = FALSE;
 
 	while (*param == ' ' || *param == '\t') {
@@ -1285,10 +1285,10 @@ PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 	return (param);
 }
 
-void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
+void PASCAL DequoteParam(wchar_t *dest, size_t dest_len, wchar_t *src)
 {
 	BOOL quoted = FALSE;
-	PCHAR dest_end = dest + dest_len - 1;
+	wchar_t *dest_end = dest + dest_len - 1;
 
 	if (src == dest) {
 		while (*src != '\0' && *src != '"' && dest < dest_end) {

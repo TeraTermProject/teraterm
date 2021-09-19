@@ -49,6 +49,7 @@ DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 wchar_t *ExtractDirNameW(const wchar_t *PathName);
 wchar_t *ExtractFileNameW(const wchar_t *PathName);
 void FitFileName(PCHAR FileName, int destlen, const char *DefExt);
+void FitFileNameW(wchar_t *FileName, size_t destlen, const wchar_t *DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void AppendSlashW(wchar_t *Path, size_t destlen);
 void DeleteSlash(PCHAR Path);
@@ -75,6 +76,7 @@ int isInvalidStrftimeChar(PCHAR FName);
 void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
 void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt, PCHAR FName, int destlen);
+void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wchar_t *DefExt, wchar_t *FName, size_t destlen);
 void RestoreNewLine(PCHAR Text);
 size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
@@ -118,8 +120,8 @@ char *strelapsed(DWORD start_time);
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);
 
-DllExport PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param);
-DllExport void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
+DllExport wchar_t * PASCAL GetParam(wchar_t *buff, size_t size, wchar_t *param);
+DllExport void PASCAL DequoteParam(wchar_t *dest, size_t dest_len, wchar_t *src);
 void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
