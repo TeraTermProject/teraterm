@@ -131,7 +131,7 @@ void SetKeyMap()
 	}
 
 	if (LoadTTSET())
-		(*ReadKeyboardCnf)(ts.KeyCnfFN, KeyMap, TRUE);
+		(*ReadKeyboardCnf)(ts.KeyCnfFNW, KeyMap, TRUE);
 	FreeTTSET();
 }
 

@@ -44,8 +44,8 @@ typedef struct TKeyMap_st *PKeyMap;
 typedef void (PASCAL *PReadIniFile)(const wchar_t *FName, PTTSet ts);
 //typedef void (PASCAL *PWriteIniFile)(PCHAR FName, PTTSet ts);
 typedef void (PASCAL *PWriteIniFile)(const wchar_t *FName, PTTSet ts);
-typedef void (PASCAL *PReadKeyboardCnf)
-  (PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
+//typedef void (PASCAL *PReadKeyboardCnf)(PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
+typedef void (PASCAL *PReadKeyboardCnf)(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning);
 typedef void (PASCAL *PCopyHostList)
   (PCHAR IniSrc, PCHAR IniDest);
 typedef void (PASCAL *PAddHostToList)

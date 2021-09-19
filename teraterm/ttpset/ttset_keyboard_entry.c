@@ -32,13 +32,13 @@
 #include "dllutil.h"
 #include "../teraterm/keyboard_i.h"
 
-void PASCAL ReadKeyboardCnf(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
+void PASCAL ReadKeyboardCnf(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning)
 {
-	void (*ReadKeyboardCnfExe)(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning);
+	void (*ReadKeyboardCnfExe)(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning);
 	DWORD r = DLLGetApiAddress(L"ttermpro.exe", DLL_LOAD_LIBRARY_CURRENT, "ReadKeyboardCnfExe", (void **)&ReadKeyboardCnfExe);
 	if (r != NO_ERROR) {
 		return;
 	}
 
-	ReadKeyboardCnfExe(FNameA, KeyMap, ShowWarning);
+	ReadKeyboardCnfExe(FName, KeyMap, ShowWarning);
 }

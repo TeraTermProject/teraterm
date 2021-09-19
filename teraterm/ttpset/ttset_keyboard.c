@@ -239,10 +239,9 @@ static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
  *		ttpset.dll ttste_keyboard_entry.c ‚Ì ReadKeyboardCnf() ‚©‚ç‚±‚±‚ªƒR[ƒ‹‚³‚ê‚é
  *		KeyMap ‚Í‰Šú‰»Ï‚Ý
  */
-__declspec(dllexport) void ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL ShowWarning)
+__declspec(dllexport) void ReadKeyboardCnfExe(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning)
 {
 	int i, j;
-	const wchar_t *FName = ToWcharA(FNameA);
 
 	ReadKeyboardMap(KeyMap, FName);
 	ReadUserkeysSection(FName, KeyMap);
@@ -263,6 +262,4 @@ __declspec(dllexport) void ReadKeyboardCnfExe(PCHAR FNameA, PKeyMap KeyMap, BOOL
 					}
 					KeyMap->Map[i] = 0xFFFF;
 				}
-
-	free((void *)FName);
 }
