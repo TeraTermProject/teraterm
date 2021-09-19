@@ -287,15 +287,15 @@ static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
   }
 }
 
-static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
-  char buff[1024];
-  PCHAR next;
+static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
+  wchar_t buff[1024];
+  wchar_t *next;
 
   pvar->origParseParam(Param, ts, DDETopic);
 
   next = Param;
   while (next = GetParam(buff, sizeof(buff), next)) {
-    if (_strnicmp(buff, "/W=", 3) == 0) {
+    if (_wcsnicmp(buff, L"/W=", 3) == 0) {
       strncpy_s(pvar->orig_title, sizeof(pvar->orig_title), pvar->ts->Title, _TRUNCATE);
       SetTitleStr(pvar->orig_title, FALSE);
       break;

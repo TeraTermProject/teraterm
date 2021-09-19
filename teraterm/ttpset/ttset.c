@@ -175,11 +175,12 @@ error:
  *    TRUE: 変換成功
  *    FALSE: 変換失敗
  */
-static int SerialPortConfconvertStr2Id(enum serial_port_conf type, PCHAR str, WORD *id)
+static int SerialPortConfconvertStr2Id(enum serial_port_conf type, const wchar_t *str, WORD *id)
 {
 	id_str_pair_t *conf;
 	int ret = FALSE;
 	int i;
+	char *strA;
 
 	switch (type) {
 		case COM_DATABIT:
@@ -198,24 +199,25 @@ static int SerialPortConfconvertStr2Id(enum serial_port_conf type, PCHAR str, WO
 			conf = NULL;
 			break;
 	}
-	if (conf == NULL)
-		goto error;
+	if (conf == NULL) {
+		return FALSE;
+	}
 
+	strA = ToCharW(str);
 	for (i = 0 ;  ; i++) {
-		if (conf[i].id == IDENDMARK)
-			goto error;
-		if (_stricmp(conf[i].str, str) == 0) {
+		if (conf[i].id == IDENDMARK) {
+			ret = FALSE;
+			break;
+		}
+		if (_stricmp(conf[i].str, strA) == 0) {
 			*id = conf[i].id;
+			ret = TRUE;
 			break;
 		}
 	}
-
-	ret = TRUE;
-
-error:
-	return (ret);
+	free(strA);
+	return ret;
 }
-
 
 WORD str2id(PCHAR far * List, PCHAR str, WORD DefId)
 {
@@ -247,31 +249,32 @@ void id2str(PCHAR far * List, WORD Id, WORD DefId, PCHAR str, int destlen)
 	strncpy_s(str, destlen, List[i], _TRUNCATE);
 }
 
-int IconName2IconId(const char *name) {
+static int IconName2IconId(const wchar_t *name)
+{
 	int id;
 
-	if (_stricmp(name, "tterm") == 0) {
+	if (_wcsicmp(name, L"tterm") == 0) {
 		id = IDI_TTERM;
 	}
-	else if (_stricmp(name, "vt") == 0) {
+	else if (_wcsicmp(name, L"vt") == 0) {
 		id = IDI_VT;
 	}
-	else if (_stricmp(name, "tek") == 0) {
+	else if (_wcsicmp(name, L"tek") == 0) {
 		id = IDI_TEK;
 	}
-	else if (_stricmp(name, "tterm_classic") == 0) {
+	else if (_wcsicmp(name, L"tterm_classic") == 0) {
 		id = IDI_TTERM_CLASSIC;
 	}
-	else if (_stricmp(name, "vt_classic") == 0) {
+	else if (_wcsicmp(name, L"vt_classic") == 0) {
 		id = IDI_VT_CLASSIC;
 	}
-	else if (_stricmp(name, "tterm_3d") == 0) {
+	else if (_wcsicmp(name, L"tterm_3d") == 0) {
 		id = IDI_TTERM_3D;
 	}
-	else if (_stricmp(name, "vt_3d") == 0) {
+	else if (_wcsicmp(name, L"vt_3d") == 0) {
 		id = IDI_VT_3D;
 	}
-	else if (_stricmp(name, "cygterm") == 0) {
+	else if (_wcsicmp(name, L"cygterm") == 0) {
 		id = IDI_CYGTERM;
 	}
 	else {
@@ -279,6 +282,15 @@ int IconName2IconId(const char *name) {
 	}
 	return id;
 }
+
+static int IconName2IconIdA(const char *name)
+{
+	wchar_t *nameW = ToWcharA(name);
+	int id = IconName2IconId(nameW);
+	free(nameW);
+	return id;
+}
+
 
 void IconId2IconName(char *name, int len, int id) {
 	char *icon;
@@ -719,6 +731,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	int i;
 	HDC TmpDC;
 	char Temp[MAX_PATH], Temp2[MAX_PATH], *p;
+	wchar_t TempW[MAX_PATH];
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -1198,30 +1211,30 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->Baud = GetPrivateProfileInt(Section, "BaudRate", 9600, FName);
 
 	/* Parity */
-	GetPrivateProfileString(Section, "Parity", "",
-	                        Temp, sizeof(Temp), FName);
-	if (!SerialPortConfconvertStr2Id(COM_PARITY, Temp, &ts->Parity)) {
+	GetPrivateProfileStringW(SectionW, L"Parity", L"",
+							 TempW, _countof(TempW), FName);
+	if (!SerialPortConfconvertStr2Id(COM_PARITY, TempW, &ts->Parity)) {
 		ts->Parity = IdParityNone;
 	}
 
 	/* Data bit */
-	GetPrivateProfileString(Section, "DataBit", "",
-	                        Temp, sizeof(Temp), FName);
-	if (!SerialPortConfconvertStr2Id(COM_DATABIT, Temp, &ts->DataBit)) {
+	GetPrivateProfileStringW(SectionW, L"DataBit", L"",
+							 TempW, _countof(TempW), FName);
+	if (!SerialPortConfconvertStr2Id(COM_DATABIT, TempW, &ts->DataBit)) {
 		ts->DataBit = IdDataBit8;
 	}
 
 	/* Stop bit */
-	GetPrivateProfileString(Section, "StopBit", "",
-	                        Temp, sizeof(Temp), FName);
-	if (!SerialPortConfconvertStr2Id(COM_STOPBIT, Temp, &ts->StopBit)) {
+	GetPrivateProfileStringW(SectionW, L"StopBit", L"",
+							 TempW, _countof(TempW), FName);
+	if (!SerialPortConfconvertStr2Id(COM_STOPBIT, TempW, &ts->StopBit)) {
 		ts->StopBit = IdStopBit1;
 	}
 
 	/* Flow control */
-	GetPrivateProfileString(Section, "FlowCtrl", "",
-	                        Temp, sizeof(Temp), FName);
-	if (!SerialPortConfconvertStr2Id(COM_FLOWCTRL, Temp, &ts->Flow)) {
+	GetPrivateProfileStringW(SectionW, L"FlowCtrl", L"",
+							 TempW, _countof(TempW), FName);
+	if (!SerialPortConfconvertStr2Id(COM_FLOWCTRL, TempW, &ts->Flow)) {
 		ts->Flow = IdFlowNone;
 	}
 
@@ -1820,12 +1833,12 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// VT Window Icon
 	GetPrivateProfileString(Section, "VTIcon", "Default",
 	                        Temp, sizeof(Temp), FName);
-	ts->VTIcon = IconName2IconId(Temp);
+	ts->VTIcon = IconName2IconIdA(Temp);
 
 	// Tek Window Icon
 	GetPrivateProfileString(Section, "TEKIcon", "Default",
 	                        Temp, sizeof(Temp), FName);
-	ts->TEKIcon = IconName2IconId(Temp);
+	ts->TEKIcon = IconName2IconIdA(Temp);
 
 	// Unknown Unicode Character
 	ts->UnknownUnicodeCharaAsWide =
@@ -2254,7 +2267,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->UnicodeAmbiguousWidth < 1 || 2 < ts->UnicodeAmbiguousWidth) {
 		ts->UnicodeAmbiguousWidth = 1;
 	}
-	ts->UnicodeEmojiOverride = GetOnOff(Section, "UnicodeEmojiOverride", FName, FALSE);
+	ts->UnicodeEmojiOverride = (BYTE)GetOnOff(Section, "UnicodeEmojiOverride", FName, FALSE);
 	ts->UnicodeEmojiWidth = GetPrivateProfileInt(Section, "UnicodeEmojiWidth", 1, FName);
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = 1;
@@ -3725,7 +3738,7 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 }
 #endif
 
-static int ParsePortName(char *buff)
+static int ParsePortName(const char *buff)
 {
 	int port = parse_port_from_buf(buff);
 
@@ -3733,6 +3746,14 @@ static int ParsePortName(char *buff)
 		return port;
 	else
 		return 0;
+}
+
+static int ParsePortNameW(const wchar_t *buff)
+{
+	char *buffA = ToCharW(buff);
+	int port = ParsePortName(buffA);
+	free(buffA);
+	return port;
 }
 
 static void ParseHostName(char *HostStr, WORD * port)
@@ -3824,13 +3845,12 @@ static void ParseHostName(char *HostStr, WORD * port)
 }
 
 
-void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
+void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 {
 	int i, pos, c;
 	//int param_top;
-	char Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
-	char Temp2[MaxStrLen];
-	char TempDir[MAXPATHLEN];
+	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
+	wchar_t Temp2[MaxStrLen];
 	WORD ParamPort = 0;
 	WORD ParamCom = 0;
 	WORD ParamTCP = 0;
@@ -3839,7 +3859,7 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	DWORD ParamBaud = BaudNone;
 	BOOL HostNameFlag = FALSE;
 	BOOL JustAfterHost = FALSE;
-	PCHAR start, cur, next, p;
+	wchar_t *start, *cur, *next;
 
 	ts->HostName[0] = 0;
 	//ts->KeyCnfFN[0] = 0;
@@ -3855,21 +3875,20 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		DDETopic[0] = 0;
 	i = 0;
 	/* the first term shuld be executable filename of Tera Term */
-	start = GetParam(Temp, sizeof(Temp), Param);
+	start = GetParam(Temp, _countof(Temp), Param);
 
 	cur = start;
-	while (next = GetParam(Temp, sizeof(Temp), cur)) {
-		DequoteParam(Temp, sizeof(Temp), Temp);
-		if (_strnicmp(Temp, "/F=", 3) == 0) {	/* setup filename */
-			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
-			if (strlen(Temp2) > 0) {
-				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".INI", Temp,
-				          sizeof(Temp));
-				if (_stricmp(ts->SetupFName, Temp) != 0) {
-					strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Temp,
-					          _TRUNCATE);
+	while (next = GetParam(Temp, _countof(Temp), cur)) {
+		DequoteParam(Temp, _countof(Temp), Temp);
+		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
+			wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
+			if (Temp2[0] != 0) {
+				ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L".INI", Temp,
+						   _countof(Temp));
+				if (_wcsicmp(ts->SetupFNameW, Temp) != 0) {
 					free(ts->SetupFNameW);
-					ts->SetupFNameW = ToWcharA(ts->SetupFName);
+					ts->SetupFNameW = _wcsdup(Temp);
+					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
 					ReadIniFile(ts->SetupFNameW, ts);
 				}
 			}
@@ -3878,137 +3897,144 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	}
 
 	cur = start;
-	while (next = GetParam(Temp, sizeof(Temp), cur)) {
-		DequoteParam(Temp, sizeof(Temp), Temp);
+	while (next = GetParam(Temp, _countof(Temp), cur)) {
+		DequoteParam(Temp, _countof(Temp), Temp);
 
 		if (HostNameFlag) {
 			JustAfterHost = TRUE;
 			HostNameFlag = FALSE;
 		}
 
-		if (_strnicmp(Temp, "/AUTOWINCLOSE=", 14) == 0) {	/* AutoWinClose=on|off */
-			char *s = &Temp[14];
-			if (_stricmp(s, "on") == 0)
+		if (_wcsnicmp(Temp, L"/AUTOWINCLOSE=", 14) == 0) {	/* AutoWinClose=on|off */
+			wchar_t *s = &Temp[14];
+			if (_wcsicmp(s, L"on") == 0)
 				ts->AutoWinClose = 1;
 			else
 				ts->AutoWinClose = 0;
 		}
-		else if (_strnicmp(Temp, "/SPEED=", 7) == 0) {	/* Serial port speed */
+		else if (_wcsnicmp(Temp, L"/SPEED=", 7) == 0) {	/* Serial port speed */
 			ParamPort = IdSerial;
-			ParamBaud = atoi(&Temp[7]);
+			ParamBaud = _wtoi(&Temp[7]);
 		}
-		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* for backward compatibility */
+		else if (_wcsnicmp(Temp, L"/BAUD=", 6) == 0) {	/* for backward compatibility */
 			ParamPort = IdSerial;
-			ParamBaud = atoi(&Temp[6]);
+			ParamBaud = _wtoi(&Temp[6]);
 		}
-		else if (_stricmp(Temp, "/B") == 0) {	/* telnet binary */
+		else if (_wcsicmp(Temp, L"/B") == 0) {	/* telnet binary */
 			ParamPort = IdTCPIP;
 			ParamBin = 1;
 		}
-		else if (_strnicmp(Temp, "/C=", 3) == 0) {	/* COM port num */
+		else if (_wcsnicmp(Temp, L"/C=", 3) == 0) {	/* COM port num */
 			ParamPort = IdSerial;
-			ParamCom = atoi(&Temp[3]);
+			ParamCom = _wtoi(&Temp[3]);
 			if ((ParamCom < 1) || (ParamCom > ts->MaxComPort))
 				ParamCom = 0;
 		}
-		else if (_strnicmp(Temp, "/CDATABIT=", 10) == 0) {	/* COM data bit */
+		else if (_wcsnicmp(Temp, L"/CDATABIT=", 10) == 0) {	/* COM data bit */
 			ParamPort = IdSerial;
 			SerialPortConfconvertStr2Id(COM_DATABIT, &Temp[10], &ts->DataBit);
 		}
-		else if (_strnicmp(Temp, "/CPARITY=", 9) == 0) {	/* COM Parity */
+		else if (_wcsnicmp(Temp, L"/CPARITY=", 9) == 0) {	/* COM Parity */
 			ParamPort = IdSerial;
 			SerialPortConfconvertStr2Id(COM_PARITY, &Temp[9], &ts->Parity);
 		}
-		else if (_strnicmp(Temp, "/CSTOPBIT=", 10) == 0) {	/* COM Stop bit */
+		else if (_wcsnicmp(Temp, L"/CSTOPBIT=", 10) == 0) {	/* COM Stop bit */
 			ParamPort = IdSerial;
 			SerialPortConfconvertStr2Id(COM_STOPBIT, &Temp[10], &ts->StopBit);
 		}
-		else if (_strnicmp(Temp, "/CFLOWCTRL=", 11) == 0) {	/* COM Flow control */
+		else if (_wcsnicmp(Temp, L"/CFLOWCTRL=", 11) == 0) {	/* COM Flow control */
 			ParamPort = IdSerial;
 			SerialPortConfconvertStr2Id(COM_FLOWCTRL, &Temp[11], &ts->Flow);
 		}
-		else if (_strnicmp(Temp, "/CDELAYPERCHAR=", 15) == 0) {	/* COM Transmit delay per character (in msec) */
+		else if (_wcsnicmp(Temp, L"/CDELAYPERCHAR=", 15) == 0) {	/* COM Transmit delay per character (in msec) */
 			WORD val = 0;
 
 			ParamPort = IdSerial;
-			val = atoi(&Temp[15]);
+			val = _wtoi(&Temp[15]);
 			ts->DelayPerChar = val;
 		}
-		else if (_strnicmp(Temp, "/CDELAYPERLINE=", 15) == 0) {	/* COM Transmit delay per line (in msec) */
+		else if (_wcsnicmp(Temp, L"/CDELAYPERLINE=", 15) == 0) {	/* COM Transmit delay per line (in msec) */
 			WORD val = 0;
 
 			ParamPort = IdSerial;
-			val = atoi(&Temp[15]);
+			val = _wtoi(&Temp[15]);
 			ts->DelayPerLine = val;
 		}
-		else if (_stricmp(Temp, "/WAITCOM") == 0) {	/* wait COM arrival */
+		else if (_wcsicmp(Temp, L"/WAITCOM") == 0) {	/* wait COM arrival */
 			ts->WaitCom = 1;
 		}
-		else if (_strnicmp(Temp, "/D=", 3) == 0) {
-			if (DDETopic != NULL)
-				strncpy_s(DDETopic, 21, &Temp[3], _TRUNCATE);	// 21 = sizeof(TopicName)
+		else if (_wcsnicmp(Temp, L"/D=", 3) == 0) {
+			if (DDETopic != NULL) {
+				char *DDETopicA = ToCharW(&Temp[3]);
+				strncpy_s(DDETopic, 21, DDETopicA, _TRUNCATE);	// 21 = sizeof(TopicName)
+				free(DDETopicA);
+			}
 		}
 		// "New connection" ダイアログを表示しない (2008.11.14 maya)
-		else if (_stricmp(Temp, "/DS") == 0) {
+		else if (_wcsicmp(Temp, L"/DS") == 0) {
 			ts->HostDialogOnStartup = FALSE;
 		}
 		// TCPLocalEcho/TCPCRSend を無効にする (maya 2007.4.25)
-		else if (_stricmp(Temp, "/E") == 0) {
+		else if (_wcsicmp(Temp, L"/E") == 0) {
 			ts->DisableTCPEchoCR = TRUE;
 		}
 		// "New connection" ダイアログを表示する (2013.10.08 maya)
-		else if (_stricmp(Temp, "/ES") == 0) {
+		else if (_wcsicmp(Temp, L"/ES") == 0) {
 			ts->HostDialogOnStartup = TRUE;
 		}
-		else if (_strnicmp(Temp, "/FD=", 4) == 0) {	/* file transfer directory */
-			strncpy_s(Temp2, sizeof(Temp2), &Temp[4], _TRUNCATE);
-			if (strlen(Temp2) > 0) {
-				_getcwd(TempDir, sizeof(TempDir));
-				if (_chdir(Temp2) == 0)
-					strncpy_s(ts->FileDir, sizeof(ts->FileDir), Temp2,
+		else if (_wcsnicmp(Temp, L"/FD=", 4) == 0) {	/* file transfer directory */
+			wcsncpy_s(Temp2, _countof(Temp2), &Temp[4], _TRUNCATE);
+			if (wcslen(Temp2) > 0) {
+				char TempDir[MAXPATHLEN];
+				_getcwd(TempDir, _countof(TempDir));
+				if (_wchdir(Temp2) == 0) {
+					char *FileDirA = ToCharW(Temp2);
+					strncpy_s(ts->FileDir, sizeof(ts->FileDir), FileDirA,
 					          _TRUNCATE);
+					free(FileDirA);
+				}
 				_chdir(TempDir);
 			}
 		}
-		else if (_stricmp(Temp, "/H") == 0)	/* hide title bar */
+		else if (_wcsicmp(Temp, L"/H") == 0)	/* hide title bar */
 			ts->HideTitle = 1;
-		else if (_stricmp(Temp, "/I") == 0)	/* iconize */
+		else if (_wcsicmp(Temp, L"/I") == 0)	/* iconize */
 			ts->Minimize = 1;
-		else if (_strnicmp(Temp, "/K=", 3) == 0) {	/* Keyboard setup file */
-			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
-			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".CNF",
-			          ts->KeyCnfFN, sizeof(ts->KeyCnfFN));
-			ts->KeyCnfFNW = ToWcharA(ts->KeyCnfFN);
+		else if (_wcsnicmp(Temp, L"/K=", 3) == 0) {	/* Keyboard setup file */
+			wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
+			ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L".CNF", Temp, _countof(Temp));
+			ts->KeyCnfFNW = _wcsdup(Temp);
+			WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 		}
-		else if ((_strnicmp(Temp, "/KR=", 4) == 0) ||
-		         (_strnicmp(Temp, "/KT=", 4) == 0)) {	/* kanji code */
-			if (_stricmp(&Temp[4], "UTF8m") == 0 ||
-			    _stricmp(&Temp[4], "UTF-8m") == 0)
+		else if ((_wcsnicmp(Temp, L"/KR=", 4) == 0) ||
+		         (_wcsnicmp(Temp, L"/KT=", 4) == 0)) {	/* kanji code */
+			if (_wcsicmp(&Temp[4], L"UTF8m") == 0 ||
+			    _wcsicmp(&Temp[4], L"UTF-8m") == 0)
 				c = IdUTF8m;
-			else if (_stricmp(&Temp[4], "UTF8") == 0 ||
-			         _stricmp(&Temp[4], "UTF-8") == 0)
+			else if (_wcsicmp(&Temp[4], L"UTF8") == 0 ||
+			         _wcsicmp(&Temp[4], L"UTF-8") == 0)
 				c = IdUTF8;
-			else if (_stricmp(&Temp[4], "SJIS") == 0 ||
-			         _stricmp(&Temp[4], "KS5601") == 0)
+			else if (_wcsicmp(&Temp[4], L"SJIS") == 0 ||
+			         _wcsicmp(&Temp[4], L"KS5601") == 0)
 				c = IdSJIS;
-			else if (_stricmp(&Temp[4], "EUC") == 0)
+			else if (_wcsicmp(&Temp[4], L"EUC") == 0)
 				c = IdEUC;
-			else if (_stricmp(&Temp[4], "JIS") == 0)
+			else if (_wcsicmp(&Temp[4], L"JIS") == 0)
 				c = IdJIS;
 			else
 				c = -1;
 			if (c != -1) {
-				if (_strnicmp(Temp, "/KR=", 4) == 0)
+				if (_wcsnicmp(Temp, L"/KR=", 4) == 0)
 					ts->KanjiCode = c;
 				else
 					ts->KanjiCodeSend = c;
 			}
 		}
-		else if (_strnicmp(Temp, "/L=", 3) == 0) {	/* log file */
-			strncpy_s(ts->LogFN, sizeof(ts->LogFN), &Temp[3], _TRUNCATE);
-			ts->LogFNW = ToWcharA(ts->LogFN);
+		else if (_wcsnicmp(Temp, L"/L=", 3) == 0) {	/* log file */
+			ts->LogFNW = _wcsdup(&Temp[3]);
+			WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));
 		}
-		else if (_strnicmp(Temp, "/LA=", 4) == 0) {	/* language */
+		else if (_wcsnicmp(Temp, L"/LA=", 4) == 0) {	/* language */
 			switch (Temp[4]) {
 			  case 'E':
 			  case 'e':
@@ -4027,112 +4053,115 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				ts->Language = IdUtf8; break;
 			}
 		}
-		else if (_strnicmp(Temp, "/MN=", 4) == 0) {	/* multicastname */
-			strncpy_s(ts->MulticastName, sizeof(ts->MulticastName), &Temp[4], _TRUNCATE);
+		else if (_wcsnicmp(Temp, L"/MN=", 4) == 0) {	/* multicastname */
+			WideCharToACP_t(&Temp[4], ts->MulticastName, _countof(ts->MulticastName));
 		}
-		else if (_strnicmp(Temp, "/M=", 3) == 0) {	/* macro filename */
+		else if (_wcsnicmp(Temp, L"/M=", 3) == 0) {	/* macro filename */
 			if ((Temp[3] == 0) || (Temp[3] == '*')) {
-				strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*",
-				          _TRUNCATE);
+				ts->MacroFNW = _wcsdup(L"*");
 			} else {
-				strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
-				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".TTL",
-				          ts->MacroFN, sizeof(ts->MacroFN));
+				wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
+				ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L".TTL", Temp, _countof(Temp));
+				ts->MacroFNW = _wcsdup(Temp);
 			}
-			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
-			ts->MacroFNW = ToWcharA(ts->MacroFN);
-			ts->ComAutoConnect = FALSE;
-		}
-		else if (_stricmp(Temp, "/M") == 0) {	/* macro option without file name */
-			strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*", _TRUNCATE);
-			ts->MacroFNW = ToWcharA(ts->MacroFN);
+			WideCharToACP_t(ts->MacroFNW, ts->MacroFN, _countof(ts->MacroFN));
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
 		}
-		else if (_stricmp(Temp, "/NOLOG") == 0) {	/* disable auto logging */
+		else if (_wcsicmp(Temp, L"/M") == 0) {	/* macro option without file name */
+			ts->MacroFNW = _wcsdup(L"*");
+			WideCharToACP_t(ts->MacroFNW, ts->MacroFN, _countof(ts->MacroFN));
+			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
+			ts->ComAutoConnect = FALSE;
+		}
+		else if (_wcsicmp(Temp, L"/NOLOG") == 0) {	/* disable auto logging */
 			ts->LogFN[0] = '\0';
 			ts->LogAutoStart = 0;
 		}
-		else if (_strnicmp(Temp, "/OSC52=", 7) == 0) {	/* Clipboard access */
+		else if (_wcsnicmp(Temp, L"/OSC52=", 7) == 0) {	/* Clipboard access */
 			ts->CtrlFlag &= ~CSF_CBMASK;
-			if (_stricmp(&Temp[7], "on") == 0 || _stricmp(&Temp[7], "readwrite") == 0)
+			if (_wcsicmp(&Temp[7], L"on") == 0 || _wcsicmp(&Temp[7], L"readwrite") == 0)
 				ts->CtrlFlag |= CSF_CBRW;
-			else if (_stricmp(&Temp[7], "read") == 0)
+			else if (_wcsicmp(&Temp[7], L"read") == 0)
 				ts->CtrlFlag |= CSF_CBREAD;
-			else if (_stricmp(&Temp[7], "write") == 0)
+			else if (_wcsicmp(&Temp[7], L"write") == 0)
 				ts->CtrlFlag |= CSF_CBWRITE;
-			else if (_stricmp(&Temp[7], "off") == 0)
+			else if (_wcsicmp(&Temp[7], L"off") == 0)
 				ts->CtrlFlag |= CSF_CBNONE;
 		}
-		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
+		else if (_wcsnicmp(Temp, L"/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
-			ParamTCP = ParsePortName(&Temp[3]);
+			ParamTCP = ParsePortNameW(&Temp[3]);
 		}
-		else if (_stricmp(Temp, "/PIPE") == 0 ||
-		         _stricmp(Temp, "/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
+		else if (_wcsicmp(Temp, L"/PIPE") == 0 ||
+		         _wcsicmp(Temp, L"/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
 			ParamPort = IdNamedPipe;
 		}
-		else if (_strnicmp(Temp, "/R=", 3) == 0) {	/* Replay filename */
-			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
-			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), "", ts->HostName,
-			          sizeof(ts->HostName));
+		else if (_wcsnicmp(Temp, L"/R=", 3) == 0) {	/* Replay filename */
+			wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
+			ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L"", Temp, _countof(Temp));
+			WideCharToACP_t(Temp, ts->HostName, _countof(ts->HostName));
 			if (strlen(ts->HostName) > 0)
 				ParamPort = IdFile;
 		}
-		else if (_stricmp(Temp, "/T=0") == 0) {	/* telnet disable */
+		else if (_wcsicmp(Temp, L"/T=0") == 0) {	/* telnet disable */
 			ParamPort = IdTCPIP;
 			ParamTel = 0;
 		}
-		else if (_stricmp(Temp, "/T=1") == 0) {	/* telnet enable */
+		else if (_wcsicmp(Temp, L"/T=1") == 0) {	/* telnet enable */
 			ParamPort = IdTCPIP;
 			ParamTel = 1;
 		}
-		else if (_strnicmp(Temp, "/TEKICON=", 9) == 0) { /* Tek window icon */
+		else if (_wcsnicmp(Temp, L"/TEKICON=", 9) == 0) { /* Tek window icon */
 			ts->TEKIcon = IconName2IconId(&Temp[9]);
 		}
-		else if (_strnicmp(Temp, "/VTICON=", 8) == 0) {	/* VT window icon */
+		else if (_wcsnicmp(Temp, L"/VTICON=", 8) == 0) {	/* VT window icon */
 			ts->VTIcon = IconName2IconId(&Temp[8]);
 		}
-		else if (_stricmp(Temp, "/V") == 0) {	/* invisible */
+		else if (_wcsicmp(Temp, L"/V") == 0) {	/* invisible */
 			ts->HideWindow = 1;
 		}
-		else if (_strnicmp(Temp, "/W=", 3) == 0) {	/* Window title */
-			strncpy_s(ts->Title, sizeof(ts->Title), &Temp[3], _TRUNCATE);
+		else if (_wcsnicmp(Temp, L"/W=", 3) == 0) {	/* Window title */
+		    char* TitleA = ToCharW(&Temp[3]);
+			strncpy_s(ts->Title, sizeof(ts->Title), TitleA, _TRUNCATE);
+			free(TitleA);
 		}
-		else if (_strnicmp(Temp, "/X=", 3) == 0) {	/* Window pos (X) */
-			if (sscanf(&Temp[3], "%d", &pos) == 1) {
+		else if (_wcsnicmp(Temp, L"/X=", 3) == 0) {	/* Window pos (X) */
+			if (swscanf(&Temp[3], L"%d", &pos) == 1) {
 				ts->VTPos.x = pos;
 				if (ts->VTPos.y == CW_USEDEFAULT)
 					ts->VTPos.y = 0;
 			}
 		}
-		else if (_strnicmp(Temp, "/Y=", 3) == 0) {	/* Window pos (Y) */
-			if (sscanf(&Temp[3], "%d", &pos) == 1) {
+		else if (_wcsnicmp(Temp, L"/Y=", 3) == 0) {	/* Window pos (Y) */
+			if (swscanf(&Temp[3], L"%d", &pos) == 1) {
 				ts->VTPos.y = pos;
 				if (ts->VTPos.x == CW_USEDEFAULT)
 					ts->VTPos.x = 0;
 			}
 		}
-		else if (_stricmp(Temp, "/4") == 0)	/* Protocol Tera Term speaking */
+		else if (_wcsicmp(Temp, L"/4") == 0)	/* Protocol Tera Term speaking */
 			ts->ProtocolFamily = AF_INET;
-		else if (_stricmp(Temp, "/6") == 0)
+		else if (_wcsicmp(Temp, L"/6") == 0)
 			ts->ProtocolFamily = AF_INET6;
-		else if (_stricmp(Temp, "/DUPLICATE") == 0) {	// duplicate session (2004.12.7. yutaka)
+		else if (_wcsicmp(Temp, L"/DUPLICATE") == 0) {	// duplicate session (2004.12.7. yutaka)
 			ts->DuplicateSession = 1;
 
 		}
-		else if (_strnicmp(Temp, "/TIMEOUT=", 9) == 0) {	// Connecting Timeout value (2007.1.11. yutaka)
-			if (sscanf(&Temp[9], "%d", &pos) == 1) {
+		else if (_wcsnicmp(Temp, L"/TIMEOUT=", 9) == 0) {	// Connecting Timeout value (2007.1.11. yutaka)
+			if (swscanf(&Temp[9], L"%d", &pos) == 1) {
 				if (pos >= 0)
 					ts->ConnectingTimeout = pos;
 			}
 
 		}
-		else if ((Temp[0] != '/') && (strlen(Temp) > 0)) {
-			if (JustAfterHost && ((c=ParsePortName(Temp)) > 0))
+		else if ((Temp[0] != '/') && (wcslen(Temp) > 0)) {
+			if (JustAfterHost && ((c=ParsePortNameW(Temp)) > 0))
 				ParamTCP = c;
 			else {
-				strncpy_s(ts->HostName, sizeof(ts->HostName), Temp, _TRUNCATE);	/* host name */
+				char *HostNameA = ToCharW(Temp);
+				strncpy_s(ts->HostName, sizeof(ts->HostName), HostNameA, _TRUNCATE);	/* host name */
+				free(HostNameA);
 				if (ParamPort == IdNamedPipe) {
 					// 何もしない。
 
@@ -4187,14 +4216,15 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		break;
 	case IdNamedPipe:
 		if (ts->HostName[0] != 0 && ts->HostName[0] != '\\') {
-			if (p = strchr(ts->HostName, '\\')) {
+			char * p = strchr(ts->HostName, '\\');
+			if (p == NULL) {
 				*p++ = '\0';
-				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "\\\\%s\\pipe\\%s", ts->HostName, p);
+				_snwprintf_s(Temp, _countof(Temp), _TRUNCATE, L"\\\\%hs\\pipe\\%hs", ts->HostName, p);
 			}
 			else {
-				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "\\\\.\\pipe\\%s", ts->HostName);
+				_snwprintf_s(Temp, _countof(Temp), _TRUNCATE, L"\\\\.\\pipe\\%hs", ts->HostName);
 			}
-			strncpy_s(ts->HostName, sizeof(ts->HostName), Temp, _TRUNCATE);
+			WideCharToACP_t(Temp, ts->HostName, _countof(ts->HostName));
 		}
 		ts->PortType = IdNamedPipe;
 		ts->ComPort = 0;

@@ -16,8 +16,8 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
-  MessageBox(NULL, Param, "TTXShowCommandLine", MB_OK|MB_ICONEXCLAMATION);
+static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
+  MessageBoxW(NULL, Param, L"TTXShowCommandLine", MB_OK|MB_ICONEXCLAMATION);
   pvar->origParseParam(Param, ts, DDETopic);
 }
 

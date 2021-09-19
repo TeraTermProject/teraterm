@@ -57,6 +57,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <winsock2.h>
+#include <wchar.h>
 
 #include <lmcons.h>
 
@@ -88,6 +89,7 @@
 #include "codeconv.h"
 #include "inifile_com.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 #include "libputty.h"
 
@@ -106,9 +108,6 @@ extern const EVP_CIPHER* evp_ssh1_3des(void);
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
 #define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
 #define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
-
-#define MATCH_STR(s, o) strncmp((s), (o), NUM_ELEM(o) - 1)
-#define MATCH_STR_I(s, o) _strnicmp((s), (o), NUM_ELEM(o) - 1)
 
 /* This extension implements SSH, so we choose a load order in the
    "protocols" range. */
@@ -1384,7 +1383,7 @@ static void read_ssh_options_from_user_file(PTInstVar pvar,
 
 // Percent-encodeされた文字列srcをデコードしてdstにコピーする。
 // dstlenはdstのサイズ。これより結果が長い場合、その分は切り捨てられる。
-static void percent_decode(char *dst, int dstlen, char *src) {
+static void percent_decode(char *dst, int dstlen, const wchar_t *src) {
 	if (src == NULL || dst == NULL || dstlen < 1) {
 		return;
 	}
@@ -1396,7 +1395,7 @@ static void percent_decode(char *dst, int dstlen, char *src) {
 			src++; dst++;
 		}
 		else {
-			*dst++ = *src++;
+			*dst++ = (char)*src++;
 		}
 		dstlen--;
 	}
@@ -1404,8 +1403,9 @@ static void percent_decode(char *dst, int dstlen, char *src) {
 	return;
 }
 
-void add_forward_param(PTInstVar pvar, char *param)
+static void add_forward_param(PTInstVar pvar, const wchar_t *paramW)
 {
+	char *param = ToCharW(paramW);
 	if (pvar->settings.DefaultForwarding[0] == 0) {
 		strncpy_s(pvar->settings.DefaultForwarding,
 		          sizeof(pvar->settings.DefaultForwarding),
@@ -1418,15 +1418,17 @@ void add_forward_param(PTInstVar pvar, char *param)
 		          sizeof(pvar->settings.DefaultForwarding),
 		          param, _TRUNCATE);
 	}
+	free(param);
 }
 
-static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
-	int param_len=strlen(param);
+static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
+{
+	int param_len = wcslen(param);
 	int opt_len = param_len+1;
-	char *option = (char *)calloc(opt_len, sizeof(char));
-	char *option2 = (char *)calloc(opt_len, sizeof(char));
+	wchar_t *option = (wchar_t *)calloc(opt_len, sizeof(wchar_t));
+	wchar_t *option2 = (wchar_t *)calloc(opt_len, sizeof(wchar_t));
 	int action;
-	PCHAR start, cur, next;
+	wchar_t *start, *cur, *next;
 	size_t i;
 
 	if (pvar->hostdlg_activated) {
@@ -1442,40 +1444,33 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		action = OPTION_NONE;
 
 		if ((option[0] == '-' || option[0] == '/')) {
-			wchar_t* option2W;
-			if (MATCH_STR(option + 1, "ssh") == 0) {
-				if (MATCH_STR(option + 4, "-f=") == 0) {
-					strncpy_s(option2, opt_len, option + 7, _TRUNCATE);
-					option2W = ToWcharA(option2);
-					read_ssh_options_from_user_file(pvar, option2W);
-					free(option2W);
+			if (wcsncmp(option + 1, L"ssh", 3) == 0) {
+				if (wcsncmp(option + 4, L"-f=", 3) == 0) {
+					const wchar_t *file = option + 7;
+					read_ssh_options_from_user_file(pvar, file);
 					action = OPTION_CLEAR;
-				} else if (MATCH_STR(option + 4, "-consume=") == 0) {
-					strncpy_s(option2, opt_len, option + 13, _TRUNCATE);
-					option2W = ToWcharA(option2);
-					read_ssh_options_from_user_file(pvar, option2W);
-					free(option2W);
-					DeleteFile(option2);
+				} else if (wcsncmp(option + 4, L"-consume=", 9) == 0) {
+					const wchar_t* file = option + 13;
+					read_ssh_options_from_user_file(pvar, file);
+					DeleteFileW(file);
 					action = OPTION_CLEAR;
 				}
 
 			// ttermpro.exe の /F= 指定でも TTSSH の設定を読む (2006.10.11 maya)
-			} else if (MATCH_STR_I(option + 1, "f=") == 0) {
-				strncpy_s(option2, opt_len, option + 3, _TRUNCATE);
-				option2W = ToWcharA(option2);
-				read_ssh_options_from_user_file(pvar, option2W);
-				free(option2W);
+			} else if (_wcsnicmp(option + 1, L"f=", 2) == 0) {
+				const wchar_t *file = option + 3;
+				read_ssh_options_from_user_file(pvar, file);
 				// Tera Term側でも解釈する必要があるので消さない
 			}
 		}
 
 		switch (action) {
 			case OPTION_CLEAR:
-				memset(cur, ' ', next-cur);
+				wmemset(cur, ' ', next-cur);
 				break;
 			case OPTION_REPLACE:
-				memset(cur, ' ', next-cur);
-				memcpy(cur+1, option, strlen(option));
+				wmemset(cur, ' ', next-cur);
+				wmemcpy(cur+1, option, wcslen(option));
 				break;
 		}
 
@@ -1489,13 +1484,13 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 
 		if ((option[0] == '-' || option[0] == '/')) {
 			action = OPTION_CLEAR;
-			if (MATCH_STR(option + 1, "ssh") == 0) {
+			if (wcsncmp(option + 1, L"ssh", 3) == 0) {
 				if (option[4] == 0) {
 					pvar->settings.Enabled = 1;
-				} else if (MATCH_STR(option + 4, "-L") == 0 ||
-				           MATCH_STR(option + 4, "-R") == 0 ||
-				           MATCH_STR(option + 4, "-D") == 0) {
-					char *p = option + 5;
+				} else if (wcsncmp(option + 4, L"-L", 3) == 0 ||
+				           wcsncmp(option + 4, L"-R", 3) == 0 ||
+				           wcsncmp(option + 4, L"-D", 3) == 0) {
+					wchar_t *p = option + 5;
 					option2[0] = *p;
 					i = 1;
 					while (*++p) {
@@ -1512,72 +1507,76 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 						option2[i] = 0;
 						add_forward_param(pvar, option2);
 					}
-				} else if (MATCH_STR(option + 4, "-X") == 0) {
-					add_forward_param(pvar, "X");
+				} else if (wcsncmp(option + 4, L"-X", 2) == 0) {
+					add_forward_param(pvar, L"X");
 					if (option+6 != 0) {
+						char *option6 = ToCharW(option + 6);
 						strncpy_s(pvar->settings.X11Display,
 						          sizeof(pvar->settings.X11Display),
-						          option + 6, _TRUNCATE);
+						          option6, _TRUNCATE);
+						free(option6);
 					}
-				} else if (strcmp(option + 4, "-v") == 0) {
+				} else if (wcscmp(option + 4, L"-v") == 0) {
 					pvar->settings.LogLevel = LOG_LEVEL_VERBOSE;
-				} else if (_stricmp(option + 4, "-autologin") == 0 ||
-				           _stricmp(option + 4, "-autologon") == 0) {
+				} else if (_wcsicmp(option + 4, L"-autologin") == 0 ||
+				           _wcsicmp(option + 4, L"-autologon") == 0) {
 					pvar->settings.TryDefaultAuth = TRUE;
-				} else if (MATCH_STR_I(option + 4, "-agentconfirm=") == 0) {
-					if ((_stricmp(option+18, "off") == 0) ||
-					    (_stricmp(option+18, "no") == 0) ||
-					    (_stricmp(option+18, "false") == 0) ||
-					    (_stricmp(option+18, "0") == 0) ||
-					    (_stricmp(option+18, "n") == 0)) {
+				} else if (_wcsnicmp(option + 4, L"-agentconfirm=", 14) == 0) {
+					if ((_wcsicmp(option+18, L"off") == 0) ||
+					    (_wcsicmp(option+18, L"no") == 0) ||
+					    (_wcsicmp(option+18, L"false") == 0) ||
+					    (_wcsicmp(option+18, L"0") == 0) ||
+					    (_wcsicmp(option+18, L"n") == 0)) {
 						pvar->settings.ForwardAgentConfirm = 0;
 					}
 					else {
 						pvar->settings.ForwardAgentConfirm = 1;
 					}
-				} else if (strcmp(option + 4, "-a") == 0) {
+				} else if (wcscmp(option + 4, L"-a") == 0) {
 					pvar->settings.ForwardAgent = FALSE;
-				} else if (strcmp(option + 4, "-A") == 0) {
+				} else if (wcscmp(option + 4, L"-A") == 0) {
 					pvar->settings.ForwardAgent = TRUE;
 
-				} else if (MATCH_STR(option + 4, "-C=") == 0) {
-					pvar->settings.CompressionLevel = atoi(option+7);
+				} else if (wcsncmp(option + 4, L"-C=", 3) == 0) {
+					pvar->settings.CompressionLevel = _wtoi(option+7);
 					if (pvar->settings.CompressionLevel < 0) {
 						pvar->settings.CompressionLevel = 0;
 					}
 					else if (pvar->settings.CompressionLevel > 9) {
 						pvar->settings.CompressionLevel = 9;
 					}
-				} else if (strcmp(option + 4, "-C") == 0) {
+				} else if (wcscmp(option + 4, L"-C") == 0) {
 					pvar->settings.CompressionLevel = 6;
-				} else if (strcmp(option + 4, "-c") == 0) {
+				} else if (wcscmp(option + 4, L"-c") == 0) {
 					pvar->settings.CompressionLevel = 0;
-				} else if (MATCH_STR_I(option + 4, "-icon=") == 0) {
-					if ((_stricmp(option+10, "old") == 0) ||
-					    (_stricmp(option+10, "yellow") == 0) ||
-					    (_stricmp(option+10, "securett_yellow") == 0)) {
+				} else if (_wcsnicmp(option + 4, L"-icon=", 6) == 0) {
+					if ((_wcsicmp(option+10, L"old") == 0) ||
+					    (_wcsicmp(option+10, L"yellow") == 0) ||
+					    (_wcsicmp(option+10, L"securett_yellow") == 0)) {
 						pvar->settings.IconID = IDI_SECURETT_YELLOW;
 					}
-					else if ((_stricmp(option+10, "green") == 0) ||
-					         (_stricmp(option+10, "securett_green") == 0)) {
+					else if ((_wcsicmp(option+10, L"green") == 0) ||
+					         (_wcsicmp(option+10, L"securett_green") == 0)) {
 						pvar->settings.IconID = IDI_SECURETT_GREEN;
 					}
 					else {
 						pvar->settings.IconID = IDI_SECURETT;
 					}
-				} else if (MATCH_STR(option + 4, "-subsystem=") == 0) {
+				} else if (wcsncmp(option + 4, L"-subsystem=", 11) == 0) {
+					char *option15 = ToCharW(option + 15);
 					pvar->use_subsystem = TRUE;
 					strncpy_s(pvar->subsystem_name,
 					          sizeof(pvar->subsystem_name),
-					          option + 15, _TRUNCATE);
-				} else if (strcmp(option + 4, "-N") == 0) {
+					          option15, _TRUNCATE);
+					free(option15);
+				} else if (wcscmp(option + 4, L"-N") == 0) {
 					pvar->nosession = TRUE;
 
 				// /ssh1 と /ssh2 オプションの新規追加 (2006.9.16 maya)
-				} else if (strcmp(option + 4, "1") == 0) {
+				} else if (wcscmp(option + 4, L"1") == 0) {
 					pvar->settings.Enabled = 1;
 					pvar->settings.ssh_protocol_version = 1;
-				} else if (strcmp(option + 4, "2") == 0) {
+				} else if (wcscmp(option + 4, L"2") == 0) {
 					pvar->settings.Enabled = 1;
 					pvar->settings.ssh_protocol_version = 2;
 
@@ -1592,8 +1591,8 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				}
 
 			// ttermpro.exe の /T= 指定の流用なので、大文字も許す (2006.10.19 maya)
-			} else if (MATCH_STR_I(option + 1, "t=") == 0) {
-				if (strcmp(option + 3, "2") == 0) {
+			} else if (_wcsnicmp(option + 1, L"t=", 2) == 0) {
+				if (wcscmp(option + 3, L"2") == 0) {
 					pvar->settings.Enabled = 1;
 					// /t=2はttssh側での拡張なので消す
 				} else {
@@ -1602,28 +1601,28 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				}
 
 			// /1 および /2 オプションの新規追加 (2004.10.3 yutaka)
-			} else if (strcmp(option + 1, "1") == 0) {
+			} else if (wcscmp(option + 1, L"1") == 0) {
 				// command line: /ssh /1 is SSH1 only
 				pvar->settings.ssh_protocol_version = 1;
 
-			} else if (strcmp(option + 1, "2") == 0) {
+			} else if (wcscmp(option + 1, L"2") == 0) {
 				// command line: /ssh /2 is SSH2 & SSH1
 				pvar->settings.ssh_protocol_version = 2;
 
-			} else if (strcmp(option + 1, "nossh") == 0) {
+			} else if (wcscmp(option + 1, L"nossh") == 0) {
 				// '/nossh' オプションの追加。
 				// TERATERM.INI でSSHが有効になっている場合、うまくCygtermが起動しないことが
 				// あることへの対処。(2004.10.11 yutaka)
 				pvar->settings.Enabled = 0;
 
-			} else if (strcmp(option + 1, "telnet") == 0) {
+			} else if (wcscmp(option + 1, L"telnet") == 0) {
 				// '/telnet' が指定されているときには '/nossh' と同じく
 				// SSHを無効にする (2006.9.16 maya)
 				pvar->settings.Enabled = 0;
 				// Tera Term の Telnet フラグも付ける
 				pvar->ts->Telnet = 1;
 
-			} else if (MATCH_STR(option + 1, "auth=") == 0) {
+			} else if (wcsncmp(option + 1, L"auth=", 5) == 0) {
 				// SSH2自動ログインオプションの追加
 				//
 				// SYNOPSIS: /ssh /auth=passowrd /user=ユーザ名 /passwd=パスワード
@@ -1635,23 +1634,23 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				//
 				pvar->ssh2_autologin = 1; // for SSH2 (2004.11.30 yutaka)
 
-				if (_stricmp(option + 6, "password") == 0) { // パスワード
+				if (_wcsicmp(option + 6, L"password") == 0) { // パスワード
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_PASSWORD;
 					pvar->ssh2_authmethod = SSH_AUTH_PASSWORD;
 
-				} else if (_stricmp(option + 6, "keyboard-interactive") == 0) { // keyboard-interactive認証
+				} else if (_wcsicmp(option + 6, L"keyboard-interactive") == 0) { // keyboard-interactive認証
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 					pvar->ssh2_authmethod = SSH_AUTH_TIS;
 
-				} else if (_stricmp(option + 6, "challenge") == 0) { // keyboard-interactive認証
+				} else if (_wcsicmp(option + 6, L"challenge") == 0) { // keyboard-interactive認証
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 					pvar->ssh2_authmethod = SSH_AUTH_TIS;
 
-				} else if (_stricmp(option + 6, "publickey") == 0) { // 公開鍵認証
+				} else if (_wcsicmp(option + 6, L"publickey") == 0) { // 公開鍵認証
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_RSA;
 					pvar->ssh2_authmethod = SSH_AUTH_RSA;
 
-				} else if (_stricmp(option + 6, "pageant") == 0) { // 公開鍵認証 by Pageant
+				} else if (_wcsicmp(option + 6, L"pageant") == 0) { // 公開鍵認証 by Pageant
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_RSA;
 					pvar->ssh2_authmethod = SSH_AUTH_PAGEANT;
 
@@ -1659,20 +1658,20 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					// TODO:
 				}
 
-			} else if (MATCH_STR(option + 1, "user=") == 0) {
-				_snprintf_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), _TRUNCATE, "%s", option+6);
+			} else if (wcsncmp(option + 1, L"user=", 5) == 0) {
+				_snprintf_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), _TRUNCATE, "%ls", option+6);
 
-			} else if (MATCH_STR(option + 1, "passwd=") == 0) {
-				_snprintf_s(pvar->ssh2_password, sizeof(pvar->ssh2_password), _TRUNCATE, "%s", option+8);
+			} else if (wcsncmp(option + 1, L"passwd=", 7) == 0) {
+				_snprintf_s(pvar->ssh2_password, sizeof(pvar->ssh2_password), _TRUNCATE, "%ls", option+8);
 
-			} else if (MATCH_STR(option + 1, "keyfile=") == 0) {
-				_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%s", option+9);
+			} else if (wcsncmp(option + 1, L"keyfile=", 8) == 0) {
+				_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%ls", option+9);
 
-			} else if (strcmp(option + 1, "ask4passwd") == 0) {
+			} else if (wcscmp(option + 1, L"ask4passwd") == 0) {
 				// パスワードを聞く (2006.9.18 maya)
 				pvar->ask4passwd = 1;
 
-			} else if (strcmp(option + 1, "nosecuritywarning") == 0) {
+			} else if (wcscmp(option + 1, L"nosecuritywarning") == 0) {
 				// known_hostsチェックをしない。当該オプションを使うと、セキュリティ性が低下する
 				// ため、隠しオプション扱いとする。
 				// (2009.10.4 yutaka)
@@ -1690,12 +1689,12 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			}
 
 		}
-		else if ((MATCH_STR_I(option, "ssh://") == 0) ||
-		         (MATCH_STR_I(option, "ssh1://") == 0) ||
-		         (MATCH_STR_I(option, "ssh2://") == 0) ||
-		         (MATCH_STR_I(option, "slogin://") == 0) ||
-		         (MATCH_STR_I(option, "slogin1://") == 0) ||
-		         (MATCH_STR_I(option, "slogin2://") == 0)) {
+		else if ((_wcsnicmp(option, L"ssh://", 6) == 0) ||
+		         (_wcsnicmp(option, L"ssh1://", 7) == 0) ||
+		         (_wcsnicmp(option, L"ssh2://", 7) == 0) ||
+		         (_wcsnicmp(option, L"slogin://", 9) == 0) ||
+		         (_wcsnicmp(option, L"slogin1://", 10) == 0) ||
+		         (_wcsnicmp(option, L"slogin2://", 10) == 0)) {
 			//
 			// ssh://user@host/ 等のURL形式のサポート
 			// 基本的な書式は telnet:// URLに順ずる
@@ -1704,13 +1703,13 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			//   RFC3986: Uniform Resource Identifier (URI): Generic Syntax
 			//   RFC4248: The telnet URI Scheme
 			//
-			char *p, *p2, *p3;
+			wchar_t *p, *p2, *p3;
 			int optlen, hostlen;
 
-			optlen = strlen(option);
+			optlen = wcslen(option);
 
 			// 最初の':'の前の文字が数字だった場合、それをsshプロトコルバージョンとみなす
-			p = _mbschr(option, ':');
+			p = wcschr(option, ':');
 			switch (*(p-1)) {
 			case '1':
 				pvar->settings.ssh_protocol_version = 1;
@@ -1724,15 +1723,15 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			p += 3;
 
 			// path part を切り捨てる
-			if ((p2 = _mbschr(p, '/')) != NULL) {
+			if ((p2 = wcschr(p, '/')) != NULL) {
 				*p2 = 0;
 			}
 
 			// '@'があった場合、それより前はユーザ情報
-			if ((p2 = _mbschr(p, '@')) != NULL) {
+			if ((p2 = wcschr(p, '@')) != NULL) {
 				*p2 = 0;
 				// ':'以降はパスワード
-				if ((p3 = _mbschr(p, ':')) != NULL) {
+				if ((p3 = wcschr(p, ':')) != NULL) {
 					*p3 = 0;
 					percent_decode(pvar->ssh2_password, sizeof(pvar->ssh2_password), p3 + 1);
 				}
@@ -1743,25 +1742,25 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 
 			// host part を option の先頭に移動して、scheme part を潰す
 			// port指定が無かった時にport番号を足すための領域確保の意味もある
-			hostlen = strlen(p);
-			memmove_s(option, optlen, p, hostlen);
+			hostlen = wcslen(p);
+			wmemmove_s(option, optlen, p, hostlen);
 			option[hostlen] = 0;
 
 			// ポート指定が無い時は":22"を足す
 			if (option[0] == '[' && option[hostlen-1] == ']' ||     // IPv6 raw address without port
-			    option[0] != '[' && _mbschr(option, ':') == NULL) { // hostname or IPv4 raw address without port
-				memcpy_s(option+hostlen, optlen-hostlen, ":22", 3);
+			    option[0] != '[' && wcschr(option, ':') == NULL) { // hostname or IPv4 raw address without port
+				wmemcpy_s(option+hostlen, optlen-hostlen, L":22", 3);
 				hostlen += 3;
 			}
 
 			// ポート指定より後をすべてスペースで潰す
-			memset(option+hostlen, ' ', optlen-hostlen);
+			wmemset(option+hostlen, ' ', optlen-hostlen);
 
 			pvar->settings.Enabled = 1;
 
 			action = OPTION_REPLACE;
 		}
-		else if (_mbschr(option, '@') != NULL) {
+		else if (wcschr(option, '@') != NULL) {
 			//
 			// user@host 形式のサポート
 			//   取り合えずsshでのみサポートの為、ユーザ名はttssh内で潰す。
@@ -1769,16 +1768,19 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			//   将来的にtelnet authentication optionをサポートした時は
 			//   Tera Term本体で処理するようにする予定。
 			//
-			char *p;
-			p = _mbschr(option, '@');
+			char *optionA;
+			wchar_t *p;
+			p = wcschr(option, '@');
 			*p = 0;
 
-			strncpy_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), option, _TRUNCATE);
+			optionA = ToCharW(option);
+			strncpy_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), optionA, _TRUNCATE);
+			free(optionA);
 
 			// ユーザ名部分をスペースで潰す。
 			// 後続のTTXやTera Term本体で解釈する時にはスペースを読み飛ばすので、
 			// ホスト名を先頭に詰める必要は無い。
-			memset(option, ' ', p-option+1);
+			wmemset(option, ' ', p-option+1);
 
 			action = OPTION_REPLACE;
 		}
@@ -1786,11 +1788,11 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 
 		switch (action) {
 			case OPTION_CLEAR:
-				memset(cur, ' ', next-cur);
+				wmemset(cur, ' ', next-cur);
 				break;
 			case OPTION_REPLACE:
-				memset(cur, ' ', next-cur);
-				memcpy(cur+1, option, strlen(option));
+				wmemset(cur, ' ', next-cur);
+				wmemcpy(cur+1, option, wcslen(option));
 				break;
 		}
 

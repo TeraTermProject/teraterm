@@ -4,6 +4,7 @@
 #include "tt_res.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <wchar.h>
 
 #define ORDER 5800
 
@@ -23,10 +24,10 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->cv = cv;
 }
 
-BOOL ColorStr2ColorRef(COLORREF *color, PCHAR Str) {
+static BOOL ColorStr2ColorRef(COLORREF *color, wchar_t *Str) {
   int TmpColor[3];
   int i, result;
-  PCHAR cur, next;
+  wchar_t *cur, *next;
 
   cur = Str;
 
@@ -34,10 +35,10 @@ BOOL ColorStr2ColorRef(COLORREF *color, PCHAR Str) {
     if (!cur)
       return FALSE;
 
-    if ((next = strchr(cur, ',')) != NULL)
+    if ((next = wcsrchr(cur, L',')) != NULL)
       *next = 0;
 
-    result = sscanf_s(cur, "%d", &TmpColor[i]);
+    result = swscanf_s(cur, L"%d", &TmpColor[i]);
 
     if (next)
       *next++ = ',';
@@ -52,9 +53,9 @@ BOOL ColorStr2ColorRef(COLORREF *color, PCHAR Str) {
   return TRUE;
 }
 
-static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
-  char buff[1024];
-  PCHAR start, cur, next;
+static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
+  wchar_t buff[1024];
+  wchar_t *start, *cur, *next;
   int x, y;
 
   /* the first term shuld be executable filename of Tera Term */
@@ -62,20 +63,20 @@ static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 
   cur = start;
   while (next = GetParam(buff, sizeof(buff), cur)) {
-    if (_strnicmp(buff, "/FG=", 4) == 0) {
+    if (_wcsnicmp(buff, L"/FG=", 4) == 0) {
       ColorStr2ColorRef(&(ts->VTColor[0]), &buff[4]);
-      memset(cur, ' ', next - cur);
+      wmemset(cur, ' ', next - cur);
     }
-    else if (_strnicmp(buff, "/BG=", 4) == 0) {
+    else if (_wcsnicmp(buff, L"/BG=", 4) == 0) {
       ColorStr2ColorRef(&(ts->VTColor[1]), &buff[4]);
-      memset(cur, ' ', next - cur);
+      wmemset(cur, ' ', next - cur);
     }
-    else if (_strnicmp(buff, "/SIZE=", 6) == 0) {
-      if (sscanf_s(buff+6, "%dx%d", &x, &y) == 2 || sscanf_s(buff+6, "%d,%d", &x, &y) == 2) {
-	ts->TerminalWidth = x;
-	ts->TerminalHeight = y;
+    else if (_wcsnicmp(buff, L"/SIZE=", 6) == 0) {
+      if (swscanf_s(buff+6, L"%dx%d", &x, &y) == 2 || swscanf_s(buff+6, L"%d,%d", &x, &y) == 2) {
+        ts->TerminalWidth = x;
+        ts->TerminalHeight = y;
       }
-      memset(cur, ' ', next - cur);
+      wmemset(cur, ' ', next - cur);
     }
     cur = next;
   }

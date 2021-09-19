@@ -238,7 +238,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
-	char *Param;
 	int CmdShow;
 	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
@@ -277,9 +276,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/* Parse command line parameters*/
 	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
 	// 落ちるバグを修正。(2007.6.12 maya)
-	Param = GetCommandLine();
 	if (LoadTTSET()) {
-		(*ParseParam)(Param, &ts, &(TopicName[0]));
+		wchar_t *ParamW = GetCommandLineW();
+		(*ParseParam)(ParamW, &ts, &(TopicName[0]));
 	}
 	FreeTTSET();
 
@@ -3516,10 +3515,11 @@ void CVTWindow::OnFileNewConnection()
 			ts.ProtocolFamily = GetHNRec.ProtocolFamily;
 			ts.ComPort = GetHNRec.ComPort;
 
-			if ((GetHNRec.PortType==IdTCPIP) &&
-				LoadTTSET()) {
-				(*ParseParam)(Command, &ts, NULL);
+			if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
+				wchar_t *commandW = ToWcharA(Command);
+				(*ParseParam)(commandW, &ts, NULL);
 				FreeTTSET();
+				free(commandW);
 			}
 			SetKeyMap();
 			if (ts.MacroFN[0]!=0) {

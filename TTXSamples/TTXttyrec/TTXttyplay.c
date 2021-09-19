@@ -402,17 +402,17 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	}
 }
 
-static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
-	char buff[1024];
-	PCHAR next;
+static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
+	wchar_t buff[1024];
+	wchar_t *next;
 	pvar->origParseParam(Param, ts, DDETopic);
 
 	next = Param;
 	while (next = GetParam(buff, sizeof(buff), next)) {
-		if (_strnicmp(buff, "/ttyplay-nowait", 16) == 0 || _strnicmp(buff, "/tpnw", 6) == 0) {
+		if (_wcsnicmp(buff, L"/ttyplay-nowait", 16) == 0 || _wcsnicmp(buff, L"/tpnw", 6) == 0) {
 			pvar->nowait = TRUE;
 		}
-		else if (_strnicmp(buff, "/TTYPLAY", 9) == 0 || _strnicmp(buff, "/TP", 4) == 0) {
+		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0) {
 			pvar->enable = TRUE;
 		}
 	}

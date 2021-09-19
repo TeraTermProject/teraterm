@@ -99,12 +99,12 @@ private:
 		write_options(fileName);
 	}
 
-	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
-		int param_len=strlen(param);
-		char option[1024];
+	static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic) {
+		size_t param_len = wcslen(param);
+		wchar_t option[1024];
 		int opt_len = sizeof(option);
 		int action;
-		PCHAR start, cur, next;
+		wchar_t *start, *cur, *next;
 
 		memset(&option, '\0', opt_len);
 
@@ -118,20 +118,22 @@ private:
 
 			if ((option[0] == '-' || option[0] == '/')) {
 				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
-					const char *f = get_teraterm_dir_relative_name(option + 3);
+					char *optA = ToCharW(option + 3);
+					const char *f = get_teraterm_dir_relative_name(optA);
 					wchar_t *fW = ToWcharA(f);
 					read_options(fW);
+					free(optA);
 					free(fW);
 				}
 			}
 
 			switch (action) {
 				case OPTION_CLEAR:
-					memset(cur, ' ', next-cur);
+					wmemset(cur, ' ', next-cur);
 					break;
 				case OPTION_REPLACE:
-					memset(cur, ' ', next-cur);
-					memcpy(cur+1, option, strlen(option));
+					wmemset(cur, ' ', next-cur);
+					wmemcpy(cur+1, option, wcslen(option));
 					break;
 			}
 
@@ -144,22 +146,26 @@ private:
 			action = OPTION_NONE;
 
 			if ((option[0] == '-' || option[0] == '/')) {
-				if (strlen(option + 1) >= 6 && option[6] == '=') {
+				if (wcslen(option + 1) >= 6 && option[6] == '=') {
 					option[6] = '\0';
-					if (_stricmp(option + 1, "proxy") == 0) {
-						ProxyWSockHook::parseURL(option + 7, TRUE);
+					if (_wcsicmp(option + 1, L"proxy") == 0) {
+						char *url = ToCharW(option + 7);
+						ProxyWSockHook::parseURL(url, TRUE);
+						free(url);
 						action = OPTION_CLEAR;
 					}else{
 						option[6] = '=';
 					}
 				}
-				else if (_stricmp(option+1, "noproxy") == 0) {
+				else if (_wcsicmp(option+1, L"noproxy") == 0) {
 					// -noproxy ‚Í -proxy=none:// ‚Ì•Ê–¼
 					ProxyWSockHook::parseURL("none://", TRUE);
 					action = OPTION_CLEAR;
 				}
 			}else{
-				String realhost = ProxyWSockHook::parseURL(option, FALSE);
+				char *url = ToCharW(option);
+				String realhost = ProxyWSockHook::parseURL(url, FALSE);
+				free(url);
 				if (realhost != NULL) {
 					getInstance().realhost = realhost;
 					if (realhost.indexOf("://") == -1) {
@@ -175,11 +181,11 @@ private:
 
 			switch (action) {
 				case OPTION_CLEAR:
-					memset(cur, ' ', next-cur);
+					wmemset(cur, ' ', next-cur);
 					break;
 				case OPTION_REPLACE:
-					memset(cur, ' ', next-cur);
-					memcpy(cur+1, option, strlen(option));
+					wmemset(cur, ' ', next-cur);
+					wmemcpy(cur+1, option, wcslen(option));
 					break;
 			}
 

@@ -396,19 +396,16 @@ static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
 //	/F= による設定ファイルの切り替えのみ対応。
 //
 
-static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
-	char buff[1024];
-	PCHAR next;
+static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
+	wchar_t buff[1024];
+	wchar_t *next;
 	pvar->origParseParam(Param, ts, DDETopic);
 
 	next = Param;
 	while (next = GetParam(buff, sizeof(buff), next)) {
 		DequoteParam(buff, sizeof(buff), buff);
-		if (_strnicmp(buff, "/F=", 3) == 0) {
-			char *f = buff+3;
-			wchar_t *fW = ToWcharA(f);
-			ReadINI(fW, ts);
-			free(fW);
+		if (_wcsnicmp(buff, L"/F=", 3) == 0) {
+			ReadINI(buff+3, ts);
 		}
 	}
 

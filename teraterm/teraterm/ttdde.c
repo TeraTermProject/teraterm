@@ -48,6 +48,7 @@
 
 #include "filesys.h"
 #include "sendmem.h"
+#include "codeconv.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -473,8 +474,11 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		char Temp[MaxStrLen + 2];
 		strncpy_s(Temp, sizeof(Temp),"a ", _TRUNCATE); // dummy exe name
 		strncat_s(Temp,sizeof(Temp),ParamFileName,_TRUNCATE);
-		if (LoadTTSET())
-			(*ParseParam)(Temp, &ts, NULL);
+		if (LoadTTSET()) {
+			wchar_t *commandline = ToWcharA(Temp);
+			(*ParseParam)(commandline, &ts, NULL);
+			free(commandline);
+		}
 		FreeTTSET();
 		cv.NoMsg = 1; /* suppress error messages */
 		PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
