@@ -3593,41 +3593,29 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
 }
 
-void PASCAL CopySerialList(PCHAR IniSrcA, PCHAR IniDestA, PCHAR section,
-                               PCHAR key, int MaxList)
+void PASCAL CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,
+						   const wchar_t *key, int MaxList)
 {
 	int i, j;
-	char EntName[10], EntName2[10];
-	char TempHost[HostNameMaxLength + 1];
-#if	INI_FILE_IS_UNICODE
-	const wchar_t *IniSrc = ToWcharA(IniSrcA);
-	const wchar_t *IniDest = ToWcharA(IniDestA);
-#else
-	const char *IniSrc = IniSrcA;
-	const char *IniDest = IniDestA;
-#endif
+	wchar_t EntName[10], EntName2[10];
+	wchar_t TempHost[HostNameMaxLength + 1];
 
-#if	INI_FILE_IS_UNICODE
 	if (_wcsicmp(IniSrc, IniDest) == 0)
 		return;
-#else
-	if (_stricmp(IniSrc, IniDest) == 0)
-		return;
-#endif
 
-	WritePrivateProfileString(section, NULL, NULL, IniDest);
+	WritePrivateProfileStringW(section, NULL, NULL, IniDest);
 
 	i = j = 1;
 	do {
-		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "%s%i", key, i);
-		_snprintf_s(EntName2, sizeof(EntName2), _TRUNCATE, "%s%i", key, j);
+		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"%s%i", key, i);
+		_snwprintf_s(EntName2, _countof(EntName2), _TRUNCATE, L"%s%i", key, j);
 
 		/* Get one hostname from file IniSrc */
-		GetPrivateProfileString(section, EntName, "",
-		                        TempHost, sizeof(TempHost), IniSrc);
+		GetPrivateProfileStringW(section, EntName, L"",
+		                        TempHost, _countof(TempHost), IniSrc);
 		/* Copy it to the file IniDest */
-		if (strlen(TempHost) > 0) {
-			WritePrivateProfileString(section, EntName2, TempHost, IniDest);
+		if (TempHost[0] != 0) {
+			WritePrivateProfileStringW(section, EntName2, TempHost, IniDest);
 			j++;
 		}
 		i++;
@@ -3635,7 +3623,7 @@ void PASCAL CopySerialList(PCHAR IniSrcA, PCHAR IniDestA, PCHAR section,
 	while (i <= MaxList);
 
 	/* update file */
-	WritePrivateProfileString(NULL, NULL, NULL, IniDest);
+	WritePrivateProfileStringW(NULL, NULL, NULL, IniDest);
 }
 
 void PASCAL AddValueToList(PCHAR FNameA, PCHAR Host, PCHAR section,
@@ -3704,9 +3692,9 @@ void PASCAL AddValueToList(PCHAR FNameA, PCHAR Host, PCHAR section,
 }
 
  /* copy hostlist from source IniFile to dest IniFile */
-void PASCAL CopyHostList(PCHAR IniSrc, PCHAR IniDest)
+void PASCAL CopyHostList(const wchar_t *IniSrc, const wchar_t *IniDest)
 {
-	CopySerialList(IniSrc, IniDest, "Hosts", "Host", MAXHOSTLIST);
+	CopySerialList(IniSrc, IniDest, L"Hosts", L"Host", MAXHOSTLIST);
 }
 
 void PASCAL AddHostToList(PCHAR FName, PCHAR Host)

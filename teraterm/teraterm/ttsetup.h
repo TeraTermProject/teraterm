@@ -46,14 +46,14 @@ typedef void (PASCAL *PReadIniFile)(const wchar_t *FName, PTTSet ts);
 typedef void (PASCAL *PWriteIniFile)(const wchar_t *FName, PTTSet ts);
 //typedef void (PASCAL *PReadKeyboardCnf)(PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
 typedef void (PASCAL *PReadKeyboardCnf)(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning);
-typedef void (PASCAL *PCopyHostList)
-  (PCHAR IniSrc, PCHAR IniDest);
+//typedef void (PASCAL *PCopyHostList)(PCHAR IniSrc, PCHAR IniDest);
+typedef void (PASCAL *PCopyHostList)(const wchar_t *IniSrc, const wchar_t *IniDest);
 typedef void (PASCAL *PAddHostToList)
   (PCHAR FName, PCHAR Host);
 typedef void (PASCAL *PParseParam)
   (PCHAR Param, PTTSet ts, PCHAR DDETopic);
-typedef void (PASCAL *PCopySerialList)
-  (PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
+//typedef void (PASCAL *PCopySerialList)(PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
+typedef void (PASCAL *PCopySerialList)(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section, const wchar_t *key, int MaxList);
 typedef void (PASCAL *PAddValueToList)
   (PCHAR FName, PCHAR Host, PCHAR section, PCHAR key, int MaxList);
 

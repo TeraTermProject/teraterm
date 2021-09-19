@@ -4728,9 +4728,7 @@ void CVTWindow::OnSetupSave()
 		/* write current setup values to file */
 		(*WriteIniFile)(ts.SetupFNameW, &ts);
 		/* copy host list */
-		char * PrevSetupFN = ToCharW(PrevSetupFNW);
-		(*CopyHostList)(PrevSetupFN, ts.SetupFName);
-		free(PrevSetupFN);
+		(*CopyHostList)(PrevSetupFNW, ts.SetupFNameW);
 		FreeTTSET();
 		free(PrevSetupFNW);
 		PrevSetupFNW = NULL;
