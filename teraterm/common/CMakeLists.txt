@@ -25,6 +25,8 @@ add_library(
   getcontent.h
   i18n.h
   i18n_static.c
+  inifile_com.h
+  inifile_com.cpp
   tipwin.cpp
   tipwin.h
   tmfc.cpp

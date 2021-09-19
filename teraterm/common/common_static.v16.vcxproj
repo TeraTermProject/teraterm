@@ -137,6 +137,7 @@
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
     <ClCompile Include="fileread.cpp" />
+    <ClCompile Include="inifile_com.cpp" />
     <ClCompile Include="tipwin.cpp" />
     <ClCompile Include="tmfc.cpp" />
     <ClCompile Include="tmfc_frame.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="comportinfo.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
+    <ClInclude Include="inifile_com.h" />
     <ClInclude Include="tipwin.h" />
     <ClInclude Include="tmfc.h" />
     <ClInclude Include="compat_win.h" />

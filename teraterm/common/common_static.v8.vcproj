@@ -249,6 +249,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\inifile_com.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\inifile_com.h"
+			>
+		</File>
+		<File
 			RelativePath=".\tipwin.cpp"
 			>
 		</File>
