@@ -9,6 +9,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#include "inifile_com.h"
+
 #include "gettimeofday.h"
 
 #define ORDER 6000
@@ -64,10 +66,10 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
-BOOL GetOnOff(PCHAR sect, PCHAR key, PCHAR fn, BOOL def) {
+BOOL GetOnOff(PCHAR sect, PCHAR key, const wchar_t *fn, BOOL def) {
   char buff[4];
 
-  GetPrivateProfileString(sect, key, "", buff, sizeof(buff), fn);
+  GetPrivateProfileStringAFileW(sect, key, "", buff, sizeof(buff), fn);
 
   if (def) {
     if (_stricmp(buff, "off") == 0) {
@@ -97,7 +99,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->record = FALSE;
 }
 
-static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   (pvar->origReadIniFile)(fn, ts);
   pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
 }

@@ -9,6 +9,8 @@
 #include "resource.h"
 #include "i18n.h"
 #include "dlglib.h"
+#include "inifile_com.h"
+#include "codeconv.h"
 
 #define ORDER 4000
 
@@ -74,10 +76,10 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
 	return NULL;
 }
 
-WORD GetOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, BOOL Default)
+WORD GetOnOff(PCHAR Sect, PCHAR Key, const wchar_t *FName, BOOL Default)
 {
 	char Temp[4];
-	GetPrivateProfileString(Sect, Key, "", Temp, sizeof(Temp), FName);
+	GetPrivateProfileStringAFileW(Sect, Key, "", Temp, sizeof(Temp), FName);
 	if (Default) {
 		if (_stricmp(Temp, "off") == 0)
 			return 0;
@@ -328,24 +330,24 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 //
 // TTXReadIniFile, TTXWriteIniFile -- 設定ファイルの読み書き
 //
-void ReadINI(PCHAR fn, PTTSet ts) {
-	char sect[OutBuffSize];
-	char *p;
+void ReadINI(const wchar_t *fn, PTTSet ts) {
+	wchar_t sect[OutBuffSize];
+	wchar_t *p;
 
 	// DLL ファイル名から、INI のセクション名を決める
 	if (fn[0] == '\\' || fn[0] == '/' || (fn[0] != 0 && fn[1] == ':')) {
-		strncpy_s(sect, sizeof(sect), fn, _TRUNCATE);
+		wcsncpy_s(sect, _countof(sect), fn, _TRUNCATE);
 	}
 	else {
-		GetModuleFileName(NULL, sect, sizeof(sect));
-		p = strrchr(sect, '\\');
+		GetModuleFileNameW(NULL, sect, _countof(sect));
+		p = wcsrchr(sect, '\\');
 		if (!p) {
 			return;
 		}
-		strncpy_s(p+1, sizeof(sect) - ((p+1)-sect), fn, _TRUNCATE);
+		wcsncpy_s(p+1, sizeof(sect) - ((p+1)-sect), fn, _TRUNCATE);
 	}
 
-	GetPrivateProfileString(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), sect);
+	GetPrivateProfileStringAFileW(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), sect);
 	strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
@@ -356,7 +358,7 @@ void ReadINI(PCHAR fn, PTTSet ts) {
 		pvar->command[pvar->cmdLen] = '\0';
 	}
 
-	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, sect);
+	pvar->interval = GetPrivateProfileIntAFileW(SECTION, "Interval", DEFAULT_INTERVAL, sect);
 	if (pvar->interval < MINIMUM_INTERVAL) {
 		pvar->interval = MINIMUM_INTERVAL;
 	}
@@ -364,26 +366,26 @@ void ReadINI(PCHAR fn, PTTSet ts) {
 	pvar->enable = GetOnOff(SECTION, "Enable", sect, FALSE);
 }
 
-static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
 	pvar->origReadIniFile(fn, ts);
 	ReadINI(fn, ts);
 
 	return;
 }
 
-static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
 	char buff[20];
 
 	pvar->origWriteIniFile(fn, ts);
 
-	WritePrivateProfileString(SECTION, "Enable", pvar->enable?"on":"off", fn);
+	WritePrivateProfileStringAFileW(SECTION, "Enable", pvar->enable?"on":"off", fn);
 
-	WritePrivateProfileString(SECTION, "Command", pvar->orgCommand, fn);
+	WritePrivateProfileStringAFileW(SECTION, "Command", pvar->orgCommand, fn);
 
 	_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d", pvar->interval);
-	WritePrivateProfileString(SECTION, "Interval", buff, fn);
+	WritePrivateProfileStringAFileW(SECTION, "Interval", buff, fn);
 
-	WritePrivateProfileString(SECTION, "AddNewLine", pvar->add_nl?"on":"off", fn);
+	WritePrivateProfileStringAFileW(SECTION, "AddNewLine", pvar->add_nl?"on":"off", fn);
 
 	return;
 }
@@ -403,7 +405,10 @@ static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	while (next = GetParam(buff, sizeof(buff), next)) {
 		DequoteParam(buff, sizeof(buff), buff);
 		if (_strnicmp(buff, "/F=", 3) == 0) {
-			ReadINI(buff+3, ts);
+			char *f = buff+3;
+			wchar_t *fW = ToWcharA(f);
+			ReadINI(fW, ts);
+			free(fW);
 		}
 	}
 

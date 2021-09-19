@@ -96,10 +96,10 @@ public:
 	}
 
 
-	int open(int resourceId, HWND owner = NULL) {
+	INT_PTR open(int resourceId, HWND owner = NULL) {
 		return open(GetInstanceHandle(), resourceId, owner);
 	}
-	int open(HINSTANCE instance, int resourceId, HWND owner = NULL) {
+	INT_PTR open(HINSTANCE instance, int resourceId, HWND owner = NULL) {
 		YCLVERIFY(prepareOpen(this) == NULL, "Another dialog has been opening yet.");
 #if 0
 		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, DialogProc, NULL);

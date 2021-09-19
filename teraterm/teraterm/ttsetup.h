@@ -40,10 +40,10 @@ extern "C" {
 // é¿ç€ÇÃå^ÇÕ tttypes_key.h Ç include
 typedef struct TKeyMap_st *PKeyMap;
 
-typedef void (PASCAL *PReadIniFile)
-  (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PWriteIniFile)
-  (PCHAR FName, PTTSet ts);
+//typedef void (PASCAL *PReadIniFile)(PCHAR FName, PTTSet ts);
+typedef void (PASCAL *PReadIniFile)(const wchar_t *FName, PTTSet ts);
+//typedef void (PASCAL *PWriteIniFile)(PCHAR FName, PTTSet ts);
+typedef void (PASCAL *PWriteIniFile)(const wchar_t *FName, PTTSet ts);
 typedef void (PASCAL *PReadKeyboardCnf)
   (PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
 typedef void (PASCAL *PCopyHostList)

@@ -10,6 +10,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#include "inifile_com.h"
+
 #include "gettimeofday.h"
 
 #define ORDER 6001
@@ -416,11 +418,11 @@ static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	}
 }
 
-static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
 	(pvar->origReadIniFile)(fn, ts);
 //	ts->TitleFormat = 0;
-	pvar->maxwait = GetPrivateProfileInt(INISECTION, "MaxWait", 0, fn);
-	pvar->speed = GetPrivateProfileInt(INISECTION, "Speed", 0, fn);
+	pvar->maxwait = GetPrivateProfileIntAFileW(INISECTION, "MaxWait", 0, fn);
+	pvar->speed = GetPrivateProfileIntAFileW(INISECTION, "Speed", 0, fn);
 }
 
 static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {

@@ -13,19 +13,19 @@ static HANDLE hInst; /* Instance handle of TTX*.DLL */
 typedef struct {
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
-	char origIniFileName[MAXPATHLEN];
+	wchar_t origIniFileName[MAXPATHLEN];
 } TInstVar;
 
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
-	strcpy_s(pvar->origIniFileName, sizeof(pvar->origIniFileName), fn);
+static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
+	wcscpy_s(pvar->origIniFileName, sizeof(pvar->origIniFileName), fn);
 	(pvar->origReadIniFile)(fn, ts);
 }
 
-static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
-	CopyFile(pvar->origIniFileName, fn, TRUE);
+static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
+	CopyFileW(pvar->origIniFileName, fn, TRUE);
 	(pvar->origWriteIniFile)(fn, ts);
 }
 

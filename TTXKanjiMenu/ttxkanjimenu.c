@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "inifile_com.h"
+
 #define IniSection "TTXKanjiMenu"
 #define ORDER 5000
 
@@ -257,13 +259,13 @@ static void CallResetCharSet(HWND hWin){
 /*
  * Ý’è‚Ì“Ç‚Ýž‚Ý
  */
-static void PASCAL TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
 	char buff[20];
 
 	/* Call original ReadIniFile */
 	pvar->origReadIniFile(fn, ts);
 
-	GetPrivateProfileString(IniSection, "UseOneSetting", "on", buff, sizeof(buff), fn);
+	GetPrivateProfileStringAFileW(IniSection, "UseOneSetting", "on", buff, sizeof(buff), fn);
 	if (_stricmp(buff, "off") == 0) {
 		pvar->UseOneSetting = FALSE;
 	}
@@ -288,11 +290,11 @@ static void PASCAL TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
 /*
  * Ý’è‚Ì•Û‘¶
  */
-static void PASCAL TTXKanjiMenuWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXKanjiMenuWriteIniFile(const wchar_t *fn, PTTSet ts) {
 	/* Call original WriteIniFile */
 	pvar->origWriteIniFile(fn, ts);
 
-	WritePrivateProfileString(IniSection, "UseOneSetting", pvar->UseOneSetting?"on":"off", fn);
+	WritePrivateProfileStringAFileW(IniSection, "UseOneSetting", pvar->UseOneSetting?"on":"off", fn);
 
 	return;
 }

@@ -49,6 +49,7 @@ target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
   ttpcmn
+  common_static
   )
 
 install(

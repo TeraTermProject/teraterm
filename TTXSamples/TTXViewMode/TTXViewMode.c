@@ -8,6 +8,7 @@
 #include <string.h>
 #include <windows.h>
 #include "dlglib.h"
+#include "inifile_com.h"
 
 #define ORDER 4000
 #define ID_MENU_VIEWMODE 55200
@@ -110,13 +111,13 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   }
 }
 
-static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   pvar->origReadIniFile(fn, ts);
-  GetPrivateProfileString(SECTION, "Password", "", pvar->password, sizeof(pvar->password), fn);
+  GetPrivateProfileStringAFileW(SECTION, "Password", "", pvar->password, sizeof(pvar->password), fn);
   return;
 }
 
-static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
   pvar->origWriteIniFile(fn, ts);
 //  WritePrivateProfileString(SECTION, "Password", pvar->password, fn);
   return;

@@ -86,6 +86,8 @@
 
 #include "compat_win.h"
 #include "codeconv.h"
+#include "inifile_com.h"
+#include "asprintf.h"
 
 #include "libputty.h"
 
@@ -98,6 +100,12 @@ extern const EVP_CIPHER* evp_ssh1_3des(void);
 #undef EndDialog
 #define EndDialog(p1,p2) \
 	TTEndDialog(p1, p2)
+#undef GetPrivateProfileInt
+#undef GetPrivateProfileString
+#define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntAFileW(p1, p2, p3, p4)
+#define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
+#define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
+#define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
 
 #define MATCH_STR(s, o) strncmp((s), (o), NUM_ELEM(o) - 1)
 #define MATCH_STR_I(s, o) _strnicmp((s), (o), NUM_ELEM(o) - 1)
@@ -223,13 +231,13 @@ static void clear_local_settings(PTInstVar pvar)
 	pvar->ts_SSH->TryDefaultAuth = FALSE;
 }
 
-static BOOL read_BOOL_option(PCHAR fileName, char *keyName, BOOL def)
+static BOOL read_BOOL_option(const wchar_t *fileName, char *keyName, BOOL def)
 {
 	char buf[1024];
 
 	buf[0] = 0;
-	GetPrivateProfileString("TTSSH", keyName, "", buf, sizeof(buf),
-	                        fileName);
+	GetPrivateProfileStringAFileW("TTSSH", keyName, "", buf, sizeof(buf),
+								  fileName);
 	if (buf[0] == 0) {
 		return def;
 	} else {
@@ -239,7 +247,7 @@ static BOOL read_BOOL_option(PCHAR fileName, char *keyName, BOOL def)
 	}
 }
 
-static void read_string_option(PCHAR fileName, char *keyName,
+static void read_string_option(const wchar_t *fileName, char *keyName,
                                char *def, char *buf, int bufSize)
 {
 
@@ -247,7 +255,7 @@ static void read_string_option(PCHAR fileName, char *keyName,
 	GetPrivateProfileString("TTSSH", keyName, def, buf, bufSize, fileName);
 }
 
-static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
+static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 {
 	char buf[1024];
 	TS_SSH *settings = pvar->ts_SSH;
@@ -381,7 +389,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	clear_local_settings(pvar);
 }
 
-static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
+static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
                               TS_SSH *settings, BOOL copy_forward)
 {
 	char buf[1024];
@@ -1339,7 +1347,7 @@ static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks)
 	*hooks->GetHostName = TTXGetHostName;
 }
 
-static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts)
+static void PASCAL TTXReadINIFile(const wchar_t *fileName, PTTSet ts)
 {
 	(pvar->ReadIniFile) (fileName, ts);
 	read_ssh_options(pvar, fileName);
@@ -1348,7 +1356,7 @@ static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts)
 	FWDUI_load_settings(pvar);
 }
 
-static void PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts)
+static void PASCAL TTXWriteINIFile(const wchar_t *fileName, PTTSet ts)
 {
 	(pvar->WriteIniFile) (fileName, ts);
 	*pvar->ts_SSH = pvar->settings;
@@ -1358,15 +1366,16 @@ static void PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts)
 }
 
 static void read_ssh_options_from_user_file(PTInstVar pvar,
-                                            char *user_file_name)
+                                            const wchar_t *user_file_name)
 {
 	if (user_file_name[0] == '.') {
 		read_ssh_options(pvar, user_file_name);
 	} else {
-		char buf[1024];
+		wchar_t *fname;
 
-		get_teraterm_dir_relative_name(buf, sizeof(buf), user_file_name);
-		read_ssh_options(pvar, buf);
+		fname = get_teraterm_dir_relative_nameW(user_file_name);
+		read_ssh_options(pvar, fname);
+		free(fname);
 	}
 
 	pvar->settings = *pvar->ts_SSH;
@@ -1433,14 +1442,19 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		action = OPTION_NONE;
 
 		if ((option[0] == '-' || option[0] == '/')) {
+			wchar_t* option2W;
 			if (MATCH_STR(option + 1, "ssh") == 0) {
 				if (MATCH_STR(option + 4, "-f=") == 0) {
 					strncpy_s(option2, opt_len, option + 7, _TRUNCATE);
-					read_ssh_options_from_user_file(pvar, option2);
+					option2W = ToWcharA(option2);
+					read_ssh_options_from_user_file(pvar, option2W);
+					free(option2W);
 					action = OPTION_CLEAR;
 				} else if (MATCH_STR(option + 4, "-consume=") == 0) {
 					strncpy_s(option2, opt_len, option + 13, _TRUNCATE);
-					read_ssh_options_from_user_file(pvar, option2);
+					option2W = ToWcharA(option2);
+					read_ssh_options_from_user_file(pvar, option2W);
+					free(option2W);
 					DeleteFile(option2);
 					action = OPTION_CLEAR;
 				}
@@ -1448,7 +1462,9 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			// ttermpro.exe の /F= 指定でも TTSSH の設定を読む (2006.10.11 maya)
 			} else if (MATCH_STR_I(option + 1, "f=") == 0) {
 				strncpy_s(option2, opt_len, option + 3, _TRUNCATE);
-				read_ssh_options_from_user_file(pvar, option2);
+				option2W = ToWcharA(option2);
+				read_ssh_options_from_user_file(pvar, option2W);
+				free(option2W);
 				// Tera Term側でも解釈する必要があるので消さない
 			}
 		}
@@ -2452,6 +2468,27 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 
+}
+
+/**
+ *	ファイル名をフルパスに変換する
+ *	@return	フルパスファイル名
+ *			free()すること
+ */
+wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename)
+{
+	wchar_t *path;
+	wchar_t *ret;
+
+	if (basename[0] == '\\' || basename[0] == '/'
+	 || (basename[0] != 0 && basename[1] == ':')) {
+		return _wcsdup(basename);
+	}
+
+	// ttermpro.exeのパス
+	path = GetHomeDirW(NULL);
+	aswprintf(&ret, L"%s\\%s", path, basename);
+	return ret;
 }
 
 void get_teraterm_dir_relative_name(char *buf, int bufsize,
@@ -4662,7 +4699,11 @@ static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen,
 		buf[cmdlen] = 0;
 		cmd[i] = 0;
 
-		write_ssh_options(pvar, tmpFile, &pvar->settings, FALSE);
+		{
+			wchar_t *tmpFileW = ToWcharA(tmpFile);
+			write_ssh_options(pvar, tmpFileW, &pvar->settings, FALSE);
+			free(tmpFileW);
+		}
 
 		strncat_s(cmd, cmdlen, " /ssh-consume=", _TRUNCATE);
 		strncat_s(cmd, cmdlen, tmpFile, _TRUNCATE);

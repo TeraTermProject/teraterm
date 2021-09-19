@@ -10,6 +10,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#include "inifile_com.h"
+
 #define ORDER 4800
 // #define ID_MENUITEM 37000
 #define INISECTION "AdditionalTitle"
@@ -240,15 +242,15 @@ static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
   return;
 }
 
-static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   char buff[sizeof(pvar->ts->Title)];
 
   (pvar->origReadIniFile)(fn, ts);
-  GetPrivateProfileString(INISECTION, "AdditionalTitle", "", pvar->add_title, sizeof(pvar->add_title), fn);
+  GetPrivateProfileStringAFileW(INISECTION, "AdditionalTitle", "", pvar->add_title, sizeof(pvar->add_title), fn);
 
   strncpy_s(pvar->orig_title, sizeof(pvar->orig_title), pvar->ts->Title, _TRUNCATE);
 
-  GetPrivateProfileString(INISECTION, "AddMode", "off", buff, sizeof(buff), fn);
+  GetPrivateProfileStringAFileW(INISECTION, "AddMode", "off", buff, sizeof(buff), fn);
   if (_stricmp(buff, "top") == 0) {
     pvar->add_mode = ADD_TOP;
     pvar->ts->AcceptTitleChangeRequest = FALSE;
@@ -264,21 +266,21 @@ static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
   }
 }
 
-static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->orig_title, _TRUNCATE);
   (pvar->origWriteIniFile)(fn, ts);
   SetTitleStr(pvar->orig_title, FALSE);
 
-  WritePrivateProfileString(INISECTION, "AdditionalTitle", pvar->add_title, fn);
+  WritePrivateProfileStringAFileW(INISECTION, "AdditionalTitle", pvar->add_title, fn);
   switch (pvar->add_mode) {
     case ADD_NONE:
-      WritePrivateProfileString(INISECTION, "AddMode", "off", fn);
+      WritePrivateProfileStringAFileW(INISECTION, "AddMode", "off", fn);
       break;
     case ADD_TOP:
-      WritePrivateProfileString(INISECTION, "AddMode", "top", fn);
+      WritePrivateProfileStringAFileW(INISECTION, "AddMode", "top", fn);
       break;
     case ADD_BOTTOM:
-      WritePrivateProfileString(INISECTION, "AddMode", "bottom", fn);
+      WritePrivateProfileStringAFileW(INISECTION, "AddMode", "bottom", fn);
       break;
     default:
       ; // not reached

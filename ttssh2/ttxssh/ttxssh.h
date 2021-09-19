@@ -127,7 +127,7 @@ extern HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 
 
 /*
- * Host key rotation 
+ * Host key rotation
  */
 #define SSH_UPDATE_HOSTKEYS_NO	0
 #define SSH_UPDATE_HOSTKEYS_YES	1
@@ -384,6 +384,7 @@ void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ..
 #endif
 
 void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
+wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename);
 int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);
 int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);
 

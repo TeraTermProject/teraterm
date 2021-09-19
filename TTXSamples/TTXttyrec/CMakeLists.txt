@@ -48,6 +48,7 @@ target_include_directories(
 target_link_libraries(
   TTXttyplay
   PRIVATE
+  common_static
   ttpcmn
   #
   comdlg32
@@ -101,7 +102,9 @@ target_include_directories(
 target_link_libraries(
   TTXttyrec
   PRIVATE
+  common_static
   ttpcmn
+  #
   comdlg32
   )
 

@@ -89,6 +89,7 @@ target_sources(
   YCL/include/YCL/ValueCtrl.h
   YCL/include/YCL/Vector.h
   YCL/include/YCL/Window.h
+  YCL/include/YCL/wstring.h
   )
 
 source_group(

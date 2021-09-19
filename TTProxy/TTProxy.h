@@ -1,6 +1,8 @@
 #ifndef _YEBISOCKS_TTX_H_
 #define _YEBISOCKS_TTX_H_
 
+#include "codeconv.h"
+
 #include <YCL/DynamicLinkLibrary.h>
 using namespace yebisuya;
 
@@ -58,12 +60,12 @@ private:
 		}
 		::PostMessage(getInstance().cv->HWin, WM_COMMAND, ID_ASYNCMESSAGEBOX, 0);
 	}
-	static void read_options(const char* filename) {
+	static void read_options(const wchar_t* filename) {
 		IniFile inifile(filename, "TTProxy");
 		ProxyWSockHook::load(inifile);
 		getInstance().initialized = true;
 	}
-	static void write_options(const char* filename) {
+	static void write_options(const wchar_t* filename) {
 		IniFile inifile(filename, "TTProxy");
 		ProxyWSockHook::save(inifile);
 	}
@@ -88,11 +90,11 @@ private:
 		return buffer.toString();
 	}
 
-	static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts) {
+	static void PASCAL TTXReadINIFile(const wchar_t *fileName, PTTSet ts) {
 		getInstance().ORIG_ReadIniFile(fileName, ts);
 		read_options(fileName);
 	}
-	static void PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts) {
+	static void PASCAL TTXWriteINIFile(const wchar_t *fileName, PTTSet ts) {
 		getInstance().ORIG_WriteIniFile(fileName, ts);
 		write_options(fileName);
 	}
@@ -116,7 +118,10 @@ private:
 
 			if ((option[0] == '-' || option[0] == '/')) {
 				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
-					read_options(get_teraterm_dir_relative_name(option + 3));
+					const char *f = get_teraterm_dir_relative_name(option + 3);
+					wchar_t *fW = ToWcharA(f);
+					read_options(fW);
+					free(fW);
 				}
 			}
 
@@ -211,7 +216,7 @@ private:
 
 	static void PASCAL TTXOpenTCP(TTXSockHooks* hooks) {
 		if (!getInstance().initialized) {
-			read_options(getInstance().ts->SetupFName);
+			read_options(getInstance().ts->SetupFNameW);
 		}
 		(FARPROC&) *hooks->Pconnect = ProxyWSockHook::hook_connect((FARPROC) *hooks->Pconnect);
 		(FARPROC&) *hooks->PWSAAsyncGetHostByName = ProxyWSockHook::hook_WSAAsyncGetHostByName((FARPROC) *hooks->PWSAAsyncGetHostByName);

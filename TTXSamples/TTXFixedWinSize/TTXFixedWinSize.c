@@ -57,7 +57,7 @@ static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
     *hooks->SetupTerminal = FixedSizeSetupTerminalDlg;
 }
 
-static void PASCAL FixedSizeReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL FixedSizeReadIniFile(const wchar_t *fn, PTTSet ts) {
     (pvar->origReadIniFile)(fn, ts);
     ts->TerminalWidth = WIDTH;
     ts->TerminalHeight = HEIGHT;

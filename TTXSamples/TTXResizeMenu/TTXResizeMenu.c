@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "compat_win.h"
+#include "inifile_com.h"
 
 #define ORDER 5900
 #define SECTION "Resize Menu"
@@ -183,7 +184,7 @@ static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
   return;
 }
 
-static void PASCAL ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL ResizeMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
   int i, x, y;
   char Key[20], Buff[100];
 
@@ -191,7 +192,7 @@ static void PASCAL ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
 
   for (i=0; i<MAX_MENU_ITEMS; i++) {
     _snprintf_s(Key, sizeof(Key), _TRUNCATE, "ResizeMenu%d", i+1);
-    GetPrivateProfileString(SECTION, Key, "\n", Buff, sizeof(Buff), fn);
+    GetPrivateProfileStringAFileW(SECTION, Key, "\n", Buff, sizeof(Buff), fn);
 
     if (sscanf_s(Buff, "%d , %d", &x, &y) == 2) {
       if (x < -1 ) {

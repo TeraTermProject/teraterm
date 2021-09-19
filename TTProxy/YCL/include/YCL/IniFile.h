@@ -16,6 +16,9 @@
 #include <YCL/Enumeration.h>
 #include <YCL/Vector.h>
 #include <YCL/Hashtable.h>
+#include <YCL/wstring.h>
+
+#include "inifile_com.h"
 
 namespace yebisuya {
 
@@ -41,7 +44,7 @@ private:
 		Vector<String> list;
 		mutable int index;
 	public:
-		EnumKeyNames(const char* filename, const char* section):index(0) {
+		EnumKeyNames(const wchar_t* filename, const char* section):index(0) {
 			Hashtable<String, int> table;
 			int section_len = strlen(section);
 			char* buffer;
@@ -85,7 +88,7 @@ private:
 		char* buffer;
 		mutable char* p;
 	public:
-		EnumValueNames(const char* filename, const char* section) {
+		EnumValueNames(const wchar_t* filename, const char* section) {
 			size_t size = 256;
 			while ((buffer = getValueNames(filename, section, size)) == NULL)
 				size += 256;
@@ -138,28 +141,28 @@ private:
             return ((IniFile*) ini)->deleteValue(name);
         }
     };
-	static char* getSectionNames(const char* filename, size_t size) {
+	static char* getSectionNames(const wchar_t* filename, size_t size) {
 		char* buffer = new char[size];
-		if (::GetPrivateProfileSectionNames(buffer, size, filename) < size - 2)
+		if (::GetPrivateProfileSectionNamesAFileW(buffer, size, filename) < size - 2)
 			return buffer;
 		delete[] buffer;
 		return NULL;
 	}
-	static char* getValueNames(const char* filename, const char* section, size_t size) {
+	static char* getValueNames(const wchar_t* filename, const char* section, size_t size) {
 		static const char null = '\0';
 		char* buffer = new char[size];
-		if (::GetPrivateProfileString(section, NULL, &null, buffer, size, filename) < size - 2)
+		if (GetPrivateProfileStringAFileW(section, NULL, &null, buffer, size, filename) < size - 2)
 			return buffer;
 		delete[] buffer;
 		return NULL;
 	}
-	static String getString(const char* filename, const char* section, const char* name, bool& exists, size_t size) {
+	static String getString(const wchar_t* filename, const char* section, const char* name, bool& exists, size_t size) {
 		char* buffer = (char*) alloca(size);
-		size_t len = ::GetPrivateProfileString(section, name, INVALID(), buffer, size, filename);
+		size_t len = GetPrivateProfileStringAFileW(section, name, INVALID(), buffer, size, filename);
 		if (len < size - 2) {
 			// 改行を含んだ文字列はiniファイルからは取得できないので取得失敗したことが分かる
 			if (buffer[0] == '\n') {
-				exists = false; 
+				exists = false;
 				return NULL;
 			}
 			// エスケープ文字を展開
@@ -174,7 +177,7 @@ private:
 		buffer.append(subkeyName);
 		return buffer.toString();
 	}
-	static bool deleteAllSubsection(const char* filename, const char* section, const char* subkey) {
+	static bool deleteAllSubsection(const wchar_t* filename, const char* section, const char* subkey) {
 		String keyname = generateSectionName(section, subkey);
 		int keyname_len = keyname.length();
 
@@ -187,7 +190,7 @@ private:
 		while (*name != '\0') {
 			if (strncmp(name, keyname, keyname_len) == 0) {
 				if (name[keyname_len] == '\0' || name[keyname_len] == '\\') {
-					if (!::WritePrivateProfileString(name, NULL, NULL, filename)) {
+					if (!WritePrivateProfileStringAFileW(name, NULL, NULL, filename)) {
 						succeeded = false;
 						break;
 					}
@@ -200,12 +203,12 @@ private:
 		return succeeded;
 	}
 
-	String filename;
+	WString filename;
 	String section;
 public:
 	IniFile() {
 	}
-	IniFile(String filename, String section):filename(filename), section(section) {
+	IniFile(WString filename, String section):filename(filename), section(section) {
 	}
 	IniFile(const IniFile& parent, const char* subkeyName):filename(parent.filename), section(generateSectionName(parent.section, subkeyName)) {
 	}
@@ -214,7 +217,7 @@ public:
 		return filename != NULL && section != NULL;
 	}
 	long getInteger(const char* name, long defaultValue = 0)const {
-		return filename != NULL && section != NULL ? ::GetPrivateProfileInt(section, name, defaultValue, filename) : defaultValue;
+		return filename != NULL && section != NULL ? ::GetPrivateProfileIntAFileW(section, name, defaultValue, filename) : defaultValue;
 	}
 	String getString(const char* name)const {
 		return getString(name, NULL);
@@ -256,7 +259,7 @@ public:
 				buffer.append('"');
 				value = buffer.toString();
 			}
-			return ::WritePrivateProfileString(section, name, value, filename) != FALSE;
+			return ::WritePrivateProfileStringAFileW(section, name, value, filename) != FALSE;
 		}
 		return false;
 	}
@@ -266,7 +269,7 @@ public:
 
 	bool existsValue(const char* name) {
 		char buffer[3];
-		::GetPrivateProfileString(section, name, INVALID(), buffer, countof(buffer), filename);
+		::GetPrivateProfileStringAFileW(section, name, INVALID(), buffer, countof(buffer), filename);
 		return buffer[0] != '\n';
 	}
 	bool deleteKey(const char* name) {
@@ -274,10 +277,10 @@ public:
 	}
 	bool deleteValue(const char* name) {
 		return filename != NULL && section != NULL && name != NULL
-			&& ::WritePrivateProfileString(section, name, NULL, filename) != FALSE;
+			&& ::WritePrivateProfileStringAFileW(section, name, NULL, filename) != FALSE;
 	}
 
-	bool open(String filename, String section) {
+	bool open(WString filename, String section) {
 		close();
 		this->filename = filename;
 		this->section = section;

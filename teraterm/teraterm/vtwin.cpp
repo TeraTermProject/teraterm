@@ -255,7 +255,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		/* first instance */
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
-			(*ReadIniFile)(ts.SetupFName, &ts);
+			(*ReadIniFile)(ts.SetupFNameW, &ts);
 			FreeTTSET();
 		}
 		else {
@@ -266,7 +266,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		// 2つめ以降のプロセスにおいても、ディスクから TERATERM.INI を読む。(2004.11.4 yutaka)
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
-			(*ReadIniFile)(ts.SetupFName, &ts);
+			(*ReadIniFile)(ts.SetupFNameW, &ts);
 			FreeTTSET();
 		}
 		else {
@@ -1134,7 +1134,7 @@ void CVTWindow::RestoreSetup()
 	strncat_s(ts.SetupFName,sizeof(ts.SetupFName),TempName,_TRUNCATE);
 
 	if (LoadTTSET()) {
-		(*ReadIniFile)(ts.SetupFName,&ts);
+		(*ReadIniFile)(ts.SetupFNameW, &ts);
 	}
 	FreeTTSET();
 
@@ -4726,7 +4726,7 @@ void CVTWindow::OnSetupSave()
 
 		CopyFileW(PrevSetupFNW, ts.SetupFNameW, TRUE);
 		/* write current setup values to file */
-		(*WriteIniFile)(ts.SetupFName, &ts);
+		(*WriteIniFile)(ts.SetupFNameW, &ts);
 		/* copy host list */
 		char * PrevSetupFN = ToCharW(PrevSetupFNW);
 		(*CopyHostList)(PrevSetupFN, ts.SetupFName);
