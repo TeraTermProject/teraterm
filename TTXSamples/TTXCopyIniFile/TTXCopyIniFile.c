@@ -20,7 +20,7 @@ static TInstVar *pvar;
 static TInstVar InstVar;
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
-	wcscpy_s(pvar->origIniFileName, sizeof(pvar->origIniFileName), fn);
+	wcscpy_s(pvar->origIniFileName, _countof(pvar->origIniFileName), fn);
 	(pvar->origReadIniFile)(fn, ts);
 }
 
