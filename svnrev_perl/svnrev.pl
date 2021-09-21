@@ -37,6 +37,40 @@ sub read_toolinfo {
 	close($FD);
 }
 
+sub search_svn {
+	my @test_list = (
+		"C:/Program Files/TortoiseSVN/bin/svn.exe",
+		"C:/cygwin64/bin/svn.exe",
+		"C:/cygwin/bin/svn.exe",
+		"/usr/bin/svn.exe"	# msys, cygwin
+		);
+	for (my $i = 0; $i < @test_list; $i++) {
+		my $test = $test_list[$i];
+		if (-e $test) {
+			$svn = $test;
+			return;
+		}
+	}
+}
+
+sub search_git {
+	my @test_list = (
+		"C:/Program Files/Git/bin/git.exe",
+		"C:/cygwin64/bin/git.exe",
+		"C:/cygwin/bin/git.exe",
+		"/usr/bin/git.exe"	# msys, cygwin
+		);
+	for (my $i = 0; $i < @test_list; $i++) {
+		my $test = $test_list[$i];
+		if (-e $test) {
+			$git = $test;
+			return;
+		}
+	}
+}
+
+&search_svn();
+&search_git();
 &read_toolinfo();
 
 GetOptions(
@@ -138,7 +172,16 @@ if ($svninfo{'release'} != 1) {
 }
 local $revision = $svninfo{'Revision'};
 
+if ($verbose != 0) {
+	print "SVNREVISION $revision\n";
+	print "RELEASE $svninfo{'release'}\n";
+	print "BRANCH_NAME $svninfo{'name'}\n";
+}
+
 # output for source(C,C++) header
+if ($verbose != 0) {
+	print "write '$out_header'\n";
+}
 open(my $FD, ">$out_header") || die "error $out_header";
 print $FD "/* $header */\n";
 print $FD "/* #define TT_VERSION_STR \"$version\" check teraterm/common/tt-version.h */\n";
@@ -156,6 +199,9 @@ print $FD "#define BRANCH_NAME \"$svninfo{'name'}\"\n";
 close($FD);
 
 # output for bat file
+if ($verbose != 0) {
+	print "write '$out_bat'\n";
+}
 open(my $FD, ">$out_bat") || die "error $out_bat";
 print $FD "\@rem $header\n";
 print $FD "set VERSION=$version\n";
@@ -171,6 +217,9 @@ close($FD);
 
 # output for cmake
 if ($out_cmake ne "") {
+	if ($verbose != 0) {
+		print "write '$out_cmake'\n";
+	}
 	open(my $FD, ">$out_cmake") || die "error $out_cmake";
 	print $FD "# $header\n";
 	print $FD "set(VERSION \"$version\")\n";

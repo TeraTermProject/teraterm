@@ -14,9 +14,16 @@
       strawberry perl が buildtools/perl に展開される
   - または、いくつかのメジャーなperlを探して見つければ使用する
   - perl が見つからない場合は svnversion.default.h が使用される
-- svn(又は git)を実行できるようにする
-  - svn が実行できるよう環境変数 PATH を設定する
-  - または、toolinfo.txt にツールのパスを書いておく
+- svn(又は git)をインストールしておく
+  - Windows用svnの例
+    - TortoiseSVN の command line client tools
+      - https://tortoisesvn.net/
+  - Windows用gitの例
+    - git
+      - https://git-scm.com/
+  - 標準的なインストールフォルダから自動的に実行ファイルを探す
+  - 見つからない場合は環境変数 PATH にあるプログラムを実行する
+  - toolinfo.txt にツールのパスを書いておくと優先して使用される
   - ツールが実行できない場合もヘッダファイルは作成される
 
 # ヘッダの作成方法
