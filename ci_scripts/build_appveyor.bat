@@ -1,3 +1,5 @@
+if exist teraterm\ttpdlg\svnversion.h del teraterm\ttpdlg\svnversion.h
+if exist svnrev_perl\sourcetree_info.bat del svnrev_perl\sourcetree_info.bat
 call svnrev_perl\svnrev.bat
 call svnrev_perl\sourcetree_info.bat
 if "%GENERATOR%" == "Visual Studio 8 2005" (
@@ -7,9 +9,9 @@ if "%GENERATOR%" == "Visual Studio 8 2005" (
 )
 if "%COMPILER%" == "mingw"  (
   set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin
-  pacman -S --noconfirm --needed mingw32/mingw-w64-i686-cmake
+  pacman -S --noconfirm --needed mingw-w64-i686-cmake mingw-w64-i686-gcc make
   if "%MINGW_CC%" == "clang" (
-    pacman -S --noconfirm --needed mingw32/mingw-w64-i686-clang
+    pacman -S --noconfirm --needed mingw-w64-i686-clang
   )
   set CC=%MINGW_CC%
   set CXX=%MINGW_CXX%
@@ -18,9 +20,9 @@ if "%COMPILER%" == "mingw"  (
 )
 if "%COMPILER%" == "mingw_x64"  (
   set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin
-  pacman -S --noconfirm --needed mingw64/mingw-w64-x86_64-cmake
+  pacman -S --noconfirm --needed mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc make
   if "%MINGW_CC%" == "clang" (
-    pacman -S --noconfirm --needed mingw64/mingw-w64-x86_64-clang
+    pacman -S --noconfirm --needed mingw-w64-x86_64-clang
   )
   set CC=%MINGW_CC%
   set CXX=%MINGW_CXX%
@@ -40,6 +42,7 @@ if not exist openssl11_%COMPILER% (
 cd ..
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 cd %BUILD_DIR%
+if exist build_config.cmake del build_config.cmake
 if exist cmakecache.txt del cmakecache.txt
 set ZIP_FILE=snapshot-%VERSION%-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%.zip
 set SETUP_FILE=snapshot-%VERSION%-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDLY%
