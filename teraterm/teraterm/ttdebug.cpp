@@ -261,13 +261,18 @@ static wchar_t *CreateDumpFilename()
 	SYSTEMTIME local_time;
 	GetLocalTime(&local_time);
 
+#if defined(SVNVERSION)
+	char *version;
+	asprintf(&version, "r%04d", SVNVERSION);
+#else
+	char *version = strdup("unknown");
+#endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"%s\\teraterm_r%04d_%04d%02d%02d-%02d%02d%02d.dmp",
-			  desktop,
-			  SVNVERSION,
+	aswprintf(&dump_file, L"%s\\teraterm_%hs_%04d%02d%02d-%02d%02d%02d.dmp",
+			  desktop, version,
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond);
-
+	free(version);
 	free(desktop);
 	return dump_file;
 }
