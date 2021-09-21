@@ -131,7 +131,7 @@ endif()
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake")
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/teraterm/ttpdlg)
   execute_process(
-    COMMAND ${PERL} svnrev.pl --svn \"${Subversion_SVN_EXECUTABLE}\" --git \"${GIT_EXECUTABLE}\" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_BINARY_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${CMAKE_BINARY_DIR}/build_config.cmake
+    COMMAND ${PERL} svnrev.pl --svn "${Subversion_SVN_EXECUTABLE}" --git "${GIT_EXECUTABLE}" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_BINARY_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${CMAKE_BINARY_DIR}/build_config.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/svnrev_perl
     RESULT_VARIABLE rv
     )
