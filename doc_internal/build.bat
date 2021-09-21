@@ -1,4 +1,5 @@
 cd /d %~dp0
-path c:\cygwin64\bin;%PATH%
-bash build.sh
+call ..\ci_scripts\find_cmake.bat
+"%CMAKE_COMMAND%" -P doxygen.cmake
+"%CMAKE_COMMAND%" -P global.cmake
 pause

@@ -6,8 +6,7 @@ if(NOT DOXYGEN_FOUND)
 else()
   add_custom_target(
     doxygen
-    ${DOXYGEN_EXECUTABLE} Doxyfile
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doxygen
+    COMMAND ${CMAKE_COMMAND} -P doxygen.cmake
     )
 
   set_target_properties(
@@ -24,13 +23,9 @@ message("HTAGS=${HTAGS}")
 if(("${GTAGS}" STREQUAL "GTAGS-NOTFOUND") OR ("${HTAGS}" STREQUAL "HTAGS-NOTFOUND"))
   message(warning "global not found")
 else()
-  message("${HTAGS} -ans --tabs 4 -F -d ${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/global")
   add_custom_target(
     global
-    COMMAND bash ./gtags_update.sh
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/global
-    COMMAND ${HTAGS} -ans --tabs 4 -F -d ${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/global
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..
+    COMMAND ${CMAKE_COMMAND} -P global.cmake
     )
 
   set_target_properties(
