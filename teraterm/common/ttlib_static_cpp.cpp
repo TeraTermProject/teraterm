@@ -1070,6 +1070,53 @@ wchar_t *GetDownloadFolderW(void)
 	return download;
 }
 
+#if defined(__MINGW32__) ||  _MSC_VER >= 1600 // VS2010+
+static BOOL doSelectFolderWCOM(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
+{
+	IFileOpenDialog *pDialog;
+	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_IFileOpenDialog, (void **)&pDialog);
+	if (FAILED(hr)) {
+		*folder = NULL;
+		return FALSE;
+	}
+
+	DWORD options;
+	pDialog->GetOptions(&options);
+	pDialog->SetOptions(options | FOS_PICKFOLDERS);
+	pDialog->SetTitle(msg);
+	{
+		IShellItem *psi;
+		hr = SHCreateItemFromParsingName(def, NULL, IID_IShellItem, (void **)&psi);
+		if (SUCCEEDED(hr)) {
+			hr = pDialog->SetFolder(psi);
+			psi->Release();
+		}
+	}
+	hr = pDialog->Show(hWnd);
+
+	BOOL result = FALSE;
+	if (SUCCEEDED(hr)) {
+		IShellItem *pItem;
+		hr = pDialog->GetResult(&pItem);
+		if (SUCCEEDED(hr)) {
+			PWSTR pPath;
+			hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pPath);
+			if (SUCCEEDED(hr)) {
+				*folder = wcsdup(pPath);
+				CoTaskMemFree(pPath);
+				result = TRUE;
+			}
+		}
+	}
+
+	if (!result) {
+		// cancel(or some error)
+		*folder = NULL;
+	}
+	pDialog->Release();
+	return result;
+}
+#else
 static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
 	switch(uMsg) {
@@ -1091,18 +1138,7 @@ static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM l
 	return 0;
 }
 
-/**
- *	フォルダを選択する
- *	SHBrowseForFolderW() をコールする
- *
- *	@param[in]	def			選択フォルダの初期値(特に指定しないときは NULL or "")
- *	@param[out]	**folder	選択したフォルダのフルパス(キャンセル時はセットされない)
- *							不要になったら free() すること(キャンセル時はfree()不要)
- *	@retval	TRUE	選択した
- *	@retval	FALSE	キャンセルした
- *
- */
-BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
+static BOOL doSelectFolderWAPI(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
 {
 	wchar_t buf[MAX_PATH];
 	BROWSEINFOW bi = {};
@@ -1127,6 +1163,28 @@ BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t 
 	*folder = _wcsdup(buf);
 	CoTaskMemFree(pidlBrowse);
 	return TRUE;
+}
+#endif
+
+/**
+ *	フォルダを選択する
+ *	SHBrowseForFolderW() をコールする
+ *
+ *	@param[in]	def			選択フォルダの初期値(特に指定しないときは NULL or "")
+ *	@param[out]	**folder	選択したフォルダのフルパス(キャンセル時はセットされない)
+ *							不要になったら free() すること(キャンセル時はfree()不要)
+ *	@retval	TRUE	選択した
+ *	@retval	FALSE	キャンセルした
+ *
+ */
+BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
+{
+	// TODO 両立したい
+#if defined(__MINGW32__) ||  _MSC_VER >= 1600 // VS2010+
+	return doSelectFolderWCOM(hWnd, def, msg, folder);
+#else
+	return doSelectFolderWAPI(hWnd, def, msg, folder);
+#endif
 }
 
 /* fit a filename to the windows-filename format */
