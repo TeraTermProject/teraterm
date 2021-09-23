@@ -6,7 +6,8 @@ if(NOT DOXYGEN_FOUND)
 else()
   add_custom_target(
     doxygen
-    COMMAND ${CMAKE_COMMAND} -P doxygen.cmake
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/doxygen.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     )
 
   set_target_properties(
@@ -25,7 +26,8 @@ if(("${GTAGS}" STREQUAL "GTAGS-NOTFOUND") OR ("${HTAGS}" STREQUAL "HTAGS-NOTFOUN
 else()
   add_custom_target(
     global
-    COMMAND ${CMAKE_COMMAND} -P global.cmake
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/global.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     )
 
   set_target_properties(
