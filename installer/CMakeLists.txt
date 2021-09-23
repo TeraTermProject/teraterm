@@ -321,11 +321,13 @@ else()
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
     )
 
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cygtool_build)
+
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR} -P build_cygtool.cmake
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR} -P ${CMAKE_CURRENT_LIST_DIR}/cygtool/build_cygtool.cmake
     COMMAND ${CMAKE_COMMAND} -E echo ${CMAKE_GENERATOR}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/cygtool
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cygtool_build
     COMMENT Generate "${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll"
     )
 
@@ -353,13 +355,14 @@ else()
     COMMAND "${ISCC}" ${ISCC_OPTION} teraterm_cmake.iss
     WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
     )
+
+  set_target_properties(
+    cygtool
+    PROPERTIES FOLDER installer
+    )
 endif()
 set_target_properties(
   inno_setup
-  PROPERTIES FOLDER installer
-  )
-set_target_properties(
-  cygtool
   PROPERTIES FOLDER installer
   )
 
