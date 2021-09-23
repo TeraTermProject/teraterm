@@ -316,7 +316,23 @@ elseif("${ISCC}" STREQUAL "ISCC-NOTFOUND")
     COMMAND "${CMAKE_COMMAND}" -E echo "inno setup not found"
     )
 else()
-  add_subdirectory(cygtool)
+  add_custom_target(
+    cygtool
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
+    )
+
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR} -P build_cygtool.cmake
+    COMMAND ${CMAKE_COMMAND} -E echo ${CMAKE_GENERATOR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/cygtool
+    COMMENT Generate "${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll"
+    )
+
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
+    DESTINATION .
+    )
 
   configure_file(
     teraterm_cmake.iss.in teraterm_cmake.iss
@@ -336,6 +352,10 @@ else()
 endif()
 set_target_properties(
   inno_setup
+  PROPERTIES FOLDER installer
+  )
+set_target_properties(
+  cygtool
   PROPERTIES FOLDER installer
   )
 

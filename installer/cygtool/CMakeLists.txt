@@ -1,4 +1,8 @@
-﻿set(PACKAGE_NAME "cygtool_dll")
+﻿cmake_minimum_required(VERSION 3.11)
+
+set(PACKAGE_NAME "cygtool_dll")
+
+project(${PACKAGE_NAME})
 
 add_library(
   ${PACKAGE_NAME} SHARED
@@ -24,19 +28,20 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 target_link_libraries(
-  cygtool_dll
+  ${PACKAGE_NAME}
   PRIVATE
   version
   )
 
 set_target_properties(
-  cygtool_dll
+  ${PACKAGE_NAME}
   PROPERTIES
+  PREFIX ""
   OUTPUT_NAME "cygtool"
   )
 
 set_target_properties(
-  cygtool_dll
+  ${PACKAGE_NAME}
   PROPERTIES
   FOLDER installer
   )
@@ -48,7 +53,7 @@ target_include_directories(
   )
 
 install(
-  TARGETS cygtool_dll
+  TARGETS ${PACKAGE_NAME}
   DESTINATION .
   )
 
@@ -66,7 +71,7 @@ if(false)
     )
 
   target_link_libraries(
-    cygtool_dll
+    cygtool_exe
     PRIVATE
     version
     )
