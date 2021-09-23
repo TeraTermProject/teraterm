@@ -342,10 +342,14 @@ else()
   if (RELEASE)
     set(ISCC_OPTION "/DSETUP_RELEASE=1")
   endif()
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    list(APPEND ISCC_OPTION "/DM_X64=1")
+  endif()
   add_custom_target(
     inno_setup
-#    COMMAND "${CMAKE_COMMAND}" --build . --target install
-    COMMAND "${CMAKE_COMMAND}" -E echo "${ISCC} ${ISCC_OPTION} teraterm_cmake.iss"
+    DEPENDS cygtool
+#    DEPENDS INSTALL
+#    COMMAND "${CMAKE_COMMAND}" -E echo "${ISCC} ${ISCC_OPTION} teraterm_cmake.iss"
     COMMAND "${ISCC}" ${ISCC_OPTION} teraterm_cmake.iss
     WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
     )

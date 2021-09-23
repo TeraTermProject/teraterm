@@ -48,6 +48,9 @@ PrivilegesRequired=none
 SolidCompression=yes
 Compression=lzma2/ultra64
 OutputDir=@PROJECT_BINARY_DIR@
+#ifdef M_X64
+ArchitecturesInstallIn64BitMode=x64
+#endif
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
