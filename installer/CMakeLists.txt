@@ -350,10 +350,15 @@ else()
       WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
       )
   else()
+    configure_file(
+      exec_iscc.bat.in
+      exec_iscc.bat
+      NEWLINE_STYLE CRLF
+      )
     add_custom_target(
       inno_setup
       DEPENDS cygtool
-      COMMAND cmd /c "${ISCC} ${ISCC_OPTION} teraterm_cmake.iss"
+      COMMAND cmd /c exec_iscc.bat
       WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
       )
   endif()
