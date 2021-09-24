@@ -47,6 +47,10 @@
 
 #include "ttlib.h"
 
+#if _WIN32_WINNT >= 0x0600 // Vista+
+#define IFILEOPENDIALOG_ENABLE 1
+#endif
+
 /**
  *	MessageBox‚ð•\Ž¦‚·‚é
  *
@@ -1070,7 +1074,7 @@ wchar_t *GetDownloadFolderW(void)
 	return download;
 }
 
-#if defined(__MINGW32__) ||  _MSC_VER >= 1600 // VS2010+
+#if IFILEOPENDIALOG_ENABLE
 static BOOL doSelectFolderWCOM(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
 {
 	IFileOpenDialog *pDialog;
@@ -1180,7 +1184,7 @@ static BOOL doSelectFolderWAPI(HWND hWnd, const wchar_t *def, const wchar_t *msg
 BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
 {
 	// TODO —¼—§‚µ‚½‚¢
-#if defined(__MINGW32__) ||  _MSC_VER >= 1600 // VS2010+
+#if IFILEOPENDIALOG_ENABLE
 	return doSelectFolderWCOM(hWnd, def, msg, folder);
 #else
 	return doSelectFolderWAPI(hWnd, def, msg, folder);
