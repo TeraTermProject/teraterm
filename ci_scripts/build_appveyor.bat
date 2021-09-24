@@ -50,7 +50,5 @@ set SNAPSHOT_DIR=snapshot-r%SVNVERSION%-%DATE%_%TIME%-appveyor-%COMPILER_FRIENDL
 "%CMAKE_COMMAND%" .. -G "%GENERATOR%" %CMAKE_OPTION_GENERATE% -DSNAPSHOT_DIR=%SNAPSHOT_DIR% -DSETUP_ZIP=%ZIP_FILE% -DSETUP_EXE=%SETUP_FILE% -DSETUP_RELEASE=%RELEASE%
 "%CMAKE_COMMAND%" --build . --target install %CMAKE_OPTION_BUILD%
 "%CMAKE_COMMAND%" --build . --target zip
-if NOT "%COMPILER%" == "mingw" if NOT "%COMPILER%" == "mingw_x64" (
-  "%CMAKE_COMMAND%" --build . --target inno_setup
-)
+"%CMAKE_COMMAND%" --build . --target inno_setup
 cd ..
