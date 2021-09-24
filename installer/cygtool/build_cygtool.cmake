@@ -13,6 +13,10 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019") OR
     (${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022"))
   # 32bit build for inno setup
   set(GENERATE_OPTION "-A;Win32")
+elseif(${CMAKE_COMMAND} MATCHES "msys64/mingw64/bin")
+  message("switch msys 32bit env")
+  set(ENV{PATH} "c:\\msys64\\mingw32\\bin;c:\\msys64\\usr\\bin")
+  set(CMAKE_COMMAND "C:/msys64/mingw32/bin/cmake.exe")
 endif()
 
 message("CMAKE_GENERATOR=${CMAKE_GENERATOR}")
