@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.13)
+﻿cmake_minimum_required(VERSION 3.11)
 
 set(PACKAGE_NAME "cygtool_dll")
 
@@ -12,11 +12,15 @@ add_library(
 
 if(MINGW)
   # libgcc_s_dw2-1.dll に依存しないため
-  target_link_options(
-    ${PACKAGE_NAME}
-    PRIVATE
-    -static-libgcc
-    )
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
+    target_link_options(
+      ${PACKAGE_NAME}
+      PRIVATE
+      -static-libgcc
+      )
+  else()
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
+  endif()
 endif()
 
 if(SUPPORT_OLD_WINDOWS)
