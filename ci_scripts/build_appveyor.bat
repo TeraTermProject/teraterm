@@ -21,8 +21,10 @@ if "%COMPILER%" == "mingw"  (
 if "%COMPILER%" == "mingw_x64"  (
   set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin
   pacman -S --noconfirm --needed mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc make
+  pacman -S --noconfirm --needed mingw-w64-i686-cmake mingw-w64-i686-gcc make
   if "%MINGW_CC%" == "clang" (
     pacman -S --noconfirm --needed mingw-w64-x86_64-clang
+    pacman -S --noconfirm --needed mingw-w64-i686-clang
   )
   set CC=%MINGW_CC%
   set CXX=%MINGW_CXX%
