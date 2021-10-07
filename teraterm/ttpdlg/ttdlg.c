@@ -36,10 +36,12 @@
 #include <io.h>
 #include <direct.h>
 #include <commdlg.h>
+#include <commctrl.h>
 #include <dlgs.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -54,6 +56,7 @@
 #include "helpid.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "compat_win.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -2504,6 +2507,56 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 }
 #endif
 
+/**
+ *	デフォルトサイズでアイコンをロードする
+ *		DestroyIcon()すること
+ */
+static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, UINT dpi)
+{
+	HICON hIcon;
+	HRESULT hr;
+	int cx;
+	int cy;
+	// - 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
+	if (pGetSystemMetricsForDpi != NULL) {
+		cx = pGetSystemMetricsForDpi(SM_CXICON, dpi);
+		cy = pGetSystemMetricsForDpi(SM_CYICON, dpi);
+	}
+	else {
+		cx = GetSystemMetrics(SM_CXICON);
+		cy = GetSystemMetrics(SM_CYICON);
+	}
+#if 0	// TODO
+//#if defined(NTDDI_VISTA) && (NTDDI_VERSION >= NTDDI_VISTA)
+	// LoadIconWithScaleDown() は vistaから
+	hr = LoadIconWithScaleDown(hInst, name, cx, cy, &hIcon);
+	// LoadIconMetric();
+#else
+	hr = E_NOTIMPL;
+#endif
+	if(FAILED(hr)) {
+		int fuLoad = LR_DEFAULTCOLOR;
+		if (IsWindowsNT4()) {
+			fuLoad = LR_VGACOLOR;
+		}
+#if 0
+		// TODO 9x
+		hIcon = LoadImageW(hInst, name, IMAGE_ICON, cx, cy, fuLoad);
+#else
+		{
+			if (HIWORD(name) == 0) {
+				hIcon = LoadImageA(hInst, (LPCSTR)name, IMAGE_ICON, cx, cy, fuLoad);
+			} else {
+				char *nameA = ToCharW(name);
+				hIcon = LoadImageA(hInst, nameA, IMAGE_ICON, cx, cy, fuLoad);
+				free(nameA);
+			}
+		}
+#endif
+	}
+	return hIcon;
+}
+
 static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -2517,6 +2570,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	WORD w, h;
 	POINT point;
 	char uimsg[MAX_UIMSG];
+	static HICON dlghicon = NULL;
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
@@ -2524,7 +2578,6 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	static int dlgw, dlgh;
 	static HBITMAP dlgbmp = NULL, dlgprevbmp = NULL;
 	static LPDWORD dlgpixel = NULL;
-	static HICON dlghicon = NULL;
 	const int icon_x = 15, icon_y = 10, icon_w = 32, icon_h = 32;
 	const int ID_EFFECT_TIMER = 1;
 	RECT dlgrc = {0};
@@ -2544,23 +2597,24 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_INITDIALOG:
 			// アイコンを動的にセット
 			{
-				int fuLoad = LR_DEFAULTCOLOR;
 				HICON hicon;
+				UINT dpi;
 
+#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
+				int fuLoad = LR_DEFAULTCOLOR;
 				if (IsWindowsNT4()) {
 					fuLoad = LR_VGACOLOR;
 				}
-
-#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
 				                  IMAGE_ICON, icon_w, icon_h, fuLoad);
 				// Picture Control に描画すると、なぜか透過色が透過にならず、黒となってしまうため、
 				// WM_PAINT で描画する。
 				dlghicon = hicon;
 #else
-				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
-				                  IMAGE_ICON, 32, 32, fuLoad);
+				dpi = GetMonitorDpiFromWindow(Dialog);
+				hicon = TTLoadIcon(hInst, MAKEINTRESOURCEW(IDI_TTERM), dpi);
 				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
+				dlghicon = hicon;
 #endif
 			}
 
@@ -2827,7 +2881,18 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			break;
 #endif
+		case WM_DPICHANGED: {
+			const UINT new_dpi = LOWORD(wParam);
+			DestroyIcon(dlghicon);
+			dlghicon = TTLoadIcon(hInst, MAKEINTRESOURCEW(IDI_TTERM), new_dpi);
+			SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)dlghicon, 0);
+			break;
+		}
 
+		case WM_DESTROY:
+			DestroyIcon(dlghicon);
+			dlghicon = NULL;
+			break;
 	}
 	return FALSE;
 }
