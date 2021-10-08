@@ -24,6 +24,36 @@
       </dd>
     </dl>
 
+    <h2>簡単な設定の方法</h2>
+    <dl>
+      <dt>中国語,日本語,韓国語(CJK)で使用する場合</dt>
+      <dd>
+          Japanese/UTF-8 など、"Japanese/" などがついたコーディングを選ぶ<br>
+          →Ambiguous Characters Width が 2cell となる
+          →Override Emoji Characters Width 有効となり 2cell となる
+      </dd>
+    </dl>
+
+    <h2>表示される文字について</h2>
+    Tera Term のリポジトリにテスト用テキストがあるので表示してチェックできます。
+    <ul>
+        <li>漢字の文字幅<br>
+            "wget https://ja.osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/unicodebuf-east_asian_width.txt?export=raw -O -"
+        <li>絵文字の文字幅<br>
+            "wget https://ja.osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/unicodebuf-text-emoji.txt?export=raw -O -"
+    </ul>
+    次のことに注意してください
+    <ul>
+        <li>フォントのデザイン通り表示されます。
+            <ul>
+                <li>Tera Term が全角,2cellとして表示、デザインが半角,1cellの場合、
+                    半角の後ろにスペースが入ってるように表示されます。
+                <li>Tera Term が半角,1cellとして表示、デザインが全角,2cellの場合、
+                    全角の左半分が表示されます。
+            </ul>
+        </li>
+    </ul>
+
     <h2>East_Asian_Width特性とセル数について</h2>
 
     <p>

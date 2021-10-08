@@ -32,6 +32,10 @@ Ambiguous(曖昧)
 	U+00BC	VULGAR FRACTION ONE QUARTER
 "Ё"
 	U+0041	CYRILLIC CAPITAL LETTER
+"Ø"
+	U+00D8	o slash
+"φ"
+	U+03C6	GREEK SMALL LETTER PHI
 "–"
 	U+2013	EN DASH
 "—"
@@ -55,6 +59,8 @@ Neutral(中立)
 "©"
 	U+00A9	COPYRIGHT SIGN
 	Emoji
+"Á"
+	U+00C1	LATIN CAPITAL LETTER A WITH ACUTE
 "Ѐ"
 	U+0400	CYRILLIC CAPITAL LETTER
 "−"
@@ -68,7 +74,3 @@ Neutral(中立)
 "❤"
 	U+2764	HEAVY BLACK HEART
 	Emoji
-
-
----
-

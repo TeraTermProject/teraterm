@@ -1,19 +1,32 @@
-﻿🍣:U+1F363 SUSHI
-😁:U+1F601 GRINNING FACE WITH SMILING EYES
--- Emoji modifyer
+﻿-- Emoji modifyer
 👶:U+1F476 BABY
 👶🏻:+ U+1F3FB EMOJI MODIFIER FITZPATRICK TYPE-1-2
 👶🏼:+ U+1F3FC EMOJI MODIFIER FITZPATRICK TYPE-3
 👶🏿:+ U+1F3FF EMOJI MODIFIER FITZPATRICK TYPE-6
--- Ambiguous width
-😘:U+1F618 face
-🏎:U+1F3CE F1
-❤:U+2764 ハート
-㋿:U+32FF 令和
-☺:U+263A smiling face
-😀:U+1F600 grinning face
 -- zwj
 👨:U+1F468 MAN
 👩:U+1F469 WOMAN
 👦:U+1F466 BOY
 👨‍👩‍👦‍👦:+ ZWJ(U+200D)
+-- Not Emoji + Neautral
+☻:U+263B  BLACK SMILING FACE
+-- Emoji + Half
+ない?
+-- Emoji(<U+1F000) + Neautral
+©:U+00A9 COPYRIGHT SIGN
+☹:U+2639 WHITE FROWNING FACE
+☺:U+263A White Smiling Face
+❤:U+2764 HEAVY BLACK HEART
+-- Emoji(>=U+1F000) + Neautral
+🏎:U+1F3CE racing car
+-- Emoji(>=U+1F000) + Wide
+🍣:U+1F363 SUSHI
+😀:U+1F600 grinning face
+😁:U+1F601 GRINNING FACE WITH SMILING EYES
+😊:U+1F60A smiling face with smiling eyes
+😘:U+1F618 face blowing a kiss
+🤔:U+1F914 thinking face
+💙:U+1F499 blue heart
+-- Ambiguous width (not emoji)
+←:U+2190  LEFTWARDS ARROW
+↑:U+2191  UPWARDS ARROW
