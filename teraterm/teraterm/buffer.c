@@ -2212,14 +2212,19 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 	if (ts_->UnicodeEmojiOverride) {
 		if (*emoji) {
 			// äGï∂éöÇæÇ¡ÇΩèÍçá
-			if (ts_->UnicodeEmojiWidth == 2) {
-				// ëSäp
-				return FALSE;
-			} else {
-				if (u32 >= 0x1f000) {
+			if (u32 < 0x1f000) {
+				if (ts_->UnicodeEmojiWidth == 2) {
+					// ëSäp
 					return FALSE;
 				}
-				return TRUE;
+				else {
+					// îºäp
+					return TRUE;
+				}
+			}
+			else {
+				// èÌÇ…ëSäp
+				return FALSE;
 			}
 		}
 	}

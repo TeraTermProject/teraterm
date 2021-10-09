@@ -16,6 +16,7 @@ insert_final_newline = true
 end_of_line = crlf
 charset = cp932
 indent_style = space
+indent_size = 2
 
 [*.md]
 end_of_line = crlf

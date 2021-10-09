@@ -14,13 +14,22 @@
     <dl>
       <dt>Ambiguous Characters width</dt>
       <dd>
-	    1 Cell または 2 Cell を選択。
+        1 Cell または 2 Cell を選択します。
       </dd>
 
       <dt>Override Emoji Characters width</dt>
       <dd>
-	    文字が絵文字のとき、文字属性を無視して文字幅を設定する場合チェックする<br>
-        1 Cell または 2 Cell を選択。
+        チェックすると、絵文字属性のある文字は East_Asian_Width特性を置き換えて文字幅を設定します。
+        <ul>
+          <li>コードポイント U+1F000 以上の絵文字は常に2Cell(全角)として扱います。
+          <li>コードポイント U+1F000 未満の絵文字は
+            <dl>
+              <dt>2callが選択されたとき</dt>
+              <dd>2Cell(全角)として扱う</dd>
+              <dt>1callが選択されたとき</dt>
+              <dd>1Cell(半角)として扱う</dd>
+            </dl>
+        </ul>
       </dd>
     </dl>
 
@@ -28,36 +37,53 @@
     <dl>
       <dt>中国語,日本語,韓国語(CJK)で使用する場合</dt>
       <dd>
-          Japanese/UTF-8 など、"Japanese/" などがついたコーディングを選ぶ<br>
-          →Ambiguous Characters Width が 2cell となる
-          →Override Emoji Characters Width 有効となり 2cell となる
+        Japanese/UTF-8 など、"Japanese/" などがついたコーディングを選ぶ<br>
+        →Ambiguous Characters Width が 2Cell となる<br>
+        →Override Emoji Characters Width 有効となり 2Cell となる
       </dd>
     </dl>
 
     <h2>表示される文字について</h2>
     Tera Term のリポジトリにテスト用テキストがあるので表示してチェックできます。
     <ul>
-        <li>漢字の文字幅<br>
-            "wget https://ja.osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/unicodebuf-east_asian_width.txt?export=raw -O -"
-        <li>絵文字の文字幅<br>
-            "wget https://ja.osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/unicodebuf-text-emoji.txt?export=raw -O -"
+      <li>漢字の文字幅<br>
+        "wget https://ja.osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/unicodebuf-east_asian_width.txt?export=raw -O -"
+      <li>絵文字の文字幅<br>
+        "wget https://ja.osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/unicodebuf-text-emoji.txt?export=raw -O -"
     </ul>
     次のことに注意してください
     <ul>
-        <li>フォントのデザイン通り表示されます。
-            <ul>
-                <li>Tera Term が全角,2cellとして表示、デザインが半角,1cellの場合、
-                    半角の後ろにスペースが入ってるように表示されます。
-                <li>Tera Term が半角,1cellとして表示、デザインが全角,2cellの場合、
-                    全角の左半分が表示されます。
-            </ul>
-        </li>
+      <li>フォントのグリフ(デザイン)通り表示されます。
+        <ul>
+          <li>Tera Term が全角,2Cellとして表示、デザインが半角,1Cellの場合、
+            半角の後ろにスペースが入ってるように表示されます。
+          <li>Tera Term が半角,1Cellとして表示、デザインが全角,2Cellの場合、
+            全角の左半分が表示されます。
+        </ul>
+      </li>
+      <li>Tera Termの扱う文字幅と、ホストが意図している文字幅が異なることがあります。<br>
+        プログラム、ライブラリ例
+        <ul>
+          <li>テキストエディタ(vim,emacs,nanoなど)
+          <li>ビュア(more,less,lvなど)
+          <li>bashなどに組み込まれているreadlineライブラリ(行編集ライブラリ)
+          <li>aptitudeなどに組み込まれているcursesライブラリ(端末制御ライブラリ)
+        </ul>
+      </li>
+      <li>指定フォントに表示したい文字が収納されていないかもしれません。
+        <ul>
+          <li>表示できる文字(指定文字のグリフ)が存在しない場合<br>
+            OSのよって黒い点「・」(例)が描画されます。OSのバージョンによっては他の表示になるかもしれません。
+          <li>OSのバージョンによっては、自動的に他のフォントを使って描画されます。<br>
+            この機能をフォントリンクと呼びます。
+        </ul>
+      </li>
     </ul>
 
     <h2>East_Asian_Width特性とセル数について</h2>
 
     <p>
-      East Asian Width(東アジアの文字幅)として、
+      East_Asian_Width特性(東アジアの文字幅)として、
       各文字には特性が割り当てられています。
     </p>
 
@@ -90,27 +116,48 @@ cells数(2=全角/1=半角)
 </pre>
 
     <p>
-      CJK環境では、Ambiguousの場合に文字幅を2 cellにしたほうが自然です。
+      CJK環境では、Ambiguousの文字幅を 2Cell にしたほうが自然です。<br>
+      また、日本語フォントでは 2Cell でデザインされていることがほとんどだと思われます。
     </p>
 
     <p>
-      Neutralは東アジアの組版には通常出現しない事になっていますが、
-      絵文字がこの領域に入っています。
+      Neutralには絵文字が入っていて、1cellで描画すると日本では不自然な表示となります。
+      絵文字の時の文字幅を変更することで自然な表示とすることができます。
+
+      <dl>
+        <dt>例</dt>
+        <dd>顔 U+263A</dd>
+        <dd>トランプのスイート U+2764</dd>
+        <dd><a href="https://ja.wikipedia.org/wiki/%E3%81%9D%E3%81%AE%E4%BB%96%E3%81%AE%E8%A8%98%E5%8F%B7">wikipedia</a></dd>
     </p>
 
     <p>
-      East Asian Width の特性とは別に、各文字には絵文字属性があります。
-      (Tera TermではコードポイントU+0080未満は絵文字として扱いません)
+      次のデータをもとに属性を決定しています。<br>
+      http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt
+    </p>
+
+    <h2>絵文字について</h2>
+
+    <p>
+      絵文字属性は East Asian Width の特性とは別の文字特性です。
     </p>
 
     <p>
-      CJK環境では従来の文字コードで1byteでは表現できない場合は
-      2cellで扱うほうが自然です。
-      Tera termではEast Asian Widthを無視して2 cellとして扱うことができるよう設定が可能です。
+      CJK環境では、East_Asian_Width特性と同様、
+      従来の文字コードで1byteで表現できない文字は
+      2Cell で扱うほうが自然です。
     </p>
 
     <p>
-      また、日本語フォントでは絵文字は2cellでデザインされていることが多いと思われます。
+      非CJK環境では、従来の文字コードでは全角は存在しなかったので、
+      多くの文字を半角として扱うのが自然です。<br>
+      顔の絵文字など(コードポイントU+1F000以上)はUnicode以降の文字なので、全角としてあつかってよさそうです。
+    </p>
+
+    <p>
+      次の情報をもとに絵文字の判定を行っています。<br>
+      https://www.unicode.org/Public/emoji/12.1/emoji-data.txt<br>
+      ただし、コードポイントU+0080未満は絵文字として扱いません。
     </p>
 
   </body>

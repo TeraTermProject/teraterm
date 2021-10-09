@@ -12,12 +12,12 @@
 ☻:U+263B  BLACK SMILING FACE
 -- Emoji + Half
 ない?
--- Emoji(<U+1F000) + Neautral
+-- Emoji(<U+1F000) + Neutral
 ©:U+00A9 COPYRIGHT SIGN
 ☹:U+2639 WHITE FROWNING FACE
 ☺:U+263A White Smiling Face
 ❤:U+2764 HEAVY BLACK HEART
--- Emoji(>=U+1F000) + Neautral
+-- Emoji(>=U+1F000) + Neutral
 🏎:U+1F3CE racing car
 -- Emoji(>=U+1F000) + Wide
 🍣:U+1F363 SUSHI
