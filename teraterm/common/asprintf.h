@@ -34,8 +34,21 @@
 extern "C" {
 #endif
 
+#if defined(_MSC_VER) && !defined(_Printf_format_string_)
+// ’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í‰½‚à‚µ‚È‚¢‚æ‚¤‚É’è‹`‚µ‚Ä‚¨‚­
+#define _Printf_format_string_
+#endif
+
+#if defined(_MSC_VER)
+int asprintf(char **strp, _Printf_format_string_ const char *fmt, ...);
+int aswprintf(wchar_t **strp, _Printf_format_string_ const wchar_t *fmt, ...);
+#elif defined(__GNUC__)
+int asprintf(char **strp, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+int aswprintf(wchar_t **strp, const wchar_t *fmt, ...); // __attribute__ ((format (wprintf, 2, 3)));
+#else
 int asprintf(char **strp, const char *fmt, ...);
 int aswprintf(wchar_t **strp, const wchar_t *fmt, ...);
+#endif
 int vasprintf(char **strp, const char *fmt, va_list ap);
 int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap);
 

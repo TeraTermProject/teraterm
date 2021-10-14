@@ -41,6 +41,11 @@ extern "C" {
 #define DllExport __declspec(dllexport)
 #endif
 
+#if defined(_MSC_VER) && !defined(_Printf_format_string_)
+// ’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í‰½‚à‚µ‚È‚¢‚æ‚¤‚É’è‹`‚µ‚Ä‚¨‚­
+#define _Printf_format_string_
+#endif
+
 BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos);
 BOOL GetFileNamePosU8(const char *PathName, int *DirLen, int *FNPos);
 BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos);
@@ -97,8 +102,16 @@ void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *de
 int get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
 BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder);
+#if defined(_MSC_VER)
+DllExport void OutputDebugPrintf(_Printf_format_string_ const char *fmt, ...);
+void OutputDebugPrintfW(_Printf_format_string_ const wchar_t *fmt, ...);
+#elif defined(__GNUC__)
+DllExport void OutputDebugPrintf(_Printf_format_string_ const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+void OutputDebugPrintfW(const wchar_t *fmt, ...); // __attribute__ ((format (wprintf, 1, 2)));
+#else
 DllExport void OutputDebugPrintf(const char *fmt, ...);
 void OutputDebugPrintfW(const wchar_t *fmt, ...);
+#endif
 void OutputDebugHexDump(const void *data, size_t len);
 DllExport DWORD get_OPENFILENAME_SIZEA();
 DllExport DWORD get_OPENFILENAME_SIZEW();

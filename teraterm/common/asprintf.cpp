@@ -34,11 +34,16 @@
 
 #include "asprintf.h"
 
+// Visual Studio ではない時、無効化(消す)
+#if !defined(_MSC_VER)
+#define _Printf_format_string_
+#endif
+
 /**
  *	領域を確保して、文字列をフォーマットして、ポインタ返す
  *	不要になったら free() すること
  *	@retval	出力文字数(終端の'\0'を含む)
- *			エラー時は -1
+ *			エラー時 -1
  */
 int vasprintf(char **strp, const char *fmt, va_list ap)
 {
@@ -72,8 +77,7 @@ int vasprintf(char **strp, const char *fmt, va_list ap)
  *	領域を確保して、文字列をフォーマットして、ポインタ返す
  *	不要になったら free() すること
  *	@retval	出力文字数(終端のL'\0'を含む)
- *			フォーマット文字列がおかしいときはL"EILSEQ"
- *			その他エラー時は -1
+ *			エラー時 -1
  */
 int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 {
@@ -107,10 +111,9 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
  *	領域を確保して、文字列をフォーマットして、ポインタ返す
  *	不要になったら free() すること
  *	@retval	出力文字数(終端の'\0'を含む)
- *			フォーマット文字列がおかしいときは"EILSEQ"
- *			その他エラー時は -1
+ *			エラー時 -1
  */
-int asprintf(char **strp, const char *fmt, ...)
+int asprintf(char **strp, _Printf_format_string_ const char *fmt, ...)
 {
 	int r;
 	va_list ap;
@@ -124,10 +127,9 @@ int asprintf(char **strp, const char *fmt, ...)
  *	領域を確保して、文字列をフォーマットして、ポインタ返す
  *	不要になったら free() すること
  *	@retval	出力文字数(終端の'\0'を含む)
- *			フォーマット文字列がおかしいときはL"EILSEQ"
- *			その他エラー時は -1
+ *			エラー時 -1
  */
-int aswprintf(wchar_t **strp, const wchar_t *fmt, ...)
+int aswprintf(wchar_t **strp, _Printf_format_string_ const wchar_t *fmt, ...)
 {
 	int r;
 	va_list ap;
