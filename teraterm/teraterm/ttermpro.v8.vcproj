@@ -749,6 +749,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\ttpfile\protolog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpfile\protolog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\ttpfile\quickvan.c"
 				>
 			</File>

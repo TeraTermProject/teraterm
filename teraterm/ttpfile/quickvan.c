@@ -62,6 +62,7 @@ typedef struct {
   BYTE CheckSum;
 	TProtoLog *log;
 	const char *FullName;	// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
+	WORD LogState;
 } TQVVar;
 typedef TQVVar far *PQVVar;
 
@@ -109,9 +110,9 @@ static int QVRead1Byte(PFileVarProto fv, PQVVar qv, PComVar cv, LPBYTE b)
 
   if (qv->log != NULL) {
 	TProtoLog *log = qv->log;
-    if (log->LogState!=1)
+    if (qv->LogState!=1)
     {
-		log->LogState = 1;
+		qv->LogState = 1;
 		log->WriteRaw(log, "\015\012<<<\015\012", 7);
     }
     log->DumpByte(log, *b);
@@ -127,8 +128,8 @@ static int QVWrite(PFileVarProto fv, PQVVar qv, PComVar cv, PCHAR B, int C)
 
   if (qv->log != NULL && (i>0)) {
 	  TProtoLog* log = qv->log;
-	  if (log->LogState != 0) {
-		  log->LogState = 0;
+	  if (qv->LogState != 0) {
+		  qv->LogState = 0;
 		  log->WriteRaw(log, "\015\012>>>\015\012", 7);
     }
     for (j=0 ; j <= i-1 ; j++)
@@ -165,8 +166,9 @@ static BOOL QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   if ((ts->LogFlag & LOG_QV)!=0) {
 	  TProtoLog* log = ProtoLogCreate();
 	  qv->log = log;
+	  log->SetFolderW(log, ts->LogDirW);
 	  log->Open(log, "QUICKVAN.LOG");
-	  log->LogState = 2;
+	  qv->LogState = 2;
   }
 
   fv->FileOpen = FALSE;

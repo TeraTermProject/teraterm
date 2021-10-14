@@ -190,6 +190,8 @@ target_sources(
   ../ttpfile/ftlib.h
   ../ttpfile/kermit.c
   ../ttpfile/kermit.h
+  ../ttpfile/protolog.cpp
+  ../ttpfile/protolog.h
   ../ttpfile/quickvan.c
   ../ttpfile/quickvan.h
   ../ttpfile/xmodem.c

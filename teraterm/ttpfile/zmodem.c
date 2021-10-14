@@ -80,6 +80,7 @@ typedef struct {
   int TOutFin;
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
+	WORD LogState;
 } TZVar;
 typedef TZVar far *PZVar;
 
@@ -256,13 +257,13 @@ static int ZRead1Byte(PFileVarProto fv, PZVar zv, PComVar cv, LPBYTE b)
 
 	if (zv->log != NULL) {
 		TProtoLog *log = zv->log;
-		if (log->LogState == 0) {
+		if (zv->LogState == 0) {
 			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
 			show_sendbuf(log);
 
-			log->LogState = 1;
+			zv->LogState = 1;
 			s = "\015\012<<< Received\015\012";
 			log->WriteRaw(log, s, strlen(s));
 		}
@@ -283,13 +284,13 @@ static int ZWrite(PFileVarProto fv, PZVar zv, PComVar cv, PCHAR B, int C)
 
 	if (zv->log != NULL && (i > 0)) {
 		TProtoLog* log = zv->log;
-		if (log->LogState != 0) {
+		if (zv->LogState != 0) {
 			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
 			show_recvbuf(log);
 
-			log->LogState = 0;
+			zv->LogState = 0;
 			s = "\015\012Sending >>>\015\012";
 			log->WriteRaw(log, s, strlen(s));
 		}
@@ -767,8 +768,9 @@ static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	if ((ts->LogFlag & LOG_Z) != 0) {
 		TProtoLog* log = ProtoLogCreate();
 		zv->log = log;
+		log->SetFolderW(log, ts->LogDirW);
 		log->Open(log, "ZMODEM.LOG");
-		log->LogState = 0;
+		zv->LogState = 0;
 	}
 
 	switch (zv->ZMode) {

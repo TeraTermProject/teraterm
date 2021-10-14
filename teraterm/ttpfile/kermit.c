@@ -1248,8 +1248,8 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		ctime_s(ctime_str, sizeof(ctime_str), &tm);
 
 		kv->log = log;
+		log->SetFolderW(log, ts->LogDirW);
 		log->Open(log, "KERMIT.LOG");
-		log->LogState = 0;
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KERMIT %s start: %s\n",
 			kv->KmtMode == IdKmtSend ? "Send" :
 			kv->KmtMode == IdKmtReceive ? "Receive" :

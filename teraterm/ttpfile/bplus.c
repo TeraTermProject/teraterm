@@ -75,6 +75,7 @@ typedef struct {
   BYTE Q[8];
 	TProtoLog *log;
 	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
+	WORD LogState;
 } TBPVar;
 typedef TBPVar far *PBPVar;
 
@@ -205,8 +206,9 @@ static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   if ((ts->LogFlag & LOG_BP)!=0) {
 	  TProtoLog* log = ProtoLogCreate();
 	  bv->log = log;
+	  log->SetFolderW(log, ts->LogDirW);
 	  log->Open(log, "BPLUS.LOG");
-	  log->LogState = 0;
+	  bv->LogState = 0;
   }
 
   return TRUE;
@@ -220,9 +222,9 @@ static int BPRead1Byte(PFileVarProto fv, PBPVar bv, PComVar cv, LPBYTE b)
   if (bv->log != NULL)
   {
 	TProtoLog *log = bv->log;
-    if (log->LogState==0)
+    if (bv->LogState==0)
     {
-		log->LogState = 1;
+		bv->LogState = 1;
 		log->WriteRaw(log, "\015\012<<<\015\012", 7);
     }
     log->DumpByte(log, *b);
@@ -239,9 +241,9 @@ static int BPWrite(PFileVarProto fv, PBPVar bv, PComVar cv, PCHAR B, int C)
   if (bv->log != NULL && (i>0))
   {
 	  TProtoLog* log = bv->log;
-	  if (log->LogState != 0)
+	  if (bv->LogState != 0)
     {
-		  log->LogState = 0;
+		  bv->LogState = 0;
 		  log->WriteRaw(log,"\015\012>>>\015\012",7);
     }
     for (j=0 ; j <= i-1 ; j++)

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2021- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +26,38 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, routines for file transfer protocol */
-
 #pragma once
+
+#include <stdlib.h>		// for size_t
+#include <windows.h>	// for BOOL
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-WORD UpdateCRC(BYTE b, WORD CRC);
-LONG UpdateCRC32(BYTE b, LONG CRC);
+typedef struct ProtoLog {
+	// public
+	BOOL (*Open)(struct ProtoLog *pv, const char *file);
+	BOOL (*OpenA)(struct ProtoLog *pv, const char *file);
+	BOOL (*OpenW)(struct ProtoLog *pv, const wchar_t *file);
+	BOOL (*OpenU8)(struct ProtoLog *pv, const char *fileU8);
+	void (*Close)(struct ProtoLog *pv);
+	/**
+	 *	フォルダをセットする
+	 *	@param[in]	フォルダ(NULLのときフォルダ未設定となる)
+	 */
+	void (*SetFolderW)(struct ProtoLog *pv, const wchar_t *folder);
+	size_t (*WriteRaw)(struct ProtoLog *pv, const void *data, size_t len);
+	size_t (*WriteStr)(struct ProtoLog *pv, const char *str);
+	void (*DumpByte)(struct ProtoLog *pv, BYTE b);
+	void (*DumpFlush)(struct ProtoLog *pv);
+	void (*Destory)(struct ProtoLog *pv);
+	// private
+	void *private_data;
+} TProtoLog;
+
+TProtoLog *ProtoLogCreate(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-#include "protolog.h"

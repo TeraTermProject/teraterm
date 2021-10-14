@@ -58,6 +58,7 @@ typedef struct {
   int CANCount;
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
+	WORD LogState;
 } TXVar;
 typedef TXVar far *PXVar;
 
@@ -85,11 +86,11 @@ static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 	if (xv->log != NULL) {
 		TProtoLog *log = xv->log;
 
-		if (log->LogState == 0) {
+		if (xv->LogState == 0) {
 			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
-			log->LogState = 1;
+			xv->LogState = 1;
 			log->WriteRaw(log, "\015\012<<<\015\012", 7);
 		}
 		log->DumpByte(log, *b);
@@ -104,11 +105,11 @@ static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
 	i = CommBinaryOut(cv, B, C);
 	if (xv->log != NULL && (i > 0)) {
 		TProtoLog* log = xv->log;
-		if (log->LogState != 0) {
+		if (xv->LogState != 0) {
 			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
-			log->LogState = 0;
+			xv->LogState = 0;
 			log->WriteRaw(log, "\015\012>>>\015\012", 7);
 		}
 		for (j = 0; j <= i - 1; j++)
@@ -224,8 +225,9 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	if (LogFlag) {
 		TProtoLog* log = ProtoLogCreate();
 		xv->log = log;
+		log->SetFolderW(log, ts->LogDirW);
 		log->Open(log, "XMODEM.LOG");
-		log->LogState = 0;
+		xv->LogState = 0;
 	}
 
 	xv->FullName = fv->GetNextFname(fv);

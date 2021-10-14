@@ -69,6 +69,7 @@ typedef struct {
   BOOL RecvFilesize;
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
+	WORD LogState;
 } TYVar;
 typedef TYVar *PYVar;
 
@@ -106,12 +107,12 @@ static int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 	if (yv->log != NULL)
 	{
 		TProtoLog *log = yv->log;
-		if (log->LogState==0)
+		if (yv->LogState==0)
 		{
 			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
-			log->LogState = 1;
+			yv->LogState = 1;
 			log->WriteRaw(log, "\015\012<<<\015\012", 7);
 		}
 		log->DumpByte(log, *b);
@@ -127,12 +128,12 @@ static int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
 	if (yv->log != NULL && (i>0))
 	{
 		TProtoLog* log = yv->log;
-		if (log->LogState != 0)
+		if (yv->LogState != 0)
 		{
 			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
-			log->LogState = 0;
+			yv->LogState = 0;
 			log->WriteRaw(log, "\015\012>>>\015\012", 7);
 		}
 		for (j=0 ; j <= i-1 ; j++)
@@ -346,8 +347,9 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	if ((ts->LogFlag & LOG_Y)!=0) {
 		TProtoLog* log = ProtoLogCreate();
 		yv->log = log;
+		log->SetFolderW(log, ts->LogDirW);
 		log->Open(log, "YMODEM.LOG");
-		log->LogState = 0;
+		yv->LogState = 0;
 	}
 
 	initialize_file_info(fv, yv);
