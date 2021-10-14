@@ -798,12 +798,12 @@ void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 void logputs(int level, char *msg)
 {
 	if (level <= pvar->settings.LogLevel) {
-		char buf[4096];
 		int file;
 
-		get_teraterm_dir_relative_name(buf, NUM_ELEM(buf), "TTSSH.LOG");
-		file = _open(buf, _O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
-		             _S_IREAD | _S_IWRITE);
+		wchar_t *fname = get_teraterm_dir_relative_nameW(L"TTSSH.LOG");
+		file = _wopen(fname, _O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
+					  _S_IREAD | _S_IWRITE);
+		free(fname);
 
 		if (file >= 0) {
 			char *strtime = mctimelocal("%Y-%m-%d %H:%M:%S.%NZ", TRUE);
