@@ -726,30 +726,29 @@ private:
     protected:
         virtual bool dispatch(UINT message, WPARAM wParam, LPARAM lParam) {
             if (message == WM_COMMAND && wParam == MAKEWPARAM(IDC_REFER, BN_CLICKED)) {
-                char buffer[1024];
-                char uimsg[MAX_UIMSG];
-                OPENFILENAME ofn = {
-                    sizeof ofn,
-                    *this,
-                };
+                wchar_t buffer[1024];
+                wchar_t uimsg[MAX_UIMSG];
+				OPENFILENAMEW ofn = {};
+                ofn.lStructSize = get_OPENFILENAME_SIZEW();
+                ofn.hwndOwner = *this;
                 ofn.lpstrFile = buffer;
-                ofn.nMaxFile = countof(buffer);
+                ofn.nMaxFile = _countof(buffer);
                 ofn.Flags = OFN_LONGNAMES | OFN_NONETWORKBUTTON | OFN_PATHMUSTEXIST | OFN_NOREADONLYRETURN | OFN_HIDEREADONLY;
-                UTIL_get_lang_msg("MSG_LOGFILE_SELECT", uimsg, sizeof(uimsg),
-                                  "Select Logfile");
+                UTIL_get_lang_msgW("MSG_LOGFILE_SELECT", uimsg, _countof(uimsg),
+                                   L"Select Logfile");
                 ofn.lpstrTitle = uimsg;
                 if (logfile != NULL) {
-                    strcpy_s(buffer, sizeof buffer, logfile);
+                    wcscpy_s(buffer, _countof(buffer), logfile);
                 }else{
                     buffer[0] = '\0';
                 }
-                if (::GetSaveFileName(&ofn)) {
+                if (::GetSaveFileNameW(&ofn)) {
                     if (buffer[0] != '\0') {
                         logfile = buffer;
                     }else{
                         logfile = NULL;
                     }
-                    log.SetWindowText(buffer);
+                    log.SetWindowTextW(buffer);
                 }
                 return true;
             }
@@ -806,7 +805,7 @@ private:
             erro.SetWindowText(ErrorMessage);
 
             if (logfile != NULL)
-                log.SetWindowText(logfile);
+                log.SetWindowTextW(logfile);
 
             CenterWindow((HWND)*this, GetParent());
 
@@ -835,7 +834,7 @@ private:
             ConnectedMessage = conn.GetWindowText();
             ErrorMessage     = erro.GetWindowText();
 
-            logfile = log.GetWindowTextLength() > 0 ? log.GetWindowText() : NULL;
+            logfile = log.GetWindowTextLengthW() > 0 ? log.GetWindowTextW() : NULL;
 
             Dialog::onOK();
         }
@@ -843,7 +842,7 @@ private:
             Dialog::onCancel();
         }
     public:
-        String logfile;
+        WString logfile;
         int timeout;
         int resolve;
 
@@ -1089,11 +1088,11 @@ private:
             };
             SetI18nDlgStrsW(hWnd, "TTProxy", text_info, _countof(text_info), UILanguageFileW);
 
-            UTIL_get_lang_msgW("DLG_ABOUT_EXTENSION", uimsg, sizeof(uimsg),
+            UTIL_get_lang_msgW("DLG_ABOUT_EXTENSION", uimsg, _countof(uimsg),
                                L"Tera Term proxy extension");
-            UTIL_get_lang_msgW("DLG_ABOUT_YEBISUYA", uimsg2, sizeof(uimsg2),
+            UTIL_get_lang_msgW("DLG_ABOUT_YEBISUYA", uimsg2, _countof(uimsg2),
                                L"YebisuyaHompo");
-            UTIL_get_lang_msgW("DLG_ABOUT_HOMEPAGE", uimsg3, sizeof(uimsg3),
+            UTIL_get_lang_msgW("DLG_ABOUT_HOMEPAGE", uimsg3, _countof(uimsg3),
                                L"TTProxy home page");
             GetDlgItemTextW(hWnd, IDC_VERSION, buf, _countof(buf));
             len = wcslen(buf) + 50;
@@ -2146,7 +2145,7 @@ private:                                                   \
         return ORIG_closesocket(s);
     }
 
-    String logfile;
+    WString logfile;
     int timeout;
     enum SocksResolve {
         RESOLVE_AUTO,
@@ -2218,7 +2217,7 @@ private:                                                   \
         prompt_table[3] = ini.getString("TelnetConnectedMessage", "-- Connected to ");
         prompt_table[4] = ini.getString("TelnetErrorMessage", "!!!!!!!!");
 
-        logfile = ini.getString("DebugLog");
+        logfile = ini.getStringW(L"DebugLog");
         Logger::open(logfile);
     }
     void _save(IniFile& ini) {
@@ -2269,7 +2268,7 @@ private:                                                   \
         ini.setString("TelnetConnectedMessage", prompt_table[3]);
         ini.setString("TelnetErrorMessage",     prompt_table[4]);
 
-        ini.setString("DebugLog", logfile);
+        ini.setString(L"DebugLog", logfile);
     }
 public:
     static void setOwner(HWND owner) {
@@ -2348,7 +2347,7 @@ public:
     static String generateURL() {
         return instance().defaultProxy.generateURL();
     }
-        static String parseURL(const char* url, BOOL prefix) {
+    static String parseURL(const char* url, BOOL prefix) {
         ProxyInfo proxy;
         String realhost = ProxyInfo::parse(url, proxy);
         if (realhost != NULL) {

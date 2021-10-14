@@ -70,7 +70,6 @@ target_sources(
   PRIVATE
   YCL/include/YCL/Array.h
   YCL/include/YCL/ComboBoxCtrl.h
-  YCL/include/YCL/common.h
   YCL/include/YCL/Dialog.h
   YCL/include/YCL/DynamicLinkLibrary.h
   YCL/include/YCL/EditBoxCtrl.h
@@ -88,8 +87,10 @@ target_sources(
   YCL/include/YCL/StringUtil.h
   YCL/include/YCL/ValueCtrl.h
   YCL/include/YCL/Vector.h
+  YCL/include/YCL/WString.h
+  YCL/include/YCL/WStringBuffer.h
   YCL/include/YCL/Window.h
-  YCL/include/YCL/wstring.h
+  YCL/include/YCL/common.h
   )
 
 source_group(

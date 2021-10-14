@@ -10,6 +10,7 @@
 #include <YCL/common.h>
 
 #include <YCL/String.h>
+#include <YCL/WString.h>
 
 namespace yebisuya {
 
@@ -37,8 +38,14 @@ public:
 	int GetWindowTextLength()const {
 		return ::GetWindowTextLength(window);
 	}
+	int GetWindowTextLengthW()const {
+		return ::GetWindowTextLengthW(window);
+	}
 	int GetWindowText(char* buffer, int size)const {
 		return ::GetWindowText(window, buffer, size);
+	}
+	int GetWindowTextW(wchar_t* buffer, int size)const {
+		return ::GetWindowTextW(window, buffer, size);
 	}
 	String GetWindowText()const {
 		int length = GetWindowTextLength();
@@ -46,8 +53,17 @@ public:
 		GetWindowText(buffer, length + 1);
 		return buffer;
 	}
+	WString GetWindowTextW()const {
+		int length = GetWindowTextLengthW();
+		wchar_t* buffer = (wchar_t*) alloca(sizeof(wchar_t) * (length + 1));
+		GetWindowTextW(buffer, length + 1);
+		return buffer;
+	}
 	bool SetWindowText(const char* text) {
 		return ::SetWindowText(window, text) != FALSE;
+	}
+	bool SetWindowTextW(const wchar_t* text) {
+		return ::SetWindowTextW(window, text) != FALSE;
 	}
 	LRESULT SendMessage(UINT message, WPARAM wparam = 0, LPARAM lparam = 0)const {
 		return ::SendMessage(window, message, wparam, lparam);

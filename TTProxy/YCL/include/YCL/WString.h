@@ -26,6 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* String.h ÇäÓÇ…çÏê¨ */
+
 #ifndef _YCL_WSTRING_H_
 #define _YCL_WSTRING_H_
 

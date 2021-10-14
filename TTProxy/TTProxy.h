@@ -206,6 +206,7 @@ private:
 	static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 		getInstance().ts = ts;
 		getInstance().cv = cv;
+		Logger::set_folder(ts->LogDirW);
 
 		ProxyWSockHook::setMessageShower(&getInstance().shower);
 	}

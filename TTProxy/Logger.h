@@ -7,6 +7,7 @@ using namespace yebisuya;
 class Logger {
 private:
 	HANDLE logfile;
+	WString folder_;
 	Logger():logfile(INVALID_HANDLE_VALUE) {
 	}
 public:
@@ -78,14 +79,25 @@ private:
 	}
 
 public:
-	static void open(String filename) {
+	static void open(WString filename) {
 		close();
-		if (filename != NULL) {
-			HANDLE logfile = ::CreateFile(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			if (logfile != INVALID_HANDLE_VALUE) {
-				::SetFilePointer(logfile, 0, NULL, FILE_END);
-				instance().logfile = logfile;
-			}
+
+		if (filename == NULL) {
+			return;
+		}
+
+		WString full_filename;
+		if (IsRelativePathW(filename)) {
+			full_filename = instance().folder_ + L"\\" + filename;
+		}
+		else {
+			full_filename = filename;
+		}
+
+		HANDLE logfile = ::CreateFileW(full_filename, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (logfile != INVALID_HANDLE_VALUE) {
+			::SetFilePointer(logfile, 0, NULL, FILE_END);
+			instance().logfile = logfile;
 		}
 	}
 	static void close() {
@@ -99,6 +111,9 @@ public:
 	}
 	static void log(const char* label, const unsigned char* data, int size) {
 		instance().debuglog_binary(label, data, size);
+	}
+	static void set_folder(const WString &folder) {
+		instance().folder_ = folder;
 	}
 };
 

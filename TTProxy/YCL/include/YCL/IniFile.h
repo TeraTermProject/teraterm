@@ -16,9 +16,11 @@
 #include <YCL/Enumeration.h>
 #include <YCL/Vector.h>
 #include <YCL/Hashtable.h>
-#include <YCL/wstring.h>
+#include <YCL/WString.h>
 
 #include "inifile_com.h"
+#include "asprintf.h"
+#include "codeconv.h"
 
 namespace yebisuya {
 
@@ -171,6 +173,23 @@ private:
 		exists = true;
 		return NULL;
 	}
+	static WString getStringW(const wchar_t* filename, const char* section, const wchar_t* name, bool& exists, size_t size) {
+		wchar_t* buffer = (wchar_t*) alloca(sizeof(wchar_t) * size);
+		wchar_t* sectionW = ToWcharA(section);
+		size_t len = GetPrivateProfileStringW(sectionW, name, L"\n:", buffer, size, filename);
+		free(sectionW);
+		if (len < size - 2) {
+			// 改行を含んだ文字列はiniファイルからは取得できないので取得失敗したことが分かる
+			if (buffer[0] == '\n') {
+				exists = false;
+				return NULL;
+			}
+			// エスケープ文字を展開
+			return StringUtil::unescapeW(buffer);
+		}
+		exists = true;
+		return NULL;
+	}
 	static String generateSectionName(const char* parentSection, const char* subkeyName) {
 		StringBuffer buffer = parentSection;
 		buffer.append('\\');
@@ -234,6 +253,21 @@ public:
 		}
 		return defaultValue;
 	}
+	WString getStringW(const wchar_t* name)const {
+		return getStringW(name, NULL);
+	}
+	WString getStringW(const wchar_t* name, WString defaultValue)const {
+		if (filename != NULL && section != NULL && name != NULL) {
+			size_t size = 256;
+			WString string;
+			bool exists;
+			while ((string = getStringW(filename, section, name, exists, size)) == NULL && exists)
+				size += 256;
+			if (string != NULL)
+				return string;
+		}
+		return defaultValue;
+	}
 	bool getBoolean(const char* name, bool defaultValue = false)const {
 		String string = getString(name);
 		if (string != NULL) {
@@ -262,6 +296,25 @@ public:
 			return ::WritePrivateProfileStringAFileW(section, name, value, filename) != FALSE;
 		}
 		return false;
+	}
+	bool setString(const wchar_t* name, WString value) {
+		if (filename == NULL || section == NULL || name == NULL) {
+			return false;
+		}
+
+		// NULLでなければエスケープしてから""で括る
+		if (value != NULL) {
+			WStringBuffer buffer;
+			buffer.append('"');
+			if (!StringUtil::escapeW(buffer, value))
+				buffer.append(value);
+			buffer.append('"');
+			value = buffer.toString();
+		}
+		wchar_t *sectionW = ToWcharA(section);
+		BOOL r = ::WritePrivateProfileStringW(sectionW, name, value, filename);
+		free(sectionW);
+		return r != FALSE;
 	}
 	bool setBoolean(const char* name, bool value) {
 		return setString(name, value ? YES() : NO());

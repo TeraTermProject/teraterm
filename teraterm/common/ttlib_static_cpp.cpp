@@ -1106,7 +1106,7 @@ static BOOL doSelectFolderWCOM(HWND hWnd, const wchar_t *def, const wchar_t *msg
 			PWSTR pPath;
 			hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pPath);
 			if (SUCCEEDED(hr)) {
-				*folder = wcsdup(pPath);
+				*folder = _wcsdup(pPath);
 				CoTaskMemFree(pPath);
 				result = TRUE;
 			}
@@ -1245,4 +1245,24 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
 		AppendSlashW(FName,destlen);
 	}
 	wcsncat_s(FName,destlen,Temp,_TRUNCATE);
+}
+
+/**
+ *	pathが相対パスかどうかを返す
+ *		TODO "\path\path" は 相対パスではないのではないか?
+ */
+BOOL IsRelativePathW(const wchar_t *path)
+{
+	if (path[0] == '\\' || path[0] == '/' || path[0] != '\0' && path[1] == ':') {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL IsRelativePathA(const char *path)
+{
+	if (path[0] == '\\' || path[0] == '/' || path[0] != '\0' && path[1] == ':') {
+		return FALSE;
+	}
+	return TRUE;
 }

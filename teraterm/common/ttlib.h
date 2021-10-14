@@ -189,6 +189,8 @@ void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemI
 BOOL IsTextW(const wchar_t *str, size_t len);
 wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len);
 wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_);
+BOOL IsRelativePathA(const char *path);
+BOOL IsRelativePathW(const wchar_t *path);
 
 #ifdef __cplusplus
 }
