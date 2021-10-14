@@ -361,7 +361,7 @@ typedef struct cygterm {
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
-	char HomeDir[MAXPATHLEN];		// ttermpro.exe のあるフォルダ
+	char HomeDir[MAXPATHLEN];		// ttermpro.exe のあるフォルダ(個人設定ファイルのあるフォルダ)
 
 	/* Setup file name */
 	char SetupFName[MAX_PATH];
@@ -645,13 +645,15 @@ struct tttset {
 	BYTE UnicodeAmbiguousWidth;
 	BYTE UnicodeEmojiOverride;
 	BYTE UnicodeEmojiWidth;
-	wchar_t *HomeDirW;		// ttermpro.exe のあるフォルダ
-	wchar_t *SetupFNameW;
-	wchar_t *KeyCnfFNW;
+	wchar_t *HomeDirW;	// ttermpro.exe のあるフォルダ(個人設定ファイルのあるフォルダ)
+	wchar_t *SetupFNameW;	// "TERATERM.INI" のフルパス
+	wchar_t *KeyCnfFNW;		// "KEYBOARD.CNF" のフルパス
 	wchar_t *LogFNW;
 	wchar_t *MacroFNW;
 	wchar_t *UILanguageFileW;			// 絶対パス
 	wchar_t *UILanguageFileW_ini;		// 相対パス,iniファイルの中身
+	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
+	wchar_t *LogDirW;					// logやダンプを置くフォルダ
 };
 
 typedef struct tttset TTTSet, *PTTSet;

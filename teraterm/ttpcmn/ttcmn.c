@@ -109,6 +109,17 @@ void WINAPI CopyTTSetToShmem(PTTSet ts)
 	memcpy(&pm->ts, ts, sizeof(TTTSet));
 }
 
+static wchar_t* GetLogDirW()
+{
+	wchar_t *local_app_data;
+	wchar_t *log;
+	_SHGetKnownFolderPath(&FOLDERID_LocalAppData, 0, NULL, &local_app_data);
+	aswprintf(&log, L"%s\\%s", local_app_data, L"teraterm5");
+	free(local_app_data);
+	CreateDirectoryW(log, NULL);
+	return log;
+}
+
 BOOL WINAPI StartTeraTerm(PTTSet ts)
 {
 	if (FirstInstance) {
@@ -128,6 +139,8 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
 	// 起動時には、共有メモリの HomeDir と SetupFName は空になる
 	/* Get home directory (ttermpro.exeのフォルダ) */
+	ts->ExeDirW = GetHomeDirW(hInst);
+	ts->LogDirW = GetLogDirW();
 	ts->HomeDirW = GetHomeDirW(hInst);
 	WideCharToACP_t(ts->HomeDirW, ts->HomeDir, _countof(ts->HomeDir));
 	SetCurrentDirectoryW(ts->HomeDirW);
