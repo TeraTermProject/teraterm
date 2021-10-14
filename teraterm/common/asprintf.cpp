@@ -31,6 +31,8 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <string.h>
+#include <wchar.h>
 
 #include "asprintf.h"
 
@@ -137,4 +139,64 @@ int aswprintf(wchar_t **strp, _Printf_format_string_ const wchar_t *fmt, ...)
 	r = vaswprintf(strp, fmt, ap);
 	va_end(ap);
 	return r;
+}
+
+/**
+ *	文字列を連結する
+ *	@param[in]	dest	mallocされた領域,文字列
+ *						*dest == NULLの場合は新たな領域が確保される
+ *						不要になったら free() すること
+ *	@param[in]	add		連結される文字列
+ *						NULLの場合はなにも行わない
+ */
+void awcscat(wchar_t **dest, const wchar_t *add)
+{
+	if (*dest == NULL) {
+		*dest = _wcsdup(add);
+		return;
+	}
+	else if (add == NULL) {
+		return;
+	}
+	else {
+		size_t dest_len = wcslen(*dest);
+		size_t add_len = wcslen(add);
+		size_t new_len = dest_len + add_len + 1;
+		wchar_t *new_dest = (wchar_t *)realloc(*dest, sizeof(wchar_t) * new_len);
+		if (new_dest == NULL) {
+			// メモリ不足, 何も行わない
+			return;
+		}
+		wmemcpy(new_dest + dest_len, add, add_len + 1);
+		*dest = new_dest;
+	}
+}
+
+/**
+ *	文字列を連続して連結する
+ *	@param[in]	dest	mallocされた領域,文字列
+ *						*dest == NULLの場合は新たな領域が確保される
+ *						不要になったら free() すること
+ *	@param[in]	add		連結される文字列
+ *						NULLの場合はなにも行わない
+ *				NULL まで連続して連結される
+ *	例
+ *		wchar_t *full_path = NULL;
+ *		awcscats(&full_path, dir, L"\\", filename, NULL);
+ *		CreateFileW(full_path, ...);
+ *		Free(full_path);
+ */
+void awcscats(wchar_t **dest, const wchar_t *add, ...)
+{
+	va_list ap;
+	va_start(ap, add);
+	awcscat(dest, add);
+	for(;;) {
+		const wchar_t *ap_add = va_arg(ap, wchar_t *);
+		if (ap_add == NULL) {
+			break;
+		}
+		awcscat(dest, ap_add);
+	}
+	va_end(ap);
 }

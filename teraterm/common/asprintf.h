@@ -52,6 +52,9 @@ int aswprintf(wchar_t **strp, const wchar_t *fmt, ...);
 int vasprintf(char **strp, const char *fmt, va_list ap);
 int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap);
 
+void awcscat(wchar_t **dest, const wchar_t *add);
+void awcscats(wchar_t **dest, const wchar_t *add, ...);
+
 #ifdef __cplusplus
 }
 #endif

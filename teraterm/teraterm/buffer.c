@@ -5392,29 +5392,6 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 }
 
 /**
- *	文字列を連結する
- *	@param[in]	dest	mallocされた領域
- *						*dest == NULLの場合は新たな領域が確保される
- *						不要になったら free() すること
- *	@param[in]	add		連結される文字列
- */
-static void awcscat(wchar_t **dest, const wchar_t *add)
-{
-	if (*dest == NULL) {
-		*dest = _wcsdup(add);
-		return;
-	}
-	else {
-		size_t dest_len = wcslen(*dest);
-		size_t add_len = wcslen(add);
-		size_t new_len = dest_len + add_len + 1;
-		wchar_t *new_dest = realloc(*dest, sizeof(wchar_t ) * new_len);
-		wcscat(new_dest, add);
-		*dest = new_dest;
-	}
-}
-
-/**
  *	指定位置の文字情報を文字列で返す
  *	デバグ用途
  *
