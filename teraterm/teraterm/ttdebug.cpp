@@ -265,10 +265,10 @@ static wchar_t *CreateDumpFilename()
 	char *version;
 	asprintf(&version, "r%04d", SVNVERSION);
 #else
-	char *version = strdup("unknown");
+	char *version = _strdup("unknown");
 #endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"%s\\teraterm_%hs_%04d%02d%02d-%02d%02d%02d.dmp",
+	aswprintf(&dump_file, L"%s\\teraterm_%hs_%04u%02u%02u-%02u%02u%02u.dmp",
 			  desktop, version,
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond);

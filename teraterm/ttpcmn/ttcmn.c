@@ -1213,6 +1213,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 				break;
 			default:
 				assert(FALSE);
+				code_page = 936;
 				break;
 			}
 		}

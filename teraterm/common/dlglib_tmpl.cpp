@@ -390,7 +390,7 @@ static DLGTEMPLATE *GetDlgTemplate(
 	} else {
 		// copy with replacing font
 		int size_namediff =
-			wcslen(FontFaceName) - wcslen(logfont.lfFaceName);
+			(int)wcslen(FontFaceName) - (int)wcslen(logfont.lfFaceName);
 		size_namediff *= sizeof(WCHAR);
 		size_namediff += 3;		// テキスト、フォント名長でalignが変化する
 		size_t new_size_forcast = prev_size + size_namediff;

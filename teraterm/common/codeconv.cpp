@@ -1037,7 +1037,7 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len)
 {
 	const DWORD flags = 0;
-	size_t out_len = WideCharToMultiByte(CP_ACP, flags, wstr_ptr, -1, mb_ptr, mb_len, NULL, NULL);
+	size_t out_len = WideCharToMultiByte(CP_ACP, flags, wstr_ptr, -1, mb_ptr, (int)mb_len, NULL, NULL);
 	if (out_len == 0) {
 		// •ÏŠ·Ž¸”s
 		DWORD err = GetLastError();
@@ -1069,7 +1069,7 @@ size_t ACPToWideChar_t(const char *str_ptr, wchar_t *wstr_ptr, size_t wstr_len)
 {
 	size_t out_len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
 										 str_ptr, -1,
-										 wstr_ptr, wstr_len);
+										 wstr_ptr, (int)wstr_len);
 	if (out_len == wstr_len) {
 		wstr_ptr[wstr_len-1] = 0;
 	}
