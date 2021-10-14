@@ -119,10 +119,10 @@ private:
 			if ((option[0] == '-' || option[0] == '/')) {
 				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
 					char *optA = ToCharW(option + 3);
-					const char *f = get_teraterm_dir_relative_name(optA);
+					String f = get_teraterm_dir_relative_name(optA);
+					free(optA);
 					wchar_t *fW = ToWcharA(f);
 					read_options(fW);
-					free(optA);
 					free(fW);
 				}
 			}
