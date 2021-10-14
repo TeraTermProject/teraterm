@@ -40,6 +40,7 @@
 #include <process.h>
 
 #include "telnet.h"
+#include "asprintf.h"
 #include "tt_res.h"
 
 int TelStatus;
@@ -123,10 +124,13 @@ void InitTelnet()
 	tr.WinSize.x = ts.TerminalWidth;
 	tr.WinSize.y = ts.TerminalHeight;
 
-	if ((ts.LogFlag & LOG_TEL) != 0)
-		tr.LogFile = CreateFileA("TELNET.LOG", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+	if ((ts.LogFlag & LOG_TEL) != 0) {
+		wchar_t *full_path = NULL;
+		awcscats(&full_path, ts.LogDirW, L"\\", L"TELNET.LOG", NULL);
+		tr.LogFile = CreateFileW(full_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 								 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	else
+		free(full_path);
+	} else
 		tr.LogFile = 0;
 }
 
