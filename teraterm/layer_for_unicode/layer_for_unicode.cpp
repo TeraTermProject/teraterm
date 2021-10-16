@@ -822,3 +822,17 @@ int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMa
 	free(strA);
 	return len;
 }
+
+HANDLE WINAPI _LoadImageW(HINSTANCE hInst, LPCWSTR name, UINT type,
+						  int cx, int cy, UINT fuLoad)
+{
+	HANDLE handle;
+	if (HIWORD(name) == 0) {
+		handle = LoadImageA(hInst, (LPCSTR)name, type, cx, cy, fuLoad);
+	} else {
+		char *nameA = ToCharW(name);
+		handle = LoadImageA(hInst, nameA, type, cx, cy, fuLoad);
+		free(nameA);
+	}
+	return handle;
+}

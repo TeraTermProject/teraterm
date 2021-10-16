@@ -66,6 +66,8 @@ int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT 
 LRESULT WINAPI _DefWindowProcW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL WINAPI _ModifyMenuW(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem);
 int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
+HANDLE WINAPI _LoadImageW(HINSTANCE hInst, LPCWSTR name, UINT type,
+						  int cx, int cy, UINT fuLoad);
 
 // kernel32.dll
 DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName);

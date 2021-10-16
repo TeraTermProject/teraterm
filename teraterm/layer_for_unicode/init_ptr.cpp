@@ -30,7 +30,7 @@
 
 #include "codeconv.h"
 
-// #define ALWAYS_ANSI	1
+#define ALWAYS_ANSI	1
 
 static bool IsWindowsNTKernel(void)
 {

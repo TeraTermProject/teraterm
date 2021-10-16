@@ -2539,20 +2539,7 @@ static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, UINT dpi)
 		if (IsWindowsNT4()) {
 			fuLoad = LR_VGACOLOR;
 		}
-#if 0
-		// TODO 9x
 		hIcon = LoadImageW(hInst, name, IMAGE_ICON, cx, cy, fuLoad);
-#else
-		{
-			if (HIWORD(name) == 0) {
-				hIcon = LoadImageA(hInst, (LPCSTR)name, IMAGE_ICON, cx, cy, fuLoad);
-			} else {
-				char *nameA = ToCharW(name);
-				hIcon = LoadImageA(hInst, nameA, IMAGE_ICON, cx, cy, fuLoad);
-				free(nameA);
-			}
-		}
-#endif
 	}
 	return hIcon;
 }
