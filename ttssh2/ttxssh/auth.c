@@ -789,10 +789,12 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		init_auth_dlg(pvar, dlg, &UseControlChar);
 
 		// "▼"画像をセットする
-		hIconDropdown = LoadImage(hInst, MAKEINTRESOURCE(IDI_DROPDOWN),
-								  IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-		SendMessage(GetDlgItem(dlg, IDC_USERNAME_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
-		SendMessage(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), BM_SETIMAGE, IMAGE_ICON, (LPARAM)hIconDropdown);
+		const UINT dpi = GetMonitorDpiFromWindow(dlg);
+		int size = 16 * dpi / 96;	// 16 = original image size for 96dpi
+		hIconDropdown = LoadImageW(hInst, MAKEINTRESOURCEW(IDI_DROPDOWN),
+								   IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+		SendDlgItemMessage(dlg, IDC_USERNAME_OPTION, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)hIconDropdown);
+		SendDlgItemMessage(dlg, IDC_SSHPASSWORD_OPTION, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)hIconDropdown);
 
 		// SSH2 autologinが有効の場合は、タイマを仕掛ける。 (2004.12.1 yutaka)
 		if (pvar->ssh2_autologin == 1) {
