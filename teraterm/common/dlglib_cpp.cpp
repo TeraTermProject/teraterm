@@ -40,6 +40,7 @@
 #include "ttlib.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "compat_win.h"
 
 /**
  *	EndDialog() 互換関数
@@ -325,4 +326,101 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
 	free(user_filter_maskW);
 	free(UILanguageFileW);
 	return ret;
+}
+
+/**
+ *	デフォルトサイズでアイコンをロードする
+ *		DestroyIcon()すること
+ */
+static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, UINT dpi)
+{
+	HICON hIcon;
+	HRESULT hr;
+	int cx;
+	int cy;
+	// - 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
+	if (pGetSystemMetricsForDpi != NULL) {
+		cx = pGetSystemMetricsForDpi(SM_CXICON, dpi);
+		cy = pGetSystemMetricsForDpi(SM_CYICON, dpi);
+	}
+	else {
+		cx = GetSystemMetrics(SM_CXICON);
+		cy = GetSystemMetrics(SM_CYICON);
+	}
+#if 0 // defined(NTDDI_VISTA) && (NTDDI_VERSION >= NTDDI_VISTA)
+	// LoadIconWithScaleDown() は vistaから
+	hr = LoadIconWithScaleDown(hInst, name, cx, cy, &hIcon);
+	// LoadIconMetric();
+#else
+	hr = E_NOTIMPL;
+#endif
+	if(FAILED(hr)) {
+		int fuLoad = LR_DEFAULTCOLOR;
+		if (IsWindowsNT4()) {
+			fuLoad = LR_VGACOLOR;
+		}
+		hIcon = (HICON)LoadImageW(hinst, name, IMAGE_ICON, cx, cy, fuLoad);
+	}
+	return hIcon;
+}
+
+typedef struct {
+	wchar_t *icon_name;
+	HICON icon;
+	WNDPROC prev_proc;
+} IconSubclassData;
+
+static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	IconSubclassData *data = (IconSubclassData *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	switch (msg) {
+	case WM_DPICHANGED: {
+		const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
+		const UINT new_dpi = LOWORD(wp);
+		HICON icon = TTLoadIcon(hinst, data->icon_name, new_dpi);
+		if (icon != NULL) {
+			DestroyIcon(data->icon);
+			data->icon = icon;
+			SendMessage(hwnd, STM_SETICON, (WPARAM)icon, 0);
+		}
+		break;
+	}
+	case WM_NCDESTROY: {
+		LRESULT result = CallWindowProc(data->prev_proc, hwnd, msg, wp, lp);
+		DestroyIcon(data->icon);
+		if (HIWORD(data->icon_name) != 0) {
+			free(data->icon_name);
+		}
+		free(data);
+		return result;
+	}
+	default:
+		break;
+	}
+	return CallWindowProc(data->prev_proc, hwnd, msg, wp, lp);
+}
+
+/**
+ *	ダイアログのコントロールにアイコンをセットする
+ *
+ *		例
+ *			SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM));
+ *		DPIが変化したときにアイコンのサイズを変更する
+ *			case WM_DPICHANGED:
+ *				SendDlgItemMessage(Dialog, IDC_TT_ICON, Message, wParam, lParam);
+ */
+void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name)
+{
+	IconSubclassData *data = (IconSubclassData *)malloc(sizeof(IconSubclassData));
+	data->icon_name = (HIWORD(name) == 0) ? (wchar_t *)name : _wcsdup(name);
+
+	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
+	const UINT dpi = GetMonitorDpiFromWindow(dlg);
+	data->icon = TTLoadIcon(hinst, name, dpi);
+
+	const HWND hWnd = GetDlgItem(dlg, nID);
+	SendMessage(hWnd, STM_SETICON, (WPARAM)data->icon, 0);
+
+	data->prev_proc = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)IconProc);
+	SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 }
