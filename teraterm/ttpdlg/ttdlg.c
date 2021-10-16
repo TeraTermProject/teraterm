@@ -36,7 +36,6 @@
 #include <io.h>
 #include <direct.h>
 #include <commdlg.h>
-#include <commctrl.h>
 #include <dlgs.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -2526,8 +2525,7 @@ static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, UINT dpi)
 		cx = GetSystemMetrics(SM_CXICON);
 		cy = GetSystemMetrics(SM_CYICON);
 	}
-#if 0	// TODO
-//#if defined(NTDDI_VISTA) && (NTDDI_VERSION >= NTDDI_VISTA)
+#if 0 // defined(NTDDI_VISTA) && (NTDDI_VERSION >= NTDDI_VISTA)
 	// LoadIconWithScaleDown() は vistaから
 	hr = LoadIconWithScaleDown(hInst, name, cx, cy, &hIcon);
 	// LoadIconMetric();
@@ -2542,6 +2540,67 @@ static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, UINT dpi)
 		hIcon = LoadImageW(hInst, name, IMAGE_ICON, cx, cy, fuLoad);
 	}
 	return hIcon;
+}
+
+typedef struct {
+	wchar_t *icon_name;
+	HICON icon;
+	WNDPROC prev_proc;
+} IconSubclassData;
+
+static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	IconSubclassData *data = (IconSubclassData *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	switch (msg) {
+	case WM_DPICHANGED: {
+		const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
+		const UINT new_dpi = LOWORD(wp);
+		HICON icon = TTLoadIcon(hinst, data->icon_name, new_dpi);
+		if (icon != NULL) {
+			DestroyIcon(data->icon);
+			data->icon = icon;
+			SendMessage(hwnd, STM_SETICON, (WPARAM)icon, 0);
+		}
+		break;
+	}
+	case WM_NCDESTROY: {
+		LRESULT result = CallWindowProc(data->prev_proc, hwnd, msg, wp, lp);
+		DestroyIcon(data->icon);
+		if (HIWORD(data->icon_name) != 0) {
+			free(data->icon_name);
+		}
+		free(data);
+		return result;
+	}
+	default:
+		break;
+	}
+	return CallWindowProc(data->prev_proc, hwnd, msg, wp, lp);
+}
+
+/**
+ *	ダイアログのコントロールにアイコンをセットする
+ *
+ *		例
+ *			SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM));
+ *		DPIが変化したときにアイコンのサイズを変更する
+ *			case WM_DPICHANGED:
+ *				SendDlgItemMessage(Dialog, IDC_TT_ICON, Message, wParam, lParam);
+ */
+void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name)
+{
+	IconSubclassData *data = (IconSubclassData *)malloc(sizeof(IconSubclassData));
+	data->icon_name = (HIWORD(name) == 0) ? (wchar_t *)name : _wcsdup(name);
+
+	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
+	const UINT dpi = GetMonitorDpiFromWindow(dlg);
+	data->icon = TTLoadIcon(hinst, name, dpi);
+
+	const HWND hWnd = GetDlgItem(dlg, nID);
+	SendMessage(hWnd, STM_SETICON, (WPARAM)data->icon, 0);
+
+	data->prev_proc = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)IconProc);
+	SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 }
 
 static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -2565,6 +2624,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	static int dlgw, dlgh;
 	static HBITMAP dlgbmp = NULL, dlgprevbmp = NULL;
 	static LPDWORD dlgpixel = NULL;
+	static HICON dlghicon = NULL;
 	const int icon_x = 15, icon_y = 10, icon_w = 32, icon_h = 32;
 	const int ID_EFFECT_TIMER = 1;
 	RECT dlgrc = {0};
@@ -2584,11 +2644,9 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_INITDIALOG:
 			// アイコンを動的にセット
 			{
-				HICON hicon;
-				UINT dpi;
-
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 				int fuLoad = LR_DEFAULTCOLOR;
+				HICON hicon;
 				if (IsWindowsNT4()) {
 					fuLoad = LR_VGACOLOR;
 				}
@@ -2598,10 +2656,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				// WM_PAINT で描画する。
 				dlghicon = hicon;
 #else
-				dpi = GetMonitorDpiFromWindow(Dialog);
-				hicon = TTLoadIcon(hInst, MAKEINTRESOURCEW(IDI_TTERM), dpi);
-				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
-				dlghicon = hicon;
+				SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM));
 #endif
 			}
 
@@ -2868,13 +2923,9 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			break;
 #endif
-		case WM_DPICHANGED: {
-			const UINT new_dpi = LOWORD(wParam);
-			DestroyIcon(dlghicon);
-			dlghicon = TTLoadIcon(hInst, MAKEINTRESOURCEW(IDI_TTERM), new_dpi);
-			SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)dlghicon, 0);
+		case WM_DPICHANGED:
+			SendDlgItemMessage(Dialog, IDC_TT_ICON, Message, wParam, lParam);
 			break;
-		}
 
 		case WM_DESTROY:
 			DestroyIcon(dlghicon);
