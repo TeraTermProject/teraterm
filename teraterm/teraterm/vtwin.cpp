@@ -4609,7 +4609,7 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFile   = NameW;
-	ofn.nMaxFile    = sizeof(NameW);
+	ofn.nMaxFile    = _countof(NameW);
 	ofn.lpstrFilter = FNameFilter;
 	ofn.nFilterIndex = 1;
 	ofn.hInstance = hInst;
