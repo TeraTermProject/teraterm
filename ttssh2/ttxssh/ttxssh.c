@@ -2156,19 +2156,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
 		}
 
-		// アイコンを動的にセット
-		{
-			int fuLoad = LR_DEFAULTCOLOR;
-			HICON hicon;
-
-			if (IsWindowsNT4()) {
-				fuLoad = LR_VGACOLOR;
-			}
-
-			hicon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
-			                  IMAGE_ICON, 32, 32, fuLoad);
-			SendDlgItemMessage(dlg, IDC_TTSSH_ICON, STM_SETICON, (WPARAM)hicon, 0);
-		}
+		SetDlgItemIcon(dlg, IDC_TTSSH_ICON, MAKEINTRESOURCEW(pvar->settings.IconID));
 
 		init_about_dlg(pvar, dlg);
 		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
@@ -2216,6 +2204,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		if (DlgAboutTextFont != NULL) {
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
 		}
+		SendDlgItemMessage(dlg, IDC_TTSSH_ICON, msg, wParam, lParam);
 		return FALSE;
 	}
 
