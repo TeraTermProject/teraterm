@@ -94,7 +94,7 @@ int GetFontPixelFromPoint(HWND hWnd, int point);
 void ExpandCBWidth(HWND dlg, int ID);
 wchar_t *GetCommonDialogFilterWW(const char *user_filter_mask, const wchar_t *UILanguageFile);
 wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile);
-void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name);
+void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy);
 
 #ifdef __cplusplus
 }

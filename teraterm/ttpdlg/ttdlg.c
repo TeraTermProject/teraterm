@@ -2558,7 +2558,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				// WM_PAINT Ç≈ï`âÊÇ∑ÇÈÅB
 				dlghicon = hicon;
 #else
-				SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM));
+				SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM), 0, 0);
 #endif
 			}
 

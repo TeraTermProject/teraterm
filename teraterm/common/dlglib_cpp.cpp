@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <wchar.h>
+#include <assert.h>
 
 #include "dlglib.h"
 #include "ttlib.h"
@@ -329,23 +330,35 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
 }
 
 /**
- *	デフォルトサイズでアイコンをロードする
+ *	アイコンをロードする
+ *	@param[in]	hinst
+ *	@param[in]	name
+ *	@param[in]	cx	アイコンサイズ
+ *	@param[in]	cy	アイコンサイズ
+ *	@param[in]	dpi	cx,cy は 96dpiからの比率
+ *	@return		HICON
+ *
+ *		cx == 0 && cy == 0 のときデフォルトのアイコンサイズで読み込む
  *		DestroyIcon()すること
  */
-static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, UINT dpi)
+static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
 {
 	HICON hIcon;
 	HRESULT hr;
-	int cx;
-	int cy;
-	// - 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
-	if (pGetSystemMetricsForDpi != NULL) {
-		cx = pGetSystemMetricsForDpi(SM_CXICON, dpi);
-		cy = pGetSystemMetricsForDpi(SM_CYICON, dpi);
+	if (cx == 0 && cy == 0) {
+		// 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
+		if (pGetSystemMetricsForDpi != NULL) {
+			cx = pGetSystemMetricsForDpi(SM_CXICON, dpi);
+			cy = pGetSystemMetricsForDpi(SM_CYICON, dpi);
+		}
+		else {
+			cx = GetSystemMetrics(SM_CXICON);
+			cy = GetSystemMetrics(SM_CYICON);
+		}
 	}
 	else {
-		cx = GetSystemMetrics(SM_CXICON);
-		cy = GetSystemMetrics(SM_CYICON);
+		cx = cx * dpi / 96;
+		cy = cy * dpi / 96;
 	}
 #if 0 // defined(NTDDI_VISTA) && (NTDDI_VERSION >= NTDDI_VISTA)
 	// LoadIconWithScaleDown() は vistaから
@@ -368,7 +381,24 @@ typedef struct {
 	wchar_t *icon_name;
 	HICON icon;
 	WNDPROC prev_proc;
+	int cx;
+	int cy;
 } IconSubclassData;
+
+static void SetIcon(HWND hwnd, HICON icon)
+{
+	char class_name[32];
+	int r = GetClassNameA(hwnd, class_name, _countof(class_name));
+	if (strcmp(class_name, "Button") == 0) {
+		SendMessage(hwnd, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)icon);
+	}
+	else if (strcmp(class_name, "Static") == 0) {
+		SendMessage(hwnd, STM_SETICON, (WPARAM)icon, 0);
+	}
+	else {
+		assert(("not support", FALSE));
+	}
+}
 
 static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -377,11 +407,11 @@ static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DPICHANGED: {
 		const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 		const UINT new_dpi = LOWORD(wp);
-		HICON icon = TTLoadIcon(hinst, data->icon_name, new_dpi);
+		HICON icon = TTLoadIcon(hinst, data->icon_name, data->cx, data->cy, new_dpi);
 		if (icon != NULL) {
 			DestroyIcon(data->icon);
 			data->icon = icon;
-			SendMessage(hwnd, STM_SETICON, (WPARAM)icon, 0);
+			SetIcon(hwnd, icon);
 		}
 		break;
 	}
@@ -403,24 +433,34 @@ static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 /**
  *	ダイアログのコントロールにアイコンをセットする
  *
- *		例
- *			SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM));
- *		DPIが変化したときにアイコンのサイズを変更する
- *			case WM_DPICHANGED:
- *				SendDlgItemMessage(Dialog, IDC_TT_ICON, Message, wParam, lParam);
+ *	@param	dlg		ダイアログ
+ *	@param	nID		コントロールID
+ *	@param	name	アイコン
+ *	@param	cx		アイコンサイズ
+ *	@param	cy		アイコンサイズ
+ *
+ *	cx == 0 && cy == 0 のときデフォルトのアイコンサイズで読み込む
+ *
+ *	セットする例
+ *		SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM), 0, 0);
+ *	DPIが変化したときにアイコンのサイズを変更する例
+ *		case WM_DPICHANGED:
+ *			SendDlgItemMessage(Dialog, IDC_TT_ICON, WM_DPICHANGED, wParam, lParam);
  */
-void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name)
+void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 {
 	IconSubclassData *data = (IconSubclassData *)malloc(sizeof(IconSubclassData));
 	data->icon_name = (HIWORD(name) == 0) ? (wchar_t *)name : _wcsdup(name);
+	data->cx = cx;
+	data->cy = cy;
 
 	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
 	const UINT dpi = GetMonitorDpiFromWindow(dlg);
-	data->icon = TTLoadIcon(hinst, name, dpi);
+	data->icon = TTLoadIcon(hinst, name, cx, cy, dpi);
 
-	const HWND hWnd = GetDlgItem(dlg, nID);
-	SendMessage(hWnd, STM_SETICON, (WPARAM)data->icon, 0);
+	const HWND hwnd = GetDlgItem(dlg, nID);
+	SetIcon(hwnd, data->icon);
 
-	data->prev_proc = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)IconProc);
-	SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)data);
+	data->prev_proc = (WNDPROC)SetWindowLongPtrW(hwnd, GWLP_WNDPROC, (LONG_PTR)IconProc);
+	SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)data);
 }

@@ -772,7 +772,6 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	static BOOL autologin_sent_none;
 	static BOOL UseControlChar;
 	static BOOL ShowPassPhrase;
-	static HICON hIconDropdown;
 	static size_t username_str_len;
 	static wchar_t password_char;	// 伏せ字キャラクタ
 
@@ -789,12 +788,8 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		init_auth_dlg(pvar, dlg, &UseControlChar);
 
 		// "▼"画像をセットする
-		const UINT dpi = GetMonitorDpiFromWindow(dlg);
-		int size = 16 * dpi / 96;	// 16 = original image size for 96dpi
-		hIconDropdown = LoadImageW(hInst, MAKEINTRESOURCEW(IDI_DROPDOWN),
-								   IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
-		SendDlgItemMessage(dlg, IDC_USERNAME_OPTION, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)hIconDropdown);
-		SendDlgItemMessage(dlg, IDC_SSHPASSWORD_OPTION, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)hIconDropdown);
+		SetDlgItemIcon(dlg, IDC_USERNAME_OPTION, MAKEINTRESOURCEW(IDI_DROPDOWN), 16, 16);
+		SetDlgItemIcon(dlg, IDC_SSHPASSWORD_OPTION, MAKEINTRESOURCEW(IDI_DROPDOWN), 16, 16);
 
 		// SSH2 autologinが有効の場合は、タイマを仕掛ける。 (2004.12.1 yutaka)
 		if (pvar->ssh2_autologin == 1) {
@@ -1163,10 +1158,9 @@ canceled:
 		}
 		return FALSE;
 
-	case WM_DESTROY:
-		if (hIconDropdown != NULL) {
-			DeleteObject(hIconDropdown);
-		}
+	case WM_DPICHANGED:
+		SendDlgItemMessage(dlg, IDC_USERNAME_OPTION, WM_DPICHANGED, wParam, lParam);
+		SendDlgItemMessage(dlg, IDC_SSHPASSWORD_OPTION, WM_DPICHANGED, wParam, lParam);
 		return FALSE;
 
 	default:

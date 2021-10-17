@@ -2156,7 +2156,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
 		}
 
-		SetDlgItemIcon(dlg, IDC_TTSSH_ICON, MAKEINTRESOURCEW(pvar->settings.IconID));
+		SetDlgItemIcon(dlg, IDC_TTSSH_ICON, MAKEINTRESOURCEW(pvar->settings.IconID), 0, 0);
 
 		init_about_dlg(pvar, dlg);
 		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
@@ -2204,7 +2204,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		if (DlgAboutTextFont != NULL) {
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
 		}
-		SendDlgItemMessage(dlg, IDC_TTSSH_ICON, msg, wParam, lParam);
+		SendDlgItemMessage(dlg, IDC_TTSSH_ICON, WM_DPICHANGED, wParam, lParam);
 		return FALSE;
 	}
 
