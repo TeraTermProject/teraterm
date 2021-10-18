@@ -1266,3 +1266,52 @@ BOOL IsRelativePathA(const char *path)
 	}
 	return TRUE;
 }
+
+// OSが 指定されたバージョンと等しい かどうかを判別する。
+BOOL IsWindowsVer(DWORD dwPlatformId, DWORD dwMajorVersion, DWORD dwMinorVersion)
+{
+	OSVERSIONINFOEXA osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = dwPlatformId;
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
+	dwlConditionMask = _VerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
+	dwlConditionMask = _VerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
+	dwlConditionMask = _VerSetConditionMask(dwlConditionMask, VER_MINORVERSION, op);
+	ret = _VerifyVersionInfoA(&osvi, VER_PLATFORMID | VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
+	return (ret);
+}
+
+// OSが 指定されたバージョン以降 かどうかを判別する。
+//   dwPlatformId を見ていないので NT カーネル内でしか比較できない
+//   5.0 以上で比較すること
+BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
+{
+	OSVERSIONINFOEXA osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_GREATER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
+	dwlConditionMask = _VerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
+	dwlConditionMask = _VerSetConditionMask(dwlConditionMask, VER_MINORVERSION, op);
+	ret = _VerifyVersionInfoA(&osvi, VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
+	return (ret);
+}
+
+// OSが Windows XP 以降 かどうかを判別する。
+//
+// return TRUE:  XP or later
+//        FALSE: 2000 or earlier
+BOOL IsWindowsXPOrLater(void)
+{
+	return IsWindowsVerOrLater(5, 1);
+}

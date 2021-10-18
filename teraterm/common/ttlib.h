@@ -113,6 +113,8 @@ DllExport void OutputDebugPrintf(const char *fmt, ...);
 void OutputDebugPrintfW(const wchar_t *fmt, ...);
 #endif
 void OutputDebugHexDump(const void *data, size_t len);
+BOOL IsWindowsVer(DWORD dwPlatformId, DWORD dwMajorVersion, DWORD dwMinorVersion);
+BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion);
 DllExport DWORD get_OPENFILENAME_SIZEA();
 DllExport DWORD get_OPENFILENAME_SIZEW();
 DllExport BOOL IsWindows95();
@@ -121,6 +123,7 @@ DllExport BOOL IsWindowsNT4();
 DllExport BOOL IsWindowsNTKernel();
 DllExport BOOL IsWindows2000();
 DllExport BOOL IsWindows2000OrLater();
+BOOL IsWindowsXPOrLater(void);
 DllExport BOOL IsWindowsVistaOrLater();
 DllExport BOOL IsWindows7OrLater();
 DllExport BOOL HasMultiMonitorSupport();
