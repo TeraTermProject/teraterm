@@ -370,6 +370,8 @@ static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UI
 	if(FAILED(hr)) {
 		int fuLoad = LR_DEFAULTCOLOR;
 		if (IsWindowsNT4()) {
+			// Windows NT 4.0 は 4bit アイコンしかサポートしていない
+			// 16(4bit) color = VGA color
 			fuLoad = LR_VGACOLOR;
 		}
 		hIcon = (HICON)LoadImageW(hinst, name, IMAGE_ICON, cx, cy, fuLoad);
