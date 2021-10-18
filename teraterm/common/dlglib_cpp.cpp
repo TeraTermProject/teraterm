@@ -333,9 +333,9 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
  *	アイコンをロードする
  *	@param[in]	hinst
  *	@param[in]	name
- *	@param[in]	cx	アイコンサイズ
+ *	@param[in]	cx	アイコンサイズ(96dpi時)
  *	@param[in]	cy	アイコンサイズ
- *	@param[in]	dpi	cx,cy は 96dpiからの比率
+ *	@param[in]	dpi	アイコンサイズ(cx,cy)はdpi/96倍のサイズで読み込まれる
  *	@return		HICON
  *
  *		cx == 0 && cy == 0 のときデフォルトのアイコンサイズで読み込む
@@ -343,8 +343,6 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
  */
 static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
 {
-	HICON hIcon;
-	HRESULT hr;
 	if (cx == 0 && cy == 0) {
 		// 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
 		if (pGetSystemMetricsForDpi != NULL) {
@@ -360,21 +358,10 @@ static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UI
 		cx = cx * dpi / 96;
 		cy = cy * dpi / 96;
 	}
-#if 0 // defined(NTDDI_VISTA) && (NTDDI_VERSION >= NTDDI_VISTA)
-	// LoadIconWithScaleDown() は vistaから
-	hr = LoadIconWithScaleDown(hInst, name, cx, cy, &hIcon);
-	// LoadIconMetric();
-#else
-	hr = E_NOTIMPL;
-#endif
+	HICON hIcon;
+	HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon);
 	if(FAILED(hr)) {
-		int fuLoad = LR_DEFAULTCOLOR;
-		if (IsWindowsNT4()) {
-			// Windows NT 4.0 は 4bit アイコンしかサポートしていない
-			// 16(4bit) color = VGA color
-			fuLoad = LR_VGACOLOR;
-		}
-		hIcon = (HICON)LoadImageW(hinst, name, IMAGE_ICON, cx, cy, fuLoad);
+		hIcon = NULL;
 	}
 	return hIcon;
 }

@@ -63,6 +63,8 @@ HWND (WINAPI *pGetConsoleWindow)(void);
 DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
 static ULONGLONG (WINAPI *pVerSetConditionMask)(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask);
 static BOOL (WINAPI *pVerifyVersionInfoA)(LPOSVERSIONINFOEX lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
+BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
+BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -94,6 +96,9 @@ BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile,
 
 // shell32.dll
 static HRESULT (WINAPI *pSHGetKnownFolderPath)(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
+
+// comctl32.dll
+static HRESULT (WINAPI *pLoadIconWithScaleDown)(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico);
 
 
 class Initializer {
@@ -196,6 +201,8 @@ static const APIInfo Lists_kernel32[] = {
 	{ "GetConsoleWindow", (void **)&pGetConsoleWindow },
 	{ "VerSetConditionMask", (void **)&pVerSetConditionMask },
 	{ "VerifyVersionInfoA", (void **)&pVerifyVersionInfoA },
+	{ "SetDefaultDllDirectories", (void **)&pSetDefaultDllDirectories },
+	{ "SetDllDirectoryA", (void **)&pSetDllDirectoryA },
 	{},
 };
 
@@ -228,6 +235,11 @@ static const APIInfo Lists_shell32[] = {
 	{},
 };
 
+static const APIInfo Lists_comctl32[] = {
+	{ "LoadIconWithScaleDown", (void **)&pLoadIconWithScaleDown },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -239,6 +251,7 @@ static const DllInfo DllInfos[] = {
 	{ L"imagehlp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_imagehlp },
 	{ L"dbghelp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dbghelp },
 	{ L"shell32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
+	{ L"comctl32.dll", DLL_LOAD_LIBRARY_SxS, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{},
 };
 
@@ -254,6 +267,20 @@ static bool IsWindowsNTKernel()
 	else {
 		return true;
 	}
+}
+
+static bool IsWindowsNT4()
+{
+	OSVERSIONINFOA osvi;
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	GetVersionExA(&osvi);
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+		osvi.dwMajorVersion == 4 &&
+		osvi.dwMinorVersion == 0) {
+		// NT4
+		return true;
+	}
+	return false;
 }
 
 void WinCompatInit()
@@ -361,12 +388,12 @@ static BOOL _myVerifyVersionInfo(
 	DWORD dwTypeMask,
 	DWORDLONG dwlConditionMask)
 {
-	OSVERSIONINFO osvi;
+	OSVERSIONINFOA osvi;
 	WORD cond;
 	BOOL ret, check_next;
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+	GetVersionExA(&osvi);
 
 	if (dwTypeMask & VER_BUILDNUMBER) {
 		cond = (WORD)((dwlConditionMask >> (2*3)) & 0x07);
@@ -583,5 +610,30 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 	SHGetPathFromIDListW(pidl, path);
 	CoTaskMemFree(pidl);
 	*ppszPath = _wcsdup(path);
+	return S_OK;
+}
+
+HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico)
+{
+	if (pLoadIconWithScaleDown != NULL) {
+		HRESULT hr = pLoadIconWithScaleDown(hinst, pszName, cx, cy, phico);
+		if (SUCCEEDED(hr)) {
+			return hr;
+		}
+	}
+
+	HICON hIcon;
+	int fuLoad = LR_DEFAULTCOLOR;
+	if (IsWindowsNT4()) {
+		// Windows NT 4.0 は 4bit アイコンしかサポートしていない
+		// 16(4bit) color = VGA color
+		fuLoad = LR_VGACOLOR;
+	}
+	hIcon = (HICON)LoadImageW(hinst, pszName, IMAGE_ICON, cx, cy, fuLoad);
+	if (hIcon == NULL) {
+		*phico = NULL;
+		return E_NOTIMPL;
+	}
+	*phico = hIcon;
 	return S_OK;
 }

@@ -33,11 +33,14 @@
 #endif
 #include <crtdbg.h>
 
+#include "compat_win.h"
+#include "ttlib.h"	// for IsWindowsXPOrLater()
+
 #include "dllutil.h"
 
 typedef struct {
 	const wchar_t *fname;
-	DLLLoadFlag LoadFlag;
+	BOOL NeedFreeLibrary;
 	HMODULE handle;
 	int refCount;
 } HandleList_t;
@@ -47,67 +50,86 @@ static int HandleListCount;
 
 static HMODULE GetHandle(const wchar_t *fname, DLLLoadFlag LoadFlag)
 {
-	wchar_t dllPath[MAX_PATH];
 	HMODULE module;
-	int i;
 	HandleList_t *p;
-	int r;
 
+	// 以前にロードした?
+	if (LoadFlag != DLL_GET_MODULE_HANDLE) {
+		p = HandleList;
+		for (int i = 0; i < HandleListCount; i++) {
+			if (wcscmp(p->fname, fname) == 0) {
+				p->refCount++;
+				return p->handle;
+			}
+			p++;
+		}
+	}
+
+	// モジュールがロード済みならハンドルが取得できる
+	// exeをロードしたときにdllがロードされていれば、ハンドルが返ってくる
+	module = GetModuleHandleW(fname);
 	if (LoadFlag == DLL_GET_MODULE_HANDLE) {
-		module = GetModuleHandleW(fname);
-		assert(module != NULL);
+		// module == NULL でも return する
 		return module;
 	}
 
-	// 以前にロードした?
-	p = HandleList;
-	for (i = 0; i < HandleListCount; i++) {
-		if (wcscmp(p->fname, fname) == 0) {
-			p->refCount++;
-			return p->handle;
-		}
-		p++;
-	}
-
-	// 新たにロードする
-	dllPath[0] = 0;
-	switch (LoadFlag) {
-	case DLL_LOAD_LIBRARY_SYSTEM:
-		r = GetSystemDirectoryW(dllPath, _countof(dllPath));
-		assert(r != 0);
-		if (r == 0) return NULL;
-		break;
-	case DLL_LOAD_LIBRARY_CURRENT:
-		r = GetModuleFileNameW(NULL, dllPath, _countof(dllPath));
-		assert(r != 0);
-		if (r == 0) return NULL;
-		*wcsrchr(dllPath, L'\\') = 0;
-		break;
-	default:
-		return NULL;
-	}
-	wcscat_s(dllPath, _countof(dllPath), L"\\");
-	wcscat_s(dllPath, _countof(dllPath), fname);
-	module = LoadLibraryW(dllPath);
+	BOOL NeedFreeLibrary = FALSE;
 	if (module == NULL) {
-		// 存在しない,dllじゃない?
-		return NULL;
+		// 新たにロードする
+		int r;
+		wchar_t dllPath[MAX_PATH];
+		dllPath[0] = 0;
+		switch (LoadFlag) {
+		case DLL_LOAD_LIBRARY_SxS:
+			if (IsWindowsXPOrLater()) {
+				// Side by Side ローディングを利用するためフルパスにしない
+				;
+			} else {
+				// dllインジェクション対策でフルパスでロード
+				r = GetSystemDirectoryW(dllPath, _countof(dllPath));
+				assert(r != 0);
+				if (r == 0) return NULL;
+				wcscat_s(dllPath, _countof(dllPath), L"\\");
+			}
+			break;
+		case DLL_LOAD_LIBRARY_SYSTEM:
+			r = GetSystemDirectoryW(dllPath, _countof(dllPath));
+			assert(r != 0);
+			if (r == 0) return NULL;
+			wcscat_s(dllPath, _countof(dllPath), L"\\");
+			break;
+		case DLL_LOAD_LIBRARY_CURRENT:
+			r = GetModuleFileNameW(NULL, dllPath, _countof(dllPath));
+			assert(r != 0);
+			if (r == 0) return NULL;
+			*(wcsrchr(dllPath, L'\\') + 1) = 0;
+			break;
+		default:
+			return NULL;
+		}
+		wcscat_s(dllPath, _countof(dllPath), fname);
+		module = LoadLibraryW(dllPath);
+		if (module == NULL) {
+			// 存在しない,dllじゃない?
+			return NULL;
+		}
+		NeedFreeLibrary = TRUE;
 	}
 
 	// リストに追加
-	HandleListCount++;
-	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t)*HandleListCount);
-	p = &HandleList[i];
+	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t) * (HandleListCount + 1));
+	p = &HandleList[HandleListCount];
 	p->fname = _wcsdup(fname);
 	p->handle = module;
-	p->LoadFlag = LoadFlag;
+	p->NeedFreeLibrary = NeedFreeLibrary;
 	p->refCount = 1;
+	HandleListCount++;
 	return module;
 }
 
 static void DLLFree(HandleList_t *p)
 {
-	if (p->LoadFlag != DLL_GET_MODULE_HANDLE) {
+	if (p->NeedFreeLibrary) {
 		FreeLibrary(p->handle);
 	}
 	free((void *)p->fname);
@@ -281,10 +303,6 @@ static void SetupLoadLibraryPath(void)
 	BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR);
 	const wchar_t *kernel32 = L"kernel32.dll";
 
-#if !defined(LOAD_LIBRARY_SEARCH_SYSTEM32)
-#define LOAD_LIBRARY_SEARCH_SYSTEM32        0x00000800
-#endif
-
 	// SetDefaultDllDirectories() が使える場合は、
 	// 検索パスを %WINDOWS%\system32 のみに設定する
 	DLLGetApiAddress(kernel32, DLL_GET_MODULE_HANDLE,
@@ -317,11 +335,10 @@ void DLLInit()
 
 void DLLExit()
 {
-	int i;
 	if (HandleListCount == 0) {
 		return;		// 未使用
 	}
-	for (i = 0; i < HandleListCount; i++) {
+	for (int i = 0; i < HandleListCount; i++) {
 		HandleList_t *p = &HandleList[i];
 		DLLFree(p);
 	}

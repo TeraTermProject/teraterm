@@ -33,7 +33,8 @@ extern "C" {
 typedef enum {
 	DLL_GET_MODULE_HANDLE,		// GetModuleHandleW() APIを使用する
 	DLL_LOAD_LIBRARY_SYSTEM,	// system ディレクトリから LoadLiberaryW() APIでロード
-	DLL_LOAD_LIBRARY_CURRENT,	// カレントディレクトリから LoadLiberaryW() APIでロード
+	DLL_LOAD_LIBRARY_CURRENT,	// exe,dllと同一ディレクトリから LoadLiberaryW() APIでロード
+	DLL_LOAD_LIBRARY_SxS,		// Side by Side
 } DLLLoadFlag;
 
 typedef enum {

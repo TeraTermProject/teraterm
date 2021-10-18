@@ -153,6 +153,8 @@ extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 extern HWND (WINAPI *pGetConsoleWindow)(void);
 ULONGLONG _VerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask);
 BOOL _VerifyVersionInfoA(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
+extern BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
+extern BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 
 // htmlhelp.dll (hhctrl.ocx)
 HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
@@ -185,6 +187,10 @@ typedef enum
 
 #endif
 HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
+
+// comctl32.dll
+HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico);
+
 
 void WinCompatInit();
 
