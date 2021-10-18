@@ -54,6 +54,7 @@
 #include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "compat_win.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 

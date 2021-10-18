@@ -11,7 +11,7 @@
 
 #include <YCL/String.h>
 #include <YCL/StringBuffer.h>
-#include <YCL/wStringBuffer.h>
+#include <YCL/WStringBuffer.h>
 
 namespace yebisuya {
 
