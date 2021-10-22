@@ -83,7 +83,7 @@ void PASCAL TTXEnd(void);
 
 /* This function is called when a new Tera Term is being started with certain
    settings and the extension may wish to add some options to the command line */
-void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec);
+void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec);
 #ifdef __cplusplus
 }
 #endif

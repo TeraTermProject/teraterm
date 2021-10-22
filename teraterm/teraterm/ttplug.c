@@ -374,12 +374,13 @@ void PASCAL TTXEnd(void)
 	UnloadExtensions();
 }
 
-void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
-  int i;
+void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
+{
+	int i;
 
-  for (i = 0; i < NumExtensions; i++) {
-    if (Extensions[i].exports->TTXSetCommandLine != NULL) {
-      Extensions[i].exports->TTXSetCommandLine(cmd, cmdlen, rec);
-    }
-  }
+	for (i = 0; i < NumExtensions; i++) {
+		if (Extensions[i].exports->TTXSetCommandLine != NULL) {
+			Extensions[i].exports->TTXSetCommandLine(cmd, cmdlen, rec);
+		}
+	}
 }
