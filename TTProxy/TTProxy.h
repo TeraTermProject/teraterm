@@ -287,13 +287,16 @@ private:
 		}
 	}
 
-	static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
-		String url = ProxyWSockHook::generateURL();
+	static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec) {
+		String urlA = ProxyWSockHook::generateURL();
+		wchar_t *urlW = ToWcharA(urlA);
+		WString url = urlW;
+		free(urlW);
 		if (url != NULL) {
-			if (strlen(cmd) + 8 + url.length() >= (unsigned) cmdlen)
+			if (wcslen(cmd) + 8 + url.length() >= (unsigned) cmdlen)
 				return;
-			strcat_s(cmd, cmdlen, " -proxy=");
-			strcat_s(cmd, cmdlen, url);
+			wcscat_s(cmd, cmdlen, L" -proxy=");
+			wcscat_s(cmd, cmdlen, url);
 		}
 	}
 
