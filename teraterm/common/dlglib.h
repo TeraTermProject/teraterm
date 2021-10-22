@@ -95,6 +95,7 @@ void ExpandCBWidth(HWND dlg, int ID);
 wchar_t *GetCommonDialogFilterWW(const char *user_filter_mask, const wchar_t *UILanguageFile);
 wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile);
 void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy);
+void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW);
 
 #ifdef __cplusplus
 }

@@ -1046,21 +1046,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			)
 			GetHNRec->PortType = IdTCPIP;
 
-		{
-			i = 1;
-			do {
-				wchar_t EntNameW[128];
-				wchar_t *TempHostW;
-				_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
-				hGetPrivateProfileStringW(L"Hosts", EntNameW, L"", GetHNRec->SetupFNW, &TempHostW);
-				if (TempHostW[0] != 0) {
-					SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING,
-										0, (LPARAM) TempHostW);
-				}
-				free(TempHostW);
-				i++;
-			} while (i <= MAXHOSTLIST);
-		}
+		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
 
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
 		                   HostNameMaxLength - 1, 0);

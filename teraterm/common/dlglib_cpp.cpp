@@ -42,6 +42,7 @@
 #include "codeconv.h"
 #include "asprintf.h"
 #include "compat_win.h"
+#include "win32helper.h"
 
 /**
  *	EndDialog() 互換関数
@@ -452,4 +453,24 @@ void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 
 	data->prev_proc = (WNDPROC)SetWindowLongPtrW(hwnd, GWLP_WNDPROC, (LONG_PTR)IconProc);
 	SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)data);
+}
+
+/**
+ *	接続したホスト履歴をコンボボックスにセットする
+ */
+void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
+{
+	int i = 1;
+	do {
+		wchar_t EntNameW[128];
+		wchar_t *TempHostW;
+		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
+		hGetPrivateProfileStringW(L"Hosts", EntNameW, L"", SetupFNW, &TempHostW);
+		if (TempHostW[0] != 0) {
+			SendDlgItemMessageW(dlg, dlg_item, CB_ADDSTRING,
+								0, (LPARAM) TempHostW);
+		}
+		free(TempHostW);
+		i++;
+	} while (i <= maxhostlist);
 }

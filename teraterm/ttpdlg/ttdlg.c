@@ -1848,7 +1848,6 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 	};
 	PGetHNRec GetHNRec;
 	char EntName[128];
-	char TempHost[HostNameMaxLength+1];
 	WORD i, j, w;
 	BOOL Ok;
 	WORD ComPortTable[MAXCOMPORT];
@@ -1869,17 +1868,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				GetHNRec->PortType = IdTCPIP;
 			}
 
-			i = 1;
-			do {
-				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-				GetPrivateProfileString("Hosts",EntName,"",
-				                        TempHost,sizeof(TempHost),GetHNRec->SetupFN);
-				if ( strlen(TempHost) > 0 ) {
-					SendDlgItemMessage(Dialog, IDC_HOSTNAME, CB_ADDSTRING,
-					                   0, (LPARAM)TempHost);
-				}
-				i++;
-			} while (i <= MAXHOSTLIST);
+			SetComboBoxHostHistory(Dialog, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
+			ExpandCBWidth(Dialog, IDC_HOSTNAME);
 
 			SendDlgItemMessage(Dialog, IDC_HOSTNAME, EM_LIMITTEXT,
 			                   HostNameMaxLength-1, 0);
