@@ -299,8 +299,6 @@ void DLLGetApiAddressFromLists(const DllInfo *dllInfos)
 
 static void SetupLoadLibraryPath(void)
 {
-	BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD);
-	BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR);
 	const wchar_t *kernel32 = L"kernel32.dll";
 
 	// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍA

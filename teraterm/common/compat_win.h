@@ -156,6 +156,10 @@ BOOL _VerifyVersionInfoA(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMa
 extern BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 extern BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 
+#if !defined(LOAD_LIBRARY_SEARCH_SYSTEM32)
+#define LOAD_LIBRARY_SEARCH_SYSTEM32        0x00000800
+#endif
+
 // htmlhelp.dll (hhctrl.ocx)
 HWND _HtmlHelpW(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
