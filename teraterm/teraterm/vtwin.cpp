@@ -3506,6 +3506,14 @@ DWORD TTWinExecA(const char *commandA)
 	return e;
 }
 
+/**
+ *	新しい接続
+ *
+ *	TODO
+ *		次の変数がコマンドライン長の上限の一因となっている
+ *		- hostname[HostNameMaxLength] (ホスト名、コマンドライン)
+ *		- command[MAXPATHLEN + HostNameMaxLength]
+ */
 void CVTWindow::OnFileNewConnection()
 {
 	if (Connecting) return;
@@ -3526,20 +3534,11 @@ void CVTWindow::OnFileNewConnection()
 	GetHNRec.MaxComPort = ts.MaxComPort;
 	GetHNRec.HostName = hostname;
 
-	HelpId = HlpFileNewConnection;
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
 	BOOL r = (*GetHostName)(HVTWin,&GetHNRec);
 
 	if (r) {
-		char Command[MAXPATHLEN + HostNameMaxLength];
-		char Command2[MAXPATHLEN + HostNameMaxLength];
-
-		strncpy_s(Command, _countof(Command), "ttermpro ", _TRUNCATE);
-		char *hostnameA = ToCharW(hostname);
-		strncat_s(Command, _countof(Command), hostnameA, _TRUNCATE);
-		free(hostnameA);
-
 		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 			if (ts.HistoryList) {
 				(*AddHostToList)(ts.SetupFNameW, hostname);
@@ -3552,6 +3551,7 @@ void CVTWindow::OnFileNewConnection()
 			FreeTTSET();
 		}
 
+		static const wchar_t *ttermpro = L"ttermpro";
 		if (! cv.Ready) {
 			ts.PortType = GetHNRec.PortType;
 			ts.Telnet = GetHNRec.Telnet;
@@ -3560,10 +3560,12 @@ void CVTWindow::OnFileNewConnection()
 			ts.ComPort = GetHNRec.ComPort;
 
 			if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
-				wchar_t *commandW = ToWcharA(Command);
-				(*ParseParam)(commandW, &ts, NULL);
+				wchar_t command[MAXPATHLEN + HostNameMaxLength];
+				wcsncpy_s(command, _countof(command), ttermpro, _TRUNCATE);
+				wcsncat_s(command, _countof(command), L" ", _TRUNCATE);
+				wcsncat_s(command, _countof(command), hostname, _TRUNCATE);
+				(*ParseParam)(command, &ts, NULL);
 				FreeTTSET();
-				free(commandW);
 			}
 			SetKeyMap();
 			if (ts.MacroFN[0]!=0) {
@@ -3578,39 +3580,38 @@ void CVTWindow::OnFileNewConnection()
 			ResetSetup();
 		}
 		else {
+			wchar_t Command[MAXPATHLEN + HostNameMaxLength];
+
 			if (GetHNRec.PortType==IdSerial) {
-				char comport[5];
-				Command[8] = 0;
-				strncat_s(Command,sizeof(Command)," /C=",_TRUNCATE);
-				_snprintf_s(comport, sizeof(comport), _TRUNCATE, "%d", GetHNRec.ComPort);
-				strncat_s(Command,sizeof(Command),comport,_TRUNCATE);
+				_snwprintf_s(Command, _countof(Command), _TRUNCATE, L"%s /C=%d", ttermpro, GetHNRec.ComPort);
 			}
 			else {
-				char tcpport[6];
-				DeleteComment(Command2, sizeof(Command2), &Command[9]);
-				Command[9] = 0;
+				wcsncpy_s(Command, _countof(Command), ttermpro, _TRUNCATE);
+				wcsncat_s(Command, _countof(Command), L" ", _TRUNCATE);
 				if (GetHNRec.Telnet==0)
-					strncat_s(Command,sizeof(Command)," /T=0",_TRUNCATE);
+					wcsncat_s(Command,_countof(Command), L" /T=0",_TRUNCATE);
 				else
-					strncat_s(Command,sizeof(Command)," /T=1",_TRUNCATE);
+					wcsncat_s(Command,_countof(Command), L" /T=1",_TRUNCATE);
 				if (GetHNRec.TCPPort != 0) {
-					strncat_s(Command,sizeof(Command)," /P=",_TRUNCATE);
-					_snprintf_s(tcpport, sizeof(tcpport), _TRUNCATE, "%d", GetHNRec.TCPPort);
-					strncat_s(Command,sizeof(Command),tcpport,_TRUNCATE);
+					wchar_t tcpport[16];
+					_snwprintf_s(tcpport, _countof(tcpport), _TRUNCATE, L" /P=%d", GetHNRec.TCPPort);
+					wcsncat_s(Command,_countof(Command),tcpport,_TRUNCATE);
 				}
 				/********************************/
 				/* ここにプロトコル処理を入れる */
 				/********************************/
 				if (GetHNRec.ProtocolFamily == AF_INET) {
-					strncat_s(Command,sizeof(Command)," /4",_TRUNCATE);
+					wcsncat_s(Command,_countof(Command), L" /4",_TRUNCATE);
 				} else if (GetHNRec.ProtocolFamily == AF_INET6) {
-					strncat_s(Command,sizeof(Command)," /6",_TRUNCATE);
+					wcsncat_s(Command,_countof(Command), L" /6",_TRUNCATE);
 				}
-				strncat_s(Command,sizeof(Command)," ",_TRUNCATE);
-				strncat_s(Command,sizeof(Command),Command2,_TRUNCATE);
+				wchar_t *hostname_nocomment = DeleteCommentW(hostname);
+				wcsncat_s(Command,_countof(Command), L" ", _TRUNCATE);
+				wcsncat_s(Command,_countof(Command), hostname_nocomment, _TRUNCATE);
+				free(hostname_nocomment);
 			}
-			TTXSetCommandLine(Command, sizeof(Command), &GetHNRec); /* TTPLUG */
-			WinExec(Command,SW_SHOW);
+			TTXSetCommandLine(Command, _countof(Command), &GetHNRec); /* TTPLUG */
+			TTWinExec(Command);
 		}
 	}
 	else {/* canceled */
@@ -3625,10 +3626,8 @@ void CVTWindow::OnFileNewConnection()
 // (2004.12.6 yutaka)
 void CVTWindow::OnDuplicateSession()
 {
-	char Command[1024];
+	wchar_t Command[1024];
 	const char *exec = "ttermpro";
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
 	char cygterm_cfg[MAX_PATH];
 	FILE *fp;
 	char buf[256], *head, *body;
@@ -3675,18 +3674,18 @@ void CVTWindow::OnDuplicateSession()
 		OnCygwinConnection();
 		return;
 	} else if (cv.TelFlag) { // telnet
-		_snprintf_s(Command, sizeof(Command), _TRUNCATE,
-		            "%s %s:%d /DUPLICATE /nossh",
-		            exec, ts.HostName, ts.TCPPort);
+		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
+					 L"%hs %hs:%d /DUPLICATE /nossh",
+					 exec, ts.HostName, ts.TCPPort);
 
 	} else if (cv.isSSH) { // SSH
 		// ここの処理は TTSSH 側にやらせるべき (2004.12.7 yutaka)
 		// TTSSH側でのオプション生成を追加。(2005.4.8 yutaka)
-		_snprintf_s(Command, sizeof(Command), _TRUNCATE,
-		            "%s %s:%d /DUPLICATE",
-		            exec, ts.HostName, ts.TCPPort);
+		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
+					 L"%hs %hs:%d /DUPLICATE",
+					 exec, ts.HostName, ts.TCPPort);
 
-		TTXSetCommandLine(Command, sizeof(Command), NULL); /* TTPLUG */
+		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
 
 	} else {
 		// telnet/ssh/cygwin接続以外では複製を行わない。
@@ -3697,26 +3696,19 @@ void CVTWindow::OnDuplicateSession()
 	// cf. http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682
 	// (2011.3.27 yutaka)
 	if (strlen(ts.KeyCnfFN) > 0) {
-		strncat_s(Command, sizeof(Command), " /K=", _TRUNCATE);
-		strncat_s(Command, sizeof(Command), ts.KeyCnfFN, _TRUNCATE);
+		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
+		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
+	DWORD e = TTWinExec(Command);
+	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
 	}
 }
 
@@ -3744,8 +3736,6 @@ void CVTWindow::OnCygwinConnection()
 	size_t envbufflen;
 	const char *exename = "cygterm.exe";
 	char cygterm[MAX_PATH];
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
 
 	if (strlen(ts.CygwinDirectory) > 0) {
 		if (SearchPath(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
@@ -3815,16 +3805,12 @@ found_dll:;
 	}
 
 found_path:;
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-
 	strncpy_s(cygterm, sizeof(cygterm), ts.HomeDir, _TRUNCATE);
 	AppendSlash(cygterm, sizeof(cygterm));
 	strncat_s(cygterm, sizeof(cygterm), exename, _TRUNCATE);
 
-	if (CreateProcess(NULL, cygterm, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
+	DWORD e = TTWinExecA(cygterm);
+	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -3832,9 +3818,6 @@ found_path:;
 			MB_OK | MB_ICONWARNING
 		};
 		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
 	}
 }
 
