@@ -36,338 +36,51 @@ Languageに "Japanese" と "Korean" のいずれかを選んだ場合、次に「Setup[全般]」
 送信および受信コードに UTF-8 を設定することができます。
 </p>
 
+<h1>内部構造</h1>
+
 <p>
-現状のTera Termは内部設計がUnicode対応になっておらず、
-以下に示すように文字コードは二段変換になっています。
+  Tera Term 4 は内部バッファの文字コードはDBCSでした。、例えば日本語ではShift JISでした。
+</p>
+
+<p>
+  Tera Term 5 は内部バッファの文字コードは、Unicodeです。
+</p>
+
+<p>
+  大まかなデータの流れは次のようになっています。
 </p>
 
 <pre>
-UTF-8 &lt;-----&gt; Unicode(UTF-16LE) &lt;-----&gt; MBCS
-        (1)                       (2)
+                                                                              +--------------+
+                              +------------------------+ Code:Unicode         |              |
+                              |                        +--------------------->+  Window      |
+                              |  buffer@buffer.c       |                      |   Display    |
+                              |   Code:Unicode         | Code:                |   Print      |
+                              |                        |  Input to Unicode    |              |
+                              |                        +<------------------+  +--------------+
+                              +------------------------+                   |
+                                                                           |
+                              +------------------------+   CommRead1Byte() |
+                              |                        +-------------------+
+                              |  Input buffer@ttpcmn   |
++-----------+                 |   Code:Input           | Code:
+|           |                 |                        |  Unicode to Input    +--------------+
+|  Socket   +---------------->+                        +<---------------------+              |
+|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |
+|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |
+|  Plugin   |                 +------------------------+                      |   SendMem    |
+|           +<----------------+                        | Code:                |    File      |
++-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |
+                              |   Code:Output          +<---------------------+              |
+                              |                        |  CommTextOutW()      +--------------+
+                              |                        |  CommBinaryOut()
+                              +------------------------+  CommRawOut()
 </pre>
 
 <p>
-(1)において、4.102から 4byte UTF-8 に対応したため、UTF-8のデコード時に
-Unicode の情報が欠落することはなくなりました。<br>
-漢字コード(受信) に UTF-8m が選択されていると結合文字(combining
-character)の処理が一部が行われます。Mac OS X(HFS+)を考慮したものとなっ
-ています。<br>
-
-(2)において、UnicodeとMBCS(Multiple Byte Character Set)の相互変換を行うために、
-ロケール(言語指定)を正しく設定する必要があります。
+  Windows 9xのとき、キー入力は Unicode に変換してから処理を行います。
+  描画は UnicodeをShift JISに変換して描画します。
 </p>
-
-<p>
-Unicodeによるローカライズ言語を扱えるようにするためには、teraterm.iniファイルにロケールの設定が必要となります。下記にサンプルを示します。
-</p>
-
-<pre>
-; Locale for Unicode
-Locale = japanese
-</pre>
-
-<p>
-この設定は、"Terminal setup[端末の設定]" ダイアログの 「Locale[ロケール]」でも設定できます。
-</p>
-
-<p>
-ロケールに設定できる内容については、下記のサイトを参照してください。
-</p>
-<ul>
-  <li><a href="http://msdn.microsoft.com/en-us/library/39cwe7zf.aspx">Language Strings</a></li>
-</ul>
-
-<h4>設定例: WindowsXP 簡体字中国語</h4>
-
-<ul>
- <li>Setup -&gt; Terminal で locale=chs に設定する </li>
- <li>Setup -&gt; Font で フォント名=NSimSun, 文字セット=CHINESE_GB2312, サイズ=9 に設定する。 </li>
-</ul>
-
-
-
-<h4>設定例: WindowsXP 米国</h4>
-<pre>
-; Locale for Unicode
-Locale = american
-</pre>
-
-<p>
-また、MBCSを表示する為にフォントを正しく設定する必要があります。<br>
-「Setup[設定]」メニューの「Font[フォント]」で、"フォント"に使用する言語の文字が
-扱えるフォントを、"文字セット" に使用する言語の文字セットを指定してください。<br>
-
-ロケールおよびフォントが正しく設定されていれば、英語版Windowsで日本語を表示したり、
-日本語版Windowsで韓国語を表示したりする事も可能です。<br>
-ただし多言語対応していないので、一つのTera Termウィンドウで日本語と韓国語を同時に
-表示したりする事は出来ません。
-</p>
-
-
-<h3>※注意: Mac OS X</h3>
-<p>
-"UTF-8m" はMac OS X(HFS+)向けのエンコーディング指定です。受信のみのサポートです。<br>
-「/KR」コマンドラインでは"UTF8m"を指定することができます。
-</p>
-
-<h3 name="locale" id="locale">参考: Language Strings for Locale</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Primary language</th>
-      <th>Sublanguage</th>
-      <th>Language string</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr>
-      <td>Chinese</td>
-      <td>Chinese</td>
-      <td>"chinese"</td>
-    </tr>
-
-    <tr>
-      <td>Chinese</td>
-      <td>Chinese (simplified)</td>
-      <td>"chinese-simplified" or "chs"</td>
-    </tr>
-
-    <tr>
-      <td>Chinese</td>
-      <td>Chinese (traditional)</td>
-      <td>"chinese-traditional" or "cht"</td>
-    </tr>
-
-    <tr>
-      <td>Czech</td>
-      <td>Czech</td>
-      <td>"csy" or "czech"</td>
-    </tr>
-
-    <tr>
-      <td>Danish</td>
-      <td>Danish</td>
-      <td>"dan" or "danish"</td>
-    </tr>
-
-    <tr>
-      <td>Dutch</td>
-      <td>Dutch (default)</td>
-      <td>"dutch" or "nld"</td>
-    </tr>
-
-    <tr>
-      <td>Dutch</td>
-      <td>Dutch (Belgium)</td>
-      <td>"belgian", "dutch-belgian", or "nlb"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (default)</td>
-      <td>"english"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (Australia)</td>
-      <td>"australian", "ena", or "english-aus"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (Canada)</td>
-      <td>"canadian", "enc", or "english-can"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (New Zealand)</td>
-      <td>"english-nz" or "enz"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (United Kingdom)</td>
-      <td>"eng", "english-uk", or "uk"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (United States)</td>
-      <td>"american", "american english", "american-english", "english-american", "english-us", "english-usa", "enu", "us", or "usa"</td>
-    </tr>
-
-    <tr>
-      <td>Finnish</td>
-      <td>Finnish</td>
-      <td>"fin" or "finnish"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (default)</td>
-      <td>"fra" or "french"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (Belgium)</td>
-      <td>"frb" or "french-belgian"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (Canada)</td>
-      <td>"frc" or "french-canadian"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (Switzerland)</td>
-      <td>"french-swiss" or "frs"</td>
-    </tr>
-
-    <tr>
-      <td>German</td>
-      <td>German (default)</td>
-      <td>"deu" or "german"</td>
-    </tr>
-
-    <tr>
-      <td>German</td>
-      <td>German (Austria)</td>
-      <td>"dea" or "german-austrian"</td>
-    </tr>
-
-    <tr>
-      <td>German</td>
-      <td>German (Switzerland)</td>
-      <td>"des", "german-swiss", or "swiss"</td>
-    </tr>
-
-    <tr>
-      <td>Greek</td>
-      <td>Greek</td>
-      <td>"ell" or "greek"</td>
-    </tr>
-
-    <tr>
-      <td>Hungarian</td>
-      <td>Hungarian</td>
-      <td>"hun" or "hungarian"</td>
-    </tr>
-
-    <tr>
-      <td>Icelandic</td>
-      <td>Icelandic</td>
-      <td>"icelandic" or "isl"</td>
-    </tr>
-
-    <tr>
-      <td>Italian</td>
-      <td>Italian (default)</td>
-      <td>"ita" or "italian"</td>
-    </tr>
-
-    <tr>
-      <td>Italian</td>
-      <td>Italian (Switzerland)</td>
-      <td>"italian-swiss" or "its"</td>
-    </tr>
-
-    <tr>
-      <td>Japanese</td>
-      <td>Japanese</td>
-      <td>"japanese" or "jpn"</td>
-    </tr>
-
-    <tr>
-      <td>Korean</td>
-      <td>Korean</td>
-      <td>"kor" or "korean"</td>
-    </tr>
-
-    <tr>
-      <td>Norwegian</td>
-      <td>Norwegian (default)</td>
-      <td>"norwegian"</td>
-    </tr>
-
-    <tr>
-      <td>Norwegian</td>
-      <td>Norwegian (Bokmal)</td>
-      <td>"nor" or "norwegian-bokmal"</td>
-    </tr>
-
-    <tr>
-      <td>Norwegian</td>
-      <td>Norwegian (Nynorsk)</td>
-      <td>"non" or "norwegian-nynorsk"</td>
-    </tr>
-
-    <tr>
-      <td>Polish</td>
-      <td>Polish</td>
-      <td>"plk" or "polish"</td>
-    </tr>
-
-    <tr>
-      <td>Portuguese</td>
-      <td>Portuguese (default)</td>
-      <td>"portuguese" or "ptg"</td>
-    </tr>
-
-    <tr>
-      <td>Portuguese</td>
-      <td>Portuguese (Brazil)</td>
-      <td>"portuguese-brazilian" or "ptb"</td>
-    </tr>
-
-    <tr>
-      <td>Russian</td>
-      <td>Russian (default)</td>
-      <td>"rus" or "russian"</td>
-    </tr>
-
-    <tr>
-      <td>Slovak</td>
-      <td>Slovak</td>
-      <td>"sky" or "slovak"</td>
-    </tr>
-
-    <tr>
-      <td>Spanish</td>
-      <td>Spanish (default)</td>
-      <td>"esp" or "spanish"</td>
-    </tr>
-
-    <tr>
-      <td>Spanish</td>
-      <td>Spanish (Mexico)</td>
-      <td>"esm" or "spanish-mexican"</td>
-    </tr>
-
-    <tr>
-      <td>Spanish</td>
-      <td>Spanish (Modern)</td>
-      <td>"esn" or "spanish-modern"</td>
-    </tr>
-
-    <tr>
-      <td>Swedish</td>
-      <td>Swedish</td>
-      <td>"sve" or "swedish"</td>
-    </tr>
-
-    <tr>
-      <td>Turkish</td>
-      <td>Turkish</td>
-      <td>"trk" or "turkish"</td>
-    </tr>
-  </tbody>
-</table>
 
 </BODY>
 </HTML>
