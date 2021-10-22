@@ -139,6 +139,7 @@ DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);
 DllExport wchar_t * PASCAL GetParam(wchar_t *buff, size_t size, wchar_t *param);
 DllExport void PASCAL DequoteParam(wchar_t *dest, size_t dest_len, wchar_t *src);
 void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
+wchar_t *DeleteCommentW(const wchar_t *src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
 BOOL GetPositionOnWindow(
