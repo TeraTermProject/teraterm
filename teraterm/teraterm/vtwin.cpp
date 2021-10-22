@@ -3467,6 +3467,45 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+/**
+ *	プログラムを実行する
+ *
+ *	@param[in]	command		実行するコマンドライン
+ *							CreateProcess() にそのまま渡される
+ * 	@retval		NO_ERROR	エラーなし
+ *	@retval		エラーコード	(NO_ERROR以外)
+ *
+ *	シンプルにプログラムを起動するだけの関数
+ *		CreateProcess() は CloseHandle() を忘れてハンドルリークを起こしやすい
+ *		単純なプログラム実行ではこの関数を使用すると安全
+ */
+DWORD TTWinExec(const wchar_t *command)
+{
+	STARTUPINFOW si = {};
+	PROCESS_INFORMATION pi = {};
+
+	GetStartupInfoW(&si);
+
+	BOOL r = CreateProcessW(NULL, (LPWSTR)command, NULL, NULL, FALSE, 0,
+							NULL, NULL, &si, &pi);
+	if (r == 0) {
+		// error
+		return GetLastError();
+	}
+
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+	return NO_ERROR;
+}
+
+DWORD TTWinExecA(const char *commandA)
+{
+	wchar_t *commandW = ToWcharA(commandA);
+	DWORD e = TTWinExec(commandW);
+	free(commandW);
+	return e;
+}
+
 void CVTWindow::OnFileNewConnection()
 {
 	if (Connecting) return;
