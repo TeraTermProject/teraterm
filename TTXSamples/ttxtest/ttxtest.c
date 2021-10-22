@@ -290,7 +290,7 @@ static void PASCAL TTXEnd(void) {
 
 /*
 */
-static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
+static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec) {
   printf("TTXSetCommandLine %d\n", ORDER);
 }
 
