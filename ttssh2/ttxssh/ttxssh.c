@@ -2216,7 +2216,6 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	HWND hostkeyControl = GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST);
 	HWND macControl = GetDlgItem(dlg, IDC_SSHMAC_LIST);
 	HWND compControl = GetDlgItem(dlg, IDC_SSHCOMP_LIST);
-	HWND hostkeyRotationControl = GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_STATIC);
 	HWND hostkeyRotationControlList = GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_COMBO);
 	int i;
 	int ch;
@@ -4652,17 +4651,16 @@ static void dquote_string(char *str, char *dst, int dst_len)
 	strncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen,
-                                         PGetHNRec rec)
+static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 {
-	char tmpFile[MAX_PATH];
-	char tmpPath[1024];
-	char *buf;
-	char *p;
+	wchar_t tmpFile[MAX_PATH];
+	wchar_t tmpPath[1024];
+	wchar_t *buf;
+	wchar_t *p;
 	int i;
 
-	GetTempPath(sizeof(tmpPath), tmpPath);
-	GetTempFileName(tmpPath, "TTX", 0, tmpFile);
+	GetTempPathW(_countof(tmpPath), tmpPath);
+	GetTempFileNameW(tmpPath, L"TTX", 0, tmpFile);
 
 	for (i = 0; cmd[i] != ' ' && cmd[i] != 0; i++) {
 	}
@@ -4670,24 +4668,21 @@ static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen,
 	if (i < cmdlen) {
 		int ssh_enable = -1;
 
-		buf = malloc(cmdlen+1);
-		strncpy_s(buf, cmdlen, cmd + i, _TRUNCATE);
+		buf = malloc(sizeof(wchar_t) * (cmdlen+1));
+		wcsncpy_s(buf, cmdlen, cmd + i, _TRUNCATE);
 		buf[cmdlen] = 0;
 		cmd[i] = 0;
 
-		{
-			wchar_t *tmpFileW = ToWcharA(tmpFile);
-			write_ssh_options(pvar, tmpFileW, &pvar->settings, FALSE);
-			free(tmpFileW);
-		}
+		write_ssh_options(pvar, tmpFile, &pvar->settings, FALSE);
 
-		strncat_s(cmd, cmdlen, " /ssh-consume=", _TRUNCATE);
-		strncat_s(cmd, cmdlen, tmpFile, _TRUNCATE);
+		wcsncat_s(cmd, cmdlen, L" /ssh-consume=", _TRUNCATE);
+		wcsncat_s(cmd, cmdlen, tmpFile, _TRUNCATE);
 
-		strncat_s(cmd, cmdlen, buf, _TRUNCATE);
+		wcsncat_s(cmd, cmdlen, buf, _TRUNCATE);
 
 		// コマンドラインでの指定をチェック
-		if (p = strstr(buf, " /ssh")) {
+		p = wcsstr(buf, L" /ssh");
+		if (p != NULL) {
 			switch (*(p + 5)) {
 				case '\0':
 				case ' ':
@@ -4696,8 +4691,8 @@ static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen,
 					ssh_enable = 1;
 			}
 		}
-		else if (strstr(buf, " /nossh") ||
-		         strstr(buf, " /telnet")) {
+		else if (wcsstr(buf, L" /nossh") ||
+		         wcsstr(buf, L" /telnet")) {
 			ssh_enable = 0;
 		}
 
@@ -4705,59 +4700,59 @@ static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen,
 		// 指定されたときは、ラジオボタンの SSH および SSH プロトコルバージョンを
 		// 適用するのをやめる (2007.11.1 maya)
 		if (pvar->hostdlg_Enabled && ssh_enable == -1) {
-			strncat_s(cmd, cmdlen, " /ssh", _TRUNCATE);
+			wcsncat_s(cmd, cmdlen, L" /ssh", _TRUNCATE);
 
 			// add option of SSH protcol version (2004.10.11 yutaka)
 			if (pvar->settings.ssh_protocol_version == 2) {
-				strncat_s(cmd, cmdlen, " /2", _TRUNCATE);
+				wcsncat_s(cmd, cmdlen, L" /2", _TRUNCATE);
 			} else {
-				strncat_s(cmd, cmdlen, " /1", _TRUNCATE);
+				wcsncat_s(cmd, cmdlen, L" /1", _TRUNCATE);
 			}
 
 		}
 
 		// セッション複製の場合は、自動ログイン用パラメータを付ける。(2005.4.8 yutaka)
-		if (strstr(buf, "DUPLICATE")) {
+		if (wcsstr(buf, L"DUPLICATE")) {
 			char mark[MAX_PATH];
-			char tmp[MAX_PATH*2];
+			wchar_t tmp[MAX_PATH*2];
 
 			// 自動ログインの場合は下記フラグが0のため、必要なコマンドを付加する。
 			if (!pvar->hostdlg_Enabled) {
-				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					" /ssh /%d", pvar->settings.ssh_protocol_version);
-				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
+							 L" /ssh /%d", pvar->settings.ssh_protocol_version);
+				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 			}
 
 			// パスワードを覚えている場合のみ、コマンドラインに渡す。(2006.8.3 yutaka)
 			if (pvar->settings.remember_password &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-				            " /auth=password /user=%s /passwd=%s", pvar->auth_state.user, mark);
-				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
+							 L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-				            " /auth=publickey /user=%s /passwd=%s", pvar->auth_state.user, mark);
-				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
+							 L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 				dquote_string(pvar->session_settings.DefaultRSAPrivateKeyFile, mark, sizeof(mark));
-				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, " /keyfile=%s", mark);
-				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L" /keyfile=%hs", mark);
+				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-				            " /auth=challenge /user=%s /passwd=%s", pvar->auth_state.user, mark);
-				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
+							 L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-				            " /auth=pageant /user=%s", pvar->auth_state.user);
-				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
+							 L" /auth=pageant /user=%hs", pvar->auth_state.user);
+				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else {
 				// don't come here

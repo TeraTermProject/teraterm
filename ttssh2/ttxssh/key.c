@@ -335,7 +335,7 @@ int ssh_rsa_verify(RSA *key,
 		memset(sigblob, 0, diff);
 		len = modlen;
 	}
-	
+
 	/* sha1 the data */
 	//	nid = (datafellows & SSH_BUG_RSASIGMD5) ? NID_md5 : NID_sha1;
 	nid = NID_sha1;
@@ -447,7 +447,7 @@ error:
 	return ret;
 }
 
-static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen, 
+static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen,
                               unsigned char *data, unsigned int datalen)
 {
 	buffer_t *b;
@@ -972,7 +972,7 @@ key_fingerprint_randomart(const char *alg, u_char *dgst_raw, u_int dgst_raw_len,
 
 	return retval;
 }
-#undef	FLDBASE	
+#undef	FLDBASE
 #undef	FLDSIZE_Y
 #undef	FLDSIZE_X
 
@@ -1054,7 +1054,7 @@ static void key_add_private(Key *k)
 			break;
 
 		case KEY_ED25519:
-			/* no need to prealloc */	
+			/* no need to prealloc */
 			break;
 
 		case KEY_UNSPEC:
@@ -1159,7 +1159,7 @@ Key *key_new(int type)
 			break;
 
 		case KEY_ED25519:
-			/* no need to prealloc */	
+			/* no need to prealloc */
 			break;
 
 		case KEY_UNSPEC:
@@ -1596,7 +1596,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 		memcpy(*sigptr, buffer_ptr(msg), len);
 		free(sig);
-		
+
 		break;
 	}
 	case KEY_DSA: // DSA
@@ -1717,7 +1717,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 	case KEY_ED25519:
 		ret = ssh_ed25519_sign(keypair, sigptr, siglen, data, datalen);
-		if (ret != 0) 
+		if (ret != 0)
 			goto error;
 		break;
 
@@ -1853,7 +1853,7 @@ void key_private_serialize(Key *key, buffer_t *b)
 	char *s;
 	BIGNUM *e, *n, *d, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
-	
+
 	s = get_ssh2_hostkey_type_name_from_key(key);
 	buffer_put_cstring(b, s);
 
@@ -2025,7 +2025,7 @@ ecdsa_error:
 		case KEY_ED25519:
 			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
 			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
-			if (pklen != ED25519_PK_SZ) 
+			if (pklen != ED25519_PK_SZ)
 				goto error;
 			if (sklen != ED25519_SK_SZ)
 				goto error;
@@ -2040,7 +2040,7 @@ ecdsa_error:
 	switch (k->type) {
 		case KEY_RSA1:
 		case KEY_RSA:
-			if (RSA_blinding_on(k->rsa, NULL) != 1) 
+			if (RSA_blinding_on(k->rsa, NULL) != 1)
 				goto error;
 			break;
 	}
@@ -2261,7 +2261,7 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 	size_t i;
 	int buf_len;
 	struct hostkeys_update_ctx *ctx;
-	
+
 	ctx = pvar->hostkey_ctx;
 
 	if (ctx->nkeys > 0) {
@@ -2322,7 +2322,8 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 	}
 }
 
-static UINT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+//typedef INT_PTR (CALLBACK* DLGPROC)(HWND, UINT, WPARAM, LPARAM);
+static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
 	char buf[1024];
@@ -2341,7 +2342,7 @@ static UINT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPa
 
 		host = pvar->ssh_state.hostname;
 		ctx = pvar->hostkey_ctx;
-		
+
 		GetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
@@ -2408,10 +2409,6 @@ static UINT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPa
 static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 {
 	size_t i;
-	int dlgresult;
-	char *host;
-
-	host = pvar->ssh_state.hostname;
 
 	// "/nosecuritywarning"が指定されている場合、更新は一切行わない。
 	if (pvar->nocheck_known_hosts) {
@@ -2421,6 +2418,7 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 
 	// known_hostsファイルの更新を行うため、ユーザに問い合わせを行う。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
+		INT_PTR dlgresult;
 		HWND cur_active = GetActiveWindow();
 
 		pvar->hostkey_ctx = ctx;
