@@ -457,7 +457,10 @@ void DebugHexDump(void (*f)(const char *s), const void *data_, size_t len)
 
 static void OutputDebugHexDumpSub(const char *s)
 {
-	OutputDebugPrintf("%s\n", s);
+	char *s_cr;
+	asprintf(&s_cr, "%s\n", s);
+	OutputDebugStringA(s_cr);
+	free(s_cr);
 }
 
 void OutputDebugHexDump(const void *data, size_t len)
