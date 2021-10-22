@@ -3469,13 +3469,13 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 
 void CVTWindow::OnFileNewConnection()
 {
-//	char Command[MAXPATHLEN], Command2[MAXPATHLEN];
-	char Command[MAXPATHLEN + HostNameMaxLength], Command2[MAXPATHLEN + HostNameMaxLength]; // yutaka
-	TGetHNRec GetHNRec; /* record for dialog box */
-
 	if (Connecting) return;
+	if (! LoadTTDLG()) {
+		return;
+	}
 
-	HelpId = HlpFileNewConnection;
+	wchar_t hostname[HostNameMaxLength];
+	TGetHNRec GetHNRec; /* record for dialog box */
 	GetHNRec.SetupFN = ts.SetupFName;
 	GetHNRec.SetupFNW = ts.SetupFNameW;
 	GetHNRec.PortType = ts.PortType;
@@ -3485,25 +3485,30 @@ void CVTWindow::OnFileNewConnection()
 	GetHNRec.ProtocolFamily = ts.ProtocolFamily;
 	GetHNRec.ComPort = ts.ComPort;
 	GetHNRec.MaxComPort = ts.MaxComPort;
+	GetHNRec.HostName = hostname;
 
-	strncpy_s(Command, sizeof(Command),"ttermpro ", _TRUNCATE);
-	GetHNRec.HostName = &Command[9];
-
-	if (! LoadTTDLG()) {
-		return;
-	}
-
+	HelpId = HlpFileNewConnection;
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
-	if ((*GetHostName)(HVTWin,&GetHNRec)) {
+	BOOL r = (*GetHostName)(HVTWin,&GetHNRec);
+
+	if (r) {
+		char Command[MAXPATHLEN + HostNameMaxLength];
+		char Command2[MAXPATHLEN + HostNameMaxLength];
+
+		strncpy_s(Command, _countof(Command), "ttermpro ", _TRUNCATE);
+		char *hostnameA = ToCharW(hostname);
+		strncat_s(Command, _countof(Command), hostnameA, _TRUNCATE);
+		free(hostnameA);
+
 		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 			if (ts.HistoryList) {
-				wchar_t *HostNameW = ToWcharA(GetHNRec.HostName);
-				(*AddHostToList)(ts.SetupFNameW, HostNameW);
-				free(HostNameW);
+				(*AddHostToList)(ts.SetupFNameW, hostname);
 			}
 			if (ts.JumpList) {
-				add_session_to_jumplist(GetHNRec.HostName, GetHNRec.SetupFN);
+				char *HostNameA = ToCharW(hostname);
+				add_session_to_jumplist(HostNameA, GetHNRec.SetupFN);
+				free(HostNameA);
 			}
 			FreeTTSET();
 		}

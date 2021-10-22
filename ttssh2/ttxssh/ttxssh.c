@@ -1207,8 +1207,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 						i == 0 ? AF_UNSPEC :
 						i == 1 ? AF_INET6 : AF_INET;
 					GetHNRec->PortType = IdTCPIP;
-					GetDlgItemText(dlg, IDC_HOSTNAME, GetHNRec->HostName,
-					               HostNameMaxLength);
+					GetDlgItemTextW(dlg, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
 					pvar->hostdlg_activated = TRUE;
 					pvar->hostdlg_Enabled = FALSE;
 					if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {

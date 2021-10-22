@@ -475,7 +475,7 @@ static BOOL PASCAL TTXSetupWin(HWND parent, PTTSet ts) {
 
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec GetHNRec) {
 	GetHNRec->PortType = IdTCPIP;
-	_snprintf_s(GetHNRec->HostName, MAXPATHLEN, _TRUNCATE, "/R=\"%s\" /TP", pvar->openfn);
+	_snwprintf_s(GetHNRec->HostName, MAXPATHLEN, _TRUNCATE, L"/R=\"%hs\" /TP", pvar->openfn);
 	return (TRUE);
 }
 

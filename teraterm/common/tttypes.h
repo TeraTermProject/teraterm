@@ -793,7 +793,7 @@ typedef struct {
 	PCHAR SetupFN; // setup file name
 	const wchar_t *SetupFNW;
 	WORD PortType; // TCPIP/Serial
-	PCHAR HostName; // host name
+	wchar_t *HostName; // host name
 	WORD Telnet; // non-zero: enable telnet
 	WORD TelPort; // default TCP port# for telnet
 	WORD TCPPort; // TCP port #

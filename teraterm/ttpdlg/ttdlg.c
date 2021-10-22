@@ -1960,7 +1960,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						char afstr[BUFSIZ];
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
 						if ( GetHNRec->PortType==IdTCPIP ) {
-							GetDlgItemText(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
+							GetDlgItemTextW(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
 						}
 						else {
 							GetHNRec->HostName[0] = 0;
