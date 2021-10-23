@@ -1544,11 +1544,6 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Quick-VAN window size -- special */
 	ts->QVWinSize = GetPrivateProfileInt(Section, "QVWinSize", 8, FName);
 
-	/* Russian character set (print) -- special option */
-	GetPrivateProfileString(Section, "RussPrint", "",
-	                        Temp, sizeof(Temp), FName);
-	ts->RussPrint = str2id(RussList, Temp, IdWindows);
-
 	/* Scroll threshold -- special option */
 	ts->ScrollThreshold =
 		GetPrivateProfileInt(Section, "ScrollThreshold", 12, FName);
@@ -3035,10 +3030,6 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Quick-VAN window size -- special */
 	WriteInt(Section, "QVWinSize", FName, ts->QVWinSize);
-
-	/* Russian character set (print) -- special option */
-	id2str(RussList, ts->RussPrint, IdWindows, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "RussPrint", Temp, FName);
 
 	/* Scroll threshold -- special option */
 	WriteInt(Section, "ScrollThreshold", FName, ts->ScrollThreshold);
