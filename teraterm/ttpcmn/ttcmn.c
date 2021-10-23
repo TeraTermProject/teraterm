@@ -1207,7 +1207,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 		if (mb_len != 1) {
 			b = '?';
 		} else {
-			b = RussConv(IdWindows, cv->RussHost, mb_char[0]);
+			b = RussConv(IdWindows, states->KanjiCode, mb_char[0]);
 		}
 		TempStr[TempLen++] = b;
 	} else if (cv->Language == IdKorean || cv->Language == IdChinese) {

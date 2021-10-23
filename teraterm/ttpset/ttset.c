@@ -959,11 +959,6 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        Temp, sizeof(Temp), FName);
 	ts->TerminalID = str2id(TermList, Temp, IdVT100);
 
-	/* Russian character set (host) */
-	GetPrivateProfileString(Section, "RussHost", "",
-	                        Temp, sizeof(Temp), FName);
-	ts->RussHost = str2id(RussList, Temp, IdKOI8);
-
 	/* Title String */
 	GetPrivateProfileString(Section, "Title", "Tera Term",
 	                        ts->Title, sizeof(ts->Title), FName);
@@ -1149,11 +1144,6 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Bold font flag */
 	if (GetOnOff(Section, "EnableBold", FName, TRUE))
 		ts->FontFlag |= FF_BOLD;
-
-	/* Russian character set (font) */
-	GetPrivateProfileString(Section, "RussFont", "",
-	                        Temp, sizeof(Temp), FName);
-	ts->RussFont = str2id(RussList, Temp, IdWindows);
 
 	/* TEK Font */
 	ReadFont(Section, "TEKFont", "Courier,0,-13,0", FName,
@@ -2529,10 +2519,6 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	id2str(TermList, ts->TerminalID, IdVT100, Temp, sizeof(Temp));
 	WritePrivateProfileString(Section, "TerminalID", Temp, FName);
 
-	/* Russian character set (host)  */
-	id2str(RussList, ts->RussHost, IdKOI8, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "RussHost", Temp, FName);
-
 	/* Title text */
 	WritePrivateProfileString(Section, "Title", ts->Title, FName);
 
@@ -2707,10 +2693,6 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* Enable bold font flag */
 	WriteOnOff(Section, "EnableBold", FName,
 		(WORD) (ts->FontFlag & FF_BOLD));
-
-	/* Russian character set (font) */
-	id2str(RussList, ts->RussFont, IdWindows, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "RussFont", Temp, FName);
 
 	/* TEK Font */
 	WriteFont(Section, "TEKFont", FName,

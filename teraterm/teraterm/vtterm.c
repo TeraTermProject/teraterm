@@ -880,7 +880,7 @@ static void PutChar(BYTE b)
 			break;
 		}
 	} else if (ts.Language == IdRussian) {
-		BYTE c = RussConv(ts.RussHost, IdWindows, b);
+		BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
 		unsigned long u32 = MBCP_UTF32(c, 1251);
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 	} else {

@@ -316,7 +316,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->JIS7KatakanaSend = ts->JIS7KatakanaSend;
 	cv->KanjiIn = ts->KanjiIn;
 	cv->KanjiOut = ts->KanjiOut;
-	cv->RussHost = ts->RussHost;
 	cv->DelayFlag = TRUE;
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;

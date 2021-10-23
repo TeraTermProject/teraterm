@@ -289,8 +289,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				}
 			}
 			else if (ts->Language==IdRussian) {
-				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
-				SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
 #if UNICODE_INTERNAL_BUFF
 				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSCLIENT),FALSE);
 				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSFONT),FALSE);
@@ -381,12 +379,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 							}
 						}
 						else if (ts->Language==IdRussian) {
-							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST)) > 0) {
-								ts->RussHost = w;
-							}
-							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT)) > 0) {
-								ts->RussFont = w;
-							}
+							;
 						}
 						else if (ts->Language==IdKorean || // HKS
 						         ts->Language==IdUtf8) {

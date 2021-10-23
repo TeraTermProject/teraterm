@@ -384,7 +384,7 @@ struct tttset {
 	WORD PassThruDelay;
 	WORD PrnConvFF;
 	WORD FontFlag;
-	WORD RussFont;
+	WORD reserve_RussFont;
 	int ScrollThreshold;
 	WORD Debug;
 	WORD LogFlag;
@@ -425,7 +425,7 @@ struct tttset {
 	WORD JIS7KatakanaSend;
 	WORD KanjiIn;
 	WORD KanjiOut;
-	WORD RussHost;
+	WORD reserve_RussHost;
 	WORD reserve_RussClient;
 	WORD RussPrint;
 	WORD AutoWinSwitch;
@@ -909,7 +909,7 @@ typedef struct {
 	WORD JIS7KatakanaSend;
 	WORD KanjiIn;
 	WORD KanjiOut;
-	WORD RussHost;
+	WORD reserve_RussHost;
 	WORD reserve_RussClient;
 	/* from PortSet */
 	WORD DelayPerChar;

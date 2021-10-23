@@ -166,8 +166,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->JIS7Katakana = 0;
 					ts->KanjiIn = 0;
 					ts->KanjiOut = 0;
-					ts->RussHost = 0;
-					ts->RussFont = 0;
 
 					// 受信コード
 					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
@@ -195,7 +193,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					}
 					else if (lang == IdRussian &&
 							 (coding == IdWindows || coding == IdKOI8 || coding == Id866 || coding == IdISO)) {
-						ts->RussHost = coding;
 					}
 					else if (lang == IdKorean && coding == IdKoreanCP51949) {
 						;
