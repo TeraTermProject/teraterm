@@ -6334,14 +6334,30 @@ static void ParseFirst(BYTE b)
 		break;
 
 	  case IdRussian:
-		if (ParseFirstRus(b)) {
-			return;
+		switch (ts.KanjiCode) {
+		case IdUTF8:
+			if (ParseFirstUTF8(b, 0)) {
+				return;
+			}
+			break;
+		default:
+			if (ParseFirstRus(b)) {
+				return;
+			}
 		}
 		break;
 
 	case IdChinese:
-		if (ParseFirstCn(b)) {
-			return;
+		switch (ts.KanjiCode) {
+		case IdUTF8:
+			if (ParseFirstUTF8(b, 0)) {
+				return;
+			}
+			break;
+		default:
+			if (ParseFirstCn(b)) {
+				return;
+			}
 		}
 		break;
 	}

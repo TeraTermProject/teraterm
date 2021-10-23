@@ -40,6 +40,7 @@
 #include "compat_win.h"
 #include "setting.h"
 #include "helpid.h"
+#include "ttlib_charset.h"
 
 #include "coding_pp.h"
 
@@ -50,28 +51,6 @@ static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
 static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
 static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
 static const char *CellWidthList[] = { "1 Cell", "2 Cell", NULL };
-
-static const struct {
-	int lang;
-	int coding;
-	const char *CodeName;
-} KanjiList[] = {
-	{ IdUtf8,		IdUTF8,				"UTF-8" },
-	{ IdEnglish,	IdCodeEnglish,		"English" },
-	{ IdJapanese,	IdSJIS,				"Japanese/SJIS (CP932)" },
-	{ IdJapanese,	IdEUC,				"Japanese/EUC" },
-	{ IdJapanese,	IdJIS,				"Japanese/JIS" },
-	{ IdJapanese,	IdUTF8,				"Japanese/UTF-8" },
-	{ IdRussian,	IdWindows,			"Russian/Windows (CP1251)" },
-	{ IdRussian,	IdKOI8,				"Russian/KOI8-R" },
-	{ IdRussian,	Id866,				"Russian/CP 866" },
-	{ IdRussian,	IdISO,				"Russian/ISO 8859-5" },
-	{ IdKorean,		IdKoreanCP51949,	"Korean/KS5601 (CP51949)" },
-	{ IdKorean,		IdUTF8,				"Korean/UTF-8" },
-	{ IdChinese,	IdCnGB2312,			"China/GB2312 (CP936)" },
-	{ IdChinese,	IdCnBig5,			"China/Big5 (CP950)" },
-	{ IdChinese,	IdUTF8,				"China/UTF-8" },
-};
 
 struct CodingPPData {
 	TTTSet *pts;
@@ -104,19 +83,23 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			int recv_index = 0;
 			int send_index = 0;
-			for (int i = 0; i < _countof(KanjiList); i++) {
-				int id = KanjiList[i].lang * 100 + KanjiList[i].coding;
+			for (int i = 0;; i++) {
+				const TKanjiList *p = GetKanjiList(i);
+				if (p == NULL) {
+					break;
+				}
+				int id = p->lang * 100 + p->coding;
 				int index =
-					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)KanjiList[i].CodeName);
+					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_SETITEMDATA, index, id);
-				if (ts->Language == KanjiList[i].lang && ts->KanjiCode == KanjiList[i].coding) {
+				if (ts->Language == p->lang && ts->KanjiCode == p->coding) {
 					recv_index = i;
 				}
 
 				index =
-					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)KanjiList[i].CodeName);
+					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETITEMDATA, index, id);
-				if (ts->Language == KanjiList[i].lang && ts->KanjiCodeSend == KanjiList[i].coding) {
+				if (ts->Language == p->lang && ts->KanjiCodeSend == p->coding) {
 					send_index = i;
 				}
 			}

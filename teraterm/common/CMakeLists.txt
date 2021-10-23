@@ -38,6 +38,8 @@ add_library(
   ttlib.h
   ttlib_static.c
   ttlib_static_cpp.cpp
+  ttlib_charset.h
+  ttlib_charset.cpp
   win32helper.cpp
   win32helper.h
   )

@@ -48,6 +48,7 @@
 #include "codeconv.h"
 #include "win32helper.h"
 #include "inifile_com.h"
+#include "ttlib_charset.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -65,8 +66,6 @@ static PCHAR far TermList[] =
 	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	"VT320", "VT382", "VT420", "VT520", "VT525", NULL };
 
-static PCHAR far RussList[] =
-	{ "Windows", "KOI8-R", "CP-866", "ISO-8859-5", NULL };
 static PCHAR far RussList2[] = { "Windows", "KOI8-R", NULL };
 
 
@@ -770,16 +769,9 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Language */
 	GetPrivateProfileString(Section, "Language", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "Japanese") == 0)
-		ts->Language = IdJapanese;
-	else if (_stricmp(Temp, "Russian") == 0)
-		ts->Language = IdRussian;
-	else if (_stricmp(Temp, "English") == 0)
-		ts->Language = IdEnglish;
-	else if (_stricmp(Temp,"Korean") == 0) // HKS
-		ts->Language = IdKorean;
-	else if (_stricmp(Temp,"UTF-8") == 0)
-		ts->Language = IdUtf8;
+	if (Temp[0] != 0) {
+		ts->Language = GetLanguageFromStr(Temp);
+	}
 	else {
 		switch (PRIMARYLANGID(GetSystemDefaultLangID())) {
 		case LANG_JAPANESE:
@@ -880,23 +872,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Kanji Code (receive) */
 	GetPrivateProfileString(Section, "KanjiReceive", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "EUC") == 0)
-		ts->KanjiCode = IdEUC;
-	else if (_stricmp(Temp, "JIS") == 0)
-		ts->KanjiCode = IdJIS;
-	else if (_stricmp(Temp, "UTF-8") == 0)
-		ts->KanjiCode = IdUTF8;
-	else if (_stricmp(Temp, "UTF-8m") == 0)
-		ts->KanjiCode = IdUTF8m;
-	else if (_stricmp(Temp, "KS5601") == 0)
-		ts->KanjiCode = IdSJIS;
-	else
-		ts->KanjiCode = IdSJIS;
-	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
-	{
-		WORD KanjiCode = ts->KanjiCode;
-		ts->KanjiCode = KanjiCodeTranslate(ts->Language,KanjiCode);
-	}
+	ts->KanjiCode = GetKanjiCodeFromStr(ts->Language, Temp);
 
 	/* Katakana (receive) */
 	GetPrivateProfileString(Section, "KatakanaReceive", "",
@@ -909,21 +885,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Kanji Code (transmit) */
 	GetPrivateProfileString(Section, "KanjiSend", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "EUC") == 0)
-		ts->KanjiCodeSend = IdEUC;
-	else if (_stricmp(Temp, "JIS") == 0)
-		ts->KanjiCodeSend = IdJIS;
-	else if (_stricmp(Temp, "UTF-8") == 0)
-		ts->KanjiCodeSend = IdUTF8;
-	else if (_stricmp(Temp, "KS5601") == 0)
-		ts->KanjiCode = IdSJIS;
-	else
-		ts->KanjiCodeSend = IdSJIS;
-	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
-	{
-		WORD KanjiCodeSend = ts->KanjiCodeSend;
-		ts->KanjiCodeSend = KanjiCodeTranslate(ts->Language,KanjiCodeSend);
-	}
+	ts->KanjiCodeSend = GetKanjiCodeFromStr(ts->Language, Temp);
 
 	/* Katakana (receive) */
 	GetPrivateProfileString(Section, "KatakanaSend", "",
@@ -2276,24 +2238,10 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	}
 
 	/* Language */
-	switch (ts->Language) {
-	case IdJapanese:
-		strncpy_s(Temp, sizeof(Temp), "Japanese", _TRUNCATE);
-		break;
-	case IdKorean:
-		strncpy_s(Temp, sizeof(Temp), "Korean",   _TRUNCATE);
-		break;
-	case IdRussian:
-		strncpy_s(Temp, sizeof(Temp), "Russian",  _TRUNCATE);
-		break;
-	case IdUtf8:
-		strncpy_s(Temp, sizeof(Temp), "UTF-8",  _TRUNCATE);
-		break;
-	default:
-		strncpy_s(Temp, sizeof(Temp), "English",  _TRUNCATE);
+	{
+		const char *language_str = GetLanguageStr(ts->Language);
+		WritePrivateProfileString(Section, "Language", language_str, FName);
 	}
-
-	WritePrivateProfileString(Section, "Language", Temp, FName);
 
 	/* Port type */
 	WritePrivateProfileString(Section, "Port", (ts->PortType==IdSerial)?"serial":"tcpip", FName);
@@ -2352,32 +2300,10 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	}
 
 	/* Kanji Code (receive)  */
-	switch (ts->KanjiCode) {
-	case IdEUC:
-		strncpy_s(Temp, sizeof(Temp), "EUC", _TRUNCATE);
-		break;
-	case IdJIS:
-		strncpy_s(Temp, sizeof(Temp), "JIS", _TRUNCATE);
-		break;
-	case IdUTF8:
-		strncpy_s(Temp, sizeof(Temp), "UTF-8", _TRUNCATE);
-		break;
-	case IdUTF8m:
-		strncpy_s(Temp, sizeof(Temp), "UTF-8m", _TRUNCATE);
-		break;
-	default:
-		switch (ts->Language) {
-		case IdJapanese:
-			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
-			break;
-		case IdKorean:
-			strncpy_s(Temp, sizeof(Temp), "KS5601", _TRUNCATE);
-			break;
-		default:
-			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
-		}
+	{
+		const char *code_str = GetKanjiCodeStr(ts->Language, ts->KanjiCode);
+		WritePrivateProfileString(Section, "KanjiReceive", code_str, FName);
 	}
-	WritePrivateProfileString(Section, "KanjiReceive", Temp, FName);
 
 	/* Katakana (receive)  */
 	if (ts->JIS7Katakana == 1)
@@ -2388,29 +2314,10 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "KatakanaReceive", Temp, FName);
 
 	/* Kanji Code (transmit)  */
-	switch (ts->KanjiCodeSend) {
-	case IdEUC:
-		strncpy_s(Temp, sizeof(Temp), "EUC", _TRUNCATE);
-		break;
-	case IdJIS:
-		strncpy_s(Temp, sizeof(Temp), "JIS", _TRUNCATE);
-		break;
-	case IdUTF8:
-		strncpy_s(Temp, sizeof(Temp), "UTF-8", _TRUNCATE);
-		break;
-	default:
-		switch (ts->Language) {
-		case IdJapanese:
-			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
-			break;
-		case IdKorean:
-			strncpy_s(Temp, sizeof(Temp), "KS5601", _TRUNCATE);
-			break;
-		default:
-			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
-		}
+	{
+		const char *code_str = GetKanjiCodeStr(ts->Language, ts->KanjiCodeSend);
+		WritePrivateProfileString(Section, "KanjiSend", code_str, FName);
 	}
-	WritePrivateProfileString(Section, "KanjiSend", Temp, FName);
 
 	/* Katakana (transmit)  */
 	if (ts->JIS7KatakanaSend == 1)
@@ -3811,8 +3718,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 
 void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 {
-	int i, pos, c;
-	//int param_top;
+	int pos, c;
 	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
 	wchar_t Temp2[MaxStrLen];
 	WORD ParamPort = 0;
@@ -3837,7 +3743,7 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 	/* Get command line parameters */
 	if (DDETopic != NULL)
 		DDETopic[0] = 0;
-	i = 0;
+
 	/* the first term shuld be executable filename of Tera Term */
 	start = GetParam(Temp, _countof(Temp), Param);
 

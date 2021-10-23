@@ -293,6 +293,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ttlib_charset.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ttlib_charset.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ttlib_static.c"
 			>
 		</File>

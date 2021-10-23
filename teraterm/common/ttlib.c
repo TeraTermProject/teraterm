@@ -1060,33 +1060,6 @@ DWORD get_OPENFILENAME_SIZEW()
 	return CDSIZEOF_STRUCT(OPENFILENAMEW,lpTemplateName);
 }
 
-/**
- *	KanjiCodeTranslate(Language(dest), KanjiCodeID(source)) returns KanjiCodeID
- *	@param[in]	lang (IdEnglish, IdJapanese, IdRussian, ...)
- *	@param[in]	kcode (IdSJIS, IdEUC, ... IdKOI8 ... )
- *	@return		langに存在する漢字コードを返す
- *
- *	langに存在しない漢字コードを使用しないようこの関数を使用する
- *		- iniファイルの読み込み時
- *		- 設定でlangを切り替えた時
- */
-int KanjiCodeTranslate(int lang, int kcode)
-{
-	static const int Table[][5] = {
-		{1, 2, 3, 4, 5}, /* to English (dummy) */
-		{1, 2, 3, 4, 5}, /* to Japanese(dummy) */
-		{1, 2, 3, 4, 5}, /* to Russian (dummy) */
-		{1, 1, 1, 4, 5}, /* to Korean */
-		{4, 4, 4, 4, 5}, /* to Utf8 */
-		{1, 2, 2, 2, 2}, /* to Chinese */
-	};
-	if (lang < 1 || lang > IdLangMax) lang = 1;
-	if (kcode < 1 || kcode > 5) kcode = 1;
-	lang--;
-	kcode--;
-	return Table[lang][kcode];
-}
-
 char *mctimelocal(char *format, BOOL utc_flag)
 {
 	SYSTEMTIME systime;

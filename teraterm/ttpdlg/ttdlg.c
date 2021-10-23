@@ -56,6 +56,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "compat_win.h"
+#include "ttlib_charset.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -106,7 +107,6 @@ static const char *KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
 static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
 static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
 static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
-static const char *RussList[] = {"Windows(CP 1251)","KOI8-R","CP 866","ISO 8859-5",NULL};
 static const char *RussList2[] = {"Windows","KOI8-R",NULL};
 static const char *MetaList[] = {"off", "on", "left", "right", NULL};
 static const char *MetaList2[] = {"off", "on", NULL};
@@ -2816,7 +2816,6 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static const char *LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
 static const wchar_t **LangUIList = NULL;
 #define LANG_EXT L".lng"
 
@@ -2945,8 +2944,20 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SendDlgItemMessage(Dialog, IDC_GENPORT, CB_SETCURSEL,w,0);
 
 			if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
+				int sel = 0;
+				int i;
 				ShowDlgItem(Dialog,IDC_GENLANGLABEL,IDC_GENLANG);
-				SetDropDownList(Dialog, IDC_GENLANG, LangList, ts->Language);
+				for (i = 0;; i++) {
+					const TLanguageList *lang = GetLanguageList(i);
+					if (lang == NULL) {
+						break;
+					}
+					if (ts->Language == lang->language) {
+						sel = i;
+					}
+					SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_ADDSTRING, 0, (LPARAM)lang->str);
+				}
+				SendDlgItemMessage(Dialog, IDC_GENLANG, CB_SETCURSEL, sel, 0);
 			}
 
 			// 最初に指定されている言語ファイルの番号を覚えておく。

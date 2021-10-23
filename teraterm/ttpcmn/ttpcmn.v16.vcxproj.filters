@@ -54,13 +54,13 @@
     <ClInclude Include="..\common\ttlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="devpkey_teraterm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\compat_win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\dllutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\devpkey_teraterm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -33,6 +33,7 @@
 #include "teraterm.h"
 #include "tt-version.h"
 #include "../teraterm/unicode_test.h"
+#include "tttypes_charset.h"
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -151,15 +152,6 @@ typedef enum {
 #define KmtOptLongPacket 1
 #define KmtOptFileAttr 2
 #define KmtOptSlideWin 4
-
-  /* Language */
-#define IdEnglish  1
-#define IdJapanese 2
-#define IdRussian  3
-#define IdKorean   4  //HKS
-#define IdUtf8     5
-#define	IdChinese  6
-#define IdLangMax  IdChinese
 
 // LogDialog Option
 #define LOGDLG_BINARY          1
@@ -677,43 +669,6 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdVT420  10
 #define IdVT520  11
 #define IdVT525  12
-
-  /* Kanji Code ID */
-  /*  ts.KanjiCode, ts.KanjiCodeSend ÇÃíl */
-
-// ts.Language == IdEnglish
-#define IdCodeEnglish	1
-
-// ts.Language == IdJapanese
-#define IdSJIS  1
-#define IdEUC   2
-#define IdJIS   3
-#define IdUTF8  4		// IdUtf8 (è¨ï∂éö)ÇÕ ts.Language óp
-#define IdUTF8m 5
-
-// ts.Language == IdRussian
-// Russian code sets
-#define IdWindows 1
-#define IdKOI8    2
-#define Id866     3
-#define IdISO     4
-
-// ts.Language == IdKorean
-// Korean
-#define	IdKoreanCP51949 1	// CP51949, KS5601
-
-// ts.Language == IdChinese
-// China
-#define	IdCnGB2312		1	// 1 CP936, GB2312
-#define	IdCnBig5		2	// 2 CP950, Big5
-
-  /* KanjiIn modes */
-#define IdKanjiInA 1
-#define IdKanjiInB 2
-  /* KanjiOut modes */
-#define IdKanjiOutB 1
-#define IdKanjiOutJ 2
-#define IdKanjiOutH 3
 
 #define TermWidthMax  1000
 #define TermHeightMax 500

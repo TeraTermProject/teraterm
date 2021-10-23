@@ -1117,7 +1117,8 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 		output_char_count = 1;
 	} else if (cv->Language == IdUtf8 ||
 			   (cv->Language == IdJapanese && states->KanjiCode == IdUTF8) ||
-			   (cv->Language == IdKorean && states->KanjiCode == IdUTF8))
+			   (cv->Language == IdKorean && states->KanjiCode == IdUTF8) ||
+			   (cv->Language == IdChinese && states->KanjiCode == IdUTF8))
 	{
 		// UTF-8 Ç≈èoóÕ
 		size_t utf8_len = sizeof(TempStr);

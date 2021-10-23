@@ -141,11 +141,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\compat_win.h" />
+    <ClInclude Include="..\common\devpkey_teraterm.h" />
     <ClInclude Include="..\common\dllutil.h" />
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\servicenames.h" />
     <ClInclude Include="..\common\ttlib.h" />
-    <ClInclude Include="devpkey_teraterm.h" />
     <ClInclude Include="language.h" />
   </ItemGroup>
   <ItemGroup>
