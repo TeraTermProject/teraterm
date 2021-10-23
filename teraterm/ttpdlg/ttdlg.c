@@ -290,7 +290,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			}
 			else if (ts->Language==IdRussian) {
 				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
-				SetDropDownList(Dialog,IDC_TERMRUSSCLIENT,RussList,ts->RussClient);
 				SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
 #if UNICODE_INTERNAL_BUFF
 				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSCLIENT),FALSE);
@@ -384,9 +383,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						else if (ts->Language==IdRussian) {
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST)) > 0) {
 								ts->RussHost = w;
-							}
-							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT)) > 0) {
-								ts->RussClient = w;
 							}
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT)) > 0) {
 								ts->RussFont = w;

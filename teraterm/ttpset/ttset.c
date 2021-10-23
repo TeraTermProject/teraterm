@@ -964,11 +964,6 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        Temp, sizeof(Temp), FName);
 	ts->RussHost = str2id(RussList, Temp, IdKOI8);
 
-	/* Russian character set (client) */
-	GetPrivateProfileString(Section, "RussClient", "",
-	                        Temp, sizeof(Temp), FName);
-	ts->RussClient = str2id(RussList, Temp, IdWindows);
-
 	/* Title String */
 	GetPrivateProfileString(Section, "Title", "Tera Term",
 	                        ts->Title, sizeof(ts->Title), FName);
@@ -2537,10 +2532,6 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* Russian character set (host)  */
 	id2str(RussList, ts->RussHost, IdKOI8, Temp, sizeof(Temp));
 	WritePrivateProfileString(Section, "RussHost", Temp, FName);
-
-	/* Russian character set (client)  */
-	id2str(RussList, ts->RussClient, IdWindows, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "RussClient", Temp, FName);
 
 	/* Title text */
 	WritePrivateProfileString(Section, "Title", ts->Title, FName);

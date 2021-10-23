@@ -426,7 +426,7 @@ struct tttset {
 	WORD KanjiIn;
 	WORD KanjiOut;
 	WORD RussHost;
-	WORD RussClient;
+	WORD reserve_RussClient;
 	WORD RussPrint;
 	WORD AutoWinSwitch;
 	WORD TerminalID;

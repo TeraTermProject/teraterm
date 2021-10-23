@@ -167,7 +167,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->KanjiIn = 0;
 					ts->KanjiOut = 0;
 					ts->RussHost = 0;
-					ts->RussClient = 0;
 					ts->RussFont = 0;
 
 					// 受信コード

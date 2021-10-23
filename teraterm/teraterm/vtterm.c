@@ -6282,12 +6282,7 @@ static BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
 	if (b>=128) {
-#if !UNICODE_INTERNAL_BUFF
-		b = RussConv(ts.RussHost,ts.RussClient,b);
 		PutChar(b);
-#else
-		PutChar(b);
-#endif
 		return TRUE;
 	}
 	return FALSE;
