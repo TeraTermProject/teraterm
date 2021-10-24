@@ -1324,37 +1324,57 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		u16 = (wchar_t)nChar;
 	} else {
 		// 入力は ANSI
-		if (vtwin_work.dbcs_lead_byte == 0 && IsDBCSLeadByte(nChar)) {
-			// ANSI 2バイト文字の 1byte目だった
-			//	通常は WM_IME_* メッセージで処理される
-			//	次の場合ここに入ってくる
-			//		TERATERM.INI で IME=off のとき
-			//		imm32.dll がロードできなかったとき
-			vtwin_work.dbcs_lead_byte = nChar;
-			return;
-		}
-		else {
-			// ANSI(ACP) -> UTF-32 -> UTF-16
-			char mb_str[2];
-			size_t mb_len;
-			if (vtwin_work.dbcs_lead_byte == 0) {
-				// 1バイト文字
-				mb_str[0] = (char)nChar;
-				mb_len = 1;
-			}
-			else {
-				// 2バイト文字
-				mb_str[0] = (char)vtwin_work.dbcs_lead_byte;
-				mb_str[1] = (char)nChar;
-				mb_len = 2;
-				vtwin_work.dbcs_lead_byte = 0;
-			}
-			unsigned int u32;
-			mb_len = MBCPToUTF32(mb_str, mb_len, CP_ACP, &u32);
-			if (mb_len == 0) {
+		if (ts.Language == IdJapanese || ts.Language == IdChinese || ts.Language == IdKorean) {
+			// CJK (2byte文字)
+			if (vtwin_work.dbcs_lead_byte == 0 && IsDBCSLeadByte(nChar)) {
+				// ANSI 2バイト文字の 1byte目だった
+				//	通常は WM_IME_* メッセージで処理される
+				//	次の場合ここに入ってくる
+				//		TERATERM.INI で IME=off のとき
+				//		imm32.dll がロードできなかったとき
+				vtwin_work.dbcs_lead_byte = nChar;
 				return;
 			}
+			else {
+				// ANSI(ACP) -> UTF-32 -> UTF-16
+				char mb_str[2];
+				size_t mb_len;
+				if (vtwin_work.dbcs_lead_byte == 0) {
+					// 1バイト文字
+					mb_str[0] = (char)nChar;
+					mb_len = 1;
+				}
+				else {
+					// 2バイト文字
+					mb_str[0] = (char)vtwin_work.dbcs_lead_byte;
+					mb_str[1] = (char)nChar;
+					mb_len = 2;
+					vtwin_work.dbcs_lead_byte = 0;
+				}
+				unsigned int u32;
+				mb_len = MBCPToUTF32(mb_str, mb_len, CP_ACP, &u32);
+				if (mb_len == 0) {
+					return;
+				}
+				u16 = (wchar_t)u32;
+			}
+		}
+		else if (ts.Language == IdRussian) {
+			BYTE c;
+			if (ts.RussKeyb == IdWindows) {
+				// key = CP1251
+				c = (char)nChar;
+			}
+			else {
+				// key -> CP1251
+				c = RussConv(ts.RussKeyb, IdWindows, nChar);
+			}
+			// CP1251 -> UTF-32 -> UTF-16
+			unsigned long u32 = MBCP_UTF32(c, 1251);
 			u16 = (wchar_t)u32;
+		}
+		else {
+			u16 = (wchar_t)nChar;
 		}
 	}
 
