@@ -128,6 +128,10 @@ const char *GetKanjiCodeStr(int language, int kanji_code)
  */
 int GetKanjiCodeFromStr(int language, const char *kanji_code_str)
 {
+	if (kanji_code_str[0] == 0) {
+		return IdUTF8;
+	}
+
 	for (int i = 0; i < sizeof(KanjiList); i++) {
 		if (KanjiList[i].lang == language &&
 			strcmp(KanjiList[i].KanjiCode, kanji_code_str) == 0) {

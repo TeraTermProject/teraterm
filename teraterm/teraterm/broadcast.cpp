@@ -32,6 +32,8 @@
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "ttwinman.h"
+#include "compat_win.h"
+#include "asprintf.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -88,6 +90,32 @@
  */
 
 #define BROADCAST_LOGFILE L"broadcast.log"
+
+/**
+ *	履歴を保存するファイル名(フルパス)を取得
+ *	@return	ファイル名
+ *			不要になったら free() すること
+ */
+static wchar_t *GetHistoryFileName(TTTSet *ts_)
+{
+	wchar_t *fname;
+
+	// My Documents に file が存在する場合、それを優先して使用する
+	// TODO この動作は削除したほうがよさそう
+#if 1
+	HRESULT hr = _SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &fname);
+	awcscats(&fname, L"\\", BROADCAST_LOGFILE, NULL);
+	DWORD r = GetFileAttributesW(fname);
+	if (r != INVALID_FILE_ATTRIBUTES) {
+		return fname;
+	}
+	free(fname);
+#endif
+
+	fname = NULL;
+	awcscats(&fname, ts_->HomeDirW, L"\\", BROADCAST_LOGFILE, NULL);
+	return fname;
+}
 
 static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
 {
@@ -199,7 +227,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 				const wchar_t *lpstr = GetConvStringW(dlg, lParam, &len);
 				if (lpstr != NULL) {
 					char32_t *strU32 = ToU32W(lpstr);
-					int count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+					int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 					for (int i = 0 ; i < count ; i++) {
 						if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
 							HWND hwnd = GetNthWin(i);
@@ -451,7 +479,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			if (ts.BroadcastCommandHistory) {
 				SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			}
-			wchar_t *historyfile = GetDefaultFNameW(ts.HomeDirW, BROADCAST_LOGFILE);
+			wchar_t *historyfile = GetHistoryFileName(&ts);
 			ApplyBroadCastCommandHisotry(hWnd, historyfile);
 			free(historyfile);
 
@@ -584,7 +612,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
 							history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
 							if (history) {
-								wchar_t *historyfile = GetDefaultFNameW(ts.HomeDirW, BROADCAST_LOGFILE);
+								wchar_t *historyfile = GetHistoryFileName(&ts);
 								if (LoadTTSET()) {
 									(*AddValueToList)(historyfile, buf, L"BroadcastCommands", L"Command",
 													  ts.MaxBroadcatHistory);
@@ -638,7 +666,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
-						wchar_t *historyfile = GetDefaultFNameW(ts.HomeDirW, BROADCAST_LOGFILE);
+						wchar_t *historyfile = GetHistoryFileName(&ts);
 						ApplyBroadCastCommandHisotry(hWnd, historyfile);
 						free(historyfile);
 					}

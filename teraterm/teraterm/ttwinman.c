@@ -257,7 +257,7 @@ HMODULE LoadHomeDLL(const wchar_t *DLLname)
 {
 	HMODULE handle;
 	wchar_t *DLLpath;
-	aswprintf(&DLLpath, L"%s\\%s", ts.HomeDirW, DLLname);
+	aswprintf(&DLLpath, L"%s\\%s", ts.ExeDirW, DLLname);
 	handle = LoadLibraryW(DLLpath);
 	free(DLLpath);
 	return handle;

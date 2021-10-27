@@ -805,7 +805,7 @@ BYTE ConvHexCharW(wchar_t b)
 }
 
 /**
- *	Hwx2Str() の wchar_t 版
+ *	Hex2Str() の wchar_t 版
  */
 int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
 {
@@ -878,20 +878,22 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
 }
 
 /*
- * Get home(exe,dll) directory
+ * Get Exe(exe,dll) directory
+ *	ttermpro.exe, プラグインがあるフォルダ
+ *	ttypes.ExeDirW と同一
+ *	もとは GetHomeDirW() だった
  *
  * @param[in]		hInst		WinMain()の HINSTANCE または NULL
- * @return			HomeDir
+ * @return			ExeDir		不要になったら free() すること
  */
-wchar_t *GetHomeDirW(HINSTANCE hInst)
+wchar_t *GetExeDirW(HINSTANCE hInst)
 {
 	wchar_t *TempW;
 	wchar_t *dir;
-	DWORD error = hGetModuleFileNameW(NULL, &TempW);
-	if (error != 0) {
+	DWORD error = hGetModuleFileNameW(hInst, &TempW);
+	if (error != NO_ERROR) {
 		// パスの取得に失敗した。致命的、abort() する。
 		abort();
-		// ここでreturnしてもプラグイン(ttpset.dll)のロードに失敗してabort()する
 	}
 	dir = ExtractDirNameW(TempW);
 	free(TempW);
@@ -899,9 +901,49 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
 }
 
 /*
+ * Get home directory
+ *		個人用設定ファイルフォルダ取得
+ *		ttypes.HomeDirW と同一
+ *		TERATERM.INI などがおいてあるフォルダ
+ *		ttermpro.exe があるフォルダは GetExeDirW() で取得
+ *		%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
+ *
+ * @param[in]		hInst		WinMain()の HINSTANCE または NULL
+ * @return			HomeDir		不要になったら free() すること
+ */
+wchar_t *GetHomeDirW(HINSTANCE hInst)
+{
+	wchar_t *path;
+	_SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
+	wchar_t *ret = NULL;
+	awcscats(&ret, path, L"\\teraterm5", NULL);
+	free(path);
+	return ret;
+}
+
+/*
+ * Get log directory
+ *		ログ保存フォルダ取得
+ *		ttypes.LogDirW と同一
+ *		%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
+ *
+ * @param[in]		hInst		WinMain()の HINSTANCE または NULL
+ * @return			LogDir		不要になったら free() すること
+ */
+wchar_t* GetLogDirW(void)
+{
+	wchar_t *path;
+	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
+	wchar_t *ret = NULL;
+	awcscats(&ret, path, L"\\teraterm5", NULL);
+	free(path);
+	return ret;
+}
+
+/*
  *	UILanguageFileのフルパスを取得する
  *
- *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
+ *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
  *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
  *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
  *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス

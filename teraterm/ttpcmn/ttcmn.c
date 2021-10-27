@@ -109,17 +109,6 @@ void WINAPI CopyTTSetToShmem(PTTSet ts)
 	memcpy(&pm->ts, ts, sizeof(TTTSet));
 }
 
-static wchar_t* GetLogDirW()
-{
-	wchar_t *local_app_data;
-	wchar_t *log;
-	_SHGetKnownFolderPath(&FOLDERID_LocalAppData, 0, NULL, &local_app_data);
-	aswprintf(&log, L"%s\\%s", local_app_data, L"teraterm5");
-	free(local_app_data);
-	CreateDirectoryW(log, NULL);
-	return log;
-}
-
 BOOL WINAPI StartTeraTerm(PTTSet ts)
 {
 	if (FirstInstance) {
@@ -139,16 +128,60 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
 	// 起動時には、共有メモリの HomeDir と SetupFName は空になる
 	/* Get home directory (ttermpro.exeのフォルダ) */
-	ts->ExeDirW = GetHomeDirW(hInst);
+	ts->ExeDirW = GetExeDirW(hInst);
+
+	// LogDir
 	ts->LogDirW = GetLogDirW();
+	CreateDirectoryW(ts->LogDirW, NULL);
+
+	// HomeDir
 	ts->HomeDirW = GetHomeDirW(hInst);
 	WideCharToACP_t(ts->HomeDirW, ts->HomeDir, _countof(ts->HomeDir));
-	SetCurrentDirectoryW(ts->HomeDirW);
+	CreateDirectoryW(ts->HomeDirW, NULL);
+	SetCurrentDirectoryW(ts->HomeDirW);		// TODO 必要??
 
+#if 1
+	{
+		// TERATERM.INI のフルパス
+		wchar_t *setup = NULL;
+		awcscats(&setup, ts->HomeDirW, L"\\TERATERM.INI", NULL);
+
+		// ファイルある?
+		if (GetFileAttributesW(setup) == INVALID_FILE_ATTRIBUTES) {
+			// exeフォルダからコピーする
+			wchar_t *src_ini = NULL;
+			awcscats(&src_ini, ts->ExeDirW, L"\\TERATERM.INI", NULL);
+			CopyFileW(src_ini, setup, TRUE);
+			free(src_ini);
+		}
+
+		ts->SetupFNameW = setup;
+	}
+#else
 	ts->SetupFNameW = GetDefaultSetupFNameW(ts->HomeDirW);
+#endif
 	WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
 
+#if 1
+	{
+		// KEYBOARD.CNF のフルパス
+		wchar_t *keycnf = NULL;
+		awcscats(&keycnf, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
+
+		// ファイルある?
+		if (GetFileAttributesW(keycnf) == INVALID_FILE_ATTRIBUTES) {
+			// exeフォルダからコピーする
+			wchar_t *src_ini = NULL;
+			awcscats(&src_ini, ts->ExeDirW, L"\\KEYBOARD.CNF", NULL);
+			CopyFileW(src_ini, keycnf, TRUE);
+			free(src_ini);
+		}
+
+		ts->KeyCnfFNW = keycnf;
+	}
+#else
 	ts->KeyCnfFNW = GetDefaultFNameW(ts->HomeDirW, L"KEYBOARD.CNF");
+#endif
 	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 
 	if (FirstInstance) {

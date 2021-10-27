@@ -1730,7 +1730,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
 	// UI language message file (full path)
-	ts->UILanguageFileW = GetUILanguageFileFullW(ts->HomeDirW, ts->UILanguageFileW_ini);
+	ts->UILanguageFileW = GetUILanguageFileFullW(ts->ExeDirW, ts->UILanguageFileW_ini);
 	WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 

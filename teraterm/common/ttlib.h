@@ -90,7 +90,8 @@ int GetNthNum2(PCHAR Source, int Nth, int defval);
 void GetDownloadFolder(char *dest, int destlen);
 wchar_t *GetDownloadFolderW(void);
 wchar_t *GetHomeDirW(HINSTANCE hInst);
-void GetDefaultFName(const char *home, const char *file, char *dest, int destlen);
+wchar_t *GetExeDirW(HINSTANCE hInst);
+wchar_t* GetLogDirW(void);
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file);
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home);
 void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,

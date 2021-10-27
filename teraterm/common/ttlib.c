@@ -828,17 +828,6 @@ void GetDownloadFolder(char *dest, int destlen)
 	free(download);
 }
 
-void GetDefaultFName(const char *home, const char *file, char *dest, int destlen)
-{
-	wchar_t *homeW = ToWcharA(home);
-	wchar_t *fileW = ToWcharA(file);
-	wchar_t *destW = GetDefaultFNameW(homeW, fileW);
-	WideCharToACP_t(destW, dest, destlen);
-	free(destW);
-	free(fileW);
-	free(homeW);
-}
-
 /*
  *	UILanguageFile‚Ìƒtƒ‹ƒpƒX‚ðŽæ“¾‚·‚é
  *

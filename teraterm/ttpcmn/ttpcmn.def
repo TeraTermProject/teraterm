@@ -22,7 +22,6 @@ EXPORTS
   CommBinaryEcho @26
   CommTextEchoW
   DetectComPorts @42
-  GetDefaultFName @47
   ExtractFileName @48
   replaceInvalidFileNameChar @74
   b64encode @75

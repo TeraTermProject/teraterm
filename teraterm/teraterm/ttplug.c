@@ -146,15 +146,15 @@ static void LoadExtensions(PTTSet ts_)
 	wchar_t *load_mask;
 	WIN32_FIND_DATAW fd;
 	HANDLE hFind;
-	wchar_t *HomeDirW = ts_->HomeDirW;
+	wchar_t *ExeDirW = ts_->ExeDirW;
 
-	aswprintf(&load_mask, L"%s\\TTX*.DLL", HomeDirW);
+	aswprintf(&load_mask, L"%s\\TTX*.DLL", ExeDirW);
 
 	hFind = FindFirstFileW(load_mask, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			wchar_t *filename;
-			aswprintf(&filename, L"%s\\%s", HomeDirW, fd.cFileName);
+			aswprintf(&filename, L"%s\\%s", ExeDirW, fd.cFileName);
 			loadExtension(filename, ts_->UILanguageFileW);
 			free(filename);
 		} while (FindNextFileW(hFind, &fd));

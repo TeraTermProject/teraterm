@@ -2461,8 +2461,9 @@ wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename)
 	}
 
 	// ttermpro.exe‚ÌƒpƒX
-	path = GetHomeDirW(NULL);
+	path = GetExeDirW(NULL);
 	aswprintf(&ret, L"%s\\%s", path, basename);
+	free(path);
 	return ret;
 }
 

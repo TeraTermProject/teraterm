@@ -2838,7 +2838,7 @@ static void free_lang_ui_list()
 	}
 }
 
-static int make_sel_lang_ui(const wchar_t *HomeDir)
+static int make_sel_lang_ui(const wchar_t *dir)
 {
 	int    i;
 	int    file_num;
@@ -2848,7 +2848,7 @@ static int make_sel_lang_ui(const wchar_t *HomeDir)
 
 	free_lang_ui_list();
 
-	aswprintf(&fullpath, L"%s\\%s\\*%s", HomeDir, get_lang_folder(), LANG_EXT);
+	aswprintf(&fullpath, L"%s\\%s\\*%s", dir, get_lang_folder(), LANG_EXT);
 
 	file_num = 0;
 	hFind = FindFirstFileW(fullpath, &fd);
@@ -2961,7 +2961,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			}
 
 			// 最初に指定されている言語ファイルの番号を覚えておく。
-			uilist_count = make_sel_lang_ui(ts->HomeDirW);
+			uilist_count = make_sel_lang_ui(ts->ExeDirW);
 			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFileW_ini);
 			if (LangUIList[0] != NULL) {
 				int i = 0;
@@ -3015,7 +3015,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 							aswprintf(&ts->UILanguageFileW_ini, L"%s\\%s", get_lang_folder(), LangUIList[w - 1]);
 							WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
-							ts->UILanguageFileW = GetUILanguageFileFullW(ts->HomeDirW, ts->UILanguageFileW_ini);
+							ts->UILanguageFileW = GetUILanguageFileFullW(ts->ExeDirW, ts->UILanguageFileW_ini);
 							WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 							// タイトルの更新を行う。(2014.2.23 yutaka)
