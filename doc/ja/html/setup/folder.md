@@ -6,7 +6,7 @@
   - %APPDATA%\teraterm5
 - 動作ログ、ダンプ
   - %LOCALAPPDATA%\teraterm5
-- 実行ファイル(32bitOS+32bitEXE)
+- 実行ファイル(32bitOS+32bitEXEの場合)
   - %PROGRAMFILES%\teraterm5
 
 ### Windows Vista以降 の場合のフォルダ例
@@ -51,5 +51,6 @@
 
 次のように動作する
 - 設定ファイルを置くフォルダを作成する
-- 設定ファイルをフォルダにコピーする
+- ttermpro.exeのフォルダにある設定ファイルを
+- 設定ファイルを置くフォルダにコピーする
 
