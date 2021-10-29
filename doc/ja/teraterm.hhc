@@ -280,10 +280,32 @@
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Terminal">
+				<param name="Name" value="Terminal(Japanese)">
 				<param name="Local" value="html\menu\setup-terminal.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal(English)">
+					<param name="Local" value="html\menu\setup-terminal_en.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal(Korean)">
+					<param name="Local" value="html\menu\setup-terminal_ko.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal(Russian)">
+					<param name="Local" value="html\menu\setup-terminal_ru.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal(UTF-8)">
+					<param name="Local" value="html\menu\setup-terminal_utf8.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Window">
 				<param name="Local" value="html\menu\setup-window.html">
@@ -299,6 +321,13 @@
 				<param name="Local" value="html\menu\setup-keyboard.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Keyboard(Russian)">
+					<param name="Local" value="html\menu\setup-keyboard_ru.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Serial port">
 				<param name="Local" value="html\menu\setup-serialport.html">
