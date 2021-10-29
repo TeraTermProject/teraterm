@@ -2532,6 +2532,24 @@ int copy_teraterm_dir_relative_path(char *dest, int destsize,
 	return strlen(dest);
 }
 
+/**
+ *	ファイル名をフルパスに変換する
+ *	@return	フルパスファイル名
+ *			free()すること
+ */
+wchar_t *get_home_dir_relative_nameW(const wchar_t *basename)
+{
+	wchar_t *path;
+
+	if (!IsRelativePathW(basename)) {
+		return _wcsdup(basename);
+	}
+
+	path = GetHomeDirW(NULL);
+	awcscats(&path, L"\\", basename, NULL);
+	return path;
+}
+
 static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 {
 	char buf[4096];
