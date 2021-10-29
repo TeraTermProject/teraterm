@@ -41,6 +41,7 @@ See LICENSE.TXT for the license.
 #include "dns.h"
 #include "dlglib.h"
 #include "compat_win.h"
+#include "codeconv.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -53,6 +54,7 @@ See LICENSE.TXT for the license.
 #include <sys/stat.h>
 #include <direct.h>
 #include <memory.h>
+#include <wchar.h>
 
 #include "codeconv.h"
 #include "asprintf.h"
@@ -72,12 +74,12 @@ BOOL HOSTS_resume_session_after_known_hosts(PTInstVar pvar);
 void HOSTS_cancel_session_after_known_hosts(PTInstVar pvar);
 
 
-static char **parse_multi_path(char *buf)
+static wchar_t **parse_multi_path(wchar_t *buf)
 {
 	int i;
-	int ch;
+	wchar_t ch;
 	int num_paths = 1;
-	char ** result;
+	wchar_t ** result;
 	int last_path_index;
 
 	for (i = 0; (ch = buf[i]) != 0; i++) {
@@ -87,21 +89,21 @@ static char **parse_multi_path(char *buf)
 	}
 
 	result =
-		(char **) malloc(sizeof(char *) * (num_paths + 1));
+		(wchar_t **) malloc(sizeof(wchar_t *) * (num_paths + 1));
 
 	last_path_index = 0;
 	num_paths = 0;
 	for (i = 0; (ch = buf[i]) != 0; i++) {
 		if (ch == ';') {
 			buf[i] = 0;
-			result[num_paths] = _strdup(buf + last_path_index);
+			result[num_paths] = _wcsdup(buf + last_path_index);
 			num_paths++;
 			buf[i] = ch;
 			last_path_index = i + 1;
 		}
 	}
 	if (i > last_path_index) {
-		result[num_paths] = _strdup(buf + last_path_index);
+		result[num_paths] = _wcsdup(buf + last_path_index);
 		num_paths++;
 	}
 	result[num_paths] = NULL;
@@ -123,23 +125,26 @@ void HOSTS_init(PTInstVar pvar)
 
 void HOSTS_open(PTInstVar pvar)
 {
+	wchar_t *known_hosts_filesW = ToWcharA(pvar->session_settings.KnownHostsFiles);
 	pvar->hosts_state.file_names =
-		parse_multi_path(pvar->session_settings.KnownHostsFiles);
+		parse_multi_path(known_hosts_filesW);
+	free(known_hosts_filesW);
 }
 
 //
 // known_hostsファイルの内容をすべて pvar->hosts_state.file_data へ読み込む
 //
-static int begin_read_file(PTInstVar pvar, char *name,
+static int begin_read_file(PTInstVar pvar, wchar_t *name,
                            int suppress_errors)
 {
 	int fd;
 	int length;
 	int amount_read;
-	char buf[2048];
+	wchar_t *bufW;
 
-	get_teraterm_dir_relative_name(buf, sizeof(buf), name);
-	fd = _open(buf, _O_RDONLY | _O_SEQUENTIAL | _O_BINARY);
+	bufW = get_teraterm_dir_relative_nameW(name);
+	fd = _wopen(bufW, _O_RDONLY | _O_SEQUENTIAL | _O_BINARY);
+	free(bufW);
 	if (fd == -1) {
 		if (!suppress_errors) {
 			if (errno == ENOENT) {
@@ -560,7 +565,7 @@ static int read_host_key(PTInstVar pvar,
 	do {
 		if (pvar->hosts_state.file_data == NULL
 		 || pvar->hosts_state.file_data[pvar->hosts_state.file_data_index] == 0) {
-			char *filename;
+			wchar_t *filename;
 			int keep_going = 1;
 
 			if (pvar->hosts_state.file_data != NULL) {
@@ -797,7 +802,7 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 	int success = 0;
 	int suppress_errors = 1;
 	unsigned short tcpport;
-	char *filename;
+	wchar_t *filename;
 	char *hostname;
 	Key *key;
 
@@ -1238,7 +1243,7 @@ static char *format_specified_host_key(Key *key, char *hostname, unsigned short 
 
 static void add_host_key(PTInstVar pvar)
 {
-	char *name = NULL;
+	wchar_t *name = NULL;
 
 	if ( pvar->hosts_state.file_names != NULL)
 		name = pvar->hosts_state.file_names[0];
@@ -1254,12 +1259,13 @@ static void add_host_key(PTInstVar pvar)
 		int fd;
 		int amount_written;
 		int close_result;
-		char buf[FILENAME_MAX];
+		wchar_t *buf;
 
-		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
-		fd = _open(buf,
+		buf = get_teraterm_dir_relative_nameW(name);
+		fd = _wopen(buf,
 		          _O_APPEND | _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY,
 		          _S_IREAD | _S_IWRITE);
+		free(buf);
 		if (fd == -1) {
 			if (errno == EACCES) {
 				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
@@ -1291,7 +1297,7 @@ static void add_host_key(PTInstVar pvar)
 // 指定したキーを known_hosts に追加する。
 void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 {
-	char *name = NULL;
+	wchar_t *name = NULL;
 	char *hostname;
 	unsigned short tcpport;
 
@@ -1313,12 +1319,13 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 		int fd;
 		int amount_written;
 		int close_result;
-		char buf[FILENAME_MAX];
+		wchar_t *buf;
 
-		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
-		fd = _open(buf,
+		buf = get_teraterm_dir_relative_nameW(name);
+		fd = _wopen(buf,
 			_O_APPEND | _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY,
 			_S_IREAD | _S_IWRITE);
+		free(buf);
 		if (fd == -1) {
 			if (errno == EACCES) {
 				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
@@ -1354,7 +1361,7 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 //
 static void delete_different_key(PTInstVar pvar)
 {
-	char *name = pvar->hosts_state.file_names[0];
+	wchar_t *name = pvar->hosts_state.file_names[0];
 
 	if (name == NULL || name[0] == 0) {
 		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
@@ -1373,7 +1380,8 @@ static void delete_different_key(PTInstVar pvar)
 		int amount_written = 0;
 		int close_result;
 		int data_index = 0;
-		char buf[FILENAME_MAX];
+		wchar_t *buf;
+		wchar_t *filenameW;
 
 		// 書き込み一時ファイルを開く
 #if _MSC_VER < 1900 // less than VSC2015(VC14.0)
@@ -1527,9 +1535,12 @@ error1:
 		}
 
 		// 書き込み一時ファイルからリネーム
-		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
-		_unlink(buf);
-		rename(filename, buf);
+		buf = get_teraterm_dir_relative_nameW(name);
+		_wunlink(buf);
+		filenameW = ToWcharA(filename);
+		_wrename(filenameW, buf);
+		free(buf);
+		free(filenameW);
 
 error2:
 		_unlink(filename);
@@ -1544,7 +1555,7 @@ error2:
 
 void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 {
-	char *name = pvar->hosts_state.file_names[0];
+	wchar_t *name = pvar->hosts_state.file_names[0];
 	char *hostname;
 	unsigned short tcpport;
 
@@ -1568,7 +1579,8 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		int amount_written = 0;
 		int close_result;
 		int data_index = 0;
-		char buf[FILENAME_MAX];
+		wchar_t *buf;
+		wchar_t *filenameW;
 
 		// 書き込み一時ファイルを開く
 #if _MSC_VER < 1900 // less than VSC2015(VC14.0)
@@ -1720,9 +1732,12 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		}
 
 		// 書き込み一時ファイルからリネーム
-		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
-		_unlink(buf);
-		rename(filename, buf);
+		buf = get_teraterm_dir_relative_nameW(name);
+		_wunlink(buf);
+		filenameW = ToWcharA(filename);
+		_wrename(filenameW, buf);
+		free(filenameW);
+		free(buf);
 
 	error2:
 		_unlink(filename);

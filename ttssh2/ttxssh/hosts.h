@@ -49,7 +49,7 @@ typedef struct {
 #endif
 
   int file_num;
-  char **file_names;
+  wchar_t **file_names;
   int file_data_index;
   char *file_data;  // known_hostsファイルの内容がすべて格納される
 
