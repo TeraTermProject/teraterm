@@ -142,7 +142,7 @@ static int begin_read_file(PTInstVar pvar, wchar_t *name,
 	int amount_read;
 	wchar_t *bufW;
 
-	bufW = get_teraterm_dir_relative_nameW(name);
+	bufW = get_home_dir_relative_nameW(name);
 	fd = _wopen(bufW, _O_RDONLY | _O_SEQUENTIAL | _O_BINARY);
 	free(bufW);
 	if (fd == -1) {
@@ -1261,7 +1261,7 @@ static void add_host_key(PTInstVar pvar)
 		int close_result;
 		wchar_t *buf;
 
-		buf = get_teraterm_dir_relative_nameW(name);
+		buf = get_home_dir_relative_nameW(name);
 		fd = _wopen(buf,
 		          _O_APPEND | _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY,
 		          _S_IREAD | _S_IWRITE);
@@ -1321,7 +1321,7 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 		int close_result;
 		wchar_t *buf;
 
-		buf = get_teraterm_dir_relative_nameW(name);
+		buf = get_home_dir_relative_nameW(name);
 		fd = _wopen(buf,
 			_O_APPEND | _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY,
 			_S_IREAD | _S_IWRITE);
@@ -1535,7 +1535,7 @@ error1:
 		}
 
 		// 書き込み一時ファイルからリネーム
-		buf = get_teraterm_dir_relative_nameW(name);
+		buf = get_home_dir_relative_nameW(name);
 		_wunlink(buf);
 		filenameW = ToWcharA(filename);
 		_wrename(filenameW, buf);
@@ -1732,7 +1732,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		}
 
 		// 書き込み一時ファイルからリネーム
-		buf = get_teraterm_dir_relative_nameW(name);
+		buf = get_home_dir_relative_nameW(name);
 		_wunlink(buf);
 		filenameW = ToWcharA(filename);
 		_wrename(filenameW, buf);

@@ -3470,7 +3470,7 @@ __declspec(dllexport) size_t CALLBACK TTXReadKnownHostsFile(wchar_t *filename, s
 			*p = 0;		// cut readonly ssh known hosts
 		}
 
-		fullpath = get_teraterm_dir_relative_nameW(filenameW);
+		fullpath = get_home_dir_relative_nameW(filenameW);
 		ret = wcslen(fullpath);
 		if (filename != NULL) {
 			wcsncpy_s(filename, maxlen, fullpath, _TRUNCATE);
