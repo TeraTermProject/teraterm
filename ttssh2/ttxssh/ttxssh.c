@@ -3427,26 +3427,44 @@ __declspec(dllexport) int CALLBACK TTXScpReceivefile(char *remotefile, char *loc
 }
 
 
-// TTSSHの設定内容(known hosts file)を返す。
-//
-// return TRUE: 返却成功
-//        FALSE: 失敗
-// (2015.3.9 yutaka)
-__declspec(dllexport) int CALLBACK TTXReadKnownHostsFile(char *filename, int maxlen)
+/**
+ * TTSSHの設定内容(known hosts file)を返す。
+ * フルパスで返す
+ *
+ * @param[in]	filename	ファイル名へのポインタ
+ *							NULLの時文字数を返す
+ * @param[in]	maxlen		ファイル名の文字数
+ *							(filename != NULLの時有効)
+ * @retval		文字数(0以外),(filename == NULLの時は'\0'も含む)
+ *				0	エラー
+ */
+__declspec(dllexport) size_t CALLBACK TTXReadKnownHostsFile(wchar_t *filename, size_t maxlen)
 {
-	int ret = FALSE;
-	char *p;
-
-	if (pvar->settings.Enabled) {
-		strncpy_s(filename, maxlen, pvar->settings.KnownHostsFiles, _TRUNCATE);
-		p = strchr(filename, ';');
-		if (p)
-			*p = 0;
-
-		ret = TRUE;
+	if (!pvar->settings.Enabled) {
+		return 0;
 	}
+	else {
+		wchar_t *fullpath;
+		wchar_t *filenameW = ToWcharA(pvar->settings.KnownHostsFiles);
+		wchar_t *p = wcschr(filenameW, L';');
+		size_t ret;
+		if (p) {
+			*p = 0;		// cut readonly ssh known hosts
+		}
 
-	return (ret);
+		fullpath = get_teraterm_dir_relative_nameW(filenameW);
+		ret = wcslen(fullpath);
+		if (filename != NULL) {
+			wcsncpy_s(filename, maxlen, fullpath, _TRUNCATE);
+		}
+		else {
+			ret++;
+		}
+		free(fullpath);
+		free(filenameW);
+
+		return ret;
+	}
 }
 
 

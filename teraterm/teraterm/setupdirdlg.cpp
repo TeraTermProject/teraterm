@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <string.h>
+#include <assert.h>
 
 #include <shlobj.h>
 #include <windows.h>
@@ -286,7 +287,7 @@ static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filen
 	wchar_t *local_appdata;
 	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &local_appdata);
 	wchar_t *vs_file;
-	aswprintf(&vs_file, L"%s\\VirtualStore%s", local_appdata, path_nodrive, file);
+	aswprintf(&vs_file, L"%s\\VirtualStore%s\\%s", local_appdata, path_nodrive, file);
 	free(local_appdata);
 
 	// 最後に、Virtual Storeにファイルがあるかどうかを調べる。
@@ -396,29 +397,22 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		// ssh_known_hosts
 		{
-			typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
-			HMODULE h = NULL;
-			PSSH_read_known_hosts_file func = NULL;
-			if (((h = GetModuleHandle("ttxssh.dll")) != NULL)) {
-				func = (PSSH_read_known_hosts_file)GetProcAddress(h, "TTXReadKnownHostsFile");
+			HMODULE h = GetModuleHandle("ttxssh.dll");
+			if (h != NULL) {
+				size_t (CALLBACK *func)(wchar_t *, size_t) = NULL;
+				void **pfunc = (void **)&func;
+				*pfunc = (void *)GetProcAddress(h, "TTXReadKnownHostsFile");
 				if (func) {
-					char temp[MAX_PATH];
-					int ret = func(temp, sizeof(temp));
-					if (ret) {
-						char *s = strstr(temp, ":\\");
+					size_t size = func(NULL, 0);
+					if (size != 0) {
+						wchar_t *temp = (wchar_t *)malloc(sizeof(wchar_t) * size);
+						func(temp, size);
+						assert(!IsRelativePathW(temp));
 
-						if (s) { // full path
-							tmpbufW = ToWcharA(temp);
-						}
-						else { // relative path
-							aswprintf(&tmpbufW, L"%s\\%hs", pts->HomeDirW, temp);
-						}
-
-						SetDlgItemTextW(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, tmpbufW);
+						SetDlgItemTextW(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, temp);
 
 						/// (2) Virutal Storeへの変換
-						ret = convertVirtualStoreW(tmpbufW, &vs);
-						free(tmpbufW);
+						ret = convertVirtualStoreW(temp, &vs);
 						hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
 						EnableWindow(hWnd, ret);
 						hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
@@ -430,7 +424,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 						else {
 							SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
 						}
-
+						free(temp);
 					}
 				}
 			}
