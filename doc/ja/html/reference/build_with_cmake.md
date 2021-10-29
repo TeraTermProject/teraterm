@@ -7,8 +7,7 @@
 
 - Visual Studio 2005 をサポートしている cmake の最後のバージョンは 3.11.4 です
 - Visual Studio 2005 (Expressも含む)以外を使用する場合は特に制限はありません
-- Visual Studio 2017,2019 インストーラーで、オプションを選べば cmake をインストールできます
-- cmake 3.14から Visual Studio 2019 をサポートしています
+- Visual Studio 2017,2019,2022 インストーラーで、オプションを選べば cmake をインストールできます
 
 ## MinGW (very experimental)
 

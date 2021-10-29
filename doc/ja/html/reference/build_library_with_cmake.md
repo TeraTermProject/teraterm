@@ -32,17 +32,19 @@
 
 ### batファイルを使用する場合
 
-buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
+libs/buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
 
-    1. Visual Studio 16 2019
-    2. Visual Studio 16 2019 x64
-    3. Visual Studio 15 2017
-    4. Visual Studio 14 2015
-    5. Visual Studio 12 2013
-    6. Visual Studio 11 2012
-    7. Visual Studio 10 2010
-    8. Visual Studio 9 2008
-    9. Visual Studio 8 2005
+    1. Visual Studio 17 2022
+    2. Visual Studio 17 2022 x64
+    3. Visual Studio 16 2019
+    4. Visual Studio 16 2019 x64
+    5. Visual Studio 15 2017
+    6. Visual Studio 14 2015
+    7. Visual Studio 12 2013
+    8. Visual Studio 11 2012
+    9. Visual Studio 10 2010
+    a. Visual Studio 9 2008
+    b. Visual Studio 8 2005
     select no
 
 VS2005を選択した場合、
@@ -76,11 +78,11 @@ Visual Studio 2005の場合は、cmakeのバージョン3.11.4以前を使用
 
 - 次のフォルダにライブラリの `*.h` , `*.lib` が生成される
     - `cJSON`
-	- `oniguruma_{compiler}`
-	- `openssl_{compiler}`
-	- `putty`
-	- `SFMT_{compiler}`
-	- `zlib_{compiler}`
+    - `oniguruma_{compiler}`
+    - `openssl_{compiler}`
+    - `putty`
+    - `SFMT_{compiler}`
+    - `zlib_{compiler}`
 
 ## download アーカイブダウンロードフォルダ
 
