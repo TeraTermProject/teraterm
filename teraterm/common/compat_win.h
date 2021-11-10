@@ -175,11 +175,13 @@ extern BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE
 // shell32.dll
 #if !defined(NTDDI_VERSION) || !defined(NTDDI_VISTA) || (NTDDI_VERSION < NTDDI_VISTA)
 typedef GUID KNOWNFOLDERID;
+#if !defined(REFKNOWNFOLDERID)
 #ifdef __cplusplus
 #define REFKNOWNFOLDERID const KNOWNFOLDERID &
 #else // !__cplusplus
 #define REFKNOWNFOLDERID const KNOWNFOLDERID * const
 #endif // __cplusplus
+#endif
 
 #include "ttknownfolders.h"
 

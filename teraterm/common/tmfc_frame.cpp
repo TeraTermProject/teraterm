@@ -79,7 +79,7 @@ BOOL TTCFrameWnd::CreateW(
 		nullptr);
 	pseudoPtr = nullptr;
 	if (hWnd == nullptr) {
-		OutputDebugPrintf("CreateWindow %d\n", GetLastError());
+		OutputDebugPrintf("CreateWindow %ld\n", GetLastError());
 		return FALSE;
 	} else {
 		m_hWnd = hWnd;

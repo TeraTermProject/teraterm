@@ -379,6 +379,9 @@ static void SetIcon(HWND hwnd, HICON icon)
 {
 	char class_name[32];
 	int r = GetClassNameA(hwnd, class_name, _countof(class_name));
+	if (r == 0) {
+		return;
+	}
 	if (strcmp(class_name, "Button") == 0) {
 		SendMessage(hwnd, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)icon);
 	}
@@ -386,7 +389,8 @@ static void SetIcon(HWND hwnd, HICON icon)
 		SendMessage(hwnd, STM_SETICON, (WPARAM)icon, 0);
 	}
 	else {
-		assert(("not support", FALSE));
+		// not support
+		assert(FALSE);
 	}
 }
 

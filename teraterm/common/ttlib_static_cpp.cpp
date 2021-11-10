@@ -1298,7 +1298,7 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
  */
 BOOL IsRelativePathW(const wchar_t *path)
 {
-	if (path[0] == '\\' || path[0] == '/' || path[0] != '\0' && path[1] == ':') {
+	if (path[0] == '\\' || path[0] == '/' || (path[0] != '\0' && path[1] == ':')) {
 		return FALSE;
 	}
 	return TRUE;
@@ -1306,7 +1306,7 @@ BOOL IsRelativePathW(const wchar_t *path)
 
 BOOL IsRelativePathA(const char *path)
 {
-	if (path[0] == '\\' || path[0] == '/' || path[0] != '\0' && path[1] == ':') {
+	if (path[0] == '\\' || path[0] == '/' || (path[0] != '\0' && path[1] == ':')) {
 		return FALSE;
 	}
 	return TRUE;
