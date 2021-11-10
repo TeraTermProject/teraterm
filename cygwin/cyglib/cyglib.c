@@ -39,6 +39,13 @@
 
 #include "cyglib.h"
 
+//#define CYGWIN	1
+//#define MSYS2	1
+
+#if !defined(CYGWIN) && !defined(MSYS2)
+#define CYGWIN	1
+#endif
+
 /**
  *	cygwin1.dll‚ð’T‚·
  *
@@ -54,7 +61,7 @@ static BOOL CygwinSearchDLL(const wchar_t *cygwin_dir, wchar_t **find_dir, BOOL 
 	wchar_t file[MAX_PATH];
 	wchar_t *filename;
 	wchar_t c;
-#if 1
+#if CYGWIN
 	const wchar_t *dll_base = L"cygwin1";
 	const wchar_t *search_paths[] = {
 		L"%c:\\cygwin\\bin",
@@ -62,7 +69,7 @@ static BOOL CygwinSearchDLL(const wchar_t *cygwin_dir, wchar_t **find_dir, BOOL 
 		NULL,
 	};
 #endif
-#if 0
+#if MSYS2
 	const wchar_t *dll_base = L"msys-2.0";
 	const wchar_t *search_paths[] = {
 		L"%c:\\msys\\usr\\bin",
@@ -212,10 +219,13 @@ DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline)
 	wchar_t *ExeDirW;
 	wchar_t *cygterm_cmd;
 	DWORD e;
+#if CYGWIN
 	const wchar_t *cygterm_exe = L"cygterm.exe";
-//	const wchar_t *cygterm_exe = L"msys2term.exe";
+#endif
+#if MSYS2
+	const wchar_t *cygterm_exe = L"msys2term.exe";
+#endif
 
-//	CygwinDirectory = NULL;
 	find_cygwin = CygwinSearchDLL(CygwinDirectory, &find_dir, &find_in_path);
 	if (find_cygwin == FALSE) {
 		return ERROR_FILE_NOT_FOUND;

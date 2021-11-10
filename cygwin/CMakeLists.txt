@@ -8,15 +8,12 @@ set_target_properties(
   cyglib
   PROPERTIES FOLDER cygwin)
 
-add_subdirectory(cygtool)
+add_subdirectory(cygtool_build)
 set_target_properties(
-  cygtool_dll
+  cygtool_build
   PROPERTIES FOLDER cygwin)
 
-if(false)
-  add_subdirectory(cygterm)
-  set_target_properties(
-    cygterm
-    PROPERTIES FOLDER cygwin)
-endif()
-
+add_subdirectory(cygterm_build)
+set_target_properties(
+  cygterm_build
+  PROPERTIES FOLDER cygwin)
