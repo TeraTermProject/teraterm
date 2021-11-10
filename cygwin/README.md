@@ -1,7 +1,7 @@
 ﻿# cygwin に関連するプログラムなど
 
 - cyglaunch
-  - cygterm を実行するプログラム
+  - cygterm(または msys2term) を実行するプログラム
 - cygterm
   - cygwin(msys2)のシェルとTera Termの橋渡しをするプログラム
   - cygwin用64bit, 32bit, msys2用(msys2term) をビルド可能

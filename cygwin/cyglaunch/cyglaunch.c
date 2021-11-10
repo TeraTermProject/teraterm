@@ -37,6 +37,7 @@
 
 #include "ttlib.h"
 #include "asprintf.h"
+#include "win32helper.h"
 #include "cyglib.h"
 
 #define Section L"Tera Term"
@@ -48,7 +49,7 @@ static wchar_t *GetCygwinDir(void)
 {
 	wchar_t *HomeDir;
 	wchar_t *teraterm_ini;
-	wchar_t CygwinDir[256];
+	wchar_t *CygwinDir;
 
 	HomeDir = GetHomeDirW(NULL);
 	teraterm_ini = NULL;
@@ -56,14 +57,11 @@ static wchar_t *GetCygwinDir(void)
 	free(HomeDir);
 
 	// Cygwin install path
- 	GetPrivateProfileStringW(Section, L"CygwinDirectory", L"",
-							 CygwinDir, _countof(CygwinDir), teraterm_ini);
+ 	hGetPrivateProfileStringW(Section, L"CygwinDirectory", L"",
+							  teraterm_ini, &CygwinDir);
 	free(teraterm_ini);
 
-	if (CygwinDir[0] == 0) {
-		return NULL;
-	}
-	return _wcsdup(CygwinDir);
+	return CygwinDir;
 }
 
 int wmain(int argc, wchar_t *argv[])
@@ -71,8 +69,8 @@ int wmain(int argc, wchar_t *argv[])
 	wchar_t *CygwinDir;
 	wchar_t *Cmdline;
 	int i;
-	BOOL d_opt=FALSE;
 	DWORD e;
+	BOOL msys2term = FALSE;
 
 	setlocale(LC_ALL, "");
 
@@ -82,16 +80,21 @@ int wmain(int argc, wchar_t *argv[])
 		if (i != 1) {
 			awcscat(&Cmdline, L" ");
 		}
-		if (d_opt && wcsncmp(L"\"\\\\", argv[i], 3) == 0) {
-			argv[i][1] = '/';
-			argv[i][2] = '/';
+		if (wcscmp(argv[i], L"-d") == 0 && *(argv+1) != NULL) {
+			i++;
+			if (wcsncmp(L"\"\\\\", argv[i], 3) == 0) {
+				// -d "\\path\..." ÇèëÇ´ä∑Ç¶
+				argv[i][1] = '/';
+				argv[i][2] = '/';
+			}
+			awcscat(&Cmdline, L"-d ");
+			awcscat(&Cmdline, argv[i]);
 		}
-		awcscat(&Cmdline, argv[i]);
-		if (wcscmp(argv[i], L"-d") == 0) {
-			d_opt = TRUE;
+		else if (wcscmp(argv[i], L"-msys2") == 0) {
+			msys2term = TRUE;
 		}
 		else {
-			d_opt = FALSE;
+			awcscat(&Cmdline, argv[i]);
 		}
 	}
 
@@ -99,7 +102,13 @@ int wmain(int argc, wchar_t *argv[])
 	CygwinDir = GetCygwinDir();
 
 	// cygtermÇé¿çsÇ∑ÇÈ
-	e = CygwinConnect(CygwinDir, Cmdline);
+	if (msys2term) {
+		e = Msys2Connect(CygwinDir, Cmdline);
+	}
+	else {
+		e = CygwinConnect(CygwinDir, Cmdline);
+	}
+
 	switch(e) {
 	case NO_ERROR:
 		break;
@@ -110,10 +119,15 @@ int wmain(int argc, wchar_t *argv[])
 		MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
 		break;
 	case ERROR_OPEN_FAILED:
-	default:
-		MessageBox(NULL, "Can't execute Cygterm.", "ERROR", MB_OK | MB_ICONWARNING);
+	default: {
+		const char *msg = msys2term ? "Can't execute msys2term." :
+			"Can't execute Cygterm.";
+		MessageBox(NULL, msg, "ERROR", MB_OK | MB_ICONWARNING);
 		break;
 	}
+	}
 
+	free(Cmdline);
+	free(CygwinDir);
 	return 0;
 }
