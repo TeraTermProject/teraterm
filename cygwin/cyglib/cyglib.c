@@ -29,7 +29,6 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <direct.h>
 #include <locale.h>
 #include <string.h>
 #include <errno.h>
@@ -39,44 +38,23 @@
 
 #include "cyglib.h"
 
-//#define CYGWIN	1
-//#define MSYS2	1
-
-#if !defined(CYGWIN) && !defined(MSYS2)
-#define CYGWIN	1
-#endif
-
 /**
- *	cygwin1.dllを探す
+ *	cygwin1.dll / msys-2.0.dllを探す
  *
- *	@param[in]	cygwin_dir		(存在するであろう)フォルダ
+ *	@param[in]	dll_base		dllファイル名
+ *	@param[in]	cygwin_dir		(存在するであろう)フォルダ(*1)
+ *	@param[in]	search_paths	(*1)が見つからなかったときに探すパス
  *	@param[out]	find_dir		見つかったフォルダ free() すること
  *	@param[out]	find_in_path	環境変数 PATH 内に見つかった
  *
  *	@retval		TRUE	見つかった
  *	@retval		FALSE	見つからない
  */
-static BOOL CygwinSearchDLL(const wchar_t *cygwin_dir, wchar_t **find_dir, BOOL *find_in_path)
+static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const wchar_t **search_paths, wchar_t **find_dir, BOOL *find_in_path)
 {
 	wchar_t file[MAX_PATH];
 	wchar_t *filename;
 	wchar_t c;
-#if CYGWIN
-	const wchar_t *dll_base = L"cygwin1";
-	const wchar_t *search_paths[] = {
-		L"%c:\\cygwin\\bin",
-		L"%c:\\cygwin64\\bin",
-		NULL,
-	};
-#endif
-#if MSYS2
-	const wchar_t *dll_base = L"msys-2.0";
-	const wchar_t *search_paths[] = {
-		L"%c:\\msys\\usr\\bin",
-		L"%c:\\msys64\\usr\\bin",
-		NULL,
-	};
-#endif
 	wchar_t *dll;
 	int i;
 	DWORD r;
@@ -88,7 +66,7 @@ static BOOL CygwinSearchDLL(const wchar_t *cygwin_dir, wchar_t **find_dir, BOOL 
 	if (cygwin_dir != NULL && cygwin_dir[0] != 0) {
 		// SearchPathW() で探す
 		dll = NULL;
-		awcscats(&dll, L"bin\\", dll_base, L".dll", NULL);
+		awcscats(&dll, L"bin\\", dll_base, NULL);
 		r = SearchPathW(cygwin_dir, dll, L".dll", _countof(file), file, &filename);
 		free(dll);
 		if (r > 0) {
@@ -97,7 +75,7 @@ static BOOL CygwinSearchDLL(const wchar_t *cygwin_dir, wchar_t **find_dir, BOOL 
 
 		// SearchPathW() だと "msys-2.0.dll" が見つけることができない (Windows 10)
 		dll = NULL;
-		awcscats(&dll, cygwin_dir, L"\\", dll_base, L".dll", NULL);
+		awcscats(&dll, cygwin_dir, L"\\bin\\", dll_base, L".dll", NULL);
 		r = GetFileAttributesW(dll);
 		if (r != INVALID_FILE_ATTRIBUTES) {
 			// 見つかった
@@ -211,7 +189,7 @@ static BOOL AddPath(const wchar_t *add_path)
  *	@retval		ERROR_NOT_ENOUGH_MEMORY		メモリ不足
  *	@retval		ERROR_OPEN_FAILED			実行できない
  */
-DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline)
+static DWORD Connect(const wchar_t *cygterm_exe, const wchar_t *dll_base, const wchar_t *CygwinDirectory, const wchar_t **search_paths, const wchar_t *cmdline)
 {
 	BOOL find_cygwin;
 	wchar_t *find_dir;
@@ -219,14 +197,8 @@ DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline)
 	wchar_t *ExeDirW;
 	wchar_t *cygterm_cmd;
 	DWORD e;
-#if CYGWIN
-	const wchar_t *cygterm_exe = L"cygterm.exe";
-#endif
-#if MSYS2
-	const wchar_t *cygterm_exe = L"msys2term.exe";
-#endif
 
-	find_cygwin = CygwinSearchDLL(CygwinDirectory, &find_dir, &find_in_path);
+	find_cygwin = SearchDLL(dll_base, CygwinDirectory, search_paths, &find_dir, &find_in_path);
 	if (find_cygwin == FALSE) {
 		return ERROR_FILE_NOT_FOUND;
 	}
@@ -256,4 +228,43 @@ DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline)
 	}
 
 	return NO_ERROR;
+}
+
+/**
+ *	Connect to local cygwin
+ *	cygtermを実行
+ *
+ *	@param[in]	CygwinDirectory		Cygwinがインストールしてあるフォルダ
+ *									見つからなければデフォルトフォルダなどを探す
+ *	@param[in]	cmdline				cygtermに渡すコマンドライン引数
+ *									NULLのとき引数なし
+ *	@retval		NO_ERROR					実行できた
+ *	@retval		ERROR_FILE_NOT_FOUND		cygwinが見つからない(cygwin1.dllが見つからない)
+ *	@retval		ERROR_NOT_ENOUGH_MEMORY		メモリ不足
+ *	@retval		ERROR_OPEN_FAILED			実行できない
+ */
+DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline)
+{
+	static const wchar_t *cygterm_exe = L"cygterm.exe";
+	static const wchar_t *dll_base = L"cygwin1";
+	static const wchar_t *search_paths[] = {
+		L"%c:\\cygwin\\bin",
+		L"%c:\\cygwin64\\bin",
+		NULL,
+	};
+
+	return Connect(cygterm_exe, dll_base, CygwinDirectory, search_paths, cmdline);
+}
+
+DWORD Msys2Connect(const wchar_t *Msys2Directory, const wchar_t *cmdline)
+{
+	static const wchar_t *cygterm_exe = L"msys2term.exe";
+	static const wchar_t *dll_base = L"msys-2.0";
+	static const wchar_t *search_paths[] = {
+		L"%c:\\msys\\usr\\bin",
+		L"%c:\\msys64\\usr\\bin",
+		NULL,
+	};
+
+	return Connect(cygterm_exe, dll_base, Msys2Directory, search_paths, cmdline);
 }

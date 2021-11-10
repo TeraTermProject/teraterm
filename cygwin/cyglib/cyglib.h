@@ -35,6 +35,7 @@ extern "C" {
 #endif
 
 DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline);
+DWORD Msys2Connect(const wchar_t *Msys2Directory, const wchar_t *cmdline);
 
 #ifdef __cplusplus
 }
