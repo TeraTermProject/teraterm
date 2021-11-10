@@ -94,7 +94,6 @@ xcopy /s /e /y /i /exclude:archive-exclude.txt release\Collector %dst%\Collector
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang_utf16le %dst%\lang_utf16le
 del /f %dst%\lang\English.lng
-del /f %dst%\svnrev.exe
 
 perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
 
