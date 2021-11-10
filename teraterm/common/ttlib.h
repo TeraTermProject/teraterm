@@ -196,6 +196,8 @@ wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len);
 wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_);
 BOOL IsRelativePathA(const char *path);
 BOOL IsRelativePathW(const wchar_t *path);
+DWORD TTWinExec(const wchar_t *command);
+DWORD TTWinExecA(const char *commandA);
 
 #ifdef __cplusplus
 }
