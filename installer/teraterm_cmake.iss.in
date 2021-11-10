@@ -110,11 +110,11 @@ Source: @PROJECT_SOURCE_DIR@/installer\release\lang_utf16le\Simplified Chinese.l
 Source: @PROJECT_SOURCE_DIR@/installer\release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: @CMAKE_INSTALL_PREFIX@/ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: @PROJECT_SOURCE_DIR@/cygterm\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
-Source: @PROJECT_SOURCE_DIR@/cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: @PROJECT_SOURCE_DIR@/cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
-Source: @PROJECT_SOURCE_DIR@/cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: @PROJECT_SOURCE_DIR@/cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: @PROJECT_SOURCE_DIR@/cygwin/cygterm\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
+Source: @PROJECT_SOURCE_DIR@/cygwin/cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: @PROJECT_SOURCE_DIR@/cygwin/cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
+Source: @PROJECT_SOURCE_DIR@/cygwin/cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: @CMAKE_INSTALL_PREFIX@/cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/cygtool.dll; Components: cygterm; Flags: dontcopy
 ;Source: @PROJECT_SOURCE_DIR@/build_vs2019_x64\..\libs\logmett\Setup_LogMeTT_2_12_1.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
 ;Source: @PROJECT_SOURCE_DIR@/build_vs2019_x64\..\libs\logmett\Setup_TTLEditor_1_5_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall

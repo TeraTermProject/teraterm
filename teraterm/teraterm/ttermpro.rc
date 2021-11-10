@@ -523,7 +523,7 @@ IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
 
 IDI_VT_3D               ICON                    "../common/vt_3d.ico"
 
-IDI_CYGTERM             ICON                    "../../cygterm/cygterm.ico"
+IDI_CYGTERM             ICON                    "../../cygwin/cygterm/cygterm.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -267,30 +267,6 @@ install(
   RENAME KEYBOARD.CNF
   )
 
-# cygterm
-if ((EXISTS "C:/cygwin64/bin") OR (EXISTS "C:/cygwin/bin"))
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -P ${CMAKE_CURRENT_SOURCE_DIR}/build_cygterm.cmake)")
-
-  install(
-    FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm.exe
-    ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm.cfg
-    ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cyglaunch.exe
-    ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm+.tar.gz
-    DESTINATION .
-    )
-  install(
-    FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm.exe
-    DESTINATION ./cygterm+-i686
-    )
-  install(
-    FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/../cygterm/cygterm+-x86_64/cygterm.exe
-    DESTINATION ./cygterm+-x86_64
-    )
-endif()
-
 # Inno Setup
 #  Create setup.exe
 find_program(
@@ -311,26 +287,6 @@ if("${ISCC}" STREQUAL "ISCC-NOTFOUND")
     COMMAND "${CMAKE_COMMAND}" -E echo "inno setup not found"
     )
 else()
-  add_custom_target(
-    cygtool ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
-    )
-
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cygtool_build)
-
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -P ${CMAKE_CURRENT_LIST_DIR}/cygtool/build_cygtool.cmake
-    COMMAND ${CMAKE_COMMAND} -E echo ${CMAKE_GENERATOR}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cygtool_build
-    COMMENT Generate "${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll"
-    )
-
-  install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/cygtool.dll
-    DESTINATION .
-    )
-
   configure_file(
     teraterm_cmake.iss.in teraterm_cmake.iss
     NEWLINE_STYLE CRLF
@@ -362,11 +318,6 @@ else()
       WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
       )
   endif()
-
-  set_target_properties(
-    cygtool
-    PROPERTIES FOLDER installer
-    )
 endif()
 set_target_properties(
   inno_setup

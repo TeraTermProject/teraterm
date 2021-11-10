@@ -44,15 +44,15 @@ mkdir %dst%
 copy /y ..\teraterm\release\*.exe %dst%
 copy /y ..\teraterm\release\*.dll %dst%
 copy /y ..\ttssh2\ttxssh\Release\ttxssh.dll %dst%
-copy /y ..\cygterm\cygterm.exe %dst%
-copy /y ..\cygterm\cygterm.cfg %dst%
-copy /y ..\cygterm\cyglaunch.exe %dst%
-copy /y "..\cygterm\cygterm+.tar.gz" %dst%
-copy /y "..\cygterm\cygterm.exe" %dst%
+copy /y ..\cygwin\cygterm\cygterm.exe %dst%
+copy /y ..\cygwin\cygterm\cygterm.cfg %dst%
+copy /y "..\cygwin\cygterm\cygterm+.tar.gz" %dst%
+copy /y "..\cygwin\cygterm\cygterm.exe" %dst%
 mkdir "%dst%\cygterm+-i686"
-copy /y "..\cygterm\cygterm.exe" "%dst%\cygterm+-i686"
+copy /y "..\cygwin\cygterm\cygterm.exe" "%dst%\cygterm+-i686"
 mkdir "%dst%\cygterm+-x86_64"
-copy /y "..\cygterm\cygterm+-x86_64\cygterm.exe" "%dst%\cygterm+-x86_64"
+copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" "%dst%\cygterm+-x86_64"
+copy /y ..\cygwin\Release\cyglaunch.exe %dst%
 copy /y ..\ttpmenu\Release\ttpmenu.exe %dst%
 copy /y ..\TTProxy\Release\TTXProxy.dll %dst%
 copy /y ..\TTXKanjiMenu\Release\ttxkanjimenu.dll %dst%

@@ -183,6 +183,7 @@ add_subdirectory(tools)
 if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/TTXAdditional/CMakeLists.txt)
   add_subdirectory(TTXAdditional)
 endif()
+add_subdirectory(cygwin)
 
 ### create buildinfo.txt
 configure_file(

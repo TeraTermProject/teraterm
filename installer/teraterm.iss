@@ -112,14 +112,14 @@ Source: release\lang_utf16le\Simplified Chinese.lng; DestDir: {app}\lang_utf16le
 Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: ..\cygterm\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
-Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
-Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: ..\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
-Source: cygtool\cygtool.dll; Components: cygterm; Flags: dontcopy
-Source: ..\libs\logmett\Setup_LogMeTT_2_12_1.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
-Source: ..\libs\logmett\Setup_TTLEditor_1_5_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
+Source: ..\cygwin\cygterm\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
+Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
+Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: ..\cygwin\Release\cyglaunch.exe; DestDir: {app}; Components: cygterm
+Source: ..\cygwin\Release\cygtool.dll; Components: cygterm; Flags: dontcopy
+;Source: ..\libs\logmett\Setup_LogMeTT_2_12_1.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
+;Source: ..\libs\logmett\Setup_TTLEditor_1_5_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion

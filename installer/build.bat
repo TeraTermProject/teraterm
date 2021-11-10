@@ -89,6 +89,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v8.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v8.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v8.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v8.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v8.sln
 
 rem VS2005にSP1が適用されているかをチェックする
 cl /? 2>&1 | findstr /C:"14.00.50727.762"
@@ -115,6 +116,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v9.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v9.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v9.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v9.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v9.sln
 goto vsend
 
 :vs2010
@@ -124,6 +126,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v10.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v10.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v10.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v10.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v10.sln
 goto vsend
 
 :vs2012
@@ -133,6 +136,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v11.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v11.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v11.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v11.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v11.sln
 goto vsend
 
 :vs2013
@@ -142,6 +146,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v12.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v12.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v12.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v12.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v12.sln
 goto vsend
 
 :vs2015
@@ -151,6 +156,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v14.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v14.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v14.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v14.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v14.sln
 goto vsend
 
 :vs2017
@@ -160,6 +166,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v15.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v15.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v15.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v15.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v15.sln
 goto vsend
 
 :vs2019
@@ -169,6 +176,7 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v16.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v16.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v16.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v16.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v16.sln
 goto vsend
 
 :vsend
@@ -208,16 +216,13 @@ devenv /%BUILD% release %TTPMENUSLN%
 if ERRORLEVEL 1 goto fail
 devenv /%BUILD% release %TTXSAMPLESLN%
 if ERRORLEVEL 1 goto fail
+devenv /%BUILD% release %CYGWINSLN%
+if ERRORLEVEL 1 goto fail
 
 rem cygterm をコンパイル
-pushd ..\cygterm
+pushd ..\cygwin\cygterm
 if "%BUILD%" == "rebuild" make clean
 make
-popd
-
-rem cygtool をコンパイル
-pushd cygtool
-nmake -f cygtool.mak
 popd
 
 rem lng ファイルを作成
