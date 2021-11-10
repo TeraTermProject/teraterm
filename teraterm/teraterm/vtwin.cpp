@@ -65,6 +65,7 @@
 #include "ttplug.h"  /* TTPLUG */
 #include "teraterml.h"
 #include "buffer.h"
+#include "cyglib.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -3690,50 +3691,18 @@ void CVTWindow::OnDuplicateSession()
 	}
 }
 
-static void __dupenv_s(char **envptr, size_t, const char* name)
-{
-#if defined(_MSC_VER)
-	_dupenv_s(envptr, NULL, name);
-#else
-    const char* s = getenv(name);
-	if (s == NULL) {
-		*envptr = NULL;
-		return;
-	}
-	*envptr = strdup(s);
-#endif
-}
-
 //
 // Connect to local cygwin
 //
 void CVTWindow::OnCygwinConnection()
 {
-	char file[MAX_PATH], *filename;
-	char c, *envptr, *envbuff=NULL;
-	size_t envbufflen;
-	const char *exename = "cygterm.exe";
-	char cygterm[MAX_PATH];
-
-	if (strlen(ts.CygwinDirectory) > 0) {
-		if (SearchPath(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-			goto found_dll;
-		}
-	}
-
-	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-		goto found_path;
-	}
-
-	for (c = 'C' ; c <= 'Z' ; c++) {
-		char tmp[MAX_PATH];
-		sprintf_s(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
-		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-			goto found_dll;
-		}
-	}
-
-	{
+	wchar_t *CygwinDirectory = ToWcharA(ts.CygwinDirectory);
+	DWORD e = CygwinConnect(CygwinDirectory, NULL);
+	free(CygwinDirectory);
+	switch(e) {
+	case NO_ERROR:
+		break;
+	case ERROR_FILE_NOT_FOUND: {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -3741,54 +3710,20 @@ void CVTWindow::OnCygwinConnection()
 			MB_OK | MB_ICONWARNING
 		};
 		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		break;
 	}
-	return;
-
-found_dll:;
-	__dupenv_s(&envptr, NULL, "PATH");
-	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
-	if (envptr != NULL) {
-		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
-		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			static const TTMessageBoxInfoW info = {
-				"Tera Term",
-				"MSG_ERROR", L"ERROR",
-				"MSG_CYGTERM_ENV_ALLOC_ERROR", L"Can't allocate memory for environment variable.",
-				MB_OK | MB_ICONWARNING
-			};
-			TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
-			free(envptr);
-			return;
-		}
-		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s;%s", file, envptr);
-		free(envptr);
-	} else {
-		envbufflen = strlen(file) + 6; // "PATH="(5) + NUL(1)
-		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			static const TTMessageBoxInfoW info = {
-				"Tera Term",
-				"MSG_ERROR", L"ERROR",
-				"MSG_CYGTERM_ENV_ALLOC_ERROR", L"Can't allocate memory for environment variable.",
-				MB_OK | MB_ICONWARNING
-			};
-			TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
-			return;
-		}
-		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s", file);
+	case ERROR_NOT_ENOUGH_MEMORY: {
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_ERROR", L"ERROR",
+			"MSG_CYGTERM_ENV_ALLOC_ERROR", L"Can't allocate memory for environment variable.",
+			MB_OK | MB_ICONWARNING
+		};
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		break;
 	}
-	_putenv(envbuff);
-	if (envbuff) {
-		free(envbuff);
-		envbuff = NULL;
-	}
-
-found_path:;
-	strncpy_s(cygterm, sizeof(cygterm), ts.HomeDir, _TRUNCATE);
-	AppendSlash(cygterm, sizeof(cygterm));
-	strncat_s(cygterm, sizeof(cygterm), exename, _TRUNCATE);
-
-	DWORD e = TTWinExecA(cygterm);
-	if (e != NO_ERROR) {
+	case ERROR_OPEN_FAILED:
+	default: {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -3796,9 +3731,10 @@ found_path:;
 			MB_OK | MB_ICONWARNING
 		};
 		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		break;
+	}
 	}
 }
-
 
 //
 // TeraTerm Menu‚Ì‹N“®

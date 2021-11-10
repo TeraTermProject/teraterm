@@ -1,145 +1,119 @@
+/*
+ * Copyright (C) 2007- TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 //
 // Cygterm launcher
-//
-// (C) 2007- TeraTerm Project
-//   https://ttssh2.osdn.jp/
-//
-// [How to compile]
-// Cygwin:
-//  # cc -mno-cygwin -mwindows -o cyglaunch cyglaunch.c
 //
 
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <direct.h>
+#include <locale.h>
 
-#define Section "Tera Term"
-char *FName = "TERATERM.INI";
+#include "ttlib.h"
+#include "asprintf.h"
+#include "cyglib.h"
 
+#define Section L"Tera Term"
 
-//
-// Connect to local cygwin
-//
-void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
+/**
+ * TERATERM.INI から CygwinDirectory を読み込む
+ */
+static wchar_t *GetCygwinDir(void)
 {
-	char file[MAX_PATH], *filename;
-	char c, *envptr, *envbuff;
-	int envbufflen;
-	char *exename = "cygterm.exe";
-	char cmd[1024];
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
+	wchar_t *HomeDir;
+	wchar_t *teraterm_ini;
+	wchar_t CygwinDir[256];
 
-	if (strlen(CygwinDirectory) > 0) {
-		if (SearchPath(CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-			goto found_dll;
-		}
-	}
-
-	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-		goto found_path;
-	}
-
-	for (c = 'C' ; c <= 'Z' ; c++) {
-		char tmp[MAX_PATH];
-		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
-		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-			goto found_dll;
-		}
-	}
-
-	MessageBox(NULL, "Can't find Cygwin directory.", "ERROR", MB_OK | MB_ICONWARNING);
-	return;
-
-found_dll:;
-	envptr = getenv("PATH");
-	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
-	if (envptr != NULL) {
-		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
-		if ((envbuff=malloc(envbufflen)) == NULL) {
-			MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
-			return;
-		}
-		_snprintf(envbuff, envbufflen, "PATH=%s;%s", file, envptr);
-	} else {
-		envbufflen = strlen(file) + strlen(envptr) + 6; // "PATH="(5) + NUL(1)
-		if ((envbuff=malloc(envbufflen)) == NULL) {
-			MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
-			return;
-		}
-		_snprintf(envbuff, envbufflen, "PATH=%s", file);
-	}
-	_putenv(envbuff);
-	if (envbuff) {
-		free(envbuff);
-		envbuff = NULL;
-	}
-
-found_path:;
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	strcpy(cmd, exename);
-	strcat(cmd, " ");
-	strncat(cmd, cmdline, sizeof(cmd)-strlen(cmd)-1);
-//printf("%s", cmd);
-//MessageBox(NULL, cmd, "", MB_OK);
-	if (CreateProcess(
-			NULL,
-			cmd,
-			NULL, NULL, FALSE, 0,
-			NULL, NULL,
-			&si, &pi) == 0) {
-		MessageBox(NULL, "Can't execute Cygterm.", "ERROR", MB_OK | MB_ICONWARNING);
-	}
-}
-
-
-int main(int argc, char** argv)
-{
-	char Temp[256], CygwinDir[256], Cmdline[256];
-	char *bs;
-	int i;
-	BOOL d_opt=FALSE;
-
-	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) > 0 &&
-	   (bs = strrchr(Temp, '\\')) != NULL) {
-		*bs = 0;
-		_chdir(Temp);
-		_snprintf(bs, sizeof(Temp) + Temp - bs, "\\%s", FName);
-	}
-	else {
-		_snprintf(Temp, sizeof(Temp), ".\\", FName);
-	}
+	HomeDir = GetHomeDirW(NULL);
+	teraterm_ini = NULL;
+	awcscats(&teraterm_ini, HomeDir, L"\\TERATERM.INI", NULL);
+	free(HomeDir);
 
 	// Cygwin install path
- 	GetPrivateProfileString(Section, "CygwinDirectory", "c:\\cygwin",
-			  CygwinDir, sizeof(CygwinDir), Temp);
+ 	GetPrivateProfileStringW(Section, L"CygwinDirectory", L"",
+							 CygwinDir, _countof(CygwinDir), teraterm_ini);
+	free(teraterm_ini);
 
-	//printf("%s %d\n", CygwinDir, GetLastError());
+	if (CygwinDir[0] == 0) {
+		return NULL;
+	}
+	return _wcsdup(CygwinDir);
+}
 
-	Cmdline[0] = 0;
+int wmain(int argc, wchar_t *argv[])
+{
+	wchar_t *CygwinDir;
+	wchar_t *Cmdline;
+	int i;
+	BOOL d_opt=FALSE;
+	DWORD e;
+
+	setlocale(LC_ALL, "");
+
+	// 引数を結合してコマンドラインを作成
+	Cmdline = NULL;
 	for (i=1; i<argc; i++) {
 		if (i != 1) {
-			strncat(Cmdline, " ", sizeof(Cmdline)-strlen(Cmdline)-1);
+			awcscat(&Cmdline, L" ");
 		}
-		if (d_opt && strncmp("\"\\\\", argv[i], 3) == 0) {
+		if (d_opt && wcsncmp(L"\"\\\\", argv[i], 3) == 0) {
 			argv[i][1] = '/';
 			argv[i][2] = '/';
 		}
-		strncat(Cmdline, argv[i], sizeof(Cmdline)-strlen(Cmdline)-1);
-		if (strcmp(argv[i], "-d") == 0) {
+		awcscat(&Cmdline, argv[i]);
+		if (wcscmp(argv[i], L"-d") == 0) {
 			d_opt = TRUE;
 		}
 		else {
 			d_opt = FALSE;
 		}
 	}
-	//printf("%s\n", Cmdline);
 
-	OnCygwinConnection(CygwinDir, Cmdline);
+	// cygwinがインストールされているフォルダ
+	CygwinDir = GetCygwinDir();
+
+	// cygtermを実行する
+	e = CygwinConnect(CygwinDir, Cmdline);
+	switch(e) {
+	case NO_ERROR:
+		break;
+	case ERROR_FILE_NOT_FOUND:
+		MessageBox(NULL, "Can't find Cygwin directory.", "ERROR", MB_OK | MB_ICONWARNING);
+		break;
+	case ERROR_NOT_ENOUGH_MEMORY:
+		MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
+		break;
+	case ERROR_OPEN_FAILED:
+	default:
+		MessageBox(NULL, "Can't execute Cygterm.", "ERROR", MB_OK | MB_ICONWARNING);
+		break;
+	}
 
 	return 0;
 }

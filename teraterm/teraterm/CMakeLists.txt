@@ -303,6 +303,7 @@ target_link_libraries(
   ttpcmn
   ttpset
   ttptek
+  cyglib
   ${ONIGURUMA_LIB}
   ${SFMT_LIB}
   )

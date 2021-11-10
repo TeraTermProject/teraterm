@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "common\com
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "svnrev_perl", "..\svnrev_perl\svnrev_perl.v16.vcxproj", "{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cyglib", "..\cygwin\cyglib\cyglib.v16.vcxproj", "{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -76,6 +78,12 @@ Global
 		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|Win32.Build.0 = Release|Win32
 		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|x64.ActiveCfg = Release|x64
 		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|x64.Build.0 = Release|x64
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|Win32.Build.0 = Debug|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|x64.ActiveCfg = Debug|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Release|Win32.ActiveCfg = Release|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Release|Win32.Build.0 = Release|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

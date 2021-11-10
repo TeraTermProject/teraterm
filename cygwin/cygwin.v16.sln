@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cyglib", "cyglib\cyglib.v16.vcxproj", "{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cyglaunch", "cyglaunch\cyglaunch.v16.vcxproj", "{11B49891-80F0-4DD3-B6E9-70BBE64A4BBF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cygtool", "cygtool\cygtool.v16.vcxproj", "{E8955970-1031-42B4-9419-F82D9DD80C66}"
@@ -13,6 +15,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|x86.ActiveCfg = Debug|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|x86.Build.0 = Debug|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Release|x86.ActiveCfg = Release|Win32
+		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Release|x86.Build.0 = Release|Win32
 		{11B49891-80F0-4DD3-B6E9-70BBE64A4BBF}.Debug|x86.ActiveCfg = Debug|Win32
 		{11B49891-80F0-4DD3-B6E9-70BBE64A4BBF}.Debug|x86.Build.0 = Debug|Win32
 		{11B49891-80F0-4DD3-B6E9-70BBE64A4BBF}.Release|x86.ActiveCfg = Release|Win32

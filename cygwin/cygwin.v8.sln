@@ -1,7 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual C++ Express 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cyglib", "cyglib\cyglib.v8.vcproj", "{0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cyglaunch", "cyglaunch\cyglaunch.v8.vcproj", "{1A41E0B4-7FBC-44C6-83A4-7881F60CE8C8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5} = {0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cygtool", "cygtool\cygtool.v8.vcproj", "{4F0887EE-225F-407A-A403-5A723A4C7B2B}"
 EndProject
@@ -11,6 +16,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5}.Debug|Win32.Build.0 = Debug|Win32
+		{0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5}.Release|Win32.ActiveCfg = Release|Win32
+		{0C5959D7-A1AB-42ED-BAC2-B158B64CC4D5}.Release|Win32.Build.0 = Release|Win32
 		{1A41E0B4-7FBC-44C6-83A4-7881F60CE8C8}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1A41E0B4-7FBC-44C6-83A4-7881F60CE8C8}.Debug|Win32.Build.0 = Debug|Win32
 		{1A41E0B4-7FBC-44C6-83A4-7881F60CE8C8}.Release|Win32.ActiveCfg = Release|Win32
