@@ -1,0 +1,8 @@
+Chinese Simplified, GB2312, CP936
+https://zh.wikipedia.org/wiki/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6
+
+开源软件（英 ：open source software，缩写：OSS）又称开放源代码软件，
+是一种源代码可以任意获取的计算机软件，这种软件的版权持有人在软件协议的
+规定之下保留一部分权利并允许用户学习、修改以及以任何目的向任何人分发该
+软件。开源协议通常符合放原始的定的要求。
+
