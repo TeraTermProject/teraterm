@@ -5,6 +5,9 @@ call svnrev_perl\sourcetree_info.bat
 if exist c:\cygwin64\setup-x86_64.exe (
   c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
 )
+if exist c:\msys64\usr\bin\pacman.exe (
+  c:\msys64\usr\bin\pacman.exe  -S --noconfirm --needed cmake
+)
 if "%GENERATOR%" == "Visual Studio 8 2005" (
   cd buildtools
   call getcmake.bat nopause
