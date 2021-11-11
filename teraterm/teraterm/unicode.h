@@ -30,8 +30,6 @@
 extern "C" {
 #endif
 
-unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code);
-int UnicodeGetIndexOfCombiningFirstCode(unsigned short code);
 char UnicodeGetWidthProperty(unsigned long u32);
 int UnicodeIsCombiningCharacter(unsigned long u32);
 int UnicodeIsVariationSelector(unsigned long u32);

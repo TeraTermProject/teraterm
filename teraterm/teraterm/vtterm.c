@@ -6129,16 +6129,12 @@ static void ParseASCII(BYTE b)
 // UTF-8で受信データを処理する
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
-static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
+static BOOL ParseFirstUTF8(BYTE b)
 {
 	static BYTE buf[4];
 	static int count = 0;
-	static int can_combining = 0;
-	static unsigned int first_code;
-	static int first_code_index;
 
 	unsigned int code;
-	unsigned short cset;
 
 	if (ts.FallbackToCP932 && Fallbacked) {
 		return ParseFirstJP(b);
@@ -6148,11 +6144,6 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 		// 1バイト目および2バイト目がASCIIの場合は、すべてASCII出力とする。
 		// 1バイト目がC1制御文字(0x80-0x9f)の場合も同様。
 		if (count == 0 || count == 1) {
-			if (proc_combining == 1 && can_combining == 1) {
-				PutU32(first_code);
-				can_combining = 0;
-			}
-
 			if (count == 1) {
 				ParseASCII(buf[0]);
 			}
@@ -6170,11 +6161,6 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 	// 2バイトコードの場合
 	if ((buf[0] & 0xe0) == 0xc0) {
 		if ((buf[1] & 0xc0) == 0x80) {
-
-			if (proc_combining == 1 && can_combining == 1) {
-				PutU32(first_code);
-				can_combining = 0;
-			}
 
 			code = ((buf[0] & 0x1f) << 6);
 			code |= ((buf[1] & 0x3f));
@@ -6205,42 +6191,6 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 		code = ((buf[0] & 0xf) << 12);
 		code |= ((buf[1] & 0x3f) << 6);
 		code |= ((buf[2] & 0x3f));
-
-		if (proc_combining == 1) {
-			if (can_combining == 0) {
-				first_code_index = UnicodeGetIndexOfCombiningFirstCode(code);
-				if (first_code_index != -1) {
-					can_combining = 1;
-					first_code = code;
-					count = 0;
-					return (TRUE);
-				}
-			} else {
-				can_combining = 0;
-				cset = UnicodeGetPrecomposedChar(first_code_index, first_code, code);
-				if (cset != 0) { // success
-					code = cset;
-
-				} else { // error
-					// 2つめの文字が半濁点の1文字目に相当する場合は、再度検索を続ける。(2005.10.15 yutaka)
-					first_code_index = UnicodeGetIndexOfCombiningFirstCode(code);
-					if (first_code_index != -1) {
-						// 1つめの文字はそのまま出力する
-						PutU32(first_code);
-
-						can_combining = 1;
-						first_code = code;
-						count = 0;
-						return (TRUE);
-					}
-
-					PutU32(first_code);
-					PutU32(code);
-					count = 0;
-					return (TRUE);
-				}
-			}
-		}
 
 		PutU32(code);
 
@@ -6292,18 +6242,18 @@ static void ParseFirst(BYTE b)
 {
 	switch (ts.Language) {
 	  case IdUtf8:
-		ParseFirstUTF8(b, ts.KanjiCode == IdUTF8m);
+		  ParseFirstUTF8(b);
 		return;
 
 	  case IdJapanese:
 		switch (ts.KanjiCode) {
 		  case IdUTF8:
-			if (ParseFirstUTF8(b, 0)) {
+			  if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
 		  case IdUTF8m:
-			if (ParseFirstUTF8(b, 1)) {
+			  if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
@@ -6317,12 +6267,12 @@ static void ParseFirst(BYTE b)
 	  case IdKorean:
 		switch (ts.KanjiCode) {
 		  case IdUTF8:
-			if (ParseFirstUTF8(b, 0)) {
+			if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
 		  case IdUTF8m:
-			if (ParseFirstUTF8(b, 1)) {
+			if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
@@ -6336,7 +6286,7 @@ static void ParseFirst(BYTE b)
 	  case IdRussian:
 		switch (ts.KanjiCode) {
 		case IdUTF8:
-			if (ParseFirstUTF8(b, 0)) {
+			if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
@@ -6350,7 +6300,7 @@ static void ParseFirst(BYTE b)
 	case IdChinese:
 		switch (ts.KanjiCode) {
 		case IdUTF8:
-			if (ParseFirstUTF8(b, 0)) {
+			if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;

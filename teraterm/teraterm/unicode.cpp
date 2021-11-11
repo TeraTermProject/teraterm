@@ -195,7 +195,7 @@ int main(int, char *[])
 //
 #include "uni_combining.map"
 
-unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code)
+static unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code)
 {
 	const combining_map_t *table = mapCombiningToPrecomposed;
 	int tmax = _countof(mapCombiningToPrecomposed);
@@ -216,7 +216,7 @@ unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short first_c
 	return (result);
 }
 
-int UnicodeGetIndexOfCombiningFirstCode(unsigned short code)
+static int UnicodeGetIndexOfCombiningFirstCode(unsigned short code)
 {
 	const combining_map_t *table = mapCombiningToPrecomposed;
 	int tmax = _countof(mapCombiningToPrecomposed);
@@ -252,6 +252,14 @@ int UnicodeGetIndexOfCombiningFirstCode(unsigned short code)
  *	@param[in]	code
  *	@retval		0		åãçáÇ≈Ç´Ç»Ç¢
  *	@retval		à»äO	åãçáÇµÇΩUnicode
+ *
+ *		ó·
+ *			first_code
+ *				U+307B(ÇŸ)
+ *			code
+ *				U+309A(ÅK)
+ *			retval
+ *				U+307D(Ç€)
  */
 unsigned short UnicodeCombining(unsigned short first_code, unsigned short code)
 {
