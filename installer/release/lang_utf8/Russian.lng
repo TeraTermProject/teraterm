@@ -1123,7 +1123,6 @@ MENU_RECV_SJIS=Прием: &Shift_JIS
 MENU_RECV_EUCJP=Прием: &EUC-JP
 MENU_RECV_JIS=Прием: &JIS
 MENU_RECV_UTF8=Прием: &UTF-8
-MENU_RECV_UTF8m=Прием: UTF-8&m
 MENU_RECV_KS5601=Прием: &KS5601
 MENU_SEND_SJIS=Передача: S&hift_JIS
 MENU_SEND_EUCJP=Передача: EU&C-JP
@@ -1135,7 +1134,6 @@ MENU_SJIS=Прием/Передача: &Shift_JIS
 MENU_EUCJP=Прием/Передача: &EUC-JP
 MENU_JIS=Прием/Передача: &JIS
 MENU_UTF8=Прием/Передача: &UTF-8
-MENU_UTF8m=Прием: UTF-8&m/Передача: UTF-8
 MENU_KS5601=Прием/Передача: &KS5601
 
 

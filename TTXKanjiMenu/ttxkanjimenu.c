@@ -34,7 +34,7 @@
 #define UpdateRecvMenu(val)	\
 	CheckMenuRadioItem(pvar->hmEncode, \
 	                   ID_MI_KANJIRECV + IdSJIS, \
-	                   ID_MI_KANJIRECV + IdUTF8m, \
+	                   ID_MI_KANJIRECV + IdUTF8, \
 	                   ID_MI_KANJIRECV + (val), \
 	                   MF_BYCOMMAND)
 #define UpdateSendMenu(val)	\
@@ -56,14 +56,12 @@ static const KmTextInfo MenuNameRecvJ[] = {
 	{ ID_MI_KANJIRECV + IdEUC,   "Recv: &EUC-JP" },
 	{ ID_MI_KANJIRECV + IdJIS,   "Recv: &JIS" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "Recv: &UTF-8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "Recv: UTF-8&m" }
 };
 
 // 受信漢字コード (韓国語)
 static const KmTextInfo MenuNameRecvK[] = {
 	{ ID_MI_KANJIRECV + IdSJIS,  "Recv: &KS5601" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "Recv: &UTF-8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "Recv: UTF-8&m" }
 };
 
 // 送信漢字コード (日本語)
@@ -86,14 +84,12 @@ static const KmTextInfo MenuNameOneJ[] = {
 	{ ID_MI_KANJIRECV + IdEUC,   "Recv/Send: &EUC-JP" },
 	{ ID_MI_KANJIRECV + IdJIS,   "Recv/Send: &JIS" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "Recv/Send: &UTF-8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "Recv: UTF-8&m/Send: UTF-8" }
 };
 
 // 送受信漢字コード (韓国語)
 static const KmTextInfo MenuNameOneK[] = {
 	{ ID_MI_KANJIRECV + IdSJIS,  "Recv/Send: &KS5601" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "Recv/Send: &UTF-8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "Recv: UTF-8&m/Send: UTF-8" }
 };
 
 // メニュー自体の国際化用情報 (日本語)
@@ -113,7 +109,6 @@ static const DlgTextInfo MenuInfoSeparateJ[] = {
 	{ ID_MI_KANJIRECV + IdEUC,   "MENU_RECV_EUCJP" },
 	{ ID_MI_KANJIRECV + IdJIS,   "MENU_RECV_JIS" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "MENU_RECV_UTF8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "MENU_RECV_UTF8m" },
 	// 送信
 	{ ID_MI_KANJISEND + IdSJIS,  "MENU_SEND_SJIS" },
 	{ ID_MI_KANJISEND + IdEUC,   "MENU_SEND_EUCJP" },
@@ -128,7 +123,6 @@ static const DlgTextInfo MenuInfoSeparateK[] = {
 	// 受信
 	{ ID_MI_KANJIRECV + IdSJIS,  "MENU_RECV_KS5601" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "MENU_RECV_UTF8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "MENU_RECV_UTF8m" },
 	// 送信
 	{ ID_MI_KANJISEND + IdSJIS,  "MENU_SEND_KS5601" },
 	{ ID_MI_KANJISEND + IdUTF8,  "MENU_SEND_UTF8" },
@@ -143,7 +137,6 @@ static const DlgTextInfo MenuInfoOneJ[] = {
 	{ ID_MI_KANJIRECV + IdEUC,   "MENU_EUCJP" },
 	{ ID_MI_KANJIRECV + IdJIS,   "MENU_JIS" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "MENU_UTF8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "MENU_UTF8m" },
 	// UseOneSetting
 	{ ID_MI_USEONESETTING, "MENU_USE_ONE_SETTING" }
 };
@@ -153,7 +146,6 @@ static const DlgTextInfo MenuInfoOneK[] = {
 	// 送受信
 	{ ID_MI_KANJIRECV + IdSJIS,  "MENU_KS5601" },
 	{ ID_MI_KANJIRECV + IdUTF8,  "MENU_UTF8" },
-	{ ID_MI_KANJIRECV + IdUTF8m, "MENU_UTF8m" },
 	// UseOneSetting
 	{ ID_MI_USEONESETTING, "MENU_USE_ONE_SETTING" }
 };
@@ -205,19 +197,11 @@ static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	if (ret) {
 		if (orgRecvCode == pvar->ts->KanjiCode && orgSendCode != pvar->ts->KanjiCodeSend) {
 			// 送信コードのみ変更した場合は送信コードに合わせる
-			// ただし、送信:UTF-8 && 受信:UTF-8m の場合は対象外
-			if (pvar->ts->KanjiCodeSend != IdUTF8 || pvar->ts->KanjiCode != IdUTF8m) {
-				pvar->ts->KanjiCode = pvar->ts->KanjiCodeSend;
-			}
+			pvar->ts->KanjiCode = pvar->ts->KanjiCodeSend;
 		}
 		else {
 			// それ以外は受信コードに合わせる
-			if (pvar->ts->KanjiCode == IdUTF8m) {
-				pvar->ts->KanjiCodeSend = IdUTF8;
-			}
-			else {
-				pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
-			}
+			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
 		}
 	}
 
@@ -231,6 +215,8 @@ static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
  * 設定ダイアログ呼出の後処理のみを利用する。
  */
 static BOOL PASCAL ResetCharSet(HWND parent, PTTSet ts) {
+	(void)parent;
+	(void)ts;
 	pvar->NeedResetCharSet = FALSE;
 	return TRUE;
 }
@@ -273,12 +259,7 @@ static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
 		pvar->UseOneSetting = TRUE;
 		// UseOneSetting が on の場合は、送受信設定が同じになるように調整する
 		if (pvar->ts->Language == IdJapanese) {
-			if (pvar->ts->KanjiCode == IdUTF8m) {
-				pvar->ts->KanjiCodeSend = IdUTF8;
-			}
-			else {
-				pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
-			}
+			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
 		}
 		else if (pvar->ts->Language == IdKorean) {
 			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
@@ -338,7 +319,7 @@ static int GetMenuPosByChildId(HMENU menu, UINT id) {
  * UseOneSetting が off の時に使う
  */
 static void InsertSendKcodeMenu(HMENU menu) {
-	UINT flag = MF_BYPOSITION | MF_STRING | MF_CHECKED;
+//	UINT flag = MF_BYPOSITION | MF_STRING | MF_CHECKED;
 	int i;
 
 	if (pvar->ts->Language == IdJapanese) {
@@ -496,6 +477,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
  */
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	// メニューが呼び出されたら、最新の設定に更新する。(2007.5.25 yutaka)
+	(void)menu;
 	UpdateRecvMenu(pvar->ts->KanjiCode);
 	if (!pvar->UseOneSetting) {
 		UpdateSendMenu(pvar->ts->KanjiCodeSend);
@@ -510,13 +492,10 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	WORD val;
 
-	if ((cmd > ID_MI_KANJIRECV) && (cmd <= ID_MI_KANJIRECV+IdUTF8m)) {
+	if ((cmd > ID_MI_KANJIRECV) && (cmd <= ID_MI_KANJIRECV+IdUTF8)) {
 		val = cmd - ID_MI_KANJIRECV;
 		pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = val;
 		if (pvar->UseOneSetting) {
-			if (val == IdUTF8m) {
-				val = IdUTF8;
-			}
 			pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 		}
 		CallResetCharSet(hWin);
@@ -543,12 +522,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		else {
 			pvar->UseOneSetting = TRUE;
 
-			if (pvar->ts->KanjiCode == IdUTF8m) {
-				val = IdUTF8;
-			}
-			else {
-				val = pvar->ts->KanjiCode;
-			}
+			val = pvar->ts->KanjiCode;
 			pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 
 			DeleteSendKcodeMenu(pvar->hmEncode);
@@ -593,6 +567,7 @@ BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 	/* do version checking if necessary */
 	/* if (Version!=TTVERSION) return FALSE; */
+	(void)Version;
 
 	if (size > exports->size) {
 		size = exports->size;
@@ -607,6 +582,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
                     ULONG ul_reason_for_call,
                     LPVOID lpReserved)
 {
+	(void)lpReserved;
 	switch( ul_reason_for_call ) {
 		case DLL_THREAD_ATTACH:
 			/* do thread initialization */
