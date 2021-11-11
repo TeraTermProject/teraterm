@@ -102,8 +102,6 @@ static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
 static const char *TermListJ[] =
 	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
-static const char *KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
-static const char *KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
 static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
 static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
 static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
@@ -111,56 +109,67 @@ static const char *RussList2[] = {"Windows","KOI8-R",NULL};
 static const char *MetaList[] = {"off", "on", "left", "right", NULL};
 static const char *MetaList2[] = {"off", "on", NULL};
 
-// HKS
-static const char *KoreanList[] = {"KS5601", "UTF-8", NULL};
-static const char *KoreanListSend[] = {"KS5601", "UTF-8", NULL};
+// TODO ttlib_charset と統合を考える
+typedef struct {
+	const char *name;
+	int code;
+} TDropList;
 
-// UTF-8
-static const char *Utf8List[] = {"UTF-8", NULL};
-static const char *Utf8ListSend[] = {"UTF-8", NULL};
+static const TDropList KanjiList[] = {
+	{ "SJIS", IdSJIS },
+	{ "EUC", IdEUC },
+	{ "JIS", IdJIS },
+	{ "UTF-8", IdUTF8 },
+	{ NULL, 0 },
+};
+
+static const TDropList RussList[] = {
+	{ "Windows(CP1251)", IdWindows },
+	{ "KOI8-R", IdKOI8 },
+	{ "CP866", Id866 },
+	{ "ISO 8859-5", IdISO },
+	{ NULL, 0 },
+};
+
+static const TDropList KoreanList[] = {
+	{ "KS5601", IdKoreanCP51949 },
+	{ "UTF-8", IdUTF8 },
+	{ NULL, 0 },
+};
+
+static const TDropList Utf8List[] = {
+	{ "UTF-8", IdUTF8 },
+	{ NULL, 0 },
+};
+
+static const TDropList ChineseList[] = {
+	{ "GB2312 (CP936)",	IdCnGB2312 },
+	{ "BIG5 (CP950)", IdCnBig5 },
+	{ "UTF-8", IdUTF8 },
+	{ NULL, 0 },
+};
 
 static const char *BaudList[] =
 	{"110","300","600","1200","2400","4800","9600",
 	 "14400","19200","38400","57600","115200",
 	 "230400", "460800", "921600", NULL};
 
-// convert table for KanjiCodeID and ListID
-// cf. KanjiList,KanjiListSend
-//     KoreanList,KoreanListSend
-//     Utf8List,Utf8ListSend
-//     IdSJIS, IdEUC, IdJIS, IdUTF8, IdUTF8m
-//     IdEnglish, IdJapanese, IdRussian, IdKorean, IdUtf8
-/* KanjiCode2List(Language,KanjiCodeID) returns ListID */
-static int KanjiCode2List(int lang, int kcode)
+static void SetKanjiCodeDropDownList(HWND HDlg, int id, const TDropList *list, int sel_code)
 {
-	int Table[5][5] = {
-		{1, 2, 3, 4, 5}, /* English (dummy) */
-		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
-		{1, 2, 3, 4, 5}, /* Russian (dummy) */
-		{1, 1, 1, 2, 3}, /* Korean */
-		{1, 1, 1, 1, 2}, /* Utf8 */
-	};
-	lang--;
-	kcode--;
-	return Table[lang][kcode];
-}
+	int i = 0;
+	int sel_index = 0;
 
-/* List2KanjiCode(Language,ListID) returns KanjiCodeID */
-static int List2KanjiCode(int lang, int list)
-{
-	int Table[5][5] = {
-		{1, 2, 3, 4, 5}, /* English (dummy) */
-		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
-		{1, 2, 3, 4, 5}, /* Russian (dummy) */
-		{1, 4, 5, 1, 1}, /* Korean */
-		{4, 5, 4, 4, 4}, /* Utf8 */
-	};
-	lang--;
-	list--;
-	if (list < 0) {
-		list = 0;
+	while (list[i].name != NULL) {
+		const char *name = list[i].name;
+		int code = list[i].code;
+		int index = SendDlgItemMessageA(HDlg, id, CB_ADDSTRING, 0, (LPARAM)name);
+		SendDlgItemMessageA(HDlg, id, CB_SETITEMDATA, index, code);
+		if (code == sel_code) {
+			sel_index = i;
+		}
+		i++;
 	}
-	return Table[lang][list];
+	SendDlgItemMessage(HDlg, id, CB_SETCURSEL, sel_index, 0);
 }
 
 /*
@@ -218,7 +227,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				};
 				SetDlgTexts(Dialog, TextInfosRu, _countof(TextInfosRu), UILanguageFile);
 			}
-			else if (ts->Language==IdUtf8 || ts->Language==IdKorean) {
+			else if (ts->Language==IdUtf8 || ts->Language==IdKorean || ts->Language == IdChinese) {
 				static const DlgTextInfo TextInfosKo[] = {
 					{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
 					{ IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND" },
@@ -270,12 +279,12 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetRB(Dialog,ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
 
 			if (ts->Language==IdJapanese) {
-				SetDropDownList(Dialog, IDC_TERMKANJI, KanjiList, ts->KanjiCode);
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJI, KanjiList, ts->KanjiCode);
 				if ( ts->KanjiCode!=IdJIS ) {
 					DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
 				}
 				SetRB(Dialog,ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
-				SetDropDownList(Dialog, IDC_TERMKANJISEND, KanjiListSend, ts->KanjiCodeSend);
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJISEND, KanjiList, ts->KanjiCodeSend);
 				if ( ts->KanjiCodeSend!=IdJIS ) {
 					DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
 				}
@@ -289,18 +298,20 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				}
 			}
 			else if (ts->Language==IdRussian) {
-#if UNICODE_INTERNAL_BUFF
-				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSCLIENT),FALSE);
-				EnableWindow(GetDlgItem(Dialog, IDC_TERMRUSSFONT),FALSE);
-#endif
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJI, RussList,ts->KanjiCode);
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJISEND, RussList,ts->KanjiCodeSend);
 			}
 			else if (ts->Language==IdKorean) { // HKS
-				SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, KanjiCode2List(ts->Language,ts->KanjiCode));
-				SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJI, KoreanList, ts->KanjiCode);
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJISEND, KoreanList, ts->KanjiCodeSend);
 			}
 			else if (ts->Language==IdUtf8) {
-				SetDropDownList(Dialog, IDC_TERMKANJI, Utf8List, KanjiCode2List(ts->Language,ts->KanjiCode));
-				SetDropDownList(Dialog, IDC_TERMKANJISEND, Utf8ListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJI, Utf8List, ts->KanjiCode);
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJISEND, Utf8List, ts->KanjiCodeSend);
+			}
+			else if (ts->Language == IdChinese) {
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJI, ChineseList, ts->KanjiCode);
+				SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJISEND, ChineseList, ts->KanjiCodeSend);
 			}
 			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
@@ -364,10 +375,12 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 						if (ts->Language==IdJapanese) {
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
+								w = (int)SendDlgItemMessageA(Dialog, IDC_TERMKANJI, CB_GETITEMDATA, w - 1, 0);
 								ts->KanjiCode = w;
 							}
 							GetRB(Dialog,&ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND)) > 0) {
+								w = (int)SendDlgItemMessageA(Dialog, IDC_TERMKANJISEND, CB_GETITEMDATA, w - 1, 0);
 								ts->KanjiCodeSend = w;
 							}
 							GetRB(Dialog,&ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
@@ -378,16 +391,17 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 								ts->KanjiOut = w;
 							}
 						}
-						else if (ts->Language==IdRussian) {
-							;
-						}
 						else if (ts->Language==IdKorean || // HKS
+								 ts->Language==IdRussian ||
+								 ts->Language==IdChinese ||
 						         ts->Language==IdUtf8) {
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
-								ts->KanjiCode = List2KanjiCode(ts->Language, w);
+								w = (int)SendDlgItemMessageA(Dialog, IDC_TERMKANJI, CB_GETITEMDATA, w - 1, 0);
+								ts->KanjiCode = w;
 							}
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND)) > 0) {
-								ts->KanjiCodeSend = List2KanjiCode(ts->Language, w);
+								w = (int)SendDlgItemMessageA(Dialog, IDC_TERMKANJISEND, CB_GETITEMDATA, w - 1, 0);
+								ts->KanjiCodeSend = w;
 							}
 
 							ts->JIS7KatakanaSend=0;
@@ -2956,6 +2970,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						sel = i;
 					}
 					SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_ADDSTRING, 0, (LPARAM)lang->str);
+					SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_SETITEMDATA, i, (LPARAM)lang->language);
 				}
 				SendDlgItemMessage(Dialog, IDC_GENLANG, CB_SETCURSEL, sel, 0);
 			}
@@ -2994,7 +3009,9 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						}
 
 						if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
-							WORD language = (WORD)GetCurSel(Dialog, IDC_GENLANG);
+							WORD language;
+							w = (WORD)GetCurSel(Dialog, IDC_GENLANG);
+							language = (int)SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_GETITEMDATA, w - 1, 0);
 
 							// Language が変更されたとき、
 							// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
@@ -3140,6 +3157,7 @@ BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 		break;
 	case IdKorean: // Korean mode //HKS
 	case IdUtf8:   // UTF-8 mode
+	case IdChinese:
 		i = IDD_TERMDLGK;
 		break;
 	case IdRussian: // Russian mode
@@ -3150,9 +3168,9 @@ BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 	}
 
 	return
-		(BOOL)DialogBoxParam(hInst,
-		                     MAKEINTRESOURCE(i),
-		                     WndParent, TermDlg, (LPARAM)ts);
+		(BOOL)TTDialogBoxParam(hInst,
+							   MAKEINTRESOURCE(i),
+							   WndParent, TermDlg, (LPARAM)ts);
 }
 
 BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
