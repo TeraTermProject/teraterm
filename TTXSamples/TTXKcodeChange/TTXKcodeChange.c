@@ -217,7 +217,7 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
 		else if (_stricmp(p, "UTF8") == 0 || _stricmp(p, "UTF-8") == 0)
 		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = IdUTF8;
 		else if (_stricmp(p, "UTF8m") == 0 || _stricmp(p, "UTF-8m") == 0)
-		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = IdUTF8m;
+		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = IdUTF8;
 	      }
 	      p = p2;
 	    }
@@ -255,9 +255,6 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
 		    break;
 		  case IdUTF8:
 		    CommOut("kr=UTF8;", 8);
-		    break;
-		  case IdUTF8m:
-		    CommOut("kr=UTF8m;", 9);
 		    break;
 		}
 	      }
