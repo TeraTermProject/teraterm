@@ -102,7 +102,7 @@ static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
 static const char *TermListJ[] =
 	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
-static const char *KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", "UTF-8m", NULL};
+static const char *KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
 static const char *KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
 static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
 static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
@@ -112,11 +112,11 @@ static const char *MetaList[] = {"off", "on", "left", "right", NULL};
 static const char *MetaList2[] = {"off", "on", NULL};
 
 // HKS
-static const char *KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
+static const char *KoreanList[] = {"KS5601", "UTF-8", NULL};
 static const char *KoreanListSend[] = {"KS5601", "UTF-8", NULL};
 
 // UTF-8
-static const char *Utf8List[] = {"UTF-8", "UTF-8m", NULL};
+static const char *Utf8List[] = {"UTF-8", NULL};
 static const char *Utf8ListSend[] = {"UTF-8", NULL};
 
 static const char *BaudList[] =

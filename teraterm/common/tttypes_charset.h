@@ -49,7 +49,6 @@
 #define IdEUC   2
 #define IdJIS   3
 #define IdUTF8  4		// IdUtf8 (è¨ï∂éö)ÇÕ ts.Language óp
-#define IdUTF8m 5
 
 // ts.Language == IdRussian
 // Russian code sets

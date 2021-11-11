@@ -3878,10 +3878,13 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if ((_wcsnicmp(Temp, L"/KR=", 4) == 0) ||
 		         (_wcsnicmp(Temp, L"/KT=", 4) == 0)) {	/* kanji code */
+#if 1
 			if (_wcsicmp(&Temp[4], L"UTF8m") == 0 ||
 			    _wcsicmp(&Temp[4], L"UTF-8m") == 0)
-				c = IdUTF8m;
-			else if (_wcsicmp(&Temp[4], L"UTF8") == 0 ||
+				c = IdUTF8;
+			else
+#endif
+			if (_wcsicmp(&Temp[4], L"UTF8") == 0 ||
 			         _wcsicmp(&Temp[4], L"UTF-8") == 0)
 				c = IdUTF8;
 			else if (_wcsicmp(&Temp[4], L"SJIS") == 0 ||

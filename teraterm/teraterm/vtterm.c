@@ -4369,7 +4369,7 @@ void ControlSequence(BYTE b)
 
 int CheckUTF8Seq(BYTE b, int utf8_stat)
 {
-	if (ts.Language == IdUtf8 || (ts.Language==IdJapanese && (ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m))) {
+	if (ts.Language == IdUtf8 || (ts.Language==IdJapanese && ts.KanjiCode==IdUTF8)) {
 		if (utf8_stat > 0) {
 			if (b >= 0x80 && b < 0xc0) {
 				utf8_stat -= 1;
@@ -5219,8 +5219,6 @@ static void ConvertToCP932(char *str, int destlen)
 
 				} else if (ts.KanjiCode == IdUTF8) {
 
-				} else if (ts.KanjiCode == IdUTF8m) {
-
 				} else {
 
 				}
@@ -5285,7 +5283,7 @@ static void XSequence(BYTE b)
 		  case 1: /* Change icon name */
 		  case 2: /* Change window title */
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
-				if ((ts.KanjiCode == IdUTF8 || ts.KanjiCode == IdUTF8m) || ts.Language == IdUtf8) {
+				if (ts.KanjiCode == IdUTF8 || ts.Language == IdUtf8) {
 					char *titleTmp;
 
 					titleTmp = ToCharU8(StrBuff);
@@ -5787,7 +5785,7 @@ static BOOL CheckKanji(BYTE b)
 	ConvJIS = FALSE;
 
 	if (ts.KanjiCode==IdSJIS ||
-	   (ts.FallbackToCP932 && (ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m))) {
+	   (ts.FallbackToCP932 && ts.KanjiCode==IdUTF8)) {
 		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
 			Fallbacked = TRUE;
 			return TRUE; // SJIS kanji
@@ -5904,7 +5902,6 @@ static BOOL ParseFirstJP(BYTE b)
 			}
 			break;
 		case IdUTF8:
-		case IdUTF8m:
 			PutChar('?');
 			break;
 		default:
@@ -5920,7 +5917,6 @@ static BOOL ParseFirstJP(BYTE b)
 			}
 			break;
 		case IdUTF8:
-		case IdUTF8m:
 			PutChar('?');
 			break;
 		default:
@@ -6252,11 +6248,6 @@ static void ParseFirst(BYTE b)
 				return;
 			}
 			break;
-		  case IdUTF8m:
-			  if (ParseFirstUTF8(b)) {
-				return;
-			}
-			break;
 		  default:
 			if (ParseFirstJP(b))  {
 				return;
@@ -6267,11 +6258,6 @@ static void ParseFirst(BYTE b)
 	  case IdKorean:
 		switch (ts.KanjiCode) {
 		  case IdUTF8:
-			if (ParseFirstUTF8(b)) {
-				return;
-			}
-			break;
-		  case IdUTF8m:
 			if (ParseFirstUTF8(b)) {
 				return;
 			}
