@@ -33,7 +33,7 @@
 //
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_28 (2016/02/17)";
+static char Version[] = "version 1.07_30_beta (2021/11/14)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,8 +52,10 @@ static char Version[] = "version 1.07_28 (2016/02/17)";
 #include <sys/wait.h>
 #include <arpa/inet.h>
 #include <windows.h>
+#include <shlobj.h>
 #include <pwd.h>
 #include <sys/select.h>
+#include <wchar.h>
 
 // pageant support (ssh-agent proxy)
 //----------------------------------
@@ -284,28 +286,106 @@ void parse_cfg_line(char *buf)
     return;
 }
 
+// '\\' -> '/'
+void convert_bs(char *path)
+{
+    char *p = path;
+    while(*p != 0) {
+        if (*p == '\\') {
+            *p = '/';
+        }
+        p++;
+    }
+}
+
+// L'\\' -> L'/'
+void convert_bsW(wchar_t *path)
+{
+    wchar_t *p = path;
+    while(*p != 0) {
+        if (*p == L'\\') {
+            *p = L'/';
+        }
+        p++;
+    }
+}
+
+// wchar -> utf8
+char *convert_utf8_from_wchar(const wchar_t *strW)
+{
+    size_t mb_len = ::WideCharToMultiByte(CP_UTF8, 0, strW, -1, NULL, 0, NULL, NULL);
+    char *u8 = (char *)malloc(sizeof(wchar_t) * mb_len);
+    ::WideCharToMultiByte(CP_UTF8, 0, strW, -1, u8, mb_len, NULL, NULL);
+    return u8;
+}
+
+// $APPDATA
+char *get_appdata_dir()
+{
+#if 0
+	// link error :-(
+    wchar_t *home_pathW;
+    SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &home_pathW);
+    convert_bsW(home_pathW);
+    char *home_pathU8 = convert_utf8_from_wchar(home_pathW);
+    CoTaskMemFree(home_pathW);
+    return home_pathU8;
+#endif
+#if 1
+    char *appdata = strdup(getenv("APPDATA"));
+    convert_bs(appdata);
+    return appdata;
+#endif
+}
+
+void get_cfg_filenames(char **cfg_exe_full, char **cfg_appdata_full, char **cfg)
+{
+    wchar_t win_conf[MAX_PATH];
+
+    // get cfg path from exe path
+    if (GetModuleFileNameW(NULL, win_conf, MAX_PATH) <= 0) {
+        *cfg_exe_full = NULL;
+        *cfg = NULL;
+        return;
+    }
+
+    convert_bsW(win_conf);
+
+    wchar_t* bcW = wcsrchr(win_conf, '/');
+    if (bcW != NULL) {
+        wchar_t* dot = wcsrchr(bcW, '.');
+        if (dot == NULL) {
+            wcscat(bcW, L".cfg");
+        } else {
+            wcscpy(dot, L".cfg");
+        }
+    }
+    char *u8 = convert_utf8_from_wchar(win_conf);
+    *cfg_exe_full = u8;
+
+    char *bs = strrchr(u8, '/');
+    *cfg = strdup(bs+1);
+
+    char *appdata = get_appdata_dir();
+    const char *teraterm = "/teraterm5/";
+    size_t len = strlen(appdata) + strlen(teraterm) + strlen(*cfg) + 1;
+    *cfg_appdata_full = (char *)malloc(sizeof(wchar_t) * len);
+    strcpy(*cfg_appdata_full, appdata);
+    strcat(*cfg_appdata_full, teraterm);
+    strcat(*cfg_appdata_full, *cfg);
+    free(appdata);
+}
+
 //====================//
 // load configuration //
 //--------------------//
 void load_cfg()
 {
-    // Windows system configuration file (.cfg) path
-    char win_conf[MAX_PATH];
-
-    // get cfg path from exe path
-    if (GetModuleFileName(NULL, win_conf, MAX_PATH) <= 0) {
-        return;
-    }
-    char* bs = strrchr(win_conf, '\\');
-    if (bs == NULL) {
-        return;
-    }
-    char* dot = strrchr(bs, '.');
-    if (dot == NULL) {
-        strcat(bs, ".cfg");
-    } else {
-        strcpy(dot, ".cfg");
-    }
+    // configuration file (.cfg) path
+    char *conf_exe_full;
+    char *conf_appdata_full;
+    char *conf_base;
+    get_cfg_filenames(&conf_exe_full, &conf_appdata_full, &conf_base);
 
     char sys_conf[] = "/etc/cygterm.conf";
 
@@ -324,15 +404,15 @@ void load_cfg()
     if (username != NULL) {
         struct passwd* pw_ent = getpwnam(username);
         if (pw_ent != NULL) {
-	    strncpy(pw_shell, pw_ent->pw_shell, sizeof(pw_shell)-1);
-	    pw_shell[sizeof(pw_shell)-1] = 0;
+            strncpy(pw_shell, pw_ent->pw_shell, sizeof(pw_shell)-1);
+            pw_shell[sizeof(pw_shell)-1] = 0;
 
             strcpy(usr_conf, pw_ent->pw_dir);
             strcat(usr_conf, "/.");
-            strcat(usr_conf, bs + 1);
+            strcat(usr_conf, conf_base);
             char* dot = strrchr(usr_conf, '.');
             if (dot == NULL) {
-                strcat(bs, "rc");
+                strcat(usr_conf, "rc");
             } else {
                 strcpy(dot, "rc");
             }
@@ -356,8 +436,14 @@ void load_cfg()
         strcpy(tmp_conf, "");
     }
 
-    char *conf_path[] = { tmp_conf, win_conf, sys_conf, usr_conf };
-    for (int i = 0; i < 4; i++) {
+    char const *conf_path[] = {
+        tmp_conf,
+        conf_exe_full,      // [exe directory]/cygterm.cfg
+        sys_conf,           // /etc/cygterm.conf
+        conf_appdata_full,  // $APPDATA/teraterm5/cygterm.cfg
+        usr_conf            // ~/cygtermrc
+    };
+    for (int i = 0; i < sizeof(conf_path)/sizeof(conf_path[0]); i++) {
         // ignore empty configuration file path
         if (strcmp(conf_path[i], "") == 0) {
             continue;
@@ -378,6 +464,10 @@ void load_cfg()
     if (strcmp(tmp_conf, "") != 0) {
         unlink(tmp_conf);
     }
+
+    free(conf_base);
+    free(conf_exe_full);
+    free(conf_appdata_full);
 }
 
 void quote_cut(char *dst, size_t len, char *src) {

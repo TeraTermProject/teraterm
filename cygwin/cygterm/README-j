@@ -3,14 +3,12 @@
 
                 ターミナル・エミュレータで Cygwin を使う。
 
-                (C) 2006-2016 TeraTerm Project
+                (C) 2006- TeraTerm Project
                 https://ttssh2.osdn.jp/
 
                 Based on CygTerm by Original developer:
                 Copyright (C) 2000-2006 NSym
                 nsym@dd.iij4u.or.jp
-      (English) https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html
-     (Japanese) https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index.html
 
 
 // は じ め に //
@@ -97,9 +95,15 @@
 
     cygterm.cfg は設定ファイルです。 使用する端末エミュレータのコマンドライン
     や起動するシェルのコマンドライン等を設定します。
-    cygterm.cfg は cygterm.exe と同じディレクトリにないといけません。
 
-      cygterm.cfg の例
+    cygterm.cfg は次の順序で読み込まれます。
+      - コマンドライン引数
+      - exe と同じフォルダ
+      - /etc/cygterm.conf (cygwinの/etc/)
+      - $APPDATA/teraterm5/cygterm.cfg
+      - ~/.cygtermrc
+
+    cygterm.cfg の例
       +-----------------------------------------------------------------------
       | TERM = C:\program files\ttermpro\ttermpro.exe %s %d /KR=SJIS /KT=SJIS
       | TERM_TYPE = vt100
@@ -263,22 +267,11 @@
     実行時に接続できず、慌てることになってしまいます。
     TCP/IP Port# に 23 を指定して設定保存し直せば元に戻ります。
 
-// 動 作 確 認 //
-
-    2010年 10月現在、以下の環境で動作が確認できています。
-
-        WindowsXP SP3 + Cygwin 1.5.25-15
-        WindowsXP SP3 + Cygwin 1.7.7
-
-        ターミナルエミュレータ
-                Tera Term Pro 2.3
-                Tera Term 4.67
-                PuTTY 0.60
-        シェル
-                bash 3.2.51
-                zsh 4.3.10
-
 // 変 更 履 歴 //
+v1.07_30(beta) 2021/11/14
+        * 読み込む設定ファイルを追加
+          $APPDATA/teraterm5/cygterm.cfg
+
 v1.07_29 2016/11/26 (by maya)
         * アイコンを変更した。
 
@@ -302,7 +295,7 @@ v1.07_24 2013/08/15 (by maya)
 
 v1.07_23 2011/04/18 (by doda)
         * -d オプションで指定されたディレクトリへの移動が失敗した時、
-	  エラーメッセージを表示するようにした。
+          エラーメッセージを表示するようにした。
 
 v1.07_22 2011/03/03 (by maya)
         * インストーラから起動チェックをするための mutex を削除した。
@@ -312,7 +305,7 @@ v1.07_21 2011/02/28 (by maya)
 
 v1.07_20 2010/10/20 (by doda)
         * '-d' オプションでのディレクトリ変更のタイミングを遅らせた。
-	  (security fix)
+          (security fix)
 
 v1.07_19 2010/01/28 (by doda)
         * '-s' オプションの引数に 'AUTO' を受け付けるようにした。
@@ -439,7 +432,7 @@ v1.03 2002/07/24
         * ターミナル・エミュレータが通知してくるターミナルタイプに、大文字が
           含まれていれば、それを小文字に変換するように修正。
           ターミナル・エミュレータによっては環境変数 TERM の値が 'ANSI' 'VT100'
-          のように大文字にり terminfo にマッチしないため。
+          のように大文字なり terminfo にマッチしないため。
           (Windows 2000 telnet.exe 等)
 
 v1.02 2002/07/22
