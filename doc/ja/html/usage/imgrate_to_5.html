@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Tera Term 5 へ移行</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Tera Term 5 へ移行</h1>
+
+    <ul>
+      <li>Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです
+      <ul>
+        <li>Windows 10, 11をターゲットにしています</li>
+        <li>特徴などは<a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">Unicode化基本方針</a>を参照ください</li>
+      </ul>
+      <li>Tera Term 4 と同居することができます</li>
+      <li>設定ファイルはTera Term 4用をそのまま使用できます</li>
+      <ul>
+        <li>TERATERM.INI,KEYBOARD.CFGはUnicode対応となりました</li>
+        <li>Unicodeに変換しておくと、Unicodeパス,ファイル名などの設定内容が正しく保存できます</li>
+        <ul>
+          <li>Tera Term 4 ではパス名にShift_JISで表現できない文字が含まれているとその項目は正しく保存されませんでした</li>
+        </ul>
+        <li>変換しなくてもそのまま使用できます</li>
+        <li>Unicodeの文字コードはUTF-16 (with LE BOM)です</li>
+        <li>Windowsのメモ帳で開いて文字コードをUTF-16LEに設定して上書き保存する変換できます</li>
+      </ul>
+      <li>設定ファイルのデフォルトフォルダが変更されました</li>
+      <ul>
+        <li>%APPDATA%\teraterm5\</li>
+        <li>Tera Term 4 の設定ファイルをコピーしてください</li>
+        <ul>
+          <li>TERATERM.INI</li>
+          <li>KEYBOARD.CNF</li>
+          <li>cygterm.cfg</li>
+        </ul>
+        <li>ファイルがない場合、ttermpro.exe起動時にデフォルトの設定ファイルがコピーされます</li>
+        <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした</li>
+      </ul>
+    </ul>
+  </body>
+</html>
