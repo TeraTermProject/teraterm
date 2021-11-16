@@ -109,6 +109,33 @@ void WINAPI CopyTTSetToShmem(PTTSet ts)
 	memcpy(&pm->ts, ts, sizeof(TTTSet));
 }
 
+static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const wchar_t *dest_dir)
+{
+	for (;;) {
+		const wchar_t *filename = *file_list;
+		file_list++;
+		if (filename == NULL) {
+			break;
+		}
+
+		wchar_t *dest = NULL;
+		awcscats(&dest, dest_dir, L"\\", filename, NULL);
+
+		size_t len = wcslen(dest);
+		if (dest[len - 1] == '\\') {
+			// フォルダ作成
+			CreateDirectoryW(dest, NULL);
+		}
+		else {
+			wchar_t *src = NULL;
+			awcscats(&src, src_dir, L"\\", filename, NULL);
+			CopyFileW(src, dest, TRUE);		// TRUE = do not copy if exists
+			free(src);
+		}
+		free(dest);
+	}
+}
+
 BOOL WINAPI StartTeraTerm(PTTSet ts)
 {
 	if (FirstInstance) {
@@ -140,49 +167,41 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	CreateDirectoryW(ts->HomeDirW, NULL);
 	SetCurrentDirectoryW(ts->HomeDirW);		// TODO 必要??
 
-#if 1
-	{
-		// TERATERM.INI のフルパス
-		wchar_t *setup = NULL;
-		awcscats(&setup, ts->HomeDirW, L"\\TERATERM.INI", NULL);
-
-		// ファイルある?
-		if (GetFileAttributesW(setup) == INVALID_FILE_ATTRIBUTES) {
-			// exeフォルダからコピーする
-			wchar_t *src_ini = NULL;
-			awcscats(&src_ini, ts->ExeDirW, L"\\TERATERM.INI", NULL);
-			CopyFileW(src_ini, setup, TRUE);
-			free(src_ini);
-		}
-
-		ts->SetupFNameW = setup;
-	}
-#else
-	ts->SetupFNameW = GetDefaultSetupFNameW(ts->HomeDirW);
-#endif
+	// TERATERM.INI のフルパス
+	ts->SetupFNameW = NULL;
+	awcscats(&ts->SetupFNameW, ts->HomeDirW, L"\\TERATERM.INI", NULL);
 	WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
 
-#if 1
-	{
-		// KEYBOARD.CNF のフルパス
-		wchar_t *keycnf = NULL;
-		awcscats(&keycnf, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
-
-		// ファイルある?
-		if (GetFileAttributesW(keycnf) == INVALID_FILE_ATTRIBUTES) {
-			// exeフォルダからコピーする
-			wchar_t *src_ini = NULL;
-			awcscats(&src_ini, ts->ExeDirW, L"\\KEYBOARD.CNF", NULL);
-			CopyFileW(src_ini, keycnf, TRUE);
-			free(src_ini);
-		}
-
-		ts->KeyCnfFNW = keycnf;
-	}
-#else
-	ts->KeyCnfFNW = GetDefaultFNameW(ts->HomeDirW, L"KEYBOARD.CNF");
-#endif
+	// KEYBOARD.CNF のフルパス
+	ts->KeyCnfFNW = NULL;
+	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
 	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
+
+	// TERATERM.INI が存在する?
+	if (GetFileAttributesW(ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
+		// 存在しない場合、設定ファイルを個人フォルダへコピーする
+		// TODO 設定ファイルの unicode, ansi変換
+		static const wchar_t *filelist[] = {
+			L"TERATERM.INI",
+			L"KEYBOARD.CNF",
+			L"cygterm.cfg",
+#if 0
+			L"theme\\",
+			L"theme\\Advanced.sample",
+			L"theme\\ImageFile.INI",
+			L"theme\\scale\\",
+			L"theme\\scale\\23.jpg",
+			L"theme\\scale\\43.jpg",
+			L"theme\\Scale.INI",
+			L"theme\\tile\\",
+			L"theme\\tile\\03.jpg",
+			L"theme\\tile\\44.jpg",
+			L"theme\\Tile.INI",
+#endif
+			NULL,
+		};
+		CopyFiles(filelist, ts->ExeDirW, ts->HomeDirW);
+	}
 
 	if (FirstInstance) {
 		FirstInstance = FALSE;
