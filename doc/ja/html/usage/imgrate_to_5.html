@@ -42,5 +42,26 @@
         <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした</li>
       </ul>
     </ul>
+
+    <h1>Tera Term 5 へ移行(plugin)</h1>
+
+    <ul>
+      <li>compat_w95.hは不要となりました</li>
+      <ul>
+        <li><a href="https://osdn.net/projects/ttssh2/scm/svn/commits/9129">r9239</a></li>
+      </ul>
+      <li>plugin APIを変更しました</li>
+      <ul>
+        <li>ファイル名がUnicode (型が char から wchar_t) になりました。</li>
+        <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l44">trunk/teraterm/ttsetup.h</a></li>
+        <li><a href="https://osdn.net/projects/ttssh2/svn/view/branches/4-stable/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l39">4-stable/teraterm/ttsetup.h</a></li>
+      </ul>
+      <li>iniファイル読み書き共通関数を追加しました</li>
+      <ul>
+        <li>ファイル名だけをUnicode化して従来と同じ動作をする関数を準備</li>
+        <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/inifile_com.h?view=markup&root=ttssh2">trunk/teraterm/common/inifile_com.h</a></li>
+      </ul>
+    </ul>
+
   </body>
 </html>
