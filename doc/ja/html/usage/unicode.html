@@ -39,11 +39,12 @@ Languageに "Japanese" と "Korean" のいずれかを選んだ場合、次に「Setup[全般]」
 <h1>内部構造</h1>
 
 <p>
-  Tera Term 4 は内部バッファの文字コードはDBCSでした。、例えば日本語ではShift JISでした。
+  Tera Term 5 以前の内部バッファの文字コードはMBCS(Multibyte Character Set)でした。
+  例えば「Language[言語]」を"Japanese"としたとき内部バッファの文字コードはShift_JISでした。
 </p>
 
 <p>
-  Tera Term 5 は内部バッファの文字コードは、Unicodeです。
+  Tera Term 5 の内部バッファの文字コードは Unicodeです。
 </p>
 
 <p>
@@ -78,8 +79,8 @@ Languageに "Japanese" と "Korean" のいずれかを選んだ場合、次に「Setup[全般]」
 </pre>
 
 <p>
-  Windows 9xのとき、キー入力は Unicode に変換してから処理を行います。
-  描画は UnicodeをShift JISに変換して描画します。
+  Windows 95/98/Meのとき、キー入力は Unicode に変換してから処理を行います。
+  描画は UnicodeをMBCSに変換して描画します。
 </p>
 
 </BODY>
