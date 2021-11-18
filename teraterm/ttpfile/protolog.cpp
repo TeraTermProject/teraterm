@@ -175,6 +175,8 @@ static void SetFolderW(struct ProtoLog *pv, const wchar_t *folder)
 
 static void ProtoLogDestroy(TProtoLog *pv)
 {
+	pv->Close(pv);
+
 	PrivateData_t *pdata = (PrivateData_t *)pv->private_data;
 	if (pdata->Folder != NULL) {
 		free(pdata->Folder);
@@ -182,7 +184,6 @@ static void ProtoLogDestroy(TProtoLog *pv)
 	}
 	free(pdata);
 	pv->private_data = NULL;
-	pv->Close(pv);
 	free(pv);
 }
 
@@ -210,6 +211,7 @@ TProtoLog *ProtoLogCreate()
 	pv->DumpFlush = DumpFlush;
 	pv->WriteRaw = WriteRawData;
 	pv->Destory = ProtoLogDestroy;
+	pv->private_data = pdata;
 
 	pdata->LogFile = INVALID_HANDLE_VALUE;
 
