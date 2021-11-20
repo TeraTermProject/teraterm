@@ -581,7 +581,7 @@ void ChangeTerminalSize(int Nx, int Ny)
 }
 
 void SendCSIstr(char *str, int len) {
-	int l;
+	size_t l;
 
 	if (str == NULL || len < 0)
 		return;
@@ -602,7 +602,7 @@ void SendCSIstr(char *str, int len) {
 }
 
 void SendOSCstr(char *str, int len, char TermChar) {
-	int l;
+	size_t l;
 
 	if (str == NULL || len < 0)
 		return;
@@ -633,7 +633,7 @@ void SendOSCstr(char *str, int len, char TermChar) {
 }
 
 void SendDCSstr(char *str, int len) {
-	int l;
+	size_t l;
 
 	if (str == NULL || len < 0)
 		return;
@@ -1438,7 +1438,7 @@ void RestoreCursor()
 	RelativeOrgMode = Buff->RelativeOrgMode;
 }
 
-void AnswerTerminalType()
+static void AnswerTerminalType(void)
 {
 	char Tmp[50];
 
@@ -1490,7 +1490,7 @@ void AnswerTerminalType()
 	CommBinaryOut(&cv,Tmp,strlen(Tmp)); /* Report terminal ID */
 }
 
-void ESCSpace(BYTE b)
+static void ESCSpace(BYTE b)
 {
 	switch (b) {
 	case 'F':  // S7C1T
@@ -1504,7 +1504,7 @@ void ESCSpace(BYTE b)
 	}
 }
 
-void ESCSharp(BYTE b)
+static void ESCSharp(BYTE b)
 {
 	switch (b) {
 	case '8':  /* Fill screen with "E" (DECALN) */
@@ -1521,7 +1521,7 @@ void ESCSharp(BYTE b)
 }
 
 /* select double byte code set */
-void ESCDBCSSelect(BYTE b)
+static void ESCDBCSSelect(BYTE b)
 {
 	int Dist;
 
@@ -1552,7 +1552,7 @@ void ESCDBCSSelect(BYTE b)
 	}
 }
 
-void ESCSelectCode(BYTE b)
+static void ESCSelectCode(BYTE b)
 {
 	switch (b) {
 		case '0':
@@ -1563,7 +1563,7 @@ void ESCSelectCode(BYTE b)
 }
 
 	/* select single byte code set */
-void ESCSBCSSelect(BYTE b)
+static void ESCSBCSSelect(BYTE b)
 {
 	int Dist;
 
@@ -3262,7 +3262,7 @@ static void PrintFileFinish(PrintFile *handle)
 	PrintFile_ = NULL;
 }
 
-void CSQ_i_Mode()		// DECMC
+static void CSQ_i_Mode(void)		// DECMC
 {
 	switch (Param[1]) {
 	  case 1:
@@ -3421,7 +3421,7 @@ void CSQ_n_Mode()		// DECDSR
 	}
 }
 
-void CSQuest(BYTE b)
+static void CSQuest(BYTE b)
 {
 	switch (b) {
 	  case 'J': CSQSelScreenErase(); break;	// DECSED
@@ -4205,7 +4205,7 @@ void PrnParseCS(BYTE b) // printer mode
 	WriteToPrnFile(PrintFile_, b,TRUE);
 }
 
-void ParseCS(BYTE b) /* b is the final char */
+static void ParseCS(BYTE b) /* b is the final char */
 {
 	if (PrinterMode) { // printer mode
 		PrnParseCS(b);
@@ -5507,8 +5507,6 @@ void CANSeen(BYTE b)
  *	unicode(UTF-32,wchar_t)をバッファへ書き込む
  *	ログにも書き込む
  *
- *	元は UnicodeToCP932() だった
- *
  *	PutChar() の UTF-32版
  */
 static void PutU32(unsigned int code)
@@ -6114,9 +6112,26 @@ static BOOL ParseFirstUTF8(BYTE b)
 		return ParseFirstJP(b);
 	}
 
+	// UTF-8エンコード
+	//	Unicode					1byte,		  2byte,	   3byte, 		  4byte
+	//	U+0000  ... U+007f		0x00 .. 0x7f
+	//	U+0080  ... U+07ff		0xc2 .. 0xdf, 0x80 .. 0xbf
+	//	U+0800  ... U+ffff		0xe0 .. 0xef, 0x80 .. 0xbf, 0x80 .. 0xbf
+	//	U+10000 ... U+10ffff	0xf0 .. 0xf4, 0x80 .. 0xbf, 0x80 .. 0xbf, 0x80 .. 0xbf
+	// UTF-8でデコードできない場合
+	//	- 1byte目
+	//		- C1(0x80 - 0x9f)
+	//		- 0xa0 - 0xc1
+	//		- 0xf5 - 0xff
+	//	- 2byte目以降
+	//		- 0x00 - 0x7f
+	//		--0xc0 - 0xff
+
 	if ((b & 0x80) != 0x80 || ((b & 0xe0) == 0x80 && count == 0)) {
 		// 1バイト目および2バイト目がASCIIの場合は、すべてASCII出力とする。
 		// 1バイト目がC1制御文字(0x80-0x9f)の場合も同様。
+
+		// 入力文字が 0x00 ... 0x7f
 		if (count == 0 || count == 1) {
 			if (count == 1) {
 				ParseASCII(buf[0]);
