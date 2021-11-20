@@ -5071,13 +5071,8 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 
 static void XsProcClipboard(PCHAR buff)
 {
-	int len, blen;
-	char *p, *cbbuff, hdr[20];
+	char *p;
 	wchar_t *notify_buff, *notify_title;
-	HGLOBAL cbmem;
-	int wide_len;
-	HGLOBAL wide_cbmem;
-	LPWSTR wide_buf;
 
 	p = buff;
 	while (strchr("cps01234567", *p)) {
@@ -5087,6 +5082,7 @@ static void XsProcClipboard(PCHAR buff)
 	if (*p++ == ';') {
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
+				char hdr[20];
 				if (ts.NotifyClipboardAccess) {
 					GetI18nStrWW("Tera Term", "MSG_CBACCESS_TITLE",
 								 L"Clipboard Access", ts.UILanguageFileW, &notify_title);
@@ -5112,27 +5108,15 @@ static void XsProcClipboard(PCHAR buff)
 			}
 		}
 		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access
-			len = strlen(buff);
-			blen = len * 3 / 4 + 1;
-
-			if ((cbmem = GlobalAlloc(GMEM_MOVEABLE, blen)) == NULL) {
-				return;
-			};
-			if ((cbbuff = GlobalLock(cbmem)) == NULL) {
-				GlobalFree(cbmem);
-				return;
-			}
-
+			size_t len = strlen(buff);
+			size_t blen = len * 3 / 4 + 1;
+			char *cbbuff = malloc(blen);
 			len = b64decode(cbbuff, blen, p);
-
 			if (len < 0 || len >= blen) {
-				GlobalUnlock(cbmem);
-				GlobalFree(cbmem);
+				free(cbbuff);
 				return;
 			}
-
 			cbbuff[len] = 0;
-			GlobalUnlock(cbmem);
 
 			if (ts.NotifyClipboardAccess) {
 				wchar_t *buf;
@@ -5147,22 +5131,16 @@ static void XsProcClipboard(PCHAR buff)
 				free(notify_buff);
 			}
 
-			wide_len = MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, NULL, 0);
-			wide_cbmem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
-			if (wide_cbmem) {
-				wide_buf = (LPWSTR)GlobalLock(wide_cbmem);
-				MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, wide_buf, wide_len);
-				GlobalUnlock(wide_cbmem);
+			// cbbuff に入っている文字列をクリップボードにセットする
+			{
+				// wchar_t へ変換して設定
+				//	とりあえずUTF-8 が入っている前提
+				// 	TODO 受信文字コードに合わせて変更すればok?
+				wchar_t *cbbuffW = ToWcharU8(cbbuff);
+				CBSetTextW(NULL, cbbuffW, 0);
+				free(cbbuffW);
 			}
-
-			if (OpenClipboard(NULL)) {
-				EmptyClipboard();
-				SetClipboardData(CF_TEXT, cbmem);
-				if (wide_buf) {
-					SetClipboardData(CF_UNICODETEXT, wide_cbmem);
-				}
-				CloseClipboard();
-			}
+			free(cbbuff);
 		}
 		else if (ts.NotifyClipboardAccess) {
 			GetI18nStrWW("Tera Term", "MSG_CBACCESS_REJECT_TITLE",

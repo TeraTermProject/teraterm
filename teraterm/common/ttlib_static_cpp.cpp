@@ -194,41 +194,38 @@ BOOL IsTextW(const wchar_t *str, size_t len)
  *	クリップボードからwchar_t文字列を取得する
  *	文字列長が必要なときはwcslen()すること
  *	@param	hWnd
- *	@param	emtpy	TRUEのときクリップボードを空にする
- *	@retval	文字列へのポインタ 使用後free()すること
- *			文字がない(またはエラー時)はNULL
+ *	@param	emtpy		TRUEのときクリップボードを空にする
+ *	@retval	NULL		エラー
+ *	@retval	NULL以外	文字列へのポインタ 使用後free()すること
  */
 wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 {
-	UINT Cf;
-	wchar_t *str_w = NULL;
-	size_t str_w_len;
-	HGLOBAL TmpHandle;
-
-	// TODO GetPriorityClipboardFormat()
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
-		Cf = CF_UNICODETEXT;
+	static const UINT list[] = {
+		CF_UNICODETEXT,
+		CF_TEXT,
+		CF_OEMTEXT,
+		CF_HDROP,
+	};
+	UINT Cf = GetPriorityClipboardFormat((UINT *)list, _countof(list));
+	if (Cf == 0) {
+		// クリップボードが空だった
+		// 空文字を返す
+		return wcsdup(L"");
 	}
-	else if (IsClipboardFormatAvailable(CF_TEXT)) {
-		Cf = CF_TEXT;
-	}
-	else if (IsClipboardFormatAvailable(CF_OEMTEXT)) {
-		Cf = CF_OEMTEXT;
-	}
-	else if (IsClipboardFormatAvailable(CF_HDROP)) {
-		Cf = CF_HDROP;
-	}
-	else {
+	if (Cf == -1) {
+		// 扱えるデータがなかった
 		return NULL;
 	}
 
  	if (!OpenClipboard(hWnd)) {
 		return NULL;
 	}
-	TmpHandle = GetClipboardData(Cf);
+	HGLOBAL TmpHandle = GetClipboardData(Cf);
 	if (TmpHandle == NULL) {
 		return NULL;
 	}
+	wchar_t *str_w = NULL;
+	size_t str_w_len;
 	if (Cf == CF_HDROP) {
 		HDROP hDrop = (HDROP)TmpHandle;
 		UINT count = DragQueryFileW(hDrop, (UINT)-1, NULL, 0);
