@@ -466,7 +466,7 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 // RecurringCommand設定ダイアログのコールバック関数。
 //
 static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
-	const static DlgTextInfo text_info[] = {
+	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_TITLE" },
 		{ IDC_ENABLE, "DLG_ENABLE" },
 		{ IDC_INTERVAL_LABEL, "DLG_INTERVAL" },
