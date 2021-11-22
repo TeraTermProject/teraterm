@@ -157,16 +157,11 @@
 #define IDC_TERMIDLABEL                 1061
 #define IDC_TERMKANJILABEL              1062
 #define IDC_TERMKANJISENDLABEL          1063
-#define IDC_TERMRUSSCHARSET             1065
-#define IDC_TERMRUSSHOSTLABEL           1066
-#define IDC_TERMRUSSCLIENTLABEL         1067
 #define IDC_WINLISTLABEL                1068
 #define IDC_TCPIPTELNETKEEPALIVELABEL   1069
 #define IDC_SELECT_DIR                  1070
 #define IDC_BUILDTIME                   1071
 #define IDC_BUILDTOOL                   1072
-#define IDC_TERMRUSSFONTLABEL           1075
-#define IDC_TERMRUSSFONT                1076
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
 #define IDC_SERIALTEXT                  1079
@@ -176,7 +171,6 @@
 #define IDC_WINLISTLIST                 1201
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
-#define IDD_TERMDLGR                    1300
 #define IDD_TERMDLGK                    1301
 #define IDC_STATIC                      -1
 #define IDC_GENLANUI_LABEL              -1

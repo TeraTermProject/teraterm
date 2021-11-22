@@ -219,11 +219,13 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				SetDlgTexts(Dialog, TextInfosJp, _countof(TextInfosJp), UILanguageFile);
 			}
 			else if ( ts->Language==IdRussian ) {
+				// TODO
+				// 		éüÇÃÉLÅ[ÇégÇÌÇ»Ç≠Ç»Ç¡ÇΩ,êÆóùÇ∑ÇÈ
+				//			"DLG_TERM_RUSSCHARSET"
+				//			"DLG_TERM_RUSSFONT"
 				static const DlgTextInfo TextInfosRu[] = {
-					{ IDC_TERMRUSSCHARSET, "DLG_TERM_RUSSCHARSET" },
-					{ IDC_TERMRUSSHOSTLABEL, "DLG_TERM_RUSSHOST" },
-					{ IDC_TERMRUSSCLIENTLABEL, "DLG_TERM_RUSSCLIENT" },
-					{ IDC_TERMRUSSFONTLABEL, "DLG_TERM_RUSSFONT" },
+					{ IDC_TERMKANJILABEL, "DLG_TERM_RUSSCLIENT" },
+					{ IDC_TERMKANJISENDLABEL, "DLG_TERM_RUSSHOST" },
 				};
 				SetDlgTexts(Dialog, TextInfosRu, _countof(TextInfosRu), UILanguageFile);
 			}
@@ -3158,10 +3160,8 @@ BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 	case IdKorean: // Korean mode //HKS
 	case IdUtf8:   // UTF-8 mode
 	case IdChinese:
-		i = IDD_TERMDLGK;
-		break;
 	case IdRussian: // Russian mode
-		i = IDD_TERMDLGR;
+		i = IDD_TERMDLGK;
 		break;
 	default:  // English mode
 		i = IDD_TERMDLG;
