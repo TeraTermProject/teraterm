@@ -55,6 +55,7 @@
 #include "codeconv.h"
 #include "asprintf.h"
 #include "helpid.h"
+#include "win32helper.h"
 
 #include "setupdirdlg.h"
 
@@ -94,15 +95,14 @@ static BOOL GetVirtualStoreEnvironment(void)
 	// UACが有効かどうか。
 	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
 	flag = 0;
-	lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-		TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"),
-		NULL, KEY_QUERY_VALUE, &hKey
-		);
+	lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
+						 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+						 0, KEY_QUERY_VALUE, &hKey);
 	if (lRet == ERROR_SUCCESS) {
 		dwDataSize = sizeof(lpData) / sizeof(lpData[0]);
-		lRet = RegQueryValueEx(
+		lRet = RegQueryValueExA(
 			hKey,
-			TEXT("EnableLUA"),
+			"EnableLUA",
 			0,
 			&dwType,
 			(LPBYTE)lpData,
@@ -146,7 +146,7 @@ error:
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openFileWithApplication(const wchar_t *filename, const char *editor, const char *UILanguageFile)
+static BOOL openFileWithApplication(const wchar_t *filename, const char *editor, const wchar_t *UILanguageFile)
 {
 	wchar_t *commandW = NULL;
 	BOOL ret = FALSE;
@@ -160,7 +160,7 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxA(NULL, &info, UILanguageFile, no);
+		TTMessageBoxW(NULL, &info, UILanguageFile, no);
 
 		goto error;
 	}
@@ -182,7 +182,7 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 			"DLG_SETUPDIR_OPENFILE_ERROR", L"Cannot open file.(%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxA(NULL, &info, UILanguageFile, no);
+		TTMessageBoxW(NULL, &info, UILanguageFile, no);
 
 		goto error;
 	}
@@ -199,36 +199,50 @@ error:;
 	return (ret);
 }
 
-//
-// エクスプローラでパスを開く。
-//
-// return TRUE: success
-//        FALSE: failure
-//
-static BOOL openDirectoryWithExplorer(const wchar_t *path, const char *UILanguageFile)
+/**
+ *	エクスプローラで指定ファイルのフォルダを開く
+ *	ファイルが存在する場合はファイルを選択した状態で開く
+ *	ファイルが存在しない場合はフォルダを開く
+ *
+ *	@param	file	ファイル
+ *	@retval TRUE: success
+ *	@retval	FALSE: failure
+ */
+static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILanguageFile)
 {
 	BOOL ret;
 
-	const DWORD attr = GetFileAttributesW(path);
+	DWORD attr = GetFileAttributesW(file);
 	if (attr == INVALID_FILE_ATTRIBUTES) {
-		// ファイルが存在しない
-		DWORD no = GetLastError();
-		static const TTMessageBoxInfoW info = {
-			"Tera Term",
-			"MSG_ERROR", L"ERROR",
-			"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)",
-			MB_OK | MB_ICONWARNING
-		};
-		TTMessageBoxA(NULL, &info, UILanguageFile, no);
-		ret = FALSE;
+		// ファイルが存在しない, ディレクトリをオープンする
+		wchar_t *dir = ExtractDirNameW(file);
+		attr = GetFileAttributesW(dir);
+		if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+			// フォルダを開く
+			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", dir, NULL, SW_NORMAL);
+			ret = h > 32 ? TRUE : FALSE;
+		}
+		else {
+			// ファイルもフォルダも存在しない
+			DWORD no = GetLastError();
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_ERROR", L"ERROR",
+				"DLG_SETUPDIR_NOFILE_ERROR", L"File does not exist.(%d)",
+				MB_OK | MB_ICONWARNING
+			};
+			TTMessageBoxW(NULL, &info, UILanguageFile, no);
+			ret = FALSE;
+		}
+		free(dir);
 	} else if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-		// フォルダを開く
-		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", path, NULL, SW_NORMAL);
+		// 指定されたのがフォルダだった、フォルダを開く
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", file, NULL, SW_NORMAL);
 		ret = h > 32 ? TRUE : FALSE;
 	} else {
 		// フォルダを開く + ファイル選択
 		wchar_t *param;
-		aswprintf(&param, L"/select,%s", path);
+		aswprintf(&param, L"/select,%s", file);
 		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", param, NULL, SW_NORMAL);
 		free(param);
 		ret = h > 32 ? TRUE : FALSE;
@@ -308,15 +322,6 @@ epilogue:
 	free(path);
 	free(file);
 	return ret;
-}
-
-static wchar_t *GetWindowTextAlloc(HWND hWnd)
-{
-	size_t length = GetWindowTextLengthW(hWnd);
-	length++;
-	wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * length);
-	GetWindowTextW(hWnd, buf, (int)length);
-	return buf;
 }
 
 static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -530,31 +535,24 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 
 		if (button_pressed) {
-			wchar_t *filename_p;
+			wchar_t *filename;
 			if (!IsWindowEnabled(GetDlgItem(hDlgWnd, edit_vstore))) {
-				filename_p = GetWindowTextAlloc(GetDlgItem(hDlgWnd, edit));
+				hGetWindowTextW(GetDlgItem(hDlgWnd, edit), &filename);
 			} else {
-				filename_p = GetWindowTextAlloc(GetDlgItem(hDlgWnd, edit_vstore));
+				hGetWindowTextW(GetDlgItem(hDlgWnd, edit_vstore), &filename);
 			}
 
-			const char *UILanguageFile = pts->UILanguageFile;
+			const wchar_t *UILanguageFile = pts->UILanguageFileW;
 			if (open_dir) {
-#if 0
-				// フォルダを開く
-				wchar_t *path_p = ExtractDirNameW(filename_p);
-				openDirectoryWithExplorer(path_p, UILanguageFile);
-				free(path_p);
-#else
 				// フォルダを開いて、ファイルを選択する
-				openDirectoryWithExplorer(filename_p, UILanguageFile);
-#endif
+				openDirectoryWithExplorer(filename, UILanguageFile);
 			}
 			else {
-				char *editor = pts->ViewlogEditor;
-				openFileWithApplication(filename_p, editor, UILanguageFile);
+				const char *editor = pts->ViewlogEditor;
+				openFileWithApplication(filename, editor, UILanguageFile);
 			}
 
-			free(filename_p);
+			free(filename);
 			return TRUE;
 		}
 		return FALSE;
