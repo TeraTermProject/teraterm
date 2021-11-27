@@ -8,8 +8,11 @@ add_library(
   language.c
   language.h
   ttcmn.c
-  ttcmn_notify.cpp
   ttcmn_cominfo.c
+  ttcmn_cominfo.h
+  ttcmn_dup.cpp
+  ttcmn_dup.h
+  ttcmn_notify.cpp
   ttpcmn-version.rc
   ttpcmn.def
   ${COMMON_SRC}

@@ -231,6 +231,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ttcmn_dup.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ttcmn_notify.cpp"
 				>
 			</File>
@@ -265,6 +269,14 @@
 			</File>
 			<File
 				RelativePath="..\common\servicenames.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttcmn_cominfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ttcmn_dup.h"
 				>
 			</File>
 			<File

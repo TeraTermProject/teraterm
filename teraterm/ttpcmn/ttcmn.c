@@ -49,6 +49,8 @@
 #include "compat_win.h"
 #include "asprintf.h"
 
+#include "ttcmn_dup.h"
+
 #define DllExport __declspec(dllexport)
 #include "ttcommon.h"
 
@@ -56,8 +58,6 @@
 typedef struct {
 	size_t size_tmap;		/* sizeof TMap */
 	size_t size_tttset;		/* sizeof TTTSet */
-	/* Setup information from "teraterm.ini" */
-	TTTSet ts;
 	// Window list
 	int NWin;
 	HWND WinList[MAXNWIN];
@@ -71,6 +71,9 @@ typedef struct {
 	WINDOWPLACEMENT WinPrevRect[MAXNWIN];
 	BOOL WinUndoFlag;
 	int WinUndoStyle;
+	// Duplicate Teraterm data
+	HANDLE DuplicateDataHandle;
+	DWORD DuplicateDataSizeLow;
 } TMap;
 typedef TMap *PMap;
 
@@ -96,17 +99,38 @@ enum window_style {
 	WIN_SIDEBYSIDE,
 };
 
+static const char DupDataName[] = "dupdata";
 
 void WINAPI CopyShmemToTTSet(PTTSet ts)
 {
-	// 現在の設定を共有メモリからコピーする
-	memcpy(ts, &pm->ts, sizeof(TTTSet));
+	DWORD size = pm->DuplicateDataSizeLow;
+	HANDLE handle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, DupDataName);
+	void *ptr = (void *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+	TTCMNUnserialize(ptr, (size_t)size, ts);
+	UnmapViewOfFile(ptr);
+	CloseHandle(handle);
+	pm->DuplicateDataSizeLow = 0;
 }
 
 void WINAPI CopyTTSetToShmem(PTTSet ts)
 {
-	// 現在の設定を共有メモリへコピーする
-	memcpy(&pm->ts, ts, sizeof(TTTSet));
+	size_t size;
+	void *ptr = TTCMNSerialize(ts, &size);
+	if (ptr != NULL) {
+		HANDLE handle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, (DWORD)size, DupDataName);
+		void *dest = (void *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS,0,0,0);
+		memcpy(dest, ptr, size);
+		UnmapViewOfFile(dest);
+		//CloseHandle(handle);	do not close, 使用しない状態になるとなくなってしまう
+
+		if (pm->DuplicateDataHandle != NULL) {
+			// 1回前の情報を削除する
+			CloseHandle(pm->DuplicateDataHandle);
+		}
+		pm->DuplicateDataHandle = handle;
+		pm->DuplicateDataSizeLow = (DWORD)size;
+		free(ptr);
+	}
 }
 
 static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const wchar_t *dest_dir)
@@ -146,13 +170,11 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	}
 	else {
 		/* only the first instance uses saved position */
-		pm->ts.VTPos.x = CW_USEDEFAULT;
-		pm->ts.VTPos.y = CW_USEDEFAULT;
-		pm->ts.TEKPos.x = CW_USEDEFAULT;
-		pm->ts.TEKPos.y = CW_USEDEFAULT;
+		ts->VTPos.x = CW_USEDEFAULT;
+		ts->VTPos.y = CW_USEDEFAULT;
+		ts->TEKPos.x = CW_USEDEFAULT;
+		ts->TEKPos.y = CW_USEDEFAULT;
 	}
-
-	memcpy(ts,&(pm->ts),sizeof(TTTSet));
 
 	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
 	// 起動時には、共有メモリの HomeDir と SetupFName は空になる

@@ -40,6 +40,9 @@
     <ClCompile Include="ttcmn_cominfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ttcmn_dup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\i18n.h">
@@ -61,6 +64,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\devpkey_teraterm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttcmn_dup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttcmn_cominfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
