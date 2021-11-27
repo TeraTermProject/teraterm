@@ -112,16 +112,18 @@ void WINAPI CopyTTSetToShmem(PTTSet ts)
 static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const wchar_t *dest_dir)
 {
 	for (;;) {
+		wchar_t *dest;
+		size_t len;
 		const wchar_t *filename = *file_list;
 		file_list++;
 		if (filename == NULL) {
 			break;
 		}
 
-		wchar_t *dest = NULL;
+		dest = NULL;
 		awcscats(&dest, dest_dir, L"\\", filename, NULL);
 
-		size_t len = wcslen(dest);
+		len = wcslen(dest);
 		if (dest[len - 1] == '\\') {
 			// ÉtÉHÉãÉ_çÏê¨
 			CreateDirectoryW(dest, NULL);

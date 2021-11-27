@@ -210,7 +210,7 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	if (Cf == 0) {
 		// クリップボードが空だった
 		// 空文字を返す
-		return wcsdup(L"");
+		return _wcsdup(L"");
 	}
 	if (Cf == -1) {
 		// 扱えるデータがなかった
