@@ -49,7 +49,7 @@
 
 struct FontPPData {
 	HINSTANCE hInst;
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFileW;
 	TTTSet *pts;
 	DLGTEMPLATE *dlg_templ;
 //	LOGFONTA VTFont;
@@ -75,10 +75,11 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 {
 	if (Message == WM_INITDIALOG) {
 		FontPPData *dlg_data = (FontPPData *)(((CHOOSEFONTA *)lParam)->lCustData);
-		wchar_t uimsg[MAX_UIMSG];
-		get_lang_msgW("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
-					  L"\"Font style\" selection here won't affect actual font appearance.", dlg_data->UILanguageFile);
+		wchar_t *uimsg;
+		static const wchar_t def[] = L"\"Font style\" selection here won't affect actual font appearance.";
+		GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", def, dlg_data->UILanguageFileW, &uimsg);
 		SetDlgItemTextW(Dialog, stc6, uimsg);
+		free(uimsg);
 
 		SetFocus(GetDlgItem(Dialog,cmb1));
 
@@ -202,6 +203,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, ts);
 
+					// font quality
+					int cur = (int)SendDlgItemMessageA(hWnd, IDC_FONT_QUALITY, CB_GETCURSEL, 0, 0);
+					ts->FontQuality =
+						cur == 0 ? DEFAULT_QUALITY :
+						cur == 1 ? NONANTIALIASED_QUALITY :
+						cur == 2 ? ANTIALIASED_QUALITY :
+						CLEARTYPE_QUALITY;
+
 					break;
 				}
 				case PSN_HELP:
@@ -262,7 +271,7 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 
 	FontPPData *Param = (FontPPData *)calloc(sizeof(FontPPData), 1);
 	Param->hInst = inst;
-	Param->UILanguageFile = pts->UILanguageFile;
+	Param->UILanguageFileW = pts->UILanguageFileW;
 	Param->pts = pts;
 
 	PROPSHEETPAGEW_V1 psp = {};

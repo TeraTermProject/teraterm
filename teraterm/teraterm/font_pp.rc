@@ -65,7 +65,7 @@ BEGIN
     LTEXT           "フォント品質",IDC_STATIC,19,129,39,8
     CONTROL         "OSで非表示のフォントもフォントダイアログの一覧に表示する",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,194,200,10
-    COMBOBOX        IDC_FONT_QUALITY,30,141,87,69,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FONT_QUALITY,30,141,87,69,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "文字描画で使用するAPI",IDC_STATIC,19,50,80,8
     CONTROL         "プロポーショナルフォントもフォントダイアログの一覧に表示する",IDC_LIST_PRO_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,209,203,10
