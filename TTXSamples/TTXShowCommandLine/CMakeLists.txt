@@ -14,6 +14,7 @@ if(SUPPORT_OLD_WINDOWS)
     ${PACKAGE_NAME}
     PRIVATE
     layer_for_unicode
+    common_static
     )
   if(MSVC)
     target_sources(
@@ -44,4 +45,3 @@ target_include_directories(
   ../../teraterm/teraterm
   ../../teraterm/common
   )
-

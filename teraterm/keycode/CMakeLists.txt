@@ -16,6 +16,7 @@ if(SUPPORT_OLD_WINDOWS)
     ${PACKAGE_NAME}
     PRIVATE
     layer_for_unicode
+    common_static
     )
   if(MSVC)
     target_sources(
@@ -68,8 +69,8 @@ if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
     ${PACKAGE_NAME_2}
     PRIVATE
-    common_static
     layer_for_unicode
+    common_static
     )
   if(MSVC)
     target_sources(

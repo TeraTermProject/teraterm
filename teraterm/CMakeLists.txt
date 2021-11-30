@@ -43,6 +43,8 @@ if(SUPPORT_OLD_WINDOWS)
     set_target_properties(
       layer_for_unicode
       PROPERTIES FOLDER teraterm)
+  else()
+    message(FATAL_ERROR "64bit binary can not support 9x")
   endif()
 
   if(MINGW)
@@ -52,5 +54,3 @@ if(SUPPORT_OLD_WINDOWS)
       PROPERTIES FOLDER teraterm)
   endif(MINGW)
 endif()
-
-
