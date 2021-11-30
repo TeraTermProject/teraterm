@@ -950,9 +950,9 @@ wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguag
 	wchar_t *fullpath;
 	size_t size = wcslen(HomeDir) + 1 + wcslen(UILanguageFileRel) + 1;
 	wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
-	wcscpy(rel, HomeDir);
-	wcscat(rel, L"\\");
-	wcscat(rel, UILanguageFileRel);
+	wcscpy_s(rel, size, HomeDir);
+	wcscat_s(rel, size, L"\\");
+	wcscat_s(rel, size, UILanguageFileRel);
 	hGetFullPathNameW(rel, &fullpath, NULL);
 	free(rel);
 	return fullpath;
@@ -983,7 +983,7 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 		// My Documents ‚É file ‚ª‚ ‚é‚©?
 		size_t destlen = (wcslen(MyDoc) + wcslen(file) + 1 + 1) * sizeof(wchar_t);
 		wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * destlen);
-		wcscpy(dest, MyDoc);
+		wcscpy_s(dest, destlen, MyDoc);
 		AppendSlashW(dest,destlen);
 		wcsncat_s(dest, destlen, file, _TRUNCATE);
 		DWORD r = GetFileAttributesW(dest);
@@ -1000,7 +1000,7 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 
 	size_t destlen = (wcslen(home) + wcslen(file) + 1 + 1) * sizeof(wchar_t);
 	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * destlen);
-	wcscpy(dest, home);
+	wcscpy_s(dest, destlen, home);
 	AppendSlashW(dest,destlen);
 	wcsncat_s(dest, destlen, file, _TRUNCATE);
 	return dest;

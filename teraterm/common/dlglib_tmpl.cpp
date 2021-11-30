@@ -85,17 +85,6 @@ typedef struct
 } DLGITEMTEMPLATEEX;
 #pragma pack(pop)
 
-#if 0 // !defined(_MSC_VER)
-static inline errno_t wcscpy_s(
-	wchar_t *dest,
-	size_t dest_size,
-	const wchar_t *src)
-{
-	wcscpy(dest, src);
-	return 0;
-}
-#endif
-
 static size_t CopySz(const WORD *src, WORD *dest)
 {
 	size_t size = 0;
