@@ -26,6 +26,49 @@ cyglaunch で解釈されない引数は cygterm(又は msys2term)へ渡され�
 
 cygterm_here_reg_sample.txt 参照
 
+## cyglaunchの動作
+
+cygterm.exe の起動と同等なbat
+
+```
+set PATH=c:\cygwin64\bin;%PATH%
+\path\to\cygterm.exe
+```
+
+msys2term.exe の起動と同等なbat
+
+```
+set PATH=c:\msys64\bin;%PATH%
+\path\to\msys2term.exe
+```
+
+## TODO
+
+cyglaunchを拡張して次のbatと同等に起動させれば、Tera Termから使用できる
+
+### cmd.exe
+
+```
+start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "%COMSPEC%"
+```
+
+Microsoft Windows [Version 10.0.19043.1348] で動作確認
+
+### powershell.exe
+
+```
+start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+```
+
+### WSL (Windows Subsystem for Linux)
+
+```
+start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "/path/to/winpty.exe c:/windows/system32/bash.exe"
+```
+
+winpty は [github](https://github.com/rprichard/winpty/releases) からダウンロードすることができる。
+
+
 ## 歴史
 
 - cyglaunch は通常のexeファイル

@@ -27,6 +27,14 @@ install(
   DESTINATION .
   )
 
+install(
+  FILES
+  cyglaunch_cmd.bat
+  cyglaunch_powershell.bat
+  cyglaunch_wsl.bat
+  DESTINATION .
+  )
+
 if(MSVC)
   # subsystem:windows, but start form wmain()
   if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
