@@ -3284,6 +3284,8 @@
 
   <li>バグ修正
     <ul>
+      <li>Windows Vista以降でVirtual Storeが有効の場合でかつHost key rotationが有効の場合、known_hostsから元々あったホスト鍵を削除してしまう問題を修正した。</li>
+      <li>Windows Vista以降でVirtual Storeが有効の場合、ホスト鍵の種類が同じで、鍵の内容が異なるときに、known_hostsからの鍵削除ができない問題を修正した。</li>
     </ul>
   </li>
 
