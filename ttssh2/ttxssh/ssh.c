@@ -99,6 +99,8 @@ static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
 static CRITICAL_SECTION g_ssh_scp_lock;   /* SCP受信用ロック */
 
+static int g_scp_sending;  /* SCP送信中か? */
+
 static void try_send_credentials(PTInstVar pvar);
 static void prep_compression(PTInstVar pvar);
 
@@ -357,6 +359,8 @@ static void ssh2_channel_delete(Channel_t *c)
 		// Windows9xで落ちる問題を修正した。
 		if (c->scp.dir == FROMREMOTE)
 			ssh2_scp_free_packetlist(c);
+
+		g_scp_sending = FALSE;
 	}
 	if (c->type == TYPE_AGENT) {
 		buffer_free(c->agent_msg);
@@ -4254,6 +4258,8 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	finish_send_packet(pvar);
 	buffer_free(msg);
 
+	g_scp_sending = TRUE;
+
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at SSH_scp_transaction().");
 
 	return TRUE;
@@ -4270,6 +4276,11 @@ error:
 int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile)
 {
 	return SSH_scp_transaction(pvar, sendfile, dstfile, TOREMOTE);
+}
+
+int SSH_scp_sending_status(void)
+{
+	return g_scp_sending;
 }
 
 int SSH_start_scp_receive(PTInstVar pvar, char *filename)
