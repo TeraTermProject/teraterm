@@ -56,7 +56,7 @@
   Inno Setup Preprocessor
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - その他
-  Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
+  Cygwin 最新版(v4.105からCygTerm+はVista以降対応となったため)
   ActivePerl 5.10 以上 または Strawberry perl 5.30.1.1 以上
     ビルド過程で使用します
     - OpenSSL のコンパイル(必須)
@@ -243,9 +243,7 @@
 ■ CygTermのビルド方法
   CygTermのビルド方法について以下に示します。
 
-   1. Cygwin(http://www.cygwin.com/win-9x.html)をインストールする。
-      注意: 1.7.x は Windows 9x をサポートしていないので、1.5.x を利用する。
-            1.5.x は Windows 7 をサポートしていないようだが、1.5.x でコンパイルされたバイナリは 1.7.x 環境で実行できる。
+   1. Cygwin(https://www.cygwin.com/)をインストールする。
    2. Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
       # cd cygterm
    3. CygTermをコンパイルする。
@@ -353,40 +351,71 @@
      パッチがコミットされると即リリース扱いになり、リリース日はその日付となる。
      これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
 
-  4. 動作確認をする
+  4. 前回のリリースからCygTerm+に変更がある場合は、64bit Cygwinでビルドして cygterm\cygterm+-x86_64\cygterm.exe の差し替えを行う。
+  
+  5. 動作確認をする
      - インストーラを作成する。
        ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される。
      - インストールおよび実行をテストする。
 
-  5. SVN のタグを作成する。
+  6. SVN のタグを作成する。
      タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。
      svn copy -m "Release 4.82" svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_82
 
-  6. リリース用のタグでチェックアウトし直す。
+  7. リリース用のタグでチェックアウトし直す。
 
-  7. インストーラを作成する。
-     ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
+  8. インストーラを作成する。
+     - teraterm\installer\teraterm.iss を編集する
+       #define AppVer "4.???"
+       ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+       
+       [InnoIDE_PreCompile]
+       Name: makechm.bat
+       ;Name: build.bat
+       Name: build.bat; Parameters: rebuild
 
-  8. OSDN を更新する。
+       [InnoIDE_PostCompile]
+       Name: makearchive.bat; Parameters: release
+
+       [PreCompile]
+       Name: makechm.bat
+       ;Name: build.bat
+       Name: build.bat; Parameters: rebuild
+
+       [PostCompile]
+       Name: makearchive.bat; Parameters: release
+
+       [_ISToolPreCompile]
+       Name: makechm.bat
+       ;Name: build.bat
+       Name: build.bat; Parameters: rebuild
+
+       [_ISToolPostCompile]
+       Name: makearchive.bat; Parameters: release   
+       
+  
+     - ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
+
+  9. OSDN を更新する。
      - [ダウンロード]-[管理]-[新規作成]
          変更履歴を入力してリリースを作成する。
      - [ニュース一覧]-[新規登録]
          ニュース記事を作成する。
 
-  9. メーリングリストにアナウンスする。
+  10. メーリングリストにアナウンスする。
 
-  10. プロジェクトページを更新する。
+  11. プロジェクトページを更新する。
 
-  11. スナップショットを削除する。
+  12. スナップショットを削除する。
 
-  12. フォーラムに告知する。
+  13. フォーラムに告知する。
       - Announcements http://logmett.com/support-forums/5
         Announcements に新規投稿する。種類は Announcement。
         一つ前の Announcement の種類を Normal に変更する。
         Announcement は三個残すことになっているので、三つ前の Announcement を削除する。
 
-  13. Twitter に告知する。
+  14. Twitter に告知する。
       https://twitter.com/Tera_Term
       リリース告知をツイートして固定する。
 
-  14. Chocolatey の登録を更新
+  15. Chocolatey の登録を更新
