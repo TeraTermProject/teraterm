@@ -80,7 +80,9 @@ static void *LoadRawFile(FILE *fp, size_t *_len, BOOL terminate)
 
 /**
  *	ファイルをメモリに読み込む
+ *	@param[in]	fp		"rb" でオープンすること
  *	@param[out]	*_len	サイズ(最後に付加される"\0\0"を含む)
+ *						省略不可
  *	@retval		ファイルの中身へのポインタ(使用後free()すること)
  *				NULL=エラー
  */
@@ -115,16 +117,21 @@ uint8_t *LoadFileBinary(const wchar_t *FileName, size_t *_len)
  *
  *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
  *						NULLのときは長さを返さない
+ *	@param[out] *_code	ファイルの文字コード
  *	@retval		ファイルの中身へのポインタ(使用後free()すること)
  *				NULL=エラー
  */
-char *LoadFileU8(FILE *fp, size_t *_len)
+char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code)
 {
 	size_t len;
+	LoadFileCode code;
 	void *vbuf = LoadRawFile(fp, &len);
 	if (vbuf == NULL) {
 		if (_len != NULL) {
 			*_len = 0;
+		}
+		if (_code != NULL) {
+			*_code = FILE_CODE_NONE;
 		}
 		return NULL;
 	}
@@ -133,12 +140,14 @@ char *LoadFileU8(FILE *fp, size_t *_len)
 	if (len >= 3 && (buf[0] == 0xef && buf[1] == 0xbb && buf[2] == 0xbf)) {
 		// UTF-8 BOM
 		//		trim BOM
+		code = FILE_CODE_UTF8;
 		len -= 3;
 		memmove(&buf[0], &buf[3], len);
 	} else if(len >= 2 && (buf[0] == 0xff && buf[1] == 0xfe)) {
 		// UTF-16LE BOM
 		//		UTF-16LE -> UTF-8
 		const char *u8 = ToU8W((wchar_t *)&buf[2]);
+		code = FILE_CODE_UTF16LE;
 
 		free(buf);
 		buf = (uint8_t *)u8;
@@ -158,23 +167,44 @@ char *LoadFileU8(FILE *fp, size_t *_len)
 		}
 		//		UTF-16LE -> UTF-8
 		const char *u8 = ToU8W((wchar_t *)&buf[2]);
+		code = FILE_CODE_UTF16BE;
 
 		free(buf);
 		buf = (uint8_t *)u8;
 	} else {
 		// ACP? -> UTF-8
 		const char *u8 = ToU8A((char *)buf);
+		code = FILE_CODE_UTF8;
 		if (u8 != NULL) {
 			// ACP -> UTF-8
 			free(buf);
 			buf = (uint8_t *)u8;
+			code = FILE_CODE_ACP;
 		}
 	}
 
 	if (_len != NULL) {
 		*_len = strlen((char *)buf)+1;	// 改めて長さを計る
 	}
+	if (_code != NULL) {
+		*_code = code;
+	}
 	return (char *)buf;
+}
+
+/**
+ *	ファイルをメモリに読み込む
+ *	中身はUTF-8に変換される
+ *	ファイルの最後は '\0'でターミネートされている
+ *
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *						NULLのときは長さを返さない
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
+ */
+char *LoadFileU8(FILE *fp, size_t *_len)
+{
+	return LoadFileU8C(fp, _len, NULL);
 }
 
 /**

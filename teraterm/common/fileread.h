@@ -26,10 +26,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include <stdio.h>
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif//__cplusplus
 
+typedef enum {
+	FILE_CODE_NONE,
+	FILE_CODE_UTF8,
+	FILE_CODE_UTF16LE,
+	FILE_CODE_UTF16BE,
+	FILE_CODE_ACP,
+} LoadFileCode;
+
+char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code);
 char *LoadFileU8A(const char *FileName, size_t *_len);
 char *LoadFileU8W(const wchar_t *FileName, size_t *_len);
 wchar_t *LoadFileWA(const char *FileName, size_t *_len);
