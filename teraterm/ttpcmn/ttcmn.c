@@ -47,6 +47,7 @@
 #include "tt_res.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "win32helper.h"
 #include "asprintf.h"
 
 #include "ttcmn_dup.h"
@@ -238,11 +239,10 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 
 // 設定ファイルをディスクに保存し、Tera Term本体を再起動する。
 // (2012.4.30 yutaka)
+// 使っていない?
 void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 {
-	char path[1024];
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
+	wchar_t *path;
 	int ret;
 
 	static const TTMessageBoxInfoW info = {
@@ -263,14 +263,9 @@ void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 	PostQuitMessage(0);
 
 	// 自プロセスの再起動。
-	if (GetModuleFileName(NULL, path, sizeof(path)) == 0) {
-		return;
-	}
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-	if (CreateProcess(NULL, path, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
+	if (hGetModuleFileNameW(NULL, &path) == 0) {
+		TTWinExec(path);
+		free(path);
 	}
 }
 
