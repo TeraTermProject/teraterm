@@ -31,33 +31,54 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<!--h3 id="teraterm_5.0">202x.xx.xx (Ver 5.0)</h3>
+<h3 id="teraterm_5.0">202x.xx.xx (Ver 5.0)</h3>
 <ul class="history">
-  <li>Changes
+  <!-- li>変更
     <ul>
+      <li></li>
+    </ul>
+  </li -->
+
+  <li>バグ修正
+    <ul>
+      <li>TELNET.LOGのファイルハンドルがクローズできていない問題を修正した。</li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li>Q & A集に輸出規制(EAR)について追記した。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_4.106">2021.6.5 (Ver 4.106)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>端末横幅の最大値を500文字から1000文字に変更した。</li>
       <li>シリアルポート接続
         <ul>
           <li>シリアルポート設定で、1.5ストップビットのサポートを削除した。</li>
           <li>teraterm.ini の StopBit エントリから"1.5"を削除した。</li>
         </ul></li>
-      <li>端末横幅の最大値を500文字から1000文字に変更した</li>
     </ul>
   </li>
 
-  <li>Bug fixes
+  <li>バグ修正
     <ul>
-      <li><a href="../macro/command/filecreate.html">filecreate</a>, <a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで開いたファイルハンドルがロックしている問題を修正した。</li>
-      <li><a href="../macro/command/yesnobox.html">yesnobox</a> マクロコマンドで、言語ファイルを読み込まないとき "OK" が表示されていた。"yes" に修正。4.103でエンバグ。</li>
-      <li>ツールチップ表示時のメモリリークを修正。4.103でのエンバグ。</li>
-      <li><a href="../usage/tips/ime.html#feedback">IMEの前後参照変換機能</a>が動作するよう修正。4.103でのエンバグ。</li>
-      <li>メインディスプレイ以外でデスクトップ画像を背景に表示できなかったのを修正。4.101でのエンバグ。</li>
-      <li>VT ウィンドウと Htmlヘルプウィンドウを同時に閉じるとアプリケーションフォールトが発生する不具合を修正</li>
-      <li>telnetのログがクローズできていなかったので修正した。</li>
       <li>ログの経過時間形式のタイムスタンプの形式が正しくない問題を修正した。</li>
+      <li><a href="../usage/tips/ime.html#feedback">IMEの前後参照変換機能</a>が動作するよう修正した。4.103でのエンバグ。</li>
+      <li>VT ウィンドウと Htmlヘルプウィンドウを同時に閉じるとアプリケーションフォールトが発生する不具合を修正した。</li>
+      <li>メインディスプレイ以外でデスクトップ画像を背景に表示できなかったのを修正した。4.101でのエンバグ。</li>
+      <li>ツールチップ表示時のメモリリークを修正した。4.103でのエンバグ。</li>
+      <li><a href="../macro/command/yesnobox.html">yesnobox</a> マクロコマンドで、言語ファイルを読み込まないとき "OK" が表示されていた。"yes" に修正した。4.103でエンバグ。</li>
+      <li><a href="../macro/command/filecreate.html">filecreate</a>, <a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで開いたファイルハンドルがロックしている問題を修正した。</li>
+      <li><a href="../macro/command/getdate.html">getdate</a>, <a href="../macro/command/gettime.html">gettime</a> マクロコマンドで timezone つきで呼び出すと正しい時刻を返さない問題を修正した。v4.105でのビルドミス。</li>
     </ul>
   </li>
 
-  <li>Misc
+  <li>その他
     <ul>
       <li><a href="#ttssh_2.92">TTSSH(2.92)</a>へ差し替えた。</li>
       <li><a href="#kanjimenu_0.1.8">TTX KanjiMenu Plugin(0.1.8)</a>へ差し替えた。</li>
@@ -65,7 +86,7 @@
       <li>Oniguruma 6.9.7.1へ差し替えた。</li>
     </ul>
   </li>
-</ul-->
+</ul>
 
 <h3 id="teraterm_4.105">2019.12.7 (Ver 4.105)</h3>
 <ul class="history">
@@ -3283,7 +3304,7 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
-<!--h3 id="ttssh_2.92">202x.xx.x (Ver 2.92)</h3>
+<h3 id="ttssh_2.92">2021.6.5 (Ver 2.92)</h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -3294,21 +3315,21 @@
 
   <li>バグ修正
     <ul>
-      <li>システムのメモリが不足している時、鍵交換時のホスト鍵による署名検証で不正な署名を正しい物として扱う可能性が有った問題を修正した。</li>
       <li>Windows Vista以降でVirtual Storeが有効の場合でかつHost key rotationが有効の場合、known_hostsから元々あったホスト鍵を削除してしまう問題を修正した。</li>
       <li>Windows Vista以降でVirtual Storeが有効の場合、ホスト鍵の種類が同じで、鍵の内容が異なるときに、known_hostsからの鍵削除ができない問題を修正した。</li>
       <li>D&DによるSCP送信で、多数のファイルを一括送信するとエラーになる問題を修正した。</li>
-      <li>SSH認証ダイアログで一部のコントロールが常に有効になっていた</li>
-      <li>ユーザ認証が完了した直後にVTウィンドウのサイズを変更したり Send berak を送信すると、サーバから切断される問題を修正した。</li>
+      <li>ユーザ認証が完了した直後にVTウィンドウのサイズを変更したり Send break を送信したりすると、サーバから切断される問題を修正した。</li>
+      <li>システムのメモリが不足している時、鍵交換時のホスト鍵による署名検証で不正な署名を正しい物として扱う可能性が有った問題を修正した。</li>
+      <li>SSH認証ダイアログで一部のコントロールが常に有効になる問題を修正した。</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li>OpenSSL 1.1.1k へ差し替えた。</li>
+      <li>OpenSSL 1.1.1dから1.1.1kへ差し替えた。</li>
     </ul>
   </li>
-</ul-->
+</ul>
 
 <h3 id="ttssh_2.91">2019.12.7 (Ver 2.91)</h3>
 <ul class="history">
@@ -5109,7 +5130,7 @@
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
-<h3 id="ttmenu_1.16">2021.xx.xx (Ver 1.16)</h3>
+<h3 id="ttmenu_1.16">2021.6.5 (Ver 1.16)</h3>
 <ul class="history">
       <li>リストへ登録するボタンのツールチップの文言をRegister, Unregisterに変更した。</li>
       <li>バージョン情報に余計な￥が表示されていた問題を修正した。</li>
