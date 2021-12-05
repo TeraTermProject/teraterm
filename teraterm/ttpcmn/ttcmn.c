@@ -36,6 +36,7 @@
 #include <htmlhelp.h>
 #include <assert.h>
 #include <crtdbg.h>
+#include <time.h>
 
 #define DllExport __declspec(dllexport)
 #include "language.h"
@@ -49,6 +50,7 @@
 #include "compat_win.h"
 #include "win32helper.h"
 #include "asprintf.h"
+#include "fileread.h"
 
 #include "ttcmn_dup.h"
 
@@ -163,6 +165,21 @@ static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const 
 	}
 }
 
+static void ConvertIniFiles(const wchar_t *filelist[],  const wchar_t *dir, const wchar_t *date_str)
+{
+	while(1) {
+		if (*filelist == NULL) {
+			break;
+		}
+
+		wchar_t *fname = NULL;
+		awcscats(&fname, dir, L"\\", *filelist, NULL);
+		ConvertIniFileCharCode(fname, date_str);
+		free(fname);
+		filelist++;
+	}
+}
+
 BOOL WINAPI StartTeraTerm(PTTSet ts)
 {
 	if (FirstInstance) {
@@ -202,10 +219,9 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
 	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 
-	// TERATERM.INI が存在する?
+	// TERATERM.INI が存在しないとき
+	// 設定ファイルを個人フォルダへコピーする
 	if (GetFileAttributesW(ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
-		// 存在しない場合、設定ファイルを個人フォルダへコピーする
-		// TODO 設定ファイルの unicode, ansi変換
 		static const wchar_t *filelist[] = {
 			L"TERATERM.INI",
 			L"KEYBOARD.CNF",
@@ -226,6 +242,26 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 			NULL,
 		};
 		CopyFiles(filelist, ts->ExeDirW, ts->HomeDirW);
+	}
+
+	// iniファイルの文字コードを変換する
+	{
+		static const wchar_t *filelist[] = {
+			L"TERATERM.INI",
+			L"KEYBOARD.CNF",
+			NULL,
+		};
+
+		// backup ファイルにつける日付文字列
+		time_t now;
+		time(&now);
+		struct tm *now_tm;
+		now_tm = localtime(&now);
+		wchar_t dete_str[256];
+		wcsftime(dete_str, _countof(dete_str), L"%y%m%d_%H%M%S_", now_tm);
+
+		// iniファイルを変換する
+		ConvertIniFiles(filelist, ts->HomeDirW, dete_str);
 	}
 
 	if (FirstInstance) {

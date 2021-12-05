@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* C99風に記述できるようにcppとした */
+/* Visual Studio 2005 が C89 */
+
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,12 +41,14 @@
 #include <wchar.h>
 #include <shlobj.h>
 #include <malloc.h>
+#include <time.h>
 
 #include "i18n.h"
 #include "asprintf.h"
 #include "win32helper.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "fileread.h"
 
 #include "ttlib.h"
 
@@ -1424,4 +1429,122 @@ DWORD TTWinExecA(const char *commandA)
 	DWORD e = TTWinExec(commandW);
 	free(commandW);
 	return e;
+}
+
+/**
+ *	バックアップファイルを作成する
+ *
+ *	@param[in]	fname		ファイル名(フルパス)
+ *	@param[in]	prev_str	ファイル名の前に追加する文字列
+ *							NULLの場合は、現在日時文字列となる
+ *	例
+ *		frame
+ *			"C:\Users\user\AppData\Roaming\teraterm5\TERATERM.INI"
+ *		prev_str
+ *			NULL
+ *		作成されるバックアップファイル
+ *			"C:\Users\user\AppData\Roaming\teraterm5\211204_231234_TERATERM.INI"
+ */
+void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str)
+{
+	DWORD attr = GetFileAttributesW(fname);
+	if (attr == INVALID_FILE_ATTRIBUTES) {
+		// ファイルがない
+		return;
+	}
+
+	wchar_t dete_str[32];
+	const wchar_t *prev_str_ptr = prev_str;
+	if (prev_str == NULL) {
+		time_t now;
+		time(&now);
+		struct tm *now_tm;
+		now_tm = localtime(&now);
+		wcsftime(dete_str, _countof(dete_str), L"%y%m%d_%H%M%S_", now_tm);
+		prev_str_ptr = dete_str;
+	}
+
+	wchar_t *dup = _wcsdup(fname);
+	wchar_t *p = wcsrchr(dup, L'\\') + 1;
+	wchar_t *name = _wcsdup(p);
+	*p = 0;
+	const wchar_t *path = dup;
+
+	wchar_t *bak_fname = NULL;
+	awcscats(&bak_fname, path, prev_str_ptr, name, NULL);
+	free(dup);
+	free(name);
+
+	MoveFileW(fname, bak_fname);
+	CopyFileW(bak_fname, fname, TRUE);
+	free(bak_fname);
+}
+
+// common_static.lib 単体でビルドできるよう追加
+// TODO すべてcommon_static移動する?
+static BOOL _IsWindows2000OrLater(void)
+{
+	return IsWindowsVerOrLater(5, 0);
+}
+
+/**
+ *	iniファイルを現在の環境に合わせて変換する
+ *
+ *	@param	fname	フルパスファイル名
+ *	@param	bak_str	変換時に元ファイルをバックアップするときに追加する文字列
+ *	@retval	TRUE	変換した(バックアップを作成した)
+ *	@retval	FALSE	変換しなかった(ファイルが存在しない)
+ *
+ *	iniファイルの文字コード
+ *		NT系ではANSIまたはUnicode,UTF16BE BOM)を使用できる
+ *		9x系ではANSIのみ
+ */
+BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str)
+{
+	FILE *fp;
+	_wfopen_s(&fp, fname, L"rb");
+	if (fp == NULL) {
+		// ファイルが存在しない
+		return FALSE;
+	}
+
+	// ファイルを読み込む
+	LoadFileCode code;
+	size_t len;
+	char *ini_u8 = LoadFileU8C(fp, &len, &code);
+	fclose(fp);
+
+	BOOL converted = FALSE;
+	if(_IsWindows2000OrLater()) {
+		// UTF16 LE
+		if (code != FILE_CODE_UTF16LE) {
+			CreateBakupFile(fname, bak_str);
+
+			wchar_t *ini_u16 = ToWcharU8(ini_u8);
+			_wfopen_s(&fp, fname, L"wb");
+			if (fp != NULL) {
+				fwrite("\xff\xfe", 2, 1, fp);	// BOM
+				fwrite(ini_u16, wcslen(ini_u16), sizeof(wchar_t), fp);
+				fclose(fp);
+				converted = TRUE;
+			}
+		}
+	}
+	else {
+		// ACP
+		if (code != FILE_CODE_ACP) {
+			CreateBakupFile(fname, bak_str);
+
+			char *ini_acp = ToCharU8(ini_u8);
+			_wfopen_s(&fp, fname, L"wb");
+			if (fp != NULL) {
+				fwrite(ini_acp, strlen(ini_acp), sizeof(char), fp);
+				fclose(fp);
+				converted = TRUE;
+			}
+		}
+	}
+	free(ini_u8);
+
+	return converted;
 }

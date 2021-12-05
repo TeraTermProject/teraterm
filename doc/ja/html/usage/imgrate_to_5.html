@@ -9,57 +9,72 @@
   </head>
 
   <body>
+    <h1>Tera Term 5 について</h1>
+    <ul>
+      <li>Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです。</li>
+      <ul>
+        <li>ターミナル(内部バッファ、描画、キー入力)のUnicode化
+        <li>Windows UI(メニュー、ダイアログ)のUnicode化
+        <li>その他Windows APIのUnicode版への切り替え(ファイル名など)
+      </ul>
+      <li>Windows 10, 11をターゲットにしています。</li>
+      <li>特徴などは<a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">Unicode化基本方針</a>を参照ください。</li>
+    </ul>
+
     <h1>Tera Term 5 へ移行</h1>
 
     <ul>
-      <li>Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです
+      <li>Tera Term 4 と同居することができます。</li>
+      <li>設定ファイルはTera Term 4用をそのまま使用できます。</li>
       <ul>
-        <li>Windows 10, 11をターゲットにしています</li>
-        <li>特徴などは<a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">Unicode化基本方針</a>を参照ください</li>
-      </ul>
-      <li>Tera Term 4 と同居することができます</li>
-      <li>設定ファイルはTera Term 4用をそのまま使用できます</li>
-      <ul>
-        <li>TERATERM.INI,KEYBOARD.CFGはUnicode対応となりました</li>
-        <li>Unicodeに変換しておくと、Unicodeパス,ファイル名などの設定内容が正しく保存できます</li>
+        <li>TERATERM.INI,KEYBOARD.CFGはUnicode対応となりました。</li>
         <ul>
-          <li>Tera Term 4 ではパス名にShift_JISで表現できない文字が含まれているとその項目は正しく保存されませんでした</li>
+          <li>cygterm.cfgは対応していません。</li>
         </ul>
-        <li>変換しなくてもそのまま使用できます</li>
-        <li>Unicodeの文字コードはUTF-16 (with LE BOM)です</li>
-        <li>Windowsのメモ帳で開いて文字コードをUTF-16LEに設定して上書き保存する変換できます</li>
+        <li>Windows 10,11(2000から?)ではiniファイルをUnicode化することができます。</li>
+        <li>Unicode化したiniファイルの文字コードはUTF-16 (with LE BOM)です。</li>
+        <li>Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
+        <li>Tera Term 5 は起動時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
+        <li>変換前のファイルはバックアップされています。</li>
       </ul>
-      <li>設定ファイルのデフォルトフォルダが変更されました</li>
+      <li>設定ファイルのデフォルトフォルダが変更されました。</li>
       <ul>
         <li>%APPDATA%\teraterm5\</li>
-        <li>Tera Term 4 の設定ファイルをコピーしてください</li>
+        <li>Tera Term 4 の設定ファイルをコピーしてください。</li>
         <ul>
           <li>TERATERM.INI</li>
           <li>KEYBOARD.CNF</li>
           <li>cygterm.cfg</li>
         </ul>
-        <li>ファイルがない場合、ttermpro.exe起動時にデフォルトの設定ファイルがコピーされます</li>
-        <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした</li>
+        <li>ファイルがない場合、ttermpro.exe起動時にデフォルトの設定ファイルがコピーされます。</li>
+        <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした。</li>
+        <li><a href="../setup/folder.md">フォルダについて (現在は Windows 10(11)で動作テストしています)</a></li>
       </ul>
     </ul>
 
     <h1>Tera Term 5 へ移行(plugin)</h1>
 
     <ul>
-      <li>compat_w95.hは不要となりました</li>
+      <li>compat_w95.hは不要となりました。</li>
       <ul>
         <li><a href="https://osdn.net/projects/ttssh2/scm/svn/commits/9129">r9239</a></li>
       </ul>
-      <li>plugin APIを変更しました</li>
+      <li>plugin APIを変更しました。</li>
       <ul>
         <li>ファイル名がUnicode (型が char から wchar_t) になりました。</li>
         <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l44">trunk/teraterm/ttsetup.h</a></li>
         <li><a href="https://osdn.net/projects/ttssh2/svn/view/branches/4-stable/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l39">4-stable/teraterm/ttsetup.h</a></li>
       </ul>
-      <li>iniファイル読み書き共通関数を追加しました</li>
+      <li>iniファイル読み書き共通関数を追加しました。</li>
       <ul>
-        <li>ファイル名だけをUnicode化して従来と同じ動作をする関数を準備</li>
+        <li>ファイル名だけをUnicode化して従来と同じ動作をする関数を準備。</li>
         <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/inifile_com.h?view=markup&root=ttssh2">trunk/teraterm/common/inifile_com.h</a></li>
+      </ul>
+      <li>struct tttset (tttypes.h) のメンバを変更しました。</li>
+      <ul>
+        <li>ファイル名、パス、文字列のメンバには、WがついたUnicode版のメンバが追加。</li>
+        <li>ファイル名、パスの文字数はMAX_PATH文字以上になることを考慮。</li>
+        <li>まだ変化する予定(メンバ名、順序、サイズ、型などなど)。</li>
       </ul>
     </ul>
 

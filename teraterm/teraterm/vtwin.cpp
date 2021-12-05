@@ -4748,7 +4748,32 @@ void CVTWindow::OnSetupSave()
 		}
 #endif
 
-		CopyFileW(PrevSetupFNW, ts.SetupFNameW, TRUE);
+		if (wcscmp(PrevSetupFNW, ts.SetupFNameW) == 0) {
+			// 同名ファイルへ書き込み(上書き)
+			// バックアップを作成
+			CreateBakupFile(ts.SetupFNameW, NULL);
+		}
+		else {
+			// 異なるファイルへ書き込み
+			CopyFileW(PrevSetupFNW, ts.SetupFNameW, TRUE);
+		}
+
+		if (GetFileAttributesW(ts.SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
+			// ファイルがない
+			// UTF16LE BOMだけのiniファイルを作成
+			FILE *fp;
+			_wfopen_s(&fp, ts.SetupFNameW, L"wb");
+			if (fp != NULL) {
+				fwrite("\xff\xfe", 2, 1, fp);	// BOM
+				fclose(fp);
+			}
+		}
+		else {
+			// ファイルが存在する
+			// iniファイルの文字コードを変更する
+			ConvertIniFileCharCode(ts.SetupFNameW, NULL);
+		}
+
 		/* write current setup values to file */
 		(*WriteIniFile)(ts.SetupFNameW, &ts);
 		/* copy host list */
