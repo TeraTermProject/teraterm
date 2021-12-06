@@ -254,16 +254,10 @@
 ■ ヘルプファイルのビルド方法
   ヘルプファイルのビルド方法について以下に示します。
 
-  1. HTML Help Workshopを以下のサイトから入手しインストールする。
-     http://www.microsoft.com/en-us/download/details.aspx?id=21138
+  1. HTML Help Compiler を入手する。
+     Visual Studio (2017 以降) を "C++ MFC" オプションを選択してインストールすると、HTML Help Compiler (hhc.exe) がインストールされる。
 
-  2. コマンドプロンプトからバッチファイルを起動し、必要なファイルをコピーする。
-     > cd teraterm\insatller
-     > convtext.bat
-
-  3. FileのOpenから doc\en\teraterm.hhp および doc\jp\teratermj.hhp を開く。
-
-  4. FileのCompileでヘルプファイルをコンパイルする。
+  2. doc\makechm.bat を実行する。
 
 
 ■ リリースの方法
