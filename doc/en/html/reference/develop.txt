@@ -267,16 +267,10 @@ Example: adding a TTSSH menu under File menu
 * How to build HTML help file
   To build  HTML help file is shown in the following step:
 
-  1. Install HTML Help Workshop from below site:
-     http://www.microsoft.com/en-us/download/details.aspx?id=21138
+  1. Install HTML Help Compiler
+     Installing Visual Studio (2017 or later) with "C++ MFC" option, HTML Help Compiler (hhc.exe) is installed.
 
-  2. Copy document files with batch file on command prompt.
-     > cd teraterm\insatller
-     > convtext.bat
-
-  3. Select Open of File menu and open doc\en\teraterm.hhp file or doc\jp\teratermj.hhp.
-
-  4. Select Compile of File menu and HTML help file will be created.
+  2. Run doc\makechm.bat
 
 
 * How to release Tera Term installation package
