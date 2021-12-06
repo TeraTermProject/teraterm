@@ -49,7 +49,7 @@
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - その他
   Cygwin 最新版(v4.105からCygTerm+はVista以降対応となったため)
-  ActivePerl 5.10 以上
+  ActivePerl 5.10 以上 もしくは Strawberry Perl 5.30.1.1 以上
     OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     ソースのチェックアウトに使った svn と互換性のあるバージョン。
