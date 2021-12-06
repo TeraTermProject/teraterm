@@ -57,8 +57,8 @@ typedef unsigned char uint8_t;
  *	データシリアライズ情報構造体
  */
 typedef struct {
-	int size;		// データのサイズ(0で終了)
-	int offset;		// 先頭からのオフセット
+	size_t size;		// データのサイズ(0で終了)
+	size_t offset;		// 先頭からのオフセット
 	enum {
 		COPY = 0,				// データをコピーする
 		MALLOCED_WSTRING = 1,	// mallocした領域の
@@ -209,7 +209,7 @@ static size_t CheckSignature(const uint8_t *ptr, size_t size)
 	return sizeof(signature);
 }
 
-#if defined(_MSC_VER) && (_MSC_VER < 1600)
+#if !defined(offsetof)
 #define offsetof(s,m) ((size_t)&(((s*)0)->m))
 #endif
 
