@@ -63,11 +63,8 @@ start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /K
 ### WSL (Windows Subsystem for Linux)
 
 ```
-start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "/path/to/winpty.exe c:/windows/system32/bash.exe"
+start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "c:/windows/system32/wsl.exe"
 ```
-
-winpty は [github](https://github.com/rprichard/winpty/releases) からダウンロードすることができる。
-
 
 ## 歴史
 
