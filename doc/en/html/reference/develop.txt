@@ -56,7 +56,7 @@
 - others
   Cygwin the latest version(because CygTerm+ supports Vista or later from v4.105)
 ------
-  ActivePerl 5.10 or later version
+  ActivePerl 5.10 or later version, Strawberry Perl 5.30.1.1 or later version
     converts character-code and return-code of documents for building OpenSSL.
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     Use the compatible version for check-outed svn version.
