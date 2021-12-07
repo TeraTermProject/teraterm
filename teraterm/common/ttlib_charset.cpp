@@ -109,7 +109,7 @@ const TKanjiList *GetKanjiList(int index)
  */
 const char *GetKanjiCodeStr(int language, int kanji_code)
 {
-	for (int i = 0; i < sizeof(KanjiList); i++) {
+	for (int i = 0; i < _countof(KanjiList); i++) {
 		if (KanjiList[i].lang == language &&
 			KanjiList[i].coding == kanji_code) {
 			return KanjiList[i].KanjiCode;
@@ -132,7 +132,7 @@ int GetKanjiCodeFromStr(int language, const char *kanji_code_str)
 		return IdUTF8;
 	}
 
-	for (int i = 0; i < sizeof(KanjiList); i++) {
+	for (int i = 0; i < _countof(KanjiList); i++) {
 		if (KanjiList[i].lang == language &&
 			strcmp(KanjiList[i].KanjiCode, kanji_code_str) == 0) {
 			return KanjiList[i].coding;
