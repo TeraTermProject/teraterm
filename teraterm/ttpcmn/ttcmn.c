@@ -253,15 +253,13 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 		};
 
 		// backup ファイルにつける日付文字列
-		time_t now;
-		time(&now);
-		struct tm *now_tm;
-		now_tm = localtime(&now);
-		wchar_t dete_str[256];
-		wcsftime(dete_str, _countof(dete_str), L"%y%m%d_%H%M%S_", now_tm);
+		wchar_t *date_str = MakeISO8601Str(0);
+		awcscat(&date_str, L"_");
 
 		// iniファイルを変換する
-		ConvertIniFiles(filelist, ts->HomeDirW, dete_str);
+		ConvertIniFiles(filelist, ts->HomeDirW, date_str);
+
+		free(date_str);
 	}
 
 	if (FirstInstance) {

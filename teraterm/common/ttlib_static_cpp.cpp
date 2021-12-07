@@ -1548,3 +1548,22 @@ BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str)
 
 	return converted;
 }
+
+/**
+ *	ISO8601基本形式の日時文字列を作成する
+ *
+ *	@param	t	文字列を作成する時間
+ *				0で現在時刻
+ *	@return		文字列、不要になったらfree()すること
+ */
+wchar_t *MakeISO8601Str(time_t t)
+{
+	if (t == 0) {
+		t = time(NULL);
+	}
+	struct tm now_tm;
+	localtime_s(&now_tm, &t);
+	wchar_t date_str[128];
+	wcsftime(date_str, _countof(date_str), L"%Y%m%dT%H%M%S%z", &now_tm);
+	return _wcsdup(date_str);
+}
