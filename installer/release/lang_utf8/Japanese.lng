@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-21)
+﻿; Updated by TeraTerm Project (2021-12-08)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -17,7 +17,6 @@ MENU_FILE_STOPLOG=ログを終了(&Q)
 MENU_FILE_SENDFILE=ファイル送信(&S)...
 MENU_FILE_CHANGEDIR=ディレクトリを変更(&C)...
 MENU_FILE_REPLAYLOG=ログを再生(&R)...
-MENU_FILE_LOGMETT=Log&MeTT
 MENU_FILE_PRINT=印刷(&P)...\tAlt+P
 MENU_FILE_DISCONNECT=接続断(&D)\tAlt+I
 MENU_FILE_EXIT=終了(&X)\tAlt+Q
@@ -152,7 +151,6 @@ MSG_FIND_CYGTERM_DIR_ERROR=Cygwin ディレクトリが見つかりません
 MSG_CYGTERM_ENV_ALLOC_ERROR=環境変数用のメモリが確保できません
 MSG_EXEC_CYGTERM_ERROR=Cygterm が実行できません
 MSG_EXEC_TTMENU_ERROR=TeraTerm Menu が実行できません (%d)
-MSG_EXEC_LOGMETT_ERROR=LogMeTT が実行できません. (%d)
 MSG_VIEW_LOGFILE_ERROR=ログファイルを表示できません (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=バイナリモードで記録された再生するログファイルを選択してください
 FILEDLG_OPEN_LOGFILE_FILTER=すべてのファイル(*.*)\0*.*\0\0

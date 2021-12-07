@@ -696,64 +696,6 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	}
 }
 
-// LogMeIn.exe -> LogMeTT.exe へリネーム (2005.2.21 yutaka)
-static char LogMeTTMenuString[] = "Log&MeTT";
-static char LogMeTT[MAX_PATH];
-
-#define IS_LOGMETT_NOTFOUND     0
-#define IS_LOGMETT_FOUND        1
-#define IS_LOGMETT_UNKNOWN      2
-
-static BOOL isLogMeTTExist()
-{
-	const char *LogMeTTexename = "LogMeTT.exe";
-	LONG result;
-	HKEY key;
-	int inregist = 0;
-	DWORD dwSize;
-	DWORD dwType;
-	DWORD dwDisposition;
-	char *path;
-
-	static int status = IS_LOGMETT_UNKNOWN;
-
-	if (status != IS_LOGMETT_UNKNOWN) {
-		return status == IS_LOGMETT_FOUND;
-	}
-
-	/* LogMeTT 2.9.6からはレジストリにインストールパスが含まれる。*/
-	result = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\LogMeTT", 0, NULL,
-				REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &key, &dwDisposition);
-	if (result == ERROR_SUCCESS) {
-		result = RegQueryValueEx(key, "InstallPath", NULL, &dwType, NULL, &dwSize);
-		if (result == ERROR_SUCCESS) {
-			path = (char *)malloc(dwSize);
-			if (path != NULL) {
-				result = RegQueryValueEx(key, "InstallPath", NULL, &dwType, (LPBYTE)path, &dwSize);
-				if (result == ERROR_SUCCESS) {
-					inregist = 1;
-					strncpy_s(LogMeTT, sizeof(LogMeTT), path, _TRUNCATE);
-				}
-				free(path);
-			}
-		}
-		RegCloseKey(key);
-	}
-
-	if (inregist == 0) {
-		strncpy_s(LogMeTT, sizeof(LogMeTT), ts.HomeDir, _TRUNCATE);
-		AppendSlash(LogMeTT, sizeof(LogMeTT));
-		strncat_s(LogMeTT, sizeof(LogMeTT), LogMeTTexename, _TRUNCATE);
-	}
-
-	if (_access(LogMeTT, 0) == -1) {
-		status = IS_LOGMETT_NOTFOUND;
-		return FALSE;
-	}
-	status = IS_LOGMETT_FOUND;
-	return TRUE;
-}
-
 void CVTWindow::InitMenu(HMENU *Menu)
 {
 	static const DlgTextInfo MenuTextInfo[] = {
@@ -776,7 +718,6 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_SENDFILE, "MENU_FILE_SENDFILE" },
 		{ ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG" },
 		{ ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR" },
-		{ ID_FILE_LOGMEIN, "MENU_FILE_LOGMETT" },
 		{ ID_FILE_PRINT2, "MENU_FILE_PRINT" },
 		{ ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT" },
 		{ ID_FILE_EXIT, "MENU_FILE_EXIT" },
@@ -853,13 +794,6 @@ void CVTWindow::InitMenu(HMENU *Menu)
 
 	SetDlgMenuTextsW(hMenu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
 
-	/* LogMeTT の存在を確認してメニューを追加する */
-	if (isLogMeTTExist()) {
-		::InsertMenu(FileMenu, ID_FILE_PRINT2, MF_STRING | MF_ENABLED | MF_BYCOMMAND,
-		             ID_FILE_LOGMEIN, LogMeTTMenuString);
-		::InsertMenu(FileMenu, ID_FILE_PRINT2, MF_SEPARATOR, NULL, NULL);
-	}
-
 	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFileW);
 	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFileW);
 	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFileW);
@@ -924,7 +858,6 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		// 新規メニューを追加 (2004.12.5 yutaka)
 		EnableMenuItem(FileMenu,ID_FILE_CYGWINCONNECTION,MF_BYCOMMAND | MF_ENABLED);
 		EnableMenuItem(FileMenu,ID_FILE_TERATERMMENU,MF_BYCOMMAND | MF_ENABLED);
-		EnableMenuItem(FileMenu,ID_FILE_LOGMEIN,MF_BYCOMMAND | MF_ENABLED);
 
 		// XXX: この位置にしないと、logがグレイにならない。 (2005.2.1 yutaka)
 		if (FLogIsOpend()) { // ログ採取モードの場合
@@ -3846,38 +3779,6 @@ void CVTWindow::OnTTMenuLaunch()
 }
 
 
-//
-// LogMeTTの起動
-//
-void CVTWindow::OnLogMeInLaunch()
-{
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-
-	if (!isLogMeTTExist()) {
-		return;
-	}
-
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	if (CreateProcess(NULL, LogMeTT, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
-		static const TTMessageBoxInfoW info = {
-			"Tera Term",
-			"MSG_ERROR", L"ERROR",
-			"MSG_EXEC_LOGMETT_ERROR", L"Can't execute LogMeTT. (%d)",
-			MB_OK | MB_ICONWARNING
-		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-	}
-}
-
-
 void CVTWindow::OnFileLog()
 {
 	FLogDlgInfo_t info;
@@ -5355,7 +5256,6 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_DUPLICATESESSION: OnDuplicateSession(); break;
 		case ID_FILE_CYGWINCONNECTION: OnCygwinConnection(); break;
 		case ID_FILE_TERATERMMENU: OnTTMenuLaunch(); break;
-		case ID_FILE_LOGMEIN: OnLogMeInLaunch(); break;
 		case ID_FILE_LOG: OnFileLog(); break;
 		case ID_FILE_COMMENTTOLOG: OnCommentToLog(); break;
 		case ID_FILE_VIEWLOG: OnViewLog(); break;

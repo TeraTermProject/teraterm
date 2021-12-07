@@ -74,7 +74,7 @@
 　TTSSHやTTProxy、TTXKanjiMenuといったプラグイン形式のDLLは、Tera Termの起動時に明示的に LoadLibrary() を使ってダイナミックロードされます。ロード対象となるDLLのファイル名は、TTXInit()#ttplug.c において、"TTX*.DLL"というパターンにマッチしたものとなります。<br>
 　<br>
 　
-　"keycode.exe"と"ttpmenu.exe"、"LogMeTT.exe"は単体アプリケーションです。<br>
+　"keycode.exe"と"ttpmenu.exe"は単体アプリケーションです。<br>
 　<br>
 　
 　Cygwin接続のしくみについては、別の節で説明します。
@@ -279,7 +279,6 @@ static TTXExports Exports = {
 <h2 id="configuration">設定ファイルの読み書き</h2>
 　Windowsではアプリケーションのデータ保存のために、レジストリが伝統的に利用されていますが、Tera Termではその誕生がWindows 3.1までに遡るために、.iniファイルによるローカルディレクトリへの保存方法が標準となっています。<br>
 　パッケージに同梱されるCygTermに関してもローカルディレクトリへデータが保存されます。<br>
-　LogMeTTとTTLEditはレジストリへ保存されます。<br>
 　例外として、TeraTerm Menuはデフォルトでレジストリへ保存をします。カレントディレクトリに"ttpmenu.ini"（0バイトで可）を設置することで、レジストリの代わりに.iniファイルを使うようにすることもできます。ただし、レジストリから.iniファイルへの移行は自動で行いませんので、手動で再登録してください。<br>
 　<br>
 　

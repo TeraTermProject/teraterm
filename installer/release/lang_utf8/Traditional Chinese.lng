@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-21)
+﻿; Updated by TeraTerm Project (2021-12-08)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -18,7 +18,6 @@ MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=發送文件(&S)...
 MENU_FILE_CHANGEDIR=更改目錄(&C)...
 MENU_FILE_REPLAYLOG=重播日誌(&R)...
-MENU_FILE_LOGMETT=Log&MeTT
 MENU_FILE_PRINT=列印(&P)...\tAlt+P
 MENU_FILE_DISCONNECT=中斷連線(&D)\tAlt+I
 MENU_FILE_EXIT=關閉(&X)\tAlt+Q
@@ -153,7 +152,6 @@ MSG_FIND_CYGTERM_DIR_ERROR=未能找到 Cygwin 目錄
 MSG_CYGTERM_ENV_ALLOC_ERROR=無法為環境變量分配記憶體
 MSG_EXEC_CYGTERM_ERROR=無法運行 Cygterm
 MSG_EXEC_TTMENU_ERROR=無法運行 TeraTerm Menu (%d)
-MSG_EXEC_LOGMETT_ERROR=無法運行 LogMeTT (%d)
 MSG_VIEW_LOGFILE_ERROR=無法查看日誌文件 (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=選擇要重播的二進制日誌文件
 FILEDLG_OPEN_LOGFILE_FILTER=所有文件(*.*)\0*.*\0\0

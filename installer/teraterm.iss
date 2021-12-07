@@ -117,8 +117,6 @@ Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
 Source: ..\cygwin\Release\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\Release\cygtool.dll; Components: cygterm; Flags: dontcopy
-;Source: ..\libs\logmett\Setup_LogMeTT_2_12_1.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
-;Source: ..\libs\logmett\Setup_TTLEditor_1_5_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -151,8 +149,6 @@ Name: custom; Description: {cm:type_custom}; Flags: iscustom
 Name: TeraTerm; Description: Tera Term & Macro; Flags: fixed; Types: custom compact full standard
 Name: TTSSH; Description: TTSSH; Types: compact full standard
 Name: cygterm; Description: CygTerm+; Types: full standard; Check: not isIA64
-Name: LogMeTT; Description: LogMeTT ({cm:comp_installer}); Types: full; MinVersion: 4.1.1998,4.0.1381sp6
-Name: TTLEdit; Description: TTLEdit ({cm:comp_installer}); Types: full; MinVersion: 4.1.1998,4.0.1381sp6
 Name: TeraTerm_Menu; Description: TeraTerm Menu; Types: full
 Name: TTProxy; Description: TTProxy; Types: full standard
 Name: Additional_Plugins; Description: {cm:comp_TTX}
@@ -247,10 +243,6 @@ Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_
 
 [Run]
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
-Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Flags: skipifsilent runasoriginaluser; Components: LogMeTT
-Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Parameters: /SILENT; Flags: skipifnotsilent runasoriginaluser; Components: LogMeTT
-Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Flags: skipifsilent runasoriginaluser; Components: TTLEdit
-Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Parameters: /SILENT; Flags: skipifnotsilent runasoriginaluser; Components: TTLEdit
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
 
 [CustomMessages]

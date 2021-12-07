@@ -79,7 +79,7 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
     Plug-in DLL-s, like TTSSH, TTProxy and TTXKanjiMenu, are dynamically loaded by LoadLibrary() API call at Tera Term startup. DLL filename should follow the pattern "TTX*.DLL" defined in TTXInit()#ttplug.c function. <br>
   <br>
 
-        The "keycode.exe", "ttpmenu.exe", "LogMeTT.exe" and "TTLEdit.exe" are separate applications that are not in direct communication with Tera Term.
+        The "keycode.exe", "ttpmenu.exe" are separate applications that are not in direct communication with Tera Term.
 
   <br>
   
@@ -275,7 +275,6 @@ static TTXExports Exports = {
 <h2 id="configuration">Reading and Writing Configuration File</h2>
 Modern Windows applications use system Registry to store their settings. Tera Term, however, stores its configuration in .ini file because that was the common practice back in the days when Tera Term was created. <br>
 
-LogMeTT and TTLEdit programs included in Tera Term package store their configurations in system Registry. <br>
 CygTerm programsincluded in Tera Term package store their configurations in the local file. <br>
 
 Unlike other applications, Tera Term Menu stores its configuration in Registry, but if current directory contains "ttpmenu.ini" file, it will try to read configuration from this file even if the file is empty (0 bytes in size). Note that the tool does not migrate settings from Registry to .ini file, so you may need to re-create them if you decide to use .ini file. <br>

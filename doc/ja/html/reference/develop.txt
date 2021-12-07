@@ -326,9 +326,6 @@
        http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html
      CygTerm
        https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index.html
-     LogMeTT
-       http://logmett.com/logmett-freeware
-       http://logmett.com/ttleditor
 
   2. ドキュメントを確認する。
      - ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。

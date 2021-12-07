@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-21)
+﻿; Updated by TeraTerm Project (2021-12-08)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -18,7 +18,6 @@ MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Envoyer un fichier...
 MENU_FILE_CHANGEDIR=&Changer de dossier...
 MENU_FILE_REPLAYLOG=&Reafficher le journal...
-MENU_FILE_LOGMETT=Log&MeTT
 MENU_FILE_PRINT=&Imprimer...\tAlt+P
 MENU_FILE_DISCONNECT=&Déconnecter\tAlt+I
 MENU_FILE_EXIT=Quitter\tAlt+Q
@@ -153,7 +152,6 @@ MSG_FIND_CYGTERM_DIR_ERROR=Répertoire de Cygwin non trouvé.
 MSG_CYGTERM_ENV_ALLOC_ERROR=Impossible d'allouer de la mémoire pour la variable d'environnement.
 MSG_EXEC_CYGTERM_ERROR=Impossible d'exécuter Cygterm.
 MSG_EXEC_TTMENU_ERROR=Impossible d'exécuter le menu de TeraTerm. (%d)
-MSG_EXEC_LOGMETT_ERROR=Impossible d'exécuter LogMeTT. (%d)
 MSG_VIEW_LOGFILE_ERROR=Impossible de voir le fichier journal. (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=Sélectionner l'affichage du fichier journal en mode binaire
 FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0

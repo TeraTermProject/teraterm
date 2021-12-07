@@ -21,7 +21,3 @@ UILanguageFile=lang\Japanese.lng
 - インストーラの標準インストールでは含まれない多くの追加プラグインが
   同梱されています。不要なものは削除・リネームしてください。
 
-- LogMeTT, TTLEdit は含まれていません。必要な場合は入手してください。
-  http://logmett.com/logmett-freeware
-  http://logmett.com/ttleditor
-

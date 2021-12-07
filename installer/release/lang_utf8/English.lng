@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-21)
+﻿; Updated by TeraTerm Project (2021-12-08)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -17,7 +17,6 @@ MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Send file...
 MENU_FILE_CHANGEDIR=&Change directory...
 MENU_FILE_REPLAYLOG=&Replay Log...
-MENU_FILE_LOGMETT=Log&MeTT
 MENU_FILE_PRINT=&Print...\tAlt+P
 MENU_FILE_DISCONNECT=&Disconnect\tAlt+I
 MENU_FILE_EXIT=E&xit\tAlt+Q
@@ -152,7 +151,6 @@ MSG_FIND_CYGTERM_DIR_ERROR=Can't find Cygwin directory.
 MSG_CYGTERM_ENV_ALLOC_ERROR=Can't allocate memory for environment variable.
 MSG_EXEC_CYGTERM_ERROR=Can't execute Cygterm.
 MSG_EXEC_TTMENU_ERROR=Can't execute TeraTerm Menu. (%d)
-MSG_EXEC_LOGMETT_ERROR=Can't execute LogMeTT. (%d)
 MSG_VIEW_LOGFILE_ERROR=Can't view logging file. (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=Select replay log file with binary mode
 FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0

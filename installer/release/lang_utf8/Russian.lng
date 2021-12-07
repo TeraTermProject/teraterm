@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2020-03-21)
+﻿; Updated by TeraTerm Project (2021-12-08)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -18,7 +18,6 @@ MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Передать файл...
 MENU_FILE_CHANGEDIR=&Изменить путь...
 MENU_FILE_REPLAYLOG=&Воспроизвести лог...
-MENU_FILE_LOGMETT=&LogMeTT
 MENU_FILE_PRINT=&Печать...\tAlt+P
 MENU_FILE_DISCONNECT=&Разъединение\tAlt+I
 MENU_FILE_EXIT=&Выход\tAlt+Q
@@ -153,7 +152,6 @@ MSG_FIND_CYGTERM_DIR_ERROR=Не найдена папка Cygwin
 MSG_CYGTERM_ENV_ALLOC_ERROR=Не удается выделить память для переменной среды
 MSG_EXEC_CYGTERM_ERROR=Не удается запустить Cygterm
 MSG_EXEC_TTMENU_ERROR=Не удается запустить меню Tera Term (%d).
-MSG_EXEC_LOGMETT_ERROR=Не удается запустить LogMeTT (%d).
 MSG_VIEW_LOGFILE_ERROR=Не удается посмотреть лог-файл (%d).
 FILEDLG_OPEN_LOGFILE_TITLE=Посмотреть лог-файл в бинарном режиме 
 FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0

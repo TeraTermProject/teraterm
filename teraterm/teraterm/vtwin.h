@@ -165,7 +165,6 @@ protected:
 	void OnDuplicateSession();
 	void OnCygwinConnection();
 	void OnTTMenuLaunch();
-	void OnLogMeInLaunch();
 	void OnFileLog();
 	void OnCommentToLog();
 	void OnViewLog();

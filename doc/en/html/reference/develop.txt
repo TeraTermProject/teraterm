@@ -327,9 +327,6 @@ Example: adding a TTSSH menu under File menu
        http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html
      CygTerm
        https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html
-     LogMeTT
-       http://logmett.com/logmett-freeware
-       http://logmett.com/ttleditor
 
   2. Check the document files.
 
