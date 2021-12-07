@@ -59,7 +59,6 @@ Name: en; MessagesFile: compiler:Default.isl
 Name: ja; MessagesFile: compiler:Languages\Japanese.isl
 
 [Dirs]
-Name: {app}\Collector; Components: Collector
 Name: {app}\theme; Components: TeraTerm
 Name: {app}\theme\scale; Components: TeraTerm
 Name: {app}\theme\tile; Components: TeraTerm
@@ -133,13 +132,6 @@ Source: release\theme\tile\03.jpg; DestDir: {app}\theme\tile; Components: TeraTe
 Source: release\theme\tile\44.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
 Source: release\plugin\ttAKJpeg.dll; DestDir: {app}\plugin\; Components: TeraTerm
 Source: release\plugin\ttAKJpeg.txt; DestDir: {app}\plugin\; Components: TeraTerm
-Source: release\Collector\Collector.exe; DestDir: {app}\Collector\; Components: Collector
-Source: release\Collector\collector.ini; DestDir: {app}\Collector\; Components: Collector
-Source: release\Collector\Collector_org.exe; DestDir: {app}\Collector\; Components: Collector
-Source: release\Collector\hthook.dll; DestDir: {app}\Collector\; Components: Collector
-Source: release\Collector\mfc70.dll; DestDir: {app}\Collector\; Components: Collector
-Source: release\Collector\msvcr70.dll; DestDir: {app}\Collector\; Components: Collector
-Source: release\Collector\readme.txt; DestDir: {app}\Collector\; Components: Collector
 Source: ..\TTXKanjiMenu\release\ttxkanjimenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKanjiMenu; Flags: ignoreversion
 Source: ..\TTXSamples\release\TTXResizeMenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXResizeMenu; Flags: ignoreversion
 Source: ..\TTXSamples\release\TTXttyrec.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
@@ -163,7 +155,6 @@ Name: LogMeTT; Description: LogMeTT ({cm:comp_installer}); Types: full; MinVersi
 Name: TTLEdit; Description: TTLEdit ({cm:comp_installer}); Types: full; MinVersion: 4.1.1998,4.0.1381sp6
 Name: TeraTerm_Menu; Description: TeraTerm Menu; Types: full
 Name: TTProxy; Description: TTProxy; Types: full standard
-Name: Collector; Description: Collector; Types: full
 Name: Additional_Plugins; Description: {cm:comp_TTX}
 Name: Additional_Plugins/TTXResizeMenu; Description: TTXResizeMenu ({cm:comp_TTXResizeMenu}); Types: full standard
 Name: Additional_Plugins/TTXttyrec; Description: TTXttyrec ({cm:comp_TTXttyrec}); Types: full standard
@@ -180,11 +171,9 @@ Name: {group}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFi
 Name: {group}\{cm:UninstallProgram,{#AppName}}; Filename: {uninstallexe}; Components: TeraTerm; Flags: createonlyiffileexists
 Name: {group}\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
 Name: {group}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; IconIndex: 0; Components: TeraTerm_Menu; Flags: createonlyiffileexists
-Name: {group}\Collector; Filename: {app}\Collector\Collector.exe; WorkingDir: {app}\Collector; IconFilename: {app}\Collector\Collector.exe; IconIndex: 0; Components: Collector; Flags: createonlyiffileexists
 Name: {userdesktop}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: quicklaunchicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userstartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists
-Name: {userstartup}\Collector; Filename: {app}\collector\collector.exe; WorkingDir: {app}\Collector; IconFilename: {app}\collector\collector.exe; Components: Collector; Tasks: startupcollectoricon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
 [Registry]
@@ -249,7 +238,6 @@ Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueDa
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
 Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
 Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
-Name: startupcollectoricon; Description: {cm:task_startupcollectoricon}; Components: Collector
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
 Name: quickcyglaunch; Description: {cm:task_quickcyglaunch}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
@@ -264,13 +252,11 @@ Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Parameters: /SILENT; Flags: skipifnots
 Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Flags: skipifsilent runasoriginaluser; Components: TTLEdit
 Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Parameters: /SILENT; Flags: skipifnotsilent runasoriginaluser; Components: TTLEdit
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
-Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
 
 [CustomMessages]
 en.task_desktopicon=Create Tera Term shortcut to &Desktop
 en.task_quicklaunchicon=Create Tera Term shortcut to &Quick Launch
 en.task_startupttmenuicon=Create TeraTerm &Menu shortcut to Startup
-en.task_startupcollectoricon=Create &Collector shortcut to Startup
 en.task_cygtermhere=Add "Cy&gterm Here" to Context menu
 en.task_quickcyglaunch=Create cyg&launch shortcut to Quick Launch
 en.task_macroassoc=Associate .&ttl file to ttpmacro.exe
@@ -280,7 +266,6 @@ en.task_ttyplayassoc=Associate .tty file to tterm&pro.exe
 ja.task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
 ja.task_quicklaunchicon=クイック起動に Tera Term のショートカットを作る(&Q)
 ja.task_startupttmenuicon=スタートアップに TeraTerm &Menu のショートカットを作る
-ja.task_startupcollectoricon=スタートアップに &Collector のショートカットを作る
 ja.task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
 ja.task_quickcyglaunch=クイック起動に cyg&launch のショートカットを作る
 ja.task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
@@ -297,10 +282,8 @@ ja.type_compact=コンパクトインストール
 ja.type_custom=カスタムインストール
 en.launch_teraterm=Launch &Tera Term
 en.launch_ttmenu=Launch TeraTerm &Menu
-en.launch_collector=Launch &Collector
 ja.launch_teraterm=今すぐ &Tera Term を実行する
 ja.launch_ttmenu=今すぐ TeraTerm &Menu を実行する
-ja.launch_collector=今すぐ &Collector を実行する
 en.msg_language_caption=Select Language
 en.msg_language_description=Which language shoud be used?
 en.msg_language_subcaption=Select the language of application's menu and dialog, then click Next.
@@ -469,17 +452,13 @@ begin
   FileName[2] := FileDir + '\keycode.exe';
   FileName[3] := FileDir + '\ttpmenu.exe';
   FileName[4] := FileDir + '\cygterm.exe';
-  FileName[5] := FileDir + '\Collector.exe';
-  FileName[6] := FileDir + '\Collector_org.exe';
   FileDesc[0] := 'Tera Term';
   FileDesc[1] := 'Tera Term Macro';
   FileDesc[2] := 'Keycode';
   FileDesc[3] := 'TeraTerm Menu';
   FileDesc[4] := 'CygTerm+';
-  FileDesc[5] := 'Collector';
-  FileDesc[6] := 'Collector';
 
-  for i := 0 to 6 do
+  for i := 0 to 4 do
   begin
     case CheckFileUsing(FileName[i]) of
       1:
