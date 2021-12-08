@@ -47,7 +47,7 @@ static void ReadList(PKeyMap KeyMap, const wchar_t *section, const keymap_list_t
 {
 	size_t i;
 	const keymap_list_t *p = list;
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < count; p++,i++) {
 		wchar_t Temp[11];
 		WORD Num;
 		GetPrivateProfileStringW(section, p->key_str, L"", Temp, _countof(Temp), FName);
