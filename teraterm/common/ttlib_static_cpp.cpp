@@ -1453,15 +1453,12 @@ void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str)
 		return;
 	}
 
-	wchar_t dete_str[32];
+	wchar_t *date_str = NULL;
 	const wchar_t *prev_str_ptr = prev_str;
 	if (prev_str == NULL) {
-		time_t now;
-		time(&now);
-		struct tm *now_tm;
-		now_tm = localtime(&now);
-		wcsftime(dete_str, _countof(dete_str), L"%y%m%d_%H%M%S_", now_tm);
-		prev_str_ptr = dete_str;
+		date_str = MakeISO8601Str(0);
+		awcscat(&date_str, L"_");
+		prev_str_ptr = date_str;
 	}
 
 	wchar_t *dup = _wcsdup(fname);
@@ -1478,6 +1475,9 @@ void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str)
 	MoveFileW(fname, bak_fname);
 	CopyFileW(bak_fname, fname, TRUE);
 	free(bak_fname);
+	if (date_str != NULL) {
+		free(date_str);
+	}
 }
 
 // common_static.lib ’P‘Ì‚Åƒrƒ‹ƒh‚Å‚«‚é‚æ‚¤’Ç‰Á
