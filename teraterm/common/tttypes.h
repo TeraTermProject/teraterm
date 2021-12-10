@@ -154,9 +154,6 @@ typedef enum {
 #define KmtOptFileAttr 2
 #define KmtOptSlideWin 4
 
-// LogDialog Option
-#define LOGDLG_BINARY          1
-
 // log rotate mode
 enum rotate_mode {
 	ROTATE_NONE,
