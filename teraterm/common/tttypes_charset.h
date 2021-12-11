@@ -42,7 +42,23 @@
   /*  ts.KanjiCode, ts.KanjiCodeSend ‚Ì’l */
 
 // ts.Language == IdEnglish
-#define IdCodeEnglish	1
+typedef enum {
+	IdISO8859_1,
+	IdISO8859_2,
+	IdISO8859_3,
+	IdISO8859_4,
+	IdISO8859_5,
+	IdISO8859_6,
+	IdISO8859_7,
+	IdISO8859_8,
+	IdISO8859_9,
+	IdISO8859_10,
+	IdISO8859_11,
+	IdISO8859_13,
+	IdISO8859_14,
+	IdISO8859_15,
+	IdISO8859_16,
+} IdKanjiCode;
 
 // ts.Language == IdJapanese
 #define IdSJIS  1

@@ -242,6 +242,10 @@
 				RelativePath="..\common\ttlib.c"
 				>
 			</File>
+			<File
+				RelativePath="..\teraterm\unicode.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -281,6 +285,10 @@
 			</File>
 			<File
 				RelativePath="..\common\ttlib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\teraterm\unicode.h"
 				>
 			</File>
 		</Filter>

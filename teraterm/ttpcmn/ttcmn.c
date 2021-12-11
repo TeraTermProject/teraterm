@@ -51,6 +51,7 @@
 #include "win32helper.h"
 #include "asprintf.h"
 #include "fileread.h"
+#include "../teraterm/unicode.h"
 
 #include "ttcmn_dup.h"
 
@@ -168,11 +169,12 @@ static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const 
 static void ConvertIniFiles(const wchar_t *filelist[],  const wchar_t *dir, const wchar_t *date_str)
 {
 	while(1) {
+		wchar_t *fname;
 		if (*filelist == NULL) {
 			break;
 		}
 
-		wchar_t *fname = NULL;
+		fname = NULL;
 		awcscats(&fname, dir, L"\\", *filelist, NULL);
 		ConvertIniFileCharCode(fname, date_str);
 		free(fname);
@@ -1349,7 +1351,10 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 			TempStr[TempLen++] = mb_char[1];
 		}
 	} else if (cv->Language == IdEnglish) {
-		TempStr[TempLen++] = u32;
+		char byte;
+		int part = KanjiCodeToISO8859Part(states->KanjiCode);
+		int r = UnicodeToISO8859(part, u32, &byte);
+		TempStr[TempLen++] = byte;
 	} else {
 		assert(FALSE);
 	}

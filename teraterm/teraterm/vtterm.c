@@ -62,6 +62,7 @@
 #include "vtterm.h"
 
 #include "unicode_test.h"
+// #define DEBUG_DUMP_INPUTCODE 1
 
 static void ParseFirst(BYTE b);
 
@@ -6227,6 +6228,23 @@ static BOOL ParseFirstRus(BYTE b)
 	return FALSE;
 }
 
+static BOOL ParseEnglish(BYTE b)
+{
+	unsigned short u16 = 0;
+	int part = KanjiCodeToISO8859Part(ts.KanjiCode);
+	int r = UnicodeFromISO8859(part, b, &u16);
+	if (r == 0) {
+		return FALSE;
+	}
+	if (u16 < 0x100) {
+		ParseASCII((BYTE)u16);
+	}
+	else {
+		PutU32(u16);
+	}
+	return TRUE;
+}
+
 static void ParseFirst(BYTE b)
 {
 	switch (ts.Language) {
@@ -6289,6 +6307,12 @@ static void ParseFirst(BYTE b)
 			}
 		}
 		break;
+	case IdEnglish: {
+		if (ParseEnglish(b)) {
+			return;
+		}
+		break;
+	}
 	}
 
 	if (SSflag) {

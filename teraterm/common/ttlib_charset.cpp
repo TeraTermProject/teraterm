@@ -27,6 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <assert.h>
+
 #include "tttypes_charset.h"
 
 #include "ttlib_charset.h"
@@ -42,14 +44,28 @@ static const TLanguageList LanguageList[] = {
 
 static const TKanjiList KanjiList[] = {
 	{ IdUtf8,		IdUTF8,				"UTF-8",					"UTF-8" },
-	{ IdEnglish,	IdCodeEnglish,		"English",					"English" },
+	{ IdEnglish,	IdISO8859_1,		"English/ISO8859-1",		"ISO8859-1" },
+	{ IdEnglish,	IdISO8859_2,		"English/ISO8859-2",		"ISO8859-2" },
+	{ IdEnglish,	IdISO8859_3,		"English/ISO8859-3",		"ISO8859-3" },
+	{ IdEnglish,	IdISO8859_4,		"English/ISO8859-4",		"ISO8859-4" },
+	{ IdEnglish,	IdISO8859_5,		"English/ISO8859-5",		"ISO8859-5" },
+	{ IdEnglish,	IdISO8859_6,		"English/ISO8859-6",		"ISO8859-6" },
+	{ IdEnglish,	IdISO8859_7,		"English/ISO8859-7",		"ISO8859-7" },
+	{ IdEnglish,	IdISO8859_8,		"English/ISO8859-8",		"ISO8859-8" },
+	{ IdEnglish,	IdISO8859_9,		"English/ISO8859-9",		"ISO8859-9" },
+	{ IdEnglish,	IdISO8859_10,		"English/ISO8859-10",		"ISO8859-10" },
+	{ IdEnglish,	IdISO8859_11,		"English/ISO8859-11",		"ISO8859-11" },
+	{ IdEnglish,	IdISO8859_13,		"English/ISO8859-13",		"ISO8859-13" },
+	{ IdEnglish,	IdISO8859_14,		"English/ISO8859-14",		"ISO8859-14" },
+	{ IdEnglish,	IdISO8859_15,		"English/ISO8859-15",		"ISO8859-15" },
+	{ IdEnglish,	IdISO8859_16,		"English/ISO8859-16",		"ISO8859-16" },
+	{ IdJapanese,	IdUTF8,				"Japanese/UTF-8",			"UTF-8" },
 	{ IdJapanese,	IdSJIS,				"Japanese/SJIS (CP932)",	"SJIS" },
 	{ IdJapanese,	IdEUC,				"Japanese/EUC",				"EUC" },
 	{ IdJapanese,	IdJIS,				"Japanese/JIS",				"JIS" },
-	{ IdJapanese,	IdUTF8,				"Japanese/UTF-8",			"UTF-8" },
-	{ IdRussian,	IdWindows,			"Russian/Windows (CP1251)",	"CP1251" },
+	{ IdRussian,	IdWindows,			"Russian/Windows (CP1251)",	"Windows(CP1251)" },
 	{ IdRussian,	IdKOI8,				"Russian/KOI8-R",			"KOI8-R" },
-	{ IdRussian,	Id866,				"Russian/CP 866",			"CP866" },
+	{ IdRussian,	Id866,				"Russian/CP866",			"CP866" },
 	{ IdRussian,	IdISO,				"Russian/ISO 8859-5",		"IS8859-5" },
 	{ IdKorean,		IdKoreanCP51949,	"Korean/KS5601 (CP51949)",	"KS5601" },
 	{ IdKorean,		IdUTF8,				"Korean/UTF-8",				"UTF-8" },
@@ -101,6 +117,8 @@ const TKanjiList *GetKanjiList(int index)
 
 /**
  *	漢字コード文字列を取得
+ *	iniファイルに保存する漢字コード文字列用
+ *
  *	@param[in]	language (=ts.Language)
  *						IdJapanese, IdKorean, ...
  *	@param[in]	kanji_code (=ts.KanjiCode (receive) or ts.KanjiCodeSend)
@@ -120,6 +138,8 @@ const char *GetKanjiCodeStr(int language, int kanji_code)
 
 /**
  *	漢字コードを取得
+ *	iniファイルに保存されている漢字コード文字列を漢字コードに変換する
+
  *	@param[in]	language (=ts.Language)
  *						IdJapanese, IdKorean, ...
  *	@param[in]	kanji_code_str
@@ -144,7 +164,7 @@ int GetKanjiCodeFromStr(int language, const char *kanji_code_str)
 /**
  *	KanjiCodeTranslate(Language(dest), KanjiCodeID(source)) returns KanjiCodeID
  *	@param[in]	lang (IdEnglish, IdJapanese, IdRussian, ...)
- *	@param[in]	kcode (IdSJIS, IdEUC, ... IdKOI8 ... )
+ *	@param[in]	kcode (IdSJIS, IdEUC, ... IdKOI8 ... ) (IdKanjiCode)
  *	@return		langに存在する漢字コードを返す
  *
  *	langに存在しない漢字コードを使用しないようこの関数を使用する
@@ -153,17 +173,58 @@ int GetKanjiCodeFromStr(int language, const char *kanji_code_str)
  */
 int KanjiCodeTranslate(int lang, int kcode)
 {
-	static const int Table[][5] = {
-		{1, 2, 3, 4, 5}, /* to English (dummy) */
-		{1, 2, 3, 4, 5}, /* to Japanese(dummy) */
-		{1, 2, 3, 4, 5}, /* to Russian (dummy) */
-		{1, 1, 1, 4, 5}, /* to Korean */
-		{4, 4, 4, 4, 5}, /* to Utf8 */
-		{1, 2, 2, 2, 2}, /* to Chinese */
+	// 組み合わせが存在している?
+	for (int i = 0; i < _countof(KanjiList); i++) {
+		if (KanjiList[i].lang == lang &&
+			KanjiList[i].coding == kcode) {
+			// 存在している
+			return kcode;
+		}
+	}
+
+	// リスト内の一番最初の漢字コードを返す
+	for (int i = 0; i < _countof(KanjiList); i++) {
+		if (KanjiList[i].lang == lang) {
+			return KanjiList[i].coding;
+		}
+	}
+
+	assert(0);	// ありえない
+	return IdUTF8;
+}
+
+/**
+ *	漢字コードから ISO8859の部番号を返す
+ *	@param	kanjicode	IdISO8859-1...16
+ *	@return 1...16		ISO8859に関係ない漢字コードの場合は1を返す
+ */
+int KanjiCodeToISO8859Part(int kanjicode)
+{
+	static const struct {
+		IdKanjiCode kanji_code;
+		int iso8859_part;
+	} list[] = {
+		{ IdISO8859_1, 1 },
+		{ IdISO8859_2, 2 },
+		{ IdISO8859_3, 3 },
+		{ IdISO8859_4, 4 },
+		{ IdISO8859_5, 5 },
+		{ IdISO8859_6, 6 },
+		{ IdISO8859_7, 7 },
+		{ IdISO8859_8, 8 },
+		{ IdISO8859_9, 9 },
+		{ IdISO8859_10, 10 },
+		{ IdISO8859_11, 11 },
+		{ IdISO8859_13, 13 },
+		{ IdISO8859_14, 14 },
+		{ IdISO8859_15, 15 },
+		{ IdISO8859_16, 16 },
 	};
-	if (lang < 1 || lang > IdLangMax) lang = 1;
-	if (kcode < 1 || kcode > 5) kcode = 1;
-	lang--;
-	kcode--;
-	return Table[lang][kcode];
+	for (size_t i = 0; i < _countof(list); i++) {
+		if (list[i].kanji_code == kanjicode) {
+			return list[i].iso8859_part;
+		}
+	}
+	assert(FALSE);
+	return 1;
 }

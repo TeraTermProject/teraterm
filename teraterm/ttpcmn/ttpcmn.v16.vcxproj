@@ -134,6 +134,7 @@
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\teraterm\unicode.cpp" />
     <ClCompile Include="language.c" />
     <ClCompile Include="ttcmn.c" />
     <ClCompile Include="ttcmn_cominfo.c" />
@@ -147,6 +148,7 @@
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\servicenames.h" />
     <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\teraterm\unicode.h" />
     <ClInclude Include="language.h" />
     <ClInclude Include="ttcmn_cominfo.h" />
     <ClInclude Include="ttcmn_dup.h" />

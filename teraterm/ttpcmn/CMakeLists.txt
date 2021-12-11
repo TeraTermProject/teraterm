@@ -15,7 +15,7 @@ add_library(
   ttcmn_notify.cpp
   ttpcmn-version.rc
   ttpcmn.def
-  ${COMMON_SRC}
+  ../teraterm/unicode.cpp
   )
 
 if(SUPPORT_OLD_WINDOWS)
