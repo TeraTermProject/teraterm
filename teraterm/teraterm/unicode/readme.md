@@ -43,3 +43,9 @@
 
 - 絵文字判定のためのテーブル
 - [get_emoji_table.md](get_emoji_table.md)
+
+## iso8859-X.md
+
+- [iso8859.md](iso8859.md)
+- 2部(iso8859-2.tbl)から16部(iso8859-16.tbl)まで
+  - 12部は規格上破棄されていて存在しない
