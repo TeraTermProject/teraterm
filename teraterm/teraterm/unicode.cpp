@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "unicode.h"
 
@@ -269,4 +270,142 @@ unsigned short UnicodeCombining(unsigned short first_code, unsigned short code)
 	}
 	unsigned short cset = UnicodeGetPrecomposedChar(first_code_index, first_code, code);
 	return cset;
+}
+
+typedef struct {
+	unsigned char code;
+	unsigned short unicode;
+} ISO8859Table_t;
+
+/**
+ *	ISO8859テーブル
+ */
+const ISO8859Table_t *GetISO8859Table(int iso8859_part)
+{
+	static const ISO8859Table_t iso8859_2[] = {
+#include "iso8859-2.tbl"
+	};
+	static const ISO8859Table_t iso8859_3[] = {
+#include "iso8859-3.tbl"
+	};
+	static const ISO8859Table_t iso8859_4[] = {
+#include "iso8859-4.tbl"
+	};
+	static const ISO8859Table_t iso8859_5[] = {
+#include "iso8859-5.tbl"
+	};
+	static const ISO8859Table_t iso8859_6[] = {
+#include "iso8859-6.tbl"
+	};
+	static const ISO8859Table_t iso8859_7[] = {
+#include "iso8859-7.tbl"
+	};
+	static const ISO8859Table_t iso8859_8[] = {
+#include "iso8859-8.tbl"
+	};
+	static const ISO8859Table_t iso8859_9[] = {
+#include "iso8859-9.tbl"
+	};
+	static const ISO8859Table_t iso8859_10[] = {
+#include "iso8859-10.tbl"
+	};
+	static const ISO8859Table_t iso8859_11[] = {
+#include "iso8859-11.tbl"
+	};
+	static const ISO8859Table_t iso8859_13[] = {
+#include "iso8859-13.tbl"
+	};
+	static const ISO8859Table_t iso8859_14[] = {
+#include "iso8859-14.tbl"
+	};
+	static const ISO8859Table_t iso8859_15[] = {
+#include "iso8859-15.tbl"
+	};
+	static const ISO8859Table_t iso8859_16[] = {
+#include "iso8859-16.tbl"
+	};
+
+	static const ISO8859Table_t *tables[] = {
+		NULL,	// 0
+		NULL,	// ISO8859-1
+		iso8859_2,
+		iso8859_3,
+		iso8859_4,
+		iso8859_5,
+		iso8859_6,
+		iso8859_7,
+		iso8859_8,
+		iso8859_9,
+		iso8859_10,
+		iso8859_11,
+		NULL,
+		iso8859_13,
+		iso8859_14,
+		iso8859_15,
+		iso8859_16,
+	};
+	if (iso8859_part >= _countof(tables)) {
+		assert(0);
+		return NULL;
+	}
+	assert(tables[iso8859_part] != NULL);
+	return tables[iso8859_part];
+}
+
+/**
+ *	ISO8859からUnicodeへ変換
+ */
+int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16)
+{
+	if (part == 1) {
+		// ISO8859-1 は unicode と同一
+		*u16 = b;
+		return 1;
+	}
+	const ISO8859Table_t *table = GetISO8859Table(part);
+	if (table == NULL) {
+		// 見つからなかった
+		*u16 = 0;
+		return 0;
+	}
+	for (int i = 0; i < 0xff; i++ ){
+		if (table[i].code == b) {
+			*u16 = table[i].unicode;
+			return 1;
+		}
+	}
+	*u16 = 0;
+	return 0;
+}
+
+/**
+ *	UnicodeからISO8859へ変換
+ */
+int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b)
+{
+	if (part == 1) {
+		// ISO8859-1 は unicode と同一
+		*b = (unsigned char)u32;
+		return 1;
+	}
+	if (u32 >= 0x10000) {
+		// 変換先に存在しないコード
+		*b = 0;
+		return 0;
+	}
+	const unsigned short u16 = (unsigned short)u32;
+	const ISO8859Table_t *table = GetISO8859Table(part);
+	if (table == NULL) {
+		// 見つからなかった
+		*b = 0;
+		return 0;
+	}
+	for (int i = 0; i < 0xff; i++ ){
+		if (table[i].unicode == u16) {
+			*b = table[i].code;
+			return 1;
+		}
+	}
+	*b = 0;
+	return 0;
 }
