@@ -2,6 +2,16 @@ version: 0.1.{build}
 
 environment:
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      COMPILER: VS_143
+      COMPILER_FRIENDLY: vs2022
+      GENERATOR: "Visual Studio 17 2022"
+      CMAKE_COMMAND: cmake
+      CMAKE_OPTION_LIBS: -DARCHITECTURE=Win32
+      CMAKE_OPTION_GENERATE: "-A Win32"
+      CMAKE_OPTION_BUILD: --config Release
+      BUILD_DIR: build
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       COMPILER: VS_142
       COMPILER_FRIENDLY: vs2019
@@ -101,3 +111,8 @@ artifacts:
   - path: build\%ZIP_FILE%
   - path: build\%SETUP_FILE%.exe
   - path: build\buildinfo.txt
+
+on_success:
+  - ci_scripts\notify.bat success
+on_failure:
+  - ci_scripts\notify.bat failure

@@ -1,5 +1,6 @@
 if exist teraterm\ttpdlg\svnversion.h del teraterm\ttpdlg\svnversion.h
 if exist svnrev_perl\sourcetree_info.bat del svnrev_perl\sourcetree_info.bat
+call ci_scripts\install.bat
 call svnrev_perl\svnrev.bat
 call svnrev_perl\sourcetree_info.bat
 if exist c:\cygwin64\setup-x86_64.exe (

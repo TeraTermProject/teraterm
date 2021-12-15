@@ -37,7 +37,7 @@ install(
 
 if(MSVC)
   # subsystem:windows, but start form wmain()
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+  if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:wmainCRTStartup")
   else()
     target_link_options(
