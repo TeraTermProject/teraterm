@@ -47,18 +47,7 @@ my $description = <<"EOS";
 $ENV{COMPILER_FRIENDLY}/$ENV{COMPILER}
 Commit \[r$revision\]($rev_url) by $ENV{APPVEYOR_REPO_COMMIT_AUTHOR} on $ENV{APPVEYOR_REPO_COMMIT_TIMESTAMP}
 \[Download\]($artifacts_url)
-\[Build worker image = $image\](https://www.appveyor.com/docs/windows-images-software/)
 EOS
-if (defined $ENV{APPVEYOR_REPO_COMMIT_MESSAGE}) {
-	$description .= <<"EOS";
-$ENV{APPVEYOR_REPO_COMMIT_MESSAGE}
-EOS
-}
-if (defined $ENV{APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED}) {
-	$description .= <<"EOS";
-$ENV{APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED}
-EOS
-}
 
 my %json= (
 	"content" => "build $result r$revision",
