@@ -8,13 +8,14 @@
 # テーブルの作り方
 
 - あらかじめ emoji-data.txt をダウンロードしておく
+  - `wget https://unicode.org/Public/emoji/12.1/emoji-data.txt`
 - 次のように実行
-  - `perl get_emoji_table.pl > unicode_emoji.tbl`
+  - `perl get_emoji_table.pl`
 
-# ?
+# etc
 
 - CJK環境では絵文字は全角
-- 非CJKでは0x1f000未満の絵文字は半角、それ以外は全角 
+- 非CJKでは0x1f000未満の絵文字は半角、それ以外は全角
 
 ## original data
 

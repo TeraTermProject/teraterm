@@ -1,3 +1,4 @@
+﻿// emoji-data.txt
 { 0x0000a9, 0x0000a9 }, // copyright
 { 0x0000ae, 0x0000ae }, // registered
 { 0x00203c, 0x00203c }, // double exclamation mark

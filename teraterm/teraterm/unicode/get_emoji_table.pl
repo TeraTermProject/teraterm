@@ -1,19 +1,37 @@
 ﻿#!/usr/bin/perl
 use utf8;
+use strict;
+use warnings;
+
+binmode STDOUT, ":utf8";
 
 sub output {
-	my ($start, $end, $comment) = @_;
+	my ($fh, $start, $end, $comment) = @_;
 
 	if ($start >= 0x80) {
-		printf("{ 0x%06x, 0x%06x }, // %s\n", $start, $end, $comment);
+		printf($fh "{ 0x%06x, 0x%06x }, // %s\n", $start, $end, $comment);
 	}
 }
 
-open(FILE, "emoji-data.txt") || die "Cannot open width file.";
+my $fname_out = "unicode_emoji.tbl";
+if (@ARGV == 1) {
+	$fname_out = $ARGV[0];
+}
 
-$block = 0;
-$oend = 0;
-while($a = <FILE>) {
+my $src_file = "emoji-data.txt";
+open(my $fh, "<:utf8", $src_file) || die "Cannot open $src_file.";
+open(my $fh_out, ">:crlf:utf8", $fname_out) || die "Cannot open $fname_out.";
+printf($fh_out "\x{feff}");	# BOM
+printf($fh_out "// $src_file\n");
+
+my $block = 0;
+my $start;
+my $end;
+my $comment;
+my $ostart;
+my $ocomment;
+my $oend = 0;
+while(my $a = <$fh>) {
 	if ($a =~ /^# ======/) {
 		$block = $block + 1;
 		if ($block == 2) {
@@ -41,7 +59,7 @@ while($a = <FILE>) {
 		# combine
 		$oend = $end;
 	} else {
-		output($ostart, $oend, $ocomment);
+		output($fh_out, $ostart, $oend, $ocomment);
 		$ostart = $start;
 		$oend = $end;
 		$ocomment = $comment;
@@ -49,5 +67,5 @@ while($a = <FILE>) {
 }
 
 if ($oend != 0) {
-	output($ostart, $oend, $ocomment);
+	output($fh_out, $ostart, $oend, $ocomment);
 }
