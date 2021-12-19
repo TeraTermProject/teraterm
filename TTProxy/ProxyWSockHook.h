@@ -13,7 +13,6 @@ using namespace yebisuya;
 #include "resource.h"
 #include "Hooker.h"
 #include "Logger.h"
-#include "SSLSocket.h"
 
 #include "ttlib.h"
 #include "i18n.h"
@@ -159,12 +158,7 @@ private:
             }
             *dst = '\0';
             const PROXY_TYPE_TABLE* table = proxy_type_table();
-            bool ssl_enabled = SSLSocket::isEnabled();
             while (table->name != NULL) {
-                if (!ssl_enabled && strstr(table->name, "ssl") != NULL) {
-                    table++;
-                    continue;
-                }
                 if (strcmp(buffer, table->name) == 0)
                     return table->type;
                 table++;
@@ -915,13 +909,6 @@ private:
             type.addString("TELNET");
             type.addString("SOCKS4");
             type.addString("SOCKS5");
-            if (SSLSocket::isEnabled()) {
-                type.addString("SSL");
-                type.addString("HTTP+SSL");
-                type.addString("TELNET+SSL");
-                type.addString("SOCKS4+SSL");
-                type.addString("SOCKS5+SSL");
-            }
             type.setCurSel(proxy.type);
 
             if (proxy.type != ProxyInfo::TYPE_NONE && proxy.type != ProxyInfo::TYPE_SSL) {
@@ -1825,183 +1812,17 @@ private:                                                   \
             result = 0;
             break;
         case ProxyInfo::TYPE_HTTP:
-        case ProxyInfo::TYPE_HTTP_SSL:
             result = begin_relay_http(info->proxy, info->realhost, info->realport, s);
             break;
         case ProxyInfo::TYPE_TELNET:
-        case ProxyInfo::TYPE_TELNET_SSL:
             result = begin_relay_telnet(info->proxy, info->realhost, info->realport, s);
             break;
         case ProxyInfo::TYPE_SOCKS4:
-        case ProxyInfo::TYPE_SOCKS4_SSL:
             result = begin_relay_socks4(info->proxy, info->realhost, info->realport, s);
             break;
         case ProxyInfo::TYPE_SOCKS5:
-        case ProxyInfo::TYPE_SOCKS5_SSL:
             result = begin_relay_socks5(info->proxy, info->realhost, info->realport, s);
             break;
-        }
-        if (result == 0) {
-            if (info->proxy.type == ProxyInfo::TYPE_SSL
-                || info->proxy.type == ProxyInfo::TYPE_HTTP_SSL
-                || info->proxy.type == ProxyInfo::TYPE_TELNET_SSL
-                || info->proxy.type == ProxyInfo::TYPE_SOCKS4_SSL
-                || info->proxy.type == ProxyInfo::TYPE_SOCKS5_SSL) {
-                if (!SSLSocket::isEnabled()) {
-                    WSASetLastError(WSAECONNREFUSED);
-                    return SOCKET_ERROR;
-                }
-                SSLSocket* ssl = new SSLSocket();
-                if (!ssl->connect(s, info->realhost)) {
-                    shutdown(s, SD_BOTH);
-                    int error_code = ssl->get_verify_result();
-                    char uimsg[MAX_UIMSG];
-                    delete ssl;
-                    switch (error_code) {
-                        case IDS_UNABLE_TO_GET_ISSUER_CERT:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_GET_ISSUER_CERT", uimsg, sizeof(uimsg),
-                                              "Unable to get Issuer Certificate");
-                            break;
-                        case IDS_UNABLE_TO_GET_CRL:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_GET_CRL", uimsg, sizeof(uimsg),
-                                              "Unable to get Certificate CRL");
-                            break;
-                        case IDS_UNABLE_TO_DECRYPT_CERT_SIGNATURE:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE", uimsg, sizeof(uimsg),
-                                              "Unable to decrypt Certificate's Signature");
-                            break;
-                        case IDS_UNABLE_TO_DECRYPT_CRL_SIGNATURE:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE", uimsg, sizeof(uimsg),
-                                              "Unable to decrypt CRL's Signature");
-                            break;
-                        case IDS_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY", uimsg, sizeof(uimsg),
-                                              "Unable to decode Issuer Public Key");
-                            break;
-                        case IDS_CERT_SIGNATURE_FAILURE:
-                            UTIL_get_lang_msg("MSG_CERT_SIGNATURE_FAILURE", uimsg, sizeof(uimsg),
-                                              "Certificate Signature failure");
-                            break;
-                        case IDS_CRL_SIGNATURE_FAILURE:
-                            UTIL_get_lang_msg("MSG_CRL_SIGNATURE_FAILURE", uimsg, sizeof(uimsg),
-                                              "CRL Signature failure");
-                            break;
-                        case IDS_CERT_NOT_YET_VALID:
-                            UTIL_get_lang_msg("MSG_CERT_NOT_YET_VALID", uimsg, sizeof(uimsg),
-                                              "Certificate is not yet valid");
-                            break;
-                        case IDS_CERT_HAS_EXPIRED:
-                            UTIL_get_lang_msg("MSG_CERT_HAS_EXPIRED", uimsg, sizeof(uimsg),
-                                              "Certificate has expired");
-                            break;
-                        case IDS_CRL_NOT_YET_VALID:
-                            UTIL_get_lang_msg("MSG_CRL_NOT_YET_VALID", uimsg, sizeof(uimsg),
-                                              "CRL is not yet valid");
-                            break;
-                        case IDS_CRL_HAS_EXPIRED:
-                            UTIL_get_lang_msg("MSG_CRL_HAS_EXPIRED", uimsg, sizeof(uimsg),
-                                              "CRL has expired");
-                            break;
-                        case IDS_ERROR_IN_CERT_NOT_BEFORE_FIELD:
-                            UTIL_get_lang_msg("MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in Certificate's notBefore field");
-                            break;
-                        case IDS_ERROR_IN_CERT_NOT_AFTER_FIELD:
-                            UTIL_get_lang_msg("MSG_ERROR_IN_CERT_NOT_AFTER_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in Certificate's notAfter field");
-                            break;
-                        case IDS_ERROR_IN_CRL_LAST_UPDATE_FIELD:
-                            UTIL_get_lang_msg("MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in CRL's lastUpdate field");
-                            break;
-                        case IDS_ERROR_IN_CRL_NEXT_UPDATE_FIELD:
-                            UTIL_get_lang_msg("MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in CRL's nextUpdate field");
-                            break;
-                        case IDS_OUT_OF_MEM:
-                            UTIL_get_lang_msg("MSG_OUT_OF_MEM", uimsg, sizeof(uimsg),
-                                              "Out of memory");
-                            break;
-                        case IDS_DEPTH_ZERO_SELF_SIGNED_CERT:
-                            UTIL_get_lang_msg("MSG_DEPTH_ZERO_SELF_SIGNED_CERT", uimsg, sizeof(uimsg),
-                                              "Self-signed Certificate");
-                            break;
-                        case IDS_SELF_SIGNED_CERT_IN_CHAIN:
-                            UTIL_get_lang_msg("MSG_SELF_SIGNED_CERT_IN_CHAIN", uimsg, sizeof(uimsg),
-                                              "Self-signed Certificate found in Certificate chain");
-                            break;
-                        case IDS_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY", uimsg, sizeof(uimsg),
-                                              "Unable to get Local Issuer Certificate");
-                            break;
-                        case IDS_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE", uimsg, sizeof(uimsg),
-                                              "Unable to verify the first Certificate");
-                            break;
-                        case IDS_CERT_CHAIN_TOO_LONG:
-                            UTIL_get_lang_msg("MSG_CERT_CHAIN_TOO_LONG", uimsg, sizeof(uimsg),
-                                              "Certificate chain too long");
-                            break;
-                        case IDS_CERT_REVOKED:
-                            UTIL_get_lang_msg("MSG_CERT_REVOKED", uimsg, sizeof(uimsg),
-                                              "Certificate revoked");
-                            break;
-                        case IDS_INVALID_CA:
-                            UTIL_get_lang_msg("MSG_INVALID_CA", uimsg, sizeof(uimsg),
-                                              "Invalid CA Certificate");
-                            break;
-                        case IDS_PATH_LENGTH_EXCEEDED:
-                            UTIL_get_lang_msg("MSG_PATH_LENGTH_EXCEEDED", uimsg, sizeof(uimsg),
-                                              "Path length constraint exceeded");
-                            break;
-                        case IDS_INVALID_PURPOSE:
-                            UTIL_get_lang_msg("MSG_INVALID_PURPOSE", uimsg, sizeof(uimsg),
-                                              "Unsupported Certificate purpose");
-                            break;
-                        case IDS_CERT_UNTRUSTED:
-                            UTIL_get_lang_msg("MSG_CERT_UNTRUSTED", uimsg, sizeof(uimsg),
-                                              "Certificate not trusted");
-                            break;
-                        case IDS_CERT_REJECTED:
-                            UTIL_get_lang_msg("MSG_CERT_REJECTED", uimsg, sizeof(uimsg),
-                                              "Certificate rejected");
-                            break;
-                        case IDS_SUBJECT_ISSUER_MISMATCH:
-                            UTIL_get_lang_msg("MSG_SUBJECT_ISSUER_MISMATCH", uimsg, sizeof(uimsg),
-                                              "Subject Issuer mismatch");
-                            break;
-                        case IDS_AKID_SKID_MISMATCH:
-                            UTIL_get_lang_msg("MSG_AKID_SKID_MISMATCH", uimsg, sizeof(uimsg),
-                                              "Authority and Subject Key Identifier mismatch");
-                            break;
-                        case IDS_AKID_ISSUER_SERIAL_MISMATCH:
-                            UTIL_get_lang_msg("MSG_AKID_ISSUER_SERIAL_MISMATCH", uimsg, sizeof(uimsg),
-                                              "Authority and Issuer Serial Number mismatch");
-                            break;
-                        case IDS_KEYUSAGE_NO_CERTSIGN:
-                            UTIL_get_lang_msg("MSG_KEYUSAGE_NO_CERTSIGN", uimsg, sizeof(uimsg),
-                                              "Key usage does not include Certificate signing");
-                            break;
-                        case IDS_APPLICATION_VERIFICATION:
-                            UTIL_get_lang_msg("MSG_APPLICATION_VERIFICATION", uimsg, sizeof(uimsg),
-                                              "Application verification failure");
-                            break;
-                        case IDS_UNMATCH_COMMON_NAME:
-                            UTIL_get_lang_msg("MSG_UNMATCH_COMMON_NAME", uimsg, sizeof(uimsg),
-                                              "Unmatch Common Name");
-                            break;
-                        case IDS_UNABLE_TO_GET_COMMON_NAME:
-                            UTIL_get_lang_msg("MSG_UNABLE_TO_GET_COMMON_NAME", uimsg, sizeof(uimsg),
-                                              "Unable to get Common Name");
-                            break;
-                        default:
-                            uimsg[0] = NULL;
-                            break;
-                    }
-                    return setError(s, uimsg);
-                }
-                sslmap.put(s,ssl);
-            }
         }
         return result;
     }
@@ -2012,16 +1833,6 @@ private:                                                   \
             if (info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
                 hostname = info->realhost;
             }else{
-                if (info->proxy.type == ProxyInfo::TYPE_SSL
-                    || info->proxy.type == ProxyInfo::TYPE_HTTP_SSL
-                    || info->proxy.type == ProxyInfo::TYPE_TELNET_SSL
-                    || info->proxy.type == ProxyInfo::TYPE_SOCKS4_SSL
-                    || info->proxy.type == ProxyInfo::TYPE_SOCKS5_SSL) {
-                    if (!SSLSocket::isEnabled()) {
-                        ::WSASetLastError(WSAHOST_NOT_FOUND);
-                        return NULL;
-                    }
-                }
                 if (info->buffer == NULL) {
                     int bufferLength = sizeof (DUMMYHOSTENT) + strlen(info->realhost);
                     info->buffer = new char[bufferLength];
@@ -2037,16 +1848,6 @@ private:                                                   \
         ConnectionInfo* info = connectioninfolist.find(hostname);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
             return ORIG_WSAAsyncGetHostByName(window, message, hostname, buffer, bufferLength);
-        }
-        if (info->proxy.type == ProxyInfo::TYPE_SSL
-            || info->proxy.type == ProxyInfo::TYPE_HTTP_SSL
-            || info->proxy.type == ProxyInfo::TYPE_TELNET_SSL
-            || info->proxy.type == ProxyInfo::TYPE_SOCKS4_SSL
-            || info->proxy.type == ProxyInfo::TYPE_SOCKS5_SSL) {
-            if (!SSLSocket::isEnabled()) {
-                ::WSASetLastError(WSAHOST_NOT_FOUND);
-                return NULL;
-            }
         }
         HANDLE handle = connectioninfolist.getTask(info);
         int len = sizeof (DUMMYHOSTENT) + strlen(hostname);
@@ -2064,16 +1865,6 @@ private:                                                   \
         ConnectionInfo* info = connectioninfolist.find(hostname);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
             return ORIG_WSAAsyncGetAddrInfo(window, message, hostname, portname, hints, res);
-        }
-        if (info->proxy.type == ProxyInfo::TYPE_SSL
-            || info->proxy.type == ProxyInfo::TYPE_HTTP_SSL
-            || info->proxy.type == ProxyInfo::TYPE_TELNET_SSL
-            || info->proxy.type == ProxyInfo::TYPE_SOCKS4_SSL
-            || info->proxy.type == ProxyInfo::TYPE_SOCKS5_SSL) {
-            if (!SSLSocket::isEnabled()) {
-                ::WSASetLastError(WSAHOST_NOT_FOUND);
-                return NULL;
-            }
         }
         HANDLE handle = connectioninfolist.getTask(info);
         int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostname) + 1;
@@ -2113,30 +1904,18 @@ private:                                                   \
     }
 
     DECLARE_HOOKAPI(int, send, (SOCKET s, const char* buf, int len, int flags), (s, buf, len, flags)) {
-        SSLSocket* ssl = sslmap.get(s);
-        if (ssl != NULL)
-            return ssl->write(buf, len);
         return ORIG_send(s, buf, len, flags);
     }
     DECLARE_HOOKAPI(int, sendto, (SOCKET s, const char* buf, int len, int flags,   const struct sockaddr* to, int tolen), (s, buf, len, flags, to, tolen)) {
         return ORIG_sendto(s, buf, len, flags, to, tolen);
     }
     DECLARE_HOOKAPI(int, recv, (SOCKET s, char* buf, int len, int flags), (s, buf, len, flags)) {
-        SSLSocket* ssl = sslmap.get(s);
-        if (ssl != NULL)
-            return ssl->read(buf, len);
         return ORIG_recv(s, buf, len, flags);
     }
     DECLARE_HOOKAPI(int, recvfrom, (SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen), (s, buf, len, flags, from, fromlen)) {
         return ORIG_recvfrom(s, buf, len, flags, from, fromlen);
     }
     DECLARE_HOOKAPI(int, closesocket, (SOCKET s), (s)) {
-        SSLSocket* ssl = sslmap.get(s);
-        if (ssl != NULL) {
-            ssl->close();
-            sslmap.remove(s);
-            delete ssl;
-        }
         return ORIG_closesocket(s);
     }
 
@@ -2150,7 +1929,6 @@ private:                                                   \
     String prompt_table[5];
     ProxyInfo defaultProxy;
     ConnectionInfoList connectioninfolist;
-    Hashtable<SOCKET, SSLSocket*> sslmap;
     MessageShower* shower;
     HWND owner;
     HMODULE resource_module;

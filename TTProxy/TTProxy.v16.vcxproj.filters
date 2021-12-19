@@ -58,9 +58,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SSLSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
