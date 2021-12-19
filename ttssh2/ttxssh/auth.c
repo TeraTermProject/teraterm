@@ -660,6 +660,14 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->pageant_keyfinal=FALSE;
 
 		// Pageant �ƒʐM
+		if (!putty_agent_exists()) {
+			UTIL_get_lang_msg("MSG_PAGEANT_NOTFOUND", pvar,
+			                  "Can't find Pageant.");
+			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+
+			return FALSE;
+		}
+
 		if (SSHv1(pvar)) {
 			pvar->pageant_keylistlen = putty_get_ssh1_keylist(&pvar->pageant_key);
 		}
@@ -667,8 +675,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			pvar->pageant_keylistlen = putty_get_ssh2_keylist(&pvar->pageant_key);
 		}
 		if (pvar->pageant_keylistlen == 0) {
-			UTIL_get_lang_msg("MSG_PAGEANT_NOTFOUND", pvar,
-			                  "Can't find Pageant.");
+			UTIL_get_lang_msg("MSG_PAGEANT_NOKEY", pvar,
+			                  "Pageant has no valid key.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 
 			return FALSE;
