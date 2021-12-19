@@ -21,18 +21,9 @@ popd
 :patch_end
 
 
-if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
-perl Configure no-asm no-async no-shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
-perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
-if exist "makefile.dbg" del makefile.dbg
-ren makefile.tmp makefile.dbg
-nmake -f makefile.dbg clean
-nmake -f makefile.dbg
-mkdir out32.dbg
-move libcrypto* out32.dbg
-move libssl* out32.dbg
-move apps\openssl.exe out32.dbg
-:build_dbg_end
+rem ossl_static.pdb は *.pdb なので nmake clean すると削除されてしまう。
+rem debug のときのほうが必要だと思われるので、
+rem release を先にビルドして debug の ossl_static.pdb が残るようにする。
 
 if exist "out32\libcrypto.lib" goto build_end
 perl Configure no-asm no-async no-shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501
@@ -45,7 +36,22 @@ mkdir out32
 move libcrypto* out32
 move libssl* out32
 move apps\openssl.exe out32
+move ossl_static.pdb out32
 :build_end
+
+if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
+perl Configure no-asm no-async no-shared no-capieng no-dso no-engine VC-WIN32 -D_WIN32_WINNT=0x0501 --debug
+perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
+if exist "makefile.dbg" del makefile.dbg
+ren makefile.tmp makefile.dbg
+nmake -f makefile.dbg clean
+nmake -f makefile.dbg
+mkdir out32.dbg
+move libcrypto* out32.dbg
+move libssl* out32.dbg
+move apps\openssl.exe out32.dbg
+move ossl_static.pdb out32.dbg
+:build_dbg_end
 
 
 rem Visual Studio 2005 の場合は 2003 R2 Platform SDK の導入を確認する
