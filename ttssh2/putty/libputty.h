@@ -46,6 +46,7 @@ extern void *agent_query(void *in, int inlen, void **out, int *outlen,
 int putty_get_ssh2_keylist(unsigned char **keylist);
 void *putty_sign_ssh2_key(unsigned char *pubkey,
                           unsigned char *data,
+                          int datalen,
                           int *outlen);
 int putty_get_ssh1_keylist(unsigned char **keylist);
 void *putty_hash_ssh1_challenge(unsigned char *pubkey,
@@ -54,9 +55,9 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
                                 int datalen,
                                 unsigned char *session_id,
                                 int *outlen);
-int putty_get_ssh1_keylen(unsigned char *key,
-                          int maxlen);
+int putty_get_ssh1_keylen(unsigned char *key, int maxlen);
 const char *putty_get_version();
+BOOL putty_agent_exists();
 
 static void *get_keylist1(int *length);
 static void *get_keylist2(int *length);

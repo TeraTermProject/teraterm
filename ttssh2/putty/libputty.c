@@ -70,11 +70,12 @@ int putty_get_ssh2_keylist(unsigned char **keylist)
 
 /*
  * for SSH2
- *   公開鍵とデータ(同じく公開鍵)を渡し、
- *   公開鍵によって署名されたデータを得る
+ *   公開鍵とデータを渡し、
+ *   秘密鍵によって署名されたデータを得る
  */
-void *putty_sign_ssh2_key(unsigned char *pubkey,
+void *putty_sign_ssh2_key(unsigned char *pubkey /* length(4byte) + data */,
                           unsigned char *data,
+                          int datalen,
                           int *outlen)
 {
 	void *ret;
@@ -82,11 +83,11 @@ void *putty_sign_ssh2_key(unsigned char *pubkey,
 	unsigned char *request, *response;
 	void *vresponse;
 	int resplen;
-	int pubkeylen, datalen, reqlen;
+	int pubkeylen, reqlen;
+	int flags = 0;
 
 	pubkeylen = GET_32BIT(pubkey);
-	datalen = GET_32BIT(data);
-	reqlen = 4 + 1 + (4 + pubkeylen) + (4 + datalen);
+	reqlen = 4 + 1 + (4 + pubkeylen) + (4 + datalen) + 4;
 	request = (unsigned char *)malloc(reqlen);
 
 	// request length
@@ -95,8 +96,12 @@ void *putty_sign_ssh2_key(unsigned char *pubkey,
 	request[4] = SSH2_AGENTC_SIGN_REQUEST;
 	// public key (length + data)
 	memcpy(request + 5, pubkey, 4 + pubkeylen);
-	// sign data (length + data)
-	memcpy(request + 5 + 4 + pubkeylen, data, 4 + datalen);
+	// sign data length
+	PUT_32BIT(request + 5 + 4 + pubkeylen, datalen);
+	// sign data
+	memcpy(request + 5 + 4 + pubkeylen + 4, data, datalen);
+	// flags word
+	PUT_32BIT(request + 5 + 4 + pubkeylen + 4 + datalen, flags);
 
 	agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
 
@@ -170,7 +175,7 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
 	// session_id
 	memcpy(p, session_id, 16);
 	p += 16;
-	// terminator?
+	// response format
 	PUT_32BIT(p, 1);
 
 	agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
@@ -191,8 +196,7 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
 	return ret;
 }
 
-int putty_get_ssh1_keylen(unsigned char *key,
-                          int maxlen)
+int putty_get_ssh1_keylen(unsigned char *key, int maxlen)
 {
 	return rsa_public_blob_len(key, maxlen);
 }
@@ -368,6 +372,14 @@ static void *get_keylist2(int *length)
 		*length = resplen-5;
 
 	return ret;
+}
+
+BOOL putty_agent_exists()
+{
+	if (agent_exists()) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 // from WINDOWS\WINDOW.C (putty 0.60)

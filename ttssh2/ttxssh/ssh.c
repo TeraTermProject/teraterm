@@ -7409,7 +7409,6 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 		unsigned char *puttykey;
 		buffer_t *signbuf;
-		unsigned char *signmsg;
 		unsigned char *signedmsg;
 		int signedlen;
 
@@ -7446,11 +7445,9 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		puttykey += len;
 
 		// Pageant ‚É–¼‚µ‚Ä‚à‚ç‚¤
-		signmsg = (unsigned char *)malloc(signbuf->len + 4);
-		set_uint32_MSBfirst(signmsg, signbuf->len);
-		memcpy(signmsg + 4, signbuf->buf, signbuf->len);
 		signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
-		                                signmsg, &signedlen);
+		                                signbuf->buf, signbuf->len,
+		                                &signedlen);
 		buffer_free(signbuf);
 		if (signedmsg == NULL) {
 			safefree(pvar->pageant_key);
