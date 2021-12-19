@@ -25,13 +25,6 @@
 #include <ws2tcpip.h>
 #include <wspiapi.h>
 
-#include <openssl/crypto.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/x509v3.h>
-
 #include <teraterm.h>
 #include <tttypes.h>
 #include <ttplugin.h>
