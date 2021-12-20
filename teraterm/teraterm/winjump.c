@@ -56,7 +56,6 @@
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <initguid.h>
 #if defined(__MINGW32__) || defined(_INC_SDKDDKVER)
 #define HAS_PROPKEY_H 1
 #endif
