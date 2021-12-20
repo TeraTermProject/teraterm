@@ -105,10 +105,14 @@
 #include "teraprn.h"
 #include "setupdirdlg.h"
 
-#include "initguid.h"
-//#include "Usbiodef.h"
+#include <initguid.h>
+#if _MSC_VER == 1400  // Visual Studio 2005(VC8.0)
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
+#else
+#include <usbiodef.h>	// GUID_DEVINTERFACE_USB_DEVICE
+#endif
+
 #include "win32helper.h"
 
 #define VTClassName L"VTWin32"
