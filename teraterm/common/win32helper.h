@@ -40,6 +40,7 @@ DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t *
 DWORD hGetCurrentDirectoryW(wchar_t **dir);
 DWORD hGetWindowTextW(HWND hWnd, wchar_t **text);
 DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text);
+DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded);
 
 #ifdef __cplusplus
 }

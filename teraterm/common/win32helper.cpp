@@ -242,3 +242,16 @@ DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text)
 	HWND hWnd = GetDlgItem(hDlg, id);
 	return hGetWindowTextW(hWnd, text);
 }
+
+DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded)
+{
+	size_t len = (size_t)ExpandEnvironmentStringsW(src, NULL, 0);
+	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * len);
+	if (dest == NULL) {
+		*expanded = NULL;
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	ExpandEnvironmentStringsW(src, dest, (DWORD)len);
+	*expanded = dest;
+	return NO_ERROR;
+}
