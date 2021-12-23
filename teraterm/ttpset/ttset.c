@@ -1297,18 +1297,24 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        sizeof(ts->XModemRcvCommand), FName);
 
 	/* Default directory for file transfer */
-	GetPrivateProfileString(Section, "FileDir", "",
-	                        ts->FileDir, sizeof(ts->FileDir), FName);
-	if (strlen(ts->FileDir) == 0)
-		GetDownloadFolder(ts->FileDir, sizeof(ts->FileDir));
-	else {
-		char FileDirExpanded[MAX_PATH];
-		ExpandEnvironmentStrings(ts->FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-		_getcwd(Temp, sizeof(Temp));
-		if (_chdir(FileDirExpanded) != 0)
-			GetDownloadFolder(ts->FileDir, sizeof(ts->FileDir));
-		_chdir(Temp);
+	hGetPrivateProfileStringW(SectionW, L"FileDir", L"", FName, &ts->FileDirW);
+	if (ts->FileDirW != NULL && ts->FileDirW[0] != 0) {
+		wchar_t *FileDirExpanded;
+		hExpandEnvironmentStringsW(ts->FileDirW, &FileDirExpanded);
+		free(ts->FileDirW);
+		ts->FileDirW = NULL;
+		if (DoesFolderExistW(FileDirExpanded)) {
+			ts->FileDirW = FileDirExpanded;
+		}
+		else {
+			free(FileDirExpanded);
+		}
 	}
+	if (ts->FileDirW == NULL || ts->FileDirW[0] == 0) {
+		free(ts->FileDirW);
+		ts->FileDirW = GetDownloadFolderW();
+	}
+	WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
 
 	/* filter on file send (2007.6.5 maya) */
 	GetPrivateProfileString(Section, "FileSendFilter", "",
@@ -2774,7 +2780,7 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	                          ts->XModemRcvCommand, FName);
 
 	/* Default directory for file transfer */
-	WritePrivateProfileString(Section, "FileDir", ts->FileDir, FName);
+	WritePrivateProfileStringW(SectionW, L"FileDir", ts->FileDirW, FName);
 
 	/* filter on file send (2007.6.5 maya) */
 	WritePrivateProfileString(Section, "FileSendFilter",
@@ -3855,15 +3861,12 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		else if (_wcsnicmp(Temp, L"/FD=", 4) == 0) {	/* file transfer directory */
 			wcsncpy_s(Temp2, _countof(Temp2), &Temp[4], _TRUNCATE);
 			if (wcslen(Temp2) > 0) {
-				char TempDir[MAXPATHLEN];
-				_getcwd(TempDir, _countof(TempDir));
-				if (_wchdir(Temp2) == 0) {
-					char *FileDirA = ToCharW(Temp2);
-					strncpy_s(ts->FileDir, sizeof(ts->FileDir), FileDirA,
-					          _TRUNCATE);
-					free(FileDirA);
+				wchar_t *dir = Temp2;
+				if (DoesFolderExistW(dir)) {
+					free(ts->FileDirW);
+					ts->FileDirW = _wcsdup(dir);
+					WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
 				}
-				_chdir(TempDir);
 			}
 		}
 		else if (_wcsicmp(Temp, L"/H") == 0)	/* hide title bar */

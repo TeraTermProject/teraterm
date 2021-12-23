@@ -383,7 +383,7 @@ struct tttset {
 	WORD XmodemOpt, XmodemBin;
 	int ZmodemDataLen, ZmodemWinSize;
 	int QVWinSize;
-	char FileDir[MAXPATHLEN];
+	char FileDir[MAXPATHLEN];		// switch FileDirW
 	char FileSendFilter[128];
 	WORD Language;
 	char DelimList[52];
@@ -644,6 +644,7 @@ struct tttset {
 	wchar_t *UILanguageFileW_ini;		// 相対パス,iniファイルの中身
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
 	wchar_t *LogDirW;					// logやダンプを置くフォルダ
+	wchar_t *FileDirW;					// ダウンロードパス(ロード時環境変数が展開されるがセーブ時失われる)
 };
 
 typedef struct tttset TTTSet, *PTTSet;

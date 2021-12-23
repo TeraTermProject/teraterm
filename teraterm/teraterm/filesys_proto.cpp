@@ -677,7 +677,7 @@ wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
 	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	wchar_t *FNFilter = GetCommonDialogFilterW(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
