@@ -6,28 +6,59 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\putty\CONF.C">
+    <ClCompile Include="..\..\libs\putty\aqsync.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\MISC.C">
+    <ClCompile Include="..\..\libs\putty\callback.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\TREE234.C">
+    <ClCompile Include="..\..\libs\putty\errsock.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\VERSION.C">
+    <ClCompile Include="..\..\libs\putty\marshal.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\WINDOWS\WINMISC.C">
+    <ClCompile Include="..\..\libs\putty\memory.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\WINDOWS\WINPGNTC.C">
+    <ClCompile Include="..\..\libs\putty\mpint.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\WINDOWS\WINSECUR.C">
+    <ClCompile Include="..\..\libs\putty\sshsh256.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\tree234.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\version.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\wincapi.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\winhandl.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\winhsock.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\winmisc.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\winnpc.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\winpgntc.c">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\winsecur.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
     <ClCompile Include="libputty.c" />
+    <ClCompile Include="putty-import.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libputty.h" />
