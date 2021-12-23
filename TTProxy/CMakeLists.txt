@@ -2,16 +2,12 @@
 
 project(${PACKAGE_NAME})
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
-
 add_library(
   ${PACKAGE_NAME} SHARED
   Hooker.h
   Logger.h
   ProxyWSockHook.h
   resource.h
-  SSLLIB.h
-  SSLSocket.h
   StdAfx.cpp
   StdAfx.h
   TTProxy.cpp
@@ -111,7 +107,6 @@ target_include_directories(
   ../teraterm/teraterm
   ../teraterm/common
   YCL/include
-  ${OPENSSL_INCLUDE_DIRS}
   .
   )
 
