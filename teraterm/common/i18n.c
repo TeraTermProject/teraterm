@@ -51,7 +51,7 @@ DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_
 	else {
 		wmemcpy(buf, str, buf_len - 1);
 		buf[buf_len - 1] = '\0';
-		assert(("buffer too small",0));
+		assert(FALSE);
 	}
 	free(str);
 	return size;
@@ -77,7 +77,7 @@ DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf
 	else {
 		memcpy(buf, strA, buf_len - 1);
 		buf[buf_len - 1] = '\0';
-		assert(("buffer too small",0));
+		assert(FALSE);
 	}
 	free(defW);
 	free(strA);
