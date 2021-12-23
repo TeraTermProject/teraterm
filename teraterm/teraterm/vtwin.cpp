@@ -106,7 +106,8 @@
 #include "setupdirdlg.h"
 
 #include <initguid.h>
-#if _MSC_VER == 1400  // Visual Studio 2005(VC8.0)
+#if _MSC_VER < 1600
+// Visual Studio 2005,2008 のとき、2010より古いバージョンのとき
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
 #else
