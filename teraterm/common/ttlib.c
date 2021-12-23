@@ -464,35 +464,36 @@ BOOL DoesFileExist(const char *FName)
 	return (_stat(FName,&st)==0);
 }
 
-BOOL DoesFolderExist(const char *FName)
+/**
+ *	check if a folder exists or not
+ *	マクロ互換性のため
+ *	DoesFileExist() は従来通りフォルダまたはファイルがあれば TRUE を返し
+ *  DoesFolderExist() はフォルダがある場合のみ TRUE を返す。
+ */
+BOOL DoesFolderExistW(const wchar_t *FName)
 {
-	// check if a folder exists or not
-	// マクロ互換性のため
-	// DoesFileExist は従来通りフォルダまたはファイルがあれば TRUE を返し
-	// DoesFileExist はフォルダがある場合のみ TRUE を返す。
-	struct _stat st;
-
-	if (_stat(FName,&st)==0) {
-		if ((st.st_mode & _S_IFDIR) > 0) {
-			return TRUE;
-		}
-		else {
-			return FALSE;
-		}
-	}
-	else {
+	const DWORD r = GetFileAttributesW(FName);
+	if (r == INVALID_FILE_ATTRIBUTES) {
 		return FALSE;
 	}
+	if (r & FILE_ATTRIBUTE_DIRECTORY) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL DoesFolderExist(const char *FName)
+{
+	wchar_t *FNameW = ToWcharA(FName);
+	BOOL r = DoesFolderExistW(FNameW);
+	free(FNameW);
+	return r;
 }
 
 long GetFSize(const char *FName)
 {
-	struct _stat st;
-
-	if (_stat(FName,&st)==-1) {
-		return 0;
-	}
-	return (long)st.st_size;
+	unsigned long long size = GetFSize64A(FName);
+	return (long)size;
 }
 
 long GetFMtime(const char *FName)

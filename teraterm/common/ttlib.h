@@ -64,6 +64,7 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen);
 int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen);
 BOOL DoesFileExist(const char *FName);
 BOOL DoesFolderExist(const char *FName);
+BOOL DoesFolderExistW(const wchar_t *FName);
 long GetFSize(const char *FName);
 unsigned long long GetFSize64H(HANDLE hFile);
 unsigned long long GetFSize64W(const wchar_t *FName);
