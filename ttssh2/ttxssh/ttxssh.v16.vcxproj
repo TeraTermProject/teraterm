@@ -128,7 +128,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto-47.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto-47.lib;Bcrypt.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Release;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
