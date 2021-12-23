@@ -22,7 +22,15 @@
 
 /*
  * ChaCha based random number generator for OpenBSD.
+ *   openssh-portable: openbsd-compat/arc4random.c
  */
+
+/*
+ * with LibreSSL, use getentropy() instead of RAND_bytes().
+ *   OpenBSD: lib/libcrypto/arc4random/getentropy_win.c
+ *   $OpenBSD: getentropy_win.c,v 1.6 2020/11/11 10:41:24 bcook Exp $
+ */
+
 
 #include <sys/types.h>
 
@@ -35,8 +43,12 @@
 #include "arc4random.h"
 #include "chacha.h"
 
+#ifndef LIBRESSL_VERSION_NUMBER
 #include <openssl/rand.h>
 #include <openssl/err.h>
+#else
+#include <bcrypt.h>
+#endif
 
 /* OpenSSH isn't multithreaded */
 #define _ARC4_LOCK()
@@ -64,14 +76,41 @@ _rs_init(u_char *buf, size_t n)
 	chacha_ivsetup(&rs, buf + KEYSZ, NULL);
 }
 
+#ifdef LIBRESSL_VERSION_NUMBER
+/*
+ * On Windows, BCryptGenRandom with BCRYPT_USE_SYSTEM_PREFERRED_RNG is supposed
+ * to be a well-seeded, cryptographically strong random number generator.
+ * https://docs.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgenrandom
+ */
+static int
+getentropy(void *buf, size_t len)
+{
+	if (len > 256) {
+		return (-1);
+	}
+
+	if (FAILED(BCryptGenRandom(NULL, buf, len, BCRYPT_USE_SYSTEM_PREFERRED_RNG))) {
+		return (-1);
+	}
+
+	return (0);
+}
+#endif /* LIBRESSL_VERSION_NUMBER */
+
 static void
 _rs_stir(void)
 {
 	u_char rnd[KEYSZ + IVSZ];
 
+#ifndef LIBRESSL_VERSION_NUMBER
 	if (RAND_bytes(rnd, sizeof(rnd)) <= 0) {
 		return;
 	}
+#else
+	if (getentropy(rnd, sizeof(rnd)) <= 0) {
+		return;
+	}
+#endif
 
 	if (!rs_initialized) {
 		rs_initialized = 1;
