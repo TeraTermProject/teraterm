@@ -1,4 +1,5 @@
-﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildall.cmake
+﻿# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 15 2017 Win64" -P buildall.cmake
