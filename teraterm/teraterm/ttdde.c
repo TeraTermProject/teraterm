@@ -1220,11 +1220,6 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	if (Startup)
 		strncat_s(Cmnd,sizeof(Cmnd)," /S",_TRUNCATE); // "startup" flag
 
-#if 0
-	if (WinExec(Cmnd,SW_MINIMIZE) < 32)
-		EndDDE();
-#else
-
 	// ログ採取中も下げないことにする。(2005.8.14 yutaka)
 #if 0
 	// Tera Term本体でログ採取中にマクロを実行すると、マクロの動作が停止することが
@@ -1254,5 +1249,8 @@ void RunMacro(PCHAR FName, BOOL Startup)
 		&si, &pi) == 0) {
 			EndDDE();
 	}
-#endif
+	else {
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+	}
 }
