@@ -4431,7 +4431,7 @@ void CVTWindow::OnSetupSerialPort()
 				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
 			}
 
-			WinExec(Command,SW_SHOW);
+			TTWinExecA(Command);
 			return;
 		}
 
