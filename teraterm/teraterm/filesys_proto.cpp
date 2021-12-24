@@ -215,7 +215,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	// 受信フォルダ
 	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
 	AppendSlashW(FileDirExpanded, _countof(FileDirExpanded));
 	fv->RecievePath = _wcsdup(FileDirExpanded);
 
@@ -934,7 +934,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, _countof(FileDirExpanded));
+	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */
@@ -1498,7 +1498,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW((wc)ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
+	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, sizeof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */
