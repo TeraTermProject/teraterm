@@ -2007,28 +2007,23 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_DIRHELP, "BTN_HELP" },
 	};
-	PCHAR CurDir;
-	char HomeDir[MAXPATHLEN];
-	char TmpDir[MAXPATHLEN];
-	RECT R;
-	HDC TmpDC;
-	SIZE s;
-	HWND HDir, HSel, HOk, HCancel, HHelp;
-	POINT D, B, S;
-	int WX, WY, WW, WH, CW, DW, DH, BW, BH, SW, SH;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 
 	switch (Message) {
-		case WM_INITDIALOG:
+		case WM_INITDIALOG: {
+			PTTSet ts;
+			wchar_t *CurDir;
+			RECT R;
+			HDC TmpDC;
+			SIZE s;
+			HWND HDir, HSel, HOk, HCancel, HHelp;
+			POINT D, B, S;
+			int WX, WY, WW, WH, CW, DW, DH, BW, BH, SW, SH;
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
-
-			CurDir = (PCHAR)(lParam);
+			ts = (PTTSet)lParam;
+			CurDir = ts->FileDirW;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
-
-			SetDlgItemText(Dialog, IDC_DIRCURRENT, CurDir);
-			SendDlgItemMessage(Dialog, IDC_DIRNEW, EM_LIMITTEXT,
-			                   MAXPATHLEN-1, 0);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgItemTextW(Dialog, IDC_DIRCURRENT, CurDir);
 
 // adjust dialog size
 			// get size of current dir text
@@ -2039,7 +2034,7 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			ScreenToClient(Dialog,&D);
 			DH = R.bottom-R.top;
 			TmpDC = GetDC(Dialog);
-			GetTextExtentPoint32(TmpDC,CurDir,strlen(CurDir),&s);
+			GetTextExtentPoint32W(TmpDC,CurDir,(int)wcslen(CurDir),&s);
 			ReleaseDC(Dialog,TmpDC);
 			DW = s.cx + s.cx/10;
 
@@ -2101,52 +2096,71 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
+		}
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
-				case IDOK:
-					CurDir = (PCHAR)GetWindowLongPtr(Dialog,DWLP_USER);
-					if ( CurDir!=NULL ) {
-						char FileDirExpanded[MAX_PATH];
-						_getcwd(HomeDir,sizeof(HomeDir));
-						ExpandEnvironmentStrings(CurDir, FileDirExpanded, sizeof(FileDirExpanded));
-						_chdir(FileDirExpanded);
-						GetDlgItemText(Dialog, IDC_DIRNEW, TmpDir, sizeof(TmpDir));
-						if ( strlen(TmpDir)>0 ) {
-							ExpandEnvironmentStrings(TmpDir, FileDirExpanded, sizeof(FileDirExpanded));
-							if (_chdir(FileDirExpanded) != 0) {
-								get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
-								get_lang_msg("MSG_FIND_DIR_ERROR", uimsg, sizeof(uimsg), "Cannot find directory", UILanguageFile);
-								MessageBox(Dialog,uimsg,uimsg2,MB_ICONEXCLAMATION);
-								_chdir(HomeDir);
-								return TRUE;
-							}
-							strncpy_s(CurDir, MAXPATHLEN, TmpDir, _TRUNCATE);
+				case IDOK: {
+					PTTSet ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
+					BOOL OK = FALSE;
+					wchar_t *current_dir;
+					wchar_t *new_dir;
+					hGetCurrentDirectoryW(&current_dir);
+					hGetDlgItemTextW(Dialog, IDC_DIRNEW, &new_dir);
+					if (wcslen(new_dir) > 0) {
+						wchar_t *FileDirExpanded;
+						hExpandEnvironmentStringsW(new_dir, &FileDirExpanded);
+						if (DoesFolderExistW(FileDirExpanded)) {
+							free(ts->FileDirW);
+							ts->FileDirW = new_dir;
+							WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
+							OK = TRUE;
 						}
-						_chdir(HomeDir);
+						else {
+							free(new_dir);
+						}
+						free(FileDirExpanded);
 					}
-					EndDialog(Dialog, 1);
+					SetCurrentDirectoryW(current_dir);
+					free(current_dir);
+					if (OK) {
+						EndDialog(Dialog, 1);
+					}
+					else {
+						static const TTMessageBoxInfoW info = {
+							"Tera Term",
+							"MSG_TT_ERROR", L"Tera Term: Error",
+							"MSG_FIND_DIR_ERROR", L"Cannot find directory",
+							MB_ICONEXCLAMATION
+						};
+						TTMessageBoxW(Dialog, &info, ts->UILanguageFileW);
+					}
 					return TRUE;
+				}
 
 				case IDCANCEL:
 					EndDialog(Dialog, 0);
 					return TRUE;
 
 				case IDC_SELECT_DIR: {
-					wchar_t uimsgW[MAX_UIMSG];
-					wchar_t *buf, *buf2;
-					get_lang_msgW("DLG_SELECT_DIR_TITLE", uimsgW, _countof(uimsgW),
-								  L"Select new directory", UILanguageFile);
-					{
-						wchar_t FileDirExpanded[MAX_PATH];
-						hGetDlgItemTextW(Dialog, IDC_DIRNEW, &buf);
-						ExpandEnvironmentStringsW(buf, FileDirExpanded, _countof(FileDirExpanded));
-						if (doSelectFolderW(Dialog, FileDirExpanded, uimsgW, &buf2)) {
-							SetDlgItemTextW(Dialog, IDC_DIRNEW, buf2);
-							free(buf2);
-						}
+					PTTSet ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
+					wchar_t *uimsgW;
+					wchar_t *buf;
+					wchar_t *FileDirExpanded;
+					GetI18nStrWW("Tera Term", "DLG_SELECT_DIR_TITLE", L"Select new directory", ts->UILanguageFileW, &uimsgW);
+					hGetDlgItemTextW(Dialog, IDC_DIRNEW, &buf);
+					if (buf[0] == 0) {
+						free(buf);
+						hGetDlgItemTextW(Dialog, IDC_DIRCURRENT, &buf);
+					}
+					hExpandEnvironmentStringsW(buf, &FileDirExpanded);
+					free(buf);
+					if (doSelectFolderW(Dialog, FileDirExpanded, uimsgW, &buf)) {
+						SetDlgItemTextW(Dialog, IDC_DIRNEW, buf);
 						free(buf);
 					}
+					free(FileDirExpanded);
+					free(uimsgW);
 					return TRUE;
 				}
 
@@ -3153,12 +3167,12 @@ BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 		                     WndParent, HostDlg, (LPARAM)GetHNRec);
 }
 
-BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir)
+BOOL WINAPI _ChangeDirectory(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_DIRDLG),
-		                     WndParent, DirDlg, (LPARAM)CurDir);
+		                     WndParent, DirDlg, (LPARAM)ts);
 }
 
 BOOL WINAPI _AboutDialog(HWND WndParent)

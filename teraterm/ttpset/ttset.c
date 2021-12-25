@@ -1301,16 +1301,14 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->FileDirW != NULL && ts->FileDirW[0] != 0) {
 		wchar_t *FileDirExpanded;
 		hExpandEnvironmentStringsW(ts->FileDirW, &FileDirExpanded);
-		free(ts->FileDirW);
-		ts->FileDirW = NULL;
-		if (DoesFolderExistW(FileDirExpanded)) {
-			ts->FileDirW = FileDirExpanded;
+		if (!DoesFolderExistW(FileDirExpanded)) {
+			free(ts->FileDirW);
+			ts->FileDirW = NULL;
 		}
-		else {
-			free(FileDirExpanded);
-		}
+		free(FileDirExpanded);
 	}
 	if (ts->FileDirW == NULL || ts->FileDirW[0] == 0) {
+		// デフォルトフォルダをセットする
 		free(ts->FileDirW);
 		ts->FileDirW = GetDownloadFolderW();
 	}

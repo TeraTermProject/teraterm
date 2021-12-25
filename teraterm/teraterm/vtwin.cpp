@@ -4062,7 +4062,7 @@ void CVTWindow::OnFileChangeDir()
 	}
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
-	(*ChangeDirectory)(HVTWin,ts.FileDir);
+	(*ChangeDirectory)(HVTWin, &ts);
 }
 
 void CVTWindow::OnFilePrint()

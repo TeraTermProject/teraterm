@@ -35,7 +35,7 @@ BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts);
 BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts);
 BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts);
 BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec);
-BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir);
+BOOL WINAPI _ChangeDirectory(HWND WndParent, PTTSet ts);
 BOOL WINAPI _AboutDialog(HWND WndParent);
 BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts);
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts);
