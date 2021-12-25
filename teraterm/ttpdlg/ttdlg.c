@@ -172,7 +172,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfosCom, _countof(TextInfosCom), UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfosCom, _countof(TextInfosCom), ts->UILanguageFileW);
 			if (ts->Language==IdJapanese) {
 				static const DlgTextInfo TextInfosJp[] = {
 					{ IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
@@ -182,7 +182,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 					{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
 				};
-				SetDlgTexts(Dialog, TextInfosJp, _countof(TextInfosJp), UILanguageFile);
+				SetDlgTextsW(Dialog, TextInfosJp, _countof(TextInfosJp), ts->UILanguageFileW);
 			}
 			else if ( ts->Language==IdRussian ) {
 				// TODO
@@ -193,14 +193,14 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					{ IDC_TERMKANJILABEL, "DLG_TERM_RUSSCLIENT" },
 					{ IDC_TERMKANJISENDLABEL, "DLG_TERM_RUSSHOST" },
 				};
-				SetDlgTexts(Dialog, TextInfosRu, _countof(TextInfosRu), UILanguageFile);
+				SetDlgTextsW(Dialog, TextInfosRu, _countof(TextInfosRu), ts->UILanguageFileW);
 			}
 			else if (ts->Language==IdUtf8 || ts->Language==IdKorean || ts->Language == IdChinese) {
 				static const DlgTextInfo TextInfosKo[] = {
 					{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
 					{ IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND" },
 				};
-				SetDlgTexts(Dialog, TextInfosKo, _countof(TextInfosKo), UILanguageFile);
+				SetDlgTextsW(Dialog, TextInfosKo, _countof(TextInfosKo), ts->UILanguageFileW);
 			}
 
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
@@ -548,7 +548,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
 			SendDlgItemMessage(Dialog, IDC_WINTITLE, EM_LIMITTEXT,
 			                   sizeof(ts->Title)-1, 0);
@@ -560,7 +560,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			if (ts->VTFlag>0) {
 				wchar_t *uimsg;
-				GetI18nStrWA("Tera Term", "DLG_WIN_PCBOLD16", L"&16 Colors (PC style)", UILanguageFile, &uimsg);
+				GetI18nStrWW("Tera Term", "DLG_WIN_PCBOLD16", L"&16 Colors (PC style)", ts->UILanguageFileW, &uimsg);
 				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU, uimsg);
 				free(uimsg);
 
@@ -647,9 +647,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						{ "DLG_WIN_REVERSEATTR", L"Reverse" },
 						{ NULL, L"URL" },
 					};
-					wchar_t *UILanguageFileW = ToWcharA(UILanguageFile);
-					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), UILanguageFileW, 1);
-					free(UILanguageFileW);
+					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), ts->UILanguageFileW, 1);
 				}
 #ifdef USE_NORMAL_BGCOLOR
 				ShowDlgItem(Dialog,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
@@ -1047,7 +1045,7 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
 			SetRB(Dialog,ts->BSKey-1,IDC_KEYBBS,IDC_KEYBBS);
 			SetRB(Dialog,ts->DelKey,IDC_KEYBDEL,IDC_KEYBDEL);
@@ -1128,7 +1126,7 @@ static TipWin *g_SerialDlgSpeedTip;
  * シリアルポート設定ダイアログのOKボタンを接続先に応じて名称を切り替える。
  * 条件判定は OnSetupSerialPort() と合わせる必要がある。
  */
-static void serial_dlg_change_OK_button(HWND dlg, int portno)
+static void serial_dlg_change_OK_button(HWND dlg, int portno, const wchar_t *UILanguageFileW)
 {
 	static const DlgTextInfo TextInfoNewConnection[] = {
 		{ IDOK, "DLG_SERIAL_OK_CONNECTION" },
@@ -1146,21 +1144,21 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno)
 	const char *ok_text;
 
 	if ( cv.Ready && (cv.PortType != IdSerial) ) {
-		ret = SetDlgTexts(dlg, TextInfoNewConnection, _countof(TextInfoNewConnection), UILanguageFile);
+		ret = SetDlgTextsW(dlg, TextInfoNewConnection, _countof(TextInfoNewConnection), UILanguageFileW);
 		ok_text = "Connect with &New window";
 
 	} else {
 		if (cv.Open) {
 			if (portno != cv.ComPort) {
-				ret = SetDlgTexts(dlg, TextInfoCloseNewOpen, _countof(TextInfoCloseNewOpen), UILanguageFile);
+				ret = SetDlgTextsW(dlg, TextInfoCloseNewOpen, _countof(TextInfoCloseNewOpen), UILanguageFileW);
 				ok_text = "Close and &New open";
 			} else {
-				ret = SetDlgTexts(dlg, TextInfoResetSetting, _countof(TextInfoResetSetting), UILanguageFile);
+				ret = SetDlgTextsW(dlg, TextInfoResetSetting, _countof(TextInfoResetSetting), UILanguageFileW);
 				ok_text = "&New setting";
 			}
 
 		} else {
-			ret = SetDlgTexts(dlg, TextInfoNewOpen, _countof(TextInfoNewOpen), UILanguageFile);
+			ret = SetDlgTextsW(dlg, TextInfoNewOpen, _countof(TextInfoNewOpen), UILanguageFileW);
 			ok_text = "&New open";
 		}
 	}
@@ -1317,7 +1315,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFile);
 
 			EnableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
 			EnableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
@@ -1326,7 +1324,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			// COMポートの詳細情報を取得する。
 			// COMの接続状況は都度変わるため、ダイアログを表示する度に取得する。
 			// 不要になったら、ComPortInfoFree()でメモリを解放すること。
-			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount, UILanguageFile);
+			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount, ts->UILanguageFile);
 
 			w = 0;
 
@@ -1428,7 +1426,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
 			// それに応じてOKボタンのラベル名を切り替える。
-			serial_dlg_change_OK_button(Dialog, ComPortTable[w]);
+			serial_dlg_change_OK_button(Dialog, ComPortTable[w], ts->UILanguageFileW);
 
 			return TRUE;
 
@@ -1526,7 +1524,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 						// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
 						// それに応じてOKボタンのラベル名を切り替える。
-						serial_dlg_change_OK_button(Dialog, portno);
+						serial_dlg_change_OK_button(Dialog, portno, ts->UILanguageFileW);
 
 						break;
 
@@ -2022,7 +2020,7 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			ts = (PTTSet)lParam;
 			CurDir = ts->FileDirW;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 			SetDlgItemTextW(Dialog, IDC_DIRCURRENT, CurDir);
 
 // adjust dialog size
