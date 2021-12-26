@@ -71,7 +71,6 @@ HlpUsageShortcut=html\usage\shortcut.html
 HlpUsageSsh=html\usage\ssh.html
 HlpUsageCygwin=html\usage\cygwin.html
 HlpUsageProxy=html\usage\proxy.html
-HlpUsageLogmettLogMetttutorial=html\usage\LogMeTT\LogMeTTTutorial.htm
 HlpUsageTipsIndex=html\usage\tips\index.html
 HlpUsageTipsConfig=html\usage\tips\teraterm_config_howto.html
 HlpUsageTipsLog=html\usage\tips\loging_howto.html
