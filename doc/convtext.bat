@@ -12,8 +12,8 @@ set REF_J=ja\html\reference
 %TOSJIS% -i ..\libs\putty\LICENCE       -o %REF_J%\PuTTY-LICENSE.txt     -l crlf
 %TOSJIS% -i ..\libs\SFMT\LICENSE.txt    -o %REF_E%\SFMT-LICENSE.txt      -l unix
 %TOSJIS% -i ..\libs\SFMT\LICENSE.txt    -o %REF_J%\SFMT-LICENSE.txt      -l unix
-%TOSJIS% -i ..\cygterm\COPYING          -o %REF_E%\CygTerm+-LICENSE.txt  -l unix
-%TOSJIS% -i ..\cygterm\COPYING          -o %REF_J%\CygTerm+-LICENSE.txt  -l unix
+%TOSJIS% -i ..\cygwin\cygterm\COPYING   -o %REF_E%\CygTerm+-LICENSE.txt  -l unix
+%TOSJIS% -i ..\cygwin\cygterm\COPYING   -o %REF_J%\CygTerm+-LICENSE.txt  -l unix
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_E%\zlib-LICENSE.txt      -l unix
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_J%\zlib-LICENSE.txt      -l unix
 %TOSJIS% -i ..\libs\cJSON\LICENSE       -o %REF_E%\cJSON-LICENSE.txt     -l crlf
