@@ -72,7 +72,7 @@
 - Oniguruma 6.9.7.1 (https://github.com/kkos/oniguruma)
 - OpenSSL 1.1.1k (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
-- PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+- PuTTY 0.76 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html)
 - cJSON 1.7.14 (https://github.com/DaveGamble/cJSON/)
 - The reference C implementation of Argon2 20190702 (https://github.com/P-H-C/phc-winner-argon2)
