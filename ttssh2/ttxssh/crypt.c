@@ -724,7 +724,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	if (c == NULL)
 		goto error;
 
-	HMAC_Init(c, mac->key, mac->key_len, mac->md);
+	HMAC_Init_ex(c, mac->key, mac->key_len, mac->md, NULL);
 	set_uint32_MSBfirst(b, sequence_number);
 	HMAC_Update(c, b, sizeof(b));
 	HMAC_Update(c, data, len);
@@ -782,7 +782,7 @@ BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
 		if (c == NULL)
 			return FALSE;
 
-		HMAC_Init(c, mac->key, mac->key_len, mac->md);
+		HMAC_Init_ex(c, mac->key, mac->key_len, mac->md, NULL);
 		set_uint32_MSBfirst(b, sequence_number);
 		HMAC_Update(c, b, sizeof(b));
 		HMAC_Update(c, data, len);
