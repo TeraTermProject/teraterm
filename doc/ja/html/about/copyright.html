@@ -175,14 +175,98 @@ OF SUCH DAMAGE.
 </pre>
 
 <h3>技術</h3>
-<pre>
-TTSSHは以下の技術を利用しています:
-鍵交換方式: diffie-hellman-group1-sha1, diffie-hellman-group14-sha1, diffie-hellman-group-exchange-sha1, diffie-hellman-group-exchange-sha256, ecdh-sha2-nistp256, ecdh-sha2-nistp384, ecdh-sha2-nistp521
-サーバホスト鍵の公開鍵アルゴリズム: ssh-rsa1, ssh-dss, ssh-rsa, ecdsa-sha2-nistp256, ecdsa-sha2-nistp384, ecdsa-sha2-nistp521, ssh-ed25519
-暗号化アルゴリズム: DES, 3DES, AES(128bit,192bit,256bit), Blowfish(128bit), ARCFOUR(128bit,256bit), CAST-128(128bit), Camellia(128bit,192bit,256bit)
-MACアルゴリズム: hmac-sha1, hmac-md5, hmac-sha1-96, hmac-md5-96, hmac-ripemd160@openssh.com, hmac-sha2-256, hmac-sha2-256-96, hmac-sha2-512, hmac-sha2-512-96
-公開鍵認証の公開鍵アルゴリズム: ssh-dss, ssh-rsa, ecdsa-sha2-nistp256, ecdsa-sha2-nistp384, ecdsa-sha2-nistp521
-</pre>
+<p>TTSSHは以下の技術を利用しています:</p>
+<ul>
+  <li>
+    KEX(鍵交換)アルゴリズム
+    <ul>
+      <li>diffie-hellman-group1-sha1</li>
+      <li>diffie-hellman-group14-sha1</li>
+      <li>diffie-hellman-group-exchange-sha1</li>
+      <li>diffie-hellman-group-exchange-sha256</li>
+      <li>ecdh-sha2-nistp256</li>
+      <li>ecdh-sha2-nistp384</li>
+      <li>ecdh-sha2-nistp521</li>
+      <li>diffie-hellman-group14-sha256</li>
+      <li>diffie-hellman-group16-sha512</li>
+      <li>diffie-hellman-group18-sha512</li>
+    </ul>
+  </li>
+  <li>
+    サーバホスト鍵アルゴリズム
+    <ul>
+      <li>ssh-rsa1 (SSH1)</li>
+      <li>ssh-rsa</li>
+      <li>ssh-dss</li>
+      <li>ecdsa-sha2-nistp256</li>
+      <li>ecdsa-sha2-nistp384</li>
+      <li>ecdsa-sha2-nistp521</li>
+      <li>ssh-ed25519</li>
+    </ul>
+  </li>
+  <li>
+    暗号アルゴリズム
+    <ul>
+      <li>DES (SSH1)</li>
+      <li>3DES (SSH1)</li>
+      <li>Blowfish (SSH1)</li>
+      <li>3des-cbc</li>
+      <li>aes128-cbc</li>
+      <li>aes128-cbc</li>
+      <li>aes256-cbc</li>
+      <li>blowfish-cbc</li>
+      <li>aes128-ctr</li>
+      <li>aes192-ctr</li>
+      <li>aes256-ctr</li>
+      <li>arcfour</li>
+      <li>arcfour128</li>
+      <li>arcfour256</li>
+      <li>cast128-cbc</li>
+      <li>3des-ctr</li>
+      <li>blowfish-ctr</li>
+      <li>cast128-ctr</li>
+      <li>camellia128-cbc</li>
+      <li>camellia192-cbc</li>
+      <li>camellia256-cbc</li>
+      <li>camellia128-ctr</li>
+      <li>camellia192-ctr</li>
+      <li>camellia256-ctr</li>
+      <li>aes128-gcm@openssh.com</li>
+      <li>aes256-gcm@openssh.com</li>
+      <li>chacha20-poly1305@openssh.com</li>
+    </ul>
+  </li>
+  <li>
+    MAC(メッセージ認証コード)アルゴリズム
+    <ul>
+      <li>hmac-sha1</li>
+      <li>hmac-md5</li>
+      <li>hmac-sha1-96</li>
+      <li>hmac-md5-96</li>
+      <li>hmac-ripemd160@openssh.com</li>
+      <li>hmac-sha2-256</li>
+      <li>hmac-sha2-512</li>
+      <li>hmac-sha1-etm@openssh.com</li>
+      <li>hmac-md5-etm@openssh.com</li>
+      <li>hmac-sha1-96-etm@openssh.com</li>
+      <li>hmac-md5-96-etm@openssh.com</li>
+      <li>hmac-ripemd160-etm@openssh.com</li>
+      <li>hmac-sha2-256-etm@openssh.com</li>
+      <li>hmac-sha2-512-etm@openssh.com</li>
+    </ul>
+  </li>
+  <li>
+    公開鍵認証の署名アルゴリズム
+    <ul>
+      <li>ssh-dss</li>
+      <li>ssh-rsa (RSA/SHA-1)</li>
+      <li>ecdsa-sha2-nistp256</li>
+      <li>ecdsa-sha2-nistp384</li>
+      <li>ecdsa-sha2-nistp521</li>
+      <li>ssh-ed25519</li>
+    </ul>
+  </li>
+</ul>
 
 
 <h2>CygTerm+</h2>
