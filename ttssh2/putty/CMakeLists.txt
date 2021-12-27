@@ -16,6 +16,7 @@ set(PUTTY_SRC
   ../../libs/putty/sshsh256.c
   ../../libs/putty/tree234.c
   ../../libs/putty/utils.c
+  ../../libs/putty/version.c
   ../../libs/putty/windows/wincapi.c
   ../../libs/putty/windows/winhandl.c
   ../../libs/putty/windows/winhsock.c
