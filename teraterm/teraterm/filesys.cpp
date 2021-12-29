@@ -1608,6 +1608,8 @@ int ProtoDlgParse()
 	if (PtDlg==NULL)
 		return P;
 
+	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
+
 	if ((*ProtoParse)(ProtoId,FileVar,ProtoVar,&cv))
 		P = 0; /* continue */
 	else {

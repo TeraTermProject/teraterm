@@ -429,12 +429,15 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 	int i;
 	BOOL SendFlag;
 	WORD Check;
+	BOOL is0x43Received = FALSE;//受信文字に'C'(0x43)が含まれているかのフラグ
 
 	SendFlag = FALSE;
 	if (xv->PktBufCount == 0) {
-		for (i=XRead1Byte(fv, xv, cv, &b); !SendFlag; i=XRead1Byte(fv, xv, cv, &b)) {
+		for(;;){
+			i = XRead1Byte(fv, xv, cv, &b);
 			if (i == 0)
-				return TRUE;
+				break; //先行して受信した文字が全て無くなるまで繰り返す(CAN CANのみ即時キャンセル)
+
 			switch (b) {
 			case ACK:
 				if (!fv->FileOpen) {
@@ -449,13 +452,15 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				break;
 			case NAK:
 				if (xv->PktNum == 0 && xv->PktNumOffset == 0) {
-					if (xv->XOpt == XoptCRC) {
-						// receiver wants to use checksum.
-						XSetOpt(fv, xv, XoptCheck);
-					} else if (xv->XOpt == Xopt1kCRC) {
-						/* we wanted 1k with CRC, but the other end specified checksum */
-						/* keep the 1k block, but move back to checksum mode.          */
-						XSetOpt(fv, xv, Xopt1kCksum);
+					if (!is0x43Received) { //先にCRC要求'C'(0x43)を受け付けていた場合はCRCモードを維持。(CRCで送って受け付けなかった場合はNAKを送ってくるはずなのでCheckSumでの再送に切り替わる)
+						if (xv->XOpt == XoptCRC) {
+							// receiver wants to use checksum.
+							XSetOpt(fv, xv, XoptCheck);
+						} else if (xv->XOpt == Xopt1kCRC) {
+							/* we wanted 1k with CRC, but the other end specified checksum */
+							/* keep the 1k block, but move back to checksum mode.          */
+							XSetOpt(fv, xv, Xopt1kCksum);
+						}
 					}
 				}
 				SendFlag = TRUE;
@@ -478,11 +483,18 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 						XSetOpt(fv, xv, Xopt1kCRC);
 					}
 					SendFlag = TRUE;
+					is0x43Received = TRUE;//CRCで要求があった
 				}
 				break;
 			}
 			xv->CANCount = 0;
 		}
+
+		if (!SendFlag){
+			return TRUE; //送信するものがないなら処理を抜ける
+		}
+
+
 		// reset timeout timer
 		FTSetTimeOut(fv, xv->TOutVLong);
 
