@@ -5,11 +5,52 @@ cd libressl
 
 if exist "CMakeCache.txt" goto end
 
-cmake -G "Visual Studio 16 2019" -A Win32
+
+if not "%VSINSTALLDIR%" == "" goto vsinstdir
+
+:check_2019
+if "%VS160COMNTOOLS%" == "" goto check_2022
+if not exist "%VS160COMNTOOLS%\VsDevCmd.bat" goto check_2022
+call "%VS160COMNTOOLS%\VsDevCmd.bat"
+goto vs2019
+
+:check_2022
+if "%VS170COMNTOOLS%" == "" goto novs
+if not exist "%VS170COMNTOOLS%\VsDevCmd.bat" goto novs
+call "%VS170COMNTOOLS%\VsDevCmd.bat"
+goto vs2022
+
+:novs
+echo "Can't find Visual Studio"
+goto fail
+
+:vsinstdir
+rem Visual Studioのバージョン判別
+set VSCMNDIR="%VSINSTALLDIR%\Common7\Tools\"
+set VSCMNDIR=%VSCMNDIR:\\=\%
+
+if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
+if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto vs2022
+
+echo Unknown Visual Studio version
+goto fail
+
+:vs2019
+set CMAKE_PARAMETER=-G "Visual Studio 16 2019" -A Win32
+goto vsend
+
+:vs2022
+set CMAKE_PARAMETER=-G "Visual Studio 17 2022" -A Win32
+goto vsend
+
+:vsend
+
+
+cmake %CMAKE_PARAMETER%
 perl -e "open(IN,'CMakeCache.txt');while(<IN>){s|=/MD|=/MT|;print $_;}close(IN);" > CMakeCache.txt.tmp
 move /y CMakeCache.txt.tmp CMakeCache.txt
 rem 変更した CMakeCache.txt に基づいて生成されるように再度実行
-cmake -G "Visual Studio 16 2019" -A Win32
+cmake %CMAKE_PARAMETER%
 
 devenv /build Debug LibreSSL.sln /project crypto /projectconfig Debug
 
@@ -19,3 +60,10 @@ devenv /build Release LibreSSL.sln /project crypto /projectconfig Release
 :end
 cd ..
 exit /b 0
+
+
+:fail
+cd ..
+echo "buildlibressl.bat を終了します"
+@echo on
+exit /b 1
