@@ -295,9 +295,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	// DPI Aware (çÇDPIëŒâû)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		char Temp[4];
-		GetPrivateProfileString("Tera Term", "DPIAware", NULL, Temp, sizeof(Temp), ts.SetupFName);
-		if (_stricmp(Temp, "on") == 0) {
+		wchar_t Temp[4];
+		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on", Temp, _countof(Temp), ts.SetupFNameW);
+		if (_wcsicmp(Temp, L"on") == 0) {
 			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 			}
