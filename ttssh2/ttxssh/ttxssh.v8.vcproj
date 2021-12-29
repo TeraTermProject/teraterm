@@ -24,7 +24,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(OutDir)\puttyrev.exe&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -121,7 +120,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(OutDir)\puttyrev.exe&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
