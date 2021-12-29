@@ -1,0 +1,25 @@
+﻿# clang format setting for Tera Term
+#
+# - この設定に従わなくてもokです
+# - どのようなインデントにするかの参考に使用してください
+# - diffが取れなくなるので従来からあるファイルに一気に適応しないでください
+#   (実験段階です)
+# - Visual Studio 2017からclang-formatをIDEから利用できます
+#   - 次の方法でclang-formatの使用を変更できます
+#   - [ツール]/[オプション] →
+#     [テキスト エディタ―]/[C/C++]/[書式設定]/[clang-formatサポート]
+#
+BasedOnStyle: Google
+ColumnLimit: 120
+UseTab: Always
+IndentWidth: 4
+TabWidth: 4
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Custom
+BraceWrapping:
+	AfterFunction: 'true'
+	BeforeElse: 'true'
+	AfterClass: 'true'
+SortIncludes: false
+AccessModifierOffset: -4

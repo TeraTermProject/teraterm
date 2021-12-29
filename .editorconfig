@@ -1,0 +1,52 @@
+root = true
+
+[*]
+indent_style = tab
+indent_size = 4
+
+[*.{cpp,c,h}]
+indent_style = tab
+indent_size = 4
+end_of_line = crlf
+charset = cp932
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.html]
+end_of_line = crlf
+charset = cp932
+indent_style = space
+indent_size = 2
+
+[*.md]
+end_of_line = crlf
+charset = utf-8-bom
+indent_style = space
+
+[*.pl]
+end_of_line = crlf
+charset = utf-8-bom
+indent_style = tab
+indent_size = 4
+
+[*.txt]
+end_of_line = crlf
+charset = cp932
+indent_style = tab
+indent_size = 4
+
+[*.asm]
+end_of_line = crlf
+charset = utf8
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[{CMakeLists.txt,*.cmake}]
+end_of_line = crlf
+charset = utf-8-bom
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
