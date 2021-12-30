@@ -16,7 +16,6 @@ add_library(
 target_sources(
   ttxssh
   PRIVATE
-  ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
   ../matcher/matcher.c
   arc4random.c
   arc4random.h
@@ -168,30 +167,6 @@ target_link_libraries(
   delayimp
   # OpenSSL が使用
   crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
-  )
-
-### create puttyversion.h
-
-set(PUTTY_ISS "${CMAKE_SOURCE_DIR}/libs/putty/windows/putty.iss")
-if(NOT EXISTS ${PUTTY_ISS})
-  message(FATAL_ERROR "${PUTTY_ISS} not found")
-endif()
-
-file(READ "${CMAKE_SOURCE_DIR}/libs/putty/windows/putty.iss" iis)
-
-string(REGEX MATCH "VersionInfoTextVersion=([^\n]+)\n" _ ${iis})
-set(version_str ${CMAKE_MATCH_1})
-if("${version_str}" STREQUAL "")
-  string(REGEX MATCH "AppVerName=([^\n]+)\n" _ ${iis})
-  set(version_str ${CMAKE_MATCH_1})
-endif()
-if("${version_str}" STREQUAL "")
-  set(version_str "unknown")
-endif()
-message("putty version=\"${version_str}\"")
-FILE(
-  WRITE ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
-  "#define PUTTYVERSION \"${version_str}\"\n"
   )
 
 install(
