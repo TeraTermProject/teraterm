@@ -129,8 +129,10 @@ void normalize_mac_order(char *buf)
 		HMAC_SHA2_512,
 		HMAC_SHA2_256,
 		HMAC_SHA1,
+#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
 		HMAC_RIPEMD160_EtM,
 		HMAC_RIPEMD160,
+#endif
 		HMAC_MD5_EtM,
 		HMAC_MD5,
 		HMAC_NONE,
@@ -138,6 +140,9 @@ void normalize_mac_order(char *buf)
 		HMAC_MD5_96_EtM,
 		HMAC_SHA1_96,
 		HMAC_MD5_96,
+#if !defined(LIBRESSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000UL
+		0, 0, // Dummy for HMAC_RIPEMD160_EtM, HMAC_RIPEMD160
+#endif
 		0, // Dummy for HMAC_SHA2_512_96,
 		0, // Dummy for HMAC_SHA2_256_96,
 	};

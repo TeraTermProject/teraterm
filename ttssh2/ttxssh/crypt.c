@@ -606,10 +606,13 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_AES128_CBC)
 		            | (1 << SSH2_CIPHER_AES192_CBC)
 		            | (1 << SSH2_CIPHER_AES256_CBC)
+#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
 		            | (1 << SSH2_CIPHER_BLOWFISH_CBC)
+#endif
 		            | (1 << SSH2_CIPHER_AES128_CTR)
 		            | (1 << SSH2_CIPHER_AES192_CTR)
 		            | (1 << SSH2_CIPHER_AES256_CTR)
+#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
 		            | (1 << SSH2_CIPHER_ARCFOUR)
 		            | (1 << SSH2_CIPHER_ARCFOUR128)
 		            | (1 << SSH2_CIPHER_ARCFOUR256)
@@ -617,6 +620,7 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_3DES_CTR)
 		            | (1 << SSH2_CIPHER_BLOWFISH_CTR)
 		            | (1 << SSH2_CIPHER_CAST128_CTR)
+#endif
 		            | (1 << SSH2_CIPHER_CAMELLIA128_CBC)
 		            | (1 << SSH2_CIPHER_CAMELLIA192_CBC)
 		            | (1 << SSH2_CIPHER_CAMELLIA256_CBC)

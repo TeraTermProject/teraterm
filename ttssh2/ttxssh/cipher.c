@@ -46,9 +46,9 @@ static const struct ssh2cipher ssh2_ciphers[] = {
 	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, 0, 0, EVP_aes_192_cbc},      // RFC4253
 	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, 0, 0, EVP_aes_256_cbc},      // RFC4253
 	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, 0, 0, EVP_bf_cbc},           // RFC4253
-	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, 0, 0, EVP_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, 0, 0, EVP_aes_192_ctr},      // RFC4344
+	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, 0, 0, EVP_aes_256_ctr},      // RFC4344
 	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, 0, 0, EVP_rc4},              // RFC4253
 	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, 0, 0, EVP_rc4},              // RFC4345
 	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, 0, 0, EVP_rc4},              // RFC4345
@@ -59,9 +59,9 @@ static const struct ssh2cipher ssh2_ciphers[] = {
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, 0, 0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, 0, 0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, 0, 0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, 0, 0, EVP_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, 0, 0, EVP_camellia_192_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, 0, 0, EVP_camellia_256_ctr}, // draft-kanno-secsh-camellia-02
 #ifdef WITH_CAMELLIA_PRIVATE
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0,  0,  0, EVP_camellia_128_cbc},
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0,  0,  0, EVP_camellia_192_cbc},
@@ -328,19 +328,30 @@ void normalize_cipher_order(char *buf)
 		SSH2_CIPHER_AES128_CTR,
 		SSH2_CIPHER_CAMELLIA128_CBC,
 		SSH2_CIPHER_AES128_CBC,
+#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
 		SSH2_CIPHER_3DES_CTR,
+#endif
 		SSH2_CIPHER_3DES_CBC,
+#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
 		SSH2_CIPHER_BLOWFISH_CTR,
 		SSH2_CIPHER_BLOWFISH_CBC,
 		SSH2_CIPHER_CAST128_CTR,
 		SSH2_CIPHER_CAST128_CBC,
+#endif
 		SSH_CIPHER_3DES,
 		SSH_CIPHER_NONE,
+#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
 		SSH2_CIPHER_ARCFOUR256,
 		SSH2_CIPHER_ARCFOUR128,
 		SSH2_CIPHER_ARCFOUR,
+#endif
 		SSH_CIPHER_BLOWFISH,
 		SSH_CIPHER_DES,
+#if !defined(LIBRESSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000UL
+		0, 0, 0, // Dummy for SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_BLOWFISH_CBC,
+		0, 0,    // Dummy for SSH2_CIPHER_CAST128_CTR, SSH2_CIPHER_CAST128_CBC
+		0, 0, 0, // Dummy for SSH2_CIPHER_ARCFOUR256, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR
+#endif
 		0, 0, 0 // Dummy for SSH_CIPHER_IDEA, SSH_CIPHER_TSS, SSH_CIPHER_RC4
 	};
 
