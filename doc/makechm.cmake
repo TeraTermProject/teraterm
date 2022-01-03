@@ -1,15 +1,20 @@
 ﻿# cmake -P makechm.cmake
 
 if(CMAKE_HOST_WIN32)
-  find_program(
-    PERL perl.exe
-    HINTS ${CMAKE_CURRENT_LIST_DIR}/../buildtools/perl/perl/bin
-    HINTS c:/Strawberry/perl/bin
-    HINTS c:/Perl64/bin
-    HINTS c:/Perl/bin
-    HINTS c:/cygwin/usr/bin
-    HINTS c:/cygwin64/usr/bin
-    )
+  if("${CMAKE_COMMAND}" MATCHES "msys")
+    # msys
+    find_program(PERL perl.exe)
+  else()
+    find_program(
+      PERL perl.exe
+      HINTS ${CMAKE_CURRENT_LIST_DIR}/../buildtools/perl/perl/bin
+      HINTS c:/Strawberry/perl/bin
+      HINTS c:/Perl64/bin
+      HINTS c:/Perl/bin
+      HINTS c:/cygwin/usr/bin
+      HINTS c:/cygwin64/usr/bin
+      )
+  endif()
   find_program(
     HHC hhc.exe
     HINTS "C:/Program Files (x86)/HTML Help Workshop"
