@@ -50,13 +50,6 @@ target_link_options(
   -mwindows
   )
 
-target_link_libraries(
-  ${PACKAGE_NAME}
-  PRIVATE
-  shell32
-  ole32
-  )
-
 install(
   TARGETS ${PACKAGE_NAME}
   DESTINATION .

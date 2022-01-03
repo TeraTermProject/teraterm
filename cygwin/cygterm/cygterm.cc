@@ -51,14 +51,11 @@ static char Version[] = "version 1.07_30_beta (2021/11/14)";
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
+#include <windows.h>
+#include <shlobj.h>
 #include <pwd.h>
 #include <sys/select.h>
 #include <wchar.h>
-
-#include <windows.h>
-#include <shlobj.h>
-#define INITGUID
-#include <knownfolders.h>
 
 // pageant support (ssh-agent proxy)
 //----------------------------------
@@ -325,12 +322,20 @@ char *convert_utf8_from_wchar(const wchar_t *strW)
 // $APPDATA
 char *get_appdata_dir()
 {
+#if 0
+	// link error :-(
     wchar_t *home_pathW;
     SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &home_pathW);
     convert_bsW(home_pathW);
     char *home_pathU8 = convert_utf8_from_wchar(home_pathW);
     CoTaskMemFree(home_pathW);
     return home_pathU8;
+#endif
+#if 1
+    char *appdata = strdup(getenv("APPDATA"));
+    convert_bs(appdata);
+    return appdata;
+#endif
 }
 
 void get_cfg_filenames(char **cfg_exe_full, char **cfg_appdata_full, char **cfg)
