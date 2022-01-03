@@ -26,9 +26,8 @@ else(CMAKE_HOST_WIN32)
     PERL perl
     )
   set(HHC "HHC-NOTFOUND")
-  # "apt-get install fp-utils" to install chmcmd
   find_program(
-    CHMCMD chmcmd2
+    CHMCMD chmcmd
     )
 endif(CMAKE_HOST_WIN32)
 

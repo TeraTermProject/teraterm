@@ -6,12 +6,20 @@
     HINTS "$ENV{ProgramFiles}/HTML Help Workshop"
     HINTS "$ENV{ProgramFiles\(x86\)}/HTML Help Workshop"
     )
+  find_program(
+    CHMCMD chmcmd
+    HINTS ${CMAKE_CURRENT_LIST_DIR}/../buildtools/chmcmd/
+    )
 else()
   set(HHC "HHC-NOTFOUND")
+  find_program(
+    CHMCMD chmcmd2
+    )
 endif()
 message("hhc=${HHC}")
 
-if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFOUND"))
+if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND")
+    AND (NOT(("${HHC}" STREQUAL "HHC-NOTFOUND") AND "${CHMCMD}" STREQUAL "CHMCMD-NOTFOUND")))
   file(
     GLOB_RECURSE
     SRC_EN

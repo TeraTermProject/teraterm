@@ -21,6 +21,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 sudo apt-get -y install cmake perl subversion
 sudo apt-get -y install g++-mingw-w64
+sudo apt-get -y install fp-utils
 cd /path/to/teraterm
 ```
 

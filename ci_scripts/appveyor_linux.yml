@@ -3,7 +3,7 @@ image: Ubuntu2004
 build: off
 
 init:
-  - sudo apt-get -y install cmake perl subversion g++-mingw-w64
+  - sudo apt-get -y install cmake perl subversion g++-mingw-w64 fp-utils
 
 cache:
   - libs
