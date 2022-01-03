@@ -407,19 +407,18 @@ LogTimestampUTC=off
 </pre>
 
 <h1 id="HighDPI">High DPI Aware</h1>
-<p>
-The High DPI feature is experimentally supported. Tera Term works as the Per-monitor DPI Aware application when "DPIAware=on" entry is set at [Tera Term] section of the setup file like the following:
-</p>
-
-<pre>
-DPIAware=on
-</pre>
 
 <p>
-Without the entry, Tera Term works as the DPI Unaware application as before. In the future release, it may automatically work as the Per-monitor DPI Aware application and, may ignore "DPIAware=on" entry.
+The High DPI feature is supported.
+Tera Term works as the Per-monitor DPI Aware application.
 </p>
+
 <p>
-Scaling results become smooth when you choose a TrueType font for the <a href="../menu/setup-font.html">Font</a>.
+Tera Term works as the DPI Unaware application when "DPIAware=off" entry is added to [Tera Term] section in teraterm.ini.
+</p>
+
+<p>
+Scaling results become smooth at High DPI when you choose a TrueType font for the <a href="../menu/setup-font.html">Font</a>.
 </p>
 <p>
 High DPI aware has some modes. For more reference, see the DPI AwarenessMode section on the <a href="https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-desktop-application-development-on-windows#dpi-awareness-mode">High DPI Desktop Application Development on Windows DPI AwarenessMode</a>.
