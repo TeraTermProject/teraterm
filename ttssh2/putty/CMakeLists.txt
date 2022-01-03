@@ -7,20 +7,24 @@ if(MINGW)
 endif()
 
 set(PUTTY_SRC
-  ../../libs/putty/putty.h
-  ../../libs/putty/pageant.h
-  ../../libs/putty/conf.c
-  ../../libs/putty/misc.h
-  ../../libs/putty/misc.c
-  ../../libs/putty/tree234.h
+  ../../libs/putty/aqsync.c
+  ../../libs/putty/callback.c
+  ../../libs/putty/errsock.c
+  ../../libs/putty/marshal.c
+  ../../libs/putty/memory.c
+  ../../libs/putty/mpint.c
+  ../../libs/putty/sshsh256.c
   ../../libs/putty/tree234.c
-  ../../libs/putty/version.h
+  ../../libs/putty/utils.c
   ../../libs/putty/version.c
+  ../../libs/putty/windows/wincapi.c
+  ../../libs/putty/windows/winhandl.c
+  ../../libs/putty/windows/winhsock.c
   ../../libs/putty/windows/winmisc.c
+  ../../libs/putty/windows/winnpc.c
   ../../libs/putty/windows/winpgntc.c
-  ../../libs/putty/windows/winsecur.h
   ../../libs/putty/windows/winsecur.c
-  )
+	  )
 
 source_group(
   "putty"
@@ -31,6 +35,7 @@ source_group(
 set(SRC
   libputty.c
   libputty.h
+  putty-import.c
   )
 
 include_directories(

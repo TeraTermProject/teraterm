@@ -9503,9 +9503,9 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 		data = agent_msg->buf;
 	}
 
-	agent_query(data, *agent_request_len, &response, &resplen, NULL, NULL);
+	putty_agent_query_synchronous(data, *agent_request_len, &response, &resplen);
 	if (response == NULL || resplen < 5) {
-		logprintf(LOG_LEVEL_NOTICE, "%s Agent Forwarding Error: agent_query is failed.", __FUNCTION__);
+		logprintf(LOG_LEVEL_NOTICE, "%s Agent Forwarding Error: putty_agent_query_synchronous is failed.", __FUNCTION__);
 		goto error;
 	}
 
