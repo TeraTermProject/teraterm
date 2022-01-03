@@ -27,7 +27,7 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND") AND NOT("${HHC}" STREQUAL "HHC-NOTFO
     )
 
   add_custom_target(
-    chm
+    chm ALL
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm
     SOURCES ${SRC_EN}
