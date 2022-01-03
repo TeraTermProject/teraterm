@@ -1,4 +1,4 @@
-set TOSJIS=perl ..\installer\2sjis.pl
+set TOSJIS=perl 2sjis.pl
 set REF_E=en\html\reference
 set REF_J=ja\html\reference
 %TOSJIS% -i ..\libs\oniguruma\COPYING   -o %REF_E%\Oniguruma-LICENSE.txt -l unix

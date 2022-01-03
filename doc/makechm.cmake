@@ -38,7 +38,7 @@ message("chmcmd=${CHMCMD}")
 
 
 function(ConvertHTML CMD_OPTION)
-  set(CONV_CMD ${PERL} "../installer/2sjis.pl")
+  set(CONV_CMD ${PERL} "2sjis.pl")
   set(CONV_CMD_OPTION ${CMD_OPTION})
   separate_arguments(CONV_CMD_OPTION)
   set(CMD ${CONV_CMD} ${CONV_CMD_OPTION})
