@@ -45,12 +45,11 @@ goto vsend
 
 :vsend
 
+set CMAKE=cmake
+rem set CMAKE="C:\Program Files\CMake\bin\cmake"
+rem set CMAKE="%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake"
 
-cmake %CMAKE_PARAMETER%
-perl -e "open(IN,'CMakeCache.txt');while(<IN>){s|=/MD|=/MT|;print $_;}close(IN);" > CMakeCache.txt.tmp
-move /y CMakeCache.txt.tmp CMakeCache.txt
-rem ïœçXÇµÇΩ CMakeCache.txt Ç…äÓÇ√Ç¢Çƒê∂ê¨Ç≥ÇÍÇÈÇÊÇ§Ç…çƒìxé¿çs
-cmake %CMAKE_PARAMETER%
+%CMAKE% -DMSVC=on -DUSE_STATIC_MSVC_RUNTIMES=on %CMAKE_PARAMETER%
 
 devenv /build Debug LibreSSL.sln /project crypto /projectconfig Debug
 
