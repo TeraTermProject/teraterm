@@ -125,6 +125,22 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 
 const EVP_CIPHER *evp_ssh1_3des(void)
 {
+#ifndef LIBRESSL_VERSION_NUMBER
+	static EVP_CIPHER *p = NULL;
+
+	if (p == NULL) {
+		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/8, /*key_len*/16);
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
+	}
+	if (p) {
+		EVP_CIPHER_meth_set_iv_length(p, 0);
+		EVP_CIPHER_meth_set_init(p, ssh1_3des_init);
+		EVP_CIPHER_meth_set_cleanup(p, ssh1_3des_cleanup);
+		EVP_CIPHER_meth_set_do_cipher(p, ssh1_3des_cbc);
+		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH);
+	}
+	return (p);
+#else
 	static EVP_CIPHER ssh1_3des;
 
 	memset(&ssh1_3des, 0, sizeof(EVP_CIPHER));
@@ -137,4 +153,5 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 	ssh1_3des.do_cipher = ssh1_3des_cbc;
 	ssh1_3des.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH;
 	return (&ssh1_3des);
+#endif
 }
