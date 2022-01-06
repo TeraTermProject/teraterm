@@ -1,9 +1,15 @@
 ﻿set(PACKAGE_NAME "ttxssh")
 
+option(TTXSSH_OPENSSL3 "Use OpenSSL3" on)
+
 project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
+if(TTXSSH_OPENSSL3)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl3.cmake)
+else()
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
+endif()
 
 add_library(
   ${PACKAGE_NAME} SHARED
@@ -156,9 +162,23 @@ target_include_directories(
   ../../teraterm/common
   ../matcher
   ../putty
-  ${OPENSSL_INCLUDE_DIRS}
   ${ZLIB_INCLUDE_DIRS}
-)
+  )
+
+if(TTXSSH_OPENSSL3)
+  target_include_directories(
+    ${PACKAGE_NAME}
+    PRIVATE
+    ${OPENSSL3_INCLUDE_DIRS}
+    )
+else()
+  target_include_directories(
+    ${PACKAGE_NAME}
+    PRIVATE
+    ${OPENSSL_INCLUDE_DIRS}
+    )
+endif()
+
 
 set_target_properties(
   ${PACKAGE_NAME}
@@ -189,8 +209,23 @@ target_link_libraries(
   ttpcmn
   argon2
   ${ZLIB_LIB}
-  ${OPENSSL_LIB}
   )
+
+if(TTXSSH_LIBRESSL)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    ${OPENSSL3_LIB}
+    bcrypt.lib
+    )
+else()
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    ${OPENSSL_LIB}
+    crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
+    )
+endif()
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
@@ -207,8 +242,6 @@ target_link_libraries(
   gdi32
   comdlg32
   comctl32
-  # OpenSSL が使用
-  crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
   )
 
 ### create puttyversion.h
