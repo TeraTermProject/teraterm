@@ -1,0 +1,625 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>Tera Term 開発者向け</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1 class="center">Tera Term 開発者向け</h1>
+
+<ol>
+  <li><a href="#environment">開発環境</a></li>
+  <li><a href="#library">ライブラリ</a></li>
+  <li><a href="#committer">SVN コミッターへの注意</a></li>
+  <li><a href="#ini-entry">TERATERM.INI への項目追加</a></li>
+  <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
+  <li><a href="#add-macro-command">マクロコマンド追加時の作業リスト</a></li>
+  <li><a href="#build-library">ライブラリのビルド方法</a></li>
+  <li><a href="#build-teraterm">Tera Termのビルド方法</a></li>
+  <li><a href="#build-teraterm-menu">TeraTerm Menuのビルド方法</a></li>
+  <li><a href="#build-ttxkanjimenu">TTXKanjiMenuのビルド方法</a></li>
+  <li><a href="#build-ttproxy">TTProxyのビルド方法</a></li>
+  <li><a href="#build-ttssh">TTSSHのビルド方法</a></li>
+  <li><a href="#build-cygterm">CygTermのビルド方法</a></li>
+  <li><a href="#build-ttxsamples">TTXSamplesのビルド方法</a></li>
+  <li><a href="#build-htmlhelp">ヘルプファイルのビルド方法</a></li>
+  <li><a href="#release">リリースの方法</a></li>
+</ol>
+
+<hr>
+
+<h2 id="environment">開発環境</h2>
+
+<ul>
+  <li>OS
+    <ul>
+      <li>Windows XP Professional</li>
+      <li>Windows 8 Pro</li>
+      <li>Windows 8.1 Pro</li>
+      <li>Windows 10 Pro</li>
+    </ul>
+  </li>
+  <li>Tera Term Project でリリースに使用しているコンパイラ
+    <ul>
+      <li>Visual Studio 2005 SP1 (Standard Edition 以上)
+        <ul>
+          <li>Service Pack 1 (VS80sp1-KB926601-X86-ENU.exe)</li>
+          <li>Microsoft Visual Studio 2005 Service Pack 1 MFC セキュリティ更新プログラム (VS80sp1-KB2538218-v2-X86-INTL.exe)</li>
+          <li>Windows Vista 以上でビルドする場合は、Visual Studio 2005 Service Pack 1 Update for Windows Vista (VS80sp1-KB932236-X86-JPN.exe)</li>
+          <li>Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)<br />
+              注: Visual Studio 2005 Standard Editionでは、OpenSSL のビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。<br />
+              SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
+              <pre>
+e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
+     LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
+              </pre>
+              修正バッチファイル C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>サポートされているコンパイラ
+    <ul>
+      <li>Visual Studio 2005 (Express EditionはTera Term 4.103から対応)
+        <ul>
+          <li>with SDK 7.0
+            <ul>
+              <li>Windows Server 2003 R2 Platform SDK (= Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1) (5.2.3790.2075.51.PlatformSDK_Svr2003R2_rtm.img)<br />
+                  注: Microsoftのサイトからは入手不可能(2019/04/07時点)</li>
+            </ul>
+          </li>
+          <li>with SDK 7.1
+            <ul>
+              <li>Microsoft Windows SDK for Windows 7 and .NET Framework 4 (GRMSDK_EN_DVD.iso)</li>
+              <li>Visual Studio 2005で利用するにはKB949009(VS80sp1-KB949009-X86-INTL.exe)かKB980422(VS80sp1-KB980422-x86-INTL.exe)が必要<br />
+                  注: KB949009,KB980422はMicrosoftのサイトから入手不可能</li>
+            </ul>
+            Windows95でも動作するバイナリをビルド可能
+          </li>
+        </ul>
+      </li>
+      <li>Visual Studio 2008 SP1 (Standard Edition 以上)<br />
+          注: コンパイルされた実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
+      </li>
+      <li>Visual Studio 2010 SP1 (Professional Edition 以上)<br />
+          注: コンパイルされた実行ファイルは Windows 2000, NT 4.0, 95, 98, Me で動きません。
+      </li>
+      <li>Visual Studio 2012 Update 4 (Professional Edition 以上)<br />
+          注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。<br />
+          Windows Vista, XP をサポートするには v110_xp を指定してください。
+      </li>
+      <li>Visual Studio Community 2013 Update 5<br />
+        <ul>
+          <li>MFC MBCS DLL アドオン (vc_mbcsmfc.exe)</li>
+        </ul>
+          注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。<br />
+          Windows Vista, XP をサポートするには v120_xp を指定してください。
+      </li>
+      <li>Visual Studio Community 2015 Update 3<br />
+          注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。<br />
+          Windows Vista, XP をサポートするには v140_xp を指定してください。
+      </li>
+      <li>Visual Studio Community 2017<br />
+          注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。<br />
+          Windows Vista, XP をサポートするには v141_xp を指定してください。
+      </li>
+      <li>Visual Studio Community 2019<br />
+          注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
+      </li>
+      <li>バッチファイルからビルドするために<br />
+          Visual Studio のコマンドプロンプトからバッチファイルを実行するか、以下のように環境変数を設定してください。<br />
+          使用したいバージョンの Visual Studio の "(x86) Native Tools Command Prompt" を実行し、コンパイラのパスに関係する PATH と VSINSTALLDIR 変数を環境変数に登録してください。
+          <pre>
+Example:
+INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
+LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
+PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
+VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
+          </pre>
+      </li>
+    </ul>
+  </li>
+  <li>インストーラ
+    <ul>
+      <li>Inno Setup 5.6.1 ANSI (http://www.jrsoftware.org/isinfo.php)
+        <ul>
+          <li>Inno Setup Preprocessor</li>
+        </ul>
+      </li>
+      <li>ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)</li>
+    </ul>
+  </li>
+  <li>その他
+    <ul>
+      <li>Cygwin 最新版(v4.105からCygTerm+はVista以降対応となったため)</li>
+      <li>ActivePerl 5.10 以上 または Strawberry Perl 5.30.1.1 以上<br />
+          ビルド過程で使用します<br />
+          <ul>
+            <li>OpenSSL のコンパイル(必須)</li>
+            <li>ドキュメントファイルの文字コード・改行コード変換(必須)</li>
+            <li>リビジョン番号取得 (perlがない場合リビジョン番号を取得せずにビルドします)</li>
+          </ul>
+      </li>
+      <li>Subversion for Windows (http://sourceforge.net/projects/win32svn/)<br />
+          ソースのチェックアウトに使った svn と互換性のあるバージョン。<br />
+          libs\svn へ解凍します。("svnversion.exe" が libs\svn\bin に配置されるようにしてください)</li>
+      <li>Subversion for Windows (http://sourceforge.net/projects/win32svn/)<br />
+          リビジョン番号取得時に使用します<br />
+          svnrev_perl/toolinfo.txt に svn.exe のフルパスを記述いてください。<br />
+          詳しくは svnrev_perl/readme.md を参照ください
+      </li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2 id="library">ライブラリ</h2>
+
+<ul>
+  <li>Oniguruma 6.9.7.1 (https://github.com/kkos/oniguruma)</li>
+  <li>OpenSSL 1.1.1k (http://www.openssl.org/)</li>
+  <li>zlib 1.2.11 (http://www.zlib.net/)</li>
+  <li>PuTTY 0.76 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)</li>
+  <li>SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)</li>
+  <li>cJSON 1.7.14 (https://github.com/DaveGamble/cJSON/)</li>
+  <li>The reference C implementation of Argon2 20190702 (https://github.com/P-H-C/phc-winner-argon2)</li>
+</ul>
+
+
+<h2 id="committer">SVN コミッターへの注意</h2>
+
+<p>
+SVN リポジトリは一般向けとは違い、以下の通りです。
+</p>
+<pre>
+svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk
+</pre>
+
+<p>
+ファイルを別のディレクトリで編集しないでください。<br />
+コミットしたときに別の人の修正を削除してしまうことがあります。
+</p>
+
+<p>
+アップデート・コミット時の注意<br />
+svnの処理が失敗することがあるので、ファイルをエディタ等で開いたままで行わないでください。
+</p>
+
+<p>
+言語ファイル編集時の注意<br />
+言語ファイル(installer\release\lang\*.lng)は多言語対応エディタ(vim, EmEditor, Notepad++等)で編集してください。
+</p>
+
+
+<h2 id="ini-entry">TERATERM.INI への項目追加</h2>
+
+<p>
+項目名<br />
+すでに EnableFoo... や DisableBar... が混在してしまっているが、混乱しやすい。<br />
+今後は Baz... という形式にするのが望ましい。
+</p>
+
+
+<h2 id="menu-id">メニューID追加時の命名規則</h2>
+
+<pre>
+1桁目は 5
+</pre>
+<pre>
+2桁目は
+  Tera Term VT ウィンドウなら  0
+  Tera Term TEK ウィンドウなら 1
+  TTSSH なら                   2
+  TTProxy なら                 3
+  TTXKanjiMenu なら            4
+</pre>
+<pre>
+3桁目は
+  [File] メニューなら    1
+  [Edit] メニューなら    2
+  [Setup] メニューなら   3
+  [Control] メニューなら 4
+  [Window] メニューなら  8
+  [Help] メニューなら    9
+</pre>
+
+<p>
+例：File配下にTTSSHのメニューを追加する
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
+
+
+<h2 id="add-macro-command">マクロコマンド追加時の作業リスト</h2>
+
+<p>
+Tera Termマクロを新設するときの作業手順について、以下に示します。
+</p>
+
+<ul>
+  <li>ソースコードの修正
+    <ul>
+      <li>コマンドの内部 ID を採番する。（「内部 ID」は"helpid.h"にも使用される）<br />
+          ... teraterm/ttmacro/ttmparse.h</li>
+      <li>コマンド名を走査して内部 ID に変換する。<br />
+          ... CheckReservedWord@teraterm/ttmacro/ttmparse.c</li>
+      <li>コマンドの内部 ID から実際に処理をする関数を呼ぶ。<br />
+          ... ExecCmnd@teraterm/ttmacro/ttl.c</li>
+      <li>処理する関数を作る。</li>
+    </ul>
+  </li>
+  <li>ヘルプ(言語ごと)
+    <ul>
+      <li>コマンドのヘルプを作る。<br />
+          ... doc/LANG/html/macro/command/hogefunc.html</li>
+      <li>コマンド一覧ページに追加する。<br />
+          ... doc/LANG/html/macro/command/index.html</li>
+      <li>ヘルプトピックに追加する。<br />
+          ... doc/LANG/teraterm.hhc</li>
+      <li>ヘルプページのコンテキスト ID を採番する。<br />
+          値は コマンドの内部 ID + 92000。<br />
+          ... teraterm/common/helpid.h</li>
+      <li>コンテキスト ID と呼び出すファイルのエイリアスを作成する。<br />
+          テキストエディタで直接開き、[ALIAS]にHTMLを追加する。<br />
+          ... doc/LANG/teraterm.hhp</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2 id="build-library">ライブラリのビルド方法</h2>
+
+<ul>
+  <li>PuTTY (used by TTSSH)
+    <ol>
+      <li>PuTTY のソースを libs/putty の中に展開する。<br />
+          ttssh ソリューション配下の putty プロジェクトにより必要な機能のみが静的ライブラリ化され、ttxssh.dll にリンクされるため、展開するだけでよい。</li>
+    </ol>
+  </li>
+  <li>Oniguruma (used by Tera Term Macro)
+    <ol>
+      <li>oniguruma のソースを libs/oniguruma の中に展開する。</li>
+      <li>スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。</li>
+      <li>コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma6.bat を実行する。</li>
+    </ol>
+  </li>
+  <li>OpenSSL (used by TTSSH)
+    <ol>
+      <li>openssl のソースを libs/openssl の中に展開する。</li>
+      <li> OpenSSL 1.0.0e 以降で、libs/openssl/Makefile.bak が最初から存在する場合は、一度だけ手動で削除してください。</li>
+      <li>スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。</li>
+      <li>コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl11.bat を実行する。</li>
+    </ol>
+  </li>
+  <li>Zlib (used by TTSSH)
+    <ol>
+      <li>zlib のソースを libs/zlib の中に展開する。</li>
+      <li>スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。</li>
+      <li>コマンドプロンプト上から libs ディレクトリに移動し、buildzlib.bat を実行する。</li>
+    </ol>
+  </li>
+  <li>SFMT (used by Tera Term Macro)
+    <ol>
+      <li>SFMT のソースを libs/SFMT の中に展開する。</li>
+      <li>スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。</li>
+      <li>コマンドプロンプト上から libs ディレクトリに移動し、buildSFMT.bat を実行する。</li>
+      <li>必要に応じて libs/SFMT/SFMT_version_for_teraterm.h のバージョン番号を修正する。</li>
+    </ol>
+  </li>
+  <li>cJSON (used by TTXCheckUpdate plugin)
+    <ol>
+      <li>EcJSON のソースを libs/cJSON の中に展開する。</li>
+    </ol>
+  </li>
+  <li>The reference C implementation of Argon2 (used by TTSSH)
+    <ol>
+      <li>argon2 のソースを libs/argon2 の中に展開する。<br />
+          argon2 リファレンス実装には静的ライブラリを生成するプロジェクトファイルが含まれていない。<br />
+          ttssh ソリューション配下の argon2 プロジェクトにより静的ライブラリが生成され、ttxssh.dll にリンクされるため、展開するだけでよい。</li>
+    </ol>
+  </li>
+</ul>
+
+<h2 id="build-teraterm">Tera Termのビルド方法</h2>
+
+<p>
+Tera Termのビルド方法について以下に示します。<br />
+ビルドにはVisual Studio 2005 Standard Edition以上が必要です。（Visual Studio 2005 Express Editionは不可）
+</p>
+
+<ol>
+  <li>ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。</li>
+  <li>teraterm\visualc\ttermpro.sln をVisual Studioで開く。<br />
+      .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功するとteraterm ディレクトリに実行プログラムが生成される。</li>
+</ol>
+
+
+<h2 id="build-teraterm-menu">TeraTerm Menuのビルド方法</h2>
+
+<ol>
+  <li>Checkout TeraTerm Menu source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>ttpmenu\ttpmenu.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると ttpmenu ディレクトリに ttpmenu.exe が生成される。</li>
+</ol>
+
+
+<h2 id="build-ttxkanjimenu">TTXKanjiMenuのビルド方法</h2>
+
+<ol>
+  <li>Checkout TeraTerm Menu source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると TTXKanjiMenu ディレクトリに ttxkanjimenu.dll が生成される。</li>
+</ol>
+
+
+<h2 id="build-ttproxy">TTProxyのビルド方法</h2>
+
+<p>
+TTProxyのビルド方法について以下に示します。<br />
+ビルドにはVisual Studio 2005(VC++8.0)が必要です。
+</p>
+
+<ol>
+  <li>ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。</li>
+  <li>TTProxy\TTProxy.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると TTProxy ディレクトリにDLLが生成される。</li>
+</ol>
+
+
+<h2 id="build-ttssh">TTSSHのビルド方法</h2>
+
+<p>
+TTSSHのビルド方法について以下に示します。<br />
+ビルドにはVisual Studio 2005(VC++8.0)、ActivePerlが必要です。
+</p>
+
+<p>
+TTSSH単体のビルドは VS2005 Express Edition でも可能です。ttpcmn.libをリンクするため、Tera Termのビルドを事前に行っておく必要があります。VS2005 Express EditionではTera Termのビルドはできませんが、ttpcmn.libは作成することができます。
+</p>
+
+<p>
+VS2008 Express Editionでビルドすると、.rcファイルで下記のエラーが発生します。<br />
+.\ttxssh.rc(10) : fatal error RC1015: cannot open include file 'afxres.h'.<br />
+本現象を回避するには、.rcファイルをテキストエディタで開き、afxres.hのincludeを削除し、新規に2行を追加します。<br />
+</p>
+<pre>
+- #include "afxres.h"
++ #include <windows.h>
++ #define IDC_STATIC -1
+</pre>
+
+<ol>
+  <li>ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。</li>
+  <li>ttssh2\ttssh.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される。</li>
+</ol>
+
+
+<h2 id="build-cygterm">CygTermのビルド方法</h2>
+
+<p>
+CygTermのビルド方法について以下に示します。
+</p>
+
+<ol>
+  <li>Cygwin(https://www.cygwin.com/)をインストールする。</li>
+  <li>Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
+<pre>
+# cd cygterm
+</pre>
+  </li>
+  <li>CygTermをコンパイルする。
+<pre>
+# make
+</pre>
+  </li>
+</ol>
+
+
+<h2 id="build-ttxsamples">TTXSamplesのビルド方法</h2>
+
+<p>
+リポジトリのTTXSamplesに Tera Term Extension (TTX)のサンプルがあります。TTXを作る際の参考にしてください。<br />
+TTXSamplesのビルドにはVisual Studio 2005(VC++8.0)が必要です。Tera Term本体とは違い、Express Editionでもビルド可能です。
+</p>
+
+<ol>
+  <li>ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。</li>
+  <li>TTXSamples\TTXSamples.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると TTXSamples ディレクトリにDLLが生成される。</li>
+</ol>
+
+<p>
+各TTXの詳細については、プロジェクト内のReadMe-ja.txtを参照してください。
+</p>
+
+
+
+<h2 id="build-htmlhelp">ヘルプファイルのビルド方法</h2>
+
+<p>
+ヘルプファイルのビルド方法について以下に示します。
+</p>
+
+<ol>
+  <li>HTML Help Compiler を入手する。<br />
+      Visual Studio (2017 以降) を "C++ MFC" オプションを選択してインストールすると、HTML Help Compiler (hhc.exe) がインストールされる。</li>
+  <li>doc\makechm.bat を実行する。</li>
+</ol>
+
+
+<h2 id="release">リリースの方法</h2>
+
+<p>
+リリースの方法について以下に示します。
+</p>
+
+<ol>
+  <li>RC 作成時にバージョンを一つインクリメントする。<br />
+      一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため、このタイミングとする(cf. TT_FILEMAPNAME 定義)。
+    <ul>
+      <li>teraterm\common\tt-version.h</li>
+      <li>ttssh2\ttxssh\ttxssh-version.h</li>
+      <li>ttpmenu\ttpmenu.rc // only modifying</li>
+      <li>TTProxy\TTProxy.rc // only modifying</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
+      <li>installer\teraterm.iss
+        <ul>
+          <li>AppVer を上げ、"RC" を追加</li>
+          <li>snapshot を コメントアウト</li>
+          <li>バッチファイルの呼び出しを修正</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする。
+    <ul>
+      <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
+      <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpdlg\ttpdlg.rc // dialog</li>
+      <li>teraterm\ttpfile\ttpfile-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpmacro\ttm-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpset\ttpset-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttptek\ttptek-version.rc // VERSIONINFO</li>
+      <li>ttssh2\ttxssh\ttxssh.rc // dialog</li>
+      <li>ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO</li>
+      <li>ttpmenu\ttpmenu.rc // dialog, VERSIONINFO</li>
+      <li>TTProxy\TTProxy.rc // dialog, VERSIONINFO(en), VERSIONINFO(ja)</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // VERSIONINFO</li>
+      <li>installer\teraterm.iss</li>
+      <li>installer\release\license.txt // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\index.html</li>
+      <li>doc\en\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\macro\index.html</li>
+      <li>doc\ja\html\index.html</li>
+      <li>doc\ja\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\ja\html\macro\index.html</li>
+    </ul>
+  </li>
+  <li>依存ライブラリ、ツール、インポート元の最新版をチェックする。
+    <ul>
+      <li>Visual Studio<br />
+          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
+      <li>Inno Setup<br />
+          http://www.jrsoftware.org/isdl.php</li>
+      <li>Oniguruma<br />
+          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
+      <li>OpenSSL<br />
+          http://www.openssl.org/</li>
+      <li>zlib<br />
+          http://www.zlib.net/</li>
+      <li>PuTTY<br />
+          http://www.chiark.greenend.org.uk/~sgtatham/putty/</li>
+      <li>SFMT<br />
+          http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html</li>
+      <li>CygTerm<br />
+          https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html</li>
+    </ul>
+  </li>
+  <li>ドキュメントを確認する。
+    <ul>
+      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
+      <li>変更履歴の書き忘れを確認する。<br />
+       おおむね変更した順に追記される変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
+      <li>ドキュメント差分が翻訳されていることを確認する。</li>
+    </ul>
+  </li>
+  <li>バージョンを上げ、日付を変更する。
+    <ul>
+      <li>teraterm.iss<br />
+          AppVer から RC を削除</li>
+      <li>html/about/hisotry.html</li>
+    </ul>
+    CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。<br />
+    パッチがコミットされると即リリース扱いになり、リリース日はその日付となる。<br />
+    これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
+  </li>
+  <li>前回のリリースからCygTerm+に変更がある場合は、64bit Cygwinでビルドして cygterm\cygterm+-x86_64\cygterm.exe の差し替えを行う。</li>
+  <li>動作確認をする
+    <ul>
+      <li>インストーラを作成する。<br />
+          ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される。</li>
+      <li>インストールおよび実行をテストする。</li>
+    </ul>
+  </li>
+  <li>SVN のタグを作成する。<br />
+      タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。<br />
+      <pre>
+svn copy -m "Release 4.82" svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_82
+      </pre>
+  </li>
+  <li>リリース用のタグでチェックアウトし直す。</li>
+  <li>インストーラを作成する。
+    <ul>
+      <li>teraterm\installer\teraterm.iss を編集する
+<pre>
+#define AppVer "4.???"
+;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+
+[InnoIDE_PreCompile]
+Name: makechm.bat
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
+
+[InnoIDE_PostCompile]
+Name: makearchive.bat; Parameters: release
+
+[PreCompile]
+Name: makechm.bat
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
+
+[PostCompile]
+Name: makearchive.bat; Parameters: release
+
+[_ISToolPreCompile]
+Name: makechm.bat
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
+
+[_ISToolPostCompile]
+Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+      <li>ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される</li>
+    </ul>
+  </li>
+  <li>OSDN を更新する。
+    <ul>
+      <li>[ダウンロード]-[管理]-[新規作成]<br />
+          変更履歴を入力してリリースを作成する。</li>
+      <li>[ニュース一覧]-[新規登録]<br />
+          ニュース記事を作成する。</li>
+    </ul>
+  </li>
+  <li>メーリングリストにアナウンスする。</li>
+  <li>プロジェクトページを更新する。</li>
+  <li>スナップショットを削除する。</li>
+  <li>Twitter に告知する。<br />
+      https://twitter.com/Tera_Term<br />
+      リリース告知をツイートして固定する。</li>
+  </li>
+  <li>フォーラムに告知する。<br />
+      Announcements http://logmett.com/support-forums/5<br />
+      Announcements に新規投稿する。種類は Announcement。<br />
+      一つ前の Announcement の種類を Normal に変更する。<br />
+      Announcement は三個残すことになっているので、三つ前の Announcement を削除する。</li>
+  <li>Chocolatey の登録を更新</li>
+</ol>
+
+</body>
+</html>
