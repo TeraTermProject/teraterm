@@ -1,0 +1,566 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Tera Term Development</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1 class="center">Tera Term Development</h1>
+
+<ol>
+  <li><a href="#environment">Development Environment</a></li>
+  <li><a href="#library">Libraries</a></li>
+  <li><a href="#committer">Notice for SVN committer</a></li>
+  <li><a href="#ini-entry">Add entry to TERATERM.INI</a></li>
+  <li><a href="#menu-id">Naming rule to add menu ID</a></li>
+  <li><a href="#add-macro-command">What to do when new macro command is added?</a></li>
+  <li><a href="#build-library">How to build Libraries</a></li>
+  <li><a href="#build-teraterm">How to build Tera Term</a></li>
+  <li><a href="#build-teraterm-menu">How to build TeraTerm Menu</a></li>
+  <li><a href="#build-ttxkanjimenu">How to build TTXKanjiMenu</a></li>
+  <li><a href="#build-ttproxy">How to build TTProxy</a></li>
+  <li><a href="#build-ttssh">How to build TTSSH</a></li>
+  <li><a href="#build-cygterm">How to build CygTerm</a></li>
+  <li><a href="#build-ttxsamples">How to build TTXSamples</a></li>
+  <li><a href="#build-htmlhelp">How to build HTML help file</a></li>
+  <li><a href="#release">How to release Tera Term installation package</a></li>
+</ol>
+
+<hr>
+
+<h2 id="environment">Development Environment</h2>
+
+<ul>
+  <li>OS
+    <ul>
+      <li>Windows XP Professional</li>
+      <li>Windows 8 Pro</li>
+      <li>Windows 8.1 Pro</li>
+      <li>Windows 10 Pro</li>
+    </ul>
+  </li>
+  <li>Compiler used for release in Tera Term Project
+    <ul>
+      <li>Visual Studio 2005 SP1 Standard Edition (or higher edition)
+        <ul>
+          <li>Service Pack 1 (VS80sp1-KB926601-X86-ENU.exe)</li>
+          <li>Microsoft Visual Studio 2005 Service Pack 1 MFC Security Update (VS80sp1-KB2538218-v2-X86-INTL.exe)</li>
+          <li>When Windows Vista or higher, Visual Studio 2005 Service Pack 1 Update for Windows Vista (VS80sp1-KB932232-X86-ENU.exe)</li>
+          <li>Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)<br />
+              Note: The OpenSSL will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.<br />
+              Append to the beginning of INCLUDE and LIB of C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat, to be given priority for the INCLUDE and LIB directory of SDK installation directory.<br />
+              <pre>
+e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
+     LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
+              </pre>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Supported Compiler
+    <ul>
+      <li>Visual Studio 2005 (Express Edition was supported from Tera Term 4.103)
+        <ul>
+          <li>with SDK 7.0
+            <ul>
+              <li>Windows Server 2003 R2 Platform SDK (= Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1) (5.2.3790.2075.51.PlatformSDK_Svr2003R2_rtm.img)<br />
+                  Note: unavailable on Microsoft website (at Apr 07, 2019).</li>
+            </ul>
+          </li>
+          <li>with SDK 7.1
+            <ul>
+              <li>Microsoft Windows SDK for Windows 7 and .NET Framework 4 (GRMSDK_EN_DVD.iso)</li>
+              <li>To use with Visual Studio 2005, KB949009(VS80sp1-KB949009-X86-INTL.exe) or KB980422(VS80sp1-KB980422-x86-INTL.exe) is necessary.<br />
+                  Note: KB949009 and KB980422 are unavailable on Microsoft website.</li>
+            </ul>
+            built binary is able to run on Windows 95.
+          </li>
+        </ul>
+      </li>
+      <li>Visual Studio 2008 SP1 Standard Edition (or higher edition)<br />
+          Note: The executable program which was compiled by this version does not work on Windows NT 4.0, 95, 98 and Me.
+      </li>
+      <li>Visual Studio 2010 SP1 Professional Edition (or higher edition)<br />
+          Note: The executable program which was compiled by this version does not work on Windows 2000, NT 4.0, 95, 98 and Me.
+      </li>
+      <li>Visual Studio 2012 Update 4 Professional Edition (or higher edition)<br />
+          Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+      </li>
+      <li>Visual Studio Community 2013 Update 5<br />
+        <ul>
+          <li>MFC MBCS DLL Add-on (vc_mbcsmfc.exe) is necessary.</li>
+        </ul>
+          Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+      </li>
+      <li>Visual Studio Community 2015 Update 3<br />
+          Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+      </li>
+      <li>Visual Studio Community 2017<br />
+          Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+      </li>
+      <li>Visual Studio Community 2019<br />
+          Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+      </li>
+    </ul>
+  </li>
+  <li>Installer
+    <ul>
+      <li>Inno Setup 5.6.1 ANSI (http://www.jrsoftware.org/isinfo.php)
+        <ul>
+          <li>Inno Setup Preprocessor</li>
+        </ul>
+      </li>
+      <li>ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)</li>
+    </ul>
+  </li>
+  <li>Others
+    <ul>
+      <li>Cygwin the latest version (because CygTerm+ supports Vista or later from v4.105)</li>
+      <li>ActivePerl 5.10 or later version , Strawberry Perl 5.30.1.1 or later version<br />
+          converts character-code and return-code of documents for building OpenSSL.</li>
+      <li>Subversion for Windows (http://sourceforge.net/projects/win32svn/)<br />
+          Use the compatible version for check-outed svn version.<br />
+          Extract into libs\svn. ("svnversion.exe" is located in libs\svn\bin directory.)</li>
+      <li>Patch<br />
+          When the patch command is not found in the path, please put the "patch.exe" into the libs\openssl_patch directory.<br />
+          https://gitforwindows.org/ (https://github.com/git-for-windows/git/releases/latest). Next, extract the file and copy the  patch.exe, msys-gcc_s-1.dll, msys-2.0.dll of usr\bin directory.</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2 id="library">Libraries</h2>
+
+<ul>
+  <li>Oniguruma 6.9.7.1 (https://github.com/kkos/oniguruma)</li>
+  <li>OpenSSL 1.1.1k (http://www.openssl.org/)</li>
+  <li>zlib 1.2.11 (http://www.zlib.net/)</li>
+  <li>PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)</li>
+  <li>SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)</li>
+  <li>The reference C implementation of Argon2 20190702 (https://github.com/P-H-C/phc-winner-argon2)</li>
+</ul>
+
+
+<h2 id="committer">Notice for SVN committer</h2>
+
+<p>
+SVN repository for committer is the following:
+</p>
+<pre>
+svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable
+</pre>
+
+<p>
+Should not edit checkout file in copying directory.<br />
+The other modification code may be deleted in SVN server when you commit checkout file. Also, fix it carefully when the conflicting occurs.
+</p>
+
+<p>
+Should not have opened checkout file.<br />
+SVN commit procedure may be failure while checkout file will have been opened.
+</p>
+
+<p>
+Edit language files<br />
+Use the text editor supporting multi languages(vim, EmEditor, Notepad++, etc) to edit the language files(installer\release\lang\*.lng).
+</p>
+
+
+<h2 id="ini-entry">Add entry to TERATERM.INI</h2>
+
+<p>
+Entry name<br />
+Unfortunately, the confusing entries such as EnableFoo... and DisableBar... are included.<br />
+It recommends that the new name like as Baz....
+</p>
+
+
+<h2 id="menu-id">Naming rule to add menu ID</h2>
+
+<pre>
+The first digit is 5.
+</pre>
+<pre>
+The second digit is:
+  Tera Term VT window         0
+  Tera Term TEK window        1
+  TTSSH                       2
+  TTProxy                     3
+  TTXKanjiMenu                4
+</pre>
+<pre>
+The third digit is:
+  [File] menu                 1
+  [Edit] menu                 2
+  [Setup] menu                3
+  [Control] menu              4
+  [Window] menu               8
+  [Help] menu                 9
+</pre>
+
+<p>
+Example: adding a TTSSH menu under File menu
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
+
+
+<h2 id="add-macro-command">What to do when new macro command is added?</h2>
+
+<ul>
+  <li>Coding
+    <ul>
+      <li>get a new number of command internal ID.<br />
+          ... teraterm/ttmacro/ttmparse.h</li>
+      <li>add a if statement to below function.<br />
+          ... CheckReservedWord@teraterm/ttmacro/ttmparse.c</li>
+      <li>add a caller doing the macro command.<br />
+          ... ExecCmnd@teraterm/ttmacro/ttl.c</li>
+      <li>make a function code for the macro command.</li>
+    </ul>
+  </li>
+  <li>Help topic
+    <ul>
+      <li>make the command help file.<br />
+          ... doc/LANG/html/macro/command/hogefunc.html</li>
+      <li>add the file to help topic.<br />
+          ... doc/LANG/teraterm.hhc</li>
+      <li>get a new number of context ID in help page.<br />
+          The value is internal ID + 92000.<br />
+          ... teraterm/common/helpid.h</li>
+      <li>make the alias between context ID and calling file.<br />
+          Open the .hhp file by using Text Editor, added a html line in [ALIAS] tag.<br />
+          ... doc/LANG/teraterm.hhp</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2 id="build-library">How to build Libraries</h2>
+
+<ul>
+  <li>PuTTY (used by TTSSH)
+    <ol>
+      <li>Extract PuTTY source into libs/putty directory.</li>
+    </ol>
+  </li>
+  <li>Oniguruma (used by Tera Term Macro)
+    <ol>
+      <li>Extract oniguruma source into libs/oniguruma directory.</li>
+      <li>Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.</li>
+      <li>Move 'libs' directory on the command prompt. And run buildoniguruma6.bat.</li>
+    </ol>
+  </li>
+  <li>OpenSSL (used by TTSSH)
+    <ol>
+      <li>Extract openssl source into libs/openssl directory.</li>
+      <li>When the libs/openssl/Makefile.bak file exists on the OpenSSL 1.0.0e or later, delete the file only once</li>
+      <li>Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.</li>
+      <li>Move 'libs' directory on the command prompt. And run buildopenssl11.bat.</li>
+    </ol>
+  </li>
+  <li>Zlib (used by TTSSH)
+    <ol>
+      <li>Extract zlib source into libs/zlib directory.</li>
+      <li>Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.</li>
+      <li>Move 'libs' directory on the command prompt. And run buildzlib.bat.</li>
+    </ol>
+  </li>
+  <li>SFMT (used by Tera Term Macro)
+    <ol>
+      <li>Extract SFMT source into libs/SFMT directory.</li>
+      <li>Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.</li>
+      <li>Move 'libs' directory on the command prompt. And run buildSFMT.bat.</li>
+      <li>Modify version information in libs/SFMT/SFMT_version_for_teraterm.h if necessary.</li>
+    </ol>
+  </li>
+  <li>The reference C implementation of Argon2 (used by TTSSH)
+    <ol>
+      <li>Extract argon2 source into libs/argon2 directory.</li>
+    </ol>
+  </li>
+</ul>
+
+<h2 id="build-teraterm">How to build Tera Term</h2>
+
+<p>
+To build Tera Term source code is shown in the following step:<br />
+And you should use Visual Studio 2005 Standard Edition later version to build Tera Term because Tera Term program links MFC library (Visual Studio 2005 Express Edition can't be used).
+</p>
+
+<ol>
+  <li>Checkout Tera Term source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>Open teraterm\visualc\ttermpro.sln with Visual Studio.<br />
+      The linefeed code of .sln file must be "CR+LF".</li>
+  <li>Build Tera Term solution.</li>
+  <li>Tera Term execution program will be generated in teraterm\visualc\bin directory if the building is successful.</li>
+</ol>
+
+
+<h2 id="build-teraterm-menu">How to build TeraTerm Menu</h2>
+
+<ol>
+  <li>Checkout TeraTerm Menu source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>Open ttpmenu\ttpmenu.sln with Visual Studio.</li>
+  <li>Build ttpmenu solution.</li>
+  <li>ttpmenu.exe will be generated in Release directory if the building is successful.</li>
+</ol>
+
+
+<h2 id="build-ttxkanjimenu">How to build TTXKanjiMenu</h2>
+
+<ol>
+  <li>Checkout TTXKanjiMenu source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>Open TTXKanjiMenu\ttxkanjimenu.sln with Visual Studio.</li>
+  <li>Build ttpmenu solution.</li>
+  <li>ttxkanjimenu.dll will be generated in TTXKanjiMenu directory if the building is successful.</li>
+</ol>
+
+
+<h2 id="build-ttproxy">How to build TTProxy</h2>
+
+<p>
+To build TTProxy source code is shown in the following step:<br />
+And you need Visual Studio 2005(VC++8.0) to build.
+</p>
+
+<ol>
+  <li>Checkout TTProxy source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>Open TTProxy\TTProxy.sln with Visual Studio.</li>
+  <li>Build TTProxy solution.</li>
+  <li>TTProxy DLL module will be generated in TTProxy directory if the building is successful.</li>
+</ol>
+
+
+<h2 id="build-ttssh">How to build TTSSH</h2>
+
+<p>
+To build TTSSH source code is shown in the following step:<br />
+And you need Visual Studio 2005(VC++8.0) and ActivePerl to build.
+</p>
+
+<p>
+VS2005 Express Edition is able to build TTSSH. TTSSH links to ttpcmn.lib and it must be created beforehand. VS2005 Express Edition cannot build Tera Term, but it can create ttpcmn.lib
+</p>
+
+<p>
+On VS2008 Express Edition, following error occurs:<br />
+.\ttxssh.rc(10) : fatal error RC1015: cannot open include file 'afxres.h'.<br />
+To avoid this error, edit ttxssh.rc file. Delete the line of "afxres.h", and add 2 lines.<br />
+</p>
+<pre>
+- #include "afxres.h"
++ #include <windows.h>
++ #define IDC_STATIC -1
+</pre>
+
+<ol>
+  <li>Checkout TTSSH source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>Open ttssh2\ttssh.sln with Visual Studio.</li>
+  <li>Build TTSSH solution.</li>
+  <li>TTSSH DLL will be generated in ttssh2\ttxssh directory if the building is successful.</li>
+</ol>
+
+
+<h2 id="build-cygterm">How to build CygTerm</h2>
+
+<p>
+To build CygTerm source code is shown in the following step:
+</p>
+
+<ol>
+  <li>Install Cygwin(https://www.cygwin.com/) to your PC.</li>
+  <li>Launch Cygwin shell and go to cygterm directory.
+<pre>
+# cd cygterm
+</pre>
+  </li>
+  <li>Compile Cygterm.
+<pre>
+# make
+</pre>
+   </li>
+</ol>
+
+
+<h2 id="build-ttxsamples">How to build TTXSamples</h2>
+
+<p>
+To build TTXSamples source code is shown in the following step:<br />
+And you need Visual Studio 2005(VC++8.0) to build. VS2005 Express Edition is able to build TTXSamples.
+</p>
+
+<ol>
+  <li>Checkout TTXSamples source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
+  <li>Open TTXSamples\TTXSamples.sln with Visual Studio.</li>
+  <li>Build TTXSamples solution.</li>
+  <li>TTXSamples DLL module will be generated in TTXSamples directory if the building is successful.</li>
+</ol>
+
+
+<h2 id="build-htmlhelp">How to build HTML help file</h2>
+
+<p>
+To build  HTML help file is shown in the following step:
+</p>
+
+<ol>
+  <li>Install HTML Help Compiler<br />
+      Installing Visual Studio (2017 or later) with "C++ MFC" option, HTML Help Compiler (hhc.exe) is installed.</li>
+  <li>Run doc\makechm.bat</li>
+</ol>
+
+
+<h2 id="release">How to release Tera Term installation package</h2>
+
+<p>
+To release Tera Term installation package is shown in the following step:
+</p>
+
+<ol>
+  <li>Increment the version while RC release process.<br />
+      The binary is released for test in this timing. Prevent that old and new binary have same version number.
+    <ul>
+      <li>teraterm\common\tt-version.h</li>
+      <li>ttssh2\ttxssh\ttxssh-version.h</li>
+      <li>ttpmenu\ttpmenu.rc // only modifying</li>
+      <li>TTProxy\TTProxy.rc // only modifying</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
+      <li>installer\teraterm.iss
+        <ul>
+          <li>version up AppVer and add "RC"</li>
+          <li>comment out snapshot</li>
+          <li>change called batch files</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Increment the year of last publication of copyright notice if it is first release in this year.
+    <ul>
+      <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
+      <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpdlg\ttpdlg.rc // dialog</li>
+      <li>teraterm\ttpfile\ttpfile-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpmacro\ttm-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpset\ttpset-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttptek\ttptek-version.rc // VERSIONINFO</li>
+      <li>ttssh2\ttxssh\ttxssh.rc // dialog</li>
+      <li>ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO</li>
+      <li>ttpmenu\ttpmenu.rc // dialog, VERSIONINFO</li>
+      <li>TTProxy\TTProxy.rc // dialog, VERSIONINFO(en), VERSIONINFO(ja)</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // VERSIONINFO</li>
+      <li>installer\teraterm.iss</li>
+      <li>installer\release\license.txt // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\index.html</li>
+      <li>doc\en\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\macro\index.html</li>
+      <li>doc\ja\html\index.html</li>
+      <li>doc\ja\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\ja\html\macro\index.html</li>
+    </ul>
+  </li>
+  <li>Check latest libraries and tools.
+    <ul>
+      <li>Visual Studio<br />
+          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
+      <li>Inno Setup<br />
+          http://www.jrsoftware.org/isdl.php</li>
+      <li>Oniguruma<br />
+          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
+      <li>OpenSSL<br />
+          http://www.openssl.org/</li>
+      <li>zlib<br />
+          http://www.zlib.net/</li>
+      <li>PuTTY<br />
+          http://www.chiark.greenend.org.uk/~sgtatham/putty/</li>
+      <li>SFMT<br />
+          http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html</li>
+      <li>CygTerm<br />
+          https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html</li>
+    </ul>
+  </li>
+  <li>Check the document files.</li>
+  <li>Increase the software version and modify date.
+    <ul>
+      <li>teraterm.iss<br />
+          remove "RC" from AppVer</li>
+      <li>html/about/hisotry.html</li>
+    </ul>
+    Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.<br />
+    Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
+  </li>
+  <li>When CygTerm+ is changed from previous version, please build the software with 64bit Cygwin and replace cygterm\cygterm+-x86_64\cygterm.exe.</li>
+  <li>Evaluate executable program file.
+    <ul>
+      <li>Make installer package<br />
+          Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.</li>
+      <li>Test Tera Term installation and evaluate it.</li>
+    </ul>
+  </li>
+  <li>Create SVN tag.<br />
+      The naming rule is `teraterm-version'(ex. teraterm-4_106).<br />
+<pre>
+svn copy -m "Release 4.106" svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
+</pre>
+  </li>
+  <li>Re-checkout from svn tag.</li>
+  <li>Make installer package
+    <ul>
+      <li>Edit "teraterm\installer\teraterm.iss"
+<pre>
+#define AppVer "4.???"
+;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+
+[InnoIDE_PreCompile]
+Name: makechm.bat
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
+
+[InnoIDE_PostCompile]
+Name: makearchive.bat; Parameters: release
+
+[PreCompile]
+Name: makechm.bat
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
+
+[PostCompile]
+Name: makearchive.bat; Parameters: release
+
+[_ISToolPreCompile]
+Name: makechm.bat
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
+
+[_ISToolPostCompile]
+Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+      <li>Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.</li>
+    </ul>
+  </li>
+  <li>Update OSDN project site.
+    <ul>
+      <li>Add new release.</li>
+      <li>Submit news.</li>
+    </ul>
+  </li>
+  <li>Announce release to mailing list(in Japan).</li>
+  <li>Update OSDN project home page.</li>
+  <li>Delete snapshots.</li>
+  <li>Announce release to Twitter.<br />
+      https://twitter.com/Tera_Term<br />
+      Post release announcement and pin.</li>
+  </li>
+  <li>Update Chocolatey</li>
+</ol>
+
+</body>
+</html>
