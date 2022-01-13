@@ -197,7 +197,6 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022")
     find_program(
       VCVARS32 vcvarsall.bat
-      HINTS "C:/Program Files/Microsoft Visual Studio/2022/Preview/VC/Auxiliary/Build"
       HINTS "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build"
       HINTS "C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Auxiliary/Build"
       HINTS "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build"
@@ -386,4 +385,3 @@ else()
     message(FATAL_ERROR "cmake install fail ${rv}")
   endif()
 endif()
-
