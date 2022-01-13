@@ -46,25 +46,13 @@ set PATH=c:\msys64\bin;%PATH%
 
 cyglaunchを拡張して次のbatと同等に起動させれば、Tera Termから使用できる
 
-### cmd.exe
-
-```
-start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "%COMSPEC%"
-```
-
-Microsoft Windows [Version 10.0.19043.1348] で動作確認
-
-### powershell.exe
-
-```
-start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
-```
-
-### WSL (Windows Subsystem for Linux)
-
-```
-start "" "\path\to\cygterm.exe" -t "\path\to\ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /nossh /VTICON=TTERM" -s "c:/windows/system32/wsl.exe"
-```
+- cyglaunch_cmd.bat
+  - cmd.exe を Tera Term 内で動作させる
+  - Microsoft Windows [Version 10.0.19043.1348] で動作確認
+- cyglaunch_powershell.bat
+  - powershell を Tera Term 内で動作させる
+- cyglaunch_wsl.bat
+  - wsl を Tera Term 内で動作させる
 
 ## 歴史
 
