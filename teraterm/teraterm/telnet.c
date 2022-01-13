@@ -704,7 +704,7 @@ void ParseTel(BOOL *Size, int *nx, int *ny)
 
 	*Size = tr.ChangeWinSize;
 	*nx = tr.WinSize.x;
-	*ny = tr.WinSize.x;
+	*ny = tr.WinSize.y;
 }
 
 void TelEnableHisOpt(BYTE b)
