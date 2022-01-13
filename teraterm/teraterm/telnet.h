@@ -101,17 +101,17 @@
 extern "C" {
 #endif
 
-void InitTelnet();
-void EndTelnet();
+void InitTelnet(void);
+void EndTelnet(void);
 void ParseTel(BOOL *Size, int *Nx, int *Ny);
 void TelEnableHisOpt(BYTE b);
 void TelEnableMyOpt(BYTE b);
 void TelInformWinSize(int nx, int ny);
-void TelSendAYT();
-void TelSendBreak();
-void TelChangeEcho();
-void TelStartKeepAliveThread();
-void TelUpdateKeepAliveInterval();
+void TelSendAYT(void);
+void TelSendBreak(void);
+void TelChangeEcho(void);
+void TelStartKeepAliveThread(void);
+void TelUpdateKeepAliveInterval(void);
 
 extern int TelStatus;
 

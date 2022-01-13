@@ -89,7 +89,7 @@ static UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
 	return NumberOfBytesWritten;
 }
 
-void DefaultTelRec()
+static void DefaultTelRec(void)
 {
 	int i;
 
@@ -107,7 +107,7 @@ void DefaultTelRec()
 	tr.ChangeWinSize = FALSE;
 }
 
-void InitTelnet()
+void InitTelnet(void)
 {
 	TelStatus = TelIdle;
 
@@ -134,7 +134,7 @@ void InitTelnet()
 		tr.LogFile = 0;
 }
 
-void EndTelnet()
+void EndTelnet(void)
 {
 	if (tr.LogFile) {
 		CloseHandle(tr.LogFile);
@@ -144,7 +144,7 @@ void EndTelnet()
 	TelStopKeepAliveThread();
 }
 
-void TelWriteLog1(BYTE b)
+static void TelWriteLog1(BYTE b)
 {
 	BYTE Temp[3];
 	BYTE Ch;
@@ -166,7 +166,7 @@ void TelWriteLog1(BYTE b)
 	win16_lwrite(tr.LogFile, Temp, 3);
 }
 
-void TelWriteLog(PCHAR Buf, int C)
+static void TelWriteLog(PCHAR Buf, int C)
 {
 	int i;
 
@@ -175,7 +175,7 @@ void TelWriteLog(PCHAR Buf, int C)
 		TelWriteLog1(Buf[i]);
 }
 
-void SendBack(BYTE a, BYTE b)
+static void SendBack(BYTE a, BYTE b)
 {
 	BYTE Str3[3];
 
@@ -187,7 +187,7 @@ void SendBack(BYTE a, BYTE b)
 		TelWriteLog(Str3, 3);
 }
 
-void SendWinSize()
+static void SendWinSize(void)
 {
 	int i;
 	BYTE TmpBuff[21];
@@ -226,7 +226,7 @@ void SendWinSize()
 		TelWriteLog(TmpBuff, i);
 }
 
-void ParseTelIAC(BYTE b)
+static void ParseTelIAC(BYTE b)
 {
 	switch (b) {
 	case SE: break;
@@ -265,7 +265,7 @@ void ParseTelIAC(BYTE b)
 	}
 }
 
-void ParseTelSB(BYTE b)
+static void ParseTelSB(BYTE b)
 {
 	BYTE TmpStr[51];
 	int i;
@@ -362,7 +362,7 @@ void ParseTelSB(BYTE b)
 	}
 }
 
-void ParseTelWill(BYTE b)
+static void ParseTelWill(BYTE b)
 {
 	if (b <= MaxTelOpt) {
 		switch (tr.HisOpt[b].Status) {
@@ -452,7 +452,7 @@ void ParseTelWill(BYTE b)
 	TelStatus = TelIdle;
 }
 
-void ParseTelWont(BYTE b)
+static void ParseTelWont(BYTE b)
 {
 	if (b <= MaxTelOpt) {
 		switch (tr.HisOpt[b].Status) {
@@ -532,7 +532,7 @@ void ParseTelWont(BYTE b)
 	TelStatus = TelIdle;
 }
 
-void ParseTelDo(BYTE b)
+static void ParseTelDo(BYTE b)
 {
 	if (b <= MaxTelOpt) {
 		switch (tr.MyOpt[b].Status) {
@@ -608,7 +608,7 @@ void ParseTelDo(BYTE b)
 	TelStatus = TelIdle;
 }
 
-void ParseTelDont(BYTE b)
+static void ParseTelDont(BYTE b)
 {
 	if (b <= MaxTelOpt) {
 		switch (tr.MyOpt[b].Status) {
@@ -732,7 +732,7 @@ void TelEnableHisOpt(BYTE b)
 	}
 }
 
-void TelDisableHisOpt(BYTE b)
+static void TelDisableHisOpt(BYTE b)
 {
 	if (b <= MaxTelOpt) {
 		switch (tr.HisOpt[b].Status) {
@@ -782,7 +782,7 @@ void TelEnableMyOpt(BYTE b)
 	}
 }
 
-void TelDisableMyOpt(BYTE b)
+static void TelDisableMyOpt(BYTE b)
 {
 	if (b <= MaxTelOpt) {
 		switch (tr.MyOpt[b].Status) {
@@ -818,7 +818,7 @@ void TelInformWinSize(int nx, int ny)
 	}
 }
 
-void TelSendAYT()
+void TelSendAYT(void)
 {
 	BYTE Str[2];
 
@@ -830,7 +830,7 @@ void TelSendAYT()
 		TelWriteLog(Str, 2);
 }
 
-void TelSendBreak()
+void TelSendBreak(void)
 {
 	BYTE Str[2];
 
@@ -842,7 +842,7 @@ void TelSendBreak()
 		TelWriteLog(Str, 2);
 }
 
-void TelChangeEcho()
+void TelChangeEcho(void)
 {
 	if (ts.LocalEcho==0)
 		TelEnableHisOpt(ECHO);
@@ -850,7 +850,7 @@ void TelChangeEcho()
 		TelDisableHisOpt(ECHO);
 }
 
-static void TelSendNOP()
+static void TelSendNOP(void)
 {
 	BYTE Str[2];
 
@@ -901,7 +901,8 @@ static INT_PTR CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp
 }
 
 
-static unsigned _stdcall TelKeepAliveThread(void *dummy) {
+static unsigned _stdcall TelKeepAliveThread(void *dummy)
+{
 	static int instance = 0;
 
 	if (instance > 0)
@@ -919,7 +920,8 @@ static unsigned _stdcall TelKeepAliveThread(void *dummy) {
 	return 0;
 }
 
-void TelStartKeepAliveThread() {
+void TelStartKeepAliveThread(void)
+{
 	unsigned tid;
 
 	if (ts.TelKeepAliveInterval > 0) {
@@ -937,7 +939,8 @@ void TelStartKeepAliveThread() {
 	}
 }
 
-static void TelStopKeepAliveThread() {
+static void TelStopKeepAliveThread(void)
+{
 	if (keepalive_thread != INVALID_HANDLE_VALUE) {
 		nop_interval = 0;
 		WaitForSingleObject(keepalive_thread, INFINITE);
@@ -948,7 +951,8 @@ static void TelStopKeepAliveThread() {
 	}
 }
 
-void TelUpdateKeepAliveInterval() {
+void TelUpdateKeepAliveInterval(void)
+{
 	if (cv.Open && cv.TelFlag && ts.TCPPort==ts.TelPort) {
 		if (ts.TelKeepAliveInterval > 0 && keepalive_thread == INVALID_HANDLE_VALUE)
 			TelStartKeepAliveThread();
