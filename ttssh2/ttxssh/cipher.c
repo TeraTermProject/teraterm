@@ -59,9 +59,15 @@ static const struct ssh2cipher ssh2_ciphers[] = {
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, 0, 0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, 0, 0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, 0, 0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
+#ifndef LIBRESSL_VERSION_NUMBER
 	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, 0, 0, EVP_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, 0, 0, EVP_camellia_192_ctr}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, 0, 0, EVP_camellia_256_ctr}, // draft-kanno-secsh-camellia-02
+#else
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+#endif
 #ifdef WITH_CAMELLIA_PRIVATE
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0,  0,  0, EVP_camellia_128_cbc},
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0,  0,  0, EVP_camellia_192_cbc},
