@@ -133,6 +133,7 @@ ssh_aes_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_aes_128_ctr(void)
 {
+#ifndef LIBRESSL_VERSION_NUMBER
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -147,6 +148,22 @@ evp_aes_128_ctr(void)
 		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV);
 	}
 	return (p);
+#else
+	static EVP_CIPHER aes_ctr;
+
+	memset(&aes_ctr, 0, sizeof(EVP_CIPHER));
+	aes_ctr.nid = NID_undef;
+	aes_ctr.block_size = AES_BLOCK_SIZE;
+	aes_ctr.iv_len = AES_BLOCK_SIZE;
+	aes_ctr.key_len = 16;
+	aes_ctr.init = ssh_aes_ctr_init;
+	aes_ctr.cleanup = ssh_aes_ctr_cleanup;
+	aes_ctr.do_cipher = ssh_aes_ctr;
+#ifndef SSH_OLD_EVP
+	aes_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
+#endif
+	return (&aes_ctr);
+#endif
 }
 
 //============================================================================
@@ -212,6 +229,7 @@ ssh_des3_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_des3_ctr(void)
 {
+#ifndef LIBRESSL_VERSION_NUMBER
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -226,6 +244,22 @@ evp_des3_ctr(void)
 		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV);
 	}
 	return (p);
+#else
+	static EVP_CIPHER des3_ctr;
+
+	memset(&des3_ctr, 0, sizeof(EVP_CIPHER));
+	des3_ctr.nid = NID_undef;
+	des3_ctr.block_size = DES_BLOCK_SIZE;
+	des3_ctr.iv_len = DES_BLOCK_SIZE;
+	des3_ctr.key_len = 24;
+	des3_ctr.init = ssh_des3_ctr_init;
+	des3_ctr.cleanup = ssh_des3_ctr_cleanup;
+	des3_ctr.do_cipher = ssh_des3_ctr;
+#ifndef SSH_OLD_EVP
+	des3_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
+#endif
+	return (&des3_ctr);
+#endif
 }
 
 //============================================================================
@@ -306,6 +340,7 @@ ssh_bf_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_bf_ctr(void)
 {
+#ifndef LIBRESSL_VERSION_NUMBER
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -320,6 +355,22 @@ evp_bf_ctr(void)
 		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV);
 	}
 	return (p);
+#else
+	static EVP_CIPHER blowfish_ctr;
+
+	memset(&blowfish_ctr, 0, sizeof(EVP_CIPHER));
+	blowfish_ctr.nid = NID_undef;
+	blowfish_ctr.block_size = BF_BLOCK;
+	blowfish_ctr.iv_len = BF_BLOCK;
+	blowfish_ctr.key_len = 16;
+	blowfish_ctr.init = ssh_bf_ctr_init;
+	blowfish_ctr.cleanup = ssh_bf_ctr_cleanup;
+	blowfish_ctr.do_cipher = ssh_bf_ctr;
+#ifndef SSH_OLD_EVP
+	blowfish_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
+#endif
+	return (&blowfish_ctr);
+#endif
 }
 
 //============================================================================
@@ -400,6 +451,7 @@ ssh_cast5_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_cast5_ctr(void)
 {
+#ifndef LIBRESSL_VERSION_NUMBER
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -414,6 +466,22 @@ evp_cast5_ctr(void)
 		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV);
 	}
 	return (p);
+#else
+	static EVP_CIPHER cast5_ctr;
+
+	memset(&cast5_ctr, 0, sizeof(EVP_CIPHER));
+	cast5_ctr.nid = NID_undef;
+	cast5_ctr.block_size = CAST_BLOCK;
+	cast5_ctr.iv_len = CAST_BLOCK;
+	cast5_ctr.key_len = 16;
+	cast5_ctr.init = ssh_cast5_ctr_init;
+	cast5_ctr.cleanup = ssh_cast5_ctr_cleanup;
+	cast5_ctr.do_cipher = ssh_cast5_ctr;
+#ifndef SSH_OLD_EVP
+	cast5_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
+#endif
+	return (&cast5_ctr);
+#endif
 }
 
 //============================================================================
@@ -474,7 +542,7 @@ ssh_camellia_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 const EVP_CIPHER *
 evp_camellia_128_ctr(void)
 {
-
+#ifndef LIBRESSL_VERSION_NUMBER
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -489,4 +557,20 @@ evp_camellia_128_ctr(void)
 		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV);
 	}
 	return (p);
+#else
+	static EVP_CIPHER camellia_ctr;
+
+	memset(&camellia_ctr, 0, sizeof(EVP_CIPHER));
+	camellia_ctr.nid = NID_undef;
+	camellia_ctr.block_size = CAMELLIA_BLOCK_SIZE;
+	camellia_ctr.iv_len = CAMELLIA_BLOCK_SIZE;
+	camellia_ctr.key_len = 16;
+	camellia_ctr.init = ssh_camellia_ctr_init;
+	camellia_ctr.cleanup = ssh_camellia_ctr_cleanup;
+	camellia_ctr.do_cipher = ssh_camellia_ctr;
+#ifndef SSH_OLD_EVP
+	camellia_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
+#endif
+	return (&camellia_ctr);
+#endif
 }

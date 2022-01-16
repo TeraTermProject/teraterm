@@ -52,7 +52,6 @@ struct ssh1_3des_ctx
 };
 
 const EVP_CIPHER * evp_ssh1_3des(void);
-int ssh1_3des_iv(EVP_CIPHER_CTX *, int, u_char *, int);
 
 static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *iv, int enc)
 {
@@ -124,37 +123,9 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 	return 1;
 }
 
-// ssh1_3des_iv ‚Í–¢Žg—pB
-int ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
-{
-	struct ssh1_3des_ctx *c;
-
-	if (len != 24) {
-		//fatal("%s: bad 3des iv length: %d", __func__, len);
-		return SSH_ERR_INVALID_ARGUMENT;
-	}
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(evp)) == NULL) {
-		//fatal("%s: no 3des context", __func__);
-		return SSH_ERR_INTERNAL_ERROR;
-	}
-
-	if (doset) {
-		//debug3("%s: Installed 3DES IV", __func__);
-		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k1), iv, 8);
-		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k2), iv + 8, 8);
-		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k3), iv + 16, 8);
-	} else {
-		//debug3("%s: Copying 3DES IV", __func__);
-		memcpy(iv, EVP_CIPHER_CTX_iv(c->k1), 8);
-		memcpy(iv + 8, EVP_CIPHER_CTX_iv(c->k2), 8);
-		memcpy(iv + 16, EVP_CIPHER_CTX_iv(c->k3), 8);
-	}
-	return 0;
-}
-
 const EVP_CIPHER *evp_ssh1_3des(void)
 {
+#ifndef LIBRESSL_VERSION_NUMBER
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -169,4 +140,18 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH);
 	}
 	return (p);
+#else
+	static EVP_CIPHER ssh1_3des;
+
+	memset(&ssh1_3des, 0, sizeof(EVP_CIPHER));
+	ssh1_3des.nid = NID_undef;
+	ssh1_3des.block_size = 8;
+	ssh1_3des.iv_len = 0;
+	ssh1_3des.key_len = 16;
+	ssh1_3des.init = ssh1_3des_init;
+	ssh1_3des.cleanup = ssh1_3des_cleanup;
+	ssh1_3des.do_cipher = ssh1_3des_cbc;
+	ssh1_3des.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH;
+	return (&ssh1_3des);
+#endif
 }

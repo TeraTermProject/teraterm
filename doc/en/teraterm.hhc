@@ -578,8 +578,8 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of OpenSSL">
-			<param name="Local" value="html\reference\OpenSSL-LICENSE.txt">
+			<param name="Name" value="License of LibreSSL">
+			<param name="Local" value="html\reference\LibreSSL-LICENSE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

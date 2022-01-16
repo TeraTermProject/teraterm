@@ -55,5 +55,9 @@ message("argon2")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -P argon2.cmake
   )
+message("libressl")
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildlibressl.cmake
+  )
 
 message("done buildall.cmake")

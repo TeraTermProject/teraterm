@@ -10,7 +10,7 @@ if ERRORLEVEL 1 (
     exit /b 1
 )
 
-CALL buildopenssl11.bat
+CALL buildlibressl.bat
 if ERRORLEVEL 1 (
     echo "buildall.bat ÇèIóπÇµÇ‹Ç∑"
     exit /b 1
