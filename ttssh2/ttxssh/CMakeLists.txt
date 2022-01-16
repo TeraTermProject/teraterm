@@ -211,7 +211,7 @@ target_link_libraries(
   ${ZLIB_LIB}
   )
 
-if(TTXSSH_LIBRESSL)
+if(TTXSSH_OPENSSL3)
   target_link_libraries(
     ${PACKAGE_NAME}
     PRIVATE
