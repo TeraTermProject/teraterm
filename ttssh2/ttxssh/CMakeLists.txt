@@ -1,12 +1,15 @@
 ﻿set(PACKAGE_NAME "ttxssh")
 
 option(TTXSSH_LIBRESSL "User LibreSSL" on)
+option(TTXSSH_OPENSSL3 "Use OpenSSL3" off)
 
 project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 if(TTXSSH_LIBRESSL)
   include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_libressl.cmake)
+elseif(TTXSSH_OPENSSL3)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl3.cmake)
 else()
   include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
 endif()
@@ -163,11 +166,18 @@ target_include_directories(
   ../putty
   ${ZLIB_INCLUDE_DIRS}
   )
+
 if(TTXSSH_LIBRESSL)
   target_include_directories(
     ${PACKAGE_NAME}
     PRIVATE
     ${LIBRESSL_INCLUDE_DIRS}
+    )
+elseif(TTXSSH_OPENSSL3)
+  target_include_directories(
+    ${PACKAGE_NAME}
+    PRIVATE
+    ${OPENSSL3_INCLUDE_DIRS}
     )
 else()
   target_include_directories(
@@ -214,6 +224,13 @@ if(TTXSSH_LIBRESSL)
     ${PACKAGE_NAME}
     PRIVATE
     ${LIBRESSL_LIB}
+    bcrypt.lib
+    )
+elseif(TTXSSH_OPENSSL3)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    ${OPENSSL3_LIB}
     bcrypt.lib
     )
 else()
