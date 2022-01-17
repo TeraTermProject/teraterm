@@ -2491,7 +2491,7 @@ static void mark_url_w(int cur_x, int cur_y)
 		if ((cur_y + 1) < NumOfLines) {
 			if ((CodeLineW[x].attr & AttrLineContinued) != 0) {
 				const LONG TmpPtr = GetLinePtr(PageStart + cur_y + 1);
-				if ((CodeLineW[TmpPtr + NumOfColumns - 1].attr & AttrURL) != 0) {
+				if ((CodeBuffW[TmpPtr + NumOfColumns - 1].attr & AttrURL) != 0) {
 					next = TRUE;
 				}
 			}
