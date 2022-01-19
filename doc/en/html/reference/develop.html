@@ -454,23 +454,84 @@ To build  HTML help file is shown in the following step:
 To release Tera Term installation package is shown in the following step:
 </p>
 
+<h3>From start release until create RC</h3>
+
 <ol>
-  <li>Increment the version while RC release process.<br />
-      The binary is released for test in this timing. Prevent that old and new binary have same version number.
+  <li>Confirm ticket and branches.
+    <ul>
+      <li>Confirm in project team.
+        <ul>
+          <li>Organize / decide whether to include bug fix / feature in this release or defer.</li>
+        </ul>
+      </li>
+      <li>Merge branches
+        <ul>
+          <li>Verify trunk / 4-stable and working branches.</li>
+        </ul>
+      </li>
+      <li>Close tickets.
+        <ul>
+<!--
+          <li>すでに修正済み、処理済みのものはクローズする<br />
+              リリース時には、対象のマイルストーンのチケットはすべてクローズされている状態になる</li>
+          <li>次のリリースへ回すものはマイルストーンを変更する<br />
+              次のリリース用マイルストーンを作成する</li>
+-->
+        </ul>
+      </li>
+<!--
+      <li>この時点で新たに出てくるチケットの対応を検討する</li>
+-->
+    </ul>
+  </li>
+  <li>Confirm tools, libraries, import sources.
+    <ul>
+      <li>Visual Studio (<a href="https://visualstudio.microsoft.com">https://visualstudio.microsoft.com</a>)</li>
+      <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php">https://jrsoftware.org/isdl.php</a>)</li>
+      <li>Oniguruma (<a href="https://github.com/kkos/oniguruma">https://github.com/kkos/oniguruma</a>)</li>
+      <li>OpenSSL (<a href="https://www.openssl.org">https://www.openssl.org</a>)</li>
+      <li>zlib (<a href="https://www.zlib.net">http://www.zlib.net</a>)</li>
+      <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
+      <li>SFMT (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
+      <li>cJSON (<a href="https://github.com/DaveGamble/cJSON">https://github.com/DaveGamble/cJSON</a>)</li>
+      <li>The reference C implementation of Argon2 (<a href="https://github.com/P-H-C/phc-winner-argon2">https://github.com/P-H-C/phc-winner-argon2</a>)</li>
+    </ul>
+<!--
+    <p>リリースに使うバージョンはこの時点でおおむね決定する。</p>
+-->
+  </li>
+<!--
+  <!--li>今回のリリースに入れたいものが落ち着く</li>
+-->
+</ol>
+
+<h3>From create RC until release</h3>
+
+<ol>
+  <li>Confirm documents.
+    <ul>
+<!--
+      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
+      <li>変更履歴を確認し、書き忘れがあれば追記する。</li>
+      <li>変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
+      <li>ドキュメント差分が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
+-->
+    </ul>
+  </li>
+  <li>Increment the version while RC release process.
+    <p>The binary is released for test in this timing. Prevent that old and new binary have same version number.</p>
     <ul>
       <li>teraterm\common\tt-version.h</li>
       <li>ttssh2\ttxssh\ttxssh-version.h</li>
-      <li>ttpmenu\ttpmenu.rc // only modifying</li>
+      <li>Onttpmenu\ttpmenu.rc // only modifying</li>
       <li>TTProxy\TTProxy.rc // only modifying</li>
       <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
-      <li>installer\teraterm.iss
-        <ul>
-          <li>version up AppVer and add "RC"</li>
-          <li>comment out snapshot</li>
-          <li>change called batch files</li>
-        </ul>
-      </li>
     </ul>
+    <p>
+      By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed.<br />
+      The release date is the day committed by a developer. <!--そのため、修正・バージョンのインクリメント・変更履歴を同時にコミットする。--><br />
+      Because user can get gcc compiler for free.
+    </p>
   </li>
   <li>Increment the year of last publication of copyright notice if it is first release in this year.
     <ul>
@@ -497,106 +558,197 @@ To release Tera Term installation package is shown in the following step:
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
-  <li>Check latest libraries and tools.
+  <li>Replace 64bit Cygwin binary
+    <p>
+<!--
+      前回のリリースから CygTerm+ に変更がある場合は、64bit Cygwinでビルドした cygterm\cygterm+-x86_64\cygterm.exe をコミットする。<br />
+      ソース修正をコミットするときに、同時にバイナリがコミットされていれば、リリース時にこの工程を行う必要はない。
+-->
+    </p>
+  </li>
+  <li>Create installer.
     <ul>
-      <li>Visual Studio<br />
-          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
-      <li>Inno Setup<br />
-          http://www.jrsoftware.org/isdl.php</li>
-      <li>Oniguruma<br />
-          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
-      <li>OpenSSL<br />
-          http://www.openssl.org/</li>
-      <li>zlib<br />
-          http://www.zlib.net/</li>
-      <li>PuTTY<br />
-          http://www.chiark.greenend.org.uk/~sgtatham/putty/</li>
-      <li>SFMT<br />
-          http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html</li>
-      <li>CygTerm<br />
-          https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html</li>
+      <li>Version up AppVer and add "RC" in teraterm.iss.
+        <pre>
+- #define AppVer "4.105"
++ #define AppVer "4.106-RC1"
+        </pre>
+      </li>
+      <li>Comment out snapshot in teraterm.iss.
+        <pre>
+- #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
++ ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+        </pre>
+      </li>
+      <li>Change calling batch file to enable rebuild and create archive.
+        <pre>
+  [InnoIDE_PreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [InnoIDE_PostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+  
+  [PreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+  
+  [_ISToolPreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [_ISToolPostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+        </pre>
+      </li>
+      <li id="RC_commit">Commit this state.</li>
+      <li>Open teraterm\installer\teraterm.iss with ISTool, and create installer by "Project"-"Compile Setup."</li>
+      <li>Compress portable version with zip.</li>
     </ul>
   </li>
-  <li>Check the document files.</li>
-  <li>Increase the software version and modify date.
+  <li>Test run installer, run and connect in all supported OS.</li>
+  <li>Add to OSDN Release
     <ul>
-      <li>teraterm.iss<br />
-          remove "RC" from AppVer</li>
+      <li>Add new release (e.g. "4.106 RC") to "Tera Term RC" Package.</li>
+      <li>Add installer and portable zip file to new release.</li>
+    </ul>
+  </li>
+  <li>Announce RC release.
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> mailing list</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term">https://twitter.com/Tera_Term</a>)</li>
+    </ul>
+  </li>
+  <li>Get feedbacks.
+    <p>If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."</p>
+  </li>
+</ol>
+
+<h3>Release</h3>
+
+
+<ol>
+  <li>Confirm documents. (same as above)</li>
+  <li>Modify release date.
+    <ul>
       <li>html/about/hisotry.html</li>
     </ul>
-    Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.<br />
-    Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
   </li>
-  <li>When CygTerm+ is changed from previous version, please build the software with 64bit Cygwin and replace cygterm\cygterm+-x86_64\cygterm.exe.</li>
-  <li>Evaluate executable program file.
+  <li>Create installer.
     <ul>
-      <li>Make installer package<br />
-          Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.</li>
-      <li>Test Tera Term installation and evaluate it.</li>
+      <li>Change AppVer in teraterm.iss.
+        <pre>
+- #define AppVer "4.106-RC1"
++ #define AppVer "4.106"
+        </pre>
+      </li>
+      <li>Open teraterm\installer\teraterm.iss with ISTool, and create installer by "Project"-"Compile Setup."</li>
     </ul>
   </li>
+  <li>Commit this state.</li>
   <li>Create SVN tag.<br />
-      The naming rule is `teraterm-version'(ex. teraterm-4_82).<br />
-<pre>
-svn copy -m "Release 4.82" svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_82
-</pre>
+    The naming rule is `teraterm-version' (e.g. teraterm-4_106).
+    <pre>
+svn copy -m "Release 4.106" \
+    svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable \
+    svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
+    </pre>
   </li>
-  <li>Re-checkout from svn tag.</li>
-  <li>Make installer package
+  <li>Re-checkout from svn tag.<br />
+    <p>All source code is same as development branch. Only SVN revision is different.</p>
+  </li>
+  <li>Create installer.
     <ul>
-      <li>Edit "teraterm\installer\teraterm.iss"
-<pre>
-#define AppVer "4.???"
-;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-
-[InnoIDE_PreCompile]
-Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
-
-[InnoIDE_PostCompile]
-Name: makearchive.bat; Parameters: release
-
-[PreCompile]
-Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
-
-[PostCompile]
-Name: makearchive.bat; Parameters: release
-
-[_ISToolPreCompile]
-Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
-
-[_ISToolPostCompile]
-Name: makearchive.bat; Parameters: release
-</pre>
-      </li>
-      <li>Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.</li>
+      <li>Open teraterm\installer\teraterm.iss with ISTool, and create installer by "Project"-"Compile Setup."</li>
+      <li>Compress portable version with zip.</li>
     </ul>
   </li>
   <li>Update OSDN project site.
     <ul>
-      <li>Add new release.</li>
+      <li>add new release (e.g. "4.106") to "Tera Term" Package.</li>
+      <li>Add installer and portable zip file to new release.</li>
+<!--
+      <li>ドキュメントの変更履歴から、リリースの「変更履歴」に（Wikiフォーマットで）転記する（日本語・英語とも）</li>
+-->
       <li>Submit news.</li>
     </ul>
   </li>
-  <li>Announce release to mailing list(in Japan).</li>
-  <li>Update OSDN project home page.</li>
-  <li>Delete snapshots.</li>
-  <li>Announce release to forum(in Canada).<br />
-      Announcements http://logmett.com/support-forums/5<br />
-      Create new topic in `Announcements' entry.<br />
-      Change the type of previous Announcement from Announcement to Normal.<br />
-      Delete third previous Announcement.</li>
-  <li>Announce release to Twitter.<br />
-      https://twitter.com/Tera_Term<br />
-      Post release announcement and pin.</li>
+  <li>Update OSDN project home page (<a href="https://ttssh2.osdn.jp">https://ttssh2.osdn.jp</a>).
+    <p><a href="https://osdn.net/projects/ttssh2/wiki/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%83%9A%E3%83%BC%E3%82%B8%E3%81%AE%E6%9B%B4%E6%96%B0%E6%89%8B%E9%A0%86">How to update project home page (in Japanese).</a></p>
   </li>
-  <li>Update Chocolatey</li>
+  <li>Announce release.
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> mailing list</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term">https://twitter.com/Tera_Term</a>)
+        <ul>
+          <li>Pin announce tweet.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li id="revert_teraterm_iss">Revert teraterm.iss in development branch.
+    <pre>
+- ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
++ #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+
+  [InnoIDE_PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [InnoIDE_PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+  
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+  
+  [_ISToolPreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [_ISToolPostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+    </pre>
+  </li>
+  <li>Update Chocolatey.</li>
 </ol>
+
+<h3>About code freeze.</h3>
+
+<p>
+After code freeze, only critical bug fix is able to committed.<br />
+Code freeze start with <a href="#RC_commit">RC commit in development branch</a>, and end with <a href="#revert_teraterm_iss">revert teraterm.iss commit in development branch</a>.
+</p>
 
 </body>
 </html>

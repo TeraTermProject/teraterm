@@ -27,7 +27,7 @@
   <li><a href="#build-cygterm">CygTermのビルド方法</a></li>
   <li><a href="#build-ttxsamples">TTXSamplesのビルド方法</a></li>
   <li><a href="#build-htmlhelp">ヘルプファイルのビルド方法</a></li>
-  <li><a href="#release">リリースの方法</a></li>
+  <li><a href="#release">リリースの手順</a></li>
 </ol>
 
 <hr>
@@ -461,31 +461,82 @@ TTXSamplesのビルドにはVisual Studio 2005(VC++8.0)が必要です。Tera Term本体とは違
 </ol>
 
 
-<h2 id="release">リリースの方法</h2>
+<h2 id="release">リリースの手順</h2>
 
 <p>
-リリースの方法について以下に示します。
+TeraTerm Project でのリリース手順について以下に示します。
 </p>
 
+<h3>リリース作業の開始からRC作成まで</h3>
+
 <ol>
-  <li>RC 作成時にバージョンを一つインクリメントする。<br />
-      一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため、このタイミングとする(cf. TT_FILEMAPNAME 定義)。
+  <li>チケット、ブランチなどを確認する
+    <ul>
+      <li>プロジェクトチーム内で確認する
+        <ul>
+          <li>今回のリリースに入れるもの・次回以降に延期するものを整理・決定する</li>
+        </ul>
+      </li>
+      <li>ブランチをマージする
+        <ul>
+          <li>trunk と 4-stable 間、作業中のブランチなど</li>
+        </ul>
+      </li>
+      <li>チケットをクローズする
+        <ul>
+          <li>すでに修正済み、処理済みのものはクローズする<br />
+              リリース時には、対象のマイルストーンのチケットはすべてクローズされている状態になる</li>
+          <li>次のリリースへ回すものはマイルストーンを変更する<br />
+              次のリリース用マイルストーンを作成する</li>
+        </ul>
+      </li>
+      <li>この時点で新たに出てくるチケットの対応を検討する</li>
+    </ul>
+  </li>
+  <li>ツール、ライブラリ、インポート元の最新版をチェックする
+    <ul>
+      <li>Visual Studio (<a href="https://visualstudio.microsoft.com">https://visualstudio.microsoft.com</a>)</li>
+      <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php">https://jrsoftware.org/isdl.php</a>)</li>
+      <li>Oniguruma (<a href="https://github.com/kkos/oniguruma">https://github.com/kkos/oniguruma</a>)</li>
+      <li>OpenSSL (<a href="https://www.openssl.org">https://www.openssl.org</a>)</li>
+      <li>zlib (<a href="https://www.zlib.net">http://www.zlib.net</a>)</li>
+      <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
+      <li>SFMT (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
+      <li>cJSON (<a href="https://github.com/DaveGamble/cJSON">https://github.com/DaveGamble/cJSON</a>)</li>
+      <li>The reference C implementation of Argon2 (<a href="https://github.com/P-H-C/phc-winner-argon2">https://github.com/P-H-C/phc-winner-argon2</a>)</li>
+    </ul>
+    <p>リリースに使うバージョンはこの時点でおおむね決定する。</p>
+  </li>
+  <li>今回のリリースに入れたいものが落ち着く</li>
+</ol>
+
+<h3>RC作成からリリースまで</h3>
+
+<ol>
+  <li>ドキュメントを確認する
+    <ul>
+      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
+      <li>変更履歴を確認し、書き忘れがあれば追記する。</li>
+      <li>変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
+      <li>ドキュメント差分が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
+    </ul>
+  </li>
+  <li>バージョンを一つインクリメントする
+    <p>一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため、このタイミングとする（例: TT_FILEMAPNAME 定義 など）。</p>
     <ul>
       <li>teraterm\common\tt-version.h</li>
       <li>ttssh2\ttxssh\ttxssh-version.h</li>
-      <li>ttpmenu\ttpmenu.rc // only modifying</li>
-      <li>TTProxy\TTProxy.rc // only modifying</li>
-      <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
-      <li>installer\teraterm.iss
-        <ul>
-          <li>AppVer を上げ、"RC" を追加</li>
-          <li>snapshot を コメントアウト</li>
-          <li>バッチファイルの呼び出しを修正</li>
-        </ul>
-      </li>
+      <li>Onttpmenu\ttpmenu.rc // 変更時のみ</li>
+      <li>TTProxy\TTProxy.rc // 変更時のみ</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // 変更時のみ</li>
     </ul>
+    <p>
+      CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。<br />
+      修正がコミットされると即リリース扱いになり、リリース日はその日付となる。そのため、修正・バージョンのインクリメント・変更履歴を同時にコミットする。<br />
+      これはコンパイラの入手が容易なため。
+    </p>
   </li>
-  <li>この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする。
+  <li>この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする
     <ul>
       <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
       <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
@@ -510,116 +561,192 @@ TTXSamplesのビルドにはVisual Studio 2005(VC++8.0)が必要です。Tera Term本体とは違
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
-  <li>依存ライブラリ、ツール、インポート元の最新版をチェックする。
+  <li>64bit Cygwin バイナリを差し替える
+    <p>
+      前回のリリースから CygTerm+ に変更がある場合は、64bit Cygwinでビルドした cygterm\cygterm+-x86_64\cygterm.exe をコミットする。<br />
+      ソース修正をコミットするときに、同時にバイナリがコミットされていれば、リリース時にこの工程を行う必要はない。
+    </p>
+  </li>
+  <li>インストーラを作成する
     <ul>
-      <li>Visual Studio<br />
-          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
-      <li>Inno Setup<br />
-          http://www.jrsoftware.org/isdl.php</li>
-      <li>Oniguruma<br />
-          http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx</li>
-      <li>OpenSSL<br />
-          http://www.openssl.org/</li>
-      <li>zlib<br />
-          http://www.zlib.net/</li>
-      <li>PuTTY<br />
-          http://www.chiark.greenend.org.uk/~sgtatham/putty/</li>
-      <li>SFMT<br />
-          http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html</li>
-      <li>CygTerm<br />
-          https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html</li>
+      <li>teraterm.iss の AppVer を「次のバージョン-RC」とする
+        <pre>
+- #define AppVer "4.105"
++ #define AppVer "4.106-RC1"
+        </pre>
+      </li>
+      <li>teraterm.iss の snapshot をコメントアウトする
+        <pre>
+- #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
++ ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+        </pre>
+      </li>
+      <li>teraterm.iss から起動するバッチを、リリース用に「リビルド有効」「アーカイブ作成有効」にする
+        <pre>
+  [InnoIDE_PreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [InnoIDE_PostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+  
+  [PreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+  
+  [_ISToolPreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [_ISToolPostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+        </pre>
+      </li>
+      <li id="RC_commit">この状態でコミットする</li>
+      <li>ISTool で teraterm\installer\teraterm.iss を開き、"Project"-"Compile Setup" でインストーラを作成する</li>
+      <li>作成されたポータブル版を zip で圧縮する</li>
     </ul>
   </li>
-  <li>ドキュメントを確認する。
+  <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
+  <li>OSDN のリリース物件に追加する
     <ul>
-      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
-      <li>変更履歴の書き忘れを確認する。<br />
-       おおむね変更した順に追記される変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
-      <li>ドキュメント差分が翻訳されていることを確認する。</li>
+      <li>「Tera Term RC」パッケージに新しいリリース（例: "4.106 RC"）を追加する</li>
+      <li>新しいリリースに、インストーラ・ポータブル版の zip ファイルを追加する</li>
     </ul>
   </li>
-  <li>バージョンを上げ、日付を変更する。
+  <li>RCの作成をアナウンスする
     <ul>
-      <li>teraterm.iss<br />
-          AppVer から RC を削除</li>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> メーリングリスト</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term">https://twitter.com/Tera_Term</a>)</li>
+    </ul>
+  </li>
+  <li>フィードバックを受け入れる
+    <p>修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」</p>
+  </li>
+</ol>
+
+<h3>リリース作業</h3>
+
+<ol>
+  <li>ドキュメントを確認する (詳細は同上)</li>
+  <li>リリース日を変更する
+    <ul>
       <li>html/about/hisotry.html</li>
     </ul>
-    CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。<br />
-    パッチがコミットされると即リリース扱いになり、リリース日はその日付となる。<br />
-    これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
   </li>
-  <li>前回のリリースからCygTerm+に変更がある場合は、64bit Cygwinでビルドして cygterm\cygterm+-x86_64\cygterm.exe の差し替えを行う。</li>
-  <li>動作確認をする
+  <li>インストーラを作成する
     <ul>
-      <li>インストーラを作成する。<br />
-          ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される。</li>
-      <li>インストールおよび実行をテストする。</li>
-    </ul>
-  </li>
-  <li>SVN のタグを作成する。<br />
-      タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。<br />
-      <pre>
-svn copy -m "Release 4.82" svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_82
-      </pre>
-  </li>
-  <li>リリース用のタグでチェックアウトし直す。</li>
-  <li>インストーラを作成する。
-    <ul>
-      <li>teraterm\installer\teraterm.iss を編集する
-<pre>
-#define AppVer "4.???"
-;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-
-[InnoIDE_PreCompile]
-Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
-
-[InnoIDE_PostCompile]
-Name: makearchive.bat; Parameters: release
-
-[PreCompile]
-Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
-
-[PostCompile]
-Name: makearchive.bat; Parameters: release
-
-[_ISToolPreCompile]
-Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
-
-[_ISToolPostCompile]
-Name: makearchive.bat; Parameters: release
-</pre>
+      <li>teraterm.iss の AppVer を変更する
+        <pre>
+- #define AppVer "4.106-RC1"
++ #define AppVer "4.106"
+        </pre>
       </li>
-      <li>ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される</li>
+      <li>ISTool で teraterm\installer\teraterm.iss を開き、"Project"-"Compile Setup" で作成する</li>
     </ul>
   </li>
-  <li>OSDN を更新する。
+  <li>この状態でコミットする</li>
+  <li>SVN のタグを作成する<br />
+    タグ名は「teraterm-バージョン」。（例: v4.106ならば"teraterm-4_106"）
+    <pre>
+svn copy -m "Release 4.106" \
+    svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable \
+    svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
+    </pre>
+  </li>
+  <li>リリース用のタグでチェックアウトし直す<br />
+    <p>SVN のリビジョン以外のすべてが、開発ブランチと同じ状態になる</p>
+  </li>
+  <li>インストーラを作成する
     <ul>
-      <li>[ダウンロード]-[管理]-[新規作成]<br />
-          変更履歴を入力してリリースを作成する。</li>
-      <li>[ニュース一覧]-[新規登録]<br />
-          ニュース記事を作成する。</li>
+      <li>ISTool で teraterm\installer\teraterm.iss を開き、"Project"-"Compile Setup" で作成する</li>
+      <li>作成されたポータブル版を zip で圧縮する</li>
     </ul>
   </li>
-  <li>メーリングリストにアナウンスする。</li>
-  <li>プロジェクトページを更新する。</li>
-  <li>スナップショットを削除する。</li>
-  <li>Twitter に告知する。<br />
-      https://twitter.com/Tera_Term<br />
-      リリース告知をツイートして固定する。</li>
+  <li>OSDN を更新する
+    <ul>
+      <li>「Tera Term」パッケージに新しいリリース（例: "4.106"）を追加する</li>
+      <li>新しいリリースに、インストーラ・ポータブル版の zip ファイルを追加する</li>
+      <li>ドキュメントの変更履歴から、リリースの「変更履歴」に（Wikiフォーマットで）転記する（日本語・英語とも）</li>
+      <li>ニュース記事を作成する</li>
+    </ul>
   </li>
-  <li>フォーラムに告知する。<br />
-      Announcements http://logmett.com/support-forums/5<br />
-      Announcements に新規投稿する。種類は Announcement。<br />
-      一つ前の Announcement の種類を Normal に変更する。<br />
-      Announcement は三個残すことになっているので、三つ前の Announcement を削除する。</li>
-  <li>Chocolatey の登録を更新</li>
+  <li>プロジェクトページ (<a href="https://ttssh2.osdn.jp">https://ttssh2.osdn.jp</a>) を更新する
+    <p>更新のしかたは <a href="https://osdn.net/projects/ttssh2/wiki/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%83%9A%E3%83%BC%E3%82%B8%E3%81%AE%E6%9B%B4%E6%96%B0%E6%89%8B%E9%A0%86">プロジェクトページの更新手順</a> を参照</p>
+  </li>
+  <li>リリースをアナウンスする
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> メーリングリスト</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term">https://twitter.com/Tera_Term</a>)
+        <ul>
+          <li>リリースアナウンスのツイートを固定ツイートにする</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li id="revert_teraterm_iss">開発ブランチの teraterm.iss を戻し、コミットする
+    <pre>
+- ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
++ #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+
+  [InnoIDE_PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [InnoIDE_PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+  
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+  
+  [_ISToolPreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [_ISToolPostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+    </pre>
+  </li>
+  <li>Chocolatey の登録を更新する</li>
 </ol>
+
+<h3>コードフリーズについて</h3>
+
+<p>
+コードフリース中は、原則的には致命的なバグの修正のみ可能となります。<br />
+コードフリーズは、RC作成（<a href="#RC_commit">開発ブランチ で teraterm.iss に RC を付けるコミット</a>）</a>からリリース（<a href="#revert_teraterm_iss">開発ブランチの teraterm.iss を戻すコミット</a>）までとします。
+</p>
 
 </body>
 </html>
