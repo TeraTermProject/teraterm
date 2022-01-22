@@ -99,6 +99,7 @@ sub check_html_file {
 
 	open(FP, "<:crlf:encoding(sjis)", "$filename") || return;
 	$no = 1;
+	my $find_title = 0;
 	while ($line = <FP>) {
 #		$line = chomp($line);
 #		print "$line\n";
@@ -108,10 +109,17 @@ sub check_html_file {
 			$val = $1;
 			$val =~ s/"/&#34;/g;  # 二重引用符をエスケープする
 			write_add_index($filename, $val);
+			$find_title = 1;
 			last;
 		}
 
 		$no++;
+	}
+	if ($find_title == 0) {
+		# タイトルがないhtmlのときファイル名をタイトルとする
+		$filename =~ /\/([^\/]+)\.html$/;
+		my $title = $1;
+		write_add_index($filename, $title);
 	}
 	close(FP);
 }
