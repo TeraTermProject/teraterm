@@ -28,3 +28,6 @@ set REF_J=ja\html\reference
 %TOSJIS% -i %REF_E%/keyboard_cfg.md     -o %REF_E%/keyboard_cfg.html
 %TOSJIS% -i %REF_J%/menu_id.md          -o %REF_J%/menu_id.html
 %TOSJIS% -i %REF_E%/menu_id.md          -o %REF_E%/menu_id.html
+
+%TOSJIS% -i ja/html/setup/folder.md     -o ja/html/setup/folder.html
+%TOSJIS% -i en/html/setup/folder.md     -o en/html/setup/folder.html

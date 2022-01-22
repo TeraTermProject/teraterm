@@ -91,6 +91,9 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND"))
   ConvertHTML("-i ${REF_E}/menu_id.md                    -o ${REF_E}/menu_id.html")
   ConvertHTML("-i ${REF_J}/menu_id.md                    -o ${REF_J}/menu_id.html")
 
+  ConvertHTML("-i en/html/setup/folder.md                -o en/html/setup/folder.html")
+  ConvertHTML("-i ja/html/setup/folder.md                -o ja/html/setup/folder.html")
+
   execute_process(
     COMMAND ${PERL} htmlhelp_index_make.pl en html -o en/Index.hhk
     COMMAND ${PERL} htmlhelp_index_make.pl ja html -o ja/Index.hhk
