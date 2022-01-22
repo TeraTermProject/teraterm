@@ -1,8 +1,8 @@
-﻿# メニュー ID 表
+﻿# LIST OF MENU IDs
 
 ## VT window
 
-    メニューコマンド                    ID
+    Menu command                        ID
     -----------------------------------------
     [File] New connection               50110
     [File] Duplicate session            50111
@@ -73,8 +73,7 @@
     [Help] Index                        50910
     [Help] About Tera Term              50990
 
-
-    TTSSH メニューコマンド              ID
+    TTSSH Menu command                  ID
     -----------------------------------------
     [Setup] SSH                         52310
     [Setup] SSH Authentication          52320
@@ -82,12 +81,12 @@
     [Setup] SSH KeyGenerator            52340
     [Help] About TTSSH                  52910
 
-    TTProxy メニューコマンド            ID
+    TTProxy Menu command                ID
     -----------------------------------------
     [Setup] Proxy                       53310
     [Help] About TTProxy                53910
 
-    TTXKanjiMenu メニューコマンド       ID
+    TTXKanjiMenu Menu command           ID
     -----------------------------------------
     [KanjiCode] Recv: Shift_JIS         54010
     [KanjiCode] Recv: EUC-JP            54011
@@ -100,45 +99,45 @@
     [KanjiCode] Send: UTF-8             54113
     [KanjiCode] Use one setting         54200
 
-    TTXAlwaysOnTop メニューコマンド     ID
+    TTXAlwaysOnTop Menu command         ID
     -----------------------------------------
     [Control] Always on top             55000
-    -- SetWindowPos(HWND_TOP)           55001 (メニュー割り当て無し)
-    -- SetWindowPos(HWND_BOTTOM)        55002 (メニュー割り当て無し)
-    -- SetWindowPos(HWND_TOPMOST)       55003 (メニュー割り当て無し)
-    -- SetWindowPos(HWND_NOTOPMOST)     55004 (メニュー割り当て無し)
-    
-    TTXResizeMenu メニューコマンド      ID
+    -- SetWindowPos(HWND_TOP)           55001 (not in menu)
+    -- SetWindowPos(HWND_BOTTOM)        55002 (not in menu)
+    -- SetWindowPos(HWND_TOPMOST)       55003 (not in menu)
+    -- SetWindowPos(HWND_NOTOPMOST)     55004 (not in menu)
+
+    TTXResizeMenu Menu command          ID
     -----------------------------------------
     [Resize] Menu(1) - Menu(20)         55101 - 55120
-    -- Increase window width            55151 (メニュー割り当てなし)
-    -- Decrease window width            55152 (メニュー割り当てなし)
-    -- Increase window height           55153 (メニュー割り当てなし)
-    -- Decrease window height           55154 (メニュー割り当てなし)
+    -- Increase window width            55151 (not in menu)
+    -- Decrease window width            55152 (not in menu)
+    -- Increase window height           55153 (not in menu)
+    -- Decrease window height           55154 (not in menu)
 
-    TTXViewMode メニューコマンド        ID
+    TTXViewMode Menu command            ID
     -----------------------------------------
     [Setup] ViewMode password           55200
     [Control] View mode                 55210
 
-    TTXttyrec メニューコマンド          ID
+    TTXttyrec Menu command              ID
     -----------------------------------------
     [File] TTY Record                   55301
 
-    TTXttyplay メニューコマンド         ID
+    TTXttyplay Menu command             ID
     -----------------------------------------
     [File] TTY Replay                   55302
 
-    TTXRecurringCommand メニューコマンド ID
+    TTXRecurringCommand Menu command    ID
     -----------------------------------------
     [Setup] Recurring Command           55500
     [Control] Recurring Command         55501
-    -- Enable Recurring Command         55502 (メニュー割り当て無し)
-    -- Disable Recurring Command        55503 (メニュー割り当て無し)
+    -- Enable Recurring Command         55502 (not in menu)
+    -- Disable Recurring Command        55503 (not in menu)
 
 ## TEK window
 
-    メニューコマンド                    ID
+    Menu command                        ID
     -----------------------------------------
     [File] Print                        51110
     [File] Exit                         51190

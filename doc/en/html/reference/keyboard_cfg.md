@@ -1,11 +1,11 @@
-﻿# キーボード設定ファイルについて
+﻿# ABOUT THE KEYBOARD SETUP FILE
 
-## キーボード設定ファイルの形式
+## FORMAT OF THE KEYBOARD SETUP FILE
 
-キーボード設定ファイルの中で用いられる PC key code は PC の各キーまたはキーの
-組み合わせに対応した数値で、使用するキーボードによって異なります。
+Each key or key combination has a unique key code, which is called
+"PC key code".
 
-キーボード設定ファイルには次の6つのセクションが存在します。
+The keyboard setup file has six sections.
 
 - [VT editor keypad]
 - [VT numeric keypad]
@@ -14,39 +14,43 @@
 - [Shortcut keys]
 - [User keys]
 
-### [VT editor keypad] セクション
+### [VT editor keypad] section
 
-VT 端末のエディターキーを PC キーに割り当てます。
+In this section, VT editor keys are assigned to PC keys.
 
-	形式:
+	Format:
 		<VT editor key name>=<PC key code>
+
+	where:
 
 	<VT editor key name>
 		Up, Down, Right, Left, Find, Insert, Remove, Select,
 		Prev, Next
 
-	<PC key code>
-		PC key code (10進数)
+	  <PC key code>
+		PC key code (decimal number)
 
-	例:
+	Example:
 		Up=328
 
-### [VT numeric keypad] セクション
+### [VT numeric keypad] section
 
-VT端末の数値キーを PC キーに割り当てます。
+In this section, VT numeric keys are assigned to PC keys.
 
-	形式:
+	Format:
 		<VT numeric key name>=<PC key code>
 
-	<VT numeric key name>
+	where:
+
+	  <VT numeric key name>
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
 		Num9, NumMinus, NumComma, NumPeriod, NumEnter, PF1,
 		PF2, PF3, PF4
 
-	<PC key code>
-		PC key code (10進数)
+	  <PC key code>
+		PC key code (decimal number)
 
-	例:
+	Example:
 		Num0=82
 
 #### 注意
@@ -58,153 +62,155 @@ VT 端末ではメインキーパッドの "Enter" キーと数値キーパッ�
 PC key code を発生するキーボード(例えば PC9801 キーボード)の場合は
 注意が必要です。
 
-### [VT function keys] セクション
+### [VT function keys] section
 
-VT 端末のファンクションキーを PC キーに割り当てます。
+In this section, VT function keys are assigned to PC keys.
 
-	形式:
+	Format:
 		<VT function key name>=<PC key code>
 
-	<VT function key name>
-		(VT 端末のファンクションキー)
+	where:
+
+	  <VT function key name>
+		(Function keys of VT terminal)
 		Hold, Print, Break, F6, F7, F8, F9, F10, F11, F12,
 		F13, F14, Help, Do, F17, F18, F19, F20
-		(VT 端末の"ユーザー定義キー")
+		("User defined keys" of VT terminal)
 		UDK6, UDK7, UDK8, UDK9, UDK10, UDK11, UDK12, UDK13,
 		UDK14, UDK15, UDK16, UDK17, UDK18, UDK19, UDK20
 
-	<PC key code>
-		PC key code (10進数)
+	  <PC key code>
+		PC key code (decimal number)
 
-	例:
+	Example:
 		F6=64
 
-### [X function keys] セクション
+### [X function keys] section
 
-Xterm の F1-F5 キー、およびバックタブキーを PC キーに割り当てます。
+In this section, Xterm F1-F5 keys and BackTab key are assigned to PC keys.
 
-	形式:
+	Format:
 		<Xterm function key name>=<PC key code>
 
-	<Xterm function key name>
+	where:
+
+	  <Xterm function key name>
 		XF1, XF2, XF3, XF4, XF5, XBackTab
 
-	<PC key code>
-		PC key code (10進数)
+	  <PC key code>
+		PC key code (decimal number)
 
-	例:
+	Example:
 		XF1=59
 
-### [Shortcut keys] セクション
+### [Shortcut keys] section
 
-Tera Term の機能をPC キーに割り当てます。
+In this section, Tera Term functions are assigned to PC keys.
 
-	形式:
+	Format:
 		<Shortcut key name>=<PC key code>
 
-	<Shortcut key name>	機能
-	---------------------------------------------------------
-	EditCopy		[Edit] Copy コマンド
-	EditPaste		[Edit] Paste コマンド
-	EditPasteCR		[Edit] Paste<CR> コマンド
-	EditCLS 		[Edit] Clear screen コマンド
-	EditCLB 		[Edit] Clear buffer コマンド
-	ControlOpenTEK		[Control] Open TEK コマンド
-	ControlCloseTEK 	[Control] Close TEK コマンド
-	LineUp			一行スクロールアップ
-	LineDown		一行スクロールダウン
-	PageUp			一ページスクロールアップ
-	PageDown		一ページスクロールダウン
-	BuffTop 		バッファー先頭へスクロール
-	BuffBottom		バッファー最後へスクロール
-	NextWin 		次の Tera Term ウィンドウへ移動
-	PrevWin 		前の Tera Term ウィンドウへ移動
-	NextShownWin 		次の最小化されていない Tera Term ウィンドウへ移動
-	PrevShownWin 		前の最小化されていない Tera Term ウィンドウへ移動
-	LocalEcho		Local echo を on/off する
+	where:
+	  <Shortcut key name>	Function
+	  --------------------------------------------
+	  EditCopy		[Edit] Copy command
+	  EditPaste		[Edit] Paste command
+	  EditPasteCR		[Edit] Paste<CR> command
+	  EditCLS		[Edit] Clear screen command
+	  EditCLB		[Edit] Clear buffer command
+	  ControlOpenTEK	[Control] Open TEK command
+	  ControlCloseTEK	[Control] Close TEK command
+	  LineUp		Scrolls up screen by 1 line
+	  LineDown		Scrolls down by 1 line
+	  PageUp		Scrolls up by 1 page
+	  PageDown		Scrolls down by 1 page
+	  BuffTop		Scrolls screen to buffer top
+	  BuffBottom		Scrolls screen to buffer bottom
+	  NextWin		Moves to the next Tera Term window
+	  PrevWin		Moves to the previous Tera Term window
+	  NextShownWin		Moves to the next Tera Term window (except minimized)
+	  PrevShownWin		Moves to the previous Tera Term window (except minimized)
+	  LocalEcho		Toggles the local echo status
 
-	<PC key code>
-		PC key code (10進数)
+	  <PC key code>
+		PC key code (decimal number)
 
-	例:
+	Example:
 		LineUp=1352
 
-### [User keys] セクション
+### [User keys] section
 
-ユーザーキーと、そのキーを押したときに実行される機能
-(文字列の送出、マクロファイルの実行、メニューコマンドの実行)を
-定義します。
+This section defines user keys for functions, sending a character
+string, executing a macro file or executing a menu command.
 
-	形式:
-		<User key name>=<PC key code>,<Control flag>,<文字列>
-		<User key name>=off
+	Format:
+		<User key name>=<PC key code>,<Control flag>,
+				<Character string>
 
-	<User key name>
+	where:
+
+	  <User key name>
 		User1, User2, User3,...., User99
-		最大99個まで設定可能
+		Maximum number of user keys is 99. 
+		For example, if you want to define ten user keys,
+		you must use the first ten names, from "User1" to "User10".
 
-	<PC key code>
-		PC key code (10進数)
+	  <PC key code>
+		PC key code (decimal number)
 
-	<Control flag>
-		キーを押したときに <文字列> をどのように取り扱うかを指定
-		するフラグ。
-			0	<文字列>をそのまま(8bit/文字として)送出する。
-			1	<文字列>に含まれる文字や改行コードを
-				Tera Term の設定にあわせて変換し、変換
-				された文字列を送出する。
-			2	<文字列>のファイル名のマクロファイルを
-				実行する。
-			3	メニュー ID <文字列> で指定される
-				Tera Term のメニューコマンドを実行する。
+	  <Control flag>
+		Control flag which specifies how <character string>
+		is treated when the PC key is pressed.
+			0	<Character string> is sent as it is.
+			1	New-line codes in <Character string>
+				are converted by Tera Term and
+				the converted string is sent.
+			2	A macro file which has the name of
+				<Character string> is executed.
+			3	A Tera Term menu command specified
+				by the menu ID <Character string> is
+				executed.
 
-	<文字列>:
-		<Control flag> が 0 または 1 の場合、キーを押したときに
-		送出される文字列。表示不可能な文字(制御文字等)はその
-		文字コードを $ と2文字の16進数で表現する。
-		(例: CR 文字は '$0D')。"$" そのものは "$24" で表現する。
-		Tera Term 内部では設定ファイルはUTF-16(16bit/文字)で処理している。
-		<Control flag> が 0 の場合、8bit/文字として処理する。
-		U+0000..U+00FFは$00..$FFとしてそのまま送信する。
-		それ以外は$FFとして送信する。
-			U+0000..U+007F=基本ラテン文字
-			U+0080..U+00FF=ラテン1補助
-		<Control flag> が 1 の場合、
-		Unicode文字列として処理する。
+	  <Character string>
+		If <Control flag> is 0 or 1, <Character string>
+		represents the character string to be sent.
+		A non-printable character (control character) in
+		the string can be expressed as a "$" and ASCII code
+		in two-character hex number. For example, CR character
+		is expressed as "$0D". "$" itself is expressed as "$24".
+		See "Appendix A  ASCII CODE TABLE".
 
-		<Control flag> が 2 の場合、
-		実行されるマクロファイルのファイル名。
+		If <Control flag> is 2, <Character string> specifies
+		the macro file name to be executed.
 
-		<Control flag> が 3 の場合、
-		実行されるメニューコマンドのメニュー ID (数字)。
-		メニュー IDについては「メニュー ID 表」参照。
+		If <Control flag> is 3, <Character string> is the menu
+		ID which specifies the menu command to be executed.
+		The menu ID should be expressed as a decimal number.
+		See "Appendix B  LIST OF MENU IDs".
 
-	例:
+	Example:
 		User1=1083,0,telnet myhost
 		User2=1084,0,$0D$0A
-		User3=1085,1,こんにちは。
+		User3=1085,1,$0D
 		User4=1086,2,test.ttl
 		User5=1087,3,50110
 
-## 注意
+## NOTE
 
-1つの PC key code はキーボード設定ファイルの中で一回だけ使用することが
-できます。もし、1つの PC key code を複数のキー定義で使用した場合、
-Tera Term がキーボード設定ファイルを読み込んだときに、
-"Key code XXX is used more than once" という警告メッセージが表示されます。
-この場合ある一つのキー定義だけが有効になり、その他は無視されます。
+You can use a PC key code only once in the setup file.
+If you use a PC key code for multiple key assignments,
+the warning message "Key code XXX is used more than once" is
+displayed when the file is loaded by Tera Term. In this case,
+one of the assignments becomes effective and others are ignored.
 
-あるキー設定項目にどの PC キーも割り当てたくない場合は、以下のように
-PC key code の代わりに "off" を指定してください。
+If you don't want to assign a key item to any PC key,
+use the word "off" like the following:
 
-    EditCopy=off
+EditCopy=off
 
-## 可能なキーの組み合わせ
+## KEY COMBINATIONS
 
-キーボード設定ファイルで設定可能な PC のキーは, KEYCODE.EXE で PC key code が
-表示されるキーです。単一のキーだけでなく、Ctrl, Shift, Alt を用いたキーの組み
-合わせでも PC key code を表示させることができます。可能な組み合わせを
-以下に示します。
+The following key combinations are acceptable to Tera Term and KEYCODE.EXE:
 
 	Shift+key
 	Ctrl+key
@@ -213,66 +219,68 @@ PC key code の代わりに "off" を指定してください。
 	Ctrl+Alt+key
 	Shift+Ctrl+Alt+key
 
-Tera Term や Windows のショートカットキーに割り当てられているキーの組み合わせ
-(例えば Alt+key など)はキーボード設定ファイルで指定できません。
+Since some combinations (such as Alt+key) are used as shortcut keys of
+Tera Term and Windows, they don't have PC key codes and can't be specified
+in the keyboard setup file.
 
-ただし、Altキーをメタ・キーとして使う設定にしている場合(設定->キーボードにある
-Metaキーにチェックをいれている状態)はAlt+keyも指定する事ができます。
-キーコードは KEYCODE.EXE で調べられますが、単体のAltキーとの組合せには
-対応していません。Altキーとの組合せでのキーコードを調べるには、単独での
-キーコードを調べて、その値に2048を足してください。
+[NOTE]
+You can specify `Alt+key' combination when Alt key uses meta key. Check
+`Meta key' under Keyboard of Setup menu. The key code can be obtained by
+KEYCODE.EXE, unfortunately the key code of `Alt+key' combination can not
+be obtained. Also, you obtain the key code and add 2048 on the value.
 
-たとえば、Alt+Vのキーコードは V が 47 なので、2095 となります。
+For example, the `V' key code is 47, also `Alt+V' key code is 2095.
 
-    ; Shift + Insert
-    EditPaste=850
+; Shift + Insert
+EditPaste=850
 
-これを例えば EditPaste=2095 に変更すれば、Metaキーをパススルーにしていても
-Alt+Vで張り付けができるようになります。
+If you change above entry to `EditPaste=2095', you can paste by using
+`Alt+V' on condition that Meta key is pass through.
 
-Shift+Insertを残したままAlt+Vでの張り付けを行いたい場合は、KEYBOARD.CNF の
-[User keys]セクションに以下の設定を追加します。
+You add in the following entry to [User keys] section in KEYBOARD.CNF if
+you wan to paster by using `Alt+V' remaining `Shift+Insert' function.
 
-    User1=2095,3,50230
+User1=2095,3,50230
 
 ## Q & A
 
-- Q. Tera Term を起動するたびに "Key code XXX is used more than once" という
-   メッセージがでる。
-- A. 「注意」を参照。
+- Q. Every time I run Tera Term, the warning message
+   "Key code XXX is used more than once" is displayed.
+- A. See "3.2 NOTE".
 
-- Q. PC の F1 キーを VT100 の PF1 キーとして使いたい。以下のように設定したが
-   うまくいかない。
-
-	[VT function keys]
-	F1=PF1		(これはまちがい)
-
-- A. 左辺は **PC** のキーの名前ではなく **VT端末** のキーの名前を指定しなけ
-   ればなりません。また、右辺にはキーの名前ではなく、キーコードを指定して
-   ください。
-   また、キー設定を変えるときは、キーコードの重複使用をしないようにして
-   ください。
-
-   以下のように設定してください。
+- Q. I want to use the PC "F1" key as the VT100 PF1 key. I edit the 
+   keyboard setup file like the following but it does not work:
 
 	[VT function keys]
-	PF1=59			(59 は F1 キーのキーコード)
+	F1=PF1		(This is wrong.)
+
+- A. The left hand side can not be the name of a **PC key** but
+   the name of a **VT terminal key**. The right hand side can not be
+   the name of a key but a PC key code.
+   See "3.1 FORMAT OF THE KEYBOARD SETUP FILE".
+   You should also be careful not to specify a PC key code more than
+   once in the setup file (see "3.2 NOTE").
+
+   Edit the keyboard setup file like the following:
+
+	[VT function keys]
+	PF1=59			(59 is the keycode for the F1 key.)
 	[X function keys]
-	;XF1=59			(キーコード 59 の重複使用をさける)
-	XF1=off			("off" で置き換える)
+	;XF1=59			(Avoid specifying 59 twice.)
+	XF1=off			(Replace 59 by "off".)
 
-- Q. F1 キーを押したときにエスケープシーケンス ESC [ A を送出するように
-   するための設定方法は?
-- A. ユーザーキーを使えば、好きな文字列を送出することができます。
-   くわしくは、「3.1 キーボード設定ファイルの形式」を読んでください。
-   また、キー設定を変えるときは、キーコードの重複使用をしないようにして
-   ください(「3.2 注意」を参照)。
+- Q. How to edit the keyboard setup file to assign the F1 key
+   for sending the escape sequence "ESC [ A"?
+- A. You can send any character string by using a user key.
+   See "3.1 FORMAT OF THE KEYBOARD SETUP FILE".
+   You should also be careful not to specify a PC keycode more than
+   once in the setup file (see "3.2 NOTE").
 
-   以下のように設定してください。
+   Edit the keyboard setup file like the following:
 
 	[X function keys]
-	;XF1=59			(F1 キーのキーコード 59 の重複使用をさける)
-	XF1=off			("off" で置き換える)
+	;XF1=59			(59 is the keycode for the F1 key.)
+					(Avoid specifying 59 twice.)
+	XF1=off			(Replace 59 by "off".)
 	[User keys]
-	User1=59,0,$1B[A		(ESC の ASCII コードは $1B)
-
+	User1=59,0,$1B[A		(The ASCII code for ESC is $1B.)
