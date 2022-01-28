@@ -800,9 +800,9 @@ void logputs(int level, char *msg)
 	if (level <= pvar->settings.LogLevel) {
 		int file;
 
-		wchar_t *fname = get_teraterm_dir_relative_nameW(L"TTSSH.LOG");
+		wchar_t *fname = get_log_dir_relative_nameW(L"TTSSH.LOG");
 		file = _wopen(fname, _O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
-					  _S_IREAD | _S_IWRITE);
+		              _S_IREAD | _S_IWRITE);
 		free(fname);
 
 		if (file >= 0) {
@@ -2446,7 +2446,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 }
 
 /**
- *	ファイル名をフルパスに変換する
+ *	ファイル名を exe のあるフォルダからの相対パスとみなし、フルパスに変換する
  *	@return	フルパスファイル名
  *			free()すること
  */
@@ -2533,7 +2533,8 @@ int copy_teraterm_dir_relative_path(char *dest, int destsize,
 }
 
 /**
- *	ファイル名をフルパスに変換する
+ *	ファイル名を個人用設定ファイルフォルダからの相対パスとみなし、フルパスに変換する
+ *		%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
  *	@return	フルパスファイル名
  *			free()すること
  */
@@ -2546,6 +2547,25 @@ wchar_t *get_home_dir_relative_nameW(const wchar_t *basename)
 	}
 
 	path = GetHomeDirW(NULL);
+	awcscats(&path, L"\\", basename, NULL);
+	return path;
+}
+
+/**
+ *	ファイル名をログ保存フォルダからの相対パスとみなし、フルパスに変換する
+ *		%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
+ *	@return	フルパスファイル名
+ *			free()すること
+ */
+wchar_t *get_log_dir_relative_nameW(const wchar_t *basename)
+{
+	wchar_t *path;
+
+	if (!IsRelativePathW(basename)) {
+		return _wcsdup(basename);
+	}
+
+	path = GetLogDirW();
 	awcscats(&path, L"\\", basename, NULL);
 	return path;
 }
