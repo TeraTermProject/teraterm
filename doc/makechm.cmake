@@ -86,8 +86,6 @@ if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND"))
   ConvertHTML("-i ${REF_J}/build_with_cmake.md           -o ${REF_J}/build_with_cmake.html")
   ConvertHTML("-i ${REF_E}/build_library_with_cmake.md   -o ${REF_E}/build_library_with_cmake.html")
   ConvertHTML("-i ${REF_J}/build_library_with_cmake.md   -o ${REF_J}/build_library_with_cmake.html")
-  ConvertHTML("-i ${REF_E}/keyboard_cfg.md               -o ${REF_E}/keyboard_cfg.html")
-  ConvertHTML("-i ${REF_J}/keyboard_cfg.md               -o ${REF_J}/keyboard_cfg.html")
   ConvertHTML("-i ${REF_E}/menu_id.md                    -o ${REF_E}/menu_id.html")
   ConvertHTML("-i ${REF_J}/menu_id.md                    -o ${REF_J}/menu_id.html")
 

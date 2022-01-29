@@ -552,13 +552,6 @@
 			<param name="Local" value="html\setup\keyboard.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
-			<UL>
-			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="キーボード設定ファイル詳細">
-				<param name="Local" value="html\reference\keyboard_cfg.html">
-				<param name="ImageNumber" value="11">
-			</OBJECT>
-			</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="TTSSH known_hosts ファイル">
 			<param name="Local" value="html\setup\knownfiles.html">
