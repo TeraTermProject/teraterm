@@ -740,8 +740,13 @@ DWORD WINAPI _ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize
 	char dstA[MAX_PATH];	// MAX_PATH?
 	DWORD r = ExpandEnvironmentStringsA(srcA, dstA, sizeof(dstA));
 	wchar_t *dstW = ToWcharA(dstA);
-	wcsncpy_s(lpDst, nSize, dstW, _TRUNCATE);
 	r = (DWORD)wcslen(dstW);
+	if (lpDst == NULL || nSize == 0) {
+		r++;
+	}
+	else {
+		wcsncpy_s(lpDst, nSize, dstW, _TRUNCATE);
+	}
 	free(srcA);
 	free(dstW);
 	return r;
