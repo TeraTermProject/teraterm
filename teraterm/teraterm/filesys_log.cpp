@@ -1344,18 +1344,13 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
  */
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 {
-	// フォルダ
-	char FileDirExpanded[MAX_PATH];
 	const char *logdir;
+
 	if (strlen(ts.LogDefaultPath) > 0) {
 		logdir = ts.LogDefaultPath;
 	}
-	else if (strlen(ts.FileDir) > 0) {
-		ExpandEnvironmentStrings(ts.FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-		logdir = FileDirExpanded;
-	}
 	else {
-		logdir = ts.HomeDir;
+		logdir = ToCharW(ts.LogDirW);
 	}
 
 	// 元となるファイル名

@@ -192,7 +192,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
-  <dd>起動時にログを開始</dd>
+  <dd>起動時にログを開始<br />
+      ファイル名に含まれた<a href="../menu/setup-additional-log.html#LogFileNameFormat">Tera Term と strftime の書式</a>が解釈されます。<br />
+      ファイル名が絶対パスでないときは、<a href="../menu/setup-additional-log.html#LogDefaultPath">標準のログ保存先</a>からの相対パスと見なされます。それが設定されていない場合は<a href="../setup/folder.html#LogDir">ログフォルダ</a>からの相対パスと見なされます。</dd>
 
   <dt id="la">/LA=&lt;language&gt;</dt>
   <dd>言語モード

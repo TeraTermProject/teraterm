@@ -3341,8 +3341,11 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
 		if (ts.LogFN == NULL || ts.LogFN[0] == 0) {
 			ts.LogFNW = FLogGetLogFilename(NULL);
-			WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
 		}
+		else {
+			ts.LogFNW = FLogGetLogFilename(ToWcharA(ts.LogFN));
+		}
+		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
 		if (ts.LogFN[0]!=0) {
 			FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
 		}

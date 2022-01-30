@@ -19,12 +19,15 @@
 
       <dt id="LogDefaultName">Default log file name(strftime format)</dt>
       <dd>
-	Specify default log file name. It can include a format of strftime.
+	Specify default log file name.<br />
+	<span id="LogFileNameFormat">It can include formats of Tera Term and strftime.</span>
 <pre>
-SYNOPSIS:
+SYNOPSIS of Tera Term:
 &amp;h      Host name(or empty when not connecting)
 &amp;p      TCP port number(or empty when not connecting, not TCP connection)
 &amp;u      Logon user name
+
+SYNOPSIS of strftime:
 %a      Abbreviated weekday name
 %A      Full weekday name
 %b      Abbreviated month name
@@ -53,16 +56,8 @@ SYNOPSIS:
 
       <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
-	    <p>標準のログ保存先を指定します。
-
-        <p>指定がない場合は、teraterm.ini の [Tera Term] セクション FileDir で指定された
-          環境変数を展開されたのフォルダを使用します。
-          (文字列に環境変数が含まれていると展開されます)
-
-        <p>設定されていない場合は、OSのダウンロードフォルダが使用します。
-
-        <p>使用できない場合は、ttermpro.exeのフォルダが使用します。
-
+	    <p>Specify default log save folder that is used when log file name is not a full path.<br />
+           If it is not specified, <a href="../setup/folder.html#LogDir">log folder</a> is used.
       </dd>
 
       <dt id="LogAutoStart">Auto start logging</dt>

@@ -191,7 +191,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
-  <dd>Start Tera Term with logging.</dd>
+  <dd>Start Tera Term with logging.<br />
+      File name can include <a href="../menu/setup-additional-log.html#LogFileNameFormat">formats of Tera Term and strftime</a>.<br />
+      If this value is not a full path, it is understood as a relative path from <a href="../menu/setup-additional-log.html#LogDefaultPath">default log save folder</a>. If it is not specified, file name is understood as a relative path from <a href="../setup/folder.html#LogDir">log folder</a>.</dd>
 
   <dt id="la">/LA=&lt;language&gt;</dt>
   <dd>Language mode.
