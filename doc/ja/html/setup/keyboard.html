@@ -105,13 +105,13 @@ VT 端末のエディターキーを PC キーに割り当てます。
 
 <pre>
 	形式:
-		<VT editor key name>=<PC key code>
+		&lt;VT editor key name&gt;=&lt;PC key code&gt;
 
-	<VT editor key name>
+	&lt;VT editor key name&gt;
 		Up, Down, Right, Left, Find, Insert, Remove, Select,
 		Prev, Next
 
-	<PC key code>
+	&lt;PC key code&gt;
 		PC key code (10進数)
 
 	例:
@@ -126,14 +126,14 @@ VT端末の数値キーを PC キーに割り当てます。
 
 <pre>
 	形式:
-		<VT numeric key name>=<PC key code>
+		&lt;VT numeric key name&gt;=&lt;PC key code&gt;
 
-	<VT numeric key name>
+	&lt;VT numeric key name&gt;
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
 		Num9, NumMinus, NumComma, NumPeriod, NumEnter, PF1,
 		PF2, PF3, PF4
 
-	<PC key code>
+	&lt;PC key code&gt;
 		PC key code (10進数)
 
 	例:
@@ -159,9 +159,9 @@ VT 端末のファンクションキーを PC キーに割り当てます。
 
 <pre>
 	形式:
-		<VT function key name>=<PC key code>
+		&lt;VT function key name&gt;=&lt;PC key code&gt;
 
-	<VT function key name>
+	&lt;VT function key name&gt;
 		(VT 端末のファンクションキー)
 		Hold, Print, Break, F6, F7, F8, F9, F10, F11, F12,
 		F13, F14, Help, Do, F17, F18, F19, F20
@@ -169,7 +169,7 @@ VT 端末のファンクションキーを PC キーに割り当てます。
 		UDK6, UDK7, UDK8, UDK9, UDK10, UDK11, UDK12, UDK13,
 		UDK14, UDK15, UDK16, UDK17, UDK18, UDK19, UDK20
 
-	<PC key code>
+	&lt;PC key code&gt;
 		PC key code (10進数)
 
 	例:
@@ -184,12 +184,12 @@ Xterm の F1-F5 キー、およびバックタブキーを PC キーに割り当てます。
 
 <pre>
 	形式:
-		<Xterm function key name>=<PC key code>
+		&lt;Xterm function key name&gt;=&lt;PC key code&gt;
 
-	<Xterm function key name>
+	&lt;Xterm function key name&gt;
 		XF1, XF2, XF3, XF4, XF5, XBackTab
 
-	<PC key code>
+	&lt;PC key code&gt;
 		PC key code (10進数)
 
 	例:
@@ -204,13 +204,13 @@ Tera Term の機能をPC キーに割り当てます。
 
 <pre>
 	形式:
-		<Shortcut key name>=<PC key code>
+		&lt;Shortcut key name&gt;=&lt;PC key code&gt;
 
-	<Shortcut key name>	機能
+	&lt;Shortcut key name&gt;	機能
 	---------------------------------------------------------
 	EditCopy		[Edit] Copy コマンド
 	EditPaste		[Edit] Paste コマンド
-	EditPasteCR		[Edit] Paste<CR> コマンド
+	EditPasteCR		[Edit] Paste&lt;CR&gt; コマンド
 	EditCLS 		[Edit] Clear screen コマンド
 	EditCLB 		[Edit] Clear buffer コマンド
 	ControlOpenTEK		[Control] Open TEK コマンド
@@ -227,7 +227,7 @@ Tera Term の機能をPC キーに割り当てます。
 	PrevShownWin 		前の最小化されていない Tera Term ウィンドウへ移動
 	LocalEcho		Local echo を on/off する
 
-	<PC key code>
+	&lt;PC key code&gt;
 		PC key code (10進数)
 
 	例:
@@ -244,46 +244,46 @@ Tera Term の機能をPC キーに割り当てます。
 
 <pre>
 	形式:
-		<User key name>=<PC key code>,<Control flag>,<文字列>
-		<User key name>=off
+		&lt;User key name&gt;=&lt;PC key code&gt;,&lt;Control flag&gt;,&lt;文字列&gt;
+		&lt;User key name&gt;=off
 
-	<User key name>
+	&lt;User key name&gt;
 		User1, User2, User3,...., User99
 		最大99個まで設定可能
 
-	<PC key code>
+	&lt;PC key code&gt;
 		PC key code (10進数)
 
-	<Control flag>
-		キーを押したときに <文字列> をどのように取り扱うかを指定
+	&lt;Control flag&gt;
+		キーを押したときに &lt;文字列&gt; をどのように取り扱うかを指定
 		するフラグ。
-			0	<文字列>をそのまま(8bit/文字として)送出する。
-			1	<文字列>に含まれる文字や改行コードを
+			0	&lt;文字列&gt;をそのまま(8bit/文字として)送出する。
+			1	&lt;文字列&gt;に含まれる文字や改行コードを
 				Tera Term の設定にあわせて変換し、変換
 				された文字列を送出する。
-			2	<文字列>のファイル名のマクロファイルを
+			2	&lt;文字列&gt;のファイル名のマクロファイルを
 				実行する。
-			3	メニュー ID <文字列> で指定される
+			3	メニュー ID &lt;文字列&gt; で指定される
 				Tera Term のメニューコマンドを実行する。
 
-	<文字列>:
-		<Control flag> が 0 または 1 の場合、キーを押したときに
+	&lt;文字列&gt;:
+		&lt;Control flag&gt; が 0 または 1 の場合、キーを押したときに
 		送出される文字列。表示不可能な文字(制御文字等)はその
 		文字コードを $ と2文字の16進数で表現する。
 		(例: CR 文字は '$0D')。"$" そのものは "$24" で表現する。
 		Tera Term 内部では設定ファイルはUTF-16(16bit/文字)で処理している。
-		<Control flag> が 0 の場合、8bit/文字として処理する。
+		&lt;Control flag&gt; が 0 の場合、8bit/文字として処理する。
 		U+0000..U+00FFは$00..$FFとしてそのまま送信する。
 		それ以外は$FFとして送信する。
 			U+0000..U+007F=基本ラテン文字
 			U+0080..U+00FF=ラテン1補助
-		<Control flag> が 1 の場合、
+		&lt;Control flag&gt; が 1 の場合、
 		Unicode文字列として処理する。
 
-		<Control flag> が 2 の場合、
+		&lt;Control flag&gt; が 2 の場合、
 		実行されるマクロファイルのファイル名。
 
-		<Control flag> が 3 の場合、
+		&lt;Control flag&gt; が 3 の場合、
 		実行されるメニューコマンドのメニュー ID (数字)。
 		メニュー IDについては「メニュー ID 表」参照。
 

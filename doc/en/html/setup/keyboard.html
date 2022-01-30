@@ -107,15 +107,15 @@ In this section, VT editor keys are assigned to PC keys.
 
 <pre>
 	Format:
-		<VT editor key name>=<PC key code>
+		&lt;VT editor key name&gt;=&lt;PC key code&gt;
 
 	where:
 
-	<VT editor key name>
+	&lt;VT editor key name&gt;
 		Up, Down, Right, Left, Find, Insert, Remove, Select,
 		Prev, Next
 
-	  <PC key code>
+	  &lt;PC key code&gt;
 		PC key code (decimal number)
 
 	Example:
@@ -130,16 +130,16 @@ In this section, VT numeric keys are assigned to PC keys.
 
 <pre>
 	Format:
-		<VT numeric key name>=<PC key code>
+		&lt;VT numeric key name&gt;=&lt;PC key code&gt;
 
 	where:
 
-	  <VT numeric key name>
+	  &lt;VT numeric key name&gt;
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8,
 		Num9, NumMinus, NumComma, NumPeriod, NumEnter, PF1,
 		PF2, PF3, PF4
 
-	  <PC key code>
+	  &lt;PC key code&gt;
 		PC key code (decimal number)
 
 	Example:
@@ -165,11 +165,11 @@ In this section, VT function keys are assigned to PC keys.
 
 <pre>
 	Format:
-		<VT function key name>=<PC key code>
+		&lt;VT function key name&gt;=&lt;PC key code&gt;
 
 	where:
 
-	  <VT function key name>
+	  &lt;VT function key name&gt;
 		(Function keys of VT terminal)
 		Hold, Print, Break, F6, F7, F8, F9, F10, F11, F12,
 		F13, F14, Help, Do, F17, F18, F19, F20
@@ -177,7 +177,7 @@ In this section, VT function keys are assigned to PC keys.
 		UDK6, UDK7, UDK8, UDK9, UDK10, UDK11, UDK12, UDK13,
 		UDK14, UDK15, UDK16, UDK17, UDK18, UDK19, UDK20
 
-	  <PC key code>
+	  &lt;PC key code&gt;
 		PC key code (decimal number)
 
 	Example:
@@ -192,14 +192,14 @@ In this section, Xterm F1-F5 keys and BackTab key are assigned to PC keys.
 
 <pre>
 	Format:
-		<Xterm function key name>=<PC key code>
+		&lt;Xterm function key name&gt;=&lt;PC key code&gt;
 
 	where:
 
-	  <Xterm function key name>
+	  &lt;Xterm function key name&gt;
 		XF1, XF2, XF3, XF4, XF5, XBackTab
 
-	  <PC key code>
+	  &lt;PC key code&gt;
 		PC key code (decimal number)
 
 	Example:
@@ -214,14 +214,14 @@ In this section, Tera Term functions are assigned to PC keys.
 
 <pre>
 	Format:
-		<Shortcut key name>=<PC key code>
+		&lt;Shortcut key name&gt;=&lt;PC key code&gt;
 
 	where:
-	  <Shortcut key name>	Function
+	  &lt;Shortcut key name&gt;	Function
 	  --------------------------------------------
 	  EditCopy		[Edit] Copy command
 	  EditPaste		[Edit] Paste command
-	  EditPasteCR		[Edit] Paste<CR> command
+	  EditPasteCR		[Edit] Paste&lt;CR&gt; command
 	  EditCLS		[Edit] Clear screen command
 	  EditCLB		[Edit] Clear buffer command
 	  ControlOpenTEK	[Control] Open TEK command
@@ -238,7 +238,7 @@ In this section, Tera Term functions are assigned to PC keys.
 	  PrevShownWin		Moves to the previous Tera Term window (except minimized)
 	  LocalEcho		Toggles the local echo status
 
-	  <PC key code>
+	  &lt;PC key code&gt;
 		PC key code (decimal number)
 
 	Example:
@@ -254,35 +254,35 @@ string, executing a macro file or executing a menu command.
 
 <pre>
 	Format:
-		<User key name>=<PC key code>,<Control flag>,
-				<Character string>
+		&lt;User key name&gt;=&lt;PC key code&gt;,&lt;Control flag&gt;,
+				&lt;Character string&gt;
 
 	where:
 
-	  <User key name>
+	  &lt;User key name&gt;
 		User1, User2, User3,...., User99
 		Maximum number of user keys is 99. 
 		For example, if you want to define ten user keys,
 		you must use the first ten names, from "User1" to "User10".
 
-	  <PC key code>
+	  &lt;PC key code&gt;
 		PC key code (decimal number)
 
-	  <Control flag>
-		Control flag which specifies how <character string>
+	  &lt;Control flag&gt;
+		Control flag which specifies how &lt;character string&gt;
 		is treated when the PC key is pressed.
-			0	<Character string> is sent as it is.
-			1	New-line codes in <Character string>
+			0	&lt;Character string&gt; is sent as it is.
+			1	New-line codes in &lt;Character string&gt;
 				are converted by Tera Term and
 				the converted string is sent.
 			2	A macro file which has the name of
-				<Character string> is executed.
+				&lt;Character string&gt; is executed.
 			3	A Tera Term menu command specified
-				by the menu ID <Character string> is
+				by the menu ID &lt;Character string&gt; is
 				executed.
 
-	  <Character string>
-		If <Control flag> is 0 or 1, <Character string>
+	  &lt;Character string&gt;
+		If &lt;Control flag&gt; is 0 or 1, &lt;Character string&gt;
 		represents the character string to be sent.
 		A non-printable character (control character) in
 		the string can be expressed as a "$" and ASCII code
@@ -290,10 +290,10 @@ string, executing a macro file or executing a menu command.
 		is expressed as "$0D". "$" itself is expressed as "$24".
 		See "Appendix A  ASCII CODE TABLE".
 
-		If <Control flag> is 2, <Character string> specifies
+		If &lt;Control flag&gt; is 2, &lt;Character string&gt; specifies
 		the macro file name to be executed.
 
-		If <Control flag> is 3, <Character string> is the menu
+		If &lt;Control flag&gt; is 3, &lt;Character string&gt; is the menu
 		ID which specifies the menu command to be executed.
 		The menu ID should be expressed as a decimal number.
 		See "Appendix B  LIST OF MENU IDs".
