@@ -102,7 +102,7 @@ static wchar_t *GetHistoryFileName(TTTSet *ts_)
 
 	// My Documents ‚É file ‚ª‘¶İ‚·‚éê‡A‚»‚ê‚ğ—Dæ‚µ‚Äg—p‚·‚é
 	// TODO ‚±‚Ì“®ì‚Ííœ‚µ‚½‚Ù‚¤‚ª‚æ‚³‚»‚¤
-#if 1
+#if 0
 	HRESULT hr = _SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &fname);
 	awcscats(&fname, L"\\", BROADCAST_LOGFILE, NULL);
 	DWORD r = GetFileAttributesW(fname);
