@@ -47,7 +47,11 @@ function(ConvertHTML CMD_OPTION)
   separate_arguments(CONV_CMD_OPTION)
   set(CMD ${CONV_CMD} ${CONV_CMD_OPTION})
 
-  string(JOIN " " CMD_PRINT ${CMD})
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+    string(JOIN " " CMD_PRINT ${CMD})
+  else()
+    string(REPLACE ";" " " CMD_PRINT "${CMD}")
+  endif()
   #message(STATUS ${CMD_PRINT})
 
   execute_process(

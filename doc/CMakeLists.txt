@@ -13,7 +13,7 @@
 else()
   set(HHC "HHC-NOTFOUND")
   find_program(
-    CHMCMD chmcmd2
+    CHMCMD chmcmd
     )
 endif()
 message("hhc=${HHC}")
