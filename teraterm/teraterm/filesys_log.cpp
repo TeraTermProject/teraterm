@@ -1344,10 +1344,10 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
  */
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 {
-	const char *logdir;
+	char *logdir;
 
 	if (strlen(ts.LogDefaultPath) > 0) {
-		logdir = ts.LogDefaultPath;
+		logdir = strdup(ts.LogDefaultPath);
 	}
 	else {
 		logdir = ToCharW(ts.LogDirW);
@@ -1370,6 +1370,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	ParseStrftimeFileName(full_path, sizeof(full_path));
 	ConvertLogname(full_path, sizeof(full_path));
 
+	free(logdir);
 	return ToWcharA(full_path);
 }
 

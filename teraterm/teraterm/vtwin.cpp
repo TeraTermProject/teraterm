@@ -3343,7 +3343,9 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
 		else {
-			ts.LogFNW = FLogGetLogFilename(ToWcharA(ts.LogFN));
+			wchar_t *LogFNW = ToWcharA(ts.LogFN);
+			ts.LogFNW = FLogGetLogFilename(LogFNW);
+			free(LogFNW);
 		}
 		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
 		if (ts.LogFN[0]!=0) {
