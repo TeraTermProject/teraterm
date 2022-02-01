@@ -568,8 +568,17 @@ void save_memdump(char *filename)
 	int i;
 	time_t t;
 	struct tm *tm;
+	wchar_t *filenameW = NULL;
+	wchar_t *dumpfileW = NULL;
+	char *dumpfile = NULL;
 
-	fp = fopen(filename, "w");
+	filenameW = ToWcharA(filename);
+	dumpfileW = get_log_dir_relative_nameW(filenameW);
+	dumpfile = ToCharW(dumpfileW);
+	fp = fopen(dumpfile, "w");
+	free(filenameW);
+	free(dumpfileW);
+	free(dumpfile);
 	if (fp == NULL)
 		return;
 

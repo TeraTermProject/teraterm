@@ -36,6 +36,7 @@
 #include "svnversion.h"	// for SVNVERSION
 
 #include "ttdebug.h"
+#include "ttlib.h"
 
 /**
  *	コンソールウィンドウを表示するデバグ用
@@ -254,10 +255,6 @@ error:
 
 static wchar_t *CreateDumpFilename()
 {
-	// とりあえずデスクトップに作成
-	wchar_t *desktop;
-	_SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_CREATE, NULL, &desktop);
-
 	SYSTEMTIME local_time;
 	GetLocalTime(&local_time);
 
@@ -268,23 +265,28 @@ static wchar_t *CreateDumpFilename()
 	char *version = _strdup("unknown");
 #endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"%s\\teraterm_%hs_%04u%02u%02u-%02u%02u%02u.dmp",
-			  desktop, version,
+	aswprintf(&dump_file, L"teraterm_%hs_%04u%02u%02u-%02u%02u%02u.dmp",
+			  version,
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond);
 	free(version);
-	free(desktop);
 	return dump_file;
 }
 
 static void DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
+	wchar_t *logdir = NULL;
+	wchar_t *dumpfile = NULL;
+
 	if (pMiniDumpWriteDump == NULL) {
 		// MiniDumpWriteDump() がサポートされていない。XPより前
 		return;
 	}
 
-	HANDLE file = CreateFileW(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	logdir = GetLogDirW();
+	awcscats(&dumpfile, logdir, L"\\", filename, NULL);
+	HANDLE file = CreateFileW(dumpfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	free(dumpfile);
 	if (file == INVALID_HANDLE_VALUE) {
 		return;
 	}
