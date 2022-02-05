@@ -4,7 +4,7 @@ root = true
 indent_style = tab
 indent_size = 4
 
-[*.{cpp,c,h}]
+[*.{cpp,c,h,cc}]
 indent_style = tab
 indent_size = 4
 end_of_line = crlf

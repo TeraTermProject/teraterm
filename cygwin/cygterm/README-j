@@ -91,17 +91,30 @@
        BINDIR に cygterm.exe と cygterm.cfg がインストールされます。
        cygterm.cfg は上書きされません。
 
+// 動作モード //
+
+    cygterm.exe と同じフォルダに portable.ini がある場合ポータブル版と
+    して動作します。portable.ini がない場合は通常版として動作します。
+
 // 設 定 フ ァ イ ル //
 
     cygterm.cfg は設定ファイルです。 使用する端末エミュレータのコマンドライン
     や起動するシェルのコマンドライン等を設定します。
 
-    cygterm.cfg は次の順序で読み込まれます。
-      - コマンドライン引数
-      - exe と同じフォルダ
-      - /etc/cygterm.conf (cygwinの/etc/)
-      - $APPDATA/teraterm5/cygterm.cfg
-      - ~/.cygtermrc
+    cygterm.cfg は次の順序で読みます。
+
+    - exeと同じフォルダの cygterm.cfg
+    - /etc/cygterm.conf
+    - $APPDATA/teraterm5/cygterm.cfg
+    - ~/.cygtermrc
+
+    $SHELL と $USER は、設定ファイル読み込み前に設定されます。
+    後から読み込んだ値で上書きされます。
+    設定ファイルを読み込んだのちコマンドラインオプションで指定で上書きされます。
+
+    ポータブル版のときは、次のファイルのみを読み込みます。
+
+    - $APPDATA/teraterm5/cygterm.cfg
 
     cygterm.cfg の例
       +-----------------------------------------------------------------------
@@ -110,9 +123,9 @@
       | PORT_START = 20000
       | PORT_RANGE = 40
       | SHELL = /bin/bash
-      | ENV_1 = MAKE_MODE=unix
-      | ENV_2 = HOME=/home
-      |   :         :
+
+    設定ファイルの文字コードはUTF-8です。
+    (Cygwin 1.5環境では Shift_JIS です。)
 
     TERM
     ----
@@ -268,9 +281,11 @@
     TCP/IP Port# に 23 を指定して設定保存し直せば元に戻ります。
 
 // 変 更 履 歴 //
-v1.07_30(beta) 2021/11/14
+v1.07_30 2022/02/06
         * 読み込む設定ファイルを追加
           $APPDATA/teraterm5/cygterm.cfg
+        * Unicode対応
+        * ポータブル版対応(仮)
 
 v1.07_29 2016/11/26 (by maya)
         * アイコンを変更した。

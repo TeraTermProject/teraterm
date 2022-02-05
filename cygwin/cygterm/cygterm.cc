@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CygTerm+ - yet another Cygwin console
 // Copyright (C) 2000-2006 NSym.
-// (C) 2006-2016 TeraTerm Project
+// (C) 2006- TeraTerm Project
 //---------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License (GPL) as published by
@@ -22,18 +22,20 @@
 // CygTerm+ - yet another Cygwin console
 //
 //   Using Cygwin with a terminal emulator.
-//   
+//
 //   Writtern by TeraTerm Project.
 //            https://ttssh2.osdn.jp/
-//   
+//
 //   Original written by NSym.
-//                         *** Web Pages ***
-//  (English) http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/index-e.html
-// (Japanese) http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/index.html
 //
 
+#if !defined(__CYGWIN__)
+#error check compiler
+#endif
+
+// MessageBoxのタイトルで使用 TODO exeファイル名に変更
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_30_beta (2021/11/14)";
+//static char Version[] = "version 1.07_30_beta (2021/11/14)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,6 +59,10 @@ static char Version[] = "version 1.07_30_beta (2021/11/14)";
 #include <sys/select.h>
 #include <wchar.h>
 
+#include "sub.h"
+
+#include "cygterm_cfg.h"
+
 // pageant support (ssh-agent proxy)
 //----------------------------------
 #define AGENT_COPYDATA_ID 0x804e50ba
@@ -70,92 +76,50 @@ char sockname[256];
 
 // TCP port for TELNET
 //--------------------
-int port_start = 20000;  // default lowest port number
-int port_range = 40;     // default number of ports
-
-// command lines of a terminal-emulator and a shell
-//-------------------------------------------------
-char cmd_term[256] = "";
-char cmd_termopt[256] = "";
-char cmd_shell[128] = "";
-char pw_shell[128] = "";
-char change_dir[256] = "";
+#define PORT_START_DEFAULT 20000  // default lowest port number
+#define PORT_RANGE_DEFAULT 40     // default number of ports
 
 // TCP port for connection to another terminal application
 //--------------------------------------------------------
 int cl_port = 0;
+u_short listen_port;
 
 // telnet socket timeout
 //----------------------
-int telsock_timeout = 5;    // timeout 5 sec
-
-// dumb terminal flag
-//-------------------
-bool dumb = false;
+#define TELSOCK_TIMEOUT_DEFAULT 5   // timeout 5 sec
 
 // chdir to HOME
 //--------------
-bool home_chdir = false;
+#define HOME_CHDIR_DEFAULT false
 
 // login shell flag
 //-----------------
-bool enable_loginshell = false;
+#define ENABLE_LOGINSHELL_DEFAULT false
 
 // ssh agent proxy
 //----------------
-bool enable_agent_proxy = false;
-
-// terminal type & size
-//---------------------
-char term_type[41] = "";
-struct winsize win_size = {0,0,0,0};
+#define ENABLE_AGENT_PROXY_DEFAULT false
 
 // debug mode
 //-----------
-bool debug_flag = false;
+#define DEBUG_FLAG_DEFAULT false;
+bool debug_flag = DEBUG_FLAG_DEFAULT;
 
-// additional env vars given to a shell
-//-------------------------------------
-struct sh_env_t {
-    struct sh_env_t* next;
-    char env[1];
-} sh_env = {NULL, ""};
-
-sh_env_t* sh_envp = &sh_env;
-
-int add_env(sh_env_t** envp, const char* str, const char* str2)
-{
-	int len;
-	sh_env_t* e;
-
-	len = strlen(str);
-	if (str2) {
-		len += strlen(str2) + 1;
-	}
-
-	e = (sh_env_t*)malloc(sizeof(sh_env_t) + len);
-	if (e) {
-		if (str2) {
-			snprintf(e->env, len + 1, "%s=%s", str, str2);
-		}
-		else {
-			strcpy(e->env, str);
-		}
-		e->next = NULL;
-		*envp = ((*envp)->next = e);
-		return 1;
-	}
-	else {
-		return 0;
-	}
-}
+// "cygterm.cfg"
+static char *cfg_base;          // "cygterm.cfg"
+static char *cfg_exe;           // [exe directory]/cygterm.cfg
+static char *conf_appdata_full; // $APPDATA/teraterm5/cygterm.cfg
+static char *sys_conf;          // /etc/cygterm.conf
+static char *usr_conf;          // ~/cygtermrc  $HOME/cygtermrc
 
 //================//
 // message output //
 //----------------//
+// msg は ANSI文字コード (UTF8は化ける)
 void msg_print(const char* msg)
 {
-    MessageBox(NULL, msg, Program, MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+    OutputDebugStringA(msg);
+    MessageBoxA(NULL, msg, Program, MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 }
 
 //=========================//
@@ -167,7 +131,7 @@ void api_error(const char* string = NULL)
     char *ptr = msg;
     if (string != NULL)
         ptr += snprintf(ptr, sizeof(msg), "%s\n\n", string);
-    FormatMessage(
+    FormatMessageA(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         ptr, sizeof(msg)-(ptr-msg), NULL
@@ -191,283 +155,149 @@ void c_error(const char* string = NULL)
 //======================//
 // debug message output //
 //======================//
-void debug_msg_print(const char* msg)
+void debug_msg_print(const char* msg, ...)
 {
-    if (debug_flag) {
-        msg_print(msg);
-    }
-}
+	if (debug_flag) {
+		char *tmp1;
+		va_list arg;
+		va_start(arg, msg);
+		vasprintf(&tmp1, msg, arg);
+		va_end(arg);
 
-//==================================//
-// parse line in configuration file //
-//----------------------------------//
-void parse_cfg_line(char *buf)
-{
-    // "KEY = VALUE" format in each line.
-    // skip leading/trailing blanks. KEY is not case-sensitive.
-    char* p1;
-    for (p1 = buf; isspace(*p1); ++p1);
-    if (!isalpha(*p1)) {
-        return; // comment line with non-alphabet 1st char
-    }
-    char* name = p1;
-    for (++p1; isalnum(*p1) || *p1 == '_'; ++p1);
-    char* p2;
-    for (p2 = p1; isspace(*p2); ++p2);
-    if (*p2 != '=') {
-        return; // igonore line without '='
-    }
-    for (++p2; isspace(*p2); ++p2);
-    char* val = p2;
-    for (p2 += strlen(p2); isspace(*(p2-1)); --p2);
-    *p1 = *p2 = 0;
-
-    if (!strcasecmp(name, "TERM")) {
-        // terminal emulator command line (host:%s, port#:%d)
-        strncpy(cmd_term, val, sizeof(cmd_term)-1);
-        cmd_term[sizeof(cmd_term)-1] = 0;
-    }
-    else if (!strcasecmp(name, "SHELL")) {
-        // shell command line
-        if (strcasecmp(val, "AUTO") != 0) {
-            strncpy(cmd_shell, val, sizeof(cmd_shell)-1);
-        }
-	else {
-	    strncpy(cmd_shell, pw_shell, sizeof(cmd_shell)-1);
+		char *tmp2;
+		unsigned long pid = GetCurrentProcessId();
+		asprintf(&tmp2, "dbg %lu: %s\n", pid, tmp1);
+		OutputDebugStringA(tmp2);
+		// printf("%s", tmp2);
+		free(tmp2);
+		free(tmp1);
 	}
-	cmd_shell[sizeof(cmd_shell)-1] = 0;
-    }
-    else if (!strcasecmp(name, "PORT_START")) {
-        // minimum port# for TELNET
-        port_start = atoi(val);
-    }
-    else if (!strcasecmp(name, "PORT_RANGE")) {
-        // number of ports for TELNET
-        port_range = atoi(val);
-    }
-    else if (!strcasecmp(name, "TERM_TYPE")) {
-        // terminal type name (maybe overridden by TELNET negotiation.)
-        strncpy(term_type, val, sizeof(term_type)-1);
-        term_type[sizeof(term_type)-1] = 0;
-    }
-    else if (!strncasecmp(name, "ENV_", 4)) {
-        // additional env vars given to a shell
-	add_env(&sh_envp, val, NULL);
-    }
-    else if (!strcasecmp(name, "HOME_CHDIR")) {
-        // change directory to home
-        if (strchr("YyTt", *val) != NULL || atoi(val) > 0) {
-            home_chdir = true;
-        }
-    }
-    else if (!strcasecmp(name, "LOGIN_SHELL")) {
-        // execute a shell as a login shell
-        if (strchr("YyTt", *val) != NULL || atoi(val) > 0) {
-            enable_loginshell = true;
-        }
-    }
-    else if (!strcasecmp(name, "SOCKET_TIMEOUT")) {
-        // telnet socket timeout
-        telsock_timeout = atoi(val);
-    }
-    else if (!strcasecmp(name, "SSH_AGENT_PROXY")) {
-        // ssh-agent proxy
-        if (strchr("YyTt", *val) != NULL || atoi(val) > 0) {
-            enable_agent_proxy = true;
-        }
-    }
-    else if (!strcasecmp(name, "DEBUG")) {
-        // debug mode
-        if (strchr("YyTt", *val) != NULL || atoi(val) > 0) {
-            debug_flag = true;
-        }
-    }
-
-    return;
 }
 
-// '\\' -> '/'
-void convert_bs(char *path)
+static void get_cfg_filenames()
 {
-    char *p = path;
-    while(*p != 0) {
-        if (*p == '\\') {
-            *p = '/';
-        }
-        p++;
-    }
+	char *argv0 = GetModuleFileNameU8();
+	// cfg base filename "cygterm.cfg"
+	char *p = strrchr(argv0, '.');
+	*p = 0;	// cut ".exe"
+	p = strrchr(argv0, '/') + 1;
+	cfg_base = (char *)malloc(strlen(p) + 5);
+	strcpy(cfg_base, p);
+	strcat(cfg_base, ".cfg");
+
+	// exe path
+	cfg_exe = (char *)malloc(strlen(argv0) + strlen(cfg_base));
+	strcpy(cfg_exe, argv0);
+	p = strrchr(cfg_exe, '/') + 1;
+	strcpy(p, cfg_base);
+	free(argv0);
+	argv0 = NULL;
+
+	// home	 $HOME/cygtermrc
+	const char *home = getenv("HOME");
+	usr_conf = (char *)malloc(strlen(home) + strlen(cfg_base) + 2);
+	strcpy(usr_conf, home);
+	strcat(usr_conf, "/.");
+	strcat(usr_conf, cfg_base);
+	p = strrchr(usr_conf, '.');		// ".cfg" -> "rc"
+	strcpy(p, "rc");
+
+	// system
+	sys_conf = (char *)malloc(sizeof("/etc/") + strlen(cfg_base) + 2);
+	strcpy(sys_conf, "/etc/");
+	strcat(sys_conf, cfg_base);
+	p = strrchr(sys_conf, '.');
+	strcpy(p, ".conf");		// ".cfg" -> ".conf"
+
+	// $APPDATA/teraterm5/cygterm.cfg
+	char *appdata = GetAppDataDirU8();
+	const char *teraterm = "/teraterm5/";
+	size_t len = strlen(appdata) + strlen(teraterm) + strlen(cfg_base) + 1;
+	conf_appdata_full = (char *)malloc(sizeof(char) * len);
+	strcpy(conf_appdata_full, appdata);
+	strcat(conf_appdata_full, teraterm);
+	strcat(conf_appdata_full, cfg_base);
+	free(appdata);
 }
 
-// L'\\' -> L'/'
-void convert_bsW(wchar_t *path)
+/**
+ *  read /etc/passwd
+ *  get user name from getlogin().  if it fails, use $USERNAME instead.
+ *  and get /etc/passwd information by getpwnam(3) with user name,
+ */
+static void get_username_and_shell(cfg_data_t *cfg)
 {
-    wchar_t *p = path;
-    while(*p != 0) {
-        if (*p == L'\\') {
-            *p = L'/';
-        }
-        p++;
-    }
+	const char* username = getlogin();
+	if (username == NULL)
+		username = getenv("USERNAME");
+	if (username != NULL) {
+		struct passwd* pw_ent = getpwnam(username);
+		if (pw_ent != NULL) {
+			free(cfg->shell);
+			cfg->shell = strdup(pw_ent->pw_shell);
+			free(cfg->username);
+			cfg->username = strdup(pw_ent->pw_name);
+		}
+		else {
+			free(cfg->username);
+			cfg->username = strdup(username);
+		}
+	}
 }
 
-// wchar -> utf8
-char *convert_utf8_from_wchar(const wchar_t *strW)
-{
-    size_t mb_len = ::WideCharToMultiByte(CP_UTF8, 0, strW, -1, NULL, 0, NULL, NULL);
-    char *u8 = (char *)malloc(sizeof(wchar_t) * mb_len);
-    ::WideCharToMultiByte(CP_UTF8, 0, strW, -1, u8, mb_len, NULL, NULL);
-    return u8;
-}
-
-// $APPDATA
-char *get_appdata_dir()
-{
-#if 0
-	// link error :-(
-    wchar_t *home_pathW;
-    SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &home_pathW);
-    convert_bsW(home_pathW);
-    char *home_pathU8 = convert_utf8_from_wchar(home_pathW);
-    CoTaskMemFree(home_pathW);
-    return home_pathU8;
-#endif
-#if 1
-    char *appdata = strdup(getenv("APPDATA"));
-    convert_bs(appdata);
-    return appdata;
-#endif
-}
-
-void get_cfg_filenames(char **cfg_exe_full, char **cfg_appdata_full, char **cfg)
-{
-    wchar_t win_conf[MAX_PATH];
-
-    // get cfg path from exe path
-    if (GetModuleFileNameW(NULL, win_conf, MAX_PATH) <= 0) {
-        *cfg_exe_full = NULL;
-        *cfg = NULL;
-        return;
-    }
-
-    convert_bsW(win_conf);
-
-    wchar_t* bcW = wcsrchr(win_conf, '/');
-    if (bcW != NULL) {
-        wchar_t* dot = wcsrchr(bcW, '.');
-        if (dot == NULL) {
-            wcscat(bcW, L".cfg");
-        } else {
-            wcscpy(dot, L".cfg");
-        }
-    }
-    char *u8 = convert_utf8_from_wchar(win_conf);
-    *cfg_exe_full = u8;
-
-    char *bs = strrchr(u8, '/');
-    *cfg = strdup(bs+1);
-
-    char *appdata = get_appdata_dir();
-    const char *teraterm = "/teraterm5/";
-    size_t len = strlen(appdata) + strlen(teraterm) + strlen(*cfg) + 1;
-    *cfg_appdata_full = (char *)malloc(sizeof(wchar_t) * len);
-    strcpy(*cfg_appdata_full, appdata);
-    strcat(*cfg_appdata_full, teraterm);
-    strcat(*cfg_appdata_full, *cfg);
-    free(appdata);
-}
+#define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
 
 //====================//
 // load configuration //
 //--------------------//
-void load_cfg()
+static void load_cfg(cfg_data_t *cfg)
 {
-    // configuration file (.cfg) path
-    char *conf_exe_full;
-    char *conf_appdata_full;
-    char *conf_base;
-    get_cfg_filenames(&conf_exe_full, &conf_appdata_full, &conf_base);
+	// 設定ファイル読み込み順
+	//		リストの上のほうから先に読み込まれる
+	//		リストの下のほうから後に読み込まれる(あと勝ち)
+	//		下の方が優先順位が高い
+	// 通常時
+	char *conf_order_normal_list[] = {
+		cfg_exe,			// [exe directory]/cygterm.cfg
+		sys_conf,			// /etc/cygterm.conf
+		conf_appdata_full,	// $APPDATA/teraterm5/cygterm.cfg
+		usr_conf			// ~/cygtermrc
+	};
+	const int conf_order_normal_count = (int)_countof(conf_order_normal_list);
 
-    char sys_conf[] = "/etc/cygterm.conf";
+	// ポータブル時
+	char *conf_order_portable_list[] = {
+		cfg_exe,			// [exe directory]/cygterm.cfg
+	};
+	const int conf_order_portable_count = (int)_countof(conf_order_portable_list);
 
-    // user configuration file (~/.*rc) path
-    char usr_conf[MAX_PATH] = "";
+	char **conf_order_list;
+	int conf_order_count;
+	if (IsPortableMode()) {
+		// ポータブル時
+		conf_order_list = conf_order_portable_list;
+		conf_order_count = conf_order_portable_count;
+	}
+	else {
+		// 通常時
+		conf_order_list = conf_order_normal_list;
+		conf_order_count = conf_order_normal_count;
+	}
 
-    // auto generated configuration file path
-    char tmp_conf[MAX_PATH] = "/tmp/cygtermrc.XXXXXX";
+	// 実際に読み込む
+	for (int i = 0; i < conf_order_count; i++) {
+		const char *fname = conf_order_list[i];
+		debug_msg_print("load %s", fname);
+		// ignore empty configuration file path
+		if (fname == NULL || strcmp(fname, "") == 0) {
+			debug_msg_print("  pass");
+			continue;
+		}
 
-    // get user name from getlogin().  if it fails, use $USERNAME instead.
-    // and get /etc/passwd information by getpwnam(3) with user name,
-    // and generate temporary configuration file by mktemp(3).
-    const char* username = getlogin();
-    if (username == NULL)
-        username = getenv("USERNAME");
-    if (username != NULL) {
-        struct passwd* pw_ent = getpwnam(username);
-        if (pw_ent != NULL) {
-            strncpy(pw_shell, pw_ent->pw_shell, sizeof(pw_shell)-1);
-            pw_shell[sizeof(pw_shell)-1] = 0;
-
-            strcpy(usr_conf, pw_ent->pw_dir);
-            strcat(usr_conf, "/.");
-            strcat(usr_conf, conf_base);
-            char* dot = strrchr(usr_conf, '.');
-            if (dot == NULL) {
-                strcat(usr_conf, "rc");
-            } else {
-                strcpy(dot, "rc");
-            }
-        }
-        int fd = mkstemp(tmp_conf);
-        FILE* fp = fdopen(fd, "w");
-        if (fp != NULL) {
-            if (pw_ent != NULL) {
-                fprintf(fp, "ENV_1=USER=%s\n",  pw_ent->pw_name);
-                fprintf(fp, "ENV_2=SHELL=%s\n", pw_ent->pw_shell);
-                fprintf(fp, "SHELL=%s\n", pw_ent->pw_shell);
-            } else {
-                fprintf(fp, "ENV_1=USER=%s\n",       username);
-            }
-            fclose(fp);
-        }
-    }
-
-    if (strcmp(usr_conf, "") == 0) {
-        strcpy(usr_conf, "");
-        strcpy(tmp_conf, "");
-    }
-
-    char const *conf_path[] = {
-        tmp_conf,
-        conf_exe_full,      // [exe directory]/cygterm.cfg
-        sys_conf,           // /etc/cygterm.conf
-        conf_appdata_full,  // $APPDATA/teraterm5/cygterm.cfg
-        usr_conf            // ~/cygtermrc
-    };
-    for (int i = 0; i < sizeof(conf_path)/sizeof(conf_path[0]); i++) {
-        // ignore empty configuration file path
-        if (strcmp(conf_path[i], "") == 0) {
-            continue;
-        }
-        // read each setting parameter
-        FILE* fp;
-        if ((fp = fopen(conf_path[i], "r")) == NULL) {
-            continue;
-        }
-        char buf[BUFSIZ];
-        while (fgets(buf, sizeof(buf), fp) != NULL) {
-            parse_cfg_line(buf);
-        }
-        fclose(fp);
-    }
-
-    // remove temporary configuration file, if it was generated.
-    if (strcmp(tmp_conf, "") != 0) {
-        unlink(tmp_conf);
-    }
-
-    free(conf_base);
-    free(conf_exe_full);
-    free(conf_appdata_full);
+		bool r = cfg->load(cfg, fname);
+		debug_msg_print("  %s", r ? "ok" : "ng");
+		cfg->dump(cfg, debug_msg_print);
+	}
 }
 
 void quote_cut(char *dst, size_t len, char *src) {
@@ -483,87 +313,80 @@ void quote_cut(char *dst, size_t len, char *src) {
 //=======================//
 // commandline arguments //
 //-----------------------//
-void get_args(int argc, char** argv)
+void get_args(char** argv, cfg_data_t *cfg)
 {
-    char tmp[sizeof(cmd_termopt)];
-
     for (++argv; *argv != NULL; ++argv) {
         if (!strcmp(*argv, "-t")) {             // -t <terminal emulator>
             if (*++argv == NULL)
                 break;
-            strncpy(cmd_term, *argv, sizeof(cmd_term)-1);
-            cmd_term[sizeof(cmd_term)-1] = '\0';
+            free(cfg->term);
+            cfg->term = strdup(*argv);
         }
         else if (!strcmp(*argv, "-p")) {        // -p <port#>
             if (*(argv+1) != NULL) {
-                ++argv, cl_port = atoi(*argv);
+                ++argv;
+                cfg->cl_port = atoi(*argv);
             }
         }
         else if (!strcmp(*argv, "-dumb")) {     // -dumb
-            dumb = true;
-            strcpy(term_type, "dumb");
+            cfg->dumb = 1;
+            free(cfg->term_type);
+            cfg->term_type = strdup("dumb");
         }
         else if (!strcmp(*argv, "-s")) {        // -s <shell>
             if (*++argv == NULL)
                 break;
-	    if (strcasecmp(*argv, "AUTO") != 0) {
-		strncpy(cmd_shell, *argv, sizeof(cmd_shell)-1);
-	    }
-	    else {
-		strncpy(cmd_shell, pw_shell, sizeof(cmd_shell)-1);
-	    }
-            cmd_shell[sizeof(cmd_shell)-1] = '\0';
+            if (strcasecmp(*argv, "AUTO") != 0) {
+                free(cfg->shell);
+                cfg->shell = strdup(*argv);
+            }
         }
         else if (!strcmp(*argv, "-cd")) {       // -cd
-            home_chdir = true;
+            cfg->home_chdir = true;
         }
         else if (!strcmp(*argv, "-nocd")) {     // -nocd
-            home_chdir = false;
+            cfg->home_chdir = false;
         }
         else if (!strcmp(*argv, "+cd")) {       // +cd
-            home_chdir = false;
+            cfg->home_chdir = false;
         }
         else if (!strcmp(*argv, "-ls")) {       // -ls
-            enable_loginshell = true;
+            cfg->enable_loginshell = true;
         }
         else if (!strcmp(*argv, "-nols")) {     // -nols
-            enable_loginshell = false;
+            cfg->enable_loginshell = false;
         }
         else if (!strcmp(*argv, "+ls")) {       // +ls
-            enable_loginshell = false;
+            cfg->enable_loginshell = false;
         }
         else if (!strcmp(*argv, "-A")) {       // -A
-            enable_agent_proxy = true;
+            cfg->enable_agent_proxy = true;
         }
         else if (!strcmp(*argv, "-a")) {       // -a
-            enable_agent_proxy = false;
+            cfg->enable_agent_proxy = false;
         }
         else if (!strcmp(*argv, "-v")) {        // -v <additional env var>
             if (*(argv+1) != NULL) {
+                sh_env_t *sh_env = cfg->sh_env;
                 ++argv;
-		add_env(&sh_envp, *argv, NULL);
+                sh_env->add1(sh_env, *argv);
             }
         }
         else if (!strcmp(*argv, "-d")) {        // -d <exec directory>
             if (*++argv == NULL)
                 break;
+            char change_dir[256] = "";
             quote_cut(change_dir, sizeof(change_dir), *argv);
+            cfg->change_dir = strdup(change_dir);
         }
         else if (!strcmp(*argv, "-o")) {        // -o <additional option for terminal>
             if (*++argv == NULL)
                 break;
-            if (cmd_termopt[0] == '\0') {
-                strncpy(cmd_termopt, *argv, sizeof(cmd_termopt)-1);
-                cmd_termopt[sizeof(cmd_termopt)-1] = '\0';
-            }
-            else {
-                snprintf(tmp, sizeof(tmp), "%s %s", cmd_termopt, *argv);
-                strncpy(cmd_termopt, tmp, sizeof(cmd_termopt)-1);
-                cmd_termopt[sizeof(cmd_termopt)-1] = '\0';
-            }
+            free(cfg->termopt);
+            cfg->termopt = strdup(*argv);
         }
         else if (!strcmp(*argv, "-debug")) {    // -debug
-            debug_flag = true;
+            cfg->debug_flag = true;
         }
     }
 }
@@ -605,14 +428,14 @@ unsigned long agent_request(unsigned char *out, unsigned long out_size, unsigned
 		goto agent_error;
 	}
 
-	hwnd = FindWindow("Pageant", "Pageant");
+	hwnd = FindWindowA("Pageant", "Pageant");
 	if (!hwnd) {
 		goto agent_error;
 	}
 
 	sprintf(mapname, "PageantRequest%08x", (unsigned)GetCurrentThreadId());
-	fmap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-	                         0, AGENT_MAX_MSGLEN, mapname);
+	fmap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
+							  0, AGENT_MAX_MSGLEN, mapname);
 	if (!fmap) {
 		goto agent_error;
 	}
@@ -626,7 +449,7 @@ unsigned long agent_request(unsigned char *out, unsigned long out_size, unsigned
 	cds.lpData = mapname;
 
 	memcpy(p, in, len + 4);
-	if (SendMessage(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds) > 0) {
+	if (SendMessageA(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds) > 0) {
 		len = get_uint32(p);
 		if (out_size >= len + 4) {
 			memcpy(out, p, len + 4);
@@ -650,6 +473,7 @@ agent_error:
 }
 
 void sighandler(int sig) {
+	(void)sig;
 	unlink(sockname);
 	rmdir(sockdir);
 	exit(0);
@@ -707,9 +531,7 @@ void agent_proxy()
 {
 	int sock, asock, ret;
 	long len;
-	unsigned long reqlen;
 	struct sockaddr_un addr;
-	unsigned char tmpbuff[AGENT_MAX_MSGLEN];
 	struct connList connections, *new_conn, *prev, *cur;
 	fd_set readfds, writefds, rfds, wfds;
 	struct sigaction act;
@@ -863,17 +685,16 @@ agent_thread_cleanup:
 	exit(0);
 }
 
-int exec_agent_proxy()
+static int exec_agent_proxy(sh_env_t *sh_env)
 {
 	int pid;
-	int malloc_size;
 
 	if (mkdtemp(sockdir) == NULL) {
 		return -1;
 	}
-	snprintf(sockname, sizeof(sockname), "%s/agent.%ld", sockdir, getpid());
+	snprintf(sockname, sizeof(sockname), "%s/agent.%ld", sockdir, (long)getpid());
 
-	if (!add_env(&sh_envp, "SSH_AUTH_SOCK", sockname)) {
+	if (sh_env->add(sh_env, "SSH_AUTH_SOCK", sockname)) {
 		return -1;
 	}
 
@@ -890,40 +711,64 @@ int exec_agent_proxy()
 //=============================//
 // terminal emulator execution //
 //-----------------------------//
-DWORD WINAPI term_thread(LPVOID)
+DWORD WINAPI term_thread(LPVOID param)
 {
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    FillMemory(&si, sizeof(si), 0);
-    si.cb = sizeof(si);
-    si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_SHOW;
-    DWORD flag = 0;
-    if (!CreateProcess(
-         NULL, cmd_term, NULL, NULL, FALSE, flag, NULL, NULL, &si, &pi))
-    {
-        api_error(cmd_term);
-        return 0;
-    }
-    WaitForSingleObject(pi.hProcess, INFINITE);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-    return 0;
+	cfg_data_t *cfg = (cfg_data_t *)param;
+
+	in_addr addr;
+	addr.s_addr = htonl(INADDR_LOOPBACK);
+	char *term;
+	asprintf(&term, cfg->term, inet_ntoa(addr), (int)ntohs(listen_port));
+	if (cfg->termopt != NULL) {
+		char *tmp;
+		asprintf(&tmp, "%s %s", tmp, cfg->termopt);
+		free(term);
+		term = tmp;
+	}
+
+	debug_msg_print("CreateProcess '%s'", term);
+
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	FillMemory(&si, sizeof(si), 0);
+	si.cb = sizeof(si);
+	si.dwFlags = STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_SHOW;
+	DWORD flag = 0;
+
+#if defined(UNICODE)
+	wchar_t *termT = ToWcharU8(term);
+#else
+	char *termT = strdup(term);
+#endif
+
+	BOOL r =
+		CreateProcess(
+			NULL, termT, NULL, NULL, FALSE, flag, NULL, NULL, &si, &pi);
+	free(termT);
+	if (!r) {
+		api_error(term);
+		return 0;
+	}
+	WaitForSingleObject(pi.hProcess, INFINITE);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+	return 0;
 }
 
-//============================-==========//
+//=======================================//
 // thread creation for terminal emulator //
 //---------------------------------------//
-HANDLE exec_term()
+HANDLE exec_term(cfg_data_t *cfg)
 {
     DWORD id;
-    return CreateThread(NULL, 0, term_thread, NULL, 0, &id);
+    return CreateThread(NULL, 0, term_thread, cfg, 0, &id);
 }
 
 //=======================================//
 // listener socket for TELNET connection //
 //---------------------------------------//
-int listen_telnet(u_short* port)
+int listen_telnet(u_short* port, cfg_data_t *cfg)
 {
     int lsock;
     if ((lsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -933,13 +778,13 @@ int listen_telnet(u_short* port)
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     int i;
-    for (i = 0; i < port_range; ++i) { // find an unused port#
-        addr.sin_port = htons(port_start + i);
+    for (i = 0; i < cfg->port_range; ++i) { // find an unused port#
+        addr.sin_port = htons(cfg->port_start + i);
         if (bind(lsock, (struct sockaddr *)&addr, sizeof(addr)) == 0) {
             break;
         }
     }
-    if (i == port_range) {
+    if (i == cfg->port_range) {
         shutdown(lsock, 2);
         close(lsock);
         return -1;
@@ -956,13 +801,13 @@ int listen_telnet(u_short* port)
 //=============================//
 // accept of TELNET connection //
 //-----------------------------//
-int accept_telnet(int lsock)
+int accept_telnet(int lsock, cfg_data_t *cfg)
 {
     fd_set rbits;
     FD_ZERO(&rbits);
     FD_SET(lsock, &rbits);
     struct timeval tm;
-    tm.tv_sec = telsock_timeout;
+    tm.tv_sec = cfg->telsock_timeout;
     tm.tv_usec = 0;
     if (select(FD_SETSIZE, &rbits, 0, 0, &tm) <= 0) {
         c_error("accept_telnet: select failed");
@@ -1057,9 +902,8 @@ void get_argv(char **argv, int maxc, char *s)
 //=================//
 // shell execution //
 //-----------------//
-int exec_shell(int* sh_pid)
+static int exec_shell(int* sh_pid, cfg_data_t *cfg)
 {
-    char env_term[64];
     // open pty master
     int master;
     if ((master = open(DEVPTY, O_RDWR)) < 0) {
@@ -1098,26 +942,31 @@ int exec_shell(int* sh_pid)
             }
         }
         // set env vars
-        if (*term_type != 0) {
+        if (cfg->term_type != NULL) {
             // set terminal type to $TERM
-            sprintf(env_term, "TERM=%s", term_type);
-            putenv(env_term);
+            setenv("TERM", cfg->term_type, 1);
         }
         // set other additional env vars
-        sh_env_t* e;
-        for (e = sh_env.next; e != NULL; e = e->next) {
-            putenv(e->env);
+        int i = 0;
+        sh_env_t *sh_env = cfg->sh_env;
+        while(1) {
+            char *value;
+            const char *env = sh_env->get(sh_env, i++, &value);
+            if (env == NULL) {
+                break;
+            }
+            setenv(env, value, 1);
         }
-	// change directory
-        if (change_dir[0] != 0) {
-	    if (chdir(change_dir) < 0) {
-		char tmp[256];
-		snprintf(tmp, 256, "exec_shell: Can't chdir to \"%s\".", change_dir);
-		tmp[255] = 0;
-		c_error(tmp);
-	    }
+        // change directory
+        if (cfg->change_dir != NULL) {
+            if (chdir(cfg->change_dir) < 0) {
+                char tmp[256];
+                snprintf(tmp, 256, "exec_shell: Can't chdir to \"%s\".", cfg->change_dir);
+                tmp[255] = 0;
+                c_error(tmp);
+            }
         }
-        else if (home_chdir) {
+        else if (cfg->home_chdir) {
             // chdir to home directory
             const char *home_dir = getenv("HOME");
             // ignore chdir(2) system-call error.
@@ -1125,21 +974,23 @@ int exec_shell(int* sh_pid)
         }
         // execute a shell
         char *argv[32];
+        char *cmd_shell = cfg->shell;
         get_argv(argv, 32, cmd_shell);
-        if (enable_loginshell) {
-                char shell_path[128];
-                char *pos;
-                strcpy(shell_path, argv[0]);
-                if ((pos = strrchr(argv[0], '/')) != NULL) {
-                        *pos = '-';
-                        argv[0] = pos;
-                }
-                debug_msg_print(shell_path);
-                execv(shell_path, argv);
+        cfg->shell = strdup(cmd_shell);
+        if (cfg->enable_loginshell) {
+            char shell_path[128];
+            char *pos;
+            strcpy(shell_path, argv[0]);
+            if ((pos = strrchr(argv[0], '/')) != NULL) {
+                *pos = '-';
+                argv[0] = pos;
+            }
+            debug_msg_print("execv '%s' (login shell)", shell_path);
+            execv(shell_path, argv);
         }
         else {
-                debug_msg_print(argv[0]);
-                execv(argv[0], argv);
+            debug_msg_print("execv '%s'", argv[0]);
+            execv(argv[0], argv);
         }
         // no error, exec() doesn't return
         c_error(argv[0]);
@@ -1230,6 +1081,15 @@ enum { oECHO=1, oSGA=3, oTERM=24, oNAWS=31 };
 
 bool c_will_term = false;
 bool c_will_naws = false;
+
+// terminal type & size
+//---------------------
+char *term_type;
+struct winsize win_size = {0,0,0,0};
+
+// dumb terminal flag
+//-------------------
+bool dumb = false;
 
 u_char telnet_cmd(IOBuf* te)
 {
@@ -1416,60 +1276,87 @@ void telnet_session(int te_sock, int sh_pty)
 //---------------------------------------------------------//
 int main(int argc, char** argv)
 {
+    (void)argc;
     int listen_sock = -1;
-    u_short listen_port;
     int te_sock = -1;
     int sh_pty = -1;
     HANDLE hTerm = NULL;
     int sh_pid, agent_pid = 0;
 
+
+    // configuration file (.cfg) path
+    get_cfg_filenames();
+    debug_msg_print("cfg_base %s", cfg_base);
+    debug_msg_print("cfg_exe %s", cfg_exe);
+    debug_msg_print("conf_appdata_full %s", conf_appdata_full);
+    debug_msg_print("sys_conf %s", sys_conf);
+    debug_msg_print("usr_conf %s", usr_conf);
+
+
+    // set default values
+    cfg_data_t *cfg = create_cfg();
+    cfg->port_start = PORT_START_DEFAULT;
+    cfg->port_range = PORT_RANGE_DEFAULT;
+    cfg->telsock_timeout = TELSOCK_TIMEOUT_DEFAULT;
+    cfg->home_chdir = HOME_CHDIR_DEFAULT;
+    cfg->enable_loginshell = ENABLE_LOGINSHELL_DEFAULT;
+    cfg->enable_agent_proxy = ENABLE_AGENT_PROXY_DEFAULT;
+    cfg->debug_flag = DEBUG_FLAG_DEFAULT;
+
     // load configuration
-    load_cfg();
+    get_username_and_shell(cfg);	// from /etc/passwd
+    cfg->dump(cfg, debug_msg_print);
+    load_cfg(cfg);
+    sh_env_t *sh_env = cfg->sh_env;
+    sh_env->add(sh_env, "SHELL", cfg->shell);
+    sh_env->add(sh_env, "USER", cfg->username);
+    debug_msg_print("loginshell %d", cfg->enable_loginshell);
+    cfg->dump(cfg, debug_msg_print);
 
     // read commandline arguments
-    get_args(argc, argv);
+    get_args(argv, cfg);
+    cfg->dump(cfg, debug_msg_print);
 
-    if (cmd_shell[0] == 0) {
+    // restore values
+    debug_flag = cfg->debug_flag;
+
+    if (cfg->shell == NULL) {
         msg_print("missing shell");
         return 0;
     }
-    if (cmd_term[0] == 0 && cl_port <= 0) {
+    if (cfg->term == NULL && cl_port <= 0) {
         msg_print("missing terminal");
         return 0;
     }
 
-    if (change_dir[0] != 0) {
-	home_chdir = false;
-	if (enable_loginshell) {
-	    add_env(&sh_envp, "CHERE_INVOKING=y", NULL);
-	}
+    if (cfg->change_dir != NULL) {
+        cfg->home_chdir = false;
+        if (cfg->enable_loginshell) {
+            sh_env->add(sh_env, "CHERE_INVOKING", "y");
+        }
     }
 
     // terminal side connection
-    if (cl_port > 0) {
+    if (cfg->cl_port > 0) {
         // connect to the specified TCP port
+        cl_port = cfg->cl_port;
         if ((te_sock = connect_client()) < 0) {
             goto cleanup;
         }
     } else {
         // prepare a TELNET listener socket
-        if ((listen_sock = listen_telnet(&listen_port)) < 0) {
+        if ((listen_sock = listen_telnet(&listen_port, cfg)) < 0) {
             goto cleanup;
         }
-        in_addr addr;
-        addr.s_addr = htonl(INADDR_LOOPBACK);
-        char tmp[256];
         debug_msg_print("execute terminal");
-        snprintf(tmp, sizeof(tmp), cmd_term, inet_ntoa(addr), (int)ntohs(listen_port));
-        snprintf(cmd_term, sizeof(cmd_term), "%s %s", tmp, cmd_termopt);
 
         // execute a terminal emulator
-        if ((hTerm = exec_term()) == NULL) {
+        if ((hTerm = exec_term(cfg)) == NULL) {
             api_error("exec_term failed");
             goto cleanup;
         }
         // accept connection from the terminal emulator
-        if ((te_sock = accept_telnet(listen_sock)) < 0) {
+        if ((te_sock = accept_telnet(listen_sock, cfg)) < 0) {
             goto cleanup;
         }
         shutdown(listen_sock, 2);
@@ -1477,18 +1364,20 @@ int main(int argc, char** argv)
         listen_sock = -1;
     }
     // TELNET negotiation
+    term_type = cfg->term_type;
+    dumb = cfg->dumb;
     if (!dumb) {
         telnet_nego(te_sock);
     }
 
     // execute ssh-agent proxy
-    if (enable_agent_proxy) {
-        agent_pid = exec_agent_proxy();
+    if (cfg->enable_agent_proxy) {
+        agent_pid = exec_agent_proxy(sh_env);
     }
 
     // execute a shell
     debug_msg_print("execute shell");
-    if ((sh_pty = exec_shell(&sh_pid)) < 0) {
+    if ((sh_pty = exec_shell(&sh_pid, cfg)) < 0) {
         debug_msg_print("exec_shell failed");
         goto cleanup;
     }
@@ -1528,6 +1417,12 @@ int main(int argc, char** argv)
 }
 
 #ifdef NO_WIN_MAIN
+// リンク時に -mwindows を指定しているので
+// 実行ファイルは subsystem=windows で生成されている
+// プログラムのエントリは WinMainCRTStartup() となる
+// cygwinでインストールされるgcc 11.2 ではとくに指定しなくても main() がコールされる
+//
+// 以前のcygwinのgccでは次のコードが必要だったのかもしれない
 // This program is an Win32 application but, start as Cygwin main().
 //------------------------------------------------------------------
 extern "C" {
