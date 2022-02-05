@@ -353,14 +353,17 @@ ClearType       = ClearTypeを利用する
 	ログを表示するエディタを指定します。
       </dd>
 
-      <dt id="LogDefaultName">Default log file name(strftime format)</dt>
+      <dt id="LogDefaultName">Default log file name</dt>
       <dd>
-	標準のログファイル名を指定します。strftime の書式が使用できます。
+	標準のログファイル名を指定します。<br />
+	<span id="LogFileNameFormat">Tera Term と strftime の書式が使用できます。</span>
 <pre>
-書式:
+Tera Term の書式:
 &amp;h      ホスト名。未接続の場合は空。
 &amp;p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
 &amp;u      ログオン中のユーザ名。
+
+strftime の書式:
 %a      曜日の省略形。
 %A      曜日の正式名。
 %b      月の省略形。
@@ -385,11 +388,20 @@ ClearType       = ClearTypeを利用する
 	タイム ゾーンが不明な場合は指定しません。
 %%      パーセント記号。
 </pre>
+	    <div id="LogFullpath">
+	      <div style="font-weight:bold;">ログファイル名がフルパスでないときの動作</div>
+	      以下の順序で設定値を走査し、値があればそのフォルダからの相対パスとみなします。
+	      <ul>
+	        <li><a href="#LogDefaultPath">標準のログ保存先</a></li>
+	        <li><a href="file-chdir.html">ファイル転送のためのディレクトリ</a></li>
+	        <li>ttermpro.exe のあるディレクトリ</li>
+	      </ul>
+        </div>
       </dd>
 
       <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
-	標準のログ保存先を指定します。ログファイルがフルパスで指定されなかったときに使用されます。
+	標準のログ保存先を指定します。
       </dd>
 
       <dt id="LogAutoStart">Auto start logging</dt>

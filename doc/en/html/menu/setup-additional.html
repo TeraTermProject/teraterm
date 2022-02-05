@@ -356,14 +356,17 @@ ClearType       = Use the ClearType.
 	Specify the editor that is used for display log file
       </dd>
 
-      <dt id="LogDefaultName">Default log file name(strftime format)</dt>
+      <dt id="LogDefaultName">Default log file name</dt>
       <dd>
-	Specify default log file name. It can include a format of strftime.
+	Specify default log file name.<br />
+	<span id="LogFileNameFormat">It can include formats of Tera Term and strftime.</span>
 <pre>
-SYNOPSIS:
+SYNOPSIS of Tera Term:
 &amp;h      Host name(or empty when not connecting)
 &amp;p      TCP port number(or empty when not connecting, not TCP connection)
 &amp;u      Logon user name
+
+SYNOPSIS of strftime:
 %a      Abbreviated weekday name
 %A      Full weekday name
 %b      Abbreviated month name
@@ -388,11 +391,20 @@ SYNOPSIS:
 	no characters if time zone is unknown
 %%      Percent sign
 </pre>
+	    <div id="LogFullpath">
+	      <div style="font-weight:bold;">When log file name is not a full path</div>
+	      Tera Term scans value following order. If a value found, file name is understood as a relative path from that folder.
+	      <ul>
+	        <li><a href="#LogDefaultPath">Default log save folder</a></li>
+	        <li><a href="file-chdir.html">Directory for file transfers</a></li>
+	        <li>ttermpro.exe directory</li>
+	      </ul>
+        </div>
       </dd>
 
       <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
-	Specify default path to save log file. It is used when the log file name is not a full path.
+	Specify default path to save log file.
       </dd>
 
       <dt id="LogAutoStart">Auto start logging</dt>
