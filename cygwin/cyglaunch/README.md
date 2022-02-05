@@ -6,19 +6,23 @@ cygterm を起動するプログラム
 
 cyglaunch で解釈されない引数は cygterm(又は msys2term)へ渡される
 
--msys2
-    cygterm ではなく msys2term を起動する
-    次のオプションを付けることで msys2の環境を設定できる
+- `-msys2`  
+  cygterm ではなく msys2term を起動する  
+  環境変数 MSYSTEM の値によって msys2の環境を設定する  
+  -v は cygterm へ渡されるオプション
 
-    -v MSYSTEM=MSYS
-        msys
-    -v MSYSTEM=MINGW32
-        mingw32
-    -v MSYSTEM=MINGW64
-        mingw64
+- `-v MSYSTEM=MSYS`  
+  msys2 を msys 環境で起動する  
+  `-v` は cygterm へ渡されるオプション
+- `-v MSYSTEM=MINGW32`  
+  msys2 を mingw32 環境で起動する  
+  `-v` は cygterm へ渡されるオプション
+- `-v MSYSTEM=MINGW64`  
+  msys2 を mingw64 環境で起動する  
+  `-v` は cygterm へ渡されるオプション
 
-    msys2の起動については次のURLを参照
-    https://www.msys2.org/wiki/Launchers/
+msys2の起動については次のURLを参照
+https://www.msys2.org/wiki/Launchers/
 
 ## from explorer
 
@@ -38,7 +42,8 @@ set PATH=c:\cygwin64\bin;%PATH%
 msys2term.exe の起動と同等なbat
 
 ```
-set PATH=c:\msys64\bin;%PATH%
+set PATH=c:\msys64\usr\bin;%PATH%
+set MSYSTEM=MINGW32
 \path\to\msys2term.exe
 ```
 
