@@ -29,6 +29,8 @@
 
 /* useful routines */
 
+#include <time.h>	// for time_t
+
 #pragma once
 
 #include "i18n.h"
@@ -108,7 +110,7 @@ BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t 
 DllExport void OutputDebugPrintf(_Printf_format_string_ const char *fmt, ...);
 void OutputDebugPrintfW(_Printf_format_string_ const wchar_t *fmt, ...);
 #elif defined(__GNUC__)
-DllExport void OutputDebugPrintf(_Printf_format_string_ const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+DllExport void OutputDebugPrintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 void OutputDebugPrintfW(const wchar_t *fmt, ...); // __attribute__ ((format (wprintf, 1, 2)));
 #else
 DllExport void OutputDebugPrintf(const char *fmt, ...);
