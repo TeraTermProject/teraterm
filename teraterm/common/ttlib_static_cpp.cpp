@@ -904,6 +904,35 @@ wchar_t *GetExeDirW(HINSTANCE hInst)
 
 #define PORTABLE_FILENAME L"portable.ini"
 
+/**
+ *	ポータブル版として動作するか
+ *
+ *	@retval		TRUE		ポータブル版
+ *	@retval		FALSE		通常インストール版
+ */
+BOOL IsPortableMode(void)
+{
+	static BOOL called = FALSE;
+	static BOOL ret_val = FALSE;
+	if (called == FALSE) {
+		called = TRUE;
+		wchar_t *exe_dir = GetExeDirW(NULL);
+		wchar_t *portable_ini = NULL;
+		awcscats(&portable_ini, exe_dir, L"\\", PORTABLE_FILENAME, NULL);
+		free(exe_dir);
+		DWORD r = GetFileAttributesW(portable_ini);
+		free(portable_ini);
+		if (r == INVALID_FILE_ATTRIBUTES) {
+			//ファイルが存在しない
+			ret_val = FALSE;
+		}
+		else {
+			ret_val = TRUE;
+		}
+	}
+	return ret_val;
+}
+
 /*
  * Get home directory
  *		個人用設定ファイルフォルダ取得
@@ -920,21 +949,17 @@ wchar_t *GetExeDirW(HINSTANCE hInst)
  */
 wchar_t *GetHomeDirW(HINSTANCE hInst)
 {
-	wchar_t *path;
-	wchar_t *ret = NULL;
-	wchar_t *ExeDirW = GetExeDirW(hInst);
-	wchar_t *portable_file = NULL;
-	struct _stat s;
-	awcscats(&portable_file, ExeDirW, L"\\" PORTABLE_FILENAME, NULL);
-	if (_wstat(portable_file, &s) == 0) {
-		free(portable_file);
-		return ExeDirW;
+	if (IsPortableMode()) {
+		return GetExeDirW(hInst);
 	}
-	free(portable_file);
-	_SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
-	awcscats(&ret, path, L"\\teraterm5", NULL);
-	free(path);
-	return ret;
+	else {
+		wchar_t *path;
+		wchar_t *ret = NULL;
+		_SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
+		awcscats(&ret, path, L"\\teraterm5", NULL);
+		free(path);
+		return ret;
+	}
 }
 
 /*
@@ -951,23 +976,20 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
  */
 wchar_t* GetLogDirW(HINSTANCE hInst)
 {
-	wchar_t *path;
 	wchar_t *ret = NULL;
-	wchar_t *ExeDirW = GetExeDirW(hInst);
-	wchar_t *portable_file = NULL;
-	struct _stat s;
-	awcscats(&portable_file, ExeDirW, L"\\" PORTABLE_FILENAME, NULL);
-	if (_wstat(portable_file, &s) == 0) {
+	if (IsPortableMode()) {
+		wchar_t *ExeDirW = GetExeDirW(hInst);
 		awcscats(&ret, ExeDirW, L"\\log", NULL);
-		free(portable_file);
 		free(ExeDirW);
 		return ret;
 	}
-	free(portable_file);
-	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
-	awcscats(&ret, path, L"\\teraterm5", NULL);
-	free(path);
-	return ret;
+	else {
+		wchar_t *path;
+		_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
+		awcscats(&ret, path, L"\\teraterm5", NULL);
+		free(path);
+		return ret;
+	}
 }
 
 /*

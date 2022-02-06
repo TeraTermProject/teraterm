@@ -223,8 +223,6 @@ error_return:
  */
 BOOL IsPortableMode(void)
 {
-	return FALSE;
-#if 0
 	static BOOL called = FALSE;
 	static BOOL ret_val = FALSE;
 	if (called == FALSE) {
@@ -260,7 +258,6 @@ BOOL IsPortableMode(void)
 		}
 	}
 	return ret_val;
-#endif
 }
 
 // $APPDATA wchar_t
