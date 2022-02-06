@@ -98,6 +98,7 @@ perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
 
 if "%release%"=="yes" (
 copy nul %dst%\ttpmenu.ini
+copy nul %dst%\portable.ini
 )
 
 exit /b

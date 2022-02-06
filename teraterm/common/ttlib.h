@@ -94,7 +94,7 @@ void GetDownloadFolder(char *dest, int destlen);
 wchar_t *GetDownloadFolderW(void);
 wchar_t *GetHomeDirW(HINSTANCE hInst);
 wchar_t *GetExeDirW(HINSTANCE hInst);
-wchar_t* GetLogDirW(void);
+wchar_t* GetLogDirW(HINSTANCE hInst);
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file);
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home);
 void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,

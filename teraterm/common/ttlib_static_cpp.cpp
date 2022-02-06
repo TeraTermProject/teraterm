@@ -902,13 +902,18 @@ wchar_t *GetExeDirW(HINSTANCE hInst)
 	return dir;
 }
 
+#define PORTABLE_FILENAME L"portable.ini"
+
 /*
  * Get home directory
  *		個人用設定ファイルフォルダ取得
  *		ttypes.HomeDirW と同一
  *		TERATERM.INI などがおいてあるフォルダ
- *		ttermpro.exe があるフォルダは GetExeDirW() で取得
- *		%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
+ *		ttermpro.exe があるフォルダは GetHomeDirW() ではなく GetExeDirW() で取得できる
+ *		ExeDirW に portable.ini がある場合
+ *			ExeDirW
+ *		ExeDirW に portable.ini がない場合
+ *			%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
  *
  * @param[in]		hInst		WinMain()の HINSTANCE または NULL
  * @return			HomeDir		不要になったら free() すること
@@ -916,8 +921,17 @@ wchar_t *GetExeDirW(HINSTANCE hInst)
 wchar_t *GetHomeDirW(HINSTANCE hInst)
 {
 	wchar_t *path;
-	_SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
 	wchar_t *ret = NULL;
+	wchar_t *ExeDirW = GetExeDirW(hInst);
+	wchar_t *portable_file = NULL;
+	struct _stat s;
+	awcscats(&portable_file, ExeDirW, L"\\" PORTABLE_FILENAME, NULL);
+	if (_wstat(portable_file, &s) == 0) {
+		free(portable_file);
+		return ExeDirW;
+	}
+	free(portable_file);
+	_SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
 	awcscats(&ret, path, L"\\teraterm5", NULL);
 	free(path);
 	return ret;
@@ -927,16 +941,30 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
  * Get log directory
  *		ログ保存フォルダ取得
  *		ttypes.LogDirW と同一
- *		%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
+ *		ExeDirW に portable.ini がある場合
+ *			ExeDirW\log
+ *		ExeDirW に portable.ini がない場合
+ *			%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
  *
  * @param[in]		hInst		WinMain()の HINSTANCE または NULL
  * @return			LogDir		不要になったら free() すること
  */
-wchar_t* GetLogDirW(void)
+wchar_t* GetLogDirW(HINSTANCE hInst)
 {
 	wchar_t *path;
-	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
 	wchar_t *ret = NULL;
+	wchar_t *ExeDirW = GetExeDirW(hInst);
+	wchar_t *portable_file = NULL;
+	struct _stat s;
+	awcscats(&portable_file, ExeDirW, L"\\" PORTABLE_FILENAME, NULL);
+	if (_wstat(portable_file, &s) == 0) {
+		awcscats(&ret, ExeDirW, L"\\log", NULL);
+		free(portable_file);
+		free(ExeDirW);
+		return ret;
+	}
+	free(portable_file);
+	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
 	awcscats(&ret, path, L"\\teraterm5", NULL);
 	free(path);
 	return ret;

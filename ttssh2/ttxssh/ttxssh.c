@@ -2565,7 +2565,7 @@ wchar_t *get_log_dir_relative_nameW(const wchar_t *basename)
 		return _wcsdup(basename);
 	}
 
-	path = GetLogDirW();
+	path = GetLogDirW(NULL);
 	awcscats(&path, L"\\", basename, NULL);
 	return path;
 }

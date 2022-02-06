@@ -283,7 +283,7 @@ static void DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pE
 		return;
 	}
 
-	logdir = GetLogDirW();
+	logdir = GetLogDirW(NULL);
 	awcscats(&dumpfile, logdir, L"\\", filename, NULL);
 	HANDLE file = CreateFileW(dumpfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	free(dumpfile);

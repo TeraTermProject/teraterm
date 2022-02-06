@@ -202,7 +202,7 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	ts->ExeDirW = GetExeDirW(hInst);
 
 	// LogDir
-	ts->LogDirW = GetLogDirW();
+	ts->LogDirW = GetLogDirW(hInst);
 	CreateDirectoryW(ts->LogDirW, NULL);
 
 	// HomeDir
