@@ -449,9 +449,9 @@ void ssh_heartbeat_unlock(void)
 // (2005.3.7 yutaka)
 //
 #define MEMTAG_MAX 300
-#define LOGDUMP "ssh2connect.log"
-#define LOG_PACKET_DUMP "ssh2packet.log"
-#define SENDTOME "Please send '"LOGDUMP"' file to Tera Term developer team."
+#define LOGDUMP L"ssh2connect.log"
+#define LOG_PACKET_DUMP L"ssh2packet.log"
+#define SENDTOME L"Please send '" LOGDUMP L"' file to Tera Term developer team."
 
 typedef struct memtag {
 	char *name;
@@ -562,22 +562,16 @@ void finish_memdump(void)
 	memtag_count = 0;
 }
 
-void save_memdump(char *filename)
+void save_memdump(wchar_t *filename)
 {
 	FILE *fp;
 	int i;
 	time_t t;
 	struct tm *tm;
-	wchar_t *filenameW = NULL;
-	wchar_t *dumpfileW = NULL;
-	char *dumpfile = NULL;
+	wchar_t *dumpfile = NULL;
 
-	filenameW = ToWcharA(filename);
-	dumpfileW = get_log_dir_relative_nameW(filenameW);
-	dumpfile = ToCharW(dumpfileW);
-	fp = fopen(dumpfile, "w");
-	free(filenameW);
-	free(dumpfileW);
+	dumpfile = get_log_dir_relative_nameW(filename);
+	_wfopen_s(&fp, dumpfile, L"w");
 	free(dumpfile);
 	if (fp == NULL)
 		return;
@@ -5466,7 +5460,10 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *sha
 			}
 		}
 		else {
-			_snprintf_s(emsg, sizeof(emsg), _TRUNCATE, "%s: key verify error (%d)\r\n%s", __FUNCTION__, ret, SENDTOME);
+			char *buf = NULL;
+			buf = ToCharW(SENDTOME);
+			_snprintf_s(emsg, sizeof(emsg), _TRUNCATE, "%s: key verify error (%d)\r\n%s", __FUNCTION__, ret, buf);
+			free(buf);
 		}
 
 		save_memdump(LOGDUMP);
