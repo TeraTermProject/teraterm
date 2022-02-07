@@ -482,7 +482,6 @@ var
   CodePage      : integer;
   VTFont        : String;
   TEKFont       : String;
-  FileDir       : String;
   TCPPort       : integer;
   ViewlogEditor : String;
   CipherOrder   : String;
@@ -493,7 +492,6 @@ begin
   CodePage       := GetIniInt('Tera Term', 'CodePage', 0, 0, 0, iniFile);
   VTFont         := GetIniString('Tera Term', 'VTFont', '', iniFile);
   TEKFont        := GetIniString('Tera Term', 'TEKFont', '', iniFile);
-  FileDir        := GetIniString('Tera Term', 'FileDir', '', iniFile);
   TCPPort        := GetIniInt('Tera Term', 'TCPPort', 0, 0, 65535, iniFile)
   ViewlogEditor  := GetIniString('Tera Term', 'ViewlogEditor', '', iniFile);
   CipherOrder    := GetIniString('TTSSH', 'CipherOrder', '', iniFile);
@@ -612,11 +610,6 @@ begin
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Traditional Chinese.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Default.lng', iniFile);
-  end;
-
-  if Length(FileDir) = 0 then begin
-    FileDir := ExpandConstant('{app}');
-    SetIniString('Tera Term', 'FileDir', FileDir, iniFile);
   end;
 
   if TCPPort = 0 then begin
