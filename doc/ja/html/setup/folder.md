@@ -1,12 +1,16 @@
 ﻿# Tera Term が使用するフォルダ
 
-|                  | インストール版(*1)         | ポータブル版                 |
-|------------------|----------------------------|------------------------------|
-| 設定ファイル     | `%APPDATA%\teraterm5`      | exeファイルのあるフォルダ    |
-| 動作ログ、ダンプ | `%LOCALAPPDATA%\teraterm5` | `%USERPROFILE%\Documents\teraterm5` (*2) |
+- インストール版
+  - 設定ファイル
+    - `%APPDATA%\teraterm5`
+  - 動作ログ、ダンプ
+    - `%LOCALAPPDATA%\teraterm5`
 
-- *1 インストール先 (32bitOS+32bitEXEの場合) `%PROGRAMFILES%\teraterm5`
-- *2 SHGetKnownFolderPath(FOLDERID_Documents) + "\teraterm5"
+- ポータブル版
+  - 設定ファイル
+    - exeファイルのあるフォルダ
+  - 動作ログ、ダンプ
+    - exeファイルのあるフォルダ + `\log`
 
 # ポータブル版について
 
