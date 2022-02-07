@@ -1741,8 +1741,14 @@ int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM 
 	}
 	case PSCB_INITIALIZED:
 	{
+		static const DlgTextInfo TextInfos[] = {
+			{ IDOK, "BTN_OK" },
+			{ IDCANCEL, "BTN_CANCEL" },
+			{ IDHELP, "BTN_HELP" },
+		};
 		CAddSettingPropSheetDlg *self = gTTCPS;
 		self->m_hWnd = hWnd;
+		SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 		CenterWindow(hWnd, self->m_hParentWnd);
 		break;
 	}
