@@ -232,9 +232,13 @@ Root: HKCR; Subkey: TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {ap
 Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 [Tasks]
-Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
-Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
-Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
+; Tera Term 4 のを上書きしないよう、テスト版の間はデフォルトを off にする
+; Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
+; Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
+; Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
+Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm; Flags: unchecked
+Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm; Flags: unchecked
+Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu; Flags: unchecked
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
 Name: quickcyglaunch; Description: {cm:task_quickcyglaunch}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
