@@ -31,6 +31,7 @@ AppCopyright=(C) 2004-2020 TeraTerm Project
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://ttssh2.osdn.jp/
 AppSupportURL=https://ttssh2.osdn.jp/
+AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
 #ifndef snapshot
 AppVersion={#AppVer}
@@ -40,7 +41,7 @@ AppVersion={#AppVer}+ snapshot-{#snapshot}
 AppVerName={#AppName} {#AppVer}+ snapshot-{#snapshot}
 #endif
 LicenseFile=release\license.txt
-DefaultDirName={pf}\teraterm
+DefaultDirName={pf}\teraterm5
 DefaultGroupName={#AppName}
 ShowLanguageDialog=yes
 AllowNoIcons=true

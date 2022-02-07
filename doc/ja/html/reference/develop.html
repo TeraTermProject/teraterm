@@ -126,12 +126,8 @@ VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
   </li>
   <li>インストーラ
     <ul>
-      <li>Inno Setup 5.6.1 ANSI (http://www.jrsoftware.org/isinfo.php)
-        <ul>
-          <li>Inno Setup Preprocessor</li>
-        </ul>
-      </li>
-      <li>ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)</li>
+      <li>Inno Setup 6.2.0 (https://jrsoftware.org/isinfo.php)
+      <li>Inno Script Studio 2.5.1 (https://www.kymoto.org/products/inno-script-studio)</li>
     </ul>
   </li>
   <li>その他
@@ -583,17 +579,6 @@ TeraTerm Project でのリリース手順について以下に示します。
       </li>
       <li>teraterm.iss から起動するバッチを、リリース用に「リビルド有効」「アーカイブ作成有効」にする
         <pre>
-  [InnoIDE_PreCompile]
-  Name: makechm.bat
-- Name: build.bat
-- ;Name: build.bat; Parameters: rebuild
-+ ;Name: build.bat
-+ Name: build.bat; Parameters: rebuild
-  
-  [InnoIDE_PostCompile]
-- ;Name: makearchive.bat; Parameters: release
-+ Name: makearchive.bat; Parameters: release
-  
   [PreCompile]
   Name: makechm.bat
 - Name: build.bat
@@ -604,21 +589,10 @@ TeraTerm Project でのリリース手順について以下に示します。
   [PostCompile]
 - ;Name: makearchive.bat; Parameters: release
 + Name: makearchive.bat; Parameters: release
-  
-  [_ISToolPreCompile]
-  Name: makechm.bat
-- Name: build.bat
-- ;Name: build.bat; Parameters: rebuild
-+ ;Name: build.bat
-+ Name: build.bat; Parameters: rebuild
-  
-  [_ISToolPostCompile]
-- ;Name: makearchive.bat; Parameters: release
-+ Name: makearchive.bat; Parameters: release
         </pre>
       </li>
       <li id="RC_commit">この状態でコミットする</li>
-      <li>ISTool で teraterm\installer\teraterm.iss を開き、"Project"-"Compile Setup" でインストーラを作成する</li>
+      <li>Inno Script Studio で teraterm\installer\teraterm.iss を開き、"Project"-"Compile" でインストーラを作成する</li>
       <li>作成されたポータブル版を zip で圧縮する</li>
     </ul>
   </li>
@@ -674,7 +648,7 @@ svn copy -m "Release 4.106" \
   </li>
   <li>インストーラを作成する
     <ul>
-      <li>ISTool で teraterm\installer\teraterm.iss を開き、"Project"-"Compile Setup" で作成する</li>
+      <li>Inno Script Studio で teraterm\installer\teraterm.iss を開き、"Project"-"Compile" で作成する</li>
       <li>作成されたポータブル版を zip で圧縮する</li>
     </ul>
   </li>
@@ -704,17 +678,6 @@ svn copy -m "Release 4.106" \
 - ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 + #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
-  [InnoIDE_PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-  
-  [InnoIDE_PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-  
   [PreCompile]
   Name: makechm.bat
 - ;Name: build.bat
@@ -723,17 +686,6 @@ svn copy -m "Release 4.106" \
 + ;Name: build.bat; Parameters: rebuild
   
   [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-  
-  [_ISToolPreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-  
-  [_ISToolPostCompile]
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
     </pre>
