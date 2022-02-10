@@ -3,17 +3,13 @@
 
                 Using Cygwin with a terminal emulator.
 
-                (C) 2006-2016 TeraTerm Project
+                (C) 2006- TeraTerm Project
                 https://ttssh2.osdn.jp/
 
                 Based on CygTerm by Original developer:
                 Copyright (C) 2000-2006 NSym
 
                 nsym@dd.iij4u.or.jp
-
-      (English) https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html
-
-     (Japanese) https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index.html
 
 
 // P R E F A C E //
@@ -95,22 +91,43 @@
       in advance.  cygterm.exe and cygterm.cfg are installed in BINDIR.
       cygterm.cfg is not overwritten.
 
+// normal mode / portable mode //
+
+    If portable.ini is exists in the same folder, cygterm.exe is
+    portable mode. Otherwise cygterm.exe is normal mode.
+
 // C O N F I G U R A T I O N //
 
     cygterm.cfg is a configuration file.  This includes definitions for the
     command lines of a terminal emulator and a shell, and several parameters.
+
     cygterm.cfg is loaded from the same directory cygterm.exe exists in.
 
-      An example of cygterm.cfg
+    cygterm.cfg reading order:
+
+    - cygterm.cfg in the same folder as cygterm.exe
+    - /etc/cygterm.conf
+    - $APPDATA/teraterm5/cygterm.cfg
+    - ~/.cygtermrc
+
+    $SHELL and $USER are set before reading cygterm.cfg.
+    Overwritten with the value of cygterm.cfg readed later.
+    Then it will be overwritten by command line options.
+
+    When portable mode, cygterm reads next only one file.
+
+    - $APPDATA/teraterm5/cygterm.cfg
+
+    An example of cygterm.cfg
       +-----------------------------------------------------------------------
       | TERM = C:\program files\ttermpro\ttermpro.exe %s %d /KR=SJIS /KT=SJIS
       | TERM_TYPE = vt100
       | PORT_START = 20000
       | PORT_RANGE = 40
       | SHELL = /bin/bash
-      | ENV_1 = MAKE_MODE=unix
-      | ENV_2 = HOME=/home
-      |   :         :
+
+    The character encoding of cygterm.cfg is utf-8
+    (In Cygwin 1.5, The character encoding of cygterm.cfg will be ACP)
 
     TERM
     ----
@@ -267,7 +284,13 @@
                 zsh 4.3.10
 
 // C H A N G E S //
-v1.07_28 2016/11/26 (by maya)
+v1.07_30 2022/02/06
+        * Add cfg file to read
+          $APPDATA/teraterm5/cygterm.cfg
+        * Modify for Unicode
+        * Add portable mode
+
+v1.07_29 2016/11/26 (by maya)
         * Changed the icon image.
 
 v1.07_28 2016/02/17 (by doda)
