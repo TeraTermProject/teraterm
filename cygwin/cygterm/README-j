@@ -1,7 +1,7 @@
 
                 CygTerm+  -  yet another Cygwin console
 
-                $B%?!<%_%J%k!&%(%_%e%l!<%?$G(B Cygwin $B$r;H$&!#(B
+                ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚Å Cygwin ‚ğg‚¤B
 
                 (C) 2006- TeraTerm Project
                 https://ttssh2.osdn.jp/
@@ -11,112 +11,112 @@
                 nsym@dd.iij4u.or.jp
 
 
-// $B$O(B $B$8(B $B$a(B $B$K(B //
+// ‚Í ‚¶ ‚ß ‚É //
 
-    Cygwin$B%3%s%=!<%k$G$"$k(BDOS$BAk$r%?!<%_%J%k!&%(%_%e%l!<%?$GCV$-BX$($F$_$h$&!"(B
-    $B$H$$$&;n$_$G$9!#(B $B$?$@$7!X%j%b!<%H%m%0%$%s$N$7$/$_$rMxMQ$;$:$K!Y$H$$$&(B
-    $BA0Ds$G$9!#(B $B$7$?$,$C$F(B inetd $B$H$+(B in.telnetd $B$H$+(B login $BEy$O;HMQ$7$^$;$s!#(B
+    CygwinƒRƒ“ƒ\[ƒ‹‚Å‚ ‚éDOS‘‹‚ğƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚Å’u‚«‘Ö‚¦‚Ä‚İ‚æ‚¤A
+    ‚Æ‚¢‚¤‚İ‚Å‚·B ‚½‚¾‚µwƒŠƒ‚[ƒgƒƒOƒCƒ“‚Ì‚µ‚­‚İ‚ğ—˜—p‚¹‚¸‚Éx‚Æ‚¢‚¤
+    ‘O’ñ‚Å‚·B ‚µ‚½‚ª‚Á‚Ä inetd ‚Æ‚© in.telnetd ‚Æ‚© login “™‚Íg—p‚µ‚Ü‚¹‚ñB
 
-// $B9M(B $B$((B $BJ}(B //
+// l ‚¦ •û //
 
-    $B%?!<%_%J%k!&%(%_%e%l!<%?$H(BCygwin$B>e$N%7%'%k$r5/F0$7!"N><T$rCf7Q$9$k!#(B
-    $B$3$l$r9T$&%W%m%0%i%`$r:n$l$P$h$$!#(B
+    ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ÆCygwinã‚ÌƒVƒFƒ‹‚ğ‹N“®‚µA—¼Ò‚ğ’†Œp‚·‚éB
+    ‚±‚ê‚ğs‚¤ƒvƒƒOƒ‰ƒ€‚ğì‚ê‚Î‚æ‚¢B
 
-// $B;E(B $BMM(B //
+// d —l //
 
-    1. $B$3$N%W%m%0%i%`$r<B9T$9$k$H!"%?!<%_%J%k!&%(%_%e%l!<%?$,N)$A>e$,$j!"(B
-       $B$=$3$K%7%'%k$N%W%m%s%W%H$,8=$l!"(BCygwin$B%3%s%=!<%k$H$7$F;H$($k$3$H!#(B
+    1. ‚±‚ÌƒvƒƒOƒ‰ƒ€‚ğÀs‚·‚é‚ÆAƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ª—§‚¿ã‚ª‚èA
+       ‚»‚±‚ÉƒVƒFƒ‹‚Ìƒvƒƒ“ƒvƒg‚ªŒ»‚êACygwinƒRƒ“ƒ\[ƒ‹‚Æ‚µ‚Äg‚¦‚é‚±‚ÆB
 
-    2. $B5/F0$9$k%?!<%_%J%k!&%(%_%e%l!<%?$H%7%'%k$OA*Br2DG=$G$"$k$3$H!#(B
+    2. ‹N“®‚·‚éƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ÆƒVƒFƒ‹‚Í‘I‘ğ‰Â”\‚Å‚ ‚é‚±‚ÆB
 
-    3. $B%7%'%kB&$N2hLL@)8f$,@5>o$KF0:n$7!"%?!<%_%J%k!&%(%_%e%l!<%?B&$N(B
-       $B2hLL%5%$%:JQ99$K$bDI?o$9$k$3$H!#(B
+    3. ƒVƒFƒ‹‘¤‚Ì‰æ–Ê§Œä‚ª³í‚É“®ì‚µAƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‘¤‚Ì
+       ‰æ–ÊƒTƒCƒY•ÏX‚É‚à’Ç‚·‚é‚±‚ÆB
 
-// $B@_(B $B7W(B //
+// İ Œv //
 
-    cygterm.exe $B=hM}>\:Y(B
+    cygterm.exe ˆ—Ú×
 
-      [1] TELNET$B@\B3$rBT$A<u$1$k%j%9%J!<%=%1%C%H$rMQ0U$9$k!#(B
-          $B%=%1%C%H$K3d$jEv$F$kL$;HMQ%]!<%HHV9f$O;XDjHO0OFb$+$iC5$7=P$9!#(B
+      [1] TELNETÚ‘±‚ğ‘Ò‚¿ó‚¯‚éƒŠƒXƒi[ƒ\ƒPƒbƒg‚ğ—pˆÓ‚·‚éB
+          ƒ\ƒPƒbƒg‚ÉŠ„‚è“–‚Ä‚é–¢g—pƒ|[ƒg”Ô†‚Íw’è”ÍˆÍ“à‚©‚ç’T‚µo‚·B
 
-      [2] $BJL%9%l%C%I$G%?!<%_%J%k!&%(%_%e%l!<%?$r5/F0$9$k!#(B
-          $B$3$N$H$-5/F00z?t$K(B IP$B%"%I%l%9(B 127.0.0.1 $B$H(B [1]$B$N%]!<%HHV9f$r;XDj$9$k!#(B
+      [2] •ÊƒXƒŒƒbƒh‚Åƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ğ‹N“®‚·‚éB
+          ‚±‚Ì‚Æ‚«‹N“®ˆø”‚É IPƒAƒhƒŒƒX 127.0.0.1 ‚Æ [1]‚Ìƒ|[ƒg”Ô†‚ğw’è‚·‚éB
 
-      [3] $B%?!<%_%J%k!&%(%_%e%l!<%?$+$i$N@\B3$r<u$1F~$l$k!#(B
-          $B%;%-%e%j%F%#!<>e(B 127.0.0.1 $B0J30$+$i$N@\B3$O5Q2<$9$k!#(B
+      [3] ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚©‚ç‚ÌÚ‘±‚ğó‚¯“ü‚ê‚éB
+          ƒZƒLƒ…ƒŠƒeƒB[ã 127.0.0.1 ˆÈŠO‚©‚ç‚ÌÚ‘±‚Í‹p‰º‚·‚éB
 
-      [4] fork()$B$7$?;R%W%m%;%9>e!"(BPTY($B5<;wC<Kv(B)$B%9%l!<%VB&$G%7%'%k$r5/F0$9$k!#(B
+      [4] fork()‚µ‚½qƒvƒƒZƒXãAPTY(‹[—’[––)ƒXƒŒ[ƒu‘¤‚ÅƒVƒFƒ‹‚ğ‹N“®‚·‚éB
 
-      [5] [3]$B$N(B TELNET$B@\B3%=%1%C%H$H(B [4]$B$N(B PTY$B%^%9%?!<B&$NF~=PNO$r66EO$7$9$k!#(B
+      [5] [3]‚Ì TELNETÚ‘±ƒ\ƒPƒbƒg‚Æ [4]‚Ì PTYƒ}ƒXƒ^[‘¤‚Ì“üo—Í‚ğ‹´“n‚µ‚·‚éB
 
-    TELNET$B%W%m%H%3%k$X$NBP1~(B (option negotiation)
+    TELNETƒvƒƒgƒRƒ‹‚Ö‚Ì‘Î‰ (option negotiation)
 
-        $B%?!<%_%J%k!&%(%_%e%l!<%?$+$i%?!<%_%J%k%?%$%W$NDLCN$r<u$1!"(B
-        $B%7%'%k>e(B TERM $B4D6-JQ?t$K%;%C%H$9$k!#(B
+        ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚©‚çƒ^[ƒ~ƒiƒ‹ƒ^ƒCƒv‚Ì’Ê’m‚ğó‚¯A
+        ƒVƒFƒ‹ã TERM ŠÂ‹«•Ï”‚ÉƒZƒbƒg‚·‚éB
 
-        $B%?!<%_%J%k!&%(%_%e%l!<%?$+$i%?!<%_%J%k%5%$%:$NDLCN$r<u$1!"(B
-        PTY$B$N%&%#%s%I%&%5%$%:$rF1%5%$%:$KJQ99$9$k!#(B
+        ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚©‚çƒ^[ƒ~ƒiƒ‹ƒTƒCƒY‚Ì’Ê’m‚ğó‚¯A
+        PTY‚ÌƒEƒBƒ“ƒhƒEƒTƒCƒY‚ğ“¯ƒTƒCƒY‚É•ÏX‚·‚éB
 
-        $B<+J,$,(B Go Ahead $B$r;H$o$J$$;v$N5v2D$r%?!<%_%J%k%(%_%e%l!<%?$KMW5a$9$k!#(B
+        ©•ª‚ª Go Ahead ‚ğg‚í‚È‚¢–‚Ì‹–‰Â‚ğƒ^[ƒ~ƒiƒ‹ƒGƒ~ƒ…ƒŒ[ƒ^‚É—v‹‚·‚éB
 
-        $B%?!<%_%J%k%(%_%e%l!<%?$,(B Go Ahead $B$r;HMQ$7$J$$$h$&$KMW5a$9$k!#(B
+        ƒ^[ƒ~ƒiƒ‹ƒGƒ~ƒ…ƒŒ[ƒ^‚ª Go Ahead ‚ğg—p‚µ‚È‚¢‚æ‚¤‚É—v‹‚·‚éB
 
-        $B%?!<%_%J%k%(%_%e%l!<%?$NAw?.FbMF$r%(%3!<%P%C%/$9$k5v2D$rMW5a$9$k!#(B
+        ƒ^[ƒ~ƒiƒ‹ƒGƒ~ƒ…ƒŒ[ƒ^‚Ì‘—M“à—e‚ğƒGƒR[ƒoƒbƒN‚·‚é‹–‰Â‚ğ—v‹‚·‚éB
 
-        [$B;2>H(B: RFC854 TELNET PROTOCOL SPECIFICATION]
+        [QÆ: RFC854 TELNET PROTOCOL SPECIFICATION]
 
-    cygterm.exe $B$O%&%#%s%I%&$r;}$?$J$$(B Win32$B%"%W%j$H$7$F<BAu$9$k!#(B
+    cygterm.exe ‚ÍƒEƒBƒ“ƒhƒE‚ğ‚½‚È‚¢ Win32ƒAƒvƒŠ‚Æ‚µ‚ÄÀ‘•‚·‚éB
 
-// $B%=(B $B!<(B $B%9(B //
+// ƒ\ [ ƒX //
 
-    README-j     -  $B$3$N%U%!%$%k(B
-    README       -  README-j$B1QLu(B
+    README-j     -  ‚±‚Ìƒtƒ@ƒCƒ‹
+    README       -  README-j‰p–ó
     COPYING      -  GNU General Public License (GPL) Version 2
-    Makefile     -  $B%a%$%/%U%!%$%k(B
-    cygterm.cc   -  $B%=!<%9%3!<%I(B
-    cygterm.cfg  -  $B@_Dj%U%!%$%k(B
+    Makefile     -  ƒƒCƒNƒtƒ@ƒCƒ‹
+    cygterm.cc   -  ƒ\[ƒXƒR[ƒh
+    cygterm.cfg  -  İ’èƒtƒ@ƒCƒ‹
 
-    $B"((B Free Software Foundation $BH/9T(B GNU General Public License (GPL)
-       $B$K=`5r$9$k%U%j!<%=%U%H%&%'%"$H$7$FG[I[$7$^$9!#(B
-       COPYING $B;2>H!#(B(https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+    ¦ Free Software Foundation ”­s GNU General Public License (GPL)
+       ‚É€‹’‚·‚éƒtƒŠ[ƒ\ƒtƒgƒEƒFƒA‚Æ‚µ‚Ä”z•z‚µ‚Ü‚·B
+       COPYING QÆB(https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 
-       $BJdB-(B: $BB>%W%m%0%i%`$,(B CygTerm$B<B9T7A<0(B(cygterm.exe)$B$r5/F0$7DL?.$7$F(B
-             $B;HMQ$9$k$3$H$O!"$=$l$,Hs(BGPL$B%W%m%0%i%`$N>l9g$G$b5v2D$5$l$^$9!#(B
+       •â‘«: ‘¼ƒvƒƒOƒ‰ƒ€‚ª CygTermÀsŒ`®(cygterm.exe)‚ğ‹N“®‚µ’ÊM‚µ‚Ä
+             g—p‚·‚é‚±‚Æ‚ÍA‚»‚ê‚ª”ñGPLƒvƒƒOƒ‰ƒ€‚Ìê‡‚Å‚à‹–‰Â‚³‚ê‚Ü‚·B
 
-// $B%$(B $B%s(B $B%9(B $B%H(B $B!<(B $B%k(B //
+// ƒC ƒ“ ƒX ƒg [ ƒ‹ //
 
-    Cygwin$B4D6-2<$G(B make install $B$r<B9T$7$^$9!#(B
+    CygwinŠÂ‹«‰º‚Å make install ‚ğÀs‚µ‚Ü‚·B
 
-    $B"((B $B%$%s%9%H!<%k@h%G%#%l%/%H%j$O(B Makefile $BCf(B BINDIR $B$G@_Dj$7$F$*$-$^$9!#(B
-       BINDIR $B$K(B cygterm.exe $B$H(B cygterm.cfg $B$,%$%s%9%H!<%k$5$l$^$9!#(B
-       cygterm.cfg $B$O>e=q$-$5$l$^$;$s!#(B
+    ¦ ƒCƒ“ƒXƒg[ƒ‹æƒfƒBƒŒƒNƒgƒŠ‚Í Makefile ’† BINDIR ‚Åİ’è‚µ‚Ä‚¨‚«‚Ü‚·B
+       BINDIR ‚É cygterm.exe ‚Æ cygterm.cfg ‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ü‚·B
+       cygterm.cfg ‚Íã‘‚«‚³‚ê‚Ü‚¹‚ñB
 
-// $BF0:n%b!<%I(B //
+// “®ìƒ‚[ƒh //
 
-    cygterm.exe $B$HF1$8%U%)%k%@$K(B portable.ini $B$,$"$k>l9g%]!<%?%V%kHG$H(B
-    $B$7$FF0:n$7$^$9!#(Bportable.ini $B$,$J$$>l9g$ODL>oHG$H$7$FF0:n$7$^$9!#(B
+    cygterm.exe ‚Æ“¯‚¶ƒtƒHƒ‹ƒ_‚É portable.ini ‚ª‚ ‚éê‡ƒ|[ƒ^ƒuƒ‹”Å‚Æ
+    ‚µ‚Ä“®ì‚µ‚Ü‚·Bportable.ini ‚ª‚È‚¢ê‡‚Í’Êí”Å‚Æ‚µ‚Ä“®ì‚µ‚Ü‚·B
 
-// $B@_(B $BDj(B $B%U(B $B%!(B $B%$(B $B%k(B //
+// İ ’è ƒt ƒ@ ƒC ƒ‹ //
 
-    cygterm.cfg $B$O@_Dj%U%!%$%k$G$9!#(B $B;HMQ$9$kC<Kv%(%_%e%l!<%?$N%3%^%s%I%i%$%s(B
-    $B$d5/F0$9$k%7%'%k$N%3%^%s%I%i%$%sEy$r@_Dj$7$^$9!#(B
+    cygterm.cfg ‚Íİ’èƒtƒ@ƒCƒ‹‚Å‚·B g—p‚·‚é’[––ƒGƒ~ƒ…ƒŒ[ƒ^‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“
+    ‚â‹N“®‚·‚éƒVƒFƒ‹‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ““™‚ğİ’è‚µ‚Ü‚·B
 
-    cygterm.cfg $B$O<!$N=g=x$GFI$_$^$9!#(B
+    cygterm.cfg ‚ÍŸ‚Ì‡˜‚Å“Ç‚İ‚Ü‚·B
 
-    - exe$B$HF1$8%U%)%k%@$N(B cygterm.cfg
+    - exe‚Æ“¯‚¶ƒtƒHƒ‹ƒ_‚Ì cygterm.cfg
     - /etc/cygterm.conf
     - $APPDATA/teraterm5/cygterm.cfg
     - ~/.cygtermrc
 
-    $SHELL $B$H(B $USER $B$O!"@_Dj%U%!%$%kFI$_9~$_A0$K@_Dj$5$l$^$9!#(B
-    $B8e$+$iFI$_9~$s$@CM$G>e=q$-$5$l$^$9!#(B
-    $B@_Dj%U%!%$%k$rFI$_9~$s$@$N$A%3%^%s%I%i%$%s%*%W%7%g%s$G;XDj$G>e=q$-$5$l$^$9!#(B
+    $SHELL ‚Æ $USER ‚ÍAİ’èƒtƒ@ƒCƒ‹“Ç‚İ‚İ‘O‚Éİ’è‚³‚ê‚Ü‚·B
+    Œã‚©‚ç“Ç‚İ‚ñ‚¾’l‚Åã‘‚«‚³‚ê‚Ü‚·B
+    İ’èƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚¾‚Ì‚¿ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒIƒvƒVƒ‡ƒ“‚Åw’è‚Åã‘‚«‚³‚ê‚Ü‚·B
 
-    $B%]!<%?%V%kHG$N$H$-$O!"<!$N%U%!%$%k$N$_$rFI$_9~$_$^$9!#(B
+    ƒ|[ƒ^ƒuƒ‹”Å‚Ì‚Æ‚«‚ÍAŸ‚Ìƒtƒ@ƒCƒ‹‚Ì‚İ‚ğ“Ç‚İ‚İ‚Ü‚·B
 
     - $APPDATA/teraterm5/cygterm.cfg
 
-    cygterm.cfg $B$NNc(B
+    cygterm.cfg ‚Ì—á
       +-----------------------------------------------------------------------
       | TERM = C:\program files\ttermpro\ttermpro.exe %s %d /KR=SJIS /KT=SJIS
       | TERM_TYPE = vt100
@@ -124,347 +124,347 @@
       | PORT_RANGE = 40
       | SHELL = /bin/bash
 
-    $B@_Dj%U%!%$%k$NJ8;z%3!<%I$O(BUTF-8$B$G$9!#(B
-    (Cygwin 1.5$B4D6-$G$O(B Shift_JIS $B$G$9!#(B)
+    İ’èƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh‚ÍUTF-8‚Å‚·B
+    (Cygwin 1.5ŠÂ‹«‚Å‚Í Shift_JIS ‚Å‚·B)
 
     TERM
     ----
-        $B%?!<%_%J%k!&%(%_%e%l!<%?$N5/F0%3%^%s%I%i%$%s$G$9!#(B
-        $B%3%^%s%IL>$O(B Windows$B4D6-$G%Q%9$,DL$C$F$J$1$l$P%U%k%Q%9$G=q$-$^$9!#(B
-        $B%[%9%H;XDj$N$H$3$m$O(B %s $B$H$7!"%]!<%H;XDj$N$H$3$m$O(B %d $B$H$7$^$9!#(B
+        ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚Ì‹N“®ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Å‚·B
+        ƒRƒ}ƒ“ƒh–¼‚Í WindowsŠÂ‹«‚ÅƒpƒX‚ª’Ê‚Á‚Ä‚È‚¯‚ê‚Îƒtƒ‹ƒpƒX‚Å‘‚«‚Ü‚·B
+        ƒzƒXƒgw’è‚Ì‚Æ‚±‚ë‚Í %s ‚Æ‚µAƒ|[ƒgw’è‚Ì‚Æ‚±‚ë‚Í %d ‚Æ‚µ‚Ü‚·B
 
     TERM_TYPE
     ---------
-        $B%?!<%_%J%k!&%(%_%e%l!<%?$,%?!<%_%J%k%?%$%W$rM?$($F$/$l$J$+$C$?(B
-        $B>l9g$K:NMQ$9$k%?!<%_%J%k%?%$%W$G$9!#(B ($B%G%U%)%k%H(B:vt100)
-        $B%7%'%k>e!"4D6-JQ?t(B TERM $B$K%;%C%H$5$l$^$9!#(B
+        ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ªƒ^[ƒ~ƒiƒ‹ƒ^ƒCƒv‚ğ—^‚¦‚Ä‚­‚ê‚È‚©‚Á‚½
+        ê‡‚ÉÌ—p‚·‚éƒ^[ƒ~ƒiƒ‹ƒ^ƒCƒv‚Å‚·B (ƒfƒtƒHƒ‹ƒg:vt100)
+        ƒVƒFƒ‹ãAŠÂ‹«•Ï” TERM ‚ÉƒZƒbƒg‚³‚ê‚Ü‚·B
 
     PORT_START
     ----------
-        $B;H$$;O$a$k(B ($B;H$C$F$h$$:G>.$N(B) $B%]!<%HHV9f$G$9!#(B ($B%G%U%)%k%H(B:20000)
+        g‚¢n‚ß‚é (g‚Á‚Ä‚æ‚¢Å¬‚Ì) ƒ|[ƒg”Ô†‚Å‚·B (ƒfƒtƒHƒ‹ƒg:20000)
 
     PORT_RANGE
     ----------
-        $B;H$C$F$h$$%]!<%HHV9f$N8D?t$G$9!#(B ($B%G%U%)%k%H(B:40)
+        g‚Á‚Ä‚æ‚¢ƒ|[ƒg”Ô†‚ÌŒÂ”‚Å‚·B (ƒfƒtƒHƒ‹ƒg:40)
 
-        PORT_START $B!A(B PORT_START+PORT_RANGE $B$NHO0O$G6u$-%]!<%H$rC5$7$^$9!#(B
-        $B$3$N?t$@$1F1;~<B9T$G$-$k$3$H$K$J$j$^$9!#(B
+        PORT_START ` PORT_START+PORT_RANGE ‚Ì”ÍˆÍ‚Å‹ó‚«ƒ|[ƒg‚ğ’T‚µ‚Ü‚·B
+        ‚±‚Ì”‚¾‚¯“¯Às‚Å‚«‚é‚±‚Æ‚É‚È‚è‚Ü‚·B
 
     SHELL
     -----
-        Cygwin$BB&%7%'%k(B ($BDL>o(B /bin/bash) $B$N5/F0%3%^%s%I%i%$%s$G$9!#(B
-        ($B%G%U%)%k%H(B: /etc/passwd$B$N>pJs$r;HMQ(B)
-        $B%3%^%s%IL>$N%U%k%Q%9$+!"(B"AUTO"$B$r;XDj$7$^$9!#(B
+        Cygwin‘¤ƒVƒFƒ‹ (’Êí /bin/bash) ‚Ì‹N“®ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Å‚·B
+        (ƒfƒtƒHƒ‹ƒg: /etc/passwd‚Ìî•ñ‚ğg—p)
+        ƒRƒ}ƒ“ƒh–¼‚Ìƒtƒ‹ƒpƒX‚©A"AUTO"‚ğw’è‚µ‚Ü‚·B
 
     LOGIN_SHELL
     -----------
-        $B%7%'%k$r%m%0%$%s%7%'%k$H$7$F5/F0$9$k$+$I$&$+$r;XDj$7$^$9!#(B
-        $B%G%U%)%k%H$OL58z$G$9!#(B
+        ƒVƒFƒ‹‚ğƒƒOƒCƒ“ƒVƒFƒ‹‚Æ‚µ‚Ä‹N“®‚·‚é‚©‚Ç‚¤‚©‚ğw’è‚µ‚Ü‚·B
+        ƒfƒtƒHƒ‹ƒg‚Í–³Œø‚Å‚·B
 
-        $B0lHLE*$J%7%'%k$G$O%m%0%$%s%7%'%k$H$7$F5/F0$5$l$k$H!"(B.profile$B$d(B
-        .login$B$J$I$N%m%0%$%s;~$N$_FI$_9~$`%9%?!<%H%"%C%W%U%!%$%k$r<B9T(B
-        $B$7$^$9!#(B
-        $B$3$l$i$N%U%!%$%k$G$O!"DL>o!"0J2<$N$h$&$J;v$,9T$o$l$^$9!#(B
-        $B!&(BPATH$B$d(BUSER$BEy$N3F<o4D6-JQ?t$N@_Dj$r9T$&(B
-        $B!&C<Kv$N@_Dj$rE,@Z$K9T$&(B
-        $B!&%+%l%s%H%G%#%l%/%H%j$r%f!<%6$N%[!<%`%G%#%l%/%H%j$KJQ99$9$k!#(B
+        ˆê”Ê“I‚ÈƒVƒFƒ‹‚Å‚ÍƒƒOƒCƒ“ƒVƒFƒ‹‚Æ‚µ‚Ä‹N“®‚³‚ê‚é‚ÆA.profile‚â
+        .login‚È‚Ç‚ÌƒƒOƒCƒ“‚Ì‚İ“Ç‚İ‚ŞƒXƒ^[ƒgƒAƒbƒvƒtƒ@ƒCƒ‹‚ğÀs
+        ‚µ‚Ü‚·B
+        ‚±‚ê‚ç‚Ìƒtƒ@ƒCƒ‹‚Å‚ÍA’ÊíAˆÈ‰º‚Ì‚æ‚¤‚È–‚ªs‚í‚ê‚Ü‚·B
+        EPATH‚âUSER“™‚ÌŠeíŠÂ‹«•Ï”‚Ìİ’è‚ğs‚¤
+        E’[––‚Ìİ’è‚ğ“KØ‚És‚¤
+        EƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğƒ†[ƒU‚Ìƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚É•ÏX‚·‚éB
 
-        $B0lIt$N%7%'%k(B(tclsh$B$J$I(B)$B$d%7%'%k0J30$N%W%m%0%i%`$r5/F0$9$k>l9g$O(B
-        $B8z2L$,$"$j$^$;$s!#(B
+        ˆê•”‚ÌƒVƒFƒ‹(tclsh‚È‚Ç)‚âƒVƒFƒ‹ˆÈŠO‚ÌƒvƒƒOƒ‰ƒ€‚ğ‹N“®‚·‚éê‡‚Í
+        Œø‰Ê‚ª‚ ‚è‚Ü‚¹‚ñB
 
     HOME_CHDIR
     ----------
-        patch level 01 $B$K4^$^$l$k(B"$B%[!<%`%G%#%l%/%H%j$X$N0\F0(B"$B$r5!G=$5$;$k$+(B
-        $B$I$&$+$r;XDj$7$^$9!#%G%U%)%k%H$OL58z$G$9!#(B
+        patch level 01 ‚ÉŠÜ‚Ü‚ê‚é"ƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚Ö‚ÌˆÚ“®"‚ğ‹@”\‚³‚¹‚é‚©
+        ‚Ç‚¤‚©‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í–³Œø‚Å‚·B
 
     SOCKET_TIMEOUT
     --------------
-        $B%?!<%_%J%k!&%(%_%e%l!<%?$+$i$N(Btelnet$B@\B3$rBT$A<u$1$k%=%1%C%H$,(B
-        $B%?%$%`%"%&%H$9$k$^$G$N;~4V$r;XDj$7$^$9!#(B ($B%G%U%)%k%H(B: 5$BIC(B)
+        ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚©‚ç‚ÌtelnetÚ‘±‚ğ‘Ò‚¿ó‚¯‚éƒ\ƒPƒbƒg‚ª
+        ƒ^ƒCƒ€ƒAƒEƒg‚·‚é‚Ü‚Å‚ÌŠÔ‚ğw’è‚µ‚Ü‚·B (ƒfƒtƒHƒ‹ƒg: 5•b)
 
     SSH_AGENT_PROXY
     ---------------
-        ssh$BG'>Z%(!<%8%'%s%HE>Aw5!G=$rDs6!$9$k$+$r;XDj$7$^$9!#(B
-        $BM-8z$K$9$k$H!"(BOpenSSH$B$N(Bssh$BG'>Z%(!<%8%'%s%H$KBP1~$7$?%W%m%0%i%`$,!"(B
-        CygTerm+$B$rDL$7$F(BPageant$B$K%"%/%;%9$G$-$k$h$&$K$J$j$^$9!#(B
-        $B%G%U%)%k%H$OL58z$G$9!#(B
+        ssh”FØƒG[ƒWƒFƒ“ƒg“]‘—‹@”\‚ğ’ñ‹Ÿ‚·‚é‚©‚ğw’è‚µ‚Ü‚·B
+        —LŒø‚É‚·‚é‚ÆAOpenSSH‚Ìssh”FØƒG[ƒWƒFƒ“ƒg‚É‘Î‰‚µ‚½ƒvƒƒOƒ‰ƒ€‚ªA
+        CygTerm+‚ğ’Ê‚µ‚ÄPageant‚ÉƒAƒNƒZƒX‚Å‚«‚é‚æ‚¤‚É‚È‚è‚Ü‚·B
+        ƒfƒtƒHƒ‹ƒg‚Í–³Œø‚Å‚·B
 
     ENV_X
     -----
-        $B%7%'%k5/F0;~$K@_Dj$7$F$*$-$?$$4D6-JQ?t$G$9!#!VJQ?tL>(B=$BCM!W$N7A<0(B
-        (putenv$B7A<0(B) $B$G5-=R$7$^$9!#(B ENV_ $B$G;O$a$l$P$$$/$D$G$b5-=R$G$-$^$9!#(B
+        ƒVƒFƒ‹‹N“®‚Éİ’è‚µ‚Ä‚¨‚«‚½‚¢ŠÂ‹«•Ï”‚Å‚·Bu•Ï”–¼=’lv‚ÌŒ`®
+        (putenvŒ`®) ‚Å‹Lq‚µ‚Ü‚·B ENV_ ‚Ån‚ß‚ê‚Î‚¢‚­‚Â‚Å‚à‹Lq‚Å‚«‚Ü‚·B
 
 
-// $B5/(B $BF0(B $BJ}(B $BK!(B //
+// ‹N “® •û –@ //
 
-    $B%3%^%s%I%i%$%s!&%*%W%7%g%s(B
+    ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“EƒIƒvƒVƒ‡ƒ“
 
         cygterm.exe [-t 'terminal-emulator'] [-p port-number] [-dumb]
                     [-s 'shell'] [-ls | -nols] [-cd | -nocd] [-a | -A]
                     [-v 'env-var' ...] [-d 'directory'] [-o 'parameter']
 
         -t 'terminal-emulator'
-                $B%?!<%_%J%k!&%(%_%e%l!<%?$r;XDj$7$^$9!#(B
-                $B;XDj7A<0$O@_Dj%U%!%$%k$N(B TERM $B$HF1$8$G$9!#(B
-                $B6uGrJ8;z$r4^$`>l9g$OI,$:%/%)!<%H$G0O$_$^$9!#(B
+                ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ğw’è‚µ‚Ü‚·B
+                w’èŒ`®‚Íİ’èƒtƒ@ƒCƒ‹‚Ì TERM ‚Æ“¯‚¶‚Å‚·B
+                ‹ó”’•¶š‚ğŠÜ‚Şê‡‚Í•K‚¸ƒNƒH[ƒg‚ÅˆÍ‚İ‚Ü‚·B
 
         -p port-number
-                $B%?!<%_%J%k!&%(%_%e%l!<%?$r5/F0$9$k$N$G$O$J$/!"(B
-                $B%m!<%+%k%[%9%H$N$3$N%]!<%HHV9f$X$N@\B3$r;n$_$^$9!#(B
-                $BB>$N%"%W%j%1!<%7%g%s!&%W%m%0%i%`$,(B -p $B%*%W%7%g%s$r;H$C$F!"(B
-                cygterm.exe $B7PM3$G(B Cygwin$B$rMxMQ$9$k!"Ey$,9M$($i$l$^$9!#(B
+                ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ğ‹N“®‚·‚é‚Ì‚Å‚Í‚È‚­A
+                ƒ[ƒJƒ‹ƒzƒXƒg‚Ì‚±‚Ìƒ|[ƒg”Ô†‚Ö‚ÌÚ‘±‚ğ‚İ‚Ü‚·B
+                ‘¼‚ÌƒAƒvƒŠƒP[ƒVƒ‡ƒ“EƒvƒƒOƒ‰ƒ€‚ª -p ƒIƒvƒVƒ‡ƒ“‚ğg‚Á‚ÄA
+                cygterm.exe Œo—R‚Å Cygwin‚ğ—˜—p‚·‚éA“™‚ªl‚¦‚ç‚ê‚Ü‚·B
 
         -dumb
-                TELNET$B%*%W%7%g%s!&%M%4%7%(!<%7%g%s$r9T$$$^$;$s!#(B
-                $B$5$i$K(B TELNET$B%3%^%s%I$,Aw?.$5$l$F$-$F$bL5;k$7$^$9!#(B
-                $B%7%'%kB&$N4D6-JQ?t(B TERM $B$O(B 'dumb' $B$H$J$j$^$9!#(B
+                TELNETƒIƒvƒVƒ‡ƒ“EƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ğs‚¢‚Ü‚¹‚ñB
+                ‚³‚ç‚É TELNETƒRƒ}ƒ“ƒh‚ª‘—M‚³‚ê‚Ä‚«‚Ä‚à–³‹‚µ‚Ü‚·B
+                ƒVƒFƒ‹‘¤‚ÌŠÂ‹«•Ï” TERM ‚Í 'dumb' ‚Æ‚È‚è‚Ü‚·B
 
         -s 'shell'
-                Cygwin$B>e$N%7%'%k$r;XDj$7$^$9!#(B
-                $B;XDj7A<0$O@_Dj%U%!%$%k$N(B SHELL $B$HF1$8$G$9!#(B
-                $B6uGrJ8;z$r4^$`>l9g$OI,$:%/%)!<%H$G0O$_$^$9!#(B
-                $BI,$:$7$b%7%'%k%3%^%s%I$G$"$kI,MW$O$"$j$^$;$s!#(B
+                Cygwinã‚ÌƒVƒFƒ‹‚ğw’è‚µ‚Ü‚·B
+                w’èŒ`®‚Íİ’èƒtƒ@ƒCƒ‹‚Ì SHELL ‚Æ“¯‚¶‚Å‚·B
+                ‹ó”’•¶š‚ğŠÜ‚Şê‡‚Í•K‚¸ƒNƒH[ƒg‚ÅˆÍ‚İ‚Ü‚·B
+                •K‚¸‚µ‚àƒVƒFƒ‹ƒRƒ}ƒ“ƒh‚Å‚ ‚é•K—v‚Í‚ ‚è‚Ü‚¹‚ñB
 
         -ls
-                $B%7%'%k$r%m%0%$%s%7%'%k$H$7$F5/F0$7$^$9!#(B
+                ƒVƒFƒ‹‚ğƒƒOƒCƒ“ƒVƒFƒ‹‚Æ‚µ‚Ä‹N“®‚µ‚Ü‚·B
 
         -nols
-                $B%7%'%k$r(B($B%m%0%$%s%7%'%k$G$O$J$/(B)$BDL>o$N%7%'%k$H$7$F5/F0$7$^$9!#(B
+                ƒVƒFƒ‹‚ğ(ƒƒOƒCƒ“ƒVƒFƒ‹‚Å‚Í‚È‚­)’Êí‚ÌƒVƒFƒ‹‚Æ‚µ‚Ä‹N“®‚µ‚Ü‚·B
 
         -cd
-                $B%+%l%s%H%G%#%l%/%H%j$r%[!<%`%G%#%l%/%H%j$K0\F0$7$F$+$i(B
-                $B%7%'%k$r5/F0$7$^$9!#(B
+                ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µ‚Ä‚©‚ç
+                ƒVƒFƒ‹‚ğ‹N“®‚µ‚Ü‚·B
 
         -nocd
-                $B%+%l%s%H%G%#%l%/%H%j$r0\F0$;$:$K%7%'%k$r5/F0$7$^$9!#(B
+                ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğˆÚ“®‚¹‚¸‚ÉƒVƒFƒ‹‚ğ‹N“®‚µ‚Ü‚·B
 
         -A
-                ssh$BG'>Z%(!<%8%'%s%HE>Aw5!G=$rM-8z$K$7$^$9!#(B
+                ssh”FØƒG[ƒWƒFƒ“ƒg“]‘—‹@”\‚ğ—LŒø‚É‚µ‚Ü‚·B
 
         -a
-                ssh$BG'>Z%(!<%8%'%s%HE>Aw5!G=$rL58z$K$7$^$9!#(B
+                ssh”FØƒG[ƒWƒFƒ“ƒg“]‘—‹@”\‚ğ–³Œø‚É‚µ‚Ü‚·B
 
         -v 'env-var'
-                $B%7%'%k5/F0;~$K@_Dj$7$F$*$-$?$$4D6-JQ?t$r;XDj$7$^$9!#(B
-                $B;XDj7A<0$O@_Dj%U%!%$%k$N(B ENV_X $B$HF1$8$G$9!#(B
-                $B6uGrJ8;z$r4^$`>l9g$OI,$:%/%)!<%H$G0O$_$^$9!#(B
-                -v $B%*%W%7%g%s$O$$$/$D$G$b;XDj$G$-$^$9!#(B
+                ƒVƒFƒ‹‹N“®‚Éİ’è‚µ‚Ä‚¨‚«‚½‚¢ŠÂ‹«•Ï”‚ğw’è‚µ‚Ü‚·B
+                w’èŒ`®‚Íİ’èƒtƒ@ƒCƒ‹‚Ì ENV_X ‚Æ“¯‚¶‚Å‚·B
+                ‹ó”’•¶š‚ğŠÜ‚Şê‡‚Í•K‚¸ƒNƒH[ƒg‚ÅˆÍ‚İ‚Ü‚·B
+                -v ƒIƒvƒVƒ‡ƒ“‚Í‚¢‚­‚Â‚Å‚àw’è‚Å‚«‚Ü‚·B
 
         -d 'directory'
-                $B%+%l%s%H%G%#%l%/%H%j$r;XDj$5$l$?%G%#%l%/%H%j$K0\F0$7$F$+$i(B
-                $B%7%'%k$r5/F0$7$^$9!#(B
+                ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğw’è‚³‚ê‚½ƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µ‚Ä‚©‚ç
+                ƒVƒFƒ‹‚ğ‹N“®‚µ‚Ü‚·B
 
         -o 'parameter'
-                $B%?!<%_%J%k!&%(%_%e%l!<%?$X$NDI2C$N%Q%i%a!<%?$r;XDj$7$^$9!#(B
-                TERM$B$rJQ$($:$KDI2C$N%Q%i%a!<%?$r;XDj$7$?$$;~$K;H$$$^$9!#(B
+                ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚Ö‚Ì’Ç‰Á‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚Ü‚·B
+                TERM‚ğ•Ï‚¦‚¸‚É’Ç‰Á‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚½‚¢‚Ég‚¢‚Ü‚·B
 
-    $B%?!<%_%J%k!&%(%_%e%l!<%?$b$7$/$O@\B3@h%]!<%HHV9f!"$H(B Cygwin$BB&%7%'%k$N(B
-    $B;XDj$,:GDcI,MW$H$J$j$^$9!#(B $B$3$l$i$,%3%^%s%I%i%$%s!&%*%W%7%g%s$K$h$C$F(B
-    $BM?$($i$l$k$J$i$P!"@_Dj%U%!%$%k(B cygterm.cfg $B$,L5$/$F$b<B9T$G$-$^$9!#(B
+    ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚à‚µ‚­‚ÍÚ‘±æƒ|[ƒg”Ô†A‚Æ Cygwin‘¤ƒVƒFƒ‹‚Ì
+    w’è‚ªÅ’á•K—v‚Æ‚È‚è‚Ü‚·B ‚±‚ê‚ç‚ªƒRƒ}ƒ“ƒhƒ‰ƒCƒ“EƒIƒvƒVƒ‡ƒ“‚É‚æ‚Á‚Ä
+    —^‚¦‚ç‚ê‚é‚È‚ç‚ÎAİ’èƒtƒ@ƒCƒ‹ cygterm.cfg ‚ª–³‚­‚Ä‚àÀs‚Å‚«‚Ü‚·B
 
-    cygterm.exe $B$O(B cygwin1.dll $B$rMxMQ$9$k(B Win32$B%"%W%j%1!<%7%g%s$G$9!#(B
-    Cygwin$B>e$+$i<B9T$9$k$3$H$b!"(BWindows$B>e$N%7%g!<%H%+%C%H$+$i<B9T$9$k$3$H$b(B
-    $B$G$-$^$9!#(B
+    cygterm.exe ‚Í cygwin1.dll ‚ğ—˜—p‚·‚é Win32ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Å‚·B
+    Cygwinã‚©‚çÀs‚·‚é‚±‚Æ‚àAWindowsã‚ÌƒVƒ‡[ƒgƒJƒbƒg‚©‚çÀs‚·‚é‚±‚Æ‚à
+    ‚Å‚«‚Ü‚·B
 
-    $B"((B Windows$B>e$+$i<B9T$9$k$K$O(B cygwin1.dll $B$N%G%#%l%/%H%j%Q%9$,(B
-       Windows$B4D6-JQ?t(B PATH $B$KDI2C$5$l$F$$$kI,MW$,$"$j$^$9!#(B
-       ($BDL>o(B Cygwin$B%k!<%H%G%#%l%/%H%j(B\bin)
+    ¦ Windowsã‚©‚çÀs‚·‚é‚É‚Í cygwin1.dll ‚ÌƒfƒBƒŒƒNƒgƒŠƒpƒX‚ª
+       WindowsŠÂ‹«•Ï” PATH ‚É’Ç‰Á‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+       (’Êí Cygwinƒ‹[ƒgƒfƒBƒŒƒNƒgƒŠ\bin)
 
-// $BCm(B $B0U(B $B;v(B $B9`(B //
+// ’ ˆÓ – € //
 
-    * Tera Term$B;HMQ;~$NCm0U(B
+    * Tera Termg—p‚Ì’ˆÓ
 
-    $B%?!<%_%J%k!&%(%_%e%l!<%?$,(B Tera Term $B$N>l9g!"(Bcygterm.exe $B$+$i5/F0$5$l$?(B
-    $B>uBV$G@_DjJ]B8(B [Setup][Save setup] $B$r9T$o$J$$$h$&Cm0U$7$F$/$@$5$$!#(B
-    TCP/IP$B@_Dj$N(B Telnet$B%]!<%HHV9f$,(B 23 $B0J30$GJ]B8$5$l!"DL>o$N(B Telnet$BL\E*$N(B
-    $B<B9T;~$K@\B3$G$-$:!"92$F$k$3$H$K$J$C$F$7$^$$$^$9!#(B
-    TCP/IP Port# $B$K(B 23 $B$r;XDj$7$F@_DjJ]B8$7D>$;$P85$KLa$j$^$9!#(B
+    ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ª Tera Term ‚Ìê‡Acygterm.exe ‚©‚ç‹N“®‚³‚ê‚½
+    ó‘Ô‚Åİ’è•Û‘¶ [Setup][Save setup] ‚ğs‚í‚È‚¢‚æ‚¤’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢B
+    TCP/IPİ’è‚Ì Telnetƒ|[ƒg”Ô†‚ª 23 ˆÈŠO‚Å•Û‘¶‚³‚êA’Êí‚Ì Telnet–Ú“I‚Ì
+    Às‚ÉÚ‘±‚Å‚«‚¸AQ‚Ä‚é‚±‚Æ‚É‚È‚Á‚Ä‚µ‚Ü‚¢‚Ü‚·B
+    TCP/IP Port# ‚É 23 ‚ğw’è‚µ‚Äİ’è•Û‘¶‚µ’¼‚¹‚ÎŒ³‚É–ß‚è‚Ü‚·B
 
-// $BJQ(B $B99(B $BMz(B $BNr(B //
+// •Ï X —š —ğ //
 v1.07_30 2022/02/06
-        * $BFI$_9~$`@_Dj%U%!%$%k$rDI2C(B
+        * “Ç‚İ‚Şİ’èƒtƒ@ƒCƒ‹‚ğ’Ç‰Á
           $APPDATA/teraterm5/cygterm.cfg
-        * Unicode$BBP1~(B
-        * $B%]!<%?%V%kHGBP1~(B($B2>(B)
+        * Unicode‘Î‰
+        * ƒ|[ƒ^ƒuƒ‹”Å‘Î‰(‰¼)
 
 v1.07_29 2016/11/26 (by maya)
-        * $B%"%$%3%s$rJQ99$7$?!#(B
+        * ƒAƒCƒRƒ“‚ğ•ÏX‚µ‚½B
 
 v1.07_28 2016/02/17 (by doda)
-        * $B%G%P%C%0%b!<%I$rDI2C$7$?!#(B
+        * ƒfƒoƒbƒOƒ‚[ƒh‚ğ’Ç‰Á‚µ‚½B
 
 v1.07_27 2016/02/09 (by doda)
-        * -cd $B%*%W%7%g%s(B(HOME_CHDIR=y) $B$h$j(B -d $B%*%W%7%g%s$G$N%G%#%l%/(B
-          $B%H%j;XDj$rM%@h$9$k$h$&$K$7$?!#(B
-        * -ls $B%*%W%7%g%s(B(LOGIN_SHELL=y) $B$N;XDj;~$K(B -d $B%*%W%7%g%s$r;XDj(B
-          $B$7$?>l9g!"(BCHERE_INVOKING=y $B$r%;%C%H$9$k$h$&$K$7$?!#(B
+        * -cd ƒIƒvƒVƒ‡ƒ“(HOME_CHDIR=y) ‚æ‚è -d ƒIƒvƒVƒ‡ƒ“‚Å‚ÌƒfƒBƒŒƒN
+          ƒgƒŠw’è‚ğ—Dæ‚·‚é‚æ‚¤‚É‚µ‚½B
+        * -ls ƒIƒvƒVƒ‡ƒ“(LOGIN_SHELL=y) ‚Ìw’è‚É -d ƒIƒvƒVƒ‡ƒ“‚ğw’è
+          ‚µ‚½ê‡ACHERE_INVOKING=y ‚ğƒZƒbƒg‚·‚é‚æ‚¤‚É‚µ‚½B
 
 v1.07_26 2015/12/14 (by doda)
-        * ssh $BG'>Z%(!<%8%'%s%HE>Aw$GJ#?t%3%M%/%7%g%s$KBP1~$7$?!#(B
+        * ssh ”FØƒG[ƒWƒFƒ“ƒg“]‘—‚Å•¡”ƒRƒlƒNƒVƒ‡ƒ“‚É‘Î‰‚µ‚½B
 
 v1.07_25 2015/02/21 (by doda)
-        * TERM $B4D6-JQ?t$,@5$7$/@_Dj$5$l$k$h$&$K$7$?!#(B
+        * TERM ŠÂ‹«•Ï”‚ª³‚µ‚­İ’è‚³‚ê‚é‚æ‚¤‚É‚µ‚½B
 
 v1.07_24 2013/08/15 (by maya)
-        * 64bit Cygwin $B$G$bF0:n$9$k$h$&$K$7$?!#(B (cyglaunch)
+        * 64bit Cygwin ‚Å‚à“®ì‚·‚é‚æ‚¤‚É‚µ‚½B (cyglaunch)
 
 v1.07_23 2011/04/18 (by doda)
-        * -d $B%*%W%7%g%s$G;XDj$5$l$?%G%#%l%/%H%j$X$N0\F0$,<:GT$7$?;~!"(B
-          $B%(%i!<%a%C%;!<%8$rI=<($9$k$h$&$K$7$?!#(B
+        * -d ƒIƒvƒVƒ‡ƒ“‚Åw’è‚³‚ê‚½ƒfƒBƒŒƒNƒgƒŠ‚Ö‚ÌˆÚ“®‚ª¸”s‚µ‚½A
+          ƒGƒ‰[ƒƒbƒZ[ƒW‚ğ•\¦‚·‚é‚æ‚¤‚É‚µ‚½B
 
 v1.07_22 2011/03/03 (by maya)
-        * $B%$%s%9%H!<%i$+$i5/F0%A%'%C%/$r$9$k$?$a$N(B mutex $B$r:o=|$7$?!#(B
+        * ƒCƒ“ƒXƒg[ƒ‰‚©‚ç‹N“®ƒ`ƒFƒbƒN‚ğ‚·‚é‚½‚ß‚Ì mutex ‚ğíœ‚µ‚½B
 
 v1.07_21 2011/02/28 (by maya)
-        * $B%$%s%9%H!<%i$+$i5/F0%A%'%C%/$r$9$k$?$a$N(B mutex $B$rDI2C$7$?!#(B
+        * ƒCƒ“ƒXƒg[ƒ‰‚©‚ç‹N“®ƒ`ƒFƒbƒN‚ğ‚·‚é‚½‚ß‚Ì mutex ‚ğ’Ç‰Á‚µ‚½B
 
 v1.07_20 2010/10/20 (by doda)
-        * '-d' $B%*%W%7%g%s$G$N%G%#%l%/%H%jJQ99$N%?%$%_%s%0$rCY$i$;$?!#(B
+        * '-d' ƒIƒvƒVƒ‡ƒ“‚Å‚ÌƒfƒBƒŒƒNƒgƒŠ•ÏX‚Ìƒ^ƒCƒ~ƒ“ƒO‚ğ’x‚ç‚¹‚½B
           (security fix)
 
 v1.07_19 2010/01/28 (by doda)
-        * '-s' $B%*%W%7%g%s$N0z?t$K(B 'AUTO' $B$r<u$1IU$1$k$h$&$K$7$?!#(B
+        * '-s' ƒIƒvƒVƒ‡ƒ“‚Ìˆø”‚É 'AUTO' ‚ğó‚¯•t‚¯‚é‚æ‚¤‚É‚µ‚½B
 
 v1.07_18 2010/01/19 (by doda)
-        * '-d' $B%*%W%7%g%s$N0z?t$+$iFs=E0zMQId$r:o=|$9$k$h$&$K$7$?!#(B
+        * '-d' ƒIƒvƒVƒ‡ƒ“‚Ìˆø”‚©‚ç“ñdˆø—p•„‚ğíœ‚·‚é‚æ‚¤‚É‚µ‚½B
 
 v1.07_17 2009/06/16 (by doda)
-        * TELNET SGA/ECHO$B%*%W%7%g%s$N%M%4%7%(!<%7%g%s$r9T$&$h$&$K$7$?!#(B
+        * TELNET SGA/ECHOƒIƒvƒVƒ‡ƒ“‚ÌƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ğs‚¤‚æ‚¤‚É‚µ‚½B
 
 v1.07_16 2008/11/21 (by doda)
-        * ssh $BG'>Z%(!<%8%'%s%HE>Aw5!G=$rM-8z$K$9$k%*%W%7%g%s$r(B '-a' $B$+$i(B
-          '-A' $B$KJQ99$7$?!#(B
-        * ssh $BG'>Z%(!<%8%'%s%HE>Aw5!G=$rL58z$K$9$k%*%W%7%g%s(B '-a' $B$rDI2C$7$?!#(B
+        * ssh ”FØƒG[ƒWƒFƒ“ƒg“]‘—‹@”\‚ğ—LŒø‚É‚·‚éƒIƒvƒVƒ‡ƒ“‚ğ '-a' ‚©‚ç
+          '-A' ‚É•ÏX‚µ‚½B
+        * ssh ”FØƒG[ƒWƒFƒ“ƒg“]‘—‹@”\‚ğ–³Œø‚É‚·‚éƒIƒvƒVƒ‡ƒ“ '-a' ‚ğ’Ç‰Á‚µ‚½B
 
 v1.07_15 2008/11/01 (by doda)
-        * ssh $BG'>Z%(!<%8%'%s%HE>Aw5!G=$r%5%]!<%H$7$?!#(B
+        * ssh ”FØƒG[ƒWƒFƒ“ƒg“]‘—‹@”\‚ğƒTƒ|[ƒg‚µ‚½B
 
 v1.07_14 2007/12/17 (by doda)
-        * $B%?!<%_%J%k!&%(%_%e%l!<%?$NDI2C$N%Q%i%a!<%?$r;XDj$9$k%*%W%7%g%s(B
-          '-o' $B$rDI2C$7$?!#(B
+        * ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚Ì’Ç‰Á‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚·‚éƒIƒvƒVƒ‡ƒ“
+          '-o' ‚ğ’Ç‰Á‚µ‚½B
 
 v1.07_13 2007/08/03 (by maya)
-        * $B3+;O%G%#%l%/%H%j$r;XDj$9$k(B '-d' $B%*%W%7%g%s$rDI2C$7$?!#(B
+        * ŠJnƒfƒBƒŒƒNƒgƒŠ‚ğw’è‚·‚é '-d' ƒIƒvƒVƒ‡ƒ“‚ğ’Ç‰Á‚µ‚½B
 
 v1.07_12 2007/06/10 (by doda)
-        * telnet $B$NBT$A<u$1%=%1%C%H$N%?%$%`%"%&%H$r@_Dj$9$k%*%W%7%g%s(B
-          SOCKET_TIMEOUT $B$rDI2C$7$?!#(B
+        * telnet ‚Ì‘Ò‚¿ó‚¯ƒ\ƒPƒbƒg‚Ìƒ^ƒCƒ€ƒAƒEƒg‚ğİ’è‚·‚éƒIƒvƒVƒ‡ƒ“
+          SOCKET_TIMEOUT ‚ğ’Ç‰Á‚µ‚½B
 
-          SOCKET_TIMEOUT = $BIC?t(B
+          SOCKET_TIMEOUT = •b”
 
 v1.07_11 2007/01/31 (import from cygterm v1.07)
-        * gcc 3.4 $B$G$N(B WinMainCRTStartup() $B:FDj5A%(%i!<2sHr(B
-        * $BO"B3=PNO;~$G$b%-!<%\!<%I3d$j9~$_$,F~$k$h$&$K!#(B
+        * gcc 3.4 ‚Å‚Ì WinMainCRTStartup() Ä’è‹`ƒGƒ‰[‰ñ”ğ
+        * ˜A‘±o—Í‚Å‚àƒL[ƒ{[ƒhŠ„‚è‚İ‚ª“ü‚é‚æ‚¤‚ÉB
 
 v1.06_11 2006/09/29 (by maya)
-        * $B4D6-JQ?t$H(B /etc/passwd $B$N(B HOME $B$r;H$o$J$$$h$&$K$7$?!#(B
-          Cygwin $B$K$h$C$F%;%C%H$5$l$?(B HOME $B$,MxMQ$5$l$k!#4XO"9`L\(B /etc/profile
-        * $B@_Dj%U%!%$%k$NM%@h=g0L$rJQ99$7$?!#(B
-          $B%3%^%s%I%i%$%s0z?t(B > ~/.cygtermrc > /etc/cygterm.conf > cygterm.cfg
+        * ŠÂ‹«•Ï”‚Æ /etc/passwd ‚Ì HOME ‚ğg‚í‚È‚¢‚æ‚¤‚É‚µ‚½B
+          Cygwin ‚É‚æ‚Á‚ÄƒZƒbƒg‚³‚ê‚½ HOME ‚ª—˜—p‚³‚ê‚éBŠÖ˜A€–Ú /etc/profile
+        * İ’èƒtƒ@ƒCƒ‹‚Ì—Dæ‡ˆÊ‚ğ•ÏX‚µ‚½B
+          ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø” > ~/.cygtermrc > /etc/cygterm.conf > cygterm.cfg
           > /etc/passwd
 
 v1.06_10 2006/09/28 (by doda)
-        * $B%f!<%6L>$rF@$k$N$K!"4D6-JQ?t(B USERNAME $B$NBe$o$j$K(B getlogin() $B$r;H$&(B
-          $B$h$&$K$7$?!#(B
+        * ƒ†[ƒU–¼‚ğ“¾‚é‚Ì‚ÉAŠÂ‹«•Ï” USERNAME ‚Ì‘ã‚í‚è‚É getlogin() ‚ğg‚¤
+          ‚æ‚¤‚É‚µ‚½B
 
 v1.06_09 2006/09/25 (by doda)
-        * SHELL$B$,@_Dj$5$l$F$$$J$$>l9g$O!"(B/etc/passwd $B$+$i%7%'%k$N>pJs$rF@$k(B
-          $B$h$&$K$7$?!#(B
+        * SHELL‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍA/etc/passwd ‚©‚çƒVƒFƒ‹‚Ìî•ñ‚ğ“¾‚é
+          ‚æ‚¤‚É‚µ‚½B
 
 v1.06_08 2006/08/30 (by maya)
-        * cygterm.cfg $B$r@_Dj%U%!%$%k$NCf$G:GM%@h$5$l$k$h$&$K$7$?!#(B
+        * cygterm.cfg ‚ğİ’èƒtƒ@ƒCƒ‹‚Ì’†‚ÅÅ—Dæ‚³‚ê‚é‚æ‚¤‚É‚µ‚½B
 
 v1.06_07 2006/08/19 (by maya)
-        * Windows $B$N(B $B4D6-JQ?t(B HOME $B$,@_Dj$5$l$F$$$l$P;H$&$h$&$K$7$?!#(B
+        * Windows ‚Ì ŠÂ‹«•Ï” HOME ‚ªİ’è‚³‚ê‚Ä‚¢‚ê‚Îg‚¤‚æ‚¤‚É‚µ‚½B
 
 v1.06_06 2006/08/18 (by doda)
-        * -s$B$H(B-t$B%*%W%7%g%s$N%Q%i%a!<%?$ND9$5$r@)8B$7$?!#(B
+        * -s‚Æ-tƒIƒvƒVƒ‡ƒ“‚Ìƒpƒ‰ƒ[ƒ^‚Ì’·‚³‚ğ§ŒÀ‚µ‚½B
 
 v1.06_05 2006/08/18 (by maya)
-        * $B%$%s%9%H!<%i$+$i5/F0%A%'%C%/$r$9$k$?$a!"(Bmutex $B$r:n@.$7$?!#(B
+        * ƒCƒ“ƒXƒg[ƒ‰‚©‚ç‹N“®ƒ`ƒFƒbƒN‚ğ‚·‚é‚½‚ßAmutex ‚ğì¬‚µ‚½B
 
 v1.06_04 2006/08/15 (by doda)
-        * $B%7%'%k$r%m%0%$%s%7%'%k$H$7$F8F$S=P$9%*%W%7%g%s(B LOGIN_SHELL $B$r(B
-          $BDI2C$7$?!#(B
+        * ƒVƒFƒ‹‚ğƒƒOƒCƒ“ƒVƒFƒ‹‚Æ‚µ‚ÄŒÄ‚Ño‚·ƒIƒvƒVƒ‡ƒ“ LOGIN_SHELL ‚ğ
+          ’Ç‰Á‚µ‚½B
 
           LOGIN_SHELL: yes | no
 
 v1.06_03 2006/08/15 (by doda)
-        * $B%[!<%`%G%#%l%/%H%j$G5/F0$9$k$N$rA*Br$9$k%*%W%7%g%s(B HOME_CHDIR $B$r(B
-          $BDI2C$7$?!#(B
+        * ƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚Å‹N“®‚·‚é‚Ì‚ğ‘I‘ğ‚·‚éƒIƒvƒVƒ‡ƒ“ HOME_CHDIR ‚ğ
+          ’Ç‰Á‚µ‚½B
 
           HOME_CHDIR: yes | no
 
 v1.06_02 2006/02/09 (by babydamons@yahoo.co.jp)
-        * CygTerm$B$N%"%$%3%s$,:n@.$5$l$^$7$?!#!J(B"DotWork 2.50"$B$K$F:n@.!K(B
-          "DotWork 2.50" $B$O1&5-$N(BURL$B$h$jF~<j2DG=$G$9!#(B
+        * CygTerm‚ÌƒAƒCƒRƒ“‚ªì¬‚³‚ê‚Ü‚µ‚½Bi"DotWork 2.50"‚É‚Äì¬j
+          "DotWork 2.50" ‚Í‰E‹L‚ÌURL‚æ‚è“üè‰Â”\‚Å‚·B
           http://www5a.biglobe.ne.jp/~suuta/
-          $B$9$P$i$7$$%=%U%H%&%'%"$r8x3+$7$F$$$?$@$-!"(B
-          "suuta at hamal dot freemal dot ne dot jp"$B$K46<UCW$7$^$9!#(B
+          ‚·‚Î‚ç‚µ‚¢ƒ\ƒtƒgƒEƒFƒA‚ğŒöŠJ‚µ‚Ä‚¢‚½‚¾‚«A
+          "suuta at hamal dot freemal dot ne dot jp"‚ÉŠ´Ó’v‚µ‚Ü‚·B
 
-        * Makefile $B$,=$@5$5$l$^$7$?!#(B"clean" $B%?!<%2%C%H$G(B cygterm.ico $B$r:o=|(B
-          $B$7$J$$$h$&$K!#(B
+        * Makefile ‚ªC³‚³‚ê‚Ü‚µ‚½B"clean" ƒ^[ƒQƒbƒg‚Å cygterm.ico ‚ğíœ
+          ‚µ‚È‚¢‚æ‚¤‚ÉB
 
 v1.06_01 2006/02/08 (by babydamons@yahoo.co.jp)
-        * $B0J2<$N@_Dj%U%!%$%k$NFI$_9~$_$r%5%]!<%H(B:
+        * ˆÈ‰º‚Ìİ’èƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚ğƒTƒ|[ƒg:
             + /etc/cygterm.conf
             + ~/.cygtermrc
 
-        * $B%7%'%k$,%f!<%6$N%[!<%`%G%#%l%/%H%j$G5/F0$5$l$k$h$&$K!#(B
+        * ƒVƒFƒ‹‚ªƒ†[ƒU‚Ìƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚Å‹N“®‚³‚ê‚é‚æ‚¤‚ÉB
 
-        * $B%"%+%&%s%H$N@_Dj>pJs$r(B /etc/passwd $B$+$i(B getpwnam(3) $B$GFI$_9~$`$h$&$K!#(B
-          $B%"%+%&%s%HL>$O4D6-JQ?t(B USERNAME $B$+$i(Bgetenv(3) $B$G<hF@$7$F$^$9!#(B
+        * ƒAƒJƒEƒ“ƒg‚Ìİ’èî•ñ‚ğ /etc/passwd ‚©‚ç getpwnam(3) ‚Å“Ç‚İ‚Ş‚æ‚¤‚ÉB
+          ƒAƒJƒEƒ“ƒg–¼‚ÍŠÂ‹«•Ï” USERNAME ‚©‚çgetenv(3) ‚Åæ“¾‚µ‚Ä‚Ü‚·B
 
-        * Makefile $B=$@5!'%G%#%U%)%k%H$G%"%$%3%s$D$-$N(B .exe $B$r%S%k%I$7$^$9!#(B
+        * Makefile C³FƒfƒBƒtƒHƒ‹ƒg‚ÅƒAƒCƒRƒ“‚Â‚«‚Ì .exe ‚ğƒrƒ‹ƒh‚µ‚Ü‚·B
 
 v1.06 2004/01/24
-        * $B%3%^%s%I%i%$%s!&%*%W%7%g%s$rDI2C!#(B
-            -t 'terminal-emulator' ($B%?!<%_%J%k!&%(%_%e%l!<%?;XDj(B)
-            -p port-number ($B@\B3@h%]!<%HHV9f;XDj(B)
-            -dumb ($B%@%`%?!<%_%J%k;XDj(B)
-            -s 'shell' ($B%7%'%k;XDj(B)
-            -v 'env-var' ($B4D6-JQ?t;XDj(B)
+        * ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“EƒIƒvƒVƒ‡ƒ“‚ğ’Ç‰ÁB
+            -t 'terminal-emulator' (ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^w’è)
+            -p port-number (Ú‘±æƒ|[ƒg”Ô†w’è)
+            -dumb (ƒ_ƒ€ƒ^[ƒ~ƒiƒ‹w’è)
+            -s 'shell' (ƒVƒFƒ‹w’è)
+            -v 'env-var' (ŠÂ‹«•Ï”w’è)
 
-        * Makefile$B=$@5(B
-          make install $B$G(B BINDIR $B$,B8:_$7$J$1$l$P%(%i!<$K$J$k$h$&$K!#(B
+        * MakefileC³
+          make install ‚Å BINDIR ‚ª‘¶İ‚µ‚È‚¯‚ê‚ÎƒGƒ‰[‚É‚È‚é‚æ‚¤‚ÉB
 
-        * $B%=!<%9%U%!%$%k1QJ82=(B (cygterm.cc, README.txt)
+        * ƒ\[ƒXƒtƒ@ƒCƒ‹‰p•¶‰» (cygterm.cc, README.txt)
 
 v1.05 2003/01/14
-        * Ctrl+SPACE(NUL)$B$,Aw?.$G$-$k$h$&$K=$@5!#(B
-          $B2~9T%3!<%I(B CR+NUL $B$r=hM}$9$kJ}K!$H$7$FC1=c$K(B NUL$BJ8;z$rL5;k$7$F$$$?(B
-          $B$?$a!"(BCtrl+SPACE $B2!2<;~$G$b(B NUL $B$,Aw?.$5$l$J$+$C$?!#(B
+        * Ctrl+SPACE(NUL)‚ª‘—M‚Å‚«‚é‚æ‚¤‚ÉC³B
+          ‰üsƒR[ƒh CR+NUL ‚ğˆ—‚·‚é•û–@‚Æ‚µ‚Ä’Pƒ‚É NUL•¶š‚ğ–³‹‚µ‚Ä‚¢‚½
+          ‚½‚ßACtrl+SPACE ‰Ÿ‰º‚Å‚à NUL ‚ª‘—M‚³‚ê‚È‚©‚Á‚½B
 
 v1.04 2002/12/08
-        * $B%?!<%_%J%k!&%(%_%e%l!<%?$*$h$S%7%'%k$N5/F0$K<:GT$7$?$H$-$K(B
-          $B%(%i!<%a%C%;!<%8$rI=<($9$k$h$&$K$7$?!#(B
+        * ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚¨‚æ‚ÑƒVƒFƒ‹‚Ì‹N“®‚É¸”s‚µ‚½‚Æ‚«‚É
+          ƒGƒ‰[ƒƒbƒZ[ƒW‚ğ•\¦‚·‚é‚æ‚¤‚É‚µ‚½B
 
-        * Makefile$B=$@5(B
-          make install $B$G(B cygterm.cfg $B$r>e=q$-$7$J$$$h$&$K!#(B
-          gcc$B%*%W%7%g%s$K(B -fno-exceptions $B$rDI2C!"(BGCC-3$B$N%j%s%/%(%i!<2sHr!#(B
+        * MakefileC³
+          make install ‚Å cygterm.cfg ‚ğã‘‚«‚µ‚È‚¢‚æ‚¤‚ÉB
+          gccƒIƒvƒVƒ‡ƒ“‚É -fno-exceptions ‚ğ’Ç‰ÁAGCC-3‚ÌƒŠƒ“ƒNƒGƒ‰[‰ñ”ğB
 
 v1.03 2002/07/24
-        * $B%?!<%_%J%k!&%(%_%e%l!<%?$,DLCN$7$F$/$k%?!<%_%J%k%?%$%W$K!"BgJ8;z$,(B
-          $B4^$^$l$F$$$l$P!"$=$l$r>.J8;z$KJQ49$9$k$h$&$K=$@5!#(B
-          $B%?!<%_%J%k!&%(%_%e%l!<%?$K$h$C$F$O4D6-JQ?t(B TERM $B$NCM$,(B 'ANSI' 'VT100'
-          $B$N$h$&$KBgJ8;z$J$j(B terminfo $B$K%^%C%A$7$J$$$?$a!#(B
-          (Windows 2000 telnet.exe $BEy(B)
+        * ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ª’Ê’m‚µ‚Ä‚­‚éƒ^[ƒ~ƒiƒ‹ƒ^ƒCƒv‚ÉA‘å•¶š‚ª
+          ŠÜ‚Ü‚ê‚Ä‚¢‚ê‚ÎA‚»‚ê‚ğ¬•¶š‚É•ÏŠ·‚·‚é‚æ‚¤‚ÉC³B
+          ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚É‚æ‚Á‚Ä‚ÍŠÂ‹«•Ï” TERM ‚Ì’l‚ª 'ANSI' 'VT100'
+          ‚Ì‚æ‚¤‚É‘å•¶š‚È‚è terminfo ‚Éƒ}ƒbƒ`‚µ‚È‚¢‚½‚ßB
+          (Windows 2000 telnet.exe “™)
 
 v1.02 2002/07/22
-        * $B%?!<%_%J%k!&%(%_%e%l!<%?$,%3%s%=!<%k!&%"%W%j%1!<%7%g%s$N$H$-$K5/F0(B
-          $B$G$-$J$+$C$?$N$r=$@5!#(B(Windows 2000 telnet.exe $BEy(B)
-          CreateProcess()$B8F=P$7%_%9!#(B
+        * ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚ªƒRƒ“ƒ\[ƒ‹EƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ì‚Æ‚«‚É‹N“®
+          ‚Å‚«‚È‚©‚Á‚½‚Ì‚ğC³B(Windows 2000 telnet.exe “™)
+          CreateProcess()ŒÄo‚µƒ~ƒXB
 
-        * $B%?!<%_%J%k!&%(%_%e%l!<%?$+$i(B CR+LF $B$,Aw$i$l$F$-$?$i(B LF $B$OE>Aw$7$J$$(B
-          $B$h$&$K$7!"2~9T$,#22sH/@8$9$k$N$r=$@5!#(B(Windows 98 telnet.exe $BEy(B)
+        * ƒ^[ƒ~ƒiƒ‹EƒGƒ~ƒ…ƒŒ[ƒ^‚©‚ç CR+LF ‚ª‘—‚ç‚ê‚Ä‚«‚½‚ç LF ‚Í“]‘—‚µ‚È‚¢
+          ‚æ‚¤‚É‚µA‰üs‚ª‚Q‰ñ”­¶‚·‚é‚Ì‚ğC³B(Windows 98 telnet.exe “™)
 
-        * $B%P!<%8%g%sHV9f$r(B cygterm.exe $B$KKd$a9~$`$h$&$K$7$?!#(B
-          $B3NG'J}K!$O(B $ strings cygterm.exe | grep version
+        * ƒo[ƒWƒ‡ƒ“”Ô†‚ğ cygterm.exe ‚É–„‚ß‚Ş‚æ‚¤‚É‚µ‚½B
+          Šm”F•û–@‚Í $ strings cygterm.exe | grep version
 
 v1.01 2002/07/19
-        * zsh, tcsh $B$GF0:n$7$J$+$C$?$N$r=$@5!#5<;wC<Kv$N%*!<%W%sJ}K!$,0-$/!"(B
-          zsh, tcsh $B$G$O5/F0$H$H$b$KF~NO$,%V%m%C%/$5$l$?!#(B
+        * zsh, tcsh ‚Å“®ì‚µ‚È‚©‚Á‚½‚Ì‚ğC³B‹[—’[––‚ÌƒI[ƒvƒ“•û–@‚ªˆ«‚­A
+          zsh, tcsh ‚Å‚Í‹N“®‚Æ‚Æ‚à‚É“ü—Í‚ªƒuƒƒbƒN‚³‚ê‚½B
 
 v1.00 2000/12/17
-        * $B=i4|%P!<%8%g%s40@.(B
+        * ‰Šúƒo[ƒWƒ‡ƒ“Š®¬
 
