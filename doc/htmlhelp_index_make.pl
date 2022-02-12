@@ -22,7 +22,7 @@ my $result = GetOptions(
 
 my $OUT;
 if ($out eq "-") {
-	binmode STDIN, ":crlf:encoding(shiftjis)";
+	binmode STDOUT, ":crlf:encoding(shiftjis)";
 	$OUT = *STDOUT;
 } else {
 	open ($OUT, '>:crlf:encoding(shiftjis)', $out);
