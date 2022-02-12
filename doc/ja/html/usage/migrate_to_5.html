@@ -10,15 +10,53 @@
 
   <body>
     <h1>Tera Term 5 について</h1>
+    Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです。
     <ul>
-      <li>Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです。</li>
+      <li>特徴
       <ul>
         <li>ターミナル(内部バッファ、描画、キー入力)のUnicode化
-        <li>Windows UI(メニュー、ダイアログ)のUnicode化
-        <li>その他Windows APIのUnicode版への切り替え(ファイル名など)
+          <ul>
+            <li>多言語の同時表示ができます。<br>
+              Tera Term 4 では、例えば日本語を表示する設定にしていると中国語は表示できませんでした
+            <li>ISO8859-1から16に対応しました。
+            <li>ロケールの設定が不要になりました。
+          </ul>
+        <li>Windows UI(メニュー、ダイアログ)のUnicode化<br>
+          次の場合でもメニューやダイアログは設定した言語で正しく表示されます。
+          <ul>
+            <li>"現在のシステムロケール"以外の言語に設定した場合。
+            <li>"ワールドワイド言語サポートで Unicode UTF-8 を使用"にチェックが入っている場合。
+          </ul>
+        <li>その他Windows APIのUnicode版への切り替え
+          <ul>
+            <li>Unicode ファイル名を使用できます。
+          </ul>
+        <li>マクロのUnicode化
+          <ul>
+            <li>内部コードがUnicode(UTF-8)になりました。
+            <li>ダイアログなどのGUIで多言語表示できます。
+          </ul>
       </ul>
-      <li>Windows 10, 11をターゲットにしています。</li>
-      <li>特徴などは<a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">Unicode化基本方針</a>を参照ください。</li>
+      <li>動作環境
+        <ul>
+          <li>alpha は次の環境でテストを行っています。
+            <ul>
+              <li>Windows 10, 11
+              <li>Cygwin 3.3.4(most recent version)
+            </ul>
+          <li>正式リリース(見込み)
+            <ul>
+              <li>Windows 7 から 11<br>
+                Visual Sutdio 2022 によるビルドを予定しているので
+                <a href="https://osdn.net/projects/ttssh2/wiki/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83#h2-Visual.20Studio.20.E3.81.A7.E3.83.93.E3.83.AB.E3.83.89.E3.81.97.E3.81.9F.E3.83.90.E3.82.A4.E3.83.8A.E3.83.AA.E3.81.AE.E5.8B.95.E4.BD.9C.E3.81.99.E3.82.8B.E7.92.B0.E5.A2.83">Windows 7 以降サポート</a>となります。
+              <li>Cygwin (most recent version)
+            </ul>
+        </ul>
+      <li>その他
+        <ul>
+          <li><a href="https://osdn.net/projects/ttssh2/wiki/%E6%B1%BA%E5%AE%9A%E4%BA%8B%E9%A0%85#h1-Tera.20Term.205.x">開発ツール,使用ライブラリなど</a>
+          <li><a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">実装状況</a>
+        </ul>
     </ul>
 
     <h1>Tera Term 5 へ移行</h1>
@@ -29,9 +67,13 @@
       <ul>
         <li>TERATERM.INI,KEYBOARD.CFGはUnicode対応となりました。</li>
         <ul>
-          <li>cygterm.cfgは対応していません。</li>
+          <li>cygterm.cfgの文字コードは、cygwin 3.3.4ではUTF-8です</li>
         </ul>
-        <li>Windows 10,11(2000から?)ではiniファイルをUnicode化することができます。</li>
+        <li>Windows 10,11ではiniファイルをUnicode化することができます。<br>
+        <ul>
+          <li>iniファイルを扱うWin32APIがUnicode対応となります</li>
+          <li>cygterm.cfgはWin32APIを使って読み書きしていません</li>
+        </ul>
         <li>Unicode化したiniファイルの文字コードはUTF-16 (with LE BOM)です。</li>
         <li>Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
         <li>Tera Term 5 は起動時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
@@ -48,7 +90,7 @@
         </ul>
         <li>ファイルがない場合、ttermpro.exe起動時にデフォルトの設定ファイルがコピーされます。</li>
         <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした。</li>
-        <li><a href="../setup/folder.md">フォルダについて (現在は Windows 10(11)で動作テストしています)</a></li>
+        <li><a href="../setup/folder.html">フォルダについて</a></li>
       </ul>
     </ul>
 
