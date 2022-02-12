@@ -887,6 +887,7 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
  *
  * @param[in]		hInst		WinMain()の HINSTANCE または NULL
  * @return			ExeDir		不要になったら free() すること
+ *								文字列の最後にパス区切り('\')はついていない
  */
 wchar_t *GetExeDirW(HINSTANCE hInst)
 {
@@ -946,6 +947,7 @@ BOOL IsPortableMode(void)
  *
  * @param[in]		hInst		WinMain()の HINSTANCE または NULL
  * @return			HomeDir		不要になったら free() すること
+ *								文字列の最後にパス区切り('\')はついていない
  */
 wchar_t *GetHomeDirW(HINSTANCE hInst)
 {
@@ -955,9 +957,10 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
 	else {
 		wchar_t *path;
 		wchar_t *ret = NULL;
-		_SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
+		_SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path);
 		awcscats(&ret, path, L"\\teraterm5", NULL);
 		free(path);
+		CreateDirectoryW(ret, NULL);
 		return ret;
 	}
 }
@@ -973,6 +976,7 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
  *
  * @param[in]		hInst		WinMain()の HINSTANCE または NULL
  * @return			LogDir		不要になったら free() すること
+ *								文字列の最後にパス区切り('\')はついていない
  */
 wchar_t* GetLogDirW(HINSTANCE hInst)
 {
@@ -981,15 +985,15 @@ wchar_t* GetLogDirW(HINSTANCE hInst)
 		wchar_t *ExeDirW = GetExeDirW(hInst);
 		awcscats(&ret, ExeDirW, L"\\log", NULL);
 		free(ExeDirW);
-		return ret;
 	}
 	else {
 		wchar_t *path;
-		_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
+		_SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
 		awcscats(&ret, path, L"\\teraterm5", NULL);
 		free(path);
-		return ret;
 	}
+	CreateDirectoryW(ret, NULL);
+	return ret;
 }
 
 /*
@@ -1167,7 +1171,7 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 wchar_t *GetDownloadFolderW(void)
 {
 	wchar_t *download;
-	_SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &download);
+	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &download);
 	return download;
 }
 

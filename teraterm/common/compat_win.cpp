@@ -583,6 +583,7 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 		return r;
 	}
 
+	// égópAPIÇÕ [ttssh2-dev 28] éQè∆
 	int csidl;
 	if (GetCSIDLFromFKNOWNFOLDERID(rfid, &csidl) == FALSE) {
 		*ppszPath = _wcsdup(L"");
@@ -596,6 +597,10 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 		BOOL r = SHGetSpecialFolderPathW(NULL, path, csidl, create);
 		if (!r) {
 			path[0] = 0;
+		} else {
+			if ((dwFlags & KF_FLAG_CREATE) != 0) {
+				CreateDirectoryW(path, NULL);
+			}
 		}
 		*ppszPath = _wcsdup(path);
 		return r ? S_OK : E_FAIL;
@@ -610,6 +615,9 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 	SHGetPathFromIDListW(pidl, path);
 	CoTaskMemFree(pidl);
 	*ppszPath = _wcsdup(path);
+	if ((dwFlags & KF_FLAG_CREATE) != 0) {
+		CreateDirectoryW(path, NULL);
+	}
 	return S_OK;
 }
 
