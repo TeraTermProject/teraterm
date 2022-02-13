@@ -98,21 +98,7 @@
  */
 static wchar_t *GetHistoryFileName(TTTSet *ts_)
 {
-	wchar_t *fname;
-
-	// My Documents ‚É file ‚ª‘¶Ý‚·‚éê‡A‚»‚ê‚ð—Dæ‚µ‚ÄŽg—p‚·‚é
-	// TODO ‚±‚Ì“®ì‚Ííœ‚µ‚½‚Ù‚¤‚ª‚æ‚³‚»‚¤
-#if 0
-	HRESULT hr = _SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &fname);
-	awcscats(&fname, L"\\", BROADCAST_LOGFILE, NULL);
-	DWORD r = GetFileAttributesW(fname);
-	if (r != INVALID_FILE_ATTRIBUTES) {
-		return fname;
-	}
-	free(fname);
-#endif
-
-	fname = NULL;
+	wchar_t *fname = NULL;
 	awcscats(&fname, ts_->HomeDirW, L"\\", BROADCAST_LOGFILE, NULL);
 	return fname;
 }
