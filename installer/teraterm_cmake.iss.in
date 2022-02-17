@@ -476,7 +476,6 @@ end;
 procedure SetIniFile(iniFile: String);
 var
   Language      : String;
-  Locale        : String;
   VTFont        : String;
   TEKFont       : String;
   TCPPort       : integer;
@@ -485,7 +484,6 @@ var
 
 begin
   Language       := GetIniString('Tera Term', 'Language', '', iniFile);
-  Locale         := GetIniString('Tera Term', 'Locale', '', iniFile);
   VTFont         := GetIniString('Tera Term', 'VTFont', '', iniFile);
   TEKFont        := GetIniString('Tera Term', 'TEKFont', '', iniFile);
   TCPPort        := GetIniInt('Tera Term', 'TCPPort', 0, 0, 65535, iniFile)
@@ -495,20 +493,6 @@ begin
   case GetUILanguage and $3FF of
   $04: // Chinese
     begin
-
-      case GetUILanguage of
-      $c04, $1404, $404: // Hong Kong, Macao, Taiwan
-        begin
-          if Length(Locale) = 0 then
-            SetIniString('Tera Term', 'Locale', 'cht', iniFile);
-        end;
-      else
-        begin
-          if Length(Locale) = 0 then
-            SetIniString('Tera Term', 'Locale', 'chs', iniFile);
-        end;
-      end;
-
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'UTF-8', iniFile);
       if Length(VTFont) = 0 then
@@ -520,8 +504,6 @@ begin
     begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'Japanese', iniFile);
-      if Length(Locale) = 0 then
-        SetIniString('Tera Term', 'Locale', 'japanese', iniFile);
       if Length(VTFont) = 0 then
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-19,128', iniFile);
       if Length(TEKFont) = 0 then
@@ -531,8 +513,6 @@ begin
     begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'Korean', iniFile);
-      if Length(Locale) = 0 then
-        SetIniString('Tera Term', 'Locale', 'korean', iniFile);
       if Length(VTFont) = 0 then
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
@@ -542,8 +522,6 @@ begin
     begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'Russian', iniFile);
-      if Length(Locale) = 0 then
-        SetIniString('Tera Term', 'Locale', 'russian', iniFile);
       if Length(VTFont) = 0 then
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
@@ -556,15 +534,11 @@ begin
 
         if Length(Language) = 0 then
           SetIniString('Tera Term', 'Language', 'UTF-8', iniFile);
-        if Length(Locale) = 0 then
-          SetIniString('Tera Term', 'Locale', 'american', iniFile);
 
       end else begin // Other
 
         if Length(Language) = 0 then
           SetIniString('Tera Term', 'Language', 'English', iniFile);
-        if Length(Locale) = 0 then
-          SetIniString('Tera Term', 'Locale', 'english', iniFile);
 
       end;
 
