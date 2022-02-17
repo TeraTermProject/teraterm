@@ -30,6 +30,10 @@ install(
 install(
   FILES
   cyglaunch_cmd.bat
+  cyglaunch_git_bash.bat
+  cyglaunch_msys2_mingw32.bat
+  cyglaunch_msys2_mingw64.bat
+  cyglaunch_msys2_msys.bat
   cyglaunch_powershell.bat
   cyglaunch_wsl.bat
   DESTINATION .
