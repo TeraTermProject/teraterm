@@ -35,9 +35,9 @@ $(LAUNCH) : $(LAUNCH_SRC) $(ICO) $(RC)
 	@#
 	@# $(CC)                   gcc less than 4.3.2 (supports "-mno-cygwin")
 	@# gcc-3                   gcc3 (supports "-mno-cygwin")
-	@# i686-pc-mingw32-gcc     mingw-gcc-core
-	@# i686-w64-mingw32-gcc    mingw64-i686-gcc-core
-	@# x86_64-w64-mingw32-gcc  mingw64-x86_64-gcc-core
+	@# i686-pc-mingw32-gcc     mingw-gcc-core (host=MinGW.org Project / target=i686)
+	@# i686-w64-mingw32-gcc    mingw64-i686-gcc-core  (host=Mingw-w64 Project / target=i686)
+	@# x86_64-w64-mingw32-gcc  mingw64-x86_64-gcc-core  (host=Mingw-w64 Project/ target=x86_64)
   ifeq (i686, $(shell uname -m))
 	windres -O coff -o $(RES) $(RC)
 	( i686-pc-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
