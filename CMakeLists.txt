@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.11)
 
 project(teraterm_all)
 
-if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
+if(MSVC AND (MSVC_VERSION LESS_EQUAL 1400))
+  # Visual Studio 2005 (1400=VS2005)
   set(SUPPORT_OLD_WINDOWS_DEFAULT ON)
 else()
   set(SUPPORT_OLD_WINDOWS_DEFAULT OFF)
@@ -22,7 +23,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #set(_WIN32_WINNT "0x0a00") # 0x0a00=_WIN32_WINNT_WIN10
 #set(_WIN32_WINNT "0x0501") # Tera Term がビルドできる最小値
-if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005" OR ${CMAKE_GENERATOR} MATCHES "Visual Studio 9 2008")
+if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
+  # Visual Studio 2005, 2008  (1500=VS2008)
   set(_WIN32_WINNT "0x0501")
   set(TTXSSH OFF)
 endif()

@@ -15,6 +15,16 @@ if(NOT "${ARCHITECTURE}" STREQUAL "")
   set(ARCHITECTURE_OPTION -DARCHITECTURE=${ARCHITECTURE})
 endif()
 
+if(NOT DEFINED BUILD_SSL_LIBRARY)
+  if(NOT(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005" OR ${CMAKE_GENERATOR} MATCHES "Visual Studio 9 2008"))
+    set(BUILD_SSL_LIBRARY OFF)
+  else()
+    set(BUILD_SSL_LIBRARY ON)
+  endif()
+endif()
+
+message("BUILD_SSL_LIBRARY=${BUILD_SSL_LIBRARY}")
+
 # install tools
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   if(NOT EXISTS c:/Strawberry/perl/bin/perl.exe)
@@ -43,10 +53,12 @@ message("SFMT")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P SFMT.cmake
   )
-message("openssl 1.1")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl11.cmake
-  )
+if(BUILD_SSL_LIBRARY)
+  message("openssl 1.1")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl11.cmake
+    )
+endif(BUILD_SSL_LIBRARY)
 message("cJSON")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -P cJSON.cmake
@@ -55,9 +67,11 @@ message("argon2")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -P argon2.cmake
   )
-message("libressl")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildlibressl.cmake
-  )
+if(BUILD_SSL_LIBRARY)
+  message("libressl")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildlibressl.cmake
+    )
+endif(BUILD_SSL_LIBRARY)
 
 message("done buildall.cmake")
