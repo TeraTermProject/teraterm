@@ -1,9 +1,12 @@
 ﻿# svnrev
 
-- svn(又は git)の情報からヘッダファイルとバッチファイルを作成する
-  - `../teraterm/ttpdlg/svnversion.h`
-  - `sourcetree_info.bat`
-  - buildフォルダの `build_config.cmake` (cmake時のみ)
+- ソースツリーのsvn(又は git)の情報をヘッダファイル等に書き出すためのツール
+  - ソース用のヘッダフィル
+    - 例 `../teraterm/ttpdlg/svnversion.h`
+  - CI用のbatファイル
+    - 例 `sourcetree_info.bat`
+  - cmake用ファイル
+    - 例 buildフォルダの `build_config.cmake`
 
 ## 準備
 
@@ -16,6 +19,8 @@
   - perl が見つからない場合は svnversion.default.h が使用される
 - svn(又は git)をインストールしておく
   - Windows用svnの例
+    - Subversion for Windows
+      - http://sourceforge.net/projects/win32svn/
     - TortoiseSVN の command line client tools
       - https://tortoisesvn.net/
   - Windows用gitの例
