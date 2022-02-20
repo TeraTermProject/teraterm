@@ -97,7 +97,7 @@ sub write_info_header
 	open(my $FD, ">$out_header") || die "error $out_header";
 	print $FD "/* $header */\n";
 	print $FD "/* #define TT_VERSION_STR \"$version\" check teraterm/common/tt-version.h */\n";
-	if (defined $revision) {
+	if ($revision ne '') {
 		print $FD "#define SVNVERSION $revision\n";
 	} else {
 		print $FD "#undef SVNVERSION\n";
@@ -119,7 +119,7 @@ sub write_info_bat
 	open(my $FD, ">$out_bat") || die "error $out_bat";
 	print $FD "\@rem $header\n";
 	print $FD "set VERSION=$version\n";
-	if (defined $revision) {
+	if ($revision ne '') {
 		print $FD "set SVNVERSION=$revision\n";
 	} else {
 		print $FD "set SVNVERSION=unknown\n";
@@ -138,7 +138,7 @@ sub write_info_cmake
 	open(my $FD, ">$out_cmake") || die "error $out_cmake";
 	print $FD "# $header\n";
 	print $FD "set(VERSION \"$version\")\n";
-	if (defined $revision) {
+	if ($revision ne '') {
 		print $FD "set(SVNVERSION \"$revision\")\n";
 	} else {
 		print $FD "#set(SVNVERSION \"0000\")\n";
