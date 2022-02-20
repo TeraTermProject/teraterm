@@ -133,6 +133,9 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)..\svnrev_perl\svnrev.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\ttlib.c" />
@@ -285,9 +288,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\cygwin\cyglib\cyglib.v16.vcxproj">
       <Project>{a171f48c-bfb2-4766-97c3-9b8b7be9d548}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\svnrev_perl\svnrev_perl.v16.vcxproj">
-      <Project>{53db5f02-7f9e-4e29-9751-b0dac6a8eeba}</Project>
     </ProjectReference>
     <ProjectReference Include="..\common\common_static.v16.vcxproj">
       <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>

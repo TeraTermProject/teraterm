@@ -16,8 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttptek", "ttptek\ttptek.v16
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "common\common_static.v16.vcxproj", "{AC42387D-23EC-45DB-81F9-8933C7EFA52A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "svnrev_perl", "..\svnrev_perl\svnrev_perl.v16.vcxproj", "{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cyglib", "..\cygwin\cyglib\cyglib.v16.vcxproj", "{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}"
 EndProject
 Global
@@ -70,14 +68,6 @@ Global
 		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Release|Win32.ActiveCfg = Release|Win32
 		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Release|Win32.Build.0 = Release|Win32
 		{AC42387D-23EC-45DB-81F9-8933C7EFA52A}.Release|x64.ActiveCfg = Release|Win32
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Debug|Win32.Build.0 = Debug|Win32
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Debug|x64.ActiveCfg = Debug|x64
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Debug|x64.Build.0 = Debug|x64
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|Win32.ActiveCfg = Release|Win32
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|Win32.Build.0 = Release|Win32
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|x64.ActiveCfg = Release|x64
-		{53DB5F02-7F9E-4E29-9751-B0DAC6A8EEBA}.Release|x64.Build.0 = Release|x64
 		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|Win32.Build.0 = Debug|Win32
 		{A171F48C-BFB2-4766-97C3-9B8B7BE9D548}.Debug|x64.ActiveCfg = Debug|Win32
