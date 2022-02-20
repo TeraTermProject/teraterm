@@ -92,6 +92,9 @@
     <Manifest>
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)..\svnrev_perl\svnrev.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>

@@ -25,6 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="$(SolutionDir)..\svnrev_perl\svnrev.bat"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -118,6 +119,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="$(SolutionDir)..\svnrev_perl\svnrev.bat"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
