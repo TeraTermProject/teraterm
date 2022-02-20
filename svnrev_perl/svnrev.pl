@@ -279,7 +279,8 @@ if ($verbose != 0) {
 }
 
 # output for source(C,C++) header
-if ($header_revision ne $svninfo{'Revision'}) {
+if (! -f $out_header ||
+    $header_revision ne $svninfo{'Revision'}) {
 	if ($verbose != 0) {
 		print "write '$out_header'\n";
 	}
