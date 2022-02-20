@@ -1,8 +1,8 @@
 if exist teraterm\ttpdlg\svnversion.h del teraterm\ttpdlg\svnversion.h
-if exist svnrev_perl\sourcetree_info.bat del svnrev_perl\sourcetree_info.bat
+if exist buildtools\svnrev\sourcetree_info.bat del buildtools\svnrev\sourcetree_info.bat
 call ci_scripts\install.bat
-call svnrev_perl\svnrev.bat
-call svnrev_perl\sourcetree_info.bat
+call buildtools\svnrev\svnrev.bat
+call buildtools\svnrev\sourcetree_info.bat
 if exist c:\cygwin64\setup-x86_64.exe (
   c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
 )

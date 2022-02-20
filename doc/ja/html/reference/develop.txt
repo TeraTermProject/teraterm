@@ -64,8 +64,8 @@
     - リビジョン番号取得 (perlがない場合リビジョン番号を取得せずにビルドします)
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     リビジョン番号取得時に使用します
-    svnrev_perl/toolinfo.txt に svn.exe のフルパスを記述いてください。
-    詳しくは svnrev_perl/readme.md を参照ください
+    buildtools/svnrev/toolinfo.txt に svn.exe のフルパスを記述いてください。
+    詳しくは buildtools/svnrev/readme.md を参照ください
 
 
 ■ ライブラリ

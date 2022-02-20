@@ -93,7 +93,7 @@
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <PreBuildEvent>
-      <Command>$(SolutionDir)..\svnrev_perl\svnrev.bat</Command>
+      <Command>$(SolutionDir)..\buildtools\svnrev\svnrev.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,7 +137,7 @@
       <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <PreBuildEvent>
-      <Command>$(SolutionDir)..\svnrev_perl\svnrev.bat</Command>
+      <Command>$(SolutionDir)..\buildtools\svnrev\svnrev.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

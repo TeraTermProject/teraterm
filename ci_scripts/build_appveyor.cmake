@@ -17,8 +17,8 @@ endif()
 # svn revision
 file(MAKE_DIRECTORY ${BUILD_DIR}/teraterm/ttpdlg)
 execute_process(
-  COMMAND perl ${CMAKE_CURRENT_LIST_DIR}/../svnrev_perl/svnrev.pl -v --root "${CMAKE_CURRENT_LIST_DIR}/.." --header ${BUILD_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${BUILD_DIR}/build_config.cmake
-  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../svnrev_perl
+  COMMAND perl ${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/svnrev.pl -v --root "${CMAKE_CURRENT_LIST_DIR}/.." --header ${BUILD_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${BUILD_DIR}/build_config.cmake
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev
   )
 
 
