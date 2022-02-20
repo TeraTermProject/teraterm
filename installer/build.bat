@@ -197,7 +197,7 @@ popd
 
 rem "rebuild"を指定しない場合、svnversion.h を更新する。
 if not exist ..\teraterm\ttpdlg\svnversion.h goto create_svnversion_h
-if "%BUILD%" == "rebuild" goto build
+if not "%BUILD%" == "rebuild" goto build
 
 del ..\teraterm\ttpdlg\svnversion.h
 :create_svnversion_h
