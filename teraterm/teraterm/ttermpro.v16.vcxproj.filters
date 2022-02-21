@@ -25,6 +25,9 @@
     <Filter Include="ttpfile">
       <UniqueIdentifier>{0494dec4-73a6-4271-9dfa-ad4b61e2b62c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cyglib">
+      <UniqueIdentifier>{ceb6977e-f86f-423e-a1ca-d2fcb004e7cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filesys.cpp">
@@ -194,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="..\ttpfile\protolog.cpp">
       <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cygwin\cyglib\cyglib.c">
+      <Filter>cyglib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -452,6 +458,9 @@
     </ClInclude>
     <ClInclude Include="..\ttpfile\protolog.h">
       <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cygwin\cyglib\cyglib.h">
+      <Filter>cyglib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
