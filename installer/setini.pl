@@ -17,6 +17,9 @@ while(<INI>){
 	s/^(VTFont\s*=).*$/$1$vtfont/;
 	s/^(TEKFont\s*=).*$/$1Terminal,0,8,128/;
 	s/^(TCPPort\s*=).*$/${1}22/;
+	s/^(UnicodeAmbiguousWidth=).*$/${1}2/;
+	s/^(UnicodeEmojiOverride=).*$/$1on/;
+	s/^(UnicodeEmojiWidth=).*$/${1}2/;
 	print;
 }
 close INI;
