@@ -7,7 +7,7 @@
 #  perl htmlhelp_index_make.pl ja html > ja\Index.hhk
 #
 
-require 5.24.0;
+require 5.8.0;
 use strict;
 use warnings;
 use utf8;

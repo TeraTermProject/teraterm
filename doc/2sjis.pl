@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/perl -w
 
-require 5.24.0;
+require 5.8.0;
 use strict;
 use warnings;
 use Encode;
