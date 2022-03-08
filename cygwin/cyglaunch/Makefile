@@ -1,8 +1,5 @@
 # Makefile for cyglaunch
 
-BINDIR = $(HOME)/bin
-
-UNAME_A = $(shell uname -a)
 UNAME_M = $(shell uname -m)
 CURRENT_MAKEFILE_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -37,13 +34,12 @@ RC = x86_64-w64-mingw32-windres
 endif
 
 CFLAGS = -O2 -fno-exceptions -DUNICODE -D_UNICODE -MMD -I $(CYGLIB_DIR) -I $(COMMON_DIR)
-#CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions -DUNICODE -D_UNICODE -MMD -I../cyglib -I../../teraterm/common
-#CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -mwindows -municode
 #LDFLAGS = -municode
 
 ifneq ("$(wildcard asprintf.cpp)","")
+# standalone build
 COMMON_DIR = .
 CYGLIB_DIR = .
 CYGTERM_DIR = .
@@ -66,10 +62,8 @@ SRC_RC = cyglaunch.rc
 OBJ = $(addsuffix .o,$(notdir $(basename $(SRC))))
 DEP = $(OBJ:.o=.d)
 ICO = $(CYGTERM_DIR)/cygterm.ico
-ARCHIVE = cygterm+.tar.gz
 
-
-.PHONY: all clean install uninstall arc $(ARCHIVE)
+.PHONY: all clean install uninstall arc copyfile
 
 all : $(EXE)
 
@@ -104,24 +98,21 @@ $(SRC_RC):
 ttlib_static_dir.o: $(COMMON_DIR)/ttlib_static_dir.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ -DENABLE_COMAPT_WIN=0
 
-
 -include $(DEP)
 
-test:
-	@echo $(SRC)
-	@echo $(OBJ)
-	@echo $(COMMON_DIR)
-	@echo $(CYGLIB_DIR)
-	@echo $(MAKEFILE_LIST)
-	@echo $(MAKEFILE)
-	@echo $(CURRENT_MAKEFILE_DIR)
-
-arc: $(ARCHIVE)
-
-$(ARCHIVE):
-ifneq ("$(wildcard $(ARCHIVE))","")
-	gunzip $(ARCHIVE)
-endif
-	tar rvf $(ARCHIVE:.gz=) cyglaunch.c Makefile -C $(COMMON_DIR) asprintf.cpp asprintf.h win32helper.cpp win32helper.h -C $(CURRENT_MAKEFILE_DIR)/$(CYGLIB_DIR) cyglib.c cyglib.h -C $(CURRENT_MAKEFILE_DIR)/$(CYGTERM_DIR) cygterm.ico
-	gzip $(ARCHIVE:.gz=)
-
+# copy files for standalone build
+copyfile:
+	@echo COPY_DEST=$(COPY_DEST)
+	cp Makefile $(COPY_DEST)/Makefile.cyglaunch
+	cp cyglaunch.c $(COPY_DEST)
+	cp $(COMMON_DIR)/asprintf.cpp $(COPY_DEST)
+	cp $(COMMON_DIR)/asprintf.h $(COPY_DEST)
+	cp $(COMMON_DIR)/win32helper.cpp $(COPY_DEST)
+	cp $(COMMON_DIR)/win32helper.h $(COPY_DEST)
+	cp $(COMMON_DIR)/ttlib_static_dir.cpp $(COPY_DEST)
+	cp $(COMMON_DIR)/ttlib_static_dir.h $(COPY_DEST)
+	cp $(COMMON_DIR)/ttknownfolders.c $(COPY_DEST)
+	cp $(COMMON_DIR)/ttknownfolders.h $(COPY_DEST)
+	cp $(CYGLIB_DIR)/cyglib.c $(COPY_DEST)
+	cp $(CYGLIB_DIR)/cyglib.h $(COPY_DEST)
+	cp $(CYGTERM_DIR)/cygterm.ico $(COPY_DEST)
