@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#include "ttlib.h"
+#include "ttlib_static_dir.h"
 #include "asprintf.h"
 #include "win32helper.h"
 #include "cyglib.h"
@@ -113,16 +113,16 @@ int wmain(int argc, wchar_t *argv[])
 	case NO_ERROR:
 		break;
 	case ERROR_FILE_NOT_FOUND:
-		MessageBox(NULL, "Can't find Cygwin directory.", "ERROR", MB_OK | MB_ICONWARNING);
+		MessageBoxA(NULL, "Can't find Cygwin directory.", "ERROR", MB_OK | MB_ICONWARNING);
 		break;
 	case ERROR_NOT_ENOUGH_MEMORY:
-		MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
+		MessageBoxA(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
 		break;
 	case ERROR_OPEN_FAILED:
 	default: {
 		const char *msg = msys2term ? "Can't execute msys2term." :
 			"Can't execute Cygterm.";
-		MessageBox(NULL, msg, "ERROR", MB_OK | MB_ICONWARNING);
+		MessageBoxA(NULL, msg, "ERROR", MB_OK | MB_ICONWARNING);
 		break;
 	}
 	}
