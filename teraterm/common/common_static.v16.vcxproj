@@ -151,6 +151,7 @@
     <ClCompile Include="ttlib_charset.cpp" />
     <ClCompile Include="ttlib_static.c" />
     <ClCompile Include="ttlib_static_cpp.cpp" />
+    <ClCompile Include="ttlib_static_dir.cpp" />
     <ClCompile Include="win32helper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="ttknownfolders.h" />
     <ClInclude Include="ttlib.h" />
     <ClInclude Include="ttlib_charset.h" />
+    <ClInclude Include="ttlib_static_dir.h" />
     <ClInclude Include="win32helper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

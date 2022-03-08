@@ -36,10 +36,12 @@ add_library(
   ttknownfolders.h
   ttknownfolders.c
   ttlib.h
+  ttlib_charset.cpp
+  ttlib_charset.h
   ttlib_static.c
   ttlib_static_cpp.cpp
-  ttlib_charset.h
-  ttlib_charset.cpp
+  ttlib_static_dir.cpp
+  ttlib_static_dir.h
   win32helper.cpp
   win32helper.h
   )

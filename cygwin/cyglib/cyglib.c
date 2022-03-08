@@ -33,7 +33,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "ttlib.h"
+#include "ttlib_static_dir.h"
 #include "asprintf.h"
 
 #include "cyglib.h"

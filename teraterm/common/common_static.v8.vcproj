@@ -309,6 +309,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ttlib_static_dir.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ttlib_static_dir.h"
+			>
+		</File>
+		<File
 			RelativePath=".\win32helper.cpp"
 			>
 		</File>

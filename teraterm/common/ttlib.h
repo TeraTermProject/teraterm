@@ -34,6 +34,7 @@
 #pragma once
 
 #include "i18n.h"
+#include "ttlib_static_dir.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,9 +93,6 @@ void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
 void GetDownloadFolder(char *dest, int destlen);
 wchar_t *GetDownloadFolderW(void);
-wchar_t *GetHomeDirW(HINSTANCE hInst);
-wchar_t *GetExeDirW(HINSTANCE hInst);
-wchar_t* GetLogDirW(HINSTANCE hInst);
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file);
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home);
 void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
@@ -199,7 +197,6 @@ wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len);
 wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_);
 BOOL IsRelativePathA(const char *path);
 BOOL IsRelativePathW(const wchar_t *path);
-DWORD TTWinExec(const wchar_t *command);
 DWORD TTWinExecA(const char *commandA);
 void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str);
 BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str);
