@@ -1347,7 +1347,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	char *logdir;
 
 	if (strlen(ts.LogDefaultPath) > 0) {
-		logdir = strdup(ts.LogDefaultPath);
+		logdir = _strdup(ts.LogDefaultPath);
 	}
 	else {
 		logdir = ToCharW(ts.LogDirW);

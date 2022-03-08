@@ -53,10 +53,6 @@
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
 
-#ifndef CLEARTYPE_QUALITY
-#define CLEARTYPE_QUALITY 5
-#endif
-
 #define Section "Tera Term"
 #define SectionW L"Tera Term"
 

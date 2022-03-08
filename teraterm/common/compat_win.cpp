@@ -62,7 +62,7 @@ void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
 HWND (WINAPI *pGetConsoleWindow)(void);
 DWORD (WINAPI *pExpandEnvironmentStringsW)(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize);
 static ULONGLONG (WINAPI *pVerSetConditionMask)(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask);
-static BOOL (WINAPI *pVerifyVersionInfoA)(LPOSVERSIONINFOEX lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
+static BOOL (WINAPI *pVerifyVersionInfoA)(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
 BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 
@@ -126,7 +126,7 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 	char pszOldWindowTitle[MY_BUFSIZE];  // Contains original WindowTitle.
 
 	// Fetch current window title.
-	DWORD size = GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
+	DWORD size = GetConsoleTitleA(pszOldWindowTitle, MY_BUFSIZE);
 	if (size == 0) {
 		DWORD err = GetLastError();
 		if (err == ERROR_INVALID_HANDLE) {
@@ -136,19 +136,19 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 	}
 
 	// Format a "unique" NewWindowTitle.
-	wsprintf(pszNewWindowTitle, "%d/%d", GetTickCount(), GetCurrentProcessId());
+	wsprintfA(pszNewWindowTitle, "%d/%d", GetTickCount(), GetCurrentProcessId());
 
 	// Change current window title.
-	SetConsoleTitle(pszNewWindowTitle);
+	SetConsoleTitleA(pszNewWindowTitle);
 
 	// Ensure window title has been updated.
 	Sleep(40);
 
 	// Look for NewWindowTitle.
-	hwndFound = FindWindow(NULL, pszNewWindowTitle);
+	hwndFound = FindWindowA(NULL, pszNewWindowTitle);
 
 	// Restore original window title.
-	SetConsoleTitle(pszOldWindowTitle);
+	SetConsoleTitleA(pszOldWindowTitle);
 
 	return hwndFound;
 }
@@ -384,7 +384,7 @@ DWORDLONG dwlConditionMask
    +------------------------------------------- condition of wProductType
 */
 static BOOL _myVerifyVersionInfo(
-	LPOSVERSIONINFOEX lpVersionInformation,
+	LPOSVERSIONINFOEXA lpVersionInformation,
 	DWORD dwTypeMask,
 	DWORDLONG dwlConditionMask)
 {

@@ -28,9 +28,6 @@
 
 #include <windows.h>
 
-#if !defined(NTDDI_VERSION) || (NTDDI_VERSION < NTDDI_VISTA)
-// FOLDERID_* がSDK内に定義されていない
 // このファイル(*.obj)に実体を置く
 #define INITGUID
 #include "ttknownfolders.h"
-#endif
