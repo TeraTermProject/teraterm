@@ -55,7 +55,9 @@ ICO = cygterm.ico
 CFG = cygterm.cfg
 ARCHIVE = cygterm+.tar.gz
 
-.PHONY: all clean install uninstall cygterm_x86_64 cygterm_i686
+.PHONY: all clean install uninstall archive
+.PHONY: cygterm+-x86_64 cygterm+-i686
+.PHONY: cygterm+-x86_64-clean cygterm+-i686-clean
 
 all : $(EXE)
 
@@ -78,6 +80,7 @@ clean :
 	rm -f $(EXE) $(SRC_RC) $(RES) $(ARCHIVE)
 	rm -f $(DEP)
 	rm -f $(OBJ) *.o *.obj
+	rm -f $(ARCHIVE)
 ifneq (,$(BINARY_DIR))
 	rm -rf $(BINARY_DIR)
 endif
@@ -106,8 +109,14 @@ cygterm.o:
 cygterm+-x86_64:
 	make CC=x86_64-pc-cygwin-gcc CXX=x86_64-pc-cygwin-g++ RC=x86_64-pc-cygwin-windres EXE_BASE=cygterm.exe BINARY_DIR=cygterm+-x86_64 all
 
+cygterm+-x86_64-clean:
+	make BINARY_DIR=cygterm+-x86_64 clean
+
 cygterm+-i686:
 	make CC=i686-pc-cygwin-gcc CXX=i686-pc-cygwin-g++ RC=i686-pc-cygwin-windres EXE_BASE=cygterm.exe BINARY_DIR=cygterm+-i686 all
+
+cygterm+-i686-clean:
+	make BINARY_DIR=cygterm+-i686 clean
 
 $(BINARY_DIR)/%.o: %.cpp
 	@mkdir -p $(BINARY_DIR)

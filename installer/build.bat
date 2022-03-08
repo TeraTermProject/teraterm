@@ -216,8 +216,14 @@ if ERRORLEVEL 1 goto fail
 
 rem cygterm をコンパイル
 pushd ..\cygwin\cygterm
-if "%BUILD%" == "rebuild" make clean
-make
+if "%BUILD%" == "rebuild" (
+    make clean
+    make cygterm+-x86_64-clean
+    make cygterm+-i686-clean
+)
+make cygterm+-x86_64 -j
+make cygterm+-i686 -j
+make archive
 popd
 
 rem lng ファイルを作成
