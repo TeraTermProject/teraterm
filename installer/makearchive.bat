@@ -15,6 +15,9 @@ if "%1"=="release" SET release=yes
 CALL makechm.bat
 CALL build.bat %rebuild%
 if ERRORLEVEL 1 goto fail
+set release_bak=%release%
+CALL ..\buildtools\svnrev\sourcetree_info.bat
+set release=%release_bak%
 
 rem  change folder name
 if not "%release%"=="yes" goto snapshot
@@ -24,18 +27,7 @@ set dst=Output\teraterm-%ver%
 goto create
 
 :snapshot
-rem  for XP or later
-for /f "delims=" %%a in ('perl -e "($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time); $mon++; printf (1900+$year . substr(\"0\".$mon,-2) . substr(\"0\".$mday,-2));"') do @set today=snapshot-%%a
-
-@for /l %%i in (1,1,10) do @(
-if %%i==1 (
-set dst=%today%
-if not exist %today% goto create
-) else (
-set dst=%today%_%%i
-if not exist %today%_%%i goto create
-)
-)
+set dst=snapshot-%DATE%_%TIME%
 
 :create
 del /s /q %dst%\*.*

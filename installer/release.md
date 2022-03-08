@@ -1,0 +1,25 @@
+﻿# release.bat について
+
+- Tera Term をビルドするためのスクリプト(Windows用batファイル)
+  - ミスなくリリース用バイナリを作成することを目的としている
+  - 仕様ライブラリをダウンロード、展開、ビルドできる
+- 次の機能がある
+  - ビルド環境の準備
+    - 環境変数 PATH の設定
+  - 使用するライブラリをダウンロード、展開、ビルド
+  - Tera Term をビルド、アーカイブ、インストーラー作成
+  - 使用ツールのパスやバージョンなどを表示
+  - ビルドできる状態にセットアップして cmd.exe を起動する
+- ビルドに使用するツールの指定について
+  - 各ツールのデフォルトのインストールフォルダを探す
+  - 個別に使用したいツールを明示する場合は toolinfo.bat で指定する
+    - 参考 toolinfo_sample.bat
+  - 使用ツールは次のドキュメントを参照
+    - [doc/ja/html/reference/develop.html](../doc/ja/html/reference/develop.html)
+- Tera Termをビルドしたときの最終的な生成ファイル
+  - 通常ビルド時
+    - installer/Output/teraterm-YYMMDD_HHMMSS.exe
+    - installer/TERATERM_r9999_YYMMDD_HHMMSS.zip
+  - Release時(svnのURLが tags/teraterm-N-N となっていた時)
+    - installer/Output/teraterm-YYMMDD_HHMMSS.exe
+    - installer/Output/TERATERM_r9999_YYMMDD_HHMMSS.zip
