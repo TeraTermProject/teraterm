@@ -21,42 +21,66 @@ override RC= windres
 endif
 endif
 
-CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions -DUNICODE -D_UNICODE
+CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions -DUNICODE -D_UNICODE -MMD
 #CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -mwindows
 
-EXE = cygterm.exe
+EXE_BASE = cygterm.exe
 SRC = \
-	cygterm.cc \
-	cygterm_cfg.cc \
+	cygterm.cpp \
+	cygterm_cfg.cpp \
+	sub.cpp
+H = \
 	cygterm_cfg.h \
-	sub.cpp \
 	sub.h
-CFG = cygterm.cfg
+
+#BINARY_DIR = cygterm_x86_64
+
+ifeq (,$(BINARY_DIR))
+# output to current dir
+EXE = $(EXE_BASE)
+OBJ = $(SRC:.cpp=.o)
 RES = cygterm.res
+else
+# output to $(BINARY_DIR)
+EXE = $(BINARY_DIR)/$(EXE_BASE)
+OBJ = $(addprefix $(BINARY_DIR)/,$(SRC:.cpp=.o))
+RES = $(BINARY_DIR)/cygterm.res
+endif
+SRC_RC = cygterm.rc
+DEP = $(OBJ:.o=.d)
+
 ICO = cygterm.ico
-SRC_RC  = cygterm.rc
+CFG = cygterm.cfg
 ARCHIVE = cygterm+.tar.gz
 
 .PHONY: all clean install uninstall cygterm_x86_64 cygterm_i686
 
 all : $(EXE)
 
+-include $(DEP)
+
 archive : $(ARCHIVE)
 
-$(EXE) : cygterm.o cygterm_cfg.o sub.o $(RES)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(EXE) $^ -lole32
-	strip $(EXE)
+$(EXE) : $(OBJ) $(RES)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lole32
+	strip $@
 
 $(RES): $(SRC_RC) $(ICO)
-	$(RC) -O coff -o $(RES) $(SRC_RC)
+	@mkdir -p $(dir $@)
+	$(RC) -O coff -o $@ $(SRC_RC)
 
 $(SRC_RC):
 	echo 'icon ICON $(ICO)' > $(SRC_RC)
 
 clean :
-	rm -f $(EXE) $(SRC_RC) $(RES) $(ARCHIVE) *.o *.obj
+	rm -f $(EXE) $(SRC_RC) $(RES) $(ARCHIVE)
+	rm -f $(DEP)
+	rm -f $(OBJ) *.o *.obj
+ifneq (,$(BINARY_DIR))
+	rm -rf $(BINARY_DIR)
+endif
 
 install : $(EXE)
 	@ install -v $(EXE) $(BINDIR)/$(EXE)
@@ -68,25 +92,23 @@ uninstall :
 	rm -f $(BINDIR)/$(EXE)
 	rm -f $(BINDIR)/$(CFG)
 
-$(ARCHIVE) : $(SRC) $(ICO) $(CFG) README README-j Makefile CMakeLists.txt
-	tar cf - $(SRC) $(ICO) $(CFG) COPYING README README-j Makefile CMakeLists.txt msys2term.cfg | gzip > $(ARCHIVE)
+$(ARCHIVE) : $(SRC) $(H) $(ICO) $(CFG) README README-j Makefile CMakeLists.txt
+	tar cf - $(SRC) $(H) $(ICO) $(CFG) COPYING README README-j Makefile CMakeLists.txt msys2term.cfg | gzip > $(ARCHIVE)
 
 cygterm.o:
   ifeq (0, $(shell nm /usr/lib/crt0.o | grep -c WinMainCRTStartup))
-	$(CXX) $(CXXFLAGS) -DNO_WIN_MAIN cygterm.cc -c -o $@
+	$(CXX) $(CXXFLAGS) -DNO_WIN_MAIN cygterm.cpp -c -o $@
   else
-	$(CXX) $(CXXFLAGS) cygterm.cc -c -o $@
+	$(CXX) $(CXXFLAGS) cygterm.cpp -c -o $@
   endif
 
-# cc -M *.cc *.cpp
-cygterm.o: cygterm.cc sub.h cygterm_cfg.h
-cygterm_cfg.o: cygterm_cfg.cc cygterm_cfg.h
-sub.o: sub.cpp sub.h
-
 # call sub make
-cygterm_x86_64:
-	make CC=x86_64-pc-cygwin-gcc CXX=x86_64-pc-cygwin-g++ RC=x86_64-pc-cygwin-windres EXE=cygterm_x86_64.exe
+cygterm+-x86_64:
+	make CC=x86_64-pc-cygwin-gcc CXX=x86_64-pc-cygwin-g++ RC=x86_64-pc-cygwin-windres EXE_BASE=cygterm.exe BINARY_DIR=cygterm+-x86_64 all
 
-cygterm_i686:
-	make CC=i686-pc-cygwin-gcc CXX=i686-pc-cygwin-g++ RC=i686-pc-cygwin-windres clean all EXE=cygterm_i686.exe
+cygterm+-i686:
+	make CC=i686-pc-cygwin-gcc CXX=i686-pc-cygwin-g++ RC=i686-pc-cygwin-windres EXE_BASE=cygterm.exe BINARY_DIR=cygterm+-i686 all
 
+$(BINARY_DIR)/%.o: %.cpp
+	@mkdir -p $(BINARY_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@

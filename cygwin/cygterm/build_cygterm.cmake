@@ -1,6 +1,8 @@
 ﻿# cygterm, msys2termのビルド
 # - 生成可能な cygterm, msys2term をビルド
 # - CMAKE_INSTALL_PREFIX にコピーする
+# 例
+#  mkdir build_all && cd build_all && cmake -P ../build_cygterm.cmake
 
 message("CMAKE_COMMAND=${CMAKE_COMMAND}")
 message("CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME}")

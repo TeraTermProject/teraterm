@@ -24,8 +24,8 @@ file(WRITE "${CMAKE_CURRENT_LIST_DIR}/cygterm.rc" "icon ICON cygterm.ico")
 
 add_executable(
   ${PACKAGE_NAME}
-  cygterm.cc
-  cygterm_cfg.cc
+  cygterm.cpp
+  cygterm_cfg.cpp
   cygterm_cfg.h
   sub.cpp
   sub.h
@@ -89,8 +89,8 @@ install(
 set(ARCHIVE "cygterm+.tar.gz")
 
 set(SRC
-  cygterm.cc
-  cygterm_cfg.cc
+  cygterm.cpp
+  cygterm_cfg.cpp
   cygterm_cfg.h
   sub.cpp
   sub.h
