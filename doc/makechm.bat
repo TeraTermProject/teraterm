@@ -20,13 +20,13 @@ if ERRORLEVEL 1 goto English
 
 for /f "delims=" %%i in ('perl htmlhelp_update_check.pl ja teratermj.chm') do @set updated=%%i
 if "%updated%"=="updated" (
-perl htmlhelp_index_make.pl ja html > ja\Index.hhk
+perl htmlhelp_index_make.pl ja html -o ja\Index.hhk
 %HELP_COMPILER% ja\teraterm.hhp
 )
 
 :English
 for /f "delims=" %%i in ('perl htmlhelp_update_check.pl en teraterm.chm') do @set updated=%%i
 if "%updated%"=="updated" (
-perl htmlhelp_index_make.pl en html > en\Index.hhk
+perl htmlhelp_index_make.pl en html -o en\Index.hhk
 %HELP_COMPILER% en\teraterm.hhp
 )

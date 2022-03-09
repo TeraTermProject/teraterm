@@ -3,8 +3,8 @@
 #
 # HTMLヘルプのインデックスファイルを生成する
 #
-# Usage(ActivePerl):
-#  perl htmlhelp_index_make.pl ja html > ja\Index.hhk
+# Usage:
+#  perl htmlhelp_index_make.pl ja html -o ja\Index.hhk
 #
 
 require 5.8.0;
@@ -16,17 +16,15 @@ use Getopt::Long
 
 binmode STDOUT, ":utf8";
 
-my $out = "-";
+my $out = "index.hhk";
+my $verbose = 0;
 my $result = GetOptions(
-	'out|o=s' => \$out);
+	'out|o=s' => \$out,
+	'verbose' => \$verbose
+	);
 
 my $OUT;
-if ($out eq "-") {
-	binmode STDOUT, ":crlf:encoding(shiftjis)";
-	$OUT = *STDOUT;
-} else {
-	open ($OUT, '>:crlf:encoding(shiftjis)', $out);
-}
+open ($OUT, '>:crlf:encoding(shiftjis)', $out);
 
 my @dirstack = ();
 
@@ -62,7 +60,6 @@ EOD
 
 sub get_file_paths {
 	my ($top_dir)= @_;
-	my @paths=();
 	my @temp = ();
 
 	#-- カレントの一覧を取得 --#
@@ -71,12 +68,13 @@ sub get_file_paths {
 	closedir(DIR);
 	foreach my $path (sort @temp) {
 		next if( $path =~ /^\.{1,2}$/ );                # '.' と '..' はスキップ
-		next if( $path =~ /^\.svn$/ );                # '.svn' はスキップ
+		next if( $path =~ /^\.svn$/ );                  # '.svn' はスキップ
 
 		my $full_path = "$top_dir" . '/' . "$path";
 
-#		print "$full_path\r\n";                     # 表示だけなら全てを表示してくれる-------
-		push(@paths, $full_path);                       # データとして取り込んでも前の取り込みが初期化される
+		if ($verbose != 0) {
+			print "$full_path\r\n";
+		}
 		if( -d "$top_dir/$path" ){                      #-- ディレクトリの場合は自分自身を呼び出す
 			&get_file_paths("$full_path");
 
@@ -85,7 +83,6 @@ sub get_file_paths {
 
 		}
 	}
-	return \@paths;
 }
 
 sub check_html_file {
