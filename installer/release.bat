@@ -3,6 +3,16 @@ setlocal
 set CUR=%~dp0
 cd /d %CUR%
 
+set VS_VERSION=2019
+set ONIG_VERSION=6.9.7.1
+set ONIG_FOLDER_NAME=6.9.7 rem for 6.9.7.1
+set ZLIB_VERSION=1.2.11
+set PUTTY_VERSION=0.76
+set SFMT_VERSION=1.5.1
+set CJSON_VERSION=1.7.14
+set ARGON2_VERSION=20190702
+set LIBRESSL_VERSION=3.4.2
+
 call :setup_tools_env
 
 echo =======
@@ -57,47 +67,47 @@ setlocal
 cd /d %CUR%..\libs
 
 :oniguruma
-%CURL% -L https://github.com/kkos/oniguruma/releases/download/v6.9.7.1/onig-6.9.7.1.tar.gz -o oniguruma.tar.gz
+%CURL% -L https://github.com/kkos/oniguruma/releases/download/v%ONIG_VERSION%/onig-%ONIG_VERSION%.tar.gz -o oniguruma.tar.gz
 %CMAKE% -E tar xf oniguruma.tar.gz
 %CMAKE% -E rm -rf oniguruma
-%CMAKE% -E rename onig-6.9.7 oniguruma
+%CMAKE% -E rename onig-%ONIG_FOLDER_NAME% oniguruma
 
 :zlib
-%CURL% -L https://zlib.net/zlib-1.2.11.tar.xz -o zlib.tar.xz
+%CURL% -L https://zlib.net/zlib-%ZLIB_VERSION%.tar.xz -o zlib.tar.xz
 %CMAKE% -E tar xf zlib.tar.xz
 %CMAKE% -E rm -rf zlib
-%CMAKE% -E rename zlib-1.2.11 zlib
+%CMAKE% -E rename zlib-%ZLIB_VERSION% zlib
 
 :putty
-%CURL% -L https://the.earth.li/~sgtatham/putty/0.76/putty-0.76.tar.gz -o putty.tar.gz
+%CURL% -L https://the.earth.li/~sgtatham/putty/%PUTTY_VERSION%/putty-%PUTTY_VERSION%.tar.gz -o putty.tar.gz
 %CMAKE% -E tar xf putty.tar.gz
 %CMAKE% -E rm -rf putty
-%CMAKE% -E rename putty-0.76 putty
+%CMAKE% -E rename putty-%PUTTY_VERSION% putty
 
 :SFMT
-%CURL% -L http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip -o sfmt.zip
+%CURL% -L http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-%SFMT_VERSION%.zip -o sfmt.zip
 %CMAKE% -E tar xf sfmt.zip
 %CMAKE% -E rm -rf SFMT
-%CMAKE% -E rename SFMT-src-1.5.1 SFMT
-echo #define SFMT_VERSION "1.5.1" > SFMT\SFMT_version_for_teraterm.h
+%CMAKE% -E rename SFMT-src-%SFMT_VERSION% SFMT
+echo #define SFMT_VERSION "%SFMT_VERSION%" > SFMT\SFMT_version_for_teraterm.h
 
 :cJSON
-%CURL% -L https://github.com/DaveGamble/cJSON/archive/v1.7.14.zip -o cJSON.zip
+%CURL% -L https://github.com/DaveGamble/cJSON/archive/v%CJSON_VERSION%.zip -o cJSON.zip
 %CMAKE% -E tar xf cJSON.zip
 %CMAKE% -E rm -rf cJSON
-%CMAKE% -E rename cJSON-1.7.14 cJSON
+%CMAKE% -E rename cJSON-%CJSON_VERSION% cJSON
 
 :argon2
-%CURL% -L https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/20190702.tar.gz -o argon2.tar.gz
+%CURL% -L https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/%ARGON2_VERSION%.tar.gz -o argon2.tar.gz
 %CMAKE% -E tar xf argon2.tar.gz
 %CMAKE% -E rm -rf argon2
-%CMAKE% -E rename phc-winner-argon2-20190702 argon2
+%CMAKE% -E rename phc-winner-argon2-%ARGON2_VERSION% argon2
 
 :libressl
-%CURL% -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.4.2.tar.gz -o libressl.tar.gz
+%CURL% -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-%LIBRESSL_VERSION%.tar.gz -o libressl.tar.gz
 %CMAKE% -E tar xf libressl.tar.gz
 %CMAKE% -E rm -rf libressl
-%CMAKE% -E rename libressl-3.4.2 libressl
+%CMAKE% -E rename libressl-%LIBRESSL_VERSION% libressl
 
 endlocal
 exit /b 0
@@ -141,7 +151,7 @@ rem ####################
 
 set CURL=%SystemRoot%\System32\curl.exe
 set CYGWIN_PATH=C:\cygwin64\bin
-set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\2019
+set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\%VS_VERSION%
 
 if exist toolinfo.bat (
     echo found toolinfo.bat
