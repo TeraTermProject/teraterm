@@ -506,15 +506,21 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'on', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '2', iniFile);
     end;
   $11: // Japanese
     begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'Japanese', iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-19,128', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'ÇlÇr ÉSÉVÉbÉN,0,-16,128', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,128', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'on', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '2', iniFile);
     end;
   $12: // Korean
     begin
@@ -524,6 +530,9 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'on', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '2', iniFile);
     end;
   $19: // Russian
     begin
@@ -533,6 +542,9 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '1', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'off', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '1', iniFile);
     end;
   else // Other
     begin
@@ -553,6 +565,9 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '1', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'off', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '1', iniFile);
     end;
   end;
 
