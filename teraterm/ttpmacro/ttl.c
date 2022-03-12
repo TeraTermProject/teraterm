@@ -1468,7 +1468,9 @@ WORD TTLFileCreate()
 		SetResult(-1);
 		return Err;
 	}
-	FH = _lcreat(FName,0);
+	FH = CreateFileA(FName,
+					 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+					 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
 	}
