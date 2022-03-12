@@ -219,13 +219,16 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
 	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 
-	// TERATERM.INI が存在しないとき
-	// 設定ファイルを個人フォルダへコピーする
-	if (GetFileAttributesW(ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
+	// ポータブルモードではなく、
+	// 個人設定ファイルのあるフォルダ HomeDirW に TERATERM.INI が存在しないとき
+	if (!IsPortableMode() &&
+		(GetFileAttributesW(ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES)) {
+		// 設定ファイルを個人フォルダへコピーする
 		static const wchar_t *filelist[] = {
 			L"TERATERM.INI",
 			L"KEYBOARD.CNF",
 			L"cygterm.cfg",
+			L"ssh_known_hosts",
 #if 0
 			L"theme\\",
 			L"theme\\Advanced.sample",
