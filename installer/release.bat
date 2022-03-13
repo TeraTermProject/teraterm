@@ -127,6 +127,8 @@ rem ####################
 
 setlocal
 cd /d %CUR%
+set TT_VERSION=
+for /f "delims=" %%i in ('perl issversion.pl') do @set TT_VERSION=%%i
 
 if "%1" == "freeze_state" (
     call build.bat rebuild
@@ -137,7 +139,7 @@ if "%1" == "freeze_state" (
 call ..\buildtools\svnrev\sourcetree_info.bat
 if "%1" == "freeze_state" (
     pushd Output
-    %CMAKE% -E tar cf TERATERM_r%SVNVERSION%_%DATE%_%TIME%.zip --format=zip teraterm-5.0/
+    %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
     popd
 ) else (
     %CMAKE% -E tar cf TERATERM_r%SVNVERSION%_%DATE%_%TIME%.zip --format=zip snapshot-%DATE%_%TIME%
