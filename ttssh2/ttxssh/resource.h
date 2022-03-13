@@ -19,6 +19,7 @@
 #define IDD_SSHUPDATE_HOSTKEY           111
 #define IDI_SECURETT_GREEN              113
 #define IDI_DROPDOWN                    114
+#define IDI_SECURETT_FLAT               115
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDD_SSHDIFFERENTKEY             601

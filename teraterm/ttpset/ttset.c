@@ -269,6 +269,12 @@ static int IconName2IconId(const wchar_t *name)
 	else if (_wcsicmp(name, L"vt_3d") == 0) {
 		id = IDI_VT_3D;
 	}
+	else if (_wcsicmp(name, L"tterm_flat") == 0) {
+		id = IDI_TTERM_FLAT;
+	}
+	else if (_wcsicmp(name, L"vt_flat") == 0) {
+		id = IDI_VT_FLAT;
+	}
 	else if (_wcsicmp(name, L"cygterm") == 0) {
 		id = IDI_CYGTERM;
 	}
@@ -310,6 +316,12 @@ void IconId2IconName(char *name, int len, int id) {
 			break;
 		case IDI_VT_3D:
 			icon = "vt_3d";
+			break;
+		case IDI_TTERM_FLAT:
+			icon = "tterm_flat";
+			break;
+		case IDI_VT_FLAT:
+			icon = "vt_flat";
 			break;
 		case IDI_CYGTERM:
 			icon = "cygterm";

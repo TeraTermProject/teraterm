@@ -30,6 +30,8 @@
 #define IDD_SENDFILEDLG                 127
 #define IDD_TABSHEET_CODING             128
 #define IDD_TABSHEET_FONT               129
+#define IDI_TTERM_FLAT                  130
+#define IDI_VT_FLAT                     131
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_FULLPATH               1001
 #define IDC_FULLPATH_LABEL              1002
@@ -357,7 +359,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        129
+#define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
 #define _APS_NEXT_CONTROL_VALUE         2607
 #define _APS_NEXT_SYMED_VALUE           101
