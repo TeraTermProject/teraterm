@@ -1,6 +1,10 @@
-#!/usr/bin/perl
+﻿#!/usr/bin/perl
 
-open ISS, 'teraterm.iss';
+use strict;
+use warnings;
+use utf8;
+
+open(ISS, '<:crlf:encoding(cp932)', 'teraterm.iss');
 while(<ISS>){
 	if (/^#define AppVer "(.+)"$/) {
 		print $1;
