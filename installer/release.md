@@ -2,7 +2,7 @@
 
 - Tera Term をビルドするためのスクリプト(Windows用batファイル)
   - ミスなくリリース用バイナリを作成することを目的としている
-  - 仕様ライブラリをダウンロード、展開、ビルドできる
+  - 使用ライブラリをダウンロード、展開、ビルドできる
 - 次の機能がある
   - ビルド環境の準備
     - 環境変数 PATH の設定
@@ -20,6 +20,6 @@
   - 通常ビルド時
     - installer/Output/teraterm-YYMMDD_HHMMSS.exe
     - installer/TERATERM_r9999_YYMMDD_HHMMSS.zip
-  - Release時(svnのURLが tags/teraterm-N-N となっていた時)
+  - Release時
     - installer/Output/teraterm-YYMMDD_HHMMSS.exe
-    - installer/Output/TERATERM_r9999_YYMMDD_HHMMSS.zip
+    - installer/Output/teraterm_x.y.zip
