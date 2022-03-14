@@ -17,10 +17,11 @@ set LIBRESSL_VERSION=3.4.2
 call :setup_tools_env
 
 echo =======
-echo 1. download libs, rebuild libs and Tera Term, installer, archive
-echo 2. build libs
-echo 3. build libs and rebuild Tera Term, installer, archive (for Release build)
-echo 4. build libs and Tera Term (for Normal build, snapshot)
+echo 1. force download and rebuild libs / rebuild Tera Term, installer, archive
+echo 2. download and build libs / rebuild Tera Term, installer, archive
+echo 3. download and build libs
+echo 4. build libs and rebuild Tera Term, installer, archive (for Release build)
+echo 5. build libs and Tera Term (for Normal build, snapshot)
 echo 7. exec cmd.exe
 echo 8. check tools
 echo 9. exit
@@ -33,19 +34,26 @@ if "%1" == "" (
 echo %no%
 
 if "%no%" == "1" (
-    call :update_libs
+    call :download_libs force
     call :build_teraterm freeze_state
 )
 
 if "%no%" == "2" (
+    call :download_libs
     call :build_libs
-)
-
-if "%no%" == "3" (
     call :build_teraterm freeze_state
 )
 
+if "%no%" == "3" (
+    call :download_libs
+    call :build_libs
+)
+
 if "%no%" == "4" (
+    call :build_teraterm freeze_state
+)
+
+if "%no%" == "5" (
     call :build_teraterm
 )
 
@@ -62,10 +70,22 @@ exit 0
 
 
 rem ####################
-:update_libs
+:download_libs
 
 setlocal
 cd /d %CUR%..\libs
+
+if "%1" == "force" goto download_libs_download
+
+cmake -P checklibs.cmake
+call checklibs_result.bat
+del checklibs_result.bat
+if "%RESULT%" == "1" (
+    echo already all library downloaded
+    goto download_libs_finish
+)
+
+:download_libs_download
 
 :oniguruma
 %CURL% -L https://github.com/kkos/oniguruma/releases/download/v%ONIG_VERSION%/onig-%ONIG_VERSION%.tar.gz -o oniguruma.tar.gz
@@ -110,6 +130,7 @@ echo #define SFMT_VERSION "%SFMT_VERSION%" > SFMT\SFMT_version_for_teraterm.h
 %CMAKE% -E rm -rf libressl
 %CMAKE% -E rename libressl-%LIBRESSL_VERSION% libressl
 
+:download_libs_finish
 endlocal
 exit /b 0
 
