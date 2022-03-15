@@ -694,7 +694,7 @@ static int exec_agent_proxy(sh_env_t *sh_env)
 	}
 	snprintf(sockname, sizeof(sockname), "%s/agent.%ld", sockdir, (long)getpid());
 
-	if (sh_env->add(sh_env, "SSH_AUTH_SOCK", sockname)) {
+	if (!sh_env->add(sh_env, "SSH_AUTH_SOCK", sockname)) {
 		return -1;
 	}
 
