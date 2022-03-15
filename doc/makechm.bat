@@ -15,8 +15,10 @@ set updated=
 CALL convtext.bat
 
 REM Check Japanese version Windows
-chcp | find "932" > NUL
-if ERRORLEVEL 1 goto English
+if not "%APPVEYOR%" == "True" (
+    chcp | find "932" > NUL
+    if ERRORLEVEL 1 goto English
+)
 
 for /f "delims=" %%i in ('perl htmlhelp_update_check.pl ja teratermj.chm') do @set updated=%%i
 if "%updated%"=="updated" (

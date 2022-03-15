@@ -1,0 +1,24 @@
+image: Visual Studio 2019
+
+environment:
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
+build: off
+
+init:
+  - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
+
+cache:
+  - libs
+
+build_script:
+  - ci_scripts/build_appveyor_release_bat.bat
+
+artifacts:
+  - path: installer/Output/*.exe
+  - path: installer/Output/*.zip
+
+on_success:
+  - ci_scripts\notify.bat success
+on_failure:
+  - ci_scripts\notify.bat failure
