@@ -1721,6 +1721,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 				memcpy(newfiledata + newFilePos, 
 					pvar->hosts_state.file_data + data_index,
 					length);
+				newFilePos += length;
 
 			}
 			data_index = pvar->hosts_state.file_data_index;
