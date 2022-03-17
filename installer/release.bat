@@ -14,7 +14,7 @@ set CJSON_VERSION=1.7.14
 set ARGON2_VERSION=20190702
 set LIBRESSL_VERSION=3.4.2
 
-if "%APPVEYOR%" == "" set NOPAUSE=1
+if "%APPVEYOR%" == "True" set NOPAUSE=1
 
 call :setup_tools_env
 
@@ -67,7 +67,7 @@ if "%no%" == "8" (
     call :check_tools
 )
 
-if "%NOPAUSE" == "" pause
+if not "%NOPAUSE%" == "1" pause
 exit 0
 
 
@@ -223,7 +223,7 @@ if exist %PERL% exit /b 0
 set PERL=C:\cygwin\usr\bin\perl.exe
 if exist %PERL% exit /b 0
 echo perl not found
-if "%NOPAUSE" == "" pause
+if not "%NOPAUSE%" == "1" pause
 exit
 
 rem ####################
@@ -243,7 +243,7 @@ set SVN_PATH=C:\Program Files\TortoiseSVN\bin
 set SVN="%SVN_PATH%\svn.exe"
 if exist %SVN% exit /b 0
 echo svn not found
-if "%NOPAUSE" == "" pause
+if not "%NOPAUSE%" == "1" pause
 exit
 
 rem ####################
@@ -262,7 +262,7 @@ set CMAKE_PATH=%VCINSTALLDIR%\..\Common7\IDE\CommonExtensions\Microsoft\CMake\CM
 set CMAKE="%CMAKE_PATH%\cmake.exe"
 if exist %CMAKE% exit /b 0
 echo cmake not found
-if "%NOPAUSE" == "" pause
+if not "%NOPAUSE%" == "1" pause
 exit
 
 rem ####################
@@ -281,7 +281,7 @@ set INNO_SETUP="C:\Program Files (x86)\Inno Setup 6\iscc.exe"
 if exist %INNO_SETUP% exit /b 0
 :search_iscc_not_found
 echo iscc(inno setup) not found
-if "%NOPAUSE" == "" pause
+if not "%NOPAUSE%" == "1" pause
 exit
 
 rem ####################
@@ -302,7 +302,7 @@ if exist "%VS_BASE%\Enterprise" (
 :vs_not_found
 echo Visual Studio not found
 echo VS_BASE=%VS_BASE%
-if "%NOPAUSE" == "" pause
+if not "%NOPAUSE%" == "1" pause
 exit
 
 rem ####################

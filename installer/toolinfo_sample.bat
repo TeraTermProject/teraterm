@@ -12,3 +12,6 @@ rem set CMAKE_PATH=C:\Program Files\CMake\bin
 rem set CURL=C:\Windows\System32\curl.exe
 rem set CYGWIN_PATH=C:\cygwin64\bin
 rem set INNO_SETUP="C:\Program Files (x86)\Inno Setup 6\iscc.exe"
+
+rem release.bat ‚Ö‚ÌŽwŽ¦
+rem set NOPAUSE=0
