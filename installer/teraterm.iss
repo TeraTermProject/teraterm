@@ -891,6 +891,8 @@ begin
 end;
 
 [InstallDelete]
+; インストーラに含めたことがあり、のちに含めなくなったファイルを指定する。
+; 上書きインストールしたあとアンインストールしたときに削除されないため。
 Name: {app}\OpenSSH-LICENCE.txt; Type: files
 Name: {app}\cygterm-README.txt; Type: files
 Name: {app}\cygterm-README-j.txt; Type: files
@@ -920,4 +922,6 @@ Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
 Name: {app}\ttpdlg.dll; Type: files
 
 [UninstallDelete]
+; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を
+; スクリプトでコピーしたもので、自動でアンインストールされないため。
 Name: {app}\cygterm.exe; Type: files
