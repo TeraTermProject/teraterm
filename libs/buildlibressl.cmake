@@ -5,10 +5,10 @@
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "libressl-3.4.2")
-set(SRC_ARC "libressl-3.4.2.tar.gz")
-set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.4.2.tar.gz")
-set(SRC_ARC_HASH_SHA256 cb82ca7d547336917352fbd23db2fc483c6c44d35157b32780214ec74197b3ce)
+set(SRC_DIR_BASE "libressl-3.4.3")
+set(SRC_ARC "libressl-3.4.3.tar.gz")
+set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.4.3.tar.gz")
+set(SRC_ARC_HASH_SHA256 ff88bffe354818b3ccf545e3cafe454c5031c7a77217074f533271d63c37f08d)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/libressl")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/libressl/src")
