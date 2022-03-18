@@ -72,7 +72,7 @@ Source: ..\teraterm\release\ttermpro.exe; DestDir: {app}; Components: TeraTerm; 
 Source: ..\teraterm\release\ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm
 Source: release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
 ;Source: release\TSPECIAL1.TTF; DestDir: {app}; Components: TeraTerm
 Source: ..\doc\en\teraterm.chm; DestDir: {app}; Components: TeraTerm
@@ -80,7 +80,7 @@ Source: ..\doc\ja\teratermj.chm; DestDir: {app}; Components: TeraTerm
 Source: release\license.txt; DestDir: {app}; Components: TeraTerm
 Source: release\FUNCTION.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify; DestName: KEYBOARD.CNF
+Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
 Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\NT98KEYB.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\PC98KEYB.CNF; DestDir: {app}; Components: TeraTerm
@@ -111,9 +111,9 @@ Source: release\lang_utf16le\Korean.lng; DestDir: {app}\lang_utf16le; Components
 Source: release\lang_utf16le\Simplified Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
-Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
 Source: ..\cygwin\cygterm\cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
-Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
 Source: ..\cygwin\Release\cyglaunch.exe; DestDir: {app}; Components: cygterm
@@ -825,7 +825,7 @@ end; // CurStepChanged
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  ini     : array[0..6] of String;
+  ini     : array[0..1] of String;
   buf     : String;
   conf    : String;
   confmsg : String;
@@ -836,13 +836,8 @@ begin
   case CurUninstallStep of
     usPostUninstall:
       begin
-        ini[0] := '\TERATERM.INI';
-        ini[1] := '\KEYBOARD.CNF';
-        ini[2] := '\lang\Default.lng';
-        ini[3] := '\lang_utf16le\Default.lng';
-        ini[4] := '\ssh_known_hosts';
-        ini[5] := '\cygterm.cfg';
-        ini[6] := '\broadcast.log';
+        ini[0] := '\lang\Default.lng';
+        ini[1] := '\lang_utf16le\Default.lng';
 
         conf := CustomMessage('msg_del_confirm');
         app  := ExpandConstant('{app}');
@@ -857,7 +852,7 @@ begin
         if not silent then begin
 
           // delete config files
-          for i := 0 to 6 do
+          for i := 0 to 1 do
           begin
             buf := app + ini[i];
             if FileExists(buf) then begin
