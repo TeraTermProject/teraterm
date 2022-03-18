@@ -1,4 +1,4 @@
-#define AppName "Tera Term"
+ï»¿#define AppName "Tera Term"
 #define AppVer "5.0"
 #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
@@ -232,7 +232,7 @@ Root: HKCR; Subkey: TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {ap
 Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 [Tasks]
-; Tera Term 4 ‚Ì‚ğã‘‚«‚µ‚È‚¢‚æ‚¤AƒeƒXƒg”Å‚ÌŠÔ‚ÍƒfƒtƒHƒ‹ƒg‚ğ off ‚É‚·‚é
+; Tera Term 4 ã®ã‚’ä¸Šæ›¸ãã—ãªã„ã‚ˆã†ã€ãƒ†ã‚¹ãƒˆç‰ˆã®é–“ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚’ off ã«ã™ã‚‹
 ; Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
 ; Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
 ; Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
@@ -260,27 +260,27 @@ en.task_macroassoc=Associate .&ttl file to ttpmacro.exe
 en.task_telnetassoc=Associate t&elnet protocol to ttermpro.exe
 en.task_sshassoc=Associate &ssh protocol to ttermpro.exe
 en.task_ttyplayassoc=Associate .tty file to tterm&pro.exe
-ja.task_desktopicon=ƒfƒXƒNƒgƒbƒv‚É Tera Term ‚ÌƒVƒ‡[ƒgƒJƒbƒg‚ğì‚é(&D)
-ja.task_quicklaunchicon=ƒNƒCƒbƒN‹N“®‚É Tera Term ‚ÌƒVƒ‡[ƒgƒJƒbƒg‚ğì‚é(&Q)
-ja.task_startupttmenuicon=ƒXƒ^[ƒgƒAƒbƒv‚É TeraTerm &Menu ‚ÌƒVƒ‡[ƒgƒJƒbƒg‚ğì‚é
-ja.task_cygtermhere=ƒRƒ“ƒeƒLƒXƒgƒƒjƒ…[‚É "Cy&gterm Here" ‚ğ’Ç‰Á‚·‚é
-ja.task_quickcyglaunch=ƒNƒCƒbƒN‹N“®‚É cyg&launch ‚ÌƒVƒ‡[ƒgƒJƒbƒg‚ğì‚é
-ja.task_macroassoc=.&ttl ƒtƒ@ƒCƒ‹‚ğ ttpmacro.exe ‚ÉŠÖ˜A•t‚¯‚é
-ja.task_telnetassoc=t&elnet ƒvƒƒgƒRƒ‹‚ğ ttermpro.exe ‚ÉŠÖ˜A•t‚¯‚é
-ja.task_sshassoc=&ssh ƒvƒƒgƒRƒ‹‚ğ ttermpro.exe ‚ÉŠÖ˜A•t‚¯‚é
-ja.task_ttyplayassoc=.tty ƒtƒ@ƒCƒ‹‚ğ tterm&pro.exe ‚ÉŠÖ˜A•t‚¯‚é
+ja.task_desktopicon=ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã« Tera Term ã®ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚’ä½œã‚‹(&D)
+ja.task_quicklaunchicon=ã‚¯ã‚¤ãƒƒã‚¯èµ·å‹•ã« Tera Term ã®ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚’ä½œã‚‹(&Q)
+ja.task_startupttmenuicon=ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—ã« TeraTerm &Menu ã®ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚’ä½œã‚‹
+ja.task_cygtermhere=ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ã« "Cy&gterm Here" ã‚’è¿½åŠ ã™ã‚‹
+ja.task_quickcyglaunch=ã‚¯ã‚¤ãƒƒã‚¯èµ·å‹•ã« cyg&launch ã®ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚’ä½œã‚‹
+ja.task_macroassoc=.&ttl ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ ttpmacro.exe ã«é–¢é€£ä»˜ã‘ã‚‹
+ja.task_telnetassoc=t&elnet ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ ttermpro.exe ã«é–¢é€£ä»˜ã‘ã‚‹
+ja.task_sshassoc=&ssh ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ ttermpro.exe ã«é–¢é€£ä»˜ã‘ã‚‹
+ja.task_ttyplayassoc=.tty ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ tterm&pro.exe ã«é–¢é€£ä»˜ã‘ã‚‹
 en.type_standard=Standard installation
 en.type_full=Full installation
 en.type_compact=Compact installation
 en.type_custom=Custom installation
-ja.type_standard=•W€ƒCƒ“ƒXƒg[ƒ‹
-ja.type_full=ƒtƒ‹ƒCƒ“ƒXƒg[ƒ‹
-ja.type_compact=ƒRƒ“ƒpƒNƒgƒCƒ“ƒXƒg[ƒ‹
-ja.type_custom=ƒJƒXƒ^ƒ€ƒCƒ“ƒXƒg[ƒ‹
+ja.type_standard=æ¨™æº–ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+ja.type_full=ãƒ•ãƒ«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+ja.type_compact=ã‚³ãƒ³ãƒ‘ã‚¯ãƒˆã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+ja.type_custom=ã‚«ã‚¹ã‚¿ãƒ ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
 en.launch_teraterm=Launch &Tera Term
 en.launch_ttmenu=Launch TeraTerm &Menu
-ja.launch_teraterm=¡‚·‚® &Tera Term ‚ğÀs‚·‚é
-ja.launch_ttmenu=¡‚·‚® TeraTerm &Menu ‚ğÀs‚·‚é
+ja.launch_teraterm=ä»Šã™ã &Tera Term ã‚’å®Ÿè¡Œã™ã‚‹
+ja.launch_ttmenu=ä»Šã™ã TeraTerm &Menu ã‚’å®Ÿè¡Œã™ã‚‹
 en.msg_language_caption=Select Language
 en.msg_language_description=Which language shoud be used?
 en.msg_language_subcaption=Select the language of application's menu and dialog, then click Next.
@@ -292,41 +292,41 @@ en.msg_language_russian=&Russian
 en.msg_language_korean=&Korean
 en.msg_language_chinese=&Chinese(Simplified)
 en.msg_language_tchinese=Chinese(&Traditional)
-ja.msg_language_caption=Œ¾Œê‚Ì‘I‘ğ
-ja.msg_language_description=ƒ†[ƒU[ƒCƒ“ƒ^[ƒtƒF[ƒX‚ÌŒ¾Œê‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢B
-ja.msg_language_subcaption=ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ìƒƒjƒ…[‚âƒ_ƒCƒAƒƒO“™‚Ì•\¦Œ¾Œê‚ğ‘I‘ğ‚µ‚ÄAuŸ‚Öv‚ğƒNƒŠƒbƒN‚µ‚Ä‚­‚¾‚³‚¢B
-ja.msg_language_none=‰pŒê(&E)
-ja.msg_language_japanese=“ú–{Œê(&J)
-ja.msg_language_german=ƒhƒCƒcŒê(&G)
-ja.msg_language_french=ƒtƒ‰ƒ“ƒXŒê(&F)
-ja.msg_language_russian=ƒƒVƒAŒê(&R)
-ja.msg_language_korean=ŠØ‘Œê(&K)
-ja.msg_language_chinese=ŠÈ‘Ìš’†‘Œê(&C)
-ja.msg_language_tchinese=”É‘Ìš’†‘Œê(&T)
+ja.msg_language_caption=è¨€èªã®é¸æŠ
+ja.msg_language_description=ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã®è¨€èªã‚’é¸æŠã—ã¦ãã ã•ã„ã€‚
+ja.msg_language_subcaption=ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚„ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ç­‰ã®è¡¨ç¤ºè¨€èªã‚’é¸æŠã—ã¦ã€ã€Œæ¬¡ã¸ã€ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ã¦ãã ã•ã„ã€‚
+ja.msg_language_none=è‹±èª(&E)
+ja.msg_language_japanese=æ—¥æœ¬èª(&J)
+ja.msg_language_german=ãƒ‰ã‚¤ãƒ„èª(&G)
+ja.msg_language_french=ãƒ•ãƒ©ãƒ³ã‚¹èª(&F)
+ja.msg_language_russian=ãƒ­ã‚·ã‚¢èª(&R)
+ja.msg_language_korean=éŸ“å›½èª(&K)
+ja.msg_language_chinese=ç°¡ä½“å­—ä¸­å›½èª(&C)
+ja.msg_language_tchinese=ç¹ä½“å­—ä¸­å›½èª(&T)
 en.msg_del_confirm=Are you sure that you want to delete %s ?
-ja.msg_del_confirm=%s ‚ğíœ‚µ‚Ü‚·‚©H
+ja.msg_del_confirm=%s ã‚’å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ
 en.msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
-ja.msg_uninstall_confirm=ˆÈ‘O‚Ìƒo[ƒWƒ‡ƒ“‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ä‚¢‚é‚æ‚¤‚Å‚·Bæ‚ÉƒAƒ“ƒCƒ“ƒXƒg[ƒ‹‚·‚é‚±‚Æ‚ğ‚¨Š©‚ß‚µ‚Ü‚·BƒAƒ“ƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·‚©H
+ja.msg_uninstall_confirm=ä»¥å‰ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã‚‹ã‚ˆã†ã§ã™ã€‚å…ˆã«ã‚¢ãƒ³ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ã“ã¨ã‚’ãŠå‹§ã‚ã—ã¾ã™ã€‚ã‚¢ãƒ³ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã‹ï¼Ÿ
 en.comp_TTX=Additional Plugins
-ja.comp_TTX=’Ç‰Áƒvƒ‰ƒOƒCƒ“
+ja.comp_TTX=è¿½åŠ ãƒ—ãƒ©ã‚°ã‚¤ãƒ³
 en.comp_TTXResizeMenu=VT-Window size can be changed from preset
-ja.comp_TTXResizeMenu=VTƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğƒvƒŠƒZƒbƒg’l‚Ì’†‚©‚ç•ÏX‚Å‚«‚é‚æ‚¤‚É‚·‚é
+ja.comp_TTXResizeMenu=VTã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’ãƒ—ãƒªã‚»ãƒƒãƒˆå€¤ã®ä¸­ã‹ã‚‰å¤‰æ›´ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 en.comp_TTXttyrec=ttyrec format record data can be recorded or playback
-ja.comp_TTXttyrec=ttyrecŒ`®‚Ì˜^‰æƒf[ƒ^‚ğ‹L˜^/Ä¶‚Å‚«‚é‚æ‚¤‚É‚·‚é
+ja.comp_TTXttyrec=ttyrecå½¢å¼ã®éŒ²ç”»ãƒ‡ãƒ¼ã‚¿ã‚’è¨˜éŒ²/å†ç”Ÿã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 en.comp_TTXKanjiMenu=Changes Japanese Kanji Code from VT-Window menu
-ja.comp_TTXKanjiMenu=“ú–{Œê‚ÌŠ¿šƒR[ƒh‚ğVTƒEƒBƒ“ƒhƒE‚Ìƒƒjƒ…[‚©‚çİ’è‚Å‚«‚é‚æ‚¤‚É‚·‚é
+ja.comp_TTXKanjiMenu=æ—¥æœ¬èªã®æ¼¢å­—ã‚³ãƒ¼ãƒ‰ã‚’VTã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‹ã‚‰è¨­å®šã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 en.comp_TTXKcodeChange=Change Japanese Kanji code by remote sequence
-ja.comp_TTXKcodeChange=ƒŠƒ‚[ƒg‚©‚ç‚ÌƒV[ƒPƒ“ƒX‚Å“ú–{Œê‚ÌŠ¿šƒR[ƒh‚ğ•ÏX‚·‚é
+ja.comp_TTXKcodeChange=ãƒªãƒ¢ãƒ¼ãƒˆã‹ã‚‰ã®ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ã§æ—¥æœ¬èªã®æ¼¢å­—ã‚³ãƒ¼ãƒ‰ã‚’å¤‰æ›´ã™ã‚‹
 en.comp_TTXViewMode=View-only mode can be used
-ja.comp_TTXViewMode=•\¦ê—pƒ‚[ƒh‚É‚·‚é‚±‚Æ‚ª‚Å‚«‚é
+ja.comp_TTXViewMode=è¡¨ç¤ºå°‚ç”¨ãƒ¢ãƒ¼ãƒ‰ã«ã™ã‚‹ã“ã¨ãŒã§ãã‚‹
 en.comp_TTXAlwaysOnTop=Always On Top can be used
-ja.comp_TTXAlwaysOnTop=í‚ÉÅ‘O–Ê‚É•\¦‚Å‚«‚é‚æ‚¤‚É‚·‚é
+ja.comp_TTXAlwaysOnTop=å¸¸ã«æœ€å‰é¢ã«è¡¨ç¤ºã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 en.comp_TTXRecurringCommand=Recurring Command can be used
-ja.comp_TTXRecurringCommand=’èŠú“I‚É•¶š—ñ‚ğ‘—M‚·‚é
+ja.comp_TTXRecurringCommand=å®šæœŸçš„ã«æ–‡å­—åˆ—ã‚’é€ä¿¡ã™ã‚‹
 en.comp_installer=Other installer is started
-ja.comp_installer=ƒCƒ“ƒXƒg[ƒ‰‚ª‹N“®‚µ‚Ü‚·
+ja.comp_installer=ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ©ãŒèµ·å‹•ã—ã¾ã™
 en.msg_AppRunningError=Setup has detected that %s is currently running.%n%nPlease close all instances of it now, then click Next to continue.
-ja.msg_AppRunningError=ƒZƒbƒgƒAƒbƒv‚ÍÀs’†‚Ì %s ‚ğŒŸo‚µ‚Ü‚µ‚½B%n%nŠJ‚¢‚Ä‚¢‚éƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğ‚·‚×‚Ä•Â‚¶‚Ä‚©‚çuŸ‚Öv‚ğƒNƒŠƒbƒN‚µ‚Ä‚­‚¾‚³‚¢B
+ja.msg_AppRunningError=ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯å®Ÿè¡Œä¸­ã® %s ã‚’æ¤œå‡ºã—ã¾ã—ãŸã€‚%n%né–‹ã„ã¦ã„ã‚‹ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ã™ã¹ã¦é–‰ã˜ã¦ã‹ã‚‰ã€Œæ¬¡ã¸ã€ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ã¦ãã ã•ã„ã€‚
 
 [Code]
 const
@@ -515,7 +515,7 @@ begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'Japanese', iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', '‚l‚r ƒSƒVƒbƒN,0,-16,128', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯,0,-16,128', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,128', iniFile);
       SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
@@ -659,7 +659,7 @@ begin
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
-    // ‘¼‚ÌŒ¾Œê‚ÍÅV”Å‚É’Ç]‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅA“ú–{Œê‚¾‚¯“Á•Êˆµ‚¢
+    // ä»–ã®è¨€èªã¯æœ€æ–°ç‰ˆã«è¿½å¾“ã—ã¦ã„ãªã„ã®ã§ã€æ—¥æœ¬èªã ã‘ç‰¹åˆ¥æ‰±ã„
     else
       UILangFilePage.SelectedValueIndex := 0;
   end;
@@ -684,22 +684,22 @@ begin
                                'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\UTF-8 TeraTerm Pro with TTSSH2_is1',
                                'UninstallString', uninstaller) then
         begin
-          // UTF-8 TeraTerm Pro with TTSSH2 ‚ÌƒAƒ“ƒCƒ“ƒXƒg[ƒ‰•¶š—ñ‚ğ”­Œ©‚µ‚½
+          // UTF-8 TeraTerm Pro with TTSSH2 ã®ã‚¢ãƒ³ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ©æ–‡å­—åˆ—ã‚’ç™ºè¦‹ã—ãŸ
           if not RegKeyExists(HKEY_LOCAL_MACHINE,
                               'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Tera Term_is1') then
           begin
-            // Tera Term ‚ÌƒCƒ“ƒXƒg[ƒ‹ƒGƒ“ƒgƒŠ‚ªŒ©‚Â‚©‚ç‚È‚¢(‹¤‘¶‚µ‚Ä‚¢‚È‚¢)
+            // Tera Term ã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã‚¨ãƒ³ãƒˆãƒªãŒè¦‹ã¤ã‹ã‚‰ãªã„(å…±å­˜ã—ã¦ã„ãªã„)
             if MsgBox(CustomMessage('msg_uninstall_confirm'), mbInformation, MB_YESNO) = IDYES then
             begin
-              // ƒ†[ƒU‚ªƒAƒ“ƒCƒ“ƒXƒg[ƒ‹‚ğ‘I‘ğ‚µ‚½
+              // ãƒ¦ãƒ¼ã‚¶ãŒã‚¢ãƒ³ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã‚’é¸æŠã—ãŸ
 
-              // —¼’[‚Ì " ‚ğí‚é
+              // ä¸¡ç«¯ã® " ã‚’å‰Šã‚‹
               uninstaller2 := Copy(uninstaller, 2, Length(uninstaller) - 2);
 
               if not Exec(uninstaller2, '', '', SW_SHOW,
                           ewWaitUntilTerminated, ResultCode) then
               begin
-                // Às‚É¸”s
+                // å®Ÿè¡Œã«å¤±æ•—
                 MsgBox(SysErrorMessage(ResultCode), mbError, MB_OK);
               end;
             end;
