@@ -1,7 +1,10 @@
 ﻿# ライブラリのバージョンをチェックする
+#   installer/release.batから使用
+# 単体で実行
+#   cmake -P checklibs.cmake
 
 # 全体のhashはこの値になる
-set(EXPECT_HASH "7605acb0b9d3e7eb764cee6b4b68817609a8b21929c4e7a22d4785f0010ea3d6")
+set(EXPECT_HASH "8a9fc9f6658191cf42e678e0d1fdd42b7046285fb4ade64d566fb32430387285")
 
 # バージョンをチェックするために使用するファイル
 set(CHECK_VERSION_FILES
