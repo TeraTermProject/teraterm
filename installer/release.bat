@@ -4,15 +4,6 @@ set CUR=%~dp0
 cd /d %CUR%
 
 set VS_VERSION=2019
-set ONIG_VERSION=6.9.7.1
-rem for 6.9.7.1
-set ONIG_FOLDER_NAME=6.9.7
-set ZLIB_VERSION=1.2.11
-set PUTTY_VERSION=0.76
-set SFMT_VERSION=1.5.1
-set CJSON_VERSION=1.7.14
-set ARGON2_VERSION=20190702
-set LIBRESSL_VERSION=3.4.3
 
 if "%APPVEYOR%" == "True" set NOPAUSE=1
 
@@ -77,62 +68,10 @@ rem ####################
 setlocal
 cd /d %CUR%..\libs
 
-if "%1" == "force" goto download_libs_download
+set OPT=
+if "%1" == "force" set OPT=-DFORCE_DOWNLOAD=on
+%CMAKE% %OPT% -P download.cmake
 
-cmake -P checklibs.cmake
-call checklibs_result.bat
-del checklibs_result.bat
-if "%RESULT%" == "1" (
-    echo already all library downloaded
-    goto download_libs_finish
-)
-
-:download_libs_download
-
-:oniguruma
-%CURL% -L https://github.com/kkos/oniguruma/releases/download/v%ONIG_VERSION%/onig-%ONIG_VERSION%.tar.gz -o oniguruma.tar.gz
-%CMAKE% -E tar xf oniguruma.tar.gz
-%CMAKE% -E rm -rf oniguruma
-%CMAKE% -E rename onig-%ONIG_FOLDER_NAME% oniguruma
-
-:zlib
-%CURL% -L https://zlib.net/zlib-%ZLIB_VERSION%.tar.xz -o zlib.tar.xz
-%CMAKE% -E tar xf zlib.tar.xz
-%CMAKE% -E rm -rf zlib
-%CMAKE% -E rename zlib-%ZLIB_VERSION% zlib
-
-:putty
-%CURL% -L https://the.earth.li/~sgtatham/putty/%PUTTY_VERSION%/putty-%PUTTY_VERSION%.tar.gz -o putty.tar.gz
-%CMAKE% -E tar xf putty.tar.gz
-%CMAKE% -E rm -rf putty
-%CMAKE% -E rename putty-%PUTTY_VERSION% putty
-
-:SFMT
-%CURL% -L http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-%SFMT_VERSION%.zip -o sfmt.zip
-%CMAKE% -E tar xf sfmt.zip
-%CMAKE% -E rm -rf SFMT
-%CMAKE% -E rename SFMT-src-%SFMT_VERSION% SFMT
-echo #define SFMT_VERSION "%SFMT_VERSION%" > SFMT\SFMT_version_for_teraterm.h
-
-:cJSON
-%CURL% -L https://github.com/DaveGamble/cJSON/archive/v%CJSON_VERSION%.zip -o cJSON.zip
-%CMAKE% -E tar xf cJSON.zip
-%CMAKE% -E rm -rf cJSON
-%CMAKE% -E rename cJSON-%CJSON_VERSION% cJSON
-
-:argon2
-%CURL% -L https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/%ARGON2_VERSION%.tar.gz -o argon2.tar.gz
-%CMAKE% -E tar xf argon2.tar.gz
-%CMAKE% -E rm -rf argon2
-%CMAKE% -E rename phc-winner-argon2-%ARGON2_VERSION% argon2
-
-:libressl
-%CURL% -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-%LIBRESSL_VERSION%.tar.gz -o libressl.tar.gz
-%CMAKE% -E tar xf libressl.tar.gz
-%CMAKE% -E rm -rf libressl
-%CMAKE% -E rename libressl-%LIBRESSL_VERSION% libressl
-
-:download_libs_finish
 endlocal
 exit /b 0
 
