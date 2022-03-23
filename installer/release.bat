@@ -99,14 +99,20 @@ if "%1" == "freeze_state" (
     call makearchive.bat
 )
 call ..\buildtools\svnrev\sourcetree_info.bat
+if not exist Output mkdir Output
+set FILENAME_BASE=teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%
 if "%1" == "freeze_state" (
     pushd Output
-    %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
+    %CMAKE% -E tar cf %FILENAME_BASE%.zip --format=zip teraterm-%TT_VERSION%/
     popd
+    set INNO_SETUP_OPT_VERSION=
+    set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%"
 ) else (
-    %CMAKE% -E tar cf TERATERM_r%SVNVERSION%_%DATE%_%TIME%.zip --format=zip snapshot-%DATE%_%TIME%
+    %CMAKE% -E tar cf Output/%FILENAME_BASE%-snapshot.zip --format=zip snapshot-%DATE%_%TIME%
+    set INNO_SETUP_OPT_VERSION="/DVerSubStr=r%SVNVERSION%-%DATE%_%TIME%"
+    set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
 )
-%INNO_SETUP% teraterm.iss
+%INNO_SETUP% %INNO_SETUP_OPT_VERSION% %INNO_SETUP_OPT_OUTPUT% teraterm.iss
 
 endlocal
 exit /b 0
@@ -246,6 +252,8 @@ exit
 
 rem ####################
 :exec_cmd
+call ..\buildtools\svnrev\svnrev.bat
+call ..\buildtools\svnrev\sourcetree_info.bat
 cmd
 exit /b 0
 

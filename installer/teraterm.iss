@@ -1,6 +1,5 @@
 ﻿#define AppName "Tera Term"
 #define AppVer "5.0"
-#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
@@ -33,12 +32,10 @@ AppPublisherURL=https://ttssh2.osdn.jp/
 AppSupportURL=https://ttssh2.osdn.jp/
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
-#ifndef snapshot
+#ifndef VerSubStr
 AppVersion={#AppVer}
-AppVerName={#AppName} {#AppVer}
 #else
-AppVersion={#AppVer}+ snapshot-{#snapshot}
-AppVerName={#AppName} {#AppVer}+ snapshot-{#snapshot}
+AppVersion={#AppVer} {#VerSubStr}
 #endif
 LicenseFile=release\license.txt
 DefaultDirName={pf}\teraterm5
@@ -46,10 +43,10 @@ DefaultGroupName={#AppName}
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-#ifndef snapshot
+#ifndef OutputSubStr
 OutputBaseFilename=teraterm-{#AppVer}
 #else
-OutputBaseFilename=teraterm-{#snapshot}
+OutputBaseFilename=teraterm-{#AppVer}-{#OutputSubStr}
 #endif
 PrivilegesRequired=none
 SolidCompression=yes

@@ -17,9 +17,9 @@
   - 使用ツールは次のドキュメントを参照
     - [doc/ja/html/reference/develop.html](../doc/ja/html/reference/develop.html)
 - Tera Termをビルドしたときの最終的な生成ファイル
-  - 通常ビルド時
-    - installer/Output/teraterm-YYMMDD_HHMMSS.exe
-    - installer/TERATERM_r9999_YYMMDD_HHMMSS.zip
   - Release時
-    - installer/Output/teraterm-YYMMDD_HHMMSS.exe
-    - installer/Output/teraterm_x.y.zip
+    - installer/Output/teraterm-x.y-r9999-YYMMDD_HHMMSS-username.exe
+    - installer/Output/teraterm_x.y-r9999-YYMMDD_HHMMSS-username.zip
+  - 通常ビルド(snapshot)時
+    - installer/Output/teraterm-x.y-r9999-YYMMDD_HHMMSS-username-snapshot.exe
+    - installer/Output/teraterm-x.y-r9999-YYMMDD_HHMMSS-username-snapshot.zip
