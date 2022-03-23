@@ -142,6 +142,7 @@ set(CHECK_FILE "cJSON/CHANGELOG.md")
 set(CHECK_HASH "4ff95e0060ea2dbc13720079399e77d404d89e514b569fcc8d741f3272c98e53")
 set(SRC_URL "https://github.com/DaveGamble/cJSON/archive/v1.7.14.zip")
 set(ARC_HASH "d797b4440c91a19fa9c721d1f8bab21078624aa9555fc64c5c82e24aa2a08221")
+#   ARC_HASH by TeraTerm Project
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/cJSON")
 download_extract(
   ${SRC_URL}
@@ -163,6 +164,7 @@ set(CHECK_FILE "libressl/ChangeLog")
 set(CHECK_HASH "96b2032157a92af8ae02ac57cdc9b96a96a3e91b89602936cf6403c9bf7e88ca")
 set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.4.3.tar.gz")
 set(ARC_HASH "ff88bffe354818b3ccf545e3cafe454c5031c7a77217074f533271d63c37f08d")
+#   ARC_HASH was picked from https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/libressl")
 download_extract(
   ${SRC_URL}
@@ -205,6 +207,7 @@ set(CHECK_FILE "putty/version.h")
 set(CHECK_HASH "c6975607ae6fb8510d56fae403fdd83bbafa3efe32397e5956375db49d0fadda")
 set(SRC_URL "https://the.earth.li/~sgtatham/putty/0.76/putty-0.76.tar.gz")
 set(ARC_HASH "547cd97a8daa87ef71037fab0773bceb54a8abccb2f825a49ef8eba5e045713f")
+#   ARC_HASH was picked from https://the.earth.li/~sgtatham/putty/0.76/sha256sums
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/putty")
 download_extract(
   ${SRC_URL}
@@ -226,6 +229,7 @@ set(CHECK_FILE "SFMT/CHANGE-LOG.txt")
 set(CHECK_HASH "ac65302c740579c7dccc99b2fcd735af3027957680f2ce227042755646abb1db")
 set(SRC_URL "http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
 set(ARC_HASH "630d1dfa6b690c30472f75fa97ca90ba62f9c13c5add6c264fdac2c1d3a878f4")
+#   ARC_HASH by TeraTerm Project
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/SFMT")
 download_extract(
   ${SRC_URL}
