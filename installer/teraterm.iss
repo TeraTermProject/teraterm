@@ -336,7 +336,7 @@ const
 procedure SHChangeNotify(wEventId, uFlags, dwItem1, dwItem2: Integer);
 external 'SHChangeNotify@shell32.dll stdcall';
 
-function FindCygwinPath(CygwinDirectory, CygwinDir: AnsiString; Dirlen: Cardinal): Integer;
+function FindCygwinPath(CygwinDirectory: AnsiString; CygwinDir: AnsiString; Dirlen: Cardinal): Integer;
 external 'FindCygwinPath@files:cygtool.dll stdcall setuponly';
 
 function PortableExecutableMachine(CygwinDir: AnsiString): Integer;
@@ -751,8 +751,8 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   iniFile : String;
-  CygDir  : String;
-  CygPath : String;
+  CygDir  : AnsiString;
+  CygPath : AnsiString;
   CygDll  : String;
   Cygterm : String;
   Res     : Integer;

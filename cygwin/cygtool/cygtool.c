@@ -26,8 +26,8 @@ search_path:;
 	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 #ifdef EXE
 		printf("  %s from PATH\n", file);
-		goto found_dll;
 #endif
+		goto found_dll;
 	}
 
 	for (c = 'C' ; c <= 'Z' ; c++) {
