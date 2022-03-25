@@ -1,11 +1,40 @@
+/*
+ * Copyright (C) 2014- TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #include <stdio.h>
+#include <wchar.h>
 
-int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
+#include "cygtool.h"
+
+int __stdcall FindCygwinPath(const wchar_t *CygwinDirectory, wchar_t *Dir, size_t Dirlen)
 {
-	char file[MAX_PATH], *filename;
+	wchar_t file[MAX_PATH], *filename;
 	char c;
 
 	/* zero-length string from Inno Setup is NULL */
@@ -13,30 +42,21 @@ int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
 		goto search_path;
 	}
 
-	if (strlen(CygwinDirectory) > 0) {
-		if (SearchPath(CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-#ifdef EXE
-			printf("  %s from CygwinDirectory\n", file);
-#endif
+	if (CygwinDirectory[0] != 0) {
+		if (SearchPathW(CygwinDirectory, L"bin\\cygwin1", L".dll", _countof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
 
 search_path:;
-	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-#ifdef EXE
-		printf("  %s from PATH\n", file);
-#endif
+	if (SearchPathW(NULL, L"cygwin1", L".dll", _countof(file), file, &filename) > 0) {
 		goto found_dll;
 	}
 
 	for (c = 'C' ; c <= 'Z' ; c++) {
-		char tmp[MAX_PATH];
-		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
-		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
-#ifdef EXE
-			printf("  %s from %c:\\\n", file, c);
-#endif
+		wchar_t tmp[MAX_PATH];
+		swprintf(tmp, _countof(tmp), L"%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
+		if (SearchPathW(tmp, L"cygwin1", L".dll", _countof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
@@ -44,22 +64,22 @@ search_path:;
 	return 0;
 
 found_dll:;
-	memset(Dir, '\0', Dirlen);
-	if (Dirlen <= strlen(file) - 16) {
+	wmemset(Dir, '\0', Dirlen);
+	if (Dirlen <= wcslen(file) - 16) {
 		return 0;
 	}
-	memcpy(Dir, file, strlen(file) - 16); // delete "\\bin\\cygwin1.dll"
+	wmemcpy(Dir, file, wcslen(file) - 16); // delete "\\bin\\cygwin1.dll"
 	return 1;
 }
 
-int __stdcall PortableExecutableMachine(char *file)
+int __stdcall PortableExecutableMachine(const wchar_t *file)
 {
 	FILE *fp;
 	unsigned char buf[4];
 	long e_lfanew;
 	WORD Machine;
 
-	if ((fp = fopen(file, "rb")) == NULL) {
+	if (_wfopen_s(&fp, file, L"rb") != 0) {
 		return IMAGE_FILE_MACHINE_UNKNOWN;
 	}
 
@@ -73,9 +93,6 @@ int __stdcall PortableExecutableMachine(char *file)
 		return IMAGE_FILE_MACHINE_UNKNOWN;
 	}
 	e_lfanew = buf[0] + (buf[1] << 8) + (buf[1] << 16) + (buf[1] << 24);
-#ifdef EXE
-	printf("  e_lfanew => x%08x\n", e_lfanew);
-#endif
 
 	// IMAGE_NT_HEADERS32
 	//   DWORD Signature;
@@ -95,7 +112,7 @@ int __stdcall PortableExecutableMachine(char *file)
 	return Machine;
 }
 
-int __stdcall CygwinVersion(char *dll, int *major, int *minor)
+int __stdcall CygwinVersion(const wchar_t *dll, int *major, int *minor)
 {
 	DWORD dwSize;
 	DWORD dwHandle;
@@ -103,18 +120,18 @@ int __stdcall CygwinVersion(char *dll, int *major, int *minor)
 	UINT uLen;
 	VS_FIXEDFILEINFO *pFileInfo;
 
-	dwSize = GetFileVersionInfoSize(dll, &dwHandle);
+	dwSize = GetFileVersionInfoSizeW(dll, &dwHandle);
 	if (dwSize == 0) {
 		return 0;
 	}
 
 	lpBuf = malloc(dwSize);
-	if (!GetFileVersionInfo(dll, dwHandle, dwSize, lpBuf)) {
+	if (!GetFileVersionInfoW(dll, dwHandle, dwSize, lpBuf)) {
 		free(lpBuf);
 		return 0;
 	}
 
-	if (!VerQueryValue(lpBuf, "\\", (LPVOID*)&pFileInfo, &uLen)) {
+	if (!VerQueryValueW(lpBuf, L"\\", (LPVOID*)&pFileInfo, &uLen)) {
 		free(lpBuf);
 		return 0;
 	}
@@ -127,59 +144,6 @@ int __stdcall CygwinVersion(char *dll, int *major, int *minor)
 	return 1;
 }
 
-#ifdef EXE
-int main(void)
-{
-	char file[MAX_PATH];
-	char version[MAX_PATH];
-	int file_len = sizeof(file);
-	int version_major, version_minor;
-	int res;
-
-	printf("FindCygwinPath()\n");
-	res = FindCygwinPath("", file, file_len);
-	printf("  result => %d\n", res);
-	if (!res) {
-		printf("\n");
-		return -1;
-	}
-	printf("  Cygwin directory => %s\n", file);
-	printf("\n");
-
-	printf("PortableExecutableMachine()\n");
-	strncat_s(file, sizeof(file), "\\bin\\cygwin1.dll", _TRUNCATE);
-	printf("  Cygwin DLL => %s\n", file);
-	res = PortableExecutableMachine(file);
-	printf("  Machine => x%04x", res);
-	switch (res) {
-		case IMAGE_FILE_MACHINE_I386:
-			printf(" = %s\n", "IMAGE_FILE_MACHINE_I386");
-			break;
-		case IMAGE_FILE_MACHINE_AMD64:
-			printf(" = %s\n", "IMAGE_FILE_MACHINE_AMD64");
-			break;
-		default:
-			printf("\n");
-			return -1;
-			break;
-	}
-	printf("\n");
-
-	printf("CygwinVersion()\n");
-	printf("  Cygwin DLL => %s\n", file);
-	res = CygwinVersion(file, &version_major, &version_minor);
-	printf("  result => %d\n", res);
-	if (!res) {
-	printf("\n");
-		return -1;
-	}
-	printf("  version_major => %d\n", version_major);
-	printf("  version_minor => %d\n", version_minor);
-	printf("\n");
-
-	return 0;
-}
-#else
 BOOL WINAPI DllMain(HANDLE hInstance,
 		    ULONG ul_reason_for_call,
 		    LPVOID lpReserved)
@@ -200,4 +164,3 @@ BOOL WINAPI DllMain(HANDLE hInstance,
   }
   return TRUE;
 }
-#endif
