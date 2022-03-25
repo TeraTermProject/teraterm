@@ -66,7 +66,6 @@ static wchar_t *GetCygwinDir(void)
 
 int wmain(int argc, wchar_t *argv[])
 {
-	wchar_t *CygwinDir;
 	wchar_t *Cmdline;
 	int i;
 	DWORD e;
@@ -98,15 +97,16 @@ int wmain(int argc, wchar_t *argv[])
 		}
 	}
 
-	// cygwinがインストールされているフォルダ
-	CygwinDir = GetCygwinDir();
 
 	// cygtermを実行する
 	if (msys2term) {
-		e = Msys2Connect(CygwinDir, Cmdline);
+		e = Msys2Connect(L"c:\\msys64", Cmdline);
 	}
 	else {
+		// cygwinがインストールされているフォルダ
+		wchar_t *CygwinDir = GetCygwinDir();
 		e = CygwinConnect(CygwinDir, Cmdline);
+		free(CygwinDir);
 	}
 
 	switch(e) {
@@ -128,6 +128,5 @@ int wmain(int argc, wchar_t *argv[])
 	}
 
 	free(Cmdline);
-	free(CygwinDir);
 	return 0;
 }

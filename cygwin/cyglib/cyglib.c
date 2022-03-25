@@ -41,8 +41,9 @@
 /**
  *	cygwin1.dll / msys-2.0.dllを探す
  *
- *	@param[in]	dll_base		dllファイル名
+ *	@param[in]	dll_base		"cygwin1", "msys-2.0" など、"dll" を除いたベース
  *	@param[in]	cygwin_dir		(存在するであろう)フォルダ(*1)
+ *								指定なしの場合は NULL を渡す
  *	@param[in]	search_paths	(*1)が見つからなかったときに探すパス
  *	@param[out]	find_dir		見つかったフォルダ free() すること
  *	@param[out]	find_in_path	環境変数 PATH 内に見つかった
@@ -64,26 +65,33 @@ static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const 
 
 	// 指定されたフォルダに存在するか?
 	if (cygwin_dir != NULL && cygwin_dir[0] != 0) {
-		// SearchPathW() で探す
-		dll = NULL;
-		awcscats(&dll, L"bin\\", dll_base, NULL);
-		r = SearchPathW(cygwin_dir, dll, L".dll", _countof(file), file, &filename);
-		free(dll);
-		if (r > 0) {
-			goto found_dll;
-		}
+		static const wchar_t *dll_paths[] = {
+			L"bin\\",		// cygwinは bin/ の下にdllがある
+			L"usr\\bin\\"	// msys2は usr/bin/ の下にdllがある
+		};
+		for (i = 0; i < _countof(dll_paths); i++) {
+			// SearchPathW() で探す
+			dll = NULL;
+			awcscats(&dll, dll_paths[i], dll_base, NULL);
+			r = SearchPathW(cygwin_dir, dll, L".dll", _countof(file), file, &filename);
+			free(dll);
+			if (r > 0) {
+				goto found_dll;
+			}
 
-		// SearchPathW() だと "msys-2.0.dll" が見つけることができない (Windows 10)
-		dll = NULL;
-		awcscats(&dll, cygwin_dir, L"\\bin\\", dll_base, L".dll", NULL);
-		r = GetFileAttributesW(dll);
-		if (r != INVALID_FILE_ATTRIBUTES) {
-			// 見つかった
+			// 見つからなかったら GetFileAttributesW() でさらに調べる
+			// 		SearchPathW() が"msys-2.0.dll" が見つけることができない
+			//		"." が入っているからか?
+			dll = NULL;
+			awcscats(&dll, cygwin_dir, L"\\", dll_paths[i], dll_base, L".dll", NULL);
 			wcscpy_s(file, _countof(file), dll);
 			free(dll);
-			goto found_dll;
+			r = GetFileAttributesW(file);
+			if (r != INVALID_FILE_ATTRIBUTES) {
+				// 見つかった
+				goto found_dll;
+			}
 		}
-		free(dll);
 	}
 
 	// PATH から探す
@@ -179,8 +187,10 @@ static BOOL AddPath(const wchar_t *add_path)
 /**
  *	Connect to local cygwin
  *	cygtermを実行
- *
- *	@param[in]	CygwinDirectory		Cygwinがインストールしてあるフォルダ
+
+ *	@param[in]	dll_base			"cygwin1", "msys-2.0" など、"dll" を除いたベース
+ *	@param[in]	CygwinDirectory		Cygwin(msys2)がインストールしてあるフォルダ
+ *									指定なしの場合は NULL を渡す
  *									見つからなければデフォルトフォルダなどを探す
  *	@param[in]	cmdline				cygtermに渡すコマンドライン引数
  *									NULLのとき引数なし
