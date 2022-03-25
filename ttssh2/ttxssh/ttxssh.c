@@ -1479,9 +1479,9 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 			if (wcsncmp(option + 1, L"ssh", 3) == 0) {
 				if (option[4] == 0) {
 					pvar->settings.Enabled = 1;
-				} else if (wcsncmp(option + 4, L"-L", 3) == 0 ||
-				           wcsncmp(option + 4, L"-R", 3) == 0 ||
-				           wcsncmp(option + 4, L"-D", 3) == 0) {
+				} else if (wcsncmp(option + 4, L"-L", 2) == 0 ||
+				           wcsncmp(option + 4, L"-R", 2) == 0 ||
+				           wcsncmp(option + 4, L"-D", 2) == 0) {
 					wchar_t *p = option + 5;
 					option2[0] = *p;
 					i = 1;
