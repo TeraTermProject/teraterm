@@ -8,8 +8,8 @@ set_target_properties(
   cyglib
   PROPERTIES FOLDER cygwin)
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-  # 32bit build
+if(MSVC AND (CMAKE_SIZEOF_VOID_P EQUAL 4))
+  # Visual Studio 32bit build
   add_subdirectory(cygtool)
 
   set_target_properties(
@@ -23,12 +23,14 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     FOLDER cygwin
     )
 else()
-  # 64bit build
+  # other build system...
   if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
     add_subdirectory(cygtool_build)
-    set_target_properties(
-      cygtool_build
-      PROPERTIES FOLDER cygwin)
+    if(TARGET cygtool_build)
+      set_target_properties(
+        cygtool_build
+        PROPERTIES FOLDER cygwin)
+    endif()
   endif()
 endif()
 

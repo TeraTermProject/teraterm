@@ -338,11 +338,20 @@ install(
   DESTINATION .
   )
 if(MSVC AND ENABLE_DEBUG_INFO AND (${CMAKE_VERSION} VERSION_GREATER "3.13"))
-  install(
-    FILES
-    $<TARGET_PDB_FILE:teraterm>
-    $<$<CONFIG:Debug>:debug/ttermpro.map>
-    $<$<CONFIG:Release>:release/ttermpro.map>
-    DESTINATION .
-    )
+  if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    install(
+      FILES
+      $<TARGET_PDB_FILE:teraterm>
+      $<CONFIG>/ttermpro.map
+      DESTINATION .
+      )
+  else()
+    # single configuration like "NMake Makefiles"
+    install(
+      FILES
+      $<TARGET_PDB_FILE:teraterm>
+      ${CMAKE_BINARY_DIR}/ttermpro.map
+      DESTINATION .
+      )
+  endif()
 endif()
