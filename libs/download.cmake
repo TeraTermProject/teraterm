@@ -121,6 +121,7 @@ set(CHECK_FILE "argon2/CHANGELOG.md")
 set(CHECK_HASH "1b513eb6524f0a3ac5e182bf2713618ddd8f2616ebe6e090d647c49b3e7eb2ec")
 set(SRC_URL "https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/20190702.tar.gz")
 set(ARC_HASH "daf972a89577f8772602bf2eb38b6a3dd3d922bf5724d45e7f9589b5e830442c")
+#   ARC_HASH by TeraTerm Project
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/argon2")
 download_extract(
   ${SRC_URL}
