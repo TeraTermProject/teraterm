@@ -84,7 +84,6 @@ void BuffAllSelect();
 void BuffScreenSelect();
 void BuffCancelSelection();
 void ChangeSelectRegion();
-void BuffScroll(int Count, int Bottom);
 void BuffInsertSpace(int Count);
 void BuffEraseCurToEnd();
 void BuffEraseHomeToCur();

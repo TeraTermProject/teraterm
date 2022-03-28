@@ -278,7 +278,7 @@ static void BuffAddChar(buff_char_t *buff, char32_t u32)
 				i++;
 				p->pCombinationChars16[i] = u16_str[1];
 			}
-			p->CombinationCharCount16 += wlen;
+			p->CombinationCharCount16 += (unsigned char)wlen;
 		}
 	}
 }
@@ -652,7 +652,7 @@ void BuffReset()
 	BuffDiscardSavedScreen();
 }
 
-void BuffScroll(int Count, int Bottom)
+static void BuffScroll(int Count, int Bottom)
 {
 	int i, n;
 	LONG SrcPtr, DestPtr;
