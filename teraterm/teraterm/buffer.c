@@ -380,7 +380,7 @@ static void GetPosFromPtr(const buff_char_t *b, int *bx, int *by)
 		y -= BuffStartAbs;
 	}
 	else {
-		y += (NumOfLines - BuffStartAbs);
+		y = y - BuffStartAbs + NumOfLinesInBuff;
 	}
 	*bx = x;
 	*by = y;
@@ -2344,7 +2344,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	const buff_char_t *b;
 
 	// URL強調の先頭を探す
-	TmpPtr = GetLinePtr(PageStart + cur_y) + cur_x - 1;
+	TmpPtr = GetLinePtr(PageStart + cur_y) + cur_x - 1;	// カーソル位置をポインタへ
 	while ((CodeBuffW[TmpPtr].attr & AttrURL) != 0) {
 		if (TmpPtr == 0) {
 			break;
@@ -2352,8 +2352,15 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		TmpPtr--;
 	}
 	TmpPtr++;
+
+	// ポインタをカーソル位置へ
 	GetPosFromPtr(&CodeBuffW[TmpPtr], &sx, &sy);
-	sy = sy - PageStart;
+	if (sy >= PageStart) {
+		sy = sy - PageStart;
+	} else {
+		sy = sy - PageStart;
+		sy = sy + NumOfLinesInBuff;
+	}
 
 	// 行末を探す
 	ex = NumOfColumns - 1;
