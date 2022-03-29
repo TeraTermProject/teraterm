@@ -370,6 +370,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 				case IDC_TERMKANJI:
 					w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
+					w = (WORD)SendDlgItemMessageA(Dialog, IDC_TERMKANJI, CB_GETITEMDATA, w - 1, 0);
 					if (w==IdJIS) {
 						EnableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
 					}
@@ -380,6 +381,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 				case IDC_TERMKANJISEND:
 					w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
+					w = (WORD)SendDlgItemMessageA(Dialog, IDC_TERMKANJISEND, CB_GETITEMDATA, w - 1, 0);
 					if (w==IdJIS) {
 						EnableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
 					}
