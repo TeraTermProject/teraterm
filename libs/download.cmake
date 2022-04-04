@@ -252,12 +252,12 @@ endif()
 # zlib
 message("zlib")
 set(EXT_DIR "${CMAKE_CURRENT_LIST_DIR}")
-set(DIR_IN_ARC "zlib-1.2.11")
+set(DIR_IN_ARC "zlib-1.2.12")
 set(RENAME_DIR "zlib")
 set(CHECK_FILE "zlib/ChangeLog")
-set(CHECK_HASH "4c9f1a65b9b4be8bf164a97775ef50e4db4e02ea8c9933fdbe629a640691375e")
-set(SRC_URL "https://zlib.net/zlib-1.2.11.tar.xz")
-set(ARC_HASH "4ff941449631ace0d4d203e3483be9dbc9da454084111f97ea0a2114e19bf066")
+set(CHECK_HASH "66a955bd457c93d490c13b82f283b5507972fe50bcd8d9d6dd821ab57f187c2d")
+set(SRC_URL "https://zlib.net/zlib-1.2.12.tar.xz")
+set(ARC_HASH "7db46b8d7726232a621befaab4a1c870f00a90805511c0e0090441dac57def18")
 #   ARC_HASH was picked from https://www.zlib.net
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/zlib")
 download_extract(
