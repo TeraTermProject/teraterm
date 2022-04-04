@@ -1,5 +1,5 @@
 ﻿#define AppName "Tera Term"
-#define AppVer "5.0"
+#define AppVer "5.0-alpha1"
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
@@ -39,7 +39,7 @@ AppVersion={#AppVer} {#VerSubStr}
 #endif
 LicenseFile=release\license.txt
 DefaultDirName={pf}\teraterm5
-DefaultGroupName={#AppName}
+DefaultGroupName={#AppName} 5
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
