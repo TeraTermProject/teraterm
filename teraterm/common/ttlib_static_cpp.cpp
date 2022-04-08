@@ -1278,7 +1278,7 @@ wchar_t *DeleteCommentW(const wchar_t *src)
 	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * (dest_size + 1));
 	wchar_t *dest_top = dest;
 	BOOL quoted = FALSE;
-	wchar_t *dest_end = dest + dest_size - 1;
+	wchar_t *dest_end = dest + dest_size;
 
 	while (*src != '\0' && dest < dest_end && (quoted || *src != ';')) {
 		*dest++ = *src;
