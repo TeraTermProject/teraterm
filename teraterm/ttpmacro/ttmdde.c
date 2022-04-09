@@ -37,6 +37,7 @@
 #include "ttmdlg.h"
 #include "ttmparse.h"
 #include "ttmmsg.h"
+#include "codeconv.h"
 
 #include "ttmdde.h"
 
@@ -275,7 +276,11 @@ BOOL InitDDE(HWND HWin)
 	}
 
 	Service= DdeCreateStringHandle(Inst, ServiceName, CP_WINANSI);
-	Topic  = DdeCreateStringHandleW(Inst, TopicName, CP_WINANSI);
+	{
+		char *TopicNameA = ToCharW(TopicName);
+		Topic  = DdeCreateStringHandle(Inst, TopicNameA, CP_WINANSI);
+		free(TopicNameA);
+	}
 	Item   = DdeCreateStringHandle(Inst, ItemName, CP_WINANSI);
 	Item2  = DdeCreateStringHandle(Inst, ItemName2, CP_WINANSI);
 	if ((Service==0) || (Topic==0) ||
