@@ -591,6 +591,13 @@ WORD TTLConnect(WORD mode)
 	// link to Tera Term
 	if (wcslen(TopicName)==0)
 	{
+		char TopicNameA[11];
+		w = HIWORD(HMainWin);
+		Word2HexStr(w,TopicNameA);
+		w = LOWORD(HMainWin);
+		Word2HexStr(w,&(TopicNameA[4]));
+		ACPToWideChar_t(TopicNameA, TopicName, _countof(TopicName));
+
 		switch (mode) {
 		case RsvConnect:
 			strncpy_s(Cmnd, sizeof(Cmnd),TTERMCOMMAND, _TRUNCATE);
@@ -599,15 +606,9 @@ WORD TTLConnect(WORD mode)
 			strncpy_s(Cmnd, sizeof(Cmnd),CYGTERMCOMMAND, _TRUNCATE);
 			break;
 		}
-		char *TopicNameA = ToCharW(TopicName);
-		w = HIWORD(HMainWin);
-		Word2HexStr(w,TopicNameA);
-		w = LOWORD(HMainWin);
-		Word2HexStr(w,&(TopicNameA[4]));
 		strncat_s(Cmnd,sizeof(Cmnd),TopicNameA,_TRUNCATE);
 		strncat_s(Cmnd,sizeof(Cmnd)," ",_TRUNCATE);
 		strncat_s(Cmnd,sizeof(Cmnd),Str,_TRUNCATE);
-		free(TopicNameA);
 		if (WinExec(Cmnd,SW_SHOW)<32)
 			return ErrCantConnect;
 		TTLStatus = IdTTLInitDDE;
