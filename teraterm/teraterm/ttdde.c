@@ -110,6 +110,8 @@ void DDEPut1(BYTE b)
 		cv_DCount = InBuffSize;
 		cv_DStart = cv_LogPtr;
 	}
+	else
+		cv_DCount++;
 }
 
 static BOOL DDECreateBuf(void)
