@@ -1317,7 +1317,7 @@ void CLogPropPageDlg::OnInitDialog()
 	SetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultName);
 
 	// Log Default File Path (2007.5.30 maya)
-	SetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath);
+	SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPathW);
 
 	/* Auto start logging (2007.5.31 maya) */
 	SetCheck(IDC_AUTOSTART, ts.LogAutoStart);
@@ -1425,14 +1425,18 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// ログディレクトリの選択ダイアログ
 			{
 				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFile);
-				wchar_t *buf;
-				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &buf);
-				wchar_t *buf2;
-				if (doSelectFolderW(GetSafeHwnd(), buf, title, &buf2)) {
-					SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, buf2);
-					free(buf2);
+				wchar_t *default_path;
+				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &default_path);
+				if (default_path[0] == 0) {
+					free(default_path);
+					default_path = _wcsdup(ts.LogDirW);
 				}
-				free(buf);
+				wchar_t *new_path;
+				if (doSelectFolderW(GetSafeHwnd(), default_path, title, &new_path)) {
+					SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, new_path);
+					free(new_path);
+				}
+				free(default_path);
 				free(title);
 			}
 
@@ -1534,7 +1538,8 @@ void CLogPropPageDlg::OnOK()
 	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);
 
 	// Log Default File Path (2007.5.30 maya)
-	GetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath, _countof(ts.LogDefaultPath));
+	free(ts.LogDefaultPathW);
+	hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &ts.LogDefaultPathW);
 
 	/* Auto start logging (2007.5.31 maya) */
 	ts.LogAutoStart = GetCheck(IDC_AUTOSTART);

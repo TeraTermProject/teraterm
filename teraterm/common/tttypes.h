@@ -504,7 +504,7 @@ struct tttset {
 	WORD LogTypePlainText;
 	WORD LogTimestamp;
 	char LogDefaultName[80];
-	char LogDefaultPath[MAX_PATH];
+	wchar_t *LogDefaultPathW;	// ログフォルダ([file]/[log]メニューのログ)
 	WORD LogAutoStart;
 	unsigned int PasteFlag;
 	WORD FallbackToCP932;	// ConfirmPasteMouseRButton が廃止になったので転用

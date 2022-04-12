@@ -608,9 +608,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.lpstrFile = fname;
 			ofn.nMaxFile = _countof(fname);
 			ofn.lpstrTitle = caption;
-			ofn.lpstrInitialDir = ToWcharA(work->pts->LogDefaultPath);
+			ofn.lpstrInitialDir = work->pts->LogDefaultPathW;
 			BOOL Ok = GetSaveFileNameW(&ofn);
-			free((void *)ofn.lpstrInitialDir);
 			free(caption);
 			free(FNFilter);
 			if (Ok) {
@@ -1354,14 +1353,7 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
  */
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 {
-	char *logdir;
-
-	if (strlen(ts.LogDefaultPath) > 0) {
-		logdir = _strdup(ts.LogDefaultPath);
-	}
-	else {
-		logdir = ToCharW(ts.LogDirW);
-	}
+	const char *logdir = ToCharW(ts.LogDefaultPathW);
 
 	// Œ³‚Æ‚È‚éƒtƒ@ƒCƒ‹–¼
 	char base_name[MAX_PATH];
@@ -1380,7 +1372,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	ParseStrftimeFileName(full_path, sizeof(full_path));
 	ConvertLogname(full_path, sizeof(full_path));
 
-	free(logdir);
+	free((void *)logdir);
 	return ToWcharA(full_path);
 }
 

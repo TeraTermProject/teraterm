@@ -1266,10 +1266,13 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        ts->LogDefaultName, sizeof(ts->LogDefaultName),
 	                        FName);
 
-	/* Default Log file path (2007.5.30 maya) */
-	GetPrivateProfileString(Section, "LogDefaultPath", "",
-	                        ts->LogDefaultPath, sizeof(ts->LogDefaultPath),
-	                        FName);
+	/* Default Log file path */
+	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
+	if (ts->LogDefaultPathW[0] == 0) {
+		// 未指定("LogDefaultPath=")だった、デフォルト値を入れておく
+		free(ts->LogDefaultPathW);
+		ts->LogDefaultPathW = _wcsdup(ts->LogDirW);
+	}
 
 	/* Auto start logging (2007.5.31 maya) */
 	ts->LogAutoStart = GetOnOff(Section, "LogAutoStart", FName, FALSE);
@@ -2746,9 +2749,12 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "LogDefaultName",
 	                          ts->LogDefaultName, FName);
 
-	/* Default Log file path (2007.5.30 maya) */
-	WritePrivateProfileString(Section, "LogDefaultPath",
-	                          ts->LogDefaultPath, FName);
+	/* Default Log file path */
+	if (wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
+		// 異なっているとき、フォルダを指定してる
+		WritePrivateProfileStringW(SectionW, L"LogDefaultPath",
+								   ts->LogDefaultPathW, FName);
+	}
 
 	/* Auto start logging (2007.5.31 maya) */
 	WriteOnOff(Section, "LogAutoStart", FName, ts->LogAutoStart);
