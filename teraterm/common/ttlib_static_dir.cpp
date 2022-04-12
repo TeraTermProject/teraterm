@@ -104,6 +104,21 @@ static wchar_t *GetAppdataDir(void)
 }
 #endif
 
+/**
+ *	LocalAppDataフォルダの取得
+ *	環境変数 LOCALAPPDATA のフォルダ
+ *
+ *	@retval	LocalAppDataフォルダ
+ */
+#if ENABLE_COMAPT_WIN
+static wchar_t *GetLocalAppdataDir(void)
+{
+	wchar_t *path;
+	_SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
+	return path;
+}
+#endif
+
 /*
  * Get Exe(exe,dll) directory
  *	ttermpro.exe, プラグインがあるフォルダ
@@ -208,7 +223,7 @@ wchar_t* GetLogDirW(HINSTANCE hInst)
 		free(ExeDirW);
 	}
 	else {
-		wchar_t *path = GetAppdataDir();
+		wchar_t *path = GetLocalAppdataDir();
 		awcscats(&ret, path, L"\\teraterm5", NULL);
 		free(path);
 	}
