@@ -52,6 +52,7 @@
 #include "helpid.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 #include "filesys_log_res.h"
 #include "filesys_log.h"
@@ -560,9 +561,9 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			wchar_t filename[MAX_PATH];
-			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
-			work->info->filename = _wcsdup(filename);
+			wchar_t *filename;
+			hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
+			work->info->filename = filename;
 			work->info->append = IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED;
 			work->info->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
 			work->info->code = (LogCode_t)SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_GETCURSEL, 0, 0);
@@ -579,8 +580,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		case IDC_FOPT_FILENAME_BUTTON: {
 			/* save current dir */
 			const wchar_t *UILanguageFile = work->pts->UILanguageFileW;
-			wchar_t curdir[MAXPATHLEN];
-			GetCurrentDirectoryW(_countof(curdir), curdir);
+			wchar_t *curdir;
+			hGetCurrentDirectoryW(&curdir);
 
 			wchar_t fname[MAX_PATH];
 			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
@@ -618,6 +619,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			/* restore dir */
 			SetCurrentDirectoryW(curdir);
+			free(curdir);
 
 			break;
 		}
@@ -641,9 +643,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		case IDC_FOPT_FILENAME_EDIT:
 			if (HIWORD(wParam) == EN_CHANGE){
-				wchar_t filename[MAX_PATH];
-				GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename, _countof(filename));
+				wchar_t *filename;
+				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
 				CheckLogFile(Dialog, filename, work);
+				free(filename);
 			}
 			break;
 		case IDC_NEW_OVERWRITE:
