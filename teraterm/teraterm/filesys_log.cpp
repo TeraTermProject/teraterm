@@ -684,8 +684,8 @@ static void OpenLogFile(PFileVar fv)
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
-	LogVar->FileHandle = CreateFileW(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-									  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	LogVar->FileHandle = CreateFileW(fv->FullName, GENERIC_WRITE, dwShareMode, NULL,
+									 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
 static BOOL LogStart(const wchar_t *fname)
@@ -1156,7 +1156,7 @@ void FLogRotateHalt(void)
 	LogVar->RotateStep = 0;
 }
 
-static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_COMMENT_TITLE" },
@@ -1207,7 +1207,7 @@ void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 		return;
 	}
 	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
-				HVTWin, OnCommentDlgProc);
+				hWnd, OnCommentDlgProc);
 }
 
 void FLogClose(void)
@@ -1494,7 +1494,6 @@ void FLogWriteFile(void)
 void FLogPutUTF32(unsigned int u32)
 {
 	PFileVar fv = LogVar;
-	size_t i;
 	BOOL log_available = (cv_LogBuf != 0);
 
 	if (!log_available) {
@@ -1516,7 +1515,7 @@ void FLogPutUTF32(unsigned int u32)
 		// UTF-8
 		char u8_buf[4];
 		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
-		for (i = 0; i < u8_len; i++) {
+		for (size_t i = 0; i < u8_len; i++) {
 			BYTE b = u8_buf[i];
 			LogPut1(b);
 		}
@@ -1527,8 +1526,7 @@ void FLogPutUTF32(unsigned int u32)
 		// UTF-16
 		wchar_t u16[2];
 		size_t u16_len = UTF32ToUTF16(u32, u16, _countof(u16));
-		size_t i;
-		for (i = 0; i < u16_len; i++) {
+		for (size_t i = 0; i < u16_len; i++) {
 			if (fv->log_code == LOG_UTF16LE) {
 				// UTF-16LE
 				LogPut1(u16[i] & 0xff);
