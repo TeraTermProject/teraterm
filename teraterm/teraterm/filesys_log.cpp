@@ -578,20 +578,22 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		case IDC_FOPT_FILENAME_BUTTON: {
 			/* save current dir */
-			const char *UILanguageFile = work->pts->UILanguageFile;
+			const wchar_t *UILanguageFile = work->pts->UILanguageFileW;
 			wchar_t curdir[MAXPATHLEN];
 			GetCurrentDirectoryW(_countof(curdir), curdir);
 
 			wchar_t fname[MAX_PATH];
 			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
 
-			wchar_t *FNFilter = GetCommonDialogFilterW(NULL, UILanguageFile);
+			const wchar_t* simple_log_filter = L"*.txt;*.log";
+			wchar_t *FNFilter = GetCommonDialogFilterWW(simple_log_filter, UILanguageFile);
 
-			wchar_t caption[MAX_PATH];
-			wchar_t uimsg[MAX_UIMSG];
-			get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLog, UILanguageFile);
-			wcsncpy_s(caption, _countof(caption), L"Tera Term: ", _TRUNCATE);
-			wcsncat_s(caption, _countof(caption), uimsg, _TRUNCATE);
+			wchar_t *caption;
+			wchar_t *uimsg;
+			GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG",
+						 TitLog, UILanguageFile, &uimsg);
+			aswprintf(&caption, L"Tera Term: %s", uimsg);
+			free(uimsg);
 
 			OPENFILENAMEW ofn = {};
 			ofn.lStructSize = get_OPENFILENAME_SIZEW();
@@ -605,7 +607,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.lpstrFile = fname;
 			ofn.nMaxFile = _countof(fname);
 			ofn.lpstrTitle = caption;
+			ofn.lpstrInitialDir = ToWcharA(work->pts->LogDefaultPath);
 			BOOL Ok = GetSaveFileNameW(&ofn);
+			free((void *)ofn.lpstrInitialDir);
+			free(caption);
 			free(FNFilter);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
