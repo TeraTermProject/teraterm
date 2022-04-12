@@ -502,7 +502,6 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
 
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
-		work->info->filename = NULL;
 
 		// Binary/Text チェックボックス
 		if (pts->LogBinary) {
@@ -549,6 +548,9 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		if (pts->LogBinary || !pts->LogTimestamp) {
 			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		}
+
+		CheckLogFile(Dialog, work->info->filename, work);
+		work->info->filename = NULL;
 
 		CenterWindow(Dialog, GetParent(Dialog));
 
