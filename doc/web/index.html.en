@@ -151,10 +151,10 @@ Tera Term language files to localize the menu and the message are as follows. If
 
 <tr>
   <td>English</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/English.lng?root=ttssh2&amp;view=log">English.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/English.lng">English.lng</a></td>
   <td rowspan="8">2019-11-22</td>
   <td>-</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/English.lng?root=ttssh2&amp;view=log">English.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/English.lng">English.lng</a></td>
   <td rowspan="8">2021-12-08</td>
   <td>-</td>
   <td>-</td>
@@ -162,63 +162,63 @@ Tera Term language files to localize the menu and the message are as follows. If
 
 <tr>
   <td>Japanese</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/Japanese.lng?root=ttssh2&amp;view=log">Japanese.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Japanese.lng">Japanese.lng</a></td>
   <td>-</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/Japanese.lng?root=ttssh2&amp;view=log">Japanese.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Japanese.lng">Japanese.lng</a></td>
   <td>-</td>
   <td>-</td>
 </tr>
 
 <tr>
   <td>German</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/German.lng?root=ttssh2&amp;view=log">German.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/German.lng">German.lng</a></td>
   <td>2010-05-17</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/German.lng?root=ttssh2&amp;view=log">German.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/German.lng">German.lng</a></td>
   <td>2010-05-17</td>
   <td>Alexander Wiechert</td>
 </tr>
 
 <tr>
   <td>French</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/French.lng?root=ttssh2&amp;view=log">French.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/French.lng">French.lng</a></td>
   <td>2010-07-21</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/French.lng?root=ttssh2&amp;view=log">French.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/French.lng">French.lng</a></td>
   <td>2010-07-21</td>
   <td>Francois MOCQ</td>
 </tr>
 
 <tr>
   <td>Russian</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/Russian.lng?root=ttssh2&amp;view=log">Russian.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Russian.lng">Russian.lng</a></td>
   <td>2017-07-19</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/Russian.lng?root=ttssh2&amp;view=log">Russian.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Russian.lng">Russian.lng</a></td>
   <td>2017-07-19</td>
   <td>Sergey Ryumik</td>
 </tr>
 
 <tr>
   <td>Korean</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/Korean.lng?root=ttssh2&amp;view=log">Korean.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Korean.lng">Korean.lng</a></td>
   <td>2013-07-25</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/Korean.lng?root=ttssh2&amp;view=log">Korean.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Korean.lng">Korean.lng</a></td>
   <td>2013-07-25</td>
   <td>Daehong Kim</td>
 </tr>
 
 <tr>
   <td>Chinese (Simplified)</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/Simplified%20Chinese.lng?root=ttssh2&amp;view=log">Simplified Chinese.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
   <td>2017-04-11</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/Simplified%20Chinese.lng?root=ttssh2&amp;view=log">Simplified Chinese.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
   <td>2017-04-11</td>
   <td>LiShaohui</td>
 </tr>
 
 <tr>
   <td>Chinese (Traditional)</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/branches/4-stable/installer/release/lang/Traditional%20Chinese.lng?root=ttssh2&amp;view=log">Traditional Chinese.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
   <td>2014-09-22</td>
-  <td><a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/installer/release/lang_utf8/Traditional%20Chinese.lng?root=ttssh2&amp;view=log">Traditional Chinese.lng</a></td>
+  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
   <td>2014-09-22</td>
   <td>Wei Yan</td>
 </tr>
