@@ -60,13 +60,13 @@ document.write('(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###
 </noscript>
 
 
-<h2>TeraTerm Project</h2>
+<h2 id="Project">TeraTerm Project</h2>
 
 <p>
 TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH module "TTSSH". This software is open source software under <a href="/manual/en/about/copyright.html">BSD License</a>. This is Tera Term Pro 2.3 succession version and is being officially recognized by the original author. Development is continuing in <a href="https://osdn.net/projects/ttssh2/">Project Page</a> on OSDN.
 </p>
 
-<h2>Download</h2>
+<h2 id="Download">Download</h2>
 
 <p>
 Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>. Current latest release is <a href="https://osdn.net/rel/ttssh2/4.106">4.106</a>.
@@ -77,7 +77,7 @@ If you can get latest development version, the source code is available from <a 
 Here is the <a href="https://osdn.net/projects/ttssh2/releases/p15375">Old release</a>, however we recommend using the latest release as possible.
 </p>
 
-<h2>Manual</h2>
+<h2 id="Manual">Manual</h2>
 
 <p>
 Following manuals are available.<br>
@@ -89,7 +89,7 @@ However, a user can check next version contents. Tera Term developer can prelimi
 <li><a href="/manual/en/macro/">MACRO for Tera Term</a></li>
 </ul>
 
-<h2>Support</h2>
+<h2 id="Support">Support</h2>
 
 <p>
 Please report bugs to <a href="https://osdn.net/projects/ttssh2/ticket/?type%5B%5D=5333&type_mode%5B%5D=eq&status%5B%5D=1">Bugs</a> of Ticket.
@@ -122,12 +122,12 @@ The <a href="http://logmett.com/forum/">support forum</a> is maintanced by Boris
 
 The <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">ttssh2-dev</a> ML is opened for Tera Term development. But this mailing list is Japanese only.
 
-<h3>How to build source codes</h3>
+<h3 id="build">How to build source codes</h3>
 <p>
 Refer to <a href="https://ttssh2.osdn.jp/manual/en/reference/develop.txt">develop.txt</a>.
 </p>
 
-<h3>Translations</h3>
+<h3 id="localize">Translations</h3>
 <p>
 Tera Term language files to localize the menu and the message are as follows. If you want to add a new language, please download the provided `English.lng' file and translate it with your language. Also, e-mail the translated file to us.
 </p>

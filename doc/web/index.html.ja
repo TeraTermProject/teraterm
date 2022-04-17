@@ -60,13 +60,13 @@ document.write('(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###
 </noscript>
 
 
-<h2>TeraTerm Project</h2>
+<h2 id="Project">TeraTerm Project</h2>
 
 <p>
 TeraTerm Project は、ターミナルエミュレータ Tera Term 、および SSH 対応拡張モジュール TTSSH の開発をしています。<a href="/manual/ja/about/copyright.html">BSDライセンス</a>に基づくオープンソース・ソフトウェアです。オリジナルの Tera Term Pro 2.3 の原作者公認の後継版です。開発は、OSDN上の<a href="https://ja.osdn.net/projects/ttssh2/">プロジェクトページ</a>で行われています。
 </p>
 
-<h2>ダウンロード</h2>
+<h2 id="Download">ダウンロード</h2>
 
 <p>
 最新のリリースは、OSDN より<a href="https://ja.osdn.net/projects/ttssh2/releases/">ダウンロード</a>することができます。現在の最新版は <a href="https://ja.osdn.net/rel/ttssh2/4.106">4.106</a> です。
@@ -77,7 +77,7 @@ TeraTerm Project は、ターミナルエミュレータ Tera Term 、および 
 <a href="https://ja.osdn.net/projects/ttssh2/releases/p15375">古いリリース</a>はこちらから入手可能ですが、なるべく最新版を利用することを推奨します。
 </p>
 
-<h2>マニュアル</h2>
+<h2 id="Manual">マニュアル</h2>
 
 <p>
 以下のマニュアルがあります。<br>
@@ -89,7 +89,7 @@ TeraTerm Project は、ターミナルエミュレータ Tera Term 、および 
 <li><a href="/manual/ja/macro/">MACROヘルプ</a></li>
 </ul>
 
-<h2>サポート</h2>
+<h2 id="Support">サポート</h2>
 
 <p>
 バグの報告は、チケットの「<a href="https://ja.osdn.net/projects/ttssh2/ticket/?type%5B%5D=5333&amp;type_mode%5B%5D=eq&amp;status%5B%5D=1">バグ</a>」までお願いします。
@@ -127,12 +127,12 @@ Tera Term 開発のためのメーリングリスト <a href="https://lists.osdn
 TeraTerm Projectでは、共同開発者を募集しています。オープンソース開発に興味ある方は、プロジェクトチーム(ttssh2-contact<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me)までご連絡願います。
 </p>
 
-<h3>ソースコードのビルド方法</h3>
+<h3 id="build">ソースコードのビルド方法</h3>
 <p>
 <a href="/manual/ja/reference/develop.txt">develop.txt</a>を参照願います。
 </p>
 
-<h3>言語ファイルの翻訳</h3>
+<h3 id="localize">言語ファイルの翻訳</h3>
 <p>
 Tera Termのメニューやメッセージをローカライズするための、言語ファイルの各言語への翻訳状況は以下のようになっています。他言語への翻訳を行われた場合は、プロジェクトチームまでご連絡願います。
 </p>
