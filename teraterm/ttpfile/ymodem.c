@@ -817,7 +817,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			case 'C':
 			case 'G':
 				// 'C'を受け取ると、ブロックの送信を開始する。
-				if ((0 == yv->PktNum) && (0 == yv->PktNumOffset))
+				if ((0 == yv->PktNum) && (0 == yv->PktNumOffset) && !(yv->LastMessage == 'C'))
 				{
 					// ファイル情報送信後、ACK -> 'C' と受信したので、次のブロックを送信する。
 					if (yv->SendFileInfo)
