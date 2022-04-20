@@ -2452,6 +2452,83 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 	strncpy_s(buf, buf_size, "unknown compiler");
 }
 #endif
+
+#if defined(WDK_NTDDI_VERSION)
+// ビルドしたときに使われた SDK のバージョンを取得する
+// URL: https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
+// - Visual Studio Installer に表示されるバージョン
+// - インストールされた SDK が「アプリと機能」で表示されるバージョン
+// - 上記 URL での表示バージョン
+// - インストール先フォルダ名
+// で、最後のブロックの数字が同じではない。
+// 
+static void GetSDKInfo(char *buf, size_t buf_size)
+{
+	char tmpbuf[128];
+
+	if (WDK_NTDDI_VERSION >= 0x0A00000B) {
+		strncpy_s(buf, buf_size, "Windows SDK", _TRUNCATE);
+		switch (WDK_NTDDI_VERSION) {
+			case 0x0A00000B: // NTDDI_WIN10_CO
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.22000.194)", _TRUNCATE);
+				break;
+			default:
+				strncat_s(buf, buf_size, " (unknown)", _TRUNCATE);
+				break;
+		}
+	}
+	else if (WDK_NTDDI_VERSION >= 0x0A000000) {
+		strncpy_s(buf, buf_size, "Windows 10 SDK", _TRUNCATE);
+		switch (WDK_NTDDI_VERSION) {
+			case 0x0A000000: // NTDDI_WIN10, 1507
+				strncat_s(buf, buf_size, " (10.0.10240.0)", _TRUNCATE);
+				break;
+			case 0x0A000001: // NTDDI_WIN10_TH2, 1511
+				strncat_s(buf, buf_size, " Version 1511 (10.0.10586.212)", _TRUNCATE);
+				break;
+			case 0x0A000002: // NTDDI_WIN10_RS1, 1607
+				strncat_s(buf, buf_size, " Version 1607 (10.0.14393.795)", _TRUNCATE);
+				break;
+			case 0x0A000003: // NTDDI_WIN10_RS2, 1703
+				strncat_s(buf, buf_size, " Version 1703 (10.0.15063.468)", _TRUNCATE);
+				break;
+			case 0x0A000004: // NTDDI_WIN10_RS3, 1709
+				strncat_s(buf, buf_size, " Version 1709 (10.0.16299.91)", _TRUNCATE);
+				break;
+			case 0x0A000005: // NTDDI_WIN10_RS4, 1803
+				strncat_s(buf, buf_size, " Version 1803 (10.0.17134.12)", _TRUNCATE);
+				break;
+			case 0x0A000006: // NTDDI_WIN10_RS5, 1809
+				strncat_s(buf, buf_size, " Version 1809 (10.0.17763.132)", _TRUNCATE);
+				break;
+			case 0x0A000007: // NTDDI_WIN10_19H1, 1903
+				strncat_s(buf, buf_size, " Version 1903 (10.0.18362.1)", _TRUNCATE);
+				break;
+			case 0x0A000008: // NTDDI_WIN10_VB, 2004
+				strncat_s(buf, buf_size, " Version 2004 (10.0.19041.685)", _TRUNCATE);
+				break;
+			case 0x0A000009: // NTDDI_WIN10_MN, 2004? cf. _PCW_REGISTRATION_INFORMATION
+				strncat_s(buf, buf_size, " Version 2004 (10.0.19645.0)", _TRUNCATE);
+				break;
+			case 0x0A00000A: // NTDDI_WIN10_FE, 2104
+				strncat_s(buf, buf_size, " Version 2104 (10.0.20348.1)", _TRUNCATE);
+				break;
+			default:
+				strncat_s(buf, buf_size, " (unknown)", _TRUNCATE);
+				break;
+		}
+	}
+	else {
+		strncpy_s(buf, buf_size, "Windows SDK unknown", _TRUNCATE);
+	}
+}
+#else
+static void GetSDKInfo(char *buf, size_t buf_size)
+{
+	strncpy_s(buf, buf_size, "Windows SDK unknown", _TRUNCATE);
+}
+#endif
+
 static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
