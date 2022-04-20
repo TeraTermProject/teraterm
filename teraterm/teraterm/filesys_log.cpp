@@ -725,7 +725,7 @@ static BOOL LogStart(const wchar_t *fname)
 	cv_LCount = 0;
 
 	OpenLogFile(fv);
-	if (LogVar->FileHandle == INVALID_HANDLE_VALUE) {
+	if (fv->FileHandle == INVALID_HANDLE_VALUE) {
 		return FALSE;
 	}
 
@@ -733,7 +733,7 @@ static BOOL LogStart(const wchar_t *fname)
 	fv->eLineEnd = Line_LineHead;
 	if (ts.Append > 0)
 	{
-		SetFilePointer(LogVar->FileHandle, 0, NULL, FILE_END);
+		SetFilePointer(fv->FileHandle, 0, NULL, FILE_END);
 		/* 2007.05.24 Gentaro
 		   If log file already exists,
 		   a newline is inserted before the first timestamp.
@@ -748,33 +748,33 @@ static BOOL LogStart(const wchar_t *fname)
 	}
 
 	// Log rotate configuration
-	LogVar->RotateMode = ts.LogRotate;
-	LogVar->RotateSize = ts.LogRotateSize;
-	LogVar->RotateStep = ts.LogRotateStep;
+	fv->RotateMode = ts.LogRotate;
+	fv->RotateSize = ts.LogRotateSize;
+	fv->RotateStep = ts.LogRotateStep;
 
 	// Log rotateが有効の場合、初期ファイルサイズを設定する。
 	// 最初のファイルが設定したサイズでローテートしない問題の修正。
 	// (2016.4.9 yutaka)
-	if (LogVar->RotateMode != ROTATE_NONE) {
-		DWORD size = GetFileSize(LogVar->FileHandle, NULL);
+	if (fv->RotateMode != ROTATE_NONE) {
+		DWORD size = GetFileSize(fv->FileHandle, NULL);
 		if (size == -1) {
 			return FALSE;
 		}
-		LogVar->ByteCount = size;
+		fv->ByteCount = size;
 	}
 	else {
-		LogVar->ByteCount = 0;
+		fv->ByteCount = 0;
 	}
 
-	if (! OpenFTDlg_(LogVar)) {
+	if (! OpenFTDlg_(fv)) {
 		return FALSE;
 	}
 
-	LogVar->IsPause = FALSE;
-	LogVar->StartTime = GetTickCount();
+	fv->IsPause = FALSE;
+	fv->StartTime = GetTickCount();
 
 	if (ts.DeferredLogWriteMode) {
-		StartThread(LogVar);
+		StartThread(fv);
 	}
 
 	if (FileLog) {
@@ -1557,22 +1557,22 @@ static void FLogOutputBOM(void)
 	case 0: {
 		// UTF-8
 		const char *bom = "\xef\xbb\xbf";
-		WriteFile(LogVar->FileHandle, bom, 3, &wrote, NULL);
-		LogVar->ByteCount += 3;
+		WriteFile(fv->FileHandle, bom, 3, &wrote, NULL);
+		fv->ByteCount += 3;
 		break;
 	}
 	case 1: {
 		// UTF-16LE
 		const char *bom = "\xff\xfe";
-		WriteFile(LogVar->FileHandle, bom, 2, &wrote, NULL);
-		LogVar->ByteCount += 2;
+		WriteFile(fv->FileHandle, bom, 2, &wrote, NULL);
+		fv->ByteCount += 2;
 		break;
 	}
 	case 2: {
 		// UTF-16BE
 		const char *bom = "\xfe\xff";
-		WriteFile(LogVar->FileHandle, bom, 2, &wrote, NULL);
-		LogVar->ByteCount += 2;
+		WriteFile(fv->FileHandle, bom, 2, &wrote, NULL);
+		fv->ByteCount += 2;
 		break;
 	}
 	default:
