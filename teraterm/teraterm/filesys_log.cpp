@@ -507,6 +507,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// Binary/Text チェックボックス
 		if (pts->LogBinary) {
 			CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTBIN);
+			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
+			EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
 		}
 		else {
 			CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTTEXT);
