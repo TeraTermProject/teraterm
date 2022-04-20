@@ -738,11 +738,11 @@ static BOOL LogStart(const wchar_t *fname)
 		*/
 		fv->eLineEnd = Line_FileHead;
 	}
-	else {
-		// 追記ではない(新規)場合は BOM を出力する
-		if (fv->bom) {
-			FLogOutputBOM();
-		}
+
+	// BOM出力
+	if (ts.Append == 0 && ts.LogBinary == 0 && fv->bom) {
+		// 追記ではない(新規) && バイナリではない && BOM を出力時
+		FLogOutputBOM();
 	}
 
 	// Log rotate configuration
