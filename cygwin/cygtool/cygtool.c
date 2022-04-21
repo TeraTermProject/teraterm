@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <wchar.h>
 
+#define CYGTOOL_DLL
 #include "cygtool.h"
 
 int __stdcall FindCygwinPath(const wchar_t *CygwinDirectory, wchar_t *Dir, size_t Dirlen)

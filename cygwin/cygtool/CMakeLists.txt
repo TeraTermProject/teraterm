@@ -7,28 +7,24 @@ project(${PACKAGE_NAME})
 add_library(
   ${PACKAGE_NAME} SHARED
   cygtool.c
-  cygtool.def
+  cygtool.h
   )
-
 if(MSVC)
-  target_compile_options(
+  target_sources(
     ${PACKAGE_NAME}
     PRIVATE
-    -MT
+    cygtool.def
     )
 endif()
 
 if(MINGW)
   # libgcc_s_dw2-1.dll に依存しないため
-  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
-    target_link_options(
-      ${PACKAGE_NAME}
-      PRIVATE
-      -static-libgcc
-      )
-  else()
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
-  endif()
+  target_link_options(
+    ${PACKAGE_NAME}
+    PRIVATE
+    -static-libgcc
+    -Wl,--add-stdcall-alias
+  )
 endif()
 
 if(SUPPORT_OLD_WINDOWS)
@@ -48,6 +44,14 @@ if(SUPPORT_OLD_WINDOWS)
   endif()
 endif(SUPPORT_OLD_WINDOWS)
 
+if(MINGW)
+  set_target_properties(
+    ${PACKAGE_NAME}
+    PROPERTIES PREFIX ""
+    SUFFIX ".dll"
+    )
+endif()
+
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
@@ -62,12 +66,7 @@ target_include_directories(
 
 install(
   TARGETS ${PACKAGE_NAME}
-  DESTINATION .
-  )
-
-install(
-  TARGETS ${PACKAGE_NAME}
-  DESTINATION .
+  RUNTIME DESTINATION .
   )
 
 ###### cygtool_tester
@@ -75,12 +74,6 @@ install(
 add_executable(
   cygtool_tester
   cygtool_tester.c
-  )
-
-target_compile_options(
-  cygtool_tester
-  PRIVATE
-  -I ${CMAKE_CURRENT_LIST_DIR}/../../teraterm/common
   )
 
 target_link_libraries(

@@ -92,6 +92,9 @@
   <ItemGroup>
     <ClCompile Include="cygtool.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cygtool.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

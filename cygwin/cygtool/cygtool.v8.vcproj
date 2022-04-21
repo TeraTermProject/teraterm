@@ -61,6 +61,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib"
+				ModuleDefinitionFile="cygtool.def"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -131,6 +132,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib"
+				ModuleDefinitionFile="cygtool.def"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -167,6 +169,10 @@
 		</File>
 		<File
 			RelativePath=".\cygtool.def"
+			>
+		</File>
+		<File
+			RelativePath=".\cygtool.h"
 			>
 		</File>
 	</Files>

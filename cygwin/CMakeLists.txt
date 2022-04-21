@@ -31,9 +31,9 @@ else()
   # other build system...
   if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
     add_subdirectory(cygtool_build)
-    if(TARGET cygtool_build)
+    if(TARGET cygtool)
       set_target_properties(
-        cygtool_build
+        cygtool
         PROPERTIES FOLDER cygwin)
     endif()
   endif()
