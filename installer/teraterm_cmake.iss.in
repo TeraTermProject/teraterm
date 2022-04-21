@@ -26,7 +26,7 @@ Name: build.bat
 ;Name: makearchive.bat; Parameters: release
 
 [Setup]
-AppCopyright=(C) 2004-2020 TeraTerm Project
+AppCopyright=(C) 2004-2022 TeraTerm Project
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://ttssh2.osdn.jp/
 AppSupportURL=https://ttssh2.osdn.jp/

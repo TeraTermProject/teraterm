@@ -290,7 +290,6 @@
      - teraterm\teraterm\tt-version.rc // VERSIONINFO
      - teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO
      - teraterm\ttpdlg\ttpdlg.rc // dialog
-     - teraterm\ttpfile\ttpfile-version.rc // VERSIONINFO
      - teraterm\ttpmacro\ttm-version.rc // VERSIONINFO
      - teraterm\ttpset\ttpset-version.rc // VERSIONINFO
      - teraterm\ttptek\ttptek-version.rc // VERSIONINFO
