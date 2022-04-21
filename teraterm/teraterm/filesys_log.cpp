@@ -98,11 +98,8 @@ typedef struct {
 
 	BOOL FileLog;
 	BOOL BinLog;
-} TFileVar_;
-typedef TFileVar_ *PFileVar_;
-
-#define PFileVar PFileVar_
-#define TFileVar TFileVar_
+} TFileVar;
+typedef TFileVar *PFileVar;
 
 static PFileVar LogVar = NULL;
 
@@ -115,15 +112,14 @@ static int cv_BinSkip;
 // 遅延書き込み用スレッドのメッセージ
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
 
-static void FileTransEnd_(void);
 static void Log1Bin(BYTE b);
 static void LogBinSkip(int add);
 static BOOL CreateLogBuf(void);
 static BOOL CreateBinBuf(void);
 void LogPut1(BYTE b);
 static void OutputStr(const wchar_t *str);
-static void LogToFile(void);
-static void FLogOutputBOM(void);
+static void LogToFile(PFileVar fv);
+static void FLogOutputBOM(PFileVar fv);
 
 static BOOL OpenFTDlg_(PFileVar fv)
 {
@@ -228,29 +224,29 @@ static void FixLogOption(void)
 
 
 // スレッドの終了とファイルのクローズ
-static void CloseFileSync(PFileVar ptr)
+static void CloseFileSync(PFileVar fv)
 {
 	BOOL ret;
 
-	if (ptr->FileHandle == INVALID_HANDLE_VALUE) {
+	if (fv->FileHandle == INVALID_HANDLE_VALUE) {
 		return;
 	}
 
-	if (ptr->LogThread != INVALID_HANDLE_VALUE) {
+	if (fv->LogThread != INVALID_HANDLE_VALUE) {
 		// スレッドの終了待ち
-		ret = PostThreadMessage(ptr->LogThreadId, WM_QUIT, 0, 0);
+		ret = PostThreadMessage(fv->LogThreadId, WM_QUIT, 0, 0);
 		if (ret != 0) {
 			// スレッドキューにエンキューできた場合のみ待ち合わせを行う。
-			WaitForSingleObject(ptr->LogThread, INFINITE);
+			WaitForSingleObject(fv->LogThread, INFINITE);
 		}
 		else {
 			//DWORD code = GetLastError();
 		}
-		CloseHandle(ptr->LogThread);
-		ptr->LogThread = INVALID_HANDLE_VALUE;
+		CloseHandle(fv->LogThread);
+		fv->LogThread = INVALID_HANDLE_VALUE;
 	}
-	CloseHandle(ptr->FileHandle);
-	ptr->FileHandle = INVALID_HANDLE_VALUE;
+	CloseHandle(fv->FileHandle);
+	fv->FileHandle = INVALID_HANDLE_VALUE;
 }
 
 // 遅延書き込み用スレッド
@@ -274,7 +270,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 			case WM_DPC_LOGTHREAD_SEND:
 				buf = (PCHAR)msg.wParam;
 				buflen = (DWORD)msg.lParam;
-				WriteFile(LogVar->FileHandle, buf, buflen, &wrote, NULL);
+				WriteFile(fv->FileHandle, buf, buflen, &wrote, NULL);
 				free(buf);   // ここでメモリ解放
 				break;
 
@@ -692,14 +688,12 @@ static void OpenLogFile(PFileVar fv)
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
-	LogVar->FileHandle = CreateFileW(fv->FullName, GENERIC_WRITE, dwShareMode, NULL,
-									 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	fv->FileHandle = CreateFileW(fv->FullName, GENERIC_WRITE, dwShareMode, NULL,
+								 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
-static BOOL LogStart(const wchar_t *fname)
+static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 {
-	PFileVar fv = LogVar;
-
 	fv->FullName = _wcsdup(fname);
 	FixLogOption();
 
@@ -743,7 +737,7 @@ static BOOL LogStart(const wchar_t *fname)
 	// BOM出力
 	if (ts.Append == 0 && ts.LogBinary == 0 && fv->bom) {
 		// 追記ではない(新規) && バイナリではない && BOM を出力時
-		FLogOutputBOM();
+		FLogOutputBOM(fv);
 	}
 
 	// Log rotate configuration
@@ -796,6 +790,7 @@ static BOOL LogStart(const wchar_t *fname)
  */
 void FLogOutputAllBuffer(void)
 {
+	PFileVar fv = LogVar;
 	DWORD ofs;
 	int size;
 	wchar_t buf[512];
@@ -807,7 +802,7 @@ void FLogOutputAllBuffer(void)
 
 		OutputStr(buf);
 		OutputStr(L"\r\n");
-		LogToFile();
+		LogToFile(fv);
 	}
 }
 
@@ -871,36 +866,36 @@ static inline void logfile_unlock(void)
 
 // ログをローテートする。
 // (2013.3.21 yutaka)
-static void LogRotate(void)
+static void LogRotate(PFileVar fv)
 {
 	int loopmax = 10000;  // XXX
 	int i, k;
 
-	if (LogVar->RotateMode == ROTATE_NONE)
+	if (fv->RotateMode == ROTATE_NONE)
 		return;
 
-	if (LogVar->RotateMode == ROTATE_SIZE) {
-		if (LogVar->ByteCount <= LogVar->RotateSize)
+	if (fv->RotateMode == ROTATE_SIZE) {
+		if (fv->ByteCount <= fv->RotateSize)
 			return;
-		//OutputDebugPrintf("%s: mode %d size %ld\n", __FUNCTION__, LogVar->RotateMode, LogVar->ByteCount);
+		//OutputDebugPrintf("%s: mode %d size %ld\n", __FUNCTION__, fv->RotateMode, fv->ByteCount);
 	} else {
 		return;
 	}
 
 	logfile_lock();
 	// ログサイズを再初期化する。
-	LogVar->ByteCount = 0;
+	fv->ByteCount = 0;
 
 	// いったん今のファイルをクローズして、別名のファイルをオープンする。
-	CloseFileSync(LogVar);
+	CloseFileSync(fv);
 
 	// 世代ローテーションのステップ数の指定があるか
-	if (LogVar->RotateStep > 0)
-		loopmax = LogVar->RotateStep;
+	if (fv->RotateStep > 0)
+		loopmax = fv->RotateStep;
 
 	for (i = 1 ; i <= loopmax ; i++) {
 		wchar_t *filename;
-		aswprintf(&filename, L"%s.%d", LogVar->FullName, i);
+		aswprintf(&filename, L"%s.%d", fv->FullName, i);
 		DWORD attr = GetFileAttributesW(filename);
 		free(filename);
 		if (attr == INVALID_FILE_ATTRIBUTES)
@@ -915,11 +910,11 @@ static void LogRotate(void)
 	for (k = i-1 ; k >= 0 ; k--) {
 		wchar_t *oldfile;
 		if (k == 0)
-			oldfile = _wcsdup(LogVar->FullName);
+			oldfile = _wcsdup(fv->FullName);
 		else
-			aswprintf(&oldfile, L"%s.%d", LogVar->FullName, k);
+			aswprintf(&oldfile, L"%s.%d", fv->FullName, k);
 		wchar_t *newfile;
-		aswprintf(&newfile, L"%s.%d", LogVar->FullName, k+1);
+		aswprintf(&newfile, L"%s.%d", fv->FullName, k+1);
 		DeleteFileW(newfile);
 		if (MoveFileW(oldfile, newfile) == 0) {
 			OutputDebugPrintf("%s: rename %d\n", __FUNCTION__, errno);
@@ -929,18 +924,18 @@ static void LogRotate(void)
 	}
 
 	// 再オープン
-	OpenLogFile(LogVar);
-	if (LogVar->bom) {
-		FLogOutputBOM();
+	OpenLogFile(fv);
+	if (fv->bom) {
+		FLogOutputBOM(fv);
 	}
 	if (ts.DeferredLogWriteMode) {
-		StartThread(LogVar);
+		StartThread(fv);
 	}
 
 	logfile_unlock();
 }
 
-static wchar_t *TimeStampStr()
+static wchar_t *TimeStampStr(PFileVar fv)
 {
 	char *strtime = NULL;
 	switch (ts.LogTimestampType) {
@@ -952,7 +947,7 @@ static wchar_t *TimeStampStr()
 		strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
 		break;
 	case TIMESTAMP_ELAPSED_LOGSTART:
-		strtime = strelapsed(LogVar->StartTime);
+		strtime = strelapsed(fv->StartTime);
 		break;
 	case TIMESTAMP_ELAPSED_CONNECTED:
 		strtime = strelapsed(cv.ConnectedTime);
@@ -971,9 +966,8 @@ static wchar_t *TimeStampStr()
 /**
  * バッファ内のログをファイルへ書き込む
  */
-static void LogToFile(void)
+static void LogToFile(PFileVar fv)
 {
-	PFileVar fv = LogVar;
 	PCHAR Buf;
 	int Start, Count;
 	BYTE b;
@@ -1015,17 +1009,17 @@ static void LogToFile(void)
 
 		WriteBuf[WriteBufLen++] = b;
 
-		(LogVar->ByteCount)++;
+		(fv->ByteCount)++;
 	}
 
 	// 書き込み
 	if (WriteBufLen > 0) {
 		if (ts.DeferredLogWriteMode) {
-			PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
+			PostThreadMessage(fv->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
 		}
 		else {
 			DWORD wrote;
-			WriteFile(LogVar->FileHandle, WriteBuf, WriteBufLen, &wrote, NULL);
+			WriteFile(fv->FileHandle, WriteBuf, WriteBufLen, &wrote, NULL);
 			free(WriteBuf);
 		}
 	}
@@ -1042,11 +1036,11 @@ static void LogToFile(void)
 		cv_BCount = Count;
 	}
 	if (FLogIsPause() || ProtoGetProtoFlag()) return;
-	LogVar->FLogDlg->RefreshNum(LogVar->StartTime, LogVar->FileSize, LogVar->ByteCount);
+	fv->FLogDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
 
 
 	// ログ・ローテート
-	LogRotate();
+	LogRotate(fv);
 }
 
 static BOOL CreateLogBuf(void)
@@ -1091,29 +1085,26 @@ static void FreeBinBuf(void)
 	cv_BCount = 0;
 }
 
-static void FileTransEnd_(void)
+static void FileTransEnd_(PFileVar fv)
 {
-	if (LogVar == NULL) {
-		return;
-	}
-	PFileVar fv = LogVar;
 	fv->FileLog = FALSE;
 	fv->BinLog = FALSE;
 	cv.Log1Byte = NULL;
 	cv.Log1Bin = NULL;
 	cv.LogBinSkip = NULL;
-	PFileTransDlg FLogDlg = LogVar->FLogDlg;
+	PFileTransDlg FLogDlg = fv->FLogDlg;
 	if (FLogDlg != NULL) {
 		FLogDlg->DestroyWindow();
 		FLogDlg = NULL;
-		LogVar->FLogDlg = NULL;
+		fv->FLogDlg = NULL;
 	}
-	CloseFileSync(LogVar);
+	CloseFileSync(fv);
 	FreeLogBuf();
 	FreeBinBuf();
-	free(LogVar->FullName);
-	LogVar->FullName = NULL;
-	free(LogVar);
+	free(fv->FullName);
+	fv->FullName = NULL;
+	free(fv);
+
 	LogVar = NULL;
 }
 
@@ -1122,11 +1113,12 @@ static void FileTransEnd_(void)
  */
 void FLogPause(BOOL Pause)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
-	LogVar->IsPause = Pause;
-	LogVar->FLogDlg->ChangeButton(Pause);
+	fv->IsPause = Pause;
+	fv->FLogDlg->ChangeButton(Pause);
 }
 
 /**
@@ -1135,11 +1127,12 @@ void FLogPause(BOOL Pause)
  */
 void FLogRotateSize(size_t size)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
-	LogVar->RotateMode = ROTATE_SIZE;
-	LogVar->RotateSize = (LONG)size;
+	fv->RotateMode = ROTATE_SIZE;
+	fv->RotateSize = (LONG)size;
 }
 
 /**
@@ -1148,10 +1141,11 @@ void FLogRotateSize(size_t size)
  */
 void FLogRotateRotate(int step)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
-	LogVar->RotateStep = step;
+	fv->RotateStep = step;
 }
 
 /**
@@ -1160,12 +1154,13 @@ void FLogRotateRotate(int step)
  */
 void FLogRotateHalt(void)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
-	LogVar->RotateMode = ROTATE_NONE;
-	LogVar->RotateSize = 0;
-	LogVar->RotateStep = 0;
+	fv->RotateMode = ROTATE_NONE;
+	fv->RotateSize = 0;
+	fv->RotateStep = 0;
 }
 
 static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM)
@@ -1215,7 +1210,8 @@ static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
  */
 void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
 	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
@@ -1224,11 +1220,12 @@ void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 
 void FLogClose(void)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
 
-	FileTransEnd_();
+	FileTransEnd_(fv);
 }
 
 /**
@@ -1241,14 +1238,12 @@ void FLogClose(void)
  */
 BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 {
-	BOOL ret;
-
 	if (LogVar != NULL) {
 		return FALSE;
 	}
 
 	//
-	PFileVar fv = (PFileVar)malloc(sizeof(TFileVar));
+	PFileVar fv = (PFileVar)malloc(sizeof(*fv));
 	if (fv == NULL) {
 		return FALSE;
 	}
@@ -1260,9 +1255,9 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 
 	fv->log_code = code;
 	fv->bom = bom;
-	ret = LogStart(fname);
+	BOOL ret = LogStart(fv, fname);
 	if (ret == FALSE) {
-		FileTransEnd_();
+		FileTransEnd_(fv);
 	}
 
 	return ret;
@@ -1292,14 +1287,15 @@ void FLogWriteStr(const wchar_t *str)
 
 void FLogInfo(char *param_ptr, size_t param_len)
 {
-	if (LogVar) {
+	PFileVar fv = LogVar;
+	if (fv) {
 		param_ptr[0] = '0'
 			+ (ts.LogBinary != 0)
 			+ ((ts.Append != 0) << 1)
 			+ ((ts.LogTypePlainText != 0) << 2)
 			+ ((ts.LogTimestamp != 0) << 3)
 			+ ((ts.LogHideDialog != 0) << 4);
-		char *filenameU8 = ToU8W(LogVar->FullName);
+		char *filenameU8 = ToU8W(fv->FullName);
 		strncpy_s(param_ptr + 1, param_len - 1, filenameU8, _TRUNCATE);
 		free(filenameU8);
 	}
@@ -1495,14 +1491,14 @@ void FLogWriteFile(void)
 	if (cv_LogBuf!=NULL)
 	{
 		if (fv->FileLog) {
-			LogToFile();
+			LogToFile(fv);
 		}
 	}
 
 	if (cv_BinBuf!=NULL)
 	{
 		if (fv->BinLog) {
-			LogToFile();
+			LogToFile(fv);
 		}
 	}
 }
@@ -1521,7 +1517,7 @@ void FLogPutUTF32(unsigned int u32)
 	if (ts.LogTimestamp && fv->eLineEnd) {
 		// タイムスタンプを出力
 		fv->eLineEnd = Line_Other; /* clear endmark*/
-		wchar_t* strtime = TimeStampStr();
+		wchar_t* strtime = TimeStampStr(fv);
 		FLogWriteStr(strtime);
 		free(strtime);
 	}
@@ -1562,9 +1558,8 @@ void FLogPutUTF32(unsigned int u32)
 	}
 }
 
-static void FLogOutputBOM(void)
+static void FLogOutputBOM(PFileVar fv)
 {
-	PFileVar fv = LogVar;
 	DWORD wrote;
 
 	switch(fv->log_code) {
