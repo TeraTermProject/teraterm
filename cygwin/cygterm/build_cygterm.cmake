@@ -39,26 +39,22 @@ function(GetMsys2Path path)
   if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "MSYS")
     # msys2のcmake
     set(PATH "/c/msys64/usr/bin")
-    if (EXISTS ${PATH})
+    if (EXISTS "c:/msys64/usr/bin/msys-2.0.dll")
       set(${path} ${PATH} PARENT_SCOPE)
     endif()
   elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
-    if(${CMAKE_COMMAND} MATCHES "msys")
-      # msys2/mingw64(32) のcmake
-      set(PATH "c:/msys64/usr/bin")
-      if (EXISTS ${PATH})
-        #なぜかうまくいかない
-        #set(${path} ${PATH} PARENT_SCOPE)
-      endif()
-    else()
-      # windowsのcmake
-      set(PATH "c:\\msys64\\usr\\bin")
-      if (EXISTS ${PATH})
-        set(${path} ${PATH} PARENT_SCOPE)
-      endif()
+    # msys2/mingw64 or msys2/mingw32 or Windows のcmake
+    set(PATH "c:/msys64/usr/bin")   # msys2インストールフォルダ
+    if (EXISTS ${PATH})
+      set(${path} ${PATH} PARENT_SCOPE)
     endif()
+  elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "CYGWIN")
+    # cygwin の cmake ,未実装
+    unset(${path} PARENT_SCOPE)
   else()
+    message("?")
   endif()
+  message("last")
 endfunction()
 
 function(build TARGET_CMAKE_COMMAND DIST_DIR GENERATE_OPTION)
@@ -68,7 +64,7 @@ function(build TARGET_CMAKE_COMMAND DIST_DIR GENERATE_OPTION)
     message("${TARGET_CMAKE_COMMAND} not found")
     return()
   endif()
-  if(${TARGET_CMAKE_COMMAND} MATCHES "msys")
+  if("${TARGET_CMAKE_COMMAND}" MATCHES "msys")
     # msys2のときは、c:/path -> /c/path に書き換える
     string(REGEX REPLACE "([A-z]):[/\\]" "/\\1/" CMAKE_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_DIR}")
     string(REGEX REPLACE "([A-z]):[/\\]" "/\\1/" GENERATE_OPTION "${GENERATE_OPTION}")
@@ -121,10 +117,13 @@ endif()
 
 ## msys2
 GetMsys2Path(PATH)
-set(ENV{PATH} ${PATH})
-message("msys2 ENV{PATH}=$ENV{PATH}")
+if(DEFINED PATH)
+  set(ENV{PATH} "/usr/bin") # msys2 の cmake を使うので決め打ち
+  set(ENV{MSYSTEM} "MSYS")
+  message("PATH=${PATH}")
+  message("msys2 ENV{PATH}=$ENV{PATH}")
 
-if (EXISTS ${PATH}/g++.exe)
+  #if (EXISTS "${PATH}/g++.exe")
   unset(GENERATE_OPTIONS)
   if(DEFINED CMAKE_INSTALL_PREFIX)
     set(GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")

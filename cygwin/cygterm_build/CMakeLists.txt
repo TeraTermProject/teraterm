@@ -1,10 +1,19 @@
-﻿# cygwin,msys2を使って cygterm,msys2term をビルドする
+﻿# cygterm,msys2term をビルドする
+#   - ${CMAKE_CURRENT_LIST_DIR}/../cygtool/build_cygterm.cmake を使ってビルド
+#   - ${CMAKE_BINARY_DIR}/$<CONFIG> にビルドしたファイルを出力
+#   - install で出力先にコピー
 
 cmake_minimum_required(VERSION 3.13) # for Generator-Expression
+
+set(CYGTERM_DIR "${CMAKE_CURRENT_LIST_DIR}/../cygterm")
+
+file(GLOB SRC "${CYGTERM_DIR}/*.cpp" "${CYGTERM_DIR}/*.h")
 
 add_custom_target(
   cygterm_build ALL
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/build_mark.txt
+  DEPENDS ${SRC}
+  SOURCES ${SRC}
   )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cygterm_build)
@@ -18,7 +27,7 @@ endif()
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/build_mark.txt
   COMMAND ${CMAKE_COMMAND} -E echo ${BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${BINARY_DIR} -P ${CMAKE_CURRENT_LIST_DIR}/../cygterm/build_cygterm.cmake
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${BINARY_DIR} -P ${CYGTERM_DIR}/build_cygterm.cmake
   COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/build_mark.txt
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cygterm_build
   )
