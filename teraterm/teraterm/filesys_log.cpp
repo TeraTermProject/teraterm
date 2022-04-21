@@ -96,6 +96,8 @@ typedef struct {
 	LogCode_t log_code;
 	BOOL bom;
 
+	BOOL FileLog;
+	BOOL BinLog;
 } TFileVar_;
 typedef TFileVar_ *PFileVar_;
 
@@ -103,9 +105,6 @@ typedef TFileVar_ *PFileVar_;
 #define TFileVar TFileVar_
 
 static PFileVar LogVar = NULL;
-
-static BOOL FileLog = FALSE;
-static BOOL BinLog = FALSE;
 
 static PCHAR cv_LogBuf;
 static int cv_LogPtr, cv_LStart, cv_LCount;
@@ -706,16 +705,16 @@ static BOOL LogStart(const wchar_t *fname)
 
 	if (ts.LogBinary > 0)
 	{
-		BinLog = TRUE;
-		FileLog = FALSE;
+		fv->BinLog = TRUE;
+		fv->FileLog = FALSE;
 		if (! CreateBinBuf())
 		{
 			return FALSE;
 		}
 	}
 	else {
-		BinLog = FALSE;
-		FileLog = TRUE;
+		fv->BinLog = FALSE;
+		fv->FileLog = TRUE;
 		if (! CreateLogBuf())
 		{
 			return FALSE;
@@ -777,10 +776,10 @@ static BOOL LogStart(const wchar_t *fname)
 		StartThread(fv);
 	}
 
-	if (FileLog) {
+	if (fv->FileLog) {
 		cv.Log1Byte = LogPut1;
 	}
-	if (BinLog) {
+	if (fv->BinLog) {
 		cv.Log1Bin = Log1Bin;
 		cv.LogBinSkip = LogBinSkip;
 	}
@@ -819,12 +818,14 @@ void FLogOutputAllBuffer(void)
  */
 void LogPut1(BYTE b)
 {
+	PFileVar fv = LogVar;
+
 	cv_LogBuf[cv_LogPtr] = b;
 	cv_LogPtr++;
 	if (cv_LogPtr>=InBuffSize)
 		cv_LogPtr = cv_LogPtr-InBuffSize;
 
-	if (FileLog)
+	if (fv->FileLog)
 	{
 		if (cv_LCount>=InBuffSize)
 		{
@@ -972,17 +973,18 @@ static wchar_t *TimeStampStr()
  */
 static void LogToFile(void)
 {
+	PFileVar fv = LogVar;
 	PCHAR Buf;
 	int Start, Count;
 	BYTE b;
 
-	if (FileLog)
+	if (fv->FileLog)
 	{
 		Buf = cv_LogBuf;
 		Start = cv_LStart;
 		Count = cv_LCount;
 	}
-	else if (BinLog)
+	else if (fv->BinLog)
 	{
 		Buf = cv_BinBuf;
 		Start = cv_BStart;
@@ -1030,7 +1032,7 @@ static void LogToFile(void)
 
 	logfile_unlock();
 
-	if (FileLog)
+	if (fv->FileLog)
 	{
 		cv_LStart = Start;
 		cv_LCount = Count;
@@ -1094,8 +1096,9 @@ static void FileTransEnd_(void)
 	if (LogVar == NULL) {
 		return;
 	}
-	FileLog = FALSE;
-	BinLog = FALSE;
+	PFileVar fv = LogVar;
+	fv->FileLog = FALSE;
+	fv->BinLog = FALSE;
 	cv.Log1Byte = NULL;
 	cv.Log1Bin = NULL;
 	cv.LogBinSkip = NULL;
@@ -1243,7 +1246,6 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 	if (LogVar != NULL) {
 		return FALSE;
 	}
-	if ((FileLog) || (BinLog)) return FALSE;
 
 	//
 	PFileVar fv = (PFileVar)malloc(sizeof(TFileVar));
@@ -1273,12 +1275,12 @@ BOOL FLogIsOpend(void)
 
 BOOL FLogIsOpendText(void)
 {
-	return LogVar != NULL && FileLog;
+	return LogVar != NULL && LogVar->FileLog;
 }
 
 BOOL FLogIsOpendBin(void)
 {
-	return LogVar != NULL && BinLog;
+	return LogVar != NULL && LogVar->BinLog;
 }
 
 void FLogWriteStr(const wchar_t *str)
@@ -1450,10 +1452,14 @@ static void LogBinSkip(int add)
  */
 int FLogGetCount(void)
 {
-	if (FileLog) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		return 0;
+	}
+	if (fv->FileLog) {
 		return cv_LCount;
 	}
-	if (BinLog) {
+	if (fv->BinLog) {
 		return cv_BCount;
 	}
 	return 0;
@@ -1464,10 +1470,14 @@ int FLogGetCount(void)
  */
 int FLogGetFreeCount(void)
 {
-	if (FileLog) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		return 0;
+	}
+	if (fv->FileLog) {
 		return InBuffSize - cv_LCount;
 	}
-	if (BinLog) {
+	if (fv->BinLog) {
 		return InBuffSize - cv_BCount;
 	}
 	return 0;
@@ -1478,16 +1488,20 @@ int FLogGetFreeCount(void)
  */
 void FLogWriteFile(void)
 {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		return;
+	}
 	if (cv_LogBuf!=NULL)
 	{
-		if (FileLog) {
+		if (fv->FileLog) {
 			LogToFile();
 		}
 	}
 
 	if (cv_BinBuf!=NULL)
 	{
-		if (BinLog) {
+		if (fv->BinLog) {
 			LogToFile();
 		}
 	}
