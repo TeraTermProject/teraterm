@@ -25,23 +25,23 @@ add_custom_command(
 
 install(
   FILES
-    ${BINARY_DIR}/cygterm_x86_64/cygterm.exe
-    ${BINARY_DIR}/cygterm_x86_64/cygterm.cfg
-  DESTINATION cygterm_x86_64
+    ${BINARY_DIR}/cygterm+-x86_64/cygterm.exe
+    ${BINARY_DIR}/cygterm+-x86_64/cygterm.cfg
+  DESTINATION cygterm+-x86_64
   OPTIONAL
   )
 install(
   FILES
-    ${BINARY_DIR}/cygterm_x86_64/cygterm.exe
-    ${BINARY_DIR}/cygterm_x86_64/cygterm.cfg
+    ${BINARY_DIR}/cygterm+-x86_64/cygterm.exe
+    ${BINARY_DIR}/cygterm+-x86_64/cygterm.cfg
   DESTINATION .
   OPTIONAL
   )
 install(
   FILES
-    ${BINARY_DIR}/cygterm_i686/cygterm.exe
-    ${BINARY_DIR}/cygterm_i686/cygterm.cfg
-  DESTINATION cygterm_i686
+    ${BINARY_DIR}/cygterm+-i686/cygterm.exe
+    ${BINARY_DIR}/cygterm+-i686/cygterm.cfg
+  DESTINATION cygterm+-i686
   OPTIONAL
   )
 install(

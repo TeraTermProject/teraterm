@@ -1,4 +1,5 @@
-﻿#define AppName "Tera Term 5 alpha"
+﻿#define AppName "Tera Term"
+#define AppVer "5.0-alpha1"
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
@@ -29,17 +30,16 @@ AppCopyright=(C) 2004-2020 TeraTerm Project
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://ttssh2.osdn.jp/
 AppSupportURL=https://ttssh2.osdn.jp/
+AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
 #ifdef SETUP_RELEASE
 AppVersion=@VERSION@
-AppVerName={#AppName} @VERSION@
 #else
 AppVersion=@VERSION@+ snapshot-r@SVNVERSION@-@DATE@
-AppVerName={#AppName} r@SVNVERSION@-@DATE@
 #endif
 LicenseFile=@PROJECT_SOURCE_DIR@/installer\release\license.txt
 DefaultDirName={pf}\teraterm5
-DefaultGroupName={#AppName}
+DefaultGroupName={#AppName} 5
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
@@ -69,7 +69,7 @@ Source: @CMAKE_INSTALL_PREFIX@/ttermpro.exe; DestDir: {app}; Components: TeraTer
 Source: @CMAKE_INSTALL_PREFIX@/ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: @PROJECT_SOURCE_DIR@/installer\release\TERATERM.INI; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: @PROJECT_SOURCE_DIR@/installer\release\TERATERM.INI; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
 ;Source: release\TSPECIAL1.TTF; DestDir: {app}; Components: TeraTerm
 Source: @CMAKE_INSTALL_PREFIX@/teraterm.chm; DestDir: {app}; Components: TeraTerm
@@ -77,7 +77,7 @@ Source: @CMAKE_INSTALL_PREFIX@/teratermj.chm; DestDir: {app}; Components: TeraTe
 Source: @PROJECT_SOURCE_DIR@/installer\release\license.txt; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\FUNCTION.CNF; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: @PROJECT_SOURCE_DIR@/installer\release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify; DestName: KEYBOARD.CNF
+Source: @PROJECT_SOURCE_DIR@/installer\release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
 Source: @PROJECT_SOURCE_DIR@/installer\release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\NT98KEYB.CNF; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\PC98KEYB.CNF; DestDir: {app}; Components: TeraTerm
@@ -108,11 +108,11 @@ Source: @PROJECT_SOURCE_DIR@/installer\release\lang_utf16le\Korean.lng; DestDir:
 Source: @PROJECT_SOURCE_DIR@/installer\release\lang_utf16le\Simplified Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: @PROJECT_SOURCE_DIR@/installer\release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: @CMAKE_INSTALL_PREFIX@/ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
-Source: @PROJECT_SOURCE_DIR@/installer\release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: @CMAKE_INSTALL_PREFIX@/cygterm.exe; DestDir: {app}; Components: cygterm
-Source: @CMAKE_INSTALL_PREFIX@/cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: @CMAKE_INSTALL_PREFIX@/cygterm_i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
-Source: @CMAKE_INSTALL_PREFIX@/cygterm_x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: @PROJECT_SOURCE_DIR@/installer\release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
+Source: @CMAKE_INSTALL_PREFIX@/cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
+Source: @CMAKE_INSTALL_PREFIX@/cygterm.cfg; DestDir: {app}; Components: cygterm
+;Source: @CMAKE_INSTALL_PREFIX@/cygterm+.tar.gz; DestDir: {app}; Components: cygterm
+Source: @CMAKE_INSTALL_PREFIX@/cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/cygtool.dll; Components: cygterm; Flags: dontcopy
 Source: @CMAKE_INSTALL_PREFIX@/ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
@@ -165,8 +165,8 @@ Name: {group}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFi
 Name: {group}\{cm:UninstallProgram,{#AppName}}; Filename: {uninstallexe}; Components: TeraTerm; Flags: createonlyiffileexists
 Name: {group}\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
 Name: {group}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; IconIndex: 0; Components: TeraTerm_Menu; Flags: createonlyiffileexists
-Name: {userdesktop}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: quicklaunchicon; IconIndex: 0; Flags: createonlyiffileexists
+Name: {userdesktop}\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: quicklaunchicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userstartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
@@ -231,7 +231,9 @@ Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueDa
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
 Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
-Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
+; Tera Term 4 のを上書きしないよう、テスト版の間は TeraTerm Menu のデフォルトを off にする
+; Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
+Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu; Flags: unchecked
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
 Name: quickcyglaunch; Description: {cm:task_quickcyglaunch}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
@@ -332,10 +334,10 @@ const
 procedure SHChangeNotify(wEventId, uFlags, dwItem1, dwItem2: Integer);
 external 'SHChangeNotify@shell32.dll stdcall';
 
-function FindCygwinPath(CygwinDirectory, CygwinDir: AnsiString; Dirlen: Cardinal): Integer;
+function FindCygwinPath(CygwinDirectory: String; CygwinDir: String; Dirlen: Cardinal): Integer;
 external 'FindCygwinPath@files:cygtool.dll stdcall setuponly';
 
-function PortableExecutableMachine(CygwinDir: AnsiString): Integer;
+function PortableExecutableMachine(CygwinDir: String): Integer;
 external 'PortableExecutableMachine@files:cygtool.dll stdcall setuponly';
 
 var
@@ -499,15 +501,21 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'on', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '2', iniFile);
     end;
   $11: // Japanese
     begin
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'Japanese', iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-19,128', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'ＭＳ ゴシック,0,-16,128', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,128', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'on', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '2', iniFile);
     end;
   $12: // Korean
     begin
@@ -517,6 +525,9 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '2', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'on', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '2', iniFile);
     end;
   $19: // Russian
     begin
@@ -526,6 +537,9 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '1', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'off', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '1', iniFile);
     end;
   else // Other
     begin
@@ -546,6 +560,9 @@ begin
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+      SetIniString('Tera Term', 'UnicodeAmbiguousWidth', '1', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiOverride', 'off', iniFile);
+      SetIniString('Tera Term', 'UnicodeEmojiWidth', '1', iniFile);
     end;
   end;
 
@@ -803,7 +820,7 @@ end; // CurStepChanged
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  ini     : array[0..6] of String;
+  ini     : array[0..1] of String;
   buf     : String;
   conf    : String;
   confmsg : String;
@@ -814,13 +831,8 @@ begin
   case CurUninstallStep of
     usPostUninstall:
       begin
-        ini[0] := '\TERATERM.INI';
-        ini[1] := '\KEYBOARD.CNF';
-        ini[2] := '\lang\Default.lng';
-        ini[3] := '\lang_utf16le\Default.lng';
-        ini[4] := '\ssh_known_hosts';
-        ini[5] := '\cygterm.cfg';
-        ini[6] := '\broadcast.log';
+        ini[0] := '\lang\Default.lng';
+        ini[1] := '\lang_utf16le\Default.lng';
 
         conf := CustomMessage('msg_del_confirm');
         app  := ExpandConstant('{app}');
@@ -835,7 +847,7 @@ begin
         if not silent then begin
 
           // delete config files
-          for i := 0 to 6 do
+          for i := 0 to 1 do
           begin
             buf := app + ini[i];
             if FileExists(buf) then begin
@@ -869,6 +881,8 @@ begin
 end;
 
 [InstallDelete]
+; インストーラに含めたことがあり、のちに含めなくなったファイルを指定する。
+; 上書きインストールしたあとアンインストールしたときに削除されないため。
 Name: {app}\OpenSSH-LICENCE.txt; Type: files
 Name: {app}\cygterm-README.txt; Type: files
 Name: {app}\cygterm-README-j.txt; Type: files
@@ -898,4 +912,6 @@ Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
 Name: {app}\ttpdlg.dll; Type: files
 
 [UninstallDelete]
+; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を
+; スクリプトでコピーしたもので、自動でアンインストールされないため。
 Name: {app}\cygterm.exe; Type: files
