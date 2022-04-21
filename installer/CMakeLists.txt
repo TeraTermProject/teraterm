@@ -283,7 +283,12 @@ find_program(
   )
 message("ISCC=${ISCC}")
 
-if("${ISCC}" STREQUAL "ISCC-NOTFOUND")
+if(NOT TARGET ttssh)
+  add_custom_target(
+    inno_setup
+    COMMAND "${CMAKE_COMMAND}" -E echo "ttssh was not build"
+    )
+elseif("${ISCC}" STREQUAL "ISCC-NOTFOUND")
   add_custom_target(
     inno_setup
     COMMAND "${CMAKE_COMMAND}" -E echo "inno setup not found"
@@ -295,31 +300,17 @@ else()
     )
 
   if (RELEASE)
-    set(ISCC_OPTION "/DSETUP_RELEASE=1")
+    set(ISCC_OPTION "-DSETUP_RELEASE=1")
   endif()
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    list(APPEND ISCC_OPTION "/DM_X64=1")
+    list(APPEND ISCC_OPTION "-DM_X64=1")
   endif()
-  if(NOT MINGW)
-    add_custom_target(
-      inno_setup
-      DEPENDS cygtool
-      COMMAND "${ISCC}" ${ISCC_OPTION} teraterm_cmake.iss
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
-      )
-  else()
-    configure_file(
-      exec_iscc.bat.in
-      exec_iscc.bat
-      NEWLINE_STYLE CRLF
-      )
-    add_custom_target(
-      inno_setup
-      DEPENDS cygtool
-      COMMAND cmd /c exec_iscc.bat
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
-      )
-  endif()
+  add_custom_target(
+    inno_setup
+    DEPENDS cygtool
+    COMMAND ${ISCC} ${ISCC_OPTION} teraterm_cmake.iss
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
+    )
 endif()
 set_target_properties(
   inno_setup
