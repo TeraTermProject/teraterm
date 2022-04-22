@@ -32,6 +32,8 @@ add_library(
   tmfc.cpp
   tmfc.h
   tmfc_frame.cpp
+  tmfc_propdlg.cpp
+  tmfc_propdlg.h
   tmfc_property.cpp
   ttknownfolders.h
   ttknownfolders.c

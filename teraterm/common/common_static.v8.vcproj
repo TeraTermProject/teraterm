@@ -277,6 +277,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\tmfc_propdlg.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\tmfc_propdlg.h"
+			>
+		</File>
+		<File
 			RelativePath=".\tmfc_property.cpp"
 			>
 		</File>

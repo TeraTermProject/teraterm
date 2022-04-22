@@ -29,6 +29,7 @@
 #pragma once
 
 #include "tmfc.h"
+#include "tmfc_propdlg.h"
 #include "tt_res.h"
 #include "teraterm.h"
 #include "tipwin.h"
@@ -126,35 +127,6 @@ private:
 	cygterm_t settings;
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnHelp();
-};
-
-// Property Sheet
-class TTCPropSheetDlg
-{
-public:
-	TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
-	virtual ~TTCPropSheetDlg();
-	INT_PTR DoModal();
-	void AddPage(HPROPSHEETPAGE page);
-	void SetCaption(const wchar_t *caption);
-
-private:
-	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
-	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-	static HINSTANCE ghInstance;
-	static class TTCPropSheetDlg *gTTCPS;
-	LRESULT CALLBACK WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-
-	PROPSHEETHEADERW m_psh;
-	HWND m_hWnd;
-	HWND m_hParentWnd;
-	HINSTANCE m_hInst;
-
-	int m_PageCount;
-	HPROPSHEETPAGE hPsp[9];
-
-	LONG_PTR m_OrgProc;
-	LONG_PTR m_OrgUserData;
 };
 
 // AddSetting Property Sheet
