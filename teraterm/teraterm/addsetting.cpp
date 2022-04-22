@@ -1725,6 +1725,30 @@ void CCygwinPropPageDlg::OnHelp()
 HINSTANCE CAddSettingPropSheetDlg::ghInstance;
 class CAddSettingPropSheetDlg *CAddSettingPropSheetDlg::gTTCPS;
 
+LRESULT CALLBACK CAddSettingPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch(msg){
+	case WM_INITDIALOG:
+	case WM_SHOWWINDOW: {
+		CenterWindow(dlg, m_hParentWnd);
+		break;
+		}
+	}
+	SetWindowLongPtrW(dlg, GWLP_WNDPROC, m_OrgProc);
+	SetWindowLongPtrW(dlg, GWLP_USERDATA, m_OrgUserData);
+	LRESULT result = CallWindowProcW((WNDPROC)m_OrgProc, dlg, msg, wParam, lParam);
+	m_OrgProc = SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)WndProcStatic);
+	m_OrgUserData = SetWindowLongPtrW(dlg, GWLP_USERDATA, (LONG_PTR)this);
+
+	return result;
+}
+
+LRESULT CALLBACK CAddSettingPropSheetDlg::WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	CAddSettingPropSheetDlg *self = (CAddSettingPropSheetDlg *)GetWindowLongPtr(dlg, GWLP_USERDATA);
+	return self->WndProc(dlg, msg, wParam, lParam);
+}
+
 int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 {
 	switch (msg) {
@@ -1755,6 +1779,8 @@ int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM 
 		self->m_hWnd = hWnd;
 		SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 		CenterWindow(hWnd, self->m_hParentWnd);
+		self->m_OrgProc = SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcStatic);
+		self->m_OrgUserData = SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)self);
 		break;
 	}
 	}

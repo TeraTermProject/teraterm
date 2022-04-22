@@ -138,8 +138,10 @@ public:
 
 private:
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
+	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 	static HINSTANCE ghInstance;
 	static class CAddSettingPropSheetDlg *gTTCPS;
+	LRESULT CALLBACK WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	PROPSHEETHEADERW m_psh;
 	HWND m_hWnd;
@@ -151,4 +153,6 @@ private:
 
 	int m_PageCountCPP;
 	TTCPropertyPage *m_Page[7];
+	LONG_PTR m_OrgProc;
+	LONG_PTR m_OrgUserData;
 };
