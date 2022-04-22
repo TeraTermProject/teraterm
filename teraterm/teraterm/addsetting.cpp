@@ -1722,10 +1722,10 @@ void CCygwinPropPageDlg::OnHelp()
 
 #define REWRITE_TEMPLATE	1
 // quick hack :-(
-HINSTANCE CAddSettingPropSheetDlg::ghInstance;
-class CAddSettingPropSheetDlg *CAddSettingPropSheetDlg::gTTCPS;
+HINSTANCE TTCPropSheetDlg::ghInstance;
+class TTCPropSheetDlg* TTCPropSheetDlg::gTTCPS;
 
-LRESULT CALLBACK CAddSettingPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg){
 	case WM_INITDIALOG:
@@ -1743,13 +1743,13 @@ LRESULT CALLBACK CAddSettingPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wPa
 	return result;
 }
 
-LRESULT CALLBACK CAddSettingPropSheetDlg::WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TTCPropSheetDlg::WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	CAddSettingPropSheetDlg *self = (CAddSettingPropSheetDlg *)GetWindowLongPtr(dlg, GWLP_USERDATA);
+	TTCPropSheetDlg*self = (TTCPropSheetDlg*)GetWindowLongPtr(dlg, GWLP_USERDATA);
 	return self->WndProc(dlg, msg, wParam, lParam);
 }
 
-int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
+int CALLBACK TTCPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 {
 	switch (msg) {
 	case PSCB_PRECREATE:
@@ -1775,10 +1775,9 @@ int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM 
 			{ IDCANCEL, "BTN_CANCEL" },
 			{ IDHELP, "BTN_HELP" },
 		};
-		CAddSettingPropSheetDlg *self = gTTCPS;
+		TTCPropSheetDlg*self = gTTCPS;
 		self->m_hWnd = hWnd;
 		SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
-		CenterWindow(hWnd, self->m_hParentWnd);
 		self->m_OrgProc = SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcStatic);
 		self->m_OrgUserData = SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)self);
 		break;
@@ -1787,8 +1786,13 @@ int CALLBACK CAddSettingPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM 
 	return 0;
 }
 
-// CAddSettingPropSheetDlg
-CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd)
+void TTCPropSheetDlg::AddPage(HPROPSHEETPAGE page)
+{
+	hPsp[m_PageCount] = page;
+	m_PageCount++;
+}
+
+TTCPropSheetDlg::TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd)
 {
 	m_hInst = hInstance;
 	m_hWnd = 0;
@@ -1800,7 +1804,33 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	m_psh.hwndParent = hParentWnd;
 	m_psh.hInstance = hInstance;
 	m_psh.pfnCallback = PropSheetProc;
+	m_PageCount = 0;
+}
+TTCPropSheetDlg::~TTCPropSheetDlg()
+{
+	free((void*)m_psh.pszCaption);
+}
 
+void TTCPropSheetDlg::SetCaption(const wchar_t* caption)
+{
+	m_psh.pszCaption = _wcsdup(caption);
+}
+
+INT_PTR TTCPropSheetDlg::DoModal()
+{
+	m_psh.nPages = m_PageCount;
+	m_psh.phpage = hPsp;
+	ghInstance = m_hInst;
+	gTTCPS = this;
+	return PropertySheetW(&m_psh);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+// CAddSettingPropSheetDlg
+CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
+	TTCPropSheetDlg(hInstance, hParentWnd)
+{
 	// CPP,tmfcのTTCPropertyPage派生クラスから生成
 	int i = 0;
 	m_Page[i++] = new CGeneralPropPageDlg(hInstance);
@@ -1814,35 +1844,27 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 		m_Page[i++] = new CDebugPropPage(hInstance);
 	}
 	m_PageCountCPP = i;
+
+	HPROPSHEETPAGE page;
 	for (i = 0; i < m_PageCountCPP; i++) {
-		hPsp[i] = m_Page[i]->CreatePropertySheetPage();
+		page = m_Page[i]->CreatePropertySheetPage();
+		AddPage(page);
 	}
 
 	// TTCPropertyPage を使用しない PropertyPage
-	hPsp[m_PageCountCPP+0] = CodingPageCreate(hInstance, &ts);
-	hPsp[m_PageCountCPP+1] = FontPageCreate(hInstance, &ts);
-	m_PageCount = m_PageCountCPP + 2;
+	page = CodingPageCreate(hInstance, &ts);
+	AddPage(page);
+	page = FontPageCreate(hInstance, &ts);
+	AddPage(page);
 
-	m_psh.nPages = m_PageCount;
-	m_psh.phpage = hPsp;
-
-	wchar_t UIMsg[MAX_UIMSG];
-	get_lang_msgW("DLG_TABSHEET_TITLE", UIMsg, _countof(UIMsg),
-				  L"Tera Term: Additional settings", ts.UILanguageFile);
-	m_psh.pszCaption = _wcsdup(UIMsg);
+	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFile);
+	SetCaption(title);
+	free(title);
 }
 
 CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 {
-	free((void*)m_psh.pszCaption);
 	for (int i = 0; i < m_PageCountCPP; i++) {
 		delete m_Page[i];
 	}
-}
-
-INT_PTR CAddSettingPropSheetDlg::DoModal()
-{
-	ghInstance = m_hInst;
-	gTTCPS = this;
-	return PropertySheetW(&m_psh);
 }

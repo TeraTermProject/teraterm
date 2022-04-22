@@ -129,18 +129,20 @@ private:
 };
 
 // Property Sheet
-class CAddSettingPropSheetDlg
+class TTCPropSheetDlg
 {
 public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
-	virtual ~CAddSettingPropSheetDlg();
+	TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
+	virtual ~TTCPropSheetDlg();
 	INT_PTR DoModal();
+	void AddPage(HPROPSHEETPAGE page);
+	void SetCaption(const wchar_t *caption);
 
 private:
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
 	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 	static HINSTANCE ghInstance;
-	static class CAddSettingPropSheetDlg *gTTCPS;
+	static class TTCPropSheetDlg *gTTCPS;
 	LRESULT CALLBACK WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	PROPSHEETHEADERW m_psh;
@@ -151,8 +153,18 @@ private:
 	int m_PageCount;
 	HPROPSHEETPAGE hPsp[9];
 
-	int m_PageCountCPP;
-	TTCPropertyPage *m_Page[7];
 	LONG_PTR m_OrgProc;
 	LONG_PTR m_OrgUserData;
+};
+
+// AddSetting Property Sheet
+class CAddSettingPropSheetDlg: public TTCPropSheetDlg
+{
+public:
+	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
+	~CAddSettingPropSheetDlg();
+
+private:
+	int m_PageCountCPP;
+	TTCPropertyPage *m_Page[7];
 };
