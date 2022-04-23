@@ -160,7 +160,6 @@
 #define IDC_WINLISTLABEL                1068
 #define IDC_TCPIPTELNETKEEPALIVELABEL   1069
 #define IDC_SELECT_DIR                  1070
-#define IDC_BUILDTIME                   1071
 #define IDC_BUILDTOOL                   1072
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
@@ -177,7 +176,7 @@
 #define IDC_GENLANGUI_LABEL             -1
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

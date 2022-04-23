@@ -57,6 +57,7 @@
 #include "win32helper.h"
 #include "compat_win.h"
 #include "ttlib_charset.h"
+#include "asprintf.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -2461,11 +2462,9 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 // - 上記 URL での表示バージョン
 // - インストール先フォルダ名
 // で、最後のブロックの数字が同じではない。
-// 
+//
 static void GetSDKInfo(char *buf, size_t buf_size)
 {
-	char tmpbuf[128];
-
 	if (WDK_NTDDI_VERSION >= 0x0A00000B) {
 		strncpy_s(buf, buf_size, "Windows SDK", _TRUNCATE);
 		switch (WDK_NTDDI_VERSION) {
@@ -2616,14 +2615,25 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "SFMT %s", SFMT_VERSION);
 			SetDlgItemTextA(Dialog, IDC_SFMT_VERSION, buf);
 
-			// ビルドしたときに使われたコンパイラを設定する。(2009.3.3 yutaka)
-			GetCompilerInfo(tmpbuf, sizeof(tmpbuf));
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using %s", tmpbuf);
-			SetDlgItemTextA(Dialog, IDC_BUILDTOOL, buf);
+			// build info
+			{
+				// コンパイラ、日時、SDK
+				char *info;
+				char sdk[128];
+				GetCompilerInfo(tmpbuf, sizeof(tmpbuf));
+				GetSDKInfo(sdk, _countof(sdk));
+				asprintf(&info,
+						 "Built info:\r\n"
+					     "  compiler: %s\r\n"
+						 "  date and time: %s %s\r\n"
+						 "  sdk: %s",
+						 tmpbuf,
+						 __DATE__, __TIME__,
+						 sdk);
 
-			// ビルドタイムを設定する。(2009.3.4 yutaka)
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Build time: %s %s", __DATE__, __TIME__);
-			SetDlgItemTextA(Dialog, IDC_BUILDTIME, buf);
+				SetDlgItemTextA(Dialog, IDC_BUILDTOOL, info);
+				free(info);
+			}
 
 			// static text のサイズを変更 (2007.4.16 maya)
 			hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
