@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2021-12-08)
+﻿; Updated by TeraTerm Project (2022-04-23)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -454,10 +454,13 @@ MSG_FIND_DIR_ERROR=Verzeichnis kann nicht gefunden werden
 
 ; ttpfile
 ; ttfile.c
-DLG_FOPT=Option
-DLG_FOPT_BINARY=&Binär
+DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=&Anhängen
-DLG_FOPT_PLAIN=&Plain-Text
+DLG_FOPT_TEXT=T&ext
+DLG_FOPT_BINARY=&Binär
+DLG_FOPT_BOM=&BOM
+DLG_FOPT_PLAIN=&Plain text
 DLG_FOPT_TIMESTAMP=&Zeitstempel
 DLG_FOPT_HIDEDIALOG=&Dialog ausblenden
 DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer

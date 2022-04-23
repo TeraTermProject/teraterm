@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2021-12-08)
+﻿; Updated by TeraTerm Project (2022-04-23)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -454,9 +454,12 @@ MSG_FIND_DIR_ERROR=未找到目錄
 
 ; ttpfile
 ; ttfile.c
-DLG_FOPT=選項
-DLG_FOPT_BINARY=二進制(&R)
+DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=追加(&A)
+DLG_FOPT_TEXT=T&ext
+DLG_FOPT_BINARY=二進制(&R)
+DLG_FOPT_BOM=&BOM
 DLG_FOPT_PLAIN=純文本(&P)
 DLG_FOPT_TIMESTAMP=時間戳(&T)
 DLG_FOPT_HIDEDIALOG=隱藏對話框(&D)

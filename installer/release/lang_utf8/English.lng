@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2021-12-08)
+﻿; Updated by TeraTerm Project (2022-04-23)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -453,9 +453,12 @@ MSG_FIND_DIR_ERROR=Cannot find directory
 
 ; ttpfile
 ; ttfile.c
-DLG_FOPT=Option
-DLG_FOPT_BINARY=Bina&ry
+DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=&Append
+DLG_FOPT_TEXT=T&ext
+DLG_FOPT_BINARY=Bina&ry
+DLG_FOPT_BOM=&BOM
 DLG_FOPT_PLAIN=&Plain text
 DLG_FOPT_TIMESTAMP=&Timestamp
 DLG_FOPT_HIDEDIALOG=Hide &dialog
