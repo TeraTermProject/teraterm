@@ -2624,9 +2624,9 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				GetSDKInfo(sdk, _countof(sdk));
 				asprintf(&info,
 						 "Built info:\r\n"
-					     "  compiler: %s\r\n"
-						 "  date and time: %s %s\r\n"
-						 "  sdk: %s",
+					     "  Compiler: %s\r\n"
+						 "  Date and Time: %s %s\r\n"
+						 "  SDK: %s",
 						 tmpbuf,
 						 __DATE__, __TIME__,
 						 sdk);
