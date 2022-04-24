@@ -18,14 +18,13 @@
     <dl>
       <dt id="FileName">File Name</dt>
       <dd>
-	Enter or select the log file name.
+	Enter or select the log file name.<br>
+  Or drop file in this dialog.
       </dd>
 
-      <dt id="Binary">Binary</dt>
+      <dt id="New_Overwrite">New / Overwrite</dt>
       <dd>
-	If you select this option, received characters are written without
-	any modifications. Otherwise, new-line codes are converted and
-	escape sequences are stripped out.
+  New or Overwrite file.
       </dd>
 
       <dt id="Append">Append</dt>
@@ -35,26 +34,32 @@
 	overwritten.
       </dd>
 
+      <dt id="Text">Text</dt>
+      <dd>
+	Output text file.
+      </dd>
+
+      <dt id="BOM">BOM</dt>
+      <dd>
+	Output BOM (Byte Oder Mark) at beginning of log file.
+      </dd>
+
+      <dt id="Code">UTF-8/UTF-16LE/UTF-16BE</dt>
+      <dd>
+        Select charactor code to output.
+      </dd>
+
       <dt id="PlainText">Plain text</dt>
       <dd>
 	If you select this option, ASCII non-printable characters are not written.<br>
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
       </dd>
 
-      <dt id="HideDialog">Hide dialog</dt>
-      <dd>
-	If you select this option, "Log" dialog box is not displayed.
-      </dd>
-
-      <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
-      <dd>
-	If you select this option, the logging starts after current all buffer is written into a log file.
-      </dd>
-
       <dt id="Timestamp">Timestamp</dt>
       <dd>
 	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
 	The timestamp type can be selected from following.
+
 	<dl id="Timestamptype">
 	  <dt>Local Time</dt>
 	  <dd>
@@ -81,6 +86,23 @@
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
       </dd>
     </dl>
+
+      <dt id="Binary">Binary</dt>
+      <dd>
+	If you select this option, received characters are written without
+	any modifications. Otherwise, new-line codes are converted and
+	escape sequences are stripped out.
+      </dd>
+
+      <dt id="HideDialog">Hide dialog</dt>
+      <dd>
+	If you select this option, "Log" dialog box is not displayed.
+      </dd>
+
+      <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
+      <dd>
+	If you select this option, the logging starts after current all buffer is written into a log file.
+      </dd>
 
     <h2 id="Logging">"Log" dialog box (displayed while logging)</h2>
     <dl>

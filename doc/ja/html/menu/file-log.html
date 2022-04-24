@@ -18,14 +18,13 @@
     <dl>
       <dt id="FileName">File Name</dt>
       <dd>
-	書き込むファイルのファイル名を入力または選択してください。
+	書き込むファイルのファイル名を入力または選択してください。<br>
+  またはダイアログにファイルをドロップしてください。
       </dd>
 
-      <dt id="Binary">Binary</dt>
+      <dt id="New_Overwrite">New / Overwrite</dt>
       <dd>
-	ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
-	選択しない場合は、漢字コード、改行文字は変換され、
-	エスケープシーケンスは取り除かれてから書き込まれます。
+  新規またはファイルを上書きします。
       </dd>
 
       <dt id="Append">Append</dt>
@@ -34,20 +33,25 @@
 	選択しない場合は上書きされます。
       </dd>
 
+      <dt id="Text">Text</dt>
+      <dd>
+	テキストを出力します。
+      </dd>
+
+      <dt id="BOM">BOM</dt>
+      <dd>
+	BOM(バイトオーダーマーク)をファイルの先頭に出力します。
+      </dd>
+
+      <dt id="Code">UTF-8/UTF-16LE/UTF-16BE</dt>
+      <dd>
+        出力する文字コードを選択します。
+      </dd>
+
       <dt id="PlainText">Plain text</dt>
       <dd>
 	ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
-      </dd>
-
-      <dt id="HideDialog">Hide dialog</dt>
-      <dd>
-	ログ転送のダイアログを表示したくない場合は選択してください。
-      </dd>
-
-      <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
-      <dd>
-	現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
       </dd>
 
       <dt id="Timestamp">Timestamp</dt>
@@ -80,6 +84,23 @@
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
       </dd>
     </dl>
+
+      <dt id="Binary">Binary</dt>
+      <dd>
+	ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
+	選択しない場合は、漢字コード、改行文字は変換され、
+	エスケープシーケンスは取り除かれてから書き込まれます。
+      </dd>
+
+      <dt id="HideDialog">Hide dialog</dt>
+      <dd>
+	ログ転送のダイアログを表示したくない場合は選択してください。
+      </dd>
+
+      <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
+      <dd>
+	現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
+      </dd>
 
     <h2 id="Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</h2>
     <dl>
