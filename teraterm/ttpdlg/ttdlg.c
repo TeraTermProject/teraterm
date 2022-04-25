@@ -650,7 +650,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						{ "DLG_WIN_REVERSEATTR", L"Reverse" },
 						{ NULL, L"URL" },
 					};
-					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), ts->UILanguageFileW, 1);
+					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), ts->UILanguageFileW, 0);
 				}
 #ifdef USE_NORMAL_BGCOLOR
 				ShowDlgItem(Dialog,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
