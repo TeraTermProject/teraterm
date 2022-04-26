@@ -156,7 +156,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		// focus to "SCP dest textbox" or "Cancel"
 		{
 			int focus_id;
-			if (Param->ScpEnable) {
+			if (Param->DropType == DROP_TYPE_SCP) {
 				focus_id = IDC_SCP_PATH;
 			} else {
 				focus_id = IDCANCEL;

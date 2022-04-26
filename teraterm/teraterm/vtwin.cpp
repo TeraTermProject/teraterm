@@ -2043,14 +2043,18 @@ void CVTWindow::DropListFree()
 	}
 }
 
-LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
+/**
+ *  ファイルがドロップされた
+ *	@param	ShowDialog	0	表示しても表示しなくても良い
+ *						1	必ず表示する
+ */
+LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 {
 	// iniに保存されない、今実行しているTera Termでのみ有効な設定
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
 	static unsigned char DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	static bool DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
 
-	(void)lParam;
 	int FileCount = 0;
 	int DirectoryCount = 0;
 	for (int i = 0; i < DropListCount; i++) {
@@ -2115,6 +2119,9 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 				}
 			}
 			DoSameProcess = false;
+		}
+		if (DropType == DROP_TYPE_SEND_FILE && ts.TransBin) {
+			DropType = DROP_TYPE_SEND_FILE_BINARY;
 		}
 	} else {
 		if (DirectoryCount > 0 &&
