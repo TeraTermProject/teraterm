@@ -47,6 +47,7 @@ enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
+	bool SendFileCheck,
 	TTTSet *pts,
 	unsigned char *DropTypePaste,
 	bool *DoSameProcess,

@@ -46,6 +46,7 @@ struct DrapDropDlgParam {
 	char *ScpSendDirPtr;
 	int ScpSendDirSize;
 	bool SendfileEnable;
+	bool SendfileBinaryCheck;
 	bool PasteNewlineEnable;
 	int RemaingFileCount;
 	bool DoSameProcess;
@@ -113,7 +114,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetEditboxSubclass(hDlgWnd, IDC_SCP_PATH, FALSE);
 
 		// Send File
-		if (Param->DropType == DROP_TYPE_SEND_FILE_BINARY) {
+		if (Param->DropType == DROP_TYPE_SEND_FILE_BINARY || Param->SendfileBinaryCheck) {
 			SendMessage(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 		}
 		if (!Param->SendfileEnable) {
@@ -248,6 +249,7 @@ enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
+	bool SendFileBinaryCheck,
 	TTTSet *pts,
 	unsigned char *DropTypePaste,
 	bool *DoSameProcess,
@@ -260,6 +262,7 @@ enum drop_type ShowDropDialogBox(
 	Param.DropTypePaste = *DropTypePaste;
 	Param.ScpEnable = EnableSCP;
 	Param.SendfileEnable = EnableSendFile;
+	Param.SendfileBinaryCheck = SendFileBinaryCheck;
 	Param.PasteNewlineEnable = true;
 	Param.RemaingFileCount = RemaingFileCount;
 	Param.DoNotShowDialog = *DoNotShowDialog;

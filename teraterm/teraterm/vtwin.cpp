@@ -2054,6 +2054,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
 	static unsigned char DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	static bool DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
+	static bool TransBin;
 
 	int FileCount = 0;
 	int DirectoryCount = 0;
@@ -2075,6 +2076,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 	unsigned char DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	if (DefaultDropType == DROP_TYPE_CANCEL) {
 		// default is not set
+		TransBin = ts.TransBin == 0 ? false : true;
 		if (!ShowDialog) {
 			if (FileCount == 1 && DirectoryCount == 0) {
 				if (ts.ConfirmFileDragAndDrop) {
@@ -2120,7 +2122,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			}
 			DoSameProcess = false;
 		}
-		if (DropType == DROP_TYPE_SEND_FILE && ts.TransBin) {
+		if (DropType == DROP_TYPE_SEND_FILE && TransBin) {
 			DropType = DROP_TYPE_SEND_FILE_BINARY;
 		}
 	} else {
@@ -2153,6 +2155,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
 								  DirectoryCount == 0 ? true : false,
+								  TransBin,
 								  &ts,
 								  &DropTypePaste,
 								  &DoSameProcess,
@@ -2164,6 +2167,12 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			if (DoSameProcessNextDrop) {
 				DefaultDropType = DropType;
 				DefaultDropTypePaste = DropTypePaste;
+				if (DropType == DROP_TYPE_SEND_FILE) {
+					TransBin = false;
+				}
+				if (DropType == DROP_TYPE_SEND_FILE_BINARY) {
+					TransBin = true;
+				}
 			}
 			if (!ts.ConfirmFileDragAndDrop) {
 				DefaultShowDialog = !DoNotShowDialog;
@@ -4822,12 +4831,12 @@ void CVTWindow::OnSetupSerialPort()
 	FreeTTDLG();
 
 	if (Ok && ts.ComPort > 0) {
-		/* 
+		/*
 		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
 		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
 		 */
 		if ( cv.Ready && (cv.PortType != IdSerial) ) {
-			_snprintf_s(Command, sizeof(Command), 
+			_snprintf_s(Command, sizeof(Command),
 				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
 				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
 
