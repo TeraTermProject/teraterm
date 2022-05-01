@@ -126,8 +126,6 @@ Source: release\theme\scale\23.jpg; DestDir: {app}\theme\scale; Components: Tera
 Source: release\theme\scale\43.jpg; DestDir: {app}\theme\scale; Components: TeraTerm
 Source: release\theme\tile\03.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
 Source: release\theme\tile\44.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
-Source: release\plugin\ttAKJpeg.dll; DestDir: {app}\plugin\; Components: TeraTerm
-Source: release\plugin\ttAKJpeg.txt; DestDir: {app}\plugin\; Components: TeraTerm
 Source: ..\TTXKanjiMenu\release\ttxkanjimenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKanjiMenu; Flags: ignoreversion
 Source: ..\TTXSamples\release\TTXResizeMenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXResizeMenu; Flags: ignoreversion
 Source: ..\TTXSamples\release\TTXttyrec.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion

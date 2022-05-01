@@ -637,6 +637,7 @@ static HBITMAP GetBitmapHandle(const char *File)
 	HANDLE hFile;
 	short type;
 	HBITMAP hBitmap = NULL;
+	HRESULT result;
 
 	hFile=CreateFile(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
@@ -653,13 +654,11 @@ static HBITMAP GetBitmapHandle(const char *File)
 
 	CreateStreamOnHGlobal(hMem,TRUE,&iStream);
 
-	OleLoadPicture(iStream,nFileSize,FALSE,&IID_IPicture,(LPVOID*)&iPicture);
-
-	// 画像ファイルではないバイナリファイルを指定した場合に、
-	// プログラムが落ちる問題を修正した。
-	// (2015.12.5 yutaka)
-	if (iPicture == NULL)
+	result = OleLoadPicture(iStream, nFileSize, FALSE, &IID_IPicture, (LPVOID *)&iPicture);
+	if (result != S_OK || iPicture == NULL) {
+		// 画像ファイルではない,対応した画像ファイル場合
 		return NULL;
+	}
 
 	iStream->lpVtbl->Release(iStream);
 
