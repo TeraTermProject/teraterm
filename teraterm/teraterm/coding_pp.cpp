@@ -123,12 +123,17 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetRB(hWnd, ts->JIS7Katakana, IDC_TERMKANA, IDC_TERMKANA);
 			SetRB(hWnd, ts->JIS7KatakanaSend, IDC_TERMKANASEND, IDC_TERMKANASEND);
 
-			SetDropDownList(hWnd, IDC_TERMKIN, KanjiInList, ts->KanjiIn);
-			if ((ts->TermFlag & TF_ALLOWWRONGSEQUENCE) != 0) {
-				SetDropDownList(hWnd, IDC_TERMKOUT, KanjiOutList2, ts->KanjiOut);
-			}
-			else {
-				SetDropDownList(hWnd, IDC_TERMKOUT, KanjiOutList, ts->KanjiOut);
+			{
+				const char **kanji_out_list;
+				int n;
+				n = ts->KanjiIn;
+				n = (n <= 0 || 2 < n) ? IdKanjiInB : n;
+				SetDropDownList(hWnd, IDC_TERMKIN, KanjiInList, n);
+
+				kanji_out_list = (ts->TermFlag & TF_ALLOWWRONGSEQUENCE) ? KanjiOutList2 : KanjiOutList;
+				n = ts->KanjiOut;
+				n = (n <= 0 || 3 < n) ? IdKanjiOutB : n;
+				SetDropDownList(hWnd, IDC_TERMKOUT, kanji_out_list, n);
 			}
 
 			// characters as wide

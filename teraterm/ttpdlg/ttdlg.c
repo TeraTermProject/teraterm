@@ -258,12 +258,18 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
 				}
 				SetRB(Dialog,ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
-				SetDropDownList(Dialog,IDC_TERMKIN,KanjiInList,ts->KanjiIn);
-				if ((ts->TermFlag & TF_ALLOWWRONGSEQUENCE)!=0) {
-					SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList2,ts->KanjiOut);
-				}
-				else {
-					SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList,ts->KanjiOut);
+
+				{
+					const char **kanji_out_list;
+					int n;
+					n = ts->KanjiIn;
+					n = (n <= 0 || 2 < n) ? IdKanjiInB : n;
+					SetDropDownList(Dialog, IDC_TERMKIN, KanjiInList, n);
+
+					kanji_out_list = (ts->TermFlag & TF_ALLOWWRONGSEQUENCE) ? KanjiOutList2 : KanjiOutList;
+					n = ts->KanjiOut;
+					n = (n <= 0 || 3 < n) ? IdKanjiOutB : n;
+					SetDropDownList(Dialog, IDC_TERMKOUT, kanji_out_list, n);
 				}
 			}
 			CenterWindow(Dialog, GetParent(Dialog));
