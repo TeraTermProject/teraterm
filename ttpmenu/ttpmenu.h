@@ -24,8 +24,6 @@
 #define		LISTBOX_HEIGHT			18
 #define		LISTBOX_WIDTH			20
 #define		TERATERM				"ttermpro.exe"
-//#define		TTSSH					"ttssh.exe"
-// ttssh.exeはUTF-8 TeraTermでは不要。TeraTerm本体と同じでよい。(2004.12.2 yutaka)
 #define		TTSSH					TERATERM
 #define		TTERM_KEY				"Software\\ShinpeiTools\\TTermMenu"
 #define		LOGIN_PROMPT			"login:"

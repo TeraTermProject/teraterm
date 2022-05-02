@@ -1948,13 +1948,6 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 
 	}
 
-	// ttssh.exeは廃止したので下記チェックは削除する。(2004.12.3 yutaka)
-#if 0
-	if ((pt = lstrstri(g_JobInfo.szTeraTerm, TTSSH)) != NULL)
-		if (::lstrcmpi(pt, TTSSH) == 0)
-			::CheckDlgButton(hWnd, CHECK_TTSSH, TRUE);
-#endif
-
 	::CheckDlgButton(hWnd, CHECK_STARTUP, g_JobInfo.bStartup);
 
 	return TRUE;

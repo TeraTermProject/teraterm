@@ -1,9 +1,6 @@
 ﻿add_subdirectory(ttxssh)
 set_target_properties(ttxssh PROPERTIES FOLDER ttssh2)
 
-add_subdirectory(ttssh)
-set_target_properties(ttssh PROPERTIES FOLDER ttssh2)
-
 add_subdirectory(matcher)
 set_target_properties(matcher PROPERTIES FOLDER ttssh2)
 

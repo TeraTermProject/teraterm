@@ -5,9 +5,6 @@ The following directory structure is used:
 
 .               Workspace files
 .\ttxssh        Files for the project that builds TTXSSH.DLL
-.\ttssh         Files for the project that builds TTSSH.EXE
-                (just a small wrapper that launches the original
-                TTERMPRO.EXE)
 .\matcher       Files for the project that builds TEST.EXE which tests
                 the micro-regexp matcher used when scanning
                 ssh_known_hosts
