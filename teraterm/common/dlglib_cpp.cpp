@@ -342,7 +342,7 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
  *		cx == 0 && cy == 0 のときデフォルトのアイコンサイズで読み込む
  *		DestroyIcon()すること
  */
-static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
+HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
 {
 	if (cx == 0 && cy == 0) {
 		// 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32

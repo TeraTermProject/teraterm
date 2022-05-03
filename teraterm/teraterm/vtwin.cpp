@@ -241,6 +241,23 @@ void SetAutoConnectPort(int port)
 	AutoDisconnectedPort = port;
 }
 
+static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int dpi)
+{
+	// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=76)のとき)
+	HICON icon = TTLoadIcon(hInst_, icon_name, 0, 0, dpi);
+	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
+	if (icon != NULL) {
+		DestroyIcon(icon);
+	}
+
+	// 大きいアイコン(16x16,ディスプレイの拡大率が100%(dpi=76)のとき)
+	icon = TTLoadIcon(hInst_, icon_name, 16, 16, dpi);
+	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+	if (icon != NULL) {
+		DestroyIcon(icon);
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
@@ -250,7 +267,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RECT rect;
 	DWORD Style;
 	int CmdShow;
-	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
 
@@ -418,21 +434,12 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// USBデバイス変化通知登録
 	RegDeviceNotify(HVTWin);
 
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
+	{
+		const int dpi = GetMonitorDpiFromWindow(m_hWnd);
+		const int icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
+		const wchar_t *icon_name = MAKEINTRESOURCEW(icon_id);
+		SetIcon(m_hInst, m_hWnd, icon_name, dpi);
 	}
-	::PostMessage(HVTWin,WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(hInstance,
-	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
-	                                IMAGE_ICON,16,16,fuLoad));
-	// Vista の Aero において Alt+Tab 切り替えで表示されるアイコンが
-	// 16x16 アイコンの拡大になってしまうので、大きいアイコンも
-	// セットする (2008.9.3 maya)
-	::PostMessage(HVTWin,WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(hInstance,
-	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
-	                                IMAGE_ICON, 0, 0, fuLoad));
-
 	SetCustomNotifyIcon(
 		(HICON)LoadImage(
 			hInstance,
@@ -5040,6 +5047,12 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	IgnoreSizeMessage = FALSE;
 
 	ChangeCaret();
+
+	{
+		const int icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
+		const wchar_t *icon_name = MAKEINTRESOURCEW(icon_id);
+		SetIcon(m_hInst, m_hWnd, icon_name, NewDPI);
+	}
 
 	return TRUE;
 }
