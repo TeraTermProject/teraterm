@@ -229,7 +229,6 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 			L"KEYBOARD.CNF",
 			L"cygterm.cfg",
 			L"ssh_known_hosts",
-#if 0
 			L"theme\\",
 			L"theme\\Advanced.sample",
 			L"theme\\ImageFile.INI",
@@ -241,7 +240,6 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 			L"theme\\tile\\03.jpg",
 			L"theme\\tile\\44.jpg",
 			L"theme\\Tile.INI",
-#endif
 			NULL,
 		};
 		CopyFiles(filelist, ts->ExeDirW, ts->HomeDirW);

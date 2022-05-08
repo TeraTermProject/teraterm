@@ -49,6 +49,7 @@
 #include "win32helper.h"
 #include "inifile_com.h"
 #include "ttlib_charset.h"
+#include "asprintf.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -58,11 +59,11 @@
 
 #define MaxStrLen (LONG)512
 
-static PCHAR far TermList[] =
+static const PCHAR TermList[] =
 	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	"VT320", "VT382", "VT420", "VT520", "VT525", NULL };
 
-static PCHAR far RussList2[] = { "Windows", "KOI8-R", NULL };
+static const PCHAR RussList2[] = { "Windows", "KOI8-R", NULL };
 
 
 /*
@@ -72,16 +73,16 @@ static PCHAR far RussList2[] = { "Windows", "KOI8-R", NULL };
 
 typedef struct id_str_pair {
 	WORD id;
-	char *str;
+	const char *str;
 } id_str_pair_t;
 
-static id_str_pair_t serial_conf_databit[] = {
+static const id_str_pair_t serial_conf_databit[] = {
 	{IdDataBit7, "7"},
 	{IdDataBit8, "8"},
 	{IDENDMARK, NULL},
 };
 
-static id_str_pair_t serial_conf_parity[] = {
+static const id_str_pair_t serial_conf_parity[] = {
 	{IdParityNone, "none"},
 	{IdParityOdd, "odd"},
 	{IdParityEven, "even"},
@@ -90,7 +91,7 @@ static id_str_pair_t serial_conf_parity[] = {
 	{IDENDMARK, NULL},
 };
 
-static id_str_pair_t serial_conf_stopbit[] = {
+static const id_str_pair_t serial_conf_stopbit[] = {
 	{IdStopBit1, "1"},
 	{IdStopBit2, "2"},
 	{IDENDMARK, NULL},
@@ -116,7 +117,7 @@ static id_str_pair_t serial_conf_flowctrl[] = {
  */
 int WINAPI SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
 {
-	id_str_pair_t *conf;
+	const id_str_pair_t *conf;
 	int ret = FALSE;
 	int i;
 
@@ -172,7 +173,7 @@ error:
  */
 static int SerialPortConfconvertStr2Id(enum serial_port_conf type, const wchar_t *str, WORD *id)
 {
-	id_str_pair_t *conf;
+	const id_str_pair_t *conf;
 	int ret = FALSE;
 	int i;
 	char *strA;
@@ -214,7 +215,7 @@ static int SerialPortConfconvertStr2Id(enum serial_port_conf type, const wchar_t
 	return ret;
 }
 
-WORD str2id(PCHAR far * List, PCHAR str, WORD DefId)
+static WORD str2id(const PCHAR *List, PCHAR str, WORD DefId)
 {
 	WORD i;
 	i = 0;
@@ -228,7 +229,7 @@ WORD str2id(PCHAR far * List, PCHAR str, WORD DefId)
 	return i;
 }
 
-void id2str(PCHAR far * List, WORD Id, WORD DefId, PCHAR str, int destlen)
+static void id2str(const PCHAR *List, WORD Id, WORD DefId, PCHAR str, int destlen)
 {
 	int i;
 
@@ -3069,29 +3070,41 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(NULL, NULL, NULL, FName);
 
 	// Eterm lookfeel alphablend (2005.4.24 yutaka)
-#define ETERM_SECTION BG_SECTION
-	WriteOnOff(ETERM_SECTION, "BGEnable", FName,
+	WriteOnOff(BG_SECTION, "BGEnable", FName,
 	           ts->EtermLookfeel.BGEnable);
-	WriteOnOff(ETERM_SECTION, "BGUseAlphaBlendAPI", FName,
+	WriteOnOff(BG_SECTION, "BGUseAlphaBlendAPI", FName,
 	           ts->EtermLookfeel.BGUseAlphaBlendAPI);
-	WritePrivateProfileString(ETERM_SECTION, "BGSPIPath",
+	WritePrivateProfileString(BG_SECTION, "BGSPIPath",
 	                          ts->EtermLookfeel.BGSPIPath, FName);
-	WriteOnOff(ETERM_SECTION, "BGFastSizeMove", FName,
+	WriteOnOff(BG_SECTION, "BGFastSizeMove", FName,
 	           ts->EtermLookfeel.BGFastSizeMove);
-	WriteOnOff(ETERM_SECTION, "BGFlickerlessMove", FName,
+	WriteOnOff(BG_SECTION, "BGFlickerlessMove", FName,
 	           ts->EtermLookfeel.BGNoCopyBits);
-	WriteOnOff(ETERM_SECTION, "BGNoFrame", FName,
+	WriteOnOff(BG_SECTION, "BGNoFrame", FName,
 	           ts->EtermLookfeel.BGNoFrame);
-	WritePrivateProfileString(ETERM_SECTION, "BGThemeFile",
+	WritePrivateProfileString(BG_SECTION, "BGThemeFile",
 	                          ts->EtermLookfeel.BGThemeFile, FName);
+
+	// themeフォルダを作る
 	{
-		wchar_t TempW[MAX_PATH];
-		_snwprintf_s(TempW, _countof(TempW), _TRUNCATE, L"%hs\\%hs", ts->HomeDir, BG_THEME_IMAGEFILE);
-		WritePrivateProfileStringA(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, TempW);
-		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, TempW, ts->BGImgBrightness);
-		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, TempW, ts->BGImgBrightness);
+		wchar_t *theme_folder = NULL;
+		awcscats(&theme_folder, ts->HomeDirW, L"\\", BG_THEME_DIR, NULL);
+		CreateDirectoryW(theme_folder, NULL);
+		free(theme_folder);
 	}
-	WriteOnOff(ETERM_SECTION, "BGIgnoreThemeFile", FName,
+
+	// テーマファイルに保存("theme\\ImageFile.INI")
+	//		TODO BGThemeFileはチェックしなくてよい?
+	{
+		wchar_t *theme_file = NULL;
+		aswprintf(&theme_file, L"%s\\%hs", ts->HomeDirW, BG_THEME_IMAGEFILE);
+		WritePrivateProfileStringAFileW(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, theme_file);
+		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, theme_file, ts->BGImgBrightness);
+		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, theme_file, ts->BGImgBrightness);
+		free(theme_file);
+	}
+
+	WriteOnOff(BG_SECTION, "BGIgnoreThemeFile", FName,
 		ts->EtermLookfeel.BGIgnoreThemeFile);
 
 #ifdef USE_NORMAL_BGCOLOR
@@ -4123,6 +4136,8 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 BOOL WINAPI DllMain(HANDLE hInst,
                     ULONG ul_reason_for_call, LPVOID lpReserved)
 {
+	(void)hInst;
+	(void)lpReserved;
 	switch (ul_reason_for_call) {
 	case DLL_THREAD_ATTACH:
 		/* do thread initialization */

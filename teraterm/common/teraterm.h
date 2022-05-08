@@ -60,6 +60,7 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 // Eterm look-feel
 #define BG_SECTION "BG"
 #define BG_DESTFILE "BGDestFile"
+#define BG_THEME_DIR L"theme"
 #define BG_THEME_IMAGEFILE "theme\\ImageFile.INI"
 #define BG_THEME_IMAGEFILE_DEFAULT "theme\\*.INI"
 #define BG_THEME_IMAGE_BRIGHTNESS_DEFAULT 64
@@ -87,4 +88,3 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 		fclose(fp); \
 	} \
 }
-

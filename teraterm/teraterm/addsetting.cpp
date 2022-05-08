@@ -643,8 +643,6 @@ CVisualPropPageDlg::~CVisualPropPageDlg()
 
 void CVisualPropPageDlg::OnInitDialog()
 {
-	char buf[MAXPATHLEN];
-
 	TTCPropertyPage::OnInitDialog();
 
 	static const DlgTextInfo TextInfos[] = {
@@ -702,7 +700,6 @@ void CVisualPropPageDlg::OnInitDialog()
 	// Eterm look-feelの背景画像指定。
 	SetDlgItemTextA(IDC_BGIMG_EDIT, ts.BGImageFilePath);
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.BGImgBrightness);
 	SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, ts.BGImgBrightness);
 
 	// BGEnable関係なく、チェックボックスを付ける。
@@ -776,6 +773,7 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (5)ANSI color
 	for (int i = 0 ; i < 16 ; i++) {
+		char buf[4];
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", i);
 		SendDlgItemMessageA(IDC_ANSI_COLOR, LB_INSERTSTRING, i, (LPARAM)buf);
 	}
