@@ -4484,7 +4484,6 @@ void CVTWindow::OnSetupGeneral()
 
 /* GetSetupFname function id */
 typedef enum {
-	GSF_SAVE,		// Save setup
 	GSF_RESTORE,	// Restore setup
 	GSF_LOADKEY,	// Load key map
 } GetSetupFnameFuncId;
@@ -4549,27 +4548,6 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 
 	BOOL Ok;
 	switch (FuncId) {
-	case GSF_SAVE:
-		ofn.lpstrDefExt = L"ini";
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		// 初期ファイルディレクトリをプログラム本体がある箇所に固定する (2005.1.6 yutaka)
-		// 読み込まれたteraterm.iniがあるディレクトリに固定する。
-		// これにより、/F= で指定された位置に保存されるようになる。(2005.1.26 yutaka)
-		// Windows Vista ではファイル名まで指定すると NULL と同じ挙動をするようなので、
-		// ファイル名を含まない形でディレクトリを指定するようにした。(2006.9.16 maya)
-//		ofn.lpstrInitialDir = __argv[0];
-//		ofn.lpstrInitialDir = ts->SetupFName;
-		ofn.lpstrInitialDir = DirW;
-		ofn.lpstrTitle = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE", L"Tera Term: Save setup", UILanguageFileW);
-		Ok = GetSaveFileNameW(&ofn);
-		if (Ok) {
-			free(ts->SetupFNameW);
-			ts->SetupFNameW = _wcsdup(NameW);
-			char *Name = ToCharW(NameW);
-			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
-			free(Name);
-		}
-		break;
 	case GSF_RESTORE:
 		ofn.lpstrDefExt = L"ini";
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
@@ -4623,13 +4601,77 @@ static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
 
 void CVTWindow::OnSetupSave()
 {
-	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);
+	PTTSet pts = &ts;
+	const wchar_t *UILanguageFileW = pts->UILanguageFileW;
+
+	// save current dir
+	//		GetSaveFileNameW() がカレントフォルダを変更してしまうため
+	wchar_t *cur_dir;
+	hGetCurrentDirectoryW(&cur_dir);
+
+	wchar_t *filter = _get_lang_msg("FILEDLG_SETUP_FILTER",
+									L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFileW);
+	wchar_t *title = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE",
+								   L"Tera Term: Save setup", UILanguageFileW);
+
+	// iniファイルのあるフォルダ
+	wchar_t *DirW = ExtractDirNameW(pts->SetupFNameW);
+
+	// カレントをiniファイルのあるフォルダにしておく
+	// 		ダイアログが開くときに、
+	//		カレントをオープンするため(7以前?)
+	SetCurrentDirectoryW(DirW);
+
+	// ファイル名をフルパスで初期化しておく
+	// 		ダイアログが開くときに、
+	//		ファイルのパスをオープンするため(7以降?)
+	wchar_t NameW[MAX_PATH];
+	wcsncpy_s(NameW, _countof(NameW), pts->SetupFNameW, _TRUNCATE);
+
+	/* OPENFILENAME record */
+	OPENFILENAMEW ofn = {};
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
+	ofn.hwndOwner   = m_hWnd;
+	ofn.lpstrFile   = NameW;
+	ofn.nMaxFile    = _countof(NameW);
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = 1;
+	ofn.hInstance = hInst;
+	ofn.lpstrDefExt = L"ini";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_SHOWHELP;
+	ofn.lpstrInitialDir = DirW;	// 初めて開くときに使用される,2回目以降は最後に利用したフォルダになる(7以降?)
+	ofn.lpstrTitle = title;
+
 	HelpId = HlpSetupSave;
-	BOOL Ok = _GetSetupFname(HVTWin,GSF_SAVE,&ts);
+	BOOL Ok = GetSaveFileNameW(&ofn);
+#if defined(_DEBUG)
+	if (!Ok) {
+		DWORD Err = GetLastError();
+		DWORD DlgErr = CommDlgExtendedError();
+		assert(Err == 0 && DlgErr == 0);
+	}
+#endif
+
+	free(filter);
+	free(title);
+	free(DirW);
+
+	/* restore dir */
+	SetCurrentDirectoryW(cur_dir);
+	free(cur_dir);
+
 	if (! Ok) {
-		free(PrevSetupFNW);
+		// キャンセル
 		return;
 	}
+
+	// ファイル名を入れ替える
+	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);	// 前のファイルを覚えておく
+	free(pts->SetupFNameW);
+	pts->SetupFNameW = _wcsdup(NameW);
+	char *Name = ToCharW(NameW);
+	strncpy_s(pts->SetupFName, sizeof(pts->SetupFName), Name, _TRUNCATE);
+	free(Name);
 
 	// 書き込みできるか?
 	const DWORD attr = GetFileAttributesW(ts.SetupFNameW);
