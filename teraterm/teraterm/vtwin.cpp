@@ -256,6 +256,26 @@ static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int d
 	if (icon != NULL) {
 		DestroyIcon(icon);
 	}
+
+	// 通知領域のアイコン
+	//if (IsWindows2000()) {
+	if (IsWindows2000OrLater()) {
+		icon  = GetCustomNotifyIcon();
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+		icon = TTLoadIcon(hInst_, icon_name, 0, 0, dpi);
+		SetCustomNotifyIcon(icon);
+	}
+}
+
+static void SetVTIcon(TTTSet *ts, HINSTANCE inst, WORD icon_id)
+{
+	ts->Instance = inst;
+	ts->VTIcon = icon_id;
+
+	const int dpi = GetMonitorDpiFromWindow(HVTWin);
+	SetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), dpi);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -269,8 +289,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	int CmdShow;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
+	ts.Instance = hInstance;
 
 	CommInit(&cv);
+	ts.SetVTIcon = SetVTIcon;
 	isFirstInstance = StartTeraTerm(&ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
@@ -5051,7 +5073,8 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	{
 		const int icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
 		const wchar_t *icon_name = MAKEINTRESOURCEW(icon_id);
-		SetIcon(m_hInst, m_hWnd, icon_name, NewDPI);
+		const HINSTANCE inst = ts.Instance;
+		SetIcon(inst, m_hWnd, icon_name, NewDPI);
 	}
 
 	return TRUE;

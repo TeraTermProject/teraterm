@@ -676,45 +676,7 @@ static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
 
 void notify_established_secure_connection(PTInstVar pvar)
 {
-	int fuLoad = LR_DEFAULTCOLOR;
-
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
-
-	// LoadIcon ではなく LoadImage を使うようにし、
-	// 16x16 のアイコンを明示的に取得するようにした (2006.8.9 maya)
-	if (SecureLargeIcon == NULL) {
-		SecureLargeIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
-		                            IMAGE_ICON, 0, 0, fuLoad);
-	}
-	if (SecureSmallIcon == NULL) {
-		SecureSmallIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
-		                            IMAGE_ICON, 16, 16, fuLoad);
-	}
-
-	if (SecureLargeIcon != NULL && SecureSmallIcon != NULL) {
-		pvar->OldLargeIcon =
-			(HICON) SendMessage(pvar->NotificationWindow, WM_GETICON,
-			                    ICON_BIG, 0);
-		pvar->OldSmallIcon =
-			(HICON) SendMessage(pvar->NotificationWindow, WM_GETICON,
-			                    ICON_SMALL, 0);
-
-		PostMessage(pvar->NotificationWindow, WM_SETICON, ICON_BIG,
-		            (LPARAM) SecureLargeIcon);
-		PostMessage(pvar->NotificationWindow, WM_SETICON, ICON_SMALL,
-		            (LPARAM) SecureSmallIcon);
-	}
-
-	if (IsWindows2000()) {
-		if (SecureNotifyIcon == NULL) {
-			SecureNotifyIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
-			                             IMAGE_ICON, 0, 0, LR_VGACOLOR | LR_SHARED);
-		}
-		OldNotifyIcon = GetCustomNotifyIcon();
-		SetCustomNotifyIcon(SecureNotifyIcon);
-	}
+	pvar->ts->SetVTIcon(pvar->ts, hInst, pvar->settings.IconID);
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
 }
@@ -4921,7 +4883,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		// リーク時のブロック番号を元にブレークを仕掛けるには、以下のようにする。
 		//_CrtSetBreakAlloc(3228);
 #endif
-//		_CrtSetBreakAlloc(259);
 		DisableThreadLibraryCalls(hInstance);
 		hInst = hInstance;
 		pvar = &InstVar;

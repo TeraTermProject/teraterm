@@ -348,6 +348,8 @@ typedef struct cygterm {
 } cygterm_t;
 
 /* TTTSet */
+typedef struct tttset TTTSet, *PTTSet;
+
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
@@ -549,6 +551,7 @@ struct tttset {
 	WORD CRSend_ini;
 	WORD LocalEcho_ini;
 	WORD UnicodeDecSpMapping;
+	HINSTANCE Instance;
 	WORD VTIcon;
 	WORD TEKIcon;
 	WORD ScrollWindowClearScreen;
@@ -645,9 +648,10 @@ struct tttset {
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
 	wchar_t *LogDirW;					// logやダンプを置くフォルダ
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
-};
 
-typedef struct tttset TTTSet, *PTTSet;
+
+	void (*SetVTIcon)(TTTSet *ts, HINSTANCE Inst, WORD icon_id);
+};
 
   /* New Line modes */
 #define IdCR   1
