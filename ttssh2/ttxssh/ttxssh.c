@@ -115,11 +115,6 @@ extern const EVP_CIPHER* evp_ssh1_3des(void);
 
 HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 
-static HICON SecureLargeIcon = NULL;
-static HICON SecureSmallIcon = NULL;
-static HICON SecureNotifyIcon = NULL;
-static HICON OldNotifyIcon = NULL;
-
 static TInstVar *pvar;
 
 typedef struct {
@@ -187,19 +182,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	FWD_end(pvar);
 	FWDUI_end(pvar);
 
-	if (pvar->OldLargeIcon != NULL) {
-		PostMessage(pvar->NotificationWindow, WM_SETICON, ICON_BIG,
-		            (LPARAM) pvar->OldLargeIcon);
-		pvar->OldLargeIcon = NULL;
-	}
-	if (pvar->OldSmallIcon != NULL) {
-		PostMessage(pvar->NotificationWindow, WM_SETICON, ICON_SMALL,
-		            (LPARAM) pvar->OldSmallIcon);
-		pvar->OldSmallIcon = NULL;
-	}
-	if (OldNotifyIcon) {
-		SetCustomNotifyIcon(OldNotifyIcon);
-	}
+	pvar->ts->SetVTIcon(NULL, 0);
 
 	ssh_heartbeat_lock_finalize();
 
@@ -676,7 +659,7 @@ static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
 
 void notify_established_secure_connection(PTInstVar pvar)
 {
-	pvar->ts->SetVTIcon(pvar->ts, hInst, pvar->settings.IconID);
+	pvar->ts->SetVTIcon(hInst, pvar->settings.IconID);
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
 }

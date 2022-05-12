@@ -243,14 +243,14 @@ void SetAutoConnectPort(int port)
 
 static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int dpi)
 {
-	// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=76)のとき)
+	// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=96)のとき)
 	HICON icon = TTLoadIcon(hInst_, icon_name, 0, 0, dpi);
 	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 	if (icon != NULL) {
 		DestroyIcon(icon);
 	}
 
-	// 大きいアイコン(16x16,ディスプレイの拡大率が100%(dpi=76)のとき)
+	// 大きいアイコン(16x16,ディスプレイの拡大率が100%(dpi=96)のとき)
 	icon = TTLoadIcon(hInst_, icon_name, 16, 16, dpi);
 	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
 	if (icon != NULL) {
@@ -269,12 +269,19 @@ static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int d
 	}
 }
 
-static void SetVTIcon(TTTSet *ts, HINSTANCE inst, WORD icon_id)
+static void SetVTIcon(HINSTANCE hInstance, WORD IconID)
 {
-	ts->Instance = inst;
-	ts->VTIcon = icon_id;
-
+	HINSTANCE inst;
+	WORD icon_id;
 	const int dpi = GetMonitorDpiFromWindow(HVTWin);
+
+	ts.PluginVTIocnInstance = hInstance;
+	ts.PluginVTIocnID = IconID;
+
+	inst = (ts.PluginVTIocnInstance == NULL) ? hInst : hInstance;
+	icon_id = (ts.PluginVTIocnID != 0) ? IconID :
+	                                     (ts.VTIcon != IdIconDefault) ? ts.VTIcon
+	                                                                  : IDI_VT;
 	SetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), dpi);
 }
 
@@ -289,7 +296,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	int CmdShow;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
-	ts.Instance = hInstance;
 
 	CommInit(&cv);
 	ts.SetVTIcon = SetVTIcon;
@@ -457,10 +463,14 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RegDeviceNotify(HVTWin);
 
 	{
+		HINSTANCE inst;
+		WORD icon_id;
 		const int dpi = GetMonitorDpiFromWindow(m_hWnd);
-		const int icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
-		const wchar_t *icon_name = MAKEINTRESOURCEW(icon_id);
-		SetIcon(m_hInst, m_hWnd, icon_name, dpi);
+		inst = (ts.PluginVTIocnInstance != NULL) ? ts.PluginVTIocnInstance : m_hInst;
+		icon_id = (ts.PluginVTIocnID != 0) ? ts.PluginVTIocnID
+		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
+		                                                                  : IDI_VT;
+		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), dpi);
 	}
 	SetCustomNotifyIcon(
 		(HICON)LoadImage(
@@ -5071,10 +5081,13 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	ChangeCaret();
 
 	{
-		const int icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
-		const wchar_t *icon_name = MAKEINTRESOURCEW(icon_id);
-		const HINSTANCE inst = ts.Instance;
-		SetIcon(inst, m_hWnd, icon_name, NewDPI);
+		HINSTANCE inst;
+		WORD icon_id;
+		inst = (ts.PluginVTIocnInstance != NULL) ? ts.PluginVTIocnInstance : hInst;
+		icon_id = (ts.PluginVTIocnID != 0) ? ts.PluginVTIocnID
+		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
+		                                                                  : IDI_VT;
+		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
 
 	return TRUE;

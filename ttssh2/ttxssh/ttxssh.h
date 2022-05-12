@@ -238,8 +238,8 @@ typedef struct _TInstVar {
 	HWND NotificationWindow;
 	unsigned int notification_msg;
 	long notification_events;
-	HICON OldSmallIcon;
-	HICON OldLargeIcon;
+	HICON OldSmallIcon; // 使用しない
+	HICON OldLargeIcon; // 使用しない
 
 	BOOL hostdlg_activated;
 	BOOL hostdlg_Enabled;
