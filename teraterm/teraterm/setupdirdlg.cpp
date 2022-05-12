@@ -470,128 +470,17 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_SETUPDIR_TITLE" },
-		{ IDC_INI_SETUPDIR_GROUP, "DLG_SETUPDIR_INIFILE" },
-		{ IDC_KEYCNF_SETUPDIR_GROUP, "DLG_SETUPDIR_KEYBOARDFILE" },
-		{ IDC_CYGTERM_SETUPDIR_GROUP, "DLG_SETUPDIR_CYGTERMFILE" },
-		{ IDC_SSH_SETUPDIR_GROUP, "DLG_SETUPDIR_KNOWNHOSTSFILE" },
 	};
 	TTTSet *pts = (TTTSet *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
-	wchar_t *tmpbufW;
-	HWND hWnd;
 
 	switch (msg) {
 	case WM_INITDIALOG: {
-		BOOL ret;
 		pts = (TTTSet *)lp;
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pts);
 
 		// I18N
 		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
 
-		// 設定ファイル(teraterm.ini)のパスを取得する。
-		/// (1)
-		SetDlgItemTextW(hDlgWnd, IDC_INI_SETUPDIR_EDIT, pts->SetupFNameW);
-		/// (2) Virutal Storeへの変換
-		wchar_t *vs;
-		ret = convertVirtualStoreW(pts->SetupFNameW, &vs);
-		hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
-		EnableWindow(hWnd, ret);
-		hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
-		EnableWindow(hWnd, ret);
-		if (ret) {
-			SetDlgItemTextW(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, vs);
-			free(vs);
-		}
-		else {
-			SetDlgItemTextA(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, "");
-		}
-
-		// 設定ファイル(KEYBOARD.CNF)のパスを取得する。
-		/// (1)
-		SetDlgItemTextW(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, pts->KeyCnfFNW);
-		/// (2) Virutal Storeへの変換
-		ret = convertVirtualStoreW(pts->KeyCnfFNW, &vs);
-		hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
-		EnableWindow(hWnd, ret);
-		hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
-		EnableWindow(hWnd, ret);
-		if (ret) {
-			SetDlgItemTextW(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, vs);
-			free(vs);
-		}
-		else {
-			SetDlgItemTextA(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, "");
-		}
-
-		// cygterm.cfg は ttermpro.exe 配下に位置する。
-		/// (1)
-		aswprintf(&tmpbufW, L"%s\\cygterm.cfg", pts->HomeDirW);
-		SetDlgItemTextW(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, tmpbufW);
-		/// (2) Virutal Storeへの変換
-		ret = convertVirtualStoreW(tmpbufW, &vs);
-		free(tmpbufW);
-		hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
-		EnableWindow(hWnd, ret);
-		hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
-		EnableWindow(hWnd, ret);
-		if (ret) {
-			SetDlgItemTextW(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, vs);
-			free(vs);
-		}
-		else {
-			SetDlgItemTextA(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, "");
-		}
-
-		// ssh_known_hosts
-		{
-			HMODULE h = GetModuleHandle("ttxssh.dll");
-			if (h != NULL) {
-				size_t (CALLBACK *func)(wchar_t *, size_t) = NULL;
-				void **pfunc = (void **)&func;
-				*pfunc = (void *)GetProcAddress(h, "TTXReadKnownHostsFile");
-				if (func) {
-					size_t size = func(NULL, 0);
-					if (size != 0) {
-						wchar_t *temp = (wchar_t *)malloc(sizeof(wchar_t) * size);
-						func(temp, size);
-						assert(!IsRelativePathW(temp));
-
-						SetDlgItemTextW(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, temp);
-
-						/// (2) Virutal Storeへの変換
-						ret = convertVirtualStoreW(temp, &vs);
-						hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
-						EnableWindow(hWnd, ret);
-						hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
-						EnableWindow(hWnd, ret);
-						if (ret) {
-							SetDlgItemTextW(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, vs);
-							free(vs);
-						}
-						else {
-							SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
-						}
-						free(temp);
-					}
-				}
-			}
-			else {
-				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT);
-				EnableWindow(hWnd, FALSE);
-				SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, "");
-				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON);
-				EnableWindow(hWnd, FALSE);
-				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON_FILE);
-				EnableWindow(hWnd, FALSE);
-				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
-				EnableWindow(hWnd, FALSE);
-				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
-				EnableWindow(hWnd, FALSE);
-				SetDlgItemTextA(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
-			}
-		}
-
-		/////////////////////////////////////////////////////////////
 		HWND hWndList = GetDlgItem(hDlgWnd, IDC_SETUP_DIR_LIST);
 		ListView_SetExtendedListViewStyleEx(hWndList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
 
@@ -703,67 +592,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	}
 
 	case WM_COMMAND: {
-		BOOL button_pressed = FALSE;
-		BOOL open_dir = FALSE;
-		int edit;
-		int edit_vstore;
 		switch (LOWORD(wp)) {
-		case IDC_INI_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			edit = IDC_INI_SETUPDIR_EDIT;
-			edit_vstore = IDC_INI_SETUPDIR_EDIT_VSTORE;
-			open_dir = TRUE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_INI_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
-			edit = IDC_INI_SETUPDIR_EDIT;
-			edit_vstore = IDC_INI_SETUPDIR_EDIT_VSTORE;
-			open_dir = FALSE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_KEYCNF_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			edit = IDC_KEYCNF_SETUPDIR_EDIT;
-			edit_vstore = IDC_KEYCNF_SETUPDIR_EDIT_VSTORE;
-			open_dir = TRUE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_KEYCNF_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
-			edit = IDC_KEYCNF_SETUPDIR_EDIT;
-			edit_vstore = IDC_KEYCNF_SETUPDIR_EDIT_VSTORE;
-			open_dir = FALSE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_CYGTERM_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			edit = IDC_CYGTERM_SETUPDIR_EDIT;
-			edit_vstore = IDC_CYGTERM_SETUPDIR_EDIT_VSTORE;
-			open_dir = TRUE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_CYGTERM_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
-			edit = IDC_CYGTERM_SETUPDIR_EDIT;
-			edit_vstore = IDC_CYGTERM_SETUPDIR_EDIT_VSTORE;
-			open_dir = FALSE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			edit = IDC_SSH_SETUPDIR_EDIT;
-			edit_vstore = IDC_SSH_SETUPDIR_EDIT_VSTORE;
-			open_dir = TRUE;
-			button_pressed = TRUE;
-			break;
-
-		case IDC_SSH_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
-			edit = IDC_SSH_SETUPDIR_EDIT;
-			edit_vstore = IDC_SSH_SETUPDIR_EDIT_VSTORE;
-			open_dir = FALSE;
-			button_pressed = TRUE;
-			break;
-
 		case IDHELP:
 			OpenHelp(HH_HELP_CONTEXT, HlpMenuSetupDir, pts->UILanguageFile);
 			break;
@@ -780,28 +609,6 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		default:
 			return FALSE;
-		}
-
-		if (button_pressed) {
-			wchar_t *filename;
-			if (!IsWindowEnabled(GetDlgItem(hDlgWnd, edit_vstore))) {
-				hGetWindowTextW(GetDlgItem(hDlgWnd, edit), &filename);
-			} else {
-				hGetWindowTextW(GetDlgItem(hDlgWnd, edit_vstore), &filename);
-			}
-
-			const wchar_t *UILanguageFile = pts->UILanguageFileW;
-			if (open_dir) {
-				// フォルダを開いて、ファイルを選択する
-				openDirectoryWithExplorer(filename, UILanguageFile);
-			}
-			else {
-				const char *editor = pts->ViewlogEditor;
-				openFileWithApplication(filename, editor, UILanguageFile);
-			}
-
-			free(filename);
-			return TRUE;
 		}
 		return FALSE;
 	}
