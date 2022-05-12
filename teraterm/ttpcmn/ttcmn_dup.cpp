@@ -27,11 +27,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <direct.h>
 #include <string.h>
 #include <stdio.h>
 #include <windows.h>
 #include <assert.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
 #include <wchar.h>
 #if (defined(_MSC_VER) && (_MSC_VER >= 1600)) || !defined(_MSC_VER)
@@ -61,7 +62,7 @@ typedef struct {
 	size_t offset;		// 先頭からのオフセット
 	enum {
 		COPY = 0,				// データをコピーする
-		MALLOCED_WSTRING = 1,	// mallocした領域の
+		MALLOCED_WSTRING = 1,	// mallocした領域の wchar_t 文字列
 	} type;
 } TSerializeInfo;
 
@@ -88,7 +89,12 @@ static uint8_t *SerializeData(const void *data, const TSerializeInfo *info, size
 			const size_t l = info->size;
 			unsigned char *d;
 			const unsigned char *s = (unsigned char *)src  + info->offset;
-			blob = (uint8_t *)realloc(blob, size + l);
+			uint8_t *p = (uint8_t*)realloc(blob, size + l);
+			if (p == NULL) {
+				free(blob);
+				return NULL;
+			}
+			blob = p;
 			d = blob + size;
 			memcpy(d, s, l);
 			size += l;
@@ -103,7 +109,12 @@ static uint8_t *SerializeData(const void *data, const TSerializeInfo *info, size
 			}
 			const size_t str_len_byte = str_len * sizeof(wchar_t);
 			const size_t alloc_len = sizeof(size_t) + str_len_byte;
-			blob = (uint8_t *)realloc(blob, size + alloc_len);
+			uint8_t *p = (uint8_t*)realloc(blob, size + alloc_len);
+			if (p == NULL) {
+				free(blob);
+				return NULL;
+			}
+			blob = p;
 			uint8_t *d = blob + size;
 			*(size_t *)d = str_len;
 			d += sizeof(size_t);
@@ -154,7 +165,10 @@ static void UnserializeData(const void *blob, size_t size, const TSerializeInfo 
 			else {
 				const size_t byte_len = l * sizeof(wchar_t);
 				wchar_t *str = (wchar_t *)malloc(byte_len);
-				wmemcpy(str, (wchar_t *)src, l);
+				assert(str != NULL);
+				if (str != NULL) {
+					wmemcpy(str, (wchar_t*)src, l);
+				}
 				*d = str;
 				src += byte_len;
 			}
@@ -189,6 +203,7 @@ static const uint8_t signature[] = {
 static uint8_t *MakeSignature(size_t *size)
 {
 	uint8_t *p = (uint8_t *)malloc(sizeof(signature));
+	assert(p != NULL);
 	memcpy(p, signature, sizeof(signature));
 	*size = sizeof(signature);
 	return p;
@@ -235,15 +250,17 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, UILanguageFileW_ini) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, ExeDirW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogDirW) },
+	{ MALLOCED_WSTRING_INFO(TTTSet, LogDefaultPathW) },
+	{ MALLOCED_WSTRING_INFO(TTTSet, FileDirW) },
 	{ 0, 0, TSerializeInfo::COPY },
 };
 
 /**
  *	TTTSet 構造体をバイナリデータに変換
  *
- *	@param		ts	TTTSet構造体へのポインタ
- *	@return		バイナリへのデータのサイズ
- *	@return		バイナリへのデータへポインタ
+ *	@param[in]		ts	TTTSet構造体へのポインタ
+ *	@param[out]		バイナリデータのサイズ
+ *	@return			バイナリデータへポインタ
  */
 void *TTCMNSerialize(const TTTSet *ts, size_t *size)
 {
@@ -253,6 +270,7 @@ void *TTCMNSerialize(const TTTSet *ts, size_t *size)
 	uint8_t *data = SerializeData(ts, serialize_info, &data_size);
 
 	uint8_t *dest = (uint8_t *)malloc(signature_size + data_size);
+	assert(dest != NULL);
 	memcpy(dest, signature_data, signature_size);
 	memcpy(dest + signature_size, data, data_size);
 	free(data);

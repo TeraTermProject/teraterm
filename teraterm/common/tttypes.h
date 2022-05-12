@@ -347,7 +347,13 @@ typedef struct cygterm {
 	char reserve[20];
 } cygterm_t;
 
-/* TTTSet */
+/**
+ *	TTTSet
+ *		セッションの複製時
+ *		この構造体は複製先にコピーされる
+ *		path等、動的に確保した部分のコピーは
+ *		../ttcmn_dup.cpp を参照
+ */
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
