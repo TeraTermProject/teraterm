@@ -4759,6 +4759,8 @@ void CVTWindow::OnSetupRestore()
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
+	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	SetupDirectoryDialog(m_hInst, HVTWin, &ts);
 }
 

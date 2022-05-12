@@ -324,6 +324,148 @@ epilogue:
 	return ret;
 }
 
+/**
+ *	リスト定義用構造体
+ */
+typedef enum {
+	LIST_PARAM_STR = 1,			// 文字列
+	LIST_PARAM_FUNC = 2,		// 関数
+} SetupListParam;
+typedef struct {
+	const char *key;			// テキストのキー
+	const wchar_t *def_text;	// デフォルトテキスト
+	SetupListParam param;		// param_ptr の内容を示す
+	void *param_ptr;			// paramが示す値
+	void *data_ptr;				// 関数毎に使用するデータ
+} SetupList;
+
+/**
+ *	メニューを出して選択された処理を実行する
+ */
+static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *path, const TTTSet *pts)
+{
+	const wchar_t *UILanguageFile = pts->UILanguageFileW;
+	const DWORD file_stat = GetFileAttributesW(path);
+	const BOOL dir = (file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0 ? TRUE : FALSE;
+
+	HMENU hMenu= CreatePopupMenu();
+	AppendMenuW(hMenu, (dir ? MF_DISABLED : MF_ENABLED) | MF_STRING | 0, 1, L"&Open file");
+	AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, L"Open folder(with explorer)");
+	AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, L"Send path to clipboard");
+	int result = TrackPopupMenu(hMenu, TPM_RETURNCMD, pointer_pos->x, pointer_pos->y, 0 , hWnd, NULL);
+	DestroyMenu(hMenu);
+	switch (result) {
+	case 1: {
+		// アプリで開く
+		const char *editor = pts->ViewlogEditor;
+		openFileWithApplication(path, editor, UILanguageFile);
+		break;
+	}
+	case 2: {
+		// フォルダを開いて、ファイルを選択する
+		openDirectoryWithExplorer(path, UILanguageFile);
+		break;
+	}
+	case 3: {
+		// クリップボードへ文字列送信
+		CBSetTextW(hWnd, path, 0);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+static wchar_t *GetCygtermIni(const SetupList *list, const TTTSet *pts)
+{
+	wchar_t *cygterm_ini;
+	aswprintf(&cygterm_ini, L"%s\\cygterm.cfg", pts->HomeDirW);
+	if (list->data_ptr != 0) {
+		wchar_t *virtual_store_path;
+		BOOL ret = convertVirtualStoreW(cygterm_ini, &virtual_store_path);
+		free(cygterm_ini);
+		if (ret) {
+			return virtual_store_path;
+		} else {
+			return NULL;
+		}
+	}
+	return cygterm_ini;
+}
+
+static wchar_t *GetTTXSSHKwnownHostFile(const SetupList *list, const TTTSet *)
+{
+	HMODULE h = GetModuleHandle("ttxssh.dll");
+	if (h == NULL) {
+		return NULL;
+	}
+
+	size_t (CALLBACK *func)(wchar_t *, size_t) = NULL;
+	void **pfunc = (void **)&func;
+	*pfunc = (void *)GetProcAddress(h, "TTXReadKnownHostsFile");
+	if (func == NULL) {
+		return NULL;
+	}
+
+	size_t size = func(NULL, 0);
+	if (size == 0) {
+		return NULL;
+	}
+
+	wchar_t *temp = (wchar_t *)malloc(sizeof(wchar_t) * size);
+	func(temp, size);
+	assert(!IsRelativePathW(temp));
+
+	if (list->data_ptr != 0) {
+		wchar_t *virtual_store_path;
+		BOOL ret = convertVirtualStoreW(temp, &virtual_store_path);
+		if (ret) {
+			return virtual_store_path;
+		} else {
+			return NULL;
+		}
+	}
+
+	return temp;
+}
+
+/**
+ *	Virtaul Storeへのパスを返す
+ */
+static wchar_t *GetVirtualStorePath(const SetupList *list, const TTTSet *)
+{
+	const wchar_t *path = (wchar_t *)list->data_ptr;
+	wchar_t *virtual_store_path;
+	BOOL ret = convertVirtualStoreW(path, &virtual_store_path);
+	if (ret) {
+		return virtual_store_path;
+	} else {
+		// virtual storeは使用されていない
+		return NULL;
+	}
+}
+
+/**
+ *	Susie plug-in パス
+ */
+static wchar_t *GetSusiePluginPath(const SetupList *, const TTTSet *pts)
+{
+	const char *spi_path = pts->EtermLookfeel.BGSPIPath;
+	wchar_t *path;
+	aswprintf(&path, L"%s\\%hs", pts->ExeDirW, spi_path);
+	return path;
+}
+
+/**
+ *	Susie plug-in パス
+ */
+static wchar_t *GetCurrentPath(const SetupList *, const TTTSet *)
+{
+	wchar_t *path;
+	hGetCurrentDirectoryW(&path);
+	return path;
+}
+
 static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -449,6 +591,112 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			}
 		}
 
+		/////////////////////////////////////////////////////////////
+		HWND hWndList = GetDlgItem(hDlgWnd, IDC_SETUP_DIR_LIST);
+		ListView_SetExtendedListViewStyleEx(hWndList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+
+		LV_COLUMNA lvcol;
+		lvcol.mask = LVCF_TEXT | LVCF_SUBITEM;
+		lvcol.pszText = (LPSTR)"name";
+		lvcol.iSubItem = 0;
+		//ListView_InsertColumn(hWndList, 0, &lvcol);
+		SendMessage(hWndList, LVM_INSERTCOLUMNA, 0, (LPARAM)&lvcol);
+
+		lvcol.pszText = (LPSTR)"path/file";
+		lvcol.iSubItem = 1;
+		//ListView_InsertColumn(hWndList, 1, &lvcol);
+		SendMessage(hWndList, LVM_INSERTCOLUMNA, 1, (LPARAM)&lvcol);
+
+		// 設定一覧
+		static const SetupList setup_list[] = {
+			{ "DLG_SETUPDIR_INIFILE", L"Tera Term Configuration File",
+			  LIST_PARAM_STR, pts->SetupFNameW, },
+			{ NULL, L"  Virtual Store",
+			  LIST_PARAM_FUNC, (void *)GetVirtualStorePath, pts->SetupFNameW },
+			{ "DLG_SETUPDIR_KEYBOARDFILE", L"Keyboard Configuration File",
+			  LIST_PARAM_STR, pts->KeyCnfFNW },
+			{ NULL, L"  Virtual Store",
+			  LIST_PARAM_FUNC, (void*)GetVirtualStorePath, pts->KeyCnfFNW },
+			{ "DLG_SETUPDIR_CYGTERMFILE", L"CygTerm Configuration File",
+			  LIST_PARAM_FUNC, (void*)GetCygtermIni, (void *)0 },
+			{ NULL, L"  Virtual Store",
+			  LIST_PARAM_FUNC, (void*)GetCygtermIni, (void *)1 },
+			{ "DLG_SETUPDIR_KNOWNHOSTSFILE", L"SSH known_hosts File",
+			  LIST_PARAM_FUNC, (void*)GetTTXSSHKwnownHostFile, (void *)0 },
+			{ NULL, L"  Virtual Store",
+			  LIST_PARAM_FUNC, (void*)GetTTXSSHKwnownHostFile, (void *)1 },
+			{ NULL, L"CurrentDirectry",
+			  LIST_PARAM_FUNC, (void*)GetCurrentPath },
+			{ NULL, L"HomeDir",
+			  LIST_PARAM_STR, pts->HomeDirW },
+			{ NULL, L"ExeDir",
+			  LIST_PARAM_STR, pts->ExeDirW },
+			{ NULL, L"LogDir",
+			  LIST_PARAM_STR, pts->LogDirW },
+			{ NULL, L"LogDefaultPathW",
+			  LIST_PARAM_STR, pts->LogDefaultPathW },
+			{ NULL, L"Download",
+			  LIST_PARAM_STR, pts->FileDirW },
+			{ NULL, L"Susie Plugin Path",
+			  LIST_PARAM_FUNC, (void*)GetSusiePluginPath },
+			{ NULL, L"UI language file",
+			  LIST_PARAM_STR, pts->UILanguageFileW },
+		};
+
+		int y = 0;
+		for (const SetupList *list = &setup_list[0]; list != &setup_list[_countof(setup_list)]; list++) {
+
+			const SetupListParam param = list->param;
+			wchar_t *s;
+			if (param & LIST_PARAM_STR) {
+				// 文字列へのポインタ
+				s = (wchar_t *)list->param_ptr;
+			} else if (param & LIST_PARAM_FUNC) {
+				// 関数から文字列をもらう
+				typedef wchar_t *(*func_t)(const SetupList *list, TTTSet *pts);
+				func_t func = (func_t)list->param_ptr;
+				s = func(list, pts);
+			} else {
+				assert("bad list?");
+				s = NULL;
+			}
+			if (s == NULL) {
+				// 表示不要
+				continue;
+			}
+
+			const char *key = list->key;
+			const wchar_t *def_text = list->def_text;
+			wchar_t *text;
+			GetI18nStrWW("Tera Term", key, def_text, pts->UILanguageFileW, &text);
+
+			LVITEMW item;
+			item.mask = LVIF_TEXT;
+			item.iItem = y;
+			item.iSubItem = 0;
+			item.pszText = text;
+			SendMessage(hWndList, LVM_INSERTITEMW, 0, (LPARAM)&item);
+			free(text);
+
+			item.mask = LVIF_TEXT;
+			item.iItem = y;
+			item.iSubItem = 1;
+			item.pszText = s;
+			SendMessage(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
+
+			y++;
+
+			if (param & LIST_PARAM_FUNC) {
+				// 表示用にもらった文字列を開放
+				free(s);
+			}
+		}
+
+		// 幅を調整
+		for (int i = 0; i < 2; i++) {
+			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE);
+		}
+
 		CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
 		return TRUE;
@@ -561,6 +809,39 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		TTEndDialog(hDlgWnd, 0);
 		return TRUE;
 
+	case WM_NOTIFY: {
+		NMHDR *nmhdr = (NMHDR *)lp;
+		if (nmhdr->idFrom == IDC_SETUP_DIR_LIST) {
+			NMLISTVIEW *nmlist = (NMLISTVIEW *)lp;
+			switch (nmlist->hdr.code) {
+//			case NM_CLICK:
+			case NM_RCLICK: {
+				POINT pointer_pos;
+				GetCursorPos(&pointer_pos);
+				LVHITTESTINFO ht = {};
+				ht.pt = pointer_pos;
+				ScreenToClient(nmlist->hdr.hwndFrom, &ht.pt);
+				ListView_HitTest(nmlist->hdr.hwndFrom, &ht);
+				if (ht.flags & LVHT_ONITEM) {
+					int hit_item = ht.iItem;
+
+					wchar_t path[MAX_PATH];
+					LV_ITEMW item;
+					item.mask = TVIF_TEXT;
+					item.iItem = hit_item;
+					item.iSubItem = 1;
+					item.pszText = path;
+					item.cchTextMax = _countof(path);
+					SendMessageW(nmlist->hdr.hwndFrom, LVM_GETITEMW, 0, (LPARAM)&item);
+
+					PopupAndExec(nmlist->hdr.hwndFrom, &pointer_pos, path, pts);
+				}
+				break;
+			}
+			}
+		}
+		break;
+	}
 	default:
 		return FALSE;
 	}
