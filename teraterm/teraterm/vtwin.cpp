@@ -756,16 +756,14 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	                                IMAGE_ICON, 0, 0, fuLoad));
 
 	{
-		int fuLoad = LR_DEFAULTCOLOR;
 		// Windows 2000 のタスクトレイアイコンは 4bit のみ対応
+		// Windows 2000 以外は VT ウィンドウから取得されるのでなにもしない
 		if (IsWindows2000()) {
-			fuLoad = LR_VGACOLOR;
+			HICON NotifyIcon = (HICON)LoadImage(hInstance,
+			                                    MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
+			                                    IMAGE_ICON, 16, 16, LR_VGACOLOR | LR_SHARED);
+			SetCustomNotifyIcon(NotifyIcon);
 		}
-		SetCustomNotifyIcon(
-			(HICON)LoadImage(
-				hInstance,
-				MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
-				IMAGE_ICON, 16, 16, fuLoad | LR_SHARED));
 	}
 
 	MainMenu = NULL;

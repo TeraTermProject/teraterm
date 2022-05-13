@@ -191,8 +191,12 @@ static void uninit_TTSSH(PTInstVar pvar)
 		            (LPARAM) pvar->OldSmallIcon);
 		pvar->OldSmallIcon = NULL;
 	}
-	if (OldNotifyIcon) {
-		SetCustomNotifyIcon(OldNotifyIcon);
+
+	if (IsWindows2000()) {
+		if (OldNotifyIcon != NULL) {
+			SetCustomNotifyIcon(OldNotifyIcon);
+			OldNotifyIcon = NULL;
+		}
 	}
 
 	ssh_heartbeat_lock_finalize();
@@ -694,17 +698,16 @@ void notify_established_secure_connection(PTInstVar pvar)
 	}
 
 	{
-		int fuLoad = LR_DEFAULTCOLOR;
 		// Windows 2000 のタスクトレイアイコンは 4bit のみ対応
+		// Windows 2000 以外は VT ウィンドウから取得されるのでなにもしない
 		if (IsWindows2000()) {
-			fuLoad = LR_VGACOLOR;
+			if (SecureNotifyIcon == NULL) {
+				SecureNotifyIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
+				                             IMAGE_ICON, 16, 16, LR_VGACOLOR | LR_SHARED);
+			}
+			OldNotifyIcon = GetCustomNotifyIcon();
+			SetCustomNotifyIcon(SecureNotifyIcon);
 		}
-		if (SecureNotifyIcon == NULL) {
-			SecureNotifyIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
-			                             IMAGE_ICON, 16, 16, fuLoad | LR_SHARED);
-		}
-		OldNotifyIcon = GetCustomNotifyIcon();
-		SetCustomNotifyIcon(SecureNotifyIcon);
 	}
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
