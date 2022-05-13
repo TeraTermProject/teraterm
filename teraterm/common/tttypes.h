@@ -510,7 +510,7 @@ struct tttset {
 	WORD LogTypePlainText;
 	WORD LogTimestamp;
 	char LogDefaultName[80];
-	wchar_t *LogDefaultPathW;	// ログフォルダ([file]/[log]メニューのログ)
+	char reserve_LogDefaultPath[MAX_PATH];	// 廃止,LogDefaultPathW へ移行
 	WORD LogAutoStart;
 	unsigned int PasteFlag;
 	WORD FallbackToCP932;	// ConfirmPasteMouseRButton が廃止になったので転用
@@ -651,6 +651,7 @@ struct tttset {
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
 	wchar_t *LogDirW;					// logやダンプを置くフォルダ
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
+	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
 };
 
 typedef struct tttset TTTSet, *PTTSet;
