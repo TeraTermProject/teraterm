@@ -52,7 +52,7 @@ static const struct {
 	WORD key_code;
 	const char *key_str;
 } key_list[] = {
-	{VK_CONTROL, "VT_CONTROL"},
+	{VK_CONTROL, "VK_CONTROL"},
 	{VK_SHIFT, "VK_SHIFT"},
 };
 
