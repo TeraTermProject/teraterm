@@ -252,16 +252,30 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 			break;
 		}
-		case WM_DESTROY: {
-			free(dlg_data->dlg_templ);
-			free(dlg_data);
-			SetWindowLongPtr(hWnd, DWLP_USER, NULL);
-			break;
-		}
 		default:
 			return FALSE;
 	}
 	return FALSE;
+}
+
+static UINT CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp)
+{
+	(void)hwnd;
+	UINT ret_val = 0;
+	switch (uMsg) {
+	case PSPCB_CREATE:
+		ret_val = 1;
+		break;
+	case PSPCB_RELEASE:
+		free((void *)ppsp->pResource);
+		ppsp->pResource = NULL;
+		free((void *)ppsp->lParam);
+		ppsp->lParam = NULL;
+		break;
+	default:
+		break;
+	}
+	return ret_val;
 }
 
 HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
@@ -276,16 +290,16 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
-	psp.dwFlags = PSP_DEFAULT;
+	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE /*| PSP_HASHELP */;
 	psp.hInstance = inst;
+	psp.pfnCallback = CallBack;
+	psp.pszTitle = L"font";		// TODO lng ƒtƒ@ƒCƒ‹‚É“ü‚ê‚é
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
 	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
 	psp.pResource = Param->dlg_templ;
 #endif
-	psp.pszTitle = L"font";
-	psp.dwFlags |= (PSP_USETITLE /*| PSP_HASHELP */);
 
 	psp.pfnDlgProc = Proc;
 	psp.lParam = (LPARAM)Param;
