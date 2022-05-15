@@ -270,19 +270,19 @@ static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int d
 	}
 }
 
-static void SetVTIcon(HINSTANCE hInstance, WORD IconID)
+static void SetVTIcon(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 {
 	HINSTANCE inst;
 	WORD icon_id;
 	const int dpi = GetMonitorDpiFromWindow(HVTWin);
 
-	ts.PluginVTIocnInstance = hInstance;
-	ts.PluginVTIocnID = IconID;
+	ts->PluginVTIocnInstance = hInstance;
+	ts->PluginVTIocnID = IconID;
 
-	inst = (ts.PluginVTIocnInstance == NULL) ? hInst : hInstance;
-	icon_id = (ts.PluginVTIocnID != 0) ? IconID :
-	                                     (ts.VTIcon != IdIconDefault) ? ts.VTIcon
-	                                                                  : IDI_VT;
+	inst = (ts->PluginVTIocnInstance == NULL) ? hInst : hInstance;
+	icon_id = (ts->PluginVTIocnID != 0) ? IconID :
+	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
+	                                                                    : IDI_VT;
 	SetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), dpi);
 }
 

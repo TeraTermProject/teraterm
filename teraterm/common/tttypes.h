@@ -348,6 +348,8 @@ typedef struct cygterm {
 } cygterm_t;
 
 /* TTTSet */
+typedef struct tttset TTTSet, *PTTSet;
+
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
@@ -648,10 +650,8 @@ struct tttset {
 	HINSTANCE PluginVTIocnInstance;
 	WORD PluginVTIocnID;
 
-	void (*SetVTIcon)(HINSTANCE hInstance, WORD IconID);
+	void (*SetVTIcon)(TTTSet *ts, HINSTANCE hInstance, WORD IconID);
 };
-
-typedef struct tttset TTTSet, *PTTSet;
 
   /* New Line modes */
 #define IdCR   1

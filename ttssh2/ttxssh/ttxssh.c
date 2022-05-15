@@ -182,7 +182,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	FWD_end(pvar);
 	FWDUI_end(pvar);
 
-	pvar->ts->SetVTIcon(NULL, 0);
+	pvar->ts->SetVTIcon(pvar->ts, NULL, 0);
 
 	ssh_heartbeat_lock_finalize();
 
@@ -659,7 +659,7 @@ static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
 
 void notify_established_secure_connection(PTInstVar pvar)
 {
-	pvar->ts->SetVTIcon(hInst, pvar->settings.IconID);
+	pvar->ts->SetVTIcon(pvar->ts, hInst, pvar->settings.IconID);
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
 }
