@@ -647,8 +647,8 @@ struct tttset {
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
 	wchar_t *LogDirW;					// logやダンプを置くフォルダ
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
-	HINSTANCE PluginVTIocnInstance;
-	WORD PluginVTIocnID;
+	HINSTANCE PluginVTIconInstance;
+	WORD PluginVTIconID;
 
 	void (*SetVTIcon)(TTTSet *ts, HINSTANCE hInstance, WORD IconID);
 };

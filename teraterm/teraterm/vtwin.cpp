@@ -276,11 +276,11 @@ static void SetVTIcon(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 	WORD icon_id;
 	const int dpi = GetMonitorDpiFromWindow(HVTWin);
 
-	ts->PluginVTIocnInstance = hInstance;
-	ts->PluginVTIocnID = IconID;
+	ts->PluginVTIconInstance = hInstance;
+	ts->PluginVTIconID = IconID;
 
-	inst = (ts->PluginVTIocnInstance == NULL) ? hInst : hInstance;
-	icon_id = (ts->PluginVTIocnID != 0) ? IconID :
+	inst = (ts->PluginVTIconInstance == NULL) ? hInst : hInstance;
+	icon_id = (ts->PluginVTIconID != 0) ? IconID :
 	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
 	                                                                    : IDI_VT;
 	SetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), dpi);
@@ -467,8 +467,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		HINSTANCE inst;
 		WORD icon_id;
 		const int dpi = GetMonitorDpiFromWindow(m_hWnd);
-		inst = (ts.PluginVTIocnInstance != NULL) ? ts.PluginVTIocnInstance : m_hInst;
-		icon_id = (ts.PluginVTIocnID != 0) ? ts.PluginVTIocnID
+		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
+		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
 		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), dpi);
@@ -5079,8 +5079,8 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	{
 		HINSTANCE inst;
 		WORD icon_id;
-		inst = (ts.PluginVTIocnInstance != NULL) ? ts.PluginVTIocnInstance : hInst;
-		icon_id = (ts.PluginVTIocnID != 0) ? ts.PluginVTIocnID
+		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : hInst;
+		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
 		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);

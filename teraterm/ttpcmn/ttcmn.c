@@ -273,8 +273,8 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 		return FALSE;
 	}
 
-	ts->PluginVTIocnInstance = NULL;
-	ts->PluginVTIocnID = 0;
+	ts->PluginVTIconInstance = NULL;
+	ts->PluginVTIconID = 0;
 }
 
 // 設定ファイルをディスクに保存し、Tera Term本体を再起動する。
