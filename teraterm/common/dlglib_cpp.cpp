@@ -479,3 +479,51 @@ void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar
 		i++;
 	} while (i <= maxhostlist);
 }
+
+/**
+ *	ウィンドウにアイコンをセットする
+ *
+ *	@param	hInst		アイコンを保持しているモジュールのinstance
+ *						icon_name == NULL のとき NULL でもよい
+ *	@param	hWnd		アイコンを設定するWindow Handle
+ *	@param	icon_name	アイコン名
+ *						NULLのとき アイコンを削除する
+ *						idからの変換はMAKEINTRESOURCEW()を使う
+ *	@param	dpi			dpi
+ *						0 のとき hWnd が表示されているモニタのDPI
+ */
+void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
+{
+	HICON icon;
+	if (icon_name != NULL) {
+		if (dpi == 0) {
+			// hWnd が表示されているモニタのDPI
+			dpi = GetMonitorDpiFromWindow(hWnd);
+		}
+
+		// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=96)のとき)
+		icon = TTLoadIcon(hInst, icon_name, 0, 0, dpi, FALSE);
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+
+		// 小さいアイコン(16x16,ディスプレイの拡大率が100%(dpi=96)のとき)
+		icon = TTLoadIcon(hInst, icon_name, 16, 16, dpi, FALSE);
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+	}
+	else {
+		// アイコンを削除
+		icon = (HICON)::SendMessage(hWnd, WM_GETICON, ICON_BIG, 0);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, 0);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+	}
+}

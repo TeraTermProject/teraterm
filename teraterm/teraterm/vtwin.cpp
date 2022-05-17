@@ -241,28 +241,10 @@ void SetAutoConnectPort(int port)
 	AutoDisconnectedPort = port;
 }
 
-static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int dpi)
-{
-	// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=96)のとき)
-	HICON icon = TTLoadIcon(hInst_, icon_name, 0, 0, dpi, FALSE);
-	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
-	if (icon != NULL) {
-		DestroyIcon(icon);
-	}
-
-	// 小さいアイコン(16x16,ディスプレイの拡大率が100%(dpi=96)のとき)
-	icon = TTLoadIcon(hInst_, icon_name, 16, 16, dpi, FALSE);
-	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
-	if (icon != NULL) {
-		DestroyIcon(icon);
-	}
-}
-
 static void SetVTIcon(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 {
 	HINSTANCE inst;
 	WORD icon_id;
-	const int dpi = GetMonitorDpiFromWindow(HVTWin);
 
 	ts->PluginVTIconInstance = hInstance;
 	ts->PluginVTIconID = IconID;
@@ -271,7 +253,7 @@ static void SetVTIcon(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 	icon_id = (ts->PluginVTIconID != 0) ? IconID :
 	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
 	                                                                    : IDI_VT;
-	SetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), dpi);
+	TTSetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -454,14 +436,13 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	{
 		HINSTANCE inst;
 		WORD icon_id;
-		const int dpi = GetMonitorDpiFromWindow(m_hWnd);
 
 		// VT ウィンドウのアイコン
 		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
 		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
-		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), dpi);
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(icon_id), 0);
 
 		// 通知領域のアイコン
 		// Windows 2000 のタスクトレイアイコンは 4bit のみ対応なので、ID を保存しておいて表示のときに読み込んでもらう
@@ -5082,7 +5063,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
-		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
 
 	return TRUE;

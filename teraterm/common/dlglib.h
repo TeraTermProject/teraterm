@@ -97,6 +97,7 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
 void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy);
 void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW);
 HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify);
+void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi);
 
 #ifdef __cplusplus
 }
