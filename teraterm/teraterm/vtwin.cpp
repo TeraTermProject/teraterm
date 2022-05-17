@@ -244,29 +244,17 @@ void SetAutoConnectPort(int port)
 static void SetIcon(HINSTANCE hInst_, HWND hWnd, const wchar_t *icon_name, int dpi)
 {
 	// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=96)のとき)
-	HICON icon = TTLoadIcon(hInst_, icon_name, 0, 0, dpi);
+	HICON icon = TTLoadIcon(hInst_, icon_name, 0, 0, dpi, FALSE);
 	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 	if (icon != NULL) {
 		DestroyIcon(icon);
 	}
 
 	// 小さいアイコン(16x16,ディスプレイの拡大率が100%(dpi=96)のとき)
-	icon = TTLoadIcon(hInst_, icon_name, 16, 16, dpi);
+	icon = TTLoadIcon(hInst_, icon_name, 16, 16, dpi, FALSE);
 	icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
 	if (icon != NULL) {
 		DestroyIcon(icon);
-	}
-
-	// 通知領域のアイコン
-	// Windows 2000 のタスクトレイアイコンは 4bit のみ対応
-	// Windows 2000 以外は VT ウィンドウから取得されるのでなにもしない
-	if (IsWindows2000()) {
-		icon  = GetCustomNotifyIcon();
-		if (icon != NULL) {
-			DestroyIcon(icon);
-		}
-		icon = TTLoadIcon(hInst_, icon_name, 16, 16, dpi);
-		SetCustomNotifyIcon(icon);
 	}
 }
 
@@ -467,11 +455,22 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		HINSTANCE inst;
 		WORD icon_id;
 		const int dpi = GetMonitorDpiFromWindow(m_hWnd);
+
+		// VT ウィンドウのアイコン
 		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
 		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
 		SetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), dpi);
+
+		// 通知領域のアイコン
+		// Windows 2000 のタスクトレイアイコンは 4bit のみ対応なので、ID を保存しておいて表示のときに読み込んでもらう
+		// Windows 2000 以外は VT ウィンドウから取得されるのでなにもしない
+		if (IsWindows2000()) {
+			icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
+			icon_id = IDI_VT_CLASSIC;
+			SetCustomNotifyIconID(inst, icon_id, FALSE);
+		}
 	}
 
 	MainMenu = NULL;

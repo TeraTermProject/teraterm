@@ -48,11 +48,12 @@
 #include "ttcommon.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "dlglib.h"
 
 typedef struct {
 	TT_NOTIFYICONDATAW_V2 notify_icon;
 	int NotifyIconShowCount;
-	HICON CustomIcon;
+	HICON CustomIcon; // 未使用
 } NotifyIcon;
 
 /**
@@ -88,6 +89,15 @@ static NotifyIcon *NotifyCreate(HWND hWnd, HICON icon, UINT msg)
 	ni->NotifyIconShowCount = 0;
 
 	return ni;
+}
+
+static void NotifyUpdateIcon(NotifyIcon *ni, HICON icon)
+{
+	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
+	NotifyIcon->uFlags = NIF_ICON;
+	NotifyIcon->uID = 1;
+	NotifyIcon->hIcon = icon;
+	Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
 }
 
 static void NotifyDelete(NotifyIcon *ni)
@@ -160,40 +170,97 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 	ni->NotifyIconShowCount += 1;
 }
 
-/*
- *	EXPORT API
- */
-static HICON CustomIcon = NULL;
-
 static NotifyIcon *GetNotifyData(PComVar cv)
 {
 	NotifyIcon *p = (NotifyIcon *)cv->NotifyIcon;
 	return p;
 }
 
+/*
+ *	EXPORT API
+ */
+
+// SetCustomNotifyIcon(), GetCustomNotifyIcon() で操作できるが、内部からは使用されない
+static HICON CustomIcon = NULL;
+
+// 動作するが CustomIcon は使用されない
 void WINAPI SetCustomNotifyIcon(HICON icon)
 {
 	CustomIcon = icon;
 }
 
+// 動作するが CustomIcon は使用されない
 HICON WINAPI GetCustomNotifyIcon()
 {
 	return CustomIcon;
 }
 
+static HINSTANCE TTCustomIconInstance = NULL;
+static WORD TTCustomIconID = 0;
+static HINSTANCE CustomIconInstance = NULL;
+static WORD CustomIconID = 0;
+
+void WINAPI SetCustomNotifyIconID(HINSTANCE hInstance, WORD IconID, BOOL plugin)
+{
+	if (!plugin) {
+		CustomIconInstance = hInstance;
+		CustomIconID = IconID;
+
+		// あとで外部からカスタム通知アイコンを消去されるときのために
+		// Tera Term 本体から設定されたカスタム通知アイコンを保持しておく
+		TTCustomIconInstance = hInstance;
+		TTCustomIconID = IconID;
+	}
+	else {
+		if (hInstance == NULL) {
+			CustomIconInstance = TTCustomIconInstance;
+		}
+		else {
+			CustomIconInstance = hInstance;
+		}
+		if (IconID == 0) {
+			CustomIconID = TTCustomIconID;
+		}
+		else {
+			CustomIconID = IconID;
+		}
+	}
+}
+
 void WINAPI CreateNotifyIcon(PComVar cv)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
-	if (ni != NULL) {
+	HICON icon = NULL;
+
+	// ウィンドウハンドルが必要になるので、接続中でないとアイコンは作成できない
+	if (cv->HWin == NULL) {
 		return;
 	}
-	HICON icon = CustomIcon;
-	if (icon == NULL) {
+
+	if (CustomIconInstance != NULL && CustomIconID != 0) {
+		const int dpi = GetMonitorDpiFromWindow(cv->HWin);
+		icon = TTLoadIcon(CustomIconInstance, MAKEINTRESOURCEW(CustomIconID), 16 ,16, dpi, TRUE);
+	}
+	else {
 		icon = (HICON)SendMessage(cv->HWin, WM_GETICON, ICON_SMALL, 0);
 	}
 
-	ni = NotifyCreate(cv->HWin, icon, WM_USER_NOTIFYICON);
+	if (ni == NULL) {
+		ni = NotifyCreate(cv->HWin, icon, WM_USER_NOTIFYICON);
+	}
+	else {
+		NotifyUpdateIcon(ni, icon);
+	}
 	cv->NotifyIcon = ni;
+
+	// 通知アイコンは渡したらコピーされるので保持しなくてよい
+	// すぐに破棄する
+	// https://docs.microsoft.com/ja-jp/windows/win32/shell/taskbar
+	// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
+	if (CustomIconInstance != NULL && CustomIconID != 0 &&
+	    icon != NULL) {
+		DestroyIcon(icon);
+	}
 }
 
 void WINAPI DeleteNotifyIcon(PComVar cv)
@@ -207,10 +274,12 @@ void WINAPI DeleteNotifyIcon(PComVar cv)
 
 void WINAPI ShowNotifyIcon(PComVar cv)
 {
-	NotifyIcon* ni = GetNotifyData(cv);
+	NotifyIcon* ni;
+
+	CreateNotifyIcon(cv);
+	ni = GetNotifyData(cv);
 	if (ni == NULL) {
-		CreateNotifyIcon(cv);
-		ni = GetNotifyData(cv);
+		return;
 	}
 
 	NotifyShowIcon(ni);
@@ -219,22 +288,29 @@ void WINAPI ShowNotifyIcon(PComVar cv)
 void WINAPI HideNotifyIcon(PComVar cv)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
+	if (ni == NULL) {
+		return;
+	}
 	NotifyHide(ni);
 }
 
-// 使われていない
 void WINAPI SetVerNotifyIcon(PComVar cv, unsigned int ver)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
+	if (ni == NULL) {
+		return;
+	}
 	NotifySetVersion(ni, ver);
 }
 
 void WINAPI NotifyMessageW(PComVar cv, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
-	NotifyIcon *ni = GetNotifyData(cv);
+	NotifyIcon *ni;
+
+	CreateNotifyIcon(cv);
+	ni = GetNotifyData(cv);
 	if (ni == NULL) {
-		CreateNotifyIcon(cv);
-		ni = GetNotifyData(cv);
+		return;
 	}
 
 	NotifySetMessageW(ni, msg, title, flag);

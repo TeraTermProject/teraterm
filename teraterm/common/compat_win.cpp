@@ -283,6 +283,20 @@ static bool IsWindowsNT4()
 	return false;
 }
 
+static bool IsWindows2000()
+{
+	OSVERSIONINFOA osvi;
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	GetVersionExA(&osvi);
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+		osvi.dwMajorVersion == 5 &&
+		osvi.dwMinorVersion == 0) {
+		// 2000
+		return true;
+	}
+	return false;
+}
+
 void WinCompatInit()
 {
 	static BOOL done = FALSE;
@@ -621,7 +635,7 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 	return S_OK;
 }
 
-HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico)
+HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico, BOOL notify)
 {
 	if (pLoadIconWithScaleDown != NULL) {
 		HRESULT hr = pLoadIconWithScaleDown(hinst, pszName, cx, cy, phico);
@@ -632,10 +646,18 @@ HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, 
 
 	HICON hIcon;
 	int fuLoad = LR_DEFAULTCOLOR;
-	if (IsWindowsNT4()) {
+	if (notify) {
+		// Windows 2000 のタスクトレイアイコンは 4bit アイコンのみ対応
+		if (IsWindows2000()) {
+			fuLoad = LR_VGACOLOR;
+		}
+	}
+	else {
 		// Windows NT 4.0 は 4bit アイコンしかサポートしていない
 		// 16(4bit) color = VGA color
-		fuLoad = LR_VGACOLOR;
+		if (IsWindowsNT4()) {
+			fuLoad = LR_VGACOLOR;
+		}
 	}
 	hIcon = (HICON)LoadImageW(hinst, pszName, IMAGE_ICON, cx, cy, fuLoad);
 	if (hIcon == NULL) {

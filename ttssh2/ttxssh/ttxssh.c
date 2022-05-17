@@ -183,6 +183,9 @@ static void uninit_TTSSH(PTInstVar pvar)
 	FWDUI_end(pvar);
 
 	pvar->ts->SetVTIcon(pvar->ts, NULL, 0);
+	if (IsWindows2000()) {
+		SetCustomNotifyIconID(NULL, 0, TRUE);
+	}
 
 	ssh_heartbeat_lock_finalize();
 
@@ -660,6 +663,13 @@ static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
 void notify_established_secure_connection(PTInstVar pvar)
 {
 	pvar->ts->SetVTIcon(pvar->ts, hInst, pvar->settings.IconID);
+
+	// 通知領域のアイコン
+	// Windows 2000 のタスクトレイアイコンは 4bit のみ対応なので、ID を保存しておいて表示のときに読み込んでもらう
+	// Windows 2000 以外は VT ウィンドウから取得されるのでなにもしない
+	if (IsWindows2000()) {
+		SetCustomNotifyIconID(hInst, pvar->settings.IconID, TRUE);
+	}
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
 }

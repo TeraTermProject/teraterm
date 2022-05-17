@@ -82,6 +82,7 @@ DllExport void PASCAL HideNotifyIcon(PComVar cv);
 DllExport void PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
 DllExport void PASCAL SetCustomNotifyIcon(HICON icon);
 DllExport HICON PASCAL GetCustomNotifyIcon(void);
+DllExport void PASCAL SetCustomNotifyIconID(HINSTANCE hInstance, WORD IconID, BOOL plugin);
 
 #define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
 #define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)

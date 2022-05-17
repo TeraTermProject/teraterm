@@ -337,12 +337,13 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
  *	@param[in]	cx	アイコンサイズ(96dpi時)
  *	@param[in]	cy	アイコンサイズ
  *	@param[in]	dpi	アイコンサイズ(cx,cy)はdpi/96倍のサイズで読み込まれる
+ *	@param[in]	notify	カスタム通知アイコンの場合は TRUE, ウィンドウアイコンの場合は FALSE
  *	@return		HICON
  *
  *		cx == 0 && cy == 0 のときデフォルトのアイコンサイズで読み込む
  *		DestroyIcon()すること
  */
-HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
+HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify)
 {
 	if (cx == 0 && cy == 0) {
 		// 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
@@ -360,7 +361,7 @@ HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
 		cy = cy * dpi / 96;
 	}
 	HICON hIcon;
-	HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon);
+	HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon, notify);
 	if(FAILED(hr)) {
 		hIcon = NULL;
 	}
@@ -401,7 +402,7 @@ static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DPICHANGED: {
 		const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 		const UINT new_dpi = LOWORD(wp);
-		HICON icon = TTLoadIcon(hinst, data->icon_name, data->cx, data->cy, new_dpi);
+		HICON icon = TTLoadIcon(hinst, data->icon_name, data->cx, data->cy, new_dpi, FALSE);
 		if (icon != NULL) {
 			DestroyIcon(data->icon);
 			data->icon = icon;
@@ -450,7 +451,7 @@ void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 
 	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
 	const UINT dpi = GetMonitorDpiFromWindow(dlg);
-	data->icon = TTLoadIcon(hinst, name, cx, cy, dpi);
+	data->icon = TTLoadIcon(hinst, name, cx, cy, dpi, FALSE);
 
 	const HWND hwnd = GetDlgItem(dlg, nID);
 	SetIcon(hwnd, data->icon);

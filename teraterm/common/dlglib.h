@@ -96,7 +96,7 @@ wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t 
 wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile);
 void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy);
 void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW);
-HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi);
+HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify);
 
 #ifdef __cplusplus
 }
