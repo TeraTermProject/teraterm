@@ -361,9 +361,20 @@ HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi,
 		cy = cy * dpi / 96;
 	}
 	HICON hIcon;
-	HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon, notify);
-	if(FAILED(hr)) {
-		hIcon = NULL;
+	if (IsWindowsNT4() || (notify && IsWindows2000())) {
+		// 4bit アイコン
+		// 		1. NT4 のとき
+		//				Windows NT 4.0 は 4bit アイコンしかサポートしていない
+		// 		2. Windows 2000 のタスクトレイアイコンのとき
+		//				Windows 2000 のタスクトレイは 4bit アイコンしかサポートしていない
+		// LR_VGACOLOR = 16(4bit) color = VGA color
+		hIcon = (HICON)LoadImageW(hinst, name, IMAGE_ICON, cx, cy, LR_VGACOLOR);
+	}
+	else {
+		HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon);
+		if(FAILED(hr)) {
+			hIcon = NULL;
+		}
 	}
 	return hIcon;
 }
