@@ -53,8 +53,6 @@ class PrivateData : public TTCDialog
 {
 public:
 	PrivateData() {
-		SmallIcon = NULL;
-		BigIcon = NULL;
 		check_2sec = NULL;
 		show = FALSE;
 		UILanguageFile_ = NULL;
@@ -98,8 +96,6 @@ public:
 
 private:
 	virtual BOOL OnInitDialog() {
-		int fuLoad = LR_DEFAULTCOLOR;
-
 		if (HideDialog) {
 			// Visible = False でもフォアグラウンドに来てしまうので、そうならない
 			// ように拡張スタイル WS_EX_NOACTIVATE を指定する。
@@ -109,20 +105,7 @@ private:
 			ModifyStyleEx(0, WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
 		}
 
-		if (IsWindowsNT4()) {
-			fuLoad = LR_VGACOLOR;
-		}
-		SmallIcon = LoadImage(m_hInst,
-							  MAKEINTRESOURCE(IDI_TTERM),
-							  IMAGE_ICON, 16, 16, fuLoad);
-		::PostMessage(m_hWnd, WM_SETICON, ICON_SMALL,
-					  (LPARAM)SmallIcon);
-
-		BigIcon = LoadImage(m_hInst,
-							MAKEINTRESOURCE(IDI_TTERM),
-							IMAGE_ICON, 0, 0, fuLoad);
-		::PostMessage(m_hWnd, WM_SETICON, ICON_BIG,
-					  (LPARAM)BigIcon);
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTERM), 0);
 
 		AddModelessHandle(m_hWnd);
 
@@ -136,6 +119,7 @@ private:
 
 	virtual BOOL OnClose()
 	{
+		TTSetIcon(m_hInst, m_hWnd, NULL, 0);
 		if (observer_ != NULL) {
 			observer_->OnClose();
 		}
@@ -176,6 +160,18 @@ private:
 
 		delete this;
 		return TRUE;
+	}
+
+	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM) {
+		switch (msg) {
+		case WM_DPICHANGED: {
+			const UINT NewDPI = LOWORD(wp);
+			TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTERM), NewDPI);
+			return (LRESULT)TRUE;
+		}
+		default:
+			return (LRESULT)FALSE;
+		}
 	}
 
 private:
