@@ -2530,6 +2530,17 @@ void WINAPI CreateNotifyIcon(PComVar cv)
 
 		NotifyIconShowCount = 0;
 	}
+	else {
+		cv->NotifyIcon->uFlags = NIF_ICON;
+		cv->NotifyIcon->uID = 1;
+		if (CustomIcon) {
+			notify_icon.hIcon = CustomIcon;
+		}
+		else {
+			notify_icon.hIcon = (HICON)SendMessage(cv->HWin, WM_GETICON, ICON_SMALL, 0);
+		}
+		Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+	}
 
 	return;
 }
@@ -2547,8 +2558,9 @@ void WINAPI DeleteNotifyIcon(PComVar cv)
 
 void WINAPI ShowNotifyIcon(PComVar cv)
 {
+	CreateNotifyIcon(cv);
 	if (cv->NotifyIcon == NULL) {
-		CreateNotifyIcon(cv);
+		return;
 	}
 
 	cv->NotifyIcon->uFlags = NIF_STATE;
@@ -2597,8 +2609,9 @@ void WINAPI NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
 		return;
 	}
 
+	CreateNotifyIcon(cv);
 	if (cv->NotifyIcon == NULL) {
-		CreateNotifyIcon(cv);
+		return;
 	}
 
 	cv->NotifyIcon->uFlags = NIF_INFO | NIF_STATE;
