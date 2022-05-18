@@ -13,6 +13,7 @@ cache:
 
 build_script:
   - ci_scripts/build_appveyor_release_bat.bat
+  - ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
 artifacts:
   - path: installer/Output/*.exe
