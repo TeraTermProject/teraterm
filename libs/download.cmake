@@ -181,12 +181,12 @@ download_extract(
 # oniguruma
 message("oniguruma")
 set(EXT_DIR "${CMAKE_CURRENT_LIST_DIR}")
-set(DIR_IN_ARC "onig-6.9.7")
+set(DIR_IN_ARC "onig-6.9.8")
 set(RENAME_DIR "oniguruma")
 set(CHECK_FILE "oniguruma/HISTORY")
-set(CHECK_HASH "5ad81979c1e3beb313bf94e5a57c0772810b5b159cdfa629e2daf7b0643e1a3d")
-set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.7.1/onig-6.9.7.1.tar.gz")
-set(ARC_HASH "https://github.com/kkos/oniguruma/releases/download/v6.9.7.1/onig-6.9.7.1.tar.gz.sha256")
+set(CHECK_HASH "9291f7a1beaa0410265663dc8c18d442b7b3c4fd62a6d6f58df7cacdc4be3c92")
+set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.8/onig-6.9.8.tar.gz")
+set(ARC_HASH "https://github.com/kkos/oniguruma/releases/download/v6.9.8/onig-6.9.8.tar.gz.sha256")
 set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/oniguruma")
 download_extract(
   ${SRC_URL}
