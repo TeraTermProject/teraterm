@@ -258,7 +258,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return FALSE;
 }
 
-static UINT CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp)
+static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp)
 {
 	(void)hwnd;
 	UINT ret_val = 0;
