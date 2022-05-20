@@ -252,7 +252,6 @@ BOOL CCtrlWindow::OnInitDialog()
 	};
 	BOOL IOption, VOption;
 	int CmdShow;
-	int fuLoad = LR_DEFAULTCOLOR;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
 
@@ -260,17 +259,7 @@ BOOL CCtrlWindow::OnInitDialog()
 
 	Pause = FALSE;
 
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
-	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(m_hInst,
-	                                MAKEINTRESOURCE(IDI_TTMACRO),
-	                                IMAGE_ICON,16,16,fuLoad));
-	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(m_hInst,
-	                                MAKEINTRESOURCE(IDI_TTMACRO),
-	                                IMAGE_ICON,0,0,fuLoad));
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 
 	ParseParam(&IOption,&VOption);
 

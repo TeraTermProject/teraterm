@@ -58,7 +58,6 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
-	int fuLoad = LR_DEFAULTCOLOR;
 	m_hInst = hInstance;
 
 	if (! LoadTTTEK()) {
@@ -106,17 +105,7 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	// register this window to the window list
 	RegWin(HVTWin,HTEKWin);
 
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
-	::PostMessage(HTEKWin,WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(hInstance,
-	                                MAKEINTRESOURCE((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK),
-	                                IMAGE_ICON,16,16,fuLoad));
-	::PostMessage(HTEKWin,WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(hInstance,
-	                                MAKEINTRESOURCE((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK),
-	                                IMAGE_ICON, 0, 0, fuLoad));
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK), 0);
 
 	MainMenu = NULL;
 	WinMenu = NULL;
@@ -915,6 +904,11 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 				retval = HTCAPTION;
 			}
 		}
+		break;
+	}
+	case WM_DPICHANGED: {
+		const UINT NewDPI = LOWORD(wp);
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK), NewDPI);
 		break;
 	}
 	default:
