@@ -39,7 +39,7 @@ endif()
 # build
 message("oniguruma")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P oniguruma.cmake
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildoniguruma.cmake
   )
 message("zlib")
 execute_process(
