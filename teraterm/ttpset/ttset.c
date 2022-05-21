@@ -734,6 +734,36 @@ static void WriteCygtermConfFile(PTTSet ts)
 
 }
 
+/**
+ *	BGセクションの読み込み
+ *		テーマ以外のアイテム
+ */
+static void DispReadIni(const wchar_t *FName, PTTSet ts)
+{
+	ts->EtermLookfeel.BGUseAlphaBlendAPI = GetOnOff(BG_SECTION, "BGUseAlphaBlendAPI", FName, TRUE);
+	ts->EtermLookfeel.BGNoFrame = GetOnOff(BG_SECTION, "BGNoFrame", FName, FALSE);
+	ts->EtermLookfeel.BGFastSizeMove = GetOnOff(BG_SECTION, "BGFastSizeMove", FName, TRUE);
+	ts->EtermLookfeel.BGNoCopyBits = GetOnOff(BG_SECTION, "BGFlickerlessMove", FName, TRUE);
+}
+
+/**
+ *	BGセクションの書き込み
+ *		テーマ以外のアイテム
+ */
+static void DispWriteIni(const wchar_t *FName, PTTSet ts)
+{
+	WriteOnOff(BG_SECTION, "BGUseAlphaBlendAPI", FName,
+	           ts->EtermLookfeel.BGUseAlphaBlendAPI);
+	WritePrivateProfileString(BG_SECTION, "BGSPIPath",
+	                          ts->EtermLookfeel.BGSPIPath, FName);
+	WriteOnOff(BG_SECTION, "BGFastSizeMove", FName,
+	           ts->EtermLookfeel.BGFastSizeMove);
+	WriteOnOff(BG_SECTION, "BGFlickerlessMove", FName,
+	           ts->EtermLookfeel.BGNoCopyBits);
+	WriteOnOff(BG_SECTION, "BGNoFrame", FName,
+	           ts->EtermLookfeel.BGNoFrame);
+}
+
 void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 {
 	int i;
@@ -2231,6 +2261,8 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = 1;
 	}
+
+	DispReadIni(FName, ts);
 }
 
 void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
@@ -3071,19 +3103,11 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* update file */
 	WritePrivateProfileString(NULL, NULL, NULL, FName);
 
+	DispWriteIni(FName, ts);
+
 	// Eterm lookfeel alphablend (2005.4.24 yutaka)
 	WriteOnOff(BG_SECTION, "BGEnable", FName,
 	           ts->EtermLookfeel.BGEnable);
-	WriteOnOff(BG_SECTION, "BGUseAlphaBlendAPI", FName,
-	           ts->EtermLookfeel.BGUseAlphaBlendAPI);
-	WritePrivateProfileString(BG_SECTION, "BGSPIPath",
-	                          ts->EtermLookfeel.BGSPIPath, FName);
-	WriteOnOff(BG_SECTION, "BGFastSizeMove", FName,
-	           ts->EtermLookfeel.BGFastSizeMove);
-	WriteOnOff(BG_SECTION, "BGFlickerlessMove", FName,
-	           ts->EtermLookfeel.BGNoCopyBits);
-	WriteOnOff(BG_SECTION, "BGNoFrame", FName,
-	           ts->EtermLookfeel.BGNoFrame);
 	WritePrivateProfileString(BG_SECTION, "BGThemeFile",
 	                          ts->EtermLookfeel.BGThemeFile, FName);
 

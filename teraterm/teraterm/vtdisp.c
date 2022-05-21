@@ -1417,11 +1417,6 @@ void BGInitialize(BOOL initialize_once)
 		BGEnable = BGGetOnOff("BGEnable", FALSE, ts.SetupFName);
 	}
 
-	ts.EtermLookfeel.BGUseAlphaBlendAPI = BGGetOnOff("BGUseAlphaBlendAPI", TRUE, ts.SetupFName);
-	ts.EtermLookfeel.BGNoFrame = BGGetOnOff("BGNoFrame", FALSE, ts.SetupFName);
-	ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove", TRUE, ts.SetupFName);
-	ts.EtermLookfeel.BGNoCopyBits = BGGetOnOff("BGFlickerlessMove", TRUE, ts.SetupFName);
-
 	GetPrivateProfileString(BG_SECTION, "BGSPIPath", "plugin", BGSPIPath, MAX_PATH, ts.SetupFName);
 	strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
 
@@ -1883,7 +1878,6 @@ static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
 void ChangeFont()
 {
 	int i, j;
-	TEXTMETRIC Metrics;
 	LOGFONTA VTlf;
 
 	/* Delete Old Fonts */
@@ -1896,15 +1890,16 @@ void ChangeFont()
 			DeleteObject(VTFont[i]);
 	}
 
+	/* Normal Font */
+	SetLogFont(&VTlf, TRUE);
+	VTFont[0] = CreateFontIndirect(&VTlf);
+
+	/* set IME font */
+	SetConversionLogFont(HVTWin, &VTlf);
+
 	{
 		HDC TmpDC = GetDC(HVTWin);
-
-		/* Normal Font */
-		SetLogFont(&VTlf, TRUE);
-		VTFont[0] = CreateFontIndirect(&VTlf);
-
-		/* set IME font */
-		SetConversionLogFont(HVTWin, &VTlf);
+		TEXTMETRIC Metrics;
 
 		SelectObject(TmpDC, VTFont[0]);
 		GetTextMetrics(TmpDC, &Metrics);
