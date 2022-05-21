@@ -466,9 +466,15 @@ DWORD WINAPI _GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer)
 	char dir[MAX_PATH];
 	GetCurrentDirectoryA(_countof(dir), dir);
 	wchar_t *strW = ToWcharA(dir);
-	wcsncpy_s(lpBuffer, nBufferLength, strW, _TRUNCATE);
+	DWORD r;
+	if (lpBuffer != NULL) {
+		wcsncpy_s(lpBuffer, nBufferLength, strW, _TRUNCATE);
+		r =  (DWORD)wcslen(lpBuffer);
+	}
+	else {
+		r =  (DWORD)wcslen(strW) + 1;
+	}
 	free(strW);
-	DWORD r =  (DWORD)wcslen(lpBuffer);
 	return r;
 }
 
