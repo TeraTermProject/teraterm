@@ -43,6 +43,7 @@
 #include "helpid.h"
 #include "filesys.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog

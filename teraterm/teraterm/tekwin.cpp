@@ -47,6 +47,7 @@
 #include <htmlhelp.h>
 #include "dlglib.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 #define TEKClassName L"TEKWin32"
 

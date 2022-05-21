@@ -40,6 +40,7 @@
 #include "dlglib.h"
 #include "tt_res.h"
 #include "teraterml.h"
+#include "compat_win.h"
 
 #include "ftdlg_lite.h"
 
@@ -146,16 +147,6 @@ private:
 	}
 
 	virtual BOOL PostNcDestroy() {
-		if (SmallIcon) {
-			DestroyIcon((HICON)SmallIcon);
-			SmallIcon = NULL;
-		}
-
-		if (BigIcon) {
-			DestroyIcon((HICON)BigIcon);
-			BigIcon = NULL;
-		}
-
 		RemoveModelessHandle(m_hWnd);
 
 		delete this;
@@ -175,8 +166,6 @@ private:
 	}
 
 private:
-	HANDLE SmallIcon;
-	HANDLE BigIcon;
 	const char *UILanguageFile_;
 
 public:

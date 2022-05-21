@@ -11,6 +11,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttermpro", "teraterm\ttermp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keycode", "keycode\keycode.v8.vcproj", "{B31BF2E8-79E6-4735-BEA2-C1B4041C2D2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DF4E3C36-A743-4FB4-8EE9-49899E69ED32} = {DF4E3C36-A743-4FB4-8EE9-49899E69ED32}
+		{118E0D32-5553-4F73-9927-E873C1C500E4} = {118E0D32-5553-4F73-9927-E873C1C500E4}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpcmn", "ttpcmn\ttpcmn.v8.vcproj", "{118E0D32-5553-4F73-9927-E873C1C500E4}"
 	ProjectSection(ProjectDependencies) = postProject

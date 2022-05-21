@@ -207,8 +207,8 @@ void TimerProc(HWND hWnd, WPARAM wParam)
 
 LRESULT OnDpiChanged(HWND hWnd, WPARAM wp, LPARAM lp)
 {
-	(void)lp;
 	const UINT NewDPI = LOWORD(wp);
+	(void)lp;
 	TTSetIcon(ghInstance, hWnd, MAKEINTRESOURCEW(IDI_KEYCODE), NewDPI);
 	return TRUE;
 }
