@@ -430,10 +430,7 @@ struct tttset {
 /*------ WinSet --------*/
 	WORD VTFlag;
 	HFONT SampleFont;
-	/* begin - ishizaki */
-	/* WORD TmpColor[3][6]; */
-	WORD TmpColor[12][6];
-	/* end - ishizaki */
+	WORD reserve_TmpColor[12][6];
 	/* Tera Term window setup variables */
 	char Title[TitleBuffSize];
 	WORD TitleFormat;

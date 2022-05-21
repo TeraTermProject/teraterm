@@ -740,6 +740,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	HDC TmpDC;
 	char Temp[MAX_PATH], Temp2[MAX_PATH], *p;
 	wchar_t TempW[MAX_PATH];
+	WORD TmpColor[12][6];
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -808,13 +809,13 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* VT win position */
 	GetPrivateProfileString(Section, "VTPos", "-2147483648,-2147483648", Temp, sizeof(Temp), FName);	/* default: random position */
-	GetNthNum(Temp, 1, (int far *) (&ts->VTPos.x));
-	GetNthNum(Temp, 2, (int far *) (&ts->VTPos.y));
+	GetNthNum(Temp, 1, (int *) (&ts->VTPos.x));
+	GetNthNum(Temp, 2, (int *) (&ts->VTPos.y));
 
 	/* TEK win position */
 	GetPrivateProfileString(Section, "TEKPos", "-2147483648,-2147483648", Temp, sizeof(Temp), FName);	/* default: random position */
-	GetNthNum(Temp, 1, (int far *) &(ts->TEKPos.x));
-	GetNthNum(Temp, 2, (int far *) &(ts->TEKPos.y));
+	GetNthNum(Temp, 1, (int *) &(ts->TEKPos.x));
+	GetNthNum(Temp, 2, (int *) &(ts->TEKPos.y));
 
 	/* Save VT Window position */
 	ts->SaveVTWinPos = GetOnOff(Section, "SaveVTWinPos", FName, FALSE);
@@ -974,21 +975,21 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "VTColor", "0,0,0,255,255,255",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int far *) &(ts->TmpColor[0][i]));
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
 	for (i = 0; i <= 1; i++)
-		ts->VTColor[i] = RGB((BYTE) ts->TmpColor[0][i * 3],
-		                     (BYTE) ts->TmpColor[0][i * 3 + 1],
-		                     (BYTE) ts->TmpColor[0][i * 3 + 2]);
+		ts->VTColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+		                     (BYTE) TmpColor[0][i * 3 + 1],
+		                     (BYTE) TmpColor[0][i * 3 + 2]);
 
 	/* VT Bold Color */
 	GetPrivateProfileString(Section, "VTBoldColor", "0,0,255,255,255,255",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int far *) &(ts->TmpColor[0][i]));
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
 	for (i = 0; i <= 1; i++)
-		ts->VTBoldColor[i] = RGB((BYTE) ts->TmpColor[0][i * 3],
-		                         (BYTE) ts->TmpColor[0][i * 3 + 1],
-		                         (BYTE) ts->TmpColor[0][i * 3 + 2]);
+		ts->VTBoldColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+		                         (BYTE) TmpColor[0][i * 3 + 1],
+		                         (BYTE) TmpColor[0][i * 3 + 2]);
 	if (GetOnOff(Section, "EnableBoldAttrColor", FName, TRUE))
 		ts->ColorFlag |= CF_BOLDCOLOR;
 
@@ -996,11 +997,11 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "VTBlinkColor", "255,0,0,255,255,255",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int far *) &(ts->TmpColor[0][i]));
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
 	for (i = 0; i <= 1; i++)
-		ts->VTBlinkColor[i] = RGB((BYTE) ts->TmpColor[0][i * 3],
-		                          (BYTE) ts->TmpColor[0][i * 3 + 1],
-		                          (BYTE) ts->TmpColor[0][i * 3 + 2]);
+		ts->VTBlinkColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+		                          (BYTE) TmpColor[0][i * 3 + 1],
+		                          (BYTE) TmpColor[0][i * 3 + 2]);
 	if (GetOnOff(Section, "EnableBlinkAttrColor", FName, TRUE))
 		ts->ColorFlag |= CF_BLINKCOLOR;
 
@@ -1008,11 +1009,11 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "VTReverseColor", "255,255,255,0,0,0",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int far *) &(ts->TmpColor[0][i]));
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
 	for (i = 0; i <= 1; i++)
-		ts->VTReverseColor[i] = RGB((BYTE) ts->TmpColor[0][i * 3],
-		                          (BYTE) ts->TmpColor[0][i * 3 + 1],
-		                          (BYTE) ts->TmpColor[0][i * 3 + 2]);
+		ts->VTReverseColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+		                          (BYTE) TmpColor[0][i * 3 + 1],
+		                          (BYTE) TmpColor[0][i * 3 + 2]);
 	if (GetOnOff(Section, "EnableReverseAttrColor", FName, FALSE))
 		ts->ColorFlag |= CF_REVERSECOLOR;
 
@@ -1023,11 +1024,11 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "URLColor", "0,255,0,255,255,255",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int far *) &(ts->TmpColor[0][i]));
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
 	for (i = 0; i <= 1; i++)
-		ts->URLColor[i] = RGB((BYTE) ts->TmpColor[0][i * 3],
-		                      (BYTE) ts->TmpColor[0][i * 3 + 1],
-		                      (BYTE) ts->TmpColor[0][i * 3 + 2]);
+		ts->URLColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+		                      (BYTE) TmpColor[0][i * 3 + 1],
+		                      (BYTE) TmpColor[0][i * 3 + 2]);
 	if (GetOnOff(Section, "EnableURLColor", FName, TRUE))
 		ts->ColorFlag |= CF_URLCOLOR;
 
@@ -1038,11 +1039,11 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "TEKColor", "0,0,0,255,255,255",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int far *) &(ts->TmpColor[0][i]));
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
 	for (i = 0; i <= 1; i++)
-		ts->TEKColor[i] = RGB((BYTE) ts->TmpColor[0][i * 3],
-		                      (BYTE) ts->TmpColor[0][i * 3 + 1],
-		                      (BYTE) ts->TmpColor[0][i * 3 + 2]);
+		ts->TEKColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+		                      (BYTE) TmpColor[0][i * 3 + 1],
+		                      (BYTE) TmpColor[0][i * 3 + 2]);
 
 	/* ANSI color definition (in the case FullColor=on)  -- special option
 	   o UseTextColor should be off, or the background and foreground color of
@@ -1076,10 +1077,10 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 		n /= 4;
 		for (i = 0; i < n; i++) {
 			int colorid, r, g, b;
-			GetNthNum(Temp, i * 4 + 1, (int far *) &colorid);
-			GetNthNum(Temp, i * 4 + 2, (int far *) &r);
-			GetNthNum(Temp, i * 4 + 3, (int far *) &g);
-			GetNthNum(Temp, i * 4 + 4, (int far *) &b);
+			GetNthNum(Temp, i * 4 + 1, (int *) &colorid);
+			GetNthNum(Temp, i * 4 + 2, (int *) &r);
+			GetNthNum(Temp, i * 4 + 3, (int *) &g);
+			GetNthNum(Temp, i * 4 + 4, (int *) &b);
 			ts->ANSIColor[colorid & 15] =
 				RGB((BYTE) r, (BYTE) g, (BYTE) b);
 		}
@@ -1616,14 +1617,14 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// VT-print scaling factors (pixels per inch) --- special option
 	GetPrivateProfileString(Section, "VTPPI", "0,0",
 	                        Temp, sizeof(Temp), FName);
-	GetNthNum(Temp, 1, (int far *) &ts->VTPPI.x);
-	GetNthNum(Temp, 2, (int far *) &ts->VTPPI.y);
+	GetNthNum(Temp, 1, (int *) &ts->VTPPI.x);
+	GetNthNum(Temp, 2, (int *) &ts->VTPPI.y);
 
 	// TEK-print scaling factors (pixels per inch) --- special option
 	GetPrivateProfileString(Section, "TEKPPI", "0,0",
 	                        Temp, sizeof(Temp), FName);
-	GetNthNum(Temp, 1, (int far *) &ts->TEKPPI.x);
-	GetNthNum(Temp, 2, (int far *) &ts->TEKPPI.y);
+	GetNthNum(Temp, 1, (int *) &ts->TEKPPI.x);
+	GetNthNum(Temp, 2, (int *) &ts->TEKPPI.y);
 
 	// Show "Window" menu -- special option
 	if (GetOnOff(Section, "WindowMenu", FName, TRUE))
@@ -2239,6 +2240,7 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	char buf[20];
 	int ret;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], msg[MAX_UIMSG];
+	WORD TmpColor[12][6];
 
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
@@ -2481,76 +2483,76 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	for (i = 0; i <= 1; i++) {
 		if (ts->ColorFlag & CF_REVERSEVIDEO) {
 			if (ts->ColorFlag & CF_REVERSECOLOR) {
-				ts->TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
-				ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
-				ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
+				TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
+				TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
+				TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
 			}
 			else {
-				ts->TmpColor[0][i * 3] = GetRValue(ts->VTColor[!i]);
-				ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[!i]);
-				ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[!i]);
+				TmpColor[0][i * 3] = GetRValue(ts->VTColor[!i]);
+				TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[!i]);
+				TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[!i]);
 			}
 		}
 		else {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
 		}
 	}
 	WriteInt6(Section, "VTColor", FName,
-	          ts->TmpColor[0][0], ts->TmpColor[0][1], ts->TmpColor[0][2],
-	          ts->TmpColor[0][3], ts->TmpColor[0][4], ts->TmpColor[0][5]);
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	/* VT Bold Color */
 	for (i = 0; i <= 1; i++) {
 		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[!i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[!i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[!i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[!i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[!i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[!i]);
 		}
 		else {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[i]);
 		}
 	}
 	WriteInt6(Section, "VTBoldColor", FName,
-	          ts->TmpColor[0][0], ts->TmpColor[0][1], ts->TmpColor[0][2],
-	          ts->TmpColor[0][3], ts->TmpColor[0][4], ts->TmpColor[0][5]);
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	/* VT Blink Color */
 	for (i = 0; i <= 1; i++) {
 		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[!i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[!i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[!i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[!i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[!i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[!i]);
 		}
 		else {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[i]);
 		}
 	}
 	WriteInt6(Section, "VTBlinkColor", FName,
-	          ts->TmpColor[0][0], ts->TmpColor[0][1], ts->TmpColor[0][2],
-	          ts->TmpColor[0][3], ts->TmpColor[0][4], ts->TmpColor[0][5]);
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	/* VT Reverse Color */
 	for (i = 0; i <= 1; i++) {
 		if (ts->ColorFlag & CF_REVERSEVIDEO && ts->ColorFlag & CF_REVERSECOLOR) {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
 		}
 		else {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
+			TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
 		}
 	}
 	WriteInt6(Section, "VTReverseColor", FName,
-	          ts->TmpColor[0][0], ts->TmpColor[0][1], ts->TmpColor[0][2],
-	          ts->TmpColor[0][3], ts->TmpColor[0][4], ts->TmpColor[0][5]);
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	WriteOnOff(Section, "EnableClickableUrl", FName,
 	           ts->EnableClickableUrl);
@@ -2558,19 +2560,19 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* URL color */
 	for (i = 0; i <= 1; i++) {
 		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->URLColor[!i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[!i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[!i]);
+			TmpColor[0][i * 3] = GetRValue(ts->URLColor[!i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[!i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[!i]);
 		}
 		else {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->URLColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[i]);
+			TmpColor[0][i * 3] = GetRValue(ts->URLColor[i]);
+			TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[i]);
+			TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[i]);
 		}
 	}
 	WriteInt6(Section, "URLColor", FName,
-	          ts->TmpColor[0][0], ts->TmpColor[0][1], ts->TmpColor[0][2],
-	          ts->TmpColor[0][3], ts->TmpColor[0][4], ts->TmpColor[0][5]);
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	WriteOnOff(Section, "EnableBoldAttrColor", FName,
 	           (WORD) (ts->ColorFlag & CF_BOLDCOLOR));
@@ -2592,13 +2594,13 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* TEK Color */
 	for (i = 0; i <= 1; i++) {
-		ts->TmpColor[0][i * 3] = GetRValue(ts->TEKColor[i]);
-		ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->TEKColor[i]);
-		ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->TEKColor[i]);
+		TmpColor[0][i * 3] = GetRValue(ts->TEKColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->TEKColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->TEKColor[i]);
 	}
 	WriteInt6(Section, "TEKColor", FName,
-	          ts->TmpColor[0][0], ts->TmpColor[0][1], ts->TmpColor[0][2],
-	          ts->TmpColor[0][3], ts->TmpColor[0][4], ts->TmpColor[0][5]);
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	/* TEK color emulation */
 	WriteOnOff(Section, "TEKColorEmulation", FName, ts->TEKColorEmu);
