@@ -213,7 +213,7 @@ static BOOL IsLoadImageOnlyEnabled(void)
 	return !IsWindowsVistaOrLater();
 }
 
-HBITMAP CreateScreenCompatibleBitmap(int width,int height)
+static HBITMAP CreateScreenCompatibleBitmap(int width,int height)
 {
   HDC     hdc;
   HBITMAP hbm;
@@ -236,7 +236,7 @@ HBITMAP CreateScreenCompatibleBitmap(int width,int height)
   return hbm;
 }
 
-HBITMAP CreateDIB24BPP(int width,int height,unsigned char **buf,int *lenBuf)
+static HBITMAP CreateDIB24BPP(int width,int height,unsigned char **buf,int *lenBuf)
 {
   HDC        hdc;
   HBITMAP    hbm;
@@ -270,7 +270,7 @@ HBITMAP CreateDIB24BPP(int width,int height,unsigned char **buf,int *lenBuf)
   return hbm;
 }
 
-HDC  CreateBitmapDC(HBITMAP hbm)
+static HDC  CreateBitmapDC(HBITMAP hbm)
 {
   HDC hdc;
 
@@ -286,7 +286,7 @@ HDC  CreateBitmapDC(HBITMAP hbm)
   return hdc;
 }
 
-void DeleteBitmapDC(HDC *hdc)
+static void DeleteBitmapDC(HDC *hdc)
 {
   HBITMAP hbm;
 
@@ -309,7 +309,7 @@ void DeleteBitmapDC(HDC *hdc)
   *hdc = 0;
 }
 
-void FillBitmapDC(HDC hdc,COLORREF color)
+static void FillBitmapDC(HDC hdc,COLORREF color)
 {
   HBITMAP hbm;
   BITMAP  bm;
@@ -317,7 +317,7 @@ void FillBitmapDC(HDC hdc,COLORREF color)
   HBRUSH  hBrush;
 
   #ifdef _DEBUG
-    OutputDebugPrintf("FillBitmapDC : hdc = %x color = %p\n",hdc,color);
+    OutputDebugPrintf("FillBitmapDC : hdc = %p color = %08x\n",hdc,color);
   #endif
 
   if(!hdc)
@@ -344,7 +344,7 @@ FARPROC GetProcAddressWithDllName(char *dllName,char *procName)
     return 0;
 }
 
-void RandomFile(char *filespec_src,char *filename, int destlen)
+static void RandomFile(const char *filespec_src,char *filename, int destlen)
 {
   int    i;
   int    file_num;
@@ -407,7 +407,7 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
   //ディレクトリ取得
   ZeroMemory(filename,destlen);
   {
-    int tmplen;
+    size_t tmplen;
     char *tmp;
     tmplen = filePart - fullpath + 1;
     tmp = (char *)_alloca(tmplen);
@@ -1063,7 +1063,7 @@ static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LP
   return TRUE;
 }
 
-void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
+static void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
 {
   RECT  rectClient;
   POINT point;
@@ -1193,151 +1193,152 @@ void BGSetupPrimary(BOOL forceSetup)
   }
 }
 
-static COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
+static COLORREF BGGetColor(char *name, COLORREF defcolor, char *file)
 {
-  unsigned int r,g,b;
-  char colorstr[256],defstr[256];
+	unsigned int r, g, b;
+	char colorstr[256], defstr[256];
 
-  _snprintf_s(defstr,sizeof(defstr),_TRUNCATE,"%d,%d,%d",GetRValue(defcolor),GetGValue(defcolor),GetBValue(defcolor));
+	_snprintf_s(defstr, sizeof(defstr), _TRUNCATE, "%d,%d,%d", GetRValue(defcolor), GetGValue(defcolor),
+				GetBValue(defcolor));
 
-  GetPrivateProfileString(BG_SECTION,name,defstr,colorstr,255,file);
+	GetPrivateProfileString(BG_SECTION, name, defstr, colorstr, 255, file);
 
-  r = g = b = 0;
+	r = g = b = 0;
 
-  sscanf(colorstr,"%d , %d , %d",&r,&g,&b);
+	sscanf(colorstr, "%d , %d , %d", &r, &g, &b);
 
-  return RGB(r,g,b);
+	return RGB(r, g, b);
 }
 
-static BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,char **strList,int nList)
+static BG_PATTERN BGGetStrIndex(char *name, BG_PATTERN def, char *file, char **strList, int nList)
 {
-  char defstr[64],str[64];
-  int  i;
+	char defstr[64], str[64];
+	int i;
 
-  def %= nList;
+	def %= nList;
 
-  strncpy_s(defstr, sizeof(defstr),strList[def], _TRUNCATE);
-  GetPrivateProfileString(BG_SECTION,name,defstr,str,64,file);
+	strncpy_s(defstr, sizeof(defstr), strList[def], _TRUNCATE);
+	GetPrivateProfileString(BG_SECTION, name, defstr, str, 64, file);
 
-  for(i = 0;i < nList;i++)
-    if(!_stricmp(str,strList[i]))
-      return i;
+	for (i = 0; i < nList; i++)
+		if (!_stricmp(str, strList[i]))
+			return i;
 
-  return 0;
+	return 0;
 }
 
-BOOL BGGetOnOff(char *name,BOOL def,char *file)
+static BOOL BGGetOnOff(char *name, BOOL def, char *file)
 {
-  char *strList[2] = {"Off","On"};
+	char *strList[2] = {"Off", "On"};
 
-  return BGGetStrIndex(name,def,file,strList,2);
+	return BGGetStrIndex(name, def, file, strList, 2);
 }
 
-BG_PATTERN BGGetPattern(char *name,BG_PATTERN def,char *file)
+static BG_PATTERN BGGetPattern(char *name, BG_PATTERN def, char *file)
 {
-  char *strList[6]={"stretch","tile","center","fitwidth","fitheight","autofit"};
+	char *strList[6] = {"stretch", "tile", "center", "fitwidth", "fitheight", "autofit"};
 
-  return BGGetStrIndex(name,def,file,strList,6);
+	return BGGetStrIndex(name, def, file, strList, 6);
 }
 
-BG_PATTERN BGGetType(char *name,BG_TYPE def,char *file)
+static BG_TYPE BGGetType(char *name, BG_TYPE def, char *file)
 {
-  char *strList[3]={"color","picture","wallpaper"};
+	char *strList[3] = {"color", "picture", "wallpaper"};
 
-  return BGGetStrIndex(name,def,file,strList,3);
+	return BGGetStrIndex(name, def, file, strList, 3);
 }
 
-void BGReadTextColorConfig(char *file)
+static void BGReadTextColorConfig(char *file)
 {
-  ANSIColor[IdFore   ] = BGGetColor("Fore"   ,ANSIColor[IdFore],file);
-  ANSIColor[IdBack   ] = BGGetColor("Back"   ,ANSIColor[IdBack],file);
-  ANSIColor[IdRed    ] = BGGetColor("Red"    ,ANSIColor[IdRed    ],file);
-  ANSIColor[IdGreen  ] = BGGetColor("Green"  ,ANSIColor[IdGreen  ],file);
-  ANSIColor[IdYellow ] = BGGetColor("Yellow" ,ANSIColor[IdYellow ],file);
-  ANSIColor[IdBlue   ] = BGGetColor("Blue"   ,ANSIColor[IdBlue   ],file);
-  ANSIColor[IdMagenta] = BGGetColor("Magenta",ANSIColor[IdMagenta],file);
-  ANSIColor[IdCyan   ] = BGGetColor("Cyan"   ,ANSIColor[IdCyan   ],file);
+	ANSIColor[IdFore] = BGGetColor("Fore", ANSIColor[IdFore], file);
+	ANSIColor[IdBack] = BGGetColor("Back", ANSIColor[IdBack], file);
+	ANSIColor[IdRed] = BGGetColor("Red", ANSIColor[IdRed], file);
+	ANSIColor[IdGreen] = BGGetColor("Green", ANSIColor[IdGreen], file);
+	ANSIColor[IdYellow] = BGGetColor("Yellow", ANSIColor[IdYellow], file);
+	ANSIColor[IdBlue] = BGGetColor("Blue", ANSIColor[IdBlue], file);
+	ANSIColor[IdMagenta] = BGGetColor("Magenta", ANSIColor[IdMagenta], file);
+	ANSIColor[IdCyan] = BGGetColor("Cyan", ANSIColor[IdCyan], file);
 
-  ANSIColor[IdFore   + 8] = BGGetColor("DarkFore"   ,ANSIColor[IdFore   + 8],file);
-  ANSIColor[IdBack   + 8] = BGGetColor("DarkBack"   ,ANSIColor[IdBack   + 8],file);
-  ANSIColor[IdRed    + 8] = BGGetColor("DarkRed"    ,ANSIColor[IdRed    + 8],file);
-  ANSIColor[IdGreen  + 8] = BGGetColor("DarkGreen"  ,ANSIColor[IdGreen  + 8],file);
-  ANSIColor[IdYellow + 8] = BGGetColor("DarkYellow" ,ANSIColor[IdYellow + 8],file);
-  ANSIColor[IdBlue   + 8] = BGGetColor("DarkBlue"   ,ANSIColor[IdBlue   + 8],file);
-  ANSIColor[IdMagenta+ 8] = BGGetColor("DarkMagenta",ANSIColor[IdMagenta+ 8],file);
-  ANSIColor[IdCyan   + 8] = BGGetColor("DarkCyan"   ,ANSIColor[IdCyan   + 8],file);
+	ANSIColor[IdFore + 8] = BGGetColor("DarkFore", ANSIColor[IdFore + 8], file);
+	ANSIColor[IdBack + 8] = BGGetColor("DarkBack", ANSIColor[IdBack + 8], file);
+	ANSIColor[IdRed + 8] = BGGetColor("DarkRed", ANSIColor[IdRed + 8], file);
+	ANSIColor[IdGreen + 8] = BGGetColor("DarkGreen", ANSIColor[IdGreen + 8], file);
+	ANSIColor[IdYellow + 8] = BGGetColor("DarkYellow", ANSIColor[IdYellow + 8], file);
+	ANSIColor[IdBlue + 8] = BGGetColor("DarkBlue", ANSIColor[IdBlue + 8], file);
+	ANSIColor[IdMagenta + 8] = BGGetColor("DarkMagenta", ANSIColor[IdMagenta + 8], file);
+	ANSIColor[IdCyan + 8] = BGGetColor("DarkCyan", ANSIColor[IdCyan + 8], file);
 
-  BGVTColor[0]      = BGGetColor("VTFore",BGVTColor[0],file);
-  BGVTColor[1]      = BGGetColor("VTBack",BGVTColor[1],file);
+	BGVTColor[0] = BGGetColor("VTFore", BGVTColor[0], file);
+	BGVTColor[1] = BGGetColor("VTBack", BGVTColor[1], file);
 
-  BGVTBlinkColor[0] = BGGetColor("VTBlinkFore",BGVTBlinkColor[0],file);
-  BGVTBlinkColor[1] = BGGetColor("VTBlinkBack",BGVTBlinkColor[1],file);
+	BGVTBlinkColor[0] = BGGetColor("VTBlinkFore", BGVTBlinkColor[0], file);
+	BGVTBlinkColor[1] = BGGetColor("VTBlinkBack", BGVTBlinkColor[1], file);
 
-  BGVTBoldColor[0]  = BGGetColor("VTBoldFore" ,BGVTBoldColor[0],file);
-  BGVTBoldColor[1]  = BGGetColor("VTBoldBack" ,BGVTBoldColor[1],file);
+	BGVTBoldColor[0] = BGGetColor("VTBoldFore", BGVTBoldColor[0], file);
+	BGVTBoldColor[1] = BGGetColor("VTBoldBack", BGVTBoldColor[1], file);
 
-  BGVTReverseColor[0]  = BGGetColor("VTReverseFore" ,BGVTReverseColor[0],file);
-  BGVTReverseColor[1]  = BGGetColor("VTReverseBack" ,BGVTReverseColor[1],file);
+	BGVTReverseColor[0] = BGGetColor("VTReverseFore", BGVTReverseColor[0], file);
+	BGVTReverseColor[1] = BGGetColor("VTReverseBack", BGVTReverseColor[1], file);
 
-  /* begin - ishizaki */
-  BGURLColor[0]     = BGGetColor("URLFore" ,BGURLColor[0],file);
-  BGURLColor[1]     = BGGetColor("URLBack" ,BGURLColor[1],file);
-  /* end - ishizaki */
+	/* begin - ishizaki */
+	BGURLColor[0] = BGGetColor("URLFore", BGURLColor[0], file);
+	BGURLColor[1] = BGGetColor("URLBack", BGURLColor[1], file);
+	/* end - ishizaki */
 }
 
-void BGReadIniFile(char *file)
+static void BGReadIniFile(char *file)
 {
-  char path[MAX_PATH];
+	char path[MAX_PATH];
 
-  // Easy Setting
-  BGDest.pattern = BGGetPattern("BGPicturePattern",BGSrc1.pattern,file);
-  BGDest.color   = BGGetColor("BGPictureBaseColor",BGSrc1.color,file);
+	// Easy Setting
+	BGDest.pattern = BGGetPattern("BGPicturePattern", BGSrc1.pattern, file);
+	BGDest.color = BGGetColor("BGPictureBaseColor", BGSrc1.color, file);
 
-  GetPrivateProfileString(BG_SECTION,"BGPictureFile",BGSrc1.file,path,MAX_PATH,file);
-  RandomFile(path,BGDest.file,sizeof(BGDest.file));
+	GetPrivateProfileString(BG_SECTION, "BGPictureFile", BGSrc1.file, path, MAX_PATH, file);
+	RandomFile(path, BGDest.file, sizeof(BGDest.file));
 
-  BGSrc1.alpha   = 255 - GetPrivateProfileInt(BG_SECTION,"BGPictureTone",255 - BGSrc1.alpha,file);
+	BGSrc1.alpha = 255 - GetPrivateProfileInt(BG_SECTION, "BGPictureTone", 255 - BGSrc1.alpha, file);
 
-  if(!strcmp(BGDest.file,""))
-    BGSrc1.alpha = 255;
+	if (!strcmp(BGDest.file, ""))
+		BGSrc1.alpha = 255;
 
-  BGSrc2.alpha   = 255 - GetPrivateProfileInt(BG_SECTION,"BGFadeTone",255 - BGSrc2.alpha,file);
-  BGSrc2.color   = BGGetColor("BGFadeColor",BGSrc2.color,file);
+	BGSrc2.alpha = 255 - GetPrivateProfileInt(BG_SECTION, "BGFadeTone", 255 - BGSrc2.alpha, file);
+	BGSrc2.color = BGGetColor("BGFadeColor", BGSrc2.color, file);
 
-  BGReverseTextAlpha = GetPrivateProfileInt(BG_SECTION,"BGReverseTextTone",BGReverseTextAlpha,file);
+	BGReverseTextAlpha = GetPrivateProfileInt(BG_SECTION, "BGReverseTextTone", BGReverseTextAlpha, file);
 
-  //Src1 の読み出し
-  BGSrc1.type      = BGGetType("BGSrc1Type",BGSrc1.type,file);
-  BGSrc1.pattern   = BGGetPattern("BGSrc1Pattern",BGSrc1.pattern,file);
-  BGSrc1.antiAlias = BGGetOnOff("BGSrc1AntiAlias",BGSrc1.antiAlias,file);
-  BGSrc1.alpha     = GetPrivateProfileInt(BG_SECTION,"BGSrc1Alpha"  ,BGSrc1.alpha  ,file);
-  BGSrc1.color     = BGGetColor("BGSrc1Color",BGSrc1.color,file);
+	// Src1 の読み出し
+	BGSrc1.type = BGGetType("BGSrc1Type", BGSrc1.type, file);
+	BGSrc1.pattern = BGGetPattern("BGSrc1Pattern", BGSrc1.pattern, file);
+	BGSrc1.antiAlias = BGGetOnOff("BGSrc1AntiAlias", BGSrc1.antiAlias, file);
+	BGSrc1.alpha = GetPrivateProfileInt(BG_SECTION, "BGSrc1Alpha", BGSrc1.alpha, file);
+	BGSrc1.color = BGGetColor("BGSrc1Color", BGSrc1.color, file);
 
-  GetPrivateProfileString(BG_SECTION,"BGSrc1File",BGSrc1.file,path,MAX_PATH,file);
-  RandomFile(path,BGSrc1.file,sizeof(BGSrc1.file));
+	GetPrivateProfileString(BG_SECTION, "BGSrc1File", BGSrc1.file, path, MAX_PATH, file);
+	RandomFile(path, BGSrc1.file, sizeof(BGSrc1.file));
 
-  //Src2 の読み出し
-  BGSrc2.type      = BGGetType("BGSrc2Type",BGSrc2.type,file);
-  BGSrc2.pattern   = BGGetPattern("BGSrc2Pattern",BGSrc2.pattern,file);
-  BGSrc2.antiAlias = BGGetOnOff("BGSrc2AntiAlias",BGSrc2.antiAlias,file);
-  BGSrc2.alpha     = GetPrivateProfileInt(BG_SECTION,"BGSrc2Alpha"  ,BGSrc2.alpha  ,file);
-  BGSrc2.color     = BGGetColor("BGSrc2Color",BGSrc2.color,file);
+	// Src2 の読み出し
+	BGSrc2.type = BGGetType("BGSrc2Type", BGSrc2.type, file);
+	BGSrc2.pattern = BGGetPattern("BGSrc2Pattern", BGSrc2.pattern, file);
+	BGSrc2.antiAlias = BGGetOnOff("BGSrc2AntiAlias", BGSrc2.antiAlias, file);
+	BGSrc2.alpha = GetPrivateProfileInt(BG_SECTION, "BGSrc2Alpha", BGSrc2.alpha, file);
+	BGSrc2.color = BGGetColor("BGSrc2Color", BGSrc2.color, file);
 
-  GetPrivateProfileString(BG_SECTION,"BGSrc2File",BGSrc2.file,path,MAX_PATH,file);
-  RandomFile(path,BGSrc2.file,sizeof(BGSrc2.file));
+	GetPrivateProfileString(BG_SECTION, "BGSrc2File", BGSrc2.file, path, MAX_PATH, file);
+	RandomFile(path, BGSrc2.file, sizeof(BGSrc2.file));
 
-  //Dest の読み出し
-  BGDest.type      = BGGetType("BGDestType",BGDest.type,file);
-  BGDest.pattern   = BGGetPattern("BGDestPattern",BGDest.pattern,file);
-  BGDest.antiAlias = BGGetOnOff("BGDestAntiAlias",BGDest.antiAlias,file);
-  BGDest.color     = BGGetColor("BGDestColor",BGDest.color,file);
+	// Dest の読み出し
+	BGDest.type = BGGetType("BGDestType", BGDest.type, file);
+	BGDest.pattern = BGGetPattern("BGDestPattern", BGDest.pattern, file);
+	BGDest.antiAlias = BGGetOnOff("BGDestAntiAlias", BGDest.antiAlias, file);
+	BGDest.color = BGGetColor("BGDestColor", BGDest.color, file);
 
-  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, BGDest.file,path,MAX_PATH,file);
-  RandomFile(path,BGDest.file,sizeof(BGDest.file));
+	GetPrivateProfileString(BG_SECTION, BG_DESTFILE, BGDest.file, path, MAX_PATH, file);
+	RandomFile(path, BGDest.file, sizeof(BGDest.file));
 
-  //その他読み出し
-  BGReverseTextAlpha = GetPrivateProfileInt(BG_SECTION,"BGReverseTextAlpha",BGReverseTextAlpha,file);
-  BGReadTextColorConfig(file);
+	//その他読み出し
+	BGReverseTextAlpha = GetPrivateProfileInt(BG_SECTION, "BGReverseTextAlpha", BGReverseTextAlpha, file);
+	BGReadTextColorConfig(file);
 }
 
 void BGDestruct(void)
@@ -1367,173 +1368,172 @@ void BGDestruct(void)
  */
 void BGInitialize(BOOL initialize_once)
 {
-  char path[MAX_PATH],config_file[MAX_PATH],tempPath[MAX_PATH];
-  char BGSPIPath[MAX_PATH];
+	char path[MAX_PATH], config_file[MAX_PATH], tempPath[MAX_PATH];
+	char BGSPIPath[MAX_PATH];
 
-  ZeroMemory(path, sizeof(path));
-  ZeroMemory(config_file, sizeof(config_file));
-  ZeroMemory(tempPath, sizeof(tempPath));
+	ZeroMemory(path, sizeof(path));
+	ZeroMemory(config_file, sizeof(config_file));
+	ZeroMemory(tempPath, sizeof(tempPath));
 
-  // VTColor を読み込み
-  BGVTColor[0] = ts.VTColor[0];
-  BGVTColor[1] = ts.VTColor[1];
+	// VTColor を読み込み
+	BGVTColor[0] = ts.VTColor[0];
+	BGVTColor[1] = ts.VTColor[1];
 
-  BGVTBoldColor[0] = ts.VTBoldColor[0];
-  BGVTBoldColor[1] = ts.VTBoldColor[1];
+	BGVTBoldColor[0] = ts.VTBoldColor[0];
+	BGVTBoldColor[1] = ts.VTBoldColor[1];
 
-  BGVTBlinkColor[0] = ts.VTBlinkColor[0];
-  BGVTBlinkColor[1] = ts.VTBlinkColor[1];
+	BGVTBlinkColor[0] = ts.VTBlinkColor[0];
+	BGVTBlinkColor[1] = ts.VTBlinkColor[1];
 
-  BGVTReverseColor[0] = ts.VTReverseColor[0];
-  BGVTReverseColor[1] = ts.VTReverseColor[1];
+	BGVTReverseColor[0] = ts.VTReverseColor[0];
+	BGVTReverseColor[1] = ts.VTReverseColor[1];
 
 #if 1
-  // ハイパーリンク描画の復活。(2009.8.26 yutaka)
-  /* begin - ishizaki */
-  BGURLColor[0] = ts.URLColor[0];
-  BGURLColor[1] = ts.URLColor[1];
-  /* end - ishizaki */
+	// ハイパーリンク描画の復活。(2009.8.26 yutaka)
+	/* begin - ishizaki */
+	BGURLColor[0] = ts.URLColor[0];
+	BGURLColor[1] = ts.URLColor[1];
+	/* end - ishizaki */
 #else
-  // TODO: ハイパーリンクの描画がリアルタイムに行われないことがあるので、
-  // 色属性変更はいったん取りやめることにする。将来、対応する。(2005.4.3 yutaka)
-  BGURLColor[0] = ts.VTColor[0];
-  BGURLColor[1] = ts.VTColor[1];
+	// TODO: ハイパーリンクの描画がリアルタイムに行われないことがあるので、
+	// 色属性変更はいったん取りやめることにする。将来、対応する。(2005.4.3 yutaka)
+	BGURLColor[0] = ts.VTColor[0];
+	BGURLColor[1] = ts.VTColor[1];
 #endif
 
-  // ANSI color設定のほうを優先させる (2005.2.3 yutaka)
-  InitColorTable();
+	// ANSI color設定のほうを優先させる (2005.2.3 yutaka)
+	InitColorTable();
 
-  //リソース解放
-  BGDestruct();
+	//リソース解放
+	BGDestruct();
 
-  //BG が有効かチェック
-  // 空の場合のみ、ディスクから読む。BGInitialize()が Tera Term 起動時以外にも、
-  // Additional settings から呼び出されることがあるため。
-  if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
-	  ts.EtermLookfeel.BGEnable = BGEnable = BGGetOnOff("BGEnable",FALSE,ts.SetupFName);
-  } else {
-	  BGEnable = BGGetOnOff("BGEnable",FALSE,ts.SetupFName);
-  }
+	// BG が有効かチェック
+	//  空の場合のみ、ディスクから読む。BGInitialize()が Tera Term 起動時以外にも、
+	//  Additional settings から呼び出されることがあるため。
+	if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
+		ts.EtermLookfeel.BGEnable = BGEnable = BGGetOnOff("BGEnable", FALSE, ts.SetupFName);
+	}
+	else {
+		BGEnable = BGGetOnOff("BGEnable", FALSE, ts.SetupFName);
+	}
 
-	  ts.EtermLookfeel.BGUseAlphaBlendAPI = BGGetOnOff("BGUseAlphaBlendAPI",TRUE ,ts.SetupFName);
-	  ts.EtermLookfeel.BGNoFrame = BGGetOnOff("BGNoFrame"         ,FALSE,ts.SetupFName);
-	  ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove"    ,TRUE ,ts.SetupFName);
-	  ts.EtermLookfeel.BGNoCopyBits = BGGetOnOff("BGFlickerlessMove" ,TRUE ,ts.SetupFName);
+	ts.EtermLookfeel.BGUseAlphaBlendAPI = BGGetOnOff("BGUseAlphaBlendAPI", TRUE, ts.SetupFName);
+	ts.EtermLookfeel.BGNoFrame = BGGetOnOff("BGNoFrame", FALSE, ts.SetupFName);
+	ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove", TRUE, ts.SetupFName);
+	ts.EtermLookfeel.BGNoCopyBits = BGGetOnOff("BGFlickerlessMove", TRUE, ts.SetupFName);
 
-	  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
-	  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
+	GetPrivateProfileString(BG_SECTION, "BGSPIPath", "plugin", BGSPIPath, MAX_PATH, ts.SetupFName);
+	strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
 
-  if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
-	  //コンフィグファイルの決定
-	  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
-	  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
+	if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
+		//コンフィグファイルの決定
+		GetPrivateProfileString(BG_SECTION, "BGThemeFile", "", path, MAX_PATH, ts.SetupFName);
+		strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
 
-	  // 背景画像の読み込み
-	  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
-	  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
+		// 背景画像の読み込み
+		_snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
+		GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
 
-	  // 背景画像の明るさの読み込み。
-	  // BGSrc1Alpha と BGSrc2Alphaは同値として扱う。
-	  ts.BGImgBrightness = GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
-  }
+		// 背景画像の明るさの読み込み。
+		// BGSrc1Alpha と BGSrc2Alphaは同値として扱う。
+		ts.BGImgBrightness =
+			GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
+	}
 
-  // BGEnableが真でも、initialize_once == FALSEの場合は初期化をしない。
-  // Tera Termの起動時のみに初期化する。
-  if (initialize_once) {
-	  // Tera Term起動時に一度だけ読む。
-	  ts.EtermLookfeel.BGIgnoreThemeFile = BGGetOnOff("BGIgnoreThemeFile", FALSE ,ts.SetupFName);
-  }
+	// BGEnableが真でも、initialize_once == FALSEの場合は初期化をしない。
+	// Tera Termの起動時のみに初期化する。
+	if (initialize_once) {
+		// Tera Term起動時に一度だけ読む。
+		ts.EtermLookfeel.BGIgnoreThemeFile = BGGetOnOff("BGIgnoreThemeFile", FALSE, ts.SetupFName);
+	}
 
-  if(!BGEnable)
-    return;
+	if (!BGEnable)
+		return;
 
+	//乱数初期化
+	// add cast (2006.2.18 yutaka)
+	srand((unsigned int)time(NULL));
 
-  //乱数初期化
-  // add cast (2006.2.18 yutaka)
-  srand((unsigned int)time(NULL));
+	// BGシステム設定読み出し
+	BGUseAlphaBlendAPI = ts.EtermLookfeel.BGUseAlphaBlendAPI;
+	BGNoFrame = ts.EtermLookfeel.BGNoFrame;
+	BGFastSizeMove = ts.EtermLookfeel.BGFastSizeMove;
+	BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
 
-  //BGシステム設定読み出し
-  BGUseAlphaBlendAPI = ts.EtermLookfeel.BGUseAlphaBlendAPI;
-  BGNoFrame = ts.EtermLookfeel.BGNoFrame;
-  BGFastSizeMove = ts.EtermLookfeel.BGFastSizeMove;
-  BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
+	//テンポラリーファイル名を生成
+	GetTempPath(MAX_PATH, tempPath);
+	GetTempFileName(tempPath, "ttAK", 0, BGDest.fileTmp);
+	GetTempFileName(tempPath, "ttAK", 0, BGSrc1.fileTmp);
+	GetTempFileName(tempPath, "ttAK", 0, BGSrc2.fileTmp);
 
-  //テンポラリーファイル名を生成
-  GetTempPath(MAX_PATH,tempPath);
-  GetTempFileName(tempPath,"ttAK",0,BGDest.fileTmp);
-  GetTempFileName(tempPath,"ttAK",0,BGSrc1.fileTmp);
-  GetTempFileName(tempPath,"ttAK",0,BGSrc2.fileTmp);
+	//デフォルト値
+	BGDest.type = BG_PICTURE;
+	BGDest.pattern = BG_STRETCH;
+	BGDest.color = RGB(0, 0, 0);
+	BGDest.antiAlias = TRUE;
+	strncpy_s(BGDest.file, sizeof(BGDest.file), "", _TRUNCATE);
 
-  //デフォルト値
-  BGDest.type      = BG_PICTURE;
-  BGDest.pattern   = BG_STRETCH;
-  BGDest.color     = RGB(0,0,0);
-  BGDest.antiAlias = TRUE;
-  strncpy_s(BGDest.file, sizeof(BGDest.file),"", _TRUNCATE);
+	BGSrc1.type = BG_WALLPAPER;
+	BGSrc1.pattern = BG_STRETCH;
+	BGSrc1.color = RGB(255, 255, 255);
+	BGSrc1.antiAlias = TRUE;
+	BGSrc1.alpha = 255;
+	strncpy_s(BGSrc1.file, sizeof(BGSrc1.file), "", _TRUNCATE);
 
-  BGSrc1.type      = BG_WALLPAPER;
-  BGSrc1.pattern   = BG_STRETCH;
-  BGSrc1.color     = RGB(255,255,255);
-  BGSrc1.antiAlias = TRUE;
-  BGSrc1.alpha     = 255;
-  strncpy_s(BGSrc1.file, sizeof(BGSrc1.file),"", _TRUNCATE);
+	BGSrc2.type = BG_COLOR;
+	BGSrc2.pattern = BG_STRETCH;
+	BGSrc2.color = RGB(0, 0, 0);
+	BGSrc2.antiAlias = TRUE;
+	BGSrc2.alpha = 128;
+	strncpy_s(BGSrc2.file, sizeof(BGSrc2.file), "", _TRUNCATE);
 
-  BGSrc2.type      = BG_COLOR;
-  BGSrc2.pattern   = BG_STRETCH;
-  BGSrc2.color     = RGB(0,0,0);
-  BGSrc2.antiAlias = TRUE;
-  BGSrc2.alpha     = 128;
-  strncpy_s(BGSrc2.file, sizeof(BGSrc2.file),"", _TRUNCATE);
+	BGReverseTextAlpha = 255;
 
-  BGReverseTextAlpha = 255;
+	//設定の読み出し
+	BGReadIniFile(ts.SetupFName);
 
-  //設定の読み出し
-  BGReadIniFile(ts.SetupFName);
+	//コンフィグファイルの決定
+	GetPrivateProfileString(BG_SECTION, "BGThemeFile", "", path, MAX_PATH, ts.SetupFName);
+	RandomFile(path, config_file, sizeof(config_file));
 
-  //コンフィグファイルの決定
-  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
-  RandomFile(path,config_file,sizeof(config_file));
+	// ImageFile.INIではない場合はランダムに選ぶ。
+	if (strstr(path, BG_THEME_IMAGEFILE_NAME) == NULL) {
+		// テーマファイルを無視する場合は空にする。
+		if (ts.EtermLookfeel.BGIgnoreThemeFile) {
+			ZeroMemory(config_file, sizeof(config_file));
+		}
+	}
 
-  // ImageFile.INIではない場合はランダムに選ぶ。
-  if (strstr(path, BG_THEME_IMAGEFILE_NAME) == NULL) {
-	  // テーマファイルを無視する場合は空にする。
-	  if (ts.EtermLookfeel.BGIgnoreThemeFile) {
-		ZeroMemory(config_file, sizeof(config_file));
-	  }
-  }
+	//設定のオーバーライド
+	if (strcmp(config_file, "")) {
+		char dir[MAX_PATH], prevDir[MAX_PATH];
 
-  //設定のオーバーライド
-  if(strcmp(config_file,""))
-  {
-    char dir[MAX_PATH],prevDir[MAX_PATH];
+		// INIファイルのあるディレクトリに一時的に移動
+		GetCurrentDirectory(MAX_PATH, prevDir);
 
-    //INIファイルのあるディレクトリに一時的に移動
-    GetCurrentDirectory(MAX_PATH,prevDir);
+		ExtractDirName(config_file, dir);
+		SetCurrentDirectory(dir);
 
-    ExtractDirName(config_file,dir);
-    SetCurrentDirectory(dir);
+		BGReadIniFile(config_file);
 
-    BGReadIniFile(config_file);
+		SetCurrentDirectory(prevDir);
+	}
 
-    SetCurrentDirectory(prevDir);
-  }
+	//壁紙 or 背景をプリロード
+	BGPreloadSrc(&BGDest);
+	BGPreloadSrc(&BGSrc1);
+	BGPreloadSrc(&BGSrc2);
 
-  //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest);
-  BGPreloadSrc(&BGSrc1);
-  BGPreloadSrc(&BGSrc2);
-
-  // AlphaBlend のアドレスを読み込み
-  if(BGUseAlphaBlendAPI) {
-	if(pAlphaBlend != NULL)
-	  BGAlphaBlend = pAlphaBlend;
-	else
-	  BGAlphaBlend = AlphaBlendWithoutAPI;
-  }
-  else {
-    BGAlphaBlend = AlphaBlendWithoutAPI;
-  }
-
+	// AlphaBlend のアドレスを読み込み
+	if (BGUseAlphaBlendAPI) {
+		if (pAlphaBlend != NULL)
+			BGAlphaBlend = pAlphaBlend;
+		else
+			BGAlphaBlend = AlphaBlendWithoutAPI;
+	}
+	else {
+		BGAlphaBlend = AlphaBlendWithoutAPI;
+	}
 }
 
 void BGExchangeColor() {
