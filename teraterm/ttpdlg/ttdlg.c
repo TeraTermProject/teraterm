@@ -443,11 +443,13 @@ static void DispSample(HWND Dialog, WinDlgWork *work, int IAttr)
 	COLORREF Text, Back;
 	int DX[3];
 	TEXTMETRIC Metrics;
-	RECT Rect, TestRect;
+	RECT TestRect;
 	int FW,FH;
 	HDC DC;
+	HWND HWndSample;
 
-	DC = GetDC(Dialog);
+	HWndSample = GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA);
+	DC = GetDC(HWndSample);
 	Text = RGB(work->TmpColor[IAttr][0],
 	           work->TmpColor[IAttr][1],
 	           work->TmpColor[IAttr][2]);
@@ -464,20 +466,12 @@ static void DispSample(HWND Dialog, WinDlgWork *work, int IAttr)
 	FH = Metrics.tmHeight;
 	for (i = 0 ; i <= 2 ; i++)
 		DX[i] = FW;
-	GetClientRect(Dialog,&Rect);
-	TestRect.left = Rect.left + (int)((Rect.right-Rect.left)*0.70);
-	TestRect.right = Rect.left + (int)((Rect.right-Rect.left)*0.93);
-	TestRect.top = Rect.top + (int)((Rect.bottom-Rect.top)*0.54);
-#ifdef USE_NORMAL_BGCOLOR
-	TestRect.bottom = Rect.top + (int)((Rect.bottom-Rect.top)*0.90);
-#else
-	TestRect.bottom = Rect.top + (int)((Rect.bottom-Rect.top)*0.94);
-#endif
+	GetClientRect(HWndSample,&TestRect);
 	x = (int)((TestRect.left+TestRect.right) / 2 - FW * 1.5);
 	y = (TestRect.top+TestRect.bottom-FH) / 2;
 	ExtTextOut(DC, x,y, ETO_CLIPPED | ETO_OPAQUE,
 	           &TestRect, "ABC", 3, &(DX[0]));
-	ReleaseDC(Dialog,DC);
+	ReleaseDC(HWndSample,DC);
 }
 
 static void ChangeColor(HWND Dialog, WinDlgWork *work, int IAttr, int IOffset)
@@ -575,9 +569,13 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			                   sizeof(ts->Title)-1, 0);
 
 			SetRB(Dialog,ts->HideTitle,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
+			SetRB(Dialog,ts->EtermLookfeel.BGNoFrame,IDC_NO_FRAME,IDC_NO_FRAME);
 			SetRB(Dialog,ts->PopupMenu,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
-			if ( ts->HideTitle>0 )
+			if ( ts->HideTitle>0 ) {
 				DisableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
+			} else {
+				DisableDlgItem(Dialog,IDC_NO_FRAME,IDC_NO_FRAME);
+			}
 
 			if (work->VTFlag>0) {
 				wchar_t *uimsg;
@@ -713,8 +711,11 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			switch (LOWORD(wParam)) {
 				case IDOK:
 					if ( ts!=NULL ) {
+						WORD w;
 						GetDlgItemText(Dialog,IDC_WINTITLE,ts->Title,sizeof(ts->Title));
 						GetRB(Dialog,&ts->HideTitle,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
+						GetRB(Dialog,&w,IDC_NO_FRAME,IDC_NO_FRAME);
+						ts->EtermLookfeel.BGNoFrame = w;
 						GetRB(Dialog,&ts->PopupMenu,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
 						DC = GetDC(Dialog);
 						if (work->VTFlag>0) {
@@ -895,9 +896,11 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					GetRB(Dialog,&i,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
 					if (i>0) {
 						DisableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
+						EnableDlgItem(Dialog,IDC_NO_FRAME,IDC_NO_FRAME);
 					}
 					else {
 						EnableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
+						DisableDlgItem(Dialog,IDC_NO_FRAME,IDC_NO_FRAME);
 					}
 					break;
 

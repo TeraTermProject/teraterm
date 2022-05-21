@@ -56,6 +56,8 @@
 #define IDC_WINATTR                     221
 #define IDC_WINAIXTERM16                222
 #define IDC_WINXTERM256                 223
+#define IDC_NO_FRAME                    224
+#define IDC_DRAW_SAMPLE_AREA            225
 #define IDC_WINUSENORMALBG              231
 #define IDC_WINHELP                     299
 #define IDD_KEYBDLG                     300
