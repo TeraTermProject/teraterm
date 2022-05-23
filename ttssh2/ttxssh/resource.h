@@ -19,6 +19,7 @@
 #define IDD_SSHUPDATE_HOSTKEY           111
 #define IDI_SECURETT_GREEN              113
 #define IDI_DROPDOWN                    114
+#define IDI_SECURETT_CLASSIC            115
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDD_SSHDIFFERENTKEY             601
@@ -244,7 +245,7 @@
 #define IDC_SSHAUTHSETUP_HELP           1251
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118

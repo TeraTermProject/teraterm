@@ -367,6 +367,10 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	         (_stricmp(buf, "securett_green") == 0)) {
 		settings->IconID = IDI_SECURETT_GREEN;
 	}
+	else if ((_stricmp(buf, "classic") == 0) ||
+	         (_stricmp(buf, "securett_classic") == 0)) {
+		settings->IconID = IDI_SECURETT_CLASSIC;
+	}
 	else {
 		settings->IconID = IDI_SECURETT;
 	}
@@ -491,6 +495,9 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	}
 	else if (settings->IconID==IDI_SECURETT_GREEN) {
 		WritePrivateProfileString("TTSSH", "SSHIcon", "green", fileName);
+	}
+	else if (settings->IconID==IDI_SECURETT_CLASSIC) {
+		WritePrivateProfileString("TTSSH", "SSHIcon", "classic", fileName);
 	}
 	else {
 		WritePrivateProfileString("TTSSH", "SSHIcon", "Default", fileName);
@@ -1690,6 +1697,10 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					else if ((_stricmp(option+10, "green") == 0) ||
 					         (_stricmp(option+10, "securett_green") == 0)) {
 						pvar->settings.IconID = IDI_SECURETT_GREEN;
+					}
+					else if ((_stricmp(option+10, "classic") == 0) ||
+					         (_stricmp(option+10, "securett_classic") == 0)) {
+						pvar->settings.IconID = IDI_SECURETT_CLASSIC;
 					}
 					else {
 						pvar->settings.IconID = IDI_SECURETT;
