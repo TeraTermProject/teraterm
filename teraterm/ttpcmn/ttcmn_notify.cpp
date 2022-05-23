@@ -105,6 +105,7 @@ static void NotifyDelete(NotifyIcon *ni)
 	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
 	Shell_NotifyIconW(NIM_DELETE, NotifyIcon);
 	ni->NotifyIconShowCount = 0;
+	free(ni);
 }
 
 static void NotifyShowIcon(NotifyIcon *ni)

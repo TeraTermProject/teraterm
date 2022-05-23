@@ -1418,6 +1418,9 @@ void CVTWindow::OnClose()
 
 	SaveVTPos();
 	DestroyWindow();
+
+	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+	DeleteNotifyIcon(&cv);
 }
 
 // ëSTera TermÇÃèIóπÇéwé¶Ç∑ÇÈ
@@ -1485,8 +1488,6 @@ void CVTWindow::OnDestroy()
 	FreeBuffer();
 
 	TTXEnd(); /* TTPLUG */
-
-	DeleteNotifyIcon(&cv);
 }
 
 static void EscapeFilename(const wchar_t *src, wchar_t *dest)
