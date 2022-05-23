@@ -241,7 +241,7 @@ void SetAutoConnectPort(int port)
 	AutoDisconnectedPort = port;
 }
 
-static void SetVTIcon(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
+static void SetVTIconID(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 {
 	HINSTANCE inst;
 	WORD icon_id;
@@ -269,7 +269,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	m_hInst = hInstance;
 
 	CommInit(&cv);
-	ts.SetVTIcon = SetVTIcon;
+	ts.SetVTIconID = SetVTIconID;
 	isFirstInstance = StartTeraTerm(&ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */

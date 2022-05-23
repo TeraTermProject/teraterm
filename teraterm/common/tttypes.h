@@ -650,7 +650,7 @@ struct tttset {
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
 
-	void (*SetVTIcon)(TTTSet *ts, HINSTANCE hInstance, WORD IconID);
+	void (*SetVTIconID)(TTTSet *ts, HINSTANCE hInstance, WORD IconID);
 };
 
   /* New Line modes */
