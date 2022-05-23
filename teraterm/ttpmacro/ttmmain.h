@@ -74,5 +74,5 @@ protected:
 	LRESULT OnDdeReady(WPARAM wParam, LPARAM lParam);
 	LRESULT OnDdeEnd(WPARAM wParam, LPARAM lParam);
 	LRESULT OnMacroBringup(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDpiChanged(WPARAM wp, LPARAM lp);
 };
-

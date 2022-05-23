@@ -684,6 +684,13 @@ LRESULT CCtrlWindow::OnMacroBringup(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT CCtrlWindow::OnDpiChanged(WPARAM wp, LPARAM)
+{
+	const UINT new_dpi = LOWORD(wp);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), new_dpi);
+	return TRUE;
+}
+
 LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg)
@@ -721,6 +728,9 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_USER_DDEEND:
 		OnDdeEnd(wp, lp);
+		break;
+	case WM_DPICHANGED:
+		OnDpiChanged(wp, lp);
 		break;
 	}
 	return FALSE;
