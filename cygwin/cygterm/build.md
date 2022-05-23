@@ -16,6 +16,8 @@
   - make
   - cygwin32-gcc-core
   - cygwin32-gcc-g++
+  - tar
+  - gzip
   - setupを使ったインストール例
     - `setup-x86_64.exe --quiet-mode --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core`
 
@@ -26,6 +28,8 @@
   - make
   - cygwin64-gcc-core
   - cygwin64-gcc-g++
+  - tar
+  - gzip
   - setupを使ったインストール例
     - `setup-x86.exe --quiet-mode --packages cygwin64-gcc-g++ --packages cygwin64-gcc-core`
 
