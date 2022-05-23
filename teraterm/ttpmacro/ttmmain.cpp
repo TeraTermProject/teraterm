@@ -376,6 +376,8 @@ void CCtrlWindow::OnDestroy()
 
 	EndTTL();
 	EndDDE();
+	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+
 	::DestroyWindow(m_hStatus);
 }
 

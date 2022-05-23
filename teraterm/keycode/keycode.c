@@ -213,6 +213,12 @@ LRESULT OnDpiChanged(HWND hWnd, WPARAM wp, LPARAM lp)
 	return TRUE;
 }
 
+LRESULT OnDestroy(HWND hWnd)
+{
+	TTSetIcon(ghInstance, hWnd, NULL, 0);
+	return TRUE;
+}
+
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam,
   LPARAM lParam)
 {
@@ -246,6 +252,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam,
 			TimerProc(hWnd, wParam);
 			break;
 		case WM_DESTROY:
+			OnDestroy(hWnd);
 			PostQuitMessage(0);
 			break;
 		case WM_DPICHANGED:

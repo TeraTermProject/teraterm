@@ -292,6 +292,8 @@ void CTEKWindow::OnDestroy()
 	HTEKWin = NULL;
 	pTEKWin = NULL;
 	ActiveWin = IdVT;
+
+	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
 }
 
 void CTEKWindow::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
