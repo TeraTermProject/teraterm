@@ -799,6 +799,9 @@ void CVisualPropPageDlg::OnInitDialog()
 	// (11)URL Underline
 	SetCheck(IDC_URL_UNDERLINE, (ts.FontFlag&FF_URLUNDERLINE) != 0);
 
+	SetCheck(IDC_CHECK_FAST_SIZE_MOVE, ts.EtermLookfeel.BGFastSizeMove != 0);
+	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
+
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
 
@@ -1230,6 +1233,9 @@ void CVisualPropPageDlg::OnOK()
 	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_URL_UNDERLINE)) {
 		ts.FontFlag ^= FF_URLUNDERLINE;
 	}
+
+	ts.EtermLookfeel.BGFastSizeMove = GetCheck(IDC_CHECK_FAST_SIZE_MOVE);
+	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
 
 	if (flag_changed) {
 		// re-launch

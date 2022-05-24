@@ -114,6 +114,8 @@
 #define IDC_URL_UNDERLINE               1075
 #define IDC_ALPHA_BLEND_ACTIVE_TRACKBAR 1076
 #define IDC_ALPHA_BLEND_INACTIVE_TRACKBAR 1077
+#define IDC_CHECK_FLICKER_LESS_MOVE     1078
+#define IDC_CHECK_FAST_SIZE_MOVE        1079
 #define IDD_PRNABORTDLG                 2100
 #define IDD_FILETRANSDLG                2200
 #define IDC_TRANSFNAME                  2201
@@ -325,7 +327,7 @@
 #define ID_FILE_TERATERMMENU            52006
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
