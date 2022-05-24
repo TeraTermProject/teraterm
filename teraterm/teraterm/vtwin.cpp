@@ -3339,7 +3339,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 
 	/* Auto start logging or /L= option */
 	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
-		if (ts.LogFN == NULL || ts.LogFN[0] == 0) {
+		if (ts.LogFN[0] == 0) {
 			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
 		else {
