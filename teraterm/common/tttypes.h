@@ -330,6 +330,8 @@ typedef struct {
 	char BGThemeFile[MAX_PATH];
 	int BGIgnoreThemeFile;
 	char reserve[20];
+	wchar_t *BGThemeFileW;
+	wchar_t *BGSPIPathW;
 } eterm_lookfeel_t;
 
 typedef struct cygterm {
@@ -648,6 +650,7 @@ struct tttset {
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
 	wchar_t *LogDirW;					// logやダンプを置くフォルダ
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
+	wchar_t *BGImageFilePathW;
 	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
 };
 

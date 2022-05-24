@@ -42,6 +42,7 @@
 #include "setting.h"
 #include "codeconv.h"
 #include "libsusieplugin.h"
+#include "asprintf.h"
 #include "inifile_com.h"
 #include "win32helper.h"
 
@@ -1370,12 +1371,10 @@ void BGDestruct(void)
  */
 void BGInitialize(BOOL initialize_once)
 {
-	char path[MAX_PATH], config_file[MAX_PATH], tempPath[MAX_PATH];
-	char BGSPIPath[MAX_PATH];
+	char path[MAX_PATH];
+	char config_file[MAX_PATH];
 
-	ZeroMemory(path, sizeof(path));
 	ZeroMemory(config_file, sizeof(config_file));
-	ZeroMemory(tempPath, sizeof(tempPath));
 
 	// VTColor を読み込み
 	BGVTColor[0] = ts.VTColor[0];
@@ -1390,18 +1389,8 @@ void BGInitialize(BOOL initialize_once)
 	BGVTReverseColor[0] = ts.VTReverseColor[0];
 	BGVTReverseColor[1] = ts.VTReverseColor[1];
 
-#if 1
-	// ハイパーリンク描画の復活。(2009.8.26 yutaka)
-	/* begin - ishizaki */
 	BGURLColor[0] = ts.URLColor[0];
 	BGURLColor[1] = ts.URLColor[1];
-	/* end - ishizaki */
-#else
-	// TODO: ハイパーリンクの描画がリアルタイムに行われないことがあるので、
-	// 色属性変更はいったん取りやめることにする。将来、対応する。(2005.4.3 yutaka)
-	BGURLColor[0] = ts.VTColor[0];
-	BGURLColor[1] = ts.VTColor[1];
-#endif
 
 	// ANSI color設定のほうを優先させる (2005.2.3 yutaka)
 	InitColorTable();
@@ -1419,22 +1408,29 @@ void BGInitialize(BOOL initialize_once)
 		BGEnable = BGGetOnOff("BGEnable", FALSE, ts.SetupFNameW);
 	}
 
-	GetPrivateProfileString(BG_SECTION, "BGSPIPath", "plugin", BGSPIPath, MAX_PATH, ts.SetupFName);
-	strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
+	hGetPrivateProfileStringW(BG_SECTIONW, L"BGSPIPath", L"plugin", ts.SetupFNameW, &ts.EtermLookfeel.BGSPIPathW);
+	WideCharToACP_t(ts.EtermLookfeel.BGSPIPathW, ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath));
 
 	if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
-		//コンフィグファイルの決定
-		GetPrivateProfileString(BG_SECTION, "BGThemeFile", "", path, MAX_PATH, ts.SetupFName);
-		strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
+		wchar_t *theme_imagefile;
+
+		//コンフィグファイル(テーマファイル)の決定
+		hGetPrivateProfileStringW(BG_SECTIONW, L"BGThemeFile", L"", ts.SetupFNameW, &ts.EtermLookfeel.BGThemeFileW);
+		WideCharToACP_t(ts.EtermLookfeel.BGThemeFileW, ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile));
+
+		// テーマファイルImageFile.INIから
+		aswprintf(&theme_imagefile, L"%s\\%hs", ts.HomeDirW, BG_THEME_IMAGEFILE);
 
 		// 背景画像の読み込み
-		_snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
-		GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
+		hGetPrivateProfileStringW(BG_SECTIONW, BG_DESTFILEW, L"", theme_imagefile, &ts.BGImageFilePathW);
+		WideCharToACP_t(ts.BGImageFilePathW, ts.BGImageFilePath, _countof(ts.BGImageFilePath));
 
 		// 背景画像の明るさの読み込み。
 		// BGSrc1Alpha と BGSrc2Alphaは同値として扱う。
 		ts.BGImgBrightness =
-			GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
+			GetPrivateProfileIntW(BG_SECTIONW, BG_THEME_IMAGE_BRIGHTNESS1W, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, theme_imagefile);
+
+		free(theme_imagefile);
 	}
 
 	// BGEnableが真でも、initialize_once == FALSEの場合は初期化をしない。
@@ -1458,10 +1454,14 @@ void BGInitialize(BOOL initialize_once)
 	BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
 
 	//テンポラリーファイル名を生成
-	GetTempPath(MAX_PATH, tempPath);
-	GetTempFileName(tempPath, "ttAK", 0, BGDest.fileTmp);
-	GetTempFileName(tempPath, "ttAK", 0, BGSrc1.fileTmp);
-	GetTempFileName(tempPath, "ttAK", 0, BGSrc2.fileTmp);
+	{
+		char tempPath[MAX_PATH];
+		ZeroMemory(tempPath, sizeof(tempPath));
+		GetTempPathA(MAX_PATH, tempPath);
+		GetTempFileNameA(tempPath, "ttAK", 0, BGDest.fileTmp);
+		GetTempFileNameA(tempPath, "ttAK", 0, BGSrc1.fileTmp);
+		GetTempFileNameA(tempPath, "ttAK", 0, BGSrc2.fileTmp);
+	}
 
 	//デフォルト値
 	BGDest.type = BG_PICTURE;
