@@ -355,7 +355,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		        WS_BORDER | WS_THICKFRAME | WS_POPUP;
 
 #ifdef ALPHABLEND_TYPE2
-		if(BGNoFrame)
+		if (ts.EtermLookfeel.BGNoFrame)
 			Style &= ~(WS_BORDER | WS_THICKFRAME);
 #endif
 	}
@@ -407,7 +407,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI
-	if(BGNoFrame && ts.HideTitle > 0) {
+	if(ts.EtermLookfeel.BGNoFrame && ts.HideTitle > 0) {
 		DWORD ExStyle = (DWORD)::GetWindowLongPtr(HVTWin,GWL_EXSTYLE);
 		ExStyle &= ~WS_EX_CLIENTEDGE;
 		::SetWindowLongPtr(HVTWin,GWL_EXSTYLE,ExStyle);
@@ -2801,7 +2801,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ALPHABLEND_TYPE2
-	if(BGEnable && BGNoCopyBits) {
+	if(BGEnable && ts.EtermLookfeel.BGNoCopyBits) {
 		((WINDOWPOS*)lParam)->flags |= SWP_NOCOPYBITS;
 	}
 #endif
@@ -3254,7 +3254,7 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	                      WS_MINIMIZEBOX | WS_MAXIMIZEBOX) | WS_BORDER | WS_POPUP;
 
 #ifdef ALPHABLEND_TYPE2
-		if(BGNoFrame) {
+		if(ts.EtermLookfeel.BGNoFrame) {
 			Style   &= ~(WS_THICKFRAME | WS_BORDER);
 			ExStyle &= ~WS_EX_CLIENTEDGE;
 		}else{

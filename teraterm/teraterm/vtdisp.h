@@ -47,8 +47,6 @@ void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(void);
 
 extern BOOL BGEnable;
-extern BOOL BGNoFrame;
-extern BOOL BGNoCopyBits;
 //-->
 
 void InitDisp();

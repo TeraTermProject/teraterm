@@ -171,7 +171,6 @@ static BGSrc BGSrc2;
 int  BGEnable;
 static int  BGReverseTextAlpha;
 static int  BGUseAlphaBlendAPI;
-BOOL BGNoFrame;
 static BOOL BGFastSizeMove;
 
 static COLORREF BGVTColor[2];
@@ -185,7 +184,6 @@ static COLORREF BGURLColor[2];
 static RECT BGPrevRect;
 static BOOL BGReverseText;
 
-BOOL   BGNoCopyBits;
 static BOOL   BGInSizeMove;
 static HBRUSH BGBrushInSizeMove;
 
@@ -1449,9 +1447,7 @@ void BGInitialize(BOOL initialize_once)
 
 	// BGシステム設定読み出し
 	BGUseAlphaBlendAPI = ts.EtermLookfeel.BGUseAlphaBlendAPI;
-	BGNoFrame = ts.EtermLookfeel.BGNoFrame;
 	BGFastSizeMove = ts.EtermLookfeel.BGFastSizeMove;
-	BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
 
 	//テンポラリーファイル名を生成
 	{
