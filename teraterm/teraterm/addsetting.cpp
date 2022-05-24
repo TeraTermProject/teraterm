@@ -1245,7 +1245,7 @@ void CVisualPropPageDlg::OnOK()
 
 void CVisualPropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalVisual, 0);
 }
 
 // CLogPropPageDlg ダイアログ
