@@ -442,7 +442,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
-		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(icon_id), 0);
+		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), 0);
 
 		// 通知領域のアイコン
 		// Windows 2000 のタスクトレイアイコンは 4bit のみ対応なので、ID を保存しておいて表示のときに読み込んでもらう
@@ -5060,11 +5060,11 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	{
 		HINSTANCE inst;
 		WORD icon_id;
-		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : hInst;
+		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
 		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
 		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
 		                                                                  : IDI_VT;
-		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
+		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
 
 	return TRUE;
