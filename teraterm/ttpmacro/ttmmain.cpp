@@ -33,6 +33,7 @@
 #include <commctrl.h>
 #include <stdio.h>
 
+#include "compat_win.h"
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmdlg.h"
