@@ -249,8 +249,8 @@ static void SetVTIconID(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 	ts->PluginVTIconInstance = hInstance;
 	ts->PluginVTIconID = IconID;
 
-	inst = (ts->PluginVTIconInstance == NULL) ? hInst : hInstance;
-	icon_id = (ts->PluginVTIconID != 0) ? IconID :
+	inst = (ts->PluginVTIconInstance == NULL) ? hInst : ts->PluginVTIconInstance;
+	icon_id = (ts->PluginVTIconID != 0) ? ts->PluginVTIconID :
 	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
 	                                                                    : IDI_VT;
 	TTSetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), 0);
