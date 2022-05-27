@@ -284,6 +284,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ttcmn_notify.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\ttlib.h"
 				>
 			</File>

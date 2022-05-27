@@ -42,19 +42,31 @@
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttcommon.h"
 #include "codeconv.h"
 #include "compat_win.h"
 #include "dlglib.h"
 
+#define	TTCMN_NOTIFY_INTERNAL 1
+#include "ttcmn_notify.h"
+
 typedef struct {
-	TT_NOTIFYICONDATAW_V2 notify_icon;
+	BOOL enable;
 	int NotifyIconShowCount;
-	HICON CustomIcon; // 未使用
+	HWND parent_wnd;
+	BOOL created;
+	UINT callback_msg;
+	BOOL no_sound;
+	HINSTANCE IconInstance;
+	WORD IconID;
+	HINSTANCE CustomIconInstance;
+	WORD CustomIconID;
 } NotifyIcon;
+
+// https://nyaruru.hatenablog.com/entry/20071008/p3
 
 /**
  *	Shell_NotifyIconW() wrapper
@@ -68,54 +80,36 @@ typedef struct {
  */
 static BOOL Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 {
-	return Shell_NotifyIconW(dwMessage, (NOTIFYICONDATAW*)lpData);
+	BOOL r = Shell_NotifyIconW(dwMessage, (NOTIFYICONDATAW*)lpData);
+#if _DEBUG
+	DWORD e = GetLastError();
+	assert(r != FALSE && e == 0);
+#endif
+	return r;
 }
 
-static NotifyIcon *NotifyCreate(HWND hWnd, HICON icon, UINT msg)
+static HICON LoadIcon(NotifyIcon *ni)
 {
-	NotifyIcon *ni = (NotifyIcon *)malloc(sizeof(NotifyIcon));
-	memset(ni, 0, sizeof(*ni));
+	HINSTANCE IconInstance = ni->CustomIconInstance == NULL ? ni->IconInstance : ni->CustomIconInstance;
+	WORD IconID = ni->CustomIconID == 0 ? ni->IconID : ni->CustomIconID;
+	const int primary_monitor_dpi = GetMonitorDpiFromWindow(NULL);
+	//const int primary_monitor_dpi = 96;
+	return TTLoadIcon(IconInstance, MAKEINTRESOURCEW(IconID), 16 ,16, primary_monitor_dpi, TRUE);
+}
 
-	TT_NOTIFYICONDATAW_V2 *p = &ni->notify_icon;
+static void CreateNotifyIconData(NotifyIcon *ni, TT_NOTIFYICONDATAW_V2 *p)
+{
+	assert(ni->parent_wnd != NULL);
+	memset(p, 0, sizeof(*p));
 	p->cbSize = sizeof(*p);
-	p->hWnd = hWnd;
+	p->hWnd = ni->parent_wnd;
 	p->uID = 1;
-	p->uFlags = NIF_ICON | NIF_MESSAGE;
-	p->uCallbackMessage = msg;
-	p->hIcon = icon;
+	p->uCallbackMessage = ni->callback_msg;
+	p->hIcon = LoadIcon(ni);
 
-	Shell_NotifyIconW(NIM_ADD, p);
-
-	ni->NotifyIconShowCount = 0;
-
-	return ni;
-}
-
-static void NotifyUpdateIcon(NotifyIcon *ni, HICON icon)
-{
-	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-	NotifyIcon->uFlags = NIF_ICON;
-	NotifyIcon->uID = 1;
-	NotifyIcon->hIcon = icon;
-	Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
-}
-
-static void NotifyDelete(NotifyIcon *ni)
-{
-	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-	Shell_NotifyIconW(NIM_DELETE, NotifyIcon);
-	ni->NotifyIconShowCount = 0;
-	free(ni);
-}
-
-static void NotifyShowIcon(NotifyIcon *ni)
-{
-	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-	NotifyIcon->uFlags = NIF_STATE;
-	NotifyIcon->dwState = 0;
-	NotifyIcon->dwStateMask = NIS_HIDDEN;
-	Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
-	ni->NotifyIconShowCount += 1;
+	p->uFlags =
+		((p->uCallbackMessage != 0) ? NIF_MESSAGE : 0) |
+		((p->hIcon != NULL) ? NIF_ICON : 0);
 }
 
 static void NotifyHide(NotifyIcon *ni)
@@ -124,196 +118,125 @@ static void NotifyHide(NotifyIcon *ni)
 		ni->NotifyIconShowCount -= 1;
 	}
 	else {
-		TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-		NotifyIcon->uFlags = NIF_STATE;
-		NotifyIcon->dwState = NIS_HIDDEN;
-		NotifyIcon->dwStateMask = NIS_HIDDEN;
-		Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
+		TT_NOTIFYICONDATAW_V2 notify_icon;
+		CreateNotifyIconData(ni, &notify_icon);
+		notify_icon.uFlags |= NIF_STATE;
+		notify_icon.dwState = NIS_HIDDEN;
+		notify_icon.dwStateMask = NIS_HIDDEN;
+		Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
 		ni->NotifyIconShowCount = 0;
+		DestroyIcon(notify_icon.hIcon);
 	}
 }
 
-static void NotifySetVersion(NotifyIcon *ni, unsigned int ver)
-{
-	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-	NotifyIcon->uVersion = ver;
-	Shell_NotifyIconW(NIM_SETVERSION, NotifyIcon);
-}
-
+/**
+ *
+ *	@param	flag	NOTIFYICONDATA.dwInfoFlags
+ *					1	information icon
+ *					2	warning icon
+ *					3	error icon
+ */
 static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
 	if (msg == NULL) {
 		return;
 	}
-
-	if (! HasBalloonTipSupport()) {
-		return;
+	if (title == NULL) {
+		flag = NIIF_NONE;
 	}
 
-	TT_NOTIFYICONDATAW_V2 *NotifyIcon = &ni->notify_icon;
-	NotifyIcon->uFlags = NIF_INFO | NIF_STATE;
-	NotifyIcon->dwState = 0;
-	NotifyIcon->dwStateMask = NIS_HIDDEN;
+	if (ni->no_sound) {
+		flag |= NIIF_NOSOUND;
+	}
+
+	TT_NOTIFYICONDATAW_V2 notify_icon;
+	CreateNotifyIconData(ni, &notify_icon);
+	notify_icon.uFlags |= NIF_INFO;
+	notify_icon.uFlags |= NIF_STATE;
+	notify_icon.dwState = 0;
+	notify_icon.dwStateMask = NIS_HIDDEN;
 
 	if (title) {
-		NotifyIcon->dwInfoFlags = flag;
-		wcsncpy_s(NotifyIcon->szInfoTitle, _countof(NotifyIcon->szInfoTitle), title, _TRUNCATE);
+		wcsncpy_s(notify_icon.szInfoTitle, _countof(notify_icon.szInfoTitle), title, _TRUNCATE);
 	}
 	else {
-		NotifyIcon->dwInfoFlags = NIIF_NONE;
-		NotifyIcon->szInfoTitle[0] = 0;
+		notify_icon.szInfoTitle[0] = 0;
+	}
+	notify_icon.dwInfoFlags = flag;
+
+	wcsncpy_s(notify_icon.szInfo, _countof(notify_icon.szInfo), msg, _TRUNCATE);
+
+	if (!ni->created) {
+		if (Shell_NotifyIconW(NIM_ADD, &notify_icon) != FALSE) {
+			ni->created = TRUE;
+		}
+	}
+	else {
+		Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
 	}
 
-	wcsncpy_s(NotifyIcon->szInfo, _countof(NotifyIcon->szInfo), msg, _TRUNCATE);
-
-	Shell_NotifyIconW(NIM_MODIFY, NotifyIcon);
-
+	// 通知アイコンは渡したらコピーされるので保持しなくてよい
+	// すぐに破棄してok
+	// https://docs.microsoft.com/ja-jp/windows/win32/shell/taskbar
+	// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
+	DestroyIcon(notify_icon.hIcon);
 	ni->NotifyIconShowCount += 1;
+}
+
+static void NotifySetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
+{
+	ni->CustomIconInstance = hInstance;
+	ni->CustomIconID = IconID;
+}
+
+static NotifyIcon *NotifyInitialize(HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+{
+	NotifyIcon *ni = (NotifyIcon *)calloc(sizeof(NotifyIcon) ,1);
+	assert(hWnd != NULL);
+	if (! HasBalloonTipSupport()) {
+		ni->enable = FALSE;
+		return ni;
+	}
+	ni->enable = TRUE;
+	ni->parent_wnd = hWnd;
+	ni->callback_msg = msg;
+	ni->no_sound = FALSE;
+	ni->IconInstance = hInstance;
+	ni->IconID = IconID;
+	return ni;
+}
+
+static void NotifyUninitialize(NotifyIcon *ni)
+{
+	if (ni->enable && ni->created) {
+		TT_NOTIFYICONDATAW_V2 notify_icon;
+		CreateNotifyIconData(ni, &notify_icon);
+		Shell_NotifyIconW(NIM_DELETE, &notify_icon);
+		DestroyIcon(notify_icon.hIcon);
+	}
+	free(ni);
 }
 
 static NotifyIcon *GetNotifyData(PComVar cv)
 {
+	assert(cv != NULL);
 	NotifyIcon *p = (NotifyIcon *)cv->NotifyIcon;
+	assert(p != NULL);
 	return p;
 }
 
 /*
  *	EXPORT API
  */
-
-// SetCustomNotifyIcon(), GetCustomNotifyIcon() で操作できるが、内部からは使用されない
-static HICON CustomIcon = NULL;
-
-// 動作するが CustomIcon は使用されない
-void WINAPI SetCustomNotifyIcon(HICON icon)
-{
-	CustomIcon = icon;
-}
-
-// 動作するが CustomIcon は使用されない
-HICON WINAPI GetCustomNotifyIcon()
-{
-	return CustomIcon;
-}
-
-static HINSTANCE TTCustomIconInstance = NULL;
-static WORD TTCustomIconID = 0;
-static HINSTANCE CustomIconInstance = NULL;
-static WORD CustomIconID = 0;
-
-void WINAPI SetCustomNotifyIconID(HINSTANCE hInstance, WORD IconID, BOOL plugin)
-{
-	if (!plugin) {
-		CustomIconInstance = hInstance;
-		CustomIconID = IconID;
-
-		// あとで外部からカスタム通知アイコンを消去されるときのために
-		// Tera Term 本体から設定されたカスタム通知アイコンを保持しておく
-		TTCustomIconInstance = hInstance;
-		TTCustomIconID = IconID;
-	}
-	else {
-		if (hInstance == NULL) {
-			CustomIconInstance = TTCustomIconInstance;
-		}
-		else {
-			CustomIconInstance = hInstance;
-		}
-		if (IconID == 0) {
-			CustomIconID = TTCustomIconID;
-		}
-		else {
-			CustomIconID = IconID;
-		}
-	}
-}
-
-void WINAPI CreateNotifyIcon(PComVar cv)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	HICON icon = NULL;
-
-	// ウィンドウハンドルが必要になるので、接続中でないとアイコンは作成できない
-	if (cv->HWin == NULL) {
-		return;
-	}
-
-	if (CustomIconInstance != NULL && CustomIconID != 0) {
-		const int dpi = GetMonitorDpiFromWindow(cv->HWin);
-		icon = TTLoadIcon(CustomIconInstance, MAKEINTRESOURCEW(CustomIconID), 16 ,16, dpi, TRUE);
-	}
-	else {
-		icon = (HICON)SendMessage(cv->HWin, WM_GETICON, ICON_SMALL, 0);
-	}
-
-	if (ni == NULL) {
-		ni = NotifyCreate(cv->HWin, icon, WM_USER_NOTIFYICON);
-	}
-	else {
-		NotifyUpdateIcon(ni, icon);
-	}
-	cv->NotifyIcon = ni;
-
-	// 通知アイコンは渡したらコピーされるので保持しなくてよい
-	// すぐに破棄する
-	// https://docs.microsoft.com/ja-jp/windows/win32/shell/taskbar
-	// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
-	if (CustomIconInstance != NULL && CustomIconID != 0 &&
-	    icon != NULL) {
-		DestroyIcon(icon);
-	}
-}
-
-void WINAPI DeleteNotifyIcon(PComVar cv)
-{
-	NotifyIcon* ni = GetNotifyData(cv);
-	if (ni == NULL) {
-		return;
-	}
-	NotifyDelete(ni);
-}
-
-void WINAPI ShowNotifyIcon(PComVar cv)
-{
-	NotifyIcon* ni;
-
-	CreateNotifyIcon(cv);
-	ni = GetNotifyData(cv);
-	if (ni == NULL) {
-		return;
-	}
-
-	NotifyShowIcon(ni);
-}
-
 void WINAPI HideNotifyIcon(PComVar cv)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
-	if (ni == NULL) {
-		return;
-	}
 	NotifyHide(ni);
-}
-
-void WINAPI SetVerNotifyIcon(PComVar cv, unsigned int ver)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	if (ni == NULL) {
-		return;
-	}
-	NotifySetVersion(ni, ver);
 }
 
 void WINAPI NotifyMessageW(PComVar cv, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
-	NotifyIcon *ni;
-
-	CreateNotifyIcon(cv);
-	ni = GetNotifyData(cv);
-	if (ni == NULL) {
-		return;
-	}
-
+	NotifyIcon *ni = GetNotifyData(cv);
 	NotifySetMessageW(ni, msg, title, flag);
 }
 
@@ -325,3 +248,56 @@ void WINAPI NotifyMessage(PComVar cv, const char *msg, const char *title, DWORD 
 	free(titleW);
 	free(msgW);
 }
+
+/**
+ *	通知領域初期化
+ *
+ *	@param	hWnd		通知領域の親ウィンドウ
+ *	@param	msg			親ウィンドウへ送られるメッセージID
+ *	@param	hInstance	アイコンを持つモジュールのinstance
+ *	@param	IconID		アイコンのリソースID
+ */
+void WINAPI NotifyInitialize(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+{
+	assert (cv->NotifyIcon == NULL);	// 2重初期化
+	NotifyIcon *ni = NotifyInitialize(hWnd, msg, hInstance, IconID);
+	cv->NotifyIcon = ni;
+}
+
+/**
+ *	通知領域完了
+ */
+void WINAPI NotifyUninitialize(PComVar cv)
+{
+	NotifyIcon *ni = GetNotifyData(cv);
+	NotifyUninitialize(ni);
+	cv->NotifyIcon = NULL;
+}
+
+/**
+ *	通知領域で使用するアイコンをセットする
+ *
+ *	@param	hInstance	アイコンを持つモジュールのinstance
+ *	@param	IconID		アイコンのリソースID
+ *
+ *	各々をNULL, 0 にすると NotifyInitialize() で設定したアイコンに戻る
+ */
+void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID)
+{
+	NotifyIcon *ni = GetNotifyData(cv);
+	NotifySetIconID(ni, hInstance, IconID);
+}
+
+/**
+ * Tera Termの通知領域の使い方
+ * - 通知するときに、アイコンとバルーンを表示
+ *   - 初めての通知時に、通知アイコン作成
+ * - 通知タイムアウト
+ *   - 通知アイコンを隠す
+ *   - vtwin.cpp の CVTWindow::OnNotifyIcon() を参照
+ * - 通知をクリック
+ *   - 通知アイコンを隠す + vtwinのZオーダーを最前面に
+ *   - vtwin.cpp の CVTWindow::OnNotifyIcon() を参照
+ * - 終了時
+ *   - アイコンを削除
+ */

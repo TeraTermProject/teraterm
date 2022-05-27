@@ -41,6 +41,7 @@
 #include "tttypes.h"
 #include "tttypes_key.h"
 
+#define	TTCMN_NOTIFY_INTERNAL 1
 #include "ttcommon.h"
 #include "ttwinman.h"
 #include "ttsetup.h"
@@ -254,6 +255,7 @@ static void SetVTIconID(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
 	                                                                    : IDI_VT;
 	TTSetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), 0);
+	NotifySetIconID(&cv, inst, icon_id);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -444,14 +446,12 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		                                                                  : IDI_VT;
 		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), 0);
 
-		// 通知領域のアイコン
-		// Windows 2000 のタスクトレイアイコンは 4bit のみ対応なので、ID を保存しておいて表示のときに読み込んでもらう
-		// Windows 2000 以外は VT ウィンドウから取得されるのでなにもしない
+		// 通知領域初期化
 		if (IsWindows2000()) {
-			icon_id = (ts.VTIcon != IdIconDefault) ? ts.VTIcon : IDI_VT;
+			// Windows 2000 のタスクトレイアイコンは 4bit のみ対応
 			icon_id = IDI_VT_CLASSIC;
-			SetCustomNotifyIconID(inst, icon_id, FALSE);
 		}
+		NotifyInitialize(&cv, m_hWnd, WM_USER_NOTIFYICON, hInstance, icon_id);
 	}
 
 	MainMenu = NULL;
@@ -1420,7 +1420,7 @@ void CVTWindow::OnClose()
 	DestroyWindow();
 
 	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
-	DeleteNotifyIcon(&cv);
+	NotifyUninitialize(&cv);
 }
 
 // 全Tera Termの終了を指示する

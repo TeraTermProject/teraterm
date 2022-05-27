@@ -78,6 +78,9 @@
     <ClInclude Include="..\teraterm\unicode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ttcmn_notify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpcmn.def">
