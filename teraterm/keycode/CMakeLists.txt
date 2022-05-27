@@ -29,8 +29,8 @@ endif(SUPPORT_OLD_WINDOWS)
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
-  ttpcmn
   common_static
+  ttpcmn
 )
 
 set_target_properties(
@@ -89,8 +89,8 @@ endif(SUPPORT_OLD_WINDOWS)
 target_link_libraries(
   ${PACKAGE_NAME_2}
   PRIVATE
-  ttpcmn
   common_static
+  ttpcmn
 )
 
 set_target_properties(
