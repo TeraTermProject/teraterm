@@ -38,6 +38,7 @@ add_custom_target(
     ${RELEASE_DIR}/lang_utf16le/Korean.lng
     ${RELEASE_DIR}/lang_utf16le/Russian.lng
     "${RELEASE_DIR}/lang_utf16le/Simplified Chinese.lng"
+    ${RELEASE_DIR}/lang_utf16le/Spanish.lng
     "${RELEASE_DIR}/lang_utf16le/Traditional Chinese.lng"
     ${RELEASE_DIR}/lang/Default.lng
     ${RELEASE_DIR}/lang/English.lng
@@ -47,6 +48,7 @@ add_custom_target(
     ${RELEASE_DIR}/lang/Korean.lng
     ${RELEASE_DIR}/lang/Russian.lng
     "${RELEASE_DIR}/lang/Simplified Chinese.lng"
+    ${RELEASE_DIR}/lang/Spanish.lng
     "${RELEASE_DIR}/lang/Traditional Chinese.lng"
   SOURCES
     ${RELEASE_DIR}/lang_utf8/Default.lng
@@ -77,6 +79,7 @@ add_custom_command(
     ${RELEASE_DIR}/lang_utf16le/Korean.lng
     ${RELEASE_DIR}/lang_utf16le/Russian.lng
     "${RELEASE_DIR}/lang_utf16le/Simplified Chinese.lng"
+    ${RELEASE_DIR}/lang_utf16le/Spanish.lng
     "${RELEASE_DIR}/lang_utf16le/Traditional Chinese.lng"
     ${RELEASE_DIR}/lang/Default.lng
     ${RELEASE_DIR}/lang/English.lng
@@ -86,6 +89,7 @@ add_custom_command(
     ${RELEASE_DIR}/lang/Korean.lng
     ${RELEASE_DIR}/lang/Russian.lng
     "${RELEASE_DIR}/lang/Simplified Chinese.lng"
+    ${RELEASE_DIR}/lang/Spanish.lng
     "${RELEASE_DIR}/lang/Traditional Chinese.lng"
     COMMAND ${CMAKE_COMMAND} -E make_directory ${RELEASE_DIR}/lang_utf16le
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl utf16le ${RELEASE_DIR}/lang_utf8/Default.lng ${RELEASE_DIR}/lang_utf16le/Default.lng
@@ -96,6 +100,7 @@ add_custom_command(
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl utf16le ${RELEASE_DIR}/lang_utf8/Korean.lng ${RELEASE_DIR}/lang_utf16le/Korean.lng
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl utf16le ${RELEASE_DIR}/lang_utf8/Russian.lng ${RELEASE_DIR}/lang_utf16le/Russian.lng
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl utf16le "${RELEASE_DIR}/lang_utf8/Simplified Chinese.lng" "${RELEASE_DIR}/lang_utf16le/Simplified Chinese.lng"
+    COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl utf16le ${RELEASE_DIR}/lang_utf8/Spanish.lng ${RELEASE_DIR}/lang_utf16le/Spanish.lng
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl utf16le "${RELEASE_DIR}/lang_utf8/Traditional Chinese.lng" "${RELEASE_DIR}/lang_utf16le/Traditional Chinese.lng"
     COMMAND ${CMAKE_COMMAND} -E make_directory ${RELEASE_DIR}/lang
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl cp1252 ${RELEASE_DIR}/lang_utf8/Default.lng ${RELEASE_DIR}/lang/Default.lng
@@ -106,6 +111,7 @@ add_custom_command(
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl cp949 ${RELEASE_DIR}/lang_utf8/Korean.lng ${RELEASE_DIR}/lang/Korean.lng
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl windows-1251 ${RELEASE_DIR}/lang_utf8/Russian.lng ${RELEASE_DIR}/lang/Russian.lng
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl cp936 "${RELEASE_DIR}/lang_utf8/Simplified Chinese.lng" "${RELEASE_DIR}/lang/Simplified Chinese.lng"
+    COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl cp1252 ${RELEASE_DIR}/lang_utf8/Spanish.lng ${RELEASE_DIR}/lang/Spanish.lng
     COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/utf8_to.pl cp950 "${RELEASE_DIR}/lang_utf8/Traditional Chinese.lng" "${RELEASE_DIR}/lang/Traditional Chinese.lng"
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${RELEASE_DIR}/lang ${CMAKE_BINARY_DIR}/$<CONFIG>/lang
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${RELEASE_DIR}/lang_utf16le ${CMAKE_BINARY_DIR}/$<CONFIG>/lang_utf16le
