@@ -62,11 +62,9 @@ protected:
 
 	BOOL OnClose();
 	void OnDestroy();
-	BOOL OnEraseBkgnd(HDC DC);
 	void OnPaint();
 	void OnSize(UINT nType, int cx, int cy);
 	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
-	HCURSOR OnQueryDragIcon();
 	void OnSysColorChange();
 	void OnTimer(UINT_PTR nIDEvent);
 	LRESULT OnDdeCmndEnd(WPARAM wParam, LPARAM lParam);

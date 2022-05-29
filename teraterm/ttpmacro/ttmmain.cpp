@@ -383,17 +383,6 @@ void CCtrlWindow::OnDestroy()
 }
 
 // for icon drawing in Win NT 3.5
-BOOL CCtrlWindow::OnEraseBkgnd(HDC DC)
-{
-	if (::IsIconic(m_hWnd)) {
-		return TRUE;
-	}
-	else {
-		return FALSE;
-	}
-}
-
-// for icon drawing in Win NT 3.5
 void CCtrlWindow::OnPaint()
 {
 	PAINTSTRUCT ps;
@@ -409,14 +398,6 @@ void CCtrlWindow::OnPaint()
 	SetDlgItemText(IDC_FILENAME, GetMacroFileName());
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
 	SetDlgItemText(IDC_LINENO, buf);
-
-	if (::IsIconic(m_hWnd)) {
-		int OldMapMode = GetMapMode(dc);
-		SetMapMode(dc, MM_TEXT);
-		SendMessage(WM_ICONERASEBKGND,(WPARAM)dc, 0);	// TODO
-		DrawIcon(dc, 0, 0, m_hIcon);
-		SetMapMode(dc, OldMapMode);
-	}
 
 	EndPaint(&ps);
 }
@@ -475,12 +456,6 @@ void CCtrlWindow::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	lpmmi->ptMinTrackSize.x = m_init_width;
 	lpmmi->ptMinTrackSize.y = m_init_height;
 #endif
-}
-
-// for icon drawing in Win NT 3.5
-HCURSOR CCtrlWindow::OnQueryDragIcon()
-{
-	return m_hIcon;
 }
 
 void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
@@ -699,9 +674,6 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DESTROY:
 		OnDestroy();
 		PostQuitMessage(0);
-		break;
-	case WM_ERASEBKGND:
-		OnEraseBkgnd((HDC)wp);
 		break;
 	case WM_PAINT:
 		OnPaint();
