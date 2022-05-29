@@ -92,7 +92,7 @@ HWND TTCreateDialog(
 	DLGPROC lpDialogFunc)
 {
 	return TTCreateDialogParam(hInstance, lpTemplateName,
-							   hWndParent, lpDialogFunc, NULL);
+							   hWndParent, lpDialogFunc, (LPARAM)NULL);
 }
 
 /**
@@ -116,7 +116,7 @@ INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplateName,
  */
 INT_PTR TTDialogBox(HINSTANCE hInstance, LPCTSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc)
 {
-	return TTDialogBoxParam(hInstance, lpTemplateName, hWndParent, lpDialogFunc, NULL);
+	return TTDialogBoxParam(hInstance, lpTemplateName, hWndParent, lpDialogFunc, (LPARAM)NULL);
 }
 
 /**

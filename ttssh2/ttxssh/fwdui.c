@@ -933,8 +933,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 	return TRUE;
 }
 
-static UINT_PTR CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                       LPARAM lParam)
+static INT_PTR CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	FWDEditClosure *closure;
 	PTInstVar pvar;
@@ -1059,8 +1058,7 @@ static void remove_forwarding_entry(HWND dlg)
 	}
 }
 
-static UINT_PTR CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                  LPARAM lParam)
+static INT_PTR CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
 	BOOL ret;
