@@ -289,9 +289,10 @@ LRESULT CFileTransDlg::DlgProc(UINT msg, WPARAM wp, LPARAM)
 	case WM_DPICHANGED: {
 		const UINT NewDPI = LOWORD(wp);
 		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTERM), NewDPI);
-		return (LRESULT)TRUE;
+		break;
 	}
 	default:
-		return (LRESULT)FALSE;
+		break;
 	}
+	return (LRESULT)FALSE;
 }
