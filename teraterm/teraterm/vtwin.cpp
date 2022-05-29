@@ -446,11 +446,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		                                                                  : IDI_VT;
 		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), 0);
 
-		// 通知領域初期化
-		if (IsWindows2000()) {
-			// Windows 2000 のタスクトレイアイコンは 4bit のみ対応
-			icon_id = IDI_VT_CLASSIC;
-		}
+		// 通知領域のアイコン
 		NotifyInitialize(&cv, m_hWnd, WM_USER_NOTIFYICON, hInstance, icon_id);
 	}
 
