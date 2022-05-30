@@ -255,7 +255,6 @@ static void SetVTIconID(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
 	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
 	                                                                    : IDI_VT;
 	TTSetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), 0);
-	NotifySetIconID(&cv, inst, icon_id);
 }
 
 /////////////////////////////////////////////////////////////////////////////
