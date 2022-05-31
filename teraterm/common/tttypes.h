@@ -650,7 +650,7 @@ struct tttset {
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
 
-	void (*SetVTIconID)(TTTSet *ts, HINSTANCE hInstance, WORD IconID);
+	HINSTANCE TeraTermInstance;
 };
 
   /* New Line modes */
@@ -921,6 +921,8 @@ typedef struct {
 	void (*Log1Byte)(BYTE b);
 	void (*Log1Bin)(BYTE b);
 	void (*LogBinSkip)(int add);
+
+	TTTSet *ts;
 } TComVar;
 typedef TComVar *PComVar;
 

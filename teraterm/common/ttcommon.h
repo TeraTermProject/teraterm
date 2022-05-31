@@ -80,3 +80,4 @@ DllExport int PASCAL CommTextEchoW(PComVar cv, const wchar_t *B, int C);
 #include "../ttpcmn/language.h"
 #include "../ttpcmn/ttcmn_cominfo.h"
 #include "../ttpcmn/ttcmn_notify.h"
+#include "../ttpcmn/ttcmn_lib.h"

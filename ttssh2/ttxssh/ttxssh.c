@@ -183,7 +183,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	FWDUI_end(pvar);
 
 	// VT ウィンドウのアイコン
-	pvar->ts->SetVTIconID(pvar->ts, NULL, 0);
+	SetVTIconID(pvar->cv, NULL, 0);
 
 	// 通知領域のカスタムアイコン
 	NotifySetIconID(pvar->cv, NULL, 0);
@@ -664,7 +664,7 @@ static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
 void notify_established_secure_connection(PTInstVar pvar)
 {
 	// VT ウィンドウのアイコン
-	pvar->ts->SetVTIconID(pvar->ts, hInst, pvar->settings.IconID);
+	SetVTIconID(pvar->cv, hInst, pvar->settings.IconID);
 
 	// 通知領域のカスタムアイコン
 	NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);

@@ -242,21 +242,6 @@ void SetAutoConnectPort(int port)
 	AutoDisconnectedPort = port;
 }
 
-static void SetVTIconID(TTTSet *ts, HINSTANCE hInstance, WORD IconID)
-{
-	HINSTANCE inst;
-	WORD icon_id;
-
-	ts->PluginVTIconInstance = hInstance;
-	ts->PluginVTIconID = IconID;
-
-	inst = (ts->PluginVTIconInstance == NULL) ? hInst : ts->PluginVTIconInstance;
-	icon_id = (ts->PluginVTIconID != 0) ? ts->PluginVTIconID :
-	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
-	                                                                    : IDI_VT;
-	TTSetIcon(inst, HVTWin, MAKEINTRESOURCEW(icon_id), 0);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
@@ -270,7 +255,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	m_hInst = hInstance;
 
 	CommInit(&cv);
-	ts.SetVTIconID = SetVTIconID;
+	cv.ts = &ts;
 	isFirstInstance = StartTeraTerm(&ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
@@ -415,6 +400,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
 	if (HVTWin == NULL) return;
+	cv.HWin = HVTWin;
 	// register this window to the window list
 	SerialNo = RegWin(HVTWin,NULL);
 
@@ -434,20 +420,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// USBデバイス変化通知登録
 	RegDeviceNotify(HVTWin);
 
-	{
-		HINSTANCE inst;
-		WORD icon_id;
+	// 通知領域初期化
+	NotifyInitialize(&cv, m_hWnd, WM_USER_NOTIFYICON, NULL, 0);
 
-		// VT ウィンドウのアイコン
-		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
-		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
-		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
-		                                                                  : IDI_VT;
-		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), 0);
-
-		// 通知領域のアイコン
-		NotifyInitialize(&cv, m_hWnd, WM_USER_NOTIFYICON, hInstance, icon_id);
-	}
+	// VT ウィンドウのアイコン
+	SetVTIconID(&cv, NULL, 0);
 
 	MainMenu = NULL;
 	WinMenu = NULL;
