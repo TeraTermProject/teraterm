@@ -391,6 +391,7 @@ typedef struct {
 	BOOL file_exist;
 	int current_bom;
 	TTTSet *pts;
+	TComVar *pcv;
 } LogDlgWork_t;
 
 static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
@@ -576,7 +577,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			EndDialog(Dialog, IDCANCEL);
 			break;
 		case IDHELP:
-			OpenHelp(HH_HELP_CONTEXT, HlpFileLog, work->pts->UILanguageFile);
+			OpenHelpCV(work->pcv, HH_HELP_CONTEXT, HlpFileLog);
 			break;
 		case IDC_FOPT_FILENAME_BUTTON: {
 			/* save current dir */
@@ -1334,6 +1335,7 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
 	work->info = info;
 	work->info->filename = srcfnameW;
 	work->pts = &ts;
+	work->pcv = &cv;
 	INT_PTR ret = TTDialogBoxParam(
 		hInst, MAKEINTRESOURCE(IDD_LOGDLG),
 		hWnd, LogFnHook, (LPARAM)work);

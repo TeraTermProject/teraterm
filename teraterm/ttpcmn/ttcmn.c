@@ -616,37 +616,6 @@ void WINAPI UndoAllWin(void) {
 	}
 }
 
-void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
-{
-	wchar_t Temp[MAX_PATH];
-	HWND HWin;
-	wchar_t *HelpFN;
-	wchar_t uimsg[MAX_UIMSG];
-	wchar_t *HomeDirW;
-
-	/* Get home directory  TODO ts.HomeDirW へ切り替え */
-	if (GetModuleFileNameW(NULL,Temp,_countof(Temp)) == 0) {
-		return;
-	}
-	HomeDirW = ExtractDirNameW(Temp);
-	get_lang_msgW("HELPFILE", uimsg, _countof(uimsg), L"teraterm.chm", UILanguageFile);
-	aswprintf(&HelpFN, L"%s\\%s", HomeDirW, uimsg);
-	free(HomeDirW);
-
-	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
-	HWin = GetDesktopWindow();
-	if (_HtmlHelpW(HWin, HelpFN, Command, Data) == NULL) {
-		// ヘルプが開けなかった
-		static const TTMessageBoxInfoW info = {
-			"Tera Term",
-			NULL, L"Tera Term: HTML help",
-			"MSG_OPENHELP_ERROR", L"Can't open HTML help file(%s).",
-			MB_OK | MB_ICONERROR };
-		TTMessageBoxA(HWin, &info, UILanguageFile, HelpFN);
-	}
-	free(HelpFN);
-}
-
 HWND WINAPI GetNthWin(int n)
 {
 	if (n<pm->NWin) {

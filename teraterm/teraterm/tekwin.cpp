@@ -647,7 +647,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 LRESULT CTEKWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
-	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
+	OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
 	return 0;
 }
 
@@ -771,7 +771,7 @@ void CTEKWindow::OnWindowWindow()
 
 void CTEKWindow::OnHelpIndex()
 {
-	OpenHelp(HH_DISPLAY_TOPIC, 0, ts.UILanguageFile);
+	OpenHelpCV(&cv, HH_DISPLAY_TOPIC, 0);
 }
 
 void CTEKWindow::OnHelpAbout()

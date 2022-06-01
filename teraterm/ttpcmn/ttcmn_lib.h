@@ -37,6 +37,9 @@ extern "C" {
 #endif
 
 DllExport void SetVTIconID(TComVar *cv, HINSTANCE hInstance, WORD IconID);
+DllExport void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
+DllExport void WINAPI OpenHelpW(UINT Command, DWORD Data, const wchar_t *ExeDirW, wchar_t *UILanguageFileW);
+DllExport void WINAPI OpenHelpCV(TComVar *cv, UINT Command, DWORD Data);
 
 #ifdef __cplusplus
 }

@@ -61,7 +61,6 @@ DllExport void PASCAL ShowAllWinStacked(HWND);
 DllExport void PASCAL ShowAllWinCascade(HWND);
 DllExport void PASCAL BroadcastClosingMessage(HWND myhwnd);
 DllExport void PASCAL UndoAllWin(void);
-DllExport void PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
 
 DllExport int PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
 DllExport int PASCAL CommRead1Byte(PComVar cv, LPBYTE b);

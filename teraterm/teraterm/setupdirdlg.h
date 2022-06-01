@@ -32,4 +32,4 @@
 #include <windows.h>
 #include "tttypes.h"
 
-void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TTTSet *pts);
+void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv);

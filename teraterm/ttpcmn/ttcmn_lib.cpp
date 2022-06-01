@@ -27,9 +27,13 @@
  */
 
 #include "tt_res.h"
-#include "ttcmn_lib.h"
 #include "dlglib.h"
-#include "ttcmn_notify.h"
+#include "asprintf.h"
+#include "compat_win.h"
+#include "win32helper.h"
+#include "codeconv.h"
+
+#include "ttcmn_lib.h"
 
 /**
  *	VT Window のアイコンとをセットする
@@ -58,4 +62,87 @@ void SetVTIconID(TComVar *cv, HINSTANCE hInstance, WORD IconID)
 	                                      (ts->VTIcon != IdIconDefault) ? ts->VTIcon
 	                                                                    : IDI_VT;
 	TTSetIcon(icon_inst, cv->HWin, MAKEINTRESOURCEW(icon_id), 0);
+}
+
+static wchar_t *GetCHMFile(const wchar_t *exe_dir, const wchar_t *UILanguageFile)
+{
+	wchar_t *chm;
+	wchar_t *chm_fname;
+
+	GetI18nStrWW("Tera Term", "HELPFILE", L"teraterm.chm", UILanguageFile, &chm_fname);
+	if(!IsRelativePathW(chm_fname)) {
+		return chm_fname;
+	}
+	aswprintf(&chm, L"%s\\%s", exe_dir, chm_fname);
+	free(chm_fname);
+	return chm;
+}
+
+/**
+ *	ヘルプを開く
+ *
+ *	@param[in]	Command			HtmlHelp() API の第3引数
+ *	@param[in]	Data			HtmlHelp() API の第4引数
+ *	@param[in]	ExeDirW
+ *	@param[in]	UILanguageFileW
+ *
+ */
+void WINAPI OpenHelpW(UINT Command, DWORD Data, const wchar_t *ExeDirW, wchar_t *UILanguageFileW)
+{
+	HWND HWin;
+	wchar_t *chm;
+
+	chm = GetCHMFile(ExeDirW, UILanguageFileW);
+
+	HWin = GetDesktopWindow();
+	if (_HtmlHelpW(HWin, chm, Command, Data) == NULL) {
+		// ヘルプが開けなかった
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			NULL, L"Tera Term: HTML help",
+			"MSG_OPENHELP_ERROR", L"Can't open HTML help file(%s).",
+			MB_OK | MB_ICONERROR };
+		TTMessageBoxW(HWin, &info, UILanguageFileW, chm);
+	}
+	free(chm);
+}
+
+/**
+ *	ヘルプを開く
+ *
+ *	@param[in]	Command		HtmlHelp() API の第3引数
+ *	@param[in]	Data		HtmlHelp() API の第4引数
+ *
+ *	次のコードは
+ *		HWND HVTWin = GetParent(hDlgWnd);
+ *		PostMessage(HVTWin, WM_USER_DLGHELP2, help_id, 0);
+ *	次の関数呼び出しと同等
+ *		OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
+ *
+ */
+void WINAPI OpenHelpCV(TComVar *cv, UINT Command, DWORD Data)
+{
+	TTTSet *ts = cv->ts;
+	return OpenHelpW(Command, Data, ts->ExeDirW, ts->UILanguageFileW);
+}
+
+/**
+ *	ヘルプを開く
+ *
+ *	互換維持のため存在
+ *	OpenHelpCV() へ切り替えをおすすめ
+ */
+void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFileA)
+{
+	wchar_t *Temp;
+	wchar_t *HomeDirW;
+	wchar_t *UILanguageFileW;
+
+	hGetModuleFileNameW(NULL, &Temp);
+	HomeDirW = ExtractDirNameW(Temp);
+	UILanguageFileW = ToWcharA(UILanguageFileA);
+	OpenHelpW(Command, Data, HomeDirW, UILanguageFileW);
+	free(UILanguageFileW);
+	free(HomeDirW);
+	free(Temp);
 }

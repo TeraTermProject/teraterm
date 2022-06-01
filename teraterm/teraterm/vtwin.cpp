@@ -3429,7 +3429,7 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
-	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
+	OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
 	return 0;
 }
 
@@ -4705,7 +4705,7 @@ void CVTWindow::OnSetupRestore()
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	SetupDirectoryDialog(m_hInst, HVTWin, &ts);
+	SetupDirectoryDialog(m_hInst, HVTWin, &cv);
 }
 
 void CVTWindow::OnSetupLoadKeyMap()
@@ -4884,7 +4884,7 @@ void CVTWindow::OnWindowUndo()
 
 void CVTWindow::OnHelpIndex()
 {
-	OpenHelp(HH_DISPLAY_TOPIC, 0, ts.UILanguageFile);
+	OpenHelpCV(&cv, HH_DISPLAY_TOPIC, 0);
 }
 
 void CVTWindow::OnHelpAbout()
