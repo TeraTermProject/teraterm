@@ -528,11 +528,12 @@ void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
 	}
 	else {
 		// ÉAÉCÉRÉìÇçÌèú
-		icon = (HICON)::SendMessage(hWnd, WM_GETICON, ICON_BIG, 0);
+		HICON null_icon = NULL;
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)null_icon);
 		if (icon != NULL) {
 			DestroyIcon(icon);
 		}
-		icon = (HICON)::SendMessage(hWnd, WM_GETICON, ICON_SMALL, 0);
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)null_icon);
 		if (icon != NULL) {
 			DestroyIcon(icon);
 		}
