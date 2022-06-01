@@ -1389,11 +1389,10 @@ void CVTWindow::OnClose()
 	ProtoEnd();
 
 	SaveVTPos();
+	DestroyWindow();
 
 	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
 	NotifyUninitialize(&cv);
-
-	DestroyWindow();
 }
 
 // ‘STera Term‚ÌI—¹‚ğw¦‚·‚é
