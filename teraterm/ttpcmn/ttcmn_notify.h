@@ -42,7 +42,7 @@ extern "C" {
 #if defined(TTCMN_NOTIFY_INTERNAL)
 DllExport void WINAPI NotifyInitialize(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID);
 DllExport void WINAPI NotifyUninitialize(PComVar cv);
-DllExport void WINAPI HideNotifyIcon(PComVar cv);
+DllExport void WINAPI NotifyHideIcon(PComVar cv);
 #endif
 
 // plugin ‚©‚ç‚àŽg—p‰Â”\‚ÈIF

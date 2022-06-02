@@ -228,7 +228,7 @@ static NotifyIcon *GetNotifyData(PComVar cv)
 /*
  *	EXPORT API
  */
-void WINAPI HideNotifyIcon(PComVar cv)
+void WINAPI NotifyHideIcon(PComVar cv)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
 	NotifyHide(ni);

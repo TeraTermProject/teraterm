@@ -3482,14 +3482,14 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 			break;
 		  case WM_LBUTTONDOWN:
 		  case WM_RBUTTONDOWN:
-			HideNotifyIcon(&cv);
+			NotifyHideIcon(&cv);
 			break;
 		  case NIN_BALLOONTIMEOUT:
-			HideNotifyIcon(&cv);
+			NotifyHideIcon(&cv);
 			break;
 		  case NIN_BALLOONUSERCLICK:
 			::SetForegroundWindow(HVTWin);
-			HideNotifyIcon(&cv);
+			NotifyHideIcon(&cv);
 			break;
 		}
 	}
