@@ -40,8 +40,10 @@ extern "C" {
 
 // ttermpro.exe “à•”‚ÅŽg—p(Tera Term plugin‚©‚ç‚Í—˜—p‚µ‚È‚¢)
 #if defined(TTCMN_NOTIFY_INTERNAL)
-DllExport void WINAPI NotifyInitialize(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID);
+DllExport void WINAPI NotifyInitialize(PComVar cv);
 DllExport void WINAPI NotifyUninitialize(PComVar cv);
+DllExport void WINAPI NotifySetWindow(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID);
+DllExport void WINAPI NotifyUnsetWindow(PComVar cv);
 DllExport void WINAPI NotifyHideIcon(PComVar cv);
 #endif
 

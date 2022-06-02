@@ -421,7 +421,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RegDeviceNotify(HVTWin);
 
 	// 通知領域初期化
-	NotifyInitialize(&cv, m_hWnd, WM_USER_NOTIFYICON, NULL, 0);
+	NotifyInitialize(&cv);
+	NotifySetWindow(&cv, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
 
 	// VT ウィンドウのアイコン
 	SetVTIconID(&cv, NULL, 0);
@@ -1389,10 +1390,9 @@ void CVTWindow::OnClose()
 	ProtoEnd();
 
 	SaveVTPos();
-	DestroyWindow();
-
+	NotifyUnsetWindow(&cv);
 	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
-	NotifyUninitialize(&cv);
+	DestroyWindow();
 }
 
 // 全Tera Termの終了を指示する
@@ -1460,6 +1460,8 @@ void CVTWindow::OnDestroy()
 	FreeBuffer();
 
 	TTXEnd(); /* TTPLUG */
+
+	NotifyUninitialize(&cv);
 }
 
 static void EscapeFilename(const wchar_t *src, wchar_t *dest)

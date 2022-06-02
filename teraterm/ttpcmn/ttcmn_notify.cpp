@@ -54,7 +54,7 @@
 #include "ttcmn_notify.h"
 
 typedef struct {
-	BOOL enable;
+	BOOL enable;					// FALSE 通知APIが使えないOS or 使えない状態
 	int NotifyIconShowCount;
 	HWND parent_wnd;
 	BOOL created;
@@ -93,7 +93,6 @@ static HICON LoadIcon(NotifyIcon *ni)
 	HINSTANCE IconInstance = ni->CustomIconInstance == NULL ? ni->IconInstance : ni->CustomIconInstance;
 	WORD IconID = ni->CustomIconID == 0 ? ni->IconID : ni->CustomIconID;
 	const int primary_monitor_dpi = GetMonitorDpiFromWindow(NULL);
-	//const int primary_monitor_dpi = 96;
 	return TTLoadIcon(IconInstance, MAKEINTRESOURCEW(IconID), 16 ,16, primary_monitor_dpi, TRUE);
 }
 
@@ -138,7 +137,11 @@ static void NotifyHide(NotifyIcon *ni)
  */
 static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
-	if (msg == NULL) {
+	if (!ni->enable || msg == NULL) {
+		return;
+	}
+	if (ni->parent_wnd == NULL) {
+		// まだウィンドウをセットしていない
 		return;
 	}
 	if (title == NULL) {
@@ -189,13 +192,24 @@ static void NotifySetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
 	ni->CustomIconID = IconID;
 }
 
-static NotifyIcon *NotifyInitialize(HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+static NotifyIcon *NotifyInitialize(void)
 {
 	NotifyIcon *ni = (NotifyIcon *)calloc(sizeof(NotifyIcon) ,1);
+	return ni;
+}
+
+/**
+ *	親ウィンドウと通知領域のアイコンをセットする
+ *	このAPIをコールすると通知領域が使えるようになる
+ *
+ *	@param hWnd		通知領域に関連付けるウィンドウ(ここでは親ウィンドウと呼ぶ)
+ */
+static void NotifySetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+{
 	assert(hWnd != NULL);
 	if (! HasBalloonTipSupport()) {
 		ni->enable = FALSE;
-		return ni;
+		return;
 	}
 	ni->enable = TRUE;
 	ni->parent_wnd = hWnd;
@@ -203,17 +217,27 @@ static NotifyIcon *NotifyInitialize(HWND hWnd, UINT msg, HINSTANCE hInstance, WO
 	ni->no_sound = FALSE;
 	ni->IconInstance = hInstance;
 	ni->IconID = IconID;
-	return ni;
 }
 
-static void NotifyUninitialize(NotifyIcon *ni)
+/**
+ *	親ウィンドウを破棄する前に通知領域のアイコンを削除する
+ *	このAPIをコールすると通知領域は使えなくなる
+ */
+static void NotifyUnsetWindow(NotifyIcon *ni)
 {
 	if (ni->enable && ni->created) {
 		TT_NOTIFYICONDATAW_V2 notify_icon;
 		CreateNotifyIconData(ni, &notify_icon);
 		Shell_NotifyIconW(NIM_DELETE, &notify_icon);
 		DestroyIcon(notify_icon.hIcon);
+		ni->created = FALSE;
+		ni->enable = FALSE;
 	}
+}
+
+static void NotifyUninitialize(NotifyIcon *ni)
+{
+	NotifyUnsetWindow(ni);
 	free(ni);
 }
 
@@ -257,10 +281,10 @@ void WINAPI NotifyMessage(PComVar cv, const char *msg, const char *title, DWORD 
  *	@param	hInstance	アイコンを持つモジュールのinstance
  *	@param	IconID		アイコンのリソースID
  */
-void WINAPI NotifyInitialize(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+void WINAPI NotifyInitialize(PComVar cv)
 {
-	assert (cv->NotifyIcon == NULL);	// 2重初期化
-	NotifyIcon *ni = NotifyInitialize(hWnd, msg, hInstance, IconID);
+	assert(cv->NotifyIcon == NULL);	 // 2重初期化
+	NotifyIcon *ni = NotifyInitialize();
 	cv->NotifyIcon = ni;
 }
 
@@ -275,12 +299,38 @@ void WINAPI NotifyUninitialize(PComVar cv)
 }
 
 /**
+ *	ウィンドウとアイコンをセットする
+ *
+ *	@param	hWnd		通知領域の親ウィンドウ
+ *	@param	msg			親ウィンドウへ送られるメッセージID
+ *	@param	hInstance	アイコンを持つモジュールのinstance
+ *	@param	IconID		アイコンのリソースID
+ *
+ *	ここでセットしたアイコンがデフォルトのアイコンとなる
+ */
+void WINAPI NotifySetWindow(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+{
+	NotifyIcon *ni = GetNotifyData(cv);
+	NotifySetWindow(ni, hWnd, msg, hInstance, IconID);
+}
+
+/**
+ *	通知領域の親ウィンドウを破棄する前にコールする
+ *	このAPIをコールすると通知領域は使えなくなる
+ */
+void WINAPI NotifyUnsetWindow(PComVar cv)
+{
+	NotifyIcon *ni = GetNotifyData(cv);
+	NotifyUnsetWindow(ni);
+}
+
+/**
  *	通知領域で使用するアイコンをセットする
  *
  *	@param	hInstance	アイコンを持つモジュールのinstance
  *	@param	IconID		アイコンのリソースID
  *
- *	各々をNULL, 0 にすると NotifyInitialize() で設定したアイコンに戻る
+ *	各々をNULL, 0 にすると NotifySetWindow() で設定したデフォルトのアイコンに戻る
  */
 void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID)
 {
