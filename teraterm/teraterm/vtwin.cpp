@@ -3338,19 +3338,21 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	}
 
 	/* Auto start logging or /L= option */
-	if (ts.LogAutoStart || ts.LogFN[0] != 0) {
-		if (ts.LogFN[0] == 0) {
-			ts.LogFNW = FLogGetLogFilename(NULL);
-		}
-		else {
-			wchar_t *LogFNW = ToWcharA(ts.LogFN);
+	if (ts.LogAutoStart || ts.LogFNW != NULL) {
+		if (ts.LogFNW != NULL) {
+			// "/L"= で指定されているとき(Auto start logging かもしれない)
+			//   指定ファイル名を展開する
+			wchar_t *LogFNW = _wcsdup(ts.LogFNW);
 			ts.LogFNW = FLogGetLogFilename(LogFNW);
 			free(LogFNW);
 		}
-		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
-		if (ts.LogFN[0]!=0) {
-			FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
+		else {
+			// Auto start logging のとき("/L"で指定されていないとき)
+			//   デフォルトのファイル名
+			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
+		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
+		FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
 	}
 
 	if ((ts.PortType==IdTCPIP) &&

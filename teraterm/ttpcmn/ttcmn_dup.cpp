@@ -244,7 +244,6 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, HomeDirW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, SetupFNameW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, KeyCnfFNW) },
-	{ MALLOCED_WSTRING_INFO(TTTSet, LogFNW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, MacroFNW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, UILanguageFileW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, UILanguageFileW_ini) },
@@ -295,4 +294,9 @@ void TTCMNUnserialize(const void *ptr, size_t size, TTTSet *ts)
 		size -= signature_size;
 		UnserializeData(data, size, serialize_info, ts);
 	}
+
+	// ログファイル名は複製元と同一にはできないので引き継いでいない
+	// ポインタとパス(ANSI)をクリアする
+	ts->LogFNW = NULL;
+	ts->LogFN[0] = 0;
 }
