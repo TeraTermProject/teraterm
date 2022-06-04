@@ -1501,11 +1501,12 @@ void BGInitialize(BOOL initialize_once)
 	if (strcmp(config_file, "")) {
 		wchar_t *dir;
 		wchar_t *prevDir;
+		wchar_t *config_fileW;
 
 		hGetCurrentDirectoryW(&prevDir);
 
 		// INIファイルのあるディレクトリに一時的に移動
-		wchar_t *config_fileW = ToWcharA(config_file);
+		config_fileW = ToWcharA(config_file);
 		dir = ExtractDirNameW(config_fileW);
 		SetCurrentDirectoryW(dir);
 		free(dir);
