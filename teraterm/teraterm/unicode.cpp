@@ -380,6 +380,12 @@ int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16)
 
 /**
  *	Unicode‚©‚çISO8859‚Ö•ÏŠ·
+ *
+ *	@param[in]	part	IS8859‚Ì•” 1...11,13...16
+ *	@param[in]	u32		Unicode
+ *	@param[out]	*b		ISO8859 char
+ *	@retval		0		•ÏŠ·‚Å‚«‚È‚¢
+ *	@retval		1		•ÏŠ·‚Å‚«‚½
  */
 int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b)
 {

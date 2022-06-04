@@ -1353,6 +1353,10 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 		char byte;
 		int part = KanjiCodeToISO8859Part(states->KanjiCode);
 		int r = UnicodeToISO8859(part, u32, &byte);
+		if (r == 0) {
+			// •ÏŠ·‚Å‚«‚È‚¢•¶šƒR[ƒh‚¾‚Á‚½
+			byte = '?';
+		}
 		TempStr[TempLen++] = byte;
 	} else {
 		assert(FALSE);
