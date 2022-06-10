@@ -3342,9 +3342,9 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 		if (ts.LogFNW != NULL) {
 			// "/L"= で指定されているとき(Auto start logging かもしれない)
 			//   指定ファイル名を展開する
-			wchar_t *LogFNW = _wcsdup(ts.LogFNW);
-			ts.LogFNW = FLogGetLogFilename(LogFNW);
-			free(LogFNW);
+			wchar_t *LogFNW = FLogGetLogFilename(ts.LogFNW);
+			free(ts.LogFNW);
+			ts.LogFNW = LogFNW;
 		}
 		else {
 			// Auto start logging のとき("/L"で指定されていないとき)
