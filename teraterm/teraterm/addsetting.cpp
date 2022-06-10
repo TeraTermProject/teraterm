@@ -1500,7 +1500,7 @@ void CLogPropPageDlg::OnOK()
 {
 	char buf[80], buf2[80];
 	time_t time_local;
-	struct tm *tm_local;
+	struct tm tm_local;
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
@@ -1519,9 +1519,9 @@ void CLogPropPageDlg::OnOK()
 
 	// åªç›éûçèÇéÊìæ
 	time(&time_local);
-	tm_local = localtime(&time_local);
+	localtime_s(&tm_local, & time_local);
 	// éûçèï∂éöóÒÇ…ïœä∑
-	if (strlen(buf) != 0 && strftime(buf2, sizeof(buf2), buf, tm_local) == 0) {
+	if (strlen(buf) != 0 && strftime(buf2, sizeof(buf2), buf, &tm_local) == 0) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
