@@ -1166,13 +1166,15 @@ void BGSetupPrimary(BOOL forceSetup)
     ZeroMemory(&bf,sizeof(bf));
     bf.BlendOp = AC_SRC_OVER;
 
-    if(bf.SourceConstantAlpha = BGSrc1.alpha)
+    bf.SourceConstantAlpha = BGSrc1.alpha;
+    if(bf.SourceConstantAlpha)
     {
       BGLoadSrc(hdcSrc,&BGSrc1);
       (BGAlphaBlend)(hdcBG,0,0,ScreenWidth,ScreenHeight,hdcSrc,0,0,ScreenWidth,ScreenHeight,bf);
     }
 
-    if(bf.SourceConstantAlpha = BGSrc2.alpha)
+    bf.SourceConstantAlpha = BGSrc2.alpha;
+    if(bf.SourceConstantAlpha)
     {
       BGLoadSrc(hdcSrc,&BGSrc2);
       (BGAlphaBlend)(hdcBG,0,0,ScreenWidth,ScreenHeight,hdcSrc,0,0,ScreenWidth,ScreenHeight,bf);
@@ -2671,16 +2673,16 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
   }
 }
 
-static void DrawTextBGImage(HDC hdcBGBuffer, int X, int Y, int width, int height)
+static void DrawTextBGImage(HDC _hdcBGBuffer, int X, int Y, int width, int height)
 {
 	RECT  rect;
 	SetRect(&rect,0,0,width,height);
 
 	//ëãÇÃà⁄ìÆÅAÉäÉTÉCÉYíÜÇÕîwåiÇ BGBrushInSizeMove Ç≈ìhÇËÇ¬Ç‘Ç∑
 	if(BGInSizeMove)
-		FillRect(hdcBGBuffer,&rect,BGBrushInSizeMove);
+		FillRect(_hdcBGBuffer,&rect,BGBrushInSizeMove);
 
-	BitBlt(hdcBGBuffer,0,0,width,height,hdcBG,X,Y,SRCCOPY);
+	BitBlt(_hdcBGBuffer,0,0,width,height,hdcBG,X,Y,SRCCOPY);
 
 	if(BGReverseText == TRUE)
 	{
@@ -2689,7 +2691,7 @@ static void DrawTextBGImage(HDC hdcBGBuffer, int X, int Y, int width, int height
 			BLENDFUNCTION bf;
 			HBRUSH hbr;
 
-			hbr = CreateSolidBrush(GetBkColor(hdcBGBuffer));
+			hbr = CreateSolidBrush(GetBkColor(_hdcBGBuffer));
 			FillRect(hdcBGWork,&rect,hbr);
 			DeleteObject(hbr);
 
@@ -2697,7 +2699,7 @@ static void DrawTextBGImage(HDC hdcBGBuffer, int X, int Y, int width, int height
 			bf.BlendOp             = AC_SRC_OVER;
 			bf.SourceConstantAlpha = BGReverseTextAlpha;
 
-			BGAlphaBlend(hdcBGBuffer,0,0,width,height,hdcBGWork,0,0,width,height,bf);
+			BGAlphaBlend(_hdcBGBuffer,0,0,width,height,hdcBGWork,0,0,width,height,bf);
 		}
 	}
 }
