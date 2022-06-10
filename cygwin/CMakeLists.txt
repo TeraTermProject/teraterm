@@ -3,15 +3,15 @@ set_target_properties(
   cyglaunch
   PROPERTIES FOLDER cygwin)
 
-if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
-  # linux上ではcygwin関連はビルドしない
-  return()
-endif()
-
 add_subdirectory(cyglib)
 set_target_properties(
   cyglib
   PROPERTIES FOLDER cygwin)
+
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+  # linux上ではcygwinが必要なものはビルドできない
+  return()
+endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32bit build
