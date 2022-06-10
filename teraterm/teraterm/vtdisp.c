@@ -333,18 +333,6 @@ static void FillBitmapDC(HDC hdc,COLORREF color)
   DeleteObject(hBrush);
 }
 
-FARPROC GetProcAddressWithDllName(char *dllName,char *procName)
-{
-  HINSTANCE hDll;
-
-  hDll = LoadLibrary(dllName);
-
-  if(hDll)
-    return GetProcAddress(hDll,procName);
-  else
-    return 0;
-}
-
 static void RandomFile(const char *filespec_src,char *filename, int destlen)
 {
   int    i;
@@ -1342,7 +1330,7 @@ static void BGReadIniFile(const wchar_t *file)
 	BGReadTextColorConfig(file);
 }
 
-void BGDestruct(void)
+static void BGDestruct(void)
 {
   if(!BGEnable)
     return;
@@ -1566,15 +1554,15 @@ void BGExchangeColor() {
 //    BGReverseText = !BGReverseText;
 }
 
-void BGFillRect(HDC hdc,RECT *R,HBRUSH brush)
+static void BGFillRect(HDC hdc, RECT *R, HBRUSH brush)
 {
-  if(!BGEnable)
-    FillRect(hdc,R,brush);
-  else
-    BitBlt(VTDC,R->left,R->top,R->right - R->left,R->bottom - R->top,hdcBG,R->left,R->top,SRCCOPY);
+	if (!BGEnable)
+		FillRect(hdc, R, brush);
+	else
+		BitBlt(hdc, R->left, R->top, R->right - R->left, R->bottom - R->top, hdcBG, R->left, R->top, SRCCOPY);
 }
 
-void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
+static void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
 {
 	RECT r;
 
