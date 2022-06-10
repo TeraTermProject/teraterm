@@ -344,7 +344,7 @@ void ReadINI(const wchar_t *fn, PTTSet ts) {
 		if (!p) {
 			return;
 		}
-		wcsncpy_s(p+1, sizeof(sect) - ((p+1)-sect), fn, _TRUNCATE);
+		wcsncpy_s(p+1, _countof(sect) - ((p+1)-sect), fn, _TRUNCATE);
 	}
 
 	GetPrivateProfileStringAFileW(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), sect);
