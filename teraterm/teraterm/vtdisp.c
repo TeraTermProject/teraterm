@@ -1667,7 +1667,7 @@ void BGOnSettingChange(void)
 //-->
 #endif  // ALPHABLEND_TYPE2
 
-void DispApplyANSIColor() {
+void DispApplyANSIColor(void) {
   int i;
 
   for (i = IdBack ; i <= IdFore+8 ; i++)
@@ -1684,7 +1684,7 @@ void DispApplyANSIColor() {
   }
 }
 
-void InitColorTable()
+void InitColorTable(void)
 {
   int i;
 
@@ -1714,7 +1714,7 @@ void DispSetNearestColors(int start, int end, HDC DispCtx) {
   }
 }
 
-void InitDisp()
+void InitDisp(void)
 {
   HDC TmpDC;
   BOOL bMultiDisplaySupport = FALSE;
@@ -1783,7 +1783,7 @@ void InitDisp()
   }
 }
 
-void EndDisp()
+void EndDisp(void)
 {
   int i, j;
 
@@ -1812,7 +1812,7 @@ void EndDisp()
 
 }
 
-void DispReset()
+void DispReset(void)
 {
   /* Cursor */
   CursorX = 0;
@@ -1879,7 +1879,7 @@ static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
   }
 }
 
-void ChangeFont()
+void ChangeFont(void)
 {
 	int i, j;
 	LOGFONTA VTlf;
@@ -1963,7 +1963,7 @@ void ChangeFont()
 	}
 }
 
-void ResetIME()
+void ResetIME(void)
 {
 	/* reset language for communication */
 	cv.Language = ts.Language;
@@ -2002,7 +2002,7 @@ void ResetIME()
 	if (IsCaretOn()) CaretOn();
 }
 
-void ChangeCaret()
+void ChangeCaret(void)
 {
   UINT T;
 
@@ -2119,7 +2119,7 @@ void UpdateCaretPosition(BOOL enforce)
   }
 }
 
-void CaretOn()
+void CaretOn(void)
 // Turn on the cursor
 {
 #if UNICODE_DEBUG_CARET_OFF
@@ -2192,7 +2192,7 @@ void CaretOn()
 	}
 }
 
-void CaretOff()
+void CaretOff(void)
 {
 	if (ts.KillFocusCursor == 0 && !Active)
 		return;
@@ -2207,14 +2207,14 @@ void CaretOff()
 	}
 }
 
-void DispDestroyCaret()
+void DispDestroyCaret(void)
 {
   DestroyCaret();
   if (ts.NonblinkingCursor!=0)
 	KillTimer(HVTWin,IdCaretTimer);
 }
 
-BOOL IsCaretOn()
+BOOL IsCaretOn(void)
 // check if caret is on
 {
 	return ((ts.KillFocusCursor || Active) && (CaretStatus==0));
@@ -2229,7 +2229,7 @@ void DispEnableCaret(BOOL On)
   CaretEnabled = On;
 }
 
-BOOL IsCaretEnabled()
+BOOL IsCaretEnabled(void)
 {
   return CaretEnabled;
 }
@@ -2363,14 +2363,14 @@ void PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
   *Ye = (PaintRect.bottom-1) / FontHeight + WinOrgY;
 }
 
-void DispEndPaint()
+void DispEndPaint(void)
 {
   if (VTDC==NULL) return;
   SelectObject(VTDC,DCPrevFont);
   VTDC = NULL;
 }
 
-void DispClearWin()
+void DispClearWin(void)
 {
   InvalidateRect(HVTWin,NULL,FALSE);
 
@@ -2392,7 +2392,7 @@ void DispClearWin()
   if (IsCaretOn()) CaretOn();
 }
 
-void DispChangeBackground()
+void DispChangeBackground(void)
 {
   DispReleaseDC();
   if (Background != NULL) DeleteObject(Background);
@@ -2414,7 +2414,7 @@ void DispChangeBackground()
   InvalidateRect(HVTWin,NULL,TRUE);
 }
 
-void DispChangeWin()
+void DispChangeWin(void)
 {
   /* Change window caption */
   ChangeTitle();
@@ -2447,7 +2447,7 @@ void DispChangeWin()
   DispChangeBackground();
 }
 
-void DispInitDC()
+void DispInitDC(void)
 {
 
   if (VTDC==NULL)
@@ -2477,7 +2477,7 @@ void DispInitDC()
 #endif  // ALPHABLEND_TYPE2
 }
 
-void DispReleaseDC()
+void DispReleaseDC(void)
 {
   if (VTDC==NULL) return;
   SelectObject(VTDC, DCPrevFont);
@@ -3077,7 +3077,7 @@ BOOL IsLineVisible(int* X, int* Y)
 
 //-------------- scrolling functions --------------------
 
-void AdjustScrollBar() /* called by ChangeWindowSize() */
+void AdjustScrollBar(void) /* called by ChangeWindowSize() */
 {
   LONG XRange, YRange;
   int ScrollPosX, ScrollPosY;
@@ -3162,7 +3162,7 @@ void DispCountScroll(int n)
   if (ScrollCount>=ts.ScrollThreshold) DispUpdateScroll();
 }
 
-void DispUpdateScroll()
+void DispUpdateScroll(void)
 {
   int d;
   RECT R;
@@ -3268,7 +3268,7 @@ void DispUpdateScroll()
   if (IsCaretOn()) CaretOn();
 }
 
-void DispScrollHomePos()
+void DispScrollHomePos(void)
 {
   NewOrgX = 0;
   NewOrgY = 0;
@@ -3360,7 +3360,7 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
 	return CP_ACP;
 }
 
-void DispSetupFontDlg()
+void DispSetupFontDlg(void)
 //  Popup the Setup Font dialogbox and
 //  reset window
 {
@@ -3387,7 +3387,7 @@ void DispSetupFontDlg()
   ChangeCaret();
 }
 
-void DispRestoreWinSize()
+void DispRestoreWinSize(void)
 //  Restore window size by double clik on caption bar
 {
   if (ts.TermIsWin>0) return;
@@ -3406,7 +3406,7 @@ void DispRestoreWinSize()
   }
 }
 
-void DispSetWinPos()
+void DispSetWinPos(void)
 {
   int CaretX, CaretY;
   POINT Point;
@@ -3798,7 +3798,7 @@ void DispResizeWin(int w, int h) {
 	AdjustSize = FALSE;
 }
 
-BOOL DispWindowIconified() {
+BOOL DispWindowIconified(void) {
 	return IsIconic(HVTWin);
 }
 
