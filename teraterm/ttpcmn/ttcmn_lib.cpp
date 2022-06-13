@@ -48,7 +48,7 @@
  *
  *	通知領域のアイコンをセットするときは NotifySetIconID() を使用する
  */
-void SetVTIconID(TComVar *cv, HINSTANCE hInstance, WORD IconID)
+void WINAPI SetVTIconID(TComVar *cv, HINSTANCE hInstance, WORD IconID)
 {
 	HINSTANCE icon_inst;
 	WORD icon_id;
