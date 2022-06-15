@@ -185,9 +185,6 @@ static void uninit_TTSSH(PTInstVar pvar)
 	// VT ウィンドウのアイコン
 	SetVTIconID(pvar->cv, NULL, 0);
 
-	// 通知領域のカスタムアイコン
-	NotifySetIconID(pvar->cv, NULL, 0);
-
 	ssh_heartbeat_lock_finalize();
 
 	cipher_free_SSH2(pvar->cc[MODE_IN]);
@@ -665,9 +662,6 @@ void notify_established_secure_connection(PTInstVar pvar)
 {
 	// VT ウィンドウのアイコン
 	SetVTIconID(pvar->cv, hInst, pvar->settings.IconID);
-
-	// 通知領域のカスタムアイコン
-	NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
 }

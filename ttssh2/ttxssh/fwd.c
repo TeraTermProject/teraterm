@@ -1953,7 +1953,10 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY_TITLE", pvar, "Agent Forwarding");
 		strncpy_s(title, sizeof(title), pvar->ts->UIMsg, _TRUNCATE);
 		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY", pvar, "Remote host access to agent");
+
+		NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);
 		NotifyInfoMessage(pvar->cv, pvar->ts->UIMsg, title);
+		NotifySetIconID(pvar->cv, NULL, 0);
 	}
 
 	if (pvar->session_settings.ForwardAgentConfirm) {

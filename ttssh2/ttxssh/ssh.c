@@ -7229,7 +7229,9 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 		case 3:
 			msgW = ToWcharU8(msg);
 			if (msgW) {
+				NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);
 				NotifyInfoMessageW(pvar->cv, msgW, L"Authentication Banner");
+				NotifySetIconID(pvar->cv, NULL, 0);
 				free(msgW);
 			}
 			break;
@@ -9492,7 +9494,10 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 				strncpy_s(title, sizeof(title), pvar->ts->UIMsg, _TRUNCATE);
 				UTIL_get_lang_msg("MSG_SSH_AGENTERROR_TOOLARGE", pvar,
 					"Agent request size is too large, ignore it.");
+
+				NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);
 				NotifyInfoMessage(pvar->cv, pvar->ts->UIMsg, title);
+				NotifySetIconID(pvar->cv, NULL, 0);
 			}
 
 			goto error;
