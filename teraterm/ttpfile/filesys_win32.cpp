@@ -343,7 +343,7 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 	}
 
 	// to unique
-	if (unique) {
+	if (unique && DoesFileExist(full)) {
 		char *filename = CreateUniqueFilename(full);
 		free(full);
 		full = filename;
