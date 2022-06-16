@@ -66,8 +66,6 @@ typedef struct {
 	WORD CustomIconID;
 } NotifyIcon;
 
-// https://nyaruru.hatenablog.com/entry/20071008/p3
-
 /**
  *	Shell_NotifyIconW() wrapper
  *		- TT_NOTIFYICONDATAW_V2 ÇÕ Windows 2000 à»ç~Ç≈égópâ¬î\
@@ -81,10 +79,7 @@ typedef struct {
 static BOOL Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 {
 	BOOL r = Shell_NotifyIconW(dwMessage, (NOTIFYICONDATAW*)lpData);
-#if _DEBUG
-	DWORD e = GetLastError();
-	assert(r != FALSE && e == 0);
-#endif
+	assert(r != FALSE);
 	return r;
 }
 
