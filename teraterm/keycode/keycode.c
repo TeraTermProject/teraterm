@@ -215,7 +215,10 @@ LRESULT OnDpiChanged(HWND hWnd, WPARAM wp, LPARAM lp)
 
 LRESULT OnDestroy(HWND hWnd)
 {
-	TTSetIcon(ghInstance, hWnd, NULL, 0);
+	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
+	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
+	// ことがあるので破棄しない
+	// TTSetIcon(ghInstance, hWnd, NULL, 0);
 	return TRUE;
 }
 

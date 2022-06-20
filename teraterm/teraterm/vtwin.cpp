@@ -1391,7 +1391,12 @@ void CVTWindow::OnClose()
 
 	SaveVTPos();
 	NotifyUnsetWindow(&cv);
-	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+
+	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
+	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
+	// ことがあるので破棄しない
+	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+
 	DestroyWindow();
 }
 
