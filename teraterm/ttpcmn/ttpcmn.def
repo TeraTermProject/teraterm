@@ -29,6 +29,9 @@ EXPORTS
 
   NotifyHideIcon @81
   NotifyMessage @79
+  NotifyMessageW
+  NotifySetIconID
+  SetVTIconID
 
   SJIS2JIS @30
   SJIS2EUC @31
@@ -54,6 +57,8 @@ EXPORTS
   BroadcastClosingMessage @59
   UndoAllWin @60
 
+  OpenHelpW
+  OpenHelpCV
   OpenHelp @61
 
   GetParam @62
