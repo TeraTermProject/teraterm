@@ -348,8 +348,6 @@ typedef struct cygterm {
 } cygterm_t;
 
 /* TTTSet */
-typedef struct tttset TTTSet, *PTTSet;
-
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
@@ -649,9 +647,10 @@ struct tttset {
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
-
 	HINSTANCE TeraTermInstance;
 };
+
+typedef struct tttset TTTSet, *PTTSet;
 
   /* New Line modes */
 #define IdCR   1
