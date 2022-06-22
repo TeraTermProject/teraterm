@@ -44,13 +44,13 @@
       <li>コマンドラインで指定されたログファイル名を、標準のログファイル名と同じように<a href="../menu/setup-additional-log.html#LogFileNameFormat">置換する</a>ようにした。</li>
       <li>コマンドラインで指定されたログファイル名、標準のログファイル名ともに、フルパスでない場合に<a href="../menu/setup-additional-log.html#LogDefaultPath">標準のログ保存先</a>または<a href="../setup/folder.html#LogDir">ログフォルダ</a>からの相対パスとみなすようにした。</li>
     </ul>
-      <li>32bit アイコンが通知アイコンに使われるようにした。</li>
   </li>
 
   <li>バグ修正
     <ul>
       <li>TELNET.LOGのファイルハンドルがクローズできていない問題を修正した。</li>
       <li>telnet(cygterm)接続時、NAWS(Negotiate About Window Size)が送られてきたときウィンドウサイズを誤って設定する可能性があったので修正。</li>
+      <li>通知アイコンにフルカラーアイコンが使われない問題を修正した。</li>
       <li>カスタム通知アイコンを変更しても通知アイコンが変更されない問題を修正した。</li>
     </ul>
   </li>
@@ -3317,10 +3317,11 @@
 
 <h3 id="ttssh_3.0">2022.xx.xx (Ver 3.0 not released)</h3>
 <ul class="history">
-  <!--li>変更
+  <li>変更
     <ul>
+      <!--li>TTSSH からの通知には TTSSH のアイコンが通知アイコンに使われるようにした。</li-->
     </ul>
-  </li-->
+  </li>
 
   <!--li>バグ修正
     <ul>
