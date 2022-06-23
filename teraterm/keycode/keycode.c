@@ -34,6 +34,9 @@
 #include <string.h>
 #include <tchar.h>
 
+#include "compat_win.h"
+#include "dlglib.h"
+
 #include "kc_res.h"
 #define ClassName _T("KeyCodeWin32")
 
@@ -81,6 +84,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		}
 	}
 
+	// DPI Aware (高DPI対応)
+	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
+		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
+			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+		}
+	}
+
 	if(!hPrevInstance) {
 		wc.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
 		wc.lpfnWndProc = MainWndProc;
@@ -111,14 +121,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	ShowWindow(hWnd, nCmdShow);
 
-	PostMessage(hWnd,WM_SETICON,ICON_SMALL,
-	            (LPARAM)LoadImage(hInstance,
-	                              MAKEINTRESOURCE(IDI_KEYCODE),
-	                              IMAGE_ICON,16,16,0));
-	PostMessage(hWnd,WM_SETICON,ICON_BIG,
-	            (LPARAM)LoadImage(hInstance,
-	                              MAKEINTRESOURCE(IDI_KEYCODE),
-	                              IMAGE_ICON,0,0,0));
+	TTSetIcon(hInstance, hWnd, MAKEINTRESOURCEW(IDI_KEYCODE), 0);
 
 	while(GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
@@ -202,6 +205,23 @@ void TimerProc(HWND hWnd, WPARAM wParam)
 	}
 }
 
+LRESULT OnDpiChanged(HWND hWnd, WPARAM wp, LPARAM lp)
+{
+	const UINT NewDPI = LOWORD(wp);
+	(void)lp;
+	TTSetIcon(ghInstance, hWnd, MAKEINTRESOURCEW(IDI_KEYCODE), NewDPI);
+	return TRUE;
+}
+
+LRESULT OnDestroy(HWND hWnd)
+{
+	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
+	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
+	// ことがあるので破棄しない
+	// TTSetIcon(ghInstance, hWnd, NULL, 0);
+	return TRUE;
+}
+
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam,
   LPARAM lParam)
 {
@@ -235,7 +255,11 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam,
 			TimerProc(hWnd, wParam);
 			break;
 		case WM_DESTROY:
+			OnDestroy(hWnd);
 			PostQuitMessage(0);
+			break;
+		case WM_DPICHANGED:
+			OnDpiChanged(hWnd, wParam, lParam);
 			break;
 		default:
 			return (DefWindowProc(hWnd, msg, wParam, lParam));

@@ -321,6 +321,7 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
  *	hWndの表示されているモニタのDPIを取得する
  *	Per-monitor DPI awareness対応
  *
+ *	@param	hWnd	(NULLのときPrimary monitor)
  *	@retval	DPI値(通常のDPIは96)
  */
 int GetMonitorDpiFromWindow(HWND hWnd)
@@ -336,7 +337,15 @@ int GetMonitorDpiFromWindow(HWND hWnd)
 	} else {
 		UINT dpiX;
 		UINT dpiY;
-		HMONITOR hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		HMONITOR hMonitor;
+		if (hWnd == NULL) {
+			// https://devblogs.microsoft.com/oldnewthing/20070809-00/?p=25643
+			const POINT ptZero = { 0, 0 };
+			hMonitor = pMonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY);
+		}
+		else {
+			hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		}
 		pGetDpiForMonitor(hMonitor, 0 /*0=MDT_EFFECTIVE_DPI*/, &dpiX, &dpiY);
 		return (int)dpiY;
 	}

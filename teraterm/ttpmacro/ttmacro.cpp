@@ -139,6 +139,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+	// DPI Aware (çÇDPIëŒâû)
+	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
+		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
+			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+		}
+	}
+
 //	InitCommonControls();
 	init();
 

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004- TeraTerm Project
+ * Copyright (C) 2022- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +29,18 @@
 #pragma once
 
 #include <windows.h>
+
 #include "tttypes.h"
 
-void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+DllExport void WINAPI SetVTIconID(TComVar *cv, HINSTANCE hInstance, WORD IconID);
+DllExport void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
+DllExport void WINAPI OpenHelpW(UINT Command, DWORD Data, const wchar_t *ExeDirW, wchar_t *UILanguageFileW);
+DllExport void WINAPI OpenHelpCV(TComVar *cv, UINT Command, DWORD Data);
+
+#ifdef __cplusplus
+}
+#endif

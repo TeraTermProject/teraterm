@@ -139,6 +139,7 @@
     <ClCompile Include="ttcmn.c" />
     <ClCompile Include="ttcmn_cominfo.c" />
     <ClCompile Include="ttcmn_dup.cpp" />
+    <ClCompile Include="ttcmn_lib.cpp" />
     <ClCompile Include="ttcmn_notify.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +153,8 @@
     <ClInclude Include="language.h" />
     <ClInclude Include="ttcmn_cominfo.h" />
     <ClInclude Include="ttcmn_dup.h" />
+    <ClInclude Include="ttcmn_lib.h" />
+    <ClInclude Include="ttcmn_notify.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpcmn.def" />

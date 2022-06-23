@@ -652,6 +652,9 @@ struct tttset {
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
 	wchar_t *BGImageFilePathW;
 	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
+	HINSTANCE PluginVTIconInstance;
+	WORD PluginVTIconID;
+	HINSTANCE TeraTermInstance;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -924,6 +927,8 @@ typedef struct {
 	void (*Log1Byte)(BYTE b);
 	void (*Log1Bin)(BYTE b);
 	void (*LogBinSkip)(int add);
+
+	TTTSet *ts;
 } TComVar;
 typedef TComVar *PComVar;
 

@@ -471,12 +471,14 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_SETUPDIR_TITLE" },
 	};
-	TTTSet *pts = (TTTSet *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
+	TComVar *pcv = (TComVar*)GetWindowLongPtr(hDlgWnd, DWLP_USER);
+	TTTSet *pts = pcv != NULL ? pcv->ts : NULL;
 
 	switch (msg) {
 	case WM_INITDIALOG: {
-		pts = (TTTSet *)lp;
-		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pts);
+		pcv = (TComVar *)lp;
+		pts = pcv->ts;
+		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pcv);
 
 		// I18N
 		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
@@ -594,7 +596,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	case WM_COMMAND: {
 		switch (LOWORD(wp)) {
 		case IDHELP:
-			OpenHelp(HH_HELP_CONTEXT, HlpMenuSetupDir, pts->UILanguageFile);
+			OpenHelpCV(pcv, HH_HELP_CONTEXT, HlpMenuSetupDir);
 			break;
 
 		case IDOK:
@@ -655,8 +657,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	return TRUE;
 }
 
-void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TTTSet *pts)
+void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 {
 	TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
-					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)pts);
+					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)pcv);
 }

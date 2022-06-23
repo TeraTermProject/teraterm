@@ -61,7 +61,6 @@ DllExport void PASCAL ShowAllWinStacked(HWND);
 DllExport void PASCAL ShowAllWinCascade(HWND);
 DllExport void PASCAL BroadcastClosingMessage(HWND myhwnd);
 DllExport void PASCAL UndoAllWin(void);
-DllExport void PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
 
 DllExport int PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
 DllExport int PASCAL CommRead1Byte(PComVar cv, LPBYTE b);
@@ -73,26 +72,11 @@ DllExport int PASCAL CommTextOutW(PComVar cv, const wchar_t *B, int C);
 DllExport int PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
 DllExport int PASCAL CommTextEchoW(PComVar cv, const wchar_t *B, int C);
 
-DllExport void PASCAL CreateNotifyIcon(PComVar cv);
-DllExport void PASCAL DeleteNotifyIcon(PComVar cv);
-DllExport void PASCAL NotifyMessageW(PComVar cv, const wchar_t *message, const wchar_t *title, DWORD flag);
-DllExport void PASCAL NotifyMessage(PComVar cv, const char *message, const char *title, DWORD flag);
-DllExport void PASCAL ShowNotifyIcon(PComVar cv);
-DllExport void PASCAL HideNotifyIcon(PComVar cv);
-DllExport void PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
-DllExport void PASCAL SetCustomNotifyIcon(HICON icon);
-DllExport HICON PASCAL GetCustomNotifyIcon(void);
-
-#define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
-#define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)
-#define NotifyErrorMessage(cv, msg, title) NotifyMessage(cv, msg, title, 3)
-#define NotifyInfoMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 1)
-#define NotifyWarnMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 2)
-#define NotifyErrorMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 3)
-
 #ifdef __cplusplus
 }
 #endif
 
 #include "../ttpcmn/language.h"
 #include "../ttpcmn/ttcmn_cominfo.h"
+#include "../ttpcmn/ttcmn_notify.h"
+#include "../ttpcmn/ttcmn_lib.h"

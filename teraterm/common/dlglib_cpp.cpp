@@ -92,7 +92,7 @@ HWND TTCreateDialog(
 	DLGPROC lpDialogFunc)
 {
 	return TTCreateDialogParam(hInstance, lpTemplateName,
-							   hWndParent, lpDialogFunc, NULL);
+							   hWndParent, lpDialogFunc, (LPARAM)NULL);
 }
 
 /**
@@ -116,7 +116,7 @@ INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplateName,
  */
 INT_PTR TTDialogBox(HINSTANCE hInstance, LPCTSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc)
 {
-	return TTDialogBoxParam(hInstance, lpTemplateName, hWndParent, lpDialogFunc, NULL);
+	return TTDialogBoxParam(hInstance, lpTemplateName, hWndParent, lpDialogFunc, (LPARAM)NULL);
 }
 
 /**
@@ -337,12 +337,13 @@ wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILang
  *	@param[in]	cx	アイコンサイズ(96dpi時)
  *	@param[in]	cy	アイコンサイズ
  *	@param[in]	dpi	アイコンサイズ(cx,cy)はdpi/96倍のサイズで読み込まれる
+ *	@param[in]	notify	カスタム通知アイコンの場合は TRUE, ウィンドウアイコンの場合は FALSE
  *	@return		HICON
  *
  *		cx == 0 && cy == 0 のときデフォルトのアイコンサイズで読み込む
  *		DestroyIcon()すること
  */
-static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi)
+HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify)
 {
 	if (cx == 0 && cy == 0) {
 		// 100%(96dpi?)のとき、GetSystemMetrics(SM_CXICON)=32
@@ -360,9 +361,20 @@ static HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UI
 		cy = cy * dpi / 96;
 	}
 	HICON hIcon;
-	HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon);
-	if(FAILED(hr)) {
-		hIcon = NULL;
+	if (IsWindowsNT4() || (notify && IsWindows2000())) {
+		// 4bit アイコン
+		// 		1. NT4 のとき
+		//				Windows NT 4.0 は 4bit アイコンしかサポートしていない
+		// 		2. Windows 2000 のタスクトレイアイコンのとき
+		//				Windows 2000 のタスクトレイは 4bit アイコンしかサポートしていない
+		// LR_VGACOLOR = 16(4bit) color = VGA color
+		hIcon = (HICON)LoadImageW(hinst, name, IMAGE_ICON, cx, cy, LR_VGACOLOR);
+	}
+	else {
+		HRESULT hr = _LoadIconWithScaleDown(hinst, name, cx, cy, &hIcon);
+		if(FAILED(hr)) {
+			hIcon = NULL;
+		}
 	}
 	return hIcon;
 }
@@ -401,7 +413,7 @@ static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DPICHANGED: {
 		const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 		const UINT new_dpi = LOWORD(wp);
-		HICON icon = TTLoadIcon(hinst, data->icon_name, data->cx, data->cy, new_dpi);
+		HICON icon = TTLoadIcon(hinst, data->icon_name, data->cx, data->cy, new_dpi, FALSE);
 		if (icon != NULL) {
 			DestroyIcon(data->icon);
 			data->icon = icon;
@@ -450,7 +462,7 @@ void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 
 	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
 	const UINT dpi = GetMonitorDpiFromWindow(dlg);
-	data->icon = TTLoadIcon(hinst, name, cx, cy, dpi);
+	data->icon = TTLoadIcon(hinst, name, cx, cy, dpi, FALSE);
 
 	const HWND hwnd = GetDlgItem(dlg, nID);
 	SetIcon(hwnd, data->icon);
@@ -477,4 +489,53 @@ void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar
 		free(TempHostW);
 		i++;
 	} while (i <= maxhostlist);
+}
+
+/**
+ *	ウィンドウにアイコンをセットする
+ *
+ *	@param	hInst		アイコンを保持しているモジュールのinstance
+ *						icon_name == NULL のとき NULL でもよい
+ *	@param	hWnd		アイコンを設定するWindow Handle
+ *	@param	icon_name	アイコン名
+ *						NULLのとき アイコンを削除する
+ *						idからの変換はMAKEINTRESOURCEW()を使う
+ *	@param	dpi			dpi
+ *						0 のとき hWnd が表示されているモニタのDPI
+ */
+void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
+{
+	HICON icon;
+	if (icon_name != NULL) {
+		if (dpi == 0) {
+			// hWnd が表示されているモニタのDPI
+			dpi = GetMonitorDpiFromWindow(hWnd);
+		}
+
+		// 大きいアイコン(32x32,ディスプレイの拡大率が100%(dpi=96)のとき)
+		icon = TTLoadIcon(hInst, icon_name, 0, 0, dpi, FALSE);
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+
+		// 小さいアイコン(16x16,ディスプレイの拡大率が100%(dpi=96)のとき)
+		icon = TTLoadIcon(hInst, icon_name, 16, 16, dpi, FALSE);
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+	}
+	else {
+		// アイコンを削除
+		HICON null_icon = NULL;
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)null_icon);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)null_icon);
+		if (icon != NULL) {
+			DestroyIcon(icon);
+		}
+	}
 }

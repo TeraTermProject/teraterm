@@ -41,6 +41,7 @@
 #include "tttypes.h"
 #include "tttypes_key.h"
 
+#define	TTCMN_NOTIFY_INTERNAL 1
 #include "ttcommon.h"
 #include "ttwinman.h"
 #include "ttsetup.h"
@@ -250,11 +251,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RECT rect;
 	DWORD Style;
 	int CmdShow;
-	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
 
 	CommInit(&cv);
+	cv.ts = &ts;
 	isFirstInstance = StartTeraTerm(&ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
@@ -399,6 +400,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
 	if (HVTWin == NULL) return;
+	cv.HWin = HVTWin;
 	// register this window to the window list
 	SerialNo = RegWin(HVTWin,NULL);
 
@@ -418,26 +420,12 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// USBデバイス変化通知登録
 	RegDeviceNotify(HVTWin);
 
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
-	::PostMessage(HVTWin,WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(hInstance,
-	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
-	                                IMAGE_ICON,16,16,fuLoad));
-	// Vista の Aero において Alt+Tab 切り替えで表示されるアイコンが
-	// 16x16 アイコンの拡大になってしまうので、大きいアイコンも
-	// セットする (2008.9.3 maya)
-	::PostMessage(HVTWin,WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(hInstance,
-	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
-	                                IMAGE_ICON, 0, 0, fuLoad));
+	// 通知領域初期化
+	NotifyInitialize(&cv);
+	NotifySetWindow(&cv, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
 
-	SetCustomNotifyIcon(
-		(HICON)LoadImage(
-			hInstance,
-			MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
-			IMAGE_ICON, 16, 16, LR_VGACOLOR|LR_SHARED));
+	// VT ウィンドウのアイコン
+	SetVTIconID(&cv, NULL, 0);
 
 	MainMenu = NULL;
 	WinMenu = NULL;
@@ -1402,6 +1390,13 @@ void CVTWindow::OnClose()
 	ProtoEnd();
 
 	SaveVTPos();
+	NotifyUnsetWindow(&cv);
+
+	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
+	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
+	// ことがあるので破棄しない
+	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+
 	DestroyWindow();
 }
 
@@ -1471,7 +1466,7 @@ void CVTWindow::OnDestroy()
 
 	TTXEnd(); /* TTPLUG */
 
-	DeleteNotifyIcon(&cv);
+	NotifyUninitialize(&cv);
 }
 
 static void EscapeFilename(const wchar_t *src, wchar_t *dest)
@@ -3443,7 +3438,7 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
-	OpenHelp(HH_HELP_CONTEXT, help_id, ts.UILanguageFile);
+	OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
 	return 0;
 }
 
@@ -3496,14 +3491,14 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 			break;
 		  case WM_LBUTTONDOWN:
 		  case WM_RBUTTONDOWN:
-			HideNotifyIcon(&cv);
+			NotifyHideIcon(&cv);
 			break;
 		  case NIN_BALLOONTIMEOUT:
-			HideNotifyIcon(&cv);
+			NotifyHideIcon(&cv);
 			break;
 		  case NIN_BALLOONUSERCLICK:
 			::SetForegroundWindow(HVTWin);
-			HideNotifyIcon(&cv);
+			NotifyHideIcon(&cv);
 			break;
 		}
 	}
@@ -4763,7 +4758,7 @@ void CVTWindow::OnOpenSetupDirectory()
 {
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
-	SetupDirectoryDialog(m_hInst, HVTWin, &ts);
+	SetupDirectoryDialog(m_hInst, HVTWin, &cv);
 }
 
 void CVTWindow::OnSetupLoadKeyMap()
@@ -4942,7 +4937,7 @@ void CVTWindow::OnWindowUndo()
 
 void CVTWindow::OnHelpIndex()
 {
-	OpenHelp(HH_DISPLAY_TOPIC, 0, ts.UILanguageFile);
+	OpenHelpCV(&cv, HH_DISPLAY_TOPIC, 0);
 }
 
 void CVTWindow::OnHelpAbout()
@@ -5086,6 +5081,16 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	IgnoreSizeMessage = FALSE;
 
 	ChangeCaret();
+
+	{
+		HINSTANCE inst;
+		WORD icon_id;
+		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
+		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
+		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
+		                                                                  : IDI_VT;
+		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
+	}
 
 	return TRUE;
 }

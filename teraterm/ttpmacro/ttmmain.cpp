@@ -33,6 +33,7 @@
 #include <commctrl.h>
 #include <stdio.h>
 
+#include "compat_win.h"
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmdlg.h"
@@ -252,7 +253,6 @@ BOOL CCtrlWindow::OnInitDialog()
 	};
 	BOOL IOption, VOption;
 	int CmdShow;
-	int fuLoad = LR_DEFAULTCOLOR;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
 
@@ -260,17 +260,7 @@ BOOL CCtrlWindow::OnInitDialog()
 
 	Pause = FALSE;
 
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
-	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(m_hInst,
-	                                MAKEINTRESOURCE(IDI_TTMACRO),
-	                                IMAGE_ICON,16,16,fuLoad));
-	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(m_hInst,
-	                                MAKEINTRESOURCE(IDI_TTMACRO),
-	                                IMAGE_ICON,0,0,fuLoad));
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 
 	ParseParam(&IOption,&VOption);
 
@@ -387,18 +377,13 @@ void CCtrlWindow::OnDestroy()
 
 	EndTTL();
 	EndDDE();
-	::DestroyWindow(m_hStatus);
-}
 
-// for icon drawing in Win NT 3.5
-BOOL CCtrlWindow::OnEraseBkgnd(HDC DC)
-{
-	if (::IsIconic(m_hWnd)) {
-		return TRUE;
-	}
-	else {
-		return FALSE;
-	}
+	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
+	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
+	// ことがあるので破棄しない
+	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+
+	::DestroyWindow(m_hStatus);
 }
 
 // for icon drawing in Win NT 3.5
@@ -417,14 +402,6 @@ void CCtrlWindow::OnPaint()
 	SetDlgItemText(IDC_FILENAME, GetMacroFileName());
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
 	SetDlgItemText(IDC_LINENO, buf);
-
-	if (::IsIconic(m_hWnd)) {
-		int OldMapMode = GetMapMode(dc);
-		SetMapMode(dc, MM_TEXT);
-		SendMessage(WM_ICONERASEBKGND,(WPARAM)dc, 0);	// TODO
-		DrawIcon(dc, 0, 0, m_hIcon);
-		SetMapMode(dc, OldMapMode);
-	}
 
 	EndPaint(&ps);
 }
@@ -483,12 +460,6 @@ void CCtrlWindow::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	lpmmi->ptMinTrackSize.x = m_init_width;
 	lpmmi->ptMinTrackSize.y = m_init_height;
 #endif
-}
-
-// for icon drawing in Win NT 3.5
-HCURSOR CCtrlWindow::OnQueryDragIcon()
-{
-	return m_hIcon;
 }
 
 void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
@@ -693,6 +664,13 @@ LRESULT CCtrlWindow::OnMacroBringup(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT CCtrlWindow::OnDpiChanged(WPARAM wp, LPARAM)
+{
+	const UINT new_dpi = LOWORD(wp);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), new_dpi);
+	return TRUE;
+}
+
 LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg)
@@ -700,9 +678,6 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DESTROY:
 		OnDestroy();
 		PostQuitMessage(0);
-		break;
-	case WM_ERASEBKGND:
-		OnEraseBkgnd((HDC)wp);
 		break;
 	case WM_PAINT:
 		OnPaint();
@@ -730,6 +705,9 @@ LRESULT CCtrlWindow::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_USER_DDEEND:
 		OnDdeEnd(wp, lp);
+		break;
+	case WM_DPICHANGED:
+		OnDpiChanged(wp, lp);
 		break;
 	}
 	return FALSE;

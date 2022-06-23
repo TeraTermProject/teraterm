@@ -5,6 +5,7 @@ project(${PACKAGE_NAME})
 add_library(
   ${PACKAGE_NAME}
   SHARED
+  ../teraterm/unicode.cpp
   language.c
   language.h
   ttcmn.c
@@ -12,10 +13,12 @@ add_library(
   ttcmn_cominfo.h
   ttcmn_dup.cpp
   ttcmn_dup.h
+  ttcmn_lib.cpp
+  ttcmn_lib.h
   ttcmn_notify.cpp
+  ttcmn_notify.h
   ttpcmn-version.rc
   ttpcmn.def
-  ../teraterm/unicode.cpp
   )
 
 if(SUPPORT_OLD_WINDOWS)

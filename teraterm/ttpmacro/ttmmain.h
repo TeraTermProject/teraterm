@@ -62,11 +62,9 @@ protected:
 
 	BOOL OnClose();
 	void OnDestroy();
-	BOOL OnEraseBkgnd(HDC DC);
 	void OnPaint();
 	void OnSize(UINT nType, int cx, int cy);
 	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
-	HCURSOR OnQueryDragIcon();
 	void OnSysColorChange();
 	void OnTimer(UINT_PTR nIDEvent);
 	LRESULT OnDdeCmndEnd(WPARAM wParam, LPARAM lParam);
@@ -74,5 +72,5 @@ protected:
 	LRESULT OnDdeReady(WPARAM wParam, LPARAM lParam);
 	LRESULT OnDdeEnd(WPARAM wParam, LPARAM lParam);
 	LRESULT OnMacroBringup(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDpiChanged(WPARAM wp, LPARAM lp);
 };
-

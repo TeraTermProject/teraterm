@@ -16,7 +16,6 @@ if(SUPPORT_OLD_WINDOWS)
     ${PACKAGE_NAME}
     PRIVATE
     layer_for_unicode
-    common_static
     )
   if(MSVC)
     target_sources(
@@ -26,6 +25,13 @@ if(SUPPORT_OLD_WINDOWS)
       )
   endif()
 endif(SUPPORT_OLD_WINDOWS)
+
+target_link_libraries(
+  ${PACKAGE_NAME}
+  PRIVATE
+  common_static
+  ttpcmn
+)
 
 set_target_properties(
   ${PACKAGE_NAME}
@@ -70,7 +76,6 @@ if(SUPPORT_OLD_WINDOWS)
     ${PACKAGE_NAME_2}
     PRIVATE
     layer_for_unicode
-    common_static
     )
   if(MSVC)
     target_sources(
@@ -80,6 +85,13 @@ if(SUPPORT_OLD_WINDOWS)
       )
   endif()
 endif(SUPPORT_OLD_WINDOWS)
+
+target_link_libraries(
+  ${PACKAGE_NAME_2}
+  PRIVATE
+  common_static
+  ttpcmn
+)
 
 set_target_properties(
   ${PACKAGE_NAME_2}

@@ -64,11 +64,11 @@ private:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual BOOL PostNcDestroy();
 	virtual BOOL OnInitDialog();
+	virtual BOOL OnClose();
+	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 
 private:
 	BOOL Pause;
-	HANDLE SmallIcon;
-	HANDLE BigIcon;
 	const char *UILanguageFile;
 	WORD OpId;
 	int ProgStat;	// プログレスバーの進捗が戻らないよう記憶しておく

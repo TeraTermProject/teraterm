@@ -43,14 +43,13 @@
 #include "helpid.h"
 #include "filesys.h"
 #include "codeconv.h"
+#include "compat_win.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
 CFileTransDlg::CFileTransDlg()
 {
-	SmallIcon = NULL;
-	BigIcon = NULL;
 	DlgCaption = NULL;
 	FileName = NULL;
 	FullName = NULL;
@@ -212,8 +211,6 @@ BOOL CFileTransDlg::OnInitDialog()
 		{ IDC_TRANSHELP, "BTN_HELP" },
 	};
 
-	int fuLoad = LR_DEFAULTCOLOR;
-
 	if (HideDialog) {
 		// Visible = False でもフォアグラウンドに来てしまうので、そうならない
 		// ように拡張スタイル WS_EX_NOACTIVATE を指定する。
@@ -229,20 +226,7 @@ BOOL CFileTransDlg::OnInitDialog()
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
-	if (IsWindowsNT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
-	SmallIcon = LoadImage(m_hInst,
-						  MAKEINTRESOURCE(IDI_TTERM),
-						  IMAGE_ICON, 16, 16, fuLoad);
-	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_SMALL,
-				  (LPARAM)SmallIcon);
-
-	BigIcon = LoadImage(m_hInst,
-						MAKEINTRESOURCE(IDI_TTERM),
-						IMAGE_ICON, 0, 0, fuLoad);
-	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
-				  (LPARAM)BigIcon);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTERM), 0);
 
 	AddModelessHandle(m_hWnd);
 
@@ -285,23 +269,30 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
+BOOL CFileTransDlg::OnClose()
+{
+	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+	return TRUE;
+}
+
 BOOL CFileTransDlg::PostNcDestroy()
 {
-	// logopenとlogcloseを繰り返すと、GDIリソースリークとなる問題を修正した。
-	//   - LoadImage()によるアイコンリソースを解放する。
-	// (2016.10.5 yutaka)
-	if (SmallIcon) {
-		DestroyIcon((HICON)SmallIcon);
-		SmallIcon = NULL;
-	}
-
-	if (BigIcon) {
-		DestroyIcon((HICON)BigIcon);
-		BigIcon = NULL;
-	}
-
 	RemoveModelessHandle(m_hWnd);
 
 	delete this;
 	return TRUE;
+}
+
+LRESULT CFileTransDlg::DlgProc(UINT msg, WPARAM wp, LPARAM)
+{
+	switch (msg) {
+	case WM_DPICHANGED: {
+		const UINT NewDPI = LOWORD(wp);
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTERM), NewDPI);
+		break;
+	}
+	default:
+		break;
+	}
+	return (LRESULT)FALSE;
 }

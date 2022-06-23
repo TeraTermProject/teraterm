@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004- TeraTerm Project
+ * Copyright (C) 2022- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +29,36 @@
 #pragma once
 
 #include <windows.h>
-#include "tttypes.h"
 
-void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
+
+// ttermpro.exe 内部で使用(Tera Term pluginからは利用しない)
+#if defined(TTCMN_NOTIFY_INTERNAL)
+DllExport void WINAPI NotifyInitialize(PComVar cv);
+DllExport void WINAPI NotifyUninitialize(PComVar cv);
+DllExport void WINAPI NotifySetWindow(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID);
+DllExport void WINAPI NotifyUnsetWindow(PComVar cv);
+DllExport void WINAPI NotifyHideIcon(PComVar cv);
+#endif
+
+// plugin からも使用可能なIF
+DllExport void WINAPI NotifyMessageW(PComVar cv, const wchar_t *message, const wchar_t *title, DWORD flag);
+DllExport void WINAPI NotifyMessage(PComVar cv, const char *message, const char *title, DWORD flag);
+DllExport void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID);
+
+#define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
+#define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)
+#define NotifyErrorMessage(cv, msg, title) NotifyMessage(cv, msg, title, 3)
+#define NotifyInfoMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 1)
+#define NotifyWarnMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 2)
+#define NotifyErrorMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 3)
+
+#ifdef __cplusplus
+}
+#endif
