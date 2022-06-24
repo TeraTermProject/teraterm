@@ -984,7 +984,7 @@ static INT_PTR CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPA
 static void add_forwarding_entry(PTInstVar pvar, HWND dlg)
 {
 	FWDRequestSpec new_spec;
-	int result;
+	INT_PTR result;
 	FWDEditClosure closure = { &new_spec, pvar };
 
 	new_spec.type = FWD_LOCAL_TO_REMOTE;
@@ -1023,7 +1023,7 @@ static void edit_forwarding_entry(PTInstVar pvar, HWND dlg)
 		if (spec != NULL) {
 			FWDEditClosure closure = { spec, pvar };
 
-			int result =
+			INT_PTR result =
 				DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHFWDEDIT),
 				               dlg, fwd_edit_dlg_proc, (LPARAM) & closure);
 
