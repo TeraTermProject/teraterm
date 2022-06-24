@@ -37,26 +37,39 @@ public:
 	TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd, const wchar_t *uilangfile);
 	virtual ~TTCPropSheetDlg();
 	INT_PTR DoModal();
-	void AddPage(HPROPSHEETPAGE page);
+	void AddPage(HPROPSHEETPAGE page, const wchar_t *path = NULL);
 	void SetCaption(const wchar_t *caption);
+	static void SetTreeViewMode(BOOL enable);
 
 private:
-	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
-	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-	static HINSTANCE ghInstance;
-	static class TTCPropSheetDlg *gTTCPS;
-	LRESULT CALLBACK WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-
-	PROPSHEETHEADERW m_psh;
 	HWND m_hWnd;
 	HWND m_hParentWnd;
 	HINSTANCE m_hInst;
+	wchar_t *m_UiLanguageFile;
 
-	int m_PageCount;
-	HPROPSHEETPAGE hPsp[9];
-
+	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
+	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
+	static class TTCPropSheetDlg *gTTCPS;
+	LRESULT CALLBACK WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 	LONG_PTR m_OrgProc;
 	LONG_PTR m_OrgUserData;
 
-	wchar_t *m_UiLanguageFile;
+	PROPSHEETHEADERW m_psh;
+	int m_PageCount;
+	struct TTPropSheetPage {
+		HPROPSHEETPAGE hPsp;
+		wchar_t *path;
+	};
+	TTPropSheetPage *m_Page;
+
+	// tree control
+	BOOL m_TreeView;
+	HWND m_hWndTV;
+	void AddTreeControl();
+	void CreateTree(HWND dlg);
+	HTREEITEM CreatePath(const wchar_t *path, HTREEITEM hParent, int data);
+	HTREEITEM GetTreeItem(int nPage, HTREEITEM hParent);
+
+	// èâä˙íl
+	static BOOL m_TreeViewInit;
 };
