@@ -265,6 +265,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\tipwin2.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\tipwin2.h"
+			>
+		</File>
+		<File
 			RelativePath=".\tmfc.cpp"
 			>
 		</File>

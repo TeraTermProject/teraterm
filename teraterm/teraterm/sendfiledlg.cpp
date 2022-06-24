@@ -43,61 +43,9 @@
 #include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "tipwin2.h"
 
 #include "sendfiledlg.h"
-
-typedef struct tagTipWinData {
-	HWND hDlg;
-	HWND hTip;
-} TipWin2;
-
-static TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
-{
-	HINSTANCE hInst = hInstance;
-	if (hInstance == NULL) {
-		hInst = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE);
-	}
-
-	HWND hTip = CreateWindowExW(NULL, TOOLTIPS_CLASSW, NULL,
-								WS_POPUP |TTS_ALWAYSTIP | TTS_BALLOON,
-								CW_USEDEFAULT, CW_USEDEFAULT,
-								CW_USEDEFAULT, CW_USEDEFAULT,
-								hDlg, NULL,
-								hInst, NULL);
-	if (hTip == NULL) {
-		return NULL;
-	}
-	SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, INT_MAX);
-
-	TipWin2 *tWin = (TipWin2 *)calloc(sizeof(TipWin2), 1);
-	if (tWin == NULL) {
-		return NULL;
-	}
-	tWin->hTip = hTip;
-	tWin->hDlg = hDlg;
-
-	return tWin;
-}
-
-static void TipWin2Destroy(TipWin2 *tWin)
-{
-	DestroyWindow(tWin->hTip);
-	tWin->hTip = NULL;
-	free(tWin);
-}
-
-static BOOL TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text)
-{
-	TOOLINFOW toolInfo = {};
-	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.hwnd = tWin->hDlg;
-	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;	// TTF_IDISHWND ‚ª‚ ‚ê‚Îrect‚ÍŽQÆ‚³‚ê‚È‚¢
-	toolInfo.uId = (UINT_PTR)GetDlgItem(tWin->hDlg, id);
-	toolInfo.lpszText = (LPWSTR)text;	// text ‚Í SendMessage() Žž‚É‘¶Ý‚·‚ê‚Î—Ç‚¢
-	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
-
-	return TRUE;
-}
 
 typedef struct {
 	sendfiledlgdata *create_param;

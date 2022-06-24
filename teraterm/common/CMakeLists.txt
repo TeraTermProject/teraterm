@@ -29,6 +29,8 @@ add_library(
   inifile_com.cpp
   tipwin.cpp
   tipwin.h
+  tipwin2.cpp
+  tipwin2.h
   tmfc.cpp
   tmfc.h
   tmfc_frame.cpp

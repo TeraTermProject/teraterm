@@ -139,6 +139,7 @@
     <ClCompile Include="fileread.cpp" />
     <ClCompile Include="inifile_com.cpp" />
     <ClCompile Include="tipwin.cpp" />
+    <ClCompile Include="tipwin2.cpp" />
     <ClCompile Include="tmfc.cpp" />
     <ClCompile Include="tmfc_frame.cpp" />
     <ClCompile Include="tmfc_propdlg.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="fileread.h" />
     <ClInclude Include="inifile_com.h" />
     <ClInclude Include="tipwin.h" />
+    <ClInclude Include="tipwin2.h" />
     <ClInclude Include="tmfc.h" />
     <ClInclude Include="compat_win.h" />
     <ClInclude Include="dllutil.h" />
