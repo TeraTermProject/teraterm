@@ -56,6 +56,7 @@
 #include "asprintf.h"
 #include "helpid.h"
 #include "win32helper.h"
+#include "tipwin2.h"
 
 #include "setupdirdlg.h"
 
@@ -466,19 +467,26 @@ static wchar_t *GetCurrentPath(const SetupList *, const TTTSet *)
 	return path;
 }
 
+typedef struct {
+	TComVar *pcv;
+	TipWin2 *tipwin;
+} dlg_data_t;
+
 static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_SETUPDIR_TITLE" },
 	};
-	TComVar *pcv = (TComVar*)GetWindowLongPtr(hDlgWnd, DWLP_USER);
-	TTTSet *pts = pcv != NULL ? pcv->ts : NULL;
+	dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
+	TComVar *pcv = (dlg_data == NULL) ? NULL : dlg_data->pcv;
+	TTTSet *pts = (pcv == NULL) ? NULL : pcv->ts;
 
 	switch (msg) {
 	case WM_INITDIALOG: {
-		pcv = (TComVar *)lp;
+		dlg_data = (dlg_data_t *)lp;
+		pcv = dlg_data->pcv;
 		pts = pcv->ts;
-		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)pcv);
+		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)dlg_data);
 
 		// I18N
 		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
@@ -590,6 +598,9 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
+		static const wchar_t *str = L"Right click to open submenu";
+		dlg_data->tipwin = TipWin2Create(NULL, hDlgWnd);
+		TipWin2SetTextW(dlg_data->tipwin, IDC_SETUP_DIR_LIST, str);
 		return TRUE;
 	}
 
@@ -615,6 +626,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		return FALSE;
 	}
 	case WM_CLOSE:
+		TipWin2Destroy(dlg_data->tipwin);
+		dlg_data->tipwin = NULL;
 		TTEndDialog(hDlgWnd, 0);
 		return TRUE;
 
@@ -659,6 +672,9 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 {
+	dlg_data_t* dlg_data = (dlg_data_t*)calloc(sizeof(dlg_data_t), 1);
+	dlg_data->pcv = pcv;
 	TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
-					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)pcv);
+					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)dlg_data);
+	free(dlg_data);
 }
