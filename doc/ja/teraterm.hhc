@@ -554,6 +554,48 @@
 			<param name="Local" value="html\setup\teraterm.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ターミナルエミュレーション">
+					<param name="Local" value="html\setup\teraterm-term.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ウィンドウ">
+					<param name="Local" value="html\setup\teraterm-win.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="通信">
+					<param name="Local" value="html\setup\teraterm-com.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ファイル転送">
+					<param name="Local" value="html\setup\teraterm-trans.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="印刷">
+					<param name="Local" value="html\setup\teraterm-prn.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="その他">
+					<param name="Local" value="html\setup\teraterm-misc.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="TTSSH">
+					<param name="Local" value="html\setup\teraterm-ssh.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="設定ファイルの全項目一覧">
+					<param name="Local" value="html\setup\teraterm-ini.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+			</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="キーボード設定ファイル概要">
 			<param name="Local" value="html\setup\keyboard.html">

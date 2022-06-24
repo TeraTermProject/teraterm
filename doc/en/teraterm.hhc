@@ -516,6 +516,48 @@
 			<param name="Local" value="html\setup\teraterm.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal emulation">
+					<param name="Local" value="html\setup\teraterm-term.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Window">
+					<param name="Local" value="html\setup\teraterm-win.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Communication">
+					<param name="Local" value="html\setup\teraterm-com.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="File transfer">
+					<param name="Local" value="html\setup\teraterm-trans.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Printing">
+					<param name="Local" value="html\setup\teraterm-prn.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Miscellaneous">
+					<param name="Local" value="html\setup\teraterm-misc.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="TTSSH">
+					<param name="Local" value="html\setup\teraterm-ssh.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="All items of Tera Term setup file">
+					<param name="Local" value="html\setup\teraterm-ini.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+			</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Keyboard setup file overview">
 			<param name="Local" value="html\setup\keyboard.html">
