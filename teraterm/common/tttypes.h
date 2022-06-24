@@ -655,6 +655,9 @@ struct tttset {
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
 	HINSTANCE TeraTermInstance;
+
+	// Experimental
+	BYTE ExperimentalTreeProprtySheetEnable;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

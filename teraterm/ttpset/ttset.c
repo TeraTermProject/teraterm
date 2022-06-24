@@ -2263,6 +2263,9 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	}
 
 	DispReadIni(FName, ts);
+
+	// Experimental
+	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 }
 
 void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
