@@ -67,6 +67,17 @@ typedef enum MONITOR_DPI_TYPE {
 #define OPENFILENAME_SIZE_VERSION_400A	76
 #endif
 
+// 10.0.22000 or later
+#define DWMWA_WINDOW_CORNER_PREFERENCE 33
+#if !defined(DWM_WINDOW_CORNER_PREFERENCE)
+typedef enum  {
+  DWMWCP_DEFAULT = 0,
+  DWMWCP_DONOTROUND = 1,
+  DWMWCP_ROUND = 2,
+  DWMWCP_ROUNDSMALL = 3
+} DWM_WINDOW_CORNER_PREFERENCE;
+#endif
+
 extern BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 extern BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 extern HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
@@ -89,6 +100,9 @@ extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 #define pAddFontResourceEx		pAddFontResourceExA
 #define pRemoveFontResourceEx	pRemoveFontResourceExA
 #endif // !UNICODE
+
+// dwmapi.dll
+extern HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 
 void WinCompatInit();
 

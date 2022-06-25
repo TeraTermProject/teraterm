@@ -49,6 +49,9 @@ HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
 
+// dwmapi.dll
+HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
+
 static const APIInfo Lists_user32[] = {
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
@@ -79,11 +82,17 @@ static const APIInfo Lists_Shcore[] = {
 	{},
 };
 
+static const APIInfo Lists_dwmapi[] = { // Windows Vista or later
+	{ "DwmSetWindowAttribute", (void **)&pDwmSetWindowAttribute },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
 	{ _T("gdi32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_gdi32 },
 	{ _T("Shcore.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_Shcore },
+	{ _T("dwmapi.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwmapi },
 	{},
 };
 

@@ -718,6 +718,13 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
 	if (HVTWin == NULL) return;
+
+	// Windows 11 でウィンドウの角が丸くならないようにする
+	if (pDwmSetWindowAttribute != NULL) {
+		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
+		pDwmSetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+	}
+
 	// register this window to the window list
 	SerialNo = RegWin(HVTWin,NULL);
 
