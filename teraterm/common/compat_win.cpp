@@ -100,6 +100,8 @@ static HRESULT (WINAPI *pSHGetKnownFolderPath)(REFKNOWNFOLDERID rfid, DWORD dwFl
 // comctl32.dll
 static HRESULT (WINAPI *pLoadIconWithScaleDown)(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico);
 
+// dwmapi.dll
+HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 
 class Initializer {
 public:
@@ -240,6 +242,11 @@ static const APIInfo Lists_comctl32[] = {
 	{},
 };
 
+static const APIInfo Lists_dwmapi[] = { // Windows Vista or later
+	{ "DwmSetWindowAttribute", (void **)&pDwmSetWindowAttribute },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -252,6 +259,7 @@ static const DllInfo DllInfos[] = {
 	{ L"dbghelp.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dbghelp },
 	{ L"shell32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
 	{ L"comctl32.dll", DLL_LOAD_LIBRARY_SxS, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
+	{ L"dwmapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwmapi },
 	{},
 };
 

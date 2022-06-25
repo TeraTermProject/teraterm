@@ -97,11 +97,19 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 		rect.bottom = rect.top + 400; //temporary height
 	}
 	CreateW(hInstance, TEKClassName, L"Tera Term", Style, rect, ::GetDesktopWindow(), NULL);
+
 //--------------------------------------------------------
 	HTEKWin = GetSafeHwnd();
 	if (HTEKWin == NULL) {
 		return;
 	}
+
+	// Windows 11 でウィンドウの角が丸くならないようにする
+	if (pDwmSetWindowAttribute != NULL) {
+		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
+		pDwmSetWindowAttribute(HTEKWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+	}
+
 	tk.HWin = HTEKWin;
 	// register this window to the window list
 	RegWin(HVTWin,HTEKWin);
