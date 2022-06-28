@@ -289,10 +289,10 @@ find_program(
   )
 message("ISCC=${ISCC}")
 
-if(NOT TARGET ttssh)
+if(NOT TARGET ttxssh)
   add_custom_target(
     inno_setup
-    COMMAND "${CMAKE_COMMAND}" -E echo "ttssh was not build"
+    COMMAND "${CMAKE_COMMAND}" -E echo "ttxssh was not build"
     )
 elseif("${ISCC}" STREQUAL "ISCC-NOTFOUND")
   add_custom_target(
