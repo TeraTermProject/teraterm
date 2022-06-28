@@ -1579,9 +1579,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 	size_t str_size;	// 確保したサイズ
 	size_t k;
 	LONG TmpPtr;
-	int IStart, IEnd;
 	int x, y;
-	BOOL LineContinued;
 
 	str_size = NumOfColumns * (ey - sy + 1);
 	str_w = malloc(sizeof(wchar_t) * str_size);
@@ -1592,26 +1590,23 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 	TmpPtr = GetLinePtr(sy);
 	k = 0;
 	for (y = sy; y<=ey ; y++) {
+		int IStart;		// 開始
+		int IEnd;		// 終了
+		BOOL LineContinued;
+
 		if (box_select) {
-			IStart = SelectStart.x;
-			IEnd = SelectEnd.x-1;
+			IStart = sx;
+			IEnd = ex - 1;
+			LineContinued = FALSE;
 		}
 		else {
-			IStart = 0;
-			IEnd = NumOfColumns-1;
-			if (y== sy) {
-				IStart = sx;
-			}
-			if (y== ey) {
-				IEnd = ex -1;
-			}
-		}
+			// 行選択
+			IStart = (y == sy) ? sx : 0;
+			IEnd = (y == ey) ? ex - 1 : NumOfColumns - 1;
 
-		// 次の行に続いてる?
-		LineContinued = FALSE;
-		if (!box_select) {
-			// 行選択の場合のみ
-			if (ts.EnableContinuedLineCopy && y!= ey ) {
+			// 次の行に続いてる?
+			LineContinued = FALSE;
+			if (ts.EnableContinuedLineCopy && y!= ey) {
 				LONG NextTmpPtr = NextLinePtr(TmpPtr);
 				if ((CodeBuffW[NextTmpPtr].attr & AttrLineContinued) != 0) {
 					LineContinued = TRUE;
@@ -1619,21 +1614,29 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 			}
 		}
 
+		// 不要スペースを調べる
+		//   IEnd=コピーが必要な最後の位置
 		if (!LineContinued) {
-			while ((IEnd>0)) {
-				// コピー不要分を削除
+			while (IEnd >= IStart) {
+				// コピー不要な" "(0x20)を削除
 				const buff_char_t *b = &CodeBuffW[TmpPtr + IEnd];
-				if (b->u32 == 0x20) {
-					MoveCharPtr(TmpPtr,&IEnd,-1);	// 切り詰める
-				}
-				else {
+				if (b->u32 != 0x20) {
+					// スペース以外だった
+					IEnd++;
 					break;
 				}
+				if (IEnd == 0) {
+					break;
+				}
+				// 切り詰める
+				MoveCharPtr(TmpPtr,&IEnd,-1);
 			}
 		}
 
+		// 1ライン文字列をコピーする
+		//   IEnd=コピーが必要な最後の位置+1
 		x = IStart;
-		while (x <= IEnd) {
+		while (x < IEnd) {
 			const buff_char_t *b = &CodeBuffW[TmpPtr + x];
 			if (b->u32 != 0) {
 				str_w[k++] = b->wc2[0];
