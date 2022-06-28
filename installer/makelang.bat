@@ -20,5 +20,5 @@ perl utf8_to.pl cp932 release/lang_utf8/Japanese.lng release/lang/Japanese.lng
 perl utf8_to.pl cp949 release/lang_utf8/Korean.lng release/lang/Korean.lng
 perl utf8_to.pl windows-1251 release/lang_utf8/Russian.lng release/lang/Russian.lng
 perl utf8_to.pl cp936 "release/lang_utf8/Simplified Chinese.lng" "release/lang/Simplified Chinese.lng"
-perl utf8_to.pl cp1252 release/lang_utf8/Spanish.lng release/lang_utf16le/Spanish.lng
+perl utf8_to.pl cp1252 release/lang_utf8/Spanish.lng release/lang/Spanish.lng
 perl utf8_to.pl cp950 "release/lang_utf8/Traditional Chinese.lng" "release/lang/Traditional Chinese.lng"
