@@ -73,7 +73,9 @@ BOOL GetMonitorSizeByChar(int *width, int *height) {
     margin_w = (rc_wnd.right - rc_wnd.left) - (rc_cl.right - rc_cl.left);
     cell_w = (rc_cl.right - rc_cl.left) / pvar->ts->TerminalWidth;
 
-    *width = (rc_dsk.right - rc_dsk.left - margin_w) / cell_w;
+    if (cell_w > 0) {
+      *width = (rc_dsk.right - rc_dsk.left - margin_w) / cell_w;
+    }
   }
   if (height) {
     int margin_h, cell_h;
@@ -81,7 +83,9 @@ BOOL GetMonitorSizeByChar(int *width, int *height) {
     margin_h = (rc_wnd.bottom - rc_wnd.top) - (rc_cl.bottom - rc_cl.top);
     cell_h = (rc_cl.bottom - rc_cl.top) / pvar->ts->TerminalHeight;
 
-    *height = (rc_dsk.bottom - rc_dsk.top - margin_h) / cell_h;
+    if (cell_h > 0) {
+      *height = (rc_dsk.bottom - rc_dsk.top - margin_h) / cell_h;
+    }
   }
 
   return TRUE;
