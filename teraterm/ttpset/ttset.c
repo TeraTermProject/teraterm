@@ -2264,6 +2264,9 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	DispReadIni(FName, ts);
 
+	// rounded corner preference for VT/TEK window
+	ts->WindowCornerDontround = GetOnOff(Section, "WindowCornerDontround", FName, FALSE);
+
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 }
@@ -3532,6 +3535,9 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
+
+	// // rounded corner preference for VT/TEK window
+	WriteOnOff(Section, "WindowCornerDontround", FName, ts->WindowCornerDontround);
 }
 
 void PASCAL CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

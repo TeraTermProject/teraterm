@@ -655,6 +655,7 @@ struct tttset {
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
 	HINSTANCE TeraTermInstance;
+	WORD WindowCornerDontround;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;

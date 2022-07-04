@@ -403,7 +403,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	cv.HWin = HVTWin;
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
-	if (pDwmSetWindowAttribute != NULL) {
+	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
 		pDwmSetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
 	}
