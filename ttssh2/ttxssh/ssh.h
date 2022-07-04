@@ -289,7 +289,7 @@ typedef enum {
 /* Minimum modulus size (n) for RSA keys. */
 #define SSH_RSA_MINIMUM_MODULUS_SIZE    768
 
-#define SSH_KEYGEN_DEFAULT_BITS   2048
+#define SSH_KEYGEN_DEFAULT_BITS   3072
 #define SSH_RSA_MINIMUM_KEY_SIZE   768
 #define SSH_DSA_MINIMUM_KEY_SIZE  1024
 
