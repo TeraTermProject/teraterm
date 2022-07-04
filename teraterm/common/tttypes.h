@@ -710,6 +710,7 @@ struct tttset {
 	int RunningVersion;
 	DWORD SelectStartDelay;
 	int EtermLookfeel_BGIgnoreThemeFile;	// eterm_lookfeel_t ‚Ìƒƒ“ƒo[‚¾‚Á‚½
+	WORD WindowCornerDontround;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

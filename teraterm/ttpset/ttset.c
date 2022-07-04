@@ -2244,6 +2244,9 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ReadFont3("Tera Term", "DlgFont", NULL, FName,
 			  ts->DialogFontName, sizeof(ts->DialogFontName),
 			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
+
+	// rounded corner preference for VT/TEK window
+	ts->WindowCornerDontround = GetOnOff(Section, "WindowCornerDontround", FName, FALSE);
 }
 
 void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -3570,6 +3573,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 				ts->DialogFontPoint,
 				ts->DialogFontCharSet);
 	WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, FName);
+
+	// // rounded corner preference for VT/TEK window
+	WriteOnOff(Section, "WindowCornerDontround", FName, ts->WindowCornerDontround);
 }
 
 #define VTEditor "VT editor keypad"
