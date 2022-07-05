@@ -6,13 +6,15 @@ use warnings;
 use Encode;
 use utf8;
 use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use File::Basename;
 
 my $PERL = $^X;
 
 sub MarkdownToHTML {
 	my $buf = $_[0];
 
-	my $cmd = "$PERL Markdown_1.0.1/Markdown.pl";
+	my $script_dir = dirname(__FILE__);
+	my $cmd = "$PERL $script_dir/Markdown_1.0.1/Markdown.pl";
 #	my $cmd = 'cat';
 
 	my $out_file = "MD_TO_HTML_$$" . "_md";
@@ -50,14 +52,16 @@ my($in, $out, $result);
 my $coding = "shiftjis";
 my $lf = "crlf";
 my $type = "text";
-my $zlib_special;
+my $zlib_special = 0;
+my $no_utime = 0;
 
 $result = GetOptions('in|i=s'       => \$in,
                      'out|o=s'      => \$out,
                      'coding|c=s'   => \$coding,
                      'lf|l=s'       => \$lf,
                      'type|t=s'     => \$type,
-                     'zlib_special' => \$zlib_special);
+                     'zlib_special' => \$zlib_special,
+                     'no_utime'     => \$no_utime);
 
 if (!(defined($in) && defined($out))) {
 	die "Usage: $0 --in file --out file [ --coding input_encoding ] [ --lf line_format ] [ --type type ]\n";
@@ -98,7 +102,11 @@ if ($out eq "-") {
 print $OUT $buf;
 close $OUT;
 
-if ($in ne "-") {
+# 出力ファイルの時刻を入力ファイルと同一に変更する
+#  - makechm.bat では chm のコンパイルを最小にするために
+#    出力ファイルの時刻を変更する
+#  - cmakeビルドでは、出力ファイルのほうが新しい状態にする
+if (($in ne "-") && ($no_utime == 0)) {
 	my(@filestat) = stat $in;
 	utime $filestat[8], $filestat[9], $out;
 }
