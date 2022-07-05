@@ -1,4 +1,18 @@
-﻿if (MSVC OR MINGW)
+﻿if(CMAKE_HOST_WIN32)
+  if("${CMAKE_COMMAND}" MATCHES "msys")
+    # msys
+    find_program(PERL perl.exe)
+  else()
+    find_program(
+      PERL perl.exe
+      HINTS ${CMAKE_CURRENT_LIST_DIR}/../buildtools/perl/perl/bin
+      HINTS c:/Strawberry/perl/bin
+      HINTS c:/Perl64/bin
+      HINTS c:/Perl/bin
+      HINTS c:/cygwin/usr/bin
+      HINTS c:/cygwin64/usr/bin
+      )
+  endif()
   find_program(
     HHC hhc.exe
     HINTS "C:/Program Files (x86)/HTML Help Workshop"
@@ -8,78 +22,23 @@
     )
   find_program(
     CHMCMD chmcmd
-    HINTS ${CMAKE_CURRENT_LIST_DIR}/../buildtools/chmcmd/
+    HINTS ${CMAKE_CURRENT_LIST_DIR}/../../buildtools/chmcmd/
     )
-else()
+else(CMAKE_HOST_WIN32)
+  find_program(
+    PERL perl
+    )
   set(HHC "HHC-NOTFOUND")
   find_program(
     CHMCMD chmcmd
     )
+endif(CMAKE_HOST_WIN32)
+
+if ("${PERL}" STREQUAL "PERL-NOTFOUND")
+  return()
 endif()
-message("hhc=${HHC}")
 
-if (NOT("${PERL}" STREQUAL "PERL-NOTFOUND")
-    AND (NOT(("${HHC}" STREQUAL "HHC-NOTFOUND") AND "${CHMCMD}" STREQUAL "CHMCMD-NOTFOUND")))
-  file(
-    GLOB_RECURSE
-    SRC_EN
-    LIST_DIRECTORIES false
-    en/*.html en/*.md en/*.png en/*.hhc en/*.hhp
-    )
-
-  file(
-    GLOB_RECURSE
-    SRC_JP
-    LIST_DIRECTORIES false
-    ja/*.html ja/*.md ja/*.png ja/*.hhc ja/*.hhp
-    )
-
-  add_custom_target(
-    chm ALL
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm
-    SOURCES ${SRC_EN}
-    SOURCES ${SRC_JP}
-    SOURCES htmlhelp_index_make.pl
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-
-  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC_EN})
-  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC_JP})
-
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm
-    COMMAND ${CMAKE_COMMAND} -P makechm.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT Generate "${CMAKE_CURRENT_BINARY_DIR}/teraterm.chm"
-    )
-
-  set_target_properties(
-    chm
-    PROPERTIES FOLDER doc)
-
-  install(
-    FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm
-    ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm
-    DESTINATION .
-    )
-
-else()
-
-  # chmが存在したらコピーする
-  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm)
-    install(
-      FILES ${CMAKE_CURRENT_SOURCE_DIR}/en/teraterm.chm
-      DESTINATION .
-      )
-  endif()
-  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm)
-    install(
-      FILES ${CMAKE_CURRENT_SOURCE_DIR}/ja/teratermj.chm
-      DESTINATION .
-      )
-  endif()
-
-endif()
+add_subdirectory(en)
+set_target_properties(chm_en PROPERTIES FOLDER doc)
+add_subdirectory(ja)
+set_target_properties(chm_ja PROPERTIES FOLDER doc)
