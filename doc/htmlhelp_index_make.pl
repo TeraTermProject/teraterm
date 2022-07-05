@@ -46,7 +46,7 @@ sub do_main {
 EOD
 
 	push @dirstack, getcwd;
-	chdir $path;
+	chdir $path or die "cannot chdir to $path $!";
 	get_file_paths($body);
 	chdir pop @dirstack;
 
