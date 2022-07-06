@@ -764,6 +764,23 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
 	           ts->EtermLookfeel.BGNoFrame);
 }
 
+/**
+ *	Unicode Ambiguous,Emoji のデフォルト幅
+ */
+static int GetDefaultUnicodeWidth(void)
+{
+	int ret_val = 1;
+	const int langcode = GetUserDefaultUILanguage();
+	if (langcode == 0x0411 ||	// Japanese
+		langcode == 0x0412 ||	// Korean
+		langcode == 0x0404 ||	// Chinese (Traditional)
+		langcode == 0x0804 )	// Chinese (Simplified)
+	{
+		ret_val = 2;
+	}
+	return ret_val;
+}
+
 void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 {
 	int i;
@@ -2252,14 +2269,14 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
 
 	// Unicode設定
-	ts->UnicodeAmbiguousWidth = GetPrivateProfileInt(Section, "UnicodeAmbiguousWidth", 1, FName);
+	ts->UnicodeAmbiguousWidth = GetPrivateProfileInt(Section, "UnicodeAmbiguousWidth", 0, FName);
 	if (ts->UnicodeAmbiguousWidth < 1 || 2 < ts->UnicodeAmbiguousWidth) {
-		ts->UnicodeAmbiguousWidth = 1;
+		ts->UnicodeAmbiguousWidth = GetDefaultUnicodeWidth();
 	}
 	ts->UnicodeEmojiOverride = (BYTE)GetOnOff(Section, "UnicodeEmojiOverride", FName, FALSE);
-	ts->UnicodeEmojiWidth = GetPrivateProfileInt(Section, "UnicodeEmojiWidth", 1, FName);
+	ts->UnicodeEmojiWidth = GetPrivateProfileInt(Section, "UnicodeEmojiWidth", 0, FName);
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
-		ts->UnicodeEmojiWidth = 1;
+		ts->UnicodeEmojiWidth = GetDefaultUnicodeWidth();
 	}
 
 	DispReadIni(FName, ts);
