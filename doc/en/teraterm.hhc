@@ -132,8 +132,90 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Tips">
 			<param name="Local" value="html\usage\tips\index.html">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
+		<UL>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Numeric keypad">
+				<param name="Local" value="html/usage/tips/about_tenkey.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Keypad mode">
+				<param name="Local" value="html/usage/tips/appkeypad.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Tips on B-Plus">
+				<param name="Local" value="html/usage/tips/b-plus.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Delimiter character of word selected by double-click">
+				<param name="Local" value="html/usage/tips/double-click.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Transfer the file via the intermediate server">
+				<param name="Local" value="html/usage/tips/forwarding-files.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Log and replay functions">
+				<param name="Local" value="html/usage/tips/loging_howto.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Named pipe">
+				<param name="Local" value="html/usage/tips/namedpipe.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Tips on TCP/IP connection with a port other than 23">
+				<param name="Local" value="html/usage/tips/not_port23.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="PF1-PF4 keys of VT100">
+				<param name="Local" value="html/usage/tips/pf1-pf4key_vt100.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Associate with TELNET protocol">
+				<param name="Local" value="html/usage/tips/telnet_protocol.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="How to configure Tera Term">
+				<param name="Local" value="html/usage/tips/teraterm_config_howto.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="User shortcut keys">
+				<param name="Local" value="html/usage/tips/user-shortcutkey.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Vim Control Sequence Example">
+				<param name="Local" value="html/usage/tips/vim.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Virtual Store">
+				<param name="Local" value="html/usage/tips/virtual_store.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Tips on XMODEM">
+				<param name="Local" value="html/usage/tips/xmodem.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Tips on ZMODEM">
+				<param name="Local" value="html/usage/tips/zmodem.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Additional plugins">
 			<param name="ImageNumber" value="1">

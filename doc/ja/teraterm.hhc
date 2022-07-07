@@ -136,8 +136,124 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ヒント">
 			<param name="Local" value="html\usage\tips\index.html">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
+		<UL>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="テンキー(数値キーパッド)について">
+				<param name="Local" value="html/usage/tips/about_tenkey.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="キーパッドモードについて">
+				<param name="Local" value="html/usage/tips/appkeypad.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="B-Plus のヒント">
+				<param name="Local" value="html/usage/tips/b-plus.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="ダブルクリックによる単語選択の区切り文字">
+				<param name="Local" value="html/usage/tips/double-click.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="中間ホストを経由してホストに接続した場合のファイル転送">
+				<param name="Local" value="html/usage/tips/forwarding-files.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="IMEのヒント">
+				<param name="Local" value="html/usage/tips/ime.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="正しくない &#34;Kanji-out&#34; を使用可能にする">
+				<param name="Local" value="html/usage/tips/incorrect-kanjiout.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="ログの取り方、ログの再生機能">
+				<param name="Local" value="html/usage/tips/loging_howto.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="名前付きパイプ">
+				<param name="Local" value="html/usage/tips/namedpipe.html">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="NIFTY-Serve のヒント">
+				<param name="Local" value="html/usage/tips/nifty-serve.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="C1 制御文字 ($80-$9F) を使用しない">
+				<param name="Local" value="html/usage/tips/not-c1-char.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="TCP/IP 接続で 23 以外の TCP port 番号を使用する場合の注意">
+				<param name="Local" value="html/usage/tips/not_port23.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="パソコン通信的接続法">
+				<param name="Local" value="html/usage/tips/pc-communication.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="PC-VAN のヒント">
+				<param name="Local" value="html/usage/tips/pc_van.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="VT100 の PF1-PF4 キー">
+				<param name="Local" value="html/usage/tips/pf1-pf4key_vt100.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Quick-VAN のヒント">
+				<param name="Local" value="html/usage/tips/quick_van.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="TELNET プロトコルに関連付ける">
+				<param name="Local" value="html/usage/tips/telnet_protocol.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Tera Term の設定法">
+				<param name="Local" value="html/usage/tips/teraterm_config_howto.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="ユーザー・ショートカット・キー">
+				<param name="Local" value="html/usage/tips/user-shortcutkey.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="vim からの制御シーケンスの使用例">
+				<param name="Local" value="html/usage/tips/vim.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Virtual Store">
+				<param name="Local" value="html/usage/tips/virtual_store.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="XMODEM のヒント">
+				<param name="Local" value="html/usage/tips/xmodem.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="ZMODEM のヒント">
+				<param name="Local" value="html/usage/tips/zmodem.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="追加プラグイン">
 			<param name="ImageNumber" value="1">
