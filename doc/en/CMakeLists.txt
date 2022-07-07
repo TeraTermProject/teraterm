@@ -69,6 +69,8 @@ endif()
 add_custom_command(
   OUTPUT ${BINARY_DIR}/teraterm.chm
   DEPENDS ${CMAKE_CURRENT_LIST_DIR}/Index.hhk
+  DEPENDS ${CMAKE_CURRENT_LIST_DIR}/teraterm.hhc
+  DEPENDS ${CMAKE_CURRENT_LIST_DIR}/teraterm.hhp
   DEPENDS ${CONVERTED_FILES}
   DEPENDS ${SRC}
   COMMAND ${CMAKE_COMMAND} -E rm -f ${BINARY_DIR}/teraterm.chm
