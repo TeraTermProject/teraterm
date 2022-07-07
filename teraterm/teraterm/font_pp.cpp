@@ -41,6 +41,7 @@
 #include "vtdisp.h"		// for DispSetupFontDlg()
 #include "buffer.h"
 #include "compat_win.h"	// for CF_INACTIVEFONTS
+#include "helpid.h"
 
 #include "font_pp.h"
 
@@ -213,10 +214,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 					break;
 				}
-				case PSN_HELP:
-					MessageBox(hWnd, "Tera Term", "not implimented",
-							   MB_OK | MB_ICONEXCLAMATION);
+				case PSN_HELP: {
+					HWND vtwin = GetParent(hWnd);
+					vtwin = GetParent(vtwin);
+					PostMessage(vtwin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalFont, 0);
 					break;
+				}
 				default:
 					break;
 			}
@@ -290,7 +293,7 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
-	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE /*| PSP_HASHELP */;
+	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
 	psp.pszTitle = L"font";		// TODO lng ƒtƒ@ƒCƒ‹‚É“ü‚ê‚é

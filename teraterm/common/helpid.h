@@ -159,6 +159,7 @@
 #define HlpMenuSetupAdditionalCoding        43020
 #define HlpMenuSetupAdditionalLog           43021
 #define HlpMenuSetupAdditionalVisual        43022
+#define HlpMenuSetupAdditionalFont          43023
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

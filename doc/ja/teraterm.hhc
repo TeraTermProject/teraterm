@@ -500,6 +500,11 @@
 					<param name="Local" value="html\menu\setup-additional-visual.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="font tab">
+					<param name="Local" value="html\menu\setup-additional-font.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Save setup">
