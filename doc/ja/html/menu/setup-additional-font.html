@@ -11,7 +11,67 @@
   <body>
     <h1>Additional settings / "Font" タブ ([Setup] メニュー)</h1>
 
-    refer to <a href="setup-additional-coding.html">coding tab help</a>
+    <dl>
+      <dt>ターミナルフォント</dt>
+      <dd>
+        VTWinのフォントを指定します。
+        <dl>
+          <dt>ANSI API</dt>
+          <dd>
+            ANSI(Unicodeではない)描画APIを使用します。<br>
+            UnicodeをANSIへ変換するためにコードページを指定する必要があります。
+            フォントによっては指定が必要かもしれません。<br>
+            通常は使用しません。
+          </dd>
+
+          <dt>Unicode API</dt>
+          <dd>
+            Unicodeを直接使用できる描画APIを使用します。<br>
+            通常はこちらを使用します。
+          </dd>
+
+          <dt id="FontQuality">Font quality</dt>
+          <dd>
+	          フォントの品質を設定することができます。OSが対応している種類のみ有効に動作します。
+<pre>
+Default         = OSの設定(スクリーン フォントの縁を滑らかにする)に依存
+Non-Antialiased = アンチエイリアスを無効にする
+Antialiased     = アンチエイリアスを有効にする
+ClearType       = ClearTypeを利用する
+</pre>
+          </dd>
+
+          <dt>文字間スペース</dt>
+          <dd>
+            工事中です。
+          </dd>
+        </dl>
+      </dd>
+
+      <dt>ダイアログフォント</dt>
+      <dd>ダイアログで使用するフォントを指定します
+        <dl>
+          <dt>デフォルト</dt>
+          <dd>
+            デフォルトのダイアログフォントを使用します。<br>
+            SystemParametersInfo(SPI_GETNONCLIENTMETRICS) を使用してOSからフォントを取得しています。
+          </dd>
+      </dd>
+
+      <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
+      <dd>
+        Windows 7以降には各フォントをフォント一覧に
+        表示するか非表示にするかを設定する機能が追加されました。
+        Tera Term のこの設定を有効にすると、
+        OS側で非表示に設定されたフォントも選択できるようになります。
+      </dd>
+
+      <dt>プロポーショナルフォントもフォントダイアログの一覧に表示する</dt>
+      <dd>
+        工事中、検討中です。
+      </dd>
+
+    </dl>
 
   </body>
 </html>

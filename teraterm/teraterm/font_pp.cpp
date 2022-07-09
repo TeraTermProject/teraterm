@@ -142,6 +142,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{0, "DLG_GEN_TITLE"},
+		{ IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
+		{ IDC_FONT_QUALITY_LABEL, "DLG_TAB_VISUAL_FONT_QUALITY" },
 	};
 	FontPPData *dlg_data = (FontPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
