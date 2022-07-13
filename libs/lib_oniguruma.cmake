@@ -14,8 +14,14 @@ set(ONIGURUMA_LIBRARY_DIRS ${ONIGURUMA_ROOT}/lib)
 if(MINGW)
   set(ONIGURUMA_LIB ${ONIGURUMA_LIBRARY_DIRS}/libonig.a)
 else()
-  set(ONIGURUMA_LIB
-    debug ${ONIGURUMA_LIBRARY_DIRS}/onigd.lib
-    optimized ${ONIGURUMA_LIBRARY_DIRS}/onig.lib
+  if(GENERATOR_IS_MULTI_CONFIG)
+    set(ONIGURUMA_LIB
+      debug ${ONIGURUMA_LIBRARY_DIRS}/onigd.lib
+      optimized ${ONIGURUMA_LIBRARY_DIRS}/onig.lib
     )
+  else()
+    set(ONIGURUMA_LIB
+      ${ONIGURUMA_LIBRARY_DIRS}/onig.lib
+    )
+  endif()
 endif()

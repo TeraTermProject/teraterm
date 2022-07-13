@@ -6,22 +6,19 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(LIBRESSL_ROOT "${LIBRESSL_ROOT}_x64")
 endif()
 
+set(LIBRESSL_INCLUDE_DIRS ${LIBRESSL_ROOT}/include)
 if(MINGW)
-  set(LIBRESSL_INCLUDE_DIRS
-    ${LIBRESSL_ROOT}/include
-    )
-
   set(LIBRESSL_LIB
     ${LIBRESSL_ROOT}/lib/libcrypto-47.a
     bcrypt
   )
 else()
-  set(LIBRESSL_INCLUDE_DIRS
-    ${LIBRESSL_ROOT}/include
+  if(GENERATOR_IS_MULTI_CONFIG)
+    set(LIBRESSL_LIB
+      debug ${LIBRESSL_ROOT}/lib/crypto-47d.lib
+      optimized ${LIBRESSL_ROOT}/lib/crypto-47.lib
     )
-
-  set(LIBRESSL_LIB
-    debug ${LIBRESSL_ROOT}/lib/crypto-47d.lib
-    optimized ${LIBRESSL_ROOT}/lib/crypto-47.lib
-    )
+  else()
+    set(LIBRESSL_LIB ${LIBRESSL_ROOT}/lib/crypto-47.lib)
+  endif()
 endif()

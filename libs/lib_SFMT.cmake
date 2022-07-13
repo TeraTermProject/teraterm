@@ -12,9 +12,12 @@ set(SFMT_LIBRARY_DIRS "${SFMT_ROOT}/lib")
 if(MINGW)
   set(SFMT_LIB ${SFMT_LIBRARY_DIRS}/libsfmt.a)
 else()
-  set(SFMT_LIB
-    optimized ${SFMT_LIBRARY_DIRS}/sfmt.lib
-    debug ${SFMT_LIBRARY_DIRS}/sfmtd.lib
-#    debug ${SFMT_LIBRARY_DIRS}/sfmt.lib
+  if(GENERATOR_IS_MULTI_CONFIG)
+    set(SFMT_LIB
+      optimized ${SFMT_LIBRARY_DIRS}/sfmt.lib
+      debug ${SFMT_LIBRARY_DIRS}/sfmtd.lib
     )
+  else()
+    set(SFMT_LIB ${SFMT_LIBRARY_DIRS}/sfmt.lib)
+  endif()
 endif()

@@ -13,8 +13,12 @@ if(MINGW)
     ${ZLIB_LIBRARY_DIRS}/libzlibstatic.a
     )
 else()
-  set(ZLIB_LIB
-    debug ${ZLIB_LIBRARY_DIRS}/zlibstaticd.lib
-    optimized ${ZLIB_LIBRARY_DIRS}/zlibstatic.lib
+  if(GENERATOR_IS_MULTI_CONFIG)
+    set(ZLIB_LIB
+      debug ${ZLIB_LIBRARY_DIRS}/zlibstaticd.lib
+      optimized ${ZLIB_LIBRARY_DIRS}/zlibstatic.lib
     )
+  else()
+    set(ZLIB_LIB ${ZLIB_LIBRARY_DIRS}/zlibstatic.lib)
+  endif()
 endif()
