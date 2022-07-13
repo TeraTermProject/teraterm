@@ -7,6 +7,9 @@
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -P buildall.cmake
 
+set(BUILD_OPENSSL1 OFF)
+set(BUILD_OPENSSL3 OFF)
+
 if("${CMAKE_GENERATOR}" STREQUAL "")
   message(FATAL_ERROR "set CMAKE_GENERATOR!")
 endif()
@@ -54,10 +57,18 @@ execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P SFMT.cmake
   )
 if(BUILD_SSL_LIBRARY)
-  message("openssl 1.1")
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl11.cmake
+  if(BUILD_OPENSSL1)
+    message("openssl 1.1")
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl11.cmake
     )
+  endif(BUILD_OPENSSL1)
+  if(BUILD_OPENSSL3)
+    message("openssl 3")
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl3.cmake
+    )
+  endif(BUILD_OPENSSL3)
 endif(BUILD_SSL_LIBRARY)
 message("cJSON")
 execute_process(
