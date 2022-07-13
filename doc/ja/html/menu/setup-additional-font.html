@@ -20,7 +20,7 @@
           <dd>
             ANSI(Unicodeではない)描画APIを使用します。<br>
             UnicodeをANSIへ変換するためにコードページを指定する必要があります。
-            フォントによっては指定が必要かもしれません。<br>
+            フォントによってはANSIで描画する必要かもしれません。<br>
             通常は使用しません。
           </dd>
 
@@ -43,7 +43,8 @@ ClearType       = ClearTypeを利用する
 
           <dt>文字間スペース</dt>
           <dd>
-            工事中です。
+            工事中です。<br>
+            <a href="../setup/teraterm-win.html#space">文字(行)間にすきまをあける</a>を参照ください。
           </dd>
         </dl>
       </dd>
@@ -51,11 +52,12 @@ ClearType       = ClearTypeを利用する
       <dt>ダイアログフォント</dt>
       <dd>ダイアログで使用するフォントを指定します
         <dl>
-          <dt>デフォルト</dt>
+          <dt>デフォルト ボタン</dt>
           <dd>
             デフォルトのダイアログフォントを使用します。<br>
-            SystemParametersInfo(SPI_GETNONCLIENTMETRICS) を使用してOSからフォントを取得しています。
+            SystemParametersInfo(SPI_GETNONCLIENTMETRICS) を使用してWindowsからフォントを取得しています。
           </dd>
+        </dl>
       </dd>
 
       <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>

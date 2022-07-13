@@ -9,66 +9,66 @@
   </head>
 
   <body>
-    <h1>Additional settings / "Font" タブ ([Setup] メニュー)</h1>
+    <h1>Additional settings / "Font" tab ([Setup] menu)</h1>
 
     <dl>
-      <dt>ターミナルフォント</dt>
+      <dt>terminal font</dt>
       <dd>
-        VTWinのフォントを指定します。
+        Specify VTWin font.
         <dl>
           <dt>ANSI API</dt>
           <dd>
-            ANSI(Unicodeではない)描画APIを使用します。<br>
-            UnicodeをANSIへ変換するためにコードページを指定する必要があります。
-            フォントによっては指定が必要かもしれません。<br>
-            通常は使用しません。
+            Use ANSI(not Unicode) Draw API.<br>
+            Codepage needs to convert Unicode to ANSI character.
+            Some fonts need to use ANSI Draw API.<br>
+            Normally not used.
           </dd>
 
           <dt>Unicode API</dt>
           <dd>
-            Unicodeを直接使用できる描画APIを使用します。<br>
-            通常はこちらを使用します。
+            User Unicode Draw API.<br>
+            Normally not used.
           </dd>
 
           <dt id="FontQuality">Font quality</dt>
           <dd>
-	          フォントの品質を設定することができます。OSが対応している種類のみ有効に動作します。
+	Specifies the font quality. This feature will work well only if the operating system supports.
 <pre>
-Default         = OSの設定(スクリーン フォントの縁を滑らかにする)に依存
-Non-Antialiased = アンチエイリアスを無効にする
-Antialiased     = アンチエイリアスを有効にする
-ClearType       = ClearTypeを利用する
+Default         = Dependent on OS configuration(Smooth edges of screen fonts).
+Non-Antialiased = Disable the anti-aliasing.
+Antialiased     = Enable the anti-aliasing.
+ClearType       = Use the ClearType.
 </pre>
           </dd>
 
-          <dt>文字間スペース</dt>
+          <dt>Character space</dt>
           <dd>
-            工事中です。
+            Under construction.<br>
+            see <a href="../setup/teraterm-win.html#space">Space between characters (lines)</a>.
           </dd>
         </dl>
       </dd>
 
-      <dt>ダイアログフォント</dt>
-      <dd>ダイアログで使用するフォントを指定します
+      <dt>Dialog font</dt>
+      <dd>Specify Dialog font.
         <dl>
-          <dt>デフォルト</dt>
+          <dt>default button</dt>
           <dd>
-            デフォルトのダイアログフォントを使用します。<br>
-            SystemParametersInfo(SPI_GETNONCLIENTMETRICS) を使用してOSからフォントを取得しています。
+            Set default font<br>
+            SystemParametersInfo(SPI_GETNONCLIENTMETRICS) API is used to get font from Windows.
           </dd>
+        </dl>
       </dd>
 
       <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
       <dd>
-        Windows 7以降には各フォントをフォント一覧に
-        表示するか非表示にするかを設定する機能が追加されました。
-        Tera Term のこの設定を有効にすると、
-        OS側で非表示に設定されたフォントも選択できるようになります。
+	A feature that some fonts can be shown or not on the font list is added on Windows 7 or later. 
+	When this setting is enabled, whole fonts can be selected on the Font setting dialog.
       </dd>
 
-      <dt>プロポーショナルフォントもフォントダイアログの一覧に表示する</dt>
+      <dt>List proportional font in font dialog</dt>
       <dd>
-        工事中、検討中です。
+        Under construction.
       </dd>
 
     </dl>
