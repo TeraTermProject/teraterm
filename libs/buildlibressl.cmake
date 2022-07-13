@@ -28,7 +28,7 @@ endif()
 # Configure + Generate
 function(cmake_generate GENERATOR SRC_DIR WORKING_DIR OPTIONS)
   execute_process(
-    COMMAND ${CMAKE_COMMAND} ${SRC_DIR} .. -G "${GENERATOR}" ${OPTIONS}
+    COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G "${GENERATOR}" ${OPTIONS}
     WORKING_DIRECTORY "${BUILD_DIR}"
     ENCODING AUTO
     RESULT_VARIABLE rv
@@ -124,7 +124,7 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
     cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
 
     if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-      set(APPEND BUILD_TOOL_OPTIONS "-j")
+      list(APPEND BUILD_TOOL_OPTIONS "-j")
     endif()
 
     unset(BUILD_OPTIONS)
