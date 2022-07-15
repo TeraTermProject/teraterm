@@ -62,6 +62,7 @@ TTCPropSheetDlg::TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd, const wch
 	m_psh.pfnCallback = PropSheetProc;
 	m_Page = NULL;
 	m_PageCount = 0;
+	m_StartPage = 0;
 	m_TreeView = m_TreeViewInit;
 }
 
@@ -101,6 +102,11 @@ void TTCPropSheetDlg::SetCaption(const wchar_t* caption)
 	m_psh.pszCaption = _wcsdup(caption);
 }
 
+void TTCPropSheetDlg::SetStartPage(int start)
+{
+	m_StartPage = start;
+}
+
 INT_PTR TTCPropSheetDlg::DoModal()
 {
 	INT_PTR result;
@@ -111,6 +117,7 @@ INT_PTR TTCPropSheetDlg::DoModal()
 	}
 	m_psh.nPages = m_PageCount;
 	m_psh.phpage = hPsp;
+	m_psh.nStartPage = m_StartPage;
 	gTTCPS = this;
 	result = PropertySheetW(&m_psh);
 	free(hPsp);

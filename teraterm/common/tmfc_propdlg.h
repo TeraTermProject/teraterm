@@ -40,12 +40,14 @@ public:
 	void AddPage(HPROPSHEETPAGE page, const wchar_t *path = NULL);
 	void SetCaption(const wchar_t *caption);
 	static void SetTreeViewMode(BOOL enable);
+	void SetStartPage(int start);
 
 private:
 	HWND m_hWnd;
 	HWND m_hParentWnd;
 	HINSTANCE m_hInst;
 	wchar_t *m_UiLanguageFile;
+	int m_StartPage;
 
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
 	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
