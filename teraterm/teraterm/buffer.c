@@ -1581,7 +1581,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 	LONG TmpPtr;
 	int x, y;
 
-	str_size = NumOfColumns * (ey - sy + 1);
+	str_size = (NumOfColumns + 2) * (ey - sy + 1);
 	str_w = malloc(sizeof(wchar_t) * str_size);
 
 	LockBuffer();
@@ -1602,14 +1602,24 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 		else {
 			// 行選択
 			IStart = (y == sy) ? sx : 0;
-			IEnd = (y == ey) ? ex - 1 : NumOfColumns - 1;
-
-			// 次の行に続いてる?
 			LineContinued = FALSE;
-			if (ts.EnableContinuedLineCopy && y!= ey) {
-				LONG NextTmpPtr = NextLinePtr(TmpPtr);
-				if ((CodeBuffW[NextTmpPtr].attr & AttrLineContinued) != 0) {
-					LineContinued = TRUE;
+			if (y == ey) {
+				// 1行選択時、又は
+				// 複数行選択時の最後の行
+				IEnd = ex - 1;
+			}
+			else {
+				// 複数行選択時の途中の行
+				// 行末まで選択されている
+				IEnd = NumOfColumns - 1;
+
+				// 継続行コピー設定
+				if (ts.EnableContinuedLineCopy) {
+					LONG NextTmpPtr = NextLinePtr(TmpPtr);
+					if ((CodeBuffW[NextTmpPtr].attr & AttrLineContinued) != 0) {
+						// 次の行に継続している
+						LineContinued = TRUE;
+					}
 				}
 			}
 		}
@@ -1617,12 +1627,12 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 		// 不要スペースを調べる
 		//   IEnd=コピーが必要な最後の位置
 		if (!LineContinued) {
+			// 次の行に継続していないなら、スペースを削除する
 			while (IEnd >= IStart) {
 				// コピー不要な" "(0x20)を削除
 				const buff_char_t *b = &CodeBuffW[TmpPtr + IEnd];
 				if (b->u32 != 0x20) {
 					// スペース以外だった
-					IEnd++;
 					break;
 				}
 				if (IEnd == 0) {
@@ -1634,9 +1644,8 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 		}
 
 		// 1ライン文字列をコピーする
-		//   IEnd=コピーが必要な最後の位置+1
 		x = IStart;
-		while (x < IEnd) {
+		while (x <= IEnd) {
 			const buff_char_t *b = &CodeBuffW[TmpPtr + x];
 			if (b->u32 != 0) {
 				str_w[k++] = b->wc2[0];
