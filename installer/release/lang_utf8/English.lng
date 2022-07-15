@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-04-23)
+﻿; Updated by TeraTerm Project (2022-07-15)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -175,6 +175,7 @@ DLG_TABSHEET_TITLE_COPYPASTE=Copy and Paste
 DLG_TABSHEET_TITLE_VISUAL=Visual
 DLG_TABSHEET_TITLE_LOG=Log
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+DLG_TABSHEET_TITLE_FONT=Font
 
 DLG_TAB_GENERAL_CLICKURL=&Enable clickable URL
 DLG_TAB_GENERAL_DISABLESENDBREAK=Disable accelerator &send break
@@ -262,6 +263,15 @@ DLG_TAB_LOG_ROTATESTEP=&Rotate
 
 
 DLG_TAB_CYGWIN_PATH=Cygwin install &path
+
+DLG_TAB_FONT_VTWINFONT=&VTWindow Font
+DLG_TAB_FONT_BTN_SELECT=&Select...
+DLG_TAB_FONT_VTFONT_TITLE=API for drawing
+DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_BTN_DEFAULT=D&efault
+DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
+DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog"
+DLG_TAB_FONT_CHARACTER_SPACE=character space
 
 DLG_COMMENT_TITLE=Comment to Log
 

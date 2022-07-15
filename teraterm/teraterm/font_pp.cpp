@@ -115,8 +115,8 @@ static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 
 static void EnableCodePage(HWND hWnd, BOOL enable)
 {
-	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_PAGECODE_LABEL), enable);
-	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_PAGECODE_EDIT), enable);
+	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_LABEL), enable);
+	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_EDIT), enable);
 }
 
 static void SetFontString(HWND hWnd, int item, const LOGFONTA *logfont)
@@ -141,9 +141,17 @@ static void SetVTFontString(HWND hWnd, int item, const TTTSet *ts)
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{0, "DLG_GEN_TITLE"},
-		{ IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
+		{ IDC_VTWINFONT, "DLG_TAB_FONT_VTWINFONT" },
+		{ IDC_VTFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
+		{ IDC_VTFONT_TITLE, "DLG_TAB_FONT_VTFONT_TITLE" },
+		{ IDC_VTFONT_CODEPAGE_LABEL, "DLG_TAB_FONT_CODEPAGE_LABEL" },
 		{ IDC_FONT_QUALITY_LABEL, "DLG_TAB_VISUAL_FONT_QUALITY" },
+		{ IDC_DLGFONT, "DLG_TAB_FONT_DLGFONT"},
+		{ IDC_DLGFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
+		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
+		{ IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
+		{ IDC_LIST_PRO_FONTS, "DLG_TAB_FONT_LIST_PRO_FONTS" },
+		{ IDC_CHARACTER_SPACE_TITLE, "DLG_TAB_FONT_CHARACTER_SPACE" },
 	};
 	FontPPData *dlg_data = (FontPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
@@ -162,7 +170,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			CheckDlgButton(hWnd,
 						   UnicodeDebugParam.UseUnicodeApi ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
 						   BST_CHECKED);
-			SetDlgItemInt(hWnd, IDC_VTFONT_PAGECODE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
+			SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
 			EnableCodePage(hWnd, UnicodeDebugParam.UseUnicodeApi ? FALSE : TRUE);
 
 			CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS, ts->ListHiddenFonts);
@@ -199,7 +207,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					UnicodeDebugParam.UseUnicodeApi =
 						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
 					UnicodeDebugParam.CodePageForANSIDraw =
-						GetDlgItemInt(hWnd, IDC_VTFONT_PAGECODE_EDIT, NULL, FALSE);
+						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
 					// ANSI表示用のコードページを設定する
 					BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
@@ -237,7 +245,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 			case IDC_VTFONT_CHOOSE | (BN_CLICKED << 16): {
 				DispSetupFontDlg();
-				SetDlgItemInt(hWnd, IDC_VTFONT_PAGECODE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
+				SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
 				SetVTFontString(hWnd, IDC_VTFONT_EDIT, ts);
 				break;
 			}
@@ -298,7 +306,10 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	psp.pszTitle = L"font";		// TODO lng ファイルに入れる
+	wchar_t *UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_FONT",
+				 L"Font", pts->UILanguageFileW, &UIMsg);
+	psp.pszTitle = UIMsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
@@ -310,5 +321,6 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.lParam = (LPARAM)Param;
 
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	free(UIMsg);
 	return hpsp;
 }

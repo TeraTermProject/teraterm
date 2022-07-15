@@ -13,11 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
+// 英語 (米国) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -52,28 +52,28 @@ END
 
 IDD_TABSHEET_FONT DIALOGEX 0, 0, 309, 267
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CAPTION | WS_SYSMENU
-CAPTION "表示/フォント"
+CAPTION "font"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "ターミナルフォント",IDC_STATIC,7,7,115,8
+    LTEXT           "&VTWindow Font",IDC_VTWINFONT,7,7,115,8
     EDITTEXT        IDC_VTFONT_EDIT,19,27,148,12,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "変更",IDC_VTFONT_CHOOSE,177,27,50,14
-    LTEXT           "文字描画で使用するAPI",IDC_STATIC,19,50,123,8
-    CONTROL         "ANSI API",IDC_VTFONT_ANSI,"Button",BS_AUTORADIOBUTTON,31,66,88,10
-    CONTROL         "Unicode API",IDC_VTFONT_UNICODE,"Button",BS_AUTORADIOBUTTON,31,110,93,10
-    LTEXT           "表示用文字変換コードページ",IDC_VTFONT_PAGECODE_LABEL,43,81,131,8
-    EDITTEXT        IDC_VTFONT_PAGECODE_EDIT,44,92,40,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Select...",IDC_VTFONT_CHOOSE,177,26,50,14
+    LTEXT           "API for drawing",IDC_VTFONT_TITLE,19,50,123,8
+    CONTROL         "&Unicode API",IDC_VTFONT_UNICODE,"Button",BS_AUTORADIOBUTTON,31,64,93,10
+    CONTROL         "&ANSI API",IDC_VTFONT_ANSI,"Button",BS_AUTORADIOBUTTON,31,82,88,10
+    LTEXT           "&Code page for display character conversion",IDC_VTFONT_CODEPAGE_LABEL,43,97,131,8
+    EDITTEXT        IDC_VTFONT_CODEPAGE_EDIT,44,108,40,12,ES_AUTOHSCROLL
     LTEXT           "&Font Quality",IDC_FONT_QUALITY_LABEL,19,129,91,8
     COMBOBOX        IDC_FONT_QUALITY,30,141,87,69,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "ダイアログフォント",IDC_STATIC,7,162,115,8
-    EDITTEXT        IDC_DLGFONT_EDIT,19,175,148,12,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "変更",IDC_DLGFONT_CHOOSE,177,175,50,14
-    PUSHBUTTON      "デフォルト",IDC_DLGFONT_DEFAULT,231,175,50,14
+    LTEXT           "&Dialog font",IDC_DLGFONT,7,162,115,8
+    EDITTEXT        IDC_DLGFONT_EDIT,19,177,148,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Select...",IDC_DLGFONT_CHOOSE,177,176,50,14
+    PUSHBUTTON      "&default",IDC_DLGFONT_DEFAULT,231,176,50,14
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,194,234,10
-    CONTROL         "プロポーショナルフォントもフォントダイアログの一覧に表示する",IDC_LIST_PRO_FONTS,
+    CONTROL         "List &proportional fonts in font dialog",IDC_LIST_PRO_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,209,240,10
-    LTEXT           "文字間スペース",IDC_STATIC,187,51,115,8,WS_DISABLED
+    LTEXT           "character space",IDC_CHARACTER_SPACE_TITLE,187,51,115,8,WS_DISABLED
     EDITTEXT        IDC_SPACE_TOP,224,68,40,14,ES_AUTOHSCROLL | WS_DISABLED
     EDITTEXT        IDC_SPACE_BOTTOM,224,87,40,14,ES_AUTOHSCROLL | WS_DISABLED
     EDITTEXT        IDC_SPACE_LEFT,224,105,40,14,ES_AUTOHSCROLL | WS_DISABLED
@@ -95,6 +95,8 @@ BEGIN
         RIGHTMARGIN, 302
         TOPMARGIN, 7
         BOTTOMMARGIN, 260
+        HORZGUIDE, 33
+        HORZGUIDE, 183
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -110,7 +112,7 @@ BEGIN
     0
 END
 
-#endif    // 日本語 (日本) resources
+#endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
