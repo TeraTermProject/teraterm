@@ -1624,15 +1624,19 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 			}
 		}
 
-		// 不要スペースを調べる
-		//   IEnd=コピーが必要な最後の位置
-		if (!LineContinued) {
+		// IEnd=コピーが必要な最後の位置
+		if (LineContinued) {
+			// 行の一番最後までコピーする
+			IEnd++;
+		}
+		else {
 			// 次の行に継続していないなら、スペースを削除する
 			while (IEnd >= IStart) {
 				// コピー不要な" "(0x20)を削除
 				const buff_char_t *b = &CodeBuffW[TmpPtr + IEnd];
 				if (b->u32 != 0x20) {
 					// スペース以外だった
+					IEnd++;
 					break;
 				}
 				if (IEnd == 0) {
@@ -1644,8 +1648,9 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 		}
 
 		// 1ライン文字列をコピーする
+		//   IEnd=コピーが必要な最後の位置+1
 		x = IStart;
-		while (x <= IEnd) {
+		while (x < IEnd) {
 			const buff_char_t *b = &CodeBuffW[TmpPtr + x];
 			if (b->u32 != 0) {
 				str_w[k++] = b->wc2[0];
