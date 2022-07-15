@@ -1765,3 +1765,9 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 		delete m_Page[i];
 	}
 }
+
+void CAddSettingPropSheetDlg::SetStartPage(Page page)
+{
+	int start_page = page == DefaultPage ? 0: 7;
+	TTCPropSheetDlg::SetStartPage(start_page);
+}

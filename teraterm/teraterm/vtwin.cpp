@@ -4207,18 +4207,16 @@ void CVTWindow::OnEditCancelSelection()
 	ChangeSelectRegion();
 }
 
-// Additional settings dialog
-//
-// (2004.9.5 yutaka) new added
-// (2005.2.22 yutaka) changed to Tab Control
-// (2008.5.12 maya) changed to PropertySheet
-void CVTWindow::OnExternalSetup()
+void CVTWindow::OpenExternalSetup(int page)
 {
+	CAddSettingPropSheetDlg::Page additional_page =
+		page == 0 ? CAddSettingPropSheetDlg::DefaultPage : CAddSettingPropSheetDlg::FontPage;
 	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg::SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
+	CAddSetting.SetStartPage(additional_page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
 #ifdef ALPHABLEND_TYPE2
@@ -4237,6 +4235,16 @@ void CVTWindow::OnExternalSetup()
 		// コーディングタブで設定が変化したときコールする必要がある
 		SetupTerm();
 	}
+}
+
+// Additional settings dialog
+//
+// (2004.9.5 yutaka) new added
+// (2005.2.22 yutaka) changed to Tab Control
+// (2008.5.12 maya) changed to PropertySheet
+void CVTWindow::OnExternalSetup()
+{
+	OpenExternalSetup(0);
 }
 
 void CVTWindow::OnSetupTerminal()
@@ -4314,10 +4322,15 @@ void CVTWindow::OnSetupWindow()
 
 void CVTWindow::OnSetupFont()
 {
-	HelpId = HlpSetupFont;
-	DispSetupFontDlg();
-	// ANSI表示用のコードページを設定する
-	BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
+	if (ts.ExperimentalDontUseFontDialog) {
+		OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
+	}
+	else {
+		HelpId = HlpSetupFont;
+		DispSetupFontDlg();
+		// ANSI表示用のコードページを設定する
+		BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
+	}
 }
 
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -4337,42 +4350,47 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 
 void CVTWindow::OnSetupDlgFont()
 {
-	LOGFONTA LogFont;
-	CHOOSEFONTA cf;
-	BOOL result;
-
-	// LOGFONT準備
-	memset(&LogFont, 0, sizeof(LogFont));
-	strncpy_s(LogFont.lfFaceName, sizeof(LogFont.lfFaceName), ts.DialogFontName,  _TRUNCATE);
-	LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, ts.DialogFontPoint);
-	LogFont.lfCharSet = ts.DialogFontCharSet;
-	if (LogFont.lfFaceName[0] == 0) {
-		GetMessageboxFont(&LogFont);
+	if (ts.ExperimentalDontUseFontDialog) {
+		OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
 	}
+	else {
+		LOGFONTA LogFont;
+		CHOOSEFONTA cf;
+		BOOL result;
 
-	// ダイアログ表示
-	memset(&cf, 0, sizeof(cf));
-	cf.lStructSize = sizeof(cf);
-	cf.hwndOwner = HVTWin;
-	cf.lpLogFont = &LogFont;
-	cf.Flags =
-		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-		CF_SHOWHELP | CF_NOVERTFONTS |
-		CF_ENABLEHOOK;
-	if (IsWindows7OrLater() && ts.ListHiddenFonts) {
-		cf.Flags |= CF_INACTIVEFONTS;
-	}
-	cf.lpfnHook = TFontHook;
-	cf.nFontType = REGULAR_FONTTYPE;
-	cf.hInstance = m_hInst;
-	HelpId = HlpSetupFont;
-	result = ChooseFontA(&cf);
+		// LOGFONT準備
+		memset(&LogFont, 0, sizeof(LogFont));
+		strncpy_s(LogFont.lfFaceName, sizeof(LogFont.lfFaceName), ts.DialogFontName,  _TRUNCATE);
+		LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, ts.DialogFontPoint);
+		LogFont.lfCharSet = ts.DialogFontCharSet;
+		if (LogFont.lfFaceName[0] == 0) {
+			GetMessageboxFont(&LogFont);
+		}
 
-	if (result) {
-		// 設定
-		strncpy_s(ts.DialogFontName, sizeof(ts.DialogFontName), LogFont.lfFaceName, _TRUNCATE);
-		ts.DialogFontPoint = cf.iPointSize / 10;
-		ts.DialogFontCharSet = LogFont.lfCharSet;
+		// ダイアログ表示
+		memset(&cf, 0, sizeof(cf));
+		cf.lStructSize = sizeof(cf);
+		cf.hwndOwner = HVTWin;
+		cf.lpLogFont = &LogFont;
+		cf.Flags =
+			CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
+			CF_SHOWHELP | CF_NOVERTFONTS |
+			CF_ENABLEHOOK;
+		if (IsWindows7OrLater() && ts.ListHiddenFonts) {
+			cf.Flags |= CF_INACTIVEFONTS;
+		}
+		cf.lpfnHook = TFontHook;
+		cf.nFontType = REGULAR_FONTTYPE;
+		cf.hInstance = m_hInst;
+		HelpId = HlpSetupFont;
+		result = ChooseFontA(&cf);
+
+		if (result) {
+			// 設定
+			strncpy_s(ts.DialogFontName, sizeof(ts.DialogFontName), LogFont.lfFaceName, _TRUNCATE);
+			ts.DialogFontPoint = cf.iPointSize / 10;
+			ts.DialogFontCharSet = LogFont.lfCharSet;
+		}
 	}
 }
 

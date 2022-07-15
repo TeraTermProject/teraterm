@@ -135,8 +135,14 @@ class CAddSettingPropSheetDlg: public TTCPropSheetDlg
 public:
 	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
 	~CAddSettingPropSheetDlg();
+	enum Page {
+		DefaultPage,
+		FontPage,
+	};
+	void SetStartPage(Page page);
 
 private:
 	int m_PageCountCPP;
 	TTCPropertyPage *m_Page[7];
+	Page m_StartPage;
 };
