@@ -341,7 +341,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		UnicodeDebugParam.CodePopupKey1 = VK_CONTROL;
 		UnicodeDebugParam.CodePopupKey2 = VK_CONTROL;
 		UnicodeDebugParam.UseUnicodeApi = FALSE;
-        UnicodeDebugParam.CodePageForANSIDraw = 932;
+        UnicodeDebugParam.CodePageForANSIDraw = GetACP();
 	}
 
 	/* Initialize scroll buffer */
