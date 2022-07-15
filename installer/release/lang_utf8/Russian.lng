@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-04-23)
+﻿; Updated by TeraTerm Project (2022-07-15)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -176,6 +176,7 @@ DLG_TABSHEET_TITLE_COPYPASTE=Правка
 DLG_TABSHEET_TITLE_VISUAL=Экран
 DLG_TABSHEET_TITLE_LOG=Лог
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+DLG_TABSHEET_TITLE_FONT=Font
 
 DLG_TAB_GENERAL_CLICKURL=&Запуск URL одним кликом
 DLG_TAB_GENERAL_DISABLESENDBREAK=&Отключить ускоритель и послать останов
@@ -263,6 +264,15 @@ DLG_TAB_LOG_ROTATESTEP=&Ротация
 
 
 DLG_TAB_CYGWIN_PATH=&Путь инсталляции Cygwin
+
+DLG_TAB_FONT_VTWINFONT=&VTWindow Font
+DLG_TAB_FONT_BTN_SELECT=&Select...
+DLG_TAB_FONT_VTFONT_TITLE=API for drawing
+DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_BTN_DEFAULT=D&efault
+DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
+DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog"
+DLG_TAB_FONT_CHARACTER_SPACE=character space
 
 DLG_COMMENT_TITLE=Комментарии к логу
 

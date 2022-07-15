@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-04-23)
+﻿; Updated by TeraTerm Project (2022-07-15)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -176,6 +176,7 @@ DLG_TABSHEET_TITLE_COPYPASTE=复制和粘贴
 DLG_TABSHEET_TITLE_VISUAL=显示
 DLG_TABSHEET_TITLE_LOG=日志
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+DLG_TABSHEET_TITLE_FONT=Font
 
 DLG_TAB_GENERAL_CLICKURL=启用链接可点击(&E)
 DLG_TAB_GENERAL_DISABLESENDBREAK=禁止加速器发送中断(&S)
@@ -263,6 +264,15 @@ DLG_TAB_LOG_ROTATESTEP=轮(&R)
 
 
 DLG_TAB_CYGWIN_PATH=Cygwin 安装路径(&P)
+
+DLG_TAB_FONT_VTWINFONT=&VTWindow Font
+DLG_TAB_FONT_BTN_SELECT=&Select...
+DLG_TAB_FONT_VTFONT_TITLE=API for drawing
+DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_BTN_DEFAULT=D&efault
+DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
+DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog"
+DLG_TAB_FONT_CHARACTER_SPACE=character space
 
 DLG_COMMENT_TITLE=添加注释到日志
 

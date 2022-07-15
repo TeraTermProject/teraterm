@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-04-23)
+﻿; Updated by TeraTerm Project (2022-07-15)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -176,6 +176,7 @@ DLG_TABSHEET_TITLE_COPYPASTE=Copier Coller
 DLG_TABSHEET_TITLE_VISUAL=Apparence
 DLG_TABSHEET_TITLE_LOG=Journal
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+DLG_TABSHEET_TITLE_FONT=Font
 
 DLG_TAB_GENERAL_CLICKURL=&Autoriser URL cliquable
 DLG_TAB_GENERAL_DISABLESENDBREAK=Dévalider accélération envoi de break
@@ -263,6 +264,15 @@ DLG_TAB_LOG_ROTATESTEP=&Rotate
 
 
 DLG_TAB_CYGWIN_PATH=Répertoire d'install. de Cygwin
+
+DLG_TAB_FONT_VTWINFONT=&VTWindow Font
+DLG_TAB_FONT_BTN_SELECT=&Select...
+DLG_TAB_FONT_VTFONT_TITLE=API for drawing
+DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_BTN_DEFAULT=D&efault
+DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
+DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog"
+DLG_TAB_FONT_CHARACTER_SPACE=character space
 
 DLG_COMMENT_TITLE=Ajouter commentaire au journal
 

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-04-23)
+﻿; Updated by TeraTerm Project (2022-07-15)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -176,6 +176,7 @@ DLG_TABSHEET_TITLE_COPYPASTE=복사 및 붙여넣기
 DLG_TABSHEET_TITLE_VISUAL=보이기
 DLG_TABSHEET_TITLE_LOG=로그
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+DLG_TABSHEET_TITLE_FONT=Font
 
 DLG_TAB_GENERAL_CLICKURL=클릭가능한 URL 활성화(&E)
 DLG_TAB_GENERAL_DISABLESENDBREAK=Send break 가속을 비활성화합니다(&S)
@@ -263,6 +264,15 @@ DLG_TAB_LOG_ROTATESTEP=순환(&R)
 
 
 DLG_TAB_CYGWIN_PATH=Cygwin 설치 경로(&P)
+
+DLG_TAB_FONT_VTWINFONT=&VTWindow Font
+DLG_TAB_FONT_BTN_SELECT=&Select...
+DLG_TAB_FONT_VTFONT_TITLE=API for drawing
+DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_BTN_DEFAULT=D&efault
+DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
+DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog"
+DLG_TAB_FONT_CHARACTER_SPACE=character space
 
 DLG_COMMENT_TITLE=로그 주석
 
