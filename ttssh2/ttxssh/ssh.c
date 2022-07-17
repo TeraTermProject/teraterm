@@ -6681,20 +6681,17 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	// ペイロードの構築
 	username = pvar->auth_state.user;  // ユーザ名
 	buffer_put_string(msg, username, strlen(username));
+	buffer_put_string(msg, connect_id, strlen(connect_id));
 
 	if (!pvar->tryed_ssh2_authlist) { // "none"メソッドの送信
 		// 認証リストをサーバから取得する。
 		// SSH2_MSG_USERAUTH_FAILUREが返るが、サーバにはログは残らない。
 		// (2007.4.27 yutaka)
-		s = connect_id;
-		buffer_put_string(msg, s, strlen(s));
 		s = "none";  // method name
 		buffer_put_string(msg, s, strlen(s));
 
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) { // パスワード認証
 		// password authentication method
-		s = connect_id;
-		buffer_put_string(msg, s, strlen(s));
 		s = "password";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 0); // 0
@@ -6707,9 +6704,6 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		buffer_put_string(msg, s, strlen(s));
 
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) { // keyboard-interactive (2005.3.12 yutaka)
-		//s = "ssh-userauth";  // service name
-		s = connect_id;
-		buffer_put_string(msg, s, strlen(s));
 		s = "keyboard-interactive";  // method name
 		buffer_put_string(msg, s, strlen(s));
 		s = "";  // language tag
@@ -6760,8 +6754,6 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		}
 
 		// step3
-		s = connect_id;
-		buffer_put_string(msg, s, strlen(s));
 		s = "publickey";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 1); // true
@@ -6771,7 +6763,6 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		buffer_append_length(msg, s, bloblen);
 		buffer_append_length(msg, signature, siglen);
 
-
 		buffer_free(blob);
 		buffer_free(signbuf);
 		free(signature);
@@ -6779,8 +6770,6 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) { // Pageant
 		unsigned char *puttykey;
 
-		s = connect_id;
-		buffer_put_string(msg, s, strlen(s));
 		s = "publickey";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 0); // false
@@ -7724,7 +7713,6 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return FALSE;
 	}
