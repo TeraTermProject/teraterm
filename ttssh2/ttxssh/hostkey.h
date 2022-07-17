@@ -58,6 +58,12 @@ typedef enum {
 	KEY_ALGO_UNSPEC,
 	KEY_ALGO_MAX = KEY_ALGO_UNSPEC,
 } ssh_keyalgo;
+
+typedef enum {
+	SSH_AGENT_SIGN_DEFAULT = 0,
+	SSH_AGENT_RSA_SHA2_256 = 2,
+	SSH_AGENT_RSA_SHA2_512 = 4,
+} ssh_agentflag;
 #define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ED25519)
 
 // fingerprint‚ÌŽí•Ê
@@ -94,6 +100,7 @@ char *get_ssh2_hostkey_type_name_from_key(Key *key);
 ssh_keyalgo get_ssh2_hostkey_algorithm_from_name(const char *name);
 char* get_ssh2_hostkey_algorithm_name(ssh_keyalgo algo);
 int get_ssh2_key_hashtype(ssh_keyalgo algo);
+int get_ssh2_agent_flag(ssh_keyalgo algo);
 ssh_keytype get_ssh2_hostkey_type_from_algorithm(ssh_keyalgo algo);
 const char* get_ssh2_hostkey_type_name_from_algorithm(ssh_keyalgo algo);
 char* get_digest_algorithm_name(digest_algorithm id);

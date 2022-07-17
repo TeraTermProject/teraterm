@@ -35,21 +35,22 @@ struct ssh2_host_key_t {
 	ssh_keyalgo algo;
 	ssh_keytype type;
 	int digest_type;
+	ssh_agentflag signflag;
 	char *name;
 };
 
 static const struct ssh2_host_key_t ssh2_host_key[] = {
-	{KEY_ALGO_RSA1,     KEY_RSA1,     NID_sha1,   "ssh-rsa1"},            // for SSH1 only
-	{KEY_ALGO_RSA,      KEY_RSA,      NID_sha1,   "ssh-rsa"},             // RFC4253
-	{KEY_ALGO_DSA,      KEY_DSA,      NID_sha1,   "ssh-dss"},             // RFC4253
-	{KEY_ALGO_ECDSA256, KEY_ECDSA256, NID_sha256, "ecdsa-sha2-nistp256"}, // RFC5656
-	{KEY_ALGO_ECDSA384, KEY_ECDSA384, NID_sha384, "ecdsa-sha2-nistp384"}, // RFC5656
-	{KEY_ALGO_ECDSA521, KEY_ECDSA521, NID_sha512, "ecdsa-sha2-nistp521"}, // RFC5656
-	{KEY_ALGO_ED25519,  KEY_ED25519,  NID_sha512, "ssh-ed25519"},         // RDC8709
-	{KEY_ALGO_RSASHA256,KEY_RSA,      NID_sha256, "rsa-sha2-256"},        // RFC8332
-	{KEY_ALGO_RSASHA512,KEY_RSA,      NID_sha512, "rsa-sha2-512"},        // RFC8332
-	{KEY_ALGO_UNSPEC,   KEY_UNSPEC,   NID_undef,  "ssh-unknown"},
-	{KEY_ALGO_NONE,     KEY_NONE,     NID_undef,  NULL},
+	{KEY_ALGO_RSA1,     KEY_RSA1,     NID_sha1,   SSH_AGENT_SIGN_DEFAULT, "ssh-rsa1"},            // for SSH1 only
+	{KEY_ALGO_RSA,      KEY_RSA,      NID_sha1,   SSH_AGENT_SIGN_DEFAULT, "ssh-rsa"},             // RFC4253
+	{KEY_ALGO_DSA,      KEY_DSA,      NID_sha1,   SSH_AGENT_SIGN_DEFAULT, "ssh-dss"},             // RFC4253
+	{KEY_ALGO_ECDSA256, KEY_ECDSA256, NID_sha256, SSH_AGENT_SIGN_DEFAULT, "ecdsa-sha2-nistp256"}, // RFC5656
+	{KEY_ALGO_ECDSA384, KEY_ECDSA384, NID_sha384, SSH_AGENT_SIGN_DEFAULT, "ecdsa-sha2-nistp384"}, // RFC5656
+	{KEY_ALGO_ECDSA521, KEY_ECDSA521, NID_sha512, SSH_AGENT_SIGN_DEFAULT, "ecdsa-sha2-nistp521"}, // RFC5656
+	{KEY_ALGO_ED25519,  KEY_ED25519,  NID_sha512, SSH_AGENT_SIGN_DEFAULT, "ssh-ed25519"},         // RDC8709
+	{KEY_ALGO_RSASHA256,KEY_RSA,      NID_sha256, SSH_AGENT_RSA_SHA2_256, "rsa-sha2-256"},        // RFC8332
+	{KEY_ALGO_RSASHA512,KEY_RSA,      NID_sha512, SSH_AGENT_RSA_SHA2_512, "rsa-sha2-512"},        // RFC8332
+	{KEY_ALGO_UNSPEC,   KEY_UNSPEC,   NID_undef,  SSH_AGENT_SIGN_DEFAULT, "ssh-unknown"},
+	{KEY_ALGO_NONE,     KEY_NONE,     NID_undef,  SSH_AGENT_SIGN_DEFAULT, NULL},
 };
 
 struct ssh_digest_t {
@@ -156,6 +157,21 @@ int get_ssh2_key_hashtype(ssh_keyalgo algo)
 
 	// not found.
 	return NID_sha1;
+}
+
+int get_ssh2_agent_flag(ssh_keyalgo algo)
+{
+	const struct ssh2_host_key_t *ptr = ssh2_host_key;
+
+	while (ptr->name != NULL) {
+		if (algo == ptr->algo) {
+			return ptr->signflag;
+		}
+		ptr++;
+	}
+
+	// not found.
+	return SSH_AGENT_SIGN_DEFAULT;
 }
 
 ssh_keytype get_ssh2_hostkey_type_from_algorithm(ssh_keyalgo algo)

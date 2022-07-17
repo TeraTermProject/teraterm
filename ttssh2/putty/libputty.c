@@ -130,7 +130,8 @@ int putty_get_ssh2_keylist(unsigned char **keylist)
 void *putty_sign_ssh2_key(unsigned char *pubkey /* length(4byte) + data */,
                           unsigned char *data,
                           int datalen,
-                          int *outlen)
+                          int *outlen,
+                          int signflags)
 {
 	void *ret;
 
@@ -139,7 +140,6 @@ void *putty_sign_ssh2_key(unsigned char *pubkey /* length(4byte) + data */,
 	int response_len;
 	int pubkeylen;
 	strbuf *agentreq = strbuf_new_for_agent_query();
-	int signflags = 0;
 
 	put_byte(agentreq, SSH2_AGENTC_SIGN_REQUEST);
 	pubkeylen = GET_32BIT_MSB_FIRST(pubkey);

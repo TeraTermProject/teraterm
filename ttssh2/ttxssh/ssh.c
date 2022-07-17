@@ -6778,6 +6778,9 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) { // Pageant
 		unsigned char *puttykey;
+		unsigned char *keytype_name, *keyalgo_name;
+		ssh_keytype keytype;
+		ssh_keyalgo keyalgo;
 
 		s = "publickey";
 		buffer_put_string(msg, s, strlen(s));
@@ -6794,9 +6797,16 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		}
 		puttykey = pvar->pageant_curkey;
 
-		// アルゴリズムをコピーする
+		// 鍵種別から利用する署名アルゴリズムを決定する
 		len = get_uint32_MSBfirst(puttykey+4);
-		buffer_put_string(msg, puttykey+8, len);
+		keytype_name = puttykey + 8;
+		keytype = get_hostkey_type_from_name(keytype_name);
+		keyalgo = choose_SSH2_keysign_algorithm(pvar->server_sig_algs, keytype);
+		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
+
+		// アルゴリズムをコピーする
+		len = strlen(keyalgo_name);
+		buffer_put_string(msg, keyalgo_name, len);
 
 		// 鍵をコピーする
 		len = get_uint32_MSBfirst(puttykey);
@@ -7502,6 +7512,11 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		unsigned char *signedmsg;
 		int signedlen;
 
+		unsigned char *keytype_name, *keyalgo_name;
+		ssh_keytype keytype;
+		ssh_keyalgo keyalgo;
+		ssh_agentflag signflag;
+
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_PK_OK was received.");
 
 		username = pvar->auth_state.user;  // ユーザ名
@@ -7524,9 +7539,17 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 		puttykey = pvar->pageant_curkey;
 
-		// アルゴリズムをコピーする
+		// 鍵種別から利用する署名アルゴリズムを決定する
 		len = get_uint32_MSBfirst(puttykey+4);
-		buffer_put_string(signbuf, puttykey+8, len);
+		keytype_name = puttykey + 8;
+		keytype = get_hostkey_type_from_name(keytype_name);
+		keyalgo = choose_SSH2_keysign_algorithm(pvar->server_sig_algs, keytype);
+		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
+		signflag = get_ssh2_agent_flag(keyalgo);
+
+		// アルゴリズムをコピーする
+		len = strlen(keyalgo_name);
+		buffer_put_string(signbuf, keyalgo_name, len);
 
 		// 鍵をコピーする
 		len = get_uint32_MSBfirst(puttykey);
@@ -7537,7 +7560,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		// Pageant に署名してもらう
 		signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
 		                                signbuf->buf, signbuf->len,
-		                                &signedlen);
+		                                &signedlen, signflag);
 		buffer_free(signbuf);
 		if (signedmsg == NULL) {
 			safefree(pvar->pageant_key);
@@ -7563,8 +7586,8 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		puttykey = pvar->pageant_curkey;
 
 		// アルゴリズムをコピーする
-		len = get_uint32_MSBfirst(puttykey+4);
-		buffer_put_string(msg, puttykey+8, len);
+		len = strlen(keyalgo_name);
+		buffer_put_string(msg, keyalgo_name, len);
 
 		// 鍵をコピーする
 		len = get_uint32_MSBfirst(puttykey);
