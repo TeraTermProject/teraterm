@@ -1563,7 +1563,7 @@ static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int da
 }
 
 
-BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen)
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen, ssh_keyalgo keyalgo)
 {
 	buffer_t *msg = NULL;
 	char *s;
@@ -1578,11 +1578,27 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	switch (keypair->type) {
 	case KEY_RSA: // RSA
 	{
-		const EVP_MD *evp_md = EVP_sha1();
+		const EVP_MD *evp_md;
 		EVP_MD_CTX *md = NULL;
 		u_char digest[EVP_MAX_MD_SIZE], *sig;
 		u_int slen, dlen, len;
-		int ok, nid = NID_sha1;
+		int ok, nid;
+
+		nid = get_ssh2_key_hashtype(keyalgo);
+
+		switch(nid) {
+		case NID_sha1:
+			evp_md = EVP_sha1();
+			break;
+		case NID_sha256:
+			evp_md = EVP_sha256();
+			break;
+		case NID_sha512:
+			evp_md = EVP_sha512();
+			break;
+		default:
+			goto error;
+		}
 
 		md = EVP_MD_CTX_new();
 		if (md == NULL)
@@ -1622,7 +1638,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		}
 
-		s = get_ssh2_hostkey_type_name_from_key(keypair);
+		s = get_ssh2_keyalgo_name(keyalgo);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_append_length(msg, sig, slen);
 		len = buffer_len(msg);

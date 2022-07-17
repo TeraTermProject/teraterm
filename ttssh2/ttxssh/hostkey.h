@@ -100,6 +100,7 @@ char* get_digest_algorithm_name(digest_algorithm id);
 
 void normalize_host_key_order(char *buf);
 ssh_keyalgo choose_SSH2_host_key_algorithm(char *server_proposal, char *my_proposal);
+ssh_keyalgo choose_SSH2_keysign_algorithm(char *server_proposal, ssh_keytype keytype);
 void SSH2_update_host_key_myproposal(PTInstVar pvar);
 
 #endif /* SSHCMAC_H */

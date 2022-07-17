@@ -6720,10 +6720,15 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		char *signature = NULL;
 		int siglen;
 		Key *keypair = pvar->auth_state.cur_cred.key_pair;
+		ssh_keyalgo keyalgo;
+		char *keyalgo_name;
 
 		if (get_SSH2_publickey_blob(pvar, &blob, &bloblen) == FALSE) {
 			goto error;
 		}
+
+		keyalgo = choose_SSH2_keysign_algorithm(pvar->server_sig_algs, keypair->type);
+		keyalgo_name = get_ssh2_keyalgo_name(keyalgo);
 
 		// step1
 		signbuf = buffer_init();
@@ -6741,13 +6746,15 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = "publickey";
 		buffer_put_string(signbuf, s, strlen(s));
 		buffer_put_char(signbuf, 1); // true
-		s = get_ssh2_hostkey_type_name_from_key(keypair); // key type‚É‰‚¶‚½•¶š—ñ‚ğ“¾‚é
+
+		s = keyalgo_name;
 		buffer_put_string(signbuf, s, strlen(s));
+
 		s = buffer_ptr(blob);
 		buffer_append_length(signbuf, s, bloblen);
 
 		// –¼‚Ìì¬
-		if ( generate_SSH2_keysign(keypair, &signature, &siglen, buffer_ptr(signbuf), buffer_len(signbuf)) == FALSE) {
+		if (generate_SSH2_keysign(keypair, &signature, &siglen, buffer_ptr(signbuf), buffer_len(signbuf), keyalgo) == FALSE) {
 			buffer_free(blob);
 			buffer_free(signbuf);
 			goto error;
@@ -6757,8 +6764,10 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = "publickey";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 1); // true
-		s = get_ssh2_hostkey_type_name_from_key(keypair); // key type‚É‰‚¶‚½•¶š—ñ‚ğ“¾‚é
+
+		s = keyalgo_name;
 		buffer_put_string(msg, s, strlen(s));
+
 		s = buffer_ptr(blob);
 		buffer_append_length(msg, s, bloblen);
 		buffer_append_length(msg, signature, siglen);
