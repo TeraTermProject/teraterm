@@ -795,27 +795,10 @@ static int choose_cipher(PTInstVar pvar, int supported)
 
 BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 {
-	if (SSHv1(pvar)) {
-		pvar->crypt_state.sender_cipher = choose_cipher(pvar,
-		                                                pvar->crypt_state.
-		                                                supported_sender_ciphers);
-		pvar->crypt_state.receiver_cipher =
-			choose_cipher(pvar, pvar->crypt_state.supported_receiver_ciphers);
-
-	} else { // SSH2(yutaka)
-		if (pvar->ciphers[MODE_OUT] == NULL) {
-			pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
-		}
-		else {
-			pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
-		}
-		if (pvar->ciphers[MODE_IN] == NULL) {
-			pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
-		}
-		else {
-			pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
-		}
-	}
+	pvar->crypt_state.sender_cipher =
+		choose_cipher(pvar, pvar->crypt_state.supported_sender_ciphers);
+	pvar->crypt_state.receiver_cipher =
+		choose_cipher(pvar, pvar->crypt_state.supported_receiver_ciphers);
 
 	if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE
 		|| pvar->crypt_state.receiver_cipher == SSH_CIPHER_NONE) {
@@ -1089,6 +1072,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			// SSH2
 			cipher = pvar->ciphers[MODE_OUT];
 			if (cipher) {
+				pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_OUT], cipher,
 				                 enc->key, enc->key_len,
@@ -1098,6 +1082,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.encrypt = crypt_SSH2_encrypt;
 			}
 			else {
+				pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
 				isOK = FALSE;
 			}
 		}
@@ -1133,6 +1118,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			// SSH2
 			cipher = pvar->ciphers[MODE_IN];
 			if (cipher) {
+				pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_IN], cipher,
 				                 enc->key, enc->key_len,
@@ -1142,6 +1128,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.decrypt = crypt_SSH2_decrypt;
 			}
 			else {
+				pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
 				isOK = FALSE;
 			}
 		}

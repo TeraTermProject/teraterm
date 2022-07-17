@@ -70,10 +70,6 @@ See LICENSE.TXT for the license.
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
-BOOL HOSTS_resume_session_after_known_hosts(PTInstVar pvar);
-void HOSTS_cancel_session_after_known_hosts(PTInstVar pvar);
-
-
 static wchar_t **parse_multi_path(wchar_t *buf)
 {
 	int i;
@@ -1867,7 +1863,7 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			 * known_hostsダイアログのために一時停止していた
 			 * SSHサーバとのネゴシエーションを再開させる。
 			 */
-			HOSTS_resume_session_after_known_hosts(pvar);
+			SSH_notify_host_OK(pvar);
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
@@ -1876,11 +1872,6 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
-			/*
-			 * known_hostsをキャンセルするため、再開用のリソースを破棄しておく。
-			 */
-			HOSTS_cancel_session_after_known_hosts(pvar);
-
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
@@ -1891,8 +1882,6 @@ canceled:
 			 * known_hosts中にサーバ側からネットワーク切断された場合、
 			 * ダイアログのみを閉じる。
 			 */
-			HOSTS_cancel_session_after_known_hosts(pvar);
-
 			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
@@ -2022,7 +2011,7 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 			 * known_hostsダイアログのために一時停止していた
 			 * SSHサーバとのネゴシエーションを再開させる。
 			 */
-			HOSTS_resume_session_after_known_hosts(pvar);
+			SSH_notify_host_OK(pvar);
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
@@ -2031,11 +2020,6 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
-			/*
-			 * known_hostsをキャンセルするため、再開用のリソースを破棄しておく。
-			 */
-			HOSTS_cancel_session_after_known_hosts(pvar);
-
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
@@ -2046,8 +2030,6 @@ canceled:
 			 * known_hosts中にサーバ側からネットワーク切断された場合、
 			 * ダイアログのみを閉じる。
 			 */
-			HOSTS_cancel_session_after_known_hosts(pvar);
-
 			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
@@ -2178,7 +2160,7 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			 * known_hostsダイアログのために一時停止していた
 			 * SSHサーバとのネゴシエーションを再開させる。
 			 */
-			HOSTS_resume_session_after_known_hosts(pvar);
+			SSH_notify_host_OK(pvar);
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
@@ -2187,11 +2169,6 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
-			/*
-			 * known_hostsをキャンセルするため、再開用のリソースを破棄しておく。
-			 */
-			HOSTS_cancel_session_after_known_hosts(pvar);
-
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
@@ -2202,8 +2179,6 @@ canceled:
 			 * known_hosts中にサーバ側からネットワーク切断された場合、
 			 * ダイアログのみを閉じる。
 			 */
-			HOSTS_cancel_session_after_known_hosts(pvar);
-
 			pvar->hosts_state.hosts_dialog = NULL;
 			EndDialog(dlg, 0);
 			return TRUE;
@@ -2415,48 +2390,6 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 
 	return FALSE;
 }
-
-/*
- * known_hostsダイアログでユーザ承認後、SSHサーバとのネゴシエーションを再開する。
- */
-BOOL HOSTS_resume_session_after_known_hosts(PTInstVar pvar)
-{
-	enum ssh_kex_known_hosts type;
-	int ret = FALSE;
-
-	type = pvar->contents_after_known_hosts.kex_type;
-	if (type == SSH1_PUBLIC_KEY_KNOWN_HOSTS) {
-		ret = handle_server_public_key_after_known_hosts(pvar);
-
-	} else if (type == SSH2_DH_KEX_REPLY_KNOWN_HOSTS) {
-		ret = handle_SSH2_dh_kex_reply_after_known_hosts(pvar);
-
-	} else if (type == SSH2_DH_GEX_REPLY_KNOWN_HOSTS) {
-		ret = handle_SSH2_dh_gex_reply_after_known_hosts(pvar);
-
-	} else if (type == SSH2_ECDH_KEX_REPLY_KNOWN_HOSTS) {
-		ret = handle_SSH2_ecdh_kex_reply_after_known_hosts(pvar);
-
-	}
-
-	return (ret);
-}
-
-/*
- * known_hostsダイアログのSSHごとのキャンセル処理
- */
-void HOSTS_cancel_session_after_known_hosts(PTInstVar pvar)
-{
-	enum ssh_kex_known_hosts type;
-
-	type = pvar->contents_after_known_hosts.kex_type;
-	if (type != NONE_KNOWN_HOSTS) {
-		handle_SSH2_canel_reply_after_known_hosts(pvar);
-	}
-
-	return;
-}
-
 
 void HOSTS_notify_disconnecting(PTInstVar pvar)
 {

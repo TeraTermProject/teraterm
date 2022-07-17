@@ -278,8 +278,7 @@ typedef struct _TInstVar {
 	compression_type ctos_compression;
 	compression_type stoc_compression;
 	int we_need;
-	int key_done;
-	int rekeying;
+	int kex_status;
 	char *session_id;
 	int session_id_len;
 	SSHKeys ssh2_keys[MODE_MAX];
@@ -346,8 +345,6 @@ typedef struct _TInstVar {
 
 	// dialog resource
 	HFONT hFontFixed;		// hosts.c内のダイアログ用
-
-	bottom_half_known_hosts_t contents_after_known_hosts;
 
 	char *server_sig_algs;
 

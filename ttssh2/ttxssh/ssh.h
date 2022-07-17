@@ -434,6 +434,11 @@ typedef struct {
 #define STATUS_INTERACTIVE                    0x10
 #define STATUS_IN_PARTIAL_ID_STRING           0x20
 
+#define KEX_FLAG_KEXDONE          0x01
+#define KEX_FLAG_REKEYING         0x02
+#define KEX_FLAG_NEWKEYS_SENT     0x04
+#define KEX_FLAG_NEWKEYS_RECEIVED 0x08
+
 void SSH_init(PTInstVar pvar);
 void SSH_open(PTInstVar pvar);
 void SSH_notify_disconnecting(PTInstVar pvar, char *reason);
@@ -619,33 +624,5 @@ struct global_confirm {
 	void *ctx;
 	int ref_count;
 };
-
-/*  
- * SSH bottom half after known_hosts
- */
-enum ssh_kex_known_hosts {
-	NONE_KNOWN_HOSTS = 0,
-	SSH1_PUBLIC_KEY_KNOWN_HOSTS,
-	SSH2_DH_KEX_REPLY_KNOWN_HOSTS,
-	SSH2_DH_GEX_REPLY_KNOWN_HOSTS,
-	SSH2_ECDH_KEX_REPLY_KNOWN_HOSTS,
-};
-
-typedef struct bottom_half_known_hosts {
-	enum ssh_kex_known_hosts kex_type;
-
-	unsigned char *payload;
-	int payload_len;
-	UINT_PTR payload_offset;
-
-	BOOL SSH2_MSG_NEWKEYS_received;	
-} bottom_half_known_hosts_t;
-
-void handle_SSH2_canel_reply_after_known_hosts(PTInstVar pvar);
-
-BOOL handle_server_public_key_after_known_hosts(PTInstVar pvar);
-BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar);
-BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar);
-BOOL handle_SSH2_ecdh_kex_reply_after_known_hosts(PTInstVar pvar);
 
 #endif /* __SSH_H */
