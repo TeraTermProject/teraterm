@@ -4376,7 +4376,12 @@ void debug_print(int no, char *msg, int len)
 #endif
 }
 
-SSHKeys current_keys[MODE_MAX];
+
+/*
+ * 鍵交換で生成した鍵の置き場。実際の通信に使われるのはpvar->ssh2_keys[]であり、ここに置いただけでは使われない。
+ * 有効にするタイミングで、pvar->ssh2_keys にコピーする。
+ */
+static SSHKeys current_keys[MODE_MAX];
 
 
 #define write_buffer_file(buf,len) do_write_buffer_file(buf,len,__FILE__,__LINE__)
@@ -5478,7 +5483,7 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *sha
 	}
 
 cont:
-	kex_derive_keys(pvar, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
+	kex_derive_keys(pvar, current_keys, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
 
 	// KEX finish
 	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
