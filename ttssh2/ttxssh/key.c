@@ -340,7 +340,7 @@ int ssh_rsa_verify(RSA *key,
 	}
 	//debug_print(41, signature, signaturelen);
 	ptr = signature;
-	algo_name = get_ssh2_keyalgo_name(keyalgo);
+	algo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
 
 	// step1
 	len = get_uint32_MSBfirst(ptr);
@@ -1638,7 +1638,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		}
 
-		s = get_ssh2_keyalgo_name(keyalgo);
+		s = get_ssh2_hostkey_algorithm_name(keyalgo);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_append_length(msg, sig, slen);
 		len = buffer_len(msg);
@@ -2261,7 +2261,7 @@ static int check_hostkey_algorithm(PTInstVar pvar, Key *key)
 		if (index == KEY_ALGO_NONE) // disabled line
 			break;
 
-		if (key->type == get_ssh2_keytype_from_keyalgo(index))
+		if (key->type == get_ssh2_hostkey_type_from_algorithm(index))
 			return 1;
 	}
 

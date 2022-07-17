@@ -91,11 +91,11 @@ typedef enum {
 ssh_keytype get_hostkey_type_from_name(char *name);
 char* get_ssh2_hostkey_type_name(ssh_keytype type);
 char *get_ssh2_hostkey_type_name_from_key(Key *key);
-ssh_keyalgo get_ssh2_keyalgo_from_name(const char *name);
-char* get_ssh2_keyalgo_name(ssh_keyalgo algo);
+ssh_keyalgo get_ssh2_hostkey_algorithm_from_name(const char *name);
+char* get_ssh2_hostkey_algorithm_name(ssh_keyalgo algo);
 int get_ssh2_key_hashtype(ssh_keyalgo algo);
-ssh_keytype get_ssh2_keytype_from_keyalgo(ssh_keyalgo algo);
-const char* get_ssh2_keytype_name_from_keyalgo(ssh_keyalgo algo);
+ssh_keytype get_ssh2_hostkey_type_from_algorithm(ssh_keyalgo algo);
+const char* get_ssh2_hostkey_type_name_from_algorithm(ssh_keyalgo algo);
 char* get_digest_algorithm_name(digest_algorithm id);
 
 void normalize_host_key_order(char *buf);
