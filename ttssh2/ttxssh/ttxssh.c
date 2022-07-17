@@ -1928,7 +1928,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_type_name(pvar->hostkey_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_keyalgo_name(pvar->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
@@ -2287,7 +2287,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 			                   L"<Host Keys below this line are disabled>", uimsg);
 			SendMessageW(hostkeyControl, LB_ADDSTRING, 0, (LPARAM)uimsg);
 		} else {
-			const char *name = get_ssh2_hostkey_type_name(index);
+			const char *name = get_ssh2_keyalgo_name(index);
 			if (name != NULL) {
 				SendMessageA(hostkeyControl, LB_ADDSTRING, 0, (LPARAM) name);
 			}
@@ -2591,10 +2591,10 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 			buf[0] = 0;
 			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
 			for (j = 0;
-				j <= KEY_MAX
-				 && strcmp(buf, get_ssh2_hostkey_type_name(j)) != 0; j++) {
+				j <= KEY_ALGO_MAX
+				 && strcmp(buf, get_ssh2_keyalgo_name(j)) != 0; j++) {
 			}
-			if (j <= KEY_MAX) {
+			if (j <= KEY_ALGO_MAX) {
 				buf2[buf2index] = '0' + j;
 				buf2index++;
 			} else {

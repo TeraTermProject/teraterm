@@ -4484,8 +4484,8 @@ void SSH2_send_kexinit(PTInstVar pvar)
 
 void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
 {
-	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
-	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
+	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_ALGO_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
+	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_ALGO_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
 	int i, j, k=-1;
 
 	memset(listed, 0, sizeof(listed));
@@ -4758,8 +4758,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
 
 	pvar->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
-	if (pvar->hostkey_type == KEY_UNSPEC) {
-		strncpy_s(tmp, sizeof(tmp), "unknown host KEY type: ", _TRUNCATE);
+	if (pvar->hostkey_type == KEY_ALGO_UNSPEC) {
+		strncpy_s(tmp, sizeof(tmp), "unknown host KEY algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
@@ -4968,7 +4968,7 @@ skip:
 		get_kex_algorithm_name(pvar->kex_type));
 
 	logprintf(LOG_LEVEL_VERBOSE, "server host key algorithm: %s",
-		get_ssh2_hostkey_type_name(pvar->hostkey_type));
+		get_ssh2_keyalgo_name(pvar->hostkey_type));
 
 	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm client to server: %s",
 		get_cipher_string(pvar->ciphers[MODE_OUT]));
@@ -5596,10 +5596,13 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != get_ssh2_keytype_from_keyalgo(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
-		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
+		            get_ssh2_keytype_name_from_keyalgo(pvar->hostkey_type),
+		            get_ssh2_keyalgo_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -5698,10 +5701,13 @@ BOOL handle_SSH2_dh_kex_reply_after_known_hosts(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != get_ssh2_keytype_from_keyalgo(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
-		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
+		            get_ssh2_keytype_name_from_keyalgo(pvar->hostkey_type),
+		            get_ssh2_keyalgo_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -5861,10 +5867,13 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != get_ssh2_keytype_from_keyalgo(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
-		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
+		            get_ssh2_keytype_name_from_keyalgo(pvar->hostkey_type),
+		            get_ssh2_keyalgo_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -5970,10 +5979,13 @@ BOOL handle_SSH2_dh_gex_reply_after_known_hosts(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != get_ssh2_keytype_from_keyalgo(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
-		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
+		            get_ssh2_keytype_name_from_keyalgo(pvar->hostkey_type),
+		            get_ssh2_keyalgo_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6134,10 +6146,13 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != get_ssh2_keytype_from_keyalgo(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
-		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            get_ssh2_keytype_name_from_keyalgo(pvar->hostkey_type),
+		            get_ssh2_keyalgo_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6242,10 +6257,13 @@ BOOL handle_SSH2_ecdh_kex_reply_after_known_hosts(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != get_ssh2_keytype_from_keyalgo(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
-		            get_ssh2_hostkey_type_name(pvar->hostkey_type), get_ssh2_hostkey_type_name(hostkey->type));
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            get_ssh2_keytype_name_from_keyalgo(pvar->hostkey_type),
+		            get_ssh2_keyalgo_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}

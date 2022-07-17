@@ -2199,20 +2199,18 @@ static void hostkeys_update_ctx_free(struct hostkeys_update_ctx *ctx)
 //
 static int check_hostkey_algorithm(PTInstVar pvar, Key *key)
 {
-	int ret = 0;
 	int i, index;
 
 	for (i = 0; pvar->settings.HostKeyOrder[i] != 0; i++) {
 		index = pvar->settings.HostKeyOrder[i] - '0';
-		if (index == KEY_NONE) // disabled line
+		if (index == KEY_ALGO_NONE) // disabled line
 			break;
 
-		if (strcmp(get_ssh2_hostkey_type_name_from_key(key),
-		           get_ssh2_hostkey_type_name(index)) == 0)
+		if (key->type == get_ssh2_keytype_from_keyalgo(index))
 			return 1;
 	}
 
-	return (ret);
+	return 0;
 }
 
 // Callback function

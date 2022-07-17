@@ -43,6 +43,19 @@ typedef enum {
 	KEY_UNSPEC,
 	KEY_MAX = KEY_UNSPEC,
 } ssh_keytype;
+
+typedef enum {
+	KEY_ALGO_NONE,
+	KEY_ALGO_RSA1,
+	KEY_ALGO_RSA,
+	KEY_ALGO_DSA,
+	KEY_ALGO_ECDSA256,
+	KEY_ALGO_ECDSA384,
+	KEY_ALGO_ECDSA521,
+	KEY_ALGO_ED25519,
+	KEY_ALGO_UNSPEC,
+	KEY_ALGO_MAX = KEY_ALGO_UNSPEC,
+} ssh_keyalgo;
 #define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ED25519)
 
 // fingerprint‚ÌŽí•Ê
@@ -76,10 +89,15 @@ typedef enum {
 ssh_keytype get_hostkey_type_from_name(char *name);
 char* get_ssh2_hostkey_type_name(ssh_keytype type);
 char *get_ssh2_hostkey_type_name_from_key(Key *key);
+ssh_keyalgo get_ssh2_keyalgo_from_name(const char *name);
+char* get_ssh2_keyalgo_name(ssh_keyalgo algo);
+int get_ssh2_keyalgo_hashtype(ssh_keyalgo algo);
+ssh_keytype get_ssh2_keytype_from_keyalgo(ssh_keyalgo algo);
+const char* get_ssh2_keytype_name_from_keyalgo(ssh_keyalgo algo);
 char* get_digest_algorithm_name(digest_algorithm id);
 
 void normalize_host_key_order(char *buf);
-ssh_keytype choose_SSH2_host_key_algorithm(char *server_proposal, char *my_proposal);
+ssh_keyalgo choose_SSH2_host_key_algorithm(char *server_proposal, char *my_proposal);
 void SSH2_update_host_key_myproposal(PTInstVar pvar);
 
 #endif /* SSHCMAC_H */
