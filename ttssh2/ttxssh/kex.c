@@ -141,7 +141,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 {
 	static char buf[512]; // TODO: malloc()‚É‚·‚×‚«
 	int index;
-	int len, i;
+	int i;
 
 	// ’ÊM’†‚É‚ÍŒÄ‚Î‚ê‚È‚¢‚Í‚¸‚¾‚ªA”O‚Ì‚½‚ßB(2006.6.26 maya)
 	if (pvar->socket != INVALID_SOCKET) {
@@ -156,9 +156,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), get_kex_algorithm_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
+	strncat_s(buf, sizeof(buf), "ext-info-c", _TRUNCATE);
 	myproposal[PROPOSAL_KEX_ALGS] = buf; 
 }
 

@@ -132,6 +132,8 @@ typedef enum {
 	SSH2_MSG_DEBUG           = 4,
 	SSH2_MSG_SERVICE_REQUEST = 5,
 	SSH2_MSG_SERVICE_ACCEPT  = 6,
+	SSH2_MSG_EXT_INFO        = 7, // RFC 8308
+	SSH2_MSG_NEWCOMPRESS     = 8, // RFC 8308
 
 	// 20..29 Algorithm negotiation (RFC 4253)
 	SSH2_MSG_KEXINIT = 20,

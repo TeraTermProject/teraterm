@@ -349,6 +349,8 @@ typedef struct _TInstVar {
 
 	bottom_half_known_hosts_t contents_after_known_hosts;
 
+	char *server_sig_algs;
+
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data

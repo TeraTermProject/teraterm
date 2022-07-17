@@ -114,6 +114,7 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar);
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar);
 static BOOL handle_SSH2_newkeys(PTInstVar pvar);
 static BOOL handle_SSH2_service_accept(PTInstVar pvar);
+static BOOL handle_SSH2_ext_info(PTInstVar pvar);
 static BOOL handle_SSH2_userauth_success(PTInstVar pvar);
 static BOOL handle_SSH2_userauth_failure(PTInstVar pvar);
 static BOOL handle_SSH2_userauth_banner(PTInstVar pvar);
@@ -1897,6 +1898,7 @@ static void init_protocol(PTInstVar pvar)
 		enque_handler(pvar, SSH2_MSG_KEX_DH_GEX_REPLY, handle_SSH2_dh_gex_reply);
 		enque_handler(pvar, SSH2_MSG_NEWKEYS, handle_SSH2_newkeys);
 		enque_handler(pvar, SSH2_MSG_SERVICE_ACCEPT, handle_SSH2_service_accept);
+		enque_handler(pvar, SSH2_MSG_EXT_INFO, handle_SSH2_ext_info);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_SUCCESS, handle_SSH2_userauth_success);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_FAILURE, handle_SSH2_userauth_failure);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_BANNER, handle_SSH2_userauth_banner);
@@ -2946,6 +2948,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->agentfwd_enable = FALSE;
 	pvar->use_subsystem = FALSE;
 	pvar->nosession = FALSE;
+	pvar->server_sig_algs = NULL;
 
 }
 
@@ -3507,6 +3510,9 @@ void SSH_end(PTInstVar pvar)
 		}
 
 		pvar->tryed_ssh2_authlist = FALSE;
+
+		free(pvar->server_sig_algs);
+		pvar->server_sig_algs = NULL;
 
 		// add (2008.3.2 yutaka)
 		for (mode = 0 ; mode < MODE_MAX ; mode++) {
@@ -6514,6 +6520,8 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	if (!AUTH_set_supported_auth_types(pvar, type))
 		return FALSE;
 
+	SSH2_dispatch_add_message(SSH2_MSG_EXT_INFO);
+
 	SSH_notify_host_OK(pvar);
 
 
@@ -6598,6 +6606,60 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_BANNER);
 
 	return do_SSH2_authrequest(pvar);
+}
+
+
+/*
+ * SSH_MSG_EXT_INFO:
+ *     byte       SSH_MSG_EXT_INFO (value 7)
+ *     uint32     nr-extensions
+ *     repeat the following 2 fields "nr-extensions" times:
+ *       string   extension-name
+ *       string   extension-value (binary)
+ */
+
+static BOOL handle_SSH2_ext_info(PTInstVar pvar)
+{
+	unsigned int num_of_exts, i, len;
+	unsigned char ext_name[256], ext_val[2048];
+	char *new_payload_buffer = NULL;
+
+	logputs(LOG_LEVEL_INFO, "SSH2_EXT_INFO was received.");
+
+	if (!get_uint32_from_payload(pvar, &num_of_exts)) {
+		logprintf(LOG_LEVEL_WARNING, "%s: ext info payload was corrupted", __FUNCTION__);
+		return FALSE;
+	}
+	logprintf(LOG_LEVEL_VERBOSE, "%s: %d extensions", __FUNCTION__, num_of_exts);
+
+	for (i=0; i<num_of_exts; i++) {
+		if (!get_string_from_payload(pvar, ext_name, sizeof(ext_name), &len, TRUE)) {
+			logprintf(LOG_LEVEL_WARNING, "%s: can't get extension name", __FUNCTION__);
+			return FALSE;
+		}
+		if (strcmp(ext_name, "server-sig-algs") == 0) {
+			if (!get_namelist_from_payload(pvar, ext_val, sizeof(ext_val), &len)) {
+				logprintf(LOG_LEVEL_WARNING, "%s: can't get extension value", __FUNCTION__);
+				return FALSE;
+			}
+			if (pvar->server_sig_algs) {
+				logprintf(LOG_LEVEL_WARNING, "%s: update server-sig-algs, old=%s, new=%s",
+				          __FUNCTION__, pvar->server_sig_algs, ext_val);
+				free(pvar->server_sig_algs);
+			}
+			pvar->server_sig_algs = strdup(ext_val);
+			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: server-sig-algs, value: %s", __FUNCTION__, ext_val);
+		}
+		else {
+			if (!get_string_from_payload(pvar, ext_val, sizeof(ext_val), &len, TRUE)) {
+				logprintf(LOG_LEVEL_WARNING, "%s: can't get extension value", __FUNCTION__);
+				return FALSE;
+			}
+			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: ext_name", __FUNCTION__, ext_name);
+		}
+	}
+
+	return TRUE;
 }
 
 // ユーザ認証パケットの構築
