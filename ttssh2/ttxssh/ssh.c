@@ -6444,35 +6444,6 @@ static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar)
 
 static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 {
-	int supported_ciphers = (1 << SSH2_CIPHER_3DES_CBC
-	                       | 1 << SSH2_CIPHER_AES128_CBC
-	                       | 1 << SSH2_CIPHER_AES192_CBC
-	                       | 1 << SSH2_CIPHER_AES256_CBC
-#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
-	                       | 1 << SSH2_CIPHER_BLOWFISH_CBC
-#endif
-	                       | 1 << SSH2_CIPHER_AES128_CTR
-	                       | 1 << SSH2_CIPHER_AES192_CTR
-	                       | 1 << SSH2_CIPHER_AES256_CTR
-#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
-	                       | 1 << SSH2_CIPHER_ARCFOUR
-	                       | 1 << SSH2_CIPHER_ARCFOUR128
-	                       | 1 << SSH2_CIPHER_ARCFOUR256
-	                       | 1 << SSH2_CIPHER_CAST128_CBC
-	                       | 1 << SSH2_CIPHER_3DES_CTR
-	                       | 1 << SSH2_CIPHER_BLOWFISH_CTR
-	                       | 1 << SSH2_CIPHER_CAST128_CTR
-#endif
-	                       | 1 << SSH2_CIPHER_CAMELLIA128_CBC
-	                       | 1 << SSH2_CIPHER_CAMELLIA192_CBC
-	                       | 1 << SSH2_CIPHER_CAMELLIA256_CBC
-	                       | 1 << SSH2_CIPHER_CAMELLIA128_CTR
-	                       | 1 << SSH2_CIPHER_CAMELLIA192_CTR
-	                       | 1 << SSH2_CIPHER_CAMELLIA256_CTR
-	                       | 1 << SSH2_CIPHER_AES128_GCM
-	                       | 1 << SSH2_CIPHER_AES256_GCM
-	                       | 1 << SSH2_CIPHER_CHACHAPOLY
-	);
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
 
@@ -6519,9 +6490,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 
 	}
 
-	// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€‚ÌÝ’è
-	if (!CRYPT_set_supported_ciphers(pvar, supported_ciphers, supported_ciphers))
-		return FALSE;
+	// ”FØ•ûŽ®‚ÌÝ’è
 	if (!AUTH_set_supported_auth_types(pvar, type))
 		return FALSE;
 

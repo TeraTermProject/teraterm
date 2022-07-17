@@ -595,43 +595,13 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 {
 	int cipher_mask;
 
-	if (SSHv1(pvar)) {
-		cipher_mask = (1 << SSH_CIPHER_DES)
-		            | (1 << SSH_CIPHER_3DES)
-		            | (1 << SSH_CIPHER_BLOWFISH);
-
-	} else { // for SSH2(yutaka)
-		// SSH2がサポートするデータ通信用アルゴリズム（公開鍵交換用とは別）
-		cipher_mask =((1 << SSH2_CIPHER_3DES_CBC)
-		            | (1 << SSH2_CIPHER_AES128_CBC)
-		            | (1 << SSH2_CIPHER_AES192_CBC)
-		            | (1 << SSH2_CIPHER_AES256_CBC)
-#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
-		            | (1 << SSH2_CIPHER_BLOWFISH_CBC)
-#endif
-		            | (1 << SSH2_CIPHER_AES128_CTR)
-		            | (1 << SSH2_CIPHER_AES192_CTR)
-		            | (1 << SSH2_CIPHER_AES256_CTR)
-#if defined(LIBRESSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000UL
-		            | (1 << SSH2_CIPHER_ARCFOUR)
-		            | (1 << SSH2_CIPHER_ARCFOUR128)
-		            | (1 << SSH2_CIPHER_ARCFOUR256)
-		            | (1 << SSH2_CIPHER_CAST128_CBC)
-		            | (1 << SSH2_CIPHER_3DES_CTR)
-		            | (1 << SSH2_CIPHER_BLOWFISH_CTR)
-		            | (1 << SSH2_CIPHER_CAST128_CTR)
-#endif
-		            | (1 << SSH2_CIPHER_CAMELLIA128_CBC)
-		            | (1 << SSH2_CIPHER_CAMELLIA192_CBC)
-		            | (1 << SSH2_CIPHER_CAMELLIA256_CBC)
-		            | (1 << SSH2_CIPHER_CAMELLIA128_CTR)
-		            | (1 << SSH2_CIPHER_CAMELLIA192_CTR)
-		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
-		            | (1 << SSH2_CIPHER_AES128_GCM)
-		            | (1 << SSH2_CIPHER_AES256_GCM)
-		            | (1 << SSH2_CIPHER_CHACHAPOLY)
-		);
+	if (SSHv2(pvar)) {
+		return TRUE;
 	}
+
+	cipher_mask = (1 << SSH_CIPHER_DES)
+	            | (1 << SSH_CIPHER_3DES)
+	            | (1 << SSH_CIPHER_BLOWFISH);
 
 	sender_ciphers &= cipher_mask;
 	receiver_ciphers &= cipher_mask;
