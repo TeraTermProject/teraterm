@@ -37,7 +37,7 @@
 
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
-               unsigned char *data, unsigned int datalen);
+               unsigned char *data, unsigned int datalen, ssh_keyalgo key_algo);
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
 unsigned char *duplicate_ED25519_PK(unsigned char *src);

@@ -53,6 +53,8 @@ typedef enum {
 	KEY_ALGO_ECDSA384,
 	KEY_ALGO_ECDSA521,
 	KEY_ALGO_ED25519,
+	KEY_ALGO_RSASHA256,
+	KEY_ALGO_RSASHA512,
 	KEY_ALGO_UNSPEC,
 	KEY_ALGO_MAX = KEY_ALGO_UNSPEC,
 } ssh_keyalgo;
@@ -91,7 +93,7 @@ char* get_ssh2_hostkey_type_name(ssh_keytype type);
 char *get_ssh2_hostkey_type_name_from_key(Key *key);
 ssh_keyalgo get_ssh2_keyalgo_from_name(const char *name);
 char* get_ssh2_keyalgo_name(ssh_keyalgo algo);
-int get_ssh2_keyalgo_hashtype(ssh_keyalgo algo);
+int get_ssh2_key_hashtype(ssh_keyalgo algo);
 ssh_keytype get_ssh2_keytype_from_keyalgo(ssh_keyalgo algo);
 const char* get_ssh2_keytype_name_from_keyalgo(ssh_keyalgo algo);
 char* get_digest_algorithm_name(digest_algorithm id);

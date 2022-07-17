@@ -46,6 +46,8 @@ static const struct ssh2_host_key_t ssh2_host_key[] = {
 	{KEY_ALGO_ECDSA384, KEY_ECDSA384, NID_sha384, "ecdsa-sha2-nistp384"}, // RFC5656
 	{KEY_ALGO_ECDSA521, KEY_ECDSA521, NID_sha512, "ecdsa-sha2-nistp521"}, // RFC5656
 	{KEY_ALGO_ED25519,  KEY_ED25519,  NID_sha512, "ssh-ed25519"},         // RDC8709
+	{KEY_ALGO_RSASHA256,KEY_RSA,      NID_sha256, "rsa-sha2-256"},        // RFC8332
+	{KEY_ALGO_RSASHA512,KEY_RSA,      NID_sha512, "rsa-sha2-512"},        // RFC8332
 	{KEY_ALGO_UNSPEC,   KEY_UNSPEC,   NID_undef,  "ssh-unknown"},
 	{KEY_ALGO_NONE,     KEY_NONE,     NID_undef,  NULL},
 };
@@ -141,7 +143,7 @@ ssh_keyalgo get_ssh2_keyalgo_from_name(const char *name)
 	return KEY_ALGO_UNSPEC;
 }
 
-int get_ssh2_keyalgo_hashtype(ssh_keyalgo algo)
+int get_ssh2_key_hashtype(ssh_keyalgo algo)
 {
 	const struct ssh2_host_key_t *ptr = ssh2_host_key;
 
@@ -198,6 +200,8 @@ void normalize_host_key_order(char *buf)
 		KEY_ALGO_ECDSA384,
 		KEY_ALGO_ECDSA521,
 		KEY_ALGO_ED25519,
+		KEY_ALGO_RSASHA256,
+		KEY_ALGO_RSASHA512,
 		KEY_ALGO_RSA,
 		KEY_ALGO_DSA,
 		KEY_ALGO_NONE,

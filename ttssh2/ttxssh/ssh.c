@@ -5446,7 +5446,7 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *sha
 		}
 	}
 
-	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
+	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen, pvar->hostkey_type)) != 1) {
 		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				BIGNUM *n;

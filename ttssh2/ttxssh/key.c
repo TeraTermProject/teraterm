@@ -192,6 +192,37 @@ static const u_char id_sha1[] = {
 	0x05, 0x00, /* NULL */
 	0x04, 0x14  /* Octet string, length 0x14 (20), followed by sha1 hash */
 };
+
+/*
+ * See http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
+ * id-sha256 OBJECT IDENTIFIER ::= { joint-iso-itu-t(2) country(16) us(840)
+ *	organization(1) gov(101) csor(3) nistAlgorithm(4) hashAlgs(2)
+ *	id-sha256(1) }
+ */
+static const u_char id_sha256[] = {
+	0x30, 0x31, /* type Sequence, length 0x31 (49) */
+	0x30, 0x0d, /* type Sequence, length 0x0d (13) */
+	0x06, 0x09, /* type OID, length 0x09 */
+	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, /* id-sha256 */
+	0x05, 0x00, /* NULL */
+	0x04, 0x20  /* Octet string, length 0x20 (32), followed by sha256 hash */
+};
+
+/*
+ * See http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
+ * id-sha512 OBJECT IDENTIFIER ::= { joint-iso-itu-t(2) country(16) us(840)
+ *	organization(1) gov(101) csor(3) nistAlgorithm(4) hashAlgs(2)
+ *	id-sha256(3) }
+ */
+static const u_char id_sha512[] = {
+	0x30, 0x51, /* type Sequence, length 0x51 (81) */
+	0x30, 0x0d, /* type Sequence, length 0x0d (13) */
+	0x06, 0x09, /* type OID, length 0x09 */
+	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03, /* id-sha512 */
+	0x05, 0x00, /* NULL */
+	0x04, 0x40  /* Octet string, length 0x40 (64), followed by sha512 hash */
+};
+
 /*
  * id-md5 OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840)
  *	rsadsi(113549) digestAlgorithm(2) 5 }
@@ -224,6 +255,16 @@ static int openssh_RSA_verify(int type, u_char *hash, u_int hashlen,
 		oid = id_md5;
 		oidlen = sizeof(id_md5);
 		hlen = 16;
+		break;
+	case NID_sha256:
+		oid = id_sha256;
+		oidlen = sizeof(id_sha256);
+		hlen = 32;
+		break;
+	case NID_sha512:
+		oid = id_sha512;
+		oidlen = sizeof(id_sha512);
+		hlen = 64;
 		break;
 	default:
 		goto done;
@@ -269,16 +310,14 @@ done:
 
 int ssh_rsa_verify(RSA *key,
                    u_char *signature, u_int signaturelen,
-                   u_char *data, u_int datalen)
+                   u_char *data, u_int datalen, ssh_keyalgo keyalgo)
 {
 	const EVP_MD *evp_md;
 	EVP_MD_CTX *md = NULL;
-	//	char *ktype;
 	u_char digest[EVP_MAX_MD_SIZE], *sigblob;
 	u_int len, dlen, modlen;
-//	int rlen, ret, nid;
 	int ret = -1, nid;
-	char *ptr;
+	char *ptr, *algo_name;
 	BIGNUM *n;
 
 	md = EVP_MD_CTX_new();
@@ -301,11 +340,13 @@ int ssh_rsa_verify(RSA *key,
 	}
 	//debug_print(41, signature, signaturelen);
 	ptr = signature;
+	algo_name = get_ssh2_keyalgo_name(keyalgo);
 
 	// step1
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
-	if (strncmp("ssh-rsa", ptr, len) != 0) {
+	if (strncmp(algo_name, ptr, len) != 0) {
+		logprintf(10, "%s: signature type mismatch: sig: %s, hostkey: %s", __FUNCTION__, ptr, algo_name);
 		ret = -4;
 		goto error;
 	}
@@ -337,11 +378,9 @@ int ssh_rsa_verify(RSA *key,
 		len = modlen;
 	}
 
-	/* sha1 the data */
-	//	nid = (datafellows & SSH_BUG_RSASIGMD5) ? NID_md5 : NID_sha1;
-	nid = NID_sha1;
+	nid = get_ssh2_key_hashtype(keyalgo);
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
-		//error("ssh_rsa_verify: EVP_get_digestbynid %d failed", nid);
+		logprintf(10, "%s: EVP_get_digestbynid %d failed", __FUNCTION__, nid);
 		ret = -6;
 		goto error;
 	}
@@ -521,13 +560,13 @@ error:
 
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
-               unsigned char *data, unsigned int datalen)
+               unsigned char *data, unsigned int datalen, ssh_keyalgo keyalgo)
 {
 	int ret = 0;
 
 	switch (key->type) {
 	case KEY_RSA:
-		ret = ssh_rsa_verify(key->rsa, signature, signaturelen, data, datalen);
+		ret = ssh_rsa_verify(key->rsa, signature, signaturelen, data, datalen, keyalgo);
 		break;
 	case KEY_DSA:
 		ret = ssh_dss_verify(key->dsa, signature, signaturelen, data, datalen);
@@ -2512,8 +2551,9 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 
 		sig = buffer_get_string_msg(bsig, &siglen_i);
 		siglen = siglen_i;
-		// Verify signature
-		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b));
+		// 手抜き。hostkey algorithm を使うのは RSA の時のみなので、
+		// とりあえず KEY_ALGO_RSA を指定しておく。
+		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b), KEY_ALGO_RSA);
 		free(sig);
 		sig = NULL;
 		if (ret != 1) {
