@@ -175,33 +175,34 @@ error:
 //
 
 /*
-* See:
-* http://www.rsasecurity.com/rsalabs/pkcs/pkcs-1/
-* ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.asn
-*/
+ * See:
+ * http://www.rsasecurity.com/rsalabs/pkcs/pkcs-1/
+ * ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.asn
+ */
+
 /*
-* id-sha1 OBJECT IDENTIFIER ::= { iso(1) identified-organization(3)
-*	oiw(14) secsig(3) algorithms(2) 26 }
-*/
+ * id-sha1 OBJECT IDENTIFIER ::= { iso(1) identified-organization(3)
+ *	oiw(14) secsig(3) algorithms(2) 26 }
+ */
 static const u_char id_sha1[] = {
 	0x30, 0x21, /* type Sequence, length 0x21 (33) */
-		0x30, 0x09, /* type Sequence, length 0x09 */
-		0x06, 0x05, /* type OID, length 0x05 */
-		0x2b, 0x0e, 0x03, 0x02, 0x1a, /* id-sha1 OID */
-		0x05, 0x00, /* NULL */
-		0x04, 0x14  /* Octet string, length 0x14 (20), followed by sha1 hash */
+	0x30, 0x09, /* type Sequence, length 0x09 */
+	0x06, 0x05, /* type OID, length 0x05 */
+	0x2b, 0x0e, 0x03, 0x02, 0x1a, /* id-sha1 OID */
+	0x05, 0x00, /* NULL */
+	0x04, 0x14  /* Octet string, length 0x14 (20), followed by sha1 hash */
 };
 /*
-* id-md5 OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840)
-*	rsadsi(113549) digestAlgorithm(2) 5 }
-*/
+ * id-md5 OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840)
+ *	rsadsi(113549) digestAlgorithm(2) 5 }
+ */
 static const u_char id_md5[] = {
 	0x30, 0x20, /* type Sequence, length 0x20 (32) */
-		0x30, 0x0c, /* type Sequence, length 0x09 */
-		0x06, 0x08, /* type OID, length 0x05 */
-		0x2a, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x02, 0x05, /* id-md5 */
-		0x05, 0x00, /* NULL */
-		0x04, 0x10  /* Octet string, length 0x10 (16), followed by md5 hash */
+	0x30, 0x0c, /* type Sequence, length 0x09 */
+	0x06, 0x08, /* type OID, length 0x05 */
+	0x2a, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x02, 0x05, /* id-md5 */
+	0x05, 0x00, /* NULL */
+	0x04, 0x10  /* Octet string, length 0x10 (16), followed by md5 hash */
 };
 
 static int openssh_RSA_verify(int type, u_char *hash, u_int hashlen,
