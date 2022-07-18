@@ -2819,22 +2819,36 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			// 描画予定がない(StrChangeCount==0)のに、
 			// 結合文字を受信した場合、描画する
 			buff_char_t *b = &CodeLineW[CursorX];
-			if (IsBuffPadding(b)) {
-				// カーソルが2セルの右側
-				StrChangeStart = CursorX - 1;
-				StrChangeCount = 2;
-			}
-			else {
-				// カーソルが1セル又は、2セルの左側
+			if (Wrap) {
 				if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
-					// 1つ前の文字が2セル
+					// 行末に2セルの文字が描画済み、2セルの右側にカーソルがある状態
+					StrChangeStart = CursorX - 1;
 					StrChangeCount = 2;
 				}
 				else {
-					// 1つ前の文字が1セル
+					// 行末に1セルの文字が描画されている、その上にカーソルがある状態
+					StrChangeStart = CursorX;
 					StrChangeCount = 1;
 				}
-				StrChangeStart = CursorX - StrChangeCount;
+			}
+			else {
+				if (IsBuffPadding(b)) {
+					// カーソルが2セルの右側
+					StrChangeStart = CursorX - 1;
+					StrChangeCount = 2;
+				}
+				else {
+					// カーソルが1セル又は、2セルの左側
+					if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
+						// 1つ前の文字が2セル
+						StrChangeCount = 2;
+					}
+					else {
+						// 1つ前の文字が1セル
+						StrChangeCount = 1;
+					}
+					StrChangeStart = CursorX - StrChangeCount;
+				}
 			}
 		}
 
