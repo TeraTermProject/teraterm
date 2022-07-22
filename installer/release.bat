@@ -92,23 +92,28 @@ cd /d %CUR%
 set TT_VERSION=
 for /f "delims=" %%i in ('perl issversion.pl') do @set TT_VERSION=%%i
 
+call ..\buildtools\svnrev\sourcetree_info.bat
 if "%1" == "freeze_state" (
+    call build.bat rebuild
+    call makearchive.bat release
+) else if "%RELEASE%" == "1" (
     call build.bat rebuild
     call makearchive.bat release
 ) else (
     call makearchive.bat
 )
-call ..\buildtools\svnrev\sourcetree_info.bat
 if not exist Output mkdir Output
-set FILENAME_BASE=teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%
-if "%1" == "freeze_state" (
+set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
+if "%RELEASE%" == "1" (
     pushd Output
-    %CMAKE% -E tar cf %FILENAME_BASE%.zip --format=zip teraterm-%TT_VERSION%/
+    %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
     popd
     set INNO_SETUP_OPT_VERSION=
-    set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%"
+    set INNO_SETUP_OPT_OUTPUT=
 ) else (
-    %CMAKE% -E tar cf Output/%FILENAME_BASE%-snapshot.zip --format=zip snapshot-%DATE%_%TIME%
+    %CMAKE% -E rename snapshot-%DATE%_%TIME% %SNAPSHOT_PORTABLE_OUTPUT%
+    %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%
+    %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT% snapshot-%DATE%_%TIME%
     set INNO_SETUP_OPT_VERSION="/DVerSubStr=r%SVNVERSION%-%DATE%_%TIME%"
     set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
 )
