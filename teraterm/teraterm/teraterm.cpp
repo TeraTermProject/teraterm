@@ -320,11 +320,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	{
 		// TTTSet(struct tttset)に新しいメンバーを追加するときは後ろに追加する
 		//		TTTSetを参照するプラグインとの互換性を保つため
-		const size_t ts_offset_dialogfont_r8106 = 10176;
 		const size_t ts_size_r9033 = 10196;
+		const size_t ts_size_r10035 = 10200;
+		BOOL valid_ts_size = FALSE;
+		const size_t ts_offset_dialogfont_r8106 = 10176;
 		size_t ts_size = sizeof(ts);
 		size_t ts_offset_dialogfont = offsetof(tttset, DialogFontCharSet);
-		if (ts_size != ts_size_r9033 || ts_offset_dialogfont != ts_offset_dialogfont_r8106) {
+		switch (ts_size) {
+			case ts_size_r9033:
+			case ts_size_r10035:
+				valid_ts_size = TRUE;
+				break;
+		}
+		if (valid_ts_size == FALSE ||
+		    ts_offset_dialogfont != ts_offset_dialogfont_r8106) {
 			MessageBoxA(NULL, "Check struct tttset size", "Tera Term", MB_OK | MB_ICONERROR);
 			return 0;
 		}
