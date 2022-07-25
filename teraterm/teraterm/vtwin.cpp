@@ -2134,13 +2134,9 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			}
 			DoSameProcess = false;
 		}
-		if (DropType == DROP_TYPE_SEND_FILE && TransBin) {
-			DropType = DROP_TYPE_SEND_FILE_BINARY;
-		}
 	} else {
 		if (DirectoryCount > 0 &&
 			(DefaultDropType == DROP_TYPE_SEND_FILE ||
-			 DefaultDropType == DROP_TYPE_SEND_FILE_BINARY ||
 			 DefaultDropType == DROP_TYPE_SCP))
 		{	// デフォルトのままでは処理できない組み合わせ
 			DropType = DROP_TYPE_PASTE_FILENAME;
@@ -2167,7 +2163,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
 								  DirectoryCount == 0 ? true : false,
-								  TransBin,
+								  &TransBin,
 								  &ts,
 								  &DropTypePaste,
 								  &DoSameProcess,
@@ -2178,13 +2174,6 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			}
 			if (DoSameProcessNextDrop) {
 				DefaultDropType = DropType;
-				DefaultDropTypePaste = DropTypePaste;
-				if (DropType == DROP_TYPE_SEND_FILE) {
-					TransBin = false;
-				}
-				if (DropType == DROP_TYPE_SEND_FILE_BINARY) {
-					TransBin = true;
-				}
 			}
 			if (!ts.ConfirmFileDragAndDrop) {
 				DefaultShowDialog = !DoNotShowDialog;
@@ -2197,12 +2186,11 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			// cancel
 			break;
 		case DROP_TYPE_SEND_FILE:
-		case DROP_TYPE_SEND_FILE_BINARY:
 			if (SendVar==NULL && NewFileVar(&SendVar)) {
 				HelpId = HlpFileSend;
 				strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileName,  _TRUNCATE);
 				SendVar->DirLen = 0;
-				ts.TransBin = DropType == DROP_TYPE_SEND_FILE ? 0 : 1;
+				ts.TransBin = TransBin;
 				FileSendStart();
 #if 0
 #if 0
@@ -2225,6 +2213,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 		case DROP_TYPE_PASTE_FILENAME:
 		{
 			const bool escape = (DropTypePaste & DROP_TYPE_PASTE_ESCAPE) ? true : false;
+
+			DefaultDropTypePaste = DropTypePaste;
 
 			TermSendStartBracket();
 

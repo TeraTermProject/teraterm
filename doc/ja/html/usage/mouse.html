@@ -72,7 +72,7 @@ VT window
       <dl>
         <dt><a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> が on のとき</dt>
         <dd>ドロップするとダイアログが表示されます。<br>
-            ただし、ダイアログで "次のドロップ時、ダイアログを表示しない" をチェックして OK を押すと表示されなくなります。その後は CTRL キーを押しながらドロップすればダイアログが表示されます。</dd>
+            ただし、ダイアログで "次のドロップ時、ダイアログを表示しない" をチェックして OK を押すと表示されなくなります。その後は CTRL キーを押しながらドロップすると、ふたたびダイアログが表示されます。</dd>
         <dt>ConfirmFileDragAndDrop が off のとき</dt>
         <dd>
           1つのファイルをドロップすると、ダイアログを表示せずに処理します。デフォルトの処理はSend File (Paste content of file)です。<br>
@@ -136,8 +136,7 @@ VT window
           ダイアログが表示される場合にはダイアログの設定に反映され、
           表示されない場合はユーザへ確認せずに同じ処理をします。<br>
           設定ファイル(TERATERM.INI)に対応する設定項目は存在せず、保存はされません。<br>
-          記憶される内容は、処理の種類(SCP/Send file/Send file(binary)/Paste Filename)と
-          ファイル名ペースト時のセパレータ(Separator is Space/Separator is NewLine)です。
+          記憶されるのは、処理の種類(SCP/Send File/Paste Filename)です。
         </dd>
         <dt>次のドロップ時、ダイアログを表示しない</dt>
         <dd>
@@ -146,8 +145,9 @@ VT window
           このチェックボックスは ConfirmFileDragAndDrop が off のときのみチェックすることができます。<br>
           この設定は ConfirmFileDragAndDrop とは別の設定であり、
           <a href="../menu/setup-save.html">[Setup] Save Setup</a> で設定を保存しても保存されません。<br>
-          たとえば「次のドロップ時、同じ処理を行う」で SCP を選んだあとにフォルダをドロップするなど、
-          処理できない（確認が必要な）場合や、CTRL キーを押しながらドロップした場合は、ダイアログが表示されます。
+          この設定をチェックした後でも、たとえば「次のドロップ時、同じ処理を行う」で
+          SCP を選んだあとにフォルダをドロップするなど処理できない（確認が必要な）場合や、
+          CTRL キーを押しながらドロップした場合には、ふたたびダイアログが表示されます。
         </dd>
       </dl>
     </dd>
