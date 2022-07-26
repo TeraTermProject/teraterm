@@ -78,9 +78,14 @@ TTCPropSheetDlg::~TTCPropSheetDlg()
 	free(m_Page);
 }
 
-void TTCPropSheetDlg::SetTreeViewMode(BOOL enable)
+void TTCPropSheetDlg::SetTreeViewModeInit(BOOL enable)
 {
 	m_TreeViewInit = enable;
+}
+
+void TTCPropSheetDlg::SetTreeViewMode(BOOL enable)
+{
+	m_TreeView = enable;
 }
 
 void TTCPropSheetDlg::AddPage(HPROPSHEETPAGE hpage, const wchar_t *path)

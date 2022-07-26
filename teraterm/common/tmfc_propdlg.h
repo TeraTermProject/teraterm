@@ -39,7 +39,8 @@ public:
 	INT_PTR DoModal();
 	void AddPage(HPROPSHEETPAGE page, const wchar_t *path = NULL);
 	void SetCaption(const wchar_t *caption);
-	static void SetTreeViewMode(BOOL enable);
+	void SetTreeViewMode(BOOL enable);
+	static void SetTreeViewModeInit(BOOL enable);
 	void SetStartPage(int start);
 
 private:

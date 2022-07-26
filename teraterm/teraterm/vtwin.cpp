@@ -4214,8 +4214,8 @@ void CVTWindow::OpenExternalSetup(int page)
 	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
 	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
-	CAddSettingPropSheetDlg::SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
+	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
 	CAddSetting.SetStartPage(additional_page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
