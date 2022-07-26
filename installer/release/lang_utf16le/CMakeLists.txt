@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.23)
+﻿cmake_minimum_required(VERSION 3.11)
 
 set(PACKAGE_NAME "lang_utf16le")
 project(${PACKAGE_NAME})
