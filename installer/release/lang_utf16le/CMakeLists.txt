@@ -27,6 +27,7 @@ function(ConvertLNG FNAME OPTION)
     OUTPUT ${DEST}
     DEPENDS ${SRC}
     DEPENDS ${SCRIPT}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
     COMMAND ${PERL} ${SCRIPT} ${OPTION} ${SRC} ${DEST}
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
@@ -34,16 +35,16 @@ function(ConvertLNG FNAME OPTION)
   set(SRC_FILES ${SRC_FILES} PARENT_SCOPE)
 endfunction()
 
-ConvertLNG(Default.lng utf16)
-ConvertLNG(English.lng utf16)
-ConvertLNG(French.lng utf16)
-ConvertLNG(German.lng utf16)
-ConvertLNG(Japanese.lng utf16)
-ConvertLNG(Korean.lng utf16)
-ConvertLNG(Russian.lng utf16)
-ConvertLNG("Simplified Chinese.lng" utf16)
-ConvertLNG(Spanish.lng utf16)
-ConvertLNG("Traditional Chinese.lng" utf16)
+ConvertLNG(Default.lng utf16le)
+ConvertLNG(English.lng utf16le)
+ConvertLNG(French.lng utf16le)
+ConvertLNG(German.lng utf16le)
+ConvertLNG(Japanese.lng utf16le)
+ConvertLNG(Korean.lng utf16le)
+ConvertLNG(Russian.lng utf16le)
+ConvertLNG("Simplified Chinese.lng" utf16le)
+ConvertLNG(Spanish.lng utf16le)
+ConvertLNG("Traditional Chinese.lng" utf16le)
 
 add_custom_target(
   ${PACKAGE_NAME} ALL
