@@ -1581,14 +1581,19 @@ void CVTWindow::DropListFree()
 	}
 }
 
-LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
+/**
+ *  ファイルがドロップされた
+ *	@param	ShowDialog	0	表示しても表示しなくても良い
+ *						1	必ず表示する
+ */
+LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 {
 	// iniに保存されない、今実行しているTera Termでのみ有効な設定
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
 	static unsigned char DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	static bool DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
+	static bool TransBin;
 
-	(void)lParam;
 	int FileCount = 0;
 	int DirectoryCount = 0;
 	for (int i = 0; i < DropListCount; i++) {
@@ -1609,6 +1614,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	unsigned char DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	if (DefaultDropType == DROP_TYPE_CANCEL) {
 		// default is not set
+		TransBin = ts.TransBin == 0 ? false : true;
 		if (!ShowDialog) {
 			if (FileCount == 1 && DirectoryCount == 0) {
 				if (ts.ConfirmFileDragAndDrop) {
@@ -1657,7 +1663,6 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	} else {
 		if (DirectoryCount > 0 &&
 			(DefaultDropType == DROP_TYPE_SEND_FILE ||
-			 DefaultDropType == DROP_TYPE_SEND_FILE_BINARY ||
 			 DefaultDropType == DROP_TYPE_SCP))
 		{	// デフォルトのままでは処理できない組み合わせ
 			DropType = DROP_TYPE_PASTE_FILENAME;
@@ -1684,6 +1689,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
 								  DirectoryCount == 0 ? true : false,
+								  &TransBin,
 								  &ts,
 								  &DropTypePaste,
 								  &DoSameProcess,
@@ -1694,7 +1700,6 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 			}
 			if (DoSameProcessNextDrop) {
 				DefaultDropType = DropType;
-				DefaultDropTypePaste = DropTypePaste;
 			}
 			if (!ts.ConfirmFileDragAndDrop) {
 				DefaultShowDialog = !DoNotShowDialog;
@@ -1707,14 +1712,18 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 			// cancel
 			break;
 		case DROP_TYPE_SEND_FILE:
-			SendMemSendFile(FileName, FALSE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
-			break;
-		case DROP_TYPE_SEND_FILE_BINARY:
-			SendMemSendFile(FileName, TRUE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+			if (!TransBin) {
+				SendMemSendFile(FileName, FALSE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+			}
+			else {
+				SendMemSendFile(FileName, TRUE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+			}
 			break;
 		case DROP_TYPE_PASTE_FILENAME:
 		{
 			const bool escape = (DropTypePaste & DROP_TYPE_PASTE_ESCAPE) ? true : false;
+
+			DefaultDropTypePaste = DropTypePaste;
 
 			TermSendStartBracket();
 

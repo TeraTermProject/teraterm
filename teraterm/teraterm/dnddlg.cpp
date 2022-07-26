@@ -46,7 +46,7 @@ struct DrapDropDlgParam {
 	char *ScpSendDirPtr;
 	int ScpSendDirSize;
 	bool SendfileEnable;
-	bool PasteNewlineEnable;
+	bool SendfileBinary;
 	int RemaingFileCount;
 	bool DoSameProcess;
 	bool DoSameProcessNextDrop;
@@ -94,11 +94,10 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		// target file
 		SetDlgItemTextW(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
 
-		// checkbox
+		// drop type
 		CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO,
-						 (Param->DropType == DROP_TYPE_SEND_FILE ||
-						  Param->DropType == DROP_TYPE_SEND_FILE_BINARY) ? IDC_SENDFILE_RADIO :
-						 Param->DropType == DROP_TYPE_PASTE_FILENAME  ? IDC_PASTE_RADIO :
+						 Param->DropType == DROP_TYPE_SEND_FILE ? IDC_SENDFILE_RADIO :
+						 Param->DropType == DROP_TYPE_PASTE_FILENAME ? IDC_PASTE_RADIO :
 						 IDC_SCP_RADIO);
 
 		// SCP
@@ -113,7 +112,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetEditboxEmacsKeybind(hDlgWnd, IDC_SCP_PATH);
 
 		// Send File
-		if (Param->DropType == DROP_TYPE_SEND_FILE_BINARY) {
+		if (Param->SendfileBinary) {
 			SendMessage(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 		}
 		if (!Param->SendfileEnable) {
@@ -156,7 +155,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		// focus to "SCP dest textbox" or "Cancel"
 		{
 			int focus_id;
-			if (Param->ScpEnable) {
+			if (Param->DropType == DROP_TYPE_SCP) {
 				focus_id = IDC_SCP_PATH;
 			} else {
 				focus_id = IDCANCEL;
@@ -198,9 +197,10 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 								DlgData->Param->ScpSendDirPtr, DlgData->Param->ScpSendDirSize);
 			} else if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_RADIO) == BST_CHECKED) {
 				// Send File
-				DlgData->Param->DropType =
+				DlgData->Param->DropType = DROP_TYPE_SEND_FILE;
+				DlgData->Param->SendfileBinary =
 					(IsDlgButtonChecked(hDlgWnd, IDC_BINARY_CHECK) == BST_CHECKED) ?
-					DROP_TYPE_SEND_FILE_BINARY : DROP_TYPE_SEND_FILE;
+					true : false;
 			} else /* if (IsDlgButtonChecked(hDlgWnd, IDC_PASTE_RADIO) == BST_CHECKED) */ {
 				// Paste Filename
 				DlgData->Param->DropType = DROP_TYPE_PASTE_FILENAME;
@@ -248,6 +248,7 @@ enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
+	bool *SendfileBinary,
 	TTTSet *pts,
 	unsigned char *DropTypePaste,
 	bool *DoSameProcess,
@@ -260,7 +261,7 @@ enum drop_type ShowDropDialogBox(
 	Param.DropTypePaste = *DropTypePaste;
 	Param.ScpEnable = EnableSCP;
 	Param.SendfileEnable = EnableSendFile;
-	Param.PasteNewlineEnable = true;
+	Param.SendfileBinary = *SendfileBinary;
 	Param.RemaingFileCount = RemaingFileCount;
 	Param.DoNotShowDialog = *DoNotShowDialog;
 	Param.DoNotShowDialogEnable = pts->ConfirmFileDragAndDrop ? false : true,
@@ -279,5 +280,6 @@ enum drop_type ShowDropDialogBox(
 	*DoSameProcess = Param.DoSameProcess;
 	*DoSameProcessNextDrop = Param.DoSameProcessNextDrop;
 	*DoNotShowDialog = Param.DoNotShowDialog;
+	*SendfileBinary = Param.SendfileBinary;
 	return Param.DropType;
 }

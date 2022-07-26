@@ -32,8 +32,7 @@
 enum drop_type {
 	DROP_TYPE_CANCEL,
 	DROP_TYPE_SCP,
-	DROP_TYPE_SEND_FILE,		// past contents of file
-	DROP_TYPE_SEND_FILE_BINARY,
+	DROP_TYPE_SEND_FILE,		// paste contents of file
 	DROP_TYPE_PASTE_FILENAME,
 };
 
@@ -47,6 +46,7 @@ enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
+	bool *SendfileBinary,
 	TTTSet *pts,
 	unsigned char *DropTypePaste,
 	bool *DoSameProcess,
