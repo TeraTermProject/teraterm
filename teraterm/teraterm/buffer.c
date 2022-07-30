@@ -547,7 +547,7 @@ static void NewLine(int Line)
 	LinePtr = GetLinePtr(Line);
 }
 
-void LockBuffer()
+void LockBuffer(void)
 {
 	BuffLock++;
 	if (BuffLock>1) {
@@ -556,7 +556,7 @@ void LockBuffer()
 	NewLine(PageStart+CursorY);
 }
 
-void UnlockBuffer()
+void UnlockBuffer(void)
 {
 	if (BuffLock==0) {
 		return;
@@ -567,7 +567,7 @@ void UnlockBuffer()
 	}
 }
 
-void FreeBuffer()
+void FreeBuffer(void)
 {
 	BuffLock = 1;
 	UnlockBuffer();
@@ -577,7 +577,7 @@ void FreeBuffer()
 	}
 }
 
-void BuffAllSelect()
+void BuffAllSelect(void)
 {
 	SelectStart.x = 0;
 	SelectStart.y = 0;
@@ -588,7 +588,7 @@ void BuffAllSelect()
 	Selecting = TRUE;
 }
 
-void BuffScreenSelect()
+void BuffScreenSelect(void)
 {
 	int X, Y;
 	DispConvWinToScreen(0, 0, &X, &Y, NULL);
@@ -601,7 +601,7 @@ void BuffScreenSelect()
 	Selecting = TRUE;
 }
 
-void BuffCancelSelection()
+void BuffCancelSelection(void)
 {
 	SelectStart.x = 0;
 	SelectStart.y = 0;
@@ -610,7 +610,7 @@ void BuffCancelSelection()
 	Selecting = FALSE;
 }
 
-void BuffReset()
+void BuffReset(void)
 // Reset buffer status. don't update real display
 //   called by ResetTerminal()
 {
@@ -823,7 +823,7 @@ void BuffInsertSpace(int Count)
 	BuffUpdateRect(sx, CursorY, CursorRightM + extr, CursorY);
 }
 
-void BuffEraseCurToEnd()
+void BuffEraseCurToEnd(void)
 // Erase characters from cursor to the end of screen
 {
 	LONG TmpPtr;
@@ -849,7 +849,7 @@ void BuffEraseCurToEnd()
 	DispEraseCurToEnd(YEnd);
 }
 
-void BuffEraseHomeToCur()
+void BuffEraseHomeToCur(void)
 // Erase characters from home to cursor
 {
 	LONG TmpPtr;
@@ -1086,7 +1086,7 @@ void BuffEraseChars(int Count)
 	DispEraseCharsInLine(sx, Count + extr);
 }
 
-void BuffFillWithE()
+void BuffFillWithE(void)
 // Fill screen with 'E' characters
 {
 	LONG TmpPtr;
@@ -3422,7 +3422,7 @@ void BuffUpdateRect
 	}
 }
 
-void UpdateStr()
+void UpdateStr(void)
 // Display not-yet-displayed string
 {
 	int X, Y;
@@ -3459,7 +3459,7 @@ void MoveCursor(int Xnew, int Ynew)
 	}
 }
 
-void MoveRight()
+void MoveRight(void)
 /* move cursor right, but dont update screen.
   this procedure must be called from DispChar&DispKanji only */
 {
@@ -3470,7 +3470,7 @@ void MoveRight()
 	}
 }
 
-void BuffSetCaretWidth()
+void BuffSetCaretWidth(void)
 {
 	buff_char_t *CodeLineW = &CodeBuffW[LinePtr];
 	BOOL DW;
@@ -3480,7 +3480,7 @@ void BuffSetCaretWidth()
 	DispSetCaretWidth(DW);
 }
 
-void ScrollUp1Line()
+void ScrollUp1Line(void)
 {
 	int i, linelen;
 	int extl=0, extr=0;
@@ -3681,7 +3681,7 @@ void BuffRegionScrollDownNLines(int n) {
 	}
 }
 
-void BuffClearScreen()
+void BuffClearScreen(void)
 { // clear screen
 	if (isCursorOnStatusLine) {
 		BuffScrollNLines(1); /* clear status line */
@@ -3693,14 +3693,14 @@ void BuffClearScreen()
 	}
 }
 
-void BuffUpdateScroll()
+void BuffUpdateScroll(void)
 // Updates scrolling
 {
 	UpdateStr();
 	DispUpdateScroll();
 }
 
-void CursorUpWithScroll()
+void CursorUpWithScroll(void)
 {
 	if ((0<CursorY) && (CursorY<CursorTop) ||
 	    (CursorTop<CursorY)) {
@@ -3795,7 +3795,7 @@ static void invokeBrowserW(int x, int y)
 	}
 }
 
-void ChangeSelectRegion()
+void ChangeSelectRegion(void)
 {
 	POINT TempStart, TempEnd;
 	int j, IStart, IEnd;
@@ -4405,7 +4405,7 @@ end:
 	UnlockBuffer();
 }
 
-wchar_t *BuffEndSelect()
+wchar_t *BuffEndSelect(void)
 //  End text selection by mouse button up
 {
 	wchar_t *retval = NULL;
@@ -4646,7 +4646,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 	TTXSetWinSize(NumOfLines-StatusLine, NumOfColumns); /* TTPLUG */
 }
 
-void ChangeWin()
+void ChangeWin(void)
 {
 	int Ny;
 
@@ -4678,7 +4678,7 @@ void ChangeWin()
 	DispChangeWin();
 }
 
-void ClearBuffer()
+void ClearBuffer(void)
 {
 	/* Reset buffer */
 	PageStart = 0;
@@ -4719,7 +4719,7 @@ void ClearBuffer()
 	DispClearWin();
 }
 
-void SetTabStop()
+void SetTabStop(void)
 {
 	int i,j;
 
@@ -4918,7 +4918,7 @@ void BuffSetCurCharAttr(TCharAttr Attr) {
 }
 
 // TODO
-void BuffSaveScreen()
+void BuffSaveScreen(void)
 {
 	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
 	buff_char_t *CodeDestW;
@@ -4956,7 +4956,7 @@ void BuffSaveScreen()
 	_CrtCheckMemory();
 }
 
-void BuffRestoreScreen()
+void BuffRestoreScreen(void)
 {
 	PCHAR CodeSrc, AttrSrc, AttrSrc2, AttrSrcFG, AttrSrcBG;
 	buff_char_t *CodeSrcW;
@@ -5013,7 +5013,7 @@ void BuffRestoreScreen()
 	_CrtCheckMemory();
 }
 
-void BuffDiscardSavedScreen()
+void BuffDiscardSavedScreen(void)
 {
 	if (SaveBuff != NULL) {
 		free(SaveBuff);
@@ -5022,7 +5022,7 @@ void BuffDiscardSavedScreen()
 	_CrtCheckMemory();
 }
 
-void BuffSelectedEraseCurToEnd()
+void BuffSelectedEraseCurToEnd(void)
 // Erase characters from cursor to the end of screen
 {
 	buff_char_t* CodeLineW = &CodeBuffW[LinePtr];
@@ -5056,7 +5056,7 @@ void BuffSelectedEraseCurToEnd()
 	BuffUpdateRect(0, CursorY, NumOfColumns, YEnd);
 }
 
-void BuffSelectedEraseHomeToCur()
+void BuffSelectedEraseHomeToCur(void)
 // Erase characters from home to cursor
 {
 	buff_char_t* CodeLineW = &CodeBuffW[LinePtr];
