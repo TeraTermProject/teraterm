@@ -4186,6 +4186,43 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 	}
 }
 
+/**
+ *	このモジュールの初期化
+ *		現在やることなし
+ *		*注* 動的なロードを行っていないため、常にロードされている状態となっている
+ */
+DllExport void TTSetInit(void)
+{
+}
+
+/**
+ *	このモジュールの終了
+ *		確保したメモリの開放
+ */
+DllExport void TTSetUnInit(TTTSet *ts)
+{
+	wchar_t **ptr_list[] = {
+		&ts->HomeDirW,
+		&ts->SetupFNameW,
+		&ts->KeyCnfFNW,
+		&ts->EtermLookfeel.BGThemeFileW,
+		&ts->EtermLookfeel.BGSPIPathW,
+		&ts->UILanguageFileW,
+		&ts->UILanguageFileW_ini,
+		&ts->ExeDirW,
+		&ts->LogDirW,
+		&ts->FileDirW,
+		&ts->BGImageFilePathW,
+		&ts->LogDefaultPathW,
+	};
+	int i;
+	for(i = 0; i < _countof(ptr_list); i++) {
+		void **ptr = ptr_list[i];
+		free(*ptr);
+		*ptr = NULL;
+	}
+}
+
 BOOL WINAPI DllMain(HANDLE hInst,
                     ULONG ul_reason_for_call, LPVOID lpReserved)
 {

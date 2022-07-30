@@ -9,6 +9,8 @@ extern "C" {
 #endif
 
 DllExport int WINAPI SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen);
+DllExport void TTSetInit(void);
+DllExport void TTSetUnInit(TTTSet *ts);
 
 #ifdef __cplusplus
 }

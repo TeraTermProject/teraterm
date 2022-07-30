@@ -1473,6 +1473,8 @@ void CVTWindow::OnDestroy()
 
 	TTXEnd(); /* TTPLUG */
 
+	TTSetUnInit(&ts);
+
 	NotifyUninitialize(&cv);
 }
 
