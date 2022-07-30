@@ -15,11 +15,11 @@
   endif()
   find_program(
     HHC hhc.exe
-    HINTS "C:/Program Files (x86)/HTML Help Workshop"
+    HINTS "C:/Program Files \(x86\)/HTML Help Workshop"
     HINTS "C:/Program Files/HTML Help Workshop"
     HINTS "$ENV{ProgramFiles}/HTML Help Workshop"
     HINTS "$ENV{ProgramFiles\(x86\)}/HTML Help Workshop"
-    )
+  )
   find_program(
     CHMCMD chmcmd
     HINTS ${CMAKE_CURRENT_LIST_DIR}/../../buildtools/chmcmd/

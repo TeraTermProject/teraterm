@@ -1,10 +1,4 @@
 ﻿
-if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-  set(BINARY_DIR "${CMAKE_BINARY_DIR}/$<CONFIG>")
-else()
-  set(BINARY_DIR "${CMAKE_BINARY_DIR}")
-endif()
-
 add_custom_target(
   teraterm_ini ALL
   DEPENDS ${BINARY_DIR}/TERATERM.INI

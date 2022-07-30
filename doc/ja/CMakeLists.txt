@@ -2,10 +2,8 @@
 set(PACKAGE_NAME "chm_ja")
 project(${PACKAGE_NAME})
 
-if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-  set(BINARY_DIR "${CMAKE_BINARY_DIR}/$<CONFIG>")
-else()
-  set(BINARY_DIR "${CMAKE_BINARY_DIR}")
+if(NOT DEFINED BINARY_DIR)
+  MESSAGE(FATAL_ERROR "check BINARY_DIR")
 endif()
 
 set(CONVERTED_FILES "")
@@ -66,6 +64,13 @@ else()
   set(HHC_COMMAND ${CHMCMD})
 endif()
 
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+  set(RM rm)
+else()
+  # 3.11は rm がない。remove を使用する
+  set(RM remove)
+endif()
+
 add_custom_command(
   OUTPUT ${BINARY_DIR}/teratermj.chm
   DEPENDS ${CMAKE_CURRENT_LIST_DIR}/Index.hhk
@@ -73,7 +78,7 @@ add_custom_command(
   DEPENDS ${CMAKE_CURRENT_LIST_DIR}/teraterm.hhp
   DEPENDS ${CONVERTED_FILES}
   DEPENDS ${SRC}
-  COMMAND ${CMAKE_COMMAND} -E rm -f ${BINARY_DIR}/teratermj.chm
+  COMMAND ${CMAKE_COMMAND} -E ${RM} -f ${BINARY_DIR}/teratermj.chm
   COMMAND ${CMAKE_COMMAND} -DHHC=${HHC_COMMAND} -P ../chm.cmake
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_LIST_DIR}/teratermj.chm ${BINARY_DIR}/teratermj.chm
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}

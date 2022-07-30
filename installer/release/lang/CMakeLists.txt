@@ -3,11 +3,10 @@
 set(PACKAGE_NAME "lang")
 project(${PACKAGE_NAME})
 
-if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-  set(BINARY_DIR "${CMAKE_BINARY_DIR}/$<CONFIG>")
-else()
-  set(BINARY_DIR "${CMAKE_BINARY_DIR}")
+if(NOT DEFINED BINARY_DIR)
+  MESSAGE(FATAL_ERROR "check BINARY_DIR")
 endif()
+
 set(OUTPUT_DIR "${BINARY_DIR}/lang/")
 
 if(NOT DEFINED PERL)

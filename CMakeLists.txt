@@ -21,6 +21,18 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
+# 出力フォルダ
+if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+    set(BINARY_DIR "${CMAKE_BINARY_DIR}/$<CONFIG>")
+  else()
+    # 3.11のときはとりあえず debug ビルドと仮定する
+    set(BINARY_DIR "${CMAKE_BINARY_DIR}/debug")
+  endif()
+else()
+  set(BINARY_DIR "${CMAKE_BINARY_DIR}")
+endif()
+
 #set(_WIN32_WINNT "0x0a00") # 0x0a00=_WIN32_WINNT_WIN10
 #set(_WIN32_WINNT "0x0501") # Tera Term がビルドできる最小値
 if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
