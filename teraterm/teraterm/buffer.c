@@ -1383,20 +1383,20 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 			endp = Ptr + XEnd + 1;
 
 			if (XStart > 0 && (CodeBuffW[i].attr & AttrKanji)) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 			}
 			while (++i < endp) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 			}
 			if (XEnd < NumOfColumns-1 && (CodeBuffW[i-1].attr & AttrKanji)) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 			}
@@ -1406,14 +1406,14 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 			endp = Ptr + NumOfColumns;
 
 			if (XStart > 0 && (CodeBuffW[i].attr & AttrKanji)) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 			}
 			while (++i < endp) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 			}
@@ -1424,8 +1424,8 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 				endp = Ptr + NumOfColumns;
 
 				while (i < endp) {
-					CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-					CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+					CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+					CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 					if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 					if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 					i++;
@@ -1437,15 +1437,15 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 			endp = Ptr + XEnd + 1;
 
 			while (i < endp) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 				i++;
 			}
 			if (XEnd < NumOfColumns-1 && (CodeBuffW[i-1].attr & AttrKanji)) {
-				CodeBuffW[i].attr = CodeBuffW[i].attr & ~mask->Attr | attr->Attr;
-				CodeBuffW[i].attr2 = CodeBuffW[i].attr2 & ~mask->Attr2 | attr->Attr2;
+				CodeBuffW[i].attr = (CodeBuffW[i].attr & ~mask->Attr) | attr->Attr;
+				CodeBuffW[i].attr2 = (CodeBuffW[i].attr2 & ~mask->Attr2) | attr->Attr2;
 				if (mask->Attr2 & Attr2Fore) { CodeBuffW[i].fg = attr->Fore; }
 				if (mask->Attr2 & Attr2Back) { CodeBuffW[i].bg = attr->Back; }
 			}
@@ -2071,12 +2071,9 @@ void BuffPrint(BOOL ScrollRegion)
 {
 	int Id;
 	POINT PrintStart, PrintEnd;
-	TCharAttr TempAttr;
 	int j;
 	int IStart, IEnd;
 	LONG TmpPtr;
-
-	TempAttr = DefCharAttr;
 
 	if (ScrollRegion) {
 		Id = VTPrintInit(IdPrnScrollRegion);
@@ -3086,18 +3083,15 @@ static BOOL CheckSelect(int x, int y)
 
 	if (BoxSelect) {
 		return (Selected &&
-		((SelectStart.x<=x) && (x<SelectEnd.x) ||
-		 (SelectEnd.x<=x) && (x<SelectStart.x)) &&
-		((SelectStart.y<=y) && (y<=SelectEnd.y) ||
-		 (SelectEnd.y<=y) && (y<=SelectStart.y)));
+				(((SelectStart.x <= x) && (x < SelectEnd.x)) || ((SelectEnd.x <= x) && (x < SelectStart.x))) &&
+				(((SelectStart.y <= y) && (y <= SelectEnd.y)) || ((SelectEnd.y <= y) && (y <= SelectStart.y))));
 	}
 	else {
-		L = MAKELONG(x,y);
-		L1 = MAKELONG(SelectStart.x,SelectStart.y);
-		L2 = MAKELONG(SelectEnd.x,SelectEnd.y);
+		L = MAKELONG(x, y);
+		L1 = MAKELONG(SelectStart.x, SelectStart.y);
+		L2 = MAKELONG(SelectEnd.x, SelectEnd.y);
 
-		return (Selected &&
-			((L1<=L) && (L<L2) || (L2<=L) && (L<L1)));
+		return (Selected && (((L1 <= L) && (L < L2)) || ((L2 <= L) && (L < L1))));
 	}
 }
 
@@ -3702,11 +3696,10 @@ void BuffUpdateScroll(void)
 
 void CursorUpWithScroll(void)
 {
-	if ((0<CursorY) && (CursorY<CursorTop) ||
-	    (CursorTop<CursorY)) {
-		MoveCursor(CursorX,CursorY-1);
+	if (((0 < CursorY) && (CursorY < CursorTop)) || (CursorTop < CursorY)) {
+		MoveCursor(CursorX, CursorY - 1);
 	}
-	else if (CursorY==CursorTop) {
+	else if (CursorY == CursorTop) {
 		ScrollUp1Line();
 	}
 }
@@ -3827,11 +3820,9 @@ void ChangeSelectRegion(void)
 		return;
 	}
 
-	if ((SelectEndOld.y < SelectEnd.y) ||
-	    (SelectEndOld.y==SelectEnd.y) &&
-	    (SelectEndOld.x<=SelectEnd.x)) {
+	if ((SelectEndOld.y < SelectEnd.y) || ((SelectEndOld.y == SelectEnd.y) && (SelectEndOld.x <= SelectEnd.x))) {
 		TempStart = SelectEndOld;
-		TempEnd.x = SelectEnd.x-1;
+		TempEnd.x = SelectEnd.x - 1;
 		TempEnd.y = SelectEnd.y;
 	}
 	else {
@@ -4218,8 +4209,8 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	TmpPtr = GetLinePtr(SelectStart.y);
 	// check if the cursor is on the right half of a character
 	if ((SelectStartTmp.x>0) &&
-	    ((CodeBuffW[TmpPtr+SelectStartTmp.x-1].attr & AttrKanji) != 0) ||
-	    ((CodeBuffW[TmpPtr+SelectStartTmp.x].attr & AttrKanji) == 0) &&
+	    (((CodeBuffW[TmpPtr+SelectStartTmp.x-1].attr & AttrKanji) != 0) ||
+		 ((CodeBuffW[TmpPtr+SelectStartTmp.x].attr & AttrKanji) == 0)) &&
 	     Right) {
 		SelectStartTmp.x++;
 	}
@@ -4268,8 +4259,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	LockBuffer();
 	// check if the cursor is on the right half of a character
 	if ((X>0) &&
-	    ((CodeBuffW[TmpPtr+X-1].attr & AttrKanji) != 0) ||
-	    (X<NumOfColumns) &&
+	    (((CodeBuffW[TmpPtr+X-1].attr & AttrKanji) != 0) || (X<NumOfColumns)) &&
 	    ((CodeBuffW[TmpPtr+X].attr & AttrKanji) == 0) &&
 	    Right) {
 		X++;
@@ -4300,8 +4290,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	SelectEnd.y = Y;
 
 	if (NClick==2) { // drag after double click
-		if ((SelectEnd.y>SelectStart.y) ||
-		    (SelectEnd.y==SelectStart.y) &&
+		if (((SelectEnd.y>SelectStart.y) || (SelectEnd.y==SelectStart.y)) &&
 		    (SelectEnd.x>=SelectStart.x)) {
 			if (SelectStart.x==DblClkEnd.x) {
 				SelectEnd = DblClkStart;
@@ -4371,10 +4360,8 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 		}
 	}
 	else if (NClick==3) { // drag after tripple click
-		if ((SelectEnd.y>SelectStart.y) ||
-		    (SelectEnd.y==SelectStart.y) &&
-		    (SelectEnd.x>=SelectStart.x)) {
-			if (SelectStart.x==DblClkEnd.x) {
+		if ((SelectEnd.y > SelectStart.y) || ((SelectEnd.y == SelectStart.y) && (SelectEnd.x >= SelectStart.x))) {
+			if (SelectStart.x == DblClkEnd.x) {
 				SelectEnd = DblClkStart;
 				ChangeSelectRegion();
 				SelectStart = DblClkStart;
@@ -4437,9 +4424,7 @@ wchar_t *BuffEndSelect(void)
 				SelectEnd.y = SelectEndOld.y;
 			}
 		}
-		else if ((SelectEnd.y < SelectStart.y) ||
-		         (SelectEnd.y == SelectStart.y) &&
-		          (SelectEnd.x < SelectStart.x)) {
+		else if ((SelectEnd.y < SelectStart.y) || ((SelectEnd.y == SelectStart.y) && (SelectEnd.x < SelectStart.x))) {
 			SelectEndOld = SelectStart;
 			SelectStart = SelectEnd;
 			SelectEnd = SelectEndOld;
