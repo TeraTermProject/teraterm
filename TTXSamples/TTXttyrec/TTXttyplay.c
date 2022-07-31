@@ -40,6 +40,7 @@ struct recheader {
 typedef struct {
 	PTTSet ts;
 	PComVar cv;
+	TCreateFile origPCreateFile;
 	TReadFile origPReadFile;
 	TWriteFile origPWriteFile;
 	PParseParam origParseParam;
@@ -54,6 +55,7 @@ typedef struct {
 	int speed;
 	BOOL pause;
 	BOOL nowait;
+	BOOL open_error;
 	struct timeval last;
 	struct timeval wait;
 	char openfn[MAX_PATH];
@@ -108,6 +110,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
+	pvar->origPCreateFile = NULL;
 	pvar->origPReadFile = NULL;
 	pvar->origPWriteFile = NULL;
 	pvar->enable = FALSE;
@@ -119,6 +122,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->wait.tv_usec = 1;
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
+	pvar->open_error = FALSE;
 }
 
 void RestoreTitle() {
@@ -135,6 +139,27 @@ void ChangeTitle(char *title) {
 	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), title, _TRUNCATE);
 	pvar->ChangeTitle = TRUE;
 	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
+}
+
+static HANDLE PASCAL TTXCreateFile(LPCTSTR FName, DWORD AcMode, DWORD ShMode,
+    LPSECURITY_ATTRIBUTES SecAttr, DWORD CreateDisposition, DWORD FileAttr, HANDLE Template) {
+
+	HANDLE ret;
+
+	ret = pvar->origPCreateFile(FName, AcMode, ShMode, SecAttr, CreateDisposition, FileAttr, Template);
+
+	if (pvar->enable) {
+		if (ret == INVALID_HANDLE_VALUE) {
+			pvar->enable = FALSE;
+			pvar->open_error = TRUE;
+			pvar->played = FALSE;
+		}
+		else {
+			pvar->open_error = FALSE;
+		}
+	}
+
+	return ret;
 }
 
 static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rbytes, LPOVERLAPPED rol) {
@@ -350,8 +375,10 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 
 static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
 	if (pvar->cv->PortType == IdFile && pvar->enable) {
+		pvar->origPCreateFile = *hooks->PCreateFile;
 		pvar->origPReadFile = *hooks->PReadFile;
 		pvar->origPWriteFile = *hooks->PWriteFile;
+		*hooks->PCreateFile = TTXCreateFile;
 		*hooks->PReadFile = TTXReadFile;
 		*hooks->PWriteFile = TTXWriteFile;
 
@@ -360,6 +387,9 @@ static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
 }
 
 static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
+	if (pvar->origPCreateFile) {
+		*hooks->PCreateFile = pvar->origPCreateFile;
+	}
 	if (pvar->origPReadFile) {
 		*hooks->PReadFile = pvar->origPReadFile;
 	}
