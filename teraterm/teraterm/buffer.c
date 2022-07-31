@@ -567,8 +567,25 @@ void UnlockBuffer(void)
 	}
 }
 
+static void FreeCombinationBuffer(void)
+{
+	int i;
+	for (i = 0; i < NumOfColumns * NumOfLinesInBuff; i++) {
+		buff_char_t *b = &CodeBuffW[i];
+		if (b->pCombinationChars16 != NULL) {
+			free(b->pCombinationChars16);
+			b->pCombinationChars16 = NULL;
+		}
+		if (b->pCombinationChars32 != NULL) {
+			free(b->pCombinationChars32);
+			b->pCombinationChars32 = NULL;
+		}
+	}
+}
+
 void FreeBuffer(void)
 {
+	FreeCombinationBuffer();
 	BuffLock = 1;
 	UnlockBuffer();
 	if (CodeBuffW != NULL) {
