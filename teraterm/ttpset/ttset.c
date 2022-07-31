@@ -4214,6 +4214,7 @@ DllExport void TTSetUnInit(TTTSet *ts)
 		&ts->FileDirW,
 		&ts->BGImageFilePathW,
 		&ts->LogDefaultPathW,
+		&ts->MacroFNW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {
