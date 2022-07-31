@@ -12,6 +12,10 @@ if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
   # linux上ではcygwinが必要なものはビルドできない
   return()
 endif()
+if(CMAKE_COMMAND MATCHES "Microsoft")
+  # VS付属のcmakeは何か動作が異なっている
+  return()
+endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32bit build
