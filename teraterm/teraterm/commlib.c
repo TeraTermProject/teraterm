@@ -493,7 +493,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 		case IdFile:
 			InitFileIO(IdFile);  /* TTPLUG */
 			TTXOpenFile(); /* TTPLUG */
-			cv->ComID = PCreateFile(ts->HostName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+			cv->ComID = PCreateFile(ts->HostName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 			InvalidHost = (cv->ComID == INVALID_HANDLE_VALUE);
 			if (InvalidHost) {
 				if (cv->NoMsg==0) {
