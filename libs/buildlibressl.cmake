@@ -100,11 +100,11 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
     cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
 
     unset(BUILD_OPTIONS)
-    list(APPEND BUILD_OPTIONS "--config Debug")
+    list(APPEND BUILD_OPTIONS --config Debug)
     cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
 
     unset(BUILD_OPTIONS)
-    list(APPEND BUILD_OPTIONS "--config Release")
+    list(APPEND BUILD_OPTIONS --config Release)
     cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
 
     return()
