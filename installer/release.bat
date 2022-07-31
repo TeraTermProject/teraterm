@@ -168,9 +168,9 @@ set PERL=C:\Perl64\bin\perl.exe
 if exist %PERL% exit /b 0
 set PERL=C:\Perl\bin\perl.exe
 if exist %PERL% exit /b 0
-set PERL=C:\cygwin64\usr\bin\perl.exe
+set PERL=C:\cygwin64\bin\perl.exe
 if exist %PERL% exit /b 0
-set PERL=C:\cygwin\usr\bin\perl.exe
+set PERL=C:\cygwin\bin\perl.exe
 if exist %PERL% exit /b 0
 echo perl not found
 if not "%NOPAUSE%" == "1" pause
