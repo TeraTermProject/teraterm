@@ -4215,10 +4215,12 @@ DllExport void TTSetUnInit(TTTSet *ts)
 		&ts->BGImageFilePathW,
 		&ts->LogDefaultPathW,
 		&ts->MacroFNW,
+		&ts->LogFNW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {
 		void **ptr = ptr_list[i];
+		_CrtIsValidHeapPointer(*ptr);
 		free(*ptr);
 		*ptr = NULL;
 	}

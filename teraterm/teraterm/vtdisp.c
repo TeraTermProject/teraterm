@@ -1396,6 +1396,7 @@ void BGInitialize(BOOL initialize_once)
 		BGEnable = BGGetOnOff("BGEnable", FALSE, ts.SetupFNameW);
 	}
 
+	free(ts.EtermLookfeel.BGSPIPathW);
 	hGetPrivateProfileStringW(BG_SECTIONW, L"BGSPIPath", L"plugin", ts.SetupFNameW, &ts.EtermLookfeel.BGSPIPathW);
 	WideCharToACP_t(ts.EtermLookfeel.BGSPIPathW, ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath));
 
@@ -1403,6 +1404,7 @@ void BGInitialize(BOOL initialize_once)
 		wchar_t *theme_imagefile;
 
 		//コンフィグファイル(テーマファイル)の決定
+		free(ts.EtermLookfeel.BGThemeFileW);
 		hGetPrivateProfileStringW(BG_SECTIONW, L"BGThemeFile", L"", ts.SetupFNameW, &ts.EtermLookfeel.BGThemeFileW);
 		WideCharToACP_t(ts.EtermLookfeel.BGThemeFileW, ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile));
 
@@ -1410,6 +1412,7 @@ void BGInitialize(BOOL initialize_once)
 		aswprintf(&theme_imagefile, L"%s\\%hs", ts.HomeDirW, BG_THEME_IMAGEFILE);
 
 		// 背景画像の読み込み
+		free(ts.BGImageFilePathW);
 		hGetPrivateProfileStringW(BG_SECTIONW, BG_DESTFILEW, L"", theme_imagefile, &ts.BGImageFilePathW);
 		WideCharToACP_t(ts.BGImageFilePathW, ts.BGImageFilePath, _countof(ts.BGImageFilePath));
 
