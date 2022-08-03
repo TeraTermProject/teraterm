@@ -13,7 +13,7 @@ if(MINGW)
     bcrypt
   )
 else()
-  if(GENERATOR_IS_MULTI_CONFIG)
+  if(IS_MULTI_CONFIG)
     set(LIBRESSL_LIB
       debug ${LIBRESSL_ROOT}/lib/crypto-47d.lib
       optimized ${LIBRESSL_ROOT}/lib/crypto-47.lib
