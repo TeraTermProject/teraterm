@@ -145,7 +145,7 @@ static void DLLFreeFromList(int no)
 
 	// ŠJ•ú‚·‚é
 	DLLFree(p);
-	memcpy(p, p+1, sizeof(*p) + (HandleListCount - no - 1));
+	memcpy(p, p+1, sizeof(*p) * (HandleListCount - no - 1));
 	HandleListCount--;
 	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t)*HandleListCount);
 }
