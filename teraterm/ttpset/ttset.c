@@ -4201,21 +4201,21 @@ DllExport void TTSetInit(void)
  */
 DllExport void TTSetUnInit(TTTSet *ts)
 {
-	wchar_t **ptr_list[] = {
-		&ts->HomeDirW,
-		&ts->SetupFNameW,
-		&ts->KeyCnfFNW,
-		&ts->EtermLookfeel.BGThemeFileW,
-		&ts->EtermLookfeel.BGSPIPathW,
-		&ts->UILanguageFileW,
-		&ts->UILanguageFileW_ini,
-		&ts->ExeDirW,
-		&ts->LogDirW,
-		&ts->FileDirW,
-		&ts->BGImageFilePathW,
-		&ts->LogDefaultPathW,
-		&ts->MacroFNW,
-		&ts->LogFNW,
+	void **ptr_list[] = {
+		(void **)&ts->HomeDirW,
+		(void **)&ts->SetupFNameW,
+		(void **)&ts->KeyCnfFNW,
+		(void **)&ts->EtermLookfeel.BGThemeFileW,
+		(void **)&ts->EtermLookfeel.BGSPIPathW,
+		(void **)&ts->UILanguageFileW,
+		(void **)&ts->UILanguageFileW_ini,
+		(void **)&ts->ExeDirW,
+		(void **)&ts->LogDirW,
+		(void **)&ts->FileDirW,
+		(void **)&ts->BGImageFilePathW,
+		(void **)&ts->LogDefaultPathW,
+		(void **)&ts->MacroFNW,
+		(void **)&ts->LogFNW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {
