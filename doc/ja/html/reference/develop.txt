@@ -291,7 +291,6 @@
      - teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO
      - teraterm\ttpdlg\ttpdlg.rc // dialog
      - teraterm\ttpmacro\ttm-version.rc // VERSIONINFO
-     - teraterm\ttpset\ttpset-version.rc // VERSIONINFO
      - teraterm\ttptek\ttptek-version.rc // VERSIONINFO
      - ttssh2\ttxssh\ttxssh.rc // dialog
      - ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO

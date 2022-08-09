@@ -30,7 +30,6 @@ my @file_list = (
 	"teraterm/ttpcmn/ttpcmn-version.rc",
 	"teraterm/ttpdlg/ttpdlg.rc",
 	"teraterm/ttpmacro/ttm-version.rc",
-	"teraterm/ttpset/ttpset-version.rc",
 	"teraterm/ttptek/ttptek-version.rc",
 	"ttpmenu/ttpmenu.rc",
 	"ttssh2/ttxssh/ttxssh-version.rc",

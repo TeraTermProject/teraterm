@@ -67,7 +67,6 @@ Name: {app}\lang_utf16le; Components: TeraTerm
 [Files]
 Source: ..\teraterm\release\ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: ..\teraterm\release\ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm
 Source: release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
@@ -910,6 +909,7 @@ Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
 Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
 Name: {app}\ttpdlg.dll; Type: files
+Name: {app}\ttpset.dll; Type: files
 
 [UninstallDelete]
 ; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を
