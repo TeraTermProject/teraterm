@@ -16,6 +16,9 @@
   - https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 - Windows 10 Console
   - https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+- Color UniversalDesign 4
+  - 色覚多様性に対応した設定例
+  - カラーユニバーサルデザイン(CUD)推奨配色セット ver.4に準拠
 
 ## format
 
