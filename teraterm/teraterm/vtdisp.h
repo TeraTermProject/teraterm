@@ -38,7 +38,9 @@ extern "C" {
 /* prototypes */
 //<!--by AKASI
 void BGInitialize(BOOL initialize_once);
-void BGSetupPrimary(BOOL);
+void BGLoadThemeFile(TTTSet *pts);
+void BGSetupPrimary(BOOL forceSetup);
+void BGWriteThemeFile(const wchar_t *theme_file);
 
 void BGExchangeColor(void);
 
@@ -46,7 +48,7 @@ void BGOnSettingChange(void);
 void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(void);
 
-extern BOOL BGEnable;
+//extern BOOL BGEnable;
 //-->
 
 void InitDisp(void);
@@ -151,6 +153,15 @@ extern BOOL IMECompositionState;
 #define WINDOW_LOWER    5
 #define WINDOW_REFRESH  6
 #define WINDOW_TOGGLE_MAXIMIZE 7
+
+#include "bg_theme.h"
+
+typedef struct {
+	BG_PATTERN id;
+	const char *str;
+} BG_PATTERN_ST;
+
+const BG_PATTERN_ST *GetBGPatternList(int index);
 
 #ifdef __cplusplus
 }

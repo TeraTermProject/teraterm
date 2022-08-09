@@ -169,7 +169,6 @@
 #define IDC_DAD_STATIC                  2525
 #define IDC_PROTOELAPSEDTIME            2526
 #define IDC_TRANS_ELAPSED               2527
-#define IDC_BGIMG_LABEL                 2527
 #define IDC_TRANS_ETIME                 2528
 #define IDC_BGIMG_BUTTON                2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
@@ -185,7 +184,6 @@
 #define IDC_OPT_PLAINTEXT               2537
 #define IDC_OPT_TIMESTAMP               2538
 #define IDC_OPT_HIDEDLG                 2539
-#define IDC_CHECK7                      2540
 #define IDC_OPT_INCBUF                  2540
 #define IDC_OPT_TIMESTAMP_TYPE          2541
 #define IDC_BGIMG_BRIGHTNESS            2551
@@ -233,6 +231,10 @@
 #define IDC_SENDFILE_DELAYTIME_EDIT     2605
 #define IDC_SENDFILE_CHECK_4            2606
 #define IDC_SETUP_DIR_LIST              2607
+#define IDC_THEME_FILE                  2609
+#define IDC_THEME_BUTTON                2610
+#define IDC_THEME_EDIT                  2611
+#define IDC_THEME_EDITOR_BUTTON         2612
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -308,7 +310,6 @@
 #define ID_CONTROL_MACRO                50470
 #define ID_CONTROL_SHOW_MACRO           50480
 #define ID_HELP_INDEX2                  50910
-#define ID_HELP_USING2                  50920
 #define ID_HELP_ABOUT                   50990
 #define ID_TEKFILE_PRINT                51110
 #define ID_TEKFILE_EXIT                 51190
@@ -333,7 +334,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2608
+#define _APS_NEXT_CONTROL_VALUE         2620
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

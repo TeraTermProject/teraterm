@@ -321,15 +321,13 @@ enum LogTimestampType {
 
 // Eterm lookfeel alphablend structure
 typedef struct {
-	int BGEnable;
+	int BGEnable;	// 0/1/2 = theme使用しない/固定テーマ/ランダムテーマ
 	int BGUseAlphaBlendAPI;
-	char BGSPIPath[MAX_PATH];
+	char reserve_BGSPIPath[MAX_PATH];
 	int BGFastSizeMove;
 	int BGNoCopyBits;
 	int BGNoFrame;
-	char BGThemeFile[MAX_PATH];
-	int BGIgnoreThemeFile;
-	char reserve[20];
+	char reserver_BGThemeFile[MAX_PATH - sizeof(wchar_t *) * 2];
 	wchar_t *BGThemeFileW;
 	wchar_t *BGSPIPathW;
 } eterm_lookfeel_t;
@@ -590,7 +588,7 @@ struct tttset {
 	WORD KermitOpt;
 	WORD FontQuality;
 	char ScpSendDir[MAXPATHLEN];
-	char BGImageFilePath[MAX_PATH];
+	char reserver_BGImageFilePath[MAX_PATH];
 	int LogRotate;		//	enum rotate_mode LogRotate;
 	DWORD LogRotateSize;
 	WORD LogRotateSizeType;
@@ -610,7 +608,7 @@ struct tttset {
 	int SendBreakTime;
 	WORD FileSendHighSpeedMode;
 	WORD AutoComPortReconnect;
-	WORD BGImgBrightness;
+	WORD reserver_BGImgBrightness;
 	cygterm_t CygtermSettings;
 	int XmodemTimeOutInit;
 	int XmodemTimeOutInitCRC;
@@ -650,7 +648,6 @@ struct tttset {
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
 	wchar_t *LogDirW;					// logやダンプを置くフォルダ
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
-	wchar_t *BGImageFilePathW;
 	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;

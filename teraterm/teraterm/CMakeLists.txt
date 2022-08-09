@@ -11,6 +11,7 @@ add_executable(
   ${PACKAGE_NAME} WIN32
   addsetting.cpp
   addsetting.h
+  bg_theme.h
   broadcast.cpp
   broadcast.h
   buffer.c
@@ -115,6 +116,11 @@ add_executable(
   debug_pp.rc
   sendfiledlg.cpp
   sendfiledlg.h
+  #
+  themedlg.cpp
+  themedlg.h
+  themedlg.rc
+  themedlg_res.h
   )
 
 target_sources(

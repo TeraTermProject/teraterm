@@ -202,6 +202,7 @@ void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str);
 BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str);
 wchar_t *MakeISO8601Str(time_t t);
 int KanjiCodeToISO8859Part(int kanjicode);
+void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height);
 
 #ifdef __cplusplus
 }

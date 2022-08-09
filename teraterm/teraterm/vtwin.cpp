@@ -105,6 +105,7 @@
 #include "asprintf.h"
 #include "teraprn.h"
 #include "setupdirdlg.h"
+#include "themedlg.h"
 #include "ttcmn_static.h"
 
 #include <initguid.h>
@@ -351,6 +352,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 
 	InitDisp();
+	BGLoadThemeFile(&ts);
 
 	if (ts.HideTitle>0) {
 		Style = WS_VSCROLL | WS_HSCROLL |
@@ -1029,8 +1031,13 @@ void CVTWindow::ResetSetup()
 
 	/* background and ANSI color */
 #ifdef ALPHABLEND_TYPE2
+
+#if 0
+	// 起動時のみに読み込むテーマが無効になってしまうので削除
 	BGInitialize(FALSE);
 	BGSetupPrimary(TRUE);
+#endif
+
 	// 2006/03/17 by 337 : Alpha値も即時変更
 	// Layered窓になっていない場合は効果が無い
 	//
@@ -2815,7 +2822,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ALPHABLEND_TYPE2
-	if(BGEnable && ts.EtermLookfeel.BGNoCopyBits) {
+	if(ts.EtermLookfeel.BGEnable && ts.EtermLookfeel.BGNoCopyBits) {
 		((WINDOWPOS*)lParam)->flags |= SWP_NOCOPYBITS;
 	}
 #endif
@@ -4231,11 +4238,16 @@ void CVTWindow::OpenExternalSetup(int page)
 	CAddSetting.SetStartPage(additional_page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
+#if 0
 #ifdef ALPHABLEND_TYPE2
-		BGInitialize(FALSE);
+		if (ts.EtermLookfeel.BGEnable != 0 && ts.EtermLookfeel.BGThemeFileW != NULL) {
+			// テーマファイルを読み込む
+			BGLoadThemeFile(&ts);
+		}
 		BGSetupPrimary(TRUE);
 #else
 		DispApplyANSIColor();
+#endif
 #endif
 		DispSetNearestColors(IdBack, IdFore+8, NULL);
 		ChangeWin();
@@ -4983,9 +4995,17 @@ void CVTWindow::OnHelpAbout()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
-	(*AboutDialog)(HVTWin);
+	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
+		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
+		SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
+					  ts.UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
+		ThemeDialog(m_hInst, m_hWnd, &cv);
+	}
+	else {
+		SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
+					  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+		(*AboutDialog)(HVTWin);
+	}
 }
 
 LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)

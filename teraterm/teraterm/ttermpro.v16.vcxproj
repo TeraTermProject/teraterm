@@ -181,6 +181,7 @@
     <ClCompile Include="telnet.c" />
     <ClCompile Include="teraprn.cpp" />
     <ClCompile Include="teraterm.cpp" />
+    <ClCompile Include="themedlg.cpp" />
     <ClCompile Include="ttdde.c" />
     <ClCompile Include="ttdebug.cpp" />
     <ClCompile Include="ttdialog.c" />
@@ -250,6 +251,7 @@
     <ResourceCompile Include="filesys_log.rc" />
     <ResourceCompile Include="font_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
+    <ResourceCompile Include="themedlg.rc" />
     <ResourceCompile Include="tt-version.rc" />
     <ResourceCompile Include="ttermpro.rc" />
   </ItemGroup>
@@ -284,6 +286,8 @@
     <ClInclude Include="tekwin.h" />
     <ClInclude Include="telnet.h" />
     <ClInclude Include="teraprn.h" />
+    <ClInclude Include="themedlg.h" />
+    <ClInclude Include="themedlg_res.h" />
     <ClInclude Include="ttdde.h" />
     <ClInclude Include="ttdebug.h" />
     <ClInclude Include="ttdialog.h" />

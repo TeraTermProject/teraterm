@@ -131,6 +131,7 @@ HlpMenuSetupAdditionalCoding=html\menu\setup-additional-coding.html
 HlpMenuSetupAdditionalLog=html\menu\setup-additional-log.html
 HlpMenuSetupAdditionalVisual=html\menu\setup-additional-visual.html
 HlpMenuSetupAdditionalFont=html\menu\setup-additional-font.html
+HlpMenuSetupAdditionalTheme=html\menu\setup-additional-visual-theme.html
 HlpMenuSetupSave=html\menu\setup-save.html
 HlpMenuSetupRestore=html\menu\setup-restore.html
 HlpMenuSetupDir=html\menu\setup-directory.html

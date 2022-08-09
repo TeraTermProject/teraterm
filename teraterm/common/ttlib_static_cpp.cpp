@@ -1442,3 +1442,54 @@ wchar_t *MakeISO8601Str(time_t t)
 	wcsftime(date_str, _countof(date_str), L"%Y%m%dT%H%M%S%z", &now_tm);
 	return _wcsdup(date_str);
 }
+
+// base
+// https://www.daniweb.com/programming/software-development/threads/481786/saving-an-hdc-as-a-bmp-file
+void HDCToFile(const wchar_t* fname, HDC hdc, RECT Area, WORD BitsPerPixel = 24)
+{
+    LONG Width = Area.right - Area.left;
+    LONG Height = Area.bottom - Area.top;
+
+    BITMAPINFO Info;
+    BITMAPFILEHEADER Header;
+    memset(&Info, 0, sizeof(Info));
+    memset(&Header, 0, sizeof(Header));
+    Info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    Info.bmiHeader.biWidth = Width;
+    Info.bmiHeader.biHeight = Height;
+    Info.bmiHeader.biPlanes = 1;
+    Info.bmiHeader.biBitCount = BitsPerPixel;
+    Info.bmiHeader.biCompression = BI_RGB;
+    Info.bmiHeader.biSizeImage = Width * Height * (BitsPerPixel > 24 ? 4 : 3);
+    Header.bfType = 0x4D42;
+    Header.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+    char* Pixels = NULL;
+    HDC MemDC = CreateCompatibleDC(hdc);
+    HBITMAP Section = CreateDIBSection(hdc, &Info, DIB_RGB_COLORS, (void**)&Pixels, 0, 0);
+    DeleteObject(SelectObject(MemDC, Section));
+    BitBlt(MemDC, 0, 0, Width, Height, hdc, Area.left, Area.top, SRCCOPY);
+    DeleteDC(MemDC);
+
+	FILE *fp;
+	_wfopen_s(&fp, fname, L"wb");
+    if (fp != NULL) {
+        fwrite((char*)&Header, sizeof(Header), 1, fp);
+		fwrite((char *)&Info.bmiHeader, sizeof(Info.bmiHeader),1, fp);
+		fwrite(Pixels, (((BitsPerPixel * Width + 31) & ~31) / 8) * Height, 1, fp);
+		fclose(fp);
+    }
+
+    DeleteObject(Section);
+}
+
+void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height)
+{
+	RECT rect;
+	rect.top = 0;
+	rect.left = 0;
+	rect.right = width;
+	rect.bottom = height;
+
+	HDCToFile(fname, hdc, rect);
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Theme Editor</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Theme Editor</h1>
+
+    テーマはTera Termの背景、文字の色、または、両方を一括して扱う仕組み。<br>
+    各タブで設定を行う。<br>
+    [OK] で動作中のTera Termに反映され、[Cancel] で反映されずに破棄される。
+
+    <dl>
+      <dt><a href="#preview">preview/file tab</a></dt>
+      <dd>テーマの一時的な設定(preview),テーマファイルの読み込みと書き出し</dd>
+      <dt><a href="#bg">Backgroud tab</a></dt>
+      <dd>BG(背景画像)に関する設定を行う</dd>
+      <dt><a href="#color">color tab</a></dt>
+      <dd>文字の色に関する設定を行う</dd>
+    </dl>
+
+    <a href="#theme_file">テーマファイルについて</a>
+
+    <hr>
+
+    <h2 id="preview">preview/file tab</h2>
+
+    preview<br>
+    テーマの一時的な設定(preview)、やり直し(undo)を行う
+    <dl>
+      <dt>[preview]</dt>
+      <dd>設定したテーマを一時的に設定(preview)する</dd>
+      <dt>[undo]</dt>
+      <dd>変更したテーマをダイアログを開く前の状態に戻す</dd>
+    </dl>
+
+    file<br>
+    テーマファイルからテーマを読み込み、テーマを保存する
+    <dl>
+      <dt>[load]</dt>
+      <dd>テーマファイルを読み込む</dd>
+      <dt>[save]</dt>
+      <dd>
+        設定中のテーマをファイルに書き出す<br>
+        BGテーマ、Colorテーマを書き出すかを選択できる
+      </dd>
+    </dl>
+
+    <hr>
+
+    <h2 id="bg">Backgroud tab(背景テーマ)</h2>
+
+    <p>
+      *注意* 背景画像を表示するため、文字の背景は無効化される。
+
+    <p>
+      Tera Term の背景画像は次のように指定する。<br>
+      <img src="setup-additional-visual-theme.png"><br>
+
+      <a href="../setup/teraterm-win.html#eterm">テーマファイルについて(Eterm風半透明ウィンドウ)</a>
+
+    <h3>iniファイル内のキーについてのメモ</h3>
+
+    仕様が固まったら消す
+
+    <dl>
+      <dt>BGPictureTone</dt>
+      <dd>
+        背景画像(Dest)にデスクトップ画像(Src1)どれぐらいブレンドするか<br>
+        BGSrc1Alpha = 255 - BGPictureTone<br>
+        0=デスクトップ画像(Src1)が100%<br>
+        255=背景画像(Dest)が100%
+      </dd>
+      <dt>BGFadeColor</dt>
+      <dd>
+        Src2の色<br>
+        BGFadeColor = BGSrc2Color
+      </dd>
+      <dt>BGFadeTone</dt>
+      <dd>DestとSrc1の合成画像に単色(Src2)をどれぐらいブレンドするか<br>
+        BGSrc2Alpha = 255 - BGFadeTone<br>
+        0=単色(Src2)が100%<br>
+        255=DestとSrc1の合成画像が100%
+      </dd>
+    </dl>
+
+    <hr>
+
+    <h2 id="color">color tab(カラーテーマ)</h2>
+
+    <p>
+      *注意* 背景画像を表示しているとき、文字の背景は無効化される。
+
+    <p>
+      カラーテーマはデフォルト色に上書きして色が設定される。<br>
+      <a href="#default_color">デフォルト色</a>はTERATERM.INI で設定される。<br>
+      iniファイル内で設定しない色はデフォルト色となる。
+
+    <p>
+      このタブでは次のことができる<br>
+      <ul>
+        <li>色の設定
+        <li>デフォルトの色に戻す
+      </ul>
+
+    <p>
+      色の設定はリストで色を選んで右クリック(orダブルクリック)
+
+    <p>
+      今のところ commctrlのカラーピッカーを使用。<br>
+      Tera Term内のカラーピッカーに切り替えるか?
+
+    <p>
+      設定した色を表示する例
+      <pre>wget https://gist.githubusercontent.com/10sr/6852331/raw/9d9d50714a4039932bb48091e111378d73c098db/256colors2.pl -O - | perl</pre>
+
+    <dl>
+      <dt>[default]</dt>
+      <dd>デフォルト色を設定</dd>
+    </dl>
+
+    <hr>
+
+    <h2 id="theme_file">themeファイル</h2>
+
+    <ul>
+      <li>themeファイルの種類
+      <li>デフォルト色について
+    </ul>
+
+    <h3>themeファイルの種類</h3>
+
+    テーマファイルにはいくつかの種類がある。<br>
+    TODO 仕様をちゃんと決める
+
+    <dl>
+      <dt>BG + カラー</dt>
+      <dd>
+        [BG]と[Color Theme]の2セクション入ったファイル<br>
+        [BG]セクションには背景画像の設定だけ入っている
+      </dd>
+      <dt>BG のみ</dt>
+      <dd>
+        [BG]セクションのみのファイル<br>
+        [BG]セクションには背景画像の設定だけ入っている
+      </dd>
+      <dt>カラーのみ</dt>
+      <dd>
+        [Color Theme]のみのファイル<br>
+      </dd>
+      <dt>BG + 旧カラー (廃止したい)</dt>
+      <dd>
+        [BG]セクションのみのファイル<br>
+        [BG]セクションには背景画像と文字の色情報が入っている<br>
+        [BG]セクションの色情報は廃止したい<br>
+      </dd>
+    </dl>
+
+    <h3 id="default_color">デフォルト色について</h3>
+
+    デフォルト色は TERATERM.INI の次のキーワードで設定できる
+    <ul>
+      <li>VTColor
+      <li>VTBoldColor
+      <li>VTBlinkColor
+      <li>VTReverseColor
+      <li>URLColor
+      <li>ANSIColor
+    </ul>
+
+  </body>
+</html>

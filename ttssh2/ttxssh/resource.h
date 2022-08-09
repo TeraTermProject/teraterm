@@ -87,7 +87,6 @@
 #define IDC_HOSTTCPPROTOCOLLABEL        1046
 #define IDC_SSHRTLLISTENADDR            1046
 #define IDC_HOSTTCPPROTOCOL             1047
-#define IDC_COMBO1                      1049
 #define IDC_SSH_VERSION                 1049
 #define IDC_HOSTKEY_ROTATION_COMBO      1049
 #define IDC_SSH_VERSION_LABEL           1050
@@ -95,7 +94,6 @@
 #define IDC_HEARTBEATLABEL              1052
 #define IDC_HEARTBEAT_EDIT              1053
 #define IDC_HEARTBEATLABEL2             1054
-#define IDC_CHECK1                      1055
 #define IDC_HISTORY                     1055
 #define IDC_REMEMBER_PASSWORD           1055
 #define IDC_CHECKAUTH                   1055
@@ -207,7 +205,6 @@
 #define IDC_PUTTY_VERSION               1209
 #define IDC_ED25519_TYPE                1211
 #define IDC_HOSTKEY_ROTATION_STATIC     1212
-#define IDC_LIST1                       1213
 #define IDC_MESSAGE                     1214
 #define IDC_HOSTKEY_MESSAGE             1214
 #define IDC_ADDKEY_TEXT                 1215
@@ -246,7 +243,7 @@
 #define IDC_SSHAUTHSETUP_HELP           1251
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118

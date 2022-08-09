@@ -451,9 +451,8 @@ static wchar_t *GetVirtualStorePath(const SetupList *list, const TTTSet *)
  */
 static wchar_t *GetSusiePluginPath(const SetupList *, const TTTSet *pts)
 {
-	const char *spi_path = pts->EtermLookfeel.BGSPIPath;
 	wchar_t *path;
-	aswprintf(&path, L"%s\\%hs", pts->ExeDirW, spi_path);
+	aswprintf(&path, L"%s\\%s", pts->ExeDirW, pts->EtermLookfeel.BGSPIPathW);
 	return path;
 }
 

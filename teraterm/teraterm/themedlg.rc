@@ -1,0 +1,154 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "themedlg_res.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winresrc.h>
+#define IDC_STATIC -1
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// ì˙ñ{åÍ (ì˙ñ{) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "themedlg_res.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // ì˙ñ{åÍ (ì˙ñ{) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// âpåÍ (ïƒçë) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TABSHEET_THEME_EDITOR DIALOGEX 0, 0, 326, 252
+STYLE DS_SETFONT | WS_CHILD | WS_BORDER
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    LTEXT           "base",IDC_BGIMG_BASE_TITLE,15,8,16,8
+    LTEXT           "Color (RRGGBB)",IDC_BGIMG_COLOR_TITLE,36,23,143,8
+    EDITTEXT        IDC_BGIMG_COLOR_EDIT,36,37,34,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Background &Image",IDC_BGIMG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,57,73,10
+    EDITTEXT        IDC_BGIMG_EDIT,36,74,255,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BGIMG_BUTTON,295,74,14,14
+    COMBOBOX        IDC_BGIMG_COMBO,36,96,107,45,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Mixing desktop wallpaper image",IDC_WALLPAPER_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,117,269,10
+    LTEXT           "Alpha (0=no effect ... 255=overwrite)",IDC_WALLPAPER_ALPHA_TITLE,36,132,143,8
+    EDITTEXT        IDC_WALLPAPER_ALPHA_EDIT,36,145,22,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "static text",IDC_BG_THEME_HELP,178,147,144,101
+    CONTROL         "Mixing simple color plane",IDC_SIMPLE_COLOR_PLANE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,167,148,10
+    LTEXT           "Color (RRGGBB)",IDC_SIMPLE_COLOR_PLANE_COLOR_TITLE,36,182,143,8
+    EDITTEXT        IDC_SIMPLE_COLOR_PLANE_COLOR,36,197,34,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Alpha (0=no effect ... 255=overwrite)",IDC_SIMPLE_COLOR_PLANE_ALPHA_TITLE,36,215,132,8
+    EDITTEXT        IDC_SIMPLE_COLOR_PLANE_ALPHA,36,227,22,14,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_TABSHEET_COLOR_THEME_EDITOR DIALOGEX 0, 0, 326, 267
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_COLOR_LIST,"SysListView32",LVS_REPORT | LVS_AUTOARRANGE | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,15,14,286,191
+    LTEXT           "sample text\n(under construction)",IDC_STATIC,16,212,109,24
+    PUSHBUTTON      "Default",IDC_COLOR_DEFAULT_BUTTON,15,241,50,14
+END
+
+IDD_TABSHEET_THEME_FILE DIALOGEX 0, 0, 292, 159
+STYLE DS_SETFONT | WS_CHILD | WS_BORDER
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Preview",IDC_FILE_PREVIEW_BUTTON,13,13,50,14
+    PUSHBUTTON      "Undo",IDC_FILE_UNDO_BUTTON,13,34,50,14
+    LTEXT           "theme file",IDC_STATIC,13,58,90,8
+    PUSHBUTTON      "Load",IDC_FILE_LOAD_BUTTON,26,74,50,14
+    PUSHBUTTON      "Save",IDC_FILE_SAVE_BUTTON,26,95,50,14
+    CONTROL         "Save BG theme",IDC_FILE_SAVE_BG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,40,116,73,10
+    CONTROL         "Save Color theme",IDC_FILE_SAVE_COLOR_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,40,131,77,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TABSHEET_THEME_EDITOR, DIALOG
+    BEGIN
+        VERTGUIDE, 15
+        VERTGUIDE, 36
+        BOTTOMMARGIN, 248
+        HORZGUIDE, 96
+    END
+
+    IDD_TABSHEET_COLOR_THEME_EDITOR, DIALOG
+    BEGIN
+    END
+
+    IDD_TABSHEET_THEME_FILE, DIALOG
+    BEGIN
+        VERTGUIDE, 13
+        VERTGUIDE, 26
+        VERTGUIDE, 40
+        BOTTOMMARGIN, 151
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // âpåÍ (ïƒçë) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

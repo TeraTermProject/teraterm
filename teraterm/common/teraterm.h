@@ -63,15 +63,16 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 #define BG_DESTFILE "BGDestFile"
 #define BG_DESTFILEW L"BGDestFile"
 #define BG_THEME_DIR L"theme"
-#define BG_THEME_IMAGEFILE "theme\\ImageFile.INI"
-#define BG_THEME_IMAGEFILE_DEFAULT "theme\\*.INI"
+//#define BG_THEME_IMAGEFILE "theme\\ImageFile.INI"
+//#define BG_THEME_IMAGEFILE_DEFAULT "theme\\*.INI"
 #define BG_THEME_IMAGE_BRIGHTNESS_DEFAULT 64
 #define BG_THEME_IMAGE_BRIGHTNESS1 "BGSrc1Alpha"
 #define BG_THEME_IMAGE_BRIGHTNESS1W L"BGSrc1Alpha"
 #define BG_THEME_IMAGE_BRIGHTNESS2 "BGSrc2Alpha"
-#define BG_THEME_IMAGEFILE_NAME "ImageFile.INI"
-#define BG_THEME_THEMEFILE_SCALE "Scale.INI"
-#define BG_THEME_THEMEFILE_TILE "Tile.INI"
+//#define BG_THEME_IMAGEFILE_NAME "ImageFile.INI"
+//#define BG_THEME_IMAGEFILE_NAMEW L"ImageFile.INI"
+//#define BG_THEME_THEMEFILE_SCALE "Scale.INI"
+//#define BG_THEME_THEMEFILE_TILE "Tile.INI"
 
 // Added by 337 2006/03/01
 #define USE_NORMAL_BGCOLOR

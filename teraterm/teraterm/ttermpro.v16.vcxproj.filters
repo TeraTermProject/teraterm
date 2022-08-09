@@ -204,6 +204,9 @@
     <ClCompile Include="..\..\cygwin\cyglib\cyglib.c">
       <Filter>cyglib</Filter>
     </ClCompile>
+    <ClCompile Include="themedlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
     <ClCompile Include="..\ttpset\ttset.c">
       <Filter>ttpset</Filter>
     </ClCompile>
@@ -267,6 +270,9 @@
     </ResourceCompile>
     <ResourceCompile Include="filesys_log.rc">
       <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="themedlg.rc">
+      <Filter>dialog</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
@@ -476,6 +482,12 @@
     </ClInclude>
     <ClInclude Include="..\..\cygwin\cyglib\cyglib.h">
       <Filter>cyglib</Filter>
+    </ClInclude>
+    <ClInclude Include="themedlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="themedlg_res.h">
+      <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\ttpset\ttset.h">
       <Filter>ttpset</Filter>

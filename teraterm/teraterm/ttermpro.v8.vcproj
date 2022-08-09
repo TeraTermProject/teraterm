@@ -691,6 +691,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\themedlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\themedlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\themedlg.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\themedlg_res.h"
+				>
+			</File>
+			<File
 				RelativePath="ttdialog.c"
 				>
 			</File>
