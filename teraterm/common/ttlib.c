@@ -44,29 +44,6 @@
 #include "compat_win.h"
 #include "codeconv.h"
 
-/* OS version with GetVersionEx(*1)
-
-                dwMajorVersion   dwMinorVersion    dwPlatformId
-Windows95       4                0                 VER_PLATFORM_WIN32_WINDOWS
-Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS
-WindowsMe       4                90                VER_PLATFORM_WIN32_WINDOWS
-WindowsNT4.0    4                0                 VER_PLATFORM_WIN32_NT
-Windows2000     5                0                 VER_PLATFORM_WIN32_NT
-WindowsXP       5                1                 VER_PLATFORM_WIN32_NT
-WindowsXPx64    5                2                 VER_PLATFORM_WIN32_NT
-WindowsVista    6                0                 VER_PLATFORM_WIN32_NT
-Windows7        6                1                 VER_PLATFORM_WIN32_NT
-Windows8        6                2                 VER_PLATFORM_WIN32_NT
-Windows8.1(*2)  6                2                 VER_PLATFORM_WIN32_NT
-Windows8.1(*3)  6                3                 VER_PLATFORM_WIN32_NT
-Windows10(*2)   6                2                 VER_PLATFORM_WIN32_NT
-Windows10(*3)   10               0                 VER_PLATFORM_WIN32_NT
-
-(*1) GetVersionEx()が c4996 warning となるのは、VS2013(_MSC_VER=1800) からです。
-(*2) manifestに supportedOS Id を追加していない。
-(*3) manifestに supportedOS Id を追加している。
-*/
-
 // for isInvalidFileNameChar / replaceInvalidFileNameChar
 static char *invalidFileNameChars = "\\/:*?\"<>|";
 
@@ -925,6 +902,11 @@ void OutputDebugPrintf(const char *fmt, ...)
 	OutputDebugStringA(tmp);
 }
 
+// 各バージョンチェックは直値にできるかもしれない
+//  例
+//		VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
+//		IsWindowsNT4() は常に FALSE を返す
+
 // OSが WindowsNT カーネルかどうかを判別する。
 //
 // return TRUE:  NT kernel
@@ -959,9 +941,6 @@ BOOL IsWindowsMe()
 // OSが WindowsNT4.0 かどうかを判別する。
 BOOL IsWindowsNT4()
 {
-	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
-	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
-	// 無条件に FALSE を返してもよいかもしれない。
 	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
 }
 

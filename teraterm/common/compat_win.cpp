@@ -65,6 +65,7 @@ static ULONGLONG (WINAPI *pVerSetConditionMask)(ULONGLONG dwlConditionMask, DWOR
 static BOOL (WINAPI *pVerifyVersionInfoA)(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
 BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
+static BOOL (WINAPI *pGetVersionExA)(LPOSVERSIONINFOA lpVersionInformation);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -263,11 +264,47 @@ static const DllInfo DllInfos[] = {
 	{},
 };
 
+/* OS version with GetVersionEx(*1)
+
+                dwMajorVersion   dwMinorVersion    dwPlatformId
+Windows95       4                0                 VER_PLATFORM_WIN32_WINDOWS
+Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS
+WindowsMe       4                90                VER_PLATFORM_WIN32_WINDOWS
+WindowsNT4.0    4                0                 VER_PLATFORM_WIN32_NT
+Windows2000     5                0                 VER_PLATFORM_WIN32_NT
+WindowsXP       5                1                 VER_PLATFORM_WIN32_NT
+WindowsXPx64    5                2                 VER_PLATFORM_WIN32_NT
+WindowsVista    6                0                 VER_PLATFORM_WIN32_NT
+Windows7        6                1                 VER_PLATFORM_WIN32_NT
+Windows8        6                2                 VER_PLATFORM_WIN32_NT
+Windows8.1(*2)  6                2                 VER_PLATFORM_WIN32_NT
+Windows8.1(*3)  6                3                 VER_PLATFORM_WIN32_NT
+Windows10(*2)   6                2                 VER_PLATFORM_WIN32_NT
+Windows10(*3)   10               0                 VER_PLATFORM_WIN32_NT
+
+(*1) GetVersionEx()が c4996 warning となるのは、VS2013(_MSC_VER=1800) からです。
+(*2) manifestに supportedOS Id を追加していない。
+(*3) manifestに supportedOS Id を追加している。
+*/
+static BOOL _GetVersionExA(LPOSVERSIONINFOA lpVersionInformation)
+{
+	static OSVERSIONINFOA VersionInformation;
+	if (pGetVersionExA == NULL) {
+		// エラーが返ることはない (2022-08-04)
+		VersionInformation = *lpVersionInformation;
+		void **func = (void **) & pGetVersionExA;
+		DLLGetApiAddress(L"kernel32.dll", DLL_LOAD_LIBRARY_SYSTEM, "GetVersionExA", func);
+		pGetVersionExA(&VersionInformation);
+	}
+	*lpVersionInformation = VersionInformation;
+	return TRUE;
+}
+
 static bool IsWindowsNTKernel()
 {
 	OSVERSIONINFOA osvi;
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
-	GetVersionExA(&osvi);
+	_GetVersionExA(&osvi);
 	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
 		// Windows 9x
 		return false;
@@ -281,7 +318,7 @@ static bool IsWindowsNT4()
 {
 	OSVERSIONINFOA osvi;
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
-	GetVersionExA(&osvi);
+	_GetVersionExA(&osvi);
 	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
 		osvi.dwMajorVersion == 4 &&
 		osvi.dwMinorVersion == 0) {
@@ -401,7 +438,7 @@ static BOOL _myVerifyVersionInfo(
 	BOOL ret, check_next;
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-	GetVersionExA(&osvi);
+	_GetVersionExA(&osvi);
 
 	if (dwTypeMask & VER_BUILDNUMBER) {
 		cond = (WORD)((dwlConditionMask >> (2*3)) & 0x07);
