@@ -12,6 +12,10 @@
 - Tera Term Pro 2.3
 - Draula
   - https://github.com/dracula/windows-terminal
+- Windows XP Console
+  - https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+- Windows 10 Console
+  - https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 
 ## format
 
