@@ -1182,17 +1182,17 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno, const wchar_t *UIL
 static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
 {
 	int i;
-	const ComPortInfo_t *p;
 
-	for (i = 0 ; i < ComPortInfoCount ; i++) {
-		p = &ComPortInfoPtr[i];
-		if (p->port_no == portno)
-			break;
+	for (i = 0; i < ComPortInfoCount; i++) {
+		const ComPortInfo_t *p = &ComPortInfoPtr[i];
+		if (p->port_no == portno) {
+			SetDlgItemTextW(dlg, IDC_SERIALTEXT, p->property);
+			return;
+		}
 	}
-	if (i >= ComPortInfoCount)  // 該当するCOMポートが見つからなかった
-		return;
 
-	SetDlgItemTextW(dlg, IDC_SERIALTEXT, p->property);
+	// 該当するCOMポートが見つからなかった
+	SetDlgItemTextW(dlg, IDC_SERIALTEXT, NULL);
 }
 
 /*

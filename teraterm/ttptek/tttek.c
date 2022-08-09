@@ -640,14 +640,14 @@ void PASCAL TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy)
 void CopyToClipboard
   (PTEKVar tk, PTTSet ts, int x, int y, int Width, int Height)
 {
-  HDC CopyDC;
-  HBITMAP CopyBitmap;
 
   if (tk->Select) SwitchRubberBand(tk,ts,FALSE);
   TEKCaretOff(tk);
   if (OpenClipboard(tk->HWin) && EmptyClipboard())
   {
     /* Create the new bitmap */
+    HDC CopyDC;
+    HBITMAP CopyBitmap;
     CopyDC = CreateCompatibleDC(tk->MemDC);
     CopyBitmap = CreateCompatibleBitmap(tk->MemDC, Width, Height);
     CopyBitmap = SelectObject(CopyDC, CopyBitmap);
@@ -655,10 +655,10 @@ void CopyToClipboard
     CopyBitmap = SelectObject(CopyDC, CopyBitmap);
     /* Transfer the new bitmap to the clipboard */
     SetClipboardData(CF_BITMAP, CopyBitmap);
+    DeleteDC(CopyDC);
   }
 
   CloseClipboard();
-  DeleteDC(CopyDC);
 
   TEKCaretOn(tk,ts);
   SwitchRubberBand(tk,ts,tk->Select);

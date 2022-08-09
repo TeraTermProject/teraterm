@@ -3519,7 +3519,7 @@ void CSDouble(BYTE b)
 	}
 }
 
-void CSDolRequestMode() // DECRQM
+static void CSDolRequestMode(void) // DECRQM
 {
 	char buff[256];
 	char *pp;
@@ -3811,6 +3811,9 @@ void CSDolRequestMode() // DECRQM
 			break;
 		}
 		break;
+	  default:
+		assert(FALSE);
+		return;
 	}
 
 	len = _snprintf_s(buff, sizeof(buff), _TRUNCATE, "%s%d;%d$y", pp, Param[1], resp);

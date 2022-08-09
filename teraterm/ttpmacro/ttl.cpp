@@ -2608,7 +2608,7 @@ WORD TTLGetSpecialFolder()
 	return Err;
 }
 
-WORD TTLGetTime(WORD mode)
+static WORD TTLGetTime(WORD mode)
 {
 	WORD Err;
 	TVarId VarId;
@@ -2650,8 +2650,10 @@ WORD TTLGetTime(WORD mode)
 
 	}
 	else {
+		// mode = RsvGetDate or RsvGetTime
 		switch (mode) {
 		case RsvGetDate:
+		default:
 			format = "%Y-%m-%d";
 			break;
 		case RsvGetTime:
