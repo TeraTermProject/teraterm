@@ -28,15 +28,15 @@
  */
 
 /* TTCMN.DLL, main */
-#include <direct.h>
 #include <string.h>
 #include <stdio.h>
 #include <windows.h>
 #include <setupapi.h>
 #include <htmlhelp.h>
 #include <assert.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
 #include <crtdbg.h>
-#include <time.h>
 
 #define DllExport __declspec(dllexport)
 #include "language.h"
@@ -45,55 +45,17 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
-#include "tt_res.h"
 #include "codeconv.h"
 #include "compat_win.h"
 #include "win32helper.h"
-#include "asprintf.h"
-#include "fileread.h"
 #include "../teraterm/unicode.h"
 
-#include "ttcmn_dup.h"
-
-#define DllExport __declspec(dllexport)
+#include "ttcmn_shared_memory.h"
 #include "ttcommon.h"
-
-/* shared memory */
-typedef struct {
-	size_t size_tmap;		/* sizeof TMap */
-	size_t size_tttset;		/* sizeof TTTSet */
-	// Window list
-	int NWin;
-	HWND WinList[MAXNWIN];
-	/* COM port use flag
-	 *           bit 8  7  6  5  4  3  2  1
-	 * char[0] : COM 8  7  6  5  4  3  2  1
-	 * char[1] : COM16 15 14 13 12 11 10  9 ...
-	 */
-	unsigned char ComFlag[(MAXCOMPORT-1)/CHAR_BIT+1];
-	/* Previous window rect (Tera Term 4.78 or later) */
-	WINDOWPLACEMENT WinPrevRect[MAXNWIN];
-	BOOL WinUndoFlag;
-	int WinUndoStyle;
-	// Duplicate Teraterm data
-	HANDLE DuplicateDataHandle;
-	DWORD DuplicateDataSizeLow;
-} TMap;
-typedef TMap *PMap;
-
-// TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
-// TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが
-// 連番からバージョン番号を使うように変更した為、通常は手動で変更する必要は無い
-#define TT_FILEMAPNAME "ttset_memfilemap_" TT_VERSION_STR("_")
-
-/* first instance flag */
-static BOOL FirstInstance = TRUE;
-
-static HINSTANCE hInst;
+#include "ttcmn_i.h"
 
 static PMap pm;
 
-static HANDLE HMap = NULL;
 #define VTCLASSNAME "VTWin32"
 #define TEKCLASSNAME "TEKWin32"
 
@@ -102,210 +64,6 @@ enum window_style {
 	WIN_STACKED,
 	WIN_SIDEBYSIDE,
 };
-
-static const char DupDataName[] = "dupdata";
-
-void WINAPI CopyShmemToTTSet(PTTSet ts)
-{
-	DWORD size = pm->DuplicateDataSizeLow;
-	HANDLE handle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, DupDataName);
-	void *ptr = (void *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-	TTCMNUnserialize(ptr, (size_t)size, ts);
-	UnmapViewOfFile(ptr);
-	CloseHandle(handle);
-	pm->DuplicateDataSizeLow = 0;
-}
-
-void WINAPI CopyTTSetToShmem(PTTSet ts)
-{
-	size_t size;
-	void *ptr = TTCMNSerialize(ts, &size);
-	if (ptr != NULL) {
-		HANDLE handle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, (DWORD)size, DupDataName);
-		void *dest = (void *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS,0,0,0);
-		memcpy(dest, ptr, size);
-		UnmapViewOfFile(dest);
-		//CloseHandle(handle);	do not close, 使用しない状態になるとなくなってしまう
-
-		if (pm->DuplicateDataHandle != NULL) {
-			// 1回前の情報を削除する
-			CloseHandle(pm->DuplicateDataHandle);
-		}
-		pm->DuplicateDataHandle = handle;
-		pm->DuplicateDataSizeLow = (DWORD)size;
-		free(ptr);
-	}
-}
-
-static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const wchar_t *dest_dir)
-{
-	for (;;) {
-		wchar_t *dest;
-		size_t len;
-		const wchar_t *filename = *file_list;
-		file_list++;
-		if (filename == NULL) {
-			break;
-		}
-
-		dest = NULL;
-		awcscats(&dest, dest_dir, L"\\", filename, NULL);
-
-		len = wcslen(dest);
-		if (dest[len - 1] == '\\') {
-			// フォルダ作成
-			CreateDirectoryW(dest, NULL);
-		}
-		else {
-			wchar_t *src = NULL;
-			awcscats(&src, src_dir, L"\\", filename, NULL);
-			CopyFileW(src, dest, TRUE);		// TRUE = do not copy if exists
-			free(src);
-		}
-		free(dest);
-	}
-}
-
-static void ConvertIniFiles(const wchar_t *filelist[],  const wchar_t *dir, const wchar_t *date_str)
-{
-	while(1) {
-		wchar_t *fname;
-		if (*filelist == NULL) {
-			break;
-		}
-
-		fname = NULL;
-		awcscats(&fname, dir, L"\\", *filelist, NULL);
-		ConvertIniFileCharCode(fname, date_str);
-		free(fname);
-		filelist++;
-	}
-}
-
-BOOL WINAPI StartTeraTerm(PTTSet ts)
-{
-	if (FirstInstance) {
-		// init window list
-		pm->NWin = 0;
-	}
-	else {
-		/* only the first instance uses saved position */
-		ts->VTPos.x = CW_USEDEFAULT;
-		ts->VTPos.y = CW_USEDEFAULT;
-		ts->TEKPos.x = CW_USEDEFAULT;
-		ts->TEKPos.y = CW_USEDEFAULT;
-	}
-
-	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
-	// 起動時には、共有メモリの HomeDir と SetupFName は空になる
-	/* Get home directory (ttermpro.exeのフォルダ) */
-	ts->ExeDirW = GetExeDirW(hInst);
-
-	// LogDir
-	ts->LogDirW = GetLogDirW(hInst);
-
-	// HomeDir
-	ts->HomeDirW = GetHomeDirW(hInst);
-	WideCharToACP_t(ts->HomeDirW, ts->HomeDir, _countof(ts->HomeDir));
-	SetCurrentDirectoryW(ts->HomeDirW);		// TODO 必要??
-
-	// TERATERM.INI のフルパス
-	ts->SetupFNameW = NULL;
-	awcscats(&ts->SetupFNameW, ts->HomeDirW, L"\\TERATERM.INI", NULL);
-	WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
-
-	// KEYBOARD.CNF のフルパス
-	ts->KeyCnfFNW = NULL;
-	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
-	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
-
-	// ポータブルモードではなく、
-	// 個人設定ファイルのあるフォルダ HomeDirW に TERATERM.INI が存在しないとき
-	if (!IsPortableMode() &&
-		(GetFileAttributesW(ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES)) {
-		// 設定ファイルを個人フォルダへコピーする
-		static const wchar_t *filelist[] = {
-			L"TERATERM.INI",
-			L"KEYBOARD.CNF",
-			L"cygterm.cfg",
-			L"ssh_known_hosts",
-			L"theme\\",
-			L"theme\\Advanced.sample",
-			L"theme\\ImageFile.INI",
-			L"theme\\scale\\",
-			L"theme\\scale\\23.jpg",
-			L"theme\\scale\\43.jpg",
-			L"theme\\Scale.INI",
-			L"theme\\tile\\",
-			L"theme\\tile\\03.jpg",
-			L"theme\\tile\\44.jpg",
-			L"theme\\Tile.INI",
-			NULL,
-		};
-		CopyFiles(filelist, ts->ExeDirW, ts->HomeDirW);
-	}
-
-	// iniファイルの文字コードを変換する
-	{
-		static const wchar_t *filelist[] = {
-			L"TERATERM.INI",
-			L"KEYBOARD.CNF",
-			NULL,
-		};
-
-		// backup ファイルにつける日付文字列
-		wchar_t *date_str = MakeISO8601Str(0);
-		awcscat(&date_str, L"_");
-
-		// iniファイルを変換する
-		ConvertIniFiles(filelist, ts->HomeDirW, date_str);
-
-		free(date_str);
-	}
-
-	if (FirstInstance) {
-		FirstInstance = FALSE;
-		return TRUE;
-	}
-	else {
-		return FALSE;
-	}
-
-	ts->PluginVTIconInstance = NULL;
-	ts->PluginVTIconID = 0;
-}
-
-// 設定ファイルをディスクに保存し、Tera Term本体を再起動する。
-// (2012.4.30 yutaka)
-// 使っていない?
-void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
-{
-	wchar_t *path;
-	int ret;
-
-	static const TTMessageBoxInfoW info = {
-		"Tera Term",
-		NULL, L"Tera Term: Configuration Warning",
-		"MSG_TT_TAKE_EFFECT",
-		L"This option takes effect the next time a session is started.\n"
-		L"Are you sure that you want to relaunch Tera Term?",
-		MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2
-	};
-	ret = TTMessageBoxA(hwnd, &info, ts->UILanguageFile);
-	if (ret != IDYES)
-		return;
-
-	SendMessage(hwnd, WM_COMMAND, ID_SETUP_SAVE, 0);
-	// ID_FILE_EXIT メッセージではアプリが落ちることがあるため、WM_QUIT をポストする。
-	//PostMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
-	PostQuitMessage(0);
-
-	// 自プロセスの再起動。
-	if (hGetModuleFileNameW(NULL, &path) == 0) {
-		TTWinExec(path);
-		free(path);
-	}
-}
 
 void WINAPI SetCOMFlag(int Com)
 {
@@ -373,7 +131,7 @@ void WINAPI UnregWin(HWND HWin)
 	}
 }
 
-char GetWindowTypeChar(HWND Hw, HWND HWin)
+static char GetWindowTypeChar(HWND Hw, HWND HWin)
 {
 #if 0
 	if (HWin == Hw)
@@ -1308,6 +1066,9 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 				code_page = 936;
 				break;
 			}
+		} else {
+			assert(FALSE);
+			code_page = 0;
 		}
 		/* code_page に変換して出力 */
 		mb_len = sizeof(mb_char);
@@ -1446,51 +1207,12 @@ int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-/*
- *	@return		エラーが有る場合 FALSE
- *	@param[in]	BOOL first_instance
+/**
+ *	共有メモリへのポインタをセット
  */
-static BOOL OpenSharedMemory(BOOL *first_instance_)
+DllExport void WINAPI SetPMPtr(PMap pm_)
 {
-	int i;
-	HMap = NULL;
-	pm = NULL;
-	for (i = 0; i < 100; i++) {
-		char tmp[32];
-		HANDLE hMap;
-		BOOL first_instance;
-		TMap *map;
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, i == 0 ? "%s" : "%s_%d", TT_FILEMAPNAME, i);
-		hMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-								 0, sizeof(TMap), tmp);
-		if (hMap == NULL) {
-			return FALSE;
-		}
-
-		first_instance = (GetLastError() != ERROR_ALREADY_EXISTS);
-
-		map = (TMap *)MapViewOfFile(hMap,FILE_MAP_WRITE,0,0,0);
-		if (map == NULL) {
-			return FALSE;
-		}
-
-		if (first_instance ||
-			(map->size_tmap == sizeof(TMap) &&
-			 map->size_tttset == sizeof(TTTSet)))
-		{
-			map->size_tmap = sizeof(TMap);
-			map->size_tttset = sizeof(TTTSet);
-			HMap = hMap;
-			pm = map;
-			*first_instance_ = first_instance;
-			return TRUE;
-		}
-
-		// next try
-		UnmapViewOfFile(map);
-		CloseHandle(hMap);
-	}
-	return FALSE;
+	pm = pm_;
 }
 
 BOOL WINAPI DllMain(HANDLE hInstance,
@@ -1509,17 +1231,12 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 #ifdef _DEBUG
 			_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-			hInst = hInstance;
-			if (OpenSharedMemory(&FirstInstance) == FALSE) {
-				// dllロード失敗、teratermが起動しない
-				return FALSE;
-			}
 			WinCompatInit();
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */
-			UnmapViewOfFile(pm);
-			CloseHandle(HMap);
+			// TODO ttermpro.exeで行う
+//			CloseSharedMemory(pm, HMap);
 			break;
 	}
 	return TRUE;

@@ -803,6 +803,30 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="ttpcmn"
+			>
+			<File
+				RelativePath="..\ttpcmn\ttcmn_dup.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpcmn\ttcmn_dup.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpcmn\ttcmn_shared_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpcmn\ttcmn_static.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpcmn\ttcmn_static.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 		<Global

@@ -144,6 +144,8 @@
     <ClCompile Include="..\..\cygwin\cyglib\cyglib.c" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\susie_plugin\libsusieplugin.cpp" />
+    <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
+    <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
     <ClCompile Include="..\ttpfile\bplus.c" />
     <ClCompile Include="..\ttpfile\filesys_win32.cpp" />
     <ClCompile Include="..\ttpfile\ftlib.c" />
@@ -199,6 +201,9 @@
     <ClInclude Include="../ttpdlg/ttdlg.h" />
     <ClInclude Include="..\..\cygwin\cyglib\cyglib.h" />
     <ClInclude Include="..\susie_plugin\libsusieplugin.h" />
+    <ClInclude Include="..\ttpcmn\ttcmn_dup.h" />
+    <ClInclude Include="..\ttpcmn\ttcmn_shared_memory.h" />
+    <ClInclude Include="..\ttpcmn\ttcmn_static.h" />
     <ClInclude Include="..\ttpfile\bplus.h" />
     <ClInclude Include="..\ttpfile\filesys_win32.h" />
     <ClInclude Include="..\ttpfile\file_res.h" />

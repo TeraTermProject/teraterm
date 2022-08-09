@@ -38,11 +38,6 @@ extern "C" {
 #define DllExport __declspec(dllimport)
 #endif
 
-DllExport void PASCAL CopyShmemToTTSet(PTTSet ts);
-DllExport void PASCAL CopyTTSetToShmem(PTTSet ts);
-DllExport BOOL PASCAL StartTeraTerm(PTTSet ts);
-DllExport void PASCAL RestartTeraTerm(HWND hwnd, PTTSet ts);
-
 DllExport void PASCAL SetCOMFlag(int com);
 DllExport void PASCAL ClearCOMFlag(int com);
 DllExport int PASCAL CheckCOMFlag(int com);

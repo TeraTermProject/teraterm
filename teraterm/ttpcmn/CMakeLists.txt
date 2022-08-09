@@ -11,12 +11,11 @@ add_library(
   ttcmn.c
   ttcmn_cominfo.c
   ttcmn_cominfo.h
-  ttcmn_dup.cpp
-  ttcmn_dup.h
   ttcmn_lib.cpp
   ttcmn_lib.h
   ttcmn_notify.cpp
   ttcmn_notify.h
+  ttcmn_shared_memory.h
   ttpcmn-version.rc
   ttpcmn.def
   )

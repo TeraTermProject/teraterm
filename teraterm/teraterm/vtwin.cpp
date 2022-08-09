@@ -105,6 +105,7 @@
 #include "asprintf.h"
 #include "teraprn.h"
 #include "setupdirdlg.h"
+#include "ttcmn_static.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -256,7 +257,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	CommInit(&cv);
 	cv.ts = &ts;
-	isFirstInstance = StartTeraTerm(&ts);
+	isFirstInstance = StartTeraTerm(m_hInst, &ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
 

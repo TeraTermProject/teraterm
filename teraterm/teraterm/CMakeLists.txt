@@ -220,6 +220,21 @@ source_group(
   REGULAR_EXPRESSION
   "..\/ttpset\/")
 
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../ttpcmn/ttcmn_dup.cpp
+  ../ttpcmn/ttcmn_dup.h
+  ../ttpcmn/ttcmn_shared_memory.h
+  ../ttpcmn/ttcmn_static.c
+  ../ttpcmn/ttcmn_static.h
+)
+
+source_group(
+  "ttpcmn"
+  REGULAR_EXPRESSION
+  "..\/ttpcmn\/")
+
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     if(${CMAKE_VERSION} VERSION_LESS "3.12.0")

@@ -1,5 +1,4 @@
 EXPORTS
-  StartTeraTerm @1
   SetCOMFlag @44
   ClearCOMFlag @45
   CheckCOMFlag @46
@@ -39,8 +38,6 @@ EXPORTS
   RussConv @33
   RussConvStr @34
   ConvertUnicode @35
-  CopyTTSetToShmem @36
-  CopyShmemToTTSet @37
   
   GetI18nStr @40
   GetI18nLogfont @41
@@ -50,7 +47,6 @@ EXPORTS
   doSelectFolder @51
 
   mctimelocal @53
-  RestartTeraTerm @55
   ShowAllWinSidebySide @56
   ShowAllWinStacked @57
   ShowAllWinCascade @58
@@ -87,3 +83,5 @@ EXPORTS
   SetI18nDlgStrs
   SetI18nMenuStrs
   GetMessageboxFont
+
+  SetPMPtr

@@ -31,6 +31,9 @@
     <Filter Include="ttpset">
       <UniqueIdentifier>{5c80e9f6-d586-4ebc-860d-1d2915b6e1b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ttpcmn">
+      <UniqueIdentifier>{68f0946a-607e-4e50-89d8-edaee85394d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filesys.cpp">
@@ -206,6 +209,12 @@
     </ClCompile>
     <ClCompile Include="..\ttpset\ttset_keyboard.c">
       <Filter>ttpset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpcmn\ttcmn_static.c">
+      <Filter>ttpcmn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp">
+      <Filter>ttpcmn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -473,6 +482,15 @@
     </ClInclude>
     <ClInclude Include="..\ttpset\ttset_i.h">
       <Filter>ttpset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpcmn\ttcmn_dup.h">
+      <Filter>ttpcmn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpcmn\ttcmn_shared_memory.h">
+      <Filter>ttpcmn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpcmn\ttcmn_static.h">
+      <Filter>ttpcmn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
