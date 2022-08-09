@@ -28,6 +28,9 @@
     <Filter Include="cyglib">
       <UniqueIdentifier>{ceb6977e-f86f-423e-a1ca-d2fcb004e7cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ttpset">
+      <UniqueIdentifier>{5c80e9f6-d586-4ebc-860d-1d2915b6e1b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filesys.cpp">
@@ -189,9 +192,6 @@
     <ClCompile Include="ttdebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\ttpset\ttset_keyboard.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="setupdirdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -200,6 +200,12 @@
     </ClCompile>
     <ClCompile Include="..\..\cygwin\cyglib\cyglib.c">
       <Filter>cyglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpset\ttset.c">
+      <Filter>ttpset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpset\ttset_keyboard.c">
+      <Filter>ttpset</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -461,6 +467,12 @@
     </ClInclude>
     <ClInclude Include="..\..\cygwin\cyglib\cyglib.h">
       <Filter>cyglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpset\ttset.h">
+      <Filter>ttpset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpset\ttset_i.h">
+      <Filter>ttpset</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

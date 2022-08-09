@@ -74,4 +74,4 @@ void FreeTTSET();
 }
 #endif
 
-#include "../ttpset/ttset.h"
+#include "../ttpset/ttset_i.h"

@@ -272,10 +272,6 @@
       <Project>{ba519362-a2c2-4b1a-905b-f00791f9038a}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpset\ttpset.v11.vcxproj">
-      <Project>{5cf58947-e861-4a5c-b0b1-e85486f149cd}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\ttptek\ttptek.v11.vcxproj">
       <Project>{6d08053b-1c68-4a7e-8766-3553f5af010b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

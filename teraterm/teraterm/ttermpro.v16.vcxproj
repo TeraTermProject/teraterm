@@ -153,6 +153,7 @@
     <ClCompile Include="..\ttpfile\xmodem.c" />
     <ClCompile Include="..\ttpfile\ymodem.c" />
     <ClCompile Include="..\ttpfile\zmodem.c" />
+    <ClCompile Include="..\ttpset\ttset.c" />
     <ClCompile Include="..\ttpset\ttset_keyboard.c" />
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="broadcast.cpp" />
@@ -208,6 +209,8 @@
     <ClInclude Include="..\ttpfile\xmodem.h" />
     <ClInclude Include="..\ttpfile\ymodem.h" />
     <ClInclude Include="..\ttpfile\zmodem.h" />
+    <ClInclude Include="..\ttpset\ttset.h" />
+    <ClInclude Include="..\ttpset\ttset_i.h" />
     <ClInclude Include="broadcast.h" />
     <ClInclude Include="checkeol.h" />
     <ClInclude Include="coding_pp.h" />
@@ -300,10 +303,6 @@
     </ProjectReference>
     <ProjectReference Include="..\ttpmacro\ttpmacro.v16.vcxproj">
       <Project>{ba519362-a2c2-4b1a-905b-f00791f9038a}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\ttpset\ttpset.v16.vcxproj">
-      <Project>{5cf58947-e861-4a5c-b0b1-e85486f149cd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\ttptek\ttptek.v16.vcxproj">

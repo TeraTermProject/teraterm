@@ -37,6 +37,7 @@
 #include "ttlib.h"
 #include "codeconv.h"
 #include "../teraterm/keyboard_i.h"
+#include "ttset.h"
 
 typedef struct {
 	int key_id;
@@ -235,11 +236,9 @@ static void ReadUserkeysSection(const wchar_t *FName, PKeyMap KeyMap)
 
 /**
  *	keyboard.cnf を読み込む
- *		このファイルは ttermpro.exe にリンクされている
- *		ttpset.dll ttset_keyboard_entry.c の ReadKeyboardCnf() からここがコールされる
  *		KeyMap は初期化済み
  */
-__declspec(dllexport) void ReadKeyboardCnfExe(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning)
+void PASCAL _ReadKeyboardCnf(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning)
 {
 	int i, j;
 

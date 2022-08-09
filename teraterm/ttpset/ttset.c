@@ -115,7 +115,7 @@ static id_str_pair_t serial_conf_flowctrl[] = {
  *    TRUE: 変換成功
  *    FALSE: 変換失敗
  */
-int WINAPI SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
+int SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
 {
 	const id_str_pair_t *conf;
 	int ret = FALSE;
@@ -781,7 +781,7 @@ static int GetDefaultUnicodeWidth(void)
 	return ret_val;
 }
 
-void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
+void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
@@ -2289,7 +2289,7 @@ void PASCAL ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);
 }
 
-void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
+void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 {
 	int i;
 	char Temp[MAX_PATH];
@@ -3558,8 +3558,8 @@ void PASCAL WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "WindowCornerDontround", FName, ts->WindowCornerDontround);
 }
 
-void PASCAL CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,
-						   const wchar_t *key, int MaxList)
+void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,
+							const wchar_t *key, int MaxList)
 {
 	int i, j;
 	wchar_t EntName[10], EntName2[10];
@@ -3591,8 +3591,8 @@ void PASCAL CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const 
 	WritePrivateProfileStringW(NULL, NULL, NULL, IniDest);
 }
 
-void PASCAL AddValueToList(const wchar_t *FName, const wchar_t *Host, const wchar_t *section,
-						   const wchar_t *key, int MaxList)
+void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wchar_t *section,
+							const wchar_t *key, int MaxList)
 {
 	wchar_t *MemP;
 	wchar_t EntName[13];
@@ -3647,14 +3647,14 @@ void PASCAL AddValueToList(const wchar_t *FName, const wchar_t *Host, const wcha
 }
 
  /* copy hostlist from source IniFile to dest IniFile */
-void PASCAL CopyHostList(const wchar_t *IniSrc, const wchar_t *IniDest)
+void PASCAL _CopyHostList(const wchar_t *IniSrc, const wchar_t *IniDest)
 {
-	CopySerialList(IniSrc, IniDest, L"Hosts", L"Host", MAXHOSTLIST);
+	_CopySerialList(IniSrc, IniDest, L"Hosts", L"Host", MAXHOSTLIST);
 }
 
-void PASCAL AddHostToList(const wchar_t *FName, const wchar_t *Host)
+void PASCAL _AddHostToList(const wchar_t *FName, const wchar_t *Host)
 {
-	AddValueToList(FName, Host, L"Hosts", L"Host", MAXHOSTLIST);
+	_AddValueToList(FName, Host, L"Hosts", L"Host", MAXHOSTLIST);
 }
 #if 0
 BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
@@ -3800,7 +3800,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 }
 
 
-void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
+void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 {
 	int pos, c;
 	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
@@ -3843,7 +3843,7 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 					free(ts->SetupFNameW);
 					ts->SetupFNameW = _wcsdup(Temp);
 					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
-					ReadIniFile(ts->SetupFNameW, ts);
+					_ReadIniFile(ts->SetupFNameW, ts);
 				}
 			}
 		}
@@ -4191,7 +4191,7 @@ void PASCAL ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
  *		現在やることなし
  *		*注* 動的なロードを行っていないため、常にロードされている状態となっている
  */
-DllExport void TTSetInit(void)
+void TTSetInit(void)
 {
 }
 
@@ -4199,7 +4199,7 @@ DllExport void TTSetInit(void)
  *	このモジュールの終了
  *		確保したメモリの開放
  */
-DllExport void TTSetUnInit(TTTSet *ts)
+void TTSetUnInit(TTTSet *ts)
 {
 	void **ptr_list[] = {
 		(void **)&ts->HomeDirW,

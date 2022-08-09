@@ -12,8 +12,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpfile", "ttpfile\ttpfile.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpmacro", "ttpmacro\ttpmacro.v12.vcxproj", "{BA519362-A2C2-4B1A-905B-F00791F9038A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpset", "ttpset\ttpset.v12.vcxproj", "{5CF58947-E861-4A5C-B0B1-E85486F149CD}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttptek", "ttptek\ttptek.v12.vcxproj", "{6D08053B-1C68-4A7E-8766-3553F5AF010B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "svnrev", "svnrev\svnrev.v12.vcxproj", "{80F1C3F0-A213-4D48-85C8-A265990D19A7}"
@@ -44,10 +42,6 @@ Global
 		{BA519362-A2C2-4B1A-905B-F00791F9038A}.Debug|Win32.Build.0 = Debug|Win32
 		{BA519362-A2C2-4B1A-905B-F00791F9038A}.Release|Win32.ActiveCfg = Release|Win32
 		{BA519362-A2C2-4B1A-905B-F00791F9038A}.Release|Win32.Build.0 = Release|Win32
-		{5CF58947-E861-4A5C-B0B1-E85486F149CD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{5CF58947-E861-4A5C-B0B1-E85486F149CD}.Debug|Win32.Build.0 = Debug|Win32
-		{5CF58947-E861-4A5C-B0B1-E85486F149CD}.Release|Win32.ActiveCfg = Release|Win32
-		{5CF58947-E861-4A5C-B0B1-E85486F149CD}.Release|Win32.Build.0 = Release|Win32
 		{6D08053B-1C68-4A7E-8766-3553F5AF010B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6D08053B-1C68-4A7E-8766-3553F5AF010B}.Debug|Win32.Build.0 = Debug|Win32
 		{6D08053B-1C68-4A7E-8766-3553F5AF010B}.Release|Win32.ActiveCfg = Release|Win32

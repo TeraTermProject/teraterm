@@ -42,7 +42,6 @@ add_executable(
   ftdlg.h
   keyboard.c
   keyboard.h
-  ../ttpset/ttset_keyboard.c
   prnabort.cpp
   prnabort.h
   protodlg.cpp
@@ -207,6 +206,20 @@ source_group(
   REGULAR_EXPRESSION
   "..\/ttpfile\/")
 
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../ttpset/ttset.c
+  ../ttpset/ttset.h
+  ../ttpset/ttset_i.h
+  ../ttpset/ttset_keyboard.c
+)
+
+source_group(
+  "ttpset"
+  REGULAR_EXPRESSION
+  "..\/ttpset\/")
+
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
@@ -301,7 +314,6 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  ttpset
   ttptek
   cyglib
   ${ONIGURUMA_LIB}

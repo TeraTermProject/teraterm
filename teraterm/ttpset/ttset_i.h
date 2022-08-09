@@ -1,5 +1,5 @@
 /*
- * (C) 2021- TeraTerm Project
+ * (C) 2022- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,20 +25,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+// teraterm/ と ttset/ 間で使用するAPI
+// pluginからは使用しない
 
-#include <windows.h>
+#pragma once
 
-#include "teraterm.h"
-#include "dllutil.h"
-#include "../teraterm/keyboard_i.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void PASCAL ReadKeyboardCnf(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning)
-{
-	void (*ReadKeyboardCnfExe)(const wchar_t *FName, PKeyMap KeyMap, BOOL ShowWarning);
-	DWORD r = DLLGetApiAddress(L"ttermpro.exe", DLL_LOAD_LIBRARY_CURRENT, "ReadKeyboardCnfExe", (void **)&ReadKeyboardCnfExe);
-	if (r != NO_ERROR) {
-		return;
-	}
+int SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen);
+void TTSetInit(void);
+void TTSetUnInit(TTTSet *ts);
 
-	ReadKeyboardCnfExe(FName, KeyMap, ShowWarning);
+#ifdef __cplusplus
 }
+#endif

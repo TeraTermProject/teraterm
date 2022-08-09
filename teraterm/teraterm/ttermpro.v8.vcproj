@@ -382,10 +382,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ttpset\ttset_keyboard.c"
-				>
-			</File>
-			<File
 				RelativePath="ttsetup.c"
 				>
 			</File>
@@ -788,6 +784,22 @@
 			</File>
 			<File
 				RelativePath="..\ttpfile\zmodem.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ttpset"
+			>
+			<File
+				RelativePath="..\ttpset\ttset.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpset\ttset.h"
+				>
+			</File>
+			<File
+				RelativePath="..\ttpset\ttset_keyboard.c"
 				>
 			</File>
 		</Filter>
