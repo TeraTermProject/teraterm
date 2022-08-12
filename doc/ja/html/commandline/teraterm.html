@@ -192,7 +192,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
-  <dd>起動時にログを開始</dd>
+  <dd>起動時にログを開始<br />
+      ファイル名に含まれた<a href="../menu/setup-additional.html#LogFileNameFormat">Tera Term と strftime の書式</a>が解釈されます。<br />
+      ファイル名がフルパスでないときは、<a href="../menu/setup-additional.html#LogFullpath">フルパスに変換</a>して開かれます。</dd>
 
   <dt id="la">/LA=&lt;language&gt;</dt>
   <dd>言語モード
