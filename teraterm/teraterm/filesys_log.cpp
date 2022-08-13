@@ -389,62 +389,94 @@ typedef struct {
 	FLogDlgInfo_t *info;
 	// work
 	BOOL file_exist;
-	int current_bom;
+	int current_bom; // 存在するファイルのエンコーディング（ファイルのBOMから判定）
 	TTTSet *pts;
 	TComVar *pcv;
 } LogDlgWork_t;
 
-static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
+
+/*
+ * Log ダイアログのうち、Enable/Disable が変化するコントロール
+ * 
+ * - Append
+ *   指定されたファイルが存在する場合は Enable
+ *   指定されたファイルが存在しない場合は Disable
+ * 
+ * - BOM, Encoding
+ *   Text かつ New/Overwrite の場合に Enable
+ *   そうでない場合に Disable
+ * 
+ * - Plain Text, Timestamp, Timestamp 種別
+ *   Text の場合は Enable
+ *   Binary の場合は Disable
+ * 
+ * - Timestamp 種別
+ *   Timestamp=on の場合は Enable
+ *   Timestamp=off の場合は Disable
+ */
+
+static void ArrangeControls(HWND Dialog, LogDlgWork_t *work,
+                            WORD Append, WORD LogBinary,
+                            WORD LogTypePlainText, WORD LogTimestamp)
 {
 	if (work->file_exist) {
+		// Append ラジオボタンは、ファイルがあるときだけ有効になる
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), TRUE);
-		if (work->pts->Append > 0) {
+
+		if (Append > 0) {
 			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
 		}
+		else {
+			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
+		}
 	}
-	else {
-		// ファイルがない -> 新規
+	else { // ファイルがない -> 新規
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), FALSE);
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 	}
 
-	if (work->file_exist && IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED) {
-		// ファイルが存在する && append
-		int bom = work->current_bom;
-		if (bom != 0) {
-			// BOM有り
-			CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
-			int cur =
-				bom == 1 ? 0 :
-				bom == 2 ? 1 :
-				bom == 3 ? 2 : 0;
-			SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, cur, 0);
-		}
-		else {
-			// BOMなし
-			CheckDlgButton(Dialog, IDC_BOM, BST_UNCHECKED);
-			SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
-		}
-		if (IsDlgButtonChecked(Dialog, IDC_FOPTTEXT) == BST_CHECKED) {
-			EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
-			if (bom != 0) {
-				// BOM有り
-				EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
-			}
-			else {
-				// BOMなし
-				EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
-			}
-		}
+	if (!LogBinary && !Append) {
+		EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
+		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
 	}
 	else {
-		// ファイルがない 又は appendではない(上書き)
-		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
-		CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
-		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
-		if (IsDlgButtonChecked(Dialog, IDC_FOPTTEXT) == BST_CHECKED) {
-			EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
+		EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
+		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
+	}
+
+	if (LogBinary) {
+		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTBIN);
+
+		DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+	}
+	else {
+		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTTEXT);
+
+		EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		EnableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+
+		if (LogTypePlainText) {
+			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		}
+		if (LogTimestamp) {
+			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		}
+		else {
+			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+		}
+	}
+
+	if (work->file_exist && Append) {
+		// 既存ファイルのエンコーディングを反映する
+		int bom = work->current_bom;
+		int cur =
+			bom == 1 ? 0 :
+			bom == 2 ? 1 :
+			bom == 3 ? 2 : 0;
+		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, cur, 0);
 	}
 }
 
@@ -455,7 +487,6 @@ static void CheckLogFile(HWND Dialog, const wchar_t *filename, LogDlgWork_t *wor
 	CheckLogFile(filename, &exist, &bom);
 	work->file_exist = exist;
 	work->current_bom = bom;
-	ArrangeControls(Dialog, work);
 }
 
 static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -481,7 +512,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	};
 	LogDlgWork_t *work = (LogDlgWork_t *)GetWindowLongPtr(Dialog, DWLP_USER);
 
-	if (Message == 	RegisterWindowMessage(HELPMSGSTRING)) {
+	if (Message == RegisterWindowMessage(HELPMSGSTRING)) {
 		// コモンダイアログからのヘルプメッセージを付け替える
 		Message = WM_COMMAND;
 		wParam = IDHELP;
@@ -495,7 +526,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 		SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
 		SetI18nListW("Tera Term", Dialog, IDC_TIMESTAMPTYPE, timestamp_list, _countof(timestamp_list),
-					 pts->UILanguageFileW, 0);
+		             pts->UILanguageFileW, 0);
 
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-8");
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16LE");
@@ -504,56 +535,27 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
 
-		// Binary/Text チェックボックス
-		if (pts->LogBinary) {
-			CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTBIN);
-			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
-			EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
-		}
-		else {
-			CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTTEXT);
-		}
+		// timestamp 種別
+		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
+		             pts->LogTimestampType == TIMESTAMP_UTC ? 1 :
+		             pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
+		             pts->LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
 
-		// Plain Text チェックボックス
-		if (pts->LogBinary) {
-			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		}
-		else if (pts->LogTypePlainText) {
-			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		}
 
-		// Hide dialogチェックボックス (2008.1.30 maya)
+		CheckLogFile(Dialog, work->info->filename, work);
+		ArrangeControls(Dialog, work, pts->Append, pts->LogBinary, pts->LogTypePlainText, pts->LogTimestamp);
+		work->info->filename = NULL;
+
+		// Hide dialog チェックボックス
 		if (pts->LogHideDialog) {
 			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
 		}
 
-		// Include screen bufferチェックボックス (2013.9.29 yutaka)
+		// Include screen buffer チェックボックス
 		if (pts->LogAllBuffIncludedInFirst) {
 			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 		}
-
-		// timestampチェックボックス (2006.7.23 maya)
-		if (pts->LogBinary) {
-			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-		else if (pts->LogTimestamp) {
-			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-
-		// timestamp 種別
-		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
-				pts->LogTimestampType == TIMESTAMP_UTC ? 1 :
-				pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
-				pts->LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
-		if (pts->LogBinary || !pts->LogTimestamp) {
-			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-		}
-
-		CheckLogFile(Dialog, work->info->filename, work);
-		work->info->filename = NULL;
 
 		CenterWindow(Dialog, GetParent(Dialog));
 
@@ -624,22 +626,18 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			break;
 		}
-		case IDC_FOPTBIN:
-			EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
-			EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
-			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
-			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-			break;
+		case IDC_NEW_OVERWRITE:
+		case IDC_APPEND:
 		case IDC_FOPTTEXT:
-			ArrangeControls(Dialog, work);
-			EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
-			// FALLTHROUGH -- BinFlag が off の時は Timestamp 種別の有効/無効を設定する
+		case IDC_FOPTBIN:
 		case IDC_TIMESTAMP:
-			if (IsDlgButtonChecked(Dialog, IDC_TIMESTAMP) == BST_CHECKED) {
-				EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
-			}
-			else {
-				DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+			{
+				WORD Appnd, LogBinary, LogTypePlainText, LogTimestamp;
+				GetRB(Dialog, &Appnd, IDC_APPEND, IDC_APPEND);
+				GetRB(Dialog, &LogBinary, IDC_FOPTBIN, IDC_FOPTBIN);
+				GetRB(Dialog, &LogTypePlainText, IDC_PLAINTEXT, IDC_PLAINTEXT);
+				GetRB(Dialog, &LogTimestamp, IDC_TIMESTAMP, IDC_TIMESTAMP);
+				ArrangeControls(Dialog, work, Appnd, LogBinary, LogTypePlainText, LogTimestamp);
 			}
 			break;
 		case IDC_FOPT_FILENAME_EDIT:
@@ -648,18 +646,15 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
 				CheckLogFile(Dialog, filename, work);
 				free(filename);
+				{
+					WORD Appnd, LogBinary, LogTypePlainText, LogTimestamp;
+					GetRB(Dialog, &Appnd, IDC_APPEND, IDC_APPEND);
+					GetRB(Dialog, &LogBinary, IDC_FOPTBIN, IDC_FOPTBIN);
+					GetRB(Dialog, &LogTypePlainText, IDC_PLAINTEXT, IDC_PLAINTEXT);
+					GetRB(Dialog, &LogTimestamp, IDC_TIMESTAMP, IDC_TIMESTAMP);
+					ArrangeControls(Dialog, work, Appnd, LogBinary, LogTypePlainText, LogTimestamp);
+				}
 			}
-			break;
-		case IDC_NEW_OVERWRITE:
-			if (IsDlgButtonChecked(Dialog, IDC_FOPTTEXT) == BST_CHECKED) {
-				EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
-				EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
-				CheckDlgButton(Dialog, IDC_BOM, BST_CHECKED);
-				SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
-			}
-			break;
-		case IDC_APPEND:
-			ArrangeControls(Dialog, work);
 			break;
 		}
 		break;
