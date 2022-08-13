@@ -23,6 +23,18 @@ install(
   DESTINATION .
   )
 
+add_custom_target(
+  special_font ALL
+  DEPENDS ${BINARY_DIR}/TSPECIAL1.TTF
+)
+
+add_custom_command(
+  OUTPUT ${BINARY_DIR}/TSPECIAL1.TTF
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/release/TSPECIAL1.TTF ${BINARY_DIR}
+)
+
+set_target_properties(special_font PROPERTIES FOLDER installer)
+
 install(
   DIRECTORY release/
   DESTINATION .
