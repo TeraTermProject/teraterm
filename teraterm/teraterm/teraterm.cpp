@@ -53,29 +53,33 @@
 #include "teraterml.h"
 #include "sendmem.h"
 #include "ttdebug.h"
+#include "win32helper.h"
+#include "asprintf.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 static BOOL AddFontFlag;
-static wchar_t TSpecialFont[MAX_PATH];
+static wchar_t *TSpecialFont;
 static CVTWindow* pVTWin;
 static DWORD HtmlHelpCookie;
 
 static void LoadSpecialFont(void)
 {
+	wchar_t *mod_path;
 	if (IsExistFontW(L"Tera Special", SYMBOL_CHARSET, TRUE)) {
 		// すでに存在するのでロードしない
 		return;
 	}
 
-	if (GetModuleFileNameW(NULL, TSpecialFont, _countof(TSpecialFont)) == 0) {
+	if (hGetModuleFileNameW(NULL, &mod_path) != 0) {
 		AddFontFlag = FALSE;
 		return;
 	}
-	*wcsrchr(TSpecialFont, L'\\') = 0;
-	wcscat_s(TSpecialFont, L"\\TSPECIAL1.TTF");
+	*wcsrchr(mod_path, L'\\') = 0;
+	aswprintf(&TSpecialFont, L"%s\\TSPECIAL1.TTF", mod_path);
+	free(mod_path);
 
 	// teraterm.exeのみで有効なフォントとなる。
 	// removeしなくても終了するとOSからなくなる
@@ -368,6 +372,8 @@ exit_message_loop:
 	_HtmlHelpW(NULL, NULL, HH_CLOSE_ALL, 0);
 	_HtmlHelpW(NULL, NULL, HH_UNINITIALIZE, HtmlHelpCookie);
 
+	free(TSpecialFont);
+	TSpecialFont = NULL;
 	UnloadSpecialFont();
 	DLLExit();
 
