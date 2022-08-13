@@ -55,7 +55,6 @@
 
 #include "ttmdlg.h"
 
-char HomeDir[MAX_PATH];
 wchar_t *HomeDirW;
 wchar_t FileName[MAX_PATH];
 wchar_t TopicName[11];
@@ -78,7 +77,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	wchar_t *start, *cur, *next;
 
 	// go home directory
-	_chdir(HomeDir);
+	SetCurrentDirectoryW(HomeDirW);
 
 	// Get command line parameters
 	FileName[0] = 0;
@@ -190,7 +189,7 @@ BOOL GetFileName(HWND HWin)
 	// 以前読み込んだ .ttl ファイルのパスを記憶できるように、初期ディレクトリを固定にしない。
 	// (2008.4.7 yutaka)
 #if 0
-	FNameRec.lpstrInitialDir = HomeDir;
+	FNameRec.lpstrInitialDir = HomeDirW;
 #endif
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	FNameRec.lpstrDefExt = L"TTL";

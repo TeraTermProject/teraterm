@@ -41,6 +41,7 @@
 #include "dlglib.h"
 #include "dllutil.h"
 #include "codeconv.h"
+#include "win32helper.h"
 
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -53,9 +54,9 @@
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
+wchar_t *UILanguageFileW;
 char UILanguageFile[MAX_PATH];
 static wchar_t *SetupFNameW;
-static char *SetupFName;
 static HWND CtrlWnd;
 static HINSTANCE hInst;
 
@@ -74,28 +75,23 @@ HWND GetHWND()
 
 static void init()
 {
-	char UILanguageFileRel[MAX_PATH];
-	LOGFONTA logfont;
-
 	HomeDirW = GetHomeDirW(hInst);
-	char *HomeDirA = ToCharW(HomeDirW);
-	strcpy_s(HomeDir, sizeof(HomeDir), HomeDirA);
-	free(HomeDirA);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
-	SetupFName = ToCharW(SetupFNameW);
-	GetPrivateProfileString("Tera Term", "UILanguageFile", "lang\\Default.lng",
-	                        UILanguageFileRel, sizeof(UILanguageFileRel), SetupFName);
-	GetUILanguageFileFull(HomeDir, UILanguageFileRel,
-						  UILanguageFile, sizeof(UILanguageFile));
+
+	wchar_t *UILanguageFileRel;
+	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileRel);
+	UILanguageFileW = GetUILanguageFileFullW(HomeDirW, UILanguageFileRel);
+	free(UILanguageFileRel);
+	WideCharToACP_t(UILanguageFileW, UILanguageFile, sizeof(UILanguageFile));
 
 	DLLInit();
 	WinCompatInit();
 
 	// DPI Aware (高DPI対応)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		char Temp[4];
-		GetPrivateProfileString("Tera Term", "DPIAware", NULL, Temp, sizeof(Temp), SetupFName);
-		if (_stricmp(Temp, "on") == 0) {
+		wchar_t Temp[4];
+		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", NULL, Temp, sizeof(Temp), SetupFNameW);
+		if (_wcsicmp(Temp, L"on") == 0) {
 			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 			}
@@ -103,9 +99,10 @@ static void init()
 	}
 
 	// UILanguageFileの "Tera Term" セクション "DLG_SYSTEM_FONT" のフォントに設定する
-	GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
+	LOGFONTW logfont;
+	GetI18nLogfontW(L"Tera Term", L"DlgFont", &logfont, 0, SetupFNameW);
 	SetDialogFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet,
-				  UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+				  UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 }
 
 // TTMACRO main engine
@@ -189,6 +186,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	delete pCCtrlWindow;
 	pCCtrlWindow = NULL;
 
+	free(UILanguageFileW);
+	free(SetupFNameW);
+	free(HomeDirW);
 	DLLExit();
 	return ExitCode;
 }
