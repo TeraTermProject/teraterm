@@ -24,7 +24,9 @@
 #define IDC_FOPT_FILENAME_BUTTON        2596
 #define IDC_SENDFILE_FILENAME_TITLE     2598
 #define IDC_FOPT_FILENAME_EDIT          2599
+#define IDC_APPEND_GROUP                2600
 #define IDC_TEXTCODING_DROPDOWN         2601
+#define IDC_BINARY_GROUP                2602
 #define IDC_FOPTBIN                     2608
 #define IDC_FOPTTEXT                    2609
 #define IDC_NEW_OVERWRITE               2612

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-07-15)
+﻿; Updated by TeraTerm Project (2022-08-13)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -465,8 +465,10 @@ MSG_FIND_DIR_ERROR=Impossible de trouver le répertoire
 ; ttpfile
 ; ttfile.c
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=&Ajouter
+DLG_FOPT_BINARY_LABEL=Text or Binary mode
 DLG_FOPT_TEXT=T&ext
 DLG_FOPT_BINARY=&Binaire
 DLG_FOPT_BOM=&BOM

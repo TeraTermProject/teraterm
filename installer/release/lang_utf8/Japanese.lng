@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-07-15)
+﻿; Updated by TeraTerm Project (2022-08-13)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -464,8 +464,10 @@ MSG_FIND_DIR_ERROR=ディレクトリが見つかりません
 ; ttpfile
 ; ttfile.c
 DLG_FOPT_FILENAME_TITLE=ログファイル名(dialogにファイルをドロップ)(&F)
+DLG_FOPT_APPEND_LABEL=書き込みモード
 DLG_FOPT_NEW_OVERWRITE=新規/上書き(&N)
 DLG_FOPT_APPEND=追記(&A)
+DLG_FOPT_BINARY_LABEL=テキスト/バイナリモード
 DLG_FOPT_TEXT=テキスト(&E)
 DLG_FOPT_BINARY=バイナリ(&R)
 DLG_FOPT_BOM=&BOM

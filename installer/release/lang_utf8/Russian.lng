@@ -465,8 +465,10 @@ MSG_FIND_DIR_ERROR=Не удается найти папку
 ; ttpfile
 ; ttfile.c
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
-DLG_FOPT_APPEND=&Дополнение 
+DLG_FOPT_APPEND=&Дополнение
+DLG_FOPT_BINARY_LABEL=Text or Binary mode
 DLG_FOPT_TEXT=T&ext
 DLG_FOPT_BINARY=&Бинарный
 DLG_FOPT_BOM=&BOM

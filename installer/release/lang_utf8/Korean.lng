@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-07-15)
+﻿; Updated by TeraTerm Project (2022-08-13)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -465,8 +465,10 @@ MSG_FIND_DIR_ERROR=디렉토리를 찾을 수 없습니다
 ; ttpfile
 ; ttfile.c
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=추가(&A)
+DLG_FOPT_BINARY_LABEL=Text or Binary mode
 DLG_FOPT_TEXT=T&ext
 DLG_FOPT_BINARY=바이너리(&R)
 DLG_FOPT_BOM=&BOM
