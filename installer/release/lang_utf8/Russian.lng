@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-07-15)
+﻿; Updated by TeraTerm Project (2022-08-13)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -464,7 +464,7 @@ MSG_FIND_DIR_ERROR=Не удается найти папку
 
 ; ttpfile
 ; ttfile.c
-DLG_FOPT=Вариант
+DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=&Дополнение 
 DLG_FOPT_TEXT=T&ext

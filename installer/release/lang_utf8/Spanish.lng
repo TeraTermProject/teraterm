@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-07-15)
+﻿; Updated by TeraTerm Project (2022-08-13)
 ; Traducido por Filiberto Olguin Ascona.
 
 [Tera Term]
@@ -406,13 +406,20 @@ MSG_FIND_DIR_ERROR=Cannot find directory
 
 ; ttpfile
 ; ttfile.c
-DLG_FOPT=Option
-DLG_FOPT_BINARY=&Binary
+DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
+DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
 DLG_FOPT_APPEND=&Append
+DLG_FOPT_TEXT=T&ext
+DLG_FOPT_BINARY=Bina&ry
+DLG_FOPT_BOM=&BOM
 DLG_FOPT_PLAIN=&Plain text
 DLG_FOPT_TIMESTAMP=&Timestamp
 DLG_FOPT_HIDEDIALOG=Hide &dialog
-DLG_FOPT_ALLBUFFINFIRST=&Include screen buffer
+DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer
+DLG_FOPT_TIMESTAMP_LOCAL=Local Time
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
 
 DLG_XOPT=Option
 DLG_XOPT_CHECKSUM=Check&sum
