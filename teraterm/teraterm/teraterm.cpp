@@ -63,9 +63,9 @@ static wchar_t TSpecialFont[MAX_PATH];
 static CVTWindow* pVTWin;
 static DWORD HtmlHelpCookie;
 
-static void LoadSpecialFont()
+static void LoadSpecialFont(void)
 {
-	if (IsExistFontA("Tera Special", SYMBOL_CHARSET, TRUE)) {
+	if (IsExistFontW(L"Tera Special", SYMBOL_CHARSET, TRUE)) {
 		// Ç∑Ç≈Ç…ë∂ç›Ç∑ÇÈÇÃÇ≈ÉçÅ[ÉhÇµÇ»Ç¢
 		return;
 	}
@@ -94,7 +94,7 @@ static void LoadSpecialFont()
 	}
 }
 
-static void UnloadSpecialFont()
+static void UnloadSpecialFont(void)
 {
 	if (!AddFontFlag) {
 		return;
@@ -108,7 +108,7 @@ static void UnloadSpecialFont()
 	}
 }
 
-static void init()
+static void init(void)
 {
 	DLLInit();
 	WinCompatInit();
@@ -229,7 +229,7 @@ static BOOL OnIdle(LONG lCount)
 }
 
 static HWND main_window;
-HWND GetHWND()
+HWND GetHWND(void)
 {
 	return main_window;
 }
