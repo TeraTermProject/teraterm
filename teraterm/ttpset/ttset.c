@@ -434,23 +434,23 @@ static void ReadFont(
 
 // フォント情報読み込み、3パラメータ版
 static void ReadFont3(
-	const char *Sect, const char *Key, const char *Default, const wchar_t *FName,
-	char *FontName, size_t FontNameLen, int *FontPoint, int *FontCharSet)
+	const wchar_t *Sect, const wchar_t *Key, const wchar_t *Default, const wchar_t *FName,
+	wchar_t *FontName, size_t FontNameLen, int *FontPoint, int *FontCharSet)
 {
-	char Temp[MAX_PATH];
-	GetPrivateProfileString(Sect, Key, Default,
-	                        Temp, _countof(Temp), FName);
+	wchar_t *Temp;
+	hGetPrivateProfileStringW(Sect, Key, Default, FName, & Temp);
 	if (Temp[0] == 0) {
 		// デフォルトがセットされていない & iniにエントリーがない場合
 		FontName[0] = 0;
 		*FontPoint = 0;
 		*FontCharSet = 0;
 	} else {
-		GetNthString(Temp, 1, FontNameLen, FontName);
-		GetNthNum(Temp, 2, FontPoint);
-		GetNthNum(Temp, 3, FontCharSet);
+		GetNthStringW(Temp, 1, FontNameLen, FontName);
+		GetNthNumW(Temp, 2, FontPoint);
+		GetNthNumW(Temp, 3, FontCharSet);
 		// TODO ちゃんとパースする
 	}
+	free(Temp);
 }
 
 #define CYGTERM_FILE "cygterm.cfg"  // CygTerm configuration file
@@ -2305,8 +2305,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ReadCygtermConfFile(ts);
 
 	// dialog font
-	ReadFont3("Tera Term", "DlgFont", NULL, FName,
-			  ts->DialogFontName, sizeof(ts->DialogFontName),
+	ReadFont3(L"Tera Term", L"DlgFont", NULL, FName,
+			  ts->DialogFontNameW, _countof(ts->DialogFontNameW),
 			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
 
 	// Unicode設定
@@ -2338,6 +2338,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	int ret;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], msg[MAX_UIMSG];
 	WORD TmpColor[12][6];
+	wchar_t *TempW;
 
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
@@ -3577,11 +3578,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteCygtermConfFile(ts);
 
 	// dialog font
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s,%d,%d",
-				ts->DialogFontName,
-				ts->DialogFontPoint,
-				ts->DialogFontCharSet);
-	WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, FName);
+	aswprintf(&TempW, L"%s,%d,%d", ts->DialogFontNameW, ts->DialogFontPoint, ts->DialogFontCharSet);
+	WritePrivateProfileStringW(L"Tera Term", L"DlgFont", TempW, FName);
+	free(TempW);
 
 	// Unicode設定
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);

@@ -121,29 +121,48 @@ INT_PTR TTDialogBox(HINSTANCE hInstance, LPCTSTR lpTemplateName, HWND hWndParent
 
 /**
  *	ダイアログフォントを設定する
- */
-void SetDialogFont(const char *FontName, int FontPoint, int FontCharSet,
-				   const char *UILanguageFile, const char *Section, const char *Key)
+ *		1. 指定フォントを設定する(存在しない場合は2へ)
+ *		2. lngファイル内のフォントを設定する(設定がない,存在しない場合は3へ)
+ *		3. MessageBox()のフォントを設定する
+ *
+ * @param FontName			フォント 名前 (NULLのとき指定なし)
+ * @param FontPoint			フォント ポイント
+ * @param FontCharSet		フォント CharSet(不要?)
+ * @param UILanguageFile	lng ファイル (NULLのとき指定なし)
+ * @param Section			lng セクション
+ * @param Key				lng キー
+*/
+void SetDialogFont(const wchar_t *FontName, int FontPoint, int FontCharSet,
+				   const wchar_t *UILanguageFile, const char *Section, const char *Key)
 {
-	LOGFONTA logfont;
+	LOGFONTW logfont;
 	BOOL result;
 
 	// 指定フォントをセット
 	if (FontName != NULL && FontName[0] != 0) {
 		// 存在チェック
-		result = IsExistFontA(FontName, FontCharSet, TRUE);
+		result = IsExistFontW(FontName, FontCharSet, TRUE);
+#if 0
+		// 存在をチェックしない
+		//   存在しなくてもフォントリンクで多分うまく表示される
+		//result = TRUE;
+#endif
 		if (result == TRUE) {
-			TTSetDlgFontA(FontName, FontPoint, FontCharSet);
+			TTSetDlgFontW(FontName, FontPoint, FontCharSet);
 			return;
 		}
 	}
 
 	// .lngの指定
 	if (UILanguageFile != NULL && Section != NULL && Key != NULL) {
-		result = GetI18nLogfont(Section, Key, &logfont, 0, UILanguageFile);
+		wchar_t *sectionW = ToWcharA(Section);
+		wchar_t *keyW = ToWcharA(Key);
+		result = GetI18nLogfontW(sectionW, keyW, &logfont, 0, UILanguageFile);
+		free(keyW);
+		free(sectionW);
 		if (result == TRUE) {
-			if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
-				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+			if (IsExistFontW(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+				TTSetDlgFontW(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 				return;
 			}
 		}
@@ -151,11 +170,11 @@ void SetDialogFont(const char *FontName, int FontPoint, int FontCharSet,
 
 	// ini,lngで指定されたフォントが見つからなかったとき、
 	// messagebox()のフォントをとりあえず選択しておく
-	GetMessageboxFont(&logfont);
+	GetMessageboxFontW(&logfont);
 	if (logfont.lfHeight < 0) {
 		logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
 	}
-	TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	TTSetDlgFontW(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 }
 
 

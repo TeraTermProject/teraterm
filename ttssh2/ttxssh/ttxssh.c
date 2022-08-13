@@ -1267,14 +1267,14 @@ hostssh_enabled:
 
 static void UTIL_SetDialogFont()
 {
-	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-	              pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
+	SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
+	              pvar->ts->UILanguageFileW, "TTSSH", "DLG_TAHOMA_FONT");
 }
 
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 {
-	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-	              pvar->ts->UILanguageFile, "TTSSH", "DLG_TAHOMA_FONT");
+	SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
+	              pvar->ts->UILanguageFileW, "TTSSH", "DLG_TAHOMA_FONT");
 //	              pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
 	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
 	                             parent, TTXHostDlg, (LPARAM)rec);

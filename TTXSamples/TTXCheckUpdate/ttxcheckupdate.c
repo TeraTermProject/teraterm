@@ -224,8 +224,8 @@ static void ShowDialog(HWND hWnd)
 	}
 
 	/* ダイアログを出す */
-	SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-				  pvar->ts->UILanguageFile, "Tera Term", "DLG_TAHOMA_FONT");
+	SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
+				  pvar->ts->UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	TTDialogBoxParam(pvar->hInst, MAKEINTRESOURCE(IDD_CHECK_UPDATE_DIALOG), hWnd, DlgProc, (LPARAM)pvar);
 
 	/* 終了 */

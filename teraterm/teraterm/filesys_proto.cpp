@@ -839,8 +839,8 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet ts)
 {
-	SetDialogFont(ts->DialogFontName, ts->DialogFontPoint, ts->DialogFontCharSet,
-				  ts->UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(ts->DialogFontNameW, ts->DialogFontPoint, ts->DialogFontCharSet,
+				  ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	return (BOOL)TTDialogBoxParam(hInst,
 								  MAKEINTRESOURCE(IDD_GETFNDLG),
 								  HWin, GetFnDlg, (LPARAM)fv);

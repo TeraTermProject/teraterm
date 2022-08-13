@@ -537,8 +537,8 @@ static INT_PTR CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	switch (cmd) {
 	  case ID_MENU_SETUP:
-		SetDialogFont(pvar->ts->DialogFontName, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
-					  pvar->ts->UILanguageFile, SECTION, "DLG_TAHOMA_FONT");
+		SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
+					  pvar->ts->UILanguageFileW, SECTION, "DLG_TAHOMA_FONT");
 		switch (TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
 								 hWin, RecurringCommandSetting, (LPARAM)NULL)) {
 		  case IDOK:

@@ -301,8 +301,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
-	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
 	BOOL bIdle = TRUE;	// idle状態か?
 	LONG lCount = 0;

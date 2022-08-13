@@ -86,8 +86,8 @@ INT_PTR TTDialogBox(
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
-void SetDialogFont(const char *FontName, int FontHeight, int FontCharSet,
-				   const char *UILanguageFile, const char *Section, const char *Key);
+void SetDialogFont(const wchar_t *FontName, int FontHeight, int FontCharSet,
+				   const wchar_t *UILanguageFile, const char *Section, const char *Key);
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
 BOOL IsExistFontW(const wchar_t *face, BYTE charset, BOOL strict);
 int GetFontPointFromPixel(HWND hWnd, int pixel);

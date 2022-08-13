@@ -3280,13 +3280,11 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	switch (Message) {
 		case WM_INITDIALOG:
 		{
-			static LPCHOOSEFONT cf;
 			PTTSet ts;
 			wchar_t *uimsg;
 
 			//EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
-			cf = (LPCHOOSEFONT)lParam;
-			ts = (PTTSet)cf->lCustData;
+			ts = (PTTSet)((CHOOSEFONTA *)lParam)->lCustData;
 
 			GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", L"\"Font style\" selection here won't affect actual font appearance.",
 						 ts->UILanguageFileW, &uimsg);
@@ -3321,16 +3319,13 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	return FALSE;
 }
 
-#ifndef CF_INACTIVEFONTS
-#define CF_INACTIVEFONTS 0x02000000L
-#endif
 BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts)
 {
-	CHOOSEFONT cf;
+	CHOOSEFONTA cf;
 	BOOL Ok;
 
-	memset(&cf, 0, sizeof(CHOOSEFONT));
-	cf.lStructSize = sizeof(CHOOSEFONT);
+	memset(&cf, 0, sizeof(cf));
+	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = WndParent;
 	cf.lpLogFont = LogFont;
 	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
@@ -3343,7 +3338,7 @@ BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts)
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;
 	cf.lCustData = (LPARAM)ts;
-	Ok = ChooseFont(&cf);
+	Ok = ChooseFontA(&cf);
 	return Ok;
 }
 

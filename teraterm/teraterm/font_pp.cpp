@@ -42,6 +42,7 @@
 #include "buffer.h"
 #include "compat_win.h"	// for CF_INACTIVEFONTS
 #include "helpid.h"
+#include "codeconv.h"
 
 #include "font_pp.h"
 
@@ -54,20 +55,20 @@ struct FontPPData {
 	TTTSet *pts;
 	DLGTEMPLATE *dlg_templ;
 //	LOGFONTA VTFont;
-	LOGFONTA DlgFont;
+	LOGFONTW DlgFont;
 };
 
-static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTA *logfont)
+static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 {
 	memset(logfont, 0, sizeof(*logfont));
 	logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
-	strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName),ts->DialogFontName, _TRUNCATE);
+	wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName),ts->DialogFontNameW, _TRUNCATE);
 	logfont->lfCharSet = ts->DialogFontCharSet;
 }
 
-static void SetDlgLogFont(HWND hWnd, const LOGFONTA *logfont, TTTSet *ts)
+static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)
 {
-	strncpy_s(ts->DialogFontName, sizeof(ts->DialogFontName), logfont->lfFaceName, _TRUNCATE);
+	wcsncpy_s(ts->DialogFontNameW, _countof(ts->DialogFontNameW), logfont->lfFaceName, _TRUNCATE);
 	ts->DialogFontPoint = GetFontPointFromPixel(hWnd, -logfont->lfHeight);
 	ts->DialogFontCharSet = logfont->lfCharSet;
 }
@@ -94,7 +95,7 @@ static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 	const TTTSet *ts = dlg_data->pts;
 
 	// ダイアログ表示
-	CHOOSEFONTA cf = {};
+	CHOOSEFONTW cf = {};
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = hWnd;
 	cf.lpLogFont = &dlg_data->DlgFont;
@@ -109,7 +110,7 @@ static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = dlg_data->hInst;
 	cf.lCustData = (LPARAM)dlg_data;
-	BOOL result = ChooseFontA(&cf);
+	BOOL result = ChooseFontW(&cf);
 	return result;
 }
 
@@ -119,21 +120,21 @@ static void EnableCodePage(HWND hWnd, BOOL enable)
 	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_EDIT), enable);
 }
 
-static void SetFontString(HWND hWnd, int item, const LOGFONTA *logfont)
+static void SetFontString(HWND hWnd, int item, const LOGFONTW *logfont)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/dimm/ns-dimm-logfonta
 	// http://www.coara.or.jp/~tkuri/D/015.htm#D2002-09-14
-	char b[128];
-	sprintf_s(b, "%s (%d,%d) %d", logfont->lfFaceName, logfont->lfWidth, logfont->lfHeight, logfont->lfCharSet);
-	SetDlgItemTextA(hWnd, item, b);
+	wchar_t b[128];
+	swprintf_s(b, L"%s (%d,%d) %d", logfont->lfFaceName, logfont->lfWidth, logfont->lfHeight, logfont->lfCharSet);
+	SetDlgItemTextW(hWnd, item, b);
 }
 
 static void SetVTFontString(HWND hWnd, int item, const TTTSet *ts)
 {
-	LOGFONTA logfont = {};
+	LOGFONTW logfont = {};
 	logfont.lfWidth = ts->VTFontSize.x;
 	logfont.lfHeight = ts->VTFontSize.y;
-	strncpy_s(logfont.lfFaceName, sizeof(logfont.lfFaceName),ts->VTFont, _TRUNCATE);
+	ACPToWideChar_t(ts->VTFont, logfont.lfFaceName, _countof(logfont.lfFaceName));
 	logfont.lfCharSet = ts->VTFontCharSet;
 	SetFontString(hWnd, item, &logfont);
 }
@@ -256,7 +257,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 
 			case IDC_DLGFONT_DEFAULT | (BN_CLICKED << 16): {
-				GetMessageboxFont(&dlg_data->DlgFont);
+				GetMessageboxFontW(&dlg_data->DlgFont);
 				SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 			}
 

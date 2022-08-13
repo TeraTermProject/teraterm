@@ -805,8 +805,8 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 		goto activate;
 	}
 
-	SetDialogFont(ts.DialogFontName, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFile, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
 	// CreateDialogW() で生成したダイアログは、
 	// エディットボックスにIMEからの入力が化けることがある (20/05/27,Windows10 64bit)

@@ -629,7 +629,7 @@ struct tttset {
 	char LogTimestampFormat[48];
 	int TerminalInputSpeed;
 	int TerminalOutputSpeed;
-	char DialogFontName[LF_FACESIZE];
+	char reserve_DialogFontName[LF_FACESIZE];	// DialogFontNameW �ֈڍs
 	int DialogFontPoint;
 	int DialogFontCharSet;
 	int ConfigVersion;
@@ -653,6 +653,7 @@ struct tttset {
 	WORD PluginVTIconID;
 	HINSTANCE TeraTermInstance;
 	WORD WindowCornerDontround;
+	wchar_t DialogFontNameW[LF_FACESIZE];
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
