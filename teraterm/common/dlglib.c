@@ -452,7 +452,7 @@ static int CALLBACK IsExistFontSubA(
 	(void)lpntm;
 	if (nFontType != DEVICE_FONTTYPE &&
 		_stricmp(lpelf->elfLogFont.lfFaceName, info->face) == 0 &&
-		lpelf->elfLogFont.lfCharSet == info->charset)
+		(info->charset == DEFAULT_CHARSET || lpelf->elfLogFont.lfCharSet == info->charset))
 	{
 		info->found = TRUE;
 		return 0;
@@ -486,6 +486,68 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	info.face = face;
 	info.charset = charset;
 	EnumFontFamiliesExA(hDC, &lf, (FONTENUMPROCA)IsExistFontSubA, (LPARAM)&info, 0);
+	ReleaseDC(NULL, hDC);
+	return info.found;
+}
+
+typedef struct {
+	BOOL found;
+	const wchar_t *face;
+	BYTE charset;
+} IsExistFontInfoW;
+
+static int CALLBACK IsExistFontSubW(
+	const ENUMLOGFONTW* lpelf, const NEWTEXTMETRICW* lpntm,
+	int nFontType, LPARAM lParam)
+{
+	IsExistFontInfoW *info = (IsExistFontInfoW *)lParam;
+	(void)lpntm;
+	if (nFontType != DEVICE_FONTTYPE &&
+		_wcsicmp(lpelf->elfLogFont.lfFaceName, info->face) == 0 &&
+		(info->charset == DEFAULT_CHARSET || lpelf->elfLogFont.lfCharSet == info->charset))
+	{
+		info->found = TRUE;
+		return 0;
+	}
+	return 1;
+}
+
+/**
+ *	フォントが存在しているかチェックする
+ *
+ *	@param[in]	face		フォント名(ファイル名ではない)
+ *	@param[in]	charset		SHIFTJIS_CHARSETなど
+ *	@param[in]	strict		TRUE	フォントリンクは検索に含めない
+ *							FALSE	フォントリンクも検索に含める
+ *	@retval		FALSE		フォントはしない
+ *	@retval		TRUE		フォントは存在する
+ *
+ *	strict = FALSE時、存在しないフォントでも表示できるならTRUEが返る
+ *	(charste = DEFAULT_CHARSET のときと同じ)
+ *
+ *	* 注
+ *		- face は system locale とは異なるフォント名とはマッチしない
+ *		- 理由 (EnumFontFamiliesExW() のドキュメントから)
+ *		  - Englsh(ANSI) name と localized name の2つのフォント名を持っている
+ *		  - localized name は system localと同じ時だけ取得できる
+ *		    - EnumFontFamiliesExW() の仕様
+ *		  - ハングルで指定された Gulim,Dotum は存在の確認できない
+ *		- 解決案
+ *		  - http://archives.miloush.net/michkap/archive/2006/02/13/530814.html
+ */
+BOOL IsExistFontW(const wchar_t *face, BYTE charset, BOOL strict)
+{
+	HDC hDC = GetDC(NULL);
+	LOGFONTW lf;
+	IsExistFontInfoW info;
+	memset(&lf, 0, sizeof(lf));
+	lf.lfCharSet = !strict ? DEFAULT_CHARSET : charset;
+	// ↑DEFAULT_CHARSETとするとフォントリンクも有効になるようだ
+	lf.lfPitchAndFamily = 0;
+	info.found = FALSE;
+	info.face = face;
+	info.charset = charset;
+	EnumFontFamiliesExW(hDC, &lf, (FONTENUMPROCW)IsExistFontSubW, (LPARAM)&info, 0);
 	ReleaseDC(NULL, hDC);
 	return info.found;
 }

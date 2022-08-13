@@ -81,6 +81,7 @@ void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextI
 				 const char *UILanguageFile, int nsel);
 int GetI18nLogfontAW(const char *section, const char *key, PLOGFONTA logfont, int ppi, const wchar_t *iniFile);
 int GetI18nLogfontAA(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
+int GetI18nLogfontW(const wchar_t *section, const wchar_t *key, PLOGFONTW logfont, int ppi, const wchar_t *iniFile);
 
 #ifdef __cplusplus
 }

@@ -89,6 +89,7 @@ INT_PTR TTDialogBox(
 void SetDialogFont(const char *FontName, int FontHeight, int FontCharSet,
 				   const char *UILanguageFile, const char *Section, const char *Key);
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
+BOOL IsExistFontW(const wchar_t *face, BYTE charset, BOOL strict);
 int GetFontPointFromPixel(HWND hWnd, int pixel);
 int GetFontPixelFromPoint(HWND hWnd, int point);
 void ExpandCBWidth(HWND dlg, int ID);

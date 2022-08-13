@@ -884,8 +884,7 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
  *
  *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
  *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
- *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
- *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス
+ *	@return			LanguageFile			lngファイルのフルパス
  */
 wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguageFileRel)
 {
@@ -1014,6 +1013,53 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 
 	GetNthString(Source, Nth, sizeof(T), T);
 	if (sscanf_s(T, "%d", &v) != 1) {
+		v = defval;
+	}
+
+	return v;
+}
+
+BOOL GetNthStringW(const wchar_t *Source, int Nth, size_t Size, wchar_t *Dest)
+{
+	int i, j, k;
+
+	i = 1;
+	j = 0;
+	k = 0;
+
+	while (i<Nth && Source[j] != 0) {
+		if (Source[j++] == ',') {
+			i++;
+		}
+	}
+
+	if (i == Nth) {
+		while (Source[j] != 0 && Source[j] != ',' && k<Size-1) {
+			Dest[k++] = Source[j++];
+		}
+	}
+
+	Dest[k] = 0;
+	return (i>=Nth);
+}
+
+void GetNthNumW(const wchar_t *Source, int Nth, int *Num)
+{
+	wchar_t T[15];
+
+	GetNthStringW(Source,Nth,_countof(T),T);
+	if (swscanf_s(T, L"%d", Num) != 1) {
+		*Num = 0;
+	}
+}
+
+int GetNthNum2W(const wchar_t *Source, int Nth, int defval)
+{
+	wchar_t T[15];
+	int v;
+
+	GetNthStringW(Source, Nth, _countof(T), T);
+	if (swscanf_s(T, L"%d", &v) != 1) {
 		v = defval;
 	}
 
@@ -1492,4 +1538,22 @@ void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height)
 	rect.bottom = height;
 
 	HDCToFile(fname, hdc, rect);
+}
+
+/**
+ *	ダイアログフォントを取得する
+ *	GetMessageboxFontA() の unicode版
+ *	エラーは発生しない
+ */
+void GetMessageboxFontW(LOGFONTW *logfont)
+{
+	NONCLIENTMETRICSW nci;
+	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICSW, lfMessageFont);
+	BOOL r;
+
+	memset(&nci, 0, sizeof(nci));
+	nci.cbSize = st_size;
+	r = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+	assert(r == TRUE);
+	*logfont = nci.lfStatusFont;
 }

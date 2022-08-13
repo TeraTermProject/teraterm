@@ -250,6 +250,39 @@ void SetI18nMenuStrsA(HMENU hMenu, const char *section, const DlgTextInfo *infos
 	free(UILanguageFileW);
 }
 
+int GetI18nLogfontW(const wchar_t *section, const wchar_t *key, PLOGFONTW logfont, int ppi, const wchar_t *iniFile)
+{
+	wchar_t *tmp;
+	wchar_t font[LF_FACESIZE];
+	int height, charset;
+	assert(iniFile[0] != '\0');
+	memset(logfont, 0, sizeof(*logfont));
+
+	hGetPrivateProfileStringW(section, key, L"", iniFile, &tmp);
+	if (tmp[0] == L'\0') {
+		free(tmp);
+		return FALSE;
+	}
+
+	GetNthStringW(tmp, 1, LF_FACESIZE-1, font);
+	GetNthNumW(tmp, 2, &height);
+	GetNthNumW(tmp, 3, &charset);
+
+	if (font[0] != '\0') {
+		wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), font, _TRUNCATE);
+	}
+	logfont->lfCharSet = (BYTE)charset;
+	if (ppi != 0) {
+		logfont->lfHeight = MulDiv(height, -ppi, 72);
+	} else {
+		logfont->lfHeight = height;
+	}
+	logfont->lfWidth = 0;
+
+	free(tmp);
+	return TRUE;
+}
+
 int GetI18nLogfontAW(const char *section, const char *key, PLOGFONTA logfont, int ppi, const wchar_t *iniFile)
 {
 	wchar_t sectionW[64];

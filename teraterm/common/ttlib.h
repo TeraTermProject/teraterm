@@ -95,6 +95,9 @@ void GetDownloadFolder(char *dest, int destlen);
 wchar_t *GetDownloadFolderW(void);
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file);
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home);
+BOOL GetNthStringW(const wchar_t *Source, int Nth, size_t Size, wchar_t *Dest);
+void GetNthNumW(const wchar_t *Source, int Nth, int *Num);
+int GetNthNum2W(const wchar_t *Source, int Nth, int defval);
 void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
 						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
 wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguageFileRel);
@@ -148,6 +151,7 @@ BOOL GetPositionOnWindow(
 	HWND hWnd, const POINT *point,
 	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
 DllExport void GetMessageboxFont(LOGFONTA *logfont);
+void GetMessageboxFontW(LOGFONTW *logfont);
 void GetDesktopRect(HWND hWnd, RECT *rect);
 void CenterWindow(HWND hWnd, HWND hWndParent);
 void MoveWindowToDisplay(HWND hWnd);

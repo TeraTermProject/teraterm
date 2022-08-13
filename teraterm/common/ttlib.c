@@ -1266,13 +1266,13 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body)
  */
 DllExport void GetMessageboxFont(LOGFONT *logfont)
 {
-	NONCLIENTMETRICS nci;
-	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
+	NONCLIENTMETRICSA nci;
+	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICSA, lfMessageFont);
 	BOOL r;
 
 	memset(&nci, 0, sizeof(nci));
 	nci.cbSize = st_size;
-	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+	r = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
 	assert(r == TRUE);
 	*logfont = nci.lfStatusFont;
 }
