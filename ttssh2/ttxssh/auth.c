@@ -1524,8 +1524,8 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	if (pvar->settings.DefaultUserType == 1 &&
-		pvar->session_settings.DefaultUserName[0] == 0) {
-		// 空なので「入力しない」にしておく
+		pvar->settings.DefaultUserName[0] == 0) {
+		// 「デフォルトユーザ名を使用する」設定だがユーザ名がないので、「入力しない」にする
 		pvar->settings.DefaultUserType = 0;
 	}
 	id = pvar->settings.DefaultUserType == 1 ? IDC_SSH_DEFAULTUSERNAME :
