@@ -80,6 +80,15 @@ if(NOT EXISTS ${SRC_DIR}/README.md)
   file(RENAME
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/COPYING
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/Oniguruma-LICENSE.txt)
+  file(COPY
+    ${SRC_DIR}/doc/RE
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help/en)
+  file(COPY
+    ${SRC_DIR}/doc/RE.ja
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help/ja)
+  file(RENAME
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/ja/RE.ja
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/ja/RE)
 endif()
 
 ########################################
