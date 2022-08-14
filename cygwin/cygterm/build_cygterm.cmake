@@ -2,11 +2,38 @@
 # - 生成可能な cygterm, msys2term をビルド
 # - CMAKE_INSTALL_PREFIX にコピーする
 # 例
-#  mkdir build_all && cd build_all && cmake -P ../build_cygterm.cmake
+#  mkdir build_all && cd build_all && cmake -DCMAKE_INSTALL_PREFIX=c:/tmp/cygterm -P ../build_cygterm.cmake
 
 message("CMAKE_COMMAND=${CMAKE_COMMAND}")
 message("CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME}")
 message("CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+
+if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+  message(FATAL_ERROR "CMAKE_INSTALL_PREFIX not defined")
+endif()
+if((NOT (${CMAKE_INSTALL_PREFIX} MATCHES "^[A-z]:[/\\]")) AND (NOT(${CMAKE_INSTALL_PREFIX} MATCHES "^/")))
+  message(FATAL_ERROR "CMAKE_INSTALL_PREFIX(${CMAKE_INSTALL_PREFIX}) must absolute")
+endif()
+
+function(ToCygwinPath in_path out_var)
+  if("${in_path}" MATCHES "^[A-z]:[/\\]")
+    # windows native absolute path
+    string(REGEX REPLACE "([A-z]):[/\\]" "/cygdrive/\\1/" new_path "${in_path}")
+    set(${out_var} ${new_path} PARENT_SCOPE)
+  else()
+    set(${out_var} ${in_path} PARENT_SCOPE)
+  endif()
+endfunction()
+
+function(ToMsys2Path in_path out_var)
+  if("${in_path}" MATCHES "^[A-z]:[/\\]")
+    # windows native absolute path
+    string(REGEX REPLACE "([A-z]):[/\\]" "/\\1/" new_str "${in_path}")
+    set(${out_var} ${new_str} PARENT_SCOPE)
+  else()
+    set(${out_var} ${in_path} PARENT_SCOPE)
+  endif()
+endfunction()
 
 # cygwinのインストールパスを返す
 # 見つからない場合は ""
@@ -54,38 +81,26 @@ function(GetMsys2Path path)
   else()
     message("?")
   endif()
-  message("last")
 endfunction()
 
-function(build TARGET_CMAKE_COMMAND DIST_DIR GENERATE_OPTION)
-  file(REMOVE_RECURSE ${DIST_DIR})
-  file(MAKE_DIRECTORY ${DIST_DIR})
+function(build TARGET_CMAKE_COMMAND SRC_DIR BUILD_DIR INSTALL_DIR GENERATE_OPTIONS)
+  file(REMOVE_RECURSE ${BUILD_DIR})
+  file(MAKE_DIRECTORY ${BUILD_DIR})
   if((NOT EXISTS ${TARGET_CMAKE_COMMAND}) AND (NOT EXISTS "${TARGET_CMAKE_COMMAND}.exe"))
     message("${TARGET_CMAKE_COMMAND} not found")
     return()
   endif()
-  if("${TARGET_CMAKE_COMMAND}" MATCHES "msys")
-    # msys2のときは、c:/path -> /c/path に書き換える
-    string(REGEX REPLACE "([A-z]):[/\\]" "/\\1/" CMAKE_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_DIR}")
-    string(REGEX REPLACE "([A-z]):[/\\]" "/\\1/" GENERATE_OPTION "${GENERATE_OPTION}")
-  endif()
-  message("${TARGET_CMAKE_COMMAND} ${CMAKE_CURRENT_LIST_DIR} -G \"Unix Makefiles\" ${GENERATE_OPTION} ${MSYS2_ADD}")
+  list(APPEND GENERATE_OPTIONS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR})
   execute_process(
-    COMMAND ${TARGET_CMAKE_COMMAND} ${CMAKE_CURRENT_LIST_DIR} -G "Unix Makefiles" ${GENERATE_OPTION} ${MSYS2_ADD}
-    WORKING_DIRECTORY ${DIST_DIR}
+    COMMAND ${TARGET_CMAKE_COMMAND} ${SRC_DIR} -G "Unix Makefiles" ${GENERATE_OPTIONS}
+    WORKING_DIRECTORY ${BUILD_DIR}
     RESULT_VARIABLE rv
-    )
+  )
   #message("rv=${rv}")
   execute_process(
-    COMMAND ${TARGET_CMAKE_COMMAND} --build . --config release -- -j
-    WORKING_DIRECTORY ${DIST_DIR}
-    )
-  if (DEFINED CMAKE_INSTALL_PREFIX)
-    execute_process(
-      COMMAND ${TARGET_CMAKE_COMMAND} --build . --config release --target install
-      WORKING_DIRECTORY ${DIST_DIR}
-      )
-  endif()
+    COMMAND ${TARGET_CMAKE_COMMAND} --build . --config release --target install -- -j
+    WORKING_DIRECTORY ${BUILD_DIR}
+  )
 endfunction()
 
 ## cygwin
@@ -95,24 +110,20 @@ message("cygwin ENV{PATH}=$ENV{PATH}")
 
 if (EXISTS ${PATH}/g++.exe)
   # gcc-core, gcc-g++ package (cygwin 64bit)
-  set(GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/toolchain_x86_64-cygwin.cmake")
-  if(DEFINED CMAKE_INSTALL_PREFIX)
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/cygterm+-x86_64")
-  endif()
-  build("${PATH}/cmake" "build_cygterm_x86_64" "${GENERATE_OPTIONS}")
-  if(DEFINED CMAKE_INSTALL_PREFIX)
-    file(COPY "${CMAKE_INSTALL_PREFIX}/cygterm+-x86_64/cygterm.exe" DESTINATION ${CMAKE_INSTALL_PREFIX})
-    file(COPY "${CMAKE_INSTALL_PREFIX}/cygterm+-x86_64/cygterm.cfg" DESTINATION ${CMAKE_INSTALL_PREFIX})
-  endif()
+  ToCygwinPath(${CMAKE_CURRENT_LIST_DIR} CURRENT_LIST_DIR)
+  set(GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CURRENT_LIST_DIR}/toolchain_x86_64-cygwin.cmake")
+  ToCygwinPath(${CMAKE_INSTALL_PREFIX} INSTALL_PREFIX)
+  build("${PATH}/cmake" ${CURRENT_LIST_DIR} "build_cygterm_x86_64" "${INSTALL_PREFIX}/cygterm+-x86_64" "${GENERATE_OPTIONS}")
+  file(COPY "${CMAKE_INSTALL_PREFIX}/cygterm+-x86_64/cygterm.exe" DESTINATION ${CMAKE_INSTALL_PREFIX})
+  file(COPY "${CMAKE_INSTALL_PREFIX}/cygterm+-x86_64/cygterm.cfg" DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()
 
 if (EXISTS ${PATH}/i686-pc-cygwin-g++.exe)
   # cygwin32-gcc-core, cygwin32-gcc-g++ package (cygwin 32bit on cygwin 64bit)
-  set(GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/toolchain_i686-cygwin.cmake")
-  if(DEFINED CMAKE_INSTALL_PREFIX)
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/cygterm+-i686")
-  endif()
-  build("${PATH}/cmake" "build_cygterm_i686" "${GENERATE_OPTIONS}")
+  ToCygwinPath(${CMAKE_CURRENT_LIST_DIR} CURRENT_LIST_DIR)
+  set(GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CURRENT_LIST_DIR}/toolchain_i686-cygwin.cmake")
+  ToCygwinPath(${CMAKE_INSTALL_PREFIX} INSTALL_PREFIX)
+  build("${PATH}/cmake" ${CURRENT_LIST_DIR} "build_cygterm_i686" "${INSTALL_PREFIX}/cygterm+-i686" "${GENERATE_OPTIONS}")
 endif()
 
 ## msys2
@@ -123,10 +134,9 @@ if(DEFINED PATH)
   message("PATH=${PATH}")
   message("msys2 ENV{PATH}=$ENV{PATH}")
 
-  #if (EXISTS "${PATH}/g++.exe")
-  unset(GENERATE_OPTIONS)
-  if(DEFINED CMAKE_INSTALL_PREFIX)
-    set(GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
-  endif()
-  build("${PATH}/cmake" "build_msys2term_x86_64" "${GENERATE_OPTIONS}")
+  ToMsys2Path(${CMAKE_CURRENT_LIST_DIR} CURRENT_LIST_DIR)
+  set(GENERATE_OPTIONS "")
+  ToMsys2Path(${CMAKE_INSTALL_PREFIX} INSTALL_PREFIX)
+  build("${PATH}/cmake" ${CURRENT_LIST_DIR} "build_msys2term_x86_64" "${INSTALL_PREFIX}" "${GENERATE_OPTIONS}")
+
 endif()
