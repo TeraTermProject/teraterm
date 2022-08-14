@@ -405,6 +405,9 @@ typedef struct {
  * - BOM, Encoding
  *   Text かつ New/Overwrite の場合に Enable
  *   そうでない場合に Disable
+ *   BOM はファイルの先頭から書き込むときしか意味がない
+ *   Encoding は追記でも意味があるが、既存ファイルのエンコーディングを
+ *   強制的にダイアログに反映するので、ユーザによる指定はさせない
  * 
  * - Plain Text, Timestamp, Timestamp 種別
  *   Text の場合は Enable
