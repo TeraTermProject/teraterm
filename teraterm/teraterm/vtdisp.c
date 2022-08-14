@@ -175,9 +175,7 @@ static COLORREF BGVTColor[2];
 static COLORREF BGVTBoldColor[2];
 static COLORREF BGVTBlinkColor[2];
 static COLORREF BGVTReverseColor[2];
-/* begin - ishizaki */
-static COLORREF BGURLColor[2];
-/* end - ishizaki */
+static COLORREF BGURLColor[2];	// URLêFÇ∆UnderlineëÆê´êFÇåìóp
 
 static RECT BGPrevRect;
 static BOOL BGReverseText;
@@ -1385,10 +1383,8 @@ static void BGReadTextColorConfig(const wchar_t *file)
 	BGVTReverseColor[0] = BGGetColor("VTReverseFore", BGVTReverseColor[0], file);
 	BGVTReverseColor[1] = BGGetColor("VTReverseBack", BGVTReverseColor[1], file);
 
-	/* begin - ishizaki */
 	BGURLColor[0] = BGGetColor("URLFore", BGURLColor[0], file);
 	BGURLColor[1] = BGGetColor("URLBack", BGURLColor[1], file);
-	/* end - ishizaki */
 }
 
 /**
@@ -2021,8 +2017,13 @@ void ChangeFont(void)
 	}
 
 	/* Underline */
-	VTlf.lfUnderline = 1;
-	VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
+	if (ts.FontFlag & FF_URLUNDERLINE) {
+		VTlf.lfUnderline = 1;
+		VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
+	}
+	else {
+		VTFont[AttrUnder] = VTFont[0];
+	}
 
 	if (ts.FontFlag & FF_BOLD) {
 		/* Bold */
@@ -2594,6 +2595,7 @@ void DispReleaseDC(void)
 
 #define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
 #define isURLUnderlined(x) ((ts.FontFlag & FF_URLUNDERLINE) && ((x).Attr & AttrURL))
+#define isUnderlined(x) (/*(ts.ColorFlag & CF_UNDERLINE) &&*/ ((x).Attr & AttrUnder))
 #define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
 #define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
 #define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))
@@ -2637,7 +2639,15 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	  BackColor = ts.VTBoldColor[1];
 #endif
 	}
-    /* begin - ishizaki */
+	else if (isUnderlined(Attr)) {
+#ifdef ALPHABLEND_TYPE2
+	  TextColor = BGURLColor[0];
+	  BackColor = BGURLColor[1];
+#else
+	  TextColor = ts.URLColor[0];
+	  BackColor = ts.URLColor[1];
+#endif
+	}
 	else if (isURLColored(Attr)) {
 #ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGURLColor[0];
@@ -2647,7 +2657,6 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	  BackColor = ts.URLColor[1];
 #endif
 	}
-    /* end - ishizaki */
 	else {
 	  if (isForeColored(Attr)) {
 		TextColor = ANSIColor[Attr.Fore];
@@ -2693,26 +2702,33 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    TextColor = ANSIColor[Attr.Fore];
 	  }
 	}
-	else if (isBlinkColored(Attr))
 #ifdef ALPHABLEND_TYPE2 // AKASI
+	else if (isBlinkColored(Attr))
 	  TextColor = BGVTBlinkColor[0];
 	else if (isBoldColored(Attr))
 	  TextColor = BGVTBoldColor[0];
+	else if (isUnderlined(Attr))
+	  TextColor = BGURLColor[0];
 	else if (isURLColored(Attr))
 	  TextColor = BGURLColor[0];
 	else {
 	  TextColor = BGVTColor[0];
+	  NoReverseColor = 1;
+	}
 #else
+	else if (isBlinkColored(Attr))
 	  TextColor = ts.VTBlinkColor[0];
 	else if (isBoldColored(Attr))
 	  TextColor = ts.VTBoldColor[0];
+	else if (isUnderlined(Attr))
+	  TextColor = ts.URLColor[0];
 	else if (isURLColored(Attr))
 	  TextColor = ts.URLColor[0];
 	else {
 	  TextColor = ts.VTColor[0];
-#endif
 	  NoReverseColor = 1;
 	}
+#endif
 	if (isBackColored(Attr)) {
 	  if (Attr.Back<8 && (ts.ColorFlag&CF_PCBOLD16)) {
 	    if (((Attr.Attr&AttrBlink)!=0) == (Attr.Back!=0)) {
@@ -2729,28 +2745,37 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    BackColor = ANSIColor[Attr.Back];
 	  }
 	}
-	else if (isBlinkColored(Attr))
 #ifdef ALPHABLEND_TYPE2 // AKASI
+	else if (isBlinkColored(Attr))
 	  BackColor = BGVTBlinkColor[1];
 	else if (isBoldColored(Attr))
 	  BackColor = BGVTBoldColor[1];
+	else if (isUnderlined(Attr))
+	  BackColor = BGURLColor[1];
 	else if (isURLColored(Attr))
 	  BackColor = BGURLColor[1];
 	else {
 	  BackColor = BGVTColor[1];
-#else
-	  BackColor = ts.VTBlinkColor[1];
-	else if (isBoldColored(Attr))
-	  BackColor = ts.VTBoldColor[1];
-	else if (isURLColored(Attr))
-	  BackColor = ts.URLColor[1];
-	else {
-	  BackColor = ts.VTColor[1];
-#endif
 	  if (NoReverseColor == 1) {
 	    NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
 	  }
 	}
+#else
+	else if (isBlinkColored(Attr))
+	  BackColor = ts.VTBlinkColor[1];
+	else if (isBoldColored(Attr))
+	  BackColor = ts.VTBoldColor[1];
+	else if (isUnderlined(Attr))
+	  BackColor = ts.URLColor[1];
+	else if (isURLColored(Attr))
+	  BackColor = ts.URLColor[1];
+	else {
+	  BackColor = ts.VTColor[1];
+	  if (NoReverseColor == 1) {
+	    NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
+	  }
+	}
+#endif
   }
 #ifdef USE_NORMAL_BGCOLOR_REJECT
   if (ts.UseNormalBGColor) {

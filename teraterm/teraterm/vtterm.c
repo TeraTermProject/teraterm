@@ -602,7 +602,7 @@ void SendCSIstr(char *str, int len) {
 	CommBinaryOut(&cv, str, l);
 }
 
-void SendOSCstr(char *str, int len, char TermChar) {
+static void SendOSCstr(char *str, int len, char TermChar) {
 	size_t l;
 
 	if (str == NULL || len < 0)
@@ -2621,7 +2621,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 	}
 }
 
-void CSSetAttr()		// SGR
+static void CSSetAttr(void)		// SGR
 {
 	UpdateStr();
 	ParseSGRParams(&CharAttr, NULL, 1);
@@ -5044,7 +5044,7 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 	return colornum;
 }
 
-void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermChar) {
+static void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermChar) {
 	COLORREF color;
 	char StrBuff[256];
 	unsigned int colornum;
