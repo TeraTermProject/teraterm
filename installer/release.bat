@@ -10,11 +10,12 @@ if "%APPVEYOR%" == "True" set NOPAUSE=1
 call :setup_tools_env
 
 echo =======
-echo 1. force download and rebuild libs / rebuild Tera Term, installer, archive
-echo 2. download and build libs / rebuild Tera Term, installer, archive
-echo 3. download and build libs
-echo 4. build libs and rebuild Tera Term, installer, archive (for Release build)
-echo 5. build libs and Tera Term (for Normal build, snapshot)
+echo 1. force download and rebuild libs / rebuild Tera Term, installer, archive (for Release build)
+echo 2. download and build libs / rebuild Tera Term, installer, archive  (for Release build)
+echo 3. download and build libs / build Tera Term, installer, archive  (for snapshot)
+echo 4. download and build libs
+echo 5. build libs / rebuild Tera Term, installer, archive (for Release build)
+echo 6. build libs / build Tera Term, installer, archive (for snapshot)
 echo 7. exec cmd.exe
 echo 8. check tools
 echo 9. exit
@@ -28,6 +29,7 @@ echo %no%
 
 if "%no%" == "1" (
     call :download_libs force
+    call :build_libs
     call :build_teraterm freeze_state
 )
 
@@ -40,13 +42,19 @@ if "%no%" == "2" (
 if "%no%" == "3" (
     call :download_libs
     call :build_libs
+    call :build_teraterm
 )
 
 if "%no%" == "4" (
-    call :build_teraterm freeze_state
+    call :download_libs
+    call :build_libs
 )
 
 if "%no%" == "5" (
+    call :build_teraterm freeze_state
+)
+
+if "%no%" == "6" (
     call :build_teraterm
 )
 
@@ -94,23 +102,28 @@ for /f "delims=" %%i in ('perl issversion.pl') do @set TT_VERSION=%%i
 
 call ..\buildtools\svnrev\sourcetree_info.bat
 if "%1" == "freeze_state" (
-    call build.bat rebuild
-    call makearchive.bat release
-) else if "%RELEASE%" == "1" (
+    set RELEASE=1
+)
+setlocal
+if "%RELEASE%" == "1" (
     call build.bat rebuild
     call makearchive.bat release
 ) else (
     call makearchive.bat
 )
+endlocal
 if not exist Output mkdir Output
 set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
 if "%RELEASE%" == "1" (
+    echo release
     pushd Output
     %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
     popd
     set INNO_SETUP_OPT_VERSION=
     set INNO_SETUP_OPT_OUTPUT=
 ) else (
+    echo snapshot
+    dir
     %CMAKE% -E rename snapshot-%DATE%_%TIME% %SNAPSHOT_PORTABLE_OUTPUT%
     %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%
     %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT% snapshot-%DATE%_%TIME%
