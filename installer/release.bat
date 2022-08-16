@@ -12,9 +12,10 @@ call :setup_tools_env
 echo =======
 echo 1. force download and rebuild libs / rebuild Tera Term, installer, archive
 echo 2. download and build libs / rebuild Tera Term, installer, archive
-echo 3. download and build libs
-echo 4. build libs and rebuild Tera Term, installer, archive (for Release build)
-echo 5. build libs and Tera Term (for Normal build, snapshot)
+echo 3. download and build libs / build Tera Term, installer, archive
+echo 4. download and build libs
+echo 5. build libs / rebuild Tera Term, installer, archive
+echo 6. build libs / build Tera Term, installer, archive
 echo 7. exec cmd.exe
 echo 8. check tools
 echo 9. exit
@@ -28,25 +29,32 @@ echo %no%
 
 if "%no%" == "1" (
     call :download_libs force
-    call :build_teraterm freeze_state
+    call :build_libs
+    call :build_teraterm rebuild
 )
 
 if "%no%" == "2" (
     call :download_libs
     call :build_libs
-    call :build_teraterm freeze_state
+    call :build_teraterm rebuild
 )
 
 if "%no%" == "3" (
     call :download_libs
     call :build_libs
+    call :build_teraterm
 )
 
 if "%no%" == "4" (
-    call :build_teraterm freeze_state
+    call :download_libs
+    call :build_libs
 )
 
 if "%no%" == "5" (
+    call :build_teraterm rebuild
+)
+
+if "%no%" == "6" (
     call :build_teraterm
 )
 
@@ -93,12 +101,12 @@ set TT_VERSION=
 for /f "delims=" %%i in ('perl issversion.pl') do @set TT_VERSION=%%i
 
 call ..\buildtools\svnrev\sourcetree_info.bat
-if "%1" == "freeze_state" (
+if "%RELEASE%" == "1" (
     call build.bat rebuild
     call makearchive.bat release
-) else if "%RELEASE%" == "1" (
+) else if "%1" == "rebuild" (
     call build.bat rebuild
-    call makearchive.bat release
+    call makearchive.bat
 ) else (
     call makearchive.bat
 )
