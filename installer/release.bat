@@ -103,7 +103,7 @@ if "%1" == "freeze_state" (
     call makearchive.bat
 )
 if not exist Output mkdir Output
-set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
+set SNAPSHOT_PORTABLE_OUTPUT=teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot
 if "%RELEASE%" == "1" (
     pushd Output
     %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
@@ -111,6 +111,11 @@ if "%RELEASE%" == "1" (
     set INNO_SETUP_OPT_VERSION=
     set INNO_SETUP_OPT_OUTPUT=
 ) else (
+    echo snapshot-%DATE%_%TIME%
+    echo %SNAPSHOT_PORTABLE_OUTPUT%
+    cd
+    dir snapshot-%DATE%_%TIME%
+
     %CMAKE% -E rename snapshot-%DATE%_%TIME% %SNAPSHOT_PORTABLE_OUTPUT%
     %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%
     %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT% snapshot-%DATE%_%TIME%
