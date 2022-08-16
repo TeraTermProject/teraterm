@@ -28,6 +28,7 @@ goto create
 
 :snapshot
 set dst=snapshot-%DATE%_%TIME%
+echo %dst%
 
 :create
 del /s /q %dst%\*.*
