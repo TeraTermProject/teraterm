@@ -447,17 +447,7 @@ static wchar_t *GetVirtualStorePath(const SetupList *list, const TTTSet *)
 }
 
 /**
- *	Susie plug-in パス
- */
-static wchar_t *GetSusiePluginPath(const SetupList *, const TTTSet *pts)
-{
-	wchar_t *path;
-	aswprintf(&path, L"%s\\%s", pts->ExeDirW, pts->EtermLookfeel.BGSPIPathW);
-	return path;
-}
-
-/**
- *	Susie plug-in パス
+ *	current
  */
 static wchar_t *GetCurrentPath(const SetupList *, const TTTSet *)
 {
@@ -536,7 +526,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			{ NULL, L"Download",
 			  LIST_PARAM_STR, pts->FileDirW },
 			{ NULL, L"Susie Plugin Path",
-			  LIST_PARAM_FUNC, (void*)GetSusiePluginPath },
+			  LIST_PARAM_STR, pts->EtermLookfeel.BGSPIPathW },
 			{ NULL, L"UI language file",
 			  LIST_PARAM_STR, pts->UILanguageFileW },
 		};
