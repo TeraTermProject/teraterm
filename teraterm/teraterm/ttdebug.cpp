@@ -329,7 +329,11 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 
 void DebugTestCrash(void)
 {
+#if defined(__MINGW32__)
+	__builtin_trap();
+#else
 	*(int *)0 = 0;
+#endif
 }
 
 static void InvalidParameterHandler(const wchar_t* /*expression*/,
