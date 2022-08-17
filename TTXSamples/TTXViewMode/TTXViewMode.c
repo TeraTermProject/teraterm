@@ -48,7 +48,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   items = GetMenuItemCount(menu);
 
   for (i=0; i<items; i++) {
-    if (m = GetSubMenu(menu, i)) {
+    if ((m = GetSubMenu(menu, i))) {
       subitems = GetMenuItemCount(m);
       for (j=0; j<subitems; j++) {
         cur_id = GetMenuItemID(m, j);
@@ -151,7 +151,7 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   }
 }
 
-static LRESULT CALLBACK ViewModeInputPass(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ViewModeInputPass(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
   char password[50];
 
   switch (msg) {
@@ -179,7 +179,7 @@ static LRESULT CALLBACK ViewModeInputPass(HWND dlg, UINT msg, WPARAM wParam, LPA
   return FALSE;
 }
 
-static LRESULT CALLBACK ViewModeSetPass(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ViewModeSetPass(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
   char passwd1[50], passwd2[50];
 
   switch (msg) {
