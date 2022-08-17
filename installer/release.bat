@@ -6,6 +6,7 @@ cd /d %CUR%
 set VS_VERSION=2019
 
 if "%APPVEYOR%" == "True" set NOPAUSE=1
+if exist ..\buildtools\svnrev\sourcetree_info.bat del ..\buildtools\svnrev\sourcetree_info.bat
 
 call :setup_tools_env
 
@@ -100,7 +101,6 @@ cd /d %CUR%
 set TT_VERSION=
 for /f "delims=" %%i in ('perl issversion.pl') do @set TT_VERSION=%%i
 
-call ..\buildtools\svnrev\sourcetree_info.bat
 if "%RELEASE%" == "1" (
     call build.bat rebuild
     call makearchive.bat release
@@ -115,13 +115,17 @@ set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-r%SVNVERSION%-%DATE%_%TIME%-
 if "%RELEASE%" == "1" (
     pushd Output
     %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
+    %CMAKE% -E tar cf teraterm-%TT_VERSION%_pdb.zip --format=zip teraterm-%TT_VERSION%_pdb/
     popd
     set INNO_SETUP_OPT_VERSION=
     set INNO_SETUP_OPT_OUTPUT=
 ) else (
     %CMAKE% -E rename snapshot-%DATE%_%TIME% %SNAPSHOT_PORTABLE_OUTPUT%
+    %CMAKE% -E rename snapshot-%DATE%_%TIME%_pdb %SNAPSHOT_PORTABLE_OUTPUT%_pdb
     %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%
+    %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%_pdb.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%_pdb
     %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT% snapshot-%DATE%_%TIME%
+    %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT%_pdb snapshot-%DATE%_%TIME%_pdb
     set INNO_SETUP_OPT_VERSION="/DVerSubStr=r%SVNVERSION%-%DATE%_%TIME%"
     set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=r%SVNVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
 )
@@ -133,7 +137,6 @@ exit /b 0
 rem ####################
 :setup_tools_env
 
-set CURL=%SystemRoot%\System32\curl.exe
 set CYGWIN_PATH=C:\cygwin64\bin
 set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\%VS_VERSION%
 
@@ -279,11 +282,6 @@ ver
 echo Visual Studio
 echo VS_BASE=%VS_BASE%
 cl
-
-echo curl
-where curl
-echo CURL=%CURL%
-%CURL% --version
 
 echo svn
 where svn

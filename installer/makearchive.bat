@@ -1,13 +1,11 @@
 @echo off
 
-SET debug=no
 SET plugins=no
 SET rebuild=
 SET release=
 
 if "%1"=="/?" goto help
 @echo on
-if "%1"=="debug" SET debug=yes
 if "%1"=="plugins" SET plugins=yes
 if "%1"=="rebuild" SET rebuild=rebuild
 if "%1"=="release" SET release=yes
@@ -50,13 +48,16 @@ copy /y ..\TTXKanjiMenu\Release\ttxkanjimenu.dll %dst%
 if "%plugins%"=="yes" copy /y ..\TTXSamples\Release\*.dll %dst%
 if "%release%"=="yes" copy /y ..\TTXSamples\Release\*.dll %dst%
 
-rem Debug file
-if "%debug%"=="yes" copy /y ..\teraterm\release\*.pdb %dst%
-if "%debug%"=="yes" copy /y ..\ttssh2\ttxssh\Release\ttxssh.pdb %dst%
-if "%debug%"=="yes" copy /y ..\ttpmenu\Release\ttxssh.pdb %dst%
-if "%debug%"=="yes" copy /y ..\TTProxy\Release\TTXProxy.pdb %dst%
-if "%debug%"=="yes" copy /y ..\TTXKanjiMenu\Release\ttxkanjimenu.pdb %dst%
-if "%debug%"=="yes" if "%plugins%"=="yes" copy /y ..\TTXSamples\Release\*.pdb %dst%
+rem pdb files
+del /s /q %dst%_pdb\*.*
+mkdir %dst%_pdb
+
+copy /y ..\teraterm\release\*.pdb %dst%_pdb
+copy /y ..\ttssh2\ttxssh\Release\ttxssh.pdb %dst%_pdb
+copy /y ..\ttpmenu\Release\ttxssh.pdb %dst%_pdb
+copy /y ..\TTProxy\Release\TTXProxy.pdb %dst%_pdb
+copy /y ..\TTXKanjiMenu\Release\ttxkanjimenu.pdb %dst%_pdb
+if "%plugins%"=="yes" copy /y ..\TTXSamples\Release\*.pdb %dst%_pdb
 
 if "%plugins%"=="yes" (
 pushd %dst%
@@ -99,7 +100,6 @@ echo Tera Termをビルドするために必要なソースコードをすべてコンパイルします。(Com
 echo.
 echo   %0          通常のビルド(Normal building)
 echo   %0 rebuild  リビルド(Re-building)
-echo   %0 debug    デバッグ情報含むビルド(Building with Debug information)
 echo   %0 plugins  プラグイン情報含むビルド(Building with all plugins)
 echo   %0 release  通常のビルド + プラグインを含む + フォルダ名が特殊(Normal + Plugins building + unique folder naming)
 echo      アーカイブ版リリース作成用(for archive version released)

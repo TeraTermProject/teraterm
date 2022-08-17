@@ -20,6 +20,23 @@
   - Release時
     - installer/Output/teraterm-x.y.exe
     - installer/Output/teraterm_x.y.zip
+    - installer/Output/teraterm_x.y_pdb.zip
   - 通常ビルド(snapshot)時
     - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot.exe
     - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot.zip
+    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot_pdb.zip
+
+## pdbファイル
+
+- pdb = program database files (symbol files)
+- デバグ時に使用する
+
+### 使い方
+
+- 次のファイルを同じフォルダに配置する
+  - クラッシュしたときのミニダンプ
+    - teraterm_rREV_YYMMDD-HHMMSS-PID.dmp
+  - exe,dll
+  - pdb
+- ミニダンプをダブルクリックしてVisual Studioを起動する
+- アクションの[ネイティブのみでデバグ]をクリック
