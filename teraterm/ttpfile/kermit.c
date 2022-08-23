@@ -988,11 +988,11 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		// CommBinaryOut() で1KBまでという制限がかかっていることが判明したため、
 		// 512バイトまでに拡張する。
 		// (2012.2.7 yutaka)
-		maxlen = kv->KmtYour.MAXLX - kv->KmtMy.CHKT - LONGPKT_HEADNUM - 1;
-		maxlen = min(maxlen, 512);
+		// CommBinaryOut() の制限は 16KB で、KMT_PKTMAX=4032 を超えない
+		maxlen = kv->KmtYour.MAXLX - kv->KmtMy.CHKT - 7;
 
 	} else {
-		maxlen = kv->KmtYour.MAXL-kv->KmtMy.CHKT-4;
+		maxlen = kv->KmtYour.MAXL - kv->KmtMy.CHKT - 2;
 	}
 
 	NextFlag = KmtEncode(fv,kv);
