@@ -44,8 +44,6 @@
 
 #include "kermit.h"
 
-#define KERMIT_CAPAS
-
 typedef struct {
 	int MAXL;
 	int MAXLX;
@@ -121,6 +119,17 @@ typedef TKmtVar far *PKmtVar;
 #define	KMT_CAP_LONGPKT	2
 #define	KMT_CAP_SLIDWIN	4
 #define	KMT_CAP_FILATTR	8
+/*
+ * Long Packet の動作
+ * - 受信
+ *   KmtLongPacket が有効なら kv->KmtMy.CAPAS の Long Packet を有効にする
+ *   kv->KmtMy.CAPAS がリモートに送信され、Long Packet が受信可能であることを伝える
+ *   Long Packet が飛んでくると、KmtLongPacket の設定にかかわらず受信する
+ * - 送信
+ *   リモートからの通知が kv->KmtYour.CAPAS に保存される
+ *   kv->KmtYour.CAPAS が有効で kv->KmtMy.CAPAS (KmtLongPacket) も有効なら長い送信データを作成する
+ *   LEN が 94 を超えるパケットは Long Packet で送信する
+ */
 
 #define	KMT_ATTR_TIME	001
 #define	KMT_ATTR_MODE	002
@@ -325,22 +334,11 @@ static void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		CommBinaryOut(cv,&(kv->KmtYour.PADC), 1);
 
 	/* packet */
-#ifdef KERMIT_CAPAS
 	C = kv->PktOutCount;
-#else
-	C = KmtNum(kv->PktOut[1]) + 2;
-#endif
 	CommBinaryOut(cv,&kv->PktOut[0], C);
 
 	if (kv->log != NULL) {
-#if 0
-		TProtoLog* log = kv->log;
-		log->WriteRaw(log, "> ",2);
-		log->WriteRaw(log, &(kv->PktOut[1]),C-1);
-		log->WriteRaw(log, "\015\012",2);
-#else
 		KmtWriteLog(fv, kv, &(kv->PktOut[0]), C);
-#endif
 	}
 
 	/* end-of-line character */
@@ -414,7 +412,6 @@ static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktTyp
 	kv->PktOut[11] = kv->KmtMy.CHKT + 0x30;
 	kv->PktOut[12] = kv->KmtMy.REPT;
 
-#ifdef KERMIT_CAPAS
 	if (kv->KmtMy.CAPAS > 0) {
 		kv->PktOut[13] = KmtChar(kv->KmtMy.CAPAS);
 		NParam++;
@@ -425,7 +422,6 @@ static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktTyp
 			NParam += 3;
 		}
 	}
-#endif
 
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum - kv->PktNumOffset),PktType,NParam);
 	KmtSendPacket(fv,kv,cv);
@@ -981,13 +977,6 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	//   リモートの CAPAS が有効、かつ Tera Term の設定が有効
 	if (kv->KmtYour.CAPAS & KMT_CAP_LONGPKT &&
 	    kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
-		// Long Packetで94バイト以上送ると、なぜか相手側が受け取ってくれないので、
-		// 送信失敗するため、94バイトに制限する。
-		// 受信は速いが、送信は遅くなる。
-		// (2012.2.5 yutaka)
-		// CommBinaryOut() で1KBまでという制限がかかっていることが判明したため、
-		// 512バイトまでに拡張する。
-		// (2012.2.7 yutaka)
 		// CommBinaryOut() の制限は 16KB で、KMT_PKTMAX=4032 を超えない
 		maxlen = kv->KmtYour.MAXLX - kv->KmtMy.CHKT - 7;
 
@@ -1215,7 +1204,6 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	 * (2012/1/22 yutaka)
 	 */
 	kv->KmtMy.CAPAS = 0x00;
-#ifdef KERMIT_CAPAS
 	if (ts->KermitOpt & KmtOptLongPacket) {
 		kv->KmtMy.CAPAS |= KMT_CAP_LONGPKT;
 		kv->KmtMy.MAXLX = KMT_DATAMAX;
@@ -1227,7 +1215,6 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	}
 	if (ts->KermitOpt & KmtOptFileAttr)
 		kv->KmtMy.CAPAS |= KMT_CAP_FILATTR;
-#endif
 
 	/* default your parameters */
 	kv->KmtYour = kv->KmtMy;
@@ -1368,7 +1355,7 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 			case WaitLen:
 				kv->PktIn[1] = b;
 				kv->PktInLen = KmtNum(b);
-#ifdef KERMIT_CAPAS
+
 				if (kv->PktInLen == 0) {  /* Long Packet */
 					kv->PktInCount = 0;
 				} else if (kv->PktInLen >= 3) {  /* Normal Packet */
@@ -1391,16 +1378,13 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 					kv->PktReadMode = WaitMark;
 					goto read_end;
 				}
-#else
-				kv->PktInCount = kv->PktInLen;
-#endif
+
 				kv->PktInPtr = 2;
 				kv->PktReadMode = WaitCheck;
 				break;
 			case WaitCheck:
 				kv->PktIn[kv->PktInPtr] = b;
 				kv->PktInPtr++;
-#ifdef KERMIT_CAPAS
 				/* Long Packet */
 				// Tera Term から有効だと通知していなくても受信する
 				if (kv->PktInCount == 0 && kv->PktInPtr == 6) {
@@ -1424,10 +1408,7 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 				if (kv->PktInCount != 0 && kv->PktInPtr >= kv->PktInCount) {
 					GetPkt = TRUE;
 				}
-#else
-				kv->PktInCount--;
-				GetPkt = (kv->PktInCount==0);
-#endif
+
 				if (GetPkt) kv->PktReadMode = WaitMark;
 				break;
 			}
@@ -1440,11 +1421,7 @@ read_end:
 
 	if (kv->log != NULL)
 	{
-#ifdef KERMIT_CAPAS
 		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInCount);
-#else
-		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInLen+2);
-#endif
 	}
 
 	PktNumNew = KmtCalcPktNum(kv,kv->PktIn[2]);
