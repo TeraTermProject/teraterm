@@ -48,6 +48,7 @@
 
 typedef struct {
 	int MAXL;
+	int MAXLX;
 	BYTE TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT,CAPAS,WINDO,MAXLX1,MAXLX2;
 } KermitParam;
 
@@ -419,8 +420,8 @@ static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktTyp
 		NParam++;
 		if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
 			kv->PktOut[14] = KmtChar(0);
-			kv->PktOut[15] = KmtChar(KMT_DATAMAX / 95);
-			kv->PktOut[16] = KmtChar(KMT_DATAMAX % 95);
+			kv->PktOut[15] = KmtChar(kv->KmtMy.MAXLX / 95);
+			kv->PktOut[16] = KmtChar(kv->KmtMy.MAXLX % 95);
 			NParam += 3;
 		}
 	}
@@ -492,7 +493,8 @@ static BOOL KmtCheckQuote(BYTE b)
 
 static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 {
-	int i, NParam, off, cap, maxlen;
+	int i, NParam, off;
+	int maxlen = 0;
 	BYTE b, n;
 
 	if (kv->PktInLen == 0) {  /* Long Packet */
@@ -594,19 +596,6 @@ static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 
 		  case 10:  /* CAPAS */
 			  kv->KmtYour.CAPAS = n;
-
-			  // Tera Termとサーバの capabilities のANDを取る。
-			  cap = 0;
-			  if (n & kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
-				  cap |= KMT_CAP_LONGPKT;
-			  }
-			  if (n & kv->KmtMy.CAPAS & KMT_CAP_SLIDWIN) {
-				  cap |= KMT_CAP_SLIDWIN;
-			  }
-			  if (n & kv->KmtMy.CAPAS & KMT_CAP_FILATTR) {
-				  cap |= KMT_CAP_FILATTR;
-			  }
-			  kv->KmtMy.CAPAS = cap;
 			  break;
 
 		  case 11:  /* WINDO */
@@ -623,14 +612,13 @@ static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 		}
 	}
 
-	/* Long Packet の場合、MAXL を更新する。*/
-	if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
-		kv->KmtMy.MAXL = maxlen;
-		if (kv->KmtMy.MAXL < 10)
-			kv->KmtMy.MAXL = 80;
-		else if (kv->KmtMy.MAXL > KMT_DATAMAX)
-			kv->KmtMy.MAXL = KMT_DATAMAX;
+	/* Long Packet の場合、MAXLX を更新する。*/
+	if (kv->KmtYour.CAPAS & KMT_CAP_LONGPKT) {
+		kv->KmtYour.MAXLX = maxlen;
 
+		// こちらの送信バッファサイズを超えないため
+		if (kv->KmtYour.MAXL > KMT_DATAMAX)
+			kv->KmtYour.MAXL = KMT_DATAMAX;
 	} else {
 		/* Capabilities が落ちているのに、LEN=0 の場合は、MAXL は DefMAXL のままとする。
 		 * TODO: 本来はエラーとすべき？
@@ -989,7 +977,10 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	DataLen = 0;
 	DataLenNew = 0;
 
-	if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
+	// Long Packet
+	//   リモートの CAPAS が有効、かつ Tera Term の設定が有効
+	if (kv->KmtYour.CAPAS & KMT_CAP_LONGPKT &&
+	    kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
 		// Long Packetで94バイト以上送ると、なぜか相手側が受け取ってくれないので、
 		// 送信失敗するため、94バイトに制限する。
 		// 受信は速いが、送信は遅くなる。
@@ -997,7 +988,7 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		// CommBinaryOut() で1KBまでという制限がかかっていることが判明したため、
 		// 512バイトまでに拡張する。
 		// (2012.2.7 yutaka)
-		maxlen = kv->KmtMy.MAXL - kv->KmtMy.CHKT - LONGPKT_HEADNUM - 1;
+		maxlen = kv->KmtYour.MAXLX - kv->KmtMy.CHKT - LONGPKT_HEADNUM - 1;
 		maxlen = min(maxlen, 512);
 
 	} else {
@@ -1225,14 +1216,23 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	 */
 	kv->KmtMy.CAPAS = 0x00;
 #ifdef KERMIT_CAPAS
-	if (ts->KermitOpt & KmtOptLongPacket)
+	if (ts->KermitOpt & KmtOptLongPacket) {
 		kv->KmtMy.CAPAS |= KMT_CAP_LONGPKT;
+		kv->KmtMy.MAXLX = KMT_DATAMAX;
+	}
+	else {
+		// Tera Term から有効だと通知していなくても
+		// Long Packet を送ってくる場合のため
+		kv->KmtMy.MAXLX = KMT_DATAMAX;
+	}
 	if (ts->KermitOpt & KmtOptFileAttr)
 		kv->KmtMy.CAPAS |= KMT_CAP_FILATTR;
 #endif
 
 	/* default your parameters */
 	kv->KmtYour = kv->KmtMy;
+	kv->KmtYour.CAPAS = 0x00;
+	kv->KmtYour.MAXLX = 0;
 
 	kv->Quote8 = FALSE;
 	kv->RepeatFlag = FALSE;
@@ -1373,6 +1373,17 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 					kv->PktInCount = 0;
 				} else if (kv->PktInLen >= 3) {  /* Normal Packet */
 					kv->PktInCount = kv->PktInLen + 2;
+					// OutputDebugPrintf("Normal Packet: %d bytes\n", kv->PktInCount);
+					
+					// "Initialize でリモートが送ってきた MAXL" + 2 (MARK, LEN)
+					// を超えるサイズのパケットをリモートが送ろうとしてきた
+					if (kv->PktInCount > kv->KmtMy.MAXL + 2) {
+						KmtStringLog(fv, kv, "Remote is attempting to send %d bytes, but MAXL from remote is %d. Must be less than or equal to %d bytes.",
+						             kv->PktInCount, kv->KmtMy.MAXL, kv->KmtMy.MAXL + 2);
+						GetPkt = FALSE;
+						kv->PktReadMode = WaitMark;
+						goto read_end;
+					}
 				} else {
 					/* If unchar(LEN) = 1 or 2, the packet is invalid and should cause an Error. */
 					KmtStringLog(fv, kv, "If unchar(LEN) = %d is 1 or 2, the packet is invalid.", kv->PktInLen);
@@ -1387,22 +1398,25 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 				kv->PktReadMode = WaitCheck;
 				break;
 			case WaitCheck:
-				// バッファが溢れたら、異常終了する。
-				// Tera Term側がLong Packetをサポートしていない場合に、サーバ側から不正に
-				// Long Packetが送られてきた場合も救済できる。
-				if (kv->PktInPtr > kv->KmtMy.MAXL) {
-					KmtStringLog(fv, kv, "Read buffer overflow(%d > %d).", kv->PktInPtr, kv->KmtMy.MAXL);
-					GetPkt = FALSE;
-					kv->PktReadMode = WaitMark;
-					goto read_end;
-				}
 				kv->PktIn[kv->PktInPtr] = b;
 				kv->PktInPtr++;
 #ifdef KERMIT_CAPAS
-				// Long Packet
+				/* Long Packet */
+				// Tera Term から有効だと通知していなくても受信する
 				if (kv->PktInCount == 0 && kv->PktInPtr == 6) {
 					kv->PktInLongPacketLen = KmtNum(kv->PktIn[4])*95 + KmtNum(kv->PktIn[5]);
 					kv->PktInCount = kv->PktInLongPacketLen + 7;
+					// OutputDebugPrintf("Long: %d\n", kv->PktInCount);
+
+					// "Initialize でリモートが送ってきた MAXLX1*95 + MAXLX2" + 7 (MARK から HCHEK)
+					// を超えるサイズのパケットをリモートが送ろうとしてきた
+					if (kv->PktInCount > kv->KmtMy.MAXLX + 7) {
+						KmtStringLog(fv, kv, "Remote is attempting to send %d bytes, but MAXLX from remote is %d. Must be less than or equal to %d bytes.",
+						             kv->PktInCount, kv->KmtMy.MAXLX, kv->KmtMy.MAXLX + 7);
+						GetPkt = FALSE;
+						kv->PktReadMode = WaitMark;
+						goto read_end;
+					}
 				}
 
 				// 期待したバッファサイズになったら終わる。
@@ -1508,7 +1522,7 @@ read_end:
 			if (PktNumNew==kv->PktNum)
 				KmtSendPacket(fv,kv,cv);
 			else if (PktNumNew==kv->PktNum+1) {
-				if (kv->KmtMy.CAPAS & KMT_CAP_FILATTR)
+				if (kv->KmtYour.CAPAS & KMT_CAP_FILATTR)
 					KmtSendNextData(fv,kv,cv);
 				else
 					KmtSendNextData(fv,kv,cv);
@@ -1560,7 +1574,7 @@ read_end:
 			break;
 		case SendFile:
 			if (PktNumNew==kv->PktNum) {
-				if (kv->KmtMy.CAPAS & KMT_CAP_FILATTR)
+				if (kv->KmtYour.CAPAS & KMT_CAP_FILATTR)
 					KmtSendNextFileAttr(fv,kv,cv);
 				else
 					KmtSendNextData(fv,kv,cv);
