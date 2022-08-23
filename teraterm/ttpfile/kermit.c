@@ -1410,9 +1410,10 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 
 					// "Initialize でリモートが送ってきた MAXLX1*95 + MAXLX2" + 7 (MARK から HCHEK)
 					// を超えるサイズのパケットをリモートが送ろうとしてきた
-					if (kv->PktInCount > kv->KmtMy.MAXLX + 7) {
+					//   +1 は C-Kermit 9.0.305 Alpha.05 以降が 1 バイト多く送ってくるため
+					if (kv->PktInCount > kv->KmtMy.MAXLX + 7 + 1) {
 						KmtStringLog(fv, kv, "Remote is attempting to send %d bytes, but MAXLX from remote is %d. Must be less than or equal to %d bytes.",
-						             kv->PktInCount, kv->KmtMy.MAXLX, kv->KmtMy.MAXLX + 7);
+						             kv->PktInCount, kv->KmtMy.MAXLX, kv->KmtMy.MAXLX + 7 + 1);
 						GetPkt = FALSE;
 						kv->PktReadMode = WaitMark;
 						goto read_end;
