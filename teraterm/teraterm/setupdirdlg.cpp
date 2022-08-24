@@ -496,7 +496,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		SendMessage(hWndList, LVM_INSERTCOLUMNA, 1, (LPARAM)&lvcol);
 
 		// Ý’èˆê——
-		static const SetupList setup_list[] = {
+		const SetupList setup_list[] = {
 			{ "DLG_SETUPDIR_INIFILE", L"Tera Term Configuration File",
 			  LIST_PARAM_STR, pts->SetupFNameW, },
 			{ NULL, L"  Virtual Store",
