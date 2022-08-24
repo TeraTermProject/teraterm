@@ -545,6 +545,7 @@ static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 				  }
 			  }
 			  else /* S-packet from remote host */
+			  {
 				  if ((b=='Y') && KmtCheckQuote(kv->KmtMy.QBIN))
 					  kv->Quote8 = TRUE;
 				  else if (KmtCheckQuote(b))
@@ -552,10 +553,12 @@ static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 					  kv->KmtMy.QBIN = b;
 					  kv->Quote8 = TRUE;
 				  }
+			  }
 
-				  if (! kv->Quote8) kv->KmtMy.QBIN = 'N';
-				  kv->KmtYour.QBIN = kv->KmtMy.QBIN;
-				  break;
+			  if (! kv->Quote8)
+				  kv->KmtMy.QBIN = 'N';
+			  kv->KmtYour.QBIN = kv->KmtMy.QBIN;
+			  break;
 
 		  case 8:
 			  kv->KmtYour.CHKT = b - 0x30;
@@ -1445,6 +1448,7 @@ read_end:
 			fv->Success = TRUE;
 			return FALSE;
 		}
+		break;
 	case 'D':
 		if ((kv->KmtState == ReceiveData) &&
 			(PktNumNew > kv->PktNum))
