@@ -144,5 +144,4 @@ public:
 private:
 	int m_PageCountCPP;
 	TTCPropertyPage *m_Page[7];
-	Page m_StartPage;
 };

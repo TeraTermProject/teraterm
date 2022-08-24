@@ -819,10 +819,10 @@ void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 	}
 }
 
-static void OpacityTooltip(CTipWin* tip, HWND hDlg, int trackbar, int pos, const char *UILanguageFile)
+static void OpacityTooltip(CTipWin* tip, HWND hDlg, int trackbar, int pos, const wchar_t *UILanguageFile)
 {
 	wchar_t *uimsg;
-	GetI18nStrWA("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", ts.UILanguageFile, &uimsg);
+	GetI18nStrWW("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", UILanguageFile, &uimsg);
 	wchar_t *tipbuf;
 	aswprintf(&tipbuf, uimsg, (pos / 255.0) * 100);
 	RECT rc;
@@ -945,7 +945,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				int r, g, b;
 
 				sel = GetCurSel(IDC_ANSI_COLOR);
-				if (sel < 0 && sel > sizeof(ts.ANSIColor)-1) {
+				if (sel < 0 || sel > _countof(ts.ANSIColor)-1) {
 					return TRUE;
 				}
 
@@ -998,7 +998,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
 				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
-				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_ACTIVE, pos, ts.UILanguageFile);
+				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_ACTIVE, pos, ts.UILanguageFileW);
 				return TRUE;
 			}
 		case IDC_ALPHA_BLEND_INACTIVE | (EN_CHANGE << 16):
@@ -1014,7 +1014,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
 				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
-				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, ts.UILanguageFile);
+				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, ts.UILanguageFileW);
 				return TRUE;
 			}
 	}

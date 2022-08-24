@@ -1500,7 +1500,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	const char *UILanguageFile = ts.UILanguageFile;
 
 	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, sizeof(FileDirExpanded));
+	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
 	/* save current dir */

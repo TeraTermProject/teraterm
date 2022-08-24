@@ -113,7 +113,7 @@ static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
 	do {
 		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"Command%d", i);
 		GetPrivateProfileStringW(L"BroadcastCommands",EntName, L"",
-								 Command,sizeof(Command), historyfile);
+								 Command, _countof(Command), historyfile);
 		if (Command[0] != 0) {
 			SendDlgItemMessageW(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
 								0, (LPARAM)Command);
