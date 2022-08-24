@@ -81,8 +81,6 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 #include "ttlib.h"
 
 #define MAXPATHLEN 256
-/* version 2.3 */
-#define TTVERSION (WORD)23
 
 #define DEBUG_PRINT(val) { \
 	FILE *fp; \

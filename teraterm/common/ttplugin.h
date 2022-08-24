@@ -33,6 +33,9 @@
 #include "ttsetup.h"
 #include "ttfileio.h"
 
+// プラグインのバージョン
+#define TTVERSION (WORD)23	/* version 2.3 */
+
 typedef struct {
   Tclosesocket * Pclosesocket;
   Tconnect * Pconnect;
