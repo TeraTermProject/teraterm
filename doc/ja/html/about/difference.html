@@ -13,7 +13,7 @@
 <h1>Tera Term Pro 2.3との差分</h1>
 
 <p>
-Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Tera Term (バージョン4) との差について概説します。
+Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Tera Term 4 と、Tera Term 5 との差について概説します。
 </p>
 
 <h2>機能差分一覧</h2>
@@ -22,11 +22,13 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 <tr>
 	<th>項目</th>
 	<th>Tera Term Pro 2.3</th>
-	<th>Tera Term</th>
+	<th>Tera Term 4</th>
+	<th>Tera Term 5</th>
 </tr>
 
 <tr>
 	<td>ソースコード</td>
+	<td>開示</td>
 	<td>開示</td>
 	<td>開示</td>
 </tr>
@@ -35,17 +37,20 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 	<td>ライセンス</td>
 	<td>プロプライエタリ<a id="fn_link_1" href="#fn_1">*1</a></td>
 	<td>修正BSDライセンス<a id="fn_link_2" href="#fn_2">*2</a></td>
+	<td>修正BSDライセンス</td>
 </tr>
 
 <tr>
 	<td>開発環境</td>
 	<td>Visual C++ 5.0 / Watcom C/C++ 11.0</td>
 	<td>Visual Studio 2005</td>
+	<td>Visual Studio 2019</td>
 </tr>
 
 <tr>
 	<td>アイコン</td>
 	<td><img src="../image/tterm_classic.png" alt="Tera Term" width="32" height="32"><a id="fn_link_3" href="#fn_3">*3</a></td>
+	<td><img src="../image/tterm.png" alt="Tera Term" width="32" height="32"><a href="#fn_3">*3</a></td>
 	<td><img src="../image/tterm.png" alt="Tera Term" width="32" height="32"><a href="#fn_3">*3</a></td>
 </tr>
 
@@ -53,11 +58,13 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 	<td>最大COMポート</td>
 	<td>16</td>
 	<td>4096</td>
+	<td>4096</td>
 </tr>
 
 <tr>
 	<td>シリアルスピード</td>
 	<td>110～115200</td>
+	<td>110～921600 自由入力も可能</td>
 	<td>110～921600 自由入力も可能</td>
 </tr>
 
@@ -65,17 +72,20 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 	<td>日本語文字コード</td>
 	<td>EUC-JP/Shift_JIS/JIS</td>
 	<td>EUC-JP/Shift_JIS/JIS/UTF-8/UTF-8 MAC</td>
+	<td>EUC-JP/Shift_JIS/JIS/UTF-8</td>
 </tr>
 
 <tr>
 	<td>Unicode 対応</td>
 	<td>未サポート</td>
 	<td>単一言語サポート<a id="fn_link_4" href="#fn_4">*4</a></td>
+	<td>他言語サポート</td>
 </tr>
 
 <tr>
 	<td>IPv6 対応</td>
 	<td>No</td>
+	<td>Yes</td>
 	<td>Yes</td>
 </tr>
 
@@ -83,6 +93,7 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 	<td>国際化対応</td>
 	<td>No</td>
 	<td>Yes<a id="fn_link_5" href="#fn_5">*5</a></td>
+	<td>Yes</td>
 </tr>
 
 <tr>
@@ -94,17 +105,24 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 			<li>Oniguruma</li>
 			<li>SFMT</li>
 		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>Oniguruma</li>
+			<li>SFMT</li>
+		</ul>
 		<a id="fn_link_6" href="#fn_6">*6</a>
 	</td>
 </tr>
 
 <tr>
-	<td colspan="3">&nbsp;</td>
+	<td colspan="4">&nbsp;</td>
 </tr>
 
 <tr>
 	<td>TTSSHアイコン</td>
 	<td><img src="../image/ttsecure.png" alt="TTSSH" width="32" height="32"></td>
+	<td><img src="../image/ttssh-flat.png" alt="TTSSH" width="32" height="32"><a href="#fn_3">*3</a></td>
 	<td><img src="../image/ttssh-flat.png" alt="TTSSH" width="32" height="32"><a href="#fn_3">*3</a></td>
 </tr>
 
@@ -112,17 +130,20 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 	<td>対応 SSH バージョン</td>
 	<td>SSH 1.5</td>
 	<td>SSH 1.5 and 2</td>
+	<td>SSH 1.5 and 2</td>
 </tr>
 
 <tr>
 	<td>対応 SSH 機能</td>
 	<td>シェル、ポート転送、X11転送</td>
 	<td>シェル、ポート転送、X11転送、SCP</td>
+	<td>シェル、ポート転送、X11転送、SCP</td>
 </tr>
 
 <tr>
 	<td>Pageant<a id="fn_link_3" href="#fn_7">*7</a> との連携</td>
 	<td>No</td>
+	<td>Yes</td>
 	<td>Yes</td>
 </tr>
 
@@ -143,18 +164,29 @@ Tera Term 原作者 寺西高氏による Tera Term Pro 2.3 (オリジナルバージョン) と、Ter
 			    Pageantとの連携のために使用。通信や端末エミュレーションのためには使用していない</li>
 			<li>argon2</li>
 		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>LibreSSL<br />
+			    暗号化ライブラリとして使用。TLSのためには使用していない</li>
+			<li>zlib</li>
+			<li>PuTTY<br />
+			    Pageantとの連携のために使用。通信や端末エミュレーションのためには使用していない</li>
+			<li>argon2</li>
+		</ul>
 		<a href="#fn_6">*6</a>
 	</td>
 </tr>
 
 <tr>
-	<td colspan="3">&nbsp;</td>
+	<td colspan="4">&nbsp;</td>
 </tr>
 
 <tr>
 	<td>プロキシ接続対応</td>
 	<td>No</td>
 	<td>Yes<a id="fn_link_8" href="#fn_8">*8</a> (HTTP, TELNET, SOCKS4, SOCKS5)</td>
+	<td>Yes (HTTP, TELNET, SOCKS4, SOCKS5)</td>
 </tr>
 
 </table>

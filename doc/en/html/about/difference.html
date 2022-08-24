@@ -13,7 +13,7 @@
 <h1>Differences from 2.3</h1>
 
 <p>
-Overview of difference between Teraterm 2.3 (original version) by Takashi Teranishi and Tera Term (version 4).
+Overview of difference between Teraterm 2.3 (original version) by Takashi Teranishi and Tera Term 4 and Tera Term 5.
 </p>
 
 <h2>Feature Differences</h2>
@@ -22,11 +22,13 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 <tr>
 	<th>Content</th>
 	<th>Tera Term Pro 2.3</th>
-	<th>Tera Term</th>
+	<th>Tera Term 4</th>
+	<th>Tera Term 5</th>
 </tr>
 
 <tr>
 	<td>Source code</td>
+	<td>Opened</td>
 	<td>Opened</td>
 	<td>Opened</td>
 </tr>
@@ -35,17 +37,20 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	<td>License</td>
 	<td>Proprietary<a id="fn_link_1" href="#fn_1">*1</a></td>
 	<td>Modified BSD license<a id="fn_link_2" href="#fn_2">*2</a></td>
+	<td>Modified BSD license</td>
 </tr>
 
 <tr>
 	<td>Development tool</td>
 	<td>Visual C++ 5.0 / Watcom C/C++ 11.0</td>
 	<td>Visual Studio 2005</td>
+	<td>Visual Studio 2019</td>
 </tr>
 
 <tr>
 	<td>Icon</td>
 	<td><img src="../image/tterm_classic.png" alt="Tera Term" width="32" height="32"><a id="fn_link_3" href="#fn_3">*3</a></td>
+	<td><img src="../image/tterm.png" alt="Tera Term" width="32" height="32"><a href="#fn_3">*3</a></td>
 	<td><img src="../image/tterm.png" alt="Tera Term" width="32" height="32"><a href="#fn_3">*3</a></td>
 </tr>
 
@@ -53,11 +58,13 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	<td>Maximum COM port</td>
 	<td>16</td>
 	<td>4096</td>
+	<td>4096</td>
 </tr>
 
 <tr>
 	<td>Serial speed</td>
 	<td>from 110 to 115200</td>
+	<td>from 110 to 921600, and editable</td>
 	<td>from 110 to 921600, and editable</td>
 </tr>
 
@@ -65,17 +72,20 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	<td>Japanese character code</td>
 	<td>EUC-JP/Shift_JIS/JIS</td>
 	<td>EUC-JP/Shift_JIS/JIS/UTF-8/UTF-8 MAC</td>
+	<td>EUC-JP/Shift_JIS/JIS/UTF-8</td>
 </tr>
 
 <tr>
 	<td>Unicode support</td>
 	<td>Not supported</td>
 	<td>Support single language<a id="fn_link_4" href="#fn_4">*4</a></td>
+	<td>Support multi language</td>
 </tr>
 
 <tr>
 	<td>IPv6 support</td>
 	<td>No</td>
+	<td>Yes</td>
 	<td>Yes</td>
 </tr>
 
@@ -83,6 +93,7 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	<td>i18n support</td>
 	<td>No</td>
 	<td>Yes<a id="fn_link_5" href="#fn_5">*5</a></td>
+	<td>Yes</td>
 </tr>
 
 <tr>
@@ -94,17 +105,24 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 			<li>Oniguruma</li>
 			<li>SFMT</li>
 		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>Oniguruma</li>
+			<li>SFMT</li>
+		</ul>
 		<a id="fn_link_6" href="#fn_6">*6</a>
 	</td>
 </tr>
 
 <tr>
-	<td colspan="3">&nbsp;</td>
+	<td colspan="4">&nbsp;</td>
 </tr>
 
 <tr>
 	<td>TTSSH icon</td>
 	<td><img src="../image/ttsecure.png" alt="TTSSH" width="32" height="32"></td>
+	<td><img src="../image/ttssh-flat.png" alt="TTSSH" width="32" height="32"><a href="#fn_3">*3</a></td>
 	<td><img src="../image/ttssh-flat.png" alt="TTSSH" width="32" height="32"><a href="#fn_3">*3</a></td>
 </tr>
 
@@ -112,17 +130,20 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	<td>supported SSH version</td>
 	<td>SSH 1.5</td>
 	<td>SSH 1.5 and 2</td>
+	<td>SSH 1.5 and 2</td>
 </tr>
 
 <tr>
 	<td>supported SSH feature</td>
 	<td>shell, port-forwarding, X11 forwarding</td>
 	<td>shell, port-forwarding, X11 forwarding, SCP</td>
+	<td>shell, port-forwarding, X11 forwarding, SCP</td>
 </tr>
 
 <tr>
 	<td>Pageant<a id="fn_link_3" href="#fn_7">*7</a> collaboration</td>
 	<td>No</td>
+	<td>Yes</td>
 	<td>Yes</td>
 </tr>
 
@@ -143,18 +164,29 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 			    used for cooperation with Pageant, but not used for communication and terminal emulation</li>
 			<li>argon2</li>
 		</ul>
+	</td>
+	<td>
+		<ul>
+			<li>LibreSSL<br />
+			    used as the encryption library, but not used as TLS</li>
+			<li>zlib</li>
+			<li>PuTTY<br />
+			    used for cooperation with Pageant, but not used for communication and terminal emulation</li>
+			<li>argon2</li>
+		</ul>
 		<a href="#fn_6">*6</a>
 	</td>
 </tr>
 
 <tr>
-	<td colspan="3">&nbsp;</td>
+	<td colspan="4">&nbsp;</td>
 </tr>
 
 <tr>
 	<td>Proxy</td>
 	<td>No</td>
 	<td>Yes<a id="fn_link_8" href="#fn_8">*8</a> (HTTP, TELNET, SOCKS4, SOCKS5)</td>
+	<td>Yes (HTTP, TELNET, SOCKS4, SOCKS5)</td>
 </tr>
 
 </table>
