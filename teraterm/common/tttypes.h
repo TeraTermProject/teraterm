@@ -332,21 +332,6 @@ typedef struct {
 	wchar_t *BGSPIPathW;
 } eterm_lookfeel_t;
 
-typedef struct cygterm {
-	BOOL update_flag;
-	char term[128];
-	char term_type[80];
-	char port_start[80];
-	char port_range[80];
-	char shell[80];
-	char env1[128];
-	char env2[128];
-	BOOL login_shell;
-	BOOL home_chdir;
-	BOOL agent_proxy;
-	char reserve[20];
-} cygterm_t;
-
 /**
  *	TTTSet
  *		ÉZÉbÉVÉáÉìÇÃï°êªéû
@@ -609,7 +594,7 @@ struct tttset {
 	WORD FileSendHighSpeedMode;
 	WORD AutoComPortReconnect;
 	WORD reserver_BGImgBrightness;
-	cygterm_t CygtermSettings;
+	char reserve_CygtermSettings[720];
 	int XmodemTimeOutInit;
 	int XmodemTimeOutInitCRC;
 	int XmodemTimeOutShort;

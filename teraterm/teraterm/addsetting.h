@@ -115,6 +115,25 @@ private:
 };
 
 // Cygwin Page
+extern "C" {
+typedef struct cygterm {
+	char term[128];
+	char term_type[80];
+	char port_start[80];
+	char port_range[80];
+	char shell[80];
+	char env1[128];
+	char env2[128];
+	BOOL login_shell;
+	BOOL home_chdir;
+	BOOL agent_proxy;
+} cygterm_t;
+
+void ReadCygtermConfFile(const char *homedir, cygterm_t *psettings);
+BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings);
+BOOL CmpCygtermConfFile(const cygterm_t *a, const cygterm_t *b);
+}
+
 class CCygwinPropPageDlg : public TTCPropertyPage
 {
 public:
