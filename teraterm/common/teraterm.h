@@ -54,9 +54,6 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 	#endif
 #endif
 
-// AKASI氏によるEterm風透過ウィンドウ
-#define ALPHABLEND_TYPE2
-
 // Eterm look-feel
 #define BG_SECTION "BG"
 #define BG_SECTIONW L"BG"

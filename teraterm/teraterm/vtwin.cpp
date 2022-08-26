@@ -366,10 +366,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		Style = WS_VSCROLL | WS_HSCROLL |
 		        WS_BORDER | WS_THICKFRAME | WS_POPUP;
 
-#ifdef ALPHABLEND_TYPE2
 		if (ts.EtermLookfeel.BGNoFrame)
 			Style &= ~(WS_BORDER | WS_THICKFRAME);
-#endif
 	}
 	else
 #ifdef WINDOW_MAXMIMUM_ENABLED
@@ -425,15 +423,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	logfile_lock_initialize();
 	SetMouseCursor(ts.MouseCursorName);
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 	if(ts.EtermLookfeel.BGNoFrame && ts.HideTitle > 0) {
 		DWORD ExStyle = (DWORD)::GetWindowLongPtr(HVTWin,GWL_EXSTYLE);
 		ExStyle &= ~WS_EX_CLIENTEDGE;
 		::SetWindowLongPtr(HVTWin,GWL_EXSTYLE,ExStyle);
 	}
-//-->
-#endif
 
 	// USBデバイス変化通知登録
 	RegDeviceNotify(HVTWin);
@@ -1038,7 +1032,6 @@ void CVTWindow::ResetSetup()
 	SetupTerm();
 
 	/* background and ANSI color */
-#ifdef ALPHABLEND_TYPE2
 
 #if 0
 	// 起動時のみに読み込むテーマが無効になってしまうので削除
@@ -1052,9 +1045,6 @@ void CVTWindow::ResetSetup()
 	// AlphaBlend を即時反映できるようにする。
 	// (2016.12.24 yutaka)
 	SetWindowAlpha(ts.AlphaBlendActive);
-#else
-	DispApplyANSIColor();
-#endif
 	DispSetNearestColors(IdBack, IdFore+8, NULL);
 
 	/* setup window */
@@ -2266,11 +2256,7 @@ void CVTWindow::OnPaint()
 		return;
 	}
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 	BGSetupPrimary(FALSE);
-//-->
-#endif
 
 	PaintDC = BeginPaint(&ps);
 
@@ -2826,23 +2812,18 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 	return TRUE;
 }
 
-//<!--by AKASI
 LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 {
-#ifdef ALPHABLEND_TYPE2
 	if(ts.EtermLookfeel.BGEnable && ts.EtermLookfeel.BGNoCopyBits) {
 		((WINDOWPOS*)lParam)->flags |= SWP_NOCOPYBITS;
 	}
-#endif
 
 	return TTCFrameWnd::DefWindowProc(WM_WINDOWPOSCHANGING,wParam,lParam);
 }
 
 LRESULT CVTWindow::OnSettingChange(WPARAM wParam, LPARAM lParam)
 {
-#ifdef ALPHABLEND_TYPE2
 	BGOnSettingChange();
-#endif
 	return TTCFrameWnd::DefWindowProc(WM_SETTINGCHANGE,wParam,lParam);
 }
 
@@ -2850,23 +2831,18 @@ LRESULT CVTWindow::OnEnterSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	EnableSizeTip(1);
 
-#ifdef ALPHABLEND_TYPE2
 	BGOnEnterSizeMove();
-#endif
 	return TTCFrameWnd::DefWindowProc(WM_ENTERSIZEMOVE,wParam,lParam);
 }
 
 LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
-#ifdef ALPHABLEND_TYPE2
 	BGOnExitSizeMove();
-#endif
 
 	EnableSizeTip(0);
 
 	return TTCFrameWnd::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
 }
-//-->
 
 LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 {
@@ -3282,14 +3258,12 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 		Style = Style & ~(WS_SYSMENU | WS_CAPTION |
 	                      WS_MINIMIZEBOX | WS_MAXIMIZEBOX) | WS_BORDER | WS_POPUP;
 
-#ifdef ALPHABLEND_TYPE2
 		if(ts.EtermLookfeel.BGNoFrame) {
 			Style   &= ~(WS_THICKFRAME | WS_BORDER);
 			ExStyle &= ~WS_EX_CLIENTEDGE;
 		}else{
 			ExStyle |=  WS_EX_CLIENTEDGE;
 		}
-#endif
 	}
 	else {
 		Style = Style & ~WS_POPUP | WS_SYSMENU | WS_CAPTION |
@@ -3301,9 +3275,7 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 	AdjustSize = TRUE;
 	::SetWindowLongPtr(HVTWin, GWL_STYLE, Style);
-#ifdef ALPHABLEND_TYPE2
 	::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, ExStyle);
-#endif
 	::SetWindowPos(HVTWin, NULL, 0, 0, 0, 0,
 	               SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	::ShowWindow(HVTWin, SW_SHOW);
@@ -4247,15 +4219,11 @@ void CVTWindow::OpenExternalSetup(int page)
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
 #if 0
-#ifdef ALPHABLEND_TYPE2
 		if (ts.EtermLookfeel.BGEnable != 0 && ts.EtermLookfeel.BGThemeFileW != NULL) {
 			// テーマファイルを読み込む
 			BGLoadThemeFile(&ts);
 		}
 		BGSetupPrimary(TRUE);
-#else
-		DispApplyANSIColor();
-#endif
 #endif
 		DispSetNearestColors(IdBack, IdFore+8, NULL);
 		ChangeWin();
@@ -4335,10 +4303,8 @@ void CVTWindow::OnSetupWindow()
 	if (Ok) {
 		// Eterm lookfeelの画面情報も更新することで、リアルタイムでの背景色変更が
 		// 可能となる。(2006.2.24 yutaka)
-#ifdef ALPHABLEND_TYPE2
 		BGInitialize(FALSE);
 		BGSetupPrimary(TRUE);
-#endif
 
 		// タイトルが変更されていたら、リモートタイトルをクリアする
 		if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
@@ -5453,14 +5419,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		retval = TTCFrameWnd::DefWindowProc(msg, wp ,lp);
 		if (ts.HideTitle>0) {
 			if ((retval == HTCLIENT) && AltKey()) {
-#ifdef ALPHABLEND_TYPE2
 			if(ShiftKey())
 				retval = HTBOTTOMRIGHT;
 			else
 				retval = HTCAPTION;
-#else
-			retval = HTCAPTION;
-#endif
 			}
 		}
 		break;

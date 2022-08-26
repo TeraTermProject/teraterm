@@ -36,7 +36,6 @@ extern "C" {
 #endif
 
 /* prototypes */
-//<!--by AKASI
 void BGInitialize(BOOL initialize_once);
 void BGLoadThemeFile(TTTSet *pts);
 void BGSetupPrimary(BOOL forceSetup);
@@ -47,9 +46,6 @@ void BGExchangeColor(void);
 void BGOnSettingChange(void);
 void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(void);
-
-//extern BOOL BGEnable;
-//-->
 
 void InitDisp(void);
 void EndDisp(void);
@@ -104,7 +100,6 @@ void DispRestoreWinSize(void);
 void DispSetWinPos(void);
 void DispSetActive(BOOL ActiveFlag);
 void InitColorTable(void);
-void DispApplyANSIColor(void);
 void DispSetNearestColors(int start, int end, HDC DispCtx);
 int TCharAttrCmp(TCharAttr a, TCharAttr b);
 void DispSetColor(unsigned int num, COLORREF color);

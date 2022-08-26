@@ -94,9 +94,7 @@ HFONT VTFont[AttrFontMask+1];
 int FontHeight, FontWidth, ScreenWidth, ScreenHeight;
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
-#ifdef ALPHABLEND_TYPE2
 static int CRTWidth, CRTHeight;
-#endif
 int CursorX, CursorY;
 /* Virtual screen region */
 RECT VirtualScreen;
@@ -142,8 +140,6 @@ static int dScroll = 0;
 static int SRegionTop;
 static int SRegionBottom;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 #include "ttlib.h"
 #include <stdio.h>
 #include <time.h>
@@ -1765,25 +1761,16 @@ void BGOnSettingChange(void)
   InvalidateRect(HVTWin, NULL, FALSE);
 }
 
-//-->
-#endif  // ALPHABLEND_TYPE2
-
-// TODO ALPHABLEND_TYPE2 éûÇÕäOïîÇ©ÇÁÉRÅ[ÉãÇ≥ÇÍÇ»Ç¢
 //
-void DispApplyANSIColor(void) {
+static void DispApplyANSIColor(void) {
   int i;
 
   for (i = IdBack ; i <= IdFore+8 ; i++)
     ANSIColor[i] = ts.ANSIColor[i];
 
   if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-#ifdef ALPHABLEND_TYPE2
     ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
     ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
-#else
-    ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-    ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-#endif
   }
 }
 
@@ -1824,14 +1811,10 @@ void InitDisp(void)
 
   TmpDC = GetDC(NULL);
 
-#ifdef ALPHABLEND_TYPE2
   CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
   CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
   BGInitialize(TRUE);
-#else
-  InitColorTable();
-#endif  // ALPHABLEND_TYPE2
 
   DispSetNearestColors(IdBack, 255, TmpDC);
 
@@ -1907,12 +1890,7 @@ void EndDisp(void)
 	Background = 0;
   }
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
   BGDestruct();
-//-->
-#endif  // ALPHABLEND_TYPE2
-
 }
 
 void DispReset(void)
@@ -2147,10 +2125,8 @@ void CaretKillFocus(BOOL show)
 	  return;
 
   // Eterm lookfeelÇÃèÍçáÇÕâΩÇ‡ÇµÇ»Ç¢
-#ifdef ALPHABLEND_TYPE2
   if (BGEnable)
 	  return;
-#endif	// ALPHABLEND_TYPE2
 
   /* Get Device Context */
   DispInitDC();
@@ -2208,10 +2184,8 @@ void UpdateCaretPosition(BOOL enforce)
 	  return;
 
   // Eterm lookfeelÇÃèÍçáÇÕâΩÇ‡ÇµÇ»Ç¢
-#ifdef ALPHABLEND_TYPE2
   if (BGEnable)
 	  return;
-#endif	// ALPHABLEND_TYPE2
 
   if (enforce == TRUE || !Active) {
 	  rc.left = CaretX;
@@ -2454,15 +2428,7 @@ void PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
   DCPrevFont = SelectObject(VTDC, VTFont[0]);
   DispInitDC();
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
-//if (fBkGnd)
   if(!BGEnable && fBkGnd)
-//-->
-#else
-  if (fBkGnd)
-#endif  // ALPHABLEND_TYPE2
-
     FillRect(VTDC, &PaintRect,Background);
 
   *Xs = PaintRect.left / FontWidth + WinOrgX;
@@ -2512,11 +2478,7 @@ void DispChangeBackground(void)
       Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
   }
   else {
-#ifdef ALPHABLEND_TYPE2
     Background = CreateSolidBrush(BGVTColor[1]);
-#else
-    Background = CreateSolidBrush(ts.VTColor[1]);
-#endif  // ALPHABLEND_TYPE2
   }
 
   InvalidateRect(HVTWin,NULL,TRUE);
@@ -2544,11 +2506,8 @@ void DispChangeWin(void)
     ANSIColor[IdFore ]   = ts.VTColor[0];
     ANSIColor[IdBack ]   = ts.VTColor[1];
 
-#ifdef ALPHABLEND_TYPE2
 	ANSIColor[IdFore ]   = BGVTColor[0];
 	ANSIColor[IdBack ]   = BGVTColor[1];
-#endif  // ALPHABLEND_TYPE2
-
   }
 
   /* change background color */
@@ -2566,23 +2525,14 @@ void DispInitDC(void)
   else
     SelectObject(VTDC, VTFont[0]);
 
-#ifdef ALPHABLEND_TYPE2
   SetTextColor(VTDC, BGVTColor[0]);
   SetBkColor(VTDC, BGVTColor[1]);
-#else
-  SetTextColor(VTDC, ts.VTColor[0]);
-  SetBkColor(VTDC, ts.VTColor[1]);
-#endif  // ALPHABLEND_TYPE2
 
   SetBkMode(VTDC,OPAQUE);
   DCAttr = DefCharAttr;
   DCReverse = FALSE;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
   BGReverseText = FALSE;
-//-->
-#endif  // ALPHABLEND_TYPE2
 }
 
 void DispReleaseDC(void)
@@ -2622,51 +2572,27 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 
   if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 	if (isBlinkColored(Attr)) {
-#ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGVTBlinkColor[0];
 	  BackColor = BGVTBlinkColor[1];
-#else
-	  TextColor = ts.VTBlinkColor[0];
-	  BackColor = ts.VTBlinkColor[1];
-#endif
 	}
 	else if (isBoldColored(Attr)) {
-#ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGVTBoldColor[0];
 	  BackColor = BGVTBoldColor[1];
-#else
-	  TextColor = ts.VTBoldColor[0];
-	  BackColor = ts.VTBoldColor[1];
-#endif
 	}
 	else if (isUnderlined(Attr)) {
-#ifdef ALPHABLEND_TYPE2
 	  TextColor = BGURLColor[0];
 	  BackColor = BGURLColor[1];
-#else
-	  TextColor = ts.URLColor[0];
-	  BackColor = ts.URLColor[1];
-#endif
 	}
 	else if (isURLColored(Attr)) {
-#ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGURLColor[0];
 	  BackColor = BGURLColor[1];
-#else
-	  TextColor = ts.URLColor[0];
-	  BackColor = ts.URLColor[1];
-#endif
 	}
 	else {
 	  if (isForeColored(Attr)) {
 		TextColor = ANSIColor[Attr.Fore];
 	  }
 	  else {
-#ifdef ALPHABLEND_TYPE2 // AKASI
 		TextColor = BGVTColor[0];
-#else
-		TextColor = ts.VTColor[0];
-#endif
 		NoReverseColor = 1;
 	  }
 
@@ -2674,11 +2600,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		BackColor = ANSIColor[Attr.Back];
 	  }
 	  else {
-#ifdef ALPHABLEND_TYPE2 // AKASI
 		BackColor = BGVTColor[1];
-#else
-		BackColor = ts.VTColor[1];
-#endif
 		if (NoReverseColor == 1) {
 		  NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
 		}
@@ -2702,7 +2624,6 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    TextColor = ANSIColor[Attr.Fore];
 	  }
 	}
-#ifdef ALPHABLEND_TYPE2 // AKASI
 	else if (isBlinkColored(Attr))
 	  TextColor = BGVTBlinkColor[0];
 	else if (isBoldColored(Attr))
@@ -2715,20 +2636,6 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	  TextColor = BGVTColor[0];
 	  NoReverseColor = 1;
 	}
-#else
-	else if (isBlinkColored(Attr))
-	  TextColor = ts.VTBlinkColor[0];
-	else if (isBoldColored(Attr))
-	  TextColor = ts.VTBoldColor[0];
-	else if (isUnderlined(Attr))
-	  TextColor = ts.URLColor[0];
-	else if (isURLColored(Attr))
-	  TextColor = ts.URLColor[0];
-	else {
-	  TextColor = ts.VTColor[0];
-	  NoReverseColor = 1;
-	}
-#endif
 	if (isBackColored(Attr)) {
 	  if (Attr.Back<8 && (ts.ColorFlag&CF_PCBOLD16)) {
 	    if (((Attr.Attr&AttrBlink)!=0) == (Attr.Back!=0)) {
@@ -2745,7 +2652,6 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    BackColor = ANSIColor[Attr.Back];
 	  }
 	}
-#ifdef ALPHABLEND_TYPE2 // AKASI
 	else if (isBlinkColored(Attr))
 	  BackColor = BGVTBlinkColor[1];
 	else if (isBoldColored(Attr))
@@ -2760,46 +2666,19 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
 	  }
 	}
-#else
-	else if (isBlinkColored(Attr))
-	  BackColor = ts.VTBlinkColor[1];
-	else if (isBoldColored(Attr))
-	  BackColor = ts.VTBoldColor[1];
-	else if (isUnderlined(Attr))
-	  BackColor = ts.URLColor[1];
-	else if (isURLColored(Attr))
-	  BackColor = ts.URLColor[1];
-	else {
-	  BackColor = ts.VTColor[1];
-	  if (NoReverseColor == 1) {
-	    NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
-	  }
-	}
-#endif
   }
 #ifdef USE_NORMAL_BGCOLOR_REJECT
   if (ts.UseNormalBGColor) {
- #ifdef ALPHABLEND_TYPE2
     BackColor = BGVTColor[1];
- #else
-    BackColor = ts.VTColor[1];
- #endif
   }
 #endif
 
   if (Reverse != ((Attr.Attr & AttrReverse) != 0))
   {
-#ifdef ALPHABLEND_TYPE2
     BGReverseText = TRUE;
-#endif
     if ((Attr.Attr & AttrReverse) && !NoReverseColor) {
-#ifdef ALPHABLEND_TYPE2
       SetTextColor(VTDC, BGVTReverseColor[0]);
       SetBkColor(  VTDC, BGVTReverseColor[1]);
-#else
-      SetTextColor(VTDC, ts.VTReverseColor[0]);
-      SetBkColor(  VTDC, ts.VTReverseColor[1]);
-#endif
     }
     else {
       SetTextColor(VTDC, BackColor);
@@ -2807,9 +2686,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
     }
   }
   else {
-#ifdef ALPHABLEND_TYPE2 // by AKASI
     BGReverseText = FALSE;
-#endif
     SetTextColor(VTDC,TextColor);
     SetBkColor(  VTDC,BackColor);
   }
@@ -3050,11 +2927,7 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
  */
 void DispStr(const char *Buff, int Count, int Y, int* X)
 {
-#ifdef ALPHABLEND_TYPE2
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-#else
-	HDC BGDC = NULL;
-#endif
 	DrawStrA(VTDC, BGDC, Buff, Count, FontWidth, FontHeight, Y, X);
 }
 
@@ -3063,11 +2936,7 @@ void DispStr(const char *Buff, int Count, int Y, int* X)
  */
 void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
 {
-#ifdef ALPHABLEND_TYPE2
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-#else
-	HDC BGDC = NULL;
-#endif
 	DrawStrW(VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
 }
 
@@ -3081,27 +2950,15 @@ void DispEraseCurToEnd(int YEnd)
   R.top = (CursorY+1-WinOrgY)*FontHeight;
   R.bottom = (YEnd+1-WinOrgY)*FontHeight;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  FillRect(VTDC,&R,Background);
   BGFillRect(VTDC,&R,Background);
-//-->
-#else
-  FillRect(VTDC,&R,Background);
-#endif
 
   R.left = (CursorX-WinOrgX)*FontWidth;
   R.bottom = R.top;
   R.top = R.bottom-FontHeight;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  FillRect(VTDC,&R,Background);
   BGFillRect(VTDC,&R,Background);
-//-->
-#else
-  FillRect(VTDC,&R,Background);
-#endif
 }
 
 void DispEraseHomeToCur(int YHome)
@@ -3114,27 +2971,15 @@ void DispEraseHomeToCur(int YHome)
   R.top = (YHome-WinOrgY)*FontHeight;
   R.bottom = (CursorY-WinOrgY)*FontHeight;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  FillRect(VTDC,&R,Background);
   BGFillRect(VTDC,&R,Background);
-//-->
-#else
-  FillRect(VTDC,&R,Background);
-#endif
 
   R.top = R.bottom;
   R.bottom = R.top + FontHeight;
   R.right = (CursorX+1-WinOrgX)*FontWidth;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  FillRect(VTDC,&R,Background);
   BGFillRect(VTDC,&R,Background);
-//-->
-#else
-  FillRect(VTDC,&R,Background);
-#endif
 }
 
 void DispEraseCharsInLine(int XStart, int Count)
@@ -3147,14 +2992,8 @@ void DispEraseCharsInLine(int XStart, int Count)
   R.left = (XStart-WinOrgX)*FontWidth;
   R.right = R.left + Count * FontWidth;
 
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  FillRect(VTDC,&R,Background);
   BGFillRect(VTDC,&R,Background);
-//-->
-#else
-  FillRect(VTDC,&R,Background);
-#endif
 }
 
 BOOL DispDeleteLines(int Count, int YEnd)
@@ -3171,14 +3010,8 @@ BOOL DispDeleteLines(int Count, int YEnd)
 	R.right = ScreenWidth;
 	R.top = (CursorY-WinOrgY)*FontHeight;
 	R.bottom = (YEnd+1-WinOrgY)*FontHeight;
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  ScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
-  BGScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
-//-->
-#else
-  ScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
-#endif
+	BGScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
 	UpdateWindow(HVTWin);
 	return TRUE;
   }
@@ -3200,14 +3033,8 @@ BOOL DispInsertLines(int Count, int YEnd)
     R.right = ScreenWidth;
     R.top = (CursorY-WinOrgY)*FontHeight;
     R.bottom = (YEnd+1-WinOrgY)*FontHeight;
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  ScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
     BGScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
-//-->
-#else
-  ScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
-#endif
 	UpdateWindow(HVTWin);
     return TRUE;
   }
@@ -3347,14 +3174,8 @@ void DispUpdateScroll(void)
     R.right = ScreenWidth;
     R.top = (SRegionTop-WinOrgY)*FontHeight;
     R.bottom = (SRegionBottom+1-WinOrgY)*FontHeight;
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  ScrollWindow(HVTWin,0,-d,&R,&R);
     BGScrollWindow(HVTWin,0,-d,&R,&R);
-//-->
-#else
-  ScrollWindow(HVTWin,0,-d,&R,&R);
-#endif
 
     if ((SRegionTop==0) && (dScroll>0))
 	{ // update scroll bar if BuffEnd is changed
@@ -3394,26 +3215,14 @@ void DispUpdateScroll(void)
   if (NewOrgX==WinOrgX)
   {
     d = (NewOrgY-WinOrgY) * FontHeight;
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  ScrollWindow(HVTWin,0,-d,NULL,NULL);
     BGScrollWindow(HVTWin,0,-d,NULL,NULL);
-//-->
-#else
-  ScrollWindow(HVTWin,0,-d,NULL,NULL);
-#endif
   }
   else if (NewOrgY==WinOrgY)
   {
     d = (NewOrgX-WinOrgX) * FontWidth;
-#ifdef ALPHABLEND_TYPE2
-//<!--by AKASI
 //  ScrollWindow(HVTWin,-d,0,NULL,NULL);
     BGScrollWindow(HVTWin,-d,0,NULL,NULL);
-//-->
-#else
-  ScrollWindow(HVTWin,-d,0,NULL,NULL);
-#endif
   }
   else
     InvalidateRect(HVTWin,NULL,TRUE);
@@ -3599,10 +3408,8 @@ void DispSetWinPos(void)
   ClientToScreen(HVTWin,&Point);
   CompletelyVisible = (Point.y <= VirtualScreen.bottom);
 
-#ifdef ALPHABLEND_TYPE2
    if(BGEnable)
 	InvalidateRect(HVTWin, NULL, FALSE);
-#endif
 }
 
 void DispMoveWindow(int x, int y) {
@@ -3657,7 +3464,6 @@ void DispSetColor(unsigned int num, COLORREF color)
 	ReleaseDC(NULL, TmpDC);
 
 	switch (num) {
-#ifdef ALPHABLEND_TYPE2
 	case CS_VT_NORMALFG:
 		BGVTColor[0] = color;
 		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
@@ -3683,33 +3489,6 @@ void DispSetColor(unsigned int num, COLORREF color)
 	case CS_VT_REVERSEBG: BGVTReverseColor[1] = color; break;
 	case CS_VT_URLFG:     BGURLColor[0] = color; break;
 	case CS_VT_URLBG:     BGURLColor[1] = color; break;
-#else
-	case CS_VT_NORMALFG:
-		ts.VTColor[0] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-		}
-		break;
-	case CS_VT_NORMALBG:
-		ts.VTColor[1] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-		}
-		if (ts.UseNormalBGColor) {
-			ts.VTBoldColor[1] = ts.VTColor[1];
-			ts.VTBlinkColor[1] = ts.VTColor[1];
-			ts.URLColor[1] = ts.VTColor[1];
-		}
-		break;
-	case CS_VT_BOLDFG:    ts.VTBoldColor[0] = color; break;
-	case CS_VT_BOLDBG:    ts.VTBoldColor[1] = color; break;
-	case CS_VT_BLINKFG:   ts.VTBlinkColor[0] = color; break;
-	case CS_VT_BLINKBG:   ts.VTBlinkColor[1] = color; break;
-	case CS_VT_REVERSEFG: ts.VTReverseColor[0] = color; break;
-	case CS_VT_REVERSEBG: ts.VTReverseColor[1] = color; break;
-	case CS_VT_URLFG:     ts.URLColor[0] = color; break;
-	case CS_VT_URLBG:     ts.URLColor[1] = color; break;
-#endif
 	case CS_TEK_FG:       ts.TEKColor[0] = color; break;
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
@@ -3740,7 +3519,6 @@ void DispResetColor(unsigned int num)
 	}
 
 	switch(num) {
-#ifdef ALPHABLEND_TYPE2
 	case CS_VT_NORMALFG:
 		BGVTColor[0] = ts.VTColor[0];
 		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
@@ -3766,7 +3544,6 @@ void DispResetColor(unsigned int num)
 	case CS_VT_REVERSEBG: BGVTReverseColor[1] = ts.VTReverseColor[1]; break;
 	case CS_VT_URLFG:     BGURLColor[0] = ts.URLColor[0]; break;
 	case CS_VT_URLBG:     BGURLColor[1] = ts.URLColor[1]; break;
-#endif
 	case CS_TEK_FG:
 		break;
 	case CS_TEK_BG:
@@ -3809,11 +3586,7 @@ void DispResetColor(unsigned int num)
 	default:
 		if (num == IdBack) {
 			if (ts.ColorFlag & CF_USETEXTCOLOR) {
-#ifdef ALPHABLEND_TYPE2
 				ANSIColor[IdBack] = BGVTColor[1]; // use background color for "Black"
-#else
-				ANSIColor[IdBack] = ts.VTColor[1]; // use background color for "Black"
-#endif
 			}
 			else {
 				ANSIColor[IdBack] = ts.ANSIColor[IdBack];
@@ -3822,11 +3595,7 @@ void DispResetColor(unsigned int num)
 		}
 		else if (num == IdFore) {
 			if (ts.ColorFlag & CF_USETEXTCOLOR) {
-#ifdef ALPHABLEND_TYPE2
 				ANSIColor[IdFore] = BGVTColor[0]; // use text color for "white"
-#else
-				ANSIColor[IdFore] = ts.VTColor[0]; // use text color for "white"
-#endif
 			}
 			else {
 				ANSIColor[IdFore] = ts.ANSIColor[IdFore];
@@ -3899,11 +3668,7 @@ void UpdateBGBrush() {
       Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
   }
   else {
-#ifdef ALPHABLEND_TYPE2
     Background = CreateSolidBrush(BGVTColor[1]);
-#else
-    Background = CreateSolidBrush(ts.VTColor[1]);
-#endif  // ALPHABLEND_TYPE2
   }
 }
 

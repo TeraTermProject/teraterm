@@ -133,12 +133,10 @@ protected:
 	void OnTimer(UINT_PTR nIDEvent);
 	void OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
 	BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData);
-//<!--by AKASI
 	LRESULT OnWindowPosChanging(WPARAM wParam, LPARAM lParam);
 	LRESULT OnSettingChange(WPARAM wParam, LPARAM lParam);
 	LRESULT OnEnterSizeMove(WPARAM wParam, LPARAM lParam);
 	LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
-//-->
 	LRESULT OnIMEStartComposition(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMEEndComposition(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMEComposition(WPARAM wParam, LPARAM lParam);

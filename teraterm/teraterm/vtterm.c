@@ -3094,9 +3094,7 @@ void CSQExchangeColor()		// DECSCNM / Visual Bell
 
 	ts.ColorFlag ^= CF_REVERSEVIDEO;
 
-#ifdef ALPHABLEND_TYPE2
 	BGExchangeColor();
-#endif
 	DispChangeBackground();
 	UpdateWindow(HVTWin);
 }
