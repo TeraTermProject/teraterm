@@ -668,10 +668,9 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					};
 					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), ts->UILanguageFileW, 0);
 				}
-#ifdef USE_NORMAL_BGCOLOR
 				ShowDlgItem(Dialog,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 				SetRB(Dialog,ts->UseNormalBGColor,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
-#endif
+
 				ShowDlgItem(Dialog, IDC_FONTBOLD, IDC_FONTBOLD);
 				SetRB(Dialog, (ts->FontFlag & FF_BOLD) > 0, IDC_FONTBOLD,IDC_FONTBOLD);
 			}
@@ -823,9 +822,9 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 								ts->URLColor[i] = GetNearestColor(DC,ts->URLColor[i]);
 								/* end - ishizaki */
 							}
-#ifdef USE_NORMAL_BGCOLOR
 							GetRB(Dialog,&ts->UseNormalBGColor,
 							      IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
+#if 1
 							// 2006/03/11 by 337
 							if (ts->ColorFlag & CF_REVERSEVIDEO) {
 								if (ts->UseNormalBGColor) {

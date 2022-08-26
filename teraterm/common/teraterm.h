@@ -71,9 +71,6 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 //#define BG_THEME_THEMEFILE_SCALE "Scale.INI"
 //#define BG_THEME_THEMEFILE_TILE "Tile.INI"
 
-// Added by 337 2006/03/01
-#define USE_NORMAL_BGCOLOR
-
 #include "i18n.h"
 #include "ttlib.h"
 

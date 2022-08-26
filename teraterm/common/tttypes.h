@@ -499,9 +499,7 @@ struct tttset {
 	WORD DisableAcceleratorSendBreak;
 	int EnableClickableUrl;
 	eterm_lookfeel_t EtermLookfeel;
-#ifdef USE_NORMAL_BGCOLOR
 	WORD UseNormalBGColor;
-#endif
 	char UILanguageFile[MAX_PATH];			// ê‚ëŒÉpÉX
 	char UIMsg[MAX_UIMSG];
 	WORD BroadcastCommandHistory;

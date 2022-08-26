@@ -1610,10 +1610,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->UnknownUnicodeCharaAsWide =
 		GetOnOff(Section, "UnknownUnicodeCharacterAsWide", FName, FALSE);
 
-#ifdef USE_NORMAL_BGCOLOR
 	// UseNormalBGColor
 	ts->UseNormalBGColor =
 		GetOnOff(Section, "UseNormalBGColor", FName, FALSE);
+#if 1
 	// 2006/03/11 by 337
 	if (ts->UseNormalBGColor) {
 		ts->VTBoldColor[1] =
@@ -2908,10 +2908,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	}
 #endif
 
-#ifdef USE_NORMAL_BGCOLOR
 	// UseNormalBGColor
 	WriteOnOff(Section, "UseNormalBGColor", FName, ts->UseNormalBGColor);
-#endif
 
 	// UI language message file
 	WritePrivateProfileString(Section, "UILanguageFile",
