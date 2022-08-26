@@ -31,7 +31,7 @@
 /*
  * putty プロジェクトは
  * - PuTTY のソースファイル (プロジェクトに読み込むファイルは最小限)
- * - libputty.c/h 
+ * - libputty.c/h
  *   PuTTY の機能を利用するインターフェース
  *   PuTTY のソースファイルから必要な関数のみをコピー
  * から静的ライブラリ libputty.lib を生成し、TTXSSH からリンクされて利用される。
@@ -76,7 +76,8 @@ int putty_get_ssh2_keylist(unsigned char **keylist)
 void *putty_sign_ssh2_key(unsigned char *pubkey /* length(4byte) + data */,
                           unsigned char *data,
                           int datalen,
-                          int *outlen)
+                          int *outlen,
+                          int signflags)
 {
 	void *ret;
 
@@ -84,7 +85,6 @@ void *putty_sign_ssh2_key(unsigned char *pubkey /* length(4byte) + data */,
 	void *vresponse;
 	int resplen;
 	int pubkeylen, reqlen;
-	int flags = 0;
 
 	pubkeylen = GET_32BIT(pubkey);
 	reqlen = 4 + 1 + (4 + pubkeylen) + (4 + datalen) + 4;
@@ -101,7 +101,7 @@ void *putty_sign_ssh2_key(unsigned char *pubkey /* length(4byte) + data */,
 	// sign data
 	memcpy(request + 5 + 4 + pubkeylen + 4, data, datalen);
 	// flags word
-	PUT_32BIT(request + 5 + 4 + pubkeylen + 4 + datalen, flags);
+	PUT_32BIT(request + 5 + 4 + pubkeylen + 4 + datalen, signflags);
 
 	agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
 

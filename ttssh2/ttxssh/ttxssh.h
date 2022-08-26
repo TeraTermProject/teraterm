@@ -191,7 +191,7 @@ typedef struct _TS_SSH {
 
 	// KEX order(derived from teraterm.ini)
 	char KexOrder[KEX_DH_MAX+1];
-	char HostKeyOrder[KEY_MAX+1];
+	char HostKeyOrder[KEY_ALGO_MAX+1];
 	char MacOrder[HMAC_MAX+1];
 	char CompOrder[COMP_MAX+1];
 
@@ -272,14 +272,13 @@ typedef struct _TInstVar {
 	buffer_t *my_kex;
 	buffer_t *peer_kex;
 	kex_algorithm kex_type; // KEX algorithm
-	ssh_keytype hostkey_type;
+	ssh_keyalgo hostkey_type;
 	const struct ssh2cipher *ciphers[MODE_MAX];
 	const struct SSH2Mac *macs[MODE_MAX];
 	compression_type ctos_compression;
 	compression_type stoc_compression;
 	int we_need;
-	int key_done;
-	int rekeying;
+	int kex_status;
 	char *session_id;
 	int session_id_len;
 	SSHKeys ssh2_keys[MODE_MAX];
@@ -347,7 +346,7 @@ typedef struct _TInstVar {
 	// dialog resource
 	HFONT hFontFixed;		// hosts.c内のダイアログ用
 
-	bottom_half_known_hosts_t contents_after_known_hosts;
+	char *server_sig_algs;
 
 } TInstVar;
 

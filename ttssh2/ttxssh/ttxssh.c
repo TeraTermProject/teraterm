@@ -161,7 +161,7 @@ static void init_TTSSH(PTInstVar pvar)
 	FWDUI_init(pvar);
 
 	ssh_heartbeat_lock_initialize();
-	
+
 	pvar->cc[MODE_IN] = NULL;
 	pvar->cc[MODE_OUT] = NULL;
 	// メモリ確保は CRYPT_start_encryption の先の cipher_init_SSH2 に移動
@@ -739,13 +739,13 @@ static void add_err_msg(PTInstVar pvar, char *msg)
 		char *buf;
 
 		// すでに同じメッセージが登録済みの場合は追加しない。
-		if (strstr(pvar->err_msg, msg)) 
+		if (strstr(pvar->err_msg, msg))
 			return;
-		
+
 		buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
 		buf = malloc(buf_len);
 		// メモリが確保できない場合は何もしない。
-		if (buf == NULL) 
+		if (buf == NULL)
 			return;
 
 		strncpy_s(buf, buf_len, pvar->err_msg, _TRUNCATE);
@@ -1619,7 +1619,7 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	}
 
 	cur = start;
-	while (next = GetParam(option, opt_len, cur)) {	
+	while (next = GetParam(option, opt_len, cur)) {
 		DequoteParam(option, opt_len, option);
 		action = OPTION_NONE;
 
@@ -2119,7 +2119,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msg("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_type_name(pvar->hostkey_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_algorithm_name(pvar->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
@@ -2239,7 +2239,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 static WNDPROC g_defAboutDlgEditWndProc;  // Edit Controlのサブクラス化用
 static int g_deltaSumAboutDlg = 0;        // マウスホイールのDelta累積用
 
-static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
+static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	WORD keys;
 	short delta;
@@ -2492,7 +2492,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 			                  "<Host Keys below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
-			name = get_ssh2_hostkey_type_name(index);
+			name = get_ssh2_hostkey_algorithm_name(index);
 		}
 
 		if (name != NULL) {
@@ -2754,10 +2754,10 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 			buf[0] = 0;
 			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
 			for (j = 0;
-				j <= KEY_MAX
-				 && strcmp(buf, get_ssh2_hostkey_type_name(j)) != 0; j++) {
+				j <= KEY_ALGO_MAX
+				 && strcmp(buf, get_ssh2_hostkey_algorithm_name(j)) != 0; j++) {
 			}
-			if (j <= KEY_MAX) {
+			if (j <= KEY_ALGO_MAX) {
 				buf2[buf2index] = '0' + j;
 				buf2index++;
 			} else {
@@ -3103,8 +3103,8 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
-	unsigned char *ed25519_sk; 
-	unsigned char *ed25519_pk; 
+	unsigned char *ed25519_sk;
+	unsigned char *ed25519_pk;
 	ssh_keytype type;
 } ssh_private_key_t;
 
@@ -3114,8 +3114,8 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
-	unsigned char *ed25519_sk; 
-	unsigned char *ed25519_pk; 
+	unsigned char *ed25519_sk;
+	unsigned char *ed25519_pk;
 	ssh_keytype type;
 } ssh_public_key_t;
 
@@ -3186,7 +3186,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		public_key.rsa = pub;
 		break;
 	}
-	
+
 	case KEY_DSA:
 	{
 		DSA *priv = NULL;
@@ -3663,7 +3663,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	buffer_t *kdf = NULL;
 	buffer_t *encoded = NULL;
 	buffer_t *blob = NULL;
-	int blocksize, keylen, ivlen, authlen, i, n; 
+	int blocksize, keylen, ivlen, authlen, i, n;
 	unsigned char *key = NULL, salt[SALT_LEN];
 	char *kdfname = KDFNAME;
 	struct sshcipher_ctx *cc = NULL;
@@ -4530,7 +4530,7 @@ error:;
 				buffer_free(enc);
 				cipher_free_SSH2(cc);
 
-			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
+			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
 
 			} else { // SSH2 RSA, DSA, ECDSA
@@ -4560,7 +4560,7 @@ error:;
 					MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 					break;
 				}
- 
+
 				switch (key_type) {
 				case KEY_RSA: // RSA
 					ret = PEM_write_RSAPrivateKey(fp, private_key.rsa, cipher, buf, len, NULL, NULL);
@@ -4714,7 +4714,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 static void _dquote_string(char *str, char *dst, int dst_len)
 {
 	int i, len, n;
-	
+
 	len = strlen(str);
 	n = 0;
 	for (i = 0 ; i < len ; i++) {

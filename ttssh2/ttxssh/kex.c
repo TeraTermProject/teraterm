@@ -64,9 +64,6 @@ static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 };
 
 
-extern SSHKeys current_keys[MODE_MAX];
-
-
 char* get_kex_algorithm_name(kex_algorithm kextype)
 {
 	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
@@ -141,7 +138,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 {
 	static char buf[512]; // TODO: malloc()にすべき
 	int index;
-	int len, i;
+	int i;
 
 	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
 	if (pvar->socket != INVALID_SOCKET) {
@@ -156,9 +153,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), get_kex_algorithm_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
-	len = strlen(buf);
-	if (len > 0)
-		buf[len - 1] = '\0';  // get rid of comma
+	strncat_s(buf, sizeof(buf), "ext-info-c", _TRUNCATE);
 	myproposal[PROPOSAL_KEX_ALGS] = buf; 
 }
 
@@ -685,8 +680,10 @@ skip:;
 	return digest;
 }
 
-
-void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secret,
+/*
+ * 鍵交換の結果から各鍵を生成し newkeys にセットして戻す。
+ */
+void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, BIGNUM *shared_secret,
                      char *session_id, int session_id_len)
 {
 #define NKEYS	6
@@ -705,24 +702,13 @@ void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secr
 		else
 			ctos = 0;
 
-#if 0
-		// free already allocated buffer (2004.12.27 yutaka)
-		// キー再作成時にMAC corruptとなるので削除。(2005.1.5 yutaka)
-		if (current_keys[mode].enc.iv != NULL)
-			free(current_keys[mode].enc.iv);
-		if (current_keys[mode].enc.key != NULL)
-			free(current_keys[mode].enc.key);
-		if (current_keys[mode].mac.key != NULL)
-			free(current_keys[mode].mac.key);
-#endif
-
 		// setting
-		current_keys[mode].enc.iv  = keys[ctos ? 0 : 1];
-		current_keys[mode].enc.key = keys[ctos ? 2 : 3];
-		current_keys[mode].mac.key = keys[ctos ? 4 : 5];
+		newkeys[mode].enc.iv  = keys[ctos ? 0 : 1];
+		newkeys[mode].enc.key = keys[ctos ? 2 : 3];
+		newkeys[mode].mac.key = keys[ctos ? 4 : 5];
 
-		//debug_print(20 + mode*3, current_keys[mode]->enc.iv, 8);
-		//debug_print(21 + mode*3, current_keys[mode]->enc.key, 24);
-		//debug_print(22 + mode*3, current_keys[mode]->mac.key, 24);
+		//debug_print(20 + mode*3, newkeys[mode]->enc.iv, 8);
+		//debug_print(21 + mode*3, newkeys[mode]->enc.key, 24);
+		//debug_print(22 + mode*3, newkeys[mode]->mac.key, 24);
 	}
 }

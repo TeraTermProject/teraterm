@@ -47,7 +47,8 @@ int putty_get_ssh2_keylist(unsigned char **keylist);
 void *putty_sign_ssh2_key(unsigned char *pubkey,
                           unsigned char *data,
                           int datalen,
-                          int *outlen);
+                          int *outlen,
+                          int signflags);
 int putty_get_ssh1_keylist(unsigned char **keylist);
 void *putty_hash_ssh1_challenge(unsigned char *pubkey,
                                 int pubkeylen,

@@ -595,39 +595,13 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 {
 	int cipher_mask;
 
-	if (SSHv1(pvar)) {
-		cipher_mask = (1 << SSH_CIPHER_DES)
-		            | (1 << SSH_CIPHER_3DES)
-		            | (1 << SSH_CIPHER_BLOWFISH);
-
-	} else { // for SSH2(yutaka)
-		// SSH2がサポートするデータ通信用アルゴリズム（公開鍵交換用とは別）
-		cipher_mask =((1 << SSH2_CIPHER_3DES_CBC)
-		            | (1 << SSH2_CIPHER_AES128_CBC)
-		            | (1 << SSH2_CIPHER_AES192_CBC)
-		            | (1 << SSH2_CIPHER_AES256_CBC)
-		            | (1 << SSH2_CIPHER_BLOWFISH_CBC)
-		            | (1 << SSH2_CIPHER_AES128_CTR)
-		            | (1 << SSH2_CIPHER_AES192_CTR)
-		            | (1 << SSH2_CIPHER_AES256_CTR)
-		            | (1 << SSH2_CIPHER_ARCFOUR)
-		            | (1 << SSH2_CIPHER_ARCFOUR128)
-		            | (1 << SSH2_CIPHER_ARCFOUR256)
-		            | (1 << SSH2_CIPHER_CAST128_CBC)
-		            | (1 << SSH2_CIPHER_3DES_CTR)
-		            | (1 << SSH2_CIPHER_BLOWFISH_CTR)
-		            | (1 << SSH2_CIPHER_CAST128_CTR)
-		            | (1 << SSH2_CIPHER_CAMELLIA128_CBC)
-		            | (1 << SSH2_CIPHER_CAMELLIA192_CBC)
-		            | (1 << SSH2_CIPHER_CAMELLIA256_CBC)
-		            | (1 << SSH2_CIPHER_CAMELLIA128_CTR)
-		            | (1 << SSH2_CIPHER_CAMELLIA192_CTR)
-		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
-		            | (1 << SSH2_CIPHER_AES128_GCM)
-		            | (1 << SSH2_CIPHER_AES256_GCM)
-		            | (1 << SSH2_CIPHER_CHACHAPOLY)
-		);
+	if (SSHv2(pvar)) {
+		return TRUE;
 	}
+
+	cipher_mask = (1 << SSH_CIPHER_DES)
+	            | (1 << SSH_CIPHER_3DES)
+	            | (1 << SSH_CIPHER_BLOWFISH);
 
 	sender_ciphers &= cipher_mask;
 	receiver_ciphers &= cipher_mask;
@@ -684,7 +658,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 
 	} else { // for SSH2(yutaka)
 		mac = &pvar->ssh2_keys[MODE_IN].mac;
-		if (mac == NULL || mac->enabled == 0) 
+		if (mac == NULL || mac->enabled == 0)
 			return 0;
 
 		return (pvar->ssh2_keys[MODE_IN].mac.mac_len);
@@ -692,7 +666,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 
 }
 
-// HMACの検証 
+// HMACの検証
 // ※本関数は SSH2 でのみ使用される。
 // (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
@@ -715,7 +689,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	}
 
 	if ((u_int)mac->mac_len > sizeof(m)) {
-		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
+		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)",
 		          mac->mac_len, sizeof(m), sequence_number, len);
 		goto error;
 	}
@@ -743,7 +717,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	return TRUE;
 
 error:
-	if (c) 
+	if (c)
 		HMAC_CTX_free(c);
 
 	return FALSE;
@@ -755,7 +729,7 @@ unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 
 	if (SSHv2(pvar)) {	// for SSH2(yutaka)
 		mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		if (mac == NULL || mac->enabled == 0) 
+		if (mac == NULL || mac->enabled == 0)
 			return 0;
 
 		return (mac->mac_len);
@@ -775,7 +749,7 @@ BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
 
 	if (SSHv2(pvar)) { // for SSH2(yutaka)
 		mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		if (mac == NULL || mac->enabled == 0) 
+		if (mac == NULL || mac->enabled == 0)
 			return FALSE;
 
 		c = HMAC_CTX_new();
@@ -821,27 +795,10 @@ static int choose_cipher(PTInstVar pvar, int supported)
 
 BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 {
-	if (SSHv1(pvar)) {
-		pvar->crypt_state.sender_cipher = choose_cipher(pvar,
-		                                                pvar->crypt_state.
-		                                                supported_sender_ciphers);
-		pvar->crypt_state.receiver_cipher =
-			choose_cipher(pvar, pvar->crypt_state.supported_receiver_ciphers);
-
-	} else { // SSH2(yutaka)
-		if (pvar->ciphers[MODE_OUT] == NULL) {
-			pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
-		}
-		else {
-			pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
-		}
-		if (pvar->ciphers[MODE_IN] == NULL) {
-			pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
-		}
-		else {
-			pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
-		}
-	}
+	pvar->crypt_state.sender_cipher =
+		choose_cipher(pvar, pvar->crypt_state.supported_sender_ciphers);
+	pvar->crypt_state.receiver_cipher =
+		choose_cipher(pvar, pvar->crypt_state.supported_receiver_ciphers);
 
 	if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE
 		|| pvar->crypt_state.receiver_cipher == SSH_CIPHER_NONE) {
@@ -1115,6 +1072,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			// SSH2
 			cipher = pvar->ciphers[MODE_OUT];
 			if (cipher) {
+				pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_OUT], cipher,
 				                 enc->key, enc->key_len,
@@ -1124,6 +1082,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.encrypt = crypt_SSH2_encrypt;
 			}
 			else {
+				pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
 				isOK = FALSE;
 			}
 		}
@@ -1159,6 +1118,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			// SSH2
 			cipher = pvar->ciphers[MODE_IN];
 			if (cipher) {
+				pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_IN], cipher,
 				                 enc->key, enc->key_len,
@@ -1168,6 +1128,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.decrypt = crypt_SSH2_decrypt;
 			}
 			else {
+				pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
 				isOK = FALSE;
 			}
 		}
@@ -1263,18 +1224,18 @@ void CRYPT_end(PTInstVar pvar)
 	destroy_public_key(&pvar->crypt_state.server_key);
 
 	if (pvar->crypt_state.detect_attack_statics.h != NULL) {
-		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h, 
+		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h,
 		                 pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
 		free(pvar->crypt_state.detect_attack_statics.h);
 	}
 
 	SecureZeroMemory(pvar->crypt_state.sender_cipher_key,
 	                 sizeof(pvar->crypt_state.sender_cipher_key));
-	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key, 
+	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key,
 	                 sizeof(pvar->crypt_state.receiver_cipher_key));
-	SecureZeroMemory(pvar->crypt_state.server_cookie, 
+	SecureZeroMemory(pvar->crypt_state.server_cookie,
 	                 sizeof(pvar->crypt_state.server_cookie));
-	SecureZeroMemory(pvar->crypt_state.client_cookie, 
+	SecureZeroMemory(pvar->crypt_state.client_cookie,
 	                 sizeof(pvar->crypt_state.client_cookie));
 	SecureZeroMemory(&pvar->crypt_state.enc, sizeof(pvar->crypt_state.enc));
 	SecureZeroMemory(&pvar->crypt_state.dec, sizeof(pvar->crypt_state.dec));
