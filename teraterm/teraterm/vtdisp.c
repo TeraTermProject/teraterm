@@ -4579,6 +4579,8 @@ void BGSave(const BGTheme *bg_theme, const wchar_t *file)
 
 	WritePrivateProfileIntAFileW(BG_SECTION, "BGSrc2Alpha", bg_theme->BGSrc2.alpha, file);
 	WriteCOLORREF(BG_SECTION, "BGSrc2Color", file, bg_theme->BGSrc2.color);
+
+	WritePrivateProfileIntW(BG_SECTIONW, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
 }
 
 /**
@@ -4598,6 +4600,8 @@ void BGSet(const BGTheme *bg_theme)
 	BGSrc2.alpha = bg_theme->BGSrc2.alpha;
 	BGSrc2.color = bg_theme->BGSrc2.color;
 
+	BGReverseTextAlpha = bg_theme->BGReverseTextAlpha;
+
 	DecideBGEnable();
 }
 
@@ -4612,6 +4616,8 @@ void BGGet(BGTheme *bg_theme)
 
 	bg_theme->BGSrc2.alpha = BGSrc2.alpha;
 	bg_theme->BGSrc2.color = BGSrc2.color;
+
+	bg_theme->BGReverseTextAlpha = BGReverseTextAlpha;
 }
 
 /**
@@ -4646,7 +4652,7 @@ static void BGSaveColorANSI(TAnsiColorSetting *color, const wchar_t *fn)
 	for (i = 0; i < 16; i++) {
 		wchar_t color_str[32];
 		const COLORREF c = color->color[i];
-		swprintf(color_str, sizeof(color_str), L"%d,%d,%d, ", GetRValue(c), GetGValue(c), GetBValue(c));
+		swprintf(color_str, _countof(color_str), L"%d,%d,%d, ", GetRValue(c), GetGValue(c), GetBValue(c));
 		awcscat(&buff, color_str);
 	}
 

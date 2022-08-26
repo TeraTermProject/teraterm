@@ -138,7 +138,7 @@ static COLORREF GetDlgItemTextColor(HWND hDlg, int ID)
 
 static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 {
-	SendDlgItemMessage(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, (bg_theme->BGDest.type == BG_PICTURE) ? TRUE : FALSE, 0);
+	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, (bg_theme->BGDest.type == BG_PICTURE) ? TRUE : FALSE, 0);
 	SetDlgItemTextA(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file);
 	SetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT, bg_theme->BGDest.color);
 	{
@@ -152,15 +152,17 @@ static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 				break;
 			}
 		}
-		SendDlgItemMessage(hWnd, IDC_BGIMG_COMBO, CB_SETCURSEL, sel, 0);
+		SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_SETCURSEL, sel, 0);
 	}
 
-	SendDlgItemMessage(hWnd, IDC_WALLPAPER_CHECK, BM_SETCHECK, bg_theme->BGSrc1.alpha != 0, 0);
+	SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_SETCHECK, bg_theme->BGSrc1.alpha != 0, 0);
 	SetDlgItemInt(hWnd, IDC_WALLPAPER_ALPHA_EDIT, bg_theme->BGSrc1.alpha, FALSE);
 
-	SendDlgItemMessage(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_SETCHECK, bg_theme->BGSrc2.alpha != 0, 0);
+	SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_SETCHECK, bg_theme->BGSrc2.alpha != 0, 0);
 	SetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, bg_theme->BGSrc2.alpha, FALSE);
 	SetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR, bg_theme->BGSrc2.color);
+
+	SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGReverseTextAlpha);
 }
 
 static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
@@ -171,8 +173,8 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 	bg_theme->BGDest.type = checked & BST_CHECKED ? BG_PICTURE : BG_NONE;
 	GetDlgItemTextA(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file, sizeof(bg_theme->BGDest.file));
 	bg_theme->BGDest.color = GetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT);
-	index = SendDlgItemMessage(hWnd, IDC_BGIMG_COMBO, CB_GETCURSEL, 0, 0);
-	bg_theme->BGDest.pattern = (BG_PATTERN)SendDlgItemMessage(hWnd, IDC_BGIMG_COMBO, CB_GETITEMDATA, index, 0);
+	index = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETCURSEL, 0, 0);
+	bg_theme->BGDest.pattern = (BG_PATTERN)SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETITEMDATA, index, 0);
 
 	checked = SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_GETCHECK, 0, 0);
 	if (checked & BST_CHECKED) {
@@ -192,6 +194,8 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 		bg_theme->BGSrc2.alpha = 0;
 	}
 	bg_theme->BGSrc2.color = GetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR);
+
+	bg_theme->BGReverseTextAlpha = SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 }
 
 static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -224,6 +228,8 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				index = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_ADDSTRING, 0, (LPARAM)st->str);
 				SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_SETITEMDATA, index, st->id);
 			}
+
+			SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
 
 			ResetControls(hWnd, &dlg_data->bg_theme);
 			return TRUE;
@@ -555,7 +561,6 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 			case NM_RCLICK: {
 				static COLORREF CustColors[16];		// TODO 一時的な色保存必要?
 				int i = nmlist->iItem;
-				int j = nmlist->iSubItem;
 				CHOOSECOLORA cc = {};
 				cc.lStructSize = sizeof(cc);
 				cc.hwndOwner = hWnd;

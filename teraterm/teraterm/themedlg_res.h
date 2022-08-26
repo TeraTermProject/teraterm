@@ -11,6 +11,8 @@
 #define IDC_FILE_SAVE_BUTTON            2403
 #define IDC_FILE_SAVE_BG_CHECK          2404
 #define IDC_FILE_SAVE_COLOR_CHECK       2405
+#define IDC_REVERSE_TEXT_ALPHA_SLIDER   2406
+#define IDC_REVERSE_TEXT_ALPHA_TITLE    2407
 #define IDC_BG_THEME_HELP               2900
 #define IDC_BGIMG_BASE_TITLE            3000
 #define IDC_BGIMG_EDIT                  3001

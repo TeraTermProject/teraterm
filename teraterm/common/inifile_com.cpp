@@ -96,6 +96,16 @@ UINT GetPrivateProfileIntAFileW(const char *appA, const char *keyA, int def, con
 	return r;
 }
 
+BOOL WritePrivateProfileIntW(const wchar_t *app, const wchar_t *key, int val, const wchar_t *filenameW)
+{
+	// intでは12桁あればok			123456789012
+	// INT_MIN(int最小値)			-2147483648
+	// INT_MAX(int最大値)			2147483647
+	wchar_t str[16];
+	_snwprintf_s(str, _countof(str), _TRUNCATE, L"%d", val);
+	return WritePrivateProfileStringW(app, key, str, filenameW);
+}
+
 /**
  *	WritePrivateProfileIntA() のファイル名だけが wchar_t 版
  */

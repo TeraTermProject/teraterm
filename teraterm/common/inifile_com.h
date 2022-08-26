@@ -39,6 +39,7 @@ BOOL WritePrivateProfileStringAFileW(const char *appA, const char *keyA, const c
 UINT GetPrivateProfileIntAFileW(const char *appA, const char *keyA, int def, const wchar_t *filenameW);
 BOOL WritePrivateProfileIntAFileW(const char *appA, const char *keyA, int val, const wchar_t *filenameW);
 DWORD GetPrivateProfileSectionNamesAFileW(const char *lpszReturnBuffer, DWORD nSize, const wchar_t *filenameW);
+BOOL WritePrivateProfileIntW(const wchar_t *app, const wchar_t *key, int val, const wchar_t *filenameW);
 
 #ifdef __cplusplus
 }
