@@ -41,8 +41,6 @@ void BGLoadThemeFile(TTTSet *pts);
 void BGSetupPrimary(BOOL forceSetup);
 void BGWriteThemeFile(const wchar_t *theme_file);
 
-void BGExchangeColor(void);
-
 void BGOnSettingChange(void);
 void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(void);

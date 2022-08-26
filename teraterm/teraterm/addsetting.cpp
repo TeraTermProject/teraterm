@@ -1049,7 +1049,6 @@ void CVisualPropPageDlg::OnOK()
 {
 	int sel;
 	char buf[MAXPATHLEN];
-	COLORREF TmpColor;
 	int flag_changed = 0;
 
 	// (1)
@@ -1139,27 +1138,7 @@ void CVisualPropPageDlg::OnOK()
 	}
 
 	// (8) Attr Reverse Color
-	if (ts.ColorFlag & CF_REVERSEVIDEO) { // Reverse VideoÉÇÅ[Éh(DECSCNM)éûÇÕèàóùÇïœÇ¶ÇÈ
-		if (ts.ColorFlag & CF_REVERSECOLOR) {
-			if (!GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
-				TmpColor = ts.VTColor[0];
-				ts.VTColor[0] = ts.VTReverseColor[1];
-				ts.VTReverseColor[1] = ts.VTColor[1];
-				ts.VTColor[1] = ts.VTReverseColor[0];
-				ts.VTReverseColor[0] = TmpColor;
-				ts.ColorFlag ^= CF_REVERSECOLOR;
-			}
-		}
-		else if (GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
-			TmpColor = ts.VTColor[0];
-			ts.VTColor[0] = ts.VTReverseColor[0];
-			ts.VTReverseColor[0] = ts.VTColor[1];
-			ts.VTColor[1] = ts.VTReverseColor[1];
-			ts.VTReverseColor[1] = TmpColor;
-			ts.ColorFlag ^= CF_REVERSECOLOR;
-		}
-	}
-	else if (((ts.ColorFlag & CF_REVERSECOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
+	if (((ts.ColorFlag & CF_REVERSECOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
 		ts.ColorFlag ^= CF_REVERSECOLOR;
 	}
 

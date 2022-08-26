@@ -598,64 +598,21 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				}
 
 				for (i = 0 ; i <= 1 ; i++) {
-					if (ts->ColorFlag & CF_REVERSEVIDEO) {
-						//
-						// Reverse Videoモード(DECSCNMがon)の時
-						//
-						if (ts->ColorFlag & CF_REVERSECOLOR) {
-							//
-							// VTReverseColorが有効の時は
-							// VTColorとVTReverseColorを入れ替える
-							//
-							work->TmpColor[0][i*3]   = GetRValue(ts->VTReverseColor[i]);
-							work->TmpColor[0][i*3+1] = GetGValue(ts->VTReverseColor[i]);
-							work->TmpColor[0][i*3+2] = GetBValue(ts->VTReverseColor[i]);
-							work->TmpColor[3][i*3]   = GetRValue(ts->VTColor[i]);
-							work->TmpColor[3][i*3+1] = GetGValue(ts->VTColor[i]);
-							work->TmpColor[3][i*3+2] = GetBValue(ts->VTColor[i]);
-						}
-						else {
-							//
-							// VTReverseColorが無効の時は
-							// ・VTColorの文字色と背景色を入れ替える
-							// ・VTReverseColorはいじらない
-							//
-							work->TmpColor[0][i*3]   = GetRValue(ts->VTColor[!i]);
-							work->TmpColor[0][i*3+1] = GetGValue(ts->VTColor[!i]);
-							work->TmpColor[0][i*3+2] = GetBValue(ts->VTColor[!i]);
-						}
-						//
-						// 他の属性色は文字色と背景色を入れ替える
-						//
-						work->TmpColor[1][i*3]   = GetRValue(ts->VTBoldColor[!i]);
-						work->TmpColor[1][i*3+1] = GetGValue(ts->VTBoldColor[!i]);
-						work->TmpColor[1][i*3+2] = GetBValue(ts->VTBoldColor[!i]);
-						work->TmpColor[2][i*3]   = GetRValue(ts->VTBlinkColor[!i]);
-						work->TmpColor[2][i*3+1] = GetGValue(ts->VTBlinkColor[!i]);
-						work->TmpColor[2][i*3+2] = GetBValue(ts->VTBlinkColor[!i]);
-						work->TmpColor[4][i*3]   = GetRValue(ts->URLColor[!i]);
-						work->TmpColor[4][i*3+1] = GetGValue(ts->URLColor[!i]);
-						work->TmpColor[4][i*3+2] = GetBValue(ts->URLColor[!i]);
-					}
-					else {
-						work->TmpColor[0][i*3]   = GetRValue(ts->VTColor[i]);
-						work->TmpColor[0][i*3+1] = GetGValue(ts->VTColor[i]);
-						work->TmpColor[0][i*3+2] = GetBValue(ts->VTColor[i]);
-						work->TmpColor[1][i*3]   = GetRValue(ts->VTBoldColor[i]);
-						work->TmpColor[1][i*3+1] = GetGValue(ts->VTBoldColor[i]);
-						work->TmpColor[1][i*3+2] = GetBValue(ts->VTBoldColor[i]);
-						work->TmpColor[2][i*3]   = GetRValue(ts->VTBlinkColor[i]);
-						work->TmpColor[2][i*3+1] = GetGValue(ts->VTBlinkColor[i]);
-						work->TmpColor[2][i*3+2] = GetBValue(ts->VTBlinkColor[i]);
-						work->TmpColor[3][i*3]   = GetRValue(ts->VTReverseColor[i]);
-						work->TmpColor[3][i*3+1] = GetGValue(ts->VTReverseColor[i]);
-						work->TmpColor[3][i*3+2] = GetBValue(ts->VTReverseColor[i]);
-						/* begin - ishizaki */
-						work->TmpColor[4][i*3]   = GetRValue(ts->URLColor[i]);
-						work->TmpColor[4][i*3+1] = GetGValue(ts->URLColor[i]);
-						work->TmpColor[4][i*3+2] = GetBValue(ts->URLColor[i]);
-						/* end - ishizaki */
-					}
+					work->TmpColor[0][i*3]   = GetRValue(ts->VTColor[i]);
+					work->TmpColor[0][i*3+1] = GetGValue(ts->VTColor[i]);
+					work->TmpColor[0][i*3+2] = GetBValue(ts->VTColor[i]);
+					work->TmpColor[1][i*3]   = GetRValue(ts->VTBoldColor[i]);
+					work->TmpColor[1][i*3+1] = GetGValue(ts->VTBoldColor[i]);
+					work->TmpColor[1][i*3+2] = GetBValue(ts->VTBoldColor[i]);
+					work->TmpColor[2][i*3]   = GetRValue(ts->VTBlinkColor[i]);
+					work->TmpColor[2][i*3+1] = GetGValue(ts->VTBlinkColor[i]);
+					work->TmpColor[2][i*3+2] = GetBValue(ts->VTBlinkColor[i]);
+					work->TmpColor[3][i*3]   = GetRValue(ts->VTReverseColor[i]);
+					work->TmpColor[3][i*3+1] = GetGValue(ts->VTReverseColor[i]);
+					work->TmpColor[3][i*3+2] = GetBValue(ts->VTReverseColor[i]);
+					work->TmpColor[4][i*3]   = GetRValue(ts->URLColor[i]);
+					work->TmpColor[4][i*3+1] = GetGValue(ts->URLColor[i]);
+					work->TmpColor[4][i*3+2] = GetBValue(ts->URLColor[i]);
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
 				{
@@ -745,123 +702,34 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 									GetDlgItemInt(Dialog,IDC_WINSCROLL2,NULL,FALSE);
 							}
 							for (i = 0 ; i <= 1 ; i++) {
-								if (ts->ColorFlag & CF_REVERSEVIDEO) {
-									//
-									// Reverse Videoモード(DECSCNMがon)の時
-									//
-									if (ts->ColorFlag & CF_REVERSECOLOR) {
-										//
-										// VTReverseColorが有効の時は
-										// VTColorとVTReverseColorを入れ替える
-										//
-										ts->VTReverseColor[i] =
-											RGB(work->TmpColor[0][i*3],
-											    work->TmpColor[0][i*3+1],
-											    work->TmpColor[0][i*3+2]);
-										ts->VTColor[i] =
-											RGB(work->TmpColor[3][i*3],
-											    work->TmpColor[3][i*3+1],
-											    work->TmpColor[3][i*3+2]);
-									}
-									else {
-										//
-										// VTReverseColorが無効の時は
-										// ・VTColorの文字色と背景色を入れ替える
-										// ・VTReverseColorはいじらない
-										//
-										ts->VTColor[i] =
-											RGB(work->TmpColor[0][(!i)*3],
-											    work->TmpColor[0][(!i)*3+1],
-											    work->TmpColor[0][(!i)*3+2]);
-									}
-									//
-									// ・他の属性色は文字色と背景色を入れ替える
-									//
-									ts->VTBoldColor[i] =
-										RGB(work->TmpColor[1][(!i)*3],
-										    work->TmpColor[1][(!i)*3+1],
-										    work->TmpColor[1][(!i)*3+2]);
-									ts->VTBlinkColor[i] =
-										RGB(work->TmpColor[2][(!i)*3],
-										    work->TmpColor[2][(!i)*3+1],
-										    work->TmpColor[2][(!i)*3+2]);
-									ts->URLColor[i] =
-										RGB(work->TmpColor[4][(!i)*3],
-										    work->TmpColor[4][(!i)*3+1],
-										    work->TmpColor[4][(!i)*3+2]);
-								}
-								else {
-									ts->VTColor[i] =
-										RGB(work->TmpColor[0][i*3],
-										    work->TmpColor[0][i*3+1],
-										    work->TmpColor[0][i*3+2]);
-									ts->VTBoldColor[i] =
-										RGB(work->TmpColor[1][i*3],
-										    work->TmpColor[1][i*3+1],
-										    work->TmpColor[1][i*3+2]);
-									ts->VTBlinkColor[i] =
-										RGB(work->TmpColor[2][i*3],
-										    work->TmpColor[2][i*3+1],
-										    work->TmpColor[2][i*3+2]);
-									ts->VTReverseColor[i] =
-										RGB(work->TmpColor[3][i*3],
-										    work->TmpColor[3][i*3+1],
-										    work->TmpColor[3][i*3+2]);
-									/* begin - ishizaki */
-									ts->URLColor[i] =
-										RGB(work->TmpColor[4][i*3],
-										    work->TmpColor[4][i*3+1],
-										    work->TmpColor[4][i*3+2]);
-									/* end - ishizaki */
-								}
+								ts->VTColor[i] =
+									RGB(work->TmpColor[0][i*3],
+										work->TmpColor[0][i*3+1],
+										work->TmpColor[0][i*3+2]);
+								ts->VTBoldColor[i] =
+									RGB(work->TmpColor[1][i*3],
+										work->TmpColor[1][i*3+1],
+										work->TmpColor[1][i*3+2]);
+								ts->VTBlinkColor[i] =
+									RGB(work->TmpColor[2][i*3],
+										work->TmpColor[2][i*3+1],
+										work->TmpColor[2][i*3+2]);
+								ts->VTReverseColor[i] =
+									RGB(work->TmpColor[3][i*3],
+										work->TmpColor[3][i*3+1],
+										work->TmpColor[3][i*3+2]);
+								ts->URLColor[i] =
+									RGB(work->TmpColor[4][i*3],
+										work->TmpColor[4][i*3+1],
+										work->TmpColor[4][i*3+2]);
 								ts->VTColor[i] = GetNearestColor(DC,ts->VTColor[i]);
 								ts->VTBoldColor[i] = GetNearestColor(DC,ts->VTBoldColor[i]);
 								ts->VTBlinkColor[i] = GetNearestColor(DC,ts->VTBlinkColor[i]);
 								ts->VTReverseColor[i] = GetNearestColor(DC,ts->VTReverseColor[i]);
-								/* begin - ishizaki */
 								ts->URLColor[i] = GetNearestColor(DC,ts->URLColor[i]);
-								/* end - ishizaki */
 							}
 							GetRB(Dialog,&ts->UseNormalBGColor,
 							      IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
-#if 1
-							// 2006/03/11 by 337
-							if (ts->ColorFlag & CF_REVERSEVIDEO) {
-								if (ts->UseNormalBGColor) {
-									//
-									// Reverse Videoモード(DECSCNMがon)の時
-									//
-									if (ts->ColorFlag & CF_REVERSECOLOR) {
-										//
-										// VTReverseColorが有効の時は
-										// 文字色を反転背景色に合わせる
-										//
-										ts->VTBoldColor[0] =
-										ts->VTBlinkColor[0] =
-										ts->URLColor[0] =
-											ts->VTReverseColor[1];
-									}
-									else {
-										//
-										// VTReverseColorが無効の時は
-										// 文字色を通常文字色に合わせる
-										//
-										ts->VTBoldColor[0] =
-										ts->VTBlinkColor[0] =
-										ts->URLColor[0] =
-											ts->VTColor[0];
-									}
-								}
-							}
-							else {
-								if (ts->UseNormalBGColor) {
-									ts->VTBoldColor[1] =
-									ts->VTBlinkColor[1] =
-									ts->URLColor[1] =
-										ts->VTColor[1];
-								}
-							}
-#endif
 							GetRB(Dialog, &i, IDC_FONTBOLD, IDC_FONTBOLD);
 							if (i > 0) {
 								ts->FontFlag |= FF_BOLD;

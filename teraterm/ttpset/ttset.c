@@ -1613,13 +1613,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// UseNormalBGColor
 	ts->UseNormalBGColor =
 		GetOnOff(Section, "UseNormalBGColor", FName, FALSE);
-#if 1
-	// 2006/03/11 by 337
-	if (ts->UseNormalBGColor) {
-		ts->VTBoldColor[1] =
-			ts->VTBlinkColor[1] = ts->URLColor[1] = ts->VTColor[1];
-	}
-#endif
 
 	// AutoScrollOnlyInBottomLine
 	ts->AutoScrollOnlyInBottomLine =
@@ -2295,23 +2288,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* VT Color */
 	for (i = 0; i <= 1; i++) {
-		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			if (ts->ColorFlag & CF_REVERSECOLOR) {
-				TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
-				TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
-				TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
-			}
-			else {
-				TmpColor[0][i * 3] = GetRValue(ts->VTColor[!i]);
-				TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[!i]);
-				TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[!i]);
-			}
-		}
-		else {
-			TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
-		}
+		TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
 	}
 	WriteInt6(Section, "VTColor", FName,
 	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
@@ -2319,16 +2298,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* VT Bold Color */
 	for (i = 0; i <= 1; i++) {
-		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[!i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[!i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[!i]);
-		}
-		else {
-			TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[i]);
-		}
+		TmpColor[0][i * 3] = GetRValue(ts->VTBoldColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBoldColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBoldColor[i]);
 	}
 	WriteInt6(Section, "VTBoldColor", FName,
 	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
@@ -2336,16 +2308,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* VT Blink Color */
 	for (i = 0; i <= 1; i++) {
-		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[!i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[!i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[!i]);
-		}
-		else {
-			TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[i]);
-		}
+		TmpColor[0][i * 3] = GetRValue(ts->VTBlinkColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTBlinkColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTBlinkColor[i]);
 	}
 	WriteInt6(Section, "VTBlinkColor", FName,
 	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
@@ -2353,16 +2318,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* VT Reverse Color */
 	for (i = 0; i <= 1; i++) {
-		if (ts->ColorFlag & CF_REVERSEVIDEO && ts->ColorFlag & CF_REVERSECOLOR) {
-			TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
-		}
-		else {
-			TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
-		}
+		TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
 	}
 	WriteInt6(Section, "VTReverseColor", FName,
 	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
@@ -2373,16 +2331,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* URL color */
 	for (i = 0; i <= 1; i++) {
-		if (ts->ColorFlag & CF_REVERSEVIDEO) {
-			TmpColor[0][i * 3] = GetRValue(ts->URLColor[!i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[!i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[!i]);
-		}
-		else {
-			TmpColor[0][i * 3] = GetRValue(ts->URLColor[i]);
-			TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[i]);
-			TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[i]);
-		}
+		TmpColor[0][i * 3] = GetRValue(ts->URLColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->URLColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->URLColor[i]);
 	}
 	WriteInt6(Section, "URLColor", FName,
 	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],

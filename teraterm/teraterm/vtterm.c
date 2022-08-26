@@ -3060,41 +3060,13 @@ void CSGT(BYTE b)
 	}
 }
 
-void CSQExchangeColor()		// DECSCNM / Visual Bell
+// DECSCNM / Visual Bell
+static void CSQExchangeColor(void)
 {
-	COLORREF ColorRef;
-
 	BuffUpdateScroll();
-
-	if (ts.ColorFlag & CF_REVERSECOLOR) {
-		ColorRef = ts.VTColor[0];
-		ts.VTColor[0] = ts.VTReverseColor[0];
-		ts.VTReverseColor[0] = ColorRef;
-		ColorRef = ts.VTColor[1];
-		ts.VTColor[1] = ts.VTReverseColor[1];
-		ts.VTReverseColor[1] = ColorRef;
-	}
-	else {
-		ColorRef = ts.VTColor[0];
-		ts.VTColor[0] = ts.VTColor[1];
-		ts.VTColor[1] = ColorRef;
-	}
-
-	ColorRef = ts.VTBoldColor[0];
-	ts.VTBoldColor[0] = ts.VTBoldColor[1];
-	ts.VTBoldColor[1] = ColorRef;
-
-	ColorRef = ts.VTBlinkColor[0];
-	ts.VTBlinkColor[0] = ts.VTBlinkColor[1];
-	ts.VTBlinkColor[1] = ColorRef;
-
-	ColorRef = ts.URLColor[0];
-	ts.URLColor[0] = ts.URLColor[1];
-	ts.URLColor[1] = ColorRef;
 
 	ts.ColorFlag ^= CF_REVERSEVIDEO;
 
-	BGExchangeColor();
 	DispChangeBackground();
 	UpdateWindow(HVTWin);
 }

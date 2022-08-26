@@ -174,7 +174,7 @@ static COLORREF BGVTReverseColor[2];
 static COLORREF BGURLColor[2];	// URL色とUnderline属性色を兼用
 
 static RECT BGPrevRect;
-static BOOL BGReverseText;
+static BOOL BGReverseText;	// TRUEのとき、現在描画中の文字色のFG/BGが反転している
 
 static BOOL   BGInSizeMove;
 static HBRUSH BGBrushInSizeMove;
@@ -1632,37 +1632,6 @@ void BGLoadThemeFile(TTTSet *pts)
 	DecideBGEnable();
 }
 
-void BGExchangeColor() {
-	COLORREF ColorRef;
-      if (ts.ColorFlag & CF_REVERSECOLOR) {
-        ColorRef = BGVTColor[0];
-        BGVTColor[0] = BGVTReverseColor[0];
-        BGVTReverseColor[0] = ColorRef;
-        ColorRef = BGVTColor[1];
-        BGVTColor[1] = BGVTReverseColor[1];
-        BGVTReverseColor[1] = ColorRef;
-      }
-      else {
-        ColorRef = BGVTColor[0];
-        BGVTColor[0] = BGVTColor[1];
-        BGVTColor[1] = ColorRef;
-      }
-
-      ColorRef = BGVTBoldColor[0];
-      BGVTBoldColor[0] = BGVTBoldColor[1];
-      BGVTBoldColor[1] = ColorRef;
-
-      ColorRef = BGVTBlinkColor[0];
-      BGVTBlinkColor[0] = BGVTBlinkColor[1];
-      BGVTBlinkColor[1] = ColorRef;
-
-      ColorRef = BGURLColor[0];
-      BGURLColor[0] = BGURLColor[1];
-      BGURLColor[1] = ColorRef;
-
-//    BGReverseText = !BGReverseText;
-}
-
 static void BGFillRect(HDC hdc, RECT *R, HBRUSH brush)
 {
 	if (!BGEnable)
@@ -2543,153 +2512,193 @@ void DispReleaseDC(void)
   VTDC = NULL;
 }
 
-#define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
-#define isURLUnderlined(x) ((ts.FontFlag & FF_URLUNDERLINE) && ((x).Attr & AttrURL))
-#define isUnderlined(x) (/*(ts.ColorFlag & CF_UNDERLINE) &&*/ ((x).Attr & AttrUnder))
-#define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
-#define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
-#define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))
-#define isForeColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Fore))
-#define isBackColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Back))
-
 void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 // Setup device context
 //   Attr: character attributes
 //   Reverse: true if text is selected (reversed) by mouse
 {
-  COLORREF TextColor, BackColor;
-  int NoReverseColor = 2;
+	COLORREF TextColor, BackColor;
+	WORD AttrFlag;	// Attr + Flag
+	WORD Attr2Flag;	// Attr2 + Flag
+	BOOL reverse;
+	const BOOL use_normal_bg_color = ts.UseNormalBGColor;
 
-  if (VTDC==NULL)  DispInitDC();
+	if (VTDC == NULL)
+		DispInitDC();
 
-  if (TCharAttrCmp(DCAttr, Attr) == 0 && DCReverse == Reverse) {
-    return;
-  }
-  DCAttr = Attr;
-  DCReverse = Reverse;
-
-  SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | (isURLUnderlined(Attr)?AttrUnder:0)]);
-
-  if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-	if (isBlinkColored(Attr)) {
-	  TextColor = BGVTBlinkColor[0];
-	  BackColor = BGVTBlinkColor[1];
+	// 反転
+	reverse = FALSE;
+	if (Reverse) {
+		reverse = TRUE;
 	}
-	else if (isBoldColored(Attr)) {
-	  TextColor = BGVTBoldColor[0];
-	  BackColor = BGVTBoldColor[1];
+	if ((Attr.Attr & AttrReverse) != 0) {
+		reverse = reverse ? FALSE : TRUE;
 	}
-	else if (isUnderlined(Attr)) {
-	  TextColor = BGURLColor[0];
-	  BackColor = BGURLColor[1];
+	if ((ts.ColorFlag & CF_REVERSEVIDEO) != 0) {
+		reverse = reverse ? FALSE : TRUE;
 	}
-	else if (isURLColored(Attr)) {
-	  TextColor = BGURLColor[0];
-	  BackColor = BGURLColor[1];
+
+	if (TCharAttrCmp(DCAttr, Attr) == 0 && DCReverse == reverse) {
+		return;
+	}
+	DCAttr = Attr;
+	DCReverse = reverse;
+
+	// フォント設定
+	if ((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) {
+		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
 	}
 	else {
-	  if (isForeColored(Attr)) {
-		TextColor = ANSIColor[Attr.Fore];
-	  }
-	  else {
-		TextColor = BGVTColor[0];
-		NoReverseColor = 1;
-	  }
+		SelectObject(VTDC, VTFont[Attr.Attr & AttrFontMask]);
+	}
 
-	  if (isBackColored(Attr)) {
-		BackColor = ANSIColor[Attr.Back];
-	  }
-	  else {
-		BackColor = BGVTColor[1];
-		if (NoReverseColor == 1) {
-		  NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
+	// ts.ColorFlag と Attr を合成した Attr を作る
+	AttrFlag = 0;
+	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) ? AttrURL : 0;
+	AttrFlag |= (/*(ts.ColorFlag & CF_UNDERLINE) &&*/ (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) ? AttrBold : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) ? AttrBlink : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr.Attr & AttrReverse)) ? AttrReverse : 0;
+	Attr2Flag = 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) ? Attr2Fore : 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) ? Attr2Back : 0;
+
+	// 色を決定する
+	TextColor = BGVTColor[0];
+	BackColor = BGVTColor[1];
+	if ((AttrFlag & (AttrURL | AttrUnder | AttrBold | AttrBlink)) == 0) {
+		if (!reverse) {
+			TextColor = BGVTColor[0];
+			BackColor = BGVTColor[1];
 		}
-	  }
+		else {
+			TextColor = BGVTReverseColor[0];
+			BackColor = BGVTReverseColor[1];
+		}
+	} else if (AttrFlag & AttrBlink) {
+		if (!reverse) {
+			TextColor = BGVTBlinkColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGVTBlinkColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGVTBlinkColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGVTBlinkColor[0];
+		}
+	} else if (AttrFlag & AttrBold) {
+		if (!reverse) {
+			TextColor = BGVTBoldColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGVTBoldColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGVTBoldColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGVTBoldColor[0];
+		}
+	} else if (AttrFlag & AttrUnder) {
+		if (!reverse) {
+			TextColor = BGURLColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGURLColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGURLColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGURLColor[0];
+		}
+	} else if (AttrFlag & AttrURL) {
+		if (!reverse) {
+			TextColor = BGURLColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGURLColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGURLColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGURLColor[0];
+		}
 	}
-  }
-  else { // full color
-	if (isForeColored(Attr)) {
-	  if (Attr.Fore<8 && (ts.ColorFlag&CF_PCBOLD16)) {
-	    if (((Attr.Attr&AttrBold)!=0) == (Attr.Fore!=0)) {
-	      TextColor = ANSIColor[Attr.Fore];
-	    }
-	    else {
-	      TextColor = ANSIColor[Attr.Fore ^ 8];
-	    }
-	  }
-	  else if (Attr.Fore < 16 && (Attr.Fore&7) != 0) {
-	    TextColor = ANSIColor[Attr.Fore ^ 8];
-	  }
-	  else {
-	    TextColor = ANSIColor[Attr.Fore];
-	  }
-	}
-	else if (isBlinkColored(Attr))
-	  TextColor = BGVTBlinkColor[0];
-	else if (isBoldColored(Attr))
-	  TextColor = BGVTBoldColor[0];
-	else if (isUnderlined(Attr))
-	  TextColor = BGURLColor[0];
-	else if (isURLColored(Attr))
-	  TextColor = BGURLColor[0];
-	else {
-	  TextColor = BGVTColor[0];
-	  NoReverseColor = 1;
-	}
-	if (isBackColored(Attr)) {
-	  if (Attr.Back<8 && (ts.ColorFlag&CF_PCBOLD16)) {
-	    if (((Attr.Attr&AttrBlink)!=0) == (Attr.Back!=0)) {
-	      BackColor = ANSIColor[Attr.Back];
-	    }
-	    else {
-	      BackColor = ANSIColor[Attr.Back ^ 8];
-	    }
-	  }
-	  else if (Attr.Back < 16 && (Attr.Back&7) != 0) {
-	    BackColor = ANSIColor[Attr.Back ^ 8];
-	  }
-	  else {
-	    BackColor = ANSIColor[Attr.Back];
-	  }
-	}
-	else if (isBlinkColored(Attr))
-	  BackColor = BGVTBlinkColor[1];
-	else if (isBoldColored(Attr))
-	  BackColor = BGVTBoldColor[1];
-	else if (isUnderlined(Attr))
-	  BackColor = BGURLColor[1];
-	else if (isURLColored(Attr))
-	  BackColor = BGURLColor[1];
-	else {
-	  BackColor = BGVTColor[1];
-	  if (NoReverseColor == 1) {
-	    NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
-	  }
-	}
-  }
-#ifdef USE_NORMAL_BGCOLOR_REJECT
-  if (ts.UseNormalBGColor) {
-    BackColor = BGVTColor[1];
-  }
-#endif
 
-  if (Reverse != ((Attr.Attr & AttrReverse) != 0))
-  {
-    BGReverseText = TRUE;
-    if ((Attr.Attr & AttrReverse) && !NoReverseColor) {
-      SetTextColor(VTDC, BGVTReverseColor[0]);
-      SetBkColor(  VTDC, BGVTReverseColor[1]);
-    }
-    else {
-      SetTextColor(VTDC, BackColor);
-      SetBkColor(  VTDC, TextColor);
-    }
-  }
-  else {
-    BGReverseText = FALSE;
-    SetTextColor(VTDC,TextColor);
-    SetBkColor(  VTDC,BackColor);
-  }
+	if (Attr2Flag & Attr2Fore) {
+		if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
+			// 8色モード
+			TextColor = ANSIColor[Attr.Fore];
+		}
+		else {
+			// 16/256色
+			if (Attr.Fore < 8 && (ts.ColorFlag & CF_PCBOLD16)) {
+				if (((Attr.Attr & AttrBold) != 0) == (Attr.Fore != 0)) {
+					TextColor = ANSIColor[Attr.Fore];
+				}
+				else {
+					TextColor = ANSIColor[Attr.Fore ^ 8];
+				}
+			}
+			else if (Attr.Fore < 16 && (Attr.Fore & 7) != 0) {
+				TextColor = ANSIColor[Attr.Fore ^ 8];
+			}
+			else {
+				TextColor = ANSIColor[Attr.Fore];
+			}
+		}
+	}
+
+	if (Attr2Flag & Attr2Back) {
+		if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
+			// 8色モード
+			BackColor = ANSIColor[Attr.Back];
+		}
+		else {
+			// 16/256色
+			if (Attr.Back < 8 && (ts.ColorFlag & CF_PCBOLD16)) {
+				if (((Attr.Attr & AttrBlink) != 0) == (Attr.Back != 0)) {
+					BackColor = ANSIColor[Attr.Back];
+				}
+				else {
+					BackColor = ANSIColor[Attr.Back ^ 8];
+				}
+			}
+			else if (Attr.Back < 16 && (Attr.Back & 7) != 0) {
+				BackColor = ANSIColor[Attr.Back ^ 8];
+			}
+			else {
+				BackColor = ANSIColor[Attr.Back];
+			}
+		}
+	}
+
+	// 描画時(DrawStrW())に参照する
+	if (reverse) {
+		BGReverseText = TRUE;
+	}
+	else {
+		BGReverseText = FALSE;
+	}
+
+	SetTextColor(VTDC, TextColor);
+	SetBkColor(VTDC, BackColor);
 }
 
 /**
