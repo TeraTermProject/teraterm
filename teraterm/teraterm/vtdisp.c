@@ -2815,34 +2815,55 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
   }
 }
 
-static void DrawTextBGImage(HDC _hdcBGBuffer, int X, int Y, int width, int height)
+/**
+ * @brief •¶š‚Ì”wŒi‚ğì¬‚·‚é
+ *		hdc ‚É (0,0)-(width,height) ‚Ì•¶š”wŒi‚ğì¬‚·‚é
+ *		alpha‚Ì’l‚É‚æ‚Á‚Ä”wŒi‰æ‘œ(hdcBG)‚ğƒuƒŒƒ“ƒh‚·‚é
+ *
+ * @param hdc		ì¬‚·‚éhdc
+ * @param X			•¶šˆÊ’u(”wŒi‰æ‘œ‚ÌˆÊ’u)
+ * @param Y
+ * @param width		•¶šƒTƒCƒY
+ * @param height
+ * @param alpha		”wŒi‰æ‘œ‚Ì•s“§–¾“x 0..255
+ *						0=”wŒi‰æ‘œ‚ª‚»‚Ì‚Ü‚Ü“]‘—‚³‚ê‚é
+ *						255=”wŒi‚Í“§–¾(‰e‹¿‚È‚µ)
+ */
+static void DrawTextBGImage(HDC hdc, int X, int Y, int width, int height, unsigned char alpha)
 {
-	RECT  rect;
-	SetRect(&rect,0,0,width,height);
+	if (BGInSizeMove) {
+		// BGInSizeMove!=0(‘‹‚ÌˆÚ“®AƒŠƒTƒCƒY’†)
+		//   ”wŒi‚ğ BGBrushInSizeMove ‚Å“h‚è‚Â‚Ô‚·
+		RECT rect;
+		SetRect(&rect, 0, 0, width, height);
+		FillRect(hdc, &rect, BGBrushInSizeMove);
+	}
+	else if (alpha == 255) {
+		// •s“§–¾
+		//   ”wŒi‰æ‘œ‚ğ‚»‚Ì‚Ü‚Ü•¶š”wŒi‚É“]‘—
+		BitBlt(hdc, 0, 0, width, height, hdcBG, X, Y, SRCCOPY);
+	}
+	else {
+		// “§–¾
+		//   ((alpha)*•¶š‚Ì”wŒiF + (255-alpha)*”wŒi‰æ‘œ)/255 ‚ğ•¶š”wŒi‚Æ‚·‚é
+		RECT rect;
+		BLENDFUNCTION bf;
+		HBRUSH hbr;
 
-	//‘‹‚ÌˆÚ“®AƒŠƒTƒCƒY’†‚Í”wŒi‚ğ BGBrushInSizeMove ‚Å“h‚è‚Â‚Ô‚·
-	if(BGInSizeMove)
-		FillRect(_hdcBGBuffer,&rect,BGBrushInSizeMove);
+		// ”wŒi‰æ‘œ‚ğ•¶š”wŒi‚É“]‘—
+		BitBlt(hdc, 0, 0, width, height, hdcBG, X, Y, SRCCOPY);
 
-	BitBlt(_hdcBGBuffer,0,0,width,height,hdcBG,X,Y,SRCCOPY);
+		// ƒ[ƒN‚ğ”wŒiF‚Å“h‚è‚Â‚Ô‚µ
+		hbr = CreateSolidBrush(GetBkColor(hdc));
+		SetRect(&rect, 0, 0, width, height);
+		FillRect(hdcBGWork, &rect, hbr);
+		DeleteObject(hbr);
 
-	if(BGReverseText == TRUE)
-	{
-		if(BGReverseTextAlpha < 255)
-		{
-			BLENDFUNCTION bf;
-			HBRUSH hbr;
-
-			hbr = CreateSolidBrush(GetBkColor(_hdcBGBuffer));
-			FillRect(hdcBGWork,&rect,hbr);
-			DeleteObject(hbr);
-
-			ZeroMemory(&bf,sizeof(bf));
-			bf.BlendOp             = AC_SRC_OVER;
-			bf.SourceConstantAlpha = BGReverseTextAlpha;
-
-			BGAlphaBlend(_hdcBGBuffer,0,0,width,height,hdcBGWork,0,0,width,height,bf);
-		}
+		// ƒ[ƒN‚ğ“§–¾“xalpha‚Å“]‘—
+		ZeroMemory(&bf, sizeof(bf));
+		bf.BlendOp = AC_SRC_OVER;
+		bf.SourceConstantAlpha = alpha;
+		BGAlphaBlend(hdc, 0, 0, width, height, hdcBGWork, 0, 0, width, height, bf);
 	}
 }
 
@@ -2902,13 +2923,23 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
 		SetBkColor(BGDC, GetBkColor(DC));
 
 		// •¶š‚Ì”wŒi‚ğ•`‰æ
-		DrawTextBGImage(BGDC, *X, Y, width, height);
+		DrawTextBGImage(BGDC, *X, Y, width, height, BGReverseTextAlpha);
 
 		// •¶š‚ğ•`‰æ
-		eto_options = ETO_CLIPPED;
-		if (BGReverseText == TRUE && BGReverseTextAlpha < 255) {
-			eto_options |= ETO_OPAQUE;
+		eto_options = ETO_CLIPPED;	// •¶š•”•ª(face•”•ª)‚Ì‚İ•`‰æ
+		if (BGReverseText == TRUE) {
+			if (BGReverseTextAlpha < 255) {
+				DrawTextBGImage(BGDC, *X, Y, width, height, BGReverseTextAlpha);
+			}
+			else {
+				// •¶š‚Å–„‚Ü‚é‚Ì‚Å”wŒi•s—v
+				eto_options |= ETO_OPAQUE;	// ”wŒi‚à•`‰æ
+			}
+		} else {
+			DrawTextBGImage(BGDC, *X, Y, width, height, 255);
 		}
+
+		// •¶š‚ğ•`‰æ
 		ExtTextOutA(BGDC, ts.FontDX, ts.FontDY, eto_options, &rect, StrA, Count, &Dx[0]);
 
 		// Window‚É“\‚è•t‚¯
@@ -2981,13 +3012,20 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 		SetBkColor(BGDC, GetBkColor(DC));
 
 		// •¶š‚Ì”wŒi‚ğ•`‰æ
-		DrawTextBGImage(BGDC, *X, Y, width, height);
+		eto_options = ETO_CLIPPED;	// •¶š•”•ª(face•”•ª)‚Ì‚İ•`‰æ
+		if (BGReverseText == TRUE) {
+			if (BGReverseTextAlpha < 255) {
+				DrawTextBGImage(BGDC, *X, Y, width, height, BGReverseTextAlpha);
+			}
+			else {
+				// •¶š‚Å–„‚Ü‚é‚Ì‚Å”wŒi•s—v
+				eto_options |= ETO_OPAQUE;	// ”wŒi‚à•`‰æ
+			}
+		} else {
+			DrawTextBGImage(BGDC, *X, Y, width, height, 255);
+		}
 
 		// •¶š‚ğ•`‰æ
-		eto_options = ETO_CLIPPED;
-		if (BGReverseText == TRUE && BGReverseTextAlpha < 255) {
-			eto_options |= ETO_OPAQUE;
-		}
 		ExtTextOutW(BGDC, ts.FontDX, ts.FontDY, eto_options, &rect, StrW, Count, &Dx[0]);
 
 		// Window‚É“\‚è•t‚¯
