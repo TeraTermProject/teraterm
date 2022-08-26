@@ -500,6 +500,14 @@ MSG_INI_ERROR=Tera Term: Error
 MSG_INI_WRITE_ERROR=Cannot write ini file.
 
 
+; theme
+DLG_THEME_PREVIEW_FILE_TITLE=preview/file
+
+DLG_THEME_BG_TITLE=background image
+DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE=reverse text bg alpha
+
+DLG_THEME_COLOR_TITLE=text color
+
 [TTSSH]
 ; font
 DLG_TAHOMA_FONT=Tahoma,8,0

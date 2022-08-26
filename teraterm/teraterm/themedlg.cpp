@@ -195,7 +195,7 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 	}
 	bg_theme->BGSrc2.color = GetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR);
 
-	bg_theme->BGReverseTextAlpha = SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+	bg_theme->BGReverseTextAlpha = (int)SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 }
 
 static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -204,9 +204,14 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 	switch (msg) {
 		case WM_INITDIALOG: {
+			static const DlgTextInfo TextInfos[] = {
+				{ IDC_REVERSE_TEXT_ALPHA_TITLE, "DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE" },
+			};
 			int i;
 			dlg_data = (ThemeDlgData*)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
+
+			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
 			SetDlgItemTextW(hWnd, IDC_BG_THEME_HELP,
 							L"Mix order:\n"
@@ -319,12 +324,16 @@ static HPROPSHEETPAGE ThemeEditorCreate2(ThemeDlgData *dlg_data)
 	const int id = IDD_TABSHEET_THEME_EDITOR;
 	HINSTANCE inst = dlg_data->hInst;
 
+	wchar_t *title;
+	GetI18nStrWW("Tera Term", "DLG_THEME_BG_TITLE",
+				 L"Background", dlg_data->pts->UILanguageFileW, &title);
+
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = BGCallBack;
-	psp.pszTitle = L"Background(BG)";		// TODO lng ファイルに入れる
+	psp.pszTitle = title;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 	psp.dwFlags |= PSP_DLGINDIRECT;
 	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
@@ -332,7 +341,9 @@ static HPROPSHEETPAGE ThemeEditorCreate2(ThemeDlgData *dlg_data)
 	psp.pfnDlgProc = BGThemeProc;
 	psp.lParam = (LPARAM)dlg_data;
 
-	return CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	free(title);
+	return hpsp;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -632,12 +643,16 @@ static HPROPSHEETPAGE ColorThemeEditorCreate2(ThemeDlgData *dlg_data)
 	const int id = IDD_TABSHEET_COLOR_THEME_EDITOR;
 	HINSTANCE inst = dlg_data->hInst;
 
+	wchar_t *title;
+	GetI18nStrWW("Tera Term", "DLG_THEME_COLOR_TITLE",
+				 L"color", dlg_data->pts->UILanguageFileW, &title);
+
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = ColorCallBack;
-	psp.pszTitle = L"color";		// TODO lng ファイルに入れる
+	psp.pszTitle = title;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if 1
 	psp.dwFlags |= PSP_DLGINDIRECT;
@@ -648,6 +663,7 @@ static HPROPSHEETPAGE ColorThemeEditorCreate2(ThemeDlgData *dlg_data)
 	psp.lParam = (LPARAM)dlg_data;
 
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	free(title);
 	return hpsp;
 }
 
@@ -832,12 +848,16 @@ static HPROPSHEETPAGE ThemeEditorFile(ThemeDlgData* dlg_data)
 
 	HINSTANCE inst = dlg_data->hInst;
 
+	wchar_t *title;
+	GetI18nStrWW("Tera Term", "DLG_THEME_PREVIEW_FILE_TITLE",
+				 L"preview/file", dlg_data->pts->UILanguageFileW, &title);
+
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = FileCallBack;
-	psp.pszTitle = L"preview/file";		// TODO lng ファイルに入れる
+	psp.pszTitle = title;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if 1
 	psp.dwFlags |= PSP_DLGINDIRECT;
@@ -848,6 +868,7 @@ static HPROPSHEETPAGE ThemeEditorFile(ThemeDlgData* dlg_data)
 	psp.lParam = (LPARAM)dlg_data;
 
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	free(title);
 	return hpsp;
 }
 

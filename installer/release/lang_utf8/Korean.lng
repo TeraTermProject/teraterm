@@ -558,6 +558,14 @@ MSG_INI_ERROR=Tera Term: 오류
 MSG_INI_WRITE_ERROR=ini 파일을 저장할 수 없습니다.
 
 
+; theme
+DLG_THEME_PREVIEW_FILE_TITLE=preview/file
+
+DLG_THEME_BG_TITLE=background image
+DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE=reverse text bg alpha
+
+DLG_THEME_COLOR_TITLE=text color
+
 [TTSSH]
 ; font
 DLG_SYSTEM_FONT=굴림,10,128

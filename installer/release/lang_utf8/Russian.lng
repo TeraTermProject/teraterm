@@ -558,6 +558,14 @@ MSG_INI_ERROR=Tera Term: Ошибка
 MSG_INI_WRITE_ERROR=Не удается записать ini-файл.
 
 
+; theme
+DLG_THEME_PREVIEW_FILE_TITLE=preview/file
+
+DLG_THEME_BG_TITLE=background image
+DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE=reverse text bg alpha
+
+DLG_THEME_COLOR_TITLE=text color
+
 [TTSSH]
 ; font
 DLG_SYSTEM_FONT=System,14,0

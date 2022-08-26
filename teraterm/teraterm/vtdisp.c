@@ -4570,8 +4570,10 @@ void BGLoad(const wchar_t *file, BGTheme *bg_theme, TColorTheme *color_theme)
 void BGSave(const BGTheme *bg_theme, const wchar_t *file)
 {
 	WritePrivateProfileStringAFileW(BG_SECTION, BG_DESTFILE, bg_theme->BGDest.file, file);
+#if 0
 	WritePrivateProfileStringAFileW(BG_SECTION, "BGDestType",
 									bg_theme->BGDest.type == BG_PICTURE ? "picture" : "color", file);
+#endif
 	WriteCOLORREF(BG_SECTION, "BGDestColor", file, bg_theme->BGDest.color);
 	WritePrivateProfileStringAFileW(BG_SECTION, "BGDestPattern", GetBGPatternStr(bg_theme->BGDest.pattern), file);
 
