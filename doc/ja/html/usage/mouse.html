@@ -150,6 +150,48 @@ VT window
           CTRL キーを押しながらドロップした場合には、ふたたびダイアログが表示されます。
         </dd>
       </dl>
+      <table id="dialog_parameter" border="1">
+        <tr>
+          <th>項目</th>
+          <th>読み込み元・書き込み先</th>
+          <th>書き込まれる条件</th>
+        </tr>
+        <tr>
+          <td>Drop type (SCP/Send File/Paste Filename)</td>
+          <td>ダイアログの設定(メモリ上)</td>
+          <td>Do same process, next drop を on で確定したとき</td>
+        </tr>
+        <tr>
+          <td>SCP:<br />&nbsp;&nbsp;dest</td>
+          <td>Tera Term の設定 (TERATERM.INI の ScpSendDir に対応)</td>
+          <td>Drop type を SCP で確定したとき</td>
+        </tr>
+        <tr>
+          <td>Send File:<br />&nbsp;&nbsp;Binary</td>
+          <td>Tera Term の設定 (TERATERM.INI の TransBin に対応)</td>
+          <td>Drop type を Send File で確定したとき</td>
+        </tr>
+        <tr>
+          <td>Paste Filename:<br />&nbsp;&nbsp;Escape<br />&nbsp;&nbsp;Separator (Space/NewLine)</td>
+          <td>ダイアログの設定(メモリ上)</td>
+          <td>Drop type を Paste Filename で確定したとき</td>
+        </tr>
+        <tr>
+          <td>Do this for the next N files</td>
+          <td>なし</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Do same process, next drop</td>
+          <td>ダイアログの設定(メモリ上)</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Do not display this dialog, next drop</td>
+          <td>ダイアログの設定(メモリ上)</td>
+          <td></td>
+        </tr>
+      </table>
     </dd>
   </dl>
 </dd>
