@@ -144,6 +144,48 @@ VT window
           For example, when "Do same process, next drop" and SCP are selected, a folder is dropped. Next, when the action can not be done(needing confirmation) or dropping by using CTRL key pressing, the dialog is shown.
         </dd>
       </dl>
+      <table id="dialog_parameter" border="1">
+        <tr>
+          <th>item</th>
+          <th>read from / write to</th>
+          <th>condition of write</th>
+        </tr>
+        <tr>
+          <td>Drop type (SCP/Send File/Paste Filename)</td>
+          <td>Configuration of dialog (on memory)</td>
+          <td>When "Do same process, next drop" is "on" and proceeded.</td>
+        </tr>
+        <tr>
+          <td>SCP<br />&nbsp;&nbsp;dest</td>
+          <td>Configuration of Tera Term (ScpSendDir of TERATERM.INI)</td>
+          <td>When Drop type is "SCP" and proceeded.</td>
+        </tr>
+        <tr>
+          <td>Send File<br />&nbsp;&nbsp;Binary</td>
+          <td>Configuration of Tera Term (TransBin of TERATERM.INI)</td>
+          <td>When Drop type is "Send File" and proceeded.</td>
+        </tr>
+        <tr>
+          <td>Paste Filename<br />&nbsp;&nbsp;Escape<br />&nbsp;&nbsp;Separator (Space/NewLine)</td>
+          <td>Configuration of dialog (on memory)</td>
+          <td>When Drop type is "Paste Filename" and proceeded.</td>
+        </tr>
+        <tr>
+          <td>Do this for the next N files</td>
+          <td>none</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Do same process, next drop</td>
+          <td>Configuration of dialog (on memory)</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Do not display this dialog, next drop</td>
+          <td>Configuration of dialog (on memory)</td>
+          <td></td>
+        </tr>
+      </table>
     </dd>
   </dl>
 </dd>
