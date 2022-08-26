@@ -312,6 +312,14 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		CopyShmemToTTSet(&ts);
 	}
 
+	/* only the first instance uses saved position */
+	if (!isFirstInstance) {
+		ts.VTPos.x = CW_USEDEFAULT;
+		ts.VTPos.y = CW_USEDEFAULT;
+		ts.TEKPos.x = CW_USEDEFAULT;
+		ts.TEKPos.y = CW_USEDEFAULT;
+	}
+
 	InitKeyboard();
 	SetKeyMap();
 

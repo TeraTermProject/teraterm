@@ -198,13 +198,6 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 		// init window list
 		pm->NWin = 0;
 	}
-	else {
-		/* only the first instance uses saved position */
-		ts->VTPos.x = CW_USEDEFAULT;
-		ts->VTPos.y = CW_USEDEFAULT;
-		ts->TEKPos.x = CW_USEDEFAULT;
-		ts->TEKPos.y = CW_USEDEFAULT;
-	}
 
 	// if (FirstInstance) { ‚Ì•”•ª‚©‚çˆÚ“® (2008.3.13 maya)
 	// ‹N“®‚É‚ÍA‹¤—Lƒƒ‚ƒŠ‚Ì HomeDir ‚Æ SetupFName ‚Í‹ó‚É‚È‚é
