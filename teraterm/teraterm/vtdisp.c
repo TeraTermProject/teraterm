@@ -2644,11 +2644,22 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	if (Attr2Flag & Attr2Fore) {
 		if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 			// 8色モード
+			//		table index		default color
+			//		0    			黒,Black
+			//		1-7  			明るい色,原色 (Bright color)
 			TextColor = ANSIColor[Attr.Fore];
 		}
 		else {
 			// 16/256色
+			//	ANSIColor[] の 1-7 には明るい色、8-15 には少し暗い色が入っている
 			if (Attr.Fore < 8 && (ts.ColorFlag & CF_PCBOLD16)) {
+				//		Fore -> table index		default color
+				//	not Bold時
+				//		0    -> 0   (変化なし)	黒,Black
+				//		1-7  -> 9-15			少しくらい色
+				//	Bold時
+				//		0    -> 0   (変化なし)	黒,Black
+				//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
 				if (((Attr.Attr & AttrBold) != 0) == (Attr.Fore != 0)) {
 					TextColor = ANSIColor[Attr.Fore];
 				}
@@ -2656,11 +2667,20 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 					TextColor = ANSIColor[Attr.Fore ^ 8];
 				}
 			}
-			else if (Attr.Fore < 16 && (Attr.Fore & 7) != 0) {
-				TextColor = ANSIColor[Attr.Fore ^ 8];
-			}
 			else {
-				TextColor = ANSIColor[Attr.Fore];
+				//		Fore -> table index		default color
+				//		0    -> 0   (変化なし)	黒,Black
+				//		1-7  -> 9-15			少しくらい色
+				//		8    -> 8   (変化なし)	灰色, Bright Black(Gray)
+				//		9-15 -> 1-7				明るい色,原色 (Bright color)
+				//		16-  -> 16- (変化なし)
+				if (Attr.Fore < 16 && (Attr.Fore & 7) != 0) {
+					// Attr.Back が 1-7,9-15 のとき
+					TextColor = ANSIColor[Attr.Fore ^ 8];
+				}
+				else {
+					TextColor = ANSIColor[Attr.Fore];
+				}
 			}
 		}
 	}
@@ -2668,11 +2688,22 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	if (Attr2Flag & Attr2Back) {
 		if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 			// 8色モード
+			//		table index		default color
+			//		0    			黒,Black
+			//		1-7  			明るい色,原色 (Bright color)
 			BackColor = ANSIColor[Attr.Back];
 		}
 		else {
 			// 16/256色
+			//	ANSIColor[] の 1-7 には明るい色、8-15 には少し暗い色が入っている
 			if (Attr.Back < 8 && (ts.ColorFlag & CF_PCBOLD16)) {
+				//		Back -> table index		default color
+				//	not Bold時
+				//		0    -> 0   (変化なし)	黒,Black
+				//		1-7  -> 9-15			少しくらい色
+				//	Bold時
+				//		0    -> 0   (変化なし)	黒,Black
+				//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
 				if (((Attr.Attr & AttrBlink) != 0) == (Attr.Back != 0)) {
 					BackColor = ANSIColor[Attr.Back];
 				}
@@ -2680,11 +2711,20 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 					BackColor = ANSIColor[Attr.Back ^ 8];
 				}
 			}
-			else if (Attr.Back < 16 && (Attr.Back & 7) != 0) {
-				BackColor = ANSIColor[Attr.Back ^ 8];
-			}
 			else {
-				BackColor = ANSIColor[Attr.Back];
+				//		Back -> table index		default color
+				//		0    -> 0   (変化なし)	黒,Black
+				//		1-7  -> 9-15			少しくらい色
+				//		8    -> 8   (変化なし)	灰色, Bright Black(Gray)
+				//		9-15 -> 1-7				明るい色,原色 (Bright color)
+				//		16-  -> 16- (変化なし)
+				if (Attr.Back < 16 && (Attr.Back & 7) != 0) {
+					// Attr.Back が 1-7,9-15 のとき
+					BackColor = ANSIColor[Attr.Back ^ 8];
+				}
+				else {
+					BackColor = ANSIColor[Attr.Back];
+				}
 			}
 		}
 	}
