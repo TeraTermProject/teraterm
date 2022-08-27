@@ -2704,7 +2704,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 				//	Bold
 				//		0    -> 0   (•Ï‰»‚È‚µ)	•,Black
 				//		1-7  -> 1-7 (•Ï‰»‚È‚µ)	–¾‚é‚¢F,Œ´F (Bright color)
-				if (((Attr.Attr & AttrBlink) != 0) == (Attr.Back != 0)) {
+				if (((Attr.Attr & AttrBold) != 0) == (Attr.Back != 0)) {
 					BackColor = ANSIColor[Attr.Back];
 				}
 				else {
