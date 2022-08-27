@@ -2318,9 +2318,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* VT Reverse Color */
 	for (i = 0; i <= 1; i++) {
-		TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
-		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
-		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
+		TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
 	}
 	WriteInt6(Section, "VTReverseColor", FName,
 	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
