@@ -87,7 +87,7 @@ if (1) {
 
 	print "\x1b[0m";
 
-	print "3bit(8) and 4bit(16) color Standard\n";
+	print "3bit(8) Standard color / 4bit(16) Darker color\n";
 	print " FG: SGR 30..37 m  BG: SGR 40..47 m\n";
 	for ($f = 0; $f < 8; $f++) {
 		for ($b = 0; $b < 8; $b++) {
@@ -99,24 +99,50 @@ if (1) {
 	print "\x1b[0m";
 	print "\n";
 
-	print "aixterm 4bit(16) color bright\n";
-	print " FG: SGR 90..97 m  BG: SGR 100..107 m\n";
-	for ($f = 0; $f < 8; $f++) {
-		for ($b = 0; $b < 8; $b++) {
-			printf("\x1b[%d;%dm %3d/%3d ", $f + 90, $b + 100, $f + 90 , $b + 100);
+	if (1) {
+		print "aixterm 4bit(16) bright color\n";
+		print " FG: SGR 90..97 m  BG: SGR 100..107 m\n";
+		for ($f = 0; $f < 8; $f++) {
+			for ($b = 0; $b < 8; $b++) {
+				printf("\x1b[%d;%dm %3d/%3d ", $f + 90, $b + 100, $f + 90 , $b + 100);
+			}
+			print "\x1b[0m";
+			print "\n";
+		}
+	}
+
+	if (1) {
+		print "PC-Style 4bit(16) bright color\n";
+		print " FG: SGR 30..37 m  BG: SGR 40..47 m\n";
+		for ($f = 0; $f < 8; $f++) {
+			for ($b = 0; $b < 8; $b++) {
+				print "\x1b[1m";
+				printf("\x1b[%d;%dm %3d/%3d ", $f + 30, $b + 40, $f + 30, $b + 40);
+			}
+			print "\x1b[0m";
+			print "\n";
 		}
 		print "\x1b[0m";
 		print "\n";
 	}
 
-	print "PC 4bit(16) color bright\n";
-	print " FG: SGR 38 ; 5 ; n m  BG: 48 ; 5 ; n m (256color only)\n";
-	for ($f = 0; $f < 8; $f++) {
-		for ($b = 0; $b < 8; $b++) {
-			printf("\x1b[38;5;%dm\x1b[48;5;%dm %3d/%3d ", $f + 8 , $b + 8, $f + 8 , $b + 8);
+	if (1) {
+		print "PC 4bit(16) color\n";
+		print " FG: SGR 38 ; 5 ; n m  BG: 48 ; 5 ; n m (256color only)\n";
+		for ($f = 0; $f < 8; $f++) {
+			for ($b = 0; $b < 8; $b++) {
+				printf("\x1b[38;5;%dm\x1b[48;5;%dm %3d/%3d ", $f, $b, $f, $b);
+			}
+			print "\x1b[0m";
+			print "\n";
 		}
-		print "\x1b[0m";
-		print "\n";
+		for ($f = 0; $f < 8; $f++) {
+			for ($b = 0; $b < 8; $b++) {
+				printf("\x1b[38;5;%dm\x1b[48;5;%dm %3d/%3d ", $f + 8, $b + 8, $f + 8, $b + 8);
+			}
+			print "\x1b[0m";
+			print "\n";
+		}
 	}
 }
 
