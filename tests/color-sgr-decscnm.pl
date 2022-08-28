@@ -56,6 +56,11 @@ if (1) {
 	print "\x1b[0m";
 	print "\n";
 
+	print "\x1b[7m\x1b[31m\x1b[42m";
+	print "Reverse           / SGR 7 + SGR 31(FG Red) + SGR 42(BG Greed)";
+	print "\x1b[0m";
+	print "\n";
+
 	print "\x1b[1m\x1b[41m";
 	print "BOLD + BG RED     / SGR 1 + SGR 41(BG Red)";
 	print "\x1b[0m";
@@ -154,11 +159,11 @@ if (1) {
 if (1) {
 	print "==================== DECSCNM test\n";
 	for ($i = 0; $i < 50; $i++) {
-		sleep(1);
 		if (($i % 2) == 0) {
-			print "\x1b[?5h";
-		} else {
 			print "\x1b[?5l";
+		} else {
+			print "\x1b[?5h";
 		}
+		sleep(1);
 	}
 }
