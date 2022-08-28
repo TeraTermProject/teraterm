@@ -2641,6 +2641,12 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		}
 	}
 
+	/*
+	 *	ANSIColor[] の 1-7 には明るい色(原色)、8-15 には少し暗い色が入っている
+	 *	8色モードでは原色が使われる
+	 *	16色以上では 1-7 に標準色、8-15 に明るい色が必要なので、入れ替え処理をする
+	 */
+
 	if (Attr2Flag & Attr2Fore) {
 		if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 			// 8色モード
@@ -2651,12 +2657,12 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		}
 		else {
 			// 16/256色
-			//	ANSIColor[] の 1-7 には明るい色、8-15 には少し暗い色が入っている
 			if (Attr.Fore < 8 && (ts.ColorFlag & CF_PCBOLD16)) {
+				/* Bold のときは文字色を明るくしたいので入れ替えない */
 				//		Fore -> table index		default color
 				//	not Bold時
 				//		0    -> 0   (変化なし)	黒,Black
-				//		1-7  -> 9-15			少しくらい色
+				//		1-7  -> 9-15			少し暗い色
 				//	Bold時
 				//		0    -> 0   (変化なし)	黒,Black
 				//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
@@ -2670,12 +2676,12 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 			else {
 				//		Fore -> table index		default color
 				//		0    -> 0   (変化なし)	黒,Black
-				//		1-7  -> 9-15			少しくらい色
+				//		1-7  -> 9-15			少し暗い色
 				//		8    -> 8   (変化なし)	灰色, Bright Black(Gray)
 				//		9-15 -> 1-7				明るい色,原色 (Bright color)
 				//		16-  -> 16- (変化なし)
 				if (Attr.Fore < 16 && (Attr.Fore & 7) != 0) {
-					// Attr.Back が 1-7,9-15 のとき
+					// Attr.Fore が 1-7,9-15 のとき
 					TextColor = ANSIColor[Attr.Fore ^ 8];
 				}
 				else {
@@ -2695,12 +2701,12 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		}
 		else {
 			// 16/256色
-			//	ANSIColor[] の 1-7 には明るい色、8-15 には少し暗い色が入っている
 			if (Attr.Back < 8 && (ts.ColorFlag & CF_PCBOLD16)) {
+				/* Blink のときは背景色を明るくしたいので入れ替えない */
 				//		Back -> table index		default color
-				//	not Bold時
+				//	not Blink時
 				//		0    -> 0   (変化なし)	黒,Black
-				//		1-7  -> 9-15			少しくらい色
+				//		1-7  -> 9-15			少し暗い色
 				//	Bold時
 				//		0    -> 0   (変化なし)	黒,Black
 				//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
@@ -2714,7 +2720,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 			else {
 				//		Back -> table index		default color
 				//		0    -> 0   (変化なし)	黒,Black
-				//		1-7  -> 9-15			少しくらい色
+				//		1-7  -> 9-15			少し暗い色
 				//		8    -> 8   (変化なし)	灰色, Bright Black(Gray)
 				//		9-15 -> 1-7				明るい色,原色 (Bright color)
 				//		16-  -> 16- (変化なし)
