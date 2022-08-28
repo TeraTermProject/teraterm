@@ -2619,9 +2619,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* VT Reverse Color */
 	for (i = 0; i <= 1; i++) {
 		if (ts->ColorFlag & CF_REVERSEVIDEO && ts->ColorFlag & CF_REVERSECOLOR) {
-			ts->TmpColor[0][i * 3] = GetRValue(ts->VTColor[i]);
-			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTColor[i]);
-			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTColor[i]);
+			ts->TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
+			ts->TmpColor[0][i * 3 + 1] = GetGValue(ts->VTReverseColor[i]);
+			ts->TmpColor[0][i * 3 + 2] = GetBValue(ts->VTReverseColor[i]);
 		}
 		else {
 			ts->TmpColor[0][i * 3] = GetRValue(ts->VTReverseColor[i]);
