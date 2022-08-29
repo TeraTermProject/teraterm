@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+﻿#!/usr/bin/perl
 
 local $| = 1;
 
@@ -48,17 +48,17 @@ if (1) {
 	print "\n";
 
 	print "\x1b[0m\x1b[42m";
-	print "RED               / SGR 0 + SGR 42(BG Greed)";
+	print "RED               / SGR 0 + SGR 42(BG Green)";
 	print "\x1b[0m";
 	print "\n";
 
 	print "\x1b[31m\x1b[42m";
-	print "RED               / SGR 31(FG Red) + SGR 42(BG Greed)";
+	print "RED               / SGR 31(FG Red) + SGR 42(BG Green)";
 	print "\x1b[0m";
 	print "\n";
 
 	print "\x1b[7m\x1b[31m\x1b[42m";
-	print "Reverse           / SGR 7 + SGR 31(FG Red) + SGR 42(BG Greed)";
+	print "Reverse           / SGR 7 + SGR 31(FG Red) + SGR 42(BG Green)";
 	print "\x1b[0m";
 	print "\n";
 
