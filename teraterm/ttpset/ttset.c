@@ -839,8 +839,21 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "EnableURLColor", FName, TRUE))
 		ts->ColorFlag |= CF_URLCOLOR;
 
+	/* Underline */
 	if (GetOnOff(Section, "URLUnderline", FName, TRUE))
 		ts->FontFlag |= FF_URLUNDERLINE;
+	if (GetOnOff(Section, "UnderlineAttrFont", FName, TRUE))
+		ts->FontFlag |= FF_UNDERLINE;
+	if (GetOnOff(Section, "UnderlineAttrColor", FName, TRUE))
+		ts->ColorFlag |= CF_UNDERLINE;
+	GetPrivateProfileString(Section, "UnderlineColor", "39,170,233,128,128,128",
+	                        Temp, sizeof(Temp), FName);
+	for (i = 0; i <= 5; i++)
+		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
+	for (i = 0; i <= 1; i++)
+		ts->VTUnderlineColor[i] = RGB((BYTE) TmpColor[0][i * 3],
+									  (BYTE) TmpColor[0][i * 3 + 1],
+									  (BYTE) TmpColor[0][i * 3 + 2]);
 
 	/* TEK Color */
 	GetPrivateProfileString(Section, "TEKColor", "0,0,0,255,255,255",
@@ -2328,6 +2341,20 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	WriteOnOff(Section, "EnableClickableUrl", FName,
 	           ts->EnableClickableUrl);
+
+	/* Underline */
+	WriteOnOff(Section, "UnderlineAttrFont", FName,
+	           (WORD) (ts->FontFlag |= FF_URLUNDERLINE));
+	WriteOnOff(Section, "UnderlineAttrColor", FName,
+	           (WORD) (ts->ColorFlag |= CF_UNDERLINE));
+	for (i = 0; i <= 1; i++) {
+		TmpColor[0][i * 3] = GetRValue(ts->VTUnderlineColor[i]);
+		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTUnderlineColor[i]);
+		TmpColor[0][i * 3 + 2] = GetBValue(ts->VTUnderlineColor[i]);
+	}
+	WriteInt6(Section, "VTUnderlineColor", FName,
+	          TmpColor[0][0], TmpColor[0][1], TmpColor[0][2],
+	          TmpColor[0][3], TmpColor[0][4], TmpColor[0][5]);
 
 	/* URL color */
 	for (i = 0; i <= 1; i++) {

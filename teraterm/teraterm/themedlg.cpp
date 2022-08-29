@@ -356,6 +356,8 @@ static struct {
 	{ L"VTColor Back", RGB(0,0,0) },
 	{ L"VTBoldColor Fore", RGB(0,0,0) },
 	{ L"VTBoldColor Back", RGB(0,0,0) },
+	{ L"VTUnderlineColor Fore", RGB(0,0,0) },
+	{ L"VTUnderlineColor Back", RGB(0,0,0) },
 	{ L"VTBlinkColor Fore", RGB(0,0,0) },
 	{ L"VTBlinkColor Back", RGB(0,0,0) },
 	{ L"VTReverseColor Fore", RGB(0,0,0) },
@@ -386,14 +388,16 @@ static void SetColor(const TColorTheme *data)
 	list[1].color = data->vt.bg;
 	list[2].color = data->bold.fg;
 	list[3].color = data->bold.bg;
-	list[4].color = data->blink.fg;
-	list[5].color = data->blink.bg;
-	list[6].color = data->reverse.fg;
-	list[7].color = data->reverse.bg;
-	list[8].color = data->url.fg;
-	list[9].color = data->url.bg;
+	list[4].color = data->underline.fg;
+	list[5].color = data->underline.bg;
+	list[6].color = data->blink.fg;
+	list[7].color = data->blink.bg;
+	list[8].color = data->reverse.fg;
+	list[9].color = data->reverse.bg;
+	list[10].color = data->url.fg;
+	list[11].color = data->url.bg;
 	for (int i = 0; i < 16; i++) {
-		list[10+i].color = data->ansicolor.color[i];
+		list[12+i].color = data->ansicolor.color[i];
 	}
 }
 
@@ -403,14 +407,16 @@ static void RestoreColor(TColorTheme *data)
 	data->vt.bg = list[1].color;
 	data->bold.fg = list[2].color;
 	data->bold.bg = list[3].color;
-	data->blink.fg = list[4].color;
-	data->blink.bg = list[5].color;
-	data->reverse.fg = list[6].color;
-	data->reverse.bg = list[7].color;
-	data->url.fg = list[8].color;
-	data->url.bg = list[9].color;
+	data->underline.fg = list[4].color;
+	data->underline.bg = list[5].color;
+	data->blink.fg = list[6].color;
+	data->blink.bg = list[7].color;
+	data->reverse.fg = list[8].color;
+	data->reverse.bg = list[9].color;
+	data->url.fg = list[10].color;
+	data->url.bg = list[11].color;
 	for (int i = 0; i < 16; i++) {
-		data->ansicolor.color[i] = list[10+i].color;
+		data->ansicolor.color[i] = list[12+i].color;
 	}
 }
 

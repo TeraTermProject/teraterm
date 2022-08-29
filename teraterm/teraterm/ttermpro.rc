@@ -169,23 +169,29 @@ BEGIN
     EDITTEXT        IDC_COLOR_BLUE,69,140,19,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "SAMPLE",IDC_SAMPLE_COLOR,90,125,25,8
     CONTROL         "Enable B&old attribute color",IDC_ENABLE_ATTR_COLOR_BOLD,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,96,105,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,97,147,12
     CONTROL         "Enable B&link attribute color",IDC_ENABLE_ATTR_COLOR_BLINK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,109,105,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,109,147,12
     CONTROL         "Enable Re&verse attribute color",IDC_ENABLE_ATTR_COLOR_REVERSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,121,105,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,121,147,12
     CONTROL         "Enable &URL attribute color",IDC_ENABLE_URL_COLOR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,133,105,12
-    CONTROL         "Enable A&NSI color",IDC_ENABLE_ANSI_COLOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,145,105,12
-    CONTROL         "Un&derline URL string",IDC_URL_UNDERLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,157,105,12
-    LTEXT           "(*)Need to Save setup and restart Tera Term",IDC_RESTART,94,180,177,8,NOT WS_VISIBLE | WS_DISABLED
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,133,147,12
+    CONTROL         "Enable A&NSI color",IDC_ENABLE_ANSI_COLOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,145,147,12
+    CONTROL         "Un&derline URL string",IDC_URL_UNDERLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,157,147,12
+    CONTROL         "Enable Underline attribute color",IDC_ENABLE_ATTR_UNDERLINE_COLOR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,169,147,12
+    CONTROL         "Enable Underline attribute font",IDC_ENABLE_ATTR_UNDERLINE_FONT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,181,147,12
+    CONTROL         "Enable Bold attribute font",IDC_ENABLE_ATTR_FONT_BOLD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,193,147,12
+    LTEXT           "(*)Need to Save setup and restart Tera Term",IDC_RESTART,154,228,177,8,NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "Theme Editor",IDC_THEME_EDITOR_BUTTON,5,171,50,14
     CONTROL         "FastSizeMove",IDC_CHECK_FAST_SIZE_MOVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,188,105,12
     CONTROL         "FlickerLessMove",IDC_CHECK_FLICKER_LESS_MOVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,200,105,12
     COMBOBOX        IDC_THEME_FILE,14,229,120,55,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_THEME_EDIT,14,245,269,14,ES_AUTOHSCROLL
     GROUPBOX        "theme at startup ",IDC_STATIC,5,219,313,48
     PUSHBUTTON      "...",IDC_THEME_BUTTON,287,245,14,14
-    PUSHBUTTON      "Theme Editor",IDC_THEME_EDITOR_BUTTON,5,171,50,14
 END
 
 IDD_TABSHEET_LOG DIALOGEX 0, 0, 258, 188
@@ -398,6 +404,8 @@ BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 331
         VERTGUIDE, 48
+        VERTGUIDE, 125
+        VERTGUIDE, 272
         TOPMARGIN, 5
         BOTTOMMARGIN, 279
     END

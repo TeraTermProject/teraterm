@@ -78,9 +78,10 @@ typedef struct {
 typedef struct {
 	char name[50];
 	TColorSetting vt;
-	TColorSetting bold;
-	TColorSetting blink;
-	TColorSetting reverse;
+	TColorSetting bold;			// SGR 1
+	TColorSetting underline;	// SGR 4
+	TColorSetting blink;		// SGR 5
+	TColorSetting reverse;		// SGR 7
 	TColorSetting url;
 	TAnsiColorSetting ansicolor;
 } TColorTheme;

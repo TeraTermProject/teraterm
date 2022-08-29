@@ -752,6 +752,7 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (6)Bold Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_BOLD, (ts.ColorFlag&CF_BOLDCOLOR) != 0);
+	SetCheck(IDC_ENABLE_ATTR_FONT_BOLD, (ts.FontFlag&FF_BOLD) != 0);
 
 	// (7)Blink Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_BLINK, (ts.ColorFlag&CF_BLINKCOLOR) != 0);
@@ -759,14 +760,16 @@ void CVisualPropPageDlg::OnInitDialog()
 	// (8)Reverse Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE, (ts.ColorFlag&CF_REVERSECOLOR) != 0);
 
-	// (9)URL Color
+	// Underline Attr
+	SetCheck(IDC_ENABLE_ATTR_UNDERLINE_COLOR, (ts.ColorFlag&CF_UNDERLINE) != 0);
+	SetCheck(IDC_ENABLE_ATTR_UNDERLINE_FONT, (ts.FontFlag&FF_UNDERLINE) != 0);
+
+	// URL Underline Attr
 	SetCheck(IDC_ENABLE_URL_COLOR, (ts.ColorFlag&CF_URLCOLOR) != 0);
-
-	// (10)Color
-	SetCheck(IDC_ENABLE_ANSI_COLOR, (ts.ColorFlag&CF_ANSICOLOR) != 0);
-
-	// (11)URL Underline
 	SetCheck(IDC_URL_UNDERLINE, (ts.FontFlag&FF_URLUNDERLINE) != 0);
+
+	// Color
+	SetCheck(IDC_ENABLE_ANSI_COLOR, (ts.ColorFlag&CF_ANSICOLOR) != 0);
 
 	SetCheck(IDC_CHECK_FAST_SIZE_MOVE, ts.EtermLookfeel.BGFastSizeMove != 0);
 	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
@@ -1131,6 +1134,9 @@ void CVisualPropPageDlg::OnOK()
 	if (((ts.ColorFlag & CF_BOLDCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BOLD)) {
 		ts.ColorFlag ^= CF_BOLDCOLOR;
 	}
+	if (((ts.FontFlag & FF_BOLD) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_BOLD)) {
+		ts.FontFlag ^= FF_BOLD;
+	}
 
 	// (7) Attr Blink Color
 	if (((ts.ColorFlag & CF_BLINKCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BLINK)) {
@@ -1142,19 +1148,25 @@ void CVisualPropPageDlg::OnOK()
 		ts.ColorFlag ^= CF_REVERSECOLOR;
 	}
 
-	// (9) URL Color
+	// Underline Attr
+	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_UNDERLINE_FONT)) {
+		ts.FontFlag ^= FF_UNDERLINE;
+	}
+	if (((ts.ColorFlag & CF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_UNDERLINE_COLOR)) {
+		ts.ColorFlag ^= CF_UNDERLINE;
+	}
+
+	// URL Underline Attr
+	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_URL_UNDERLINE)) {
+		ts.FontFlag ^= FF_URLUNDERLINE;
+	}
 	if (((ts.ColorFlag & CF_URLCOLOR) != 0) != GetCheck(IDC_ENABLE_URL_COLOR)) {
 		ts.ColorFlag ^= CF_URLCOLOR;
 	}
 
-	// (10) Color
+	// Color
 	if (((ts.ColorFlag & CF_ANSICOLOR) != 0) != GetCheck(IDC_ENABLE_ANSI_COLOR)) {
 		ts.ColorFlag ^= CF_ANSICOLOR;
-	}
-
-	// (11) URL Underline
-	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_URL_UNDERLINE)) {
-		ts.FontFlag ^= FF_URLUNDERLINE;
 	}
 
 	ts.EtermLookfeel.BGFastSizeMove = GetCheck(IDC_CHECK_FAST_SIZE_MOVE);

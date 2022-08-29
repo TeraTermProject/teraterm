@@ -220,12 +220,13 @@ enum LogTimestampType {
 
 #define CF_USETEXTCOLOR 256
 #define CF_REVERSEVIDEO 512
+#define CF_UNDERLINE	1024
 
 // Font flags (used in ts.FontFlag)
 #define FF_BOLD         1
 #define FF_FAINT        2   // Not used
 #define FF_ITALIC       4   // Not used
-#define FF_UNDERLINE    8   // Not used
+#define FF_UNDERLINE    8
 #define FF_BLINK        16  // Not used
 #define FF_RAPIDBLINK   32  // Not used
 #define FF_REVERSE      64  // Not used
@@ -430,9 +431,7 @@ struct tttset {
 	WORD TEKColorEmu;
 	COLORREF VTColor[2];
 	COLORREF TEKColor[2];
-	/* begin - ishizaki */
 	COLORREF URLColor[2];
-	/* end   - ishizaki */
 	COLORREF VTBoldColor[2];       // SGR 1
 	COLORREF VTFaintColor[2];      // SGR 2
 	COLORREF VTItalicColor[2];     // SGR 3

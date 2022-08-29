@@ -169,9 +169,10 @@ static int  BGReverseTextAlpha;
 
 static COLORREF BGVTColor[2];
 static COLORREF BGVTBoldColor[2];
+static COLORREF BGVTUnderlineColor[2];	// SGR 4
 static COLORREF BGVTBlinkColor[2];
 static COLORREF BGVTReverseColor[2];
-static COLORREF BGURLColor[2];	// URL色とUnderline属性色を兼用
+static COLORREF BGURLColor[2];			// URL属性色
 
 static RECT BGPrevRect;
 static BOOL BGReverseText;	// TRUEのとき、現在描画中の文字色のFG/BGが反転している
@@ -1376,6 +1377,9 @@ static void BGReadTextColorConfig(const wchar_t *file)
 	BGVTBoldColor[0] = BGGetColor("VTBoldFore", BGVTBoldColor[0], file);
 	BGVTBoldColor[1] = BGGetColor("VTBoldBack", BGVTBoldColor[1], file);
 
+	BGVTUnderlineColor[0] = BGGetColor("VTUnderlineFore", BGVTUnderlineColor[0], file);
+	BGVTUnderlineColor[1] = BGGetColor("VTUnderlineBack", BGVTUnderlineColor[1], file);
+
 	BGVTReverseColor[0] = BGGetColor("VTReverseFore", BGVTReverseColor[0], file);
 	BGVTReverseColor[1] = BGGetColor("VTReverseBack", BGVTReverseColor[1], file);
 
@@ -1497,6 +1501,9 @@ static void BGSetDefaultColor(TTTSet *pts)
 
 	BGVTBoldColor[0] = pts->VTBoldColor[0];
 	BGVTBoldColor[1] = pts->VTBoldColor[1];
+
+	BGVTUnderlineColor[0] = pts->VTUnderlineColor[0];
+	BGVTUnderlineColor[1] = pts->VTUnderlineColor[1];
 
 	BGVTBlinkColor[0] = pts->VTBlinkColor[0];
 	BGVTBlinkColor[1] = pts->VTBlinkColor[1];
@@ -1964,7 +1971,7 @@ void ChangeFont(void)
 	}
 
 	/* Underline */
-	if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
 		VTlf.lfUnderline = 1;
 		VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
 	}
@@ -1979,7 +1986,7 @@ void ChangeFont(void)
 		VTFont[AttrBold] = CreateFontIndirect(&VTlf);
 
 		/* Bold + Underline */
-		if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 			VTlf.lfUnderline = 1;
 			VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
 		}
@@ -2003,7 +2010,7 @@ void ChangeFont(void)
 	VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
 
 	/* Special font (Underline) */
-	if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+	if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 		VTlf.lfUnderline = 1;
 		VTlf.lfHeight = FontHeight - 1; // adjust for underline
 		VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
@@ -2020,7 +2027,7 @@ void ChangeFont(void)
 		VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
 
 		/* Special font (Bold + Underline) */
-		if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 			VTlf.lfUnderline = 1;
 			VTlf.lfHeight = FontHeight - 1; // adjust for underline
 			VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
@@ -2632,17 +2639,18 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	DCReverse = reverse;
 
 	// フォント設定
-	if ((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) {
+	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
+		((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
 		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
 	}
 	else {
-		SelectObject(VTDC, VTFont[Attr.Attr & AttrFontMask]);
+		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
 
 	// ts.ColorFlag と Attr を合成した Attr を作る
 	AttrFlag = 0;
 	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) ? AttrURL : 0;
-	AttrFlag |= (/*(ts.ColorFlag & CF_UNDERLINE) &&*/ (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
 	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) ? AttrBold : 0;
 	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) ? AttrBlink : 0;
 	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr.Attr & AttrReverse)) ? AttrReverse : 0;
@@ -2696,7 +2704,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		}
 	} else if (AttrFlag & AttrUnder) {
 		if (!reverse) {
-			TextColor = BGURLColor[0];
+			TextColor = BGVTUnderlineColor[0];
 			if (!use_normal_bg_color) {
 				BackColor = BGURLColor[1];
 			} else {
@@ -2708,7 +2716,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 			} else {
 				TextColor = BGVTColor[1];
 			}
-			BackColor = BGURLColor[0];
+			BackColor = BGVTUnderlineColor[0];
 		}
 	} else if (AttrFlag & AttrURL) {
 		if (!reverse) {
@@ -3958,6 +3966,8 @@ void GetColorData(TColorTheme *data)
 	data->vt.bg = BGVTColor[1];
 	data->bold.fg = BGVTBoldColor[0];
 	data->bold.bg = BGVTBoldColor[1];
+	data->underline.fg = BGVTUnderlineColor[0];
+	data->underline.bg = BGVTUnderlineColor[1];
 	data->blink.fg = BGVTBlinkColor[0];
 	data->blink.bg = BGVTBlinkColor[1];
 	data->reverse.fg = BGVTReverseColor[0];
@@ -3977,6 +3987,8 @@ void BGSetColorData(const TColorTheme *data)
 	BGVTColor[1] = data->vt.bg;
 	BGVTBoldColor[0] = data->bold.fg;
 	BGVTBoldColor[1] = data->bold.bg;
+	BGVTUnderlineColor[0] = data->underline.fg;
+	BGVTUnderlineColor[1] = data->underline.bg;
 	BGVTBlinkColor[0] = data->blink.fg;
 	BGVTBlinkColor[1] = data->blink.bg;
 	BGVTReverseColor[0] = data->reverse.fg;
