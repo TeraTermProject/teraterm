@@ -1,4 +1,4 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 
 local $| = 1;
 
@@ -167,4 +167,5 @@ if (1) {
 		}
 		sleep(1);
 	}
+	print "\x1b[?5l";
 }
