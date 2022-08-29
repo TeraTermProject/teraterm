@@ -1977,9 +1977,15 @@ void ChangeFont(void)
 		VTlf.lfUnderline = 0;
 		VTlf.lfWeight = FW_BOLD;
 		VTFont[AttrBold] = CreateFontIndirect(&VTlf);
+
 		/* Bold + Underline */
-		VTlf.lfUnderline = 1;
-		VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+		if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+			VTlf.lfUnderline = 1;
+			VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+		}
+		else {
+			VTFont[AttrBold | AttrUnder] = VTFont[AttrBold];
+		}
 	}
 	else {
 		VTFont[AttrBold] = VTFont[AttrDefault];
@@ -1997,9 +2003,14 @@ void ChangeFont(void)
 	VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
 
 	/* Special font (Underline) */
-	VTlf.lfUnderline = 1;
-	VTlf.lfHeight = FontHeight - 1; // adjust for underline
-	VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
+	if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+		VTlf.lfUnderline = 1;
+		VTlf.lfHeight = FontHeight - 1; // adjust for underline
+		VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
+	}
+	else {
+		VTFont[AttrSpecial | AttrUnder] = VTFont[AttrSpecial];
+	}
 
 	if (ts.FontFlag & FF_BOLD) {
 		/* Special font (Bold) */
@@ -2007,10 +2018,16 @@ void ChangeFont(void)
 		VTlf.lfHeight = FontHeight;
 		VTlf.lfWeight = FW_BOLD;
 		VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
+
 		/* Special font (Bold + Underline) */
-		VTlf.lfUnderline = 1;
-		VTlf.lfHeight = FontHeight - 1; // adjust for underline
-		VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+		if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
+			VTlf.lfUnderline = 1;
+			VTlf.lfHeight = FontHeight - 1; // adjust for underline
+			VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+		}
+		else {
+			VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrBold];
+		}
 	}
 	else {
 		VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
