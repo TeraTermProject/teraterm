@@ -1964,7 +1964,7 @@ void ChangeFont(void)
 	}
 
 	/* Underline */
-	if (ts.FontFlag & FF_URLUNDERLINE) {
+	if (/*ts.FontFlag & FF_UNDERLINE*/ 1 || ts.FontFlag & FF_URLUNDERLINE) {
 		VTlf.lfUnderline = 1;
 		VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
 	}
