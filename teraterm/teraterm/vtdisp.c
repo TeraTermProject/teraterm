@@ -2515,9 +2515,9 @@ void DispReleaseDC(void)
 /**
  * シーケンスのcolor_indexをANSIColor[]のindexへ変換する
  *
- * ANSIColor[] の 1-7 には明るい色(原色)、8-15 には少し暗い色が入っている
+ * ANSIColor[] の 1-7 には明るい色(原色)、9-15 には少し暗い色が入っている
  * 8色モードでは原色が使われる
- * 16色以上では 1-7 に標準色、8-15 に明るい色が必要なので、入れ替え処理をする
+ * 16色以上では 1-7 に標準色、9-15 に明るい色が必要なので、入れ替え処理をする
  *
  * @param color_index
  * @param pcbold16				0/0以外 = 16 color mode PC Styleではない/である
@@ -2537,7 +2537,6 @@ static int Get256ColorIndex(int color_index, int pcbold16, int pcbold16_bright)
 	else {
 		// 16/256色
 		if (color_index < 8 && (pcbold16 != 0)) {
-			/* bright のときは文字色を明るくしたいので入れ替えない */
 			//		index-> table index		default color
 			//	not bright時
 			//		0    -> 0   (変化なし)	黒,Black
@@ -2545,6 +2544,13 @@ static int Get256ColorIndex(int color_index, int pcbold16, int pcbold16_bright)
 			//	bright時
 			//		0    -> 0   (変化なし)	黒,Black
 			//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
+			/*
+			 * PC-style
+			 *   Bold 属性と文字色属性の組み合わせで明るい文字色を表す
+			 *   Blink 属性と背景色属性の組み合わせで明るい背景色を表す
+			 * そのため CF_PCBOLD16 が有効で pcbold16_bright が true のときは入れ替えない
+			 * この組み合わせで明るい色を表すのは PC-style だけ
+			 */
 			if ((pcbold16_bright != 0) == (color_index != 0)) {
 				table_index = color_index;
 			}
@@ -2556,9 +2562,14 @@ static int Get256ColorIndex(int color_index, int pcbold16, int pcbold16_bright)
 			//		index-> table index		default color
 			//		0    -> 0   (変化なし)	黒,Black
 			//		1-7  -> 9-15			少し暗い色
-			//		8    -> 8   (変化なし)	灰色, Bright Black(Gray)
+			//		8    -> 8   (変化なし)	灰色, Bright Black (Gray)
 			//		9-15 -> 1-7				明るい色,原色 (Bright color)
 			//		16-  -> 16- (変化なし)
+			/*
+			 * 9-15 は常に入れ替えられる
+			 *   CF_PCBOLD16 が有効で pcbold16_bright が true のときは 1-7 も 9-15 も明るい色になるが、
+			 *   9-15 は PC-style によるものではないので、明るい色でよい
+			 */
 			if (color_index < 16 && (color_index & 7) != 0) {
 				// color_index が 1-7,9-15 のとき
 				table_index = color_index ^ 8;
