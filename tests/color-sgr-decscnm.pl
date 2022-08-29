@@ -1,4 +1,5 @@
-﻿
+#!/usr/bin/perl
+
 local $| = 1;
 
 print "\x1b[0m";
