@@ -1946,7 +1946,7 @@ void ChangeFont(void)
 
 	/* Normal Font */
 	SetLogFont(&VTlf, TRUE);
-	VTFont[0] = CreateFontIndirect(&VTlf);
+	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
 
 	/* set IME font */
 	SetConversionLogFont(HVTWin, &VTlf);
@@ -1955,7 +1955,7 @@ void ChangeFont(void)
 		HDC TmpDC = GetDC(HVTWin);
 		TEXTMETRIC Metrics;
 
-		SelectObject(TmpDC, VTFont[0]);
+		SelectObject(TmpDC, VTFont[AttrDefault]);
 		GetTextMetrics(TmpDC, &Metrics);
 		FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
 		FontHeight = Metrics.tmHeight + ts.FontDH;
@@ -1969,7 +1969,7 @@ void ChangeFont(void)
 		VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
 	}
 	else {
-		VTFont[AttrUnder] = VTFont[0];
+		VTFont[AttrUnder] = VTFont[AttrDefault];
 	}
 
 	if (ts.FontFlag & FF_BOLD) {
