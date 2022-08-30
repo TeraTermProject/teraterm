@@ -846,7 +846,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->FontFlag |= FF_UNDERLINE;
 	if (GetOnOff(Section, "UnderlineAttrColor", FName, TRUE))
 		ts->ColorFlag |= CF_UNDERLINE;
-	GetPrivateProfileString(Section, "UnderlineColor", "39,170,233,128,128,128",
+	GetPrivateProfileString(Section, "VTUnderlineColor", "39,170,233,128,128,128",
 	                        Temp, sizeof(Temp), FName);
 	for (i = 0; i <= 5; i++)
 		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
