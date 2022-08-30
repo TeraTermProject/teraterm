@@ -2706,13 +2706,13 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		if (!reverse) {
 			TextColor = BGVTUnderlineColor[0];
 			if (!use_normal_bg_color) {
-				BackColor = BGURLColor[1];
+				BackColor = BGVTUnderlineColor[1];
 			} else {
 				BackColor = BGVTColor[1];
 			}
 		} else {
 			if (!use_normal_bg_color) {
-				TextColor = BGURLColor[1];
+				TextColor = BGVTUnderlineColor[1];
 			} else {
 				TextColor = BGVTColor[1];
 			}
