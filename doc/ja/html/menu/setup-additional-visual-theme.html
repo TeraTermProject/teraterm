@@ -179,15 +179,17 @@ wget https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/color-sgr-d
 
     <h3 id="default_color">デフォルト色について</h3>
 
-    デフォルト色は TERATERM.INI の次のキーワードで設定できる
-    <ul>
-      <li>VTColor
-      <li>VTBoldColor
-      <li>VTBlinkColor
-      <li>VTReverseColor
-      <li>URLColor
-      <li>ANSIColor
-    </ul>
+    デフォルト色とフォントは TERATERM.INI の次のキーワードで設定できる
+<pre>
+| Attr \ ini    | font on/off       | color on/off           | color(R,G,B,R,G,B) |
+|---------------|-------------------|------------------------|--------------------|
+| Normal        | -                 | -                      | VTColor            |
+| Bold          | EnableBold        | EnableBoldAttrColor    | VTBoldColor        |
+| Blink         | -                 | EnableBlinkAttrColor   | VTBlinkColor       |
+| Reverse       | -                 | EnableReverseAttrColor | VTReverseColor     |
+| URL Underline | URLUnderline      | EnableURLColor         | URLColor           |
+| Underline     | UnderlineAttrFont | UnderlineAttrColor     | VTUnderlineColor   |
+</pre>
 
   </body>
 </html>
