@@ -2610,6 +2610,28 @@ void DispReleaseDC()
 #define isForeColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Fore))
 #define isBackColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Back))
 
+/**
+ * 文字色・背景色を設定する
+ *   シーケンスの色番号から ANSIColor[] の色を得る処理が含まれる
+ *
+ * ANSIColor[] の 0-7 には原色(明るい色)、8-15 には少し暗い色が入っている
+ *   0: Black   8: Gray (Bright Black)
+ * 
+ * 8色モードでは原色が使われる
+ * 16色以上では 0-7 が標準色、8-15 が明るい色になるので、1-7 と 9-15 を入れ替える
+ *   (8 は明るいので入れ替えなくてよい)
+ *
+ * PC-style 16 colors
+ *   Bold 属性と文字色属性(0-7)の組み合わせで明るい文字色を表す
+ *   Blink 属性と背景色属性(0-7)の組み合わせで明るい背景色を表す
+ * - そのため CF_PCBOLD16 が有効で、文字色が Bold のとき・背景色が Blink のときは
+ * 原色(明るい色)になるよう 1-7 は入れ替えない。
+ * - CF_PCBOLD16 が無効なときには 1-7 を入れ替える。
+ *   この組み合わせで明るい色を表すのは PC-style だけなので入れ替える。
+ * - 9-15 は常に入れ替える。
+ *   CF_PCBOLD16 が有効で、文字色が Bold のとき・背景色が Blink のときは 1-7 も 9-15 も
+ * 明るい色になるが、9-15 は他の拡張モードで使われる。
+ */
 void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 // Setup device context
 //   Attr: character attributes
