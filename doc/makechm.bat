@@ -10,16 +10,27 @@ if exist "%Programfiles%\HTML Help Workshop\hhc.exe" (
 set HELP_COMPILER="%Programfiles%\HTML Help Workshop\hhc.exe"
 )
 
+if defined SystemRoot (
+    set FIND=%SystemRoot%\system32\find.exe
+    set CHCP=%SystemRoot%\system32\chcp.com
+) else (
+    set FIND=find.exe
+    set CHCP=chcp.exe
+)
+
 set updated=
 
 CALL convtext.bat
 
 REM Check Japanese version Windows
-if not "%APPVEYOR%" == "True" (
-    chcp | find "932" > NUL
-    if ERRORLEVEL 1 goto English
-)
+if "%APPVEYOR%" == "True" goto JA
+%CHCP% | %FIND% "932" > NUL
+if NOT ERRORLEVEL 1 goto JA
+%CHCP% | %FIND% "65001" > NUL
+if NOT ERRORLEVEL 1 goto JA
+goto English
 
+:JA
 for /f "delims=" %%i in ('perl htmlhelp_update_check.pl ja teratermj.chm') do @set updated=%%i
 if "%updated%"=="updated" (
 perl htmlhelp_index_make.pl ja html -o ja\Index.hhk
