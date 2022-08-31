@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-13)
+﻿; Updated by TeraTerm Project (2022-08-31)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -245,12 +245,15 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SIカラー
 DLG_TAB_VISUAL_RED=赤(&R)
 DLG_TAB_VISUAL_GREEN=緑(&G)
 DLG_TAB_VISUAL_BLUE=青(&B)
-DLG_TAB_VISUAL_BOLD=高輝度属性色を有効にする(&O)
+DLG_TAB_VISUAL_BOLD_COLOR=高輝度属性色を有効にする(&O)
+DLG_TAB_VISUAL_BOLD_FONT=高輝度属性フォントを有効にする
 DLG_TAB_VISUAL_BLINK=点滅属性色を有効にする(&L)
 DLG_TAB_VISUAL_REVERSE=反転属性色を有効にする(&V)
-DLG_TAB_VISUAL_URL=URL属性色を有効にする(&U)
+DLG_TAB_VISUAL_UNDERLINE_COLOR=下線属性色を有効にする
+DLG_TAB_VISUAL_UNDERLINE_FONT=下線属性に下線を付加する
+DLG_TAB_VISUAL_URL_COLOR=URL属性色を有効にする(&U)
+DLG_TAB_VISUAL_URL_FONT=URL文字列に下線を付加する(&U)
 DLG_TAB_VISUAL_ANSI=ANSIカラーを有効にする(&N)
-DLG_TAB_VISUAL_URLUL=URL文字列に下線を付加する(&D)
 DLG_TAB_VISUAL_RESTART=(*)設定の保存とTera Termの再起動が必要
 
 DLG_TAB_LOG_EDITOR=ログ表示用エディタ(&E)

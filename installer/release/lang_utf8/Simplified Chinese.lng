@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-13)
+﻿; Updated by TeraTerm Project (2022-08-31)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -246,12 +246,15 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI色
 DLG_TAB_VISUAL_RED=红(&R)
 DLG_TAB_VISUAL_GREEN=绿(&G)
 DLG_TAB_VISUAL_BLUE=蓝(&B)
-DLG_TAB_VISUAL_BOLD=启用高亮颜色属性(&O)
+DLG_TAB_VISUAL_BOLD_COLOR=启用高亮颜色属性(&O)
+DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=启用闪烁颜色属性(&L)
 DLG_TAB_VISUAL_REVERSE=启用反转颜色属性(&V)
-DLG_TAB_VISUAL_URL=启用链接颜色属性(&U)
+DLG_TAB_VISUAL_URL_COLOR=启用链接颜色属性(&U)
+DLG_TAB_VISUAL_URL_FONT=链接添加下划线(&D)
+DLG_TAB_VISUAL_URL_COLOR=Enable &URL attribute color
+DLG_TAB_VISUAL_URL_FONT=Enable &URL attribute font
 DLG_TAB_VISUAL_ANSI=启用ANSI色(&N)
-DLG_TAB_VISUAL_URLUL=链接添加下划线(&D)
 DLG_TAB_VISUAL_RESTART=(*)需要保存配置并重启 Tera Term
 
 DLG_TAB_LOG_EDITOR=日志编辑器(&E)

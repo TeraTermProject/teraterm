@@ -529,10 +529,6 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDC_FONTBOLD, "DLG_WIN_BOLDFONT" },
 		{ IDC_WINHIDETITLE, "DLG_WIN_HIDETITLE" },
 		{ IDC_WINHIDEMENU, "DLG_WIN_HIDEMENU" },
-		{ IDC_WINCOLOREMU, "DLG_WIN_COLOREMU" },		// "Color emulation"
-#if 0
-		{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },		// "16 Colors (PC style)"
-#endif
 		{ IDC_WINAIXTERM16, "DLG_WIN_AIXTERM16" },
 		{ IDC_WINXTERM256, "DLG_WIN_XTERM256" },
 		{ IDC_WINSCROLL1, "DLG_WIN_SCROLL1" },
@@ -564,6 +560,18 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			ts = work->ts;
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
+			{
+				// VTWin‚ÆTEKWin‚Åƒ‰ƒxƒ‹‚ªˆÙ‚È‚Á‚Ä‚¢‚é
+				static const DlgTextInfo TextInfosVT[] = {
+					{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },
+				};
+				static const DlgTextInfo TextInfosTEK[] = {
+					{ IDC_WINCOLOREMU, "DLG_WIN_COLOREMU" },
+				};
+				const DlgTextInfo *TextInfosVTTEK = (work->VTFlag>0) ? TextInfosVT : TextInfosTEK;
+				SetDlgTextsW(Dialog, TextInfosVTTEK, 1, ts->UILanguageFileW);
+			}
+
 			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
 			SendDlgItemMessage(Dialog, IDC_WINTITLE, EM_LIMITTEXT,
 			                   sizeof(ts->Title)-1, 0);
@@ -578,11 +586,6 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			}
 
 			if (work->VTFlag>0) {
-				wchar_t *uimsg;
-				GetI18nStrWW("Tera Term", "DLG_WIN_PCBOLD16", L"&16 Colors (PC style)", ts->UILanguageFileW, &uimsg);
-				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU, uimsg);
-				free(uimsg);
-
 				SetRB(Dialog, (ts->ColorFlag&CF_PCBOLD16)!=0, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
 				SetRB(Dialog, (ts->ColorFlag&CF_AIXTERM16)!=0, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
 				SetRB(Dialog, (ts->ColorFlag&CF_XTERM256)!=0,IDC_WINXTERM256,IDC_WINXTERM256);

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-13)
+﻿; Updated by TeraTerm Project (2022-08-31)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -246,12 +246,15 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI 색상
 DLG_TAB_VISUAL_RED=빨강(&R)
 DLG_TAB_VISUAL_GREEN=초록(&G)
 DLG_TAB_VISUAL_BLUE=블루(&B)
-DLG_TAB_VISUAL_BOLD=굵기 속성 활성화(&O)
+DLG_TAB_VISUAL_BOLD_COLOR=굵기 속성 활성화(&O)
+DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=반짝임 속성 활성화(&L)
 DLG_TAB_VISUAL_REVERSE=반전 속성 색상 활성화(&V)
-DLG_TAB_VISUAL_URL=URL 속성 활성화(&U)
+DLG_TAB_VISUAL_UNDERLINE_COLOR=Enable Underline attribute color
+DLG_TAB_VISUAL_UNDERLINE_FONT=Enable Underline attribute font
+DLG_TAB_VISUAL_URL_COLOR=URL 속성 활성화(&U)
+DLG_TAB_VISUAL_URL_FONT=밑줄 URL 문자열(&D)
 DLG_TAB_VISUAL_ANSI=ANSI 색상 활성화(&N)
-DLG_TAB_VISUAL_URLUL=밑줄 URL 문자열(&D)
 DLG_TAB_VISUAL_RESTART=(*)설정을 저장하고 Tera Term을 재시작해야 합니다.
 
 DLG_TAB_LOG_EDITOR=로그보기 에디터(&E)
