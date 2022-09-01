@@ -114,6 +114,7 @@ add_executable(
   debug_pp.cpp
   debug_pp.h
   debug_pp.rc
+  debug_pp_res.h
   sendfiledlg.cpp
   sendfiledlg.h
   #

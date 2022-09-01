@@ -650,9 +650,6 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_ALPHABLEND, "DLG_TAB_VISUAL_ALPHA" },
 		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE" },
 		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE" },
-		{ IDC_MIXED_THEME_FILE, "DLG_TAB_VISUAL_BGMIXED_THEMEFILE" },
-		{ IDC_BGIMG_CHECK, "DLG_TAB_VISUAL_BGIMG" },
-		{ IDC_BGIMG_BRIGHTNESS, "DLG_TAB_VISUAL_BGIMG_BRIGHTNESS" },
 		{ IDC_MOUSE, "DLG_TAB_VISUAL_MOUSE" },
 		{ IDC_FONT_QUALITY_LABEL, "DLG_TAB_VISUAL_FONT_QUALITY" },
 		{ IDC_ANSICOLOR, "DLG_TAB_VISUAL_ANSICOLOR" },
@@ -668,10 +665,6 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_ENABLE_ATTR_COLOR_URL, "DLG_TAB_VISUAL_URL_COLOR" },			// URL Attribute
 		{ IDC_ENABLE_ATTR_FONT_URL, "DLG_TAB_VISUAL_URL_FONT" },
 		{ IDC_ENABLE_ANSI_COLOR, "DLG_TAB_VISUAL_ANSI" },
-#if 0
-		{ IDC_ETERM_LOOKFEEL, "DLG_TAB_VISUAL_ETERM" },
-		{ IDC_RESTART, "DLG_TAB_VISUAL_RESTART" },
-#endif
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -848,77 +841,51 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	int sel;
 
 	switch (wParam) {
-	case IDC_THEME_EDITOR_BUTTON | (BN_CLICKED << 16): {
-		ThemeDialog(m_hInst, m_hWnd, &cv);
-		break;
-	}
-	case IDC_THEME_FILE | (CBN_SELCHANGE << 16): {
-		int r = GetCurSel(IDC_THEME_FILE);
-		// 固定のとき、ファイル名を入力できるようにする
-		BOOL enable = (r == 1) ? TRUE : FALSE;
-		EnableDlgItem(IDC_THEME_EDIT, enable);
-		EnableDlgItem(IDC_THEME_BUTTON, enable);
-		break;
-	}
-	case IDC_THEME_BUTTON | (BN_CLICKED << 16): {
-		// テーマファイルを選択する
-		OPENFILENAMEW ofn = {};
-		wchar_t szFile[MAX_PATH];
-		wchar_t *curdir;
-		wchar_t *theme_dir;
-		hGetCurrentDirectoryW(&curdir);
-
-		if (GetFileAttributesW(ts.EtermLookfeel.BGThemeFileW) != INVALID_FILE_ATTRIBUTES) {
-			wcsncpy_s(szFile, _countof(szFile), ts.EtermLookfeel.BGThemeFileW, _TRUNCATE);
-		} else {
-			szFile[0] = 0;
+		case IDC_THEME_EDITOR_BUTTON | (BN_CLICKED << 16): {
+			ThemeDialog(m_hInst, m_hWnd, &cv);
+			break;
 		}
-
-		aswprintf(&theme_dir, L"%s\\theme", ts.HomeDirW);
-
-		ofn.lStructSize = get_OPENFILENAME_SIZEW();
-		ofn.hwndOwner = GetSafeHwnd();
-		ofn.lpstrFilter = L"Theme Files(*.ini)\0*.ini\0All Files(*.*)\0*.*\0";
-		ofn.lpstrFile = szFile;
-		ofn.nMaxFile = _countof(szFile);
-		ofn.lpstrTitle = L"select theme file";
-		ofn.lpstrInitialDir = theme_dir;
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-		BOOL ok = GetOpenFileNameW(&ofn);
-		SetCurrentDirectoryW(curdir);
-		free(curdir);
-		free(theme_dir);
-		if (ok) {
-			SetDlgItemTextW(IDC_THEME_EDIT, szFile);
+		case IDC_THEME_FILE | (CBN_SELCHANGE << 16): {
+			int r = GetCurSel(IDC_THEME_FILE);
+			// 固定のとき、ファイル名を入力できるようにする
+			BOOL enable = (r == 1) ? TRUE : FALSE;
+			EnableDlgItem(IDC_THEME_EDIT, enable);
+			EnableDlgItem(IDC_THEME_BUTTON, enable);
+			break;
 		}
-		return TRUE;
-	}
+		case IDC_THEME_BUTTON | (BN_CLICKED << 16): {
+			// テーマファイルを選択する
+			OPENFILENAMEW ofn = {};
+			wchar_t szFile[MAX_PATH];
+			wchar_t *curdir;
+			wchar_t *theme_dir;
+			hGetCurrentDirectoryW(&curdir);
 
-		case IDC_BGIMG_BUTTON | (BN_CLICKED << 16):
-			// 背景画像をダイアログで指定する。
-			{
-				OPENFILENAMEW ofn;
-				wchar_t szFile[MAX_PATH];
-				wchar_t *curdir;
-				hGetCurrentDirectoryW(&curdir);
+			if (GetFileAttributesW(ts.EtermLookfeel.BGThemeFileW) != INVALID_FILE_ATTRIBUTES) {
+				wcsncpy_s(szFile, _countof(szFile), ts.EtermLookfeel.BGThemeFileW, _TRUNCATE);
+			} else {
+				szFile[0] = 0;
+			}
 
-				memset(&ofn, 0, sizeof(ofn));
-				memset(szFile, 0, sizeof(szFile));
-				ofn.lStructSize = get_OPENFILENAME_SIZEW();
-				ofn.hwndOwner = GetSafeHwnd();
-				ofn.lpstrFilter = L"Image Files(*.jpg;*.jpeg;*.bmp)\0*.jpg;*.jpeg;*.bmp\0All Files(*.*)\0*.*\0";
-				ofn.lpstrFile = szFile;
-				ofn.nMaxFile = _countof(szFile);
-				ofn.lpstrTitle = L"select image file";
-				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				BOOL ok = GetOpenFileNameW(&ofn);
-				SetCurrentDirectoryW(curdir);
-				free(curdir);
-				if (ok) {
-					SetDlgItemTextW(IDC_BGIMG_EDIT, szFile);
-				}
+			aswprintf(&theme_dir, L"%s\\theme", ts.HomeDirW);
+
+			ofn.lStructSize = get_OPENFILENAME_SIZEW();
+			ofn.hwndOwner = GetSafeHwnd();
+			ofn.lpstrFilter = L"Theme Files(*.ini)\0*.ini\0All Files(*.*)\0*.*\0";
+			ofn.lpstrFile = szFile;
+			ofn.nMaxFile = _countof(szFile);
+			ofn.lpstrTitle = L"select theme file";
+			ofn.lpstrInitialDir = theme_dir;
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			BOOL ok = GetOpenFileNameW(&ofn);
+			SetCurrentDirectoryW(curdir);
+			free(curdir);
+			free(theme_dir);
+			if (ok) {
+				SetDlgItemTextW(IDC_THEME_EDIT, szFile);
 			}
 			return TRUE;
+		}
 
 		case IDC_EDIT_BGIMG_BRIGHTNESS | (EN_CHANGE << 16) :
 			{

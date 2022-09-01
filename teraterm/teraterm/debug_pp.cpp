@@ -33,7 +33,7 @@
 #include "tmfc.h"
 #include "tt_res.h"
 #include "debug_pp.h"
-#include "../common/tt_res.h"
+#include "debug_pp_res.h"
 #include "ttdebug.h"
 #include "dlglib.h"
 #include "compat_win.h"

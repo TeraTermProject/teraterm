@@ -50,7 +50,6 @@
 #define IDC_COLOR_BLUE                  1015
 #define IDC_SAMPLE_COLOR                1016
 #define IDC_COMMAND_EDIT                1017
-#define IDC_RESTART                     1017
 #define IDC_ENTERKEY_CHECK              1018
 #define IDC_RADIO_CRLF                  1019
 #define IDC_RADIO_CR                    1020
@@ -119,6 +118,7 @@
 #define IDC_ENABLE_ATTR_COLOR_UNDERLINE 1080
 #define IDC_ENABLE_ATTR_FONT_UNDERLINE  1081
 #define IDC_ENABLE_ATTR_FONT_BOLD       1082
+#define IDC_CHECK_CornerDontround       1083
 #define IDD_PRNABORTDLG                 2100
 #define IDD_FILETRANSDLG                2200
 #define IDC_TRANSFNAME                  2201
@@ -147,12 +147,10 @@
 #define IDC_SCROLL_LINE                 2510
 #define IDC_PASTEDELAY_EDIT             2510
 #define IDC_SCP_PATH                    2510
-#define IDC_BGIMG_EDIT                  2510
 #define IDC_ROTATE_SIZE                 2510
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
 #define IDC_LOG_ROTATE                  2512
-#define IDC_BGIMG_CHECK                 2512
 #define IDC_MOUSEWHEEL_SCROLL_LINE      2513
 #define IDC_WINDOW_CTRL                 2513
 #define IDC_TRANSPROGRESS               2514
@@ -173,7 +171,6 @@
 #define IDC_PROTOELAPSEDTIME            2526
 #define IDC_TRANS_ELAPSED               2527
 #define IDC_TRANS_ETIME                 2528
-#define IDC_BGIMG_BUTTON                2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
 #define IDC_ROTATE_SIZE_TYPE            2529
 #define IDC_CLIPBOARD_ACCESS            2530
@@ -189,7 +186,6 @@
 #define IDC_OPT_HIDEDLG                 2539
 #define IDC_OPT_INCBUF                  2540
 #define IDC_OPT_TIMESTAMP_TYPE          2541
-#define IDC_BGIMG_BRIGHTNESS            2551
 #define IDC_EDIT_BGIMG_BRIGHTNESS       2552
 #define IDC_TRIMNLCHAR                  2564
 #define IDC_CLIPBOARD_NOTIFY            2566
@@ -218,10 +214,6 @@
 #define IDC_SELECT_ON_ACTIVATE          2589
 #define IDC_MIXED_THEME_FILE            2590
 #define IDC_ACCEPT_CLEAR_SBUFF          2591
-#define IDC_DEBUG_POPUP_ENABLE          2592
-#define IDC_DEBUG_POPUP_KEY1            2593
-#define IDC_DEBUG_POPUP_KEY2            2594
-#define IDC_DEBUG_CONSOLE_BUTTON        2595
 #define IDC_SENDFILE_FILENAME_BUTTON    2596
 #define IDC_SENDFILE_CHECK_BINARY       2597
 #define IDC_SENDFILE_FILENAME_TITLE     2598
