@@ -2541,7 +2541,7 @@ void DispReleaseDC(void)
  *
  * ANSIColor[] の 0-7 には原色(明るい色)、8-15 には少し暗い色が入っている
  *   0: Black   8: Gray (Bright Black)
- * 
+ *
  * 8色モードでは原色が使われる
  * 16色以上では 0-7 が標準色、8-15 が明るい色になるので、1-7 と 9-15 を入れ替える
  *   (8 は明るいので入れ替えなくてよい)
@@ -2619,6 +2619,17 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	BOOL reverse;
 	const BOOL use_normal_bg_color = ts.UseNormalBGColor;
 
+	// ts.ColorFlag と Attr を合成した Attr を作る
+	AttrFlag = 0;
+	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) ? AttrURL : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) ? AttrBold : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) ? AttrBlink : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr.Attr & AttrReverse)) ? AttrReverse : 0;
+	Attr2Flag = 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) ? Attr2Fore : 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) ? Attr2Back : 0;
+
 	if (VTDC == NULL)
 		DispInitDC();
 
@@ -2627,7 +2638,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	if (Reverse) {
 		reverse = TRUE;
 	}
-	if ((Attr.Attr & AttrReverse) != 0) {
+	if ((AttrFlag & AttrReverse) != 0) {
 		reverse = reverse ? FALSE : TRUE;
 	}
 	if ((ts.ColorFlag & CF_REVERSEVIDEO) != 0) {
@@ -2648,17 +2659,6 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	else {
 		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
-
-	// ts.ColorFlag と Attr を合成した Attr を作る
-	AttrFlag = 0;
-	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) ? AttrURL : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) ? AttrBold : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) ? AttrBlink : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr.Attr & AttrReverse)) ? AttrReverse : 0;
-	Attr2Flag = 0;
-	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) ? Attr2Fore : 0;
-	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) ? Attr2Back : 0;
 
 	// 色を決定する
 	TextColor = BGVTColor[0];

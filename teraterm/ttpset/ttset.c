@@ -2344,9 +2344,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Underline */
 	WriteOnOff(Section, "UnderlineAttrFont", FName,
-	           (WORD) (ts->FontFlag |= FF_URLUNDERLINE));
+	           (WORD) (ts->FontFlag & FF_UNDERLINE));
 	WriteOnOff(Section, "UnderlineAttrColor", FName,
-	           (WORD) (ts->ColorFlag |= CF_UNDERLINE));
+	           (WORD) (ts->ColorFlag & CF_UNDERLINE));
 	for (i = 0; i <= 1; i++) {
 		TmpColor[0][i * 3] = GetRValue(ts->VTUnderlineColor[i]);
 		TmpColor[0][i * 3 + 1] = GetGValue(ts->VTUnderlineColor[i]);

@@ -1152,7 +1152,7 @@ void CVisualPropPageDlg::OnOK()
 	}
 
 	// Underline Attr
-	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_UNDERLINE)) {
+	if (((ts.FontFlag & FF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_UNDERLINE)) {
 		ts.FontFlag ^= FF_UNDERLINE;
 	}
 	if (((ts.ColorFlag & CF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_UNDERLINE)) {
