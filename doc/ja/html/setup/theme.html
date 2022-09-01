@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Theme 設定ファイル</TITLE>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+
+  <h1>Theme 設定ファイル</h1>
+
+  TODO
+  <ul>
+    <li>BGSPIPath(画像を読み込むのに用いる、Susie Plugin が格納されているフォルダを指定します。)の設定GUIを作る
+    <li>仕様をちゃんと決める
+    <li>仕様に合わせて<a href="https://ttssh2.osdn.jp/tmp/color/">color picker(仮)</a>を修正
+  </ul>
+
+  <h2>themeファイルの種類</h2>
+
+  テーマファイルにはいくつかの種類がある。
+
+  <dl>
+    <dt>BG + カラー</dt>
+    <dd>
+      [BG]と[Color Theme]の2セクション入ったファイル<br>
+      [BG]セクションには背景画像の設定だけ入っている
+    </dd>
+    <dt>BG のみ</dt>
+    <dd>
+      [BG]セクションのみのファイル<br>
+      [BG]セクションには背景画像の設定だけ入っている
+    </dd>
+    <dt>カラーのみ</dt>
+    <dd>
+      [Color Theme]のみのファイル<br>
+    </dd>
+    <dt>BG + 旧カラー (廃止したい)</dt>
+    <dd>
+      [BG]セクションのみのファイル<br>
+      [BG]セクションには背景画像と文字の色情報が入っている<br>
+      [BG]セクションの色情報は廃止したい<br>
+    </dd>
+  </dl>
+
+  <h3>BG theme</h3>
+
+  iniファイルの[BG]セクション部分
+
+  <dl>
+    <dt>BGPictureTone</dt>
+    <dd>
+      背景画像(Dest)にデスクトップ画像(Src1)どれぐらいブレンドするか<br>
+      BGSrc1Alpha = 255 - BGPictureTone<br>
+      0=デスクトップ画像(Src1)が100%<br>
+      255=背景画像(Dest)が100%
+    </dd>
+    <dt>BGFadeColor</dt>
+    <dd>
+      Src2の色<br>
+      BGFadeColor = BGSrc2Color
+    </dd>
+    <dt>BGFadeTone</dt>
+    <dd>DestとSrc1の合成画像に単色(Src2)をどれぐらいブレンドするか<br>
+      BGSrc2Alpha = 255 - BGFadeTone<br>
+      0=単色(Src2)が100%<br>
+      255=DestとSrc1の合成画像が100%
+    </dd>
+
+    <dt>BGReverseTextTone</dt>
+    <dd>
+      0 - 255<br>
+      反転テキストの透明度
+    </dd>
+
+    <dt>BGPictureFile</dt>
+    <dd>
+      ファイル名<br>
+      壁紙と合成する画像ファイル名を指定します。<br>
+        ファイル名にワイルドカードが指定された場合、一致するファイルからランダムに一つ選びます。<br>
+        相対パスを利用する場合は、テーマファイルからの相対パスを指定してください。<br>
+        読み込めるファイルの種類は、BGSPIPath に格納されたプラグインによります。<br>
+        ビットマップはプラグインが無くても読み込めます。
+    </dd>
+
+    <dt>BGPicturePattern</dt>
+    <dd>Stretch<br>
+        Tile<br>
+        Center<br>
+        FitWidth<br>
+        FitHeight<br>
+        AutoFit<br>
+      画像ファイルの描画方法を指定します。<br>
+      FitWidth、FitHeight は画像のアスペクト比を維持したまま、画像を拡大縮小します。<br>
+      AutoFit は、ウィンドウと画像の間に隙間ができないように、FitWidth と FitHeight を切り替えます。
+    </dd>
+
+    <dt>BGPictureBaseColor</dt>
+    <dd>R, G, B<br>
+      画像とウィンドウの間に隙間ができた場合、この色で塗られます。
+    </dd>
+
+    <dt>BGPictureTone</dt>
+    <dd>0 - 255<br>
+      画像ファイルの透明度
+    </dd>
+
+    <dt>BGFadeTone</dt>
+    <dd>0 - 255<br>
+      背景全体をフェードします。</dd>
+
+    <dt>BGFadeColor</dt>
+    <dd>R, G, B<br>
+      フェードしたときの色を指定します。</dd>
+  </dl>
+
+  <dl>
+    <dt>VTFore や Red など (廃止)</dt>
+    <dd>R, G, B<br>
+      テキストの色を設定します。</dd>
+  </dl>
+
+<h2>テーマファイルの拡張設定</h2>
+
+<p>
+theme\Advanced.sample ファイルを利用して、拡張設定をすることができます。<br>
+下記は、指定した画像ファイル(sample.jpg)を Tera Term の背景に描画する例で、
+teraterm.ini の BGThemeFile エントリで指定してください。
+</p>
+
+<pre>
+[BG]
+; Advanced Setting
+; Image source setting
+; Type      : Color / Picture / Wallpaper
+: Pattern   : Stretch / Tile / Center / FitWidth / FitHeight / AutoFit
+; AntiAlias : On / Off
+; Color     : R,G,B (0-255)
+; Alpha     : 0-255
+; File      : wildcard =&gt; random select
+; Dest = (Src1  * Src1Alpha + Dest * (255 - Src1Alpha)) / 255
+; Dest = (Src2  * Src2Alpha + Dest * (255 - Src2Alpha)) / 255
+BGReverseTextAlpha = 192
+;
+BGDestType      = Picture
+BGDestFile      = sample.jpg
+BGDestPattern   = AutoFit
+BGDestAntiAlias = On
+BGDestColor     = 0,0,0
+;
+BGSrc1Type      = Color
+BGSrc1File      = 
+BGSrc1Pattern   = 
+BGSrc1AntiAlias = 
+BGSrc1Color     = 32,32,32
+BGSrc1Alpha     = 64
+;
+BGSrc2Type      = Color
+BGSrc2File      = 
+BGSrc2Pattern   = 
+BGSrc2AntiAlias = 
+BGSrc2Color     = 32,32,32
+BGSrc2Alpha     = 64
+</pre>
+
+<h2>color theme</h2>
+
+  TBD<br>
+
+  TODO
+  <ul>
+    <li>仕様書く
+    <li>release/theme/color/readme.md にリンク張る
+  </ul>
+
+</body>
+</html>

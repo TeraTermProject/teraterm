@@ -2,56 +2,83 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<TITLE>Background transparency</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>look and feel</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </HEAD>
 <BODY>
 
-<h1>Background transparency</h1>
+<h1>look and feel‚Ì•ÏX</h1>
 
 <p>
-Tera Term supports window background transparency. Now Tera Term has two types of transparency function. You can select either function. 
+”¼“§–¾ƒEƒBƒ“ƒhƒEAƒe[ƒ}‚ðŽg—p‚µ‚ÄTera Term‚Ìlook and feel‚ð•ÏX‚Å‚«‚Ü‚·B”¼“§–¾ƒEƒBƒ“ƒhƒE‚Æƒe[ƒ}‚Í“¯Žž‚ÉÝ’è‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
 </p>
 
-<h2>(1) AlphaBlend window</h2>
+<ul>
+  <li><a href="#transparent">”¼“§–¾ƒEƒBƒ“ƒhƒE</a></li>
+  <li><a href="#theme">ƒe[ƒ}</a></li>
+  <ul>
+    <li><a href="#theme/bg">ƒe[ƒ}/BG</a></li>
+    <ul>
+      <li><a href="#theme/bg/desktop">ƒfƒXƒNƒgƒbƒv‰æ‘œ‚Ì“\‚è•t‚¯</a></li>
+      <li><a href="#theme/bg/image">”wŒi‰æ‘œ‚Ì“\‚è•t‚¯</a></li>
+    </ul>
+    <li><a href="#theme/color">ƒe[ƒ}/Color</a></li>
+  </ul>
+</ul>
+
+<h2 id="transparent">”¼“§–¾ƒEƒBƒ“ƒhƒE</h2>
 
 <p>
-In this type Tera Term window can be background transparency. As a point that should be noted, this function is enabled on only Windows2000 later.<br>
-You can configure the value in "Visual" tab on <a href="../menu/setup-additional.html">[Setup] Additional settings</a>.<br>
-You can set up the value of transparency. The range of transparency is from 0 to 255. The more transparency reduces the value, the more window transparency is blinding. Default value is 255 (opaque).
+‚±‚Ì‹@”\‚ðŽg‚¤‚ÆATera Term‚ÌƒEƒBƒ“ƒhƒE‚ð”¼“§–¾‚É‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·BWindows2000ˆÈ~‚Å—LŒø‚Å‚·B<br>
+Ý’è‚ÍA<a href="../menu/setup-additional-visual.html#AlphaBlendActive">[Setup] Additional settings ‚Ì Visual ƒ^ƒu</a>‚Ås‚¦‚Ü‚·B<br>
+“§–¾“x‚Í0`255‚Ì”ÍˆÍ‚ÅŽw’è‚·‚é‚±‚Æ‚ª‚Å‚«A’l‚ð¬‚³‚­‚·‚é‚Ù‚Ç“§–¾“x‚Í‹­‚­‚È‚è‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í255i•s“§–¾j‚Å‚·B
+ƒEƒBƒ“ƒhƒE‚ÌƒAƒNƒeƒBƒuŽž‚Æ”ñƒAƒNƒeƒBƒuŽžŠeX‚Å“§–¾“x‚ðŽw’è‚Å‚«‚Ü‚·B
+</p>
+
+<p>
+ƒ^ƒXƒNƒo[ã‚ÅƒzƒC[ƒ‹‚ð‰ñ“]‚³‚¹‚é‚ÆˆêŽž“I‚É“§–¾“x‚ð•ÏX‚Å‚«‚Ü‚·B
 </p>
 
 <img src="image/teraterm_alpha.png" width=598 height=488></img>
 
-
-
-<h2>(2) Eterm lookfeel window</h2>
+<h2 id="theme">ƒe[ƒ}</h2>
 
 <p>
-In this type Tera Term window looks like Eterm background transparency. If this function is enabled, Tera Term window becomes background transparency and mixes the wallpaper with your specified image file(*.jpg).<br>
-Please edit the "BGEnable=on" in the teraterm.ini file, or you can configure the value in "Visual" tab on <a href="../menu/setup-additional.html">[Setup] Additional settings</a>.
+Tera Term‚Ì”wŒi‚Ì‰æ‘œA•¶Žš‚ÌF‚ðˆêŠ‡‚µ‚Ä•ÏX‚·‚éƒe[ƒ}‚ðŽg—p‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
+ƒe[ƒ}‚Í Tera Term 4‚ÌEterm lookfeel(Eterm•—‚É‚·‚é)‚ð’u‚«Š·‚¦‚½‚à‚Ì‚Å‚·
+(<a href="https://sourceforge.net/projects/eterm/">Eterm</a>‚Íxterm‚Ì’u‚«Š·‚¦‚ðˆÓ}‚µ‚½ vt102 ’[––ƒGƒ~ƒ…ƒŒ[ƒ^[‚Å‚·)B<br>
+<a href="../menu/setup-additional-visual.html#theme">[Setup] Additional settings ‚Ì Visual ƒ^ƒu</a>‚ÅA‹N“®Žž‚É“Ç‚Ýž‚Þƒe[ƒ}ƒtƒ@ƒCƒ‹‚ðŽw’è‚µ‚Ü‚·B‚Ü‚½ƒe[ƒ}‚ÌÝ’è‚ÍATheme Editorƒ{ƒ^ƒ“‚ð‰Ÿ‚·‚Æ•\Ž¦‚³‚ê‚éÝ’èƒ_ƒCƒAƒƒO‚Ås‚¦‚Ü‚·B
 </p>
 
+<h3 id="theme/bg">ƒe[ƒ}/BG(”wŒi)</h3>
+
 <p>
-Please refer to "<a href="../setup/teraterm-win.html#eterm">Eterm lookfeel window</a>" for more detailed settings.
+Tera Term ‚Ì”wŒi‚ÉAƒfƒXƒNƒgƒbƒv‰æ‘œ(Windows‚Ì”wŒi‰æ‘œ)‚âŽw’è‰æ‘œ‚ð•\Ž¦‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·BƒfƒXƒNƒgƒbƒv‰æ‘œ‚ÆŽw’è‰æ‘œ‚ðƒuƒŒƒ“ƒh‚µ‚Ä•\Ž¦‚·‚é‚±‚Æ‚à‚Å‚«‚Ü‚·B
+</p>
+
+<h4 id="theme/bg/desktop">ƒfƒXƒNƒgƒbƒv‰æ‘œ‚Ì“\‚è•t‚¯</h4>
+<p>
+‚±‚Ì‹@”\‚ðŽg‚¤‚ÆATera Term‚Ì”wŒi‚ÉƒfƒXƒNƒgƒbƒv‰æ‘œ‚ª•\Ž¦‚³‚ê‚Ü‚·B<br>
 </p>
 
 <img src="image/teraterm_eterm.png" width=598 height=488></img>
 
 
-
-<h2>(3) Background image</h2>
+<h4 id="theme/bg/image">”wŒi‰æ‘œ‚Ì“\‚è•t‚¯</h4>
 
 <p>
-When both Eterm lookfeel and Background Image is enabled, an image file can be drawn into the terminal background.<br>
-And then, the background window does not make transparent.
+‰æ‘œ‚ðŽw’è‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
 </p>
 
 <img src="image/teraterm_backimg.png" width=598 height=423></img>
 
 
+<h3 id="theme/color">ƒe[ƒ}/Color(•¶ŽšF)</h3>
+
+•¶Žš‚ÌF‚ðˆêŠ‡‚µ‚Ä•ÏX‚·‚éƒJƒ‰[ƒe[ƒ}‚ðŽg—p‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
 
 </BODY>
 </HTML>

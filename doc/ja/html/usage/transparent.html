@@ -3,56 +3,82 @@
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<TITLE>透過ウィンドウ</TITLE>
+<TITLE>look and feelの変更</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </HEAD>
 <BODY>
 
-<h1>透過ウィンドウ</h1>
+<h1>look and feelの変更</h1>
 
 <p>
-Tera Termはウィンドウの半透明をサポートしています。現在、半透明ウィンドウは2種類のタイプがあり、ユーザは好きな方を選択することができます。
+半透明ウィンドウ、テーマを使用してTera Termのlook and feelを変更できます。半透明ウィンドウとテーマは同時に設定することができます。
 </p>
 
-<h2>(1) 半透明ウィンドウ</h2>
+<ul>
+  <li><a href="#transparent">半透明ウィンドウ</a></li>
+  <li><a href="#theme">テーマ</a></li>
+  <ul>
+    <li><a href="#theme/bg">テーマ/BG</a></li>
+    <ul>
+      <li><a href="#theme/bg/desktop">デスクトップ画像の貼り付け</a></li>
+      <li><a href="#theme/bg/image">背景画像の貼り付け</a></li>
+    </ul>
+    <li><a href="#theme/color">テーマ/Color</a></li>
+  </ul>
+</ul>
+
+<h2 id="transparent">半透明ウィンドウ</h2>
 
 <p>
-この機能を使うと、Tera Termのウィンドウを半透明にすることができます。この機能は、Windows2000以降で有効です。<br>
-この設定は、<a href="../menu/setup-additional.html">[Setup] Additional settings</a> の Visual タブで行えます。<br>
+この機能を使うと、Tera Termのウィンドウを半透明にすることができます。Windows2000以降で有効です。<br>
+設定は、<a href="../menu/setup-additional-visual.html#AlphaBlendActive">[Setup] Additional settings の Visual タブ</a>で行えます。<br>
+透明度は0～255の範囲で指定することができ、値を小さくするほど透明度は強くなります。
+デフォルトは255（不透明）です。
+ウィンドウのアクティブ時と非アクティブ時各々で透明度を指定できます。
+</p>
 
-透明度は0～255の範囲で指定することができ、値を小さくするほど透明度は強くなります。デフォルトは255（不透明）です。
+<p>
+タスクバー上でホイールを回転させると一時的に透明度を変更できます。
 </p>
 
 <img src="image/teraterm_alpha.png" width=598 height=488></img>
 
-
-
-<h2>(2) Eterm風半透明ウィンドウ</h2>
+<h2 id="theme">テーマ</h2>
 
 <p>
-この機能を使うと、Eterm風の半透明ウィンドウを使用することができます。この機能を有効にすると、Tera Termのウィンドウは半透明化され、壁紙と指定した画像ファイル(*.jpg)と混合されて描画されるようになります。<br>
-この機能は、<a href="../menu/setup-additional.html">[Setup] Additional settings</a> の Visual タブで有効にするか、直接 teraterm.ini の"BGEnable=on"と変更してください。
+Tera Termの背景の画像、文字の色を一括して変更するテーマを使用することができます。
+テーマは Tera Term 4のEterm lookfeel(Eterm風にする)を置き換えたものです
+(<a href="https://sourceforge.net/projects/eterm/">Eterm</a>はxtermの置き換えを意図した vt102 端末エミュレーターです)。<br>
+<a href="../menu/setup-additional-visual.html#theme">[Setup] Additional settings の Visual タブ</a>で、起動時に読み込むテーマファイルを指定します。またテーマの設定は、Theme Editorボタンを押すと表示される設定ダイアログで行えます。
 </p>
 
+<h3 id="theme/bg">テーマ/BG(背景)</h3>
+
 <p>
-そのほかの設定については「<a href="../setup/teraterm-win.html#eterm">Eterm風半透明ウィンドウ</a>」を参照してください。
+Tera Term の背景に、デスクトップ画像(Windowsの背景画像)や指定画像を表示することができます。デスクトップ画像と指定画像をブレンドして表示することもできます。
+</p>
+
+<h4 id="theme/bg/desktop">デスクトップ画像の貼り付け</h4>
+<p>
+この機能を使うと、Tera Termの背景にデスクトップ画像が表示されます。<br>
 </p>
 
 <img src="image/teraterm_eterm.png" width=598 height=488></img>
 
 
-
-<h2>(3) 背景画像の貼り付け</h2>
+<h4 id="theme/bg/image">背景画像の貼り付け</h4>
 
 <p>
-Eterm lookfeelとBackground Imageを同時に有効にすることで、端末の背景に任意の画像を貼り付けることができます。<br>
-この場合、半透明化はされません。
+画像を指定することができます。
 </p>
 
 <img src="image/teraterm_backimg.png" width=598 height=423></img>
 
 
+<h3 id="theme/color">テーマ/Color(文字色)</h3>
+
+文字の色を一括して変更するカラーテーマを使用することができます。
 
 </BODY>
 </HTML>

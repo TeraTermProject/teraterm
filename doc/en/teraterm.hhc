@@ -675,6 +675,11 @@
 			<param name="Local" value="html\setup\lng.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="theme file">
+			<param name="Local" value="html\setup\theme.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Reference data">

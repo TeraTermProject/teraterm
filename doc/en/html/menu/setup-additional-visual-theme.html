@@ -12,6 +12,7 @@
     <h1>Theme Editor</h1>
 
     テーマはTera Termの背景、文字の色、または、両方を一括して扱う仕組み。<br>
+    Theme Editorはテーマの編集を行う。<br>
     各タブで設定を行う。<br>
     [OK] で動作中のTera Termに反映され、[Cancel] で反映されずに破棄される。
 
@@ -24,7 +25,7 @@
       <dd>文字の色に関する設定を行う</dd>
     </dl>
 
-    <a href="#theme_file">テーマファイルについて</a>
+    <a href="../setup/theme.html">テーマファイルについて</a>
 
     <hr>
 
@@ -59,42 +60,47 @@
       *注意* 背景画像を表示するため、文字の背景は無効化される。
     </p>
 
-    <h3>背景画像</h3>
-
-    <p>
-      Tera Term の背景画像は次のように合成される。<br>
-      <img src="setup-additional-visual-theme.png"><br>
-
-      <a href="../setup/teraterm-win.html#eterm">テーマファイルについて(Eterm風半透明ウィンドウ)</a>
-
-    <h3>文字BG</h3>
-
-    <p>
-      文字を選択したとき、文字の背景と背景画像の混合比を指定することができる。
-    </p>
-
-    <h3>iniファイル内のキーについてのメモ</h3>
-
-    仕様が固まったら消す
+    上から順に背景画像が合成されていく。
 
     <dl>
-      <dt>BGPictureTone</dt>
+      <dt>base Color</dt>
       <dd>
-        背景画像(Dest)にデスクトップ画像(Src1)どれぐらいブレンドするか<br>
-        BGSrc1Alpha = 255 - BGPictureTone<br>
-        0=デスクトップ画像(Src1)が100%<br>
-        255=背景画像(Dest)が100%
+        背景画像を使用しない場合はこの色で塗りつぶされる。背景画像が描画されない部分がある場合もこの色で塗りつぶされる。
       </dd>
-      <dt>BGFadeColor</dt>
+
+      <dt>Backgroud Image</dt>
       <dd>
-        Src2の色<br>
-        BGFadeColor = BGSrc2Color
+        背景画像を指定する。<br>
+        描画方法は次の中から選択する
+        <dl>
+          <dt>stretch</dt>
+          <dt>tile</dt>
+          <dt>center</dt>
+          <dt>fit_width</dt>
+          <dt>fit_height</dt>
+          <dt>autofit</dt>
+          <dt>autofill</dt>
+          <dd>
+            TODO 詳細を調べて書く
+          </dd>
+        </dl></dd>
+
+      <dt>desktop wallpaper image</dt>
+      <dd>
+        Windowsの壁紙画像をアルファブレンドする。
       </dd>
-      <dt>BGFadeTone</dt>
-      <dd>DestとSrc1の合成画像に単色(Src2)をどれぐらいブレンドするか<br>
-        BGSrc2Alpha = 255 - BGFadeTone<br>
-        0=単色(Src2)が100%<br>
-        255=DestとSrc1の合成画像が100%
+
+      <dt>simple color plane</dt>
+      <dd>
+        単色をアルファブレンドする。<br>
+        例:背景画像,壁紙をブレンドした状態で少し暗くする場合は、000000を128の割合でアルファブレンドする。
+      </dd>
+
+      <dt>文字反転時の文字BG部分と背景画像のアルファブレンド</dt>
+      <dd>
+        文字反転時の文字BG部分と背景画像のアルファブレンド値を指定する
+      </dd>
+
       </dd>
     </dl>
 
@@ -137,47 +143,39 @@ wget https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/color-sgr-d
     </dl>
 
     <hr>
+    <h2>背景テーマのOverview</h2>
 
-    <h2 id="theme_file">themeファイル</h2>
+    Tera Term の背景画像は次のように合成される。<br>
+    <img src="setup-additional-visual-theme.png"><br>
 
-    <ul>
-      <li>themeファイルの種類
-      <li>デフォルト色について
-    </ul>
+    <hr>
 
-    <h3>themeファイルの種類</h3>
+<h2>色設定のOverview</h2>
 
-    テーマファイルにはいくつかの種類がある。<br>
-    TODO
-    <ul>
-      <li>仕様をちゃんと決める
-      <li>仕様に合わせて<a href="https://ttssh2.osdn.jp/tmp/color/">color picker(仮)</a>を修正
-    </ul>
+Tera Term 5 alpha 時点の仕様
 
-    <dl>
-      <dt>BG + カラー</dt>
-      <dd>
-        [BG]と[Color Theme]の2セクション入ったファイル<br>
-        [BG]セクションには背景画像の設定だけ入っている
-      </dd>
-      <dt>BG のみ</dt>
-      <dd>
-        [BG]セクションのみのファイル<br>
-        [BG]セクションには背景画像の設定だけ入っている
-      </dd>
-      <dt>カラーのみ</dt>
-      <dd>
-        [Color Theme]のみのファイル<br>
-      </dd>
-      <dt>BG + 旧カラー (廃止したい)</dt>
-      <dd>
-        [BG]セクションのみのファイル<br>
-        [BG]セクションには背景画像と文字の色情報が入っている<br>
-        [BG]セクションの色情報は廃止したい<br>
-      </dd>
-    </dl>
+<pre>
++------------+          +-----------------------------------+         +---------+        +----------+
+|TERATERM.INI| read     |Tera Term                          |         |Theme    |        |Theme File|
+|            | (Startup)| +---------+          +----------+ |(launch) |Editor   |  Save  | INI      |
+| Default    +------------>         | Startup  |          +----------->         +------->+          |
+|  Colors    |          | | Default +----------> Draw     | |         |         |        | Colors   |
+|            <------------+  Colors | Load     |  Colors  <-----------+         +<-------+          |
+|            |  Write   | |         | Default  |          | |   OK    |         |  Load  |          |
+|            |          | +---------+          +----------+ |         |         |        |          |
++------------+          +-----------------------------------+         +---------+        +----------+
+</pre>
 
-    <h3 id="default_color">デフォルト色について</h3>
+<ul>
+  <li>Tera Termのデフォルト色はTERATERM.INIから読み込む<br>
+    描画色はデフォルト色となる<br>
+    起動時に読み込むthemefileを指定していて、カラーテーマが含まれていると、テーマの色となる
+  <li>Theme Editorで色をロード,編集してokを押すとTera Termの描画用の色となる
+  <li>TERATERM.INIに保存するとデフォルト色が保存される
+  <li>描画色をデフォルト色に持っていくことはできない
+</ul>
+
+    <h2 id="default_color">デフォルト色について</h2>
 
     デフォルト色とフォントは TERATERM.INI の次のキーワードで設定できる
 <pre>
