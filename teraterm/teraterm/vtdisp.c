@@ -1743,11 +1743,6 @@ static void DispApplyANSIColor(void) {
 
   for (i = IdBack ; i <= IdFore+8 ; i++)
     ANSIColor[i] = ts.ANSIColor[i];
-
-  if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-    ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
-    ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
-  }
 }
 
 void InitColorTable(void)
@@ -2490,19 +2485,6 @@ void DispChangeWin(void)
   /* Change caret shape */
   ChangeCaret();
 
-  if ((ts.ColorFlag & CF_USETEXTCOLOR)==0)
-  {
-    ANSIColor[IdFore ]   = ts.ANSIColor[IdFore ];
-    ANSIColor[IdBack ]   = ts.ANSIColor[IdBack ];
-  }
-  else { // use text (background) color for "white (black)"
-    ANSIColor[IdFore ]   = ts.VTColor[0];
-    ANSIColor[IdBack ]   = ts.VTColor[1];
-
-	ANSIColor[IdFore ]   = BGVTColor[0];
-	ANSIColor[IdBack ]   = BGVTColor[1];
-  }
-
   /* change background color */
   DispChangeBackground();
 }
@@ -2757,6 +2739,26 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		}
 		else {
 			TextColor = ANSIColor[index];
+		}
+	}
+
+	// UseTextColor=on のときの処理
+	//	背景色(Back)を考慮せずに文字色(Fore)だけを変更するアプリを使っていて
+	//	文字が見えない状態になったら通常文字色か反転属性文字色を使用する
+	if ((ts.ColorFlag & CF_USETEXTCOLOR) !=0) {
+		if ((Attr2Flag & Attr2Fore) && (Attr2Flag & Attr2Back)) {
+			const int is_target_color = (Attr.Fore == IdFore || Attr.Fore == IdBack || Attr.Fore == 15);
+//			const int is_target_color = 1;
+			if (Attr.Fore == Attr.Back && is_target_color) {
+				if (!reverse) {
+					TextColor = BGVTColor[0];
+					BackColor = BGVTColor[1];
+				}
+				else {
+					TextColor = BGVTReverseColor[0];
+					BackColor = BGVTReverseColor[1];
+				}
+			}
 		}
 	}
 
@@ -3546,15 +3548,9 @@ void DispSetColor(unsigned int num, COLORREF color)
 	switch (num) {
 	case CS_VT_NORMALFG:
 		BGVTColor[0] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
-		}
 		break;
 	case CS_VT_NORMALBG:
 		BGVTColor[1] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
-		}
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = color; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = color; break;
@@ -3598,15 +3594,9 @@ void DispResetColor(unsigned int num)
 	switch(num) {
 	case CS_VT_NORMALFG:
 		BGVTColor[0] = ts.VTColor[0];
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-		}
 		break;
 	case CS_VT_NORMALBG:
 		BGVTColor[1] = ts.VTColor[1];
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-		}
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = ts.VTBoldColor[0]; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = ts.VTBoldColor[1]; break;
@@ -3651,25 +3641,7 @@ void DispResetColor(unsigned int num)
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	default:
-		if (num == IdBack) {
-			if (ts.ColorFlag & CF_USETEXTCOLOR) {
-				ANSIColor[IdBack] = BGVTColor[1]; // use background color for "Black"
-			}
-			else {
-				ANSIColor[IdBack] = ts.ANSIColor[IdBack];
-			}
-			DispSetNearestColors(num, num, NULL);
-		}
-		else if (num == IdFore) {
-			if (ts.ColorFlag & CF_USETEXTCOLOR) {
-				ANSIColor[IdFore] = BGVTColor[0]; // use text color for "white"
-			}
-			else {
-				ANSIColor[IdFore] = ts.ANSIColor[IdFore];
-			}
-			DispSetNearestColors(num, num, NULL);
-		}
-		else if (num <= 15) {
+		if (num <= 15) {
 			ANSIColor[num] = ts.ANSIColor[num];
 			DispSetNearestColors(num, num, NULL);
 		}
