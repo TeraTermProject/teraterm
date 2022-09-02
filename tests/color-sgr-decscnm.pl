@@ -86,6 +86,21 @@ if (1) {
 	print "Underline         / SGR 4 + SGR 104(BG Bright Blue)";
 	print "\x1b[0m";
 	print "\n";
+
+	print "\x1b[30m\x1b[40m";
+	print "Underline         / SGR 30 + SGR 40 (FG&BG Black)";
+	print "\x1b[0m";
+	print "\n";
+
+	print "\x1b[37m\x1b[47m";
+	print "Underline         / SGR 37 + SGR 47 (FG&BG White(8color)/Gray(16,256color))";
+	print "\x1b[0m";
+	print "\n";
+
+	print "\x1b[97m\x1b[107m";
+	print "Underline         / SGR 97 + SGR 107 (FG&BG White(16,256color))";
+	print "\x1b[0m";
+	print "\n";
 }
 
 if (1) {
