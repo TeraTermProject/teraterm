@@ -15,7 +15,7 @@ message("GREP=${GREP}")
 message("GTAGS=${GTAGS}")
 
 execute_process(
-  COMMAND ${FIND} teraterm TTProxy TTX* ttssh2 -type f -name "*.c" -o -name "*.cpp" -o -name "*.h"
+  COMMAND ${FIND} teraterm TTProxy TTX* ttssh2 cygwin -type f -name "*.c" -o -name "*.cpp" -o -name "*.h"
   COMMAND ${GREP} -v Release
   COMMAND ${GREP} -v Debug
   COMMAND ${GREP} -v .vs
@@ -27,4 +27,3 @@ execute_process(
   COMMAND ${GTAGS} -f gtags.files
   )
 # see doc_internal/readme.md
-
