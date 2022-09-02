@@ -996,7 +996,7 @@ BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
 	return (i>=Nth);
 }
 
-void GetNthNum(PCHAR Source, int Nth, int far *Num)
+void GetNthNum(PCHAR Source, int Nth, int *Num)
 {
 	char T[15];
 
