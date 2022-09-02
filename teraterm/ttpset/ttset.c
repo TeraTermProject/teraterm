@@ -541,13 +541,39 @@ static int GetDefaultUnicodeWidth(void)
 	return ret_val;
 }
 
+static void GetPrivateProfileColor2(const char *appA, const char *keyA, const char *defA, const wchar_t *fname,
+									COLORREF *color)
+{
+	int i;
+	int j;
+
+	wchar_t *str;
+	wchar_t *appW = ToWcharA(appA);
+	wchar_t *keyW = ToWcharA(keyA);
+	wchar_t *defW = ToWcharA(defA);
+	hGetPrivateProfileStringW(appW, keyW, defW, fname, &str);
+	free(appW);
+	free(keyW);
+	free(defW);
+
+	for (i = 0; i < 2; i++) {
+		BYTE rgb[3];
+		for (j = 0; j < 3; j++) {
+			int t;
+			GetNthNumW(str, 1 + (i * 3) + j, &t);
+			rgb[j] = (BYTE)t;
+		}
+		color[i] = RGB(rgb[0], rgb[1], rgb[2]);
+	}
+
+	free(str);
+}
+
 void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 {
 	int i;
-	HDC TmpDC;
 	char Temp[MAX_PATH], Temp2[MAX_PATH], *p;
 	wchar_t TempW[MAX_PATH];
-	WORD TmpColor[12][6];
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -779,48 +805,20 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		GetPrivateProfileInt(Section, "ScrollBuffSize", 100, FName);
 
 	/* VT Color */
-	GetPrivateProfileString(Section, "VTColor", "0,0,0,255,255,255",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->VTColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-		                     (BYTE) TmpColor[0][i * 3 + 1],
-		                     (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "VTColor", "0,0,0,255,255,255", FName, ts->VTColor);
 
 	/* VT Bold Color */
-	GetPrivateProfileString(Section, "VTBoldColor", "0,0,255,255,255,255",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->VTBoldColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-		                         (BYTE) TmpColor[0][i * 3 + 1],
-		                         (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "VTBoldColor", "0,0,255,255,255,255", FName, ts->VTBoldColor);
 	if (GetOnOff(Section, "EnableBoldAttrColor", FName, TRUE))
 		ts->ColorFlag |= CF_BOLDCOLOR;
 
 	/* VT Blink Color */
-	GetPrivateProfileString(Section, "VTBlinkColor", "255,0,0,255,255,255",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->VTBlinkColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-		                          (BYTE) TmpColor[0][i * 3 + 1],
-		                          (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "VTBlinkColor", "255,0,0,255,255,255", FName, ts->VTBlinkColor);
 	if (GetOnOff(Section, "EnableBlinkAttrColor", FName, TRUE))
 		ts->ColorFlag |= CF_BLINKCOLOR;
 
 	/* VT Reverse Color */
-	GetPrivateProfileString(Section, "VTReverseColor", "255,255,255,0,0,0",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->VTReverseColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-		                          (BYTE) TmpColor[0][i * 3 + 1],
-		                          (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "VTReverseColor", "255,255,255,0,0,0", FName, ts->VTReverseColor);
 	if (GetOnOff(Section, "EnableReverseAttrColor", FName, FALSE))
 		ts->ColorFlag |= CF_REVERSECOLOR;
 
@@ -828,14 +826,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		GetOnOff(Section, "EnableClickableUrl", FName, FALSE);
 
 	/* URL Color */
-	GetPrivateProfileString(Section, "URLColor", "0,255,0,255,255,255",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->URLColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-		                      (BYTE) TmpColor[0][i * 3 + 1],
-		                      (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "URLColor", "0,255,0,255,255,255", FName, ts->URLColor);
 	if (GetOnOff(Section, "EnableURLColor", FName, TRUE))
 		ts->ColorFlag |= CF_URLCOLOR;
 
@@ -846,24 +837,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->FontFlag |= FF_UNDERLINE;
 	if (GetOnOff(Section, "UnderlineAttrColor", FName, TRUE))
 		ts->ColorFlag |= CF_UNDERLINE;
-	GetPrivateProfileString(Section, "VTUnderlineColor", "255,0,255,255,255,255",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->VTUnderlineColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-									  (BYTE) TmpColor[0][i * 3 + 1],
-									  (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "VTUnderlineColor", "255,0,255,255,255,255", FName, ts->VTUnderlineColor);
 
 	/* TEK Color */
-	GetPrivateProfileString(Section, "TEKColor", "0,0,0,255,255,255",
-	                        Temp, sizeof(Temp), FName);
-	for (i = 0; i <= 5; i++)
-		GetNthNum(Temp, i + 1, (int *) &(TmpColor[0][i]));
-	for (i = 0; i <= 1; i++)
-		ts->TEKColor[i] = RGB((BYTE) TmpColor[0][i * 3],
-		                      (BYTE) TmpColor[0][i * 3 + 1],
-		                      (BYTE) TmpColor[0][i * 3 + 2]);
+	GetPrivateProfileColor2(Section, "TEKColor", "0,0,0,255,255,255", FName, ts->TEKColor);
 
 	/* ANSI color definition (in the case FullColor=on)  -- special option
 	   o UseTextColor should be off, or the background and foreground color of
@@ -906,22 +883,30 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		}
 	}
 
-	TmpDC = GetDC(0);			/* Get screen device context */
-	for (i = 0; i <= 1; i++)
-		ts->VTColor[i] = GetNearestColor(TmpDC, ts->VTColor[i]);
-	for (i = 0; i <= 1; i++)
-		ts->VTBoldColor[i] = GetNearestColor(TmpDC, ts->VTBoldColor[i]);
-	for (i = 0; i <= 1; i++)
-		ts->VTBlinkColor[i] = GetNearestColor(TmpDC, ts->VTBlinkColor[i]);
-	for (i = 0; i <= 1; i++)
-		ts->TEKColor[i] = GetNearestColor(TmpDC, ts->TEKColor[i]);
-	/* begin - ishizaki */
-	for (i = 0; i <= 1; i++)
-		ts->URLColor[i] = GetNearestColor(TmpDC, ts->URLColor[i]);
-	/* end - ishizaki */
-	for (i = 0; i < 16; i++)
-		ts->ANSIColor[i] = GetNearestColor(TmpDC, ts->ANSIColor[i]);
-	ReleaseDC(0, TmpDC);
+	// 描画するデバイス(ディスプレイ/プリンタ)に合わせて
+	// GetNearestColor()するほうが良いのではないだろうか
+	// 最近のディスプレイアダプタなら24bit colorだと思われるので
+	// このブロックは事実上影響ないのかもしれない
+#if 1
+	{
+		HDC TmpDC = GetDC(0);			/* Get screen device context */
+		for (i = 0; i <= 1; i++)
+			ts->VTColor[i] = GetNearestColor(TmpDC, ts->VTColor[i]);
+		for (i = 0; i <= 1; i++)
+			ts->VTBoldColor[i] = GetNearestColor(TmpDC, ts->VTBoldColor[i]);
+		for (i = 0; i <= 1; i++)
+			ts->VTBlinkColor[i] = GetNearestColor(TmpDC, ts->VTBlinkColor[i]);
+		for (i = 0; i <= 1; i++)
+			ts->TEKColor[i] = GetNearestColor(TmpDC, ts->TEKColor[i]);
+		for (i = 0; i <= 1; i++)
+			ts->URLColor[i] = GetNearestColor(TmpDC, ts->URLColor[i]);
+		for (i = 0; i <= 1; i++)
+			ts->VTUnderlineColor[i] = GetNearestColor(TmpDC, ts->VTUnderlineColor[i]);
+		for (i = 0; i < 16; i++)
+			ts->ANSIColor[i] = GetNearestColor(TmpDC, ts->ANSIColor[i]);
+		ReleaseDC(0, TmpDC);
+	}
+#endif
 	if (GetOnOff(Section, "EnableANSIColor", FName, TRUE))
 		ts->ColorFlag |= CF_ANSICOLOR;
 
