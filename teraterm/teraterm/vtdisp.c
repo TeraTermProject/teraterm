@@ -3555,11 +3555,6 @@ void DispSetColor(unsigned int num, COLORREF color)
 		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
 			ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
 		}
-		if (ts.UseNormalBGColor) {
-			BGVTBoldColor[1] = BGVTColor[1];
-			BGVTBlinkColor[1] = BGVTColor[1];
-			BGURLColor[1] = BGVTColor[1];
-		}
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = color; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = color; break;
@@ -3610,11 +3605,6 @@ void DispResetColor(unsigned int num)
 		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
 			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
 		}
-		if (ts.UseNormalBGColor) {
-			BGVTBoldColor[1] = ts.VTColor[1];
-			BGVTBlinkColor[1] = ts.VTColor[1];
-			BGURLColor[1] = ts.VTColor[1];
-		}
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = ts.VTBoldColor[0]; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = ts.VTBoldColor[1]; break;
@@ -3648,16 +3638,9 @@ void DispResetColor(unsigned int num)
 		// VT color Background
 		BGVTColor[1] = ts.VTColor[1];
 		BGVTReverseColor[1] = ts.VTReverseColor[1];
-		if (ts.UseNormalBGColor) {
-			BGVTBoldColor[1] = ts.VTColor[1];
-			BGVTBlinkColor[1] = ts.VTColor[1];
-			BGURLColor[1] = ts.VTColor[1];
-		}
-		else {
-			BGVTBoldColor[1] = ts.VTBoldColor[1];
-			BGVTBlinkColor[1] = ts.VTBlinkColor[1];
-			BGURLColor[1] = ts.URLColor[1];
-		}
+		BGVTBoldColor[1] = ts.VTBoldColor[1];
+		BGVTBlinkColor[1] = ts.VTBlinkColor[1];
+		BGURLColor[1] = ts.URLColor[1];
 
 		// ANSI Color / xterm 256 color
 		InitColorTable();
