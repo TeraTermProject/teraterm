@@ -3564,6 +3564,8 @@ void DispSetColor(unsigned int num, COLORREF color)
 	case CS_VT_REVERSEBG: BGVTReverseColor[1] = color; break;
 	case CS_VT_URLFG:     BGURLColor[0] = color; break;
 	case CS_VT_URLBG:     BGURLColor[1] = color; break;
+	case CS_VT_UNDERFG:   BGVTUnderlineColor[0] = color; break;
+	case CS_VT_UNDERBG:   BGVTUnderlineColor[1] = color; break;
 	case CS_TEK_FG:       ts.TEKColor[0] = color; break;
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
@@ -3614,6 +3616,8 @@ void DispResetColor(unsigned int num)
 	case CS_VT_REVERSEBG: BGVTReverseColor[1] = ts.VTReverseColor[1]; break;
 	case CS_VT_URLFG:     BGURLColor[0] = ts.URLColor[0]; break;
 	case CS_VT_URLBG:     BGURLColor[1] = ts.URLColor[1]; break;
+	case CS_VT_UNDERFG:   BGVTUnderlineColor[0] = ts.VTUnderlineColor[0]; break;
+	case CS_VT_UNDERBG:   BGVTUnderlineColor[1] = ts.VTUnderlineColor[1]; break;
 	case CS_TEK_FG:
 		break;
 	case CS_TEK_BG:
@@ -3701,6 +3705,8 @@ COLORREF DispGetColor(unsigned int num)
 	case CS_VT_REVERSEBG: color = ts.VTReverseColor[1]; break;
 	case CS_VT_URLFG:     color = ts.URLColor[0]; break;
 	case CS_VT_URLBG:     color = ts.URLColor[1]; break;
+	case CS_VT_UNDERFG:   color = ts.VTUnderlineColor[0]; break;
+	case CS_VT_UNDERBG:   color = ts.VTUnderlineColor[1]; break;
 	case CS_TEK_FG:       color = ts.TEKColor[0]; break;
 	case CS_TEK_BG:       color = ts.TEKColor[1]; break;
 	default:

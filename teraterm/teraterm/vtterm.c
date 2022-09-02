@@ -4946,7 +4946,8 @@ BOOL XsParseColor(char *colspec, COLORREF *color)
 	return TRUE;
 }
 
-unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
+static unsigned int XtColor2TTColor(int mode, unsigned int xt_color)
+{
 	unsigned int colornum = CS_UNSPEC;
 
 	switch ((mode>=100) ? mode-100 : mode) {
@@ -4956,8 +4957,7 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 			colornum = CS_VT_BOLDFG;
 			break;
 		  case 257:
-			// Underline -- not supported.
-			// colornum = CS_VT_UNDERFG;
+			colornum = CS_VT_UNDERFG;
 			break;
 		  case 258:
 			colornum = CS_VT_BLINKFG;
@@ -4982,8 +4982,7 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 			colornum = CS_VT_BOLDFG;
 			break;
 		  case 1:
-			// Underline -- not supported.
-			// colornum = CS_VT_UNDERFG;
+			colornum = CS_VT_UNDERFG;
 			break;
 		  case 2:
 			colornum = CS_VT_BLINKFG;
