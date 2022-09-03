@@ -12,46 +12,62 @@
 <h1>透過ウィンドウ</h1>
 
 <p>
-Tera Termはウィンドウの半透明をサポートしています。現在、半透明ウィンドウは2種類のタイプがあり、ユーザは好きな方を選択することができます。
+Tera Term はウィンドウの半透明をサポートしています。現在、半透明ウィンドウは2種類のタイプがあり、ユーザは好きな方を選択することができます。
 </p>
 
 <h2>(1) 半透明ウィンドウ</h2>
 
 <p>
-この機能を使うと、Tera Termのウィンドウを半透明にすることができます。この機能は、Windows2000以降で有効です。<br>
+この機能を使うと、Tera Term の VT ウィンドウ全体を半透明にすることができます。この機能は、Windows2000以降で有効です。<br>
 この設定は、<a href="../menu/setup-additional.html">[Setup] Additional settings</a> の Visual タブで行えます。<br>
 
 透明度は0～255の範囲で指定することができ、値を小さくするほど透明度は強くなります。デフォルトは255（不透明）です。
 </p>
 
-<img src="image/teraterm_alpha.png" width=598 height=488></img>
+<img src="image/transparent-api.png" />
 
 
 
 <h2>(2) Eterm風半透明ウィンドウ</h2>
 
 <p>
-この機能を使うと、Eterm風の半透明ウィンドウを使用することができます。この機能を有効にすると、Tera Termのウィンドウは半透明化され、壁紙と指定した画像ファイル(*.jpg)と混合されて描画されるようになります。<br>
+この機能を使うと、Eterm風の半透明ウィンドウを使用することができます。Eterm風半透明ウィンドウ機能では、Tera Term の VT ウィンドウのクライアント領域（端末部分）の背景が変更されます。<br />
 この機能は、<a href="../menu/setup-additional.html">[Setup] Additional settings</a> の Visual タブで有効にするか、直接 teraterm.ini の"BGEnable=on"と変更してください。
 </p>
 
 <p>
-そのほかの設定については「<a href="../setup/teraterm-win.html#eterm">Eterm風半透明ウィンドウ</a>」を参照してください。
+細かい設定パラメータについては「<a href="../setup/teraterm-win.html#eterm">Eterm風半透明ウィンドウ</a>」を参照してください。
 </p>
 
-<img src="image/teraterm_eterm.png" width=598 height=488></img>
 
-
-
-<h2>(3) 背景画像の貼り付け</h2>
+<h3>(2)-1 テーマファイルと Windows 背景の混合</h3>
 
 <p>
-Eterm lookfeelとBackground Imageを同時に有効にすることで、端末の背景に任意の画像を貼り付けることができます。<br>
-この場合、半透明化はされません。
+端末の背景に、テーマファイルで指定された画像ファイルが表示されます。<br />
+このとき Tera Term は指定された画像に Windows の背景画像（壁紙）を混合できるので、あたかも半透明であるかのように見えます。<br>
 </p>
 
-<img src="image/teraterm_backimg.png" width=598 height=423></img>
+<img src="image/transparent-eterm-mix.png" />
 
+
+<h3>(2)-2 画像を使用する</h3>
+
+<p>
+任意の画像を指定することで、その画像を端末の背景にすることができます。<br />
+この場合は Windows の背景画像（壁紙）を混合しないので、半透明化されているようには見えません。<br />
+（このような指定をするテーマファイルが作成されます）
+</p>
+
+<img src="image/transparent-eterm-bg.png" />
+
+
+<h3>(2)-3 Windows 壁紙を使用する</h3>
+
+<p>
+テーマファイルを使用しないことで、端末の背景に Windows の背景画像（壁紙）が表示され、あたかも半透明であるかのように見えます。
+</p>
+
+<img src="image/transparent-eterm-trans.png" />
 
 
 </BODY>
