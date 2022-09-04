@@ -22,7 +22,8 @@ cyglaunch で解釈されない引数は cygterm(又は msys2term)へ渡され�
   `-v` は cygterm へ渡されるオプション
 
 msys2の起動については次のURLを参照
-https://www.msys2.org/wiki/Launchers/
+- https://www.msys2.org/wiki/Launchers/
+- https://www.msys2.org/docs/environments/
 
 ## from explorer
 

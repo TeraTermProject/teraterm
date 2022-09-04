@@ -1,1 +1,1 @@
-cyglaunch -msys2 -v MSYSTEM=mingw64
+cyglaunch -msys2 -v MSYSTEM=MINGW64

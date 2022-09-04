@@ -278,3 +278,15 @@ DWORD Msys2Connect(const wchar_t *Msys2Directory, const wchar_t *cmdline)
 
 	return Connect(cygterm_exe, dll_base, Msys2Directory, search_paths, cmdline);
 }
+
+DWORD GitBashConnect(const wchar_t *Msys2Directory, const wchar_t *cmdline)
+{
+	static const wchar_t *cygterm_exe = L"msys2term.exe";
+	static const wchar_t *dll_base = L"msys-2.0";
+	static const wchar_t *search_paths[] = {
+		L"%c:\\Program Files\\Git\\usr\\bin",
+		NULL,
+	};
+
+	return Connect(cygterm_exe, dll_base, Msys2Directory, search_paths, cmdline);
+}

@@ -64,12 +64,18 @@ static wchar_t *GetCygwinDir(void)
 	return CygwinDir;
 }
 
+typedef enum {
+	SYSTEM_CYGWIN,
+	SYSTEM_MSYS2,
+	SYSTEM_GIT_BASH
+} system_t;
+
 int wmain(int argc, wchar_t *argv[])
 {
 	wchar_t *Cmdline;
 	int i;
 	DWORD e;
-	BOOL msys2term = FALSE;
+	system_t system = SYSTEM_CYGWIN;
 
 	setlocale(LC_ALL, "");
 
@@ -89,8 +95,14 @@ int wmain(int argc, wchar_t *argv[])
 			awcscat(&Cmdline, L"-d ");
 			awcscat(&Cmdline, argv[i]);
 		}
+		else if (wcscmp(argv[i], L"-cygwin") == 0) {
+			system = SYSTEM_CYGWIN;
+		}
 		else if (wcscmp(argv[i], L"-msys2") == 0) {
-			msys2term = TRUE;
+			system = SYSTEM_MSYS2;
+		}
+		else if (wcscmp(argv[i], L"-gitbash") == 0) {
+			system = SYSTEM_GIT_BASH;
 		}
 		else {
 			awcscat(&Cmdline, argv[i]);
@@ -99,16 +111,24 @@ int wmain(int argc, wchar_t *argv[])
 
 
 	// cygtermを実行する
-	if (msys2term) {
-		e = Msys2Connect(L"c:\\msys64", Cmdline);
-	}
-	else {
+	switch(system) {
+	default:
+	case SYSTEM_CYGWIN: {
 		// cygwinがインストールされているフォルダ
 		wchar_t *CygwinDir = GetCygwinDir();
 		e = CygwinConnect(CygwinDir, Cmdline);
 		free(CygwinDir);
+		break;
 	}
-
+	case SYSTEM_MSYS2: {
+		e = Msys2Connect(L"c:\\msys64", Cmdline);
+		break;
+	}
+	case SYSTEM_GIT_BASH: {
+		e = GitBashConnect(L"c:\\Program Files\\Git\\usr\\bin", Cmdline);
+		break;
+	}
+	}
 	switch(e) {
 	case NO_ERROR:
 		break;
@@ -120,8 +140,10 @@ int wmain(int argc, wchar_t *argv[])
 		break;
 	case ERROR_OPEN_FAILED:
 	default: {
-		const char *msg = msys2term ? "Can't execute msys2term." :
-			"Can't execute Cygterm.";
+		const char *msg =
+			system == SYSTEM_CYGWIN ? "Can't execute Cygterm.":
+			system == SYSTEM_MSYS2 ? "Can't execute msys2term.":
+			"Can't execute gitbash.";
 		MessageBoxA(NULL, msg, "ERROR", MB_OK | MB_ICONWARNING);
 		break;
 	}
