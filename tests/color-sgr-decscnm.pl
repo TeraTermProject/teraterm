@@ -2,6 +2,11 @@
 
 local $| = 1;
 
+sub pause {
+	printf("pause(hit enter)\n");
+	<STDIN>;
+}
+
 print "\x1b[0m";
 print "SGR(Select Graphic Rendition) test\n";
 
@@ -164,6 +169,23 @@ if (1) {
 			print "\x1b[0m";
 			print "\n";
 		}
+	}
+}
+
+# OSCシーケンス 色設定
+if (1) {
+	print "==================== OSC test\n";
+	pause();
+
+	printf("black-white\n");
+	for ($i = 0; $i < 16; $i++) {
+		printf("\x1b]4;%d;#%1x%1x%1x\x1b\\", $i, $i, $i, $i);
+	}
+	pause();
+
+	printf("reset color\n");
+	for ($i = 0; $i < 16; $i++) {
+		printf("\x1b]104;%d\x1b\\", $i, $i, $i, $i);
 	}
 }
 

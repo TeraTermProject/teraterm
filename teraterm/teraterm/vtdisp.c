@@ -3566,7 +3566,15 @@ void DispSetColor(unsigned int num, COLORREF color)
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
 		if (num <= 255) {
-			ANSIColor[num] = color;
+			if (1 <= num && num <= 7) {
+				num += 8;
+				ANSIColor[num] = color;
+			} else if (9 <= num && num <= 15) {
+				num -= 8;
+				ANSIColor[num] = color;
+			} else {
+				ANSIColor[num] = color;
+			}
 		}
 		else {
 			return;
