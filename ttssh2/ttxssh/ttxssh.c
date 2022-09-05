@@ -318,7 +318,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 	settings->ssh_protocol_version = GetPrivateProfileInt("TTSSH", "ProtocolVersion", 2, fileName);
 
 	// SSH heartbeat time(second) (2004.12.11 yutaka)
-	settings->ssh_heartbeat_overtime = GetPrivateProfileInt("TTSSH", "HeartBeat", 60, fileName);
+	settings->ssh_heartbeat_overtime = GetPrivateProfileInt("TTSSH", "HeartBeat", 300, fileName);
 
 	// パスワード認証および公開鍵認証に使うパスワードをメモリ上に保持しておくかどうかを
 	// 表す。(2006.8.5 yutaka)
