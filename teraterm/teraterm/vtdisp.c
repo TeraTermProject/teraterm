@@ -1475,7 +1475,7 @@ void BGDestruct(void)
 /*
  * Eterm lookfeel機能による初期化処理
  *
- * initialize_once: 
+ * initialize_once:
  *    TRUE: Tera Termの起動時
  *    FALSE: Tera Termの起動時以外
  */
@@ -2616,7 +2616,7 @@ void DispReleaseDC()
  *
  * ANSIColor[] の 0-7 には原色(明るい色)、8-15 には少し暗い色が入っている
  *   0: Black   8: Gray (Bright Black)
- * 
+ *
  * 8色モードでは原色が使われる
  * 16色以上では 0-7 が標準色、8-15 が明るい色になるので、1-7 と 9-15 を入れ替える
  *   (8 は明るいので入れ替えなくてよい)
@@ -3601,7 +3601,15 @@ void DispSetColor(unsigned int num, COLORREF color)
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
 		if (num <= 255) {
-			ANSIColor[num] = color;
+			if (1 <= num && num <= 7) {
+				num += 8;
+				ANSIColor[num] = color;
+			} else if (9 <= num && num <= 15) {
+				num -= 8;
+				ANSIColor[num] = color;
+			} else {
+				ANSIColor[num] = color;
+			}
 		}
 		else {
 			return;
