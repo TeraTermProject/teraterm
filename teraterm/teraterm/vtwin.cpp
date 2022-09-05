@@ -643,7 +643,15 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {
+		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
+		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
+		POINT VTPos = ts.VTPos;
+		POINT TEKPos = ts.TEKPos;
+
 		CopyShmemToTTSet(&ts);
+
+		ts.VTPos = VTPos;
+		ts.TEKPos = TEKPos;
 	}
 
 	InitKeyboard();

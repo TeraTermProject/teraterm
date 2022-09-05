@@ -107,13 +107,6 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 		// init window list
 		pm->NWin = 0;
 	}
-	else {
-		/* only the first instance uses saved position */
-		pm->ts.VTPos.x = CW_USEDEFAULT;
-		pm->ts.VTPos.y = CW_USEDEFAULT;
-		pm->ts.TEKPos.x = CW_USEDEFAULT;
-		pm->ts.TEKPos.y = CW_USEDEFAULT;
-	}
 
 	memcpy(ts,&(pm->ts),sizeof(TTTSet));
 
