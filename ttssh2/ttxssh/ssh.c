@@ -4438,7 +4438,7 @@ void SSH2_send_kexinit(PTInstVar pvar)
 
 	// cookieのセット
 	CRYPT_set_random_data(pvar, cookie, sizeof(cookie));
-	CRYPT_set_server_cookie(pvar, cookie);
+	CRYPT_set_client_cookie(pvar, cookie);
 	buffer_append(msg, cookie, sizeof(cookie));
 
 	// クライアントのキー情報
@@ -4719,13 +4719,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	push_memdump("KEXINIT", "exchange algorithm list: receiving", data, len);
 
-	// cookie; ここでは使わないので読み飛ばす
-	if (! grab_payload(pvar, SSH2_COOKIE_LENGTH)) {
+	// cookie
+	if (! get_bytearray_from_payload(pvar, buf, SSH2_COOKIE_LENGTH)) {
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
 					"%s: truncated packet (cookie)", __FUNCTION__);
 		msg = tmp;
 		goto error;
 	}
+	CRYPT_set_server_cookie(pvar, buf);
 
 	// 各要素(鍵交換,暗号化等)で使用するアルゴリズムの決定。
 	// サーバからはカンマ区切りでのリストが送られて来る。
