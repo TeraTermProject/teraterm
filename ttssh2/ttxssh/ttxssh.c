@@ -512,6 +512,10 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 
 	_itoa_s(settings->AuthBanner, buf, sizeof(buf), 10);
 	WritePrivateProfileString("TTSSH", "AuthBanner", buf, fileName);
+
+	WritePrivateProfileString("TTSSH", "KexKeyLogFile", settings->KexKeyLogFile, fileName);
+	WritePrivateProfileString("TTSSH", "KexKeyLogging",
+	                          settings->KexKeyLogging ? "1" : "0", fileName);
 }
 
 
