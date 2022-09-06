@@ -64,6 +64,7 @@
 
 #include <direct.h>
 #include <io.h>
+#include <fcntl.h>
 
 // SSH2 macro
 #ifdef _DEBUG
@@ -643,6 +644,31 @@ void push_bignum_memdump(char *name, char *desc, BIGNUM *bignum)
 	BN_bn2bin(bignum, buf);
 	push_memdump(name, desc, buf, len); // at push_bignum_memdump()
 	free(buf); // free
+}
+
+log_kex_key(PTInstVar pvar, char *type, char *msg)
+{
+	int fd, i;
+	unsigned char buff[4], *cookie;
+
+	if (pvar->settings.KexKeyLogging && pvar->settings.KexKeyLogFile[0] != 0) {
+		fd = _open(pvar->settings.KexKeyLogFile,
+			_O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
+			_S_IREAD | _S_IWRITE);
+		if (fd >= 0) {
+			cookie = pvar->crypt_state.client_cookie;
+			_write(fd, type, strlen(type));
+			_write(fd, " ", 1);
+			for (i=0; i<16; i++) {
+				_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%02x", cookie[i]);
+				_write(fd, buff, 2);
+			}
+			_write(fd, " ", 1);
+			_write(fd, msg, strlen(msg));
+			_write(fd, "\n", 1);
+			_close(fd);
+		}
+	}
 }
 
 static unsigned int get_predecryption_amount(PTInstVar pvar)
@@ -5073,6 +5099,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
+	log_kex_key(pvar, "CLIENT_SECRET", BN_bn2hex(dh->priv_key));
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -5304,6 +5331,8 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
 
+	log_kex_key(pvar, "CLIENT_SECRET", BN_bn2hex(dh->priv_key));
+
 	// 公開鍵をサーバへ送信
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -5381,6 +5410,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	}
 	group = EC_KEY_get0_group(client_key);
 
+	log_kex_key(pvar, "CLIENT_SECRET", BN_bn2hex(EC_KEY_get0_private_key(client_key)));
 
 	msg = buffer_init();
 	if (msg == NULL) {

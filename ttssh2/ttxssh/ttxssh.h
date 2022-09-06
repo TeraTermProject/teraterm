@@ -208,6 +208,9 @@ typedef struct _TS_SSH {
 	int GexMinimalGroupSize;
 
 	int AuthBanner;
+
+	BOOL KexKeyLogging;
+	char KexKeyLogFile[1024];
 } TS_SSH;
 
 typedef struct _TInstVar {

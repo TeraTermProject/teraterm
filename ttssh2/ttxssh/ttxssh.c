@@ -373,6 +373,14 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 1, fileName);
 
+	read_string_option(fileName, "KexKeyLogFile", "", settings->KexKeyLogFile, sizeof(settings->KexKeyLogFile));
+	if (settings->KexKeyLogFile[0] == 0) {
+		settings->KexKeyLogging = 0;
+	}
+	else {
+		settings->KexKeyLogging = GetPrivateProfileInt("TTSSH", "KexKeyLogging", 0, fileName);
+	}
+
 	clear_local_settings(pvar);
 }
 
