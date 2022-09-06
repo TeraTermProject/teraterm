@@ -64,7 +64,9 @@
 
 #include <direct.h>
 #include <io.h>
+#ifdef _DEBUG	// KEX logging
 #include <fcntl.h>
+#endif
 
 // SSH2 macro
 #ifdef _DEBUG
@@ -648,6 +650,7 @@ void push_bignum_memdump(char *name, char *desc, BIGNUM *bignum)
 
 void log_kex_key(PTInstVar pvar, const BIGNUM *secret)
 {
+#ifdef _DEBUG	// KEX logging
 	int fd, i;
 	unsigned char buff[4], *cookie;
 	char *hexstr;
@@ -673,6 +676,7 @@ void log_kex_key(PTInstVar pvar, const BIGNUM *secret)
 		}
 		OPENSSL_free(hexstr);
 	}
+#endif
 }
 
 static unsigned int get_predecryption_amount(PTInstVar pvar)
@@ -5334,7 +5338,6 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
-
 	log_kex_key(pvar, dh->priv_key);
 
 	// 公開鍵をサーバへ送信
@@ -5413,7 +5416,6 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 		goto error;
 	}
 	group = EC_KEY_get0_group(client_key);
-
 	log_kex_key(pvar, EC_KEY_get0_private_key(client_key));
 
 	msg = buffer_init();

@@ -373,6 +373,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 1, fileName);
 
+#ifdef _DEBUG
 	read_string_option(fileName, "KexKeyLogFile", "", settings->KexKeyLogFile, sizeof(settings->KexKeyLogFile));
 	if (settings->KexKeyLogFile[0] == 0) {
 		settings->KexKeyLogging = 0;
@@ -380,6 +381,10 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 	else {
 		settings->KexKeyLogging = GetPrivateProfileInt("TTSSH", "KexKeyLogging", 0, fileName);
 	}
+#else
+	settings->KexKeyLogFile[0] = 0;
+	settings->KexKeyLogging = 0;
+#endif
 
 	clear_local_settings(pvar);
 }
@@ -513,9 +518,11 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 	_itoa_s(settings->AuthBanner, buf, sizeof(buf), 10);
 	WritePrivateProfileString("TTSSH", "AuthBanner", buf, fileName);
 
+#ifdef _DEBUG
 	WritePrivateProfileString("TTSSH", "KexKeyLogFile", settings->KexKeyLogFile, fileName);
 	WritePrivateProfileString("TTSSH", "KexKeyLogging",
 	                          settings->KexKeyLogging ? "1" : "0", fileName);
+#endif
 }
 
 
