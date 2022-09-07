@@ -116,7 +116,7 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 	for(;;) {
 		DWORD r = GetPrivateProfileStringW(section, key, def, b, (DWORD)size, ini);
 		if (r == 0 || b[0] == L'\0') {
-			DWORD error = GetLastError();
+			error = GetLastError();
 			free(b);
 			*str = _wcsdup(L"");
 //			aswprintf(str, L"%s/%s\n",section, key);	// Šm”F—p
@@ -157,7 +157,9 @@ DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t *
 	size_t len = GetFullPathNameW(lpFileName, 0, NULL, NULL);		// include L'\0'
 	if (len == 0) {
 		*fullpath = NULL;
-		*filepart = NULL;
+		if (filepart != NULL) {
+			*filepart = NULL;
+		}
 		return GetLastError();
 	}
 	wchar_t *path = (wchar_t *)malloc(sizeof(wchar_t) * len);
