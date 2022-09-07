@@ -226,6 +226,21 @@ make cygterm+-i686 -j
 make archive
 popd
 
+rem msys2term
+if not exist c:\msys64\usr\bin\msys-2.0.dll goto msys2term_pass
+setlocal
+PATH=C:\msys64\usr\bin
+pushd ..\cygwin\cygterm
+if "%BUILD%" == "rebuild" (
+    make clean
+    make msys2term-clean
+)
+make msys2term -j
+endlocal
+popd
+
+:msys2term_pass
+
 rem lng ƒtƒ@ƒCƒ‹‚ğì¬
 call makelang.bat
 

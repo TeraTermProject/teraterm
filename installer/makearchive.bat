@@ -41,6 +41,10 @@ copy /y "..\cygwin\cygterm\cygterm+-i686\cygterm.exe" "%dst%\cygterm+-i686"
 mkdir "%dst%\cygterm+-x86_64"
 copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" "%dst%\cygterm+-x86_64"
 copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" %dst%
+if not exist ..\cygwin\cygterm\msys2term\msys2term.exe goto msys2term_pass
+copy /y ..\cygwin\cygterm\msys2term\msys2term.exe %dst%
+copy /y ..\cygwin\cygterm\msys2term.cfg %dst%
+:msys2term_pass
 copy /y ..\cygwin\Release\cyglaunch.exe %dst%
 copy /y ..\ttpmenu\Release\ttpmenu.exe %dst%
 copy /y ..\TTProxy\Release\TTXProxy.dll %dst%

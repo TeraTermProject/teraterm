@@ -5,8 +5,11 @@ BINDIR = $(HOME)/bin
 CC = gcc
 CXX = g++
 RC = windres
+EXE_BASE = cygterm.exe
 UNAME_A = $(shell uname -a)
 
+
+ifneq (,$(findstring CYGWIN, "$(UNAME_A)"))
 ifneq (,$(findstring x86_64, "$(UNAME_A)"))
 ifneq (,$(findstring x86_64, $(RC)))
 # x86_64-pc-cygwin-windres is not exists
@@ -20,13 +23,16 @@ ifneq (,$(findstring i686, $(RC)))
 override RC= windres
 endif
 endif
+else
+# msys2
+EXE_BASE = msys2term.exe
+endif
 
 CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions -DUNICODE -D_UNICODE -MMD
 #CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -mwindows
 
-EXE_BASE = cygterm.exe
 SRC = \
 	cygterm.cpp \
 	cygterm_cfg.cpp \
@@ -58,6 +64,7 @@ ARCHIVE = cygterm+.tar.gz
 .PHONY: all clean install uninstall archive
 .PHONY: cygterm+-x86_64 cygterm+-i686
 .PHONY: cygterm+-x86_64-clean cygterm+-i686-clean
+.PHONY: msys2term msys2term-clean
 
 all : $(EXE)
 ifneq (,$(wildcard Makefile.cyglaunch))
@@ -127,6 +134,12 @@ cygterm+-i686:
 
 cygterm+-i686-clean:
 	make BINARY_DIR=cygterm+-i686 clean
+
+msys2term:
+	make BINARY_DIR=msys2term all
+
+msys2term-clean:
+	make BINARY_DIR=msys2term clean
 
 $(BINARY_DIR)/%.o: %.cpp
 	@mkdir -p $(BINARY_DIR)
