@@ -93,7 +93,7 @@ getentropy(void *buf, size_t len)
 		return (-1);
 	}
 
-	return (0);
+	return (1);
 }
 #endif /* LIBRESSL_VERSION_NUMBER */
 
