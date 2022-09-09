@@ -219,6 +219,9 @@
     <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp">
       <Filter>ttpcmn</Filter>
     </ClCompile>
+    <ClCompile Include="themefile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -503,6 +506,9 @@
     </ClInclude>
     <ClInclude Include="..\ttpcmn\ttcmn_static.h">
       <Filter>ttpcmn</Filter>
+    </ClInclude>
+    <ClInclude Include="theme.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

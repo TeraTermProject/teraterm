@@ -182,6 +182,7 @@
     <ClCompile Include="teraprn.cpp" />
     <ClCompile Include="teraterm.cpp" />
     <ClCompile Include="themedlg.cpp" />
+    <ClCompile Include="themefile.cpp" />
     <ClCompile Include="ttdde.c" />
     <ClCompile Include="ttdebug.cpp" />
     <ClCompile Include="ttdialog.c" />
@@ -286,6 +287,7 @@
     <ClInclude Include="tekwin.h" />
     <ClInclude Include="telnet.h" />
     <ClInclude Include="teraprn.h" />
+    <ClInclude Include="theme.h" />
     <ClInclude Include="themedlg.h" />
     <ClInclude Include="themedlg_res.h" />
     <ClInclude Include="ttdde.h" />

@@ -56,6 +56,8 @@
 
 #define Section "Tera Term"
 #define SectionW L"Tera Term"
+#define BG_SECTION "BG"
+#define BG_SECTIONW L"BG"
 
 #define MaxStrLen (LONG)512
 
@@ -2845,29 +2847,16 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* ZMODEM 受信コマンド (2007.12.21 yutaka) */
 	WritePrivateProfileString(Section, "ZmodemRcvCommand", ts->ZModemRcvCommand, FName);
 
-	/* update file */
-	WritePrivateProfileString(NULL, NULL, NULL, FName);
-
 	DispWriteIni(FName, ts);
 
 	// themeフォルダを作る
+#if 0	// Tera Term がファイル保存時に作る?
 	{
+#define BG_THEME_DIR L"theme"
 		wchar_t *theme_folder = NULL;
 		awcscats(&theme_folder, ts->HomeDirW, L"\\", BG_THEME_DIR, NULL);
 		CreateDirectoryW(theme_folder, NULL);
 		free(theme_folder);
-	}
-
-	// テーマファイルに保存("theme\\ImageFile.INI")
-	//		TODO BGThemeFileはチェックしなくてよい?
-#if 0
-	{
-		wchar_t *theme_file = NULL;
-		aswprintf(&theme_file, L"%s\\%hs", ts->HomeDirW, BG_THEME_IMAGEFILE);
-		WritePrivateProfileStringAFileW(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, theme_file);
-		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, theme_file, ts->BGImgBrightness);
-		WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, theme_file, ts->BGImgBrightness);
-		free(theme_file);
 	}
 #endif
 

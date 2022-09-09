@@ -29,6 +29,8 @@
 
 /* TERATERM.EXE, VT terminal display routines */
 
+#pragma once
+
 #include "buffer.h"		// for TCharAttr
 
 #ifdef __cplusplus
@@ -39,7 +41,6 @@ extern "C" {
 void BGInitialize(BOOL initialize_once);
 void BGLoadThemeFile(TTTSet *pts);
 void BGSetupPrimary(BOOL forceSetup);
-void BGWriteThemeFile(const wchar_t *theme_file);
 
 void BGOnSettingChange(void);
 void BGOnEnterSizeMove(void);
@@ -147,14 +148,7 @@ extern BOOL IMECompositionState;
 #define WINDOW_REFRESH  6
 #define WINDOW_TOGGLE_MAXIMIZE 7
 
-#include "bg_theme.h"
-
-typedef struct {
-	BG_PATTERN id;
-	const char *str;
-} BG_PATTERN_ST;
-
-const BG_PATTERN_ST *GetBGPatternList(int index);
+#include "theme.h"
 
 #ifdef __cplusplus
 }

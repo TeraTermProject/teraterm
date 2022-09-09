@@ -60,7 +60,7 @@
 #include "tmfc.h"
 #include "tmfc_propdlg.h"
 
-#include "bg_theme.h"
+#include "theme.h"
 #include "themedlg_res.h"
 #include "themedlg.h"
 
@@ -96,7 +96,7 @@ typedef struct {
 static void SetWindowTextColor(HWND hWnd, COLORREF color)
 {
 	char str[32];
-	sprintf(str, "%02x%02x%02x", GetRValue(color), GetGValue(color), GetBValue(color));
+	sprintf_s(str, "%02x%02x%02x", GetRValue(color), GetGValue(color), GetBValue(color));
 	SetWindowTextA(hWnd, str);
 }
 
@@ -116,17 +116,17 @@ static COLORREF GetWindowTextColor(HWND hWnd)
 	memcpy(elem, &str[0], 2);
 	elem[2] = 0;
 	r = 0;
-	sscanf(elem, "%x", &r);
+	sscanf_s(elem, "%x", &r);
 
 	memcpy(elem, &str[2], 2);
 	elem[2] = 0;
 	g = 0;
-	sscanf(elem, "%x", &g);
+	sscanf_s(elem, "%x", &g);
 
 	memcpy(elem, &str[4], 2);
 	elem[2] = 0;
 	b = 0;
-	sscanf(elem, "%x", &b);
+	sscanf_s(elem, "%x", &b);
 
 	return RGB(r, g, b);
 }
@@ -138,7 +138,8 @@ static COLORREF GetDlgItemTextColor(HWND hDlg, int ID)
 
 static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 {
-	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, (bg_theme->BGDest.type == BG_PICTURE) ? TRUE : FALSE, 0);
+	BOOL bg_enable = (bg_theme->BGDest.type == BG_PICTURE && (bg_theme->BGDest.file != NULL && bg_theme->BGDest.file[0] != 0)) ? TRUE : FALSE;
+	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, bg_enable, 0);
 	SetDlgItemTextA(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file);
 	SetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT, bg_theme->BGDest.color);
 	{
@@ -226,7 +227,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			for (i = 0;; i++) {
 				LRESULT index;
-				const BG_PATTERN_ST *st = GetBGPatternList(i);
+				const BG_PATTERN_ST *st = ThemeBGPatternList(i);
 				if (st == NULL) {
 					break;
 				}
@@ -516,7 +517,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 		switch (wp) {
 		case IDC_COLOR_DEFAULT_BUTTON | (BN_CLICKED << 16): {
 			// デフォルト
-			BGGetColorDefault(&dlg_data->color_tab.color_theme);
+			ThemeGetColorDefault(&dlg_data->color_tab.color_theme);
 			SetColor(&dlg_data->color_tab.color_theme);
 			SetColorListCtrl(hWnd);
 			break;
@@ -735,8 +736,8 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case IDC_FILE_PREVIEW_BUTTON | (BN_CLICKED << 16): {
 			set:
 			// preview
-			BGSet(&dlg_data->bg_theme);
-			BGSetColorData(&dlg_data->color_tab.color_theme);
+			ThemeSetBG(&dlg_data->bg_theme);
+			ThemeSetColor(&dlg_data->color_tab.color_theme);
 			BGSetupPrimary(TRUE);
 			InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 			break;
@@ -760,7 +761,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			ofn.lpstrTitle = L"select theme file";
 
 			if (GetOpenFileNameW(&ofn)) {
-				BGLoad(theme_file, &dlg_data->bg_theme, &dlg_data->color_tab.color_theme);
+				ThemeLoad(theme_file, &dlg_data->bg_theme, &dlg_data->color_tab.color_theme);
 
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
@@ -769,8 +770,8 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					MB_YESNO | MB_ICONWARNING
 				};
 				if (TTMessageBoxW(hWnd, &info, ts->UILanguageFileW) == IDYES) {
-					BGSetColorData(&dlg_data->color_tab.color_theme);
-					BGSet(&dlg_data->bg_theme);
+					ThemeSetColor(&dlg_data->color_tab.color_theme);
+					ThemeSetBG(&dlg_data->bg_theme);
 					//SetColor(&dlg_data->color_tab.color_theme);
 
 					BGSetupPrimary(TRUE);
@@ -802,11 +803,11 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			if (GetSaveFileNameW(&ofn)) {
 				LRESULT checked = SendDlgItemMessageA(hWnd, IDC_FILE_SAVE_BG_CHECK, BM_GETCHECK, 0, 0);
 				if (checked & BST_CHECKED) {
-					BGSave(&dlg_data->bg_theme, theme_file);
+					ThemeSaveBG(&dlg_data->bg_theme, theme_file);
 				}
 				checked = SendDlgItemMessageA(hWnd, IDC_FILE_SAVE_COLOR_CHECK, BM_GETCHECK, 0, 0);
 				if (checked & BST_CHECKED) {
-					BGSaveColor(&dlg_data->color_tab.color_theme, theme_file);
+					ThemeSaveColor(&dlg_data->color_tab.color_theme, theme_file);
 				}
 			}
 			break;
@@ -912,24 +913,24 @@ void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 	dlg_data->pcv = pcv;
 	dlg_data->pts = pcv->ts;
 	dlg_data->hVTWin = pcv->HWin;
-	BGGet(&dlg_data->bg_theme);
+	ThemeGetBG(&dlg_data->bg_theme);
 	dlg_data->backup.bg_theme = dlg_data->bg_theme;
-	GetColorData(&dlg_data->color_tab.color_theme);
+	ThemeGetColor(&dlg_data->color_tab.color_theme);
 	dlg_data->backup.color_theme = dlg_data->color_tab.color_theme;
 
 	CThemeDlg dlg(hInst, hWnd, dlg_data);
 	INT_PTR r = dlg.DoModal();
 	if (r == 0) {
 		// cancel時、バックアップ内容に戻す
-		BGSet(&dlg_data->backup.bg_theme);
-		BGSetColorData(&dlg_data->color_tab.color_theme);
+		ThemeSetBG(&dlg_data->backup.bg_theme);
+		ThemeSetColor(&dlg_data->color_tab.color_theme);
 		BGSetupPrimary(TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}
 	else if (r >= 1) {
 		// okなど(Changes were saved by the user)
-		BGSet(&dlg_data->bg_theme);
-		BGSetColorData(&dlg_data->color_tab.color_theme);
+		ThemeSetBG(&dlg_data->bg_theme);
+		ThemeSetColor(&dlg_data->color_tab.color_theme);
 		BGSetupPrimary(TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}

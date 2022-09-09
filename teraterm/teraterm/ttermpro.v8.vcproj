@@ -257,6 +257,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\themefile.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ttdebug.cpp"
 				>
 			</File>
@@ -480,6 +484,10 @@
 			</File>
 			<File
 				RelativePath="..\common\teraterm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\theme.h"
 				>
 			</File>
 			<File

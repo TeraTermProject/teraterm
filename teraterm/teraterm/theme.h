@@ -31,6 +31,10 @@
 
 #include <windows.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum _BG_TYPE { BG_COLOR = 0, BG_PICTURE, BG_WALLPAPER, BG_NONE } BG_TYPE;
 typedef enum _BG_PATTERN {
 	BG_STRETCH = 0,
@@ -86,17 +90,31 @@ typedef struct {
 	TAnsiColorSetting ansicolor;
 } TColorTheme;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-void BGLoad(const wchar_t *fname, BGTheme *bg_theme, TColorTheme *color_theme);
-void BGSave(const BGTheme *bg_theme, const wchar_t *fname);
-void BGSaveColor(TColorTheme *color_theme, const wchar_t *fname);
-void BGSet(const BGTheme *bg_theme);
-void BGGet(BGTheme *bg_theme);
-void GetColorData(TColorTheme *data);
-void BGSetColorData(const TColorTheme *data);
-void BGGetColorDefault(TColorTheme *data);
+typedef struct {
+	BG_PATTERN id;
+	const char *str;
+} BG_PATTERN_ST;
+
+// setting / themefile.cpp
+const BG_PATTERN_ST *ThemeBGPatternList(int index);
+
+// file / themefile.cpp
+void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme);
+void ThemeLoadColor(const wchar_t *fn, TColorTheme *color_theme);
+void ThemeLoadColorOld(const wchar_t *file, TColorTheme *theme);
+void ThemeLoad(const wchar_t *fname, BGTheme *bg_theme, TColorTheme *color_theme);
+void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *fname);
+void ThemeSaveColor(TColorTheme *color_theme, const wchar_t *fname);
+
+// setting / vtdisp.c
+void ThemeGetBG(BGTheme *bg_theme);
+void ThemeSetBG(const BGTheme *bg_theme);
+void ThemeGetColor(TColorTheme *data);
+void ThemeSetColor(const TColorTheme *data);
+void ThemeGetColorDefault(TColorTheme *data);
+void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme);
+void ThemeGetBGDefault(BGTheme *bg_theme);
+
 #ifdef __cplusplus
 }
 #endif
