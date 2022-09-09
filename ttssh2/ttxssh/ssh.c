@@ -654,13 +654,21 @@ void log_kex_key(PTInstVar pvar, const BIGNUM *secret)
 	int fd, i;
 	unsigned char buff[4], *cookie;
 	char *hexstr;
+	wchar_t *fname;
 
 	if (pvar->settings.KexKeyLogging && pvar->settings.KexKeyLogFile[0] != 0) {
 		hexstr = BN_bn2hex(secret);
 		if (hexstr == NULL) {
 			return;
 		}
-		fd = _open(pvar->settings.KexKeyLogFile,
+
+		fname = get_log_dir_relative_nameW(pvar->settings.KexKeyLogFile);
+		if (fname == NULL) {
+			OPENSSL_free(hexstr);
+			return;
+		}
+
+		fd = _wopen(fname,
 			_O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
 			_S_IREAD | _S_IWRITE);
 		if (fd >= 0) {
@@ -674,6 +682,7 @@ void log_kex_key(PTInstVar pvar, const BIGNUM *secret)
 			_write(fd, "\n", 1);
 			_close(fd);
 		}
+		free(fname);
 		OPENSSL_free(hexstr);
 	}
 #endif
