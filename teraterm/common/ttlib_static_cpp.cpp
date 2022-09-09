@@ -1557,3 +1557,118 @@ void GetMessageboxFontW(LOGFONTW *logfont)
 	assert(r == TRUE);
 	*logfont = nci.lfStatusFont;
 }
+
+/**
+ *	ファイルをランダムに選ぶ
+ *
+ *		rand() を使っているのでプラグインで利用するときはsrand()すること
+ *			srand((unsigned int)time(NULL));
+ *
+ *	@param[in] filespec_src		入力ファイル名
+ *								ワイルドカード("*","?"など)が入っていてもよい、なくてもよい
+ *								ワイルドカードが入っているときはランダムにファイルが出力される
+ *								%HOME% 等は環境変数として展開される
+ *								フルパスでなくてもよい
+ *	@return		選ばれたファイル、不要になったらfree()すること
+ *				NULL=ファイルがない
+ */
+wchar_t *RandomFileW(const wchar_t *filespec_src)
+{
+	int    i;
+	int    file_num;
+	wchar_t   *fullpath;
+	HANDLE hFind;
+	WIN32_FIND_DATAW fd;
+	wchar_t *file_env;
+	DWORD e;
+	wchar_t *dir;
+
+	if (filespec_src == NULL || filespec_src[0] == 0) {
+		return NULL;
+	}
+
+	//環境変数を展開
+	hExpandEnvironmentStringsW(filespec_src, &file_env);
+
+	//絶対パスに変換
+	e = hGetFullPathNameW(file_env, &fullpath, NULL);
+	free(file_env);
+	file_env = NULL;
+	if(e != NO_ERROR) {
+		return NULL;
+	}
+
+	//ファイルが存在しているか?
+	if (GetFileAttributesW(fullpath) != INVALID_FILE_ATTRIBUTES) {
+		// マスク("*.jpg"など)がなくファイルが直接指定してある場合
+		return fullpath;
+	}
+
+	//ファイルを数える
+	hFind = FindFirstFileW(fullpath,&fd);
+	if (hFind == INVALID_HANDLE_VALUE) {
+		free(fullpath);
+		return NULL;
+	}
+	file_num = 0;
+	do {
+		if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			file_num ++;
+	} while(FindNextFileW(hFind,&fd));
+	FindClose(hFind);
+	if(!file_num) {
+		// 0個
+		free(fullpath);
+		return NULL;
+	}
+
+	//何番目のファイルにするか決める。
+	file_num = rand()%file_num + 1;
+
+	hFind = FindFirstFileW(fullpath,&fd);
+	if(hFind == INVALID_HANDLE_VALUE) {
+		free(fullpath);
+		return NULL;
+	}
+	i = 0;
+	do{
+		if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			i ++;
+	} while(i < file_num && FindNextFileW(hFind,&fd));
+	FindClose(hFind);
+
+	//ディレクトリ取得
+	dir = ExtractDirNameW(fullpath);
+	free(fullpath);
+
+	fullpath = NULL;
+	awcscats(&fullpath, dir, L"\\", fd.cFileName);
+	free(dir);
+	return fullpath;
+}
+
+/**
+ *	ファイルをランダムに選ぶ
+ *
+ *	@param[in] filespec_src		入力ファイル名
+ *								ワイルドカード("*","?"など)が入っていてもよい、なくてもよい
+ *								ワイルドカードが入っているときはランダムにファイルが出力される
+ *								フルパスでなくてもよい
+ *	@param[out]	filename		フルパスファイル名
+ *								カレントフォルダ相対でフルパスに変換される
+ *								ファイルがないときは [0] = NULL
+ *	@param[in]	destlen			filename の領域長
+ */
+void RandomFile(const char *filespec_src,char *filename, int destlen)
+{
+	wchar_t *filespec_srcW = ToWcharA(filespec_src);
+	wchar_t *one = RandomFileW(filespec_srcW);
+	if (one != NULL) {
+		WideCharToACP_t(one, filename, destlen);
+		free(one);
+	}
+	else {
+		filename[0] = 0;
+	}
+	free(filespec_srcW);
+}

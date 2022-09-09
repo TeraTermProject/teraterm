@@ -375,9 +375,14 @@ static void FillBitmapDC(HDC hdc,COLORREF color)
   DeleteObject(hBrush);
 }
 
-#if 0
 static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
 {
+#if 1
+	(void)fname;
+	(void)hdc;
+	(void)width;
+	(void)height;
+#else
 	if (IsRelativePathW(fname)) {
 		wchar_t *desktop;
 		wchar_t *bmpfile;
@@ -391,124 +396,7 @@ static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
 	else {
 		SaveBmpFromHDC(fname, hdc, width, height);
 	}
-}
-#else
-static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
-{
-	(void)fname;
-	(void)hdc;
-	(void)width;
-	(void)height;
-}
 #endif
-
-
-/**
- *	ファイルをランダムに選ぶ
- *
- *	@param[in] filespec_src		入力ファイル名
- *								ワイルドカード("*","?"など)が入っていてもよい、なくてもよい
- *								ワイルドカードが入っているときはランダムにファイルが出力される
- *								フルパスでなくてもよい
- *	@param[out]	filename		フルパスファイル名
- *								カレントフォルダ相対でフルパスに変換される
- *								ファイルがないときは [0] = NULL
- *	@param[in]	destlen			filename の領域長
- */
-static void RandomFile(const char *filespec_src,char *filename, int destlen)
-{
-  int    i;
-  int    file_num;
-  char   fullpath[1024];
-  char   *filePart;
-  char filespec[1024];
-  HANDLE hFind;
-  WIN32_FIND_DATA fd;
-
-  //環境変数を展開
-  ExpandEnvironmentStringsA(filespec_src, filespec, sizeof(filespec));
-
-  //絶対パスに変換
-  if(!GetFullPathNameA(filespec,MAX_PATH,fullpath,&filePart)) {
-	filename[0] = 0;
-	return;
-  }
-
-  //ファイルが存在しているか?
-  if (GetFileAttributesA(fullpath) != INVALID_FILE_ATTRIBUTES) {
-	// マスク("*.jpg"など)がなくファイルが直接指定してある場合
-	strncpy_s(filename,destlen,fullpath,_TRUNCATE);
-	return;
-  }
-
-  //ファイルを数える
-  hFind = FindFirstFile(fullpath,&fd);
-  if (hFind == INVALID_HANDLE_VALUE) {
-	filename[0] = 0;
-	return;
-  }
-  file_num = 0;
-
-  if(hFind != INVALID_HANDLE_VALUE && filePart)
-  {
-
-    do{
-
-      if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-        file_num ++;
-
-    }while(FindNextFile(hFind,&fd));
-
-  }
-
-  if(!file_num)
-    return;
-
-  FindClose(hFind);
-
-  //何番目のファイルにするか決める。
-  file_num = rand()%file_num + 1;
-
-  hFind = FindFirstFile(fullpath,&fd);
-
-  if(hFind != INVALID_HANDLE_VALUE)
-  {
-    i = 0;
-
-    do{
-
-      if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-        i ++;
-
-    }while(i < file_num && FindNextFile(hFind,&fd));
-
-  }else{
-    return;
-  }
-
-  FindClose(hFind);
-
-  //ディレクトリ取得
-  ZeroMemory(filename,destlen);
-  {
-    size_t tmplen;
-    char *tmp;
-    tmplen = filePart - fullpath + 1;
-    tmp = (char *)_alloca(tmplen);
-    strncpy_s(tmp,tmplen,fullpath,filePart - fullpath);
-    strncpy_s(filename,destlen,tmp,_TRUNCATE);
-  }
-
-  strncat_s(filename,destlen,fd.cFileName,_TRUNCATE);
-}
-
-static wchar_t *RandomFileW(const wchar_t *filespecW)
-{
-	char filespecA[MAX_PATH];
-	char filenameA[MAX_PATH];
-	WideCharToACP_t(filespecW, filespecA, _countof(filespecA));
-	RandomFile(filespecA, filenameA, _countof(filenameA));
-	return ToWcharA(filenameA);
 }
 
 static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
@@ -1298,7 +1186,7 @@ static COLORREF BGGetColor(const char *name, COLORREF defcolor, const wchar_t *f
 
 	r = g = b = 0;
 
-	sscanf(colorstr, "%d , %d , %d", &r, &g, &b);
+	sscanf_s(colorstr, "%d , %d , %d", &r, &g, &b);
 
 	return RGB(r, g, b);
 }
@@ -1533,10 +1421,6 @@ void BGInitialize(BOOL initialize_once)
 
 	//リソース解放
 	BGDestruct();
-
-	//乱数初期化 TODO Tera Term の最初で行う
-	// add cast (2006.2.18 yutaka)
-	srand((unsigned int)time(NULL));
 
 	//テンポラリーファイル名を生成
 	{
@@ -4408,7 +4292,7 @@ void BGSave(const BGTheme *bg_theme, const wchar_t *file)
  */
 void BGSet(const BGTheme *bg_theme)
 {
-	strcpy(BGDest.file, bg_theme->BGDest.file);
+	strcpy_s(BGDest.file, _countof(BGDest.file), bg_theme->BGDest.file);
 	BGDest.type = bg_theme->BGDest.type;
 	BGDest.color = bg_theme->BGDest.color;
 	BGDest.pattern = bg_theme->BGDest.pattern;
@@ -4427,7 +4311,7 @@ void BGSet(const BGTheme *bg_theme)
 
 void BGGet(BGTheme *bg_theme)
 {
-	strcpy(bg_theme->BGDest.file, BGDest.file);
+	strcpy_s(bg_theme->BGDest.file, _countof(bg_theme->BGDest.file), BGDest.file);
 	bg_theme->BGDest.type = BGDest.type;
 	bg_theme->BGDest.color = BGDest.color;
 	bg_theme->BGDest.pattern = BGDest.pattern;
@@ -4457,9 +4341,9 @@ static void BGSaveColorOne(const TColorSetting *color, const char *key, const wc
 	COLORREF fg = color->fg;
 	COLORREF bg = color->bg;
 
-	sprintf(buf, "%d,%d, %d,%d,%d, %d,%d,%d", 1, 1,
-			GetRValue(fg), GetGValue(fg), GetBValue(fg),
-			GetRValue(bg), GetGValue(bg), GetBValue(bg));
+	sprintf_s(buf, _countof(buf), "%d,%d, %d,%d,%d, %d,%d,%d", 1, 1,
+			  GetRValue(fg), GetGValue(fg), GetBValue(fg),
+			  GetRValue(bg), GetGValue(bg), GetBValue(bg));
 	WritePrivateProfileStringAFileW("Color Theme", key, buf, fn);
 }
 

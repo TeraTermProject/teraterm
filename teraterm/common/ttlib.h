@@ -207,6 +207,8 @@ BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str);
 wchar_t *MakeISO8601Str(time_t t);
 int KanjiCodeToISO8859Part(int kanjicode);
 void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height);
+wchar_t *RandomFileW(const wchar_t *filespec_src);
+void RandomFile(const char *filespec_src,char *filename, int destlen);
 
 #ifdef __cplusplus
 }
