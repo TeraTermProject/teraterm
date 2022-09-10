@@ -93,7 +93,7 @@ getentropy(void *buf, size_t len)
 		return (-1);
 	}
 
-	return (1);
+	return (0);
 }
 #endif /* LIBRESSL_VERSION_NUMBER */
 
@@ -107,7 +107,7 @@ _rs_stir(void)
 		return;
 	}
 #else
-	if (getentropy(rnd, sizeof(rnd)) <= 0) {
+	if (getentropy(rnd, sizeof(rnd)) == -1) {
 		return;
 	}
 #endif
