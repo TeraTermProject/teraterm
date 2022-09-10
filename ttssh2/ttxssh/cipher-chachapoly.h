@@ -24,7 +24,6 @@
 typedef unsigned int u_int32_t;
 typedef unsigned long long u_int64_t;
 
-#include "chacha.h"
 #include "poly1305.h"
 
 #define CHACHA_KEYLEN	32 /* Only 256 bit keys used here */
