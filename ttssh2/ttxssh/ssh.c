@@ -68,6 +68,11 @@
 #include <fcntl.h>
 #endif
 
+#ifndef MAX
+# define MAX(a,b) (((a)>(b))?(a):(b))
+# define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
 // SSH2 macro
 #ifdef _DEBUG
 #define SSH2_DEBUG
