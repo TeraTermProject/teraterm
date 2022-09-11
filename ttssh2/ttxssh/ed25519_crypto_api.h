@@ -31,7 +31,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "arc4random.h"
+
+#ifndef LIBRESSL_VERSION_NUMBER
+  #include "arc4random.h"
+#else
+  // include LibreSSL header file
+  #include <compat/stdlib.h>
+#endif
 
 typedef unsigned char u_int8_t;
 typedef unsigned short int u_int16_t;

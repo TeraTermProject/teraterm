@@ -8,6 +8,13 @@ Public domain.
 
 // #include "includes.h"
 
+/*
+ * このソースは OpenSSL のときだけ使われる
+ * LibreSSL のときは libressl/crypto/compat/chacha_private.h が使われる
+ */
+#include <openssl/opensslv.h> /* For OPENSSL_VERSION_NUMBER */
+#ifndef LIBRESSL_VERSION_NUMBER
+
 #include "chacha.h"
 
 /* $OpenBSD: chacha.c,v 1.1 2013/11/21 00:45:44 djm Exp $ */
@@ -219,3 +226,5 @@ chacha_encrypt_bytes(chacha_ctx *x, const u8 *m, u8 *c, u32 bytes)
     m += 64;
   }
 }
+
+#endif /* LIBRESSL_VERSION_NUMBER */

@@ -40,7 +40,6 @@
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "keyfiles.h"
-#include "arc4random.h"
 #include "auth.h"
 #include "helpid.h"
 
@@ -70,6 +69,13 @@
 #include <openssl/rand.h>
 #include <openssl/rc4.h>
 #include <openssl/md5.h>
+
+#ifndef LIBRESSL_VERSION_NUMBER
+  #include "arc4random.h"
+#else
+  // include LibreSSL header file
+  #include <compat/stdlib.h>
+#endif
 
 // include ZLib header file
 #include <zlib.h>
