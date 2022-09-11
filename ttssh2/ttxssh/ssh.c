@@ -5098,7 +5098,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	int len;
-	BIGNUM *pub_key;
+	BIGNUM *pub_key, *priv_key;
 
 	// Diffie-Hellman key agreement
 	switch (pvar->kex_type) {
@@ -5121,7 +5121,8 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
-	log_kex_key(pvar, dh->priv_key);
+	DH_get0_key(dh, NULL, &priv_key);
+	log_kex_key(pvar, priv_key);
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -5273,7 +5274,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	char tmpbuf[256];
-	BIGNUM *pub_key;
+	BIGNUM *pub_key, *priv_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_GROUP was received.");
 
@@ -5352,7 +5353,8 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	// 秘密にすべき乱数(X)を生成
 	dh_gen_key(pvar, dh, pvar->we_need);
-	log_kex_key(pvar, dh->priv_key);
+	DH_get0_key(dh, NULL, &priv_key);
+	log_kex_key(pvar, priv_key);
 
 	// 公開鍵をサーバへ送信
 	msg = buffer_init();
