@@ -184,11 +184,11 @@ Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\comm
 ; Associate with .TTL
 Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,0; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
+Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,3; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 Root: HKCR; Subkey: .ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 Root: HKCR; Subkey: TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCR; Subkey: TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,0; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
+Root: HKCR; Subkey: TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,3; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 Root: HKCR; Subkey: TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 ; Associate with telnet://
 Root: HKCU; Subkey: Software\Classes\telnet\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Check: isWin2kOrLater; Components: TeraTerm; Tasks: telnetassoc

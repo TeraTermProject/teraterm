@@ -154,6 +154,7 @@ END
 IDI_TTMACRO             ICON                    "ttmacro.ico"
 IDI_TTMACRO_3D          ICON                    "ttmacro_3d.ico"
 IDI_TTMACRO_FLAT        ICON                    "ttmacro_flat.ico"
+IDI_TTMACRO_FILE        ICON                    "ttmacrof.ico"
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
