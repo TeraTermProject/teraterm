@@ -653,11 +653,11 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_SECURETT            ICON                    "ttsecure.ico"
-IDI_SECURETT_CLASSIC    ICON                    "ttsecure_classic.ico"
 IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
 IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
-IDI_SECURETT_FLAT       ICON                    "ttsecure_flat.ico"
 IDI_DROPDOWN            ICON                    "dropdown.ico"
+IDI_SECURETT_CLASSIC    ICON                    "ttsecure_classic.ico"
+IDI_SECURETT_FLAT       ICON                    "ttsecure_flat.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
