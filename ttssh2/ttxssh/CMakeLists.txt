@@ -164,6 +164,7 @@ target_include_directories(
   ../../teraterm/common
   ../matcher
   ../putty
+  ../../libs/include
   ${ZLIB_INCLUDE_DIRS}
   )
 
