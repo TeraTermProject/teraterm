@@ -1175,7 +1175,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_SERIALHELP, "BTN_HELP" },
 	};
-	PTTSet ts = NULL;
+	PTTSet ts = (PTTSet)GetWindowLongPtr(Dialog, DWLP_USER);
 	int i, w, sel;
 	char Temp[128];
 	static WORD ComPortTable[MAXCOMPORT];  // 使用可能なCOMポート番号
@@ -1314,7 +1314,6 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						memset(Temp, 0, sizeof(Temp));
 						GetDlgItemText(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
