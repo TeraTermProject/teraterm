@@ -37,8 +37,6 @@ extern "C" {
 void BGInitialize(BOOL initialize_once);
 void BGSetupPrimary(BOOL);
 
-void BGExchangeColor(void);
-
 void BGOnSettingChange(void);
 void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(void);

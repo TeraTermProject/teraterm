@@ -1658,37 +1658,6 @@ void BGInitialize(BOOL initialize_once)
 
 }
 
-void BGExchangeColor() {
-	COLORREF ColorRef;
-      if (ts.ColorFlag & CF_REVERSECOLOR) {
-        ColorRef = BGVTColor[0];
-        BGVTColor[0] = BGVTReverseColor[0];
-        BGVTReverseColor[0] = ColorRef;
-        ColorRef = BGVTColor[1];
-        BGVTColor[1] = BGVTReverseColor[1];
-        BGVTReverseColor[1] = ColorRef;
-      }
-      else {
-        ColorRef = BGVTColor[0];
-        BGVTColor[0] = BGVTColor[1];
-        BGVTColor[1] = ColorRef;
-      }
-
-      ColorRef = BGVTBoldColor[0];
-      BGVTBoldColor[0] = BGVTBoldColor[1];
-      BGVTBoldColor[1] = ColorRef;
-
-      ColorRef = BGVTBlinkColor[0];
-      BGVTBlinkColor[0] = BGVTBlinkColor[1];
-      BGVTBlinkColor[1] = ColorRef;
-
-      ColorRef = BGURLColor[0];
-      BGURLColor[0] = BGURLColor[1];
-      BGURLColor[1] = ColorRef;
-
-//    BGReverseText = !BGReverseText;
-}
-
 void BGFillRect(HDC hdc,RECT *R,HBRUSH brush)
 {
   if(!BGEnable)
@@ -1790,21 +1759,11 @@ void BGOnSettingChange(void)
 //-->
 #endif  // ALPHABLEND_TYPE2
 
-void DispApplyANSIColor() {
+static void DispApplyANSIColor(void) {
   int i;
 
   for (i = IdBack ; i <= IdFore+8 ; i++)
     ANSIColor[i] = ts.ANSIColor[i];
-
-  if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-#ifdef ALPHABLEND_TYPE2
-    ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
-    ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
-#else
-    ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-    ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-#endif
-  }
 }
 
 void InitColorTable()
@@ -2544,22 +2503,6 @@ void DispChangeWin()
   /* Change caret shape */
   ChangeCaret();
 
-  if ((ts.ColorFlag & CF_USETEXTCOLOR)==0)
-  {
-    ANSIColor[IdFore ]   = ts.ANSIColor[IdFore ];
-    ANSIColor[IdBack ]   = ts.ANSIColor[IdBack ];
-  }
-  else { // use text (background) color for "white (black)"
-    ANSIColor[IdFore ]   = ts.VTColor[0];
-    ANSIColor[IdBack ]   = ts.VTColor[1];
-
-#ifdef ALPHABLEND_TYPE2
-	ANSIColor[IdFore ]   = BGVTColor[0];
-	ANSIColor[IdBack ]   = BGVTColor[1];
-#endif  // ALPHABLEND_TYPE2
-
-  }
-
   /* change background color */
   DispChangeBackground();
 }
@@ -2602,17 +2545,8 @@ void DispReleaseDC()
   VTDC = NULL;
 }
 
-#define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
-#define isURLUnderlined(x) ((ts.FontFlag & FF_URLUNDERLINE) && ((x).Attr & AttrURL))
-#define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
-#define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
-#define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))
-#define isForeColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Fore))
-#define isBackColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Back))
-
 /**
- * 文字色・背景色を設定する
- *   シーケンスの色番号から ANSIColor[] の色を得る処理が含まれる
+ * シーケンスのcolor_indexをANSIColor[]のindexへ変換する
  *
  * ANSIColor[] の 0-7 には原色(明るい色)、8-15 には少し暗い色が入っている
  *   0: Black   8: Gray (Bright Black)
@@ -2624,202 +2558,250 @@ void DispReleaseDC()
  * PC-style 16 colors
  *   Bold 属性と文字色属性(0-7)の組み合わせで明るい文字色を表す
  *   Blink 属性と背景色属性(0-7)の組み合わせで明るい背景色を表す
- * - そのため CF_PCBOLD16 が有効で、文字色が Bold のとき・背景色が Blink のときは
+ * - そのため CF_PCBOLD16 が有効で pcbold16_bright が true のときは
  * 原色(明るい色)になるよう 1-7 は入れ替えない。
  * - CF_PCBOLD16 が無効なときには 1-7 を入れ替える。
  *   この組み合わせで明るい色を表すのは PC-style だけなので入れ替える。
  * - 9-15 は常に入れ替える。
- *   CF_PCBOLD16 が有効で、文字色が Bold のとき・背景色が Blink のときは 1-7 も 9-15 も
+ *   CF_PCBOLD16 が有効で pcbold16_bright が true のときは 1-7 も 9-15 も
  * 明るい色になるが、9-15 は他の拡張モードで使われる。
- */
+ *
+ * @param color_index
+ * @param pcbold16				0/0以外 = 16 color mode PC Styleではない/である
+ * @param pcbold16_bright		0/0以外 = 色を明るくしない/する
+ * @return ANSIColor[]のindex
+*/
+static int Get256ColorIndex(int color_index, int pcbold16, int pcbold16_bright)
+{
+	int table_index;
+	if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
+		// 8色モード
+		//		table index		default color
+		//		0    			黒,Black
+		//		1-7  			明るい色,原色 (Bright color)
+		table_index = color_index;
+	}
+	else {
+		// 16/256色
+		if (color_index < 8 && (pcbold16 != 0)) {
+			//		index-> table index		default color
+			//	not bright時
+			//		0    -> 0   (変化なし)	黒,Black
+			//		1-7  -> 9-15			少し暗い色
+			//	bright時
+			//		0    -> 0   (変化なし)	黒,Black
+			//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
+			if ((pcbold16_bright != 0) == (color_index != 0)) {
+				table_index = color_index;
+			}
+			else {
+				table_index = color_index ^ 8;
+			}
+		}
+		else {
+			//		index-> table index		default color
+			//		0    -> 0   (変化なし)	黒,Black
+			//		1-7  -> 9-15			少し暗い色
+			//		8    -> 8   (変化なし)	灰色, Bright Black (Gray)
+			//		9-15 -> 1-7				明るい色,原色 (Bright color)
+			//		16-  -> 16- (変化なし)
+			if (color_index < 16 && (color_index & 7) != 0) {
+				// color_index が 1-7,9-15 のとき
+				table_index = color_index ^ 8;
+			}
+			else {
+				table_index = color_index;
+			}
+		}
+	}
+	return table_index;
+}
+
 void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 // Setup device context
 //   Attr: character attributes
 //   Reverse: true if text is selected (reversed) by mouse
 {
-  COLORREF TextColor, BackColor;
-  int NoReverseColor = 2;
+	COLORREF TextColor, BackColor;
+	WORD AttrFlag;	// Attr + Flag
+	WORD Attr2Flag;	// Attr2 + Flag
+	BOOL reverse;
+	const BOOL use_normal_bg_color = ts.UseNormalBGColor;
 
-  if (VTDC==NULL)  DispInitDC();
+	// ts.ColorFlag と Attr を合成した Attr を作る
+	AttrFlag = 0;
+	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) ? AttrURL : 0;
+	//AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) ? AttrBold : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) ? AttrBlink : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr.Attr & AttrReverse)) ? AttrReverse : 0;
+	Attr2Flag = 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) ? Attr2Fore : 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) ? Attr2Back : 0;
 
-  if (TCharAttrCmp(DCAttr, Attr) == 0 && DCReverse == Reverse) {
-    return;
-  }
-  DCAttr = Attr;
-  DCReverse = Reverse;
+	if (VTDC == NULL)
+		DispInitDC();
 
-  SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | (isURLUnderlined(Attr)?AttrUnder:0)]);
-
-  if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-	if (isBlinkColored(Attr)) {
-#ifdef ALPHABLEND_TYPE2 // AKASI
-	  TextColor = BGVTBlinkColor[0];
-	  BackColor = BGVTBlinkColor[1];
-#else
-	  TextColor = ts.VTBlinkColor[0];
-	  BackColor = ts.VTBlinkColor[1];
-#endif
+	// 反転
+	reverse = FALSE;
+	if (Reverse) {
+		reverse = TRUE;
 	}
-	else if (isBoldColored(Attr)) {
-#ifdef ALPHABLEND_TYPE2 // AKASI
-	  TextColor = BGVTBoldColor[0];
-	  BackColor = BGVTBoldColor[1];
-#else
-	  TextColor = ts.VTBoldColor[0];
-	  BackColor = ts.VTBoldColor[1];
-#endif
+	if ((AttrFlag & AttrReverse) != 0) {
+		reverse = reverse ? FALSE : TRUE;
 	}
-    /* begin - ishizaki */
-	else if (isURLColored(Attr)) {
-#ifdef ALPHABLEND_TYPE2 // AKASI
-	  TextColor = BGURLColor[0];
-	  BackColor = BGURLColor[1];
-#else
-	  TextColor = ts.URLColor[0];
-	  BackColor = ts.URLColor[1];
-#endif
+	if ((ts.ColorFlag & CF_REVERSEVIDEO) != 0) {
+		reverse = reverse ? FALSE : TRUE;
 	}
-    /* end - ishizaki */
+
+	if (TCharAttrCmp(DCAttr, Attr) == 0 && DCReverse == reverse) {
+		return;
+	}
+	DCAttr = Attr;
+	DCReverse = reverse;
+
+	// フォント設定
+	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
+		//((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
+		((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrUnder))) {
+		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
+	}
 	else {
-	  if (isForeColored(Attr)) {
-		TextColor = ANSIColor[Attr.Fore];
-	  }
-	  else {
-#ifdef ALPHABLEND_TYPE2 // AKASI
-		TextColor = BGVTColor[0];
-#else
-		TextColor = ts.VTColor[0];
-#endif
-		NoReverseColor = 1;
-	  }
+		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
+	}
 
-	  if (isBackColored(Attr)) {
-		BackColor = ANSIColor[Attr.Back];
-	  }
-	  else {
-#ifdef ALPHABLEND_TYPE2 // AKASI
-		BackColor = BGVTColor[1];
-#else
-		BackColor = ts.VTColor[1];
-#endif
-		if (NoReverseColor == 1) {
-		  NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
+	// 色を決定する
+	TextColor = BGVTColor[0];
+	BackColor = BGVTColor[1];
+	if ((AttrFlag & (AttrURL | AttrUnder | AttrBold | AttrBlink)) == 0) {
+		if (!reverse) {
+			TextColor = BGVTColor[0];
+			BackColor = BGVTColor[1];
 		}
-	  }
+		else {
+			TextColor = BGVTReverseColor[0];
+			BackColor = BGVTReverseColor[1];
+		}
+	} else if (AttrFlag & AttrBlink) {
+		if (!reverse) {
+			TextColor = BGVTBlinkColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGVTBlinkColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGVTBlinkColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGVTBlinkColor[0];
+		}
+	} else if (AttrFlag & AttrBold) {
+		if (!reverse) {
+			TextColor = BGVTBoldColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGVTBoldColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGVTBoldColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGVTBoldColor[0];
+		}
+	} else if (AttrFlag & AttrUnder) {
+#define BGVTUnderlineColor BGURLColor
+		if (!reverse) {
+			TextColor = BGVTUnderlineColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGVTUnderlineColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGVTUnderlineColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGVTUnderlineColor[0];
+		}
+	} else if (AttrFlag & AttrURL) {
+		if (!reverse) {
+			TextColor = BGURLColor[0];
+			if (!use_normal_bg_color) {
+				BackColor = BGURLColor[1];
+			} else {
+				BackColor = BGVTColor[1];
+			}
+		} else {
+			if (!use_normal_bg_color) {
+				TextColor = BGURLColor[1];
+			} else {
+				TextColor = BGVTColor[1];
+			}
+			BackColor = BGURLColor[0];
+		}
 	}
-  }
-  else { // full color
-	if (isForeColored(Attr)) {
-	  if (Attr.Fore<8 && (ts.ColorFlag&CF_PCBOLD16)) {
-	    if (((Attr.Attr&AttrBold)!=0) == (Attr.Fore!=0)) {
-	      TextColor = ANSIColor[Attr.Fore];
-	    }
-	    else {
-	      TextColor = ANSIColor[Attr.Fore ^ 8];
-	    }
-	  }
-	  else if (Attr.Fore < 16 && (Attr.Fore&7) != 0) {
-	    TextColor = ANSIColor[Attr.Fore ^ 8];
-	  }
-	  else {
-	    TextColor = ANSIColor[Attr.Fore];
-	  }
-	}
-	else if (isBlinkColored(Attr))
-#ifdef ALPHABLEND_TYPE2 // AKASI
-	  TextColor = BGVTBlinkColor[0];
-	else if (isBoldColored(Attr))
-	  TextColor = BGVTBoldColor[0];
-	else if (isURLColored(Attr))
-	  TextColor = BGURLColor[0];
-	else {
-	  TextColor = BGVTColor[0];
-#else
-	  TextColor = ts.VTBlinkColor[0];
-	else if (isBoldColored(Attr))
-	  TextColor = ts.VTBoldColor[0];
-	else if (isURLColored(Attr))
-	  TextColor = ts.URLColor[0];
-	else {
-	  TextColor = ts.VTColor[0];
-#endif
-	  NoReverseColor = 1;
-	}
-	if (isBackColored(Attr)) {
-	  if (Attr.Back<8 && (ts.ColorFlag&CF_PCBOLD16)) {
-	    if (((Attr.Attr&AttrBlink)!=0) == (Attr.Back!=0)) {
-	      BackColor = ANSIColor[Attr.Back];
-	    }
-	    else {
-	      BackColor = ANSIColor[Attr.Back ^ 8];
-	    }
-	  }
-	  else if (Attr.Back < 16 && (Attr.Back&7) != 0) {
-	    BackColor = ANSIColor[Attr.Back ^ 8];
-	  }
-	  else {
-	    BackColor = ANSIColor[Attr.Back];
-	  }
-	}
-	else if (isBlinkColored(Attr))
-#ifdef ALPHABLEND_TYPE2 // AKASI
-	  BackColor = BGVTBlinkColor[1];
-	else if (isBoldColored(Attr))
-	  BackColor = BGVTBoldColor[1];
-	else if (isURLColored(Attr))
-	  BackColor = BGURLColor[1];
-	else {
-	  BackColor = BGVTColor[1];
-#else
-	  BackColor = ts.VTBlinkColor[1];
-	else if (isBoldColored(Attr))
-	  BackColor = ts.VTBoldColor[1];
-	else if (isURLColored(Attr))
-	  BackColor = ts.URLColor[1];
-	else {
-	  BackColor = ts.VTColor[1];
-#endif
-	  if (NoReverseColor == 1) {
-	    NoReverseColor = !(ts.ColorFlag & CF_REVERSECOLOR);
-	  }
-	}
-  }
-#ifdef USE_NORMAL_BGCOLOR_REJECT
-  if (ts.UseNormalBGColor) {
- #ifdef ALPHABLEND_TYPE2
-    BackColor = BGVTColor[1];
- #else
-    BackColor = ts.VTColor[1];
- #endif
-  }
-#endif
 
-  if (Reverse != ((Attr.Attr & AttrReverse) != 0))
-  {
-#ifdef ALPHABLEND_TYPE2
-    BGReverseText = TRUE;
-#endif
-    if ((Attr.Attr & AttrReverse) && !NoReverseColor) {
-#ifdef ALPHABLEND_TYPE2
-      SetTextColor(VTDC, BGVTReverseColor[0]);
-      SetBkColor(  VTDC, BGVTReverseColor[1]);
-#else
-      SetTextColor(VTDC, ts.VTReverseColor[0]);
-      SetBkColor(  VTDC, ts.VTReverseColor[1]);
-#endif
-    }
-    else {
-      SetTextColor(VTDC, BackColor);
-      SetBkColor(  VTDC, TextColor);
-    }
-  }
-  else {
-#ifdef ALPHABLEND_TYPE2 // by AKASI
-    BGReverseText = FALSE;
-#endif
-    SetTextColor(VTDC,TextColor);
-    SetBkColor(  VTDC,BackColor);
-  }
+	//	ANSIColor/Fore
+	if (Attr2Flag & Attr2Fore) {
+		const int index = Get256ColorIndex(Attr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
+		if (!reverse) {
+			TextColor = ANSIColor[index];
+		}
+		else {
+			BackColor = ANSIColor[index];
+		}
+	}
+
+	//	ANSIColor/Back
+	if (Attr2Flag & Attr2Back) {
+		const int index = Get256ColorIndex(Attr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
+		if (!reverse) {
+			BackColor = ANSIColor[index];
+		}
+		else {
+			TextColor = ANSIColor[index];
+		}
+	}
+
+	// UseTextColor=on のときの処理
+	//	背景色(Back)を考慮せずに文字色(Fore)だけを変更するアプリを使っていて
+	//	文字が見えない状態になったら通常文字色か反転属性文字色を使用する
+	if ((ts.ColorFlag & CF_USETEXTCOLOR) !=0) {
+		if ((Attr2Flag & Attr2Fore) && (Attr2Flag & Attr2Back)) {
+			const int is_target_color = (Attr.Fore == IdFore || Attr.Fore == IdBack || Attr.Fore == 15);
+//			const int is_target_color = 1;
+			if (Attr.Fore == Attr.Back && is_target_color) {
+				if (!reverse) {
+					TextColor = BGVTColor[0];
+					BackColor = BGVTColor[1];
+				}
+				else {
+					TextColor = BGVTReverseColor[0];
+					BackColor = BGVTReverseColor[1];
+				}
+			}
+		}
+	}
+
+	// 描画時(DrawStrW())に参照する
+	if (reverse) {
+		BGReverseText = TRUE;
+	}
+	else {
+		BGReverseText = FALSE;
+	}
+
+	SetTextColor(VTDC, TextColor);
+	SetBkColor(VTDC, BackColor);
 }
 
 #if 1
@@ -3547,20 +3529,9 @@ void DispSetColor(unsigned int num, COLORREF color)
 #ifdef ALPHABLEND_TYPE2
 	case CS_VT_NORMALFG:
 		BGVTColor[0] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
-		}
 		break;
 	case CS_VT_NORMALBG:
 		BGVTColor[1] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
-		}
-		if (ts.UseNormalBGColor) {
-			BGVTBoldColor[1] = BGVTColor[1];
-			BGVTBlinkColor[1] = BGVTColor[1];
-			BGURLColor[1] = BGVTColor[1];
-		}
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = color; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = color; break;
@@ -3573,20 +3544,9 @@ void DispSetColor(unsigned int num, COLORREF color)
 #else
 	case CS_VT_NORMALFG:
 		ts.VTColor[0] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-		}
 		break;
 	case CS_VT_NORMALBG:
 		ts.VTColor[1] = color;
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-		}
-		if (ts.UseNormalBGColor) {
-			ts.VTBoldColor[1] = ts.VTColor[1];
-			ts.VTBlinkColor[1] = ts.VTColor[1];
-			ts.URLColor[1] = ts.VTColor[1];
-		}
 		break;
 	case CS_VT_BOLDFG:    ts.VTBoldColor[0] = color; break;
 	case CS_VT_BOLDBG:    ts.VTBoldColor[1] = color; break;
@@ -3638,20 +3598,9 @@ void DispResetColor(unsigned int num)
 #ifdef ALPHABLEND_TYPE2
 	case CS_VT_NORMALFG:
 		BGVTColor[0] = ts.VTColor[0];
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-		}
 		break;
 	case CS_VT_NORMALBG:
 		BGVTColor[1] = ts.VTColor[1];
-		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-		}
-		if (ts.UseNormalBGColor) {
-			BGVTBoldColor[1] = ts.VTColor[1];
-			BGVTBlinkColor[1] = ts.VTColor[1];
-			BGURLColor[1] = ts.VTColor[1];
-		}
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = ts.VTBoldColor[0]; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = ts.VTBoldColor[1]; break;
@@ -3686,49 +3635,16 @@ void DispResetColor(unsigned int num)
 		// VT color Background
 		BGVTColor[1] = ts.VTColor[1];
 		BGVTReverseColor[1] = ts.VTReverseColor[1];
-		if (ts.UseNormalBGColor) {
-			BGVTBoldColor[1] = ts.VTColor[1];
-			BGVTBlinkColor[1] = ts.VTColor[1];
-			BGURLColor[1] = ts.VTColor[1];
-		}
-		else {
-			BGVTBoldColor[1] = ts.VTBoldColor[1];
-			BGVTBlinkColor[1] = ts.VTBlinkColor[1];
-			BGURLColor[1] = ts.URLColor[1];
-		}
+		BGVTBoldColor[1] = ts.VTBoldColor[1];
+		BGVTBlinkColor[1] = ts.VTBlinkColor[1];
+		BGURLColor[1] = ts.URLColor[1];
 
 		// ANSI Color / xterm 256 color
 		InitColorTable();
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	default:
-		if (num == IdBack) {
-			if (ts.ColorFlag & CF_USETEXTCOLOR) {
-#ifdef ALPHABLEND_TYPE2
-				ANSIColor[IdBack] = BGVTColor[1]; // use background color for "Black"
-#else
-				ANSIColor[IdBack] = ts.VTColor[1]; // use background color for "Black"
-#endif
-			}
-			else {
-				ANSIColor[IdBack] = ts.ANSIColor[IdBack];
-			}
-			DispSetNearestColors(num, num, NULL);
-		}
-		else if (num == IdFore) {
-			if (ts.ColorFlag & CF_USETEXTCOLOR) {
-#ifdef ALPHABLEND_TYPE2
-				ANSIColor[IdFore] = BGVTColor[0]; // use text color for "white"
-#else
-				ANSIColor[IdFore] = ts.VTColor[0]; // use text color for "white"
-#endif
-			}
-			else {
-				ANSIColor[IdFore] = ts.ANSIColor[IdFore];
-			}
-			DispSetNearestColors(num, num, NULL);
-		}
-		else if (num <= 15) {
+		if (num <= 15) {
 			ANSIColor[num] = ts.ANSIColor[num];
 			DispSetNearestColors(num, num, NULL);
 		}
