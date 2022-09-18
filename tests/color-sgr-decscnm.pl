@@ -40,7 +40,7 @@ sub ShowAttributesSGR {
 		},
 		{
 			Enter => "\x1b[0m",
-			Str => "https://ttssh2.osdn.jp/  SGR 0(Normal) + URL string\n",
+			Str => "https://ttssh2.osdn.jp/  SGR 0(Normal) + URL string",
 		},
 		{
 			Enter => "\x1b[0m\x1b[31m",
@@ -181,7 +181,8 @@ sub ShowANSIColor {
 		print " FG: SGR 30..37 m  BG: SGR 40..47 m\n";
 		for (my $f = 0; $f < 8; $f++) {
 			for (my $b = 0; $b < 8; $b++) {
-				print "\x1b[1m";
+				print "\x1b[1m";	# Bold (SGR 1) bright color fore
+				print "\x1b[5m";	# Blink (SGR 5) bright color back
 				printf("\x1b[%d;%dm %3d/%3d ", $f + 30, $b + 40, $f + 30, $b + 40);
 			}
 			print "\x1b[0m";
