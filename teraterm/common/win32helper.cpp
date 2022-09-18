@@ -89,6 +89,8 @@ error_return:
  *	@param section
  *	@param key
  *	@param def
+ *	@param ini		iniファイルのパス
+ *					NULLのときはファイル指定なし
  *	@param str		文字列を格納するバッファ
  *					不要になったらfree()する
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
@@ -105,9 +107,26 @@ error_return:
  */
 DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, const wchar_t *def, const wchar_t *ini, wchar_t **str)
 {
-	size_t size = 256;
-	wchar_t *b = (wchar_t*)malloc(sizeof(wchar_t) * size);
+	size_t size;
+	wchar_t *b;
 	DWORD error;
+
+	if (ini == NULL) {
+		// iniファイル指定なしのときデフォルト値を返す
+		//		GetPrivateProfileStringW(A)() の仕様には
+		//		ファイル名にNULLを渡して良いとの記述はない
+		//			NULLを渡したとき、
+		//			Windows10,11 ではファイルがないときと同じ動作
+		//			Windows95 は仕様外の動作
+		//				戻り値=バッファサイズ+2が返ってくる
+		*str = _wcsdup(def);
+		if (*str == NULL) {
+			return ERROR_NOT_ENOUGH_MEMORY;
+		}
+		return NO_ERROR;
+	}
+	size = 256;
+	b = (wchar_t*)malloc(sizeof(wchar_t) * size);
 	if (b == NULL) {
 		error = ERROR_NOT_ENOUGH_MEMORY;
 		goto error_return;
@@ -119,7 +138,6 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 			error = GetLastError();
 			free(b);
 			*str = _wcsdup(L"");
-//			aswprintf(str, L"%s/%s\n",section, key);	// 確認用
 			return error;
 		} else if (r < size - 2) {
 			size = r + 1;

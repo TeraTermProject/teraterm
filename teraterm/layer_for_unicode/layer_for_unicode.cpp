@@ -515,6 +515,7 @@ BOOL WINAPI _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath)
 DWORD WINAPI _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
 								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName)
 {
+	assert(lpFileName != NULL);
 	if (lpDefault == NULL) {
 		lpDefault = L"";
 	}
