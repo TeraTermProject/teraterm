@@ -714,7 +714,7 @@ void CVisualPropPageDlg::OnInitDialog()
 	for (int i = 0 ; MouseCursor[i].name ; i++) {
 		const char *name = MouseCursor[i].name;
 		SendDlgItemMessageA(IDC_MOUSE_CURSOR, CB_ADDSTRING, i, (LPARAM)name);
-		if (strcmp(name, ts.MouseCursorName) == 0) {
+		if (_stricmp(name, ts.MouseCursorName) == 0) {
 			sel = i;
 		}
 	}
