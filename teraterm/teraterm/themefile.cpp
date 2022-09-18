@@ -347,6 +347,13 @@ static void ReadANSIColorSetting(TAnsiColorSetting *color, const wchar_t *fn)
 {
 	char Buff[512];
 	int c, r, g, b;
+	// ANSIColor16は、明るい/暗いグループが入れ替わっている
+	const static int index256[] = {
+		0,
+		9, 10, 11, 12, 13, 14, 15,
+		8,
+		1, 2, 3, 4, 5, 6, 7
+	};
 
 	GetPrivateProfileStringAFileW("Color Theme", "ANSIColor", "0", Buff, sizeof(Buff), fn);
 
@@ -357,10 +364,11 @@ static void ReadANSIColorSetting(TAnsiColorSetting *color, const wchar_t *fn)
 	color->enable = c;
 
 	for (c=0; c<16; c++) {
+		int idx = index256[c];
 		GetNthNum(Buff, c * 3 + 3, &r);
 		GetNthNum(Buff, c * 3 + 4, &g);
 		GetNthNum(Buff, c * 3 + 5, &b);
-		color->color[c] = RGB(r, g, b);
+		color->color[idx] = RGB(r, g, b);
 	}
 }
 

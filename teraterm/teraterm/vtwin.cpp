@@ -1045,7 +1045,6 @@ void CVTWindow::ResetSetup()
 	// AlphaBlend を即時反映できるようにする。
 	// (2016.12.24 yutaka)
 	SetWindowAlpha(ts.AlphaBlendActive);
-	DispSetNearestColors(IdBack, IdFore+8, NULL);
 
 	/* setup window */
 	ChangeWin();
@@ -4218,14 +4217,6 @@ void CVTWindow::OpenExternalSetup(int page)
 	CAddSetting.SetStartPage(additional_page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
-#if 0
-		if (ts.EtermLookfeel.BGEnable != 0 && ts.EtermLookfeel.BGThemeFileW != NULL) {
-			// テーマファイルを読み込む
-			BGLoadThemeFile(&ts);
-		}
-		BGSetupPrimary(TRUE);
-#endif
-		DispSetNearestColors(IdBack, IdFore+8, NULL);
 		ChangeWin();
 		ChangeFont();
 		if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {

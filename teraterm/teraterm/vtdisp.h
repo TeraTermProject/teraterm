@@ -53,7 +53,6 @@ void DispConvWinToScreen
   (int Xw, int Yw, int *Xs, int *Ys, PBOOL Right);
 void DispConvScreenToWin
   (int Xs, int Ys, int *Xw, int *Yw);
-//void SetLogFont(void);
 void ChangeFont(void);
 void ResetIME(void);
 void ChangeCaret(void);
@@ -98,8 +97,6 @@ void DispSetupFontDlg(void);
 void DispRestoreWinSize(void);
 void DispSetWinPos(void);
 void DispSetActive(BOOL ActiveFlag);
-void InitColorTable(void);
-void DispSetNearestColors(int start, int end, HDC DispCtx);
 int TCharAttrCmp(TCharAttr a, TCharAttr b);
 void DispSetColor(unsigned int num, COLORREF color);
 void DispResetColor(unsigned int num);
@@ -113,7 +110,6 @@ void DispGetWindowPos(int *x, int *y, BOOL client);
 void DispGetWindowSize(int *width, int *height, BOOL client);
 void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
 int DispFindClosestColor(int red, int green, int blue);
-void UpdateBGBrush(void);
 void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count,
 			  int font_width, int font_height, int Y, int* X);
 void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count,

@@ -109,6 +109,17 @@ static BOOL CursorOnDBCS = FALSE;
 static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
+
+/*
+ *	ANSI color table
+ *		0		黒,Black
+ *		1-6		少し暗い色(Red, Green, Yellow, Blue, Magenta, Cyan)
+ *		7		Gray (15より暗い,8より明るい)
+ *		8		Gray (7より暗い,0より明るい)
+ *		9-14	明るい色,原色 (Bright Red, Green, Yellow, Blue, Magenta, Cyan)
+ *		15		白,White 255 (Bright White)
+ *		16-255	DefaultColorTable[16-255]
+ */
 static COLORREF ANSIColor[256];
 
 // caret variables
@@ -153,7 +164,7 @@ typedef struct _BGSrc
   BG_PATTERN pattern;
   BOOL       antiAlias;
   COLORREF   color;
-  int        alpha;
+  BYTE       alpha;
   int        width;
   int        height;
   char       file[MAX_PATH];
@@ -165,7 +176,7 @@ static BGSrc BGSrc1;
 static BGSrc BGSrc2;
 
 static int  BGEnable;
-static int  BGReverseTextAlpha;
+static BYTE BGReverseTextAlpha;
 
 static COLORREF BGVTColor[2];
 static COLORREF BGVTBoldColor[2];
@@ -193,6 +204,8 @@ typedef struct tagWallpaperInfo
 static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
 static HBITMAP GetBitmapHandle(const char *File);
+static void InitColorTable(const COLORREF *ANSIColor16);
+static void UpdateBGBrush(void);
 
 // LoadImage() しか使えない環境かどうかを判別する。
 // LoadImage()では .bmp 以外の画像ファイルが扱えないので要注意。
@@ -586,7 +599,7 @@ static HBITMAP GetBitmapHandle(const char *File)
 		iPicture->lpVtbl->get_Handle(iPicture,&hOle);
 	}
 
-	hBitmap=(HBITMAP)hOle;
+	hBitmap=(HBITMAP)(UINT_PTR)hOle;
 
 	return hBitmap;
 }
@@ -1164,7 +1177,7 @@ void BGInitialize(BOOL initialize_once)
 {
 	(void)initialize_once;
 
-	InitColorTable();
+	InitColorTable(ts.ANSIColor);
 
 	BGSetDefaultColor(&ts);
 
@@ -1353,6 +1366,7 @@ void BGOnSettingChange(void)
   if(!BGEnable)
     return;
 
+  // TODO モニタ(ディスプレイ)をまたぐとサイズが変化するのでは?
   CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
   CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -1365,26 +1379,66 @@ void BGOnSettingChange(void)
   InvalidateRect(HVTWin, NULL, FALSE);
 }
 
-//
-static void DispApplyANSIColor(void) {
-  int i;
-
-  for (i = IdBack ; i <= IdFore+8 ; i++)
-    ANSIColor[i] = ts.ANSIColor[i];
-}
-
-void InitColorTable(void)
+/**
+ *	旧16色カラーテーブル(ts.ANSIColor[16])の色番号から
+ *	256色カラーテーブル(ANSIColor[256])の色番号を取得
+ *
+ * @param index16 	16色の色番号
+ */
+static int GetIndex256From16(int index16)
 {
-  int i;
-
-  DispApplyANSIColor();
-
-  for (i=16; i<=255; i++) {
-    ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
-  }
+	// ANSIColor16は、明るい/暗いグループが入れ替わっている
+	const static int index256[] = {
+		0,
+		9, 10, 11, 12, 13, 14, 15,
+		8,
+		1, 2, 3, 4, 5, 6, 7
+	};
+	return index16 < _countof(index256) ? index256[index16] : index16;
 }
 
-void DispSetNearestColors(int start, int end, HDC DispCtx) {
+/**
+ *	256色カラーテーブル(ANSIColor[256])の色番号から
+ *	旧16色カラーテーブル(ts.ANSIColor[16])の色番号を取得
+ *
+ * @param index256 	256色の色番号
+ */
+static int GetIndex16From256(int index256)
+{
+	return GetIndex256From16(index256);
+}
+
+/**
+ *	ANSIカラーテーブル(ANSIColor[256])を初期化する
+ *
+ *	@param ANSIColor16	ts.ANSIColor[16]
+ *						旧16色カラーテーブル
+ */
+static void InitColorTable(const COLORREF *ANSIColor16)
+{
+	int i;
+
+	// ANSIColor[] の先頭16色を初期化
+	//		ANSIColor16は16色カラーテーブル
+	for (i = 0 ; i < 16 ; i++) {
+		int i256 = GetIndex256From16(i);
+		ANSIColor[i256] = ANSIColor16[i];
+	}
+
+	// ANSIColor[] の16番以降を初期化
+	for (i=16; i<=255; i++) {
+		ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
+	}
+}
+
+static void DispSetNearestColors(int start, int end, HDC DispCtx)
+{
+#if 1
+	// 無効化
+	(void)start;
+	(void)end;
+	(void)DispCtx;
+#else
   HDC TmpDC;
   int i;
 
@@ -1401,6 +1455,7 @@ void DispSetNearestColors(int start, int end, HDC DispCtx) {
   if (!DispCtx) {
 	ReleaseDC(NULL, TmpDC);
   }
+#endif
 }
 
 void InitDisp(void)
@@ -2085,6 +2140,8 @@ void DispClearWin(void)
 void DispChangeBackground(void)
 {
   DispReleaseDC();
+
+#if 0
   if (Background != NULL) DeleteObject(Background);
 
   if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
@@ -2096,6 +2153,9 @@ void DispChangeBackground(void)
   else {
     Background = CreateSolidBrush(BGVTColor[1]);
   }
+#else
+  UpdateBGBrush();
+#endif
 
   InvalidateRect(HVTWin,NULL,TRUE);
 }
@@ -2149,73 +2209,58 @@ void DispReleaseDC(void)
 /**
  * シーケンスのcolor_indexをANSIColor[]のindexへ変換する
  *
- * ANSIColor[] の 0-7 には原色(明るい色)、8-15 には少し暗い色が入っている
- *   0: Black   8: Gray (Bright Black)
+ * 8色モード
+ *	 原色(明るい色)が使われる
+ * 16色以上でPC-style 16 colors以外
+ *   引数 color_index は ANSIColor[] のindexと等しい
+ * PC-style 16 colors (pcbold16が0以外の時)
+ *	 pcbold16_bright が 0 のとき
+ *		少し暗い色
+ *	 pcbold16_bright が 0 以外(Bold属性 or Blonk属性)のとき
+ *		文字色属性(0-7)の組み合わせで明るい文字色を表す
  *
- * 8色モードでは原色が使われる
- * 16色以上では 0-7 が標準色、8-15 が明るい色になるので、1-7 と 9-15 を入れ替える
- *   (8 は明るいので入れ替えなくてよい)
- *
- * PC-style 16 colors
- *   Bold 属性と文字色属性(0-7)の組み合わせで明るい文字色を表す
- *   Blink 属性と背景色属性(0-7)の組み合わせで明るい背景色を表す
- * - そのため CF_PCBOLD16 が有効で pcbold16_bright が true のときは
- * 原色(明るい色)になるよう 1-7 は入れ替えない。
- * - CF_PCBOLD16 が無効なときには 1-7 を入れ替える。
- *   この組み合わせで明るい色を表すのは PC-style だけなので入れ替える。
- * - 9-15 は常に入れ替える。
- *   CF_PCBOLD16 が有効で pcbold16_bright が true のときは 1-7 も 9-15 も
- * 明るい色になるが、9-15 は他の拡張モードで使われる。
- *
- * @param color_index
+ * @param color_index			色番号
  * @param pcbold16				0/0以外 = 16 color mode PC Styleではない/である
  * @param pcbold16_bright		0/0以外 = 色を明るくしない/する
- * @return ANSIColor[]のindex
-*/
-static int Get256ColorIndex(int color_index, int pcbold16, int pcbold16_bright)
+ * @return ANSIColor[]のindex (ANSI color 256色のindex)
+ */
+static int Get16ColorIndex(int color_index_256, int pcbold16, int pcbold16_bright)
 {
-	int table_index;
 	if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 		// 8色モード
-		//		table index		default color
-		//		0    			黒,Black
-		//		1-7  			明るい色,原色 (Bright color)
-		table_index = color_index;
+		//		input	output
+		//		0    	0			黒,Black
+		//		1-7  	9-14		明るい色,原色 (Bright color)
+		if (color_index_256 == 0) {
+			return 0;
+		} else if (color_index_256 < 8) {
+			return color_index_256 + 8;
+		} else {
+			return color_index_256;
+		}
 	}
-	else {
-		// 16/256色
-		if (color_index < 8 && (pcbold16 != 0)) {
-			//		index-> table index		default color
-			//	not bright時
-			//		0    -> 0   (変化なし)	黒,Black
-			//		1-7  -> 9-15			少し暗い色
-			//	bright時
-			//		0    -> 0   (変化なし)	黒,Black
-			//		1-7  -> 1-7 (変化なし)	明るい色,原色 (Bright color)
-			if ((pcbold16_bright != 0) == (color_index != 0)) {
-				table_index = color_index;
+	else if (pcbold16) {
+		// 16 color mode PC Style
+		if (color_index_256 == 0) {
+			// black -> black
+			return 0;
+		}
+		else if (color_index_256 < 8) {
+			if (pcbold16_bright) {
+				return color_index_256 + 8;
 			}
 			else {
-				table_index = color_index ^ 8;
+				return color_index_256;
 			}
 		}
 		else {
-			//		index-> table index		default color
-			//		0    -> 0   (変化なし)	黒,Black
-			//		1-7  -> 9-15			少し暗い色
-			//		8    -> 8   (変化なし)	灰色, Bright Black (Gray)
-			//		9-15 -> 1-7				明るい色,原色 (Bright color)
-			//		16-  -> 16- (変化なし)
-			if (color_index < 16 && (color_index & 7) != 0) {
-				// color_index が 1-7,9-15 のとき
-				table_index = color_index ^ 8;
-			}
-			else {
-				table_index = color_index;
-			}
+			return color_index_256;
 		}
 	}
-	return table_index;
+	else {
+		// 16/256色
+		return color_index_256;
+	}
 }
 
 void DispSetupDC(TCharAttr Attr, BOOL Reverse)
@@ -2350,7 +2395,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 
 	//	ANSIColor/Fore
 	if (Attr2Flag & Attr2Fore) {
-		const int index = Get256ColorIndex(Attr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
+		const int index = Get16ColorIndex(Attr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
 		if (!reverse) {
 			TextColor = ANSIColor[index];
 		}
@@ -2361,7 +2406,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 
 	//	ANSIColor/Back
 	if (Attr2Flag & Attr2Back) {
-		const int index = Get256ColorIndex(Attr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
+		const int index = Get16ColorIndex(Attr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
 		if (!reverse) {
 			BackColor = ANSIColor[index];
 		}
@@ -3167,11 +3212,13 @@ int TCharAttrCmp(TCharAttr a, TCharAttr b)
 
 void DispSetColor(unsigned int num, COLORREF color)
 {
-	HDC TmpDC;
-
-	TmpDC = GetDC(NULL);
-	color = GetNearestColor(TmpDC, color);
-	ReleaseDC(NULL, TmpDC);
+#if 0
+	{
+		HDC TmpDC = GetDC(NULL);
+		color = GetNearestColor(TmpDC, color);
+		ReleaseDC(NULL, TmpDC);
+	}
+#endif
 
 	switch (num) {
 	case CS_VT_NORMALFG:
@@ -3194,13 +3241,13 @@ void DispSetColor(unsigned int num, COLORREF color)
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
 		if (num <= 255) {
-			if (1 <= num && num <= 7) {
-				num += 8;
-				ANSIColor[num] = color;
-			} else if (9 <= num && num <= 15) {
-				num -= 8;
-				ANSIColor[num] = color;
-			} else {
+			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
+				// 8色モード
+				int i256 = GetIndex256From16(num);
+				ANSIColor[i256] = color;
+			}
+			else {
+				// 16/256色モード
 				ANSIColor[num] = color;
 			}
 		}
@@ -3249,7 +3296,7 @@ void DispResetColor(unsigned int num)
 	case CS_TEK_BG:
 		break;
 	case CS_ANSICOLOR_ALL:
-		InitColorTable();
+		InitColorTable(ts.ANSIColor);
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	case CS_SP_ALL:
@@ -3273,13 +3320,21 @@ void DispResetColor(unsigned int num)
 		BGURLColor[1] = ts.URLColor[1];
 
 		// ANSI Color / xterm 256 color
-		InitColorTable();
+		InitColorTable(ts.ANSIColor);
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	default:
 		if (num <= 15) {
-			ANSIColor[num] = ts.ANSIColor[num];
-			DispSetNearestColors(num, num, NULL);
+			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
+				// 8色モード
+				int i256 = GetIndex256From16(num);
+				ANSIColor[i256] = ts.ANSIColor[num];
+			}
+			else {
+				int i16 = GetIndex16From256(num);
+				ANSIColor[num] = ts.ANSIColor[i16];
+				DispSetNearestColors(num, num, NULL);
+			}
 		}
 		else if (num <= 255) {
 			ANSIColor[num] = RGB(DefaultColorTable[num][0], DefaultColorTable[num][1], DefaultColorTable[num][2]);
@@ -3319,7 +3374,15 @@ COLORREF DispGetColor(unsigned int num)
 	case CS_TEK_BG:       color = ts.TEKColor[1]; break;
 	default:
 		if (num <= 255) {
-			color = ANSIColor[num];
+			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
+				// 8色モード
+				int i256 = GetIndex256From16(num);
+				color = ANSIColor[i256];
+			}
+			else {
+				// 16/256色モード
+				color = ANSIColor[num];
+			}
 		}
 		else {
 			color = ANSIColor[0];
@@ -3335,14 +3398,12 @@ void DispSetCurCharAttr(TCharAttr Attr) {
   UpdateBGBrush();
 }
 
-void UpdateBGBrush() {
+static void UpdateBGBrush(void)
+{
   if (Background != NULL) DeleteObject(Background);
 
   if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
-    if ((CurCharAttr.Back<16) && (CurCharAttr.Back&7)!=0)
-      Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back ^ 8]);
-    else
-      Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
+	Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
   }
   else {
     Background = CreateSolidBrush(BGVTColor[1]);
@@ -3479,7 +3540,6 @@ void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 int DispFindClosestColor(int red, int green, int blue)
 {
 	int i, color, diff_r, diff_g, diff_b, diff, min;
-	//char buff[1024];
 
 	min = 0xfffffff;
 	color = 0;
@@ -3614,8 +3674,10 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
 	color_theme->underline.fg = pts->VTUnderlineColor[0];
 	color_theme->underline.bg = pts->VTUnderlineColor[1];
 
-	for (i = IdBack ; i <= IdFore+8 ; i++)
-		color_theme->ansicolor.color[i] = pts->ANSIColor[i];
+	for (i = 0 ; i < 16 ; i++) {
+		int i256 = GetIndex256From16(i);
+		color_theme->ansicolor.color[i256] = pts->ANSIColor[i];
+	}
 
 #if 0
 	// デフォルト
@@ -3628,9 +3690,6 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
 
 	color_theme->ansicolor.change = 1;
 	color_theme->ansicolor.enable = (ts.ColorFlag & CF_ANSICOLOR) != 0;
-	for (int i=0; i<16; i++) {
-		color_theme->ansicolor.color[i] = ts.ANSIColor[i];
-	}
 #endif
 }
 
