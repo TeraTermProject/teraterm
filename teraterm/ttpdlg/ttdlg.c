@@ -1647,6 +1647,12 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
+typedef struct {
+	PGetHNRec GetHNRec;
+	ComPortInfo_t *ComPortInfoPtr;
+	int ComPortInfoCount;
+} TTXHostDlgData;
+
 static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -1660,18 +1666,19 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_HOSTHELP, "BTN_HELP" },
 	};
-	PGetHNRec GetHNRec;
-	char EntName[128];
-	WORD i, j, w;
-	BOOL Ok;
-	WORD ComPortTable[MAXCOMPORT];
-	static char *ComPortDesc[MAXCOMPORT];
-	int comports;
+	TTXHostDlgData *dlg_data = (TTXHostDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+	PGetHNRec GetHNRec = dlg_data != NULL ? dlg_data->GetHNRec : NULL;
 
 	switch (Message) {
-		case WM_INITDIALOG:
+		case WM_INITDIALOG: {
+			WORD i;
+			int j;
 			GetHNRec = (PGetHNRec)lParam;
-			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
+			dlg_data = (TTXHostDlgData *)calloc(sizeof(*dlg_data), 1);
+			SetWindowLongPtr(Dialog, DWLP_USER, (LPARAM)dlg_data);
+			dlg_data->GetHNRec = GetHNRec;
+
+			dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount, NULL);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -1704,48 +1711,34 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_SETCURSEL,0,0);
 
 			j = 0;
-			w = 1;
-			if ((comports=DetectComPorts(ComPortTable, GetHNRec->MaxComPort, ComPortDesc)) >= 0) {
-				for (i=0; i<comports; i++) {
-					// MaxComPort を越えるポートは表示しない
-					if (ComPortTable[i] > GetHNRec->MaxComPort) {
-						continue;
-					}
+			for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
+				ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
+				wchar_t *EntNameW;
+				int index;
 
-					// 使用中のポートは表示しない
-					if (CheckCOMFlag(ComPortTable[i]) == 1) {
-						continue;
-					}
+				// MaxComPort を越えるポートは表示しない
+				if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
+					continue;
+				}
+				j++;
 
-					_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "COM%d", ComPortTable[i]);
-					if (ComPortDesc[i] != NULL) {
-						strncat_s(EntName, sizeof(EntName), ": ", _TRUNCATE);
-						strncat_s(EntName, sizeof(EntName), ComPortDesc[i], _TRUNCATE);
-					}
-					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
-					                   0, (LPARAM)EntName);
-					j++;
-					if (GetHNRec->ComPort==ComPortTable[i]) {
-						w = j;
-					}
+				// 使用中のポートは表示しない
+				if (CheckCOMFlag(p->port_no) == 1) {
+					continue;
 				}
-			} else {
-				for (i=1; i<=GetHNRec->MaxComPort ;i++) {
-					// 使用中のポートは表示しない
-					if (CheckCOMFlag(i) == 1) {
-						continue;
-					}
-					_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "COM%d", i);
-					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
-					                   0, (LPARAM)EntName);
-					j++;
-					if (GetHNRec->ComPort==i) {
-						w = j;
-					}
+
+				if (p->friendly_name == NULL) {
+					aswprintf(&EntNameW, L"%s", p->port_name);
 				}
+				else {
+					aswprintf(&EntNameW, L"%s: %s", p->port_name, p->friendly_name);
+				}
+				index = (int)SendDlgItemMessageW(Dialog, IDC_HOSTCOM, CB_ADDSTRING, 0, (LPARAM)EntNameW);
+				SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_SETITEMDATA, index, i);
+				free(EntNameW);
 			}
 			if (j>0) {
-				SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_SETCURSEL,w-1,0);
+				SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_SETCURSEL,0,0);
 			}
 			else { /* All com ports are already used */
 				GetHNRec->PortType = IdTCPIP;
@@ -1765,52 +1758,37 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
-
+		}
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
-				case IDOK:
-					GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
-					if ( GetHNRec!=NULL ) {
-						char afstr[BUFSIZ];
-						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
-						if ( GetHNRec->PortType==IdTCPIP ) {
-							GetDlgItemTextW(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
-						}
-						else {
-							GetHNRec->HostName[0] = 0;
-						}
-						GetRB(Dialog,&GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
-						i = GetDlgItemInt(Dialog,IDC_HOSTTCPPORT,&Ok,FALSE);
-						if (Ok) {
-							GetHNRec->TCPPort = i;
-						}
-#define getaf(str) \
-	((strcmp((str), "IPv6") == 0) ? AF_INET6 : \
-	((strcmp((str), "IPv4") == 0) ? AF_INET : AF_UNSPEC))
-						memset(afstr, 0, sizeof(afstr));
-						GetDlgItemText(Dialog, IDC_HOSTTCPPROTOCOL, afstr, sizeof(afstr));
-						GetHNRec->ProtocolFamily = getaf(afstr);
-						memset(EntName,0,sizeof(EntName));
-						GetDlgItemText(Dialog, IDC_HOSTCOM, EntName, sizeof(EntName)-1);
-						if (strncmp(EntName, "COM", 3) == 0 && EntName[3] != '\0') {
-#if 0
-							GetHNRec->ComPort = (BYTE)(EntName[3])-0x30;
-							if (strlen(EntName)>4)
-								GetHNRec->ComPort = GetHNRec->ComPort*10 + (BYTE)(EntName[4])-0x30;
-#else
-							GetHNRec->ComPort = atoi(&EntName[3]);
-#endif
-							if (GetHNRec->ComPort > GetHNRec->MaxComPort) {
-								GetHNRec->ComPort = 1;
-							}
-						}
-						else {
-							GetHNRec->ComPort = 1;
-						}
+				case IDOK: {
+					int i;
+					int pos;
+					int index;
+					BOOL Ok;
+
+					GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
+					if ( GetHNRec->PortType==IdTCPIP ) {
+						GetDlgItemTextW(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
 					}
+					else {
+						GetHNRec->HostName[0] = 0;
+					}
+					GetRB(Dialog,&GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
+					i = GetDlgItemInt(Dialog,IDC_HOSTTCPPORT,&Ok,FALSE);
+					if (Ok) {
+						GetHNRec->TCPPort = i;
+					}
+					i = (int)SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_GETCURSEL, 0, 0);
+					GetHNRec->ProtocolFamily =
+						i == 0 ? AF_UNSPEC :
+						i == 1 ? AF_INET6 : AF_INET;
+					pos = (int)SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_GETCURSEL, 0, 0);
+					index = (int)SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_GETITEMDATA, pos, 0);
+					GetHNRec->ComPort = dlg_data->ComPortInfoPtr[index].port_no;
 					EndDialog(Dialog, 1);
 					return TRUE;
-
+				}
 				case IDCANCEL:
 					EndDialog(Dialog, 0);
 					return TRUE;
@@ -1827,15 +1805,14 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					DisableDlgItem(Dialog,IDC_HOSTTCPPROTOCOLLABEL,IDC_HOSTTCPPROTOCOL);
 					break;
 
-				case IDC_HOSTTELNET:
+				case IDC_HOSTTELNET: {
+					WORD i;
 					GetRB(Dialog,&i,IDC_HOSTTELNET,IDC_HOSTTELNET);
 					if ( i==1 ) {
-						GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
-						if ( GetHNRec!=NULL ) {
-							SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TelPort,FALSE);
-						}
+						SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TelPort,FALSE);
 					}
 					break;
+				}
 
 				case IDC_HOSTCOM:
 					if(HIWORD(wParam) == CBN_DROPDOWN) {
@@ -1864,6 +1841,11 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpFileNewConnection,0);
 					break;
 			}
+			break;
+		case WM_DESTROY:
+			ComPortInfoFree(dlg_data->ComPortInfoPtr, dlg_data->ComPortInfoCount);
+			free(dlg_data);
+			break;
 	}
 	return FALSE;
 }

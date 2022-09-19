@@ -67,16 +67,20 @@ enum window_style {
 
 void WINAPI SetCOMFlag(int Com)
 {
+	if (Com <= 0 || MAXCOMPORT <= Com) return;
 	pm->ComFlag[(Com-1)/CHAR_BIT] |= 1 << ((Com-1)%CHAR_BIT);
 }
 
 void WINAPI ClearCOMFlag(int Com)
 {
+	if (Com <= 0 || MAXCOMPORT <= Com) return;
 	pm->ComFlag[(Com-1)/CHAR_BIT] &= ~(1 << ((Com-1)%CHAR_BIT));
 }
 
 int WINAPI CheckCOMFlag(int Com)
 {
+	if (Com <= 0) return 0;
+	if (Com > MAXCOMPORT) return 1;
 	return ((pm->ComFlag[(Com-1)/CHAR_BIT] & 1 << (Com-1)%CHAR_BIT) > 0);
 }
 

@@ -96,6 +96,7 @@
 #include "inifile_com.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "comportinfo.h"
 
 #include "libputty.h"
 
@@ -978,8 +979,13 @@ static void enable_dlg_items(HWND dlg, int from, int to, BOOL enabled)
 	}
 }
 
-static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
-								   LPARAM lParam)
+typedef struct {
+	PGetHNRec GetHNRec;
+	ComPortInfo_t *ComPortInfoPtr;
+	int ComPortInfoCount;
+} TTXHostDlgData;
+
+static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_HOST_TITLE" },
@@ -998,17 +1004,20 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	};
 	static const char *ssh_version[] = {"SSH1", "SSH2", NULL};
 	static const char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
-	PGetHNRec GetHNRec;
-	char EntName[128];
-	WORD i, j, w;
-	WORD ComPortTable[MAXCOMPORT];
-	static char *ComPortDesc[MAXCOMPORT];
-	int comports;
+	TTXHostDlgData *dlg_data = (TTXHostDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+	PGetHNRec GetHNRec = dlg_data != NULL ? dlg_data->GetHNRec : NULL;
+	WORD i;
 
 	switch (msg) {
-	case WM_INITDIALOG:
-		GetHNRec = (PGetHNRec) lParam;
-		SetWindowLongPtr(dlg, DWLP_USER, lParam);
+	case WM_INITDIALOG: {
+		int j;
+
+		GetHNRec = (PGetHNRec)lParam;
+		dlg_data = (TTXHostDlgData *)calloc(sizeof(*dlg_data), 1);
+		SetWindowLongPtr(dlg, DWLP_USER, (LPARAM)dlg_data);
+		dlg_data->GetHNRec = GetHNRec;
+
+		dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount, NULL);
 
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
@@ -1070,50 +1079,35 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 
 		j = 0;
-		w = 1;
-		comports = DetectComPorts(ComPortTable, GetHNRec->MaxComPort, ComPortDesc);
-		if (comports >= 0) {
-			for (i=0; i<comports; i++) {
-				// MaxComPort を越えるポートは表示しない
-				if (ComPortTable[i] > GetHNRec->MaxComPort) {
-					continue;
-				}
+		for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
+			ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
+			wchar_t *EntNameW;
+			int index;
 
-				// 使用中のポートは表示しない
-				if (CheckCOMFlag(ComPortTable[i]) == 1) {
-					continue;
-				}
+			// MaxComPort を越えるポートは表示しない
+			if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
+				continue;
+			}
+			j++;
 
-				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "COM%d", ComPortTable[i]);
-				if (ComPortDesc[i] != NULL) {
-					strncat_s(EntName, sizeof(EntName), ": ", _TRUNCATE);
-					strncat_s(EntName, sizeof(EntName), ComPortDesc[i], _TRUNCATE);
-				}
-				SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_ADDSTRING,
-				                   0, (LPARAM)EntName);
-				j++;
-				if (GetHNRec->ComPort == ComPortTable[i])
-					w = j;
+			// 使用中のポートは表示しない
+			if (CheckCOMFlag(p->port_no) == 1) {
+				continue;
 			}
 
-		} else {
-			for (i = 1; i <= GetHNRec->MaxComPort; i++) {
-				// 使用中のポートは表示しない
-				if (CheckCOMFlag(i) == 1) {
-					continue;
-				}
-
-				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "COM%d", i);
-				SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_ADDSTRING,
-				                   0, (LPARAM) EntName);
-				j++;
-				if (GetHNRec->ComPort == i)
-					w = j;
+			if (p->friendly_name == NULL) {
+				aswprintf(&EntNameW, L"%s", p->port_name);
 			}
+			else {
+				aswprintf(&EntNameW, L"%s: %s", p->port_name, p->friendly_name);
+			}
+			index = (int)SendDlgItemMessageW(dlg, IDC_HOSTCOM, CB_ADDSTRING, 0, (LPARAM)EntNameW);
+			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETITEMDATA, index, i);
+			free(EntNameW);
 		}
 
 		if (j > 0)
-			SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_SETCURSEL, w - 1, 0);
+			SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_SETCURSEL, 0, 0);	// select first com port
 		else {					/* All com ports are already used */
 			GetHNRec->PortType = IdTCPIP;
 			enable_dlg_items(dlg, IDC_HOSTSERIAL, IDC_HOSTSERIAL, FALSE);
@@ -1160,69 +1154,63 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		// (2004.11.23 yutaka)
 		return FALSE;
 		//return TRUE;
+	}
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			GetHNRec = (PGetHNRec) GetWindowLongPtr(dlg, DWLP_USER);
-			if (GetHNRec != NULL) {
-				if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
-					BOOL Ok;
-					i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
-					if (!Ok) {
-						// TODO IDC_HOSTTCPPORTは数値しか入力できない、不要?
-						static const TTMessageBoxInfoW info = {
-							"TTSSH",
-							NULL, L"Tera Term",
-							"MSG_TCPPORT_NAN_ERROR", L"The TCP port must be a number.",
-							MB_OK | MB_ICONEXCLAMATION
-						};
-						TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
-						return TRUE;
-					}
-					GetHNRec->TCPPort = i;
-					i = (int)SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_GETCURSEL, 0, 0);
-					GetHNRec->ProtocolFamily =
-						i == 0 ? AF_UNSPEC :
-						i == 1 ? AF_INET6 : AF_INET;
-					GetHNRec->PortType = IdTCPIP;
-					GetDlgItemTextW(dlg, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
-					pvar->hostdlg_activated = TRUE;
-					pvar->hostdlg_Enabled = FALSE;
-					if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {
-						GetHNRec->Telnet = TRUE;
-					} else if (IsDlgButtonChecked(dlg, IDC_HOSTSSH)) {
-						pvar->hostdlg_Enabled = TRUE;
-
-						// check SSH protocol version
-						i = (int)SendDlgItemMessage(dlg, IDC_SSH_VERSION, CB_GETCURSEL, 0, 0);
-						pvar->settings.ssh_protocol_version = (i == 0) ? 1 : 2;
-					}
-					else {	// IDC_HOSTOTHER
-						GetHNRec->Telnet = FALSE;
-					}
-
-					// host history check button
-					if (SendMessage(GetDlgItem(dlg, IDC_HISTORY), BM_GETCHECK, 0, 0) == BST_CHECKED) {
-						pvar->ts->HistoryList = 1;
-					} else {
-						pvar->ts->HistoryList = 0;
-					}
-
-				} else {
-					GetHNRec->PortType = IdSerial;
-					GetHNRec->HostName[0] = 0;
-					memset(EntName, 0, sizeof(EntName));
-					GetDlgItemText(dlg, IDC_HOSTCOM, EntName,
-					               sizeof(EntName) - 1);
-					if (strncmp(EntName, "COM", 3) == 0 && EntName[3] != '\0') {
-						GetHNRec->ComPort = atoi(&EntName[3]);
-						if (GetHNRec->ComPort > GetHNRec->MaxComPort)
-							GetHNRec->ComPort = 1;
-					} else {
-						GetHNRec->ComPort = 1;
-					}
+			if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
+				BOOL Ok;
+				i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
+				if (!Ok) {
+					// TODO IDC_HOSTTCPPORTは数値しか入力できない、不要?
+					static const TTMessageBoxInfoW info = {
+						"TTSSH",
+						NULL, L"Tera Term",
+						"MSG_TCPPORT_NAN_ERROR", L"The TCP port must be a number.",
+						MB_OK | MB_ICONEXCLAMATION
+					};
+					TTMessageBoxA(dlg, &info, pvar->ts->UILanguageFile);
+					return TRUE;
 				}
+				GetHNRec->TCPPort = i;
+				i = (int)SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_GETCURSEL, 0, 0);
+				GetHNRec->ProtocolFamily =
+					i == 0 ? AF_UNSPEC :
+					i == 1 ? AF_INET6 : AF_INET;
+				GetHNRec->PortType = IdTCPIP;
+				GetDlgItemTextW(dlg, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
+				pvar->hostdlg_activated = TRUE;
+				pvar->hostdlg_Enabled = FALSE;
+				if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {
+					GetHNRec->Telnet = TRUE;
+				} else if (IsDlgButtonChecked(dlg, IDC_HOSTSSH)) {
+					pvar->hostdlg_Enabled = TRUE;
+
+					// check SSH protocol version
+					i = (int)SendDlgItemMessage(dlg, IDC_SSH_VERSION, CB_GETCURSEL, 0, 0);
+					pvar->settings.ssh_protocol_version = (i == 0) ? 1 : 2;
+				}
+				else {	// IDC_HOSTOTHER
+					GetHNRec->Telnet = FALSE;
+				}
+
+				// host history check button
+				if (SendMessage(GetDlgItem(dlg, IDC_HISTORY), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+					pvar->ts->HistoryList = 1;
+				} else {
+					pvar->ts->HistoryList = 0;
+				}
+
+			} else {
+				int pos;
+				int index;
+
+				GetHNRec->PortType = IdSerial;
+				GetHNRec->HostName[0] = 0;
+				pos = (int)SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_GETCURSEL, 0, 0);
+				index = (int)SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_GETITEMDATA, pos, 0);
+				GetHNRec->ComPort = dlg_data->ComPortInfoPtr[index].port_no;
 			}
 			EndDialog(dlg, 1);
 			return TRUE;
@@ -1272,12 +1260,8 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, FALSE); // disabled
 hostssh_enabled:
 
-			GetHNRec = (PGetHNRec) GetWindowLongPtr(dlg, DWLP_USER);
-
 			if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {
-				if (GetHNRec != NULL)
-					SetDlgItemInt(dlg, IDC_HOSTTCPPORT, GetHNRec->TelPort,
-					              FALSE);
+				SetDlgItemInt(dlg, IDC_HOSTTCPPORT, GetHNRec->TelPort, FALSE);
 			} else if (IsDlgButtonChecked(dlg, IDC_HOSTSSH)) {
 				SetDlgItemInt(dlg, IDC_HOSTTCPPORT, 22, FALSE);
 			}
@@ -1286,6 +1270,11 @@ hostssh_enabled:
 		case IDC_HOSTHELP:
 			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpFileNewConnection, 0);
 		}
+		break;
+	case WM_DESTROY:
+		ComPortInfoFree(dlg_data->ComPortInfoPtr, dlg_data->ComPortInfoCount);
+		free(dlg_data);
+		break;
 	}
 	return FALSE;
 }
@@ -1301,8 +1290,7 @@ static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 	SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 	              pvar->ts->UILanguageFileW, "TTSSH", "DLG_TAHOMA_FONT");
 //	              pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
-	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
-	                             parent, TTXHostDlg, (LPARAM)rec);
+	return (BOOL)DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG), parent, TTXHostDlg, (LPARAM)rec);
 }
 
 static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks)
