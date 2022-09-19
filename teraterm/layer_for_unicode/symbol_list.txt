@@ -44,6 +44,7 @@ kernel32 GetModuleHandleW@4
 kernel32 GetSystemDirectoryW@8
 kernel32 GetTempPathW@8
 kernel32 GetTempFileNameW@16
+kernel32 SystemParametersInfoW@16
 
 gdi32 AddFontResourceW@4
 gdi32 RemoveFontResourceW@4

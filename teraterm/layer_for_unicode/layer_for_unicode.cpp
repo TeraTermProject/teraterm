@@ -848,3 +848,28 @@ HANDLE WINAPI _LoadImageW(HINSTANCE hInst, LPCWSTR name, UINT type,
 	}
 	return handle;
 }
+
+static void LOGFONTAtoW(const LOGFONTA *logfontA, LOGFONTW *logfontW)
+{
+	LOGFONTA *d = (LOGFONTA *)logfontW;
+	*d = *logfontA;
+	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
+}
+
+BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
+								   PVOID pvParam, UINT fWinIni)
+{
+	if (uiAction == SPI_GETNONCLIENTMETRICS) {
+		NONCLIENTMETRICSA ncmA = {};
+		// NONCLIENTMETRICSA ‚Í VISTA ˆÈ~Šg’£‚³‚ê‚Ä‚¢‚é
+		ncmA.cbSize = CCSIZEOF_STRUCT(NONCLIENTMETRICSA, lfMessageFont);
+		BOOL r = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, uiParam, &ncmA, 0);
+		if (r != FALSE) {
+			NONCLIENTMETRICSW *ncmW = (NONCLIENTMETRICSW *)pvParam;
+			// Tera Term ‚ÅŽg—p‚·‚éƒƒ“ƒo‚¾‚¯Ý’è
+			LOGFONTAtoW(&ncmA.lfStatusFont, &ncmW->lfStatusFont);
+		}
+		return r;
+	}
+	return SystemParametersInfoW(uiAction, uiParam, pvParam, fWinIni);
+}

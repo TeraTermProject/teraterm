@@ -100,6 +100,8 @@ HMODULE WINAPI _GetModuleHandleW(LPCWSTR lpModuleName);
 UINT WINAPI _GetSystemDirectoryW(LPWSTR lpBuffer, UINT uSize);
 DWORD WINAPI _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
 UINT WINAPI _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
+BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
+								   PVOID pvParam, UINT fWinIni);
 
 // gdi32.lib
 int WINAPI _AddFontResourceW(LPCWSTR lpFileName);
