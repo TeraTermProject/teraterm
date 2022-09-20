@@ -56,6 +56,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "themedlg.h"
+#include "theme.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -65,21 +66,6 @@ const mouse_cursor_t MouseCursor[] = {
 	{NULL, NULL},
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
-
-void CVisualPropPageDlg::SetupRGBbox(int index)
-{
-	COLORREF Color = ts.ANSIColor[index];
-	BYTE c;
-
-	c = GetRValue(Color);
-	SetDlgItemNum(IDC_COLOR_RED, c);
-
-	c = GetGValue(Color);
-	SetDlgItemNum(IDC_COLOR_GREEN, c);
-
-	c = GetBValue(Color);
-	SetDlgItemNum(IDC_COLOR_BLUE, c);
-}
 
 // CGeneralPropPageDlg ダイアログ
 
@@ -620,6 +606,23 @@ void CCopypastePropPageDlg::OnHelp()
 }
 
 // CVisualPropPageDlg ダイアログ
+class CVisualPropPageDlg : public TTCPropertyPage
+{
+public:
+	CVisualPropPageDlg(HINSTANCE inst);
+	virtual ~CVisualPropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
+	enum { IDD = IDD_TABSHEET_VISUAL };
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
+	void SetupRGBbox(int index);
+	void OnHelp();
+	CTipWin* TipWin;
+	COLORREF ANSIColor[16];
+};
 
 CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CVisualPropPageDlg::IDD)
@@ -638,6 +641,21 @@ CVisualPropPageDlg::~CVisualPropPageDlg()
 	TipWin->Destroy();
 	delete TipWin;
 	TipWin = NULL;
+}
+
+void CVisualPropPageDlg::SetupRGBbox(int index)
+{
+	COLORREF Color = ANSIColor[index];
+	BYTE c;
+
+	c = GetRValue(Color);
+	SetDlgItemNum(IDC_COLOR_RED, c);
+
+	c = GetGValue(Color);
+	SetDlgItemNum(IDC_COLOR_GREEN, c);
+
+	c = GetBValue(Color);
+	SetDlgItemNum(IDC_COLOR_BLUE, c);
 }
 
 // CVisualPropPageDlg メッセージ ハンドラ
@@ -737,6 +755,9 @@ void CVisualPropPageDlg::OnInitDialog()
 	}
 
 	// (5)ANSI color
+	for (int i = 0; i < 16; i++) {
+		ANSIColor[i] = ts.ANSIColor[i];
+	}
 	for (int i = 0 ; i < 16 ; i++) {
 		char buf[4];
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", i);
@@ -918,7 +939,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				int r, g, b;
 
 				sel = GetCurSel(IDC_ANSI_COLOR);
-				if (sel < 0 || sel > _countof(ts.ANSIColor)-1) {
+				if (sel < 0 || sel > _countof(ANSIColor)-1) {
 					return TRUE;
 				}
 
@@ -952,8 +973,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_COLOR_BLUE, b);
 				}
 
-				// OK を押さなくても設定が保存されている
-				ts.ANSIColor[sel] = RGB(r, g, b);
+				ANSIColor[sel] = RGB(r, g, b);
 
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
@@ -1141,6 +1161,16 @@ void CVisualPropPageDlg::OnOK()
 
 	ts.EtermLookfeel.BGFastSizeMove = GetCheck(IDC_CHECK_FAST_SIZE_MOVE);
 	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
+
+	// ANSI Color
+	TColorTheme color;
+	// 色(デフォルト色)を設定
+	for (i = 0; i < 16; i++) {
+		ts.ANSIColor[i] = ANSIColor[i];
+	}
+	// デフォルト色を設定する
+	ThemeGetColorDefault(&color);
+	ThemeSetColor(&color);
 
 	if (flag_changed) {
 		// re-launch

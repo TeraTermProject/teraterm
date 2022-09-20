@@ -82,24 +82,6 @@ private:
 	void OnHelp();
 };
 
-// Visual Page
-class CVisualPropPageDlg : public TTCPropertyPage
-{
-public:
-	CVisualPropPageDlg(HINSTANCE inst);
-	virtual ~CVisualPropPageDlg();
-private:
-	void OnInitDialog();
-	void OnOK();
-	HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
-	enum { IDD = IDD_TABSHEET_VISUAL };
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
-	void SetupRGBbox(int index);
-	void OnHelp();
-	CTipWin* TipWin;
-};
-
 // Log Page
 class CLogPropPageDlg : public TTCPropertyPage
 {
