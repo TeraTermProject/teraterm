@@ -474,8 +474,6 @@ void CCopypastePropPageDlg::OnInitDialog()
 	SetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList);
 
 	// (9)PasteDelayPerLine
-	char buf[64];
-	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
 	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
 
 	// (10) SelectOnActivate
@@ -536,7 +534,6 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CCopypastePropPageDlg::OnOK()
 {
-	char buf[64];
 	int val;
 
 	// (1)
@@ -590,8 +587,7 @@ void CCopypastePropPageDlg::OnOK()
 	GetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
 
 	// (9)
-	GetDlgItemTextA(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
-	val = atoi(buf);
+	val = GetDlgItemInt(IDC_PASTEDELAY_EDIT);
 	ts.PasteDelayPerLine =
 		(val < 0) ? 0 :
 		(val > 5000) ? 5000 : val;
@@ -1018,18 +1014,9 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 {
 	if ( hWnd == GetDlgItem(IDC_SAMPLE_COLOR) ) {
-		BYTE r, g, b;
-		char buf[8];
-
-		GetDlgItemTextA(IDC_COLOR_RED, buf, sizeof(buf));
-		r = atoi(buf);
-
-		GetDlgItemTextA(IDC_COLOR_GREEN, buf, sizeof(buf));
-		g = atoi(buf);
-
-		GetDlgItemTextA(IDC_COLOR_BLUE, buf, sizeof(buf));
-		b = atoi(buf);
-
+		BYTE r = (BYTE)GetDlgItemInt(IDC_COLOR_RED);
+		BYTE g = (BYTE)GetDlgItemInt(IDC_COLOR_GREEN);
+		BYTE b = (BYTE)GetDlgItemInt(IDC_COLOR_BLUE);
 		SetBkMode(hDC, TRANSPARENT);
 		SetTextColor(hDC, RGB(r, g, b) );
 
@@ -1041,24 +1028,18 @@ HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 void CVisualPropPageDlg::OnOK()
 {
 	int sel;
-	char buf[MAXPATHLEN];
 	int flag_changed = 0;
+	int i;
 
 	// (1)
-	GetDlgItemTextA(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
-	if (isdigit(buf[0])) {
-		int i = atoi(buf);
-		ts.AlphaBlendActive =
-			(i < 0) ? 0 :
-			(i > 255) ? 255 : i;
-	}
-	GetDlgItemTextA(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
-	if (isdigit(buf[0])) {
-		int i = atoi(buf);
-		ts.AlphaBlendInactive =
-			(i < 0) ? 0 :
-			(i > 255) ? 255 : i;
-	}
+	i = GetDlgItemInt(IDC_ALPHA_BLEND_ACTIVE);
+	ts.AlphaBlendActive =
+		(i < 0) ? 0 :
+		(BYTE)((i > 255) ? 255 : i);
+	i = GetDlgItemInt(IDC_ALPHA_BLEND_INACTIVE);
+	ts.AlphaBlendInactive =
+		(i < 0) ? 0 :
+		(BYTE)((i > 255) ? 255 : i);
 
 	// (2) テーマファイル選択
 	{
