@@ -616,6 +616,8 @@ private:
 	void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
 	void SetupRGBbox(int index);
 	void OnHelp();
+	BOOL CheckColorChanged();
+	BOOL CheckThemeColor();
 	CTipWin* TipWin;
 	COLORREF ANSIColor[16];
 };
@@ -1025,6 +1027,40 @@ HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 	return TTCPropertyPage::OnCtlColor(hDC, hWnd);
 }
 
+/**
+ *	色の設定を変更したかチェックする
+ *	@retval	TRUE	変更した
+ *	@retval	FALSE	変更していない
+ */
+BOOL CVisualPropPageDlg::CheckColorChanged()
+{
+	for (int i = 0; i < 16; i++) {
+		if (ts.ANSIColor[i] != ANSIColor[i]) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/**
+ *	テーマカラーが設定してあるかチェックする
+ *	@retval	TRUE	設定されている
+ *	@retval	FALSE	設定されていない
+ */
+BOOL CVisualPropPageDlg::CheckThemeColor()
+{
+	TColorTheme def;	// default color (=ts.ANSIColor[])
+	ThemeGetColorDefault(&def);
+	TColorTheme disp;	// 今表示されている色
+	ThemeGetColor(&disp);
+	for (int i = 0; i < 16; i++) {
+		if (disp.ansicolor.color[i] != def.ansicolor.color[i]) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 void CVisualPropPageDlg::OnOK()
 {
 	int sel;
@@ -1144,14 +1180,36 @@ void CVisualPropPageDlg::OnOK()
 	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
 
 	// ANSI Color
-	TColorTheme color;
-	// 色(デフォルト色)を設定
-	for (i = 0; i < 16; i++) {
-		ts.ANSIColor[i] = ANSIColor[i];
+	if (CheckColorChanged()) {
+		// 色の変更が行われた
+		bool set_color = TRUE;
+
+		// カラーテーマを使って色が変更されている?
+		if (CheckThemeColor()) {
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_TT_NOTICE", L"Tera Term: Notice",
+				NULL, L"Color settings have been changed.\nDo you want to display this?",
+				MB_ICONQUESTION | MB_YESNO };
+			int r = TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+			if (r == IDNO) {
+				set_color = FALSE;
+			}
+		}
+
+		// 色を設定(デフォルト色)に反映
+		for (i = 0; i < 16; i++) {
+			ts.ANSIColor[i] = ANSIColor[i];
+		}
+
+		// 設定された色を表示に反映
+		if (set_color) {
+			TColorTheme color;
+			// デフォルト色を設定する
+			ThemeGetColorDefault(&color);
+			ThemeSetColor(&color);
+		}
 	}
-	// デフォルト色を設定する
-	ThemeGetColorDefault(&color);
-	ThemeSetColor(&color);
 
 	if (flag_changed) {
 		// re-launch
