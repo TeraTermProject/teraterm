@@ -121,22 +121,7 @@
     <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\teraterm\common\tipwin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\teraterm\common\dlglib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\teraterm\common\dlglib_cpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\teraterm\common\dlglib_tmpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\teraterm\common\ttlib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\teraterm\common\codeconv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -247,6 +232,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\teraterm\common\codeconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\compat_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\dllutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\ttlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
