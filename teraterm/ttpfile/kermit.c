@@ -1393,11 +1393,11 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 				if (kv->PktInCount == 0 && kv->PktInPtr == 6) {
 					kv->PktInLongPacketLen = KmtNum(kv->PktIn[4])*95 + KmtNum(kv->PktIn[5]);
 					kv->PktInCount = kv->PktInLongPacketLen + 7;
-					// OutputDebugPrintf("Long: %d\n", kv->PktInCount);
+					// OutputDebugPrintf("Long Packet: %d bytes\n", kv->PktInCount);
 
-					// "Initialize でリモートが送ってきた MAXLX1*95 + MAXLX2" + 7 (MARK から HCHEK)
+					// "Initialize でリモートが送ってきた MAXLX1*95 + MAXLX2" + 7 (MARK から HCHECK)
 					// を超えるサイズのパケットをリモートが送ろうとしてきた
-					//   +1 は C-Kermit 9.0.305 Alpha.05 以降が 1 バイト多く送ってくるため
+					//   +1 は C-Kermit 9.0.305 Alpha.05 から C-Kermit 10.0 Beta.04 までが 1 バイト多く送ってくるため
 					if (kv->PktInCount > kv->KmtMy.MAXLX + 7 + 1) {
 						KmtStringLog(fv, kv, "Remote is attempting to send %d bytes, but MAXLX from remote is %d. Must be less than or equal to %d bytes.",
 						             kv->PktInCount, kv->KmtMy.MAXLX, kv->KmtMy.MAXLX + 7 + 1);
