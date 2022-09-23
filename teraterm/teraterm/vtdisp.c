@@ -3400,14 +3400,28 @@ void DispSetCurCharAttr(TCharAttr Attr) {
 
 static void UpdateBGBrush(void)
 {
-  if (Background != NULL) DeleteObject(Background);
+	if (Background != NULL) DeleteObject(Background);
 
-  if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
-	Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
-  }
-  else {
-    Background = CreateSolidBrush(BGVTColor[1]);
-  }
+	if ((ts.ColorFlag & CF_REVERSEVIDEO) == 0) {
+		if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
+			const WORD AttrFlag = ((ts.ColorFlag & CF_BLINKCOLOR) && (CurCharAttr.Attr & AttrBlink)) ? AttrBlink : 0;
+			const int index = Get16ColorIndex(CurCharAttr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
+			Background = CreateSolidBrush(ANSIColor[index]);
+		}
+		else {
+			Background = CreateSolidBrush(BGVTColor[1]);
+		}
+	}
+	else {
+		if ((CurCharAttr.Attr2 & Attr2Fore) != 0) {
+			const WORD AttrFlag = ((ts.ColorFlag & CF_BOLDCOLOR) && (CurCharAttr.Attr & AttrBold)) ? AttrBold : 0;
+			const int index = Get16ColorIndex(CurCharAttr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
+			Background = CreateSolidBrush(ANSIColor[index]);
+		}
+		else {
+			Background = CreateSolidBrush(BGVTColor[0]);
+		}
+	}
 }
 
 void DispShowWindow(int mode)
