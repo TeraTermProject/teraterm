@@ -3701,22 +3701,30 @@ void DispSetCurCharAttr(TCharAttr Attr) {
   UpdateBGBrush();
 }
 
-void UpdateBGBrush() {
-  if (Background != NULL) DeleteObject(Background);
+static void UpdateBGBrush(void)
+{
+	if (Background != NULL) DeleteObject(Background);
 
-  if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
-    if ((CurCharAttr.Back<16) && (CurCharAttr.Back&7)!=0)
-      Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back ^ 8]);
-    else
-      Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
-  }
-  else {
-#ifdef ALPHABLEND_TYPE2
-    Background = CreateSolidBrush(BGVTColor[1]);
-#else
-    Background = CreateSolidBrush(ts.VTColor[1]);
-#endif  // ALPHABLEND_TYPE2
-  }
+	if ((ts.ColorFlag & CF_REVERSEVIDEO) == 0) {
+		if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
+			const WORD AttrFlag = ((ts.ColorFlag & CF_BLINKCOLOR) && (CurCharAttr.Attr & AttrBlink)) ? AttrBlink : 0;
+			const int index = Get256ColorIndex(CurCharAttr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
+			Background = CreateSolidBrush(ANSIColor[index]);
+		}
+		else {
+			Background = CreateSolidBrush(BGVTColor[1]);
+		}
+	}
+	else {
+		if ((CurCharAttr.Attr2 & Attr2Fore) != 0) {
+			const WORD AttrFlag = ((ts.ColorFlag & CF_BOLDCOLOR) && (CurCharAttr.Attr & AttrBold)) ? AttrBold : 0;
+			const int index = Get256ColorIndex(CurCharAttr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
+			Background = CreateSolidBrush(ANSIColor[index]);
+		}
+		else {
+			Background = CreateSolidBrush(BGVTColor[0]);
+		}
+	}
 }
 
 void DispShowWindow(int mode)
