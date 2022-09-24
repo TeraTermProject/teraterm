@@ -3684,6 +3684,7 @@ COLORREF DispGetColor(unsigned int num)
 	case CS_TEK_BG:       color = ts.TEKColor[1]; break;
 	default:
 		if (num <= 255) {
+			num = Get256ColorIndex(num, 0, 0);
 			color = ANSIColor[num];
 		}
 		else {
