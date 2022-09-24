@@ -141,7 +141,7 @@ void ChangeTitle(char *title) {
 	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
 
-static HANDLE PASCAL TTXCreateFile(LPCTSTR FName, DWORD AcMode, DWORD ShMode,
+static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
     LPSECURITY_ATTRIBUTES SecAttr, DWORD CreateDisposition, DWORD FileAttr, HANDLE Template) {
 
 	HANDLE ret;
