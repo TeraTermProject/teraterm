@@ -40,6 +40,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -62,9 +63,29 @@ const mouse_cursor_t MouseCursor[] = {
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
+/**
+ *	ANSI Color ÇÃ index Çïœä∑Ç∑ÇÈ
+ *		ts.ANSIColor Ç∆ 256êFÉJÉâÅ[ Ç≈àŸÇ»Ç¡ÇƒÇ¢ÇÈ
+ *			1-7 ÅÀ 9-15
+ *			9-15 ÅÀ 1-7
+ */
+static int ConvertColorIndex(int index)
+{
+	if (index > 15) {
+		assert(FALSE);
+		return index;
+	}
+	else if (index == 0 || index == 8) {
+		return index;
+	}
+	else {
+		return index ^ 8;
+	}
+}
+
 void CVisualPropPageDlg::SetupRGBbox(int index)
 {
-	COLORREF Color = ts.ANSIColor[index];
+	COLORREF Color = ts.ANSIColor[ConvertColorIndex(index)];
 	BYTE c;
 
 	c = GetRValue(Color);
@@ -1021,7 +1042,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				}
 
 				// OK ÇâüÇ≥Ç»Ç≠ÇƒÇ‡ê›íËÇ™ï€ë∂Ç≥ÇÍÇƒÇ¢ÇÈ
-				ts.ANSIColor[sel] = RGB(r, g, b);
+				ts.ANSIColor[ConvertColorIndex(sel)] = RGB(r, g, b);
 
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
