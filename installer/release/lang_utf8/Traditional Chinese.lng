@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-31)
+﻿; Updated by TeraTerm Project (2022-09-29)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -242,6 +242,7 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI色
 DLG_TAB_VISUAL_RED=紅(&R)
 DLG_TAB_VISUAL_GREEN=綠(&G)
 DLG_TAB_VISUAL_BLUE=藍(&B)
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=Window corner don't round
 DLG_TAB_VISUAL_BOLD_COLOR=啟用高亮顏色屬性(&O)
 DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=啟用閃爍顏色屬性(&L)

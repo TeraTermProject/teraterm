@@ -161,7 +161,7 @@ BEGIN
     LTEXT           "&Font Quality",IDC_FONT_QUALITY_LABEL,148,18,61,12
     COMBOBOX        IDC_FONT_QUALITY,148,30,80,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "FlickerLessMove",IDC_CHECK_FLICKER_LESS_MOVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,44,105,12
-    CONTROL         "CornerDontround",IDC_CHECK_CornerDontround,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,59,105,12
+    CONTROL         "Window corner don't round",IDC_CHECK_CORNERDONTROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,59,105,12
     LTEXT           "Charactor attributes",IDC_STATIC,137,75,63,8
     CONTROL         "Enable B&old attribute color",IDC_ENABLE_ATTR_COLOR_BOLD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,87,124,12

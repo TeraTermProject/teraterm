@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-31)
+﻿; Updated by TeraTerm Project (2022-09-29)
 ; Traducido por Filiberto Olguin Ascona.
 
 [Tera Term]
@@ -220,6 +220,7 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI color
 DLG_TAB_VISUAL_RED=&Red
 DLG_TAB_VISUAL_GREEN=&Green
 DLG_TAB_VISUAL_BLUE=&Blue
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=Window corner don't round
 DLG_TAB_VISUAL_BOLD_COLOR=Enable B&old attribute color
 DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=Enable B&link attribute color

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-31)
+﻿; Updated by TeraTerm Project (2022-09-29)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -242,6 +242,7 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI цвет
 DLG_TAB_VISUAL_RED=&      R
 DLG_TAB_VISUAL_GREEN=&      G
 DLG_TAB_VISUAL_BLUE=&      B
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=Window corner don't round
 DLG_TAB_VISUAL_BOLD_COLOR=&Цвет полужирного шрифта
 DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=&Цвет в мигающем тексте

@@ -672,6 +672,7 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_RED, "DLG_TAB_VISUAL_RED" },
 		{ IDC_GREEN, "DLG_TAB_VISUAL_GREEN" },
 		{ IDC_BLUE, "DLG_TAB_VISUAL_BLUE" },
+		{ IDC_CHECK_CORNERDONTROUND, "DLG_TAB_VISUAL_CORNER_DONT_ROUND" },
 		{ IDC_ENABLE_ATTR_COLOR_BOLD, "DLG_TAB_VISUAL_BOLD_COLOR" },		// SGR 1
 		{ IDC_ENABLE_ATTR_FONT_BOLD, "DLG_TAB_VISUAL_BOLD_FONT" },
 		{ IDC_ENABLE_ATTR_COLOR_UNDERLINE, "DLG_TAB_VISUAL_UNDERLINE_COLOR" },	// SGR 4
@@ -788,6 +789,11 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	SetCheck(IDC_CHECK_FAST_SIZE_MOVE, ts.EtermLookfeel.BGFastSizeMove != 0);
 	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
+
+	SetCheck(IDC_CHECK_CORNERDONTROUND, (ts.WindowCornerDontround) != 0);
+	if (pDwmSetWindowAttribute == NULL) {
+		EnableDlgItem(IDC_CHECK_CORNERDONTROUND, FALSE);
+	}
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
@@ -1178,6 +1184,14 @@ void CVisualPropPageDlg::OnOK()
 
 	ts.EtermLookfeel.BGFastSizeMove = GetCheck(IDC_CHECK_FAST_SIZE_MOVE);
 	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
+
+	if (ts.WindowCornerDontround != GetCheck(IDC_CHECK_CORNERDONTROUND)) {
+		ts.WindowCornerDontround = GetCheck(IDC_CHECK_CORNERDONTROUND);
+		if (pDwmSetWindowAttribute != NULL) {
+			DWM_WINDOW_CORNER_PREFERENCE preference = ts.WindowCornerDontround ? DWMWCP_DONOTROUND : DWMWCP_DEFAULT;
+			pDwmSetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+		}
+	}
 
 	// ANSI Color
 	if (CheckColorChanged()) {

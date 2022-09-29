@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-31)
+﻿; Updated by TeraTerm Project (2022-09-29)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -242,6 +242,7 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI 색상
 DLG_TAB_VISUAL_RED=빨강(&R)
 DLG_TAB_VISUAL_GREEN=초록(&G)
 DLG_TAB_VISUAL_BLUE=블루(&B)
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=Window corner don't round
 DLG_TAB_VISUAL_BOLD_COLOR=굵기 속성 활성화(&O)
 DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=반짝임 속성 활성화(&L)

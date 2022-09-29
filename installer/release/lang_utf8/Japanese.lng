@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-31)
+﻿; Updated by TeraTerm Project (2022-09-29)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -241,6 +241,7 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SIカラー
 DLG_TAB_VISUAL_RED=赤(&R)
 DLG_TAB_VISUAL_GREEN=緑(&G)
 DLG_TAB_VISUAL_BLUE=青(&B)
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=ウィンドウの角を丸くしない
 DLG_TAB_VISUAL_BOLD_COLOR=高輝度属性色を有効にする(&O)
 DLG_TAB_VISUAL_BOLD_FONT=高輝度属性フォントを有効にする
 DLG_TAB_VISUAL_BLINK=点滅属性色を有効にする(&L)

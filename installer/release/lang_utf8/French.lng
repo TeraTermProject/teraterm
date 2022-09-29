@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-08-31)
+﻿; Updated by TeraTerm Project (2022-09-29)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -242,6 +242,7 @@ DLG_TAB_VISUAL_ANSICOLOR=AN&SI color
 DLG_TAB_VISUAL_RED=Rouge
 DLG_TAB_VISUAL_GREEN=Vert
 DLG_TAB_VISUAL_BLUE=Bleu
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=Window corner don't round
 DLG_TAB_VISUAL_BOLD_COLOR=Aut. attribut couleur Gras
 DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=Aut. attribut Clignotant
