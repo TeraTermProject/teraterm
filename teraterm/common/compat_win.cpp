@@ -103,6 +103,7 @@ static HRESULT (WINAPI *pLoadIconWithScaleDown)(HINSTANCE hinst, PCWSTR pszName,
 
 // dwmapi.dll
 HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
+HRESULT (WINAPI *pDwmGetWindowAttribute)(HWND hwnd, DWORD dwAttribute, PVOID pvAttribute, DWORD cbAttribute);
 
 class Initializer {
 public:
@@ -245,6 +246,7 @@ static const APIInfo Lists_comctl32[] = {
 
 static const APIInfo Lists_dwmapi[] = { // Windows Vista or later
 	{ "DwmSetWindowAttribute", (void **)&pDwmSetWindowAttribute },
+	{ "DwmGetWindowAttribute", (void **)&pDwmGetWindowAttribute },
 	{},
 };
 

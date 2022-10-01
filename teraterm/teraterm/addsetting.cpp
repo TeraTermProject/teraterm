@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <commctrl.h>
-#include <time.h>
+#include <dwmapi.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -790,9 +790,17 @@ void CVisualPropPageDlg::OnInitDialog()
 	SetCheck(IDC_CHECK_FAST_SIZE_MOVE, ts.EtermLookfeel.BGFastSizeMove != 0);
 	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
 
+	// ウィンドウの角を丸くしない
 	SetCheck(IDC_CHECK_CORNERDONTROUND, (ts.WindowCornerDontround) != 0);
-	if (pDwmSetWindowAttribute == NULL) {
-		EnableDlgItem(IDC_CHECK_CORNERDONTROUND, FALSE);
+	{
+		DWM_WINDOW_CORNER_PREFERENCE preference;
+		if (pDwmGetWindowAttribute == NULL ||
+			pDwmGetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference)) != S_OK) {
+			// ウィンドウの角を丸くしないに対応していないなら disable にする
+			//		DwmGetWindowAttribute() API がない or
+			//		DwmGetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE) で S_OK が返らない
+			EnableDlgItem(IDC_CHECK_CORNERDONTROUND, FALSE);
+		}
 	}
 
 	// ダイアログにフォーカスを当てる
@@ -1185,6 +1193,7 @@ void CVisualPropPageDlg::OnOK()
 	ts.EtermLookfeel.BGFastSizeMove = GetCheck(IDC_CHECK_FAST_SIZE_MOVE);
 	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
 
+	// ウィンドウの角を丸くしない
 	if (ts.WindowCornerDontround != GetCheck(IDC_CHECK_CORNERDONTROUND)) {
 		ts.WindowCornerDontround = GetCheck(IDC_CHECK_CORNERDONTROUND);
 		if (pDwmSetWindowAttribute != NULL) {

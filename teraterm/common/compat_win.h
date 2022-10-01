@@ -70,8 +70,9 @@ typedef enum MONITOR_DPI_TYPE {
 #endif
 
 // 10.0.22000 or later
+#if !defined(_DWMAPI_H_)
+#define _DWMAPI_H_
 #define DWMWA_WINDOW_CORNER_PREFERENCE 33
-#if !defined(DWM_WINDOW_CORNER_PREFERENCE)
 typedef enum  {
   DWMWCP_DEFAULT = 0,
   DWMWCP_DONOTROUND = 1,
@@ -210,6 +211,7 @@ HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, 
 
 // dwmapi.dll
 extern HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
+extern HRESULT (WINAPI *pDwmGetWindowAttribute)(HWND hwnd, DWORD dwAttribute, PVOID pvAttribute, DWORD cbAttribute);
 
 void WinCompatInit();
 
