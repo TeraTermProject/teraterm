@@ -186,7 +186,6 @@
 #define IDC_OPT_HIDEDLG                 2539
 #define IDC_OPT_INCBUF                  2540
 #define IDC_OPT_TIMESTAMP_TYPE          2541
-#define IDC_EDIT_BGIMG_BRIGHTNESS       2552
 #define IDC_TRIMNLCHAR                  2564
 #define IDC_CLIPBOARD_NOTIFY            2566
 #define IDC_LIST_HIDDEN_FONTS           2567
