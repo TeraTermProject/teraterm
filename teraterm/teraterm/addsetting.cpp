@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <commctrl.h>
-#include <dwmapi.h>
+//#include <dwmapi.h>	// compat_win.h 内の定義を使用するため include しない
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -712,13 +712,24 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (2) theme file
 	{
-		SendDlgItemMessageA(IDC_THEME_FILE, CB_ADDSTRING, 0, (LPARAM)"使用しない");
-		SendDlgItemMessageA(IDC_THEME_FILE, CB_ADDSTRING, 1, (LPARAM)"固定テーマ(テーマファイル指定)");
-		SendDlgItemMessageA(IDC_THEME_FILE, CB_ADDSTRING, 2, (LPARAM)"ランダムテーマ");
+		// TODO i18n
+		const static I18nTextInfo theme_select[] = {
+#if defined(_MSC_VER)
+			{ NULL, L"使用しない" },
+			{ NULL, L"固定テーマ(テーマファイル指定)" },
+			{ NULL, L"ランダムテーマ" },
+#else
+			{ NULL, L"no use" },
+			{ NULL, L"fixed theme file" },
+			{ NULL, L"random theme file" },
+#endif
+		};
+
 		int sel = ts.EtermLookfeel.BGEnable;
 		if (sel < 0) sel = 0;
 		if (sel > 2) sel = 2;
-		SendDlgItemMessageA(IDC_THEME_FILE, CB_SETCURSEL, sel, 0);
+		SetI18nListW("Tera Term", m_hWnd, IDC_THEME_FILE, theme_select, _countof(theme_select),
+					 ts.UILanguageFileW, sel);
 		BOOL enable = (sel == 1) ? TRUE : FALSE;
 		EnableDlgItem(IDC_THEME_EDIT, enable);
 		EnableDlgItem(IDC_THEME_BUTTON, enable);
