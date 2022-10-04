@@ -2861,7 +2861,13 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 						// 1つ前の文字が1セル
 						StrChangeCount = 1;
 					}
-					StrChangeStart = CursorX - StrChangeCount;
+					if (CursorX == 0) {
+						// カーソルが左端の時
+						StrChangeStart = 0;
+					}
+					else {
+						StrChangeStart = CursorX - StrChangeCount;
+					}
 				}
 			}
 		}
@@ -3438,6 +3444,7 @@ void UpdateStr(void)
 {
 	int X, Y;
 
+	assert(StrChangeStart >= 0);
 	if (StrChangeCount==0) {
 		return;
 	}
