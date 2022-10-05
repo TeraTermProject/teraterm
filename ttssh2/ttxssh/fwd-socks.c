@@ -126,7 +126,8 @@ static int send_socks_reply(FWDDynamicFilterClosure *closure, const char *data, 
 	return UTIL_sock_buffered_write(pvar, &c->writebuf, dummy_blocking_write, c->local_socket, data, len);
 }
 
-send_socks4_reply(FWDDynamicFilterClosure *closure, int code) {
+static void send_socks4_reply(FWDDynamicFilterClosure *closure, int code)
+{
 	unsigned char buff[] = {
 		0, // NUL
 		SOCKS4_RESULT_NG, // status
