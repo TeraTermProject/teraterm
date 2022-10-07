@@ -147,6 +147,7 @@ typedef TFileVar far *PFileVar;
 
 typedef struct {
 	int MAXL;
+	int MAXLX;
 	BYTE TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT,CAPAS,WINDO,MAXLX1,MAXLX2;
 } KermitParam;
 
