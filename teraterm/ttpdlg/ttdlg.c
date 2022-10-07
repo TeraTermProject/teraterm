@@ -2328,8 +2328,8 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 				break;
 			default: {
 				char str[32];
-				sprintf_s(str, sizeof(str), " (NTDDI_VERSION=0x08%X)",
-						  WDK_NTDDI_VERSION);
+				sprintf_s(str, sizeof(str), " (NTDDI_VERSION=0x%08X)",
+				          WDK_NTDDI_VERSION);
 				strncat_s(buf, buf_size, str, _TRUNCATE);
 				break;
 			}
