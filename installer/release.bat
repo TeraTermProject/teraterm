@@ -213,6 +213,7 @@ if exist %CMAKE_PATH%\cmake.exe (
     set CMAKE="%CMAKE_PATH%\cmake.exe"
     exit /b 0
 )
+if "%CMAKE%" == "" set CMAKE="cmake.exe"
 
 where %CMAKE% > nul 2>&1
 if %errorlevel% == 0 exit /b 0

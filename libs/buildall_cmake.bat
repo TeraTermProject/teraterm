@@ -2,9 +2,13 @@
 setlocal
 cd /d %~dp0
 
+if NOT "%CMAKE%" == "" goto pass_set_cmake
+rem set CMAKE=cmake.exe
 set CMAKE="C:\Program Files\CMake\bin\cmake.exe"
+rem set CMAKE="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
 rem set CMAKE="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
 set OPT=
+:pass_set_cmake
 
 :retry_vs
 echo 1. Visual Studio 17 2022 Win32
