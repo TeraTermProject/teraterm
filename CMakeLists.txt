@@ -124,22 +124,9 @@ endif()
 
 ### tool
 # perl
-if (MSVC OR (MINGW AND (EXISTS "c:/windows")))
-  find_program(
-    PERL perl.exe
-    HINTS ${CMAKE_SOURCE_DIR}/buildtools/perl/perl/bin
-    HINTS c:/Strawberry/perl/bin
-    HINTS c:/Perl64/bin
-    HINTS c:/Perl/bin
-    HINTS c:/cygwin/usr/bin
-    HINTS c:/cygwin64/usr/bin
-    )
-else()
-  find_program(
-    PERL perl
-    )
-endif()
+include(${CMAKE_CURRENT_LIST_DIR}/buildtools/checkperl.cmake)
 message("perl=${PERL}")
+
 # svn / git-svn
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
   # git (git-svn)

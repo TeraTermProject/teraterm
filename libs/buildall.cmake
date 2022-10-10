@@ -29,15 +29,8 @@ endif()
 message("BUILD_SSL_LIBRARY=${BUILD_SSL_LIBRARY}")
 
 # install tools
-if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-  if(NOT EXISTS c:/Strawberry/perl/bin/perl.exe)
-    message("perl")
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -P perl.cmake
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../buildtools
-      )
-  endif()
-endif()
+include(${CMAKE_CURRENT_LIST_DIR}/buildtools/checkperl.cmake)
+message("perl=${PERL}")
 
 # build
 message("oniguruma")
