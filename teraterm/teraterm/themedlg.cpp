@@ -431,7 +431,7 @@ static void SetColorListCtrlValue(HWND hWndList, int y)
 	const int b = GetBValue(c);
 
 	wchar_t color_str[64];
-	swprintf_s(color_str, L"0x%02x%02x%02x", r,g,b);
+	swprintf_s(color_str, L"#%02x%02x%02x", r,g,b);
 	item.mask = LVIF_TEXT;
 	item.iItem = y;
 	item.iSubItem = 2;
@@ -498,7 +498,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 			//ListView_InsertColumn(hWndList, 1, &lvcol);
 			SendMessage(hWndList, LVM_INSERTCOLUMNA, 1, (LPARAM)&lvcol);
 
-			lvcol.pszText = (LPSTR)"value(RRGGBB)";
+			lvcol.pszText = (LPSTR)"value(#RRGGBB)";
 			lvcol.iSubItem = 2;
 			//ListView_InsertColumn(hWndList, 1, &lvcol);
 			SendMessage(hWndList, LVM_INSERTCOLUMNA, 2, (LPARAM)&lvcol);
@@ -748,7 +748,12 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			OPENFILENAMEW ofn = {};
 			wchar_t theme_file[MAX_PATH];
 
-			wcscpy_s(theme_file, _countof(theme_file), ts->EtermLookfeel.BGThemeFileW);
+			if (ts->EtermLookfeel.BGThemeFileW != NULL) {
+				wcscpy_s(theme_file, _countof(theme_file), ts->EtermLookfeel.BGThemeFileW);
+			}
+			else {
+				theme_file[0] = 0;
+			}
 
 			ofn.lStructSize = get_OPENFILENAME_SIZEW();
 			ofn.hwndOwner   = hWnd;

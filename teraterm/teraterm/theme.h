@@ -66,22 +66,26 @@ typedef struct _BGTheme {
 // color theme
 ////////////////////
 
+// Character Attributes
+//	Normal(SGR 0), BOLD(SGR 1),...
 typedef struct {
-	BOOL change;
-	BOOL enable;
-	COLORREF fg;
-	COLORREF bg;
+	BOOL change;		// TRUE/FALSE = default色から変更する/変更しない
+	BOOL enable;		// TRUE/FALSE = この文字属性(Bold attribute等)の独自色を有効/無効にする
+	COLORREF fg;		// Fore color (文字属性の独自色が有効な場合)
+	COLORREF bg;		// Back color (文字属性の独自色が有効な場合)
 } TColorSetting;
 
+// ANSI Color
 typedef struct {
-	BOOL change;
-	BOOL enable;
-	COLORREF color[16];
+	BOOL change;			// TRUE/FALSE =  default色から変更する/変更しない
+	//BOOL enable;			// 不要か?
+	COLORREF color[16];		// ANSI color 256色 の最初の16色, (前半が暗い色,後半が原色の明るい色)
 } TAnsiColorSetting;
 
+// color theme
 typedef struct {
-	char name[50];
-	TColorSetting vt;
+	wchar_t name[50];
+	TColorSetting vt;			// SGR 0
 	TColorSetting bold;			// SGR 1
 	TColorSetting underline;	// SGR 4
 	TColorSetting blink;		// SGR 5
@@ -100,8 +104,7 @@ const BG_PATTERN_ST *ThemeBGPatternList(int index);
 
 // file / themefile.cpp
 void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme);
-void ThemeLoadColor(const wchar_t *fn, TColorTheme *color_theme);
-void ThemeLoadColorOld(const wchar_t *file, TColorTheme *theme);
+void ThemeLoadColor(const wchar_t *fname, TColorTheme *color_theme);
 void ThemeLoad(const wchar_t *fname, BGTheme *bg_theme, TColorTheme *color_theme);
 void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *fname);
 void ThemeSaveColor(TColorTheme *color_theme, const wchar_t *fname);

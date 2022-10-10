@@ -150,6 +150,7 @@ extern TCharAttr DefCharAttr;
 extern BOOL IMEstat;
 extern BOOL IMECompositionState;
 
+// for DispHScroll(), DispVScroll()
 #define SCROLL_BOTTOM	1
 #define SCROLL_LINEDOWN	2
 #define SCROLL_LINEUP	3
@@ -158,6 +159,7 @@ extern BOOL IMECompositionState;
 #define SCROLL_POS	6
 #define SCROLL_TOP	7
 
+// for DispShowWindow()
 #define WINDOW_MINIMIZE 1
 #define WINDOW_MAXIMIZE 2
 #define WINDOW_RESTORE  3
@@ -165,8 +167,6 @@ extern BOOL IMECompositionState;
 #define WINDOW_LOWER    5
 #define WINDOW_REFRESH  6
 #define WINDOW_TOGGLE_MAXIMIZE 7
-
-#include "theme.h"
 
 #ifdef __cplusplus
 }

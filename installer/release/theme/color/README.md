@@ -1,5 +1,9 @@
 ﻿# color theme folder
 
+- see [Setup Files]/[theme file] in help
+- Tera Term color theme plugin was referened.
+  - https://osdn.net/users/doda/pf/TTXColorTheme/
+
 ## themes
 
 - Solarized Dark
@@ -19,12 +23,3 @@
 - Color UniversalDesign 4
   - 色覚多様性に対応した設定例
   - カラーユニバーサルデザイン(CUD)推奨配色セット ver.4に準拠
-
-## format
-
-- 未決定
-  - まだ変更すると思う
-  - TBD
-- Tera Term カラーテーマプラグイン を参考にしました。
-  - https://osdn.net/users/doda/pf/TTXColorTheme/
-

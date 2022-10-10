@@ -3583,18 +3583,34 @@ void ThemeGetColor(TColorTheme *data)
 {
 	int i;
 
+	wcscpy_s(data->name, _countof(data->name), L"Tera Term color theme");
+	data->vt.change = TRUE;
+	data->vt.enable = TRUE;
 	data->vt.fg = BGVTColor[0];
 	data->vt.bg = BGVTColor[1];
+	data->bold.change = TRUE;
+	data->bold.enable = TRUE;
 	data->bold.fg = BGVTBoldColor[0];
 	data->bold.bg = BGVTBoldColor[1];
+	data->underline.change = TRUE;
+	data->underline.enable = TRUE;
 	data->underline.fg = BGVTUnderlineColor[0];
 	data->underline.bg = BGVTUnderlineColor[1];
+	data->blink.change = TRUE;
+	data->blink.enable = TRUE;
 	data->blink.fg = BGVTBlinkColor[0];
 	data->blink.bg = BGVTBlinkColor[1];
+	data->reverse.change = TRUE;
+	data->reverse.enable = TRUE;
 	data->reverse.fg = BGVTReverseColor[0];
 	data->reverse.bg = BGVTReverseColor[1];
+	data->url.change = TRUE;
+	data->url.enable = TRUE;
 	data->url.fg = BGURLColor[0];
 	data->url.bg = BGURLColor[1];
+
+	// ANSI color
+	data->ansicolor.change = TRUE;
 	for (i = 0; i < 16; i++) {
 		data->ansicolor.color[i] = ANSIColor[i];
 	}
