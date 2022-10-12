@@ -21,7 +21,7 @@ if ("${PERL}" STREQUAL "PERL-NOTFOUND")
       COMMAND ${CMAKE_COMMAND} -P getperl.cmake
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/buildtools
     )
-    set(PERL ${CMAKE_CURRENT_LIST_DIR}/perl/perl/bin)
+    set(PERL ${CMAKE_CURRENT_LIST_DIR}/perl/perl/bin/perl.exe)
   else()
     message("perl not installed")
   endif()

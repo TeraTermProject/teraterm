@@ -29,7 +29,7 @@ endif()
 message("BUILD_SSL_LIBRARY=${BUILD_SSL_LIBRARY}")
 
 # install tools
-include(${CMAKE_CURRENT_LIST_DIR}/buildtools/checkperl.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../buildtools/checkperl.cmake)
 message("perl=${PERL}")
 
 # build
