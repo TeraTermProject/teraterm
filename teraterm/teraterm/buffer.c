@@ -207,14 +207,6 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 	}
 }
 
-static void BuffSetChar3(buff_char_t *buff, char32_t u32, unsigned char fg, unsigned char bg, char property)
-{
-	buff_char_t *p = buff;
-	BuffSetChar2(p, u32, property, TRUE, FALSE);
-	p->fg = fg;
-	p->bg = bg;
-}
-
 static void BuffSetChar4(buff_char_t *buff, char32_t u32, unsigned char fg, unsigned char bg, unsigned char attr, unsigned char attr2, char property)
 {
 	buff_char_t *p = buff;
@@ -1867,6 +1859,7 @@ static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
  *	@retval		TRUE	マッチした
  *	@retval		FALSE	マッチしていない
  */
+#if 0
 static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineContinued)
 {
 	int x;
@@ -1919,6 +1912,7 @@ static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineCo
 
 	return result;
 }
+#endif
 
 /**
  *	(x,y)から strと同一か調べる
@@ -4021,8 +4015,8 @@ void BuffDblClk(int Xw, int Yw)
 			b = CodeBuffW[TmpPtr+IStart].ansi_char;
 			DBCS = (CodeBuffW[TmpPtr+IStart].attr & AttrKanji) != 0;
 			while ((b==CodeBuffW[TmpPtr+IStart].ansi_char) ||
-			       DBCS &&
-			       ((CodeBuffW[TmpPtr+IStart].attr & AttrKanji)!=0)) {
+			       (DBCS &&
+					((CodeBuffW[TmpPtr+IStart].attr & AttrKanji)!=0))) {
 				MoveCharPtr(TmpPtr,&IStart,-1); // move left
 				if (ts.EnableContinuedLineCopy) {
 					if (IStart<=0) {
@@ -4063,8 +4057,8 @@ void BuffDblClk(int Xw, int Yw)
 			TmpPtr = GetLinePtr(YEnd);
 			i = 1;
 			while (((b==CodeBuffW[TmpPtr+IEnd].ansi_char) ||
-			        DBCS &&
-			        ((CodeBuffW[TmpPtr+IEnd].attr & AttrKanji)!=0))) {
+			        (DBCS &&
+					 ((CodeBuffW[TmpPtr+IEnd].attr & AttrKanji)!=0)))) {
 				i = MoveCharPtr(TmpPtr,&IEnd,1); // move right
 				if (ts.EnableContinuedLineCopy) {
 					if (i==0) {
@@ -4378,8 +4372,8 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 				DBCS = (CodeBuffW[TmpPtr+X].attr & AttrKanji) != 0;
 				while ((i!=0) &&
 				       ((b==CodeBuffW[TmpPtr+SelectEnd.x].ansi_char) ||
-				        DBCS &&
-				        ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0))) {
+				        (DBCS &&
+						 ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0)))) {
 					i = MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1); // move right
 				}
 			}
@@ -4406,8 +4400,8 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 				DBCS = (CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji) != 0;
 				while ((SelectEnd.x>0) &&
 				       ((b==CodeBuffW[TmpPtr+SelectEnd.x].ansi_char) ||
-				       DBCS &&
-				       ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0))) {
+						(DBCS &&
+						 ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0)))) {
 					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,-1); // move left
 				}
 				if ((b!=CodeBuffW[TmpPtr+SelectEnd.x].ansi_char) &&
