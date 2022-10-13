@@ -94,25 +94,34 @@ typedef struct {
 	unsigned long code_to;
 } UnicodeTable_t;
 
+typedef struct {
+	unsigned long code_from;
+	unsigned long code_to;
+	unsigned char category;
+} UnicodeTableCombine_t;
+
 /**
  * u32がテーブルのデータに含まれているか調べる
+ *
+ *	@retval		テーブルのindex
+ *	@retval		-1 テーブルに存在しない
  */
-static int UnicodeSimpleSearchTable(
+static int SearchTableSimple(
 	const UnicodeTable_t *table, size_t table_size,
 	unsigned long u32)
 {
 	if (u32 < table[0].code_from) {
-		return 0;
+		return -1;
 	}
 	if (u32 > table[table_size-1].code_to) {
-		return 0;
+		return -1;
 	}
 	size_t low = 0;
 	size_t high = table_size - 1;
 	while (low <= high) {
 		size_t mid = (low + high) / 2;
 		if (table[mid].code_from <= u32 && u32 <= table[mid].code_to) {
-			return 1;
+			return (int)mid;
 		} else if (table[mid].code_to < u32) {
 			low = mid + 1;
 		} else {
@@ -120,43 +129,94 @@ static int UnicodeSimpleSearchTable(
 		}
 	}
 	// テーブルの範囲外
-	return 0;
+	return -1;
+}
+
+/**
+ *	SearchTableSimple() と同じ
+ *	テーブルの型が異なる
+ *
+ *	@retval		テーブルのindex
+ *	@retval		-1 テーブルに存在しない
+ */
+static int SearchTableCombine(
+	const UnicodeTableCombine_t *table, size_t table_size,
+	unsigned long u32)
+{
+	if (u32 < table[0].code_from) {
+		return -1;
+	}
+	if (u32 > table[table_size-1].code_to) {
+		return -1;
+	}
+	size_t low = 0;
+	size_t high = table_size - 1;
+	while (low <= high) {
+		size_t mid = (low + high) / 2;
+		if (table[mid].code_from <= u32 && u32 <= table[mid].code_to) {
+			return (int)mid;
+		} else if (table[mid].code_to < u32) {
+			low = mid + 1;
+		} else {
+			high = mid - 1;
+		}
+	}
+	// テーブルの範囲外
+	return -1;
 }
 
 /*
  * 結合文字か検査する
- *		EMOJI MODIFIER も結合文字として扱う
+ *		次の文字も結合文字として扱う
+ *			EMOJI MODIFIER
+ *				= Nonspacing Mark
+ *			VARIATION SELECTOR (異体字セレクタ)
+ *				= Nonspacing Mark
  *
  *	@retval	0		結合文字ではない
- *	@retval	1		結合文字である
+ *	@retval	1		結合文字,Nonspacing Mark, カーソルは移動しない
+ *	@retval	2		結合文字,Spacing Mark, カーソルが +1 移動する
  */
 int UnicodeIsCombiningCharacter(unsigned long u32)
 {
-	const static UnicodeTable_t CombiningCharacterList[] = {
+#define Mn 1  // Nonspacing_Mark	a nonspacing combining mark (zero advance width)
+#define Mc 2  // Spacing_Mark		a spacing combining mark (positive advance width)
+#define Me 1  // Enclosing_Mark		an enclosing combining mark
+#define Sk 1  // Modifier_Symbol	a non-letterlike modifier symbol
+	const static UnicodeTableCombine_t CombiningCharacterList[] = {
 #include "unicode_combine.tbl"
 	};
-	return UnicodeSimpleSearchTable(
-		CombiningCharacterList, _countof(CombiningCharacterList),
-		u32);
+	const int index = SearchTableCombine(CombiningCharacterList, _countof(CombiningCharacterList), u32);
+	if (index == -1) {
+		return 0;
+	}
+	return (int)CombiningCharacterList[index].category;
 }
 
-
+/**
+ *	絵文字?
+ *
+ *	@retval	0	絵文字ではない
+ *	@retval	1	絵文字である
+ */
 int UnicodeIsEmoji(unsigned long u32)
 {
 	const static UnicodeTable_t EmojiList[] = {
 #include "unicode_emoji.tbl"
 	};
-	return UnicodeSimpleSearchTable(
-		EmojiList, _countof(EmojiList),
-		u32);
+	const int index = SearchTableSimple(EmojiList, _countof(EmojiList), u32);
+	return index != -1 ? 1 : 0;
 }
 
 /**
  *	異体字セレクタかチェックする
  *
+ *	UnicodeIsCombiningCharacter() で同時にチェックできるので使用しなくなった
+ *
  *	@retval	0		異体字セレクタではない
  *	@retval	1		異体字セレクタである
  */
+#if 0
 int UnicodeIsVariationSelector(unsigned long u32)
 {
 	if ((0x00180b <= u32 && u32 <= 0x00180d) ||	// FVS (Mongolian Free Variation Selector)
@@ -167,6 +227,7 @@ int UnicodeIsVariationSelector(unsigned long u32)
 	}
 	return 0;
 }
+#endif
 
 
 #if 0

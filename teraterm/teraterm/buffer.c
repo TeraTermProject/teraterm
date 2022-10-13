@@ -2682,26 +2682,28 @@ static wchar_t *GetWCS(const buff_char_t *b)
 /**
  *	(x,y)にu32を入れるとき、結合するか?
  *  @param[in]		wrap		TRUE wrap中
- *	@param[in,out]	combine		TRUE/FALSE	文字コード的には結合する/しない
+ *	@param[in,out]	combine		0	結合しない
+ *								1	結合文字,Nonspacing Mark, カーソルは移動しない
+ *								2	結合文字,Spacing Mark, カーソルが +1 移動する
  *								NULL 結果を返さない
  *	@return	結合する文字へのポインタ
- *								1 or 2セル前
+ *								1(半角) or 2(全角) or N セル前
  *								現在のセル (x が行末で wrap == TRUE 時)
  *	@return	NULL	結合しない
  */
-static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, BOOL *combine)
+static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, int *combine)
 {
 	buff_char_t *p = NULL;  // NULLのとき、前の文字はない
 	LONG LinePtr = GetLinePtr(PageStart+y);
 	buff_char_t *CodeLineW = &CodeBuffW[LinePtr];
+	int combine_type;	// 0 or 1 or 2
 
-	// TRUE = 文字コード的には結合する
-	//		VariationSelector or
-	//		CombiningCharacter or
-	//		ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ) (U+200d)
-	BOOL combine_char = UnicodeIsVariationSelector(u32) || UnicodeIsCombiningCharacter(u32) || (u32 == 0x200d);
+	combine_type = (u32 == 0x200d) ? 1 : 0;		// U+200d = ゼロ幅接合子,ZERO WIDTH JOINER(ZWJ)
+	if (combine_type == 0) {
+		combine_type = UnicodeIsCombiningCharacter(u32);
+	}
 	if (combine != NULL) {
-		*combine = combine_char;
+		*combine = combine_type;
 	}
 
 	if (x == NumOfColumns - 1 && wrap) {
@@ -2737,7 +2739,7 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, B
 
 	// 結合する?
 	// 		1つ前が ZWJ
-	if (combine_char || (p->u32_last == 0x200d)) {
+	if (combine_type != 0 || (p->u32_last == 0x200d)) {
 		return p;
 	}
 #if 1
@@ -2820,7 +2822,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	int move_x = 0;
 	static BOOL show_str_change = FALSE;
 	buff_char_t *p;
-	BOOL CombiningChar;
+	int combining_type;
 
 	assert(Attr.Attr == (Attr.AttrEx & 0xff));
 
@@ -2833,18 +2835,11 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	}
 
 	// 結合文字?
-	CombiningChar = FALSE;
-	p = IsCombiningChar(CursorX, CursorY, Wrap, u32, &CombiningChar);
-	if (p != NULL || CombiningChar == TRUE) {
+	combining_type = 0;
+	p = IsCombiningChar(CursorX, CursorY, Wrap, u32, &combining_type);
+	if (p != NULL || combining_type != 0) {
 		// 結合する
-		BOOL spacing_mark = FALSE;
-#if 1
-		// Malayalam
-		// TODO: ちゃんとテーブルを引く
-		if (u32 == 0x0d3e || u32 == 0x0d02) {
-			spacing_mark = TRUE;
-		}
-#endif
+		const BOOL spacing_mark = combining_type == 2 ? TRUE : FALSE;
 
 		move_x = 0;  // カーソル移動量=0
 

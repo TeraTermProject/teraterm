@@ -7,8 +7,15 @@
  */
 #pragma once
 
+// TODO 削除
+// 		多分0にできない
 #define	UNICODE_INTERNAL_BUFF	1	// 1 = 内部バッファunicode化
 
-// UNICODE_INTERNAL_BUFFの影響を受けない
-#define	UNICODE_DEBUG			1	// デバグ用機能enable
-#define	UNICODE_DEBUG_CARET_OFF	0	// カーソル点滅系を止めるデバグ用
+// デバグ用機能enable
+//		CTRL x2でマウスポインタ下の文字表法を表示
+#define	UNICODE_DEBUG			1
+
+// カーソル点滅系を止めるデバグ用
+//		描画が最低限となる
+//		1でカーソルの点滅処理が行われなくなる
+#define	UNICODE_DEBUG_CARET_OFF	0

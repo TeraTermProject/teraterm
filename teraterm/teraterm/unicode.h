@@ -32,7 +32,9 @@ extern "C" {
 
 char UnicodeGetWidthProperty(unsigned long u32);
 int UnicodeIsCombiningCharacter(unsigned long u32);
+#if 0
 int UnicodeIsVariationSelector(unsigned long u32);
+#endif
 int UnicodeIsEmoji(unsigned long u32);
 unsigned short UnicodeCombining(unsigned short first_code, unsigned short code);
 int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16);
