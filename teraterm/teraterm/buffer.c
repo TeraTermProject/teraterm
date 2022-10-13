@@ -55,7 +55,8 @@ typedef struct {
 	char32_t u32;
 	char32_t u32_last;
 	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' or 'n'(Narrow) or 'N'(Neutual) (文字の属性)
-	char HalfWidth;					// TRUE/FALSE = 半角/全角 (表示するときの文字幅)
+	char cell;			// 文字のcell数 1/2/3+=半角,全角,3以上
+						// 2以上のとき、この文字の後ろにpaddingがcell-1個続く
 	char Padding;					// TRUE = 全角の次の詰め物 or 行末の詰め物
 	char Emoji;						// TRUE = 絵文字
 	unsigned char CombinationCharCount16;	// charactor count
@@ -140,7 +141,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 	p->CombinationCharCount32 = 0;
 	p->CombinationCharSize32 = 0;
 	p->WidthProperty = property;
-	p->HalfWidth = (char)half_width;
+	p->cell = half_width ? 1 : 2;
 	p->u32 = u32;
 	p->u32_last = u32;
 	p->Padding = FALSE;
@@ -334,7 +335,7 @@ static BOOL IsBuffPadding(const buff_char_t *b)
 
 static BOOL IsBuffFullWidth(const buff_char_t *b)
 {
-	if (b->HalfWidth == FALSE)
+	if (b->cell != 1)
 		return TRUE;
 	return FALSE;
 }
@@ -1522,19 +1523,29 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 	BuffUpdateRect(0, YStart, NumOfColumns-1, YEnd);
 }
 
-// TODO rename
+/**
+ *	(Line,CharPtr)位置が全角の右側(文字長さN cellの1cell目ではない)とき
+ *	先頭の文字の位置を返す
+ *
+ *	If CharPtr is on the right half of a DBCS character
+ *	return pointer to the left half
+ *
+ *	@param Line		points to a line in CodeBuff
+ *	@param CharPtr	points to a char
+ *	@return points to the left half of the DBCS
+ */
 static int LeftHalfOfDBCS(LONG Line, int CharPtr)
-// If CharPtr is on the right half of a DBCS character,
-// return pointer to the left half
-//   Line: points to a line in CodeBuff
-//   CharPtr: points to a char
-//   return: points to the left half of the DBCS
 {
-	if ((CharPtr>0) &&
-		((CodeBuffW[Line+CharPtr-1].attr & AttrKanji) != 0)) {
-		CharPtr--;
+	int x = CharPtr;
+	while(x > 0) {
+		if ((CodeBuffW[Line+x].Padding) == FALSE) {
+			// paddingではない
+			break;
+		}
+		assert(x > 0);	// 行頭で padding?
+		x--;
 	}
-	return CharPtr;
+	return x;
 }
 
 static int MoveCharPtr(LONG Line, int *x, int dx)
@@ -2700,20 +2711,25 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, B
 			p--;
 		}
 	}
-	else if (x >= 1 && !IsBuffPadding(&CodeLineW[x - 1])) {
-		// 1セル前
-		p = &CodeLineW[x - 1];
-	}
-	else if (x >= 2 && !IsBuffPadding(&CodeLineW[x - 2])) {
-		// 2セル前
-		p = &CodeLineW[x - 2];
-	}
 	else {
-		// 前のもじはない
-		p = NULL;
+		if (x == 0) {
+			// 前のもじはない
+			p = NULL;
+		}
+		else {
+			// paddingではないセルを探す
+			x = LeftHalfOfDBCS(LinePtr, x - 1);		// 1cell前から調べる
+			if (!IsBuffPadding(&CodeLineW[x])) {
+				p = &CodeLineW[x];
+			}
+			else {
+				// 前のもじはない
+				p = NULL;
+			}
+		}
 	}
 
-	// 1つ前のセルあり?
+	// paddingではない前のセルあり?
 	if (p == NULL) {
 		// 前がないので結合できない
 		return NULL;
@@ -2724,6 +2740,13 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, B
 	if (combine_char || (p->u32_last == 0x200d)) {
 		return p;
 	}
+#if 1
+	// Malayalam
+	//  言語独自の処理?
+	if (p->u32_last == 0x0d4d) {
+		return p;
+	}
+#endif
 	return NULL;
 }
 
@@ -2814,6 +2837,15 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	p = IsCombiningChar(CursorX, CursorY, Wrap, u32, &CombiningChar);
 	if (p != NULL || CombiningChar == TRUE) {
 		// 結合する
+		BOOL spacing_mark = FALSE;
+#if 1
+		// Malayalam
+		// TODO: ちゃんとテーブルを引く
+		if (u32 == 0x0d3e || u32 == 0x0d02) {
+			spacing_mark = TRUE;
+		}
+#endif
+
 		move_x = 0;  // カーソル移動量=0
 
 		if (p == NULL) {
@@ -2827,6 +2859,22 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 
 		// 前の文字にくっつける
 		BuffAddChar(p, u32);
+
+		if (spacing_mark) {
+			// カーソル移動量は1
+			move_x = 1;
+
+			p->cell++;
+			StrChangeCount++;
+
+			// カーソル位置の文字は paddingにする
+			BuffSetChar(&CodeLineW[CursorX], 0, 'H');
+			CodeLineW[CursorX].Padding = TRUE;
+			CodeLineW[CursorX].attr = Attr.Attr;
+			CodeLineW[CursorX].attr2 = Attr.Attr2;
+			CodeLineW[CursorX].fg = Attr.Fore;
+			CodeLineW[CursorX].bg = Attr.Back;
+		}
 
 		// 文字描画
 		if (StrChangeCount == 0) {
@@ -3130,6 +3178,7 @@ static BOOL CheckSelect(int x, int y)
  *  @param	disp_setup_dc()	アトリビュート設定関数
  *	@param	data			disp_strW(A)() に渡されるデータ
  */
+static
 void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 					  void (*disp_strW)(const wchar_t *bufW, const char *width_info, int count, void *data),
 					  void (*disp_strA)(const char *buf, int count, void *data),
@@ -3149,7 +3198,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 	BOOL EndFlag = FALSE;
 	int count = 0;		// 現在注目している文字,IStartから
 #if 0
-	OutputDebugPrintf("BuffDrawLineI(%d,%d, %d,%d-%d)\n", DrawX, DrawY, SY, IStart, IEnd);
+	OutputDebugPrintf("BuffGetDrawInfoW(%d,%d-%d)\n", SY, IStart, IEnd);
 #endif
 	if (IEnd >= NumOfColumns) {
 		IEnd = NumOfColumns - 1;
@@ -3205,15 +3254,15 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 		if (SetString) {
 			if (b->u32 < 0x10000) {
 				bufW[lenW] = b->wc2[0];
-				bufWW[lenW] = b->HalfWidth ? 'H' : 'W';
+				bufWW[lenW] = b->cell;
 				lenW++;
 			} else {
 				// UTF-16でサロゲートペア
 				bufW[lenW] = b->wc2[0];
-				bufWW[lenW] = b->HalfWidth ? 'H' : 'W';
+				bufWW[lenW] = b->cell;
 				lenW++;
 				bufW[lenW] = b->wc2[1];
-				bufWW[lenW] = '0';
+				bufWW[lenW] = 0;
 				lenW++;
 			}
 			if (b->CombinationCharCount16 != 0)
@@ -3222,7 +3271,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				int i;
 				for (i = 0 ; i < (int)b->CombinationCharCount16; i++) {
 					bufW[lenW+i] = b->pCombinationChars16[i];
-					bufWW[lenW + i] = '0';
+					bufWW[lenW + i] = 0;
 				}
 				lenW += b->CombinationCharCount16;
 				DrawFlag = TRUE;	// コンビネーションがある場合はすぐ描画
@@ -5438,6 +5487,16 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 	return Result;
 }
 
+static wchar_t *UnicodeCodePointStr(char32_t u32)
+{
+	const wchar_t *format =
+		u32 < 0x1000 ? L"U+%04x" :
+		u32 < 0x10000 ? L"U+%05x" :  L"U+%06x";
+	wchar_t *str;
+	aswprintf(&str, format, u32);
+	return str;
+}
+
 /**
  *	指定位置の文字情報を文字列で返す
  *	デバグ用途
@@ -5536,12 +5595,12 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 				  L"attrFore  0x%02x\n"
 				  L"attrBack  0x%02x\n"
 				  L"WidthProperty %s(%hc)\n"
-				  L"Half %s\n"
+				  L"cell %hd\n"
 				  L"Padding %s\n"
 				  L"Emoji %s\n",
 				  b->fg, b->bg,
 				  width_property, b->WidthProperty,
-				  (b->HalfWidth ? L"TRUE" : L"FALSE"),
+				  b->cell,
 				  (b->Padding ? L"TRUE" : L"FALSE"),
 				  (b->Emoji ? L"TRUE" : L"FALSE")
 			);
@@ -5616,16 +5675,14 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		wchar_t *code_str;
 		int i;
 
-		aswprintf(&code_str,
-				  L"Unicode UTF-32:\n"
-				  L" U+%06X\n",
-				  b->u32);
-		awcscat(&codes_ptr, code_str);
+		awcscat(&codes_ptr, L"Unicode UTF-32:\n");
+		code_str = UnicodeCodePointStr(b->u32);
+		awcscats(&codes_ptr, L" ", code_str, L"\n", NULL);
 		free(code_str);
 		for (i=0; i<b->CombinationCharCount32; i++) {
-			wchar_t buf[32];
-			swprintf(buf, _countof(buf), L" U+%06X\n", b->pCombinationChars32[i]);
-			awcscat(&codes_ptr, buf);
+			code_str = UnicodeCodePointStr(b->pCombinationChars32[i]);
+			awcscats(&codes_ptr, L" ", code_str, L"\n", NULL);
+			free(code_str);
 		}
 		unicode_utf32_str = codes_ptr;
 	}

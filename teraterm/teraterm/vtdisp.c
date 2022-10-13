@@ -32,6 +32,7 @@
 #include "tttypes.h"
 #include <string.h>
 #include <olectl.h>
+#include <assert.h>
 
 #include "ttwinman.h"
 #include "ttime.h"
@@ -2592,6 +2593,13 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
  *		Windows 95 にも ExtTextOutW() は存在するが
  *		動作が異なるようだ
  *		TODO 文字間に対応していない?
+ *
+ *	@param	StrW			出力文字 (wchar_t)
+ *	@param	WidthInfo[]		出力文字のcell数
+ *							1		半角文字
+ *							0		結合文字, Nonspacing Mark
+ *							2+		全角文字, 半角 + Spacing Mark
+ *	@param	Count			文字数
  */
 void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count, int font_width, int font_height,
 			  int Y, int *X)
@@ -2603,12 +2611,13 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 	int height;
 
 	for (i = 0; i < Count; i++) {
-		if (WidthInfo[i] == 'H') {
+		if (WidthInfo[i] == 1) {
 			HalfCharCount++;
 			Dx[i] = font_width;
 		}
-		else if (WidthInfo[i] == '0') {
+		else if (WidthInfo[i] == 0) {
 			if (i == 0) {
+				assert(FALSE);  // 表示の最初に結合文字?
 				Dx[i] = 0;
 			}
 			else {
@@ -2617,8 +2626,8 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 			}
 		}
 		else {
-			HalfCharCount += 2;
-			Dx[i] = font_width * 2;
+			HalfCharCount += WidthInfo[i];
+			Dx[i] = font_width * WidthInfo[i];
 		}
 	}
 

@@ -48,11 +48,9 @@ extern "C" {
 #define AttrBlink         0x08
 #define AttrReverse       0x10
 #define AttrLineContinued 0x20 /* valid only at the beggining or end of a line */
-/* begin - ishizaki */
 #define AttrURL           0x40
-/* end - ishizaki */
-#define AttrKanji         0x80		// 1=‘SŠp(2cell)/0=”¼Šp(1cell)
-#define AttrPadding       0x100		// 1=padding(2cell‚ÌŸ‚Ì1cell or s––)
+#define AttrKanji         0x80		// 1=‘SŠp(2cell)/0=”¼Šp(1cell)  (buffer.c,h “à•”‚Ì‚İ)
+#define AttrPadding       0x100		// 1=padding(2cell‚ÌŸ‚Ì1cell or s––)  (vtterm - buffer ŠÔ‚Ì‚İ)
 
   /* Color attribute bit masks */
 #define Attr2Fore         0x01
