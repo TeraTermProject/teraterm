@@ -229,6 +229,21 @@ int UnicodeIsVariationSelector(unsigned long u32)
 }
 #endif
 
+/**
+ *	ヴィラーマ?
+ *
+ *	@retval	0	ヴィラーマではない
+ *	@retval	1	ヴィラーマである
+ */
+int UnicodeIsVirama(unsigned long u32)
+{
+	const static UnicodeTable_t ViramaList[] = {
+#include "unicode_virama.tbl"
+	};
+	const int index = SearchTableSimple(ViramaList, _countof(ViramaList), u32);
+	return index != -1 ? 1 : 0;
+}
+
 
 #if 0
 int main(int, char *[])

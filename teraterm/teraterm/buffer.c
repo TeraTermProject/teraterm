@@ -2736,13 +2736,11 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, i
 	if (combine_type != 0 || (p->u32_last == 0x200d)) {
 		return p;
 	}
-#if 1
-	// Malayalam
-	//  Œ¾Œê“Æ©‚Ìˆ—?
-	if (p->u32_last == 0x0d4d) {
+
+	// ƒ”ƒBƒ‰[ƒ}ˆ—
+	if (UnicodeIsVirama(p->u32_last) != 0) {
 		return p;
 	}
-#endif
 	return NULL;
 }
 

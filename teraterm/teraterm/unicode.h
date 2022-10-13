@@ -39,6 +39,7 @@ int UnicodeIsEmoji(unsigned long u32);
 unsigned short UnicodeCombining(unsigned short first_code, unsigned short code);
 int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16);
 int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b);
+int UnicodeIsVirama(unsigned long u32);
 
 #ifdef __cplusplus
 }
