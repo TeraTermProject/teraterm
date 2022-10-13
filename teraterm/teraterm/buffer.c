@@ -2817,10 +2817,10 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		move_x = 0;  // カーソル移動量=0
 
 		if (p == NULL) {
-			// 前がないのに結合文字が出てきたとき
-			// とりあえずスペースにくっつける
+			// 前のもじ(基底文字)がないのに結合文字が出てきたとき
+			// NBSP(non-breaking space) U+00A0 に結合させる
 			p = &CodeLineW[CursorX];
-			BuffSetChar(p, ' ', 'H');
+			BuffSetChar(p, 0xa0, 'H');
 
 			move_x = 1;  // カーソル移動量=1
 		}
