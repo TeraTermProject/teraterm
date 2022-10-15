@@ -1,4 +1,4 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 use utf8;
 
 open(FILE, "EastAsianWidth.txt") || die "Cannot open width file.";
