@@ -7,7 +7,7 @@
 
 - あらかじめ EastAsianWidth.txt をダウンロードしておく
 - 次のように実行
-  - `perl get_f_w_a.pl > unicode_asian_width.tbl`
+  - `perl get_asianwidth_table.pl > unicode_asian_width.tbl`
 
 ## East Asian Width について
 
