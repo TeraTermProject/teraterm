@@ -5478,8 +5478,8 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 static wchar_t *UnicodeCodePointStr(char32_t u32)
 {
 	const wchar_t *format =
-		u32 < 0x1000 ? L"U+%04x" :
-		u32 < 0x10000 ? L"U+%05x" :  L"U+%06x";
+		u32 < 0x10000 ? L"U+%04x" :
+		u32 < 0x100000 ? L"U+%05x" :  L"U+%06x";
 	wchar_t *str;
 	aswprintf(&str, format, u32);
 	return str;
