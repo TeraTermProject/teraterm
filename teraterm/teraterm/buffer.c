@@ -2676,10 +2676,11 @@ static wchar_t *GetWCS(const buff_char_t *b)
 /**
  *	(x,y)にu32を入れるとき、結合するか?
  *  @param[in]		wrap		TRUE wrap中
- *	@param[in,out]	combine		0	結合しない
+ *  @param[in]		u32			Unicode
+ *	@param[in,out]	combine		u32の文字種を返す(NULL 結果を返さない)
+ *								0	結合しない
  *								1	結合文字,Nonspacing Mark, カーソルは移動しない
  *								2	結合文字,Spacing Mark, カーソルが +1 移動する
- *								NULL 結果を返さない
  *	@return	結合する文字へのポインタ
  *								1(半角) or 2(全角) or N セル前
  *								現在のセル (x が行末で wrap == TRUE 時)
@@ -2826,13 +2827,11 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		Attr.Attr |= AttrLineContinued;
 	}
 
-	// 結合文字?
+	// 結合文字 or 1つ前の文字の影響で結合する?
 	combining_type = 0;
 	p = IsCombiningChar(CursorX, CursorY, Wrap, u32, &combining_type);
 	if (p != NULL || combining_type != 0) {
 		// 結合する
-		const BOOL spacing_mark = combining_type == 2 ? TRUE : FALSE;
-
 		move_x = 0;  // カーソル移動量=0
 
 		if (p == NULL) {
@@ -2844,15 +2843,14 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			move_x = 1;  // カーソル移動量=1
 		}
 
-		// 前の文字にくっつける
-		BuffAddChar(p, u32);
-
-		if (spacing_mark) {
+		// 入力文字は、Nonspacing mark 以外?
+		//		カーソルを+1, 文字幅を+1する
+		if (p->u32_last != 0x200d && combining_type != 1) {
 			// カーソル移動量は1
 			move_x = 1;
 
 			p->cell++;
-			StrChangeCount++;
+			StrChangeCount++;	// 再描画範囲を1cell増やす
 
 			// カーソル位置の文字は paddingにする
 			BuffSetChar(&CodeLineW[CursorX], 0, 'H');
@@ -2862,6 +2860,9 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			CodeLineW[CursorX].fg = Attr.Fore;
 			CodeLineW[CursorX].bg = Attr.Back;
 		}
+
+		// 前の文字にくっつける
+		BuffAddChar(p, u32);
 
 		// 文字描画
 		if (StrChangeCount == 0) {
