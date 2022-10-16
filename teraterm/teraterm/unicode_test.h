@@ -7,10 +7,6 @@
  */
 #pragma once
 
-// TODO 削除
-// 		多分0にできない
-#define	UNICODE_INTERNAL_BUFF	1	// 1 = 内部バッファunicode化
-
 // デバグ用機能enable
 //		CTRL x2でマウスポインタ下の文字表法を表示
 #define	UNICODE_DEBUG			1

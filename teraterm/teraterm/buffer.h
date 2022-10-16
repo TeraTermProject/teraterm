@@ -64,9 +64,7 @@ extern "C" {
 typedef struct {
 	BYTE Attr;
 	BYTE Attr2;
-#if 1 //UNICODE_INTERNAL_BUFF
 	WORD AttrEx;	// アトリビュートを増やすテスト
-#endif
 	BYTE Fore;
 	BYTE Back;
 } TCharAttr;
@@ -101,7 +99,6 @@ wchar_t *BuffCBCopyUnicode(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(PrintFile *handle, BYTE TERM);
 void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
-void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert);
 int BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);
 void BuffUpdateRect(int XStart, int YStart, int XEnd, int YEnd);
 void UpdateStr(void);

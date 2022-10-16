@@ -799,20 +799,14 @@ static void PutChar(BYTE b)
 	}
 
 	if (Wrap) {
-#if UNICODE_INTERNAL_BUFF
 		TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
 		t.Attr |= AttrLineContinued;
 		t.AttrEx = t.Attr;
 		BuffSetCursorCharAttr(CursorX, CursorY, t);
-#endif
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
-#if !UNICODE_INTERNAL_BUFF
-		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
-#else
 		CharAttrTmp.Attr |= AttrLineContinued;
 		t.AttrEx = t.Attr;
-#endif
 	}
 
 	if (NeedsOutputBufs()) {
@@ -862,7 +856,6 @@ static void PutChar(BYTE b)
 	}
 #endif
 
-#if UNICODE_INTERNAL_BUFF
 	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 	if (ts.Language == IdJapanese) {
 		unsigned long u32;
@@ -887,9 +880,6 @@ static void PutChar(BYTE b)
 	} else {
 		BuffPutUnicode(b, CharAttrTmp, InsertMode);
 	}
-#else
-	BuffPutChar(b, CharAttrTmp, InsertMode);
-#endif
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
 		UpdateStr();
@@ -934,9 +924,7 @@ static void PutDecSp(BYTE b)
 	}
 
 	CharAttrTmp.Attr |= AttrSpecial;
-#if UNICODE_INTERNAL_BUFF
 	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-#endif
 	BuffPutChar(b, CharAttrTmp, InsertMode);
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
@@ -982,23 +970,16 @@ static void PutKanji(BYTE b)
 	if (Wrap) {
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
-#if !UNICODE_INTERNAL_BUFF
-		if (ts.EnableContinuedLineCopy)
-			CharAttrTmp.Attr |= AttrLineContinued;
-#else
 		if (ts.EnableContinuedLineCopy) {
 			CharAttrTmp.Attr |= AttrLineContinued;
 			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 		}
-#endif
 	}
 	else if (CursorX > LineEnd - 1) {
 		if (AutoWrapMode) {
 			if (ts.EnableContinuedLineCopy) {
 				CharAttrTmp.Attr |= AttrLineContinued;
-#if UNICODE_INTERNAL_BUFF
 				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-#endif
 				if (CursorX == LineEnd)
 					BuffPutChar(0x20, CharAttr, FALSE);
 			}
@@ -1022,7 +1003,6 @@ static void PutKanji(BYTE b)
 		Special = FALSE;
 	}
 
-#if UNICODE_INTERNAL_BUFF
 	{
 		// codepage一覧
 		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
@@ -1061,9 +1041,6 @@ static void PutKanji(BYTE b)
 		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 	}
-#else
-	BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
-#endif
 
 	if (CursorX < LineEnd - 1) {
 		MoveRight();
@@ -2354,9 +2331,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 		  case   0:	/* Clear all */
 			attr->Attr = DefCharAttr.Attr;
 			attr->Attr2 = DefCharAttr.Attr2 | (attr->Attr2&Attr2Protect);
-#if UNICODE_INTERNAL_BUFF
 			attr->AttrEx = attr->Attr;
-#endif
 			attr->Fore = DefCharAttr.Fore;
 			attr->Back = DefCharAttr.Back;
 			mask->Attr = AttrSgrMask;
@@ -3831,9 +3806,7 @@ void CSDol(BYTE b)
 			attr.Attr &= AttrSgrMask;
 			mask.Attr &= AttrSgrMask;
 			attr.Attr2 &= Attr2ColorMask;
-#if UNICODE_INTERNAL_BUFF
 			attr.AttrEx = attr.Attr;
-#endif
 			mask.Attr2 &= Attr2ColorMask;
 			if (RectangleMode) {
 				BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
@@ -5826,14 +5799,12 @@ static BOOL ParseFirstJP(BYTE b)
 		if ((Gn[Glr[0]] == IdKatakana) || EUCkanaIn) {
 			b = b | 0x80;
 			EUCkanaIn = FALSE;
-#if UNICODE_INTERNAL_BUFF
 			{
 				// bはsjisの半角カタカナ
 				unsigned long u32 = CP932ToUTF32(b);
 				PutU32(u32);
 			}
 			return TRUE;
-#endif
 		}
 		PutChar(b);
 	}
@@ -5891,13 +5862,9 @@ static BOOL ParseFirstJP(BYTE b)
 		    (ts.KanjiCode==IdJIS) &&
 		    (ts.JIS7Katakana==0) &&
 		    ((ts.TermFlag & TF_FIXEDJIS)!=0)) {
-#if UNICODE_INTERNAL_BUFF
 			// bはsjisの半角カタカナ
 			unsigned long u32 = CP932ToUTF32(b);
 			PutU32(u32);
-#else
-			PutChar(b);	// katakana
-#endif
 		} else {
 			if (Gn[Glr[1]] == IdASCII) {
 				b = b & 0x7f;
@@ -6041,13 +6008,6 @@ static BOOL ParseFirstCn(BYTE b)
 
 static void ParseASCII(BYTE b)
 {
-#if !UNICODE_INTERNAL_BUFF
-	if (ts.Language == IdJapanese) {
-		ParseFirstJP(b);
-		return;
-	}
-#endif
-
 	if (SSflag) {
 		PutChar(b);
 		SSflag = FALSE;
