@@ -2866,13 +2866,16 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				StrChangeCount++;
 			}
 
-			// カーソル位置の文字は paddingにする
-			BuffSetChar(&CodeLineW[CursorX], 0, 'H');
-			CodeLineW[CursorX].Padding = TRUE;
-			CodeLineW[CursorX].attr = Attr.Attr;
-			CodeLineW[CursorX].attr2 = Attr.Attr2;
-			CodeLineW[CursorX].fg = Attr.Fore;
-			CodeLineW[CursorX].bg = Attr.Back;
+			// カーソル位置の文字は Paddingにする
+			//	ただし行末のときはPaddingを入れない
+			if (CursorX < NumOfColumns - 1) {
+				BuffSetChar(&CodeLineW[CursorX], 0, 'H');
+				CodeLineW[CursorX].Padding = TRUE;
+				CodeLineW[CursorX].attr = Attr.Attr;
+				CodeLineW[CursorX].attr2 = Attr.Attr2;
+				CodeLineW[CursorX].fg = Attr.Fore;
+				CodeLineW[CursorX].bg = Attr.Back;
+			}
 		}
 
 		// 前の文字にくっつける
