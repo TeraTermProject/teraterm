@@ -2850,7 +2850,21 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			move_x = 1;
 
 			p->cell++;
-			StrChangeCount++;	// 再描画範囲を1cell増やす
+			if(StrChangeCount == 0) {
+				// 描画範囲がクリアされている、再度設定する
+				StrChangeCount = p->cell;
+				if (CursorX == 0) {
+					// カーソルが左端の時
+					StrChangeStart = 0;
+				}
+				else {
+					StrChangeStart = CursorX - StrChangeCount + 1;
+				}
+			}
+			else {
+				// 描画範囲を1cell増やす
+				StrChangeCount++;
+			}
 
 			// カーソル位置の文字は paddingにする
 			BuffSetChar(&CodeLineW[CursorX], 0, 'H');
@@ -2882,28 +2896,13 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				}
 			}
 			else {
-				if (IsBuffPadding(b)) {
-					// カーソルが2セルの右側
-					StrChangeStart = CursorX - 1;
-					StrChangeCount = 2;
+				StrChangeCount = p->cell;
+				if (CursorX == 0) {
+					// カーソルが左端の時
+					StrChangeStart = 0;
 				}
 				else {
-					// カーソルが1セル又は、2セルの左側
-					if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
-						// 1つ前の文字が2セル
-						StrChangeCount = 2;
-					}
-					else {
-						// 1つ前の文字が1セル
-						StrChangeCount = 1;
-					}
-					if (CursorX == 0) {
-						// カーソルが左端の時
-						StrChangeStart = 0;
-					}
-					else {
-						StrChangeStart = CursorX - StrChangeCount;
-					}
+					StrChangeStart = CursorX - StrChangeCount + 1;
 				}
 			}
 		}
