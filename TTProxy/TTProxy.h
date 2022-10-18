@@ -201,6 +201,7 @@ private:
 	static void copy_UILanguageFile() {
 		strncpy_s(UILanguageFile, sizeof(UILanguageFile),
 		          getInstance().ts->UILanguageFile, _TRUNCATE);
+		UILanguageFileW = getInstance().ts->UILanguageFileW;
 	}
 
 	static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
