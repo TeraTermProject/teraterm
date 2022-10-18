@@ -57,7 +57,7 @@ size_t GetI18nStrWW(const char *section, const char *key, const wchar_t *def, co
 	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
 	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
 	hGetPrivateProfileStringW(sectionW, keyW, def, iniFile, str);
-	assert(str != NULL);		// ƒƒ‚ƒŠ‚ª‚È‚¢ NULL ‚ª•Ô‚Á‚Ä‚­‚é
+	assert(*str != NULL);		// ƒƒ‚ƒŠ‚ª‚È‚¢ NULL ‚ª•Ô‚Á‚Ä‚­‚é
 	size = RestoreNewLineW(*str);
 	return size;
 }

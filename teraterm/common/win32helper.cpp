@@ -88,7 +88,8 @@ error_return:
  *
  *	@param section
  *	@param key
- *	@param def
+ *	@param def		デフォルト値
+ *					NULLのときは L"" を返す
  *	@param ini		iniファイルのパス
  *					NULLのときはファイル指定なし
  *	@param str		文字列を格納するバッファ
@@ -96,6 +97,8 @@ error_return:
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
  *
  *		次の場合 str = L"" が返る (free()すること)
+ *			ini=NULLの場合
+ *				戻り値 NO_ERROR
  *			keyに空が設定されている 'key='と記述 ("="の後に何も書いていない)
  *				戻り値 NO_ERROR
  *			keyが存在せずdef=NULL 場合
@@ -119,7 +122,7 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 		//			Windows10,11 ではファイルがないときと同じ動作
 		//			Windows95 は仕様外の動作
 		//				戻り値=バッファサイズ+2が返ってくる
-		*str = _wcsdup(def);
+		*str = _wcsdup(def != NULL ? def : L"");  // 引数がNULLのときの動作は未定義
 		if (*str == NULL) {
 			return ERROR_NOT_ENOUGH_MEMORY;
 		}
