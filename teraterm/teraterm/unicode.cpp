@@ -100,6 +100,16 @@ typedef struct {
 	unsigned char category;
 } UnicodeTableCombine_t;
 
+typedef struct {
+	unsigned long code_from;
+	unsigned long code_to;
+	char *block_name;
+} UnicodeTableBlock_t;
+
+const UnicodeTableBlock_t UnicodeBlockList[] = {
+#include "unicode_block.tbl"
+};
+
 /**
  * u32がテーブルのデータに含まれているか調べる
  *
@@ -141,6 +151,39 @@ static int SearchTableSimple(
  */
 static int SearchTableCombine(
 	const UnicodeTableCombine_t *table, size_t table_size,
+	unsigned long u32)
+{
+	if (u32 < table[0].code_from) {
+		return -1;
+	}
+	if (u32 > table[table_size-1].code_to) {
+		return -1;
+	}
+	size_t low = 0;
+	size_t high = table_size - 1;
+	while (low <= high) {
+		size_t mid = (low + high) / 2;
+		if (table[mid].code_from <= u32 && u32 <= table[mid].code_to) {
+			return (int)mid;
+		} else if (table[mid].code_to < u32) {
+			low = mid + 1;
+		} else {
+			high = mid - 1;
+		}
+	}
+	// テーブルの範囲外
+	return -1;
+}
+
+/**
+ *	SearchTableSimple() と同じ
+ *	テーブルの型が異なる
+ *
+ *	@retval		テーブルのindex
+ *	@retval		-1 テーブルに存在しない
+ */
+static int SearchTableBlock(
+	const UnicodeTableBlock_t *table, size_t table_size,
 	unsigned long u32)
 {
 	if (u32 < table[0].code_from) {
@@ -244,6 +287,24 @@ int UnicodeIsVirama(unsigned long u32)
 	return index != -1 ? 1 : 0;
 }
 
+/**
+ *	Unicode block の index を得る
+ *
+ *	@retval	-1	block が見つからない
+ *	@retval		block の index
+ */
+int UnicodeBlockIndex(unsigned long u32)
+{
+	return SearchTableBlock(UnicodeBlockList, _countof(UnicodeBlockList), u32);
+}
+
+char *UnicodeBlockName(int index)
+{
+	if (index == -1) {
+		return "";
+	}
+	return UnicodeBlockList[index].block_name;
+}
 
 #if 0
 int main(int, char *[])

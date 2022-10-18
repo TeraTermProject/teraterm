@@ -2740,7 +2740,16 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, i
 
 	// ヴィラーマ処理
 	if (UnicodeIsVirama(p->u32_last) != 0) {
-		return p;
+		// 1つ前のヴィラーマと同じ block の文字である
+		int block_index_last = UnicodeBlockIndex(p->u32_last);
+		int block_index = UnicodeBlockIndex(u32);
+#if 0
+		OutputDebugPrintf("U+%06x, %d, %s\n", p->u32_last, block_index_last, UnicodeBlockName(block_index_last));
+		OutputDebugPrintf("U+%06x, %d, %s\n", u32, block_index, UnicodeBlockName(block_index));
+#endif
+		if (block_index_last == block_index) {
+			return p;
+		}
 	}
 	return NULL;
 }

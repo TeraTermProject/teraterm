@@ -44,6 +44,11 @@
 - 絵文字判定のためのテーブル
 - [get_emoji_table.md](get_emoji_table.md)
 
+## [unicode_block.tbl](../unicode_block.tbl)
+
+- Unicode block のテーブル
+- [get_block_table.md](get_block_table.md)
+
 ## iso8859-X.md
 
 - [iso8859.md](iso8859.md)
