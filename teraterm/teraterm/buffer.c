@@ -2894,7 +2894,6 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 		if (StrChangeCount == 0) {
 			// 描画予定がない(StrChangeCount==0)のに、
 			// 結合文字を受信した場合、描画する
-			buff_char_t *b = &CodeLineW[CursorX];
 			if (Wrap) {
 				if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
 					// 行末に2セルの文字が描画済み、2セルの右側にカーソルがある状態

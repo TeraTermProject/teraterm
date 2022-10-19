@@ -41,7 +41,7 @@ int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16);
 int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b);
 int UnicodeIsVirama(unsigned long u32);
 int UnicodeBlockIndex(unsigned long u32);
-char *UnicodeBlockName(int);
+const char *UnicodeBlockName(int);
 
 #ifdef __cplusplus
 }

@@ -103,10 +103,10 @@ typedef struct {
 typedef struct {
 	unsigned long code_from;
 	unsigned long code_to;
-	char *block_name;
+	const char *block_name;
 } UnicodeTableBlock_t;
 
-const UnicodeTableBlock_t UnicodeBlockList[] = {
+static const UnicodeTableBlock_t UnicodeBlockList[] = {
 #include "unicode_block.tbl"
 };
 
@@ -298,7 +298,7 @@ int UnicodeBlockIndex(unsigned long u32)
 	return SearchTableBlock(UnicodeBlockList, _countof(UnicodeBlockList), u32);
 }
 
-char *UnicodeBlockName(int index)
+const char *UnicodeBlockName(int index)
 {
 	if (index == -1) {
 		return "";
