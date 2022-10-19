@@ -32,7 +32,7 @@
 
 - East Asian Width 特性テーブル
   - [東アジアの文字幅(wikiepdia)](https://ja.wikipedia.org/wiki/%E6%9D%B1%E3%82%A2%E3%82%B8%E3%82%A2%E3%81%AE%E6%96%87%E5%AD%97%E5%B9%85)参照
-- [get_f_w_a.md](get_f_w_a.md)
+- [get_asianwidth_table.md](get_asianwidth_table.md)
 
 ## [unicode_combine.tbl](../unicode_combine.tbl)
 
@@ -43,6 +43,11 @@
 
 - 絵文字判定のためのテーブル
 - [get_emoji_table.md](get_emoji_table.md)
+
+## [unicode_virama.tbl](../unicode_virama.tbl)
+
+- ヴィラーマ判定のためのテーブル
+- [get_virama_table.md](get_virama_table.md)
 
 ## [unicode_block.tbl](../unicode_block.tbl)
 
