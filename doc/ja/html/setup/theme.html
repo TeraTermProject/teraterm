@@ -30,7 +30,7 @@
   <dl>
     <dt>BG(背景)テーマ</dt>
     <dd>
-      [BG]セクションが入ったファイル<br>
+      [BG Theme]セクションが入ったファイル<br>
       このセクションには背景画像の設定が入る
     </dd>
     <dt>カラーテーマ</dt>
@@ -52,7 +52,11 @@
 
   <h2 id="BGTheme">BG(背景)テーマ</h2>
 
-  セクション名は"[BG]"
+  <h3>section</h3>
+
+  "BG theme"<br>
+
+  "BG"セクションも読み込み可能(廃止予定)。両方ある場合は"BG theme"が優先。
 
   <dl>
     <dt>BGDestColor</dt>
@@ -113,20 +117,20 @@
     </dd>
   </dl>
 
-  <h3 id="ColorTheme">color theme</h3>
+  <h2 id="ColorTheme">color theme</h2>
 
-  <h4>section</h4>
+  <h3>section</h3>
 
   "Color Theme"
 
-  <h4>name</h4>
+  <h3>name</h3>
 
   <dl>
-    <dt>name</dt>
+    <dt>Theme</dt>
     <dd>テーマ名、値は文字列</dd>
   </dl>
 
-  <h4>attribute color</h4>
+  <h3>attribute color</h3>
 
   <dl>
     <dt>VTColor</dt>
@@ -181,7 +185,7 @@
     </dd>
   </dl>
 
-  <h4>ANSI color</h4>
+  <h3>ANSI color</h3>
 
   256色/16色 ANSI colorの最初の16色。<br>
   8色時は、Dark colorを使用しない

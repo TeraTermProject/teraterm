@@ -1387,7 +1387,7 @@ void BGOnSettingChange(void)
 static int GetIndex256From16(int index16)
 {
 	// ANSIColor16は、明るい/暗いグループが入れ替わっている
-	const static int index256[] = {
+	static const int index256[] = {
 		0,
 		9, 10, 11, 12, 13, 14, 15,
 		8,
@@ -3735,7 +3735,7 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
  */
 void ThemeSetBG(const BGTheme *bg_theme)
 {
-	strcpy_s(BGDest.file, _countof(BGDest.file), bg_theme->BGDest.file);
+	WideCharToACP_t(bg_theme->BGDest.file, BGDest.file, _countof(BGDest.file));
 	BGDest.type = bg_theme->BGDest.type;
 	BGDest.color = bg_theme->BGDest.color;
 	BGDest.pattern = bg_theme->BGDest.pattern;
@@ -3754,7 +3754,7 @@ void ThemeSetBG(const BGTheme *bg_theme)
 
 void ThemeGetBG(BGTheme *bg_theme)
 {
-	strcpy_s(bg_theme->BGDest.file, _countof(bg_theme->BGDest.file), BGDest.file);
+	ACPToWideChar_t(BGDest.file, bg_theme->BGDest.file, _countof(bg_theme->BGDest.file));
 	bg_theme->BGDest.type = BG_PICTURE;
 	bg_theme->BGDest.color = BGDest.color;
 	bg_theme->BGDest.pattern = BGDest.pattern;

@@ -52,7 +52,7 @@ typedef struct {
 	BOOL antiAlias;
 	COLORREF color;
 	int alpha;
-	char file[MAX_PATH];
+	wchar_t file[MAX_PATH];
 } TBGSrc;
 
 typedef struct _BGTheme {
@@ -96,7 +96,7 @@ typedef struct {
 
 typedef struct {
 	BG_PATTERN id;
-	const char *str;
+	const wchar_t *str;
 } BG_PATTERN_ST;
 
 // setting / themefile.cpp

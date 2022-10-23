@@ -54,7 +54,6 @@
 #include "win32helper.h"
 #include "tipwin2.h"
 #include "dlglib.h"
-#include "inifile_com.h"
 #include "helpid.h"
 #include "vtdisp.h"
 #include "tmfc.h"
@@ -140,7 +139,7 @@ static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 {
 	BOOL bg_enable = (bg_theme->BGDest.type == BG_PICTURE && (bg_theme->BGDest.file != NULL && bg_theme->BGDest.file[0] != 0)) ? TRUE : FALSE;
 	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, bg_enable, 0);
-	SetDlgItemTextA(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file);
+	SetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file);
 	SetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT, bg_theme->BGDest.color);
 	{
 		LRESULT count = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETCOUNT, 0, 0);
@@ -172,7 +171,7 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 	LRESULT index;
 	checked = SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_GETCHECK, 0, 0);
 	bg_theme->BGDest.type = checked & BST_CHECKED ? BG_PICTURE : BG_NONE;
-	GetDlgItemTextA(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file, sizeof(bg_theme->BGDest.file));
+	GetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file, _countof(bg_theme->BGDest.file));
 	bg_theme->BGDest.color = GetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT);
 	index = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETCURSEL, 0, 0);
 	bg_theme->BGDest.pattern = (BG_PATTERN)SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETITEMDATA, index, 0);
@@ -231,7 +230,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				if (st == NULL) {
 					break;
 				}
-				index = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_ADDSTRING, 0, (LPARAM)st->str);
+				index = SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_ADDSTRING, 0, (LPARAM)st->str);
 				SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_SETITEMDATA, index, st->id);
 			}
 
