@@ -229,6 +229,7 @@
 #define IDC_THEME_BUTTON                2610
 #define IDC_THEME_EDIT                  2611
 #define IDC_THEME_EDITOR_BUTTON         2612
+#define IDC_THEME_ENABLE                2613
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -328,7 +329,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2620
+#define _APS_NEXT_CONTROL_VALUE         2614
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

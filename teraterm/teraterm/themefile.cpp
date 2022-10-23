@@ -445,7 +445,6 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	}
 	else {
 		bg_theme->BGDest.file[0] = 0;
-		bg_theme->BGDest.type = BG_NONE;	// ”wŒi‰æ‘œ–³‚µ
 	}
 
 	// Src1 ‚Ì“Ç‚Ýo‚µ
@@ -453,8 +452,6 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	bg_theme->BGSrc1.pattern = BGGetPattern(section, L"BGSrc1Pattern", bg_theme->BGSrc1.pattern, file);
 	bg_theme->BGSrc1.antiAlias = BGGetOnOff(section, L"BGSrc1AntiAlias", bg_theme->BGSrc1.antiAlias, file);
 	bg_theme->BGSrc1.alpha = 255 - GetPrivateProfileIntW(section, L"BGPictureTone", 255 - bg_theme->BGSrc1.alpha, file);
-	if (bg_theme->BGDest.file[0] == 0)
-		bg_theme->BGSrc1.alpha = 255;
 	bg_theme->BGSrc1.alpha = GetPrivateProfileIntW(section, L"BGSrc1Alpha", bg_theme->BGSrc1.alpha, file);
 	bg_theme->BGSrc1.color = BGGetColor(section, L"BGSrc1Color", bg_theme->BGSrc1.color, file);
 	GetPrivateProfileStringW(section, L"BGSrc1File", bg_theme->BGSrc1.file, pathW, _countof(pathW), file);

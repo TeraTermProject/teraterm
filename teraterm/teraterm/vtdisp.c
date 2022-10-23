@@ -166,6 +166,11 @@ typedef struct tagWallpaperInfo
 
 static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
+typedef struct {
+	BOOL bg_enable;
+} vtdisp_work_t;
+static vtdisp_work_t vtdisp_work;
+
 static HBITMAP GetBitmapHandle(const char *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
@@ -897,6 +902,8 @@ static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LP
   HRGN hRgn;
   int  x;
   int  y;
+  (void)hMonitor;
+  (void)hdcMonitor;
 
   LoadWallpaperStruct *lws = (LoadWallpaperStruct*)dwData;
 
@@ -1174,6 +1181,8 @@ void BGInitialize(BOOL initialize_once)
  */
 static void DecideBGEnable(void)
 {
+	vtdisp_work_t *w = &vtdisp_work;
+
 	// ”wŒi‰æ‘œƒ`ƒFƒbƒN
 	if (BGDest.file[0] == 0) {
 		// ”wŒi‰æ‘œ‚ÍŽg—p‚µ‚È‚¢
@@ -1195,9 +1204,11 @@ static void DecideBGEnable(void)
 	if (BGDest.type == BG_NONE && BGSrc1.type == BG_NONE && BGSrc2.type == BG_NONE) {
 		// BG‚ÍŽg—p‚µ‚È‚¢
 		BGEnable = FALSE;
+		w->bg_enable = FALSE;
 	}
 	else {
 		BGEnable = TRUE;
+		w->bg_enable = TRUE;
 	}
 }
 
@@ -1425,6 +1436,7 @@ void InitDisp(void)
 {
   HDC TmpDC;
   BOOL bMultiDisplaySupport = FALSE;
+  vtdisp_work_t *w = &vtdisp_work;
 
   TmpDC = GetDC(NULL);
 
@@ -1484,6 +1496,8 @@ void InitDisp(void)
     if ( ts.TEKPos.x < VirtualScreen.left ) ts.TEKPos.x = VirtualScreen.left;
     if ( ts.TEKPos.y < VirtualScreen.top ) ts.TEKPos.y = VirtualScreen.top;
   }
+
+  w->bg_enable = FALSE;
 }
 
 void EndDisp(void)
@@ -3736,4 +3750,23 @@ void ThemeGetBG(BGTheme *bg_theme)
 void ThemeGetColorDefault(TColorTheme *color_theme)
 {
 	ThemeGetColorDefaultTS(&ts, color_theme);
+}
+
+void ThemeSetEnable(BOOL enable)
+{
+	vtdisp_work_t *w = &vtdisp_work;
+	if (enable) {
+		DecideBGEnable();
+		w->bg_enable = BGEnable;
+	}
+	else {
+		w->bg_enable = FALSE;
+		BGEnable = FALSE;
+	}
+}
+
+BOOL ThemeGetEnable(void)
+{
+	vtdisp_work_t *w = &vtdisp_work;
+	return w->bg_enable;
 }

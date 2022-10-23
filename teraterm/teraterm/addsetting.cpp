@@ -814,6 +814,8 @@ void CVisualPropPageDlg::OnInitDialog()
 		}
 	}
 
+	SetCheck(IDC_THEME_ENABLE, ThemeGetEnable() ? BST_CHECKED : BST_UNCHECKED);
+
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
 
@@ -1073,7 +1075,6 @@ BOOL CVisualPropPageDlg::CheckThemeColor()
 void CVisualPropPageDlg::OnOK()
 {
 	int sel;
-	int flag_changed = 0;
 	int i;
 
 	// (1)
@@ -1229,9 +1230,13 @@ void CVisualPropPageDlg::OnOK()
 		}
 	}
 
-	if (flag_changed) {
-		// re-launch
-		// RestartTeraTerm(GetSafeHwnd(), &ts);
+	if ((GetCheck(IDC_THEME_ENABLE) == BST_CHECKED) && ThemeGetEnable() == FALSE) {
+		// テーマをenableにする
+		ThemeSetEnable(TRUE);
+	}
+	else if ((GetCheck(IDC_THEME_ENABLE) == BST_UNCHECKED) && ThemeGetEnable() == TRUE) {
+		// テーマをdisableにする
+		ThemeSetEnable(FALSE);
 	}
 }
 
