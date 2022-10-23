@@ -775,21 +775,23 @@ createdc:
 
 static void BGPreloadSrc(BGSrc *src)
 {
-  DeleteBitmapDC(&(src->hdc));
+	DeleteBitmapDC(&(src->hdc));
 
-  switch(src->type)
-  {
-    case BG_COLOR :
-      break;
+	switch (src->type) {
+		case BG_COLOR:
+			break;
 
-    case BG_WALLPAPER :
-      BGPreloadWallpaper(src);
-      break;
+		case BG_WALLPAPER:
+			BGPreloadWallpaper(src);
+			break;
 
-    case BG_PICTURE :
-      BGPreloadPicture(src);
-      break;
-  }
+		case BG_PICTURE:
+			BGPreloadPicture(src);
+			break;
+
+		default:
+			break;
+	}
 }
 
 static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
@@ -946,6 +948,8 @@ static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LP
           y < rectDest.bottom;y += lws->src->height)
         BitBlt(lws->hdcDest,x,y,lws->src->width,lws->src->height,lws->src->hdc,0,0,SRCCOPY);
       break;
+    default:
+      break;
   }
 
   //ƒŠ[ƒWƒ‡ƒ“‚ð”jŠü
@@ -998,22 +1002,23 @@ static void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   SetWindowOrgEx(hdcDest,0,0,NULL);
 }
 
-static void BGLoadSrc(HDC hdcDest,BGSrc *src)
+static void BGLoadSrc(HDC hdcDest, BGSrc *src)
 {
-  switch(src->type)
-  {
-    case BG_COLOR :
-      FillBitmapDC(hdcDest,src->color);
-      break;
+	switch (src->type) {
+		case BG_COLOR:
+			FillBitmapDC(hdcDest, src->color);
+			break;
 
-    case BG_WALLPAPER :
-      BGLoadWallpaper(hdcDest,src);
-      break;
+		case BG_WALLPAPER:
+			BGLoadWallpaper(hdcDest, src);
+			break;
 
-    case BG_PICTURE :
-      BGLoadPicture(hdcDest,src);
-      break;
-  }
+		case BG_PICTURE:
+			BGLoadPicture(hdcDest, src);
+			break;
+		default:
+			break;
+	}
 }
 
 void BGSetupPrimary(BOOL forceSetup)
@@ -2876,18 +2881,17 @@ void DispScrollNLines(int Top, int Bottom, int Direction)
 //  Bottom: bottom line
 //  Direction: +: forward, -: backward
 {
-  if ((dScroll*Direction <0) ||
-      (dScroll*Direction >0) &&
-      ((SRegionTop!=Top) ||
-       (SRegionBottom!=Bottom)))
-    DispUpdateScroll();
-  SRegionTop = Top;
-  SRegionBottom = Bottom;
-  dScroll = dScroll + Direction;
-  if (Direction>0)
-    DispCountScroll(Direction);
-  else
-    DispCountScroll(-Direction);
+	if (((dScroll * Direction < 0) || (dScroll * Direction > 0)) &&
+		(((SRegionTop != Top) || (SRegionBottom != Bottom)))) {
+		DispUpdateScroll();
+	}
+	SRegionTop = Top;
+	SRegionBottom = Bottom;
+	dScroll = dScroll + Direction;
+	if (Direction > 0)
+		DispCountScroll(Direction);
+	else
+		DispCountScroll(-Direction);
 }
 
 void DispCountScroll(int n)
