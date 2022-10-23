@@ -29,8 +29,6 @@
 
 /* TERATERM.EXE, Clipboard routines */
 
-#include "unicode_test.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

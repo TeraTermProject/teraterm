@@ -32,7 +32,6 @@
 
 #include "teraterm.h"
 #include "tt-version.h"
-#include "../teraterm/unicode_test.h"
 #include "tttypes_charset.h"
 
 #define IdBreakTimer         1

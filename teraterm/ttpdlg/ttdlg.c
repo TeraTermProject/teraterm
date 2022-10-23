@@ -48,7 +48,6 @@
 #include "dlg_res.h"
 #include "svnversion.h"
 #include "ttdlg.h"
-#include "../teraterm/unicode_test.h"
 #include "tipwin.h"
 #include "comportinfo.h"
 #include "codeconv.h"

@@ -46,7 +46,6 @@
 #include "codeconv.h"
 #include "unicode.h"
 #include "buffer.h"
-#include "unicode_test.h"
 #include "asprintf.h"
 #include "ttcstd.h"
 
