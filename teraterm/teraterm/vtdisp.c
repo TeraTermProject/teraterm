@@ -904,10 +904,12 @@ static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LP
   HRGN hRgn;
   int  x;
   int  y;
+  LoadWallpaperStruct *lws;
+
   (void)hMonitor;
   (void)hdcMonitor;
 
-  LoadWallpaperStruct *lws = (LoadWallpaperStruct*)dwData;
+  lws = (LoadWallpaperStruct*)dwData;
 
   if(!IntersectRect(&rectDest,lprcMonitor,lws->rectClient))
     return TRUE;
