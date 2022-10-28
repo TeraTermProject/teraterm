@@ -54,7 +54,6 @@
 #include "vtdisp.h"
 
 #define CurWidth 2
-// #define DRAW_RED_BOX	1
 
 #include "defaultcolortable.c"
 
@@ -103,7 +102,6 @@ BOOL IMECompositionState;	/* •ÏŠ·ó‘Ô TRUE=•ÏŠ·’† */
 static HDC VTDC = NULL; /* Device context for VT window */
 static TCharAttr DCAttr;
 static TCharAttr CurCharAttr;
-static BOOL DCReverse;
 static HFONT DCPrevFont;
 
 TCharAttr DefCharAttr = {
@@ -149,10 +147,9 @@ static COLORREF BGVTReverseColor[2];
 static COLORREF BGURLColor[2];			// URL‘®«F
 
 static RECT BGPrevRect;
-static BOOL BGReverseText;	// TRUE‚Ì‚Æ‚«AŒ»İ•`‰æ’†‚Ì•¶šF‚ÌFG/BG‚ª”½“]‚µ‚Ä‚¢‚é
 
 static BOOL   BGInSizeMove;
-static HBRUSH BGBrushInSizeMove;
+//static HBRUSH BGBrushInSizeMove;
 
 static HDC hdcBGWork;
 static HDC hdcBGBuffer;
@@ -168,12 +165,20 @@ static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLEND
 
 typedef struct {
 	BOOL bg_enable;
+	BYTE alpha_vtback;
+	BYTE alpha_back;
+	BOOL debug_drawbox_text;
+	BOOL debug_drawbox_fillrect;
+	//
+	BYTE DCBackAlpha;
+	COLORREF DCBackColor;
 } vtdisp_work_t;
 static vtdisp_work_t vtdisp_work;
 
 static HBITMAP GetBitmapHandle(const char *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
+static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha);
 
 // LoadImage() ‚µ‚©g‚¦‚È‚¢ŠÂ‹«‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
 // LoadImage()‚Å‚Í .bmp ˆÈŠO‚Ì‰æ‘œƒtƒ@ƒCƒ‹‚ªˆµ‚¦‚È‚¢‚Ì‚Å—v’ˆÓB
@@ -289,7 +294,7 @@ static void FillBitmapDC(HDC hdc,COLORREF color)
   HBRUSH  hBrush;
 
   #ifdef _DEBUG
-    OutputDebugPrintf("FillBitmapDC : hdc = %p color = %08x\n",hdc,color);
+    OutputDebugPrintf("FillBitmapDC : hdc = %p color = %08lx\n",hdc,color);
   #endif
 
   if(!hdc)
@@ -1261,6 +1266,113 @@ void BGLoadThemeFile(TTTSet *pts)
 	DecideBGEnable();
 }
 
+/**
+ *	ƒfƒoƒO—pAbox‚ğ•`‰æ‚·‚é
+ */
+static void DrawBox(HDC hdc, int sx, int sy, int width, int height, COLORREF rgb)
+{
+	HPEN red_pen = CreatePen(PS_SOLID, 0, rgb);
+	HGDIOBJ old_pen = SelectObject(hdc, red_pen);
+	MoveToEx(hdc, sx, sy, NULL);
+	LineTo(hdc, sx + width, sy);
+	LineTo(hdc, sx + width, sy + height);
+	LineTo(hdc, sx, sy + height);
+	LineTo(hdc, sx, sy);
+	MoveToEx(hdc, sx, sy, NULL);
+	LineTo(hdc, sx + width, sy + height);
+	MoveToEx(hdc, sx + width, sy, NULL);
+	LineTo(hdc, sx, sy + height);
+	SelectObject(hdc, old_pen);
+	DeleteObject(red_pen);
+}
+
+/**
+ * @brief •¶š‚Ì”wŒi‚ğì¬‚·‚é
+ *		hdc ‚É (0,0)-(width,height) ‚Ì•¶š”wŒi‚ğì¬‚·‚é
+ *		alpha‚Ì’l‚É‚æ‚Á‚Ä”wŒi‰æ‘œ(hdcBG)‚ğƒuƒŒƒ“ƒh‚·‚é
+ *
+ * @param hdc		•`‰æ‚·‚éhdc
+ * @param X			•¶šˆÊ’u(”wŒi‰æ‘œ‚ÌˆÊ’u)
+ * @param Y
+ * @param width		•¶šƒTƒCƒY
+ * @param height
+ * @param alpha		”wŒi‰æ‘œ‚Ì•s“§–¾“x 0..255
+ *						0=”wŒi‰æ‘œ‚ª‚»‚Ì‚Ü‚Ü“]‘—‚³‚ê‚é
+ *						255=”wŒi‚Í“§–¾(‰e‹¿‚È‚µ)
+ */
+static void DrawTextBGImage(HDC hdc, int X, int Y, int width, int height, COLORREF color, unsigned char alpha)
+{
+	HBRUSH hbr = CreateSolidBrush(color);
+
+	// hdc‚É”wŒi‰æ‘œ‚ğ•`‰æ
+	if (BGInSizeMove) {
+		// BGInSizeMove!=0(‘‹‚ÌˆÚ“®AƒŠƒTƒCƒY’†)
+		RECT rect;
+		SetRect(&rect, 0, 0, width, height);
+		//FillRect(hdc, &rect, BGBrushInSizeMove);	//   ”wŒi‚ğ BGBrushInSizeMove ‚Å“h‚è‚Â‚Ô‚·
+		FillRect(hdc, &rect, hbr);
+	}
+	else {
+		RECT rect;
+		BLENDFUNCTION bf;
+		BOOL r;
+
+		// ƒ[ƒNDC‚É•¶š‚Ì”wŒi‚ğ•`‰æ
+		SetRect(&rect, 0, 0, width, height);
+		FillRect(hdcBGWork, &rect, hbr);
+
+		// •s“§–¾
+		//   ”wŒi‰æ‘œ‚ğ‚»‚Ì‚Ü‚Ü•¶š”wŒi‚É“]‘—
+		BitBlt(hdc, 0, 0, width, height, hdcBG, X, Y, SRCCOPY);
+
+		// hdc‚Éƒ[ƒNDC‚É—pˆÓ‚µ‚½•¶š‚Ì”wŒi‚ğalphablend
+		ZeroMemory(&bf, sizeof(bf));
+		bf.BlendOp = AC_SRC_OVER;
+		bf.SourceConstantAlpha = alpha;
+		r = BGAlphaBlend(hdc, 0, 0, width, height, hdcBGWork, 0, 0, width, height, bf);
+		assert(r == TRUE);
+		(void)r;
+	}
+
+	DeleteObject(hbr);
+}
+
+static void BGFillRectAttr(HDC hdc, const RECT *R, HBRUSH brush, const TCharAttr *attr)
+{
+	vtdisp_work_t* w = &vtdisp_work;
+	if (!BGEnable)
+		FillRect(hdc, R, brush);
+	else {
+		int y;
+		int sy;
+		int ey;
+		int left;
+		int width;
+		COLORREF fore;
+		COLORREF back;
+		BYTE alpha = 0;
+		GetDrawAttr(attr, FALSE, &fore, &back, &alpha);
+		sy = R->top / FontHeight;
+		ey = R->bottom / FontHeight;
+		left = R->left;
+		width = R->right - R->left;
+		for (y = sy; y < ey; y++) {
+			int top = y * FontHeight;
+
+			// ”wŒi‰æ‘œ‚ğ•`‰æ
+			DrawTextBGImage(hdcBGBuffer, left, top, width, FontHeight, back, alpha);
+
+			// •¶š”wŒi‚ğWindow‚É“\‚è•t‚¯
+			BitBlt(hdc, left, top, width, FontHeight, hdcBGBuffer, 0, 0, SRCCOPY);
+		}
+	}
+
+	if (w->debug_drawbox_fillrect) {
+		DrawBox(hdc, R->left, R->top, R->right - R->left, R->bottom - R->top, RGB(0xff, 0, 0));
+	}
+}
+
+#if 0
 static void BGFillRect(HDC hdc, RECT *R, HBRUSH brush)
 {
 	if (!BGEnable)
@@ -1268,6 +1380,7 @@ static void BGFillRect(HDC hdc, RECT *R, HBRUSH brush)
 	else
 		BitBlt(hdc, R->left, R->top, R->right - R->left, R->bottom - R->top, hdcBG, R->left, R->top, SRCCOPY);
 }
+#endif
 
 static void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
 {
@@ -1301,12 +1414,14 @@ static void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect
 
 void BGOnEnterSizeMove(void)
 {
-  int  r,g,b;
-
   if(!BGEnable || !ts.EtermLookfeel.BGFastSizeMove)
     return;
 
   BGInSizeMove = TRUE;
+
+#if 0
+  {
+  int  r,g,b;
 
   //”wŒiF¶¬
   r = GetRValue(BGDest.color);
@@ -1322,6 +1437,8 @@ void BGOnEnterSizeMove(void)
   b = (b * (255 - BGSrc2.alpha) + GetBValue(BGSrc2.color) * BGSrc2.alpha) >> 8;
 
   BGBrushInSizeMove = CreateSolidBrush(RGB(r,g,b));
+  }
+#endif
 }
 
 void BGOnExitSizeMove(void)
@@ -1334,12 +1451,14 @@ void BGOnExitSizeMove(void)
   BGSetupPrimary(TRUE);
   InvalidateRect(HVTWin,NULL,FALSE);
 
+#if 0
   //ƒuƒ‰ƒV‚ğíœ
   if(BGBrushInSizeMove)
   {
     DeleteObject(BGBrushInSizeMove);
     BGBrushInSizeMove = NULL;
   }
+#endif
 }
 
 void BGOnSettingChange(void)
@@ -1505,6 +1624,11 @@ void InitDisp(void)
   }
 
   w->bg_enable = FALSE;
+  w->alpha_back = 255;
+  w->alpha_vtback = 255;
+  w->debug_drawbox_text = FALSE;
+  w->debug_drawbox_fillrect = FALSE;
+  BGReverseTextAlpha = 255;
 }
 
 void EndDisp(void)
@@ -2123,25 +2247,11 @@ void DispClearWin(void)
 
 void DispChangeBackground(void)
 {
-  DispReleaseDC();
+	DispReleaseDC();
 
-#if 0
-  if (Background != NULL) DeleteObject(Background);
+	UpdateBGBrush();
 
-  if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
-    if ((CurCharAttr.Back<16) && (CurCharAttr.Back&7)!=0)
-      Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back ^ 8]);
-    else
-      Background = CreateSolidBrush(ANSIColor[CurCharAttr.Back]);
-  }
-  else {
-    Background = CreateSolidBrush(BGVTColor[1]);
-  }
-#else
-  UpdateBGBrush();
-#endif
-
-  InvalidateRect(HVTWin,NULL,TRUE);
+	InvalidateRect(HVTWin,NULL,TRUE);
 }
 
 void DispChangeWin(void)
@@ -2163,7 +2273,6 @@ void DispChangeWin(void)
 
 void DispInitDC(void)
 {
-
   if (VTDC==NULL)
   {
     VTDC = GetDC(HVTWin);
@@ -2177,9 +2286,6 @@ void DispInitDC(void)
 
   SetBkMode(VTDC,OPAQUE);
   DCAttr = DefCharAttr;
-  DCReverse = FALSE;
-
-  BGReverseText = FALSE;
 }
 
 void DispReleaseDC(void)
@@ -2247,34 +2353,39 @@ static int Get16ColorIndex(int color_index_256, int pcbold16, int pcbold16_brigh
 	}
 }
 
-void DispSetupDC(TCharAttr Attr, BOOL Reverse)
-// Setup device context
-//   Attr: character attributes
-//   Reverse: true if text is selected (reversed) by mouse
+/**
+ *	•¶š‚ÌƒAƒgƒŠƒrƒ…[ƒg‚Æ”½“](—Ìˆæ‘I‘ğ)ó‘Ô‚©‚ç•`‰æF‚È‚Ç‚ğ“¾‚é
+ *
+ *	@param[in]	Attr		•¶š‘®«î•ñ
+ *	@param[in]	reverse		”½“](—Ìˆæ‘I‘ğ)ó‘Ô
+ *	@param[out]	fore_color	•¶š‘OŒiF
+ *	@param[out]	back_color	•¶š”wŒiF
+ *	@param[ot]	alpha		¬‡Š„‡
+ */
+static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha)
 {
 	COLORREF TextColor, BackColor;
 	WORD AttrFlag;	// Attr + Flag
 	WORD Attr2Flag;	// Attr2 + Flag
 	BOOL reverse;
 	const BOOL use_normal_bg_color = ts.UseNormalBGColor;
+	vtdisp_work_t *w = &vtdisp_work;
+	BYTE alpha;
 
 	// ts.ColorFlag ‚Æ Attr ‚ğ‡¬‚µ‚½ Attr ‚ğì‚é
 	AttrFlag = 0;
-	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) ? AttrURL : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr.Attr & AttrUnder)) ? AttrUnder : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) ? AttrBold : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) ? AttrBlink : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr.Attr & AttrReverse)) ? AttrReverse : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr->Attr & AttrURL)) ? AttrURL : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr->Attr & AttrUnder)) ? AttrUnder : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr->Attr & AttrBold)) ? AttrBold : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr->Attr & AttrBlink)) ? AttrBlink : 0;
+	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr->Attr & AttrReverse)) ? AttrReverse : 0;
 	Attr2Flag = 0;
-	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) ? Attr2Fore : 0;
-	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) ? Attr2Back : 0;
-
-	if (VTDC == NULL)
-		DispInitDC();
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr->Attr2 & Attr2Fore)) ? Attr2Fore : 0;
+	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr->Attr2 & Attr2Back)) ? Attr2Back : 0;
 
 	// ”½“]
 	reverse = FALSE;
-	if (Reverse) {
+	if (_reverse) {
 		reverse = TRUE;
 	}
 	if ((AttrFlag & AttrReverse) != 0) {
@@ -2282,21 +2393,6 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	}
 	if ((ts.ColorFlag & CF_REVERSEVIDEO) != 0) {
 		reverse = reverse ? FALSE : TRUE;
-	}
-
-	if (TCharAttrCmp(DCAttr, Attr) == 0 && DCReverse == reverse) {
-		return;
-	}
-	DCAttr = Attr;
-	DCReverse = reverse;
-
-	// ƒtƒHƒ“ƒgİ’è
-	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
-		((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
-		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
-	}
-	else {
-		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
 
 	// F‚ğŒˆ’è‚·‚é
@@ -2379,7 +2475,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 
 	//	ANSIColor/Fore
 	if (Attr2Flag & Attr2Fore) {
-		const int index = Get16ColorIndex(Attr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
+		const int index = Get16ColorIndex(Attr->Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
 		if (!reverse) {
 			TextColor = ANSIColor[index];
 		}
@@ -2390,7 +2486,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 
 	//	ANSIColor/Back
 	if (Attr2Flag & Attr2Back) {
-		const int index = Get16ColorIndex(Attr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
+		const int index = Get16ColorIndex(Attr->Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
 		if (!reverse) {
 			BackColor = ANSIColor[index];
 		}
@@ -2404,9 +2500,9 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	//	•¶š‚ªŒ©‚¦‚È‚¢ó‘Ô‚É‚È‚Á‚½‚ç’Êí•¶šF‚©”½“]‘®«•¶šF‚ğg—p‚·‚é
 	if ((ts.ColorFlag & CF_USETEXTCOLOR) !=0) {
 		if ((Attr2Flag & Attr2Fore) && (Attr2Flag & Attr2Back)) {
-			const int is_target_color = (Attr.Fore == IdFore || Attr.Fore == IdBack || Attr.Fore == 15);
+			const int is_target_color = (Attr->Fore == IdFore || Attr->Fore == IdBack || Attr->Fore == 15);
 //			const int is_target_color = 1;
-			if (Attr.Fore == Attr.Back && is_target_color) {
+			if (Attr->Fore == Attr->Back && is_target_color) {
 				if (!reverse) {
 					TextColor = BGVTColor[0];
 					BackColor = BGVTColor[1];
@@ -2419,89 +2515,56 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		}
 	}
 
-	// •`‰æ(DrawStrW())‚ÉQÆ‚·‚é
-	if (reverse) {
-		BGReverseText = TRUE;
+	if (BackColor == BGVTColor[1]) {
+		// ’Êí(ƒAƒgƒŠƒrƒ…[ƒg‚È‚µ)‚Ìback
+		alpha = w->alpha_vtback;
+	}
+	else if (!reverse) {
+		// ˆê”Ê(”½“]‘®«(SGR 4)ˆÈŠO)‚Ìback
+		alpha = w->alpha_back;
 	}
 	else {
-		BGReverseText = FALSE;
+		// ”½“]‘®«(SGR 4)‚Ìback
+		alpha = BGReverseTextAlpha;
 	}
 
-	SetTextColor(VTDC, TextColor);
-	SetBkColor(VTDC, BackColor);
+	*fore_color = TextColor;
+	*back_color = BackColor;
+	*_alpha = alpha;
 }
 
 /**
- * @brief •¶š‚Ì”wŒi‚ğì¬‚·‚é
- *		hdc ‚É (0,0)-(width,height) ‚Ì•¶š”wŒi‚ğì¬‚·‚é
- *		alpha‚Ì’l‚É‚æ‚Á‚Ä”wŒi‰æ‘œ(hdcBG)‚ğƒuƒŒƒ“ƒh‚·‚é
- *
- * @param hdc		ì¬‚·‚éhdc
- * @param X			•¶šˆÊ’u(”wŒi‰æ‘œ‚ÌˆÊ’u)
- * @param Y
- * @param width		•¶šƒTƒCƒY
- * @param height
- * @param alpha		”wŒi‰æ‘œ‚Ì•s“§–¾“x 0..255
- *						0=”wŒi‰æ‘œ‚ª‚»‚Ì‚Ü‚Ü“]‘—‚³‚ê‚é
- *						255=”wŒi‚Í“§–¾(‰e‹¿‚È‚µ)
+ * Setup device context
+ *   Attr: character attributes
+ *   Reverse: true if text is selected (reversed) by mouse
  */
-static void DrawTextBGImage(HDC hdc, int X, int Y, int width, int height, unsigned char alpha)
+void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 {
-	if (BGInSizeMove) {
-		// BGInSizeMove!=0(‘‹‚ÌˆÚ“®AƒŠƒTƒCƒY’†)
-		//   ”wŒi‚ğ BGBrushInSizeMove ‚Å“h‚è‚Â‚Ô‚·
-		RECT rect;
-		SetRect(&rect, 0, 0, width, height);
-		FillRect(hdc, &rect, BGBrushInSizeMove);
-	}
-	else if (alpha == 255) {
-		// •s“§–¾
-		//   ”wŒi‰æ‘œ‚ğ‚»‚Ì‚Ü‚Ü•¶š”wŒi‚É“]‘—
-		BitBlt(hdc, 0, 0, width, height, hdcBG, X, Y, SRCCOPY);
+	vtdisp_work_t *w = &vtdisp_work;
+	COLORREF TextColor, BackColor;
+	BYTE alpha;
+
+	GetDrawAttr(&Attr, Reverse, &TextColor, &BackColor, &alpha);
+
+	if (VTDC == NULL)
+		DispInitDC();
+
+	// ƒtƒHƒ“ƒgİ’è
+	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
+		((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
+		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
 	}
 	else {
-		// “§–¾
-		//   ((alpha)*•¶š‚Ì”wŒiF + (255-alpha)*”wŒi‰æ‘œ)/255 ‚ğ•¶š”wŒi‚Æ‚·‚é
-		RECT rect;
-		BLENDFUNCTION bf;
-		HBRUSH hbr;
-
-		// ”wŒi‰æ‘œ‚ğ•¶š”wŒi‚É“]‘—
-		BitBlt(hdc, 0, 0, width, height, hdcBG, X, Y, SRCCOPY);
-
-		// ƒ[ƒN‚ğ”wŒiF‚Å“h‚è‚Â‚Ô‚µ
-		hbr = CreateSolidBrush(GetBkColor(hdc));
-		SetRect(&rect, 0, 0, width, height);
-		FillRect(hdcBGWork, &rect, hbr);
-		DeleteObject(hbr);
-
-		// ƒ[ƒN‚ğ“§–¾“xalpha‚Å“]‘—
-		ZeroMemory(&bf, sizeof(bf));
-		bf.BlendOp = AC_SRC_OVER;
-		bf.SourceConstantAlpha = alpha;
-		BGAlphaBlend(hdc, 0, 0, width, height, hdcBGWork, 0, 0, width, height, bf);
+		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
-}
 
-// draw red box for debug
-#if DRAW_RED_BOX
-static void DrawRedBox(HDC DC, int sx, int sy, int width, int height)
-{
-	HPEN red_pen = CreatePen(PS_SOLID, 0, RGB(0xff, 0, 0));
-	HGDIOBJ old_pen = SelectObject(DC, red_pen);
-	MoveToEx(DC, sx, sy, NULL);
-	LineTo(DC, sx + width, sy);
-	LineTo(DC, sx + width, sy + height);
-	LineTo(DC, sx, sy + height);
-	LineTo(DC, sx, sy);
-	MoveToEx(DC, sx, sy, NULL);
-	LineTo(DC, sx + width, sy + height);
-	MoveToEx(DC, sx + width, sy, NULL);
-	LineTo(DC, sx, sy + height);
-	SelectObject(DC, old_pen);
-	DeleteObject(red_pen);
+	// Fİ’è
+	SetTextColor(VTDC, TextColor);
+	SetBkColor(VTDC, BackColor);
+
+	w->DCBackColor = BackColor;
+	w->DCBackAlpha = alpha;
 }
-#endif
 
 /**
  *	1s•`‰æ ANSI
@@ -2512,15 +2575,30 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
 	int i;
 	int width;
 	int height;
+	BOOL direct_draw;
+	BYTE alpha = 0;
+	vtdisp_work_t *w = &vtdisp_work;
 
 	for (i = 0; i < Count; i++) {
 		Dx[i] = font_width;
 	}
 
+	direct_draw = FALSE;
+	if (BGDC == NULL) {
+		// ƒ[ƒN‚Ìw’è‚ª‚È‚¢‚Æ’¼Ú•`‰æ
+		direct_draw = TRUE;
+	}
+	else {
+		alpha = w->DCBackAlpha;
+		if (alpha == 255) {
+			direct_draw = TRUE;
+		}
+	}
+
 	// ƒeƒLƒXƒg•`‰æ—Ìˆæ
 	width = Count * font_width;
 	height = font_height;
-	if (BGDC == NULL) {
+	if (direct_draw) {
 		RECT RText;
 		SetRect(&RText, *X, Y, *X + width, Y + height);
 
@@ -2529,43 +2607,30 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
 	else {
 		HFONT hPrevFont;
 		RECT rect;
-		int eto_options;
 
-		SetRect(&rect, 0, 0, 0 + width, 0 + height);
+		// BGDC‚É”wŒi‰æ‘œ‚ğ•`‰æ
+		const COLORREF BackColor = GetBkColor(DC);
+		DrawTextBGImage(BGDC, *X, Y, width, height, BackColor, alpha);
 
-		// BGDC ‚Ì‘®«‚ğİ’è
+		// BGDC‚É•¶š‚ğ•`‰æ
 		hPrevFont = SelectObject(BGDC, GetCurrentObject(DC, OBJ_FONT));
 		SetTextColor(BGDC, GetTextColor(DC));
 		SetBkColor(BGDC, GetBkColor(DC));
+		SetRect(&rect, 0, 0, 0 + width, 0 + height);
+		ExtTextOutA(BGDC, ts.FontDX, ts.FontDY, ETO_CLIPPED, &rect, StrA, Count, &Dx[0]);
+		SelectObject(BGDC, hPrevFont);
 
-		// •¶š‚Ì”wŒi‚ğ•`‰æ
-		eto_options = ETO_CLIPPED;	// •¶š•”•ª(face•”•ª)‚Ì‚İ•`‰æ
-		if (BGReverseText == TRUE) {
-			if (BGReverseTextAlpha < 255) {
-				DrawTextBGImage(BGDC, *X, Y, width, height, BGReverseTextAlpha);
-			}
-			else {
-				// •¶š‚Å–„‚Ü‚é‚Ì‚Å”wŒi•s—v
-				eto_options |= ETO_OPAQUE;	// ”wŒi‚à•`‰æ
-			}
-		} else {
-			DrawTextBGImage(BGDC, *X, Y, width, height, 255);
-		}
-
-		// •¶š‚ğ•`‰æ
-		ExtTextOutA(BGDC, ts.FontDX, ts.FontDY, eto_options, &rect, StrA, Count, &Dx[0]);
-
-		// Window‚É“\‚è•t‚¯
+		// BGDC‚É•`‰æ‚µ‚½•¶š‚ğWindow‚É“\‚è•t‚¯
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 
 		SelectObject(BGDC, hPrevFont);
 	}
 
-#if DRAW_RED_BOX
-	DrawRedBox(DC, *X, Y, width, height);
-#endif
-
 	*X += width;
+
+	if (w->debug_drawbox_text) {
+		DrawBox(DC, *X, Y, width, height, RGB(0xff, 0, 0));
+	}
 }
 
 /**
@@ -2574,6 +2639,11 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
  *		“®ì‚ªˆÙ‚È‚é‚æ‚¤‚¾
  *		TODO •¶šŠÔ‚É‘Î‰‚µ‚Ä‚¢‚È‚¢?
  *
+ *
+ *	@param  DC				•`‰ææDC
+ *	@param  BGDC			•`‰ææƒ[ƒNDC
+ *							NULL‚Ìƒ[ƒN‚È‚µ(=”wŒi•`‰æ‚È‚µ)
+ *							ƒvƒŠƒ“ƒ^‚Ö‚Ìo—Í‚Ì‚Íí‚ÉNULL
  *	@param	StrW			o—Í•¶š (wchar_t)
  *	@param	WidthInfo[]		o—Í•¶š‚Ìcell”
  *							1		”¼Šp•¶š
@@ -2589,6 +2659,9 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 	int i;
 	int width;
 	int height;
+	BOOL direct_draw;
+	BYTE alpha = 0;
+	vtdisp_work_t *w = &vtdisp_work;
 
 	for (i = 0; i < Count; i++) {
 		if (WidthInfo[i] == 1) {
@@ -2611,10 +2684,21 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 		}
 	}
 
+	direct_draw = FALSE;
+	if (BGDC == NULL) {
+		// ƒ[ƒN‚Ìw’è‚ª‚È‚¢‚Æ’¼Ú•`‰æ
+		direct_draw = TRUE;
+	}
+	else {
+		alpha = w->DCBackAlpha;
+		if (alpha == 255) {
+			direct_draw = TRUE;
+		}
+	}
 	// ƒeƒLƒXƒg•`‰æ—Ìˆæ
 	width = HalfCharCount * font_width;
 	height = font_height;
-	if (BGDC == NULL) {
+	if (direct_draw) {
 		RECT RText;
 		SetRect(&RText, *X, Y, *X + width, Y + height);
 
@@ -2623,43 +2707,28 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 	else {
 		HFONT hPrevFont;
 		RECT rect;
-		int eto_options;
 
-		SetRect(&rect, 0, 0, 0 + width, 0 + height);
+		// BGDC‚É”wŒi‰æ‘œ‚ğ•`‰æ
+		const COLORREF BackColor = GetBkColor(DC);
+		DrawTextBGImage(BGDC, *X, Y, width, height, BackColor, alpha);
 
-		// BGDC ‚Ì‘®«‚ğİ’è
+		// BGDC‚É•¶š‚ğ•`‰æ
 		hPrevFont = SelectObject(BGDC, GetCurrentObject(DC, OBJ_FONT));
 		SetTextColor(BGDC, GetTextColor(DC));
 		SetBkColor(BGDC, GetBkColor(DC));
-
-		// •¶š‚Ì”wŒi‚ğ•`‰æ
-		eto_options = ETO_CLIPPED;	// •¶š•”•ª(face•”•ª)‚Ì‚İ•`‰æ
-		if (BGReverseText == TRUE) {
-			if (BGReverseTextAlpha < 255) {
-				DrawTextBGImage(BGDC, *X, Y, width, height, BGReverseTextAlpha);
-			}
-			else {
-				// •¶š‚Å–„‚Ü‚é‚Ì‚Å”wŒi•s—v
-				eto_options |= ETO_OPAQUE;	// ”wŒi‚à•`‰æ
-			}
-		} else {
-			DrawTextBGImage(BGDC, *X, Y, width, height, 255);
-		}
-
-		// •¶š‚ğ•`‰æ
-		ExtTextOutW(BGDC, ts.FontDX, ts.FontDY, eto_options, &rect, StrW, Count, &Dx[0]);
-
-		// Window‚É“\‚è•t‚¯
-		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
-
+		SetRect(&rect, 0, 0, 0 + width, 0 + height);
+		ExtTextOutW(BGDC, ts.FontDX, ts.FontDY, ETO_CLIPPED, &rect, StrW, Count, &Dx[0]);
 		SelectObject(BGDC, hPrevFont);
+
+		// BGDC‚É•`‰æ‚µ‚½•¶š‚ğWindow‚É“\‚è•t‚¯
+		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
-#if DRAW_RED_BOX
-	DrawRedBox(DC, *X, Y, width, height);
-#endif
-
 	*X += width;
+
+	if (w->debug_drawbox_text) {
+		DrawBox(DC, *X, Y, width, height, RGB(0,255,0));
+	}
 }
 
 /**
@@ -2684,60 +2753,58 @@ void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int*
 	DrawStrW(VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
 }
 
-void DispEraseCurToEnd(int YEnd)
+void DispEraseCurToEnd(int YEnd, const TCharAttr *attr)
 {
-  RECT R;
+	RECT R;
 
-  if (VTDC==NULL) DispInitDC();
-  R.left = 0;
-  R.right = ScreenWidth;
-  R.top = (CursorY+1-WinOrgY)*FontHeight;
-  R.bottom = (YEnd+1-WinOrgY)*FontHeight;
+	if (VTDC == NULL)
+		DispInitDC();
+	R.left = 0;
+	R.right = ScreenWidth;
+	R.top = (CursorY + 1 - WinOrgY) * FontHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * FontHeight;
 
-//  FillRect(VTDC,&R,Background);
-  BGFillRect(VTDC,&R,Background);
+	BGFillRectAttr(VTDC, &R, Background, attr);
 
-  R.left = (CursorX-WinOrgX)*FontWidth;
-  R.bottom = R.top;
-  R.top = R.bottom-FontHeight;
+	R.left = (CursorX - WinOrgX) * FontWidth;
+	R.bottom = R.top;
+	R.top = R.bottom - FontHeight;
 
-//  FillRect(VTDC,&R,Background);
-  BGFillRect(VTDC,&R,Background);
+	BGFillRectAttr(VTDC, &R, Background, attr);
 }
 
-void DispEraseHomeToCur(int YHome)
+void DispEraseHomeToCur(int YHome, const TCharAttr *attr)
 {
-  RECT R;
+	RECT R;
 
-  if (VTDC==NULL) DispInitDC();
-  R.left = 0;
-  R.right = ScreenWidth;
-  R.top = (YHome-WinOrgY)*FontHeight;
-  R.bottom = (CursorY-WinOrgY)*FontHeight;
+	if (VTDC == NULL)
+		DispInitDC();
+	R.left = 0;
+	R.right = ScreenWidth;
+	R.top = (YHome - WinOrgY) * FontHeight;
+	R.bottom = (CursorY - WinOrgY) * FontHeight;
 
-//  FillRect(VTDC,&R,Background);
-  BGFillRect(VTDC,&R,Background);
+	BGFillRectAttr(VTDC, &R, Background, attr);
 
-  R.top = R.bottom;
-  R.bottom = R.top + FontHeight;
-  R.right = (CursorX+1-WinOrgX)*FontWidth;
+	R.top = R.bottom;
+	R.bottom = R.top + FontHeight;
+	R.right = (CursorX + 1 - WinOrgX) * FontWidth;
 
-//  FillRect(VTDC,&R,Background);
-  BGFillRect(VTDC,&R,Background);
+	BGFillRectAttr(VTDC, &R, Background, attr);
 }
 
-void DispEraseCharsInLine(int XStart, int Count)
+void DispEraseCharsInLine(int XStart, int Count, const TCharAttr *attr)
 {
-  RECT R;
+	RECT R;
 
-  if (VTDC==NULL) DispInitDC();
-  R.top = (CursorY-WinOrgY)*FontHeight;
-  R.bottom = R.top+FontHeight;
-  R.left = (XStart-WinOrgX)*FontWidth;
-  R.right = R.left + Count * FontWidth;
+	if (VTDC == NULL)
+		DispInitDC();
+	R.top = (CursorY - WinOrgY) * FontHeight;
+	R.bottom = R.top + FontHeight;
+	R.left = (XStart - WinOrgX) * FontWidth;
+	R.right = R.left + Count * FontWidth;
 
-//  FillRect(VTDC,&R,Background);
-  BGFillRect(VTDC,&R,Background);
+	BGFillRectAttr(VTDC, &R, Background, attr);
 }
 
 BOOL DispDeleteLines(int Count, int YEnd)
@@ -3388,28 +3455,34 @@ void DispSetCurCharAttr(TCharAttr Attr) {
 
 static void UpdateBGBrush(void)
 {
+	COLORREF bg_rgb;
+	vtdisp_work_t *w = &vtdisp_work;
+
 	if (Background != NULL) DeleteObject(Background);
 
 	if ((ts.ColorFlag & CF_REVERSEVIDEO) == 0) {
 		if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
 			const WORD AttrFlag = ((ts.ColorFlag & CF_BLINKCOLOR) && (CurCharAttr.Attr & AttrBlink)) ? AttrBlink : 0;
 			const int index = Get16ColorIndex(CurCharAttr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
-			Background = CreateSolidBrush(ANSIColor[index]);
+			bg_rgb = ANSIColor[index];
 		}
 		else {
-			Background = CreateSolidBrush(BGVTColor[1]);
+			bg_rgb = BGVTColor[1];
 		}
 	}
 	else {
 		if ((CurCharAttr.Attr2 & Attr2Fore) != 0) {
 			const WORD AttrFlag = ((ts.ColorFlag & CF_BOLDCOLOR) && (CurCharAttr.Attr & AttrBold)) ? AttrBold : 0;
 			const int index = Get16ColorIndex(CurCharAttr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
-			Background = CreateSolidBrush(ANSIColor[index]);
+			bg_rgb = ANSIColor[index];
 		}
 		else {
-			Background = CreateSolidBrush(BGVTColor[0]);
+			bg_rgb = BGVTColor[0];
 		}
 	}
+
+	w->DCBackColor = bg_rgb;
+	Background = CreateSolidBrush(bg_rgb);
 }
 
 void DispShowWindow(int mode)
@@ -3651,6 +3724,8 @@ void ThemeGetBGDefault(BGTheme *bg_theme)
 	bg_theme->BGSrc2.file[0] = 0;
 
 	bg_theme->BGReverseTextAlpha = 255;
+	bg_theme->TextBackAlpha = 255;
+	bg_theme->BackAlpha = 255;
 }
 
 #if 0
@@ -3729,6 +3804,11 @@ void ThemeSetBG(const BGTheme *bg_theme)
 	BGSrc2.color = bg_theme->BGSrc2.color;
 
 	BGReverseTextAlpha = bg_theme->BGReverseTextAlpha;
+	{
+		vtdisp_work_t *w = &vtdisp_work;
+		w->alpha_vtback = bg_theme->TextBackAlpha;
+		w->alpha_back = bg_theme->BackAlpha;
+	}
 
 	DecideBGEnable();
 }
@@ -3748,6 +3828,11 @@ void ThemeGetBG(BGTheme *bg_theme)
 	bg_theme->BGSrc2.color = BGSrc2.color;
 
 	bg_theme->BGReverseTextAlpha = BGReverseTextAlpha;
+	{
+		vtdisp_work_t *w = &vtdisp_work;
+		bg_theme->TextBackAlpha = w->alpha_vtback;
+		bg_theme->BackAlpha = w->alpha_back;
+	}
 }
 
 /**

@@ -13,6 +13,10 @@
 #define IDC_FILE_SAVE_COLOR_CHECK       2405
 #define IDC_REVERSE_TEXT_ALPHA_SLIDER   2406
 #define IDC_REVERSE_TEXT_ALPHA_TITLE    2407
+#define IDC_TEXT_ALPHA_SLIDER           2408
+#define IDC_BACK_ALPHA_SLIDER           2409
+#define IDC_TEXT_ALPHA_TITLE            2410
+#define IDC_BACK_ALPHA_TITLE            2411
 #define IDC_BG_THEME_HELP               2900
 #define IDC_BGIMG_BASE_TITLE            3000
 #define IDC_BGIMG_EDIT                  3001
@@ -33,7 +37,7 @@
 #define IDC_COLOR_DEFAULT_BUTTON        4001
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

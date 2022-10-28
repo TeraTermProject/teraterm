@@ -682,6 +682,7 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_ENABLE_ATTR_COLOR_URL, "DLG_TAB_VISUAL_URL_COLOR" },			// URL Attribute
 		{ IDC_ENABLE_ATTR_FONT_URL, "DLG_TAB_VISUAL_URL_FONT" },
 		{ IDC_ENABLE_ANSI_COLOR, "DLG_TAB_VISUAL_ANSI" },
+		{ IDC_CHECK_FAST_SIZE_MOVE, "DLG_TAB_VISUAL_FAST_SIZE_MOVE" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 

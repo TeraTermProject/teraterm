@@ -373,6 +373,8 @@ void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *file)
 	WriteCOLORREF(section, L"BGSrc2Color", file, bg_theme->BGSrc2.color);
 
 	WritePrivateProfileIntW(section, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
+	WritePrivateProfileIntW(section, L"BGTextBackAlpha", bg_theme->TextBackAlpha, file);
+	WritePrivateProfileIntW(section, L"BGBackAlpha", bg_theme->BackAlpha, file);
 }
 
 static int BGGetStrIndex(const wchar_t *section, const wchar_t *name, int def, const wchar_t *file, const wchar_t * const *strList, int nList)
@@ -485,6 +487,8 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	//‚»‚Ì‘¼“Ç‚Ýo‚µ
 	bg_theme->BGReverseTextAlpha = GetPrivateProfileIntW(section, L"BGReverseTextTone", bg_theme->BGReverseTextAlpha, file);
 	bg_theme->BGReverseTextAlpha = GetPrivateProfileIntW(section, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
+	bg_theme->TextBackAlpha = GetPrivateProfileIntW(section, L"BGTextBackAlpha", bg_theme->TextBackAlpha, file);
+	bg_theme->BackAlpha = GetPrivateProfileIntW(section, L"BGBackAlpha", bg_theme->BackAlpha, file);
 }
 
 /**

@@ -59,7 +59,9 @@ typedef struct _BGTheme {
 	TBGSrc BGDest;
 	TBGSrc BGSrc1;
 	TBGSrc BGSrc2;
-	int BGReverseTextAlpha;
+	BYTE TextBackAlpha;			// ’Êí‘®«(SGR0),back•”•ª‚ÌAlpha
+	BYTE BGReverseTextAlpha;	// ”½“]‘®«(SGR7),back•”•ª‚ÌAlpha
+	BYTE BackAlpha;				// ‚»‚Ì‘¼‚Ìback•”•ª‚ÌAlpha
 } BGTheme;
 
 ////////////////////

@@ -855,7 +855,7 @@ void BuffEraseCurToEnd(void)
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	/* update window */
-	DispEraseCurToEnd(YEnd);
+	DispEraseCurToEnd(YEnd, &CurCharAttr);
 }
 
 void BuffEraseHomeToCur(void)
@@ -886,7 +886,7 @@ void BuffEraseHomeToCur(void)
 	}
 
 	/* update window */
-	DispEraseHomeToCur(YHome);
+	DispEraseHomeToCur(YHome, &CurCharAttr);
 }
 
 void BuffInsertLines(int Count, int YEnd)
@@ -954,7 +954,7 @@ void BuffEraseCharsInLine(int XStart, int Count)
 		}
 	}
 
-	DispEraseCharsInLine(XStart, Count);
+	DispEraseCharsInLine(XStart, Count, &CurCharAttr);
 }
 
 void BuffDeleteLines(int Count, int YEnd)
@@ -1092,7 +1092,7 @@ void BuffEraseChars(int Count)
 	memsetW(&(CodeLineW[CursorX]), 0x20, CurCharAttr.Fore, CurCharAttr.Back, AttrDefault, CurCharAttr.Attr2 & Attr2ColorMask, Count);
 
 	/* update window */
-	DispEraseCharsInLine(sx, Count + extr);
+	DispEraseCharsInLine(sx, Count + extr, &CurCharAttr);
 }
 
 void BuffFillWithE(void)

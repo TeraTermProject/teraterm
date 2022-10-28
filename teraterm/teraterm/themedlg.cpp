@@ -163,6 +163,8 @@ static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 	SetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR, bg_theme->BGSrc2.color);
 
 	SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGReverseTextAlpha);
+	SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->TextBackAlpha);
+	SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BackAlpha);
 }
 
 static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
@@ -195,7 +197,9 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 	}
 	bg_theme->BGSrc2.color = GetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR);
 
-	bg_theme->BGReverseTextAlpha = (int)SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+	bg_theme->BGReverseTextAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+	bg_theme->TextBackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+	bg_theme->BackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 }
 
 static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -235,6 +239,8 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 
 			SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+			SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+			SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
 
 			ResetControls(hWnd, &dlg_data->bg_theme);
 			return TRUE;
