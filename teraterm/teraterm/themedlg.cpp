@@ -161,10 +161,6 @@ static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 	SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_SETCHECK, bg_theme->BGSrc2.alpha != 0, 0);
 	SetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, bg_theme->BGSrc2.alpha, FALSE);
 	SetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR, bg_theme->BGSrc2.color);
-
-	SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGReverseTextAlpha);
-	SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->TextBackAlpha);
-	SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BackAlpha);
 }
 
 static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
@@ -196,10 +192,6 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 		bg_theme->BGSrc2.alpha = 0;
 	}
 	bg_theme->BGSrc2.color = GetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR);
-
-	bg_theme->BGReverseTextAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
-	bg_theme->TextBackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
-	bg_theme->BackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 }
 
 static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -209,9 +201,8 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	switch (msg) {
 		case WM_INITDIALOG: {
 			static const DlgTextInfo TextInfos[] = {
-				{ IDC_REVERSE_TEXT_ALPHA_TITLE, "DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE" },
+				{ IDC_BGIMG_CHECK, "DLG_THEME_BG_IMAGEFILE" },
 			};
-			int i;
 			dlg_data = (ThemeDlgData*)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
 
@@ -228,7 +219,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							L"  simple color plane"
 				);
 
-			for (i = 0;; i++) {
+			for (int i = 0;; i++) {
 				LRESULT index;
 				const BG_PATTERN_ST *st = ThemeBGPatternList(i);
 				if (st == NULL) {
@@ -237,10 +228,6 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				index = SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_ADDSTRING, 0, (LPARAM)st->str);
 				SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_SETITEMDATA, index, st->id);
 			}
-
-			SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
-			SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
-			SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
 
 			ResetControls(hWnd, &dlg_data->bg_theme);
 			return TRUE;
@@ -325,9 +312,9 @@ static UINT CALLBACK BGCallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *pp
 	return ret_val;
 }
 
-static HPROPSHEETPAGE ThemeEditorCreate2(ThemeDlgData *dlg_data)
+static HPROPSHEETPAGE ThemeEditorCreate(ThemeDlgData *dlg_data)
 {
-	const int id = IDD_TABSHEET_THEME_EDITOR;
+	const int id = IDD_TABSHEET_BG_THEME_EDITOR;
 	HINSTANCE inst = dlg_data->hInst;
 
 	wchar_t *title;
@@ -650,7 +637,7 @@ static UINT CALLBACK ColorCallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW 
 	return ret_val;
 }
 
-static HPROPSHEETPAGE ColorThemeEditorCreate2(ThemeDlgData *dlg_data)
+static HPROPSHEETPAGE ColorThemeEditorCreate(ThemeDlgData *dlg_data)
 {
 	const int id = IDD_TABSHEET_COLOR_THEME_EDITOR;
 	HINSTANCE inst = dlg_data->hInst;
@@ -891,6 +878,111 @@ static HPROPSHEETPAGE ThemeEditorFile(ThemeDlgData* dlg_data)
 
 //////////////////////////////////////////////////////////////////////////////
 
+static INT_PTR CALLBACK BGAlphaProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_THEME_BG_ALPHA_TITLE"},
+		{ IDC_TEXT_BACK_ALPHA_TITLE, "DLG_THEME_BG_ALPHA_TEXT_BACK_ALPHA_TITLE" },
+		{ IDC_REVERSE_TEXT_BACK_ALPHA_TITLE, "DLG_THEME_BG_ALPHA_REVERSE_TEXT_BACK_ALPHA_TITLE" },
+		{ IDC_OTHER_TEXT_BACK_ALPHA_TITLE, "DLG_THEME_BG_ALPHA_OTHER_BACK_TITLE" },
+	};
+	ThemeDlgData *dlg_data = (ThemeDlgData *)GetWindowLongPtr(hWnd, DWLP_USER);
+
+	switch (msg) {
+	case WM_INITDIALOG: {
+		dlg_data = (ThemeDlgData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
+		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
+		SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
+
+		SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+		SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+		SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+
+		break;
+	}
+	case WM_NOTIFY: {
+		NMHDR *nmhdr = (NMHDR *)lp;
+		switch (nmhdr->code) {
+		case PSN_APPLY: {
+			break;
+		}
+		case PSN_HELP:
+			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
+			break;
+		case PSN_KILLACTIVE: {
+			BGTheme* bg_theme = &dlg_data->bg_theme;
+			bg_theme->BGReverseTextAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+			bg_theme->TextBackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+			bg_theme->BackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+			break;
+		}
+		case PSN_SETACTIVE: {
+			BGTheme* bg_theme = &dlg_data->bg_theme;
+			SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGReverseTextAlpha);
+			SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->TextBackAlpha);
+			SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BackAlpha);
+			break;
+		}
+		default:
+			break;
+		}
+		break;
+	}
+	default:
+		return FALSE;
+	}
+	return FALSE;
+}
+
+static UINT CALLBACK BGAlphaCallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp)
+{
+	(void)hwnd;
+	UINT ret_val = 0;
+	switch (uMsg) {
+	case PSPCB_CREATE:
+		ret_val = 1;
+		break;
+	case PSPCB_RELEASE:
+		free((void *)ppsp->pResource);
+		ppsp->pResource = NULL;
+		break;
+	default:
+		break;
+	}
+	return ret_val;
+}
+
+static HPROPSHEETPAGE BGAlphaCreate(ThemeDlgData *dlg_data)
+{
+	const int id = IDD_TABSHEET_BG_THEME_ALPHA_EDITOR;
+	HINSTANCE inst = dlg_data->hInst;
+
+	wchar_t *title;
+	GetI18nStrWW("Tera Term", "DLG_THEME_BG_ALPHA_TITLE",
+				 L"bg alpha", dlg_data->pts->UILanguageFileW, &title);
+
+	PROPSHEETPAGEW_V1 psp = {};
+	psp.dwSize = sizeof(psp);
+	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
+	psp.hInstance = inst;
+	psp.pfnCallback = BGAlphaCallBack;
+	psp.pszTitle = title;
+	psp.pszTemplate = MAKEINTRESOURCEW(id);
+#if 1
+	psp.dwFlags |= PSP_DLGINDIRECT;
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+#endif
+
+	psp.pfnDlgProc = BGAlphaProc;
+	psp.lParam = (LPARAM)dlg_data;
+
+	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	free(title);
+	return hpsp;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 // Theme dialog
 class CThemeDlg: public TTCPropSheetDlg
 {
@@ -901,9 +993,11 @@ public:
 		HPROPSHEETPAGE page;
 		page = ThemeEditorFile(dlg_data);
 		AddPage(page);
-		page = ThemeEditorCreate2(dlg_data);
+		page = ThemeEditorCreate(dlg_data);
 		AddPage(page);
-		page = ColorThemeEditorCreate2(dlg_data);
+		page = BGAlphaCreate(dlg_data);
+		AddPage(page);
+		page = ColorThemeEditorCreate(dlg_data);
 		AddPage(page);
 
 		SetCaption(L"Theme Editor");

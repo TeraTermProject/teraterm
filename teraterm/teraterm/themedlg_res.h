@@ -4,7 +4,9 @@
 //
 #define IDD_TABSHEET_COLOR_THEME_EDITOR 2307
 #define IDD_TABSHEET_THEME_EDITOR       2308
+#define IDD_TABSHEET_BG_THEME_EDITOR    2308
 #define IDD_TABSHEET_THEME_FILE         2309
+#define IDD_TABSHEET_BG_THEME_ALPHA_EDITOR 2310
 #define IDC_FILE_PREVIEW_BUTTON         2400
 #define IDC_FILE_UNDO_BUTTON            2401
 #define IDC_FILE_LOAD_BUTTON            2402
@@ -17,6 +19,9 @@
 #define IDC_BACK_ALPHA_SLIDER           2409
 #define IDC_TEXT_ALPHA_TITLE            2410
 #define IDC_BACK_ALPHA_TITLE            2411
+#define IDC_OTHER_TEXT_BACK_ALPHA_TITLE 2619
+#define IDC_TEXT_BACK_ALPHA_TITLE       2620
+#define IDC_REVERSE_TEXT_BACK_ALPHA_TITLE 2621
 #define IDC_BG_THEME_HELP               2900
 #define IDC_BGIMG_BASE_TITLE            3000
 #define IDC_BGIMG_EDIT                  3001
@@ -43,7 +48,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2619
+#define _APS_NEXT_CONTROL_VALUE         2622
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
