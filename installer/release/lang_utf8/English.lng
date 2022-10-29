@@ -252,6 +252,9 @@ DLG_TAB_VISUAL_URL_COLOR=Enable &URL attribute color
 DLG_TAB_VISUAL_URL_FONT=Enable &URL attribute font
 DLG_TAB_VISUAL_ANSI=Enable A&NSI color
 DLG_TAB_VISUAL_FAST_SIZE_MOVE=Disable theme when moving or resizing window
+DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
+DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
+DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=View log &editor
 DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)

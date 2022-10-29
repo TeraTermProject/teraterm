@@ -713,17 +713,10 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (2) theme file
 	{
-		// TODO i18n
 		const static I18nTextInfo theme_select[] = {
-#if defined(_MSC_VER)
-			{ NULL, L"使用しない" },
-			{ NULL, L"固定テーマ(テーマファイル指定)" },
-			{ NULL, L"ランダムテーマ" },
-#else
-			{ NULL, L"no use" },
-			{ NULL, L"fixed theme file" },
-			{ NULL, L"random theme file" },
-#endif
+			{ "DLG_TAB_VISUAL_THEME_STARTUP_NO_USE", L"no use" },
+			{ "DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME", L"fixed theme file" },
+			{ "DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME", L"random theme file" },
 		};
 
 		int sel = ts.EtermLookfeel.BGEnable;
