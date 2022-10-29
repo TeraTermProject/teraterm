@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-09-29)
+﻿; Updated by TeraTerm Project (2022-10-29)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -252,6 +252,7 @@ DLG_TAB_VISUAL_UNDERLINE_FONT=Enable Underline attribute font
 DLG_TAB_VISUAL_URL_COLOR=&Цвет в надписях URL
 DLG_TAB_VISUAL_URL_FONT=&Подчеркивание URL
 DLG_TAB_VISUAL_ANSI=&Цвет ANSI
+DLG_TAB_VISUAL_FAST_SIZE_MOVE=Disable theme when moving or resizing window
 
 DLG_TAB_LOG_EDITOR=&Редактор лог-файла
 DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
