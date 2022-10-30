@@ -291,6 +291,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
 	// 落ちるバグを修正。(2007.6.12 maya)
 	if (LoadTTSET()) {
+		// GetCommandLineW() in MSDN remark
+		//  The lifetime of the returned value is managed by the
+		//  system, applications should not free or modify this value.
 		wchar_t *ParamW = GetCommandLineW();
 		(*ParseParam)(ParamW, &ts, &(TopicName[0]));
 	}
@@ -3565,11 +3568,10 @@ void CVTWindow::OnFileNewConnection()
 			ts.ComPort = GetHNRec.ComPort;
 
 			if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
-				wchar_t command[MAXPATHLEN + HostNameMaxLength];
-				wcsncpy_s(command, _countof(command), ttermpro, _TRUNCATE);
-				wcsncat_s(command, _countof(command), L" ", _TRUNCATE);
-				wcsncat_s(command, _countof(command), hostname, _TRUNCATE);
+				wchar_t *command = NULL;
+				awcscats(&command, ttermpro, L" ", hostname, NULL);
 				(*ParseParam)(command, &ts, NULL);
+				free(command);
 				FreeTTSET();
 			}
 			SetKeyMap();

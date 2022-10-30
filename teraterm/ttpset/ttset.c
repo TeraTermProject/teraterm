@@ -41,6 +41,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "ttlib.h"
 #include "tt_res.h"
@@ -3495,12 +3496,60 @@ static void ParseHostName(char *HostStr, WORD * port)
 	}
 }
 
+/**
+ *	コマンドラインのファイル名からフルパスを作成する
+ *
+ *	@param[in]	command_line	コマンドラインの文字列(ファイル名)
+ *	@param[in]	default_path	ファイルの存在するパス(デフォルトパス)
+ *								ファイルが相対パスの時、ファイル名の前に追加される
+ *								NULLのとき、カレントディレクトリが追加される
+ *	@param[in]	default_ini		ファイルに拡張子が存在しない場合追加される
+ *								L".ini"等
+ *								NULLのとき追加しない
+ *	@return		フルパスファイル名
+ */
+static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_path, const wchar_t *default_ini)
+{
+	wchar_t *full_path;
+	wchar_t *filepart;
+	wchar_t *tmp;
+	if (command_line == NULL || *command_line == 0) {
+		// 入力がおかしい
+		return NULL;
+	}
+	if (IsRelativePathW(command_line) && default_path != NULL) {
+		full_path = NULL;
+		awcscats(&full_path, default_path, L"\\", command_line, NULL);
+	}
+	else {
+		full_path = _wcsdup(command_line);
+	}
+
+	// ファイル名のフルパス化(正規化)
+	hGetFullPathNameW(full_path, &tmp, &filepart);
+	free(full_path);
+	full_path = tmp;
+	if (filepart == NULL) {
+		// ファイル部分がない?
+		assert(FALSE);
+		free(full_path);
+		return _wcsdup(command_line);
+	}
+
+	// 拡張子の追加
+	if (default_ini != NULL) {
+		if (wcsrchr(filepart, L'.') == NULL) {
+			awcscat(&full_path, default_ini);
+		}
+	}
+
+	return full_path;
+}
 
 void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 {
 	int pos, c;
 	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
-	wchar_t Temp2[MaxStrLen];
 	WORD ParamPort = 0;
 	WORD ParamCom = 0;
 	WORD ParamTCP = 0;
@@ -3528,26 +3577,22 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 	start = GetParam(Temp, _countof(Temp), Param);
 
 	cur = start;
-	while (next = GetParam(Temp, _countof(Temp), cur)) {
+	while ((next = GetParam(Temp, _countof(Temp), cur))) {
 		DequoteParam(Temp, _countof(Temp), Temp);
 		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
-			wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
-			if (Temp2[0] != 0) {
-				ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L".INI", Temp,
-						   _countof(Temp));
-				if (_wcsicmp(ts->SetupFNameW, Temp) != 0) {
-					free(ts->SetupFNameW);
-					ts->SetupFNameW = _wcsdup(Temp);
-					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
-					_ReadIniFile(ts->SetupFNameW, ts);
-				}
+			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".INI");
+			if (f != NULL && _wcsicmp(ts->SetupFNameW, f) != 0) {
+				free(ts->SetupFNameW);
+				ts->SetupFNameW = f;
+				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+				_ReadIniFile(ts->SetupFNameW, ts);
 			}
 		}
 		cur = next;
 	}
 
 	cur = start;
-	while (next = GetParam(Temp, _countof(Temp), cur)) {
+	while ((next = GetParam(Temp, _countof(Temp), cur))) {
 		DequoteParam(Temp, _countof(Temp), Temp);
 
 		if (HostNameFlag) {
@@ -3633,25 +3678,25 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			ts->HostDialogOnStartup = TRUE;
 		}
 		else if (_wcsnicmp(Temp, L"/FD=", 4) == 0) {	/* file transfer directory */
-			wcsncpy_s(Temp2, _countof(Temp2), &Temp[4], _TRUNCATE);
-			if (wcslen(Temp2) > 0) {
-				wchar_t *dir = Temp2;
-				if (DoesFolderExistW(dir)) {
-					free(ts->FileDirW);
-					ts->FileDirW = _wcsdup(dir);
-					WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
-				}
+			wchar_t *dir;
+			hGetFullPathNameW(&Temp[4], &dir, NULL);
+			if (dir != NULL && wcslen(dir) > 0 && DoesFolderExistW(dir)) {
+				free(ts->FileDirW);
+				ts->FileDirW = _wcsdup(dir);
+				WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
 			}
+			free(dir);
 		}
 		else if (_wcsicmp(Temp, L"/H") == 0)	/* hide title bar */
 			ts->HideTitle = 1;
 		else if (_wcsicmp(Temp, L"/I") == 0)	/* iconize */
 			ts->Minimize = 1;
 		else if (_wcsnicmp(Temp, L"/K=", 3) == 0) {	/* Keyboard setup file */
-			wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
-			ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L".CNF", Temp, _countof(Temp));
-			ts->KeyCnfFNW = _wcsdup(Temp);
-			WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
+			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".CNF");
+			if (f != NULL) {
+				ts->KeyCnfFNW = f;
+				WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
+			}
 		}
 		else if ((_wcsnicmp(Temp, L"/KR=", 4) == 0) ||
 		         (_wcsnicmp(Temp, L"/KT=", 4) == 0)) {	/* kanji code */
@@ -3681,8 +3726,11 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_wcsnicmp(Temp, L"/L=", 3) == 0) {	/* log file */
-			ts->LogFNW = _wcsdup(&Temp[3]);
-			WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));
+			wchar_t *f = GetFilePath(&Temp[3], ts->LogDefaultPathW, NULL);
+			if (f != NULL) {
+				ts->LogFNW = f;
+				WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));
+			}
 		}
 		else if (_wcsnicmp(Temp, L"/LA=", 4) == 0) {	/* language */
 			switch (Temp[4]) {
@@ -3710,9 +3758,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			if ((Temp[3] == 0) || (Temp[3] == '*')) {
 				ts->MacroFNW = _wcsdup(L"*");
 			} else {
-				wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
-				ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L".TTL", Temp, _countof(Temp));
-				ts->MacroFNW = _wcsdup(Temp);
+				ts->MacroFNW = GetFilePath(&Temp[3], ts->HomeDirW, L".TTL");
 			}
 			WideCharToACP_t(ts->MacroFNW, ts->MacroFN, _countof(ts->MacroFN));
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
@@ -3748,11 +3794,12 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			ParamPort = IdNamedPipe;
 		}
 		else if (_wcsnicmp(Temp, L"/R=", 3) == 0) {	/* Replay filename */
-			wcsncpy_s(Temp2, _countof(Temp2), &Temp[3], _TRUNCATE);
-			ConvFNameW(ts->HomeDirW, Temp2, _countof(Temp2), L"", Temp, _countof(Temp));
-			WideCharToACP_t(Temp, ts->HostName, _countof(ts->HostName));
-			if (strlen(ts->HostName) > 0)
-				ParamPort = IdFile;
+			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, NULL);
+			if (f != NULL) {
+				WideCharToACP_t(f, ts->HostName, _countof(ts->HostName));
+				if (strlen(ts->HostName) > 0)
+					ParamPort = IdFile;
+			}
 		}
 		else if (_wcsicmp(Temp, L"/T=0") == 0) {	/* telnet disable */
 			ParamPort = IdTCPIP;
