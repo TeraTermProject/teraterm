@@ -152,7 +152,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="f">/F=&lt;setup file&gt;</dt>
   <dd>設定ファイル<br>
       <span class="syntax">/F=TERATERM.INI</span> (省略時)<br>
-      ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
+      ファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスと見なされます。</dd>
 
   <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
   <dd>ファイル転送用ディレクトリ</dd>
@@ -168,7 +168,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
   <dd>キーボード設定ファイル<br>
       <span class="syntax">/K=KEYBOARD.CNF</span> (省略時)<br>
-      ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
+      ファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスと見なされます。</dd>
 
   <dt id="kr">/KR=&lt;kanji code (receive)&gt;</dt>
   <dd>漢字コード (受信)
@@ -208,7 +208,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
   <dd>起動時にマクロを実行<br>
-      ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
+      ファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスと見なされます。</dd>
 
   <dt id="mn">/MN=&lt;multicastname&gt;</dt>
   <dd><a href="../macro/command/sendmulticast.html">sendmulticast</a> マクロコマンドで指定するためのマルチキャスト名</dd>
@@ -248,6 +248,10 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="tekicon">/TEKICON=&lt;icon name&gt;</dt>
   <dd>TEKウインドウのウインドウアイコンを指定する<br>
       icon nameには、設定ファイルの<a href="../setup/teraterm-win.html#WindowIcon">TEKIcon設定</a>と同じものが使用できる。</dd>
+
+  <dt id="theme">/THEME=&lt;theme file&gt;</dt>
+  <dd>テーマファイル<br>
+      ファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスと見なされます。</dd>
 
   <dt id="timeout">/TIMEOUT=&lt;connecting timeout value&gt;</dt>
   <dd>接続中の処理をキャンセルするまでの時間（秒単位）</dd>
@@ -356,6 +360,9 @@ TTERMPRO /PIPE pipename ; \\.\pipe\pipename への接続
 /W="Tera;Term"
 </pre>
 
+<p id="note3">
+[3] portable.ini が ttermpro.exe と同じフォルダに存在するとポータブル版として動作します。<br />
+ポータブル版の時、設定ファイルフォルダは ttermpro.exe と同じフォルダとなります。
 
 <h2 id="refs">参照</h2>
 

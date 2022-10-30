@@ -3575,6 +3575,7 @@ void CVTWindow::OnFileNewConnection()
 				FreeTTSET();
 			}
 			SetKeyMap();
+			BGLoadThemeFile(&ts);
 			if (ts.MacroFN[0]!=0) {
 				RunMacro(ts.MacroFN,TRUE);
 				ts.MacroFN[0] = 0;

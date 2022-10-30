@@ -151,7 +151,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="f">/F=&lt;setup file&gt;</dt>
   <dd>Setup file<br>
       <span class="syntax">/F=TERATERM.INI</span> (default)<br>
-      If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
+      If this value is not a full path, it is understood as a relative path from %APPDATA%\teraterm5\.</dd>
 
   <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
   <dd>File transfer directory</dd>
@@ -167,7 +167,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
   <dd>Keyboard setup file<br>
       <span class="syntax">/K=KEYBOARD.CNF</span> (default)<br>
-      If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
+      If this value is not a full path, it is understood as a relative path from %APPDATA%\teraterm5\.</dd>
 
   <dt id="kr">/KR=&lt;kanji code (receive)&gt;</dt>
   <dd>Note: Japanese, Korean and UTF-8 mode only
@@ -207,7 +207,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
   <dd>Start Tera Term with macro.<br>
-      If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
+      If this value is not a full path, it is understood as a relative path from %APPDATA%\teraterm5\.</dd>
 
   <dt id="mn">/MN=&lt;multicastname&gt;</dt>
   <dd>Multicast name for <a href="../macro/command/sendmulticast.html">sendmulticast</a> macro command.</dd>
@@ -247,6 +247,10 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="tekicon">/TEKICON=&lt;icon name&gt;</dt>
   <dd>TEK window icon.<br>
       Could be specified the same value of <a href="../setup/teraterm-win.html#WindowIcon">TEKIcon of setup file</a>.</dd>
+
+  <dt id="theme">/THEME=&lt;theme file&gt;</dt>
+  <dd>Theme file<br>
+      If this value is not a full path, it is understood as a relative path from %APPDATA%\teraterm5\.</dd>
 
   <dt id="timeout">/TIMEOUT=&lt;connecting timeout value&gt;</dt>
   <dd>Could be specified per seconds.</dd>
@@ -355,6 +359,9 @@ If the value includes the `"' character, the user should write the `"' character
 /W="Tera;Term"
 </pre>
 
+<p id="note3">
+[3] portable.ini が ttermpro.exe と同じフォルダに存在するとポータブル版として動作します。<br />
+ポータブル版の時、設定ファイルフォルダは ttermpro.exe と同じフォルダとなります。
 
 <h2 id="refs">See also</h2>
 

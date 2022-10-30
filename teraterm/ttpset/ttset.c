@@ -3812,6 +3812,14 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		else if (_wcsnicmp(Temp, L"/TEKICON=", 9) == 0) { /* Tek window icon */
 			ts->TEKIcon = IconName2IconId(&Temp[9]);
 		}
+		else if (_wcsnicmp(Temp, L"/THEME=", 7) == 0) {
+			wchar_t *f = GetFilePath(&Temp[7], ts->HomeDirW, NULL);
+			if (f != NULL) {
+				free(ts->EtermLookfeel.BGThemeFileW);
+				ts->EtermLookfeel.BGThemeFileW = f;
+				ts->EtermLookfeel.BGEnable = 1;
+			}
+		}
 		else if (_wcsnicmp(Temp, L"/VTICON=", 8) == 0) {	/* VT window icon */
 			ts->VTIcon = IconName2IconId(&Temp[8]);
 		}
