@@ -1672,3 +1672,87 @@ void RandomFile(const char *filespec_src,char *filename, int destlen)
 	}
 	free(filespec_srcW);
 }
+
+/**
+ *	IsDBCSLeadByteEx() とほぼ同じ
+ *	ismbblead() の拡張
+ *
+ *	@param	b			テストする文字
+ *	@param	code_page	コードページ,CP_ACPの時現在のコードページ
+ */
+int __ismbblead(BYTE b, int code_page)
+{
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
+	switch (code_page) {
+		case 932:
+			// 日本語 shift jis
+			if (((0x81 <= b) && (b <= 0x9f)) || ((0xe0 <= b) && (b <= 0xfc))) {
+				return TRUE;
+			}
+			return FALSE;
+		case 51949:
+			// Korean CP51949
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 936:
+			// CP936 GB2312
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 950:
+			// CP950 Big5
+			if (((0xA1 <= b) && (b <= 0xc6)) || ((0xc9 <= b) && (b <= 0xf9))) {
+				return TRUE;
+			}
+			return FALSE;
+		default:
+			break;
+	}
+	return FALSE;
+}
+
+/**
+ *	ismbbtrail() の拡張
+ *
+ *	@param	b			テストする文字
+ *	@param	code_page	コードページ,CP_ACPの時現在のコードページ
+ */
+int __ismbbtrail(BYTE b, int code_page)
+{
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
+	switch (code_page) {
+		case 932:
+			if (((0x40 <= b) && (b <= 0x7E)) || ((0x80 <= b) && (b <= 0xFC))) {
+				return TRUE;
+			}
+			return FALSE;
+		case 51949:
+			// Korean CP51949
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 936:
+			// CP936 GB2312
+			if ((0xA1 <= b) && (b <= 0xFE)) {
+				return TRUE;
+			}
+			return FALSE;
+		case 950:
+			// CP950 Big5
+			if (((0x40 <= b) && (b <= 0x7e)) || ((0xa1 <= b) && (b <= 0xfe))) {
+				return TRUE;
+			}
+			return FALSE;
+		default:
+			break;
+	}
+	return FALSE;
+}
