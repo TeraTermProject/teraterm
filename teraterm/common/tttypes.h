@@ -516,7 +516,7 @@ struct tttset {
 	WORD TEKIcon;
 	WORD ScrollWindowClearScreen;
 	WORD AutoScrollOnlyInBottomLine;
-	WORD UnknownUnicodeCharaAsWide;
+	WORD reserve_UnknownUnicodeCharaAsWide;
 	char YModemRcvCommand[MAX_PATH];
 	WORD AcceptTitleChangeRequest;
 	SIZE PasteDialogSize;

@@ -48,7 +48,7 @@ void PrnStop();
 
 int VTPrintInit(int PrnFlag);
 void PrnSetupDC(TCharAttr Attr, BOOL reverse);
-void PrnOutText(const char *Buff, int Count, void *data);
+void PrnOutTextA(const char *Buff, const char *WidthInfo, int Count, void *data);
 void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
 void PrnNewLine();
 void VTPrintEnd();

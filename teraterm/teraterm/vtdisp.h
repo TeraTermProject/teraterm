@@ -98,7 +98,7 @@ void DispChangeWin(void);
 void DispInitDC(void);
 void DispReleaseDC(void);
 void DispSetupDC(TCharAttr Attr, BOOL Reverse);
-void DispStr(const char *Buff, int Count, int Y, int* X);
+void DispStrA(const char *Buff, const char *WidthInfo, int Count, int Y, int* X);
 void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X);
 void DispEraseCurToEnd(int YEnd, const TCharAttr *attr);
 void DispEraseHomeToCur(int YHome, const TCharAttr *attr);
@@ -132,10 +132,10 @@ void DispGetWindowPos(int *x, int *y, BOOL client);
 void DispGetWindowSize(int *width, int *height, BOOL client);
 void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
 int DispFindClosestColor(int red, int green, int blue);
-void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count,
-			  int font_width, int font_height, int Y, int* X);
-void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count,
-			  int font_width, int font_height, int Y, int* X);
+void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count, int font_width, int font_height,
+			  int Y, int *X);
+void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width, int font_height,
+			  int Y, int *X);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

@@ -2569,9 +2569,10 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 /**
  *	1行描画 ANSI
  */
-void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int font_height, int Y, int *X)
+void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width, int font_height, int Y, int *X)
 {
 	int Dx[TermWidthMax];
+	int HalfCharCount = 0;
 	int i;
 	int width;
 	int height;
@@ -2579,8 +2580,24 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
 	BYTE alpha = 0;
 	vtdisp_work_t *w = &vtdisp_work;
 
-	for (i = 0; i < Count; i++) {
-		Dx[i] = font_width;
+	{
+		const BYTE *p = (BYTE *)StrA;
+		const char *wp = WidthInfo;
+		int *d = Dx;
+		for (i = 0; i < Count; i++) {
+			int w = *wp++;
+			BYTE b = *p;
+			int j;
+			*d++ = font_width;
+			p++;
+			for (j = 0; j < w - 1; j++) {
+				*d++ = font_width;
+				p++;
+				wp++;
+				i++;
+			}
+			HalfCharCount += w;
+		}
 	}
 
 	direct_draw = FALSE;
@@ -2596,7 +2613,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, int Count, int font_width, int
 	}
 
 	// テキスト描画領域
-	width = Count * font_width;
+	width = HalfCharCount * font_width;
 	height = font_height;
 	if (direct_draw) {
 		RECT RText;
@@ -2738,10 +2755,10 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
  *  @param[in]	*X		horizontal position
  *  @param[out]	*X		horizontal position shifted by the width of the string
  */
-void DispStr(const char *Buff, int Count, int Y, int* X)
+void DispStrA(const char *Buff, const char *WidthInfo, int Count, int Y, int* X)
 {
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-	DrawStrA(VTDC, BGDC, Buff, Count, FontWidth, FontHeight, Y, X);
+	DrawStrA(VTDC, BGDC, Buff, WidthInfo, Count, FontWidth, FontHeight, Y, X);
 }
 
 /**

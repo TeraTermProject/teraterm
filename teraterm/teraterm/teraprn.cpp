@@ -366,7 +366,7 @@ void PrnSetupDC(TCharAttr Attr, BOOL reverse)
  *    Buff: points text buffer
  *    Count: number of characters to be printed
  */
-void PrnOutText(const char *StrA, int Count, void *data)
+void PrnOutTextA(const char *StrA, const char *WidthInfo, int Count, void *data)
 {
 	if (PrnX+PrnFW > Margin.right) {
 		/* new line */
@@ -381,7 +381,7 @@ void PrnOutText(const char *StrA, int Count, void *data)
 		PrnY = Margin.top;
 	}
 
-	DrawStrA(PrintDC, NULL, StrA, Count, PrnFW, PrnFH, PrnY, &PrnX);
+	DrawStrA(PrintDC, NULL, StrA, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
 }
 
 void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data)
@@ -483,6 +483,33 @@ void PrnFinish(PrintFile *handle)
 {
 	DeletePrintFile(handle);
 	free(handle);
+}
+
+static void PrnOutText(const char *StrA, int Count, void *data)
+{
+	// ï∂éöïùèÓïÒÇçÏÇÈ
+	//	MBCSÇÃÇ∆Ç´ÅA1byte=1cell, 2byte=2cell
+	char *WidthInfo = (char *)malloc(Count);
+	char *w = WidthInfo;
+	BYTE *s = (BYTE*)StrA;
+	for (int i = 0; i < Count; i++) {
+		BYTE b = *s++;
+		if (__ismbblead(b, CP_ACP)) {
+			// 2byteï∂éö
+			*w++ = 2;
+			*w++ = 0;
+			s++;
+			i++;
+		}
+		else {
+			// 1byteï∂éö
+			*w++ = 1;
+		}
+	}
+
+	DrawStrA(PrintDC, NULL, StrA, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
+
+	free(WidthInfo);
 }
 
 /**

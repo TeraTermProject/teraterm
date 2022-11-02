@@ -1607,10 +1607,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        Temp, sizeof(Temp), FName);
 	ts->TEKIcon = IconName2IconIdA(Temp);
 
-	// Unknown Unicode Character
-	ts->UnknownUnicodeCharaAsWide =
-		GetOnOff(Section, "UnknownUnicodeCharacterAsWide", FName, FALSE);
-
 	// UseNormalBGColor
 	ts->UseNormalBGColor =
 		GetOnOff(Section, "UseNormalBGColor", FName, FALSE);
@@ -2900,10 +2896,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	// AutoScrollOnlyInBottomLine
 	WriteOnOff(Section, "AutoScrollOnlyInBottomLine", FName,
 		ts->AutoScrollOnlyInBottomLine);
-
-	// Unknown Unicode Character
-	WriteOnOff(Section, "UnknownUnicodeCharacterAsWide", FName,
-	           ts->UnknownUnicodeCharaAsWide);
 
 	// Accept remote-controlled window title changing
 	if (ts->AcceptTitleChangeRequest == IdTitleChangeRequestOff)

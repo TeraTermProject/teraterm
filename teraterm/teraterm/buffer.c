@@ -179,21 +179,7 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 			switch (lenA) {
 			case 0:
 			default:
-#if 1
-				if (half_width) {
-					p->ansi_char = '?';
-				}
-				else {
-					p->ansi_char = (('?' << 8) | '_');
-				}
-#else
-				if (ts.UnknownUnicodeCharaAsWide) {
-					p->ansi_char = (('?' << 8) | '?');
-				}
-				else {
-					p->ansi_char = '?';
-				}
-#endif
+				p->ansi_char = '?';
 				break;
 			case 1:
 				p->ansi_char = (unsigned char)strA[0];
@@ -3178,13 +3164,14 @@ static BOOL CheckSelect(int x, int y)
 static
 void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 					  void (*disp_strW)(const wchar_t *bufW, const char *width_info, int count, void *data),
-					  void (*disp_strA)(const char *buf, int count, void *data),
+					  void (*disp_strA)(const char *buf, const char *width_info, int count, void *data),
 					  void (*disp_setup_dc)(TCharAttr Attr, BOOL Reverse),
 					  void *data)
 {
 	const LONG TmpPtr = GetLinePtr(SY);
 	int istart = IStart;
 	char bufA[TermWidthMax+1];
+	char bufAW[TermWidthMax+1];
 	wchar_t bufW[TermWidthMax+1];
 	char bufWW[TermWidthMax+1];
 	int lenW = 0;
@@ -3205,7 +3192,6 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 
 		BOOL DrawFlag = FALSE;
 		BOOL SetString = FALSE;
-		unsigned short ansi_char;
 
 		// アトリビュート取得
 		if (count == 0) {
@@ -3274,16 +3260,35 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				DrawFlag = TRUE;	// コンビネーションがある場合はすぐ描画
 			}
 
-			ansi_char = CodeBuffW[TmpPtr + istart + count].ansi_char;
-			if (ansi_char < 0x100) {
-				bufA[lenA] = ansi_char & 0xff;
-				lenA++;
-			}
-			else {
-				bufA[lenA] = (ansi_char >> 8) & 0xff;
-				lenA++;
-				bufA[lenA] = ansi_char & 0xff;
-				lenA++;
+			// ANSI版
+			{
+				unsigned short ansi_char = b->ansi_char;
+				int i;
+				int cell = b->cell;
+				int c = 0;
+				if (ansi_char < 0x100) {
+					bufA[lenA] = ansi_char & 0xff;
+					bufAW[lenA] = cell;
+					lenA++;
+					c++;
+				}
+				else {
+					bufA[lenA] = (ansi_char >> 8) & 0xff;
+					bufAW[lenA] = cell;
+					lenA++;
+					c++;
+					bufA[lenA] = ansi_char & 0xff;
+					bufAW[lenA] = 0;
+					lenA++;
+					c++;
+				}
+				// ANSI文字列で表示できるのは 1or2cell(半角or全角)
+				// 残りは '?' を表示する
+				for (i = c; i < cell; i++) {
+					bufA[lenA] = '?';
+					bufAW[lenA] = 0;
+					lenA++;
+				}
 			}
 
 			if (b->WidthProperty == 'A' || b->WidthProperty == 'N') {
@@ -3313,7 +3318,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				disp_strW(bufW, bufWW, lenW, data);
 			}
 			else {
-				disp_strA(bufA, lenA, data);
+				disp_strA(bufA, bufAW, lenA, data);
 			}
 
 			lenA = 0;
@@ -3341,12 +3346,12 @@ static void l_disp_strW(const wchar_t *bufW, const char *width_info, int count, 
 	data->draw_x = x;
 }
 
-static void l_disp_strA(const char *buf, int count, void *data_)
+static void l_disp_strA(const char *buf, const char *width_info, int count, void *data_)
 {
 	disp_data_t *data = (disp_data_t *)data_;
 	int x = data->draw_x;
 	int y = data->draw_y;
-	DispStr(buf, count, y, &x);
+	DispStrA(buf, width_info, count, y, &x);
 	data->draw_x = x;
 }
 
@@ -3407,7 +3412,7 @@ static void BuffDrawLineIPrn(int SY, int IStart, int IEnd)
 		IEnd = NumOfColumns - 1;
 	}
 
-	BuffGetDrawInfoW(SY, IStart, IEnd, PrnOutTextW, PrnOutText, PrnSetupDC, NULL);
+	BuffGetDrawInfoW(SY, IStart, IEnd, PrnOutTextW, PrnOutTextA, PrnSetupDC, NULL);
 }
 
 void BuffUpdateRect
