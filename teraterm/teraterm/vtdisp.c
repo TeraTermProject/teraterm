@@ -380,15 +380,13 @@ static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *
   return TRUE;
 }
 
-static BOOL LoadWithSPI(const char *src, const wchar_t *spi_path, const char *out)
+static BOOL LoadWithSPI(const wchar_t *src, const wchar_t *spi_path, const char *out)
 {
 	HANDLE hbmi;
 	HANDLE hbuf;
 	BOOL r;
-	wchar_t *srcW = ToWcharA(src);
 
-	r = SusieLoadPicture(srcW, spi_path, &hbmi, &hbuf);
-	free(srcW);
+	r = SusieLoadPicture(src, spi_path, &hbmi, &hbuf);
 	if (r == FALSE) {
 		return FALSE;
 	}
@@ -438,37 +436,47 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 // 画像読み込み関係
 static void BGPreloadPicture(BGSrc *src)
 {
-  HBITMAP hbm;
-  char *load_file = src->file;
-  const wchar_t *spi_path = ts.EtermLookfeel.BGSPIPathW;
+	HBITMAP hbm = NULL;
+	wchar_t *load_file = ToWcharA(src->file);
+	const wchar_t *spi_path = ts.EtermLookfeel.BGSPIPathW;
 
-  if (LoadWithSPI(src->file, spi_path, src->fileTmp) == TRUE) {
-	  load_file = src->fileTmp;
-  }
+	// Susie plugin で読み込み
+	if (LoadWithSPI(load_file, spi_path, src->fileTmp) == TRUE) {
+		// 読み込めた
+		// 読んだ画像は BMP形式で src->fileTmp に保存されている
 
-  if (IsLoadImageOnlyEnabled()) {
-    //画像をビットマップとして読み込み
-    hbm = LoadImage(0,load_file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+		// LoadImageA() API で HBITMAP に変換する
+		hbm = LoadImageA(0,src->fileTmp,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+	}
 
-  } else {
-	  // Susie pluginで読み込めないJPEGファイルが存在した場合、
-	  // OLE を利用して読む。
-    hbm = GetBitmapHandle(load_file);
+	if (hbm == NULL && !IsLoadImageOnlyEnabled()) {
+		// OLE を利用してjpegを読む
+		//		LoadImage()のみ許可されている環境ではないとき
+		char *load_fileA = ToCharW(load_file);
+		hbm = GetBitmapHandle(load_fileA);
+		free(load_fileA);
+	}
 
-  }
+	if (hbm == NULL) {
+		// 画像を LoadImageW() API で読み込む
+		// Windows 10 では高さがマイナスのbmpファイルはロードに失敗する
+		// Windows 7 では成功する
+		hbm = LoadImageW(0,load_file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+	}
 
-  if(hbm)
-  {
-    BITMAP bm;
+	if(hbm) {
+		BITMAP bm;
 
-    GetObject(hbm,sizeof(bm),&bm);
+		GetObject(hbm,sizeof(bm),&bm);
 
-    src->hdc    = CreateBitmapDC(hbm);
-    src->width  = bm.bmWidth;
-    src->height = bm.bmHeight;
-  }else{
-    src->type = BG_COLOR;
-  }
+		src->hdc    = CreateBitmapDC(hbm);
+		src->width  = bm.bmWidth;
+		src->height = bm.bmHeight;
+	}else{
+		src->type = BG_COLOR;
+	}
+
+	free(load_file);
 }
 
 static void BGGetWallpaperInfo(WallpaperInfo *wi)
@@ -528,9 +536,10 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 
 // .bmp以外の画像ファイルを読む。
 // 壁紙が .bmp 以外のファイルになっていた場合への対処。
-// (2011.8.3 yutaka)
-// cf. http://www.geocities.jp/ccfjd821/purogu/wpe-ji9.html
 // この関数は Windows 2000 未満の場合には呼んではいけない
+// TODO:
+//		IsLoadImageOnlyEnabled() は Vista 未満となっている
+//
 static HBITMAP GetBitmapHandle(const char *File)
 {
 	OLE_HANDLE hOle = 0;
