@@ -2600,18 +2600,14 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 	vtdisp_work_t *w = &vtdisp_work;
 
 	{
-		const BYTE *p = (BYTE *)StrA;
 		const char *wp = WidthInfo;
 		int *d = Dx;
 		for (i = 0; i < Count; i++) {
 			int w = *wp++;
-			BYTE b = *p;
 			int j;
 			*d++ = font_width;
-			p++;
 			for (j = 0; j < w - 1; j++) {
 				*d++ = font_width;
-				p++;
 				wp++;
 				i++;
 			}
