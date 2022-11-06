@@ -1,4 +1,4 @@
-﻿use strict;
+use strict;
 use warnings;
 use utf8;
 use Getopt::Long 'GetOptions';
