@@ -297,6 +297,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ttgdiplus.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ttgdiplus.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ttknownfolders.c"
 			>
 		</File>

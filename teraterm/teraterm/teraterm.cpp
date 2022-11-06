@@ -55,6 +55,9 @@
 #include "ttdebug.h"
 #include "win32helper.h"
 #include "asprintf.h"
+#if ENABLE_GDIPLUS
+#include "ttgdiplus.h"
+#endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -296,9 +299,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	srand((unsigned int)time(NULL));
 
 	ts.TeraTermInstance = hInstance;
+	hInst = hInstance;
 	init();
 	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
-	hInst = hInstance;
+
+#if ENABLE_GDIPLUS
+	GDIPInit();
+#endif
+
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
@@ -370,6 +378,10 @@ exit_message_loop:
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;
+
+#if ENABLE_GDIPLUS
+	GDIPUninit();
+#endif
 
 	_HtmlHelpW(NULL, NULL, HH_CLOSE_ALL, 0);
 	_HtmlHelpW(NULL, NULL, HH_UNINITIALIZE, HtmlHelpCookie);

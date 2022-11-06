@@ -1,5 +1,5 @@
 /*
- * (C) 2019- TeraTerm Project
+ * (C) 2022- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* teraterm local header   */
-/*	teraterm/ folder only  */
+#pragma once
 
-/**
- *	画像読み込みに GDI+ ライブラリを使用する
- *		Windows XP から利用可能
- */
-#if !defined(ENABLE_GDIPLUS)
-#define ENABLE_GDIPLUS	1	// 0/1=有効/無効
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-void AddModelessHandle(HWND hWnd);
-void RemoveModelessHandle(HWND hWnd);
+void GDIPInit(void);
+void GDIPUninit(void);
+HBITMAP GDIPLoad(const wchar_t *fname);
+
+#ifdef __cplusplus
+}
+#endif

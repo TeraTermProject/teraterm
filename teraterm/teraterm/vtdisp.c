@@ -29,6 +29,7 @@
 
 /* TERATERM.EXE, VT terminal display routines */
 #include "teraterm.h"
+#include "teraterml.h"
 #include "tttypes.h"
 #include <string.h>
 #include <olectl.h>
@@ -49,6 +50,9 @@
 #include "win32helper.h"
 #include "ttknownfolders.h" // for FOLDERID_Desktop
 #include "ttlib.h"
+#if ENABLE_GDIPLUS
+#include "ttgdiplus.h"
+#endif
 
 #include "theme.h"
 #include "vtdisp.h"
@@ -448,6 +452,12 @@ static void BGPreloadPicture(BGSrc *src)
 		// LoadImageA() API ‚Å HBITMAP ‚É•ÏŠ·‚·‚é
 		hbm = LoadImageA(0,src->fileTmp,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 	}
+
+#if ENABLE_GDIPLUS
+	if (hbm == NULL) {
+		hbm = GDIPLoad(load_file);
+	}
+#endif
 
 	if (hbm == NULL && !IsLoadImageOnlyEnabled()) {
 		// OLE ‚ð—˜—p‚µ‚Äjpeg‚ð“Ç‚Þ

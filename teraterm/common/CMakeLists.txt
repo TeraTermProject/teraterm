@@ -25,8 +25,8 @@ add_library(
   getcontent.h
   i18n.h
   i18n_static.c
-  inifile_com.h
   inifile_com.cpp
+  inifile_com.h
   tipwin.cpp
   tipwin.h
   tipwin2.cpp
@@ -37,8 +37,10 @@ add_library(
   tmfc_propdlg.cpp
   tmfc_propdlg.h
   tmfc_property.cpp
-  ttknownfolders.h
+  ttgdiplus.cpp
+  ttgdiplus.h
   ttknownfolders.c
+  ttknownfolders.h
   ttlib.h
   ttlib_charset.cpp
   ttlib_charset.h

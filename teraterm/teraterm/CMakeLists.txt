@@ -2,6 +2,8 @@
 
 project(${PACKAGE_NAME})
 
+option(ENABLE_GDIPLUS "Use GDI+ library" ON)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
@@ -332,6 +334,18 @@ elseif(MINGW)
     )
 endif()
 
+if(ENABLE_GDIPLUS)
+  target_compile_options(
+    ${PACKAGE_NAME}
+    PRIVATE "-DENABLE_GDIPLUS=1"
+  )
+else(ENABLE_GDIPLUS)
+  target_compile_options(
+    ${PACKAGE_NAME}
+    PRIVATE "-DENABLE_GDIPLUS=0"
+  )
+endif(ENABLE_GDIPLUS)
+
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
@@ -367,6 +381,14 @@ target_link_libraries(
   uuid
   ws2_32
   )
+
+if(ENABLE_GDIPLUS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    gdiplus.lib
+  )
+endif(ENABLE_GDIPLUS)
 
 install(
   TARGETS ${PACKAGE_NAME}
