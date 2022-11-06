@@ -133,7 +133,6 @@ typedef struct _BGSrc
   int        width;
   int        height;
   char       file[MAX_PATH];
-  char       fileTmp[MAX_PATH];
 }BGSrc;
 
 static BGSrc BGDest;
@@ -337,6 +336,10 @@ static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
 #endif
 }
 
+/**
+ *	BMP保存、デバグに使うかもしれないので残しておく
+ */
+#if 0
 static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
 {
   int    bmiSize;
@@ -383,24 +386,18 @@ static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *
 
   return TRUE;
 }
+#endif
 
-static BOOL LoadWithSPI(const wchar_t *src, const wchar_t *spi_path, const char *out)
+static HBITMAP CreateBitmapFromBITMAPINFO(const BITMAPINFO *pbmi, const unsigned char *pbuf)
 {
-	HANDLE hbmi;
-	HANDLE hbuf;
-	BOOL r;
+	void* pvBits;
+	HBITMAP hBmp = CreateDIBSection(NULL, pbmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
 
-	r = SusieLoadPicture(src, spi_path, &hbmi, &hbuf);
-	if (r == FALSE) {
-		return FALSE;
+	if (pbuf != NULL) {
+		memcpy(pvBits, pbuf, pbmi->bmiHeader.biSizeImage);
 	}
 
-	SaveBitmapFile(out, hbuf, hbmi);
-
-	LocalFree(hbmi);
-	LocalFree(hbuf);
-
-	return TRUE;
+	return hBmp;
 }
 
 static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BLENDFUNCTION bf)
@@ -445,32 +442,37 @@ static void BGPreloadPicture(BGSrc *src)
 	const wchar_t *spi_path = ts.EtermLookfeel.BGSPIPathW;
 
 	// Susie plugin で読み込み
-	if (LoadWithSPI(load_file, spi_path, src->fileTmp) == TRUE) {
-		// 読み込めた
-		// 読んだ画像は BMP形式で src->fileTmp に保存されている
-
-		// LoadImageA() API で HBITMAP に変換する
-		hbm = LoadImageA(0,src->fileTmp,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+	if (hbm == NULL) {
+		HANDLE hbmi;
+		HANDLE hbuf;
+		BOOL r = SusieLoadPicture(load_file, spi_path, &hbmi, &hbuf);
+		if (r != FALSE) {
+			hbm = CreateBitmapFromBITMAPINFO(hbmi, hbuf);
+			LocalFree(hbmi);
+			LocalFree(hbuf);
+		}
 	}
 
+	// GDI+ ライブラリを使って読み込む
 #if ENABLE_GDIPLUS
 	if (hbm == NULL) {
 		hbm = GDIPLoad(load_file);
 	}
 #endif
 
+	// OLE を利用して画像(jpeg)を読む
+	//		LoadImage()のみ許可されている環境ではないとき
 	if (hbm == NULL && !IsLoadImageOnlyEnabled()) {
-		// OLE を利用してjpegを読む
-		//		LoadImage()のみ許可されている環境ではないとき
 		char *load_fileA = ToCharW(load_file);
 		hbm = GetBitmapHandle(load_fileA);
 		free(load_fileA);
 	}
 
+	// LoadImageW() API で読み込む
 	if (hbm == NULL) {
-		// 画像を LoadImageW() API で読み込む
-		// Windows 10 では高さがマイナスのbmpファイルはロードに失敗する
-		// Windows 7 では成功する
+		// LoadImageW() APIは、
+		// Windows 10 のとき高さがマイナスのbmpファイルはロードに失敗する
+		// Windows 7 のときは成功する
 		hbm = LoadImageW(0,load_file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 	}
 
@@ -1152,11 +1154,6 @@ static void BGDestruct(void)
   DeleteBitmapDC(&(BGSrc1.hdc));
   DeleteBitmapDC(&(BGSrc2.hdc));
 
-  //テンポラリーファイル削除
-  DeleteFile(BGDest.fileTmp);
-  DeleteFile(BGSrc1.fileTmp);
-  DeleteFile(BGSrc2.fileTmp);
-
   BGEnable = FALSE;
 }
 
@@ -1184,16 +1181,6 @@ void BGInitialize(BOOL initialize_once)
 
 	//リソース解放
 	BGDestruct();
-
-	//テンポラリーファイル名を生成
-	{
-		char tempPath[MAX_PATH];
-		ZeroMemory(tempPath, sizeof(tempPath));
-		GetTempPathA(MAX_PATH, tempPath);
-		GetTempFileNameA(tempPath, "ttAK", 0, BGDest.fileTmp);
-		GetTempFileNameA(tempPath, "ttAK", 0, BGSrc1.fileTmp);
-		GetTempFileNameA(tempPath, "ttAK", 0, BGSrc2.fileTmp);
-	}
 
 	// AlphaBlend のアドレスを読み込み
 	if (ts.EtermLookfeel.BGUseAlphaBlendAPI) {
