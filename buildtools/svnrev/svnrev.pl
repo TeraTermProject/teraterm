@@ -251,7 +251,7 @@ elsif(-d "$source_root/.git" && $git ne "") {
 			$svninfo{'Revision'} = $1;
 		}
 		else {
-			$svninfo{'Revision'} = undef;
+			$svninfo{'Revision'} = '';
 		}
 
 		my $release = 0;
