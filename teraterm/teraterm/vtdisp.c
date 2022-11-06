@@ -179,6 +179,7 @@ typedef struct {
 static vtdisp_work_t vtdisp_work;
 
 static HBITMAP GetBitmapHandle(const char *File);
+static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
 static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha);
@@ -463,9 +464,7 @@ static void BGPreloadPicture(BGSrc *src)
 	// OLE を利用して画像(jpeg)を読む
 	//		LoadImage()のみ許可されている環境ではないとき
 	if (hbm == NULL && !IsLoadImageOnlyEnabled()) {
-		char *load_fileA = ToCharW(load_file);
-		hbm = GetBitmapHandle(load_fileA);
-		free(load_fileA);
+		hbm = GetBitmapHandleW(load_file);
 	}
 
 	// LoadImageW() API で読み込む
@@ -552,7 +551,7 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 // TODO:
 //		IsLoadImageOnlyEnabled() は Vista 未満となっている
 //
-static HBITMAP GetBitmapHandle(const char *File)
+static HBITMAP GetBitmapHandleW(const wchar_t *File)
 {
 	OLE_HANDLE hOle = 0;
 	IStream *iStream=NULL;
@@ -565,7 +564,7 @@ static HBITMAP GetBitmapHandle(const char *File)
 	HBITMAP hBitmap = NULL;
 	HRESULT result;
 
-	hFile=CreateFile(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+	hFile=CreateFileW(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
 	}
@@ -596,6 +595,15 @@ static HBITMAP GetBitmapHandle(const char *File)
 	hBitmap=(HBITMAP)(UINT_PTR)hOle;
 
 	return hBitmap;
+}
+
+static HBITMAP GetBitmapHandle(const char *File)
+{
+	HBITMAP hBmp;
+	wchar_t *FileW = ToWcharA(File);
+	hBmp = GetBitmapHandleW(FileW);
+	free(FileW);
+	return hBmp;
 }
 
 // 線形補完法により比較的鮮明にビットマップを拡大・縮小する。
