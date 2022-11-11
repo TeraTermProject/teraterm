@@ -85,18 +85,13 @@ sub get_file_paths {
 	}
 }
 
-sub check_html_file {
-	my($filename) = shift;
-	local(*FP);
+sub get_title {
+	my $filename = $_[0];
+	my $title = "";
 	my($line, $no, $val);
-
-	if ($filename !~ /.html$/) {
-		return;
-	}
 
 	open(FP, "<:crlf:encoding(sjis)", "$filename") || return;
 	$no = 1;
-	my $find_title = 0;
 	while ($line = <FP>) {
 #		$line = chomp($line);
 #		print "$line\n";
@@ -105,20 +100,35 @@ sub check_html_file {
 #			print "$line\n";
 			$val = $1;
 			$val =~ s/"/&#34;/g;  # 二重引用符をエスケープする
-			write_add_index($filename, $val);
-			$find_title = 1;
+			$title = $val;
 			last;
 		}
 
 		$no++;
 	}
-	if ($find_title == 0) {
+	close(FP);
+
+	return $title;
+}
+
+sub check_html_file {
+	my($filename) = shift;
+
+	if ($filename !~ /.html$/) {
+		return;
+	}
+	if ($filename =~ /#/) {
+		die "bad filename '$filename'";
+	}
+
+	my $title = &get_title($filename);
+	if ($title eq "") {
 		# タイトルがないhtmlのときファイル名をタイトルとする
 		$filename =~ /\/([^\/]+)\.html$/;
-		my $title = $1;
-		write_add_index($filename, $title);
+		$title = $1;
 	}
-	close(FP);
+
+	write_add_index($filename, $title);
 }
 
 sub write_add_index {
