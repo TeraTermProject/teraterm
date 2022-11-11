@@ -222,16 +222,15 @@ void CSequencePropPageDlg::OnInitDialog()
 		{ IDC_ACCEPT_MOUSE_EVENT_TRACKING, "DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING" },
 		{ IDC_DISABLE_MOUSE_TRACKING_CTRL, "DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL" },
 		{ IDC_ACCEPT_TITLE_CHANGING_LABEL, "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING" },
-
 		{ IDC_CURSOR_CTRL_SEQ, "DLG_TAB_SEQUENCE_CURSOR_CTRL" },
 		{ IDC_WINDOW_CTRL, "DLG_TAB_SEQUENCE_WINDOW_CTRL" },
 		{ IDC_WINDOW_REPORT, "DLG_TAB_SEQUENCE_WINDOW_REPORT" },
 		{ IDC_TITLE_REPORT_LABEL, "DLG_TAB_SEQUENCE_TITLE_REPORT" },
-
 		{ IDC_CLIPBOARD_ACCESS_LABEL, "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS" },
-
 		{ IDC_CLIPBOARD_NOTIFY, "DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY" },
 		{ IDC_ACCEPT_CLEAR_SBUFF, "DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF" },
+		{ IDC_DISABLE_PRINT_START, "DLG_TAB_SEQUENCE_PRINT_START" },
+		{ IDC_BEEP_LABEL, "DLG_TAB_SEQUENCE_BEEP_LABEL" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -299,6 +298,16 @@ void CSequencePropPageDlg::OnInitDialog()
 
 	// (10)IDC_ACCEPT_CLEAR_SBUFF
 	SetCheck(IDC_ACCEPT_CLEAR_SBUFF, (ts.TermFlag & TF_REMOTECLEARSBUFF) != 0);
+
+	SetCheck(IDC_DISABLE_PRINT_START, (ts.TermFlag & TF_PRINTERCTRL) == 0);
+
+	const static I18nTextInfo beep_type[] = {
+		{ "DLG_TAB_SEQUENCE_BEEP_DISABLE", L"disable" },		// IdBeepOff = 0
+		{ "DLG_TAB_SEQUENCE_BEEP_SOUND", L"sound" },			// IdBeepOn = 1
+		{ "DLG_TAB_SEQUENCE_BEEP_VISUALBELL", L"visualbell" },	// IdBeepVisual = 2
+	};
+	SetI18nListW("Tera Term", m_hWnd, IDC_BEEP_DROPDOWN, beep_type,
+				 _countof(beep_type), ts.UILanguageFileW, ts.Beep);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
@@ -387,6 +396,14 @@ void CSequencePropPageDlg::OnOK()
 	if (((ts.TermFlag & TF_REMOTECLEARSBUFF) != 0) != GetCheck(IDC_ACCEPT_CLEAR_SBUFF)) {
 		ts.TermFlag ^= TF_REMOTECLEARSBUFF;
 	}
+
+	if (GetCheck(IDC_DISABLE_PRINT_START) == 0) {
+		ts.TermFlag |= TF_PRINTERCTRL;
+	} else {
+		ts.TermFlag &= ~TF_PRINTERCTRL;
+	}
+
+	ts.Beep = GetCurSel(IDC_BEEP_DROPDOWN);
 }
 
 void CSequencePropPageDlg::OnHelp()
