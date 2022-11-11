@@ -1,4 +1,4 @@
-﻿#! /usr/bin/perl
+#! /usr/bin/perl
 
 #
 # HTMLヘルプのインデックスファイルを生成する
