@@ -1,7 +1,6 @@
-﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P SFMT.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64 -P SFMT.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P SFMT.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P SFMT.cmake
+﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildzlib.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildzlib.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P buildzlib.cmake
 
 ####
 if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL ""))
@@ -13,7 +12,7 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -DCMAKE_CONFIGURATION_TYPE=Release
 	  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
 	  -DARCHITECTURE=${ARCHITECTURE}
-	  -P SFMT.cmake
+	  -P buildzlib.cmake
 	  )
 	execute_process(
 	  COMMAND ${CMAKE_COMMAND}
@@ -21,7 +20,7 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -DCMAKE_CONFIGURATION_TYPE=Debug
 	  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
 	  -DARCHITECTURE=${ARCHITECTURE}
-	  -P SFMT.cmake
+	  -P buildzlib.cmake
 	  )
 	return()
   elseif(("$ENV{MSYSTEM}" MATCHES "MINGW") OR ("${CMAKE_COMMAND}" MATCHES "mingw"))
@@ -57,17 +56,16 @@ endif()
 
 include(script_support.cmake)
 
-set(SFMT_VERSION "1.5.1")
-set(SRC_DIR_BASE "SFMT-src-1.5.1")
-set(SRC_ARC "SFMT-1.5.1.zip")
-set(SRC_URL "http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
-set(SRC_ARC_HASH_SHA256 630d1dfa6b690c30472f75fa97ca90ba62f9c13c5add6c264fdac2c1d3a878f4)
+set(SRC_DIR_BASE "zlib-1.2.12")
+set(SRC_ARC "zlib-1.2.12.tar.xz")
+set(SRC_URL "https://zlib.net/zlib-1.2.12.tar.xz")
+set(SRC_ARC_HASH_SHA256 7db46b8d7726232a621befaab4a1c870f00a90805511c0e0090441dac57def18)
 
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/SFMT")
-set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/src")
-set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/src/${SRC_DIR_BASE}")
-set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/build_${TOOLSET}")
-set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/SFMT_${TOOLSET}")
+set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/zlib")
+set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src")
+set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src/${SRC_DIR_BASE}")
+set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/zlib/build_${TOOLSET}")
+set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/zlib_${TOOLSET}")
 if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32") OR ("${CMAKE_COMMAND}" MATCHES "mingw64"))
   set(BUILD_DIR "${BUILD_DIR}_x64")
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
@@ -75,11 +73,11 @@ endif()
 
 ########################################
 
-if(NOT EXISTS ${SRC_DIR}/README.txt)
+if(NOT EXISTS ${SRC_DIR}/README)
 
   file(DOWNLOAD
-	${SRC_URL}
-	${DOWN_DIR}/${SRC_ARC}
+    ${SRC_URL}
+    ${DOWN_DIR}/${SRC_ARC}
     EXPECTED_HASH SHA256=${SRC_ARC_HASH_SHA256}
     SHOW_PROGRESS
     )
@@ -92,51 +90,11 @@ if(NOT EXISTS ${SRC_DIR}/README.txt)
     )
 
   file(COPY
-    ${SRC_DIR}/LICENSE.txt
+    ${SRC_DIR}/README
     DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
   file(RENAME
-    ${CMAKE_CURRENT_LIST_DIR}/doc_help/LICENSE.txt
-    ${CMAKE_CURRENT_LIST_DIR}/doc_help/SFMT-LICENSE.txt)
-endif()
-
-########################################
-
-if(NOT EXISTS ${SRC_DIR}/SFMT_version_for_teraterm.h)
-  file(WRITE "${SRC_DIR}/SFMT_version_for_teraterm.h"
-    "// created by cmake\n"
-    "#pragma once\n"
-    "#ifndef SFMT_VERSION_H\n"
-    "#define SFMT_VERSION_H\n"
-    "#define SFMT_VERSION \"${SFMT_VERSION}\"\n"
-    "#endif"
-    )
-
-endif()
-if(NOT EXISTS ${SRC_DIR}/CMakeLists.txt)
-  file(WRITE "${SRC_DIR}/CMakeLists.txt"
-	"cmake_minimum_required(VERSION 2.4.4)\n"
-	"project(SFMT C)\n"
-	"\n"
-	"if(MSVC)\n"
-	"  set(CMAKE_DEBUG_POSTFIX \"d\")\n"
-	"endif()\n"
-	"\n"
-	"add_library(\n"
-	"  sfmt STATIC\n"
-	"  SFMT.c\n"
-	"  )\n"
-	"\n"
-	"install(\n"
-	"  TARGETS sfmt\n"
-	"  ARCHIVE DESTINATION \${CMAKE_INSTALL_PREFIX}/lib\n"
-	"  )\n"
-	"install(\n"
-	"  FILES\n"
-    "    SFMT.h SFMT-params.h SFMT-params19937.h\n"
-    "    SFMT_version_for_teraterm.h\n"
-	"  DESTINATION \${CMAKE_INSTALL_PREFIX}/include\n"
-	"  )\n"
-	)
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/README
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/zlib-LICENSE.txt)
 endif()
 
 ########################################
@@ -173,7 +131,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 
 else()
   ######################################## single configuration
-  
+
   execute_process(
 	COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${CMAKE_GENERATOR}
 	-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -185,7 +143,7 @@ else()
   if(NOT rv STREQUAL "0")
 	message(FATAL_ERROR "cmake build fail ${rv}")
   endif()
-  
+
   execute_process(
 	COMMAND ${CMAKE_COMMAND} --build . --target install
 	WORKING_DIRECTORY ${BUILD_DIR}

@@ -39,15 +39,15 @@ execute_process(
   )
 message("zlib")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P zlib.cmake
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildzlib.cmake
   )
 message("putty")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -P putty.cmake
+  COMMAND ${CMAKE_COMMAND} -P bulidputty.cmake
   )
 message("SFMT")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P SFMT.cmake
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildsfmt.cmake
   )
 if(BUILD_SSL_LIBRARY)
   if(BUILD_OPENSSL1)
@@ -65,11 +65,11 @@ if(BUILD_SSL_LIBRARY)
 endif(BUILD_SSL_LIBRARY)
 message("cJSON")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -P cJSON.cmake
+  COMMAND ${CMAKE_COMMAND} -P buildcjson.cmake
   )
 message("argon2")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -P argon2.cmake
+  COMMAND ${CMAKE_COMMAND} -P buildargon2.cmake
   )
 if(BUILD_SSL_LIBRARY)
   message("libressl")

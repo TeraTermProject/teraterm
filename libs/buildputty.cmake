@@ -1,4 +1,4 @@
-﻿# cmake -P putty.cmake
+﻿# cmake -P buildputty.cmake
 
 set(SRC_DIR_BASE "putty-0.76")
 set(SRC_ARC "putty-0.76.tar.gz")

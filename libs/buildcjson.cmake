@@ -1,4 +1,4 @@
-﻿# cmake -P cjson.cmake
+﻿# cmake -P buildcjson.cmake
 
 set(SRC_DIR_BASE "cJSON-1.7.14")
 set(SRC_ARC "v1.7.14.zip")

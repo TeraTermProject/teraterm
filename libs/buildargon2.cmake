@@ -1,4 +1,4 @@
-﻿# cmake -P argon2.cmake
+﻿# cmake -P buildargon2.cmake
 
 set(SRC_DIR_BASE "phc-winner-argon2-20190702")
 set(SRC_ARC "20190702.tar.gz")
