@@ -7,16 +7,10 @@
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "onig-6.9.8")
-set(SRC_ARC "${SRC_DIR_BASE}.tar.gz")
-set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.8/${SRC_ARC}")
-set(SRC_ARC_HASH_SHA256 28cd62c1464623c7910565fb1ccaaa0104b2fe8b12bcd646e81f73b47535213e)
-
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/oniguruma")
-set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src")
-set(SRC_DIR "${EXTRACT_DIR}/${SRC_DIR_BASE}")
-set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/oniguruma_${TOOLSET}")
-set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/build_${TOOLSET}")
+set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/oniguruma/src")
+set(SRC_DIR "${EXTRACT_DIR}/oniguruma")
+set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/oniguruma_${TOOLSET}")
+set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/oniguruma/build_${TOOLSET}")
 if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("${CMAKE_COMMAND}" MATCHES "mingw64"))
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
   set(BUILD_DIR "${BUILD_DIR}_x64")
@@ -29,7 +23,6 @@ endif()
 
 # Configure + Generate
 function(cmake_generate GENERATOR SRC_DIR WORKING_DIR OPTIONS)
-  message("${CMAKE_COMMAND} ${SRC_DIR} -G \"${GENERATOR}\" ${OPTIONS}")
   execute_process(
     COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G "${GENERATOR}" ${OPTIONS}
     WORKING_DIRECTORY "${BUILD_DIR}"
@@ -43,7 +36,6 @@ endfunction()
 
 # build + install
 function(cmake_build WORKING_DIR OPTIONS BUILD_TOOL_OPTIONS)
-  message("${CMAKE_COMMAND} --build . ${OPTIONS} --target install -- ${BUILD_TOOL_OPTIONS}")
   execute_process(
     COMMAND ${CMAKE_COMMAND} --build . ${OPTIONS} --target install -- ${BUILD_TOOL_OPTIONS}
     WORKING_DIRECTORY "${BUILD_DIR}"
@@ -57,26 +49,16 @@ endfunction()
 
 ########################################
 
-if(NOT EXISTS ${SRC_DIR}/README.md)
+file(MAKE_DIRECTORY ${SRC_DIR})
 
-  file(DOWNLOAD
-    ${SRC_URL}
-    ${DOWN_DIR}/${SRC_ARC}
-    EXPECTED_HASH SHA256=${SRC_ARC_HASH_SHA256}
-    SHOW_PROGRESS
-    )
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -DTARGET=oniguruma -DEXT_DIR=${EXTRACT_DIR} -P download.cmake
+)
 
-  file(MAKE_DIRECTORY ${EXTRACT_DIR})
-
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E tar "xvf" ${DOWN_DIR}/${SRC_ARC}
-    WORKING_DIRECTORY ${EXTRACT_DIR}
-    )
-
+if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/Oniguruma-LICENSE.txt)
   file(COPY
     ${SRC_DIR}/COPYING
-    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help
-    )
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
   file(RENAME
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/COPYING
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/Oniguruma-LICENSE.txt)

@@ -56,16 +56,10 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "zlib-1.2.12")
-set(SRC_ARC "zlib-1.2.12.tar.xz")
-set(SRC_URL "https://zlib.net/zlib-1.2.12.tar.xz")
-set(SRC_ARC_HASH_SHA256 7db46b8d7726232a621befaab4a1c870f00a90805511c0e0090441dac57def18)
-
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/zlib")
-set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src")
-set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src/${SRC_DIR_BASE}")
-set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/zlib/build_${TOOLSET}")
-set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/zlib_${TOOLSET}")
+set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/zlib/src")
+set(SRC_DIR "${EXTRACT_DIR}/zlib")
+set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/zlib/build_${TOOLSET}")
+set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/zlib_${TOOLSET}")
 if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32") OR ("${CMAKE_COMMAND}" MATCHES "mingw64"))
   set(BUILD_DIR "${BUILD_DIR}_x64")
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
@@ -73,22 +67,13 @@ endif()
 
 ########################################
 
-if(NOT EXISTS ${SRC_DIR}/README)
+file(MAKE_DIRECTORY ${SRC_DIR})
 
-  file(DOWNLOAD
-    ${SRC_URL}
-    ${DOWN_DIR}/${SRC_ARC}
-    EXPECTED_HASH SHA256=${SRC_ARC_HASH_SHA256}
-    SHOW_PROGRESS
-    )
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -DTARGET=zlib -DEXT_DIR=${EXTRACT_DIR} -P download.cmake
+)
 
-  file(MAKE_DIRECTORY ${EXTRACT_DIR})
-
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E tar "xvf" ${DOWN_DIR}/${SRC_ARC}
-    WORKING_DIRECTORY ${EXTRACT_DIR}
-    )
-
+if(${SRC_DIR}/README IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/zlib-LICENSE.txt)
   file(COPY
     ${SRC_DIR}/README
     DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)

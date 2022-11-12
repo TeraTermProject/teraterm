@@ -5,16 +5,10 @@
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "libressl-3.4.3")
-set(SRC_ARC "libressl-3.4.3.tar.gz")
-set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.4.3.tar.gz")
-set(SRC_ARC_HASH_SHA256 ff88bffe354818b3ccf545e3cafe454c5031c7a77217074f533271d63c37f08d)
-
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/libressl")
-set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/libressl/src")
-set(SRC_DIR "${EXTRACT_DIR}/${SRC_DIR_BASE}")
-set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/libressl_${TOOLSET}")
-set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/libressl/build_${TOOLSET}")
+set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/libressl/src")
+set(SRC_DIR "${EXTRACT_DIR}/libressl")
+set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/libressl/build_${TOOLSET}")
+set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/libressl_${TOOLSET}")
 if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("${CMAKE_COMMAND}" MATCHES "mingw64"))
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
   set(BUILD_DIR "${BUILD_DIR}_x64")
@@ -53,26 +47,16 @@ endfunction()
 
 ########################################
 
-if(NOT EXISTS ${SRC_DIR}/README.md)
+file(MAKE_DIRECTORY ${SRC_DIR})
 
-  file(DOWNLOAD
-    ${SRC_URL}
-    ${DOWN_DIR}/${SRC_ARC}
-    EXPECTED_HASH SHA256=${SRC_ARC_HASH_SHA256}
-    SHOW_PROGRESS
-    )
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -DTARGET=libressl -DEXT_DIR=${EXTRACT_DIR} -P download.cmake
+)
 
-  file(MAKE_DIRECTORY ${EXTRACT_DIR})
-
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E tar "xvf" ${DOWN_DIR}/${SRC_ARC}
-    WORKING_DIRECTORY ${EXTRACT_DIR}
-    )
-
+if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/LibreSSL-LICENSE.txt)
   file(COPY
     ${SRC_DIR}/COPYING
-    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help
-    )
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
   file(RENAME
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/COPYING
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/LibreSSL-LICENSE.txt)
