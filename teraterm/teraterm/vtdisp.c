@@ -160,9 +160,9 @@ static HDC hdcBG;
 
 typedef struct tagWallpaperInfo
 {
-  char filename[MAX_PATH];
-  int  pattern;
-}WallpaperInfo;
+	wchar_t *filename;
+	int  pattern;
+} WallpaperInfo;
 
 static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
@@ -178,7 +178,6 @@ typedef struct {
 } vtdisp_work_t;
 static vtdisp_work_t vtdisp_work;
 
-static HBITMAP GetBitmapHandle(const char *File);
 static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
@@ -492,59 +491,64 @@ static void BGPreloadPicture(BGSrc *src)
 
 static void BGGetWallpaperInfo(WallpaperInfo *wi)
 {
-  DWORD length;
-  int style;
-  int  tile;
-  char str[256];
-  HKEY hKey;
+	DWORD length;
+	int style;
+	int  tile;
+	char str[256];
+	HKEY hKey;
 
-  wi->pattern = BG_CENTER;
-  strncpy_s(wi->filename, sizeof(wi->filename),"", _TRUNCATE);
+	wi->pattern = BG_CENTER;
+	wi->filename = NULL;
 
-  //レジストリキーのオープン
-  if(RegOpenKeyEx(HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-    return;
+	//レジストリキーのオープン
+	if(RegOpenKeyExA(HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+		return;
 
-  //壁紙名ゲット
-  length = MAX_PATH;
-  RegQueryValueEx(hKey,"Wallpaper"     ,NULL,NULL,(BYTE*)(wi->filename),&length);
+	//壁紙ファイル名ゲット
+	hRegQueryValueExW(hKey, L"Wallpaper", NULL, NULL, &wi->filename, NULL);
 
-  //壁紙スタイルゲット
-  length = 256;
-  RegQueryValueEx(hKey,"WallpaperStyle",NULL,NULL,(BYTE*)str,&length);
-  style = atoi(str);
+	//壁紙スタイルゲット
+	length = sizeof(str);
+	RegQueryValueExA(hKey,"WallpaperStyle",NULL,NULL,(BYTE*)str,&length);
+	style = atoi(str);
 
-  //壁紙スタイルゲット
-  length = 256;
-  RegQueryValueEx(hKey,"TileWallpaper" ,NULL,NULL,(BYTE*)str,&length);
-  tile = atoi(str);
+	//壁紙スタイルゲット
+	length = sizeof(str);
+	RegQueryValueExA(hKey,"TileWallpaper" ,NULL,NULL,(BYTE*)str,&length);
+	tile = atoi(str);
 
-  //これでいいの？
-  if(tile)
-    wi->pattern = BG_TILE;
-  else {
-    switch (style) {
-    case 0: // Center(中央に表示)
-      wi->pattern = BG_CENTER;
-      break;
-    case 2: // Stretch(画面に合わせて伸縮) アスペクト比は無視される
-      wi->pattern = BG_STRETCH;
-      break;
-    case 10: // Fill(ページ横幅に合わせる) とあるが、和訳がおかしい
-             // アスペクト比を維持して、はみ出してでも最大表示する
-      wi->pattern = BG_AUTOFILL;
-      break;
-    case 6: // Fit(ページ縦幅に合わせる) とあるが、和訳がおかしい
-      // アスペクト比を維持して、はみ出さないように最大表示する
-      wi->pattern = BG_AUTOFIT;
-      break;
-    }
-  }
+	//レジストリキーのクローズ
+	RegCloseKey(hKey);
 
-  //レジストリキーのクローズ
-  RegCloseKey(hKey);
+	//これでいいの？
+	if(tile)
+		wi->pattern = BG_TILE;
+	else {
+		switch (style) {
+		case 0: // Center(中央に表示)
+			wi->pattern = BG_CENTER;
+			break;
+		case 2: // Stretch(画面に合わせて伸縮) アスペクト比は無視される
+			wi->pattern = BG_STRETCH;
+			break;
+		case 10: // Fill(ページ横幅に合わせる) とあるが、和訳がおかしい
+			// アスペクト比を維持して、はみ出してでも最大表示する
+			wi->pattern = BG_AUTOFILL;
+			break;
+		case 6: // Fit(ページ縦幅に合わせる) とあるが、和訳がおかしい
+			// アスペクト比を維持して、はみ出さないように最大表示する
+			wi->pattern = BG_AUTOFIT;
+			break;
+		}
+	}
 }
 
+/**
+ *	OleLoadPicture() を使った画像読み込み
+ * 	jpeg, bmp を読み込むことができる
+ *	(Windowsによっては他の形式も読めるかもしれない)
+ *
+ */
 // .bmp以外の画像ファイルを読む。
 // 壁紙が .bmp 以外のファイルになっていた場合への対処。
 // この関数は Windows 2000 未満の場合には呼んではいけない
@@ -725,19 +729,19 @@ static void BGPreloadWallpaper(BGSrc *src)
 		//壁紙を読み込み
 		//LR_CREATEDIBSECTION を指定するのがコツ
 		if (wi.pattern == BG_STRETCH) {
-			hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			hbm = LoadImageW(0, wi.filename, IMAGE_BITMAP, CRTWidth, CRTHeight, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		}
 		else {
-			hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+			hbm = LoadImageW(0, wi.filename, IMAGE_BITMAP,         0,        0, LR_LOADFROMFILE);
 		}
 	}
 	else {
 		BITMAP bm;
 		float ratio;
 
-		hbm = GetBitmapHandle(wi.filename);
+		hbm = GetBitmapHandleW(wi.filename);
 		if (hbm == NULL) {
-			goto createdc;
+			goto load_finish;
 		}
 
 		GetObject(hbm,sizeof(bm),&bm);
@@ -786,9 +790,10 @@ static void BGPreloadWallpaper(BGSrc *src)
 			wi.pattern = BG_STRETCH;
 		}
 	}
+load_finish:
+	free(wi.filename);
 
 	//壁紙DCを作る
-createdc:
 	if(hbm)
 	{
 		BITMAP bm;

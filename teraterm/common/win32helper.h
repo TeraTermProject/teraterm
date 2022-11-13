@@ -41,6 +41,8 @@ DWORD hGetCurrentDirectoryW(wchar_t **dir);
 DWORD hGetWindowTextW(HWND hWnd, wchar_t **text);
 DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text);
 DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded);
+LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
+						  LPDWORD lpcbData);
 
 #ifdef __cplusplus
 }

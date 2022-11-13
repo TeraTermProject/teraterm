@@ -3,35 +3,36 @@
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<TITLE>look and feelの変更</TITLE>
+<TITLE>look and feel の変更</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </HEAD>
 <BODY>
 
-<h1>look and feelの変更</h1>
+<h1>look and feel の変更</h1>
 
 <p>
-半透明ウィンドウ、テーマを使用してTera Termのlook and feelを変更できます。半透明ウィンドウとテーマは同時に設定することができます。
+半透明ウィンドウ、テーマを使用してTera Term の look and feelを変更できます。半透明ウィンドウとテーマは同時に設定することができます。
 </p>
 
 <ul>
-  <li><a href="#transparent">半透明ウィンドウ</a></li>
-  <li><a href="#theme">テーマ</a></li>
+  <li><a href="#transparent">(1) 半透明ウィンドウ</a></li>
+  <li><a href="#theme">(2) テーマ</a></li>
   <ul>
-    <li><a href="#theme/bg">テーマ/BG</a></li>
+    <li><a href="#theme/bg">(2)-1 テーマ/BG</a></li>
     <ul>
-      <li><a href="#theme/bg/desktop">デスクトップ画像の貼り付け</a></li>
-      <li><a href="#theme/bg/image">背景画像の貼り付け</a></li>
+      <li><a href="#theme/bg/desktop">デスクトップ画像を使用する</a></li>
+      <li><a href="#theme/bg/image">背景画像を使用する</a></li>
+      <li><a href="#theme/bg/image+desktop">背景画像とデスクトップ画像を使用する</a></li>
     </ul>
-    <li><a href="#theme/color">テーマ/Color</a></li>
+    <li><a href="#theme/color">(2)-2 テーマ/Color</a></li>
   </ul>
 </ul>
 
-<h2 id="transparent">半透明ウィンドウ</h2>
+<h2 id="transparent">(1) 半透明ウィンドウ</h2>
 
 <p>
-この機能を使うと、Tera Termのウィンドウを半透明にすることができます。Windows2000以降で有効です。<br>
+この機能を使うと、Tera Term のウィンドウを半透明にすることができます。Windows2000以降で有効です。<br>
 設定は、<a href="../menu/setup-additional-visual.html#AlphaBlendActive">[Setup] Additional settings の Visual タブ</a>で行えます。<br>
 透明度は0～255の範囲で指定することができ、値を小さくするほど透明度は強くなります。
 デフォルトは255（不透明）です。
@@ -44,7 +45,7 @@
 
 <img src="image/screen0.png" width=598 height=488></img>
 
-<h2 id="theme">テーマ</h2>
+<h2 id="theme">(2) テーマ</h2>
 
 <p>
 Tera Termの背景の画像、文字の色を一括して変更するテーマを使用することができます。
@@ -53,30 +54,39 @@ Tera Termの背景の画像、文字の色を一括して変更するテーマを使用することができます�
 <a href="../menu/setup-additional-visual.html#theme">[Setup] Additional settings の Visual タブ</a>で、起動時に読み込むテーマファイルを指定します。またテーマの設定は、Theme Editorボタンを押すと表示される設定ダイアログで行えます。
 </p>
 
-<h3 id="theme/bg">テーマ/BG(背景)</h3>
+<h3 id="theme/bg">(2)-1 テーマ/BG(背景)</h3>
 
 <p>
 Tera Term の背景に、デスクトップ画像(Windowsの背景画像)や指定画像を表示することができます。デスクトップ画像と指定画像をブレンドして表示することもできます。
 </p>
 
-<h4 id="theme/bg/desktop">デスクトップ画像の貼り付け</h4>
+<h4 id="theme/bg/desktop">デスクトップ画像を使用する</h4>
 <p>
 この機能を使うと、Tera Termの背景にデスクトップ画像が表示されます。<br>
 </p>
 
-<img src="image/screen1.png" width=598 height=488></img>
+<img src="image/screen1.png" />
 
 
-<h4 id="theme/bg/image">背景画像の貼り付け</h4>
+<h4 id="theme/bg/image">背景画像を使用する</h4>
 
 <p>
 画像を指定することができます。
 </p>
 
-<img src="image/screen3.png" width=598 height=423></img>
+<img src="image/screen3.png" />
 
 
-<h3 id="theme/color">テーマ/Color(文字色)</h3>
+<h4 id="theme/bg/image+desktop">背景画像とデスクトップ画像を使用する</h4>
+
+<p>
+画像ファイルとWindows の背景画像（壁紙）が混合して表示されます。
+</p>
+
+<img src="image/screen2.png" />
+
+
+<h3 id="theme/color">(2)-2 テーマ/Color(文字色)</h3>
 
 文字の色を一括して変更するカラーテーマを使用することができます。
 

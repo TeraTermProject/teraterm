@@ -278,3 +278,33 @@ DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded)
 	*expanded = dest;
 	return NO_ERROR;
 }
+
+/**
+ *	RegQueryValueExW の動的バッファ版
+ *
+ *	lpData が malloc() を使って確保される
+ *	不要になったら free() すること
+ */
+LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
+						  LPDWORD lpcbData)
+{
+	DWORD len;
+	LSTATUS r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
+	if (r != ERROR_SUCCESS) {
+		*lpData = NULL;
+		goto finish;
+	}
+	void *p = malloc(len);
+	r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
+	if (r != ERROR_SUCCESS) {
+		free(p);
+		*lpData = NULL;
+		goto finish;
+	}
+	*lpData = p;
+finish:
+	if (lpcbData != NULL) {
+		*lpcbData = len;
+	}
+	return r;
+}
