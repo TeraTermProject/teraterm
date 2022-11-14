@@ -124,16 +124,16 @@ static int SRegionBottom;
 
 typedef struct _BGSrc
 {
-  HDC        hdc;
-  BG_TYPE    type;
-  BG_PATTERN pattern;
-  BOOL       antiAlias;
-  COLORREF   color;
-  BYTE       alpha;
-  int        width;
-  int        height;
-  char       file[MAX_PATH];
-}BGSrc;
+	HDC        hdc;
+	BG_TYPE    type;
+	BG_PATTERN pattern;
+	BOOL       antiAlias;
+	COLORREF   color;
+	BYTE       alpha;
+	int        width;
+	int        height;
+	wchar_t    fileW[MAX_PATH];
+} BGSrc;
 
 static BGSrc BGDest;
 static BGSrc BGSrc1;
@@ -438,7 +438,7 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 static void BGPreloadPicture(BGSrc *src)
 {
 	HBITMAP hbm = NULL;
-	wchar_t *load_file = ToWcharA(src->file);
+	const wchar_t *load_file = src->fileW;
 	const wchar_t *spi_path = ts.EtermLookfeel.BGSPIPathW;
 
 	// Susie plugin ‚Å“Ç‚İ‚İ
@@ -485,8 +485,6 @@ static void BGPreloadPicture(BGSrc *src)
 	}else{
 		src->type = BG_COLOR;
 	}
-
-	free(load_file);
 }
 
 static void BGGetWallpaperInfo(WallpaperInfo *wi)
@@ -599,15 +597,6 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	hBitmap=(HBITMAP)(UINT_PTR)hOle;
 
 	return hBitmap;
-}
-
-static HBITMAP GetBitmapHandle(const char *File)
-{
-	HBITMAP hBmp;
-	wchar_t *FileW = ToWcharA(File);
-	hBmp = GetBitmapHandleW(FileW);
-	free(FileW);
-	return hBmp;
 }
 
 // üŒ`•âŠ®–@‚É‚æ‚è”äŠr“I‘N–¾‚Éƒrƒbƒgƒ}ƒbƒv‚ğŠg‘åEk¬‚·‚éB
@@ -835,6 +824,7 @@ static void BGPreloadSrc(BGSrc *src)
 
 static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
 {
+	const wchar_t *filename = src->fileW;
 	if(!hdcDest || !src)
 		return;
 
@@ -845,10 +835,10 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 			HBITMAP hbm;
 
 			if (IsLoadImageOnlyEnabled()) {
-				hbm = LoadImage(0,src->file,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
+				hbm = LoadImageW(0,filename,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
 			} else {
 				HBITMAP newhbm;
-				hbm = GetBitmapHandle(src->file);
+				hbm = GetBitmapHandleW(filename);
 				newhbm = CreateStretched32BppBitmapBilinear(hbm, width, height);
 				DeleteObject(hbm);
 				hbm = newhbm;
@@ -1215,7 +1205,7 @@ static void DecideBGEnable(void)
 	vtdisp_work_t *w = &vtdisp_work;
 
 	// ”wŒi‰æ‘œƒ`ƒFƒbƒN
-	if (BGDest.file[0] == 0) {
+	if (BGDest.fileW == NULL || BGDest.fileW[0] == 0) {
 		// ”wŒi‰æ‘œ‚Íg—p‚µ‚È‚¢
 		BGDest.type = BG_NONE;
 	}
@@ -3823,7 +3813,7 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
  */
 void ThemeSetBG(const BGTheme *bg_theme)
 {
-	WideCharToACP_t(bg_theme->BGDest.file, BGDest.file, _countof(BGDest.file));
+	wcscpy_s(BGDest.fileW, _countof(bg_theme->BGDest.file), bg_theme->BGDest.file);
 	BGDest.type = bg_theme->BGDest.type;
 	BGDest.color = bg_theme->BGDest.color;
 	BGDest.pattern = bg_theme->BGDest.pattern;
@@ -3847,7 +3837,7 @@ void ThemeSetBG(const BGTheme *bg_theme)
 
 void ThemeGetBG(BGTheme *bg_theme)
 {
-	ACPToWideChar_t(BGDest.file, bg_theme->BGDest.file, _countof(bg_theme->BGDest.file));
+	wcscpy_s(bg_theme->BGDest.file, _countof(bg_theme->BGDest.file), BGDest.fileW);
 	bg_theme->BGDest.type = BG_PICTURE;
 	bg_theme->BGDest.color = BGDest.color;
 	bg_theme->BGDest.pattern = BGDest.pattern;
