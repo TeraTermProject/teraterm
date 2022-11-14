@@ -294,7 +294,7 @@ LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LP
 		*lpData = NULL;
 		goto finish;
 	}
-	void *p = malloc(len);
+	BYTE *p = (BYTE *)malloc(len);
 	r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
 	if (r != ERROR_SUCCESS) {
 		free(p);
