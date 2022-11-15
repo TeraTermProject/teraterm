@@ -43,7 +43,7 @@ execute_process(
   )
 message("putty")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -P bulidputty.cmake
+  COMMAND ${CMAKE_COMMAND} -P buildputty.cmake
   )
 message("SFMT")
 execute_process(
