@@ -39,6 +39,8 @@ typedef struct tagTipWinData TipWin2;
 TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg);
 void TipWin2Destroy(TipWin2 *tWin);
 void TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text);
+void TipWin2Delete(TipWin2 *tWin, int id);
+void TipWin2Activate(TipWin2 *tWin, BOOL active);
 
 #ifdef __cplusplus
 }

@@ -31,6 +31,10 @@
  */
 #include <windows.h>
 #include <commctrl.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <assert.h>
 
 #include "tipwin2.h"
 
@@ -70,16 +74,21 @@ TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
 
 void TipWin2Destroy(TipWin2 *tWin)
 {
+	if (tWin == NULL) {
+		assert(FALSE);
+		return;
+	}
 	DestroyWindow(tWin->hTip);
 	tWin->hTip = NULL;
 	free(tWin);
 }
 
 /**
- * @brief ツールチップを登録する
- * @param tWin
- * @param id ダイアログのコントロールID
- * @param text ツールチップ
+ * @brief	ツールチップを登録する
+ * @param	tWin
+ * @param	id ダイアログのコントロールID
+ * @param	text ツールチップ
+ *			NULLのとき登録削除
  */
 void TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text)
 {
@@ -90,4 +99,33 @@ void TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text)
 	toolInfo.uId = (UINT_PTR)GetDlgItem(tWin->hDlg, id);
 	toolInfo.lpszText = (LPWSTR)text;	// text は SendMessage() 時に存在すれば良い
 	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
+}
+
+/**
+ * @brief ツールチップを削除する
+ * @param tWin
+ * @param id ダイアログのコントロールID
+ *
+ *	削除できないことがある?
+ *	TipWin2SetTextW() の text = NULL を使用したほうがよさそう
+ */
+void TipWin2Delete(TipWin2 *tWin, int id)
+{
+	TOOLINFOW toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = tWin->hDlg;
+	toolInfo.uFlags = TTF_IDISHWND;
+	toolInfo.uId = (UINT_PTR)GetDlgItem(tWin->hDlg, id);
+	PostMessageW(tWin->hTip, TTM_DELTOOLW, 0, (LPARAM)&toolInfo);
+}
+
+/**
+ * @brief ツールチップを有効/無効化する
+ * @param tWin
+ *
+ *	特定のコントロールに設定することはできない
+ */
+void TipWin2Activate(TipWin2 *tWin, BOOL active)
+{
+	PostMessageW(tWin->hTip, TTM_ACTIVATE ,active, 0);
 }
