@@ -420,6 +420,7 @@ static wchar_t *GetTTXSSHKwnownHostFile(const SetupList *list, const TTTSet *)
 	if (list->data_ptr != 0) {
 		wchar_t *virtual_store_path;
 		BOOL ret = convertVirtualStoreW(temp, &virtual_store_path);
+		free(temp);
 		if (ret) {
 			return virtual_store_path;
 		} else {
@@ -614,15 +615,19 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 		return FALSE;
 	}
-	case WM_CLOSE:
+
+	case WM_DESTROY:
 		TipWin2Destroy(dlg_data->tipwin);
 		dlg_data->tipwin = NULL;
-		TTEndDialog(hDlgWnd, 0);
 		return TRUE;
 
 	case WM_NOTIFY: {
 		NMHDR *nmhdr = (NMHDR *)lp;
-		if (nmhdr->idFrom == IDC_SETUP_DIR_LIST) {
+		if (nmhdr->code == TTN_POP) {
+			// 1‰ñ‚¾‚¯•\Ž¦‚·‚é‚½‚ßA•Â‚¶‚½‚çíœ‚·‚é
+			TipWin2SetTextW(dlg_data->tipwin, IDC_SETUP_DIR_LIST, NULL);
+		}
+		else if (nmhdr->idFrom == IDC_SETUP_DIR_LIST) {
 			NMLISTVIEW *nmlist = (NMLISTVIEW *)lp;
 			switch (nmlist->hdr.code) {
 //			case NM_CLICK:
