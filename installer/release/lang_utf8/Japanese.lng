@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-11-11)
+﻿; Updated by TeraTerm Project (2022-11-20)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -555,6 +555,7 @@ BTN_OK=OK
 BTN_CANCEL=キャンセル
 BTN_CLOSE=閉じる(&C)
 BTN_HELP=ヘルプ(&H)
+BTN_DEFAULT=デフォルト
 
 ; help
 HELPFILE=teratermj.chm
@@ -570,6 +571,8 @@ DLG_SENDFILE_TERATERM4_TOOLTIP=Tera Term 4の場合\n・ファイルから読み
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=プレビュー/ファイル
+DLG_THEME_PREVIEW_FILE_LOAD=読み込み
+DLG_THEME_PREVIEW_FILE_SAVE=保存
 
 DLG_THEME_BG_TITLE=背景画像
 DLG_THEME_BG_IMAGEFILE=背景画像ファイル

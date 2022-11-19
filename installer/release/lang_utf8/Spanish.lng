@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-11-11)
+﻿; Updated by TeraTerm Project (2022-11-20)
 ; Traducido por Filiberto Olguin Ascona.
 
 [Tera Term]
@@ -422,7 +422,7 @@ DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appeara
 DLG_WINLIST_TITLE=Tera Term: Window list
 DLG_WINLIST_LABEL=&Window:
 DLG_WINLIST_OPEN=&Open
-DLG_WINLSIT_CLOSEWIN=&Close window
+DLG_WINLIST_CLOSEWIN=&Close window
 
 MSG_FIND_DIR_ERROR=Cannot find directory
 
@@ -512,6 +512,7 @@ BTN_OK=OK
 BTN_CANCEL=Cancel
 BTN_CLOSE=Close
 BTN_HELP=&Help
+BTN_DEFAULT=Default
 
 ; help
 HELPFILE=teraterm.chm
@@ -524,9 +525,16 @@ MSG_INI_WRITE_ERROR=Cannot write ini file.
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=preview/file
+DLG_THEME_PREVIEW_FILE_LOAD=Load
+DLG_THEME_PREVIEW_FILE_SAVE=Save
 
 DLG_THEME_BG_TITLE=background image
-DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE=reverse text bg alpha
+DLG_THEME_BG_IMAGEFILE=background image file
+
+DLG_THEME_BG_ALPHA_TITLE=background image alpha
+DLG_THEME_BG_ALPHA_TEXT_BACK_ALPHA_TITLE=Normal back alpha(Opaque right direction):
+DLG_THEME_BG_ALPHA_REVERSE_TEXT_BACK_ALPHA_TITLE=Reverse back alpha:
+DLG_THEME_BG_ALPHA_OTHER_BACK_TITLE=Other back alpha:
 
 DLG_THEME_COLOR_TITLE=text color
 

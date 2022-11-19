@@ -68,28 +68,24 @@ typedef struct {
 	HINSTANCE hInst;
 	TComVar *pcv;
 	TTTSet *pts;
-	DLGTEMPLATE *dlg_templ;
-	TipWin2 *tipwin;
 	HWND hVTWin;
 	// file tab
 	struct {
-		DLGTEMPLATE *dlg_templ;
+		int dummy;
 	} FileTab;
 	// bg theme tab
-	BGTheme bg_theme;
 	struct {
-		DLGTEMPLATE *dlg_templ;
-		TipWin2 *tipwin;
 		BGTheme bg_theme;
 	} BGTab;
 	// color theme tab
 	struct {
+		TipWin2 *tipwin;
 		TColorTheme color_theme;
-	} color_tab;
+	} ColorTab;
 	struct {
 		BGTheme bg_theme;
 		TColorTheme color_theme;
-	} backup;
+	} Backup;
 } ThemeDlgData;
 
 static void SetWindowTextColor(HWND hWnd, COLORREF color)
@@ -229,7 +225,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_SETITEMDATA, index, st->id);
 			}
 
-			ResetControls(hWnd, &dlg_data->bg_theme);
+			ResetControls(hWnd, &dlg_data->BGTab.bg_theme);
 			return TRUE;
 			break;
 		}
@@ -276,11 +272,11 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
 				break;
 			case PSN_KILLACTIVE: {
-				ReadFromDialog(hWnd, &dlg_data->bg_theme);
+				ReadFromDialog(hWnd, &dlg_data->BGTab.bg_theme);
 				break;
 			}
 			case PSN_SETACTIVE: {
-				ResetControls(hWnd, &dlg_data->bg_theme);
+				ResetControls(hWnd, &dlg_data->BGTab.bg_theme);
 				break;
 			}
 			default:
@@ -467,14 +463,20 @@ static void SetColorListCtrl(HWND hWnd)
 static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{0, "DLG_GEN_TITLE"},
+		{IDC_COLOR_DEFAULT_BUTTON, "BTN_DEFAULT"},
 	};
 	ThemeDlgData *dlg_data = (ThemeDlgData *)GetWindowLongPtr(hWnd, DWLP_USER);
+	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
 
 	switch (msg) {
 	case WM_INITDIALOG: {
 		dlg_data = (ThemeDlgData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
+		ts = dlg_data->pts;
 		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
+		SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
+
+		dlg_data->ColorTab.tipwin = TipWin2Create(NULL, hWnd);
+		TipWin2SetTextW(dlg_data->ColorTab.tipwin, IDC_COLOR_LIST, L"Double click to open color picker");
 
 		{
 			HWND hWndList = GetDlgItem(hWnd, IDC_COLOR_LIST);
@@ -501,7 +503,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 			SendMessage(hWndList, LVM_INSERTCOLUMNA, 3, (LPARAM)&lvcol);
 		}
 
-		SetColor(&dlg_data->color_tab.color_theme);
+		SetColor(&dlg_data->ColorTab.color_theme);
 		SetColorListCtrl(hWnd);
 		break;
 	}
@@ -509,8 +511,8 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 		switch (wp) {
 		case IDC_COLOR_DEFAULT_BUTTON | (BN_CLICKED << 16): {
 			// デフォルト
-			ThemeGetColorDefault(&dlg_data->color_tab.color_theme);
-			SetColor(&dlg_data->color_tab.color_theme);
+			ThemeGetColorDefault(&dlg_data->ColorTab.color_theme);
+			SetColor(&dlg_data->ColorTab.color_theme);
 			SetColorListCtrl(hWnd);
 			break;
 		}
@@ -600,19 +602,28 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
 			break;
 		case PSN_KILLACTIVE: {
-			RestoreColor(&dlg_data->color_tab.color_theme);
+			RestoreColor(&dlg_data->ColorTab.color_theme);
 			break;
 		}
 		case PSN_SETACTIVE: {
-			SetColor(&dlg_data->color_tab.color_theme);
+			SetColor(&dlg_data->ColorTab.color_theme);
 			SetColorListCtrl(hWnd);
 			break;
 		}
+		case TTN_POP:
+			// 1回だけ表示するため、閉じたら削除する
+			TipWin2SetTextW(dlg_data->ColorTab.tipwin, IDC_COLOR_LIST, NULL);
+			break;
 		default:
 			break;
 		}
 		break;
 	}
+	case WM_DESTROY:
+		TipWin2Destroy(dlg_data->ColorTab.tipwin);
+		dlg_data->ColorTab.tipwin = NULL;
+		break;
+
 	default:
 		return FALSE;
 	}
@@ -671,7 +682,8 @@ static HPROPSHEETPAGE ColorThemeEditorCreate(ThemeDlgData *dlg_data)
 static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{0, "DLG_GEN_TITLE"},
+		{ IDC_FILE_LOAD_BUTTON, "DLG_THEME_PREVIEW_FILE_LOAD" },
+		{ IDC_FILE_SAVE_BUTTON, "DLG_THEME_PREVIEW_FILE_SAVE" },
 	};
 	ThemeDlgData *dlg_data = (ThemeDlgData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
@@ -681,20 +693,8 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		dlg_data = (ThemeDlgData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 		ts = dlg_data->pts;
 		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
+		SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
-		dlg_data->tipwin = TipWin2Create(NULL, hWnd);
-#if 0
-		TipWin2SetTextW(dlg_data->tipwin, IDC_BUTTON1,
-						L"テーマフィアルを読み込む\n"
-			);
-		TipWin2SetTextW(dlg_data->tipwin, IDC_BUTTON3,
-						L"現在のダイアログの状態を設定してテーマファイルに書き込む\n"
-			);
-		TipWin2SetTextW(dlg_data->tipwin, IDC_BUTTON4,
-						L"現在のダイアログの状態を設定する\n"
-						L"このページの設定は書き出さないと失われる\n"
-			);
-#endif
 		EnableWindow(GetDlgItem(hWnd, IDC_FILE_SAVE_BUTTON), FALSE);
 		return TRUE;
 		break;
@@ -704,8 +704,10 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		switch (nmhdr->code) {
 		case PSN_APPLY: {
 			// OK
+#if 0
 			TipWin2Destroy(dlg_data->tipwin);
 			dlg_data->tipwin = NULL;
+#endif
 			break;
 		}
 		case PSN_HELP:
@@ -720,16 +722,16 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		switch (wp) {
 		case IDC_FILE_UNDO_BUTTON | (BN_CLICKED << 16): {
 			// undo,元に戻す
-			dlg_data->bg_theme = dlg_data->backup.bg_theme;
-			dlg_data->color_tab.color_theme = dlg_data->backup.color_theme;
+			dlg_data->BGTab.bg_theme = dlg_data->Backup.bg_theme;
+			dlg_data->ColorTab.color_theme = dlg_data->Backup.color_theme;
 			goto set;
 			break;
 		}
 		case IDC_FILE_PREVIEW_BUTTON | (BN_CLICKED << 16): {
 			set:
 			// preview
-			ThemeSetBG(&dlg_data->bg_theme);
-			ThemeSetColor(&dlg_data->color_tab.color_theme);
+			ThemeSetBG(&dlg_data->BGTab.bg_theme);
+			ThemeSetColor(&dlg_data->ColorTab.color_theme);
 			BGSetupPrimary(TRUE);
 			InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 			break;
@@ -758,7 +760,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			ofn.lpstrTitle = L"select theme file";
 
 			if (GetOpenFileNameW(&ofn)) {
-				ThemeLoad(theme_file, &dlg_data->bg_theme, &dlg_data->color_tab.color_theme);
+				ThemeLoad(theme_file, &dlg_data->BGTab.bg_theme, &dlg_data->ColorTab.color_theme);
 
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
@@ -767,9 +769,8 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					MB_YESNO | MB_ICONWARNING
 				};
 				if (TTMessageBoxW(hWnd, &info, ts->UILanguageFileW) == IDYES) {
-					ThemeSetColor(&dlg_data->color_tab.color_theme);
-					ThemeSetBG(&dlg_data->bg_theme);
-					//SetColor(&dlg_data->color_tab.color_theme);
+					ThemeSetColor(&dlg_data->ColorTab.color_theme);
+					ThemeSetBG(&dlg_data->BGTab.bg_theme);
 
 					BGSetupPrimary(TRUE);
 					InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
@@ -800,11 +801,11 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			if (GetSaveFileNameW(&ofn)) {
 				LRESULT checked = SendDlgItemMessageA(hWnd, IDC_FILE_SAVE_BG_CHECK, BM_GETCHECK, 0, 0);
 				if (checked & BST_CHECKED) {
-					ThemeSaveBG(&dlg_data->bg_theme, theme_file);
+					ThemeSaveBG(&dlg_data->BGTab.bg_theme, theme_file);
 				}
 				checked = SendDlgItemMessageA(hWnd, IDC_FILE_SAVE_COLOR_CHECK, BM_GETCHECK, 0, 0);
 				if (checked & BST_CHECKED) {
-					ThemeSaveColor(&dlg_data->color_tab.color_theme, theme_file);
+					ThemeSaveColor(&dlg_data->ColorTab.color_theme, theme_file);
 				}
 			}
 			break;
@@ -910,14 +911,14 @@ static INT_PTR CALLBACK BGAlphaProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
 			break;
 		case PSN_KILLACTIVE: {
-			BGTheme* bg_theme = &dlg_data->bg_theme;
+			BGTheme *bg_theme = &dlg_data->BGTab.bg_theme;
 			bg_theme->BGReverseTextAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 			bg_theme->TextBackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 			bg_theme->BackAlpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 			break;
 		}
 		case PSN_SETACTIVE: {
-			BGTheme* bg_theme = &dlg_data->bg_theme;
+			BGTheme *bg_theme = &dlg_data->BGTab.bg_theme;
 			SendDlgItemMessageA(hWnd, IDC_REVERSE_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGReverseTextAlpha);
 			SendDlgItemMessageA(hWnd, IDC_TEXT_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->TextBackAlpha);
 			SendDlgItemMessageA(hWnd, IDC_BACK_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BackAlpha);
@@ -959,7 +960,7 @@ static HPROPSHEETPAGE BGAlphaCreate(ThemeDlgData *dlg_data)
 
 	wchar_t *title;
 	GetI18nStrWW("Tera Term", "DLG_THEME_BG_ALPHA_TITLE",
-				 L"bg alpha", dlg_data->pts->UILanguageFileW, &title);
+				 L"background image alpha", dlg_data->pts->UILanguageFileW, &title);
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -1017,24 +1018,24 @@ void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 	dlg_data->pcv = pcv;
 	dlg_data->pts = pcv->ts;
 	dlg_data->hVTWin = pcv->HWin;
-	ThemeGetBG(&dlg_data->bg_theme);
-	dlg_data->backup.bg_theme = dlg_data->bg_theme;
-	ThemeGetColor(&dlg_data->color_tab.color_theme);
-	dlg_data->backup.color_theme = dlg_data->color_tab.color_theme;
+	ThemeGetBG(&dlg_data->BGTab.bg_theme);
+	dlg_data->Backup.bg_theme = dlg_data->BGTab.bg_theme;
+	ThemeGetColor(&dlg_data->ColorTab.color_theme);
+	dlg_data->Backup.color_theme = dlg_data->ColorTab.color_theme;
 
 	CThemeDlg dlg(hInst, hWnd, dlg_data);
 	INT_PTR r = dlg.DoModal();
 	if (r == 0) {
 		// cancel時、バックアップ内容に戻す
-		ThemeSetBG(&dlg_data->backup.bg_theme);
-		ThemeSetColor(&dlg_data->color_tab.color_theme);
+		ThemeSetBG(&dlg_data->Backup.bg_theme);
+		ThemeSetColor(&dlg_data->Backup.color_theme);
 		BGSetupPrimary(TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}
 	else if (r >= 1) {
 		// okなど(Changes were saved by the user)
-		ThemeSetBG(&dlg_data->bg_theme);
-		ThemeSetColor(&dlg_data->color_tab.color_theme);
+		ThemeSetBG(&dlg_data->BGTab.bg_theme);
+		ThemeSetColor(&dlg_data->ColorTab.color_theme);
 		BGSetupPrimary(TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}

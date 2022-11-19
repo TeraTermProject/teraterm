@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-11-11)
+﻿; Updated by TeraTerm Project (2022-11-20)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -556,6 +556,7 @@ BTN_OK=确定
 BTN_CANCEL=取消
 BTN_CLOSE=关闭
 BTN_HELP=帮助
+BTN_DEFAULT=Default
 
 ; help
 HELPFILE=teratermj.chm
@@ -568,9 +569,16 @@ MSG_INI_WRITE_ERROR=无法写入 ini 文件
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=preview/file
+DLG_THEME_PREVIEW_FILE_LOAD=Load
+DLG_THEME_PREVIEW_FILE_SAVE=Save
 
 DLG_THEME_BG_TITLE=background image
-DLG_THEME_BG_REVERSE_TEXT_BG_ALPHA_TITLE=reverse text bg alpha
+DLG_THEME_BG_IMAGEFILE=background image file
+
+DLG_THEME_BG_ALPHA_TITLE=background image alpha
+DLG_THEME_BG_ALPHA_TEXT_BACK_ALPHA_TITLE=Normal back alpha(Opaque right direction):
+DLG_THEME_BG_ALPHA_REVERSE_TEXT_BACK_ALPHA_TITLE=Reverse back alpha:
+DLG_THEME_BG_ALPHA_OTHER_BACK_TITLE=Other back alpha:
 
 DLG_THEME_COLOR_TITLE=text color
 

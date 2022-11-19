@@ -110,11 +110,11 @@ IDD_TABSHEET_BG_THEME_ALPHA_EDITOR DIALOGEX 0, 0, 217, 145
 STYLE DS_SETFONT | WS_CHILD | WS_BORDER
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "TextBackAlpha (Opaque right direction):",IDC_TEXT_BACK_ALPHA_TITLE,14,6,195,8
+    LTEXT           "Normal back alpha(Opaque right direction):",IDC_TEXT_BACK_ALPHA_TITLE,14,6,195,8
     CONTROL         "",IDC_TEXT_ALPHA_SLIDER,"msctls_trackbar32",TBS_NOTICKS | WS_TABSTOP,14,17,151,15
-    LTEXT           "ReverseTextBackAlpha:",IDC_REVERSE_TEXT_BACK_ALPHA_TITLE,14,35,195,8
+    LTEXT           "Reverse back alpha:",IDC_REVERSE_TEXT_BACK_ALPHA_TITLE,14,35,195,8
     CONTROL         "",IDC_REVERSE_TEXT_ALPHA_SLIDER,"msctls_trackbar32",TBS_NOTICKS | WS_TABSTOP,14,46,151,15
-    LTEXT           "OtherBackAlpha:",IDC_OTHER_TEXT_BACK_ALPHA_TITLE,14,64,195,8
+    LTEXT           "Other back alpha:",IDC_OTHER_TEXT_BACK_ALPHA_TITLE,14,64,195,8
     CONTROL         "",IDC_BACK_ALPHA_SLIDER,"msctls_trackbar32",TBS_NOTICKS | WS_TABSTOP,14,75,151,15
 END
 
