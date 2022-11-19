@@ -29,3 +29,7 @@ install(
   TARGETS ${PACKAGE_NAME}
   DESTINATION .
 )
+install(FILES
+  README.md
+  DESTINATION .
+  RENAME ttreg.md)
