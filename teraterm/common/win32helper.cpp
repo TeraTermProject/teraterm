@@ -288,13 +288,14 @@ DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded)
 LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
 						  LPDWORD lpcbData)
 {
+	BYTE *p;
 	DWORD len;
 	LSTATUS r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
 	if (r != ERROR_SUCCESS) {
 		*lpData = NULL;
 		goto finish;
 	}
-	BYTE *p = (BYTE *)malloc(len);
+	p = (BYTE *)malloc(len);
 	r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
 	if (r != ERROR_SUCCESS) {
 		free(p);
