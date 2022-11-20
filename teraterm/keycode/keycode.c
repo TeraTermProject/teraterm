@@ -36,6 +36,7 @@
 
 #include "compat_win.h"
 #include "dlglib.h"
+#include "image_gdiplus.h"
 
 #include "kc_res.h"
 #define ClassName _T("KeyCodeWin32")
@@ -48,6 +49,7 @@ static HANDLE ghInstance;
 static BOOL KeyDown = FALSE;
 static BOOL Short;
 static WORD Scan;
+static HBITMAP hBmp = NULL;
 
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
@@ -119,6 +121,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	                    hInstance,
 	                    NULL);
 
+	ImageInit();
+
 	ShowWindow(hWnd, nCmdShow);
 
 	TTSetIcon(hInstance, hWnd, MAKEINTRESOURCEW(IDI_KEYCODE), 0);
@@ -181,6 +185,15 @@ void PaintProc(HWND hWnd)
 	char OutStr[30];
 
 	hDC = BeginPaint(hWnd, &ps);
+
+	{
+		HBITMAP hPrevBMP;
+		HDC memDC = CreateCompatibleDC(hDC);
+		hPrevBMP = SelectObject(memDC, hBmp);
+		StretchBlt(hDC,0,0,100,100, memDC, 0, 0, 100, 100 ,SRCCOPY);
+		SelectObject(memDC, hPrevBMP);
+		DeleteObject(memDC);
+	}
 
 	if (KeyDown) {
 		_snprintf_s(OutStr,sizeof(OutStr),_TRUNCATE,"Key code is %u.",Scan);

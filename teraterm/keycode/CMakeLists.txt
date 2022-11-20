@@ -9,6 +9,9 @@ add_executable(
   keycode-version.rc
   keycode.rc
   kc_res.h
+  #
+  image_gdiplus.cpp
+  image_gdiplus.h
   )
 
 if(SUPPORT_OLD_WINDOWS)
@@ -69,6 +72,9 @@ add_executable(
   keycode-version.rc
   keycode.rc
   kc_res.h
+  #
+  image_gdiplus.cpp
+  image_gdiplus.h
   )
 
 if(SUPPORT_OLD_WINDOWS)
