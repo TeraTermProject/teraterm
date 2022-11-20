@@ -614,6 +614,7 @@ struct tttset {
 	HINSTANCE TeraTermInstance;
 	WORD WindowCornerDontround;
 	wchar_t DialogFontNameW[LF_FACESIZE];
+	BOOL NotifySound;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;

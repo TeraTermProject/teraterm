@@ -438,6 +438,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// 通知領域初期化
 	NotifyInitialize(&cv);
 	NotifySetWindow(&cv, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
+	NotifySetSound(&cv, ts.NotifySound);
 
 	// VT ウィンドウのアイコン
 	SetVTIconID(&cv, NULL, 0);

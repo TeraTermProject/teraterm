@@ -42,6 +42,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttwinman.h"	// for ts
+#define TTCMN_NOTIFY_INTERNAL
 #include "ttcommon.h"
 #include "dlglib.h"
 #include "compat_win.h"
@@ -68,6 +69,20 @@ const mouse_cursor_t MouseCursor[] = {
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
 // CGeneralPropPageDlg ダイアログ
+
+// General Page
+class CGeneralPropPageDlg : public TTCPropertyPage
+{
+public:
+	CGeneralPropPageDlg(HINSTANCE inst);
+	virtual ~CGeneralPropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	enum { IDD = IDD_TABSHEET_GENERAL };
+	void OnHelp();
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+};
 
 CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD)
@@ -105,7 +120,10 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_TITLEFMT_DISPVTTEK, "DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK" },
 		{ IDC_TITLEFMT_SWAPHOSTTITLE, "DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE" },
 		{ IDC_TITLEFMT_DISPTCPPORT, "DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT" },
-		{ IDC_TITLEFMT_DISPSERIALSPEED, "DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED" }
+		{ IDC_TITLEFMT_DISPSERIALSPEED, "DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED" },
+		{ IDC_NOTIFICATION_TITLE, "DLG_TAB_GENERAL_NOTIFICATION_TITLE" },
+		{ IDC_NOTIFY_SOUND, "DLG_TAB_GENERAL_NOTIFIY_SOUND" },
+		{ IDC_NOTIFICATION_TEST, "DLG_TAB_GENERAL_NOTIFICATION_TEST" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -140,6 +158,9 @@ void CGeneralPropPageDlg::OnInitDialog()
 	SetCheck(IDC_TITLEFMT_SWAPHOSTTITLE, (ts.TitleFormat & (1<<3)) != 0);
 	SetCheck(IDC_TITLEFMT_DISPTCPPORT, (ts.TitleFormat & (1<<4)) != 0);
 	SetCheck(IDC_TITLEFMT_DISPSERIALSPEED, (ts.TitleFormat & (1<<5)) != 0);
+
+	// Notify
+	SetCheck(IDC_NOTIFY_SOUND, ts.NotifySound);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -188,11 +209,40 @@ void CGeneralPropPageDlg::OnOK()
 	ts.TitleFormat |= (GetCheck(IDC_TITLEFMT_SWAPHOSTTITLE) == BST_CHECKED) << 3;
 	ts.TitleFormat |= (GetCheck(IDC_TITLEFMT_DISPTCPPORT) == BST_CHECKED) << 4;
 	ts.TitleFormat |= (GetCheck(IDC_TITLEFMT_DISPSERIALSPEED) == BST_CHECKED) << 5;
+
+	// Notify
+	{
+		BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
+		if (notify_sound != ts.NotifySound) {
+			PComVar pcv = &cv;
+			ts.NotifySound = notify_sound;
+			NotifySetSound(pcv, notify_sound);
+		}
+	}
 }
 
 void CGeneralPropPageDlg::OnHelp()
 {
 	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+}
+
+BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	switch (wParam) {
+		case IDC_NOTIFICATION_TEST | (BN_CLICKED << 16): {
+			PComVar pcv = &cv;
+			wchar_t *msg = L"Test button was pushed";
+			BOOL prev_sound = NotifyGetSound(pcv);
+			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
+			NotifySetSound(pcv, notify_sound);
+			NotifyMessageW(pcv, msg, NULL, 1);
+			NotifySetSound(pcv, prev_sound);
+			break;
+		}
+		default:
+			break;
+	}
+	return TTCPropertyPage::OnCommand(wParam, lParam);
 }
 
 // CSequencePropPageDlg ダイアログ
@@ -847,7 +897,7 @@ void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 			case SB_PAGEUP:
 			case SB_THUMBPOSITION:
 			case SB_THUMBTRACK:
-				pos = SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_GETPOS, NULL, NULL);
+				pos = (int)SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_GETPOS, NULL, NULL);
 				SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
 				break;
 			case SB_ENDSCROLL:
@@ -865,7 +915,7 @@ void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 			case SB_PAGEUP:
 			case SB_THUMBPOSITION:
 			case SB_THUMBTRACK:
-				pos = SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_GETPOS, NULL, NULL);
+				pos = (int)SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_GETPOS, NULL, NULL);
 				SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
 				break;
 			case SB_ENDSCROLL:
@@ -895,8 +945,6 @@ static void OpacityTooltip(CTipWin* tip, HWND hDlg, int trackbar, int pos, const
 
 BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	int sel;
-
 	switch (wParam) {
 		case IDC_THEME_EDITOR_BUTTON | (BN_CLICKED << 16): {
 			ThemeDialog(m_hInst, m_hWnd, &cv);
@@ -944,19 +992,21 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			return TRUE;
 		}
 
-		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16):
-			sel = SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
+		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16): {
+			int sel = (int)SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
 				SetupRGBbox(sel);
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
 			return TRUE;
+		}
 
 		case IDC_COLOR_RED | (EN_CHANGE << 16) :
 		case IDC_COLOR_GREEN | (EN_CHANGE << 16) :
 		case IDC_COLOR_BLUE | (EN_CHANGE << 16) :
 			{
 				int r, g, b;
+				int sel;
 
 				sel = GetCurSel(IDC_ANSI_COLOR);
 				if (sel < 0 || sel > _countof(ANSIColor)-1) {

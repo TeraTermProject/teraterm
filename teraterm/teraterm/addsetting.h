@@ -41,19 +41,6 @@ typedef struct {
 
 extern const mouse_cursor_t MouseCursor[];
 
-// General Page
-class CGeneralPropPageDlg : public TTCPropertyPage
-{
-public:
-	CGeneralPropPageDlg(HINSTANCE inst);
-	virtual ~CGeneralPropPageDlg();
-private:
-	void OnInitDialog();
-	void OnOK();
-	enum { IDD = IDD_TABSHEET_GENERAL };
-	void OnHelp();
-};
-
 // Control Sequence Page
 class CSequencePropPageDlg : public TTCPropertyPage
 {

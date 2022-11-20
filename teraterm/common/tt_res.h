@@ -233,6 +233,9 @@
 #define IDC_DISABLE_PRINT_START         2614
 #define IDC_BEEP_LABEL                  2615
 #define IDC_BEEP_DROPDOWN               2616
+#define IDC_NOTIFICATION_TITLE          2617
+#define IDC_NOTIFY_SOUND                2618
+#define IDC_NOTIFICATION_TEST           2619
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -332,7 +335,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2614
+#define _APS_NEXT_CONTROL_VALUE         2620
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

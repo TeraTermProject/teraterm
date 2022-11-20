@@ -126,9 +126,10 @@ static void NotifyHide(NotifyIcon *ni)
 /**
  *
  *	@param	flag	NOTIFYICONDATA.dwInfoFlags
- *					1	information icon
- *					2	warning icon
- *					3	error icon
+ *					1		information icon (NIIF_INFO)
+ *					2		warning icon (NIIF_WARNING)
+ *					3		error icon (NIIF_ERROR)
+ *					0x10	(NIIF_NOSOUND) XP+
  */
 static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
@@ -144,6 +145,7 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 	}
 
 	if (ni->no_sound) {
+		// shell32.dll 6.00(XP)+
 		flag |= NIIF_NOSOUND;
 	}
 
@@ -236,6 +238,16 @@ static void NotifyUninitialize(NotifyIcon *ni)
 	free(ni);
 }
 
+static void NotifySetSound(NotifyIcon *ni, BOOL sound)
+{
+	ni->no_sound = sound == FALSE ? TRUE : FALSE;
+}
+
+static BOOL NotifyGetSound(NotifyIcon *ni)
+{
+	return ni->no_sound;
+}
+
 static NotifyIcon *GetNotifyData(PComVar cv)
 {
 	assert(cv != NULL);
@@ -266,6 +278,18 @@ void WINAPI NotifyMessage(PComVar cv, const char *msg, const char *title, DWORD 
 	NotifyMessageW(cv, msgW, titleW, flag);
 	free(titleW);
 	free(msgW);
+}
+
+DllExport void NotifySetSound(PComVar cv, BOOL sound)
+{
+	NotifyIcon *ni = GetNotifyData(cv);
+	NotifySetSound(ni, sound);
+}
+
+DllExport BOOL NotifyGetSound(PComVar cv)
+{
+	NotifyIcon *ni = GetNotifyData(cv);
+	return NotifyGetSound(ni);
 }
 
 /**

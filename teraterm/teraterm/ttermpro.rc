@@ -53,7 +53,7 @@ BEGIN
     LTEXT           "Drop with CTRL, this dialog is displayed",IDC_DAD_NOTE,7,221,236,8
 END
 
-IDD_TABSHEET_GENERAL DIALOGEX 0, 0, 258, 188
+IDD_TABSHEET_GENERAL DIALOGEX 0, 0, 258, 239
 STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_SYSMENU
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
@@ -83,6 +83,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,155,130,10
     CONTROL         "Display se&rial port speed",IDC_TITLEFMT_DISPSERIALSPEED,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,170,130,10
+    LTEXT           "Notification",IDC_NOTIFICATION_TITLE,12,188,73,8
+    CONTROL         "&Notify sound",IDC_NOTIFY_SOUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,201,220,10
+    PUSHBUTTON      "&Test",IDC_NOTIFICATION_TEST,20,215,50,14
 END
 
 IDD_TABSHEET_SEQUENCE DIALOGEX 0, 0, 258, 204
@@ -382,7 +385,7 @@ BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 252
         TOPMARGIN, 5
-        BOTTOMMARGIN, 185
+        BOTTOMMARGIN, 234
     END
 
     IDD_TABSHEET_SEQUENCE, DIALOG
@@ -509,16 +512,24 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_TTERM               ICON                    "../common/teraterm.ico"
-IDI_VT                  ICON                    "../common/vt.ico"
-IDI_TEK                 ICON                    "../common/tek.ico"
-IDI_TTERM_CLASSIC       ICON                    "../common/teraterm_classic.ico"
-IDI_VT_CLASSIC          ICON                    "../common/vt_classic.ico"
-IDI_CYGTERM             ICON                    "../../cygwin/cygterm/cygterm.ico"
-IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
-IDI_VT_3D               ICON                    "../common/vt_3d.ico"
-IDI_TTERM_FLAT          ICON                    "../common/teraterm_flat.ico"
-IDI_VT_FLAT             ICON                    "../common/vt_flat.ico"
 
+IDI_VT                  ICON                    "../common/vt.ico"
+
+IDI_TEK                 ICON                    "../common/tek.ico"
+
+IDI_TTERM_CLASSIC       ICON                    "../common/teraterm_classic.ico"
+
+IDI_VT_CLASSIC          ICON                    "../common/vt_classic.ico"
+
+IDI_CYGTERM             ICON                    "../../cygwin/cygterm/cygterm.ico"
+
+IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
+
+IDI_VT_3D               ICON                    "../common/vt_3d.ico"
+
+IDI_TTERM_FLAT          ICON                    "../common/teraterm_flat.ico"
+
+IDI_VT_FLAT             ICON                    "../common/vt_flat.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

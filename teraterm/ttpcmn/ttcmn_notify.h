@@ -45,6 +45,8 @@ DllExport void WINAPI NotifyUninitialize(PComVar cv);
 DllExport void WINAPI NotifySetWindow(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID);
 DllExport void WINAPI NotifyUnsetWindow(PComVar cv);
 DllExport void WINAPI NotifyHideIcon(PComVar cv);
+DllExport void NotifySetSound(PComVar cv, BOOL sound);
+DllExport BOOL NotifyGetSound(PComVar cv);
 #endif
 
 // plugin ‚©‚ç‚àŽg—p‰Â”\‚ÈIF
