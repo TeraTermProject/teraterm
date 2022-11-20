@@ -132,7 +132,7 @@ typedef struct _BGSrc
 	BYTE       alpha;
 	int        width;
 	int        height;
-	wchar_t    fileW[MAX_PATH];
+	wchar_t    *fileW;
 } BGSrc;
 
 static BGSrc BGDest;
@@ -1662,6 +1662,9 @@ void EndDisp(void)
   }
 
   BGDestruct();
+
+  free(BGDest.fileW);
+  BGDest.fileW = NULL;
 }
 
 void DispReset(void)
@@ -3813,7 +3816,10 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
  */
 void ThemeSetBG(const BGTheme *bg_theme)
 {
-	wcscpy_s(BGDest.fileW, _countof(bg_theme->BGDest.file), bg_theme->BGDest.file);
+	if (BGDest.fileW != NULL) {
+		free(BGDest.fileW);
+	}
+	BGDest.fileW = _wcsdup(bg_theme->BGDest.file);
 	BGDest.type = bg_theme->BGDest.type;
 	BGDest.color = bg_theme->BGDest.color;
 	BGDest.pattern = bg_theme->BGDest.pattern;
@@ -3837,7 +3843,12 @@ void ThemeSetBG(const BGTheme *bg_theme)
 
 void ThemeGetBG(BGTheme *bg_theme)
 {
-	wcscpy_s(bg_theme->BGDest.file, _countof(bg_theme->BGDest.file), BGDest.fileW);
+	if (BGDest.fileW == NULL) {
+		bg_theme->BGDest.file[0] = 0;
+	}
+	else {
+		wcscpy_s(bg_theme->BGDest.file, _countof(bg_theme->BGDest.file), BGDest.fileW);
+	}
 	bg_theme->BGDest.type = BG_PICTURE;
 	bg_theme->BGDest.color = BGDest.color;
 	bg_theme->BGDest.pattern = BGDest.pattern;
