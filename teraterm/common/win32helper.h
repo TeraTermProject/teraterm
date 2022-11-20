@@ -30,6 +30,11 @@
 
 #include <windows.h>
 
+// VS2005(SDK7.1ˆÈ‰º)‚Ì‚Æ‚«,LSTATUS‚ª‚È‚¢
+#if defined(_MSC_VER) && !defined(__MINGW32__) && _MSC_VER == 1400
+typedef LONG LSTATUS;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
