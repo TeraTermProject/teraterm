@@ -2569,7 +2569,7 @@ void CVTWindow::OnSysCommand(WPARAM nID, LPARAM lParam)
 
 void CVTWindow::OnSysKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	if ((nChar==VK_F10) || MetaKey(ts.MetaKey) && ((MainMenu==NULL) || (nChar!=VK_MENU))) {
+	if ((nChar==VK_F10) || (MetaKey(ts.MetaKey) && ((MainMenu==NULL) || (nChar!=VK_MENU)))) {
 		KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff);
 		// OnKeyDown(nChar,nRepCnt,nFlags);
 	}
@@ -3258,8 +3258,8 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	                     WS_MINIMIZEBOX;
 #else
 	if (ts.HideTitle>0) {
-		Style = Style & ~(WS_SYSMENU | WS_CAPTION |
-	                      WS_MINIMIZEBOX | WS_MAXIMIZEBOX) | WS_BORDER | WS_POPUP;
+		Style = (Style & ~(WS_SYSMENU | WS_CAPTION |
+						   WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) | WS_BORDER | WS_POPUP;
 
 		if(ts.EtermLookfeel.BGNoFrame) {
 			Style   &= ~(WS_THICKFRAME | WS_BORDER);
@@ -3269,7 +3269,7 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	else {
-		Style = Style & ~WS_POPUP | WS_SYSMENU | WS_CAPTION |
+		Style = (Style & ~WS_POPUP) | WS_SYSMENU | WS_CAPTION |
 		                 WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_BORDER;
 
 		ExStyle |=  WS_EX_CLIENTEDGE;
