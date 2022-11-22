@@ -28,7 +28,7 @@
 
 // TODO:
 //	- GDI+ Flat API へ置きかえて DLL がない場合を考慮
-//	  - GDI+ は Windows XPから利用可能
+//	  - GDI+ は Windows XPから利用ok
 
 #include <windows.h>
 #include <gdiplus.h>
