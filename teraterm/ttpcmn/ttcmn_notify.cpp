@@ -79,7 +79,6 @@ typedef struct {
 static BOOL Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 {
 	BOOL r = Shell_NotifyIconW(dwMessage, (NOTIFYICONDATAW*)lpData);
-	assert(r != FALSE);
 	return r;
 }
 
@@ -91,7 +90,7 @@ static HICON LoadIcon(NotifyIcon *ni)
 	return TTLoadIcon(IconInstance, MAKEINTRESOURCEW(IconID), 16 ,16, primary_monitor_dpi, TRUE);
 }
 
-static void CreateNotifyIconData(NotifyIcon *ni, TT_NOTIFYICONDATAW_V2 *p)
+static void InitializeNotifyIconData(NotifyIcon *ni, TT_NOTIFYICONDATAW_V2 *p)
 {
 	assert(ni->parent_wnd != NULL);
 	memset(p, 0, sizeof(*p));
@@ -99,11 +98,7 @@ static void CreateNotifyIconData(NotifyIcon *ni, TT_NOTIFYICONDATAW_V2 *p)
 	p->hWnd = ni->parent_wnd;
 	p->uID = 1;
 	p->uCallbackMessage = ni->callback_msg;
-	p->hIcon = LoadIcon(ni);
-
-	p->uFlags =
-		((p->uCallbackMessage != 0) ? NIF_MESSAGE : 0) |
-		((p->hIcon != NULL) ? NIF_ICON : 0);
+	p->uFlags = (ni->callback_msg != 0) ? NIF_MESSAGE : 0;
 }
 
 static void NotifyHide(NotifyIcon *ni)
@@ -113,13 +108,16 @@ static void NotifyHide(NotifyIcon *ni)
 	}
 	else {
 		TT_NOTIFYICONDATAW_V2 notify_icon;
-		CreateNotifyIconData(ni, &notify_icon);
+		InitializeNotifyIconData(ni, &notify_icon);
 		notify_icon.uFlags |= NIF_STATE;
 		notify_icon.dwState = NIS_HIDDEN;
 		notify_icon.dwStateMask = NIS_HIDDEN;
-		Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
+		BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
 		ni->NotifyIconShowCount = 0;
-		DestroyIcon(notify_icon.hIcon);
+		if (r == FALSE) {
+			// タスクバーからなくなっている
+			ni->created = FALSE;
+		}
 	}
 }
 
@@ -150,11 +148,13 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 	}
 
 	TT_NOTIFYICONDATAW_V2 notify_icon;
-	CreateNotifyIconData(ni, &notify_icon);
+	InitializeNotifyIconData(ni, &notify_icon);
 	notify_icon.uFlags |= NIF_INFO;
 	notify_icon.uFlags |= NIF_STATE;
 	notify_icon.dwState = 0;
 	notify_icon.dwStateMask = NIS_HIDDEN;
+	notify_icon.uFlags |= NIF_ICON;
+	notify_icon.hIcon = LoadIcon(ni);
 
 	if (title) {
 		wcsncpy_s(notify_icon.szInfoTitle, _countof(notify_icon.szInfoTitle), title, _TRUNCATE);
@@ -166,13 +166,21 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 
 	wcsncpy_s(notify_icon.szInfo, _countof(notify_icon.szInfo), msg, _TRUNCATE);
 
+	if (ni->created) {
+		BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
+		if (r == FALSE) {
+			// タスクバーからなくなっている?
+			ni->created = FALSE;
+		}
+	}
+
 	if (!ni->created) {
 		if (Shell_NotifyIconW(NIM_ADD, &notify_icon) != FALSE) {
 			ni->created = TRUE;
 		}
-	}
-	else {
-		Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
+		else {
+			// タスクバーがなくなっているときADDに失敗する
+		}
 	}
 
 	// 通知アイコンは渡したらコピーされるので保持しなくてよい
@@ -180,7 +188,9 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 	// https://docs.microsoft.com/ja-jp/windows/win32/shell/taskbar
 	// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
 	DestroyIcon(notify_icon.hIcon);
-	ni->NotifyIconShowCount += 1;
+	if (ni->created) {
+		ni->NotifyIconShowCount += 1;
+	}
 }
 
 static void NotifySetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
@@ -224,9 +234,8 @@ static void NotifyUnsetWindow(NotifyIcon *ni)
 {
 	if (ni->enable && ni->created) {
 		TT_NOTIFYICONDATAW_V2 notify_icon;
-		CreateNotifyIconData(ni, &notify_icon);
-		Shell_NotifyIconW(NIM_DELETE, &notify_icon);
-		DestroyIcon(notify_icon.hIcon);
+		InitializeNotifyIconData(ni, &notify_icon);
+		Shell_NotifyIconW(NIM_DELETE, &notify_icon);	// 戻り値チェックしない
 		ni->created = FALSE;
 		ni->enable = FALSE;
 	}

@@ -5116,12 +5116,21 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
+	static const UINT WM_TASKBER_CREATED = RegisterWindowMessage("TaskbarCreated");
+
 	LRESULT retval = 0;
 	if (msg == MsgDlgHelp) {
 		// HELPMSGSTRING message 時
 		//		wp = dialog handle
 		//		lp = initialization structure
 		OnDlgHelp(HelpId, 0);
+		return 0;
+	}
+	else if (msg == WM_TASKBER_CREATED) {
+		// タスクバーが再起動した
+		NotifyHideIcon(&cv);
+		NotifySetWindow(&cv, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
+		NotifySetSound(&cv, ts.NotifySound);
 		return 0;
 	}
 	switch(msg)
