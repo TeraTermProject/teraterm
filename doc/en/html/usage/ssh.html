@@ -23,7 +23,8 @@
     </p>
 
     <p>
-      There are several ways of connection of SSH as follows
+      There are several ways of authentication methods of SSH as follows
+    </p>
       <ul>
         <li>Password authentication</li>
         <li>Public Key (and Private key pair) authentication
@@ -33,29 +34,30 @@
         </li>
         <li>rhosts authentication for SSH1</li>
         <li>challenge/response(TIS) authentication for SSH1</li>
-	<li>keyboard-interactive authentication for SSH2</li>
+        <li>keyboard-interactive authentication for SSH2</li>
       </ul>
+    <p>
       In this document, we will describe Password authentication and Key-pair authentication which would be most widely used.
     </p>
 
     <h2 id="connproc">Procedure of connection</h2>
 
     <p>
-      When Tera Term is activated, the following dialog will let you choose login procedure.
+      When Tera Term is activated, the following dialog will let you choose a way of connecting.
     </p>
     <div class="img"><img src="../image/NewConnection.png" alt="connection dialog"></div>
     <p>
-      When using SSH, you should change SSH version in a default parameter. Make sure that it is synchronized to the host to be connected.
+      When using SSH, you should match SSH version to the host to be connected.
     </p>
 
     <p id="ssh_auth_dialog">
       Once connected, then you will be prompted to select authentication method in a dialog.<br />
-	  You can change default value in <a href="../menu/setup-sshauth.html">"TTSSH: Authentication Setup" dialog</a>
+	  You can change default value of this dialog in <a href="../menu/setup-sshauth.html">"TTSSH: Authentication Setup" dialog</a>
     </p>
     <div class="img"><img src="../image/Authentication.png" alt="Authentication method"></div>
     <p>
       The TTSSH can support some authentication methods and a user should select one of methods. When an authentication method is failed, the TTSSH does not retry to authenticate another method.<br>
-      For example, the OpenSSH client will be able to login to the server without regard to the difference the password and the keyboard-interactive authentication. However, the TTSSH can not login to the server with the keyboard-interactive and public key authentication by using the password authentication.
+      For example, the OpenSSH client will be able to login to the server without regard to the difference the password and the keyboard-interactive authentication. However, the TTSSH can not login to the server which only enabled keyboard-interactive and public key authentication by using the password authentication.
     </p>
     <ul>
       <li>If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.<br>
