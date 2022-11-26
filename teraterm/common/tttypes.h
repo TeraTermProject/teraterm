@@ -125,7 +125,7 @@ typedef TCharAttr *PCharAttr;
 #define CS_ANSICOLOR_ALL   270
 #define CS_SP_ALL          271
 #define CS_UNSPEC          0xffffffff
-#define CS_ALL             CS_UNSPEC
+#define CS_ALL             0xfffffffe	// DispResetColor() ‚¾‚¯‚ÅŽg—p
 
   /* Kermit function id */
 #define IdKmtReceive 1
@@ -245,7 +245,7 @@ enum LogTimestampType {
     TIMESTAMP_ELAPSED_CONNECTED
 };
 
-// log flags (used in ts.LogFlag) 
+// log flags (used in ts.LogFlag)
 #define LOG_TEL 1
 #define LOG_KMT 2
 #define LOG_X   4
@@ -833,7 +833,7 @@ typedef struct tttset TTTSet, *PTTSet;
 typedef struct {
 	PCHAR SetupFN; // setup file name
 	WORD PortType; // TCPIP/Serial
-	PCHAR HostName; // host name 
+	PCHAR HostName; // host name
 	WORD Telnet; // non-zero: enable telnet
 	WORD TelPort; // default TCP port# for telnet
 	WORD TCPPort; // TCP port #
@@ -1165,4 +1165,3 @@ typedef struct {
 	int WinUndoStyle;
 } TMap;
 typedef TMap *PMap;
-
