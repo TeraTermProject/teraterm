@@ -912,12 +912,9 @@ The sequence below shows data exchange with the terminal.
 
   <h3>Sequence Control</h3>
 SSH protocol allows to encrypt client-server communication by using encryption key. Public-key based encryption (asymmetric) provides higher level of security, however it is more resource intensive and not used with SSH. SSH2 utilizes symmetric encryption algorithms with shared key - AES (Advanced Encryption Standard: Rijndael algorithm) and 3DES (Triple Data Encryption Standard). <br>
-
-The key is securely shared between two parties establishing connection and is unknown to a third party. As per SSH2 protocol, when client opens TCP connection to a remote host (SSH server), unique DH key is generated based on "Diffie-Hellman" algorithm. This key is only known to the client and to the server. <br>
-Prior to creation of DH key, network packets are transmitted unencrypted (as a clear text) and can be captured by a third party, however DH algorithm allows to establish a shared secret between two parties in such a way that it cannot be compromised. <br>
-
-Once shared key has been generated, it can be used to encrypt and decrypt the packets. SSH2 protocol assigns each packet the Message Number in the range 1 to 255. Message number describes the payload of the packet. RFC4250 contains the list of all supported message numbers. SSH messages also have names that start with "SSH2_MSG_". They are defined as macros in TTSSH source code. <br>
-
+The key is securely shared between two parties establishing connection and is unknown to a third party. As per SSH2 protocol, when client opens TCP connection to a remote host (SSH server), a shared key is shared based on "Diffie-Hellman" algorithm. This key is only known to the client and to the server. <br>
+Prior to finish share of shared key, network packets are transmitted unencrypted (as a clear text) and can be captured by a third party, however DH algorithm allows to share a shared key between two parties in such a way that it cannot be compromised. <br>
+Once shared key has been shared, it can be used to encrypt and decrypt the packets. SSH2 protocol assigns each packet the Message Number in the range 1 to 255. Message number describes the payload of the packet. RFC4250 contains the list of all supported message numbers. SSH messages also have names that start with "SSH2_MSG_". They are defined as macros in TTSSH source code. <br>
 The drawing below shows the packet flow for TCP connection from a client to a server on the default SSH port 22 with password based user authentication. <br>
 
 
