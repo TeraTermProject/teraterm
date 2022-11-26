@@ -57,7 +57,7 @@ extern "C" {
 #define CS_ANSICOLOR_ALL   270
 #define CS_SP_ALL          271
 #define CS_UNSPEC          0xffffffff
-#define CS_ALL             CS_UNSPEC
+#define CS_ALL             0xfffffffe	// DispResetColor() ‚¾‚¯‚ÅŽg—p
 
 /* prototypes */
 void BGInitialize(BOOL initialize_once);
