@@ -345,3 +345,19 @@ void normalize_rsa_pubkey_sign_algo_order(char *buf)
 
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
+
+/*
+ * ssh_keyalgo から、鍵に対して標準ではないダイジェスト方式名を返す
+ *   今のところ rsa-sha2-256, rsa-sha2-512 のときだけ "SHA-256", "SHA-512" を返す
+ *   About ダイアログで、非標準のダイジェスト方式のときだけ表示するため
+ */
+char* get_ssh2_hostkey_algorithm_digest_name(ssh_keyalgo algo)
+{
+	switch (algo) {
+		case KEY_ALGO_RSASHA256:
+			return "SHA-256";
+		case KEY_ALGO_RSASHA512:
+			return "SHA-512";
+	}
+	return "";
+}

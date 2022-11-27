@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-11-22)
+; Updated by TeraTerm Project (2022-11-27)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -584,7 +584,9 @@ DLG_ABOUT_COMP_INFO=수준 %d; 비율 %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=수준 %d
 DLG_ABOUT_COMP_NONE=없슴
 DLG_ABOUT_COMP_UPDOWN=올림 %s; 내림 %s
-DLG_ABOUT_AUTH_INFO=사용자 '%s', %s 사용 중
+DLG_ABOUT_AUTH_INFO=사용자 '%s', %s authentication
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth

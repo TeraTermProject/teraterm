@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-11-22)
+; Updated by TeraTerm Project (2022-11-27)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -584,7 +584,9 @@ DLG_ABOUT_COMP_INFO=level %d; ratio %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=level %d
 DLG_ABOUT_COMP_NONE=Keiner
 DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
-DLG_ABOUT_AUTH_INFO=Benutzer '%s' verwendet %s
+DLG_ABOUT_AUTH_INFO=Benutzer '%s', %s authentication
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth

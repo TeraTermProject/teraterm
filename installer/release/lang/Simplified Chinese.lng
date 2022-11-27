@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-11-22)
+; Updated by TeraTerm Project (2022-11-27)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -585,6 +585,8 @@ DLG_ABOUT_COMP_INFO2=等级 %d
 DLG_ABOUT_COMP_NONE=无
 DLG_ABOUT_COMP_UPDOWN=上传 %s; 下载 %s
 DLG_ABOUT_AUTH_INFO=用户 '%s'，%s认证
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=主机密钥指纹：
 
 ; dlg auth

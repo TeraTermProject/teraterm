@@ -118,5 +118,6 @@ void normalize_rsa_pubkey_sign_algo_order(char *buf);
 ssh_keyalgo choose_SSH2_host_key_algorithm(char *server_proposal, char *my_proposal);
 ssh_keyalgo choose_SSH2_keysign_algorithm(PTInstVar pvar, ssh_keytype keytype);
 void SSH2_update_host_key_myproposal(PTInstVar pvar);
+char* get_ssh2_hostkey_algorithm_digest_name(ssh_keyalgo algo);
 
 #endif /* SSHCMAC_H */

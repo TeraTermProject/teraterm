@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-11-22)
+; Updated by TeraTerm Project (2022-11-27)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -584,6 +584,8 @@ DLG_ABOUT_COMP_INFO2=レベル %d
 DLG_ABOUT_COMP_NONE=なし
 DLG_ABOUT_COMP_UPDOWN=アップロード %s; ダウンロード %s
 DLG_ABOUT_AUTH_INFO=ユーザー '%s', %s認証
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=ホスト鍵の指紋:
 
 ; dlg auth
