@@ -6310,7 +6310,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 			goto error;
 		}
 
-		keyalgo = choose_SSH2_keysign_algorithm(pvar->server_sig_algs, keypair->type);
+		keyalgo = choose_SSH2_keysign_algorithm(pvar, keypair->type);
 		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
 
 		// step1
@@ -6384,7 +6384,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		len = get_uint32_MSBfirst(puttykey+4);
 		keytype_name = puttykey + 8;
 		keytype = get_hostkey_type_from_name(keytype_name);
-		keyalgo = choose_SSH2_keysign_algorithm(pvar->server_sig_algs, keytype);
+		keyalgo = choose_SSH2_keysign_algorithm(pvar, keytype);
 		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
 
 		// アルゴリズムをコピーする
@@ -7123,7 +7123,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		len = get_uint32_MSBfirst(puttykey+4);
 		keytype_name = puttykey + 8;
 		keytype = get_hostkey_type_from_name(keytype_name);
-		keyalgo = choose_SSH2_keysign_algorithm(pvar->server_sig_algs, keytype);
+		keyalgo = choose_SSH2_keysign_algorithm(pvar, keytype);
 		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
 		signflag = get_ssh2_agent_flag(keyalgo);
 
