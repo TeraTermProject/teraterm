@@ -106,44 +106,13 @@ static void GDIPSavePNG(Gdiplus::Bitmap *bitmap, const wchar_t *filename)
 }
 #endif
 
-static HBITMAP bitmap_GetHBITMAP(Gdiplus::Bitmap *bitmap)
-{
-	const int width = bitmap->GetWidth();
-	const int height = bitmap->GetHeight();
-
-	Gdiplus::Rect rect(0, 0, width, height);
-	Gdiplus::BitmapData src_info;
-	Gdiplus::Status r;
-	r = bitmap->LockBits(&rect, Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &src_info);
-	if(r != Gdiplus::Ok) {
-		return NULL;
-	}
-
-	BITMAPINFO bmi = {};
-	bmi.bmiHeader.biSize = sizeof(bmi);
-	bmi.bmiHeader.biWidth = width;
-	bmi.bmiHeader.biHeight = -height;
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32;	// = 8*4
-	bmi.bmiHeader.biCompression = BI_RGB;
-	bmi.bmiHeader.biSizeImage = width * height * 4;
-
-	// usage == DIB_PAL_COLORS のとき hdcのパレットが使用される
-	// DIB_RGB_COLORS のときは hdc は参照されない?
-	// MSDNにはNULLでもokとは書かれていない
-	void* pvBits;
-	HBITMAP hBmp = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
-	if (hBmp == NULL) {
-		return NULL;
-	}
-
-	memcpy(pvBits, src_info.Scan0, width * height * 4);
-
-	return hBmp;
-}
-
 /**
  *	画像ファイルを読み込んで HBITMAP を返す
+ *
+ *	GDI+で読み込んだ画像は32bit bitmapとなる
+ *	(32以外になることもあるかもしれない)
+ *	alphaプレーンを含んでいない画像ファイルを読み込むと、
+ *	32bit bitmap画像データのalpha値は不透明になっている
  *
  *	@param filename	ファイル名
  *	@retval			HBITMAP
@@ -163,18 +132,11 @@ HBITMAP GDIPLoad(const wchar_t *filename)
 
 	Gdiplus::PixelFormat format = bitmap.GetPixelFormat();
 
-	if (format != PixelFormat32bppARGB) {
-		HBITMAP hBmp;
-		Gdiplus::Status r;
-		Gdiplus::Color bgColor = Gdiplus::Color(0, 0, 0);
-		r = bitmap.GetHBITMAP(bgColor, &hBmp);
-		if (r != Gdiplus::Ok) {
-			return NULL;
-		}
-		return hBmp;
+	HBITMAP hBmp;
+	Gdiplus::Color bgColor = Gdiplus::Color(0, 0, 0);
+	Gdiplus::Status r = bitmap.GetHBITMAP(bgColor, &hBmp);
+	if (r != Gdiplus::Ok) {
+		return NULL;
 	}
-	else {
-		// GetHBITMAP() returns no alpha info
-		return bitmap_GetHBITMAP(&bitmap);
-	}
+	return hBmp;
 }

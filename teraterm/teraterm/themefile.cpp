@@ -359,6 +359,7 @@ void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *file)
 {
 	const wchar_t *section = BG_SECTION_NEW;
 
+	WritePrivateProfileIntW(section, L"BGDestEnable", bg_theme->BGDest.enable, file);
 	WritePrivateProfileStringW(section, L"BGDestFile", bg_theme->BGDest.file, file);
 #if 0
 	WritePrivateProfileStringW(section, L"BGDestType",
@@ -366,9 +367,12 @@ void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *file)
 #endif
 	WriteCOLORREF(section, L"BGDestColor", file, bg_theme->BGDest.color);
 	WritePrivateProfileStringW(section, L"BGDestPattern", GetBGPatternStr(bg_theme->BGDest.pattern), file);
+	WritePrivateProfileIntW(section, L"BGDestAlpha", bg_theme->BGDest.alpha, file);
 
+	WritePrivateProfileIntW(section, L"BGSrc1Enable", bg_theme->BGSrc1.enable, file);
 	WritePrivateProfileIntW(section, L"BGSrc1Alpha", bg_theme->BGSrc1.alpha, file);
 
+	WritePrivateProfileIntW(section, L"BGSrc2Enable", bg_theme->BGSrc2.enable, file);
 	WritePrivateProfileIntW(section, L"BGSrc2Alpha", bg_theme->BGSrc2.alpha, file);
 	WriteCOLORREF(section, L"BGSrc2Color", file, bg_theme->BGSrc2.color);
 
@@ -432,10 +436,12 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	wchar_t *p;
 
 	// Dest ‚Ì“Ç‚Ýo‚µ
+	bg_theme->BGDest.enable = GetPrivateProfileIntW(section, L"BGDestEnable", 0, file);
 	bg_theme->BGDest.type = BGGetType(section, L"BGDestType", bg_theme->BGDest.type, file);
 	bg_theme->BGDest.pattern = BGGetPattern(section, L"BGPicturePattern", bg_theme->BGDest.pattern, file);
 	bg_theme->BGDest.pattern = BGGetPattern(section, L"BGDestPattern", bg_theme->BGDest.pattern, file);
 	bg_theme->BGDest.antiAlias = BGGetOnOff(section, L"BGDestAntiAlias", bg_theme->BGDest.antiAlias, file);
+	bg_theme->BGDest.alpha = GetPrivateProfileIntW(section, L"BGDestAlpha", bg_theme->BGDest.alpha, file);
 	bg_theme->BGDest.color = BGGetColor(section, L"BGPictureBaseColor", bg_theme->BGDest.color, file);
 	bg_theme->BGDest.color = BGGetColor(section, L"BGDestColor", bg_theme->BGDest.color, file);
 	GetPrivateProfileStringW(section, L"BGPictureFile", bg_theme->BGDest.file, pathW, _countof(pathW), file);
@@ -450,6 +456,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	}
 
 	// Src1 ‚Ì“Ç‚Ýo‚µ
+	bg_theme->BGSrc1.enable = GetPrivateProfileIntW(section, L"BGSrc1Enable", 0, file);
 	bg_theme->BGSrc1.type = BGGetType(section, L"BGSrc1Type", bg_theme->BGSrc1.type, file);
 	bg_theme->BGSrc1.pattern = BGGetPattern(section, L"BGSrc1Pattern", bg_theme->BGSrc1.pattern, file);
 	bg_theme->BGSrc1.antiAlias = BGGetOnOff(section, L"BGSrc1AntiAlias", bg_theme->BGSrc1.antiAlias, file);
@@ -467,6 +474,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	}
 
 	// Src2 ‚Ì“Ç‚Ýo‚µ
+	bg_theme->BGSrc2.enable = GetPrivateProfileIntW(section, L"BGSrc2Enable", 0, file);
 	bg_theme->BGSrc2.type = BGGetType(section, L"BGSrc2Type", bg_theme->BGSrc2.type, file);
 	bg_theme->BGSrc2.pattern = BGGetPattern(section, L"BGSrc2Pattern", bg_theme->BGSrc2.pattern, file);
 	bg_theme->BGSrc2.antiAlias = BGGetOnOff(section, L"BGSrc2AntiAlias", bg_theme->BGSrc2.antiAlias, file);

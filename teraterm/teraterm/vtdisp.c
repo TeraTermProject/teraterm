@@ -125,6 +125,7 @@ static int SRegionBottom;
 typedef struct _BGSrc
 {
 	HDC        hdc;
+	BOOL       enable;
 	BG_TYPE    type;
 	BG_PATTERN pattern;
 	BOOL       antiAlias;
@@ -135,9 +136,9 @@ typedef struct _BGSrc
 	wchar_t    *fileW;
 } BGSrc;
 
-static BGSrc BGDest;
-static BGSrc BGSrc1;
-static BGSrc BGSrc2;
+static BGSrc BGDest;	// 背景画像用
+static BGSrc BGSrc1;	// 壁紙(Windowsのデスクトップ背景)用
+static BGSrc BGSrc2;	// fill color用
 
 static int  BGEnable;
 static BYTE BGReverseTextAlpha;
@@ -503,7 +504,7 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 		return;
 
 	//壁紙ファイル名ゲット
-	hRegQueryValueExW(hKey, L"Wallpaper", NULL, NULL, &wi->filename, NULL);
+	hRegQueryValueExW(hKey, L"Wallpaper", NULL, NULL, (void **)&wi->filename, NULL);
 
 	//壁紙スタイルゲット
 	length = sizeof(str);
@@ -1052,6 +1053,152 @@ static void BGLoadSrc(HDC hdcDest, BGSrc *src)
 	}
 }
 
+/**
+ *	32bit bitmap でも alphaが使用されていないときは
+ *	不透明なbitmapと同様に扱う
+ */
+static BOOL IsAlphaValidBitmap(HBITMAP hBmp)
+{
+	BITMAP bm;
+	BOOL alpha = FALSE;
+
+	assert(hBmp != NULL);
+
+	// 1pixelあたりのbit数をチェックする
+	GetObject(hBmp, sizeof(bm), &bm);
+	if (bm.bmBitsPixel != 32) {
+		// 32bit/pixel 以外の時は alpha 情報はない
+		return FALSE;
+	}
+
+	// alpha情報が使用されているかチェックする
+	//		すべてのピクセルで不透明となっているか調べる
+	{
+		// DIBを作成する hBmp のコピー先
+		//  hBmp が DDB のとき pixel情報をチェックできないので DIB へコピー(BitBlt)する
+		LONG width;
+		LONG height;
+		BITMAPINFO bmi;
+		void* pvBits;
+		HBITMAP hBmpDIB;
+		HBITMAP hBmpCopy;
+		HDC HDCDest;
+		HDC HDCSrc;
+		HBITMAP prev1;
+		HBITMAP prev2;
+		DWORD *p;
+		LONG i;
+
+		width = bm.bmWidth;
+		height = bm.bmHeight;
+		memset(&bmi, 0, sizeof(bmi));
+		bmi.bmiHeader.biSize = sizeof(bmi);
+		bmi.bmiHeader.biWidth = width;
+		bmi.bmiHeader.biHeight = height;
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 32;	// = 8*4
+		bmi.bmiHeader.biCompression = BI_RGB;
+		bmi.bmiHeader.biSizeImage = width * height * 4;
+		hBmpDIB = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
+
+		// hBmp が SelectObject() されいたとき
+		// 別HDCにSelectObject()できないのでコピーしておく
+		hBmpCopy = (HBITMAP)CopyImage(hBmp, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+
+		// hBmp(hBmpCopy)をDIBにコピー(BitBlt)する
+		HDCDest = CreateCompatibleDC(NULL);
+		HDCSrc = CreateCompatibleDC(NULL);
+		prev1 = SelectObject(HDCDest, hBmpDIB);
+		prev2 = SelectObject(HDCSrc, hBmpCopy);
+		BitBlt(HDCDest, 0, 0, width, height, HDCSrc, 0, 0, SRCCOPY);
+
+		// alpha値をチェックする
+		p = pvBits;
+		for (i = 0; i < width * height; i++) {
+			DWORD pix = *p++;
+			if ((pix & 0xff000000) != 0xff000000) {
+				alpha = TRUE;
+				break;
+			}
+		}
+
+		// 破棄
+		SelectObject(HDCDest, prev1);
+		SelectObject(HDCSrc, prev2);
+		DeleteObject(hBmpDIB);
+		DeleteObject(hBmpCopy);
+		DeleteDC(HDCDest);
+		DeleteDC(HDCSrc);
+	}
+	return alpha;
+}
+
+static BOOL IsAlphaValidBitmapHDC(HDC hDC)
+{
+	HBITMAP hBmp;
+
+	assert(hDC != NULL);
+	hBmp = GetCurrentObject(hDC, OBJ_BITMAP);
+	return IsAlphaValidBitmap(hBmp);
+}
+
+/**
+ *	背景画像生成
+ */
+static HDC CreateBGImage(int width, int height)
+{
+	BLENDFUNCTION bf;
+	HDC hdc_work;
+	HDC hdc_bg;
+
+	hdc_bg = CreateBitmapDC(CreateScreenCompatibleBitmap(width, height));
+	hdc_work = CreateBitmapDC(CreateScreenCompatibleBitmap(width, height));
+
+	// 壁紙(Windowsのデスクトップ背景)
+	if (BGSrc1.enable) {
+		BGLoadSrc(hdc_bg, &BGSrc1);
+	}
+	DebugSaveFile(L"bg_1.bmp", hdc_bg, width, height);
+
+	// 指定画像
+	if (BGDest.enable && BGDest.hdc != NULL) {
+		memset(&bf, 0, sizeof(bf));
+		bf.BlendOp = AC_SRC_OVER;
+		bf.SourceConstantAlpha = BGDest.alpha;
+		bf.AlphaFormat = 0;
+		if (IsAlphaValidBitmapHDC(BGDest.hdc)) {
+			// 32bitビットマップ(alpha値が存在している)場合はalpha値を参照する
+			bf.AlphaFormat = AC_SRC_ALPHA;
+		}
+		BGLoadSrc(hdc_work, &BGDest);
+		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
+	}
+	DebugSaveFile(L"bg_2.bmp", hdc_bg, width, height);
+
+	// 単色プレーン
+	if (BGSrc2.enable) {
+		memset(&bf, 0, sizeof(bf));
+		bf.BlendOp = AC_SRC_OVER;
+		bf.SourceConstantAlpha = BGSrc2.alpha;
+		bf.AlphaFormat = 0;
+		BGLoadSrc(hdc_work, &BGSrc2);
+		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
+	}
+	DebugSaveFile(L"bg_3.bmp", hdc_bg, width, height);
+
+	DeleteBitmapDC(&hdc_work);
+
+	return hdc_bg;
+}
+
+/**
+ *
+ *	ThemeSetBG(), ThemeSetColor() のあとにコールする
+ *
+ *	@param	forceSetup		FALSE	WM_PAINT時
+ *							TRUE	以外
+ *
+ */
 void BGSetupPrimary(BOOL forceSetup)
 {
   POINT point;
@@ -1094,40 +1241,12 @@ void BGSetupPrimary(BOOL forceSetup)
 
   if(!BGInSizeMove)
   {
-    BLENDFUNCTION bf;
-    HDC hdcSrc = NULL;
+	  //背景 HDC
+	  if(hdcBG) {
+		  DeleteBitmapDC(&hdcBG);
+	  }
 
-    //背景 HDC
-    if(hdcBG) DeleteBitmapDC(&hdcBG);
-      hdcBG = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,ScreenHeight));
-
-    //作業用DC
-    hdcSrc = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,ScreenHeight));
-
-    //背景生成
-    BGLoadSrc(hdcBG,&BGDest);
-    DebugSaveFile(L"bg_1.bmp", hdcBG, ScreenWidth, ScreenHeight);
-
-    ZeroMemory(&bf,sizeof(bf));
-    bf.BlendOp = AC_SRC_OVER;
-
-    bf.SourceConstantAlpha = BGSrc1.alpha;
-    if(bf.SourceConstantAlpha)
-    {
-      BGLoadSrc(hdcSrc,&BGSrc1);
-      (BGAlphaBlend)(hdcBG,0,0,ScreenWidth,ScreenHeight,hdcSrc,0,0,ScreenWidth,ScreenHeight,bf);
-    }
-    DebugSaveFile(L"bg_2.bmp", hdcBG, ScreenWidth, ScreenHeight);
-
-    bf.SourceConstantAlpha = BGSrc2.alpha;
-    if(bf.SourceConstantAlpha)
-    {
-      BGLoadSrc(hdcSrc,&BGSrc2);
-      (BGAlphaBlend)(hdcBG,0,0,ScreenWidth,ScreenHeight,hdcSrc,0,0,ScreenWidth,ScreenHeight,bf);
-    }
-    DebugSaveFile(L"bg_3.bmp", hdcBG, ScreenWidth, ScreenHeight);
-
-    DeleteBitmapDC(&hdcSrc);
+	  hdcBG = CreateBGImage(ScreenWidth, ScreenHeight);
   }
 }
 
@@ -1207,22 +1326,10 @@ static void DecideBGEnable(void)
 	// 背景画像チェック
 	if (BGDest.fileW == NULL || BGDest.fileW[0] == 0) {
 		// 背景画像は使用しない
-		BGDest.type = BG_NONE;
+		BGDest.enable = FALSE;
 	}
 
-	// デスクトップ壁紙チェック
-	if (BGSrc1.alpha == 0) {
-		// 使用しない
-		BGSrc1.type = BG_NONE;
-	}
-
-	// simple plane
-	if (BGSrc2.alpha == 0) {
-		// 使用しない
-		BGSrc2.type = BG_NONE;
-	}
-
-	if (BGDest.type == BG_NONE && BGSrc1.type == BG_NONE && BGSrc2.type == BG_NONE) {
+	if (BGDest.enable == FALSE && BGSrc1.enable == FALSE && BGSrc2.enable == FALSE) {
 		// BGは使用しない
 		BGEnable = FALSE;
 		w->bg_enable = FALSE;
@@ -1238,7 +1345,7 @@ static void DecideBGEnable(void)
  *		テーマ無しならデフォルト設定する
  *		テーマありならテーマファイルを読み出して設定する
  */
-void BGLoadThemeFile(TTTSet *pts)
+void BGLoadThemeFile(const TTTSet *pts)
 {
 	// コンフィグファイル(テーマファイル)の決定
 	switch(pts->EtermLookfeel.BGEnable) {
@@ -1427,27 +1534,6 @@ void BGOnEnterSizeMove(void)
     return;
 
   BGInSizeMove = TRUE;
-
-#if 0
-  {
-  int  r,g,b;
-
-  //背景色生成
-  r = GetRValue(BGDest.color);
-  g = GetGValue(BGDest.color);
-  b = GetBValue(BGDest.color);
-
-  r = (r * (255 - BGSrc1.alpha) + GetRValue(BGSrc1.color) * BGSrc1.alpha) >> 8;
-  g = (g * (255 - BGSrc1.alpha) + GetGValue(BGSrc1.color) * BGSrc1.alpha) >> 8;
-  b = (b * (255 - BGSrc1.alpha) + GetBValue(BGSrc1.color) * BGSrc1.alpha) >> 8;
-
-  r = (r * (255 - BGSrc2.alpha) + GetRValue(BGSrc2.color) * BGSrc2.alpha) >> 8;
-  g = (g * (255 - BGSrc2.alpha) + GetGValue(BGSrc2.color) * BGSrc2.alpha) >> 8;
-  b = (b * (255 - BGSrc2.alpha) + GetBValue(BGSrc2.color) * BGSrc2.alpha) >> 8;
-
-  BGBrushInSizeMove = CreateSolidBrush(RGB(r,g,b));
-  }
-#endif
 }
 
 void BGOnExitSizeMove(void)
@@ -1470,22 +1556,20 @@ void BGOnExitSizeMove(void)
 #endif
 }
 
+/**
+ *	WM_SETTINGCHANGE 時に呼び出す
+ */
 void BGOnSettingChange(void)
 {
-  if(!BGEnable)
-    return;
+	if(!BGEnable)
+		return;
 
-  // TODO モニタ(ディスプレイ)をまたぐとサイズが変化するのでは?
-  CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
-  CRTHeight = GetSystemMetrics(SM_CYSCREEN);
+	// TODO モニタ(ディスプレイ)をまたぐとサイズが変化するのでは?
+	CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
+	CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
-  //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest);
-  BGPreloadSrc(&BGSrc1);
-  BGPreloadSrc(&BGSrc2);
-
-  BGSetupPrimary(TRUE);
-  InvalidateRect(HVTWin, NULL, FALSE);
+	BGSetupPrimary(TRUE);
+	InvalidateRect(HVTWin, NULL, FALSE);
 }
 
 /**
@@ -3728,12 +3812,15 @@ void ThemeSetColor(const TColorTheme *data)
  */
 void ThemeGetBGDefault(BGTheme *bg_theme)
 {
+	bg_theme->BGDest.enable = FALSE;
 	bg_theme->BGDest.type = BG_PICTURE;
 	bg_theme->BGDest.pattern = BG_STRETCH;
 	bg_theme->BGDest.color = RGB(0, 0, 0);
+	bg_theme->BGDest.alpha = 255;
 	bg_theme->BGDest.antiAlias = TRUE;
 	bg_theme->BGDest.file[0] = 0;
 
+	bg_theme->BGSrc1.enable = FALSE;
 	bg_theme->BGSrc1.type = BG_WALLPAPER;
 	bg_theme->BGSrc1.pattern = BG_STRETCH;
 	bg_theme->BGSrc1.color = RGB(255, 255, 255);
@@ -3741,6 +3828,7 @@ void ThemeGetBGDefault(BGTheme *bg_theme)
 	bg_theme->BGSrc1.alpha = 0;
 	bg_theme->BGSrc1.file[0] = 0;
 
+	bg_theme->BGSrc2.enable = FALSE;
 	bg_theme->BGSrc2.type = BG_COLOR;
 	bg_theme->BGSrc2.pattern = BG_STRETCH;
 	bg_theme->BGSrc2.color = RGB(0, 0, 0);
@@ -3823,13 +3911,17 @@ void ThemeSetBG(const BGTheme *bg_theme)
 	BGDest.type = bg_theme->BGDest.type;
 	BGDest.color = bg_theme->BGDest.color;
 	BGDest.pattern = bg_theme->BGDest.pattern;
+	BGDest.enable = bg_theme->BGDest.enable;
+	BGDest.alpha = bg_theme->BGDest.alpha;
 
 	BGSrc1.type = bg_theme->BGSrc1.type;
 	BGSrc1.alpha = bg_theme->BGSrc1.alpha;
+	BGSrc1.enable = bg_theme->BGSrc1.enable;
 
 	BGSrc2.type = bg_theme->BGSrc2.type;
 	BGSrc2.alpha = bg_theme->BGSrc2.alpha;
 	BGSrc2.color = bg_theme->BGSrc2.color;
+	BGSrc2.enable = bg_theme->BGSrc2.enable;
 
 	BGReverseTextAlpha = bg_theme->BGReverseTextAlpha;
 	{
@@ -3852,13 +3944,17 @@ void ThemeGetBG(BGTheme *bg_theme)
 	bg_theme->BGDest.type = BG_PICTURE;
 	bg_theme->BGDest.color = BGDest.color;
 	bg_theme->BGDest.pattern = BGDest.pattern;
+	bg_theme->BGDest.enable = BGDest.enable;
+	bg_theme->BGDest.alpha = BGDest.alpha;
 
 	bg_theme->BGSrc1.type = BG_WALLPAPER;
 	bg_theme->BGSrc1.alpha = BGSrc1.alpha;
+	bg_theme->BGSrc1.enable = BGSrc1.enable;
 
 	bg_theme->BGSrc2.type = BG_COLOR;
 	bg_theme->BGSrc2.alpha = BGSrc2.alpha;
 	bg_theme->BGSrc2.color = BGSrc2.color;
+	bg_theme->BGSrc2.enable = BGSrc2.enable;
 
 	bg_theme->BGReverseTextAlpha = BGReverseTextAlpha;
 	{

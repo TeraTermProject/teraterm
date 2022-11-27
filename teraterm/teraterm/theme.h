@@ -49,16 +49,17 @@ typedef enum _BG_PATTERN {
 typedef struct {
 	BG_TYPE type;
 	BG_PATTERN pattern;
+	BOOL enable;
 	BOOL antiAlias;
-	COLORREF color;
+	COLORREF color;		// type=BG_PICTURE, BG_WALLPAPER時、画像のない部分塗りつぶし色
 	int alpha;
 	wchar_t file[MAX_PATH];
 } TBGSrc;
 
 typedef struct _BGTheme {
-	TBGSrc BGDest;
-	TBGSrc BGSrc1;
-	TBGSrc BGSrc2;
+	TBGSrc BGDest;				// 背景画像
+	TBGSrc BGSrc1;				// 壁紙(Windowsのデスクトップ背景)
+	TBGSrc BGSrc2;				// fill color
 	BYTE TextBackAlpha;			// 通常属性(SGR0),back部分のAlpha
 	BYTE BGReverseTextAlpha;	// 反転属性(SGR7),back部分のAlpha
 	BYTE BackAlpha;				// その他のback部分のAlpha

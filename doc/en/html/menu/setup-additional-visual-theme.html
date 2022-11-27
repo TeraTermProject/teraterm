@@ -19,9 +19,9 @@
     <dl>
       <dt><a href="#preview">preview/file tab</a></dt>
       <dd>テーマの一時的な設定(preview),テーマファイルの読み込みと書き出し</dd>
-      <dt><a href="#bg">Backgroud tab</a></dt>
+      <dt><a href="#bg">Background tab</a></dt>
       <dd>BG(背景画像)に関する設定を行う</dd>
-      <dt><a href="#bg_alpha">Backgroud alpha tab</a></dt>
+      <dt><a href="#bg_alpha">Background alpha tab</a></dt>
       <dd>BG(背景画像)と文字背景色の透過設定を行う</dd>
       <dt><a href="#color">color tab</a></dt>
       <dd>文字の色に関する設定を行う</dd>
@@ -64,23 +64,38 @@
 
     <hr>
 
-    <h2 id="bg">Backgroud tab(背景テーマ)</h2>
+    <h2 id="bg">Background tab(背景テーマ)</h2>
 
     <h3>背景</h3>
 
-    上から順に背景画像が合成されていく。
+    下から順に背景画像が合成されていく。
 
     <dl>
-      <dt>Base Color</dt>
+      <dt>Mixing simple color plane</dt>
       <dd>
-        背景画像を使用しない場合はこの色で塗りつぶされる。背景画像が描画されない部分がある場合もこの色で塗りつぶされる。
+        単色をアルファブレンドする。<br>
+        例:背景画像,壁紙をブレンドした状態で少し暗くする場合は、000000を128の割合でアルファブレンドする。
+        <dl>
+          <dt>Color (RRGGBB)</dt>
+          <dd>合成するプレーンの色</dd>
+
+          <dt>alpha</dt>
+          <dd>合成するアルファブレンド値(0...255)</dd>
+        </dl>
       </dd>
 
-      <dt>Backgroud Image</dt>
+      <dt>Background Image</dt>
       <dd>
         背景画像を指定する。<br>
         描画方法は次の中から選択する
         <dl>
+          <dt>画像ファイル名</dt>
+          <dd>
+            bmp, png, gif, jpg等<br>
+            32bit bmp, 透過pngの場合は8bitのアルファチャンネルが付加される<br>
+            透過gifの場合は1色を透明として扱う
+          </dd>
+
           <dt>stretch</dt>
           <dt>tile</dt>
           <dt>center</dt>
@@ -91,17 +106,18 @@
           <dd>
             TODO 詳細を調べて書く
           </dd>
-        </dl></dd>
+
+          <dt>alpha</dt>
+          <dd>合成するアルファブレンド値(0...255)</dd>
+
+          <dt>Color (RRGGBB)</dt>
+          <dd>景画像が描画されない部分がある場合この色で塗りつぶされる。</dd>
+        </dl>
+      </dd>
 
       <dt>desktop wallpaper image</dt>
       <dd>
-        Windowsの壁紙画像をアルファブレンドする。
-      </dd>
-
-      <dt>simple color plane</dt>
-      <dd>
-        単色をアルファブレンドする。<br>
-        例:背景画像,壁紙をブレンドした状態で少し暗くする場合は、000000を128の割合でアルファブレンドする。
+        Windowsの壁紙画像
       </dd>
 
     </dl>

@@ -31,8 +31,8 @@
 #define IDC_BGIMG_COLOR_EDIT            3005
 #define IDC_BGIMG_COMBO                 3006
 #define IDC_WALLPAPER_CHECK             3100
-#define IDC_WALLPAPER_ALPHA_TITLE       3101
-#define IDC_WALLPAPER_ALPHA_EDIT        3102
+#define IDC_BGIMG_ALPHA_TITLE       3101
+#define IDC_BGIMG_ALPHA_EDIT        3102
 #define IDC_SIMPLE_COLOR_PLANE_CHECK    3200
 #define IDC_SIMPLE_COLOR_PLANE_COLOR_TITLE 3201
 #define IDC_SIMPLE_COLOR_PLANE_COLOR    3202
@@ -42,7 +42,7 @@
 #define IDC_COLOR_DEFAULT_BUTTON        4001
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

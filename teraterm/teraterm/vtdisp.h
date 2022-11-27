@@ -61,7 +61,7 @@ extern "C" {
 
 /* prototypes */
 void BGInitialize(BOOL initialize_once);
-void BGLoadThemeFile(TTTSet *pts);
+void BGLoadThemeFile(const TTTSet *pts);
 void BGSetupPrimary(BOOL forceSetup);
 
 void BGOnSettingChange(void);

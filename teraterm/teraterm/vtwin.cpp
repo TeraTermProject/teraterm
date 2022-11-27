@@ -67,6 +67,7 @@
 #include "teraterml.h"
 #include "buffer.h"
 #include "cyglib.h"
+#include "theme.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -4296,10 +4297,23 @@ void CVTWindow::OnSetupWindow()
 	Ok = (*SetupWin)(HVTWin, &ts);
 
 	if (Ok) {
-		// Eterm lookfeelの画面情報も更新することで、リアルタイムでの背景色変更が
-		// 可能となる。(2006.2.24 yutaka)
-		BGInitialize(FALSE);
-		BGSetupPrimary(TRUE);
+		BOOL set_color = TRUE;
+		if (ThemeGetEnable()) {
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_TT_NOTICE", L"Tera Term: Notice",
+				NULL, L"Theme is used\nDo you want to set color?",
+				MB_ICONQUESTION | MB_YESNO };
+			int r = TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+			if (r == IDNO) {
+				set_color = FALSE;
+			}
+		}
+
+		// 色を設定する
+		if (set_color) {
+			DispResetColor(CS_ALL);
+		}
 
 		// タイトルが変更されていたら、リモートタイトルをクリアする
 		if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&

@@ -133,8 +133,8 @@ static COLORREF GetDlgItemTextColor(HWND hDlg, int ID)
 
 static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 {
-	BOOL bg_enable = (bg_theme->BGDest.type == BG_PICTURE && (bg_theme->BGDest.file != NULL && bg_theme->BGDest.file[0] != 0)) ? TRUE : FALSE;
-	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, bg_enable, 0);
+	// bg image
+	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, bg_theme->BGDest.enable, 0);
 	SetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file);
 	SetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT, bg_theme->BGDest.color);
 	{
@@ -150,11 +150,13 @@ static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 		}
 		SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_SETCURSEL, sel, 0);
 	}
+	SetDlgItemInt(hWnd, IDC_BGIMG_ALPHA_EDIT, bg_theme->BGDest.alpha, FALSE);
 
-	SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_SETCHECK, bg_theme->BGSrc1.alpha != 0, 0);
-	SetDlgItemInt(hWnd, IDC_WALLPAPER_ALPHA_EDIT, bg_theme->BGSrc1.alpha, FALSE);
+	// wall paper
+	SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_SETCHECK, bg_theme->BGSrc1.enable, 0);
 
-	SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_SETCHECK, bg_theme->BGSrc2.alpha != 0, 0);
+	// simple color plane
+	SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_SETCHECK, bg_theme->BGSrc2.enable, 0);
 	SetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, bg_theme->BGSrc2.alpha, FALSE);
 	SetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR, bg_theme->BGSrc2.color);
 }
@@ -163,30 +165,24 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 {
 	LRESULT checked;
 	LRESULT index;
+
+	// bg_image
 	checked = SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_GETCHECK, 0, 0);
-	bg_theme->BGDest.type = checked & BST_CHECKED ? BG_PICTURE : BG_NONE;
+	bg_theme->BGDest.enable = checked & BST_CHECKED;
 	GetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file, _countof(bg_theme->BGDest.file));
 	bg_theme->BGDest.color = GetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT);
 	index = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETCURSEL, 0, 0);
 	bg_theme->BGDest.pattern = (BG_PATTERN)SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETITEMDATA, index, 0);
+	bg_theme->BGDest.alpha = GetDlgItemInt(hWnd, IDC_BGIMG_ALPHA_EDIT, NULL, FALSE);
 
+	// wall paper
 	checked = SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_GETCHECK, 0, 0);
-	if (checked & BST_CHECKED) {
-		bg_theme->BGSrc1.type = BG_WALLPAPER;
-		bg_theme->BGSrc1.alpha = GetDlgItemInt(hWnd, IDC_WALLPAPER_ALPHA_EDIT, NULL, FALSE);
-	} else {
-		bg_theme->BGSrc1.type = BG_NONE;
-		bg_theme->BGSrc1.alpha = 0;
-	}
+	bg_theme->BGSrc1.enable = checked & BST_CHECKED;
 
+	// simple color plane
 	checked = SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_GETCHECK, 0, 0);
-	if (checked & BST_CHECKED) {
-		bg_theme->BGSrc2.type = BG_COLOR;
-		bg_theme->BGSrc2.alpha = GetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, NULL, FALSE);
-	} else {
-		bg_theme->BGSrc2.type = BG_NONE;
-		bg_theme->BGSrc2.alpha = 0;
-	}
+	bg_theme->BGSrc2.enable = checked & BST_CHECKED;
+	bg_theme->BGSrc2.alpha = GetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, NULL, FALSE);
 	bg_theme->BGSrc2.color = GetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR);
 }
 
@@ -206,13 +202,11 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetDlgItemTextW(hWnd, IDC_BG_THEME_HELP,
 							L"Mix order:\n"
-							L"  base\n"
-							L"    v\n"
+							L"  simple color plane\n"
+							L"    ^\n"
 							L"  Background Image\n"
-							L"    v\n"
+							L"    ^\n"
 							L"  wallpaper\n"
-							L"    v\n"
-							L"  simple color plane"
 				);
 
 			for (int i = 0;; i++) {
