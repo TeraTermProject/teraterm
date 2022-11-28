@@ -3475,6 +3475,7 @@ void DispResetColor(unsigned int num)
 		BGVTBlinkColor[0] = ts.VTBlinkColor[0];
 		BGVTReverseColor[0] = ts.VTReverseColor[0];
 		BGURLColor[0] = ts.URLColor[0];
+		BGVTUnderlineColor[0] = ts.VTUnderlineColor[0];
 
 		// VT color Background
 		BGVTColor[1] = ts.VTColor[1];
@@ -3482,6 +3483,7 @@ void DispResetColor(unsigned int num)
 		BGVTBoldColor[1] = ts.VTBoldColor[1];
 		BGVTBlinkColor[1] = ts.VTBlinkColor[1];
 		BGURLColor[1] = ts.URLColor[1];
+		BGVTUnderlineColor[1] = ts.VTUnderlineColor[1];
 
 		// ANSI Color / xterm 256 color
 		InitColorTable(ts.ANSIColor);

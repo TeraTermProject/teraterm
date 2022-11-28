@@ -40,6 +40,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "tttypes.h"
 #include "ttlib.h"
@@ -117,10 +118,10 @@ static const char *BaudList[] =
 static void SetKanjiCodeDropDownList(HWND HDlg, int id, int language, int sel_code)
 {
 	int i;
-	int sel_index = 0;
+	LRESULT sel_index = 0;
 
 	for(i = 0;; i++) {
-		int index;
+		LRESULT index;
 		const TKanjiList *p = GetKanjiList(i);
 		if (p == NULL) {
 			break;
@@ -135,7 +136,7 @@ static void SetKanjiCodeDropDownList(HWND HDlg, int id, int language, int sel_co
 			sel_index = index;
 		}
 	}
-	SendDlgItemMessage(HDlg, id, CB_SETCURSEL, sel_index, 0);
+	SendDlgItemMessageA(HDlg, id, CB_SETCURSEL, sel_index, 0);
 }
 
 /*
@@ -549,7 +550,6 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	HWND Wnd, HRed, HGreen, HBlue;
 	int IAttr, IOffset;
 	WORD i, pos, ScrollCode, NewPos;
-	HDC DC;
 	WinDlgWork *work = (WinDlgWork *)GetWindowLongPtr(Dialog,DWLP_USER);
 
 	switch (Message) {
@@ -615,6 +615,9 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					work->TmpColor[4][i*3]   = GetRValue(ts->URLColor[i]);
 					work->TmpColor[4][i*3+1] = GetGValue(ts->URLColor[i]);
 					work->TmpColor[4][i*3+2] = GetBValue(ts->URLColor[i]);
+					work->TmpColor[5][i*3]   = GetRValue(ts->VTUnderlineColor[i]);
+					work->TmpColor[5][i*3+1] = GetGValue(ts->VTUnderlineColor[i]);
+					work->TmpColor[5][i*3+2] = GetBValue(ts->VTUnderlineColor[i]);
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
 				{
@@ -624,6 +627,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						{ "DLG_WIN_BLINK", L"Blink" },
 						{ "DLG_WIN_REVERSEATTR", L"Reverse" },
 						{ NULL, L"URL" },
+						{ NULL, L"Underline" },
 					};
 					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), ts->UILanguageFileW, 0);
 				}
@@ -666,96 +670,105 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		case WM_COMMAND:
 			ts = work->ts;
 			RestoreVar(Dialog,work,&IAttr,&IOffset);
+			assert(IAttr < _countof(work->TmpColor));
 			switch (LOWORD(wParam)) {
-				case IDOK:
-					if ( ts!=NULL ) {
-						WORD w;
-						GetDlgItemText(Dialog,IDC_WINTITLE,ts->Title,sizeof(ts->Title));
-						GetRB(Dialog,&ts->HideTitle,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
-						GetRB(Dialog,&w,IDC_NO_FRAME,IDC_NO_FRAME);
-						ts->EtermLookfeel.BGNoFrame = w;
-						GetRB(Dialog,&ts->PopupMenu,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
-						DC = GetDC(Dialog);
-						if (work->VTFlag>0) {
-							GetRB(Dialog,&i,IDC_WINCOLOREMU,IDC_WINCOLOREMU);
-							if (i!=0) {
-								ts->ColorFlag |= CF_PCBOLD16;
-							}
-							else {
-								ts->ColorFlag &= ~(WORD)CF_PCBOLD16;
-							}
-							GetRB(Dialog,&i,IDC_WINAIXTERM16,IDC_WINAIXTERM16);
-							if (i!=0) {
-								ts->ColorFlag |= CF_AIXTERM16;
-							}
-							else {
-								ts->ColorFlag &= ~(WORD)CF_AIXTERM16;
-							}
-							GetRB(Dialog,&i,IDC_WINXTERM256,IDC_WINXTERM256);
-							if (i!=0) {
-								ts->ColorFlag |= CF_XTERM256;
-							}
-							else {
-								ts->ColorFlag &= ~(WORD)CF_XTERM256;
-							}
-							GetRB(Dialog,&ts->EnableScrollBuff,IDC_WINSCROLL1,IDC_WINSCROLL1);
-							if ( ts->EnableScrollBuff>0 ) {
-								ts->ScrollBuffSize =
-									GetDlgItemInt(Dialog,IDC_WINSCROLL2,NULL,FALSE);
-							}
-							for (i = 0 ; i <= 1 ; i++) {
-								ts->VTColor[i] =
-									RGB(work->TmpColor[0][i*3],
-										work->TmpColor[0][i*3+1],
-										work->TmpColor[0][i*3+2]);
-								ts->VTBoldColor[i] =
-									RGB(work->TmpColor[1][i*3],
-										work->TmpColor[1][i*3+1],
-										work->TmpColor[1][i*3+2]);
-								ts->VTBlinkColor[i] =
-									RGB(work->TmpColor[2][i*3],
-										work->TmpColor[2][i*3+1],
-										work->TmpColor[2][i*3+2]);
-								ts->VTReverseColor[i] =
-									RGB(work->TmpColor[3][i*3],
-										work->TmpColor[3][i*3+1],
-										work->TmpColor[3][i*3+2]);
-								ts->URLColor[i] =
-									RGB(work->TmpColor[4][i*3],
-										work->TmpColor[4][i*3+1],
-										work->TmpColor[4][i*3+2]);
-								ts->VTColor[i] = GetNearestColor(DC,ts->VTColor[i]);
-								ts->VTBoldColor[i] = GetNearestColor(DC,ts->VTBoldColor[i]);
-								ts->VTBlinkColor[i] = GetNearestColor(DC,ts->VTBlinkColor[i]);
-								ts->VTReverseColor[i] = GetNearestColor(DC,ts->VTReverseColor[i]);
-								ts->URLColor[i] = GetNearestColor(DC,ts->URLColor[i]);
-							}
-							GetRB(Dialog,&ts->UseNormalBGColor,
-							      IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
-							GetRB(Dialog, &i, IDC_FONTBOLD, IDC_FONTBOLD);
-							if (i > 0) {
-								ts->FontFlag |= FF_BOLD;
-							}
-							else {
-								ts->FontFlag &= ~(WORD)FF_BOLD;
-							}
+				case IDOK: {
+					WORD w;
+					//HDC DC;
+					GetDlgItemText(Dialog, IDC_WINTITLE, ts->Title, sizeof(ts->Title));
+					GetRB(Dialog, &ts->HideTitle, IDC_WINHIDETITLE, IDC_WINHIDETITLE);
+					GetRB(Dialog, &w, IDC_NO_FRAME, IDC_NO_FRAME);
+					ts->EtermLookfeel.BGNoFrame = w;
+					GetRB(Dialog, &ts->PopupMenu, IDC_WINHIDEMENU, IDC_WINHIDEMENU);
+					// DC = GetDC(Dialog);
+					if (work->VTFlag > 0) {
+						GetRB(Dialog, &i, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
+						if (i != 0) {
+							ts->ColorFlag |= CF_PCBOLD16;
 						}
 						else {
-							for (i = 0 ; i <= 1 ; i++) {
-								ts->TEKColor[i] =
-									RGB(work->TmpColor[0][i*3],
-									    work->TmpColor[0][i*3+1],
-									    work->TmpColor[0][i*3+2]);
-								ts->TEKColor[i] = GetNearestColor(DC,ts->TEKColor[i]);
-							}
-							GetRB(Dialog,&ts->TEKColorEmu,IDC_WINCOLOREMU,IDC_WINCOLOREMU);
+							ts->ColorFlag &= ~(WORD)CF_PCBOLD16;
 						}
-						ReleaseDC(Dialog,DC);
-
-						GetRB(Dialog,&ts->CursorShape,IDC_WINBLOCK,IDC_WINHORZ);
+						GetRB(Dialog, &i, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
+						if (i != 0) {
+							ts->ColorFlag |= CF_AIXTERM16;
+						}
+						else {
+							ts->ColorFlag &= ~(WORD)CF_AIXTERM16;
+						}
+						GetRB(Dialog, &i, IDC_WINXTERM256, IDC_WINXTERM256);
+						if (i != 0) {
+							ts->ColorFlag |= CF_XTERM256;
+						}
+						else {
+							ts->ColorFlag &= ~(WORD)CF_XTERM256;
+						}
+						GetRB(Dialog, &ts->EnableScrollBuff, IDC_WINSCROLL1, IDC_WINSCROLL1);
+						if (ts->EnableScrollBuff > 0) {
+								ts->ScrollBuffSize =
+									GetDlgItemInt(Dialog,IDC_WINSCROLL2,NULL,FALSE);
+						}
+						for (i = 0; i <= 1; i++) {
+							ts->VTColor[i] =
+								RGB(work->TmpColor[0][i*3],
+									work->TmpColor[0][i*3+1],
+									work->TmpColor[0][i*3+2]);
+							ts->VTBoldColor[i] =
+								RGB(work->TmpColor[1][i*3],
+									work->TmpColor[1][i*3+1],
+									work->TmpColor[1][i*3+2]);
+							ts->VTBlinkColor[i] =
+								RGB(work->TmpColor[2][i*3],
+									work->TmpColor[2][i*3+1],
+									work->TmpColor[2][i*3+2]);
+							ts->VTReverseColor[i] =
+								RGB(work->TmpColor[3][i*3],
+									work->TmpColor[3][i*3+1],
+									work->TmpColor[3][i*3+2]);
+							ts->URLColor[i] =
+								RGB(work->TmpColor[4][i*3],
+									work->TmpColor[4][i*3+1],
+									work->TmpColor[4][i*3+2]);
+							ts->VTUnderlineColor[i] =
+								RGB(work->TmpColor[5][i * 3],
+									work->TmpColor[5][i * 3 + 1],
+									work->TmpColor[5][i * 3 + 2]);
+#if 0
+							ts->VTColor[i] = GetNearestColor(DC, ts->VTColor[i]);
+							ts->VTBoldColor[i] = GetNearestColor(DC, ts->VTBoldColor[i]);
+							ts->VTBlinkColor[i] = GetNearestColor(DC, ts->VTBlinkColor[i]);
+							ts->VTReverseColor[i] = GetNearestColor(DC, ts->VTReverseColor[i]);
+							ts->URLColor[i] = GetNearestColor(DC, ts->URLColor[i]);
+#endif
+						}
+						GetRB(Dialog, &ts->UseNormalBGColor,
+							  IDC_WINUSENORMALBG, IDC_WINUSENORMALBG);
+						GetRB(Dialog, &i, IDC_FONTBOLD, IDC_FONTBOLD);
+						if (i > 0) {
+							ts->FontFlag |= FF_BOLD;
+						}
+						else {
+							ts->FontFlag &= ~(WORD)FF_BOLD;
+						}
 					}
+					else {
+						for (i = 0; i <= 1; i++) {
+							ts->TEKColor[i] =
+								RGB(work->TmpColor[0][i*3],
+									work->TmpColor[0][i*3+1],
+									work->TmpColor[0][i*3+2]);
+#if 0
+							ts->TEKColor[i] = GetNearestColor(DC, ts->TEKColor[i]);
+#endif
+						}
+						GetRB(Dialog, &ts->TEKColorEmu, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
+					}
+					// ReleaseDC(Dialog,DC);
+
+					GetRB(Dialog, &ts->CursorShape, IDC_WINBLOCK, IDC_WINHORZ);
 					EndDialog(Dialog, 1);
 					return TRUE;
+				}
 
 				case IDCANCEL:
 					EndDialog(Dialog, 0);
