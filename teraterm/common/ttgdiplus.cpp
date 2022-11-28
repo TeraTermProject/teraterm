@@ -130,8 +130,6 @@ HBITMAP GDIPLoad(const wchar_t *filename)
 	GDIPSavePNG(&bitmap, L"test.png");
 #endif
 
-	Gdiplus::PixelFormat format = bitmap.GetPixelFormat();
-
 	HBITMAP hBmp;
 	Gdiplus::Color bgColor = Gdiplus::Color(0, 0, 0);
 	Gdiplus::Status r = bitmap.GetHBITMAP(bgColor, &hBmp);

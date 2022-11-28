@@ -231,7 +231,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wParam) {
 		case IDC_NOTIFICATION_TEST | (BN_CLICKED << 16): {
 			PComVar pcv = &cv;
-			wchar_t *msg = L"Test button was pushed";
+			const wchar_t *msg = L"Test button was pushed";
 			BOOL prev_sound = NotifyGetSound(pcv);
 			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
 			NotifySetSound(pcv, notify_sound);
