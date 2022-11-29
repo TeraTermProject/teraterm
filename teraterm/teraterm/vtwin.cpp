@@ -4334,7 +4334,7 @@ void CVTWindow::OnSetupFont()
 	}
 	else {
 		HelpId = HlpSetupFont;
-		DispSetupFontDlg();
+		DispSetupFontDlg(m_hWnd);
 		// ANSI表示用のコードページを設定する
 		BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 	}

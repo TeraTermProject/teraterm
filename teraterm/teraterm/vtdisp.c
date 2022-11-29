@@ -3258,7 +3258,7 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
 	return CP_ACP;
 }
 
-void DispSetupFontDlg(void)
+void DispSetupFontDlg(HWND hwndOwner)
 //  Popup the Setup Font dialogbox and
 //  reset window
 {
@@ -3268,7 +3268,7 @@ void DispSetupFontDlg(void)
   ts.VTFlag = 1;
   if (! LoadTTDLG()) return;
   SetLogFont(&VTlf, FALSE);
-  Ok = ChooseFontDlg(HVTWin,&VTlf,&ts);
+  Ok = ChooseFontDlg(hwndOwner,&VTlf,&ts);
   if (! Ok) return;
 
   strncpy_s(ts.VTFont, sizeof(ts.VTFont),VTlf.lfFaceName, _TRUNCATE);

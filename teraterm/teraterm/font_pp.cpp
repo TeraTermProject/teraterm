@@ -245,7 +245,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 			case IDC_VTFONT_CHOOSE | (BN_CLICKED << 16): {
-				DispSetupFontDlg();
+				DispSetupFontDlg(hWnd);
 				SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
 				SetVTFontString(hWnd, IDC_VTFONT_EDIT, ts);
 				break;

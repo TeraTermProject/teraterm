@@ -115,7 +115,7 @@ void DispScrollHomePos(void);
 void DispAutoScroll(POINT p);
 void DispHScroll(int Func, int Pos);
 void DispVScroll(int Func, int Pos);
-void DispSetupFontDlg(void);
+void DispSetupFontDlg(HWND hwndOwner);
 void DispRestoreWinSize(void);
 void DispSetWinPos(void);
 void DispSetActive(BOOL ActiveFlag);
