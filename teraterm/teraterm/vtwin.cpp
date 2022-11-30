@@ -2141,6 +2141,13 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 
 void CVTWindow::OnMove(int x, int y)
 {
+	// ウィンドウ位置を保存
+	// 		注 x,y はクライアント領域の左上の座標
+	RECT R;
+	::GetWindowRect(HVTWin,&R);
+	ts.VTPos.x = R.left;
+	ts.VTPos.y = R.top;
+
 	DispSetWinPos();
 }
 

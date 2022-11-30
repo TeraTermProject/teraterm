@@ -111,7 +111,10 @@
           <dd>合成するアルファブレンド値(0...255)</dd>
 
           <dt>Color (RRGGBB)</dt>
-          <dd>景画像が描画されない部分がある場合この色で塗りつぶされる。</dd>
+          <dd>
+            背景画像が描画されない部分がある場合この色で埋められる。<br>
+            画像に透明部分が存在していてWindowsの壁紙画像を合成しない場合もこの色で埋められる。
+          </dd>
         </dl>
       </dd>
 
@@ -147,7 +150,7 @@
       </dd>
       <dt>
     </dl>
-    <img src="setup-additional-visual-theme-alpha.png"><br>
+    <img src="../../../image/setup-additional-visual-theme-alpha.png"><br>
     1,3の部分が透明のとき、Tera Term 4 の透過と同様となる。
 
     <hr>
@@ -189,7 +192,7 @@ wget https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/color-sgr-d
     <h2>背景テーマのOverview</h2>
 
     Tera Term の背景画像は次のように合成される。<br>
-    <img src="setup-additional-visual-theme.png"><br>
+    <img src="../../../image/setup-additional-visual-theme.png"><br>
 
     <hr>
 

@@ -804,6 +804,10 @@ load_finish:
 
 static void BGPreloadSrc(BGSrc *src)
 {
+	if (!src->enable) {
+		return;
+	}
+
 	DeleteBitmapDC(&(src->hdc));
 
 	switch (src->type) {
@@ -1048,6 +1052,7 @@ static void BGLoadSrc(HDC hdcDest, BGSrc *src)
 		case BG_PICTURE:
 			BGLoadPicture(hdcDest, src);
 			break;
+
 		default:
 			break;
 	}
@@ -1101,7 +1106,7 @@ static BOOL IsAlphaValidBitmap(HBITMAP hBmp)
 		bmi.bmiHeader.biSizeImage = width * height * 4;
 		hBmpDIB = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
 
-		// hBmp が SelectObject() されいたとき
+		// hBmp が SelectObject() されていたとき
 		// 別HDCにSelectObject()できないのでコピーしておく
 		hBmpCopy = (HBITMAP)CopyImage(hBmp, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 
@@ -1162,26 +1167,39 @@ static HDC CreateBGImage(int width, int height)
 
 	// 指定画像
 	if (BGDest.enable && BGDest.hdc != NULL) {
+		BOOL alpha_valid;
+
+		// 画像をロード(描画)する
+		BGLoadSrc(hdc_work, &BGDest);
+		alpha_valid = IsAlphaValidBitmapHDC(BGDest.hdc);
+
+		// 準備した画像を貼り付ける
 		memset(&bf, 0, sizeof(bf));
 		bf.BlendOp = AC_SRC_OVER;
 		bf.SourceConstantAlpha = BGDest.alpha;
 		bf.AlphaFormat = 0;
-		if (IsAlphaValidBitmapHDC(BGDest.hdc)) {
+		if (alpha_valid) {
 			// 32bitビットマップ(alpha値が存在している)場合はalpha値を参照する
 			bf.AlphaFormat = AC_SRC_ALPHA;
+			if (!BGSrc1.enable) {
+				// 壁紙がない場合はあらかじめ塗りつぶしておく
+				FillBitmapDC(hdc_bg, BGDest.color);
+			}
 		}
-		BGLoadSrc(hdc_work, &BGDest);
 		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
 	}
 	DebugSaveFile(L"bg_2.bmp", hdc_bg, width, height);
 
 	// 単色プレーン
 	if (BGSrc2.enable) {
+		// 画像を準備
+		BGLoadSrc(hdc_work, &BGSrc2);
+
+		// 貼り付ける
 		memset(&bf, 0, sizeof(bf));
 		bf.BlendOp = AC_SRC_OVER;
 		bf.SourceConstantAlpha = BGSrc2.alpha;
 		bf.AlphaFormat = 0;
-		BGLoadSrc(hdc_work, &BGSrc2);
 		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
 	}
 	DebugSaveFile(L"bg_3.bmp", hdc_bg, width, height);
@@ -3304,36 +3322,46 @@ void DispRestoreWinSize(void)
   }
 }
 
+/**
+ *	WM_MOVE 時にコールされる
+ */
 void DispSetWinPos(void)
 {
-  int CaretX, CaretY;
-  POINT Point;
-  RECT R;
+	int CaretX, CaretY;
+	POINT Point;
 
-  GetWindowRect(HVTWin,&R);
-  ts.VTPos.x = R.left;
-  ts.VTPos.y = R.top;
+	if (CanUseIME() && (ts.IMEInline > 0))
+	{
+		CaretX = (CursorX-WinOrgX)*FontWidth;
+		CaretY = (CursorY-WinOrgY)*FontHeight;
+		/* set IME conversion window pos. */
+		SetConversionWindow(HVTWin,CaretX,CaretY);
+	}
 
-  if (CanUseIME() && (ts.IMEInline > 0))
-  {
-    CaretX = (CursorX-WinOrgX)*FontWidth;
-    CaretY = (CursorY-WinOrgY)*FontHeight;
-    /* set IME conversion window pos. */
-    SetConversionWindow(HVTWin,CaretX,CaretY);
-  }
+	Point.x = 0;
+	Point.y = ScreenHeight;
+	ClientToScreen(HVTWin,&Point);
+	CompletelyVisible = (Point.y <= VirtualScreen.bottom);
 
-  Point.x = 0;
-  Point.y = ScreenHeight;
-  ClientToScreen(HVTWin,&Point);
-  CompletelyVisible = (Point.y <= VirtualScreen.bottom);
-
-   if(BGEnable)
-	InvalidateRect(HVTWin, NULL, FALSE);
+	if(BGEnable) {
+		if (BGSrc1.enable) {
+			// 壁紙(Windowsのデスクトップ背景)が有効な時は
+			// 全面書き直し
+			InvalidateRect(HVTWin, NULL, FALSE);
+		}
+	}
 }
 
-void DispMoveWindow(int x, int y) {
+/**
+ *	ウィンドウの位置を移動する
+ *	CSSunSequence()@vtterm.c から呼ばれる
+ */
+void DispMoveWindow(int x, int y)
+{
 	SetWindowPos(HVTWin, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
-	DispSetWinPos();
+	// WM_WINDOWPOSCHANGED を処理しないので
+	// WM_MOVE が発生して DispSetWinPos() がコールされる
+	// DispSetWinPos();
 	return;
 }
 
