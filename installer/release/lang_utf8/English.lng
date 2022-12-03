@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-11-20)
+﻿; Updated by TeraTerm Project (2022-12-01)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -194,7 +194,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=Notification
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&Notify sound
-DLG_TAB_GENERAL_NOTIFICATION_TEST=&Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&Popup Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&Tray Test
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accept &mouse event tracking request
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Disable mouse event tracking when Control is pressed

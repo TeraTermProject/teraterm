@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-11-20)
+﻿; Updated by TeraTerm Project (2022-12-01)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -195,7 +195,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=Notification
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&Notify sound
-DLG_TAB_GENERAL_NOTIFICATION_TEST=&Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&Popup Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&Tray Test
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accepter les événement souris
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=Accepter les événement souris quand CTRL est appuyé

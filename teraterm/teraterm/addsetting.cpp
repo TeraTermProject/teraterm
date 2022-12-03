@@ -122,7 +122,8 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_TITLEFMT_DISPSERIALSPEED, "DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED" },
 		{ IDC_NOTIFICATION_TITLE, "DLG_TAB_GENERAL_NOTIFICATION_TITLE" },
 		{ IDC_NOTIFY_SOUND, "DLG_TAB_GENERAL_NOTIFIY_SOUND" },
-		{ IDC_NOTIFICATION_TEST, "DLG_TAB_GENERAL_NOTIFICATION_TEST" },
+		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP" },
+		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -227,7 +228,8 @@ void CGeneralPropPageDlg::OnHelp()
 BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
-		case IDC_NOTIFICATION_TEST | (BN_CLICKED << 16): {
+		case IDC_NOTIFICATION_TEST_POPUP | (BN_CLICKED << 16): {
+			// popupを出すテスト
 			NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
 			const wchar_t *msg = L"Test button was pushed";
 			BOOL prev_sound = Notify2GetSound(ni);
@@ -235,6 +237,28 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			Notify2SetSound(ni, notify_sound);
 			Notify2SetMessageW(ni, msg, NULL, 1);
 			Notify2SetSound(ni, prev_sound);
+			break;
+		}
+		case IDC_NOTIFICATION_TEST_TRAY | (BN_CLICKED << 16): {
+			// trayにiconを出す(自動で消えない)
+			NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
+			BOOL prev_sound = Notify2GetSound(ni);
+			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
+			Notify2SetSound(ni, notify_sound);
+			Notify2SetBallonDontHide(ni, TRUE);
+			Notify2SetMessageW(ni, NULL, NULL, 1);
+			Notify2SetSound(ni, prev_sound);
+
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_TT_NOTICE", L"Tera Term: Notice",
+				NULL, L"You can change notify setting",
+				MB_OK };
+			TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+
+			// 通知領域のアイコンを消す
+			Notify2Hide(ni);
+			Notify2SetBallonDontHide(ni, FALSE);
 			break;
 		}
 		default:
