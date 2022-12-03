@@ -107,6 +107,7 @@ void WriteReg(FILE *fp, const wchar_t *menu, const wchar_t *key, const wchar_t *
 {
 	wchar_t *escaped_command = EscapeCommand(command);
 	wchar_t *escaped_arg = EscapeCommand(arg);
+	wchar_t *escaped_icon = icon == NULL ? NULL : EscapeCommand(icon);
 	fwprintf(fp,
 			 L"[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\Folder\\shell\\%s]\n"
 			 L"@=\"%s\"\n"
@@ -116,9 +117,10 @@ void WriteReg(FILE *fp, const wchar_t *menu, const wchar_t *key, const wchar_t *
 			 L"@=\"%s %s\"\n\n",
 			 key,
 			 menu,
-			 icon == NULL ? L"" : icon,
+			 escaped_icon == NULL ? L"" : escaped_icon,
 			 key,
 			 escaped_command, escaped_arg);
+	free(escaped_icon);
 	free(escaped_arg);
 	free(escaped_command);
 }
