@@ -41,7 +41,6 @@
 #include "tttypes.h"
 #include "tttypes_key.h"
 
-#define	TTCMN_NOTIFY_INTERNAL 1
 #include "ttcommon.h"
 #include "ttwinman.h"
 #include "ttsetup.h"
@@ -108,6 +107,7 @@
 #include "setupdirdlg.h"
 #include "themedlg.h"
 #include "ttcmn_static.h"
+#include "ttcmn_notify2.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -437,9 +437,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RegDeviceNotify(HVTWin);
 
 	// 通知領域初期化
-	NotifyInitialize(&cv);
-	NotifySetWindow(&cv, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
-	NotifySetSound(&cv, ts.NotifySound);
+	NotifyIcon *ni = Notify2Initialize();
+	cv.NotifyIcon = ni;
+	Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
+	Notify2SetSound(ni, ts.NotifySound);
 
 	// VT ウィンドウのアイコン
 	SetVTIconID(&cv, NULL, 0);
@@ -1407,7 +1408,7 @@ void CVTWindow::OnClose()
 	ProtoEnd();
 
 	SaveVTPos();
-	NotifyUnsetWindow(&cv);
+	Notify2UnsetWindow((NotifyIcon *)cv.NotifyIcon);
 
 	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
 	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
@@ -1485,7 +1486,8 @@ void CVTWindow::OnDestroy()
 
 	TTSetUnInit(&ts);
 
-	NotifyUninitialize(&cv);
+	Notify2Uninitialize((NotifyIcon *)cv.NotifyIcon);
+	cv.NotifyIcon = NULL;
 }
 
 static void EscapeFilename(const wchar_t *src, wchar_t *dest)
@@ -3492,32 +3494,10 @@ LRESULT CVTWindow::OnChangeTitle(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 {
-	if (wParam == 1) {
-		switch (lParam) {
-		  case WM_MOUSEMOVE:
-		  case WM_LBUTTONUP:
-		  case WM_LBUTTONDBLCLK:
-		  case WM_RBUTTONUP:
-		  case WM_RBUTTONDBLCLK:
-		  case WM_CONTEXTMENU:
-		  case NIN_BALLOONSHOW:
-		  case NIN_BALLOONHIDE:
-		  case NIN_KEYSELECT:
-		  case NIN_SELECT:
-			// nothing to do
-			break;
-		  case WM_LBUTTONDOWN:
-		  case WM_RBUTTONDOWN:
-			NotifyHideIcon(&cv);
-			break;
-		  case NIN_BALLOONTIMEOUT:
-			NotifyHideIcon(&cv);
-			break;
-		  case NIN_BALLOONUSERCLICK:
-			::SetForegroundWindow(HVTWin);
-			NotifyHideIcon(&cv);
-			break;
-		}
+	Notify2Event((NotifyIcon *)cv.NotifyIcon, wParam, lParam);
+
+	if (lParam == NIN_BALLOONUSERCLICK) {
+		::SetForegroundWindow(m_hWnd);
 	}
 
 	return 0;
@@ -5149,9 +5129,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	else if (msg == WM_TASKBER_CREATED) {
 		// タスクバーが再起動した
-		NotifyHideIcon(&cv);
-		NotifySetWindow(&cv, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
-		NotifySetSound(&cv, ts.NotifySound);
+		NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
+		Notify2Hide(ni);
+		Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
 		return 0;
 	}
 	switch(msg)

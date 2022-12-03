@@ -26,7 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// プラグインから使用するAPI
+// ttermpro.exe 内で使用する通知関連のAPI
+// プラグインから使用するAPIは ttcmn_notify.h を参照
 
 #pragma once
 
@@ -40,16 +41,19 @@ extern "C" {
 #define DllExport __declspec(dllimport)
 #endif
 
-DllExport void WINAPI NotifyMessageW(PComVar cv, const wchar_t *message, const wchar_t *title, DWORD flag);
-DllExport void WINAPI NotifyMessage(PComVar cv, const char *message, const char *title, DWORD flag);
-DllExport void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID);
+typedef struct NotifyIconST NotifyIcon;
 
-#define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
-#define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)
-#define NotifyErrorMessage(cv, msg, title) NotifyMessage(cv, msg, title, 3)
-#define NotifyInfoMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 1)
-#define NotifyWarnMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 2)
-#define NotifyErrorMessageW(cv, msg, title) NotifyMessageW(cv, msg, title, 3)
+DllExport NotifyIcon *Notify2Initialize(void);
+DllExport void Notify2Uninitialize(NotifyIcon *ni);
+DllExport void Notify2SetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID);
+DllExport void Notify2Hide(NotifyIcon *ni);
+DllExport void Notify2SetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag);
+DllExport void Notify2SetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID);
+DllExport void Notify2UnsetWindow(NotifyIcon *ni);
+DllExport void Notify2SetSound(NotifyIcon *ni, BOOL sound);
+DllExport BOOL Notify2GetSound(NotifyIcon *ni);
+DllExport void Notify2Event(NotifyIcon *ni, WPARAM wParam, LPARAM lParam);
+DllExport void Notify2SetBallonDontHide(NotifyIcon *ni, BOOL dont_hide);
 
 #ifdef __cplusplus
 }

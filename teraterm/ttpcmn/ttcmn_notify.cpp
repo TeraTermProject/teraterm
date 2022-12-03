@@ -50,10 +50,13 @@
 #include "compat_win.h"
 #include "dlglib.h"
 
-#define	TTCMN_NOTIFY_INTERNAL 1
-#include "ttcmn_notify.h"
+#undef DllExport
+#define DllExport __declspec(dllexport)
 
-typedef struct {
+#include "ttcmn_notify.h"
+#include "ttcmn_notify2.h"
+
+typedef struct NotifyIconST {
 	BOOL enable;					// FALSE 通知APIが使えないOS or 使えない状態
 	int NotifyIconShowCount;
 	HWND parent_wnd;
@@ -64,6 +67,7 @@ typedef struct {
 	WORD IconID;
 	HINSTANCE CustomIconInstance;
 	WORD CustomIconID;
+	BOOL BallonDontHide;
 } NotifyIcon;
 
 /**
@@ -101,37 +105,45 @@ static void InitializeNotifyIconData(NotifyIcon *ni, TT_NOTIFYICONDATAW_V2 *p)
 	p->uFlags = (ni->callback_msg != 0) ? NIF_MESSAGE : 0;
 }
 
-static void NotifyHide(NotifyIcon *ni)
+void Notify2Hide(NotifyIcon *ni)
 {
 	if (ni->NotifyIconShowCount > 1) {
 		ni->NotifyIconShowCount -= 1;
+		return;
 	}
-	else {
-		TT_NOTIFYICONDATAW_V2 notify_icon;
-		InitializeNotifyIconData(ni, &notify_icon);
-		notify_icon.uFlags |= NIF_STATE;
-		notify_icon.dwState = NIS_HIDDEN;
-		notify_icon.dwStateMask = NIS_HIDDEN;
-		BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
-		ni->NotifyIconShowCount = 0;
-		if (r == FALSE) {
-			// タスクバーからなくなっている
-			ni->created = FALSE;
-		}
+
+	if (!ni->BallonDontHide) {
+		return;
+	}
+
+	TT_NOTIFYICONDATAW_V2 notify_icon;
+	InitializeNotifyIconData(ni, &notify_icon);
+	notify_icon.uFlags |= NIF_STATE;
+	notify_icon.dwState = NIS_HIDDEN;
+	notify_icon.dwStateMask = NIS_HIDDEN;
+	BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
+	ni->NotifyIconShowCount = 0;
+	if (r == FALSE) {
+		// タスクバーからなくなっている
+		ni->created = FALSE;
 	}
 }
 
 /**
+ *	タスクトレイにアイコン、バルーンツールチップを表示する
  *
+ *	@param	msg		表示するメッセージ
+ *					NULLのときバルーンツールチップは表示されない
+ *	@param	title	NULLのときタイトルなし
  *	@param	flag	NOTIFYICONDATA.dwInfoFlags
  *					1		information icon (NIIF_INFO)
  *					2		warning icon (NIIF_WARNING)
  *					3		error icon (NIIF_ERROR)
  *					0x10	(NIIF_NOSOUND) XP+
  */
-static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag)
+void Notify2SetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
-	if (!ni->enable || msg == NULL) {
+	if (!ni->enable) {
 		return;
 	}
 	if (ni->parent_wnd == NULL) {
@@ -164,7 +176,12 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 	}
 	notify_icon.dwInfoFlags = flag;
 
-	wcsncpy_s(notify_icon.szInfo, _countof(notify_icon.szInfo), msg, _TRUNCATE);
+	if (msg) {
+		wcsncpy_s(notify_icon.szInfo, _countof(notify_icon.szInfo), msg, _TRUNCATE);
+	}
+	else {
+		notify_icon.szInfo[0] = 0;
+	}
 
 	if (ni->created) {
 		BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
@@ -193,13 +210,18 @@ static void NotifySetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t 
 	}
 }
 
-static void NotifySetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
+void Notify2SetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
 {
 	ni->CustomIconInstance = hInstance;
 	ni->CustomIconID = IconID;
 }
 
-static NotifyIcon *NotifyInitialize(void)
+/**
+ *	通知領域初期化
+ *
+ *	次に Notify2SetWindow() をコールする
+ */
+NotifyIcon *Notify2Initialize(void)
 {
 	NotifyIcon *ni = (NotifyIcon *)calloc(sizeof(NotifyIcon) ,1);
 	return ni;
@@ -209,9 +231,14 @@ static NotifyIcon *NotifyInitialize(void)
  *	親ウィンドウと通知領域のアイコンをセットする
  *	このAPIをコールすると通知領域が使えるようになる
  *
- *	@param hWnd		通知領域に関連付けるウィンドウ(ここでは親ウィンドウと呼ぶ)
+ *	セットしたアイコンがデフォルトのアイコンとなる
+ *
+ *	@param	hWnd		通知領域に関連付けるウィンドウ(ここでは親ウィンドウと呼ぶ)
+ *	@param	msg			親ウィンドウへ送られるメッセージID
+ *	@param	hInstance	アイコンを持つモジュールのinstance
+ *	@param	IconID		アイコンのリソースID
  */
-static void NotifySetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
+void Notify2SetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
 {
 	assert(hWnd != NULL);
 	if (! HasBalloonTipSupport()) {
@@ -230,7 +257,7 @@ static void NotifySetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInst
  *	親ウィンドウを破棄する前に通知領域のアイコンを削除する
  *	このAPIをコールすると通知領域は使えなくなる
  */
-static void NotifyUnsetWindow(NotifyIcon *ni)
+void Notify2UnsetWindow(NotifyIcon *ni)
 {
 	if (ni->enable && ni->created) {
 		TT_NOTIFYICONDATAW_V2 notify_icon;
@@ -241,21 +268,66 @@ static void NotifyUnsetWindow(NotifyIcon *ni)
 	}
 }
 
-static void NotifyUninitialize(NotifyIcon *ni)
+/**
+ *	通知領域終了
+ */
+void Notify2Uninitialize(NotifyIcon *ni)
 {
-	NotifyUnsetWindow(ni);
+	Notify2UnsetWindow(ni);
 	free(ni);
 }
 
-static void NotifySetSound(NotifyIcon *ni, BOOL sound)
+void Notify2SetSound(NotifyIcon *ni, BOOL sound)
 {
 	ni->no_sound = sound == FALSE ? TRUE : FALSE;
 }
 
-static BOOL NotifyGetSound(NotifyIcon *ni)
+BOOL Notify2GetSound(NotifyIcon *ni)
 {
 	return ni->no_sound;
 }
+
+void Notify2SetBallonDontHide(NotifyIcon *ni, BOOL dont_hide)
+{
+	ni->BallonDontHide = dont_hide;
+}
+
+/**
+ *	Notify2SetWindow() で指定したウィンドウメッセージ処理
+ */
+void Notify2Event(NotifyIcon *ni, WPARAM wParam, LPARAM lParam)
+{
+	if (wParam != 1) {
+		// NOTIFYICONDATA.uID, 1しかない
+		return;
+	}
+
+	switch (lParam) {
+		case WM_MOUSEMOVE:
+		case WM_LBUTTONUP:
+		case WM_LBUTTONDBLCLK:
+		case WM_RBUTTONUP:
+		case WM_RBUTTONDBLCLK:
+		case WM_CONTEXTMENU:
+		case NIN_BALLOONSHOW:
+		case NIN_BALLOONHIDE:
+		case NIN_KEYSELECT:
+		case NIN_SELECT:
+		default:
+			// nothing to do
+			break;
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case NIN_BALLOONTIMEOUT:
+			Notify2Hide(ni);
+			break;
+		case NIN_BALLOONUSERCLICK:
+			Notify2Hide(ni);
+			break;
+	}
+}
+
+////////////////////
 
 static NotifyIcon *GetNotifyData(PComVar cv)
 {
@@ -266,18 +338,13 @@ static NotifyIcon *GetNotifyData(PComVar cv)
 }
 
 /*
- *	EXPORT API
+ *	for plug-in APIs
  */
-void WINAPI NotifyHideIcon(PComVar cv)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	NotifyHide(ni);
-}
 
 void WINAPI NotifyMessageW(PComVar cv, const wchar_t *msg, const wchar_t *title, DWORD flag)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
-	NotifySetMessageW(ni, msg, title, flag);
+	Notify2SetMessageW(ni, msg, title, flag);
 }
 
 void WINAPI NotifyMessage(PComVar cv, const char *msg, const char *title, DWORD flag)
@@ -287,69 +354,6 @@ void WINAPI NotifyMessage(PComVar cv, const char *msg, const char *title, DWORD 
 	NotifyMessageW(cv, msgW, titleW, flag);
 	free(titleW);
 	free(msgW);
-}
-
-DllExport void NotifySetSound(PComVar cv, BOOL sound)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	NotifySetSound(ni, sound);
-}
-
-DllExport BOOL NotifyGetSound(PComVar cv)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	return NotifyGetSound(ni);
-}
-
-/**
- *	通知領域初期化
- *
- *	@param	hWnd		通知領域の親ウィンドウ
- *	@param	msg			親ウィンドウへ送られるメッセージID
- *	@param	hInstance	アイコンを持つモジュールのinstance
- *	@param	IconID		アイコンのリソースID
- */
-void WINAPI NotifyInitialize(PComVar cv)
-{
-	assert(cv->NotifyIcon == NULL);	 // 2重初期化
-	NotifyIcon *ni = NotifyInitialize();
-	cv->NotifyIcon = ni;
-}
-
-/**
- *	通知領域完了
- */
-void WINAPI NotifyUninitialize(PComVar cv)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	NotifyUninitialize(ni);
-	cv->NotifyIcon = NULL;
-}
-
-/**
- *	ウィンドウとアイコンをセットする
- *
- *	@param	hWnd		通知領域の親ウィンドウ
- *	@param	msg			親ウィンドウへ送られるメッセージID
- *	@param	hInstance	アイコンを持つモジュールのinstance
- *	@param	IconID		アイコンのリソースID
- *
- *	ここでセットしたアイコンがデフォルトのアイコンとなる
- */
-void WINAPI NotifySetWindow(PComVar cv, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	NotifySetWindow(ni, hWnd, msg, hInstance, IconID);
-}
-
-/**
- *	通知領域の親ウィンドウを破棄する前にコールする
- *	このAPIをコールすると通知領域は使えなくなる
- */
-void WINAPI NotifyUnsetWindow(PComVar cv)
-{
-	NotifyIcon *ni = GetNotifyData(cv);
-	NotifyUnsetWindow(ni);
 }
 
 /**
@@ -363,7 +367,7 @@ void WINAPI NotifyUnsetWindow(PComVar cv)
 void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID)
 {
 	NotifyIcon *ni = GetNotifyData(cv);
-	NotifySetIconID(ni, hInstance, IconID);
+	Notify2SetIconID(ni, hInstance, IconID);
 }
 
 /**

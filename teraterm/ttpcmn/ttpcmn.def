@@ -26,7 +26,6 @@ EXPORTS
   b64encode @75
   b64decode @76
 
-  NotifyHideIcon @81
   NotifyMessage @79
   NotifyMessageW
   NotifySetIconID

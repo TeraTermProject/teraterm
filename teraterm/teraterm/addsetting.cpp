@@ -42,8 +42,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttwinman.h"	// for ts
-#define TTCMN_NOTIFY_INTERNAL
-#include "ttcommon.h"
 #include "dlglib.h"
 #include "compat_win.h"
 #include "helpid.h"
@@ -58,6 +56,7 @@
 #include "win32helper.h"
 #include "themedlg.h"
 #include "theme.h"
+#include "ttcmn_notify2.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -214,9 +213,8 @@ void CGeneralPropPageDlg::OnOK()
 	{
 		BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
 		if (notify_sound != ts.NotifySound) {
-			PComVar pcv = &cv;
 			ts.NotifySound = notify_sound;
-			NotifySetSound(pcv, notify_sound);
+			Notify2SetSound((NotifyIcon *)cv.NotifyIcon, notify_sound);
 		}
 	}
 }
@@ -230,13 +228,13 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IDC_NOTIFICATION_TEST | (BN_CLICKED << 16): {
-			PComVar pcv = &cv;
+			NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
 			const wchar_t *msg = L"Test button was pushed";
-			BOOL prev_sound = NotifyGetSound(pcv);
+			BOOL prev_sound = Notify2GetSound(ni);
 			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
-			NotifySetSound(pcv, notify_sound);
-			NotifyMessageW(pcv, msg, NULL, 1);
-			NotifySetSound(pcv, prev_sound);
+			Notify2SetSound(ni, notify_sound);
+			Notify2SetMessageW(ni, msg, NULL, 1);
+			Notify2SetSound(ni, prev_sound);
 			break;
 		}
 		default:
