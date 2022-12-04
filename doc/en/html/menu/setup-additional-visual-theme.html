@@ -11,20 +11,20 @@
   <body>
     <h1>Theme Editor</h1>
 
-    テーマはTera Termの背景、文字の色、または、両方を一括して扱う仕組み。<br>
-    Theme Editorはテーマの編集を行う。<br>
-    各タブで設定を行う。<br>
-    [OK] で動作中のTera Termに反映され、[Cancel] で反映されずに破棄される。
+    テーマはTera Termの背景、文字の色、または、両方を一括して扱う枠組みです。<br>
+    Theme Editorはテーマの編集を行うことができます。<br>
+    複数のタブで設定を行います。<br>
+    [OK] で動作中のTera Termに反映され、[Cancel] で反映されずに破棄されます。
 
     <dl>
       <dt><a href="#preview">preview/file tab</a></dt>
-      <dd>テーマの一時的な設定(preview),テーマファイルの読み込みと書き出し</dd>
+      <dd>テーマの一時的な設定(preview),テーマファイルの読み込みと書き出しを行います。</dd>
       <dt><a href="#bg">Background tab</a></dt>
-      <dd>BG(背景画像)に関する設定を行う</dd>
+      <dd>BG(背景画像)に関する設定を行います。</dd>
       <dt><a href="#bg_alpha">Background alpha tab</a></dt>
-      <dd>BG(背景画像)と文字背景色の透過設定を行う</dd>
+      <dd>BG(背景画像)と文字背景色の透過設定を行います。</dd>
       <dt><a href="#color">color tab</a></dt>
-      <dd>文字の色に関する設定を行う</dd>
+      <dd>文字の色に関する設定を行います。</dd>
     </dl>
 
     <a href="../setup/theme.html">テーマファイルについて</a>
@@ -42,23 +42,23 @@
     <h2 id="preview">preview/file tab</h2>
 
     preview<br>
-    テーマの一時的な設定(preview)、やり直し(undo)を行う
+    テーマの一時的な設定(preview)、やり直し(undo)を行います。
     <dl>
       <dt>[preview]</dt>
-      <dd>設定したテーマを一時的に設定(preview)する</dd>
+      <dd>設定したテーマを一時的に設定(preview)します。</dd>
       <dt>[undo]</dt>
-      <dd>変更したテーマをダイアログを開く前の状態に戻す</dd>
+      <dd>変更したテーマをダイアログを開く前の状態に戻します。</dd>
     </dl>
 
     file<br>
-    テーマファイルからテーマを読み込み、テーマを保存する
+    テーマファイルからテーマを読み込み、テーマを保存をおこないます。
     <dl>
       <dt>[load]</dt>
-      <dd>テーマファイルを読み込む</dd>
+      <dd>テーマファイルを読み込みます。</dd>
       <dt>[save]</dt>
       <dd>
-        設定中のテーマをファイルに書き出す<br>
-        BGテーマ、Colorテーマを書き出すかを選択できる
+        設定中のテーマをファイルに書き出します。<br>
+        BGテーマ、Colorテーマ、または両方を書き出すか選択できます。
       </dd>
     </dl>
 
@@ -68,52 +68,60 @@
 
     <h3>背景</h3>
 
-    下から順に背景画像が合成されていく。
+    下から順に背景画像が合成されます。<br>
+    <a href="#bg_overview">背景テーマのOverview</a>を参照ください。
 
     <dl>
-      <dt>Mixing simple color plane</dt>
+      <dt>Simple color plane</dt>
       <dd>
-        単色をアルファブレンドする。<br>
-        例:背景画像,壁紙をブレンドした状態で少し暗くする場合は、000000を128の割合でアルファブレンドする。
+        単色をアルファブレンドします。<br>
+        例:背景画像,壁紙をブレンドした状態で少し暗くする場合は、黒をalpha半分の割合でアルファブレンドします。
         <dl>
-          <dt>Color (RRGGBB)</dt>
+          <dt>Color</dt>
           <dd>合成するプレーンの色</dd>
 
           <dt>alpha</dt>
-          <dd>合成するアルファブレンド値(0...255)</dd>
+          <dd>合成するアルファブレンド値</dd>
         </dl>
       </dd>
 
       <dt>Background Image</dt>
       <dd>
-        背景画像を指定する。<br>
-        描画方法は次の中から選択する
+        背景画像を指定します。<br>
+        画像ファイルによっては画素ごとの透明度情報も考慮します。
         <dl>
           <dt>画像ファイル名</dt>
           <dd>
             bmp, png, gif, jpg等<br>
-            32bit bmp, 透過pngの場合は8bitのアルファチャンネルが付加される<br>
-            透過gifの場合は1色を透明として扱う
+            32bit bmp, 透過pngの場合は8bitのアルファチャンネルが付加されます<br>
+            透過gifの場合は1色を透明としてあつかいます。
           </dd>
 
-          <dt>stretch</dt>
-          <dt>tile</dt>
-          <dt>center</dt>
-          <dt>fit_width</dt>
-          <dt>fit_height</dt>
-          <dt>autofit</dt>
-          <dt>autofill</dt>
+          <dt>パターン</dt>
           <dd>
+            背景画像の描画方法を指定します。
+            <ul>
+              <li>stretch</li>
+              <li>tile</li>
+              <li>center</li>
+              <li>fit_withh</li>
+              <li>fit_height</li>
+              <li>autofit</li>
+              <li>autofill</li>
+            </ul>
             TODO 詳細を調べて書く
           </dd>
 
-          <dt>alpha</dt>
-          <dd>合成するアルファブレンド値(0...255)</dd>
-
-          <dt>Color (RRGGBB)</dt>
+          <dt>Color</dt>
           <dd>
-            背景画像が描画されない部分がある場合この色で埋められる。<br>
-            画像に透明部分が存在していてWindowsの壁紙画像を合成しない場合もこの色で埋められる。
+            背景画像が描画されない部分がある場合この色で埋められます。<br>
+            画像に透明部分が存在していてWindowsの壁紙画像を合成しない場合もこの色で埋められます。
+          </dd>
+
+          <dt>alpha</dt>
+          <dd>
+            Desktop wallpaper imageと合成するアルファブレンド値<br>
+            透明から不透明まで選択できます<br>
           </dd>
         </dl>
       </dd>
@@ -133,48 +141,48 @@
       <dt>通常文字背景色の透過</dt>
       <dd>
         背景画像と通常文字背景色の透過<br>
-        透明から不透明まで選択できる<br>
+        透明から不透明まで選択できます。<br>
         画像の1の箇所
       </dd>
       <dt>反転文字背景色の透過</dt>
       <dd>
         背景画像と反転文字背景色の透過<br>
-        透明から不透明まで選択できる<br>
+        透明から不透明まで選択できます。<br>
         画像の2の箇所
       </dd>
       <dt>その他の文字背景色の透過</dt>
       <dd>
         背景画像とその他の文字背景色と透過<br>
-        透明から不透明まで選択できる<br>
+        透明から不透明まで選択できます。<br>
         画像の3の箇所
       </dd>
       <dt>
     </dl>
-    <img src="../../../image/setup-additional-visual-theme-alpha.png"><br>
-    1,3の部分が透明のとき、Tera Term 4 の透過と同様となる。
+    <img src="setup-additional-visual-theme-alpha.png"><br>
+    1,3の部分が透明のとき、Tera Term 4 の透過と同様となります。
 
     <hr>
 
     <h2 id="color">color tab(カラーテーマ)</h2>
 
     <p>
-      カラーテーマはデフォルト色に上書きして色が設定される。<br>
-      <a href="#default_color">デフォルト色</a>はTERATERM.INI で設定される。<br>
-      iniファイル内で設定しない色はデフォルト色となる。
+      カラーテーマはデフォルト色に上書きして色が設定されます。<br>
+      <a href="#default_color">デフォルト色</a>はTERATERM.INI で設定されます。<br>
+      カラーテーマのiniファイル内で設定しない色はデフォルト色となります。
 
     <p>
-      このタブでは次のことができる<br>
+      このタブでは次のことができます。<br>
       <ul>
         <li>色の設定
         <li>デフォルトの色に戻す
       </ul>
 
     <p>
-      色の設定はリストで色を選んで右クリック(orダブルクリック)
+      色の設定はリストで色を選んで右クリック(orダブルクリック)で行えます。
 
     <p>
-      今のところ commctrlのカラーピッカーを使用。<br>
-      Tera Term内のカラーピッカーに切り替えるか?
+      今のところ commctrlのカラーピッカーを使用しています。<br>
+      (TODO Tera Term内のカラーピッカーに切り替える?)
 
     <p>
       設定した色を表示する例
@@ -189,10 +197,10 @@ wget https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/tests/color-sgr-d
     </dl>
 
     <hr>
-    <h2>背景テーマのOverview</h2>
+    <h2 id="bg_overview">背景テーマのOverview</h2>
 
-    Tera Term の背景画像は次のように合成される。<br>
-    <img src="../../../image/setup-additional-visual-theme.png"><br>
+    Tera Term の背景画像は次のように合成されます。<br>
+    <img src="setup-additional-visual-theme.png"><br>
 
     <hr>
 
@@ -223,7 +231,7 @@ Tera Term 5 alpha 時点の仕様
 
     <h2 id="default_color">デフォルト色について</h2>
 
-    デフォルト色とフォントは TERATERM.INI の次のキーワードで設定できる
+    デフォルト色とフォントは TERATERM.INI の次のキーワードで設定できます。
 <pre>
 | Attr \ ini    | font on/off       | color on/off           | color(R,G,B,R,G,B) |
 |---------------|-------------------|------------------------|--------------------|
