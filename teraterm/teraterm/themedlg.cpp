@@ -63,6 +63,80 @@
 #include "themedlg_res.h"
 #include "themedlg.h"
 
+typedef struct ColorSampleDataSt ColorSampleData_t;
+
+//////////////////////////////////////////////////////////////////////////////
+typedef struct ColorSampleDataSt {
+	int dummy;
+	WNDPROC OrigProc;
+	HWND hWnd;
+	COLORREF color;
+} ColorSampleData_t;
+
+static void DispColorSample(HWND hWnd, COLORREF color)
+{
+	RECT rect;
+	HDC hDC = GetDC(hWnd);
+	HBRUSH hBrush = CreateSolidBrush(color);
+	GetClientRect(hWnd, &rect);
+	FillRect(hDC, &rect, hBrush);
+	DeleteObject(hBrush);
+	ReleaseDC(hWnd, hDC);
+}
+
+static LRESULT CALLBACK ColorSampleProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	ColorSampleData_t *self = (ColorSampleData_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	LRESULT result;
+
+	result = CallWindowProcW(self->OrigProc, hWnd, msg, wParam, lParam);
+
+	switch (msg) {
+	case WM_PAINT: {
+		DispColorSample(hWnd, self->color);
+		result = TRUE;
+		break;
+	}
+	case WM_NCDESTROY:
+		free(self);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, 0);
+		break;
+	default:
+		break;
+	}
+	return result;
+}
+
+/**
+ *	ダイアログ上のフレームをカラーサンプルにする
+ *	ColorSampleSetColor()で色を設定する
+ *	ダイアログが閉じるときに自動的に破棄される
+ *
+ */
+ColorSampleData_t *ColorSampleInit(HWND hDlg, int ID, COLORREF color)
+{
+	ColorSampleData_t *self = (ColorSampleData_t *)calloc(sizeof(ColorSampleData_t), 1);
+	HWND hWnd = GetDlgItem(hDlg, ID);
+	self->color = color;
+	self->hWnd = hWnd;
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)self);
+	self->OrigProc = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
+	SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)ColorSampleProc);
+	return self;
+}
+
+/**
+ *	色を設定する
+ */
+void ColorSampleSetColor(ColorSampleData_t *cs, COLORREF color)
+{
+	ColorSampleData_t *self = cs;
+	self->color = color;
+	InvalidateRect(self->hWnd, NULL, FALSE);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 typedef struct {
 	// 共通
 	HINSTANCE hInst;
@@ -75,6 +149,8 @@ typedef struct {
 	} FileTab;
 	// bg theme tab
 	struct {
+		ColorSampleData_t *cs_bg;
+		ColorSampleData_t *cs_splane;
 		BGTheme bg_theme;
 	} BGTab;
 	// color theme tab
@@ -131,12 +207,13 @@ static COLORREF GetDlgItemTextColor(HWND hDlg, int ID)
 	return GetWindowTextColor(GetDlgItem(hDlg, ID));
 }
 
-static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
+static void ResetControls(HWND hWnd, ThemeDlgData* dlg_data)
 {
+	const BGTheme *bg_theme = &dlg_data->BGTab.bg_theme;
+
 	// bg image
 	SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_SETCHECK, bg_theme->BGDest.enable, 0);
 	SetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file);
-	SetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT, bg_theme->BGDest.color);
 	{
 		LRESULT count = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETCOUNT, 0, 0);
 		int sel = 0;
@@ -150,15 +227,60 @@ static void ResetControls(HWND hWnd, const BGTheme *bg_theme)
 		}
 		SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_SETCURSEL, sel, 0);
 	}
-	SetDlgItemInt(hWnd, IDC_BGIMG_ALPHA_EDIT, bg_theme->BGDest.alpha, FALSE);
+	SendDlgItemMessageA(hWnd, IDC_BGIMG_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGDest.alpha);
+	ColorSampleSetColor(dlg_data->BGTab.cs_bg, bg_theme->BGDest.color);
 
 	// wall paper
 	SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_SETCHECK, bg_theme->BGSrc1.enable, 0);
 
 	// simple color plane
 	SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_SETCHECK, bg_theme->BGSrc2.enable, 0);
-	SetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, bg_theme->BGSrc2.alpha, FALSE);
-	SetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR, bg_theme->BGSrc2.color);
+	SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA_SLIDER, TBM_SETPOS, TRUE, bg_theme->BGSrc2.alpha);
+	ColorSampleSetColor(dlg_data->BGTab.cs_splane, bg_theme->BGSrc2.color);
+}
+
+static void ControlEnable(HWND hWnd)
+{
+	static const int scp_controls[] = {
+		IDC_SIMPLE_COLOR_PLANE_COLOR_TITLE,
+		IDC_SIMPLE_COLOR_PLANE_SAMPLE,
+		IDC_SIMPLE_COLOR_PLANE_BUTTON,
+		IDC_SIMPLE_COLOR_PLANE_ALPHA_TITLE,
+		IDC_SIMPLE_COLOR_PLANE_ALPHA_SLIDER,
+	};
+	static const int bg_controls[] = {
+		IDC_BGIMG_FILE_TITLE,
+		IDC_BGIMG_EDIT,
+		IDC_BGIMG_BUTTON,
+		IDC_BGIMG_PATTERN_TITLE,
+		IDC_BGIMG_COMBO,
+		IDC_BGIMG_COLOR_TITLE,
+		IDC_BGIMG_COLOR_SAMPLE,
+		IDC_BGIMG_COLOR_BUTTON,
+		IDC_BGIMG_ALPHA_TITLE,
+		IDC_BGIMG_ALPHA_SLIDER
+	};
+	int i;
+	BOOL enable;
+
+	BOOL scp_enable = (BOOL)SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_GETCHECK, 0, 0);
+	BOOL bg_enable = (BOOL)SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_GETCHECK, 0, 0);
+	BOOL wp_enable = (BOOL)SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_GETCHECK, 0, 0);
+
+	// Simple color plane
+	enable = scp_enable;
+	for (i = 0; i < _countof(scp_controls); i++) {
+		EnableWindow(GetDlgItem(hWnd, scp_controls[i]), enable);
+	}
+	enable = scp_enable && (bg_enable || wp_enable) ? TRUE : FALSE;
+	EnableWindow(GetDlgItem(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA_TITLE), enable);
+	EnableWindow(GetDlgItem(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA_SLIDER), enable);
+
+	// BG image
+	enable = bg_enable;
+	for (i = 0; i < _countof(bg_controls); i++) {
+		EnableWindow(GetDlgItem(hWnd, bg_controls[i]), enable);
+	}
 }
 
 static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
@@ -170,10 +292,9 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 	checked = SendDlgItemMessageA(hWnd, IDC_BGIMG_CHECK, BM_GETCHECK, 0, 0);
 	bg_theme->BGDest.enable = checked & BST_CHECKED;
 	GetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_theme->BGDest.file, _countof(bg_theme->BGDest.file));
-	bg_theme->BGDest.color = GetDlgItemTextColor(hWnd, IDC_BGIMG_COLOR_EDIT);
 	index = SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETCURSEL, 0, 0);
 	bg_theme->BGDest.pattern = (BG_PATTERN)SendDlgItemMessageA(hWnd, IDC_BGIMG_COMBO, CB_GETITEMDATA, index, 0);
-	bg_theme->BGDest.alpha = GetDlgItemInt(hWnd, IDC_BGIMG_ALPHA_EDIT, NULL, FALSE);
+	bg_theme->BGDest.alpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_BGIMG_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
 
 	// wall paper
 	checked = SendDlgItemMessageA(hWnd, IDC_WALLPAPER_CHECK, BM_GETCHECK, 0, 0);
@@ -182,8 +303,23 @@ static void ReadFromDialog(HWND hWnd, BGTheme* bg_theme)
 	// simple color plane
 	checked = SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_CHECK, BM_GETCHECK, 0, 0);
 	bg_theme->BGSrc2.enable = checked & BST_CHECKED;
-	bg_theme->BGSrc2.alpha = GetDlgItemInt(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA, NULL, FALSE);
-	bg_theme->BGSrc2.color = GetDlgItemTextColor(hWnd, IDC_SIMPLE_COLOR_PLANE_COLOR);
+	bg_theme->BGSrc2.alpha = (BYTE)SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA_SLIDER, TBM_GETPOS, 0, 0);
+}
+
+static BOOL ChooseColor(HWND hWnd, COLORREF *color_ptr)
+{
+	static COLORREF CustColors[16];
+	CHOOSECOLORA cc = {};
+	cc.lStructSize = sizeof(cc);
+	cc.hwndOwner = hWnd;
+	cc.rgbResult = *color_ptr;
+	cc.lpCustColors = CustColors;
+	cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+	if (ChooseColorA(&cc)) {
+		*color_ptr = cc.rgbResult;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -200,14 +336,8 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
-			SetDlgItemTextW(hWnd, IDC_BG_THEME_HELP,
-							L"Mix order:\n"
-							L"  simple color plane\n"
-							L"    ^\n"
-							L"  Background Image\n"
-							L"    ^\n"
-							L"  wallpaper\n"
-				);
+			SendDlgItemMessageA(hWnd, IDC_SIMPLE_COLOR_PLANE_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+			SendDlgItemMessageA(hWnd, IDC_BGIMG_ALPHA_SLIDER, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
 
 			for (int i = 0;; i++) {
 				LRESULT index;
@@ -219,7 +349,12 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				SendDlgItemMessageW(hWnd, IDC_BGIMG_COMBO, CB_SETITEMDATA, index, st->id);
 			}
 
-			ResetControls(hWnd, &dlg_data->BGTab.bg_theme);
+			dlg_data->BGTab.cs_bg =
+				ColorSampleInit(hWnd, IDC_BGIMG_COLOR_SAMPLE, dlg_data->BGTab.bg_theme.BGDest.color);
+			dlg_data->BGTab.cs_splane =
+				ColorSampleInit(hWnd, IDC_SIMPLE_COLOR_PLANE_SAMPLE, dlg_data->BGTab.bg_theme.BGSrc2.color);
+			ResetControls(hWnd, dlg_data);
+
 			return TRUE;
 			break;
 		}
@@ -251,6 +386,24 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				}
 				break;
 			}
+			case IDC_BGIMG_COLOR_BUTTON | (BN_CLICKED << 16):
+				if (ChooseColor(hWnd, &dlg_data->BGTab.bg_theme.BGDest.color)) {
+					ColorSampleSetColor(dlg_data->BGTab.cs_bg,
+										dlg_data->BGTab.bg_theme.BGDest.color);
+				}
+				break;
+			case IDC_SIMPLE_COLOR_PLANE_BUTTON | (BN_CLICKED << 16):
+				if (ChooseColor(hWnd, &dlg_data->BGTab.bg_theme.BGSrc2.color)) {
+					ColorSampleSetColor(dlg_data->BGTab.cs_splane,
+										dlg_data->BGTab.bg_theme.BGSrc2.color);
+				}
+				break;
+			case IDC_SIMPLE_COLOR_PLANE_CHECK | (BN_CLICKED << 16):
+			case IDC_BGIMG_CHECK | (BN_CLICKED << 16):
+			case IDC_WALLPAPER_CHECK | (BN_CLICKED << 16): {
+				ControlEnable(hWnd);
+				break;
+			}
 			default:
 				break;
 			}
@@ -270,7 +423,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 			case PSN_SETACTIVE: {
-				ResetControls(hWnd, &dlg_data->BGTab.bg_theme);
+				ResetControls(hWnd, dlg_data);
 				break;
 			}
 			default:

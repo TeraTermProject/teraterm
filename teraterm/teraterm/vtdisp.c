@@ -1181,10 +1181,10 @@ static HDC CreateBGImage(int width, int height)
 		if (alpha_valid) {
 			// 32bitビットマップ(alpha値が存在している)場合はalpha値を参照する
 			bf.AlphaFormat = AC_SRC_ALPHA;
-			if (!BGSrc1.enable) {
-				// 壁紙がない場合はあらかじめ塗りつぶしておく
-				FillBitmapDC(hdc_bg, BGDest.color);
-			}
+		}
+		if (!BGSrc1.enable) {
+			// 壁紙がない場合はあらかじめ塗りつぶしておく
+			FillBitmapDC(hdc_bg, BGDest.color);
 		}
 		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
 	}
