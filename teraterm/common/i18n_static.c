@@ -38,7 +38,8 @@
  *	lngファイル(iniファイル)から文字列を取得
  *
  *	@param[in]		section
- *	@param[in]		key
+ *	@param[in]		key			キー
+ *								NULLのときは str = def が返る
  *	@param[in]		def			デフォルト文字列
  *								NULL=未指定
  *	@param[in]		iniFile		iniファイル
@@ -51,12 +52,18 @@
  */
 size_t GetI18nStrWW(const char *section, const char *key, const wchar_t *def, const wchar_t *iniFile, wchar_t **str)
 {
-	wchar_t sectionW[64];
-	wchar_t keyW[128];
 	size_t size;
-	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
-	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
-	hGetPrivateProfileStringW(sectionW, keyW, def, iniFile, str);
+	if (key == NULL) {
+		assert(def != NULL);
+		*str = _wcsdup(def);
+	}
+	else {
+		wchar_t sectionW[64];
+		wchar_t keyW[128];
+		MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
+		MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
+		hGetPrivateProfileStringW(sectionW, keyW, def, iniFile, str);
+	}
 	assert(*str != NULL);		// メモリがない時 NULL が返ってくる
 	size = RestoreNewLineW(*str);
 	return size;
