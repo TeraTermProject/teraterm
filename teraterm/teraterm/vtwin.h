@@ -55,6 +55,9 @@ private:
     SetupMenu, ControlMenu, WinMenu, HelpMenu;
 
   // drag and drop handle
+  void DropInit();
+  void DropUninit();
+  struct DropData_tag *DropData;
   wchar_t **DropLists;
   int DropListCount;
   void DropListFree();
