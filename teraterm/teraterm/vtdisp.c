@@ -1198,7 +1198,13 @@ static HDC CreateBGImage(int width, int height)
 		// 貼り付ける
 		memset(&bf, 0, sizeof(bf));
 		bf.BlendOp = AC_SRC_OVER;
-		bf.SourceConstantAlpha = BGSrc2.alpha;
+		if (BGDest.enable || BGSrc1.enable) {
+			bf.SourceConstantAlpha = BGSrc2.alpha;
+		}
+		else {
+			// ブレンドするものがなければalphaは使わない(単純な塗りつぶし)
+			bf.SourceConstantAlpha = 255;
+		}
 		bf.AlphaFormat = 0;
 		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
 	}
