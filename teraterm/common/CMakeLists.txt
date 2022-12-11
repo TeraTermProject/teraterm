@@ -37,6 +37,8 @@ add_library(
   tmfc_propdlg.cpp
   tmfc_propdlg.h
   tmfc_property.cpp
+  ttcommdlg.cpp
+  ttcommdlg.h
   ttgdiplus.cpp
   ttgdiplus.h
   ttknownfolders.c

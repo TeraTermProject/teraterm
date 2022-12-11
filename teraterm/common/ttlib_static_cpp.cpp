@@ -52,10 +52,6 @@
 
 #include "ttlib.h"
 
-#if _WIN32_WINNT >= 0x0600 // Vista+
-#define IFILEOPENDIALOG_ENABLE 1
-#endif
-
 /**
  *	MessageBoxを表示する
  *
@@ -1071,123 +1067,6 @@ wchar_t *GetDownloadFolderW(void)
 	wchar_t *download;
 	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &download);
 	return download;
-}
-
-#if IFILEOPENDIALOG_ENABLE
-static BOOL doSelectFolderWCOM(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
-{
-	IFileOpenDialog *pDialog;
-	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_IFileOpenDialog, (void **)&pDialog);
-	if (FAILED(hr)) {
-		*folder = NULL;
-		return FALSE;
-	}
-
-	DWORD options;
-	pDialog->GetOptions(&options);
-	pDialog->SetOptions(options | FOS_PICKFOLDERS);
-	pDialog->SetTitle(msg);
-	{
-		IShellItem *psi;
-		hr = SHCreateItemFromParsingName(def, NULL, IID_IShellItem, (void **)&psi);
-		if (SUCCEEDED(hr)) {
-			hr = pDialog->SetFolder(psi);
-			psi->Release();
-		}
-	}
-	hr = pDialog->Show(hWnd);
-
-	BOOL result = FALSE;
-	if (SUCCEEDED(hr)) {
-		IShellItem *pItem;
-		hr = pDialog->GetResult(&pItem);
-		if (SUCCEEDED(hr)) {
-			PWSTR pPath;
-			hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pPath);
-			if (SUCCEEDED(hr)) {
-				*folder = _wcsdup(pPath);
-				CoTaskMemFree(pPath);
-				result = TRUE;
-			}
-		}
-	}
-
-	if (!result) {
-		// cancel(or some error)
-		*folder = NULL;
-	}
-	pDialog->Release();
-	return result;
-}
-#else
-static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
-{
-	switch(uMsg) {
-	case BFFM_INITIALIZED: {
-		// 初期化時
-
-		const wchar_t *folder = (wchar_t *)lpData;
-		if (folder == NULL || folder[0] == 0) {
-			// 選択フォルダが指定されていない
-			break;
-		}
-		// フォルダを選択状態にする
-		SendMessageW(hwnd, BFFM_SETSELECTIONW, (WPARAM)TRUE, (LPARAM)folder);
-		break;
-	}
-	default:
-		break;
-	}
-	return 0;
-}
-
-static BOOL doSelectFolderWAPI(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
-{
-	wchar_t buf[MAX_PATH];
-	BROWSEINFOW bi = {};
-	bi.hwndOwner = hWnd;
-	bi.pidlRoot = 0;	// 0 = from desktop
-	bi.pszDisplayName = buf;
-	bi.lpszTitle = msg;
-	bi.ulFlags = BIF_EDITBOX | BIF_NEWDIALOGSTYLE;
-	bi.lpfn = BrowseCallback;
-	bi.lParam = (LPARAM)def;
-	LPITEMIDLIST pidlBrowse = SHBrowseForFolderW(&bi);
-	if (pidlBrowse == NULL) {
-		*folder = NULL;
-		return FALSE;
-	}
-
-	// PIDL形式の戻り値のファイルシステムのパスに変換
-	// TODO SHGetPathFromIDListEx() へ切り替え?
-	if (!SHGetPathFromIDListW(pidlBrowse, buf)) {
-		return FALSE;
-	}
-	*folder = _wcsdup(buf);
-	CoTaskMemFree(pidlBrowse);
-	return TRUE;
-}
-#endif
-
-/**
- *	フォルダを選択する
- *	SHBrowseForFolderW() をコールする
- *
- *	@param[in]	def			選択フォルダの初期値(特に指定しないときは NULL or "")
- *	@param[out]	**folder	選択したフォルダのフルパス(キャンセル時はセットされない)
- *							不要になったら free() すること(キャンセル時はfree()不要)
- *	@retval	TRUE	選択した
- *	@retval	FALSE	キャンセルした
- *
- */
-BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
-{
-	// TODO 両立したい
-#if IFILEOPENDIALOG_ENABLE
-	return doSelectFolderWCOM(hWnd, def, msg, folder);
-#else
-	return doSelectFolderWAPI(hWnd, def, msg, folder);
-#endif
 }
 
 /* fit a filename to the windows-filename format */

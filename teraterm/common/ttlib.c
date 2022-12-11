@@ -43,6 +43,8 @@
 #include "tttypes.h"
 #include "compat_win.h"
 #include "codeconv.h"
+#include "ttlib.h"
+#include "ttcommdlg.h"
 
 // for isInvalidFileNameChar / replaceInvalidFileNameChar
 static char *invalidFileNameChars = "\\/:*?\"<>|";

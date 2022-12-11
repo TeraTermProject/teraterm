@@ -297,6 +297,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ttcommdlg.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ttcommdlg.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ttgdiplus.cpp"
 			>
 		</File>

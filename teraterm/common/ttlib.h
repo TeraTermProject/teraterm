@@ -105,8 +105,6 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 int get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
-DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
-BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder);
 #if defined(_MSC_VER)
 DllExport void OutputDebugPrintf(_Printf_format_string_ const char *fmt, ...);
 void OutputDebugPrintfW(_Printf_format_string_ const wchar_t *fmt, ...);
@@ -214,3 +212,5 @@ int __ismbblead(BYTE b, int code_page);
 #ifdef __cplusplus
 }
 #endif
+
+#include "ttcommdlg.h"
