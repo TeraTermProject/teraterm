@@ -222,7 +222,9 @@ if "%BUILD%" == "rebuild" (
     make cygterm+-i686-clean
 )
 make cygterm+-x86_64 -j
+if not exist c:\cygwin64\bin\i686-pc-cygwin-g++.exe goto cygterm32_pass
 make cygterm+-i686 -j
+:cygterm32_pass
 make archive
 popd
 

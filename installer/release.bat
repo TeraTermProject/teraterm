@@ -68,7 +68,7 @@ if "%no%" == "8" (
 )
 
 if not "%NOPAUSE%" == "1" pause
-exit 0
+exit /b 0
 
 
 rem ####################

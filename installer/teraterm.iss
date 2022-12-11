@@ -110,7 +110,7 @@ Source: release\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf16le; Component
 Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
-Source: ..\cygwin\cygterm\cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
+;Source: ..\cygwin\cygterm\cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
@@ -180,7 +180,7 @@ Root: HKCR; Subkey: Folder\shell\cygterm\command; ValueType: string; ValueData: 
 ; Cygterm Here from folder Background
 ; MinVersion 5.00.0000 = not Win9x, 6.0.6000 = Vista or later
 Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000	
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000

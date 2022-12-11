@@ -4,7 +4,8 @@ call ci_scripts\install.bat
 call buildtools\svnrev\svnrev.bat
 call buildtools\svnrev\sourcetree_info.bat
 if exist c:\cygwin64\setup-x86_64.exe (
-  c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
+  c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake
+  rem c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
 )
 if exist c:\msys64\usr\bin\pacman.exe (
   c:\msys64\usr\bin\pacman.exe  -S --noconfirm --needed cmake
