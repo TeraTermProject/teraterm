@@ -48,6 +48,8 @@ add_executable(
   prnabort.h
   protodlg.cpp
   protodlg.h
+  scp.cpp
+  scp.h
   setupdirdlg.cpp
   setupdirdlg.h
   sizetip.c

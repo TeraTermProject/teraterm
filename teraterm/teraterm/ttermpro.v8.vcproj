@@ -237,6 +237,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\scp.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sendfiledlg.cpp"
 				>
 			</File>
@@ -448,6 +452,10 @@
 			</File>
 			<File
 				RelativePath="..\susie_plugin\libsusieplugin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\scp.h"
 				>
 			</File>
 			<File

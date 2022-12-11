@@ -222,6 +222,9 @@
     <ClCompile Include="themefile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -508,6 +511,9 @@
       <Filter>ttpcmn</Filter>
     </ClInclude>
     <ClInclude Include="theme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

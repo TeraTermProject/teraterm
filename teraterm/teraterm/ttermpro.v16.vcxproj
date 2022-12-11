@@ -171,6 +171,7 @@
     <ClCompile Include="font_pp.cpp" />
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="keyboard.c" />
+    <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
     <ClCompile Include="setupdirdlg.cpp" />
     <ClCompile Include="sizetip.c" />
@@ -225,6 +226,7 @@
     <ClInclude Include="filesys_log_res.h" />
     <ClInclude Include="font_pp.h" />
     <ClInclude Include="font_pp_res.h" />
+    <ClInclude Include="scp.h" />
     <ClInclude Include="sendfiledlg.h" />
     <ClInclude Include="sendmem.h" />
     <ClCompile Include="sendmem.cpp" />

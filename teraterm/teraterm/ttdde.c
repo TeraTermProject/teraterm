@@ -45,10 +45,10 @@
 #include "sendmem.h"
 #include "codeconv.h"
 #include "broadcast.h"
-
 #include "filesys.h"
 #include "sendmem.h"
 #include "codeconv.h"
+#include "scp.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -772,63 +772,21 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 
 	case CmdScpSend:  // add 'scpsend' (2008.1.1 yutaka)
 		{
-		typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
-		static PSSH_start_scp func = NULL;
-		static HMODULE h = NULL;
-		char msg[128];
-
-		if (func == NULL) {
-			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
-				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
-				goto scp_send_error;
+			if (ScpSend(ParamFileName, ParamSecondFileName) == FALSE) {
+				const char *msg = "ttxssh.dll not support scp";
+				MessageBox(NULL, msg, "Tera Term: scprecv command error", MB_OK | MB_ICONERROR);
+				return DDE_FNOTPROCESSED;
 			}
-			func = (PSSH_start_scp)GetProcAddress(h, "TTXScpSendfile");
-			if (func == NULL) {
-				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetProcAddress(\"TTXScpSendfile\")) %d", GetLastError());
-				goto scp_send_error;
-			}
-		}
-
-		if (func != NULL) {
-			// DdeCmnd = TRUE;
-			func(ParamFileName, ParamSecondFileName);
-			break;
-		}
-
-scp_send_error:
-		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-		return DDE_FNOTPROCESSED;
 		}
 		break;
 
 	case CmdScpRcv:
 		{
-		typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
-		static PSSH_start_scp func = NULL;
-		static HMODULE h = NULL;
-		char msg[128];
-
-		if (func == NULL) {
-			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
-				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
-				goto scp_rcv_error;
+			if (ScpReceive(ParamFileName, ParamSecondFileName) == FALSE) {
+				const char *msg = "ttxssh.dll not support scp";
+				MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
+				return DDE_FNOTPROCESSED;
 			}
-			func = (PSSH_start_scp)GetProcAddress(h, "TTXScpReceivefile");
-			if (func == NULL) {
-				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetProcAddress(\"TTXScpReceivefile\")) %d", GetLastError());
-				goto scp_rcv_error;
-			}
-		}
-
-		if (func != NULL) {
-			// DdeCmnd = TRUE;
-			func(ParamFileName, ParamSecondFileName);
-			break;
-		}
-
-scp_rcv_error:
-		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-		return DDE_FNOTPROCESSED;
 		}
 		break;
 
