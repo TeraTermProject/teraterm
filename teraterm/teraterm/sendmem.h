@@ -46,6 +46,7 @@ SendMem *SendMemTextW(wchar_t *ptr, size_t len);
 SendMem *SendMemBinary(void *ptr, size_t len);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
 void SendMemInitSend(SendMem *sm, BOOL echo_only);
+void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *callback_data);
 void SendMemInitDelay(SendMem *sm, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max);
 void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile);
 void SendMemInitDialogCaption(SendMem *sm, const wchar_t *caption);
@@ -59,6 +60,7 @@ void SendMemContinuously(void);
 // convenient function
 BOOL SendMemPasteString(wchar_t *str);
 BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max);
+BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, void (*callback)(void *data), void *callback_data);
 
 #ifdef __cplusplus
 }

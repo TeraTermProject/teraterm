@@ -76,6 +76,8 @@ typedef struct SendMemTag {
 	char *UILanguageFile;
 	wchar_t *dialog_caption;
 	wchar_t *filename;
+	void (*callback)(void *data);
+	void *callback_data;
 	//
 	size_t send_left;
 	size_t send_index;
@@ -142,6 +144,12 @@ static wchar_t *wcsnchr(const wchar_t *str, size_t len, wchar_t chr)
 static void EndPaste()
 {
 	sendmem_work_t *p = sendmem_work;
+
+	if (p->callback != NULL) {
+		p->callback(p->callback_data);
+		p->callback = NULL;
+	}
+
 	free((void *)p->send_ptr);
 	p->send_ptr = NULL;
 
@@ -584,6 +592,15 @@ void SendMemInitDelay(SendMem *sm, SendMemDelayType type, DWORD delay_tick, size
 	sm->delay_tick = delay_tick;
 }
 
+/**
+ *	送信完了でコールバック
+ */
+void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *callback_data)
+{
+	sm->callback = callback;
+	sm->callback_data = callback_data;
+}
+
 // セットするとダイアログが出る
 void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile)
 {
@@ -646,7 +663,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 	return r;
 }
 #else
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
+SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
 {
 	SendMem *sm;
 	if (!binary) {
@@ -654,7 +671,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 		wchar_t *str_ptr = LoadFileWW(filename, &str_len);
 		assert(str_ptr != NULL);
 		if (str_ptr == NULL) {
-			return FALSE;
+			return NULL;
 		}
 
 		// 改行を CR のみに正規化
@@ -669,7 +686,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 		unsigned char *data_ptr = LoadFileBinary(filename, &data_len);
 		assert(data_ptr != NULL);
 		if (data_ptr == NULL) {
-			return FALSE;
+			return NULL;
 		}
 		sm = SendMemBinary(data_ptr, data_len);
 	}
@@ -678,9 +695,26 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 	SendMemInitDialogFilename(sm, filename);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);
 	SendMemStart(sm);
-	return TRUE;
+	return sm;
 }
 #endif
+
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
+{
+	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max);
+	return (sm != NULL) ? TRUE : FALSE;
+}
+
+BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, void (*callback)(void *data), void *callback_data)
+{
+	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max);
+	if (sm == NULL) {
+		return FALSE;
+	}
+
+	SendMemInitSetCallback(sm, callback, callback_data);
+	return TRUE;
+}
 
 /**
  *	短い文字列を送信する

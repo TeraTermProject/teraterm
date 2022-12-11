@@ -1595,149 +1595,210 @@ void CVTWindow::DropListFree()
 	}
 }
 
+typedef struct DropData_tag {
+	// iniに保存されない、今実行しているTera Termでのみ有効な設定
+	enum drop_type DefaultDropType;
+	unsigned char DefaultDropTypePaste;
+	bool DefaultShowDialog;
+	bool TransBin;
+	bool DoSameProcess;
+	enum drop_type DropType;
+	unsigned char DropTypePaste;
+
+	HWND vtwin;
+
+	int FileCount;
+	int DirectoryCount;
+	int SendIndex;
+} DropData_t;
+
+static DropData_t *DropData;
+
 /**
- *  ファイルがドロップされた
+ *	初期化
+ */
+static DropData_t *DropInit()
+{
+	DropData_t *data =(DropData_t *)calloc(sizeof(*data), 1);
+	data->DefaultDropType = DROP_TYPE_CANCEL;
+	data->DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
+	data->DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
+	data->vtwin = HVTWin;
+	return data;
+}
+
+/**
+ *	送信完了コールバック
+ */
+static void DropSendCallback(void *callback_data)
+{
+	DropData_t *data = (DropData_t *)callback_data;
+	// 次の送信を行う
+	::PostMessage(data->vtwin, WM_USER_DROPNOTIFY, 0, 1);
+}
+
+/**
+ *  ファイルがドロップ通知
+ *	@param	lparam		0	ファイルがドロップされた
+ *							ShowDialogが参照される
+ *						1	ファイルの転送が完了した
  *	@param	ShowDialog	0	表示しても表示しなくても良い
  *						1	必ず表示する
  */
-LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
+LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 {
-	// iniに保存されない、今実行しているTera Termでのみ有効な設定
-	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
-	static unsigned char DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
-	static bool DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
-	static bool TransBin;
-
-	int FileCount = 0;
-	int DirectoryCount = 0;
-	for (int i = 0; i < DropListCount; i++) {
-		const wchar_t *FileName = DropLists[i];
-		const DWORD attr = GetFileAttributesW(FileName);
-		if (attr == INVALID_FILE_ATTRIBUTES) {
-			FileCount++;
-		} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
-			DirectoryCount++;
-		} else {
-			FileCount++;
-		}
+	DropData_t *data = DropData;
+	if (data == NULL) {
+		// 初めてファイルのドロップが発生した
+		assert(lparam == 0);
+		data = DropInit();
+		DropData = data;
 	}
 
-	bool DoSameProcess = false;
-	const bool isSSH = (cv.isSSH == 2);
-	enum drop_type DropType;
-	unsigned char DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
-	if (DefaultDropType == DROP_TYPE_CANCEL) {
-		// default is not set
-		TransBin = ts.TransBin == 0 ? false : true;
-		if (!ShowDialog) {
-			if (FileCount == 1 && DirectoryCount == 0) {
-				if (ts.ConfirmFileDragAndDrop) {
-					if (isSSH) {
-						DropType = DROP_TYPE_SCP;
+	switch (lparam) {
+	case 0: {
+		data->FileCount = 0;
+		data->DirectoryCount = 0;
+		for (int i = 0; i < DropListCount; i++) {
+			const wchar_t *FileName = DropLists[i];
+			const DWORD attr = GetFileAttributesW(FileName);
+			if (attr == INVALID_FILE_ATTRIBUTES) {
+				data->FileCount++;
+			} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
+				data->DirectoryCount++;
+			} else {
+				data->FileCount++;
+			}
+		}
+
+		data->DoSameProcess = false;
+		const bool isSSH = (cv.isSSH == 2);
+		data->DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
+		if (data->DefaultDropType == DROP_TYPE_CANCEL) {
+			// default is not set
+			data->TransBin = ts.TransBin == 0 ? false : true;
+			if (!ShowDialog) {
+				if (data->FileCount == 1 && data->DirectoryCount == 0) {
+					if (ts.ConfirmFileDragAndDrop) {
+						if (isSSH) {
+							data->DropType = DROP_TYPE_SCP;
+						} else {
+							data->DropType = DROP_TYPE_SEND_FILE;
+						}
+						data->DoSameProcess = false;
 					} else {
-						DropType = DROP_TYPE_SEND_FILE;
+						data->DropType = DROP_TYPE_SEND_FILE;
+						data->DoSameProcess = data->DefaultShowDialog ? false : true;
 					}
-					DoSameProcess = false;
-				} else {
-					DropType = DROP_TYPE_SEND_FILE;
-					DoSameProcess = DefaultShowDialog ? false : true;
 				}
-			} else if (FileCount == 0 && DirectoryCount == 1) {
-				DropType = DROP_TYPE_PASTE_FILENAME;
-				DoSameProcess = DefaultShowDialog ? false : true;
-			} else if (FileCount > 0 && DirectoryCount > 0) {
-				DropType = DROP_TYPE_PASTE_FILENAME;
-				DoSameProcess = false;
-			} else if (FileCount > 0 && DirectoryCount == 0) {
-				// filename only
-				if (isSSH) {
-					DropType = DROP_TYPE_SCP;
-				} else {
-					DropType = DROP_TYPE_SEND_FILE;
+				else if (data->FileCount == 0 && data->DirectoryCount == 1) {
+					data->DropType = DROP_TYPE_PASTE_FILENAME;
+					data->DoSameProcess = data->DefaultShowDialog ? false : true;
 				}
-				DoSameProcess = false;
+				else if (data->FileCount > 0 && data->DirectoryCount > 0) {
+					data->DropType = DROP_TYPE_PASTE_FILENAME;
+					data->DoSameProcess = false;
+				}
+				else if (data->FileCount > 0 && data->DirectoryCount == 0) {
+					// filename only
+					if (isSSH) {
+						data->DropType = DROP_TYPE_SCP;
+					} else {
+						data->DropType = DROP_TYPE_SEND_FILE;
+					}
+					data->DoSameProcess = false;
+				} else {
+					// directory only
+					data->DropType = DROP_TYPE_PASTE_FILENAME;
+					data->DoSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
+				}
 			} else {
-				// directory only
-				DropType = DROP_TYPE_PASTE_FILENAME;
-				DoSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
+				// show dialog
+				if (data->DirectoryCount > 0) {
+					data->DropType = DROP_TYPE_PASTE_FILENAME;
+				} else {
+					if (isSSH) {
+						data->DropType = DROP_TYPE_SCP;
+					} else {
+						data->DropType = DROP_TYPE_SEND_FILE;
+					}
+				}
+				data->DoSameProcess = false;
 			}
 		} else {
-			// show dialog
-			if (DirectoryCount > 0) {
-				DropType = DROP_TYPE_PASTE_FILENAME;
+			if (data->DirectoryCount > 0 &&
+				(data->DefaultDropType == DROP_TYPE_SEND_FILE ||
+				 data->DefaultDropType == DROP_TYPE_SCP))
+			{	// デフォルトのままでは処理できない組み合わせ
+				data->DropType = DROP_TYPE_PASTE_FILENAME;
+				data->DropTypePaste = data->DefaultDropTypePaste;
+				data->DoSameProcess = false;
 			} else {
-				if (isSSH) {
-					DropType = DROP_TYPE_SCP;
-				} else {
-					DropType = DROP_TYPE_SEND_FILE;
-				}
+				data->DropType = data->DefaultDropType;
+				data->DropTypePaste = data->DefaultDropTypePaste;
+				data->DoSameProcess = (ShowDialog || data->DefaultShowDialog) ? false : true;
 			}
-			DoSameProcess = false;
 		}
-	} else {
-		if (DirectoryCount > 0 &&
-			(DefaultDropType == DROP_TYPE_SEND_FILE ||
-			 DefaultDropType == DROP_TYPE_SCP))
-		{	// デフォルトのままでは処理できない組み合わせ
-			DropType = DROP_TYPE_PASTE_FILENAME;
-			DropTypePaste = DefaultDropTypePaste;
-			DoSameProcess = false;
-		} else {
-			DropType = DefaultDropType;
-			DropTypePaste = DefaultDropTypePaste;
-			DoSameProcess = (ShowDialog || DefaultShowDialog) ? false : true;
-		}
-	}
 
-	for (int i = 0; i < DropListCount; i++) {
+		data->SendIndex = 0;
+		// break;
+		// FALLTHROUGH
+	}
+	case 1:
+	next_file: {
+		if (data->SendIndex == DropListCount) {
+			// すべて送信完了
+			goto finish;
+		}
+		int i = data->SendIndex;
+		data->SendIndex++;
 		const wchar_t *FileName = DropLists[i];
 
-		if (!DoSameProcess) {
+		if (!data->DoSameProcess) {
+			const bool isSSH = (cv.isSSH == 2);
 			bool DoSameProcessNextDrop;
-			bool DoNotShowDialog = !DefaultShowDialog;
+			bool DoNotShowDialog = !data->DefaultShowDialog;
 			SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 						  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-			DropType =
-				ShowDropDialogBox(m_hInst, HVTWin,
-								  FileName, DropType,
+			data->DropType =
+				ShowDropDialogBox(m_hInst, HVTWin, FileName, data->DropType,
 								  DropListCount - i,
-								  (DirectoryCount == 0 && isSSH) ? true : false,
-								  DirectoryCount == 0 ? true : false,
-								  &TransBin,
+								  (data->DirectoryCount == 0 && isSSH) ? true : false, data->DirectoryCount == 0 ? true : false,
+								  &data->TransBin,
 								  &ts,
-								  &DropTypePaste,
-								  &DoSameProcess,
+								  &data->DropTypePaste, &data->DoSameProcess,
 								  &DoSameProcessNextDrop,
 								  &DoNotShowDialog);
-			if (DropType == DROP_TYPE_CANCEL) {
+			if (data->DropType == DROP_TYPE_CANCEL) {
 				goto finish;
 			}
 			if (DoSameProcessNextDrop) {
-				DefaultDropType = DropType;
+				data->DefaultDropType = data->DropType;
 			}
 			if (!ts.ConfirmFileDragAndDrop) {
-				DefaultShowDialog = !DoNotShowDialog;
+				data->DefaultShowDialog = !DoNotShowDialog;
 			}
 		}
 
-		switch (DropType) {
+		switch (data->DropType) {
 		case DROP_TYPE_CANCEL:
 		default:
 			// cancel
 			break;
-		case DROP_TYPE_SEND_FILE:
-			if (!TransBin) {
-				SendMemSendFile(FileName, FALSE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+		case DROP_TYPE_SEND_FILE: {
+			if (!data->TransBin) {
+				SendMemSendFile2(FileName, FALSE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, DropSendCallback, data);
 			}
 			else {
-				SendMemSendFile(FileName, TRUE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+				SendMemSendFile2(FileName, TRUE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, DropSendCallback, data);
 			}
 			break;
+		}
 		case DROP_TYPE_PASTE_FILENAME:
 		{
-			const bool escape = (DropTypePaste & DROP_TYPE_PASTE_ESCAPE) ? true : false;
+			const bool escape = (data->DropTypePaste & DROP_TYPE_PASTE_ESCAPE) ? true : false;
 
-			DefaultDropTypePaste = DropTypePaste;
+			data->DefaultDropTypePaste = data->DropTypePaste;
 
 			TermSendStartBracket();
 
@@ -1745,7 +1806,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			TermPasteStringNoBracket(str, wcslen(str));
 			free(str);
 			if (DropListCount > 1 && i < DropListCount - 1) {
-				if (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) {
+				if (data->DropTypePaste & DROP_TYPE_PASTE_NEWLINE) {
 					TermPasteStringNoBracket(L"\x0d", 1);	// 改行(CR,0x0d)
 				}
 				else {
@@ -1755,7 +1816,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 
 			TermSendEndBracket();
 
-			break;
+			// 次のファイルの処理へ
+			goto next_file;
 		}
 		case DROP_TYPE_SCP:
 		{
@@ -1767,7 +1829,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 			else {
 				// 一括送信の場合はタイマー処理を行うことで、連続送信による
 				// エラーが起こらないようにする。
-				if (DoSameProcess) {
+				if (data->DoSameProcess) {
 					int j;
 
 					DropListCountSendScp = DropListCount - i;
@@ -1788,17 +1850,24 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM)
 					if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
 						goto finish;
 					}
-					i += FileCount - 1;
-					break;
+
+					// 次のファイルの処理へ
+					goto next_file;
 				}
 			}
 
 		}
 		}
 	}
+		break;
+	case 2:
+	default:
+	finish:
+		// 終了処理
+		DropListFree();
+		break;
+	}
 
-finish:
-	DropListFree();
 	return 0;
 }
 
