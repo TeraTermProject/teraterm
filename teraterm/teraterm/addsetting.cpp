@@ -592,26 +592,23 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDC_CONFIRM_STRING_FILE_PATH | (BN_CLICKED << 16):
 			{
-				wchar_t fileW[_countof(ts.ConfirmChangePasteStringFile)];
-				MultiByteToWideChar(CP_ACP, 0, ts.ConfirmChangePasteStringFile, -1, fileW, _countof(fileW));
+				wchar_t *def;
+				hGetDlgItemTextW(m_hWnd, IDC_CONFIRM_STRING_FILE, &def);
 
-				OPENFILENAMEW ofn;
-
-				memset(&ofn, 0, sizeof(ofn));
-				ofn.lStructSize = get_OPENFILENAME_SIZEW();
-				ofn.hwndOwner = GetSafeHwnd();
+				TTOPENFILENAMEW ofn = {};
+				ofn.hwndOwner = m_hWnd;GetSafeHwnd();
 				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", L"txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
-				ofn.lpstrFile = fileW;
-				ofn.nMaxFile = _countof(fileW);
+				ofn.lpstrFile = def;
 				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
+				ofn.lpstrInitialDir = ts.HomeDirW;
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				BOOL ok = GetOpenFileNameW(&ofn);
+				wchar_t *filename;
+				BOOL ok = TTGetOpenFileNameW(&ofn, &filename);
 				if (ok) {
-					char *file = ToCharW(fileW);
-					strncpy_s(ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile), file, _TRUNCATE);
-					free(file);
-					SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
+					SetDlgItemTextW(IDC_CONFIRM_STRING_FILE, filename);
+					free(filename);
 				}
+				free(def);
 				free((void *)ofn.lpstrFilter);
 				free((void *)ofn.lpstrTitle);
 			}
@@ -899,6 +896,8 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	SetCheck(IDC_THEME_ENABLE, ThemeGetEnable() ? BST_CHECKED : BST_UNCHECKED);
 
+	SetDlgItemTextW(IDC_SPIPATH_EDIT, ts.EtermLookfeel.BGSPIPathW);
+
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
 
@@ -982,35 +981,27 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_THEME_BUTTON | (BN_CLICKED << 16): {
 			// テーマファイルを選択する
-			OPENFILENAMEW ofn = {};
-			wchar_t szFile[MAX_PATH];
-			wchar_t *curdir;
+			wchar_t *theme_file;
+			hGetDlgItemTextW(m_hWnd, IDC_THEME_EDIT, &theme_file);
+
 			wchar_t *theme_dir;
-			hGetCurrentDirectoryW(&curdir);
-
-			if (GetFileAttributesW(ts.EtermLookfeel.BGThemeFileW) != INVALID_FILE_ATTRIBUTES) {
-				wcsncpy_s(szFile, _countof(szFile), ts.EtermLookfeel.BGThemeFileW, _TRUNCATE);
-			} else {
-				szFile[0] = 0;
-			}
-
 			aswprintf(&theme_dir, L"%s\\theme", ts.HomeDirW);
 
-			ofn.lStructSize = get_OPENFILENAME_SIZEW();
-			ofn.hwndOwner = GetSafeHwnd();
+			TTOPENFILENAMEW ofn = {};
+			ofn.hwndOwner = m_hWnd;
 			ofn.lpstrFilter = L"Theme Files(*.ini)\0*.ini\0All Files(*.*)\0*.*\0";
-			ofn.lpstrFile = szFile;
-			ofn.nMaxFile = _countof(szFile);
 			ofn.lpstrTitle = L"select theme file";
+			ofn.lpstrFile = theme_file;
 			ofn.lpstrInitialDir = theme_dir;
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-			BOOL ok = GetOpenFileNameW(&ofn);
-			SetCurrentDirectoryW(curdir);
-			free(curdir);
-			free(theme_dir);
+			wchar_t *filename;
+			BOOL ok = TTGetOpenFileNameW(&ofn, &filename);
 			if (ok) {
-				SetDlgItemTextW(IDC_THEME_EDIT, szFile);
+				SetDlgItemTextW(IDC_THEME_EDIT, filename);
+				free(filename);
 			}
+			free(theme_dir);
+			free(theme_file);
 			return TRUE;
 		}
 
@@ -1102,6 +1093,34 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, ts.UILanguageFileW);
 				return TRUE;
 			}
+		case IDC_SPIPATH_BUTTON | (BN_CLICKED << 16): {
+			wchar_t *def;
+			hGetDlgItemTextW(m_hWnd, IDC_SPIPATH_EDIT, &def);
+			if (GetFileAttributesW(def) == INVALID_FILE_ATTRIBUTES) {
+				// フォルダが存在しない(入力途中?,TT4から移行?)
+				static const TTMessageBoxInfoW info = {
+					"Tera Term",
+					"MSG_TT_NOTICE", L"Tera Term: Notice",
+					NULL, L"'%s' not exist\nUse home folder",
+					MB_OK };
+				TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW, def);
+				free(def);
+				def = _wcsdup(ts.HomeDirW);
+			}
+
+			TTBROWSEINFOW bi = {};
+			bi.hwndOwner = m_hWnd;
+			bi.lpszTitle = L"Select Susie Plugin path";
+			bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_EDITBOX | BIF_NEWDIALOGSTYLE;
+
+			wchar_t *folder;
+			if (TTSHBrowseForFolderW(&bi, def, &folder)) {
+				SetDlgItemTextW(IDC_SPIPATH_EDIT, folder);
+				free(folder);
+			}
+			free(def);
+			break;
+		}
 	}
 
 	return TTCPropertyPage::OnCommand(wParam, lParam);
@@ -1321,6 +1340,11 @@ void CVisualPropPageDlg::OnOK()
 		// テーマをdisableにする
 		ThemeSetEnable(FALSE);
 	}
+
+	wchar_t *spi_path;
+	hGetDlgItemTextW(m_hWnd, IDC_SPIPATH_EDIT, &spi_path);
+	free(ts.EtermLookfeel.BGSPIPathW);
+	ts.EtermLookfeel.BGSPIPathW = spi_path;
 }
 
 void CVisualPropPageDlg::OnHelp()
@@ -1480,28 +1504,24 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wParam) {
 		case IDC_VIEWLOG_PATH | (BN_CLICKED << 16):
 			{
-				wchar_t fileW[_countof(ts.ViewlogEditor)];
-				MultiByteToWideChar(CP_ACP, 0, ts.ViewlogEditor, -1, fileW, _countof(fileW));
+				wchar_t *editor;
+				hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR, &editor);
 
-				OPENFILENAMEW ofn;
-
-				memset(&ofn, 0, sizeof(ofn));
-				ofn.lStructSize = get_OPENFILENAME_SIZEW();
-				ofn.hwndOwner = GetSafeHwnd();
+				TTOPENFILENAMEW ofn = {};
+				ofn.hwndOwner = m_hWnd;
 				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_FILTER", L"exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
-				ofn.lpstrFile = fileW;
-				ofn.nMaxFile = _countof(fileW);
+				ofn.lpstrFile = editor;
 				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", ts.UILanguageFile);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				BOOL ok = GetOpenFileNameW(&ofn);
+				wchar_t *filew;
+				BOOL ok = TTGetOpenFileNameW(&ofn, &filew);
 				if (ok) {
-					char *file = ToCharW(fileW);
-					strncpy_s(ts.ViewlogEditor, sizeof(ts.ViewlogEditor), file, _TRUNCATE);
-					free(file);
-					SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
+					SetDlgItemTextW(IDC_VIEWLOG_EDITOR, filew);
+					free(filew);
 				}
 				free((void *)ofn.lpstrFilter);
 				free((void *)ofn.lpstrTitle);
+				free(editor);
 			}
 			return TRUE;
 

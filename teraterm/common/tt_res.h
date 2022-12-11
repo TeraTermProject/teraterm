@@ -237,6 +237,9 @@
 #define IDC_NOTIFY_SOUND                2618
 #define IDC_NOTIFICATION_TEST_POPUP     2619
 #define IDC_NOTIFICATION_TEST_TRAY      2620
+#define IDC_SPIPATH_TITLE               2621
+#define IDC_SPIPATH_EDIT                2622
+#define IDC_SPIPATH_BUTTON              2623
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -336,7 +339,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2621
+#define _APS_NEXT_CONTROL_VALUE         2624
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
