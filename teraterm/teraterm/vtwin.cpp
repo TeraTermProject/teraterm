@@ -109,6 +109,7 @@
 #include "ttcmn_static.h"
 #include "ttcmn_notify2.h"
 #include "scp.h"
+#include "ttcommdlg.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -4506,183 +4507,33 @@ void CVTWindow::OnSetupGeneral()
 	}
 }
 
-/* GetSetupFname function id */
-typedef enum {
-	GSF_RESTORE,	// Restore setup
-	GSF_LOADKEY,	// Load key map
-} GetSetupFnameFuncId;
-
-static BOOL _GetSetupFname(HWND HWin, GetSetupFnameFuncId FuncId, PTTSet ts)
-{
-	wchar_t *FNameFilter;
-	wchar_t *TempDir;
-	wchar_t *DirW = NULL;
-	wchar_t NameW[MAX_PATH];
-	const wchar_t *UILanguageFileW = ts->UILanguageFileW;
-
-	/* save current dir */
-	hGetCurrentDirectoryW(&TempDir);
-
-	/* File name filter */
-	if (FuncId==GSF_LOADKEY) {
-		FNameFilter = _get_lang_msg("FILEDLG_KEYBOARD_FILTER", L"keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFileW);
-	}
-	else {
-		FNameFilter = _get_lang_msg("FILEDLG_SETUP_FILTER", L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFileW);
-	}
-
-	if (FuncId==GSF_LOADKEY) {
-		size_t i, j;
-		wchar_t *KeyCnfFNW = ts->KeyCnfFNW;
-		GetFileNamePosW(KeyCnfFNW,&i,&j);
-		wcsncpy_s(NameW, _countof(NameW),&KeyCnfFNW[j], _TRUNCATE);
-		DirW = ExtractDirNameW(KeyCnfFNW);
-
-		if ((wcslen(NameW) == 0) || (_wcsicmp(NameW, L"KEYBOARD.CNF") == 0)) {
-			wcsncpy_s(NameW, _countof(NameW),L"KEYBOARD.CNF", _TRUNCATE);
-		}
-	}
-	else {
-		size_t i, j;
-		wchar_t *SetupFNameW = ts->SetupFNameW;
-		GetFileNamePosW(SetupFNameW,&i,&j);
-		wcsncpy_s(NameW, _countof(NameW),&SetupFNameW[j], _TRUNCATE);
-		DirW = ExtractDirNameW(SetupFNameW);
-
-		if ((wcslen(NameW) == 0) || (_wcsicmp(NameW, L"TERATERM.INI") == 0)) {
-			wcsncpy_s(NameW, _countof(NameW), L"TERATERM.INI", _TRUNCATE);
-		}
-	}
-
-	if (DirW == NULL) {
-		DirW = _wcsdup(ts->HomeDirW);
-	}
-
-	SetCurrentDirectoryW(DirW);
-
-	/* OPENFILENAME record */
-	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZEW();
-	ofn.hwndOwner   = HWin;
-	ofn.lpstrFile   = NameW;
-	ofn.nMaxFile    = _countof(NameW);
-	ofn.lpstrFilter = FNameFilter;
-	ofn.nFilterIndex = 1;
-	ofn.hInstance = hInst;
-
-	BOOL Ok;
-	switch (FuncId) {
-	case GSF_RESTORE:
-		ofn.lpstrDefExt = L"ini";
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFileW);
-		Ok = GetOpenFileNameW(&ofn);
-		if (Ok) {
-			free(ts->SetupFNameW);
-			ts->SetupFNameW = _wcsdup(NameW);
-			char *Name = ToCharW(NameW);
-			strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Name, _TRUNCATE);
-			free(Name);
-		}
-		break;
-	case GSF_LOADKEY:
-		ofn.lpstrDefExt = L"cnf";
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
-		ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFileW);
-		Ok = GetOpenFileNameW(&ofn);
-		if (Ok) {
-			free(ts->KeyCnfFNW);
-			ts->KeyCnfFNW = _wcsdup(NameW);
-			char *Name = ToCharW(NameW);
-			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), Name, _TRUNCATE);
-			free(Name);
-		}
-		break;
-	default:
-		assert(FALSE);
-		Ok = FALSE;
-		break;
-	}
-
-#if defined(_DEBUG)
-	if (!Ok) {
-		DWORD Err = GetLastError();
-		DWORD DlgErr = CommDlgExtendedError();
-		assert(Err == 0 && DlgErr == 0);
-	}
-#endif
-
-	free(FNameFilter);
-	free((void *)ofn.lpstrTitle);
-
-	/* restore dir */
-	SetCurrentDirectoryW(TempDir);
-	free(TempDir);
-	free(DirW);
-
-	return Ok;
-}
-
 void CVTWindow::OnSetupSave()
 {
 	PTTSet pts = &ts;
 	const wchar_t *UILanguageFileW = pts->UILanguageFileW;
-
-	// save current dir
-	//		GetSaveFileNameW() がカレントフォルダを変更してしまうため
-	wchar_t *cur_dir;
-	hGetCurrentDirectoryW(&cur_dir);
 
 	wchar_t *filter = _get_lang_msg("FILEDLG_SETUP_FILTER",
 									L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFileW);
 	wchar_t *title = _get_lang_msg("FILEDLG_SAVE_SETUP_TITLE",
 								   L"Tera Term: Save setup", UILanguageFileW);
 
-	// iniファイルのあるフォルダ
-	wchar_t *DirW = ExtractDirNameW(pts->SetupFNameW);
-
-	// カレントをiniファイルのあるフォルダにしておく
-	// 		ダイアログが開くときに、
-	//		カレントをオープンするため(7以前?)
-	SetCurrentDirectoryW(DirW);
-
-	// ファイル名をフルパスで初期化しておく
-	// 		ダイアログが開くときに、
-	//		ファイルのパスをオープンするため(7以降?)
-	wchar_t NameW[MAX_PATH];
-	wcsncpy_s(NameW, _countof(NameW), pts->SetupFNameW, _TRUNCATE);
-
 	/* OPENFILENAME record */
-	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZEW();
+	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner   = m_hWnd;
-	ofn.lpstrFile   = NameW;
-	ofn.nMaxFile    = _countof(NameW);
+	ofn.lpstrFile   = pts->SetupFNameW;
 	ofn.lpstrFilter = filter;
 	ofn.nFilterIndex = 1;
 	ofn.hInstance = hInst;
 	ofn.lpstrDefExt = L"ini";
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_SHOWHELP;
-	ofn.lpstrInitialDir = DirW;	// 初めて開くときに使用される,2回目以降は最後に利用したフォルダになる(7以降?)
 	ofn.lpstrTitle = title;
 
 	HelpId = HlpSetupSave;
-	BOOL Ok = GetSaveFileNameW(&ofn);
-#if defined(_DEBUG)
-	if (!Ok) {
-		DWORD Err = GetLastError();
-		DWORD DlgErr = CommDlgExtendedError();
-		assert(Err == 0 && DlgErr == 0);
-	}
-#endif
+	wchar_t *NameW;
+	BOOL Ok = TTGetSaveFileNameW(&ofn, &NameW);
 
 	free(filter);
 	free(title);
-	free(DirW);
-
-	/* restore dir */
-	SetCurrentDirectoryW(cur_dir);
-	free(cur_dir);
 
 	if (! Ok) {
 		// キャンセル
@@ -4693,9 +4544,7 @@ void CVTWindow::OnSetupSave()
 	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);	// 前のファイルを覚えておく
 	free(pts->SetupFNameW);
 	pts->SetupFNameW = _wcsdup(NameW);
-	char *Name = ToCharW(NameW);
-	strncpy_s(pts->SetupFName, sizeof(pts->SetupFName), Name, _TRUNCATE);
-	free(Name);
+	WideCharToACP_t(pts->SetupFNameW, pts->SetupFName, sizeof(pts->SetupFName));
 
 	// 書き込みできるか?
 	const DWORD attr = GetFileAttributesW(ts.SetupFNameW);
@@ -4770,9 +4619,31 @@ void CVTWindow::OnSetupSave()
 
 void CVTWindow::OnSetupRestore()
 {
+	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+	wchar_t *FNameFilter = _get_lang_msg("FILEDLG_SETUP_FILTER", L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFileW);
+
+	TTOPENFILENAMEW ofn = {};
+	ofn.hwndOwner   = m_hWnd;
+	ofn.lpstrFile   = ts.SetupFNameW;
+	ofn.lpstrFilter = FNameFilter;
+	ofn.nFilterIndex = 1;
+	ofn.hInstance = hInst;
+	ofn.lpstrDefExt = L"ini";
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
+	ofn.lpstrTitle = _get_lang_msg("FILEDLG_RESTORE_SETUP_TITLE", L"Tera Term: Restore setup", UILanguageFileW);
+
 	HelpId = HlpSetupRestore;
-	BOOL Ok = _GetSetupFname(HVTWin, GSF_RESTORE, &ts);
+	wchar_t *filename;
+	BOOL Ok = TTGetOpenFileNameW(&ofn, &filename);
+
+	free(FNameFilter);
+	free((void *)ofn.lpstrTitle);
+
 	if (Ok) {
+		free(ts.SetupFNameW);
+		ts.SetupFNameW = filename;
+		WideCharToACP_t(ts.SetupFNameW, ts.SetupFName, sizeof(ts.SetupFName));
+
 		RestoreSetup();
 	}
 }
@@ -4790,14 +4661,35 @@ void CVTWindow::OnOpenSetupDirectory()
 
 void CVTWindow::OnSetupLoadKeyMap()
 {
-	HelpId = HlpSetupLoadKeyMap;
-	BOOL Ok = _GetSetupFname(HVTWin,GSF_LOADKEY,&ts);
-	if (! Ok) {
-		return;
-	}
+	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+	wchar_t *FNameFilter =
+		_get_lang_msg("FILEDLG_KEYBOARD_FILTER", L"keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFileW);
 
-	// load key map
-	SetKeyMap();
+	TTOPENFILENAMEW ofn = {};
+	ofn.hwndOwner = m_hWnd;
+	ofn.lpstrFile   = ts.KeyCnfFNW;
+	ofn.lpstrFilter = FNameFilter;
+	ofn.nFilterIndex = 1;
+	ofn.hInstance = hInst;
+	ofn.lpstrDefExt = L"cnf";
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
+	ofn.lpstrTitle = _get_lang_msg("FILEDLG_LOAD_KEYMAP_TITLE", L"Tera Term: Load key map", UILanguageFileW);
+
+	HelpId = HlpSetupLoadKeyMap;
+	wchar_t *NameW;
+	BOOL Ok = TTGetOpenFileNameW(&ofn, &NameW);
+
+	free(FNameFilter);
+	free((void *)ofn.lpstrTitle);
+
+	if (Ok) {
+		free(ts.KeyCnfFNW);
+		ts.KeyCnfFNW = NameW;
+		WideCharToACP_t(ts.KeyCnfFNW, ts.KeyCnfFN, _countof(ts.KeyCnfFN));
+
+		// load key map
+		SetKeyMap();
+	}
 }
 
 void CVTWindow::OnControlResetTerminal()
