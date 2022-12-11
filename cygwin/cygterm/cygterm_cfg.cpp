@@ -342,7 +342,7 @@ static void dump(cfg_data_t *cfg_data, void (*print)(const char* msg, ...))
 		{ "debug_flag", offsetof(cfg_data_t, debug_flag), 'b' },
 	};
 	for (int i = 0; i < (int)(sizeof(list)/sizeof(list[0])); i++) {
-		uint8_t *p = (uint8_t *)cfg_data + list[i].offset;
+		char *p = (char *)cfg_data + list[i].offset;
 		switch (list[i].type) {
 		case 's': {
 			char *str = *(char **)p;
