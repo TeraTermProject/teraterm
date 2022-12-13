@@ -110,7 +110,9 @@ Source: release\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf16le; Component
 Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
-;Source: ..\cygwin\cygterm\cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
+#ifexist "..\cygwin\cygterm\cygterm+-i686\cygterm.exe"
+Source: ..\cygwin\cygterm\cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
+#endif
 Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
