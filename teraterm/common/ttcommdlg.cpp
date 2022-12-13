@@ -38,6 +38,19 @@
 
 #include "ttcommdlg.h"
 
+#define	NEW_DIALOG_ENABLE	1		// Vista+
+#define	OLD_DIALOG_ENABLE	1
+
+// VS2005の場合
+#if _MSC_VER == 1400
+// 2005で使えるSDKにはIFileOpenDialogがない
+#undef	NEW_DIALOG_ENABLE
+#define	NEW_DIALOG_ENABLE	0
+#undef	OLD_DIALOG_ENABLE
+#define	OLD_DIALOG_ENABLE	1
+#endif
+
+#if OLD_DIALOG_ENABLE
 static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
 	switch(uMsg) {
@@ -60,7 +73,7 @@ static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM l
 /**
  *	API版,古い
  */
-static BOOL TTSHBrowseForFolderWAPI(TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder)
+static BOOL TTSHBrowseForFolderWAPI(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder)
 {
 	wchar_t buf[MAX_PATH];	// PIDL形式で受け取るのでダミー,一応MAX_PATH長で受ける
 	BROWSEINFOW b = {};
@@ -87,6 +100,8 @@ static BOOL TTSHBrowseForFolderWAPI(TTBROWSEINFOW *bi, const wchar_t *def, wchar
 	// PIDL形式の戻り値のファイルシステムのパスに変換
 #if _MSC_VER > 1400
 	// VS2005で使えるSDKにはSHGetPathFromIDListEx()が入っていない
+	// TODO
+	//	SHGetPathFromIDListEx() を win32help へ持っていく
 	if (true) {
 		size_t len = MAX_PATH / 2;
 		wchar_t *path = NULL;
@@ -118,6 +133,7 @@ static BOOL TTSHBrowseForFolderWAPI(TTBROWSEINFOW *bi, const wchar_t *def, wchar
 	CoTaskMemFree(pidl);
 	return TRUE;
 }
+#endif	// OLD_DIALOG_ENABLE
 
 /**
  *	SHBrowseForFolderW() ほぼ互換関数
@@ -135,24 +151,26 @@ static BOOL TTSHBrowseForFolderWAPI(TTBROWSEINFOW *bi, const wchar_t *def, wchar
  *					不要になったら free() すること
  *					MAX_PATH上限なし
  */
-BOOL TTSHBrowseForFolderW(TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder)
+BOOL TTSHBrowseForFolderW(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder)
 {
-#if _MSC_VER == 1400 // VS2005の場合
-	// 2005で使えるSDKにはIFileOpenDialogがない
+#if	!NEW_DIALOG_ENABLE
 	return TTSHBrowseForFolderWAPI(bi, def, folder);
 #else
 	IFileOpenDialog *pDialog;
 	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_IFileOpenDialog, (void **)&pDialog);
 	if (FAILED(hr)) {
-		// IFileOpenDialog が使えないOS, Vista以前
+#if OLD_DIALOG_ENABLE
 		return TTSHBrowseForFolderWAPI(bi, def, folder);
+#else
+		return FALSE;
+#endif
 	}
 
 	DWORD options;
 	pDialog->GetOptions(&options);
 	pDialog->SetOptions(options | FOS_PICKFOLDERS);
 	pDialog->SetTitle(bi->lpszTitle);
-	{
+	if (def != NULL) {
 		IShellItem *psi;
 		hr = SHCreateItemFromParsingName(def, NULL, IID_IShellItem, (void **)&psi);
 		if (SUCCEEDED(hr)) {
@@ -207,7 +225,7 @@ BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t 
 	return TTSHBrowseForFolderW(&bi, def, folder);
 }
 
-static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t **filename)
+static BOOL GetOpenSaveFileNameWAPI(const TTOPENFILENAMEW *ofn, bool save, wchar_t **filename)
 {
 	// GetSaveFileNameW(), GetOpenFileNameW() がカレントフォルダを変更してしまうため
 	wchar_t *curdir;
@@ -226,11 +244,10 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 			}
 		}
 	}
-	else {
-		if (ofn->lpstrInitialDir != NULL) {
-			// 初期フォルダ指定あり
-			init_dir = _wcsdup(ofn->lpstrInitialDir);
-		}
+
+	if (init_dir == NULL && ofn->lpstrInitialDir != NULL) {
+		// 初期フォルダ指定あり
+		init_dir = _wcsdup(ofn->lpstrInitialDir);
 	}
 
 	wchar_t File[MAX_PATH];
@@ -250,6 +267,7 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 	o.lpstrTitle = ofn->lpstrTitle;
 	o.lpstrInitialDir = init_dir;
 	o.Flags = ofn->Flags;
+	o.Flags |= (OFN_EXPLORER | OFN_ENABLESIZING);
 	BOOL ok = save ? GetSaveFileNameW(&o) : GetOpenFileNameW(&o);
 #if defined(_DEBUG)
 	if (!ok) {
@@ -267,12 +285,155 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 	return ok;
 }
 
+#if NEW_DIALOG_ENABLE
+static COMDLG_FILTERSPEC *CreateFilterSpec(const wchar_t *filter, UINT *count)
+{
+	if (filter == NULL) {
+		*count = 0;
+		return NULL;
+	}
+	int n = 0;
+	const wchar_t *p = filter;
+	while (*p != 0) {
+		p += wcslen(p);
+		p++;
+		p += wcslen(p);
+		p++;
+		if (p - filter > 32*1024) {
+			// 何かおかしい
+			*count = 0;
+			return NULL;
+		}
+		n++;
+	}
+	*count = n;
+
+	COMDLG_FILTERSPEC *spec = (COMDLG_FILTERSPEC *)malloc(sizeof(COMDLG_FILTERSPEC) * n);
+	p = filter;
+	for (int i = 0; i < n; i++) {
+		spec[i].pszName = p;
+		p += wcslen(p);
+		p++;
+		spec[i].pszSpec = p;
+		p += wcslen(p);
+		p++;
+	}
+	return spec;
+}
+#endif // NEW_DIALOG_ENABLE
+
+static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t **filename)
+{
+#if !NEW_DIALOG_ENABLE
+	return GetOpenSaveFileNameWAPI(ofn, save, filename);
+#else
+	HRESULT hr = 0;
+	IFileDialog *pFile;
+	REFCLSID clsid = save ? CLSID_FileSaveDialog : CLSID_FileOpenDialog;
+	hr = CoCreateInstance(clsid, NULL, CLSCTX_ALL, IID_IFileDialog, (void**)&pFile);
+	if (FAILED(hr)) {
+#if OLD_DIALOG_ENABLE
+		return GetOpenSaveFileNameWAPI(ofn, save, filename);
+#else
+		return FALSE;
+#endif
+	}
+
+	DWORD options;
+	pFile->GetOptions(&options);
+	pFile->SetOptions(options | FOS_NOCHANGEDIR);
+
+	// 初期フォルダ
+	wchar_t* init_dir = NULL;
+	if (ofn->lpstrFile != NULL) {
+		// 初期ファイル指定あり
+		if (!IsRelativePathW(ofn->lpstrFile)) {
+			// 初期ファイルが絶対パスならパスを取り出して初期フォルダにする
+			init_dir = _wcsdup(ofn->lpstrFile);
+			wchar_t* p = wcsrchr(init_dir, L'\\');
+			if (p != NULL) {
+				*p = L'\0';
+			}
+		}
+	}
+	if (init_dir == NULL && ofn->lpstrInitialDir != NULL) {
+		// 初期フォルダ指定あり
+		init_dir = _wcsdup(ofn->lpstrInitialDir);
+	}
+	if (init_dir != NULL) {
+		IShellItem* psi;
+		hr = SHCreateItemFromParsingName(init_dir, NULL, IID_IShellItem, (void**)&psi);
+		if (SUCCEEDED(hr)) {
+			hr = pFile->SetFolder(psi);
+			psi->Release();
+		}
+		free(init_dir);
+		init_dir = NULL;
+	}
+
+	// タイトル
+	if (ofn->lpstrTitle != NULL) {
+		pFile->SetTitle(ofn->lpstrTitle);
+	}
+
+	// (最初から入力されている)ファイル名
+	if (ofn->lpstrFile != NULL) {
+		// フルパスでいれるとだめらしい
+		const wchar_t *base = wcsrchr(ofn->lpstrFile, L'\\');
+		if (base != NULL) {
+			base++;
+		}
+		else {
+			// パス区切りがない
+			base = ofn->lpstrFile;
+		}
+		pFile->SetFileName(base);
+	}
+
+	if (ofn->lpstrFilter != NULL) {
+		UINT count;
+		COMDLG_FILTERSPEC *filter_spec = CreateFilterSpec(ofn->lpstrFilter, &count);
+		pFile->SetFileTypes(count, filter_spec);
+		pFile->SetFileTypeIndex(ofn->nFilterIndex);
+		free(filter_spec);
+	}
+
+	if (ofn->lpstrDefExt != NULL) {
+		pFile->SetDefaultExtension(ofn->lpstrDefExt);
+	}
+
+	BOOL result = FALSE;
+	hr = pFile->Show(ofn->hwndOwner);
+	if (SUCCEEDED(hr)) {
+		IShellItem *pItem;
+		hr = pFile->GetResult(&pItem);
+		if (SUCCEEDED(hr)) {
+			PWSTR pFilename;
+			hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pFilename);
+			if (SUCCEEDED(hr)) {
+				*filename = _wcsdup(pFilename);
+				CoTaskMemFree(pFilename);
+				result = TRUE;
+			}
+			pItem->Release();
+		}
+	}
+	pFile->Release();
+
+	if (!result) {
+		*filename = NULL;
+	}
+	return result;
+#endif
+}
+
 /**
  *	GetOpenFileNameW() 互換関数
  *	異なる点
  *		- フォルダが変更されない
  *		- 初期フォルダ設定
  *			- 初期ファイルのフルパスを初期フォルダにする
+ *		- OFN_SHOWHELP をサポートしていない
  *
  *	@param	filename	選択されたファイル名(戻り値が TRUEの時)
  *						MAX_PATH制限なし、不要になったらfree()すること
