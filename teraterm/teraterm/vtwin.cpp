@@ -540,9 +540,11 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	// バッファが選択状態だったら、選択内容がクリップボードに
 	// コピーされてしまう問題を修正 (2007.12.6 maya)
 	if (!disableBuffEndSelect) {
+		// 選択領域の文字を取得、クリップボードへセットする
 		wchar_t *strW = BuffEndSelect();
 		if (strW != NULL) {
 			CBSetTextW(HVTWin, strW, 0);
+			free(strW);
 		}
 	}
 
