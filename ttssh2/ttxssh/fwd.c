@@ -713,27 +713,32 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 	while (channel->local_socket != INVALID_SOCKET) {
 		char buf[CHANNEL_READ_BUF_SIZE];
 		int amount;
-		int err;
+		int err = ERROR_SUCCESS;
 
 		// recvの一時停止中ならば、何もせずに戻る。
 		if (SSHv2(pvar)) {
 			Channel_t* c = ssh2_local_channel_lookup(channel_num);
-			if (c->bufchain_recv_suspended) {
+			// 接続が確立していない状態の間は c == NULL が返ってくる
+			if (c != NULL && c->bufchain_recv_suspended) {
 				logprintf(LOG_LEVEL_NOTICE, "%s: channel=%d recv was skipped for flow control",
 					__FUNCTION__, channel_num);
 				return;
 			}
 		}
 
+		// 受信(ノンブロッキングモード)
 		amount = recv(channel->local_socket, buf, sizeof(buf), 0);
 
-		// Xサーバからのデータ受信があれば、ノンブロッキングモードでソケット受信を行い、
-		// SSHサーバのXアプリケーションへ送信する。
-		//OutputDebugPrintf("%s: recv %d\n", __FUNCTION__, amount);
-
 		if (amount > 0) {
+			// 受信データあり
 			char *new_buf = buf;
 			FwdFilterResult action = FWD_FILTER_RETAIN;
+
+#if 1
+			logprintf(LOG_LEVEL_VERBOSE, "%s: recv()=%d", __FUNCTION__, amount);
+#else
+			logprintf_hexdump(LOG_LEVEL_VERBOSE, buf, amount, "%s: recv()=%d", __FUNCTION__, amount);
+#endif
 
 			if (channel->filter != NULL) {
 				action = channel->filter(channel->filter_closure, FWD_FILTER_FROM_CLIENT, &amount, &new_buf);
@@ -755,6 +760,9 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 				break;
 			}
 		} else if (amount == 0 || (err = WSAGetLastError()) == WSAEWOULDBLOCK) {
+			// 受信データがない
+			logprintf(LOG_LEVEL_VERBOSE, "%s: recv()=%d err=%s(%d)", __FUNCTION__, amount,
+					  err == WSAEWOULDBLOCK ? "WSAEWOULDBLOCK" : "-", err);
 			return;
 		} else {
 			channel_error(pvar, "reading", channel_num, err);
