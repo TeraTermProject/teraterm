@@ -419,6 +419,8 @@ Channel_t *ssh2_local_channel_lookup(int local_num)
 
 	for (i = 0 ; i < CHANNEL_MAX ; i++) {
 		c = &channels[i];
+		if (c->type != TYPE_PORTFWD)
+			continue;
 		if (c->local_num == local_num)
 			return (c);
 	}
