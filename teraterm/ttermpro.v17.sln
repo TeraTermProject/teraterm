@@ -1,18 +1,17 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.156
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttermpro", "teraterm\ttermpro.v16.vcxproj", "{BC4CDBE3-6269-47A8-BD74-EEB3A6160E06}"
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttermpro", "teraterm\ttermpro.v17.vcxproj", "{BC4CDBE3-6269-47A8-BD74-EEB3A6160E06}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keycode", "keycode\keycode.v16.vcxproj", "{B31BF2E8-79E6-4735-BEA2-C1B4041C2D2E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keycode", "keycode\keycode.v17.vcxproj", "{B31BF2E8-79E6-4735-BEA2-C1B4041C2D2E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpcmn", "ttpcmn\ttpcmn.v16.vcxproj", "{118E0D32-5553-4F73-9927-E873C1C500E4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpcmn", "ttpcmn\ttpcmn.v17.vcxproj", "{118E0D32-5553-4F73-9927-E873C1C500E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpmacro", "ttpmacro\ttpmacro.v16.vcxproj", "{BA519362-A2C2-4B1A-905B-F00791F9038A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpmacro", "ttpmacro\ttpmacro.v17.vcxproj", "{BA519362-A2C2-4B1A-905B-F00791F9038A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttptek", "ttptek\ttptek.v16.vcxproj", "{6D08053B-1C68-4A7E-8766-3553F5AF010B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttptek", "ttptek\ttptek.v17.vcxproj", "{6D08053B-1C68-4A7E-8766-3553F5AF010B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "common\common_static.v16.vcxproj", "{AC42387D-23EC-45DB-81F9-8933C7EFA52A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_static", "common\common_static.v17.vcxproj", "{AC42387D-23EC-45DB-81F9-8933C7EFA52A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
