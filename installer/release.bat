@@ -3,7 +3,8 @@ setlocal
 set CUR=%~dp0
 cd /d %CUR%
 
-set VS_VERSION=2019
+if "%VS_VERSION%" == "" set VS_VERSION=2019
+rem if "%VS_VERSION%" == "" set VS_VERSION=2022
 
 if "%APPVEYOR%" == "True" set NOPAUSE=1
 if exist ..\buildtools\svnrev\sourcetree_info.bat del ..\buildtools\svnrev\sourcetree_info.bat
@@ -138,7 +139,11 @@ rem ####################
 :setup_tools_env
 
 set CYGWIN_PATH=C:\cygwin64\bin
+set VS_BASE=C:\Program Files\Microsoft Visual Studio\%VS_VERSION%
+if exist "%VS_BASE%" goto vs_base_pass
 set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\%VS_VERSION%
+:vs_base_pass
+
 
 if exist toolinfo.bat (
     echo found toolinfo.bat

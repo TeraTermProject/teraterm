@@ -2,6 +2,7 @@ image: Visual Studio 2019
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  VS_VERSION: 2019
 
 build: off
 

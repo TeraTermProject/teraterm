@@ -2,6 +2,7 @@ image: Visual Studio 2022
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  VS_VERSION: 2022
 
 build: off
 
