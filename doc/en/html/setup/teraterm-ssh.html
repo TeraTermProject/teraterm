@@ -173,6 +173,46 @@ LogLevel=0
 </pre>
 
 
+<h1 id="RSAPubkeySignAlgorithmOrder">Sign algorithm order of RSA publickey authentication</h1>
+
+<p>
+When publickey authentication with RSA key, some hash algorithms are available for generate sign.<br />
+You can configure the priority of sign algorithm.<br />
+Among the sign algorithms supported by server and client, highest priority algorithm in client is used.
+</p>
+
+<p>
+Below setting takes priority rsa-sha2-256 lather than rsa-sha2-512.
+</p>
+
+<pre>
+RSAPubkeySignAlgorithmOrder=2310
+</pre>
+
+<table>
+<thead>
+  <tr> <th>value</th> <th>sign algorithm</th> <th>hash algorithm for generate sign</th> </tr>
+</thead>
+<tbody>
+  <tr> <td>3</td> <td>rsa-sha2-512</td> <td>SHA-512</td> </tr>
+  <tr> <td>2</td> <td>rsa-sha2-256</td> <td>SHA-256</td> </tr>
+  <tr> <td>1</td> <td>ssh-rsa</td>      <td>SHA1</td>    </tr>
+  <tr> <td>0</td> <td colspan="2">below this line are disabled.</td> </tr>
+</tbody>
+</table>
+
+<p>
+Note:<br />
+This config is for the priority of publickey authentication sign algorithm. Not for the priority of <a href="../menu/setup-ssh.html#HostKeyOrder">server hostkey</a> sign algorithm.<br />
+Also this config is for publickey authentication sign algorithm with RSA key. Not for other type keys.
+</p>
+
+<pre>
+Default:
+RSAPubkeySignAlgorithmOrder=3210
+</pre>
+
+
 <h1 id="X11Display">Destination display for X11 transfer</h1>
 
 <p>

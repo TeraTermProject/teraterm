@@ -163,6 +163,46 @@ LogLevel=0
 </pre>
 
 
+<h1 id="RSAPubkeySignAlgorithmOrder">RSA 鍵を用いた公開鍵認証の署名アルゴリズムの優先度</h1>
+
+<p>
+RSA 鍵を用いた公開鍵認証では、署名の生成に用いることができるハッシュアルゴリズムが複数あります。<br />
+TTSSH では、使用する署名アルゴリズムの優先度を設定することができます。<br />
+サーバとクライアント両者がサポートしている署名アルゴリズムの中で、クライアントで最も高い優先度のアルゴリズムが使用されます。
+</p>
+
+<p>
+以下のように設定することで、rsa-sha2-512 よりも rsa-sha2-256 を優先することができます。
+</p>
+
+<pre>
+RSAPubkeySignAlgorithmOrder=&lt;2310&gt;
+</pre>
+
+<table>
+<thead>
+  <tr> <th>値</th> <th>署名アルゴリズム</th> <th>署名の生成に使われるハッシュアルゴリズム</th> </tr>
+</thead>
+<tbody>
+  <tr> <td>3</td> <td>rsa-sha2-512</td> <td>SHA-512</td> </tr>
+  <tr> <td>2</td> <td>rsa-sha2-256</td> <td>SHA-256</td> </tr>
+  <tr> <td>1</td> <td>ssh-rsa</td>      <td>SHA1</td>    </tr>
+  <tr> <td>0</td> <td colspan="2">この値より後ろのアルゴリズムは使われない</td> </tr>
+</tbody>
+</table>
+
+<p>
+Note:<br />
+この設定項目で設定できるのは公開鍵認証の署名方式の優先度で、<a href="../menu/setup-ssh.html#HostKeyOrder">サーバホスト鍵</a>の署名方式の優先度ではありません。<br />
+また、この設定項目で設定できるのは RSA 鍵を用いた公開鍵認証の署名方式だけです。他の種類の鍵には対応していません。
+</p>
+
+<pre>
+省略時:
+RSAPubkeySignAlgorithmOrder=3210
+</pre>
+
+
 <h1 id="X11Display">X11転送での転送先ディスプレイ指定</h1>
 
 <p>
