@@ -48,10 +48,16 @@ call "%VS150COMNTOOLS%\VsDevCmd.bat"
 goto vs2017
 
 :check_2019
-if "%VS160COMNTOOLS%" == "" goto novs
+if "%VS160COMNTOOLS%" == "" goto check_2022
 if not exist "%VS160COMNTOOLS%\VsDevCmd.bat" goto novs
 call "%VS160COMNTOOLS%\VsDevCmd.bat"
 goto vs2019
+
+:check_2022
+if "%VS170COMNTOOLS%" == "" goto novs
+if not exist "%VS170COMNTOOLS%\VsDevCmd.bat" goto novs
+call "%VS170COMNTOOLS%\VsDevCmd.bat"
+goto vs2022
 
 :novs
 @echo off
@@ -78,6 +84,7 @@ if /I %VSCMNDIR% EQU "%VS120COMNTOOLS%" goto vs2013
 if /I %VSCMNDIR% EQU "%VS140COMNTOOLS%" goto vs2015
 if /I %VSCMNDIR% EQU "%VS150COMNTOOLS%" goto vs2017
 if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
+if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto vs2022
 
 echo Unknown Visual Studio version
 goto fail
@@ -177,6 +184,16 @@ set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v16.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v16.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v16.sln
 set CYGWINSLN=..\CYGWIN\cygwin.v16.sln
+goto vsend
+
+:vs2022
+set TERATERMSLN=..\teraterm\ttermpro.v17.sln
+set TTSSHSLN=..\ttssh2\ttssh.v17.sln
+set TTPROXYSLN=..\TTProxy\TTProxy.v17.sln
+set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v17.sln
+set TTPMENUSLN=..\ttpmenu\ttpmenu.v17.sln
+set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v17.sln
+set CYGWINSLN=..\CYGWIN\cygwin.v17.sln
 goto vsend
 
 :vsend

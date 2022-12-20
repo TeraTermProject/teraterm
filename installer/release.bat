@@ -3,8 +3,8 @@ setlocal
 set CUR=%~dp0
 cd /d %CUR%
 
-if "%VS_VERSION%" == "" set VS_VERSION=2019
-rem if "%VS_VERSION%" == "" set VS_VERSION=2022
+rem set VS_VERSION=2019
+if "%VS_VERSION%" == "" set VS_VERSION=2022
 
 if "%APPVEYOR%" == "True" set NOPAUSE=1
 if exist ..\buildtools\svnrev\sourcetree_info.bat del ..\buildtools\svnrev\sourcetree_info.bat
