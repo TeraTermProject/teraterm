@@ -56,10 +56,10 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "zlib-1.2.12")
-set(SRC_ARC "zlib-1.2.12.tar.xz")
-set(SRC_URL "https://zlib.net/zlib-1.2.12.tar.xz")
-set(SRC_ARC_HASH_SHA256 7db46b8d7726232a621befaab4a1c870f00a90805511c0e0090441dac57def18)
+set(SRC_DIR_BASE "zlib-1.2.13")
+set(SRC_ARC "zlib-1.2.13.tar.xz")
+set(SRC_URL "https://zlib.net/zlib-1.2.13.tar.xz")
+set(SRC_ARC_HASH_SHA256 d14c38e313afc35a9a8760dadf26042f51ea0f5d154b0630a31da0540107fb98)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/zlib")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src")
