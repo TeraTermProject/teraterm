@@ -289,7 +289,7 @@ LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LP
 						  LPDWORD lpcbData)
 {
 	BYTE *p;
-	DWORD len;
+	DWORD len = 0;
 	LSTATUS r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
 	if (r != ERROR_SUCCESS) {
 		*lpData = NULL;
