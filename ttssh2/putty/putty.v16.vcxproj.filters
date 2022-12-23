@@ -4,6 +4,18 @@
     <Filter Include="Putty Files">
       <UniqueIdentifier>{6907d95d-706b-4797-acc8-556c5fc25181}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Putty Files\crypto">
+      <UniqueIdentifier>{eaa248f0-e879-4933-9c4b-d3baa70c8acd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Putty Files\utils">
+      <UniqueIdentifier>{3251f720-73b7-403b-aadc-b5857ef10650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Putty Files\windows">
+      <UniqueIdentifier>{09527cb9-5dc8-47fa-9fc2-b4a2c98c4ef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Putty Files\windows\utils">
+      <UniqueIdentifier>{4c77737c-d1ff-49fa-a309-17727f84031e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\putty\aqsync.c">
@@ -15,47 +27,86 @@
     <ClCompile Include="..\..\libs\putty\errsock.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\marshal.c">
+    <ClCompile Include="..\..\libs\putty\crypto\mpint.c">
+      <Filter>Putty Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\crypto\sha256-select.c">
+      <Filter>Putty Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\bufchain.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\burnstr.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\dupcat.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\dupprintf.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\dupstr.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\log_proxy_stderr.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\marshal.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\memory.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\out_of_memory.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\smemclr.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\strbuf.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\tree234.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\utils\version.c">
+      <Filter>Putty Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\windows\agent-client.c">
       <Filter>Putty Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\memory.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\handle-io.c">
+      <Filter>Putty Files\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\mpint.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\handle-socket.c">
+      <Filter>Putty Files\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\sshsh256.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\handle-wait.c">
+      <Filter>Putty Files\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\tree234.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\named-pipe-client.c">
+      <Filter>Putty Files\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\utils.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\agent_named_pipe_name.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\version.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\cryptoapi.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\wincapi.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\get_system_dir.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\winhandl.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\get_username.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\winhsock.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\load_system32_dll.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\winmisc.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\security.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\winnpc.c">
-      <Filter>Putty Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\winpgntc.c">
-      <Filter>Putty Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\putty\windows\winsecur.c">
-      <Filter>Putty Files</Filter>
+    <ClCompile Include="..\..\libs\putty\windows\utils\win_strerror.c">
+      <Filter>Putty Files\windows\utils</Filter>
     </ClCompile>
     <ClCompile Include="libputty.c" />
     <ClCompile Include="putty-import.c" />
