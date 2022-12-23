@@ -51,11 +51,11 @@ Tera Term が利用するAPIのみ実装されています。
     cmake -DEXTLIB=extlib/vs2019_x64 -G "Visual Studio 16 2019" -A x64 ..
     cmake --build . --config Release
 
-# Susie plugin 仕様
+# Susie Plug-in 仕様
 
 次の情報源を参考にしました。
 
-- Susieダウンロード
+- Susieの部屋 / Susieのだうんろーど
   - https://www.digitalpad.co.jp/~takechin/download.html
   - https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh
     - PLUG_API.TXT
@@ -63,5 +63,5 @@ Tera Term が利用するAPIのみ実装されています。
 - Susie プラグイン API 定義ファイル
   - https://gist.github.com/tapetums/0a924712fb2fa0a7bb93
 
-- TORO's Software library(Win32/Win64 Plugin)
+- TORO's Library / TORO's Software library(Win32/Win64 Plugin)
   - http://toro.d.dooo.jp/slplugin.html
