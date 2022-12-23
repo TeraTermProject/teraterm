@@ -80,7 +80,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto-47.lib;Bcrypt.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto-50.lib;Bcrypt.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Debug;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
@@ -124,7 +124,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto-47.lib;Bcrypt.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto-50.lib;Bcrypt.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Release;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
