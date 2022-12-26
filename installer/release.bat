@@ -138,7 +138,14 @@ exit /b 0
 rem ####################
 :setup_tools_env
 
+set CYGWIN_PATH=%CUR%..\buildtools\cygwin64\bin
+if exist "%CYGWIN_PATH%" goto cygwin_path_pass
 set CYGWIN_PATH=C:\cygwin64\bin
+if exist "%CYGWIN_PATH%" goto cygwin_path_pass
+echo cygwin not found
+if not "%NOPAUSE%" == "1" pause
+exit
+:cygwin_path_pass
 set VS_BASE=C:\Program Files\Microsoft Visual Studio\%VS_VERSION%
 if exist "%VS_BASE%" goto vs_base_pass
 set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\%VS_VERSION%
@@ -153,17 +160,17 @@ if exist toolinfo.bat (
     set PATH=
 )
 
+set PATH=%SystemRoot%;%PATH%
+set PATH=%SystemRoot%\system32;%PATH%
 call :search_perl
 call :search_svn
 call :search_iscc
-set PATH=%PATH%;%SVN_PATH%
-set PATH=%PATH%;%PERL_PATH%
-set PATH=%PATH%;%SystemRoot%
-set PATH=%PATH%;%SystemRoot%\system32
+set PATH=%SVN_PATH%;%PATH%
+set PATH=%PERL_PATH%;%PATH%
 call :set_vs_env
 call :search_cmake
-set PATH=%PATH%;%CYGWIN_PATH%
-set PATH=%PATH%;%CMAKE_PATH%
+set PATH=%CYGWIN_PATH%;%PATH%
+set PATH=%CMAKE_PATH%;%PATH%
 exit /b 0
 
 rem ####################
@@ -176,6 +183,8 @@ if exist %PERL_PATH%\perl.exe (
 set PERL=perl.exe
 where %PERL% > nul 2>&1
 if %errorlevel% == 0 exit /b 0
+set PERL=%CUR%..\buildtools\cygwin64\bin\perl.exe
+if exist %PERL% exit /b 0
 set PERL=%CUR%..\buildtools\perl\perl\bin\perl.exe
 if exist %PERL% exit /b 0
 set PERL=C:\Strawberry\perl\bin\perl.exe
@@ -299,7 +308,7 @@ echo perl
 where perl
 echo PERL_PATH=%PERL_PATH%
 echo PERL=%PERL%
-perl --version
+%PERL% --version
 
 echo cmake
 where cmake

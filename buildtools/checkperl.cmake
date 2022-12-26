@@ -1,6 +1,7 @@
 ﻿if (MSVC OR (MINGW AND (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")))
   find_program(
     PERL perl.exe
+    HINTS ${CMAKE_CURRENT_LIST_DIR}/cygwin64/bin
     HINTS ${CMAKE_CURRENT_LIST_DIR}/perl/perl/bin
     HINTS c:/Strawberry/perl/bin
     HINTS c:/Perl64/bin
