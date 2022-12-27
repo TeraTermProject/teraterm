@@ -60,10 +60,21 @@ struct FontPPData {
 
 static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 {
-	memset(logfont, 0, sizeof(*logfont));
-	logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
-	wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName),ts->DialogFontNameW, _TRUNCATE);
-	logfont->lfCharSet = ts->DialogFontCharSet;
+	*logfont = {};
+	if (ts->DialogFontNameW == NULL || ts->DialogFontNameW[0] == 0) {
+		// フォントが設定されていなかったらOSのフォントを使用する
+		GetMessageboxFontW(logfont);
+	}
+	else {
+		wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), ts->DialogFontNameW,  _TRUNCATE);
+		logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
+		logfont->lfCharSet = ts->DialogFontCharSet;
+		logfont->lfWeight = FW_NORMAL;
+		logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
+		logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
+		logfont->lfQuality = DEFAULT_QUALITY;
+		logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+	}
 }
 
 static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)

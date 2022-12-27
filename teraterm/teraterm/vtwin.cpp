@@ -4364,11 +4364,19 @@ void CVTWindow::OnSetupDlgFont()
 
 		// LOGFONT準備
 		memset(&LogFont, 0, sizeof(LogFont));
-		wcsncpy_s(LogFont.lfFaceName, _countof(LogFont.lfFaceName), ts.DialogFontNameW,  _TRUNCATE);
-		LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, ts.DialogFontPoint);
-		LogFont.lfCharSet = ts.DialogFontCharSet;
-		if (LogFont.lfFaceName[0] == 0) {
+		if (ts.DialogFontNameW == NULL || ts.DialogFontNameW[0] == 0) {
+			// フォントが設定されていなかったらOS設定を使用する
 			GetMessageboxFontW(&LogFont);
+		}
+		else {
+			wcsncpy_s(LogFont.lfFaceName, _countof(LogFont.lfFaceName), ts.DialogFontNameW,  _TRUNCATE);
+			LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, ts.DialogFontPoint);
+			LogFont.lfCharSet = ts.DialogFontCharSet;
+			LogFont.lfWeight = FW_NORMAL;
+			LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+			LogFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+			LogFont.lfQuality = DEFAULT_QUALITY;
+			LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
 		}
 
 		// ダイアログ表示
