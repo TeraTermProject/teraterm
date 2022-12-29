@@ -90,8 +90,7 @@ VOID CTipWin::CalcStrRect(VOID)
 	SelectObject(hdc, tWin->tip_font);
 	tWin->str_rect.top = 0;
 	tWin->str_rect.left = 0;
-	DrawTextW(hdc, tWin->str, (int)tWin->str_len,
-			  &tWin->str_rect, DT_LEFT|DT_CALCRECT);
+	DrawTextW(hdc, tWin->str, (int)tWin->str_len, &tWin->str_rect, DT_LEFT | DT_CALCRECT | DT_NOPREFIX);
 	DeleteDC(hdc);
 }
 
@@ -140,7 +139,7 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 					rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
 					rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
 					rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
-					DrawTextW(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT);
+					DrawTextW(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT | DT_NOPREFIX);
 				}
 
 				SelectObject(hdc, holdbr);
