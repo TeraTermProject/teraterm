@@ -57,6 +57,7 @@
 #include "themedlg.h"
 #include "theme.h"
 #include "ttcmn_notify2.h"
+#include "filesys_log.h"	// for ConvertLognameW()
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1353,6 +1354,21 @@ void CVisualPropPageDlg::OnHelp()
 }
 
 // CLogPropPageDlg ダイアログ
+class CLogPropPageDlg : public TTCPropertyPage
+{
+public:
+	CLogPropPageDlg(HINSTANCE inst);
+	virtual ~CLogPropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	void OnOKLogFilename();
+	enum { IDD = IDD_TABSHEET_LOG };
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
+	wchar_t *CreateLogFilename(const wchar_t *format);
+	CTipWin *m_TipWin;
+};
 
 CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CLogPropPageDlg::IDD)
@@ -1362,11 +1378,15 @@ CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst)
 				 L"Log", ts.UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
+	m_TipWin = new CTipWin(inst);
 }
 
 CLogPropPageDlg::~CLogPropPageDlg()
 {
 	free((void *)m_psp.pszTitle);
+	m_TipWin->Destroy();
+	delete m_TipWin;
+	m_TipWin = NULL;
 }
 
 // CLogPropPageDlg メッセージ ハンドラ
@@ -1421,8 +1441,22 @@ void CLogPropPageDlg::OnInitDialog()
 	// Viewlog Editor path (2005.1.29 yutaka)
 	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 
-	// Log Default File Name (2006.8.28 maya)
+	// Log Default File Name
 	SetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultName);
+	static const wchar_t *logfile_patterns[] = {
+		L"%H%M%S.log",
+		L"%y%m%d%H%M%S.log",
+		L"%Y%m%d_%H%M%S.log",
+		L"%y%m%d_%H%M%S.log",
+		L"%y%m%d_%H%M%S_&h.log",
+		L"%Y%m%d_%H%M%S_%z.log",
+		L"%y%m%d_%H%M%S_%z.log",
+		L"%Y%m%dT%H%M%S%z.log",
+	};
+	for (int i = 0; i < _countof(logfile_patterns); i++) {
+		const wchar_t *pattern = logfile_patterns[i];
+		SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_ADDSTRING, 0, (LPARAM)pattern);
+	}
 
 	// Log Default File Path (2007.5.30 maya)
 	SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPathW);
@@ -1494,9 +1528,42 @@ void CLogPropPageDlg::OnInitDialog()
 			break;
 	}
 */
+	m_TipWin->Create(m_hWnd);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_VIEWLOG_EDITOR));
+}
+
+wchar_t *CLogPropPageDlg::CreateLogFilename(const wchar_t *format)
+{
+	time_t time_local;
+	struct tm tm_local;
+	time(&time_local);
+	localtime_s(&tm_local, &time_local);
+	wchar_t *str;
+
+	if (isInvalidStrftimeCharW(format)) {
+		str = _wcsdup(L"Invalid character is included in log file name.");
+	}
+	else {
+		size_t len = 128;
+		str = (wchar_t*)malloc(sizeof(wchar_t) * len);
+		wcsftime(str, len, format, &tm_local);
+		wchar_t *replace = replaceInvalidFileNameCharW(str, L'_');
+		free(str);
+		str = replace;
+
+		if (isInvalidFileNameCharW(str)) {
+			free(str);
+			str = _wcsdup(L"Invalid character is included in log file name.");
+		}
+		else {
+			wchar_t *str2 = ConvertLognameW(&cv, str);
+			free(str);
+			str = str2;
+		}
+	}
+	return str;
 }
 
 BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -1591,23 +1658,60 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				}
 			}
 			return TRUE;
+
+		case IDC_DEFAULTNAME_EDITOR | (CBN_SELCHANGE << 16) :
+		case IDC_DEFAULTNAME_EDITOR | (CBN_EDITCHANGE << 16):
+		case IDC_DEFAULTNAME_EDITOR | (CBN_CLOSEUP << 16):
+		case IDC_DEFAULTNAME_EDITOR | (CBN_SETFOCUS << 16): {
+			wchar_t *format = NULL;
+			if (wParam == (IDC_DEFAULTNAME_EDITOR | (CBN_SELCHANGE << 16))) {
+				LRESULT r = SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETCURSEL, 0, 0);
+				if (r != CB_ERR) {
+					format = (wchar_t*)malloc(50 * sizeof(wchar_t));
+					SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETLBTEXT, r, (LPARAM)format);
+				}
+			}
+			if (format == NULL) {
+				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTNAME_EDITOR, &format);
+			}
+			wchar_t *str = CreateLogFilename(format);
+			if (wcslen(str) > 0) {
+				RECT rc;
+				::GetWindowRect(::GetDlgItem(m_hWnd, IDC_DEFAULTNAME_EDITOR), &rc);
+				m_TipWin->SetText(str);
+				m_TipWin->SetPos(rc.left, rc.bottom);
+				m_TipWin->SetHideTimer(5 * 1000);  // 表示時間
+				if (!m_TipWin->IsVisible()) {
+					m_TipWin->SetVisible(TRUE);
+				}
+			}
+			else {
+				m_TipWin->SetVisible(FALSE);
+			}
+			free(str);
+			free(format);
+			return TRUE;
+		}
+
+		case IDC_DEFAULTNAME_EDITOR | (CBN_KILLFOCUS << 16): {
+			if (m_TipWin->IsVisible()) {
+				m_TipWin->SetVisible(FALSE);
+			}
+			return TRUE;
+		}
 	}
 
 	return TTCPropertyPage::OnCommand(wParam, lParam);
 }
 
-void CLogPropPageDlg::OnOK()
+void CLogPropPageDlg::OnOKLogFilename()
 {
-	char buf[80], buf2[80];
+	wchar_t *def_name;
 	time_t time_local;
 	struct tm tm_local;
 
-	// Viewlog Editor path (2005.1.29 yutaka)
-	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
-
-	// Log Default File Name (2006.8.28 maya)
-	GetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, buf, sizeof(buf));
-	if (isInvalidStrftimeChar(buf)) {
+	hGetDlgItemTextW(m_hWnd, IDC_DEFAULTNAME_EDITOR, &def_name);
+	if (isInvalidStrftimeCharW(def_name)) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -1621,25 +1725,44 @@ void CLogPropPageDlg::OnOK()
 	time(&time_local);
 	localtime_s(&tm_local, & time_local);
 	// 時刻文字列に変換
-	if (strlen(buf) != 0 && strftime(buf2, sizeof(buf2), buf, &tm_local) == 0) {
+	wchar_t buf2[MAX_PATH];
+	if (wcslen(def_name) != 0 && wcsftime(buf2, _countof(buf2), def_name, &tm_local) == 0) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_TOOLONG_ERROR", L"The log file name is too long.",
 			MB_ICONEXCLAMATION };
 		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
+		free(def_name);
 		return;
 	}
-	if (isInvalidFileNameChar(buf2)) {
+
+	wchar_t *buf3 = replaceInvalidFileNameCharW(buf2, '_');
+
+	if (isInvalidFileNameCharW(buf3)) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
 			MB_ICONEXCLAMATION };
 		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
+		free(def_name);
+		free(buf3);
 		return;
 	}
-	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);
+
+	WideCharToACP_t(def_name, ts.LogDefaultName, sizeof(ts.LogDefaultName));
+	free(def_name);
+	free(buf3);
+}
+
+void CLogPropPageDlg::OnOK()
+{
+	// Viewlog Editor path (2005.1.29 yutaka)
+	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
+
+	// Log Default File Name
+	OnOKLogFilename();
 
 	// Log Default File Path (2007.5.30 maya)
 	free(ts.LogDefaultPathW);
@@ -1650,6 +1773,7 @@ void CLogPropPageDlg::OnOK()
 
 	/* Log Rotate */
 	if (GetCheck(IDC_LOG_ROTATE)) {  /* on */
+		char buf[80];
 		ts.LogRotate = ROTATE_SIZE;
 		GetDlgItemTextA(IDC_ROTATE_SIZE_TYPE, buf, _countof(buf));
 		ts.LogRotateSizeType = 0;

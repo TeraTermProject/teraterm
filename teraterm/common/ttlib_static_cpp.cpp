@@ -52,6 +52,9 @@
 
 #include "ttlib.h"
 
+// for isInvalidFileNameCharW / replaceInvalidFileNameCharW
+static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
+
 /**
  *	MessageBoxを表示する
  *
@@ -1634,4 +1637,127 @@ int __ismbbtrail(BYTE b, int code_page)
 			break;
 	}
 	return FALSE;
+}
+
+// ファイル名に使用できない文字が含まれているか確かめる
+BOOL isInvalidFileNameCharW(const wchar_t *FName)
+{
+	// ファイルに使用することができない文字
+	// cf. Naming Files, Paths, and Namespaces
+	//     http://msdn.microsoft.com/en-us/library/aa365247.aspx
+	static const wchar_t *invalidFileNameStrings[] = {
+		L"AUX", L"CLOCK$", L"COM1", L"COM2", L"COM3", L"COM4", L"COM5", L"COM6", L"COM7", L"COM8", L"COM9",
+		L"CON", L"CONFIG$", L"LPT1", L"LPT2", L"LPT3", L"LPT4", L"LPT5", L"LPT6", L"LPT7", L"LPT8", L"LPT9",
+		L"NUL", L"PRN",
+		L".", L"..",
+		NULL
+	};
+
+	size_t i, len;
+	const wchar_t **p;
+	wchar_t c;
+
+	// チェック対象の文字を強化した。(2013.3.9 yutaka)
+	p = invalidFileNameStrings;
+	while (*p) {
+		if (_wcsicmp(FName, *p) == 0) {
+			return TRUE;  // Invalid
+		}
+		p++;
+	}
+
+	len = wcslen(FName);
+	for (i=0; i<len; i++) {
+		if ((FName[i] >= 0 && FName[i] < ' ') || wcschr(invalidFileNameCharsW, FName[i])) {
+			return TRUE;
+		}
+	}
+
+	// ファイル名の末尾にピリオドおよび空白はNG。
+	c = FName[len - 1];
+	if (c == '.' || c == ' ')
+		return TRUE;
+
+	return FALSE;
+}
+
+// ファイル名に使用できない文字を c に置き換える
+// c に 0 を指定した場合は文字を削除する
+wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
+{
+	size_t i, j = 0, len;
+	wchar_t *dest;
+
+	len = wcslen(FName);
+	dest = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
+
+	if ((c >= 0 && c < ' ') || wcschr(invalidFileNameCharsW, c)) {
+		c = 0;
+	}
+
+	for (i = 0; i < len; i++) {
+		if ((FName[i] >= 0 && FName[i] < ' ') || wcschr(invalidFileNameCharsW, FName[i])) {
+			if (c) {
+				dest[j++] = c;
+			}
+		}
+		else {
+			dest[j++] = FName[i];
+		}
+	}
+	dest[j] = 0;
+	return dest;
+}
+
+// strftime に渡せない文字が含まれているか確かめる
+BOOL isInvalidStrftimeCharW(const wchar_t *format)
+{
+	size_t i, len, p;
+
+	len = wcslen(format);
+	for (i=0; i<len; i++) {
+		if (format[i] == '%') {
+			if (format[i+1] != 0) {
+				p = i+1;
+				if (format[i+2] != 0 && format[i+1] == '#') {
+					p = i+2;
+				}
+				switch (format[p]) {
+					case 'a':
+					case 'A':
+					case 'b':
+					case 'B':
+					case 'c':
+					case 'd':
+					case 'H':
+					case 'I':
+					case 'j':
+					case 'm':
+					case 'M':
+					case 'p':
+					case 'S':
+					case 'U':
+					case 'w':
+					case 'W':
+					case 'x':
+					case 'X':
+					case 'y':
+					case 'Y':
+					case 'z':
+					case 'Z':
+					case '%':
+						i = p;
+						break;
+					default:
+						return TRUE;
+				}
+			}
+			else {
+				// % で終わっている場合はエラーとする
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;;
 }

@@ -46,21 +46,8 @@
 #include "ttlib.h"
 #include "ttcommdlg.h"
 
-// for isInvalidFileNameChar / replaceInvalidFileNameChar
-static char *invalidFileNameChars = "\\/:*?\"<>|";
-
-// ファイルに使用することができない文字
-// cf. Naming Files, Paths, and Namespaces
-//     http://msdn.microsoft.com/en-us/library/aa365247.aspx
-// (2013.3.9 yutaka)
-static char *invalidFileNameStrings[] = {
-	"AUX", "CLOCK$", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-	"CON", "CONFIG$", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
-	"NUL", "PRN",
-	".", "..",
-	NULL
-};
-
+// このファイルはいくつかのプロジェクトに追加されて直接コンパイル,リンクされている
+// common_static は lib として作成されて他のプロジェクトにでリンクされている
 
 // for b64encode/b64decode
 static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -524,123 +511,40 @@ void QuoteFName(PCHAR FName)
 // ファイル名に使用できない文字が含まれているか確かめる (2006.8.28 maya)
 int isInvalidFileNameChar(const char *FName)
 {
-	int i, len;
-	char **p, c;
-
-	// チェック対象の文字を強化した。(2013.3.9 yutaka)
-	p = invalidFileNameStrings;
-	while (*p) {
-		if (_strcmpi(FName, *p) == 0) {
-			return 1;  // Invalid
-		}
-		p++;
-	}
-
-	len = strlen(FName);
-	for (i=0; i<len; i++) {
-		if (_ismbblead(FName[i])) {
-			i++;
-			continue;
-		}
-		if ((FName[i] >= 0 && FName[i] < ' ') || strchr(invalidFileNameChars, FName[i])) {
-			return 1;
-		}
-	}
-
-	// ファイル名の末尾にピリオドおよび空白はNG。
-	c = FName[len - 1];
-	if (c == '.' || c == ' ')
-		return 1;
-
-	return 0;
+	wchar_t *FNameW = ToWcharA(FName);
+	int r = isInvalidFileNameCharW(FNameW);
+	free(FNameW);
+	return (int)r;
 }
 
 // ファイル名に使用できない文字を c に置き換える
 // c に 0 を指定した場合は文字を削除する
 void replaceInvalidFileNameChar(PCHAR FName, unsigned char c)
 {
-	int i, j=0, len;
-
-	if ((c >= 0 && c < ' ') || strchr(invalidFileNameChars, c)) {
-		c = 0;
-	}
-
-	len = strlen(FName);
-	for (i=0; i<len; i++) {
-		if (_ismbblead(FName[i])) {
-			FName[j++] = FName[i];
-			FName[j++] = FName[++i];
-			continue;
-		}
-		if ((FName[i] >= 0 && FName[i] < ' ') || strchr(invalidFileNameChars, FName[i])) {
-			if (c) {
-				FName[j++] = c;
-			}
-		}
-		else {
-			FName[j++] = FName[i];
-		}
-	}
-	FName[j] = 0;
+	wchar_t *FNameW = ToWcharA(FName);
+	wchar_t *new_fnameW = replaceInvalidFileNameCharW(FNameW, c);
+	char *new_fnameA = ToCharW(new_fnameW);
+	strcpy(FName, new_fnameA);
+	free(new_fnameA);
+	free(new_fnameW);
+	free(FNameW);
 }
+
 
 // strftime に渡せない文字が含まれているか確かめる (2006.8.28 maya)
-int isInvalidStrftimeChar(PCHAR FName)
+int isInvalidStrftimeChar(PCHAR format)
 {
-	int i, len, p;
-
-	len = strlen(FName);
-	for (i=0; i<len; i++) {
-		if (FName[i] == '%') {
-			if (FName[i+1] != 0) {
-				p = i+1;
-				if (FName[i+2] != 0 && FName[i+1] == '#') {
-					p = i+2;
-				}
-				switch (FName[p]) {
-					case 'a':
-					case 'A':
-					case 'b':
-					case 'B':
-					case 'c':
-					case 'd':
-					case 'H':
-					case 'I':
-					case 'j':
-					case 'm':
-					case 'M':
-					case 'p':
-					case 'S':
-					case 'U':
-					case 'w':
-					case 'W':
-					case 'x':
-					case 'X':
-					case 'y':
-					case 'Y':
-					case 'z':
-					case 'Z':
-					case '%':
-						i = p;
-						break;
-					default:
-						return 1;
-				}
-			}
-			else {
-				// % で終わっている場合はエラーとする
-				return 1;
-			}
-		}
-	}
-
-	return 0;
+	wchar_t *formatW = ToWcharA(format);
+	int r = isInvalidStrftimeCharW(formatW);
+	free(formatW);
+	return (int)r;
 }
+
 
 // strftime に渡せない文字を削除する (2006.8.28 maya)
 void deleteInvalidStrftimeChar(PCHAR FName)
 {
-	int i, j=0, len, p;
+	size_t i, j=0, len, p;
 
 	len = strlen(FName);
 	for (i=0; i<len; i++) {

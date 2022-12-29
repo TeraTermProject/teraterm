@@ -69,20 +69,6 @@ private:
 	void OnHelp();
 };
 
-// Log Page
-class CLogPropPageDlg : public TTCPropertyPage
-{
-public:
-	CLogPropPageDlg(HINSTANCE inst);
-	virtual ~CLogPropPageDlg();
-private:
-	void OnInitDialog();
-	void OnOK();
-	enum { IDD = IDD_TABSHEET_LOG };
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	void OnHelp();
-};
-
 // Cygwin Page
 extern "C" {
 typedef struct cygterm {

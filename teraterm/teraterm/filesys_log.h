@@ -79,6 +79,8 @@ void FLogWriteFile(void);
 void FLogPutUTF32(unsigned int u32);
 void FLogOutputAllBuffer(void);
 
+wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src);
+
 #ifdef __cplusplus
 }
 #endif

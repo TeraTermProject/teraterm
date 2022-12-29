@@ -151,67 +151,107 @@ static BOOL OpenFTDlg_(PFileVar fv)
 }
 
 /**
- *	ファイル名文字列の置き換え
- *		&h	ホスト名に置換 (2007.5.14)
- *		&p	TCPポート番号に置換 (2009.6.12)
+ *	ファイル名文字列の置き換え,ログ用
+ *	次の文字を置き換える
+ *		&h	ホスト名に置換
+ *		&p	TCPポート番号に置換
  *		&u	ログオン中のユーザ名
+ *
+ *	@param	pcv
+ *	@param	src	置き換える前の文字列(ファイル名)
+ *	@return	置き換えられた文字列
+ *			不要になったらfree()すること
+ */
+wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
+{
+	const TTTSet *pts = pcv->ts;
+	size_t dest_len = wcslen(src) + 1;
+	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * dest_len);
+
+	const wchar_t *s = src;
+	size_t i = 0;
+
+	while(*s != '\0') {
+		if (*s == '&' && *(s+1) != '\0') {
+			wchar_t c = *(s+1);
+			wchar_t *add_text = NULL;
+			switch (c) {
+			case 'h':
+				s += 2;
+				if (pcv->Open) {
+					switch(pcv->PortType) {
+					case IdTCPIP: {
+						// ホスト名がIPv6アドレスだと、ファイル名に使用できない文字(:)が入るため置換
+						wchar_t *host = ToWcharA(pts->HostName);
+						wchar_t *host_fix = replaceInvalidFileNameCharW(host, '_');
+						free(host);
+						add_text = host_fix;
+						break;
+					}
+					case IdSerial: {
+						wchar_t *port;
+						aswprintf(&port, L"COM%d", ts.ComPort);
+						add_text = port;
+						break;
+					}
+					default:
+						;
+					}
+				}
+				break;
+			case 'p':
+				s += 2;
+				if (pcv->Open) {
+					if (pcv->PortType == IdTCPIP) {
+						wchar_t *port;
+						aswprintf(&port, L"%d", ts.TCPPort);
+						add_text = port;
+					}
+				}
+				break;
+			case 'u': {
+				s += 2;
+				wchar_t user[256 + 1];	// 256=UNLEN
+				DWORD l = _countof(user);
+				if (GetUserNameW(user, &l) != 0) {
+					add_text = wcsdup(user);
+				}
+				break;
+			}
+			default:
+				// pass '&'
+				s++;
+				add_text = NULL;
+				break;
+			}
+
+			if (add_text != 0) {
+				size_t l = wcslen(add_text);
+				dest_len += l;
+				dest = (wchar_t *)realloc(dest, sizeof(wchar_t) * dest_len);
+				wcscpy(&dest[i], add_text);
+				i += l;
+			}
+		}
+		else {
+			dest[i] = *s++;
+			i++;
+		}
+	}
+	dest[i] = 0;
+	return dest;
+}
+
+/**
+ *	ファイル名文字列の置き換え ANSI版
  */
 static void ConvertLogname(char *c, int destlen)
 {
-	char buf[MAXPATHLEN], buf2[MAXPATHLEN], *p = c;
-	char tmphost[1024];
-	char tmpuser[256+1];
-	DWORD len_user = sizeof(tmpuser);
-
-	memset(buf, 0, sizeof(buf));
-
-	while(*p != '\0') {
-		if (*p == '&' && *(p+1) != '\0') {
-			switch (*(p+1)) {
-			  case 'h':
-				if (cv.Open) {
-					if (cv.PortType == IdTCPIP) {
-						// ホスト名がIPv6アドレスだと、ファイル名に使用できない文字が入るため、
-						// 余計な文字は削除する。
-						// (2013.3.9 yutaka)
-						strncpy_s(tmphost, sizeof(tmphost), ts.HostName, _TRUNCATE);
-						//strncpy_s(tmphost, sizeof(tmphost), "2001:0db8:bd05:01d2:288a:1fc0:0001:10ee", _TRUNCATE);
-						replaceInvalidFileNameChar(tmphost, '_');
-						strncat_s(buf,sizeof(buf), tmphost, _TRUNCATE);
-					}
-					else if (cv.PortType == IdSerial) {
-						strncpy_s(buf2,sizeof(buf2),buf,_TRUNCATE);
-						_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%sCOM%d", buf2, ts.ComPort);
-					}
-				}
-				break;
-			  case 'p':
-				if (cv.Open) {
-					if (cv.PortType == IdTCPIP) {
-						char port[6];
-						_snprintf_s(port, sizeof(port), _TRUNCATE, "%d", ts.TCPPort);
-						strncat_s(buf,sizeof(buf),port,_TRUNCATE);
-					}
-				}
-				break;
-			  case 'u':
-				if (GetUserName(tmpuser, &len_user) != 0) {
-					strncat_s(buf,sizeof(buf),tmpuser,_TRUNCATE);
-				}
-				break;
-			  default:
-				strncpy_s(buf2,sizeof(buf2),p,2);
-				strncat_s(buf,sizeof(buf),buf2,_TRUNCATE);
-			}
-			p++;
-		}
-		else {
-			strncpy_s(buf2,sizeof(buf2),p,1);
-			strncat_s(buf,sizeof(buf),buf2,_TRUNCATE);
-		}
-		p++;
-	}
-	strncpy_s(c, destlen, buf, _TRUNCATE);
+	wchar_t *cW = ToWcharA(c);
+	wchar_t *filenameW = ConvertLognameW(&cv, cW);
+	WideCharToACP_t(cW, c, destlen);
+	free(filenameW);
+	free(cW);
 }
 
 static void FixLogOption(void)
@@ -397,22 +437,22 @@ typedef struct {
 
 /*
  * Log ダイアログのうち、Enable/Disable が変化するコントロール
- * 
+ *
  * - Append
  *   指定されたファイルが存在する場合は Enable
  *   指定されたファイルが存在しない場合は Disable
- * 
+ *
  * - BOM, Encoding
  *   Text かつ New/Overwrite の場合に Enable
  *   そうでない場合に Disable
  *   BOM はファイルの先頭から書き込むときしか意味がない
  *   Encoding は追記でも意味があるが、既存ファイルのエンコーディングを
  *   強制的にダイアログに反映するので、ユーザによる指定はさせない
- * 
+ *
  * - Plain Text, Timestamp, Timestamp 種別
  *   Text の場合は Enable
  *   Binary の場合は Disable
- * 
+ *
  * - Timestamp 種別
  *   Timestamp=on の場合は Enable
  *   Timestamp=off の場合は Disable
