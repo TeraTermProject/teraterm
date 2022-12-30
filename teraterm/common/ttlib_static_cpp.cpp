@@ -1111,6 +1111,7 @@ void FitFileNameW(wchar_t *FileName, size_t destlen, const wchar_t *DefExt)
 	wcsncpy_s(FileName,destlen,Temp,_TRUNCATE);
 }
 
+#if 0
 void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wchar_t *DefExt, wchar_t *FName, size_t destlen)
 {
 	// destlen = sizeof FName
@@ -1127,6 +1128,7 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
 	}
 	wcsncat_s(FName,destlen,Temp,_TRUNCATE);
 }
+#endif
 
 /**
  *	pathが相対パスかどうかを返す
@@ -1760,4 +1762,70 @@ BOOL isInvalidStrftimeCharW(const wchar_t *format)
 	}
 
 	return FALSE;;
+}
+
+// strftime に渡せない文字を削除する
+void deleteInvalidStrftimeCharW(wchar_t *FName)
+{
+	size_t i, j=0, len, p;
+
+	len = wcslen(FName);
+	for (i=0; i<len; i++) {
+		if (FName[i] == '%') {
+			if (FName[i+1] != 0) {
+				p = i+1;
+				if (FName[i+2] != 0 && FName[i+1] == '#') {
+					p = i+2;
+				}
+				switch (FName[p]) {
+					case 'a':
+					case 'A':
+					case 'b':
+					case 'B':
+					case 'c':
+					case 'd':
+					case 'H':
+					case 'I':
+					case 'j':
+					case 'm':
+					case 'M':
+					case 'p':
+					case 'S':
+					case 'U':
+					case 'w':
+					case 'W':
+					case 'x':
+					case 'X':
+					case 'y':
+					case 'Y':
+					case 'z':
+					case 'Z':
+					case '%':
+						FName[j] = FName[i]; // %
+						j++;
+						i++;
+						if (p-i == 2) {
+							FName[j] = FName[i]; // #
+							j++;
+							i++;
+						}
+						FName[j] = FName[i];
+						j++;
+						break;
+					default:
+						i++; // %
+						if (p-i == 2) {
+							i++; // #
+						}
+				}
+			}
+			// % で終わっている場合はコピーしない
+		}
+		else {
+			FName[j] = FName[i];
+			j++;
+		}
+	}
+
+	FName[j] = 0;
 }

@@ -57,7 +57,7 @@
 #include "themedlg.h"
 #include "theme.h"
 #include "ttcmn_notify2.h"
-#include "filesys_log.h"	// for ConvertLognameW()
+#include "filesys_log.h"	// for FLogGetLogFilenameBase()
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -169,7 +169,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 void CGeneralPropPageDlg::OnOK()
 {
-	char buf[64];
 	int val;
 
 	// (1)
@@ -182,8 +181,7 @@ void CGeneralPropPageDlg::OnOK()
 	ts.AcceptBroadcast = GetCheck(IDC_ACCEPT_BROADCAST);
 
 	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	GetDlgItemText(IDC_SCROLL_LINE, buf, _countof(buf));
-	val = atoi(buf);
+	val = GetDlgItemInt(IDC_SCROLL_LINE);
 	if (val > 0)
 		ts.MouseWheelScrollLine = val;
 
@@ -1366,7 +1364,7 @@ private:
 	enum { IDD = IDD_TABSHEET_LOG };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnHelp();
-	wchar_t *CreateLogFilename(const wchar_t *format);
+	wchar_t *MakePreviewStr(const wchar_t *format, const wchar_t *UILanguageFile);
 	CTipWin *m_TipWin;
 };
 
@@ -1534,35 +1532,34 @@ void CLogPropPageDlg::OnInitDialog()
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_VIEWLOG_EDITOR));
 }
 
-wchar_t *CLogPropPageDlg::CreateLogFilename(const wchar_t *format)
+wchar_t *CLogPropPageDlg::MakePreviewStr(const wchar_t *format, const wchar_t *UILanguageFile)
 {
-	time_t time_local;
-	struct tm tm_local;
-	time(&time_local);
-	localtime_s(&tm_local, &time_local);
-	wchar_t *str;
+	wchar_t *str = FLogGetLogFilenameBase(format);
 
+	wchar_t *message = NULL;
 	if (isInvalidStrftimeCharW(format)) {
-		str = _wcsdup(L"Invalid character is included in log file name.");
+		wchar_t *msg;
+		GetI18nStrWW("Tera Term", "MSG_LOGFILE_INVALID_CHAR_ERROR",
+					 L"Invalid character is included in log file name.",
+					 UILanguageFile, &msg);
+		awcscats(&message, L"\r\n", msg, L"(strftime)", NULL);
+		free(msg);
 	}
-	else {
-		size_t len = 128;
-		str = (wchar_t*)malloc(sizeof(wchar_t) * len);
-		wcsftime(str, len, format, &tm_local);
-		wchar_t *replace = replaceInvalidFileNameCharW(str, L'_');
-		free(str);
-		str = replace;
 
-		if (isInvalidFileNameCharW(str)) {
-			free(str);
-			str = _wcsdup(L"Invalid character is included in log file name.");
-		}
-		else {
-			wchar_t *str2 = ConvertLognameW(&cv, str);
-			free(str);
-			str = str2;
-		}
+	if (isInvalidFileNameCharW(format)) {
+		wchar_t *msg;
+		GetI18nStrWW("Tera Term", "MSG_LOGFILE_INVALID_CHAR_ERROR",
+					 L"Invalid character is included in log file name.",
+					 UILanguageFile, &msg);
+		awcscats(&message, L"\r\n", msg, L"(char)", NULL);
+		free(msg);
 	}
+
+	if (message != NULL) {
+		awcscat(&str, message);
+		free(message);
+	}
+
 	return str;
 }
 
@@ -1674,11 +1671,11 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (format == NULL) {
 				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTNAME_EDITOR, &format);
 			}
-			wchar_t *str = CreateLogFilename(format);
-			if (wcslen(str) > 0) {
+			wchar_t *preview = MakePreviewStr(format, ts.UILanguageFileW);
+			if (preview[0] != 0 && wcscmp(format, preview) != 0) {
 				RECT rc;
 				::GetWindowRect(::GetDlgItem(m_hWnd, IDC_DEFAULTNAME_EDITOR), &rc);
-				m_TipWin->SetText(str);
+				m_TipWin->SetText(preview);
 				m_TipWin->SetPos(rc.left, rc.bottom);
 				m_TipWin->SetHideTimer(5 * 1000);  // •\Ž¦ŽžŠÔ
 				if (!m_TipWin->IsVisible()) {
@@ -1688,7 +1685,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			else {
 				m_TipWin->SetVisible(FALSE);
 			}
-			free(str);
+			free(preview);
 			free(format);
 			return TRUE;
 		}

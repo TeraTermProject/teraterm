@@ -540,71 +540,14 @@ int isInvalidStrftimeChar(PCHAR format)
 	return (int)r;
 }
 
-
-// strftime に渡せない文字を削除する (2006.8.28 maya)
+// strftime に渡せない文字を削除する
 void deleteInvalidStrftimeChar(PCHAR FName)
 {
-	size_t i, j=0, len, p;
-
-	len = strlen(FName);
-	for (i=0; i<len; i++) {
-		if (FName[i] == '%') {
-			if (FName[i+1] != 0) {
-				p = i+1;
-				if (FName[i+2] != 0 && FName[i+1] == '#') {
-					p = i+2;
-				}
-				switch (FName[p]) {
-					case 'a':
-					case 'A':
-					case 'b':
-					case 'B':
-					case 'c':
-					case 'd':
-					case 'H':
-					case 'I':
-					case 'j':
-					case 'm':
-					case 'M':
-					case 'p':
-					case 'S':
-					case 'U':
-					case 'w':
-					case 'W':
-					case 'x':
-					case 'X':
-					case 'y':
-					case 'Y':
-					case 'z':
-					case 'Z':
-					case '%':
-						FName[j] = FName[i]; // %
-						j++;
-						i++;
-						if (p-i == 2) {
-							FName[j] = FName[i]; // #
-							j++;
-							i++;
-						}
-						FName[j] = FName[i];
-						j++;
-						break;
-					default:
-						i++; // %
-						if (p-i == 2) {
-							i++; // #
-						}
-				}
-			}
-			// % で終わっている場合はコピーしない
-		}
-		else {
-			FName[j] = FName[i];
-			j++;
-		}
-	}
-
-	FName[j] = 0;
+	const size_t len = strlen(FName);
+	wchar_t *FNameW = ToWcharA(FName);
+	deleteInvalidStrftimeCharW(FNameW);
+	WideCharToACP_t(FNameW, FName, len);
+	free(FNameW);
 }
 
 // フルパスから、ファイル名部分のみを strftime で変換する (2006.8.28 maya)
@@ -647,6 +590,7 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 	}
 }
 
+#if 0
 void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt, PCHAR FName, int destlen)
 {
 	// destlen = sizeof FName
@@ -663,6 +607,7 @@ void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt,
 	}
 	strncat_s(FName,destlen,Temp,_TRUNCATE);
 }
+#endif
 
 // "\n" を改行に変換する (2006.7.29 maya)
 // "\t" をタブに変換する (2006.11.6 maya)

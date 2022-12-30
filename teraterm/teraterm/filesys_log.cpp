@@ -162,7 +162,7 @@ static BOOL OpenFTDlg_(PFileVar fv)
  *	@return	置き換えられた文字列
  *			不要になったらfree()すること
  */
-wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
+static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 {
 	const TTTSet *pts = pcv->ts;
 	size_t dest_len = wcslen(src) + 1;
@@ -225,11 +225,12 @@ wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 				break;
 			}
 
-			if (add_text != 0) {
+			if (add_text != NULL) {
 				size_t l = wcslen(add_text);
 				dest_len += l;
 				dest = (wchar_t *)realloc(dest, sizeof(wchar_t) * dest_len);
 				wcscpy(&dest[i], add_text);
+				free(add_text);
 				i += l;
 			}
 		}
@@ -240,18 +241,6 @@ wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 	}
 	dest[i] = 0;
 	return dest;
-}
-
-/**
- *	ファイル名文字列の置き換え ANSI版
- */
-static void ConvertLogname(char *c, int destlen)
-{
-	wchar_t *cW = ToWcharA(c);
-	wchar_t *filenameW = ConvertLognameW(&cv, cW);
-	WideCharToACP_t(cW, c, destlen);
-	free(filenameW);
-	free(cW);
 }
 
 static void FixLogOption(void)
@@ -1385,6 +1374,54 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
 }
 
 /**
+ *	ログファイル名用の修飾を行う,ファイル名部分のみ
+ *	- strftime() と同じ日付展開
+ *	- 設定されたログファイルフォルダを追加
+ *	- ホスト名,ポート番号展開
+ *
+ *	@param 	filename	ファイル名(パスは含まない)
+ *	@return	修飾済みファイル名
+ */
+wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
+{
+	// ファイル名部分を抽出
+	wchar_t *format = ExtractFileNameW(filename);
+	if (format == NULL) {
+		format = wcsdup(L"");
+	}
+
+	// strftime に使用できない文字を削除
+	deleteInvalidStrftimeCharW(format);
+
+	// 現在時刻を取得
+	time_t time_local;
+	time(&time_local);
+	struct tm tm_local;
+	localtime_s(&tm_local, &time_local);
+
+	// strftime()で変換
+	size_t len = 128;
+	wchar_t *formated = (wchar_t*)malloc(sizeof(wchar_t) * len);
+	size_t r = wcsftime(formated, len, format, &tm_local);
+	if (r == 0) {
+		// エラーが返ってきた
+		wcscpy(formated, format);
+	}
+	free(format);
+
+	// ホスト名など
+	wchar_t *host = ConvertLognameW(&cv, formated);
+	free(formated);
+
+	// ファイル名に使用できない文字を置換
+	//wchar_t *replaced = replaceInvalidFileNameCharW(host, 0);	// 削除
+	wchar_t *replaced = replaceInvalidFileNameCharW(host, L'_');
+	free(host);
+
+	return replaced;
+}
+
+/**
  *	ログファイル名を取得
  *	ログファイル名用の修飾を行う
  *	- strftime() と同じ日付展開
@@ -1399,27 +1436,36 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
  */
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 {
-	const char *logdir = ToCharW(ts.LogDefaultPathW);
-
-	// 元となるファイル名
-	char base_name[MAX_PATH];
+	wchar_t *dir;
+	wchar_t *fname;
 	if (log_filename == NULL) {
-		strncpy_s(base_name, _countof(base_name), ts.LogDefaultName, _TRUNCATE);
+		dir = wcsdup(ts.LogDefaultPathW);
+		fname = ToWcharA(ts.LogDefaultName);
+		//fname = wcsdup(ts.LogDefaultNameW);
+	} else if (!IsRelativePathW(log_filename)) {
+		// 絶対パスが入力された
+		dir = ExtractDirNameW(log_filename);
+		fname = ExtractFileNameW(log_filename);
 	}
 	else {
-		char *filenameA = ToCharW(log_filename);
-		strncpy_s(base_name, _countof(base_name), filenameA, _TRUNCATE);
-		free(filenameA);
+		dir = wcsdup(ts.LogDefaultPathW);
+		fname = wcsdup(log_filename);
 	}
 
-	// フルパス化
-	char full_path[MAX_PATH];
-	ConvFName(logdir, base_name, sizeof(base_name), "", full_path, sizeof(full_path));
-	ParseStrftimeFileName(full_path, sizeof(full_path));
-	ConvertLogname(full_path, sizeof(full_path));
+	wchar_t *formated = FLogGetLogFilenameBase(fname);
+	free(fname);
 
-	free((void *)logdir);
-	return ToWcharA(full_path);
+	// 連結する
+	wchar_t *logfull = NULL;
+	awcscats(&logfull, dir, L"\\", formated, NULL);
+	free(dir);
+
+	// 正規化
+	wchar_t *normal;
+	hGetFullPathNameW(logfull, &normal, NULL);
+	free(logfull);
+
+	return normal;
 }
 
 BOOL FLogIsPause()

@@ -85,10 +85,13 @@ wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c);
 DllExport void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 BOOL isInvalidStrftimeCharW(const wchar_t *format);
 int isInvalidStrftimeChar(PCHAR FName);
+void deleteInvalidStrftimeCharW(wchar_t *FName);
 void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
+#if 0
 void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt, PCHAR FName, int destlen);
 void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wchar_t *DefExt, wchar_t *FName, size_t destlen);
+#endif
 void RestoreNewLine(PCHAR Text);
 size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);

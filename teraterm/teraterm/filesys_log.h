@@ -56,6 +56,7 @@ typedef struct {
 BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
 void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename);
+wchar_t *FLogGetLogFilenameBase(const wchar_t *filename);
 
 void logfile_lock_initialize(void);
 void FLogPause(BOOL Pause);
@@ -78,8 +79,6 @@ int FLogGetFreeCount(void);
 void FLogWriteFile(void);
 void FLogPutUTF32(unsigned int u32);
 void FLogOutputAllBuffer(void);
-
-wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src);
 
 #ifdef __cplusplus
 }
