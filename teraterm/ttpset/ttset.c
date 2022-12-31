@@ -1071,10 +1071,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* File Transfer dialog visibility */
 	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
 
-	/* Default Log file name (2006.8.28 maya) */
-	GetPrivateProfileString(Section, "LogDefaultName", "teraterm.log",
-	                        ts->LogDefaultName, sizeof(ts->LogDefaultName),
-	                        FName);
+	/* Default Log file name */
+	hGetPrivateProfileStringW(SectionW, L"LogDefaultName", L"teraterm.log", FName,
+							  &ts->LogDefaultNameW);
 
 	/* Default Log file path */
 	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
@@ -2527,9 +2526,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 		break;
 	}
 
-	/* Default Log file name (2006.8.28 maya) */
-	WritePrivateProfileString(Section, "LogDefaultName",
-	                          ts->LogDefaultName, FName);
+	/* Default Log file name */
+	WritePrivateProfileStringW(SectionW, L"LogDefaultName",
+							   ts->LogDefaultNameW, FName);
 
 	/* Default Log file path */
 	if (wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {

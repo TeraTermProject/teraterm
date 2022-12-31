@@ -1440,8 +1440,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *fname;
 	if (log_filename == NULL) {
 		dir = wcsdup(ts.LogDefaultPathW);
-		fname = ToWcharA(ts.LogDefaultName);
-		//fname = wcsdup(ts.LogDefaultNameW);
+		fname = wcsdup(ts.LogDefaultNameW);
 	} else if (!IsRelativePathW(log_filename)) {
 		// â‘ÎƒpƒX‚ª“ü—Í‚³‚ê‚½
 		dir = ExtractDirNameW(log_filename);

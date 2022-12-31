@@ -467,7 +467,7 @@ struct tttset {
 	char ViewlogEditor[MAX_PATH];
 	WORD LogTypePlainText;
 	WORD LogTimestamp;
-	char LogDefaultName[80];
+	char reserve_LogDefaultName[80];		// îpé~,LogDefaultNameW Ç÷à⁄çs
 	char reserve_LogDefaultPath[MAX_PATH];	// îpé~,LogDefaultPathW Ç÷à⁄çs
 	WORD LogAutoStart;
 	unsigned int PasteFlag;
@@ -614,6 +614,7 @@ struct tttset {
 	WORD WindowCornerDontround;
 	wchar_t DialogFontNameW[LF_FACESIZE];
 	BOOL NotifySound;
+	wchar_t *LogDefaultNameW;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;

@@ -1440,7 +1440,7 @@ void CLogPropPageDlg::OnInitDialog()
 	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 
 	// Log Default File Name
-	SetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultName);
+	SetDlgItemTextW(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultNameW);
 	static const wchar_t *logfile_patterns[] = {
 		L"%H%M%S.log",
 		L"%y%m%d%H%M%S.log",
@@ -1748,8 +1748,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 		return;
 	}
 
-	WideCharToACP_t(def_name, ts.LogDefaultName, sizeof(ts.LogDefaultName));
-	free(def_name);
+	ts.LogDefaultNameW = def_name;
 	free(buf3);
 }
 
