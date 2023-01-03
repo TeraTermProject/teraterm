@@ -1534,6 +1534,7 @@ void CLogPropPageDlg::OnOK()
 		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
 		return;
 	}
+	replaceInvalidFileNameChar(buf2, '_');
 	if (isInvalidFileNameChar(buf2)) {
 		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
 		get_lang_msgT("MSG_LOGFILE_INVALID_CHAR_ERROR", uimsg2, _countof(uimsg2),
