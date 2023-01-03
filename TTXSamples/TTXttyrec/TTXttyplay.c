@@ -146,6 +146,10 @@ static HANDLE PASCAL TTXCreateFile(LPCTSTR FName, DWORD AcMode, DWORD ShMode,
 
 	HANDLE ret;
 
+	if (AcMode == GENERIC_READ && ShMode == 0) {
+		ShMode = FILE_SHARE_READ;
+	}
+
 	ret = pvar->origPCreateFile(FName, AcMode, ShMode, SecAttr, CreateDisposition, FileAttr, Template);
 
 	if (pvar->enable) {
