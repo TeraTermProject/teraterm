@@ -414,6 +414,9 @@ static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 		}
 		else if (_strnicmp(buff, "/TTYPLAY", 9) == 0 || _strnicmp(buff, "/TP", 4) == 0) {
 			pvar->enable = TRUE;
+			if (ts->PortType == IdFile && strlen(ts->HostName) > 0) {
+				strncpy_s(pvar->openfn, sizeof(pvar->openfn), ts->HostName, _TRUNCATE);
+			}
 		}
 	}
 }
