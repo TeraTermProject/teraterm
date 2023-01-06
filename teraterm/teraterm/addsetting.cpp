@@ -1442,10 +1442,12 @@ void CLogPropPageDlg::OnInitDialog()
 	// Log Default File Name
 	SetDlgItemTextW(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultNameW);
 	static const wchar_t *logfile_patterns[] = {
+		L"teraterm.log",
 		L"%H%M%S.log",
 		L"%y%m%d%H%M%S.log",
 		L"%Y%m%d_%H%M%S.log",
 		L"%y%m%d_%H%M%S.log",
+		L"teraterm_%y%m%d%H%M%S.log",
 		L"%y%m%d_%H%M%S_&h.log",
 		L"%Y%m%d_%H%M%S_%z.log",
 		L"%y%m%d_%H%M%S_%z.log",
