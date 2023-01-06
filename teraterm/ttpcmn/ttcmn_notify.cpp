@@ -112,7 +112,7 @@ void Notify2Hide(NotifyIcon *ni)
 		return;
 	}
 
-	if (!ni->BallonDontHide) {
+	if (ni->BallonDontHide) {
 		return;
 	}
 

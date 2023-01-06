@@ -256,8 +256,8 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
 
 			// 通知領域のアイコンを消す
-			Notify2Hide(ni);
 			Notify2SetBallonDontHide(ni, FALSE);
+			Notify2Hide(ni);
 			break;
 		}
 		default:
