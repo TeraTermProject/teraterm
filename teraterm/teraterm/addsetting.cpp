@@ -1666,7 +1666,8 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (wParam == (IDC_DEFAULTNAME_EDITOR | (CBN_SELCHANGE << 16))) {
 				LRESULT r = SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETCURSEL, 0, 0);
 				if (r != CB_ERR) {
-					format = (wchar_t*)malloc(50 * sizeof(wchar_t));
+					LRESULT len = SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETLBTEXTLEN, r, 0);
+					format = (wchar_t*)malloc((len + 1) * sizeof(wchar_t));
 					SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETLBTEXT, r, (LPARAM)format);
 				}
 			}
