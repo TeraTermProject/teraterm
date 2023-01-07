@@ -1385,13 +1385,23 @@ BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
 wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 {
 	// ファイル名部分を抽出
-	wchar_t *format = ExtractFileNameW(filename);
-	if (format == NULL) {
-		format = wcsdup(L"");
+	const wchar_t *last_path_sep = wcsrchr(filename, L'\\');
+	wchar_t *format;
+	if (last_path_sep == NULL) {
+		format = wcsdup(filename);
+	}
+	else {
+		format = wcsdup(last_path_sep + 1);
 	}
 
 	// strftime に使用できない文字を削除
 	deleteInvalidStrftimeCharW(format);
+
+	// 文字列長が0になった?
+	if (format[0] == 0) {
+		free(format);
+		return wcsdup(L"");
+	}
 
 	// 現在時刻を取得
 	time_t time_local;
@@ -1400,12 +1410,23 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 	localtime_s(&tm_local, &time_local);
 
 	// strftime()で変換
-	size_t len = 128;
-	wchar_t *formated = (wchar_t*)malloc(sizeof(wchar_t) * len);
-	size_t r = wcsftime(formated, len, format, &tm_local);
-	if (r == 0) {
-		// エラーが返ってきた
-		wcscpy(formated, format);
+	// 文字領域は自動拡張
+	size_t len = 32;
+	wchar_t *formated = NULL;
+	while (1) {
+		wchar_t *formated_realloc = (wchar_t *)realloc(formated, sizeof(wchar_t) * len);
+		if (formated_realloc == NULL) {
+			free(format);
+			free(formated);
+			return wcsdup(L"");
+		}
+		formated = formated_realloc;
+		size_t r = wcsftime(formated, len, format, &tm_local);
+		if (r != 0) {
+			// フォーマットできた
+			break;
+		}
+		len *= 2;
 	}
 	free(format);
 

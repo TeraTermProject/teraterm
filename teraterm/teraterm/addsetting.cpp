@@ -1457,6 +1457,7 @@ void CLogPropPageDlg::OnInitDialog()
 		const wchar_t *pattern = logfile_patterns[i];
 		SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_ADDSTRING, 0, (LPARAM)pattern);
 	}
+	ExpandCBWidth(m_hWnd, IDC_DEFAULTNAME_EDITOR);
 
 	// Log Default File Path (2007.5.30 maya)
 	SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPathW);
