@@ -1751,6 +1751,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 		return;
 	}
 
+	free(ts.LogDefaultNameW);
 	ts.LogDefaultNameW = def_name;
 	free(buf3);
 }

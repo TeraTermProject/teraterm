@@ -3963,6 +3963,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->LogDefaultPathW,
 		(void **)&ts->MacroFNW,
 		(void **)&ts->LogFNW,
+		(void **)&ts->LogDefaultNameW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {
