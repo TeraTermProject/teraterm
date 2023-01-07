@@ -36,7 +36,6 @@
 #include <stdio.h>
 #include <shlobj.h>
 #include <ctype.h>
-#include <mbctype.h>	// for _ismbblead
 #include <assert.h>
 
 #include "teraterm.h"
@@ -307,19 +306,38 @@ void AppendSlash(PCHAR Path, int destlen)
 	}
 }
 
-// Delete slashes at the end of a path name
-void DeleteSlash(PCHAR Path)
+/**
+ * Delete slashes at the end of a path name
+ *
+ *	@return	s––‚Ì '\' ‚ªíœ‚³‚ê‚½•¶Žš—ñ
+ *			•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ */
+wchar_t *DeleteSlashW(const wchar_t *Path)
 {
-	size_t i;
-	for (i=strlen(Path)-1; i>=0; i--) {
-		if (i ==0 && Path[i] == '\\' ||
-		    Path[i] == '\\' && !_ismbblead(Path[i-1])) {
-			Path[i] = '\0';
+	wchar_t *s = _wcsdup(Path);
+	size_t i = wcslen(s);
+	while(i != 0) {
+		i--;
+		if (s[i] == '\\') {
+			s[i] = '\0';
 		}
 		else {
 			break;
 		}
 	}
+	return s;
+}
+
+// Delete slashes at the end of a path name
+void DeleteSlash(PCHAR Path)
+{
+	wchar_t *PathW = ToWcharA(Path);
+	wchar_t *deletedW = DeleteSlashW(PathW);
+	char *deletedA = ToCharW(deletedW);
+	strcpy(Path, deletedA);
+	free(deletedA);
+	free(deletedW);
+	free(PathW);
 }
 
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP)

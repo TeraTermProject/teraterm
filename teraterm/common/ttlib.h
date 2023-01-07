@@ -61,6 +61,7 @@ void FitFileNameW(wchar_t *FileName, size_t destlen, const wchar_t *DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void AppendSlashW(wchar_t *Path, size_t destlen);
 void DeleteSlash(PCHAR Path);
+wchar_t *DeleteSlashW(const wchar_t *Path);
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP);
 BYTE ConvHexChar(BYTE b);
 int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen);
