@@ -12,11 +12,7 @@
 <h1>キーボード設定ファイル</h1>
 
 <p>
-キーボード設定ファイルは、キーボードの各キーとそれに割りあてるられる機能(VT 端末の機能、ユーザー定義文字列の送出、Tera Term コマンドの実行、マクロの実行)を定義します。
-</p>
-
-<p>
-Tera Term インストール時のキー設定は各キーの機能が VT 端末にできるだけ近くなるようにされています。
+キーボード設定ファイルは、キーボードの各キーとそれに割りあてるられる機能(VT 端末の機能、ユーザー定義文字列の送出、Tera Term コマンドの実行、マクロの実行)を定義します。<br />
 キーボード設定ファイルを編集することによって、自由にキー設定を変更することができます。
 </p>
 
@@ -31,49 +27,131 @@ Tera Term インストール時のキー設定は各キーの機能が VT 端末にできるだけ近くなるよ
 
 <dl>
   <dt>IBMKEYB.CNF</dt>
-  <dd>IBM-PC/AT (いわゆる DOS/V マシン) 101 (106) キーボード用設定ファイルの例 (Windows 95/NT 用)</dd>
+  <dd>IBM-PC/AT (いわゆる DOS/V マシン) 101 (106) キーボード用設定ファイルの例</dd>
 
-  <dt>PC98KEYB.CNF</dt>
-  <dd>NEC PC 98 キーボード用設定ファイルの例 (Windows 95 用)</dd>
-
-  <dt>NT98KEYB.CNF</dt>
-  <dd>NEC PC 98 キーボード 用設定ファイルの例 (Windows NT 用)</dd>
-
-  <dt>FUNCTION.CNF</dt>
-  <dd>IBMKEYB.CNF をベースにしたカスタマイズ例<br>
-      <ul>
-        <li>F1-F10 が有効</li>
-        <li>エディタキーパッド(*1)と特殊キー(*2)は、キートップに刻印された名称に対応する VT220 端末キー用のシーケンス(*3)を送出する</li>
-      </ul></dd>
-
-  <dt>EDITOR.CNF</dt>
-  <dd>IBMKEYB.CNF をベースにしたカスタマイズ例<br>
-      <ul>
-        <li>エディタキーパッド(*1)は、キートップに刻印された名称に対応する VT220 端末キー用のシーケンスを送出(*3)する</li>
-      </ul></dd>
+  <dt>VT200.CNF</dt>
+  <dd>VT220 端末でその位置に配置されているキーに相当するキー用のキーコードが送出されるようになっています。<br />
+      たとえば End キーを押した場合、IBMKEYB.CNF の設定で Page Up キーを押したときと同じキーコードが送出されます。</dd>
 
   <dt>KEYBOARD.CNF</dt>
-  <dd>インストール時には EDITOR.CNF と同一</dd>
+  <dd>インストール時には IBMKEYB.CNF と同一</dd>
 </dl>
 
 <p>
-(*1) ここで言うエディタキーパッドとは、Ins, Del, Home, End, PageUp, PageDown キーのことを指します。<br>
-(*2) ここで言う特殊キーとは、テンキーの *, /, +, -, Ctrl+"+" キーのことを指します。<br>
-(*3)VT220 端末ではこれらのキーの位置が 一般的な 101(106) キーボードとは異なっています。FUNCTION.CNF, EDITOR.CNF 以外のキーボード設定ファイルでは、VT220 端末でその位置に配置されているキーに相当するキー用のシーケンスが送出されるようになっています。これはオリジナルの Tera Term Pro の仕様をそのまま踏襲したものです。<br>
-一方 FUNCTION.CNF, EDITOR.CNF では、各特殊キーのキートップに刻印された名称に相当するキー用のシーケンスが送出されるようになっています。これにより、特殊キーに対応したアプリケーション上では、各特殊キーは刻印された名称どおりのキーとして機能するようになると思います。
-</p>
-
-<p>
-インストーラーは <strong>EDITOR.CNF</strong> を <strong>KEYBOARD.CNF</strong> としてコピーします。
+インストーラーは <strong>IBMKEYB.CNF</strong> を <strong>KEYBOARD.CNF</strong> としてコピーします。
 もし違う設定を使いたい場合には、自分で適切なファイルをコピーして <strong>KEYBOARD.CNF</strong> を作成し直してください。
 </p>
 
 <p>
-PC98 NX シリーズの PC の場合、<strong>IBMKEYB.CNF</strong> を使用してください。
+キーコードは keycode.exe で調べることができます。<A HREF="../reference/keycode.txt">keycode.txt</A>を参照ください。
 </p>
 
-<p>
-キーコードは keycode.exe で調べることができます。<A HREF="../reference/keycode.txt">keycode.txt</A>を参照ください。
+<h2>キーボードレイアウト</h2>
+
+<h3>Editing keypad</h3>
+
+<div style="float:left; text-align:center;">
+  <table border="1">
+    <tr>
+      <td>Insert</td>
+      <td>Home</td>
+      <td>Page<br />Up</td>
+    </tr>
+    <tr>
+      <td>Delete</td>
+      <td>End</td>
+      <td>Page<br />Down</td>
+    </tr>
+  </table>
+  101 Keyboard
+</div>
+<div style="float:left; text-align:center; margin-left:1em;">
+  <table border="1">
+    <tr>
+      <td>Find</td>
+      <td>Insert<br />Here</td>
+      <td>Re-<br />move</td>
+    </tr>
+    <tr>
+      <td>Select</td>
+      <td>Prev<br />Screen</td>
+      <td>Next<br />Screen</td>
+    </tr>
+  </table>
+  VT200 Keyboard
+</div>
+<br style="clear:both;">
+
+<h3>Numeric keypad</h3>
+
+<div style="float:left; text-align:center;">
+  <table border="1">
+    <tr>
+      <td style="width:3em; height:3em;">Num<br />Lock</td>
+      <td style="width:3em;">/</td>
+      <td style="width:3em;">*</td>
+      <td style="width:3em;">-</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">7</td>
+      <td>8</td>
+      <td>9</td>
+      <td rowspan="2">+</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">1</td>
+      <td>2</td>
+      <td>3</td>
+      <td rowspan="2">Enter</td>
+    </tr>
+    <tr>
+      <td colspan="2"  style=" height:3em;">0</td>
+      <td>.</td>
+    </tr>
+  </table>
+  101 Keyboard
+</div>
+<div style="float:left; text-align:center; margin-left:1em;">
+  <table border="1">
+    <tr>
+      <td style="width:3em; height:3em;">PF1</td>
+      <td style="width:3em;">PF2</td>
+      <td style="width:3em;">PF3</td>
+      <td style="width:3em;">PF4</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">7</td>
+      <td>8</td>
+      <td>9</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">4</td>
+      <td>5</td>
+      <td>6</td>
+      <td>,</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">1</td>
+      <td>2</td>
+      <td>3</td>
+      <td rowspan="2">Enter</td>
+    </tr>
+    <tr>
+      <td colspan="2" style=" height:3em;">0</td>
+      <td>.</td>
+    </tr>
+  </table>
+  VT200 Keyboard
+</div>
+<br style="clear:both;">
+
+
 
 <h1>キーボード設定ファイル詳細</h1>
 

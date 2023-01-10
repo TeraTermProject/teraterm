@@ -12,11 +12,7 @@
 <h1>Keyboard setup file</h1>
 
 <p>
-The keyboard setup file assigns keys on PC keyboard for various functions such as VT terminal functions, sending user defined character strings, Tera Term commands and executing macro files.
-</p>
-
-<p>
-The default keyboard setup stored in the file KEYBOARD.CNF is almost compatible with VT terminal keyboard.
+The keyboard setup file assigns keys on PC keyboard for various functions such as VT terminal functions, sending user defined character strings, Tera Term commands and executing macro files.<br />
 You can modify key assignments by editing the file.
 See <A HREF="../reference/keycode.txt">KEYCODE.TXT</A> for the format of keyboard setup file.
 </p>
@@ -34,47 +30,126 @@ The distribution package contains the following keyboard setup files:
   <dt>IBMKEYB.CNF</dt>
   <dd>Sample file for the IBM-PC/AT 101-key keyboard</dd>
 
-  <dt>PC98KEYB.CNF</dt>
-  <dd>Sample file for the NEC PC 98 keyboard (Japanese Windows 95)</dd>
-
-  <dt>NT98KEYB.CNF</dt>
-  <dd>Sample file for the NEC PC 98 keyboard (Japanese Windows NT)</dd>
-
-  <dt>FUNCTION.CNF</dt>
-  <dd>A customize sample based on IBMKEYB.CNF<br>
-      <ul>
-        <li>F1-F10 are modified</li>
-        <li>Editor keypad(*1) and Special keys(*2) are used to send a character sequence which displays a symbol on the key top of each VT200 terminal keyboard(*3).</li>
-      </ul></dd>
-
-  <dt>EDITOR.CNF</dt>
-  <dd>A customize sample based on IBMKEYB.CNF<br>
-      <ul>
-        <li>Editor keypad(*1) are used to send a character sequence which displays a symbol on the key top of each VT200 terminal keyboard(*3).</li>
-      </ul></dd>
+  <dt>VT200.CNF</dt>
+  <dd>The location of these keys on VT220 is different from a generic 101(106) keyboard.
+      For example if "End" key is pressed, the key code of "Page up" (when IBMKEYB.CNF is used) is sent.</dd>
 
   <dt>KEYBOARD.CNF</dt>
-  <dd>Default keyboard setup file (copy of EDITOR.CNF at the moment just after the installation)</dd>
+  <dd>Default keyboard setup file (copy of IBMKEYB.CNF at the moment just after the installation)</dd>
 </dl>
 
 <p>
-(*1) Editor keypad mentioned here are Ins, Del, Home, End, PageUp and PageDown.<br>
-(*2) Special keys mentioned here are *, /, +, -, Ctrl+"+" on a Ten-Key pad.<br>
-(*3) The location of these keys on VT220 is different from a generic 101(106) keyboard. With a keyboard setup file other than FUNCTION.CNF  and EDITOR.CNF, a character sequence to be sent is same as one of 101(106) keyboard. This is derived from the specification of original Tera Term Pro.<br>
-On the other hand, FUNCTION.CNF and EDITOR.CNF defines a character sequence which displays a symbol of each key top "as-is". By using this, special keys will behave as each symbol of key top when an application which utilizes special keys is run.
-</p>
-
-<p>
-The installer will copy <strong>EDITOR.CNF</strong> on <strong>KEYBOARD.CNF</strong>.
+The installer will copy <strong>IBMKEYB.CNF</strong> on <strong>KEYBOARD.CNF</strong>.
 If you want to use a different key map, copy an appropriate file on <strong>KEYBOARD.CNF</strong> to meet your need.
 </p>
 
-<p>
-If you want to use PC98 NX key map, use <strong>IBMKEYB.CNF</strong>.
-</p>
 
-<p>
-キーコードは keycode.exe で調べることができます。<A HREF="../reference/keycode.txt">keycode.txt</A>を参照ください。
+
+<h2>Keyboard Layout</h2>
+
+<h3>Editing keypad</h3>
+
+<div style="float:left; text-align:center;">
+  <table border="1">
+    <tr>
+      <td>Insert</td>
+      <td>Home</td>
+      <td>Page<br />Up</td>
+    </tr>
+    <tr>
+      <td>Delete</td>
+      <td>End</td>
+      <td>Page<br />Down</td>
+    </tr>
+  </table>
+  101 Keyboard
+</div>
+<div style="float:left; text-align:center; margin-left:1em;">
+  <table border="1">
+    <tr>
+      <td>Find</td>
+      <td>Insert<br />Here</td>
+      <td>Re-<br />move</td>
+    </tr>
+    <tr>
+      <td>Select</td>
+      <td>Prev<br />Screen</td>
+      <td>Next<br />Screen</td>
+    </tr>
+  </table>
+  VT200 Keyboard
+</div>
+<br style="clear:both;">
+
+<h3>Numeric keypad</h3>
+
+<div style="float:left; text-align:center;">
+  <table border="1">
+    <tr>
+      <td style="width:3em; height:3em;">Num<br />Lock</td>
+      <td style="width:3em;">/</td>
+      <td style="width:3em;">*</td>
+      <td style="width:3em;">-</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">7</td>
+      <td>8</td>
+      <td>9</td>
+      <td rowspan="2">+</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">1</td>
+      <td>2</td>
+      <td>3</td>
+      <td rowspan="2">Enter</td>
+    </tr>
+    <tr>
+      <td colspan="2"  style=" height:3em;">0</td>
+      <td>.</td>
+    </tr>
+  </table>
+  101 Keyboard
+</div>
+<div style="float:left; text-align:center; margin-left:1em;">
+  <table border="1">
+    <tr>
+      <td style="width:3em; height:3em;">PF1</td>
+      <td style="width:3em;">PF2</td>
+      <td style="width:3em;">PF3</td>
+      <td style="width:3em;">PF4</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">7</td>
+      <td>8</td>
+      <td>9</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">4</td>
+      <td>5</td>
+      <td>6</td>
+      <td>,</td>
+    </tr>
+    <tr>
+      <td style=" height:3em;">1</td>
+      <td>2</td>
+      <td>3</td>
+      <td rowspan="2">Enter</td>
+    </tr>
+    <tr>
+      <td colspan="2" style=" height:3em;">0</td>
+      <td>.</td>
+    </tr>
+  </table>
+  VT200 Keyboard
+</div>
+<br style="clear:both;">
+
 
 
 <h1>ABOUT THE KEYBOARD SETUP FILE</h1>

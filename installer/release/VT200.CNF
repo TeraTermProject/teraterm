@@ -11,15 +11,15 @@ Right=333
 ;Left arrow key
 Left=331
 ;Insert key
-Insert=338
+Find=338
 ;Home key
-Find=327
+Insert=327
 ;PageUp key
-Prev=329
+Remove=329
 ;Delete key
-Remove=339
+Select=339
 ;End key
-Select=335
+Prev=335
 ;PageDown key
 Next=337
 
@@ -45,32 +45,26 @@ Num8=72
 ;Num pad 9 key
 Num9=73
 ;Ctrl + Num pad '+' key
-NumComma=1102
+NumMinus=1102
 ;Num pad '+' key
-NumPlus=78
+NumComma=78
 ;Num pad '.' key
 NumPeriod=83
 ;Num pad Enter key
 NumEnter=284
+;Num pad NumLock key
+PF1=325
 ;Num pad '/' key
-NumSlash=309
+PF2=309
 ;Num pad '*' key
-NumAsterisk=55
+PF3=55
 ;Num pad '-' key
-NumMinus=74
+PF4=74
 
 [VT function keys]
 Hold=off
 Print=off
 Break=off
-; F1 key
-PF1=59
-; F2 key
-PF2=60
-; F3 key
-PF3=61
-; F4 key
-PF4=62
 ;F6 key
 F6=64
 ;F7 key
@@ -134,16 +128,16 @@ UDK20=1604
 
 [X function keys]
 ; F1 key
-XF1=off
+XF1=59
 ; F2 key
-XF2=off
+XF2=60
 ; F3 key
-XF3=off
+XF3=61
 ; F4 key
-XF4=off
+XF4=62
 ; F5 key
 XF5=63
-; Shift + Tab key
+; Shit + Tab key
 XBackTab=527
 
 [Shortcut keys]
