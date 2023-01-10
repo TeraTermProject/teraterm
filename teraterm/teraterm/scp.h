@@ -35,6 +35,7 @@ extern "C" {
 BOOL ScpSend(const char *local, const char *remote);
 BOOL ScpGetStatus(void);
 BOOL ScpReceive(const char *remotefile, const char *localfile);
+BOOL TTXSSHGetKnownHostsFileName(wchar_t **filename);
 
 #ifdef __cplusplus
 }

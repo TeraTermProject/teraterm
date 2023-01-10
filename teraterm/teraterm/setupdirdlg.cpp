@@ -57,6 +57,7 @@
 #include "helpid.h"
 #include "win32helper.h"
 #include "tipwin2.h"
+#include "scp.h"
 
 #include "setupdirdlg.h"
 
@@ -396,31 +397,17 @@ static wchar_t *GetCygtermIni(const SetupList *list, const TTTSet *pts)
 
 static wchar_t *GetTTXSSHKwnownHostFile(const SetupList *list, const TTTSet *)
 {
-	HMODULE h = GetModuleHandle("ttxssh.dll");
-	if (h == NULL) {
+	wchar_t *filename;
+	BOOL r = TTXSSHGetKnownHostsFileName(&filename);
+	if (!r) {
 		return NULL;
 	}
-
-	size_t (CALLBACK *func)(wchar_t *, size_t) = NULL;
-	void **pfunc = (void **)&func;
-	*pfunc = (void *)GetProcAddress(h, "TTXReadKnownHostsFile");
-	if (func == NULL) {
-		return NULL;
-	}
-
-	size_t size = func(NULL, 0);
-	if (size == 0) {
-		return NULL;
-	}
-
-	wchar_t *temp = (wchar_t *)malloc(sizeof(wchar_t) * size);
-	func(temp, size);
-	assert(!IsRelativePathW(temp));
+	assert(!IsRelativePathW(filename));
 
 	if (list->data_ptr != 0) {
 		wchar_t *virtual_store_path;
-		BOOL ret = convertVirtualStoreW(temp, &virtual_store_path);
-		free(temp);
+		BOOL ret = convertVirtualStoreW(filename, &virtual_store_path);
+		free(filename);
 		if (ret) {
 			return virtual_store_path;
 		} else {
@@ -428,7 +415,7 @@ static wchar_t *GetTTXSSHKwnownHostFile(const SetupList *list, const TTTSet *)
 		}
 	}
 
-	return temp;
+	return filename;
 }
 
 /**

@@ -27,22 +27,30 @@
  */
 
 /*
+ *	ttxssh.dll へのインターフェイス
+ *	- ttssh2/ttxssh/ttxssh.def 参照
+ *
  *	TODO
  *	- unicode(wchar_t) filename
  *	- init()/uninit() per ssh connect/disconnect
  */
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #include <windows.h>
 
 #include "scp.h"
 
 typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 typedef int (CALLBACK * PSSH_scp_sending_status)(void);
+typedef size_t (CALLBACK *PSSH_GetKnownHostsFileName)(wchar_t *, size_t);
 
 static HMODULE h = NULL;
 static PSSH_start_scp start_scp = NULL;
 static PSSH_start_scp receive_file = NULL;
 static PSSH_scp_sending_status scp_sending_status = NULL;
+static PSSH_GetKnownHostsFileName GetKnownHostsFileName;
 
 /**
  * @brief SCP関数のアドレスを取得
@@ -73,6 +81,13 @@ static BOOL ScpInit(void)
 	if (receive_file == NULL) {
 		receive_file = (PSSH_start_scp)GetProcAddress(h, "TTXScpReceivefile");
 		if (receive_file == NULL) {
+			return FALSE;
+		}
+	}
+
+	if (GetKnownHostsFileName == NULL) {
+		GetKnownHostsFileName = (PSSH_GetKnownHostsFileName)GetProcAddress(h, "TTXReadKnownHostsFile");
+		if (GetKnownHostsFileName == NULL) {
 			return FALSE;
 		}
 	}
@@ -125,4 +140,34 @@ BOOL ScpReceive(const char *remotefile, const char *localfile)
 	}
 	BOOL r = (BOOL)receive_file((char*)remotefile, (char*)localfile);
 	return r;
+}
+
+/**
+ *	knownhostファイル名を取得
+ *	不要になったらfree()すること
+ */
+BOOL TTXSSHGetKnownHostsFileName(wchar_t **filename)
+{
+	if (GetKnownHostsFileName == NULL) {
+		ScpInit();
+	}
+	if (GetKnownHostsFileName == NULL) {
+		*filename = NULL;
+		return FALSE;
+	}
+
+	size_t size = GetKnownHostsFileName(NULL, 0);
+	if (size == 0) {
+		*filename = NULL;
+		return FALSE;
+	}
+	wchar_t *f = (wchar_t *)malloc(sizeof(wchar_t) * size);
+	if (f == NULL) {
+		*filename = NULL;
+		return FALSE;
+	}
+	GetKnownHostsFileName(f, size);
+
+	*filename = f;
+	return TRUE;
 }
