@@ -1,5 +1,19 @@
 ﻿# cmake -P innosetup.cmake
 
+# check innosetup
+#   6.2.1
+set(CHECK_FILE innosetup6/bin/ISCC.exe)
+set(CHECK_HASH "0d02e30a6ad432a50eb86f1ecf330147046e671de340bcb43a170fecbd19bf51")
+if(EXISTS ${CHECK_FILE})
+  file(SHA256 ${CHECK_FILE} HASH)
+  if(${HASH} STREQUAL ${CHECK_HASH})
+    return()
+  endif()
+  message("file ${CHECK_FILE}")
+  message("actual HASH=${HASH}")
+  message("expect HASH=${CHECK_HASH}")
+endif()
+
 # unrar
 #   https://www.rarlab.com/rar_add.htm
 #   RAR/Extras page, UnRAR for Windows 6.11
@@ -43,8 +57,8 @@ execute_process(
   )
 
 # innosetup 6
-set(INNOSETUP_EXE "innosetup-6.2.0.exe")
-set(INNOSETUP_HASH "2459da3c0a67346bc43a9732d96929877d04f53b1d4c56e61be64e3b5f34d5cf")
+set(INNOSETUP_EXE "innosetup-6.2.1.exe")
+set(INNOSETUP_HASH "50d21aab83579245f88e2632a61b943ad47557e42b0f02e6ce2afef4cdd8deb1")
 file(MAKE_DIRECTORY "download/innosetup6")
 file(DOWNLOAD
   https://files.jrsoftware.org/is/6/${INNOSETUP_EXE}
