@@ -214,7 +214,7 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 				wchar_t user[256 + 1];	// 256=UNLEN
 				DWORD l = _countof(user);
 				if (GetUserNameW(user, &l) != 0) {
-					add_text = wcsdup(user);
+					add_text = _wcsdup(user);
 				}
 				break;
 			}
@@ -1388,10 +1388,10 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 	const wchar_t *last_path_sep = wcsrchr(filename, L'\\');
 	wchar_t *format;
 	if (last_path_sep == NULL) {
-		format = wcsdup(filename);
+		format = _wcsdup(filename);
 	}
 	else {
-		format = wcsdup(last_path_sep + 1);
+		format = _wcsdup(last_path_sep + 1);
 	}
 
 	// strftime に使用できない文字を削除
@@ -1400,7 +1400,7 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 	// 文字列長が0になった?
 	if (format[0] == 0) {
 		free(format);
-		return wcsdup(L"");
+		return _wcsdup(L"");
 	}
 
 	// 現在時刻を取得
@@ -1418,7 +1418,7 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 		if (formated_realloc == NULL) {
 			free(format);
 			free(formated);
-			return wcsdup(L"");
+			return _wcsdup(L"");
 		}
 		formated = formated_realloc;
 		size_t r = wcsftime(formated, len, format, &tm_local);
@@ -1460,16 +1460,16 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *dir;
 	wchar_t *fname;
 	if (log_filename == NULL) {
-		dir = wcsdup(ts.LogDefaultPathW);
-		fname = wcsdup(ts.LogDefaultNameW);
+		dir = _wcsdup(ts.LogDefaultPathW);
+		fname = _wcsdup(ts.LogDefaultNameW);
 	} else if (!IsRelativePathW(log_filename)) {
 		// 絶対パスが入力された
 		dir = ExtractDirNameW(log_filename);
 		fname = ExtractFileNameW(log_filename);
 	}
 	else {
-		dir = wcsdup(ts.LogDefaultPathW);
-		fname = wcsdup(log_filename);
+		dir = _wcsdup(ts.LogDefaultPathW);
+		fname = _wcsdup(log_filename);
 	}
 
 	wchar_t *formated = FLogGetLogFilenameBase(fname);

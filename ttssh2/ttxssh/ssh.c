@@ -6316,7 +6316,7 @@ static BOOL handle_SSH2_ext_info(PTInstVar pvar)
 				          __FUNCTION__, pvar->server_sig_algs, ext_val);
 				free(pvar->server_sig_algs);
 			}
-			pvar->server_sig_algs = strdup(ext_val);
+			pvar->server_sig_algs = _strdup(ext_val);
 			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: server-sig-algs, value: %s", __FUNCTION__, ext_val);
 		}
 		else {
