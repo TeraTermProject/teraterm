@@ -167,9 +167,7 @@ Name: {group}\{cm:UninstallProgram,{#AppName}}; Filename: {uninstallexe}; Compon
 Name: {group}\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
 Name: {group}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; IconIndex: 0; Components: TeraTerm_Menu; Flags: createonlyiffileexists
 Name: {userdesktop}\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: quicklaunchicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userstartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
 [Registry]
 ; Cygterm Here
@@ -235,12 +233,10 @@ Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueDa
 
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
-Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
 ; Tera Term 4 のを上書きしないよう、テスト版の間は TeraTerm Menu のデフォルトを off にする
 ; Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
 Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu; Flags: unchecked
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
-Name: quickcyglaunch; Description: {cm:task_quickcyglaunch}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
 Name: telnetassoc; Description: {cm:task_telnetassoc}; Components: TeraTerm; Flags: unchecked
 Name: sshassoc; Description: {cm:task_sshassoc}; Components: TTSSH; Flags: unchecked
@@ -252,19 +248,15 @@ Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; D
 
 [CustomMessages]
 en.task_desktopicon=Create Tera Term shortcut to &Desktop
-en.task_quicklaunchicon=Create Tera Term shortcut to &Quick Launch
 en.task_startupttmenuicon=Create TeraTerm &Menu shortcut to Startup
 en.task_cygtermhere=Add "Cy&gterm Here" to Context menu
-en.task_quickcyglaunch=Create cyg&launch shortcut to Quick Launch
 en.task_macroassoc=Associate .&ttl file to ttpmacro.exe
 en.task_telnetassoc=Associate t&elnet protocol to ttermpro.exe
 en.task_sshassoc=Associate &ssh protocol to ttermpro.exe
 en.task_ttyplayassoc=Associate .tty file to tterm&pro.exe
 ja.task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
-ja.task_quicklaunchicon=クイック起動に Tera Term のショートカットを作る(&Q)
 ja.task_startupttmenuicon=スタートアップに TeraTerm &Menu のショートカットを作る
 ja.task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
-ja.task_quickcyglaunch=クイック起動に cyg&launch のショートカットを作る
 ja.task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
 ja.task_telnetassoc=t&elnet プロトコルを ttermpro.exe に関連付ける
 ja.task_sshassoc=&ssh プロトコルを ttermpro.exe に関連付ける
