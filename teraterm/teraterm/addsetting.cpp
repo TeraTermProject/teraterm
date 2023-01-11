@@ -596,9 +596,9 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 				TTOPENFILENAMEW ofn = {};
 				ofn.hwndOwner = m_hWnd;GetSafeHwnd();
-				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", L"txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
+				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", L"txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
 				ofn.lpstrFile = def;
-				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
+				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", ts.UILanguageFileW);
 				ofn.lpstrInitialDir = ts.HomeDirW;
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 				wchar_t *filename;
@@ -1576,9 +1576,9 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 				TTOPENFILENAMEW ofn = {};
 				ofn.hwndOwner = m_hWnd;
-				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_FILTER", L"exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
+				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_FILTER", L"exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
 				ofn.lpstrFile = editor;
-				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", ts.UILanguageFile);
+				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", ts.UILanguageFileW);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 				wchar_t *filew;
 				BOOL ok = TTGetOpenFileNameW(&ofn, &filew);
@@ -1595,7 +1595,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_DEFAULTPATH_PUSH | (BN_CLICKED << 16):
 			// ログディレクトリの選択ダイアログ
 			{
-				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFile);
+				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFileW);
 				wchar_t *default_path;
 				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &default_path);
 				if (default_path[0] == 0) {
@@ -2176,7 +2176,7 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wParam) {
 		case IDC_SELECT_FILE | (BN_CLICKED << 16):
 			// Cygwin install ディレクトリの選択ダイアログ
-			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", ts.UILanguageFile);
+			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", ts.UILanguageFileW);
 			wchar_t *buf;
 			hGetDlgItemTextW(m_hWnd, IDC_CYGWIN_PATH, &buf);
 			wchar_t *path;
@@ -2287,7 +2287,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	page = FontPageCreate(hInstance, &ts);
 	AddPage(page);
 
-	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFile);
+	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
 	free(title);
 }

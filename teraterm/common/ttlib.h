@@ -196,7 +196,6 @@ typedef struct {
 
 int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILanguageFile, ...);
 int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILanguageFile, ...);
-wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const char *UILanguageFile);
 wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty);
 char *GetClipboardTextA(HWND hWnd, BOOL empty);
 BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len);

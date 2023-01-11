@@ -97,7 +97,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	}
 
 	wchar_t *DlgCaption;
-	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", ts.UILanguageFile);
+	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", ts.UILanguageFileW);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 	free(uimsg);
 

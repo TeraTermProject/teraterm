@@ -124,12 +124,13 @@ int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILangua
 {
 	const char *section = info->section;
 	const UINT uType = info->uType;
+	wchar_t *UILanguageFileW = ToWcharA(UILanguageFile);
 	wchar_t *title;
 	if (info->title_key == NULL) {
 		title = _wcsdup(info->title_default);
 	}
 	else {
-		title = TTGetLangStrW(section, info->title_key, info->title_default, UILanguageFile);
+		title = TTGetLangStrW(section, info->title_key, info->title_default, UILanguageFileW);
 	}
 
 	wchar_t *message = NULL;
@@ -141,7 +142,7 @@ int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILangua
 		vaswprintf(&message, format, ap);
 	}
 	else {
-		wchar_t *format = TTGetLangStrW(section, info->message_key, info->message_default, UILanguageFile);
+		wchar_t *format = TTGetLangStrW(section, info->message_key, info->message_default, UILanguageFileW);
 		va_list ap;
 		va_start(ap, UILanguageFile);
 		vaswprintf(&message, format, ap);
@@ -152,6 +153,7 @@ int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILangua
 
 	free(title);
 	free(message);
+	free(UILanguageFileW);
 
 	return r;
 }

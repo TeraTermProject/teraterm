@@ -77,10 +77,10 @@ size_t GetI18nStrWA(const char *section, const char *key, const wchar_t *def, co
 	return size;
 }
 
-wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const char *UILanguageFile)
+wchar_t *TTGetLangStrW(const char *section, const char *key, const wchar_t *def, const wchar_t *UILanguageFile)
 {
 	wchar_t *str;
-	GetI18nStrWA(section, key, def, UILanguageFile, &str);
+	GetI18nStrWW(section, key, def, UILanguageFile, &str);
 	return str;
 }
 
