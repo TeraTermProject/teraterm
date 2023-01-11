@@ -1,0 +1,475 @@
+https://www.plantuml.com/plantuml
+
+* ssh2_connect1_version.png
+@startuml
+right footer cf. RFC 4253 Section 4, Section 5
+
+participant client as C
+participant server as S
+
+C -> S: connect
+
+group Protocol Version Exchange
+  C <- S: identification string
+  note right: e.g. "SSH-1.99-OpenSSH_4.3p2 Debian-9\\n"
+
+  C -> S: identification string
+  note left: e.g. "SSH-2.00-TTSSH/2.46 Win32\\n"
+
+  note over C, S #ffffff: サーバが 1.99 でクライアントが 2.0 の場合は 2.0\n  cf. RFC 4253 Section 5.1
+
+end
+@startuml
+
+
+
+* ssh2_connect2_kex.png
+@startuml
+right footer cf. RFC 4253 Section 7
+
+participant client as C
+participant server as S
+
+group Key Exhnage
+  group Algorithm Negotiation [cf. RFC 4253 Section 7.1]
+    note over C, S #ffffff
+      supported algorithms の構造:
+        name-list kex_algorithms
+        name-list server_host_key_algorithms
+        name-list encryption_algorithms_client_to_server
+        name-list encryption_algorithms_server_to_client
+        name-list mac_algorithms_client_to_server
+        name-list mac_algorithms_server_to_client
+        name-list compression_algorithms_client_to_server
+        name-list compression_algorithms_server_to_client
+        name-list languages_client_to_server
+        name-list languages_server_to_client
+      それぞれのアルゴリズムは優先順に並んでいる
+    end note
+
+    C -> S: SSH_MSG_KEXINIT
+    note left: クライアントの supported algorithms
+
+    C <- S: SSH_MSG_KEXINIT
+    note right: サーバの supported algorithms
+
+    note over C, S #ffffff: - 両方でサポートしている\n- クライアント側で最も優先度が高い\n方式に決定する
+  end
+
+  group 鍵交換方式ごとの処理 [Diffie-Hellman key exchange\ncf. RFC 4253 Section 8]
+
+    note over C, S #ffffff
+      誰もが知っている:
+        p ... prime
+        g ... generator
+    end note
+
+    note over C, S #ffffff
+      両者が知っている:
+        V_C ... the client's identification string
+        V_S ... the server's identification string
+        I_C ... the payload of the client's SSH_MSG_KEXINIT
+        I_S ... the payload of the server's SSH_MSG_KEXINIT
+    end note
+
+    note over C  #ffffff: 乱数 x を生成する\ne = g^x mod p を計算する
+
+    C -> S: SSH_MSG_KEXDH_INIT
+    note left: e
+
+    note over S  #ffffff
+      乱数 y を生成する
+      f = g^y mod p を計算する
+      K = e^y mod p を計算する
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     e || f || K)
+        K_S ... サーバホスト鍵の公開鍵
+      s = サーバホスト鍵の秘密鍵を用いた H の署名
+    end note
+
+    C <- S: SSH_MSG_KEXDH_REPLY
+    note right: K_S\nf\ns
+
+    note over C  #ffffff
+      K_S が本当にホストの鍵か検証する
+        (e.g. known_hosts と照合する)
+      K = f^x mod p を計算する
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     e || f || K)
+      署名 s が H のものか検証する
+        (s を K_S で復号し、H と比較する)
+    end note
+
+    note over C, S  #ffffff
+      両者が持っている:
+        shared secret ... K
+        exchange hash ... H
+        セッションID ... 初回の鍵交換の H
+    end note
+
+  else Diffie-Hellman Group Exchange\ncf. RFC 4419
+
+    note over C, S #ffffff
+      両者が知っている:
+        V_C ... the client's identification string
+        V_S ... the server's identification string
+        I_C ... the payload of the client's SSH_MSG_KEXINIT
+        I_S ... the payload of the server's SSH_MSG_KEXINIT
+    end note
+
+    note over C #ffffff
+      min ... 受け入れられる p の最小サイズ
+      n ... 受信したいモジュラス p のサイズ
+      max ... 受け入れられる p の最大サイズ
+    end note
+
+    C -> S: SSH_MSG_KEX_DH_GEX_REQUEST
+    note left: min\nn\nmax
+
+    note over S #ffffff: クライアントからのサイズの要求を満たす group を探す\n  p ... prime\n  g ... generator
+
+    C <- S: SSH_MSG_KEX_DH_GEX_GROUP
+    note right: p\ng
+
+    note over C  #ffffff: 乱数 x を生成する\ne = g^x mod p を計算する
+
+    C -> S: SSH_MSG_KEX_DH_GEX_INIT
+    note left: e
+
+    note over S  #ffffff
+      乱数 y を生成する
+      f = g^y mod p を計算する
+      K = e^y mod p を計算する
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     min || n || max || g || e || f || K)
+        K_S ... サーバホスト鍵の公開鍵
+      s = サーバホスト鍵の秘密鍵を用いた H の署名
+    end note
+
+    C <- S: SSH_MSG_KEX_DH_GEX_REPLY
+    note right: K_S\nf\ns
+
+    note over C  #ffffff
+      K_S が本当にホストの鍵か検証する
+        (e.g. known_hosts と照合する)
+      K = f^x mod p を計算する
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     min || n || max || g || e || f || K)
+      署名 s が H のものか検証する
+        (s を K_S で復号し、H と比較する)
+    end note
+
+    note over C, S  #ffffff
+      両者が持っている:
+        shared secret ... K
+        exchange hash ... H
+        セッションID ... 初回の鍵交換の H
+    end note
+
+  else Elliptic Curve Diffie-Hellman Key Exchange\ncf. RFC 5656
+
+    note over C, S #ffffff
+      誰もが知っている:
+        elliptic curve
+        G ... base point
+    end note
+
+    note over C, S #ffffff
+      両者が知っている:
+        V_C ... the client's identification string
+        V_S ... the server's identification string
+        I_C ... the payload of the client's SSH_MSG_KEXINIT
+        I_S ... the payload of the server's SSH_MSG_KEXINIT
+    end note
+
+    note over C  #ffffff
+      EC 鍵ペアを生成する
+        d_C ... 秘密鍵
+        Q_C ... 公開鍵
+          Q_C = d_C * G
+    end note
+
+    C -> S: SSH_MSG_KEX_ECDH_INIT
+    note left: Q_C
+
+    note over S  #ffffff
+      Q_C が鍵として正しいか確認する
+      EC 鍵ペアを生成する
+        d_S ... 秘密鍵
+        Q_S ... 公開鍵
+          Q_S = d_S * G
+      K を計算する
+        (x, y) = d_S * Q_C
+        K = x
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     Q_C || Q_S || K)
+        K_S ... サーバホスト鍵の公開鍵
+      s = サーバホスト鍵の秘密鍵を用いた H の署名
+    end note
+
+    C <- S: SSH_MSG_KEX_ECDH_REPLY
+    note right: K_S\nQ_S\ns
+
+    note over C  #ffffff
+      K_S が本当にホストの鍵か検証する
+        (e.g. known_hosts と照合する)
+      Q_S が鍵として正しいか確認する
+      K を計算する
+        (x', y') = d_C * Q_S
+        K = x'
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     Q_C || Q_S || K)
+      署名 s が H のものか検証する
+        (s を K_S で復号し、H と比較する)
+    end note
+
+    note over C, S  #ffffff
+      両者が持っている:
+        shared secret ... K
+        exchange hash ... H
+        セッションID ... 初回の鍵交換の H
+    end note
+
+  end
+
+  C -> S: SSH_MSG_NEWKEYS
+
+  C <- S: SSH_MSG_NEWKEYS
+end
+
+== これ以降の通信は暗号化される ==
+
+@enduml
+
+
+
+* ssh2_connect3_auth.png
+@startuml
+right footer cf. RFC 4252, RFC 4253
+
+actor user as U
+participant Pageant as P
+participant client as C
+participant server as S
+
+group Service Request [cf. RFC 4253 Section 10]
+
+    C -> S: SSH_MSG_SERVICE_REQUEST
+    note left: "ssh-userauth"
+
+    C <- S: SSH_MSG_SERVICE_ACCEPT
+    note right: "ssh-userauth"
+
+end
+
+group Authentication
+  alt CheckAuthListFirst が有効な場合
+
+    U -> C:
+    note left: ユーザ名
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: ユーザ名\n"ssh-connection"\n"none"
+
+    C <- S: SSH_MSG_USERAUTH_FAILURE
+    note right: サポートしている認証方式
+
+  else 無効な場合
+
+    U -> C:
+    note left: ユーザ名
+
+  end
+
+  group 認証方式ごとの処理 [password\ncf. RFC 4252 Section 8]
+
+    U -> C:
+    note left: パスワード
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: ユーザ名\n"ssh-connection"\n"password"\nパスワード
+
+    alt 認証成功
+      C <- S: SSH_MSG_USERAUTH_SUCCESS
+    else 認証失敗
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+  else publickey\ncf. RFC 4252 Section 7
+
+    U -> C:
+    note left: 認証用鍵ファイル\nパスフレーズ
+    note over C #ffffff: ファイルから公開鍵と秘密鍵を読む
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: ユーザ名\n"ssh-connection"\n"publickey"\nFALSE\n公開鍵アルゴリズム名\n公開鍵
+
+    note over S #ffffff: 受信した公開鍵が受理できるか確認\n（authorized_keysにある、など）
+
+    alt 受理できる
+      C <- S: SSH_MSG_USERAUTH_PK_OK
+    else 受理できない
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+    note over C #ffffff: セッションID・公開鍵などの一連のデータ\nを秘密鍵で署名する
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: ユーザ名\n"ssh-connection"\n"publickey"\nTRUE\n公開鍵アルゴリズム名\n公開鍵\n署名
+
+    note over S #ffffff: 公開鍵と署名を検証
+
+    alt 認証成功
+        C <- S: SSH_MSG_USERAUTH_SUCCESS
+    else 認証失敗
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+  else keyboard-interactive\ncf. RFC 4256
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: ユーザ名\n"ssh-connection"\n"keyboard-interactive"
+
+    C <- S: SSH_MSG_USERAUTH_INFO_REQUEST
+    note right: プロンプト
+
+    loop 認証が成功または失敗する
+
+      U -> C:
+      note left: レスポンス
+
+      C -> S: SSH_MSG_USERAUTH_INFO_RESPONSE
+      note left: レスポンス
+
+      alt クライアントへのリクエストがある
+        C <- S: SSH_MSG_USERAUTH_INFO_REQUEST
+        note right: プロンプト
+      else 認証成功
+        C <- S: SSH_MSG_USERAUTH_SUCCESS
+      else 認証失敗
+        C <- S: SSH_MSG_USERAUTH_FAILURE
+      end
+
+    end
+
+  else publickey with Pageant
+
+    U -> P:
+    note left: （事前に）\n認証用鍵ファイル\nパスフレーズ
+
+    P <- C: SSH2_AGENTC_REQUEST_IDENTITIES
+    note right #ffffff: 公開鍵を要求
+
+    P -> C: SSH2_AGENTC_REQUEST_ANSWER
+    note left: 登録されている公開鍵すべて
+
+    loop 公開鍵をすべて繰り返し, PK_OK が返ってくる、または認証失敗上限に達するまで
+      C -> S: SSH_MSG_USERAUTH_REQUEST
+      note left: ユーザ名\n"ssh-connection"\n"publickey"\nFALSE\n公開鍵アルゴリズム名\n公開鍵
+
+      note over S #ffffff: 受信した公開鍵が受理できるか確認\n（authorized_keysにある、など）
+
+      alt 受理できる
+        C <- S: SSH_MSG_USERAUTH_PK_OK
+      else 受理できない
+        C <- S: SSH_MSG_USERAUTH_FAILURE
+      end
+    end
+
+    P <- C: SSH2_AGENTC_SIGN_REQUEST
+    note right: セッションID・公開鍵などの一連のデータ\n  cf. RFC 4252 Section 7
+
+    note over P #ffffff: 受け取ったデータを対応する秘密鍵で署名する
+
+    P -> C: SSH2_AGENTC_SIGN_RESPONSE
+    note left: 署名
+
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: ユーザ名\n"ssh-connection"\n"publickey"\nTRUE\n公開鍵アルゴリズム名\n公開鍵\n署名
+
+    note over S #ffffff: 公開鍵と署名を検証
+
+    alt 認証成功
+        C <- S: SSH_MSG_USERAUTH_SUCCESS
+    else 認証失敗
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+  end
+end
+
+@enduml
+
+
+
+* ssh2_connect4_channel.png
+@startuml
+right footer cf. RFC 4254
+
+participant client as C
+participant server as S
+
+group Channel Open
+  C -> S: SSH_MSG_CHANNEL_OPEN
+  note left: "session"\n  cf. RFC 4254 Section 6.1
+
+  C <- S: SSH_MSG_CHANNEL_OPEN_CONFIRMATION
+
+  alt ForwardAgent が有効な場合
+    C -> S: SSH_MSG_CHANNEL_REQUEST
+    note left: "auth-agent-req@openssh.com"
+
+    C <- S: SSH_MSG_CHANNEL_SUCCESS
+  end
+
+  C -> S: SSH_MSG_CHANNEL_REQUEST
+  note left: "pty-req"  \n  Pseudo-Terminal\n  cf. RFC 4254 Section 6.2
+
+  C <- S: SSH_MSG_CHANNEL_SUCCESS
+
+  C -> S: SSH_MSG_CHANNEL_REQUEST
+  note left: "shell"  \n  Shell\n  cf. RFC 4254 Section 6.5
+
+  C <- S: SSH_MSG_CHANNEL_WINDOW_ADJUST
+  note right: SSHサーバのウィンドウサイズ\n  cf. RFC 4254 Section 5.2
+
+  C <- S: SSH_MSG_CHANNEL_SUCCESS
+
+  C <- S: SSH_MSG_CHANNEL_DATA
+  note right: シェル情報
+
+  note over C #ffffff: Tera Term 本体へ渡す。\nTera Term には recv() が返ったように見える。
+end
+
+@enduml
+
+
+
+* ssh2_disconnect.png
+@startuml
+right footer cf. RFC 4254 Section 5.3
+
+actor user as U
+participant client as C
+participant server as S
+participant shell as SHELL
+
+U -> SHELL: logout
+
+S <-- SHELL: 
+
+C <- S: SSH_MSG_CHANNEL_EOF
+
+C <- S: SSH_MSG_CHANNEL_REQUEST
+note right: "exit-status"\n  cf. RFC 4254 Section 6.10
+
+C <- S: SSH_MSG_CHANNEL_CLOSE
+
+C -> S: SSH_MSG_CHANNEL_CLOSE
+
+C -> S: SSH_MSG_DISCONNECT
+note left #ffffff: cf. RFC 4253 Section 11.1
+
+note over C #ffffff: TCPセッションのクローズ処理を行う。\nTera Term 本体へ終了の通知を出す。
+@enduml
