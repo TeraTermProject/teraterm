@@ -1,0 +1,475 @@
+https://www.plantuml.com/plantuml
+
+* ssh2_connect1_version.png
+@startuml
+right footer cf. RFC 4253 Section 4, Section 5
+
+participant client as C
+participant server as S
+
+C -> S: connect
+
+group Protocol Version Exchange
+  C <- S: identification string
+  note right: e.g. "SSH-1.99-OpenSSH_4.3p2 Debian-9\\n"
+
+  C -> S: identification string
+  note left: e.g. "SSH-2.00-TTSSH/2.46 Win32\\n"
+
+  note over C, S #ffffff: server using 1.99 and client using 2.0, then 2.0\n  cf. RFC 4253 Section 5.1
+
+end
+@startuml
+
+
+
+* ssh2_connect2_kex.png
+@startuml
+right footer cf. RFC 4253 Section 7
+
+participant client as C
+participant server as S
+
+group Key Exhnage
+  group Algorithm Negotiation [cf. RFC 4253 Section 7.1]
+    note over C, S #ffffff
+      structure of supported algorithms:
+        name-list kex_algorithms
+        name-list server_host_key_algorithms
+        name-list encryption_algorithms_client_to_server
+        name-list encryption_algorithms_server_to_client
+        name-list mac_algorithms_client_to_server
+        name-list mac_algorithms_server_to_client
+        name-list compression_algorithms_client_to_server
+        name-list compression_algorithms_server_to_client
+        name-list languages_client_to_server
+        name-list languages_server_to_client
+      each algorithm is listed in order of preference
+    end note
+
+    C -> S: SSH_MSG_KEXINIT
+    note left: client's supported algorithms
+
+    C <- S: SSH_MSG_KEXINIT
+    note right: server's supported algorithms
+
+    note over C, S #ffffff: decided to\n- supported by both side\n- highest priority at client side
+  end
+
+  group process that corresponds to\nthe key exchange method [Diffie-Hellman key exchange\ncf. RFC 4253 Section 8]
+
+    note over C, S #ffffff
+      everyone knows:
+        p ... prime
+        g ... generator
+    end note
+
+    note over C, S #ffffff
+      both know:
+        V_C ... the client's identification string
+        V_S ... the server's identification string
+        I_C ... the payload of the client's SSH_MSG_KEXINIT
+        I_S ... the payload of the server's SSH_MSG_KEXINIT
+    end note
+
+    note over C  #ffffff: generates a random number x\ncomputes e = g^x mod p
+
+    C -> S: SSH_MSG_KEXDH_INIT
+    note left: e
+
+    note over S  #ffffff
+      generates a random number y
+      computes f = g^y mod p
+      computes K = e^y mod p
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     e || f || K)
+        K_S ... public key of server's host key
+      s = signature of H with private key of server's host key
+    end note
+
+    C <- S: SSH_MSG_KEXDH_REPLY
+    note right: K_S\nf\ns
+
+    note over C  #ffffff
+      verifies K_S is really the host key
+        (e.g. compare with known_hosts)
+      computes K = f^x mod p
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     e || f || K)
+      verifies the signature s on H
+        (decrypt s with K_S, and compare to H)
+    end note
+
+    note over C, S  #ffffff
+      both have:
+        shared secret ... K
+        exchange hash ... H
+        session identifier ... H from first exchange
+    end note
+
+  else Diffie-Hellman Group Exchange\ncf. RFC 4419
+
+    note over C, S #ffffff
+      both know:
+        V_C ... the client's identification string
+        V_S ... the server's identification string
+        I_C ... the payload of the client's SSH_MSG_KEXINIT
+        I_S ... the payload of the server's SSH_MSG_KEXINIT
+    end note
+
+    note over C #ffffff
+      min ... minimal size of p acceptable
+      n ... size of the modulus p that would like to receive
+      max ... maximal size of p acceptable
+    end note
+
+    C -> S: SSH_MSG_KEX_DH_GEX_REQUEST
+    note left: min\nn\nmax
+
+    note over S #ffffff: finds group that matchs client request size\n  p ... prime\n  g ... generator
+
+    C <- S: SSH_MSG_KEX_DH_GEX_GROUP
+    note right: p\ng
+
+    note over C  #ffffff: generates a random number x\ncomputes e = g^x mod p
+
+    C -> S: SSH_MSG_KEX_DH_GEX_INIT
+    note left: e
+
+    note over S  #ffffff
+      generates a random number y
+      computes f = g^y mod p
+      computes K = e^y mod p
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     min || n || max || g || e || f || K)
+        K_S ... public key of server's host key
+      s = signature of H with private key of server's host key
+    end note
+
+    C <- S: SSH_MSG_KEX_DH_GEX_REPLY
+    note right: K_S\nf\ns
+
+    note over C  #ffffff
+      verifies K_S is really the host key
+        (e.g. compare with known_hosts)
+      computes K = f^x mod p
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     min || n || max || g || e || f || K)
+      verifies the signature s on H
+        (decrypt s with K_S, and compare to H)
+    end note
+
+    note over C, S  #ffffff
+      both have:
+        shared secret ... K
+        exchange hash ... H
+        session identifier ... H from first exchange
+    end note
+
+  else Elliptic Curve Diffie-Hellman Key Exchange\ncf. RFC 5656
+
+    note over C, S #ffffff
+      everyone knows:
+        elliptic curve
+        G ... base point
+    end note
+
+    note over C, S #ffffff
+      both know:
+        V_C ... the client's identification string
+        V_S ... the server's identification string
+        I_C ... the payload of the client's SSH_MSG_KEXINIT
+        I_S ... the payload of the server's SSH_MSG_KEXINIT
+    end note
+
+    note over C  #ffffff
+      generates a EC key pair
+        d_C ... private key
+        Q_C ... public key
+          Q_C = d_C * G
+    end note
+
+    C -> S: SSH_MSG_KEX_ECDH_INIT
+    note left: Q_C
+
+    note over S  #ffffff
+      verifies Q_C is a valid key
+      generates a EC key pair
+        d_S ... private key
+        Q_S ... public key
+          Q_S = d_S * G
+      computes K
+        (x, y) = d_S * Q_C
+        K = x
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     Q_C || Q_S || K)
+        K_S ... public key of server's host key
+      s = signature of H with private key of server's host key
+    end note
+
+    C <- S: SSH_MSG_KEX_ECDH_REPLY
+    note right: K_S\nQ_S\ns
+
+    note over C  #ffffff
+      verifies K_S is really the host key
+        (e.g. compare with known_hosts)
+      verifies Q_S is a valid key
+      computes K
+        (x', y') = d_C * Q_S
+        K = x'
+      H = hash(V_C || V_S || I_C || I_S || K_S ||
+                     Q_C || Q_S || K)
+      verifies the signature s on H
+        (decrypt s with K_S, and compare to H)
+    end note
+
+    note over C, S  #ffffff
+      both have:
+        shared secret ... K
+        exchange hash ... H
+        session identifier ... H from first exchange
+    end note
+
+  end
+
+  C -> S: SSH_MSG_NEWKEYS
+
+  C <- S: SSH_MSG_NEWKEYS
+end
+
+== Starting from here communication is encrypted. ==
+
+@enduml
+
+
+
+* ssh2_connect3_auth.png
+@startuml
+right footer cf. RFC 4252, RFC 4253
+
+actor user as U
+participant Pageant as P
+participant client as C
+participant server as S
+
+group Service Request [cf. RFC 4253 Section 10]
+
+    C -> S: SSH_MSG_SERVICE_REQUEST
+    note left: "ssh-userauth"
+
+    C <- S: SSH_MSG_SERVICE_ACCEPT
+    note right: "ssh-userauth"
+
+end
+
+group Authentication
+  alt CheckAuthListFirst is enabled
+
+    U -> C:
+    note left: user name
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: user name\n"ssh-connection"\n"none"
+
+    C <- S: SSH_MSG_USERAUTH_FAILURE
+    note right: supported autentication methods
+
+  else disabled
+
+    U -> C:
+    note left: user name
+
+  end
+
+  group process that corresponds to\nthe authentication method [password\ncf. RFC 4252 Section 8]
+
+    U -> C:
+    note left: password
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: user name\n"ssh-connection"\n"password"\npassword
+
+    alt authentication success
+      C <- S: SSH_MSG_USERAUTH_SUCCESS
+    else authentication fail
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+  else publickey\ncf. RFC 4252 Section 7
+
+    U -> C:
+    note left: key file for authentication\npassphrase
+    note over C #ffffff: read public key and private key from the file
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: user name\n"ssh-connection"\n"publickey"\nFALSE\npublic key algorithm name\npublic key
+
+    note over S #ffffff: confirm that received public key is acceptable\n(included in authorized_keys, etc.Åj
+
+    alt acceptable
+      C <- S: SSH_MSG_USERAUTH_PK_OK
+    else not acceptable
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+    note over C #ffffff: sign data that has session identifier,\npublic key, etc with private key
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: user name\n"ssh-connection"\n"publickey"\nTRUE\npublic key algorithm name\npublic key\nsignature
+
+    note over S #ffffff: verifies public key and signature
+
+    alt authentication success
+        C <- S: SSH_MSG_USERAUTH_SUCCESS
+    else authentication fail
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+  else keyboard-interactive\ncf. RFC 4256
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: user name\n"ssh-connection"\n"keyboard-interactive"
+
+    C <- S: SSH_MSG_USERAUTH_INFO_REQUEST
+    note right: prompt
+
+    loop authentication success or fail
+
+      U -> C:
+      note left: response
+
+      C -> S: SSH_MSG_USERAUTH_INFO_RESPONSE
+      note left: response
+
+      alt have a request to client
+        C <- S: SSH_MSG_USERAUTH_INFO_REQUEST
+        note right: prompt
+      else authentication success
+        C <- S: SSH_MSG_USERAUTH_SUCCESS
+      else authentication fail
+        C <- S: SSH_MSG_USERAUTH_FAILURE
+      end
+
+    end
+
+  else publickey with Pageant
+
+    U -> P:
+    note left: (preliminarily)\nkey file for authentication\npassphrase
+
+    P <- C: SSH2_AGENTC_REQUEST_IDENTITIES
+    note right #ffffff: request for public keys
+
+    P -> C: SSH2_AGENTC_REQUEST_ANSWER
+    note left: all public keys that is added
+
+    loop all public keys, until receive PK_OK or reach to limit of failure
+      C -> S: SSH_MSG_USERAUTH_REQUEST
+      note left: user name\n"ssh-connection"\n"publickey"\nFALSE\npublic key algorithm name\npublic key
+
+      note over S #ffffff: confirm that received public key is acceptable\n(included in authorized_keys, etc.Åj
+
+      alt acceptable
+        C <- S: SSH_MSG_USERAUTH_PK_OK
+      else not acceptable
+        C <- S: SSH_MSG_USERAUTH_FAILURE
+      end
+    end
+
+    P <- C: SSH2_AGENTC_SIGN_REQUEST
+    note right: data that has session identifier,\npublic key, etc\n  cf. RFC 4252 Section 7
+
+    note over P #ffffff: sign received data with the correspond private key
+
+    P -> C: SSH2_AGENTC_SIGN_RESPONSE
+    note left: signature
+
+
+    C -> S: SSH_MSG_USERAUTH_REQUEST
+    note left: user name\n"ssh-connection"\n"publickey"\nTRUE\npublic key algorithm name\npublic key\nsignature
+
+    note over S #ffffff: verifies public key and signature
+
+    alt authentication success
+        C <- S: SSH_MSG_USERAUTH_SUCCESS
+    else authentication fail
+      C <- S: SSH_MSG_USERAUTH_FAILURE
+    end
+
+  end
+end
+
+@enduml
+
+
+
+* ssh2_connect4_channel.png
+@startuml
+right footer cf. RFC 4254
+
+participant client as C
+participant server as S
+
+group Channel Open
+  C -> S: SSH_MSG_CHANNEL_OPEN
+  note left: "session"\n  cf. RFC 4254 Section 6.1
+
+  C <- S: SSH_MSG_CHANNEL_OPEN_CONFIRMATION
+
+  alt ForwardAgent is enabled
+    C -> S: SSH_MSG_CHANNEL_REQUEST
+    note left: "auth-agent-req@openssh.com"
+
+    C <- S: SSH_MSG_CHANNEL_SUCCESS
+  end
+
+  C -> S: SSH_MSG_CHANNEL_REQUEST
+  note left: "pty-req"  \n  Pseudo-Terminal\n  cf. RFC 4254 Section 6.2
+
+  C <- S: SSH_MSG_CHANNEL_SUCCESS
+
+  C -> S: SSH_MSG_CHANNEL_REQUEST
+  note left: "shell"  \n  Shell\n  cf. RFC 4254 Section 6.5
+
+  C <- S: SSH_MSG_CHANNEL_WINDOW_ADJUST
+  note right: SSH server's window size\n  cf. RFC 4254 Section 5.2
+
+  C <- S: SSH_MSG_CHANNEL_SUCCESS
+
+  C <- S: SSH_MSG_CHANNEL_DATA
+  note right: shell information
+
+  note over C #ffffff: Passed to Tera Term core. \nTera Term then waits for recv() to return data.
+end
+
+@enduml
+
+
+
+* ssh2_disconnect.png
+@startuml
+right footer cf. RFC 4254 Section 5.3
+
+actor user as U
+participant client as C
+participant server as S
+participant shell as SHELL
+
+U -> SHELL: logout
+
+S <-- SHELL: 
+
+C <- S: SSH_MSG_CHANNEL_EOF
+
+C <- S: SSH_MSG_CHANNEL_REQUEST
+note right: "exit-status"\n  cf. RFC 4254 Section 6.10
+
+C <- S: SSH_MSG_CHANNEL_CLOSE
+
+C -> S: SSH_MSG_CHANNEL_CLOSE
+
+C -> S: SSH_MSG_DISCONNECT
+note left #ffffff: cf. RFC 4253 Section 11.1
+
+note over C #ffffff: Closing TCP session and notifying Tera Term core\nthat session was closed.
+@enduml

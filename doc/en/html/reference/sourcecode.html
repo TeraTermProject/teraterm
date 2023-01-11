@@ -919,26 +919,25 @@ The drawing below shows the packet flow for TCP connection from a client to a se
 
 
 <div align="center">
-<img src="image/ssh2_sequence1.png" width=720 height=540>
+<img src="image/ssh2_connect1_version.png">
 </div>
 
 <div align="center">
-<img src="image/ssh2_sequence2.png" width=720 height=540>
+<img src="image/ssh2_connect2_kex.png">
+</div>
+
+<div align="center">
+<img src="image/ssh2_connect3_auth.png">
+</div>
+
+<div align="center">
+<img src="image/ssh2_connect4_chennel.png">
 </div>
 
 The next drawing shows the flow of the packets when client explicitly closes the connection, i.e. enters "exit" or "logout" command in the remote shell. <br>
 
 <div align="center">
-<img src="image/ssh2_sequence3.png" width=720 height=540>
-</div>
-
-In addition to password based SSH authentication, TTSSH also supports keyboard-interactive, public key based and public key with Pageant authentication methods. Packet flows for each of these methods are shown below. <br>
-
-<div align="center">
-<img src="image/ssh2_auth1.png" width=720 height=540>
-</div>
-<div align="center">
-<img src="image/ssh2_auth2.png" width=720 height=540>
+<img src="image/ssh2_disconnect.png">
 </div>
 
 
