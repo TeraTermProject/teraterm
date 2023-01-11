@@ -1718,7 +1718,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
 			MB_ICONEXCLAMATION };
-		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
+		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
 		return;
 	}
 
@@ -1733,7 +1733,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_TOOLONG_ERROR", L"The log file name is too long.",
 			MB_ICONEXCLAMATION };
-		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
+		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
 		free(def_name);
 		return;
 	}
@@ -1746,7 +1746,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
 			MB_ICONEXCLAMATION };
-		TTMessageBoxA(m_hWnd, &info, ts.UILanguageFile);
+		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
 		free(def_name);
 		free(buf3);
 		return;
@@ -1991,14 +1991,6 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 	tmp_fp = fopen(cfg, "w");
 	if (tmp_fp == NULL) {
 		return FALSE;
-#if 0
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts->UILanguageFile);
-		get_lang_msg("MSG_CYGTERM_CONF_WRITEFILE_ERROR", ts->UIMsg, sizeof(ts->UIMsg),
-			"Can't write CygTerm configuration file (%d).", ts->UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts->UIMsg, GetLastError());
-		MessageBox(NULL, buf, uimsg, MB_ICONEXCLAMATION);
-#endif
 	}
 	else {
 		if (linenum > 0) {
@@ -2244,13 +2236,13 @@ void CCygwinPropPageDlg::OnOK()
 	// ïœçXÇ≥ÇÍÇƒÇ¢ÇÈèÍçá cygterm.cfg Ç÷èëÇ´çûÇﬁ
 	if (CmpCygtermConfFile(&settings_prop, &settings) == FALSE) {
 		if (WriteCygtermConfFile(ts.HomeDir, &settings_prop) == FALSE) {
-			char uimsg[MAX_UIMSG];
-			char buf[256];
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_CONF_WRITEFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-						 "Can't write CygTerm configuration file (%d).", ts.UILanguageFile);
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-			MessageBoxA(buf, uimsg, MB_ICONEXCLAMATION);
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_ERROR", L"ERROR",
+				"MSG_CYGTERM_CONF_WRITEFILE_ERROR", L"Can't write CygTerm configuration file (%d).",
+				MB_ICONEXCLAMATION };
+			DWORD e = GetLastError();
+			TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW, e);
 		}
 	}
 
