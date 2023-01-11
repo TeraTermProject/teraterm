@@ -1335,6 +1335,7 @@ BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str)
 				fclose(fp);
 				converted = TRUE;
 			}
+			free(ini_u16);
 		}
 	}
 	else {
@@ -1349,6 +1350,7 @@ BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str)
 				fclose(fp);
 				converted = TRUE;
 			}
+			free(ini_acp);
 		}
 	}
 	free(ini_u8);
