@@ -71,13 +71,15 @@
         </ul>
         <li>Windows 10,11ではiniファイルをUnicode化することができます。<br>
         <ul>
-          <li>iniファイルを扱うWin32APIがUnicode対応となります</li>
+          <li>iniファイルを扱うWin32APIはUnicode対応版を使用します</li>
           <li>cygterm.cfgはWin32APIを使って読み書きしていません</li>
         </ul>
         <li>Unicode化したiniファイルの文字コードはUTF-16 (with LE BOM)です。</li>
         <li>Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
         <li>Tera Term 5 は起動時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
+        <li>Tera Term 5 でTERATERM.INI保存時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
         <li>変換前のファイルはバックアップされています。</li>
+        <li><a href="../reference/dev/win32api.html#ini_file">Win32API/iniファイル</a>を参照ください</li>
       </ul>
       <li>設定ファイルのデフォルトフォルダが変更されました。</li>
       <ul>

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>Win32API</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Win32API</h1>
+
+Win32API に関するメモ
+
+<h2 id="ini_file">iniファイル</h2>
+
+<p>
+  Windows 2000(NT3?) ごろに Unicode 対応版WritePrivateProfileStringW()
+  等が実装されたと思われます。
+
+<p>
+  iniファイルの文字コードやUnicode/ANSIを混在して使用していた場合のド
+  キュメントは見当たらないため動作をまとめました。最近のWindows(少なく
+  ともWindows 10,11)では、Unicodeに対応するため次のような動作となって
+  います。
+
+<ul>
+  <li>ファイルの先頭にUTF-16LE BOM(0xff 0xfe)がついているとき、iniファイルはUnicodeのファイルとして扱われます。</li>
+  <li>ANSI/Unicode APIでUnicode/非Unicode iniファイルを読み書きしたとき自動でACP/Unicode変換が行わます(9x系では行われません)。</li>
+  <ul>
+    <li>Unicode iniファイルのとき、Unicodeとして読み書きします。</li>
+    <li>Unicode iniファイルではないとき、日本語環境ではShift_JIS(ACP)として読み書きします。</li>
+    <li>このためiniファイルの文字コードによらず透過的にAPIを利用できます。</li>
+    <li>非Unicode iniファイルにShift_JISで表現できないUnicode文字を書き込むと"?"に置換されて書き込まれます。</li>
+  </ul>
+  <li>Unicode API で最初にファイルを作成するとき、Unicode iniファイルになりません。</li>
+  <li>BOMだけの空ファイルを作ってから書き込むとUnicode iniファイルとして扱えます。</li>
+</ul>
+
+</html>

@@ -162,5 +162,25 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
   <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional.html">[Setup]Additional Setting</a> dialog.</li>
 </ul>
 
+<h2>[Tera Term 5 について]</h2>
+
+<p>
+<span class="qanda">Q.</span> 設定ファイルはTera Term 4と共有できる?<br>
+<span class="qanda">A.</span>
+Tera Term 5 で 4 の TERATERM.INI を読み込むことはできます。
+
+Tera Term 5 は TERATERM.INI を UTF-16 with LE BOM(いわゆるUTF-16LE
+BOM)に変換します。
+
+ANSI(非Unicode)版APIを使用している Tera Term 4 でも OS が文字コードを
+変換してくれるためUnicode版iniファイルを読み書きすることができます。
+ただし、ANSI/Unicodeで文字を変換できない場合文字化けが発生します。
+
+また、9x系OSには文字子コードの変換機能がないためUnicode版iniファイルは
+使用できません。
+
+<a href="../reference/dev/win32api.html">API の動作</a>も参考にしてください。
+</p>
+
 </BODY>
 </HTML>
