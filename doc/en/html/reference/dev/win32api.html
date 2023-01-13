@@ -11,31 +11,31 @@
 
 <h1>Win32API</h1>
 
-Win32API に関するメモ
+Notes on Win32API
 
-<h2 id="ini_file">iniファイル</h2>
-
-<p>
-  Windows 2000(NT3?) ごろに Unicode 対応版WritePrivateProfileStringW()
-  等が実装されたと思われます。
+<h2 id="ini_file">ini file</h2>
 
 <p>
-  iniファイルの文字コードやUnicode/ANSIを混在して使用していた場合のド
-  キュメントは見当たらないため動作をまとめました。最近のWindows(少なく
-  ともWindows 10,11)では、Unicodeに対応するため次のような動作となって
-  います。
+  in Windows 2000(NT3?) Unicode-aware version of
+  WritePrivateProfileStringW()... were implemented.
+
+<p>
+  We can't find any document about character encoding of ini files and
+  mixed use of Unicode/ANSI. We have documented the behavior.
+  In recent versions of Windows (at least Windows 10 and 11), the
+  following behavior is used to support Unicode.
 
 <ul>
-  <li>ファイルの先頭にUTF-16LE BOM(0xff 0xfe)がついているとき、iniファイルはUnicodeのファイルとして扱われます。</li>
-  <li>ANSI/Unicode APIでUnicode/非Unicode iniファイルを読み書きしたとき自動でACP/Unicode変換が行わます(9x系では行われません)。</li>
+  <li>If the file has a UTF-16LE BOM (0xff 0xfe) at the beginning, the ini file is a Unicode file.</li>
+  <li>When reading/writing Unicode/non-Unicode ini files with the ANSI/Unicode API, ACP/Unicode conversion is automatically performed.(This is not done on Windows 9x).</li>
   <ul>
-    <li>Unicode iniファイルのとき、Unicodeとして読み書きします。</li>
-    <li>Unicode iniファイルではないとき、日本語環境ではShift_JIS(ACP)として読み書きします。</li>
-    <li>このためiniファイルの文字コードによらず透過的にAPIを利用できます。</li>
-    <li>非Unicode iniファイルにShift_JISで表現できないUnicode文字を書き込むと"?"に置換されて書き込まれます。</li>
+    <li>If the file is a Unicode ini file, it is read/written as Unicode.</li>
+    <li>If the file is not a Unicode ini file, it reads and writes as Shift_JIS (ACP) in Japanese environment.</li>
+    <li>So possible to use the API transparently regardless of the character encoding of the ini file.</li>
+    <li>If Unicode characters that cannot be represented by ACP are written to a non-Unicode ini file, they are replaced by "?" and written to the file.</li>
   </ul>
-  <li>Unicode API で最初にファイルを作成するとき、Unicode iniファイルになりません。</li>
-  <li>BOMだけの空ファイルを作ってから書き込むとUnicode iniファイルとして扱えます。</li>
+  <li>When a file is created with the Unicode API, it will not be a Unicode ini file.</li>
+  <li>When a file is created with only BOM, it will be a Unicode ini file.</li>
 </ul>
 
 </html>

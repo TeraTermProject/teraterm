@@ -162,24 +162,25 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
   <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional.html">[Setup]Additional Setting</a> dialog.</li>
 </ul>
 
-<h2>[Tera Term 5 について]</h2>
+<h2>[About Tera Term 5]</h2>
 
 <p>
-<span class="qanda">Q.</span> 設定ファイルはTera Term 4と共有できる?<br>
+<span class="qanda">Q.</span> Can the configuration file(TERATERM.INI) be shared with Tera Term 4?<br>
 <span class="qanda">A.</span>
-Tera Term 5 で 4 の TERATERM.INI を読み込むことはできます。
+Tera Term 5 can read TERATERM.INI for Tera Term 4.
 
-Tera Term 5 は TERATERM.INI を UTF-16 with LE BOM(いわゆるUTF-16LE
-BOM)に変換します。
+Tera Term 5 converts TERATERM.INI to UTF-16 with LE BOM(UTF-16LE BOM).
 
-ANSI(非Unicode)版APIを使用している Tera Term 4 でも OS が文字コードを
-変換してくれるためUnicode版iniファイルを読み書きすることができます。
-ただし、ANSI/Unicodeで文字を変換できない場合文字化けが発生します。
+Tera Term 4 using the ANSI(not Unicode) API can also read/write
+Unicode ini files because the OS converts the character encoding.
 
-また、9x系OSには文字子コードの変換機能がないためUnicode版iniファイルは
-使用できません。
+But, if the characters cannot be converted in ANSI/Unicode,
+characters will be breaked.
 
-<a href="../reference/dev/win32api.html">API の動作</a>も参考にしてください。
+And, Windows 9x does not have a character code conversion function in API,
+Unicode version ini files cannot be used.
+
+Please also refer to the <a href="../reference/dev/win32api.html">API behavior</a>.
 </p>
 
 </BODY>
