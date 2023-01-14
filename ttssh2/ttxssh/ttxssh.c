@@ -1016,7 +1016,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		SetWindowLongPtr(dlg, DWLP_USER, (LPARAM)dlg_data);
 		dlg_data->GetHNRec = GetHNRec;
 
-		dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount, NULL);
+		dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
 
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 

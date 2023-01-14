@@ -61,7 +61,7 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 		ComPortDesc[i] = NULL;
 	}
 
-	port_info = ComPortInfoGet(&count, NULL);
+	port_info = ComPortInfoGet(&count);
 	p = port_info;
 	for (i = 0; i < count; i++) {
 		ComPortTable[i] = p->port_no;
@@ -90,7 +90,7 @@ int WINAPI CheckComPort(WORD ComPort)
 {
 	int count;
 	int i;
-	ComPortInfo_t *port_info = ComPortInfoGet(&count, NULL);
+	ComPortInfo_t *port_info = ComPortInfoGet(&count);
 	const ComPortInfo_t *p = port_info;
 	int found = 0;
 	for (i = 0; i < count; i++) {
