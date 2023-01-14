@@ -30,8 +30,6 @@
 #ifndef __TTPLUG_H
 #define __TTPLUG_H
 
-#include "hostname_rec.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

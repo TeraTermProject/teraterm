@@ -715,6 +715,22 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdFlowNone 3
 #define IdFlowHardDsrDtr 4  // DSR/DTR(hardware flow)
 
+
+/* GetHostName dialog record */
+typedef struct {
+	PCHAR SetupFN; // setup file name
+	const wchar_t *SetupFNW;
+	WORD PortType; // TCPIP/Serial
+	wchar_t *HostName; // host name
+	WORD Telnet; // non-zero: enable telnet
+	WORD TelPort; // default TCP port# for telnet
+	WORD TCPPort; // TCP port #
+	WORD ProtocolFamily; // Protocol Family (AF_INET/AF_INET6/AF_UNSPEC)
+	WORD ComPort; // serial port #
+	WORD MaxComPort; // max serial port #
+} TGetHNRec;
+typedef TGetHNRec *PGetHNRec;
+
 /* Control Characters */
 
 #define NUL  0x00

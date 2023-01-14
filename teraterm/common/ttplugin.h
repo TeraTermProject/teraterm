@@ -32,7 +32,6 @@
 #include "ttwsk.h"
 #include "ttsetup.h"
 #include "ttfileio.h"
-#include "hostname_rec.h"
 
 // プラグインのバージョン
 #define TTVERSION (WORD)500	/* version 5.00 */
