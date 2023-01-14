@@ -1674,7 +1674,7 @@ BOOL isInvalidFileNameCharW(const wchar_t *FName)
 
 	len = wcslen(FName);
 	for (i=0; i<len; i++) {
-		if ((FName[i] >= 0 && FName[i] < ' ') || wcschr(invalidFileNameCharsW, FName[i])) {
+		if ((FName[i] < ' ') || wcschr(invalidFileNameCharsW, FName[i])) {
 			return TRUE;
 		}
 	}
@@ -1697,12 +1697,12 @@ wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 	len = wcslen(FName);
 	dest = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
 
-	if ((c >= 0 && c < ' ') || wcschr(invalidFileNameCharsW, c)) {
+	if ((c < ' ') || wcschr(invalidFileNameCharsW, c)) {
 		c = 0;
 	}
 
 	for (i = 0; i < len; i++) {
-		if ((FName[i] >= 0 && FName[i] < ' ') || wcschr(invalidFileNameCharsW, FName[i])) {
+		if ((FName[i] < ' ') || wcschr(invalidFileNameCharsW, FName[i])) {
 			if (c) {
 				dest[j++] = c;
 			}
