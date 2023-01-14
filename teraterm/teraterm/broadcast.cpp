@@ -34,6 +34,7 @@
 #include "ttwinman.h"
 #include "compat_win.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -105,24 +106,26 @@ static wchar_t *GetHistoryFileName(TTTSet *ts_)
 
 static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
 {
-	wchar_t EntName[13];
-	wchar_t Command[HostNameMaxLength+1];
 	int i = 1;
 
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
 	do {
-		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"Command%d", i);
-		GetPrivateProfileStringW(L"BroadcastCommands",EntName, L"",
-								 Command, _countof(Command), historyfile);
-		if (Command[0] != 0) {
+		wchar_t *EntName;
+		wchar_t *Command;
+		aswprintf(&EntName, L"Command%d", i);
+		hGetPrivateProfileStringW(L"BroadcastCommands", EntName, L"", historyfile, &Command);
+		if (Command != NULL && Command[0] != 0) {
 			SendDlgItemMessageW(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
 								0, (LPARAM)Command);
 		}
+		else {
+			// èIóπ
+			i = ts.MaxBroadcatHistory;
+		}
+		free(Command);
+		free(EntName);
 		i++;
-	} while ((i <= ts.MaxBroadcatHistory) && (Command[0] != 0));
-
-	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, EM_LIMITTEXT,
-	                   HostNameMaxLength-1, 0);
+	} while (i <= ts.MaxBroadcatHistory);
 
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_SETCURSEL,0,0);
 }
