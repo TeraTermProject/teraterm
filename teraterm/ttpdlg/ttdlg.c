@@ -1121,13 +1121,14 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 	int w, h;
 	int cx, cy;
 	RECT wr;
-	wchar_t uimsg[MAX_UIMSG];
+	wchar_t *uimsg;
 	PTTSet ts;
 
 	switch (msg) {
 		case WM_MOUSEMOVE:
 			ts = (PTTSet)GetWindowLongPtr(GetParent(hWnd) ,DWLP_USER);
-			get_lang_msgW("DLG_SERIAL_SPEED_TOOLTIP", uimsg, _countof(uimsg), L"You can directly specify a number", ts->UILanguageFile);
+			uimsg = TTGetLangStrW("Tera Term",
+								  "DLG_SERIAL_SPEED_TOOLTIP", L"You can directly specify a number", ts->UILanguageFileW);
 
 			// Combo-boxの左上座標を求める
 			GetWindowRect(hWnd, &wr);
@@ -1151,6 +1152,8 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 			TipWinSetTextW(g_SerialDlgSpeedTip, uimsg);
 			TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
 			TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
+
+			free(uimsg);
 
 			break;
 	}
@@ -1193,7 +1196,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
 			EnableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
 			EnableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
@@ -1202,7 +1205,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			// COMポートの詳細情報を取得する。
 			// COMの接続状況は都度変わるため、ダイアログを表示する度に取得する。
 			// 不要になったら、ComPortInfoFree()でメモリを解放すること。
-			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount, ts->UILanguageFile);
+			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount);
 
 			w = 0;
 
@@ -1682,9 +1685,9 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetWindowLongPtr(Dialog, DWLP_USER, (LPARAM)dlg_data);
 			dlg_data->GetHNRec = GetHNRec;
 
-			dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount, NULL);
+			dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 			// ファイルおよび名前付きパイプの場合、TCP/IP扱いとする。
 			if ( GetHNRec->PortType==IdFile ||
@@ -2448,7 +2451,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 #endif
 			}
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 			// Tera Term 本体のバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
@@ -2838,7 +2841,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
 			SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
 			                   0, (LPARAM)"TCP/IP");
@@ -2988,7 +2991,7 @@ static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPA
 			Close = (PBOOL)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFile);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 			SetWinList(GetParent(Dialog),Dialog,IDC_WINLISTLIST);
 

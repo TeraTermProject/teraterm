@@ -100,7 +100,7 @@ void lscom_fopen()
 void lscom()
 {
 	int comPortCount;
-	ComPortInfo_t *infos = ComPortInfoGet(&comPortCount, NULL);
+	ComPortInfo_t *infos = ComPortInfoGet(&comPortCount);
 	printf("comport count %d\n", comPortCount);
 	for (int i = 0; i < comPortCount; i++) {
 		ComPortInfo_t *p = &infos[i];

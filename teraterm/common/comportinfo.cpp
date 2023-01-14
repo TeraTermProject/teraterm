@@ -473,7 +473,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
  *				NULLのときcomポートなし
  *				使用後ComPortInfoFree()を呼ぶこと
  */
-ComPortInfo_t *ComPortInfoGet(int *count, const char *lang)
+ComPortInfo_t *ComPortInfoGet(int *count)
 {
 #if defined(_MSC_VER) && _MSC_VER > 1400
 	// VS2005よりあたらしい場合は 9x で起動しないバイナリとなる

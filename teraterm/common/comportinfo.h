@@ -39,7 +39,7 @@ typedef struct {
 	wchar_t *property;			// ë∂ç›ÇµÇ»Ç¢èÍçáÇÕ NULL
 } ComPortInfo_t;
 
-ComPortInfo_t *ComPortInfoGet(int *count, const char *lang);
+ComPortInfo_t *ComPortInfoGet(int *count);
 void ComPortInfoFree(ComPortInfo_t *info, int count);
 
 #ifdef __cplusplus
