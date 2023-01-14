@@ -1,5 +1,5 @@
 /*
- * (C) 2018- TeraTerm Project
+ * (C) 2023- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,19 +26,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "teraterm.h"
-#include "tttypes.h"
-#include "hostname_rec.h"
+#pragma once
 
-BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts);
-BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts);
-BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts);
-BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts);
-BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts);
-BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec);
-BOOL WINAPI _ChangeDirectory(HWND WndParent, PTTSet ts);
-BOOL WINAPI _AboutDialog(HWND WndParent);
-BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts);
-BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts);
-BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close);
-//BOOL WINAPI _TTDLGSetUILanguageFile(char *file);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* GetHostName dialog record */
+typedef struct {
+	PCHAR SetupFN; // setup file name
+	const wchar_t *SetupFNW;
+	WORD PortType; // TCPIP/Serial
+	wchar_t *HostName; // host name
+	WORD Telnet; // non-zero: enable telnet
+	WORD TelPort; // default TCP port# for telnet
+	WORD TCPPort; // TCP port #
+	WORD ProtocolFamily; // Protocol Family (AF_INET/AF_INET6/AF_UNSPEC)
+	WORD ComPort; // serial port #
+	WORD MaxComPort; // max serial port #
+} TGetHNRec;
+typedef TGetHNRec *PGetHNRec;
+
+#ifdef __cplusplus
+}
+#endif
