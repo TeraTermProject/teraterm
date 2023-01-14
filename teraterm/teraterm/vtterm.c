@@ -363,7 +363,12 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	{
 		vtterm_work_t *vtterm = &vtterm_work;
-		vtterm->check_eol = CheckEOLCreate();
+		if (vtterm->check_eol == NULL) {
+			vtterm->check_eol = CheckEOLCreate();
+		}
+		else {
+			CheckEOLClear(vtterm->check_eol);
+		}
 		vtterm->log_cr_type = 0;
 	}
 }
@@ -6647,7 +6652,13 @@ void RingBell(int type) {
 	}
 }
 
-void EndTerm() {
+void EndTerm()
+{
+	vtterm_work_t *vtterm = &vtterm_work;
+	if (vtterm->check_eol != NULL) {
+		CheckEOLDestroy(vtterm->check_eol);
+		vtterm->check_eol = NULL;
+	}
 	if (CLocale) {
 		_free_locale(CLocale);
 	}
