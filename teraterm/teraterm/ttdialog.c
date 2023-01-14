@@ -47,7 +47,6 @@ PAboutDialog AboutDialog;
 PChooseFontDlg ChooseFontDlg;
 PSetupGeneral SetupGeneral;
 PWindowWindow WindowWindow;
-PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
 
 BOOL LoadTTDLG()
 {
@@ -62,9 +61,7 @@ BOOL LoadTTDLG()
 	ChooseFontDlg = _ChooseFontDlg;
 	SetupGeneral = _SetupGeneral;
 	WindowWindow = _WindowWindow;
-	TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
 
-	TTDLGSetUILanguageFile(ts.UILanguageFile);
 	TTXGetUIHooks(); /* TTPLUG */
 
 	return TRUE;

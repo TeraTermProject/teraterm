@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <winsock2.h>
 
 #include "tttypes.h"
 #include "ttlib.h"
@@ -58,6 +59,7 @@
 #include "compat_win.h"
 #include "ttlib_charset.h"
 #include "asprintf.h"
+#include "ttwinman.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -67,7 +69,6 @@
 // SFMT: SIMD-oriented Fast Mersenne Twister
 #include "SFMT_version_for_teraterm.h"
 
-#include <winsock2.h>
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
 
@@ -80,15 +81,6 @@
 #undef EndDialog
 #define EndDialog(p1,p2) \
 	TTEndDialog(p1, p2)
-
-extern HANDLE hInst;
-/*
- * ttwinman.hをincludeすると、hInstとシンボル衝突するため、
- * cvのextern宣言を個別に追加する。
- */
-extern TComVar cv;
-
-static char UILanguageFile[MAX_PATH];
 
 static const char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 static const char *NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
@@ -1692,7 +1684,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount, NULL);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
 			// ファイルおよび名前付きパイプの場合、TCP/IP扱いとする。
 			if ( GetHNRec->PortType==IdFile ||
@@ -2456,7 +2448,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 #endif
 			}
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
 			// Tera Term 本体のバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
@@ -2846,7 +2838,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			ts = (PTTSet)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFile);
 
 			SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
 			                   0, (LPARAM)"TCP/IP");
@@ -2996,7 +2988,7 @@ static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPA
 			Close = (PBOOL)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
 			SetWinList(GetParent(Dialog),Dialog,IDC_WINLISTLIST);
 
@@ -3228,10 +3220,4 @@ BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
 		                     MAKEINTRESOURCE(IDD_WINLISTDLG),
 		                     WndParent,
 							 WinListDlg, (LPARAM)Close);
-}
-
-BOOL WINAPI _TTDLGSetUILanguageFile(char *file)
-{
-	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
-	return TRUE;
 }

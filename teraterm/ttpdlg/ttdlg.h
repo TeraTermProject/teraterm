@@ -40,4 +40,4 @@ BOOL WINAPI _AboutDialog(HWND WndParent);
 BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts);
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts);
 BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close);
-BOOL WINAPI _TTDLGSetUILanguageFile(char *file);
+//BOOL WINAPI _TTDLGSetUILanguageFile(char *file);
