@@ -60,7 +60,7 @@ struct FontPPData {
 
 static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 {
-	*logfont = {};
+	memset(logfont, 0, sizeof(*logfont));
 	if (ts->DialogFontNameW == NULL || ts->DialogFontNameW[0] == 0) {
 		// フォントが設定されていなかったらOSのフォントを使用する
 		GetMessageboxFontW(logfont);
