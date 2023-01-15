@@ -86,8 +86,9 @@ void VTActivate()
  *    | +------------- displays TCP port number
  *    +--------------- displays speed of serial port
  */
-void ChangeTitle()
+void ChangeTitle(void)
 {
+#define HostNameMaxLength 1024	// ホスト名最大長  TODO 別の最大長基準 or 最大長制限をなくす
 	wchar_t TempTitle[HostNameMaxLength + TitleBuffSize * 2 + 1]; // バッファ拡張
 	wchar_t TempTitleWithRemote[TitleBuffSize * 2];
 

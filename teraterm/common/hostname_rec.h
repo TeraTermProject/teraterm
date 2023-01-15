@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006- TeraTerm Project
+ * (C) 2023- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,38 +26,32 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, variables, flags related to VT win and TEK win */
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* prototypes */
-void VTActivate();
-void ChangeTitle(void);
-void SwitchMenu();
-void SwitchTitleBar();
-HMODULE LoadHomeDLL(const wchar_t *DLLname);
+// コマンドライン最大長
+// (TGetHNRec.HostNameの確保済み文字長)
+//
+#define HostNameMaxLength 1024
+//#define HostNameMaxLength 80
 
-extern HWND HVTWin;
-extern HWND HTEKWin;
-extern int ActiveWin; /* IdVT, IdTEK */
-//extern int TalkStatus; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
-extern IdTalk TalkStatus;
-extern BOOL KeybEnabled; /* keyboard switch */
-extern BOOL Connecting;
-
-/* 'help' button on dialog box */
-extern WORD MsgDlgHelp;
-
-extern TTTSet ts;
-extern TComVar cv;
-
-/* pointers to window objects */
-extern void* pTEKWin;
-/* instance handle */
-extern HINSTANCE hInst;
-
-extern int SerialNo;
+/* GetHostName dialog record */
+typedef struct {
+	PCHAR SetupFN; // setup file name
+	const wchar_t *SetupFNW;
+	WORD PortType; // TCPIP/Serial
+	wchar_t *HostName; // host name
+	WORD Telnet; // non-zero: enable telnet
+	WORD TelPort; // default TCP port# for telnet
+	WORD TCPPort; // TCP port #
+	WORD ProtocolFamily; // Protocol Family (AF_INET/AF_INET6/AF_UNSPEC)
+	WORD ComPort; // serial port #
+	WORD MaxComPort; // max serial port #
+} TGetHNRec;
+typedef TGetHNRec *PGetHNRec;
 
 #ifdef __cplusplus
 }

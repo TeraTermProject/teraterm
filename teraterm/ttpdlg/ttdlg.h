@@ -28,6 +28,7 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
+#include "hostname_rec.h"
 
 BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts);
 BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts);

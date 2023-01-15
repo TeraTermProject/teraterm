@@ -28,6 +28,9 @@
  */
 
 /* TERATERM.EXE, TTDLG interface */
+
+#include "hostname_rec.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

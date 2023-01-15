@@ -74,8 +74,10 @@ typedef enum {
 #define IdCyan    6
 #define IdFore    7
 
+#if 0
 #define HostNameMaxLength 1024
 //#define HostNameMaxLength 80
+#endif
 #define ProtocolFamilyMaxLength 80
 
   /* internal WM_USER messages */
@@ -714,22 +716,6 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdFlowHard 2    // RTS/CTS(hardware flow)
 #define IdFlowNone 3
 #define IdFlowHardDsrDtr 4  // DSR/DTR(hardware flow)
-
-
-/* GetHostName dialog record */
-typedef struct {
-	PCHAR SetupFN; // setup file name
-	const wchar_t *SetupFNW;
-	WORD PortType; // TCPIP/Serial
-	wchar_t *HostName; // host name
-	WORD Telnet; // non-zero: enable telnet
-	WORD TelPort; // default TCP port# for telnet
-	WORD TCPPort; // TCP port #
-	WORD ProtocolFamily; // Protocol Family (AF_INET/AF_INET6/AF_UNSPEC)
-	WORD ComPort; // serial port #
-	WORD MaxComPort; // max serial port #
-} TGetHNRec;
-typedef TGetHNRec *PGetHNRec;
 
 /* Control Characters */
 

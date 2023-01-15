@@ -3509,6 +3509,7 @@ void CVTWindow::OnFileNewConnection()
 	}
 
 	wchar_t hostname[HostNameMaxLength];
+	hostname[0] = 0;
 	TGetHNRec GetHNRec; /* record for dialog box */
 	GetHNRec.SetupFN = ts.SetupFName;
 	GetHNRec.SetupFNW = ts.SetupFNameW;
