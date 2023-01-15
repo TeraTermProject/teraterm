@@ -40,6 +40,8 @@
 #include <crtdbg.h>
 #include <windows.h>
 
+#include "codeconv.h"
+
 #include "scp.h"
 
 typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
@@ -97,8 +99,14 @@ static BOOL ScpInit(void)
 
 /**
  *	ファイルを送信する
+ *	@param	local	ローカル(PC,Windows)上のファイル
+ *					フォルダは指定できない
+ *	@param	remote	リモート(sshサーバー)上のフォルダ (or ファイル名?)
+ *					L""でホームディレクトリ
+ *	@return TRUE	ok(リクエストできた)
+ *	@return FALSE	ng
  */
-BOOL ScpSend(const char *local, const char *remote)
+BOOL ScpSend(const wchar_t *local, const wchar_t *remote)
 {
 	if (start_scp == NULL) {
 		ScpInit();
@@ -106,7 +114,11 @@ BOOL ScpSend(const char *local, const char *remote)
 	if (start_scp == NULL) {
 		return FALSE;
 	}
-	BOOL r = (BOOL)start_scp((char*)local, (char*)remote);
+	char *localU8 = ToU8W(local);
+	char *remoteU8 = ToU8W(remote);
+	BOOL r = (BOOL)start_scp(localU8, remoteU8);
+	free(localU8);
+	free(remoteU8);
 	return r;
 }
 
@@ -130,7 +142,7 @@ BOOL ScpGetStatus(void)
 /**
  *	ファイルを受信する
  */
-BOOL ScpReceive(const char *remotefile, const char *localfile)
+BOOL ScpReceive(const wchar_t *remotefile, const wchar_t *localfile)
 {
 	if (receive_file == NULL) {
 		ScpInit();
@@ -138,7 +150,11 @@ BOOL ScpReceive(const char *remotefile, const char *localfile)
 	if (receive_file == NULL) {
 		return FALSE;
 	}
-	BOOL r = (BOOL)receive_file((char*)remotefile, (char*)localfile);
+	char *localU8 = ToU8W(localfile);
+	char *remoteU8 = ToU8W(remotefile);
+	BOOL r = (BOOL)receive_file(remoteU8, localU8);
+	free(localU8);
+	free(remoteU8);
 	return r;
 }
 

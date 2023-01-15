@@ -772,7 +772,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 
 	case CmdScpSend:  // add 'scpsend' (2008.1.1 yutaka)
 		{
-			if (ScpSend(ParamFileName, ParamSecondFileName) == FALSE) {
+			wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+			wchar_t *ParamSecondFileNameW = ToWcharU8(ParamSecondFileName);
+			BOOL r = ScpSend(ParamFileNameW, ParamSecondFileNameW);
+			free(ParamFileNameW);
+			free(ParamSecondFileNameW);
+			if (r == FALSE) {
 				const char *msg = "ttxssh.dll not support scp";
 				MessageBox(NULL, msg, "Tera Term: scprecv command error", MB_OK | MB_ICONERROR);
 				return DDE_FNOTPROCESSED;
@@ -782,7 +787,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 
 	case CmdScpRcv:
 		{
-			if (ScpReceive(ParamFileName, ParamSecondFileName) == FALSE) {
+			wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+			wchar_t *ParamSecondFileNameW = ToWcharU8(ParamSecondFileName);
+			BOOL r = ScpReceive(ParamFileNameW, ParamSecondFileNameW);
+			free(ParamFileNameW);
+			free(ParamSecondFileNameW);
+			if (r == FALSE) {
 				const char *msg = "ttxssh.dll not support scp";
 				MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
 				return DDE_FNOTPROCESSED;

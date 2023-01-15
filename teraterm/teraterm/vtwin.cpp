@@ -1528,29 +1528,6 @@ static wchar_t *GetPasteString(const wchar_t *str, bool escape)
 	return tmpbuf;
 }
 
-/* 入力はファイルのみ(フォルダは含まれない) */
-/**
- * SCPでファイルを送る
- * @param Filenames		ファイル名(複数)
- *						フォルダは送れない,ファイルのみ
- * @param FileCount		ファイル数(現在は1以外は使えない)
- * @param SendDir		送信フォルダ
- *
- */
-static bool SendScp(wchar_t *Filenames[], int FileCount, const char *SendDir)
-{
-	for (int i = 0; i < FileCount; i++) {
-		char *FileName = ToU8W(Filenames[i]);
-		BOOL r = ScpSend(FileName, ts.ScpSendDir);
-		free(FileName);
-		if (r == FALSE) {
-			::MessageBoxA(HVTWin, "scp send error", "Tera Term: error", MB_OK | MB_ICONERROR);
-			return false;
-		}
-	}
-	return true;
-}
-
 void CVTWindow::DropListFree()
 {
 	if (DropListCount > 0) {
@@ -1813,10 +1790,13 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 		case DROP_TYPE_SCP:
 		{
 			// send by scp
-			wchar_t **FileNames = &DropLists[i];
-			int FileCount = 1;
-			if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
+			const wchar_t *FileName = DropLists[i];
+			wchar_t *SendDirW = ToWcharA(ts.ScpSendDir);
+			BOOL r = ScpSend(FileName, SendDirW);
+			free(SendDirW);
+			if (!r) {
 				// 送信エラー
+				::MessageBoxA(HVTWin, "scp send error", "Tera Term: error", MB_OK | MB_ICONERROR);
 				goto finish;
 			}
 
