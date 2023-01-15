@@ -1,3 +1,5 @@
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
@@ -5,12 +7,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
 
 #include "inifile_com.h"
+#include "ttcommdlg.h"
+#include "codeconv.h"
 
 #include "gettimeofday.h"
 
@@ -470,22 +471,22 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 }
 
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
-	OPENFILENAME ofn;
-
 	switch (cmd) {
 	case ID_MENU_REPLAY:
 		if (!pvar->enable) {
+			TTOPENFILENAMEW ofn;
+			wchar_t *openfn;
+
 			memset(&ofn, 0, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = hWin;
-			ofn.lpstrFilter = "ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
-			ofn.lpstrFile = pvar->openfn;
-			ofn.nMaxFile = sizeof(pvar->openfn);
-			ofn.lpstrDefExt = "tty";
-			// ofn.lpstrTitle = "";
+			ofn.lpstrFilter = L"ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
+			ofn.lpstrDefExt = L"tty";
+			// ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_FILEMUSTEXIST;
 
-			if (GetOpenFileName(&ofn)) {
+			if (TTGetOpenFileNameW(&ofn, &openfn)) {
+				WideCharToACP_t(openfn, pvar->openfn, sizeof(pvar->openfn));
+				free(openfn);
 				pvar->ReplaceHostDlg = TRUE;
 				// Call New-Connection dialog
 				SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);

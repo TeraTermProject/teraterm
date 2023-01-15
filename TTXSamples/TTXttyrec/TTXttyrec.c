@@ -1,15 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
 #include "tt_res.h"
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-
 #include "inifile_com.h"
+#include "ttcommdlg.h"
 
 #include "gettimeofday.h"
 
@@ -53,7 +54,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   items = GetMenuItemCount(menu);
 
   for (i=0; i<items; i++) {
-    if (m = GetSubMenu(menu, i)) {
+	if ((m = GetSubMenu(menu, i))) {
       subitems = GetMenuItemCount(m);
       for (j=0; j<subitems; j++) {
         cur_id = GetMenuItemID(m, j);
@@ -192,12 +193,6 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 {
-	OPENFILENAME ofn;
-	char fname[MAX_PATH];
-	char buff[20];
-
-	fname[0] = '\0';
-
 	if (cmd==ID_MENUITEM) {
 		if (pvar->record) {
 			if (pvar->fh != INVALID_HANDLE_VALUE) {
@@ -208,25 +203,29 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
 		}
 		else {
+			TTOPENFILENAMEW ofn;
+			wchar_t *fname;
+
 			if (pvar->fh != INVALID_HANDLE_VALUE) {
 				CloseHandle(pvar->fh);
 			}
 
 			memset(&ofn, 0, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = hWin;
-			ofn.lpstrFilter = "ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
-			ofn.lpstrFile = fname;
-			ofn.nMaxFile = sizeof(fname);
-			ofn.lpstrDefExt = "tty";
-			// ofn.lpstrTitle = "";
+			ofn.lpstrFilter = L"ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
+			ofn.lpstrFile = NULL;
+			ofn.lpstrDefExt = L"tty";
+			ofn.lpstrInitialDir = pvar->ts->LogDirW;
+			//ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_OVERWRITEPROMPT;
-			if (GetSaveFileName(&ofn)) {
-				pvar->fh = CreateFile(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (TTGetSaveFileNameW(&ofn, &fname)) {
+				pvar->fh = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+				free(fname);
 				if (pvar->fh != INVALID_HANDLE_VALUE) {
 					pvar->record = TRUE;
 					CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
 					if (pvar->rec_stsize) {
+						char buff[20];
 						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
 									pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
 						WriteData(pvar->fh, buff, (int)strlen(buff));
