@@ -96,6 +96,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "comportinfo.h"
+#include "asprintf.h"
 
 #include "libputty.h"
 
@@ -777,26 +778,34 @@ void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 void logputs(int level, char *msg)
 {
 	if (level <= pvar->settings.LogLevel) {
+		char *buf;
+		char *strtime;
+		int len;
 		int file;
+		BOOL enable_log = TRUE;
+		BOOL enable_outputdebugstring = FALSE;
 
-		wchar_t *fname = get_log_dir_relative_nameW(L"TTSSH.LOG");
-		file = _wopen(fname, _O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
-		              _S_IREAD | _S_IWRITE);
-		free(fname);
+		strtime = mctimelocal("%Y-%m-%d %H:%M:%S.%NZ", TRUE);
+		len = asprintf(&buf, "%s [%lu] %s\n",
+					   strtime, GetCurrentProcessId(), msg);
 
-		if (file >= 0) {
-			char *strtime = mctimelocal("%Y-%m-%d %H:%M:%S.%NZ", TRUE);
-			DWORD processid;
-			char tmp[26];
+		if (enable_log) {
+			wchar_t *fname = get_log_dir_relative_nameW(L"TTSSH.LOG");
+			file = _wopen(fname, _O_RDWR | _O_APPEND | _O_CREAT | _O_TEXT,
+						  _S_IREAD | _S_IWRITE);
+			free(fname);
 
-			_write(file, strtime, strlen(strtime));
-			processid = GetCurrentProcessId();
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, " [%lu] ",processid);
-			_write(file, tmp, strlen(tmp));
-			_write(file, msg, strlen(msg));
-			_write(file, "\n", 1);
-			_close(file);
+			if (file >= 0) {
+				_write(file, buf, len - 1);	// len includes '\0'
+				_close(file);
+			}
 		}
+
+		if (enable_outputdebugstring) {
+			OutputDebugStringA(buf);
+		}
+
+		free(buf);
 	}
 }
 

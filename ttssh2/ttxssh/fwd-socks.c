@@ -101,7 +101,7 @@ void *SOCKS_init_filter(PTInstVar pvar, int channel_num, char *peer_name, int po
 	return closure;
 }
 
-void ClearRemoteConnectFlag(FWDDynamicFilterClosure *closure)
+static void ClearRemoteConnectFlag(FWDDynamicFilterClosure *closure)
 {
 	PTInstVar pvar = closure->pvar;
 	FWDChannel *c = pvar->fwd_state.channels + closure->channel_num;
@@ -122,6 +122,7 @@ static int send_socks_reply(FWDDynamicFilterClosure *closure, const char *data, 
 	FWDChannel *c = pvar->fwd_state.channels + closure->channel_num;
 
 	logprintf(LOG_LEVEL_VERBOSE, "%s: sending %d bytes.", __FUNCTION__, len);
+	//logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len, "%s: sending %d bytes.", __FUNCTION__, len);
 
 	return UTIL_sock_buffered_write(pvar, &c->writebuf, dummy_blocking_write, c->local_socket, data, len);
 }
@@ -198,7 +199,7 @@ struct socks4_header {
 	unsigned char addr[4];
 };
 
-int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char *buff, unsigned int bufflen)
+static int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char *buff, unsigned int bufflen)
 {
 	struct socks4_header s4hdr;
 	unsigned char addrbuff[NI_MAXHOST];
@@ -273,7 +274,7 @@ int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char *buff, 
 	return 1;
 }
 
-int parse_socks5_init_request(FWDDynamicFilterClosure *closure, unsigned char *buff, unsigned int bufflen)
+static int parse_socks5_init_request(FWDDynamicFilterClosure *closure, unsigned char *buff, unsigned int bufflen)
 {
 	unsigned int authmethod_count;
 	unsigned int i;
@@ -320,7 +321,7 @@ struct socks5_header {
 	unsigned char addr_len;
 };
 
-int parse_socks5_connect_request(FWDDynamicFilterClosure *closure, unsigned char *buff, unsigned int bufflen)
+static int parse_socks5_connect_request(FWDDynamicFilterClosure *closure, unsigned char *buff, unsigned int bufflen)
 {
 	struct socks5_header s5hdr;
 	unsigned char addr[NI_MAXHOST];
@@ -407,7 +408,7 @@ int parse_socks5_connect_request(FWDDynamicFilterClosure *closure, unsigned char
 	return 1;
 }
 
-FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, int *len, unsigned char **buf)
+static FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, int *len, unsigned char **buf)
 {
 	unsigned char *request = closure->request_buf;
 	unsigned int reqlen, newlen;

@@ -201,6 +201,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 {
 	int i, found;
 	Channel_t *c;
+	logprintf(LOG_LEVEL_VERBOSE, "%s: local_num %d", __FUNCTION__, local_num);
 
 	found = -1;
 	for (i = 0 ; i < CHANNEL_MAX ; i++) {
