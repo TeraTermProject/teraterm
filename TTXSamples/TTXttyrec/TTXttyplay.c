@@ -59,7 +59,7 @@ typedef struct {
 	BOOL open_error;
 	struct timeval last;
 	struct timeval wait;
-	char openfn[MAX_PATH];
+	wchar_t *openfnW;
 	char origTitle[TitleBuffSize];
 	char origOLDTitle[TitleBuffSize];
 } TInstVar;
@@ -450,7 +450,9 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0) {
 			pvar->enable = TRUE;
 			if (ts->PortType == IdFile && strlen(ts->HostName) > 0) {
-				strncpy_s(pvar->openfn, sizeof(pvar->openfn), ts->HostName, _TRUNCATE);
+				wchar_t *HostNameW = ToWcharA(ts->HostName);
+				free(pvar->openfnW);
+				pvar->openfnW = HostNameW;
 			}
 		}
 	}
@@ -485,8 +487,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			ofn.Flags = OFN_FILEMUSTEXIST;
 
 			if (TTGetOpenFileNameW(&ofn, &openfn)) {
-				WideCharToACP_t(openfn, pvar->openfn, sizeof(pvar->openfn));
-				free(openfn);
+				free(pvar->openfnW);
+				pvar->openfnW = openfn;
 				pvar->ReplaceHostDlg = TRUE;
 				// Call New-Connection dialog
 				SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
@@ -513,7 +515,7 @@ static BOOL PASCAL TTXSetupWin(HWND parent, PTTSet ts) {
 
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec GetHNRec) {
 	GetHNRec->PortType = IdTCPIP;
-	_snwprintf_s(GetHNRec->HostName, MAXPATHLEN, _TRUNCATE, L"/R=\"%hs\" /TP", pvar->openfn);
+	_snwprintf_s(GetHNRec->HostName, HostNameMaxLength, _TRUNCATE, L"/R=\"%s\" /TP", pvar->openfnW);
 	return (TRUE);
 }
 
@@ -578,6 +580,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */
+			free(pvar->openfnW);
+			pvar->openfnW = NULL;
 			break;
 	}
 	return TRUE;
