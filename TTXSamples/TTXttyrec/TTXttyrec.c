@@ -190,52 +190,53 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   }
 }
 
-static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
-  OPENFILENAME ofn;
-  char fname[MAX_PATH];
-  char buff[20];
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
+{
+	OPENFILENAME ofn;
+	char fname[MAX_PATH];
+	char buff[20];
 
-  fname[0] = '\0';
+	fname[0] = '\0';
 
-  if (cmd==ID_MENUITEM) {
-    if (pvar->record) {
-      if (pvar->fh != INVALID_HANDLE_VALUE) {
-	CloseHandle(pvar->fh);
-	pvar->fh = INVALID_HANDLE_VALUE;
-      }
-      pvar->record = FALSE;
-      CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
-    }
-    else {
-      if (pvar->fh != INVALID_HANDLE_VALUE) {
-	CloseHandle(pvar->fh);
-      }
+	if (cmd==ID_MENUITEM) {
+		if (pvar->record) {
+			if (pvar->fh != INVALID_HANDLE_VALUE) {
+				CloseHandle(pvar->fh);
+				pvar->fh = INVALID_HANDLE_VALUE;
+			}
+			pvar->record = FALSE;
+			CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
+		}
+		else {
+			if (pvar->fh != INVALID_HANDLE_VALUE) {
+				CloseHandle(pvar->fh);
+			}
 
-      memset(&ofn, 0, sizeof(ofn));
-      ofn.lStructSize = get_OPENFILENAME_SIZE();
-      ofn.hwndOwner = hWin;
-      ofn.lpstrFilter = "ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
-      ofn.lpstrFile = fname;
-      ofn.nMaxFile = sizeof(fname);
-      ofn.lpstrDefExt = "tty";
-      // ofn.lpstrTitle = "";
-      ofn.Flags = OFN_OVERWRITEPROMPT;
-      if (GetSaveFileName(&ofn)) {
-	pvar->fh = CreateFile(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (pvar->fh != INVALID_HANDLE_VALUE) {
-	  pvar->record = TRUE;
-	  CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
-	  if (pvar->rec_stsize) {
-	    _snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
-	                pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
-	    WriteData(pvar->fh, buff, (int)strlen(buff));
-	  }
+			memset(&ofn, 0, sizeof(ofn));
+			ofn.lStructSize = get_OPENFILENAME_SIZE();
+			ofn.hwndOwner = hWin;
+			ofn.lpstrFilter = "ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
+			ofn.lpstrFile = fname;
+			ofn.nMaxFile = sizeof(fname);
+			ofn.lpstrDefExt = "tty";
+			// ofn.lpstrTitle = "";
+			ofn.Flags = OFN_OVERWRITEPROMPT;
+			if (GetSaveFileName(&ofn)) {
+				pvar->fh = CreateFile(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+				if (pvar->fh != INVALID_HANDLE_VALUE) {
+					pvar->record = TRUE;
+					CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
+					if (pvar->rec_stsize) {
+						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
+									pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
+						WriteData(pvar->fh, buff, (int)strlen(buff));
+					}
+				}
+			}
+		}
+		return 1;
 	}
-      }
-    }
-    return 1;
-  }
-  return 0;
+	return 0;
 }
 
 static void PASCAL TTXEnd(void) {
