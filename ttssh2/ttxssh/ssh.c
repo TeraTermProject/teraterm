@@ -4179,11 +4179,30 @@ static int statU8(const char *filenameU8, struct __stat64 *st)
 	return r;
 }
 
-//
-// SCP support
-//
-// (2007.12.21 yutaka)
-//
+/**
+ *	ExtractFileName() UTF-8”Å
+ */
+static void ExtractFileNameU8(const char *PathName, char *FileName, size_t destlen)
+{
+	const char *sep = strrchr(PathName, '/');
+	if (sep == NULL) {
+		sep = strrchr(PathName, '\\');
+	}
+	if (sep != NULL) {
+		strncpy_s(FileName, destlen, sep + 1, _TRUNCATE);
+	}
+	else {
+		strncpy_s(FileName, destlen, PathName, _TRUNCATE);
+	}
+}
+
+/**
+ *	SCP support
+ *
+ *	@param sendfile		UTF-8
+ *	@param dstfile		UTF-8
+ *	@param direction
+ */
 int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_dir direction)
 {
 	buffer_t *msg;
@@ -4230,7 +4249,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		}
 
 		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), sendfile, _TRUNCATE);  // full path
-		ExtractFileName(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
+		ExtractFileNameU8(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
 		if (dstfile == NULL || dstfile[0] == '\0') { // remote file path
 			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);  // full path
 		} else {
