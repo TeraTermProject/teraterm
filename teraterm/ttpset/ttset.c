@@ -3833,8 +3833,10 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, NULL);
 			if (f != NULL) {
 				WideCharToACP_t(f, ts->HostName, _countof(ts->HostName));
-				if (strlen(ts->HostName) > 0)
+				if (strlen(ts->HostName) > 0) {
 					ParamPort = IdFile;
+				}
+				free(f);
 			}
 		}
 		else if (_wcsicmp(Temp, L"/T=0") == 0) {	/* telnet disable */
