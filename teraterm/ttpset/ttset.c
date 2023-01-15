@@ -3256,8 +3256,6 @@ void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const
 							const wchar_t *key, int MaxList)
 {
 	int i, j;
-	wchar_t EntName[10], EntName2[10];
-	wchar_t TempHost[HostNameMaxLength + 1];
 
 	if (_wcsicmp(IniSrc, IniDest) == 0)
 		return;
@@ -3266,17 +3264,26 @@ void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const
 
 	i = j = 1;
 	do {
-		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"%s%i", key, i);
-		_snwprintf_s(EntName2, _countof(EntName2), _TRUNCATE, L"%s%i", key, j);
+		wchar_t *TempHost;
+		wchar_t *EntName;
+		wchar_t *EntName2;
+
+		aswprintf(&EntName, L"%s%i", key, i);
+		aswprintf(&EntName2, L"%s%i", key, j);
 
 		/* Get one hostname from file IniSrc */
-		GetPrivateProfileStringW(section, EntName, L"",
-		                        TempHost, _countof(TempHost), IniSrc);
+		hGetPrivateProfileStringW(section, EntName, L"", IniSrc, &TempHost);
+
 		/* Copy it to the file IniDest */
-		if (TempHost[0] != 0) {
+		if (TempHost != NULL && TempHost[0] != 0) {
 			WritePrivateProfileStringW(section, EntName2, TempHost, IniDest);
 			j++;
 		}
+
+		free(EntName);
+		free(EntName2);
+		free(TempHost);
+
 		i++;
 	}
 	while (i <= MaxList);
@@ -3288,56 +3295,88 @@ void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const
 void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wchar_t *section,
 							const wchar_t *key, int MaxList)
 {
-	wchar_t *MemP;
-	wchar_t EntName[13];
-	int i, j, Len;
+	int ent_no;
+	int host_index;
 	BOOL Update;
+	wchar_t **hostnames;
 
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
-	MemP = malloc((HostNameMaxLength + 1) * sizeof(wchar_t) * MaxList);
-	if (MemP != NULL) {
-		wcsncpy_s(MemP, (HostNameMaxLength + 1) * MaxList, Host, _TRUNCATE);
-		j = wcslen(Host) + 1;
-		i = 1;
-		Update = TRUE;
-		do {
-			_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"%s%i", key, i);
 
-			/* Get a hostname */
-			GetPrivateProfileStringW(section, EntName, L"",
-									 &MemP[j], HostNameMaxLength + 1,
-									 FName);
-			Len = wcslen(&MemP[j]);
-			if (_wcsicmp(&MemP[j], Host) == 0) {
-				if (i == 1)
-					Update = FALSE;
-			}
-			else if (Len > 0) {
-				j = j + Len + 1;
-			}
-			i++;
-		} while ((i <= MaxList) && Update);
-
-		if (Update) {
-			WritePrivateProfileStringW(section, NULL, NULL, FName);
-
-			j = 0;
-			i = 1;
-			do {
-				_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"%s%i", key, i);
-
-				if (MemP[j] != 0)
-					WritePrivateProfileStringW(section, EntName, &MemP[j],
-											   FName);
-				j = j + wcslen(&MemP[j]) + 1;
-				i++;
-			} while ((i <= MaxList) && (MemP[j] != 0));
-			/* update file */
-			WritePrivateProfileStringW(NULL, NULL, NULL, FName);
-		}
-		free(MemP);
+	hostnames = (wchar_t **)calloc(sizeof(wchar_t), MaxList);
+	if (hostnames == NULL) {
+		return;
 	}
+
+	hostnames[0] = _wcsdup(Host);
+	ent_no = 1;
+	host_index = 1;
+	Update = TRUE;
+	do {
+		wchar_t *EntName;
+		wchar_t *hostname;
+
+		aswprintf(&EntName, L"%s%i", key, ent_no);
+		/* Get a hostname */
+		hGetPrivateProfileStringW(section, EntName, L"", FName, &hostname);
+		free(EntName);
+
+		if (hostname == NULL || hostname[0] == 0) {
+			// から
+			free(hostname);
+			break;
+		}
+		else if (_wcsicmp(hostname, Host) == 0) {
+			// 同じのがあるとリストに加えない
+			if (host_index == 1) {
+				// 先頭が同一だったら更新不要
+				Update = FALSE;
+			}
+			free(hostname);
+		}
+		else {
+			hostnames[host_index] = hostname;
+			host_index++;
+		}
+		ent_no++;
+	} while ((ent_no <= MaxList) && Update);
+
+	if (Update) {
+		// sectionを全部消す
+		WritePrivateProfileStringW(section, NULL, NULL, FName);
+
+		ent_no = 1;
+		host_index = 0;
+		do {
+			wchar_t *EntName;
+			wchar_t *hostname;
+
+			hostname = hostnames[host_index];
+			if (hostname == NULL) {
+				break;
+			}
+			aswprintf(&EntName, L"%s%i", key, ent_no);
+			WritePrivateProfileStringW(section, EntName, hostname, FName);
+			free(EntName);
+			host_index++;
+			ent_no++;
+		} while (ent_no <= MaxList);
+
+		/* update file */
+		WritePrivateProfileStringW(NULL, NULL, NULL, FName);
+	}
+
+	host_index = 0;
+	do {
+		wchar_t *hostname = hostnames[host_index];
+		if (hostname == NULL) {
+			break;
+		}
+		free(hostname);
+		hostnames[host_index] = NULL;
+		host_index++;
+	} while (host_index < MaxList);
+	free(hostnames);
 }
 
  /* copy hostlist from source IniFile to dest IniFile */
