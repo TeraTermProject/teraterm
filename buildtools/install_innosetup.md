@@ -4,7 +4,7 @@
 
 - `cmake -P innosetup.cmake` で innosetup を buildtools/ に展開します
 
-## Inno Setup をインストールせずに使用
+## Inno Setup
 
 - 'cmake -P innosetup.cmake' で innosetup を使えるよう準備する
 - innosetupインストーラーから innosetup6/ を作成する
