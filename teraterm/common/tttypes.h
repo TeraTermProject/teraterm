@@ -74,12 +74,6 @@ typedef enum {
 #define IdCyan    6
 #define IdFore    7
 
-#if 0
-#define HostNameMaxLength 1024
-//#define HostNameMaxLength 80
-#endif
-#define ProtocolFamilyMaxLength 80
-
   /* internal WM_USER messages */
 #define WM_USER_ACCELCOMMAND WM_USER+1
 #define WM_USER_CHANGEMENU   WM_USER+2

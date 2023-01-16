@@ -1060,8 +1060,6 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_ADDSTRING,
 			                   0, (LPARAM) ProtocolFamilyList[i]);
 		}
-		SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, EM_LIMITTEXT,
-		                   ProtocolFamilyMaxLength - 1, 0);
 		SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_SETCURSEL, 0, 0);
 
 		/////// SSH version
