@@ -1,6 +1,12 @@
 ﻿# install cygwin in this folder
 #  cmake -P install_cygwin.cmake
+#  cmake -DREMOVE_TMP=ON -P install_cygwin.cmake
 set(CYGWIN_ROOT "${CMAKE_CURRENT_LIST_DIR}/cygwin64")
+if(DEFINED ENV{REMOVE_TMP})
+  set(REMOVE_TMP ON)
+else()
+  option(REMOVE_TMP "" OFF)
+endif()
 
 # cygroot
 if(EXISTS "${CYGWIN_ROOT}")
@@ -32,6 +38,12 @@ execute_process(
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 
+# remove archives
+if(REMOVE_TMP)
+  file(GLOB ARC_FILES "${PACKAGE}/http*")
+  file(REMOVE_RECURSE ${ARC_FILES})
+endif()
+
 ##############################
 # cygwin 32bit from time machine
 #  http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html
@@ -62,3 +74,9 @@ execute_process(
   COMMAND ${SETUP} -X --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages cygwin32-gcc-g++
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
+
+# remove archives
+if(REMOVE_TMP)
+  file(GLOB ARC_FILES "${PACKAGE}/http*")
+  file(REMOVE_RECURSE ${ARC_FILES})
+endif()

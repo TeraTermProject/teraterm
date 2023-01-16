@@ -1,4 +1,9 @@
 ﻿# cmake -P innosetup.cmake
+if(DEFINED ENV{REMOVE_TMP})
+  set(REMOVE_TMP ON)
+else()
+  option(REMOVE_TMP "" OFF)
+endif()
 
 # check innosetup
 #   6.2.1
@@ -34,7 +39,10 @@ file(MAKE_DIRECTORY "unrar")
 execute_process(
   COMMAND ../download/unrar/${UNRAR_ZIP} /s
   WORKING_DIRECTORY "unrar"
-  )
+)
+if(REMOVE_TMP)
+  file(REMOVE_RECURSE "download/unrar")
+endif()
 
 # innounp
 set(INNOUNP_RAR "innounp050.rar")
@@ -55,6 +63,9 @@ execute_process(
   COMMAND ../unrar/UnRAR.exe x ../download/innounp/${INNOUNP_RAR}
   WORKING_DIRECTORY "innounp"
   )
+if(REMOVE_TMP)
+  file(REMOVE_RECURSE "download/innounp")
+endif()
 
 # innosetup 6
 set(INNOSETUP_EXE "innosetup-6.2.1.exe")
@@ -76,3 +87,6 @@ execute_process(
   )
 file(RENAME "innosetup6/{app}" innosetup6/bin)
 file(RENAME "innosetup6/{tmp}" innosetup6/tmp)
+if(REMOVE_TMP)
+  file(REMOVE_RECURSE "download/innosetup6")
+endif()
