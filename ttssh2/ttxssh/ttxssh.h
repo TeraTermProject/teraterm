@@ -211,6 +211,11 @@ typedef struct _TS_SSH {
 
 	BOOL KexKeyLogging;
 	wchar_t KexKeyLogFile[1024];
+
+	// Sign algorithm order
+	//   for publickey authentication (not for server hostkey)
+	//   for RSA key only
+	char RSAPubkeySignAlgorithmOrder[RSA_PUBKEY_SIGN_ALGO_MAX+1];
 } TS_SSH;
 
 typedef struct _TInstVar {

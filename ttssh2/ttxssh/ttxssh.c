@@ -286,6 +286,9 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 	// Compression algorithm order
 	READ_STD_STRING_OPTION(CompOrder);
 	normalize_comp_order(settings->CompOrder);
+	// Sign algorithm order of RSA publickey authentication
+	READ_STD_STRING_OPTION(RSAPubkeySignAlgorithmOrder);
+	normalize_rsa_pubkey_sign_algo_order(settings->RSAPubkeySignAlgorithmOrder);
 
 	read_string_option(fileName, "KnownHostsFiles", "ssh_known_hosts",
 	                   settings->KnownHostsFiles,
@@ -431,6 +434,9 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 
 	WritePrivateProfileString("TTSSH", "CompOrder",
 	                          settings->CompOrder, fileName);
+
+	WritePrivateProfileString("TTSSH", "RSAPubkeySignAlgorithmOrder",
+	                          settings->RSAPubkeySignAlgorithmOrder, fileName);
 
 	WritePrivateProfileString("TTSSH", "KnownHostsFiles",
 	                          settings->KnownHostsFiles, fileName);

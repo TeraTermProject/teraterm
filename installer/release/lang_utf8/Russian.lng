@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-12-01)
+﻿; Updated by TeraTerm Project (2023-01-18)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -623,7 +623,9 @@ DLG_ABOUT_COMP_INFO=уровень %d; отношение %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=уровень %d
 DLG_ABOUT_COMP_NONE=нет
 DLG_ABOUT_COMP_UPDOWN=Направление вверх %s; вниз %s
-DLG_ABOUT_AUTH_INFO=Пользователь '%s', использовано %s
+DLG_ABOUT_AUTH_INFO=Пользователь '%s', %s authentication
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=Отпечаток ключа хоста:
 
 ; dlg auth

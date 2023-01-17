@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-12-01)
+﻿; Updated by TeraTerm Project (2023-01-18)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -622,7 +622,9 @@ DLG_ABOUT_COMP_INFO=level %d; ratio %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=level %d
 DLG_ABOUT_COMP_NONE=none
 DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
-DLG_ABOUT_AUTH_INFO=User '%s', using %s
+DLG_ABOUT_AUTH_INFO=User '%s', %s authentication
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth

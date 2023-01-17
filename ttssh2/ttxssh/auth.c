@@ -1721,21 +1721,24 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 		strncpy_s(dest, len, "None", _TRUNCATE);
 	} else if (pvar->auth_state.cur_cred.method != SSH_AUTH_NONE) {
 		if (SSHv1(pvar)) {
-			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->auth_state.user,
 			            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
 			if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, ", %s key");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 				            "RSA");
 				strncat_s(dest, len, buf, _TRUNCATE);
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, ", %s key");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 				            "RSA");
+				strncat_s(dest, len, buf, _TRUNCATE);
+
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, " (from Pageant)");
 				strncat_s(dest, len, buf, _TRUNCATE);
 			}
 		} else {
@@ -1749,37 +1752,69 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				} else {
 					method = get_auth_method_name(pvar->auth_state.cur_cred.method);
 				}
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
 				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->auth_state.user, method);
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+				ssh_keyalgo pubkey_algo;
+				char *digest_name;
+
 				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
 				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->auth_state.user,
 				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
-				            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type));
-				strncat_s(dest, len, buf, _TRUNCATE);
+				pubkey_algo = choose_SSH2_keysign_algorithm(pvar, pvar->auth_state.cur_cred.key_pair->type);
+				digest_name = get_ssh2_hostkey_algorithm_digest_name(pubkey_algo);
+				if (strlen(digest_name) == 0) {
+					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, ", %s key");
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type));
+					strncat_s(dest, len, buf, _TRUNCATE);
+				}
+				else {
+					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, ", %s key with %s");
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type),
+					            digest_name);
+					strncat_s(dest, len, buf, _TRUNCATE);
+				}
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 				int key_len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);
 				char *s = (char *)malloc(key_len+1);
+				ssh_keytype keytype;
+				ssh_keyalgo pubkey_algo;
+				char *digest_name;
 
 				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
 				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->auth_state.user,
 				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
 				memcpy(s, pvar->pageant_curkey+4+4, key_len);
 				s[key_len] = '\0';
-				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
-				            ssh_key_type(get_hostkey_type_from_name(s)));
+				keytype = get_hostkey_type_from_name(s);
+				pubkey_algo = choose_SSH2_keysign_algorithm(pvar, keytype);
+				digest_name = get_ssh2_hostkey_algorithm_digest_name(pubkey_algo);
+				if (strlen(digest_name) == 0) {
+					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, ", %s key");
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					            ssh_key_type(get_hostkey_type_from_name(s)));
+					strncat_s(dest, len, buf, _TRUNCATE);
+				}
+				else {
+					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, ", %s key with %s");
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					            ssh_key_type(get_hostkey_type_from_name(s)),
+					            digest_name);
+					strncat_s(dest, len, buf, _TRUNCATE);
+				}
+
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, " (from Pageant)");
 				strncat_s(dest, len, buf, _TRUNCATE);
 
 				free(s);

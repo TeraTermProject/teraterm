@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2022-12-01)
+﻿; Updated by TeraTerm Project (2023-01-18)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -624,6 +624,8 @@ DLG_ABOUT_COMP_INFO2=等級 %d
 DLG_ABOUT_COMP_NONE=無
 DLG_ABOUT_COMP_UPDOWN=上傳 %s; 下載 %s
 DLG_ABOUT_AUTH_INFO=用戶 '%s'，%s認證
+DLG_ABOUT_AUTH_INFO2=, %s key
+DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth

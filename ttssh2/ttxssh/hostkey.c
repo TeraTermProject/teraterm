@@ -264,10 +264,43 @@ void SSH2_update_host_key_myproposal(PTInstVar pvar)
 	myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = buf; 
 }
 
-ssh_keyalgo choose_SSH2_keysign_algorithm(char *server_proposal, ssh_keytype keytype)
+static void SSH2_rsa_pubkey_sign_algo_myproposal(PTInstVar pvar, char *buf, int buf_len)
+{
+	int algo;
+	int len, i;
+	char *c_str;
+
+	// 設定された優先順位に応じて buf に並べる
+	buf[0] = '\0';
+	for (i = 0 ; pvar->settings.RSAPubkeySignAlgorithmOrder[i] != 0 ; i++) {
+		algo = pvar->settings.RSAPubkeySignAlgorithmOrder[i] - '0';
+		if (algo == 0) // disabled line
+			break;
+		switch (algo) {
+			case RSA_PUBKEY_SIGN_ALGO_RSA:
+				c_str = "ssh-rsa,";
+				break;
+			case RSA_PUBKEY_SIGN_ALGO_RSASHA256:
+				c_str = "rsa-sha2-256,";
+				break;
+			case RSA_PUBKEY_SIGN_ALGO_RSASHA512:
+				c_str = "rsa-sha2-512,";
+				break;
+			default:
+				continue;
+		}
+		strncat_s(buf, buf_len, c_str, _TRUNCATE);
+	}
+	len = strlen(buf);
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
+}
+
+ssh_keyalgo choose_SSH2_keysign_algorithm(PTInstVar pvar, ssh_keytype keytype)
 {
 	char buff[128];
 	const struct ssh2_host_key_t *ptr = ssh2_host_key;
+	char *server_proposal = pvar->server_sig_algs;
 
 	if (keytype == KEY_RSA) {
 		if (server_proposal == NULL) {
@@ -275,7 +308,9 @@ ssh_keyalgo choose_SSH2_keysign_algorithm(char *server_proposal, ssh_keytype key
 			return KEY_ALGO_RSA;
 		}
 		else {
-			choose_SSH2_proposal(server_proposal, "rsa-sha2-512,rsa-sha2-256,ssh-rsa", buff, sizeof(buff));
+			char rsa_myproposal[128];
+			SSH2_rsa_pubkey_sign_algo_myproposal(pvar, rsa_myproposal, sizeof(rsa_myproposal));
+			choose_SSH2_proposal(server_proposal, rsa_myproposal, buff, sizeof(buff));
 			if (strlen(buff) == 0) {
 				// not found.
 				logprintf(LOG_LEVEL_WARNING, "%s: no match sign algorithm.", __FUNCTION__);
@@ -297,4 +332,32 @@ ssh_keyalgo choose_SSH2_keysign_algorithm(char *server_proposal, ssh_keytype key
 
 	// not reached
 	return KEY_ALGO_UNSPEC;
+}
+
+void normalize_rsa_pubkey_sign_algo_order(char *buf)
+{
+	static char default_strings[] = {
+		RSA_PUBKEY_SIGN_ALGO_RSASHA512,
+		RSA_PUBKEY_SIGN_ALGO_RSASHA256,
+		RSA_PUBKEY_SIGN_ALGO_RSA,
+		RSA_PUBKEY_SIGN_ALGO_NONE,
+	};
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
+}
+
+/*
+ * ssh_keyalgo から、鍵に対して標準ではないダイジェスト方式名を返す
+ *   今のところ rsa-sha2-256, rsa-sha2-512 のときだけ "SHA-256", "SHA-512" を返す
+ *   About ダイアログで、非標準のダイジェスト方式のときだけ表示するため
+ */
+char* get_ssh2_hostkey_algorithm_digest_name(ssh_keyalgo algo)
+{
+	switch (algo) {
+		case KEY_ALGO_RSASHA256:
+			return "SHA-256";
+		case KEY_ALGO_RSASHA512:
+			return "SHA-512";
+	}
+	return "";
 }

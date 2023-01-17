@@ -93,6 +93,14 @@ typedef enum {
 	SSH_DIGEST_MAX,
 } digest_algorithm;
 
+typedef enum {
+	RSA_PUBKEY_SIGN_ALGO_NONE,
+	RSA_PUBKEY_SIGN_ALGO_RSA,
+	RSA_PUBKEY_SIGN_ALGO_RSASHA256,
+	RSA_PUBKEY_SIGN_ALGO_RSASHA512,
+	RSA_PUBKEY_SIGN_ALGO_MAX,
+} ssh_rsapubkeysignalgo;
+
 
 ssh_keytype get_hostkey_type_from_name(char *name);
 char* get_ssh2_hostkey_type_name(ssh_keytype type);
@@ -106,8 +114,10 @@ const char* get_ssh2_hostkey_type_name_from_algorithm(ssh_keyalgo algo);
 char* get_digest_algorithm_name(digest_algorithm id);
 
 void normalize_host_key_order(char *buf);
+void normalize_rsa_pubkey_sign_algo_order(char *buf);
 ssh_keyalgo choose_SSH2_host_key_algorithm(char *server_proposal, char *my_proposal);
-ssh_keyalgo choose_SSH2_keysign_algorithm(char *server_proposal, ssh_keytype keytype);
+ssh_keyalgo choose_SSH2_keysign_algorithm(PTInstVar pvar, ssh_keytype keytype);
 void SSH2_update_host_key_myproposal(PTInstVar pvar);
+char* get_ssh2_hostkey_algorithm_digest_name(ssh_keyalgo algo);
 
 #endif /* SSHCMAC_H */
