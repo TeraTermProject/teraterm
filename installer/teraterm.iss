@@ -728,8 +728,22 @@ begin
 
         if not WizardIsTaskSelected('telnetassoc') then
         begin;
+          // デフォルトで telnet プロトコルに関連付けがある Windows バージョンがあるため、Tera Term への関連付けだけを削除する
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
           RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
+        end;
+
+        if not WizardIsTaskSelected('sshassoc') then
+        begin;
+          // デフォルトの関連付けがないので、プロトコルごと削除
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\ssh');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\slogin');
+        end;
+
+        if not WizardIsTaskSelected('ttyplayassoc') then
+        begin;
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
         end;
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
