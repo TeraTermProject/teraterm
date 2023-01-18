@@ -180,6 +180,12 @@ Name: {userstartup}\Collector; Filename: {app}\collector\collector.exe; WorkingD
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
 [Registry]
+; Windows 9x, NT 4.0
+;   HKCU\Software\Classes\Folder 以下に書き込んでも関連付かない
+;   HKCR に書き込む
+; 開いたフォルダのコンテキストメニュー
+;   Windows Vista 以降で動作する
+
 ; Cygterm Here
 Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
 Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%L\"""""; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
@@ -815,6 +821,7 @@ begin
             Cygterm := ExpandConstant('{app}') + '\cygterm.exe';
             if not FileExists(Cygterm) then
             begin;
+                // インストール先に cygterm.exe がない場合は、cygwin1.dll と同じアーキテクチャのファイルをコピーする
                 CygDir := GetIniString('Tera Term', 'CygwinDirectory', 'C:\cygwin', iniFile);
                 SetLength(CygPath, 256);
                 Res := FindCygwinPath(CygDir, CygPath, 256);
@@ -828,6 +835,7 @@ begin
                         FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, True);
                 end;
             end else begin
+                // インストール先に cygterm.exe がある場合は、同じアーキテクチャのファイルをコピーする
                 Machine := PortableExecutableMachine(Cygterm);
                 if Machine = IMAGE_FILE_MACHINE_AMD64 then
                     FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, False)
@@ -932,6 +940,8 @@ begin
 end;
 
 [InstallDelete]
+; インストーラに含めたことがあり、のちに含めなくなったファイルを指定する。
+; 新しいインストーラで上書きインストールしたあとのアンインストーラでは削除されないため。
 Name: {app}\OpenSSH-LICENCE.txt; Type: files
 Name: {app}\cygterm-README.txt; Type: files
 Name: {app}\cygterm-README-j.txt; Type: files
@@ -961,4 +971,6 @@ Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
 Name: {app}\ttpdlg.dll; Type: files
 
 [UninstallDelete]
+; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を
+; スクリプトでコピーしたもので、自動でアンインストールされないため。
 Name: {app}\cygterm.exe; Type: files
