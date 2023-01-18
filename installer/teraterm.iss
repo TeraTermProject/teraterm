@@ -866,10 +866,28 @@ begin
 
         if not IsTaskSelected('telnetassoc') then
         begin;
+          // デフォルトで telnet プロトコルに関連付けがある Windows バージョンがあるため、Tera Term への関連付けだけを削除する
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
           RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
           RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'telnet\shell\Open with Tera Term');
           RegDeleteValue(HKEY_CLASSES_ROOT, 'telnet\shell', '');
+        end;
+
+        if not IsTaskSelected('sshassoc') then
+        begin;
+          // デフォルトの関連付けがないので、プロトコルごと削除
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\ssh');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\slogin');
+          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'ssh');
+          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'slogin');
+        end;
+
+        if not IsTaskSelected('ttyplayassoc') then
+        begin;
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
+          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, '.tty');
+          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'TTYRecordFile');
         end;
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
