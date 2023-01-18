@@ -51,28 +51,35 @@ install(
 
 # Inno Setup
 #  Create setup.exe
-find_program(
-  ISCC ISCC.exe
-  HINTS "${CMAKE_SOURCE_DIR}/buildtools/innosetup6/bin"
-  HINTS "C:/Program Files (x86)/Inno Setup 6/"
-  HINTS "C:/Program Files (x86)/Inno Setup 5/"
-  HINTS "C:/Program Files/Inno Setup 6/"
-  HINTS "C:/Program Files/Inno Setup 5/"
-  HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 6"
-  HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 5"
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+  find_program(
+    ISCC ISCC.exe
+    HINTS "${CMAKE_SOURCE_DIR}/buildtools/innosetup6/bin"
+    HINTS "C:/Program Files (x86)/Inno Setup 6/"
+    HINTS "C:/Program Files (x86)/Inno Setup 5/"
+    HINTS "C:/Program Files/Inno Setup 6/"
+    HINTS "C:/Program Files/Inno Setup 5/"
+    HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 6"
+    HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 5"
   )
-message("ISCC=${ISCC}")
+  message("ISCC=${ISCC}")
+endif()
 
-if(NOT TARGET ttxssh)
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
   add_custom_target(
     inno_setup
-    COMMAND "${CMAKE_COMMAND}" -E echo "ttxssh was not build"
-    )
+    COMMAND "${CMAKE_COMMAND}" -E echo "inno setup do not run"
+  )
 elseif("${ISCC}" STREQUAL "ISCC-NOTFOUND")
   add_custom_target(
     inno_setup
     COMMAND "${CMAKE_COMMAND}" -E echo "inno setup not found"
-    )
+  )
+elseif(NOT TARGET ttxssh)
+  add_custom_target(
+    inno_setup
+    COMMAND "${CMAKE_COMMAND}" -E echo "ttxssh was not build"
+  )
 else()
   configure_file(
     teraterm_cmake.iss.in teraterm_cmake.iss
