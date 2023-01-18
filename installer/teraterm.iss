@@ -653,8 +653,12 @@ begin
 
   if IsComponentSelected('TTSSH') then
     begin
+      // これまでの TERATERM.INI のデフォルト値と同じ値なら、最新のデフォルト値で上書きする
+      // 新しく追加した方式が disable line より後ろに行ってしまう現象への対処
       CipherOrder := GetIniString('TTSSH', 'CipherOrder', '', iniFile);
-      if (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;A@?EB3062') = 0) or
+      if (CompareStr(CipherOrder, 'MLK>H:J=G9I<F8C7D;EB30A@?62') = 0) or
+         (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;EB30A@?62') = 0) or
+         (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;A@?EB3062') = 0) or
          (CompareStr(CipherOrder, '>:=9<8C7D;A@?EB3062') = 0) or
          (CompareStr(CipherOrder, '>:=9<87;A@?B3026') = 0) or
          (CompareStr(CipherOrder, '>:=9<87;A@?3026') = 0) or
@@ -663,7 +667,7 @@ begin
          (CompareStr(CipherOrder, '87;9:<=>3026') = 0) or
          (CompareStr(CipherOrder, '87;9:3026') = 0) or
          (CompareStr(CipherOrder, '873026') = 0) then
-        SetIniString('TTSSH', 'CipherOrder', 'K>H:J=G9I<F8C7D;EB30A@?62', iniFile)
+        SetIniString('TTSSH', 'CipherOrder', 'MKN>H:J=G9LI<F8C7D;EB30A@?62', iniFile)
     end;
 
 end;
