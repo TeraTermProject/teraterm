@@ -1862,12 +1862,12 @@ void ReadCygtermConfFile(const char *homedir, cygterm_t *psettings)
 
 	// try to read CygTerm config file
 	memset(&settings, 0, sizeof(settings));
-	_snprintf_s(settings.term, sizeof(settings.term), _TRUNCATE, "ttermpro.exe %%s %%d /E /KR=SJIS /KT=SJIS /VTICON=CygTerm /nossh");
+	_snprintf_s(settings.term, sizeof(settings.term), _TRUNCATE, "ttermpro.exe %%s %%d /E /KR=UTF8 /KT=UTF8 /VTICON=CygTerm /nossh");
 	_snprintf_s(settings.term_type, sizeof(settings.term_type), _TRUNCATE, "vt100");
 	_snprintf_s(settings.port_start, sizeof(settings.port_start), _TRUNCATE, "20000");
 	_snprintf_s(settings.port_range, sizeof(settings.port_range), _TRUNCATE, "40");
 	_snprintf_s(settings.shell, sizeof(settings.shell), _TRUNCATE, "auto");
-	_snprintf_s(settings.env1, sizeof(settings.env1), _TRUNCATE, "MAKE_MODE=unix");
+	_snprintf_s(settings.env1, sizeof(settings.env1), _TRUNCATE, "");
 	_snprintf_s(settings.env2, sizeof(settings.env2), _TRUNCATE, "");
 	settings.login_shell = FALSE;
 	settings.home_chdir = FALSE;
