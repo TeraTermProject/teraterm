@@ -681,7 +681,7 @@ begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
 
-        if IsComponentSelected('cygterm') then
+        if WizardIsComponentSelected('cygterm') then
         begin;
             Cygterm := ExpandConstant('{app}') + '\cygterm.exe';
             if not FileExists(Cygterm) then
