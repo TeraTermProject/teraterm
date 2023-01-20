@@ -18,7 +18,7 @@ Cygwin is open source software.
 </p>
 
 <p>
-[NOTE] Cygwin 1.5.x doesn't seem support Windows 7. Please use Cygwin 1.7.x on Windows 7 or later.
+[NOTE] Cygwin 1.5.x doesn't seem support Windows 7. Please use Cygwin 1.7.x or later on Windows 7 or later.
 </p>
 
 
@@ -80,22 +80,24 @@ CygwinDirectory = c:\cygwin
 ----------------------------
 </pre>
 
-<h3>64bit Cygwin</h3>
+<h3>32bit Cygwin and 64bit Cygwin</h3>
 
 <p>
-A user needs an execution file by 
-Tera Term needs the cygterm+ program built on the 64bit Cygwin environment to connect 64bit Cygwin.
+A user needs an execution file by Tera Term needs the CygTerm+ program built
+on the 32bit Cygwin environment to connect 32bit Cygwin.
+And a user needs an execution file by Tera Term needs the CygTerm+ program
+built on the 64bit Cygwin environment to connect 64bit Cygwin.<br>
 Basically, Tera Term installation program will recognize the installed Cygwin version and copy an 
-appropriate cygterm+ program.<br>
+appropriate CygTerm+ program.<br>
 If the Tera Term installer makes an error in determination, please overwrite the cygterm.exe in the 
 cygterm+-x86_64 directory to the Tera Term installation directory. Moreover, please rebuild the 
 Cygterm+ source code.
 </p>
 
-<h3>Build Cygterm+</h3>
+<h3>Build CygTerm+</h3>
 
 <p>
-When the cygterm.exe program can not work well, please rebuild the Cygterm+ source code.<br>
+When the cygterm.exe program can not work well, please rebuild the CygTerm+ source code.<br>
 Latest source code is included as cygterm+.tar.gz.
 </p>
 
@@ -103,15 +105,18 @@ Latest source code is included as cygterm+.tar.gz.
   <caption>Packages that will need to be built</caption>
   <tr>
     <th>32bit Cygwin</th>
+    <th>Build 64bit Cygwin binary<br />on 32bit Cygwin</th>
     <th>64bit Cygwin</th>
+    <th>Build 32bit Cygwin binary<br />on 64bit Cygwin</th>
   </tr>
   <tr>
-    <td>Devel/gcc-g++<br>
-        Devel/make<br>
-        Devel/mingw-gcc-core</td>
-    <td>Devel/gcc-g++<br>
-        Devel/make<br>
-        Devel/mingw64-x86_64-gcc-core</td>
+    <td colspan="4">Devel/make</td>
+  </tr>
+  <tr>
+    <td>Devel/gcc-g++</td>
+    <td>Devel/cygwin64-gcc-g++</td>
+    <td>Devel/gcc-g++</td>
+    <td>Devel/cygwin32-gcc-g++</td>
   </tr>
 </table>
 

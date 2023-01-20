@@ -18,7 +18,7 @@ Cygwin は、オープンソースソフトウェアです。
 </p>
 
 <p>
-※注意：Cygwin 1.5.x は Windows 7 をサポートしていないようです。Windows 7 以降では Cygwin 1.7.x を利用してください。
+※注意：Cygwin 1.5.x は Windows 7 をサポートしていないようです。Windows 7 以降では Cygwin 1.7.x 以降を利用してください。
 </p>
 
 
@@ -79,17 +79,18 @@ CygwinDirectory = c:\cygwin
 ----------------------------
 </pre>
 
-<h3>64bit Cygwin</h3>
+<h3>32bit Cygwin と 64bit Cygwin</h3>
 
 <p>
-64bit Cygwin に接続するには 64 bit Cygwin環境 でビルドされた cygterm+ プログラムが必要です。通常はTera Termのインストーラが、インストールされているCygwinのバージョンを判定して適切な実行ファイルをコピーします。<br>
-インストーラの判定が正しく動作していない場合は、手動で cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term のインストールフォルダに上書きするか、自分でCygterm+をビルドし直してください。
+32bit Cygwin に接続するには 32 bit Cygwin環境 でビルドされた CygTerm+ プログラムが必要で、64bit Cygwin に接続するには 64 bit Cygwin環境 でビルドされた CygTerm+ プログラムが必要です。<br />
+通常はTera Termのインストーラが、インストールされているCygwinのバージョンを判定して適切な実行ファイルをコピーします。<br>
+インストーラの判定が正しく動作していない場合は、手動で cygterm+-i686 か cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term のインストールフォルダに上書きするか、自分でCygterm+をビルドし直してください。
 </p>
 
-<h3>Cygterm+をビルドする</h3>
+<h3>CygTerm+をビルドする</h3>
 
 <p>
-Tera Term に同梱されている実行ファイルに問題があってうまく起動しない場合は、Cygterm+ をビルドし直してください。<br>
+Tera Term に同梱されている実行ファイルに問題があってうまく起動しない場合は、CygTerm+ をビルドし直してください。<br>
 最新のソースコードは cygterm+.tar.gz として同梱されています。
 </p>
 
@@ -97,15 +98,18 @@ Tera Term に同梱されている実行ファイルに問題があってうまく起動しない場合は、Cygt
   <caption>ビルドに必要なパッケージ</caption>
   <tr>
     <th>32bit Cygwin</th>
+    <th>Build 64bit Cygwin binary<br />on 32bit Cygwin</th>
     <th>64bit Cygwin</th>
+    <th>Build 32bit Cygwin binary<br />on 64bit Cygwin</th>
   </tr>
   <tr>
-    <td>Devel/gcc-g++<br>
-        Devel/make<br>
-        Devel/mingw-gcc-core</td>
-    <td>Devel/gcc-g++<br>
-        Devel/make<br>
-        Devel/mingw64-x86_64-gcc-core</td>
+    <td colspan="4">Devel/make</td>
+  </tr>
+  <tr>
+    <td>Devel/gcc-g++</td>
+    <td>Devel/cygwin64-gcc-g++</td>
+    <td>Devel/gcc-g++</td>
+    <td>Devel/cygwin32-gcc-g++</td>
   </tr>
 </table>
 

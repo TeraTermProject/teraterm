@@ -1,21 +1,22 @@
 ﻿# cygtermのビルドについて
 
-- リリース時に64bitと32bit両方をビルドしたい
+- リリース時には 64bit バイナリと 32bit バイナリの両方をビルドしたい
 - 64bit Cygwinを使いたい
   - 近い将来 32bit Cygwinがなくなる
 
 ## 準備
 
-64bit Cygwinの32bit Cygwinクロスコンパイルを利用する
-(32bit Cygwinの64bit Cygwinクロスコンパイルも利用できる)
+64bit Cygwin では 32bit Cygwin クロスコンパイラを利用できるようにする
+32bit Cygwin では 64bit Cygwin クロスコンパイラを利用できるようにする
+リリースでは 64bit Cygwin を使用する
 
 - 64bit Cygwin時(将来はこれだけになる)
 - 次のパッケージをインストール
   - gcc-core
   - gcc-g++
   - make
-  - cygwin32-gcc-core
-  - cygwin32-gcc-g++
+  - cygwin32-gcc-core (32bit Cygwin 用バイナリを出力するクロスコンパイラ)
+  - cygwin32-gcc-g++ (同上)
   - tar
   - gzip
   - setupを使ったインストール例
@@ -26,8 +27,8 @@
   - gcc-core
   - gcc-g++
   - make
-  - cygwin64-gcc-core
-  - cygwin64-gcc-g++
+  - cygwin64-gcc-core (64bit Cygwin 用バイナリを出力するクロスコンパイラ)
+  - cygwin64-gcc-g++ (同上)
   - tar
   - gzip
   - setupを使ったインストール例
