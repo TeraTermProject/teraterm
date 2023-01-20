@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="getopt">
+      <UniqueIdentifier>{0aa971de-f4a9-4de9-af59-ab72371cae0d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libs\getopt_mb_uni_src\getopt.h">
+      <Filter>getopt</Filter>
+    </ClInclude>
+    <ClInclude Include="deviceope.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="device_com.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\libs\getopt_mb_uni_src\getopt.c" />
+  </ItemGroup>
+</Project>

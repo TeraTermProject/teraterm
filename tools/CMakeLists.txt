@@ -15,3 +15,9 @@ set_target_properties(
   ttreg
   PROPERTIES FOLDER tools
 )
+
+add_subdirectory(ttcomtester)
+set_target_properties(
+  ttcomtester
+  PROPERTIES FOLDER tools
+)
