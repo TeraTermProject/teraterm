@@ -8,7 +8,3 @@ makearchive.bat - Visual StudioƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg‚©‚çÀs‚·‚é‚ÆAˆêŠ‡‚µ‚Ä‘Sƒ\[ƒ
 teraterm.iss - ƒCƒ“ƒXƒg[ƒ‰(Inno Setup)ì¬ƒtƒ@ƒCƒ‹
 
 codesigning.bat - Àsƒtƒ@ƒCƒ‹‚ÉƒR[ƒhƒTƒCƒjƒ“ƒOØ–¾‘‚ğ•t—^‚·‚éB
-
-conv.pl, hfs_conv.pl - Unicodeƒe[ƒuƒ‹‚ÌCŒ¾Œê—pƒR[ƒh‚ğ¶¬‚·‚éB
-
-
