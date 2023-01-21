@@ -11,8 +11,10 @@
   - cmakeビルド用 cygterm(とmsys2term) をビルドするためのフォルダ
 - cygtool
   - インストーラから使用するdll
+  - [cygtool/README.md](cygtool/README.md)
 - cygtool_build
   - cmakeビルド用 cygtool をビルドするためのフォルダ
+  - [cygtool_build/README.md](cygtool_build/README.md)
 - cyglib
   - ttermpro, cyglaunch, cygtool から使用するライブラリ
 
