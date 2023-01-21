@@ -188,6 +188,8 @@
     <ClInclude Include="auth.h" />
     <ClInclude Include="buffer.h" />
     <ClInclude Include="chacha.h" />
+    <ClInclude Include="cipher-3des1.h" />
+    <ClInclude Include="cipher-ctr.h" />
     <ClInclude Include="cipher.h" />
     <ClInclude Include="cipher-chachapoly.h" />
     <ClInclude Include="comp.h" />

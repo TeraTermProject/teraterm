@@ -31,8 +31,7 @@
 #include <openssl/cast.h>
 #include <openssl/camellia.h>
 
-extern const EVP_CIPHER *evp_aes_128_ctr(void);
-extern const EVP_CIPHER *evp_camellia_128_ctr(void);
+#include "cipher-ctr.h"
 
 struct ssh_aes_ctr_ctx
 {

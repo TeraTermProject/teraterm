@@ -37,8 +37,8 @@
 
 #include "codeconv.h"
 
-// from cipher-3des.c
-extern const EVP_CIPHER* evp_ssh1_3des(void);
+#include "cipher-3des1.h"
+#include "cipher-ctr.h"
 
 static const struct ssh2cipher ssh2_ciphers[] = {
 	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, 0, 0, EVP_des_ede3_cbc},     // RFC4253
@@ -97,7 +97,7 @@ int get_cipher_id(const struct ssh2cipher *cipher)
 u_int get_cipher_block_size(const struct ssh2cipher *cipher)
 {
 	u_int blocksize = 0;
-	
+
 	if (cipher) {
 		blocksize = cipher->block_size;
 	}
@@ -202,7 +202,7 @@ char *get_cipher_name(int cipher_id)
 	case SSH_CIPHER_BLOWFISH:
 		return "Blowfish (256 key bits)";
 
-	// SSH2 
+	// SSH2
 	case SSH2_CIPHER_3DES_CBC:
 		return "3des-cbc";
 	case SSH2_CIPHER_AES128_CBC:

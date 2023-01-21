@@ -53,13 +53,6 @@ See LICENSE.TXT for the license.
 	count++; \
 }
 
-// from OpenSSH
-extern const EVP_CIPHER *evp_aes_128_ctr(void);
-extern const EVP_CIPHER *evp_des3_ctr(void);
-extern const EVP_CIPHER *evp_bf_ctr(void);
-extern const EVP_CIPHER *evp_cast5_ctr(void);
-extern const EVP_CIPHER *evp_camellia_128_ctr(void);
-
 /* Some of this code has been adapted from Ian Goldberg's Pilot SSH */
 
 typedef enum {
@@ -536,7 +529,7 @@ typedef struct PacketList {
 
 typedef struct scp {
 	enum scp_dir dir;              // transfer direction
-	enum scp_state state;          // SCP state 
+	enum scp_state state;          // SCP state
 	char localfile[MAX_PATH];      // local filename
 	char localfilefull[MAX_PATH];  // local filename fullpath
 	char remotefile[MAX_PATH];     // remote filename
@@ -556,7 +549,7 @@ typedef struct scp {
 } scp_t;
 
 enum sftp_state {
-	SFTP_INIT, SFTP_CONNECTED, SFTP_REALPATH, 
+	SFTP_INIT, SFTP_CONNECTED, SFTP_REALPATH,
 };
 
 typedef struct sftp {

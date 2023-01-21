@@ -100,9 +100,6 @@
 
 #include "libputty.h"
 
-// from cipher-3des.c
-extern const EVP_CIPHER* evp_ssh1_3des(void);
-
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
 	TTDialogBoxParam(p1,p2,p3,p4,p5)

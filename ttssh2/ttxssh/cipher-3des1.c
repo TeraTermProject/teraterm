@@ -32,6 +32,8 @@ typedef unsigned char u_char;
 
 #include "ssherr.h"
 
+#include "cipher-3des1.h"
+
 /*
  * This is used by SSH1:
  *
@@ -50,8 +52,6 @@ struct ssh1_3des_ctx
 {
 	EVP_CIPHER_CTX  *k1, *k2, *k3;
 };
-
-const EVP_CIPHER * evp_ssh1_3des(void);
 
 static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *iv, int enc)
 {

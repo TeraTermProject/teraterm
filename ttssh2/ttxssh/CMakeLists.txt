@@ -31,9 +31,11 @@ target_sources(
   chacha.c
   chacha.h
   cipher-3des1.c
+  cipher-3des1.h
   cipher-chachapoly-libcrypto.c
   cipher-chachapoly.h
   cipher-ctr.c
+  cipher-ctr.h
   cipher.c
   cipher.h
   comp.c
