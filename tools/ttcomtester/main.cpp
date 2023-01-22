@@ -294,11 +294,19 @@ int wmain(int argc, wchar_t *argv[])
 						rts = false;
 						b = EscapeCommFunction(h, CLRRTS);
 						printf("RTS=0, %d\n", b);
+						if (b == 0) {
+							DWORD err = GetLastError();
+							printf("error=0x%08d\n", err);
+						}
 					}
 					else {
 						rts = true;
 						b = EscapeCommFunction(h, SETRTS);
 						printf("RTS=1, %d\n", b);
+						if (b == 0) {
+							DWORD err = GetLastError();
+							printf("error=0x%08d\n", err);
+						}
 					}
 					break;
 				}
