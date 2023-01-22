@@ -262,7 +262,7 @@ int wmain(int argc, wchar_t *argv[])
 					size_t sended_len;
 					r = ope->write(dev, send_data, send_len, &sended_len);
 					if (r == ERROR_SUCCESS) {
-						printf("sened\n");
+						printf("sent\n");
 					}
 					else {
 						size_t sended_len_total = sended_len;
@@ -270,7 +270,7 @@ int wmain(int argc, wchar_t *argv[])
 							r = ope->wait_write(dev, &sended_len);
 #if 0
 							if (r == ERROR_SUCCESS) {
-								printf("sened\n");
+								printf("sent\n");
 							}
 #endif
 							sended_len_total += sended_len;
