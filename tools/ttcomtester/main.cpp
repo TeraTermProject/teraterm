@@ -37,20 +37,22 @@ static void key_usage(void)
 		"'d'	DTR 0/1\n"
 		"'x'	XON/XOFF\n"
 		"'e'	echo on/off\n"
-		"'s'    send big data\n"
+		"'s'	send big data\n"
+		"'l'	disp line state\n"
+		"'L'	check line state before sending\n"
 		"   send mode\n"
 		"':'	go command mode\n"
 		);
 }
 
-void DispErrorStr(wchar_t *str, DWORD err)
+void DispErrorStr(const wchar_t *str, DWORD err)
 {
 	wchar_t *buf;
 	DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_IGNORE_INSERTS;
 	FormatMessageW(flags, 0, err, 0, (LPWSTR) & buf, 0, NULL);
-	wprintf(L"%s %d=%s", str, err, buf);
+	wprintf(L"%s %d,0x%x %s", str, err, err, buf);
 	LocalFree(buf);
 }
 
@@ -213,7 +215,10 @@ int wmain(int argc, wchar_t *argv[])
 	}
 	ope->ctrl(dev, SET_COM_DCB, &dcb);
 
-	printf("':'		switch mode\n");
+	printf(
+		"':'		switch mode\n"
+		"' '(space)	key usage\n"
+		);
 	bool quit_flag = false;
 	bool receive_pending = false;
 	bool command_mode = true;
@@ -221,6 +226,7 @@ int wmain(int argc, wchar_t *argv[])
 	bool xon = true;
 	bool dtr = true;
 	bool echo_mode = false;
+	bool check_line_state = true;
 	enum {
 		STATE_CLOSE,
 		STATE_OPEN,
@@ -260,11 +266,11 @@ int wmain(int argc, wchar_t *argv[])
 						send_data[i] = (unsigned char)i;
 					}
 					size_t sended_len;
-					r = ope->write(dev, send_data, send_len, &sended_len);
-					if (r == ERROR_SUCCESS) {
+					DWORD e = ope->write(dev, send_data, send_len, &sended_len);
+					if (e == ERROR_SUCCESS) {
 						printf("sent\n");
 					}
-					else {
+					else if (e == ERROR_IO_PENDING) {
 						size_t sended_len_total = sended_len;
 						while(1) {
 							r = ope->wait_write(dev, &sended_len);
@@ -277,6 +283,9 @@ int wmain(int argc, wchar_t *argv[])
 							printf("send size %zu(%zu)/%zu\n", sended_len_total, sended_len, send_len);
 							Sleep(100);
 						}
+					}
+					else {
+						DispErrorStr(L"open()", e);
 					}
 					free(send_data);
 					break;
@@ -296,7 +305,7 @@ int wmain(int argc, wchar_t *argv[])
 						printf("RTS=0, %d\n", b);
 						if (b == 0) {
 							DWORD err = GetLastError();
-							printf("error=0x%08d\n", err);
+							DispErrorStr(L"EscapeCommFunction()", err);
 						}
 					}
 					else {
@@ -305,7 +314,7 @@ int wmain(int argc, wchar_t *argv[])
 						printf("RTS=1, %d\n", b);
 						if (b == 0) {
 							DWORD err = GetLastError();
-							printf("error=0x%08d\n", err);
+							DispErrorStr(L"EscapeCommFunction()", err);
 						}
 					}
 					break;
@@ -351,6 +360,33 @@ int wmain(int argc, wchar_t *argv[])
 						printf("echo on\n");
 						echo_mode = true;
 					}
+					break;
+				}
+				case 'l': {
+					HANDLE h;
+					ope->ctrl(dev, GET_RAW_HANDLE, &h);
+					DWORD modem_state;
+					BOOL b = GetCommModemStatus(h, &modem_state);
+					if (b == FALSE) {
+						DWORD err = GetLastError();
+						DispErrorStr(L"GetCommModemStatus()", err);
+					}
+					else {
+						printf("CTS %s / DSR %s / RING %s / RLSD %s / 0x%02x\n",
+							   (modem_state & MS_CTS_ON) == 0 ? "OFF" : "ON ",
+							   (modem_state & MS_DSR_ON) == 0 ? "OFF" : "ON ",
+							   (modem_state & MS_RING_ON) == 0 ? "OFF" : "ON ",
+							   (modem_state & MS_RLSD_ON) == 0 ? "OFF" : "ON ",
+							   modem_state
+							);
+					}
+					break;
+				}
+				case 'L': {
+					int i = check_line_state ? 0 : 1;
+					printf("check line state before sending %s\n", i == 0 ? "off" : "on");
+					ope->ctrl(dev, SET_CHECK_LINE_STATE_BEFORE_SEND, i);
+					check_line_state = i;
 					break;
 				}
 				case ':': {

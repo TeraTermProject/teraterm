@@ -25,6 +25,7 @@ typedef struct comdata_st {
 		STATE_OPEN,
 		STATE_ERROR,
 	} state;
+	bool check_line_state_before_send;
 } comdata_t;
 
 static void *init(void)
@@ -102,10 +103,30 @@ static DWORD open(device_t *device)
 	SetupComm(h, CommInQueSize, CommOutQueSize);
 	PurgeComm(h, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 
+	COMMTIMEOUTS ctmo;
+	r = GetCommTimeouts(h, &ctmo);
+	assert(r == TRUE);
+	printf("Maximum time between read chars %d\n", ctmo.ReadIntervalTimeout);
+	printf("read Multiplier of characters %d\n", ctmo.ReadTotalTimeoutMultiplier);
+	printf("read Constant in milliseconds %d\n", ctmo.ReadTotalTimeoutConstant);
+	printf("write Multiplier of characters %d\n", ctmo.WriteTotalTimeoutMultiplier);
+	printf("write Constant in milliseconds %d\n", ctmo.WriteTotalTimeoutConstant);
+
 	if (p->commtimeouts_setted) {
 		r = SetCommTimeouts(h, &p->commtimeouts);
 		assert(r == TRUE);
 	}
+	else {
+		// Tera Term ‚ªÝ’è‚µ‚Ä‚¢‚éƒpƒ‰ƒ[ƒ^
+#if 0
+		memset(&ctmo, 0, sizeof(ctmo));
+		ctmo.ReadIntervalTimeout = MAXDWORD;
+		ctmo.WriteTotalTimeoutConstant = 500;
+		r = SetCommTimeouts(h, &ctmo);
+		assert(r == TRUE);
+#endif
+	}
+
 	if (p->dcb_setted) {
 		if (p->dcb.XonChar == p->dcb.XoffChar) {
 			p->dcb.XonChar = 0x11;
@@ -326,11 +347,13 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 	}
 #endif
 
-	DWORD modem_state;
-	GetCommModemStatus(h, &modem_state);
-	if ((modem_state & MS_CTS_ON) == 0) {
-		*writed = 0;
-		return ERROR_SUCCESS;
+	if (p->check_line_state_before_send) {
+		DWORD modem_state;
+		GetCommModemStatus(h, &modem_state);
+		if ((modem_state & MS_CTS_ON) == 0) {
+			*writed = 0;
+			return ERROR_SUCCESS;
+		}
 	}
 
 #if 0
@@ -432,6 +455,18 @@ static DWORD ctrl(device_t *device, device_ctrl_request request, ...)
 		COMMTIMEOUTS *commtimeouts = va_arg(ap, COMMTIMEOUTS *);
 		p->commtimeouts = *commtimeouts;
 		p->commtimeouts_setted = true;
+		retval = ERROR_SUCCESS;
+		break;
+	}
+	case SET_CHECK_LINE_STATE_BEFORE_SEND: {
+		int check_line_state = va_arg(ap, int);
+		p->check_line_state_before_send = check_line_state;
+		retval = ERROR_SUCCESS;
+		break;
+	}
+	case GET_CHECK_LINE_STATE_BEFORE_SEND: {
+		int *check_line_state = va_arg(ap, int *);
+		*check_line_state = (int)p->check_line_state_before_send;
 		retval = ERROR_SUCCESS;
 		break;
 	}

@@ -38,6 +38,8 @@ typedef enum {
 	GET_RAW_HANDLE,
 	SET_COM_DCB,
 	SET_COM_TIMEOUTS,
+	SET_CHECK_LINE_STATE_BEFORE_SEND,
+	GET_CHECK_LINE_STATE_BEFORE_SEND,
 } device_ctrl_request;
 
 typedef struct device {
