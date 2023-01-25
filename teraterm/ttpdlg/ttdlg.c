@@ -131,12 +131,6 @@ static void SetKanjiCodeDropDownList(HWND HDlg, int id, int language, int sel_co
 	SendDlgItemMessageA(HDlg, id, CB_SETCURSEL, sel_index, 0);
 }
 
-/*
- * COMポートに関する詳細情報
- */
-static ComPortInfo_t *ComPortInfoPtr;
-static int ComPortInfoCount;
-
 static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfosCom[] = {
@@ -991,6 +985,12 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 	return FALSE;
 }
 
+typedef struct {
+	PTTSet pts;
+	ComPortInfo_t *ComPortInfoPtr;
+	int ComPortInfoCount;
+} SerialDlgData;
+
 static const char *DataList[] = {"7 bit","8 bit",NULL};
 static const char *ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
 static const char *StopList[] = {"1 bit", "2 bit", NULL};
@@ -1053,20 +1053,15 @@ static void serial_dlg_change_OK_button(HWND dlg, int portno, const wchar_t *UIL
  * シリアルポート設定ダイアログのテキストボックスにCOMポートの詳細情報を表示する。
  *
  */
-static void serial_dlg_set_comport_info(HWND dlg, int portno, char *desc)
+static void serial_dlg_set_comport_info(HWND dlg, SerialDlgData *dlg_data, int port_index)
 {
-	int i;
-
-	for (i = 0; i < ComPortInfoCount; i++) {
-		const ComPortInfo_t *p = &ComPortInfoPtr[i];
-		if (p->port_no == portno) {
-			SetDlgItemTextW(dlg, IDC_SERIALTEXT, p->property);
-			return;
-		}
+	if (port_index + 1 > dlg_data->ComPortInfoCount) {
+		SetDlgItemTextW(dlg, IDC_SERIALTEXT, NULL);
 	}
-
-	// 該当するCOMポートが見つからなかった
-	SetDlgItemTextW(dlg, IDC_SERIALTEXT, NULL);
+	else {
+		const ComPortInfo_t *p = &dlg_data->ComPortInfoPtr[port_index];
+		SetDlgItemTextW(dlg, IDC_SERIALTEXT, p->property);
+	}
 }
 
 /*
@@ -1182,19 +1177,16 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_SERIALHELP, "BTN_HELP" },
 	};
-	PTTSet ts = (PTTSet)GetWindowLongPtr(Dialog, DWLP_USER);
+	SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+	PTTSet ts = dlg_data == NULL ? NULL : dlg_data->pts;
 	int i, w, sel;
-	char Temp[128];
-	static WORD ComPortTable[MAXCOMPORT];  // 使用可能なCOMポート番号
-	static char *ComPortDesc[MAXCOMPORT];  // COMポートの詳細情報
-	static int comports; // テーブル最大数
 	WORD Flow;
-	int portno;
 
 	switch (Message) {
 		case WM_INITDIALOG:
-			ts = (PTTSet)lParam;
+			dlg_data = (SerialDlgData *)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
+			ts = dlg_data->pts;
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
@@ -1202,51 +1194,33 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			EnableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
 			EnableDlgItem(Dialog, IDOK, IDOK);
 
-			// COMポートの詳細情報を取得する。
-			// COMの接続状況は都度変わるため、ダイアログを表示する度に取得する。
-			// 不要になったら、ComPortInfoFree()でメモリを解放すること。
-			ComPortInfoPtr = ComPortInfoGet(&ComPortInfoCount);
-
 			w = 0;
 
-			if ((comports = DetectComPorts(ComPortTable, ts->MaxComPort, ComPortDesc)) > 0) {
-				for (i=0; i<comports; i++) {
+			if (dlg_data->ComPortInfoCount > 0) {
+				for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
+					ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
+					wchar_t *EntNameW;
+
 					// MaxComPort を越えるポートは表示しない
-					if (ComPortTable[i] > ts->MaxComPort) {
+					if (i > ts->MaxComPort) {
 						continue;
 					}
 
-					_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", ComPortTable[i]);
-// Serial dialogはドロップダウンリストの幅が大きくできないので、Descriptionはなしとする。
-#if 0
-					strncat_s(Temp, sizeof(Temp), ": ", _TRUNCATE);
-					strncat_s(Temp, sizeof(Temp), ComPortDesc[i], _TRUNCATE);
-#endif
-					SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
-					                   0, (LPARAM)Temp);
-					if (ComPortTable[i] == ts->ComPort) {
+					aswprintf(&EntNameW, L"%s", p->port_name);
+					SendDlgItemMessageW(Dialog, IDC_SERIALPORT, CB_ADDSTRING, 0, (LPARAM)EntNameW);
+					free(EntNameW);
+
+					if (p->port_no == ts->ComPort) {
 						w = i;
 					}
-
-					// 詳細情報を表示する
-					serial_dlg_set_comport_info(Dialog, ComPortTable[w], ComPortDesc[w]);
-
 				}
-			} else if (comports == 0) {
+				serial_dlg_set_comport_info(Dialog, dlg_data, w);
+			}
+			else { //if (ComPortInfoCount == 0) {
 				DisableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
 				DisableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
 				// COMポートが存在しない場合はOKボタンを押せないようにする。
 				DisableDlgItem(Dialog, IDOK, IDOK);
-			} else {
-				for (i=1; i<=ts->MaxComPort; i++) {
-					_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", i);
-					SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
-					                   0, (LPARAM)Temp);
-				}
-				if (ts->ComPort<=ts->MaxComPort) {
-					w = ts->ComPort-1;
-				}
-
 			}
 			SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w, 0);
 
@@ -1307,21 +1281,15 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
 			// それに応じてOKボタンのラベル名を切り替える。
-			serial_dlg_change_OK_button(Dialog, ComPortTable[w], ts->UILanguageFileW);
+			serial_dlg_change_OK_button(Dialog, dlg_data->ComPortInfoPtr[w].port_no, ts->UILanguageFileW);
 
 			return TRUE;
-
-		case WM_DESTROY:
-			// COMポートの詳細情報を解放する。
-			ComPortInfoFree(ComPortInfoPtr, ComPortInfoCount);
-			ComPortInfoPtr = NULL;
-			ComPortInfoCount = 0;
-			break;
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
 					if ( ts!=NULL ) {
+						char Temp[128];
 						memset(Temp, 0, sizeof(Temp));
 						GetDlgItemText(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
 						if (strncmp(Temp, "COM", 3) == 0 && Temp[3] != '\0') {
@@ -1396,11 +1364,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				case IDC_SERIALPORT:
 					switch (HIWORD(wParam)) {
 					case CBN_SELCHANGE: // リストからCOMポートが選択された
+						int portno;
 						sel = SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
-						portno = ComPortTable[sel];  // 新しいポート番号
+						portno = dlg_data->ComPortInfoPtr[sel].port_no;	 // ポート番号
 
 						// 詳細情報を表示する
-						serial_dlg_set_comport_info(Dialog, ComPortTable[sel], ComPortDesc[sel]);
+						serial_dlg_set_comport_info(Dialog, dlg_data, sel);
 
 						// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
 						// それに応じてOKボタンのラベル名を切り替える。
@@ -3100,10 +3069,18 @@ BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 
 BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 {
-	return
-		(BOOL)DialogBoxParam(hInst,
-		                     MAKEINTRESOURCE(IDD_SERIALDLG),
-		                     WndParent, SerialDlg, (LPARAM)ts);
+	BOOL r;
+	SerialDlgData *dlg_data = calloc(sizeof(*dlg_data), 1);
+	dlg_data->pts = ts;
+	dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
+
+	r = (BOOL)DialogBoxParam(hInst,
+							 MAKEINTRESOURCE(IDD_SERIALDLG),
+							 WndParent, SerialDlg, (LPARAM)dlg_data);
+
+	ComPortInfoFree(dlg_data->ComPortInfoPtr, dlg_data->ComPortInfoCount);
+	free(dlg_data);
+	return r;
 }
 
 BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
