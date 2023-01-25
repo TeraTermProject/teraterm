@@ -1362,8 +1362,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					return TRUE;
 
 				case IDC_SERIALPORT:
-					switch (HIWORD(wParam)) {
-					case CBN_SELCHANGE: // リストからCOMポートが選択された
+					if (HIWORD(wParam) == CBN_SELCHANGE) {
+						// リストからCOMポートが選択された
 						int portno;
 						sel = SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
 						portno = dlg_data->ComPortInfoPtr[sel].port_no;	 // ポート番号
