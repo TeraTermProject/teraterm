@@ -716,11 +716,13 @@ void PASCAL TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
   Caps = GetDeviceCaps(PrintDC,RASTERCAPS);
   if ((Caps & RC_BITBLT) != RC_BITBLT)
   {
-    char uimsg[MAX_UIMSG];
-    get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts->UILanguageFile);
-    get_lang_msg("MSG_TEK_PRINT_ERROR", ts->UIMsg, sizeof(ts->UIMsg),  "Printer dose not support graphics", ts->UILanguageFile);
-    MessageBox(tk->HWin,ts->UIMsg,uimsg,MB_ICONEXCLAMATION);
-    return;
+	  static const TTMessageBoxInfoW info = {
+		  "Tera Term",
+		  "MSG_TT_ERROR", L"Tera Term: Error",
+		  "MSG_TEK_PRINT_ERROR", L"Printer dose not support graphics",
+		  MB_ICONEXCLAMATION };
+	  TTMessageBoxW(tk->HWin, &info, ts->UILanguageFileW);
+	  return;
   }
   if (tk->Active) TEKCaretOff(tk);
   if (tk->RubberBand) SwitchRubberBand(tk,ts,FALSE);
