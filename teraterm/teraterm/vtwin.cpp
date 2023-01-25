@@ -204,37 +204,21 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	Alpha = alpha;
 }
 
-void RegDeviceNotify(HWND hWnd)
+static HDEVNOTIFY RegDeviceNotify(HWND hWnd)
 {
-	typedef HDEVNOTIFY (WINAPI *PRegisterDeviceNotification)(HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags);
-	HMODULE h;
-	PRegisterDeviceNotification pRegisterDeviceNotification;
 	DEV_BROADCAST_DEVICEINTERFACE filter;
+	HDEVNOTIFY h;
 
-	if (((h = GetModuleHandle("user32.dll")) == NULL) ||
-			((pRegisterDeviceNotification = (PRegisterDeviceNotification)GetProcAddress(h, "RegisterDeviceNotificationA")) == NULL)) {
-		return;
+	if (pRegisterDeviceNotificationA == NULL) {
+		return NULL;
 	}
 
 	ZeroMemory(&filter, sizeof(filter));
 	filter.dbcc_size = sizeof(filter);
 	filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
 	filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;
-	hDevNotify = pRegisterDeviceNotification(hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
-}
-
-void UnRegDeviceNotify(HWND hWnd)
-{
-	typedef BOOL (WINAPI *PUnregisterDeviceNotification)(HDEVNOTIFY Handle);
-	HMODULE h;
-	PUnregisterDeviceNotification pUnregisterDeviceNotification;
-
-	if (((h = GetModuleHandle("user32.dll")) == NULL) ||
-			((pUnregisterDeviceNotification = (PUnregisterDeviceNotification)GetProcAddress(h, "UnregisterDeviceNotification")) == NULL)) {
-		return;
-	}
-
-	pUnregisterDeviceNotification(hDevNotify);
+	h = pRegisterDeviceNotificationA(hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
+	return h;
 }
 
 void SetAutoConnectPort(int port)
@@ -431,7 +415,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	}
 
 	// USBデバイス変化通知登録
-	RegDeviceNotify(HVTWin);
+	hDevNotify = RegDeviceNotify(HVTWin);
 
 	// 通知領域初期化
 	NotifyIcon *ni = Notify2Initialize();
@@ -1450,7 +1434,10 @@ void CVTWindow::OnDestroy()
 	UnregWin(HVTWin);
 
 	// USBデバイス変化通知解除
-	UnRegDeviceNotify(HVTWin);
+	if (hDevNotify != NULL && pUnregisterDeviceNotification != NULL) {
+		pUnregisterDeviceNotification(hDevNotify);
+		hDevNotify = NULL;
+	}
 
 	EndKeyboard();
 

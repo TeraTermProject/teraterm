@@ -158,7 +158,11 @@ extern BOOL (WINAPI *pGetMonitorInfoA)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 extern LONG_PTR (WINAPI *pSetWindowLongPtrW)(HWND hWnd, int nIndex, LONG_PTR dwNewLong);
 extern LONG_PTR (WINAPI *pGetWindowLongPtrW)(HWND hWnd, int nIndex);
 #endif
+
+// user32
 extern int (WINAPI *pGetSystemMetricsForDpi)(int  nIndex, UINT dpi);
+extern HDEVNOTIFY (WINAPI *pRegisterDeviceNotificationA)(HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags);
+extern BOOL (WINAPI *pUnregisterDeviceNotification)(HDEVNOTIFY Handle);
 
 // kernel32
 extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
