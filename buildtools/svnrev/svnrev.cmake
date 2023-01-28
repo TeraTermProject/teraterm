@@ -1,0 +1,47 @@
+﻿# input
+#   PERL
+#   GIT_EXECUTABLE
+#   SVN_EXECUTABLE
+#   SOURCE_DIR (CMAKE_SOURCE_DIR), ソースツリーのルート
+#   BINARY_DIR (CMAKE_BINARY_DIR), バイナリツリーのルート
+
+set(CMAKE_SOURCE_DIR ${SOURCE_DIR})
+set(CMAKE_BINARY_DIR ${BINARY_DIR})
+set(SVNREV_PL ${CMAKE_CURRENT_LIST_DIR}/svnrev.pl)
+set(SVNVERSION_H ${CMAKE_BINARY_DIR}/teraterm/common/svnversion.h)
+set(BUILD_CONFIG ${CMAKE_BINARY_DIR}/build_config.cmake)
+set(SOURCETREEINFO ${CMAKE_CURRENT_LIST_DIR}/sourcetree_info.bat)
+
+unset(ARGS)
+if((DEFINED SVN_EXECUTABLE) AND (DEFINED ${SVN_EXECUTABLE}))
+  list(APPEND ARGS "--svn" "${SVN_EXECUTABLE}")
+endif()
+if((DEFINED GIT_EXECUTABLE) AND (DEFINED ${GIT_EXECUTABLE}))
+  list(APPEND ARGS "--git" "${GIT_EXECUTABLE}")
+endif()
+
+if(0)
+  message("PERL=${PERL}")
+  message("GIT_EXECUTABLE=${GIT_EXECUTABLE}")
+  message("SVN_EXECUTABLE=${SVN_EXECUTABLE}")
+  message("SOURCE_DIR=${SOURCE_DIR}")
+  message("BINARY_DIR=${BINARY_DIR}")
+  message("CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
+  message("CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
+  message("ARGS=${ARGS}")
+  message("SVNREV_PL=${SVNREV_PL}")
+  message("SVNVERSION_H=${SVNVERSION_H}")
+  message("BUILD_CONFIG=${BUILD_CONFIG}")
+  message("SOURCETREEINFO=${SOURCETREEINFO}")
+endif()
+
+execute_process(
+  COMMAND ${PERL} ${SVNREV_PL} ${ARGS}
+  --root ${CMAKE_SOURCE_DIR}
+  --header ${SVNVERSION_H}
+  --cmake ${BUILD_CONFIG}
+  --bat ${SOURCETREEINFO}
+  #--verbose
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+  RESULT_VARIABLE rv
+)

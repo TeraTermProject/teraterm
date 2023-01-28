@@ -16,7 +16,7 @@ add_library(
   ../../teraterm/common/codeconv.h
   ../../teraterm/common/dlglib.h
   ../../teraterm/common/getcontent.h
-  ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/ttpdlg/svnversion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/common/svnversion.h
   )
 
 if(SUPPORT_OLD_WINDOWS)
@@ -80,10 +80,8 @@ endif()
 target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
-  ${CMAKE_CURRENT_BINARY_DIR}/../../teraterm/ttpdlg     # for svnversion.h
   ../../libs/cJSON
   ../../teraterm/teraterm
-  ../../teraterm/common
 )
 
 target_link_libraries(

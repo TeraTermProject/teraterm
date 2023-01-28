@@ -57,8 +57,9 @@ add_library(
 target_include_directories(
   ${PACKAGE_NAME}
   PUBLIC
+  ${CMAKE_CURRENT_BINARY_DIR}       # for svnversion.h
   .
-  )
+)
 
 target_link_libraries(
   ${PACKAGE_NAME}

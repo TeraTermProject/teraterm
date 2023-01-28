@@ -95,7 +95,6 @@ set_target_properties(
 target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
-  ../common
   ../ttpfile
   .
   )

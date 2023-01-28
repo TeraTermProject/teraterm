@@ -19,7 +19,6 @@ add_executable(
 target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common
   ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/ttpcmn
   ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
   )
@@ -34,9 +33,7 @@ target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
   common_static
-  #
-  #setupapi
-  )
+)
 
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)

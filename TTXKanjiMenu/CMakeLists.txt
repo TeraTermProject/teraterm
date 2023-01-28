@@ -42,7 +42,6 @@ target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
   ../teraterm/teraterm
-  ../teraterm/common
   )
 
 target_link_libraries(

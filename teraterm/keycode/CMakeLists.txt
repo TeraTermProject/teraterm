@@ -39,12 +39,6 @@ set_target_properties(
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
-target_include_directories(
-  ${PACKAGE_NAME}
-  PRIVATE
-  ../common
-  )
-
 if(MSVC)
   target_compile_options(
     ${PACKAGE_NAME}
@@ -103,12 +97,6 @@ target_compile_definitions(
   ${PACKAGE_NAME_2}
   PRIVATE
   UNICODE _UNICODE
-  )
-
-target_include_directories(
-  ${PACKAGE_NAME_2}
-  PRIVATE
-  ../common
   )
 
 if(MSVC)

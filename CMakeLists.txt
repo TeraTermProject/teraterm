@@ -150,14 +150,18 @@ endif()
 if(EXISTS "${CMAKE_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
   file(REMOVE "${CMAKE_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
 endif()
+if(EXISTS "${CMAKE_SOURCE_DIR}/teraterm/common/svnversion.h")
+  file(REMOVE "${CMAKE_SOURCE_DIR}/teraterm/common/svnversion.h")
+endif()
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake")
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/teraterm/ttpdlg)
+if((NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake") OR
+    (NOT EXISTS "${CMAKE_BINARY_DIR}/teraterm/common/svnversion.h") OR
+    (NOT EXISTS "${CMAKE_SOURCE_DIR}/buildtools/svnrev/sourcetreeinfo.bat"))
   execute_process(
-    COMMAND ${PERL} svnrev.pl --svn "${Subversion_SVN_EXECUTABLE}" --git "${GIT_EXECUTABLE}" --root ${CMAKE_SOURCE_DIR} --header ${CMAKE_BINARY_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${CMAKE_BINARY_DIR}/build_config.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/buildtools/svnrev
+    COMMAND ${CMAKE_COMMAND} -DPERL=${PERL} -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DBINARY_DIR=${CMAKE_BINARY_DIR} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DSVN_EXECUTABLE=${Subversion_SVN_EXECUTABLE} -P svnrev.cmake
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/buildtools/svnrev
     RESULT_VARIABLE rv
-    )
+  )
   if(NOT rv STREQUAL "0")
     message(FATAL_ERROR "execute error ${PERL}")
   endif()

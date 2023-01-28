@@ -103,7 +103,7 @@ add_executable(
   tt-version.rc
   teraterm_manifest.rc
   #
-  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg/svnversion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../common/svnversion.h
   #
   unicode_test.h
   unicode.h
@@ -293,13 +293,11 @@ target_include_directories(
   PRIVATE
   .
   ../teraterm
-  ../common
   ../ttpfile
   ../ttpdlg
   ../ttpcmn
   ../susie_plugin
   ${ONIGURUMA_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}/../ttpdlg     # for svnversion.h
   ${SFMT_INCLUDE_DIRS}
   )
 

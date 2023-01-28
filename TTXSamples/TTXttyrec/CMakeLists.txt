@@ -42,7 +42,6 @@ target_include_directories(
   TTXttyplay
   PRIVATE
   ../../teraterm/teraterm
-  ../../teraterm/common
   )
 
 target_link_libraries(
@@ -96,7 +95,6 @@ target_include_directories(
   TTXttyrec
   PRIVATE
   ../../teraterm/teraterm
-  ../../teraterm/common
   )
 
 target_link_libraries(
