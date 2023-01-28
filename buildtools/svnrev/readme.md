@@ -2,7 +2,7 @@
 
 - ソースツリーのsvn(又は git)の情報をヘッダファイル等に書き出すためのツール
   - ソース用のヘッダフィル
-    - 例 `../teraterm/ttpdlg/svnversion.h`
+    - 例 `../teraterm/common/svnversion.h`
   - CI用のbatファイル
     - 例 `sourcetree_info.bat`
   - cmake用ファイル
@@ -42,7 +42,7 @@
   - ビルド用のファイルをジェネレート時に自動で生成される
   - build フォルダの build_config.cmake を削除してビルドすると再生成される
 - コマンドラインで直接実行する場合
-  - `perl svnrev.pl --root ../.. --header ../../teraterm/ttpdlg/svnversion.h`
+  - `perl svnrev.pl --root ../.. --header ../../teraterm/common/svnversion.h`
 
 ## svnrev.pl のオプション
 
