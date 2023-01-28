@@ -10,7 +10,6 @@ using namespace yebisuya;
 
 extern "C" __declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
 
-char UILanguageFile[MAX_PATH];
 wchar_t *UILanguageFileW;
 
 class TTProxy : public DynamicLinkLibrary<TTProxy> {
@@ -199,8 +198,6 @@ private:
 	}
 
 	static void copy_UILanguageFile() {
-		strncpy_s(UILanguageFile, sizeof(UILanguageFile),
-		          getInstance().ts->UILanguageFile, _TRUNCATE);
 		UILanguageFileW = getInstance().ts->UILanguageFileW;
 	}
 
@@ -254,7 +251,7 @@ private:
 			{ ID_ABOUTMENU, "MENU_ABOUT" },
 			{ ID_PROXYSETUPMENU, "MENU_SETUP" },
 		};
-		SetI18nMenuStrs("TTProxy", menu, MenuTextInfo, _countof(MenuTextInfo), getInstance().ts->UILanguageFile);
+		SetI18nMenuStrsW(menu, "TTProxy", MenuTextInfo, _countof(MenuTextInfo), getInstance().ts->UILanguageFileW);
 	}
 
 	static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {

@@ -17,17 +17,24 @@ using namespace yebisuya;
 #include "ttlib.h"
 #include "i18n.h"
 
-extern char UILanguageFile[MAX_PATH];
 extern wchar_t *UILanguageFileW;
 
 void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 {
-    GetI18nStr("TTProxy", key, buf, buf_len, def, UILanguageFile);
+	wchar_t *b;
+	wchar_t *defW = ToWcharA(def);
+    GetI18nStrWW("TTProxy", key, UILanguageFileW, defW, &b);
+	free(defW);
+	WideCharToACP_t(b, buf, buf_len);
+	free(b);
 }
 
 void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def)
 {
-    GetI18nStrW("TTProxy", key, buf, buf_len, def, UILanguageFile);
+	wchar_t *b;
+    GetI18nStrWW("TTProxy", key, UILanguageFileW, def, &b);
+	wcscpy_s(buf, buf_len, b);
+	free(b);
 }
 
 class ProxyWSockHook {
