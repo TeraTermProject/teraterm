@@ -40,6 +40,7 @@ typedef enum {
 	SET_COM_TIMEOUTS,
 	SET_CHECK_LINE_STATE_BEFORE_SEND,
 	GET_CHECK_LINE_STATE_BEFORE_SEND,
+	OPEN_CONFIG_DIALOG,
 } device_ctrl_request;
 
 typedef struct device {

@@ -470,6 +470,18 @@ static DWORD ctrl(device_t *device, device_ctrl_request request, ...)
 		retval = ERROR_SUCCESS;
 		break;
 	}
+	case OPEN_CONFIG_DIALOG: {
+		COMMCONFIG cc;
+		DWORD size = sizeof(cc);
+		BOOL r = GetCommConfig(p->h, &cc, &size);
+		assert(r == TRUE);
+		r = CommConfigDialogW(p->port_name, NULL, &cc);
+		if (r == TRUE) {
+			r = SetCommConfig(p->h, &cc, size);
+			assert(r == TRUE);
+		}
+		break;
+	}
 	}
 
 	va_end(ap);

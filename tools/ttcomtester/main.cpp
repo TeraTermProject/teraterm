@@ -40,6 +40,7 @@ static void key_usage(void)
 		"'s'	send big data\n"
 		"'l'	disp line state\n"
 		"'L'	check line state before sending\n"
+		"'D'	open device dialogbox\n"
 		"   send mode\n"
 		"':'	go command mode\n"
 		);
@@ -387,6 +388,10 @@ int wmain(int argc, wchar_t *argv[])
 					printf("check line state before sending %s\n", i == 0 ? "off" : "on");
 					ope->ctrl(dev, SET_CHECK_LINE_STATE_BEFORE_SEND, i);
 					check_line_state = i;
+					break;
+				}
+				case 'D': {
+					ope->ctrl(dev, OPEN_CONFIG_DIALOG);
 					break;
 				}
 				case ':': {
