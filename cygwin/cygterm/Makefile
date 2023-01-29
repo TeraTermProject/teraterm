@@ -104,12 +104,12 @@ uninstall :
 
 $(ARCHIVE) : $(SRC) $(H) $(ICO) $(CFG) COPYING README README-j Makefile CMakeLists.txt
 	rm -f $(ARCHIVE)
-	rm -rf tar_tmp/
-	mkdir tar_tmp
-	cp $^ tar_tmp/
-	(cd tar_tmp; tar cf ../$(ARCHIVE:.gz=) *)
+	rm -rf $(ARCHIVE:.tar.gz=)/
+	mkdir $(ARCHIVE:.tar.gz=)
+	cp $^ $(ARCHIVE:.tar.gz=)/
+	tar cf $(ARCHIVE:.gz=) $(ARCHIVE:.tar.gz=)
 	gzip $(ARCHIVE:.gz=)
-	rm -rf tar_tmp/
+	rm -rf $(ARCHIVE:.tar.gz=)/
 
 cygterm.o:
   ifeq (0, $(shell nm /usr/lib/crt0.o | grep -c WinMainCRTStartup))
