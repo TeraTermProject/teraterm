@@ -67,9 +67,6 @@ ARCHIVE = cygterm+.tar.gz
 .PHONY: msys2term msys2term-clean
 
 all : $(EXE)
-ifneq (,$(wildcard Makefile.cyglaunch))
-	make -f Makefile.cyglaunch
-endif
 
 -include $(DEP)
 
