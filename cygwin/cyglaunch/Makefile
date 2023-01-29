@@ -63,7 +63,7 @@ OBJ = $(addsuffix .o,$(notdir $(basename $(SRC))))
 DEP = $(OBJ:.o=.d)
 ICO = $(CYGTERM_DIR)/cygterm.ico
 
-.PHONY: all clean install uninstall arc copyfile
+.PHONY: all clean install uninstall
 
 all : $(EXE)
 
@@ -99,20 +99,3 @@ ttlib_static_dir.o: $(COMMON_DIR)/ttlib_static_dir.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ -DENABLE_COMAPT_WIN=0
 
 -include $(DEP)
-
-# copy files for standalone build
-copyfile:
-	@echo COPY_DEST=$(COPY_DEST)
-	cp Makefile $(COPY_DEST)/Makefile.cyglaunch
-	cp cyglaunch.c $(COPY_DEST)
-	cp $(COMMON_DIR)/asprintf.cpp $(COPY_DEST)
-	cp $(COMMON_DIR)/asprintf.h $(COPY_DEST)
-	cp $(COMMON_DIR)/win32helper.cpp $(COPY_DEST)
-	cp $(COMMON_DIR)/win32helper.h $(COPY_DEST)
-	cp $(COMMON_DIR)/ttlib_static_dir.cpp $(COPY_DEST)
-	cp $(COMMON_DIR)/ttlib_static_dir.h $(COPY_DEST)
-	cp $(COMMON_DIR)/ttknownfolders.c $(COPY_DEST)
-	cp $(COMMON_DIR)/ttknownfolders.h $(COPY_DEST)
-	cp $(CYGLIB_DIR)/cyglib.c $(COPY_DEST)
-	cp $(CYGLIB_DIR)/cyglib.h $(COPY_DEST)
-	cp $(CYGTERM_DIR)/cygterm.ico $(COPY_DEST)

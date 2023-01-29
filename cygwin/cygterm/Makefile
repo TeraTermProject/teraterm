@@ -110,7 +110,6 @@ $(ARCHIVE) : $(SRC) $(H) $(ICO) $(CFG) COPYING README README-j Makefile CMakeLis
 	rm -rf tar_tmp/
 	mkdir tar_tmp
 	cp $^ tar_tmp/
-	cd ../cyglaunch/; make copyfile COPY_DEST=../cygterm/tar_tmp
 	(cd tar_tmp; tar cf ../$(ARCHIVE:.gz=) *)
 	gzip $(ARCHIVE:.gz=)
 	rm -rf tar_tmp/
