@@ -236,13 +236,8 @@ pushd ..\cygwin\cygterm
 if "%BUILD%" == "rebuild" (
     make clean
     make cygterm+-x86_64-clean
-    make cygterm+-i686-clean
 )
 make cygterm+-x86_64 -j
-where i686-pc-cygwin-g++.exe
-if errorlevel 1 goto cygterm32_pass
-make cygterm+-i686 -j
-:cygterm32_pass
 make archive
 popd
 

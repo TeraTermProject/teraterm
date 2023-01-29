@@ -110,14 +110,10 @@ Source: release\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf16le; Component
 Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
-#ifexist "..\cygwin\cygterm\cygterm+-i686\cygterm.exe"
-Source: ..\cygwin\cygterm\cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
-#endif
 Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\Release\cyglaunch.exe; DestDir: {app}; Components: cygterm
-Source: ..\cygwin\Release\cygtool.dll; Components: cygterm; Flags: dontcopy
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -147,7 +143,7 @@ Name: custom; Description: {cm:type_custom}; Flags: iscustom
 [Components]
 Name: TeraTerm; Description: Tera Term & Macro; Flags: fixed; Types: custom compact full standard
 Name: TTSSH; Description: TTSSH; Types: compact full standard
-Name: cygterm; Description: CygTerm+; Types: full standard; Check: not isIA64
+Name: cygterm; Description: CygTerm+; Types: full standard; Check: isExecutableCygtermX64
 Name: TeraTerm_Menu; Description: TeraTerm Menu; Types: full
 Name: TTProxy; Description: TTProxy; Types: full standard
 Name: Additional_Plugins; Description: {cm:comp_TTX}
@@ -307,21 +303,33 @@ const
 procedure SHChangeNotify(wEventId, uFlags, dwItem1, dwItem2: Integer);
 external 'SHChangeNotify@shell32.dll stdcall';
 
-function FindCygwinPath(CygwinDirectory: String; CygwinDir: String; Dirlen: Cardinal): Integer;
-external 'FindCygwinPath@files:cygtool.dll stdcall setuponly';
-
-function PortableExecutableMachine(CygwinDir: String): Integer;
-external 'PortableExecutableMachine@files:cygtool.dll stdcall setuponly';
-
 var
   UILangFilePage: TInputOptionWizardPage;
 
 
-// It is different from x64
-function isIA64 : Boolean;
-begin
-  if ProcessorArchitecture = paIA64 then
+// Windows 11 or later
+function isWin11OrLater : Boolean;
+var
+  Version: TWindowsVersion;
+begin;
+  GetWindowsVersionEx(Version);
+  if (Version.Major >= 10) and (Version.Build >= 22000) then
     Result := True
+  else
+    Result := False;
+end;
+
+// Cygterm x86_64 is executable
+function isExecutableCygtermX64 : Boolean;
+begin
+  if ProcessorArchitecture = paX64 then
+    Result := True
+  else if ProcessorArchitecture = paARM64 then
+    // x86_64 binary is executable on ARM64 by WoW64
+    if isWin11OrLater then
+      Result := True
+    else
+      Result := False
   else
     Result := False;
 end;
@@ -672,46 +680,12 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   iniFile : String;
-  CygDir  : String;
-  CygPath : String;
-  CygDll  : String;
-  Cygterm : String;
-  Res     : Integer;
-  Machine : Integer;
 begin
   case CurStep of
     ssPostInstall:
       begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
-
-        if WizardIsComponentSelected('cygterm') then
-        begin;
-            Cygterm := ExpandConstant('{app}') + '\cygterm.exe';
-            if not FileExists(Cygterm) then
-            begin;
-                // インストール先に cygterm.exe がない場合は、cygwin1.dll と同じアーキテクチャのファイルをコピーする
-                CygDir := GetIniString('Tera Term', 'CygwinDirectory', 'C:\cygwin', iniFile);
-                SetLength(CygPath, 256);
-                Res := FindCygwinPath(CygDir, CygPath, 256);
-                If Res = 1 then
-                begin;
-                    CygDll := Copy(CygPath, 1, Pos(#0, CygPath) - 1) + '\bin\cygwin1.dll';
-                    Machine := PortableExecutableMachine(CygDll);
-                    if Machine = IMAGE_FILE_MACHINE_AMD64 then
-                        FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, True)
-                    else
-                        FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, True);
-                end;
-            end else begin
-                // インストール先に cygterm.exe がある場合は、同じアーキテクチャのファイルをコピーする
-                Machine := PortableExecutableMachine(Cygterm);
-                if Machine = IMAGE_FILE_MACHINE_AMD64 then
-                    FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, False)
-                else
-                    FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, False);
-            end;
-        end;
 
         if not WizardIsTaskSelected('cygtermhere') then
         begin;

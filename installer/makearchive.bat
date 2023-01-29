@@ -36,12 +36,6 @@ copy /y ..\teraterm\release\*.dll %dst%
 copy /y ..\ttssh2\ttxssh\Release\ttxssh.dll %dst%
 copy /y ..\cygwin\cygterm\cygterm.cfg %dst%
 copy /y "..\cygwin\cygterm\cygterm+.tar.gz" %dst%
-if not exist ..\cygwin\cygterm\cygterm+-i686\cygterm.exe goto cygwin32_pass
-mkdir "%dst%\cygterm+-i686"
-copy /y "..\cygwin\cygterm\cygterm+-i686\cygterm.exe" "%dst%\cygterm+-i686"
-:cygwin32_pass
-mkdir "%dst%\cygterm+-x86_64"
-copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" "%dst%\cygterm+-x86_64"
 copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" %dst%
 if not exist ..\cygwin\cygterm\msys2term\msys2term.exe goto msys2term_pass
 copy /y ..\cygwin\cygterm\msys2term\msys2term.exe %dst%
