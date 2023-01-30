@@ -41,6 +41,7 @@ static void key_usage(void)
 		"'l'	disp line state\n"
 		"'L'	check line state before sending\n"
 		"'D'	open device dialogbox\n"
+		"'v'	verbose on/off\n"
 		"   send mode\n"
 		"':'	go command mode\n"
 		);
@@ -101,6 +102,14 @@ void dumpDCB(const DCB *p)
 	printf("Fill for now.                   %d\n", p->wReserved1);
 }
 
+void dumpCOMMTIMEOUTS(const COMMTIMEOUTS *p)
+{
+	printf("Maximum time between read chars %d\n", p->ReadIntervalTimeout);
+	printf("read Multiplier of characters   %d\n", p->ReadTotalTimeoutMultiplier);
+	printf("read Constant in milliseconds   %d\n", p->ReadTotalTimeoutConstant);
+	printf("write Multiplier of characters  %d\n", p->WriteTotalTimeoutMultiplier);
+	printf("write Constant in milliseconds  %d\n", p->WriteTotalTimeoutConstant);
+}
 
 int wmain(int argc, wchar_t *argv[])
 {
@@ -112,7 +121,7 @@ int wmain(int argc, wchar_t *argv[])
 
 	bool verbose = false;
 	wchar_t *ini_base = L"ttcomtester.ini";
-	int arg_rts = RTS_CONTROL_DISABLE;
+	const wchar_t *arg_rts = L"off";
 	wchar_t *prog = argv[0];
 	wchar_t *arg_device_name = NULL;
 
@@ -146,13 +155,13 @@ int wmain(int argc, wchar_t *argv[])
 			break;
 		case L'r': {
 			if (wcscmp(optarg_w, L"off") == 0) {
-				arg_rts = RTS_CONTROL_DISABLE;
+				arg_rts = L"off";
 			} else if (wcscmp(optarg_w, L"on") == 0) {
-				arg_rts = RTS_CONTROL_ENABLE;
+				arg_rts = L"on";
 			} else if (wcscmp(optarg_w, L"hs") == 0) {
-				arg_rts = RTS_CONTROL_HANDSHAKE;
-			} else if (wcscmp(optarg_w, L"on") == 0) {
-				arg_rts = RTS_CONTROL_TOGGLE;
+				arg_rts = L"hs";
+			} else if (wcscmp(optarg_w, L"toggle") == 0) {
+				arg_rts = L"toggle";
 			} else {
 				printf("check rts option");
 				exit(1);
@@ -197,24 +206,71 @@ int wmain(int argc, wchar_t *argv[])
 
 	device_ope const *ope = dev->ope;
 	ope->ctrl(dev, SET_PORT_NAME, device_name);
-
-	DCB dcb;
-	memset(&dcb, 0, sizeof(dcb));	// 100% buildしてくれないようだ
-	dcb.DCBlength = sizeof(dcb);
-	BOOL r = BuildCommDCBW(com_param, &dcb);
-	dcb.fRtsControl = arg_rts;
-	if (r == FALSE) {
-		DWORD e = GetLastError();
-		wchar_t b[128];
-		swprintf_s(b, _countof(b), L"BuildCommDCBW('%s')", com_param);
-		DispErrorStr(b, e);
-		goto finish;
-	}
 	if (verbose) {
 		printf("param='%ls'\n", com_param);
-		dumpDCB(&dcb);
 	}
-	ope->ctrl(dev, SET_COM_DCB, &dcb);
+
+	{
+		DCB dcb;
+		memset(&dcb, 0, sizeof(dcb));	// 100% buildしてくれないようだ
+		dcb.DCBlength = sizeof(dcb);
+		BOOL r = BuildCommDCBW(com_param, &dcb);
+		if (wcscmp(arg_rts, L"off") == 0) {
+			dcb.fRtsControl = RTS_CONTROL_DISABLE;
+			dcb.fOutxCtsFlow = FALSE;
+		} else if (wcscmp(arg_rts, L"on") == 0) {
+			dcb.fRtsControl = RTS_CONTROL_ENABLE;
+			dcb.fOutxCtsFlow = FALSE;
+		} else if (wcscmp(arg_rts, L"hs") == 0) {
+			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+			dcb.fOutxCtsFlow = TRUE;
+		} else if (wcscmp(arg_rts, L"toggle") == 0) {
+			dcb.fRtsControl = RTS_CONTROL_TOGGLE;
+			//dcb.fOutxCtsFlow = TRUE; //??
+		}
+		if (r == FALSE) {
+			DWORD e = GetLastError();
+			wchar_t b[128];
+			swprintf_s(b, _countof(b), L"BuildCommDCBW('%s')", com_param);
+			DispErrorStr(b, e);
+			goto finish;
+		}
+		ope->ctrl(dev, SET_COM_DCB, &dcb);
+	}
+
+	{
+		COMMTIMEOUTS timeouts;
+		memset(&timeouts, 0, sizeof(timeouts));
+#if 0
+		// Tera Term が設定しているパラメータ
+		timeouts.ReadIntervalTimeout = MAXDWORD;
+		timeouts.WriteTotalTimeoutConstant = 500;
+#endif
+#if 0
+		// CODE PROJECT の値
+		// https://www.codeproject.com/articles/3061/creating-a-serial-communication-on-win
+		timeouts.ReadIntervalTimeout = 3;
+		timeouts.ReadTotalTimeoutMultiplier = 3;
+		timeouts.ReadTotalTimeoutConstant = 2;
+		timeouts.WriteTotalTimeoutMultiplier = 3;
+		timeouts.WriteTotalTimeoutConstant = 2;
+#endif
+#if 0
+		// PuTTYの値
+		timeouts.ReadIntervalTimeout = 1;
+		timeouts.ReadTotalTimeoutMultiplier = 0;
+		timeouts.ReadTotalTimeoutConstant = 0;
+		timeouts.WriteTotalTimeoutMultiplier = 0;
+		timeouts.WriteTotalTimeoutConstant = 0;
+#endif
+		// 今回提案する値
+		timeouts.ReadIntervalTimeout = 1;
+		timeouts.ReadTotalTimeoutMultiplier = 0;
+		timeouts.ReadTotalTimeoutConstant = 0;
+		timeouts.WriteTotalTimeoutMultiplier = 0;
+		timeouts.WriteTotalTimeoutConstant = 1;
+		ope->ctrl(dev, SET_COM_TIMEOUTS, &timeouts);
+	}
 
 	printf(
 		"':'		switch mode\n"
@@ -251,6 +307,14 @@ int wmain(int argc, wchar_t *argv[])
 					else {
 						DispErrorStr(L"open()", e);
 					}
+					if (verbose) {
+						DCB dcb;
+						ope->ctrl(dev, GET_COM_DCB, &dcb);
+						dumpDCB(&dcb);
+						COMMTIMEOUTS timeouts;
+						ope->ctrl(dev, GET_COM_TIMEOUTS, &timeouts);
+						dumpCOMMTIMEOUTS(&timeouts);
+					}
 					break;
 				}
 				case 'c': {
@@ -266,27 +330,25 @@ int wmain(int argc, wchar_t *argv[])
 					for(size_t i = 0; i < send_len; i++) {
 						send_data[i] = (unsigned char)i;
 					}
-					size_t sended_len;
-					DWORD e = ope->write(dev, send_data, send_len, &sended_len);
+					size_t sent_len;
+					DWORD e = ope->write(dev, send_data, send_len, &sent_len);
 					if (e == ERROR_SUCCESS) {
-						printf("sent\n");
+						printf("sent %zu bytes\n", sent_len);
 					}
 					else if (e == ERROR_IO_PENDING) {
-						size_t sended_len_total = sended_len;
+						size_t sent_len_total = sent_len;
 						while(1) {
-							r = ope->wait_write(dev, &sended_len);
-#if 0
-							if (r == ERROR_SUCCESS) {
-								printf("sent\n");
+							DWORD r = ope->wait_write(dev, &sent_len);
+							if (r != ERROR_SUCCESS) {
+								printf("send error\n");
 							}
-#endif
-							sended_len_total += sended_len;
-							printf("send size %zu(%zu)/%zu\n", sended_len_total, sended_len, send_len);
+							sent_len_total += sent_len;
+							printf("send size %zu(%zu)/%zu\n", sent_len_total, sent_len, send_len);
 							Sleep(100);
 						}
 					}
 					else {
-						DispErrorStr(L"open()", e);
+						DispErrorStr(L"write()", e);
 					}
 					free(send_data);
 					break;
@@ -392,6 +454,16 @@ int wmain(int argc, wchar_t *argv[])
 				}
 				case 'D': {
 					ope->ctrl(dev, OPEN_CONFIG_DIALOG);
+					if (verbose) {
+						DCB dcb;
+						ope->ctrl(dev, GET_COM_DCB, &dcb);
+						dumpDCB(&dcb);
+					}
+					break;
+				}
+				case 'v': {
+					verbose = verbose ? false : true;
+					printf("verbose %s\n", verbose?"on":"off");
 					break;
 				}
 				case ':': {
@@ -413,11 +485,11 @@ int wmain(int argc, wchar_t *argv[])
 				else {
 					if (state == STATE_OPEN) {
 						char send_text[2];
-						size_t sended_len;
+						size_t sent_len;
 						send_text[0] = (char)c;
-						DWORD e = ope->write(dev, send_text, 1, &sended_len);
+						DWORD e = ope->write(dev, send_text, 1, &sent_len);
 						if (e == ERROR_SUCCESS) {
-							printf("send %02x, %zu byte\n", c, sended_len);
+							printf("send %02x, %zu byte\n", c, sent_len);
 						}
 						else {
 							DispErrorStr(L"write() error", e);

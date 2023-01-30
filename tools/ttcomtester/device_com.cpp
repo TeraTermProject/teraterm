@@ -103,29 +103,13 @@ static DWORD open(device_t *device)
 	SetupComm(h, CommInQueSize, CommOutQueSize);
 	PurgeComm(h, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 
-	COMMTIMEOUTS ctmo;
-	r = GetCommTimeouts(h, &ctmo);
-	assert(r == TRUE);
-	printf("Maximum time between read chars %d\n", ctmo.ReadIntervalTimeout);
-	printf("read Multiplier of characters %d\n", ctmo.ReadTotalTimeoutMultiplier);
-	printf("read Constant in milliseconds %d\n", ctmo.ReadTotalTimeoutConstant);
-	printf("write Multiplier of characters %d\n", ctmo.WriteTotalTimeoutMultiplier);
-	printf("write Constant in milliseconds %d\n", ctmo.WriteTotalTimeoutConstant);
-
 	if (p->commtimeouts_setted) {
 		r = SetCommTimeouts(h, &p->commtimeouts);
 		assert(r == TRUE);
 	}
-	else {
-		// Tera Term ‚ªÝ’è‚µ‚Ä‚¢‚éƒpƒ‰ƒ[ƒ^
-#if 0
-		memset(&ctmo, 0, sizeof(ctmo));
-		ctmo.ReadIntervalTimeout = MAXDWORD;
-		ctmo.WriteTotalTimeoutConstant = 500;
-		r = SetCommTimeouts(h, &ctmo);
-		assert(r == TRUE);
-#endif
-	}
+
+	r = GetCommTimeouts(h, &p->commtimeouts);
+	assert(r == TRUE);
 
 	if (p->dcb_setted) {
 		if (p->dcb.XonChar == p->dcb.XoffChar) {
@@ -139,6 +123,9 @@ static DWORD open(device_t *device)
 			return e;
 		}
 	}
+
+	r = GetCommState(h, &p->dcb);
+	assert(r == TRUE);
 
 	SetCommMask(h, 0);
 	SetCommMask(h, EV_RXCHAR);
@@ -451,10 +438,22 @@ static DWORD ctrl(device_t *device, device_ctrl_request request, ...)
 		retval = ERROR_SUCCESS;
 		break;
 	}
+	case GET_COM_DCB: {
+		DCB *dcb = va_arg(ap, DCB *);
+		*dcb = p->dcb;
+		retval = ERROR_SUCCESS;
+		break;
+	}
 	case SET_COM_TIMEOUTS: {
 		COMMTIMEOUTS *commtimeouts = va_arg(ap, COMMTIMEOUTS *);
 		p->commtimeouts = *commtimeouts;
 		p->commtimeouts_setted = true;
+		retval = ERROR_SUCCESS;
+		break;
+	}
+	case GET_COM_TIMEOUTS: {
+		COMMTIMEOUTS *commtimeouts = va_arg(ap, COMMTIMEOUTS *);
+		*commtimeouts = p->commtimeouts;
 		retval = ERROR_SUCCESS;
 		break;
 	}
@@ -478,6 +477,8 @@ static DWORD ctrl(device_t *device, device_ctrl_request request, ...)
 		r = CommConfigDialogW(p->port_name, NULL, &cc);
 		if (r == TRUE) {
 			r = SetCommConfig(p->h, &cc, size);
+			assert(r == TRUE);
+			r = GetCommState(p->h, &p->dcb);
 			assert(r == TRUE);
 		}
 		break;
