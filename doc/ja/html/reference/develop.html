@@ -12,184 +12,352 @@
 <h1 class="center">Tera Term ŠJ”­ÒŒü‚¯</h1>
 
 <ol>
-  <li><a href="#environment">ŠJ”­ŠÂ‹«</a></li>
-  <li><a href="#library">ƒ‰ƒCƒuƒ‰ƒŠ</a></li>
-  <li><a href="#committer">SVN ƒRƒ~ƒbƒ^[‚Ö‚Ì’ˆÓ</a></li>
-  <li><a href="#ini-entry">TERATERM.INI ‚Ö‚Ì€–Ú’Ç‰Á</a></li>
-  <li><a href="#menu-id">ƒƒjƒ…[ID’Ç‰Á‚Ì–½–¼‹K‘¥</a></li>
-  <li><a href="#add-macro-command">ƒ}ƒNƒƒRƒ}ƒ“ƒh’Ç‰Á‚Ìì‹ÆƒŠƒXƒg</a></li>
-  <li><a href="#build-library">ƒ‰ƒCƒuƒ‰ƒŠ‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-teraterm">Tera Term‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-teraterm-menu">TeraTerm Menu‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-ttxkanjimenu">TTXKanjiMenu‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-ttproxy">TTProxy‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-ttssh">TTSSH‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-cygterm">CygTerm‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-ttxsamples">TTXSamples‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#build-htmlhelp">ƒwƒ‹ƒvƒtƒ@ƒCƒ‹‚Ìƒrƒ‹ƒh•û–@</a></li>
-  <li><a href="#release">ƒŠƒŠ[ƒX‚Ìè‡</a></li>
+  <li><a href="#environment">ŠJ”­ŠÂ‹«Eƒ‰ƒCƒuƒ‰ƒŠ</a>
+    <ol>
+      <li><a href="#compiler">ƒRƒ“ƒpƒCƒ‰Eƒc[ƒ‹</a></li>
+      <li><a href="#library">g—p‚µ‚Ä‚¢‚éƒ‰ƒCƒuƒ‰ƒŠ</a></li>
+    </ol>
+  </li>
+  <li><a href="#build">ƒrƒ‹ƒh‚·‚é</a>
+    <ol>
+      <li><a href="#build-env">ŠÂ‹«\’z</a></li>
+      <li><a href="#build-quick">ƒrƒ‹ƒhè‡ (Quick Start)</a>
+        <ol>
+          <li><a href="#build-quick-checkout">ƒ\[ƒXƒR[ƒh‚Ìƒ`ƒFƒbƒNƒAƒEƒg</a></li>
+          <li><a href="#build-quick-all">ƒrƒ‹ƒh</a></li>
+        </ol>
+      </li>
+      <li><a href="#build-detail">ƒrƒ‹ƒhè‡ (Úà)</a>
+        <ol>
+          <li><a href="#build-checkout">ƒ\[ƒXƒR[ƒh‚Ìƒ`ƒFƒbƒNƒAƒEƒg</a></li>
+          <li><a href="#build-library">ƒ‰ƒCƒuƒ‰ƒŠ‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-teraterm">Tera Term‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-ttssh">TTSSH‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-ttproxy">TTProxy‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-ttxkanjimenu">TTXKanjiMenu‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-ttxsamples">TTXSamples‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-teraterm-menu">TeraTerm Menu‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-cygterm">CygTerm+‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-cyglaunch">Cyglaunch‚Ìƒrƒ‹ƒh</a></li>
+          <li><a href="#build-htmlhelp">ƒwƒ‹ƒvƒtƒ@ƒCƒ‹‚Ìƒrƒ‹ƒh</a></li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li><a href="#develop">ŠJ”­ì‹Æƒƒ‚</a>
+    <ol>
+      <li><a href="#ini-entry">TERATERM.INI ‚Ö‚Ì€–Ú’Ç‰Á</a></li>
+      <li><a href="#menu-id">ƒƒjƒ…[ID’Ç‰Á‚Ì–½–¼‹K‘¥</a></li>
+      <li><a href="#add-macro-command">ƒ}ƒNƒƒRƒ}ƒ“ƒh’Ç‰Á‚Ìì‹ÆƒŠƒXƒg</a></li>
+      <li><a href="#icon">ƒAƒCƒRƒ“</a></li>
+    </ol>
+  </li>
+  <li><a href="#release">ƒŠƒŠ[ƒX‚Ìè‡</a>
+    <ol>
+      <li><a href="#start-rc">ƒŠƒŠ[ƒXì‹Æ‚ÌŠJn‚©‚çRCì¬‚Ü‚Å</a></li>
+      <li><a href="#rc-release">RCì¬‚©‚çƒŠƒŠ[ƒX‚Ü‚Å</a></li>
+      <li><a href="#release-operation">ƒŠƒŠ[ƒXì‹Æ</a></li>
+      <li><a href="#code-freeze">ƒR[ƒhƒtƒŠ[ƒY‚É‚Â‚¢‚Ä</a></li>
+    </ol>
+  </li>
 </ol>
 
 <hr>
 
-<h2 id="environment">ŠJ”­ŠÂ‹«</h2>
+<h2 id="environment">ŠJ”­ŠÂ‹«Eƒ‰ƒCƒuƒ‰ƒŠ</h2>
+
+<h3 id="compiler">ƒRƒ“ƒpƒCƒ‰Eƒc[ƒ‹</h3>
+
+<p>
+Tera Term Project ‚ÅƒŠƒŠ[ƒX‚Ég—p‚µ‚Ä‚¢‚éƒRƒ“ƒpƒCƒ‰‚ÍˆÈ‰º‚Ì’Ê‚è‚Å‚·B
+</p>
 
 <ul>
-  <li>OS
+  <li>Visual Studio Community 2022 (ÅV”Å) (<a href="https://visualstudio.microsoft.com/">https://visualstudio.microsoft.com/</a>)</li>
+  <li>Cygwin gcc (<a href="https://www.cygwin.com/">https://www.cygwin.com/</a>)<br />
+    CygTerm+ ‚Ìƒrƒ‹ƒh‚Ég—p‚µ‚Ü‚·B
+    <!--Cygwin ‚ÌÅV”Å‚Í 32bit ƒoƒCƒiƒŠ‚ª¶¬‚Å‚«‚Ü‚¹‚ñB32bit ƒoƒCƒiƒŠ‚ğ¶¬‚Å‚«‚é cygwin32-gcc-g++ ‚ğ Cygwin Time Machine (<a href="http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html">http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html</a>) ‚©‚çƒ_ƒEƒ“ƒ[ƒh‚µ‚Ü‚·B-->
+  </li>
+</ul>
+
+<p>
+ƒrƒ‹ƒh‚É•K—v‚Èƒc[ƒ‹‚ÍˆÈ‰º‚Ì’Ê‚è‚Å‚·B
+</p>
+
+<ul>
+  <li>Perl<br />
+    ˆÈ‰º‚Ì‚¢‚¸‚ê‚©:
     <ul>
-      <li>Windows XP Professional</li>
-      <li>Windows 8 Pro</li>
-      <li>Windows 8.1 Pro</li>
-      <li>Windows 10 Pro</li>
+      <li>Strawberry Perl 5.30.1.1 ˆÈã (<a href="https://strawberryperl.com/">https://strawberryperl.com/</a>)</li>
+      <li>ActivePerl 5.10 ˆÈã (<a href="https://www.activestate.com/products/perl/">https://www.activestate.com/products/perl/</a>)</ li>
+    </ul>
+    ƒrƒ‹ƒh‰ß’ö‚Åg—p‚µ‚Ü‚·B<br />
+    <ul>
+      <li>ƒhƒLƒ…ƒƒ“ƒgƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒhE‰üsƒR[ƒh•ÏŠ·(•K{)</li>
+      <li>ƒŠƒrƒWƒ‡ƒ“”Ô†æ“¾ (perl‚ª‚È‚¢ê‡ƒŠƒrƒWƒ‡ƒ“”Ô†‚ğæ“¾‚¹‚¸‚Éƒrƒ‹ƒh‚µ‚Ü‚·)</li>
     </ul>
   </li>
-  <li>Tera Term Project ‚ÅƒŠƒŠ[ƒX‚Ég—p‚µ‚Ä‚¢‚éƒRƒ“ƒpƒCƒ‰
+  <li>Subversion<br />
+    ˆÈ‰º‚Ì‚¢‚¸‚ê‚©:
     <ul>
-      <li>Visual Studio 2005 SP1 (Standard Edition ˆÈã)
-        <ul>
-          <li>Service Pack 1 (VS80sp1-KB926601-X86-ENU.exe)</li>
-          <li>Microsoft Visual Studio 2005 Service Pack 1 MFC ƒZƒLƒ…ƒŠƒeƒBXVƒvƒƒOƒ‰ƒ€ (VS80sp1-KB2538218-v2-X86-INTL.exe)</li>
-          <li>Windows Vista ˆÈã‚Åƒrƒ‹ƒh‚·‚éê‡‚ÍAVisual Studio 2005 Service Pack 1 Update for Windows Vista (VS80sp1-KB932236-X86-JPN.exe)</li>
-          <li>Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)<br />
-              ’: Visual Studio 2005 Standard Edition‚Å‚ÍAOpenSSL ‚Ìƒrƒ‹ƒh‚ª¸”s‚µ‚Ü‚·BWindows Server 2003 R2 Platform SDK ‚ğƒCƒ“ƒXƒg[ƒ‹‚µA"Crypt32.Lib"‚ğƒŠƒ“ƒN‚Å‚«‚é‚æ‚¤‚É‚µ‚Ä‚¨‚­•K—v‚ª‚ ‚è‚Ü‚·B<br />
-              SDK ‚ÅƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚½ƒfƒBƒŒƒNƒgƒŠ‚ªÅ—Dæ‚É‚È‚é‚æ‚¤AINCLUDE ‚¨‚æ‚Ñ LIB ŠÂ‹«•Ï”‚ğİ’è‚µ‚Ü‚·B
-              <pre>
-e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
-     LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
-              </pre>
-              C³ƒoƒbƒ`ƒtƒ@ƒCƒ‹ C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\vsvars32.bat
-          </li>
-        </ul>
-      </li>
+      <li>VisualSVN (<a href="https://www.visualsvn.com/downloads/">https://www.visualsvn.com/downloads/</a>)</li>
+      <li>TortoiseSVN (<a href="https://tortoisesvn.net/downloads.html">https://tortoisesvn.net/downloads.html</a>)</li>
+      <li>Subversion for Windows (<a href="http://sourceforge.net/projects/win32svn/">http://sourceforge.net/projects/win32svn/</a>)</li>
     </ul>
+    ƒ\[ƒX‚Ìƒ`ƒFƒbƒNƒAƒEƒg‚Ég—p‚µ‚Ü‚·B<br />
+    ‚Ü‚½AƒŠƒrƒWƒ‡ƒ“”Ô†‚Ìæ“¾‚Ì‚½‚ß‚ÉAƒ\[ƒX‚Ìƒ`ƒFƒbƒNƒAƒEƒg‚Ég‚Á‚½‚Ì‚ÆŒİŠ·«‚Ì‚ ‚éƒo[ƒWƒ‡ƒ“‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“”Å‚ª•K—v‚Å‚·B
   </li>
-  <li>ƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éƒRƒ“ƒpƒCƒ‰
-    <ul>
-      <li>Visual Studio 2005 (Express Edition‚ÍTera Term 4.103‚©‚ç‘Î‰)
-        <ul>
-          <li>with SDK 7.0
-            <ul>
-              <li>Windows Server 2003 R2 Platform SDK (= Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1) (5.2.3790.2075.51.PlatformSDK_Svr2003R2_rtm.img)<br />
-                  ’: Microsoft‚ÌƒTƒCƒg‚©‚ç‚Í“üè•s‰Â”\(2019/04/07“_)</li>
-            </ul>
-          </li>
-          <li>with SDK 7.1
-            <ul>
-              <li>Microsoft Windows SDK for Windows 7 and .NET Framework 4 (GRMSDK_EN_DVD.iso)</li>
-              <li>Visual Studio 2005‚Å—˜—p‚·‚é‚É‚ÍKB949009(VS80sp1-KB949009-X86-INTL.exe)‚©KB980422(VS80sp1-KB980422-x86-INTL.exe)‚ª•K—v<br />
-                  ’: KB949009,KB980422‚ÍMicrosoft‚ÌƒTƒCƒg‚©‚ç“üè•s‰Â”\</li>
-            </ul>
-            Windows95‚Å‚à“®ì‚·‚éƒoƒCƒiƒŠ‚ğƒrƒ‹ƒh‰Â”\
-          </li>
-        </ul>
-      </li>
-      <li>Visual Studio 2008 SP1 (Standard Edition ˆÈã)<br />
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB
-      </li>
-      <li>Visual Studio 2010 SP1 (Professional Edition ˆÈã)<br />
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows 2000, NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB
-      </li>
-      <li>Visual Studio 2012 Update 4 (Professional Edition ˆÈã)<br />
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows Vista, XP, 2000, NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB<br />
-          Windows Vista, XP ‚ğƒTƒ|[ƒg‚·‚é‚É‚Í v110_xp ‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
-      </li>
-      <li>Visual Studio Community 2013 Update 5<br />
-        <ul>
-          <li>MFC MBCS DLL ƒAƒhƒIƒ“ (vc_mbcsmfc.exe)</li>
-        </ul>
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows Vista, XP, 2000, NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB<br />
-          Windows Vista, XP ‚ğƒTƒ|[ƒg‚·‚é‚É‚Í v120_xp ‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
-      </li>
-      <li>Visual Studio Community 2015 Update 3<br />
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows Vista, XP, 2000, NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB<br />
-          Windows Vista, XP ‚ğƒTƒ|[ƒg‚·‚é‚É‚Í v140_xp ‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
-      </li>
-      <li>Visual Studio Community 2017<br />
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows Vista, XP, 2000, NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB<br />
-          Windows Vista, XP ‚ğƒTƒ|[ƒg‚·‚é‚É‚Í v141_xp ‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
-      </li>
-      <li>Visual Studio Community 2019<br />
-          ’: ƒRƒ“ƒpƒCƒ‹‚³‚ê‚½Àsƒtƒ@ƒCƒ‹‚Í Windows Vista, XP, 2000, NT 4.0, 95, 98, Me ‚Å“®‚«‚Ü‚¹‚ñB
-      </li>
-      <li>ƒoƒbƒ`ƒtƒ@ƒCƒ‹‚©‚çƒrƒ‹ƒh‚·‚é‚½‚ß‚É<br />
-          Visual Studio ‚ÌƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg‚©‚çƒoƒbƒ`ƒtƒ@ƒCƒ‹‚ğÀs‚·‚é‚©AˆÈ‰º‚Ì‚æ‚¤‚ÉŠÂ‹«•Ï”‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B<br />
-          g—p‚µ‚½‚¢ƒo[ƒWƒ‡ƒ“‚Ì Visual Studio ‚Ì "(x86) Native Tools Command Prompt" ‚ğÀs‚µAƒRƒ“ƒpƒCƒ‰‚ÌƒpƒX‚ÉŠÖŒW‚·‚é PATH ‚Æ VSINSTALLDIR •Ï”‚ğŠÂ‹«•Ï”‚É“o˜^‚µ‚Ä‚­‚¾‚³‚¢B
-          <pre>
-Example:
-INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
-LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
-PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
-VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
-          </pre>
-      </li>
-    </ul>
+  <li>HTML Help Compiler<br />
+    ƒwƒ‹ƒv‚Ìì¬‚Ég—p‚µ‚Ü‚·B
   </li>
-  <li>ƒCƒ“ƒXƒg[ƒ‰
+  <li>CMake<br />
+    ƒtƒ@ƒCƒ‹‚Ìƒ_ƒEƒ“ƒ[ƒh‚â“WŠJ‚âˆ³k‚È‚Ç‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>Inno Setup<br />
     <ul>
-      <li>Inno Setup 6.2.1 (<a href="https://jrsoftware.org/isinfo.php">https://jrsoftware.org/isinfo.php</a>)
+      <li>Inno Setup 6.2.1 (<a href="https://jrsoftware.org/isinfo.php">https://jrsoftware.org/isinfo.php</a>)</li>
       <li>Inno Script Studio 2.5.1 (<a href="https://www.kymoto.org/products/inno-script-studio">https://www.kymoto.org/products/inno-script-studio</a>)</li>
     </ul>
+    ƒCƒ“ƒXƒg[ƒ‰‚Ìì¬‚Ég—p‚µ‚Ü‚·B
   </li>
-  <li>‚»‚Ì‘¼
+</ul>
+
+<h3 id="library">ƒ‰ƒCƒuƒ‰ƒŠ</h3>
+
+<ul>
+  <li>Oniguruma 6.9.8 (<a href="https://github.com/kkos/oniguruma/">https://github.com/kkos/oniguruma/</a>)<br />
+    Tera Term Macro ‚Å³‹K•\Œ»‚Ì‚½‚ß‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>SFMT 1.5.1 (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)<br />
+    Tera Term Macro ‚Å—”¶¬‚Ì‚½‚ß‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>LibreSSL 3.4.3 (<a href="https://www.libressl.org/">https://www.libressl.org/</a>)<br />
+    TTSSH ‚ÅˆÃ†‚Ì‚½‚ß‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>zlib 1.2.13 (<a href="https://www.zlib.net/">https://www.zlib.net/</a>)<br />
+    TTSSH ‚Åˆ³k‚Ì‚½‚ß‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>PuTTY 0.76 (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">https://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)<br />
+    TTSSH ‚Å Pageant ‚Æ‚Ì’ÊM‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>The reference C implementation of Argon2 20190702 (<a href="https://github.com/P-H-C/phc-winner-argon2/">https://github.com/P-H-C/phc-winner-argon2/</a>)<br />
+    TTSSH ‚Å PuTTY ‚Ì”é–§Œ®ƒtƒ@ƒCƒ‹Œ`®ƒo[ƒWƒ‡ƒ“3 (PPK3) ‚Ì“Ç‚İ‚İ‚Ég—p‚µ‚Ü‚·B
+  </li>
+  <li>cJSON 1.7.14 (<a href="https://github.com/DaveGamble/cJSON/">https://github.com/DaveGamble/cJSON/</a>)<br />
+    TTXCheckUpdate plugin ‚Åg—p‚µ‚Ü‚·B
+  </li>
+</ul>
+
+
+<h2 id="build">ŠJ”­ŠÂ‹«Eƒ‰ƒCƒuƒ‰ƒŠ</h2>
+
+<h3 id="build-env">ŠÂ‹«\’z</h3>
+
+<ul>
+  <li>Visual Studio Community 2022 ‚ÌƒCƒ“ƒXƒg[ƒ‹
     <ul>
-      <li>Cygwin ÅV”Å(v4.105‚©‚çCygTerm+‚ÍVistaˆÈ~‘Î‰‚Æ‚È‚Á‚½‚½‚ß)</li>
-      <li>ActivePerl 5.10 ˆÈã ‚Ü‚½‚Í Strawberry Perl 5.30.1.1 ˆÈã<br />
-          ƒrƒ‹ƒh‰ß’ö‚Åg—p‚µ‚Ü‚·<br />
-          <ul>
-            <li>OpenSSL ‚ÌƒRƒ“ƒpƒCƒ‹(•K{)</li>
-            <li>ƒhƒLƒ…ƒƒ“ƒgƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒhE‰üsƒR[ƒh•ÏŠ·(•K{)</li>
-            <li>ƒŠƒrƒWƒ‡ƒ“”Ô†æ“¾ (perl‚ª‚È‚¢ê‡ƒŠƒrƒWƒ‡ƒ“”Ô†‚ğæ“¾‚¹‚¸‚Éƒrƒ‹ƒh‚µ‚Ü‚·)</li>
-          </ul>
-      </li>
-      <li>Subversion for Windows (<a href="http://sourceforge.net/projects/win32svn/">http://sourceforge.net/projects/win32svn/</a>)<br />
-          ƒŠƒrƒWƒ‡ƒ“”Ô†æ“¾‚Ég—p‚µ‚Ü‚·<br />
-          buildtools/svnrev/toolinfo.txt ‚É svn.exe ‚Ìƒtƒ‹ƒpƒX‚ğ‹Lq‚¢‚Ä‚­‚¾‚³‚¢B<br />
-          Ú‚µ‚­‚Í buildtools/svnrev/readme.md ‚ğQÆ‚­‚¾‚³‚¢
+      <li>C++ ‚É‚æ‚éƒfƒXƒNƒgƒbƒvŠJ”­</li>
+      <li>ÅV‚Ì v143 ƒrƒ‹ƒhƒc[ƒ‹—p C++ MFC (x86 ‚¨‚æ‚Ñ x64)<br />
+        HTML Help Compiler (hhc.exe) ‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ü‚·B
       </li>
     </ul>
   </li>
+  <li>Cygwin ‚ÌƒCƒ“ƒXƒg[ƒ‹<br />
+    CygTerm+ ƒRƒ“ƒpƒCƒ‹ê—p‚Ì Cygwin ŠÂ‹«‚ğ\’z‚·‚é‚É‚ÍAbuildtools\install_cygwin.bat ‚ğÀs‚µ‚Ü‚·B<br />
+    Šù‘¶‚ÌŠÂ‹«‚ğ—˜—p‚·‚éê‡‚É‚ÍA<a href="../usage/cygwin.html#build">‚±‚¿‚ç</a>‚ğQÆ‚µ‚Ä‚­‚¾‚³‚¢B
+  </li>
+  <li>Perl ‚ğƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B</li>
+  <li>Subversion ‚ğƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B</li>
+  <li>CMake ‚ğƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B</li>
+  <li>Inno Setup ‚ğƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B</li>
 </ul>
 
+<p>
+Tera Term ‚ğƒrƒ‹ƒh‚·‚é‚½‚ß‚Éã‹L‚Ìƒc[ƒ‹‚ğV‹K“±“ü‚·‚é‚Ì‚Å‚Í‚È‚­A‚·‚Å‚ÉƒCƒ“ƒXƒg[ƒ‹Ï‚İ‚Ìƒc[ƒ‹‚ğg‚¤‚±‚Æ‚à‚Å‚«‚Ü‚·B<br />
+installer\release.bat ‚ªƒCƒ“ƒXƒg[ƒ‹Ï‚İ‚Ìƒc[ƒ‹‚ğŒ©‚Â‚¯‚ç‚ê‚È‚¢ê‡‚ÍAinstaller\toolinfo_sample.bat ‚ğ installer\toolinfo.bat ‚ÉƒRƒs[‚µA“K‹X•ÒW‚µ‚Ä‚­‚¾‚³‚¢B
+</p>
 
-<h2 id="library">ƒ‰ƒCƒuƒ‰ƒŠ</h2>
+<h3 id="build-quick">ƒrƒ‹ƒhè‡ (Quick Start)</h3>
+
+<h4 id="build-quick-checkout">ƒ\[ƒXƒR[ƒh‚Ìƒ`ƒFƒbƒNƒAƒEƒg</h4>
+
+<p>
+ƒ\[ƒXƒR[ƒh‚ğOSDN(http://svn.osdn.net/svnroot/ttssh2/trunk/)‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚µ‚Ü‚·B<br />
+ƒvƒƒWƒFƒNƒgƒƒ“ƒo‚Í svn+ssh://&lt;username&gt;@svn.osdn.net/svnroot/ttssh2/trunk/ ‚Ü‚½‚Í https://svn.osdn.net/svnroot/ttssh2/trunk/ ‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚µ‚Ü‚·B
+</p>
+
+<h4 id="build-quick-all">ƒrƒ‹ƒh</h4>
+
+<p>
+installer\release.bat ‚ğÀs‚µA3‚ğ‘I‘ğ‚µ‚Ü‚·B
+</p>
+
+<h3 id="build-detail">ƒrƒ‹ƒhè‡ (Úà)</h3>
+
+<h4 id="build-checkout">ƒ\[ƒXƒR[ƒh‚Ìƒ`ƒFƒbƒNƒAƒEƒg</h4>
+
+<p>
+ƒ\[ƒXƒR[ƒh‚ğOSDN(http://svn.osdn.net/svnroot/ttssh2/trunk/)‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚µ‚Ü‚·B<br />
+ƒvƒƒWƒFƒNƒgƒƒ“ƒo‚Í svn+ssh://&lt;username&gt;@svn.osdn.net/svnroot/ttssh2/trunk/ ‚Ü‚½‚Í https://svn.osdn.net/svnroot/ttssh2/trunk/ ‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚µ‚Ü‚·B
+</p>
+
+<h4 id="build-library">ƒ‰ƒCƒuƒ‰ƒŠ‚Ìƒrƒ‹ƒh</h4>
+
+<p>
+"x86 Native Tools Command Prompt for VS 2022" ‚ğ—§‚¿ã‚°‚é‚©A“KØ‚È PATH ‚ğ’Ê‚µ‚Ä‚¨‚­•K—v‚ª‚ ‚è‚Ü‚·B<br />
+* ‚Ì bat ‚ğŒÂ•Ê‚ÉÀs‚·‚é‚©‚í‚è‚ÉAlibs\buildall.bat ‚ğÀs‚·‚é‚±‚Æ‚Å‚Ü‚Æ‚ß‚Äƒrƒ‹ƒh‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
+</p>
 
 <ul>
-  <li>Oniguruma 6.9.8 (<a href="https://github.com/kkos/oniguruma/">https://github.com/kkos/oniguruma/</a>)</li>
-  <li>SFMT 1.5.1 (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
-  <li>LibreSSL 3.4.3 (<a href="https://www.libressl.org/">https://www.libressl.org/</a>)</li>
-  <li>zlib 1.2.13 (<a href="https://www.zlib.net/">https://www.zlib.net/</a>)</li>
-  <li>PuTTY 0.76 (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">https://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
-  <li>The reference C implementation of Argon2 20190702 (<a href="https://github.com/P-H-C/phc-winner-argon2/">https://github.com/P-H-C/phc-winner-argon2/</a>)</li>
-  <li>cJSON 1.7.14 (<a href="https://github.com/DaveGamble/cJSON/">https://github.com/DaveGamble/cJSON/</a>)</li>
+  <li>Oniguruma
+    <ol>
+      <li>oniguruma ‚Ìƒ\[ƒX‚ğ libs/oniguruma ‚Ì’†‚É“WŠJ‚·‚éB</li>
+      <li>libs\buildoniguruma6.bat ‚ğÀs‚·‚éB*</li>
+    </ol>
+  </li>
+  <li>SFMT
+    <ol>
+      <li>SFMT ‚Ìƒ\[ƒX‚ğ libs/SFMT ‚Ì’†‚É“WŠJ‚·‚éB</li>
+      <li>libs\buildSFMT.bat ‚ğÀs‚·‚éB*</li>
+      <li>•K—v‚É‰‚¶‚Ä libs/SFMT/SFMT_version_for_teraterm.h ‚Ìƒo[ƒWƒ‡ƒ“”Ô†‚ğC³‚·‚éB</li>
+    </ol>
+  </li>
+  <li>LibreSSL
+    <ol>
+      <li>LibreSSL ‚Ìƒ\[ƒX‚ğ libs/libressl ‚Ì’†‚É“WŠJ‚·‚éB</li>
+      <li>buildlibressl.bat ‚ğÀs‚·‚éB*</li>
+    </ol>
+  </li>
+  <li>Zlib
+    <ol>
+      <li>zlib ‚Ìƒ\[ƒX‚ğ libs/zlib ‚Ì’†‚É“WŠJ‚·‚éB</li>
+      <li>buildzlib.bat ‚ğÀs‚·‚éB*</li>
+    </ol>
+  </li>
+  <li>PuTTY
+    <ol>
+      <li>PuTTY ‚Ìƒ\[ƒX‚ğ libs/putty ‚Ì’†‚É“WŠJ‚·‚éB<br />
+          ttssh ƒ\ƒŠƒ…[ƒVƒ‡ƒ“”z‰º‚Ì putty ƒvƒƒWƒFƒNƒg‚É‚æ‚è•K—v‚È‹@”\‚Ì‚İ‚ªÃ“Iƒ‰ƒCƒuƒ‰ƒŠ‰»‚³‚êAttxssh.dll ‚ÉƒŠƒ“ƒN‚³‚ê‚é‚½‚ßA“WŠJ‚·‚é‚¾‚¯‚Å‚æ‚¢B</li>
+    </ol>
+  </li>
+  <li>The reference C implementation of Argon2
+    <ol>
+      <li>argon2 ‚Ìƒ\[ƒX‚ğ libs/argon2 ‚Ì’†‚É“WŠJ‚·‚éB<br />
+          argon2 ƒŠƒtƒ@ƒŒƒ“ƒXÀ‘•‚É‚ÍÃ“Iƒ‰ƒCƒuƒ‰ƒŠ‚ğ¶¬‚·‚éƒvƒƒWƒFƒNƒgƒtƒ@ƒCƒ‹‚ªŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢B<br />
+          ttssh ƒ\ƒŠƒ…[ƒVƒ‡ƒ“”z‰º‚Ì argon2 ƒvƒƒWƒFƒNƒg‚É‚æ‚èÃ“Iƒ‰ƒCƒuƒ‰ƒŠ‚ª¶¬‚³‚êAttxssh.dll ‚ÉƒŠƒ“ƒN‚³‚ê‚é‚½‚ßA“WŠJ‚·‚é‚¾‚¯‚Å‚æ‚¢B</li>
+    </ol>
+  </li>
+  <li>cJSON
+    <ol>
+      <li>cJSON ‚Ìƒ\[ƒX‚ğ libs/cJSON ‚Ì’†‚É“WŠJ‚·‚éB</li>
+    </ol>
+  </li>
 </ul>
 
+<h4 id="build-teraterm">Tera Term‚Ìƒrƒ‹ƒh</h4>
 
-<h2 id="committer">SVN ƒRƒ~ƒbƒ^[‚Ö‚Ì’ˆÓ</h2>
+<ol>
+  <li>teraterm\ttermpro.sln ‚ğVisual Studio‚ÅŠJ‚­B<br />
+      .slnƒtƒ@ƒCƒ‹‚Ì‰üsƒR[ƒh‚ª"LF"‚É‚È‚Á‚Ä‚¢‚é‚ÆAVisual Studio‚ª‹N“®‚µ‚È‚¢‚Ì‚Å’ˆÓŠè‚¢‚Ü‚·B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ teraterm\Debug / teraterm\Release ƒfƒBƒŒƒNƒgƒŠ‚ÉÀsƒvƒƒOƒ‰ƒ€‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<h4 id="build-ttssh">TTSSH‚Ìƒrƒ‹ƒh</h4>
+
+‚ ‚ç‚©‚¶‚ß teraterm\ttermpro.sln ‚É‚æ‚Á‚Ä common_static.lib ‚ªƒrƒ‹ƒh‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+
+<ol>
+  <li>ttssh2\ttssh.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ ttssh2\ttxssh\Debug / ttssh2\ttxssh\Release ƒfƒBƒŒƒNƒgƒŠ‚ÉDLL‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<h4 id="build-ttproxy">TTProxy‚Ìƒrƒ‹ƒh</h4>
+
+‚ ‚ç‚©‚¶‚ß teraterm\ttermpro.sln ‚É‚æ‚Á‚Ä common_static.lib ‚ªƒrƒ‹ƒh‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+
+<ol>
+  <li>TTProxy\TTProxy.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ TTProxy\Debug / TTProxy\Release ƒfƒBƒŒƒNƒgƒŠ‚ÉDLL‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<h4 id="build-ttxkanjimenu">TTXKanjiMenu‚Ìƒrƒ‹ƒh</h4>
+
+‚ ‚ç‚©‚¶‚ß teraterm\ttermpro.sln ‚É‚æ‚Á‚Ä common_static.lib ‚ªƒrƒ‹ƒh‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+
+<ol>
+  <li>TTXKanjiMenu\ttxkanjimenu.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ TTXKanjiMenu\Debug / TTXKanjiMenu\Release ƒfƒBƒŒƒNƒgƒŠ‚É ttxkanjimenu.dll ‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<h4 id="build-ttxsamples">TTXSamples‚Ìƒrƒ‹ƒh</h4>
 
 <p>
-SVN ƒŠƒ|ƒWƒgƒŠ‚Íˆê”ÊŒü‚¯‚Æ‚Íˆá‚¢AˆÈ‰º‚Ì’Ê‚è‚Å‚·B
+ƒŠƒ|ƒWƒgƒŠ‚ÌTTXSamples‚É Tera Term Extension (TTX)‚ÌƒTƒ“ƒvƒ‹‚ª‚ ‚è‚Ü‚·BTTX‚ğì‚éÛ‚ÌQl‚É‚µ‚Ä‚­‚¾‚³‚¢B
 </p>
+
+‚ ‚ç‚©‚¶‚ß teraterm\ttermpro.sln ‚É‚æ‚Á‚Ä common_static.lib ‚ªƒrƒ‹ƒh‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+
+<ol>
+  <li>TTXSamples\TTXSamples.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ TTXSamples\Debug / TTXSamples\Release ƒfƒBƒŒƒNƒgƒŠ‚ÉDLL‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<p>
+ŠeTTX‚ÌÚ×‚É‚Â‚¢‚Ä‚ÍAƒvƒƒWƒFƒNƒg“à‚ÌReadMe-ja.txt‚ğQÆ‚µ‚Ä‚­‚¾‚³‚¢B
+</p>
+
+<h4 id="build-teraterm-menu">TeraTerm Menu‚Ìƒrƒ‹ƒh</h4>
+
+‚ ‚ç‚©‚¶‚ß teraterm\ttermpro.sln ‚É‚æ‚Á‚Ä common_static.lib ‚ªƒrƒ‹ƒh‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+
+<ol>
+  <li>ttpmenu\ttpmenu.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ ttpmenu\Debug / ttpmenu\Release ƒfƒBƒŒƒNƒgƒŠ‚É ttpmenu.exe ‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<h4 id="build-cygterm">CygTerm+‚Ìƒrƒ‹ƒh</h4>
+
+<ol>
+  <li>Cygwin‚ÌƒVƒFƒ‹‚ğ‹N“®‚µAcygterm ƒfƒBƒŒƒNƒgƒŠ‚ÖˆÚ“®‚·‚éB
 <pre>
-svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk
+# cd cygterm
 </pre>
+  </li>
+  <li>CygTerm+‚ğƒRƒ“ƒpƒCƒ‹‚·‚éB
+<pre>
+# make
+</pre>
+  </li>
+  <li>cygterm.exe ‚ª¶¬‚³‚ê‚éB</li>
+</ol>
 
-<p>
-ƒtƒ@ƒCƒ‹‚ğ•Ê‚ÌƒfƒBƒŒƒNƒgƒŠ‚Å•ÒW‚µ‚È‚¢‚Å‚­‚¾‚³‚¢B<br />
-ƒRƒ~ƒbƒg‚µ‚½‚Æ‚«‚É•Ê‚Ìl‚ÌC³‚ğíœ‚µ‚Ä‚µ‚Ü‚¤‚±‚Æ‚ª‚ ‚è‚Ü‚·B
-</p>
+<h4 id="build-cyglaunch">Cyglaunch‚Ìƒrƒ‹ƒh</h4>
 
-<p>
-ƒAƒbƒvƒf[ƒgEƒRƒ~ƒbƒg‚Ì’ˆÓ<br />
-svn‚Ìˆ—‚ª¸”s‚·‚é‚±‚Æ‚ª‚ ‚é‚Ì‚ÅAƒtƒ@ƒCƒ‹‚ğƒGƒfƒBƒ^“™‚ÅŠJ‚¢‚½‚Ü‚Ü‚Ås‚í‚È‚¢‚Å‚­‚¾‚³‚¢B
-</p>
+–‘O‚É teraterm\ttermpro.sln ‚Ì common_static.lib ‚ªƒrƒ‹ƒh‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
 
-<p>
-Œ¾Œêƒtƒ@ƒCƒ‹•ÒW‚Ì’ˆÓ<br />
-Œ¾Œêƒtƒ@ƒCƒ‹(installer\release\lang\*.lng)‚Í‘½Œ¾Œê‘Î‰ƒGƒfƒBƒ^(vim, EmEditor, Notepad++“™)‚Å•ÒW‚µ‚Ä‚­‚¾‚³‚¢B
-</p>
+<ol>
+  <li>cygwin\cygwin.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
+  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
+  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ cygwin\Debug / cygwin\Release ƒfƒBƒŒƒNƒgƒŠ‚É cyglaunch.exe ‚ª¶¬‚³‚ê‚éB</li>
+</ol>
+
+<h4 id="build-htmlhelp">ƒwƒ‹ƒvƒtƒ@ƒCƒ‹‚Ìƒrƒ‹ƒh</h4>
+
+<ol>
+  <li>doc\makechm.bat ‚ğÀs‚·‚éB</li>
+</ol>
 
 
-<h2 id="ini-entry">TERATERM.INI ‚Ö‚Ì€–Ú’Ç‰Á</h2>
+<h2 id="develop">ŠJ”­ì‹Æƒƒ‚</h2>
+
+
+<h3 id="ini-entry">TERATERM.INI ‚Ö‚Ì€–Ú’Ç‰Á</h3>
 
 <p>
 €–Ú–¼<br />
@@ -198,7 +366,7 @@ svn‚Ìˆ—‚ª¸”s‚·‚é‚±‚Æ‚ª‚ ‚é‚Ì‚ÅAƒtƒ@ƒCƒ‹‚ğƒGƒfƒBƒ^“™‚ÅŠJ‚¢‚½‚Ü‚Ü‚Ås‚í‚È‚¢‚Å‚
 </p>
 
 
-<h2 id="menu-id">ƒƒjƒ…[ID’Ç‰Á‚Ì–½–¼‹K‘¥</h2>
+<h3 id="menu-id">ƒƒjƒ…[ID’Ç‰Á‚Ì–½–¼‹K‘¥</h3>
 
 <pre>
 1Œ…–Ú‚Í 5
@@ -229,7 +397,7 @@ svn‚Ìˆ—‚ª¸”s‚·‚é‚±‚Æ‚ª‚ ‚é‚Ì‚ÅAƒtƒ@ƒCƒ‹‚ğƒGƒfƒBƒ^“™‚ÅŠJ‚¢‚½‚Ü‚Ü‚Ås‚í‚È‚¢‚Å‚
 </pre>
 
 
-<h2 id="add-macro-command">ƒ}ƒNƒƒRƒ}ƒ“ƒh’Ç‰Á‚Ìì‹ÆƒŠƒXƒg</h2>
+<h3 id="add-macro-command">ƒ}ƒNƒƒRƒ}ƒ“ƒh’Ç‰Á‚Ìì‹ÆƒŠƒXƒg</h3>
 
 <p>
 Tera Termƒ}ƒNƒ‚ğVİ‚·‚é‚Æ‚«‚Ìì‹Æè‡‚É‚Â‚¢‚ÄAˆÈ‰º‚É¦‚µ‚Ü‚·B
@@ -266,192 +434,348 @@ Tera Termƒ}ƒNƒ‚ğVİ‚·‚é‚Æ‚«‚Ìì‹Æè‡‚É‚Â‚¢‚ÄAˆÈ‰º‚É¦‚µ‚Ü‚·B
 </ul>
 
 
-<h2 id="build-library">ƒ‰ƒCƒuƒ‰ƒŠ‚Ìƒrƒ‹ƒh•û–@</h2>
-
-<ul>
-  <li>PuTTY (used by TTSSH)
-    <ol>
-      <li>PuTTY ‚Ìƒ\[ƒX‚ğ libs/putty ‚Ì’†‚É“WŠJ‚·‚éB<br />
-          ttssh ƒ\ƒŠƒ…[ƒVƒ‡ƒ“”z‰º‚Ì putty ƒvƒƒWƒFƒNƒg‚É‚æ‚è•K—v‚È‹@”\‚Ì‚İ‚ªÃ“Iƒ‰ƒCƒuƒ‰ƒŠ‰»‚³‚êAttxssh.dll ‚ÉƒŠƒ“ƒN‚³‚ê‚é‚½‚ßA“WŠJ‚·‚é‚¾‚¯‚Å‚æ‚¢B</li>
-    </ol>
-  </li>
-  <li>Oniguruma (used by Tera Term Macro)
-    <ol>
-      <li>oniguruma ‚Ìƒ\[ƒX‚ğ libs/oniguruma ‚Ì’†‚É“WŠJ‚·‚éB</li>
-      <li>ƒXƒ^[ƒgƒƒjƒ…[‚©‚çuVisual Studio 2005 ƒRƒ}ƒ“ƒh ƒvƒƒ“ƒvƒgv‚ğ‹N“®‚·‚éB</li>
-      <li>ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒgã‚©‚ç libs ƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µAbuildoniguruma6.bat ‚ğÀs‚·‚éB</li>
-    </ol>
-  </li>
-  <li>OpenSSL (used by TTSSH)
-    <ol>
-      <li>openssl ‚Ìƒ\[ƒX‚ğ libs/openssl ‚Ì’†‚É“WŠJ‚·‚éB</li>
-      <li> OpenSSL 1.0.0e ˆÈ~‚ÅAlibs/openssl/Makefile.bak ‚ªÅ‰‚©‚ç‘¶İ‚·‚éê‡‚ÍAˆê“x‚¾‚¯è“®‚Åíœ‚µ‚Ä‚­‚¾‚³‚¢B</li>
-      <li>ƒXƒ^[ƒgƒƒjƒ…[‚©‚çuVisual Studio 2005 ƒRƒ}ƒ“ƒh ƒvƒƒ“ƒvƒgv‚ğ‹N“®‚·‚éB</li>
-      <li>ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒgã‚©‚ç libs ƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µAbuildopenssl11.bat ‚ğÀs‚·‚éB</li>
-    </ol>
-  </li>
-  <li>Zlib (used by TTSSH)
-    <ol>
-      <li>zlib ‚Ìƒ\[ƒX‚ğ libs/zlib ‚Ì’†‚É“WŠJ‚·‚éB</li>
-      <li>ƒXƒ^[ƒgƒƒjƒ…[‚©‚çuVisual Studio 2005 ƒRƒ}ƒ“ƒh ƒvƒƒ“ƒvƒgv‚ğ‹N“®‚·‚éB</li>
-      <li>ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒgã‚©‚ç libs ƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µAbuildzlib.bat ‚ğÀs‚·‚éB</li>
-    </ol>
-  </li>
-  <li>SFMT (used by Tera Term Macro)
-    <ol>
-      <li>SFMT ‚Ìƒ\[ƒX‚ğ libs/SFMT ‚Ì’†‚É“WŠJ‚·‚éB</li>
-      <li>ƒXƒ^[ƒgƒƒjƒ…[‚©‚çuVisual Studio 2005 ƒRƒ}ƒ“ƒh ƒvƒƒ“ƒvƒgv‚ğ‹N“®‚·‚éB</li>
-      <li>ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒgã‚©‚ç libs ƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µAbuildSFMT.bat ‚ğÀs‚·‚éB</li>
-      <li>•K—v‚É‰‚¶‚Ä libs/SFMT/SFMT_version_for_teraterm.h ‚Ìƒo[ƒWƒ‡ƒ“”Ô†‚ğC³‚·‚éB</li>
-    </ol>
-  </li>
-  <li>cJSON (used by TTXCheckUpdate plugin)
-    <ol>
-      <li>EcJSON ‚Ìƒ\[ƒX‚ğ libs/cJSON ‚Ì’†‚É“WŠJ‚·‚éB</li>
-    </ol>
-  </li>
-  <li>The reference C implementation of Argon2 (used by TTSSH)
-    <ol>
-      <li>argon2 ‚Ìƒ\[ƒX‚ğ libs/argon2 ‚Ì’†‚É“WŠJ‚·‚éB<br />
-          argon2 ƒŠƒtƒ@ƒŒƒ“ƒXÀ‘•‚É‚ÍÃ“Iƒ‰ƒCƒuƒ‰ƒŠ‚ğ¶¬‚·‚éƒvƒƒWƒFƒNƒgƒtƒ@ƒCƒ‹‚ªŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢B<br />
-          ttssh ƒ\ƒŠƒ…[ƒVƒ‡ƒ“”z‰º‚Ì argon2 ƒvƒƒWƒFƒNƒg‚É‚æ‚èÃ“Iƒ‰ƒCƒuƒ‰ƒŠ‚ª¶¬‚³‚êAttxssh.dll ‚ÉƒŠƒ“ƒN‚³‚ê‚é‚½‚ßA“WŠJ‚·‚é‚¾‚¯‚Å‚æ‚¢B</li>
-    </ol>
-  </li>
-</ul>
-
-<h2 id="build-teraterm">Tera Term‚Ìƒrƒ‹ƒh•û–@</h2>
+<h3 id="icon">ƒAƒCƒRƒ“</h3>
 
 <p>
-Tera Term‚Ìƒrƒ‹ƒh•û–@‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B<br />
-ƒrƒ‹ƒh‚É‚ÍVisual Studio 2005 Standard EditionˆÈã‚ª•K—v‚Å‚·BiVisual Studio 2005 Express Edition‚Í•s‰Âj
+ƒAƒCƒRƒ“ƒtƒ@ƒCƒ‹‚É‚ÍA4bit ‚Ì 32px, 16px ‰æ‘œA32bit ‚Ì 256px, 48px, 32px, 16px ‰æ‘œ‚ğŠÜ‚ß‚Ü‚·B<br />
+ŠeƒAƒCƒRƒ“ƒtƒ@ƒCƒ‹‚É‚ÍˆÈ‰º‚Ìí—Ş‚Ì‰æ‘œ‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B
 </p>
 
-<ol>
-  <li>ƒ\[ƒXƒR[ƒh‚ğOSDN(https://ja.osdn.net/projects/ttssh2/)‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚·‚éB</li>
-  <li>teraterm\visualc\ttermpro.sln ‚ğVisual Studio‚ÅŠJ‚­B<br />
-      .slnƒtƒ@ƒCƒ‹‚Ì‰üsƒR[ƒh‚ª"LF"‚É‚È‚Á‚Ä‚¢‚é‚ÆAVisual Studio‚ª‹N“®‚µ‚È‚¢‚Ì‚Å’ˆÓŠè‚¢‚Ü‚·B</li>
-  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
-  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æteraterm ƒfƒBƒŒƒNƒgƒŠ‚ÉÀsƒvƒƒOƒ‰ƒ€‚ª¶¬‚³‚ê‚éB</li>
-</ol>
+<strong>T (Tera Term)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                           </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm.ico        </td><td>TTERM (Default)</td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm_classic.ico</td><td>TTERM_CLASSIC  </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm_3d.ico     </td><td>TTERM_3D       </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm_flat.ico   </td><td>TTERM_FLAT     </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
+<strong>VT (VT Window)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                     </th><th>icon name   </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt.ico        </td><td>VT (Default)</td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt_classic.ico</td><td>VT_CLASSIC  </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt_3d.ico     </td><td>VT_3D       </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt_flat.ico   </td><td>VT_FLAT     </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
-<h2 id="build-teraterm-menu">TeraTerm Menu‚Ìƒrƒ‹ƒh•û–@</h2>
+<strong>TEK (TEK Windows)</strong>
+<table border="1">
+  <tr>
+    <th>icon file              </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\common\tek.ico</td><td>TEK      </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+</table>
 
-<ol>
-  <li>Checkout TeraTerm Menu source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
-  <li>ttpmenu\ttpmenu.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
-  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
-  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ ttpmenu ƒfƒBƒŒƒNƒgƒŠ‚É ttpmenu.exe ‚ª¶¬‚³‚ê‚éB</li>
-</ol>
+<strong>M (Macro)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                         </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacro.ico     </td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacro_3d.ico  </td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacro_flat.ico</td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
+<strong>MF (Macro File)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                     </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacrof.ico</td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
-<h2 id="build-ttxkanjimenu">TTXKanjiMenu‚Ìƒrƒ‹ƒh•û–@</h2>
+<strong>keycode</strong>
+<table border="1">
+  <tr>
+    <th>icon file                   </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\keycode\keycode.ico</td><td>-        </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>BMP       </td><td>-         </td><td>-         </td>
+  </tr>
+</table>
 
-<ol>
-  <li>Checkout TeraTerm Menu source code from OSDN(https://osdn.net/projects/ttssh2/).</li>
-  <li>TTXKanjiMenu\ttxkanjimenu.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
-  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
-  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ TTXKanjiMenu ƒfƒBƒŒƒNƒgƒŠ‚É ttxkanjimenu.dll ‚ª¶¬‚³‚ê‚éB</li>
-</ol>
+<strong>TTSSH</strong>
+<table border="1">
+  <tr>
+    <th>icon file                             </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure.ico        </td><td>flat2 (Default)</td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_classic.ico</td><td>classic        </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_yellow.ico </td><td>yellow         </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_green.ico  </td><td>green          </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_flat.ico   </td><td>flat           </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
+<strong>TeraTerm Menu</strong>
+<table border="1">
+  <tr>
+    <th>icon file           </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>ttpmenu\teraterm.ico</td><td>-              </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
-<h2 id="build-ttproxy">TTProxy‚Ìƒrƒ‹ƒh•û–@</h2>
+<strong>Cygterm+</strong>
+<table border="1">
+  <tr>
+    <th>icon file                 </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>cygwin\cygterm\cygterm.ico</td><td>CYGTERM        </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
 
 <p>
-TTProxy‚Ìƒrƒ‹ƒh•û–@‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B<br />
-ƒrƒ‹ƒh‚É‚ÍVisual Studio 2005(VC++8.0)‚ª•K—v‚Å‚·B
-</p>
-
-<ol>
-  <li>ƒ\[ƒXƒR[ƒh‚ğOSDN(https://ja.osdn.net/projects/ttssh2/)‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚·‚éB</li>
-  <li>TTProxy\TTProxy.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
-  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
-  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ TTProxy ƒfƒBƒŒƒNƒgƒŠ‚ÉDLL‚ª¶¬‚³‚ê‚éB</li>
-</ol>
-
-
-<h2 id="build-ttssh">TTSSH‚Ìƒrƒ‹ƒh•û–@</h2>
-
-<p>
-TTSSH‚Ìƒrƒ‹ƒh•û–@‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B<br />
-ƒrƒ‹ƒh‚É‚ÍVisual Studio 2005(VC++8.0)AActivePerl‚ª•K—v‚Å‚·B
+ƒAƒCƒRƒ“ƒtƒ@ƒCƒ‹‚Ö‚Ì‰æ‘œ‚ÌŠi”[‡‚Íuƒrƒbƒg”‚ª¬‚³‚¢‡AƒTƒCƒY‚ª‘å‚«‚¢‡v‚Æ‚µ‚Ü‚·B<br />
+‚»‚¤‚Å‚È‚¢‚ÆAƒvƒƒOƒ‰ƒ€‚ªƒTƒCƒY‚ğw’è‚¹‚¸‚ÉuÅ‘åƒTƒCƒY‚Ì‰æ‘œv‚ğæ“¾‚µ‚æ‚¤‚Æ‚µ‚½‚Æ‚«‚ÉuÅ‰‚Ì‰æ‘œv‚ªæ‚èo‚³‚ê‚é‚½‚ß‚Å‚·B
 </p>
 
 <p>
-TTSSH’P‘Ì‚Ìƒrƒ‹ƒh‚Í VS2005 Express Edition ‚Å‚à‰Â”\‚Å‚·Bttpcmn.lib‚ğƒŠƒ“ƒN‚·‚é‚½‚ßATera Term‚Ìƒrƒ‹ƒh‚ğ–‘O‚És‚Á‚Ä‚¨‚­•K—v‚ª‚ ‚è‚Ü‚·BVS2005 Express Edition‚Å‚ÍTera Term‚Ìƒrƒ‹ƒh‚Í‚Å‚«‚Ü‚¹‚ñ‚ªAttpcmn.lib‚Íì¬‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
+ƒAƒCƒRƒ“ƒtƒ@ƒCƒ‹‚É‚Í 4bit ‰æ‘œ‚ğŠÜ‚ß‚Ü‚·B<br />
+Windows NT 4.0 ‚Í 4bit ƒAƒCƒRƒ“‚Ì‚İƒTƒ|[ƒg‚µ‚Ä‚¢‚é‚½‚ß‚Å‚·B‚Ü‚½AWindows 2000 ‚Ì’Ê’m—Ìˆæ‚à 4bit ƒAƒCƒRƒ“‚Ì‚İƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·B<br />
+4bit ƒAƒCƒRƒ“‚É‚ÍˆÈ‰º‚ÌF‚ªg—p‚Å‚«‚Ü‚·B
 </p>
+
+<table border="1">
+  <tr>
+    <td style="background-color:#000000;">&nbsp;&nbsp;</td><td>#000000</td><td>(0,0,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#800000;">&nbsp;&nbsp;</td><td>#800000</td><td>(128,0,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ff0000;">&nbsp;&nbsp;</td><td>#ff0000</td><td>(255,0,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ff00ff;">&nbsp;&nbsp;</td><td>#ff00ff</td><td>(255,0,255)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#008080;">&nbsp;&nbsp;</td><td>#008080</td><td>(0,128,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#008000;">&nbsp;&nbsp;</td><td>#008000</td><td>(0,128,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#00ff00;">&nbsp;&nbsp;</td><td>#00ff00</td><td>(0,255,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#00ffff;">&nbsp;&nbsp;</td><td>#00ffff</td><td>(0,255,255)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#000080;">&nbsp;&nbsp;</td><td>#000080</td><td>(0,0,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#800080;">&nbsp;&nbsp;</td><td>#800080</td><td>(128,0,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#0000ff;">&nbsp;&nbsp;</td><td>#0000ff</td><td>(0,0,255)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#c0c0c0;">&nbsp;&nbsp;</td><td>#c0c0c0</td><td>(192,192,192)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#808080;">&nbsp;&nbsp;</td><td>#808080</td><td>(128,128,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#808000;">&nbsp;&nbsp;</td><td>#808000</td><td>(128,128,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ffff00;">&nbsp;&nbsp;</td><td>#ffff00</td><td>(255,255,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ffffff;">&nbsp;&nbsp;</td><td>#ffffff</td><td>255,255,255</td>
+  </tr>
+</table>
 
 <p>
-VS2008 Express Edition‚Åƒrƒ‹ƒh‚·‚é‚ÆA.rcƒtƒ@ƒCƒ‹‚Å‰º‹L‚ÌƒGƒ‰[‚ª”­¶‚µ‚Ü‚·B<br />
-.\ttxssh.rc(10) : fatal error RC1015: cannot open include file 'afxres.h'.<br />
-–{Œ»Û‚ğ‰ñ”ğ‚·‚é‚É‚ÍA.rcƒtƒ@ƒCƒ‹‚ğƒeƒLƒXƒgƒGƒfƒBƒ^‚ÅŠJ‚«Aafxres.h‚Ìinclude‚ğíœ‚µAV‹K‚É2s‚ğ’Ç‰Á‚µ‚Ü‚·B<br />
-</p>
-<pre>
-- #include "afxres.h"
-+ #include <windows.h>
-+ #define IDC_STATIC -1
-</pre>
-
-<ol>
-  <li>ƒ\[ƒXƒR[ƒh‚ğOSDN(https://ja.osdn.net/projects/ttssh2/)‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚·‚éB</li>
-  <li>ttssh2\ttssh.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
-  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
-  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Ættssh2\ttxssh ƒfƒBƒŒƒNƒgƒŠ‚ÉDLL‚ª¶¬‚³‚ê‚éB</li>
-</ol>
-
-
-<h2 id="build-cygterm">CygTerm‚Ìƒrƒ‹ƒh•û–@</h2>
-
-<p>
-CygTerm‚Ìƒrƒ‹ƒh•û–@‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B
+ƒAƒCƒRƒ“—p‰æ‘œ‚Ìƒ\[ƒXƒtƒ@ƒCƒ‹‚ÍˆÈ‰º‚ÉŠi”[‚³‚ê‚Ä‚¢‚Ü‚·B
 </p>
 
-<ol>
-  <li>Cygwin(https://www.cygwin.com/)‚ğƒCƒ“ƒXƒg[ƒ‹‚·‚éB</li>
-  <li>Cygwin‚ÌƒVƒFƒ‹‚ğ‹N“®‚µAcygterm ƒfƒBƒŒƒNƒgƒŠ‚ÖˆÚ“®‚·‚éB
-<pre>
-# cd cygterm
-</pre>
-  </li>
-  <li>CygTerm‚ğƒRƒ“ƒpƒCƒ‹‚·‚éB
-<pre>
-# make
-</pre>
-  </li>
-</ol>
-
-
-<h2 id="build-ttxsamples">TTXSamples‚Ìƒrƒ‹ƒh•û–@</h2>
-
-<p>
-ƒŠƒ|ƒWƒgƒŠ‚ÌTTXSamples‚É Tera Term Extension (TTX)‚ÌƒTƒ“ƒvƒ‹‚ª‚ ‚è‚Ü‚·BTTX‚ğì‚éÛ‚ÌQl‚É‚µ‚Ä‚­‚¾‚³‚¢B<br />
-TTXSamples‚Ìƒrƒ‹ƒh‚É‚ÍVisual Studio 2005(VC++8.0)‚ª•K—v‚Å‚·BTera Term–{‘Ì‚Æ‚Íˆá‚¢AExpress Edition‚Å‚àƒrƒ‹ƒh‰Â”\‚Å‚·B
-</p>
-
-<ol>
-  <li>ƒ\[ƒXƒR[ƒh‚ğOSDN(https://ja.osdn.net/projects/ttssh2/)‚©‚çƒ`ƒFƒbƒNƒAƒEƒg‚·‚éB</li>
-  <li>TTXSamples\TTXSamples.sln ‚ğVisual Studio‚ÅŠJ‚­B</li>
-  <li>ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚ğƒrƒ‹ƒh‚·‚éB</li>
-  <li>ƒrƒ‹ƒh‚É¬Œ÷‚·‚é‚Æ TTXSamples ƒfƒBƒŒƒNƒgƒŠ‚ÉDLL‚ª¶¬‚³‚ê‚éB</li>
-</ol>
-
-<p>
-ŠeTTX‚ÌÚ×‚É‚Â‚¢‚Ä‚ÍAƒvƒƒWƒFƒNƒg“à‚ÌReadMe-ja.txt‚ğQÆ‚µ‚Ä‚­‚¾‚³‚¢B
-</p>
-
-
-
-<h2 id="build-htmlhelp">ƒwƒ‹ƒvƒtƒ@ƒCƒ‹‚Ìƒrƒ‹ƒh•û–@</h2>
-
-<p>
-ƒwƒ‹ƒvƒtƒ@ƒCƒ‹‚Ìƒrƒ‹ƒh•û–@‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B
-</p>
-
-<ol>
-  <li>HTML Help Compiler ‚ğ“üè‚·‚éB<br />
-      Visual Studio (2017 ˆÈ~) ‚ğ "C++ MFC" ƒIƒvƒVƒ‡ƒ“‚ğ‘I‘ğ‚µ‚ÄƒCƒ“ƒXƒg[ƒ‹‚·‚é‚ÆAHTML Help Compiler (hhc.exe) ‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚éB</li>
-  <li>doc\makechm.bat ‚ğÀs‚·‚éB</li>
-</ol>
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>source file</th>
+    <th>bit</th>
+    <th>T</th>
+    <th>VT</th>
+    <th>Macro</th>
+    <th>SSH</th>
+    <th>Cygwin</th>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat_icon_16.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat_icon_32.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  <tr>
+    <td>teraterm\common\flat_icon_48.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>teraterm\common\flat_icon_256.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>-</td>
+  </tr>
+</table>
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>source file</th>
+    <th>bit</th>
+    <th>Keycode</th>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\keycode_48.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+  </tr>
+</table>
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>source file</th>
+    <th>bit</th>
+    <th>T</th>
+    <th>VT</th>
+    <th>Macro</th>
+    <th>Macro File</th>
+    <th>SSH</th>
+    <th>Cygwin</th>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat2_icon_16.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat2_icon_32.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  <tr>
+    <td>teraterm\common\flat2_icon_48.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>teraterm\common\flat2_icon_256.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>-</td>
+  </tr>
+</table>
 
 
 <h2 id="release">ƒŠƒŠ[ƒX‚Ìè‡</h2>
@@ -460,7 +784,7 @@ TTXSamples‚Ìƒrƒ‹ƒh‚É‚ÍVisual Studio 2005(VC++8.0)‚ª•K—v‚Å‚·BTera Term–{‘Ì‚Æ‚Íˆá
 TeraTerm Project ‚Å‚ÌƒŠƒŠ[ƒXè‡‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B
 </p>
 
-<h3>ƒŠƒŠ[ƒXì‹Æ‚ÌŠJn‚©‚çRCì¬‚Ü‚Å</h3>
+<h3 id="start-rc">ƒŠƒŠ[ƒXì‹Æ‚ÌŠJn‚©‚çRCì¬‚Ü‚Å</h3>
 
 <ol>
   <li>ƒ`ƒPƒbƒgAƒuƒ‰ƒ“ƒ`‚È‚Ç‚ğŠm”F‚·‚é
@@ -488,22 +812,23 @@ TeraTerm Project ‚Å‚ÌƒŠƒŠ[ƒXè‡‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B
   </li>
   <li>ƒc[ƒ‹Aƒ‰ƒCƒuƒ‰ƒŠAƒCƒ“ƒ|[ƒgŒ³‚ÌÅV”Å‚ğƒ`ƒFƒbƒN‚·‚é
     <ul>
-      <li>Visual Studio (<a href="https://visualstudio.microsoft.com/">https://visualstudio.microsoft.com/</a>)</li>
+      <li>Visual Studio (uXVƒvƒƒOƒ‰ƒ€‚ÌŠm”Fv‚©‚çXV‚·‚é)</li>
       <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php">https://jrsoftware.org/isdl.php</a>)</li>
       <li>Oniguruma (<a href="https://github.com/kkos/oniguruma/">https://github.com/kkos/oniguruma/</a>)</li>
       <li>SFMT (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
       <li>LibreSSL (<a href="https://www.libressl.org/">https://www.libressl.org/</a>)</li>
       <li>zlib (<a href="https://www.zlib.net/">http://www.zlib.net/</a>)</li>
       <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
-      <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>The reference C implementation of Argon2 (<a href="https://github.com/P-H-C/phc-winner-argon2/">https://github.com/P-H-C/phc-winner-argon2/</a>)</li>
+      <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/">https://github.com/DaveGamble/cJSON/</a>)</li>
+      <li>Unicode (<a href="https://www.unicode.org/versions/latest/">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
     <p>ƒŠƒŠ[ƒX‚Ég‚¤ƒo[ƒWƒ‡ƒ“‚Í‚±‚Ì“_‚Å‚¨‚¨‚Ş‚ËŒˆ’è‚·‚éB</p>
   </li>
   <li>¡‰ñ‚ÌƒŠƒŠ[ƒX‚É“ü‚ê‚½‚¢‚à‚Ì‚ª—‚¿’…‚­</li>
 </ol>
 
-<h3>RCì¬‚©‚çƒŠƒŠ[ƒX‚Ü‚Å</h3>
+<h3 id="rc-release">RCì¬‚©‚çƒŠƒŠ[ƒX‚Ü‚Å</h3>
 
 <ol>
   <li>ƒhƒLƒ…ƒƒ“ƒg‚ğŠm”F‚·‚é
@@ -609,7 +934,7 @@ TeraTerm Project ‚Å‚ÌƒŠƒŠ[ƒXè‡‚É‚Â‚¢‚ÄˆÈ‰º‚É¦‚µ‚Ü‚·B
   </li>
 </ol>
 
-<h3>ƒŠƒŠ[ƒXì‹Æ</h3>
+<h3 id="release-operation">ƒŠƒŠ[ƒXì‹Æ</h3>
 
 <ol>
   <li>ƒhƒLƒ…ƒƒ“ƒg‚ğŠm”F‚·‚é (Ú×‚Í“¯ã)</li>
@@ -688,7 +1013,7 @@ svn copy -m "Release 4.106" \
   <li>Chocolatey ‚Ì“o˜^‚ğXV‚·‚é</li>
 </ol>
 
-<h3>ƒR[ƒhƒtƒŠ[ƒY‚É‚Â‚¢‚Ä</h3>
+<h3 id="code-freeze">ƒR[ƒhƒtƒŠ[ƒY‚É‚Â‚¢‚Ä</h3>
 
 <p>
 ƒR[ƒhƒtƒŠ[ƒX’†‚ÍAŒ´‘¥“I‚É‚Í’v–½“I‚ÈƒoƒO‚ÌC³‚Ì‚İ‰Â”\‚Æ‚È‚è‚Ü‚·B<br />
