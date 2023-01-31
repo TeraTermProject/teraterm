@@ -11,6 +11,7 @@
 #include	<windows.h>
 #include	<commctrl.h>
 #include	<windowsx.h>  // for GET_X_LPARAM(), GET_Y_LPARAM()
+#include	<string.h>
 
 #include	"ttpmenu.h"
 #include	"registry.h"
@@ -20,8 +21,7 @@
 #include	"compat_w95.h"
 #include	"ttlib.h"
 
-// UTF-8 TeraTermでは、デフォルトインストール先を下記に変更した。(2004.12.2 yutaka)
-// さらに、デフォルトインストール先はカレントディレクトリに変更。(2004.12.14 yutaka)
+// デフォルトインストール先はカレントディレクトリ
 #define DEFAULT_PATH "."
 
 // グローバル変数
@@ -1199,7 +1199,9 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 	char	szHostName[MAX_PATH];
 	char	szTempPath[MAX_PATH];
 	char	szMacroFile[MAX_PATH];
-	char	szArgment[MAX_PATH] = "";
+	// https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/command-line-string-limitation
+	char	szArgment[8192] = "";
+	char	szTemp[8192];
 	char	*pHostName;
 	TCHAR	*pt;
 	JobInfo	jobInfo;
@@ -1231,8 +1233,10 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 		pHostName = szHostName;
 
 	if (jobInfo.dwMode != MODE_DIRECT)
-		if (::lstrlen(jobInfo.szInitFile) != 0)
-			::wsprintf(szArgment, "/F=\"%s\"", jobInfo.szInitFile);
+		if (::lstrlen(jobInfo.szInitFile) != 0) {
+			_snprintf_s(szTemp, sizeof(szTemp),  _TRUNCATE, "/F=\"%s\"", jobInfo.szInitFile);
+			strncat_s(szArgment, sizeof(szArgment), szTemp, _TRUNCATE);
+		}
 
 	switch (jobInfo.dwMode) {
 	case MODE_AUTOLOGIN:
@@ -1251,66 +1255,69 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 		break;
 	}
 
-	// SSH自動ログインの場合はマクロは不要 (2005.1.25 yutaka)
+	// SSH自動ログインの場合はマクロは不要
 	if (jobInfo.bTtssh != TRUE) {
-		if (jobInfo.dwMode != MODE_DIRECT)
-			::wsprintf(szArgment, "%s /M=\"%s\"", szArgment, szMacroFile);
+		if (jobInfo.dwMode != MODE_DIRECT) {
+			_snprintf_s(szTemp, sizeof(szTemp),  _TRUNCATE, " /M=\"%s\"", szMacroFile);
+			strncat_s(szArgment, sizeof(szArgment), szTemp, _TRUNCATE);
+		}
 	}
 
-	if (::lstrlen(jobInfo.szOption) != 0)
-		::wsprintf(szArgment, "%s %s", szArgment, jobInfo.szOption);
+	if (::lstrlen(jobInfo.szOption) != 0) {
+		_snprintf_s(szTemp, sizeof(szTemp),  _TRUNCATE, " %s", jobInfo.szOption);
+		strncat_s(szArgment, sizeof(szArgment), szTemp, _TRUNCATE);
+	}
 
-	// TTSSHが有効の場合は、自動ログインのためのコマンドラインを付加する。(2004.12.3 yutaka)
-	// ユーザのパラメータを指定できるようにする (2005.1.25 yutaka)
-	// 公開鍵認証をサポート (2005.1.27 yutaka)
-	// /challengeをサポート (2007.11.14 yutaka)
-	// /pageantをサポート (2008.5.26 maya)
+	// TTSSHが有効の場合は、自動ログインのためのコマンドラインを付加する。
 	if (jobInfo.dwMode == MODE_AUTOLOGIN) {
 		if (jobInfo.bTtssh == TRUE) {
-			char tmp[MAX_PATH];
 			char passwd[MAX_PATH], keyfile[MAX_PATH];
 
-			strcpy(tmp, szArgment);
+			strncpy_s(szTemp, sizeof(szTemp), szArgment, _TRUNCATE);
 			dquote_string(jobInfo.szPassword, passwd, sizeof(passwd));
 			dquote_string(jobInfo.PrivateKeyFile, keyfile, sizeof(keyfile));
 
 			if (jobInfo.bChallenge) { // keyboard-interactive
-				_snprintf(szArgment, sizeof(szArgment), "%s:22 /ssh /auth=challenge /user=%s /passwd=%s %s", 
+				_snprintf_s(szArgment, sizeof(szArgment), _TRUNCATE,
+					"%s:22 /ssh /auth=challenge /user=%s /passwd=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
-					tmp
+					szTemp
 					);
 
 			} else if (jobInfo.bPageant) { // Pageant
-				_snprintf(szArgment, sizeof(szArgment), "%s:22 /ssh /auth=pageant /user=%s %s", 
+				_snprintf_s(szArgment, sizeof(szArgment), _TRUNCATE,
+					"%s:22 /ssh /auth=pageant /user=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
-					tmp
+					szTemp
 					);
 
 			} else if (jobInfo.PrivateKeyFile[0] == NULL) { // password authentication
-				_snprintf(szArgment, sizeof(szArgment), "%s:22 /ssh /auth=password /user=%s /passwd=%s %s", 
+				_snprintf_s(szArgment, sizeof(szArgment), _TRUNCATE,
+					"%s:22 /ssh /auth=password /user=%s /passwd=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
-					tmp
+					szTemp
 					);
 
 			} else { // publickey
-				_snprintf(szArgment, sizeof(szArgment), "%s:22 /ssh /auth=publickey /user=%s /passwd=%s /keyfile=%s %s", 
+				_snprintf_s(szArgment, sizeof(szArgment), _TRUNCATE,
+					"%s:22 /ssh /auth=publickey /user=%s /passwd=%s /keyfile=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
 					keyfile,
-					tmp
+					szTemp
 					);
 
 			}
 
 		} else {
 			// SSHを使わない場合、/nossh オプションを付けておく。
-			::wsprintf(szArgment, "%s /nossh", szArgment);
+			strncpy_s(szArgment, sizeof(szArgment), " /nossh", _TRUNCATE);
 		}
 	}
 
@@ -1780,7 +1787,6 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		}
 	}
 
-	// 秘密鍵ファイルの追加 (2005.1.28 yutaka)
 	if (::GetDlgItemText(hWnd, IDC_KEYFILE_PATH, g_JobInfo.PrivateKeyFile, MAX_PATH) == 0) {
 		ZeroMemory(g_JobInfo.PrivateKeyFile, sizeof(g_JobInfo.PrivateKeyFile));
 	}
@@ -1925,13 +1931,6 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		EnableWindow(GetDlgItem(hWnd, IDC_PAGEANT_CHECK), FALSE);
 
 	}
-
-	// ttssh.exeは廃止したので下記チェックは削除する。(2004.12.3 yutaka)
-#if 0
-	if ((pt = lstrstri(g_JobInfo.szTeraTerm, TTSSH)) != NULL)
-		if (::lstrcmpi(pt, TTSSH) == 0)
-			::CheckDlgButton(hWnd, CHECK_TTSSH, TRUE);
-#endif
 
 	::CheckDlgButton(hWnd, CHECK_STARTUP, g_JobInfo.bStartup);
 
