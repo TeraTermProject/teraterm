@@ -14,7 +14,13 @@ add_executable(
   #
   ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common/asprintf.h
   ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common/codeconv.h
-  )
+)
+
+target_compile_options(
+  ${PACKAGE_NAME}
+  PRIVATE
+  /W4
+)
 
 target_include_directories(
   ${PACKAGE_NAME}

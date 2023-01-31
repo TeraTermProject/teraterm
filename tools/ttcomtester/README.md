@@ -4,6 +4,37 @@
 - コマンドラインプログラム
   - cmd などから実行する
 
+## 使い方
+
+### コマンドライン
+
+```
+ttcomtester [options]
+  -h, --help               show this
+  -v, --verbose            verbose, 'v' command
+  -i, --inifile [inifile]  read inifile, default=ttcomtester.ini
+  -r, rts [rts]            RTS/CTS(HARD) flow {off|on|hs|toggle}
+  -d, --device [name]      open device name, ex com2
+```
+
+### コマンド
+
+ttcomtester はキー入力を受け付け、つぎの2つの状態がある。
+
+- command mode
+  - ttcomtester へキーで指示するためのモード
+  - ':' キーで send mode へ切り替わる
+  - 'o' device open
+  - 'c' device open
+  - 'q' 終了
+  - :
+  - ' ' (スペース) で使えるキーを表示
+- send mode
+  - 押下したきーコードをそのまま送信するモード
+  - ':' キーで command mode へ切り替わる
+
+デバイスをオープンした状態のとき、データを受信すると表示する。
+
 ## 動作確認
 
 - シリアルをクロス接続する
@@ -58,3 +89,7 @@
   - https://www.hilgraeve.com/hyperterminal-trial/
   - A free 30 day trial
 
+## Microsoft
+
+- Serial Communications in Win32
+  - https://learn.microsoft.com/en-us/previous-versions/ms810467(v=msdn.10)?redirectedfrom=MSDN

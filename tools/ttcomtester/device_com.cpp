@@ -20,6 +20,8 @@ typedef struct comdata_st {
 	bool commtimeouts_setted;
 	COMMTIMEOUTS commtimeouts;
 	bool read_requested;
+	bool write_requested;
+	DWORD write_left;
 	enum {
 		STATE_CLOSE,
 		STATE_OPEN,
@@ -66,7 +68,7 @@ static DWORD close(device_t *device)
 		return ERROR_HANDLES_CLOSED;
 	}
 
-	if (p->state != comdata_t::STATE_OPEN) {
+	if (p->state == comdata_t::STATE_CLOSE) {
 		return ERROR_SUCCESS;
 	}
 
@@ -139,12 +141,11 @@ static DWORD open(device_t *device)
 	p->h = h;
 
 	p->state = comdata_t::STATE_OPEN;
+	p->read_requested = false;
+	p->write_requested = false;
 
 	return ERROR_SUCCESS;
 }
-
-// https://donnk.com/Nmura/soft/help015.html
-// http://nonsoft.la.coocan.jp/SoftSample/VC/SampleRs232c.html
 
 /**
  *	ペンディング状態をチェックする
@@ -152,7 +153,7 @@ static DWORD open(device_t *device)
  *	@param	readed				読み込んだバイト数
  *								0	読み込まれていない
  *	@return	ERROR_SUCCESS		読み込んだ (ペンディング状態終了)
- *	@return	ERROR_IO_PENDING	読み込み待ち(正常,
+ *	@return	ERROR_IO_PENDING	読み込み待ち(正常)
  *	@return	etc					エラー
  */
 static DWORD wait_read(device_t *device, size_t *readed)
@@ -243,7 +244,7 @@ static DWORD read(device_t *device, uint8_t *buf, size_t buf_len, size_t *readed
 	}
 	if (p->read_requested) {
 		// エラー、リクエスト中
-		return ERROR_IO_PENDING;
+		return ERROR_INVALID_OPERATION;
 	}
 
 	DWORD readed_;
@@ -268,6 +269,15 @@ static DWORD read(device_t *device, uint8_t *buf, size_t buf_len, size_t *readed
 	return ERROR_SUCCESS;
 }
 
+/**
+ *	ペンディング状態をチェックする
+ *
+ *	@param	writed				書き込まれたバイト数
+ *								0	読み込まれていない
+ *	@return	ERROR_SUCCESS		読み込んだ (ペンディング状態終了)
+ *	@return	ERROR_IO_PENDING	読み込み待ち(正常)
+ *	@return	etc					エラー
+ */
 static DWORD wait_write(device_t *device, size_t *writed)
 {
 	comdata_t *p = (comdata_t *)device->private_data;
@@ -276,41 +286,61 @@ static DWORD wait_write(device_t *device, size_t *writed)
 	if (p->state != comdata_t::STATE_OPEN) {
 		return ERROR_NOT_READY;
 	}
-#if 0
-	if (p->read_requested == false) {
+
+	if (p->write_requested == false) {
 		// リクエストしていないのに待ち状態になった
 		return ERROR_INVALID_OPERATION;
 	}
-#endif
 
-	// イベント発生(書き込み完了/エラー…)
-	DWORD writed_;
-	DWORD r = GetOverlappedResult(h, &p->wol, &writed_, FALSE);
-	if (r) {
-		printf("GetOverlappedResult %d\n", r);
-		*writed = writed_;
+	//const DWORD timeout_ms = INFINITE;
+	const DWORD timeout_ms = 0;
+	DWORD wait = WaitForSingleObject(p->wol.hEvent, timeout_ms);
+	if (wait == WAIT_TIMEOUT) {
+		// まだ送信していない
+		*writed = 0;
 		return ERROR_IO_PENDING;
-		//return ERROR_SUCCESS;
+	}
+	else if (wait == WAIT_OBJECT_0) {
+		// イベント発生(書き込んだ/エラー…)
+		DWORD writed_;
+		DWORD r = GetOverlappedResult(h, &p->wol, &writed_, FALSE);
+		if (r) {
+			*writed = writed_;
+			p->write_left -= writed_;
+			if (p->write_left == 0) {
+				// 送信完了
+				p->write_requested = false;
+				return ERROR_SUCCESS;
+			}
+			else {
+				// まだペンディング中
+				return ERROR_IO_PENDING;
+			}
+		}
+		else {
+			DWORD e = GetLastError();
+			p->state = comdata_t::STATE_ERROR;
+			*writed = 0;
+			return e;
+		}
 	}
 	else {
-		DWORD e = GetLastError();
+		// WAIT_FAILED
 		p->state = comdata_t::STATE_ERROR;
 		*writed = 0;
+		DWORD e = GetLastError();
 		return e;
 	}
 }
 
 /**
  *	書き込み
- *		TODO
- *			- overlapでちゃんと動いている?チェック
- *			- 書き込み完了チェックを作る
+ *
  *	@return	ERROR_SUCCESS		書き込み完了
- *	@return	ERROR_IO_PENDING	書き込み中 (シリアルの時は発生しない)
- *								wait_write() で完了を待つ (未テスト)
+ *	@return	ERROR_IO_PENDING	書き込み中
+ *								wait_write() で完了を待つ
+ *	@return	etc					エラー
  */
-// http://www.ys-labo.com/BCB/2007/070512%20RS232C%20zenpan.html
-// https://learn.microsoft.com/en-us/previous-versions/ms810467(v=msdn.10)?redirectedfrom=MSDN
 static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *writed)
 {
 	comdata_t *p = (comdata_t *)device->private_data;
@@ -323,6 +353,11 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 
 	if (buf_len == 0) {
 		return ERROR_SUCCESS;
+	}
+
+	if (p->write_requested == true) {
+		// エラー、リクエスト中
+		return ERROR_INVALID_OPERATION;
 	}
 
 #if 0
@@ -350,17 +385,20 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 	}
 #endif
 
+	p->write_left = (DWORD)buf_len;
 	DWORD writed_;
 	BOOL r = WriteFile(h, buf, (DWORD)buf_len, &writed_, &p->wol);
 	if (!r) {
 		err = GetLastError();
 		if (err == ERROR_IO_PENDING) {
-#if 1
-			const DWORD timeout_ms = INFINITE;
+			p->write_requested = true;
+			//const DWORD timeout_ms = INFINITE;
+			const DWORD timeout_ms = 0;
 			DWORD wait = WaitForSingleObject(p->wol.hEvent, timeout_ms);
 			if (wait == WAIT_TIMEOUT) {
-				// ブロックするので発生しない
-				;
+				// まだ送信していない
+				*writed = 0;
+				return ERROR_IO_PENDING;
 			}
 			else if (wait == WAIT_OBJECT_0) {
 				// イベント発生(書き込み完了/エラー…)
@@ -390,10 +428,6 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 				DWORD e = GetLastError();
 				return e;
 			}
-#else
-			*writed = buf_len;
-			return ERROR_SUCCESS;
-#endif
 		}
 		else {
 			p->state = comdata_t::STATE_ERROR;
@@ -402,10 +436,16 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 			return e;
 		}
 	}
-	if (writed != NULL) {
-		*writed = writed_;
+	else {
+		if (writed != NULL) {
+			*writed = writed_;
+		}
+		p->write_left -= writed_;
+		if (p->write_left != 0) {
+			p->write_requested = true;
+		}
+		return ERROR_SUCCESS;
 	}
-	return err;
 }
 
 static DWORD ctrl(device_t *device, device_ctrl_request request, ...)

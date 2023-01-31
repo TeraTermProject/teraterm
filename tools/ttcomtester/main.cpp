@@ -17,10 +17,12 @@
 static void usage()
 {
 	printf(
-		"ttcomtester [option]\n"
-		"  -h\n"
-		"  -v\n"
-		"  -i ttcomtester.ini\n"
+        "ttcomtester [options]\n"
+        "  -h, --help               show this\n"
+        "  -v, --verbose            verbose, 'v' command\n"
+        "  -i, --inifile [inifile]  read inifile, default=ttcomtester.ini\n"
+        "  -r, rts [rts]            RTS/CTS(HARD) flow {off|on|hs|toggle}\n"
+        "  -d, --device [name]      open device name, ex com2\n"
 		);
 }
 
@@ -30,8 +32,8 @@ static void key_usage(void)
 		"key:\n"
 		"   command mode\n"
 		"':'	go send mode\n"
-		"'o'	open\n"
-		"'c'	close\n"
+		"'o'	device open\n"
+		"'c'	device close\n"
 		"'q'	quit\n"
 		"'r'	RTS 0/1\n"
 		"'d'	DTR 0/1\n"
@@ -137,7 +139,7 @@ int wmain(int argc, wchar_t *argv[])
 
 	opterr = 0;
     while(1) {
-		int c = getopt_long_w(argc, argv, L"vhi:r:", long_options, NULL);
+		int c = getopt_long_w(argc, argv, L"vhi:r:d:", long_options, NULL);
         if(c == -1) break;
 
         switch (c)
@@ -263,12 +265,15 @@ int wmain(int argc, wchar_t *argv[])
 		timeouts.WriteTotalTimeoutMultiplier = 0;
 		timeouts.WriteTotalTimeoutConstant = 0;
 #endif
+#if 1
 		// ç°âÒíÒàƒÇ∑ÇÈíl
 		timeouts.ReadIntervalTimeout = 1;
 		timeouts.ReadTotalTimeoutMultiplier = 0;
 		timeouts.ReadTotalTimeoutConstant = 0;
-		timeouts.WriteTotalTimeoutMultiplier = 0;
+		timeouts.WriteTotalTimeoutMultiplier = 20;
+		//timeouts.WriteTotalTimeoutMultiplier = 0;
 		timeouts.WriteTotalTimeoutConstant = 1;
+#endif
 		ope->ctrl(dev, SET_COM_TIMEOUTS, &timeouts);
 	}
 
@@ -284,11 +289,13 @@ int wmain(int argc, wchar_t *argv[])
 	bool dtr = true;
 	bool echo_mode = false;
 	bool check_line_state = true;
+	bool write_pending = false;
 	enum {
 		STATE_CLOSE,
 		STATE_OPEN,
 		STATE_ERROR,
 	} state = STATE_CLOSE;
+	printf("command mode\n");
 	while (!quit_flag) {
 		if (_kbhit() == 0) {
 			// ÉLÅ[Ç™âüÇ≥ÇÍÇƒÇ¢Ç»Ç¢
@@ -303,18 +310,20 @@ int wmain(int argc, wchar_t *argv[])
 					DWORD e = ope->open(dev);
 					if (e == ERROR_SUCCESS) {
 						state = STATE_OPEN;
+						if (verbose) {
+							DCB dcb;
+							ope->ctrl(dev, GET_COM_DCB, &dcb);
+							dumpDCB(&dcb);
+							COMMTIMEOUTS timeouts;
+							ope->ctrl(dev, GET_COM_TIMEOUTS, &timeouts);
+							dumpCOMMTIMEOUTS(&timeouts);
+						}
 					}
 					else {
 						DispErrorStr(L"open()", e);
 					}
-					if (verbose) {
-						DCB dcb;
-						ope->ctrl(dev, GET_COM_DCB, &dcb);
-						dumpDCB(&dcb);
-						COMMTIMEOUTS timeouts;
-						ope->ctrl(dev, GET_COM_TIMEOUTS, &timeouts);
-						dumpCOMMTIMEOUTS(&timeouts);
-					}
+					receive_pending = false;
+					write_pending = false;
 					break;
 				}
 				case 'c': {
@@ -336,16 +345,8 @@ int wmain(int argc, wchar_t *argv[])
 						printf("sent %zu bytes\n", sent_len);
 					}
 					else if (e == ERROR_IO_PENDING) {
-						size_t sent_len_total = sent_len;
-						while(1) {
-							DWORD r = ope->wait_write(dev, &sent_len);
-							if (r != ERROR_SUCCESS) {
-								printf("send error\n");
-							}
-							sent_len_total += sent_len;
-							printf("send size %zu(%zu)/%zu\n", sent_len_total, sent_len, send_len);
-							Sleep(100);
-						}
+						printf("send pending..\n");
+						write_pending = true;
 					}
 					else {
 						DispErrorStr(L"write()", e);
@@ -484,60 +485,88 @@ int wmain(int argc, wchar_t *argv[])
 				}
 				else {
 					if (state == STATE_OPEN) {
-						char send_text[2];
-						size_t sent_len;
-						send_text[0] = (char)c;
-						DWORD e = ope->write(dev, send_text, 1, &sent_len);
-						if (e == ERROR_SUCCESS) {
-							printf("send %02x, %zu byte\n", c, sent_len);
+						if (write_pending) {
+							printf("writing..\n");
 						}
 						else {
-							DispErrorStr(L"write() error", e);
-							state = STATE_ERROR;
+							char send_text[2];
+							size_t sent_len;
+							send_text[0] = (char)c;
+							DWORD e = ope->write(dev, send_text, 1, &sent_len);
+							if (e == ERROR_SUCCESS) {
+								printf("send %02x, %zu byte\n", c, sent_len);
+							}
+							else if (e == ERROR_IO_PENDING) {
+								write_pending = true;
+							}
+							else {
+								DispErrorStr(L"write() error", e);
+								state = STATE_ERROR;
+							}
 						}
 					}
 				}
 			}
 		}
 
-		uint8_t buf[1024];
+		static uint8_t buf[1024];
 		size_t len = 0;
 		DWORD e;
 		if (state != STATE_OPEN) {
 			Sleep(1);
 		}
-		else if (receive_pending == false) {
-			e = ope->read(dev, buf, sizeof(buf), &len);
-			if (e == ERROR_SUCCESS) {
-				if(len > 0) {
-					printf("read:\n");
-					dump(buf, len);
+		else {
+			if (write_pending == true) {
+				size_t sent_len;
+				e = ope->wait_write(dev, &sent_len);
+				if (e == ERROR_IO_PENDING) {
+					// Ç‹Çæë“ÇøèÛë‘
+					if (sent_len != 0) {
+						printf("send size %zu (pending)\n", sent_len);
+					}
+				}
+				else if (e == ERROR_SUCCESS) {
+					printf("send size %zu (finish)\n", sent_len);
+					write_pending = false;
+				} else if (e != ERROR_SUCCESS) {
+					DispErrorStr(L"write() error", e);
+					state = STATE_ERROR;
+					printf("send error\n");
 				}
 			}
-			else if (e == ERROR_IO_PENDING) {
-				printf("read pending\n");
-				receive_pending = true;
+			if (receive_pending == false) {
+				e = ope->read(dev, buf, sizeof(buf), &len);
+				if (e == ERROR_SUCCESS) {
+					if(len > 0) {
+						printf("read:\n");
+						dump(buf, len);
+					}
+				}
+				else if (e == ERROR_IO_PENDING) {
+					printf("read pending\n");
+					receive_pending = true;
+				}
+				else {
+					DispErrorStr(L"read() error", e);
+					state = STATE_ERROR;
+				}
 			}
 			else {
-				DispErrorStr(L"read() error", e);
-				state = STATE_ERROR;
-			}
-		}
-		else {
-			e = ope->wait_read(dev, &len);
-			if (e == ERROR_IO_PENDING) {
-				// Ç‹Çæë“ÇøèÛë‘
-				;
-			}
-			else if (e == ERROR_SUCCESS) {
-				printf("wait_read:\n");
-				dump(buf, len);
-				receive_pending = false;
-			}
-			else {
-				DispErrorStr(L"wait_read", e);
-				state = STATE_ERROR;
-				receive_pending = false;
+				e = ope->wait_read(dev, &len);
+				if (e == ERROR_IO_PENDING) {
+					// Ç‹Çæë“ÇøèÛë‘
+					;
+				}
+				else if (e == ERROR_SUCCESS) {
+					printf("wait_read:\n");
+					dump(buf, len);
+					receive_pending = false;
+				}
+				else {
+					DispErrorStr(L"wait_read", e);
+					state = STATE_ERROR;
+					receive_pending = false;
+				}
 			}
 		}
 
