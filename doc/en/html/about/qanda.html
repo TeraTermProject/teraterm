@@ -75,13 +75,6 @@ Please do not ask the author how to configure network properties. Please read bo
 </p>
 
 <p>
-<span class="qanda">Q.</span> How do I connect to a host with dial-up TCP/IP (PPP)?<br>
-<span class="qanda">A.</span> Before you run Tera Term, establish the PPP connection. In the case of Win 95, you should use "Dial-Up Networking".<br>
-After the dial-up (PPP) connection is established, run Tera Term. Enter the host name or IP address at the <a href="../menu/file-new.html">[File] New connection</a> dialog box. If you don't know the name or IP address of the host, ask the network administrator.<br>
-In the case of PPP connection, the serial port is controlled by the PPP connection utility. Serial port functions of Tera Term are for non-PPP connections and nothing to do with the PPP connection.
-</p>
-
-<p>
 <span class="qanda">Q.</span> Tera Term automatically closes when I logout a telnet host. How to disable closing?<br>
 <span class="qanda">A.</span> Turn "Auto window close" off in the <a href="../menu/setup-tcpip.html">[Setup] TCP/IP</a> dialog box.
 </p>
@@ -90,6 +83,36 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 <span class="qanda">Q.</span> I want to connect to a telnet host, but a serial port is always opened when Tera Term is started.<br>
 <span class="qanda">A.</span> Set "Default port" to "TCP/IP" in the <a href="../menu/setup-general.html">[Setup] General</a> dialog box.
 </p>
+
+<p>
+<span class="qanda">Q.</span> How do I connect to a host with dial-up TCP/IP (PPP)?<br>
+<span class="qanda">A.</span> Before you run Tera Term, establish the PPP connection. In the case of Win 95, you should use "Dial-Up Networking".<br>
+After the dial-up (PPP) connection is established, run Tera Term. Enter the host name or IP address at the <a href="../menu/file-new.html">[File] New connection</a> dialog box. If you don't know the name or IP address of the host, ask the network administrator.<br>
+In the case of PPP connection, the serial port is controlled by the PPP connection utility. Serial port functions of Tera Term are for non-PPP connections and nothing to do with the PPP connection.
+</p>
+
+<!--
+<p id="save_ini">
+  <span class="qanda">Q.</span> •ÏX‚µ‚½İ’è‚ª•Û‚³‚ê‚È‚¢BTera Term ‚ğI—¹‚µ‚Ä‚Ó‚½‚½‚Ñ‹N“®‚·‚é‚ÆŒ³‚É–ß‚Á‚Ä‚¢‚éB<br>
+  <span class="qanda">A.</span> Tera Term ‚Í•ÏX‚³‚ê‚½İ’è‚ğ©“®“I‚É•Û‘¶‚µ‚Ü‚¹‚ñB<a href="../menu/setup-save.html">[Setup] Save setup</a> ‚Å–¾¦“I‚É•Û‘¶‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B
+</p>
+
+<p id="menu_dialog_garbled">
+  <span class="qanda">Q.</span> ƒƒjƒ…[‚âƒ_ƒCƒAƒƒO‚Ì•¶š‚ª‰»‚¯‚éB<br>
+  <span class="qanda">A.</span> Œ»İ‚Ì Windows ‚ÌƒVƒXƒeƒ€ƒƒP[ƒ‹İ’è‚Å Tera Term ‚ÌŒ¾Œêƒtƒ@ƒCƒ‹ilang\XXX.lngj‚Ì•¶šƒR[ƒh‚ğˆµ‚¦‚È‚¢‚Æ‚«‚É‚±‚ÌŒ»Û‚ª‹N‚«‚Ü‚·B<br />
+  ‚±‚Ìê‡‚ÍˆÈ‰º‚Ì‚¢‚¸‚ê‚©‚Ì‘Î‰‚ğ‚µ‚Ä‚­‚¾‚³‚¢B
+  <ul>
+    <li>[ƒRƒ“ƒgƒ[ƒ‹ƒpƒlƒ‹]-[’nˆæ]-[Unicode‘Î‰‚Å‚Í‚È‚¢ƒvƒƒOƒ‰ƒ€‚ÌŒ¾Œê] ‚ÅƒVƒXƒeƒ€ƒƒP[ƒ‹‚Ìİ’è‚ğC³‚·‚éB<br>
+        —á: Œ¾ŒêUI ‚ª Japanese.lng ‚Ìê‡A[ƒVƒXƒeƒ€ƒƒP[ƒ‹] ‚ğu“ú–{Œêv‚ÉA[ƒ[ƒ‹ƒhƒƒCƒhŒ¾ŒêƒTƒ|[ƒg‚Å Unicode UTF-8 ‚ğg—p] ‚ğuoffv‚É•ÏX‚·‚éB</li>
+    <li>g—p‚µ‚Ä‚¢‚éŒ¾Œêƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh‚ğC³‚·‚éB<br>
+        —á: [ƒVƒXƒeƒ€ƒƒP[ƒ‹] ‚ªu“ú–{Œêv‚Å [ƒ[ƒ‹ƒhƒƒCƒhŒ¾ŒêƒTƒ|[ƒg‚Å Unicode UTF-8 ‚ğg—p] ‚ª on ‚ÅAŒ¾ŒêUI ‚ª Japanese.lng ‚Ìê‡AŒ¾Œêƒtƒ@ƒCƒ‹(lang\Japanese.lng) ‚ğ UTF-8 ‚Å•Û‘¶‚µ’¼‚·B<br>
+        ‚±‚Ì•û–@‚ğ‚Æ‚Á‚½ê‡ATera Term ‚ğã‘‚«ƒCƒ“ƒXƒg[ƒ‹‚·‚é‚½‚Ñ‚ÉŒ¾Œêƒtƒ@ƒCƒ‹‚ÌC³‚ª•K—v‚Å‚·B</li>
+    <li>•¶š‰»‚¯‚µ‚È‚¢Œ¾Œêƒtƒ@ƒCƒ‹‚ğg—p‚·‚éB<br>
+        —á: Œ¾ŒêUI ‚Å Default.lng ‚â English.lng ‚ğw’è‚·‚éB</li>
+  </ul>
+</p>
+-->
+
 
 <h2>[Keyboard]</h2>
 <p>
@@ -117,6 +140,22 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 <span class="qanda">Q.</span> How to change the keyboard shortcut for the <a href="../menu/edit.html">[Edit] Paste (Copy)</a> command to Ctrl+V (Ctrl+C)?<br>
 <span class="qanda">A.</span> See <a href="../usage/tips/user-shortcutkey.html">"User shortcut keys"</a> and <a href="../reference/keycode.txt">KEYCODE.TXT</a>.
 </p>
+
+
+<!--
+<h2>[SSH]</h2>
+<p id="ssh_C-v">
+  <span class="qanda">Q.</span> SSH ”FØƒ_ƒCƒAƒƒO‚Ì [ƒpƒXƒtƒŒ[ƒY] ‚É Ctrl+v ƒL[‚Å“\‚è•t‚¯‚Å‚«‚È‚¢B<br>
+  <span class="qanda">A.</span> uCtrl+‚È‚É‚©‚ÌƒL[v‚ª‚È‚É‚©‚Ì‘€ì‚ÉŠ„‚è“–‚½‚Á‚Ä‚¢‚é‚Æ§Œä•¶š‚ğƒpƒXƒtƒŒ[ƒY‚Ég‚¦‚È‚¢‚½‚ßACtrl+v ‚Å‚Í“\‚è•t‚¯‚Å‚«‚Ü‚¹‚ñB<br>
+  ƒpƒXƒtƒŒ[ƒY‚ğ“\‚è•t‚¯‚½‚¢‚Æ‚«‚É‚Í Shift+Ins ƒL[‚ğg—p‚µ‚Ä‚­‚¾‚³‚¢B
+</p>
+
+<p id="ssh_SCP_dir">
+  <span class="qanda">Q.</span> ‘—MæƒtƒHƒ‹ƒ_‚ğw’è‚¹‚¸‚É SCP ‚Åƒtƒ@ƒCƒ‹‚ğ‘—M‚µ‚½‚ªAƒVƒFƒ‹‚ÌƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚É•Û‘¶‚³‚ê‚È‚¢B<br>
+  <span class="qanda">A.</span> ƒvƒƒgƒRƒ‹ã‚»‚Ì‚æ‚¤‚É‘—M‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñBSSH ‚ÌuƒVƒFƒ‹v‚ÆuSCPv‚Í•Ê‚Ìƒ`ƒƒƒlƒ‹‚ğg—p‚·‚é‚½‚ß‚Å‚·B
+</p>
+-->
+
 
 <h2>[Miscellaneous]</h2>
 <p>
@@ -161,6 +200,52 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
   <li>A user configures the user's shell settings to disable sending the control sequence for the window title changing.</li>
   <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional.html">[Setup]Additional Setting</a> dialog.</li>
 </ul>
+
+<!--
+<p id="window_resize_clear">
+  <span class="qanda">Q.</span> ƒEƒBƒ“ƒhƒE‚ğƒŠƒTƒCƒY‚·‚é‚Æ‰æ–Ê‚ªƒNƒŠƒA‚³‚ê‚éB<br>
+  <span class="qanda">A.</span> ƒNƒŠƒA‚µ‚½‚­‚È‚¢ê‡‚ÍA<a href="../menu/setup-additional.html#ClearOnResize">[Setup]-[Additional settings]-[General]-[Clear display when window resized]</a> ‚ğuoffv‚É‚µ‚Ä‚­‚¾‚³‚¢B
+</p>
+
+<p id="logfile_garbled">
+  <span class="qanda">Q.</span> ƒƒOƒtƒ@ƒCƒ‹‚Ì“à—e‚ª VTWindow ‚É•\¦‚³‚ê‚½“à—e‚ÆˆÙ‚È‚éB§Œä•¶š‚â VTWindow ‚É•\¦‚³‚ê‚Ä‚¢‚È‚¢•¶š‚ªo—Í‚³‚ê‚Ä‚¢‚éB<br>
+  <span class="qanda">A.</span> ƒoƒCƒiƒŠƒƒO‚Ìê‡‚ÍAóM‚µ‚½§ŒäƒV[ƒPƒ“ƒX‚à‹L˜^‚³‚ê‚Ü‚·B<br>
+  ‚Ü‚½A‚ ‚é•¶š‚ğóM‚µ‚Ä VTWindow ‚Å•\¦‚³‚êA‚»‚ÌŒã‚ÉóM‚µ‚½§ŒäƒV[ƒPƒ“ƒX‚É‚æ‚Á‚Ä‚¢‚¿‚Ç•\¦‚³‚ê‚½•¶š‚ªŒ©‚¦‚È‚­‚È‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·B‚µ‚©‚µAóM‚µ‚½•¶š‚ÍƒƒOƒtƒ@ƒCƒ‹‚É‹L˜^‚³‚ê‚Ä‚¢‚Ü‚·B
+<pre>
+—á:
+
+test.sh
+```
+#!/bin/sh
+for i in `seq 0 4`
+do
+	echo -en "\033[G";
+	echo -n ${i};
+	sleep 1;
+done
+```
+
+ÀsŒ‹‰Ê
+```
+$ ./test.sh
+4$ 
+```
+
+ƒoƒCƒiƒŠƒƒO
+```
+
+[G0[G1[G2[G3[G4$ 
+```
+
+ƒeƒLƒXƒgƒƒO
+```
+
+01234$ 
+```
+</pre>
+</p>
+-->
+
 
 <h2>[About Tera Term 5]</h2>
 
