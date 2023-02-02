@@ -35,6 +35,7 @@
 #include <crtdbg.h>
 
 #include "tttypes.h"
+#include "tt-version.h"
 #include "ttlib.h"
 #include "codeconv.h"
 #include "compat_win.h"

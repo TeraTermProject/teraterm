@@ -41,6 +41,7 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tt-version.h"
 #include "ttlib.h"
 #include "tt_res.h"
 #include "codeconv.h"

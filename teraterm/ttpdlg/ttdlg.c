@@ -44,11 +44,11 @@
 #include <winsock2.h>
 
 #include "tttypes.h"
+#include "tt-version.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "svnversion.h"
 #include "ttdlg.h"
 #include "tipwin.h"
 #include "comportinfo.h"

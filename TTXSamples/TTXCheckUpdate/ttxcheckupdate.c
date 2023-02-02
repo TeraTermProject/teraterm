@@ -41,7 +41,6 @@
 #include "i18n.h"
 #include "asprintf.h"
 #include "tt-version.h"		// for TT_VERSION_MAJOR, TT_VERSION_MINOR
-#include "svnversion.h"		// for SVNVERSION
 
 #include "resource.h"
 #include "parse.h"

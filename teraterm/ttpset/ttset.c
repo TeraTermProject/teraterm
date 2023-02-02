@@ -43,6 +43,7 @@
 #include <crtdbg.h>
 #include <assert.h>
 
+#include "tt-version.h"
 #include "ttlib.h"
 #include "tt_res.h"
 #include "servicenames.h"

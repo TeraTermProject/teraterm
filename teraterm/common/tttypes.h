@@ -31,7 +31,6 @@
 #pragma once
 
 #include "teraterm.h"
-#include "tt-version.h"
 #include "tttypes_charset.h"
 
 #define IdBreakTimer         1

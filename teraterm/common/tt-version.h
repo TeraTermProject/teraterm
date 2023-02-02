@@ -28,8 +28,11 @@
 
 #pragma once
 
-#define TT_VERSION_MAJOR             5
-#define TT_VERSION_MINOR             0
+// defined in svnversion.h
+//	- TT_VERSION_MAJOR
+//	- TT_VERSION_MINOR
+#include "svnversion.h"
+
 #define TT_TOSTR(x)                  TT_TOSTR2(x)
 #define TT_TOSTR2(x)                 #x
 #define TT_VERSION_STR(sep)          TT_TOSTR(TT_VERSION_MAJOR) sep TT_TOSTR(TT_VERSION_MINOR)

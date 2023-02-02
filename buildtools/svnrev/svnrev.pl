@@ -6,7 +6,10 @@ use POSIX 'strftime';
 
 binmode STDOUT, ':encoding(utf8)';
 
-my $version = "5.0";
+my $tt_version_major = 5;
+my $tt_version_mainor = 0;
+my $tt_version_substr = "beta1";
+my $version = "$tt_version_major.$tt_version_mainor$tt_version_substr";
 my $svn = "svn";
 my $git = "git";
 my $out_header = "svnversion.h";
@@ -80,8 +83,7 @@ sub search_git {
 	}
 }
 
-sub dump_info()
-{
+sub dump_info {
 	my %info = @_;
 
 	print "SVNREVISION $info{'Revision'}\n";
@@ -89,14 +91,16 @@ sub dump_info()
 	print "BRANCH_NAME $info{'name'}\n";
 }
 
-sub write_info_header
-{
+sub write_info_header {
 	my ($out_header, %svninfo) = @_;
 	my $revision = $svninfo{'Revision'};
 
-	open(my $FD, ">$out_header") || die "error $out_header";
+	open(my $FD, ">$out_header") or die "error $out_header";
 	print $FD "/* $header */\n";
 	print $FD "/* #define TT_VERSION_STR \"$version\" check teraterm/common/tt-version.h */\n";
+	print $FD "#define TT_VERSION_MAJOR $tt_version_major\n";
+	print $FD "#define TT_VERSION_MINOR $tt_version_mainor\n";
+	print $FD "#define TT_VERSION_SUBSTR \"$tt_version_substr\"\n";
 	if ($revision ne '') {
 		print $FD "#define SVNVERSION $revision\n";
 	} else {
@@ -111,12 +115,11 @@ sub write_info_header
 	close($FD);
 }
 
-sub write_info_bat
-{
-	my ($out_header, %svninfo) = @_;
+sub write_info_bat {
+	my ($out_bat, %svninfo) = @_;
 	my $revision = $svninfo{'Revision'};
 
-	open(my $FD, ">$out_bat") || die "error $out_bat";
+	open(my $FD, ">$out_bat") or die "error $out_bat";
 	print $FD "\@rem $header\n";
 	print $FD "set VERSION=$version\n";
 	if ($revision ne '') {
@@ -130,12 +133,11 @@ sub write_info_bat
 	close($FD);
 }
 
-sub write_info_cmake
-{
-	my ($out_header, %svninfo) = @_;
+sub write_info_cmake {
+	my ($out_cmake, %svninfo) = @_;
 	my $revision = $svninfo{'Revision'};
 
-	open(my $FD, ">$out_cmake") || die "error $out_cmake";
+	open(my $FD, ">$out_cmake") or die "error $out_cmake";
 	print $FD "# $header\n";
 	print $FD "set(VERSION \"$version\")\n";
 	if ($revision ne '') {
@@ -149,8 +151,7 @@ sub write_info_cmake
 	close($FD);
 }
 
-sub read_revision_from_header()
-{
+sub read_revision_from_header {
 	my ($out_header) = @_;
 
 	# ヘッダーファイルがない場合
@@ -158,7 +159,7 @@ sub read_revision_from_header()
 		return '';
 	}
 
-	open FH, '<', $out_header || die "error open $out_header";
+	open(FH, '<', $out_header) or die "error open $out_header";
 	while (<FH>) {
 		if (/#define SVNVERSION (\d+)/) {
 			close FH;
