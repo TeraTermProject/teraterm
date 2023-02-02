@@ -4195,8 +4195,8 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 				MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
 				goto error;
 			}
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file exists. (%d)\noverwrite it?", c->scp.localfilefull, GetLastError());
-			dlgresult = MessageBox(NULL, buf, "TTSSH: confirm", MB_YESNO | MB_ICONERROR);
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file exists.\noverwrite it?", c->scp.localfilefull);
+			dlgresult = MessageBox(NULL, buf, "TTSSH: confirm", MB_YESNO | MB_ICONQUESTION);
 			if (dlgresult == IDNO) {
 				goto error;
 			}
