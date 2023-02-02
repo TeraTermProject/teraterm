@@ -486,7 +486,7 @@ int wmain(int argc, wchar_t *argv[])
 				else {
 					if (state == STATE_OPEN) {
 						if (write_pending) {
-							printf("writing..\n");
+							printf("writing(pending)..\n");
 						}
 						else {
 							char send_text[2];
@@ -494,9 +494,10 @@ int wmain(int argc, wchar_t *argv[])
 							send_text[0] = (char)c;
 							DWORD e = ope->write(dev, send_text, 1, &sent_len);
 							if (e == ERROR_SUCCESS) {
-								printf("send %02x, %zu byte\n", c, sent_len);
+								printf("send %02x, sent %zu byte\n", c, sent_len);
 							}
 							else if (e == ERROR_IO_PENDING) {
+								printf("send %02x, sent %zu byte pending\n", c, sent_len);
 								write_pending = true;
 							}
 							else {

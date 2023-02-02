@@ -272,8 +272,8 @@ static DWORD read(device_t *device, uint8_t *buf, size_t buf_len, size_t *readed
 /**
  *	ペンディング状態をチェックする
  *
- *	@param	writed				書き込まれたバイト数
- *								0	読み込まれていない
+ *	@param		writed				書き込まれたバイト数
+ *									0	読み込まれていない
  *	@return	ERROR_SUCCESS		読み込んだ (ペンディング状態終了)
  *	@return	ERROR_IO_PENDING	読み込み待ち(正常)
  *	@return	etc					エラー
@@ -385,19 +385,22 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 	}
 #endif
 
+	if (writed != NULL) {
+		*writed = 0;
+	}
+
 	p->write_left = (DWORD)buf_len;
 	DWORD writed_;
 	BOOL r = WriteFile(h, buf, (DWORD)buf_len, &writed_, &p->wol);
 	if (!r) {
 		err = GetLastError();
 		if (err == ERROR_IO_PENDING) {
-			p->write_requested = true;
 			//const DWORD timeout_ms = INFINITE;
 			const DWORD timeout_ms = 0;
 			DWORD wait = WaitForSingleObject(p->wol.hEvent, timeout_ms);
 			if (wait == WAIT_TIMEOUT) {
 				// まだ送信していない
-				*writed = 0;
+				p->write_requested = true;
 				return ERROR_IO_PENDING;
 			}
 			else if (wait == WAIT_OBJECT_0) {
@@ -405,47 +408,39 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 				r = GetOverlappedResult(h, &p->wol, &writed_, FALSE);
 				if (r) {
 					// 書き込み完了
-					*writed = writed_;
-					return ERROR_SUCCESS;
+					goto write_complete;
 				}
 				else {
 					err = GetLastError();
 					p->state = comdata_t::STATE_ERROR;
-					*writed = 0;
 					return err;
 				}
 			}
-			else if (wait == WAIT_ABANDONED) {
-				// どんなとき発生する? event異常?
+			else {	// wait == WAIT_ABANDONED || WAIT_FAILED
 				p->state = comdata_t::STATE_ERROR;
-				*writed = 0;
-				return ERROR_INVALID_OPERATION;
-			}
-			else {
-				// WAIT_FAILED
-				p->state = comdata_t::STATE_ERROR;
-				*writed = 0;
 				DWORD e = GetLastError();
 				return e;
 			}
 		}
 		else {
 			p->state = comdata_t::STATE_ERROR;
-			*writed = 0;
 			DWORD e = GetLastError();
 			return e;
 		}
 	}
-	else {
-		if (writed != NULL) {
-			*writed = writed_;
-		}
-		p->write_left -= writed_;
-		if (p->write_left != 0) {
-			p->write_requested = true;
-		}
-		return ERROR_SUCCESS;
+
+	// 書き込み完了
+write_complete:
+	if (writed != NULL) {
+		*writed = writed_;
 	}
+	p->write_left -= writed_;
+	if (p->write_left != 0) {
+		// すべて書き込み済みではない,pending
+		p->write_requested = true;
+		return ERROR_IO_PENDING;
+	}
+	return ERROR_SUCCESS;
 }
 
 static DWORD ctrl(device_t *device, device_ctrl_request request, ...)
