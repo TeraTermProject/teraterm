@@ -143,6 +143,8 @@ static DWORD open(device_t *device)
 	p->state = comdata_t::STATE_OPEN;
 	p->read_requested = false;
 	p->write_requested = false;
+	p->write_left = 0;
+	p->check_line_state_before_send = true;
 
 	return ERROR_SUCCESS;
 }
@@ -336,10 +338,11 @@ static DWORD wait_write(device_t *device, size_t *writed)
 /**
  *	書き込み
  *
- *	@return	ERROR_SUCCESS		書き込み完了
+ *	@return	ERROR_SUCCESS		書き込み完了(又は書き込みできなかった)
+ *									writed == 0 のとき書き込みできなかった
  *	@return	ERROR_IO_PENDING	書き込み中
- *								wait_write() で完了を待つ
- *	@return	etc					エラー
+ *									wait_write() で完了を待つ
+ *	@return	etc				エラー
  */
 static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *writed)
 {
@@ -359,6 +362,7 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 		// エラー、リクエスト中
 		return ERROR_INVALID_OPERATION;
 	}
+	assert(p->write_left == 0);
 
 #if 0
 	DWORD Errors;
@@ -389,7 +393,6 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 		*writed = 0;
 	}
 
-	p->write_left = (DWORD)buf_len;
 	DWORD writed_;
 	BOOL r = WriteFile(h, buf, (DWORD)buf_len, &writed_, &p->wol);
 	if (!r) {
@@ -397,6 +400,7 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 		if (err == ERROR_IO_PENDING) {
 			//const DWORD timeout_ms = INFINITE;
 			const DWORD timeout_ms = 0;
+			p->write_left += (DWORD)buf_len;
 			DWORD wait = WaitForSingleObject(p->wol.hEvent, timeout_ms);
 			if (wait == WAIT_TIMEOUT) {
 				// まだ送信していない
@@ -433,6 +437,11 @@ static DWORD write(device_t *device, const void *buf, size_t buf_len, size_t *wr
 write_complete:
 	if (writed != NULL) {
 		*writed = writed_;
+	}
+	if (writed_ == 0) {
+		// 操作が完了したが,送信バイト数==0
+		// = 送信バッファがfull (デバッガで動作させていた時しか発生したことがない)
+		return ERROR_INSUFFICIENT_BUFFER;
 	}
 	p->write_left -= writed_;
 	if (p->write_left != 0) {

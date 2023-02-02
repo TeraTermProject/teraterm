@@ -44,6 +44,7 @@ static void key_usage(void)
 		"'L'	check line state before sending\n"
 		"'D'	open device dialogbox\n"
 		"'v'	verbose on/off\n"
+		"'1'   send some bytes\n"
 		"   send mode\n"
 		"':'	go command mode\n"
 		);
@@ -476,6 +477,47 @@ int wmain(int argc, wchar_t *argv[])
 					printf("unknown command '%c'\n", c);
 					key_usage();
 					break;
+				case '1': {
+					// 指定バイト数を1byteづつ送るテスト
+					// FT232Rのとき、CTS=0状態で67byte程度送信するとおかしな状態になる
+					int send_size = 65;
+					for(int i =0 ; i < send_size; i++) {
+						char send_text[2];
+						send_text[0] = i;
+						size_t sent_len;
+						DWORD e = ope->write(dev, send_text, 1, &sent_len);
+						if (e == ERROR_SUCCESS) {
+							printf("send %02x, sent %zu byte %s\n", c, sent_len,
+								   sent_len != 0 ? "" : "(flow control or send buffer full)");
+						}
+						else if (e == ERROR_IO_PENDING) {
+							printf("send %02x, sent %zu byte pending\n", c, sent_len);
+							for(;;) {
+								size_t sent_len;
+								e = ope->wait_write(dev, &sent_len);
+								if (e == ERROR_IO_PENDING) {
+									if (sent_len != 0) {
+										printf("send size %zu (pending)\n", sent_len);
+									}
+								}
+								else if (e == ERROR_SUCCESS) {
+									printf("send size %zu (finish)\n", sent_len);
+									break;
+								}
+								else {
+									DispErrorStr(L"write() error", e);
+									state = STATE_ERROR;
+									printf("send error\n");
+								}
+								Sleep(1);
+							}
+						}
+						else {
+							DispErrorStr(L"write() error", e);
+							state = STATE_ERROR;
+						}
+					}
+				}
 				}
 			}
 			else {
@@ -494,11 +536,14 @@ int wmain(int argc, wchar_t *argv[])
 							send_text[0] = (char)c;
 							DWORD e = ope->write(dev, send_text, 1, &sent_len);
 							if (e == ERROR_SUCCESS) {
-								printf("send %02x, sent %zu byte\n", c, sent_len);
+								printf("send %02x, sent %zu byte %s\n", c, sent_len,
+									   sent_len != 0 ? "" : "(flow control or send buffer full)");
 							}
 							else if (e == ERROR_IO_PENDING) {
 								printf("send %02x, sent %zu byte pending\n", c, sent_len);
 								write_pending = true;
+							} else if (e == ERROR_INSUFFICIENT_BUFFER) {
+								printf("send buffer full\n");
 							}
 							else {
 								DispErrorStr(L"write() error", e);
@@ -529,7 +574,7 @@ int wmain(int argc, wchar_t *argv[])
 				else if (e == ERROR_SUCCESS) {
 					printf("send size %zu (finish)\n", sent_len);
 					write_pending = false;
-				} else if (e != ERROR_SUCCESS) {
+				} else {
 					DispErrorStr(L"write() error", e);
 					state = STATE_ERROR;
 					printf("send error\n");
