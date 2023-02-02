@@ -19,6 +19,11 @@ endif()
 if((DEFINED GIT_EXECUTABLE) AND (DEFINED ${GIT_EXECUTABLE}))
   list(APPEND ARGS "--git" "${GIT_EXECUTABLE}")
 endif()
+if((${SVNREV_PL} IS_NEWER_THAN ${SVNVERSION_H}) OR
+    (${SVNREV_PL} IS_NEWER_THAN ${BUILD_CONFIG}))
+  # 出力ファイルが古い(or存在しない)時は上書き指定
+  list(APPEND ARGS "--overwrite")
+endif()
 
 if(0)
   message("PERL=${PERL}")
