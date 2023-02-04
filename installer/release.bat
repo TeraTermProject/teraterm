@@ -169,8 +169,8 @@ set PATH=%SVN_PATH%;%PATH%
 set PATH=%PERL_PATH%;%PATH%
 call :set_vs_env
 call :search_cmake
-set PATH=%CYGWIN_PATH%;%PATH%
 set PATH=%CMAKE_PATH%;%PATH%
+set PATH=%PATH%;%CYGWIN_PATH%
 exit /b 0
 
 rem ####################
