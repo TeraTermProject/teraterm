@@ -50,11 +50,12 @@ AuthBanner=1
 </p>
 
 <pre>
-DisablePopupMessage=&lt;表示方法&gt;
+DisablePopupMessage=&lt;抑止メッセージ&gt;
 </pre>
 
 <p>
-表示方法には 0 か 1 が指定できます。それぞれの値の意味は以下のとおりです。
+"抑止メッセージ" は、抑止するメッセージ種類ごとの値を足した数値を指定してください。
+それぞれの値の意味は以下のとおりです。
 </p>
 
 <table>
@@ -63,7 +64,8 @@ DisablePopupMessage=&lt;表示方法&gt;
 </thead>
 <tbody>
   <tr> <td>0</td>  <td>ポップアップを抑止しない</td> </tr>
-  <tr> <td>1</td>  <td>ポップアップを抑止する</td> </tr>
+  <tr> <td>1</td>  <td>"ローカルポートへの転送データの送信エラー" ポップアップを抑止する</td> </tr>
+  <tr> <td>2</td>  <td>"SSH チャネルオープンエラー" ポップアップを抑止する</td> </tr>
 </tbody>
 </table>
 

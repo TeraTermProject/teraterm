@@ -124,6 +124,7 @@ extern HANDLE hInst; /* Instance handle of TTXSSH.DLL */
  */
 #define POPUP_MSG_default			0
 #define POPUP_MSG_FWD_received_data	(1 << 0)
+#define POPUP_MSG_FWD_channel_open	(1 << 1)
 
 
 /*

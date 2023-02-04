@@ -52,11 +52,11 @@ To prevent this problem, the message box can be suppressed.
 </p>
 
 <pre>
-DisablePopupMessage=&lt;Display Method&gt;
+DisablePopupMessage=&lt;Suppress Message&gt;
 </pre>
 
 <p>
-The display method can be specified with 0 or 1.
+The "Suppress Message" can be specified with the sum value of suppressing message type.
 Meaning of each value is as follows.
 </p>
 
@@ -66,7 +66,8 @@ Meaning of each value is as follows.
 </thead>
 <tbody>
   <tr> <td>0</td>  <td>Not suppress pop-up window</td> </tr>
-  <tr> <td>1</td>  <td>Suppress pop-up window</td> </tr>
+  <tr> <td>1</td>  <td>Suppress "sending forwarded data to a local port error" pop-up message</td> </tr>
+  <tr> <td>2</td>  <td>Suppress "SSH channel open error" pop-up window</td> </tr>
 </tbody>
 </table>
 
