@@ -7771,7 +7771,12 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 	                  "SSH2_MSG_CHANNEL_OPEN_FAILURE was received.\r\nchannel [%d]: reason: %s(%d) message: %s");
 	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->ts->UIMsg,
 	            id, rmsg, reason, NonNull(cstring));
-	notify_nonfatal_error(pvar, tmpbuf);
+	if ((pvar->settings.DisablePopupMessage & POPUP_MSG_FWD_channel_open) == 0) {
+		notify_nonfatal_error(pvar, tmpbuf);
+	}
+	else {
+		logputs(LOG_LEVEL_ERROR, tmpbuf);
+	}
 
 	free(cstring);
 
