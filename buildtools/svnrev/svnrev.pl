@@ -136,9 +136,6 @@ sub write_info_header {
 	open(my $FD, ">$out_header") or die "error $out_header";
 	print $FD "/* $header */\n";
 	print $FD "/* #define TT_VERSION_STR \"$version\" check teraterm/common/tt-version.h */\n";
-	print $FD "#define TT_VERSION_MAJOR $tt_version_major\n";
-	print $FD "#define TT_VERSION_MINOR $tt_version_mainor\n";
-	print $FD "#define TT_VERSION_SUBSTR \"$tt_version_substr\"\n";
 	if ($revision ne '') {
 		print $FD "#define SVNVERSION $revision\n";
 	} else {
