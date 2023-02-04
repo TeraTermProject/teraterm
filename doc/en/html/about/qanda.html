@@ -208,39 +208,32 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 </p>
 
 <p id="logfile_garbled">
-  <span class="qanda">Q.</span> ƒƒOƒtƒ@ƒCƒ‹‚Ì“à—e‚ª VTWindow ‚É•\¦‚³‚ê‚½“à—e‚ÆˆÙ‚È‚éB§Œä•¶š‚â VTWindow ‚É•\¦‚³‚ê‚Ä‚¢‚È‚¢•¶š‚ªo—Í‚³‚ê‚Ä‚¢‚éB<br>
-  <span class="qanda">A.</span> ƒoƒCƒiƒŠƒƒO‚Ìê‡‚ÍAóM‚µ‚½§ŒäƒV[ƒPƒ“ƒX‚à‹L˜^‚³‚ê‚Ü‚·B<br>
-  ‚Ü‚½A‚ ‚é•¶š‚ğóM‚µ‚Ä VTWindow ‚Å•\¦‚³‚êA‚»‚ÌŒã‚ÉóM‚µ‚½§ŒäƒV[ƒPƒ“ƒX‚É‚æ‚Á‚Ä‚¢‚¿‚Ç•\¦‚³‚ê‚½•¶š‚ªŒ©‚¦‚È‚­‚È‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·B‚µ‚©‚µAóM‚µ‚½•¶š‚ÍƒƒOƒtƒ@ƒCƒ‹‚É‹L˜^‚³‚ê‚Ä‚¢‚Ü‚·B
+  <span class="qanda">Q.</span> ƒƒOƒtƒ@ƒCƒ‹‚Ì“à—e‚ª VTWindow ‚É•\¦‚³‚ê‚½“à—e‚ÆˆÙ‚È‚éB•\¦‚Å‚«‚È‚¢•¶š‚ªo—Í‚³‚ê‚Ä‚¢‚éB<br>
+  <span class="qanda">A.</span> VTWindow ‚É•\¦‚³‚ê‚é‚Ì‚ÍAóM‚µ‚½ƒf[ƒ^‚ÉŠÜ‚Ü‚ê‚é§ŒäƒV[ƒPƒ“ƒX‚ğ‰ğÍ‚µ‚½Œ‹‰Ê‚Å‚·Bˆê•û Tera Term ‚ÌƒƒOƒtƒ@ƒCƒ‹‚ÍóM‚µ‚½ƒf[ƒ^‚ğ‹L˜^‚µ‚½‚à‚Ì‚Å‚·B<br>
+  ‚»‚Ì‚½‚ßAƒƒOƒtƒ@ƒCƒ‹‚Ìo—Í‚Æ VTWindow ‚É•\¦‚³‚ê‚éŒ‹‰Ê‚Í“¯‚¶‚É‚Í‚È‚è‚Ü‚¹‚ñBuHTML ƒtƒ@ƒCƒ‹v‚ÆuWeb ƒuƒ‰ƒEƒU‚ªƒŒƒ“ƒ_ƒŠƒ“ƒO‚µ‚½Œ‹‰Êv‚Ì‚æ‚¤‚ÉˆÙ‚È‚é‚à‚Ì‚Å‚·B
 <pre>
 —á:
-
-test.sh
+VTWindow ‚Ì•\¦
 ```
-#!/bin/sh
-for i in `seq 0 4`
-do
-	echo -en "\033[G";
-	echo -n ${i};
-	sleep 1;
-done
-```
-
-ÀsŒ‹‰Ê
-```
-$ ./test.sh
-4$ 
-```
-
-ƒoƒCƒiƒŠƒƒO
-```
-
-[G0[G1[G2[G3[G4$ 
+ls
+CMakeLists.txt  Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
+COPYING         README    cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
+sf-usr-shell:~/cygterm+$ 
 ```
 
 ƒeƒLƒXƒgƒƒO
 ```
+ls s
+CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
+COPYING		README	  cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
+sf-usr-shell:~/cygterm+$ 
 
-01234$ 
+ƒoƒCƒiƒŠƒƒO
+```
+ls s
+CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
+COPYING		README	  cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
+sf-usr-shell:~/cygterm+$ 
 ```
 </pre>
 </p>
