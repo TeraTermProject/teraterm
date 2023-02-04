@@ -5,6 +5,7 @@ set BAT=%~n0%~x0
 
 set SVNVERSION_H=../../teraterm/common/svnversion.h
 set SVNVERSION_H_DOS=..\..\teraterm\common\svnversion.h
+set SVNVERSION_H_OLD=..\..\teraterm\ttpdlg\svnversion.h
 set DO_NOT_RUN_SVNREV=do_not_run_svnrev.txt
 
 if NOT EXIST %SVNVERSION_H% goto env_perl
@@ -42,6 +43,7 @@ goto finish
 
 :found_perl
 @echo %BAT%: perl=%PERL%
+if EXIST %SVNVERSION_H_OLD% del %SVNVERSION_H_OLD%
 %PERL% svnrev.pl --root ../.. --header %SVNVERSION_H%
 goto finish
 
