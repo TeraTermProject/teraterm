@@ -19,9 +19,7 @@ set release=%release_bak%
 
 rem  change folder name
 if not "%release%"=="yes" goto snapshot
-set ver=
-for /f "delims=" %%i in ('perl issversion.pl') do @set ver=%%i
-set dst=Output\teraterm-%ver%
+set dst=Output\teraterm-%VERSION%
 goto create
 
 :snapshot

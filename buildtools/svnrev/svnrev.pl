@@ -6,10 +6,11 @@ use POSIX 'strftime';
 
 binmode STDOUT, ':encoding(utf8)';
 
-my $tt_version_major = 5;
-my $tt_version_mainor = 0;
-my $tt_version_substr = "beta1";
-my $version = "$tt_version_major.$tt_version_mainor$tt_version_substr";
+my $tt_version_major = 0;
+my $tt_version_minor = 0;
+my $tt_version_substr = "";
+my $tt_version_h = "../../teraterm/common/tt-version.h";
+my $version;
 my $svn = "svn";
 my $git = "git";
 my $out_header = "svnversion.h";
@@ -111,21 +112,17 @@ sub read_whole_file {
 sub compare_file {
 	my ($f1, $f2) = @_;
 	if (! -f $f1) {
-		print "$f1 not exsit\n";
 		return 1;
 	}
 	if (! -f $f2) {
-		print "$f2 not exsit\n";
 		return 1;
 	}
 	my $t1 = read_whole_file($f1);
 	my $t2 = read_whole_file($f2);
 	if ($t1 eq $t2) {
 		# return same
-		print "$f1=$f2\n";
 		return 0;
 	}
-	print "$f1 not equal $f2\n";
 	return 1;
 }
 
@@ -186,6 +183,33 @@ sub write_info_cmake {
 	close($FD);
 }
 
+sub read_tt_version_h()
+{
+	# ヘッダーファイルがない場合
+	if (! -f $tt_version_h) {
+		printf("no header\n");
+		$tt_version_major = 0;
+		$tt_version_minor = 0;
+		$tt_version_substr = "no_header";
+		return;
+	}
+
+	open(my $FH, '<', $tt_version_h) or die "error open $tt_version_h";
+	while (<$FH>) {
+		if (/#define\s+TT_VERSION_MAJOR\s+(\d+)/) {
+			$tt_version_major = $1;
+		}
+		elsif (/#define\s+TT_VERSION_MINOR\s+(\d+)/) {
+			$tt_version_minor = $1;
+		}
+		elsif (/#define\s+TT_VERSION_SUBSTR\s+\"(.+)\"/) {
+			$tt_version_substr = $1;
+		}
+	}
+	close $FH;
+}
+
+&read_tt_version_h();
 &search_svn();
 &search_git();
 &read_toolinfo();
@@ -206,8 +230,17 @@ $git =~ s/\\/\//g;
 $svn =~ s/"//g;
 $svn =~ s/\\/\//g;
 
+if ($tt_version_substr eq "") {
+	$version = "$tt_version_major.$tt_version_minor";
+} else {
+	$version = "$tt_version_major.$tt_version_minor-$tt_version_substr";
+}
+
 if ($verbose != 0) {
 	print "root=$source_root\n";
+	print "tt_version_major=$tt_version_major\n";
+	print "tt_version_minor=$tt_version_minor\n";
+	print "tt_version_substr=$tt_version_substr\n";
 	print "svn=\"$svn\"\n";
 	print "git=\"$git\"\n";
 	print "header=\"$out_header\"\n";

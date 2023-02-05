@@ -1,5 +1,10 @@
-﻿#define AppName "Tera Term"
+﻿
+#define AppName "Tera Term"
+#ifndef AppVer
 #define AppVer "5.0-alpha1"
+#endif
+;#define VerSubStr
+;#define OutputSubStr
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
