@@ -3414,6 +3414,21 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 	switch (msg) {
 	case WM_INITDIALOG:
+		{
+			const static DlgTextInfo text_info[] = {
+				{ 0, "DLG_SCP_TITLE" },
+				{ IDC_SENDFILE_FROM_LABEL, "DLG_SCP_SENDFILE_FROM" },
+				{ IDC_SENDFILE_TO_LABEL, "DLG_SCP_SENDFILE_TO" },
+				{ IDC_SENDFILE_NOTE, "DLG_SCP_SENDFILE_DRAG" },
+				{ IDOK, "DLG_SCP_SENDFILE_SEND" },
+				{ IDCANCEL, "DLG_SCP_SENDFILE_CANCEL" },
+				{ IDC_RECEIVEFILE_FROM_LABEL, "DLG_SCP_RECEIVEFILE_FROM" },
+				{ IDC_RECVFILE_TO_LABEL, "DLG_SCP_RECEIVEFILE_TO" },
+				{ IDC_RECV, "DLG_SCP_RECEIVEFILE_RECEIVE" },
+			};
+			SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		}
+
 		DragAcceptFiles(dlg, TRUE);
 
 		// SCPファイル送信先を表示する
@@ -3470,7 +3485,9 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_TITLE", uimsg, sizeof(uimsg),
 			             "Choose a executing file with launching logging file", ts.UILanguageFile);
 #endif
-			ofn.lpstrTitle = "Choose a sending file with SCP";
+			UTIL_get_lang_msg("DLG_SCP_SELECT_FILE_TITLE", pvar,
+			                  "Choose a sending file with SCP");
+			ofn.lpstrTitle = pvar->ts->UIMsg;
 
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 			ofn.Flags |= OFN_FORCESHOWHIDDEN;
@@ -3485,7 +3502,9 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			char buf[MAX_PATH], buf2[MAX_PATH];
 			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(buf), (LPARAM)buf);
-			if (doSelectFolder(dlg, buf2, sizeof(buf2), buf, "Choose destination directory")) {
+			UTIL_get_lang_msg("DLG_SCP_SELECT_DEST_TITLE", pvar,
+			                  "Choose destination directory");
+			if (doSelectFolder(dlg, buf2, sizeof(buf2), buf, pvar->ts->UIMsg)) {
 				strncpy_s(recvdir, sizeof(recvdir), buf2, _TRUNCATE);
 				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
 			}

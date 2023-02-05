@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2022-11-27)
+; Updated by TeraTerm Project (2023-02-06)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -830,6 +830,26 @@ DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
 DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
 
+; dlg SCP
+DLG_SCP_TITLE=TTSSH: Secure Copy Protocol (SCP)
+DLG_SCP_SENDFILE_FROM=&From:
+DLG_SCP_SENDFILE_TO=To:
+DLG_SCP_SENDFILE_DRAG=You can drag the file to this window.
+DLG_SCP_SENDFILE_SEND=&Send
+DLG_SCP_SENDFILE_CANCEL=&Cancel
+DLG_SCP_RECEIVEFILE_FROM=Fr&om:
+DLG_SCP_RECEIVEFILE_TO=To:
+DLG_SCP_RECEIVEFILE_RECEIVE=&Receive
+DLG_SCP_SELECT_FILE_TITLE=Choose a sending file with SCP
+DLG_SCP_SELECT_DEST_TITLE=Choose destination directory
+
+; dlg SCP progress
+DLG_SCP_PROGRESS_TITLE_SENDFILE=TTSSH: SCP sending file
+DLG_SCP_PROGRESS_TITLE_RECEIVEFILE=TTSSH: SCP receiving file
+DLG_SCP_PROGRESS_FILENAME_LABEL=Filename:
+DLG_SCP_PROGRESS_BYTES_LABEL=Bytes transfered:
+DLG_SCP_PROGRESS_TIME_LABEL=Time elapsed:
+
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s encrypt error(1): bytes %d (%d)
 MSG_ENCRYPT_ERROR2=%s encrypt error(2)
@@ -925,6 +945,14 @@ MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal
 MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
 MSG_SSH_AGENTERROR_TITLE=Bad agent request
 MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
+MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=TTSSH: file open error
+MSG_SSH_SCP_FILEOPEN_READ_ERROR=Can't open file for reading:
+MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=`%s' file is read only.
+MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM=`%s' file exists.\noverwrite it?
+MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=Can't open file for writing:
+MSG_SSH_SCP_CONFIRM_TITLE=TTSSH: confirm
+MSG_SSH_SCP_ERROR_TITLE=TTSSH: SCP error
+MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Unrecognized command-line option: %s
