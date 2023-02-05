@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-01-18)
+﻿; Updated by TeraTerm Project (2023-02-06)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -872,6 +872,26 @@ DLG_HOSTKEY_ROTATION_WARNING=收到来自远程服务器 %s 的主机密钥列�
 DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=指纹散列算法：
 DLG_HOSTKEY_ROTATION_ADD=%u 新密钥：
 DLG_HOSTKEY_ROTATION_REMOVE=%u 废弃密钥：
+
+; dlg SCP
+DLG_SCP_TITLE=TTSSH: Secure Copy Protocol (SCP)
+DLG_SCP_SENDFILE_FROM=&From:
+DLG_SCP_SENDFILE_TO=To:
+DLG_SCP_SENDFILE_DRAG=You can drag the file to this window.
+DLG_SCP_SENDFILE_SEND=&Send
+DLG_SCP_SENDFILE_CANCEL=&Cancel
+DLG_SCP_RECEIVEFILE_FROM=Fr&om:
+DLG_SCP_RECEIVEFILE_TO=To:
+DLG_SCP_RECEIVEFILE_RECEIVE=&Receive
+DLG_SCP_SELECT_FILE_TITLE=Choose a sending file with SCP
+DLG_SCP_SELECT_DEST_TITLE=Choose destination directory
+
+; dlg SCP progress
+DLG_SCP_PROGRESS_TITLE_SENDFILE=TTSSH: SCP sending file
+DLG_SCP_PROGRESS_TITLE_RECEIVEFILE=TTSSH: SCP receiving file
+DLG_SCP_PROGRESS_FILENAME_LABEL=Filename:
+DLG_SCP_PROGRESS_BYTES_LABEL=Bytes transfered:
+DLG_SCP_PROGRESS_TIME_LABEL=Time elapsed:
 
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s加密错误(1)：bytes %d (%d)

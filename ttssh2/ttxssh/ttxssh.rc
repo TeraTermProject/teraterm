@@ -351,40 +351,40 @@ END
 
 IDD_SSHSCP DIALOGEX 0, 0, 279, 125
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "TTSSH: Secure File Copy"
+CAPTION "TTSSH: Secure Copy Protocol (SCP)"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "&From:",IDC_STATIC,10,8,20,8
-    EDITTEXT        IDC_SENDFILE_EDIT,35,7,156,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SENDFILE_SELECT,196,7,14,14
-    LTEXT           "To:    remote host home directory",IDC_STATIC,18,25,16,8
-    EDITTEXT        IDC_SENDFILE_TO,35,24,156,14,ES_AUTOHSCROLL
-    LTEXT           "You can drag the file to this window.",IDC_FILE_PROGRESS,44,43,128,11,0,WS_EX_STATICEDGE
-    DEFPUSHBUTTON   "&Send",IDOK,222,7,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,222,24,50,14
-    PUSHBUTTON      "SFTP Test",IDC_SFTP_TEST,222,45,50,14,NOT WS_VISIBLE
+    LTEXT           "&From:",IDC_SENDFILE_FROM_LABEL,10,8,30,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_SENDFILE_EDIT,45,7,150,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SENDFILE_SELECT,200,7,14,14
+    LTEXT           "To:",IDC_SENDFILE_TO_LABEL,10,25,30,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_SENDFILE_TO,45,24,150,14,ES_AUTOHSCROLL
+    LTEXT           "You can drag the file to this window.",IDC_SENDFILE_NOTE,45,43,170,11
+    DEFPUSHBUTTON   "&Send",IDOK,223,7,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,223,24,50,14
+    PUSHBUTTON      "SFTP Test",IDC_SFTP_TEST,223,45,50,14,NOT WS_VISIBLE
     LTEXT           "-----------------------------------------------------------------------------------------------------------",IDC_DUMMY_LINE,7,63,265,8
-    LTEXT           "Fr&om:",IDC_STATIC,7,81,20,8
-    EDITTEXT        IDC_RECVFILE,37,78,154,14,ES_AUTOHSCROLL
-    LTEXT           "To: ",IDC_RECV_TO_DIRECTORY,15,100,16,8
-    EDITTEXT        IDC_RECVFILE_TO,37,97,154,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_RECVDIR_SELECT,196,97,14,14
-    PUSHBUTTON      "&Receive",IDC_RECV,222,77,50,14
+    LTEXT           "Fr&om:",IDC_RECEIVEFILE_FROM_LABEL,10,81,30,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_RECVFILE,45,78,150,14,ES_AUTOHSCROLL
+    LTEXT           "To: ",IDC_RECVFILE_TO_LABEL,10,100,30,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_RECVFILE_TO,45,97,150,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_RECVDIR_SELECT,200,97,14,14
+    PUSHBUTTON      "&Receive",IDC_RECV,223,77,50,14
 END
 
-IDD_SSHSCP_PROGRESS DIALOGEX 0, 0, 166, 100
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_SSHSCP_PROGRESS DIALOGEX 0, 0, 200, 100
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "TTSSH: SCP sending file"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Filename:",IDC_FN_STATIC,7,7,32,8
-    EDITTEXT        IDC_FILENAME,45,6,114,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Bytes:",IDC_STATIC,7,29,32,8
-    LTEXT           "0%",IDC_PROGRESS,40,29,141,8
-    LTEXT           "Time:",IDC_STATIC,7,39,32,8
-    LTEXT           "0:00",IDC_PROGTIME,40,39,141,8
-    CONTROL         "",IDC_PROGBAR,"msctls_progress32",WS_BORDER,7,52,152,14
-    DEFPUSHBUTTON   "Cancel",IDCANCEL,43,76,73,14
+    LTEXT           "Filename:",IDC_SCP_PROGRESS_FILENAME_LABEL,7,9,40,8
+    EDITTEXT        IDC_FILENAME,53,7,140,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Bytes transfered:",IDC_SCP_PROGRESS_BYTE_LABEL,7,30,60,8
+    LTEXT           "0%",IDC_PROGRESS,73,30,117,8
+    LTEXT           "Time elapsed:",IDC_SCP_PROGRESS_TIME_LABEL,7,42,60,8
+    LTEXT           "0:00",IDC_PROGTIME,73,42,117,8
+    CONTROL         "",IDC_PROGBAR,"msctls_progress32",WS_BORDER,7,54,186,14
+    DEFPUSHBUTTON   "Cancel",IDCANCEL,70,80,60,14
 END
 
 IDD_SSHPASSWD_INPUT DIALOGEX 0, 0, 240, 102
@@ -576,7 +576,7 @@ BEGIN
     IDD_SSHSCP_PROGRESS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 159
+        RIGHTMARGIN, 193
         TOPMARGIN, 7
         BOTTOMMARGIN, 93
     END
@@ -653,11 +653,17 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_SECURETT            ICON                    "ttsecure.ico"
-IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
-IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
-IDI_DROPDOWN            ICON                    "dropdown.ico"
+
 IDI_SECURETT_CLASSIC    ICON                    "ttsecure_classic.ico"
+
+IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
+
+IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
+
+IDI_DROPDOWN            ICON                    "dropdown.ico"
+
 IDI_SECURETT_FLAT       ICON                    "ttsecure_flat.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -670,6 +676,16 @@ BEGIN
 END
 
 IDD_SSHAUTHSETUP AFX_DIALOG_LAYOUT 
+BEGIN
+    0x0000
+END
+
+IDD_SSHSCP AFX_DIALOG_LAYOUT 
+BEGIN
+    0x0000
+END
+
+IDD_SSHSCP_PROGRESS AFX_DIALOG_LAYOUT 
 BEGIN
     0x0000
 END

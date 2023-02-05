@@ -162,16 +162,17 @@
 #define IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY 1089
 #define IDC_SENDFILE_SELECT             1090
 #define IDC_FILE_PROGRESS               1092
+#define IDC_SENDFILE_NOTE               1092
 #define IDC_FILENAME                    1093
 #define IDC_RECVDIR_SELECT              1093
 #define IDC_PROGRESS                    1094
-#define IDC_FN_STATIC                   1095
+#define IDC_SCP_PROGRESS_FILENAME_LABEL 1095
 #define IDC_RECVFILE                    1096
 #define IDC_RECV                        1097
 #define IDC_SFTP_TEST                   1098
 #define IDC_DUMMY_LINE                  1099
 #define IDC_LOCALUSERNAMELABEL          1100
-#define IDC_RECV_TO_DIRECTORY           1100
+#define IDC_RECVFILE_TO_LABEL           1100
 #define IDC_LOCALUSERNAME               1101
 #define IDC_RECVFILE_TO                 1101
 #define IDC_CHOOSEHOSTRSAFILE           1102
@@ -241,6 +242,11 @@
 #define IDC_SSHSETUP_HELP               1249
 #define IDC_SSHFWDSETUP_HELP            1250
 #define IDC_SSHAUTHSETUP_HELP           1251
+#define IDC_SENDFILE_FROM_LABEL         1252
+#define IDC_SENDFILE_TO_LABEL           1253
+#define IDC_RECEIVEFILE_FROM_LABEL      1254
+#define IDC_SCP_PROGRESS_BYTE_LABEL     1255
+#define IDC_SCP_PROGRESS_TIME_LABEL     1256
 
 // Next default values for new objects
 //
@@ -248,7 +254,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1252
+#define _APS_NEXT_CONTROL_VALUE         1257
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

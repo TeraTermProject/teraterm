@@ -4235,7 +4235,9 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		if (fp == NULL) {
 			char buf[1024];
 			int len;
-			strcpy_s(buf, sizeof(buf), "Can't open file for reading: ");
+			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_READ_ERROR", pvar,
+			                  "Can't open file for reading:");
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s ", pvar->ts->UIMsg);
 			len = strlen(buf);
 			FormatMessage(
 			    FORMAT_MESSAGE_FROM_SYSTEM,
@@ -4245,7 +4247,9 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 			    buf+len,
 			    sizeof(buf)-len,
 			    NULL);
-			MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
+			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", pvar,
+			                  "TTSSH: file open error");
+			MessageBox(NULL, buf, pvar->ts->UIMsg, MB_OK | MB_ICONERROR);
 			goto error;
 		}
 
@@ -4286,12 +4290,20 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 			char buf[512];
 			int dlgresult;
 			if (_access(c->scp.localfilefull, 0x02) == -1) { // 0x02 == writable
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file is read only.", c->scp.localfilefull);
-				MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
+				UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_READONLY_ERROR", pvar,
+				                  "`%s' file is read only.");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, c->scp.localfilefull);
+				UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", pvar,
+				                  "TTSSH: file open error");
+				MessageBox(NULL, buf, pvar->ts->UIMsg, MB_OK | MB_ICONERROR);
 				goto error;
 			}
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file exists.\noverwrite it?", c->scp.localfilefull);
-			dlgresult = MessageBox(NULL, buf, "TTSSH: confirm", MB_YESNO | MB_ICONQUESTION);
+			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM", pvar,
+			                  "`%s' file exists.\noverwrite it?");
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, c->scp.localfilefull);
+			UTIL_get_lang_msg("MSG_SSH_SCP_CONFIRM_TITLE", pvar,
+			                  "TTSSH: confirm");
+			dlgresult = MessageBox(NULL, buf, pvar->ts->UIMsg, MB_YESNO | MB_ICONQUESTION);
 			if (dlgresult == IDNO) {
 				goto error;
 			}
@@ -4301,7 +4313,9 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		if (fp == NULL) {
 			char buf[1024];
 			int len;
-			strcpy_s(buf, sizeof(buf), "Can't open file for writing: ");
+			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_WRITE_ERROR", pvar,
+			                  "Can't open file for writing:");
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s ", pvar->ts->UIMsg);
 			len = strlen(buf);
 			FormatMessage(
 			    FORMAT_MESSAGE_FROM_SYSTEM,
@@ -4311,7 +4325,9 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 			    buf+len,
 			    sizeof(buf)-len,
 			    NULL);
-			MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
+			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", pvar,
+			                  "TTSSH: file open error");
+			MessageBox(NULL, buf, pvar->ts->UIMsg, MB_OK | MB_ICONERROR);
 			goto error;
 		}
 
@@ -8318,8 +8334,16 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		c->scp.pvar = pvar;
 
 		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
-				   pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
+		                       pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
 		if (hDlgWnd != NULL) {
+			static const DlgTextInfo text_info[] = {
+				{ 0, "DLG_SCP_PROGRESS_TITLE_SENDFILE" },
+				{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
+				{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
+				{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
+			};
+			SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+
 			c->scp.progress_window = hDlgWnd;
 			ShowWindow(hDlgWnd, SW_SHOW);
 		}
@@ -8577,10 +8601,17 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			// 進捗ウィンドウ
 			c->scp.pvar = pvar;
 			hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
-					   pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
+			                       pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
 			if (hDlgWnd != NULL) {
+				static const DlgTextInfo text_info[] = {
+					{ 0, "DLG_SCP_PROGRESS_TITLE_RECEIVEFILE" },
+					{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_SENDFILE_FROM" },
+					{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
+					{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
+				};
+				SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+
 				c->scp.progress_window = hDlgWnd;
-				SetWindowText(hDlgWnd, "TTSSH: SCP receiving file");
 				SendMessage(GetDlgItem(hDlgWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
 				ShowWindow(hDlgWnd, SW_SHOW);
 			}
@@ -8602,8 +8633,10 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			copylen = min(buflen, sizeof(msg));
 			memcpy(msg, data, copylen);
 			msg[copylen - 1] = 0;
-			MessageBox(NULL, msg, "TTSSH: SCP error(SCP_INIT)", MB_OK | MB_ICONEXCLAMATION);
 
+			UTIL_get_lang_msg("MSG_SSH_SCP_ERROR_INIT_TITLE", pvar,
+			                  "TTSSH: SCP error (SCP_INIT)");
+			MessageBox(NULL, msg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 		}
 
 	} else if (c->scp.state == SCP_DATA) {  // payloadの受信
@@ -8684,7 +8717,9 @@ error:
 			//ssh2_channel_send_close(pvar, c);
 		}
 
-		MessageBox(NULL, msg, "TTSSH: SCP error", MB_OK | MB_ICONEXCLAMATION);
+		UTIL_get_lang_msg("MSG_SSH_SCP_ERROR_TITLE", pvar,
+		                  "TTSSH: SCP error");
+		MessageBox(NULL, msg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 	}
 }
 
