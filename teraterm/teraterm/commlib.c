@@ -33,6 +33,7 @@
 #include "tttypes.h"
 #include "tt_res.h"
 #include <process.h>
+#include <assert.h>
 
 #include "ttcommon.h"
 #include "ttwsk.h"
@@ -203,14 +204,18 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	dcb.fDtrControl = DTR_CONTROL_ENABLE;
 	dcb.fRtsControl = RTS_CONTROL_ENABLE;
+#if 1
+	dcb.XonChar = XON;
+	dcb.XoffChar = XOFF;
+#endif
 	switch (ts->Flow) {
 		case IdFlowX:
+			dcb.XonChar = XON;
+			dcb.XoffChar = XOFF;
 			dcb.fOutX = TRUE;
 			dcb.fInX = TRUE;
 			dcb.XonLim = CommXonLim;
 			dcb.XoffLim = CommXoffLim;
-			dcb.XonChar = XON;
-			dcb.XoffChar = XOFF;
 			break;
 		case IdFlowHard:  // RTS/CTS
 			dcb.fOutxCtsFlow = TRUE;
@@ -239,7 +244,19 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			break;
 	}
 
-	SetCommState(cv->ComID, &dcb);
+	if (SetCommState(cv->ComID, &dcb) == 0) {
+		// Ý’èƒGƒ‰[
+		assert(0);
+	}
+#if !defined(NDEBUG)
+	{
+		DCB dcb_read;
+		GetCommState(cv->ComID, &dcb_read);
+		if (memcmp(&dcb, &dcb_read, sizeof(dcb)) != 0) {
+			assert(0);
+		}
+	}
+#endif
 
 	/* enable receive request */
 	SetCommMask(cv->ComID,0);
