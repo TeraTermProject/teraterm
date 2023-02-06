@@ -1075,8 +1075,26 @@ void CommSend(PComVar cv)
 			Max = cv->OutBuffCount;
 			break;
 		case IdSerial:
-			ClearCommError(cv->ComID,&DErr,&Stat);
-			Max = OutBuffSize - Stat.cbOutQue;
+			Max = 1;
+			if (cv->ts->Flow == IdFlowHard || cv->ts->Flow == IdFlowHardDsrDtr) {
+				// RTS/CTS, DSR/DTR
+				DWORD modem_state;
+				GetCommModemStatus(cv->ComID, &modem_state);
+				DWORD mask = cv->ts->Flow == IdFlowHard ? MS_CTS_ON : MS_DSR_ON;
+				if ((modem_state & mask) == 0) {
+					// 信号線がアクティブではない、送信しない
+					Max = 1;
+
+					DCB dcb;
+					GetCommState(cv->ComID, &dcb);
+					int a = 0;
+				}
+			}
+
+			if (Max != 0) {
+				ClearCommError(cv->ComID, &DErr, &Stat);
+				Max = OutBuffSize - Stat.cbOutQue;
+			}
 			break;
 		case IdFile:
 			Max = cv->OutBuffCount;
