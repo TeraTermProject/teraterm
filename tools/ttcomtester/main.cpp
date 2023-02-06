@@ -335,7 +335,7 @@ int wmain(int argc, wchar_t *argv[])
 				}
 				case 's': {
 					size_t send_len = 32*1024;
-					printf("send big data %zu bytes\n", send_len);
+					printf("send big data %u bytes\n", send_len);
 					unsigned char *send_data = (unsigned char* )malloc(send_len);
 					for(size_t i = 0; i < send_len; i++) {
 						send_data[i] = (unsigned char)i;
@@ -343,7 +343,7 @@ int wmain(int argc, wchar_t *argv[])
 					size_t sent_len;
 					DWORD e = ope->write(dev, send_data, send_len, &sent_len);
 					if (e == ERROR_SUCCESS) {
-						printf("sent %zu bytes\n", sent_len);
+						printf("sent %u bytes\n", sent_len);
 					}
 					else if (e == ERROR_IO_PENDING) {
 						printf("send pending..\n");
@@ -487,21 +487,21 @@ int wmain(int argc, wchar_t *argv[])
 						size_t sent_len;
 						DWORD e = ope->write(dev, send_text, 1, &sent_len);
 						if (e == ERROR_SUCCESS) {
-							printf("send %02x, sent %zu byte %s\n", c, sent_len,
+							printf("send %02x, sent %u byte %s\n", c, sent_len,
 								   sent_len != 0 ? "" : "(flow control or send buffer full)");
 						}
 						else if (e == ERROR_IO_PENDING) {
-							printf("send %02x, sent %zu byte pending\n", c, sent_len);
+							printf("send %02x, sent %u byte pending\n", c, sent_len);
 							for(;;) {
 								size_t sent_len;
 								e = ope->wait_write(dev, &sent_len);
 								if (e == ERROR_IO_PENDING) {
 									if (sent_len != 0) {
-										printf("send size %zu (pending)\n", sent_len);
+										printf("send size %u (pending)\n", sent_len);
 									}
 								}
 								else if (e == ERROR_SUCCESS) {
-									printf("send size %zu (finish)\n", sent_len);
+									printf("send size %u (finish)\n", sent_len);
 									break;
 								}
 								else {
@@ -536,11 +536,11 @@ int wmain(int argc, wchar_t *argv[])
 							send_text[0] = (char)c;
 							DWORD e = ope->write(dev, send_text, 1, &sent_len);
 							if (e == ERROR_SUCCESS) {
-								printf("send %02x, sent %zu byte %s\n", c, sent_len,
+								printf("send %02x, sent %u byte %s\n", c, sent_len,
 									   sent_len != 0 ? "" : "(flow control or send buffer full)");
 							}
 							else if (e == ERROR_IO_PENDING) {
-								printf("send %02x, sent %zu byte pending\n", c, sent_len);
+								printf("send %02x, sent %u byte pending\n", c, sent_len);
 								write_pending = true;
 							} else if (e == ERROR_INSUFFICIENT_BUFFER) {
 								printf("send buffer full\n");
@@ -568,11 +568,11 @@ int wmain(int argc, wchar_t *argv[])
 				if (e == ERROR_IO_PENDING) {
 					// Ç‹Çæë“ÇøèÛë‘
 					if (sent_len != 0) {
-						printf("send size %zu (pending)\n", sent_len);
+						printf("send size %u (pending)\n", sent_len);
 					}
 				}
 				else if (e == ERROR_SUCCESS) {
-					printf("send size %zu (finish)\n", sent_len);
+					printf("send size %u (finish)\n", sent_len);
 					write_pending = false;
 				} else {
 					DispErrorStr(L"write() error", e);
