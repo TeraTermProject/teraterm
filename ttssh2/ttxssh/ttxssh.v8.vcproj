@@ -551,7 +551,15 @@
 			Filter="ico;rc"
 			>
 			<File
+				RelativePath="dropdown.ico"
+				>
+			</File>
+			<File
 				RelativePath="ttsecure.ico"
+				>
+			</File>
+			<File
+				RelativePath="ttsecure_classic.ico"
 				>
 			</File>
 			<File

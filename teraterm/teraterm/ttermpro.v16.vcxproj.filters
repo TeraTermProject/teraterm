@@ -155,7 +155,7 @@
     <Image Include="..\common\tek.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\common\Teraterm.ico">
+    <Image Include="..\common\teraterm.ico">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\common\teraterm_classic.ico">
