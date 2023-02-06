@@ -23,7 +23,7 @@ void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 {
 	wchar_t *b;
 	wchar_t *defW = ToWcharA(def);
-    GetI18nStrWW("TTProxy", key, UILanguageFileW, defW, &b);
+    GetI18nStrWW("TTProxy", key, defW, UILanguageFileW, &b);
 	free(defW);
 	WideCharToACP_t(b, buf, buf_len);
 	free(b);
@@ -32,7 +32,7 @@ void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def)
 {
 	wchar_t *b;
-    GetI18nStrWW("TTProxy", key, UILanguageFileW, def, &b);
+    GetI18nStrWW("TTProxy", key, def, UILanguageFileW, &b);
 	wcscpy_s(buf, buf_len, b);
 	free(b);
 }
@@ -1097,7 +1097,7 @@ private:
             ver = FileVersion::getOwnVersion().getFileVersion();
             n = sscanf_s(ver, "%d, %d, %d, %d", &a, &b, &c, &d);
             if (n == 4) {
-                swprintf_s(buf2, len, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
+                _snwprintf_s(buf2, len, _TRUNCATE, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
             }
             SetDlgItemTextW(hWnd, IDC_VERSION, (n == 4) ? buf2 : buf);
 
