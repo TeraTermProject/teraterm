@@ -176,6 +176,8 @@
   <ItemGroup>
     <Image Include="ttmacro.ico" />
     <Image Include="ttmacro_3d.ico" />
+    <Image Include="ttmacro_flat.ico" />
+    <Image Include="ttmacrof.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttm-version.rc" />

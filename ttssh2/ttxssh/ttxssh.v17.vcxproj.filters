@@ -260,6 +260,12 @@
     <Image Include="ttsecure_yellow.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="ttsecure_classic.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="dropdown.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
