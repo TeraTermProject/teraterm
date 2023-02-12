@@ -6,6 +6,7 @@
 # .\cmake-3.11.4-win32-x86\bin\cmake.exe -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="NMake Makefiles" -DBUILD_SSL_LIBRARY=OFF -P buildall.cmake
 
 set(BUILD_OPENSSL1 OFF)
 set(BUILD_OPENSSL3 OFF)
@@ -19,7 +20,8 @@ if(NOT "${ARCHITECTURE}" STREQUAL "")
 endif()
 
 if(NOT DEFINED BUILD_SSL_LIBRARY)
-  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005" OR ${CMAKE_GENERATOR} MATCHES "Visual Studio 9 2008")
+  if((${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005") OR
+      (${CMAKE_GENERATOR} MATCHES "Visual Studio 9 2008"))
     set(BUILD_SSL_LIBRARY OFF)
   else()
     set(BUILD_SSL_LIBRARY ON)

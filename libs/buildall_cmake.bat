@@ -21,7 +21,7 @@ echo 7. Visual Studio 12 2013
 echo 8. Visual Studio 11 2012
 echo 9. Visual Studio 10 2010
 echo a. Visual Studio 9 2008
-echo b. Visual Studio 8 2005
+rem echo b. Visual Studio 8 2005
 rem echo c. Visual Studio NMake (experimental)
 rem echo d. Cygwin MinGW Release + Unix Makefiles (experimental)
 set /p no="select no "

@@ -16,15 +16,21 @@
 
 ## icoファイルからpngの抽出
 
-- icon_extract.shを実行する
+- icon_extract.cmakeを実行する
+- 処理したicoファイルと同名のフォルダが作成され
 - pngファイルが各フォルダに抽出される
 
 ## pngからicoファイルを合成
 
-- icon_conbine.shを実行する
+- icon_conbine.cmakeを実行する
 - pngファイルからicoファイルが合成される
 - icoファイルはこのフォルダに作成される
-- 必要に応じて../*.icoと入れ替えを行う
+- 次のオプションでicoファイルのコピーを行う
+  - `-DCOPY_ICO=1`
+    - icoファイルを元ファイルに上書きする
+  - `-DCOPY_BMP_ICO=1`
+    - bmp形式のみのicoファイルを元ファイルのフォルダにコピーする
+    - ファイル名は `元ファイル名_bmp.ico`
 
 ## ico ファイルについて
 
@@ -42,4 +48,3 @@
 - cygwin では icoutils パッケージに入っている
 - linux では icoutils パッケージに入っている
   - `apt-get install icoutils`
-

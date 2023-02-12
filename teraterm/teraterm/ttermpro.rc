@@ -516,9 +516,17 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+#if defined(BMP_ICO)
+IDI_TTERM               ICON                    "../common/teraterm_bmp.ico"
+#else
 IDI_TTERM               ICON                    "../common/teraterm.ico"
+#endif
 
+#if defined(BMP_ICO)
+IDI_VT                  ICON                    "../common/vt_bmp.ico"
+#else
 IDI_VT                  ICON                    "../common/vt.ico"
+#endif
 
 IDI_TEK                 ICON                    "../common/tek.ico"
 
@@ -528,13 +536,29 @@ IDI_VT_CLASSIC          ICON                    "../common/vt_classic.ico"
 
 IDI_CYGTERM             ICON                    "../../cygwin/cygterm/cygterm.ico"
 
+#if defined(BMP_ICO)
+IDI_TTERM_3D            ICON                    "../common/teraterm_3d_bmp.ico"
+#else
 IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
+#endif
 
+#if defined(BMP_ICO)
+IDI_VT_3D               ICON                    "../common/vt_3d_bmp.ico"
+#else
 IDI_VT_3D               ICON                    "../common/vt_3d.ico"
+#endif
 
+#if defined(BMP_ICO)
+IDI_TTERM_FLAT          ICON                    "../common/teraterm_flat_bmp.ico"
+#else
 IDI_TTERM_FLAT          ICON                    "../common/teraterm_flat.ico"
+#endif
 
+#if defined(BMP_ICO)
+IDI_VT_FLAT             ICON                    "../common/vt_flat_bmp.ico"
+#else
 IDI_VT_FLAT             ICON                    "../common/vt_flat.ico"
+#endif
 
 
 /////////////////////////////////////////////////////////////////////////////

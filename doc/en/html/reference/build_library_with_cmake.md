@@ -31,37 +31,29 @@ You need to use Internet service because some archives are automatically downloa
 
 ### By using batch file
 
-Execute buildall_cmake.bat, and select Visual Studio.
+Execute libs/buildall_cmake.bat, and select Visual Studio.
 
-    1. Visual Studio 16 2019
-    2. Visual Studio 15 2017
-    3. Visual Studio 14 2015
-    4. Visual Studio 12 2013
-    5. Visual Studio 11 2012
-    6. Visual Studio 10 2010
-    7. Visual Studio 9 2008
-    8. Visual Studio 8 2005
+    1. Visual Studio 17 2022
+    2. Visual Studio 17 2022 x64
+    3. Visual Studio 16 2019
+    4. Visual Studio 16 2019 x64
+    5. Visual Studio 15 2017
+    6. Visual Studio 14 2015
+    7. Visual Studio 12 2013
+    8. Visual Studio 11 2012
+    9. Visual Studio 10 2010
+    a. Visual Studio 9 2008
     select no
-
-When VS2005 is selected, you can download cmake 3.11.4 and install into `libs\cmake-3.11.4-win32-x86`.
 
 ### By using cmake
 
-Case of Visual Studio 2019 x86
+Case of Visual Studio 2022 x86
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildall.cmake
 
-Case of Visual Studio 2017 x86
+Case of Visual Studio 2022 x64
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildall.cmake
-
-Case of Visual Studio 2017 x64
-
-    cmake -DCMAKE_GENERATOR="Visual Studio 15 2017 Win64" -P buildall.cmake`
-
-When Visual Studio 2005 is used, cmake 3.11.4 or earlier(if cmake is installed in libs\cmake-3.11.4-win32-x86). 
-
-    libs\cmake-3.11.4-win32-x86\bin\cmake.exe" -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64 -P buildall.cmake`
 
 ## MinGW common
 
@@ -75,7 +67,7 @@ Using cmake in each environment.
 
 - Library `*.h` and `*.lib` are created in the following:
 	- `oniguruma_{compiler}`
-	- `openssl_{compiler}`
+	- `libressl_{compiler}`
 	- `putty`
 	- `SFMT_{compiler}`
 	- `zlib_{compiler}`

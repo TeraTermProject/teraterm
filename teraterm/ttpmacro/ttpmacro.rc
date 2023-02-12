@@ -151,10 +151,17 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+#if defined(BMP_ICO)
+IDI_TTMACRO             ICON                    "ttmacro_bmp.ico"
+IDI_TTMACRO_3D          ICON                    "ttmacro_3d_bmp.ico"
+IDI_TTMACRO_FLAT        ICON                    "ttmacro_flat_bmp.ico"
+IDI_TTMACRO_FILE        ICON                    "ttmacrof_bmp.ico"
+#else
 IDI_TTMACRO             ICON                    "ttmacro.ico"
 IDI_TTMACRO_3D          ICON                    "ttmacro_3d.ico"
 IDI_TTMACRO_FLAT        ICON                    "ttmacro_flat.ico"
 IDI_TTMACRO_FILE        ICON                    "ttmacrof.ico"
+#endif
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
