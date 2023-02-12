@@ -1281,7 +1281,9 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
 			// それに応じてOKボタンのラベル名を切り替える。
-			serial_dlg_change_OK_button(Dialog, dlg_data->ComPortInfoPtr[w].port_no, ts->UILanguageFileW);
+			if (dlg_data->ComPortInfoCount > 0) {
+				serial_dlg_change_OK_button(Dialog, dlg_data->ComPortInfoPtr[w].port_no, ts->UILanguageFileW);
+			}
 
 			return TRUE;
 
