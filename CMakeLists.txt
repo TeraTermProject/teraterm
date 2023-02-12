@@ -157,6 +157,7 @@ endif()
 if((NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake") OR
     (NOT EXISTS "${CMAKE_BINARY_DIR}/teraterm/common/svnversion.h") OR
     (NOT EXISTS "${CMAKE_SOURCE_DIR}/buildtools/svnrev/sourcetreeinfo.bat"))
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/teraterm/common)
   execute_process(
     COMMAND ${CMAKE_COMMAND} -DPERL=${PERL} -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DBINARY_DIR=${CMAKE_BINARY_DIR} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DSVN_EXECUTABLE=${Subversion_SVN_EXECUTABLE} -P svnrev.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/buildtools/svnrev
