@@ -1006,47 +1006,35 @@ static TipWin *g_SerialDlgSpeedTip;
  */
 static void serial_dlg_change_OK_button(HWND dlg, int portno, const wchar_t *UILanguageFileW)
 {
-	static const DlgTextInfo TextInfoNewConnection[] = {
-		{ IDOK, "DLG_SERIAL_OK_CONNECTION" },
-	};
-	static const DlgTextInfo TextInfoNewOpen[] = {
-		{ IDOK, "DLG_SERIAL_OK_OPEN" },
-	};
-	static const DlgTextInfo TextInfoCloseNewOpen[] = {
-		{ IDOK, "DLG_SERIAL_OK_CLOSEOPEN" },
-	};
-	static const DlgTextInfo TextInfoResetSetting[] = {
-		{ IDOK, "DLG_SERIAL_OK_RESET" },
-	};
-	int ret = 0;
-	const char *ok_text;
-
+	wchar_t *uimsg;
 	if ( cv.Ready && (cv.PortType != IdSerial) ) {
-		ret = SetDlgTextsW(dlg, TextInfoNewConnection, _countof(TextInfoNewConnection), UILanguageFileW);
-		ok_text = "Connect with &New window";
-
+		uimsg = TTGetLangStrW("Tera Term",
+							  "DLG_SERIAL_OK_CONNECTION",
+							  L"Connect with &New window",
+							  UILanguageFileW);
 	} else {
 		if (cv.Open) {
 			if (portno != cv.ComPort) {
-				ret = SetDlgTextsW(dlg, TextInfoCloseNewOpen, _countof(TextInfoCloseNewOpen), UILanguageFileW);
-				ok_text = "Close and &New open";
+				uimsg = TTGetLangStrW("Tera Term",
+									  "DLG_SERIAL_OK_CLOSEOPEN",
+									  L"Close and &New open",
+									  UILanguageFileW);
 			} else {
-				ret = SetDlgTextsW(dlg, TextInfoResetSetting, _countof(TextInfoResetSetting), UILanguageFileW);
-				ok_text = "&New setting";
+				uimsg = TTGetLangStrW("Tera Term",
+									  "DLG_SERIAL_OK_RESET",
+									  L"&New setting",
+									  UILanguageFileW);
 			}
 
 		} else {
-			ret = SetDlgTextsW(dlg, TextInfoNewOpen, _countof(TextInfoNewOpen), UILanguageFileW);
-			ok_text = "&New open";
+			uimsg = TTGetLangStrW("Tera Term",
+								  "DLG_SERIAL_OK_OPEN",
+								  L"&New open",
+								  UILanguageFileW);
 		}
 	}
-
-	/* Default.lng の場合、言語ファイルから読み出せないので、
-	 * デフォルトテキストをセットする。
-	 */
-	if (ret <= 0) {
-		SetDlgItemTextA(dlg, IDOK, ok_text);
-	}
+	SetDlgItemTextW(dlg, IDOK, uimsg);
+	free(uimsg);
 }
 
 /*
@@ -1117,13 +1105,14 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 	int cx, cy;
 	RECT wr;
 	wchar_t *uimsg;
-	PTTSet ts;
+	SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	const wchar_t *UILanguageFileW;
 
 	switch (msg) {
 		case WM_MOUSEMOVE:
-			ts = (PTTSet)GetWindowLongPtr(GetParent(hWnd) ,DWLP_USER);
+			UILanguageFileW = dlg_data->pts->UILanguageFileW;
 			uimsg = TTGetLangStrW("Tera Term",
-								  "DLG_SERIAL_SPEED_TOOLTIP", L"You can directly specify a number", ts->UILanguageFileW);
+								  "DLG_SERIAL_SPEED_TOOLTIP", L"You can directly specify a number", UILanguageFileW);
 
 			// Combo-boxの左上座標を求める
 			GetWindowRect(hWnd, &wr);
@@ -1158,7 +1147,7 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 /*
  * シリアルポート設定ダイアログ
  *
- *
+ * シリアルポート数が0の時は呼ばれない
  */
 static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -1188,40 +1177,29 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 			ts = dlg_data->pts;
 
+			assert(dlg_data->ComPortInfoCount > 0);
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
-
-			EnableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
-			EnableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
-			EnableDlgItem(Dialog, IDOK, IDOK);
 
 			w = 0;
 
-			if (dlg_data->ComPortInfoCount > 0) {
-				for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
-					ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
-					wchar_t *EntNameW;
+			for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
+				ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
+				wchar_t *EntNameW;
 
-					// MaxComPort を越えるポートは表示しない
-					if (i > ts->MaxComPort) {
-						continue;
-					}
-
-					aswprintf(&EntNameW, L"%s", p->port_name);
-					SendDlgItemMessageW(Dialog, IDC_SERIALPORT, CB_ADDSTRING, 0, (LPARAM)EntNameW);
-					free(EntNameW);
-
-					if (p->port_no == ts->ComPort) {
-						w = i;
-					}
+				// MaxComPort を越えるポートは表示しない
+				if (i > ts->MaxComPort) {
+					continue;
 				}
-				serial_dlg_set_comport_info(Dialog, dlg_data, w);
+
+				aswprintf(&EntNameW, L"%s", p->port_name);
+				SendDlgItemMessageW(Dialog, IDC_SERIALPORT, CB_ADDSTRING, 0, (LPARAM)EntNameW);
+				free(EntNameW);
+
+				if (p->port_no == ts->ComPort) {
+					w = i;
+				}
 			}
-			else { //if (ComPortInfoCount == 0) {
-				DisableDlgItem(Dialog, IDC_SERIALPORT, IDC_SERIALPORT);
-				DisableDlgItem(Dialog, IDC_SERIALPORT_LABEL, IDC_SERIALPORT_LABEL);
-				// COMポートが存在しない場合はOKボタンを押せないようにする。
-				DisableDlgItem(Dialog, IDOK, IDOK);
-			}
+			serial_dlg_set_comport_info(Dialog, dlg_data, w);
 			SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w, 0);
 
 			SetDropDownList(Dialog, IDC_SERIALBAUD, BaudList, 0);
@@ -1274,6 +1252,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				(LONG_PTR)SerialDlgEditWindowProc);
 
 			// Combo-box controlをサブクラス化する。
+			SetWindowLongPtrW(GetDlgItem(Dialog, IDC_SERIALBAUD), GWLP_USERDATA, (LONG_PTR)dlg_data);
 			g_defSerialDlgSpeedComboboxWndProc = (WNDPROC)SetWindowLongPtr(
 				GetDlgItem(Dialog, IDC_SERIALBAUD),
 				GWLP_WNDPROC,
@@ -1281,9 +1260,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			// 現在の接続状態と新しいポート番号の組み合わせで、接続処理が変わるため、
 			// それに応じてOKボタンのラベル名を切り替える。
-			if (dlg_data->ComPortInfoCount > 0) {
-				serial_dlg_change_OK_button(Dialog, dlg_data->ComPortInfoPtr[w].port_no, ts->UILanguageFileW);
-			}
+			serial_dlg_change_OK_button(Dialog, dlg_data->ComPortInfoPtr[w].port_no, ts->UILanguageFileW);
 
 			return TRUE;
 
@@ -3053,6 +3030,16 @@ BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 	SerialDlgData *dlg_data = calloc(sizeof(*dlg_data), 1);
 	dlg_data->pts = ts;
 	dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
+	if (dlg_data->ComPortInfoCount == 0) {
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_TT_NOTICE", L"Tera Term: Notice",
+			NULL, L"No serial port",
+			MB_ICONINFORMATION | MB_OK
+		};
+		TTMessageBoxW(WndParent, &info, ts->UILanguageFileW);
+		return FALSE; // 変更しなかった
+	}
 
 	r = (BOOL)DialogBoxParam(hInst,
 							 MAKEINTRESOURCE(IDD_SERIALDLG),
