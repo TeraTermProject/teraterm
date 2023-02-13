@@ -268,6 +268,10 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	if (SetCommState(cv->ComID, &dcb) == 0) {
 		// Ý’èƒGƒ‰[
+		DWORD error = GetLastError();
+		char msg[128];
+		sprintf(msg, "SetCommState() error %d", error);
+		MessageBox(cv->HWin, msg, "teraterm", MB_OK);
 		assert(0);
 	}
 #if !defined(NDEBUG)
