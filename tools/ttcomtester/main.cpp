@@ -184,7 +184,13 @@ int wmain(int argc, wchar_t *argv[])
 
 	wchar_t *ini_path = _wcsdup(prog);
 	wchar_t *p = wcsrchr(ini_path, '\\');
-	*p = 0;
+	if (p != NULL) {
+		*p = 0;
+	}
+	else {
+		free(ini_path);
+		ini_path = _wcsdup(L".");
+	}
 	wchar_t *ini;
 	aswprintf(&ini, L"%s\\%s", ini_path, ini_base);
 	wprintf(L"ini='%s'\n", ini);
