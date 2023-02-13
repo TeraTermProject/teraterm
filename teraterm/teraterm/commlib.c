@@ -125,6 +125,26 @@ BOOL TCPIPClosed = TRUE;
 static HANDLE PrnID = INVALID_HANDLE_VALUE;
 static BOOL LPTFlag;
 
+typedef struct {
+	BOOL AppCTSDSRFlow;
+	DWORD RecieveBufferSize;
+	DWORD SendBufferSize;
+	WORD XonLim;
+	WORD XoffLim;
+} SerialParams_t;
+static SerialParams_t SerialParams;
+
+static void SerialParamsInit(const wchar_t *ini)
+{
+	const wchar_t *section = L"Serial.maniac";
+	SerialParams_t *p = &SerialParams;
+	p->AppCTSDSRFlow = (BOOL)GetPrivateProfileIntW(section, L"AppCTSDSRFlow", 1, ini);
+	p->RecieveBufferSize = (DWORD)GetPrivateProfileIntW(section, L"RecieveBufferSize", CommInQueSize, ini);
+	p->SendBufferSize = (DWORD)GetPrivateProfileIntW(section, L"SendBufferSize", CommOutQueSize, ini);
+	p->XonLim = (WORD)GetPrivateProfileIntW(section, L"XonLim", CommXonLim, ini);
+	p->XoffLim = (WORD)GetPrivateProfileIntW(section, L"XoffLim", CommXoffLim, ini);
+}
+
 // Initialize ComVar.
 // This routine is called only once
 // by the initialization procedure of Tera Term.
@@ -156,8 +176,10 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			return;
 	}
 
+	SerialParamsInit(ts->SetupFNameW);
+
 	ClearCommError(cv->ComID,&DErr,NULL);
-	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+	SetupComm(cv->ComID, SerialParams.RecieveBufferSize, SerialParams.SendBufferSize);
 	/* flush input and output buffers */
 	if (ClearBuff) {
 		PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
@@ -214,8 +236,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			dcb.XoffChar = XOFF;
 			dcb.fOutX = TRUE;
 			dcb.fInX = TRUE;
-			dcb.XonLim = CommXonLim;
-			dcb.XoffLim = CommXoffLim;
+			dcb.XonLim = SerialParams.XonLim;
+			dcb.XoffLim = SerialParams.XoffLim;
 			break;
 		case IdFlowHard:  // RTS/CTS
 			dcb.fOutxCtsFlow = TRUE;
@@ -1076,18 +1098,15 @@ void CommSend(PComVar cv)
 			break;
 		case IdSerial:
 			Max = 1;
-			if (cv->ts->Flow == IdFlowHard || cv->ts->Flow == IdFlowHardDsrDtr) {
+			if (SerialParams.AppCTSDSRFlow &&
+				((cv->ts->Flow == IdFlowHard || cv->ts->Flow == IdFlowHardDsrDtr))) {
 				// RTS/CTS, DSR/DTR
 				DWORD modem_state;
 				GetCommModemStatus(cv->ComID, &modem_state);
-				DWORD mask = cv->ts->Flow == IdFlowHard ? MS_CTS_ON : MS_DSR_ON;
+				const DWORD mask = cv->ts->Flow == IdFlowHard ? MS_CTS_ON : MS_DSR_ON;
 				if ((modem_state & mask) == 0) {
 					// 信号線がアクティブではない、送信しない
-					Max = 1;
-
-					DCB dcb;
-					GetCommState(cv->ComID, &dcb);
-					int a = 0;
+					Max = 0;
 				}
 			}
 
