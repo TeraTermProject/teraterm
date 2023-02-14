@@ -6205,6 +6205,7 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_SUCCESS);
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_FAILURE);
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_BANNER);
+	SSH2_dispatch_add_message(SSH2_MSG_EXT_INFO);
 
 	return do_SSH2_authrequest(pvar);
 }
