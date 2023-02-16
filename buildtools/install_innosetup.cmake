@@ -6,9 +6,9 @@ else()
 endif()
 
 # check innosetup
-#   6.2.1
+#   6.2.2
 set(CHECK_FILE innosetup6/bin/ISCC.exe)
-set(CHECK_HASH "0d02e30a6ad432a50eb86f1ecf330147046e671de340bcb43a170fecbd19bf51")
+set(CHECK_HASH "29856cf82d9a993afd7da8f99fb89f24d65ce3271c5b042cf387257c8fd7660f")
 if(EXISTS ${CHECK_FILE})
   file(SHA256 ${CHECK_FILE} HASH)
   if(${HASH} STREQUAL ${CHECK_HASH})
@@ -68,8 +68,8 @@ if(REMOVE_TMP)
 endif()
 
 # innosetup 6
-set(INNOSETUP_EXE "innosetup-6.2.1.exe")
-set(INNOSETUP_HASH "50d21aab83579245f88e2632a61b943ad47557e42b0f02e6ce2afef4cdd8deb1")
+set(INNOSETUP_EXE "innosetup-6.2.2.exe")
+set(INNOSETUP_HASH "8117d10d00a2ad33a1390978ea3872861c330e087914410a6377b22c4c5b8563")
 file(MAKE_DIRECTORY "download/innosetup6")
 file(DOWNLOAD
   https://files.jrsoftware.org/is/6/${INNOSETUP_EXE}
