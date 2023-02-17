@@ -1,17 +1,18 @@
+#! /usr/bin/perl
 #
 # copyright の年の更新を補助するためのスクリプト
 #	注意
-#		このスクリプトを実行すると
-#		ファイル内のすべての年号を書き換えるが
-#		変更されたモジュール(ttermproなど)だけを更新して
-#		コミットすること
+#		- このスクリプトを実行すると年号を書き換える
+#		- 更新したいファイル(tt-version.rcなど)だけを取り出して
+#		  リポジトリに入れる
+#		- 更新のないモジュールの年号は変更しない方針
 #
 use strict;
 use warnings;
 use utf8;
 
-my $year_from = "2020";
-my $year_to = "2022";
+my $year_from = "2022";
+my $year_to = "2023";
 
 my @file_list = (
 	"TTProxy/TTProxy.rc",
