@@ -2379,6 +2379,11 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			// Tera Term 本体のバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
+#if defined(TT_VERSION_SUBSTR)
+			if (sizeof(TT_VERSION_SUBSTR) > 1) {
+				strncat_s(buf, sizeof(buf), " " TT_VERSION_SUBSTR, _TRUNCATE);
+			}
+#endif
 #if defined(_M_X64)
 			strncat_s(buf, sizeof(buf), " 64bit", _TRUNCATE);
 #endif

@@ -196,13 +196,13 @@ sub read_tt_version_h()
 
 	open(my $FH, '<', $tt_version_h) or die "error open $tt_version_h";
 	while (<$FH>) {
-		if (/#define\s+TT_VERSION_MAJOR\s+(\d+)/) {
+		if (/^\s*#define\s+TT_VERSION_MAJOR\s+(\d+)/) {
 			$tt_version_major = $1;
 		}
-		elsif (/#define\s+TT_VERSION_MINOR\s+(\d+)/) {
+		elsif (/^\s*#define\s+TT_VERSION_MINOR\s+(\d+)/) {
 			$tt_version_minor = $1;
 		}
-		elsif (/#define\s+TT_VERSION_SUBSTR\s+\"(.+)\"/) {
+		elsif (/^\s*#define\s+TT_VERSION_SUBSTR\s+\"(.+)\"/) {
 			$tt_version_substr = $1;
 		}
 	}
