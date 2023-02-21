@@ -1478,6 +1478,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	// òAåãÇ∑ÇÈ
 	wchar_t *logfull = NULL;
 	awcscats(&logfull, dir, L"\\", formated, NULL);
+	free(formated);
 	free(dir);
 
 	// ê≥ãKâª
