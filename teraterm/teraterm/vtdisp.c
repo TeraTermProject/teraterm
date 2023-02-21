@@ -2498,7 +2498,7 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr->Attr & AttrUnder)) ? AttrUnder : 0;
 	AttrFlag |= ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr->Attr & AttrBold)) ? AttrBold : 0;
 	AttrFlag |= ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr->Attr & AttrBlink)) ? AttrBlink : 0;
-	AttrFlag |= ((ts.ColorFlag & CF_REVERSECOLOR) && (Attr->Attr & AttrReverse)) ? AttrReverse : 0;
+	AttrFlag |= (Attr->Attr & AttrReverse) ? AttrReverse : 0;
 	Attr2Flag = 0;
 	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr->Attr2 & Attr2Fore)) ? Attr2Fore : 0;
 	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr->Attr2 & Attr2Back)) ? Attr2Back : 0;
@@ -2524,8 +2524,15 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 			BackColor = BGVTColor[1];
 		}
 		else {
-			TextColor = BGVTReverseColor[0];
-			BackColor = BGVTReverseColor[1];
+			if ((ts.ColorFlag & CF_REVERSECOLOR) == 0) {
+				TextColor = BGVTColor[1];
+				BackColor = BGVTColor[0];
+			}
+			else {
+				// îΩì]ëÆê´êFÇ™óLå¯
+				TextColor = BGVTReverseColor[0];
+				BackColor = BGVTReverseColor[1];
+			}
 		}
 	} else if (AttrFlag & AttrBlink) {
 		if (!reverse) {

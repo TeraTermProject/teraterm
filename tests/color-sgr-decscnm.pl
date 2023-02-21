@@ -39,6 +39,14 @@ sub ShowAttributesSGR {
 			Str => "Reverse           / SGR 7",
 		},
 		{
+			Enter => "\x1b[1m\x1b[7m",
+			Str => "Bold + Reverse    / SGR 1 + SGR 7",
+		},
+		{
+			Enter => "\x1b[4m\x1b[7m",
+			Str => "Underline + Reverse / SGR 4 + SGR 7",
+		},
+		{
 			Enter => "\x1b[0m",
 			Str => "https://ttssh2.osdn.jp/  SGR 0(Normal) + URL string",
 		},
