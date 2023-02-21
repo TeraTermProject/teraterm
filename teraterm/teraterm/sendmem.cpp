@@ -159,10 +159,9 @@ static void EndPaste()
 		delete p->dlg;
 		delete p->dlg_observer;
 	}
-	free(p->UILanguageFile);
 	free(p->dialog_caption);
 	free(p->filename);
-	free(p);
+	SendMemFinish(p);
 
 	sendmem_work = NULL;
 
