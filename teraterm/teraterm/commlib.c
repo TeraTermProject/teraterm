@@ -138,11 +138,11 @@ static void SerialParamsInit(const wchar_t *ini)
 {
 	const wchar_t *section = L"Tera Term";
 	SerialParams_t *p = &SerialParams;
-	p->AppCTSDSRFlow = (BOOL)GetPrivateProfileIntW(section, L"Serial.AppCTSDSRFlow", 0, ini);
-	p->RecieveBufferSize = (DWORD)GetPrivateProfileIntW(section, L"Serial.RecieveBufferSize", CommInQueSize, ini);
-	p->SendBufferSize = (DWORD)GetPrivateProfileIntW(section, L"Serial.SendBufferSize", CommOutQueSize, ini);
-	p->XonLim = (WORD)GetPrivateProfileIntW(section, L"Serial.XonLim", CommXonLim, ini);
-	p->XoffLim = (WORD)GetPrivateProfileIntW(section, L"Serial.XoffLim", CommXoffLim, ini);
+	p->AppCTSDSRFlow = (BOOL)GetPrivateProfileIntW(section, L"SerialAppCTSDSRFlow", 0, ini);
+	p->RecieveBufferSize = (DWORD)GetPrivateProfileIntW(section, L"SerialRecieveBufferSize", CommInQueSize, ini);
+	p->SendBufferSize = (DWORD)GetPrivateProfileIntW(section, L"SerialSendBufferSize", CommOutQueSize, ini);
+	p->XonLim = (WORD)GetPrivateProfileIntW(section, L"SerialXonLim", CommXonLim, ini);
+	p->XoffLim = (WORD)GetPrivateProfileIntW(section, L"SerialXoffLim", CommXoffLim, ini);
 }
 
 // Initialize ComVar.

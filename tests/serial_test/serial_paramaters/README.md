@@ -5,19 +5,19 @@ Please refer [block_diagram_serial.png](block_diagram_serial.png).
 
 ```
 [Tera Term]
-Serial.AppCTSDSRFlow = 0
+SerialAppCTSDSRFlow = 0
 ```
 
-AppCTSDSRFlow = 0
+SerialAppCTSDSRFlow = 0
  Same as before (make a request to the OS)
 
-AppCTSDSRFlow = 1
+SerialAppCTSDSRFlow = 1
  Tera Term check the RTS line to stop/resume requests to the OS.
 
 ```
 [Tera Term]
-Serial.RecieveBufferSize = 8192
-Serial.SendBufferSize = 2048
+SerialRecieveBufferSize = 8192
+SerialSendBufferSize = 2048
 ```
 
 Send and receive buffer size.
