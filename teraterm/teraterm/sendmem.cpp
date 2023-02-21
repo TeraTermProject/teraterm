@@ -220,16 +220,26 @@ static void SendMemStart_i(SendMem *sm)
 #endif
 }
 
+/**
+ *	送信バッファの情報取得
+ *	@param[out]		use		使用byte
+ *	@param[out]		free	空きbyte
+ */
 static void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 {
 	if (use != NULL) {
 		*use = cv_->OutBuffCount;
 	}
 	if (free != NULL) {
-		*free = OutBuffSize - cv_->InBuffCount;
+		*free = OutBuffSize - cv_->OutBuffCount;
 	}
 }
 
+/**
+ *	受信バッファの情報取得
+ *	@param[out]		use		使用byte
+ *	@param[out]		free	空きbyte
+ */
 static void GetInBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 {
 	if (use != NULL) {
@@ -396,12 +406,20 @@ void SendMemContinuously(void)
 			need_delay = TRUE;
 			send_len = p->send_size_max;
 		}
+		if (p->type == SendMemTypeText) {
+			// 送信データ長を偶数(wchar_t毎)にする
+			send_len = send_len & (~1);
+		}
 	}
 	else {
 		// 全力送信
 		send_len = p->send_left;
 		if (buff_len < send_len) {
 			send_len = buff_len;
+		}
+		if (p->type == SendMemTypeText) {
+			// 送信データ長を偶数(wchar_t毎)にする
+			send_len = send_len & (~1);
 		}
 	}
 
