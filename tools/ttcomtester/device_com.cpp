@@ -1,11 +1,36 @@
+/*
+ * (C) 2023- TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <windows.h>
 #include <winioctl.h>
 #include <assert.h>
-
-#include "ttlib.h"
 
 #include "deviceope.h"
 
@@ -65,7 +90,7 @@ static DWORD close(device_t *device)
 {
 	comdata_t *p = (comdata_t *)device->private_data;
 	if (p == NULL) {
-		return ERROR_HANDLES_CLOSED;
+		return ERROR_INVALID_HANDLE;
 	}
 
 	if (p->state == comdata_t::STATE_CLOSE) {
@@ -235,7 +260,7 @@ static DWORD wait_read(device_t *device, size_t *readed)
  *	@return	ERROR_IO_PENDING	“Ç‚Ýž‚Ý‘Ò‚¿
  *								wait_read() ‚ÅŠ®—¹‚ð‘Ò‚Â
  */
-static DWORD read(device_t *device, uint8_t *buf, size_t buf_len, size_t *readed)
+static DWORD read(device_t *device, void *buf, size_t buf_len, size_t *readed)
 {
 	comdata_t *p = (comdata_t *)device->private_data;
 	HANDLE h = p->h;
@@ -503,7 +528,7 @@ static DWORD ctrl(device_t *device, device_ctrl_request request, ...)
 	}
 	case SET_CHECK_LINE_STATE_BEFORE_SEND: {
 		int check_line_state = va_arg(ap, int);
-		p->check_line_state_before_send = check_line_state;
+		p->check_line_state_before_send = check_line_state == 0 ? false : true;
 		retval = ERROR_SUCCESS;
 		break;
 	}

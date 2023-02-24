@@ -1,18 +1,52 @@
+/*
+ * (C) 2023- TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <stdio.h>
 #include <locale.h>
 #include <windows.h>
+#if (defined(_MSC_VER) && (_MSC_VER >= 1600)) || !defined(_MSC_VER)
 #include <stdint.h>
+#endif
 #include <conio.h>
 #include <crtdbg.h>
+#include <string>
+#include <map>
+#include <assert.h>
 
 #include "getopt.h"
-
-#include "asprintf.h"
-#include "codeconv.h"
-#include "win32helper.h"
-
+#include "buildcommdcbw.h"
 #include "deviceope.h"
+
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
+typedef unsigned char	uint8_t;
+//typedef unsigned short  uint16_t;
+//typedef unsigned int	uint32_t;
+#endif
 
 static void usage()
 {
@@ -21,32 +55,10 @@ static void usage()
         "  -h, --help               show this\n"
         "  -v, --verbose            verbose, 'v' command\n"
         "  -i, --inifile [inifile]  read inifile, default=ttcomtester.ini\n"
-        "  -r, rts [rts]            RTS/CTS(HARD) flow {off|on|hs|toggle}\n"
         "  -d, --device [name]      open device name, ex com2\n"
-		);
-}
-
-static void key_usage(void)
-{
-	printf(
-		"key:\n"
-		"   command mode\n"
-		"':'	go send mode\n"
-		"'o'	device open\n"
-		"'c'	device close\n"
-		"'q'	quit\n"
-		"'r'	RTS 0/1\n"
-		"'d'	DTR 0/1\n"
-		"'x'	XON/XOFF\n"
-		"'e'	echo on/off\n"
-		"'s'	send big data\n"
-		"'l'	disp line state\n"
-		"'L'	check line state before sending\n"
-		"'D'	open device dialogbox\n"
-		"'v'	verbose on/off\n"
-		"'1'   send some bytes\n"
-		"   send mode\n"
-		"':'	go command mode\n"
+        "  -t, --test [name]        run test\n"
+        "  -o, --option [option]\n"
+        "        \"BuildComm=baud=9600 parity=N data=8 stop=1\"\n"
 		);
 }
 
@@ -75,34 +87,34 @@ void dump(const uint8_t *buf, size_t len)
 
 void dumpDCB(const DCB *p)
 {
-	printf("sizeof(DCB)                     %d\n", p->DCBlength);
-	printf("Baudrate at which running       %d\n", p->BaudRate);
-	printf("Binary Mode (skip EOF check)    %d\n", p->fBinary);
-	printf("Enable parity checking          %d\n", p->fParity);
-	printf("CTS handshaking on output       %d\n", p->fOutxCtsFlow);
-	printf("DSR handshaking on output       %d\n", p->fOutxDsrFlow);
-	printf("DTR Flow control                %d\n", p->fDtrControl);
-	printf("DSR Sensitivity                 %d\n", p->fDsrSensitivity);
-	printf("Continue TX when Xoff sent      %d\n", p->fTXContinueOnXoff);
-	printf("Enable output X-ON/X-OFF        %d\n", p->fOutX);
-	printf("Enable input X-ON/X-OFF         %d\n", p->fInX);
-	printf("Enable Err Replacement          %d\n", p->fErrorChar);
-	printf("Enable Null stripping           %d\n", p->fNull);
-	printf("Rts Flow control                %d\n", p->fRtsControl);
-	printf("Abort all reads and writes on Error %d\n", p->fAbortOnError);
-	printf("Reserved                        %d\n", p->fDummy2);
-	printf("Not currently used              %d\n", p->wReserved);
-	printf("Transmit X-ON threshold         %d\n", p->XonLim);
-	printf("Transmit X-OFF threshold        %d\n", p->XoffLim);
-	printf("Number of bits/byte, 4-8        %d\n", p->ByteSize);
-	printf("0-4=None,Odd,Even,Mark,Space    %d\n", p->Parity);
-	printf("0,1,2 = 1, 1.5, 2               %d\n", p->StopBits);
-	printf("Tx and Rx X-ON character        %d\n", p->XonChar);
-	printf("Tx and Rx X-OFF character       %d\n", p->XoffChar);
-	printf("Error replacement char          %d\n", p->ErrorChar);
-	printf("End of Input character          %d\n", p->EofChar);
-	printf("Received Event character        %d\n", p->EvtChar);
-	printf("Fill for now.                   %d\n", p->wReserved1);
+	printf("DCBlength         sizeof(DCB)                     %d\n", p->DCBlength);
+	printf("BaudRate          Baudrate at which running       %d\n", p->BaudRate);
+	printf("fBinary           Binary Mode (skip EOF check)    %d\n", p->fBinary);
+	printf("fParity           Enable parity checking          %d\n", p->fParity);
+	printf("fOutxCtsFlow      CTS handshaking on output       %d\n", p->fOutxCtsFlow);
+	printf("fOutxDsrFlow      DSR handshaking on output       %d\n", p->fOutxDsrFlow);
+	printf("fDtrControl       DTR Flow control                %d\n", p->fDtrControl);
+	printf("fDsrSensitivity   DSR Sensitivity                 %d\n", p->fDsrSensitivity);
+	printf("fTXContinueOnXoff Continue TX when Xoff sent      %d\n", p->fTXContinueOnXoff);
+	printf("fOutX             Enable output X-ON/X-OFF        %d\n", p->fOutX);
+	printf("fInX              Enable input X-ON/X-OFF         %d\n", p->fInX);
+	printf("fErrorChar        Enable Err Replacement          %d\n", p->fErrorChar);
+	printf("fNull             Enable Null stripping           %d\n", p->fNull);
+	printf("fRtsControl       Rts Flow control                %d\n", p->fRtsControl);
+	printf("fAbortOnError Abort all reads and writes on Error %d\n", p->fAbortOnError);
+	printf("fDummy2           Reserved                        %d\n", p->fDummy2);
+	printf("wReserved         Not currently used              %d\n", p->wReserved);
+	printf("XonLim            Transmit X-ON threshold         %d\n", p->XonLim);
+	printf("XoffLim           Transmit X-OFF threshold        %d\n", p->XoffLim);
+	printf("ByteSize          Number of bits/byte, 4-8        %d\n", p->ByteSize);
+	printf("Parity            0-4=None,Odd,Even,Mark,Space    %d\n", p->Parity);
+	printf("StopBits          0,1,2 = 1, 1.5, 2               %d\n", p->StopBits);
+	printf("XonChar           Tx and Rx X-ON character        %d\n", p->XonChar);
+	printf("XoffChar          Tx and Rx X-OFF character       %d\n", p->XoffChar);
+	printf("ErrorChar         Error replacement char          %d\n", p->ErrorChar);
+	printf("EofChar           End of Input character          %d\n", p->EofChar);
+	printf("EvtChar           Received Event character        %d\n", p->EvtChar);
+	printf("wReserved1        Fill for now.                   %d\n", p->wReserved1);
 }
 
 void dumpCOMMTIMEOUTS(const COMMTIMEOUTS *p)
@@ -114,176 +126,38 @@ void dumpCOMMTIMEOUTS(const COMMTIMEOUTS *p)
 	printf("write Constant in milliseconds  %d\n", p->WriteTotalTimeoutConstant);
 }
 
-int wmain(int argc, wchar_t *argv[])
+bool verbose = false;
+std::wstring prog;
+std::wstring device_name;
+std::map<std::wstring, std::wstring> options;
+
+static void SendReceiveKeyUsage(void)
 {
-	setlocale(LC_ALL, "");
-#ifdef _DEBUG
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(269);
-#endif
+	printf(
+		"key:\n"
+		"   command mode\n"
+		"':'	go send mode\n"
+		"'o'	device open\n"
+		"'c'	device close\n"
+		"'q'	quit\n"
+		"'r'	RTS 0/1\n"
+		"'d'	DTR 0/1\n"
+		"'x'	XON/XOFF\n"
+		"'e'	echo on/off\n"
+		"'s'	send big data\n"
+		"'l'	disp line state\n"
+		"'L'	check line state before sending\n"
+		"'D'	open device dialogbox\n"
+		"'v'	verbose on/off\n"
+		"'1'   send some bytes\n"
+		"   send mode\n"
+		"':'	go command mode\n"
+		);
+}
 
-	bool verbose = false;
-	wchar_t *ini_base = L"ttcomtester.ini";
-	const wchar_t *arg_rts = L"off";
-	wchar_t *prog = argv[0];
-	wchar_t *arg_device_name = NULL;
-
-	static const struct option_w long_options[] = {
-		{L"help", no_argument, NULL, L'h'},
-		{L"verbose", no_argument, NULL, L'v'},
-		{L"inifile", required_argument, NULL, L'i'},
-		{L"rts", required_argument, NULL, L'r'},
-		{L"device", required_argument, NULL, L'd'},
-		{}
-	};
-
-
-	opterr = 0;
-    while(1) {
-		int c = getopt_long_w(argc, argv, L"vhi:r:d:", long_options, NULL);
-        if(c == -1) break;
-
-        switch (c)
-        {
-		case L'h':
-		case L'?':
-			usage();
-			return 0;
-			break;
-		case L'v':
-			verbose = true;
-			break;
-		case L'i':
-			ini_base = optarg_w;
-			break;
-		case L'r': {
-			if (wcscmp(optarg_w, L"off") == 0) {
-				arg_rts = L"off";
-			} else if (wcscmp(optarg_w, L"on") == 0) {
-				arg_rts = L"on";
-			} else if (wcscmp(optarg_w, L"hs") == 0) {
-				arg_rts = L"hs";
-			} else if (wcscmp(optarg_w, L"toggle") == 0) {
-				arg_rts = L"toggle";
-			} else {
-				printf("check rts option");
-				exit(1);
-			}
-			break;
-		}
-		case L'd': {
-			arg_device_name = _wcsdup(optarg_w);
-			break;
-		}
-		default:
-			usage();
-			return 0;
-			break;
-		}
-    }
-
-	wchar_t *ini_path = _wcsdup(prog);
-	wchar_t *p = wcsrchr(ini_path, '\\');
-	if (p != NULL) {
-		*p = 0;
-	}
-	else {
-		free(ini_path);
-		ini_path = _wcsdup(L".");
-	}
-	wchar_t *ini;
-	aswprintf(&ini, L"%s\\%s", ini_path, ini_base);
-	wprintf(L"ini='%s'\n", ini);
-
-	wchar_t *ini_device_name;
-	hGetPrivateProfileStringW(L"ttcomtester", L"device", L"com1", ini, &ini_device_name);
-	wchar_t *com_param;
-	wchar_t *com_param_default = L"baud=9600 parity=N data=8 stop=1";
-	//wchar_t *com_param_default = L"baud=9600 parity=N data=8 stop=1 rts=hs";		// error?
-	hGetPrivateProfileStringW(L"ttcomtester", L"com_param", com_param_default, ini, &com_param);
-	free(ini);
-	ini = nullptr;
-	free(ini_path);
-	ini_path = nullptr;
-
-	const wchar_t *device_name = arg_device_name;
-	if (arg_device_name == NULL) {
-		device_name = ini_device_name;
-	}
-	device_t *dev;
-	com_init(&dev);
-
+static void SendReceive(device_t *dev)
+{
 	device_ope const *ope = dev->ope;
-	ope->ctrl(dev, SET_PORT_NAME, device_name);
-	if (verbose) {
-		printf("param='%ls'\n", com_param);
-	}
-
-	{
-		DCB dcb;
-		memset(&dcb, 0, sizeof(dcb));	// 100% buildしてくれないようだ
-		dcb.DCBlength = sizeof(dcb);
-		BOOL r = BuildCommDCBW(com_param, &dcb);
-		if (wcscmp(arg_rts, L"off") == 0) {
-			dcb.fRtsControl = RTS_CONTROL_DISABLE;
-			dcb.fOutxCtsFlow = FALSE;
-		} else if (wcscmp(arg_rts, L"on") == 0) {
-			dcb.fRtsControl = RTS_CONTROL_ENABLE;
-			dcb.fOutxCtsFlow = FALSE;
-		} else if (wcscmp(arg_rts, L"hs") == 0) {
-			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
-			dcb.fOutxCtsFlow = TRUE;
-		} else if (wcscmp(arg_rts, L"toggle") == 0) {
-			dcb.fRtsControl = RTS_CONTROL_TOGGLE;
-			//dcb.fOutxCtsFlow = TRUE; //??
-		}
-		if (r == FALSE) {
-			DWORD e = GetLastError();
-			wchar_t b[128];
-			swprintf_s(b, _countof(b), L"BuildCommDCBW('%s')", com_param);
-			DispErrorStr(b, e);
-			goto finish;
-		}
-		ope->ctrl(dev, SET_COM_DCB, &dcb);
-	}
-
-	{
-		COMMTIMEOUTS timeouts;
-		memset(&timeouts, 0, sizeof(timeouts));
-#if 0
-		// Tera Term が設定しているパラメータ
-		timeouts.ReadIntervalTimeout = MAXDWORD;
-		timeouts.WriteTotalTimeoutConstant = 500;
-#endif
-#if 0
-		// CODE PROJECT の値
-		// https://www.codeproject.com/articles/3061/creating-a-serial-communication-on-win
-		timeouts.ReadIntervalTimeout = 3;
-		timeouts.ReadTotalTimeoutMultiplier = 3;
-		timeouts.ReadTotalTimeoutConstant = 2;
-		timeouts.WriteTotalTimeoutMultiplier = 3;
-		timeouts.WriteTotalTimeoutConstant = 2;
-#endif
-#if 0
-		// PuTTYの値
-		timeouts.ReadIntervalTimeout = 1;
-		timeouts.ReadTotalTimeoutMultiplier = 0;
-		timeouts.ReadTotalTimeoutConstant = 0;
-		timeouts.WriteTotalTimeoutMultiplier = 0;
-		timeouts.WriteTotalTimeoutConstant = 0;
-#endif
-#if 1
-		// 今回提案する値
-		timeouts.ReadIntervalTimeout = 1;
-		timeouts.ReadTotalTimeoutMultiplier = 0;
-		timeouts.ReadTotalTimeoutConstant = 0;
-		timeouts.WriteTotalTimeoutMultiplier = 20;
-		//timeouts.WriteTotalTimeoutMultiplier = 0;
-		timeouts.WriteTotalTimeoutConstant = 1;
-#endif
-		ope->ctrl(dev, SET_COM_TIMEOUTS, &timeouts);
-	}
-
 	printf(
 		"':'		switch mode\n"
 		"' '(space)	key usage\n"
@@ -313,7 +187,7 @@ int wmain(int argc, wchar_t *argv[])
 			if (command_mode) {
 				switch (c) {
 				case 'o': {
-					printf("open com='%ls'\n", device_name);
+					printf("open com='%ls'\n", device_name.c_str());
 					DWORD e = ope->open(dev);
 					if (e == ERROR_SUCCESS) {
 						state = STATE_OPEN;
@@ -341,7 +215,7 @@ int wmain(int argc, wchar_t *argv[])
 				}
 				case 's': {
 					size_t send_len = 32*1024;
-					printf("send big data %u bytes\n", send_len);
+					printf("send big data %ul bytes\n", (unsigned long)send_len);
 					unsigned char *send_data = (unsigned char* )malloc(send_len);
 					for(size_t i = 0; i < send_len; i++) {
 						send_data[i] = (unsigned char)i;
@@ -349,7 +223,7 @@ int wmain(int argc, wchar_t *argv[])
 					size_t sent_len;
 					DWORD e = ope->write(dev, send_data, send_len, &sent_len);
 					if (e == ERROR_SUCCESS) {
-						printf("sent %u bytes\n", sent_len);
+						printf("sent %ul bytes\n", (unsigned long)sent_len);
 					}
 					else if (e == ERROR_IO_PENDING) {
 						printf("send pending..\n");
@@ -457,7 +331,7 @@ int wmain(int argc, wchar_t *argv[])
 					int i = check_line_state ? 0 : 1;
 					printf("check line state before sending %s\n", i == 0 ? "off" : "on");
 					ope->ctrl(dev, SET_CHECK_LINE_STATE_BEFORE_SEND, i);
-					check_line_state = i;
+					check_line_state = i == 0 ? false : true;
 					break;
 				}
 				case 'D': {
@@ -481,7 +355,7 @@ int wmain(int argc, wchar_t *argv[])
 				}
 				default:
 					printf("unknown command '%c'\n", c);
-					key_usage();
+					SendReceiveKeyUsage();
 					break;
 				case '1': {
 					// 指定バイト数を1byteづつ送るテスト
@@ -489,25 +363,24 @@ int wmain(int argc, wchar_t *argv[])
 					int send_size = 65;
 					for(int i =0 ; i < send_size; i++) {
 						char send_text[2];
-						send_text[0] = i;
+						send_text[0] = (char)(unsigned char)i;
 						size_t sent_len;
 						DWORD e = ope->write(dev, send_text, 1, &sent_len);
 						if (e == ERROR_SUCCESS) {
-							printf("send %02x, sent %u byte %s\n", c, sent_len,
+							printf("send %02x, sent %ul byte %s\n", c, (unsigned long)sent_len,
 								   sent_len != 0 ? "" : "(flow control or send buffer full)");
 						}
 						else if (e == ERROR_IO_PENDING) {
-							printf("send %02x, sent %u byte pending\n", c, sent_len);
+							printf("send %02x, sent %ul byte pending\n", c, (unsigned long)sent_len);
 							for(;;) {
-								size_t sent_len;
 								e = ope->wait_write(dev, &sent_len);
 								if (e == ERROR_IO_PENDING) {
 									if (sent_len != 0) {
-										printf("send size %u (pending)\n", sent_len);
+										printf("send size %ul (pending)\n", (unsigned long)sent_len);
 									}
 								}
 								else if (e == ERROR_SUCCESS) {
-									printf("send size %u (finish)\n", sent_len);
+									printf("send size %ul (finish)\n", (unsigned long)sent_len);
 									break;
 								}
 								else {
@@ -542,11 +415,11 @@ int wmain(int argc, wchar_t *argv[])
 							send_text[0] = (char)c;
 							DWORD e = ope->write(dev, send_text, 1, &sent_len);
 							if (e == ERROR_SUCCESS) {
-								printf("send %02x, sent %u byte %s\n", c, sent_len,
+								printf("send %02x, sent %ul byte %s\n", c, (unsigned long)sent_len,
 									   sent_len != 0 ? "" : "(flow control or send buffer full)");
 							}
 							else if (e == ERROR_IO_PENDING) {
-								printf("send %02x, sent %u byte pending\n", c, sent_len);
+								printf("send %02x, sent %ul byte pending\n", c, (unsigned long)sent_len);
 								write_pending = true;
 							} else if (e == ERROR_INSUFFICIENT_BUFFER) {
 								printf("send buffer full\n");
@@ -574,11 +447,11 @@ int wmain(int argc, wchar_t *argv[])
 				if (e == ERROR_IO_PENDING) {
 					// まだ待ち状態
 					if (sent_len != 0) {
-						printf("send size %u (pending)\n", sent_len);
+						printf("send size %ul (pending)\n", (unsigned long)sent_len);
 					}
 				}
 				else if (e == ERROR_SUCCESS) {
-					printf("send size %u (finish)\n", sent_len);
+					printf("send size %ul (finish)\n", (unsigned long)sent_len);
 					write_pending = false;
 				} else {
 					DispErrorStr(L"write() error", e);
@@ -629,10 +502,335 @@ int wmain(int argc, wchar_t *argv[])
 			}
 		}
 	}
+}
 
-finish:
-	free(ini_device_name);
-	free(arg_device_name);
-	free(com_param);
-	return 0;
+void echo(device_t *dev, int rts_toggle_ms)
+{
+	device_ope const *ope = dev->ope;
+	bool receive_pending = false;
+	bool write_pending = false;
+	bool rts_assert = true;
+	DWORD rts_toggle_tick = timeGetTime();
+
+	if (rts_toggle_ms != 0) {
+		// disable RTS flow control
+		DCB dcb;
+		ope->ctrl(dev, GET_COM_DCB, &dcb);
+		dumpDCB(&dcb);
+		dcb.fRtsControl = RTS_CONTROL_DISABLE;
+		ope->ctrl(dev, SET_COM_DCB, &dcb);
+	}
+
+	DWORD e = ope->open(dev);
+	if (e != ERROR_SUCCESS) {
+		DispErrorStr(L"open()", e);
+		return;
+	}
+
+	if (verbose) {
+		DCB dcb;
+		ope->ctrl(dev, GET_COM_DCB, &dcb);
+		dumpDCB(&dcb);
+		COMMTIMEOUTS timeouts;
+		ope->ctrl(dev, GET_COM_TIMEOUTS, &timeouts);
+		dumpCOMMTIMEOUTS(&timeouts);
+	}
+
+	printf(
+		"'q'		quit\n"
+		);
+	for(;;) {
+		if (_kbhit() == 0) {
+			// キーが押されていない
+			Sleep(1);
+		}
+		else {
+			int c = _getch();
+			printf("\n'%c'\n", c);
+			switch (c) {
+			case 'q': {
+				ope->close(dev);
+				return;
+			}
+			default:
+				;
+			}
+		}
+
+		if (rts_toggle_ms != 0) {
+			DWORD now = timeGetTime();
+			if (rts_toggle_tick == 0 || (now - rts_toggle_tick >= (DWORD)rts_toggle_ms)) {
+				HANDLE h;
+				ope->ctrl(dev, GET_RAW_HANDLE, &h);
+				if (rts_assert) {
+					rts_assert = false;
+					BOOL b = EscapeCommFunction(h, CLRRTS);
+					if (b == 0) {
+						e = GetLastError();
+						DispErrorStr(L"EscapeCommFunction()", e);
+					}
+					printf("t");
+				} else {
+					rts_assert = true;
+					BOOL b = EscapeCommFunction(h, SETRTS);
+					if (b == 0) {
+						e = GetLastError();
+						DispErrorStr(L"EscapeCommFunction()", e);
+					}
+					printf("T");
+				}
+				rts_toggle_tick = now;
+			}
+		}
+
+		static uint8_t sbuf[1024];
+		static size_t slen = 0;
+		if (slen == 0) {
+			static uint8_t rbuf[1024];
+			size_t rlen = 0;
+			if (receive_pending == false) {
+				e = ope->read(dev, rbuf, sizeof(rbuf), &rlen);
+				if (e == ERROR_SUCCESS) {
+					printf("r");
+					memcpy(sbuf, rbuf, rlen);
+					slen = rlen;
+				}
+				else if (e == ERROR_IO_PENDING) {
+					receive_pending = true;
+				}
+				else {
+					DispErrorStr(L"read() error", e);
+					return;
+				}
+			}
+			else {
+				e = ope->wait_read(dev, &rlen);
+				if (e == ERROR_IO_PENDING) {
+					// まだ待ち状態
+					;
+				}
+				else if (e == ERROR_SUCCESS) {
+					printf("R");
+					receive_pending = false;
+					memcpy(sbuf, rbuf, rlen);
+					slen = rlen;
+				}
+				else {
+					DispErrorStr(L"read() error", e);
+					return;
+				}
+			}
+		}
+		else {
+			size_t sent_len;
+			if (write_pending == false) {
+				e = ope->write(dev, sbuf, slen, &sent_len);
+				if (e == ERROR_SUCCESS) {
+					printf("s");
+					slen = slen - sent_len;
+					if (slen != 0) {
+						printf("!");
+					}
+				}
+				else if (e == ERROR_IO_PENDING) {
+					write_pending = true;
+				} else if (e == ERROR_INSUFFICIENT_BUFFER) {
+					printf("send buffer full\n");
+				}
+				else {
+					DispErrorStr(L"write() error", e);
+				}
+			}
+			else {
+				e = ope->wait_write(dev, &sent_len);
+				if (e == ERROR_IO_PENDING) {
+					// まだ待ち状態
+					;
+				}
+				else if (e == ERROR_SUCCESS) {
+					printf("S");
+					slen = slen - sent_len;
+					if (slen != 0) {
+						printf("!");
+					}
+					else {
+						write_pending = false;
+					}
+				} else {
+					DispErrorStr(L"write() error", e);
+					printf("send error\n");
+				}
+			}
+		}
+	}
+}
+
+void EchoSimple(device_t *dev)
+{
+	echo(dev, 0);
+}
+
+void EchoRtsToggle(device_t *dev)
+{
+	echo(dev, 1*1000);
+}
+
+int wmain(int argc, wchar_t *argv[])
+{
+	setlocale(LC_ALL, "");
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	std::wstring test_name = L"send/receive";
+	options[L"BuildComm"] = L"baud=9600 parity=N data=8 stop=1 octs=on rts=on";
+
+	{
+		wchar_t *p = wcsrchr(argv[0], '\\');
+		if (p != NULL) {
+			prog = std::wstring(p+1);
+		}
+		else {
+			prog = std::wstring(argv[0]);
+		}
+	}
+
+	static const struct option_w long_options[] = {
+		{L"help", no_argument, NULL, L'h'},
+		{L"verbose", no_argument, NULL, L'v'},
+		{L"device", required_argument, NULL, L'd'},
+		{L"option", required_argument, NULL, L'o'},
+		{L"testname", required_argument, NULL, L't'},
+		{}
+	};
+
+	opterr = 0;
+    for(;;) {
+		int c = getopt_long_w(argc, argv, L"vhd:o:t:", long_options, NULL);
+        if(c == -1) break;
+
+        switch (c)
+        {
+		case L'h':
+		case L'?':
+			usage();
+			return 0;
+			break;
+		case L'v':
+			verbose = true;
+			break;
+		case L'd': {
+			device_name = optarg_w;
+			break;
+		}
+		case L'o': {
+			if (optarg_w != NULL) {
+				std::wstring key;
+				std::wstring param;
+				const wchar_t *p = wcschr(optarg_w, L'=');
+				if (p == NULL) {
+					key = std::wstring(optarg_w);
+					param.clear();
+				} else {
+					size_t key_size = p - optarg_w;
+					key = std::wstring(optarg_w, key_size);
+					param = std::wstring(p+1);
+				}
+				options[key] = param;
+			}
+			break;
+		}
+		case L't':
+			test_name = optarg_w;
+			break;
+		default:
+			usage();
+			return 0;
+			break;
+		}
+    }
+
+	if (device_name.empty()) {
+		printf("specify device name\n"
+			   "  --device [name]\n");
+		return 0;
+	}
+
+	device_t *dev;
+	com_init(&dev);
+
+	device_ope const *ope = dev->ope;
+	ope->ctrl(dev, SET_PORT_NAME, device_name.c_str());
+
+	{
+		const wchar_t *param = options[L"BuildComm"].c_str();
+		if (verbose) {
+			printf("param='%ls'\n", param);
+		}
+		DCB dcb;
+		memset(&dcb, 0, sizeof(dcb));
+		dcb.DCBlength = sizeof(dcb);
+		BOOL r = _BuildCommDCBW(param, &dcb);
+		if (r == FALSE) {
+			DWORD e = GetLastError();
+			dumpDCB(&dcb);
+			wchar_t b[128];
+			swprintf_s(b, _countof(b), L"BuildCommDCBW('%s')", param);
+			DispErrorStr(b, e);
+			return 0;
+		}
+		ope->ctrl(dev, SET_COM_DCB, &dcb);
+	}
+
+	{
+		COMMTIMEOUTS timeouts;
+		memset(&timeouts, 0, sizeof(timeouts));
+#if 0
+		// Tera Term が設定しているパラメータ
+		timeouts.ReadIntervalTimeout = MAXDWORD;
+		timeouts.WriteTotalTimeoutConstant = 500;
+#endif
+#if 0
+		// CODE PROJECT の値
+		// https://www.codeproject.com/articles/3061/creating-a-serial-communication-on-win
+		timeouts.ReadIntervalTimeout = 3;
+		timeouts.ReadTotalTimeoutMultiplier = 3;
+		timeouts.ReadTotalTimeoutConstant = 2;
+		timeouts.WriteTotalTimeoutMultiplier = 3;
+		timeouts.WriteTotalTimeoutConstant = 2;
+#endif
+#if 0
+		// PuTTYの値
+		timeouts.ReadIntervalTimeout = 1;
+		timeouts.ReadTotalTimeoutMultiplier = 0;
+		timeouts.ReadTotalTimeoutConstant = 0;
+		timeouts.WriteTotalTimeoutMultiplier = 0;
+		timeouts.WriteTotalTimeoutConstant = 0;
+#endif
+#if 1
+		// 今回提案する値
+		timeouts.ReadIntervalTimeout = 1;
+		timeouts.ReadTotalTimeoutMultiplier = 0;
+		timeouts.ReadTotalTimeoutConstant = 0;
+		timeouts.WriteTotalTimeoutMultiplier = 20;
+		//timeouts.WriteTotalTimeoutMultiplier = 0;
+		timeouts.WriteTotalTimeoutConstant = 1;
+#endif
+		ope->ctrl(dev, SET_COM_TIMEOUTS, &timeouts);
+	}
+
+	std::map<std::wstring, void (*)(device_t *dev)> test_list;
+	test_list[L"send/receive"] = SendReceive;
+	test_list[L"echo"] = EchoSimple;
+	test_list[L"echo_rts"] = EchoRtsToggle;
+
+	void (*test_func)(device_t *) = test_list[test_name];
+	if (test_func == NULL) {
+		printf("unknown test '%ls'\n", test_name.c_str());
+	}
+	else {
+		test_func(dev);
+	}
+
+	return 1;
 }

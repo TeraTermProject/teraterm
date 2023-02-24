@@ -6,33 +6,54 @@
 
 ## 使い方
 
-### コマンドライン
+コマンドライン
 
 ```
 ttcomtester [options]
   -h, --help               show this
   -v, --verbose            verbose, 'v' command
   -i, --inifile [inifile]  read inifile, default=ttcomtester.ini
-  -r, --rts [rts]          RTS/CTS(HARD) flow {off|on|hs|toggle}
   -d, --device [name]      open device name, ex com2
+  -t, --test [name]        run test
+  -o, --option [option]
+        "BuildComm=baud=9600 parity=N data=8 stop=1"
 ```
 
+複数のテストを切り替えることができる
+
+- `--test send/receive`
+  - 送受信テスト
+  - デフォルト(指定しなかったとき)のテスト
+- `--test echo`
+  - エコーテスト
+  - 受信したデータをそのまま送信する
+- `--test echo_rts`
+  - echo エコーの動作に加えて
+  - RTSラインを1秒ごとに0,1を切りかえる
+  - 接続先がハードフローを使用しているとき、送信先は1秒ごとに送信しなくなる
+
+## send/receive test (default test)
+
+### 起動例
+
 例1
-- `./ttcomtester --device com1 --rts on --verbose`
+- `./ttcomtester --device com1 -o "BuildComm=baud=9600 parity=N data=8 stop=1 octs=on rts=on" --verbose`
 - com1, (baud=9600 parity=N data=8 stop=1)
 - RTS/CTS flow
+  - input CTS フロー制御あり
   - output RTS=1
 - verbose
 
 例2
-- `./ttcomtester --device com2 --rts hs --verbose`
-- com2, (baud=9600 parity=N data=8 stop=1)
+- `./ttcomtester --device com1 -o "BuildComm=baud=57600 parity=N data=8 stop=1 octs=on rts=hs" --verbose`
+- com2, (baud=57600 parity=N data=8 stop=1)
 - RTS/CTS flow
-  - Hand Shake (フロー処理を行う)
+  - input CTS フロー制御あり
+  - output RTS=Hand Shake (フロー処理あり)
 - verbose
 
 - 注意
-  - RTSラインの制御(`r`キー)は、`--rts on` または `--rts off` の時のみ有効
+  - RTSラインの制御(`r`キー)は、`rts=on` または `rts=off` の時のみ有効
     - ドライバによって異なるかもしれない
 
 ### コマンド
@@ -64,6 +85,29 @@ ttcomtester はキー入力を受け付け、つぎの2つの状態がある。
 send mode時、押したキーをそのまま送信する。
 
 フロー制御が行われると送信されないこともある
+
+## echo test (--test echo),(--test echo_rts)
+
+起動例
+- `ttcomtester --device com1 -o "BuildComm=baud=57600 parity=N data=8 stop=1 octs=on rts=hs" -test echo`
+
+起動(ttcomtesterがRTSを0/1する)
+- `ttcomtester --device com1 -o "BuildComm=baud=57600 parity=N data=8 stop=1 octs=on rts=on" -test echo_rts`
+
+### 表示
+
+- `r` or `R`
+  - receive datas
+- `s` or `S`
+  - send datas
+- `t`
+  - RTS=0
+- `T`
+  - RTS=1
+
+### キー
+
+`q` 終了
 
 # 参考
 

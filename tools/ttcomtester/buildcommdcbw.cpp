@@ -27,68 +27,39 @@
  */
 
 #include <windows.h>
+#include <string.h>
+#include <wchar.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "buildcommdcbw.h"
 
-typedef enum {
-	SET_PORT_NAME,
-	GET_RAW_HANDLE,
-	SET_COM_DCB,
-	GET_COM_DCB,
-	SET_COM_TIMEOUTS,
-	GET_COM_TIMEOUTS,
-	SET_CHECK_LINE_STATE_BEFORE_SEND,
-	GET_CHECK_LINE_STATE_BEFORE_SEND,
-	OPEN_CONFIG_DIALOG,
-} device_ctrl_request;
-
-typedef struct device {
-	struct device_ope_st const *ope;
-	void *private_data;
-} device_t;
-
-typedef struct device_ope_st {
-	/**
-	 *	使用しなくなったらコールする
-	 */
-	DWORD (*destroy)(device_t *device);
-	/**
-	 *	オープン
-	 *	必ず close() すること
-	 */
-	DWORD (*open)(device_t *device);
-	/**
-	 *	close()すると再度open()できる
-	 */
-	DWORD (*close)(device_t *device);
-	/**
-	 *	read() で読み込みリクエストを行う、
-	 *		すぐ読めるかもしれないし
-	 *		ペンディングされて後で読み込めるかもしれない
-	 */
-	DWORD (*read)(device_t *device, void *buf, size_t buf_len, size_t *readed);
-
-	/**
-	 *	read() のリクエストが完了したかチェックする
-	 *		読めればreadedにバイト数が入っている
-	 *		データはread()時のアドレスに入っている
-	 */
-	DWORD (*wait_read)(device_t *device, size_t *readed);
-
-	DWORD (*write)(device_t *device, const void *buf, size_t buf_len, size_t *writed);
-	DWORD (*wait_write)(device_t *device, size_t *writed);
-
-	/**
-	 *	デバイスごとの制御
-	 */
-	DWORD (*ctrl)(device_t *device, device_ctrl_request request, ...);
-} device_ope;
-
-
-DWORD com_init(device_t **device);
-
-#ifdef __cplusplus
+/**
+ *	BuildCommDCBW() API wrapper
+ *		"rts=hs" がうまくパースできないようなのでラップする
+ *		"rts=on" "rts=off" は問題ない
+ *
+ *		BuildCommDCBW()
+ *			https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-buildcommdcbw
+ *		DCB
+ *			https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb
+ *		mode command
+ *			https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mode
+ */
+BOOL _BuildCommDCBW(LPCWSTR lpDef, LPDCB lpDCB)
+{
+	bool rts_handshake = false;
+	wchar_t *def = _wcsdup(lpDef);
+	wchar_t *rts = wcsstr(def, L"rts=hs");
+	if (rts != NULL) {
+		rts_handshake = true;
+		wmemcpy(rts, L"      ", 6);
+	}
+	BOOL r = BuildCommDCBW(def, lpDCB);
+	free(def);
+	if (r == FALSE) {
+		return FALSE;
+	}
+	if (rts_handshake) {
+		lpDCB->fRtsControl = RTS_CONTROL_HANDSHAKE;
+	}
+	return TRUE;
 }
-#endif

@@ -26,68 +26,15 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 #include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum {
-	SET_PORT_NAME,
-	GET_RAW_HANDLE,
-	SET_COM_DCB,
-	GET_COM_DCB,
-	SET_COM_TIMEOUTS,
-	GET_COM_TIMEOUTS,
-	SET_CHECK_LINE_STATE_BEFORE_SEND,
-	GET_CHECK_LINE_STATE_BEFORE_SEND,
-	OPEN_CONFIG_DIALOG,
-} device_ctrl_request;
-
-typedef struct device {
-	struct device_ope_st const *ope;
-	void *private_data;
-} device_t;
-
-typedef struct device_ope_st {
-	/**
-	 *	使用しなくなったらコールする
-	 */
-	DWORD (*destroy)(device_t *device);
-	/**
-	 *	オープン
-	 *	必ず close() すること
-	 */
-	DWORD (*open)(device_t *device);
-	/**
-	 *	close()すると再度open()できる
-	 */
-	DWORD (*close)(device_t *device);
-	/**
-	 *	read() で読み込みリクエストを行う、
-	 *		すぐ読めるかもしれないし
-	 *		ペンディングされて後で読み込めるかもしれない
-	 */
-	DWORD (*read)(device_t *device, void *buf, size_t buf_len, size_t *readed);
-
-	/**
-	 *	read() のリクエストが完了したかチェックする
-	 *		読めればreadedにバイト数が入っている
-	 *		データはread()時のアドレスに入っている
-	 */
-	DWORD (*wait_read)(device_t *device, size_t *readed);
-
-	DWORD (*write)(device_t *device, const void *buf, size_t buf_len, size_t *writed);
-	DWORD (*wait_write)(device_t *device, size_t *writed);
-
-	/**
-	 *	デバイスごとの制御
-	 */
-	DWORD (*ctrl)(device_t *device, device_ctrl_request request, ...);
-} device_ope;
-
-
-DWORD com_init(device_t **device);
+BOOL _BuildCommDCBW(LPCWSTR lpDef, LPDCB lpDCB);
 
 #ifdef __cplusplus
 }

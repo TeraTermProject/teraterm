@@ -8,12 +8,11 @@ add_executable(
   ${PACKAGE_NAME}
   ../libs/getopt_mb_uni_src/getopt.c
   ../libs/getopt_mb_uni_src/getopt.h
-  main.cpp
+  buildcommdcbw.cpp
+  buildcommdcbw.h
   device_com.cpp
   deviceope.h
-  #
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common/asprintf.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common/codeconv.h
+  main.cpp
 )
 
 target_compile_options(
@@ -25,7 +24,6 @@ target_compile_options(
 target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/common
   ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
   )
 
@@ -44,9 +42,8 @@ target_compile_definitions(
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
-  ttpcmn
-  common_static
-  )
+  winmm.lib
+)
 
 if(MINGW)
   target_link_options(
