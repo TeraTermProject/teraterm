@@ -73,6 +73,10 @@ TeraTerm Project は、ターミナルエミュレータ Tera Term 、および 
 </p>
 
 <p>
+Tera Term 5 beta1 をテストしています。OSDNから<a href="https://osdn.net/projects/ttssh2/releases/p19105">ダウンロード</a>できます。
+</p>
+
+<p>
 いち早く最新版を試したい方は、<a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVNリポジトリ</a>からソースコードを入手することができます。<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">スナップショット</a>もあります。<br>
 <a href="https://ja.osdn.net/projects/ttssh2/releases/p15375">古いリリース</a>はこちらから入手可能ですが、なるべく最新版を利用することを推奨します。
 </p>
