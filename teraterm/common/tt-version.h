@@ -30,7 +30,7 @@
 
 #define TT_VERSION_MAJOR             5
 #define TT_VERSION_MINOR             0
-#define TT_VERSION_SUBSTR            "beta1-rc1"
+#define TT_VERSION_SUBSTR            "beta1"
 // SUBSTR が不要な時はコメントアウトする
 //  使用例 "dev", "rc"
 
