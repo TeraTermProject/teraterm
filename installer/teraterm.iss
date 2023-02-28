@@ -1,7 +1,7 @@
 ﻿
 #define AppName "Tera Term"
 #ifndef AppVer
-#define AppVer "5.0-beta1"
+#define AppVer "5.0-dev"
 #endif
 ;#define VerSubStr
 ;#define OutputSubStr
@@ -16,19 +16,19 @@ Name: build.bat
 
 [PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [_ISToolPreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [_ISToolPostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [Setup]
 AppCopyright=(C) 2004-2023 TeraTerm Project
