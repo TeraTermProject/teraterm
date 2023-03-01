@@ -33,6 +33,7 @@ See LICENSE.TXT for the license.
 */
 
 #include "ttxssh.h"
+#include "codeconv.h"
 
 void UTIL_init_sock_write_buf(UTILSockWriteBuf *buf)
 {
@@ -316,20 +317,30 @@ BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf)
 
 void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def)
 {
-	GetI18nStr("TTSSH", key, pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-		def, pvar->ts->UILanguageFile);
+	wchar_t *defW = ToWcharA(def);
+	wchar_t *strW;
+	GetI18nStrWW("TTSSH", key, defW, pvar->ts->UILanguageFileW, &strW);
+	WideCharToACP_t(strW, pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg));
+	free(strW);
+	free(defW);
 }
 
 void UTIL_get_lang_msgU8(const char *key, PTInstVar pvar, const char *def)
 {
-	const char *UILanguageFile = pvar->ts->UILanguageFile;
-	GetI18nStrU8("TTSSH", key, pvar->ts->UIMsg, MAX_UIMSG, def, UILanguageFile);
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+	char *strU8;
+	GetI18nStrU8W("TTSSH", key, def, UILanguageFileW, &strU8);
+	strcpy_s(pvar->ts->UIMsg, MAX_UIMSG, strU8);
+	free(strU8);
 }
 
 void UTIL_get_lang_msgW(const char *key, PTInstVar pvar, const wchar_t *def, wchar_t *UIMsg)
 {
-	const char *UILanguageFile = pvar->ts->UILanguageFile;
-	GetI18nStrW("TTSSH", key, UIMsg, MAX_UIMSG, def, UILanguageFile);
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+	wchar_t *strW;
+	GetI18nStrWW("TTSSH", key, def, UILanguageFileW, &strW);
+	wcscpy_s(UIMsg, MAX_UIMSG, strW);
+	free(strW);
 }
 
 /*
@@ -337,12 +348,12 @@ void UTIL_get_lang_msgW(const char *key, PTInstVar pvar, const wchar_t *def, wch
  *	@retval		フォントハンドル
  *	@retval		NULL(エラー)
  */
-HFONT UTIL_get_lang_fixedfont(HWND hWnd, const char *UILanguageFile)
+HFONT UTIL_get_lang_fixedfont(HWND hWnd, const wchar_t *UILanguageFile)
 {
 	HFONT hFont;
-	LOGFONTA logfont;
+	LOGFONTW logfont;
 	int dpi = GetMonitorDpiFromWindow(hWnd);
-	BOOL result = GetI18nLogfont("TTSSH", "DLG_ABOUT_FONT", &logfont,
+	BOOL result = GetI18nLogfontW(L"TTSSH", L"DLG_ABOUT_FONT", &logfont,
 								 dpi, UILanguageFile);
 	if (result == FALSE) {
 		// 読み込めなかった場合は等幅フォントを指定する。
@@ -351,17 +362,17 @@ HFONT UTIL_get_lang_fixedfont(HWND hWnd, const char *UILanguageFile)
 
 		// ウィンドウ(ダイアログ)のフォントを取得、フォント高を参照する
 		HFONT hFontDlg;
-		LOGFONT logfontDlg;
+		LOGFONTW logfontDlg;
 		hFontDlg = (HFONT)SendMessage(hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0);
 		GetObject(hFontDlg, sizeof(logfontDlg), &logfontDlg);
 
 		memset(&logfont, 0, sizeof(logfont));
-		strncpy_s(logfont.lfFaceName, sizeof(logfont.lfFaceName), "Courier New", _TRUNCATE);
+		wcsncpy_s(logfont.lfFaceName, _countof(logfont.lfFaceName), L"Courier New", _TRUNCATE);
 		logfont.lfCharSet = ANSI_CHARSET;	// = 0
 		logfont.lfHeight = logfontDlg.lfHeight;
 		logfont.lfWidth = 0;
 	}
-	hFont = CreateFontIndirect(&logfont);	// エラー時 NULL
+	hFont = CreateFontIndirectW(&logfont);	// エラー時 NULL
 #if 1
 	if (hFont == NULL) {
 		// フォントが生成できなかった場合 stock object を使用する

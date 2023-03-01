@@ -1001,7 +1001,7 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 	SetDlgItemTextW(dlg, IDC_HOSTWARNING, buf2);
 	free(buf2);
 
-	pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+	pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
 	if (pvar->hFontFixed != NULL) {
 		SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
 						   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
@@ -1903,7 +1903,7 @@ canceled:
 		if (pvar->hFontFixed != NULL) {
 			DeleteObject(pvar->hFontFixed);
 		}
-		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
 		if (pvar->hFontFixed != NULL) {
 			SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
 							   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
@@ -2051,7 +2051,7 @@ canceled:
 		if (pvar->hFontFixed != NULL) {
 			DeleteObject(pvar->hFontFixed);
 		}
-		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
 		if (pvar->hFontFixed != NULL) {
 			SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
 							   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
@@ -2200,7 +2200,7 @@ canceled:
 		if (pvar->hFontFixed != NULL) {
 			DeleteObject(pvar->hFontFixed);
 		}
-		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFile);
+		pvar->hFontFixed = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
 		if (pvar->hFontFixed != NULL) {
 			SendDlgItemMessage(dlg, IDC_FP_RANDOMART, WM_SETFONT,
 							   (WPARAM)pvar->hFontFixed, MAKELPARAM(TRUE,0));
