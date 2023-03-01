@@ -39,7 +39,7 @@ public:
 	};
 	CFileTransLiteDlg();
 	virtual ~CFileTransLiteDlg();
-	BOOL Create(HINSTANCE hInstance, HWND hParent, const char *UILanguageFile);
+	BOOL Create(HINSTANCE hInstance, HWND hParent, const wchar_t *UILanguageFile);
 	void SetCaption(const wchar_t *caption);
 	void SetFilename(const wchar_t *filename);
 	void ChangeButton(BOOL PauseFlag);
@@ -50,4 +50,3 @@ public:
 private:
 	class PrivateData *pData;
 };
-

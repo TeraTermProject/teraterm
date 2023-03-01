@@ -38,6 +38,7 @@ extern "C" {
 #endif
 
 extern char UILanguageFile[MAX_PATH];
+extern wchar_t *UILanguageFileW;
 
 void CalcTextExtent(HWND hWnd, HFONT Font, const char *Text, LPSIZE s);
 void CalcTextExtentW(HWND hWnd, HFONT Font, const wchar_t *Text, LPSIZE s);

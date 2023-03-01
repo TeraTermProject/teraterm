@@ -2045,21 +2045,24 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	char Temp[MAX_PATH];
 	char buf[20];
 	int ret;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], msg[MAX_UIMSG];
 	WORD TmpColor[12][6];
 	wchar_t *TempW;
 
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
 	if (ret == 0) {
-		// iniファイルの書き込みに失敗したら、エラーメッセージを表示する。(2012.10.18 yutaka)
+		// iniファイルの書き込み失敗
+		wchar_t *msg, *msg_err, *title;
 		ret = GetLastError();
-		get_lang_msg("MSG_INI_WRITE_ERROR", uimsg, sizeof(uimsg), "Cannot write ini file", ts->UILanguageFile);
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "%s (%d)", uimsg, ret);
+		GetI18nStrWW("Tera Term", "MSG_INI_WRITE_ERROR", L"Cannot write ini file", ts->UILanguageFileW, &msg);
+		aswprintf(&msg_err, L"%s (%d)", msg, ret);
+		free(msg);
 
-		get_lang_msg("MSG_INI_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", ts->UILanguageFile);
+		GetI18nStrWW("Tera Term", "MSG_INI_ERROR", L"Tera Term: Error", ts->UILanguageFileW, &title);
 
-		MessageBox(NULL, msg, uimsg2, MB_ICONEXCLAMATION);
+		MessageBoxW(NULL, msg_err, title, MB_ICONEXCLAMATION);
+		free(msg_err);
+		free(title);
 	}
 
 	/* Language */
@@ -2864,8 +2867,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "UseNormalBGColor", FName, ts->UseNormalBGColor);
 
 	// UI language message file
-	WritePrivateProfileString(Section, "UILanguageFile",
-	                          ts->UILanguageFile_ini, FName);
+	WritePrivateProfileStringW(SectionW, L"UILanguageFile",
+							   ts->UILanguageFileW_ini, FName);
 
 	// Broadcast Command History (2007.3.3 maya)
 	WriteOnOff(Section, "BroadcastCommandHistory", FName,

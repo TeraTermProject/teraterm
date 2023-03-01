@@ -178,7 +178,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					free(uimsg);
 					uimsg = NULL;
 
-					wchar_t *filterW = GetCommonDialogFilterW(data->filesend_filter, data->UILanguageFile);
+					wchar_t *filterW = GetCommonDialogFilterWW(data->filesend_filter, data->UILanguageFileW);
 					wchar_t filename[MAX_PATH];
 					filename[0] = 0;
 					OPENFILENAMEW ofn = {};

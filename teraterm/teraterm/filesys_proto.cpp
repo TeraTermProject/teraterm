@@ -680,7 +680,9 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
 	wchar_t *CurDir = FileDirExpanded;
 
-	wchar_t *FNFilter = GetCommonDialogFilterW(!Receive ? ts.FileSendFilter : NULL, ts.UILanguageFile);
+	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	wchar_t *FNFilter = GetCommonDialogFilterWW(!Receive ? filterW : NULL, ts.UILanguageFileW);
+	free(filterW);
 
 	wchar_t FullName[MAX_PATH];
 	FullName[0] = 0;
@@ -932,8 +934,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 {
 #define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
-	const char *FileSendFilter = ts.FileSendFilter;
-	const char *UILanguageFile = ts.UILanguageFile;
+	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 
 	wchar_t FileDirExpanded[MAX_PATH];
 	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
@@ -949,7 +950,9 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	}
 	FnStrMem[0] = 0;
 
-	wchar_t *FNFilter = GetCommonDialogFilterW(FileSendFilter, UILanguageFile);
+	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
+	free(filterW);
 
 	wchar_t *default_filename = GetCommonDialogDefaultFilenameW(CurDir);
 	if (default_filename != NULL) {
@@ -1497,7 +1500,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 {
 	wchar_t TempDir[MAX_PATH];
 	wchar_t FileName[MAX_PATH];
-	const char *UILanguageFile = ts.UILanguageFile;
+	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 
 	wchar_t FileDirExpanded[MAX_PATH];
 	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
@@ -1506,7 +1509,9 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	wchar_t *FNFilter = GetCommonDialogFilterW(ts.FileSendFilter, UILanguageFile);
+	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
+	free(filterW);
 
 	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();

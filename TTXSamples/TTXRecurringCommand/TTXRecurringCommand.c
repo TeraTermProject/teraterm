@@ -448,7 +448,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, "Rec&urring command");
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
-	SetI18nMenuStrs(SECTION, menu, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFile);
+	SetI18nMenuStrsW(menu, SECTION, MenuTextInfo, _countof(MenuTextInfo), pvar->ts->UILanguageFileW);
 }
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {

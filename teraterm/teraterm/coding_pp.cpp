@@ -54,7 +54,7 @@ static const char *CellWidthList[] = { "1 Cell", "2 Cell", NULL };
 
 struct CodingPPData {
 	TTTSet *pts;
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFileW;
 	DLGTEMPLATE *dlg_templ;
 };
 
@@ -311,7 +311,7 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	int id = IDD_TABSHEET_CODING;
 
 	CodingPPData *Param = (CodingPPData *)calloc(sizeof(CodingPPData), 1);
-	Param->UILanguageFile = pts->UILanguageFile;
+	Param->UILanguageFileW = pts->UILanguageFileW;
 	Param->pts = pts;
 
 	PROPSHEETPAGEW_V1 psp = {};

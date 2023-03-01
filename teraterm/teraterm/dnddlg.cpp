@@ -52,7 +52,7 @@ struct DrapDropDlgParam {
 	bool DoSameProcessNextDrop;
 	bool DoNotShowDialogEnable;
 	bool DoNotShowDialog;
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFile;
 };
 
 struct DrapDropDlgData {
@@ -89,7 +89,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)DlgData);
 		DrapDropDlgParam *Param = (DrapDropDlgParam *)lp;
 		DlgData->Param = Param;
-		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
+		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
 
 		// target file
 		SetDlgItemTextW(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
@@ -267,7 +267,7 @@ enum drop_type ShowDropDialogBox(
 	Param.DoNotShowDialogEnable = pts->ConfirmFileDragAndDrop ? false : true,
 	Param.ScpSendDirPtr = pts->ScpSendDir;
 	Param.ScpSendDirSize = _countof(pts->ScpSendDir);
-	Param.UILanguageFile = pts->UILanguageFile;
+	Param.UILanguageFile = pts->UILanguageFileW;
 
 	INT_PTR ret = TTDialogBoxParam(
 		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),

@@ -339,16 +339,6 @@ wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t 
 	return GetCommonDialogFilterWW(user_filter_mask, UILanguageFile, NULL);
 }
 
-wchar_t *GetCommonDialogFilterW(const char *user_filter_mask, const char *UILanguageFile)
-{
-	wchar_t *UILanguageFileW = ToWcharA(UILanguageFile);
-	wchar_t * user_filter_maskW = ToWcharA(user_filter_mask);
-	wchar_t *ret = GetCommonDialogFilterWW(user_filter_maskW, UILanguageFileW);
-	free(user_filter_maskW);
-	free(UILanguageFileW);
-	return ret;
-}
-
 /**
  *	アイコンをロードする
  *	@param[in]	hinst

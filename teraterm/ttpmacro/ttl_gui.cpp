@@ -157,7 +157,7 @@ WORD TTLFilenameBox()
 
 	SetInputStr("");
 	if (CheckVar("inputstr", &ValType, &VarId) && (ValType==TypString)) {
-		wchar_t *FNFilter = GetCommonDialogFilterW(NULL, UILanguageFile);
+		wchar_t *FNFilter = GetCommonDialogFilterWW(NULL, UILanguageFileW);
 
 		OPENFILENAMEW ofn = {};
 		wchar_t filename[MAX_PATH];

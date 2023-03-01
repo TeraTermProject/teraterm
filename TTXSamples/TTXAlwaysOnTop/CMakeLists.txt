@@ -42,14 +42,14 @@ target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
   ../../teraterm/teraterm
-  ../../teraterm/common
-  )
+)
 
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
+  common_static
   ttpcmn
-  )
+)
 
 install(
   TARGETS ${PACKAGE_NAME}

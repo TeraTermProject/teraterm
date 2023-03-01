@@ -43,7 +43,7 @@ public:
 	};
 
 	struct Info {
-		const char *UILanguageFile;
+		const wchar_t *UILanguageFileW;
 		Op OpId;
 		wchar_t *DlgCaption;
 		wchar_t *FullName;
@@ -69,7 +69,7 @@ private:
 
 private:
 	BOOL Pause;
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFile;
 	WORD OpId;
 	int ProgStat;	// プログレスバーの進捗が戻らないよう記憶しておく
 	BOOL HideDialog;

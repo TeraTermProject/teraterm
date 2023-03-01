@@ -64,7 +64,7 @@ public:
 	BOOL Create(HINSTANCE hInstance, HWND hParent) {
 		return TTCDialog::Create(hInstance, hParent, IDD_FILETRANSDLG);
 	}
-	void SetUILanguageFile(const char *UILanguageFile) {
+	void SetUILanguageFile(const wchar_t *UILanguageFile) {
 		static const DlgTextInfo TextInfos[] = {
 			{ IDC_TRANS_FILENAME, "DLG_FILETRANS_FILENAME" },
 			{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
@@ -75,21 +75,21 @@ public:
 			{ IDC_TRANSHELP, "BTN_HELP" },
 		};
 		UILanguageFile_ = UILanguageFile;
-		SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile_);
+		SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile_);
 	}
 
 	void ChangeButton(BOOL PauseFlag)
 	{
-		wchar_t UIMsg[MAX_UIMSG];
+		wchar_t *UIMsg;
 		Pause = PauseFlag;
 		if (Pause) {
-			get_lang_msgW("DLG_FILETRANS_START", UIMsg, _countof(UIMsg), L"&Start", UILanguageFile_);
+			GetI18nStrWW("Tera Term", "DLG_FILETRANS_START", L"&Start", UILanguageFile_, &UIMsg);
 		}
 		else {
-			get_lang_msgW("DLG_FILETRANS_PAUSE", UIMsg, _countof(UIMsg), L"Pau&se", UILanguageFile_);
-
+			GetI18nStrWW("Tera Term", "DLG_FILETRANS_PAUSE", L"Pau&se", UILanguageFile_, &UIMsg);
 		}
 		SetDlgItemTextW(IDC_TRANSPAUSESTART, UIMsg);
+		free(UIMsg);
 		if (observer_ != NULL) {
 			observer_->OnPause(PauseFlag);
 		}
@@ -166,7 +166,7 @@ private:
 	}
 
 private:
-	const char *UILanguageFile_;
+	const wchar_t *UILanguageFile_;
 
 public:
 	BOOL Pause;
@@ -193,7 +193,7 @@ CFileTransLiteDlg::~CFileTransLiteDlg()
 	Destroy();
 }
 
-BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const char *UILanguageFile)
+BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t *UILanguageFile)
 {
 	pData = new PrivateData();
 	pData->check_2sec = FALSE;

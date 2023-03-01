@@ -2187,7 +2187,7 @@ BOOL CVTWindow::OnMouseWheel(
 			SetWindowAlpha(newAlpha);
 
 			wchar_t *uimsg;
-			GetI18nStrWA("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", ts.UILanguageFile, &uimsg);
+			GetI18nStrWW("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", ts.UILanguageFileW, &uimsg);
 			wchar_t *tipbuf;
 			aswprintf(&tipbuf, uimsg, (newAlpha / 255.0) * 100);
 			free(uimsg);
@@ -3933,9 +3933,10 @@ void CVTWindow::OnFileSend()
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	sendfiledlgdata data;
 	data.UILanguageFileW = ts.UILanguageFileW;
-	data.UILanguageFile = ts.UILanguageFile;
-	data.filesend_filter = ts.FileSendFilter;
+	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	data.filesend_filter = filterW;
 	INT_PTR ok = sendfiledlg(m_hInst, m_hWnd, &data);
+	free(filterW);
 	if (ok != IDOK) {
 		return;
 	}

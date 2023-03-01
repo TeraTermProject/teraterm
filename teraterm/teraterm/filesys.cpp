@@ -102,7 +102,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	free(uimsg);
 
 	CFileTransDlg::Info info;
-	info.UILanguageFile = ts.UILanguageFile;
+	info.UILanguageFileW = ts.UILanguageFileW;
 	info.OpId = CFileTransDlg::OpSendFile;
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;

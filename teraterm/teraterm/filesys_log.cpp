@@ -129,12 +129,13 @@ static BOOL OpenFTDlg_(PFileVar fv)
 	}
 
 	wchar_t *DlgCaption;
-	wchar_t uimsg[MAX_UIMSG];
-	get_lang_msgW("FILEDLG_TRANS_TITLE_LOG", uimsg, _countof(uimsg), TitLog, ts.UILanguageFile);
+	wchar_t *uimsg;
+	GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG", TitLog, ts.UILanguageFileW, &uimsg);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
+	free(uimsg);
 
 	CFileTransDlg::Info info;
-	info.UILanguageFile = ts.UILanguageFile;
+	info.UILanguageFileW = ts.UILanguageFileW;
 	info.OpId = CFileTransDlg::OpLog;
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;

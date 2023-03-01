@@ -36,8 +36,7 @@ extern "C" {
 typedef struct {
 	// in
 	const wchar_t* UILanguageFileW;
-	const char* UILanguageFile;		// TODO なくす
-	const char *filesend_filter;
+	const wchar_t *filesend_filter;
 	// out
 	wchar_t* filename;		// IDOK時、選択ファイル名が返る,使用後free()すること
 	BOOL binary;			// TRUE/FALSE = バイナリ/テキスト

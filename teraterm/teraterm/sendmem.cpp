@@ -73,7 +73,7 @@ typedef struct SendMemTag {
 	SendMemDelayType delay_type;
 	HWND hWnd;	 // タイマーを受けるwindow
 	int timer_id;  // タイマーID
-	char *UILanguageFile;
+	wchar_t *UILanguageFile;
 	wchar_t *dialog_caption;
 	wchar_t *filename;
 	void (*callback)(void *data);
@@ -619,11 +619,11 @@ void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *cal
 }
 
 // セットするとダイアログが出る
-void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const char *UILanguageFile)
+void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const wchar_t *UILanguageFile)
 {
 	sm->hInst_ = hInstance;
 	sm->hWndParent_ = hWndParent;
-	sm->UILanguageFile = _strdup(UILanguageFile);
+	sm->UILanguageFile = _wcsdup(UILanguageFile);
 }
 
 void SendMemInitDialogCaption(SendMem *sm, const wchar_t *caption)
@@ -707,7 +707,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 		}
 		sm = SendMemBinary(data_ptr, data_len);
 	}
-	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
+	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFileW);
 	SendMemInitDialogCaption(sm, L"send file");			// title
 	SendMemInitDialogFilename(sm, filename);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);

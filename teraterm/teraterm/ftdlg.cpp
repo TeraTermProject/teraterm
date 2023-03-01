@@ -68,7 +68,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	BOOL Ok;
 	HWND hwnd;
 
-	UILanguageFile = info->UILanguageFile;
+	UILanguageFile = info->UILanguageFileW;
 	OpId = info->OpId;	// OpLog or OpSendFile ‚Ì‚Ý
 	DlgCaption = _wcsdup(info->DlgCaption);
 	FullName = _wcsdup(info->FullName);
@@ -139,13 +139,13 @@ void CFileTransDlg::ChangeButton(BOOL PauseFlag)
 		static const DlgTextInfo TextInfos[] = {
 			{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_START" },
 		};
-		SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+		SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	}
 	else {
 		static const DlgTextInfo TextInfos[] = {
 			{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_PAUSE" },
 		};
-		SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+		SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	}
 }
 
@@ -224,7 +224,7 @@ BOOL CFileTransDlg::OnInitDialog()
 	SetDlgItemTextW(IDC_TRANSFNAME, FileName);
 	SetDlgItemTextW(IDC_EDIT_FULLPATH, FullName);
 
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTERM), 0);
 
