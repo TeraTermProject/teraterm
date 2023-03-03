@@ -197,7 +197,7 @@ int FWD_check_local_channel_num(PTInstVar pvar, int local_num)
 		UTIL_get_lang_msg("MSG_FWD_LOCAL_CHANNEL_ERROR", pvar,
 		                  "The server attempted to manipulate a forwarding channel that does not exist.\n"
 		                  "Either the server has a bug or is hostile. You should close this connection.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		return 0;
 	} else {
 		return 1;
@@ -223,7 +223,7 @@ static void request_error(PTInstVar pvar, int request_num, int err)
 	UTIL_get_lang_msg("MSG_FWD_REQUEST_ERROR", pvar,
 	                  "Communications error while listening for a connection to forward.\n"
 	                  "The listening port will be terminated.");
-	notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+	notify_nonfatal_error(pvar, pvar->UIMsg);
 }
 
 static void send_local_connection_closure(PTInstVar pvar, int channel_num)
@@ -359,29 +359,29 @@ static char *describe_socket_error(PTInstVar pvar, int code)
 	case WSAECONNREFUSED:
 		UTIL_get_lang_msg("MSG_FWD_REFUSED_ERROR", pvar,
 		                  "Connection refused (perhaps the service is not currently running)");
-		return pvar->ts->UIMsg;
+		return pvar->UIMsg;
 	case WSAENETDOWN:
 	case WSAENETUNREACH:
 	case WSAEHOSTUNREACH:
 		UTIL_get_lang_msg("MSG_FWD_NETDOWN_ERROR", pvar,
 		                  "The machine could not be contacted (possibly a network problem)");
-		return pvar->ts->UIMsg;
+		return pvar->UIMsg;
 	case WSAETIMEDOUT:
 	case WSAEHOSTDOWN:
 		UTIL_get_lang_msg("MSG_FWD_MACHINEDOWN_ERROR", pvar,
 		                  "The machine could not be contacted (possibly the machine is down)");
-		return pvar->ts->UIMsg;
+		return pvar->UIMsg;
 	case WSATRY_AGAIN:
 	case WSANO_RECOVERY:
 	case WSANO_ADDRESS:
 	case WSAHOST_NOT_FOUND:
 		UTIL_get_lang_msg("MSG_FWD_ADDRNOTFOUND_ERROR", pvar,
 		                  "No address was found for the machine");
-		return pvar->ts->UIMsg;
+		return pvar->UIMsg;
 	default:
 		UTIL_get_lang_msg("MSG_FWD_CONNECT_ERROR", pvar,
 		                  "The forwarding connection could not be established");
-		return pvar->ts->UIMsg;
+		return pvar->UIMsg;
 	}
 }
 
@@ -411,7 +411,7 @@ static void channel_error(PTInstVar pvar, char *action,
 		                  "%s (code %d).\n"
 		                  "The forwarded connection will be closed.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg, action,
+		            pvar->UIMsg, action,
 		            pvar->fwd_state.requests[pvar->fwd_state.channels[channel_num].
 		                                     request_num].spec.from_port_name,
 		            err_msg, err);
@@ -435,7 +435,7 @@ static void channel_opening_error(PTInstVar pvar, int channel_num, int err)
 		                  "It requested a connection to the X server on %s (display %d:%d).\n"
 		                  "%s(code %d).\n" "The forwarded connection will be closed.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg,
+		            pvar->UIMsg,
 		            request->spec.to_host, request->spec.to_port - 6000, request->spec.x11_screen,
 		            uimsg, err);
 	} else {
@@ -444,7 +444,7 @@ static void channel_opening_error(PTInstVar pvar, int channel_num, int err)
 		                  "It requested a connection to %s (port %s).\n" "%s(code %d).\n"
 		                  "The forwarded connection will be closed.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg,
+		            pvar->UIMsg,
 		            request->spec.to_host, request->spec.to_port_name,
 		            uimsg, err);
 	}
@@ -538,7 +538,7 @@ static HWND make_accept_wnd(PTInstVar pvar)
 	if (pvar->fwd_state.accept_wnd == NULL) {
 		UTIL_get_lang_msg("DLG_FWDMON_TITLE", pvar, "TTSSH Port Forwarding Monitor");
 		pvar->fwd_state.accept_wnd =
-			CreateWindow("STATIC", pvar->ts->UIMsg,
+			CreateWindow("STATIC", pvar->UIMsg,
 			             WS_DISABLED | WS_POPUP, 0, 0, 1, 1, NULL, NULL,
 			             hInst, NULL);
 		if (pvar->fwd_state.accept_wnd != NULL) {
@@ -794,7 +794,7 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 }
 
 // local connectionの受信の停止および再開の判断を行う
-// 
+//
 // notify: TRUE    recvを再開する
 //         FALSE   recvを停止する
 //
@@ -827,7 +827,7 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 			c->bufchain_recv_suspended = FALSE;
 
 			// ここで再開のメッセージを飛ばす
-			PostMessage(pvar->fwd_state.accept_wnd, WM_SOCK_IO, 
+			PostMessage(pvar->fwd_state.accept_wnd, WM_SOCK_IO,
 				(WPARAM)channel->local_socket,
 				MAKEWPARAM(FD_READ, 0)
 				);
@@ -844,9 +844,9 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 		}
 	}
 
-	logprintf(LOG_LEVEL_NOTICE, 
+	logprintf(LOG_LEVEL_NOTICE,
 		"%s: Local channel#%d recv has been `%s' for flow control(buffer size %lu, recv %s).",
-		__FUNCTION__, channel_num, 
+		__FUNCTION__, channel_num,
 		c->bufchain_recv_suspended ? "disabled" : "enabled",
 		c->bufchain_amount,
 		changed ? "changed" : ""
@@ -1197,7 +1197,7 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 				                  "Some socket(s) required for port forwarding could not be initialized.\n"
 				                  "Some port forwarding services may not be available.\n"
 				                  "(errno %d)");
-				logprintf(LOG_LEVEL_WARNING, pvar->ts->UIMsg, WSAGetLastError());
+				logprintf(LOG_LEVEL_WARNING, pvar->UIMsg, WSAGetLastError());
 			}
 			freeaddrinfo(res0);
 			/* free(request->listening_sockets); /* DO NOT FREE HERE, listening_sockets'll be freed in FWD_end */
@@ -1303,7 +1303,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 			UTIL_get_lang_msg("MSG_FWD_DUPLICATE_ERROR", pvar,
 			                  "TTSSH INTERNAL ERROR: Could not set port forwards "
 			                  "because duplicate type/port requests were found");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 			free(new_specs);
 			return;
 		}
@@ -1607,7 +1607,7 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 			                  "It requested a connection to machine %s on port %s.\n"
 			                  "An error occurred while processing the request, and it has been denied.");
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-			            pvar->ts->UIMsg,
+			            pvar->UIMsg,
 			            request->spec.to_host, request->spec.to_port_name);
 			notify_nonfatal_error(pvar, buf);
 			freeaddrinfo(request->to_host_addrs);
@@ -1690,7 +1690,7 @@ void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
 	                  "It requested a connection to machine %s on port %d.\n"
 	                  "You did not specify this forwarding to TTSSH in advance, and therefore the request was denied.");
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            pvar->ts->UIMsg,
+	            pvar->UIMsg,
 	            local_hostname, local_port);
 	notify_nonfatal_error(pvar, buf);
 }
@@ -1734,7 +1734,7 @@ void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
 	                  "The server attempted to forward a connection through this machine.\n"
 	                  "It requested a connection to the local X server.\n"
 	                  "You did not specify this forwarding to TTSSH in advance, and therefore the request was denied.");
-	notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+	notify_nonfatal_error(pvar, pvar->UIMsg);
 }
 
 // agent forwarding の要求に対し、FWDChannel を作成する
@@ -1803,7 +1803,7 @@ void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num, int reason)
 		UTIL_get_lang_msg("MSG_FWD_DENIED_BY_SERVER_ERROR", pvar,
 		                  "A program on the local machine attempted to connect to a forwarded port.\n"
 		                  "The forwarding request was denied by the server. The connection has been closed.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 	}
 
 	if (channel->filter != NULL) {
@@ -1882,10 +1882,10 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 			                  "The forwarded connection will be closed.");
 			// ポップアップ抑止指定あれば、関数を呼び出さない。
 			if ((pvar->settings.DisablePopupMessage & POPUP_MSG_FWD_received_data) == 0) {
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				notify_nonfatal_error(pvar, pvar->UIMsg);
 			}
 			else {
-				logputs(LOG_LEVEL_ERROR, pvar->ts->UIMsg);
+				logputs(LOG_LEVEL_ERROR, pvar->UIMsg);
 			}
 		}
 	}
@@ -1961,11 +1961,11 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 
 	if (pvar->session_settings.ForwardAgentNotify) {
 		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY_TITLE", pvar, "Agent Forwarding");
-		strncpy_s(title, sizeof(title), pvar->ts->UIMsg, _TRUNCATE);
+		strncpy_s(title, sizeof(title), pvar->UIMsg, _TRUNCATE);
 		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY", pvar, "Remote host access to agent");
 
 		NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);
-		NotifyInfoMessage(pvar->cv, pvar->ts->UIMsg, title);
+		NotifyInfoMessage(pvar->cv, pvar->UIMsg, title);
 		NotifySetIconID(pvar->cv, NULL, 0);
 	}
 
@@ -1973,7 +1973,7 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
 		                  "Are you sure you want to accept agent-forwarding request?");
 		if (MessageBox(cur_active != NULL ? cur_active : pvar->NotificationWindow,
-		               pvar->ts->UIMsg, "TTSSH",
+		               pvar->UIMsg, "TTSSH",
 		               MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES) {
 			return TRUE;
 		}

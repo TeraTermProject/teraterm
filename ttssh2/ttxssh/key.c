@@ -2392,7 +2392,7 @@ static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPar
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
+		SetWindowText(dlg, pvar->UIMsg);
 
 		host = pvar->ssh_state.hostname;
 		ctx = pvar->hostkey_ctx;
@@ -2400,22 +2400,22 @@ static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPar
 		GetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
+			pvar->UIMsg, host, ctx->nnew, ctx->nold
 			);
 		SetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, buf);
 
 		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->UIMsg);
 
 		GetDlgItemText(dlg, IDC_ADDKEY_TEXT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_ADD", pvar, uimsg);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nnew);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, ctx->nnew);
 		SetDlgItemText(dlg, IDC_ADDKEY_TEXT, buf);
 
 		GetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_REMOVE", pvar, uimsg);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, ctx->nold);
 		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
 
 		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
@@ -2423,10 +2423,10 @@ static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPar
 
 		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_YES", pvar, uimsg);
-		SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDOK, pvar->UIMsg);
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_NO", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDCANCEL, pvar->UIMsg);
 
 		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */

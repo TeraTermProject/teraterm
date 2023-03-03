@@ -212,7 +212,7 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 
 	if (bytes % block_size) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar, "%s encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -263,7 +263,7 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 
 err:
 	UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 	            get_cipher_name(pvar->crypt_state.sender_cipher));
 	notify_fatal_error(pvar, tmp, TRUE);
 	return FALSE;
@@ -283,7 +283,7 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 
 	if (bytes % block_size) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar, "%s decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -332,7 +332,7 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 
 err:
 	UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 	            get_cipher_name(pvar->crypt_state.receiver_cipher));
 	notify_fatal_error(pvar, tmp, TRUE);
 	return FALSE;
@@ -354,7 +354,7 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 	if (bytes % block_size) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
 		                  "%s encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -370,7 +370,7 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 
 	if (EVP_Cipher(pvar->cc[MODE_OUT]->evp, encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher));
 		notify_fatal_error(pvar, tmp, TRUE);
 	} else {
@@ -390,7 +390,7 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 	if (bytes % block_size) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
 		                  "%s decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -406,7 +406,7 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, unsigned int 
 
 	if (EVP_Cipher(pvar->cc[MODE_IN]->evp, encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher));
 		notify_fatal_error(pvar, tmp, TRUE);
 	} else {
@@ -536,7 +536,7 @@ RSA *make_key(PTInstVar pvar,
 	if (key == NULL || e == NULL || n == NULL) {
 		UTIL_get_lang_msg("MSG_RSAKEY_SETUP_ERROR", pvar,
 		                  "Error setting up RSA keys");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 
 		if (key != NULL) {
 			if (e != NULL) {
@@ -613,14 +613,14 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		                  "The server does not support any of the TTSSH encryption algorithms.\n"
 		                  "A secure connection cannot be made in the TTSSH-to-server direction.\n"
 		                  "The connection will be closed.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return FALSE;
 	} else if (receiver_ciphers == 0) {
 		UTIL_get_lang_msg("MSG_UNAVAILABLE_CIPHERS_ERROR", pvar,
 		                  "The server does not support any of the TTSSH encryption algorithms.\n"
 		                  "A secure connection cannot be made in the TTSSH-to-server direction.\n"
 		                  "The connection will be closed.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -658,7 +658,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 
 	} else { // for SSH2(yutaka)
 		mac = &pvar->ssh2_keys[MODE_IN].mac;
-		if (mac == NULL || mac->enabled == 0) 
+		if (mac == NULL || mac->enabled == 0)
 			return 0;
 
 		return (pvar->ssh2_keys[MODE_IN].mac.mac_len);
@@ -666,7 +666,7 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 
 }
 
-// HMACの検証 
+// HMACの検証
 // ※本関数は SSH2 でのみ使用される。
 // (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
@@ -689,7 +689,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	}
 
 	if ((u_int)mac->mac_len > sizeof(m)) {
-		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
+		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)",
 		          mac->mac_len, sizeof(m), sequence_number, len);
 		goto error;
 	}
@@ -717,7 +717,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	return TRUE;
 
 error:
-	if (c) 
+	if (c)
 		HMAC_CTX_free(c);
 
 	return FALSE;
@@ -729,7 +729,7 @@ unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 
 	if (SSHv2(pvar)) {	// for SSH2(yutaka)
 		mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		if (mac == NULL || mac->enabled == 0) 
+		if (mac == NULL || mac->enabled == 0)
 			return 0;
 
 		return (mac->mac_len);
@@ -749,7 +749,7 @@ BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
 
 	if (SSHv2(pvar)) { // for SSH2(yutaka)
 		mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		if (mac == NULL || mac->enabled == 0) 
+		if (mac == NULL || mac->enabled == 0)
 			return FALSE;
 
 		c = HMAC_CTX_new();
@@ -807,7 +807,7 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 		                  "To communicate with this server, you will have to enable some more ciphers\n"
 		                  "in the TTSSH Setup dialog box when you run Tera Term again.\n"
 		                  "This connection will now close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -873,7 +873,7 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 	if (bit_delta < 128 || server_key_bits < 512 || host_key_bits < 512) {
 		UTIL_get_lang_msg("MSG_RSAKEY_TOOWEAK_ERROR", pvar,
 		                  "Server RSA keys are too weak. A secure connection cannot be established.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return 0;
 	} else {
 		/* following Goldberg's code, I'm using MD5(servkey->n || hostkey->n || cookie)
@@ -1137,7 +1137,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 	if (!isOK) {
 		UTIL_get_lang_msg("MSG_CIPHER_NOTSELECTED_ERROR", pvar,
 		                  "No cipher selected!");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		SecureZeroMemory(encryption_key, CRYPT_KEY_LENGTH);
@@ -1164,7 +1164,7 @@ void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)
 {
 	UTIL_get_lang_msgU8("DLG_ABOUT_CIPHER_INFO", pvar,
 						"%s to server, %s from server");
-	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+	_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 	          get_cipher_name(pvar->crypt_state.sender_cipher),
 	          get_cipher_name(pvar->crypt_state.receiver_cipher));
 }
@@ -1180,21 +1180,21 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 		if (pvar->crypt_state.server_key.RSA_key == NULL
 		 || pvar->crypt_state.host_key.RSA_key == NULL) {
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_NONE", pvar, "None");
-			strncpy_s(dest, len, pvar->ts->UIMsg, _TRUNCATE);
+			strncpy_s(dest, len, pvar->UIMsg, _TRUNCATE);
 		} else {
 			RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
 			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO", pvar,
 								"%d-bit server key, %d-bit host key");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 			            BN_num_bits(server_n),
 			            BN_num_bits(host_n));
 		}
 	} else { // SSH2
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO2", pvar,
 								"%d-bit client key, %d-bit server key");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 			            pvar->client_key_bits,
 			            pvar->server_key_bits);
 	}
@@ -1224,18 +1224,18 @@ void CRYPT_end(PTInstVar pvar)
 	destroy_public_key(&pvar->crypt_state.server_key);
 
 	if (pvar->crypt_state.detect_attack_statics.h != NULL) {
-		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h, 
+		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h,
 		                 pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
 		free(pvar->crypt_state.detect_attack_statics.h);
 	}
 
 	SecureZeroMemory(pvar->crypt_state.sender_cipher_key,
 	                 sizeof(pvar->crypt_state.sender_cipher_key));
-	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key, 
+	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key,
 	                 sizeof(pvar->crypt_state.receiver_cipher_key));
-	SecureZeroMemory(pvar->crypt_state.server_cookie, 
+	SecureZeroMemory(pvar->crypt_state.server_cookie,
 	                 sizeof(pvar->crypt_state.server_cookie));
-	SecureZeroMemory(pvar->crypt_state.client_cookie, 
+	SecureZeroMemory(pvar->crypt_state.client_cookie,
 	                 sizeof(pvar->crypt_state.client_cookie));
 	SecureZeroMemory(&pvar->crypt_state.enc, sizeof(pvar->crypt_state.enc));
 	SecureZeroMemory(&pvar->crypt_state.dec, sizeof(pvar->crypt_state.dec));

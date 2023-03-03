@@ -117,12 +117,12 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 				RECT rect;
 				PTInstVar pvar = data->pvar;
 				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
-				strcpy_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
+				strcpy_s(uimsg, _countof(uimsg), pvar->UIMsg);
 				if (wParam == 'V' - 'A' + 1) {
 					// CTRL + V
 					strcat_s(uimsg, _countof(uimsg), "\n");
 					UTIL_get_lang_msg("DLG_AUTH_TIP_PASTE_KEY", pvar, "Use Shift + Insert to paste from clipboard");
-					strcat_s(uimsg, _countof(uimsg), pvar->ts->UIMsg);
+					strcat_s(uimsg, _countof(uimsg), pvar->UIMsg);
 				}
 				GetWindowRect(control, &rect);
 				data->tipwin = TipWinCreateA(hInst, control, rect.left, rect.bottom, uimsg);
@@ -320,11 +320,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	if (pvar->settings.ssh_protocol_version == 1) {
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
 		                  "Use challenge/response(&TIS) to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
 	} else {
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
 		                  "Use keyboard-&interactive to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
@@ -470,7 +470,7 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	// 3ファイルフィルタの追加 (2005.4.26 yutaka)
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
 	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0id_ed25519(SSH2)\\0id_ed25519\\0PuTTY(*.ppk)\\0*.ppk\\0PEM files(*.pem)\\0*.pem\\0all(*.*)\\0*.*\\0\\0");
-	memcpy(filter, pvar->ts->UIMsg, sizeof(filter));
+	memcpy(filter, pvar->UIMsg, sizeof(filter));
 	params.lpstrFilter = filter;
 	params.lpstrCustomFilter = NULL;
 	params.nFilterIndex = 0;
@@ -481,7 +481,7 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	params.lpstrInitialDir = NULL;
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_TITLE", pvar,
 	                  "Choose a file with the RSA/DSA/ECDSA/ED25519 private key");
-	params.lpstrTitle = pvar->ts->UIMsg;
+	params.lpstrTitle = pvar->UIMsg;
 	params.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
 
@@ -542,7 +542,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		if (keyfile[0] == 0) {
 			UTIL_get_lang_msg("MSG_KEYSPECIFY_ERROR", pvar,
 			                  "You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 			SetFocus(GetDlgItem(dlg, file_ctl_ID));
 			destroy_malloced_string(&password);
 			return FALSE;
@@ -625,7 +625,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 
 					UTIL_get_lang_msg("MSG_READKEY_ERROR", pvar,
 					                  "read error SSH2 private key file\r\n%s");
-					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, errmsg);
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, errmsg);
 					notify_nonfatal_error(pvar, buf);
 					// ここに来たということは SSH2 秘密鍵ファイルが開けないので
 					// 鍵ファイルの選択ボタンにフォーカスを移す
@@ -639,7 +639,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 				char buf[1024];
 				UTIL_get_lang_msg("MSG_READKEY_ERROR", pvar,
 				                  "read error SSH2 private key file\r\n%s");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, errmsg);
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, errmsg);
 				notify_nonfatal_error(pvar, buf);
 				// パスフレーズが鍵と一致しなかった場合はIDC_SSHPASSWORDにフォーカスを移す (2006.10.29 yasuhide)
 				if (invalid_passphrase) {
@@ -669,7 +669,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		if (!putty_agent_exists()) {
 			UTIL_get_lang_msg("MSG_PAGEANT_NOTFOUND", pvar,
 			                  "Can't find Pageant.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 
 			return FALSE;
 		}
@@ -683,7 +683,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		if (pvar->pageant_keylistlen == 0) {
 			UTIL_get_lang_msg("MSG_PAGEANT_NOKEY", pvar,
 			                  "Pageant has no valid key.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 
 			return FALSE;
 		}
@@ -694,7 +694,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		if (pvar->pageant_keycount == 0) {
 			UTIL_get_lang_msg("MSG_PAGEANT_NOKEY", pvar,
 			                  "Pageant has no valid key.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 
 			return FALSE;
 		}
@@ -736,7 +736,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			                  "in TTSSH, you need to set it to be the default by restarting\n"
 			                  "TTSSH and selecting \"SSH Authentication...\" from the Setup menu "
 			                  "before connecting.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 		}
 
 		pvar->auth_state.cur_cred.rhosts_client_user =
@@ -1204,7 +1204,7 @@ int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 		UTIL_get_lang_msg("MSG_NOAUTHMETHOD_ERROR", pvar,
 		                  "Server does not support any of the authentication options\n"
 		                  "provided by TTSSH. This connection will now close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return 0;
 	} else {
 		if (pvar->auth_state.auth_dialog != NULL) {
@@ -1450,7 +1450,7 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTH_ERROR", pvar,
 			                  "Unable to display authentication dialog box.\n"
 			                  "Connection terminated.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+			notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		}
 	}
 }
@@ -1678,7 +1678,7 @@ void AUTH_do_default_cred_dialog(PTInstVar pvar)
 		               default_auth_dlg_proc, (LPARAM) pvar) == -1) {
 		UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTHSETUP_ERROR", pvar,
 		                  "Unable to display authentication setup dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 	}
 }
 
@@ -1722,19 +1722,19 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 	} else if (pvar->auth_state.cur_cred.method != SSH_AUTH_NONE) {
 		if (SSHv1(pvar)) {
 			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 			            pvar->auth_state.user,
 			            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
 			if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, ", %s key");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
 				            "RSA");
 				strncat_s(dest, len, buf, _TRUNCATE);
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, ", %s key");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
 				            "RSA");
 				strncat_s(dest, len, buf, _TRUNCATE);
 
@@ -1753,7 +1753,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 					method = get_auth_method_name(pvar->auth_state.cur_cred.method);
 				}
 				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
-				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 				            pvar->auth_state.user, method);
 			}
 			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
@@ -1762,7 +1762,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 
 				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
 				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
-				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 				            pvar->auth_state.user,
 				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
@@ -1770,13 +1770,13 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				digest_name = get_ssh2_hostkey_algorithm_digest_name(pubkey_algo);
 				if (strlen(digest_name) == 0) {
 					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, ", %s key");
-					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
 					            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type));
 					strncat_s(dest, len, buf, _TRUNCATE);
 				}
 				else {
 					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, ", %s key with %s");
-					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
 					            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type),
 					            digest_name);
 					strncat_s(dest, len, buf, _TRUNCATE);
@@ -1791,7 +1791,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 
 				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
 				UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', %s authentication");
-				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 				            pvar->auth_state.user,
 				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
@@ -1802,13 +1802,13 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 				digest_name = get_ssh2_hostkey_algorithm_digest_name(pubkey_algo);
 				if (strlen(digest_name) == 0) {
 					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO2", pvar, ", %s key");
-					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
 					            ssh_key_type(get_hostkey_type_from_name(s)));
 					strncat_s(dest, len, buf, _TRUNCATE);
 				}
 				else {
 					UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO3", pvar, ", %s key with %s");
-					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
 					            ssh_key_type(get_hostkey_type_from_name(s)),
 					            digest_name);
 					strncat_s(dest, len, buf, _TRUNCATE);
@@ -1823,7 +1823,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 
 	} else {
 		UTIL_get_lang_msgU8("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
-		_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg, pvar->auth_state.user,
+		_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, pvar->auth_state.user,
 		            get_auth_method_name(pvar->auth_state.failed_method));
 	}
 

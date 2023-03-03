@@ -66,7 +66,7 @@ static keyfile_header_t keyfile_headers[] = {
 	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN EC PRIVATE KEY-----"},
 	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN ENCRYPTED PRIVATE KEY-----"},
 	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN PRIVATE KEY-----"},
-	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN OPENSSH PRIVATE KEY-----"},	
+	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN OPENSSH PRIVATE KEY-----"},
 	{SSH2_KEYFILE_TYPE_PUTTY,   "PuTTY-User-Key-File-2"},
 	{SSH2_KEYFILE_TYPE_PUTTY,   "PuTTY-User-Key-File-3"},
 	{SSH2_KEYFILE_TYPE_SECSH,   "---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----"},
@@ -149,11 +149,11 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 			UTIL_get_lang_msg("MSG_KEYFILES_READ_ENOENT_ERROR", pvar,
 			                  "An error occurred while trying to read the key file.\n"
 			                  "The specified filename does not exist.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 		} else {
 			UTIL_get_lang_msg("MSG_KEYFILES_READ_ERROR", pvar,
 			                  "An error occurred while trying to read the key file.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 		}
 		return NULL;
 	}
@@ -166,14 +166,14 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 		if (keyfile_data == NULL) {
 			UTIL_get_lang_msg("MSG_KEYFILES_READ_ALLOC_ERROR", pvar,
 			                  "Memory ran out while trying to allocate space to read the key file.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 			_close(fd);
 			return NULL;
 		}
 	} else {
 		UTIL_get_lang_msg("MSG_KEYFILES_READ_ERROR", pvar,
 		                  "An error occurred while trying to read the key file.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		_close(fd);
 		return NULL;
 	}
@@ -188,7 +188,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (amount_read != length) {
 		UTIL_get_lang_msg("MSG_KEYFILES_READ_ERROR", pvar,
 		                  "An error occurred while trying to read the key file.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -196,7 +196,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (strcmp(keyfile_data, ID_string) != 0) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_NOTCONTAIN_ERROR", pvar,
 		                  "The specified key file does not contain an SSH private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -206,7 +206,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (length < index + 9) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		                  "The specified key file has been truncated and does not contain a valid private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -218,7 +218,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (length < index + 2) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		                  "The specified key file has been truncated and does not contain a valid private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -227,7 +227,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (length < index + 2) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		                  "The specified key file has been truncated and does not contain a valid private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -237,7 +237,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (length < index + 4) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		                  "The specified key file has been truncated and does not contain a valid private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -246,7 +246,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	if (length < index + 6) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		                  "The specified key file has been truncated and does not contain a valid private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -255,7 +255,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 			UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR", pvar,
 			                  "The specified key file cannot be decrypted using the passphrase.\n"
 			                  "The file does not have the correct length.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 			free(keyfile_data);
 			return NULL;
 		}
@@ -264,7 +264,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 			UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR", pvar,
 			                  "The specified key file cannot be decrypted using the passphrase.\n"
 			                  "The cipher type used to encrypt the file is not supported by TTSSH for this purpose.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 			free(keyfile_data);
 			return NULL;
 		}
@@ -278,13 +278,13 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 			                  "The specified key file cannot be decrypted using the empty passphrase.\n"
 			                  "For auto-login, you must create a key file with no passphrase.\n"
 			                  "BEWARE: This means the key can easily be stolen.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 		}
 		else {
 			UTIL_get_lang_msg("MSG_KEYFILES_PASSPHRASE_ERROR", pvar,
 			                  "The specified key file cannot be decrypted using the passphrase.\n"
 			                  "The passphrase is incorrect.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			notify_nonfatal_error(pvar, pvar->UIMsg);
 		}
 		SecureZeroMemory(keyfile_data, length);
 		free(keyfile_data);
@@ -314,7 +314,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	    Q_index + (get_ushort16_MSBfirst(keyfile_data + Q_index) + 7) / 8 + 2) {
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		              "The specified key file has been truncated and does not contain a valid private key.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 		SecureZeroMemory(keyfile_data, length);
 		free(keyfile_data);
 		return NULL;
@@ -333,7 +333,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 		UTIL_get_lang_msg("MSG_KEYFILES_CRYPTOLIB_ERROR", pvar,
 		                  "Error in cryptography library.\n"
 		                  "Perhaps the stored key is invalid.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 
 		RSA_free(key);
 		key = NULL;
@@ -360,7 +360,7 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 		Key *result = (Key *) malloc(sizeof(Key));
 
 		// フリーするときに 0 かどうかで判別するため追加。(2004.12.20 yutaka)
-		ZeroMemory(result, sizeof(Key)); 
+		ZeroMemory(result, sizeof(Key));
 
 		result->rsa = RSA_key;
 		return result;
@@ -382,7 +382,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
                                    char *errmsg,
                                    int errmsg_len)
 {
-	/* (A) 
+	/* (A)
 	 * buffer_consume系関数を使う場合は、buffer_lenとbuffer_ptrが使えないので、
 	 *   buffer_len -> buffer_remain_len
 	 *   buffer_ptr -> buffer_tail_ptr
@@ -398,7 +398,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned char *cp, last, pad;
 	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL, *key = NULL, *salt = NULL, *comment = NULL;
 	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
-	unsigned int check1, check2, m1len, m2len; 
+	unsigned int check1, check2, m1len, m2len;
 	int dlen, i;
 	const struct ssh2cipher *cipher;
 	size_t authlen;
@@ -669,7 +669,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		return (result);
 
 	result = (Key *)malloc(sizeof(Key));
-	ZeroMemory(result, sizeof(Key)); 
+	ZeroMemory(result, sizeof(Key));
 
 	// ファイルからパスフレーズを元に秘密鍵を読み込む。
 	pk = PEM_read_PrivateKey(fp, NULL, NULL, passphrase);
@@ -750,7 +750,7 @@ error:
  * Private-Lines: 1
  * Base64...
  * Private-MAC: Base16...
- * 
+ *
  * for "ssh-rsa", it will be composed of
  *
  * "Public-Lines: " plus a number N.
@@ -836,7 +836,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	unsigned fmt_version = 0;
 
 	result = (Key *)malloc(sizeof(Key));
-	ZeroMemory(result, sizeof(Key)); 
+	ZeroMemory(result, sizeof(Key));
 	result->type = KEY_NONE;
 	result->rsa = NULL;
 	result->dsa = NULL;
@@ -1403,7 +1403,7 @@ error:
  *  - string encrypted-blob
  *
  * The key type strings are ghastly. The RSA key I looked at had a type string of
- * 
+ *
  *   `if-modn{sign{rsa-pkcs1-sha1},encrypt{rsa-pkcs1v2-oaep}}'
  *   `dl-modp{sign{dsa-nist-sha1},dh{plain}}'
  *   `ec-modp'
@@ -1420,7 +1420,7 @@ error:
  *  - mpint u  (presumably inverse of p mod q)
  *  - mpint p  (p is the smaller prime)
  *  - mpint q  (q is the larger)
- * 
+ *
  * For a DSA key, the payload blob contains:
  *  - uint32 0
  *  - mpint p
@@ -1453,7 +1453,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	struct sshcipher_ctx *cc = NULL;
 
 	result = (Key *)malloc(sizeof(Key));
-	ZeroMemory(result, sizeof(Key)); 
+	ZeroMemory(result, sizeof(Key));
 	result->type = KEY_NONE;
 	result->rsa = NULL;
 	result->dsa = NULL;
@@ -1832,13 +1832,13 @@ ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
 		if (ret != SSH2_KEYFILE_TYPE_NONE)
 			break;
 	}
-	
+
 	if (ret == SSH2_KEYFILE_TYPE_NONE) {
 		strncpy_s(errmsg, errmsg_len, "Unknown key file type.", _TRUNCATE);
 		fseek(*fp, 0, SEEK_SET);
 		return ret;
 	}
-	
+
 	fseek(*fp, 0, SEEK_SET);
 	return ret;
 }

@@ -742,7 +742,7 @@ void notify_nonfatal_error(PTInstVar pvar, char *msg)
 		if (pvar->NotificationWindow == NULL) {
 			UTIL_get_lang_msg("MSG_NONFATAL_ERROR", pvar,
 			                  "Tera Term: not fatal error");
-			MessageBox(NULL, msg, pvar->ts->UIMsg, MB_OK|MB_ICONINFORMATION);
+			MessageBox(NULL, msg, pvar->UIMsg, MB_OK|MB_ICONINFORMATION);
 			msg[0] = '\0';
 
 		} else {
@@ -1879,42 +1879,42 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 
 		if (SSHv1(pvar)) {
 			UTIL_get_lang_msgU8("DLG_ABOUT_SERVERID", pvar, "Server ID:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_protocol_version_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_SERVERKEY", pvar, "Server keys:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH", pvar, "Authentication:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			AUTH_get_auth_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_COMP", pvar, "Compression:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_compression_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
@@ -1922,46 +1922,46 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 
 		} else { // SSH2
 			UTIL_get_lang_msgU8("DLG_ABOUT_SERVERID", pvar, "Server ID:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_CLIENTID", pvar, "Client ID:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), pvar->client_version_string, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_protocol_version_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEX", pvar, "Key exchange algorithm:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), get_kex_algorithm_name(pvar->kex_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_algorithm_name(pvar->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_MAC", pvar, "MAC algorithm:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_mac_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
@@ -1973,21 +1973,21 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			else {
 				UTIL_get_lang_msgU8("DLG_ABOUT_COMP", pvar, "Compression:");
 			}
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			SSH_get_compression_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEXKEY", pvar, "Key exchange keys:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH", pvar, "Authentication:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			AUTH_get_auth_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
@@ -1997,7 +1997,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 		// ホスト公開鍵のfingerprintを表示する。
 		// (2014.5.1 yutaka)
 		UTIL_get_lang_msgU8("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
-		strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+		strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 		strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 		switch (dgst_alg) {
@@ -2787,7 +2787,7 @@ static int get_keys_file_name(HWND parent, char *buf, int bufsize,
 		UTIL_get_lang_msg("MSG_OPEN_KNOWNHOSTS_RW_TITLE", pvar,
 		                  "Choose a read/write known-hosts file");
 	}
-	params.lpstrTitle = pvar->ts->UIMsg;
+	params.lpstrTitle = pvar->UIMsg;
 	params.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
 
@@ -3099,7 +3099,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		EC_KEY *pub = NULL;
 
 		UTIL_get_lang_msg("MSG_KEYGEN_GENERATING", pvar, "generating key");
-		SetDlgItemText(((cbarg_t *)cbarg)->dlg, IDC_KEYGEN_PROGRESS_LABEL, pvar->ts->UIMsg);
+		SetDlgItemText(((cbarg_t *)cbarg)->dlg, IDC_KEYGEN_PROGRESS_LABEL, pvar->UIMsg);
 
 		priv = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		pub = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
@@ -3121,7 +3121,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		public_key.ecdsa = pub;
 
 		UTIL_get_lang_msg("MSG_KEYGEN_GENERATED", pvar, "key generated");
-		SetDlgItemText(((cbarg_t *)cbarg)->dlg, IDC_KEYGEN_PROGRESS_LABEL, pvar->ts->UIMsg);
+		SetDlgItemText(((cbarg_t *)cbarg)->dlg, IDC_KEYGEN_PROGRESS_LABEL, pvar->UIMsg);
 
 		break;
 	}
@@ -3342,7 +3342,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 #endif
 			UTIL_get_lang_msg("DLG_SCP_SELECT_FILE_TITLE", pvar,
 			                  "Choose a sending file with SCP");
-			ofn.lpstrTitle = pvar->ts->UIMsg;
+			ofn.lpstrTitle = pvar->UIMsg;
 
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 			ofn.Flags |= OFN_FORCESHOWHIDDEN;
@@ -3518,7 +3518,7 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 	case 0:
 		if (count == 0) {
 			UTIL_get_lang_msg("MSG_KEYGEN_GENERATING", pvar, "generating key");
-			strncpy_s(msg, sizeof(msg), pvar->ts->UIMsg, _TRUNCATE);
+			strncpy_s(msg, sizeof(msg), pvar->UIMsg, _TRUNCATE);
 		}
 		if (cbarg->type == KEY_DSA && count %10 != 0) {
 			return;
@@ -3541,7 +3541,7 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 		}
 		else {
 			UTIL_get_lang_msg("MSG_KEYGEN_GENERATED", pvar, "key generated");
-			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%s", pvar->ts->UIMsg);
+			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%s", pvar->UIMsg);
 		}
 		break;
 	default:
@@ -4038,21 +4038,21 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			case KEY_RSA1:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER", pvar,
 				                  "SSH1 RSA key(identity.pub)\\0identity.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "identity.pub", _TRUNCATE);
 				break;
 			case KEY_RSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA_FILTER", pvar,
 				                  "SSH2 RSA key(id_rsa.pub)\\0id_rsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_rsa.pub", _TRUNCATE);
 				break;
 			case KEY_DSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_DSA_FILTER", pvar,
 				                  "SSH2 DSA key(id_dsa.pub)\\0id_dsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_dsa.pub", _TRUNCATE);
 				break;
@@ -4061,14 +4061,14 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			case KEY_ECDSA521:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER", pvar,
 				                  "SSH2 ECDSA key(id_ecdsa.pub)\\0id_ecdsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ecdsa.pub", _TRUNCATE);
 				break;
 			case KEY_ED25519:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER", pvar,
 				                  "SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ed25519.pub", _TRUNCATE);
 				break;
@@ -4080,7 +4080,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			ofn.nMaxFile = sizeof(filename);
 			UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_TITLE", pvar,
 			                  "Save public key as:");
-			ofn.lpstrTitle = pvar->ts->UIMsg;
+			ofn.lpstrTitle = pvar->UIMsg;
 			if (GetSaveFileName(&ofn) == 0) { // failure
 				ret = CommDlgExtendedError();
 				break;
@@ -4276,21 +4276,21 @@ public_error:
 			case KEY_RSA1:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER", pvar,
 				                  "SSH1 RSA key(identity)\\0identity\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "identity", _TRUNCATE);
 				break;
 			case KEY_RSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER", pvar,
 				                  "SSH2 RSA key(id_rsa)\\0id_rsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_rsa", _TRUNCATE);
 				break;
 			case KEY_DSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER", pvar,
 				                  "SSH2 DSA key(id_dsa)\\0id_dsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_dsa", _TRUNCATE);
 				break;
@@ -4299,14 +4299,14 @@ public_error:
 			case KEY_ECDSA521:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER", pvar,
 				                  "SSH2 ECDSA key(id_ecdsa)\\0id_ecdsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ecdsa", _TRUNCATE);
 				break;
 			case KEY_ED25519:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER", pvar,
 				                  "SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ed25519", _TRUNCATE);
 				break;
@@ -4318,7 +4318,7 @@ public_error:
 			ofn.nMaxFile = sizeof(filename);
 			UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_TITLE", pvar,
 			                  "Save private key as:");
-			ofn.lpstrTitle = pvar->ts->UIMsg;
+			ofn.lpstrTitle = pvar->UIMsg;
 			if (GetSaveFileName(&ofn) == 0) { // failure
 				ret = CommDlgExtendedError();
 				break;

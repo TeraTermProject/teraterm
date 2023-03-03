@@ -110,7 +110,7 @@ static int recv_line_data(PTInstVar pvar)
 		amount_read = (pvar->Precv) (pvar->socket, &buf[i], 1, 0);
 		if (amount_read != 1) {
 			return 0; // error
-		} 
+		}
 
 		pvar->pkt_state.datalen += amount_read;
 
@@ -217,13 +217,13 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				 * aadlen: Additional Authenticated Data Length
 				 *   MAC の対象となるデータと一緒に暗号化されない、"MAC の対象となるデータの長さ"のサイズ
 				 *   この部分は packet_length で、uint32 (4バイト)
-				 * 
+				 *
 				 * - 通常の MAC 方式 (E&M) ではパケット長部分が一緒に暗号化されるので aadlen は 0 となる。
 				 * - EtM 方式の MAC や AEAD の AES-GCM では、パケット長部分が暗号化されないので
 				 * aadlen は 4 となる。
 				 * - AEAD の chacha20-poly1305 ではパケット長部分が暗号化されるが、MAC の対象となるデータ
 				 * とは別に暗号化されるので aadlen は 4 となる。
-				 * 
+				 *
 				 */
 				if ((mac && mac->etm) || authlen > 0) {
 					aadlen = 4;
@@ -297,7 +297,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				// 実際には何らかの要因で復号失敗⇒パケット長部分が壊れている事が多い。
 				UTIL_get_lang_msg("MSG_PKT_OVERSIZED_ERROR", pvar,
 				                  "Oversized packet received from server; connection will close.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+				notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 			}
 			else {
 				int amount_read = recv_data(pvar, max(total_packet_size, READAMOUNT));

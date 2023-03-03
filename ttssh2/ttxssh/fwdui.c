@@ -62,10 +62,10 @@ static void make_X_forwarding_spec(FWDRequestSpec *spec, PTInstVar pvar)
 	                     &spec->to_port, &spec->x11_screen);
 	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSERVER", pvar, "remote X server");
 	strncpy_s(spec->from_port_name, sizeof(spec->from_port_name),
-	          pvar->ts->UIMsg, _TRUNCATE);
+	          pvar->UIMsg, _TRUNCATE);
 	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSCREEN", pvar, "X server (display %d:%d)");
 	_snprintf_s(spec->to_port_name, sizeof(spec->to_port_name), _TRUNCATE,
-	            pvar->ts->UIMsg, spec->to_port - 6000, spec->x11_screen);
+	            pvar->UIMsg, spec->to_port - 6000, spec->x11_screen);
 }
 
 static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
@@ -423,7 +423,7 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 		                 spec->to_port, spec->to_port_name);
 		UTIL_get_lang_msg("MSG_FWD_REMOTE", pvar,
 		                  "Remote \"%s\" port %s to local \"%s\" port %s");
-		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->UIMsg,
 		            spec->bind_address, verbose_from_port,
 		            spec->to_host, verbose_to_port);
 		break;
@@ -434,20 +434,20 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 		                 spec->to_port, spec->to_port_name);
 		UTIL_get_lang_msg("MSG_FWD_LOCAL", pvar,
 		                  "Local \"%s\" port %s to remote \"%s\" port %s");
-		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->UIMsg,
 		            spec->bind_address, verbose_from_port,
 		            spec->to_host, verbose_to_port);
 		break;
 	case FWD_REMOTE_X11_TO_LOCAL:
 		UTIL_get_lang_msg("MSG_FWD_X", pvar,
 		                  "Remote X applications to local X server");
-		strncpy_s(buf, bufsize, pvar->ts->UIMsg, _TRUNCATE);
+		strncpy_s(buf, bufsize, pvar->UIMsg, _TRUNCATE);
 		break;
 	case FWD_LOCAL_DYNAMIC:
 		set_verbose_port(verbose_from_port, sizeof(verbose_from_port),
 		                 spec->from_port, spec->from_port_name);
 		UTIL_get_lang_msg("MSG_FWD_DYNAMIC", pvar, "Local \"%s\" port %s to remote dynamic");
-		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
+		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->UIMsg,
 		            spec->bind_address, verbose_from_port);
 		break;
 	}
@@ -583,14 +583,14 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 				UTIL_get_lang_msg("MSG_SAME_SERVERPORT_ERROR", pvar,
 				                  "You cannot have two forwarding from the same server port (%d).");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-				            pvar->ts->UIMsg, specs[i].from_port);
+				            pvar->UIMsg, specs[i].from_port);
 				break;
 			case FWD_LOCAL_TO_REMOTE:
 			case FWD_LOCAL_DYNAMIC:
 				UTIL_get_lang_msg("MSG_SAME_LOCALPORT_ERROR", pvar,
 				                  "You cannot have two forwarding from the same local port (%d).");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-				            pvar->ts->UIMsg, specs[i].from_port);
+				            pvar->UIMsg, specs[i].from_port);
 				break;
 			}
 			notify_nonfatal_error(pvar, buf);
@@ -607,7 +607,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 	if (num_unspecified_forwardings > 0) {
 		UTIL_get_lang_msg("MSG_UNSPECIFIED_FWD_ERROR1", pvar,
 		                  "The following forwarding was not specified when this SSH session began:\n\n");
-		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
 
 		for (i = 0; i < num_specs; i++) {
 			if (!FWD_can_server_listen_for(pvar, specs + i)) {
@@ -623,7 +623,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 		UTIL_get_lang_msg("MSG_UNSPECIFIED_FWD_ERROR2", pvar,
 		                  "\nDue to a limitation of the SSH protocol, this forwarding will not work in the current SSH session.\n"
 		                  "If you save these settings and start a new SSH session, the forwarding should work.");
-		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
 
 		notify_nonfatal_error(pvar, buf);
 	}
@@ -909,7 +909,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 		                  "Port \"%s\" is not a valid port number.\n"
 		                  "Either choose a port name from the list, or enter a number between 1 and 65535.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg, new_spec.from_port_name);
+		            pvar->UIMsg, new_spec.from_port_name);
 		notify_nonfatal_error(pvar, buf);
 		return FALSE;
 	}
@@ -921,7 +921,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 			                  "Port \"%s\" is not a valid port number.\n"
 			                  "Either choose a port name from the list, or enter a number between 1 and 65535.");
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-			            pvar->ts->UIMsg, new_spec.to_port_name);
+			            pvar->UIMsg, new_spec.to_port_name);
 			notify_nonfatal_error(pvar, buf);
 			return FALSE;
 		}
@@ -999,7 +999,7 @@ static void add_forwarding_entry(PTInstVar pvar, HWND dlg)
 	if (result == -1) {
 		UTIL_get_lang_msg("MSG_CREATEWINDOW_FWDEDIT_ERROR", pvar,
 		                  "Unable to display forwarding edit dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 	} else if (result) {
 		int index = add_spec_to_listbox(dlg, &new_spec, pvar);
 
@@ -1030,7 +1030,7 @@ static void edit_forwarding_entry(PTInstVar pvar, HWND dlg)
 			if (result == -1) {
 				UTIL_get_lang_msg("MSG_CREATEWINDOW_FWDEDIT_ERROR", pvar,
 				                  "Unable to display forwarding edit dialog box.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				notify_nonfatal_error(pvar, pvar->UIMsg);
 			} else if (result) {
 				SendMessage(listbox, LB_DELETESTRING, cursel, 0);
 
@@ -1125,7 +1125,7 @@ void FWDUI_do_forwarding_dialog(PTInstVar pvar)
 		               fwd_dlg_proc, (LPARAM) pvar) == -1) {
 		UTIL_get_lang_msg("MSG_CREATEWINDOW_FWDSETUP_ERROR", pvar,
 		                  "Unable to display forwarding setup dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		notify_nonfatal_error(pvar, pvar->UIMsg);
 	}
 }
 

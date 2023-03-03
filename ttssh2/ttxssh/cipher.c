@@ -517,21 +517,21 @@ int cipher_init_SSH2(
 	*ccp = NULL;
 	if ((cc = calloc(sizeof(*cc), 1)) == NULL) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 1);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return SSH_ERR_ALLOC_FAIL;
 	}
 
 	if (keylen < cipher->key_len) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 2);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_INVALID_ARGUMENT;
 		goto out;
 	}
 	if (iv != NULL && ivlen < get_cipher_iv_len(cipher)) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 3);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_INVALID_ARGUMENT;
 		goto out;
@@ -543,7 +543,7 @@ int cipher_init_SSH2(
 		ret = cc->cp_ctx != NULL ? 0 : SSH_ERR_INVALID_ARGUMENT;
 		if (ret == SSH_ERR_INVALID_ARGUMENT) {
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 4);
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		goto out;
@@ -551,14 +551,14 @@ int cipher_init_SSH2(
 	type = (*cipher->func)();
 	if ((cc->evp = EVP_CIPHER_CTX_new()) == NULL) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 5);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
 	if (EVP_CipherInit(cc->evp, type, NULL, (u_char *)iv, (do_encrypt == CIPHER_ENCRYPT)) == 0) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 6);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
@@ -566,7 +566,7 @@ int cipher_init_SSH2(
 	if (get_cipher_auth_len(cipher) &&
 	    !EVP_CIPHER_CTX_ctrl(cc->evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 7);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
@@ -575,7 +575,7 @@ int cipher_init_SSH2(
 	if (klen > 0 && keylen != (u_int)klen) {
 		if (EVP_CIPHER_CTX_set_key_length(cc->evp, keylen) == 0) {
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 8);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 8);
 			notify_fatal_error(pvar, tmp, TRUE);
 			ret = SSH_ERR_LIBCRYPTO_ERROR;
 			goto out;
@@ -583,7 +583,7 @@ int cipher_init_SSH2(
 	}
 	if (EVP_CipherInit(cc->evp, NULL, (u_char *)key, NULL, -1) == 0) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 9);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 9);
 		notify_fatal_error(pvar, tmp, TRUE);
 		ret = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
@@ -595,7 +595,7 @@ int cipher_init_SSH2(
 		if (junk == NULL || discard == NULL ||
 		    EVP_Cipher(cc->evp, discard, junk, cipher->discard_len) == 0) {
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 10);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 10);
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {

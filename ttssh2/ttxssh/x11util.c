@@ -273,7 +273,7 @@ FwdFilterResult X11_unspoofing_filter(void *void_closure, FwdFilterEvent event, 
 			UTIL_get_lang_msg("MSG_X_AUTH_ERROR", closure->pvar,
 			                  "Remote X application sent incorrect authentication data.\n"
 			                  "Its X session is being cancelled.");
-			notify_nonfatal_error(closure->pvar, closure->pvar->ts->UIMsg);
+			notify_nonfatal_error(closure->pvar, closure->pvar->UIMsg);
 			*length = 0;
 			return FWD_FILTER_CLOSECHANNEL;
 		}

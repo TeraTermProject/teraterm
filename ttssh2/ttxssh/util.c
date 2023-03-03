@@ -320,7 +320,7 @@ void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def)
 	wchar_t *defW = ToWcharA(def);
 	wchar_t *strW;
 	GetI18nStrWW("TTSSH", key, defW, pvar->ts->UILanguageFileW, &strW);
-	WideCharToACP_t(strW, pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg));
+	WideCharToACP_t(strW, pvar->UIMsg, sizeof(pvar->UIMsg));
 	free(strW);
 	free(defW);
 }
@@ -330,7 +330,7 @@ void UTIL_get_lang_msgU8(const char *key, PTInstVar pvar, const char *def)
 	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
 	char *strU8;
 	GetI18nStrU8W("TTSSH", key, def, UILanguageFileW, &strU8);
-	strcpy_s(pvar->ts->UIMsg, MAX_UIMSG, strU8);
+	strcpy_s(pvar->UIMsg, MAX_UIMSG, strU8);
 	free(strU8);
 }
 

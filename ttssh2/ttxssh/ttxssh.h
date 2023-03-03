@@ -357,6 +357,7 @@ typedef struct _TInstVar {
 
 	char *server_sig_algs;
 
+	char UIMsg[MAX_UIMSG];
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data
