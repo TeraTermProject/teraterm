@@ -472,7 +472,7 @@ struct tttset {
 	eterm_lookfeel_t EtermLookfeel;
 	WORD UseNormalBGColor;
 	char UILanguageFile[MAX_PATH];			// ê‚ëŒÉpÉX
-	char UIMsg[MAX_UIMSG];
+	char reserve_UIMsg[1024/*MAX_UIMSG*/];
 	WORD BroadcastCommandHistory;
 	WORD AcceptBroadcast;		// 337: 2007/03/20
 	WORD DisableTCPEchoCR;  // TCPLocalEcho/TCPCRSend Çñ≥å¯Ç…Ç∑ÇÈ (maya 2007.4.25)
