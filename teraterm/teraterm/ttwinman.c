@@ -127,15 +127,17 @@ void ChangeTitle(void)
 
 	if ((ts.TitleFormat & 1)!=0)
 	{ // host name
-		wchar_t UIMsg[MAX_UIMSG];
+		wchar_t *UIMsg;
 		wcsncat_s(TempTitle,_countof(TempTitle), L" - ",_TRUNCATE);
 		if (Connecting) {
-			get_lang_msgW("DLG_MAIN_TITLE_CONNECTING", UIMsg, _countof(UIMsg), L"[connecting...]", ts.UILanguageFile);
+			GetI18nStrWW("Tera Term", "DLG_MAIN_TITLE_CONNECTING", L"[connecting...]", ts.UILanguageFileW, &UIMsg);
 			wcsncat_s(TempTitle,_countof(TempTitle), UIMsg,_TRUNCATE);
+			free(UIMsg);
 		}
 		else if (! cv.Ready) {
-			get_lang_msgW("DLG_MAIN_TITLE_DISCONNECTED", UIMsg, _countof(UIMsg), L"[disconnected]", ts.UILanguageFile);
+			GetI18nStrWW("Tera Term", "DLG_MAIN_TITLE_DISCONNECTED", L"[disconnected]", ts.UILanguageFileW, &UIMsg);
 			wcsncat_s(TempTitle,_countof(TempTitle), UIMsg,_TRUNCATE);
+			free(UIMsg);
 		}
 		else if (cv.PortType==IdSerial)
 		{

@@ -189,11 +189,12 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFileW);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
-		wchar_t uimsg[MAX_UIMSG];
+		wchar_t *uimsg;
 		WinMenu = CreatePopupMenu();
-		get_lang_msgW("TEKMENU_WINDOW", uimsg, _countof(uimsg), L"&Window", ts.UILanguageFile);
+		GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 		::InsertMenuW(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					  (UINT_PTR)WinMenu, uimsg);
+		free(uimsg);
 	}
 }
 
@@ -219,7 +220,7 @@ void CTEKWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if ( SubMenu == WinMenu ) {
-		SetWinMenu(WinMenu, ts.UIMsg, sizeof(ts.UIMsg), ts.UILanguageFile, 0);
+		SetWinMenuW(WinMenu, ts.UILanguageFileW, 0);
 	}
 }
 
@@ -591,12 +592,13 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	if ((MainMenu!=NULL) &&
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
-			wchar_t uimsg[MAX_UIMSG];
+			wchar_t *uimsg;
 			WinMenu = CreatePopupMenu();
-			get_lang_msgW("TEKMENU_WINDOW", uimsg, _countof(uimsg), L"&Window", ts.UILanguageFile);
+			GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 			::InsertMenuW(MainMenu,4,
 						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 						  (UINT_PTR)WinMenu, uimsg);
+			free(uimsg);
 		}
 		else {
 			RemoveMenu(MainMenu,4,MF_BYPOSITION);
@@ -608,11 +610,12 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 	::GetSystemMenu(tk.HWin,TRUE);
 	if ((! Show) && ((ts.MenuFlag & MF_NOSHOWMENU)==0)) {
-		wchar_t uimsg[MAX_UIMSG];
+		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(tk.HWin,FALSE);
 		AppendMenuW(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msgW("TEKMENU_SHOW_MENUBAR", uimsg, _countof(uimsg), L"Show menu &bar", ts.UILanguageFile);
+		GetI18nStrWW("Tera Term", "TEKMENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
 		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
+		free(uimsg);
 	}
 	return 0;
 }
@@ -643,11 +646,12 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 	if ((ts.HideTitle==0) && (MainMenu==NULL) &&
 	    ((ts.MenuFlag & MF_NOSHOWMENU) == 0)) {
-		wchar_t uimsg[MAX_UIMSG];
+		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(HTEKWin,FALSE);
 		AppendMenuW(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msgW("TEKMENU_SHOW_MENUBAR", uimsg, _countof(uimsg), L"Show menu &bar", ts.UILanguageFile);
+		GetI18nStrWW("Tera Term", "TEKMENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
 		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
+		free(uimsg);
 	}
 	return 0;
 }

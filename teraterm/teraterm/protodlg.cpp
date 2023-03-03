@@ -40,7 +40,7 @@
 
 BOOL CProtoDlg::Create(HINSTANCE hInstance, HWND hParent, const CProtoDlgInfo *info)
 {
-	UILanguageFile = info->UILanguageFile;
+	UILanguageFile = info->UILanguageFileW;
 	HMainWin = info->HMainWin;
 
 	BOOL Ok = TTCDialog::Create(hInstance, hParent, IDD_PROTDLG);
@@ -61,7 +61,7 @@ BOOL CProtoDlg::OnInitDialog()
 		{ IDC_PROT_ELAPSED, "DLG_PROT_ELAPSED" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 	return TRUE;
 }
 

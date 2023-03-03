@@ -342,17 +342,19 @@ BOOL CCtrlWindow::OnCancel()
 
 BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	wchar_t uimsg[MAX_UIMSG];
+	wchar_t *uimsg;
 
 	switch (LOWORD(wParam)) {
 	case IDC_CTRLPAUSESTART:
 		if (Pause) {
-			get_lang_msgW("BTN_PAUSE", uimsg, _countof(uimsg),  L"Pau&se", UILanguageFile);
+			GetI18nStrWW("Tera Term", "BTN_PAUSE", L"Pau&se", UILanguageFileW, &uimsg);
 			SetDlgItemTextW(IDC_CTRLPAUSESTART, uimsg);
+			free(uimsg);
 		}
 		else {
-			get_lang_msgW("BTN_START", uimsg, _countof(uimsg),  L"&Start", UILanguageFile);
+			GetI18nStrWW("Tera Term", "BTN_START", L"&Start", UILanguageFileW, &uimsg);
 			SetDlgItemTextW(IDC_CTRLPAUSESTART, uimsg);
+			free(uimsg);
 		}
 		Pause = ! Pause;
 		return TRUE;

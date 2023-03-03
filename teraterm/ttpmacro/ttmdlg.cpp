@@ -165,18 +165,17 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 
 BOOL GetFileName(HWND HWin)
 {
-	wchar_t FNFilter[31];
+	wchar_t *FNFilter;
+	wchar_t *title;
 	OPENFILENAMEW FNameRec;
-	wchar_t uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 
 	if (FileName[0]!=0) {
 		return FALSE;
 	}
 
-	memset(FNFilter, 0, sizeof(FNFilter));
 	memset(&FNameRec, 0, sizeof(OPENFILENAME));
-	get_lang_msgW("FILEDLG_OPEN_MACRO_FILTER", uimsg, sizeof(uimsg), L"Macro files (*.ttl)\\0*.ttl\\0\\0", UILanguageFile);
-	memcpy(FNFilter, uimsg, sizeof(FNFilter));
+	GetI18nStrWW("Tera Term", "FILEDLG_OPEN_MACRO_FILTER", L"Macro files (*.ttl)\\0*.ttl\\0\\0", UILanguageFileW, &FNFilter);
+	GetI18nStrWW("Tera Term", "FILEDLG_OPEN_MACRO_TITLE", L"MACRO: Open macro", UILanguageFileW, &title);
 
 	// sizeof(OPENFILENAME) Ç≈ÇÕ Windows98/NT Ç≈èIóπÇµÇƒÇµÇ‹Ç§ÇΩÇﬂ (2006.8.14 maya)
 	FNameRec.lStructSize = get_OPENFILENAME_SIZEW();
@@ -193,14 +192,15 @@ BOOL GetFileName(HWND HWin)
 #endif
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	FNameRec.lpstrDefExt = L"TTL";
-	get_lang_msgW("FILEDLG_OPEN_MACRO_TITLE", uimsg2, sizeof(uimsg2), L"MACRO: Open macro", UILanguageFile);
-	FNameRec.lpstrTitle = uimsg2;
+	FNameRec.lpstrTitle = title;
 	if (GetOpenFileNameW(&FNameRec)) {
 		wcsncpy_s(ShortName, _countof(ShortName), &(FileName[FNameRec.nFileOffset]), _TRUNCATE);
 	}
 	else {
 		FileName[0] = 0;
 	}
+	free(FNFilter);
+	free(title);
 
 	if (FileName[0]==0) {
 		ShortName[0] = 0;

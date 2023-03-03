@@ -153,12 +153,11 @@ static char GetWindowTypeChar(HWND Hw, HWND HWin)
 		return '+';
 }
 
-void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
+void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 {
 	int i;
 	char Temp[MAXPATHLEN];
 	HWND Hw;
-	wchar_t uimsg[MAX_UIMSG];
 
 	// delete all items in Window menu
 	i = GetMenuItemCount(menu);
@@ -171,7 +170,7 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 	i = 0;
 	while (i<pm->NWin) {
 		Hw = pm->WinList[i]; // get window handle
-		if ((GetClassName(Hw,Temp,sizeof(Temp))>0) &&
+		if ((GetClassNameA(Hw,Temp,sizeof(Temp))>0) &&
 		    ((strcmp(Temp,VTCLASSNAME)==0) ||
 		     (strcmp(Temp,TEKCLASSNAME)==0))) {
 			Temp[0] = '&';
@@ -179,8 +178,8 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 			Temp[2] = ' ';
 			Temp[3] = GetWindowTypeChar(Hw, NULL);
 			Temp[4] = ' ';
-			GetWindowText(Hw,&Temp[5],sizeof(Temp)-6);
-			AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_1+i,Temp);
+			GetWindowTextA(Hw,&Temp[5],sizeof(Temp)-6);
+			AppendMenuA(menu,MF_ENABLED | MF_STRING,ID_WINDOW_1+i,Temp);
 			i++;
 			if (i>8) {
 				i = pm->NWin;
@@ -200,30 +199,34 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 			{ ID_WINDOW_SIDEBYSIDE, "MENU_WINDOW_SIDEBYSIDE" },
 		};
 
-		AppendMenu(menu, MF_SEPARATOR, 0, NULL);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_WINDOW, "&Window");
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, "&Minimize All");
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, "&Restore All");
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, "&Cascade");
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, "&Stacked");
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, "Side &by Side");
+		AppendMenuA(menu, MF_SEPARATOR, 0, NULL);
+		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_WINDOW, "&Window");
+		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, "&Minimize All");
+		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, "&Restore All");
+		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, "&Cascade");
+		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, "&Stacked");
+		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, "Side &by Side");
 
-		SetI18nMenuStrs("Tera Term", menu, MenuTextInfo, _countof(MenuTextInfo), langFile);
+		SetI18nMenuStrsW(menu, "Tera Term", MenuTextInfo, _countof(MenuTextInfo), langFile);
 
 		if (pm->WinUndoFlag) {
+			wchar_t *uimsg;
 			if (pm->WinUndoStyle == WIN_CASCADE)
-				get_lang_msgW("MENU_WINDOW_CASCADE_UNDO", uimsg, _countof(uimsg), L"&Undo - Cascade", langFile);
+				GetI18nStrWW("Tera Term", "MENU_WINDOW_CASCADE_UNDO", L"&Undo - Cascade", langFile, &uimsg);
 			else if (pm->WinUndoStyle == WIN_STACKED)
-				get_lang_msgW("MENU_WINDOW_STACKED_UNDO", uimsg, _countof(uimsg), L"&Undo - Stacked", langFile);
+				GetI18nStrWW("Tera Term", "MENU_WINDOW_STACKED_UNDO", L"&Undo - Stacked", langFile, &uimsg);
 			else
-				get_lang_msgW("MENU_WINDOW_SIDEBYSIDE_UNDO", uimsg, _countof(uimsg), L"&Undo - Side by Side", langFile);
-			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);		// TODO UNICODE
+				GetI18nStrWW("Tera Term", "MENU_WINDOW_SIDEBYSIDE_UNDO", L"&Undo - Side by Side", langFile, &uimsg);
+			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);
+			free(uimsg);
 		}
 
 	}
 	else {
-		get_lang_msgW("MENU_WINDOW_WINDOW", uimsg, _countof(uimsg), L"&Window", langFile);
+		wchar_t *uimsg;
+		GetI18nStrWW("Tera Term", "MENU_WINDOW_WINDOW", L"&Window", langFile, &uimsg);
 		AppendMenuW(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
+		free(uimsg);
 	}
 }
 

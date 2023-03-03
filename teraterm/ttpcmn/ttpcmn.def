@@ -4,7 +4,7 @@ EXPORTS
   CheckCOMFlag @46
   RegWin @10
   UnregWin @11
-  SetWinMenu @12
+  SetWinMenuW
   SetWinList @13
   SelectWin @14
   SelectNextWin @15

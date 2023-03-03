@@ -193,14 +193,14 @@ static void FTSetTimeOut(PFileVarProto fv, int T)
 
 static void SetDialogCation(struct FileVarProto *fv, const char *key, const wchar_t *default_caption)
 {
-	const char *UILanguageFile = ts.UILanguageFile;
-	wchar_t uimsg[MAX_UIMSG];
-	wchar_t caption[MAX_UIMSG];
-	wcsncpy_s(caption, _countof(caption), L"Tera Term: ", _TRUNCATE);
-	get_lang_msgW(key, uimsg, _countof(uimsg), default_caption, UILanguageFile);
-	wcsncat_s(caption, _countof(caption), uimsg, _TRUNCATE);
+	const wchar_t *UILanguageFile = ts.UILanguageFileW;
+	wchar_t *uimsg;
+	wchar_t *caption;
+	GetI18nStrWW("Tera Term", key, default_caption, UILanguageFile, &uimsg);
+	aswprintf(&caption, L"Tera Term: %s", uimsg);
+	free(uimsg);
 	free((void *)fv->DlgCaption);
-	fv->DlgCaption = _wcsdup(caption);
+	fv->DlgCaption = caption;
 }
 
 static BOOL NewFileVar_(PFileVarProto *pfv)
@@ -338,7 +338,7 @@ static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WOR
 		return FALSE;
 	}
 	CProtoDlgInfo info;
-	info.UILanguageFile = ts.UILanguageFile;
+	info.UILanguageFileW = ts.UILanguageFileW;
 	info.HMainWin = fv->HMainWin;
 	pd->Create(hInst, HVTWin, &info);
 	fv->HWin = pd->m_hWnd;
@@ -429,19 +429,19 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDC_XOPT1K, "DLG_XOPT_1K" },
 		{ IDC_XOPTBIN, "DLG_XOPT_BINARY" },
 	};
-	LPOPENFILENAMEW ofn;
 	WORD Hi, Lo;
 	LPLONG pl;
 	LPOFNOTIFY notify;
-	LOGFONT logfont;
-	HFONT font;
-	const char *UILanguageFile = ts.UILanguageFile;
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 	static HFONT DlgXoptFont;
 
 	switch (Message) {
-	case WM_INITDIALOG:
-		ofn = (LPOPENFILENAMEW)lParam;
+	case WM_INITDIALOG: {
+		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
+		LOGFONTA logfont;
+		HFONT font;
+		const char *UILanguageFile = ts.UILanguageFile;
+
 		pl = (LPLONG)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
 
@@ -484,6 +484,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		}
 		CenterCommonDialog(Dialog);
 		return TRUE;
+	}
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -856,8 +857,6 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 	};
 	LPWORD pw;
 	LPOFNOTIFY notify;
-	LOGFONT logfont;
-	HFONT font;
 	static HFONT DlgFoptFont;
 
 	switch (Message) {
@@ -865,6 +864,8 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 		const char *UILanguageFile = ts.UILanguageFile;
 		const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
+		HFONT font;
+		LOGFONTA logfont;
 		pw = (LPWORD)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
 

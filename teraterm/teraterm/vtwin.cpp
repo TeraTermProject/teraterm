@@ -796,13 +796,13 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFileW);
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
-		wchar_t uimsg[MAX_UIMSG];
+		wchar_t *uimsg;
 		WinMenu = CreatePopupMenu();
-		get_lang_msgW("MENU_WINDOW", uimsg, _countof(uimsg),
-					  L"&Window", ts.UILanguageFile);
+		GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 		InsertMenuW(hMenu, ID_HELPMENU,
 					MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					(UINT_PTR)WinMenu, uimsg);
+		free(uimsg);
 	}
 
 	TTXModifyMenu(hMenu); /* TTPLUG */
@@ -985,7 +985,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	}
 	else if (SubMenu == WinMenu)
 	{
-		SetWinMenu(WinMenu, ts.UIMsg, sizeof(ts.UIMsg), ts.UILanguageFile, 1);
+		SetWinMenuW(WinMenu, ts.UILanguageFileW, 1);
 	}
 
 	TTXModifyPopupMenu(SubMenu); /* TTPLUG */
@@ -3197,12 +3197,13 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	if ((MainMenu!=NULL) &&
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
+			wchar_t *uimsg;
 			WinMenu = CreatePopupMenu();
-			get_lang_msg("MENU_WINDOW", ts.UIMsg, sizeof(ts.UIMsg),
-			             "&Window", ts.UILanguageFile);
-			::InsertMenu(MainMenu,ID_HELPMENU,
-			             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			             (UINT_PTR)WinMenu, ts.UIMsg);
+			GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
+			::InsertMenuW(MainMenu,ID_HELPMENU,
+						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+						  (UINT_PTR)WinMenu, uimsg);
+			free(uimsg);
 		}
 		else {
 			RemoveMenu(MainMenu,ID_HELPMENU,MF_BYPOSITION);
@@ -3214,11 +3215,12 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 	::GetSystemMenu(HVTWin,TRUE);
 	if ((! Show) && ((ts.MenuFlag & MF_NOSHOWMENU)==0)) {
+		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(HVTWin,FALSE);
-		AppendMenu(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msg("MENU_SHOW_MENUBAR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Show menu &bar", ts.UILanguageFile);
-		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, ts.UIMsg);
+		AppendMenuA(SysMenu, MF_SEPARATOR, 0, NULL);
+		GetI18nStrWW("Tera Term", "MENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
+		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
+		free(uimsg);
 	}
 	return 0;
 }
@@ -3272,11 +3274,12 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 	if ((ts.HideTitle==0) && (MainMenu==NULL) &&
 	    ((ts.MenuFlag & MF_NOSHOWMENU) == 0)) {
+		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(HVTWin,FALSE);
-		AppendMenu(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msg("MENU_SHOW_MENUBAR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Show menu &bar", ts.UILanguageFile);
-		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, ts.UIMsg);
+		AppendMenuA(SysMenu, MF_SEPARATOR, 0, NULL);
+		GetI18nStrWW("Tera Term", "MENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
+		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
+		free(uimsg);
 	}
 	return 0;
 }
@@ -4309,10 +4312,13 @@ void CVTWindow::OnSetupFont()
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if (Message == WM_INITDIALOG) {
-		wchar_t uimsg[MAX_UIMSG];
-		get_lang_msgW("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
-					  L"\"Font style\" selection here won't affect actual font appearance.", ts.UILanguageFile);
+		wchar_t *uimsg;
+		GetI18nStrWW("Tera Term",
+					 "DLG_CHOOSEFONT_STC6",
+					 L"\"Font style\" selection here won't affect actual font appearance.",
+					 ts.UILanguageFileW, &uimsg);
 		SetDlgItemTextW(Dialog, stc6, uimsg);
+		free(uimsg);
 
 		SetFocus(GetDlgItem(Dialog,cmb1));
 

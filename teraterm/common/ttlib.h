@@ -109,7 +109,9 @@ void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
 						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
 wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguageFileRel);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
+// __declspec(deprecated("Replace GetI18nStrWW()"))
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+// __declspec(deprecated("Replace GetI18nStrWW()"))
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 int get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 #if defined(_MSC_VER)

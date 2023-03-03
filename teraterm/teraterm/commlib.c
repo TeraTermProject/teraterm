@@ -677,7 +677,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 {
 	wchar_t ErrMsgW[31];
 	char Temp[20];
-	wchar_t UIMsgW[MAX_UIMSG];
+	wchar_t *UIMsgW;
 
 	if (! cv->Open ) {
 		return;
@@ -695,20 +695,25 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 		case IdTCPIP:
 			switch (HIWORD(lParam)) {
 				case WSAECONNREFUSED:
-					get_lang_msgW("MSG_COMM_REFUSE_ERROR", UIMsgW, _countof(UIMsgW), L"Connection refused", ts->UILanguageFile);
+					GetI18nStrWW("Tera Term", "MSG_COMM_REFUSE_ERROR", L"Connection refused", ts->UILanguageFileW, &UIMsgW);
 					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
+					free(UIMsgW);
 					break;
 				case WSAENETUNREACH:
-					get_lang_msgW("MSG_COMM_REACH_ERROR", UIMsgW, _countof(UIMsgW), L"Network cannot be reached", ts->UILanguageFile);
+					GetI18nStrWW("Tera Term", "MSG_COMM_REACH_ERROR", L"Network cannot be reached", ts->UILanguageFileW, &UIMsgW);
 					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
+					free(UIMsgW);
 					break;
 				case WSAETIMEDOUT:
-					get_lang_msgW("MSG_COMM_CONNECT_ERROR", UIMsgW, _countof(UIMsgW), L"Connection timed out", ts->UILanguageFile);
+					GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
 					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
+					free(UIMsgW);
 					break;
 				default:
-					get_lang_msgW("MSG_COMM_TIMEOUT_ERROR", UIMsgW, _countof(UIMsgW), L"Cannot connect the host", ts->UILanguageFile);
+					GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
 					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
+					free(UIMsgW);
+					break;
 			}
 			if (HIWORD(lParam)>0) {
 				/* connect() failed */

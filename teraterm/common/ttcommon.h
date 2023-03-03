@@ -44,7 +44,7 @@ DllExport int PASCAL CheckCOMFlag(int com);
 
 DllExport int PASCAL RegWin(HWND HWinVT, HWND HWinTEK);
 DllExport void PASCAL UnregWin(HWND HWin);
-DllExport void PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag);
+DllExport void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag);
 DllExport void PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
 DllExport void PASCAL SelectWin(int WinId);
 DllExport void PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);

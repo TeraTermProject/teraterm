@@ -33,7 +33,7 @@
 // CProtoDlg dialog
 
 typedef struct {
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFileW;
 	HWND HMainWin;
 } CProtoDlgInfo;
 
@@ -49,7 +49,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PostNcDestroy();
 private:
-	const char *UILanguageFile;
+	const wchar_t *UILanguageFile;
 	HWND HMainWin;
 };
 
