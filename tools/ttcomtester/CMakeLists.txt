@@ -6,8 +6,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 add_executable(
   ${PACKAGE_NAME}
-  ../libs/getopt_mb_uni_src/getopt.c
-  ../libs/getopt_mb_uni_src/getopt.h
   buildcommdcbw.cpp
   buildcommdcbw.h
   device_com.cpp
@@ -15,17 +13,34 @@ add_executable(
   main.cpp
 )
 
+if(0)
+  target_sources(${PACKAGE_NAME}
+    PRIVATE
+    ../libs/getopt_mb_uni_src/getopt.c
+    ../libs/getopt_mb_uni_src/getopt.h
+  )
+  target_include_directories(${PACKAGE_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
+  )
+endif()
+if(1)
+  target_sources(${PACKAGE_NAME}
+    PRIVATE
+    ../libs/getoptW/getoptW.c
+    ../libs/getoptW/getoptW.h
+  )
+  target_include_directories(${PACKAGE_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getoptW
+  )
+endif()
+
 target_compile_options(
   ${PACKAGE_NAME}
   PRIVATE
   /W4
 )
-
-target_include_directories(
-  ${PACKAGE_NAME}
-  PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
-  )
 
 target_compile_options(
   ${PACKAGE_NAME}

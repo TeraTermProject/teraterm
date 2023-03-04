@@ -38,7 +38,7 @@
 #include <map>
 #include <assert.h>
 
-#include "getopt.h"
+#include "getoptW.h"
 #include "buildcommdcbw.h"
 #include "deviceope.h"
 
@@ -695,7 +695,8 @@ int wmain(int argc, wchar_t *argv[])
 		}
 	}
 
-	static const struct option_w long_options[] = {
+	//static const struct option_w long_options[] = {
+	static const struct option long_options[] = {
 		{L"help", no_argument, NULL, L'h'},
 		{L"verbose", no_argument, NULL, L'v'},
 		{L"device", required_argument, NULL, L'd'},
@@ -706,7 +707,8 @@ int wmain(int argc, wchar_t *argv[])
 
 	opterr = 0;
     for(;;) {
-		int c = getopt_long_w(argc, argv, L"vhd:o:t:", long_options, NULL);
+		//int c = getopt_long_w(argc, argv, L"vhd:o:t:", long_options, NULL);
+		int c = getoptW_long(argc, argv, L"vhd:o:t:", long_options, NULL);
         if(c == -1) break;
 
         switch (c)
@@ -720,20 +722,20 @@ int wmain(int argc, wchar_t *argv[])
 			verbose = true;
 			break;
 		case L'd': {
-			device_name = optarg_w;
+			device_name = optarg;
 			break;
 		}
 		case L'o': {
-			if (optarg_w != NULL) {
+			if (optarg != NULL) {
 				std::wstring key;
 				std::wstring param;
-				const wchar_t *p = wcschr(optarg_w, L'=');
+				const wchar_t *p = wcschr(optarg, L'=');
 				if (p == NULL) {
-					key = std::wstring(optarg_w);
+					key = std::wstring(optarg);
 					param.clear();
 				} else {
-					size_t key_size = p - optarg_w;
-					key = std::wstring(optarg_w, key_size);
+					size_t key_size = p - optarg;
+					key = std::wstring(optarg, key_size);
 					param = std::wstring(p+1);
 				}
 				options[key] = param;
@@ -741,7 +743,7 @@ int wmain(int argc, wchar_t *argv[])
 			break;
 		}
 		case L't':
-			test_name = optarg_w;
+			test_name = optarg;
 			break;
 		default:
 			usage();
