@@ -63,6 +63,8 @@ extern char __declspec(dllimport) *__progname;
 # define PROGNAME  *argv
 #endif
 
+#define __inline__ inline
+
 /* Initialise the public variables. */
 
 int optind = 1;				/* index for first non-option arg     */
@@ -522,7 +524,8 @@ int getoptW_parse( int mode, getoptW_std_args, ... )
         /*
          * we use `this_arg' to store these temporarily.
          */
-        WCHAR *this_arg[optspan];
+        //WCHAR *this_arg[optspan];
+        WCHAR **this_arg = malloc(sizeof(WCHAR *) * optspan);
         /*
          * we cannot manipulate `argv' directly, since the `getoptW'
          * API prototypes it as `read-only'; this cast to `arglist'
@@ -552,6 +555,8 @@ int getoptW_parse( int mode, getoptW_std_args, ... )
         /* adjust `optbase', to account for the relocated option.
          */
         optbase += optspan;
+
+        free(this_arg);
     }
 
     else
