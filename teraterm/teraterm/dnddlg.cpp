@@ -37,6 +37,8 @@
 #include "i18n.h"
 #include "ttlib.h"
 #include "dlglib.h"
+#include "asprintf.h"
+#include "win32helper.h"
 
 struct DrapDropDlgParam {
 	const wchar_t *TargetFilename;
@@ -134,11 +136,13 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		}
 
 		// Do this for the next %d files
-		char orgmsg[MAX_UIMSG];
-		GetDlgItemTextA(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
-		char uimsg[MAX_UIMSG];
-		_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, orgmsg, Param->RemaingFileCount - 1);
-		SetDlgItemTextA(hDlgWnd, IDC_SAME_PROCESS_CHECK, uimsg);
+		wchar_t *format;
+		hGetDlgItemTextW(hDlgWnd, IDC_SAME_PROCESS_CHECK, &format);
+		wchar_t *formated;
+		aswprintf(&formated, format, Param->RemaingFileCount - 1);
+		SetDlgItemTextW(hDlgWnd, IDC_SAME_PROCESS_CHECK, formated);
+		free(format);
+		free(formated);
 		if (Param->RemaingFileCount < 2) {
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SAME_PROCESS_CHECK), FALSE);
 		}
