@@ -240,9 +240,10 @@ void SetI18nMenuStrsW(HMENU hMenu, const char *section, const DlgTextInfo *infos
 		else {
 			if (nIDDlgItem < id_position_threshold) {
 				// 一度ModifyMenu()しておかないとメニューの位置がずれる
-				wchar_t s[MAX_UIMSG];
-				GetMenuStringW(hMenu, nIDDlgItem, s, _countof(s), MF_BYPOSITION);
+				wchar_t *s;
+				hGetMenuStringW(hMenu, nIDDlgItem, MF_BYPOSITION, &s);
 				ModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, s);
+				free(s);
 			}
 		}
 		free(uimsg);

@@ -309,3 +309,17 @@ finish:
 	}
 	return r;
 }
+
+DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text)
+{
+	size_t len = (size_t)GetMenuStringW(hMenu, uIDItem, NULL, 0, flags);
+	len++;
+	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * len);
+	if (dest == NULL) {
+		*text = NULL;
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	GetMenuStringW(hMenu, uIDItem, dest, (int)len, flags);
+	*text = dest;
+	return NO_ERROR;
+}

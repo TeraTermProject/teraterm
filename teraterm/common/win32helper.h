@@ -48,6 +48,7 @@ DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text);
 DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded);
 LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
 						  LPDWORD lpcbData);
+DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text);
 
 #ifdef __cplusplus
 }
