@@ -76,6 +76,7 @@ typedef struct {
   LONGLONG FileSize;
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
+	const wchar_t *UILanguageFileW;
 } TKmtVar;
 typedef TKmtVar far *PKmtVar;
 
@@ -140,8 +141,6 @@ typedef TKmtVar far *PKmtVar;
 #define HEADNUM 3
 /* MARK [LEN+SEQ+TYPE+LENX1+LENX2+HCHECK] DATA CHECK */
 #define LONGPKT_HEADNUM 6
-
-static const char *UILanguageFile;
 
 static BYTE KmtNum(BYTE b);
 
@@ -1059,10 +1058,12 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	{
 		if (! fv->NoMsg)
 		{
-			char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-			get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
-			get_lang_msg("MSG_CANTOPEN_FILE_ERROR", uimsg, sizeof(uimsg), "Cannot open file", UILanguageFile);
-			MessageBox(fv->HWin,uimsg,uimsg,MB_ICONEXCLAMATION);
+			static const TTMessageBoxInfoW info = {
+				"Tera Term",
+				"MSG_TT_ERROR", L"Tera Term: Error",
+				"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file",
+				MB_ICONEXCLAMATION };
+			TTMessageBoxW(fv->HWin, &info, kv->UILanguageFileW);
 		}
 		return FALSE;
 	}
@@ -1186,6 +1187,7 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	fv->FileOpen = FALSE;
 
+	kv->UILanguageFileW = ts->UILanguageFileW;
 	kv->KmtState = Unknown;
 
 	/* default my parameters */
@@ -1364,7 +1366,7 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 				} else if (kv->PktInLen >= 3) {  /* Normal Packet */
 					kv->PktInCount = kv->PktInLen + 2;
 					// OutputDebugPrintf("Normal Packet: %d bytes\n", kv->PktInCount);
-					
+
 					// "Initialize でリモートが送ってきた MAXL" + 2 (MARK, LEN)
 					// を超えるサイズのパケットをリモートが送ろうとしてきた
 					if (kv->PktInCount > kv->KmtMy.MAXL + 2) {
