@@ -2318,19 +2318,44 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 }
 #endif
 
+// static text のサイズを変更
+static void FitControlSize(HWND Dlg, UINT id)
+{
+	HDC hdc;
+	RECT r;
+	DWORD dwExt;
+	WORD w, h;
+	HWND hwnd;
+	POINT point;
+	wchar_t *text;
+	size_t text_len;
+
+	hwnd = GetDlgItem(Dlg, id);
+	hdc = GetDC(hwnd);
+	SelectObject(hdc, (HFONT)SendMessage(Dlg, WM_GETFONT, 0, 0));
+	hGetDlgItemTextW(Dlg, id, &text);
+	text_len = wcslen(text);
+	dwExt = GetTabbedTextExtentW(hdc, text, (int)text_len, 0, NULL);
+	free(text);
+	w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
+	h = HIWORD(dwExt);
+	GetWindowRect(hwnd, &r);
+	point.x = r.left;
+	point.y = r.top;
+	ScreenToClient(Dlg, &point);
+	MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
+}
+
 static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_ABOUT_TITLE" },
 	};
 	char buf[128], tmpbuf[128];
+#if 0
 	HDC hdc;
 	HWND hwnd;
-	RECT r;
-	DWORD dwExt;
-	WORD w, h;
-	POINT point;
-	char uimsg[MAX_UIMSG];
+#endif
 	static HICON dlghicon = NULL;
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
@@ -2430,19 +2455,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				free(info);
 			}
 
-			// static text のサイズを変更 (2007.4.16 maya)
-			hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
-			hdc = GetDC(hwnd);
-			SelectObject(hdc, (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0));
-			GetDlgItemTextA(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
-			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
-			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
-			h = HIWORD(dwExt);
-			GetWindowRect(hwnd, &r);
-			point.x = r.left;
-			point.y = r.top;
-			ScreenToClient(Dialog, &point);
-			MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
+			FitControlSize(Dialog, IDC_AUTHOR_URL);
 
 			// static textをサブクラス化する。ただし、tabstop, notifyプロパティを有効にしておかないと
 			// メッセージが拾えない。(2005.4.5 yutaka)
