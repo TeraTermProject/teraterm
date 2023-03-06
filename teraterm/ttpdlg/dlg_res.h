@@ -124,8 +124,6 @@
 #define IDC_LOCALE_BOX                  1022
 #define IDC_TT_VERSION                  1027
 #define IDC_AUTHOR_URL                  1028
-#define IDC_FORUM_LABEL                 1029
-#define IDC_FORUM_URL                   1030
 #define IDC_ONIGURUMA_LABEL             1031
 #define IDC_IPV6_LABEL                  1032
 #define IDC_PROJECT_LABEL               1033

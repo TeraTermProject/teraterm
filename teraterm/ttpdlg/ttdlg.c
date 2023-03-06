@@ -1971,7 +1971,7 @@ typedef struct {
 	int timer_done;
 } url_subclass_t;
 
-static url_subclass_t author_url_class, forum_url_class;
+static url_subclass_t author_url_class;
 
 // static textに割り当てるプロシージャ
 static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
@@ -2036,7 +2036,7 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 
 	case WM_TIMER:
 		// URLの上にマウスカーソルがあるなら、システムカーソルを変更する。
-		if (author_url_class.mouseover || forum_url_class.mouseover) {
+		if (author_url_class.mouseover) {
 			HCURSOR hc;
 			//SetCapture(hWnd);
 
@@ -2444,23 +2444,9 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			ScreenToClient(Dialog, &point);
 			MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
 
-			hwnd = GetDlgItem(Dialog, IDC_FORUM_URL);
-			hdc = GetDC(hwnd);
-			SelectObject(hdc, (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0));
-			GetDlgItemTextA(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
-			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
-			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
-			h = HIWORD(dwExt);
-			GetWindowRect(hwnd, &r);
-			point.x = r.left;
-			point.y = r.top;
-			ScreenToClient(Dialog, &point);
-			MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
-
 			// static textをサブクラス化する。ただし、tabstop, notifyプロパティを有効にしておかないと
 			// メッセージが拾えない。(2005.4.5 yutaka)
 			do_subclass_window(GetDlgItem(Dialog, IDC_AUTHOR_URL), &author_url_class);
-			do_subclass_window(GetDlgItem(Dialog, IDC_FORUM_URL), &forum_url_class);
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 			/*
