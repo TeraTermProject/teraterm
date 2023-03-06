@@ -55,25 +55,25 @@ typedef struct {
 #define	KMT_PKTQUE		4
 
 typedef struct {
-  BYTE PktIn[KMT_PKTMAX], PktOut[KMT_PKTMAX];
-  int PktInPtr;
-  int PktInLen, PktInCount;
-  int PktNum, PktNumOffset;
-  int PktReadMode;
-  int KmtMode, KmtState;
-  BOOL Quote8, RepeatFlag;
-  char ByteStr[6];
-  BOOL NextByteFlag;
-  int RepeatCount;
-  BYTE NextSeq;
-  BYTE NextByte;
-  KermitParam KmtMy, KmtYour;
-  int PktOutCount, PktInLongPacketLen;
-  int FileAttrFlag;
-  BOOL FileType;
-  time_t FileTime;
-  int FileMode;
-  LONGLONG FileSize;
+	BYTE PktIn[KMT_PKTMAX], PktOut[KMT_PKTMAX];
+	int PktInPtr;
+	int PktInLen, PktInCount;
+	int PktNum, PktNumOffset;
+	int PktReadMode;
+	int KmtMode, KmtState;
+	BOOL Quote8, RepeatFlag;
+	char ByteStr[6];
+	BOOL NextByteFlag;
+	int RepeatCount;
+	BYTE NextSeq;
+	BYTE NextByte;
+	KermitParam KmtMy, KmtYour;
+	int PktOutCount, PktInLongPacketLen;
+	int FileAttrFlag;
+	BOOL FileType;
+	time_t FileTime;
+	int FileMode;
+	LONGLONG FileSize;
 	TProtoLog *log;
 	const char *FullName;		// Windowsè„ÇÃÉtÉ@ÉCÉãñº UTF-8
 	const wchar_t *UILanguageFileW;
