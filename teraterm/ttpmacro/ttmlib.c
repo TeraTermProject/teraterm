@@ -274,11 +274,12 @@ void BringupWindow(HWND hWnd)
 	}
 }
 
-int MessageBoxHaltScript(HWND hWnd)//, const char *UILanguageFile)
+int MessageBoxHaltScript(HWND hWnd)
 {
-	char uimsg[MAX_UIMSG];
-	char uimsg2[MAX_UIMSG];
-	get_lang_msg("MSG_MACRO_CONF", uimsg, sizeof(uimsg), "MACRO: confirmation", UILanguageFile);
-	get_lang_msg("MSG_MACRO_HALT_SCRIPT", uimsg2, sizeof(uimsg2), "Are you sure that you want to halt this macro script?", UILanguageFile);
-	return MessageBox(hWnd, uimsg2, uimsg, MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
+	static const TTMessageBoxInfoW info = {
+		"Tera Term",
+		"MSG_MACRO_CONF", L"MACRO: confirmation",
+		"MSG_MACRO_HALT_SCRIPT", L"Are you sure that you want to halt this macro script?",
+		MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2 };
+	return TTMessageBoxW(hWnd, &info, UILanguageFileW);
 }
