@@ -6,7 +6,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\libs\getopt_mb_uni_src\getopt.h">
+    <ClInclude Include="..\libs\getoptW\getoptW.h">
       <Filter>getopt</Filter>
     </ClInclude>
     <ClInclude Include="deviceope.h" />
@@ -14,6 +14,6 @@
   <ItemGroup>
     <ClCompile Include="device_com.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\libs\getopt_mb_uni_src\getopt.c" />
+    <ClCompile Include="..\libs\getoptW\getoptW.c" />
   </ItemGroup>
 </Project>
