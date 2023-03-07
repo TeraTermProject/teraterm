@@ -80,7 +80,7 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\teraterm\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>common_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;common_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -115,15 +115,17 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\teraterm\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>common_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;common_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\libs\getoptW\getoptW.c" />
+    <ClCompile Include="buildcommdcbw.cpp" />
     <ClCompile Include="device_com.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libs\getoptW\buildcommdcbw.h" />
     <ClInclude Include="..\libs\getoptW\getoptW.h" />
     <ClInclude Include="deviceope.h" />
   </ItemGroup>

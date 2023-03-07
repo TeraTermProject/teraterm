@@ -12,8 +12,11 @@
     <ClInclude Include="deviceope.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="buildcommdcbw.cpp" />
     <ClCompile Include="device_com.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\libs\getoptW\getoptW.c" />
+    <ClCompile Include="..\libs\getoptW\getoptW.c">
+      <Filter>getopt</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
