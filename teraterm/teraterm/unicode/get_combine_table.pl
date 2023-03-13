@@ -29,9 +29,24 @@ while($a = <$IN>) {
 		}
 		elsif ($general_category eq "Mn" ||
 			   $general_category eq "Mc" ||
-			   $general_category eq "Me" ||
-			   $general_category eq "Sk") {  # Sk = Modifier_Symbol
+			   $general_category eq "Me") {
 			$combine = 1;
+		}
+		elsif ($general_category eq "Sk") {
+			# Sk = Modifier_Symbol
+			# 例外処理
+			if ($name =~ /FULLWIDTH/ || $name =~ /KATAKANA-HIRAGANA/) {
+				# 次の5文字を例外として扱う
+				# 309B;KATAKANA-HIRAGANA VOICED SOUND MARK;Sk;0;ON;<compat> 0020 3099;;;;N;;;;;
+				# 309C;KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK;Sk;0;ON;<compat> 0020 309A;;;;N;;;;;
+				# FF3E;FULLWIDTH CIRCUMFLEX ACCENT;Sk;0;ON;<wide> 005E;;;;N;FULLWIDTH SPACING CIRCUMFLEX;;;;
+				# FF40;FULLWIDTH GRAVE ACCENT;Sk;0;ON;<wide> 0060;;;;N;FULLWIDTH SPACING GRAVE;;;;
+				# FFE3;FULLWIDTH MACRON;Sk;0;ON;<wide> 00AF;;;;N;FULLWIDTH SPACING MACRON;;;;
+				$combine = 0;
+			}
+			else {
+				$combine = 1;
+			}
 		}
 
 		my $output = 0;
