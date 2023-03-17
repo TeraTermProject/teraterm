@@ -1477,51 +1477,6 @@ static void DrawTextBGImage(HDC hdc, int X, int Y, int width, int height, COLORR
 	DeleteObject(hbr);
 }
 
-static void BGFillRectAttr(HDC hdc, const RECT *R, HBRUSH brush, const TCharAttr *attr)
-{
-	vtdisp_work_t* w = &vtdisp_work;
-	if (!BGEnable)
-		FillRect(hdc, R, brush);
-	else {
-		int y;
-		int sy;
-		int ey;
-		int left;
-		int width;
-		COLORREF fore;
-		COLORREF back;
-		BYTE alpha = 0;
-		GetDrawAttr(attr, FALSE, &fore, &back, &alpha);
-		sy = R->top / FontHeight;
-		ey = R->bottom / FontHeight;
-		left = R->left;
-		width = R->right - R->left;
-		for (y = sy; y < ey; y++) {
-			int top = y * FontHeight;
-
-			// ”wŒi‰æ‘œ‚ð•`‰æ
-			DrawTextBGImage(hdcBGBuffer, left, top, width, FontHeight, back, alpha);
-
-			// •¶Žš”wŒi‚ðWindow‚É“\‚è•t‚¯
-			BitBlt(hdc, left, top, width, FontHeight, hdcBGBuffer, 0, 0, SRCCOPY);
-		}
-	}
-
-	if (w->debug_drawbox_fillrect) {
-		DrawBox(hdc, R->left, R->top, R->right - R->left, R->bottom - R->top, RGB(0xff, 0, 0));
-	}
-}
-
-#if 0
-static void BGFillRect(HDC hdc, RECT *R, HBRUSH brush)
-{
-	if (!BGEnable)
-		FillRect(hdc, R, brush);
-	else
-		BitBlt(hdc, R->left, R->top, R->right - R->left, R->bottom - R->top, hdcBG, R->left, R->top, SRCCOPY);
-}
-#endif
-
 static void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
 {
 	RECT r;
@@ -2891,60 +2846,6 @@ void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int*
 {
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
 	DrawStrW(VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
-}
-
-void DispEraseCurToEnd(int YEnd, const TCharAttr *attr)
-{
-	RECT R;
-
-	if (VTDC == NULL)
-		DispInitDC();
-	R.left = 0;
-	R.right = ScreenWidth;
-	R.top = (CursorY + 1 - WinOrgY) * FontHeight;
-	R.bottom = (YEnd + 1 - WinOrgY) * FontHeight;
-
-	BGFillRectAttr(VTDC, &R, Background, attr);
-
-	R.left = (CursorX - WinOrgX) * FontWidth;
-	R.bottom = R.top;
-	R.top = R.bottom - FontHeight;
-
-	BGFillRectAttr(VTDC, &R, Background, attr);
-}
-
-void DispEraseHomeToCur(int YHome, const TCharAttr *attr)
-{
-	RECT R;
-
-	if (VTDC == NULL)
-		DispInitDC();
-	R.left = 0;
-	R.right = ScreenWidth;
-	R.top = (YHome - WinOrgY) * FontHeight;
-	R.bottom = (CursorY - WinOrgY) * FontHeight;
-
-	BGFillRectAttr(VTDC, &R, Background, attr);
-
-	R.top = R.bottom;
-	R.bottom = R.top + FontHeight;
-	R.right = (CursorX + 1 - WinOrgX) * FontWidth;
-
-	BGFillRectAttr(VTDC, &R, Background, attr);
-}
-
-void DispEraseCharsInLine(int XStart, int Count, const TCharAttr *attr)
-{
-	RECT R;
-
-	if (VTDC == NULL)
-		DispInitDC();
-	R.top = (CursorY - WinOrgY) * FontHeight;
-	R.bottom = R.top + FontHeight;
-	R.left = (XStart - WinOrgX) * FontWidth;
-	R.right = R.left + Count * FontWidth;
-
-	BGFillRectAttr(VTDC, &R, Background, attr);
 }
 
 BOOL DispDeleteLines(int Count, int YEnd)

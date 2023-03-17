@@ -91,7 +91,8 @@ typedef struct {
 int StatusLine;	//0: none 1: shown
 /* top, bottom, left & right margin */
 int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
-BOOL Selected, Selecting;
+static BOOL Selected;		// TRUE=óÃàÊëIëÇ™çsÇÌÇÍÇƒÇ¢ÇÈ
+static BOOL Selecting;
 BOOL Wrap;
 
 static WORD TabStops[256];
@@ -901,8 +902,10 @@ void BuffInsertSpace(int Count)
 	BuffUpdateRect(sx, CursorY, CursorRightM + extr, CursorY);
 }
 
+/**
+ *	Erase characters from cursor to the end of screen
+ */
 void BuffEraseCurToEnd(void)
-// Erase characters from cursor to the end of screen
 {
 	LONG TmpPtr;
 	int offset;
@@ -923,12 +926,18 @@ void BuffEraseCurToEnd(void)
 		offset = 0;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
+
 	/* update window */
-	DispEraseCurToEnd(YEnd, &CurCharAttr);
+	BuffDrawLineI(-1, -1, CursorY + PageStart, CursorX, NumOfColumns);
+	for (i = CursorY + 1; i <= YEnd; i++) {
+		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+	}
 }
 
+/**
+ * Erase characters from home to cursor
+ */
 void BuffEraseHomeToCur(void)
-// Erase characters from home to cursor
 {
 	LONG TmpPtr;
 	int offset;
@@ -955,7 +964,10 @@ void BuffEraseHomeToCur(void)
 	}
 
 	/* update window */
-	DispEraseHomeToCur(YHome, &CurCharAttr);
+	for (i = YHome; i < CursorY; i++) {
+		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+	}
+	BuffDrawLineI(-1, -1, CursorY + PageStart, 0, CursorX-1);
 }
 
 void BuffInsertLines(int Count, int YEnd)
@@ -994,10 +1006,12 @@ void BuffInsertLines(int Count, int YEnd)
 	}
 }
 
+/**
+ *	erase characters in the current line
+ *	@param	start position of erasing
+ *	@param Count: number of characters to be erased
+ */
 void BuffEraseCharsInLine(int XStart, int Count)
-// erase characters in the current line
-//  XStart: start position of erasing
-//  Count: number of characters to be erased
 {
 	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
 	BOOL LineContinued=FALSE;
@@ -1023,7 +1037,7 @@ void BuffEraseCharsInLine(int XStart, int Count)
 		}
 	}
 
-	DispEraseCharsInLine(XStart, Count, &CurCharAttr);
+	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, XStart + Count);
 }
 
 void BuffDeleteLines(int Count, int YEnd)
@@ -1118,8 +1132,10 @@ void BuffDeleteChars(int Count)
 	BuffUpdateRect(CursorX, CursorY, CursorRightM + extr, CursorY);
 }
 
-// Erase characters in current line from cursor
-//   Count: number of characters to be deleted
+/**
+ * Erase characters in current line from cursor
+ *	@param Count	number of characters to be deleted
+ */
 void BuffEraseChars(int Count)
 {
 	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
@@ -1161,7 +1177,7 @@ void BuffEraseChars(int Count)
 	memsetW(&(CodeLineW[CursorX]), 0x20, CurCharAttr.Fore, CurCharAttr.Back, AttrDefault, CurCharAttr.Attr2 & Attr2ColorMask, Count);
 
 	/* update window */
-	DispEraseCharsInLine(sx, Count + extr, &CurCharAttr);
+	BuffDrawLineI(-1, -1, CursorY + PageStart, sx, sx + Count + extr);
 }
 
 void BuffFillWithE(void)
@@ -5815,4 +5831,9 @@ void BuffSetDispCodePage(int code_page)
 int BuffGetDispCodePage(void)
 {
 	return CodePage;
+}
+
+BOOL BuffIsSelected(void)
+{
+	return Selected;
 }

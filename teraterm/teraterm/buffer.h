@@ -154,10 +154,10 @@ BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32);
 void BuffSetDispAPI(BOOL unicode);
 void BuffSetDispCodePage(int CodePage);
 int BuffGetDispCodePage(void);
+BOOL BuffIsSelected(void);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
-extern BOOL Selected;
 extern BOOL Wrap;
 
 #define isCursorOnStatusLine (StatusLine && CursorY == NumOfLines-1)
