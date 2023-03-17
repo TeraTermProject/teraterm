@@ -121,7 +121,6 @@ endif()
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
-  iphlpapi
   ws2_32
   comctl32
   gdi32

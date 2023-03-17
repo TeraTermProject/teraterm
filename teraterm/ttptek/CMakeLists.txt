@@ -69,8 +69,6 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  #
-  iphlpapi
   gdi32
   )
 
