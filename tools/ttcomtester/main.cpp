@@ -215,7 +215,7 @@ static void SendReceive(device_t *dev)
 				}
 				case 's': {
 					size_t send_len = 32*1024;
-					printf("send big data %ul bytes\n", (unsigned long)send_len);
+					printf("send big data %lu bytes\n", (unsigned long)send_len);
 					unsigned char *send_data = (unsigned char* )malloc(send_len);
 					for(size_t i = 0; i < send_len; i++) {
 						send_data[i] = (unsigned char)i;
@@ -223,7 +223,7 @@ static void SendReceive(device_t *dev)
 					size_t sent_len;
 					DWORD e = ope->write(dev, send_data, send_len, &sent_len);
 					if (e == ERROR_SUCCESS) {
-						printf("sent %ul bytes\n", (unsigned long)sent_len);
+						printf("sent %lu bytes\n", (unsigned long)sent_len);
 					}
 					else if (e == ERROR_IO_PENDING) {
 						printf("send pending..\n");
@@ -367,20 +367,20 @@ static void SendReceive(device_t *dev)
 						size_t sent_len;
 						DWORD e = ope->write(dev, send_text, 1, &sent_len);
 						if (e == ERROR_SUCCESS) {
-							printf("send %02x, sent %ul byte %s\n", c, (unsigned long)sent_len,
+							printf("send %02x, sent %lu byte %s\n", c, (unsigned long)sent_len,
 								   sent_len != 0 ? "" : "(flow control or send buffer full)");
 						}
 						else if (e == ERROR_IO_PENDING) {
-							printf("send %02x, sent %ul byte pending\n", c, (unsigned long)sent_len);
+							printf("send %02x, sent %lu byte pending\n", c, (unsigned long)sent_len);
 							for(;;) {
 								e = ope->wait_write(dev, &sent_len);
 								if (e == ERROR_IO_PENDING) {
 									if (sent_len != 0) {
-										printf("send size %ul (pending)\n", (unsigned long)sent_len);
+										printf("send size %lu (pending)\n", (unsigned long)sent_len);
 									}
 								}
 								else if (e == ERROR_SUCCESS) {
-									printf("send size %ul (finish)\n", (unsigned long)sent_len);
+									printf("send size %lu (finish)\n", (unsigned long)sent_len);
 									break;
 								}
 								else {
@@ -415,11 +415,11 @@ static void SendReceive(device_t *dev)
 							send_text[0] = (char)c;
 							DWORD e = ope->write(dev, send_text, 1, &sent_len);
 							if (e == ERROR_SUCCESS) {
-								printf("send %02x, sent %ul byte %s\n", c, (unsigned long)sent_len,
+								printf("send %02x, sent %lu byte %s\n", c, (unsigned long)sent_len,
 									   sent_len != 0 ? "" : "(flow control or send buffer full)");
 							}
 							else if (e == ERROR_IO_PENDING) {
-								printf("send %02x, sent %ul byte pending\n", c, (unsigned long)sent_len);
+								printf("send %02x, sent %lu byte pending\n", c, (unsigned long)sent_len);
 								write_pending = true;
 							} else if (e == ERROR_INSUFFICIENT_BUFFER) {
 								printf("send buffer full\n");
@@ -447,11 +447,11 @@ static void SendReceive(device_t *dev)
 				if (e == ERROR_IO_PENDING) {
 					// Ç‹Çæë“ÇøèÛë‘
 					if (sent_len != 0) {
-						printf("send size %ul (pending)\n", (unsigned long)sent_len);
+						printf("send size %lu (pending)\n", (unsigned long)sent_len);
 					}
 				}
 				else if (e == ERROR_SUCCESS) {
-					printf("send size %ul (finish)\n", (unsigned long)sent_len);
+					printf("send size %lu (finish)\n", (unsigned long)sent_len);
 					write_pending = false;
 				} else {
 					DispErrorStr(L"write() error", e);
