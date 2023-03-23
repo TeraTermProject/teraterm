@@ -459,37 +459,53 @@ static char *alloc_control_text(HWND ctl)
 
 static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar)
 {
-	OPENFILENAME params;
-	char fullname_buf[2048] = "identity";
-	char filter[MAX_UIMSG];
+	static const wchar_t *fullname_def = L"identity";
+	static const wchar_t *filter_def =
+		L"identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\\0"
+		L"identity(RSA1)\\0identity\\0"
+		L"id_rsa(SSH2)\\0id_rsa\\0"
+		L"id_dsa(SSH2)\\0id_dsa\\0"
+		L"id_ecdsa(SSH2)\\0id_ecdsa\\0"
+		L"id_ed25519(SSH2)\\0id_ed25519\\0"
+		L"PuTTY(*.ppk)\\0*.ppk\\0"
+		L"PEM files(*.pem)\\0*.pem\\0"
+		L"all(*.*)\\0*.*\\0"
+		L"\\0";
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+	TTOPENFILENAMEW params;
+	wchar_t *filter;
+	wchar_t *title;
+	wchar_t *fullnameW;
+	BOOL r;
 
 	ZeroMemory(&params, sizeof(params));
-	params.lStructSize = get_OPENFILENAME_SIZE();
 	params.hwndOwner = parent;
-	// フィルタの追加 (2004.12.19 yutaka)
-	// 3ファイルフィルタの追加 (2005.4.26 yutaka)
-	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
-	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0id_ed25519(SSH2)\\0id_ed25519\\0PuTTY(*.ppk)\\0*.ppk\\0PEM files(*.pem)\\0*.pem\\0all(*.*)\\0*.*\\0\\0");
-	memcpy(filter, pvar->UIMsg, sizeof(filter));
+	GetI18nStrWW("TTSSH", "FILEDLG_OPEN_PRIVATEKEY_FILTER", filter_def,
+				 UILanguageFileW, &filter);
 	params.lpstrFilter = filter;
-	params.lpstrCustomFilter = NULL;
 	params.nFilterIndex = 0;
-	buf[0] = 0;
-	params.lpstrFile = fullname_buf;
-	params.nMaxFile = sizeof(fullname_buf);
-	params.lpstrFileTitle = NULL;
+	params.lpstrFile = fullname_def;
 	params.lpstrInitialDir = NULL;
-	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_TITLE", pvar,
-	                  "Choose a file with the RSA/DSA/ECDSA/ED25519 private key");
-	params.lpstrTitle = pvar->UIMsg;
+	GetI18nStrWW("TTSSH", "FILEDLG_OPEN_PRIVATEKEY_TITLE",
+				 L"Choose a file with the RSA/DSA/ECDSA/ED25519 private key",
+				 UILanguageFileW, &title);
+	params.lpstrTitle = title;
 	params.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
 
-	if (GetOpenFileName(&params) != 0) {
-		copy_teraterm_dir_relative_path(buf, bufsize, fullname_buf);
-		return 1;
-	} else {
+	r = TTGetOpenFileNameW(&params, &fullnameW);
+	free(filter);
+	free(title);
+	if (r == FALSE) {
+		buf[0] = 0;
 		return 0;
+	}
+	else {
+		char *fullnameA = ToCharW(fullnameW);
+		copy_teraterm_dir_relative_path(buf, bufsize, fullnameA);
+		free(fullnameA);
+		free(fullnameW);
+		return 1;
 	}
 }
 
