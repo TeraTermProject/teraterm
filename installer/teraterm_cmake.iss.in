@@ -1,5 +1,5 @@
-﻿#define AppName "Tera Term"
-#define AppVer "5.0-alpha1"
+﻿
+#define AppName "Tera Term"
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
@@ -32,13 +32,9 @@ AppPublisherURL=https://ttssh2.osdn.jp/
 AppSupportURL=https://ttssh2.osdn.jp/
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
-#ifdef SETUP_RELEASE
 AppVersion=@VERSION@
-#else
-AppVersion=@VERSION@+ snapshot-r@SVNVERSION@-@DATE@
-#endif
 LicenseFile=@PROJECT_SOURCE_DIR@/installer\release\license.txt
-DefaultDirName={pf}\teraterm5
+DefaultDirName={commonpf}\teraterm5
 DefaultGroupName={#AppName} 5
 ShowLanguageDialog=yes
 AllowNoIcons=true
@@ -69,7 +65,7 @@ Source: @CMAKE_INSTALL_PREFIX@/ttermpro.exe; DestDir: {app}; Components: TeraTer
 Source: @CMAKE_INSTALL_PREFIX@/ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\TERATERM.INI; DestDir: {app}; Components: TeraTerm
-Source: @PROJECT_SOURCE_DIR@/installer\release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
+Source: @PROJECT_SOURCE_DIR@/installer\release\TSPECIAL1.TTF; DestDir: {commonfonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
 ;Source: release\TSPECIAL1.TTF; DestDir: {app}; Components: TeraTerm
 Source: @CMAKE_INSTALL_PREFIX@/teraterm.chm; DestDir: {app}; Components: TeraTerm
 Source: @CMAKE_INSTALL_PREFIX@/teratermj.chm; DestDir: {app}; Components: TeraTerm
@@ -110,14 +106,10 @@ Source: @CMAKE_INSTALL_PREFIX@\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf
 Source: @CMAKE_INSTALL_PREFIX@\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: @CMAKE_INSTALL_PREFIX@/ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
-#ifexist "@CMAKE_INSTALL_PREFIX@/cygterm.exe"
-Source: @CMAKE_INSTALL_PREFIX@/cygterm+-i686\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
-#endif
 Source: @CMAKE_INSTALL_PREFIX@/cygterm.cfg; DestDir: {app}; Components: cygterm
 ;Source: @CMAKE_INSTALL_PREFIX@/cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: @CMAKE_INSTALL_PREFIX@/cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: @CMAKE_INSTALL_PREFIX@/cygterm+-x86_64\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/cyglaunch.exe; DestDir: {app}; Components: cygterm
-Source: @CMAKE_INSTALL_PREFIX@/cygtool.dll; Components: cygterm; Flags: dontcopy
 Source: @CMAKE_INSTALL_PREFIX@/ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: @CMAKE_INSTALL_PREFIX@/TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -147,7 +139,7 @@ Name: custom; Description: {cm:type_custom}; Flags: iscustom
 [Components]
 Name: TeraTerm; Description: Tera Term & Macro; Flags: fixed; Types: custom compact full standard
 Name: TTSSH; Description: TTSSH; Types: compact full standard
-Name: cygterm; Description: CygTerm+; Types: full standard; Check: not isIA64
+Name: cygterm; Description: CygTerm+; Types: full standard; Check: isExecutableCygtermX64
 Name: TeraTerm_Menu; Description: TeraTerm Menu; Types: full
 Name: TTProxy; Description: TTProxy; Types: full standard
 Name: Additional_Plugins; Description: {cm:comp_TTX}
@@ -167,76 +159,52 @@ Name: {group}\{cm:UninstallProgram,{#AppName}}; Filename: {uninstallexe}; Compon
 Name: {group}\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
 Name: {group}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; IconIndex: 0; Components: TeraTerm_Menu; Flags: createonlyiffileexists
 Name: {userdesktop}\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: quicklaunchicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userstartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
 [Registry]
 ; Cygterm Here
-Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%L\"""""; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
-Root: HKCR; Subkey: Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
-Root: HKCR; Subkey: Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%L\"""""; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%L\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
 ; Cygterm Here from folder Background
-; MinVersion 5.00.0000 = not Win9x, 6.0.6000 = Vista or later
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
-Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
-Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
 ; Associate with .TTL
-Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,0; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCR; Subkey: .ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCR; Subkey: TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCR; Subkey: TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,0; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
-Root: HKCR; Subkey: TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
+Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
+Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
+Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,3; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
+Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
 ; Associate with telnet://
-Root: HKCU; Subkey: Software\Classes\telnet\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Check: isWin2kOrLater; Components: TeraTerm; Tasks: telnetassoc
-Root: HKCU; Subkey: Software\Classes\telnet\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh %1"; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: telnetassoc
-Root: HKCR; Subkey: telnet\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: telnetassoc
-Root: HKCR; Subkey: telnet\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh %1"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TeraTerm; Tasks: telnetassoc
+Root: HKCU; Subkey: Software\Classes\telnet\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Components: TeraTerm; Tasks: telnetassoc
+Root: HKCU; Subkey: Software\Classes\telnet\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh %1"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: telnetassoc
 ; Associate with ssh://
-Root: HKCU; Subkey: Software\Classes\ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
 ; Associate with slogin://
-Root: HKCU; Subkey: Software\Classes\slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
 ; Associate with .TTY
-Root: HKCU; Subkey: Software\Classes\.tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCR; Subkey: .tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCR; Subkey: TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCR; Subkey: TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\.tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
-Name: quicklaunchicon; Description: {cm:task_quicklaunchicon}; Components: TeraTerm
 ; Tera Term 4 のを上書きしないよう、テスト版の間は TeraTerm Menu のデフォルトを off にする
 ; Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
 Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu; Flags: unchecked
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
-Name: quickcyglaunch; Description: {cm:task_quickcyglaunch}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
 Name: telnetassoc; Description: {cm:task_telnetassoc}; Components: TeraTerm; Flags: unchecked
 Name: sshassoc; Description: {cm:task_sshassoc}; Components: TTSSH; Flags: unchecked
@@ -248,19 +216,15 @@ Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; D
 
 [CustomMessages]
 en.task_desktopicon=Create Tera Term shortcut to &Desktop
-en.task_quicklaunchicon=Create Tera Term shortcut to &Quick Launch
 en.task_startupttmenuicon=Create TeraTerm &Menu shortcut to Startup
 en.task_cygtermhere=Add "Cy&gterm Here" to Context menu
-en.task_quickcyglaunch=Create cyg&launch shortcut to Quick Launch
 en.task_macroassoc=Associate .&ttl file to ttpmacro.exe
 en.task_telnetassoc=Associate t&elnet protocol to ttermpro.exe
 en.task_sshassoc=Associate &ssh protocol to ttermpro.exe
 en.task_ttyplayassoc=Associate .tty file to tterm&pro.exe
 ja.task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
-ja.task_quicklaunchicon=クイック起動に Tera Term のショートカットを作る(&Q)
 ja.task_startupttmenuicon=スタートアップに TeraTerm &Menu のショートカットを作る
 ja.task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
-ja.task_quickcyglaunch=クイック起動に cyg&launch のショートカットを作る
 ja.task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
 ja.task_telnetassoc=t&elnet プロトコルを ttermpro.exe に関連付ける
 ja.task_sshassoc=&ssh プロトコルを ttermpro.exe に関連付ける
@@ -335,52 +299,44 @@ const
 procedure SHChangeNotify(wEventId, uFlags, dwItem1, dwItem2: Integer);
 external 'SHChangeNotify@shell32.dll stdcall';
 
-function FindCygwinPath(CygwinDirectory: String; CygwinDir: String; Dirlen: Cardinal): Integer;
-external 'FindCygwinPath@files:cygtool.dll stdcall setuponly';
-
-function PortableExecutableMachine(CygwinDir: String): Integer;
-external 'PortableExecutableMachine@files:cygtool.dll stdcall setuponly';
-
 var
   UILangFilePage: TInputOptionWizardPage;
 
 
-// It is different from x64
-function isIA64 : Boolean;
-begin
-  if ProcessorArchitecture = paIA64 then
-    Result := True
-  else
-    Result := False;
-end;
-
-// Windows 2000 or later
-function isWin2kOrLater : Boolean;
+// Windows 11 or later
+function isWin11OrLater : Boolean;
 var
   Version: TWindowsVersion;
 begin;
   GetWindowsVersionEx(Version);
-  if Version.Major >= 5 then
+  if (Version.Major >= 10) and (Version.Build >= 22000) then
     Result := True
   else
     Result := False;
 end;
 
-// Window 9x or NT 4.0 or (Admins or PowerUsers)
+// Cygterm x86_64 is executable
+function isExecutableCygtermX64 : Boolean;
+begin
+  if ProcessorArchitecture = paX64 then
+    Result := True
+  else if ProcessorArchitecture = paARM64 then
+    // x86_64 binary is executable on ARM64 by WoW64
+    if isWin11OrLater then
+      Result := True
+    else
+      Result := False
+  else
+    Result := False;
+end;
+
+// Admins or PowerUsers
 function isAbleToInstallFont : Boolean;
 begin;
-  if not UsingWinNT() then begin
+  if IsAdmin() then begin
     Result := True;
   end else begin
-    if isWin2kOrLater() then begin
-      if IsAdminLoggedOn() or IsPowerUserLoggedOn() then begin
-        Result := True;
-      end else begin
-        Result := False
-      end;
-    end else begin
-      Result := True;
-    end;
+    Result := False
   end;
 end;
 
@@ -587,7 +543,7 @@ begin
   end;
 
   if TCPPort = 0 then begin
-    if IsComponentSelected('TTSSH') then
+    if WizardIsComponentSelected('TTSSH') then
       SetIniInt('Tera Term', 'TCPPort', 22, iniFile)
     else
       SetIniInt('Tera Term', 'TCPPort', 23, iniFile);
@@ -598,10 +554,14 @@ begin
     SetIniString('Tera Term', 'ViewlogEditor', ViewlogEditor, iniFile);
   end;
 
-  if IsComponentSelected('TTSSH') then
+  if WizardIsComponentSelected('TTSSH') then
     begin
+      // これまでの TERATERM.INI のデフォルト値と同じ値なら、最新のデフォルト値で上書きする
+      // 新しく追加した方式が disable line より後ろに行ってしまう現象への対処
       CipherOrder := GetIniString('TTSSH', 'CipherOrder', '', iniFile);
-      if (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;A@?EB3062') = 0) or
+      if (CompareStr(CipherOrder, 'MLK>H:J=G9I<F8C7D;EB30A@?62') = 0) or
+         (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;EB30A@?62') = 0) or
+         (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;A@?EB3062') = 0) or
          (CompareStr(CipherOrder, '>:=9<8C7D;A@?EB3062') = 0) or
          (CompareStr(CipherOrder, '>:=9<87;A@?B3026') = 0) or
          (CompareStr(CipherOrder, '>:=9<87;A@?3026') = 0) or
@@ -610,7 +570,7 @@ begin
          (CompareStr(CipherOrder, '87;9:<=>3026') = 0) or
          (CompareStr(CipherOrder, '87;9:3026') = 0) or
          (CompareStr(CipherOrder, '873026') = 0) then
-        SetIniString('TTSSH', 'CipherOrder', 'K>H:J=G9I<F8C7D;EB30A@?62', iniFile)
+        SetIniString('TTSSH', 'CipherOrder', 'MKN>H:J=G9LI<F8C7D;EB30A@?62', iniFile)
     end;
 
 end;
@@ -663,46 +623,12 @@ end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
-  uninstaller  : String;
-  uninstaller2 : String;
-  ResultCode   : Integer;
   iniFile      : String;
   ErrMsg       : String;
 begin
   Result := True;
 
   case CurPageID of
-
-    wpWelcome:
-      begin
-
-        if RegQueryStringValue(HKEY_LOCAL_MACHINE,
-                               'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\UTF-8 TeraTerm Pro with TTSSH2_is1',
-                               'UninstallString', uninstaller) then
-        begin
-          // UTF-8 TeraTerm Pro with TTSSH2 のアンインストーラ文字列を発見した
-          if not RegKeyExists(HKEY_LOCAL_MACHINE,
-                              'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Tera Term_is1') then
-          begin
-            // Tera Term のインストールエントリが見つからない(共存していない)
-            if MsgBox(CustomMessage('msg_uninstall_confirm'), mbInformation, MB_YESNO) = IDYES then
-            begin
-              // ユーザがアンインストールを選択した
-
-              // 両端の " を削る
-              uninstaller2 := Copy(uninstaller, 2, Length(uninstaller) - 2);
-
-              if not Exec(uninstaller2, '', '', SW_SHOW,
-                          ewWaitUntilTerminated, ResultCode) then
-              begin
-                // 実行に失敗
-                MsgBox(SysErrorMessage(ResultCode), mbError, MB_OK);
-              end;
-            end;
-          end;
-        end;
-
-      end;
 
     wpSelectDir:
       begin
@@ -750,12 +676,6 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   iniFile : String;
-  CygDir  : String;
-  CygPath : String;
-  CygDll  : String;
-  Cygterm : String;
-  Res     : Integer;
-  Machine : Integer;
 begin
   case CurStep of
     ssPostInstall:
@@ -763,54 +683,37 @@ begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
 
-        if IsComponentSelected('cygterm') then
-        begin;
-            Cygterm := ExpandConstant('{app}') + '\cygterm.exe';
-            if not FileExists(Cygterm) then
-            begin;
-                CygDir := GetIniString('Tera Term', 'CygwinDirectory', 'C:\cygwin', iniFile);
-                SetLength(CygPath, 256);
-                Res := FindCygwinPath(CygDir, CygPath, 256);
-                If Res = 1 then
-                begin;
-                    CygDll := Copy(CygPath, 1, Pos(#0, CygPath) - 1) + '\bin\cygwin1.dll';
-                    Machine := PortableExecutableMachine(CygDll);
-                    if Machine = IMAGE_FILE_MACHINE_AMD64 then
-                        FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, True)
-                    else
-                        FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, True);
-                end;
-            end else begin
-                Machine := PortableExecutableMachine(Cygterm);
-                if Machine = IMAGE_FILE_MACHINE_AMD64 then
-                    FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, False)
-                else
-                    FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, False);
-            end;
-        end;
-
-        if not IsTaskSelected('cygtermhere') then
+        if not WizardIsTaskSelected('cygtermhere') then
         begin;
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Folder\shell\cygterm');
-          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'Folder\shell\cygterm');
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Directory\Background\shell\cygterm');
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\LibraryFolder\Background\shell\cygterm');
         end;
 
-        if not IsTaskSelected('macroassoc') then
+        if not WizardIsTaskSelected('macroassoc') then
         begin;
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.ttl');
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TeraTerm.MacroFile');
-          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, '.ttl');
-          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'TeraTerm.MacroFile');
         end;
 
-        if not IsTaskSelected('telnetassoc') then
+        if not WizardIsTaskSelected('telnetassoc') then
         begin;
+          // デフォルトで telnet プロトコルに関連付けがある Windows バージョンがあるため、Tera Term への関連付けだけを削除する
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
           RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
-          RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'telnet\shell\Open with Tera Term');
-          RegDeleteValue(HKEY_CLASSES_ROOT, 'telnet\shell', '');
+        end;
+
+        if not WizardIsTaskSelected('sshassoc') then
+        begin;
+          // デフォルトの関連付けがないので、プロトコルごと削除
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\ssh');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\slogin');
+        end;
+
+        if not WizardIsTaskSelected('ttyplayassoc') then
+        begin;
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
         end;
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
@@ -883,7 +786,7 @@ end;
 
 [InstallDelete]
 ; インストーラに含めたことがあり、のちに含めなくなったファイルを指定する。
-; 上書きインストールしたあとアンインストールしたときに削除されないため。
+; 新しいインストーラで上書きインストールしたあとのアンインストーラでは削除されないため。
 Name: {app}\OpenSSH-LICENCE.txt; Type: files
 Name: {app}\cygterm-README.txt; Type: files
 Name: {app}\cygterm-README-j.txt; Type: files
