@@ -419,6 +419,22 @@ static void CenterCommonDialog(HWND hDlg)
 	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
 }
 
+static int get_lang_font(const wchar_t *key, HWND dlg, HFONT *font, const wchar_t *iniFile)
+{
+	*font = NULL;
+	int dpi = GetMonitorDpiFromWindow(dlg);
+	LOGFONTW logfont;
+	if (GetI18nLogfontW(L"Tera Term", key, &logfont, dpi, iniFile) == FALSE) {
+		return FALSE;
+	}
+
+	if ((*font = CreateFontIndirectW(&logfont)) == NULL) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 /* Hook function for XMODEM file name dialog box */
 static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -438,16 +454,11 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	switch (Message) {
 	case WM_INITDIALOG: {
 		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
-		LOGFONTA logfont;
-		HFONT font;
-		const char *UILanguageFile = ts.UILanguageFile;
 
 		pl = (LPLONG)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
 
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgXoptFont, UILanguageFile)) {
+		if (get_lang_font(L"DLG_TAHOMA_FONT", Dialog, &DlgXoptFont, UILanguageFileW)) {
 			SendDlgItemMessage(Dialog, IDC_XOPT, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_XOPTCHECK, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_XOPTCRC, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
@@ -861,17 +872,12 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 
 	switch (Message) {
 	case WM_INITDIALOG: {
-		const char *UILanguageFile = ts.UILanguageFile;
 		const wchar_t *UILanguageFileW = ts.UILanguageFileW;
 		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
-		HFONT font;
-		LOGFONTA logfont;
 		pw = (LPWORD)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
 
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgFoptFont, UILanguageFile)) {
+		if (get_lang_font(L"DLG_TAHOMA_FONT", Dialog, &DlgFoptFont, UILanguageFileW)) {
 			SendDlgItemMessage(Dialog, IDC_FOPT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_FOPTBIN, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_FOPTAPPEND, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));

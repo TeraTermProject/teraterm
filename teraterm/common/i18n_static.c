@@ -258,6 +258,21 @@ void SetI18nMenuStrsA(HMENU hMenu, const char *section, const DlgTextInfo *infos
 	free(UILanguageFileW);
 }
 
+/**
+ *	フォント(LOGFONTW)を取得する
+ *
+ *	@param[in]	section			UILanguageFile のセクション名
+ *	@param[in]	key				キー
+ *	@param[out]	logfont			font
+ *	@param[in]	ppi				Pixel Per Inch(=Dot Per Inch)
+ *	@param[in]	iniFile			lng file
+ *	@retval		TRUE			フォントを取得した,logfontが設定される
+ *	@retval		FALSE			フォントを取得できなかった
+ *
+ *	TODO
+ *		- 戻り値を BOOL に変更
+ *		- logfont(戻り値) を引数の一番最後に変更
+ */
 int GetI18nLogfontW(const wchar_t *section, const wchar_t *key, PLOGFONTW logfont, int ppi, const wchar_t *iniFile)
 {
 	wchar_t *tmp;
@@ -291,42 +306,32 @@ int GetI18nLogfontW(const wchar_t *section, const wchar_t *key, PLOGFONTW logfon
 	return TRUE;
 }
 
+static void LOGFONTWA(const LOGFONTW *logfontW, LOGFONTA *logfontA)
+{
+	// メンバが全く同じ部分(lfFaceName以外)は単純にコピーする
+	size_t copy_size = sizeof(*logfontA) - sizeof(logfontA->lfFaceName);
+	memcpy(logfontA, logfontW, copy_size);
+
+	// face name Unicode -> ANSI
+	WideCharToACP_t(logfontW->lfFaceName, logfontA->lfFaceName,
+					_countof(logfontA->lfFaceName));
+}
+
 int GetI18nLogfontAW(const char *section, const char *key, PLOGFONTA logfont, int ppi, const wchar_t *iniFile)
 {
-	wchar_t sectionW[64];
-	wchar_t keyW[128];
-	wchar_t tmpW[MAX_UIMSG];
-	char *tmp;
-	char font[LF_FACESIZE];
-	int height, charset;
-	assert(iniFile[0] != '\0');
-	memset(logfont, 0, sizeof(*logfont));
-
-	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
-	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
-	GetPrivateProfileStringW(sectionW, keyW, L"", tmpW, MAX_UIMSG, iniFile);
-	if (tmpW[0] == L'\0') {
-		return FALSE;
+	LOGFONTW logfontW;
+	wchar_t *sectionW = ToWcharA(section);
+	wchar_t *keyW = ToWcharA(key);
+	int r = GetI18nLogfontW(sectionW, keyW, &logfontW, ppi, iniFile);
+	free(sectionW);
+	free(keyW);
+	if (r == TRUE) {
+		LOGFONTWA(&logfontW, logfont);
 	}
-	tmp = ToCharW(tmpW);
-
-	GetNthString(tmp, 1, LF_FACESIZE-1, font);
-	GetNthNum(tmp, 2, &height);
-	GetNthNum(tmp, 3, &charset);
-
-	if (font[0] != '\0') {
-		strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
+	else {
+		memset(logfont, 0, sizeof(*logfont));
 	}
-	logfont->lfCharSet = (BYTE)charset;
-	if (ppi != 0) {
-		logfont->lfHeight = MulDiv(height, -ppi, 72);
-	} else {
-		logfont->lfHeight = height;
-	}
-	logfont->lfWidth = 0;
-
-	free(tmp);
-	return TRUE;
+	return r;
 }
 
 int GetI18nLogfontAA(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)

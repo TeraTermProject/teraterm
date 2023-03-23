@@ -731,21 +731,6 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
 }
 
-int get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
-{
-	if (GetI18nLogfont("Tera Term", key, logfont,
-	                   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
-	                   iniFile) == FALSE) {
-		return FALSE;
-	}
-
-	if ((*font = CreateFontIndirect(logfont)) == NULL) {
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
 BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg)
 {
 	wchar_t *defW = ToWcharA(def);
