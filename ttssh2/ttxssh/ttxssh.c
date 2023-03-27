@@ -1624,13 +1624,13 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				}
 
 			} else if (wcsncmp(option + 1, L"user=", 5) == 0) {
-				_snprintf_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), _TRUNCATE, "%ls", option+6);
+				WideCharToACP_t(option + 6, pvar->ssh2_username, sizeof(pvar->ssh2_username));
 
 			} else if (wcsncmp(option + 1, L"passwd=", 7) == 0) {
-				_snprintf_s(pvar->ssh2_password, sizeof(pvar->ssh2_password), _TRUNCATE, "%ls", option+8);
+				WideCharToACP_t(option + 8, pvar->ssh2_password, sizeof(pvar->ssh2_password));
 
 			} else if (wcsncmp(option + 1, L"keyfile=", 8) == 0) {
-				_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%ls", option+9);
+				WideCharToACP_t(option + 9, pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile));
 
 			} else if (wcscmp(option + 1, L"ask4passwd") == 0) {
 				// パスワードを聞く (2006.9.18 maya)
