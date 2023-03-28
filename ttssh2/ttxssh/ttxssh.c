@@ -69,6 +69,12 @@
 #include <openssl/rc4.h>
 #include <openssl/md5.h>
 
+// for legacy cipher
+#if !defined(LIBRESSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000UL
+#include <openssl/provider.h>
+#define OPENSSL_LEGACY_PROVIDER
+#endif
+
 #ifndef LIBRESSL_VERSION_NUMBER
   #include "arc4random.h"
 #else
@@ -99,6 +105,11 @@
 #include "asprintf.h"
 
 #include "libputty.h"
+
+#ifdef OPENSSL_LEGACY_PROVIDER
+static OSSL_PROVIDER *legacy_provider = NULL;
+static OSSL_PROVIDER *default_provider = NULL;
+#endif
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
@@ -207,6 +218,23 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv)
 	pvar->fatal_error = FALSE;
 	pvar->showing_err = FALSE;
 	pvar->err_msg = NULL;
+
+#ifdef OPENSSL_LEGACY_PROVIDER
+	// OpenSSL 3 à»ç~Ç≈à»â∫ÇÃÉAÉãÉSÉäÉYÉÄÇégÇ¶ÇÈÇÊÇ§Ç…Ç∑ÇÈÇΩÇﬂ
+	// - blowfish-cbc
+	// - cast128-cbc
+	// - arcfour
+	// - arcfour128
+	// - arcfour256
+	// - hmac-ripemd160@openssh.com
+	// - hmac-ripemd160-etm@openssh.com
+	if (legacy_provider == NULL) {
+		legacy_provider = OSSL_PROVIDER_load(NULL, "legacy");
+	}
+	if (default_provider == NULL) {
+		default_provider = OSSL_PROVIDER_load(NULL, "default");
+	}
+#endif
 
 	init_TTSSH(pvar);
 }
