@@ -123,9 +123,10 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 	return 1;
 }
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER <= 0x3040300fL || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 const EVP_CIPHER *evp_ssh1_3des(void)
 {
-#ifndef LIBRESSL_VERSION_NUMBER
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -155,3 +156,4 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 	return (&ssh1_3des);
 #endif
 }
+#endif

@@ -129,10 +129,11 @@ ssh_aes_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER <= 0x3040300fL || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 const EVP_CIPHER *
 evp_aes_128_ctr(void)
 {
-#ifndef LIBRESSL_VERSION_NUMBER
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -164,6 +165,7 @@ evp_aes_128_ctr(void)
 	return (&aes_ctr);
 #endif
 }
+#endif
 
 //============================================================================
 // Triple-DES
@@ -225,10 +227,11 @@ ssh_des3_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER <= 0x3040300fL || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 const EVP_CIPHER *
 evp_des3_ctr(void)
 {
-#ifndef LIBRESSL_VERSION_NUMBER
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -260,6 +263,7 @@ evp_des3_ctr(void)
 	return (&des3_ctr);
 #endif
 }
+#endif
 
 //============================================================================
 // Blowfish
@@ -336,10 +340,11 @@ ssh_bf_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER <= 0x3040300fL || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 const EVP_CIPHER *
 evp_bf_ctr(void)
 {
-#ifndef LIBRESSL_VERSION_NUMBER
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -371,6 +376,7 @@ evp_bf_ctr(void)
 	return (&blowfish_ctr);
 #endif
 }
+#endif
 
 //============================================================================
 // CAST-128
@@ -447,10 +453,11 @@ ssh_cast5_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER <= 0x3040300fL || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 const EVP_CIPHER *
 evp_cast5_ctr(void)
 {
-#ifndef LIBRESSL_VERSION_NUMBER
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -482,6 +489,7 @@ evp_cast5_ctr(void)
 	return (&cast5_ctr);
 #endif
 }
+#endif
 
 //============================================================================
 // Camellia
@@ -538,10 +546,11 @@ ssh_camellia_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER <= 0x3040300fL || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 const EVP_CIPHER *
 evp_camellia_128_ctr(void)
 {
-#ifndef LIBRESSL_VERSION_NUMBER
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x3070100fL
 	static EVP_CIPHER *p = NULL;
 
 	if (p == NULL) {
@@ -573,3 +582,4 @@ evp_camellia_128_ctr(void)
 	return (&camellia_ctr);
 #endif
 }
+#endif
