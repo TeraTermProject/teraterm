@@ -63,6 +63,7 @@
 #include "ttl_gui.h"
 #include "codeconv.h"
 #include "dllutil.h"
+#include "asprintf.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -550,7 +551,7 @@ WORD TTLCode2Str()
 
 WORD TTLConnect(WORD mode)
 {
-	TStrVal Cmnd, Str;
+	TStrVal Str;
 	WORD Err;
 	WORD w;
 
@@ -592,6 +593,11 @@ WORD TTLConnect(WORD mode)
 	if (wcslen(TopicName)==0)
 	{
 		char TopicNameA[11];
+		DWORD e;
+		wchar_t *command_line;
+		const char *command;
+		wchar_t *strW;
+
 		w = HIWORD(HMainWin);
 		Word2HexStr(w,TopicNameA);
 		w = LOWORD(HMainWin);
@@ -599,18 +605,25 @@ WORD TTLConnect(WORD mode)
 		ACPToWideChar_t(TopicNameA, TopicName, _countof(TopicName));
 
 		switch (mode) {
+		default:
+			assert(FALSE);
+			// break;
 		case RsvConnect:
-			strncpy_s(Cmnd, sizeof(Cmnd),TTERMCOMMAND, _TRUNCATE);
+			command = TTERMCOMMAND;
 			break;
 		case RsvCygConnect:
-			strncpy_s(Cmnd, sizeof(Cmnd),CYGTERMCOMMAND, _TRUNCATE);
+			command = CYGTERMCOMMAND;
 			break;
 		}
-		strncat_s(Cmnd,sizeof(Cmnd),TopicNameA,_TRUNCATE);
-		strncat_s(Cmnd,sizeof(Cmnd)," ",_TRUNCATE);
-		strncat_s(Cmnd,sizeof(Cmnd),Str,_TRUNCATE);
-		if (WinExec(Cmnd,SW_SHOW)<32)
+
+		strW = ToWcharU8(Str);
+		aswprintf(&command_line, L"%hs %hs %s", command, TopicNameA, strW);
+		e = TTWinExec(command_line);
+		free(command_line);
+		free(strW);
+		if (e != NO_ERROR) {
 			return ErrCantConnect;
+		}
 		TTLStatus = IdTTLInitDDE;
 	}
 	return Err;
