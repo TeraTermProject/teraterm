@@ -49,6 +49,7 @@
 #include "sendmem.h"
 #include "codeconv.h"
 #include "scp.h"
+#include "asprintf.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -472,19 +473,18 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				SetDdeComReady(1);
 			break;
 		}
-		{
-		char Temp[MaxStrLen + 2];
-		strncpy_s(Temp, sizeof(Temp),"a ", _TRUNCATE); // dummy exe name
-		strncat_s(Temp,sizeof(Temp),ParamFileName,_TRUNCATE);
 		if (LoadTTSET()) {
-			wchar_t *commandline = ToWcharA(Temp);
+			char *tmp_u8;
+			wchar_t *commandline;
+			asprintf(&tmp_u8, "a %s", ParamFileName); // "a" = dummy exe name
+			commandline = ToWcharU8(tmp_u8);
 			(*ParseParam)(commandline, &ts, NULL);
 			free(commandline);
+			free(tmp_u8);
 		}
 		FreeTTSET();
 		cv.NoMsg = 1; /* suppress error messages */
 		PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
-		}
 		break;
 	case CmdDisconnect:
 		if (ParamFileName[0] == '0') {
