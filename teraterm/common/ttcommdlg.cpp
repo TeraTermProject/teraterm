@@ -34,6 +34,7 @@
 #include <assert.h>
 
 #include "win32helper.h"
+#include "compat_win.h"
 #include "ttlib.h"
 
 #include "ttcommdlg.h"
@@ -172,7 +173,7 @@ BOOL TTSHBrowseForFolderW(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t *
 	pDialog->SetTitle(bi->lpszTitle);
 	if (def != NULL) {
 		IShellItem *psi;
-		hr = SHCreateItemFromParsingName(def, NULL, IID_IShellItem, (void **)&psi);
+		hr = pSHCreateItemFromParsingName(def, NULL, IID_IShellItem, (void **)&psi);
 		if (SUCCEEDED(hr)) {
 			hr = pDialog->SetFolder(psi);
 			psi->Release();
@@ -362,7 +363,7 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 	}
 	if (init_dir != NULL) {
 		IShellItem* psi;
-		hr = SHCreateItemFromParsingName(init_dir, NULL, IID_IShellItem, (void**)&psi);
+		hr = pSHCreateItemFromParsingName(init_dir, NULL, IID_IShellItem, (void**)&psi);
 		if (SUCCEEDED(hr)) {
 			hr = pFile->SetFolder(psi);
 			psi->Release();

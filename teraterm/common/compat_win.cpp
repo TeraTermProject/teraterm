@@ -99,6 +99,7 @@ BOOL(WINAPI *pMiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile,
 
 // shell32.dll
 static HRESULT (WINAPI *pSHGetKnownFolderPath)(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
+HRESULT (WINAPI *pSHCreateItemFromParsingName)(PCWSTR pszPath, IBindCtx *pbc, REFIID riid, void **ppv);
 
 // comctl32.dll
 static HRESULT (WINAPI *pLoadIconWithScaleDown)(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, HICON *phico);
@@ -240,6 +241,7 @@ static const APIInfo Lists_dbghelp[] = {
 
 static const APIInfo Lists_shell32[] = {
 	{ "SHGetKnownFolderPath", (void **)&pSHGetKnownFolderPath },
+	{ "SHCreateItemFromParsingName", (void **)&pSHCreateItemFromParsingName },
 	{},
 };
 
