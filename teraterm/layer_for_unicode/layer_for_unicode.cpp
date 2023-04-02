@@ -827,6 +827,10 @@ BOOL WINAPI _ModifyMenuW(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNe
 	return r;
 }
 
+/**
+ *	@param cchMax	バッファの文字数(終端 L'\0' も含む(sizeof(buf)/sizeof(wchar_t)))
+ *	@retrun			文字列長(終端 L'\0' を含まない,wcslen()の戻り値と同じ)
+ */
 int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags)
 {
 	int len = GetMenuStringA(hMenu, uIDItem, NULL, 0, flags);
@@ -841,11 +845,18 @@ int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMa
 		return 0;
 	}
 	wchar_t *strW = ToWcharA(strA);
-	wcsncpy_s(lpString, cchMax, strW, _TRUNCATE);
-	len = wcslen(lpString);
+	len = (int)wcslen(strW);
+	if (lpString != NULL && cchMax != 0) {
+		// 文字をセットする
+		// セットしないときは文字列長を返す
+		wcsncpy_s(lpString, cchMax, strW, _TRUNCATE);
+		if (len > cchMax - 1) {
+			len = cchMax - 1;
+		}
+	}
 	free(strW);
 	free(strA);
-	return len;
+	return len;	// 文字列長(L'\0'分を含まない)
 }
 
 HANDLE WINAPI _LoadImageW(HINSTANCE hInst, LPCWSTR name, UINT type,

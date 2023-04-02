@@ -1436,7 +1436,13 @@ void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height)
 void GetMessageboxFontW(LOGFONTW *logfont)
 {
 	NONCLIENTMETRICSW nci;
+#if 0
+	// VISTAˆÈ~‚Í\‘¢‘Ì‚ªŠg’£‚³‚ê‚Ä‚¢‚é
+	// ‚±‚±‚Å‚ÍLOGFONTW‚ªæ“¾‚Å‚«‚ê‚Î—Ç‚¢
+	const int st_size = sizeof(mci);
+#else
 	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICSW, lfMessageFont);
+#endif
 	BOOL r;
 
 	memset(&nci, 0, sizeof(nci));
