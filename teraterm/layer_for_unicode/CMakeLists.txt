@@ -81,8 +81,8 @@ if(MSVC AND (MSVC_VERSION GREATER_EQUAL 1900))
     ${PACKAGE_NAME}
     PUBLIC
     common_static
-    $<$<CONFIG:Release>:libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib>
-    $<$<CONFIG:Debug>:libucrtd.lib libvcruntimed.lib libcmtd.lib libcpmtd.lib>
+    $<$<CONFIG:Release>:libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib oldnames.lib>
+    $<$<CONFIG:Debug>:libucrtd.lib libvcruntimed.lib libcmtd.lib libcpmtd.lib oldnames.lib>
     )
 elseif(MSVC)
   target_link_libraries(
