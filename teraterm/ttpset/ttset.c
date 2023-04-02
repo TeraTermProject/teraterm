@@ -52,6 +52,7 @@
 #include "inifile_com.h"
 #include "ttlib_charset.h"
 #include "asprintf.h"
+#include "compat_win.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -529,16 +530,68 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
 }
 
 /**
+ *	GetUserDefaultUILanguage() の代替
+ *
+ *	@retval		IdEnglish, IdJapanese など(tttypes_charset.h)
+ *
+ *	TODO
+ *		GetLocaleInfo() のほうが妥当?
+ */
+static int TTGetUserDefaultUILanguage(void)
+{
+	if (pGetUserDefaultUILanguage != NULL) {
+		// GetUserDefaultUILanguage() が利用可能な場合
+
+		static const struct {
+			LANGID langid;
+			int lang;
+		} lang_table[] = {
+			{ 0x0411, IdJapanese },
+			{ 0x0412, IdKorean },
+			{ 0x0404, IdChinese },		// Chinese (Traditional)
+			{ 0x8004, IdChinese },		// Chinese (Simplified)
+			//{ 0xxxxx, IdRussian },
+		};
+
+		const LANGID langid = pGetUserDefaultUILanguage();
+		for (int i = 0; i < _countof(lang_table); i++) {
+			if (lang_table[i].langid == langid) {
+				return lang_table[i].lang;
+			}
+		}
+		return IdEnglish;
+	}
+
+	static const struct {
+		int codepage;
+		int lang;
+	} codepage_table[] = {
+		{ 932, IdJapanese },
+		{ 949, IdKorean },
+		{ 936, IdChinese },		// Chinese (Traditional)
+		{ 950, IdChinese },		// Chinese (Traditional)
+		{ 866, IdRussian },
+	};
+
+	const int codepage = GetACP();
+	for (int i = 0; i < _countof(codepage_table); i++) {
+		if (codepage_table[i].codepage == codepage) {
+			return codepage_table[i].lang;
+		}
+	}
+	return IdEnglish;
+}
+
+/**
  *	Unicode Ambiguous,Emoji のデフォルト幅
  */
 static int GetDefaultUnicodeWidth(void)
 {
 	int ret_val = 1;
-	const int langcode = GetUserDefaultUILanguage();
-	if (langcode == 0x0411 ||	// Japanese
-		langcode == 0x0412 ||	// Korean
-		langcode == 0x0404 ||	// Chinese (Traditional)
-		langcode == 0x0804 )	// Chinese (Simplified)
+	const int lang = TTGetUserDefaultUILanguage();
+	if (lang == IdJapanese ||
+		lang == IdKorean ||
+		lang == IdChinese)
 	{
 		ret_val = 2;
 	}
@@ -620,19 +673,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->Language = GetLanguageFromStr(Temp);
 	}
 	else {
-		switch (PRIMARYLANGID(GetSystemDefaultLangID())) {
-		case LANG_JAPANESE:
-			ts->Language = IdJapanese;
-			break;
-		case LANG_RUSSIAN:
-			ts->Language = IdRussian;
-			break;
-		case LANG_KOREAN:	// HKS
-			ts->Language = IdKorean;
-			break;
-		default:
-			ts->Language = IdEnglish;
-		}
+		ts->Language = TTGetUserDefaultUILanguage();
 	}
 
 	/* Port type */

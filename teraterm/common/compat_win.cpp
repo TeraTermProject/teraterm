@@ -68,6 +68,7 @@ static BOOL (WINAPI *pVerifyVersionInfoA)(LPOSVERSIONINFOEXA lpVersionInformatio
 BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 static BOOL (WINAPI *pGetVersionExA)(LPOSVERSIONINFOA lpVersionInformation);
+LANGID (WINAPI *pGetUserDefaultUILanguage)(void);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -212,6 +213,7 @@ static const APIInfo Lists_kernel32[] = {
 	{ "VerifyVersionInfoA", (void **)&pVerifyVersionInfoA },
 	{ "SetDefaultDllDirectories", (void **)&pSetDefaultDllDirectories },
 	{ "SetDllDirectoryA", (void **)&pSetDllDirectoryA },
+	{ "GetUserDefaultUILanguage", (void **)&pGetUserDefaultUILanguage },
 	{},
 };
 

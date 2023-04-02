@@ -171,6 +171,7 @@ ULONGLONG _VerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, 
 BOOL _VerifyVersionInfoA(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMask, DWORDLONG dwlConditionMask);
 extern BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 extern BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
+extern LANGID (WINAPI *pGetUserDefaultUILanguage)(void);
 
 #if !defined(LOAD_LIBRARY_SEARCH_SYSTEM32)
 #define LOAD_LIBRARY_SEARCH_SYSTEM32        0x00000800
