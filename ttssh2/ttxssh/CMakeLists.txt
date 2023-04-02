@@ -144,18 +144,14 @@ if(SUPPORT_OLD_WINDOWS)
       )
   endif()
   if(MINGW)
-    target_sources(
-      ${PACKAGE_NAME}
-      PRIVATE
-      ../../teraterm/libmingw/tlssup.c
-      )
     target_link_libraries(
       ${PACKAGE_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
+      mingw_dll_tls
       -Wl,--no-whole-archive
-      )
+    )
   endif()
 endif(SUPPORT_OLD_WINDOWS)
 

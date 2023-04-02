@@ -17,6 +17,8 @@
 
 - CランタイムDLLのバージョンを吸収するためのwrapperを作成
   - msvcrt_wrapper.c を作成
+- Windows System Libraries (WSL) を参照
+  - https://ja.osdn.net/projects/mingw/releases/
 
 ### 未解決シンボルの追加について
 

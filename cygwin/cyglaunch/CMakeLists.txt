@@ -15,6 +15,25 @@ target_include_directories(
   .
   )
 
+if(SUPPORT_OLD_WINDOWS)
+  if(MSVC)
+    target_sources(
+      ${PACKAGE_NAME}
+      PRIVATE
+      ../../teraterm/common/compat_w95_vs2005.c
+    )
+  endif()
+  if(MINGW)
+    target_link_libraries(
+      ${PACKAGE_NAME}
+      PRIVATE
+      -Wl,--whole-archive
+      mingw_msvcrt
+      -Wl,--no-whole-archive
+    )
+  endif()
+endif(SUPPORT_OLD_WINDOWS)
+
 target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE

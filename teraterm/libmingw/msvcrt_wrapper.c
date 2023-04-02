@@ -166,6 +166,18 @@ static int inner_vscprintf(const char *format, va_list ap)
 	return r;
 }
 
+int vswprintf_s(wchar_t *buf, size_t size, const wchar_t *format, va_list ap)
+{
+	int r = vswprintf(buf, size, format,ap);
+	return r;
+}
+
+static int inner_vswprintf_s(wchar_t *buf, size_t size, const wchar_t *format, va_list ap)
+{
+	int r = vswprintf(buf, size, format,ap);
+	return r;
+}
+
 static errno_t inner_sscanf_s(const char *buffer, const char *format, ...)
 {
 	int r;
@@ -387,13 +399,13 @@ static void not_implemented(void)
 {
 	MessageBox(NULL, "not_implemented", "tera trem msvcrt_wrapper", MB_OK | MB_ICONEXCLAMATION);
 }
-void *_imp___itoa_s = (void *)not_implemented;
 #endif
 
 void *_imp___vsnprintf_s = (void *)inner_vsnprintf_s;
 void *_imp___snprintf_s = (void *)inner_snprintf_s;
 void *_imp___snprintf_s_l = (void *)inner_snprintf_s_l;
 void *_imp___vsnwprintf_s = (void *)inner_vsnwprintf_s;
+void *_imp__vswprintf_s = (void *)inner_vswprintf_s;
 void *_imp___snwprintf_s = (void *)inner_snwprintf_s;
 void *_imp__swprintf_s = (void *)inner_swprintf_s;
 void *_imp___vscprintf = (void *)inner_vscprintf;

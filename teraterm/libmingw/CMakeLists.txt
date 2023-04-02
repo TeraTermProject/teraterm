@@ -1,9 +1,16 @@
 ﻿set(PACKAGE_NAME "mingw_msvcrt")
 
-project(${PACKAGE_NAME})
+project(mingw)
 
 add_library(
-  ${PACKAGE_NAME}
+  mingw_msvcrt
   STATIC
   msvcrt_wrapper.c
-  )
+)
+
+# for dll tls
+add_library(
+  mingw_dll_tls
+  STATIC
+  tlssup.c
+)
