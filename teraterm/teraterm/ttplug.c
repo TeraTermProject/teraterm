@@ -124,6 +124,9 @@ static void loadExtension(wchar_t const *fileName, const wchar_t *UILanguageFile
 		case 193:
 			sub_message = L"invalid dll image";
 			break;
+		case 126:
+			sub_message = L"dll not exist";
+			break;
 		default:
 			sub_message = L"unknown";
 			break;
