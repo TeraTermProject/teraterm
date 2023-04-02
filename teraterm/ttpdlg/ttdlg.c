@@ -1670,7 +1670,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				int index;
 
 				// MaxComPort を越えるポートは表示しない
-				if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
+				if (i > GetHNRec->MaxComPort) {
 					continue;
 				}
 				j++;
@@ -1716,30 +1716,33 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK: {
-					int i;
-					int pos;
-					int index;
-					BOOL Ok;
+					if (IsDlgButtonChecked(Dialog, IDC_HOSTTCPIP)) {
+						int i;
+						BOOL Ok;
 
-					GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
-					if ( GetHNRec->PortType==IdTCPIP ) {
+						GetHNRec->PortType = IdTCPIP;
 						GetDlgItemTextW(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
+						GetRB(Dialog,&GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
+						i = GetDlgItemInt(Dialog,IDC_HOSTTCPPORT,&Ok,FALSE);
+						if (Ok) {
+							GetHNRec->TCPPort = i;
+						}
+						i = (int)SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_GETCURSEL, 0, 0);
+						GetHNRec->ProtocolFamily =
+							i == 0 ? AF_UNSPEC :
+							i == 1 ? AF_INET6 : AF_INET;
 					}
 					else {
+						int pos;
+						int index;
+
+						GetHNRec->PortType = IdSerial;
 						GetHNRec->HostName[0] = 0;
+						pos = (int)SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_GETCURSEL, 0, 0);
+						assert(pos >= 0);
+						index = (int)SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_GETITEMDATA, pos, 0);
+						GetHNRec->ComPort = dlg_data->ComPortInfoPtr[index].port_no;
 					}
-					GetRB(Dialog,&GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
-					i = GetDlgItemInt(Dialog,IDC_HOSTTCPPORT,&Ok,FALSE);
-					if (Ok) {
-						GetHNRec->TCPPort = i;
-					}
-					i = (int)SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_GETCURSEL, 0, 0);
-					GetHNRec->ProtocolFamily =
-						i == 0 ? AF_UNSPEC :
-						i == 1 ? AF_INET6 : AF_INET;
-					pos = (int)SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_GETCURSEL, 0, 0);
-					index = (int)SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_GETITEMDATA, pos, 0);
-					GetHNRec->ComPort = dlg_data->ComPortInfoPtr[index].port_no;
 					EndDialog(Dialog, 1);
 					return TRUE;
 				}
