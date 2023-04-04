@@ -1068,6 +1068,8 @@ void CVTWindow::RestoreSetup()
 
 	if (LoadTTSET()) {
 		(*ReadIniFile)(ts.SetupFNameW, &ts);
+
+		SetColor();
 	}
 	FreeTTSET();
 
@@ -4247,6 +4249,31 @@ void CVTWindow::OnSetupTerminal()
 	}
 }
 
+/**
+ *  色をセットする、テーマが使用されているときはセットしてよいか問い合わせる
+ */
+void CVTWindow::SetColor()
+{
+	BOOL set_color = TRUE;
+	if (ThemeGetEnable()) {
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_TT_NOTICE", L"Tera Term: Notice",
+			NULL, L"Theme is used\nDo you want to set color?",
+			MB_ICONQUESTION | MB_YESNO };
+		int r = TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+		if (r == IDNO) {
+			set_color = FALSE;
+		}
+	}
+
+	// 色を設定する
+	if (set_color) {
+		DispResetColor(CS_ALL);
+	}
+
+}
+
 void CVTWindow::OnSetupWindow()
 {
 	BOOL Ok;
@@ -4266,23 +4293,7 @@ void CVTWindow::OnSetupWindow()
 	Ok = (*SetupWin)(HVTWin, &ts);
 
 	if (Ok) {
-		BOOL set_color = TRUE;
-		if (ThemeGetEnable()) {
-			static const TTMessageBoxInfoW info = {
-				"Tera Term",
-				"MSG_TT_NOTICE", L"Tera Term: Notice",
-				NULL, L"Theme is used\nDo you want to set color?",
-				MB_ICONQUESTION | MB_YESNO };
-			int r = TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
-			if (r == IDNO) {
-				set_color = FALSE;
-			}
-		}
-
-		// 色を設定する
-		if (set_color) {
-			DispResetColor(CS_ALL);
-		}
+		SetColor();
 
 		// タイトルが変更されていたら、リモートタイトルをクリアする
 		if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
