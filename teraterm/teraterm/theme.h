@@ -103,8 +103,8 @@ typedef struct {
 } BG_PATTERN_ST;
 
 // setting / themefile.cpp
-void ThemeSetEnable(BOOL enable);
-BOOL ThemeGetEnable(void);
+void ThemeEnable(BOOL enable);
+BOOL ThemeIsEnabled(void);
 const BG_PATTERN_ST *ThemeBGPatternList(int index);
 
 // file / themefile.cpp

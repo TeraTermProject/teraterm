@@ -3916,7 +3916,7 @@ void ThemeGetColorDefault(TColorTheme *color_theme)
 	ThemeGetColorDefaultTS(&ts, color_theme);
 }
 
-void ThemeSetEnable(BOOL enable)
+void ThemeEnable(BOOL enable)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 	if (enable) {
@@ -3929,7 +3929,7 @@ void ThemeSetEnable(BOOL enable)
 	}
 }
 
-BOOL ThemeGetEnable(void)
+BOOL ThemeIsEnabled(void)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 	return w->bg_enable;

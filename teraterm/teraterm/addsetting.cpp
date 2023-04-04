@@ -893,7 +893,7 @@ void CVisualPropPageDlg::OnInitDialog()
 		}
 	}
 
-	SetCheck(IDC_THEME_ENABLE, ThemeGetEnable() ? BST_CHECKED : BST_UNCHECKED);
+	SetCheck(IDC_THEME_ENABLE, ThemeIsEnabled() ? BST_CHECKED : BST_UNCHECKED);
 
 	SetDlgItemTextW(IDC_SPIPATH_EDIT, ts.EtermLookfeel.BGSPIPathW);
 
@@ -1331,13 +1331,13 @@ void CVisualPropPageDlg::OnOK()
 		}
 	}
 
-	if ((GetCheck(IDC_THEME_ENABLE) == BST_CHECKED) && ThemeGetEnable() == FALSE) {
+	if ((GetCheck(IDC_THEME_ENABLE) == BST_CHECKED) && ThemeIsEnabled() == FALSE) {
 		// テーマをenableにする
-		ThemeSetEnable(TRUE);
+		ThemeEnable(TRUE);
 	}
-	else if ((GetCheck(IDC_THEME_ENABLE) == BST_UNCHECKED) && ThemeGetEnable() == TRUE) {
+	else if ((GetCheck(IDC_THEME_ENABLE) == BST_UNCHECKED) && ThemeIsEnabled() == TRUE) {
 		// テーマをdisableにする
-		ThemeSetEnable(FALSE);
+		ThemeEnable(FALSE);
 	}
 
 	wchar_t *spi_path;

@@ -4255,7 +4255,7 @@ void CVTWindow::OnSetupTerminal()
 void CVTWindow::SetColor()
 {
 	BOOL set_color = TRUE;
-	if (ThemeGetEnable()) {
+	if (ThemeIsEnabled()) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_TT_NOTICE", L"Tera Term: Notice",
