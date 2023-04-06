@@ -334,7 +334,7 @@ static errno_t inner__wfopen_s(FILE **f, const wchar_t *name, const char *mode)
 static char *inner_strtok_s(char* str, const char* delimiters, char** context)
 {
 	(void)context;
-	char *r = strtok(str, delimiters);
+	char *r = strtok_r(str, delimiters, context);
 	return r;
 }
 
