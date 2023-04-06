@@ -47,15 +47,14 @@
 
 int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list ap)
 {
-	int truncate = count == _TRUNCATE ? 1 : 0;
-	if (truncate) {
-		count = sizeOfBuffer -1;
+	if (count == _TRUNCATE) {
+		count = sizeOfBuffer - 1;
 	}
 	else if (count < sizeOfBuffer) {
 		count = sizeOfBuffer;
 	}
 	int r = vsnprintf(buffer, count, format, ap);
-	if (truncate && r == sizeOfBuffer) {
+	if (r >= sizeOfBuffer) {
 		buffer[sizeOfBuffer - 1] = 0;
 		r = -1;
 	}
@@ -100,28 +99,25 @@ static int inner_snprintf_s_l(char *buffer, size_t sizeOfBuffer, size_t count, c
 	return r;
 }
 
-static int inner_vsnwprintf_s(wchar_t *buffer, size_t sizeOfBuffer, size_t count, const wchar_t *format, va_list ap)
+static int vsnwprintf_s(wchar_t *buffer, size_t sizeOfBuffer, size_t count, const wchar_t *format, va_list ap)
 {
-	bool truncate = false;
 	if (count == _TRUNCATE) {
-		truncate = true;
-		count = sizeOfBuffer;
+		count = sizeOfBuffer - 1;
 	}
 	else if (count < sizeOfBuffer) {
 		count = sizeOfBuffer;
 	}
 	int r = _vsnwprintf(buffer, count, format, ap);
-	if (r == -1) {
-		// error or êÿÇËéÃÇƒ
-		if (truncate) {
-			buffer[sizeOfBuffer - 1] = 0;
-		}
+	if (r >= sizeOfBuffer) {
+		buffer[sizeOfBuffer - 1] = 0;
 		r = -1;
 	}
-	else {
-		// Ç§Ç‹Ç≠èëÇ´çûÇ‹ÇÍÇΩ
-	}
 	return r;
+}
+
+static int inner_vsnwprintf_s(wchar_t *buffer, size_t sizeOfBuffer, size_t count, const wchar_t *format, va_list ap)
+{
+	return vsnwprintf_s(buffer, sizeOfBuffer, count, format, ap);
 }
 
 static int inner_snwprintf_s(wchar_t *buffer, size_t sizeOfBuffer, size_t count, const wchar_t *format, ...)
@@ -129,7 +125,7 @@ static int inner_snwprintf_s(wchar_t *buffer, size_t sizeOfBuffer, size_t count,
 	int r;
 	va_list ap;
 	va_start(ap, format);
-	r = inner_vsnwprintf_s(buffer, sizeOfBuffer, count, format, ap);
+	r = vsnwprintf_s(buffer, sizeOfBuffer, count, format, ap);
 	va_end(ap);
 	return r;
 }
@@ -139,7 +135,7 @@ int swprintf_s(wchar_t *buffer, size_t sizeOfBuffer, const wchar_t *format, ...)
 	int r;
 	va_list ap;
 	va_start(ap, format);
-	r = inner_vsnwprintf_s(buffer, sizeOfBuffer, 1, format, ap);
+	r = vsnwprintf_s(buffer, sizeOfBuffer, 1, format, ap);
 	va_end(ap);
 	return r;
 }
@@ -149,20 +145,8 @@ static int inner_swprintf_s(wchar_t *buffer, size_t sizeOfBuffer, const wchar_t 
 	int r;
 	va_list ap;
 	va_start(ap, format);
-	r = inner_vsnwprintf_s(buffer, sizeOfBuffer, 1, format, ap);
+	r = vsnwprintf_s(buffer, sizeOfBuffer, 1, format, ap);
 	va_end(ap);
-	return r;
-}
-
-__declspec(dllimport) int _vscprintf(const char *format, va_list ap)
-{
-	int r = vsnprintf(NULL, 0, format, ap);
-	return r;
-}
-
-static int inner_vscprintf(const char *format, va_list ap)
-{
-	int r = vsnprintf(NULL, 0, format, ap);
 	return r;
 }
 
@@ -408,7 +392,6 @@ void *_imp___vsnwprintf_s = (void *)inner_vsnwprintf_s;
 void *_imp__vswprintf_s = (void *)inner_vswprintf_s;
 void *_imp___snwprintf_s = (void *)inner_snwprintf_s;
 void *_imp__swprintf_s = (void *)inner_swprintf_s;
-void *_imp___vscprintf = (void *)inner_vscprintf;
 void *_imp__sscanf_s = (void *)inner_sscanf_s;
 void *_imp__swscanf_s = (void *)inner_swscanf_s;
 
