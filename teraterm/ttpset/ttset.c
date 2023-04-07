@@ -539,29 +539,6 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
  */
 static int TTGetUserDefaultUILanguage(void)
 {
-	if (pGetUserDefaultUILanguage != NULL) {
-		// GetUserDefaultUILanguage() が利用可能な場合
-
-		static const struct {
-			LANGID langid;
-			int lang;
-		} lang_table[] = {
-			{ 0x0411, IdJapanese },
-			{ 0x0412, IdKorean },
-			{ 0x0404, IdChinese },		// Chinese (Traditional)
-			{ 0x8004, IdChinese },		// Chinese (Simplified)
-			//{ 0xxxxx, IdRussian },
-		};
-
-		const LANGID langid = pGetUserDefaultUILanguage();
-		for (int i = 0; i < _countof(lang_table); i++) {
-			if (lang_table[i].langid == langid) {
-				return lang_table[i].lang;
-			}
-		}
-		return IdEnglish;
-	}
-
 	static const struct {
 		int codepage;
 		int lang;
@@ -572,9 +549,33 @@ static int TTGetUserDefaultUILanguage(void)
 		{ 950, IdChinese },		// Chinese (Traditional)
 		{ 866, IdRussian },
 	};
+	static const struct {
+		LANGID langid;
+		int lang;
+	} lang_table[] = {
+		{ 0x0411, IdJapanese },
+		{ 0x0412, IdKorean },
+		{ 0x0404, IdChinese },		// Chinese (Traditional)
+		{ 0x8004, IdChinese },		// Chinese (Simplified)
+		//{ 0xxxxx, IdRussian },
+	};
+	int i;
+	int codepage;
 
-	const int codepage = GetACP();
-	for (int i = 0; i < _countof(codepage_table); i++) {
+	if (pGetUserDefaultUILanguage != NULL) {
+		// GetUserDefaultUILanguage() が利用可能な場合
+
+		const LANGID langid = pGetUserDefaultUILanguage();
+		for (i = 0; i < _countof(lang_table); i++) {
+			if (lang_table[i].langid == langid) {
+				return lang_table[i].lang;
+			}
+		}
+		return IdEnglish;
+	}
+
+	codepage = GetACP();
+	for (i = 0; i < _countof(codepage_table); i++) {
 		if (codepage_table[i].codepage == codepage) {
 			return codepage_table[i].lang;
 		}
