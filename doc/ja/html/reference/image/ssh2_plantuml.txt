@@ -84,7 +84,7 @@ group Key Exhnage
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      e || f || K)
         K_S ... サーバホスト鍵の公開鍵
-      s = サーバホスト鍵の秘密鍵を用いた H の署名
+      s = サーバホスト鍵の秘密鍵を用いて H から作成した署名
     end note
 
     C <- S: SSH_MSG_KEXDH_REPLY
@@ -96,8 +96,7 @@ group Key Exhnage
       K = f^x mod p を計算する
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      e || f || K)
-      署名 s が H のものか検証する
-        (s を K_S で復号し、H と比較する)
+      K_S を用いて署名 s と H を検証する
     end note
 
     note over C, S  #ffffff
@@ -107,7 +106,7 @@ group Key Exhnage
         セッションID ... 初回の鍵交換の H
     end note
 
-  else Diffie-Hellman Group Exchange\ncf. RFC 4419
+  else Diffie-Hellman Group Exchange\ncf. RFC 4419 Section 3
 
     note over C, S #ffffff
       両者が知っている:
@@ -143,7 +142,7 @@ group Key Exhnage
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      min || n || max || g || e || f || K)
         K_S ... サーバホスト鍵の公開鍵
-      s = サーバホスト鍵の秘密鍵を用いた H の署名
+      s = サーバホスト鍵の秘密鍵を用いて H から作成した署名
     end note
 
     C <- S: SSH_MSG_KEX_DH_GEX_REPLY
@@ -155,8 +154,7 @@ group Key Exhnage
       K = f^x mod p を計算する
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      min || n || max || g || e || f || K)
-      署名 s が H のものか検証する
-        (s を K_S で復号し、H と比較する)
+      K_S を用いて署名 s と H を検証する
     end note
 
     note over C, S  #ffffff
@@ -166,7 +164,7 @@ group Key Exhnage
         セッションID ... 初回の鍵交換の H
     end note
 
-  else Elliptic Curve Diffie-Hellman Key Exchange\ncf. RFC 5656
+  else Elliptic Curve Diffie-Hellman Key Exchange\ncf. RFC 5656 Section 4
 
     note over C, S #ffffff
       誰もが知っている:
@@ -204,7 +202,7 @@ group Key Exhnage
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      Q_C || Q_S || K)
         K_S ... サーバホスト鍵の公開鍵
-      s = サーバホスト鍵の秘密鍵を用いた H の署名
+      s = サーバホスト鍵の秘密鍵を用いて H から作成した署名
     end note
 
     C <- S: SSH_MSG_KEX_ECDH_REPLY
@@ -219,8 +217,7 @@ group Key Exhnage
         K = x'
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      Q_C || Q_S || K)
-      署名 s が H のものか検証する
-        (s を K_S で復号し、H と比較する)
+      K_S を用いて署名 s と H を検証する
     end note
 
     note over C, S  #ffffff
@@ -317,7 +314,7 @@ group Authentication
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: ユーザ名\n"ssh-connection"\n"publickey"\nTRUE\n公開鍵アルゴリズム名\n公開鍵\n署名
 
-    note over S #ffffff: 公開鍵と署名を検証
+    note over S #ffffff: 公開鍵を用いて署名が正しいか検証
 
     alt 認証成功
         C <- S: SSH_MSG_USERAUTH_SUCCESS
@@ -388,7 +385,7 @@ group Authentication
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: ユーザ名\n"ssh-connection"\n"publickey"\nTRUE\n公開鍵アルゴリズム名\n公開鍵\n署名
 
-    note over S #ffffff: 公開鍵と署名を検証
+    note over S #ffffff: 公開鍵を用いて署名が正しいか検証
 
     alt 認証成功
         C <- S: SSH_MSG_USERAUTH_SUCCESS

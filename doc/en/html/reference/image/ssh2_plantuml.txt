@@ -84,7 +84,7 @@ group Key Exhnage
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      e || f || K)
         K_S ... public key of server's host key
-      s = signature of H with private key of server's host key
+      s = signature generated from H with private key of server's host key
     end note
 
     C <- S: SSH_MSG_KEXDH_REPLY
@@ -96,8 +96,7 @@ group Key Exhnage
       computes K = f^x mod p
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      e || f || K)
-      verifies the signature s on H
-        (decrypt s with K_S, and compare to H)
+      verifies the signature s on H with K_S
     end note
 
     note over C, S  #ffffff
@@ -107,7 +106,7 @@ group Key Exhnage
         session identifier ... H from first exchange
     end note
 
-  else Diffie-Hellman Group Exchange\ncf. RFC 4419
+  else Diffie-Hellman Group Exchange\ncf. RFC 4419 Section 3
 
     note over C, S #ffffff
       both know:
@@ -143,7 +142,7 @@ group Key Exhnage
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      min || n || max || g || e || f || K)
         K_S ... public key of server's host key
-      s = signature of H with private key of server's host key
+      s = signature generated from H with private key of server's host key
     end note
 
     C <- S: SSH_MSG_KEX_DH_GEX_REPLY
@@ -155,8 +154,7 @@ group Key Exhnage
       computes K = f^x mod p
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      min || n || max || g || e || f || K)
-      verifies the signature s on H
-        (decrypt s with K_S, and compare to H)
+      verifies the signature s on H with K_S
     end note
 
     note over C, S  #ffffff
@@ -166,7 +164,7 @@ group Key Exhnage
         session identifier ... H from first exchange
     end note
 
-  else Elliptic Curve Diffie-Hellman Key Exchange\ncf. RFC 5656
+  else Elliptic Curve Diffie-Hellman Key Exchange\ncf. RFC 5656 Section 4
 
     note over C, S #ffffff
       everyone knows:
@@ -204,7 +202,7 @@ group Key Exhnage
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      Q_C || Q_S || K)
         K_S ... public key of server's host key
-      s = signature of H with private key of server's host key
+      s = signature generated from H with private key of server's host key
     end note
 
     C <- S: SSH_MSG_KEX_ECDH_REPLY
@@ -219,8 +217,7 @@ group Key Exhnage
         K = x'
       H = hash(V_C || V_S || I_C || I_S || K_S ||
                      Q_C || Q_S || K)
-      verifies the signature s on H
-        (decrypt s with K_S, and compare to H)
+      verifies the signature s on H with K_S
     end note
 
     note over C, S  #ffffff
@@ -317,7 +314,7 @@ group Authentication
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: user name\n"ssh-connection"\n"publickey"\nTRUE\npublic key algorithm name\npublic key\nsignature
 
-    note over S #ffffff: verifies public key and signature
+    note over S #ffffff: check whether the signature is correct with public key
 
     alt authentication success
         C <- S: SSH_MSG_USERAUTH_SUCCESS
@@ -388,7 +385,7 @@ group Authentication
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: user name\n"ssh-connection"\n"publickey"\nTRUE\npublic key algorithm name\npublic key\nsignature
 
-    note over S #ffffff: verifies public key and signature
+    note over S #ffffff: check whether the signature is correct with public key
 
     alt authentication success
         C <- S: SSH_MSG_USERAUTH_SUCCESS
