@@ -3538,9 +3538,10 @@ __declspec(dllexport) size_t CALLBACK TTXReadKnownHostsFile(wchar_t *filename, s
 }
 
 
-static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
+static void keygen_progress(int phase, int count, void *cbarg_) {
 	char buff[1024];
 	static char msg[1024];
+	cbarg_t *cbarg = cbarg_;
 
 	switch (phase) {
 	case 0:
