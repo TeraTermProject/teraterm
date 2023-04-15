@@ -99,6 +99,8 @@ HANDLE SaveBuff = NULL;
 int SaveBuffX;
 int SaveBuffY;
 
+static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
+
 LONG GetLinePtr(int Line)
 {
 	LONG Ptr;
@@ -574,11 +576,16 @@ void PrevLine()
 	AttrLineBG = &AttrBuffBG[LinePtr];
 }
 
-void EraseKanji(int LR)
+/*
+ * If cursor is on left/right half of a Kanji, erase it.
+ *   LR: left(0)/right(1) flag
+ *	@return	0	処理したcell数
+ *				0	処理しなかった
+ *				1,2	処理した
+ */
+static int EraseKanji(int LR)
 {
-// If cursor is on left/right half of a Kanji, erase it.
-//   LR: left(0)/right(1) flag
-
+	int cell = 0;
 	if ((CursorX-LR>=0) &&
 	    ((AttrLine[CursorX-LR] & AttrKanji) != 0)) {
 		CodeLine[CursorX-LR] = 0x20;
@@ -592,8 +599,13 @@ void EraseKanji(int LR)
 			AttrLine2[CursorX-LR+1] = CurCharAttr.Attr2;
 			AttrLineFG[CursorX-LR+1] = CurCharAttr.Fore;
 			AttrLineBG[CursorX-LR+1] = CurCharAttr.Back;
+			cell = 2;
+		}
+		else {
+			cell = 1;
 		}
 	}
+	return cell;
 }
 
 void EraseKanjiOnLRMargin(LONG ptr, int count)
@@ -678,10 +690,15 @@ void BuffEraseCurToEnd()
 	LONG TmpPtr;
 	int offset;
 	int i, YEnd;
+	int XStart = CursorX;
+	int head = 0;
 
 	NewLine(PageStart+CursorY);
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
+		 /* if cursor is on right half of a kanji, erase the kanji */
+		if (EraseKanji(1) != 0) {
+			head = 1;
+		}
 	}
 	offset = CursorX;
 	TmpPtr = GetLinePtr(PageStart+CursorY);
@@ -698,8 +715,15 @@ void BuffEraseCurToEnd()
 		offset = 0;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
+
 	/* update window */
-	DispEraseCurToEnd(YEnd);
+	if (head == 1) {
+		XStart--;
+	}
+	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, NumOfColumns);
+	for (i = CursorY + 1; i <= YEnd; i++) {
+		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+	}
 }
 
 void BuffEraseHomeToCur()
@@ -708,10 +732,15 @@ void BuffEraseHomeToCur()
 	LONG TmpPtr;
 	int offset;
 	int i, YHome;
+	int tail = 0;
+	int draw_len;
 
 	NewLine(PageStart+CursorY);
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(0); /* if cursor is on left half of a kanji, erase the kanji */
+		/* if cursor is on left half of a kanji, erase the kanji */
+		if (EraseKanji(0) != 0) {
+			tail++;
+		}
 	}
 	offset = NumOfColumns;
 	if (isCursorOnStatusLine) {
@@ -734,7 +763,11 @@ void BuffEraseHomeToCur()
 	}
 
 	/* update window */
-	DispEraseHomeToCur(YHome);
+	draw_len = tail == 0 ? CursorX : CursorX + 1;
+	for (i = YHome; i < CursorY; i++) {
+		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+	}
+	BuffDrawLineI(-1, -1, CursorY + PageStart, 0, draw_len);
 }
 
 void BuffInsertLines(int Count, int YEnd)
@@ -787,13 +820,27 @@ void BuffEraseCharsInLine(int XStart, int Count)
 //  Count: number of characters to be erased
 {
 	BOOL LineContinued=FALSE;
+	int head = 0;
+	int tail = 0;
 
 	if (ts.EnableContinuedLineCopy && XStart == 0 && (AttrLine[0] & AttrLineContinued)) {
 		LineContinued = TRUE;
 	}
 
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
+		 /* if cursor is on right half of a kanji, erase the kanji */
+		if (EraseKanji(1) != 0) {
+			head = 1;
+		}
+
+		if (XStart + Count < NumOfColumns) {
+			int CursorXSave = CursorX;
+			CursorX = XStart + Count;
+			if (EraseKanji(1) != 0) {
+				tail = 1;
+			}
+			CursorX = CursorXSave;
+		}
 	}
 
 	NewLine(PageStart+CursorY);
@@ -813,7 +860,14 @@ void BuffEraseCharsInLine(int XStart, int Count)
 		}
 	}
 
-	DispEraseCharsInLine(XStart, Count);
+	if (head != 0) {
+		XStart -= 1;
+		Count += 1;
+	}
+	if (tail != 0) {
+		Count += 1;
+	}
+	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, XStart + Count);
 }
 
 void BuffDeleteLines(int Count, int YEnd)
@@ -910,24 +964,7 @@ void BuffEraseChars(int Count)
 // Erase characters in current line from cursor
 //   Count: number of characters to be deleted
 {
-	NewLine(PageStart+CursorY);
-
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(0); /* if cursor is on left harf of a kanji, erase the kanji */
-		EraseKanji(1); /* if cursor on right half... */
-	}
-
-	if (Count > NumOfColumns-CursorX) {
-		Count = NumOfColumns-CursorX;
-	}
-	memset(&(CodeLine[CursorX]),0x20,Count);
-	memset(&(AttrLine[CursorX]),AttrDefault,Count);
-	memset(&(AttrLine2[CursorX]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
-	memset(&(AttrLineFG[CursorX]),CurCharAttr.Fore,Count);
-	memset(&(AttrLineBG[CursorX]),CurCharAttr.Back,Count);
-
-	/* update window */
-	DispEraseCharsInLine(CursorX,Count);
+	BuffEraseCharsInLine(CursorX, Count);
 }
 
 void BuffFillWithE()
@@ -2028,6 +2065,57 @@ BOOL CheckSelect(int x, int y)
 	}
 }
 
+static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
+{
+	int X = DrawX;
+	int Y = DrawY;
+	int i, count;
+	const LONG TmpPtr = GetLinePtr(SY);
+	TCharAttr CurAttr, TempAttr;
+	BOOL CurSel, TempSel;
+
+	if (X == -1 && Y == -1) {
+		X = IStart;
+		Y = SY - PageStart;
+		if (! IsLineVisible(&X, &Y)) {
+			return;
+		}
+	}
+
+	TempAttr = DefCharAttr;
+	TempSel = FALSE;
+	DispSetupDC(DefCharAttr, TempSel);
+
+	i = IStart;
+	do {
+		CurAttr.Attr = AttrBuff[TmpPtr+i] & ~ AttrKanji;
+		CurAttr.Attr2 = AttrBuff2[TmpPtr+i];
+		CurAttr.Fore = AttrBuffFG[TmpPtr+i];
+		CurAttr.Back = AttrBuffBG[TmpPtr+i];
+		CurSel = CheckSelect(i,SY);
+		count = 1;
+		while ( (i+count <= IEnd) &&
+				(CurAttr.Attr == (AttrBuff[TmpPtr+i+count] & ~ AttrKanji)) &&
+				(CurAttr.Attr2==AttrBuff2[TmpPtr+i+count]) &&
+				(CurAttr.Fore==AttrBuffFG[TmpPtr+i+count]) &&
+				(CurAttr.Back==AttrBuffBG[TmpPtr+i+count]) &&
+				(CurSel==CheckSelect(i+count,SY)) ||
+				(i+count<NumOfColumns) &&
+				((AttrBuff[TmpPtr+i+count-1] & AttrKanji) != 0) ) {
+			count++;
+		}
+
+		if (TCharAttrCmp(CurAttr, TempAttr) != 0 || (CurSel != TempSel)) {
+			DispSetupDC(CurAttr, CurSel);
+			TempAttr = CurAttr;
+			TempSel = CurSel;
+		}
+		DispStr(&CodeBuff[TmpPtr+i],count,Y, &X);
+		i = i+count;
+	}
+	while (i<=IEnd);
+}
+
 void BuffUpdateRect
   (int XStart, int YStart, int XEnd, int YEnd)
 // Display text in a rectangular region in the screen
@@ -2036,12 +2124,11 @@ void BuffUpdateRect
 //   XEnd: x position of the lower-right corner (last character)
 //   YEnd: y position
 {
-	int i, j, count;
+	int j;
 	int IStart, IEnd;
 	int X, Y;
 	LONG TmpPtr;
-	TCharAttr CurAttr, TempAttr;
-	BOOL CurSel, TempSel, Caret;
+	BOOL Caret;
 
 	if (XStart >= WinOrgX+WinWidth) {
 		return;
@@ -2069,15 +2156,10 @@ void BuffUpdateRect
 		YEnd = WinOrgY+WinHeight-1;
 	}
 
-	TempAttr = DefCharAttr;
-	TempSel = FALSE;
-
 	Caret = IsCaretOn();
 	if (Caret) {
 		CaretOff();
 	}
-
-	DispSetupDC(DefCharAttr, TempSel);
 
 	Y = (YStart-WinOrgY)*FontHeight;
 	TmpPtr = GetLinePtr(PageStart+YStart);
@@ -2089,34 +2171,7 @@ void BuffUpdateRect
 
 		X = (IStart-WinOrgX)*FontWidth;
 
-		i = IStart;
-		do {
-			CurAttr.Attr = AttrBuff[TmpPtr+i] & ~ AttrKanji;
-			CurAttr.Attr2 = AttrBuff2[TmpPtr+i];
-			CurAttr.Fore = AttrBuffFG[TmpPtr+i];
-			CurAttr.Back = AttrBuffBG[TmpPtr+i];
-			CurSel = CheckSelect(i,j);
-			count = 1;
-			while ( (i+count <= IEnd) &&
-			        (CurAttr.Attr == (AttrBuff[TmpPtr+i+count] & ~ AttrKanji)) &&
-			        (CurAttr.Attr2==AttrBuff2[TmpPtr+i+count]) &&
-			        (CurAttr.Fore==AttrBuffFG[TmpPtr+i+count]) &&
-			        (CurAttr.Back==AttrBuffBG[TmpPtr+i+count]) &&
-			        (CurSel==CheckSelect(i+count,j)) ||
-			        (i+count<NumOfColumns) &&
-			        ((AttrBuff[TmpPtr+i+count-1] & AttrKanji) != 0) ) {
-				count++;
-			}
-
-			if (TCharAttrCmp(CurAttr, TempAttr) != 0 || (CurSel != TempSel)) {
-				DispSetupDC(CurAttr, CurSel);
-				TempAttr = CurAttr;
-				TempSel = CurSel;
-			}
-			DispStr(&CodeBuff[TmpPtr+i],count,Y, &X);
-			i = i+count;
-		}
-		while (i<=IEnd);
+		BuffDrawLineI(X, Y, j, IStart, IEnd);
 		Y = Y + FontHeight;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
@@ -2129,8 +2184,6 @@ void UpdateStr()
 // Display not-yet-displayed string
 {
 	int X, Y;
-	TCharAttr TempAttr;
-	int pos, len;
 
 	if (StrChangeCount==0) {
 		return;
@@ -2142,41 +2195,7 @@ void UpdateStr()
 		return;
 	}
 
-	TempAttr.Attr = AttrLine[StrChangeStart];
-	TempAttr.Attr2 = AttrLine2[StrChangeStart];
-	TempAttr.Fore = AttrLineFG[StrChangeStart];
-	TempAttr.Back = AttrLineBG[StrChangeStart];
-
-	/* これから描画する文字列の始まりが「URL構成文字属性」だった場合、
-	 * 当該色で行末までペイントされないようにする。
-	 * (2009.10.24 yutaka)
-	 */
-	if (TempAttr.Attr & AttrURL) {
-		/* 開始位置からどこまでが AttrURL かをカウントする */
-		len = 0;
-		for (pos = 0 ; pos < StrChangeCount ; pos++) {
-			if (TempAttr.Attr != AttrLine[StrChangeStart + pos])
-				break;
-			len++;
-		}
-		DispSetupDC(TempAttr, FALSE);
-		DispStr(&CodeLine[StrChangeStart], len, Y, &X);
-
-		/* 残りの文字列があれば、ふつうに描画を行う。*/
-		if (len < StrChangeCount) {
-			TempAttr.Attr = AttrLine[StrChangeStart + pos];
-			TempAttr.Attr2 = AttrLine2[StrChangeStart + pos];
-			TempAttr.Fore = AttrLineFG[StrChangeStart + pos];
-			TempAttr.Back = AttrLineBG[StrChangeStart + pos];
-
-			DispSetupDC(TempAttr, FALSE);
-			DispStr(&CodeLine[StrChangeStart + pos], (StrChangeCount - len), Y, &X);
-		}
-	} else {
-		DispSetupDC(TempAttr, FALSE);
-		DispStr(&CodeLine[StrChangeStart],StrChangeCount,Y, &X);
-	}
-
+	BuffDrawLineI(X, Y, PageStart + CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
 	StrChangeCount = 0;
 }
 
