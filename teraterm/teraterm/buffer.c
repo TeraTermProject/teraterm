@@ -790,19 +790,25 @@ static void BuffScroll(int Count, int Bottom)
 	NewLine(PageStart+CursorY);
 }
 
-// If cursor is on left/right half of a Kanji, erase it.
-//   LR: left(0)/right(1) flag
-//	LR	0	カーソルが漢字の左側
-//		1	カーソルが漢字の右側
-static void EraseKanji(int LR)
+/**
+ * If cursor is on left/right half of a Kanji, erase it.
+ *	@param	LR	left(0)/right(1) flag
+ *				0	カーソルが漢字の左側
+ *				1	カーソルが漢字の右側
+ *	@return		処理したcell数
+ *				0	処理しなかった
+ *				1,2	処理した
+ */
+static int EraseKanji(int LR)
 {
 	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
-
 	buff_char_t *p;
 	int bx;
+	int cell = 0;
+
 	if (CursorX < LR) {
 		// 全角判定できない
-		return;
+		return 0;
 	}
 	bx = CursorX-LR;
 	p = &CodeLineW[bx];
@@ -819,8 +825,13 @@ static void EraseKanji(int LR)
 			(p+1)->attr2 = CurCharAttr.Attr2;
 			(p+1)->fg = CurCharAttr.Fore;
 			(p+1)->bg = CurCharAttr.Back;
+			cell = 2;
+		}
+		else {
+			cell = 1;
 		}
 	}
+	return cell;
 }
 
 static void EraseKanjiOnLRMargin(LONG ptr, int count)
@@ -910,10 +921,13 @@ void BuffEraseCurToEnd(void)
 	LONG TmpPtr;
 	int offset;
 	int i, YEnd;
+	int XStart = CursorX;
+	int head = 0;
 
 	NewLine(PageStart+CursorY);
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
+	/* if cursor is on right half of a kanji, erase the kanji */
+	if (EraseKanji(1) != 0) {
+		head = 1;
 	}
 	offset = CursorX;
 	TmpPtr = GetLinePtr(PageStart+CursorY);
@@ -928,7 +942,10 @@ void BuffEraseCurToEnd(void)
 	}
 
 	/* update window */
-	BuffDrawLineI(-1, -1, CursorY + PageStart, CursorX, NumOfColumns);
+	if (head == 1) {
+		XStart--;
+	}
+	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, NumOfColumns);
 	for (i = CursorY + 1; i <= YEnd; i++) {
 		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
 	}
@@ -942,10 +959,13 @@ void BuffEraseHomeToCur(void)
 	LONG TmpPtr;
 	int offset;
 	int i, YHome;
+	int tail = 0;
+	int draw_len;
 
 	NewLine(PageStart+CursorY);
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(0); /* if cursor is on left half of a kanji, erase the kanji */
+	/* if cursor is on left half of a kanji, erase the kanji */
+	if (EraseKanji(0) != 0) {
+		tail++;
 	}
 	offset = NumOfColumns;
 	if (isCursorOnStatusLine) {
@@ -964,10 +984,11 @@ void BuffEraseHomeToCur(void)
 	}
 
 	/* update window */
+	draw_len = tail == 0 ? CursorX : CursorX + 1;
 	for (i = YHome; i < CursorY; i++) {
 		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, 0, CursorX-1);
+	BuffDrawLineI(-1, -1, CursorY + PageStart, 0, draw_len);
 }
 
 void BuffInsertLines(int Count, int YEnd)
@@ -1015,13 +1036,25 @@ void BuffEraseCharsInLine(int XStart, int Count)
 {
 	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
 	BOOL LineContinued=FALSE;
+	int head = 0;
+	int tail = 0;
 
 	if (ts.EnableContinuedLineCopy && XStart == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
 		LineContinued = TRUE;
 	}
 
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
-		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
+	/* if cursor is on right half of a kanji, erase the kanji */
+	if (EraseKanji(1) != 0) {
+		head = 1;
+	}
+
+	if (XStart + Count < NumOfColumns) {
+		int CursorXSave = CursorX;
+		CursorX = XStart + Count;
+		if (EraseKanji(1) != 0) {
+			tail = 1;
+		}
+		CursorX = CursorXSave;
 	}
 
 	NewLine(PageStart+CursorY);
@@ -1037,6 +1070,13 @@ void BuffEraseCharsInLine(int XStart, int Count)
 		}
 	}
 
+	if (head != 0) {
+		XStart -= 1;
+		Count += 1;
+	}
+	if (tail != 0) {
+		Count += 1;
+	}
 	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, XStart + Count);
 }
 
@@ -1138,46 +1178,7 @@ void BuffDeleteChars(int Count)
  */
 void BuffEraseChars(int Count)
 {
-	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
-	int extr = 0;
-	int sx = CursorX;
-	buff_char_t *b;
-	NewLine(PageStart + CursorY);
-
-	if (Count > NumOfColumns - CursorX) {
-		Count = NumOfColumns - CursorX;
-	}
-
-	b = &CodeLineW[CursorX];
-	if (IsBuffPadding(b)) {
-		// 全角の右側、全角をスペースに置き換える
-		BuffSetChar(b - 1, ' ', 'H');
-		BuffSetChar(b, ' ', 'H');
-		sx--;
-		extr++;
-	}
-	if (IsBuffFullWidth(b)) {
-		// 全角の左側、全角をスペースに置き換える
-		BuffSetChar(b, ' ', 'H');
-		BuffSetChar(b + 1, ' ', 'H');
-		if (Count == 1) {
-			extr++;
-		}
-	}
-	if (Count > 1) {
-		// 終端をチェック
-		if (IsBuffPadding(b + Count)) {
-			// 全角の右側、全角をスペースに置き換える
-			BuffSetChar(b + Count - 1, ' ', 'H');
-			BuffSetChar(b + Count, ' ', 'H');
-			extr++;
-		}
-	}
-
-	memsetW(&(CodeLineW[CursorX]), 0x20, CurCharAttr.Fore, CurCharAttr.Back, AttrDefault, CurCharAttr.Attr2 & Attr2ColorMask, Count);
-
-	/* update window */
-	BuffDrawLineI(-1, -1, CursorY + PageStart, sx, sx + Count + extr);
+	BuffEraseCharsInLine(CursorX, Count);
 }
 
 void BuffFillWithE(void)
