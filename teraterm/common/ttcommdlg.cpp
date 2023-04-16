@@ -42,9 +42,11 @@
 #define	NEW_DIALOG_ENABLE	1		// Vista+
 #define	OLD_DIALOG_ENABLE	1
 
-// VS2005‚Ìê‡
-#if _MSC_VER == 1400
-// 2005‚ÅŽg‚¦‚éSDK‚É‚ÍIFileOpenDialog‚ª‚È‚¢
+// IFileOpenDialog‚ªŽg‚¦‚È‚¢ê‡
+#if (defined(__MINGW64_VERSION_MAJOR) && (__MINGW64_VERSION_MAJOR <= 8)) || \
+	(_MSC_VER == 1400)
+//		VS2005
+//		MinGW <= 8.0
 #undef	NEW_DIALOG_ENABLE
 #define	NEW_DIALOG_ENABLE	0
 #undef	OLD_DIALOG_ENABLE
