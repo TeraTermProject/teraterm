@@ -67,3 +67,7 @@ insert_final_newline = true
 
 [*.ini]
 end_of_line = crlf
+
+[*.sh]
+end_of_line = lf
+charset = utf-8
