@@ -48,4 +48,13 @@ add_library(
   libputty
   ${SRC}
   ${PUTTY_SRC}
+)
+
+# sshsh256.c, sshsh512.c で出るエラーを回避
+if(MINGW)
+  target_compile_definitions(
+    libputty
+    PRIVATE
+    _FORCE_SOFTWARE_SHA
   )
+endif(MINGW)
