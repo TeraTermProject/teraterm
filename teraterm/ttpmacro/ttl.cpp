@@ -65,8 +65,8 @@
 #include "dllutil.h"
 #include "asprintf.h"
 
-#define TTERMCOMMAND "TTERMPRO /D="
-#define CYGTERMCOMMAND "cyglaunch -o /D="
+#define TTERMCOMMAND "TTERMPRO"
+#define CYGTERMCOMMAND "cyglaunch -o"
 
 // for 'ExecCmnd' command
 static BOOL ParseAgain;
@@ -617,7 +617,7 @@ WORD TTLConnect(WORD mode)
 		}
 
 		strW = ToWcharU8(Str);
-		aswprintf(&command_line, L"%hs %hs %s", command, TopicNameA, strW);
+		aswprintf(&command_line, L"%hs /D=%hs %s", command, TopicNameA, strW);
 		e = TTWinExec(command_line);
 		free(command_line);
 		free(strW);
