@@ -15,8 +15,14 @@
   - Settings/General
     - Project name 設定する
   - Custom configuration .yml file name (重要)
-    - AppVeyorからアクセスできるところに appveyor.ymlを置く
-    - https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/ci_scripts/appveyor.yml?export=raw
+    - AppVeyorからアクセスできるところに appveyor_*.ymlを置く
+    - https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/ci_scripts/appveyor_vs2022.yml?export=raw など
+
+
+appveyor_vs*_bat.yml
+====================
+
+Windows image の Visual Studio を使用したビルド
 
 ## build
 
@@ -28,6 +34,19 @@
     - 30分/jobぐらい
   - teraterm
 - Artifacts にsnapshot.zip ができている
+
+appveyor_ubuntu2004.yml
+=======================
+
+Linux image(Ubuntu2004) の MinGW を利用したビルド
+
+
+appveyor_mix.yml
+================
+
+いくつかのイメージを使って Visual Studio, Mingw を使って一気にビルド
+
+最近使用していない
 
 ## build_local_appveyor_*
 
