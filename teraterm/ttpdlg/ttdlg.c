@@ -145,6 +145,8 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		{ IDC_TERMLOCALECHO, "DLG_TERM_LOCALECHO" },
 		{ IDC_TERMANSBACKTEXT, "DLG_TERM_ANSBACK" },
 		{ IDC_TERMAUTOSWITCH, "DLG_TERM_AUTOSWITCH" },
+		{ IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
+		{ IDC_TERMKANJISENDLABEL, "DLG_TERM_KANJISEND" },
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_TERMHELP, "BTN_HELP" },
@@ -161,33 +163,14 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			SetDlgTextsW(Dialog, TextInfosCom, _countof(TextInfosCom), ts->UILanguageFileW);
 			if (ts->Language==IdJapanese) {
+				// 日本語の時だけ4つの項目が存在する
 				static const DlgTextInfo TextInfosJp[] = {
-					{ IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
 					{ IDC_TERMKANA, "DLG_TERM_KANA" },
-					{ IDC_TERMKANJISENDLABEL, "DLG_TERM_KANJISEND" },
 					{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
 					{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 					{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
 				};
 				SetDlgTextsW(Dialog, TextInfosJp, _countof(TextInfosJp), ts->UILanguageFileW);
-			}
-			else if ( ts->Language==IdRussian ) {
-				// TODO
-				// 		次のキーを使わなくなった,整理する
-				//			"DLG_TERM_RUSSCHARSET"
-				//			"DLG_TERM_RUSSFONT"
-				static const DlgTextInfo TextInfosRu[] = {
-					{ IDC_TERMKANJILABEL, "DLG_TERM_RUSSCLIENT" },
-					{ IDC_TERMKANJISENDLABEL, "DLG_TERM_RUSSHOST" },
-				};
-				SetDlgTextsW(Dialog, TextInfosRu, _countof(TextInfosRu), ts->UILanguageFileW);
-			}
-			else if (ts->Language==IdUtf8 || ts->Language==IdKorean || ts->Language == IdChinese) {
-				static const DlgTextInfo TextInfosKo[] = {
-					{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
-					{ IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND" },
-				};
-				SetDlgTextsW(Dialog, TextInfosKo, _countof(TextInfosKo), ts->UILanguageFileW);
 			}
 
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
