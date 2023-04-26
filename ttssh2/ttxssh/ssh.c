@@ -7006,6 +7006,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 				new_payload_buffer = msg;
 				pvar->ssh_state.payload_datastart = 0;
 				pvar->ssh_state.payload_datalen = msglen;
+				SetTimer(pvar->cv->HWin, IdKickIdleTimer, 300, 0);
 			}
 			else {
 				pvar->ssh_state.payload_datastart = 4;

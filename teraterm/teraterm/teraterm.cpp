@@ -235,6 +235,14 @@ static BOOL OnIdle(LONG lCount)
 	return (Busy>0);
 }
 
+/**
+ *	ŠO•”‚©‚ç idleˆ—‚ğs‚¤
+ */
+void OnIdleExt(void)
+{
+	OnIdle(0);
+}
+
 static HWND main_window;
 HWND GetHWND(void)
 {

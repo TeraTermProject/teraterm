@@ -2687,6 +2687,9 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 		case IdPrnProcTimer:
 			PrnFileDirectProc(PrintFile_);
 			break;
+		case IdKickIdleTimer:
+			OnIdleExt();
+			break;
 	}
 }
 

@@ -39,3 +39,4 @@
 
 void AddModelessHandle(HWND hWnd);
 void RemoveModelessHandle(HWND hWnd);
+void OnIdleExt(void);
