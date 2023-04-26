@@ -9,16 +9,16 @@ endif()
 set(LIBRESSL_INCLUDE_DIRS ${LIBRESSL_ROOT}/include)
 if(MINGW)
   set(LIBRESSL_LIB
-    ${LIBRESSL_ROOT}/lib/libcrypto-47.a
+    ${LIBRESSL_ROOT}/lib/libcrypto-50.a
     bcrypt
   )
 else()
   if(IS_MULTI_CONFIG)
     set(LIBRESSL_LIB
-      debug ${LIBRESSL_ROOT}/lib/crypto-47d.lib
-      optimized ${LIBRESSL_ROOT}/lib/crypto-47.lib
+      debug ${LIBRESSL_ROOT}/lib/crypto-50d.lib
+      optimized ${LIBRESSL_ROOT}/lib/crypto-50.lib
     )
   else()
-    set(LIBRESSL_LIB ${LIBRESSL_ROOT}/lib/crypto-47.lib)
+    set(LIBRESSL_LIB ${LIBRESSL_ROOT}/lib/crypto-50.lib)
   endif()
 endif()
