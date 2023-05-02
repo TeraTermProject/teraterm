@@ -1,6 +1,7 @@
 ﻿# libsshagentc
 
-- ssh-agent と通信するためのライブラリ
+ssh-agent と通信するためのライブラリ。
+Tera Term 以外でも使えるよう考慮。
 
 ファイル/フォルダ
 
@@ -11,6 +12,8 @@
 - skelton/
   - クライアントスケルトン
   - 何も行わない
+- sshagentc/
+  - 作成中
 
 # 資料
 
