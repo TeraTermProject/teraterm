@@ -52,7 +52,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\putty;$(SolutionDir)..\libs\putty\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libsshagentc;$(SolutionDir)..\libs\putty;$(SolutionDir)..\libs\putty\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SECURITY_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -64,7 +64,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\putty;$(SolutionDir)..\libs\putty\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libsshagentc;$(SolutionDir)..\libs\putty;$(SolutionDir)..\libs\putty\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SECURITY_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -73,23 +73,23 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\putty\aqsync.c" />
-    <ClCompile Include="..\..\libs\putty\callback.c" />
-    <ClCompile Include="..\..\libs\putty\errsock.c" />
-    <ClCompile Include="..\..\libs\putty\marshal.c" />
-    <ClCompile Include="..\..\libs\putty\memory.c" />
-    <ClCompile Include="..\..\libs\putty\mpint.c" />
-    <ClCompile Include="..\..\libs\putty\sshsh256.c" />
-    <ClCompile Include="..\..\libs\putty\tree234.c" />
-    <ClCompile Include="..\..\libs\putty\utils.c" />
-    <ClCompile Include="..\..\libs\putty\version.c" />
-    <ClCompile Include="..\..\libs\putty\windows\wincapi.c" />
-    <ClCompile Include="..\..\libs\putty\windows\winhandl.c" />
-    <ClCompile Include="..\..\libs\putty\windows\winhsock.c" />
-    <ClCompile Include="..\..\libs\putty\windows\winmisc.c" />
-    <ClCompile Include="..\..\libs\putty\windows\winnpc.c" />
-    <ClCompile Include="..\..\libs\putty\windows\winpgntc.c" />
-    <ClCompile Include="..\..\libs\putty\windows\winsecur.c" />
+    <ClCompile Include="..\..\..\libs\putty\aqsync.c" />
+    <ClCompile Include="..\..\..\libs\putty\callback.c" />
+    <ClCompile Include="..\..\..\libs\putty\errsock.c" />
+    <ClCompile Include="..\..\..\libs\putty\marshal.c" />
+    <ClCompile Include="..\..\..\libs\putty\memory.c" />
+    <ClCompile Include="..\..\..\libs\putty\mpint.c" />
+    <ClCompile Include="..\..\..\libs\putty\sshsh256.c" />
+    <ClCompile Include="..\..\..\libs\putty\tree234.c" />
+    <ClCompile Include="..\..\..\libs\putty\utils.c" />
+    <ClCompile Include="..\..\..\libs\putty\version.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\wincapi.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\winhandl.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\winhsock.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\winmisc.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\winnpc.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\winpgntc.c" />
+    <ClCompile Include="..\..\..\libs\putty\windows\winsecur.c" />
     <ClCompile Include="libputty.c" />
     <ClCompile Include="putty-import.c" />
   </ItemGroup>

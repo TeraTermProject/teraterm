@@ -261,7 +261,7 @@ const char *putty_get_version()
 	return ver;
 }
 
-void putty_agent_query_synchronous(void *in, int inlen, void **out, int *outlen)
+void putty_agent_query_synchronous(const void *in, int inlen, void **out, int *outlen)
 {
 	strbuf *buf = strbuf_new();
 

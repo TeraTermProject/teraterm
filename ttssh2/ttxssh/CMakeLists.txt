@@ -160,7 +160,7 @@ target_include_directories(
   PRIVATE
   ../../teraterm/teraterm
   ../matcher
-  ../putty
+  ../libsshagentc
   ../../libs/include
   ${ZLIB_INCLUDE_DIRS}
   )
@@ -211,7 +211,7 @@ target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
   common_static
-  libputty
+  libsshagentc
   ttpcmn
   argon2
   ${ZLIB_LIB}
