@@ -8,6 +8,9 @@
   - libsshagentc インターフェイス
 - putty/
   - putty 0.76 を利用した ssh-agent client
+- skelton/
+  - クライアントスケルトン
+  - 何も行わない
 
 # 資料
 
