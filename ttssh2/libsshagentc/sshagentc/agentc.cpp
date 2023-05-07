@@ -149,7 +149,7 @@ static char *capi_obfuscate_string(const char *realname)
 
 /**
  *	pagent named pipe名
- *	from putty windows/utils/agent_named_pipe_name.c
+ *	from PuTTY windows/utils/agent_named_pipe_name.c
  */
 static char *agent_named_pipe_name(void)
 {
@@ -328,7 +328,7 @@ finish:
 
 /**
  *	sidの取得
- *	PuTTY security.c get_user_sid()
+ *	from PuTTY windows/utils/security.c get_user_sid()
  */
 #if PUTTY_SHM
 static PSID get_user_sid(void)
@@ -386,7 +386,7 @@ static PSID get_user_sid(void)
 
 /**
  *	SECURITY_ATTRIBUTES の取得
- *	PuTTY windows/agent-client.c wm_copydata_agent_query() を参考にした
+ *	from PuTTY windows/agent-client.c wm_copydata_agent_query() の一部を切り出し
  *
  *	@param	psa		SECURITY_ATTRIBUTES へのポインタ
  *					ここに取得する
@@ -421,17 +421,18 @@ static SECURITY_ATTRIBUTES *get_sa(SECURITY_ATTRIBUTES *psa)
 }
 #endif
 
+#if PUTTY_SHM
 /**
  *	agent(pageant)と通信,共有メモリ経由
+ *	PuTTY windows/agent-client.c wm_copydata_agent_query() と同等
  *
  *	@retval	FALSE	エラー
  */
-#if PUTTY_SHM
-static BOOL query_SHM(const Buffer &request, Buffer &reply)
+static BOOL query_wm_copydata(const Buffer &request, Buffer &reply)
 {
 	HWND hwnd;
 	char mapname[25];
-	HANDLE fmap = NULL;
+	HANDLE filemap = NULL;
 	unsigned char *p = NULL;
 	unsigned long len;
 	BOOL ret = FALSE;
@@ -452,18 +453,18 @@ static BOOL query_SHM(const Buffer &request, Buffer &reply)
 	SECURITY_ATTRIBUTES sa;
 	psa = get_sa(&sa);
 	sprintf_s(mapname, "PageantRequest%08x", (unsigned)GetCurrentThreadId());
-	fmap = CreateFileMappingA(INVALID_HANDLE_VALUE, psa, PAGE_READWRITE,
-							  0, AGENT_MAX_MSGLEN, mapname);
-	if (!fmap) {
+	filemap = CreateFileMappingA(INVALID_HANDLE_VALUE, psa, PAGE_READWRITE,
+	                             0, AGENT_MAX_MSGLEN, mapname);
+	if (!filemap) {
 		goto agent_error;
 	}
 
-	if ((p = (unsigned char *)MapViewOfFile(fmap, FILE_MAP_WRITE, 0, 0, 0)) == NULL) {
+	if ((p = (unsigned char *)MapViewOfFile(filemap, FILE_MAP_WRITE, 0, 0, 0)) == NULL) {
 		goto agent_error;
 	}
 
 	COPYDATASTRUCT cds;
-#define AGENT_COPYDATA_ID 0x804e50ba	// ?
+#define AGENT_COPYDATA_ID 0x804e50ba	// from putty windows\platform.h
 	cds.dwData = AGENT_COPYDATA_ID;
 	cds.cbData = (DWORD)(strlen(mapname) + 1);
 	cds.lpData = mapname;
@@ -480,8 +481,8 @@ agent_error:
 	if (p) {
 		UnmapViewOfFile(p);
 	}
-	if (fmap) {
-		CloseHandle(fmap);
+	if (filemap) {
+		CloseHandle(filemap);
 	}
 	if (ret == 0) {
 		reply.append_uint32(5);
@@ -495,6 +496,9 @@ agent_error:
 }
 #endif
 
+/**
+ *	PuTTY windows/agent-client.c agent_query() と同等
+ */
 static BOOL query(const Buffer &request, Buffer &reply)
 {
 	BOOL r;
@@ -511,7 +515,7 @@ static BOOL query(const Buffer &request, Buffer &reply)
 	}
 #endif
 #if PUTTY_SHM
-	r = query_SHM(request, reply);
+	r = query_wm_copydata(request, reply);
 	if (r) {
 		goto finish;
 	}
@@ -622,6 +626,9 @@ const char *putty_get_version()
 	return "libsshagent 0.1";
 }
 
+/**
+ *	PuTTY aqsync.c agent_query_synchronous() と同等
+ */
 void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_ptr, int *rep_len)
 {
 	Buffer request;
@@ -634,12 +641,30 @@ void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_
 }
 
 #if PUTTY_NAMEDPIPE
+/**
+ *	PuTTY windows/agent-client.c named_pipe_agent_exists() と同等
+ */
 static BOOL check_puttyagent_namedpipe()
 {
 	char *pname = agent_named_pipe_name();
 	DWORD r = GetFileAttributesA(pname);
 	free(pname);
 	return r != INVALID_FILE_ATTRIBUTES ? TRUE : FALSE;
+}
+#endif
+
+#if PUTTY_SHM
+/**
+ *	from PuTTY windows\agent-client.c wm_copydata_agent_exists()
+ */
+static BOOL check_puttyagent_wm_copydata()
+{
+	HWND hwnd;
+	hwnd = FindWindow("Pageant", "Pageant");
+	if (!hwnd)
+		return false;
+	else
+		return true;
 }
 #endif
 
@@ -653,6 +678,9 @@ static BOOL check_MSagent_namedpipe()
 }
 #endif
 
+/**
+ *	PuTTY windows/agent-client.c agent_exists() と同等
+ */
 BOOL putty_agent_exists()
 {
 #if PUTTY_NAMEDPIPE
@@ -661,8 +689,7 @@ BOOL putty_agent_exists()
 	}
 #endif
 #if PUTTY_SHM
-	HWND hwnd = FindWindowA("Pageant", "Pageant");
-	if (hwnd) {
+	if (check_puttyagent_wm_copydata()) {
 		return TRUE;
 	}
 #endif
