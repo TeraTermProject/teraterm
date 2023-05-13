@@ -48,6 +48,7 @@
 #define PUTTY_SHM		1	// pageant shared memory
 #define PUTTY_NAMEDPIPE	1	// pageant named pipe
 #define MS_NAMEDPIPE	1	// Microsoft agent
+#define SSH1_ENABLE		1
 
 // SSH Agent
 //	Message numbers
@@ -68,6 +69,14 @@
 #define SSH_AGENT_IDENTITIES_ANSWER				12
 #define SSH_AGENT_SIGN_RESPONSE					14
 
+// ssh1
+#if SSH1_ENABLE
+#define SSH1_AGENTC_REQUEST_RSA_IDENTITIES		1
+#define SSH1_AGENT_RSA_IDENTITIES_ANSWER		2
+#define SSH1_AGENTC_RSA_CHALLENGE				3
+#define SSH1_AGENT_RSA_RESPONSE					4
+#endif
+
 #if PUTTY_SHM
 static PSID usersid;
 #endif
@@ -77,6 +86,13 @@ static uint32_t get_uint32(const uint8_t *p)
 	return (((uint32_t)p[3]		 ) | ((uint32_t)p[2] <<	 8) |
 			((uint32_t)p[1] << 16) | ((uint32_t)p[0] << 24));
 }
+
+#if SSH1_ENABLE
+static uint16_t get_uint16(const uint8_t *p)
+{
+	return ((uint32_t)p[1] | ((uint32_t)p[0] << 8));
+}
+#endif
 
 /**
  *	pageant ‚Ì named pipe–¼‚Ìˆê•”
@@ -539,32 +555,47 @@ finish:
 	return r;
 }
 
-// https://datatracker.ietf.org/doc/html/draft-miller-ssh-agent-04#section-4.4
-int putty_get_ssh2_keylist(unsigned char **keylist)
+static int putty_get_keylist(unsigned char **keylist, uint8_t req_byte, uint8_t rep_byte)
 {
 	Buffer req;
 	req.append_uint32(1);
-	req.append_byte(SSH_AGENTC_REQUEST_IDENTITIES);
+	req.append_byte(req_byte);
 
 	Buffer rep;
 	query(req, rep);
 
-	// check
-	const uint8_t *reply_ptr = (uint8_t *)rep.get_ptr();
-	uint32_t reply_len = get_uint32(reply_ptr);
-	if (rep.size() != reply_len + 4 || reply_ptr[4] != SSH_AGENT_IDENTITIES_ANSWER) {
-		*keylist = NULL;
-		return 0;
+	uint32_t key_blob_len;
+	uint8_t *key_blob_ptr;
+	if (rep.size() < 4) {
+	error:
+		key_blob_len = 0;
+		key_blob_ptr = NULL;
 	}
-
-	uint32_t key_blob_len = reply_len - (4+1);
-	uint8_t *key_blob_ptr = (uint8_t *)malloc(key_blob_len);
-	memcpy(key_blob_ptr, reply_ptr + (4+1), key_blob_len);
+	else {
+		// check
+		const uint8_t *reply_ptr = (uint8_t *)rep.get_ptr();
+		uint32_t reply_len = get_uint32(reply_ptr);
+		if (rep.size() < reply_len + 4 || reply_ptr[4] != rep_byte) {
+			key_blob_len = 0;
+			key_blob_ptr = NULL;
+			goto error;
+		}
+		key_blob_len = reply_len - (4+1);
+		key_blob_ptr = (uint8_t *)malloc(key_blob_len);
+		memcpy(key_blob_ptr, reply_ptr + (4+1), key_blob_len);
+	}
 
 	*keylist = key_blob_ptr;
 	return key_blob_len;
 }
 
+// https://datatracker.ietf.org/doc/html/draft-miller-ssh-agent-04#section-4.4
+int putty_get_ssh2_keylist(unsigned char **keylist)
+{
+	return putty_get_keylist(keylist, SSH_AGENTC_REQUEST_IDENTITIES, SSH_AGENT_IDENTITIES_ANSWER);
+}
+
+// https://datatracker.ietf.org/doc/html/draft-miller-ssh-agent-04#section-4.5
 void *putty_sign_ssh2_key(unsigned char *pubkey,
 						  unsigned char *data,
 						  int datalen,
@@ -599,8 +630,12 @@ void *putty_sign_ssh2_key(unsigned char *pubkey,
 
 int putty_get_ssh1_keylist(unsigned char **keylist)
 {
-	(void)keylist;
+#if SSH1_ENABLE
+	return putty_get_keylist(keylist, SSH1_AGENTC_REQUEST_RSA_IDENTITIES, SSH1_AGENT_RSA_IDENTITIES_ANSWER);
+#else
+	*keylist = NULL;
 	return 0;
+#endif
 }
 
 void *putty_hash_ssh1_challenge(unsigned char *pubkey,
@@ -610,20 +645,107 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
 								unsigned char *session_id,
 								int *outlen)
 {
+#if SSH1_ENABLE
+	Buffer req;
+	req.append_byte(SSH1_AGENTC_RSA_CHALLENGE);
+	req.append_array(pubkey, pubkeylen);
+	req.append_array(data, datalen);
+	req.append_array(session_id, 16);
+	req.append_uint32(1); // response format
+	req.prepend_uint32((uint32_t)req.size());
+
+	Buffer rep;
+	query(req, rep);
+
+	uint32_t ret_len;
+	uint8_t *ret_ptr;
+	if (rep.size() < 4) {
+	error:
+		ret_ptr = NULL;
+		ret_len = 0;
+	}
+	else {
+		const uint8_t *reply_ptr = (uint8_t *)rep.get_ptr();
+		uint32_t reply_len = get_uint32(reply_ptr);
+		if (reply_len != (uint32_t)(rep.size() - 4)) {
+			goto error;
+		}
+		if (reply_len < 1 + 16 || reply_ptr[4] != SSH1_AGENT_RSA_RESPONSE) {
+			goto error;
+		}
+		ret_len = (uint32_t)(reply_len - 1);
+		ret_ptr = (uint8_t *)malloc(ret_len);
+		memcpy(ret_ptr, reply_ptr + (4+1), ret_len);
+	}
+#else
 	(void)pubkey;
 	(void)pubkeylen;
 	(void)data;
 	(void)datalen;
 	(void)session_id;
-	(void)outlen;
-	return NULL;
+	uint32_t ret_len = 0;
+	uint8_t *ret_ptr = NULL;
+#endif
+
+	if (outlen)
+		*outlen = ret_len;
+
+	return ret_ptr;
 }
+
+#if SSH1_ENABLE
+static int mp_ssh1(const uint8_t *data, int len)
+{
+	if (len < 2) {
+		return 0;
+	}
+	int bit_len = get_uint16(data);
+	len -= 2;
+	data += 2;
+	int byte_len = (int)((bit_len + 7) / 8);
+	if (len < byte_len) {
+		return 0;
+	}
+	return 2 + byte_len;
+}
+#endif
 
 int putty_get_ssh1_keylen(unsigned char *key, int maxlen)
 {
+#if SSH1_ENABLE
+	int left = maxlen;
+	const uint8_t *key_ptr = key;
+
+	// 4byte
+	if (left < 4) {
+	error:
+		return 0;
+	}
+	key_ptr += 4;
+	left -= 4;
+
+	// mp
+	int len = mp_ssh1(key_ptr, left);
+	if (len == 0) {
+		goto error;
+	}
+	left -= len;
+	key_ptr += len;
+
+	// mp
+	len = mp_ssh1(key_ptr, left);
+	if (left == 0) {
+		goto error;
+	}
+	left -= len;
+	key_ptr += len;
+
+	return maxlen - left;
+#else
 	(void)key;
 	(void)maxlen;
 	return 0;
+#endif
 }
 
 const char *putty_get_version()
@@ -665,7 +787,7 @@ static BOOL check_puttyagent_namedpipe()
 static BOOL check_puttyagent_wm_copydata()
 {
 	HWND hwnd;
-	hwnd = FindWindow("Pageant", "Pageant");
+	hwnd = FindWindowA("Pageant", "Pageant");
 	if (!hwnd)
 		return false;
 	else
