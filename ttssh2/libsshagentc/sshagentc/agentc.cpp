@@ -25,8 +25,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-// PuTTY is copyright 1997-2023 Simon Tatham.
-// RLogin is copyright 1998-2023 Culti
+/*
+ * Referred to PuTTY and RLogin
+ *  License of PuTTY
+ *   PuTTY is copyright 1997-2022 Simon Tatham.
+ *  License of RLogin
+ *   Copyright (c) 2017 Culti
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
