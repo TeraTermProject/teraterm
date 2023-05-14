@@ -32,6 +32,9 @@
 #include	<commctrl.h>
 #include	<windowsx.h>  // for GET_X_LPARAM(), GET_Y_LPARAM()
 #include	<string.h>
+#define _CRTDBG_MAP_ALLOC
+#include	<stdlib.h>
+#include	<crtdbg.h>
 
 #include	"ttpmenu.h"
 #include	"registry.h"
@@ -2642,34 +2645,29 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 static void GetUILanguageFile(char *buf, int buflen)
 {
-	wchar_t *HomeDirW;
-	wchar_t *Temp;
-	wchar_t *SetupFName;
-	wchar_t *fullpath;
-	char *fullpathA;
-
 	/* Get home directory */
-	HomeDirW = GetHomeDirW(NULL);
+	wchar_t *HomeDirW = GetHomeDirW(NULL);
 
 	/* Get SetupFName */
-	SetupFName = GetDefaultSetupFNameW(HomeDirW);
+	wchar_t *SetupFName = GetDefaultSetupFNameW(HomeDirW);
+	free(HomeDirW);
 
 	/* Get LanguageFile name */
-	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", NULL, SetupFName, &Temp);
-	if (Temp[0] == L'\0') {
-		free(Temp);
-		Temp = _wcsdup(L"lang\\Default.lng");
+	wchar_t *lng_rel;
+	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", NULL, SetupFName, &lng_rel);
+	free(SetupFName);
+	if (lng_rel[0] == L'\0') {
+		free(lng_rel);
+		lng_rel = _wcsdup(L"lang\\Default.lng");
 	}
 
-	fullpath = GetUILanguageFileFullW(HomeDirW, Temp);
-	fullpathA = ToCharW(fullpath);
-	free(HomeDirW);
-	free(SetupFName);
-	free(Temp);
-	free(fullpath);
+	wchar_t *ExeDirW = GetExeDirW(NULL);
+	wchar_t *fullpath = GetUILanguageFileFullW(ExeDirW, lng_rel);
+	free(ExeDirW);
+	free(lng_rel);
 
-	strcpy_s(buf, buflen, fullpathA);
-	free(fullpathA);
+	WideCharToACP_t(fullpath, buf, buflen);
+	free(fullpath);
 }
 
 /* ==========================================================================
@@ -2698,6 +2696,10 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 	HMODULE		module;
 	pSetDllDir	setDllDir;
 	pSetDefDllDir	setDefDllDir;
+
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
 	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
