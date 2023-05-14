@@ -880,19 +880,20 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
 	return DirName;
 }
 
-/*
+/**
  *	UILanguageFileのフルパスを取得する
  *
- *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
- *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
+ *	@param[in]		ExeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
+ *	@param[in]		UILanguageFileRel		lngファイル、ExeDirからの相対パス
  *	@return			LanguageFile			lngファイルのフルパス
+ *											不要になったらfree()すること
  */
-wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguageFileRel)
+wchar_t *GetUILanguageFileFullW(const wchar_t *ExeDir, const wchar_t *UILanguageFileRel)
 {
 	wchar_t *fullpath;
-	size_t size = wcslen(HomeDir) + 1 + wcslen(UILanguageFileRel) + 1;
+	size_t size = wcslen(ExeDir) + 1 + wcslen(UILanguageFileRel) + 1;
 	wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
-	wcscpy_s(rel, size, HomeDir);
+	wcscpy_s(rel, size, ExeDir);
 	wcscat_s(rel, size, L"\\");
 	wcscat_s(rel, size, UILanguageFileRel);
 	hGetFullPathNameW(rel, &fullpath, NULL);
@@ -901,9 +902,10 @@ wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguag
 }
 
 /**
- *	設定ファイルのフルパスを取得する
+ *	設定ファイル(TERATERM.INI等)のフルパスを取得する
  *
- *	@param[in]	home	ttermpro.exe 等の実行ファイルのあるフォルダ
+ *	@param[in]	home	設定ファイルのあるフォルダ
+ *						デフォルトは GetHomeDirW() で取得
  *	@param[in]	file	設定ファイル名(パスは含まない)
  *	@return		フルパス (不要になったら free() すること)
  */
@@ -917,12 +919,26 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 	return dest;
 }
 
-// デフォルトの TERATERM.INI のフルパスを取得
+/**
+ *	デフォルトの設定ファイル(TERATERM.INI)のフルパスを取得
+ *
+ *	@param[in]	home	設定ファイルのあるフォルダ
+ *						デフォルトは GetHomeDirW() で取得
+ *						NULLの時デフォルトフォルダ
+ */
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home)
 {
 	const wchar_t *ini = L"TERATERM.INI";
-	wchar_t *buf = GetDefaultFNameW(home, ini);
-	return buf;
+	wchar_t *SetupFName;
+	if (home != NULL) {
+		SetupFName = GetDefaultFNameW(home, ini);
+	}
+	else {
+		wchar_t *HomeDirW = GetHomeDirW(NULL);
+		SetupFName = GetDefaultSetupFNameW(HomeDirW);
+		free(HomeDirW);
+	}
+	return SetupFName;
 }
 
 /**
@@ -1838,4 +1854,28 @@ void deleteInvalidStrftimeCharW(wchar_t *FName)
 	}
 
 	FName[j] = 0;
+}
+
+/**
+ * DPI Aware (高DPI対応)
+ *
+ *	指定INIファイルの Tera Term セクションのDPIAware=on のとき
+ *	高DPI対応なことをWindowsに通知する
+ *
+ *	@param	SetupFNameW		TERATERM.INI のフルパス
+ */
+void SetDPIAwareness(const wchar_t *SetupFNameW)
+{
+	if (pIsValidDpiAwarenessContext == NULL || pSetThreadDpiAwarenessContext == NULL) {
+		// 高DPIに対応していないWindows
+		return;
+	}
+
+	wchar_t Temp[4];
+	GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on", Temp, _countof(Temp), SetupFNameW);
+	if (_wcsicmp(Temp, L"on") == 0) {
+		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
+			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+		}
+	}
 }

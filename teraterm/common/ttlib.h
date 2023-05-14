@@ -216,6 +216,7 @@ void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height);
 wchar_t *RandomFileW(const wchar_t *filespec_src);
 void RandomFile(const char *filespec_src,char *filename, int destlen);
 int __ismbblead(BYTE b, int code_page);
+void SetDPIAwareness(const wchar_t *SetupFNameW);
 
 #ifdef __cplusplus
 }
