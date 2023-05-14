@@ -16,6 +16,12 @@ add_executable(
   ttpmenu.rc
   )
 
+target_compile_definitions(
+  ${PACKAGE_NAME}
+  PRIVATE
+#  UNICODE=1 _UNICODE=1
+)
+
 target_sources(
   ${PACKAGE_NAME}
   PRIVATE
