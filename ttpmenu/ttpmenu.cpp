@@ -316,7 +316,7 @@ BOOL GetApplicationFilename(char *szName, char *szPath)
 	if (bRet == FALSE || ::lstrlen(szPath) == 0) {
 		RegGetDword(hKey, KEY_TTSSH, (LPDWORD) &bTtssh);
 		::GetProfileString("Tera Term Pro", "Path", szDefault, szTTermPath, MAX_PATH);
-		::wsprintf(szPath, "%s\\%s", szTTermPath, bTtssh ? TTSSH : TERATERM);
+		::wsprintf(szPath, "%s\\%s", szTTermPath, TERATERM);
 	}
 
 	RegClose(hKey);
@@ -897,10 +897,10 @@ BOOL InitEtcDlg(HWND hWnd)
 
 	if (::lstrlen(g_JobInfo.szTeraTerm) == 0) {
 		::GetProfileString("Tera Term Pro", "Path", szDefault, szTTermPath, MAX_PATH);
-		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, g_JobInfo.bTtssh ? TTSSH : TERATERM);
+		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, TERATERM);
 	}
-	if (g_JobInfo.bTtssh == TRUE && lstrstri(g_JobInfo.szTeraTerm, TTSSH) == NULL)
-		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, TTSSH);
+	if (g_JobInfo.bTtssh == TRUE && lstrstri(g_JobInfo.szTeraTerm, TERATERM) == NULL)
+		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, TERATERM);
 	if (::lstrlen(g_JobInfo.szLoginPrompt) == 0) {
 		::lstrcpy(g_JobInfo.szLoginPrompt, LOGIN_PROMPT);
 	}
@@ -988,7 +988,7 @@ BOOL SetDefaultEtcDlg(HWND hWnd)
 	char	szTTermPath[MAX_PATH];
 
 	::GetProfileString("Tera Term Pro", "Path", szDefault, szTTermPath, MAX_PATH);
-	::wsprintf(szTTermPath, "%s\\%s", szTTermPath, g_JobInfo.bTtssh ? TTSSH : TERATERM);
+	::wsprintf(szTTermPath, "%s\\%s", szTTermPath, TERATERM);
 
 	::SetDlgItemText(hWnd, EDIT_TTMPATH, szTTermPath);
 	::SetDlgItemText(hWnd, EDIT_INITFILE, "");
@@ -1250,7 +1250,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 
 	if (::lstrlen(jobInfo.szTeraTerm) == 0) {
 		::GetProfileString("Tera Term Pro", "Path", szDefault, jobInfo.szTeraTerm, MAX_PATH);
-		::wsprintf(jobInfo.szTeraTerm, "%s\\%s", jobInfo.szTeraTerm, jobInfo.bTtssh ? TTSSH : TERATERM);
+		::wsprintf(jobInfo.szTeraTerm, "%s\\%s", jobInfo.szTeraTerm, TERATERM);
 	}
 
 	::lstrcpy(szHostName, jobInfo.szHostName);
@@ -1789,12 +1789,12 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	g_JobInfo.bStartup	= (BOOL) ::IsDlgButtonChecked(hWnd, CHECK_STARTUP);
 
 	g_JobInfo.bTtssh	= (BOOL) ::IsDlgButtonChecked(hWnd, CHECK_TTSSH);
-	if (g_JobInfo.bTtssh == TRUE && lstrstri(g_JobInfo.szTeraTerm, TTSSH) == NULL) {
+	if (g_JobInfo.bTtssh == TRUE && lstrstri(g_JobInfo.szTeraTerm, TERATERM) == NULL) {
 		::GetProfileString("Tera Term Pro", "Path", szDefault, szTTermPath, MAX_PATH);
-		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, TTSSH);
+		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, TERATERM);
 	} else if (::lstrlen(g_JobInfo.szTeraTerm) == 0) {
 		::GetProfileString("Tera Term Pro", "Path", szDefault, szTTermPath, MAX_PATH);
-		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, g_JobInfo.bTtssh ? TTSSH : TERATERM);
+		::wsprintf(g_JobInfo.szTeraTerm, "%s\\%s", szTTermPath, TERATERM);
 	}
 	
 	GetCurrentDirectory(sizeof(cur), cur);
@@ -2103,8 +2103,8 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		g_JobInfo.bTtssh	= ::IsDlgButtonChecked(hWnd, CHECK_TTSSH);
 		if (::DialogBox(g_hI, (LPCTSTR) DIALOG_ETC, hWnd, DlgCallBack_Etc) == TRUE) {
 			::CheckDlgButton(hWnd, CHECK_TTSSH, 0);
-			if ((pt = lstrstri(g_JobInfo.szTeraTerm, TTSSH)) != NULL)
-				if (::lstrcmpi(pt, TTSSH) == 0)
+			if ((pt = lstrstri(g_JobInfo.szTeraTerm, TERATERM)) != NULL)
+				if (::lstrcmpi(pt, TERATERM) == 0)
 					::CheckDlgButton(hWnd, CHECK_TTSSH, 1);
 		}
 		return TRUE;

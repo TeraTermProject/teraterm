@@ -24,7 +24,6 @@
 #define		LISTBOX_HEIGHT			18
 #define		LISTBOX_WIDTH			20
 #define		TERATERM				"ttermpro.exe"
-#define		TTSSH					TERATERM
 #define		TTERM_KEY				"Software\\ShinpeiTools\\TTermMenu"
 #define		LOGIN_PROMPT			"login:"
 #define		PASSWORD_PROMPT			"Password:"
