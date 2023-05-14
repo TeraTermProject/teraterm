@@ -239,6 +239,7 @@ END
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
+1 RT_MANIFEST ttpmenu.manifest
 
 
 #ifndef APSTUDIO_INVOKED
