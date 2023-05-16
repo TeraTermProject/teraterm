@@ -36,7 +36,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 
-#include "tt_res.h"
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "ftlib.h"
@@ -46,27 +45,27 @@
 
 /* YMODEM */
 typedef struct {
-  BYTE PktIn[1030], PktOut[1030];
-  int PktBufCount, PktBufPtr;
-  BYTE PktNum, PktNumSent;
-  int PktNumOffset;
-  int PktReadMode;
-  WORD YMode, YOpt, TextFlag;
-  WORD NAKMode;
-  int NAKCount;
-  WORD __DataLen, CheckLen;
-  BOOL CRRecv;
-  int TOutShort;
-  int TOutLong;
-  int TOutInit;
-  int TOutInitCRC;
-  int TOutVLong;
-  int SendFileInfo;
-  int SendEot;
-  int LastSendEot;
-  WORD DataLen;
-  BYTE LastMessage;
-  BOOL RecvFilesize;
+	BYTE PktIn[1030], PktOut[1030];
+	int PktBufCount, PktBufPtr;
+	BYTE PktNum, PktNumSent;
+	int PktNumOffset;
+	int PktReadMode;
+	WORD YMode, YOpt, TextFlag;
+	WORD NAKMode;
+	int NAKCount;
+	WORD __DataLen, CheckLen;
+	BOOL CRRecv;
+	int TOutShort;
+	int TOutLong;
+	int TOutInit;
+	int TOutInitCRC;
+	int TOutVLong;
+	int SendFileInfo;
+	int SendEot;
+	int LastSendEot;
+	WORD DataLen;
+	BYTE LastMessage;
+	BOOL RecvFilesize;
 	TProtoLog *log;
 	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	WORD LogState;
@@ -169,7 +168,7 @@ static void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
 		yv->CheckLen = 2;
 		break;
 	}
-	SetDlgItemText(fv->HWin, IDC_PROTOPROT, Tmp);
+	fv->SetDlgProtoText(fv, Tmp);
 }
 
 static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
@@ -313,7 +312,7 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	}
 
 	if (yv->YMode == IdYSend) {
-		InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
 		fv->ProgStat = -1;
 	}
@@ -714,9 +713,9 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 	fv->ByteCount = fv->ByteCount + c;
 
-	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, yv->PktNumOffset+yv->PktNum);
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgPaketNum(fv, yv->PktNumOffset+yv->PktNum);
+	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	fv->FTSetTimeOut(fv,yv->TOutLong);
 
@@ -1109,17 +1108,16 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	{
 		if (0 == yv->PktNumSent)
 		{
-			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, yv->PktNumOffset + 256);
+			fv->SetDlgPaketNum(fv, yv->PktNumOffset + 256);
 		}
 		else
 		{
-			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, yv->PktNumOffset + yv->PktNumSent);
+			fv->SetDlgPaketNum(fv, yv->PktNumOffset + yv->PktNumSent);
 		}
 
-		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-		              fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+		fv->SetDlgByteCount(fv, fv->ByteCount);
+		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	}
 
 	return TRUE;

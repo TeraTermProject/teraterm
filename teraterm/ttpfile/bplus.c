@@ -31,7 +31,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include <string.h>
-#include "tt_res.h"
 
 #include "dlglib.h"
 #include "ftlib.h"
@@ -45,34 +44,34 @@
 
 /* B Plus */
 typedef struct {
-  BYTE WS;
-  BYTE WR;
-  BYTE B_S;
-  BYTE CM;
-  BYTE DQ;
-  BYTE TL;
-  BYTE Q[8];
-  BYTE DR;
-  BYTE UR;
-  BYTE FI;
+	BYTE WS;
+	BYTE WR;
+	BYTE B_S;
+	BYTE CM;
+	BYTE DQ;
+	BYTE TL;
+	BYTE Q[8];
+	BYTE DR;
+	BYTE UR;
+	BYTE FI;
 } TBPParam;
 
 
 typedef struct {
-  BYTE PktIn[2066], PktOut[2066];
-  int PktInCount, CheckCount;
-  int PktOutLen, PktOutCount, PktOutPtr;
-  LONG Check, CheckCalc;
-  BYTE PktNum, PktNumSent;
-  int PktNumOffset;
-  int PktSize;
-  WORD BPMode, BPState, BPPktState;
-  BOOL GetPacket, EnqSent;
-  BYTE MaxBS, CM;
-  BOOL Quoted;
-  int TimeOut;
-  BOOL CtlEsc;
-  BYTE Q[8];
+	BYTE PktIn[2066], PktOut[2066];
+	int PktInCount, CheckCount;
+	int PktOutLen, PktOutCount, PktOutPtr;
+	LONG Check, CheckCalc;
+	BYTE PktNum, PktNumSent;
+	int PktNumOffset;
+	int PktSize;
+	WORD BPMode, BPState, BPPktState;
+	BOOL GetPacket, EnqSent;
+	BYTE MaxBS, CM;
+	BOOL Quoted;
+	int TimeOut;
+	BOOL CtlEsc;
+	BYTE Q[8];
 	TProtoLog *log;
 	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	WORD LogState;
@@ -146,9 +145,9 @@ static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   }
 
   BPDispMode(fv,bv);
-  SetDlgItemText(fv->HWin, IDC_PROTOPROT, "B-Plus");
+  fv->SetDlgProtoText(fv, "B-Plus");
 
-  InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+  fv->InitDlgProgress(fv, &fv->ProgStat);
   fv->StartTime = GetTickCount();
 
   /* file name, file size */
@@ -527,11 +526,10 @@ static void BPSendNPacket(PFileVarProto fv, PBPVar bv)
   i = i - 4;
   BPMakePacket(bv,'N',i);
 
-  SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
+  fv->SetDlgByteCount(fv, fv->ByteCount);
   if (fv->FileSize>0)
-    SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-      fv->ByteCount, fv->FileSize, &fv->ProgStat);
-  SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+    fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+  fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 }
 
 static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
@@ -555,8 +553,7 @@ static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
     bv->PktNum = 0;
     bv->PktNumOffset = bv->PktNumOffset + 10;
   }
-  SetDlgNum(fv->HWin, IDC_PROTOPKTNUM,
-	    bv->PktNum + bv->PktNumOffset);
+  fv->SetDlgPaketNum(fv, bv->PktNum + bv->PktNumOffset);
 
   if (bv->PktIn[1] != '+')
     BPSendACK(fv,bv,cv); /* Send ack */
@@ -735,45 +732,44 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 
 static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 {
-  TFileIO *fileio = fv->file;
-  bv->GetPacket = FALSE;
-  /* Packet type */
+	TFileIO *fileio = fv->file;
+	bv->GetPacket = FALSE;
+	/* Packet type */
 
-  switch (bv->PktIn[1]) {
+	switch (bv->PktIn[1]) {
     case '+': /* Transport parameters */
-      if (bv->BPState==BP_Init)
-	BPSendInit(bv);
-      else
-	BPSendFailure(bv,'E');
-      return;
+		if (bv->BPState==BP_Init)
+			BPSendInit(bv);
+		else
+			BPSendFailure(bv,'E');
+		return;
     case 'F': /* Failure */
-      if (! fv->NoMsg)
-	MessageBox(fv->HMainWin,"Transfer failure",
-	  "Tera Term: Error",MB_ICONEXCLAMATION);
-      bv->BPState = BP_Close;
-      break;
+		if (! fv->NoMsg)
+			MessageBox(fv->HMainWin,"Transfer failure",
+					   "Tera Term: Error",MB_ICONEXCLAMATION);
+		bv->BPState = BP_Close;
+		break;
     case 'N': /* Data */
-      if ((bv->BPState==BP_RecvFile) &&
-	  fv->FileOpen)
-	bv->BPState = BP_RecvData;
-      else if (bv->BPState != BP_RecvData)
-      {
-	BPSendFailure(bv,'E');
-	return;
-      }
-      fileio->WriteFile(fileio, &(bv->PktIn[2]), bv->PktInCount-2);
-      fv->ByteCount = fv->ByteCount +
-		      bv->PktInCount - 2;
-      SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-      if (fv->FileSize>0)
-	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-	  fv->ByteCount, fv->FileSize, &fv->ProgStat);
-      SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
-      break;
+		if ((bv->BPState==BP_RecvFile) &&
+			fv->FileOpen)
+			bv->BPState = BP_RecvData;
+		else if (bv->BPState != BP_RecvData)
+		{
+			BPSendFailure(bv,'E');
+			return;
+		}
+		fileio->WriteFile(fileio, &(bv->PktIn[2]), bv->PktInCount-2);
+		fv->ByteCount = fv->ByteCount +
+			bv->PktInCount - 2;
+		fv->SetDlgByteCount(fv, fv->ByteCount);
+		if (fv->FileSize>0)
+			fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		break;
     case 'T':
-      BPParseTPacket(fv,bv); /* File transfer */
-      break;
-  }
+		BPParseTPacket(fv,bv); /* File transfer */
+		break;
+	}
 }
 
 static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
@@ -832,7 +828,7 @@ static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
       break;
     case BP_Failure: bv->BPState = BP_Close; break;
   }
-  SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, bv->PktNum + bv->PktNumOffset);
+  fv->SetDlgPaketNum(fv, bv->PktNum + bv->PktNumOffset);
 }
 
 static void BPDequote(LPBYTE b)

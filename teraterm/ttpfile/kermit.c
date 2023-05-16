@@ -36,7 +36,6 @@
 #include <sys/stat.h>
 #include <sys/utime.h>
 
-#include "tt_res.h"
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -709,9 +708,9 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 	}
 
 	if (Buff==NULL)
-		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
+		fv->SetDlgByteCount(fv, fv->ByteCount);
 	*BuffLen = BuffPtr;
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 }
 
 static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
@@ -968,10 +967,9 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	int DataLen, DataLenNew, maxlen;
 	BOOL NextFlag;
 
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-		fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	DataLen = 0;
 	DataLenNew = 0;
 
@@ -1000,10 +998,9 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 	if (DataLen==0)
 	{
-		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-			fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+		fv->SetDlgByteCount(fv, fv->ByteCount);
+		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 		KmtSendEOFPacket(fv,kv,cv);
 	}
 	else {
@@ -1075,10 +1072,10 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	fv->StartTime = GetTickCount();
 
 	fv->SetDlgProtoFileName(fv, kv->FullName);
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
+	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->SetDlgPercent(fv,
 		fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	KmtIncPacketNum(kv);
 	filename = file->GetSendFilename(file, kv->FullName, FALSE, TRUE, FALSE);
@@ -1174,10 +1171,10 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	PKmtVar kv = fv->data;
 
-	SetDlgItemText(fv->HWin, IDC_PROTOPROT, "Kermit");
+	fv->SetDlgProtoText(fv, "Kermit");
 
 	if (kv->KmtMode == IdKmtSend) {
-		InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+		fv->InitDlgProgress(fv, &fv->ProgStat);
 		fv->StartTime = GetTickCount();
 	}
 	else {
@@ -1640,7 +1637,7 @@ read_end:
 			kv->PktNumOffset = kv->PktNumOffset + 64;
 	}
 
-	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, kv->PktNum);
+	fv->SetDlgPaketNum(fv, kv->PktNum);
 
 	return TRUE;
 }

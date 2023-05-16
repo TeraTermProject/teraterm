@@ -40,22 +40,22 @@
 
 /* XMODEM */
 typedef struct {
-  BYTE PktIn[1030], PktOut[1030];
-  int PktBufCount, PktBufPtr;
-  BYTE PktNum, PktNumSent;
-  int PktNumOffset;
-  int PktReadMode;
-  WORD XMode, XOpt, TextFlag;
-  WORD NAKMode;
-  int NAKCount;
-  WORD DataLen, CheckLen;
-  BOOL CRRecv;
-  int TOutShort;
-  int TOutLong;
-  int TOutInit;
-  int TOutInitCRC;
-  int TOutVLong;
-  int CANCount;
+	BYTE PktIn[1030], PktOut[1030];
+	int PktBufCount, PktBufPtr;
+	BYTE PktNum, PktNumSent;
+	int PktNumOffset;
+	int PktReadMode;
+	WORD XMode, XOpt, TextFlag;
+	WORD NAKMode;
+	int NAKCount;
+	WORD DataLen, CheckLen;
+	BOOL CRRecv;
+	int TOutShort;
+	int TOutLong;
+	int TOutInit;
+	int TOutInitCRC;
+	int TOutVLong;
+	int CANCount;
 	TProtoLog *log;
 	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	WORD LogState;
@@ -73,10 +73,7 @@ typedef TXVar far *PXVar;
 #define XnakNAK 1
 #define XnakC 2
 
-BOOL XParse(PFileVarProto fv, PComVar cv);
-void XTimeOutProc(PFileVarProto fv, PComVar cv);
-void XCancel(PFileVarProto fv, PComVar cv);
-static int SetOptV(PFileVarProto fv, int request, va_list ap);
+static void XCancel(PFileVarProto fv, PComVar cv);
 
 static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 {
@@ -217,7 +214,7 @@ static BOOL XCheckPacket(PXVar xv)
 				(LOBYTE(Check) == xv->PktIn[xv->DataLen + 4]));
 }
 
-BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	TFileIO *file = fv->file;
 	PXVar xv = fv->data;
@@ -305,7 +302,7 @@ BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	return TRUE;
 }
 
-void XCancel(PFileVarProto fv, PComVar cv)
+static void XCancel(PFileVarProto fv, PComVar cv)
 {
 	PXVar xv = fv->data;
 	// five cancels & five backspaces per spec
@@ -315,7 +312,7 @@ void XCancel(PFileVarProto fv, PComVar cv)
 	xv->XMode = 0;				// quit
 }
 
-void XTimeOutProc(PFileVarProto fv, PComVar cv)
+static void XTimeOutProc(PFileVarProto fv, PComVar cv)
 {
 	PXVar xv = fv->data;
 	switch (xv->XMode) {
@@ -636,7 +633,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 	return TRUE;
 }
 
-BOOL XParse(PFileVarProto fv, PComVar cv)
+static BOOL XParse(PFileVarProto fv, PComVar cv)
 {
 	PXVar xv = fv->data;
 	switch (xv->XMode) {

@@ -51,8 +51,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "tt_res.h"
-
 #include "dlglib.h"
 #include "ftlib.h"
 #include "ttcommon.h"
@@ -62,22 +60,22 @@
 
 /* ZMODEM */
 typedef struct {
-  BYTE RxHdr[4], TxHdr[4];
-  BYTE RxType, TERM;
-  BYTE PktIn[1032], PktOut[1032];
-  int PktInPtr, PktOutPtr;
-  int PktInCount, PktOutCount;
-  int PktInLen;
-  BOOL BinFlag;
-  BOOL Sending;
-  int ZMode, ZState, ZPktState;
-  int MaxDataLen, TimeOut, CanCount;
-  BOOL CtlEsc, CRC32, HexLo, Quoted, CRRecv;
-  WORD CRC;
-  LONG CRC3, Pos, LastPos, WinSize;
-  BYTE LastSent;
-  int TOutInit;
-  int TOutFin;
+	BYTE RxHdr[4], TxHdr[4];
+	BYTE RxType, TERM;
+	BYTE PktIn[1032], PktOut[1032];
+	int PktInPtr, PktOutPtr;
+	int PktInCount, PktOutCount;
+	int PktInLen;
+	BOOL BinFlag;
+	BOOL Sending;
+	int ZMode, ZState, ZPktState;
+	int MaxDataLen, TimeOut, CanCount;
+	BOOL CtlEsc, CRC32, HexLo, Quoted, CRRecv;
+	WORD CRC;
+	LONG CRC3, Pos, LastPos, WinSize;
+	BYTE LastSent;
+	int TOutInit;
+	int TOutFin;
 	TProtoLog *log;
 	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	WORD LogState;
@@ -614,10 +612,9 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	fv->ByteCount = 0;
 	fv->ProgStat = 0;
 	fv->StartTime = GetTickCount();
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-				  fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	add_sendbuf("%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
 		__FUNCTION__,
@@ -661,10 +658,9 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 		}
 	} while ((c != 0) && (zv->PktOutCount <= zv->MaxDataLen - 2));
 
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
-	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-				  fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	zv->Pos = fv->ByteCount;
 
 	zv->PktOut[zv->PktOutCount] = ZDLE;
@@ -716,9 +712,9 @@ static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		CommInsert1Byte(cv, ZPAD);
 	}
 
-	SetDlgItemText(fv->HWin, IDC_PROTOPROT, "ZMODEM");
+	fv->SetDlgProtoText(fv, "ZMODEM");
 
-	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+	fv->InitDlgProgress(fv, &fv->ProgStat);
 	fv->StartTime = GetTickCount();
 
 	fv->FileSize = 0;
@@ -1121,11 +1117,11 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	ZStoHdr(zv, 0);
 	zv->ZState = Z_RecvData;
 
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, 0);
+	fv->SetDlgByteCount(fv, 0);
 	if (fv->FileSize > 0)
-		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
+		fv->SetDlgPercent(fv,
 					  0, fv->FileSize, &fv->ProgStat);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, GetTickCount(), fv->ByteCount);
+	fv->SetDlgTime(fv, GetTickCount(), fv->ByteCount);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);
@@ -1159,11 +1155,11 @@ static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 	fv->ByteCount = fv->ByteCount + zv->PktInPtr;
 	zv->Pos = zv->Pos + zv->PktInPtr;
 	ZStoHdr(zv, zv->Pos);
-	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
+	fv->SetDlgByteCount(fv, fv->ByteCount);
 	if (fv->FileSize > 0)
-		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
+		fv->SetDlgPercent(fv,
 					  fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);
