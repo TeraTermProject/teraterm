@@ -66,11 +66,12 @@ target_include_directories(
   .
   )
 
-target_link_options(
-  ${PACKAGE_NAME}
-  PRIVATE
-  /MANIFEST:NO
-)
+if(MSVC)
+  target_link_options(
+    ${PACKAGE_NAME}
+    PRIVATE
+    /MANIFEST:NO)
+endif()
 
 target_link_libraries(
   ${PACKAGE_NAME}
