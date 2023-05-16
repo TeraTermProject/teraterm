@@ -572,7 +572,7 @@ static void QVWriteToFile(PFileVarProto fv, PQVVar qv)
   file->WriteFile(file,&(qv->PktIn[3]),C);
   fv->ByteCount = fv->ByteCount + C;
 
-  fv->SetDlgPaketNum(fv, qv->SeqNum);
+  fv->SetDlgPacketNum(fv, qv->SeqNum);
   fv->SetDlgByteCount(fv, fv->ByteCount);
   if (fv->FileSize>0)
     fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
@@ -957,7 +957,7 @@ static void QVSendVDATA(PFileVarProto fv, PQVVar qv)
 	file->Seek(file, Pos);
     file->ReadFile(file,&(qv->PktOut[3]),C);
     fv->ByteCount = Pos + (LONG)C;
-    fv->SetDlgPaketNum(fv, qv->SeqSent);
+    fv->SetDlgPacketNum(fv, qv->SeqSent);
     fv->SetDlgByteCount(fv, fv->ByteCount);
     fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
     fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);

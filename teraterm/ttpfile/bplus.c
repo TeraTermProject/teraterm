@@ -553,7 +553,7 @@ static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
     bv->PktNum = 0;
     bv->PktNumOffset = bv->PktNumOffset + 10;
   }
-  fv->SetDlgPaketNum(fv, bv->PktNum + bv->PktNumOffset);
+  fv->SetDlgPacketNum(fv, bv->PktNum + bv->PktNumOffset);
 
   if (bv->PktIn[1] != '+')
     BPSendACK(fv,bv,cv); /* Send ack */
@@ -828,7 +828,7 @@ static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
       break;
     case BP_Failure: bv->BPState = BP_Close; break;
   }
-  fv->SetDlgPaketNum(fv, bv->PktNum + bv->PktNumOffset);
+  fv->SetDlgPacketNum(fv, bv->PktNum + bv->PktNumOffset);
 }
 
 static void BPDequote(LPBYTE b)

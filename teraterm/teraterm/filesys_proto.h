@@ -83,7 +83,7 @@ typedef struct FileVarProto {
 	// UI
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
 	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);
-	void (*SetDlgPaketNum)(struct FileVarProto *fv, LONG Num);
+	void (*SetDlgPacketNum)(struct FileVarProto *fv, LONG Num);
 	void (*SetDlgByteCount)(struct FileVarProto *fv, LONG Num);
 	void (*SetDlgPercent)(struct FileVarProto *fv, LONG a, LONG b, int *p);
 	void (*SetDlgProtoText)(struct FileVarProto *fv, const char *text);

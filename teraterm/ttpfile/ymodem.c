@@ -713,7 +713,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 	fv->ByteCount = fv->ByteCount + c;
 
-	fv->SetDlgPaketNum(fv, yv->PktNumOffset+yv->PktNum);
+	fv->SetDlgPacketNum(fv, yv->PktNumOffset+yv->PktNum);
 	fv->SetDlgByteCount(fv, fv->ByteCount);
 	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
@@ -1108,11 +1108,11 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	{
 		if (0 == yv->PktNumSent)
 		{
-			fv->SetDlgPaketNum(fv, yv->PktNumOffset + 256);
+			fv->SetDlgPacketNum(fv, yv->PktNumOffset + 256);
 		}
 		else
 		{
-			fv->SetDlgPaketNum(fv, yv->PktNumOffset + yv->PktNumSent);
+			fv->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNumSent);
 		}
 
 		fv->SetDlgByteCount(fv, fv->ByteCount);

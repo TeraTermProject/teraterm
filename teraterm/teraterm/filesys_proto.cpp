@@ -110,7 +110,7 @@ static void _SetDlgTime(TFileVarProto *fv, DWORD elapsed, int bytes)
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 }
 
-static void _SetDlgPaketNum(struct FileVarProto *fv, LONG Num)
+static void _SetDlgPacketNum(struct FileVarProto *fv, LONG Num)
 {
 	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, Num);
 }
@@ -235,7 +235,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	fv->InitDlgProgress = _InitDlgProgress;
 	fv->SetDlgTime = _SetDlgTime;
-	fv->SetDlgPaketNum = _SetDlgPaketNum;
+	fv->SetDlgPacketNum = _SetDlgPacketNum;
 	fv->SetDlgByteCount = _SetDlgByteCount;
 	fv->SetDlgPercent = _SetDlgPercent;
 	fv->SetDlgProtoText = _SetDlgProtoText;

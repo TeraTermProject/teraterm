@@ -464,7 +464,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 
 	fv->ByteCount = fv->ByteCount + c;
 
-	fv->SetDlgPaketNum(fv, xv->PktNumOffset + xv->PktNum);
+	fv->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNum);
 	fv->SetDlgByteCount(fv, fv->ByteCount);
 	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
@@ -620,10 +620,10 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 
 	if (xv->PktBufCount == 0) {
 		if (xv->PktNumSent == 0) {
-			fv->SetDlgPaketNum(fv, xv->PktNumOffset + 256);
+			fv->SetDlgPacketNum(fv, xv->PktNumOffset + 256);
 		}
 		else {
-			fv->SetDlgPaketNum(fv, xv->PktNumOffset + xv->PktNumSent);
+			fv->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNumSent);
 		}
 		fv->SetDlgByteCount(fv, fv->ByteCount);
 		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);

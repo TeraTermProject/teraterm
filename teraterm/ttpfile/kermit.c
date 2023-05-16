@@ -1637,7 +1637,7 @@ read_end:
 			kv->PktNumOffset = kv->PktNumOffset + 64;
 	}
 
-	fv->SetDlgPaketNum(fv, kv->PktNum);
+	fv->SetDlgPacketNum(fv, kv->PktNum);
 
 	return TRUE;
 }
