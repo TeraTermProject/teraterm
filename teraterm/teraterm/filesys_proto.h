@@ -50,7 +50,8 @@ typedef struct FileVarProto {
 
 	// ↓各プロトコルで使用するワーク
 	BOOL FileOpen;
-	LONG FileSize, ByteCount;
+	LONG FileSize;
+	LONG ByteCount;
 	BOOL OverWrite;
 
 	BOOL Success;

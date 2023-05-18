@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, XMODEM protocol */
+/* XMODEM protocol */
 #include "teraterm.h"
 #include "tttypes.h"
 #include <stdio.h>
@@ -38,15 +38,28 @@
 
 #include "xmodem.h"
 
-/* XMODEM */
+typedef enum {
+	XpktSOH = 1,
+	XpktBLK = 2,
+	XpktBLK2 = 3,
+	XpktDATA = 4,
+} PKT_READ_MODE;
+
+typedef enum {
+	XnakNAK = 1,
+	XnakC = 2
+} NAK_MODE;
+
 typedef struct {
 	BYTE PktIn[1030], PktOut[1030];
 	int PktBufCount, PktBufPtr;
 	BYTE PktNum, PktNumSent;
 	int PktNumOffset;
-	int PktReadMode;
-	WORD XMode, XOpt, TextFlag;
-	WORD NAKMode;
+	PKT_READ_MODE PktReadMode;
+	WORD XMode, XOpt;
+	BOOL TextFlagConvertCRLF;
+	BOOL TextFlagTrim1A;
+	NAK_MODE NAKMode;
 	int NAKCount;
 	WORD DataLen, CheckLen;
 	BOOL CRRecv;
@@ -61,17 +74,6 @@ typedef struct {
 	WORD LogState;
 } TXVar;
 typedef TXVar far *PXVar;
-
-/* prototypes */
-
-/* XMODEM states */
-#define XpktSOH 1
-#define XpktBLK 2
-#define XpktBLK2 3
-#define XpktDATA 4
-
-#define XnakNAK 1
-#define XnakC 2
 
 static void XCancel(PFileVarProto fv, PComVar cv);
 
@@ -95,9 +97,10 @@ static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, PCHAR B, int C)
+static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, const void *_B, size_t C)
 {
 	int i, j;
+	const char *B = (char *)_B;
 
 	i = CommBinaryOut(cv, B, C);
 	if (xv->log != NULL && (i > 0)) {
@@ -183,7 +186,7 @@ static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 	fv->FTSetTimeOut(fv, t);
 }
 
-static WORD XCalcCheck(PXVar xv, PCHAR PktBuf)
+static WORD XCalcCheck(PXVar xv, const BYTE *PktBuf)
 {
 	int i;
 	WORD Check;
@@ -229,11 +232,18 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	xv->FullName = fv->GetNextFname(fv);
 	if (xv->XMode == IdXSend) {
+		size_t size;
 		fv->FileOpen = file->OpenRead(file, xv->FullName);
 		if (fv->FileOpen == FALSE) {
 			return FALSE;
 		}
-		fv->FileSize = file->GetFSize(file, xv->FullName);
+		size = file->GetFSize(file, xv->FullName);
+		if (size > 0x7FFFFFFF) { // LONG_MAX
+			// TODO
+			//  FileSize は各プロトコルごとに持つほうがよさそう
+			return FALSE;
+		}
+		fv->FileSize = (LONG)size;
 		fv->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
 		fv->FileOpen = file->OpenWrite(file, xv->FullName);
@@ -279,8 +289,6 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	switch (xv->XMode) {
 	case IdXSend:
-		xv->TextFlag = 0;
-
 		// ファイル送信開始前に、"rx ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		if (ts->XModemRcvCommand[0] != '\0') {
 			TFileIO *file = fv->file;
@@ -446,21 +454,35 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 		xv->PktNumOffset = xv->PktNumOffset + 256;
 
 	c = xv->DataLen;
-	if (xv->TextFlag > 0)
+	if (xv->TextFlagTrim1A) {
+		// パケット末の 0x1A を削除
 		while ((c > 0) && (xv->PktIn[2 + c] == 0x1A))
 			c--;
+	}
 
-	if (xv->TextFlag > 0)
+	if (xv->TextFlagConvertCRLF) {
+		// パケット内のCRのみLFのみをCR+LFに変換しながらファイルへ出力
 		for (i = 0; i <= c - 1; i++) {
 			b = xv->PktIn[3 + i];
-			if ((b == LF) && (!xv->CRRecv))
+			if ((b == LF) && (!xv->CRRecv)) {
+				// LF(0x0A)受信 && 前のデータがCR(0x0D)ではない
+				// CR(0x0D)出力
+				//  → (CR以外)+(LF) は、(CR以外)+(CR)+(LF)で出力される
 				file->WriteFile(file, "\015", 1);
-			if (xv->CRRecv && (b != LF))
+			}
+			if (xv->CRRecv && (b != LF)) {
+				// LF(0x0A)以外受信 && 前のデータがCR(0xOD)
+				// LF(0x0A)出力
+				//  → (CR)+(LF以外)は、(CR)+(LF)+(LF以外)で出力される
 				file->WriteFile(file, "\012", 1);
+			}
 			xv->CRRecv = b == CR;
 			file->WriteFile(file, &b, 1);
-	} else
+		}
+	} else {
+		// そのままファイルへ出力
 		file->WriteFile(file, &(xv->PktIn[3]), c);
+	}
 
 	fv->ByteCount = fv->ByteCount + c;
 
@@ -527,10 +549,10 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				break;
 			case 0x43:
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
-					if ((xv->XOpt == XoptCheck)) {
+					if (xv->XOpt == XoptCheck) {
 						XSetOpt(fv, xv, XoptCRC);
 					}
-					else if ((xv->XOpt == Xopt1kCksum)) {
+					else if (xv->XOpt == Xopt1kCksum) {
 						XSetOpt(fv, xv, Xopt1kCRC);
 					}
 					SendFlag = TRUE;
@@ -651,18 +673,20 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	PXVar xv = fv->data;
 	switch(request) {
 	case XMODEM_MODE: {
-		int Mode = va_arg(ap, int);
+		const int Mode = va_arg(ap, int);
 		xv->XMode = Mode;
 		return 0;
 	}
 	case XMODEM_OPT: {
-		WORD Opt1 = va_arg(ap, int);
+		const WORD Opt1 = va_arg(ap, int);
 		xv->XOpt = Opt1;
 		return 0;
 	}
 	case XMODEM_TEXT_FLAG: {
-		WORD Opt2 = va_arg(ap, int);
-		xv->TextFlag = Opt2;
+		const WORD Opt2 = va_arg(ap, int);
+		const BOOL TextFlag = Opt2 == 0 ? FALSE : TRUE;
+		xv->TextFlagConvertCRLF = TextFlag;
+		xv->TextFlagTrim1A = TextFlag;
 		return 0;
 	}
 	}
