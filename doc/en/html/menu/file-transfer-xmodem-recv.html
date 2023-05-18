@@ -32,8 +32,25 @@
 
       <dt>Binary</dt>
       <dd>
-	The binary file transfer option. If you want to receive a text file,
-	don't select this option.
+        <ul>
+          <li>
+            Checkd: Received data is treated as binary and saved in a file without modification.<br>
+            The last received packet is packed with padding(EOF,$1A).
+            For this reason, the end of file cannot be known when the end of the sent file is $1A.
+          </li>
+          <li>Unchecked: Received data is treated as text and saved in a file.<br>
+            following processes are performed:
+            <ul>
+              <li>
+                Newline code conversion<br>
+                A single CR($0D) or LF($0A) is converted to CR+LF($0D+$0A).
+              </li>
+              <li>
+                Remove padding(EOF,$0A) of each reciving packet<br>
+                EOF($1A) does not appear in the text. So $1A at the end of the file will be removed.
+              </li>
+            </ul>
+        </ul>
       </dd>
     </dl>
 

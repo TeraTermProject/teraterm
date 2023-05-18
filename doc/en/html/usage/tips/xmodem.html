@@ -46,14 +46,14 @@ If file transfers fail, try connecting to the host with the binary option. To co
 The XMODEM file transfer protocol handles files in blocks of 128 or
 1024 bytes, and file lengths cannot be exchanged.
 
-The received file length is always a multiple of 128 or 1024 bytes.
+The received data length is always a multiple of 128 or 1024 bytes.
 </p>
 
 <p>
 Sender puts padding in the last block that is longer than the length
 of the transmitted file.
 
-The pudding is $1A according to the XMODEM specification.
+The padding is $1A according to the XMODEM specification.
 But it may be some other value depending on the XMODEM sending program.
 </p>
 
