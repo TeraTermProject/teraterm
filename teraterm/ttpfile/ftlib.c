@@ -27,16 +27,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, routines for file transfer protocol */
+/* routines for file transfer protocol */
 
-#include "teraterm.h"
-#include "tttypes.h"
-#include "ttlib.h"
-#include <stdio.h>
-#include <string.h>
-
+#include <windows.h> // for BYTE, WORD, LONG
 #include "ftlib.h"
-#include "tt_res.h"
 
 WORD UpdateCRC(BYTE b, WORD CRC)
 {
