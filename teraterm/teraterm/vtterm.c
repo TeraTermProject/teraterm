@@ -4319,7 +4319,7 @@ void ControlSequence(BYTE b)
 	FirstPrm = FALSE;
 }
 
-int CheckUTF8Seq(BYTE b, int utf8_stat)
+static int CheckUTF8Seq(BYTE b, int utf8_stat)
 {
 	if (ts.Language == IdUtf8 || (ts.Language==IdJapanese && ts.KanjiCode==IdUTF8)) {
 		if (utf8_stat > 0) {
@@ -5973,6 +5973,7 @@ static BOOL ParseFirstUTF8(BYTE b)
 	static int count = 0;
 
 	unsigned int code;
+	int i;
 
 	if (ts.FallbackToCP932 && Fallbacked) {
 		return ParseFirstJP(b);
@@ -5991,94 +5992,125 @@ static BOOL ParseFirstUTF8(BYTE b)
 	//		- 0xf5 - 0xff
 	//	- 2byte目以降
 	//		- 0x00 - 0x7f
-	//		--0xc0 - 0xff
+	//		- 0xc0 - 0xff
 
-	if ((b & 0x80) != 0x80 || ((b & 0xe0) == 0x80 && count == 0)) {
-		// 1バイト目および2バイト目がASCIIの場合は、すべてASCII出力とする。
-		// 1バイト目がC1制御文字(0x80-0x9f)の場合も同様。
-
-		// 入力文字が 0x00 ... 0x7f
-		if (count == 0 || count == 1) {
-			if (count == 1) {
-				ParseASCII(buf[0]);
-			}
+	// 1byte(7bit)
+	if (count == 0) {
+		if ((b & 0x80) == 0x00) {
+			// 1byte(7bit)
+			//		0x7f以下, のとき、そのまま出力
 			ParseASCII(b);
-			count = 0;  // reset counter
+			return TRUE;
+		}
+		if ((b & 0x40) == 0x00 || b >= 0xf6 ) {
+			// UTF-8で1byteに出現しないコードのとき、そのまま出力
+			//	0x40 = 0b1011_1111, 0b10xx_xxxxというbitパターンにはならない
+			//  0xf6 以上のとき U+10FFFFより大きくなる
+			PutU32(b);
+			return TRUE;
+		}
+		// 1byte目保存
+		buf[count++] = b;
+		return TRUE;
+	}
+
+	// 2byte(11bit)
+	if ((buf[0] & 0xe0) == 0xc0) {
+		code = 0;
+		if((b & 0xc0) == 0x80) {
+			// 5bit + 6bit
+			code = ((buf[0] & 0x1f) << 6) | (b & 0x3f);
+			if (code < 0x80) {
+				// 11bit使って7bit以下の時、UTF-8の冗長な表現
+				code = 0;
+			}
+		}
+		if (code == 0){
+			// そのまま出力
+			PutU32(buf[0]);
+			PutU32(b);
+			count = 0;
+			return TRUE;
+		}
+		else {
+			PutU32(code);
+			count = 0;
 			return TRUE;
 		}
 	}
 
+	// 2byte目以降保存
 	buf[count++] = b;
-	if (count < 2) {
-		return TRUE;
-	}
 
-	// 2バイトコードの場合
-	if ((buf[0] & 0xe0) == 0xc0) {
-		if ((buf[1] & 0xc0) == 0x80) {
-
-			code = ((buf[0] & 0x1f) << 6);
-			code |= ((buf[1] & 0x3f));
-
+	// 3byte(16bit)
+	if ((buf[0] & 0xf0) == 0xe0) {
+		if(count < 3) {
+			return TRUE;
+		}
+		code = 0;
+		if ((buf[1] & 0xc0) == 0x80 && (buf[2] & 0xc0) == 0x80) {
+			// 4bit + 6bit + 6bit
+			code = ((buf[0] & 0xf) << 12);
+			code |= ((buf[1] & 0x3f) << 6);
+			code |= ((buf[2] & 0x3f));
+			if (code < 0x800) {
+				// 16bit使って11bit以下のとき、UTF-8の冗長な表現
+				code = 0;
+			}
+		}
+		if (code == 0) {
+			// そのまま出力
+			PutU32(buf[0]);
+			PutU32(buf[1]);
+			PutU32(buf[2]);
+			count = 0;
+			return TRUE;
+		} else {
 			PutU32(code);
+			count = 0;
+			return TRUE;
 		}
-		else {
-			ParseASCII(buf[0]);
-			ParseASCII(buf[1]);
+	}
+
+	// 4byte(21bit)
+	if ((buf[0] & 0xf8) == 0xf0) {
+		if(count < 4) {
+			return TRUE;
 		}
-		count = 0;
-		return TRUE;
-	}
-
-	if (count < 3) {
-		return TRUE;
-	}
-
-	if ((buf[0] & 0xf0) == 0xe0 &&
-		(buf[1] & 0xc0) == 0x80 &&
-		(buf[2] & 0xc0) == 0x80) { // 3バイトコードの場合
-
-		// UTF-8 BOM(Byte Order Mark)
-		if (buf[0] == 0xef && buf[1] == 0xbb && buf[2] == 0xbf) {
-			goto skip;
+		code = 0;
+		if ((buf[1] & 0xc0) == 0x80 && (buf[2] & 0xc0) == 0x80 && (buf[3] & 0xc0) == 0x80) {
+			// 3bit + 6bit + 6bit + 6bit
+			code = ((buf[0] & 0x07) << 18);
+			code |= ((buf[1] & 0x3f) << 12);
+			code |= ((buf[2] & 0x3f) << 6);
+			code |= (buf[3] & 0x3f);
+			if (code < 0x10000) {
+				// 21bit使って16bit以下のとき、UTF-8の冗長な表現
+				code = 0;
+			}
 		}
-
-		code = ((buf[0] & 0xf) << 12);
-		code |= ((buf[1] & 0x3f) << 6);
-		code |= ((buf[2] & 0x3f));
-
-		PutU32(code);
-
-skip:
-		count = 0;
-
+		if (code == 0) {
+			// そのまま出力
+			PutU32(buf[0]);
+			PutU32(buf[1]);
+			PutU32(buf[2]);
+			PutU32(buf[3]);
+			count = 0;
+			return TRUE;
+		} else {
+			PutU32(code);
+			count = 0;
+			return TRUE;
+		}
 	}
 
-	if (count < 4) {
-		return TRUE;
+	// ここには来ない
+	assert(FALSE);
+
+	for (i = 0; i < count; i++) {
+		ParseASCII(buf[i]);
 	}
-
-	if ((buf[0] & 0xf8) == 0xf0 &&
-		(buf[1] & 0xc0) == 0x80 &&
-		(buf[2] & 0xc0) == 0x80 &&
-		(buf[3] & 0xc0) == 0x80)
-	{	// 4バイトコードの場合
-		code = ((buf[0] & 0x07) << 18);
-		code |= ((buf[1] & 0x3f) << 12);
-		code |= ((buf[2] & 0x3f) << 6);
-		code |= (buf[3] & 0x3f);
-
-		PutU32(code);
-		count = 0;
-		return TRUE;
-	} else {
-		ParseASCII(buf[0]);
-		ParseASCII(buf[1]);
-		ParseASCII(buf[2]);
-		ParseASCII(buf[3]);
-		count = 0;
-	}
-
+	count = 0;
 	return TRUE;
 }
 
