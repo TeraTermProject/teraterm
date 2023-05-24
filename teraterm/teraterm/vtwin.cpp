@@ -139,6 +139,7 @@ static int AutoDisconnectedPort = -1;
 UnicodeDebugParam_t UnicodeDebugParam;
 typedef struct {
 	char dbcs_lead_byte;
+	UINT monitor_DPI;			// ウィンドウが表示されているディスプレイのDPI
 } vtwin_work_t;
 static vtwin_work_t vtwin_work;
 
@@ -321,10 +322,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
 	Alpha = 255;
-	IgnoreSizeMessage = FALSE;
 #if UNICODE_DEBUG
 	TipWinCodeDebug = NULL;
 #endif
+	vtwin_work.dbcs_lead_byte = 0;
+	vtwin_work.monitor_DPI = 0;
 
 	// UnicodeDebugParam
 	{
@@ -2156,6 +2158,12 @@ void CVTWindow::OnMove(int x, int y)
 	ts.VTPos.y = R.top;
 
 	DispSetWinPos();
+
+	if (vtwin_work.monitor_DPI == 0) {
+		// ウィンドウが初めて表示された
+		//	モニタのDPIを保存しておく
+		vtwin_work.monitor_DPI = GetMonitorDpiFromWindow(m_hWnd);
+	}
 }
 
 // マウスホイールの回転
@@ -2338,7 +2346,19 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
-	if (IgnoreSizeMessage) {
+	if (GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
+		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
+		//
+		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
+		// マウスのボタンを離したときに、次の2種類の発生パターンがある
+		// 1. ウィンドウが移動したとき
+		//    WM_MOVE, WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
+		// 2. ウィンドウがリサイズしたとき
+		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
+		//
+		// メッセージからは、セル数かフォントサイズか、
+		// どちらを変更すべきか判断できない
+		// ここでは 1 が妥当となるよう実装した
 		return;
 	}
 	RECT R;
@@ -4967,12 +4987,11 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 		}
 	}
 
-	IgnoreSizeMessage = TRUE;
 	::SetWindowPos(m_hWnd, NULL,
 				   NewRect->left, NewRect->top,
 				   NewWindowWidth, NewWindowHeight,
 				   SWP_NOZORDER);
-	IgnoreSizeMessage = FALSE;
+	vtwin_work.monitor_DPI = NewDPI;
 
 	ChangeCaret();
 

@@ -66,9 +66,6 @@ private:
   BYTE Alpha;
   void SetWindowAlpha(BYTE alpha);
 
-  // DPI
-  BOOL IgnoreSizeMessage;
-
   // for debug
 #if UNICODE_DEBUG
   TipWin *TipWinCodeDebug;
