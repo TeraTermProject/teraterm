@@ -145,6 +145,7 @@ static int AutoDisconnectedPort = -1;
 #define WM_IME_COMPOSITION              0x010F
 #endif
 
+static UINT monitor_DPI;			// ウィンドウが表示されているディスプレイのDPI
 static BOOL SendScpDoing;
 static TCHAR **DropListsSendScp;
 static int DropListCountSendScp;
@@ -670,7 +671,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
 	Alpha = 255;
-	IgnoreSizeMessage = FALSE;
+	monitor_DPI = 0;
 
 	/* Initialize scroll buffer */
 	InitBuffer();
@@ -2540,6 +2541,12 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 void CVTWindow::OnMove(int x, int y)
 {
 	DispSetWinPos();
+
+	if (monitor_DPI == 0) {
+		// ウィンドウが初めて表示された
+		//	モニタのDPIを保存しておく
+		monitor_DPI = GetMonitorDpiFromWindow(m_hWnd);
+	}
 }
 
 // マウスホイールの回転
@@ -2723,7 +2730,19 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
-	if (IgnoreSizeMessage) {
+	if (GetMonitorDpiFromWindow(m_hWnd) != monitor_DPI) {
+		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
+		//
+		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
+		// マウスのボタンを離したときに、次の2種類の発生パターンがある
+		// 1. ウィンドウが移動したとき
+		//    WM_MOVE, WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
+		// 2. ウィンドウがリサイズしたとき
+		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
+		//
+		// メッセージからは、セル数かフォントサイズか、
+		// どちらを変更すべきか判断できない
+		// ここでは 1 が妥当となるよう実装した
 		return;
 	}
 	RECT R;
@@ -6358,36 +6377,41 @@ void CVTWindow::OnHelpAbout()
 	FreeTTDLG();
 }
 
-LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
+LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 {
 	const UINT NewDPI = LOWORD(wp);
-	// 現在のウィンドウサイズ
-	RECT CurrentWindowRect;
-	::GetWindowRect(m_hWnd, &CurrentWindowRect);
-	const int CurrentWindowWidth = CurrentWindowRect.right - CurrentWindowRect.left;
-	const int CurrentWindowHeight = CurrentWindowRect.bottom - CurrentWindowRect.top;
-
-	// ポインタの位置
-	POINT MouseCursorScreen;
-	GetCursorPos(&MouseCursorScreen);
-	POINT MouseCursorInWindow = MouseCursorScreen;
-	MouseCursorInWindow.x -= CurrentWindowRect.left;
-	MouseCursorInWindow.y -= CurrentWindowRect.top;
+	const RECT SuggestedWindowRect = *(RECT *)lp;
+	const int SuggestedWindowWidth = SuggestedWindowRect.right - SuggestedWindowRect.left;
+	const int SuggestedWindowHeight = SuggestedWindowRect.bottom - SuggestedWindowRect.top;
 
 	// 新しいDPIに合わせてフォントを生成、
 	// クライアント領域のサイズを決定する
 	ChangeFont();
-	ScreenWidth = WinWidth*FontWidth;
-	ScreenHeight = WinHeight*FontHeight;
+	ScreenWidth = WinWidth * FontWidth;
+	ScreenHeight = WinHeight * FontHeight;
 	//AdjustScrollBar();
 
 	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
 	int NewWindowWidth;
 	int NewWindowHeight;
 	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
-		const LONG_PTR Style = ::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-		const LONG_PTR ExStyle = ::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+		const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+		if (pGetSystemMetricsForDpi != NULL) {
+			// スクロールバーが表示されている場合は、
+			// スクリーンサイズ(クライアントエリアのサイズ)に追加する
+			int min_pos;
+			int max_pos;
+			GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				ScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
+			}
+			GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				ScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
+			}
+		}
 		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
 		if (pAdjustWindowRectExForDpi != NULL) {
 			// Windows 10, version 1607+
@@ -6415,47 +6439,35 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 	}
 
 	// 新しいウィンドウ領域候補
-	RECT NewWindowRect[5];
+	RECT NewWindowRect[4];
 
-	// タイトルバー上のポインタ位置がなるべくずれない新しい位置
-	int t1 = (int)MouseCursorInWindow.y * (int)NewWindowHeight / (int)CurrentWindowHeight;
-	NewWindowRect[0].top =
-		CurrentWindowRect.top -
-		(t1 - (int)MouseCursorInWindow.y);
-	t1 = (int)MouseCursorInWindow.x * (int)NewWindowWidth / (int)CurrentWindowWidth;
-	NewWindowRect[0].left =
-		CurrentWindowRect.left -
-		(t1 - (int)MouseCursorInWindow.x);
-	NewWindowRect[0].bottom = NewWindowRect[0].top + NewWindowHeight;
-	NewWindowRect[0].right = NewWindowRect[0].left + NewWindowWidth;
+	// 推奨領域に右上寄せ
+	NewWindowRect[0].top = SuggestedWindowRect.top;
+	NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
+	NewWindowRect[0].left = SuggestedWindowRect.right - NewWindowWidth;
+	NewWindowRect[0].right = SuggestedWindowRect.right;
 
-	// 現在位置から上右寄せ
-	NewWindowRect[1].top = CurrentWindowRect.top;
-	NewWindowRect[1].bottom = CurrentWindowRect.top + NewWindowHeight;
-	NewWindowRect[1].left = CurrentWindowRect.right - NewWindowWidth;
-	NewWindowRect[1].right = CurrentWindowRect.right;
+	// 推奨領域に左上寄せ
+	NewWindowRect[1].top = SuggestedWindowRect.top;
+	NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
+	NewWindowRect[1].left = SuggestedWindowRect.left;
+	NewWindowRect[1].right = SuggestedWindowRect.left + NewWindowWidth;
 
-	// 現在位置から上左寄せ
-	NewWindowRect[2].top = CurrentWindowRect.top;
-	NewWindowRect[2].bottom = CurrentWindowRect.top + NewWindowHeight;
-	NewWindowRect[2].left = CurrentWindowRect.left;
-	NewWindowRect[2].right = CurrentWindowRect.left + NewWindowWidth;
+	// 推奨位置に右下寄せ
+	NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
+	NewWindowRect[2].bottom = SuggestedWindowRect.top;
+	NewWindowRect[2].left = SuggestedWindowRect.right - NewWindowWidth;
+	NewWindowRect[2].right = SuggestedWindowRect.right;
 
-	// 現在位置から下右寄せ
-	NewWindowRect[3].top = CurrentWindowRect.bottom - NewWindowHeight;
-	NewWindowRect[3].bottom = CurrentWindowRect.top;
-	NewWindowRect[3].left = CurrentWindowRect.right - NewWindowWidth;
-	NewWindowRect[3].right = CurrentWindowRect.right;
-
-	// 現在位置から下左寄せ
-	NewWindowRect[4].top = CurrentWindowRect.bottom - NewWindowHeight;
-	NewWindowRect[4].bottom = CurrentWindowRect.top;
-	NewWindowRect[4].left = CurrentWindowRect.left;
-	NewWindowRect[4].right = CurrentWindowRect.left + NewWindowWidth;
+	// 推奨位置に左下寄せ
+	NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
+	NewWindowRect[3].bottom = SuggestedWindowRect.top;
+	NewWindowRect[3].left = SuggestedWindowRect.left;
+	NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
 
 	// 確認
 	const RECT *NewRect = &NewWindowRect[0];
-	for (size_t i=0; i < _countof(NewWindowRect); i++) {
+	for (size_t i = 0; i < _countof(NewWindowRect); i++) {
 		const RECT *r = &NewWindowRect[i];
 		HMONITOR hMonitor = pMonitorFromRect(r, MONITOR_DEFAULTTONULL);
 		UINT dpiX;
@@ -6467,12 +6479,11 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM)
 		}
 	}
 
-	IgnoreSizeMessage = TRUE;
 	::SetWindowPos(m_hWnd, NULL,
 				   NewRect->left, NewRect->top,
 				   NewWindowWidth, NewWindowHeight,
 				   SWP_NOZORDER);
-	IgnoreSizeMessage = FALSE;
+	monitor_DPI = NewDPI;
 
 	ChangeCaret();
 

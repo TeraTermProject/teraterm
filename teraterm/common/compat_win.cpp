@@ -48,6 +48,7 @@ HRESULT (WINAPI *pGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType,
 HMONITOR (WINAPI *pMonitorFromRect)(LPCRECT lprc, DWORD dwFlags);
 BOOL (WINAPI *pAdjustWindowRectEx)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 BOOL (WINAPI *pAdjustWindowRectExForDpi)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
+int (WINAPI *pGetSystemMetricsForDpi)(int nIndex, UINT dpi);
 
 // dwmapi.dll
 HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
@@ -61,6 +62,7 @@ static const APIInfo Lists_user32[] = {
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
 	{ "AdjustWindowRectExForDpi", (void **)&pAdjustWindowRectExForDpi },
 	{ "EnumDisplayMonitors", (void **)&pEnumDisplayMonitors },
+	{ "GetSystemMetricsForDpi", (void **)&pGetSystemMetricsForDpi },
 	{},
 };
 

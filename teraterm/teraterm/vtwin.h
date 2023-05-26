@@ -61,9 +61,6 @@ private:
   BYTE Alpha;
   void SetWindowAlpha(BYTE alpha);
 
-  // DPI
-  BOOL IgnoreSizeMessage;
-
   // TipWin
   CTipWin* TipWin;
 

@@ -101,6 +101,9 @@ extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 #define pRemoveFontResourceEx	pRemoveFontResourceExA
 #endif // !UNICODE
 
+// user32
+extern int (WINAPI *pGetSystemMetricsForDpi)(int  nIndex, UINT dpi);
+
 // dwmapi.dll
 extern HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 
