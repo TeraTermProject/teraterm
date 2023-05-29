@@ -1,4 +1,19 @@
-﻿option(REMOVE_BUILD_DIR "for clean bulid" OFF)
+﻿#
+# input
+#   CMAKE_C_COMPILER
+#   CMAKE_CXX_COMPILER
+#   CMAKE_RC_COMPILER
+#       filenames
+#   GENERATE_OPTIONS
+#       cmake の generate 時の引数
+#   BUILD_TOOL_OPTIONS
+#       cmake --build  の最後に追加される
+#   BUILD_DIR
+#       build directry
+#   COMPILER_FRIENDLY
+#       インストーラ、zipファイル名の最後に追加される
+
+option(REMOVE_BUILD_DIR "for clean bulid" OFF)
 
 # create build dir
 message(STATUS "BUILD_DIR=${BUILD_DIR}")
@@ -15,9 +30,9 @@ endif()
 
 
 # svn revision
-file(MAKE_DIRECTORY ${BUILD_DIR}/teraterm/ttpdlg)
+file(MAKE_DIRECTORY ${BUILD_DIR}/teraterm/common)
 execute_process(
-  COMMAND perl ${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/svnrev.pl -v --root "${CMAKE_CURRENT_LIST_DIR}/.." --header ${BUILD_DIR}/teraterm/ttpdlg/svnversion.h --cmake ${BUILD_DIR}/build_config.cmake
+  COMMAND perl ${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/svnrev.pl -v --root "${CMAKE_CURRENT_LIST_DIR}/.." --header ${BUILD_DIR}/teraterm/common/svnversion.h --cmake ${BUILD_DIR}/build_config.cmake
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev
   )
 

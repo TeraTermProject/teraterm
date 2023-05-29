@@ -1,70 +1,47 @@
-﻿# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildsfmt.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64 -P buildsfmt.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildsfmt.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P buildsfmt.cmake
-
-####
-if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL ""))
-  if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-    # multi-configuration
-    execute_process(
-      COMMAND ${CMAKE_COMMAND}
-      -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
-      -DCMAKE_CONFIGURATION_TYPE=Release
-      -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
-      -DARCHITECTURE=${ARCHITECTURE}
-      -P buildsfmt.cmake
-      )
-    execute_process(
-      COMMAND ${CMAKE_COMMAND}
-      -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
-      -DCMAKE_CONFIGURATION_TYPE=Debug
-      -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
-      -DARCHITECTURE=${ARCHITECTURE}
-      -P buildsfmt.cmake
-      )
-    return()
-  elseif(("$ENV{MSYSTEM}" MATCHES "MINGW") OR ("${CMAKE_COMMAND}" MATCHES "mingw"))
-    # mingw on msys2
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-      set(CMAKE_BUILD_TYPE Release)
-    endif()
-  elseif("${CMAKE_GENERATOR}" MATCHES "Unix Makefiles")
-    # mingw
-    # single-configuration
-    if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
-      set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../mingw.toolchain.cmake")
-    endif()
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-      set(CMAKE_BUILD_TYPE Release)
-    endif()
-  elseif("${CMAKE_GENERATOR}" MATCHES "NMake Makefiles")
-    # VS nmake
-    # single-configuration
-    if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
-      set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/VSToolchain.cmake")
-    endif()
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-      set(CMAKE_BUILD_TYPE Release)
-    endif()
-  else()
-    # single-configuration
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-      set(CMAKE_BUILD_TYPE Release)
-    endif()
-  endif()
-endif()
+﻿# for SFMT
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=32 -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DARCHITECTURE=32 -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=64 -P buildsfmt.cmake
 
 include(script_support.cmake)
 
 set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/SFMT/src")
 set(SRC_DIR "${EXTRACT_DIR}/SFMT")
-set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/SFMT/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/SFMT_${TOOLSET}")
-if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32") OR ("${CMAKE_COMMAND}" MATCHES "mingw64"))
-  set(BUILD_DIR "${BUILD_DIR}_x64")
+set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/SFMT/build_${TOOLSET}")
+if(${ARCHITECTURE} EQUAL 64)
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
+  set(BUILD_DIR "${BUILD_DIR}_x64")
 endif()
+
+########################################
+
+# Configure + Generate
+function(cmake_generate GENERATOR SRC_DIR WORKING_DIR OPTIONS)
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G "${GENERATOR}" ${OPTIONS}
+    WORKING_DIRECTORY "${BUILD_DIR}"
+    ENCODING AUTO
+    RESULT_VARIABLE rv
+    )
+  if(NOT rv STREQUAL "0")
+    message(FATAL_ERROR "cmake build fail ${rv}")
+  endif()
+endfunction()
+
+# build + install
+function(cmake_build WORKING_DIR OPTIONS BUILD_TOOL_OPTIONS)
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} --build . ${OPTIONS} --target install -- ${BUILD_TOOL_OPTIONS}
+    WORKING_DIRECTORY "${BUILD_DIR}"
+    ENCODING AUTO
+    RESULT_VARIABLE rv
+    )
+  if(NOT rv STREQUAL "0")
+    message(FATAL_ERROR "cmake build fail ${rv}")
+  endif()
+endfunction()
 
 ########################################
 
@@ -74,7 +51,7 @@ execute_process(
   COMMAND ${CMAKE_COMMAND} -DTARGET=sfmt -DEXT_DIR=${EXTRACT_DIR} -P download.cmake
 )
 
-if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/LibreSSL-LICENSE.txt)
+if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/SFMT-LICENSE.txt)
   file(COPY
     ${SRC_DIR}/LICENSE.txt
     DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
@@ -117,55 +94,49 @@ endif()
 file(MAKE_DIRECTORY "${BUILD_DIR}")
 
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-
-  ######################################## multi configuration
-
-  if(NOT "${ARCHITECTURE}" STREQUAL "")
-    set(CMAKE_A_OPTION -A ${ARCHITECTURE})
+  # multi-configuration
+  unset(GENERATE_OPTIONS)
+  if(${ARCHITECTURE} EQUAL 64)
+    list(APPEND GENERATE_OPTIONS "-A" "x64")
+  else()
+    list(APPEND GENERATE_OPTIONS "-A" "Win32")
   endif()
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${CMAKE_GENERATOR} ${CMAKE_A_OPTION}
-    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-    ${TOOLCHAINFILE}
-    WORKING_DIRECTORY ${BUILD_DIR}
-    RESULT_VARIABLE rv
-    )
-  if(NOT rv STREQUAL "0")
-    message(FATAL_ERROR "cmake generate fail ${rv}")
-  endif()
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/VSToolchain.cmake")
 
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_CONFIGURATION_TYPE} --target install
-    WORKING_DIRECTORY ${BUILD_DIR}
-    RESULT_VARIABLE rv
-    )
-  if(NOT rv STREQUAL "0")
-    message(FATAL_ERROR "cmake install fail ${rv}")
-  endif()
+  cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
 
+  unset(BUILD_OPTIONS)
+  list(APPEND BUILD_OPTIONS --config Debug)
+  cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
+
+  unset(BUILD_OPTIONS)
+  list(APPEND BUILD_OPTIONS --config Release)
+  cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
 else()
-  ######################################## single configuration
+  # single-configuration
+  unset(GENERATE_OPTIONS)
+  if(${ARCHITECTURE} EQUAL 64)
+    list(APPEND GENERATE_OPTIONS "-DUSE_GCC_64=ON")
+  else()
+    list(APPEND GENERATE_OPTIONS "-DUSE_GCC_32=ON")
+  endif()
+  if(CMAKE_HOST_UNIX)
+    list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/../mingw.toolchain.cmake")
+  endif(CMAKE_HOST_UNIX)
+  if(("${CMAKE_GENERATOR}" MATCHES "Visual Studio") OR ("${CMAKE_GENERATOR}" MATCHES "NMake Makefiles"))
+    list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/VSToolchain.cmake")
+  endif()
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_BUILD_TYPE=Release")
 
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${CMAKE_GENERATOR}
-    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-    WORKING_DIRECTORY ${BUILD_DIR}
-    RESULT_VARIABLE rv
-    )
-  if(NOT rv STREQUAL "0")
-    message(FATAL_ERROR "cmake build fail ${rv}")
+  cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
+
+  if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
+    list(APPEND BUILD_TOOL_OPTIONS "-j")
   endif()
 
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} --build . --target install
-    WORKING_DIRECTORY ${BUILD_DIR}
-    RESULT_VARIABLE rv
-    )
-  if(NOT rv STREQUAL "0")
-    message(FATAL_ERROR "cmake install fail ${rv}")
-  endif()
+  unset(BUILD_OPTIONS)
+  cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "${BUILD_TOOL_OPTIONS}")
 
 endif()

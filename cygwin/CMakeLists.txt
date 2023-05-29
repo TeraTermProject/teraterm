@@ -8,8 +8,8 @@ set_target_properties(
   cyglib
   PROPERTIES FOLDER cygwin)
 
-if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
-  # linux上ではcygwinが必要なものはビルドできない
+if((CMAKE_HOST_SYSTEM_NAME MATCHES "Linux") OR MINGW)
+  # linux, MinGW上ではcygwinが必要なものはビルドできない
   return()
 endif()
 

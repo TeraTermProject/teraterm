@@ -20,7 +20,9 @@ if NOT "%PERL%" == "" goto found_perl
 set PERL=perl.exe
 where %PERL% > nul 2>&1
 if %errorlevel% == 0 goto found_perl
-set PERL=%~dp0..\buildtools\perl\perl\bin\perl.exe
+set PERL=%~dp0..\cygwin64\bin\perl.exe
+if exist %PERL% goto found_perl
+set PERL=%~dp0..\perl\perl\bin\perl.exe
 if exist %PERL% goto found_perl
 set PERL=C:\Strawberry\perl\bin\perl.exe
 if exist %PERL% goto found_perl

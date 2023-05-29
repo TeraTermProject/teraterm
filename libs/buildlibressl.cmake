@@ -1,7 +1,8 @@
 ﻿# for libreSSL
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildlibressl.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildlibressl.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P buildlibressl.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildlibressl.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=32 -P buildlibressl.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DARCHITECTURE=32 -P buildlibressl.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=64 -P buildlibressl.cmake
 
 include(script_support.cmake)
 
@@ -9,13 +10,10 @@ set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/libressl/src")
 set(SRC_DIR "${EXTRACT_DIR}/libressl")
 set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/libressl/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/libressl_${TOOLSET}")
-if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32") OR ("${ARCHITECTURE}" MATCHES "x64") OR ("${CMAKE_COMMAND}" MATCHES "mingw64"))
+if(${ARCHITECTURE} EQUAL 64)
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
   set(BUILD_DIR "${BUILD_DIR}_x64")
 endif()
-
-#message("BUILD_DIR=${BUILD_DIR}")
-#message("INSTALL_DIR=${INSTALL_DIR}")
 
 ########################################
 
@@ -66,53 +64,56 @@ endif()
 
 file(MAKE_DIRECTORY "${BUILD_DIR}")
 
-if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL ""))
-  if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-    # multi-configuration
-
-    unset(GENERATE_OPTIONS)
-    list(APPEND GENERATE_OPTIONS -A ${ARCHITECTURE})
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_DEBUG_POSTFIX=d")
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
-    list(APPEND GENERATE_OPTIONS "-DLIBRESSL_TESTS=off")
-    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-      list(APPEND GENERATE_OPTIONS "-DMSVC=on")
-      list(APPEND GENERATE_OPTIONS "-DUSE_STATIC_MSVC_RUNTIMES=on")
-    endif()
-
-    cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
-
-    unset(BUILD_OPTIONS)
-    list(APPEND BUILD_OPTIONS --config Debug)
-    cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
-
-    unset(BUILD_OPTIONS)
-    list(APPEND BUILD_OPTIONS --config Release)
-    cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
-
-    return()
+if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+  # multi-configuration
+  unset(GENERATE_OPTIONS)
+  if(${ARCHITECTURE} EQUAL 64)
+    list(APPEND GENERATE_OPTIONS "-A" "x64")
   else()
-    # single-configuration
-    unset(GENERATE_OPTIONS)
-    if(CMAKE_HOST_UNIX)
-      list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/../mingw.toolchain.cmake")
-    endif(CMAKE_HOST_UNIX)
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
-    list(APPEND GENERATE_OPTIONS "-DCMAKE_BUILD_TYPE=Release")
-    if(("${CMAKE_GENERATOR}" MATCHES "Visual Studio") OR ("${CMAKE_GENERATOR}" MATCHES "NMake Makefiles"))
-      list(APPEND GENERATE_OPTIONS "-DMSVC=on")
-      list(APPEND GENERATE_OPTIONS "-DUSE_STATIC_MSVC_RUNTIMES=on")
-    endif()
-
-    cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
-
-    if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-      list(APPEND BUILD_TOOL_OPTIONS "-j")
-    endif()
-
-    unset(BUILD_OPTIONS)
-    cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "${BUILD_TOOL_OPTIONS}")
-
+    list(APPEND GENERATE_OPTIONS "-A" "Win32")
   endif()
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_DEBUG_POSTFIX=d")
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
+  list(APPEND GENERATE_OPTIONS "-DLIBRESSL_TESTS=off")
+  list(APPEND GENERATE_OPTIONS "-DMSVC=on")
+  list(APPEND GENERATE_OPTIONS "-DUSE_STATIC_MSVC_RUNTIMES=on")
+
+  cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
+
+  unset(BUILD_OPTIONS)
+  list(APPEND BUILD_OPTIONS --config Debug)
+  cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
+
+  unset(BUILD_OPTIONS)
+  list(APPEND BUILD_OPTIONS --config Release)
+  cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
+else()
+  # single-configuration
+  unset(GENERATE_OPTIONS)
+  if(${ARCHITECTURE} EQUAL 64)
+    list(APPEND GENERATE_OPTIONS "-DUSE_GCC_64=ON")
+  else()
+    list(APPEND GENERATE_OPTIONS "-DUSE_GCC_32=ON")
+  endif()
+  if(CMAKE_HOST_UNIX)
+    list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/../mingw.toolchain.cmake")
+  endif(CMAKE_HOST_UNIX)
+  if(("${CMAKE_GENERATOR}" MATCHES "Visual Studio") OR ("${CMAKE_GENERATOR}" MATCHES "NMake Makefiles"))
+    list(APPEND GENERATE_OPTIONS "-DMSVC=on")
+    list(APPEND GENERATE_OPTIONS "-DUSE_STATIC_MSVC_RUNTIMES=on")
+  endif()
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
+  list(APPEND GENERATE_OPTIONS "-DCMAKE_BUILD_TYPE=Release")
+  list(APPEND GENERATE_OPTIONS "-DLIBRESSL_TESTS=off")
+
+  cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
+
+  if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
+    list(APPEND BUILD_TOOL_OPTIONS "-j")
+  endif()
+
+  unset(BUILD_OPTIONS)
+  cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "${BUILD_TOOL_OPTIONS}")
+
 endif()

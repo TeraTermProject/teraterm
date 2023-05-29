@@ -10,13 +10,14 @@
 ## Visual Studio
 
 - cmake
-	- It is OK if PATH is passed.
-	- Do not use Cygwin's cmake(Not supporting for Visual Studio).
-	- Use cmake 3.11.4 when Visual Studio 2005 is used.
+  - It is OK if PATH is passed.
+  - Do not use Cygwin's cmake(Not supporting for Visual Studio).
+  - Use cmake 3.11.4 when Visual Studio 2005 is used.
 - perl
-	- It is necessary for compiling OpenSSL, and converting character code of document and code of carriage return.
-	- ActivePerl 5.8 or later, also cygwin perl.
-	- It will be searched automatically if PATH is not passed.
+  - It is necessary for converting character code of document and code of carriage return.
+  - compiling OpenSSL (Tera Term 5 does not link OpenSSL because it switched to LibreSSL)
+  - ActivePerl 5.8 or later, also cygwin perl.
+  - It will be searched automatically if PATH is not passed.
 
 ## MinGW common (experimental)
 
@@ -49,17 +50,17 @@ Execute libs/buildall_cmake.bat, and select Visual Studio.
 
 Case of Visual Studio 2022 x86
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=32 -P buildall.cmake
 
 Case of Visual Studio 2022 x64
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64 -P buildall.cmake`
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildall.cmake`
 
 ## MinGW common
 
 Using cmake in each environment.
 
-    cmake -DCMAKE_GENERATOR="Unix Makefiles" -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=32 -P buildall.cmake
 
 # Regarding each directory
 

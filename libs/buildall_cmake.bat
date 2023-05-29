@@ -2,11 +2,8 @@
 setlocal
 cd /d %~dp0
 
-if NOT "%CMAKE%" == "" goto pass_set_cmake
-rem set CMAKE=cmake.exe
-set CMAKE="C:\Program Files\CMake\bin\cmake.exe"
-rem set CMAKE="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
-rem set CMAKE="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+if NOT "%CMAKE_COMMAND%" == "" goto pass_set_cmake
+call ..\ci_scripts\find_cmake.bat
 set OPT=
 :pass_set_cmake
 
@@ -27,10 +24,10 @@ rem echo d. Cygwin MinGW Release + Unix Makefiles (experimental)
 set /p no="select no "
 
 echo %no%
-if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=Win32 & goto build_all
-if "%no%" == "2" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=x64 & goto build_all
-if "%no%" == "3" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=Win32 & goto build_all
-if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=x64 & goto build_all
+if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=32 & goto build_all
+if "%no%" == "2" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=64 & goto build_all
+if "%no%" == "3" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=32 & goto build_all
+if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=64 & goto build_all
 if "%no%" == "5" set GENERATOR="Visual Studio 15 2017" & goto build_all
 if "%no%" == "6" set GENERATOR="Visual Studio 14 2015" & goto build_all
 if "%no%" == "7" set GENERATOR="Visual Studio 12 2013" & goto build_all
@@ -44,15 +41,15 @@ echo ? retry
 goto retry_vs
 
 :build_all
-if exist %CMAKE% goto build_all_2
-where %CMAKE% 2> nul
+if exist "%CMAKE_COMMAND%" goto build_all_2
+where "%CMAKE_COMMAND%" 2> nul
 if %errorlevel% == 0 goto build_all_2
 echo cmake not found
 pause
 exit
 
 :build_all_2
-set C=%CMAKE% -DCMAKE_GENERATOR=%GENERATOR% %OPT% -P buildall.cmake
+set C="%CMAKE_COMMAND%" -DCMAKE_GENERATOR=%GENERATOR% %OPT% -P buildall.cmake
 echo %C%
 title %C%
 pause
@@ -65,22 +62,22 @@ pause
 exit
 
 :cmake_3_11_4
-set CMAKE=%~dp0..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe
+set CMAKE_COMMAND=%~dp0..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe
 echo 1. PATH上のcmake.exeを使用する
 echo 2. VS2005でも使用できるcmake使用する
 echo    (必要なら自動でダウンロードして、このbuildtools/にインストールする)
-if exist %CMAKE% echo    インストール済み(%CMAKE%)
+if exist %CMAKE_COMMAND% echo    インストール済み(%CMAKE_COMMAND%)
 
 set /p no="select no "
 echo %no%
 if "%no%" == "2" goto download
 
-set CMAKE="cmake.exe"
-where %CMAKE%
+set CMAKE_COMMAND="cmake.exe"
+where %CMAKE_COMMAND%
 goto finish_cmake
 
 :download
-if exist %CMAKE% goto finish_cmake
+if exist %CMAKE_COMMAND% goto finish_cmake
 call ..\buildtools\getcmake.bat
 
 :finish_cmake
