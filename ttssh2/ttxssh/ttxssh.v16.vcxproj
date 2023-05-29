@@ -238,7 +238,7 @@
       <Project>{d33c59b8-e227-47d2-8f80-eda3e28bf995}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\libsshagentc\putty.v16.vcxproj">
+    <ProjectReference Include="..\libsshagentc\putty\putty.v16.vcxproj">
       <Project>{98ca1284-8f6c-4791-bf57-7e5fad33744e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
