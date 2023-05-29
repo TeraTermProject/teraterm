@@ -41,7 +41,7 @@
 #include <assert.h>
 #include <vector>
 #include <windows.h>
-#include <Lmcons.h>	// for UNLEN
+#include <lmcons.h>	// for UNLEN
 #include "libputty.h"
 #include "sha256.h"
 
