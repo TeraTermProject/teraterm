@@ -6181,9 +6181,9 @@ static void ParseFirst(BYTE b)
 
 	  case IdRussian:
 		if (ParseFirstRus(b)) {
-		  return;
+			return;
 		}
-
+		break;
 
 	case IdChinese:
 		switch (ts.KanjiCode) {
