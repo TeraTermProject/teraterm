@@ -879,7 +879,9 @@ static void PutChar(BYTE b)
 			break;
 		}
 	} else if (ts.Language == IdRussian) {
+		// CP1251‚É•ÏŠ·
 		BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
+		// CP1251->Unicode
 		unsigned long u32 = MBCP_UTF32(c, 1251);
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
 	} else {
@@ -6178,18 +6180,10 @@ static void ParseFirst(BYTE b)
 		break;
 
 	  case IdRussian:
-		switch (ts.KanjiCode) {
-		case IdUTF8:
-			if (ParseFirstUTF8(b)) {
-				return;
-			}
-			break;
-		default:
-			if (ParseFirstRus(b)) {
-				return;
-			}
+		if (ParseFirstRus(b)) {
+		  return;
 		}
-		break;
+
 
 	case IdChinese:
 		switch (ts.KanjiCode) {
