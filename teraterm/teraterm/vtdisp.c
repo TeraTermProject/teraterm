@@ -1411,6 +1411,8 @@ void BGLoadThemeFile(const TTTSet *pts)
  */
 static void DrawBox(HDC hdc, int sx, int sy, int width, int height, COLORREF rgb)
 {
+	width--;
+	height--;
 	HPEN red_pen = CreatePen(PS_SOLID, 0, rgb);
 	HGDIOBJ old_pen = SelectObject(hdc, red_pen);
 	MoveToEx(hdc, sx, sy, NULL);
@@ -2819,11 +2821,11 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
-	*X += width;
-
 	if (w->debug_drawbox_text) {
 		DrawBox(DC, *X, Y, width, height, RGB(0,255,0));
 	}
+
+	*X += width;
 }
 
 /**
