@@ -42,4 +42,6 @@ typedef unsigned int	uint32_t;
 typedef unsigned long char32_t;		// C++11 for UTF-32
 typedef wchar_t char16_t;			// C++11 for UTF-16
 #endif
+#if !defined(__cplusplus) || __cplusplus >= 202002L
 typedef unsigned char char8_t;		// C++20 for UTF-8
+#endif
