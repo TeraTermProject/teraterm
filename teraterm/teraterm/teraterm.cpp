@@ -33,6 +33,8 @@
 #include <crtdbg.h>
 #include <windows.h>
 #include <htmlhelp.h>
+#include <locale.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -297,6 +299,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 
 	srand((unsigned int)time(NULL));
+	setlocale(LC_ALL, "");
 
 	ts.TeraTermInstance = hInstance;
 	hInst = hInstance;
