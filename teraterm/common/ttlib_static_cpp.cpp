@@ -1737,6 +1737,31 @@ wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 	return dest;
 }
 
+/**
+ *	strftime formatting code
+ *
+ *	@retval	TRUE	使用可能
+ *	@retval	FALSE	使用不可
+ */
+static BOOL IsValidStrftimeCode(const wchar_t c)
+{
+#if !defined(__MINGW32__) && (_MSC_VER >= 1900) // 1900=VS2015
+	// VS2022のstrftime()で使える書式指定コード
+	//	- VS2015-2022のランタイムは互換性があると思われるので2015以上のとき
+	//	- MinGW時はランタイムのバージョンがわからなので従来の書式指定コードを使用する
+	static const wchar_t strftimeChars[] = L"aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%";
+#else
+	static const wchar_t strftimeChars[] = L"aAbBcdHIjmMpSUwWxXyYzZ%";
+#endif
+
+	if (wcschr(strftimeChars, c) != NULL) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
 // strftime に渡せない文字が含まれているか確かめる
 BOOL isInvalidStrftimeCharW(const wchar_t *format)
 {
@@ -1750,34 +1775,12 @@ BOOL isInvalidStrftimeCharW(const wchar_t *format)
 				if (format[i+2] != 0 && format[i+1] == '#') {
 					p = i+2;
 				}
-				switch (format[p]) {
-					case 'a':
-					case 'A':
-					case 'b':
-					case 'B':
-					case 'c':
-					case 'd':
-					case 'H':
-					case 'I':
-					case 'j':
-					case 'm':
-					case 'M':
-					case 'p':
-					case 'S':
-					case 'U':
-					case 'w':
-					case 'W':
-					case 'x':
-					case 'X':
-					case 'y':
-					case 'Y':
-					case 'z':
-					case 'Z':
-					case '%':
-						i = p;
-						break;
-					default:
-						return TRUE;
+				if (IsValidStrftimeCode(format[p])) {
+					i = p;
+				}
+				else {
+					// 使えない書式
+					return TRUE;
 				}
 			}
 			else {
@@ -1787,73 +1790,51 @@ BOOL isInvalidStrftimeCharW(const wchar_t *format)
 		}
 	}
 
-	return FALSE;;
+	return FALSE;
 }
 
 // strftime に渡せない文字を削除する
-void deleteInvalidStrftimeCharW(wchar_t *FName)
+void deleteInvalidStrftimeCharW(wchar_t *format)
 {
 	size_t i, j=0, len, p;
 
-	len = wcslen(FName);
+	len = wcslen(format);
 	for (i=0; i<len; i++) {
-		if (FName[i] == '%') {
-			if (FName[i+1] != 0) {
+		if (format[i] == '%') {
+			if (format[i+1] != 0) {
 				p = i+1;
-				if (FName[i+2] != 0 && FName[i+1] == '#') {
+				if (format[i+2] != 0 && format[i+1] == '#') {
 					p = i+2;
 				}
-				switch (FName[p]) {
-					case 'a':
-					case 'A':
-					case 'b':
-					case 'B':
-					case 'c':
-					case 'd':
-					case 'H':
-					case 'I':
-					case 'j':
-					case 'm':
-					case 'M':
-					case 'p':
-					case 'S':
-					case 'U':
-					case 'w':
-					case 'W':
-					case 'x':
-					case 'X':
-					case 'y':
-					case 'Y':
-					case 'z':
-					case 'Z':
-					case '%':
-						FName[j] = FName[i]; // %
+				if (IsValidStrftimeCode(format[p])) {
+					format[j] = format[i]; // %
+					j++;
+					i++;
+					if (p-i == 2) {
+						format[j] = format[i]; // #
 						j++;
 						i++;
-						if (p-i == 2) {
-							FName[j] = FName[i]; // #
-							j++;
-							i++;
-						}
-						FName[j] = FName[i];
-						j++;
-						break;
-					default:
-						i++; // %
-						if (p-i == 2) {
-							i++; // #
-						}
+					}
+					format[j] = format[i];
+					j++;
+				}
+				else {
+					// 使えない書式
+					i++; // %
+					if (p-i == 2) {
+						i++; // #
+					}
 				}
 			}
 			// % で終わっている場合はコピーしない
 		}
 		else {
-			FName[j] = FName[i];
+			format[j] = format[i];
 			j++;
 		}
 	}
 
-	FName[j] = 0;
+	format[j] = 0;
 }
 
 /**
