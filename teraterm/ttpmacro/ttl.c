@@ -2615,9 +2615,9 @@ WORD TTLGetPassword()
 	int result = 0;  /* failure */
 
 	Err = 0;
-	GetStrVal(Str,&Err);
-	GetStrVal(Str2,&Err);
-	GetStrVar(&VarId,&Err);
+	GetStrVal(Str,&Err);  // ファイル名
+	GetStrVal(Str2,&Err);  // キー名
+	GetStrVar(&VarId,&Err);  // パスワード更新時にパスワードを格納する変数
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2644,7 +2644,10 @@ WORD TTLGetPassword()
 		result = 1;  /* success */
 	}
 
-	SetStrVal(VarId,Temp2);
+	if (result == 1) {
+		SetStrVal(VarId,Temp2);
+	}
+	// パスワード入力がないときは変数を更新しない
 
 	SetResult(result);  // 成功可否を設定する。
 	return Err;
