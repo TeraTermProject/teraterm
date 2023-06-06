@@ -2653,18 +2653,15 @@ WORD TTLGetPassword()
 // setpassword 'password.dat' 'mypassword' passowrd
 WORD TTLSetPassword()
 {
-	TStrVal FileNameStr, KeyStr;
+	TStrVal FileNameStr, KeyStr, PassStr;
 	char Temp[512];
 	WORD Err;
-	TVarId VarId;
-	PCHAR VarStr;
 	int result = 0;  /* failure */
 
 	Err = 0;
 	GetStrVal(FileNameStr, &Err);   // ファイル名
 	GetStrVal(KeyStr, &Err);  // キー名
-	GetStrVar(&VarId, &Err);
-	VarStr = StrVarPtr(VarId);  // 変数へのポインタ
+	GetStrVal(PassStr, &Err);  // パスワード
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2672,14 +2669,14 @@ WORD TTLSetPassword()
 	// 文字列が空の場合はエラーとする。
 	if (FileNameStr[0]==0 || 
 	    KeyStr[0]==0 ||
-	    VarStr[0]==0)   // "getpassword"同様、空パスワードも許可しない。
+	    PassStr[0]==0)   // "getpassword"同様、空パスワードも許可しない。
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
 	GetAbsPath(FileNameStr, sizeof(FileNameStr));
 
 	// パスワードを暗号化する。
-	Encrypt(VarStr, Temp);
+	Encrypt(PassStr, Temp);
 
 	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0) 
 		result = 1;  /* success */
