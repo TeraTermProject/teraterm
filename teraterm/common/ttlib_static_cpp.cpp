@@ -1738,21 +1738,20 @@ wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 }
 
 /**
- *	strftime formatting code
+ *	使用可能な strftime() 書式文字かチェックする
  *
  *	@retval	TRUE	使用可能
  *	@retval	FALSE	使用不可
+ *
+ *	- Tera Term では strftime() で使えるすべての書式をサポートしない
+ *	- Visual Studio 2005 をベースにした書式のみ
+ *	- 追加する場合は次の点を考慮すること
+ *	  - コンパイラ(Visual Studio)のバージョンやプラットフォーム
+ *	  - マニュアルの変更
  */
 static BOOL IsValidStrftimeCode(const wchar_t c)
 {
-#if !defined(__MINGW32__) && (_MSC_VER >= 1900) // 1900=VS2015
-	// VS2022のstrftime()で使える書式指定コード
-	//	- VS2015-2022のランタイムは互換性があると思われるので2015以上のとき
-	//	- MinGW時はランタイムのバージョンがわからなので従来の書式指定コードを使用する
-	static const wchar_t strftimeChars[] = L"aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%";
-#else
 	static const wchar_t strftimeChars[] = L"aAbBcdHIjmMpSUwWxXyYzZ%";
-#endif
 
 	if (wcschr(strftimeChars, c) != NULL) {
 		return TRUE;
@@ -1762,7 +1761,7 @@ static BOOL IsValidStrftimeCode(const wchar_t c)
 	}
 }
 
-// strftime に渡せない文字が含まれているか確かめる
+// wcsftime に渡せない文字が含まれているか確かめる
 BOOL isInvalidStrftimeCharW(const wchar_t *format)
 {
 	size_t i, len, p;
@@ -1793,7 +1792,7 @@ BOOL isInvalidStrftimeCharW(const wchar_t *format)
 	return FALSE;
 }
 
-// strftime に渡せない文字を削除する
+// wcsftime に渡せない文字を削除する
 void deleteInvalidStrftimeCharW(wchar_t *format)
 {
 	size_t i, j=0, len, p;

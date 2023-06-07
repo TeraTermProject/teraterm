@@ -20,18 +20,18 @@
       <dt id="LogDefaultName">Default log file name</dt>
       <dd>
 	標準のログファイル名を指定します。<br />
-	<span id="LogFileNameFormat">Tera Term と strftime の書式が使用できます。</span>
+	<span id="LogFileNameFormat">Tera Term 独自の書式と strftimeと同様の書式が使用できます。</span>
 <pre>
-Tera Term の書式:
+Tera Term 独自の書式:
 &amp;h      ホスト名。未接続の場合は空。
 &amp;p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
 &amp;u      Windows のログオンユーザ名
 
-strftime の書式:
-%a      曜日の省略形。
-%A      曜日の正式名。
-%b      月の省略形。
-%B      月の正式名。
+strftime と同様の書式:
+%a      現在のロケールの曜日の省略形。
+%A      現在のロケールの曜日の正式名。
+%b      現在のロケールの月の省略形。
+%B      現在のロケールの月の正式名。
 %c      ロケールに対応する日付と時刻の表現。
 %d      10 進数で表す月の日付 (01 ～ 31)。
 %H      24 時間表記の時間 (00 ～ 23)。

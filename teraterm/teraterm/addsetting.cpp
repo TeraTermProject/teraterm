@@ -1440,7 +1440,6 @@ void CLogPropPageDlg::OnInitDialog()
 	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 
 	// Log Default File Name
-	SetDlgItemTextW(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultNameW);
 	static const wchar_t *logfile_patterns[] = {
 		L"teraterm.log",
 		L"%H%M%S.log",
@@ -1458,6 +1457,7 @@ void CLogPropPageDlg::OnInitDialog()
 		SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_ADDSTRING, 0, (LPARAM)pattern);
 	}
 	ExpandCBWidth(m_hWnd, IDC_DEFAULTNAME_EDITOR);
+	SetDlgItemTextW(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultNameW);
 
 	// Log Default File Path (2007.5.30 maya)
 	SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPathW);
@@ -1531,8 +1531,8 @@ void CLogPropPageDlg::OnInitDialog()
 */
 	m_TipWin->Create(m_hWnd);
 
-	// ダイアログにフォーカスを当てる
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_VIEWLOG_EDITOR));
+	PostMessage(m_hWnd, WM_NEXTDLGCTL,
+				(WPARAM)GetDlgItem(IDC_VIEWLOG_EDITOR), TRUE);
 }
 
 wchar_t *CLogPropPageDlg::MakePreviewStr(const wchar_t *format, const wchar_t *UILanguageFile)
