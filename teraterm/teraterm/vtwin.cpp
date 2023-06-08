@@ -6381,8 +6381,6 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 {
 	const UINT NewDPI = LOWORD(wp);
 	const RECT SuggestedWindowRect = *(RECT *)lp;
-	const int SuggestedWindowWidth = SuggestedWindowRect.right - SuggestedWindowRect.left;
-	const int SuggestedWindowHeight = SuggestedWindowRect.bottom - SuggestedWindowRect.top;
 
 	// 新しいDPIに合わせてフォントを生成、
 	// クライアント領域のサイズを決定する
