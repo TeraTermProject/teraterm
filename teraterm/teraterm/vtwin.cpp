@@ -1700,9 +1700,9 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 		}
 
 		data->SendIndex = 0;
-		// break;
-		// FALLTHROUGH
 	}
+		// break; なし
+		// FALLTHROUGH
 	case 1:
 	next_file: {
 		if (data->SendIndex == DropListCount) {
@@ -3797,7 +3797,7 @@ void CVTWindow::OnFileLog()
 			// ファイル削除
 			DeleteFileW(filename);
 		}
-		BOOL r = FLogOpen(filename, info.code, info.bom);
+		r = FLogOpen(filename, info.code, info.bom);
 		if (r != FALSE) {
 			if (FLogIsOpendText()) {
 				// 現在バッファにあるデータをすべて書き出してから、
@@ -4370,7 +4370,7 @@ void CVTWindow::OnSetupDlgFont()
 
 		// LOGFONT準備
 		memset(&LogFont, 0, sizeof(LogFont));
-		if (ts.DialogFontNameW == NULL || ts.DialogFontNameW[0] == 0) {
+		if (ts.DialogFontNameW[0] == 0) {
 			// フォントが設定されていなかったらOS設定を使用する
 			GetMessageboxFontW(&LogFont);
 		}
@@ -4889,8 +4889,6 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 {
 	const UINT NewDPI = LOWORD(wp);
 	const RECT SuggestedWindowRect = *(RECT *)lp;
-	const int SuggestedWindowWidth = SuggestedWindowRect.right - SuggestedWindowRect.left;
-	const int SuggestedWindowHeight = SuggestedWindowRect.bottom - SuggestedWindowRect.top;
 
 	// 新しいDPIに合わせてフォントを生成、
 	// クライアント領域のサイズを決定する
