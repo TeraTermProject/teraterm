@@ -94,7 +94,7 @@
     <ClCompile Include="putty-import.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libputty.h" />
+    <ClInclude Include="..\libputty.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
