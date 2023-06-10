@@ -284,7 +284,7 @@ static char *get_ms_namedpipe(void)
 		getenv_s(&var_size, var_ptr, var_size, var_name);
 	}
 	if (var_ptr == NULL) {
-		var_ptr = strdup(pipename_default);
+		var_ptr = _strdup(pipename_default);
 	}
 	return var_ptr;
 }
