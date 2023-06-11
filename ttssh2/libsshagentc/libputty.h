@@ -52,6 +52,8 @@ void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_
 BOOL putty_agent_exists(void);
 
 // ƒGƒ‰[‰“š—p
+//		0x00 0x00 0x00 0x01		1 = uint32 length
+//		0x05					5 = AGENT FAILURE
 #define SSH_AGENT_FAILURE_MSG "\x00\x00\x00\x01\x05"
 
 // pageant.h

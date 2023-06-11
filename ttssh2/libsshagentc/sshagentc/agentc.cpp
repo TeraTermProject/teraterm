@@ -750,7 +750,7 @@ int putty_get_ssh1_keylen(unsigned char *key, int maxlen)
 
 const char *putty_get_version()
 {
-	return "libsshagent 0.1";
+	return "libsshagent 1.0";
 }
 
 /**

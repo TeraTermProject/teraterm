@@ -255,10 +255,14 @@ int putty_get_ssh1_keylen(unsigned char *key, int maxlen)
 	return rsa_ssh1_public_blob_len(make_ptrlen(key, maxlen));
 }
 
+// PuTTY‚Ìƒo[ƒWƒ‡ƒ“‚ğ•Ô‚·
 const char *putty_get_version()
 {
 	extern const char ver[]; /* in version.c */
-	return ver;
+	static char ver_str[32];
+
+	sprintf_s(ver_str, sizeof(ver_str), "PuTTY %s", ver);
+	return ver_str;
 }
 
 void putty_agent_query_synchronous(const void *in, int inlen, void **out, int *outlen)
@@ -277,4 +281,3 @@ BOOL putty_agent_exists()
 	}
 	return FALSE;
 }
-

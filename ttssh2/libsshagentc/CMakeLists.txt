@@ -4,11 +4,11 @@ project(libsshagentc)
 # どの libsshagentc を使用するか
 #  すべて OFF の時、従来と同じ putty を使用する
 option(SSHAGENTC_SKELTON "use skelton" OFF)
-option(SSHAGENTC_NEXT "use next sshagent" OFF)
+option(SSHAGENTC_SSHAGENTC "use next sshagent client" ON)
 
 option(SSHAGENTC_TOOL "sshagentc test/debug tool" OFF)
 
-if(SSHAGENTC_NEXT)
+if(SSHAGENTC_SSHAGENTC)
   add_subdirectory(sshagentc)
 elseif(SSHAGENTC_SKELTON)
   add_subdirectory(skelton)

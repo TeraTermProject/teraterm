@@ -2073,12 +2073,12 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d\r\nCompatible with SSH protocol version 1.5 and 2.0", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
-	SendMessage(GetDlgItem(dlg, IDC_TTSSH_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
+	SetDlgItemTextA(dlg, IDC_TTSSH_VERSION, buf);
 
 	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)
 	// 条件文追加 (2005.5.11 yutaka)
 	// OPENSSL_VERSION_TEXT マクロ定義ではなく、関数を使ってバージョンを取得する。(2013.11.24 yutaka)
-	SendMessage(GetDlgItem(dlg, IDC_OPENSSL_VERSION), WM_SETTEXT, 0, (LPARAM)SSLeay_version(SSLEAY_VERSION));
+	SetDlgItemTextA(dlg, IDC_OPENSSL_VERSION, SSLeay_version(SSLEAY_VERSION));
 
 	// zlibのバージョンを設定する (2005.5.11 yutaka)
 #ifdef ZLIB_VERSION
@@ -2086,11 +2086,10 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 #else
 	_snprintf(buf, sizeof(buf), "ZLib Unknown");
 #endif
-	SendMessage(GetDlgItem(dlg, IDC_ZLIB_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
+	SetDlgItemTextA(dlg, IDC_ZLIB_VERSION, buf);
 
-	// PuTTYのバージョンを設定する (2011.7.26 yutaka)
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "PuTTY %s", putty_get_version());
-	SendMessage(GetDlgItem(dlg, IDC_PUTTY_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
+	// ssh agent client の種類とバージョンを表示
+	SetDlgItemTextA(dlg, IDC_PUTTY_VERSION, putty_get_version());
 }
 
 static WNDPROC g_defAboutDlgEditWndProc;  // Edit Controlのサブクラス化用
