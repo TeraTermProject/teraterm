@@ -181,52 +181,6 @@ static BOOL CheckKanji(BYTE b)
 	return Check;
 }
 
-static void PutKanji(BYTE b)
-{
-	unsigned long u32 = 0;
-
-	Kanji = Kanji + b;
-
-	// codepageˆê——
-	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
-	switch (ts.Language) {
-	case IdJapanese:
-		if (ConvJIS) {
-			// JIS -> Shift_JIS(CP932)
-			Kanji = JIS2SJIS((WORD)(Kanji & 0x7f7f));
-		}
-		u32 = CP932ToUTF32(Kanji);
-		break;
-	case IdKorean:
-		if (ts.KanjiCode == IdKoreanCP51949) {
-			// CP51949
-			u32 = MBCP_UTF32(Kanji, 51949);
-		}
-		else {
-			assert(FALSE);
-		}
-		break;
-	case IdChinese:
-		if (ts.KanjiCode == IdCnGB2312) {
-			// CP936 GB2312
-			u32 = MBCP_UTF32(Kanji, 936);
-		}
-		else if (ts.KanjiCode == IdCnBig5) {
-			// CP950 Big5
-			u32 = MBCP_UTF32(Kanji, 950);
-		}
-		else {
-			assert(FALSE);
-		}
-		break;
-	default:
-		assert(FALSE);
-		break;
-	}
-
-	PutU32(u32);
-}
-
 static BOOL ParseFirstJP(BYTE b)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
@@ -237,7 +191,14 @@ static BOOL ParseFirstJP(BYTE b)
 		      ConvJIS && ( (0x20<b) && (b<0x7f) ||
 		                   (0xa0<b) && (b<0xff) ))
 		{
-			PutKanji(b);
+			unsigned long u32;
+			Kanji = Kanji + b;
+			if (ConvJIS) {
+				// JIS -> Shift_JIS(CP932)
+				Kanji = JIS2SJIS((WORD)(Kanji & 0x7f7f));
+			}
+			u32 = CP932ToUTF32(Kanji);
+			PutU32(u32);
 			KanjiIn = FALSE;
 			return TRUE;
 		}
@@ -380,7 +341,16 @@ static BOOL ParseFirstKR(BYTE b)
 		    (0x61<=b) && (b<=0x7A) ||
 		    (0x81<=b) && (b<=0xFE))
 		{
-			PutKanji(b);
+			unsigned long u32 = 0;
+			if (ts.KanjiCode == IdKoreanCP51949) {
+				// CP51949
+				Kanji = Kanji + b;
+				u32 = MBCP_UTF32(Kanji, 51949);
+			}
+			else {
+				assert(FALSE);
+			}
+			PutU32(u32);
 			KanjiIn = FALSE;
 			return TRUE;
 		}
@@ -444,7 +414,20 @@ static BOOL ParseFirstCn(BYTE b)
 		if ((0x40<=b) && (b<=0x7e) ||
 		    (0xa1<=b) && (b<=0xFE))
 		{
-			PutKanji(b);
+			unsigned long u32 = 0;
+			Kanji = Kanji + b;
+			if (ts.KanjiCode == IdCnGB2312) {
+				// CP936 GB2312
+				u32 = MBCP_UTF32(Kanji, 936);
+			}
+			else if (ts.KanjiCode == IdCnBig5) {
+				// CP950 Big5
+				u32 = MBCP_UTF32(Kanji, 950);
+			}
+			else {
+				assert(FALSE);
+			}
+			PutU32(u32);
 			KanjiIn = FALSE;
 			return TRUE;
 		}
