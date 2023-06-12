@@ -239,22 +239,6 @@ static void SaveCursor()
 	SaveCursorBuf(Buff);
 }
 
-static void RestoreCursorBuff(PStatusBuff Buff)
-{
-	if (Buff->CursorX > NumOfColumns-1)
-		Buff->CursorX = NumOfColumns-1;
-	if (Buff->CursorY > NumOfLines-1-StatusLine)
-		Buff->CursorY = NumOfLines-1-StatusLine;
-	MoveCursor(Buff->CursorX, Buff->CursorY);
-
-	CharAttr = Buff->Attr;
-	BuffSetCurCharAttr(CharAttr);
-	CharSetLoadState(&Buff->CharSetState);
-
-	AutoWrapMode = Buff->AutoWrapMode;
-	RelativeOrgMode = Buff->RelativeOrgMode;
-}
-
 static void RestoreCursor()
 {
 	PStatusBuff Buff;
@@ -2349,7 +2333,8 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 				attr->Back = AttrDefaultBG;
 				break;
 			}
-			/* fall through to aixterm style back color */
+			// fall through
+			//  to aixterm style back color
 
 		  case 101:
 		  case 102:
@@ -4046,7 +4031,7 @@ static void ParseCS(BYTE b) /* b is the final char */
 
 static void ControlSequence(BYTE b)
 {
-	if ((b<=US) || (b>=0x80) && (b<=0x9F))
+	if ((b<=US) || ((b>=0x80) && (b<=0x9F)))
 		ParseControl(b); /* ctrl char */
 	else if ((b>=0x40) && (b<=0x7E))
 		ParseCS(b); /* terminate char */
@@ -4576,7 +4561,7 @@ static void DCUserKey(BYTE b)
 {
 	static int utf8_stat = 0;
 
-	if (ESCFlag && (b=='\\') || (b==ST && ts.KanjiCode!=IdSJIS && utf8_stat == 0)) {
+	if ((ESCFlag && (b=='\\')) || (b==ST && ts.KanjiCode!=IdSJIS && utf8_stat == 0)) {
 		if (! WaitKeyId) DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
 		ESCFlag = FALSE;
 		ParseMode = ModeFirst;
@@ -4847,7 +4832,7 @@ static void XsProcClipboard(PCHAR buff)
 			size_t blen = len * 3 / 4 + 1;
 			char *cbbuff = malloc(blen);
 			len = b64decode(cbbuff, blen, p);
-			if (len < 0 || len >= blen) {
+			if (len >= blen) {
 				free(cbbuff);
 				return;
 			}
@@ -5265,7 +5250,6 @@ void PutU32(unsigned int code)
 
 	{
 		int r;
-		BOOL is_update;
 		BOOL SpecialNew = FALSE;
 
 		if (code <= 0xff) {
@@ -5326,7 +5310,6 @@ void PutU32(unsigned int code)
 		// バッファに文字を入れる
 		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
 		//		エラー時はカーソル位置を検討する
-		is_update = FALSE;
 		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 	retry:
 		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
@@ -5614,8 +5597,8 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
 			tmpx[1] = 0;
 		}
 		else {
-			tmpx[0] = (x >> 6) & 0x1f | 0xc0;
-			tmpx[1] = x & 0x3f | 0x80;
+			tmpx[0] = ((x >> 6) & 0x1f) | 0xc0;
+			tmpx[1] = (x & 0x3f) | 0x80;
 			tmpx[2] = 0;
 		}
 		if (y < 128) {
@@ -5623,8 +5606,8 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
 			tmpy[1] = 0;
 		}
 		else {
-			tmpy[0] = (x >> 6) & 0x1f | 0xc0;
-			tmpy[1] = y & 0x3f | 0x80;
+			tmpy[0] = ((x >> 6) & 0x1f) | 0xc0;
+			tmpy[1] = (y & 0x3f) | 0x80;
 			tmpy[2] = 0;
 		}
 		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%s%s", CLocale, mb+32, tmpx, tmpy);

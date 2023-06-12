@@ -151,7 +151,7 @@ static BOOL CheckKanji(BYTE b)
 
 	if (ts.KanjiCode==IdSJIS ||
 	   (ts.FallbackToCP932 && ts.KanjiCode==IdUTF8)) {
-		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
+		if (((0x80<b) && (b<0xa0)) || ((0xdf<b) && (b<0xfd))) {
 			Fallbacked = TRUE;
 			return TRUE; // SJIS kanji
 		}
@@ -187,9 +187,9 @@ static BOOL ParseFirstJP(BYTE b)
 {
 	VttermKanjiWork *w = &KanjiWork;
 	if (KanjiIn) {
-		if ((! ConvJIS) && (0x3F<b) && (b<0xFD) ||
-		      ConvJIS && ( (0x20<b) && (b<0x7f) ||
-		                   (0xa0<b) && (b<0xff) ))
+		if (((! ConvJIS) && (0x3F<b) && (b<0xFD)) ||
+			(ConvJIS && ( ((0x20<b) && (b<0x7f)) ||
+						  ((0xa0<b) && (b<0xff)) )) )
 		{
 			unsigned long u32;
 			Kanji = Kanji + b;
@@ -308,11 +308,11 @@ static BOOL ParseFirstJP(BYTE b)
 		}
 
 		if ((w->Gn[w->Glr[1]] != IdASCII) ||
-		    (ts.KanjiCode==IdEUC) && EUCkanaIn ||
+		    ((ts.KanjiCode==IdEUC) && EUCkanaIn) ||
 		    (ts.KanjiCode==IdSJIS) ||
-		    (ts.KanjiCode==IdJIS) &&
-		    (ts.JIS7Katakana==0) &&
-		    ((ts.TermFlag & TF_FIXEDJIS)!=0)) {
+		    ((ts.KanjiCode==IdJIS) &&
+			 (ts.JIS7Katakana==0) &&
+			 ((ts.TermFlag & TF_FIXEDJIS)!=0))) {
 			// bはsjisの半角カタカナ
 			unsigned long u32 = CP932ToUTF32(b);
 			PutU32(u32);
@@ -337,9 +337,9 @@ static BOOL ParseFirstKR(BYTE b)
 {
 	VttermKanjiWork *w = &KanjiWork;
 	if (KanjiIn) {
-		if ((0x41<=b) && (b<=0x5A) ||
-		    (0x61<=b) && (b<=0x7A) ||
-		    (0x81<=b) && (b<=0xFE))
+		if (((0x41<=b) && (b<=0x5A)) ||
+			((0x61<=b) && (b<=0x7A)) ||
+			((0x81<=b) && (b<=0xFE)))
 		{
 			unsigned long u32 = 0;
 			if (ts.KanjiCode == IdKoreanCP51949) {
@@ -411,8 +411,8 @@ static BOOL ParseFirstCn(BYTE b)
 	VttermKanjiWork *w = &KanjiWork;
 	if (KanjiIn) {
 		// TODO
-		if ((0x40<=b) && (b<=0x7e) ||
-		    (0xa1<=b) && (b<=0xFE))
+		if (((0x40<=b) && (b<=0x7e)) ||
+		    ((0xa1<=b) && (b<=0xFE)))
 		{
 			unsigned long u32 = 0;
 			Kanji = Kanji + b;
