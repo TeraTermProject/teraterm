@@ -676,11 +676,12 @@ static BOOL ParseFirstUTF8(BYTE b)
 static BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
-	if (b>=128) {
-		PutChar(b);
-		return TRUE;
-	}
-	return FALSE;
+	// CP1251‚É•ÏŠ·
+	BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
+	// CP1251->Unicode
+	unsigned long u32 = MBCP_UTF32(c, 1251);
+	PutU32(u32);
+	return TRUE;
 }
 
 static BOOL ParseEnglish(BYTE b)

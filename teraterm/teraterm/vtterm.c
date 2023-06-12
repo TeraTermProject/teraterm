@@ -834,12 +834,15 @@ void PutChar(BYTE b)
 			BuffPutUnicode(b, CharAttrTmp, InsertMode);
 			break;
 		}
+#if 0
 	} else if (ts.Language == IdRussian) {
+		assert(FALSE);
 		// CP1251‚É•ÏŠ·
 		BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
 		// CP1251->Unicode
 		unsigned long u32 = MBCP_UTF32(c, 1251);
 		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
+#endif
 	} else {
 		BuffPutUnicode(b, CharAttrTmp, InsertMode);
 	}
