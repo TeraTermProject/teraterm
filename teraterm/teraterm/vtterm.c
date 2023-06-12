@@ -5266,26 +5266,34 @@ void PutU32(unsigned int code)
 	{
 		int r;
 		BOOL is_update;
+		BOOL SpecialNew = FALSE;
 
-		// UnicodeからDEC特殊文字へのマッピング
-		if (ts.UnicodeDecSpMapping) {
-			cset = UTF32ToDecSp(code);
-			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-				code = cset & 0xff;
-				CharAttrTmp.Attr |= AttrSpecial;
+		if (code <= 0xff) {
+			SpecialNew = CharSetIsSpecial(code);
+			if (SpecialNew) {
+				code = code & 0x7F;
 			}
 		}
 
-		if ((CharAttrTmp.Attr & AttrSpecial) == 0) {
-			if (Special) {
-				UpdateStr();
-				Special = FALSE;
+		// UnicodeからDEC特殊文字へのマッピング
+		if (SpecialNew == FALSE && ts.UnicodeDecSpMapping) {
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				SpecialNew = TRUE;
+				code = cset & 0xff;
 			}
-		} else {
-			if (!Special) {
-				UpdateStr();
-				Special = TRUE;
-			}
+		}
+
+		if (SpecialNew != Special) {
+			UpdateStr();
+			Special = SpecialNew;
+		}
+
+		if (Special) {
+			CharAttrTmp.Attr |= AttrSpecial;
+		}
+		else {
+			CharAttrTmp.Attr |= CharAttr.Attr;
 		}
 
 		if (CursorX > CursorRightM)
