@@ -35,6 +35,7 @@ sub IsC1 {
 	return 0;
 }
 
+# C0, C1, DEL 以外表示可能
 sub IsPrintableUTF8 {
 	my $ch= shift;
 	if (IsC0($ch) || IsC1($ch)) {
@@ -83,6 +84,22 @@ sub IsPrintableJIS {
 	return 1;
 }
 
+# 7bit 半角カタカナ
+sub IsPrintableJIShankakukatakana {
+	my $ch= shift;
+	if (IsC0($ch)) {
+		return 0;
+	}
+	if ($ch == 0x7f) {
+		# DEL
+		return 0;
+	}
+	if (0x21 <= $ch && $ch <= 0x5f) {
+		return 1;
+	}
+	return 0;
+}
+
 sub IsPrintableEUCJP {
 	my $ch= shift;
 	if (IsC0($ch)) {
@@ -108,6 +125,7 @@ my %check =
  'shift_jis' => \&IsPrintableShiftJIS,
  'euc-jp' => \&IsPrintableEUCJP,
  'jis' => \&IsPrintableJIS,
+ 'jishankana' => \&IsPrintableJIShankakukatakana,
  );
 
 sub usage {
@@ -234,10 +252,10 @@ a   All
 u   Unicode + UTF-8
       CES(character encoding scheme) = UTF-8
       U+0000...U+00FF
-7   ISO/IEC 2022 7bit (jis)
+7   ISO/IEC 2022 7bit (JIS 7bit)
 s   Shift_JIS
-e   Japanese/EUC (euc-jp)
-j   JIS
+e   Japanese/EUC (EUC-JP)
+j   JIS 8bit
 q   quit
 EOF
 	print "> ";
@@ -263,16 +281,16 @@ EOF
 			ShowCode('iso8859', 0x00, 0xff);
 		} elsif ($c eq '7') {
 			print "GL(0x20-0x7F) <- G0:\n";
-			$invoke_enter = chr(0x0f);
+			$invoke_enter = chr(0x0f);	# SI LS0
 			$invoke_leave = chr(0x0f);
 			ShowCode('utf8', 0x00, 0x7f);
 			print "GL(0x20-0x7F) <- G1:\n";
-			$invoke_enter = chr(0x0e);
-			$invoke_leave = chr(0x0f);
-			ShowCode('utf8', 0x00, 0x7f);
+			$invoke_enter = chr(0x0e);	# SO LS1
+			$invoke_leave = chr(0x0f);	# SI LS0
+			ShowCode('jishankana', 0x00, 0x7f);
 			print "GL(0x20-0x7F) <- G3, 0x21XX:\n";
 			$invoke_enter = chr(0x1b) . "o" . chr(0x21); # LS3(GL<-G3) + 0x21xx
-			$invoke_leave = chr(0x0f); # GL<-G0
+			$invoke_leave = chr(0x0f);	# SI LS0 (GL<-G0)
 			$cell = 2;
 			ShowCode('utf8', 0x00, 0x7f);
 			$invoke_enter = "";
