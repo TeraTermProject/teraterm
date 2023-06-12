@@ -98,7 +98,6 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 wchar_t *BuffCBCopyUnicode(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(PrintFile *handle, BYTE TERM);
-void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert);
 int BuffPutUnicode(unsigned int uc, TCharAttr Attr, BOOL Insert);
 void BuffUpdateRect(int XStart, int YStart, int XEnd, int YEnd);
 void UpdateStr(void);

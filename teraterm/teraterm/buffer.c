@@ -3244,11 +3244,6 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	return move_x;
 }
 
-void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
-{
-	BuffPutUnicode(b, Attr, Insert);
-}
-
 static BOOL CheckSelect(int x, int y)
 //  subroutine called by BuffUpdateRect
 {

@@ -36,7 +36,6 @@ extern BOOL Fallbacked;
 void ParseFirst(BYTE b);
 
 // output buffer
-void PutChar(BYTE b);
 void PutU32(unsigned int code);
 void CarriageReturn(BOOL logFlag);
 void LineFeed(BYTE b, BOOL logFlag);

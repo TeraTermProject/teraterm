@@ -70,6 +70,11 @@ typedef struct {
 
 static VttermKanjiWork KanjiWork;
 
+// Unicodeベースに切り替え
+static void PutChar(BYTE b)
+{
+	PutU32(b);
+}
 
 /**
  *	ISO2022用ワークを初期化する
@@ -492,17 +497,13 @@ static void ParseASCII(BYTE b)
 	if (b<=US) {
 		ParseControl(b);
 	} else if ((b>=0x20) && (b<=0x7E)) {
-		//Kanji = 0;
-		//PutKanji(b);
-		PutChar(b);
+		PutU32(b);
 	} else if ((b==0x8E) || (b==0x8F)) {
 		PutChar('?');
 	} else if ((b>=0x80) && (b<=0x9F)) {
 		ParseControl(b);
 	} else if (b>=0xA0) {
-		//Kanji = 0;
-		//PutKanji(b);
-		PutChar(b);
+		PutU32(b);
 	}
 }
 
@@ -800,10 +801,13 @@ void CharSet2022Invoke(int glr, int gn, BOOL single_shift)
 /**
  *	DEC特殊フォント(Tera Special font)
  *	0140(0x60) ... 0176(0x7f) に罫線でアサインされている
+ *      (0xe0) ...     (0xff) も?
  *	<ESC>(0 という特殊なエスケープシーケンスで定義
  *	about/emulations.html
  *
  *	@param	b		コード
+ *	@retval	TRUE	IdSpecial
+ *	@retval	FALSE	IdSpecialではない
  */
 BOOL CharSetIsSpecial(BYTE b)
 {

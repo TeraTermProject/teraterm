@@ -694,6 +694,11 @@ static void Tab(void)
 	if (NeedsOutputBufs()) OutputLogByte(HT);
 }
 
+static void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
+{
+	BuffPutUnicode(b, Attr, Insert);
+}
+
 static void RepeatChar(BYTE b, int count)
 {
 	int i;
@@ -742,7 +747,162 @@ static void RepeatChar(BYTE b, int count)
 	}
 }
 
-void PutChar(BYTE b)
+/**
+ *	unicode(UTF-32,wchar_t)をバッファへ書き込む
+ *	ログにも書き込む
+ *
+ *	PutChar() の UTF-32版
+ */
+void PutU32(unsigned int code)
+{
+	unsigned short cset;
+	int LineEnd;
+
+	TCharAttr CharAttrTmp;
+	CharAttrTmp = CharAttr;
+	if (code <= US) {
+		// U+0000 .. U+001f
+		// C0制御文字, C0 Coontrols
+		ParseControl(code);
+		return;
+	} else if ((0x80<=code) && (code<=0x9F)) {
+		// U+0080 .. u+009f
+		// C1制御文字, C1 Controls
+		ParseControl(code);
+		return;
+	}
+
+	{
+		int r;
+		BOOL SpecialNew = FALSE;
+
+		if (code <= 0xff) {
+			SpecialNew = CharSetIsSpecial(code);
+			if (SpecialNew) {
+				code = code & 0x7F;
+			}
+		}
+
+		// UnicodeからDEC特殊文字へのマッピング
+		if (SpecialNew == FALSE && ts.UnicodeDecSpMapping) {
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				SpecialNew = TRUE;
+				code = cset & 0xff;
+			}
+		}
+
+		if (SpecialNew != Special) {
+			UpdateStr();
+			Special = SpecialNew;
+		}
+
+		if (Special) {
+			CharAttrTmp.Attr |= AttrSpecial;
+		}
+		else {
+			CharAttrTmp.Attr |= CharAttr.Attr;
+		}
+
+		if (CursorX > CursorRightM)
+			LineEnd = NumOfColumns - 1;
+		else
+			LineEnd = CursorRightM;
+
+		// Wrap処理、カーソル移動
+		if (Wrap) {
+			// 現在 Wrap 状態
+			if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
+				// 文字コードが結合文字ではない = カーソルが移動する
+
+				// カーソル位置に行継続アトリビュートを追加
+				TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+				t.Attr |= AttrLineContinued;
+				t.AttrEx = t.Attr;
+				BuffSetCursorCharAttr(CursorX, CursorY, t);
+
+				// 行継続アトリビュートをつける
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+
+				// 次の行の行頭へ
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+		}
+
+		// バッファに文字を入れる
+		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
+		//		エラー時はカーソル位置を検討する
+		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+	retry:
+		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
+		if (r == -1) {
+			// 文字全角で行末、入力できない
+
+			if (AutoWrapMode) {
+				// 自動改行
+				// 、wrap処理
+				CharAttrTmp = CharAttr;
+				CharAttrTmp.Attr |= AttrLineContinued;
+				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
+				// AutoWrapMode
+				// ts.EnableContinuedLineCopy
+				//if (CursorX != LineEnd){
+				//&& BuffIsHalfWidthFromCode(&ts, code)) {
+
+				// full width出力が半分出力にならないように0x20を出力
+				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
+				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
+
+				// 次の行の行頭へ
+				CarriageReturn(FALSE);
+				LineFeed(LF,FALSE);
+			}
+			else {
+				// 行頭に戻す
+				CursorX = 0;
+			}
+
+			//CharAttrTmp.Attr &= ~AttrLineContinued;
+			goto retry;
+		}
+		else if (r == 0) {
+			// カーソルの移動なし,結合文字,合字など
+			// Wrap は変化しない
+			UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
+		} else if (r == 1) {
+			// 半角(1セル)
+			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+				Wrap = FALSE;
+			}
+		} else if (r == 2) {
+			// 全角(2セル)
+			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
+				MoveRight();	// 全角の右側にカーソル移動
+				UpdateStr();
+				Wrap = AutoWrapMode;
+			} else {
+				MoveRight();
+				MoveRight();
+				Wrap = FALSE;
+			}
+		}
+		else {
+			assert(FALSE);
+		}
+	}
+
+	// ログを出力
+	OutputLogUTF32(code);
+}
+
+#if 0
+static void PutChar(BYTE b)
 {
 	BOOL SpecialNew;
 	TCharAttr CharAttrTmp;
@@ -838,6 +998,11 @@ void PutChar(BYTE b)
 	else {
 		MoveRight();
 	}
+}
+#endif
+static void PutChar(BYTE b)
+{
+	PutU32(b);
 }
 
 static void PutDebugChar(BYTE b)
@@ -5221,160 +5386,6 @@ static void CANSeen(BYTE b)
 		ParseMode = ModeFirst;
 		ChangeEmu = -1;
 	}
-}
-
-/**
- *	unicode(UTF-32,wchar_t)をバッファへ書き込む
- *	ログにも書き込む
- *
- *	PutChar() の UTF-32版
- */
-void PutU32(unsigned int code)
-{
-	unsigned short cset;
-	int LineEnd;
-
-	TCharAttr CharAttrTmp;
-	CharAttrTmp = CharAttr;
-	if (code <= US) {
-		// U+0000 .. U+001f
-		// C0制御文字, C0 Coontrols
-		ParseControl(code);
-		return;
-	} else if ((0x80<=code) && (code<=0x9F)) {
-		// U+0080 .. u+009f
-		// C1制御文字, C1 Controls
-		ParseControl(code);
-		return;
-	}
-
-	{
-		int r;
-		BOOL SpecialNew = FALSE;
-
-		if (code <= 0xff) {
-			SpecialNew = CharSetIsSpecial(code);
-			if (SpecialNew) {
-				code = code & 0x7F;
-			}
-		}
-
-		// UnicodeからDEC特殊文字へのマッピング
-		if (SpecialNew == FALSE && ts.UnicodeDecSpMapping) {
-			cset = UTF32ToDecSp(code);
-			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-				SpecialNew = TRUE;
-				code = cset & 0xff;
-			}
-		}
-
-		if (SpecialNew != Special) {
-			UpdateStr();
-			Special = SpecialNew;
-		}
-
-		if (Special) {
-			CharAttrTmp.Attr |= AttrSpecial;
-		}
-		else {
-			CharAttrTmp.Attr |= CharAttr.Attr;
-		}
-
-		if (CursorX > CursorRightM)
-			LineEnd = NumOfColumns - 1;
-		else
-			LineEnd = CursorRightM;
-
-		// Wrap処理、カーソル移動
-		if (Wrap) {
-			// 現在 Wrap 状態
-			if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
-				// 文字コードが結合文字ではない = カーソルが移動する
-
-				// カーソル位置に行継続アトリビュートを追加
-				TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
-				t.Attr |= AttrLineContinued;
-				t.AttrEx = t.Attr;
-				BuffSetCursorCharAttr(CursorX, CursorY, t);
-
-				// 行継続アトリビュートをつける
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-
-				// 次の行の行頭へ
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-		}
-
-		// バッファに文字を入れる
-		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
-		//		エラー時はカーソル位置を検討する
-		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-	retry:
-		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
-		if (r == -1) {
-			// 文字全角で行末、入力できない
-
-			if (AutoWrapMode) {
-				// 自動改行
-				// 、wrap処理
-				CharAttrTmp = CharAttr;
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
-				// AutoWrapMode
-				// ts.EnableContinuedLineCopy
-				//if (CursorX != LineEnd){
-				//&& BuffIsHalfWidthFromCode(&ts, code)) {
-
-				// full width出力が半分出力にならないように0x20を出力
-				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
-				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
-
-				// 次の行の行頭へ
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-			else {
-				// 行頭に戻す
-				CursorX = 0;
-			}
-
-			//CharAttrTmp.Attr &= ~AttrLineContinued;
-			goto retry;
-		}
-		else if (r == 0) {
-			// カーソルの移動なし,結合文字,合字など
-			// Wrap は変化しない
-			UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
-		} else if (r == 1) {
-			// 半角(1セル)
-			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
-				UpdateStr();
-				Wrap = AutoWrapMode;
-			} else {
-				MoveRight();
-				Wrap = FALSE;
-			}
-		} else if (r == 2) {
-			// 全角(2セル)
-			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
-				MoveRight();	// 全角の右側にカーソル移動
-				UpdateStr();
-				Wrap = AutoWrapMode;
-			} else {
-				MoveRight();
-				MoveRight();
-				Wrap = FALSE;
-			}
-		}
-		else {
-			assert(FALSE);
-		}
-	}
-
-	// ログを出力
-	OutputLogUTF32(code);
 }
 
 /**
