@@ -54,17 +54,15 @@
 #include "ttime.h"
 #include "clipboar.h"
 #include "codeconv.h"
-#include "unicode.h"
 #include "ttdde.h"
 #include "checkeol.h"
 #include "asprintf.h"
+#include "charset.h"
 
 #include "vtterm.h"
 
 #include "unicode_test.h"
 // #define DEBUG_DUMP_INPUTCODE 1
-
-static void ParseFirst(BYTE b);
 
 #define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
 
@@ -123,7 +121,7 @@ static BOOL AcceptWheelToCursor;
 typedef struct {
 	int CursorX, CursorY;
 	TCharAttr Attr;
-	int Glr[2], Gn[4]; // G0-G3, GL & GR
+	CharSetState CharSetState;
 	BOOL AutoWrapMode;
 	BOOL RelativeOrgMode;
 } TStatusBuff;
@@ -139,9 +137,6 @@ static BYTE LastPutCharacter;
 static TStatusBuff SBuff1, SBuff2, SBuff3;
 
 static BOOL ESCFlag, JustAfterESC;
-static BOOL KanjiIn;				// TRUE = MBCSの1byte目を受信している
-static BOOL EUCkanaIn, EUCsupIn;
-static int  EUCcount;
 static BOOL Special;
 
 static int Param[NParamMax+1];
@@ -163,19 +158,6 @@ static PTStack TitleStack = NULL;
 
 /* user defined keys */
 static BOOL WaitKeyId, WaitHi;
-
-/* GL, GR code group */
-static int Glr[2];
-/* G0, G1, G2, G3 code group */
-static int Gn[4];
-/* GL for single shift 2/3 */
-static int GLtmp;
-/* single shift 2/3 flag */
-static BOOL SSflag;
-/* JIS -> SJIS conversion flag */
-static BOOL ConvJIS;
-static WORD Kanji;
-static BOOL Fallbacked;
 
 // variables for status line mode
 static int StatusX=0;
@@ -223,7 +205,7 @@ typedef struct {
 
 static vtterm_work_t vtterm_work;
 
-void ClearParams()
+static void ClearParams(void)
 {
 	ICount = 0;
 	NParam = 1;
@@ -232,54 +214,72 @@ void ClearParams()
 	Prv = 0;
 }
 
-void ResetSBuffer(PStatusBuff sbuff)
+static void SaveCursorBuf(PStatusBuff Buff)
 {
-	sbuff->CursorX = 0;
-	sbuff->CursorY = 0;
-	sbuff->Attr = DefCharAttr;
-	if (ts.Language==IdJapanese) {
-		sbuff->Gn[0] = IdASCII;
-		sbuff->Gn[1] = IdKatakana;
-		sbuff->Gn[2] = IdKatakana;
-		sbuff->Gn[3] = IdKanji;
-		sbuff->Glr[0] = 0;
-		if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
-			sbuff->Glr[1] = 2;	// 8-bit katakana
-		else
-			sbuff->Glr[1] = 3;
-	}
-	else {
-		sbuff->Gn[0] = IdASCII;
-		sbuff->Gn[1] = IdSpecial;
-		sbuff->Gn[2] = IdASCII;
-		sbuff->Gn[3] = IdASCII;
-		sbuff->Glr[0] = 0;
-		sbuff->Glr[1] = 0;
-	}
-	sbuff->AutoWrapMode = TRUE;
-	sbuff->RelativeOrgMode = FALSE;
+	Buff->CursorX = CursorX;
+	Buff->CursorY = CursorY;
+	Buff->Attr = CharAttr;
+
+	CharSetSaveState(&Buff->CharSetState);
+	Buff->AutoWrapMode = AutoWrapMode;
+	Buff->RelativeOrgMode = RelativeOrgMode;
 }
 
-void ResetAllSBuffers()
-{
-	ResetSBuffer(&SBuff1);
-	// copy SBuff1 to SBuff2
-	SBuff2 = SBuff1;
-	SBuff3 = SBuff1;
-}
-
-void ResetCurSBuffer()
+static void SaveCursor()
 {
 	PStatusBuff Buff;
 
-	if (AltScr) {
-		Buff = &SBuff3; // Alternate screen buffer
-	}
-	else {
-		Buff = &SBuff1; // Normal screen buffer
-	}
-	ResetSBuffer(Buff);
-	SBuff2 = *Buff;
+	if (isCursorOnStatusLine)
+		Buff = &SBuff2; // for status line
+	else if (AltScr)
+		Buff = &SBuff3; // for alternate screen
+	else
+		Buff = &SBuff1; // for main screen
+
+	SaveCursorBuf(Buff);
+}
+
+static void RestoreCursorBuff(PStatusBuff Buff)
+{
+	if (Buff->CursorX > NumOfColumns-1)
+		Buff->CursorX = NumOfColumns-1;
+	if (Buff->CursorY > NumOfLines-1-StatusLine)
+		Buff->CursorY = NumOfLines-1-StatusLine;
+	MoveCursor(Buff->CursorX, Buff->CursorY);
+
+	CharAttr = Buff->Attr;
+	BuffSetCurCharAttr(CharAttr);
+	CharSetLoadState(&Buff->CharSetState);
+
+	AutoWrapMode = Buff->AutoWrapMode;
+	RelativeOrgMode = Buff->RelativeOrgMode;
+}
+
+static void RestoreCursor()
+{
+	PStatusBuff Buff;
+
+	UpdateStr();
+
+	if (isCursorOnStatusLine)
+		Buff = &SBuff2; // for status line
+	else if (AltScr)
+		Buff = &SBuff3; // for alternate screen
+	else
+		Buff = &SBuff1; // for main screen
+
+	if (Buff->CursorX > NumOfColumns-1)
+		Buff->CursorX = NumOfColumns-1;
+	if (Buff->CursorY > NumOfLines-1-StatusLine)
+		Buff->CursorY = NumOfLines-1-StatusLine;
+	MoveCursor(Buff->CursorX, Buff->CursorY);
+
+	CharAttr = Buff->Attr;
+	BuffSetCurCharAttr(CharAttr);
+	CharSetLoadState(&Buff->CharSetState);
+
+	AutoWrapMode = Buff->AutoWrapMode;
+	RelativeOrgMode = Buff->RelativeOrgMode;
 }
 
 void ResetTerminal() /*reset variables but don't update screen */
@@ -322,6 +322,10 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	/* Character sets */
 	ResetCharSet();
+	// status buffers
+	SaveCursorBuf(&SBuff1);
+	SaveCursorBuf(&SBuff2);
+	SaveCursorBuf(&SBuff3);
 
 	/* ESC flag for device control sequence */
 	ESCFlag = FALSE;
@@ -333,9 +337,6 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	/* Clear printer mode */
 	PrinterMode = FALSE;
-
-	// status buffers
-	ResetAllSBuffers();
 
 	// Alternate Screen Buffer
 	AltScr = FALSE;
@@ -375,34 +376,10 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 void ResetCharSet()
 {
-	if (ts.Language==IdJapanese) {
-		Gn[0] = IdASCII;
-		Gn[1] = IdKatakana;
-		Gn[2] = IdKatakana;
-		Gn[3] = IdKanji;
-		Glr[0] = 0;
-		if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
-			Glr[1] = 2;	// 8-bit katakana
-		else
-			Glr[1] = 3;
-	}
-	else {
-		Gn[0] = IdASCII;
-		Gn[1] = IdSpecial;
-		Gn[2] = IdASCII;
-		Gn[3] = IdASCII;
-		Glr[0] = 0;
-		Glr[1] = 0;
+	if (ts.Language != IdJapanese) {
 		cv.SendCode = IdASCII;
 		cv.EchoCode = IdASCII;
 	}
-	/* Kanji flag */
-	KanjiIn = FALSE;
-	EUCkanaIn = FALSE;
-	EUCsupIn = FALSE;
-	SSflag = FALSE;
-	ConvJIS = FALSE;
-	Fallbacked = FALSE;
 
 	cv.Language = ts.Language;
 	cv.CRSend = ts.CRSend;
@@ -412,6 +389,8 @@ void ResetCharSet()
 	cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
+
+	CharSetInit();
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
@@ -422,7 +401,7 @@ void ResetKeypadMode(BOOL DisabledModeOnly)
 		AppliCursorMode = FALSE;
 }
 
-void MoveToMainScreen()
+static void MoveToMainScreen(void)
 {
 	StatusX = CursorX;
 	StatusWrap = Wrap;
@@ -586,7 +565,8 @@ void ChangeTerminalSize(int Nx, int Ny)
 	MainBottom = NumOfLines-StatusLine-1;
 }
 
-void SendCSIstr(char *str, int len) {
+static void SendCSIstr(char *str, int len)
+{
 	size_t l;
 
 	if (str == NULL || len < 0)
@@ -607,7 +587,8 @@ void SendCSIstr(char *str, int len) {
 	CommBinaryOut(&cv, str, l);
 }
 
-static void SendOSCstr(char *str, int len, char TermChar) {
+static void SendOSCstr(char *str, int len, char TermChar)
+{
 	size_t l;
 
 	if (str == NULL || len < 0)
@@ -638,7 +619,8 @@ static void SendOSCstr(char *str, int len, char TermChar) {
 
 }
 
-void SendDCSstr(char *str, int len) {
+static void SendDCSstr(char *str, int len)
+{
 	size_t l;
 
 	if (str == NULL || len < 0)
@@ -664,7 +646,7 @@ void SendDCSstr(char *str, int len) {
 
 }
 
-void BackSpace()
+static void BackSpace(void)
 {
 	if (CursorX == CursorLeftM || CursorX == 0) {
 		if (CursorY > 0 && (ts.TermFlag & TF_BACKWRAP)) {
@@ -678,7 +660,7 @@ void BackSpace()
 	}
 }
 
-static void CarriageReturn(BOOL logFlag)
+void CarriageReturn(BOOL logFlag)
 {
 	if (!ts.EnableContinuedLineCopy || logFlag)
 		if (NeedsOutputBufs()) OutputLogByte(CR);
@@ -691,7 +673,7 @@ static void CarriageReturn(BOOL logFlag)
 	Fallbacked = FALSE;
 }
 
-static void LineFeed(BYTE b, BOOL logFlag)
+void LineFeed(BYTE b, BOOL logFlag)
 {
 	/* for auto print mode */
 	if ((AutoPrintMode) &&
@@ -714,7 +696,7 @@ static void LineFeed(BYTE b, BOOL logFlag)
 	Fallbacked = FALSE;
 }
 
-void Tab()
+static void Tab(void)
 {
 	if (Wrap && !ts.VTCompatTab) {
 		CarriageReturn(FALSE);
@@ -728,7 +710,7 @@ void Tab()
 	if (NeedsOutputBufs()) OutputLogByte(HT);
 }
 
-void RepeatChar(BYTE b, int count)
+static void RepeatChar(BYTE b, int count)
 {
 	int i;
 	BOOL SpecialNew;
@@ -740,20 +722,7 @@ void RepeatChar(BYTE b, int count)
 	CharAttrTmp = CharAttr;
 	LastPutCharacter = 0;
 
-	SpecialNew = FALSE;
-	if ((b>0x5F) && (b<0x80)) {
-		if (SSflag)
-			SpecialNew = (Gn[GLtmp]==IdSpecial);
-		else
-			SpecialNew = (Gn[Glr[0]]==IdSpecial);
-	}
-	else if (b>0xDF) {
-		if (SSflag)
-			SpecialNew = (Gn[GLtmp]==IdSpecial);
-		else
-			SpecialNew = (Gn[Glr[1]]==IdSpecial);
-	}
-
+	SpecialNew = CharSetIsSpecial(b);
 	if (SpecialNew != Special) {
 		UpdateStr();
 		Special = SpecialNew;
@@ -789,7 +758,7 @@ void RepeatChar(BYTE b, int count)
 	}
 }
 
-static void PutChar(BYTE b)
+void PutChar(BYTE b)
 {
 	BOOL SpecialNew;
 	TCharAttr CharAttrTmp;
@@ -829,20 +798,7 @@ static void PutChar(BYTE b)
 
 	Wrap = FALSE;
 
-	SpecialNew = FALSE;
-	if ((b>0x5F) && (b<0x80)) {
-		if (SSflag)
-			SpecialNew = (Gn[GLtmp]==IdSpecial);
-		else
-			SpecialNew = (Gn[Glr[0]]==IdSpecial);
-	}
-	else if (b>0xDF) {
-		if (SSflag)
-			SpecialNew = (Gn[GLtmp]==IdSpecial);
-		else
-			SpecialNew = (Gn[Glr[1]]==IdSpecial);
-	}
-
+	SpecialNew = CharSetIsSpecial(b);
 	if (SpecialNew != Special) {
 		UpdateStr();
 		Special = SpecialNew;
@@ -897,172 +853,7 @@ static void PutChar(BYTE b)
 	}
 }
 
-static void PutDecSp(BYTE b)
-{
-	TCharAttr CharAttrTmp;
-
-	CharAttrTmp = CharAttr;
-
-	if (PrinterMode) { // printer mode
-		WriteToPrnFile(PrintFile_, b, TRUE);
-		return;
-	}
-
-	if (Wrap) {
-		CarriageReturn(FALSE);
-		LineFeed(LF, FALSE);
-		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
-	}
-
-	if (NeedsOutputBufs()) OutputLogByte(b);
-/*
-	if (ts.LogTypePlainText && __isascii(b) && !isprint(b)) {
-		// ASCII文字で、非表示な文字はログ採取しない。
-	} else {
-		if (NeedsOutputBufs()) OutputLogByte(b);
-	}
- */
-
-	Wrap = FALSE;
-
-	if (!Special) {
-		UpdateStr();
-		Special = TRUE;
-	}
-
-	CharAttrTmp.Attr |= AttrSpecial;
-	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-	BuffPutChar(b, CharAttrTmp, InsertMode);
-
-	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
-		UpdateStr();
-		Wrap = AutoWrapMode;
-	}
-	else {
-		MoveRight();
-	}
-}
-
-/**
- *	mbcsを出力
- */
-static void PutKanji(BYTE b)
-{
-	int LineEnd;
-	TCharAttr CharAttrTmp;
-	CharAttrTmp = CharAttr;
-
-	Kanji = Kanji + b;
-
-	if (PrinterMode && DirectPrn) {
-		WriteToPrnFile(PrintFile_, HIBYTE(Kanji),FALSE);
-		WriteToPrnFile(PrintFile_, LOBYTE(Kanji),TRUE);
-		return;
-	}
-
-	if (ConvJIS)
-		Kanji = JIS2SJIS((WORD)(Kanji & 0x7f7f));
-
-	if (PrinterMode) { // printer mode
-		WriteToPrnFile(PrintFile_, HIBYTE(Kanji),FALSE);
-		WriteToPrnFile(PrintFile_, LOBYTE(Kanji),TRUE);
-		return;
-	}
-
-	if (CursorX > CursorRightM)
-		LineEnd = NumOfColumns - 1;
-	else
-		LineEnd = CursorRightM;
-
-	if (Wrap) {
-		CarriageReturn(FALSE);
-		LineFeed(LF,FALSE);
-		if (ts.EnableContinuedLineCopy) {
-			CharAttrTmp.Attr |= AttrLineContinued;
-			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-		}
-	}
-	else if (CursorX > LineEnd - 1) {
-		if (AutoWrapMode) {
-			if (ts.EnableContinuedLineCopy) {
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-				if (CursorX == LineEnd)
-					BuffPutChar(0x20, CharAttr, FALSE);
-			}
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-		}
-		else {
-			return;
-		}
-	}
-
-	Wrap = FALSE;
-
-	if (NeedsOutputBufs()) {
-		OutputLogByte(HIBYTE(Kanji));
-		OutputLogByte(LOBYTE(Kanji));
-	}
-
-	if (Special) {
-		UpdateStr();
-		Special = FALSE;
-	}
-
-	{
-		// codepage一覧
-		// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-ucoderef/28fefe92-d66c-4b03-90a9-97b473223d43
-		unsigned long u32 = 0;
-		switch (ts.Language) {
-		case IdJapanese:
-			// ここに来た時点でCP932になっている
-			u32 = CP932ToUTF32(Kanji);
-			break;
-		case IdKorean:
-			if (ts.KanjiCode == IdKoreanCP51949) {
-				// CP51949
-				u32 = MBCP_UTF32(Kanji, 51949);
-			}
-			else {
-				assert(FALSE);
-			}
-			break;
-		case IdChinese:
-			if (ts.KanjiCode == IdCnGB2312) {
-				// CP936 GB2312
-				u32 = MBCP_UTF32(Kanji, 936);
-			}
-			else if (ts.KanjiCode == IdCnBig5) {
-				// CP950 Big5
-				u32 = MBCP_UTF32(Kanji, 950);
-			}
-			else {
-				assert(FALSE);
-			}
-			break;
-		default:
-			assert(FALSE);
-			break;
-		}
-		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
-	}
-
-	if (CursorX < LineEnd - 1) {
-		MoveRight();
-		MoveRight();
-	}
-	else {
-		if (CursorX == LineEnd - 1) {
-			MoveRight();
-		}
-		UpdateStr();
-		Wrap = AutoWrapMode;
-	}
-}
-
-void PutDebugChar(BYTE b)
+static void PutDebugChar(BYTE b)
 {
 	static BYTE buff[3];
 	int i;
@@ -1132,15 +923,17 @@ static void PrnParseControl(BYTE b) // printer mode
 			    (ts.JIS7Katakana==1) &&
 			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
 			{
-				Gn[1] = IdKatakana;
+				CharSet2022Designate(1, IdKatakana);
 			}
-			Glr[0] = 1; /* LS1 */
+			/* LS1 */
+			CharSet2022Invoke(0, 1, FALSE);
 			return;
 		}
 		break;
 	case SI:
 		if ((ts.ISO2022Flag & ISO2022_SI) && ! DirectPrn) {
-			Glr[0] = 0; /* LS0 */
+			/* LS0 */
+			CharSet2022Invoke(0, 0, FALSE);
 			return;
 		}
 		break;
@@ -1169,7 +962,7 @@ static void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(PrintFile_, b, TRUE);
 }
 
-static void ParseControl(BYTE b)
+void ParseControl(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -1272,15 +1065,15 @@ static void ParseControl(BYTE b)
 			    (ts.JIS7Katakana==1) &&
 			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
 			{
-				Gn[1] = IdKatakana;
+				CharSet2022Designate(1, IdKatakana);
 			}
 
-			Glr[0] = 1;
+			CharSet2022Invoke(0, 1, FALSE);
 		}
 		break;
 	case SI: /* LS0 */
 		if (ts.ISO2022Flag & ISO2022_SI) {
-			Glr[0] = 0;
+			CharSet2022Invoke(0, 0, FALSE);
 		}
 		break;
 	case DLE:
@@ -1330,14 +1123,12 @@ static void ParseControl(BYTE b)
 		break;
 	case SS2:
 		if (ts.ISO2022Flag & ISO2022_SS2) {
-			GLtmp = 2;
-			SSflag = TRUE;
+			CharSet2022Invoke(0, 2, TRUE);
 		}
 		break;
 	case SS3:
 		if (ts.ISO2022Flag & ISO2022_SS3) {
-			GLtmp = 3;
-			SSflag = TRUE;
+			CharSet2022Invoke(0, 3, TRUE);
 		}
 		break;
 	case DCS:
@@ -1364,63 +1155,6 @@ static void ParseControl(BYTE b)
 		ParseMode = ModeIgnore;
 		break;
 	}
-}
-
-void SaveCursor()
-{
-	int i;
-	PStatusBuff Buff;
-
-	if (isCursorOnStatusLine)
-		Buff = &SBuff2; // for status line
-	else if (AltScr)
-		Buff = &SBuff3; // for alternate screen
-	else
-		Buff = &SBuff1; // for main screen
-
-	Buff->CursorX = CursorX;
-	Buff->CursorY = CursorY;
-	Buff->Attr = CharAttr;
-
-	Buff->Glr[0] = Glr[0];
-	Buff->Glr[1] = Glr[1];
-	for (i=0 ; i<=3; i++)
-		Buff->Gn[i] = Gn[i];
-
-	Buff->AutoWrapMode = AutoWrapMode;
-	Buff->RelativeOrgMode = RelativeOrgMode;
-}
-
-void RestoreCursor()
-{
-	int i;
-	PStatusBuff Buff;
-
-	UpdateStr();
-
-	if (isCursorOnStatusLine)
-		Buff = &SBuff2; // for status line
-	else if (AltScr)
-		Buff = &SBuff3; // for alternate screen
-	else
-		Buff = &SBuff1; // for main screen
-
-	if (Buff->CursorX > NumOfColumns-1)
-		Buff->CursorX = NumOfColumns-1;
-	if (Buff->CursorY > NumOfLines-1-StatusLine)
-		Buff->CursorY = NumOfLines-1-StatusLine;
-	MoveCursor(Buff->CursorX, Buff->CursorY);
-
-	CharAttr = Buff->Attr;
-	BuffSetCurCharAttr(CharAttr);
-
-	Glr[0] = Buff->Glr[0];
-	Glr[1] = Buff->Glr[1];
-	for (i=0 ; i<=3; i++)
-		Gn[i] = Buff->Gn[i];
-
-	AutoWrapMode = Buff->AutoWrapMode;
-	RelativeOrgMode = Buff->RelativeOrgMode;
 }
 
 static void AnswerTerminalType(void)
@@ -1514,24 +1248,46 @@ static void ESCDBCSSelect(BYTE b)
 
 	switch (ICount) {
 		case 1:
+			// - ESC $ @ (01/11 02/04 04/00) (0x1b 0x24 0x40)
+			//		- G0 <- 旧JIS漢字
+			//		- 旧JIS漢字 = JIS X 0208-1978 (JIS C 6226-1978)
+			// - ESC $ B (01/11 02/04 04/02) (0x1b 0x24 0x42)
+			//		- G0 <- 新JIS漢字
+			//		- 新JIS漢字 = JIS X 0208-1990
 			if ((b=='@') || (b=='B'))
 			{
-				Gn[0] = IdKanji; /* Kanji -> G0 */
-				if ((ts.TermFlag & TF_AUTOINVOKE)!=0)
-					Glr[0] = 0; /* G0->GL */
+				/* Kanji -> G0 */
+				CharSet2022Designate(0, IdKanji);
+				if ((ts.TermFlag & TF_AUTOINVOKE)!=0) {
+					/* G0->GL */
+					CharSet2022Invoke(0, 0, FALSE);
+				}
 			}
 			break;
 		case 2:
+			// - ESC $ ( @ (01/11 02/04 02/08 04/00) (0x1b 0x24 0x28 0x40)
+			// - ESC $ ) @ (01/11 02/04 02/09 04/00) (0x1b 0x24 0x29 0x40)
+			// - ESC $ * @ (01/11 02/04 02/10 04/00) (0x1b 0x24 0x2a 0x40)
+			// - ESC $ + @ (01/11 02/04 02/11 04/00) (0x1b 0x24 0x2b 0x40)
+			//		- G0..G3 <- 旧JIS漢字
+			// - ESC $ ( B (01/11 02/04 02/08 04/02) (0x1b 0x24 0x28 0x42)
+			// - ESC $ ) B (01/11 02/04 02/09 04/02) (0x1b 0x24 0x29 0x42)
+			// - ESC $ * B (01/11 02/04 02/10 04/02) (0x1b 0x24 0x2a 0x42)
+			// - ESC $ + B (01/11 02/04 02/11 04/02) (0x1b 0x24 0x2b 0x42)
+			//		- G0..G3 <- 新JIS漢字
+			//
 			/* Second intermediate char must be
 				 '(' or ')' or '*' or '+'. */
 			Dist = (IntChar[2]-'(') & 3; /* G0 - G3 */
 			if ((b=='1') || (b=='3') ||
 					(b=='@') || (b=='B'))
 			{
-				Gn[Dist] = IdKanji; /* Kanji -> G0-3 */
-				if (((ts.TermFlag & TF_AUTOINVOKE)!=0) &&
-						(Dist==0))
-					Glr[0] = 0; /* G0->GL */
+				/* Kanji -> G0-3 */
+				CharSet2022Designate(Dist, IdKanji);
+				if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0)) {
+					/* G0->GL */
+					CharSet2022Invoke(0, 0, FALSE);
+				}
 			}
 			break;
 	}
@@ -1556,24 +1312,32 @@ static void ESCSBCSSelect(BYTE b)
 	Dist = (IntChar[1]-'(') & 3; /* G0 - G3 */
 
 	switch (b) {
-	case '0': Gn[Dist] = IdSpecial; break;
-	case '<': Gn[Dist] = IdASCII; break;
-	case '>': Gn[Dist] = IdASCII; break;
-	case 'A': Gn[Dist] = IdASCII; break;
-	case 'B': Gn[Dist] = IdASCII; break;
-	case 'H': Gn[Dist] = IdASCII; break;
+	case '0':
+		CharSet2022Designate(Dist, IdSpecial);
+		break;
+	case '<':
+	case '>':
+	case 'A':
+	case 'B':
+	case 'H':
+		CharSet2022Designate(Dist, IdASCII);
+		break;
 	case 'I':
 		if (ts.Language==IdJapanese)
-			Gn[Dist] = IdKatakana;
+			CharSet2022Designate(Dist, IdKatakana);
 		break;
-	case 'J': Gn[Dist] = IdASCII; break;
+	case 'J':
+		CharSet2022Designate(Dist, IdASCII);
+		break;
 	}
 
-	if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0))
-		Glr[0] = 0;  /* G0->GL */
+	if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0)) {
+		/* G0->GL */
+		CharSet2022Invoke(0, 0, FALSE);
+	}
 }
 
-void PrnParseEscape(BYTE b) // printer mode
+static void PrnParseEscape(BYTE b) // printer mode
 {
 	int i;
 
@@ -1630,7 +1394,7 @@ void PrnParseEscape(BYTE b) // printer mode
 	WriteToPrnFile(PrintFile_, b,TRUE);
 }
 
-void ParseEscape(BYTE b) /* b is the final char */
+static void ParseEscape(BYTE b) /* b is the final char */
 {
 	if (PrinterMode) { // printer mode
 		PrnParseEscape(b);
@@ -1678,14 +1442,12 @@ void ParseEscape(BYTE b) /* b is the final char */
 			break;
 		case 'N': /* SS2 */
 			if (ts.ISO2022Flag & ISO2022_SS2) {
-				GLtmp = 2;
-				SSflag = TRUE;
+				CharSet2022Invoke(0, 2, TRUE);
 			}
 			break;
 		case 'O': /* SS3 */
 			if (ts.ISO2022Flag & ISO2022_SS3) {
-				GLtmp = 3;
-				SSflag = TRUE;
+				CharSet2022Invoke(0, 3, TRUE);
 			}
 			break;
 		case 'P': /* DCS */
@@ -1725,27 +1487,27 @@ void ParseEscape(BYTE b) /* b is the final char */
 			break;
 		case 'n': /* LS2 */
 			if (ts.ISO2022Flag & ISO2022_LS2) {
-				Glr[0] = 2;
+				CharSet2022Invoke(0, 2, FALSE);
 			}
 			break;
 		case 'o': /* LS3 */
 			if (ts.ISO2022Flag & ISO2022_LS3) {
-				Glr[0] = 3;
+				CharSet2022Invoke(0, 3, FALSE);
 			}
 			break;
 		case '|': /* LS3R */
 			if (ts.ISO2022Flag & ISO2022_LS3R) {
-				Glr[1] = 3;
+				CharSet2022Invoke(1, 3, FALSE);
 			}
 			break;
 		case '}': /* LS2R */
 			if (ts.ISO2022Flag & ISO2022_LS2R) {
-				Glr[1] = 2;
+				CharSet2022Invoke(1, 2, FALSE);
 			}
 			break;
 		case '~': /* LS1R */
 			if (ts.ISO2022Flag & ISO2022_LS1R) {
-				Glr[1] = 1;
+				CharSet2022Invoke(1, 1, FALSE);
 			}
 			break;
 		}
@@ -1777,7 +1539,7 @@ void ParseEscape(BYTE b) /* b is the final char */
 	ParseMode = ModeFirst;
 }
 
-void EscapeSequence(BYTE b)
+static void EscapeSequence(BYTE b)
 {
 	if (b<=US)
 		ParseControl(b);
@@ -1831,7 +1593,7 @@ static void CSInsertCharacter(void)
 	BuffInsertSpace(Param[1]);
 }
 
-void CSCursorUp(BOOL AffectMargin)	// CUU / VPB
+static void CSCursorUp(BOOL AffectMargin)	// CUU / VPB
 {
 	int topMargin, NewY;
 
@@ -1849,13 +1611,13 @@ void CSCursorUp(BOOL AffectMargin)	// CUU / VPB
 	MoveCursor(CursorX, NewY);
 }
 
-void CSCursorUp1()			// CPL
+static void CSCursorUp1()			// CPL
 {
 	MoveCursor(CursorLeftM, CursorY);
 	CSCursorUp(TRUE);
 }
 
-void CSCursorDown(BOOL AffectMargin)	// CUD / VPR
+static void CSCursorDown(BOOL AffectMargin)	// CUD / VPR
 {
 	int bottomMargin, NewY;
 
@@ -1873,13 +1635,13 @@ void CSCursorDown(BOOL AffectMargin)	// CUD / VPR
 	MoveCursor(CursorX, NewY);
 }
 
-void CSCursorDown1()			// CNL
+static void CSCursorDown1()			// CNL
 {
 	MoveCursor(CursorLeftM, CursorY);
 	CSCursorDown(TRUE);
 }
 
-void CSScreenErase()
+static void CSScreenErase()
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
@@ -1927,7 +1689,7 @@ void CSScreenErase()
 	}
 }
 
-void CSQSelScreenErase()
+static void CSQSelScreenErase()
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
@@ -1954,7 +1716,7 @@ void CSQSelScreenErase()
 	}
 }
 
-void CSInsertLine()
+static void CSInsertLine()
 {
 	// Insert lines at current position
 	int Count, YEnd;
@@ -1977,7 +1739,7 @@ void CSInsertLine()
 	BuffInsertLines(Count,YEnd);
 }
 
-void CSLineErase()
+static void CSLineErase()
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
@@ -2013,7 +1775,7 @@ static void CSQSelLineErase(void)
 	}
 }
 
-void CSDeleteNLines()
+static void CSDeleteNLines()
 // Delete lines from current line
 {
 	int Count, YEnd;
@@ -2054,7 +1816,7 @@ static void CSEraseCharacter(void)
 	BuffEraseChars(Param[1]);
 }
 
-void CSRepeatCharacter()
+static void CSRepeatCharacter()
 {
 	CheckParamVal(Param[1], NumOfColumns * NumOfLines);
 
@@ -2062,7 +1824,7 @@ void CSRepeatCharacter()
 	RepeatChar(LastPutCharacter, Param[1]);
 }
 
-void CSScrollUp()
+static void CSScrollUp()
 {
 	// TODO: スクロールの最大値を端末行数に制限すべきか要検討
 	CheckParamVal(Param[1], INT_MAX);
@@ -2071,7 +1833,7 @@ void CSScrollUp()
 	BuffRegionScrollUpNLines(Param[1]);
 }
 
-void CSScrollDown()
+static void CSScrollDown()
 {
 	CheckParamVal(Param[1], NumOfLines);
 
@@ -2079,19 +1841,19 @@ void CSScrollDown()
 	BuffRegionScrollDownNLines(Param[1]);
 }
 
-void CSForwardTab()
+static void CSForwardTab()
 {
 	CheckParamVal(Param[1], NumOfColumns);
 	CursorForwardTab(Param[1], AutoWrapMode);
 }
 
-void CSBackwardTab()
+static void CSBackwardTab()
 {
 	CheckParamVal(Param[1], NumOfColumns);
 	CursorBackwardTab(Param[1]);
 }
 
-void CSMoveToColumnN()		// CHA / HPA
+static void CSMoveToColumnN()		// CHA / HPA
 {
 	CheckParamVal(Param[1], NumOfColumns);
 
@@ -2108,7 +1870,7 @@ void CSMoveToColumnN()		// CHA / HPA
 	}
 }
 
-void CSCursorRight(BOOL AffectMargin)	// CUF / HPR
+static void CSCursorRight(BOOL AffectMargin)	// CUF / HPR
 {
 	int NewX, rightMargin;
 
@@ -2128,7 +1890,7 @@ void CSCursorRight(BOOL AffectMargin)	// CUF / HPR
 	MoveCursor(NewX, CursorY);
 }
 
-void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
+static void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
 {
 	int NewX, leftMargin;
 
@@ -2149,7 +1911,7 @@ void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
 	MoveCursor(NewX, CursorY);
 }
 
-void CSMoveToLineN()		// VPA
+static void CSMoveToLineN()		// VPA
 {
 	CheckParamVal(Param[1], NumOfLines-StatusLine);
 
@@ -2168,7 +1930,7 @@ void CSMoveToLineN()		// VPA
 	Fallbacked = FALSE;
 }
 
-void CSMoveToXY()		// CUP / HVP
+static void CSMoveToXY()		// CUP / HVP
 {
 	int NewX, NewY;
 
@@ -2199,12 +1961,12 @@ void CSMoveToXY()		// CUP / HVP
 	Fallbacked = FALSE;
 }
 
-void CSDeleteTabStop()
+static void CSDeleteTabStop()
 {
 	ClearTabStop(Param[1]);
 }
 
-void CS_h_Mode()		// SM
+static void CS_h_Mode()		// SM
 {
 	switch (Param[1]) {
 	  case 2:	// KAM
@@ -2236,7 +1998,7 @@ void CS_h_Mode()		// SM
 	}
 }
 
-void CS_i_Mode()		// MC
+static void CS_i_Mode()		// MC
 {
 	switch (Param[1]) {
 	  /* print screen */
@@ -2261,7 +2023,7 @@ void CS_i_Mode()		// MC
 	}
 }
 
-void CS_l_Mode()		// RM
+static void CS_l_Mode()		// RM
 {
 	switch (Param[1]) {
 	  case 2:	// KAM
@@ -2293,7 +2055,7 @@ void CS_l_Mode()		// RM
 	}
 }
 
-void CS_n_Mode()		// DSR
+static void CS_n_Mode()		// DSR
 {
 	char Report[16];
 	int X, Y, len;
@@ -2323,7 +2085,7 @@ void CS_n_Mode()		// DSR
 	}
 }
 
-void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
+static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 {
 	int i, j, P, r, g, b, color;
 	TCharAttr dummy;
@@ -2610,7 +2372,7 @@ static void CSSetAttr(void)		// SGR
 	BuffSetCurCharAttr(CharAttr);
 }
 
-void CSSetScrollRegion()	// DECSTBM
+static void CSSetScrollRegion()	// DECSTBM
 {
 	if (isCursorOnStatusLine) {
 		MoveCursor(0,CursorY);
@@ -2634,7 +2396,7 @@ void CSSetScrollRegion()	// DECSTBM
 		MoveCursor(0, 0);
 }
 
-void CSSetLRScrollRegion()	// DECSLRM
+static void CSSetLRScrollRegion()	// DECSLRM
 {
 //	TODO: ステータスライン上での挙動確認。
 //	if (isCursorOnStatusLine) {
@@ -2658,7 +2420,7 @@ void CSSetLRScrollRegion()	// DECSLRM
 		MoveCursor(0, 0);
 }
 
-void CSSunSequence() /* Sun terminal private sequences */
+static void CSSunSequence() /* Sun terminal private sequences */
 {
 	int x, y, len;
 	char Report[TitleBuffSize*2+10];
@@ -2935,7 +2697,7 @@ void CSSunSequence() /* Sun terminal private sequences */
 	}
 }
 
-void CSLT(BYTE b)
+static void CSLT(BYTE b)
 {
 	switch (b) {
 	  case 'r':
@@ -2958,7 +2720,7 @@ void CSLT(BYTE b)
 	}
 }
 
-void CSEQ(BYTE b)
+static void CSEQ(BYTE b)
 {
 	char Report[16];
 	int len;
@@ -2973,7 +2735,7 @@ void CSEQ(BYTE b)
 	}
 }
 
-void CSGT(BYTE b)
+static void CSGT(BYTE b)
 {
 	switch (b) {
 	  case 'c': /* second terminal report (Secondary DA) */
@@ -3053,7 +2815,7 @@ static void CSQExchangeColor(void)
 	UpdateWindow(HVTWin);
 }
 
-void CSQChangeColumnMode(int width)		// DECCOLM
+static void CSQChangeColumnMode(int width)		// DECCOLM
 {
 	ChangeTerminalSize(width, NumOfLines-StatusLine);
 	LRMarginMode = FALSE;
@@ -3069,7 +2831,7 @@ void CSQChangeColumnMode(int width)		// DECCOLM
 	}
 }
 
-void CSQ_h_Mode() // DECSET
+static void CSQ_h_Mode() // DECSET
 {
 	int i;
 
@@ -3116,16 +2878,16 @@ void CSQ_h_Mode() // DECSET
 		  case 59:
 			if (ts.Language==IdJapanese) {
 				/* kanji terminal */
-				Gn[0] = IdASCII;
-				Gn[1] = IdKatakana;
-				Gn[2] = IdKatakana;
-				Gn[3] = IdKanji;
-				Glr[0] = 0;
-				if ((ts.KanjiCode==IdJIS) &&
-				    (ts.JIS7Katakana==0))
-					Glr[1] = 2;  // 8-bit katakana
+				CharSet2022Designate(0, IdASCII);
+				CharSet2022Designate(1, IdKatakana);
+				CharSet2022Designate(2, IdKatakana);
+				CharSet2022Designate(3, IdKanji);
+				CharSet2022Invoke(0, 0, FALSE);
+				if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
+					// 8-bit katakana
+					CharSet2022Invoke(1, 2, FALSE);
 				else
-					Glr[1] = 3;
+					CharSet2022Invoke(1, 3, FALSE);
 			}
 			break;
 		  case 66: AppliKeyMode = TRUE; break;		// DECNKM
@@ -3246,7 +3008,7 @@ static void CSQ_i_Mode(void)		// DECMC
 	}
 }
 
-void CSQ_l_Mode()		// DECRST
+static void CSQ_l_Mode()		// DECRST
 {
 	int i;
 
@@ -3286,16 +3048,16 @@ void CSQ_l_Mode()		// DECRST
 		  case 59:
 			if (ts.Language==IdJapanese) {
 				/* katakana terminal */
-				Gn[0] = IdASCII;
-				Gn[1] = IdKatakana;
-				Gn[2] = IdKatakana;
-				Gn[3] = IdKanji;
-				Glr[0] = 0;
-				if ((ts.KanjiCode==IdJIS) &&
-				    (ts.JIS7Katakana==0))
-					Glr[1] = 2;	// 8-bit katakana
+				CharSet2022Designate(0, IdASCII);
+				CharSet2022Designate(1, IdKatakana);
+				CharSet2022Designate(2, IdKatakana);
+				CharSet2022Designate(3, IdKanji);
+				CharSet2022Invoke(0, 0, FALSE);
+				if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
+					// 8-bit katakana
+					CharSet2022Invoke(1, 2, FALSE);
 				else
-					Glr[1] = 3;
+					CharSet2022Invoke(1, 3, FALSE);
 			}
 			break;
 		  case 66: AppliKeyMode = FALSE; break;		// DECNKM
@@ -3363,7 +3125,7 @@ void CSQ_l_Mode()		// DECRST
 	}
 }
 
-void CSQ_n_Mode()		// DECDSR
+static void CSQ_n_Mode()		// DECDSR
 {
 	switch (Param[1]) {
 	  case 53:
@@ -3386,7 +3148,7 @@ static void CSQuest(BYTE b)
 	}
 }
 
-void SoftReset()
+static void SoftReset()
 // called by software-reset escape sequence handler
 {
 	UpdateStr();
@@ -3412,13 +3174,29 @@ void SoftReset()
 	BuffSetCurCharAttr(CharAttr);
 
 	// status buffers
-	ResetCurSBuffer();
+	{
+		PStatusBuff Buff;
+		int save_x = CursorX;
+		int save_y = CursorY;
+
+		if (AltScr) {
+			Buff = &SBuff3; // Alternate screen buffer
+		}
+		else {
+			Buff = &SBuff1; // Normal screen buffer
+		}
+		CursorX = 0;
+		CursorY = 0;
+		SaveCursorBuf(Buff);
+		CursorX = save_x;
+		CursorY = save_y;
+	}
 
 	// Saved IME status
 	IMEstat = FALSE;
 }
 
-void CSExc(BYTE b)
+static void CSExc(BYTE b)
 {
 	switch (b) {
 	  case 'p':
@@ -3428,7 +3206,7 @@ void CSExc(BYTE b)
 	}
 }
 
-void CSDouble(BYTE b)
+static void CSDouble(BYTE b)
 {
 	switch (b) {
 	  case 'p': // DECSCL
@@ -3772,7 +3550,7 @@ static void CSDolRequestMode(void) // DECRQM
 	SendCSIstr(buff, len);
 }
 
-void CSDol(BYTE b)
+static void CSDol(BYTE b)
 {
 	TCharAttr attr, mask;
 	attr = DefCharAttr;
@@ -3975,7 +3753,7 @@ void CSDol(BYTE b)
 	}
 }
 
-void CSQDol(BYTE b)
+static void CSQDol(BYTE b)
 {
 	switch (b) {
 	  case 'p':
@@ -3984,7 +3762,7 @@ void CSQDol(BYTE b)
 	}
 }
 
-void CSQuote(BYTE b)
+static void CSQuote(BYTE b)
 {
 	int i, x, y;
 	switch (b) {
@@ -4071,7 +3849,8 @@ void CSQuote(BYTE b)
 	}
 }
 
-void CSSpace(BYTE b) {
+static void CSSpace(BYTE b)
+{
 	switch (b) {
 	  case 'q': // DECSCUSR
 		if (ts.WindowFlag & WF_CURSORCHANGE) {
@@ -4110,7 +3889,7 @@ void CSSpace(BYTE b) {
 	}
 }
 
-void CSAster(BYTE b)
+static void CSAster(BYTE b)
 {
 	switch (b) {
 	  case 'x': // DECSACE
@@ -4127,7 +3906,7 @@ void CSAster(BYTE b)
 	}
 }
 
-void PrnParseCS(BYTE b) // printer mode
+static void PrnParseCS(BYTE b) // printer mode
 {
 	ParseMode = ModeFirst;
 	switch (ICount) {
@@ -4262,7 +4041,7 @@ static void ParseCS(BYTE b) /* b is the final char */
 	ParseMode = ModeFirst;
 }
 
-void ControlSequence(BYTE b)
+static void ControlSequence(BYTE b)
 {
 	if ((b<=US) || (b>=0x80) && (b<=0x9F))
 		ParseControl(b); /* ctrl char */
@@ -4348,7 +4127,7 @@ static int CheckUTF8Seq(BYTE b, int utf8_stat)
 	return utf8_stat;
 }
 
-void IgnoreString(BYTE b)
+static void IgnoreString(BYTE b)
 {
 	static int utf8_stat = 0;
 
@@ -4519,7 +4298,7 @@ static void RequestStatusString(const unsigned char *StrBuff, int StrLen)	// DEC
 	SendDCSstr(RepStr, len);
 }
 
-int toHexStr(unsigned char *buff, int buffsize, unsigned char *str)
+static int toHexStr(unsigned char *buff, int buffsize, unsigned char *str)
 {
 	int len, i, copylen = 0;
 	unsigned char c;
@@ -4707,7 +4486,7 @@ static void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
 
 #define ModeDcsFirst     1
 #define ModeDcsString    2
-void DeviceControl(BYTE b)
+static void DeviceControl(BYTE b)
 {
 	static unsigned char StrBuff[256];
 	static int DcsParseMode = ModeDcsFirst;
@@ -4790,7 +4569,7 @@ void DeviceControl(BYTE b)
 	}
 }
 
-void DCUserKey(BYTE b)
+static void DCUserKey(BYTE b)
 {
 	static int utf8_stat = 0;
 
@@ -4842,7 +4621,7 @@ void DCUserKey(BYTE b)
 	}
 }
 
-BOOL XsParseColor(char *colspec, COLORREF *color)
+static BOOL XsParseColor(char *colspec, COLORREF *color)
 {
 	unsigned int r, g, b;
 //	double dr, dg, db;
@@ -5415,7 +5194,7 @@ static void XSequence(BYTE b)
 	}
 }
 
-void DLESeen(BYTE b)
+static void DLESeen(BYTE b)
 {
 	ParseMode = ModeFirst;
 	if (((ts.FTFlag & FT_BPAUTO)!=0) && (b=='B'))
@@ -5423,7 +5202,7 @@ void DLESeen(BYTE b)
 	ChangeEmu = -1;
 }
 
-void CANSeen(BYTE b)
+static void CANSeen(BYTE b)
 {
 	static int state = 0;
 
@@ -5462,7 +5241,7 @@ void CANSeen(BYTE b)
  *
  *	PutChar() の UTF-32版
  */
-static void PutU32(unsigned int code)
+void PutU32(unsigned int code)
 {
 	unsigned short cset;
 	int LineEnd;
@@ -5602,624 +5381,6 @@ static void PutU32(unsigned int code)
 
 	// ログを出力
 	OutputLogUTF32(code);
-}
-
-/**
- *	1byte目チェック
- */
-static BOOL CheckFirstByte(BYTE b, int lang, int kanji_code)
-{
-	switch (lang) {
-		case IdKorean:
-			return __ismbblead(b, 51949);
-		case IdChinese:
-			if (kanji_code == IdCnGB2312) {
-				return __ismbblead(b, 936);
-			}
-			else if (ts.KanjiCode == IdCnBig5) {
-				return __ismbblead(b, 950);
-			}
-			break;
-		default:
-			assert(FALSE);
-			break;
-	}
-	assert(FALSE);
-	return FALSE;
-}
-
-/**
- *	ts.Language == IdJapanese 時
- *	1byte目チェック
- */
-static BOOL CheckKanji(BYTE b)
-{
-	BOOL Check;
-
-	if (ts.Language!=IdJapanese)
-		return FALSE;
-
-	ConvJIS = FALSE;
-
-	if (ts.KanjiCode==IdSJIS ||
-	   (ts.FallbackToCP932 && ts.KanjiCode==IdUTF8)) {
-		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
-			Fallbacked = TRUE;
-			return TRUE; // SJIS kanji
-		}
-		if ((0xa1<=b) && (b<=0xdf)) {
-			return FALSE; // SJIS katakana
-		}
-	}
-
-	if ((b>=0x21) && (b<=0x7e)) {
-		Check = (Gn[Glr[0]]==IdKanji);
-		ConvJIS = Check;
-	}
-	else if ((b>=0xA1) && (b<=0xFE)) {
-		Check = (Gn[Glr[1]]==IdKanji);
-		if (ts.KanjiCode==IdEUC) {
-			Check = TRUE;
-		}
-		else if (ts.KanjiCode==IdJIS && ((ts.TermFlag & TF_FIXEDJIS)!=0) && (ts.JIS7Katakana==0)) {
-			Check = FALSE; // 8-bit katakana
-		}
-		ConvJIS = Check;
-	}
-	else {
-		Check = FALSE;
-	}
-
-	return Check;
-}
-
-static BOOL ParseFirstJP(BYTE b)
-// returns TRUE if b is processed
-//  (actually allways returns TRUE)
-{
-	if (KanjiIn) {
-		if ((! ConvJIS) && (0x3F<b) && (b<0xFD) ||
-		      ConvJIS && ( (0x20<b) && (b<0x7f) ||
-		                   (0xa0<b) && (b<0xff) ))
-		{
-			PutKanji(b);
-			KanjiIn = FALSE;
-			return TRUE;
-		}
-		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
-			KanjiIn = FALSE;
-		}
-		else if ((b==CR) && Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			Wrap = FALSE;
-		}
-	}
-
-	if (SSflag) {
-		if (Gn[GLtmp] == IdKanji) {
-			Kanji = b << 8;
-			KanjiIn = TRUE;
-			SSflag = FALSE;
-			return TRUE;
-		}
-		else if (Gn[GLtmp] == IdKatakana) {
-			b = b | 0x80;
-		}
-
-		PutChar(b);
-		SSflag = FALSE;
-		return TRUE;
-	}
-
-	if ((!EUCsupIn) && (!EUCkanaIn) && (!KanjiIn) && CheckKanji(b)) {
-		Kanji = b << 8;
-		KanjiIn = TRUE;
-		return TRUE;
-	}
-
-	if (b<=US) {
-		ParseControl(b);
-	}
-	else if (b==0x20) {
-		PutChar(b);
-	}
-	else if ((b>=0x21) && (b<=0x7E)) {
-		if (EUCsupIn) {
-			EUCcount--;
-			EUCsupIn = (EUCcount==0);
-			return TRUE;
-		}
-
-		if ((Gn[Glr[0]] == IdKatakana) || EUCkanaIn) {
-			b = b | 0x80;
-			EUCkanaIn = FALSE;
-			{
-				// bはsjisの半角カタカナ
-				unsigned long u32 = CP932ToUTF32(b);
-				PutU32(u32);
-			}
-			return TRUE;
-		}
-		PutChar(b);
-	}
-	else if (b==0x7f) {
-		return TRUE;
-	}
-	else if ((b>=0x80) && (b<=0x8D)) {
-		ParseControl(b);
-	}
-	else if (b==0x8E) { // SS2
-		switch (ts.KanjiCode) {
-		case IdEUC:
-			if (ts.ISO2022Flag & ISO2022_SS2) {
-				EUCkanaIn = TRUE;
-			}
-			break;
-		case IdUTF8:
-			PutChar('?');
-			break;
-		default:
-			ParseControl(b);
-		}
-	}
-	else if (b==0x8F) { // SS3
-		switch (ts.KanjiCode) {
-		case IdEUC:
-			if (ts.ISO2022Flag & ISO2022_SS3) {
-				EUCcount = 2;
-				EUCsupIn = TRUE;
-			}
-			break;
-		case IdUTF8:
-			PutChar('?');
-			break;
-		default:
-			ParseControl(b);
-		}
-	}
-	else if ((b>=0x90) && (b<=0x9F)) {
-		ParseControl(b);
-	}
-	else if (b==0xA0) {
-		PutChar(0x20);
-	}
-	else if ((b>=0xA1) && (b<=0xFE)) {
-		if (EUCsupIn) {
-			EUCcount--;
-			EUCsupIn = (EUCcount==0);
-			return TRUE;
-		}
-
-		if ((Gn[Glr[1]] != IdASCII) ||
-		    (ts.KanjiCode==IdEUC) && EUCkanaIn ||
-		    (ts.KanjiCode==IdSJIS) ||
-		    (ts.KanjiCode==IdJIS) &&
-		    (ts.JIS7Katakana==0) &&
-		    ((ts.TermFlag & TF_FIXEDJIS)!=0)) {
-			// bはsjisの半角カタカナ
-			unsigned long u32 = CP932ToUTF32(b);
-			PutU32(u32);
-		} else {
-			if (Gn[Glr[1]] == IdASCII) {
-				b = b & 0x7f;
-			}
-			PutChar(b);
-		}
-		EUCkanaIn = FALSE;
-	}
-	else {
-		PutChar(b);
-	}
-
-	return TRUE;
-}
-
-static BOOL ParseFirstKR(BYTE b)
-// returns TRUE if b is processed
-//  (actually allways returns TRUE)
-{
-	if (KanjiIn) {
-		if ((0x41<=b) && (b<=0x5A) ||
-		    (0x61<=b) && (b<=0x7A) ||
-		    (0x81<=b) && (b<=0xFE))
-		{
-			PutKanji(b);
-			KanjiIn = FALSE;
-			return TRUE;
-		}
-		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
-			KanjiIn = FALSE;
-		}
-		else if ((b==CR) && Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			Wrap = FALSE;
-		}
-	}
-
-	if ((!KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
-		Kanji = b << 8;
-		KanjiIn = TRUE;
-		return TRUE;
-	}
-
-	if (b<=US) {
-		ParseControl(b);
-	}
-	else if (b==0x20) {
-		PutChar(b);
-	}
-	else if ((b>=0x21) && (b<=0x7E)) {
-//		if (Gn[Glr[0]] == IdKatakana) {
-//			b = b | 0x80;
-//		}
-		PutChar(b);
-	}
-	else if (b==0x7f) {
-		return TRUE;
-	}
-	else if ((0x80<=b) && (b<=0x9F)) {
-		ParseControl(b);
-	}
-	else if (b==0xA0) {
-		PutChar(0x20);
-	}
-	else if ((b>=0xA1) && (b<=0xFE)) {
-		if (Gn[Glr[1]] == IdASCII) {
-			b = b & 0x7f;
-		}
-		PutChar(b);
-	}
-	else {
-		PutChar(b);
-	}
-
-	return TRUE;
-}
-
-static BOOL ParseFirstCn(BYTE b)
-// returns TRUE if b is processed
-//  (actually allways returns TRUE)
-{
-	if (KanjiIn) {
-		// TODO
-		if ((0x40<=b) && (b<=0x7e) ||
-		    (0xa1<=b) && (b<=0xFE))
-		{
-			PutKanji(b);
-			KanjiIn = FALSE;
-			return TRUE;
-		}
-		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
-			KanjiIn = FALSE;
-		}
-		else if ((b==CR) && Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			Wrap = FALSE;
-		}
-	}
-
-	if ((!KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
-		Kanji = b << 8;
-		KanjiIn = TRUE;
-		return TRUE;
-	}
-
-	if (b<=US) {
-		ParseControl(b);
-	}
-	else if (b==0x20) {
-		PutChar(b);
-	}
-	else if ((b>=0x21) && (b<=0x7E)) {
-//		if (Gn[Glr[0]] == IdKatakana) {
-//			b = b | 0x80;
-//		}
-		PutChar(b);
-	}
-	else if (b==0x7f) {
-		return TRUE;
-	}
-	else if ((0x80<=b) && (b<=0x9F)) {
-		ParseControl(b);
-	}
-	else if (b==0xA0) {
-		PutChar(0x20);
-	}
-	else if ((b>=0xA1) && (b<=0xFE)) {
-		if (Gn[Glr[1]] == IdASCII) {
-			b = b & 0x7f;
-		}
-		PutChar(b);
-	}
-	else {
-		PutChar(b);
-	}
-
-	return TRUE;
-}
-
-static void ParseASCII(BYTE b)
-{
-	if (SSflag) {
-		PutChar(b);
-		SSflag = FALSE;
-		return;
-	}
-
-	if (b<=US) {
-		ParseControl(b);
-	} else if ((b>=0x20) && (b<=0x7E)) {
-		//Kanji = 0;
-		//PutKanji(b);
-		PutChar(b);
-	} else if ((b==0x8E) || (b==0x8F)) {
-		PutChar('?');
-	} else if ((b>=0x80) && (b<=0x9F)) {
-		ParseControl(b);
-	} else if (b>=0xA0) {
-		//Kanji = 0;
-		//PutKanji(b);
-		PutChar(b);
-	}
-}
-
-// UTF-8で受信データを処理する
-// returns TRUE if b is processed
-//  (actually allways returns TRUE)
-static BOOL ParseFirstUTF8(BYTE b)
-{
-	static BYTE buf[4];
-	static int count = 0;
-
-	unsigned int code;
-	int i;
-
-	if (ts.FallbackToCP932 && Fallbacked) {
-		return ParseFirstJP(b);
-	}
-
-	// UTF-8エンコード
-	//	Unicode					1byte,		  2byte,	   3byte, 		  4byte
-	//	U+0000  ... U+007f		0x00 .. 0x7f
-	//	U+0080  ... U+07ff		0xc2 .. 0xdf, 0x80 .. 0xbf
-	//	U+0800  ... U+ffff		0xe0 .. 0xef, 0x80 .. 0xbf, 0x80 .. 0xbf
-	//	U+10000 ... U+10ffff	0xf0 .. 0xf4, 0x80 .. 0xbf, 0x80 .. 0xbf, 0x80 .. 0xbf
-	// UTF-8でデコードできない場合
-	//	- 1byte目
-	//		- C1(0x80 - 0x9f)
-	//		- 0xa0 - 0xc1
-	//		- 0xf5 - 0xff
-	//	- 2byte目以降
-	//		- 0x00 - 0x7f
-	//		- 0xc0 - 0xff
-
-	// 1byte(7bit)
-	if (count == 0) {
-		if ((b & 0x80) == 0x00) {
-			// 1byte(7bit)
-			//		0x7f以下, のとき、そのまま出力
-			ParseASCII(b);
-			return TRUE;
-		}
-		if ((b & 0x40) == 0x00 || b >= 0xf6 ) {
-			// UTF-8で1byteに出現しないコードのとき、そのまま出力
-			//	0x40 = 0b1011_1111, 0b10xx_xxxxというbitパターンにはならない
-			//  0xf6 以上のとき U+10FFFFより大きくなる
-			PutU32(b);
-			return TRUE;
-		}
-		// 1byte目保存
-		buf[count++] = b;
-		return TRUE;
-	}
-
-	// 2byte(11bit)
-	if ((buf[0] & 0xe0) == 0xc0) {
-		code = 0;
-		if((b & 0xc0) == 0x80) {
-			// 5bit + 6bit
-			code = ((buf[0] & 0x1f) << 6) | (b & 0x3f);
-			if (code < 0x80) {
-				// 11bit使って7bit以下の時、UTF-8の冗長な表現
-				code = 0;
-			}
-		}
-		if (code == 0){
-			// そのまま出力
-			PutU32(buf[0]);
-			PutU32(b);
-			count = 0;
-			return TRUE;
-		}
-		else {
-			PutU32(code);
-			count = 0;
-			return TRUE;
-		}
-	}
-
-	// 2byte目以降保存
-	buf[count++] = b;
-
-	// 3byte(16bit)
-	if ((buf[0] & 0xf0) == 0xe0) {
-		if(count < 3) {
-			return TRUE;
-		}
-		code = 0;
-		if ((buf[1] & 0xc0) == 0x80 && (buf[2] & 0xc0) == 0x80) {
-			// 4bit + 6bit + 6bit
-			code = ((buf[0] & 0xf) << 12);
-			code |= ((buf[1] & 0x3f) << 6);
-			code |= ((buf[2] & 0x3f));
-			if (code < 0x800) {
-				// 16bit使って11bit以下のとき、UTF-8の冗長な表現
-				code = 0;
-			}
-		}
-		if (code == 0) {
-			// そのまま出力
-			PutU32(buf[0]);
-			PutU32(buf[1]);
-			PutU32(buf[2]);
-			count = 0;
-			return TRUE;
-		} else {
-			PutU32(code);
-			count = 0;
-			return TRUE;
-		}
-	}
-
-	// 4byte(21bit)
-	if ((buf[0] & 0xf8) == 0xf0) {
-		if(count < 4) {
-			return TRUE;
-		}
-		code = 0;
-		if ((buf[1] & 0xc0) == 0x80 && (buf[2] & 0xc0) == 0x80 && (buf[3] & 0xc0) == 0x80) {
-			// 3bit + 6bit + 6bit + 6bit
-			code = ((buf[0] & 0x07) << 18);
-			code |= ((buf[1] & 0x3f) << 12);
-			code |= ((buf[2] & 0x3f) << 6);
-			code |= (buf[3] & 0x3f);
-			if (code < 0x10000) {
-				// 21bit使って16bit以下のとき、UTF-8の冗長な表現
-				code = 0;
-			}
-		}
-		if (code == 0) {
-			// そのまま出力
-			PutU32(buf[0]);
-			PutU32(buf[1]);
-			PutU32(buf[2]);
-			PutU32(buf[3]);
-			count = 0;
-			return TRUE;
-		} else {
-			PutU32(code);
-			count = 0;
-			return TRUE;
-		}
-	}
-
-	// ここには来ない
-	assert(FALSE);
-
-	for (i = 0; i < count; i++) {
-		ParseASCII(buf[i]);
-	}
-	count = 0;
-	return TRUE;
-}
-
-
-static BOOL ParseFirstRus(BYTE b)
-// returns if b is processed
-{
-	if (b>=128) {
-		PutChar(b);
-		return TRUE;
-	}
-	return FALSE;
-}
-
-static BOOL ParseEnglish(BYTE b)
-{
-	unsigned short u16 = 0;
-	int part = KanjiCodeToISO8859Part(ts.KanjiCode);
-	int r = UnicodeFromISO8859(part, b, &u16);
-	if (r == 0) {
-		return FALSE;
-	}
-	if (u16 < 0x100) {
-		ParseASCII((BYTE)u16);
-	}
-	else {
-		PutU32(u16);
-	}
-	return TRUE;
-}
-
-static void ParseFirst(BYTE b)
-{
-	switch (ts.Language) {
-	  case IdUtf8:
-		  ParseFirstUTF8(b);
-		return;
-
-	  case IdJapanese:
-		switch (ts.KanjiCode) {
-		  case IdUTF8:
-			  if (ParseFirstUTF8(b)) {
-				return;
-			}
-			break;
-		  default:
-			if (ParseFirstJP(b))  {
-				return;
-			}
-		}
-		break;
-
-	  case IdKorean:
-		switch (ts.KanjiCode) {
-		  case IdUTF8:
-			if (ParseFirstUTF8(b)) {
-				return;
-			}
-			break;
-		  default:
-			if (ParseFirstKR(b))  {
-				return;
-			}
-		}
-		break;
-
-	  case IdRussian:
-		if (ParseFirstRus(b)) {
-			return;
-		}
-		break;
-
-	case IdChinese:
-		switch (ts.KanjiCode) {
-		case IdUTF8:
-			if (ParseFirstUTF8(b)) {
-				return;
-			}
-			break;
-		default:
-			if (ParseFirstCn(b)) {
-				return;
-			}
-		}
-		break;
-	case IdEnglish: {
-		if (ParseEnglish(b)) {
-			return;
-		}
-		break;
-	}
-	}
-
-	if (SSflag) {
-		PutChar(b);
-		SSflag = FALSE;
-		return;
-	}
-
-	if (b<=US)
-		ParseControl(b);
-	else if ((b>=0x20) && (b<=0x7E))
-		PutChar(b);
-	else if ((b>=0x80) && (b<=0x9F))
-		ParseControl(b);
-	else if (b>=0xA0)
-		PutChar(b);
 }
 
 /**

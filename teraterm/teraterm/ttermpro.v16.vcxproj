@@ -160,6 +160,7 @@
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="broadcast.cpp" />
     <ClCompile Include="buffer.c" />
+    <ClCompile Include="charset.c" />
     <ClCompile Include="checkeol.cpp" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="coding_pp.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="..\ttpset\ttset.h" />
     <ClInclude Include="..\ttpset\ttset_i.h" />
     <ClInclude Include="broadcast.h" />
+    <ClInclude Include="charset.h" />
     <ClInclude Include="checkeol.h" />
     <ClInclude Include="coding_pp.h" />
     <ClInclude Include="coding_pp_res.h" />
