@@ -42,8 +42,15 @@
 #include "codeconv.h"
 #include "unicode.h"
 #include "language.h"	// for JIS2SJIS()
+#include "ttcstd.h"
 
 #include "charset.h"
+
+// UTF-8が不正な値だった時に表示する文字
+#define REPLACEMENT_CHARACTER	'?'
+//#define REPLACEMENT_CHARACTER	0x2592
+//#define REPLACEMENT_CHARACTER	0x20
+//#define REPLACEMENT_CHARACTER	0xfffd
 
 static BOOL KanjiIn;				// TRUE = MBCSの1byte目を受信している
 static BOOL EUCkanaIn, EUCsupIn;
@@ -59,13 +66,15 @@ static BOOL SSflag;
 /* JIS -> SJIS conversion flag */
 static BOOL ConvJIS;
 static WORD Kanji;
-BOOL Fallbacked;
+static BOOL Fallbacked;
 
 typedef struct {
 	/* GL, GR code group */
 	int Glr[2];
 	/* G0, G1, G2, G3 code group */
 	int Gn[4];
+	//
+	char32_t replacement_char;
 } VttermKanjiWork;
 
 static VttermKanjiWork KanjiWork;
@@ -107,7 +116,11 @@ static void CharSetInit2(VttermKanjiWork *w)
  */
 void CharSetInit(void)
 {
-	CharSetInit2(&KanjiWork);
+	VttermKanjiWork *w = &KanjiWork;
+
+	CharSetInit2(w);
+
+	w->replacement_char = REPLACEMENT_CHARACTER;
 	SSflag = FALSE;
 
 	KanjiIn = FALSE;
@@ -140,6 +153,22 @@ static BOOL CheckFirstByte(BYTE b, int lang, int kanji_code)
 	assert(FALSE);
 	return FALSE;
 }
+
+/**
+ *	Double-byte Character Sets
+ *	SJISの1byte目?
+ *
+ *	第1バイト0x81...0x9F or 0xE0...0xEF
+ *	第1バイト0x81...0x9F or 0xE0...0xFC
+ */
+static BOOL ismbbleadSJIS(BYTE b)
+{
+	if (((0x80<b) && (b<0xa0)) || ((0xdf<b) && (b<0xfd))) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 /**
  *	ts.Language == IdJapanese 時
  *	1byte目チェック
@@ -278,7 +307,7 @@ static BOOL ParseFirstJP(BYTE b)
 			}
 			break;
 		case IdUTF8:
-			PutChar('?');
+			PutU32(REPLACEMENT_CHARACTER);
 			break;
 		default:
 			ParseControl(b);
@@ -293,7 +322,7 @@ static BOOL ParseFirstJP(BYTE b)
 			}
 			break;
 		case IdUTF8:
-			PutChar('?');
+			PutU32(REPLACEMENT_CHARACTER);
 			break;
 		default:
 			ParseControl(b);
@@ -499,11 +528,28 @@ static void ParseASCII(BYTE b)
 	} else if ((b>=0x20) && (b<=0x7E)) {
 		PutU32(b);
 	} else if ((b==0x8E) || (b==0x8F)) {
-		PutChar('?');
+		PutU32(REPLACEMENT_CHARACTER);
 	} else if ((b>=0x80) && (b<=0x9F)) {
 		ParseControl(b);
 	} else if (b>=0xA0) {
 		PutU32(b);
+	}
+}
+
+static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len)
+{
+	const char32_t replacement_char = w->replacement_char;
+	int i;
+	for (i = 0; i < len; i++) {
+		BYTE c = *ptr++;
+		if (c < 0x80) {
+			// 不正なUTF-8文字列のなかに0x80未満があれば、
+			// 1文字のUTF-8文字としてそのまま表示する
+			ParseASCII(c);
+		}
+		else {
+			PutU32(replacement_char);
+		}
 	}
 }
 
@@ -512,14 +558,24 @@ static void ParseASCII(BYTE b)
 //  (actually allways returns TRUE)
 static BOOL ParseFirstUTF8(BYTE b)
 {
+	VttermKanjiWork *w = &KanjiWork;
 	static BYTE buf[4];
 	static int count = 0;
 
 	unsigned int code;
 	int i;
 
-	if (ts.FallbackToCP932 && Fallbacked) {
-		return ParseFirstJP(b);
+	if (Fallbacked) {
+		BOOL r = ParseFirstJP(b);
+		Fallbacked = FALSE;
+		return r;
+	}
+
+	if (b < 0x20) {
+		PutReplacementChr(w, buf, count);
+		count = 0;
+		ParseASCII(b);
+		return TRUE;
 	}
 
 	// UTF-8エンコード
@@ -536,7 +592,7 @@ static BOOL ParseFirstUTF8(BYTE b)
 	//	- 2byte目以降
 	//		- 0x00 - 0x7f
 	//		- 0xc0 - 0xff
-
+recheck:
 	// 1byte(7bit)
 	if (count == 0) {
 		if ((b & 0x80) == 0x00) {
@@ -546,10 +602,29 @@ static BOOL ParseFirstUTF8(BYTE b)
 			return TRUE;
 		}
 		if ((b & 0x40) == 0x00 || b >= 0xf6 ) {
-			// UTF-8で1byteに出現しないコードのとき、そのまま出力
+			// UTF-8で1byteに出現しないコードのとき
 			//	0x40 = 0b1011_1111, 0b10xx_xxxxというbitパターンにはならない
 			//  0xf6 以上のとき U+10FFFFより大きくなる
-			PutU32(b);
+			if (ts.FallbackToCP932) {
+				// fallbackする場合
+				if ((ts.Language == IdJapanese) && ismbbleadSJIS(b)) {
+					// 日本語の場合 && Shift_JIS 1byte目
+					// Shift_JIS に fallback
+					Fallbacked = TRUE;
+					ConvJIS = FALSE;
+					Kanji = b << 8;
+					KanjiIn = TRUE;
+					return TRUE;
+				}
+				// fallback ISO8859-1
+				PutU32(b);
+				return TRUE;
+			}
+			else {
+				// fallbackしない, 不正な文字入力
+				buf[0] = b;
+				PutReplacementChr(w, buf, 1);
+			}
 			return TRUE;
 		}
 		// 1byte目保存
@@ -569,11 +644,16 @@ static BOOL ParseFirstUTF8(BYTE b)
 			}
 		}
 		if (code == 0){
-			// そのまま出力
-			PutU32(buf[0]);
-			PutU32(b);
+			if (ts.FallbackToCP932) {
+				// fallback ISO8859-1
+				PutU32(buf[0]);
+			}
+			else {
+				buf[1] = b;
+				PutReplacementChr(w, buf, 1);
+			}
 			count = 0;
-			return TRUE;
+			goto recheck;
 		}
 		else {
 			PutU32(code);
@@ -602,12 +682,16 @@ static BOOL ParseFirstUTF8(BYTE b)
 			}
 		}
 		if (code == 0) {
-			// そのまま出力
-			PutU32(buf[0]);
-			PutU32(buf[1]);
-			PutU32(buf[2]);
+			if (ts.FallbackToCP932) {
+				// fallback ISO8859-1
+				PutU32(buf[0]);
+				PutU32(buf[1]);
+			}
+			else {
+				PutReplacementChr(w, buf, 2);
+			}
 			count = 0;
-			return TRUE;
+			goto recheck;
 		} else {
 			PutU32(code);
 			count = 0;
@@ -633,13 +717,17 @@ static BOOL ParseFirstUTF8(BYTE b)
 			}
 		}
 		if (code == 0) {
-			// そのまま出力
-			PutU32(buf[0]);
-			PutU32(buf[1]);
-			PutU32(buf[2]);
-			PutU32(buf[3]);
+			if (ts.FallbackToCP932) {
+				// fallback ISO8859-1
+				PutU32(buf[0]);
+				PutU32(buf[1]);
+				PutU32(buf[2]);
+			}
+			else {
+				PutReplacementChr(w, buf, 3);
+			}
 			count = 0;
-			return TRUE;
+			goto recheck;
 		} else {
 			PutU32(code);
 			count = 0;
@@ -861,4 +949,14 @@ void CharSetLoadState(const CharSetState *state)
 	for (i=0 ; i<=3; i++) {
 		w->Gn[i] = state->infos[2 + i];
 	}
+}
+
+/**
+ *	フォールバックの終了
+ *		受信データUTF-8時に、Shift_JIS出力中(fallback状態)を中断する
+ *
+ */
+void CharSetFallbackFinish(void)
+{
+	Fallbacked = FALSE;
 }

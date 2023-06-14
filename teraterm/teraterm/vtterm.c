@@ -654,7 +654,7 @@ void CarriageReturn(BOOL logFlag)
 	else if (CursorX < CursorLeftM)
 		MoveCursor(0, CursorY);
 
-	Fallbacked = FALSE;
+	CharSetFallbackFinish();
 }
 
 void LineFeed(BYTE b, BOOL logFlag)
@@ -677,7 +677,7 @@ void LineFeed(BYTE b, BOOL logFlag)
 
 	if (LFMode) CarriageReturn(logFlag);
 
-	Fallbacked = FALSE;
+	CharSetFallbackFinish();
 }
 
 static void Tab(void)
@@ -2079,7 +2079,7 @@ static void CSMoveToLineN()		// VPA
 		else
 			MoveCursor(CursorX,Param[1]-1);
 	}
-	Fallbacked = FALSE;
+	CharSetFallbackFinish();
 }
 
 static void CSMoveToXY()		// CUP / HVP
@@ -2110,7 +2110,7 @@ static void CSMoveToXY()		// CUP / HVP
 	}
 
 	MoveCursor(NewX, NewY);
-	Fallbacked = FALSE;
+	CharSetFallbackFinish();
 }
 
 static void CSDeleteTabStop()

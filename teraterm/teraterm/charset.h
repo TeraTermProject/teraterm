@@ -30,7 +30,7 @@ typedef struct {
 	int infos[6];
 } CharSetState;
 
-extern BOOL Fallbacked;
+//extern BOOL Fallbacked;
 
 // input
 void ParseFirst(BYTE b);
@@ -48,3 +48,4 @@ void CharSet2022Invoke(int glr, int gn, BOOL single_shift);
 BOOL CharSetIsSpecial(BYTE b);
 void CharSetSaveState(CharSetState *state);
 void CharSetLoadState(const CharSetState *state);
+void CharSetFallbackFinish(void);
