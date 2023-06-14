@@ -536,19 +536,26 @@ static void ParseASCII(BYTE b)
 	}
 }
 
-static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len)
+static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len, BOOL fallback)
 {
 	const char32_t replacement_char = w->replacement_char;
 	int i;
 	for (i = 0; i < len; i++) {
 		BYTE c = *ptr++;
-		if (c < 0x80) {
-			// 不正なUTF-8文字列のなかに0x80未満があれば、
-			// 1文字のUTF-8文字としてそのまま表示する
-			ParseASCII(c);
+		if (fallback) {
+			// fallback ISO8859-1
+			PutU32(c);
 		}
 		else {
-			PutU32(replacement_char);
+			// fallbackしない
+			if (c < 0x80) {
+				// 不正なUTF-8文字列のなかに0x80未満があれば、
+				// 1文字のUTF-8文字としてそのまま表示する
+				ParseASCII(c);
+			}
+			else {
+				PutU32(replacement_char);
+			}
 		}
 	}
 }
@@ -572,7 +579,7 @@ static BOOL ParseFirstUTF8(BYTE b)
 	}
 
 	if (b < 0x20) {
-		PutReplacementChr(w, buf, count);
+		PutReplacementChr(w, buf, count, ts.FallbackToCP932);
 		count = 0;
 		ParseASCII(b);
 		return TRUE;
@@ -601,7 +608,7 @@ recheck:
 			ParseASCII(b);
 			return TRUE;
 		}
-		if ((b & 0x40) == 0x00 || b >= 0xf6 ) {
+		if ((b & 0x40) == 0x00 || b >= 0xf6) {
 			// UTF-8で1byteに出現しないコードのとき
 			//	0x40 = 0b1011_1111, 0b10xx_xxxxというbitパターンにはならない
 			//  0xf6 以上のとき U+10FFFFより大きくなる
@@ -623,7 +630,7 @@ recheck:
 			else {
 				// fallbackしない, 不正な文字入力
 				buf[0] = b;
-				PutReplacementChr(w, buf, 1);
+				PutReplacementChr(w, buf, 1, FALSE);
 			}
 			return TRUE;
 		}
@@ -644,14 +651,7 @@ recheck:
 			}
 		}
 		if (code == 0){
-			if (ts.FallbackToCP932) {
-				// fallback ISO8859-1
-				PutU32(buf[0]);
-			}
-			else {
-				buf[1] = b;
-				PutReplacementChr(w, buf, 1);
-			}
+			PutReplacementChr(w, buf, 1, ts.FallbackToCP932);
 			count = 0;
 			goto recheck;
 		}
@@ -660,6 +660,13 @@ recheck:
 			count = 0;
 			return TRUE;
 		}
+	}
+
+	// 2byte以降正常?
+	if ((b & 0xc0) != 0x80) {	// 上位2bitが 10 か?
+		PutReplacementChr(w, buf, count, ts.FallbackToCP932);
+		count = 0;
+		goto recheck;
 	}
 
 	// 2byte目以降保存
@@ -682,14 +689,7 @@ recheck:
 			}
 		}
 		if (code == 0) {
-			if (ts.FallbackToCP932) {
-				// fallback ISO8859-1
-				PutU32(buf[0]);
-				PutU32(buf[1]);
-			}
-			else {
-				PutReplacementChr(w, buf, 2);
-			}
+			PutReplacementChr(w, buf, count - 1, ts.FallbackToCP932);
 			count = 0;
 			goto recheck;
 		} else {
@@ -717,15 +717,7 @@ recheck:
 			}
 		}
 		if (code == 0) {
-			if (ts.FallbackToCP932) {
-				// fallback ISO8859-1
-				PutU32(buf[0]);
-				PutU32(buf[1]);
-				PutU32(buf[2]);
-			}
-			else {
-				PutReplacementChr(w, buf, 3);
-			}
+			PutReplacementChr(w, buf, count - 1, ts.FallbackToCP932);
 			count = 0;
 			goto recheck;
 		} else {
