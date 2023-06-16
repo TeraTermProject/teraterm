@@ -568,9 +568,7 @@ static BOOL ParseFirstUTF8(BYTE b)
 	VttermKanjiWork *w = &KanjiWork;
 	static BYTE buf[4];
 	static int count = 0;
-
-	unsigned int code;
-	int i;
+	char32_t code;
 
 	if (Fallbacked) {
 		BOOL r = ParseFirstJP(b);
@@ -578,92 +576,76 @@ static BOOL ParseFirstUTF8(BYTE b)
 		return r;
 	}
 
-	if (b < 0x20) {
-		PutReplacementChr(w, buf, count, ts.FallbackToCP932);
-		count = 0;
-		ParseASCII(b);
-		return TRUE;
-	}
-
 	// UTF-8エンコード
-	//	Unicode					1byte,		  2byte,	   3byte, 		  4byte
-	//	U+0000  ... U+007f		0x00 .. 0x7f
-	//	U+0080  ... U+07ff		0xc2 .. 0xdf, 0x80 .. 0xbf
-	//	U+0800  ... U+ffff		0xe0 .. 0xef, 0x80 .. 0xbf, 0x80 .. 0xbf
-	//	U+10000 ... U+10ffff	0xf0 .. 0xf4, 0x80 .. 0xbf, 0x80 .. 0xbf, 0x80 .. 0xbf
+	//	The Unicode Standard Chapter 3
+	//	Table 3-7. Well-Formed UTF-8 Byte Sequences
+	// | Code Points        | First Byte | Second Byte | Third Byte | Fourth Byte |
+	// | U+0000..U+007F     | 00..7F     |             |            |             |
+	// | U+0080..U+07FF     | C2..DF     | 80..BF      |            |             |
+	// | U+0800..U+0FFF     | E0         | A0..BF      | 80..BF     |             |
+	// | U+1000..U+CFFF     | E1..EC     | 80..BF      | 80..BF     |             |
+	// | U+D000..U+D7FF     | ED         | 80..9F      | 80..BF     |             |
+	// | U+E000..U+FFFF     | EE..EF     | 80..BF      | 80..BF     |             |
+	// | U+10000..U+3FFFF   | F0         | 90..BF      | 80..BF     | 80..BF      |
+	// | U+40000..U+FFFFF   | F1..F3     | 80..BF      | 80..BF     | 80..BF      |
+	// | U+100000..U+10FFFF | F4         | 80..8F      | 80..BF     | 80..BF      |
 	// UTF-8でデコードできない場合
 	//	- 1byte目
-	//		- C1(0x80 - 0x9f)
-	//		- 0xa0 - 0xc1
-	//		- 0xf5 - 0xff
+	//		- 0x00 - 0x7f		ok
+	//		- 0x80 - 0xc1		ng
+	//		- 0xc2 - 0xf4		ok
+	//		- 0xf5 - 0xff		ng
 	//	- 2byte目以降
-	//		- 0x00 - 0x7f
-	//		- 0xc0 - 0xff
+	//		- 0x00 - 0x7f		ng
+	//		- 0x80 - 0xbf		ok
+	//		- 0xc0 - 0xff		ng
+	//  - 2byte目例外
+	//		- 1byte == 0xe0 のとき 0xa0 - 0xbfのみok
+	//		- 1byte == 0xed のとき 0x80 - 0x9fのみok
+	//		- 1byte == 0xf0 のとき 0x90 - 0xbfのみok
+	//		- 1byte == 0xf4 のとき 0x90 - 0x8fのみok
 recheck:
 	// 1byte(7bit)
 	if (count == 0) {
-		if ((b & 0x80) == 0x00) {
+		if (b <= 0x7f) {
 			// 1byte(7bit)
 			//		0x7f以下, のとき、そのまま出力
 			ParseASCII(b);
 			return TRUE;
 		}
-		if ((b & 0x40) == 0x00 || b >= 0xf6) {
-			// UTF-8で1byteに出現しないコードのとき
-			//	0x40 = 0b1011_1111, 0b10xx_xxxxというbitパターンにはならない
-			//  0xf6 以上のとき U+10FFFFより大きくなる
-			if (ts.FallbackToCP932) {
-				// fallbackする場合
-				if ((ts.Language == IdJapanese) && ismbbleadSJIS(b)) {
-					// 日本語の場合 && Shift_JIS 1byte目
-					// Shift_JIS に fallback
-					Fallbacked = TRUE;
-					ConvJIS = FALSE;
-					Kanji = b << 8;
-					KanjiIn = TRUE;
-					return TRUE;
-				}
-				// fallback ISO8859-1
-				PutU32(b);
-				return TRUE;
-			}
-			else {
-				// fallbackしない, 不正な文字入力
-				buf[0] = b;
-				PutReplacementChr(w, buf, 1, FALSE);
-			}
+		if (0xc2 <= b && b <= 0xf4) {
+			// 1byte目保存
+			buf[count++] = b;
 			return TRUE;
 		}
-		// 1byte目保存
-		buf[count++] = b;
+
+		// UTF-8で1byteに出現しないコードのとき
+		if (ts.FallbackToCP932) {
+			// fallbackする場合
+			if ((ts.Language == IdJapanese) && ismbbleadSJIS(b)) {
+				// 日本語の場合 && Shift_JIS 1byte目
+				// Shift_JIS に fallback
+				Fallbacked = TRUE;
+				ConvJIS = FALSE;
+				Kanji = b << 8;
+				KanjiIn = TRUE;
+				return TRUE;
+			}
+			// fallback ISO8859-1
+			PutU32(b);
+			return TRUE;
+		}
+		else {
+			// fallbackしない, 不正な文字入力
+			buf[0] = b;
+			PutReplacementChr(w, buf, 1, FALSE);
+		}
 		return TRUE;
 	}
 
-	// 2byte(11bit)
-	if ((buf[0] & 0xe0) == 0xc0) {
-		code = 0;
-		if((b & 0xc0) == 0x80) {
-			// 5bit + 6bit
-			code = ((buf[0] & 0x1f) << 6) | (b & 0x3f);
-			if (code < 0x80) {
-				// 11bit使って7bit以下の時、UTF-8の冗長な表現
-				code = 0;
-			}
-		}
-		if (code == 0){
-			PutReplacementChr(w, buf, 1, ts.FallbackToCP932);
-			count = 0;
-			goto recheck;
-		}
-		else {
-			PutU32(code);
-			count = 0;
-			return TRUE;
-		}
-	}
-
 	// 2byte以降正常?
-	if ((b & 0xc0) != 0x80) {	// 上位2bitが 10 か?
+	if((b & 0xc0) != 0x80) {	// == (b <= 0x7f || 0xc0 <= b)
+		// 不正な文字, (上位2bitが 0b10xx_xxxx ではない)
 		PutReplacementChr(w, buf, count, ts.FallbackToCP932);
 		count = 0;
 		goto recheck;
@@ -672,67 +654,55 @@ recheck:
 	// 2byte目以降保存
 	buf[count++] = b;
 
-	// 3byte(16bit)
-	if ((buf[0] & 0xf0) == 0xe0) {
-		if(count < 3) {
+	// 2byte(11bit)
+	if (count == 2) {
+		if ((buf[0] & 0xe0) == 0xc0) {	// == (0xc2 <= buf[0] && buf[0] <= 0xdf)
+			// 5bit + 6bit
+			code = ((buf[0] & 0x1f) << 6) | (b & 0x3f);
+			PutU32(code);
+			count = 0;
 			return TRUE;
 		}
-		code = 0;
-		if ((buf[1] & 0xc0) == 0x80 && (buf[2] & 0xc0) == 0x80) {
+		return TRUE;
+	}
+
+	// 3byte(16bit)
+	if (count == 3) {
+		if ((buf[0] & 0xf0) == 0xe0) {
+			if ((buf[0] == 0xe0 && (buf[1] < 0xa0 || 0xbf < buf[1])) ||
+				(buf[0] == 0xed && (                 0x9f < buf[1]))) {
+				// 不正な UTF-8
+				PutReplacementChr(w, buf, 2, ts.FallbackToCP932);
+				count = 0;
+				goto recheck;
+			}
 			// 4bit + 6bit + 6bit
 			code = ((buf[0] & 0xf) << 12);
 			code |= ((buf[1] & 0x3f) << 6);
 			code |= ((buf[2] & 0x3f));
-			if (code < 0x800) {
-				// 16bit使って11bit以下のとき、UTF-8の冗長な表現
-				code = 0;
-			}
-		}
-		if (code == 0) {
-			PutReplacementChr(w, buf, count - 1, ts.FallbackToCP932);
-			count = 0;
-			goto recheck;
-		} else {
 			PutU32(code);
 			count = 0;
 			return TRUE;
 		}
+		return TRUE;
 	}
 
 	// 4byte(21bit)
-	if ((buf[0] & 0xf8) == 0xf0) {
-		if(count < 4) {
-			return TRUE;
-		}
-		code = 0;
-		if ((buf[1] & 0xc0) == 0x80 && (buf[2] & 0xc0) == 0x80 && (buf[3] & 0xc0) == 0x80) {
-			// 3bit + 6bit + 6bit + 6bit
-			code = ((buf[0] & 0x07) << 18);
-			code |= ((buf[1] & 0x3f) << 12);
-			code |= ((buf[2] & 0x3f) << 6);
-			code |= (buf[3] & 0x3f);
-			if (code < 0x10000) {
-				// 21bit使って16bit以下のとき、UTF-8の冗長な表現
-				code = 0;
-			}
-		}
-		if (code == 0) {
-			PutReplacementChr(w, buf, count - 1, ts.FallbackToCP932);
-			count = 0;
-			goto recheck;
-		} else {
-			PutU32(code);
-			count = 0;
-			return TRUE;
-		}
+	assert(count == 4);
+	assert((buf[0] & 0xf8) == 0xf0);
+	if ((buf[0] == 0xf0 && (buf[1] < 0x90 || 0x9f < buf[1])) ||
+		(buf[0] == 0xf4 && (buf[1] < 0x80 || 0x8f < buf[1]))) {
+		// 不正な UTF-8
+		PutReplacementChr(w, buf, 3, ts.FallbackToCP932);
+		count = 0;
+		goto recheck;
 	}
-
-	// ここには来ない
-	assert(FALSE);
-
-	for (i = 0; i < count; i++) {
-		ParseASCII(buf[i]);
-	}
+	// 3bit + 6bit + 6bit + 6bit
+	code = ((buf[0] & 0x07) << 18);
+	code |= ((buf[1] & 0x3f) << 12);
+	code |= ((buf[2] & 0x3f) << 6);
+	code |= (buf[3] & 0x3f);
+	PutU32(code);
 	count = 0;
 	return TRUE;
 }
