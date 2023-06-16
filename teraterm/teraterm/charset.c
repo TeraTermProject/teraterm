@@ -75,6 +75,9 @@ typedef struct {
 	int Gn[4];
 	//
 	char32_t replacement_char;
+	// UTF-8 work
+	BYTE buf[4];
+	int count;
 } VttermKanjiWork;
 
 static VttermKanjiWork KanjiWork;
@@ -566,8 +569,6 @@ static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len, B
 static BOOL ParseFirstUTF8(BYTE b)
 {
 	VttermKanjiWork *w = &KanjiWork;
-	static BYTE buf[4];
-	static int count = 0;
 	char32_t code;
 
 	if (Fallbacked) {
@@ -606,7 +607,7 @@ static BOOL ParseFirstUTF8(BYTE b)
 	//		- 1byte == 0xf4 のとき 0x90 - 0x8fのみok
 recheck:
 	// 1byte(7bit)
-	if (count == 0) {
+	if (w->count == 0) {
 		if (b <= 0x7f) {
 			// 1byte(7bit)
 			//		0x7f以下, のとき、そのまま出力
@@ -615,7 +616,7 @@ recheck:
 		}
 		if (0xc2 <= b && b <= 0xf4) {
 			// 1byte目保存
-			buf[count++] = b;
+			w->buf[w->count++] = b;
 			return TRUE;
 		}
 
@@ -637,8 +638,8 @@ recheck:
 		}
 		else {
 			// fallbackしない, 不正な文字入力
-			buf[0] = b;
-			PutReplacementChr(w, buf, 1, FALSE);
+			w->buf[0] = b;
+			PutReplacementChr(w, w->buf, 1, FALSE);
 		}
 		return TRUE;
 	}
@@ -646,64 +647,64 @@ recheck:
 	// 2byte以降正常?
 	if((b & 0xc0) != 0x80) {	// == (b <= 0x7f || 0xc0 <= b)
 		// 不正な文字, (上位2bitが 0b10xx_xxxx ではない)
-		PutReplacementChr(w, buf, count, ts.FallbackToCP932);
-		count = 0;
+		PutReplacementChr(w, w->buf, w->count, ts.FallbackToCP932);
+		w->count = 0;
 		goto recheck;
 	}
 
 	// 2byte目以降保存
-	buf[count++] = b;
+	w->buf[w->count++] = b;
 
 	// 2byte(11bit)
-	if (count == 2) {
-		if ((buf[0] & 0xe0) == 0xc0) {	// == (0xc2 <= buf[0] && buf[0] <= 0xdf)
+	if (w->count == 2) {
+		if ((w->buf[0] & 0xe0) == 0xc0) {	// == (0xc2 <= w->buf[0] && w->buf[0] <= 0xdf)
 			// 5bit + 6bit
-			code = ((buf[0] & 0x1f) << 6) | (b & 0x3f);
+			code = ((w->buf[0] & 0x1f) << 6) | (b & 0x3f);
 			PutU32(code);
-			count = 0;
+			w->count = 0;
 			return TRUE;
 		}
 		return TRUE;
 	}
 
 	// 3byte(16bit)
-	if (count == 3) {
-		if ((buf[0] & 0xf0) == 0xe0) {
-			if ((buf[0] == 0xe0 && (buf[1] < 0xa0 || 0xbf < buf[1])) ||
-				(buf[0] == 0xed && (                 0x9f < buf[1]))) {
+	if (w->count == 3) {
+		if ((w->buf[0] & 0xf0) == 0xe0) {
+			if ((w->buf[0] == 0xe0 && (w->buf[1] < 0xa0 || 0xbf < w->buf[1])) ||
+				(w->buf[0] == 0xed && (                 0x9f < w->buf[1]))) {
 				// 不正な UTF-8
-				PutReplacementChr(w, buf, 2, ts.FallbackToCP932);
-				count = 0;
+				PutReplacementChr(w, w->buf, 2, ts.FallbackToCP932);
+				w->count = 0;
 				goto recheck;
 			}
 			// 4bit + 6bit + 6bit
-			code = ((buf[0] & 0xf) << 12);
-			code |= ((buf[1] & 0x3f) << 6);
-			code |= ((buf[2] & 0x3f));
+			code = ((w->buf[0] & 0xf) << 12);
+			code |= ((w->buf[1] & 0x3f) << 6);
+			code |= ((w->buf[2] & 0x3f));
 			PutU32(code);
-			count = 0;
+			w->count = 0;
 			return TRUE;
 		}
 		return TRUE;
 	}
 
 	// 4byte(21bit)
-	assert(count == 4);
-	assert((buf[0] & 0xf8) == 0xf0);
-	if ((buf[0] == 0xf0 && (buf[1] < 0x90 || 0x9f < buf[1])) ||
-		(buf[0] == 0xf4 && (buf[1] < 0x80 || 0x8f < buf[1]))) {
+	assert(w->count == 4);
+	assert((w->buf[0] & 0xf8) == 0xf0);
+	if ((w->buf[0] == 0xf0 && (w->buf[1] < 0x90 || 0x9f < w->buf[1])) ||
+		(w->buf[0] == 0xf4 && (w->buf[1] < 0x80 || 0x8f < w->buf[1]))) {
 		// 不正な UTF-8
-		PutReplacementChr(w, buf, 3, ts.FallbackToCP932);
-		count = 0;
+		PutReplacementChr(w, w->buf, 3, ts.FallbackToCP932);
+		w->count = 0;
 		goto recheck;
 	}
 	// 3bit + 6bit + 6bit + 6bit
-	code = ((buf[0] & 0x07) << 18);
-	code |= ((buf[1] & 0x3f) << 12);
-	code |= ((buf[2] & 0x3f) << 6);
-	code |= (buf[3] & 0x3f);
+	code = ((w->buf[0] & 0x07) << 18);
+	code |= ((w->buf[1] & 0x3f) << 12);
+	code |= ((w->buf[2] & 0x3f) << 6);
+	code |= (w->buf[3] & 0x3f);
 	PutU32(code);
-	count = 0;
+	w->count = 0;
 	return TRUE;
 }
 
