@@ -182,7 +182,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					else if (lang == IdRussian &&
 							 (coding == IdWindows || coding == IdKOI8 || coding == Id866 || coding == IdISO)) {
 					}
-					else if (lang == IdKorean && coding == IdKoreanCP51949) {
+					else if (lang == IdKorean && coding == IdKoreanCP949) {
 						;
 					}
 					else if (lang == IdChinese && (coding == IdCnGB2312 || coding == IdCnBig5)) {

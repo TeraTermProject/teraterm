@@ -75,7 +75,7 @@ typedef enum {
 
 // ts.Language == IdKorean
 // Korean
-#define	IdKoreanCP51949 1	// CP51949, KS5601
+#define	IdKoreanCP949 1		// CP949, KS5601
 
 // ts.Language == IdChinese
 // China

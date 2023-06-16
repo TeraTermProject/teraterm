@@ -379,7 +379,7 @@ static BOOL ParseFirstKR(BYTE b)
 			((0x81<=b) && (b<=0xFE)))
 		{
 			unsigned long u32 = 0;
-			if (ts.KanjiCode == IdKoreanCP51949) {
+			if (ts.KanjiCode == IdKoreanCP949) {
 				// CP51949
 				Kanji = Kanji + b;
 				u32 = MBCP_UTF32(Kanji, 51949);

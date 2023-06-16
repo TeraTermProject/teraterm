@@ -67,7 +67,7 @@ static const TKanjiList KanjiList[] = {
 	{ IdRussian,	IdKOI8,				"Russian/KOI8-R",			"KOI8-R" },
 	{ IdRussian,	Id866,				"Russian/CP866",			"CP866" },
 	{ IdRussian,	IdISO,				"Russian/ISO 8859-5",		"ISO8859-5" },
-	{ IdKorean,		IdKoreanCP51949,	"Korean/KS5601 (CP51949)",	"KS5601" },
+	{ IdKorean,		IdKoreanCP949,		"Korean/KS5601 (CP949)",	"KS5601" },
 	{ IdKorean,		IdUTF8,				"Korean/UTF-8",				"UTF-8" },
 	{ IdChinese,	IdCnGB2312,			"China/GB2312 (CP936)",		"GB2312" },
 	{ IdChinese,	IdCnBig5,			"China/Big5 (CP950)",		"BIG5" },
