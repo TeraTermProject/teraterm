@@ -82,7 +82,20 @@ typedef struct {
 
 static VttermKanjiWork KanjiWork;
 
-// Unicodeベースに切り替え
+static BOOL IsC0(char32_t b)
+{
+	return (b <= US);
+}
+
+static BOOL IsC1(char32_t b)
+{
+	return ((b>=0x80) && (b<=0x9F));
+}
+
+/**
+ *	PutU32() wrapper
+ *	Unicodeベースに切り替え
+ */
 static void PutChar(BYTE b)
 {
 	PutU32(b);
@@ -539,12 +552,17 @@ static void ParseASCII(BYTE b)
 	}
 }
 
+/**
+ *	REPLACEMENT_CHARACTER の表示
+ *	UTF-8 デコードから使用
+ */
 static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len, BOOL fallback)
 {
 	const char32_t replacement_char = w->replacement_char;
 	int i;
 	for (i = 0; i < len; i++) {
 		BYTE c = *ptr++;
+		assert(IsC0(c));
 		if (fallback) {
 			// fallback ISO8859-1
 			PutU32(c);
@@ -554,7 +572,7 @@ static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len, B
 			if (c < 0x80) {
 				// 不正なUTF-8文字列のなかに0x80未満があれば、
 				// 1文字のUTF-8文字としてそのまま表示する
-				ParseASCII(c);
+				PutU32(c);
 			}
 			else {
 				PutU32(replacement_char);
@@ -563,9 +581,11 @@ static void PutReplacementChr(VttermKanjiWork *w, const BYTE *ptr, size_t len, B
 	}
 }
 
-// UTF-8で受信データを処理する
-// returns TRUE if b is processed
-//  (actually allways returns TRUE)
+/**
+ * UTF-8で受信データを処理する
+ *
+ * returns TRUE if b is processed
+ */
 static BOOL ParseFirstUTF8(BYTE b)
 {
 	VttermKanjiWork *w = &KanjiWork;
@@ -608,18 +628,24 @@ static BOOL ParseFirstUTF8(BYTE b)
 recheck:
 	// 1byte(7bit)
 	if (w->count == 0) {
-		if (b <= 0x7f) {
-			// 1byte(7bit)
-			//		0x7f以下, のとき、そのまま出力
-			ParseASCII(b);
+		if (IsC0(b)) {
+			// U+0000 .. U+001f
+			// C0制御文字, C0 Coontrols
+			ParseControl(b);
 			return TRUE;
 		}
-		if (0xc2 <= b && b <= 0xf4) {
+		else if (b <= 0x7f) {
+			// 0x7f以下, のとき、そのまま出力
+			PutU32(b);
+			return TRUE;
+		}
+		else if (0xc2 <= b && b <= 0xf4) {
 			// 1byte目保存
 			w->buf[w->count++] = b;
 			return TRUE;
 		}
 
+		// 0x80 - 0xc1, 0xf5 - 0xff
 		// UTF-8で1byteに出現しないコードのとき
 		if (ts.FallbackToCP932) {
 			// fallbackする場合
@@ -660,7 +686,14 @@ recheck:
 		if ((w->buf[0] & 0xe0) == 0xc0) {	// == (0xc2 <= w->buf[0] && w->buf[0] <= 0xdf)
 			// 5bit + 6bit
 			code = ((w->buf[0] & 0x1f) << 6) | (b & 0x3f);
-			PutU32(code);
+			if (IsC1(code)) {
+				// U+0080 .. u+009f
+				// C1制御文字, C1 Controls
+				ParseControl((BYTE)code);
+			}
+			else {
+				PutU32(code);
+			}
 			w->count = 0;
 			return TRUE;
 		}
@@ -711,6 +744,10 @@ recheck:
 static BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
+	if (IsC0(b)) {
+		ParseControl(b);
+		return TRUE;
+	}
 	// CP1251に変換
 	BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
 	// CP1251->Unicode

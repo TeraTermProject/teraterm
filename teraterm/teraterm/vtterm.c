@@ -760,17 +760,6 @@ void PutU32(unsigned int code)
 
 	TCharAttr CharAttrTmp;
 	CharAttrTmp = CharAttr;
-	if (code <= US) {
-		// U+0000 .. U+001f
-		// C0§Œä•¶Žš, C0 Coontrols
-		ParseControl(code);
-		return;
-	} else if ((0x80<=code) && (code<=0x9F)) {
-		// U+0080 .. u+009f
-		// C1§Œä•¶Žš, C1 Controls
-		ParseControl(code);
-		return;
-	}
 
 	{
 		int r;
