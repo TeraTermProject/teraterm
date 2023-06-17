@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "buffer.h" for TCharAttr
+#include "buffer.h" // for TCharAttr
 
 #ifdef __cplusplus
 extern "C" {
