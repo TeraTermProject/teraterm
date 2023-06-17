@@ -30,13 +30,16 @@
 #pragma once
 
 /* Language */
-#define IdEnglish  1
-#define IdJapanese 2
-#define IdRussian  3
-#define IdKorean   4  //HKS
-#define IdUtf8     5
-#define	IdChinese  6
-#define IdLangMax  IdChinese
+typedef enum {
+	IdEnglish  = 1,
+	IdJapanese,
+	IdRussian,
+	IdKorean,  	//HKS
+	IdUtf8,
+	IdChinese,
+	IdDebug,
+	IdLangMax,
+} IdLanguage;
 
   /* Kanji Code ID */
   /*  ts.KanjiCode, ts.KanjiCodeSend ‚Ì’l */

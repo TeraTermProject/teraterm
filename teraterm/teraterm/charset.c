@@ -43,6 +43,7 @@
 #include "unicode.h"
 #include "language.h"	// for JIS2SJIS()
 #include "ttcstd.h"
+#include "keyboard.h"	// for DebugFlag
 
 #include "charset.h"
 
@@ -773,41 +774,101 @@ static BOOL ParseEnglish(BYTE b)
 	return TRUE;
 }
 
-void ParseFirst(BYTE b) {
-	switch (ts.Language) {
-	  case IdUtf8:
-		  ParseFirstUTF8(b);
+static void PutDebugChar(BYTE b)
+{
+	int i;
+	BOOL svInsertMode, svAutoWrapMode;
+	TCharAttr svCharAttr;
+	TCharAttr char_attr;
+
+	svInsertMode = TermGetInsertMode();
+	TermSetInsertMode(FALSE);
+	svAutoWrapMode = TermGetAutoWrapMode();
+	TermSetAutoWrapMode(TRUE);
+
+	TermGetAttr(&svCharAttr);
+	char_attr = svCharAttr;
+	char_attr.Attr = AttrDefault;
+	TermSetAttr(&char_attr);
+
+	if (DebugFlag==DEBUG_FLAG_HEXD) {
+		char buff[3];
+		_snprintf(buff, 3, "%02X", (unsigned int) b);
+
+		for (i=0; i<2; i++)
+			PutChar(buff[i]);
+		PutChar(' ');
+	}
+	else if (DebugFlag==DEBUG_FLAG_NORM) {
+
+		if ((b & 0x80) == 0x80) {
+			//UpdateStr();
+			char_attr.Attr = AttrReverse;
+			TermSetAttr(&char_attr);
+			b = b & 0x7f;
+		}
+
+		if (b<=US) {
+			PutChar('^');
+			PutChar((char)(b+0x40));
+		}
+		else if (b==DEL) {
+			PutChar('<');
+			PutChar('D');
+			PutChar('E');
+			PutChar('L');
+			PutChar('>');
+		}
+		else
+			PutChar(b);
+	}
+
+	TermSetAttr(&char_attr);
+	TermSetInsertMode(svInsertMode);
+	TermSetAutoWrapMode(svAutoWrapMode);
+}
+
+void ParseFirst(BYTE b)
+{
+	WORD language = ts.Language;
+	if (DebugFlag != DEBUG_FLAG_NONE) {
+		language = IdDebug;
+	}
+
+	switch (language) {
+	case IdUtf8:
+		ParseFirstUTF8(b);
 		return;
 
-	  case IdJapanese:
+	case IdJapanese:
 		switch (ts.KanjiCode) {
-		  case IdUTF8:
-			  if (ParseFirstUTF8(b)) {
+		case IdUTF8:
+			if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
-		  default:
+		default:
 			if (ParseFirstJP(b))  {
 				return;
 			}
 		}
 		break;
 
-	  case IdKorean:
+	case IdKorean:
 		switch (ts.KanjiCode) {
-		  case IdUTF8:
+		case IdUTF8:
 			if (ParseFirstUTF8(b)) {
 				return;
 			}
 			break;
-		  default:
+		default:
 			if (ParseFirstKR(b))  {
 				return;
 			}
 		}
 		break;
 
-	  case IdRussian:
+	case IdRussian:
 		if (ParseFirstRus(b)) {
 			return;
 		}
@@ -831,6 +892,10 @@ void ParseFirst(BYTE b) {
 			return;
 		}
 		break;
+	}
+	case IdDebug: {
+		PutDebugChar(b);
+		return;
 	}
 	}
 

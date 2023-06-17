@@ -2836,7 +2836,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 							// Language が変更されたとき、
 							// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
-							if (1 <= language && language <= IdLangMax && language != ts->Language) {
+							if (1 <= language && language < IdLangMax && language != ts->Language) {
 								WORD KanjiCode = ts->KanjiCode;
 								WORD KanjiCodeSend = ts->KanjiCodeSend;
 								ts->KanjiCode = KanjiCodeTranslate(language,KanjiCode);

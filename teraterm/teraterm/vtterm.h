@@ -29,6 +29,10 @@
 
 /* TERATERM.EXE, VT terminal emulation */
 
+#pragma once
+
+#include "buffer.h" for TCharAttr
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,6 +54,12 @@ void TermPasteStringNoBracket(const wchar_t *str, size_t len);
 void TermPasteString(const wchar_t *str, size_t len);
 void TermSendStartBracket(void);
 void TermSendEndBracket(void);
+void TermGetAttr(TCharAttr *attr);
+void TermSetAttr(const TCharAttr *attr);
+BOOL TermGetInsertMode(void);
+void TermSetInsertMode(BOOL insert_mode);
+BOOL TermGetAutoWrapMode(void);
+void TermSetAutoWrapMode(BOOL auto_wrap_mode);
 
 #ifdef __cplusplus
 }

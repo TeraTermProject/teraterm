@@ -994,64 +994,6 @@ static void PutChar(BYTE b)
 	PutU32(b);
 }
 
-static void PutDebugChar(BYTE b)
-{
-	static BYTE buff[3];
-	int i;
-	BOOL svInsertMode, svAutoWrapMode;
-	BYTE svCharAttr;
-
-	if (DebugFlag!=DEBUG_FLAG_NOUT) {
-		svInsertMode = InsertMode;
-		svAutoWrapMode = AutoWrapMode;
-		InsertMode = FALSE;
-		AutoWrapMode = TRUE;
-
-		svCharAttr = CharAttr.Attr;
-		if (CharAttr.Attr != AttrDefault) {
-			UpdateStr();
-			CharAttr.Attr = AttrDefault;
-		}
-
-		if (DebugFlag==DEBUG_FLAG_HEXD) {
-			_snprintf(buff, 3, "%02X", (unsigned int) b);
-
-			for (i=0; i<2; i++)
-				PutChar(buff[i]);
-			PutChar(' ');
-		}
-		else if (DebugFlag==DEBUG_FLAG_NORM) {
-
-			if ((b & 0x80) == 0x80) {
-				UpdateStr();
-				CharAttr.Attr = AttrReverse;
-				b = b & 0x7f;
-			}
-
-			if (b<=US) {
-				PutChar('^');
-				PutChar((char)(b+0x40));
-			}
-			else if (b==DEL) {
-				PutChar('<');
-				PutChar('D');
-				PutChar('E');
-				PutChar('L');
-				PutChar('>');
-			}
-			else
-				PutChar(b);
-		}
-
-		if (CharAttr.Attr != svCharAttr) {
-			UpdateStr();
-			CharAttr.Attr = svCharAttr;
-		}
-		InsertMode = svInsertMode;
-		AutoWrapMode = svAutoWrapMode;
-	}
-}
-
 static void PrnParseControl(BYTE b) // printer mode
 {
 	switch (b) {
@@ -5435,44 +5377,40 @@ int VTParse()
 			printf("%02x(%c) ", b, isprint(b) ? b : '.');
 		}
 #endif
-		if (DebugFlag!=DEBUG_FLAG_NONE)
-			PutDebugChar(b);
-		else {
-			switch (ParseMode) {
-			case ModeFirst:
-				ParseFirst(b);
-				break;
-			case ModeESC:
-				EscapeSequence(b);
-				break;
-			case ModeDCS:
-				DeviceControl(b);
-				break;
-			case ModeDCUserKey:
-				DCUserKey(b);
-				break;
-			case ModeSOS:
-				IgnoreString(b);
-				break;
-			case ModeCSI:
-				ControlSequence(b);
-				break;
-			case ModeXS:
-				XSequence(b);
-				break;
-			case ModeDLE:
-				DLESeen(b);
-				break;
-			case ModeCAN:
-				CANSeen(b);
-				break;
-			case ModeIgnore:
-				IgnoreString(b);
-				break;
-			default:
-				ParseMode = ModeFirst;
-				ParseFirst(b);
-			}
+		switch (ParseMode) {
+		case ModeFirst:
+			ParseFirst(b);
+			break;
+		case ModeESC:
+			EscapeSequence(b);
+			break;
+		case ModeDCS:
+			DeviceControl(b);
+			break;
+		case ModeDCUserKey:
+			DCUserKey(b);
+			break;
+		case ModeSOS:
+			IgnoreString(b);
+			break;
+		case ModeCSI:
+			ControlSequence(b);
+			break;
+		case ModeXS:
+			XSequence(b);
+			break;
+		case ModeDLE:
+			DLESeen(b);
+			break;
+		case ModeCAN:
+			CANSeen(b);
+			break;
+		case ModeIgnore:
+			IgnoreString(b);
+			break;
+		default:
+			ParseMode = ModeFirst;
+			ParseFirst(b);
 		}
 
 		PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
@@ -5914,4 +5852,35 @@ void TermSendEndBracket()
 	}
 
 	return;
+}
+
+void TermGetAttr(TCharAttr *attr)
+{
+	*attr = CharAttr;
+}
+
+void TermSetAttr(const TCharAttr *attr)
+{
+	UpdateStr();
+	CharAttr = *attr;
+}
+
+BOOL TermGetInsertMode(void)
+{
+	return InsertMode;
+}
+
+void TermSetInsertMode(BOOL insert_mode)
+{
+	InsertMode = insert_mode;
+}
+
+BOOL TermGetAutoWrapMode(void)
+{
+	return AutoWrapMode;
+}
+
+void TermSetAutoWrapMode(BOOL auto_wrap_mode)
+{
+	AutoWrapMode = auto_wrap_mode;
 }
