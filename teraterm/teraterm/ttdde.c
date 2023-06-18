@@ -50,6 +50,7 @@
 #include "codeconv.h"
 #include "scp.h"
 #include "asprintf.h"
+#include "charset.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -663,7 +664,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			TelChangeEcho();
 		break;
 	case CmdSetDebug:
-		DebugFlag = (Command[1]-'0')%DEBUG_FLAG_MAXD;
+		CharSetSetDebugMode((Command[1] - '0') % DEBUG_FLAG_MAXD);
 		break;
 	case CmdSetTitle:
 		strncpy_s(ts.Title, sizeof(ts.Title),ParamFileName, _TRUNCATE);

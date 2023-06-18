@@ -43,7 +43,7 @@
 #include "unicode.h"
 #include "language.h"	// for JIS2SJIS()
 #include "ttcstd.h"
-#include "keyboard.h"	// for DebugFlag
+#include "vtterm.h"
 
 #include "charset.h"
 
@@ -56,9 +56,6 @@
 static BOOL KanjiIn;				// TRUE = MBCSの1byte目を受信している
 static BOOL EUCkanaIn, EUCsupIn;
 static int  EUCcount;
-#if 0
-static BOOL Special;
-#endif
 
 /* GL for single shift 2/3 */
 static int GLtmp;
@@ -68,6 +65,8 @@ static BOOL SSflag;
 static BOOL ConvJIS;
 static WORD Kanji;
 static BOOL Fallbacked;
+
+static BYTE DebugFlag = DEBUG_FLAG_NONE;
 
 typedef struct {
 	/* GL, GR code group */
@@ -1024,4 +1023,25 @@ void CharSetLoadState(const CharSetState *state)
 void CharSetFallbackFinish(void)
 {
 	Fallbacked = FALSE;
+}
+
+/**
+ *	デバグ出力を次のモードに変更する
+ */
+void CharSetSetNextDebugMode(void)
+{
+	// ts.DebugModes には tttypes.h の DBGF_* が OR で入ってる
+	do {
+		DebugFlag = (DebugFlag + 1) % DEBUG_FLAG_MAXD;
+	} while (DebugFlag != DEBUG_FLAG_NONE && !((ts.DebugModes >> (DebugFlag - 1)) & 1));
+}
+
+BYTE CharSetGetDebugMode(void)
+{
+	return DebugFlag;
+}
+
+void CharSetSetDebugMode(BYTE mode)
+{
+	DebugFlag = mode;
 }

@@ -44,6 +44,7 @@
 #include "ttwinman.h"
 #include "ttdde.h"
 #include "codeconv.h"
+#include "charset.h"
 
 #include "keyboard.h"
 #include "keyboard_i.h"
@@ -53,7 +54,6 @@ BOOL AppliKeyMode;
 BOOL AppliCursorMode;
 int AppliEscapeMode;
 BOOL Send8BitMode;
-BYTE DebugFlag = DEBUG_FLAG_NONE;
 
 static char FuncKeyStr[NumOfUDK][FuncKeyStrMax];
 static int FuncKeyLen[NumOfUDK];
@@ -1374,9 +1374,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 	/* debug mode */
 	if (ts.Debug && (VKey == VK_ESCAPE) && ShiftKey()) {
 		MessageBeep(0);
-		do {
-			DebugFlag = (DebugFlag + 1) % DEBUG_FLAG_MAXD;
-		} while (DebugFlag != DEBUG_FLAG_NONE && !((ts.DebugModes >> (DebugFlag - 1)) & 1));
+		CharSetSetNextDebugMode();
 		CodeCount = 0;
 		PeekMessage((LPMSG)&M, HWin, WM_CHAR, WM_CHAR, PM_REMOVE);
 		return KEYDOWN_CONTROL;

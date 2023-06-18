@@ -30,8 +30,6 @@ typedef struct {
 	int infos[6];
 } CharSetState;
 
-//extern BOOL Fallbacked;
-
 // input
 void ParseFirst(BYTE b);
 
@@ -49,3 +47,13 @@ BOOL CharSetIsSpecial(BYTE b);
 void CharSetSaveState(CharSetState *state);
 void CharSetLoadState(const CharSetState *state);
 void CharSetFallbackFinish(void);
+
+// debug mode
+#define DEBUG_FLAG_NONE  0
+#define DEBUG_FLAG_NORM  1
+#define DEBUG_FLAG_HEXD  2
+#define DEBUG_FLAG_NOUT  3
+#define DEBUG_FLAG_MAXD  4
+void CharSetSetNextDebugMode(void);
+//BYTE CharSetGetDebugMode(void);
+void CharSetSetDebugMode(BYTE mode);

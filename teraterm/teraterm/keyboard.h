@@ -39,12 +39,6 @@ typedef enum {
 	KEYDOWN_CONTROL,	/* Ctrl,Shift‚È‚Ç */
 } KeyDownResult;
 
-#define DEBUG_FLAG_NONE  0
-#define DEBUG_FLAG_NORM  1
-#define DEBUG_FLAG_HEXD  2
-#define DEBUG_FLAG_NOUT  3
-#define DEBUG_FLAG_MAXD  4
-
 void SetKeyMap();
 void ClearUserKey();
 void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen);
@@ -63,7 +57,6 @@ void EndKeyboard();
 extern BOOL AutoRepeatMode;
 extern BOOL AppliKeyMode, AppliCursorMode, AppliEscapeMode;
 extern BOOL Send8BitMode;
-extern BYTE DebugFlag;
 
 #ifdef __cplusplus
 }
