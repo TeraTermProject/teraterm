@@ -58,10 +58,10 @@
 #include "checkeol.h"
 #include "asprintf.h"
 #include "charset.h"
+#include "ttcstd.h"
 
 #include "vtterm.h"
 
-#include "unicode_test.h"
 // #define DEBUG_DUMP_INPUTCODE 1
 
 #define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
@@ -131,7 +131,7 @@ typedef TStatusBuff *PStatusBuff;
 static BYTE PrevCharacter;
 static BOOL PrevCRorLFGeneratedCRLF;	  // indicates that previous CR or LF really generated a CR+LF
 
-static BYTE LastPutCharacter;
+static char32_t LastPutCharacter;
 
 // status buffer for main screen & status line
 static TStatusBuff SBuff1, SBuff2, SBuff3;
@@ -758,6 +758,7 @@ void PutU32(unsigned int code)
 	unsigned short cset;
 	int LineEnd;
 
+	LastPutCharacter = code;
 	TCharAttr CharAttrTmp;
 	CharAttrTmp = CharAttr;
 
