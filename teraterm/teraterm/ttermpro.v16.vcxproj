@@ -160,7 +160,7 @@
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="broadcast.cpp" />
     <ClCompile Include="buffer.c" />
-    <ClCompile Include="charset.c" />
+    <ClCompile Include="charset.cpp" />
     <ClCompile Include="checkeol.cpp" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="coding_pp.cpp" />

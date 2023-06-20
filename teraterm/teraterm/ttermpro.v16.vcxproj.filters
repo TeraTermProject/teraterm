@@ -225,7 +225,7 @@
     <ClCompile Include="scp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="charset.c">
+    <ClCompile Include="charset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

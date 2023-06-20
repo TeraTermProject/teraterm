@@ -26,6 +26,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
 	int infos[6];
 } CharSetState;
@@ -57,3 +61,7 @@ void CharSetFallbackFinish(void);
 void CharSetSetNextDebugMode(void);
 //BYTE CharSetGetDebugMode(void);
 void CharSetSetDebugMode(BYTE mode);
+
+#ifdef __cplusplus
+}
+#endif

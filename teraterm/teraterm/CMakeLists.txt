@@ -17,7 +17,7 @@ add_executable(
   broadcast.h
   buffer.c
   buffer.h
-  charset.c
+  charset.cpp
   charset.h
   checkeol.cpp
   checkeol.h

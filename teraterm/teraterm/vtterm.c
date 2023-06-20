@@ -758,9 +758,9 @@ void PutU32(unsigned int code)
 	unsigned short cset;
 	int LineEnd;
 
-	LastPutCharacter = code;
 	TCharAttr CharAttrTmp;
 	CharAttrTmp = CharAttr;
+	LastPutCharacter = code;
 
 	{
 		int r;

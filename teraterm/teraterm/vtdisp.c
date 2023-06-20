@@ -1411,10 +1411,10 @@ void BGLoadThemeFile(const TTTSet *pts)
  */
 static void DrawBox(HDC hdc, int sx, int sy, int width, int height, COLORREF rgb)
 {
-	width--;
-	height--;
 	HPEN red_pen = CreatePen(PS_SOLID, 0, rgb);
 	HGDIOBJ old_pen = SelectObject(hdc, red_pen);
+	width--;
+	height--;
 	MoveToEx(hdc, sx, sy, NULL);
 	LineTo(hdc, sx + width, sy);
 	LineTo(hdc, sx + width, sy + height);
