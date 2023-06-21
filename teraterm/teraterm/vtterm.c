@@ -1010,14 +1010,14 @@ static void PrnParseControl(BYTE b) // printer mode
 				CharSet2022Designate(1, IdKatakana);
 			}
 			/* LS1 */
-			CharSet2022Invoke(0, 1, FALSE);
+			CharSet2022Invoke(CHARSET_LS1);
 			return;
 		}
 		break;
 	case SI:
 		if ((ts.ISO2022Flag & ISO2022_SI) && ! DirectPrn) {
 			/* LS0 */
-			CharSet2022Invoke(0, 0, FALSE);
+			CharSet2022Invoke(CHARSET_LS0);
 			return;
 		}
 		break;
@@ -1152,12 +1152,12 @@ void ParseControl(BYTE b)
 				CharSet2022Designate(1, IdKatakana);
 			}
 
-			CharSet2022Invoke(0, 1, FALSE);
+			CharSet2022Invoke(CHARSET_LS1);
 		}
 		break;
 	case SI: /* LS0 */
 		if (ts.ISO2022Flag & ISO2022_SI) {
-			CharSet2022Invoke(0, 0, FALSE);
+			CharSet2022Invoke(CHARSET_LS0);
 		}
 		break;
 	case DLE:
@@ -1207,12 +1207,12 @@ void ParseControl(BYTE b)
 		break;
 	case SS2:
 		if (ts.ISO2022Flag & ISO2022_SS2) {
-			CharSet2022Invoke(0, 2, TRUE);
+			CharSet2022Invoke(CHARSET_SS2);
 		}
 		break;
 	case SS3:
 		if (ts.ISO2022Flag & ISO2022_SS3) {
-			CharSet2022Invoke(0, 3, TRUE);
+			CharSet2022Invoke(CHARSET_SS3);
 		}
 		break;
 	case DCS:
@@ -1344,7 +1344,7 @@ static void ESCDBCSSelect(BYTE b)
 				CharSet2022Designate(0, IdKanji);
 				if ((ts.TermFlag & TF_AUTOINVOKE)!=0) {
 					/* G0->GL */
-					CharSet2022Invoke(0, 0, FALSE);
+					CharSet2022Invoke(CHARSET_LS0);
 				}
 			}
 			break;
@@ -1370,7 +1370,7 @@ static void ESCDBCSSelect(BYTE b)
 				CharSet2022Designate(Dist, IdKanji);
 				if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0)) {
 					/* G0->GL */
-					CharSet2022Invoke(0, 0, FALSE);
+					CharSet2022Invoke(CHARSET_LS0);
 				}
 			}
 			break;
@@ -1417,7 +1417,7 @@ static void ESCSBCSSelect(BYTE b)
 
 	if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0)) {
 		/* G0->GL */
-		CharSet2022Invoke(0, 0, FALSE);
+		CharSet2022Invoke(CHARSET_LS0);
 	}
 }
 
@@ -1526,12 +1526,12 @@ static void ParseEscape(BYTE b) /* b is the final char */
 			break;
 		case 'N': /* SS2 */
 			if (ts.ISO2022Flag & ISO2022_SS2) {
-				CharSet2022Invoke(0, 2, TRUE);
+				CharSet2022Invoke(CHARSET_SS2);
 			}
 			break;
 		case 'O': /* SS3 */
 			if (ts.ISO2022Flag & ISO2022_SS3) {
-				CharSet2022Invoke(0, 3, TRUE);
+				CharSet2022Invoke(CHARSET_SS3);
 			}
 			break;
 		case 'P': /* DCS */
@@ -1571,27 +1571,27 @@ static void ParseEscape(BYTE b) /* b is the final char */
 			break;
 		case 'n': /* LS2 */
 			if (ts.ISO2022Flag & ISO2022_LS2) {
-				CharSet2022Invoke(0, 2, FALSE);
+				CharSet2022Invoke(CHARSET_LS2);
 			}
 			break;
 		case 'o': /* LS3 */
 			if (ts.ISO2022Flag & ISO2022_LS3) {
-				CharSet2022Invoke(0, 3, FALSE);
+				CharSet2022Invoke(CHARSET_LS3);
 			}
 			break;
 		case '|': /* LS3R */
 			if (ts.ISO2022Flag & ISO2022_LS3R) {
-				CharSet2022Invoke(1, 3, FALSE);
+				CharSet2022Invoke(CHARSET_LS3R);
 			}
 			break;
 		case '}': /* LS2R */
 			if (ts.ISO2022Flag & ISO2022_LS2R) {
-				CharSet2022Invoke(1, 2, FALSE);
+				CharSet2022Invoke(CHARSET_LS2R);
 			}
 			break;
 		case '~': /* LS1R */
 			if (ts.ISO2022Flag & ISO2022_LS1R) {
-				CharSet2022Invoke(1, 1, FALSE);
+				CharSet2022Invoke(CHARSET_LS1R);
 			}
 			break;
 		}
@@ -2967,12 +2967,12 @@ static void CSQ_h_Mode() // DECSET
 				CharSet2022Designate(1, IdKatakana);
 				CharSet2022Designate(2, IdKatakana);
 				CharSet2022Designate(3, IdKanji);
-				CharSet2022Invoke(0, 0, FALSE);
+				CharSet2022Invoke(CHARSET_LS0);
 				if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
 					// 8-bit katakana
-					CharSet2022Invoke(1, 2, FALSE);
+					CharSet2022Invoke(CHARSET_LS2R);
 				else
-					CharSet2022Invoke(1, 3, FALSE);
+					CharSet2022Invoke(CHARSET_LS3R);
 			}
 			break;
 		  case 66: AppliKeyMode = TRUE; break;		// DECNKM
@@ -3137,12 +3137,12 @@ static void CSQ_l_Mode()		// DECRST
 				CharSet2022Designate(1, IdKatakana);
 				CharSet2022Designate(2, IdKatakana);
 				CharSet2022Designate(3, IdKanji);
-				CharSet2022Invoke(0, 0, FALSE);
+				CharSet2022Invoke(CHARSET_LS0);
 				if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
 					// 8-bit katakana
-					CharSet2022Invoke(1, 2, FALSE);
+					CharSet2022Invoke(CHARSET_LS2R);
 				else
-					CharSet2022Invoke(1, 3, FALSE);
+					CharSet2022Invoke(CHARSET_LS3R);
 			}
 			break;
 		  case 66: AppliKeyMode = FALSE; break;		// DECNKM

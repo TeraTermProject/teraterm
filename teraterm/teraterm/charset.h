@@ -44,9 +44,20 @@ void LineFeed(BYTE b, BOOL logFlag);
 void ParseControl(BYTE b);
 
 // control
+typedef enum {
+	CHARSET_LS0,	// Locking Shift 0, SI, 0F (G0->GL)
+	CHARSET_LS1,	// Locking Shift 1, SO, 0E (G1->GL)
+	CHARSET_LS2,	// Locking Shift 2, ESC n, 1B 6E (G2->GL)
+	CHARSET_LS3,	// Locking Shift 3, ESC o, 1B 6F(G3->GL)
+	CHARSET_LS1R,	// Locking Shift 1R, ESC ~, 1B 7E (G1->GR)
+	CHARSET_LS2R,	// Locking Shift 2R, ESC }, 1B 7D (G2->GR)
+	CHARSET_LS3R,	// Locking Shift 3R, ESC |, 1B 7C (G3->GR)
+	CHARSET_SS2,	// Single Shift 2, SS2, 8E, ESC N, 1B 4E
+	CHARSET_SS3,	// Single Shift 3, SS3, 8F, ESC O, 1B 4F
+} CharSet2022Shift;
 void CharSetInit(void);
 void CharSet2022Designate(int gn, int cs);
-void CharSet2022Invoke(int glr, int gn, BOOL single_shift);
+void CharSet2022Invoke(CharSet2022Shift shift);
 BOOL CharSetIsSpecial(BYTE b);
 void CharSetSaveState(CharSetState *state);
 void CharSetLoadState(const CharSetState *state);

@@ -931,22 +931,53 @@ void CharSet2022Designate(int gn, int cs)
 
 /**
  *	ŒÄ‚Ño‚µ(Invoke)
- *	@param	glr				0/1 = GL/GR (Locking shiftŽž‚Ì‚Ý—LŒø)
- *	@param	gn				0/1/2/3 = G0/G1/G2/G3
- *	@param	single_shift	FALSE	Locking shift
- *							TRUE	Single shift
+ *	@param	shift
  */
-void CharSet2022Invoke(int glr, int gn, BOOL single_shift)
+void CharSet2022Invoke(CharSet2022Shift shift)
 {
 	VttermKanjiWork *w = &KanjiWork;
-	if (single_shift == FALSE) {
-		// Locking shift
-		w->Glr[glr] = gn;
-	}
-	else {
-		// Single shift
-		GLtmp = gn;
+	switch (shift) {
+	case CHARSET_LS0:
+		// Locking Shift 0 (G0->GL)
+		w->Glr[0] = 0;
+		break;
+	case CHARSET_LS1:
+		// Locking Shift 1 (G1->GL)
+		w->Glr[0] = 1;
+		break;
+	case CHARSET_LS2:
+		// Locking Shift 2 (G2->GL)
+		w->Glr[0] = 2;
+		break;
+	case CHARSET_LS3:
+		// Locking Shift 3 (G3->GL)
+		w->Glr[0] = 3;
+		break;
+	case CHARSET_LS1R:
+		// Locking Shift 1 (G1->GR)
+		w->Glr[1] = 1;
+		break;
+	case CHARSET_LS2R:
+		// Locking Shift 2 (G2->GR)
+		w->Glr[1] = 2;
+		break;
+	case CHARSET_LS3R:
+		// Locking Shift 3 (G3->GR)
+		w->Glr[1] = 3;
+		break;
+	case CHARSET_SS2:
+		// Single Shift 2
+		GLtmp = 2;
 		SSflag = TRUE;
+		break;
+	case CHARSET_SS3:
+		// Single Shift 3
+		GLtmp = 3;
+		SSflag = TRUE;
+		break;
+	default:
+		assert(FALSE);
+		break;
 	}
 }
 
