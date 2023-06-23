@@ -52,6 +52,7 @@ if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
   endif()
 endif()
 if(${BMP_ICO})
+  # cmake 3.11でうまく設定されない?→手で設定する
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /DBMP_ICO")
 endif()
 

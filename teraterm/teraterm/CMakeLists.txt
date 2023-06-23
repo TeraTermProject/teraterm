@@ -280,7 +280,14 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 if (MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+  else()
+    target_link_options(
+      ${PACKAGE_NAME}
+      PRIVATE
+      /MANIFEST:NO)
+  endif()
 endif()
 
 set_target_properties(

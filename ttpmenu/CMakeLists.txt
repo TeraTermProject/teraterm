@@ -67,10 +67,14 @@ target_include_directories(
   )
 
 if(MSVC)
-  target_link_options(
-    ${PACKAGE_NAME}
-    PRIVATE
-    /MANIFEST:NO)
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+  else()
+    target_link_options(
+      ${PACKAGE_NAME}
+      PRIVATE
+      /MANIFEST:NO)
+  endif()
 endif()
 
 target_link_libraries(
