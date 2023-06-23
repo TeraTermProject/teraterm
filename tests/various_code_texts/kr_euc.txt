@@ -1,4 +1,4 @@
-CP51949, (KS5601, KS C 5601, euc-kr, KS X 1001)
+CP949, (KS5601, KS C 5601, euc-kr, KS X 1001)
 https://ko.wikipedia.org/wiki/%EC%98%A4%ED%94%88_%EC%86%8C%EC%8A%A4_%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4
 
 오픈 소스 소프트웨어(open source software, OSS, 문화어:

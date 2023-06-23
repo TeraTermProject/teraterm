@@ -1059,7 +1059,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 		char mb_char[2];
 		size_t mb_len;
 		if (cv->Language == IdKorean) {
-			code_page = 51949;
+			code_page = 949;
 		} else if (cv->Language == IdChinese) {
 			switch (states->KanjiCode) {
 			case IdCnGB2312:

@@ -1602,8 +1602,8 @@ int __ismbblead(BYTE b, int code_page)
 				return TRUE;
 			}
 			return FALSE;
-		case 51949:
-			// Korean CP51949
+		case 949:
+			// Korean CP949
 			if ((0xA1 <= b) && (b <= 0xFE)) {
 				return TRUE;
 			}
@@ -1643,8 +1643,8 @@ int __ismbbtrail(BYTE b, int code_page)
 				return TRUE;
 			}
 			return FALSE;
-		case 51949:
-			// Korean CP51949
+		case 949:
+			// Korean CP949
 			if ((0xA1 <= b) && (b <= 0xFE)) {
 				return TRUE;
 			}

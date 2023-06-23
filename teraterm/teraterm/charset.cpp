@@ -153,7 +153,7 @@ static BOOL CheckFirstByte(BYTE b, int lang, int kanji_code)
 {
 	switch (lang) {
 		case IdKorean:
-			return __ismbblead(b, 51949);
+			return __ismbblead(b, 949);
 		case IdChinese:
 			if (kanji_code == IdCnGB2312) {
 				return __ismbblead(b, 936);
@@ -393,9 +393,9 @@ static BOOL ParseFirstKR(BYTE b)
 		{
 			unsigned long u32 = 0;
 			if (ts.KanjiCode == IdKoreanCP949) {
-				// CP51949
+				// CP949
 				Kanji = Kanji + b;
-				u32 = MBCP_UTF32(Kanji, 51949);
+				u32 = MBCP_UTF32(Kanji, 949);
 			}
 			else {
 				assert(FALSE);

@@ -3178,7 +3178,7 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
 		int CodePage;
 	} table[] = {
 		{ SHIFTJIS_CHARSET,  	932 },
-		{ HANGUL_CHARSET,		51949 },
+		{ HANGUL_CHARSET,		949 },
 		{ GB2312_CHARSET,	 	936 },
 		{ CHINESEBIG5_CHARSET,	950 },
 		{ RUSSIAN_CHARSET,		1251 },
