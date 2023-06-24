@@ -699,61 +699,11 @@ static void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 	BuffPutUnicode(b, Attr, Insert);
 }
 
-static void RepeatChar(BYTE b, int count)
-{
-	int i;
-	BOOL SpecialNew;
-	TCharAttr CharAttrTmp, CharAttrWrap;
-
-	if (b <= US || b == DEL)
-		return;
-
-	CharAttrTmp = CharAttr;
-	LastPutCharacter = 0;
-
-	SpecialNew = CharSetIsSpecial(b);
-	if (SpecialNew != Special) {
-		UpdateStr();
-		Special = SpecialNew;
-	}
-
-	if (Special) {
-		b = b & 0x7F;
-		CharAttrTmp.Attr |= AttrSpecial;
-	}
-	else
-		CharAttrTmp.Attr |= CharAttr.Attr;
-	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-
-	CharAttrWrap = CharAttrTmp;
-	CharAttrWrap.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
-
-	for (i=0; i<count; i++) {
-		if (Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-		}
-
-		BuffPutChar(b, Wrap ? CharAttrWrap : CharAttrTmp, InsertMode);
-
-		if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
-			UpdateStr();
-			Wrap = AutoWrapMode;
-		}
-		else {
-			Wrap = FALSE;
-			MoveRight();
-		}
-	}
-}
-
 /**
- *	unicode(UTF-32,wchar_t)をバッファへ書き込む
- *	ログにも書き込む
- *
- *	PutChar() の UTF-32版
+ *	unicode(char32_t)をバッファへ書き込む
+ *		ログにも書き込む場合は PutU32() を使う
  */
-void PutU32(unsigned int code)
+static void PutU32NoLog(unsigned int code)
 {
 	unsigned short cset;
 	int LineEnd;
@@ -886,9 +836,32 @@ void PutU32(unsigned int code)
 			assert(FALSE);
 		}
 	}
+}
+
+/**
+ *	unicode(char32_t)をバッファへ書き込む
+ *	ログにも書き込む
+ *
+ *	PutChar() の UTF-32版
+ */
+void PutU32(unsigned int code)
+{
+	PutU32NoLog(code);
 
 	// ログを出力
 	OutputLogUTF32(code);
+}
+
+static void RepeatChar(char32_t b, int count)
+{
+	int i;
+
+	if (b <= US || b == DEL)
+		return;
+
+	for (i = 0; i < count; i++) {
+		PutU32NoLog(b);
+	}
 }
 
 #if 0
@@ -1906,6 +1879,7 @@ static void CSRepeatCharacter()
 
 	BuffUpdateScroll();
 	RepeatChar(LastPutCharacter, Param[1]);
+	LastPutCharacter = 0;
 }
 
 static void CSScrollUp()
@@ -5416,7 +5390,7 @@ int VTParse()
 
 		PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
 
-		if (LastPutCharacter != b && !(ParseMode == ModeESC || ParseMode == ModeCSI)) {
+		if ((ParseMode != ModeFirst) && (!(ParseMode == ModeESC || ParseMode == ModeCSI))) {
 			LastPutCharacter = 0;
 		}
 
