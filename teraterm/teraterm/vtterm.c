@@ -627,7 +627,6 @@ static void SendDCSstr(char *str, int len)
 		CommBinaryOut(&cv, str, l);
 		CommBinaryOut(&cv,"\033\\", 2);
 	}
-
 }
 
 static void BackSpace(void)
@@ -644,7 +643,7 @@ static void BackSpace(void)
 	}
 }
 
-void CarriageReturn(BOOL logFlag)
+static void CarriageReturn(BOOL logFlag)
 {
 	if (!ts.EnableContinuedLineCopy || logFlag)
 		if (NeedsOutputBufs()) OutputLogByte(CR);
@@ -657,7 +656,7 @@ void CarriageReturn(BOOL logFlag)
 	CharSetFallbackFinish();
 }
 
-void LineFeed(BYTE b, BOOL logFlag)
+static void LineFeed(BYTE b, BOOL logFlag)
 {
 	/* for auto print mode */
 	if ((AutoPrintMode) &&

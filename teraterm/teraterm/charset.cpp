@@ -37,7 +37,6 @@
 #include <crtdbg.h>
 #include <assert.h>
 
-#include "buffer.h"	// for Wrap
 #include "ttwinman.h"
 #include "codeconv.h"
 #include "unicode.h"
@@ -255,11 +254,6 @@ static BOOL ParseFirstJP(BYTE b)
 		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
 			KanjiIn = FALSE;
 		}
-		else if ((b==CR) && Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			Wrap = FALSE;
-		}
 	}
 
 	if (SSflag) {
@@ -407,11 +401,6 @@ static BOOL ParseFirstKR(BYTE b)
 		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
 			KanjiIn = FALSE;
 		}
-		else if ((b==CR) && Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			Wrap = FALSE;
-		}
 	}
 
 	if ((!KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
@@ -483,11 +472,6 @@ static BOOL ParseFirstCn(BYTE b)
 		}
 		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
 			KanjiIn = FALSE;
-		}
-		else if ((b==CR) && Wrap) {
-			CarriageReturn(FALSE);
-			LineFeed(LF,FALSE);
-			Wrap = FALSE;
 		}
 	}
 
