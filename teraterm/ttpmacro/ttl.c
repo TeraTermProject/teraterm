@@ -2608,7 +2608,7 @@ WORD TTLGetIPv6Addr()
 
 WORD TTLGetPassword()
 {
-	TStrVal Str, Str2, Temp2;
+	TStrVal Str, Str2, Temp2 = "";
 	char Temp[512];
 	WORD Err;
 	TVarId VarId;
