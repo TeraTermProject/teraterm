@@ -217,7 +217,7 @@ WORD TTLGetPassword()
 	                         Temp, _countof(Temp), (wc)Str);
 	if (Temp[0]==0) // password not exist
 	{
-		wchar_t input_string[MaxStrLen];
+		wchar_t input_string[MaxStrLen] = {};
 		size_t Temp2_len = sizeof(Temp2);
 		OpenInpDlg(input_string, wc::fromUtf8(Str2), L"Enter password", L"", TRUE);
 		WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
