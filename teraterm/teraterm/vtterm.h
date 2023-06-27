@@ -60,6 +60,8 @@ BOOL TermGetInsertMode(void);
 void TermSetInsertMode(BOOL insert_mode);
 BOOL TermGetAutoWrapMode(void);
 void TermSetAutoWrapMode(BOOL auto_wrap_mode);
+void TermSetNextDebugMode(void);
+void TermSetDebugMode(BYTE mode);
 
 #ifdef __cplusplus
 }

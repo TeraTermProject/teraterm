@@ -203,6 +203,7 @@ typedef struct {
 	int log_cr_type;
 } vtterm_work_t;
 
+static CharSetData *charset_data;
 static vtterm_work_t vtterm_work;
 
 static void ClearParams(void)
@@ -220,7 +221,7 @@ static void SaveCursorBuf(PStatusBuff Buff)
 	Buff->CursorY = CursorY;
 	Buff->Attr = CharAttr;
 
-	CharSetSaveState(&Buff->CharSetState);
+	CharSetSaveState(charset_data, &Buff->CharSetState);
 	Buff->AutoWrapMode = AutoWrapMode;
 	Buff->RelativeOrgMode = RelativeOrgMode;
 }
@@ -260,7 +261,7 @@ static void RestoreCursor()
 
 	CharAttr = Buff->Attr;
 	BuffSetCurCharAttr(CharAttr);
-	CharSetLoadState(&Buff->CharSetState);
+	CharSetLoadState(charset_data, &Buff->CharSetState);
 
 	AutoWrapMode = Buff->AutoWrapMode;
 	RelativeOrgMode = Buff->RelativeOrgMode;
@@ -358,6 +359,8 @@ void ResetTerminal() /*reset variables but don't update screen */
 	}
 }
 
+static CharSetData *CharSetInitTerm(void);
+
 void ResetCharSet()
 {
 	if (ts.Language != IdJapanese) {
@@ -374,7 +377,10 @@ void ResetCharSet()
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
 
-	CharSetInit();
+	if (charset_data != NULL) {
+		CharSetFinish(charset_data);
+	}
+	charset_data = CharSetInitTerm();
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
@@ -653,7 +659,7 @@ static void CarriageReturn(BOOL logFlag)
 	else if (CursorX < CursorLeftM)
 		MoveCursor(0, CursorY);
 
-	CharSetFallbackFinish();
+	CharSetFallbackFinish(charset_data);
 }
 
 static void LineFeed(BYTE b, BOOL logFlag)
@@ -676,7 +682,7 @@ static void LineFeed(BYTE b, BOOL logFlag)
 
 	if (LFMode) CarriageReturn(logFlag);
 
-	CharSetFallbackFinish();
+	CharSetFallbackFinish(charset_data);
 }
 
 static void Tab(void)
@@ -716,7 +722,7 @@ static void PutU32NoLog(unsigned int code)
 		BOOL SpecialNew = FALSE;
 
 		if (code <= 0xff) {
-			SpecialNew = CharSetIsSpecial(code);
+			SpecialNew = CharSetIsSpecial(charset_data, code);
 			if (SpecialNew) {
 				code = code & 0x7F;
 			}
@@ -843,7 +849,7 @@ static void PutU32NoLog(unsigned int code)
  *
  *	PutChar() ‚Ì UTF-32”Å
  */
-void PutU32(unsigned int code)
+static void PutU32(unsigned int code)
 {
 	PutU32NoLog(code);
 
@@ -979,17 +985,17 @@ static void PrnParseControl(BYTE b) // printer mode
 			    (ts.JIS7Katakana==1) &&
 			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
 			{
-				CharSet2022Designate(1, IdKatakana);
+				CharSet2022Designate(charset_data, 1, IdKatakana);
 			}
 			/* LS1 */
-			CharSet2022Invoke(CHARSET_LS1);
+			CharSet2022Invoke(charset_data, CHARSET_LS1);
 			return;
 		}
 		break;
 	case SI:
 		if ((ts.ISO2022Flag & ISO2022_SI) && ! DirectPrn) {
 			/* LS0 */
-			CharSet2022Invoke(CHARSET_LS0);
+			CharSet2022Invoke(charset_data, CHARSET_LS0);
 			return;
 		}
 		break;
@@ -1018,7 +1024,7 @@ static void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(PrintFile_, b, TRUE);
 }
 
-void ParseControl(BYTE b)
+static void ParseControl(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -1121,15 +1127,15 @@ void ParseControl(BYTE b)
 			    (ts.JIS7Katakana==1) &&
 			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
 			{
-				CharSet2022Designate(1, IdKatakana);
+				CharSet2022Designate(charset_data, 1, IdKatakana);
 			}
 
-			CharSet2022Invoke(CHARSET_LS1);
+			CharSet2022Invoke(charset_data, CHARSET_LS1);
 		}
 		break;
 	case SI: /* LS0 */
 		if (ts.ISO2022Flag & ISO2022_SI) {
-			CharSet2022Invoke(CHARSET_LS0);
+			CharSet2022Invoke(charset_data, CHARSET_LS0);
 		}
 		break;
 	case DLE:
@@ -1179,12 +1185,12 @@ void ParseControl(BYTE b)
 		break;
 	case SS2:
 		if (ts.ISO2022Flag & ISO2022_SS2) {
-			CharSet2022Invoke(CHARSET_SS2);
+			CharSet2022Invoke(charset_data, CHARSET_SS2);
 		}
 		break;
 	case SS3:
 		if (ts.ISO2022Flag & ISO2022_SS3) {
-			CharSet2022Invoke(CHARSET_SS3);
+			CharSet2022Invoke(charset_data, CHARSET_SS3);
 		}
 		break;
 	case DCS:
@@ -1211,6 +1217,26 @@ void ParseControl(BYTE b)
 		ParseMode = ModeIgnore;
 		break;
 	}
+}
+
+static void csPutU32(char32_t code, void *client_data)
+{
+	(void)client_data;
+	PutU32(code);
+}
+
+static void csParseControl(BYTE b, void *client_data)
+{
+	(void)client_data;
+	ParseControl(b);
+}
+
+static CharSetData *CharSetInitTerm(void)
+{
+	CharSetOp op;
+	op.PutU32 = csPutU32;
+	op.ParseControl = csParseControl;
+	return CharSetInit(&op, NULL);
 }
 
 static void AnswerTerminalType(void)
@@ -1313,10 +1339,10 @@ static void ESCDBCSSelect(BYTE b)
 			if ((b=='@') || (b=='B'))
 			{
 				/* Kanji -> G0 */
-				CharSet2022Designate(0, IdKanji);
+				CharSet2022Designate(charset_data, 0, IdKanji);
 				if ((ts.TermFlag & TF_AUTOINVOKE)!=0) {
 					/* G0->GL */
-					CharSet2022Invoke(CHARSET_LS0);
+					CharSet2022Invoke(charset_data, CHARSET_LS0);
 				}
 			}
 			break;
@@ -1339,10 +1365,10 @@ static void ESCDBCSSelect(BYTE b)
 					(b=='@') || (b=='B'))
 			{
 				/* Kanji -> G0-3 */
-				CharSet2022Designate(Dist, IdKanji);
+				CharSet2022Designate(charset_data, Dist, IdKanji);
 				if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0)) {
 					/* G0->GL */
-					CharSet2022Invoke(CHARSET_LS0);
+					CharSet2022Invoke(charset_data, CHARSET_LS0);
 				}
 			}
 			break;
@@ -1369,27 +1395,27 @@ static void ESCSBCSSelect(BYTE b)
 
 	switch (b) {
 	case '0':
-		CharSet2022Designate(Dist, IdSpecial);
+		CharSet2022Designate(charset_data, Dist, IdSpecial);
 		break;
 	case '<':
 	case '>':
 	case 'A':
 	case 'B':
 	case 'H':
-		CharSet2022Designate(Dist, IdASCII);
+		CharSet2022Designate(charset_data, Dist, IdASCII);
 		break;
 	case 'I':
 		if (ts.Language==IdJapanese)
-			CharSet2022Designate(Dist, IdKatakana);
+			CharSet2022Designate(charset_data, Dist, IdKatakana);
 		break;
 	case 'J':
-		CharSet2022Designate(Dist, IdASCII);
+		CharSet2022Designate(charset_data, Dist, IdASCII);
 		break;
 	}
 
 	if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0)) {
 		/* G0->GL */
-		CharSet2022Invoke(CHARSET_LS0);
+		CharSet2022Invoke(charset_data, CHARSET_LS0);
 	}
 }
 
@@ -1498,12 +1524,12 @@ static void ParseEscape(BYTE b) /* b is the final char */
 			break;
 		case 'N': /* SS2 */
 			if (ts.ISO2022Flag & ISO2022_SS2) {
-				CharSet2022Invoke(CHARSET_SS2);
+				CharSet2022Invoke(charset_data, CHARSET_SS2);
 			}
 			break;
 		case 'O': /* SS3 */
 			if (ts.ISO2022Flag & ISO2022_SS3) {
-				CharSet2022Invoke(CHARSET_SS3);
+				CharSet2022Invoke(charset_data, CHARSET_SS3);
 			}
 			break;
 		case 'P': /* DCS */
@@ -1543,27 +1569,27 @@ static void ParseEscape(BYTE b) /* b is the final char */
 			break;
 		case 'n': /* LS2 */
 			if (ts.ISO2022Flag & ISO2022_LS2) {
-				CharSet2022Invoke(CHARSET_LS2);
+				CharSet2022Invoke(charset_data, CHARSET_LS2);
 			}
 			break;
 		case 'o': /* LS3 */
 			if (ts.ISO2022Flag & ISO2022_LS3) {
-				CharSet2022Invoke(CHARSET_LS3);
+				CharSet2022Invoke(charset_data, CHARSET_LS3);
 			}
 			break;
 		case '|': /* LS3R */
 			if (ts.ISO2022Flag & ISO2022_LS3R) {
-				CharSet2022Invoke(CHARSET_LS3R);
+				CharSet2022Invoke(charset_data, CHARSET_LS3R);
 			}
 			break;
 		case '}': /* LS2R */
 			if (ts.ISO2022Flag & ISO2022_LS2R) {
-				CharSet2022Invoke(CHARSET_LS2R);
+				CharSet2022Invoke(charset_data, CHARSET_LS2R);
 			}
 			break;
 		case '~': /* LS1R */
 			if (ts.ISO2022Flag & ISO2022_LS1R) {
-				CharSet2022Invoke(CHARSET_LS1R);
+				CharSet2022Invoke(charset_data, CHARSET_LS1R);
 			}
 			break;
 		}
@@ -1611,7 +1637,7 @@ static void EscapeSequence(BYTE b)
 		ParseControl(b);
 	else if (b>=0xA0) {
 		ParseMode=ModeFirst;
-		ParseFirst(b);
+		ParseFirst(charset_data, b);
 	}
 
 	JustAfterESC = FALSE;
@@ -1984,7 +2010,7 @@ static void CSMoveToLineN()		// VPA
 		else
 			MoveCursor(CursorX,Param[1]-1);
 	}
-	CharSetFallbackFinish();
+	CharSetFallbackFinish(charset_data);
 }
 
 static void CSMoveToXY()		// CUP / HVP
@@ -2015,7 +2041,7 @@ static void CSMoveToXY()		// CUP / HVP
 	}
 
 	MoveCursor(NewX, NewY);
-	CharSetFallbackFinish();
+	CharSetFallbackFinish(charset_data);
 }
 
 static void CSDeleteTabStop()
@@ -2936,16 +2962,16 @@ static void CSQ_h_Mode() // DECSET
 		  case 59:
 			if (ts.Language==IdJapanese) {
 				/* kanji terminal */
-				CharSet2022Designate(0, IdASCII);
-				CharSet2022Designate(1, IdKatakana);
-				CharSet2022Designate(2, IdKatakana);
-				CharSet2022Designate(3, IdKanji);
-				CharSet2022Invoke(CHARSET_LS0);
+				CharSet2022Designate(charset_data, 0, IdASCII);
+				CharSet2022Designate(charset_data, 1, IdKatakana);
+				CharSet2022Designate(charset_data, 2, IdKatakana);
+				CharSet2022Designate(charset_data, 3, IdKanji);
+				CharSet2022Invoke(charset_data, CHARSET_LS0);
 				if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
 					// 8-bit katakana
-					CharSet2022Invoke(CHARSET_LS2R);
+					CharSet2022Invoke(charset_data, CHARSET_LS2R);
 				else
-					CharSet2022Invoke(CHARSET_LS3R);
+					CharSet2022Invoke(charset_data, CHARSET_LS3R);
 			}
 			break;
 		  case 66: AppliKeyMode = TRUE; break;		// DECNKM
@@ -3106,16 +3132,16 @@ static void CSQ_l_Mode()		// DECRST
 		  case 59:
 			if (ts.Language==IdJapanese) {
 				/* katakana terminal */
-				CharSet2022Designate(0, IdASCII);
-				CharSet2022Designate(1, IdKatakana);
-				CharSet2022Designate(2, IdKatakana);
-				CharSet2022Designate(3, IdKanji);
-				CharSet2022Invoke(CHARSET_LS0);
+				CharSet2022Designate(charset_data, 0, IdASCII);
+				CharSet2022Designate(charset_data, 1, IdKatakana);
+				CharSet2022Designate(charset_data, 2, IdKatakana);
+				CharSet2022Designate(charset_data, 3, IdKanji);
+				CharSet2022Invoke(charset_data, CHARSET_LS0);
 				if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
 					// 8-bit katakana
-					CharSet2022Invoke(CHARSET_LS2R);
+					CharSet2022Invoke(charset_data, CHARSET_LS2R);
 				else
-					CharSet2022Invoke(CHARSET_LS3R);
+					CharSet2022Invoke(charset_data, CHARSET_LS3R);
 			}
 			break;
 		  case 66: AppliKeyMode = FALSE; break;		// DECNKM
@@ -4152,7 +4178,7 @@ static void ControlSequence(BYTE b)
 		}
 		else if (b>0xA0) {
 			ParseMode=ModeFirst;
-			ParseFirst(b);
+			ParseFirst(charset_data, b);
 		}
 	}
 	FirstPrm = FALSE;
@@ -5353,7 +5379,7 @@ int VTParse()
 #endif
 		switch (ParseMode) {
 		case ModeFirst:
-			ParseFirst(b);
+			ParseFirst(charset_data, b);
 			break;
 		case ModeESC:
 			EscapeSequence(b);
@@ -5384,7 +5410,7 @@ int VTParse()
 			break;
 		default:
 			ParseMode = ModeFirst;
-			ParseFirst(b);
+			ParseFirst(charset_data, b);
 		}
 
 		PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
@@ -5756,6 +5782,8 @@ void EndTerm()
 		_free_locale(CLocale);
 	}
 	CLocale = NULL;
+	CharSetFinish(charset_data);
+	charset_data = NULL;
 }
 
 BOOL BracketedPasteMode() {
@@ -5857,4 +5885,14 @@ BOOL TermGetAutoWrapMode(void)
 void TermSetAutoWrapMode(BOOL auto_wrap_mode)
 {
 	AutoWrapMode = auto_wrap_mode;
+}
+
+void TermSetNextDebugMode(void)
+{
+	CharSetSetNextDebugMode(charset_data);
+}
+
+void TermSetDebugMode(BYTE mode)
+{
+	CharSetSetDebugMode(charset_data, mode);
 }

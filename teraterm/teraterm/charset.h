@@ -26,20 +26,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "ttcstd.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct CharSetDataTag CharSetData;
 
 typedef struct {
 	int infos[6];
 } CharSetState;
 
-// input
-void ParseFirst(BYTE b);
+// ï∂éöÇÃèoóÕ
+typedef struct CharSetOpTag {
+	// èoóÕÇ≥ÇÍÇÈ Unicode ï∂éö
+	void (*PutU32)(char32_t code, void *client_data);
+	// èoóÕÇ≥ÇÍÇÈ Control ï∂éö
+	void (*ParseControl)(BYTE b, void *client_data);
+} CharSetOp;
 
-// output buffer
-void PutU32(unsigned int code);
-void ParseControl(BYTE b);
+// input
+void ParseFirst(CharSetData *w, BYTE b);
 
 // control
 typedef enum {
@@ -53,13 +61,15 @@ typedef enum {
 	CHARSET_SS2,	// Single Shift 2, SS2, 8E, ESC N, 1B 4E
 	CHARSET_SS3,	// Single Shift 3, SS3, 8F, ESC O, 1B 4F
 } CharSet2022Shift;
-void CharSetInit(void);
-void CharSet2022Designate(int gn, int cs);
-void CharSet2022Invoke(CharSet2022Shift shift);
-BOOL CharSetIsSpecial(BYTE b);
-void CharSetSaveState(CharSetState *state);
-void CharSetLoadState(const CharSetState *state);
-void CharSetFallbackFinish(void);
+
+CharSetData *CharSetInit(const CharSetOp *op, void *client_data);
+void CharSetFinish(CharSetData *w);
+void CharSet2022Designate(CharSetData *w, int gn, int cs);
+void CharSet2022Invoke(CharSetData *w, CharSet2022Shift shift);
+BOOL CharSetIsSpecial(CharSetData *w, BYTE b);
+void CharSetSaveState(CharSetData *w, CharSetState *state);
+void CharSetLoadState(CharSetData *w, const CharSetState *state);
+void CharSetFallbackFinish(CharSetData *w);
 
 // debug mode
 #define DEBUG_FLAG_NONE  0
@@ -67,9 +77,9 @@ void CharSetFallbackFinish(void);
 #define DEBUG_FLAG_HEXD  2
 #define DEBUG_FLAG_NOUT  3
 #define DEBUG_FLAG_MAXD  4
-void CharSetSetNextDebugMode(void);
-//BYTE CharSetGetDebugMode(void);
-void CharSetSetDebugMode(BYTE mode);
+void CharSetSetNextDebugMode(CharSetData *w);
+//BYTE CharSetGetDebugMode(CharSetData *w);
+void CharSetSetDebugMode(CharSetData *w, BYTE mode);
 
 #ifdef __cplusplus
 }
