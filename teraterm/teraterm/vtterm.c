@@ -4885,6 +4885,65 @@ static void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYT
 	}
 }
 
+typedef struct {
+	wchar_t *ptr;	// 変換後文字列バッファへのポインタ
+	size_t index;	// バッファ内に入っている文字数
+	size_t size;	// バッファサイズ
+} CharSetBuf;
+
+static void PutU32Buf(char32_t code, void *client_data)
+{
+	CharSetBuf *bufdata = (CharSetBuf *)client_data;
+	if (bufdata->index + 2 > bufdata->size) {
+		// バッファサイズを拡張する
+		const size_t add_size = 4;
+		wchar_t *new_ptr = (wchar_t *)realloc(bufdata->ptr, sizeof(wchar_t) * (bufdata->size + add_size));
+		if (new_ptr == NULL) {
+			return;
+		}
+		bufdata->size += add_size;
+		bufdata->ptr = new_ptr;
+	}
+	if (bufdata->index < bufdata->size) {
+		// UTF-16に変換してバッファに入れる
+		wchar_t *w16_str = &bufdata->ptr[bufdata->index];
+		size_t u16_len = UTF32ToUTF16(code, w16_str, 2);
+		bufdata->index += u16_len;
+	}
+}
+
+static void ParseControlBuf(BYTE b, void *client_data)
+{
+	PutU32Buf(b, client_data);
+}
+
+/**
+ *	受信文字列をUTF16文字列に変換する
+ *
+ *	@param	ptr		文字列
+ *	@param	len		文字列長(\nを含まない)
+ *	@retval			変換された文字列(不要になったらfree()すること)
+ *
+ */
+static wchar_t *ConvertUTF16(const BYTE *ptr, size_t len)
+{
+	CharSetOp op;
+	op.PutU32 = PutU32Buf;
+	op.ParseControl = ParseControlBuf;
+	CharSetBuf b;
+	b.size = 32;
+	b.ptr = (wchar_t *)malloc(sizeof(wchar_t) * b.size);
+	b.index = 0;
+	CharSetData *h = CharSetInit(&op, &b);
+	for (size_t i = 0; i < len; i++) {
+		BYTE c = *ptr++;
+		ParseFirst(h, c);
+	}
+	CharSetFinish(h);
+	PutU32Buf(0, &b);
+	return b.ptr;
+}
+
 static void XsProcClipboard(PCHAR buff)
 {
 	char *p;
@@ -4970,66 +5029,6 @@ static void XsProcClipboard(PCHAR buff)
 	}
 }
 
-
-// タイトルバーのCP932への変換を行う
-// 現在、SJIS、EUCのみに対応。
-// (2005.3.13 yutaka)
-static void ConvertToCP932(char *str, int destlen)
-{
-#define IS_SJIS(n) (ts.KanjiCode == IdSJIS && IsDBCSLeadByte(n))
-#define IS_EUC(n) (ts.KanjiCode == IdEUC && (n & 0x80))
-	extern WORD PASCAL JIS2SJIS(WORD KCode);
-	size_t len = strlen(str);
-	char *cc = _alloca(len + 1);
-	char *c = cc;
-	size_t i;
-	unsigned char b;
-	WORD word;
-
-	if (ts.Language == IdJapanese) {
-		for (i = 0 ; i < len ; i++) {
-			b = str[i];
-			if (IS_SJIS(b) || IS_EUC(b)) {
-				word = b<<8;
-
-				if (i == len - 1) {
-					*c++ = b;
-					continue;
-				}
-
-				b = str[i + 1];
-				word |= b;
-				i++;
-
-				if (ts.KanjiCode == IdSJIS) {
-					// SJISはそのままCP932として出力する
-
-				} else if (ts.KanjiCode == IdEUC) {
-					// EUC -> SJIS
-					word &= ~0x8080;
-					word = JIS2SJIS(word);
-
-				} else if (ts.KanjiCode == IdJIS) {
-
-				} else if (ts.KanjiCode == IdUTF8) {
-
-				} else {
-
-				}
-
-				*c++ = word >> 8;
-				*c++ = word & 0xff;
-
-			} else {
-				*c++ = b;
-			}
-		}
-
-		*c = '\0';
-		strncpy_s(str, destlen, cc, _TRUNCATE);
-	}
-}
-
 static void XSequence(BYTE b)
 {
 	static char *StrBuff = NULL;
@@ -5077,19 +5076,13 @@ static void XSequence(BYTE b)
 		  case 1: /* Change icon name */
 		  case 2: /* Change window title */
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
-				if (ts.KanjiCode == IdUTF8 || ts.Language == IdUtf8) {
-					char *titleTmp;
-
-					titleTmp = ToCharU8(StrBuff);
-					if (titleTmp) {
-						strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), titleTmp, _TRUNCATE);
-						free(titleTmp);
-					}
-				}
-				else {
-					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
-					// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
-					ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
+				size_t len = strlen(StrBuff);
+				wchar_t *titleW = ConvertUTF16(StrBuff, len);
+				char *titleA = ToCharW(titleW);
+				free(titleW);
+				if (titleA) {
+					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), titleA, _TRUNCATE);
+					free(titleA);
 				}
 				ChangeTitle();
 			}
