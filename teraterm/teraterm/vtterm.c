@@ -4993,29 +4993,27 @@ static void XsProcClipboard(PCHAR buff)
 			}
 			cbbuff[len] = 0;
 
+			// cbbuff を wchar_t へ変換
+			wchar_t *cbbuffW = ConvertUTF16(cbbuff, len);
+			free(cbbuff);
+			cbbuff = NULL;
+
 			if (ts.NotifyClipboardAccess) {
 				wchar_t *buf;
 				GetI18nStrWW("Tera Term", "MSG_CBACCESS_TITLE",
 				             L"Clipboard Access", ts.UILanguageFileW, &notify_title);
 				GetI18nStrWW("Tera Term", "MSG_CBACCESS_WRITE",
 							 L"Remote host wirtes clipboard.", ts.UILanguageFileW, &buf);
-				aswprintf(&notify_buff, L"%s\n--\n%hs", buf, cbbuff);
+				aswprintf(&notify_buff, L"%s\n--\n%s", buf, cbbuffW);
 				NotifyInfoMessageW(&cv, notify_buff, notify_title);
 				free(buf);
 				free(notify_title);
 				free(notify_buff);
 			}
 
-			// cbbuff に入っている文字列をクリップボードにセットする
-			{
-				// wchar_t へ変換して設定
-				//	とりあえずUTF-8 が入っている前提
-				// 	TODO 受信文字コードに合わせて変更すればok?
-				wchar_t *cbbuffW = ToWcharU8(cbbuff);
-				CBSetTextW(NULL, cbbuffW, 0);
-				free(cbbuffW);
-			}
-			free(cbbuff);
+			// cbbuffW をクリップボードにセットする
+			CBSetTextW(NULL, cbbuffW, 0);
+			free(cbbuffW);
 		}
 		else if (ts.NotifyClipboardAccess) {
 			GetI18nStrWW("Tera Term", "MSG_CBACCESS_REJECT_TITLE",
