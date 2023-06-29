@@ -4318,7 +4318,8 @@ void CVTWindow::OnSetupWindow()
 		// タイトルが変更されていたら、リモートタイトルをクリアする
 		if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
 		    (strcmp(orgTitle, ts.Title) != 0)) {
-			cv.TitleRemote[0] = '\0';
+			free(cv.TitleRemoteW);
+			cv.TitleRemoteW = NULL;
 		}
 
 		ChangeFont();
@@ -4729,7 +4730,8 @@ void CVTWindow::OnControlResetTerminal()
 
 void CVTWindow::OnControlResetRemoteTitle()
 {
-	cv.TitleRemote[0] = '\0';
+	free(cv.TitleRemoteW);
+	cv.TitleRemoteW = NULL;
 	ChangeTitle();
 }
 

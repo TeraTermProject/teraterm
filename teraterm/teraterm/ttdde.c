@@ -669,7 +669,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSetTitle:
 		strncpy_s(ts.Title, sizeof(ts.Title),ParamFileName, _TRUNCATE);
 		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
-			cv.TitleRemote[0] = '\0';
+			free(cv.TitleRemoteW);
+			cv.TitleRemoteW = NULL;
 		}
 		ChangeTitle();
 		break;

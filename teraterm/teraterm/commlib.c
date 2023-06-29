@@ -136,7 +136,7 @@ void CommInit(PComVar cv)
 	cv->NoMsg = 0;
 
 	cv->isSSH = 0;
-	cv->TitleRemote[0] = '\0';
+	cv->TitleRemoteW = NULL;
 
 	cv->NotifyIcon = NULL;
 

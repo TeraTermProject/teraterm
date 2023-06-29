@@ -150,7 +150,7 @@ static int ParseMode;
 static int ChangeEmu;
 
 typedef struct tstack {
-	char *title;
+	wchar_t *title;
 	struct tstack *next;
 } TStack;
 typedef TStack *PTStack;
@@ -575,6 +575,34 @@ static void SendCSIstr(char *str, int len)
 		CommBinaryOut(&cv,"\033[", 2);
 
 	CommBinaryOut(&cv, str, l);
+}
+
+static void SendOSCstrW(const wchar_t *str, char TermChar)
+{
+	size_t len;
+
+	if (str == NULL) {
+		return;
+	}
+
+	len = wcslen(str);
+
+	if (TermChar == BEL) {
+		CommBinaryOut(&cv,"\033]", 2);
+		CommTextOutW(&cv, str, len);
+		CommBinaryOut(&cv,"\007", 1);
+	}
+	else if (Send8BitMode) {
+		CommBinaryOut(&cv,"\235", 1);
+		CommTextOutW(&cv, str, len);
+		CommBinaryOut(&cv,"\234", 1);
+	}
+	else {
+		CommBinaryOut(&cv,"\033]", 2);
+		CommTextOutW(&cv, str, len);
+		CommBinaryOut(&cv,"\033\\", 2);
+	}
+
 }
 
 static void SendOSCstr(char *str, int len, char TermChar)
@@ -2508,7 +2536,6 @@ static void CSSunSequence() /* Sun terminal private sequences */
 {
 	int x, y, len;
 	char Report[TitleBuffSize*2+10];
-	PTStack t;
 
 	switch (Param[1]) {
 	  case 1: // De-iconify window
@@ -2675,30 +2702,35 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			// nothing to do
 			break;
 
-		  case IdTitleReportAccept:
+		  case IdTitleReportAccept: {
+			wchar_t *osc_str;
+			const wchar_t *remote = (cv.TitleRemoteW == NULL) ? L"" : cv.TitleRemoteW;
 			switch (ts.AcceptTitleChangeRequest) {
 			  case IdTitleChangeRequestOff:
-				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
+				aswprintf(&osc_str, L"L%hs", ts.Title);
 				break;
 
 			  case IdTitleChangeRequestAhead:
-				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, cv.TitleRemote, ts.Title);
+				aswprintf(&osc_str, L"L%s %hs", remote, ts.Title);
 				break;
 
 			  case IdTitleChangeRequestLast:
-				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, ts.Title, cv.TitleRemote);
+				aswprintf(&osc_str, L"L%hs %s", ts.Title, remote);
 				break;
 
 			  default:
-				if (cv.TitleRemote[0] == 0) {
-					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
+				if (cv.TitleRemoteW == NULL) {
+					aswprintf(&osc_str, L"L%hs", ts.Title);
 				}
 				else {
-					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, cv.TitleRemote);
+					aswprintf(&osc_str, L"L%s", remote);
 				}
+				break;
 			}
-			SendOSCstr(Report, len, ST);
+			SendOSCstrW(osc_str, ST);
+			free(osc_str);
 			break;
+		  }
 
 		  default: // IdTitleReportEmpty:
 			SendOSCstr("L", 0, ST);
@@ -2712,30 +2744,34 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			// nothing to do
 			break;
 
-		  case IdTitleReportAccept:
+		  case IdTitleReportAccept: {
+			wchar_t *osc_str;
+			wchar_t *remote = (cv.TitleRemoteW == NULL) ? L"" : cv.TitleRemoteW;
 			switch (ts.AcceptTitleChangeRequest) {
 			  case IdTitleChangeRequestOff:
-				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
+				aswprintf(&osc_str, L"l%hs", ts.Title);
 				break;
 
 			  case IdTitleChangeRequestAhead:
-				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, cv.TitleRemote, ts.Title);
+				aswprintf(&osc_str, L"l%s %hs", remote, ts.Title);
 				break;
 
 			  case IdTitleChangeRequestLast:
-				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, ts.Title, cv.TitleRemote);
+				aswprintf(&osc_str, L"l%hs %s", ts.Title, remote);
 				break;
 
 			  default:
-				if (cv.TitleRemote[0] == 0) {
-					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
+				if (cv.TitleRemoteW == NULL) {
+					aswprintf(&osc_str, L"l%hs", ts.Title);
 				}
 				else {
-					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, cv.TitleRemote);
+					aswprintf(&osc_str, L"l%s", cv.TitleRemoteW);
 				}
 			}
-			SendOSCstr(Report, len, ST);
+			SendOSCstrW(osc_str, ST);
+			free(osc_str);
 			break;
+		  }
 
 		  default: // IdTitleReportEmpty:
 			SendOSCstr("l", 0, ST);
@@ -2748,9 +2784,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 		switch (Param[2]) {
 		  case 0:
 		  case 1:
-		  case 2:
+		  case 2: {
+			PTStack t;
 			if (ts.AcceptTitleChangeRequest && (t=malloc(sizeof(TStack))) != NULL) {
-				if ((t->title = _strdup(cv.TitleRemote)) != NULL) {
+				if ((t->title = _wcsdup(cv.TitleRemoteW)) != NULL) {
 					t->next = TitleStack;
 					TitleStack = t;
 				}
@@ -2759,6 +2796,7 @@ static void CSSunSequence() /* Sun terminal private sequences */
 				}
 			}
 			break;
+		  }
 		}
 		break;
 
@@ -2767,16 +2805,18 @@ static void CSSunSequence() /* Sun terminal private sequences */
 		switch (Param[2]) {
 		  case 0:
 		  case 1:
-		  case 2:
+		  case 2: {
 			if (ts.AcceptTitleChangeRequest && TitleStack != NULL) {
+				PTStack t;
 				t = TitleStack;
 				TitleStack = t->next;
-				strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), t->title, _TRUNCATE);
+				free(cv.TitleRemoteW);
+				cv.TitleRemoteW = t->title;
 				ChangeTitle();
-				free(t->title);
 				free(t);
 			}
 			break;
+		  }
 		}
 	}
 }
@@ -4921,7 +4961,7 @@ static void ParseControlBuf(BYTE b, void *client_data)
  *	óM•¶š—ñ‚ğUTF16•¶š—ñ‚É•ÏŠ·‚·‚é
  *
  *	@param	ptr		•¶š—ñ
- *	@param	len		•¶š—ñ’·(\n‚ğŠÜ‚Ü‚È‚¢)
+ *	@param	len		•¶š—ñ’·('\0'‚ğŠÜ‚Ü‚È‚¢)
  *	@retval			•ÏŠ·‚³‚ê‚½•¶š—ñ(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ)
  *
  */
@@ -5076,12 +5116,8 @@ static void XSequence(BYTE b)
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
 				size_t len = strlen(StrBuff);
 				wchar_t *titleW = ConvertUTF16(StrBuff, len);
-				char *titleA = ToCharW(titleW);
-				free(titleW);
-				if (titleA) {
-					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), titleA, _TRUNCATE);
-					free(titleA);
-				}
+				free(cv.TitleRemoteW);
+				cv.TitleRemoteW = titleW;
 				ChangeTitle();
 			}
 			break;

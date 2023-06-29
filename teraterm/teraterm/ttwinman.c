@@ -94,10 +94,9 @@ void ChangeTitle(void)
 
 	{
 		wchar_t *title = ToWcharA(ts.Title);
-		wchar_t *title_remote = ToWcharA(cv.TitleRemote);
+		const wchar_t *title_remote = cv.TitleRemoteW;
 		if (title_remote == NULL) {
-			// TODO cv.TitleRemote Ç™ strncpy_s() Ç≈ïsê≥Ç»ï∂éöÇ™ä‹Ç‹ÇÍÇΩÇ∆Ç´ NULL Ç™ï‘ÇÈ
-			title_remote = _wcsdup(L"-");
+			title_remote = L"-";
 		}
 		if (Connecting || !cv.Ready || wcslen(title_remote) == 0) {
 			wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
@@ -122,7 +121,6 @@ void ChangeTitle(void)
 			wcsncpy_s(TempTitle, _countof(TempTitle), TempTitleWithRemote, _TRUNCATE);
 		}
 		free(title);
-		free(title_remote);
 	}
 
 	if ((ts.TitleFormat & 1)!=0)

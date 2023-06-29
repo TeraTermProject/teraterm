@@ -853,7 +853,7 @@ typedef struct {
 
 	time_t LastSendTime;
 	WORD isSSH;
-	char TitleRemote[TitleBuffSize];
+	char reserve_TitleRemote[50];	// 50 = TitleBuffSize
 
 	BYTE LineModeBuff[OutBuffSize];
 	int LineModeBuffCount, FlushLen;
@@ -872,6 +872,8 @@ typedef struct {
 	void (*LogBinSkip)(int add);
 
 	TTTSet *ts;
+
+	wchar_t *TitleRemoteW;
 } TComVar;
 typedef TComVar *PComVar;
 
