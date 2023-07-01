@@ -89,9 +89,10 @@
 #define DecLocatorButtonUp   8
 #define DecLocatorFiltered   16
 
-void RingBell(int type);
-void VisualBell();
-BOOL DecLocatorReport(int Event, int Button);
+static void RingBell(int type);
+static void VisualBell(void);
+static BOOL DecLocatorReport(int Event, int Button);
+static CharSetData *CharSetInitTerm(void);
 
 /* character attribute */
 static TCharAttr CharAttr;
@@ -137,7 +138,6 @@ static char32_t LastPutCharacter;
 static TStatusBuff SBuff1, SBuff2, SBuff3;
 
 static BOOL ESCFlag, JustAfterESC;
-static BOOL Special;
 
 static int Param[NParamMax+1];
 static int SubParam[NParamMax+1][NSParamMax+1];
@@ -274,7 +274,6 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	/* Attribute */
 	CharAttr = DefCharAttr;
-	Special = FALSE;
 	BuffSetCurCharAttr(CharAttr);
 
 	/* Various modes */
@@ -358,8 +357,6 @@ void ResetTerminal() /*reset variables but don't update screen */
 		vtterm->log_cr_type = 0;
 	}
 }
-
-static CharSetData *CharSetInitTerm(void);
 
 void ResetCharSet()
 {
@@ -738,136 +735,125 @@ static void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
  */
 static void PutU32NoLog(unsigned int code)
 {
-	unsigned short cset;
 	int LineEnd;
-
 	TCharAttr CharAttrTmp;
+	BOOL dec_special = FALSE;
+	int r;
+
 	CharAttrTmp = CharAttr;
 	LastPutCharacter = code;
 
-	{
-		int r;
-		BOOL SpecialNew = FALSE;
+	if (code <= 0xff) {
+		dec_special = CharSetIsSpecial(charset_data, code);
+	}
 
-		if (code <= 0xff) {
-			SpecialNew = CharSetIsSpecial(charset_data, code);
-			if (SpecialNew) {
-				code = code & 0x7F;
-			}
+	// UnicodeからDEC特殊文字へのマッピング
+	if (dec_special == FALSE && ts.UnicodeDecSpMapping) {
+		unsigned short cset;
+		cset = UTF32ToDecSp(code);
+		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+			dec_special = TRUE;
+			code = cset & 0xff;
+		}
+	}
+
+	if (dec_special) {
+		CharAttrTmp.Attr |= AttrSpecial;
+	}
+	else {
+		CharAttrTmp.Attr |= CharAttr.Attr;
+	}
+
+	if (CursorX > CursorRightM)
+		LineEnd = NumOfColumns - 1;
+	else
+		LineEnd = CursorRightM;
+
+	// Wrap処理、カーソル移動
+	if (Wrap) {
+		// 現在 Wrap 状態
+		if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
+			// 文字コードが結合文字ではない = カーソルが移動する
+
+			// カーソル位置に行継続アトリビュートを追加
+			TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
+			t.Attr |= AttrLineContinued;
+			t.AttrEx = t.Attr;
+			BuffSetCursorCharAttr(CursorX, CursorY, t);
+
+			// 行継続アトリビュートをつける
+			CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+
+			// 次の行の行頭へ
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+		}
+	}
+
+	// バッファに文字を入れる
+	//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
+	//		エラー時はカーソル位置を検討する
+	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
+retry:
+	r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
+	if (r == -1) {
+		// 文字全角で行末、入力できない
+
+		if (AutoWrapMode) {
+			// 自動改行
+			// 、wrap処理
+			CharAttrTmp = CharAttr;
+			CharAttrTmp.Attr |= AttrLineContinued;
+			CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
+			// AutoWrapMode
+			// ts.EnableContinuedLineCopy
+			//if (CursorX != LineEnd){
+			//&& BuffIsHalfWidthFromCode(&ts, code)) {
+
+			// full width出力が半分出力にならないように0x20を出力
+			BuffPutUnicode(0x20, CharAttrTmp, FALSE);
+			CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
+
+			// 次の行の行頭へ
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+		}
+		else {
+			// 行頭に戻す
+			CursorX = 0;
 		}
 
-		// UnicodeからDEC特殊文字へのマッピング
-		if (SpecialNew == FALSE && ts.UnicodeDecSpMapping) {
-			cset = UTF32ToDecSp(code);
-			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-				SpecialNew = TRUE;
-				code = cset & 0xff;
-			}
-		}
-
-		if (SpecialNew != Special) {
+		//CharAttrTmp.Attr &= ~AttrLineContinued;
+		goto retry;
+	}
+	else if (r == 0) {
+		// カーソルの移動なし,結合文字,合字など
+		// Wrap は変化しない
+		UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
+	} else if (r == 1) {
+		// 半角(1セル)
+		if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
 			UpdateStr();
-			Special = SpecialNew;
+			Wrap = AutoWrapMode;
+		} else {
+			MoveRight();
+			Wrap = FALSE;
 		}
-
-		if (Special) {
-			CharAttrTmp.Attr |= AttrSpecial;
+	} else if (r == 2) {
+		// 全角(2セル)
+		if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
+			MoveRight();	// 全角の右側にカーソル移動
+			UpdateStr();
+			Wrap = AutoWrapMode;
+		} else {
+			MoveRight();
+			MoveRight();
+			Wrap = FALSE;
 		}
-		else {
-			CharAttrTmp.Attr |= CharAttr.Attr;
-		}
-
-		if (CursorX > CursorRightM)
-			LineEnd = NumOfColumns - 1;
-		else
-			LineEnd = CursorRightM;
-
-		// Wrap処理、カーソル移動
-		if (Wrap) {
-			// 現在 Wrap 状態
-			if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
-				// 文字コードが結合文字ではない = カーソルが移動する
-
-				// カーソル位置に行継続アトリビュートを追加
-				TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
-				t.Attr |= AttrLineContinued;
-				t.AttrEx = t.Attr;
-				BuffSetCursorCharAttr(CursorX, CursorY, t);
-
-				// 行継続アトリビュートをつける
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-
-				// 次の行の行頭へ
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-		}
-
-		// バッファに文字を入れる
-		//	BuffPutUnicode()した戻り値で文字のセル数を知ることができる
-		//		エラー時はカーソル位置を検討する
-		CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-	retry:
-		r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
-		if (r == -1) {
-			// 文字全角で行末、入力できない
-
-			if (AutoWrapMode) {
-				// 自動改行
-				// 、wrap処理
-				CharAttrTmp = CharAttr;
-				CharAttrTmp.Attr |= AttrLineContinued;
-				CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
-				// AutoWrapMode
-				// ts.EnableContinuedLineCopy
-				//if (CursorX != LineEnd){
-				//&& BuffIsHalfWidthFromCode(&ts, code)) {
-
-				// full width出力が半分出力にならないように0x20を出力
-				BuffPutUnicode(0x20, CharAttrTmp, FALSE);
-				CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
-
-				// 次の行の行頭へ
-				CarriageReturn(FALSE);
-				LineFeed(LF,FALSE);
-			}
-			else {
-				// 行頭に戻す
-				CursorX = 0;
-			}
-
-			//CharAttrTmp.Attr &= ~AttrLineContinued;
-			goto retry;
-		}
-		else if (r == 0) {
-			// カーソルの移動なし,結合文字,合字など
-			// Wrap は変化しない
-			UpdateStr();	// 「ほ」->「ぽ」など、変化することがあるので描画する
-		} else if (r == 1) {
-			// 半角(1セル)
-			if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
-				UpdateStr();
-				Wrap = AutoWrapMode;
-			} else {
-				MoveRight();
-				Wrap = FALSE;
-			}
-		} else if (r == 2) {
-			// 全角(2セル)
-			if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
-				MoveRight();	// 全角の右側にカーソル移動
-				UpdateStr();
-				Wrap = AutoWrapMode;
-			} else {
-				MoveRight();
-				MoveRight();
-				Wrap = FALSE;
-			}
-		}
-		else {
-			assert(FALSE);
-		}
+	}
+	else {
+		assert(FALSE);
 	}
 }
 
@@ -897,105 +883,6 @@ static void RepeatChar(char32_t b, int count)
 	}
 }
 
-#if 0
-static void PutChar(BYTE b)
-{
-	BOOL SpecialNew;
-	TCharAttr CharAttrTmp;
-
-	CharAttrTmp = CharAttr;
-
-	LastPutCharacter = b;
-
-	if (PrinterMode) { // printer mode
-		WriteToPrnFile(PrintFile_, b,TRUE);
-		return;
-	}
-
-	if (Wrap) {
-		TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
-		t.Attr |= AttrLineContinued;
-		t.AttrEx = t.Attr;
-		BuffSetCursorCharAttr(CursorX, CursorY, t);
-		CarriageReturn(FALSE);
-		LineFeed(LF,FALSE);
-		CharAttrTmp.Attr |= AttrLineContinued;
-		t.AttrEx = t.Attr;
-	}
-
-	if (NeedsOutputBufs()) {
-		// (2005.2.20 yutaka)
-		if (ts.LogTypePlainText) {
-			if (__isascii(b) && !isprint(b)) {
-				// ASCII文字で、非表示な文字はログ採取しない。
-			} else {
-				OutputLogByte(b);
-			}
-		} else {
-			OutputLogByte(b);
-		}
-	}
-
-	Wrap = FALSE;
-
-	SpecialNew = CharSetIsSpecial(b);
-	if (SpecialNew != Special) {
-		UpdateStr();
-		Special = SpecialNew;
-	}
-
-	if (Special) {
-		b = b & 0x7F;
-		CharAttrTmp.Attr |= AttrSpecial;
-	}
-	else
-		CharAttrTmp.Attr |= CharAttr.Attr;
-
-#if 0
-	if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
-		CharAttrTmp.Attr |= AttrLineContinued;
-	}
-#endif
-
-	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
-	if (ts.Language == IdJapanese) {
-		unsigned long u32;
-		switch (ts.KanjiCode) {
-//		case IdJIS:
-//			b = JIS2SJIS(b);
-		case IdSJIS:
-			u32 = MBCP_UTF32(b, 932);
-			BuffPutUnicode(u32, CharAttrTmp, InsertMode);
-			break;
-		case IdUTF8:
-			BuffPutUnicode(b, CharAttrTmp, InsertMode);
-			break;
-		default:
-			BuffPutUnicode(b, CharAttrTmp, InsertMode);
-			break;
-		}
-#if 0
-	} else if (ts.Language == IdRussian) {
-		assert(FALSE);
-		// CP1251に変換
-		BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
-		// CP1251->Unicode
-		unsigned long u32 = MBCP_UTF32(c, 1251);
-		BuffPutUnicode(u32, CharAttrTmp, InsertMode);
-#endif
-	} else {
-		BuffPutUnicode(b, CharAttrTmp, InsertMode);
-	}
-
-	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
-		UpdateStr();
-		Wrap = AutoWrapMode;
-	}
-	else {
-		MoveRight();
-	}
-}
-#endif
 static void PutChar(BYTE b)
 {
 	PutU32(b);
@@ -3294,7 +3181,6 @@ static void SoftReset()
 
 	/* Attribute */
 	CharAttr = DefCharAttr;
-	Special = FALSE;
 	BuffSetCurCharAttr(CharAttr);
 
 	// status buffers
@@ -5475,7 +5361,8 @@ int MakeLocatorReportStr(char *buff, size_t buffsize, int event, int x, int y) {
 	}
 }
 
-BOOL DecLocatorReport(int Event, int Button) {
+static BOOL DecLocatorReport(int Event, int Button)
+{
 	int x, y, MaxX, MaxY, len = 0;
 	char buff[24];
 
@@ -5757,13 +5644,15 @@ void FocusReport(BOOL focus) {
 	}
 }
 
-void VisualBell() {
+static void VisualBell(void)
+{
 	CSQExchangeColor();
 	Sleep(10);
 	CSQExchangeColor();
 }
 
-void RingBell(int type) {
+static void RingBell(int type)
+{
 	DWORD now;
 
 	now = GetTickCount();
