@@ -256,6 +256,7 @@ u   Unicode + UTF-8
 s   Shift_JIS
 e   Japanese/EUC (EUC-JP)
 j   JIS 8bit
+d   DEC Special Graphics
 q   quit
 EOF
 	print "> ";
@@ -307,6 +308,14 @@ EOF
 			ShowCode('jis', 0x00, 0x7f);
 			print "C1(0x80-0x9F) & GR(0xA0-0xFF):\n";
 			ShowCode('jis', 0x80, 0xff);
+		} elsif ($c eq 'd') {
+			print "DEC Special Graphics, GL, 0x5F-0x7F\n";
+			# 5F-7F以外はASCII
+			$invoke_enter = "\x1b(0";
+			$invoke_leave = "\x1b(B";
+			ShowCode('utf8', 0x00, 0x7f);
+			$invoke_enter = "";
+			$invoke_leave = "";
 		} else {
 			print " ?\n"
 		}
