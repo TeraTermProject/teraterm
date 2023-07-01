@@ -556,7 +556,7 @@ static void PutReplacementChr(CharSetData *w, const BYTE *ptr, size_t len, BOOL 
 	int i;
 	for (i = 0; i < len; i++) {
 		BYTE c = *ptr++;
-		assert(IsC0(c));
+		assert(!IsC0(c));
 		if (fallback) {
 			// fallback ISO8859-1
 			w->Op.PutU32(c, w->ClientData);
