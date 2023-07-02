@@ -466,7 +466,7 @@ struct tttset {
 	char reserve_LogDefaultPath[MAX_PATH];	// îpé~,LogDefaultPathW Ç÷à⁄çs
 	WORD LogAutoStart;
 	unsigned int PasteFlag;
-	WORD FallbackToCP932;	// ConfirmPasteMouseRButton Ç™îpé~Ç…Ç»Ç¡ÇΩÇÃÇ≈ì]óp
+	WORD UTF8Fallback;
 	WORD DisableAcceleratorSendBreak;
 	int EnableClickableUrl;
 	eterm_lookfeel_t EtermLookfeel;

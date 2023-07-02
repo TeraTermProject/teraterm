@@ -2049,8 +2049,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->SelectStartDelay =
 		GetPrivateProfileInt(Section, "MouseSelectStartDelay", 0, FName);
 
-	// Fallback to CP932 (Experimental)
-	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
+	// UTF8 Fallback (Experimental)
+	ts->UTF8Fallback = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
+	ts->UTF8Fallback = GetOnOff(Section, "UTF8Fallback", FName, ts->UTF8Fallback);
 
 	// dialog font
 	ReadFont3(L"Tera Term", L"DlgFont", NULL, FName,

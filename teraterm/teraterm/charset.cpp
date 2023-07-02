@@ -212,7 +212,7 @@ static BOOL CheckKanji(CharSetData *w, BYTE b)
 	w->ConvJIS = FALSE;
 
 	if (ts.KanjiCode==IdSJIS ||
-	   (ts.FallbackToCP932 && ts.KanjiCode==IdUTF8)) {
+	   (ts.UTF8Fallback && ts.KanjiCode==IdUTF8)) {
 		if (((0x80<b) && (b<0xa0)) || ((0xdf<b) && (b<0xfd))) {
 			w->Fallbacked = TRUE;
 			return TRUE; // SJIS kanji
@@ -639,7 +639,7 @@ recheck:
 
 		// 0x80 - 0xc1, 0xf5 - 0xff
 		// UTF-8で1byteに出現しないコードのとき
-		if (ts.FallbackToCP932) {
+		if (ts.UTF8Fallback) {
 			// fallbackする場合
 			if ((ts.Language == IdJapanese) && ismbbleadSJIS(b)) {
 				// 日本語の場合 && Shift_JIS 1byte目
@@ -665,7 +665,7 @@ recheck:
 	// 2byte以降正常?
 	if((b & 0xc0) != 0x80) {	// == (b <= 0x7f || 0xc0 <= b)
 		// 不正な文字, (上位2bitが 0b10xx_xxxx ではない)
-		PutReplacementChr(w, w->buf, w->count, ts.FallbackToCP932);
+		PutReplacementChr(w, w->buf, w->count, ts.UTF8Fallback);
 		w->count = 0;
 		goto recheck;
 	}
@@ -698,7 +698,7 @@ recheck:
 			if ((w->buf[0] == 0xe0 && (w->buf[1] < 0xa0 || 0xbf < w->buf[1])) ||
 				(w->buf[0] == 0xed && (                 0x9f < w->buf[1]))) {
 				// 不正な UTF-8
-				PutReplacementChr(w, w->buf, 2, ts.FallbackToCP932);
+				PutReplacementChr(w, w->buf, 2, ts.UTF8Fallback);
 				w->count = 0;
 				goto recheck;
 			}
@@ -719,7 +719,7 @@ recheck:
 	if ((w->buf[0] == 0xf0 && (w->buf[1] < 0x90 || 0x9f < w->buf[1])) ||
 		(w->buf[0] == 0xf4 && (w->buf[1] < 0x80 || 0x8f < w->buf[1]))) {
 		// 不正な UTF-8
-		PutReplacementChr(w, w->buf, 3, ts.FallbackToCP932);
+		PutReplacementChr(w, w->buf, 3, ts.UTF8Fallback);
 		w->count = 0;
 		goto recheck;
 	}

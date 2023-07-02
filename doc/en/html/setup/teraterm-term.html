@@ -580,5 +580,25 @@ FixedJIS=on はG1をJIS X 0201 カタカナに固定する為の設定です。これによ
 FixedJIS=off
 </pre>
 
+<h1 id="UTF8Fallback">不正なUTF-8文字を他の文字コードとしてデコードする</h1>
+
+<p>
+受信文字がUTF-8のときに、UTF-8として不正な文字を、他の文字コードとしてデコードします。実験的実装です。この設定はRead Onlyです。
+
+<p>
+実験的実装だった FallbackToCP932 を CP932 と ISO8859-1 に拡張しました。
+
+<dl>
+  <dt>言語がJapaneseの場合</dt>
+  <dd>CP932(Shift_JIS)</dd>
+  <dt>その他の場合</dt>
+  <dd>ISO8859-1</dd>
+</dl>
+
+<pre>
+省略時:
+UTF8Fallback=off
+</pre>
+
 </BODY>
 </HTML>
