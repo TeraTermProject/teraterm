@@ -5352,7 +5352,8 @@ int VTParse()
 	return ChangeEmu;
 }
 
-int MakeLocatorReportStr(char *buff, size_t buffsize, int event, int x, int y) {
+static int MakeLocatorReportStr(char *buff, size_t buffsize, int event, int x, int y)
+{
 	if (x < 0) {
 		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d&w", CLocale, event, ButtonStat);
 	}
