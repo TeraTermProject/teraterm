@@ -760,11 +760,11 @@
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Keycode">
-			<param name="Local" value="html\reference\keycode.txt">
+			<param name="Local" value="html\reference\keycode.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="menu id">
+			<param name="Name" value="ƒƒjƒ…[ID">
 			<param name="Local" value="html\reference\menu_id.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
