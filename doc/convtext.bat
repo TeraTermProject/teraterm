@@ -24,8 +24,6 @@ set REF_J=ja\html\reference
 %TOSJIS% -i %REF_E%/build_with_cmake.md -o %REF_E%/build_with_cmake.html
 %TOSJIS% -i %REF_J%/build_library_with_cmake.md -o %REF_J%/build_library_with_cmake.html
 %TOSJIS% -i %REF_E%/build_library_with_cmake.md -o %REF_E%/build_library_with_cmake.html
-%TOSJIS% -i %REF_J%/menu_id.md          -o %REF_J%/menu_id.html
-%TOSJIS% -i %REF_E%/menu_id.md          -o %REF_E%/menu_id.html
 
 %TOSJIS% -i ja/html/setup/folder.md     -o ja/html/setup/folder.html
 %TOSJIS% -i en/html/setup/folder.md     -o en/html/setup/folder.html

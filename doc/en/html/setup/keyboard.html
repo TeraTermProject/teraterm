@@ -14,7 +14,6 @@
 <p>
 The keyboard setup file assigns keys on PC keyboard for various functions such as VT terminal functions, sending user defined character strings, Tera Term commands and executing macro files.<br />
 You can modify key assignments by editing the file.
-See <A HREF="../reference/keycode.txt">KEYCODE.TXT</A> for the format of keyboard setup file.
 </p>
 
 <p>
@@ -43,7 +42,9 @@ The installer will copy <strong>IBMKEYB.CNF</strong> on <strong>KEYBOARD.CNF</st
 If you want to use a different key map, copy an appropriate file on <strong>KEYBOARD.CNF</strong> to meet your need.
 </p>
 
-
+<p>
+The key code can be obtained by KEYCODE.EXE. See <A HREF="../reference/keycode.html">Keycode</A>.
+</p>
 
 <h2>Keyboard Layout</h2>
 
@@ -221,17 +222,6 @@ In this section, VT numeric keys are assigned to PC keys.
 		Num0=82
 </pre>
 
-<h4>注意</h4>
-
-<p>
-VT 端末ではメインキーパッドの "Enter" キーと数値キーパッドの
-"Enter" キーが違う文字列を送出するモードがあるので、"NumEnter=" の
-後にはメインキーの "Enter" の PC key code を書かないでください。
-メインキーパッドの "Enter" と数値キーパッドの "Enter" が同じ
-PC key code を発生するキーボード(例えば PC9801 キーボード)の場合は
-注意が必要です。
-</p>
-
 <h3>[VT function keys] section</h3>
 
 <p>
@@ -371,7 +361,6 @@ string, executing a macro file or executing a menu command.
 		If &lt;Control flag&gt; is 3, &lt;Character string&gt; is the menu
 		ID which specifies the menu command to be executed.
 		The menu ID should be expressed as a decimal number.
-		See "Appendix B  LIST OF MENU IDs".
 
 	Example:
 		User1=1083,0,telnet myhost
@@ -380,6 +369,10 @@ string, executing a macro file or executing a menu command.
 		User4=1086,2,test.ttl
 		User5=1087,3,50110
 </pre>
+
+<p>
+About menu IDs, see <a href="../reference/menu_id.html">LIST OF MENU IDs</a>.
+</p>
 
 <h2 id="note">NOTE</h2>
 
@@ -469,12 +462,12 @@ User1=2095,3,50230
 	F1=PF1		(This is wrong.)
 </pre>
 
-<span class="qanda">A.</span> The left hand side can not be the name of a **PC key** but
-   the name of a **VT terminal key**. The right hand side can not be
+<span class="qanda">A.</span> The left hand side can not be the name of a <strong>PC key</strong> but
+   the name of a <strong>VT terminal key</strong>. The right hand side can not be
    the name of a key but a PC key code.
    See "3.1 FORMAT OF THE KEYBOARD SETUP FILE".
    You should also be careful not to specify a PC key code more than
-   once in the setup file (see "3.2 NOTE").<br>
+   once in the setup file (see <a href="#note">NOTE</a>).<br>
 
    Edit the keyboard setup file like the following:<br>
 

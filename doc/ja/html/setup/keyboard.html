@@ -43,7 +43,7 @@
 </p>
 
 <p>
-キーコードは keycode.exe で調べることができます。<A HREF="../reference/keycode.txt">keycode.txt</A>を参照ください。
+キーコードは KEYCODE.EXE で調べることができます。<A HREF="../reference/keycode.html">Keycode</A>を参照ください。
 </p>
 
 <h2>キーボードレイアウト</h2>
@@ -363,7 +363,6 @@ Tera Term の機能をPC キーに割り当てます。
 
 		&lt;Control flag&gt; が 3 の場合、
 		実行されるメニューコマンドのメニュー ID (数字)。
-		メニュー IDについては「メニュー ID 表」参照。
 
 	例:
 		User1=1083,0,telnet myhost
@@ -372,6 +371,10 @@ Tera Term の機能をPC キーに割り当てます。
 		User4=1086,2,test.ttl
 		User5=1087,3,50110
 </pre>
+
+<p>
+メニュー IDについては「<a href="../reference/menu_id.html">メニュー ID 表</a>」参照。
+</p>
 
 <h2 id="note">注意</h2>
 
@@ -463,11 +466,11 @@ Shift+Insertを残したままAlt+Vでの張り付けを行いたい場合は、KEYBOARD.CNF の
 	F1=PF1		(これはまちがい)
 </pre>
 
-<span class="qanda">A.</span> 左辺は **PC** のキーの名前ではなく **VT端末** のキーの名前を指定しなけ
-   ればなりません。また、右辺にはキーの名前ではなく、キーコードを指定して
+<span class="qanda">A.</span> 左辺は <strong>PC</strong> のキーの名前ではなく <strong>VT端末</strong> の
+   キーの名前を指定しなければなりません。また、右辺にはキーの名前ではなく、キーコードを指定して
    ください。
    また、キー設定を変えるときは、キーコードの重複使用をしないようにして
-   ください。<br>
+   ください(<a href="#note">注意</a>を参照)。<br>
 
    以下のように設定してください。<br>
 
