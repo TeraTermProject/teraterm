@@ -563,24 +563,23 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		SetI18nListW("Tera Term", Dialog, IDC_TIMESTAMPTYPE, timestamp_list, _countof(timestamp_list),
 		             pts->UILanguageFileW, 0);
 
-		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-8");
-		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16LE");
-		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16BE");
-		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
+		SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-8");
+		SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16LE");
+		SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16BE");
+		SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
 
+		// ファイル名を設定する
+		//   ファイルのチェック、コントロールの設定も行われる
+		//		WM_COMMAND, EN_CHANGE が発生する
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
+		work->info->filename = NULL;
 
 		// timestamp 種別
 		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
 		             pts->LogTimestampType == TIMESTAMP_UTC ? 1 :
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
-		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
-
-
-		CheckLogFile(Dialog, work->info->filename, work);
-		ArrangeControls(Dialog, work, pts->Append, pts->LogBinary, pts->LogTypePlainText, pts->LogTimestamp);
-		work->info->filename = NULL;
+		SendDlgItemMessageA(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
 
 		// Hide dialog チェックボックス
 		if (pts->LogHideDialog) {
@@ -619,11 +618,9 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		case IDC_FOPT_FILENAME_BUTTON: {
 			/* save current dir */
 			const wchar_t *UILanguageFile = work->pts->UILanguageFileW;
-			wchar_t *curdir;
-			hGetCurrentDirectoryW(&curdir);
 
-			wchar_t fname[MAX_PATH];
-			GetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname, _countof(fname));
+			wchar_t *fname_ini;
+			hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &fname_ini);
 
 			const wchar_t* simple_log_filter = L"*.txt;*.log";
 			wchar_t *FNFilter = GetCommonDialogFilterWW(simple_log_filter, UILanguageFile);
@@ -635,29 +632,25 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			aswprintf(&caption, L"Tera Term: %s", uimsg);
 			free(uimsg);
 
-			OPENFILENAMEW ofn = {};
-			ofn.lStructSize = get_OPENFILENAME_SIZEW();
+			TTOPENFILENAMEW ofn = {};
 			//ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING;
 			ofn.Flags |= OFN_SHOWHELP;
-			ofn.Flags |= OFN_NOCHANGEDIR;		// うまく動作しない環境もあるようだ
 			ofn.hwndOwner = Dialog;
 			ofn.lpstrFilter = FNFilter;
 			ofn.nFilterIndex = 1;
-			ofn.lpstrFile = fname;
-			ofn.nMaxFile = _countof(fname);
+			ofn.lpstrFile = fname_ini;
 			ofn.lpstrTitle = caption;
 			ofn.lpstrInitialDir = work->pts->LogDefaultPathW;
-			BOOL Ok = GetSaveFileNameW(&ofn);
-			free(caption);
-			free(FNFilter);
+			wchar_t *fname;
+			BOOL Ok = TTGetSaveFileNameW(&ofn, &fname);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+				free(fname);
 			}
-
-			/* restore dir */
-			SetCurrentDirectoryW(curdir);
-			free(curdir);
+			free(caption);
+			free(FNFilter);
+			free(fname_ini);
 
 			break;
 		}
