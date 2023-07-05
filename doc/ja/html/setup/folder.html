@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Tera Term が使用するフォルダ</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Tera Term が使用するフォルダ</h1>
+
+<ul>
+  <li>
+    <p>インストール版</p>
+    <ul>
+      <li>
+        設定ファイル
+        <ul>
+          <li><code>%APPDATA%\teraterm5</code></li>
+        </ul>
+      </li>
+      <li>
+        動作ログ、ダンプ
+        <ul>
+          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  
+  <li>
+    <p>ポータブル版</p>
+    <ul>
+      <li>
+        設定ファイル
+        <ul>
+          <li>exeファイルのあるフォルダ</li>
+        </ul>
+      </li>
+      <li>
+        動作ログ、ダンプ
+        <ul>
+          <li>exeファイルのあるフォルダ + <code>\log</code></li>
+        </ul>
+      </li>
+  </ul>
+</ul>
+
+<h1>ポータブル版について</h1>
+
+<ul>
+  <li>環境(システム設定、個人設定)に左右されず使用することができる
+    <ul>
+      <li>
+        次のような用途を想定
+        <ul>
+          <li>USBメモリに入れて、そこから起動する</li>
+          <li>インストールせずに使用する (コピーするだけで使えるようになる)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>実行する ttermpro.exe と同じフォルダに portable.ini ファイルを置くことでポータブル版として動作</li>
+  <li>portable.ini の中身はなんでもよい(サイズ0でよい)</li>
+</ul>
+
+<h1>インストール版の使用するフォルダ,ファイルについて</h1>
+
+<h2>Windows Vista以降 の場合のフォルダ例</h2>
+
+<ul>
+  <li>
+    設定ファイル
+    <ul>
+      <li><code>C:\Users\[username]\AppData\Roaming\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    動作ログ、ダンプ
+    <ul>
+      <li><code>C:\Users\[username]\AppData\Local\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Windows 2000, XP の場合のフォルダ例</h2>
+
+<ul>
+  <li>
+    設定ファイル
+    <ul>
+      <li><code>C:\Documents and Settings\[username]\AppData\Roaming\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    動作ログ、ダンプ(未定義)
+    <ul>
+      <li><code>C:\Documents and Settings\[username]\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+<!--
+<h2>Windows NT 4.0 の場合のフォルダ例</h2>
+
+<ul>
+  <li>
+    設定ファイル
+    <ul>
+      <li><code>C:\WINNT\Profiles\[username]\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    動作ログ、ダンプ
+    <ul>
+      <li><code>C:\WINNT\Profiles\[username]\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+※%APPDATA%, %LOCALAPPDATA% 環境変数は展開されない。"%USERPROFILE%\Application Data" から？
+
+<h2>Windows 95, 98, Me の場合のフォルダ例</h2>
+
+<ul>
+  <li>
+    設定ファイル
+    <ul>
+      <li><code>C:Windows\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    動作ログ、ダンプ
+    <ul>
+      <li><code>C:Windows\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+※%APPDATA%, %LOCALAPPDATA% 環境変数は展開されない。"%WINDIR%\Application Data" から？
+-->
+
+<p>参考</p>
+
+<ul>
+  <li><a href="https://torutk.hatenablog.jp/entry/20110604/p1">https://torutk.hatenablog.jp/entry/20110604/p1</a></li>
+</ul>
+
+<h2>ファイルを指定した場合</h2>
+
+<p>コマンドラインでファイルをフルパスで指定した場合は、それを優先して使用する</p>
+
+<ul>
+  <li>TERATERM.INI</li>
+  <li>KEYBOARD.CNF</li>
+  <li>broadcast.log</li>
+</ul>
+
+<h2>設定ファイルがない場合</h2>
+
+<p>ttermpro.exeは次のように動作する</p>
+
+<ul>
+  <li>設定ファイルを置くフォルダを作成する</li>
+  <li>ttermpro.exeのフォルダにある設定ファイルを "設定ファイルを置くフォルダ" にコピーする</li>
+</ul>
+
+</body>
+</html>

@@ -36,8 +36,6 @@ ConvertHTML(${REF}/cJSON-LICENSE.txt     ../../libs/doc_help/cJSON-LICENSE.txt  
 ConvertHTML(${REF}/CygTerm+-LICENSE.txt  ../../cygwin/cygterm/COPYING              "-l;unix")
 ConvertHTML(${REF}/build_with_cmake.html          ${REF}/build_with_cmake.md "")
 ConvertHTML(${REF}/build_library_with_cmake.html  ${REF}/build_library_with_cmake.md "")
-ConvertHTML(${REF}/menu_id.html                   ${REF}/menu_id.md "")
-ConvertHTML(html/setup/folder.html                html/setup/folder.md "")
 
 file(
   GLOB_RECURSE

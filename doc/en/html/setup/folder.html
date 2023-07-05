@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Folder to put setup files</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Folder to put setup files</h1>
+
+<ul>
+  <li>
+    <p>installer edition</p>
+    <ul>
+      <li>
+        setup files
+        <ul>
+          <li><code>%APPDATA%\teraterm5</code></li>
+        </ul>
+      </li>
+      <li>
+        log files, dump files
+        <ul>
+          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  
+  <li>
+    <p>portable edition</p>
+    <ul>
+      <li>
+        setup files
+        <ul>
+          <li>a folder which is exist exe file</li>
+        </ul>
+      </li>
+      <li>
+        log files, dump files
+        <ul>
+          <li>a folder which is exist exe file + <code>\log</code></li>
+        </ul>
+      </li>
+  </ul>
+</ul>
+
+<h1>about portable edition</h1>
+
+<ul>
+  <li>Program is not affected environment (system or personal setting)
+    <ul>
+      <li>
+        Assumed usage
+        <ul>
+          <li>Copy program to USB stick, and run from it</li>
+          <li>Run without install (only copy program)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Put portable.ini file in a folder which is ttermpro.exe is exist, then program is start as portable edition.</li>
+  <li>Content of portable.ini file does not matter. (zero size file is accepted)</li>
+</ul>
+
+<h1>folders and files which is used by insaller edition</h1>
+
+<h2>Example for Windows Vista or later</h2>
+
+<ul>
+  <li>
+    setup files
+    <ul>
+      <li><code>C:\Users\[username]\AppData\Roaming\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    log files, dump files
+    <ul>
+      <li><code>C:\Users\[username]\AppData\Local\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Example for Windows 2000, XP</h2>
+
+<ul>
+  <li>
+    setup files
+    <ul>
+      <li><code>C:\Documents and Settings\[username]\AppData\Roaming\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    log files, dump files (undefined)
+    <ul>
+      <li><code>C:\Documents and Settings\[username]\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+<!--
+<h2>Example for Windows NT 4.0</h2>
+
+<ul>
+  <li>
+    setup files
+    <ul>
+      <li><code>C:\WINNT\Profiles\[username]\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    log files, dump files
+    <ul>
+      <li><code>C:\WINNT\Profiles\[username]\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+* %APPDATA%, %LOCALAPPDATA% environment variable is not expanded. "%USERPROFILE%\Application Data"?
+
+<h2>Example for Windows 95, 98, Me</h2>
+
+<ul>
+  <li>
+    setup files
+    <ul>
+      <li><code>C:Windows\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+  <li>
+    log files, dump files
+    <ul>
+      <li><code>C:Windows\Application Data\teraterm5</code></li>
+    </ul>
+  </li>
+</ul>
+
+* %APPDATA%, %LOCALAPPDATA% environment variable is not expanded. "%WINDIR%\Application Data"?
+-->
+
+<p>Reference</p>
+
+<ul>
+  <li><a href="https://torutk.hatenablog.jp/entry/20110604/p1">https://torutk.hatenablog.jp/entry/20110604/p1</a></li>
+</ul>
+
+<h2>If a file name is specified</h2>
+
+<p>If full path of a file is specified by command line option, it is used preferentially.</p>
+
+<ul>
+  <li>TERATERM.INI</li>
+  <li>KEYBOARD.CNF</li>
+  <li>broadcast.log</li>
+</ul>
+
+<h2>When setup files is not exist</h2>
+
+<p>ttermpro.exe behaves followings:</p>
+
+<ul>
+  <li>create a folder to put setup files</li>
+  <li>copy a setup file which is exist in ttermpro.exe folder to "setup file folder"</li>
+</ul>
+
+</body>
+</html>
