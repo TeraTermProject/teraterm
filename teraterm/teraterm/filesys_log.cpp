@@ -420,6 +420,9 @@ typedef struct {
 	// work
 	BOOL file_exist;
 	int current_bom; // 存在するファイルのエンコーディング（ファイルのBOMから判定）
+	UINT_PTR timer;
+	BOOL enable_timer;
+	WNDPROC proc;
 	TTTSet *pts;
 	TComVar *pcv;
 } LogDlgWork_t;
@@ -522,6 +525,21 @@ static void CheckLogFile(HWND Dialog, const wchar_t *filename, LogDlgWork_t *wor
 	work->current_bom = bom;
 }
 
+static LRESULT CALLBACK FNameEditProc(HWND dlg, UINT msg,
+									  WPARAM wParam, LPARAM lParam)
+{
+	LogDlgWork_t *work = (LogDlgWork_t *)GetWindowLongPtr(dlg, GWLP_USERDATA);
+	switch (msg) {
+	case WM_KEYDOWN:
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_KILLFOCUS:
+		work->enable_timer = FALSE;
+		break;
+	}
+	return CallWindowProcW(work->proc, dlg, msg, wParam, lParam);
+}
+
 static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -571,8 +589,12 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// ファイル名を設定する
 		//   ファイルのチェック、コントロールの設定も行われる
 		//		WM_COMMAND, EN_CHANGE が発生する
-		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, work->info->filename);
-		work->info->filename = NULL;
+		wchar_t *fname = FLogGetLogFilename(work->info->filename);
+		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+		free(fname);
+		HWND file_edit = GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT);
+		SetWindowLongPtr(file_edit, GWLP_USERDATA, (LONG_PTR)work);
+		work->proc = (WNDPROC)SetWindowLongPtrW(file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
 
 		// timestamp 種別
 		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
@@ -592,6 +614,11 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		}
 
 		CenterWindow(Dialog, GetParent(Dialog));
+
+		SetFocus(GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT));
+
+		work->enable_timer = TRUE;
+		work->timer = SetTimer(Dialog, 0, 1000, NULL);
 
 		return TRUE;
 	}
@@ -704,6 +731,24 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		DragFinish(hDrop);
 		return TRUE;
 	}
+	case WM_TIMER: {
+		if (!work->enable_timer) {
+			KillTimer(Dialog, work->timer);
+			work->timer = 0;
+			break;
+		}
+		wchar_t *fname = FLogGetLogFilename(work->info->filename);
+		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+		SendDlgItemMessageW(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, 0, -1);
+		free(fname);
+		work->timer = SetTimer(Dialog, 0, 1000, NULL);
+		break;
+	}
+	case WM_DESTROY:
+		if (work->timer != 0) {
+			KillTimer(Dialog, work->timer);
+		}
+		break;
 	}
 	return FALSE;
 }
@@ -1354,15 +1399,12 @@ const wchar_t *FLogGetFilename(void)
 BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
 {
 	LogDlgWork_t *work = (LogDlgWork_t *)calloc(sizeof(LogDlgWork_t), 1);
-	wchar_t *srcfnameW = FLogGetLogFilename(info->filename);
 	work->info = info;
-	work->info->filename = srcfnameW;
 	work->pts = &ts;
 	work->pcv = &cv;
 	INT_PTR ret = TTDialogBoxParam(
 		hInst, MAKEINTRESOURCE(IDD_LOGDLG),
 		hWnd, LogFnHook, (LPARAM)work);
-	free(srcfnameW);
 	free(work);
 	return ret == IDOK ? TRUE : FALSE;
 }
