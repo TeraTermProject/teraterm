@@ -47,10 +47,8 @@
 #include "charset.h"
 
 // UTF-8‚ª•s³‚È’l‚¾‚Á‚½Žž‚É•\Ž¦‚·‚é•¶Žš
-#define REPLACEMENT_CHARACTER	'?'
-//#define REPLACEMENT_CHARACTER	0x2592
-//#define REPLACEMENT_CHARACTER	0x20
-//#define REPLACEMENT_CHARACTER	0xfffd
+#define REPLACEMENT_CHARACTER	0xfffd		// REPLACEMENT CHARACTER
+//#define REPLACEMENT_CHARACTER	0x2e2e		// Reversed Question Mark (VT382)
 
 typedef struct CharSetDataTag {
 	/* GL, GR code group */
@@ -329,7 +327,7 @@ static BOOL ParseFirstJP(CharSetData *w, BYTE b)
 			}
 			break;
 		case IdUTF8:
-			w->Op.PutU32(REPLACEMENT_CHARACTER, w->ClientData);
+			w->Op.PutU32(w->replacement_char, w->ClientData);
 			break;
 		default:
 			w->Op.ParseControl(b, w->ClientData);
@@ -344,7 +342,7 @@ static BOOL ParseFirstJP(CharSetData *w, BYTE b)
 			}
 			break;
 		case IdUTF8:
-			w->Op.PutU32(REPLACEMENT_CHARACTER, w->ClientData);
+			w->Op.PutU32(w->replacement_char, w->ClientData);
 			break;
 		default:
 			w->Op.ParseControl(b, w->ClientData);
@@ -538,7 +536,7 @@ static void ParseASCII(CharSetData *w, BYTE b)
 	} else if ((b>=0x20) && (b<=0x7E)) {
 		w->Op.PutU32(b, w->ClientData);
 	} else if ((b==0x8E) || (b==0x8F)) {
-		w->Op.PutU32(REPLACEMENT_CHARACTER, w->ClientData);
+		w->Op.PutU32(w->replacement_char, w->ClientData);
 	} else if ((b>=0x80) && (b<=0x9F)) {
 		w->Op.ParseControl(b, w->ClientData);
 	} else if (b>=0xA0) {
