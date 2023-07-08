@@ -1,23 +1,25 @@
 ﻿# Inno Setup
 
-- https://jrsoftware.org/isinfo.php
-
-- `cmake -P innosetup.cmake` で innosetup を buildtools/ に展開します
+- Inno Setupのコマンドライン版を使用できるように buildtools/ に展開します
+- `cmake -P innosetup.cmake` で展開します
 
 ## Inno Setup
 
-- 'cmake -P innosetup.cmake' で innosetup を使えるよう準備する
-- innosetupインストーラーから innosetup6/ を作成する
-  - innosetupインストーラーを解凍するために innounp を使用
-  - innounp を解凍するために unrar を使用
-- buildtools/innosetup6/bin/ISCC.exe を使ってインストーラーを作成できる
+- https://jrsoftware.org/isinfo.php
 
-## UnRAR
-
-- https://www.rarlab.com/rar_add.htm
+buildtools/innosetup6/bin/ISCC.exe を使ってインストーラーを作成
 
 ## innounp
 
 the Inno Setup Unpacker
 
 - https://innounp.sourceforge.net/
+
+ダウンロードした innosetup インストーラーを展開するために使用
+
+
+## UnRAR
+
+- https://www.rarlab.com/rar_add.htm
+
+ダウンロードした innounp を展開するために使用

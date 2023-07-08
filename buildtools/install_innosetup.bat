@@ -1,4 +1,7 @@
+setlocal
 cd /d %~dp0
-set PATH=C:\Program Files\CMake\bin;%PATH%
-cmake -P install_innosetup.cmake
+if "%CMAKE_COMMAND%" == "" (
+   call ..\ci_scripts\find_cmake.bat
+)
+"%CMAKE_COMMAND%" -P install_innosetup.cmake
 pause
