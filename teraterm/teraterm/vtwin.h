@@ -241,3 +241,13 @@ private:
 	void SetColor();
 };
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void VtwinSetHelpId(DWORD data);
+
+#ifdef __cplusplus
+}
+#endif

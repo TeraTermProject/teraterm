@@ -83,6 +83,8 @@
 #define HlpAboutDifference      20012
 #define HlpAboutForeword        20013
 
+#define HlpAboutQandaConnection	20101
+
 #define HlpUsageKeyboard                30100
 #define HlpUsageMouse                   30200
 #define HlpUsageShortcut                30300

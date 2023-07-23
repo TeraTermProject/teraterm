@@ -141,6 +141,7 @@ UnicodeDebugParam_t UnicodeDebugParam;
 typedef struct {
 	char dbcs_lead_byte;
 	UINT monitor_DPI;			// ウィンドウが表示されているディスプレイのDPI
+	DWORD help_data;
 } vtwin_work_t;
 static vtwin_work_t vtwin_work;
 
@@ -5326,9 +5327,27 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		}
 		break;
 	}
+	case WM_HELP: {
+		vtwin_work_t *w = &vtwin_work;
+		OpenHelpCV(&cv, HH_HELP_CONTEXT, w->help_data);
+		break;
+	}
 	default:
 		retval = DefWindowProc(msg, wp, lp);
 		break;
 	}
 	return retval;
+}
+
+/**
+ *	WM_HELP メッセージを受信したとき表示するヘルプのヘルプIDを設定する
+ *
+ *		MessageBox() の uType に MB_HELP を設定すると
+ *		表示されるHELPボタンを押したときに
+ *		WM_HELP が親ウィンドウに送られる
+ */
+void VtwinSetHelpId(DWORD data)
+{
+	vtwin_work_t *w = &vtwin_work;
+	w->help_data = data;
 }

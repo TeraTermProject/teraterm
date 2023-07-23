@@ -61,7 +61,7 @@ For more information, see the project wiki page "<a href="https://osdn.net/proje
 
 <h2>[Basic usage]</h2>
 <p>
-<span class="qanda">Q.</span> I can not connect to a host.<br>
+<span class="qanda"  id="connection">Q.</span> I can not connect to a host.<br>
 <span class="qanda">A.</span> Please check the following things:
 </p>
 <ul>
@@ -70,8 +70,27 @@ For more information, see the project wiki page "<a href="https://osdn.net/proje
  <li>Is the host name or IP address correct?</li>
  <li>Can you connect to the host from other machines?</li>
 </ul>
+
 <p>
-Please do not ask the author how to configure network properties. Please read books and magazines or ask the network administrator.
+表示されたメッセージを元に、次のことを確認してください。
+</p>
+
+<dl>
+  <dt>無効なホスト(Invalid host)</dt>
+  <dd>
+    ホスト名を使って接続先を解決することができませんでした。<br>
+    ホスト名が有効かホスト名の解決が可能か確認してください。
+  </dd>
+
+  <dt>接続が拒否されました(Connection refused)</dt>
+  <dd>
+    接続先のサービスが動作していない、ファイアウォールでサービスに接続できない状態です。<br>
+    サービスの起動、ファイアウォールの設定を確認してください。
+  </dd>
+</dl>
+
+<p>
+ネットワークに関する設定は、接続しているネットワーク(プロバイダー)の管理者に問い合わせてください。
 </p>
 
 <p>

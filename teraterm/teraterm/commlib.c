@@ -29,27 +29,27 @@
 /* IPv6 modification is Copyright (C) 2000, 2001 Jun-ya KATO <kato@win6.jp> */
 
 /* TERATERM.EXE, Communication routines */
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h> /* for _snprintf() */
+#include <time.h>
+#include <process.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tt_res.h"
-#include <process.h>
-
 #include "ttcommon.h"
 #include "ttwsk.h"
 #include "ttlib.h"
 #include "ttfileio.h"
 #include "ttplug.h" /* TTPLUG */
 #include "ttdde.h"
-
 #include "commlib.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdio.h> /* for _snprintf() */
-#include <time.h>
-
 #include "filesys_log.h"
 #include "ttlib.h"
 #include "codeconv.h"
+#include "helpid.h"
+#include "vtwin.h"
 
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
@@ -414,8 +414,9 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 						"Tera Term",
 						"MSG_TT_ERROR", L"Tera Term: Error",
 						"MSG_INVALID_HOST_ERROR", L"Invalid host",
-						MB_TASKMODAL | MB_ICONEXCLAMATION
+						MB_TASKMODAL | MB_ICONEXCLAMATION | MB_HELP
 					};
+					VtwinSetHelpId(HlpAboutQandaConnection);
 					TTMessageBoxW(cv->HWin, &info, ts->UILanguageFileW);
 				}
 				goto BreakSC;
