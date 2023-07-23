@@ -219,6 +219,10 @@ HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, 
 extern HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 extern HRESULT (WINAPI *pDwmGetWindowAttribute)(HWND hwnd, DWORD dwAttribute, PVOID pvAttribute, DWORD cbAttribute);
 
+// msimg32.dll
+extern BOOL(WINAPI *pTransparentBlt)(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc,
+									 int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
+
 void WinCompatInit();
 
 #ifdef __cplusplus

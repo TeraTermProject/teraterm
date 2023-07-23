@@ -384,7 +384,7 @@ void PrnOutTextA(const char *StrA, const char *WidthInfo, int Count, void *data)
 	DrawStrA(PrintDC, NULL, StrA, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
 }
 
-void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data)
+void PrnOutTextW(const wchar_t *StrW, const char *cells, int len, void *data)
 {
 	if (PrnX+PrnFW > Margin.right) {
 		/* new line */
@@ -399,7 +399,7 @@ void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *da
 		PrnY = Margin.top;
 	}
 
-	DrawStrW(PrintDC, NULL, StrW, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
+	DrawStrW(PrintDC, NULL, StrW, cells, len, PrnFW, PrnFH, PrnY, &PrnX);
 }
 
 void PrnNewLine()

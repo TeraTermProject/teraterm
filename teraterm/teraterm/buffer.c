@@ -3356,22 +3356,24 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 			} else {
 				// UTF-16でサロゲートペア
 				bufW[lenW] = b->wc2[0];
-				bufWW[lenW] = b->cell;
-				lenW++;
-				bufW[lenW] = b->wc2[1];
 				bufWW[lenW] = 0;
 				lenW++;
+				bufW[lenW] = b->wc2[1];
+				bufWW[lenW] = b->cell;
+				lenW++;
 			}
-			if (b->CombinationCharCount16 != 0)
-			{
+			if (b->CombinationCharCount16 != 0) {
 				// コンビネーション
 				int i;
-				for (i = 0 ; i < (int)b->CombinationCharCount16; i++) {
-					bufW[lenW+i] = b->pCombinationChars16[i];
+				const char cell_tmp = bufWW[lenW - 1];
+				bufWW[lenW - 1] = 0;
+				for (i = 0; i < (int)b->CombinationCharCount16; i++) {
+					bufW[lenW + i] = b->pCombinationChars16[i];
 					bufWW[lenW + i] = 0;
 				}
+				bufWW[lenW + b->CombinationCharCount16 - 1] = cell_tmp;
 				lenW += b->CombinationCharCount16;
-				DrawFlag = TRUE;	// コンビネーションがある場合はすぐ描画
+				DrawFlag = TRUE;  // コンビネーションがある場合はすぐ描画
 			}
 
 			// ANSI版
@@ -3451,12 +3453,12 @@ typedef struct {
 	int draw_y;
 } disp_data_t;
 
-static void l_disp_strW(const wchar_t *bufW, const char *width_info, int count, void *data_)
+static void l_disp_strW(const wchar_t *bufW, const char *cells, int len, void *data_)
 {
 	disp_data_t *data = (disp_data_t *)data_;
 	int x = data->draw_x;
 	int y = data->draw_y;
-	DispStrW(bufW, width_info, count, y, &x);
+	DispStrW(bufW, cells, len, y, &x);
 	data->draw_x = x;
 }
 

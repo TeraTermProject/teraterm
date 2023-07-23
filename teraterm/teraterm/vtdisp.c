@@ -176,6 +176,8 @@ typedef struct {
 	//
 	BYTE DCBackAlpha;
 	COLORREF DCBackColor;
+
+	BOOL font_resize_enable;
 } vtdisp_work_t;
 static vtdisp_work_t vtdisp_work;
 
@@ -1702,6 +1704,7 @@ void InitDisp(void)
   w->alpha_vtback = 255;
   w->debug_drawbox_text = FALSE;
   w->debug_drawbox_fillrect = FALSE;
+  w->font_resize_enable = TRUE;
   BGReverseTextAlpha = 255;
 }
 
@@ -2730,56 +2733,66 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 	}
 }
 
-/**
- *	1s•`‰æ Unicode
- *		Windows 95 ‚É‚à ExtTextOutW() ‚Í‘¶İ‚·‚é‚ª
- *		“®ì‚ªˆÙ‚È‚é‚æ‚¤‚¾
- *		TODO •¶šŠÔ‚É‘Î‰‚µ‚Ä‚¢‚È‚¢?
- *
- *
- *	@param  DC				•`‰ææDC
- *	@param  BGDC			•`‰ææƒ[ƒNDC
- *							NULL‚Ìƒ[ƒN‚È‚µ(=”wŒi•`‰æ‚È‚µ)
- *							ƒvƒŠƒ“ƒ^‚Ö‚Ìo—Í‚Ì‚Íí‚ÉNULL
- *	@param	StrW			o—Í•¶š (wchar_t)
- *	@param	WidthInfo[]		o—Í•¶š‚Ìcell”
- *							1		”¼Šp•¶š
- *							0		Œ‹‡•¶š, Nonspacing Mark
- *							2+		‘SŠp•¶š, ”¼Šp + Spacing Mark
- *	@param	Count			•¶š”
- */
-void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count, int font_width, int font_height,
-			  int Y, int *X)
+static void DrawChar(HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t len, int cell)
 {
-	int Dx[TermWidthMax];
-	int HalfCharCount = 0;
-	int i;
+	SIZE char_size;
+	HDC char_dc;
+	HBITMAP bitmap;
+	HBITMAP prev_bitmap;
+	RECT rc;
+	vtdisp_work_t *w = &vtdisp_work;
+
+	GetTextExtentPoint32W(hDC, str, (int)len, &char_size);
+
+	char_dc = CreateCompatibleDC(hDC);
+	SetTextColor(char_dc, GetTextColor(hDC));
+	SetBkColor(char_dc, GetBkColor(hDC));
+	SelectObject(char_dc, GetCurrentObject(hDC, OBJ_FONT));
+	bitmap = CreateCompatibleBitmap(hDC, char_size.cx, char_size.cy);
+	prev_bitmap = SelectObject(char_dc, bitmap);
+
+	rc.top = 0;
+	rc.left = 0;
+	rc.right = char_size.cx;
+	rc.bottom = char_size.cy;
+	ExtTextOutW(char_dc, 0, 0, ETO_OPAQUE, &rc, str, (UINT)len, 0);
+
+	// ‰¡‚ğcell•(cell*FontWidth pixel)‚ÉŠg‘å/k¬‚µ‚Ä•`‰æ
+	int width = cell * FontWidth;
+	int height = char_size.cy;
+	if (pTransparentBlt == NULL || BGDC == NULL || w->DCBackAlpha == 255) {
+		// ’¼Ú•`‰æ
+		SetStretchBltMode(hDC, COLORONCOLOR);
+		StretchBlt(hDC, x, y, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, SRCCOPY);
+	}
+	else {
+		// BGDC‚É”wŒi‰æ‘œ‚ğ•`‰æ
+		const COLORREF BackColor = GetBkColor(hDC);
+		DrawTextBGImage(BGDC, x, y, width, height, BackColor, w->DCBackAlpha);
+
+		// BGDC‚É•¶š‚ğ•`‰æ
+		SetStretchBltMode(hDC, COLORONCOLOR);
+		pTransparentBlt(BGDC, 0, 0, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, GetBkColor(hDC));
+
+		// BGDC‚É•`‰æ‚µ‚½•¶š‚ğWindow‚É“\‚è•t‚¯
+		BitBlt(hDC, x, y, width, height, BGDC, 0, 0, SRCCOPY);
+	}
+
+	SelectObject(char_dc, prev_bitmap);
+	DeleteObject(bitmap);
+	DeleteDC(char_dc);
+}
+
+static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
+						int Count, int cells, int font_width, int font_height,
+						int Y, int *X)
+{
+	int HalfCharCount = cells;	// ƒZƒ‹”
 	int width;
 	int height;
 	BOOL direct_draw;
 	BYTE alpha = 0;
 	vtdisp_work_t *w = &vtdisp_work;
-
-	for (i = 0; i < Count; i++) {
-		if (WidthInfo[i] == 1) {
-			HalfCharCount++;
-			Dx[i] = font_width;
-		}
-		else if (WidthInfo[i] == 0) {
-			if (i == 0) {
-				assert(FALSE);  // •\¦‚ÌÅ‰‚ÉŒ‹‡•¶š?
-				Dx[i] = 0;
-			}
-			else {
-				Dx[i] = Dx[i - 1];
-				Dx[i - 1] = 0;
-			}
-		}
-		else {
-			HalfCharCount += WidthInfo[i];
-			Dx[i] = font_width * WidthInfo[i];
-		}
-	}
 
 	direct_draw = FALSE;
 	if (BGDC == NULL) {
@@ -2798,7 +2811,6 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 	if (direct_draw) {
 		RECT RText;
 		SetRect(&RText, *X, Y, *X + width, Y + height);
-
 		ExtTextOutW(DC, *X + ts.FontDX, Y + ts.FontDY, ETO_CLIPPED | ETO_OPAQUE, &RText, StrW, Count, &Dx[0]);
 	}
 	else {
@@ -2821,11 +2833,121 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
-	if (w->debug_drawbox_text) {
-		DrawBox(DC, *X, Y, width, height, RGB(0,255,0));
+	*X += width;
+}
+
+
+/**
+ *	1s•`‰æ Unicode
+ *		Windows 95 ‚É‚à ExtTextOutW() ‚Í‘¶İ‚·‚é‚ª
+ *		“®ì‚ªˆÙ‚È‚é‚æ‚¤‚¾
+ *		TODO •¶šŠÔ‚É‘Î‰‚µ‚Ä‚¢‚È‚¢?
+ *
+ *	@param  DC				•`‰ææDC
+ *	@param  BGDC			•`‰ææƒ[ƒNDC
+ *							NULL‚Ìƒ[ƒN‚È‚µ(=”wŒi•`‰æ‚È‚µ)
+ *							ƒvƒŠƒ“ƒ^‚Ö‚Ìo—Í‚Ì‚Íí‚ÉNULL
+ *	@param	StrW			o—Í•¶š (wchar_t)
+ *	@param	cells[]			o—Í•¶š‚Ìcell”
+ *							1		”¼Šp•¶š
+ *							0		Œ‹‡•¶š, Nonspacing Mark
+ *							2+		‘SŠp•¶š, ”¼Šp + Spacing Mark
+ *	@param	len				•¶š”
+ *
+ *	—á
+ *		len=2, L"AB"
+ *					0		1		2
+ *			StrW	'A'		'B'
+ *			cells	1		1
+ *
+ *		len=2, U+307B U+309A (L'‚Ù' + L'K')
+ *					0		1		2
+ *			StrW	U+307B	U+309A
+ *			cells	0		2
+ *
+ */
+void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len, int font_width, int font_height,
+			  int Y, int *X)
+{
+	int Dx[TermWidthMax];
+	int cell = 0;
+	int i;
+	vtdisp_work_t *w = &vtdisp_work;
+	int sx = *X;
+
+	if (len <= 0) {
+		return;
 	}
 
-	*X += width;
+	for (i = 0; i < len; i++) {
+		cell += cells[i];
+		Dx[i] = cells[i] * font_width;
+	}
+
+	if (w->font_resize_enable) {
+		int start_idx = 0;
+		int cell_count = 0;
+		int wchar_count = 0;
+		int zero_count = 0;
+		for (i = 0; i < len; i++) {
+			if (cells[i] == 0) {
+				if (cell_count != 0) {
+					DrawStrWSub(DC, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width, font_height, Y, X);
+					start_idx = i;
+					cell_count = 0;
+					wchar_count = 0;
+				}
+				wchar_count++;
+				zero_count++;
+			}
+#if 0
+			else if (zero_count > 2) {
+				wchar_count++;
+				cell_count += cells[i];
+				DrawStrWSub(DC, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width,
+							font_height, Y, X);
+				start_idx = i;
+				zero_count = 0;
+				cell_count = 0;
+				wchar_count = 1;
+			}
+#endif
+			else {
+				SIZE size;
+				GetTextExtentPoint32W(DC, &StrW[i - zero_count], 1 + zero_count, &size);
+				if ((size.cx == Dx[i])) {
+					wchar_count++;
+					cell_count += cells[i];
+				}
+				else {
+					if (cell_count > 0) {
+						DrawStrWSub(DC, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count,
+									font_width, font_height, Y, X);
+						start_idx += wchar_count;
+					}
+					DrawChar(DC, BGDC, *X, Y, &StrW[i - zero_count], 1 + zero_count, cells[i]);
+					*X += cells[i] * FontWidth;
+					zero_count = 0;
+					cell_count = 0;
+					wchar_count = 0;
+					start_idx++;
+				}
+			}
+		}
+		if (cell_count != 0) {
+			DrawStrWSub(DC, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width, font_height, Y,
+						X);
+		}
+	}
+	else {
+		DrawStrWSub(DC, BGDC, StrW, Dx, len, cell, font_width, font_height, Y, X);
+	}
+
+	if (w->debug_drawbox_text) {
+		int width = cell * font_width;
+		int height = font_height;
+		DrawBox(DC, sx, Y, width, height, RGB(0, 255, 0));
+	}
 }
 
 /**
@@ -3935,4 +4057,16 @@ BOOL ThemeIsEnabled(void)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 	return w->bg_enable;
+}
+
+void DispEnableResizedFont(BOOL enable)
+{
+	vtdisp_work_t *w = &vtdisp_work;
+	w->font_resize_enable = enable;
+}
+
+BOOL DispIsResizedFont()
+{
+	vtdisp_work_t *w = &vtdisp_work;
+	return w->font_resize_enable;
 }

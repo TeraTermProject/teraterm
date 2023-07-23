@@ -210,6 +210,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
+			CheckDlgButton(hWnd, IDC_RESIZED_FONT, DispIsResizedFont());
+
 			break;
 		}
 		case WM_NOTIFY: {
@@ -233,6 +235,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						cur == 1 ? NONANTIALIASED_QUALITY :
 						cur == 2 ? ANTIALIASED_QUALITY :
 						CLEARTYPE_QUALITY;
+
+					DispEnableResizedFont(IsDlgButtonChecked(hWnd, IDC_RESIZED_FONT) == BST_CHECKED);
 
 					break;
 				}

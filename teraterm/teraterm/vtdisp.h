@@ -133,6 +133,8 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int 
 			  int Y, int *X);
 void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width, int font_height,
 			  int Y, int *X);
+void DispEnableResizedFont(BOOL enable);
+BOOL DispIsResizedFont();
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

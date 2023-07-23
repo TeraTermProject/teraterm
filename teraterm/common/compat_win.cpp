@@ -109,6 +109,10 @@ static HRESULT (WINAPI *pLoadIconWithScaleDown)(HINSTANCE hinst, PCWSTR pszName,
 HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 HRESULT (WINAPI *pDwmGetWindowAttribute)(HWND hwnd, DWORD dwAttribute, PVOID pvAttribute, DWORD cbAttribute);
 
+// msimg32.dll
+BOOL (WINAPI *pTransparentBlt)(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc,
+							   int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
+
 class Initializer {
 public:
 	Initializer() {
