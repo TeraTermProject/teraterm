@@ -11,8 +11,9 @@ set(ENABLE_DEBUG_INFO 1)
 
 add_executable(
   ${PACKAGE_NAME} WIN32
-  addsetting.cpp
-  addsetting.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../common/svnversion.h
+  WSAAsyncGetAddrInfo.c
+  WSAAsyncGetAddrInfo.h
   broadcast.cpp
   broadcast.h
   buffer.c
@@ -23,14 +24,8 @@ add_executable(
   checkeol.h
   clipboar.c
   clipboar.h
-  coding_pp.cpp
-  coding_pp.h
-  coding_pp.rc
-  coding_pp_res.h
   commlib.c
   commlib.h
-  dnddlg.cpp
-  dnddlg.h
   filesys.cpp
   filesys.h
   filesys_log.cpp
@@ -38,22 +33,14 @@ add_executable(
   filesys_log_res.h
   filesys_proto.cpp
   filesys_proto.h
-  font_pp.cpp
-  font_pp.h
-  font_pp.rc
-  font_pp_res.h
-  ftdlg.cpp
-  ftdlg.h
   keyboard.c
   keyboard.h
   prnabort.cpp
   prnabort.h
-  protodlg.cpp
-  protodlg.h
   scp.cpp
   scp.h
-  setupdirdlg.cpp
-  setupdirdlg.h
+  sendmem.cpp
+  sendmem.h
   sizetip.c
   sizetip.h
   teklib.c
@@ -65,15 +52,18 @@ add_executable(
   teraprn.cpp
   teraprn.h
   teraterm.cpp
+  teraterm_manifest.rc
   teraterml.h
   theme.h
   themefile.cpp
+  tt-version.rc
   ttdde.c
   ttdde.h
   ttdebug.cpp
   ttdebug.h
   ttdialog.c
   ttdialog.h
+  ttermpro.rc
   ttfileio.c
   ttfileio.h
   ttime.c
@@ -86,6 +76,9 @@ add_executable(
   ttwinman.h
   ttwsk.c
   ttwsk.h
+  unicode.cpp
+  unicode.h
+  unicode_test.h
   vtdisp.c
   vtdisp.h
   vtterm.c
@@ -94,42 +87,72 @@ add_executable(
   vtwin.h
   winjump.c
   winjump.h
-  WSAAsyncGetAddrInfo.c
-  WSAAsyncGetAddrInfo.h
-  sendmem.cpp
-  sendmem.h
-  #
-  uni_combining.map
-  #
-  ttermpro.rc
-  tt-version.rc
-  teraterm_manifest.rc
-  #
-  ${CMAKE_CURRENT_BINARY_DIR}/../common/svnversion.h
-  #
-  unicode_test.h
-  unicode.h
-  unicode.cpp
-  unicode_asian_width.tbl
-  unicode_combine.tbl
-  unicode_emoji.tbl
-  #
-  ftdlg_lite.h
-  ftdlg_lite.cpp
-  clipboarddlg.h
+)
+
+set(SRC_DIALOG
+  addsetting.cpp
+  addsetting.h
   clipboarddlg.cpp
+  clipboarddlg.h
+  coding_pp.cpp
+  coding_pp.h
+  coding_pp.rc
+  coding_pp_res.h
   debug_pp.cpp
   debug_pp.h
   debug_pp.rc
   debug_pp_res.h
+  dnddlg.cpp
+  dnddlg.h
+  font_pp.cpp
+  font_pp.h
+  font_pp.rc
+  font_pp_res.h
+  ftdlg.cpp
+  ftdlg.h
+  ftdlg_lite.cpp
+  ftdlg_lite.h
+  logdlg.cpp
+  logdlg.h
+  protodlg.cpp
+  protodlg.h
   sendfiledlg.cpp
   sendfiledlg.h
-  #
+  setupdirdlg.cpp
+  setupdirdlg.h
   themedlg.cpp
   themedlg.h
   themedlg.rc
   themedlg_res.h
-  )
+)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ${SRC_DIALOG}
+)
+
+source_group(
+  "dialog"
+  FILES ${SRC_DIALOG})
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../teraterm/uni2sjis.map
+  ../teraterm/unisym2decsp.map
+  ../ttpcmn/sjis2uni.map
+  uni_combining.map
+  unicode_asian_width.tbl
+  unicode_combine.tbl
+  unicode_emoji.tbl
+)
+
+source_group(
+  "table_datas"
+  REGULAR_EXPRESSION
+  "(map|tbl)$"
+)
 
 target_sources(
   ${PACKAGE_NAME}
@@ -152,11 +175,7 @@ target_sources(
   ../common/dllutil.h
   ../common/codeconv.h
   ../common/tipwin.h
-  #
-  ../teraterm/unisym2decsp.map
-  ../teraterm/uni2sjis.map
-  ../ttpcmn/sjis2uni.map
-  )
+)
 
 target_sources(
   ${PACKAGE_NAME}
@@ -166,16 +185,10 @@ target_sources(
 )
 
 source_group(
-  "table_datas"
-  REGULAR_EXPRESSION
-  "(map|tbl)$"
-  )
-
-source_group(
   "common"
   REGULAR_EXPRESSION
   "..\/common\/"
-  )
+)
 
 target_sources(
   ${PACKAGE_NAME}

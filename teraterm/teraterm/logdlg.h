@@ -1,5 +1,5 @@
 /*
- * (C) 2020- TeraTerm Project
+ * (C) 2023- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,51 +28,13 @@
 
 #pragma once
 
-/* TERATERM.EXE, log routines */
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "filesys_log.h"	// for LogCode_t
 
-/**
- * ログバッファの最低空きサイズ
- *	"[YYYY-MM-DD HH:MM:SS.000]" の文字が入る程度
- */
-#define FILESYS_LOG_FREE_SPACE	(30*2)
+typedef struct {
+	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
+	BOOL append;			// TRUE/FALSE = append/new(overwrite)
+	BOOL bom;				// TRUE = BOMあり
+	LogCode_t code;
+} FLogDlgInfo_t;
 
-// logファイルの文字コード
-typedef enum LogCode {
-	LOG_UTF8,
-	LOG_UTF16LE,
-	LOG_UTF16BE,
-} LogCode_t;
-
-// log
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
-wchar_t *FLogGetLogFilename(const wchar_t *log_filename);
-wchar_t *FLogGetLogFilenameBase(const wchar_t *filename);
-
-void logfile_lock_initialize(void);
-void FLogPause(BOOL Pause);
-void FLogRotateSize(size_t size);
-void FLogRotateRotate(int step);
-void FLogRotateHalt(void);
-void FLogClose(void);
-BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom);
-BOOL FLogIsOpend(void);
-BOOL FLogIsOpendText(void);
-BOOL FLogIsOpendBin(void);
-void FLogWriteStr(const wchar_t *str);
-void FLogInfo(char *param_ptr, size_t param_len);
-const wchar_t *FLogGetFilename(void);
-BOOL FLogIsPause(void);
-void FLogWindow(int nCmdShow);
-void FLogShowDlg(void);
-int FLogGetCount(void);
-int FLogGetFreeCount(void);
-void FLogWriteFile(void);
-void FLogPutUTF32(unsigned int u32);
-void FLogOutputAllBuffer(void);
-
-#ifdef __cplusplus
-}
-#endif
+BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);

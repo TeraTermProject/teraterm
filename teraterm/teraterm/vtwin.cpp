@@ -110,6 +110,7 @@
 #include "ttcmn_notify2.h"
 #include "scp.h"
 #include "ttcommdlg.h"
+#include "logdlg.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600

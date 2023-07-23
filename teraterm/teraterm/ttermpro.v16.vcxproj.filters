@@ -228,6 +228,9 @@
     <ClCompile Include="charset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="logdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -524,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="charset.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logdlg.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
