@@ -71,6 +71,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{IDC_TERMKANASEND, "DLG_TERM_KANASEND"},
 		{IDC_TERMKINTEXT, "DLG_TERM_KIN"},
 		{IDC_TERMKOUTTEXT, "DLG_TERM_KOUT"},
+		{ IDC_UNICODE2DEC, "DLG_CODING_UNICODE_TO_DEC" },
+		{ IDC_DEC2UNICODE, "DLG_CODING_DEC_TO_UNICODE" },
+		{ IDC_DEC2UNICODE_BOXDRAWING, "DLG_CODING_UNICODE_TO_DEC_BOXDRAWING" },
+		{ IDC_DEC2UNICODE_PUNCTUATION, "DLG_CODING_UNICODE_TO_DEC_PUNCTUATION" },
+		{ IDC_DEC2UNICODE_MIDDLEDOT, "DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT" },
 	};
 	CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 
@@ -142,6 +147,16 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
 			EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), ts->UnicodeEmojiOverride);
 
+			// DEC Special Graphics
+			CheckDlgButton(hWnd, IDC_UNICODE2DEC, ts->Dec2Unicode ? BST_UNCHECKED : BST_CHECKED);
+			CheckDlgButton(hWnd, IDC_DEC2UNICODE, ts->Dec2Unicode ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hWnd, IDC_DEC2UNICODE_BOXDRAWING,
+						   (ts->UnicodeDecSpMapping & 0x01) != 0 ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hWnd, IDC_DEC2UNICODE_PUNCTUATION,
+						   (ts->UnicodeDecSpMapping & 0x02) != 0 ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hWnd, IDC_DEC2UNICODE_MIDDLEDOT,
+						   (ts->UnicodeDecSpMapping & 0x04) != 0 ? BST_CHECKED : BST_UNCHECKED);
+
 			return TRUE;
 		}
 		case WM_NOTIFY: {
@@ -206,6 +221,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->UnicodeEmojiOverride = (BYTE)IsDlgButtonChecked(hWnd, IDC_EMOJI_WIDTH_CHECK);
 					ts->UnicodeEmojiWidth = (BYTE)GetCurSel(hWnd, IDC_EMOJI_WIDTH_COMBO);
 
+					// DEC Special Graphics
+					ts->Dec2Unicode = (BYTE)IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE);
+					ts->UnicodeDecSpMapping =
+						(WORD)((IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_BOXDRAWING) << 0) |
+							   (IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_PUNCTUATION) << 1) |
+							   (IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_MIDDLEDOT) << 2));
 					break;
 				}
 				case PSN_HELP: {

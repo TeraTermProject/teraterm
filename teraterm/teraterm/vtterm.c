@@ -737,26 +737,53 @@ static void PutU32NoLog(unsigned int code)
 {
 	int LineEnd;
 	TCharAttr CharAttrTmp;
-	BOOL dec_special = FALSE;
+	BOOL dec_special;
 	int r;
 
-	CharAttrTmp = CharAttr;
 	LastPutCharacter = code;
 
+	dec_special = FALSE;
 	if (code <= 0xff) {
 		dec_special = CharSetIsSpecial(charset_data, code);
 	}
 
-	// UnicodeからDEC特殊文字へのマッピング
-	if (dec_special == FALSE && ts.UnicodeDecSpMapping) {
-		unsigned short cset;
-		cset = UTF32ToDecSp(code);
-		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-			dec_special = TRUE;
-			code = cset & 0xff;
+	if (ts.Dec2Unicode) {
+		if (dec_special) {
+			// DEC特殊文字からUnicodeへのマッピング
+			if (ts.Dec2Unicode) {
+				// 0x60から0x7e を Unicode に割り振る
+				static const char16_t dec2unicode[] = {
+					0x25c6, 0x2592, 0x2409,	0x240c,		// 0x60 -
+					0x240d, 0x240a, 0x00b0, 0x00b1,
+					0x2424, 0x240b, 0x2518, 0x2510,
+					0x250c, 0x2514, 0x253c, 0x23ba,		// 0x6c - 0x6f
+
+					0x23bb, 0x2500, 0x23bc, 0x23bd,		// 0x70 -
+					0x251c, 0x2524, 0x2534, 0x252c,
+					0x2502, 0x2264, 0x2265, 0x03c0,
+					0x2260, 0x00a3, 0x00b7,				// 0x7c - 0x7e
+				};
+				code = code & 0x7F;
+				if (0x60 <= code && code <= 0x7e) {
+					code = dec2unicode[code - 0x60];
+					dec_special = FALSE;
+				}
+			}
+		}
+	}
+	else {
+		// UnicodeからDEC特殊文字へのマッピング
+		if (dec_special == FALSE && ts.UnicodeDecSpMapping) {
+			unsigned short cset;
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				dec_special = TRUE;
+				code = cset & 0xff;
+			}
 		}
 	}
 
+	CharAttrTmp = CharAttr;
 	if (dec_special) {
 		CharAttrTmp.Attr |= AttrSpecial;
 	}

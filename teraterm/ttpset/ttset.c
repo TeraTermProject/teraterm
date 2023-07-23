@@ -2076,6 +2076,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// ’Ê’m‰¹
 	ts->NotifySound = GetOnOff(Section, "NotifySound", FName, TRUE);
 
+	ts->Dec2Unicode = FALSE;
+
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);

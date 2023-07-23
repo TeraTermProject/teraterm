@@ -610,6 +610,7 @@ struct tttset {
 	wchar_t DialogFontNameW[LF_FACESIZE];
 	BOOL NotifySound;
 	wchar_t *LogDefaultNameW;
+	BOOL Dec2Unicode;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;

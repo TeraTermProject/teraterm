@@ -19,6 +19,11 @@
 #define IDC_AMBIGUOUS_WIDTH_COMBO       2607
 #define IDC_EMOJI_WIDTH_CHECK           2608
 #define IDC_EMOJI_WIDTH_COMBO           2609
+#define IDC_UNICODE2DEC                 2612
+#define IDC_DEC2UNICODE                 2613
+#define IDC_DEC2UNICODE_BOXDRAWING      2614
+#define IDC_DEC2UNICODE_PUNCTUATION     2615
+#define IDC_DEC2UNICODE_MIDDLEDOT       2616
 
 // Next default values for new objects
 // 
@@ -27,7 +32,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        115
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2609
+#define _APS_NEXT_CONTROL_VALUE         2615
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
