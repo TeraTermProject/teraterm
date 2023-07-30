@@ -30,7 +30,7 @@
 <p>
 [<a href="https://osdn.net/projects/ttssh2/">Project page</a>] 
 [<a href="/manual/en/about/copyright.html">License</a>] 
-[<a href="https://osdn.net/projects/ttssh2/releases/">Download</a>]  
+[<a href="https://osdn.net/projects/ttssh2/releases/">Download</a> (<a href="https://github.com/TeraTermProject/osdn-download/releases">mirror</a>)]  
 [<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
 [<a href="/manual/en/">Document</a>] 
 [<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
@@ -69,11 +69,11 @@ TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH
 <h2 id="Download">Download</h2>
 
 <p>
-Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>. Current latest release is <a href="https://osdn.net/rel/ttssh2/4.106">4.106</a>.
+Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>, but currently OSDN is slow. We put a release binary to <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub</a>. Current latest release is <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-4_106"><!--https://osdn.net/rel/ttssh2/4.106-->4.106</a>.
 </p>
 
 <p>
-Tera Term 5 beta1 is testing. Download from OSDN <a href="https://osdn.net/projects/ttssh2/releases/p19105">download page</a>.
+Tera Term 5 beta1 is testing. Download from GitHub <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0_beta1"><!--https://osdn.net/projects/ttssh2/releases/p19105-->download page</a>.
 </p>
 
 <p>
