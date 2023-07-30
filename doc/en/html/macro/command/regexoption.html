@@ -317,15 +317,15 @@ default value
 
 <pre class="macro-example">
 string="test ¿ string"
-pattern="ÅE
+pattern="‡"
+
+regexoption "OPTION_NONE"
+strmatch string pattern
+messagebox result "OPTION_NONE"  ; result -&gt; 0 (Not Match)
 
 regexoption "IGNORECASE"
 strmatch string pattern
-messagebox result "ASCII"        ; result -&gt; 0 (Not Match)
-
-regexoption "ISO_8859_1" "IGNORECASE"
-strmatch string pattern
-messagebox result "ISO_8859_1"   ; result -&gt; 6 (Match)
+messagebox result "IGNORECASE"   ; result -&gt; 6 (Match)
 </pre>
 
 <pre class="macro-example">

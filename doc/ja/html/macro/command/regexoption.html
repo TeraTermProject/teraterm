@@ -320,11 +320,11 @@ string="文字データ"
 pattern="データ"
 
 strmatch string pattern
-messagebox result "デフォルト"   ; result -&gt; 0 (Not Match)
+messagebox result "デフォルト"   ; result -&gt; 7 (Match)
 
-regexoption "SJIS"
+regexoption "ENCODING_UTF8"
 strmatch string pattern
-messagebox result "SJIS"   ; result -&gt; 5 (Match)
+messagebox result "UTF8"   ; result -&gt; 7 (Match)
 </pre>
 
 <pre class="macro-example">
