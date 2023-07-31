@@ -11,55 +11,59 @@
   <body>
     <h1>Tera Term 5 について</h1>
     Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです。
+    
+    <h2>特徴</h2>
     <ul>
-      <li>特徴
-      <ul>
-        <li>ターミナル(内部バッファ、描画、キー入力)のUnicode化
-          <ul>
-            <li>多言語の同時表示ができます。<br>
-              Tera Term 4 では、例えば日本語を表示する設定にしていると中国語は表示できませんでした
-            <li>ISO8859-1から16に対応しました。
-            <li>ロケールの設定が不要になりました。
-          </ul>
-        <li>Windows UI(メニュー、ダイアログ)のUnicode化<br>
-          次の場合でもメニューやダイアログは設定した言語で正しく表示されます。
-          <ul>
-            <li>"現在のシステムロケール"以外の言語に設定した場合。
-            <li>"ワールドワイド言語サポートで Unicode UTF-8 を使用"にチェックが入っている場合。
-          </ul>
-        <li>その他Windows APIのUnicode版への切り替え
-          <ul>
-            <li>Unicode ファイル名を使用できます。
-          </ul>
-        <li>マクロ
-          <ul>
-            <li>内部コードがUnicode(UTF-8)になりました。
-            <li>Tera Term 4 はACP(日本語Windowsの場合デフォルトでCP932,Shift_JIS)でした。
-            <li>ダイアログなどのGUIで多言語表示できます。
-            <li>使用できるラベルの個数の上限・変数の個数の上限（数値,文字列,数値配列,文字列配列それぞれ）が 256 から「なし」になりました。
-          </ul>
-      </ul>
-      <li>動作環境
+      <li>ターミナル(内部バッファ、描画、キー入力)のUnicode化
         <ul>
-          <li>alpha は次の環境でテストを行っています。
-            <ul>
-              <li>Windows 10, 11
-              <li>Cygwin 3.3.4(most recent version)
-            </ul>
-          <li>正式リリース(見込み)
-            <ul>
-              <li>Windows 7 から 11<br>
-                Visual Sutdio 2022 によるビルドを予定しているので
-                <a href="https://osdn.net/projects/ttssh2/wiki/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83#h2-Visual.20Studio.20.E3.81.A7.E3.83.93.E3.83.AB.E3.83.89.E3.81.97.E3.81.9F.E3.83.90.E3.82.A4.E3.83.8A.E3.83.AA.E3.81.AE.E5.8B.95.E4.BD.9C.E3.81.99.E3.82.8B.E7.92.B0.E5.A2.83">Windows 7 以降サポート</a>となります。
-              <li>Cygwin (most recent version)
-            </ul>
+          <li>多言語の同時表示ができます。<br>
+            Tera Term 4 では、例えば日本語を表示する設定にしていると中国語は表示できませんでした</li>
+          <li>ISO8859-1から16に対応しました。</li>
+          <li>ロケールの設定が不要になりました。</li>
         </ul>
-      <li>その他
+      </li>
+      <li>Windows UI(メニュー、ダイアログ)のUnicode化<br>
+        次の場合でもメニューやダイアログは設定した言語で正しく表示されます。
         <ul>
-          <li><a href="https://osdn.net/projects/ttssh2/wiki/%E6%B1%BA%E5%AE%9A%E4%BA%8B%E9%A0%85#h1-Tera.20Term.205.x">開発ツール,使用ライブラリなど</a>
-          <li><a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">実装状況</a>
-          <li>LogMeTT, TTLEditor, Collector はインストーラから削除されました。これらはソースが公開されておらず、オープンソースライセンスでもありません。</li>
+          <li>"現在のシステムロケール"以外の言語に設定した場合。</li>
+          <li>"ワールドワイド言語サポートで Unicode UTF-8 を使用"にチェックが入っている場合。</li>
         </ul>
+      </li>
+      <li>その他Windows APIのUnicode版への切り替え<br>
+        Unicode ファイル名を使用できます。
+      </li>
+      <li>マクロ
+        <ul>
+          <li>内部コードがUnicode(UTF-8)になりました。<br>
+              Tera Term 4 はACP(日本語Windowsの場合デフォルトでCP932,Shift_JIS)でした。</li>
+          <li>ダイアログなどのGUIで多言語表示できます。</li>
+        </ul>
+      </li>
+    </ul>
+    
+    <h2>動作環境</h2>
+    <ul>
+      <li>alpha は次の環境でテストを行っています。
+        <ul>
+          <li>Windows 10, 11
+          <li>Cygwin 3.3.4(most recent version)
+        </ul>
+      </li>
+      <li>正式リリース(見込み)
+        <ul>
+          <li>Windows 7 から 11<br>
+            Visual Sutdio 2022 によるビルドを予定しているので
+            <a href="https://osdn.net/projects/ttssh2/wiki/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83#h2-Visual.20Studio.20.E3.81.A7.E3.83.93.E3.83.AB.E3.83.89.E3.81.97.E3.81.9F.E3.83.90.E3.82.A4.E3.83.8A.E3.83.AA.E3.81.AE.E5.8B.95.E4.BD.9C.E3.81.99.E3.82.8B.E7.92.B0.E5.A2.83">Windows 7 以降サポート</a>となります。
+          <li>Cygwin (most recent version)
+        </ul>
+      </li>
+    </ul>
+    
+    <h2>その他</h2>
+    <ul>
+      <li><a href="https://osdn.net/projects/ttssh2/wiki/%E6%B1%BA%E5%AE%9A%E4%BA%8B%E9%A0%85#h1-Tera.20Term.205.x">開発ツール,使用ライブラリなど</a>
+      <li><a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">実装状況</a>
+      <li>LogMeTT, TTLEditor, Collector はインストーラから削除されました。これらはソースが公開されておらず、オープンソースライセンスでもありません。</li>
     </ul>
 
     <h1>Tera Term 5 へ移行</h1>
@@ -68,31 +72,34 @@
       <li>Tera Term 4 と同居することができます。</li>
       <li>設定ファイルはTera Term 4用をそのまま使用できます。</li>
       <ul>
-        <li>TERATERM.INI,KEYBOARD.CNFはUnicode対応となりました。</li>
-        <ul>
-          <li>cygterm.cfgの文字コードは、cygwin 3.3.4ではUTF-8です</li>
-        </ul>
+        <li>TERATERM.INI,KEYBOARD.CNFはUnicode対応となりました。
+          <ul>
+            <li>cygterm.cfgの文字コードは、cygwin 3.3.4ではUTF-8です</li>
+          </ul>
+        </li>
         <li>Windows 10,11ではiniファイルをUnicode化することができます。<br>
-        <ul>
-          <li>iniファイルを扱うWin32APIはUnicode対応版を使用します</li>
-          <li>cygterm.cfgはWin32APIを使って読み書きしていません</li>
-        </ul>
-        <li>Unicode化したiniファイルの文字コードはUTF-16 (with LE BOM)です。</li>
-        <li>Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
+          <ul>
+            <li>iniファイルを扱うWin32APIはUnicode対応版を使用します</li>
+            <li>cygterm.cfgはWin32APIを使って読み書きしていません</li>
+          </ul>
+        </li>
+        <li>Unicode化したiniファイルの文字コードはUTF-16 (with LE BOM)です。<br>
+            Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
         <li>Tera Term 5 は起動時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
-        <li>Tera Term 5 でTERATERM.INI保存時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
-        <li>変換前のファイルはバックアップされています。</li>
+        <li>Tera Term 5 でTERATERM.INI保存時にiniファイルの文字コードを自動的にUnicodeに変換します。<br>
+          変換前のファイルはバックアップされています。</li>
         <li><a href="../reference/dev/win32api.html#ini_file">Win32API/iniファイル</a>を参照ください</li>
       </ul>
       <li>設定ファイルのデフォルトフォルダが変更されました。</li>
       <ul>
         <li>%APPDATA%\teraterm5\</li>
-        <li>Tera Term 4 の設定ファイルをコピーしてください。</li>
-        <ul>
-          <li>TERATERM.INI</li>
-          <li>KEYBOARD.CNF</li>
-          <li>cygterm.cfg</li>
-        </ul>
+        <li>Tera Term 4 の設定ファイルをコピーしてください。
+          <ul>
+            <li>TERATERM.INI</li>
+            <li>KEYBOARD.CNF</li>
+            <li>cygterm.cfg</li>
+          </ul>
+        </li>
         <li>ファイルがない場合、ttermpro.exe起動時にデフォルトの設定ファイルがコピーされます。</li>
         <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした。
           <ul>
@@ -101,51 +108,59 @@
         </li>
         <li><a href="../setup/folder.html">フォルダについて</a></li>
       </ul>
-      <li>マクロ</li>
-      <ul>
-        <li>ファイル(拡張子ttl)の文字コードはUTF-8を推奨します。</li>
-        <li>文字コードは自動判定しますが誤ることがあります。</li>
-        <li>BOMを付けると確実にUTF-8として読み込むことができます。</li>
-        <li>文字変数の文字列長の上限はTera Term 4と同じ511バイトです。</li>
-        <li>漢字などは1文字のバイト数が増加する(例 "あ" は 0x82,0xa0 から 0xe3,0x81,0x82となる)ため、Tera Term 4ではセットできたデータが途切れる可能性があります。</li>
-      </ul>
+      <li>マクロ
+        <ul>
+          <li>ファイル(拡張子ttl)の文字コードはUTF-8を推奨します。</li>
+          <li>文字コードは自動判定しますが誤ることがあります。<br>
+              BOMを付けると確実にUTF-8として読み込むことができます。</li>
+          <li>使用できるラベルの個数の上限・変数の個数の上限（数値,文字列,数値配列,文字列配列それぞれ）が 256 から「なし」になりました。</li>
+          <li>文字変数の文字列長の上限はTera Term 4と同じ511バイトです。<br>
+              漢字などは1文字のバイト数が増加する(例 "あ" は 0x82,0xa0 から 0xe3,0x81,0x82となる)ため、Tera Term 4ではセットできたデータが途切れる可能性があります。</li>
+        </ul>
+      </li>
     </ul>
 
     <h1>Tera Term 5 へ移行(plugin)</h1>
 
     <ul>
-      <li>compat_w95.hは不要となりました。</li>
-      <ul>
-        <li><a href="https://osdn.net/projects/ttssh2/scm/svn/commits/9129">r9239</a></li>
-      </ul>
-      <li>plugin APIを変更しました。</li>
-      <ul>
-        <li>ファイル名がUnicode (型が char から wchar_t) になりました。</li>
-        <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l44">trunk/teraterm/ttsetup.h</a></li>
-        <li><a href="https://osdn.net/projects/ttssh2/svn/view/branches/4-stable/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l39">4-stable/teraterm/ttsetup.h</a></li>
-      </ul>
-      <li>iniファイル読み書き共通関数を追加しました。</li>
-      <ul>
-        <li>ファイル名だけをUnicode化して従来と同じ動作をする関数を準備。</li>
-        <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/inifile_com.h?view=markup&root=ttssh2">trunk/teraterm/common/inifile_com.h</a></li>
-      </ul>
-      <li>struct tttset (tttypes.h) のメンバを変更しました。</li>
-      <ul>
-        <li>ファイル名、パス、文字列のメンバには、WがついたUnicode版のメンバが追加。</li>
-        <li>ファイル名、パスの文字数はMAX_PATH文字以上になることを考慮。</li>
-        <li>まだ変化する予定(メンバ名、順序、サイズ、型などなど)。</li>
-      </ul>
-      <li>通知アイコンのAPIが変更されました。</li>
-      <ul>
-        <li>高DPIに対応しました。</li>
-        <li>SetVerNotifyIcon(), SetCustomNotifyIcon(), GetCustomNotifyIcon() は削除されました。</li>
-        <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_notify.h?view=markup&root=ttssh2">trunk/teraterm/ttpcmn/ttcmn_notify.h</a></li>
-      </ul>
-      <li>ヘルプAPIを追加。</li>
-      <ul>
-        <li>Unicodeファイル名に対応したAPIを追加しました。<br>
-        <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_lib.h?view=markup&root=ttssh2">trunk/teraterm/ttpcmn/ttcmn_lib.h</a></li>
-      </ul>
+      <li>compat_w95.hは不要となりました。
+        <ul>
+          <li><a href="https://osdn.net/projects/ttssh2/scm/svn/commits/9129">r9239</a></li>
+        </ul>
+      </li>
+      <li>plugin APIを変更しました。
+        <ul>
+          <li>ファイル名がUnicode (型が char から wchar_t) になりました。</li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l44">trunk/teraterm/ttsetup.h</a></li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/branches/4-stable/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l39">4-stable/teraterm/ttsetup.h</a></li>
+        </ul>
+      </li>
+      <li>iniファイル読み書き共通関数を追加しました。
+        <ul>
+          <li>ファイル名だけをUnicode化して従来と同じ動作をする関数を準備。</li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/inifile_com.h?view=markup&root=ttssh2">trunk/teraterm/common/inifile_com.h</a></li>
+        </ul>
+      </li>
+      <li>struct tttset (tttypes.h) のメンバを変更しました。
+        <ul>
+          <li>ファイル名、パス、文字列のメンバには、WがついたUnicode版のメンバが追加。</li>
+          <li>ファイル名、パスの文字数はMAX_PATH文字以上になることを考慮。</li>
+          <li>まだ変化する予定(メンバ名、順序、サイズ、型などなど)。</li>
+        </ul>
+      </li>
+      <li>通知アイコンのAPIが変更されました。
+        <ul>
+          <li>高DPIに対応しました。</li>
+          <li>SetVerNotifyIcon(), SetCustomNotifyIcon(), GetCustomNotifyIcon() は削除されました。</li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_notify.h?view=markup&root=ttssh2">trunk/teraterm/ttpcmn/ttcmn_notify.h</a></li>
+        </ul>
+      </li>
+      <li>ヘルプAPIを追加。
+        <ul>
+          <li>Unicodeファイル名に対応したAPIを追加しました。<br>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_lib.h?view=markup&root=ttssh2">trunk/teraterm/ttpcmn/ttcmn_lib.h</a></li>
+        </ul>
+      </li>
     </ul>
 
   </body>
