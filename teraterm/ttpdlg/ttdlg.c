@@ -2173,6 +2173,9 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 	// 1916      2017     15.9.x            14.16
 	// 1920      2019     16.0.x            14.20
 	// 1921      2019     16.1.x            14.21
+	// 1929      2019     16.11.x           14.29
+	// 1930      2022     17.0.x            14.30
+	// 1936      2022     17.6.x            14.36
 	msc_ver = (_MSC_FULL_VER / 10000000);
 	msc_low_ver = (_MSC_FULL_VER / 100000) % 100;
 	if (msc_ver < 19) {
@@ -2226,22 +2229,28 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 #if defined(WDK_NTDDI_VERSION)
 // ビルドしたときに使われた SDK のバージョンを取得する
 // URL: https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
-// - Visual Studio Installer に表示されるバージョン
-// - インストールされた SDK が「アプリと機能」で表示されるバージョン
-// - 上記 URL での表示バージョン
-// - インストール先フォルダ名
-// で、最後のブロックの数字が同じではない。
-//
+// バージョン番号には
+// (1) Visual Studio でプロジェクトのプロパティの "Windows SDK バージョン" に列挙されるバージョン
+// (2) インストールされた SDK が「アプリと機能」で表示されるバージョン
+// (3) 上記 URL での表示バージョン
+// (4) インストール先フォルダ名
+// があるが、最後のブロックの数字は同じにならないことが多い。
+// e.g. (1) 10.0.18362.0, (2) 10.0.18362.1, (3) 10.0.18362.1, (4) 10.0.18362.0
+//      (1) 10.0.22000.0, (2) 10.0.22000.832, (3) 10.0.22000.832, (4) 10.0.22000.0
 static void GetSDKInfo(char *buf, size_t buf_size)
 {
 	if (WDK_NTDDI_VERSION >= 0x0A00000B) {
 		strncpy_s(buf, buf_size, "Windows SDK", _TRUNCATE);
 		switch (WDK_NTDDI_VERSION) {
 			case 0x0A00000B: // NTDDI_WIN10_CO
-				strncat_s(buf, buf_size, " for Windows 11 (10.0.22000.194)", _TRUNCATE);
+				             // 10.0.22000.194 も存在するが判定できない
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.22000.832)", _TRUNCATE);
 				break;
 			case 0x0A00000C: // NTDDI_WIN10_NI
-				strncat_s(buf, buf_size, " for Windows 11 (10.0.22621.1)", _TRUNCATE);
+				             // 10.0.22621.1 も存在するが判定できない
+				             // (2)インストーラ, (3)URL では別扱いの 10.0.22621.1778 も同じ判定になる
+				             // AppVeyor で使われているはずのバージョン番号を返す
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.22621.755)", _TRUNCATE);
 				break;
 			default: {
 				char str[32];
