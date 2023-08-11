@@ -58,11 +58,6 @@ NumSlash=309
 NumAsterisk=55
 ;Num pad '-' key
 NumMinus=74
-
-[VT function keys]
-Hold=off
-Print=off
-Break=off
 ; F1 key
 PF1=59
 ; F2 key
@@ -71,6 +66,11 @@ PF2=60
 PF3=61
 ; F4 key
 PF4=62
+
+[VT function keys]
+Hold=off
+Print=off
+Break=off
 ;F6 key
 F6=64
 ;F7 key
