@@ -7,8 +7,6 @@ set REF_J=ja\html\reference
 %TOSJIS% -i ..\libs\oniguruma\doc\RE.ja -o %REF_J%\RE.txt      -c utf8   -l unix
 %TOSJIS% -i ..\libs\libressl\COPYING    -o %REF_E%\LibreSSL-LICENSE.txt  -l unix
 %TOSJIS% -i ..\libs\libressl\COPYING    -o %REF_J%\LibreSSL-LICENSE.txt  -l unix
-%TOSJIS% -i ..\libs\putty\LICENCE       -o %REF_E%\PuTTY-LICENSE.txt     -l crlf
-%TOSJIS% -i ..\libs\putty\LICENCE       -o %REF_J%\PuTTY-LICENSE.txt     -l crlf
 %TOSJIS% -i ..\libs\SFMT\LICENSE.txt    -o %REF_E%\SFMT-LICENSE.txt      -l unix
 %TOSJIS% -i ..\libs\SFMT\LICENSE.txt    -o %REF_J%\SFMT-LICENSE.txt      -l unix
 %TOSJIS% -i ..\cygwin\cygterm\COPYING   -o %REF_E%\CygTerm+-LICENSE.txt  -l unix
