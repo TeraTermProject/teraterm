@@ -77,7 +77,7 @@ copy /y ..\doc\ja\teratermj.chm %dst%
 copy /y ..\doc\en\teraterm.chm %dst%
 
 copy /y release\*.* %dst%
-copy /y release\EDITOR.CNF %dst%\KEYBOARD.CNF
+copy /y release\IBMKEYB.CNF %dst%\KEYBOARD.CNF
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\theme %dst%\theme
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\plugin %dst%\plugin
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang

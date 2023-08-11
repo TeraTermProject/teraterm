@@ -79,12 +79,9 @@ Source: release\TSPECIAL1.TTF; DestDir: {commonfonts}; Components: TeraTerm; Att
 Source: ..\doc\en\teraterm.chm; DestDir: {app}; Components: TeraTerm
 Source: ..\doc\ja\teratermj.chm; DestDir: {app}; Components: TeraTerm
 Source: release\license.txt; DestDir: {app}; Components: TeraTerm
-Source: release\FUNCTION.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
-Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm
-Source: release\NT98KEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: release\PC98KEYB.CNF; DestDir: {app}; Components: TeraTerm
+Source: release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
+Source: release\VT200.CNF; DestDir: {app}; Components: TeraTerm
 Source: ..\teraterm\release\keycode.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpmacro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: release\delpassw.ttl; DestDir: {app}; Components: TeraTerm
