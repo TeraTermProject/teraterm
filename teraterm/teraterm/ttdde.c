@@ -628,10 +628,14 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	}
-	case CmdRestoreSetup:
-		strncpy_s(ts.SetupFName, sizeof(ts.SetupFName),ParamFileName, _TRUNCATE);
+	case CmdRestoreSetup: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		free(ts.SetupFNameW);
+		ts.SetupFNameW = ParamFileNameW;
+		WideCharToACP_t(ts.SetupFNameW, ts.SetupFName, _countof(ts.SetupFName));
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdRestoreSetup,0);
 		break;
+	}
 	case CmdSendBreak:
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdBreak,0);
 		break;
