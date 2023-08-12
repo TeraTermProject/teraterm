@@ -1347,6 +1347,36 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	return FALSE;
 }
 
+/**
+ *	コンボボックスのホスト履歴をファイルに書き出す
+ */
+static void WriteComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
+{
+	wchar_t EntNameW[10];
+	LRESULT Index;
+	int i;
+
+	WritePrivateProfileStringW(L"Hosts", NULL, NULL, SetupFNW);
+
+	Index = SendDlgItemMessageW(dlg, dlg_item, LB_GETCOUNT, 0, 0);
+	if (Index == LB_ERR) {
+		Index = 0;
+	}
+	else {
+		Index--;
+	}
+	if (Index > MAXHOSTLIST) {
+		Index = MAXHOSTLIST;
+	}
+	for (i = 1; i <= Index; i++) {
+		wchar_t *strW;
+		GetDlgItemIndexTextW(dlg, dlg_item, i - 1, &strW);
+		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"Host%i", i);
+		WritePrivateProfileStringW(L"Hosts", EntNameW, strW, SetupFNW);
+		free(strW);
+	}
+}
+
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -1368,11 +1398,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDC_TCPIPHELP, "BTN_HELP" },
 	};
 	PTTSet ts;
-	char EntName[10];
-	char TempHost[HostNameMaxLength+1];
 	UINT i, Index;
 	WORD w;
-	BOOL Ok;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -1384,21 +1411,10 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT,
 			                   HostNameMaxLength-1, 0);
 
-			i = 1;
-			do {
-				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-				GetPrivateProfileString("Hosts",EntName,"",
-				                        TempHost,sizeof(TempHost),ts->SetupFName);
-				if (strlen(TempHost) > 0) {
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING,
-					                   0, (LPARAM)TempHost);
-				}
-				i++;
-			} while (i <= MAXHOSTLIST);
+			SetComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
 
 			/* append a blank item to the bottom */
-			TempHost[0] = 0;
-			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, (LPARAM)TempHost);
+			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, 0);
 			SetRB(Dialog,ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
 			SetRB(Dialog,ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
 			SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TCPPort,FALSE);
@@ -1416,73 +1432,61 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
-				case IDOK:
-					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
-					if (ts!=NULL) {
-						WritePrivateProfileString("Hosts",NULL,NULL,ts->SetupFName);
+				case IDOK: {
+					BOOL Ok;
 
-						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
-						if (Index==(UINT)LB_ERR) {
-							Index = 0;
-						}
-						else {
-							Index--;
-						}
-						if (Index>MAXHOSTLIST) {
-							Index = MAXHOSTLIST;
-						}
-						for (i = 1 ; i <= Index ; i++) {
-							SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
-							                   i-1, (LPARAM)TempHost);
-							_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%i", i);
-							WritePrivateProfileString("Hosts",EntName,TempHost,ts->SetupFName);
-						}
-						GetRB(Dialog,&ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
-						GetRB(Dialog,&ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
-						ts->TCPPort = GetDlgItemInt(Dialog,IDC_TCPIPPORT,&Ok,FALSE);
-						if (! Ok) {
-							ts->TCPPort = ts->TelPort;
-						}
-						ts->TelKeepAliveInterval = GetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,&Ok,FALSE);
-						GetRB(Dialog,&ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-						GetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType,
-						               sizeof(ts->TermType));
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
+					assert(ts!=NULL);
+					WriteComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
+					GetRB(Dialog,&ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
+					GetRB(Dialog,&ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
+					ts->TCPPort = GetDlgItemInt(Dialog,IDC_TCPIPPORT,&Ok,FALSE);
+					if (! Ok) {
+						ts->TCPPort = ts->TelPort;
 					}
+					ts->TelKeepAliveInterval = GetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,&Ok,FALSE);
+					GetRB(Dialog,&ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
+					GetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType,
+								   sizeof(ts->TermType));
 					EndDialog(Dialog, 1);
 					return TRUE;
-
+				}
 				case IDCANCEL:
 					EndDialog(Dialog, 0);
 					return TRUE;
 
 				case IDC_TCPIPHOST:
 					if (HIWORD(wParam)==EN_CHANGE) {
-						GetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
-						if (strlen(TempHost)==0) {
+						wchar_t *host;
+						hGetDlgItemTextW(Dialog, IDC_TCPIPHOST, &host);
+						if (wcslen(host)==0) {
 							DisableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
 						}
 						else {
 							EnableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
 						}
+						free(host);
 					}
 					break;
 
-				case IDC_TCPIPADD:
-					GetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
-					if (strlen(TempHost)>0) {
+				case IDC_TCPIPADD: {
+					wchar_t *host;
+					hGetDlgItemTextW(Dialog, IDC_TCPIPHOST, &host);
+					if (wcslen(host) > 0) {
 						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL,0,0);
 						if (Index==(UINT)LB_ERR) {
 							Index = 0;
 						}
 
-						SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
-						                   Index, (LPARAM)TempHost);
+						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
+						                   Index, (LPARAM)host);
 
 						SetDlgItemText(Dialog, IDC_TCPIPHOST, 0);
 						SetFocus(GetDlgItem(Dialog, IDC_TCPIPHOST));
 					}
+					free(host);
 					break;
-
+				}
 				case IDC_TCPIPLIST:
 					if (HIWORD(wParam)==LBN_SELCHANGE) {
 						i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
@@ -1509,7 +1513,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					break;
 
 				case IDC_TCPIPUP:
-				case IDC_TCPIPDOWN:
+				case IDC_TCPIPDOWN: {
+					wchar_t *host;
 					i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
 					Index = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
 					if (Index==(UINT)LB_ERR) {
@@ -1521,12 +1526,12 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					if ((Index==0) || (Index>=i-1)) {
 						return TRUE;
 					}
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
-					                   Index, (LPARAM)TempHost);
+					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, Index, &host);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
 					                   Index, 0);
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
-					                   Index-1, (LPARAM)TempHost);
+					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
+					                   Index-1, (LPARAM)host);
+					free(host);
 					if (LOWORD(wParam)==IDC_TCPIPUP) {
 						Index--;
 					}
@@ -1545,22 +1550,25 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					}
 					SetFocus(GetDlgItem(Dialog, IDC_TCPIPLIST));
 					break;
+				}
 
-				case IDC_TCPIPREMOVE:
+				case IDC_TCPIPREMOVE: {
+					wchar_t *host;
 					i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
 					Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL, 0, 0);
 					if ((Index==(UINT)LB_ERR) ||
 						(Index==i-1)) {
 						return TRUE;
 					}
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
-					                   Index, (LPARAM)TempHost);
+					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, Index, &host);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
 					                   Index, 0);
-					SetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost);
+					SetDlgItemTextW(Dialog, IDC_TCPIPHOST, host);
 					DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPDOWN);
 					SetFocus(GetDlgItem(Dialog, IDC_TCPIPHOST));
+					free(host);
 					break;
+				}
 
 				case IDC_TCPIPTELNET:
 					GetRB(Dialog,&w,IDC_TCPIPTELNET,IDC_TCPIPTELNET);

@@ -487,10 +487,27 @@ void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 }
 
 /**
- *	接続したホスト履歴をコンボボックスにセットする
+ *	接続したホスト履歴をコンボボックスまたはリストボックスにセットする
  */
 void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
 {
+	char class_name[32];
+	UINT message;
+	int r = GetClassNameA(GetDlgItem(dlg, dlg_item), class_name, _countof(class_name));
+	if (r == 0) {
+		return;
+	}
+	if (strcmp(class_name, "ComboBox") == 0) {
+		message = CB_ADDSTRING;
+	}
+	else if (strcmp(class_name, "ListBox") == 0) {
+		message = LB_ADDSTRING;
+	}
+	else {
+		assert(FALSE);
+		return;
+	}
+
 	int i = 1;
 	do {
 		wchar_t EntNameW[128];
@@ -498,8 +515,7 @@ void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar
 		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
 		hGetPrivateProfileStringW(L"Hosts", EntNameW, L"", SetupFNW, &TempHostW);
 		if (TempHostW[0] != 0) {
-			SendDlgItemMessageW(dlg, dlg_item, CB_ADDSTRING,
-								0, (LPARAM) TempHostW);
+			SendDlgItemMessageW(dlg, dlg_item, message, 0, (LPARAM)TempHostW);
 		}
 		free(TempHostW);
 		i++;
@@ -553,4 +569,21 @@ void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
 			DestroyIcon(icon);
 		}
 	}
+}
+
+/**
+ *	ListBoxにセットされている文字列を取得する
+ *	不要になったら free() すること
+ *
+ *	@param[out]	text	設定されている文字列
+ *						不要になったらfree()する
+ *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
+ */
+DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text)
+{
+	LRESULT len = SendDlgItemMessageW(hDlg, nIDDlgItem, LB_GETTEXTLEN, index, 0);
+	wchar_t *str = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
+	SendDlgItemMessageW(hDlg, nIDDlgItem, LB_GETTEXT, index, (LPARAM)str);
+	*text = str;
+	return NO_ERROR;
 }
