@@ -81,6 +81,10 @@ cd /d %CUR%..\libs
 set OPT=
 if "%1" == "force" set OPT=-DFORCE_DOWNLOAD=on
 %CMAKE% %OPT% -P download.cmake
+if errorlevel 1 (
+   echo download error
+   exit 1
+)
 
 endlocal
 exit /b 0
