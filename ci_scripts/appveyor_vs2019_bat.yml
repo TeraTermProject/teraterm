@@ -7,7 +7,7 @@ environment:
 build: off
 
 init:
-  - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
+  - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake
 
 cache:
   - libs
