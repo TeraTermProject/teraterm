@@ -406,7 +406,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 	settings->GexMinimalGroupSize = GetPrivateProfileInt("TTSSH", "GexMinimalGroupSize", 0, fileName);
 
-	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 1, fileName);
+	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 3, fileName);
 
 #ifdef _DEBUG
 	GetPrivateProfileStringW(L"TTSSH", L"KexKeyLogFile", L"", settings->KexKeyLogFile, _countof(settings->KexKeyLogFile), fileName);

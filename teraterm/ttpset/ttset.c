@@ -1346,7 +1346,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        ts->PrnDev, sizeof(ts->PrnDev), FName);
 
 	/* プリンタ用制御コードを受け付けるか */
-	if (GetOnOff(Section, "PrinterCtrlSequence", FName, TRUE))
+	if (GetOnOff(Section, "PrinterCtrlSequence", FName, FALSE))
 		ts->TermFlag |= TF_PRINTERCTRL;
 
 	/* Printer Font --- special option */
@@ -1766,7 +1766,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->EnableLineMode = GetOnOff(Section, "EnableLineMode", FName, TRUE);
 
 	// Clear window on resize
-	if (GetOnOff(Section, "ClearOnResize", FName, TRUE))
+	if (GetOnOff(Section, "ClearOnResize", FName, FALSE))
 		ts->TermFlag |= TF_CLEARONRESIZE;
 
 	// Alternate Screen Buffer
