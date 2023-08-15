@@ -44,7 +44,7 @@ install(
   )
 
 install(
-  FILES release/EDITOR.CNF
+  FILES release/IBMKEYB.CNF
   DESTINATION .
   RENAME KEYBOARD.CNF
   )

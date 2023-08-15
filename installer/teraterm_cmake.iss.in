@@ -70,12 +70,9 @@ Source: @PROJECT_SOURCE_DIR@/installer\release\TSPECIAL1.TTF; DestDir: {commonfo
 Source: @CMAKE_INSTALL_PREFIX@/teraterm.chm; DestDir: {app}; Components: TeraTerm
 Source: @CMAKE_INSTALL_PREFIX@/teratermj.chm; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\license.txt; DestDir: {app}; Components: TeraTerm
-Source: @PROJECT_SOURCE_DIR@/installer\release\FUNCTION.CNF; DestDir: {app}; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: @PROJECT_SOURCE_DIR@/installer\release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
-Source: @PROJECT_SOURCE_DIR@/installer\release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm
-Source: @PROJECT_SOURCE_DIR@/installer\release\NT98KEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: @PROJECT_SOURCE_DIR@/installer\release\PC98KEYB.CNF; DestDir: {app}; Components: TeraTerm
+Source: @PROJECT_SOURCE_DIR@/installer\release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
+Source: @PROJECT_SOURCE_DIR@/installer\release\VT200.CNF; DestDir: {app}; Components: TeraTerm
 Source: @CMAKE_INSTALL_PREFIX@/keycode.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @CMAKE_INSTALL_PREFIX@/ttpmacro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\delpassw.ttl; DestDir: {app}; Components: TeraTerm

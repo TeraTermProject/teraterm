@@ -28,6 +28,12 @@ cd build_vs2022
 cmake .. -G "Visual Stuido 17 2022" -A Win32
 cmake --build . --config Release -j
 ```
+インストーラを作成する
+```
+cmake --build . --config Release --target Install
+cmake --build . --config Release --target inno_setup
+cmake --build . --config Release --target zip
+```
 
 ### NMake (Visual Studio, very experimental)
 
