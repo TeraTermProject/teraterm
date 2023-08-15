@@ -1,24 +1,35 @@
 image: Visual Studio 2022
 
 environment:
+# キャッシュを使わない
+# APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VS_VERSION: 2022
+  # bat の中で参照されているが、自動的に設定されないようなので指定する
+  APPVEYOR: True
 
 build: off
 
 init:
-  # - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake --packages cygwin32-gcc-g++ --packages cygwin32-gcc-core
+# - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  # c:\cygwin64 の Cygwin に cmake をインストール
+  # このコマンドではインストール済みパッケージは更新されない
+  - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake
+
+# キャッシュを使わない
+# cache:
+#   - libs
 
 build_script:
-  # - ci_scripts/build_appveyor_release_bat.bat
-  # - ci_scripts/build_appveyor_release_bat_pre_cache.bat
+  - ci_scripts/build_appveyor_release_bat.bat
+# - ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
 artifacts:
   - path: installer/Output/*.exe
   - path: installer/Output/*.zip
 
 on_success:
-  # - ci_scripts\notify.bat success
+# - ci_scripts\notify.bat success
 on_failure:
-  # - ci_scripts\notify.bat failure
+# - ci_scripts\notify.bat failure
 on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
