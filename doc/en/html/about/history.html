@@ -35,44 +35,44 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>Exchanged foforeground and background colors of characters that attributes is setted ANSIColor when colors are reversed with DECSCNM set.</li>
+      <li>U+00A0(NBSP) and U+2000..U+2003 are converted to SPACE and displayed. tree command output is displayed correctly.</li>
+      <li>XMODEM: Fix to check all received datas and process correctly, even if received datas are accumulated.</li>
+      <li>YMODEM: ignore continuous 'C' when waiting for sending.</li>
+      <!--li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li-->
       <!--li>Windows 11 で VT ウィンドウと TEK ウィンドウの角が丸くならないようにする設定を追加した。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCornerDontround">WindowCornerDontround</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li-->
-      <li>XMODEM: Fix to check all received datas and process correctly, even if received datas are accumulated.</li>
-      <li>YMODEM: ignore continuous 'C' when waiting for sending.</li>
-      <!--li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li-->
-      <!--li>ファイルドロップダイアログの Send file の Binary のチェックボックス
+      <!--li>ファイルドロップダイアログの Send file の Binary のチェックボックスの動作を変更した。
         <ul>
-          <li>デフォルトに、ini ファイルの TransBin設定を反映するようにした。</li>
-          <li>"次のドロップ時、同じ処理を行う"チェック時に、記憶するようにした。</li>
+          <li>デフォルトに、ini ファイルの TransBin 設定を反映するようにした。</li>
+          <li>"次のドロップ時、同じ処理を行う" チェック時に、記憶するようにした。</li>
       </ul></li-->
-      <li>Exchanged fore and back colors of characters that attributes is setted ANSIColor when colors are reversed with DECSCNM set.</li>
       <li>Invalid characters as file name contains Default log file name, are replaced with '_'.</li>
-      <li>U+00A0(NBSP) and U+2000..U+2003 are converted to SPACE and displayed. tree command output is displayed correctly.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>Reset text colors when <a href="../menu/control.html">[Control]-[Reset terminal]</a> is selected</li>
-      <li>The file handle of TELNET.LOG could not be closed.</li>
-      <!--li>telnet(cygterm)接続時、NAWS(Negotiate About Window Size)が送られてきたときウィンドウサイズを誤って設定する可能性があったので修正。</li-->
-      <li>MACRO: the file created with <a href="../macro/command/filecreate.html">filecreate</a> command can not be read without fileclose. This bug was introduced in 4.102.</li>
-      <!--li>ログ取得中に表示されるログダイアログのヘルプボタンを押すと Send File のヘルプが表示される問題を修正した</li-->
-      <!--li>SSH接続時、ファイルドロップ時の処理を次回も行うよう指定しても、SCPが選択される問題を修正した。</li-->
-      <!--li>通知アイコンにフルカラーのアイコンが使われない問題を修正した。</li-->
-      <!--li>カスタム通知アイコンを変更しても通知アイコンが変更されない問題を修正した。</li-->
-      <li>Fixed wrong value is written to VTReverseColor when saving TERATERM.INI during reverse video.</li>
       <li>Fixed problem with color number 1-7 and 9-15 are replaced in sequence OCS 4.
-      <!--li>TERATERM.INI の MouseCursor の設定値が小文字だと Additional settings ダイアログに反映されない問題を修正</li-->
-      <li>Fixed wrong color numbers were changed when the color palette change in Visual Tab in Additional settings dialog.</li>
       <li>Fixed wrong color numbers in the color change and response sequence.</li>
+      <li>Fixed the area selected with the mouse does not disappear when the text is erased with the erase escape sequences.</li>
+      <li>Reset text colors when <a href="../menu/control.html">[Control]-[Reset terminal]</a> is selected</li>
+      <!--li>telnet(cygterm)接続時、NAWS(Negotiate About Window Size)が送られてきたときウィンドウサイズを誤って設定する可能性があったので修正。</li-->
+      <li>Fixed DPI adjustment does not work correctly when VT Window is moved to different DPI monitor.</li>
       <!--li>Kermit でファイルを受信できないことがある問題を修正した。</li-->
       <!--li>Kermit の送信パケットのサイズを調整した。</li-->
+      <!--li>通知アイコンにフルカラーのアイコンが使われない問題を修正した。</li-->
+      <!--li>カスタム通知アイコンを変更しても通知アイコンが変更されない問題を修正した。</li-->
+      <!--li>SSH接続時、ファイルドロップ時の処理を次回も行うよう指定しても、SCPが選択される問題を修正した。</li-->
       <li>Fixed current font name was empty in ChooseFont dialog when changing dialog fonts.</li>
-      <li>Fixed the area selected with the mouse does not disappear when the text is erased with the erase escape sequences.</li>
-      <li>Fixed DPI adjustment does not work correctly when VT Window is moved to different DPI monitor.</li>
+      <li>Fixed wrong color numbers were changed when the color palette change in Visual Tab in Additional settings dialog.</li>
+      <!--li>ログ取得中に表示されるログダイアログのヘルプボタンを押すと Send File のヘルプが表示される問題を修正した</li-->
+      <li>Fixed wrong value is written to VTReverseColor when saving TERATERM.INI during reverse video.</li>
+      <!--li>TERATERM.INI の MouseCursor の設定値が小文字だと Additional settings ダイアログに反映されない問題を修正</li-->
+      <li>The file handle of TELNET.LOG could not be closed.</li>
+      <li>MACRO: can not read from the file handle that is opened by <a href="../macro/command/filecreate.html">filecreate</a> command. This bug was introduced in 4.102.</li>
       <li>MACRO: The <a href="../macro/command/setpassword.html">setpassword</a> command cause an error when password argument is a string value. Only string variable was accepted.</li>
       <li>MACRO: The <a href="../macro/command/getpassword.html">getpassword</a> command updates password variable by undefined value when password from user is no input.</li>
     </ul>
@@ -80,10 +80,11 @@
 
   <li>Misc
     <ul>
-      <li>Added about EAR(Export Administration Regulations) to Frequently asked questions.</li>
-      <li>upgraded Oniguruma to 6.9.8.</li>
+      <li>Added about EAR (Export Administration Regulations) to Frequently asked questions.</li>
+      <li>upgraded TTSSH to <a href="#ttssh_2.93">2.93</a>.</li>
       <li>upgraded TeraTerm Menu to <a href="#ttmenu_1.17">1.17</a></li>
       <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.05">1.05</a>.</li>
+      <li>upgraded Oniguruma to 6.9.8.</li>
     </ul>
   </li>
 </ul>
@@ -3340,18 +3341,18 @@ SYNOPSIS:
     <ul>
       <li>added support for SSH2 host key algorithms: rsa-sha2-256, rsa-sha2-512</li>
       <li>added support for SSH2 public key authentication methods: rsa-sha2-256, rsa-sha2-512</li>
-      <!-- li>TTSSH から通知があったときには TTSSH のアイコンが使われるようにした。</li -->
-      <li>Increased the default RSA key size to 3072 bits on <a href="../menu/setup-sshkeygenerator.html">Key Generator dialog</a>.</li>
       <!--li>キープアライブパケットの送信間隔のデフォルトを 300 秒に変更した。</li-->
+      <!-- li>SSH 接続中に通知があったときには TTSSH のアイコンが使われるようにした。</li -->
+      <li>Increased the default RSA key size to 3072 bits on <a href="../menu/setup-sshkeygenerator.html">Key Generator dialog</a>.</li>
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li><a href="../menu/setup-sshauth.html">Authentication Setup ダイアログ</a>を開いたときに、SSH 認証に使用するユーザ名設定が "Use default username" (DefaultUserType=1) なのに "Do not enter username" が選択される問題を修正した。</li>
       <li>SSH2ダイナミックポートフォワーディングを使用すると異常終了する問題を修正した。</li>
+      <li><a href="../menu/setup-sshauth.html">Authentication Setup ダイアログ</a>を開いたときに、SSH 認証に使用するユーザ名設定が "Use default username" (DefaultUserType=1) なのに "Do not enter username" が選択される問題を修正した。</li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>

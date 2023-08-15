@@ -35,44 +35,44 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>DECSCNM setで色反転時に、属性にANSIColorを設定した文字の前景色と背景色を入れ替えるようにした。</li>
+      <li>U+00A0(NBSP),U+2000..U+2003をU+0020(SPACE)に変換して表示するようにした。これによりtreeコマンドで文字化けしなくなった。</li>
+      <li>XMODEM 受信データが蓄積しても全体を調べて正しく処理するように修正した。</li>
+      <li>YMODEM 送信待ちの時、連続した 'C' を無視するようにした。</li>
+      <li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li>
       <li>Windows 11 で VT ウィンドウと TEK ウィンドウの角が丸くならないようにする設定を追加した。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCornerDontround">WindowCornerDontround</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li>
-      <li>XMODEM 受信データが蓄積しても全体を調べて正しく処理するように修正した。</li>
-      <li>YMODEM 送信待ちの時、連続した 'C' を無視するようにした。</li>
-      <li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li>
-      <li>ファイルドロップダイアログの Send file の Binary のチェックボックス
+      <li>ファイルドロップダイアログの Send file の Binary のチェックボックスの動作を変更した。
         <ul>
-          <li>デフォルトに、ini ファイルの TransBin設定を反映するようにした。</li>
-          <li>"次のドロップ時、同じ処理を行う"チェック時に、記憶するようにした。</li>
+          <li>デフォルトに、ini ファイルの TransBin 設定を反映するようにした。</li>
+          <li>"次のドロップ時、同じ処理を行う" チェック時に、記憶するようにした。</li>
       </ul></li>
-      <li>DECSCNM setで色反転時に、属性にANSIColorを設定した文字の前景色と背景色を入れ替えるようにした。</li>
       <li>標準ログファイル名にファイル名として不正な文字が含まれていた場合、'_'に置換するようにした。</li>
-      <li>U+00A0(NBSP),U+2000..U+2003をU+0020(SPACE)に変換して表示するようにした。treeコマンドで文字化けしないようになった。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li><a href="../menu/control.html">[Control]-[Reset terminal]</a>で文字色が初期化するよう修正した。</li>
-      <li>TELNET.LOGのファイルハンドルがクローズできていない問題を修正した。</li>
-      <li>telnet(cygterm)接続時、NAWS(Negotiate About Window Size)が送られてきたときウィンドウサイズを誤って設定する可能性があったので修正。</li>
-      <li><a href="../macro/command/filecreate.html">filecreate</a> マクロコマンドで作成したファイルをfilecloseせずに読み込みができなかったので修正。4.102でエンバグ。</li>
-      <li>ログ取得中に表示されるログダイアログのヘルプボタンを押すと Send File のヘルプが表示される問題を修正した。</li>
-      <li>SSH接続時、ファイルドロップ時の処理を次回も行うよう指定しても、SCPが選択される問題を修正した。</li>
-      <li>通知アイコンにフルカラーのアイコンが使われない問題を修正した。</li>
-      <li>カスタム通知アイコンを変更しても通知アイコンが変更されない問題を修正した。</li>
-      <li>反転表示時にTERATERM.INIを保存すると、VTReverseColor に誤った値が書き込まれる問題を修正した。</li>
       <li>シーケンス OSC 4 の色番号 1-7と9-15が入れ替わっていた問題を修正した。</li>
-      <li>TERATERM.INI の MouseCursor の設定値が小文字だと Additional settings ダイアログに反映されない問題を修正</li>
-      <li>その他の設定ダイアログの表示タブのカラーパレット変更で正しくない色番号が変更される問題を修正した。</li>
       <li>カラーパレット変更、取得シーケンスで、色番号を誤っていた問題を修正した。</li>
+      <li>消去シーケンスで文字が消されたとき、マウスで選択した領域が消えないように修正した。</li>
+      <li><a href="../menu/control.html">[Control]-[Reset terminal]</a>で文字色が初期化するよう修正した。</li>
+      <li>telnet(cygterm)接続時、NAWS(Negotiate About Window Size)が送られてきたときウィンドウサイズを誤って設定する可能性があったので修正した。</li>
+      <li>VT ウィンドウが異なるモニタをまたぐ時、DPI調整がうまく行われない問題を修正した。</li>
       <li>Kermit でファイルを受信できないことがある問題を修正した。</li>
       <li>Kermit の送信パケットのサイズを調整した。</li>
+      <li>通知アイコンにフルカラーのアイコンが使われない問題を修正した。</li>
+      <li>カスタム通知アイコンを変更しても通知アイコンが変更されない問題を修正した。</li>
+      <li>SSH接続時、ファイルドロップ時の処理を次回も行うよう指定しても、SCPが選択される問題を修正した。</li>
       <li>ダイアログフォント変更時、フォント選択ダイアログに現在のフォント名が表示されない問題を修正した</li>
-      <li>消去シーケンスで文字が消されたとき、マウスで選択した領域が消えないように修正した</li>
-      <li>VT ウィンドウが異なるモニタをまたぐ時、DPI調整がうまく行われない問題を修正した</li>
+      <li>その他の設定ダイアログの表示タブのカラーパレット変更で正しくない色番号が変更される問題を修正した。</li>
+      <li>ログ取得中に表示されるログダイアログのヘルプボタンを押すと Send File のヘルプが表示される問題を修正した。</li>
+      <li>反転表示時にTERATERM.INIを保存すると、VTReverseColor に誤った値が書き込まれる問題を修正した。</li>
+      <li>TERATERM.INI の MouseCursor の設定値が小文字だと Additional settings ダイアログに反映されない問題を修正した。</li>
+      <li>TELNET.LOGのファイルハンドルがクローズできていない問題を修正した。</li>
+      <li><a href="../macro/command/filecreate.html">filecreate</a> マクロコマンドで開いたファイルハンドルから読み込みができない問題を修正した。4.102でエンバグ。</li>
       <li><a href="../macro/command/setpassword.html">setpassword</a> マクロコマンドで、パスワードを文字列で渡すと Syntax Error になる問題を修正した。文字列変数で渡さないと受け付けなかった。</li>
       <li><a href="../macro/command/getpassword.html">getpassword</a> マクロコマンドでユーザにパスワードを問い合わせて入力がなかった場合、パスワードを格納する変数の内容が不定になる問題を修正した。</li>
     </ul>
@@ -81,9 +81,10 @@
   <li>その他
     <ul>
       <li>Q & A集に輸出規制(EAR)について追記した。</li>
-      <li>Oniguruma 6.9.8へ差し替えた。</li>
+      <li><a href="#ttssh_2.93">TTSSH(2.93)</a>へ差し替えた。</li>
       <li><a href="#ttmenu_1.17">TeraTerm Menu(1.17)</a>へ差し替えた。</li>
       <li><a href="#ttyrec_1.05">TTXttyrec Plugin(1.05)</a>へ差し替えた。</li>
+      <li>Oniguruma 6.9.8へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -3346,16 +3347,16 @@
     <ul>
       <li>SSH2 の rsa-sha2-256, rsa-sha2-512 ホスト鍵方式をサポートした。</li>
       <li>SSH2 の rsa-sha2-256, rsa-sha2-512 公開鍵認証をサポートした。</li>
+      <li>キープアライブパケットの送信間隔のデフォルトを 300 秒に変更した。</li>
       <li>SSH 接続中に通知があったときには TTSSH のアイコンが使われるようにした。</li>
       <li><a href="../menu/setup-sshkeygenerator.html">SSH鍵生成ダイアログ</a>の RSA 鍵のデフォルトの長さを 3072bit に変更した。</li>
-      <li>キープアライブパケットの送信間隔のデフォルトを 300 秒に変更した。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li><a href="../menu/setup-sshauth.html">Authentication Setup ダイアログ</a>を開いたときに、SSH 認証に使用するユーザ名設定が "Use default username" (DefaultUserType=1) なのに "Do not enter username" が選択される問題を修正した。</li>
       <li>SSH2ダイナミックポートフォワーディングを使用すると異常終了する問題を修正した。</li>
+      <li><a href="../menu/setup-sshauth.html">Authentication Setup ダイアログ</a>を開いたときに、SSH 認証に使用するユーザ名設定が "Use default username" (DefaultUserType=1) なのに "Do not enter username" が選択される問題を修正した。</li>
     </ul>
   </li>
 
