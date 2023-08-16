@@ -1,6 +1,8 @@
+cd /d %~dp0..
 if exist teraterm\ttpdlg\svnversion.h del teraterm\ttpdlg\svnversion.h
 if exist buildtools\svnrev\sourcetree_info.bat del buildtools\svnrev\sourcetree_info.bat
 call ci_scripts\install.bat
+cd /d %~dp0..
 call buildtools\svnrev\svnrev.bat
 call buildtools\svnrev\sourcetree_info.bat
 if "%COMPILER%" == "mingw"  (
