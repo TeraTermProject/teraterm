@@ -44,6 +44,11 @@ execute_process(
   COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages cmake,bash,tar,make,perl,gcc-core,gcc-g++,icoutils
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
+# install packages for notify
+execute_process(
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages perl-JSON,perl-LWP-Protocol-https
+  WORKING_DIRECTORY ${CYGWIN_ROOT}
+)
 
 # remove archives
 if(REMOVE_TMP)

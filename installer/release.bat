@@ -123,14 +123,13 @@ exit /b 0
 rem ####################
 :setup_tools_env
 
-set CYGWIN_PATH=%CUR%..\buildtools\cygwin64\bin
-if exist "%CYGWIN_PATH%" goto cygwin_path_pass
-set CYGWIN_PATH=C:\cygwin64\bin
-if exist "%CYGWIN_PATH%" goto cygwin_path_pass
+call %CUR%..\buildtools\find_cygwin.bat
+if not "%CYGWIN_PATH%" == "" goto cygwin_path_pass
 echo cygwin not found
 if not "%NOPAUSE%" == "1" pause
 exit
 :cygwin_path_pass
+
 set VS_BASE=C:\Program Files\Microsoft Visual Studio\%VS_VERSION%
 if exist "%VS_BASE%" goto vs_base_pass
 set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\%VS_VERSION%
