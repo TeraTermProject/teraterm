@@ -24,7 +24,7 @@ endif()
 #   RAR/Extras page, UnRAR for Windows 6.22
 set(UNRAR_ZIP "unrarw32.exe")
 set(UNRAR_URL "https://www.rarlab.com/rar/unrarw32.exe")
-set(UNRAR_HASH "f0baeb3ed0cc436a2bb172b56059b3ff33fa397bbfcb79a3dd5084e18065e0d4")
+set(UNRAR_HASH "79c7bd2d05295a4bb21fba602c59c11f84a7ad26b0cf064f891ba38e164c099b")
 file(MAKE_DIRECTORY "download/unrar")
 file(DOWNLOAD
   ${UNRAR_URL}

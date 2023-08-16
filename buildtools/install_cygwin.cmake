@@ -22,8 +22,9 @@ endif()
 ##############################
 # cygwin (64bit) latest
 
+# setup-x86_64.exe 2.926
 set(SETUP_URL "https://cygwin.com/setup-x86_64.exe")
-set(SETUP_HASH_SHA256 "6bad4555154b3b348d1bfb633a2e9d6086aa46e36952f456a434ecef5b0010e0")
+set(SETUP_HASH_SHA256 "a17217e66dd7c40fa4851a433335c1f3f003cd627116c708b2f6e66eba886ea9")
 set(SETUP "${CYGWIN_ROOT}/setup-x86_64.exe")
 
 set(DOWNLOAD_SITE "http://mirrors.kernel.org/sourceware/cygwin/")
