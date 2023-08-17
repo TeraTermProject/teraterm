@@ -4,8 +4,6 @@ environment:
 # キャッシュを使わない
 # APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VS_VERSION: 2022
-  # bat の中で参照されているが、自動的に設定されないようなので指定する
-  APPVEYOR: True
 
 build: off
 
