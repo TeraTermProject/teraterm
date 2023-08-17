@@ -35,16 +35,18 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>Changed internal processing to Unicode.</li>
+      <li>Changed the folders to read setup files, the folder to save log files.</li>
+      <li>Changed default to on for High DPI support.
+        <ul>
+          <li>Same behavior as before the change when DPIAware=off add to Tera Term section in TERATERM.INI</li>
+        </ul></li>
       <li>Added setting Underline attribute(SGR 4) color and font</li>
       <li>Exchanged foreground and background colors of characters that attributes is setted ANSIColor when colors are reversed with DECSCNM set.</li>
       <li>U+00A0(NBSP) and U+2000..U+2003 are converted to SPACE and displayed. tree command output is displayed correctly.</li>
       <li>XMODEM: Fix to check all received datas and process correctly, even if received datas are accumulated.</li>
       <li>YMODEM: ignore continuous 'C' when waiting for sending.</li>
       <!--li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li-->
-      <li>Changed default to on for High DPI support.
-        <ul>
-          <li>Same behavior as before the change when DPIAware=off add to Tera Term section in TERATERM.INI</li>
-        </ul></li>
       <!--li>Windows 11 で VT ウィンドウと TEK ウィンドウの角が丸くならないようにする設定を追加した。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCornerDontround">WindowCornerDontround</a> エントリを追加した。デフォルトはoff。</li>
@@ -86,11 +88,13 @@
 
   <li>Misc
     <ul>
+      <li>Changed requirements, Windows 7 or later.</li>
       <li>Added about EAR (Export Administration Regulations) to Frequently asked questions.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.0">3.0</a>.</li>
       <li>upgraded TeraTerm Menu to <a href="#ttmenu_1.17">1.17</a></li>
       <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.05">1.05</a>.</li>
       <li>NOTE: CygTerm+ binary included in the installer becomes to be supported on only 64bit Cygwin. Please build CygTerm+ from source code by using 32bit Cygwin, if CygTerm+ wants to run with 32bit Cygwin.</li>
+      <li>Deleted LogMeTT, TTLEditor and Collector.</li>
       <li>upgraded Oniguruma to 6.9.8.</li>
     </ul>
   </li>

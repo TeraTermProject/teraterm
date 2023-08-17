@@ -35,16 +35,18 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>内部処理を Unicode 化した。</li>
+      <li>設定ファイルの読み込みフォルダ・ログファイルの保存先フォルダを変更した。</li>
+      <li>高DPI対応のデフォルトをONに変更した。
+        <ul>
+          <li>TERATERM.INI の Tera Term セクションに DPIAware=off を加えると従来通りの動作となる。</li>
+        </ul></li>
       <li>Underline属性(SGR 4)の色とフォント設定できるようにした。</li>
       <li>DECSCNM setで色反転時に、属性にANSIColorを設定した文字の前景色と背景色を入れ替えるようにした。</li>
       <li>U+00A0(NBSP),U+2000..U+2003をU+0020(SPACE)に変換して表示するようにした。これによりtreeコマンドで文字化けしなくなった。</li>
       <li>XMODEM 受信データが蓄積しても全体を調べて正しく処理するように修正した。</li>
       <li>YMODEM 送信待ちの時、連続した 'C' を無視するようにした。</li>
       <li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li>
-      <li>高DPI対応のデフォルトをONに変更した。
-        <ul>
-          <li>TERATERM.INI の Tera Term セクションに DPIAware=off を加えると従来通りの動作となる。</li>
-        </ul></li>
       <li>Windows 11 で VT ウィンドウと TEK ウィンドウの角が丸くならないようにする設定を追加した。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCornerDontround">WindowCornerDontround</a> エントリを追加した。デフォルトはoff。</li>
@@ -86,11 +88,13 @@
 
   <li>その他
     <ul>
+      <li>動作環境が Windows 7 以上になった。</li>
       <li>Q & A集に輸出規制(EAR)について追記した。</li>
       <li><a href="#ttssh_3.0">TTSSH(3.0)</a>へ差し替えた。</li>
       <li><a href="#ttmenu_1.17">TeraTerm Menu(1.17)</a>へ差し替えた。</li>
       <li><a href="#ttyrec_1.05">TTXttyrec Plugin(1.05)</a>へ差し替えた。</li>
       <li>インストーラに同梱されている CygTerm+ バイナリは 64bit Cygwin 対応のみとなります。32bit Cygwin で動作させたい場合は、32bit Cygwin を使って CygTerm+ をソースコードからビルドしてください。</li>
+      <li>LogMeTT, TTLEditor, Collector を削除した。</li>
       <li>Oniguruma 6.9.8へ差し替えた。</li>
     </ul>
   </li>
