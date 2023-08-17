@@ -78,6 +78,7 @@
       <li>Fixed wrong value is written to VTReverseColor when saving TERATERM.INI during reverse video.</li>
       <!--li>TERATERM.INI の MouseCursor の設定値が小文字だと Additional settings ダイアログに反映されない問題を修正した。</li-->
       <li>The file handle of TELNET.LOG could not be closed.</li>
+      <li>MACRO: can not read from the file handle that is opened by <a href="../macro/command/filecreate.html">filecreate</a> command. This bug was introduced in 4.102.</li>
       <li>MACRO: The <a href="../macro/command/setpassword.html">setpassword</a> command cause an error when password argument is a string value. Only string variable was accepted.</li>
       <li>MACRO: The <a href="../macro/command/getpassword.html">getpassword</a> command updates password variable by undefined value when password from user is no input.</li>
     </ul>
