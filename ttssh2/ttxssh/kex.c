@@ -104,10 +104,10 @@ void normalize_kex_order(char *buf)
 		KEX_DH_GRP16_SHA512,
 		KEX_DH_GRP14_SHA256,
 		KEX_DH_GEX_SHA256,
-		KEX_DH_GEX_SHA1,
 		KEX_DH_GRP14_SHA1,
-		KEX_DH_GRP1_SHA1,
 		KEX_DH_NONE,
+		KEX_DH_GEX_SHA1,
+		KEX_DH_GRP1_SHA1,
 	};
 
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
