@@ -29,8 +29,13 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="2.3‚Æ‚Ì·•ª">
+			<param name="Name" value="Tera Term  2.3, 4, 5 ‚Ì”äŠr">
 			<param name="Local" value="html\about\difference.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tera Term 4 ‚©‚ç 5 ‚Ö‚ÌˆÚs">
+			<param name="Local" value="html\usage\migrate_to_5.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
