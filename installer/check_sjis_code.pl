@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 
 #
-# ‰pŒê”ÅƒhƒLƒ…ƒƒ“ƒg‚É“ú–{Œê‚ªŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢‚©‚ğ’²‚×‚éB
+# è‹±èªç‰ˆãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã«æ—¥æœ¬èªãŒå«ã¾ã‚Œã¦ã„ãªã„ã‹ã‚’èª¿ã¹ã‚‹ã€‚
 #
 # Usage(ActivePerl):
 #  perl check_sjis_code.pl > result.txt
@@ -20,21 +20,21 @@ sub get_file_paths {
 	my @paths=();
 	my @temp = ();
 
-	#-- ƒJƒŒƒ“ƒg‚Ìˆê——‚ğæ“¾ --#
+	#-- ã‚«ãƒ¬ãƒ³ãƒˆã®ä¸€è¦§ã‚’å–å¾— --#
 	opendir(DIR, $top_dir);
 	@temp = readdir(DIR);
 	closedir(DIR);
 	foreach my $path (sort @temp) {
-		next if( $path =~ /^\.{1,2}$/ );                # '.' ‚Æ '..' ‚ÍƒXƒLƒbƒv
-		next if( $path =~ /^\.svn$/ );                  # '.svn' ‚ÍƒXƒLƒbƒv
+		next if( $path =~ /^\.{1,2}$/ );                # '.' ã¨ '..' ã¯ã‚¹ã‚­ãƒƒãƒ—
+		next if( $path =~ /^\.svn$/ );                  # '.svn' ã¯ã‚¹ã‚­ãƒƒãƒ—
 
 		my $full_path = "$top_dir" . '/' . "$path";
-#		print "$full_path\r\n";                         # •\¦‚¾‚¯‚È‚ç‘S‚Ä‚ğ•\¦‚µ‚Ä‚­‚ê‚é-------
-		push(@paths, $full_path);                       # ƒf[ƒ^‚Æ‚µ‚Äæ‚è‚ñ‚Å‚à‘O‚Ìæ‚è‚İ‚ª‰Šú‰»‚³‚ê‚é
-		if( -d "$top_dir/$path" ){                      #-- ƒfƒBƒŒƒNƒgƒŠ‚Ìê‡‚Í©•ª©g‚ğŒÄ‚Ño‚·
+#		print "$full_path\r\n";                         # è¡¨ç¤ºã ã‘ãªã‚‰å…¨ã¦ã‚’è¡¨ç¤ºã—ã¦ãã‚Œã‚‹-------
+		push(@paths, $full_path);                       # ãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦å–ã‚Šè¾¼ã‚“ã§ã‚‚å‰ã®å–ã‚Šè¾¼ã¿ãŒåˆæœŸåŒ–ã•ã‚Œã‚‹
+		if( -d "$top_dir/$path" ){                      #-- ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®å ´åˆã¯è‡ªåˆ†è‡ªèº«ã‚’å‘¼ã³å‡ºã™
 			&get_file_paths("$full_path");
 		} elsif (-B $full_path) {
-			# ƒoƒCƒiƒŠƒtƒ@ƒCƒ‹‚ÍƒXƒLƒbƒv
+			# ãƒã‚¤ãƒŠãƒªãƒ•ã‚¡ã‚¤ãƒ«ã¯ã‚¹ã‚­ãƒƒãƒ—
 			next;
 
 		} elsif (&check_exclude_file($path)) {
@@ -50,7 +50,7 @@ sub get_file_paths {
 }
 
 
-# ’²¸‘ÎÛŠO‚Ìƒtƒ@ƒCƒ‹‚©‚ğ’²‚×‚é
+# èª¿æŸ»å¯¾è±¡å¤–ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚’èª¿ã¹ã‚‹
 sub check_exclude_file {
 	my($fn) = shift;
 	my($s);
@@ -65,7 +65,7 @@ sub check_exclude_file {
 
 
 # cf. http://charset.7jp.net/sjis.html
-# ShiftJIS •¶š
+# ShiftJIS æ–‡å­—
 
 sub check_sjis_code {
 	my($filename) = shift;
@@ -99,9 +99,9 @@ sub check_sjis_code {
 	close(FP);
 }
 
-# s‚ª‘ÎÛŠO‚©‚Ç‚¤‚©‚ğƒ`ƒFƒbƒN‚·‚é
-#   true: ‘ÎÛŠO‚Å‚ ‚é
-#   false: ‘ÎÛŠO‚Å‚Í‚È‚¢ 
+# è¡ŒãŒå¯¾è±¡å¤–ã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+#   true: å¯¾è±¡å¤–ã§ã‚ã‚‹
+#   false: å¯¾è±¡å¤–ã§ã¯ãªã„ 
 sub check_skipped_line {
 	my($line) = shift;
 	my($pos);
