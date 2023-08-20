@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Migration to Tera Term 5</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>About Tera Term 5</h1>
+    Tera Term 5 is the next version of Tera Term 4 with Unicode supporting.
+
+    <h2 id="feature">feature</h2>
+    <ul>
+      <li>Terminal (internal buffers, drawing and key input) is supported Unicode.
+        <ul>
+          <li>Multiple languages Display is possible.<br>
+            In Tera Term 4, Chinese could not be displayed when Japanese is displayed.
+li>
+          <li>ISO8859-1...16 are supported.</li>
+          <li>Locale settings are no longer required.</li>
+        </ul>
+      </li>
+      <li>Windows UI(Menu, Dialogs) are supported Unicode<br>
+        Menus and Dialogs will display correctly in the language you set in the following cases
+        <ul>
+          <li>When a language other "Current system locale" is set.</li>
+          <li>When "Use Unicode UTF-8 for worldwide language support" is checked.</li>
+        </ul>
+      </li>
+      <li>Switching to Unicode from ANSI versions of Windows APIs<br>
+        Unicode file names can be used.
+      </li>
+      <li>Macro
+        <ul>
+          <li>Internal code is Unicode (UTF-8)<br>
+              Internal code in Tera Term 4 is ACP (CP932,Shift_JIS by default in Japanese Windows).</li>
+          <li>GUI(dialogs) can be displayed in multiple languages.</li>
+        </ul>
+      </li>
+    </ul>
+    
+    <h2 id="requirements">requirements</h2>
+    <ul>
+      <li>See <a href="../about/requirements.html">requirements</a>page
+      <li>alpha has been tested in next environments
+        <ul>
+          <li>Windows 10, 11</li>
+          <li>Cygwin 3.3.4 (most recent version)</li>
+        </ul>
+      </li>
+    </ul>
+    
+    <h2 id="misc">misc</h2>
+    <ul>
+      <li><a href="https://osdn.net/projects/ttssh2/wiki/%E6%B1%BA%E5%AE%9A%E4%BA%8B%E9%A0%85#h1-Tera.20Term.205.x">Development tools, libraries , etc.</a>
+      <li><a href="https://osdn.net/projects/ttssh2/wiki/UNICODE">implementation status</a>
+      <li>LogMeTT, TTLEditor, and Collector have been removed from the installer. Source codes for this tools are not available and This tools are not open source license.</li>
+    </ul>
+
+    <h1 id="migrate">Migrate to Tera Term 5</h1>
+
+    <p>Tera Term 5 can install with Tera Term 4. However, ony one of them can be associated to a macro file(.TTL).</p>
+
+    <h2 id="migrate_config">configuration files</h2>
+
+    <ul>
+      <li>Tera Term 5 can use the setup file for Tera Trem 4 without modification.</li>
+      <ul>
+        <li>TERATERM.INI,KEYBOARD.CNF are supported Unicode
+          <ul>
+            <li>character encoding of cygterm.cfg is UTF-8 in cygwin 3.3.4.</li>
+          </ul>
+        </li>
+        <li>ini files are supported Unicode in Windows 10,11.<br>
+          <ul>
+            <li>Win32APIs for ini files are used Unicode version</li>
+            <li>cygterm.cfg is not using Win32API</li>
+          </ul>
+        </li>
+        <li>Character encoding of ini files is UTF-16 (with LE BOM).<br>
+            Tera Term 4 does not use the Unicode version of the API. the item in ini file could not be handled correctly if it contains characters that only be represented in Unicode.
+        <li>Tera Term 5 automatically converts character encoding of ini files to Unicode when Tera Term 5 starts.</li>
+        <li>Tera Term 5 automatically converts character encoding of ini files to Unicode when saving TERATERM.INI.<br>
+          ini file before conversion is backed up.
+      </ul>
+      <li>Tera Trem 4 can read ini files saved by Tera Term 5.</li>
+      <ul>
+        <li>Tera Trem 4 can read UTF-16 ini files(on Windows 10,11)。<br>
+          If the item in ini file contains characters that can be represented only in Unicode, it cannot be handled correctly.</li>
+        <li>refer to <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a></li>
+      </ul>
+      <li>The default folder for configuration files has been changed.
+        <ul>
+          <li>%APPDATA%\teraterm5\</li>
+          <li>Copy Tera Term 4 setup files.
+            <ul>
+              <li>TERATERM.INI</li>
+              <li>KEYBOARD.CNF</li>
+              <li>cygterm.cfg</li>
+            </ul>
+          </li>
+          <li>If the files are not exists, the default configuration file is copied when ttermpro.exe start.
+          <li>In Tera Term 4, the folder of the configuration files were the same as the folder where the executable file was placed.
+            <ul>
+              <li>My Documents\TERATERM.INI dose not read.</li>
+            </ul>
+          </li>
+          <li><a href="../setup/folder.html">about folder</a></li>
+        </ul>
+      </li>
+      <li>Default values have been changed.
+        <ul>
+          <li><a href="../setup/teraterm-misc.html#HighDPI">DPIAware</a> "off"-&gt;"on"</li>
+          <li><a href="../menu/setup-additional.html#ClearOnResize">ClearOnResize</a> "on"-&gt;"off"</li>
+          <li><a href="../setup/teraterm-prn.html#ignoremc">PrinterCtrlSequence</a> "on"-&gt;"off"</li>
+          <li><a href="../setup/teraterm-ssh.html#AuthBanner">AuthBanner</a> "1"-&gt;"3"</li>
+        </ul>
+      </li>
+    </ul>
+
+
+    <h2 id="migrate_macro">macro</h2>
+
+    <ul>
+      <li>UTF-8 is recommended for the character encoding of the ttl file.</li>
+      <li>When reading a ttl file, it automatically determines the character encoding of the file and read while converting to UTF-8. However, the automatic determination of encoding can be incorrect.<br>
+          Adding the BOM it will be read as UTF-8.</li>
+      <li>The maximum number of labels and variables (numeric, string, numeric array, and string array) is unlimited from 256.</li>
+      <li>The maximum string length for character variables is 511 bytes, the same as Tera Term 4.<br>
+          for example, Kanji character increase the number of bytets per character. (example "あ" is 0xe3,0x81,0x82 in UTF-8, 0x82,0xa0 in Shift_JIS.) String that could be set in Tera Term 4 may be corrupted in Tera Term 5.</li>
+      <li>The unit of character length and character position (index, pos) for macro commands that handle characters is byte. This is the same as Tera Term 4.<br>
+          However, the value is different from that of Tera Term 4 because the internal character encoding is different.</li>
+      <li>Performing a string operation that breaks a sequence of bytes will break the character (string).This is the same as Tera Term 4.</li>
+      <li>If there are any specifications or missing features that do not fit the Unicode, <a href="../about/contacts.html">Please let us know</a><br>
+        The following commands will be fix
+        <dl>
+          <dt><a href="../macro/command/code2str.html">code2str</a>, <a href="../macro/command/str2code.html">str2code</a></dt>
+          <dd>Change ASCII code to Unicode code points</dd>
+        </dl>
+      </li>
+    </ul>
+
+    <h2 id="migrate_plugin">plugin</h2>
+
+    <ul>
+      <li>compat_w95.h is no longer needed.
+        <ul>
+          <li><a href="https://osdn.net/projects/ttssh2/scm/svn/commits/9129">r9239</a></li>
+        </ul>
+      </li>
+      <li>Changed plugin API
+        <ul>
+          <li>filename string is Unicode (type is 'wchar_t' from 'char')</li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l44">trunk/teraterm/ttsetup.h</a></li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/branches/4-stable/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l39">4-stable/teraterm/ttsetup.h</a></li>
+        </ul>
+      </li>
+      <li>Common functions for reading and writing ini files have been added.
+        <ul>
+          <li>Added a function that converts only file names to Unicode and performs the same operation as before.</li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/inifile_com.h?view=markup&root=ttssh2">trunk/teraterm/common/inifile_com.h</a></li>
+        </ul>
+      </li>
+      <li>Change member in struct tttset (tttypes.h)
+        <ul>
+          <li>Unicode versions of filename, path, and string members with W have been added.</li>
+          <li>Character length for file names and paths is unlimited (independent of MAX_PATH).</li>
+          <li>Modifications will continue(member name, order, size, type, etc...).</li>
+        </ul>
+      </li>
+      <li>Changed The API for notification icons
+        <ul>
+          <li>High DPI is supported.</li>
+          <li>SetVerNotifyIcon(), SetCustomNotifyIcon(), GetCustomNotifyIcon() was removed.</li>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_notify.h?view=markup&root=ttssh2">trunk/teraterm/ttpcmn/ttcmn_notify.h</a></li>
+        </ul>
+      </li>
+      <li>Add Help API
+        <ul>
+          <li>Added API for Unicode filename support.<br>
+          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_lib.h?view=markup&root=ttssh2">trunk/teraterm/ttpcmn/ttcmn_lib.h</a></li>
+        </ul>
+      </li>
+    </ul>
+
+  </body>
+</html>
