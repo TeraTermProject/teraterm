@@ -81,7 +81,7 @@ li>
           </ul>
         </li>
         <li>Character encoding of ini files is UTF-16 (with LE BOM).<br>
-            Tera Term 4 does not use the Unicode version of the API. the item in ini file could not be handled correctly if it contains characters that only be represented in Unicode.
+            Tera Term 4 does not use the Unicode version of the API. the item in ini file could not be handled correctly if non ACP characters are included.
         <li>Tera Term 5 automatically converts character encoding of ini files to Unicode when Tera Term 5 starts.</li>
         <li>Tera Term 5 automatically converts character encoding of ini files to Unicode when saving TERATERM.INI.<br>
           ini file before conversion is backed up.
@@ -89,7 +89,7 @@ li>
       <li>Tera Trem 4 can read ini files saved by Tera Term 5.</li>
       <ul>
         <li>Tera Trem 4 can read UTF-16 ini files(on Windows 10,11)ÅB<br>
-          If the item in ini file contains characters that can be represented only in Unicode, it cannot be handled correctly.</li>
+          Item in ini file cannot be handled correctly if non ACP characters are included.</li>
         <li>refer to <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a></li>
       </ul>
       <li>The default folder for configuration files has been changed.
