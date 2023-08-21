@@ -580,18 +580,19 @@ FixedJIS=on はG1をJIS X 0201 カタカナに固定する為の設定です。これによ
 FixedJIS=off
 </pre>
 
-<h1 id="FallbackToCP932">不正なUTF-8文字をCP932としてデコードする</h1>
+<h1 id="FallbackToCP932">Decode invalid UTF-8 characters as CP932</h1>
 
 <p>
-受信文字がUTF-8のときに、UTF-8として不正な文字を、他の文字コードとしてデコードします。実験的実装です。
+Decode invalid UTF-8 characters as CP932. This is an experimental implementation.
 </p>
 
 <p>
-Cygwin接続時にWindows付属コマンドの出力がCP932で行われる事に対応するためのもので、それ以外のケースは想定していません。
+When using a Cygwin connection and the output character code of Windows command is CP932,
+it can be displayed correctly.
 </p>
 
 <pre>
-省略時:
+Default:
 FallbackToCP932=off
 </pre>
 
