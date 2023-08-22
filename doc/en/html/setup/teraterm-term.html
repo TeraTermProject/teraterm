@@ -1,8 +1,8 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+ï»¿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
   "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <TITLE>Terminal emulation (Tera Term setup file)</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
@@ -529,54 +529,49 @@ ISO2022ShiftFunction=on
 </pre>
 
 
-<h1 id="FIXEDJIS">7bit JISƒJƒ^ƒJƒi(ê—p)’[––‚Æ‚µ‚ÄŽg—p‚·‚é</h1>
+<h1 id="FIXEDJIS">Use as 7-bit JIS KATAKANA (dedicated) terminal</h1>
 
-<p>ŽŸ‚ÌÝ’è‚ÌŽž
+<p>In the following configuration:
   <ul>
-    <li>‘S”ÊÝ’è/Œ¾Œê: Japanese</li>
-    <li>’[––/ Š¿Žš-ŽóM: JIS</li>
-    <li>’[––/Š¿Žš-ŽóM/”¼ŠpƒJƒi: On</li>
+    <li>General Settings/Language: Japanese</li>
+    <li>Terminal/Kanji Receive: JIS</li>
+    <li>Terminal/Kanji Receive/Half-Width Kana: On</li>
   </ul>
-“ú–{Œêƒ‚[ƒh‚Å‚ÍAƒfƒtƒHƒ‹ƒg‚Å G1‚ÍAJIS X 0201 ƒJƒ^ƒJƒi(”¼ŠpƒJƒ^ƒJƒi)
-‚ªŽwŽ¦‚³‚ê‚½ó‘Ô‚Æ‚È‚è‚Ü‚·B7bitƒR[ƒh‚ÅJIS X 0201 ƒJƒ^ƒJƒi‚ðŽg‚¤ê‡A
-SO‚ÅGL‚ÉG1‚ðŒÄ‚Ño‚µ‚ÄŽg—p‚µ‚Ü‚·B
+In Japanese mode, by default, G1 is designated to JIS X 0201 half-width katakana.
+If using JIS X 0201 half-width katakana with 7-bit encoding, G1 is invoked to GL using SO to use it.
 </p>
 
 <p>
-—á‚¦‚ÎAˆÈ‰º‚ðŽÀs‚·‚é‚Æ Ã×À°Ñ ‚Æ•\Ž¦‚³‚ê‚Ü‚·B
+For example, if you execute the following, it will display as "ï¾ƒï¾—ï¾€ï½°ï¾‘".
 </p>
 <pre>
 echo -e '\016CW@0Q\017'
-# => Ã×À°Ñ
+# => ï¾ƒï¾—ï¾€ï½°ï¾‘
 </pre>
 
 <p>
-‚µ‚©‚µAG1‚É‘¼‚Ì•¶ŽšƒZƒbƒg‚ªŽwŽ¦‚³‚ê‚½ó‘Ô‚É‚È‚é‚ÆSO‚ÅJIS X 0201 ƒJƒ^
-ƒJƒi‚ª•\Ž¦‚³‚ê‚È‚­‚È‚Á‚Ä‚µ‚Ü‚¢‚Ü‚·B
+However, when G1 is designated another character set, JIS X 0201 half-width katakana is not displayed using SO.
 </p>
 
 <pre>
-# G1‚ÉUS-ASCII‚ðŽwŽ¦‚·‚é
+# G1 is designated US-ASCII.
 echo -e '\033)B'
 
-# SO‚ÅGL‚ÉG1‚ðŒÄ‚Ño‚µ‚Ä‚àJIS X 0201 ƒJƒ^ƒJƒi‚ª•\Ž¦‚Å‚«‚È‚¢
+# Even when G1 is invoked to GL using SO, JIS X 0201 half-width katakana cannot be displayed.
 echo -e '\016CW@0Q\017'
 # => CW@0Q
 </pre>
 
 <p>
-FIxedJIS=on ‚ÉÝ’è‚·‚é‚ÆSO‚ÅGL‚ÉG1‚ðŒÄ‚Ño‚·Žž‚ÉA‚ ‚ç‚©‚¶‚ßG1‚ÉJIS X
-0201 ƒJƒ^ƒJƒi‚ðŽwŽ¦‚·‚é‚æ‚¤‚É‚È‚èA‚¢‚Â‚àJIS X 0201ƒJƒ^ƒJƒi‚ª•\Ž¦‚³‚ê
-‚é‚æ‚¤‚É‚È‚è‚Ü‚·B
+When FixedJIS=on, G1 is invoked to GL using SO, G1 is designated JIS X 0201 half-width katakana. So JIS X 0201 katakana is always displayed.
 </p>
 
 <p>
-FixedJIS=on ‚ÍG1‚ðJIS X 0201 ƒJƒ^ƒJƒi‚ÉŒÅ’è‚·‚éˆ×‚ÌÝ’è‚Å‚·B‚±‚ê‚É‚æ
-‚èAí‚É7bit JISƒJƒ^ƒJƒi’[––‚Æ‚µ‚ÄŽg‚¦‚é‚æ‚¤‚É‚È‚è‚Ü‚·B
+"FixedJIS=on" is a setting to lock G1 to JIS X 0201 half-width katakana. This allows the terminal is always a 7-bit JIS katakana terminal.
 </p>
 
 <pre>
-È—ªŽž:
+Default:
 FixedJIS=off
 </pre>
 
