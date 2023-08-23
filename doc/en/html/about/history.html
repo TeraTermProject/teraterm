@@ -1557,12 +1557,12 @@
       <li>When the terminal width is 257 columns over, Tera Term does not display well.</li>
       <li>When the terminal ID is VT520 and VT525, the Primary DA (DA1) reply is incorrect.</li>
       <li>When the language is other than Japanese, the VT420, VT520 and VT525 on the <a href="../menu/setup-terminal.html">Terminal Setup</a> dialog do not work well.</li>
-      <li>When <a href="../setup/teraterm-prn.html#direct">PassThruPort</a> is specified as a local device mapping the network share, Tera Term printing does not work. cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
+      <li>When <a href="../setup/teraterm-prn.html#direct">PassThruPort</a> is specified as a local device mapping the network share, Tera Term printing does not work. cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383" target="_blank">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
       <li>Tera Term can not ignore the unsupported OSC control string. </li>
       <li>Tera Term can not understand a character after the DCS, SOS, APC and PM Control string.</li>
       <li>When a log file is opened by writable mode, the file is existing and writing by another process can be opened.</li>
       <li>When 8-bit string is received, the string is recognized as the control sequence by mistake.</li>
-      <li>Tera Term can not properly send a broadcast message to selected windows by using the broadcast command. cf.<a href="http://logmett.com/forum/viewtopic.php?f=8&amp;t=1601">Broadcast command issue in 4.68 </a></li>
+      <li>Tera Term can not properly send a broadcast message to selected windows by using the broadcast command. cf.<a href="http://logmett.com/forum/viewtopic.php?f=8&amp;t=1601" target="_blank">Broadcast command issue in 4.68 </a></li>
     </ul>
   </li>
 
@@ -2207,7 +2207,7 @@
         <ul>
           <li>added <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> entry in teraterm.ini file. The default value is on.</li>
         </ul></li>
-      <li>added the "Realtime mode" feature on Broadcast Command. This feature can send all user's key sequence to TeraTerm window, and then a user can use vi editor on all window. This feature takes after "<a href="http://www.vector.co.jp/soft/win95/net/se276622.html">TeraTerm Pro assistant</a>" free ware in lots of ways.
+      <li>added the "Realtime mode" feature on Broadcast Command. This feature can send all user's key sequence to TeraTerm window, and then a user can use vi editor on all window. This feature takes after "<a href="http://www.vector.co.jp/soft/win95/net/se276622.html" target="_blank">TeraTerm Pro assistant</a>" free ware in lots of ways.
         <ul>
           <li>added "Realtime mode" check-box in Broadcast Command dialog. The default is on.</li>
           <li>added a TeraTerm window list. Also, a user can select all item or cancel all item by double-click(toggle). </li>
@@ -2250,7 +2250,7 @@
       <li>Bug fix: Reverse video control sequence (DECSCNM) doesn't work correctly.</li>
       <li>Bug fix: When TeraTerm is the Maximize window, TerminalSize entry in relation to the window would be recorded in teraterm.ini file.</li>
       <li>Bug fix: The problem that a multi-byte character string which includes 0x5C and/or 0x7C is recognized as invalid is now fixed. This problem existed in a routine to check a file name.</li>
-      <li>Bug fix: TeraTerm COM auto connect problem.  Special thanks to Steven Yang. cf. <a href="http://www.neocom.ca/forum/viewtopic.php?t=748">TeraTerm com auto connect bug</a></li>
+      <li>Bug fix: TeraTerm COM auto connect problem.  Special thanks to Steven Yang. cf. <a href="http://www.neocom.ca/forum/viewtopic.php?t=748" target="_blank">TeraTerm com auto connect bug</a></li>
       <li>Bug fix: ANSI Color settings is not immediately reflected.</li>
       <li>Bug fix: Too many '\' characters could be shown after changing the title string by the escape sequence.</li>
       <li>added '<a href="../macro/command/getver.html">getver</a>' macro command.</li>
@@ -2290,7 +2290,7 @@
       <li>Bug fix: double close a local file handle when same file already exists on the remote host by sending the local file with ZMODEM protocol.</li>
       <li>Bug fix: Telnet keep-alive mechanism could not been thread-safe.</li>
       <li>Bug fix: New-line (transmit) of <a href="../menu/setup-terminal.html">Terminal Setup</a> would be empty when a user connects.</li>
-      <li>Bug fix: Up and Down key could not work with DELL USB keyboard. Added the workaround. Special thanks to chuckf.<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
+      <li>Bug fix: Up and Down key could not work with DELL USB keyboard. Added the workaround. Special thanks to chuckf.<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565" target="_blank">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
       <li>upgraded TTSSH version supporting SSH2 to <a href="#ttssh_2.45">2.45</a></li>
       <li>upgraded CygTerm+ to <a href="#cygterm_1.07_14">1.07_14</a></li>
       <li>upgraded Oniguruma to 5.9.1</li>
@@ -3720,7 +3720,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>The key length of blowfish-ctr symmetric key cipher is changed to 256 bits in accordance with <a href="http://tools.ietf.org/html/rfc4344">RFC 4344</a>.</li>
+      <li>The key length of blowfish-ctr symmetric key cipher is changed to 256 bits in accordance with <a href="http://tools.ietf.org/html/rfc4344" target="_blank">RFC 4344</a>.</li>
       <li>When all key exchange method are enabled, the latest method can not be used.</li>
       <li>When the X11 forwarding starts, the connection error will be occurred with error code(WSANO_RECOVERY: 11003).</li>
     </ul>
@@ -4340,7 +4340,7 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added AES128-CTR, AES192-CTR, AES256-CTR, Arcfour, Arcfour128, Arcfour256 and CAST128-CBC symmetric key cipher algorithm for SSH2 protocol. Security fix: <a href="http://www.cpni.gov.uk/Docs/Vulnerability_Advisory_SSH.txt">CPNI-957037</a>.
+      <li>added AES128-CTR, AES192-CTR, AES256-CTR, Arcfour, Arcfour128, Arcfour256 and CAST128-CBC symmetric key cipher algorithm for SSH2 protocol. Security fix: <a href="http://www.cpni.gov.uk/Docs/Vulnerability_Advisory_SSH.txt" target="_blank">CPNI-957037</a>.
         <ul>
           <li>added "&lt;", "=", "&gt;", "?", "@", "A" and "B" to CipherOrder entry in teraterm.ini file.</li>
         </ul></li>
@@ -4389,7 +4389,7 @@ SYNOPSIS:
          <li>Directly input the receiving file name</li>
        </ul></li>
 
-      <li>added support for the public key authentication with <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">Pageant</a>(an SSH authentication agent for PuTTY, PSCP and Plink).
+      <li>added support for the public key authentication with <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html" target="_blank">Pageant</a>(an SSH authentication agent for PuTTY, PSCP and Plink).
         <ul>
           <li>added "pageant" value to "/auth" command line switch.</li>
         </ul></li>
