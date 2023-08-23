@@ -1567,12 +1567,12 @@
       <li>端末の横幅が 257 桁より大きいと正常に表示できない問題を修正した。</li>
       <li>端末ID設定が VT520, VT525 の時に、Primary DA (DA1) への応答が壊れていた問題を修正した。</li>
       <li>言語モードが日本語以外の時、<a href="../menu/setup-terminal.html">Terminal Setup</a> ダイアログで端末IDに VT420, VT520, VT525 を指定しても実際には VT100 に設定される問題を修正した。</li>
-      <li>ネットワーク共有をマップしたローカルデバイスを<a href="../setup/teraterm-prn.html#direct">PassThruPort</a>に指定した場合、印刷ができない問題を修正した。cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
+      <li>ネットワーク共有をマップしたローカルデバイスを<a href="../setup/teraterm-prn.html#direct">PassThruPort</a>に指定した場合、印刷ができない問題を修正した。cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383" target="_blank">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
       <li>対応していない OSC 制御文字列を正しく無視出来ない場合があった問題を修正した。</li>
       <li>DCS, SOS, APC, PM 制御文字列の直後の文字を正しく扱えていなかった問題を修正した。</li>
       <li>ログファイルを書き込むために開くとき、存在していて書き込み中のファイルを開かないようにした。</li>
       <li>8ビット文字列の受信時に、制御シーケンスとして誤って扱う場合があった問題を修正した。</li>
-      <li>ブロードキャストコマンドにおいて、選択ウィンドウへの送信が正しくできていなかった問題を修正した。 cf.<a href="http://logmett.com/forum/viewtopic.php?f=8&amp;t=1601">Broadcast command issue in 4.68 </a></li>
+      <li>ブロードキャストコマンドにおいて、選択ウィンドウへの送信が正しくできていなかった問題を修正した。 cf.<a href="http://logmett.com/forum/viewtopic.php?f=8&amp;t=1601" target="_blank">Broadcast command issue in 4.68 </a></li>
     </ul>
   </li>
 
@@ -2216,7 +2216,7 @@
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> を追加した。デフォルトはon。</li>
         </ul></li>
-      <li>Broadcast Commandにリアルタイムモードを追加した。TeraTermウィンドウにすべてのキー入力を送ることができるため、vi操作などが可能となる。<a href="http://www.vector.co.jp/soft/win95/net/se276622.html">TeraTerm Proアシスタント</a>に近い機能。
+      <li>Broadcast Commandにリアルタイムモードを追加した。TeraTermウィンドウにすべてのキー入力を送ることができるため、vi操作などが可能となる。<a href="http://www.vector.co.jp/soft/win95/net/se276622.html" target="_blank">TeraTerm Proアシスタント</a>に近い機能。
         <ul>
           <li>Broadcast Commandダイアログに"Realtime mode"チェックボックスを追加。デフォルトはon。</li>
           <li>TeraTermウィンドウを選択可能なリストボックスを追加した。ダブルクリックでアイテムの全選択および全解除が可能（トグル）。</li>
@@ -2259,7 +2259,7 @@
       <li>リバースビデオ制御シーケンス(DECSCNM)が正しく働かないのを修正した。</li>
       <li>ウィンドウを最大化した状態で、teraterm.iniへ保存を行うと、最大化時のTerminalSizeが保存されていたバグを修正した。</li>
       <li>ファイル名をチェックするルーチンで、0x5C や 0x7C などを含むマルチバイト文字を不正な文字と判定する問題を修正した。</li>
-      <li>ポートタイプが"serial"の場合、TeraTermの起動時に自動接続しないバグを修正した。Steven Yang氏に感謝します。cf. <a href="http://www.neocom.ca/forum/viewtopic.php?t=748">TeraTerm com auto connect bug</a></li>
+      <li>ポートタイプが"serial"の場合、TeraTermの起動時に自動接続しないバグを修正した。Steven Yang氏に感謝します。cf. <a href="http://www.neocom.ca/forum/viewtopic.php?t=748" target="_blank">TeraTerm com auto connect bug</a></li>
       <li>ANSI Color 設定の変更が即座に反映されないのを修正した。</li>
       <li>エスケープシーケンスによるタイトル文字列変更後、余計な'\'が表示される場合があるのを修正した。</li>
       <li>マクロコマンド '<a href="../macro/command/getver.html">getver</a>' を追加した。</li>
@@ -2300,7 +2300,7 @@
       <li>ZMODEMによるファイル送信時に、すでにサーバ側に同一ファイルが存在した場合、ファイルハンドルの二重クローズをしていたバグを修正した。</li>
       <li>telnet キープアライブ処理が thread-safe になっていなかった問題を修正した。</li>
       <li><a href="../menu/setup-terminal.html">Terminal Setup</a> の New-line (transmit) が空欄になる問題を修正した。</li>
-      <li>Dell の USB キーボードで矢印キーが効かないことがある問題に対応した。<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
+      <li>Dell の USB キーボードで矢印キーが効かないことがある問題に対応した。<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565" target="_blank">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
       <li><a href="#ttssh_2.45">SSH2対応TTSSH(2.45)</a>へ差し替えた</li>
       <li><a href="#cygterm_1.07_14">CygTerm+ 1.07_14</a>へ差し替えた</li>
       <li>Oniguruma 5.9.1へ差し替えた</li>
@@ -3738,7 +3738,7 @@
 
   <li>バグ修正
     <ul>
-      <li>blowfish-ctr 共通鍵暗号で使用する鍵の鍵長を <a href="http://tools.ietf.org/html/rfc4344">RFC 4344</a> に合わせて 256 ビットに変更した。</li>
+      <li>blowfish-ctr 共通鍵暗号で使用する鍵の鍵長を <a href="http://tools.ietf.org/html/rfc4344" target="_blank">RFC 4344</a> に合わせて 256 ビットに変更した。</li>
       <li>鍵交換方式ですべての方式を有効にしている時に最後の方式が使われない問題を修正した。</li>
       <li>X11転送の開始が接続エラー(WSANO_RECOVERY: 11003)で失敗することがある問題を修正した。</li>
     </ul>
@@ -4357,7 +4357,7 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>SSH2 の共通鍵暗号方式に AES128-CTR, AES192-CTR, AES256-CTR, Arcfour, Arcfour128, Arcfour256, CAST128-CBC を追加した。セキュリティ対応: <a href="http://jvn.jp/niscc/CPNI-957037/">CPNI-957037</a>
+      <li>SSH2 の共通鍵暗号方式に AES128-CTR, AES192-CTR, AES256-CTR, Arcfour, Arcfour128, Arcfour256, CAST128-CBC を追加した。セキュリティ対応: <a href="http://jvn.jp/niscc/CPNI-957037/" target="_blank">CPNI-957037</a>
         <ul>
           <li>teraterm.ini の CipherOrder エントリに"&lt;", "=", "&gt;", "?", "@", "A", "B" を追加した。</li>
         </ul></li>
@@ -4406,7 +4406,7 @@
          <li>受信ファイル名は直接入力</li>
        </ul></li>
 
-      <li><a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">Pageant</a>(an SSH authentication agent for PuTTY, PSCP and Plink) を使用した公開鍵認証に対応した。
+      <li><a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html" target="_blank">Pageant</a>(an SSH authentication agent for PuTTY, PSCP and Plink) を使用した公開鍵認証に対応した。
         <ul>
           <li>コマンドラインオプションの /auth に pageant を追加した。</li>
         </ul></li>

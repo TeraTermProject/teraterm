@@ -50,8 +50,8 @@
     The main source of information about programming for Windows is MSDN Library provided by Microsoft. Tera Term developers often use MSDN Library as a reference. <br>
     
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/default.aspx">MSDN library</a></li>
-  <li><a href="http://msdn2.microsoft.com/ja-jp/library/default.aspx">MSDN library(Japanese)</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/default.aspx" target="_blank">MSDN library</a></li>
+  <li><a href="http://msdn2.microsoft.com/ja-jp/library/default.aspx" target="_blank">MSDN library(Japanese)</a></li>
 </ul>
 
 <p>
@@ -308,7 +308,7 @@ Traditionally string operations were causing majority of buffer overflow errors 
   <br>
 
 <ul>
-  <li><a href="https://msdn.microsoft.com/en-us/library/8ef0s5kh(v=vs.80).aspx">Security Enhancements in the CRT(MSDN Library)</a></li>
+  <li><a href="https://msdn.microsoft.com/en-us/library/8ef0s5kh(v=vs.80).aspx" target="_blank">Security Enhancements in the CRT(MSDN Library)</a></li>
 </ul>
 <br>
     
@@ -414,7 +414,7 @@ Visual Studio 2005 and later versions no longer support Microsoft Windows 95. Bi
       Currently Tera Term can run on Windows 95 despite the fact that it is compiled using Visual Studio 2005. The binary program built by Visual Studio 2005 by default contains link to IsDebuggerPresent function. This causes program to fail under Windows 95 because this function was first introduced in Windows 98. To resolve this issue dummy symbol replacing IsDebuggerPresent function was defined. This is certainly "unofficial" method not supported by Microsoft. For more details please check the header file comapt_w95.h. <br>      
 
 <ul>
-  <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/compat_w95.h?view=markup&root=ttssh2">comapt_w95.h</a></li>
+  <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/compat_w95.h?view=markup&root=ttssh2" target="_blank">comapt_w95.h</a></li>
 </ul>
 
 <hr>
@@ -592,8 +592,8 @@ More information about DDE is available from MSDN Library on Microsoft web site:
 
 <p>
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648711(VS.85).aspx">Dynamic Data Exchange(MSDN library)</a></li>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648712(VS.85).aspx">Dynamic Data Exchange Management Library(MSDN library)</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648711(VS.85).aspx" target="_blank">Dynamic Data Exchange(MSDN library)</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648712(VS.85).aspx" target="_blank">Dynamic Data Exchange Management Library(MSDN library)</a></li>
 </ul>
 </p>
 
@@ -781,11 +781,11 @@ As it has been mentioned earlier DDE communication buffer and log buffer in Tera
 
 <h2 id="ttssh">SSH Design and Implementation in TTSSH</h2>
   <h3>Overview</h3>
-Original TTSSH plugin for Tera Term was developed by <a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a> (currently works as <a href="http://robert.ocallahan.org/">Former Mozilla hacker</a>). It was supporting SSH1, packet compression and port forwarding. However, it did not support SSH2, SCP or SFTP. Development of the original Tera Term stopped in 1998 and its maintenance ended in 2001. <br>
+Original TTSSH plugin for Tera Term was developed by <a href="http://www.cs.cmu.edu/People/roc/" target="_blank">Robert O'Callahan</a> (currently works as <a href="http://robert.ocallahan.org/" target="_blank">Former Mozilla hacker</a>). It was supporting SSH1, packet compression and port forwarding. However, it did not support SSH2, SCP or SFTP. Development of the original Tera Term stopped in 1998 and its maintenance ended in 2001. <br>
 
 In 2004 newly formed Tera Term Project team resumed development of TTSSH and added SSH2 support to TTSSH. Over the next 3 year period the team implemented full support of SSH2 and SCP. Tera Term Project team is planning to eventually add SFTP support. <br>
 
-Initial TTTSH design was based on <a href="http://www.openssh.com/">OpenSSH</a> code. However, the main differences were that OpenSSH was written for UNIX command line interface, while TTSSH should work under Microsoft Windows and also communicate with Tera Term. As TTSSH developed, the amount of the differences with OpenSSH was increasing and currently the code of these two programs has very significant differences. <br>
+Initial TTTSH design was based on <a href="http://www.openssh.com/" target="_blank">OpenSSH</a> code. However, the main differences were that OpenSSH was written for UNIX command line interface, while TTSSH should work under Microsoft Windows and also communicate with Tera Term. As TTSSH developed, the amount of the differences with OpenSSH was increasing and currently the code of these two programs has very significant differences. <br>
 
 
   <h3>SSH Protocol</h3>
@@ -795,14 +795,14 @@ SSH2 protocol specification is defined in the following Requests for Comment (RF
  
 <p>
 <ul>
-  <li><a href="http://www.ietf.org/rfc/rfc4250.txt">RFC4250: The Secure Shell (SSH) Protocol Assigned Numbers</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4251.txt">RFC4251: The Secure Shell (SSH) Protocol Architecture</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4252.txt">RFC4252: The Secure Shell (SSH) Authentication Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4253.txt">RFC4253: The Secure Shell (SSH) Transport Layer Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4254.txt">RFC4254: The Secure Shell (SSH) Connection Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4255.txt">RFC4255: Using DNS to Securely Publish Secure Shell (SSH) Key Fingerprints</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4256.txt">RFC4256: Generic Message Exchange Authentication for the Secure Shell Protocol (SSH)</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4344.txt">RFC4344: The Secure Shell (SSH) Transport Layer Encryption Modes</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4250.txt" target="_blank">RFC4250: The Secure Shell (SSH) Protocol Assigned Numbers</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4251.txt" target="_blank">RFC4251: The Secure Shell (SSH) Protocol Architecture</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4252.txt" target="_blank">RFC4252: The Secure Shell (SSH) Authentication Protocol</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4253.txt" target="_blank">RFC4253: The Secure Shell (SSH) Transport Layer Protocol</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4254.txt" target="_blank">RFC4254: The Secure Shell (SSH) Connection Protocol</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4255.txt" target="_blank">RFC4255: Using DNS to Securely Publish Secure Shell (SSH) Key Fingerprints</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4256.txt" target="_blank">RFC4256: Generic Message Exchange Authentication for the Secure Shell Protocol (SSH)</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc4344.txt" target="_blank">RFC4344: The Secure Shell (SSH) Transport Layer Encryption Modes</a></li>
 
 </ul>
 </p>
@@ -1196,7 +1196,7 @@ Tera Term uses system caret to draw the cursor. For this purpose Tera Term utili
   <li>ShowCaret</li>
 </ul></p>
 
-According to MSDN Library description of <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648399(v=vs.85).aspx">CreateCaret function</a>, 
+According to MSDN Library description of <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648399(v=vs.85).aspx" target="_blank">CreateCaret function</a>, 
 
 <pre>
 The system provides one caret per queue. A window should create 
@@ -1503,7 +1503,7 @@ Entry points of ZMODEM are shown below.
 </table>
 
   <h3>Testing Connectivity</h3>
-  Binary transfer protocols are usually used with serial connections. Modern PC-s are rarely equipped with serial ports, which makes testing of these protocols more challenging. One on the options is to use Null-modem emulator like <a href="http://com0com.sourceforge.net/">com0com</a>. It will generate two virtual COM ports on a single PC. Then we can use 2 instances of Tera Term to connect these virtual serial ports, or use Tera Term and another software terminal emulator for this purpose. 
+  Binary transfer protocols are usually used with serial connections. Modern PC-s are rarely equipped with serial ports, which makes testing of these protocols more challenging. One on the options is to use Null-modem emulator like <a href="http://com0com.sourceforge.net/" target="_blank">com0com</a>. It will generate two virtual COM ports on a single PC. Then we can use 2 instances of Tera Term to connect these virtual serial ports, or use Tera Term and another software terminal emulator for this purpose. 
 
 <div align="center">
 <img src="image/devman_com0com.png" width=468 height=171>
@@ -1535,7 +1535,7 @@ If the data is shorter than predetermined block size, it will be padded with CPM
 More information about XMODEM protocol can be found on Wikipedia.
 
 <ul>
-  <li><a href="https://en.wikipedia.org/wiki/XMODEM">XMODEM - Wikipedia</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/XMODEM" target="_blank">XMODEM - Wikipedia</a></li>
 </ul>
 <br>
 
@@ -1546,7 +1546,7 @@ If "XmodemLog" entry of teraterm.ini file is set to "On", Tera Term will log com
 XmodemLog=on
 </pre>
 
-Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a> (COM11) 67-byte long file using XMODEM protocol is shown below. <br>
+Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/" target="_blank">RLogin</a> (COM11) 67-byte long file using XMODEM protocol is shown below. <br>
 "&lt;&lt;&lt;" indicates the data Tera Term received from the host, "&gt;&gt;&gt;" shows the data Tera Term sent to the host.
   
 <pre class=code>
@@ -1671,7 +1671,7 @@ All this is done in accordance with XMODEM protocol, however it is easy to see t
 More information about YMODEM protocol can be found on Wikipedia.
 
 <ul>
-  <li><a href="http://en.wikipedia.org/wiki/YMODEM">YMODEM - Wikipedia</a></li>
+  <li><a href="http://en.wikipedia.org/wiki/YMODEM" target="_blank">YMODEM - Wikipedia</a></li>
 </ul>
 <br>
 
@@ -1682,7 +1682,7 @@ If "YmodemLog" entry of teraterm.ini file is set to "On", Tera Term will log com
 YmodemLog=on
 </pre>
 
-Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a> (COM11) 67-byte long file using YMODEM protocol is shown below. <br>
+Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/" target="_blank">RLogin</a> (COM11) 67-byte long file using YMODEM protocol is shown below. <br>
 "&lt;&lt;&lt;" indicates the data Tera Term received from the host, "&gt;&gt;&gt;" shows the data Tera Term sent to the host.
   
 <pre class=code>
@@ -1936,7 +1936,7 @@ KERMIT (Kermit: Frog Muppet from Sesame Street) is a file transfer protocol deve
   More information about KERMIT project can be found on KERMIT project website. 
 
 <ul>
-  <li><a href="http://www.kermitproject.org/">The Kermit Project</a></li>
+  <li><a href="http://www.kermitproject.org/" target="_blank">The Kermit Project</a></li>
 </ul>
 <br>
 
