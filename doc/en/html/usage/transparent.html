@@ -2,106 +2,111 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<TITLE>look and feel の変更</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Change look and feel</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </HEAD>
 <BODY>
 
-<h1>look and feel の変更</h1>
+<h1>Change look and feel</h1>
 
 <p>
-半透明ウィンドウ、テーマを使用してTera Term の look and feelを変更できます。半透明ウィンドウとテーマは同時に設定することができます。
+You can change the look and feel of Tera Term by using transparent window and theme. Transparent window and theme can be used at the same time.
 </p>
 
 <ul>
-  <li><a href="#transparent">(1) 半透明ウィンドウ</a></li>
-  <li><a href="#theme">(2) テーマ</a></li>
+  <li><a href="#transparent">(1) Transparent window</a></li>
+  <li><a href="#theme">(2) Theme</a></li>
   <ul>
-    <li><a href="#theme/bg">(2)-1 テーマ/BG</a></li>
+    <li><a href="#theme/bg">(2)-1 Theme/BG</a></li>
     <ul>
-      <li><a href="#theme/bg/desktop">デスクトップ画像を使用する</a></li>
-      <li><a href="#theme/bg/image">背景画像を使用する</a></li>
-      <li><a href="#theme/bg/image+desktop">背景画像とデスクトップ画像を使用する</a></li>
+      <li><a href="#theme/bg/desktop">Use desktop image</a></li>
+      <li><a href="#theme/bg/image">Use background image</a></li>
+      <li><a href="#theme/bg/image+desktop">Use background image and desktop image</a></li>
     </ul>
-    <li><a href="#theme/color">(2)-2 テーマ/Color</a></li>
+    <li><a href="#theme/color">(2)-2 Theme/Color</a></li>
   </ul>
 </ul>
 
-<h2 id="transparent">(1) 半透明ウィンドウ</h2>
+<h2 id="transparent">(1) Transparent window</h2>
 
 <p>
-この機能を使うと、Tera Term のウィンドウを半透明にすることができます。Windows2000以降で有効です。<br>
-設定は、<a href="../menu/setup-additional-visual.html#AlphaBlendActive">[Setup] Additional settings の Visual タブ</a>で行えます。<br>
-透明度は0～255の範囲で指定することができ、値を小さくするほど透明度は強くなります。
-デフォルトは255（不透明）です。
-ウィンドウのアクティブ時と非アクティブ時各々で透明度を指定できます。
+Tera Term window can make transparent. The transparent window is available on Windows 2000 or later.<br>
+Settings can change on <a href="../menu/setup-additional-visual.html#AlphaBlendActive">Visual tab of [Setup] - [Additional settings]</a>.<br>
+
+Transparency can be specified as a value from 0 to 255.
+Smaller values are transparent, and opacity is 255. The default value is 255.
+Transparency can be specified for the active and inactive windows.
 </p>
 
 <p>
-タスクバー上でホイールを回転させると一時的に透明度を変更できます。
+Rotate the wheel on the taskbar to change the transparency temporarily.
 </p>
 
 <img src="image/transparent-api.png" width=598 height=488></img>
 
-<h2 id="theme">(2) テーマ</h2>
+<h2 id="theme">(2) theme</h2>
 
 <p>
-Tera Termの背景の画像、文字の色を一括して変更するテーマを使用することができます。
-
-<p>
-<a href="../menu/setup-additional-visual.html#theme">[Setup] Additional settings の Visual タブ</a>でテーマの設定を行います。
-</p>
-
-<h3 id="theme/bg">(2)-1 テーマ/BG(背景)</h3>
-
-<p>
-Tera Term の背景に、デスクトップ画像(Windowsの背景画像)や指定画像を表示することができます。デスクトップ画像と指定画像をブレンドして表示することもできます。
+Theme can change the background image and text color at once.
 </p>
 
 <p>
-テーマ/BG(背景)は Tera Term 4のEterm lookfeel(Eterm風にする)を置き換えたものです。
-Eterm(<a href="https://github.com/mej/Eterm" target="_blank">GitHub</a>)はxtermの置き換えを意図した vt102 端末エミュレーターです。
+Theme settings are made on <a href="../menu/setup-additional-visual.html#theme">Visual tab in [Setup] Additional settings</a>.
 </p>
 
-<h4 id="theme/bg/desktop">デスクトップ画像を使用する</h4>
+<h3 id="theme/bg">(2)-1 Theme/BG (backgroup)</h3>
+
 <p>
-  Tera Termの背景にデスクトップ画像を表示します。<br>
+Tera Term can display a desktop image (Windows background image) or a specified image as the background.
+The desktop image and the specified image can be blended.
+</p>
+
+<p>
+Theme/BG(background) is a replacement of Eterm lookfeel in Tera Term 4.
+Eterm(<a href="https://github.com/mej/Eterm" target="_blank">GitHub</a>) is a vt102 terminal emulator intended to replace xterm.
+</p>
+
+<h4 id="theme/bg/desktop">Use desktop image</h4>
+<p>
+  Displays a desktop image in the background of Tera Term.
 </p>
 
 <img src="image/theme-bg-desktop.png" />
 
 
-<h4 id="theme/bg/image">背景画像を使用する</h4>
+<h4 id="theme/bg/image">Use background image</h4>
 
 <p>
-  Tera Termの背景に指定した画像を表示します。透過情報が入った画像も使用できます。
+  Display specified image in the background of Tera Term.
+  Images with alpha channel can also be used.
 </p>
 
 <img src="image/theme-bg-bg.png" />
 
 
-<h4 id="theme/bg/image+desktop">背景画像とデスクトップ画像を使用する</h4>
+<h4 id="theme/bg/image+desktop">Use background and desktop images</h4>
 
 <p>
-  Tera Termの背景にデスクトップ画像と指定した画像を混合して表示します。
+  Displays a blended image of the desktop image and the specified image on background of Tera Term.
 </p>
 
 <img src="image/theme-bg-desktop+bg.png" />
 
 
-<h3 id="theme/color">(2)-2 テーマ/Color(文字色)</h3>
+<h3 id="theme/color">(2)-2 Theme/Color (character and background)</h3>
 
-文字の色を一括して変更するカラーテーマを使用することができます。
+<p>
+  Color theme can change character and background color at once.
+</p>
 
-
-<h4>使用画像</h4>
+<h4>Images</h4>
 
 <ul>
-  <li>Windows 11のデスクトップ画像
-  <li><a href="https://www.artic.edu/artworks/24645/under-the-wave-off-kanagawa-kanagawa-oki-nami-ura-also-known-as-the-great-wave-from-the-series-thirty-six-views-of-mount-fuji-fugaku-sanjurokkei" target="_blank">富嶽三十六景</a>
-  <li><a href="https://github.com/mej/Eterm/blob/master/bg/README.backgrounds" target="_blank">回路図</a>
+  <li>Windows 11 desktop image</li>
+  <li><a href="https://www.artic.edu/artworks/24645/under-the-wave-off-kanagawa-kanagawa-oki-nami-ura-also-known-as-the-great-wave-from-the-series-thirty-six-views-of-mount-fuji-fugaku-sanjurokkei" target="_blank">Fugaku sanjurokkei</a></li>
+  <li><a href="https://github.com/mej/Eterm/blob/master/bg/README.backgrounds" target="_blank">Circut</a></li>
 </ul>
 
 </BODY>
