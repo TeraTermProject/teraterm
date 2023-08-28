@@ -35,20 +35,20 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Exchanged foforeground and background colors of characters that attributes is setted ANSIColor when colors are reversed with DECSCNM set.</li>
+      <li>Exchanged foreground and background colors of characters that attributes is setted ANSIColor when colors are reversed with DECSCNM set.</li>
       <li>U+00A0(NBSP) and U+2000..U+2003 are converted to SPACE and displayed. tree command output is displayed correctly.</li>
       <li>XMODEM: Fix to check all received datas and process correctly, even if received datas are accumulated.</li>
       <li>YMODEM: ignore continuous 'C' when waiting for sending.</li>
-      <!--li>セッションを複製したときに表示されるウィンドウの位置を、TERATERM.INI で指定されている位置に変更した。</li-->
-      <!--li>Windows 11 で VT ウィンドウと TEK ウィンドウの角が丸くならないようにする設定を追加した。
+      <li>Changed window position to specified in TERATERM.INI when duplicate a session.</li>
+      <li>added a setting that can disable corner rounding of VT Window and TEK Window in Windows 11.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCornerDontround">WindowCornerDontround</a> エントリを追加した。デフォルトはoff。</li>
-        </ul></li-->
-      <!--li>ファイルドロップダイアログの Send file の Binary のチェックボックスの動作を変更した。
+          <li>added the <a href="../setup/teraterm-win.html#WindowCornerDontround">WindowCornerDontround</a> entry in the teraterm.ini file. The default is off.</li>
+        </ul></li>
+      <li>changed behavior of Binary checkbox of Send file on file drop dialog.
         <ul>
-          <li>デフォルトに、ini ファイルの TransBin 設定を反映するようにした。</li>
-          <li>"次のドロップ時、同じ処理を行う" チェック時に、記憶するようにした。</li>
-      </ul></li-->
+          <li>now default state is TransBin value of TERATERM.INI.</li>
+          <li>now state is remembered when "Do same process, next drop" is checked.</li>
+        </ul></li>
       <li>Invalid characters as file name contains Default log file name, are replaced with '_'.</li>
     </ul>
   </li>
@@ -59,18 +59,18 @@
       <li>Fixed wrong color numbers in the color change and response sequence.</li>
       <li>Fixed the area selected with the mouse does not disappear when the text is erased with the erase escape sequences.</li>
       <li>Reset text colors when <a href="../menu/control.html">[Control]-[Reset terminal]</a> is selected</li>
-      <!--li>telnet(cygterm)接続時、NAWS(Negotiate About Window Size)が送られてきたときウィンドウサイズを誤って設定する可能性があったので修正。</li-->
+      <li>Fixed wrong window size is set when NAWS (Negotiate About Window Size) is received on telnet (cygterm) connection.</li>
       <li>Fixed DPI adjustment does not work correctly when VT Window is moved to different DPI monitor.</li>
-      <!--li>Kermit でファイルを受信できないことがある問題を修正した。</li-->
-      <!--li>Kermit の送信パケットのサイズを調整した。</li-->
-      <!--li>通知アイコンにフルカラーのアイコンが使われない問題を修正した。</li-->
-      <!--li>カスタム通知アイコンを変更しても通知アイコンが変更されない問題を修正した。</li-->
-      <!--li>SSH接続時、ファイルドロップ時の処理を次回も行うよう指定しても、SCPが選択される問題を修正した。</li-->
+      <li>Fixed Kermit could not receive in some case.</li>
+      <li>Adjusted packet size of Kermit send.</li>
+      <li>Fixed full color icon is not used to notify icon.</li>
+      <li>Fixed changed custom notify icon is not used to notify icon.</li>
+      <li>Fixed when SSH connected, "Do same process, next drop" is checked on "File Drag and Drop" dialog, nevertheless always "SCP" is selected.</li>
       <li>Fixed current font name was empty in ChooseFont dialog when changing dialog fonts.</li>
       <li>Fixed wrong color numbers were changed when the color palette change in Visual Tab in Additional settings dialog.</li>
-      <!--li>ログ取得中に表示されるログダイアログのヘルプボタンを押すと Send File のヘルプが表示される問題を修正した</li-->
+      <li>Fixed "Send file" help is appear when "Help" button is pushed on Log dialog.</li>
       <li>Fixed wrong value is written to VTReverseColor when saving TERATERM.INI during reverse video.</li>
-      <!--li>TERATERM.INI の MouseCursor の設定値が小文字だと Additional settings ダイアログに反映されない問題を修正</li-->
+      <li>Fixed when setting value of MouseCursor in TERATERM.INI is lower case, value is not loaded to "Additional settings" dialog.</li>
       <li>The file handle of TELNET.LOG could not be closed.</li>
       <li>MACRO: can not read from the file handle that is opened by <a href="../macro/command/filecreate.html">filecreate</a> command. This bug was introduced in 4.102.</li>
       <li>MACRO: The <a href="../macro/command/setpassword.html">setpassword</a> command cause an error when password argument is a string value. Only string variable was accepted.</li>
@@ -3341,16 +3341,16 @@ SYNOPSIS:
     <ul>
       <li>added support for SSH2 host key algorithms: rsa-sha2-256, rsa-sha2-512 (RSA key with SHA-2 signature)</li>
       <li>added support for SSH2 public key authentication methods: rsa-sha2-256, rsa-sha2-512 (RSA key with SHA-2 signature)</li>
-      <!--li>キープアライブパケットの送信間隔のデフォルトを 300 秒に変更した。</li-->
-      <!-- li>SSH 接続中に通知があったときには TTSSH のアイコンが使われるようにした。</li -->
+      <li>changed default SSH heartbeat (keep-alive) interval to 300 seconds.</li>
+      <li>now TTSSH icon is used when the connection is SSH.</li-->
       <li>Increased the default RSA key size to 3072 bits on <a href="../menu/setup-sshkeygenerator.html">Key Generator dialog</a>.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>SSH2ダイナミックポートフォワーディングを使用すると異常終了する問題を修正した。</li>
-      <li><a href="../menu/setup-sshauth.html">Authentication Setup ダイアログ</a>を開いたときに、SSH 認証に使用するユーザ名設定が "Use default username" (DefaultUserType=1) なのに "Do not enter username" が選択される問題を修正した。</li>
+      <li>when SSH2 dynamic port forwarding is used, an application fault occurs.</li>
+      <li>when <a href="../menu/setup-sshauth.html">Authentication Setup dialog</a> is opened, username setting value is "Use default username" (DefaultUserType=1), nevertheless "Do not enter username" is selected.</li>
     </ul>
   </li>
 
