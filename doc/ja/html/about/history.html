@@ -42,6 +42,7 @@
           <li>TERATERM.INI の Tera Term セクションに DPIAware=off を加えると従来通りの動作となる。</li>
         </ul></li>
       <li>Underline属性(SGR 4)の色とフォント設定できるようにした。</li>
+      <li>コマンドラインで指定されたログファイル名または標準のログファイル名がフルパスでない場合には、<a href="../setup/folder.html#LogDir">ログフォルダ</a>または<a href="../menu/setup-additional-log.html#LogDefaultPath">標準のログ保存先</a>からの相対パスとみなすようにした。</li>
       <li>DECSCNM setで色反転時に、属性にANSIColorを設定した文字の前景色と背景色を入れ替えるようにした。</li>
       <li>U+00A0(NBSP),U+2000..U+2003をU+0020(SPACE)に変換して表示するようにした。これによりtreeコマンドで文字化けしなくなった。</li>
       <li>XMODEM 受信データが蓄積しても全体を調べて正しく処理するように修正した。</li>
@@ -53,10 +54,9 @@
         </ul></li>
       <li>ファイルドロップダイアログの Send file の Binary のチェックボックスの動作を変更した。
         <ul>
-          <li>デフォルトに、ini ファイルの TransBin設定を反映するようにした。</li>
+          <li>デフォルトに、TERATERM.INI の TransBin設定を反映するようにした。</li>
           <li>"次のドロップ時、同じ処理を行う"チェック時に、記憶するようにした。</li>
         </ul></li>
-      <li>コマンドラインで指定されたログファイル名、標準のログファイル名がフルパスでない場合に<a href="../menu/setup-additional-log.html#LogDefaultPath">標準のログ保存先</a>または<a href="../setup/folder.html#LogDir">ログフォルダ</a>からの相対パスとみなすようにした。</li>
       <li>標準ログファイル名にファイル名として不正な文字が含まれていた場合、'_'に置換するようにした。</li>
     </ul>
   </li>
@@ -93,6 +93,7 @@
       <li><a href="#ttssh_3.0">TTSSH(3.0)</a>へ差し替えた。</li>
       <li><a href="#ttmenu_1.17">TeraTerm Menu(1.17)</a>へ差し替えた。</li>
       <li><a href="#ttyrec_1.05">TTXttyrec Plugin(1.05)</a>へ差し替えた。</li>
+      <li><a href="#resizemenu_1.07">TTXResizeMenu Plugin(1.07)</a>へ差し替えた。</li>
       <li>インストーラに同梱されている CygTerm+ バイナリは 64bit Cygwin 対応のみとなります。32bit Cygwin で動作させたい場合は、32bit Cygwin を使って CygTerm+ をソースコードからビルドしてください。</li>
       <li>LogMeTT, TTLEditor, Collector を削除した。</li>
       <li>Oniguruma 6.9.8へ差し替えた。</li>
