@@ -2,80 +2,82 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<title>Theme 設定ファイル</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Theme setup file</TITLE>
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
 
-  <h1>Themeファイル</h1>
+  <h1>Theme setup file</h1>
 
   <ul>
-    <li><a href="#themefile">Themeファイルについて</a></li>
-    <li><a href="#BGTheme">BG(背景) Theme</a></li>
-    <li><a href="#ColorTheme">Color Theme</a></li>
+    <li><a href="#themefile">About theme setup file</a></li>
+    <li><a href="#BGTheme">BG(Background) theme</a></li>
+    <li><a href="#ColorTheme">Color theme</a></li>
   </ul>
 
   <h2>TODO</h2>
   <ul>
-    <li>仕様をちゃんと決める
-    <li>仕様に合わせて<a href="https://ttssh2.osdn.jp/tmp/color/" target="_blank">color picker(仮)</a>を修正
+    <li>Determine theme file specifications
+    <li>Modify <a href="https://ttssh2.osdn.jp/tmp/color/" target="_blank">color picker</a> to match theme file specifications
   </ul>
 
-  <h2 id="themefile">themeファイルについて</h2>
+  <h2 id="themefile">About theme file</h2>
 
-  テーマファイルにはいくつかの種類がある。
+  There are several types of theme file.
 
   <dl>
-    <dt>BG(背景)テーマ</dt>
+    <dt>BG(Backgroup) theme</dt>
     <dd>
-      [BG Theme]セクションが入ったファイル<br>
-      このセクションには背景画像の設定が入る
+      File containing [BG Theme] section<br>
+      This section is background image settings
     </dd>
-    <dt>カラーテーマ</dt>
+    <dt>Color theme</dt>
     <dd>
-      [Color Theme]セクションが入ったファイル<br>
-      このセクションには文字の色の設定が入る
-    <dt>旧カラーテーマ (廃止予定)</dt>
+      File containing [Color Theme] section<br>
+      This section is text color settings
     <dd>
-      [BG]セクションに文字の色の設定が入っている<br>
-      Tera Term 4 でサポートしていたカラーテーマ<br>
-      読み込みはできるが廃止予定
+    <dt>Old Color Theme (obsolete)</dt>
+    <dd>
+      The [BG] section contains the text color settings.<br>
+      Color themes supported in Tera Term 4<br>
+      Loading this file is supported. But this will be deprecated
     </dd>
   </dl>
 
-  BG(背景)テーマとカラーテーマを別のファイルに保存しておくことも、
-  1つのファイルに両方を保存することもできる。
+  BG (background) themes and color themes may be saved in separate files,
+  also save both in one file.
 
-  フォーマットはWindowsのiniファイル。
+  File format is Windows ini file.
 
-  <h2 id="BGTheme">BG(背景)テーマ</h2>
+  <h2 id="BGTheme">BG(Background) theme</h2>
 
   <h3>section</h3>
 
   "BG theme"<br>
 
-  "BG"セクションも読み込み可能(廃止予定)。両方ある場合は"BG theme"が優先。
+  The "BG" section can also be read (but will be deprecated).
+  If both are present, "BG theme" has priority.
 
   <dl>
     <dt>BGDestColor</dt>
     <dd>
-      背景画像を使用しない場合はこの色で塗りつぶされる。<br>
-      背景画像が描画されない部分がある場合もこの色で塗りつぶされる。
+      If no background image is used, it will be filled with this color.<br>
+      Areas where the background image is not drawn are also filled with this color.
     </dd>
 
     <dt>BGDestFile</dt>
     <dd>
-      背景画像
-      ファイル名にワイルドカードが指定された場合、一致するファイルからランダムに一つ選びます。<br>
-      相対パスを利用する場合は、テーマファイルからの相対パスを指定してください。<br>
-      読み込めるファイルの種類は、BGSPIPath に格納されたプラグインによります。<br>
-      ビットマップはプラグインが無くても読み込めます。
+      background image<br>
+      If a wildcard is containd in the file name, one of the matching files will be selected at random.<br>
+      If it is a relative path, specify a path relative to the theme file.<br>
+      The type of files that can be read depends on plugin stored in the BGSPIPath.<br>
+      Bitmaps(bmp) can be loaded without plugins.
     </dd>
 
     <dt>BGDestPattern</dt>
-    <dd>背景画像描画方法
+    <dd>Background pattern
       <dl>
           <dt>stretch</dt>
           <dt>tile</dt>
@@ -85,47 +87,48 @@
           <dt>autofit</dt>
           <dt>autofill</dt>
           <dd>
-            FitWidth、FitHeight は画像のアスペクト比を維持したまま、画像を拡大縮小します。<br>
-            AutoFit は、ウィンドウと画像の間に隙間ができないように、FitWidth と FitHeight を切り替えます。
+            FitWidth、FitHeight resizes image with aspect ratio maintained.<br>
+            AutoFit switches between FitWidth and FitHeight to adjust window and image size
+            to avoid gaps.
           </dd>
       </dl>
     </dd>
 
     <dt>BGSrc1Alpha</dt>
     <dd>
-      Windowsの壁紙画像をアルファブレンドする。<br>
-      背景画像(Dest)にデスクトップ画像(Src1)どれぐらいブレンドするを指定する。<br>
-      0のとき壁紙はブレンドされない。<br>
+      Alphablend the wallpaper image in Windows.<br>
+      This value to alpha blend value the desktop image (Src1) onto the background image (Dest).<br>
+      When value is 0, the wallpaper will not be blended.
     </dd>
 
 
     <dt>BGSrc2Color</dt>
     <dd>
-      背景画像全体をアルファブレンドする色
+      The color to alpha-blend entire background image.
     </dd>
 
     <dt>BGSrc2Alpha</dt>
     <dd>
-      アルファブレンド値<br>
-      DestとSrc1の合成画像に単色(Src2)をどれぐらいブレンドするか<br>
+      Alphablend value<br>
+      How much to blend a solid color (Src2) onto the image of Dest and Src1.
     </dd>
 
     <dt>BGTextBackAlpha</dt>
     <dd>
       0 - 255<br>
-      通常文字背景色のAlphaBlend値,255で不透明
+      AlphaBlend value for the normal text background color. 255 is full opacity.
     </dd>
 
     <dt>BGReverseTextAlpha</dt>
     <dd>
       0 - 255<br>
-      反転文字背景色のAlphaBlend値,255で不透明
+      AlphaBlend value for reverse text background color. 255 is full opacity.
     </dd>
 
     <dt>BGTextAlpha</dt>
     <dd>
       0 - 255<br>
-      その他の文字背景色のAlphaBlend値,255で不透明
+      AlphaBlend value for other text background colors. 255 is full opacity.
     </dd>
   </dl>
 
@@ -139,14 +142,14 @@
 
   <dl>
     <dt>Theme</dt>
-    <dd>テーマ名、値は文字列</dd>
+    <dd>Theme name, value is a string.</dd>
   </dl>
 
   <h3>attribute color</h3>
 
   <dl>
     <dt>VTColor</dt>
-    <dd>通常文字色, SGR 0</dd>
+    <dd>normal text background color, SGR 0</dd>
 
     <dt>BoldColor</dt>
     <dd>SGR 1</dd>
@@ -162,36 +165,36 @@
 
     <dt>URLColor</dt>
     <dd>
-      URL文字列<br>
-      Tera TermがURL文字列を検出したときに付加される文字アトリビュート
+      URL text color<br>
+      Text color added when Tera Term detects a URL string
     </dd>
 
-    <dt>値 (0 or 1), (0 or 1), (fore red), (fore green), (fore blue), (back red), (back green), (back blue)</dt>
-    <dt>値 (0 or 1), (0 or 1), (fore), (back)</dt>
+    <dt>values (0 or 1), (0 or 1), (fore red), (fore green), (fore blue), (back red), (back green), (back blue)</dt>
+    <dt>values (0 or 1), (0 or 1), (fore), (back)</dt>
     <dd>
       <dl>
         <dt>(0 or 1)</dt>
         <dd>
-          1=default色から変更する<br>
-          0=変更しない<br>
-          (VTColorでは参照されない)
+          1=Changing from the default color.<br>
+          0=No change.<br>
+          (Not referenced in VTColor)
         </dd>
         <dt>(0 or 1)</dt>
         <dd>
-          1=文字属性(Bold attribute等)の独自色を有効<br>
-          0=無効にする<br>
-          (VTColorでは参照されない)
+          1=Enable custom colors for text attributes (such as Bold attribute).<br>
+          0=Disable.<br>
+          (Not referenced in VTColor)
         </dd>
 
         <dt>(fore red), (fore green), (fore blue)</dt>
-        <dd>文字の色、各値は0から255</dd>
+        <dd>Text color, each value from 0 to 255.</dd>
 
         <dt>(back red), (back green), (back blue)</dt>
-        <dd>背景の色、各値は0から255</dd>
+        <dd>Background color, each from 0 to 255.</dd>
 
         <dt>(fore), (back)</dt>
         <dd>
-          #RRBBGG の形式で、各々00 から FF まで
+          #RRBBGG format, each value from 0 to ff
         </dd>
       </dl>
     </dd>
@@ -199,26 +202,26 @@
 
   <h3>ANSI color</h3>
 
-  256色/16色 ANSI colorの最初の16色。<br>
-  8色時は、Dark colorを使用しない
+  First 16 colors when 256 ANSI colors or 16 ANSI colors.<br>
+  Dark colors are not used when 8 colors.
 
   <dl>
     <dt>ANSIColor=(0 or 1)</dt>
     <dd>
-      1=default色から変更する<br>
-      0=変更しない
+      1=Changing from the default color.<br>
+      0=No change.
     </dd>
   </dl>
 
   <dl>
     <dt>Fore</dt>
-    <dd>256 ANSI color 15番<br>
-      通常文字色(Tera TermではVTColorが使用される)
+    <dd>256 ANSI color 15<br>
+      Normal text color(VTColor is used)
     </dd>
 
     <dt>Back</dt>
     <dd>256 ANSI color 0番<br>
-      通常背景色(Tera TermではVTColorが使用される)
+      Normal background color(VTColor is used)
     </dd>
 
     <dt>Red</dt>
@@ -235,14 +238,14 @@
     <dt>DarkBlue</dt>
     <dt>DarkMagenta</dt>
     <dt>DarkCyan</dt>
-    <dd>各文字色</dd>
+    <dd>Each color</dd>
 
-    <dt>値 (red), (green), (blue)</dt>
-    <dd>各値は0から255</dd>
+    <dt>Values are (red), (green), (blue)</dt>
+    <dd>from 0 to 255</dd>
 
-    <dt>値 (color)</dt>
+    <dt>value (color)</dt>
     <dd>
-      #RRBBGG の形式で、各々00 から FF まで
+      #RRBBGG format, from 00 to ff
     </dd>
 
   </dl>
