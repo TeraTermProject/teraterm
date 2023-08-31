@@ -60,7 +60,7 @@ Tera Term‚ðƒ_ƒEƒ“ƒ[ƒhEŽg—p‚·‚éƒ†[ƒU[‚ÍAã‹L‚Ìî•ñA<a href="./module.html"
 <h2>[Šî–{“I‚ÈŽg‚¢•û]</h2>
 
 <p>
-<span class="qanda">Q.</span> ƒzƒXƒg‚ÉÚ‘±‚Å‚«‚È‚¢B<br>
+<span class="qanda" id="connection">Q.</span> ƒzƒXƒg‚ÉÚ‘±‚Å‚«‚È‚¢B<br>
 <span class="qanda">A.</span> ˆÈ‰º‚Ì‚±‚Æ‚ðŠm”F‚µ‚Ä‚Ý‚Ä‚­‚¾‚³‚¢B
 </p>
 <ul>
@@ -69,8 +69,27 @@ Tera Term‚ðƒ_ƒEƒ“ƒ[ƒhEŽg—p‚·‚éƒ†[ƒU[‚ÍAã‹L‚Ìî•ñA<a href="./module.html"
  <li>ƒzƒXƒg–¼‚Ü‚½‚Í IP ƒAƒhƒŒƒX‚Í‚ ‚Á‚Ä‚Ü‚·‚©?</li>
  <li>‘¼‚Ìƒ}ƒVƒ“‚Å‚»‚ÌƒzƒXƒg‚ÉÚ‘±‚Å‚«‚Ü‚·‚ª?</li>
 </ul>
+
 <p>
-ƒlƒbƒgƒ[ƒN‚ÉŠÖ‚·‚éÝ’è–@‚É‚Â‚¢‚ÄìŽÒ‚ÉŽ¿–â‚µ‚È‚¢‚Å‚­‚¾‚³‚¢BƒCƒ“ƒ^[ƒlƒbƒgŠÖŒW‚Ì“ü–å‘‚âŽGŽ‚ð“Ç‚Þ‚©Aƒlƒbƒgƒ[ƒN(ƒvƒƒoƒCƒ_[)‚ÌŠÇ—ŽÒ‚É•·‚¢‚Ä‚­‚¾‚³‚¢B
+•\Ž¦‚³‚ê‚½ƒƒbƒZ[ƒW‚ðŒ³‚ÉAŽŸ‚Ì‚±‚Æ‚ðŠm”F‚µ‚Ä‚­‚¾‚³‚¢B
+</p>
+
+<dl>
+  <dt>–³Œø‚ÈƒzƒXƒg(Invalid host)</dt>
+  <dd>
+    ƒzƒXƒg–¼‚ðŽg‚Á‚ÄÚ‘±æ‚ð‰ðŒˆ‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B<br>
+    ƒzƒXƒg–¼‚ª—LŒø‚©ƒzƒXƒg–¼‚Ì‰ðŒˆ‚ª‰Â”\‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢B
+  </dd>
+
+  <dt>Ú‘±‚ª‹‘”Û‚³‚ê‚Ü‚µ‚½(Connection refused)</dt>
+  <dd>
+    Ú‘±æ‚ÌƒT[ƒrƒX‚ª“®ì‚µ‚Ä‚¢‚È‚¢Aƒtƒ@ƒCƒAƒEƒH[ƒ‹‚ÅƒT[ƒrƒX‚ÉÚ‘±‚Å‚«‚È‚¢ó‘Ô‚Å‚·B<br>
+    ƒT[ƒrƒX‚Ì‹N“®Aƒtƒ@ƒCƒAƒEƒH[ƒ‹‚ÌÝ’è‚ðŠm”F‚µ‚Ä‚­‚¾‚³‚¢B
+  </dd>
+</dl>
+
+<p>
+ƒlƒbƒgƒ[ƒN‚ÉŠÖ‚·‚éÝ’è‚É‚Â‚¢‚ÄìŽÒ‚ÉŽ¿–â‚¹‚¸Aƒlƒbƒgƒ[ƒN(ƒvƒƒoƒCƒ_[)‚ÌŠÇ—ŽÒ‚É•·‚¢‚Ä‚­‚¾‚³‚¢B
 </p>
 
 <p>
@@ -207,7 +226,7 @@ set term /eight		(VMS ‚Ìê‡)
 <p id="ssh_SCP_dir">
   <span class="qanda">Q.</span> ‘—MæƒtƒHƒ‹ƒ_‚ðŽw’è‚¹‚¸‚É SCP ‚Åƒtƒ@ƒCƒ‹‚ð‘—M‚µ‚½‚ªAƒVƒFƒ‹‚ÌƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚É•Û‘¶‚³‚ê‚È‚¢B<br>
   <span class="qanda">A.</span> Žd‘g‚Ýã‚»‚Ì‚æ‚¤‚É‘—M‚·‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñB<br>
-’[––ƒGƒ~ƒ…ƒŒ[ƒ^‚ÍƒŠƒ‚[ƒg‘¤‚ÌƒVƒFƒ‹‚ÌƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ð’m‚è‚Ü‚¹‚ñBƒvƒƒ“ƒvƒg‚É•\Ž¦‚³‚ê‚Ä‚¢‚é‚Æ‚µ‚Ä‚àƒŠƒ‚[ƒg‘¤‚ªo—Í‚µ‚½ƒeƒLƒXƒg‚ð‚»‚Ì‚Ü‚Ü•\Ž¦‚µ‚Ä‚¢‚é‚É‰ß‚¬‚Ü‚¹‚ñ‚µAƒvƒƒ“ƒvƒg‚ªƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ð•\Ž¦‚µ‚È‚¢‚±‚Æ‚à‚ ‚è‚Ü‚·Bƒ†[ƒU‚ªƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ð”cˆ¬‚µ‚Ä‚¢‚é‚Ì‚ÍAƒvƒƒ“ƒvƒg‚Ì•\Ž¦‚âApwd ƒRƒ}ƒ“ƒh‚Ì•\Ž¦‚â ŽÀs‚µ‚½ cd ƒRƒ}ƒ“ƒh‚È‚Ç‚ð‚à‚Æ‚Éƒ†[ƒU‚ª“ª‚Ì’†‚Å\’z‚µ‚Ä‚¢‚é‚©‚ç‚Å‚·B
+’[––ƒGƒ~ƒ…ƒŒ[ƒ^‚ÍƒŠƒ‚[ƒg‘¤‚ÌƒVƒFƒ‹‚ÌƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ð’m‚è‚Ü‚¹‚ñBƒvƒƒ“ƒvƒg‚É•\Ž¦‚³‚ê‚Ä‚¢‚é‚Æ‚µ‚Ä‚àƒŠƒ‚[ƒg‘¤‚ªo—Í‚µ‚½ƒeƒLƒXƒg‚ð‚»‚Ì‚Ü‚Ü•\Ž¦‚µ‚Ä‚¢‚é‚É‰ß‚¬‚Ü‚¹‚ñ‚µAƒvƒƒ“ƒvƒg‚ªƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ð•\Ž¦‚µ‚È‚¢‚±‚Æ‚à‚ ‚è‚Ü‚·Bƒ†[ƒU‚ªƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ð”cˆ¬‚Å‚«‚é‚Ì‚ÍAƒvƒƒ“ƒvƒg‚Ì•\Ž¦‚âApwd ƒRƒ}ƒ“ƒh‚Ì•\Ž¦‚â ŽÀs‚µ‚½ cd ƒRƒ}ƒ“ƒh‚È‚Ç‚ð‚à‚Æ‚Éƒ†[ƒU‚ª“ª‚Ì’†‚Å\’z‚µ‚Ä‚¢‚é‚©‚ç‚Å‚·B
 </p>
 
 
@@ -280,6 +299,15 @@ On ‚É‚È‚Á‚Ä‚¢‚é‚ÆATEK4010 ‚Æ‚¢‚¤ƒOƒ‰ƒtƒBƒbƒN’[––‚ÌƒRƒ“ƒgƒ[ƒ‹ƒV[ƒPƒ“ƒX‚ðŽóM‚
   ‚»‚Ì‚½‚ßAƒƒOƒtƒ@ƒCƒ‹‚Ìo—Í‚Æ VTWindow ‚É•\Ž¦‚³‚ê‚éŒ‹‰Ê‚Í“¯‚¶‚É‚Í‚È‚è‚Ü‚¹‚ñBuHTML ƒtƒ@ƒCƒ‹v‚ÆuWeb ƒuƒ‰ƒEƒU‚ªƒŒƒ“ƒ_ƒŠƒ“ƒO‚µ‚½Œ‹‰Êv‚Ì‚æ‚¤‚ÉˆÙ‚È‚é‚à‚Ì‚Å‚·B
 <pre>
 —á:
+ƒL[ƒ{[ƒh“ü—Í
+- type `l'
+- type `s'
+- type BS
+- type ` '(SPACE)
+- type BS
+- type `s'
+- type ENTER
+
 VTWindow ‚Ì•\Ž¦
 ```
 ls
@@ -288,14 +316,14 @@ COPYING         README    cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
 sf-usr-shell:~/cygterm+$ 
 ```
 
-ƒeƒLƒXƒgƒƒO
+ƒeƒLƒXƒgƒƒOi“ü—Í‚µ‚½ BS ‚Í•\Ž¦‚³‚ê‚È‚¢‚ªASPACE ‚Í•\Ž¦‚³‚ê‚Ä‚¢‚éEo—Í‚Ì TAB ‚ª‚»‚Ì‚Ü‚Ü•\Ž¦‚³‚ê‚Ä‚¢‚éj
 ```
 ls s
 CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
 COPYING		README	  cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
 sf-usr-shell:~/cygterm+$ 
 
-ƒoƒCƒiƒŠƒƒO
+ƒoƒCƒiƒŠƒƒOi‚·‚×‚Ä‚Ì“ü—Í‚ª•\Ž¦‚³‚ê‚Ä‚¢‚éEo—Í‚Ì TAB ‚ª‚»‚Ì‚Ü‚Ü•\Ž¦‚³‚ê‚Ä‚¢‚éj
 ```
 ls s
 CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp

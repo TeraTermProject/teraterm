@@ -61,7 +61,7 @@ For more information, see the project wiki page "<a href="https://osdn.net/proje
 
 <h2>[Basic usage]</h2>
 <p>
-<span class="qanda">Q.</span> I can not connect to a host.<br>
+<span class="qanda" id="connection">Q.</span> I can not connect to a host.<br>
 <span class="qanda">A.</span> Please check the following things:
 </p>
 <ul>
@@ -70,8 +70,27 @@ For more information, see the project wiki page "<a href="https://osdn.net/proje
  <li>Is the host name or IP address correct?</li>
  <li>Can you connect to the host from other machines?</li>
 </ul>
+
 <p>
-Please do not ask the author how to configure network properties. Please read books and magazines or ask the network administrator.
+Please read message and confirm followings:
+</p>
+
+<dl>
+  <dt>Invalid host</dt>
+  <dd>
+    Connection destination was not resolved from host name.<br>
+    Confirm that host name is valid and host name is able to resolve.
+  </dd>
+
+  <dt>Connection refused</dt>
+  <dd>
+    Connection destination does not up a service, or firewall drops the connection.<br>
+    Confirm service status and firewall status.
+  </dd>
+</dl>
+
+<p>
+Please do not ask the author how to configure network properties. Please ask the network administrator.
 </p>
 
 <p>
@@ -91,27 +110,25 @@ After the dial-up (PPP) connection is established, run Tera Term. Enter the host
 In the case of PPP connection, the serial port is controlled by the PPP connection utility. Serial port functions of Tera Term are for non-PPP connections and nothing to do with the PPP connection.
 </p>
 
-<!--
 <p id="save_ini">
-  <span class="qanda">Q.</span> 変更した設定が保持されない。Tera Term を終了してふたたび起動すると元に戻っている。<br>
-  <span class="qanda">A.</span> Tera Term は変更された設定を自動的に保存しません。<a href="../menu/setup-save.html">[Setup] Save setup</a> で明示的に保存する必要があります。
+  <span class="qanda">Q.</span> I changed setup item, but it is not kept. Exit Tera Term and start Tera Term, changed setup item value is restored to original value.<br>
+  <span class="qanda">A.</span> Tera Term does not save setup values automatically. To keep it, you have to explicitly save by <a href="../menu/setup-save.html">[Setup] Save setup</a>.
 </p>
 
 <p id="menu_dialog_garbled">
-  <span class="qanda">Q.</span> メニューやダイアログの文字が化ける。<br>
-  <span class="qanda">A.</span> 現在の Windows のシステムロケール設定で Tera Term の言語ファイル（lang\XXX.lng）の文字コードを扱えないときにこの現象が起きます。<br />
+  <span class="qanda">Q.</span> Menu item text or dialog text are garbled.<br>
+  <span class="qanda">A.</span> Current system locale settings of Windows can not handle the Tera Term UI language file (lang\XXX.lng).<br />
   この場合は以下のいずれかの対応をしてください。
   <ul>
-    <li>[コントロールパネル]-[地域]-[Unicode対応ではないプログラムの言語] でシステムロケールの設定を修正する。<br>
-        例: 言語UI が Japanese.lng の場合、[システムロケール] を「日本語」に、[ワールドワイド言語サポートで Unicode UTF-8 を使用] を「off」に変更する。</li>
-    <li>使用している言語ファイルの文字コードを修正する。<br>
-        例: [システムロケール] が「日本語」で [ワールドワイド言語サポートで Unicode UTF-8 を使用] が on で、言語UI が Japanese.lng の場合、言語ファイル(lang\Japanese.lng) を UTF-8 で保存し直す。<br>
-        この方法をとった場合、Tera Term を上書きインストールするたびに言語ファイルの修正が必要です。</li>
-    <li>文字化けしない言語ファイルを使用する。<br>
-        例: 言語UI で Default.lng や English.lng を指定する。</li>
+    <li>Change system locale setting from [Congtorl panel]-[Region]-[Language for non-Unicode program]<br>
+        Example: If UI language file is Japanese.lng, change "system locale" to "Japanese" and "Use Unicode UTF-8 for worldwide language support" to "off."</li>
+    <li>Change character code of UI Language file.<br>
+        Example: If "system locale" is "Japanese", "Use Unicode UTF-8 for worldwide language support" is "on" and UI language file is Japanese.lng, save UI language file (lang\Japanese.lng) as UTF-8.<br>
+        If you select this way, you have to resave as UTF-8 every time install Tera Term.</li>
+    <li>Use UI language file that is not garbled.<br>
+        Example: Select Default.lng or English.lng in UI Language.</li>
   </ul>
 </p>
--->
 
 
 <h2>[Keyboard]</h2>
@@ -142,20 +159,18 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 </p>
 
 
-<!--
 <h2>[SSH]</h2>
 <p id="ssh_C-v">
-  <span class="qanda">Q.</span> SSH 認証ダイアログの [パスフレーズ] に Ctrl+v キーで貼り付けできない。<br>
-  <span class="qanda">A.</span> 「Ctrl+なにかのキー」がなにかの操作に割り当たっていると制御文字をパスフレーズに使えないため、Ctrl+v では貼り付けできません。<br>
-  パスフレーズを貼り付けたいときには Shift+Ins キーを使用してください。
+  <span class="qanda">Q.</span> passphrase input box on SSH Authentication dialog can not paste by Ctrl+v key.<br>
+  <span class="qanda">A.</span> Tera Term does not support paste by Ctrl+v key, because of support for input control character by "Ctrl+some key."<br>
+  To paste passphrase, use Shift+Ins key.
 </p>
 
 <p id="ssh_SCP_dir">
-  <span class="qanda">Q.</span> 送信先フォルダを指定せずに SCP でファイルを送信したが、シェルのカレントディレクトリに保存されない。<br>
-  <span class="qanda">A.</span> 仕組み上そのように送信することはできません。<br>
-端末エミュレータはリモート側のシェルのカレントディレクトリを知りません。プロンプトに表示されているとしてもリモート側が出力したテキストをそのまま表示しているに過ぎませんし、プロンプトがカレントディレクトリを表示しないこともあります。ユーザがカレントディレクトリを把握しているのは、プロンプトの表示や、pwd コマンドの表示や 実行した cd コマンドなどをもとにユーザが頭の中で構築しているからです。
+  <span class="qanda">Q.</span> I sent a file by SCP without specifying destination folder, but file was not saved to shell current directory.<br>
+  <span class="qanda">A.</span> SCP can not save to shell current directory.<br>
+Terminal emulator does not know shell current directory of remote side. If prompt indicate current directory, a text from remote side is only displaying. Current directory is not shown always, in some shell or setting. User is able to understand current directory because he construct in his head from prompt text, result of `cmd' command or result of `cd' command.
 </p>
--->
 
 
 <h2>[Miscellaneous]</h2>
@@ -202,19 +217,27 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
   <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional.html">[Setup]Additional Setting</a> dialog.</li>
 </ul>
 
-<!--
 <p id="window_resize_clear">
-  <span class="qanda">Q.</span> ウィンドウをリサイズすると画面がクリアされる。<br>
-  <span class="qanda">A.</span> クリアしたくない場合は、<a href="../menu/setup-additional.html#ClearOnResize">[Setup]-[Additional settings]-[General]-[Clear display when window resized]</a> を「off」にしてください。
+  <span class="qanda">Q.</span> Window content is cleared when window is resized.<br>
+  <span class="qanda">A.</span> To prevent this behavior, turn off <a href="../menu/setup-additional.html#ClearOnResize">[Setup]-[Additional settings]-[General]-[Clear display when window resized]</a>.
 </p>
 
 <p id="logfile_garbled">
-  <span class="qanda">Q.</span> ログファイルの内容が VTWindow に表示された内容と異なる。表示できない文字が出力されている。<br>
-  <span class="qanda">A.</span> VTWindow に表示されるのは、受信したデータに含まれる制御シーケンスを解析した結果です。一方 Tera Term のログファイルは受信したデータを記録したものです。<br>
-  そのため、ログファイルの出力と VTWindow に表示される結果は同じにはなりません。「HTML ファイル」と「Web ブラウザがレンダリングした結果」のように異なるものです。
+  <span class="qanda">Q.</span> Content of log file is not same as displayed in VTWindow. Character that is not able to displayed is outputted.<br>
+  <span class="qanda">A.</span> VTWindow displays result of received data which is parsed by control sequence. On the other hand, log file is a record of received data.<br>
+  Therefore "content of log file" is not become same as "displayed content in VTWindow." It is similar that "HTML file" and "result of rendering by web browser" is different.
 <pre>
-例:
-VTWindow の表示
+Example:
+keyboard input
+- type `l'
+- type `s'
+- type BS
+- type ` '(SPACE)
+- type BS
+- type `s'
+- type ENTER
+
+display to VTWindow
 ```
 ls
 CMakeLists.txt  Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
@@ -222,14 +245,14 @@ COPYING         README    cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
 sf-usr-shell:~/cygterm+$ 
 ```
 
-テキストログ
+Text log (BS from keyboard input is not displayed, but SPACE is displayed. TAB is displayed as it is.)
 ```
 ls s
 CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
 COPYING		README	  cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
 sf-usr-shell:~/cygterm+$ 
 
-バイナリログ
+Binary log (All keyboard input is displayed. TAB is displayed as it is.)
 ```
 ls s
 CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
@@ -238,7 +261,7 @@ sf-usr-shell:~/cygterm+$
 ```
 </pre>
 </p>
--->
+
 
 </BODY>
 </HTML>
