@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <title>Additional settings / "Font" tab ([Setup] menu)</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
@@ -41,29 +41,30 @@ ClearType       = Use the ClearType.
 </pre>
           </dd>
 
-          <dt>描画幅に合わせてリサイズしたフォントを描画(Drawing resized font to fit cell width)</dt>
+          <dt>Drawing resized font to fit cell width</dt>
           <dd>
-            "&copy;"(U+00A9)など、表示しようとする幅は1cell,2cellのどちらの場合もあり、
-            フォントデザイン(フォントファイル)によって
-            フォントの幅も1cell,2cellのどちらの場合もあります。<br>
-            言語やフォントによってフォント幅は表示しようとする幅に合わない場合もあります。<br>
-            cell幅にあわせて文字が描画されると表示は自然になりますが、
-            描画速度が遅くなったり、デザインがフォント開発者の意図と異なってしまうという欠点があります。
+            Charactor width to be displayed, such as "&copy;"(U+00A9),
+            can be either 1 or 2cell, and depending on the font design (font file),
+            the font width can also be either 1 or 2cell.<br>
+            Depending on the language and font, font width may not match width to display.<br>
+            When the text is drawn to fit the cell width, looks natural,
+            but drawing may be slower and the font design may differ from the font developer's intent.
+
             <dl>
               <dt>ON</dt>
               <dd>
-                表示したい幅と描画するフォントの幅が異なっている時、
-                フォントをcell幅に合わせて文字を描画します。
+                When the width to be displayed and the width of the font to be drawn are different,
+                text is drawn with resizing font to the cell width.
               </dd>
 
               <dt>OFF</dt>
               <dd>
-                フォントファイルのデザインのまま表示します。
+                Displays the design of the font file as it is.
                 <ul>
-                  <li>Tera Term が全角,2Cellとして表示、フォントデザインが半角,1Cellの場合、
-                    半角の後ろにスペースが入ってるように表示されます。
-                  <li>Tera Term が半角,1Cellとして表示、フォントデザインが全角,2Cellの場合、
-                    全角の左半分が表示されます。
+                  <li>When Tera Term displays as 2Cell and the font design is 1Cell,
+                    1Cell charactor and 1Cell space are drawn.
+                  <li>When Tera Term displays as 1Cell and the font design is 2Cell,
+                    The left half of 2Cell is drawn.
                 </ul>
               </dd>
             </dl>
