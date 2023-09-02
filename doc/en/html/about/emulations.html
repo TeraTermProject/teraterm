@@ -29,123 +29,124 @@ sequence, and assigned to the line drawing character from 0140(0x60) to 0176(0x7
 Reference: <a href="qanda.html">Frequently asked questions</a>
 </p>
 
-<h1>色</h1>
+<h1>Color</h1>
 
-文字と背景の色について。
+About text and background colors.
 
-<h2>使用できる色モード</h2>
+<h2>Available color modes</h2>
 
-設定-ウィンドウの設定の次のチェックボックスで設定できます。
+Following checkboxes can be setted in Settings - Window Settings.
 
-各モードは同時に使用することができます。
-
-<ul>
-  <li>16 color mode (PC-Style) / 16色モード(PC形式)
-  <li>16 color mode (aixterm) / 16色モード(aixterm形式)
-  <li>256 color mode (xterm) / 256色モード(xterm形式)
-</ul>
-
-すべてをdisableにすると8色モードとなります。
-
-<h2>色の設定状態によって使用可不可が変化するシーケンス</h2>
-
-<h3>8色モード</h3>
-<p>
-16色または256色モードのいずれかがenableの時は、1-7の色は少し暗い色となっています。
-
-<p>
-16色と256色モードのすべてがdisableの時に8色モードとなり、
-1-7の色は明るい色(原色)となります。
+Each mode can be used simultaneously.
 
 <ul>
-  <li>文字色0-7 = SGR 30-37
-  <li>背景色0-7 = SGR 40-47
+  <li>16 color mode (PC style)
+  <li>16 color mode (aixterm style)
+  <li>256 color mode (xterm style)
 </ul>
 
-<h3>16色モード(PC形式)</h3>
+If all are set to disable, 8-color mode is used.
+
+<h2>Sequence which changes availability depends on color setting</h2>
+
+<h3>8 color mode</h3>
+<p>
+When either 16 or 256 color mode is enabled, colors 1-7 are slightly darker.
 
 <p>
-Blink属性はTera Term拡張です。
+When 16 and 256 color modes are disable, 8 color mode is used
+and colors 1-7 are bright(primary) colors.
 
 <ul>
-  <li>文字色0-7 = SGR 30-37
-  <li>文字色8-15 = Bold属性 + SGR 30-37
-  <li>背景色0-7 = SGR 40-47
-  <li>背景色8-15 = Blink属性 + SGR 40-47
+  <li>Fore color 0-7 = SGR 30-37
+  <li>Back color 0-7 = SGR 40-47
 </ul>
 
-<h3>16色モード(aixterm形式)</h3>
+<h3>16 color mode (PC style)</h3>
 
 <p>
-16色モード(aixterm形式) が disalbe 時 SGR100 は 「文字色と背景色が
-デフォルトに戻る」となります。
+Blink attribute is Tera Term extension.
 
 <ul>
-  <li>文字色0-7,8-15 = SGR 30-37,90-97
-  <li>背景色0-7,8-15 = SGR 40-47,100-107
+  <li>Fore color 0-7 = SGR 30-37
+  <li>Fore color 8-15 = Bold + SGR 30-37
+  <li>Back color 0-7 = SGR 40-47
+  <li>Back color 8-15 = Blink + SGR 40-47
 </ul>
 
-<h3>256色モード(xterm形式)</h3>
+<h3>16 color mode (aixterm style)</h3>
+
+<p>
+When the 16-color mode (aixterm style) is disalbe,
+SGR100 is "text and background colors set to default".
+
 <ul>
-  <li>文字色0-255 = SGR 38で色番号を指定
-  <li>背景色0-255 = SGR 48で色番号を指定
+  <li>Fore color 0-7,8-15 = SGR 30-37,90-97
+  <li>Back color 0-7,8-15 = SGR 40-47,100-107
 </ul>
 
-<h2>16色モード(PC形式)詳細</h2>
+<h3>256 color mode(xterm style)</h3>
+<ul>
+  <li>Fore color 0-255 = Set color number with SGR 38
+  <li>Back color 0-255 = Set color number with SGR 48
+</ul>
+
+<h2>16 color mode (PC style) detail</h2>
 
 <p>
-Tera Termでは
-文字色と背景色を同時に16色拡張するため、
-文字色の拡張にBold属性、背景色の拡張にBlink属性を使用します。
+In Tera Term To extend fore and background 16 color simultaneously,
+bold attribute is used to extend the fore color and
+blink attribute is used to extend the background color.
 
 <p>
-背景色の拡張にもBold属性を使ってしまうと、
-文字色15+背景色1のような指定が不可能になります。
+If bold attribute is used to extend the background color, for example,
+it is not possible to specify a fore color is 15 and background color
+is 1.
 
 <p>
-TERMINFOに従って出力するアプリ(ncurses利用アプリ等)なら、
-TERMINFOの端末エントリのsetabを次のようにすると利用可能となります。
+Application outputs according to TERMINFO (e.g. ncurses applications),
+TERMINFO entry setab as follows:
 <pre>
   setab=\E[&#37;?&#37;p1&#37;{8}&#37;&lt;&#37;t4&#37;p1&#37;d&#37;e&#37;p1&#37;{16}&#37;&lt;&#37;t5;4&#37;p1&#37;{8}&#37;-&#37;d&#37;e48;5;&#37;p1&#37;d&#37;;m,
 </pre>
 
-<h2>色の変更について</h2>
+<h2>About changing color</h2>
 
 <p>
-16色のデフォルト値はTERATERM.INIで変更することができます。
+16 default colors can be changed in TERATERM.INI.
 
 <p>
-カラーテーマを使って変更することもできます。
+<a href="../menu/setup-additional-visual-theme.html#color">Color themes</a> can also be changed.
 
-<h3>デフォルト色の変更</h3>
+<h3>Change default color</h3>
 
 <ul>
-  <li>TERATERM.INI の [Tera Term] section
+  <li>[Tera Term] section in TERATERM.INI
   <li><a href="../setup/teraterm-ini.html#ANSIColor">ANSIColor</a> key
-  <li>最初から8色分が明るい色(原色,bright version)
-  <li>次の8色分が最初の8色を少し暗くした色(黒は入れ替えない)
-
+  <li>8 bright colors from the beginning (primary color, bright version)
+  <li>Next 8 colors are slightly darker than first 8 colors (black is not replaced)
 </ul>
 
-<h3>16/256色モード時</h3>
+<h3>16/256 color mode</h3>
 
-色番号0から15は、TERATERM.INIのANSIColorで設定した色の並びと異なっています。
-前半7色と後半7色が入れ替わっています(黒とgrayは入れ替わりません)。
+Color numbers 0 through 15 are different in ANSIColor in TERATERM.INI.
+first 7 colors and second 7 colors are replaced (black and gray are not replaced).
+
 <ul>
-  <li>0は黒
-  <li>1-7は少し暗い色
-  <li>8はgray
-  <li>9-15はBright(明るい)色、原色
+  <li>0 black
+  <li>1-7 Slightly darker color
+  <li>8 gray
+  <li>9-15 Bright color, primary color
 </ul>
 
-<h3>8色モード時</h3>
+<h3>8 color mode</h3>
 
-色番号0から8は、TERATERM.INIのANSIColorで設定した最初の8色となります。
+Color numbers 0 through 8 are first 8 colors set in ANSIColor in TERATERM.INI.
 <ul>
-  <li>0-7は原色
+  <li>0-7 Bright color, primary color
 </ul>
 
-<h3>色対応表</h3>
+<h3>color table</h3>
 
 <pre>
       TERATERM.INI            16/256 color              8 color
@@ -167,26 +168,25 @@ TERMINFOの端末エントリのsetabを次のようにすると利用可能となります。
 15    "White"                 "Bright White"
 </pre>
 
-<h2>反転表示</h2>
+<h2>Reverse color</h2>
 
 <p>
-次のとき、反転表示となります。
+Reverse color is displayed in the following cases:
 <ul>
   <li>SGR 7
-  <li>DECSCNM set時
-  <li>マウス選択時
+  <li>When DECSCNM set
+  <li>When the mouse is selected
 </ul>
 
 <p>
-Tera Termでは前景色と背景色を入れ替えることで反転表示としています。
-((R,G,B)色の反転として(255-R,255-G,255-B)を使用している端末エミュレータもあります)
+In Tera Term, the fore and back colors are replace to make the display reverse color.
+(Some terminal emulators use (255-R,255-G,255-B) as (R,G,B) color invert color.)
 
 <p>
-これは次のような理由からです
+This is for following reasons:
 <ul>
-  <li>Tera Termの主なエミュレーション対象はDEC VTシリーズ
-  <li>VTシリーズでカラーが扱えるVT525の動作と同じ
-  <li>VT525の動作になるべく合わせる
+  <li>Tera Term's main emulation target is DEC VT series
+  <li>Same as VT525 operation, which can handle color in the VT series.
 </ul>
 
 </body>
