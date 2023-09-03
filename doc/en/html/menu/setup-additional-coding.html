@@ -11,27 +11,47 @@
   <body>
     <h1>Additional settings / "coding" tab ([Setup] menu)</h1>
 
-    <dl>
-      <dt>Ambiguous Characters width</dt>
-      <dd>
-        Select 1 Cell or 2 Cell.
-      </dd>
+    <h2>Ambiguous Characters width</h2>
 
-      <dt>Override Emoji Characters width</dt>
+    Select 1 Cell or 2 Cell.
+
+    <h2>Override Emoji Characters width</h2>
+
+    When checked, Overrides characters width from East_Asian_Width.
+    <ul>
+      <li>Emoji with U+1F000 and above are 2Cell (full-width).
+      <li>Emoji less than U+1F000:
+        <dl>
+          <dt>selected 2call</dt>
+          <dd>2Cell(full-width)</dd>
+          <dt>selected 1call</dt>
+          <dd>1Cell(half-width)</dd>
+        </dl>
+    </ul>
+
+    <h2>DEC Special Graphics</h2>
+
+    Select display method for DEC Special Graphics<br>
+    See <a href="../setup/teraterm-term.html#UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a>.
+
+    <dl>
+      <dt>Mapping Unicode to DEC Special Grahpics</dt>
       <dd>
-        When checked, Overrides characters width from East_Asian_Width.
-        <ul>
-          <li>Emoji with U+1F000 and above are 2Cell (full-width).
-          <li>Emoji less than U+1F000:
-            <dl>
-              <dt>selected 2call</dt>
-              <dd>2Cell(full-width)</dd>
-              <dt>selected 1call</dt>
-              <dd>1Cell(half-width)</dd>
-            </dl>
-        </ul>
+        Display using TSPECIAL.TTF which is Tera Term's proprietary font.
+        <dl>
+          <dt>Line drawing characters(U+2500-U+257F)</dt>
+          <dt>Punctuation, Block Elements, Shade</dt>
+          <dt>Middle dots(U+00B7,U+2024,U+2219)</dt>
+        </dl>
+      </dd>
+      <dt>Mapping DEC Special Grahpics to Unicode</dt>
+      <dd>
+        Display using Unicode font.
       </dd>
     </dl>
+
+
+    <hr>
 
     <h2>Easy to setup</h2>
     <dl>

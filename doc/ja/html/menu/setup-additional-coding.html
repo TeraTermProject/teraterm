@@ -11,27 +11,47 @@
   <body>
     <h1>Additional settings / "coding" タブ ([Setup] メニュー)</h1>
 
-    <dl>
-      <dt>Ambiguous Characters width</dt>
-      <dd>
-        1 Cell または 2 Cell を選択します。
-      </dd>
+    <h2>Ambiguous Characters width</h2>
 
-      <dt>Override Emoji Characters width</dt>
+    1 Cell または 2 Cell を選択します。
+
+    <h2>Override Emoji Characters width</h2>
+
+    チェックすると、絵文字属性のある文字は East_Asian_Width特性を置き換えて文字幅を設定します。
+    <ul>
+      <li>コードポイント U+1F000 以上の絵文字は常に2Cell(全角)として扱います。
+      <li>コードポイント U+1F000 未満の絵文字は
+        <dl>
+          <dt>2callが選択されたとき</dt>
+          <dd>2Cell(全角)として扱う</dd>
+          <dt>1callが選択されたとき</dt>
+          <dd>1Cell(半角)として扱う</dd>
+        </dl>
+    </ul>
+
+    <h2>DEC Special Graphics</h2>
+
+    DEC Special Graphics(DEC特殊フォント)の表示方法を指定します。<br>
+    <a href="../setup/teraterm-term.html#UnicodeDecSpMapping">UnicodeからDEC特殊文字へのマッピングを設定する</a>を参照ください。
+
+    <dl>
+      <dt>UnicodeをDEC特殊文字へマッピングする</dt>
       <dd>
-        チェックすると、絵文字属性のある文字は East_Asian_Width特性を置き換えて文字幅を設定します。
-        <ul>
-          <li>コードポイント U+1F000 以上の絵文字は常に2Cell(全角)として扱います。
-          <li>コードポイント U+1F000 未満の絵文字は
-            <dl>
-              <dt>2callが選択されたとき</dt>
-              <dd>2Cell(全角)として扱う</dd>
-              <dt>1callが選択されたとき</dt>
-              <dd>1Cell(半角)として扱う</dd>
-            </dl>
-        </ul>
+        Tera Term 独自のフォント TSPECIAL.TTF を使用して表示します。
+        <dl>
+          <dt>罫線素片(U+2500-U+257F)</dt>
+          <dt>Punctuation, Block Elements, Shade</dt>
+          <dt>中点(U+00B7,U+2024,U+2219)</dt>
+        </dl>
+      </dd>
+      <dt>DEC特殊文字をUnicodeへマッピングする</dt>
+      <dd>
+        Unicodeフォントを使用して表示します。文字幅
       </dd>
     </dl>
+
+
+    <hr>
 
     <h2>簡単な設定の方法</h2>
     <dl>
