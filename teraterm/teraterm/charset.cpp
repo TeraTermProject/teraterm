@@ -969,9 +969,9 @@ void CharSet2022Invoke(CharSetData *w, CharSet2022Shift shift)
 }
 
 /**
- *	DEC特殊フォント(Tera Special font)
- *	0140(0x60) ... 0176(0x7f) に罫線でアサインされている
- *      (0xe0) ...     (0xff) も?
+ *	DEC特殊フォント(DEC Special Graphics, DSG)
+ *	0137(0x5f) ... 0176(0x7e) に罫線でアサインされている
+ *      (0xdf) ...     (0xfe) も?
  *	<ESC>(0 という特殊なエスケープシーケンスで定義
  *	about/emulations.html
  *
@@ -983,17 +983,21 @@ BOOL CharSetIsSpecial(CharSetData *w, BYTE b)
 {
 	BOOL SpecialNew = FALSE;
 
-	if ((b>0x5F) && (b<0x80)) {
-		if (w->SSflag)
-			SpecialNew = (w->Gn[w->GLtmp]==IdSpecial);
-		else
-			SpecialNew = (w->Gn[w->Glr[0]]==IdSpecial);
+	if ((b >= 0x5F) && (b < 0x7f)) {
+		if (w->SSflag) {
+			SpecialNew = (w->Gn[w->GLtmp] == IdSpecial);
+		}
+		else {
+			SpecialNew = (w->Gn[w->Glr[0]] == IdSpecial);
+		}
 	}
-	else if (b>0xDF) {
-		if (w->SSflag)
-			SpecialNew = (w->Gn[w->GLtmp]==IdSpecial);
-		else
-			SpecialNew = (w->Gn[w->Glr[1]]==IdSpecial);
+	else if ((b >= 0xDF) && (b < 0xff)) {
+		if (w->SSflag) {
+			SpecialNew = (w->Gn[w->GLtmp] == IdSpecial);
+		}
+		else {
+			SpecialNew = (w->Gn[w->Glr[1]] == IdSpecial);
+		}
 	}
 
 	return SpecialNew;

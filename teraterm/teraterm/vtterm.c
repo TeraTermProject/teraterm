@@ -751,8 +751,13 @@ static void PutU32NoLog(unsigned int code)
 		if (dec_special) {
 			// DEC特殊文字からUnicodeへのマッピング
 			if (ts.Dec2Unicode) {
-				// 0x60から0x7e を Unicode に割り振る
+				// 0x5fから0x7e を Unicode に割り振る
+				//  Unicodeへのマッピングは
+				//  DEC Special Graphics(Wikipedia en)のUnicodeを参考にした
+				//	 https://en.wikipedia.org/wiki/DEC_Special_Graphics
 				static const char16_t dec2unicode[] = {
+											0x00a0,		// 0x5f
+
 					0x25c6, 0x2592, 0x2409,	0x240c,		// 0x60 -
 					0x240d, 0x240a, 0x00b0, 0x00b1,
 					0x2424, 0x240b, 0x2518, 0x2510,
@@ -764,8 +769,8 @@ static void PutU32NoLog(unsigned int code)
 					0x2260, 0x00a3, 0x00b7,				// 0x7c - 0x7e
 				};
 				code = code & 0x7F;
-				if (0x60 <= code && code <= 0x7e) {
-					code = dec2unicode[code - 0x60];
+				if (0x5f <= code && code <= 0x7e) {
+					code = dec2unicode[code - 0x5f];
 					dec_special = FALSE;
 				}
 			}
