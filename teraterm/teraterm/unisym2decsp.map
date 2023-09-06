@@ -31,16 +31,19 @@
  * Map of Unicode Symbols to Dec Special Characters
  */
 static const codemap_t mapUnicodeSymbolToDecSp[] = {
+#if 0
 	{ 0x00b0, 0x0266 },	// DEGREE SIGN
 	{ 0x00b1, 0x0267 },	// PLUS-MINUS SIGN
+#endif
 
 	/*
 	 * Latin-1 supplement
 	 *   http://www.unicode.org/charts/PDF/U0080.pdf
 	 */
 	{ 0x00B7, 0x047E },	// Middle dot
-
-	{ 0x03c0, 0x047b },
+#if 0
+	{ 0x03c0, 0x047b },	// GREEK SMALL LETTER PI
+#endif
 
 	/*
 	 * General punctuation
@@ -55,15 +58,18 @@ static const codemap_t mapUnicodeSymbolToDecSp[] = {
 	 *   http://www.unicode.org/charts/PDF/U2200.pdf
 	 */
 	{ 0x2219, 0x047E },	// Bullet operator
+#if 0
 	{ 0x2260, 0x047c },	// NOT EQUAL TO
 	{ 0x2264, 0x0479 },	// LESS-THAN OR EQUAL TO
 	{ 0x2265, 0x047a },	// GREATER-THAN OR EQUAL TO
+#endif
 
 	/*
 	 * Horizontal Scan line
 	 */
 	{ 0x23BA, 0x016f },	// HORIZONTAL SCAN LINE-1
 	{ 0x23BB, 0x0170 },	// HORIZONTAL SCAN LINE-3
+						//  SCAN LINE-5 is unified with the box-drawing graphic character U+2500
 	{ 0x23BC, 0x0172 },	// HORIZONTAL SCAN LINE-7
 	{ 0x23BD, 0x0173 },	// HORIZONTAL SCAN LINE-9
 
@@ -217,7 +223,9 @@ static const codemap_t mapUnicodeSymbolToDecSp[] = {
 	 */
 	{ 0x25AA, 0x027E },	// Black small square
 	{ 0x25AE, 0x0260 },	// Black vertical rectangle
+#if 0
 	{ 0x25c6, 0x0260 },	// BLACK DIAMOND
+#endif
 
 	/*
 	 * Miscellaneous symbols and arrows

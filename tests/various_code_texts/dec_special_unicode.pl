@@ -5,10 +5,11 @@ use utf8;
 binmode STDOUT, ":utf8";
 local $| = 1;
 
+print "Display using Unicodes instead of DEC Spacial Graphic\n\n";
 #
-print "      0123456789ABCDEF\n";
+print "      0123456789ABCDEF|\n";
 
-print "0x5f: ";
+print "0x50: ";
 print "               \N{U+00a0}";
 print "|\n";
 
@@ -48,4 +49,8 @@ print "\N{U+2260}";
 print "\N{U+00a3}";
 print "\N{U+00b7}";
 print " ";
-print "|\n"
+print "|\n";
+print "\n";
+
+print "scan lines\n";
+print "0x6F-0x73: \N{U+23ba}\N{U+23bb}\N{U+2500}\N{U+23bc}\N{U+23bd}\n";
