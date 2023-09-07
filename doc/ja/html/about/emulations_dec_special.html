@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>DEC Special Graphics(DEC特殊フォント)</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>DEC Special Graphics(DEC特殊フォント)</h1>
+
+<p>
+LinuxのTUI(Text User Interface)などで使われる罫線は、DEC Special Graphics(DEC特殊フォント)として処理します。
+</p>
+
+<p>
+DEC特殊フォントは、&lt;ESC&gt;(0 という特殊なエスケープシーケンスで定義されており、
+0140(0x5f,'_') ～ 0176(0x7e) にアサインされています。<br>
+受信コードがISO8859-1など日本語以外の時、G1にDEC Special Graphicsが指示されているので、SO(0x0e)でDEC Special Graphicsを表示することができます。
+</p>
+
+<p>
+Tera Termは独自のフォント(ファイル名 "TSPECIAL1.TTF", フォント名 "Tera Special")を使用してDEC特殊フォントを表示することができます。<br>
+Tera Specialの文字幅はすべて1cellです。
+</p>
+
+<p>
+  DEC Special Graphicsの表示例:<br>
+  <pre>
+echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x1b(0_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\x0f\x1b(B"
+echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x0e_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\x0f\x1b(B"</pre>
+
+  <blockquote>
+    <img src="emulations_dec_special.png"><br>
+    使用フォント: Tera Special, <a href="https://myrica.estable.jp/" target="_blank">Myrica</a>
+  </blockquote>
+
+  <dl>
+    <dt>SO(LS1(Locking Shift 1)) (0x0e)</dt>
+    <dd>GL に G1 を呼び出し</dd>
+    <dt>SI(LS0(Locking Shift 0)) (0x0f)</dt>
+    <dd>GL に G0 を呼び出し</dd>
+    <dt>ESC ( 0 (0x1B 0x28 0x30)</dt>
+    <dd>G0 に DEC Special Graphics を指示, GL に G0 を呼び出し</dd>
+    <dt>ESC ( B (0x1B 0x28 0x42)</dt>
+    <dd>G0 に ASCII を指示, GL に G0 をに呼び出し</dd>
+  </dl>
+</p>
+
+<p>
+  SO(0x0e,LS1(Locking Shift 1))で、DEC Special Graphicsを表示しない場合は、
+  <a href="../setup/teraterm-term.html#ISO2022ShiftFunction">ISO2022ShiftFunction</a>の設定を
+  変更してください。
+</p>
+
+<p>
+  次のwebの情報も参照ください。
+  <ul>
+    <li><a href="https://vt100.net/docs/vt100-ug/chapter3.html#T3-9" target="_blank">Table 3-9 Special Graphics Characters, vt100.net,VT100 User Guide</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/DEC_Special_Graphics" target="_blank">DEC Special Graphics, Wikipedia(en)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Box-drawing_character" target="_blank">Box-drawing character, Wikipedia(en)</a> / <a href="https://ja.wikipedia.org/wiki/%E7%BD%AB%E7%B7%9A%E7%B4%A0%E7%89%87">罫線素片, Wikipedia(ja)</a></li>
+    <li>ISO/IEC 2022 <a href="https://en.wikipedia.org/wiki/ISO/IEC_2022" target="_blank">Wikipedia(en)</a> <a href="https://ja.wikipedia.org/wiki/ISO/IEC_2022" target="_blank">Wikipedia(ja)</a>
+  </ul>
+</p>
+
+<p>
+  日本語環境ではTera Termは罫線や一部の記号を2カラム幅で表示します。
+  (文字の幅は設定で変更できます。<a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Additional settings / "coding" タブ, Ambiguous Characters width</a>を参照ください。)
+
+<p>
+  しかし、ホスト側のアプリケーションによってはUTF-8エンコーディング時にはこれらの文字が1カラム幅で表示されると期待した出力を行う物があり、その結果画面出力が崩れる場合があります。<br>
+また英語環境では罫線を+-|を使って表示したり、対応していない文字を??と表示したりします。<br>
+Tera Termでは、これらの文字でDEC特殊文字に近い物がある物は、それを使って表示するようにする事ができ、それによって表示の崩れを軽減する事ができます。<a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "coding" タブ, DEC Special Graphics</a>で設定できます。<br>
+ただし、マウスで選択した時にクリップボードにコピーされるのが本来とは別の文字になってしまうという副作用があります。
+</p>
+
+<p>
+  DEC Special Graphics(DEC特殊フォント)をUnicodeフォントを使用して表示することもできます。<br>
+  Unicodeフォントを使用して表示するとユーザーの好みのデザインの文字を表示することができます。<br>
+  フォントにグリフに入っていない(SCAN LINE(0x6f...0x7e)など)、デザインがおかしい、文字幅が合わないことがあります。
+  <pre>
+code Unicode
+-----+----------------------------------------------
+0x5f U+00A0 NO-BREAK SPACE
+0x60 U+25C6 BLACK DIAMOND
+0x61 U+2592 MEDIUM SHADE
+0x62 U+2409 SYMBOL FOR HORIZONTAL TABULATION
+0x63 U+240C SYMBOL FOR FORM FEED
+0x64 U+240D SYMBOL FOR CARRIAGE RETURN
+0x65 U+240A SYMBOL FOR LINE FEED
+0x66 U+00B0 DEGREE SIGN
+0x67 U+00B1 PLUS-MINUS SIGN
+0x68 U+2424 SYMBOL FOR NEWLINE
+0x69 U+240B SYMBOL FOR VERTICAL TABULATION
+0x6a U+2518 BOX DRAWINGS LIGHT UP AND LEFT
+0x6b U+2510 BOX DRAWINGS LIGHT DOWN AND LEFT
+0x6c U+250C BOX DRAWINGS LIGHT DOWN AND RIGHT
+0x6d U+2514 BOX DRAWINGS LIGHT UP AND RIGHT
+0x6e U+253C BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+0x6f U+23BA HORIZONTAL SCAN LINE-1
+0x70 U+23BB HORIZONTAL SCAN LINE-3
+0x71 U+2500 BOX DRAWINGS LIGHT HORIZONTAL
+0x72 U+23BC HORIZONTAL SCAN LINE-7
+0x73 U+23BD HORIZONTAL SCAN LINE-9
+0x74 U+251C BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+0x75 U+2524 BOX DRAWINGS LIGHT VERTICAL AND LEFT
+0x76 U+2534 BOX DRAWINGS LIGHT UP AND HORIZONTAL
+0x77 U+252C BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+0x78 U+2502 BOX DRAWINGS LIGHT VERTICAL
+0x79 U+2264 LESS-THAN OR EQUAL TO
+0x7a U+2265 GREATER-THAN OR EQUAL TO
+0x7b U+03C0 GREEK SMALL LETTER PI
+0x7c U+2260 NOT EQUAL TO
+0x7d U+00A3 POUND SIGN
+0x7e U+00B7 MIDDLE DOT
+</pre>
+
+<p>
+  次のページも参照ください。
+  <ul>
+    <li><a href="../about/qanda.html#dec_special_graphic">Q &amp; A集</a></li>
+    <li><a href="../setup/teraterm-term.html#UnicodeDecSpMapping">UnicodeからDEC特殊文字へのマッピングを設定する</a></li>
+  </ul>
+</p>
+
+</body>
+</html>
