@@ -87,7 +87,7 @@
       </ul>
       <li>Tera Trem 4 can read ini files saved by Tera Term 5.</li>
       <ul>
-        <li>Tera Trem 4 can read UTF-16 ini files(on Windows 10,11)ÅB<br>
+        <li>Tera Trem 4 can read UTF-16 ini files(on Windows 10,11).<br>
           Item in ini file cannot be handled correctly if non ACP characters are included.</li>
         <li>refer to <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a></li>
       </ul>
@@ -129,7 +129,7 @@
           Adding the BOM it will be read as UTF-8.</li>
       <li>The maximum number of labels and variables (numeric, string, numeric array, and string array) is unlimited from 256.</li>
       <li>The maximum string length for character variables is 511 bytes, the same as Tera Term 4.<br>
-          for example, Kanji character increase the number of bytets per character. (example "Ç†" is 0xe3,0x81,0x82 in UTF-8, 0x82,0xa0 in Shift_JIS.) String that could be set in Tera Term 4 may be corrupted in Tera Term 5.</li>
+          for example, Kanji character increase the number of bytets per character. (example "&copy;" is 0xc2,0xa9 in UTF-8, 0xa9 in iso-8859-1.) String that could be set in Tera Term 4 may be corrupted in Tera Term 5.</li>
       <li>The unit of character length and character position (index, pos) for macro commands that handle characters is byte. This is the same as Tera Term 4.<br>
           However, the value is different from that of Tera Term 4 because the internal character encoding is different.</li>
       <li>Performing a string operation that breaks a sequence of bytes will break the character (string).This is the same as Tera Term 4.</li>
