@@ -11,7 +11,7 @@
   <body>
     <h1>Additional settings / "coding" tab ([Setup] menu)</h1>
 
-    <h2>Ambiguous Characters width</h2>
+    <h2 id="AmbiguousCharactersWidth">Ambiguous Characters width</h2>
 
     Select 1 Cell or 2 Cell.
 
@@ -29,15 +29,17 @@
         </dl>
     </ul>
 
-    <h2>DEC Special Graphics</h2>
+    <h2 id="DecSpecial">DEC Special Graphics</h2>
 
-    Select display method for DEC Special Graphics<br>
-    See <a href="../setup/teraterm-term.html#UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a>.
+    Select display method for <a href="../about/emulations_dec_special.html">DEC Special Graphics</a>
 
     <dl>
       <dt>Mapping Unicode to DEC Special Grahpics</dt>
       <dd>
-        Display using TSPECIAL1.TTF which is Tera Term's proprietary font.
+        Display Unicode using DEC Special Graphic.<br>
+        Character width of DEC Special Graphic is 1 cell (half-width).<br>
+        Select character type to be converted.
+        See <a href="../setup/teraterm-term.html#UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a>
         <dl>
           <dt>Line drawing characters(U+2500-U+257F)</dt>
           <dt>Punctuation, Block Elements, Shade</dt>
@@ -46,7 +48,9 @@
       </dd>
       <dt>Mapping DEC Special Grahpics to Unicode</dt>
       <dd>
-        Display using Unicode font.
+        Display DEC Special Graphic using Unicode font.
+        The character width displayed in Unicode differs for each character.
+        It changes depending on Ambiguous Characters width setting.
       </dd>
     </dl>
 

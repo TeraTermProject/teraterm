@@ -58,6 +58,13 @@
 			<param name="Local" value="html\about\emulations.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<UL>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="DEC Special Graphics">
+				<param name="Local" value="html\about\emulations_dec_special.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Supported Control Sequences">
 			<param name="Local" value="html\about\ctrlseq.html">

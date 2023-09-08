@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>DEC Special Graphics</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>DEC Special Graphics</h1>
+
+<p>
+The line drawing characters by using the Linux TUI(Text User Interface) are controlled as the
+DEC special font(Tera Special font).
+</p>
+
+<p>
+The special font is defined as the &lt;ESC&gt;(0 escape
+sequence, and assigned to the line drawing character from 0137(0x5f,'_') to 0176(0x7e).<br>
+When receive code is not Japanese, such as ISO8859-1, DEC Special Graphics is designated to G1, so
+SO(0x0e) can be used to display DEC Special Graphics.
+</p>
+
+<p>
+Tera Term can display DEC Special fonts using its Special font(font name is "TSPECIAL1.TTF", font name is "Tera Specail").<br>
+All Tera Special character widths are 1cell.
+</p>
+
+
+<p>
+  Example of DEC Special Graphics:<br>
+  <pre>
+echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x1b(0_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\x0f\x1b(B"
+echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x0e_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\x0f\x1b(B"</pre>
+
+  <blockquote>
+    <img src="emulations_dec_special.png"><br>
+    font: Tera Special, <a href="https://myrica.estable.jp/" target="_blank">Myrica</a>
+  </blockquote>
+
+  <dl>
+    <dt>SO(LS1(Locking Shift 1)) (0x0e)</dt>
+    <dd>G1 is invoked over GL</dd>
+    <dt>SI(LS0(Locking Shift 0)) (0x0f)</dt>
+    <dd>G0 is invoked over GL</dd>
+    <dt>ESC ( 0 (0x1B 0x28 0x30)</dt>
+    <dd>DEC Special Graphics is designated to G0, G0 is invoked over GL</dd>
+    <dt>ESC ( B (0x1B 0x28 0x42)</dt>
+    <dd>ASCII is designated to G0, G0 is invoked over GL</dd>
+  </dl>
+</p>
+
+<p>
+  If you do not want to display DEC Special Graphics using SO(0x0e,LS1(Locking Shift 1)),
+  Change <a href="../setup/teraterm-term.html#ISO2022ShiftFunction">ISO2022ShiftFunction</a>
+  setting.
+</p>
+
+<p>
+  See also informations on web.
+  <ul>
+    <li><a href="https://vt100.net/docs/vt100-ug/chapter3.html#T3-9" target="_blank">Table 3-9 Special Graphics Characters, vt100.net,VT100 User Guide</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/DEC_Special_Graphics" target="_blank">DEC Special Graphics, Wikipedia(en)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Box-drawing_character" target="_blank">Box-drawing character, Wikipedia(en)</a> / <a href="https://ja.wikipedia.org/wiki/%E7%BD%AB%E7%B7%9A%E7%B4%A0%E7%89%87">KEISEN SOHEN, Wikipedia(ja)</a></li>
+    <li>ISO/IEC 2022 <a href="https://en.wikipedia.org/wiki/ISO/IEC_2022" target="_blank">Wikipedia(en)</a> <a href="https://ja.wikipedia.org/wiki/ISO/IEC_2022" target="_blank">Wikipedia(ja)</a>
+  </ul>
+</p>
+
+<p>
+  In CJK environment, Tera Term displays Box-drawing character and some symbols with 2 column widths.
+  (Character width can be changed in the settings.
+  Refer to <a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Additional settings / "coding" tab, Ambiguous Characters width</a>)
+</p>
+
+<p>
+However, some host applications may assume these characters will be displayed as 1-column wide character which results in incorrect display image.<br>
+In addition, a ruler may be displayed by using +-| and some unsupported characters may be displayed as ?? in English mode.<br>
+Tera Term can be configured to display these characters by similar code of DEC special characters (if any exists) to minimize the incorrect display image.
+Setting can be changed on <a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "coding" tab, DEC Special Graphics</a><br>
+However this feature causes a side effect that characters selected by mouse will be copied as different characters in a clipboard.
+</p>
+
+<p>
+  DEC Special Graphics can also be displayed using Unicode fonts.<br>
+  When displaying using Unicode fonts, user can use any design font they link.<br>
+  However, glyphs are not in font (SCAN LINE(0x6f...0x7e) etc),
+  font design is wrong, or character widths do not match.
+  <pre>
+code Unicode
+-----+----------------------------------------------
+0x5f U+00A0 NO-BREAK SPACE
+0x60 U+25C6 BLACK DIAMOND
+0x61 U+2592 MEDIUM SHADE
+0x62 U+2409 SYMBOL FOR HORIZONTAL TABULATION
+0x63 U+240C SYMBOL FOR FORM FEED
+0x64 U+240D SYMBOL FOR CARRIAGE RETURN
+0x65 U+240A SYMBOL FOR LINE FEED
+0x66 U+00B0 DEGREE SIGN
+0x67 U+00B1 PLUS-MINUS SIGN
+0x68 U+2424 SYMBOL FOR NEWLINE
+0x69 U+240B SYMBOL FOR VERTICAL TABULATION
+0x6a U+2518 BOX DRAWINGS LIGHT UP AND LEFT
+0x6b U+2510 BOX DRAWINGS LIGHT DOWN AND LEFT
+0x6c U+250C BOX DRAWINGS LIGHT DOWN AND RIGHT
+0x6d U+2514 BOX DRAWINGS LIGHT UP AND RIGHT
+0x6e U+253C BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+0x6f U+23BA HORIZONTAL SCAN LINE-1
+0x70 U+23BB HORIZONTAL SCAN LINE-3
+0x71 U+2500 BOX DRAWINGS LIGHT HORIZONTAL
+0x72 U+23BC HORIZONTAL SCAN LINE-7
+0x73 U+23BD HORIZONTAL SCAN LINE-9
+0x74 U+251C BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+0x75 U+2524 BOX DRAWINGS LIGHT VERTICAL AND LEFT
+0x76 U+2534 BOX DRAWINGS LIGHT UP AND HORIZONTAL
+0x77 U+252C BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+0x78 U+2502 BOX DRAWINGS LIGHT VERTICAL
+0x79 U+2264 LESS-THAN OR EQUAL TO
+0x7a U+2265 GREATER-THAN OR EQUAL TO
+0x7b U+03C0 GREEK SMALL LETTER PI
+0x7c U+2260 NOT EQUAL TO
+0x7d U+00A3 POUND SIGN
+0x7e U+00B7 MIDDLE DOT
+</pre>
+
+<p>
+  See next pages.
+  <ul>
+    <li><a href="../about/qanda.html#dec_special_graphic">Q &amp; A</a></li>
+    <li><a href="../setup/teraterm-term.html#UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a></li>
+  </ul>
+</p>
+
+</body>
+</html>
