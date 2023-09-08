@@ -48,9 +48,9 @@ BEGIN
     LTEXT           "&Language:",IDC_GENLANGLABEL,10,188,52,10,NOT WS_VISIBLE
     COMBOBOX        IDC_GENLANG,71,187,93,81,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
     LTEXT           "DEC Special Graphics",IDC_STATIC,141,94,110,8
-    CONTROL         "Mapping Unicode to DEC special Graphics",IDC_UNICODE2DEC,
+    CONTROL         "Mapping Unicode to DEC Special Graphics",IDC_UNICODE2DEC,
                     "Button",BS_AUTORADIOBUTTON,153,107,160,10
-    CONTROL         "Mapping DEC special Graphics to Unicode",IDC_DEC2UNICODE,
+    CONTROL         "Mapping DEC Special Graphics to Unicode",IDC_DEC2UNICODE,
                     "Button",BS_AUTORADIOBUTTON,153,162,161,10
     CONTROL         "Box-drawing character (U+2500-U+257F)",IDC_DEC2UNICODE_BOXDRAWING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,122,151,10
