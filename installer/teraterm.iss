@@ -208,7 +208,6 @@ Root: HKCU; Subkey: Software\Classes\TTYRecordFile\shell\open\command; ValueType
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
 Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
-Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu; Flags: unchecked
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
 Name: telnetassoc; Description: {cm:task_telnetassoc}; Components: TeraTerm; Flags: unchecked
