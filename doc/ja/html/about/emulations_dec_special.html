@@ -3,26 +3,26 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<title>DEC Special Graphics(DEC特殊フォント)</title>
+<title>DEC Special Graphics(DEC特殊グラフィック)</title>
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
 
-<h1>DEC Special Graphics(DEC特殊フォント)</h1>
+<h1>DEC Special Graphics(DEC特殊グラフィック)</h1>
 
 <p>
-LinuxのTUI(Text User Interface)などで使われる罫線は、DEC Special Graphics(DEC特殊フォント)として処理します。
+LinuxのTUI(Text User Interface)などで使われる罫線は、DEC Special Graphics(DEC特殊グラフィック)として処理します。
 </p>
 
 <p>
-DEC特殊フォントは、&lt;ESC&gt;(0 という特殊なエスケープシーケンスで定義されており、
+DEC Special Graphicsは、&lt;ESC&gt;(0 という特殊なエスケープシーケンスで定義されており、
 0137(0x5f,'_') ～ 0176(0x7e) にアサインされています。<br>
 受信コードがISO8859-1など日本語以外の時、G1にDEC Special Graphicsが指示されているので、SO(0x0e)でDEC Special Graphicsを表示することができます。
 </p>
 
 <p>
-Tera Termは独自のフォント(ファイル名 "TSPECIAL1.TTF", フォント名 "Tera Special")を使用してDEC特殊フォントを表示することができます。<br>
+Tera Termは独自のフォント(ファイル名 "TSPECIAL1.TTF", フォント名 "Tera Special")を使用してDEC Special Graphicsを表示することができます。<br>
 Tera Specialの文字幅はすべて1cellです。
 </p>
 
@@ -58,6 +58,10 @@ echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x0e_abcdefghijklmnopqrstuvw
 <p>
   次のwebの情報も参照ください。
   <ul>
+    <li>
+      <a href="https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#designate-character-set" target="_blank">Designate Character Set, Console Virtual Terminal Sequences, microsoft.com(en-us)</a><br>
+      <a href="https://learn.microsoft.com/ja-jp/windows/console/console-virtual-terminal-sequences#designate-character-set" target="_blank">文字セットの指定, コンソールの仮想ターミナル シーケンス, microsoft.com(ja-jp)</a>
+    </li>
     <li><a href="https://vt100.net/docs/vt100-ug/chapter3.html#T3-9" target="_blank">Table 3-9 Special Graphics Characters, vt100.net,VT100 User Guide</a></li>
     <li><a href="https://en.wikipedia.org/wiki/DEC_Special_Graphics" target="_blank">DEC Special Graphics, Wikipedia(en)</a></li>
     <li><a href="https://en.wikipedia.org/wiki/Box-drawing_character" target="_blank">Box-drawing character, Wikipedia(en)</a> / <a href="https://ja.wikipedia.org/wiki/%E7%BD%AB%E7%B7%9A%E7%B4%A0%E7%89%87">罫線素片, Wikipedia(ja)</a></li>
@@ -73,13 +77,13 @@ echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x0e_abcdefghijklmnopqrstuvw
 <p>
   しかし、ホスト側のアプリケーションによってはUTF-8エンコーディング時にはこれらの文字が1カラム幅で表示されると期待した出力を行う物があり、その結果画面出力が崩れる場合があります。<br>
 また英語環境では罫線を+-|を使って表示したり、対応していない文字を??と表示したりします。<br>
-Tera Termでは、これらの文字でDEC特殊文字に近い物がある物は、それを使って表示するようにする事ができ、それによって表示の崩れを軽減する事ができます。
+Tera Termでは、これらの文字でDEC Special Graphicsに近い物がある物は、それを使って表示するようにする事ができ、それによって表示の崩れを軽減する事ができます。
 <a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "coding" タブ, DEC Special Graphics</a>で設定できます。<br>
-ただし、マウスで選択した時にクリップボードにコピーされるのが本来とは別の文字になってしまうという副作用があります。
+ただし、マウスで選択した時にクリップボードにコピーされる文字が本来とは別の文字になってしまうという副作用があります。
 </p>
 
 <p>
-  DEC Special Graphics(DEC特殊フォント)をUnicodeフォントを使用して表示することもできます。<br>
+  DEC Special GraphicsをUnicodeフォントを使用して表示することもできます。<br>
   Unicodeフォントを使用して表示するとユーザーの好みのデザインの文字を表示することができます。<br>
   しかし、フォントにグリフに入っていない(SCAN LINE(0x6f...0x7e)など)、デザインがおかしい、文字幅が合わないことがあります。
   <pre>
@@ -124,7 +128,7 @@ code Unicode
   次のページも参照ください。
   <ul>
     <li><a href="../about/qanda.html#dec_special_graphic">Q &amp; A集</a></li>
-    <li><a href="../setup/teraterm-term.html#UnicodeDecSpMapping">UnicodeからDEC特殊文字へのマッピングを設定する</a></li>
+    <li><a href="../setup/teraterm-term.html#UnicodeDecSpMapping">UnicodeからDECSpecial Graphicsへのマッピングを設定する</a></li>
   </ul>
 </p>
 
