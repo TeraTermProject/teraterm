@@ -3,56 +3,56 @@
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<TITLE>VT100 ‚Ì Wrapˆ—</TITLE>
+<TITLE>VT100 Wrap process</TITLE>
 <link rel="stylesheet" href="../../style.css" type="text/css">
 <META http-equiv="Content-Style-Type" content="text/css">
 </HEAD>
 <BODY>
 
-<h1>VT100 ‚Ì Wrapˆ—</h1>
+<h1>VT100 Wrap process</h1>
 
 <p>
-’ÊíA•¶Žš‚ðˆê•¶Žšo—Í‚·‚éê‡A
+Normally, when outputting a single character,
+following processes are performed:
 
 <pre>
-1. Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚É•¶Žš‚ðo—Í‚·‚é
-2. ƒJ[ƒ\ƒ‹ˆÊ’u‚ðŽŸ‚ÌŒ…‚ÉˆÚ“®‚·‚é
+1. Output a character at current cursor position.
+2. Move cursor position to next cell.
 </pre>
 
-‚Æ‚¢‚¤Ž–‚ªs‚í‚ê‚Ü‚·B‚±‚Ì“®ì‚ðƒJ[ƒ\ƒ‹‚ªs––‚É—L‚éê‡‚É‚»‚Ì‚Ü‚Ü“K—p
-‚·‚é‚ÆAˆÈ‰º‚Ì‚æ‚¤‚É‚È‚è‚Ü‚·B(Ž©“®‰üs—LŒøŽž)
+When cursor is at the end of a line, If this behavior is applied,
+result is as follows (When autowrap mode is enabled):
 
 <pre>
-1. Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u(s––)‚É•¶Žš‚ðo—Í‚·‚é
-2. Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ªÅ‰º’i(ŽŸ‚Ìs‚ª–³‚¢)ê‡‚ÍˆêsƒXƒNƒ[ƒ‹‚·‚é
-3. ŽŸ‚Ìs‚Ìæ“ª‚ÉƒJ[ƒ\ƒ‹‚ðˆÚ“®‚·‚é
+1. Output a character at current cursor position.
+2. If current cursor position is at the bottom (no next line), scroll one line to make blank line.
+3. Moves cursor to the beginning of next line.
 </pre>
 
 <p>
-ŽÀÛ‚É‚±‚Ì‚æ‚¤‚È“®ì‚ð‚·‚é’[––‚à—L‚é‚Ì‚Å‚·‚ªA‚±‚Ì“®ì‚¾‚Æ‰æ–Ê‚Ì‰E‰º‚É
-•¶Žš‚ðo—Í‚·‚é‚Ì‚ª“ï‚µ‚¢(o—Í‚µ‚Ä‚àƒXƒNƒ[ƒ‹‚µ‚ÄÄ‚Ñ‹ó”’‚É‚È‚é)‚Æ‚¢‚¤
-–â‘è‚ª—L‚è‚Ü‚·B
+Some terminals actually behave this way.
+This behavior makes it difficult to output character at the lower right corner of the screen.
 
 <p>
-‚»‚Ìˆ× VT100 ‚Å‚ÍƒJ[ƒ\ƒ‹‚ªs––‚É—L‚éŽž‚Ì•¶Žšo—Í‚Ì“®ì‚ªˆÈ‰º‚Ì‚æ‚¤‚É
-‚È‚Á‚Ä‚¢‚Ü‚·B
+Therefore, when the cursor is at the end of a line, VT100 has the following character output behavior:
 
 <pre>
-1. Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u(s––)‚É•¶Žš‚ðo—Í‚·‚é
-2. ƒJ[ƒ\ƒ‹ˆÊ’u‚Ís––‚Ì‚Ü‚Ü•ÏX‚µ‚È‚¢
+1. Output characters at current cursor position (end of line).
+2. Cursor position is unchanged at the end of the line.
 </pre>
 
-‚±‚Ìó‘Ô‚Å‚³‚ç‚Éˆê•¶Žšo—Í‚·‚é‚ÆA
+<p>
+Output one character in this state:
 
 <pre>
-3. Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ªÅ‰º’i(ŽŸ‚Ìs‚ª–³‚¢)ê‡‚ÍˆêsƒXƒNƒ[ƒ‹‚·‚é
-4. ŽŸ‚Ìs‚Ìæ“ª‚ÉƒJ[ƒ\ƒ‹‚ðˆÚ“®‚·‚é
-5. Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u(ŽŸ‚Ìs‚Ìæ“ª)‚É•¶Žš‚ðo—Í‚·‚é
-6. ƒJ[ƒ\ƒ‹‚ðŽŸ‚ÌŒ…‚ÉˆÚ“®‚·‚é
+3. If current cursor position is at the bottom (no next line), scroll one line to make blank line.
+4. Moves cursor to the beginning of next line.
+5. Output a character at current cursor position.
+6. Move cursor position to next cell.
 </pre>
 
-‚Æ‚¢‚¤‚æ‚¤‚ÉAŽ©“®‰üs‚Ì”­¶‚ðs––‚Ì•¶Žš‚ÌŽŸ‚Ì•¶Žš‚Ìo—ÍŽž‚É’x‰„‚³‚¹‚é‚Æ
-‚¢‚¤“®ì‚ð‚µ‚Ü‚·B
+<p>
+Delay automatic line break when outputting character following character at the end of the line.
 
 </BODY>
 </HTML>
