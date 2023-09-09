@@ -18,18 +18,17 @@
     <dl>
       <dt>File Name</dt>
       <dd>
-	送信するファイルのファイル名を入力または選択してください。
-	すでに存在するファイルでなければなりません。<br>
+	送信するファイルのファイル名を入力または選択してください。<br>
     ダイアログにファイルをドロップすることでファイル名を入力することもできます。
       </dd>
 
       <dt>Tera Term 4 と同じ方法で送信</dt>
       <dd>
           <dl>
-              <dt>Tera Term 4 と同じ方法(チェックを入れたとき)</dt>
+              <dt>チェックを入れたとき(Tera Term 4 と同じ方法)</dt>
               <dd>
                   ファイルから読み込みながら送信します。<br>
-                  テキストファイルはACPとして読み込み、エンコードは自動判定されません。<br>
+                  テキストファイルはACPとして読み込み、エンコードは自動判定されません。
               </dd>
               <dt>チェックを外した時</dt>
               <dd>
@@ -73,12 +72,12 @@
 
       <dt>send size</dt>
       <dd>
-        送信サイズ(delay typeが per sendsizeのとき有効)
+        送信サイズ(delay typeが "per sendsize"のとき有効)
       </dd>
 
       <dt>delay time(ms)</dt>
       <dd>
-        ディレイ時間
+        ディレイ時間(delay typeが "no delay"以外のとき有効)
       </dd>
     </dl>
 
@@ -98,6 +97,7 @@
                      s1            s2                 s3                s4                         program
 Tera Term ---> Tera Term内  ---> Windows ---> (sshd,telnet,pipe) ---> OS,driver      ---> 擬似端末(pty) + シェル,その他コマンド
                送信バッファ                   (serial          )      UARTチップなど      組込プログラム等
+
                受信バッファ <---         <---                    <---                <---
                      r1            r2                 r3                r4
     </pre>
@@ -106,7 +106,8 @@ Tera Term ---> Tera Term内  ---> Windows ---> (sshd,telnet,pipe) ---> OS,driver 
       <dt>s1 Tera Term内の送信バッファ</dt>
       <dd>
         可能性は低いでしょう。<br>
-        送信バッファの空きサイズを見ながらデータを詰めていきます。</dd>
+        送信バッファの空きサイズを見ながらデータを詰めていきます。
+      </dd>
       <dt>s2 Windows</dt>
       <dd>
         可能性は低いでしょう。<br>
@@ -118,13 +119,13 @@ Tera Term ---> Tera Term内  ---> Windows ---> (sshd,telnet,pipe) ---> OS,driver 
         serialの場合エラー時の再送処理はありません。データにエラーが発生するとドロップします。<br>
         TCP/IP, pipeの場合は可能性は低いと思われます。
       </dd>
-      <dt>s4 OS,UARTチップ</dt>
+      <dt>s4 OS,UARTチップ(受信側)</dt>
       <dd>
         PC(CPU)の処理能力を超えたデータの受信(programがOSやチップから受信データを引き取らない場合)等で、
         OS(ドライバ)、UARTチップの受信バッファがオーバーフローしてドロップします。<br>
         フロー制御等はOS(ドライバ)が行うかprogramが行うかは実装によります。<br>
         TCP/IPではフロー制御,エラー時の再送が行われ、多くの場合OS内のプロトコルスタックがこれらの処理を行います。<br>
-        シリアルではフロー制御の有無はユーザーが決めることができ、オーバーフローなどエラー時の再送は行われません。
+        シリアルではフロー制御の有無はユーザーが決めることができ、オーバーフローなどエラー時の再送は自動で行われません。
       </dd>
       <dt>program</dt>
       <dd>
@@ -139,7 +140,7 @@ Tera Term ---> Tera Term内  ---> Windows ---> (sshd,telnet,pipe) ---> OS,driver 
       16550 UART                16 Byte FIFO
       FT232R                    256 Byte receive buffer
       TTY drive(Linux 2.6.26)   4KB  (<a href="../reference/sourcecode.html#ttssh">TTSSHによるSSHの設計と実装/疑似端末のしくみ</a>)
-    </pre>
+</pre>
 
     <p>
       送信データのエコーが返ってこない場合は受信データがどこかでドロップしていることも考えられます。
