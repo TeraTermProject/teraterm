@@ -87,11 +87,13 @@ However this feature causes a side effect that characters selected by mouse will
 </p>
 
 <p>
-  DEC Special Graphics can also be displayed using Unicode fonts.<br>
-  When displaying using Unicode fonts, user can use any design font they link.<br>
-  However, glyphs are not in font (SCAN LINE(0x6f...0x7e) etc),
-  font design is wrong, or character widths do not match.
+  DEC Special Graphics can alos be converted to Unicode and display with VT Window font.<br>
+  By selecting a font, user can display any preferred design font.<br>
+  However, glyphs are not in font (SCAN LINE(0x6f...0x73) etc),
+  font design is wrong, or character width do not match.
   <pre>
+DEC Special Graphic - Unicode convert table
+
 code Unicode
 -----+----------------------------------------------
 0x5f U+00A0 NO-BREAK SPACE
