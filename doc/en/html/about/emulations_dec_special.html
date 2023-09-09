@@ -12,19 +12,18 @@
 <h1>DEC Special Graphics</h1>
 
 <p>
-The line drawing characters by using the Linux TUI(Text User Interface) are controlled as the
-DEC special font(Tera Special font).
+Linux TUI (Text User Interface) transmits the line drawing characters as DEC Special Graphics in some case.
 </p>
 
 <p>
-The special font is defined as the &lt;ESC&gt;(0 escape
+DEC Special Graphics is defined as the &lt;ESC&gt;(0 escape
 sequence, and assigned to the line drawing character from 0137(0x5f,'_') to 0176(0x7e).<br>
 When receive code is not Japanese, such as ISO8859-1, DEC Special Graphics is designated to G1, so
 SO(0x0e) can be used to display DEC Special Graphics.
 </p>
 
 <p>
-Tera Term can display DEC Special fonts using its Special font(font name is "TSPECIAL1.TTF", font name is "Tera Specail").<br>
+Tera Term can display DEC Special Graphics using its Special font(font name is "TSPECIAL1.TTF", font name is "Tera Specail").<br>
 All Tera Special character widths are 1cell.
 </p>
 
@@ -81,7 +80,7 @@ echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x0e_abcdefghijklmnopqrstuvw
 <p>
 However, some host applications may assume these characters will be displayed as 1-column wide character which results in incorrect display image.<br>
 In addition, a ruler may be displayed by using +-| and some unsupported characters may be displayed as ?? in English mode.<br>
-Tera Term can be configured to display these characters by similar code of DEC special characters (if any exists) to minimize the incorrect display image.
+Tera Term can be configured to display these characters by similar code of DEC Special Graphics (if any exists) to minimize the incorrect display image.
 Setting can be changed on <a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "coding" tab, DEC Special Graphics</a><br>
 However this feature causes a side effect that characters selected by mouse will be copied as different characters in a clipboard.
 </p>
@@ -134,7 +133,7 @@ code Unicode
   See next pages.
   <ul>
     <li><a href="../about/qanda.html#dec_special_graphic">Q &amp; A</a></li>
-    <li><a href="../setup/teraterm-term.html#UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a></li>
+    <li><a href="../setup/teraterm-term.html#UnicodeDecSpMapping">Mapping of Unicode to DEC Special Graphics</a></li>
   </ul>
 </p>
 
