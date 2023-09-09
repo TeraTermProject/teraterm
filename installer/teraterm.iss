@@ -257,6 +257,7 @@ en.msg_language_russian=&Russian
 en.msg_language_korean=&Korean
 en.msg_language_chinese=&Chinese(Simplified)
 en.msg_language_tchinese=Chinese(&Traditional)
+en.msg_language_spanish=&Spanish:
 ja.msg_language_caption=言語の選択
 ja.msg_language_description=ユーザーインターフェースの言語を選択してください。
 ja.msg_language_subcaption=アプリケーションのメニューやダイアログ等の表示言語を選択して、「次へ」をクリックしてください。
@@ -268,6 +269,7 @@ ja.msg_language_russian=ロシア語(&R)
 ja.msg_language_korean=韓国語(&K)
 ja.msg_language_chinese=簡体字中国語(&C)
 ja.msg_language_tchinese=繁体字中国語(&T)
+ja.msg_language_spanish=スペイン語(&S):
 en.msg_del_confirm=Are you sure that you want to delete %s ?
 ja.msg_del_confirm=%s を削除しますか？
 en.msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
@@ -543,6 +545,8 @@ begin
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Simplified Chinese.lng', iniFile);
     7:
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Traditional Chinese.lng', iniFile);
+    8:
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Spanish.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Default.lng', iniFile);
   end;
@@ -593,6 +597,7 @@ var
   UILangFilePageKorean      : String;
   UILangFilePageChinese     : String;
   UILangFilePageTChinese    : String;
+  UILangFilePageSpanish     : String;
 begin
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
@@ -605,6 +610,7 @@ begin
   UILangFilePageKorean      := CustomMessage('msg_language_korean');
   UILangFilePageChinese     := CustomMessage('msg_language_chinese');
   UILangFilePageTChinese    := CustomMessage('msg_language_tchinese');
+  UILangFilePageSpanish     := CustomMessage('msg_language_spanish');
 
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
@@ -617,6 +623,7 @@ begin
   UILangFilePage.Add(UILangFilePageKorean);
   UILangFilePage.Add(UILangFilePageChinese);
   UILangFilePage.Add(UILangFilePageTChinese);
+  UILangFilePage.Add(UILangFilePageSpanish);
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
@@ -670,6 +677,8 @@ begin
             UILangFilePage.SelectedValueIndex := 6
           else if iniFile = 'lang_utf16le\traditional chinese.lng' then
             UILangFilePage.SelectedValueIndex := 7
+          else if iniFile = 'lang_utf16le\Spanish.lng' then
+            UILangFilePage.SelectedValueIndex := 8
           else
             UILangFilePage.SelectedValueIndex := 0;
         end;
