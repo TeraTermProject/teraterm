@@ -530,21 +530,21 @@ begin
 
   case UILangFilePage.SelectedValueIndex of
     1:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\Japanese.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Japanese.lng', iniFile);
     2:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\German.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\German.lng', iniFile);
     3:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\French.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\French.lng', iniFile);
     4:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\Russian.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Russian.lng', iniFile);
     5:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\Korean.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Korean.lng', iniFile);
     6:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\Simplified Chinese.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Simplified Chinese.lng', iniFile);
     7:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\Traditional Chinese.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Traditional Chinese.lng', iniFile);
     else
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\Default.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Default.lng', iniFile);
   end;
 
   if TCPPort = 0 then begin
@@ -656,19 +656,19 @@ begin
         if FileExists(GetDefaultIniFileName()) then
         begin
           iniFile := Lowercase(GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename()));
-          if iniFile = 'lang\japanese.lng' then
+          if iniFile = 'lang_utf16le\japanese.lng' then
             UILangFilePage.SelectedValueIndex := 1
-          else if iniFile = 'lang\german.lng' then
+          else if iniFile = 'lang_utf16le\german.lng' then
             UILangFilePage.SelectedValueIndex := 2
-          else if iniFile = 'lang\french.lng' then
+          else if iniFile = 'lang_utf16le\french.lng' then
             UILangFilePage.SelectedValueIndex := 3
-          else if iniFile = 'lang\russian.lng' then
+          else if iniFile = 'lang_utf16le\russian.lng' then
             UILangFilePage.SelectedValueIndex := 4
-          else if iniFile = 'lang\korean.lng' then
+          else if iniFile = 'lang_utf16le\korean.lng' then
             UILangFilePage.SelectedValueIndex := 5
-          else if iniFile = 'lang\simplified chinese.lng' then
+          else if iniFile = 'lang_utf16le\simplified chinese.lng' then
             UILangFilePage.SelectedValueIndex := 6
-          else if iniFile = 'lang\traditional chinese.lng' then
+          else if iniFile = 'lang_utf16le\traditional chinese.lng' then
             UILangFilePage.SelectedValueIndex := 7
           else
             UILangFilePage.SelectedValueIndex := 0;
