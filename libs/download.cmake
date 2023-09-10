@@ -275,7 +275,7 @@ function(download_zlib)
   set(RENAME_DIR "zlib")
   set(CHECK_FILE "zlib/ChangeLog")
   set(CHECK_HASH "e6fed9987017f53a18bf9eef883789577fc78feb3591bfbe3d68c3dd93d92aeb")
-  set(SRC_URL "https://zlib.net/zlib-1.2.13.tar.xz")
+  set(SRC_URL "https://zlib.net/zlib-1.3.tar.xz")
   set(ARC_HASH "8a9ba2898e1d0d774eca6ba5b4627a11e5588ba85c8851336eb38de4683050a7")
   #   ARC_HASH was picked from https://www.zlib.net
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/zlib")
