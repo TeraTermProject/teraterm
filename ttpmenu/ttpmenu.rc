@@ -157,7 +157,7 @@ FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,61,69,44,14
     CTEXT           "Tera Term %s\r\nTeraTerm Menu Version %d.%02d",IDC_VERSION,20,9,124,19
-    LTEXT           "Includes:\nversion 0.94r2\nCopyright(C) 1997-2003 S.Hayakawa\r\n(C) 2004-2021 TeraTerm Project",IDC_INCLUDE,13,31,150,35
+    LTEXT           "Includes:\nversion 0.94r2\nCopyright(C) 1997-2003 S.Hayakawa\r\n(C) 2004-2023 TeraTerm Project",IDC_INCLUDE,13,31,150,35
     ICON            "",IDC_TTPMENU_ICON,4,8,20,20
 END
 
@@ -203,8 +203,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,16,0,0
- PRODUCTVERSION 1,16,0,0
+ FILEVERSION 1,17,0,0
+ PRODUCTVERSION 1,17,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -222,12 +222,12 @@ BEGIN
             VALUE "Comments", "Tera Term launch tool"
             VALUE "CompanyName", "S.Hayakawa, TeraTerm Project"
             VALUE "FileDescription", "TeraTerm Menu"
-            VALUE "FileVersion", "1, 16, 0, 0"
+            VALUE "FileVersion", "1, 17, 0, 0"
             VALUE "InternalName", "ttpmenu"
-            VALUE "LegalCopyright", "Copyright(C) 1997-2003 S.Hayakawa, (C) 2004-2021 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright(C) 1997-2003 S.Hayakawa, (C) 2004-2023 TeraTerm Project"
             VALUE "OriginalFilename", "ttpmenu.exe"
             VALUE "ProductName", "TeraTerm Menu"
-            VALUE "ProductVersion", "1, 16, 0, 0"
+            VALUE "ProductVersion", "1, 17, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
