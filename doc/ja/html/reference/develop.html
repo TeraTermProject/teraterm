@@ -849,7 +849,10 @@ TeraTerm Project でのリリース手順について以下に示します。
   <li>バージョンを一つインクリメントする
     <p>一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため、このタイミングとする。</p>
     <ul>
-      <li>teraterm\common\tt-version.h</li>
+      <li>
+        teraterm\common\tt-version.h<br>
+        TT_VERSION_SUBSTR を "rc" にする
+      </li>
       <li>ttssh2\ttxssh\ttxssh-version.h</li>
       <li>Onttpmenu\ttpmenu.rc // 変更時のみ</li>
       <li>TTProxy\TTProxy.rc // 変更時のみ</li>
@@ -884,19 +887,36 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
-  <li>インストーラを作成する
+  <li>インストーラを作成する<br>
+    <dl>
+      <dt>installer\release.batを使用</dt>
+      <dd>
+        installer\release.bat を実行して、インストーラー、zipを作成します。<br>
+        <ul>
+          <li>
+            teraterm/common/tt-version.h を編集する
+            <pre>
+- #define TT_VERSION_SUBSTR            "dev"
++ #define TT_VERSION_SUBSTR            "rc"
+</pre>
+            バージョンなどは teraterm/common/tt-version.h の値が使用されます。
+          </li>
+          <li>
+            installer\release.bat を実行します。<br>
+            インストーラーは installer\release.bat から呼び出される installer\iscc.bat で作成されます。
+          </li>
+          <li>インストーラー、zipがinstaller\Output フォルダに出力されます。</li>
+        </ul>
+      </dd>
+      <dt>Inno Script Studio を使う場合</dt>
+      <dd>
+        RC,リリースを作成する場合は、installer\release.batを使用するほうが便利ですが、<br>
+        インストーラーのデバグなどInno Script Studioを使用すると便利です。
     <ul>
       <li>teraterm.iss の AppVer を「次のバージョン-RC」とする
         <pre>
-- #define AppVer "4.105"
-+ #define AppVer "4.106-RC1"
-        </pre>
-      </li>
-      <li>teraterm.iss の snapshot をコメントアウトする
-        <pre>
-- #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-+ ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-        </pre>
+- #define AppVer "5.0-dev"
++ #define AppVer "5.0-rc"</pre>
       </li>
       <li>teraterm.iss から起動するバッチを、リリース用に「リビルド有効」「アーカイブ作成有効」にする
         <pre>
@@ -916,11 +936,13 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>Inno Script Studio で teraterm\installer\teraterm.iss を開き、"Project"-"Compile" でインストーラを作成する</li>
       <li>作成されたポータブル版を zip で圧縮する</li>
     </ul>
+      </dd>
+    </dl>
   </li>
   <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
   <li>OSDN のリリース物件に追加する
     <ul>
-      <li>「Tera Term RC」パッケージに新しいリリース（例: "4.106 RC"）を追加する</li>
+      <li>「Tera Term RC」パッケージに新しいリリース（例: "5.0 RC"）を追加する</li>
       <li>新しいリリースに、インストーラ・ポータブル版の zip ファイルを追加する</li>
     </ul>
   </li>
@@ -945,33 +967,64 @@ TeraTerm Project でのリリース手順について以下に示します。
     </ul>
   </li>
   <li>インストーラを作成する
+    <dl>
+      <dt>installer\release.batを使用</dt>
+      <dd>
+        installer\release.bat を実行して、インストーラー、zipを作成します。<br>
+        <ul>
+          <li>
+            teraterm/common/tt-version.h を編集する
+            <pre>
+- #define TT_VERSION_SUBSTR            "rc"
++ //#define TT_VERSION_SUBSTR            "rc"
+</pre>
+          </li>
+          <li>installer\release.bat を実行します。</li>
+          <li>インストーラー、zipがinstaller\Output フォルダに出力されます。</li>
+        </ul>
+      </dd>
+      <dt>Inno Script Studio を使う場合</dt>
+      <dd>
     <ul>
       <li>teraterm.iss の AppVer を変更する
         <pre>
-- #define AppVer "4.106-RC1"
-+ #define AppVer "4.106"
-        </pre>
+- #define AppVer "5.0-rc"
++ #define AppVer "5.0"</pre>
       </li>
       <li>ISTool で teraterm\installer\teraterm.iss を開き、"Project"-"Compile Setup" で作成する</li>
     </ul>
+      </dd>
+    </dl>
   </li>
   <li>この状態でコミットする</li>
   <li>SVN のタグを作成する<br />
-    タグ名は「teraterm-バージョン」。（例: v4.106ならば"teraterm-4_106"）
+    タグ名は「teraterm-バージョン」。（例: v5.0ならば"teraterm-5_0"）
     <pre>
-svn copy -m "Release 4.106" \
+svn copy -m "Release 5.0" \
     svn+ssh://svn.osdn.net/svnroot/ttssh2/branches/4-stable \
-    svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-4_106
+    svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-5_0
     </pre>
   </li>
   <li>リリース用のタグでチェックアウトし直す<br />
     <p>SVN のリビジョン以外のすべてが、開発ブランチと同じ状態になる</p>
   </li>
   <li>インストーラを作成する
+    <dl>
+      <dt>installer\release.batを使用</dt>
+      <dd>
+        <ul>
+          <li>installer\release.bat を実行します。</li>
+          <li>インストーラー、zipがinstaller\Output フォルダに出力されます。</li>
+        </ul>
+      </dd>
+      <dt>Inno Script Studio を使う場合</dt>
+      <dd>
     <ul>
       <li>Inno Script Studio で teraterm\installer\teraterm.iss を開き、"Project"-"Compile" で作成する</li>
       <li>作成されたポータブル版を zip で圧縮する</li>
     </ul>
+      </dd>
+    </dl>
   </li>
   <li>OSDN を更新する
     <ul>
@@ -994,11 +1047,28 @@ svn copy -m "Release 4.106" \
       </li>
     </ul>
   </li>
-  <li id="revert_teraterm_iss">開発ブランチの teraterm.iss を戻し、コミットする
+  <li id="revert_teraterm_iss">開発ブランチを元に戻し、コミットする
+    <dl>
+      <dt>installer\release.batを使用</dt>
+      <dd>
+        teraterm/common/tt-version.h を編集する。
+        TT_VERSION_MINOR を1つ進めて、SUBSTR を "dev" にする。
+        <pre>
+- //#define TT_VERSION_SUBSTR            "rc"
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </dd>
+      <dt>Inno Script Studio を使う場合</dt>
+      <dd>
+        <ul>
+          <li>teraterm.iss の AppVer を「次のバージョン-dev」とする
+        <pre>
+- #define AppVer "5.0"
++ #define AppVer "5.1-dev"</pre>
+          </li>
+          <li>
+開発ブランチの teraterm.iss を戻し、コミットする
     <pre>
-- ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-+ #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-
   [PreCompile]
   Name: makechm.bat
 - ;Name: build.bat
@@ -1010,7 +1080,10 @@ svn copy -m "Release 4.106" \
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
     </pre>
-  </li>
+          </li>
+        </ul>
+      </dd>
+    </dl>
   <li>Chocolatey の登録を更新する</li>
 </ol>
 

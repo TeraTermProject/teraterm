@@ -856,7 +856,10 @@ To release Tera Term installation package is shown in the following step:
   <li>Increment the version while RC release process.
     <p>The binary is released for test in this timing. Prevent that old and new binary have same version number.</p>
     <ul>
-      <li>teraterm\common\tt-version.h</li>
+      <li>
+        teraterm\common\tt-version.h<br>
+        set TT_VERSION_SUBSTR to "rc".
+      </li>
       <li>ttssh2\ttxssh\ttxssh-version.h</li>
       <li>Onttpmenu\ttpmenu.rc // only modifying</li>
       <li>TTProxy\TTProxy.rc // only modifying</li>
@@ -892,18 +895,35 @@ To release Tera Term installation package is shown in the following step:
     </ul>
   </li>
   <li>Create installer.
+    <dl>
+      <dt>use installer\release.bat</dt>
+      <dd>
+        Run installer\release.bat to create installer and zip.<br>
+        <ul>
+          <li>
+            Edit teraterm/common/tt-version.h
+            <pre>
+- #define TT_VERSION_SUBSTR            "dev"
++ #define TT_VERSION_SUBSTR            "rc"
+</pre>
+            Versions will use values in teraterm/common/tt-version.h.
+          </li>
+          <li>
+            Run installer\release.bat.<br>
+            Create installer in installer\iscc.bat called installer\release.bat.
+          </li>
+          <li>Output install and zip in installer\Output folder.</li>
+        </ul>
+      </dd>
+      <dt>use Inno Script Studio</dt>
+      <dd>
+        It is easier to use installer\release.bat when create an RC,release.<br>
+        Debugging installer is easy to use Inno Script Studio.
     <ul>
       <li>Version up AppVer and add "RC" in teraterm.iss.
         <pre>
-- #define AppVer "4.105"
-+ #define AppVer "4.106-RC1"
-        </pre>
-      </li>
-      <li>Comment out snapshot in teraterm.iss.
-        <pre>
-- #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-+ ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-        </pre>
+- #define AppVer "5.0-dev"
++ #define AppVer "5.0-rc"</pre>
       </li>
       <li>Change calling batch file to enable rebuild and create archive.
         <pre>
@@ -923,6 +943,8 @@ To release Tera Term installation package is shown in the following step:
       <li>Open teraterm\installer\teraterm.iss with Inno Script Studio, and create installer by "Project"-"Compile."</li>
       <li>Compress portable version with zip.</li>
     </ul>
+      </dd>
+    </dl>
   </li>
   <li>Test run installer, run and connect in all supported OS.</li>
   <li>Add to OSDN Release
@@ -952,15 +974,34 @@ To release Tera Term installation package is shown in the following step:
     </ul>
   </li>
   <li>Create installer.
+    <dl>
+      <dt>Use installer\release.bat</dt>
+      <dd>
+        Run installer\release.bat to create installer and zip.<br>
+    <ul>
+          <li>
+            Change teraterm/common/tt-version.h.
+            <pre>
+- #define TT_VERSION_SUBSTR            "rc"
++ //#define TT_VERSION_SUBSTR            "rc"
+</pre>
+          </li>
+          <li>run installer\release.bat.</li>
+          <li>Installer and zip are output to installer\Output folder.</li>
+        </ul>
+      </dd>
+      <dt>Use Inno Script Studio</dt>
+      <dd>
     <ul>
       <li>Change AppVer in teraterm.iss.
         <pre>
-- #define AppVer "4.106-RC1"
-+ #define AppVer "4.106"
-        </pre>
+- #define AppVer "5.0-rc"
++ #define AppVer "5.0"</pre>
       </li>
       <li>Open teraterm\installer\teraterm.iss with ISTool, and create installer by "Project"-"Compile Setup."</li>
     </ul>
+      </dd>
+    </dl>
   </li>
   <li>Commit this state.</li>
   <li>Create SVN tag.<br />
@@ -975,10 +1016,22 @@ svn copy -m "Release 4.106" \
     <p>All source code is same as development branch. Only SVN revision is different.</p>
   </li>
   <li>Create installer.
+    <dl>
+      <dt>Use installer\release.bat</dt>
+      <dd>
+        <ul>
+          <li>run installer\release.bat.</li>
+          <li>Installer and zip are output to installer\Output folder.</li>
+        </ul>
+      </dd>
+      <dt>Use Inno Script Studio</dt>
+      <dd>
     <ul>
       <li>Open teraterm\installer\teraterm.iss with Inno Script Studio, and create installer by "Project"-"Compile."</li>
       <li>Compress portable version with zip.</li>
     </ul>
+      </dd>
+    </dl>
   </li>
   <li>Update OSDN project site.
     <ul>
@@ -1004,10 +1057,27 @@ svn copy -m "Release 4.106" \
     </ul>
   </li>
   <li id="revert_teraterm_iss">Revert teraterm.iss in development branch.
+    <dl>
+      <dt>Use installer\release.bat</dt>
+      <dd>
+        Edit teraterm/common/tt-version.h.<br>
+        Increment TT_VERSION_MINOR and set SUBSTR to "dev".
+        <pre>
+- //#define TT_VERSION_SUBSTR            "rc"
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </dd>
+      <dt>Use Inno Script Studio</dt>
+      <dd>
+        <ul>
+          <li>Set AppVer to [next version]-dev in teraterm.iss
+        <pre>
+- #define AppVer "5.0"
++ #define AppVer "5.1-dev"</pre>
+          </li>
+          <li>
+Revert teraterm.iss in developbranch and commit.
     <pre>
-- ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-+ #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
-
   [PreCompile]
   Name: makechm.bat
 - ;Name: build.bat
@@ -1020,6 +1090,9 @@ svn copy -m "Release 4.106" \
 + ;Name: makearchive.bat; Parameters: release
     </pre>
   </li>
+        </ul>
+      </dd>
+    </dl>
   <li>Update Chocolatey.</li>
 </ol>
 
