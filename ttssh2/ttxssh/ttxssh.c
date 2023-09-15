@@ -3766,11 +3766,12 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		init_password_control(pvar, dlg, IDC_CONFIRM_EDIT, NULL);
 
 		// default key type
-		SendMessage(GetDlgItem(dlg, IDC_RSA_TYPE), BM_SETCHECK, BST_CHECKED, 0);
-		key_type = KEY_RSA;
+		SendMessage(GetDlgItem(dlg, IDC_ED25519_TYPE), BM_SETCHECK, BST_CHECKED, 0);
+		key_type = KEY_ED25519;
 		saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 
 		// default key bits
+		EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 		SetDlgItemInt(dlg, IDC_KEYBITS, SSH_KEYGEN_DEFAULT_BITS, FALSE);
 		SendDlgItemMessage(dlg, IDC_KEYBITS, EM_LIMITTEXT, 4, 0);
 
@@ -3786,7 +3787,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PRIBATE_KEY), FALSE);
 
 		// default bcrypt KDF
-		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
 		SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
 		SetDlgItemInt(dlg, IDC_BCRYPT_KDF_ROUNDS, DEFAULT_ROUNDS, FALSE);
