@@ -146,7 +146,7 @@
       <li>When the opacity value of the window is temporarily changed by operating the mouse wheel on the title bar of VT window, the tooltip of the opacity value is shown.</li>
       <li>The location of resizing tooltip is automatically moved to coordinates after resizing.</li>
       <li>Added slider for specify the opacity values on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. When transparency is not available, made opacity not changeable.</li>
-      <li>Eterm look-feel: Added the <a href="../menu/setup-additional.html#MixedThemeFile">Mixed ThemeFile to Background</a> configuration. Also, added the <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> entry in the teraterm.ini file. The default value is off.</li>
+      <li>Eterm look-feel: Added the Mixed ThemeFile to Background configuration. Also, added the BGIgnoreThemeFile entry in the teraterm.ini file. The default value is off.</li>
       <li>When the opacity values of the <a href="../menu/setup-additional.html">Additional settings dialog</a> is input over than 255, the value is automatically changed to 255 over the dialog.</li>
       <li>Added support for REP control sequence.</li>
       <li>Added support for xterm ED 3 (clear scroll buffer) control sequence.
@@ -433,7 +433,7 @@
       <li>added configuration of timestamp type at the start of log file's line.
         <ul>
           <li>added "Elapsed Time (Logging)" and "Elapsed Time (Connection)" as timestamp type.</li>
-          <li>The timestamp type can be changed on <a href="../menu/file-log.html#Timestamp">Log dialog</a> and <a href="../menu/setup-additional.html#LogTimestamp">Additional settings dialog</a>.</li>
+          <li>The timestamp type can be changed on <a href="../menu/file-log.html#Timestamp">Log dialog</a> and <a href="../menu/setup-additional-log.html#LogTimestamp">Additional settings dialog</a>.</li>
           <li>The <a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> setting is obsolete, use the timestamp type setting instead.</li>
         </ul></li>
     </ul>
@@ -444,7 +444,7 @@
       <li>The response of DECRQSS control sequence was invalid.</li>
       <li>On telnet connection, the terminal size is not notified correctly if terminal width or height is 255.</li>
       <li>When the [View Log] on the <a href="../menu/file.html">[File]</a> is called, the editor does not invoked.</li>
-      <li>Fix the problem of the log option settings on the Log tab of <a href="../menu/setup-additional.html#LogOption">Additional settings dialog</a>
+      <li>Fix the problem of the log option settings on the Log tab of <a href="../menu/setup-additional-log.html#LogOption">Additional settings dialog</a>
         <ul>
           <li>PlainText and Timestamp setting is not applied.</li>
           <li>Changes to the log option settings are applied when the dialog is cancelled.</li>
@@ -552,7 +552,7 @@
       <li>added `&amp;u' parameter to log file name that can convert the logon user name.</li>
       <li>added new line normalization on pasting. The default is off.
         <ul>
-          <li>This feature can be enabled on Copy and Paste tab of <a href="../menu/setup-additional.html#NormalizeLineBreak">Additional settings dialog</a>.</li>
+          <li>This feature can be enabled on Copy and Paste tab of Additional settings dialog.</li>
         </ul></li>
       <li>added the <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
     </ul>
@@ -675,7 +675,7 @@
     <ul>
       <li>The background color erase(BCE) does not work with DECFI, DECBI control sequence.</li>
       <li>When <a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=on is enabled, Tera Term can not recognize a part of device regarding USB serial port connection and disconnection.</li>
-      <li>When <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> is enabled and an existing file is logged, first file can not be rotated by specified size.</li>
+      <li>When <a href="../menu/setup-additional-log.html#LogRotate">Log Rotate</a> is enabled and an existing file is logged, first file can not be rotated by specified size.</li>
       <li>MACRO: When <a href="../macro/command/ifthenelseif.html">if</a> has macro command without parameter, syntax error occurs.</li>
     </ul>
   </li>
@@ -747,7 +747,7 @@
         <ul>
           <li>added the <a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">FileSendHighSpeedMode</a> entry in the teraterm.ini file. The default value is on.</li>
         </ul></li>
-      <li>Eterm look-feel: added the <a href="../menu/setup-additional.html#ImageBrightness">Image Brightness</a> configuration.</li>
+      <li>Eterm look-feel: added the Image Brightness configuration.</li>
       <li>added the Virtual Store path to <a href="../menu/setup-directory.html">Setup directory</a>.</li>
       <li>The cygterm.cfg is not saved on dialog closing but is saved on the Save setup when <a href="../menu/setup-additional.html#CygTerm">the CygTerm configuration of the Additional settings</a> is used.</li>
       <li>The command line option can be quoted from an offset when the '"' is used.</li>
@@ -856,7 +856,7 @@
       <li>YMODEM: When the data is sent, the CANCEL command from the remote host does not work well.</li>
       <li>YMODEM: When the received file information contains only a file name, an end of the file name is broken.</li>
       <li>YMODEM: When the received file information does not include the file size, the file data can not be recorded well.</li>
-      <li>The setting value of the <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> will not display well.</li>
+      <li>The setting value of the <a href="../menu/setup-additional-log.html#LogRotate">Log Rotate</a> will not display well.</li>
       <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> macro command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
       <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be re-sizable.</li>
     </ul>
@@ -920,7 +920,7 @@
   <li>Changes
     <ul>
       <li>When a file is received by using YMODEM or ZMODEM protocol, the file time-stamp is updated.</li>
-      <li>added the log type configuration on the Log tab of the <a href="../menu/setup-additional.html#LogOption">Additional settings dialog</a>.</li>
+      <li>added the log type configuration on the Log tab of the <a href="../menu/setup-additional-log.html#LogOption">Additional settings dialog</a>.</li>
     </ul>
   </li>
 
@@ -1143,13 +1143,13 @@
   <li>Changes
     <ul>
       <li>Select "Selection" by default in the printer dialog when there is a selection. Special thanks to tentner.</li>
-      <li>added the <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> configuration on the Additional settings dialog.
+      <li>added the <a href="../menu/setup-additional-log.html#LogRotate">Log Rotate</a> configuration on the Additional settings dialog.
         <ul>
           <li>added the LogRotate, LogRotateSize, LogRotateSizeType and LogRotateStep entries in the teraterm.ini file.</li>
         </ul></li>
       <li>added the Exit All under the <a href="../menu/file.html">File menu</a>.</li>
       <li>added the Cascade, Stacked and Side By Side under the <a href="../menu/window.html">Window menu</a>.</li>
-      <li>added the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line option to disable the <a href="../menu/setup-additional.html#LogAutoStart">Auto start logging</a>.</li>
+      <li>added the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line option to disable the <a href="../menu/setup-additional-log.html#LogAutoStart">Auto start logging</a>.</li>
       <li>Macro
         <ul>
           <li>added the <a href="../macro/command/listbox.html">listbox</a> command.</li>
@@ -1304,7 +1304,7 @@
         <ul>
           <li>added support for the named pipe. Tera Term can <a href="../usage/tips/namedpipe.html">connect the serial port of the VMware and Hyper-V</a>.</li>
           <li>A named pipe can be specified into the TCP/IP:Host entry of <a href="../menu/file-new.html">New connection dialog</a>.</li>
-          <li>added the <a href="../commandline/teraterm.html#namedpipe">/NAMEDPIPE</a> option by specifying the named pipe.</li>
+          <li>added the <a href="../commandline/teraterm.html#pipe">/PIPE</a> option by specifying the named pipe.</li>
         </ul></li>
       <li>added the AUTO entry in the <a href="../menu/setup-terminal.html#CRReceive">New-line(receive)</a>. Special thanks to tentner.</li>
       <li>added the selection of the font quality.
@@ -1706,7 +1706,7 @@
       <li>added support for specifying any baud rate of the serial port connection.
         <ul>
           <li>A user can specify any baud rate at the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> menu.</li>
-          <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#BAUD">/BAUD</a> option.</li>
+          <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#baud">/BAUD</a> option.</li>
           <li>A user can specify any baud rate at the "<a href="../macro/command/setbaud.html">setbaud</a>" macro command.</li>
         </ul></li>
       <li>added support for the VPB and HPB control sequence.</li>
@@ -1864,7 +1864,7 @@
         </ul></li>
       <li>added support for the control sequences for window operation.
         <ul>
-          <li>added the <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a> and <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> entry in the teraterm.ini file. The default is on.</li>
+          <li>added the <a href="../setup/teraterm-ini.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-ini.html#WindowReportSequence">WindowReportSequence</a> and <a href="../setup/teraterm-ini.html#TitleReportSequence">TitleReportSequence</a> entry in the teraterm.ini file. The default is on.</li>
         </ul></li>
       <li>added support of "Line at a time" mode.
         <ul>
@@ -1893,7 +1893,7 @@
         <ul>
           <li>added the character set (aka "Script") drop-down combo box.</li>
           <li>moved the Enable bold style to <a href="../menu/setup-window.html">[Setup]-[Window]</a>.</li>
-          <li>moved the Russian Font char set to <a href="../menu/setup-terminalr.html">[Setup]-[Terminal] for Russian mode</a>.</li>
+          <li>moved the Russian Font char set to <a href="../menu/setup-terminal_ru.html">[Setup]-[Terminal] for Russian mode</a>.</li>
         </ul></li>
       <li>added the MSB set character by using the Alt key.
         <ul>
@@ -1913,7 +1913,7 @@
         </ul></li>
       <li>added a new optional setting that can disable the accelerator key for the Duplicate session.
         <ul>
-          <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
+          <li>added the <a href="../setup/teraterm-ini.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
       <li>The <a href="../commandline/teraterm.html#f">/F</a> command line option overwrites the other option.</li>
       <li>Changed the command line specification regarding the double quotation.
@@ -1922,7 +1922,7 @@
         </ul></li>
       <li>added support for specifying any strings as the ConfirmChangePaste function.
         <ul>
-          <li>added the <a href="../menu/setup-additional.html#ConfirmChagePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
+          <li>added the <a href="../menu/setup-additional.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
         </ul></li>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
@@ -2156,7 +2156,7 @@
         </ul></li>
       <li>added support for the configuration whether the Unicode character that Tera Term does not support treated as a wide character.
         <ul>
-          <li>added the <a href="../setup/teraterm-term.html#UnknownUnicodeCharacterAsWide">UnknownUnicodeCharacterAsWide</a> entry in teraterm.ini file. The default value is off.</li>
+          <li>added the UnknownUnicodeCharacterAsWide entry in teraterm.ini file. The default value is off.</li>
         </ul></li>
       <li>If a received Kanji code is either UTF-8 or UTF-8m, some characters such as a ruler and special characters will be displayed by using similar characters in DEC special character set. These characters are categorized into several groups and you can specify each group to be converted or not.
         <ul>
@@ -2217,7 +2217,7 @@
         </ul></li>
       <li>added support of mouse event tracking.
         <ul>
-          <li>added <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> entry in teraterm.ini file. The default value is on.</li>
+          <li>added <a href="../setup/teraterm-ini.html#MouseEventTracking">MouseEventTracking</a> entry in teraterm.ini file. The default value is on.</li>
         </ul></li>
       <li>added the "Realtime mode" feature on Broadcast Command. This feature can send all user's key sequence to TeraTerm window, and then a user can use vi editor on all window. This feature takes after "<a href="http://www.vector.co.jp/soft/win95/net/se276622.html" target="_blank">TeraTerm Pro assistant</a>" free ware in lots of ways.
         <ul>
@@ -2234,7 +2234,7 @@
       <li>added Font linking fixed patch. Special thanks to naoh.</li>
       <li>added the confirmation dialog when the Clipboard includes CR/LF by right-click or Alt+V. This is a foolproof way.
         <ul>
-          <li>added <a href="../setup/teraterm-misc.html#ConfirmChangePaste">ConfirmChangePaste</a> entry in teraterm.ini file. The default value is on.</li>
+          <li>added <a href="../setup/teraterm-ini.html#ConfirmChangePaste">ConfirmChangePaste</a> entry in teraterm.ini file. The default value is on.</li>
         </ul></li>
       <li>added the configuration entry to save the window position.
         <ul>

@@ -146,7 +146,7 @@
       <li>VT ウィンドウのタイトルバー上でマウスホイールを操作してウィンドウの不透明度を一時的に変更するとき、不透明度をツールチップに表示するようにした。</li>
       <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、不透明度をスライダーで指定できるようにした。半透明化が利用できないとき不透明度を変更できないようにした。</li>
       <li>リサイズ中の縦横サイズツールチップの表示位置をリサイズ後の座標に追従するようにした。</li>
-      <li>Eterm look-feel: <a href="../menu/setup-additional.html#MixedThemeFile">壁紙と画像を混合する</a>を設定できるようにした。teraterm.ini に <a href="../setup/teraterm-ini.html#BGIgnoreThemeFile">BGIgnoreThemeFile</a> エントリを追加した。デフォルトはoff。</li>
+      <li>Eterm look-feel: 壁紙と画像を混合するを設定できるようにした。teraterm.ini に BGIgnoreThemeFile エントリを追加した。デフォルトはoff。</li>
       <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで不透明度の値に256以上を入力したとき、ダイアログ上で255に変更するようにした。</li>
       <li>REP 制御シーケンスに対応した。</li>
       <li>xterm の ED 3 (スクロールバッファ消去) 制御シーケンスに対応した。
@@ -433,7 +433,7 @@
       <li>ログの行頭に追加するタイムスタンプの種類を設定できるようにした。
         <ul>
           <li>タイムスタンプの種類ととして "Elapsed Time (Logging)" と "Elapsed Time (Connection)" を追加した。</li>
-          <li><a href="../menu/file-log.html#Timestamp">Log ダイアログ</a>、および <a href="../menu/setup-additional.html#LogTimestamp">Additional settings ダイアログ</a>の Log タブで、タイムスタンプの種類を設定できるようにした。</li>
+          <li><a href="../menu/file-log.html#Timestamp">Log ダイアログ</a>、および <a href="../menu/setup-additional-log.html#LogTimestamp">Additional settings ダイアログ</a>の Log タブで、タイムスタンプの種類を設定できるようにした。</li>
           <li><a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> 設定は非推奨となりました。代わりにタイムスタンプの種類に UTC を設定してください。</li>
         </ul></li>
     </ul>
@@ -444,7 +444,7 @@
       <li>DECRQSS 制御シーケンスへの応答が間違っている問題を修正した。</li>
       <li>Telnet 接続時、端末の幅または高さが 255 の時にサーバへ端末のサイズが正しく伝わらない問題を修正した。</li>
       <li><a href="../menu/file.html">[File]</a> メニューの [View Log] でエディタが起動しない問題を修正した。</li>
-      <li><a href="../menu/setup-additional.html#LogOption">Additional settings ダイアログ</a>の Log タブで、Log Option 設定に関する問題を修正した。
+      <li><a href="../menu/setup-additional-log.html#LogOption">Additional settings ダイアログ</a>の Log タブで、Log Option 設定に関する問題を修正した。
         <ul>
           <li>PlainText, Timestamp 設定が正しく反映されない事がある問題を修正した。</li>
           <li>ダイアログをキャンセルした時に、Log Option 設定の変更が反映される問題を修正した。</li>
@@ -552,7 +552,7 @@
       <li>ログファイル名中の &amp;u を、ログオン中のユーザ名に変換する機能を追加した。</li>
       <li>貼り付け時に改行を正規化する機能を追加した。デフォルトでは無効。
         <ul>
-          <li><a href="../menu/setup-additional.html#NormalizeLineBreak">Additional settingsダイアログ</a>のCopy and Paste タブで設定を有効化できるようにした。</li>
+          <li>Additional settingsダイアログのCopy and Paste タブで設定を有効化できるようにした。</li>
         </ul></li>
       <li><a href="../macro/command/setflowctrl.html">setflowctrl</a> マクロコマンドを追加した。</li>
     </ul>
@@ -675,7 +675,7 @@
     <ul>
       <li>DECFI, DECBI 制御シーケンスで、背景色消去(BCE)が適用されない問題を修正した。</li>
       <li><a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=onの場合において、一部の機器でUSBシリアルポートの接続・切断が検出できない問題を修正した。</li>
-      <li><a href="../menu/setup-additional.html#LogRotate">ログ・ローテート</a>が有効で、既存のファイルをログ採取する場合、最初のファイルが指定したサイズで回転しない問題を修正した。</li>
+      <li><a href="../menu/setup-additional-log.html#LogRotate">ログ・ローテート</a>が有効で、既存のファイルをログ採取する場合、最初のファイルが指定したサイズで回転しない問題を修正した。</li>
       <li>マクロコマンドの 1 行形式の <a href="../macro/command/ifthenelseif.html">if</a> 文で、パラメータの無いマクロコマンドがエラーとなる問題を修正した。</li>
     </ul>
   </li>
@@ -747,7 +747,7 @@
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">FileSendHighSpeedMode</a> エントリを追加した。デフォルトはオン。</li>
         </ul></li>
-      <li>Eterm look-feel: <a href="../menu/setup-additional.html#ImageBrightness">背景画像の明るさ</a>を設定できるようにした。</li>
+      <li>Eterm look-feel: 背景画像の明るさを設定できるようにした。</li>
       <li><a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a>に Virtual Store パスを追加した。</li>
       <li><a href="../menu/setup-additional.html#CygTerm">Additional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
       <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
@@ -856,7 +856,7 @@
       <li>YMODEM 送信時にリモートからのキャンセルを正しく処理しない問題を修正した</li>
       <li>YMODEM で受信したファイル情報が最後までファイル名だった場合に、保存されるファイル名の終端が壊れる問題を修正した</li>
       <li>YMODEM で受信したファイル情報にファイルサイズがなかった場合に、ファイルの中身が保存されない問題を修正した</li>
-      <li>ログ・ローテートの設定値が<a href="../menu/setup-additional.html#LogRotate">設定画面</a>に正しく表示されない問題を修正した。</li>
+      <li>ログ・ローテートの設定値が<a href="../menu/setup-additional-log.html#LogRotate">設定画面</a>に正しく表示されない問題を修正した。</li>
       <li><a href="../macro/command/setdlgpos.html">setdlgpos</a> マクロコマンドで x=0,y=0 を指定したあと <a href="../macro/command/statusbox.html">statusbox</a> を新規に開くと、指定した位置で開かない問題を修正した。</li>
       <li>マクロファイル名が長い場合においても、マクロウィンドウに行番号が表示されるようにした。また、マクロウィンドウをリサイズ可能とした。</li>
     </ul>
@@ -920,7 +920,7 @@
   <li>変更
     <ul>
       <li>YMODEM, ZMODEM でファイルを受信したときに、ファイルの更新日時を反映するようにした。</li>
-      <li><a href="../menu/setup-additional.html#LogOption">Additional settingsダイアログ</a>のLogタブで、ログ種別を設定できるようにした。</li>
+      <li><a href="../menu/setup-additional-log.html#LogOption">Additional settingsダイアログ</a>のLogタブで、ログ種別を設定できるようにした。</li>
     </ul>
   </li>
 
@@ -1143,13 +1143,13 @@
   <li>変更
     <ul>
       <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝します。</li>
-      <li>Additional settings ダイアログに <a href="../menu/setup-additional.html#LogRotate">ログ・ローテート</a> 設定項目を追加した。
+      <li>Additional settings ダイアログに <a href="../menu/setup-additional-log.html#LogRotate">ログ・ローテート</a> 設定項目を追加した。
         <ul>
           <li>teraterm.iniにLogRotate, LogRotateSize, LogRotateSizeType, LogRotateStepエントリを追加した。</li>
         </ul></li>
       <li><a href="../menu/file.html">Fileメニュー</a>に「Tera Termの全終了(Exit All)」を追加した。</li>
       <li><a href="../menu/window.html">Windowメニュー</a>に「重ねて表示(Cascade)」「上下に並べて表示(Stacked)」「左右に並べて表示(Side By Side)」を追加した。</li>
-      <li><a href="../menu/setup-additional.html#LogAutoStart">自動ログ取得</a>を無効化する <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションを追加した。</li>
+      <li><a href="../menu/setup-additional-log.html#LogAutoStart">自動ログ取得</a>を無効化する <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションを追加した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/command/listbox.html">listbox</a>コマンドを追加した。</li>
@@ -1304,7 +1304,7 @@
         <ul>
           <li>名前付きパイプをサポートした。Tera Termから<a href="../usage/tips/namedpipe.html">VMwareやHyper-Vにシリアルポート接続が可能</a>となる。</li>
           <li><a href="../menu/file-new.html">New connectionダイアログ</a>のTCP/IP:Hostに名前付きパイプを指定できるようにした。</li>
-          <li><a href="../commandline/teraterm.html#namedpipe">/NAMEDPIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
+          <li><a href="../commandline/teraterm.html#pipe">/PIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
         </ul></li>
       <li><a href="../menu/setup-terminal.html#CRReceive">受信改行モード</a>にAUTOを追加した。tentner氏に感謝します。</li>
       <li>表示フォントの品質を選択できるようにした。
@@ -1705,7 +1705,7 @@
       <li>シリアルポート接続のボーレートを選択肢以外からも手入力出来るようにした。
         <ul>
           <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a>で任意のボーレートを指定できるようにした。</li>
-          <li><a href="../commandline/teraterm.html#BAUD">/BAUD</a> オプションで任意のボーレートを指定できるようにした。</li>
+          <li><a href="../commandline/teraterm.html#baud">/BAUD</a> オプションで任意のボーレートを指定できるようにした。</li>
           <li>マクロコマンド "<a href="../macro/command/setbaud.html">setbaud</a>" の引数にボーレートの値を直接指定できるようにした。</li>
         </ul></li>
       <li>VPB, HPB 制御シーケンスに対応した。</li>
@@ -1863,7 +1863,7 @@
         </ul></li>
       <li>ウィンドウ操作/報告制御シーケンスに対応した。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a>, <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> エントリを追加した。デフォルトはすべて on。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-ini.html#WindowReportSequence">WindowReportSequence</a>, <a href="../setup/teraterm-ini.html#TitleReportSequence">TitleReportSequence</a> エントリを追加した。デフォルトはすべて on。</li>
         </ul></li>
       <li>行単位送信(Line at a time)モードに対応した。
         <ul>
@@ -1892,7 +1892,7 @@
         <ul>
           <li>文字セットを選択できるようにした。</li>
           <li>Enable bold style を <a href="../menu/setup-window.html">[Setup]-[Window]</a> に移動した。</li>
-          <li>ロシア語モードの Font char set を、<a href="../menu/setup-terminalr.html">ロシア語モードの [Setup]-[Terminal]</a> に移動した。</li>
+          <li>ロシア語モードの Font char set を、ロシア語モードの [Setup]-[Terminal] に移動した。</li>
         </ul></li>
       <li>AltキーでMSBをセットした文字を送信する機能を追加した。
         <ul>
@@ -1912,7 +1912,7 @@
         </ul></li>
       <li>Duplicate session のアクセラレータキーを無効にできるようにした。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
       <li>コマンドラインオプションで、 <a href="../commandline/teraterm.html#f">/F</a> オプションは他のオプションより先に処理する(上書きされる)ように変更した。</li>
       <li>コマンドライン解析の仕様を変更した。
@@ -2154,7 +2154,7 @@
         </ul></li>
       <li>対応していないUnicodeの文字をワイド文字として扱うか設定できるようにした。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-term.html#UnknownUnicodeCharacterAsWide">UnknownUnicodeCharacterAsWide</a> エントリを追加した。デフォルトはoff。</li>
+          <li>teraterm.ini に UnknownUnicodeCharacterAsWide エントリを追加した。デフォルトはoff。</li>
         </ul></li>
       <li>受信漢字コードがUTF-8またはUTF-8mの時、罫線や一部の記号をDEC特殊文字の近い文字で代替表示できるようにした。代替表示される文字は幾つかの種類に分類され、種類毎に変換するか設定できる。
         <ul>
@@ -2215,7 +2215,9 @@
         </ul></li>
       <li>マウス操作の通知に対応した。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> を追加した。デフォルトはon。</li>
+          <li>teraterm.ini
+          に <a href="../setup/teraterm-ini.html#MouseEventTracking">MouseEventTracking</a>
+          を追加した。デフォルトはon。</li>
         </ul></li>
       <li>Broadcast Commandにリアルタイムモードを追加した。TeraTermウィンドウにすべてのキー入力を送ることができるため、vi操作などが可能となる。<a href="http://www.vector.co.jp/soft/win95/net/se276622.html" target="_blank">TeraTerm Proアシスタント</a>に近い機能。
         <ul>
@@ -2232,7 +2234,7 @@
       <li>Font linking 誤動作のパッチを追加した。naoh氏に感謝します。</li>
       <li>マウスの右クリックおよびAlt+Vでクリップボードの内容を貼り付けるときに、改行コードが含まれていたら、確認ダイアログを出現させるようにした。誤操作により、端末へ予期せぬコマンド投入を防ぐことができる。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ConfirmChangePaste">ConfirmChangePaste</a> を追加した。デフォルトはoff。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#ConfirmChangePaste">ConfirmChangePaste</a> を追加した。デフォルトはoff。</li>
         </ul></li>
       <li>ウィンドウの位置を保存するオプションを追加した。
         <ul>
