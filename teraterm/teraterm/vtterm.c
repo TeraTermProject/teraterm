@@ -2451,6 +2451,7 @@ static void CSSetLRScrollRegion()	// DECSLRM
 		MoveCursor(0, 0);
 }
 
+// CSI sequence
 static void CSSunSequence() /* Sun terminal private sequences */
 {
 	int x, y, len;
@@ -2706,7 +2707,12 @@ static void CSSunSequence() /* Sun terminal private sequences */
 		  case 2: {
 			PTStack t;
 			if (ts.AcceptTitleChangeRequest && (t=malloc(sizeof(TStack))) != NULL) {
-				if ((t->title = _wcsdup(cv.TitleRemoteW)) != NULL) {
+				if (cv.TitleRemoteW == NULL) {
+					t->title = NULL;
+					t->next = TitleStack;
+					TitleStack = t;
+				}
+				else if ((t->title = _wcsdup(cv.TitleRemoteW)) != NULL) {
 					t->next = TitleStack;
 					TitleStack = t;
 				}
@@ -4985,6 +4991,7 @@ static void XsProcClipboard(PCHAR buff)
 	}
 }
 
+// OSC Sequence
 static void XSequence(BYTE b)
 {
 	static char *StrBuff = NULL;
@@ -5032,10 +5039,15 @@ static void XSequence(BYTE b)
 		  case 1: /* Change icon name */
 		  case 2: /* Change window title */
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
-				size_t len = strlen(StrBuff);
-				wchar_t *titleW = ConvertUTF16(StrBuff, len);
+				const size_t len = strlen(StrBuff);
 				free(cv.TitleRemoteW);
-				cv.TitleRemoteW = titleW;
+				if (len == 0) {
+					cv.TitleRemoteW = NULL;
+				}
+				else {
+					wchar_t *titleW = ConvertUTF16(StrBuff, len);
+					cv.TitleRemoteW = titleW;
+				}
 				ChangeTitle();
 			}
 			break;
