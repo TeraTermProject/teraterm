@@ -4299,7 +4299,6 @@ void CVTWindow::SetColor()
 void CVTWindow::OnSetupWindow()
 {
 	BOOL Ok;
-	char orgTitle[TitleBuffSize];
 
 	HelpId = HlpSetupWindow;
 	ts.VTFlag = 1;
@@ -4311,7 +4310,7 @@ void CVTWindow::OnSetupWindow()
 
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	strncpy_s(orgTitle, sizeof(orgTitle), ts.Title, _TRUNCATE);
+	char *orgTitle = strdup(ts.Title);
 	Ok = (*SetupWin)(HVTWin, &ts);
 
 	if (Ok) {
@@ -4328,6 +4327,7 @@ void CVTWindow::OnSetupWindow()
 		ChangeWin();
 	}
 
+	free(orgTitle);
 }
 
 void CVTWindow::OnSetupFont()
