@@ -1292,7 +1292,7 @@
         <ul>
           <li>名前付きパイプをサポートした。Tera Termから<a href="../usage/tips/namedpipe.html">VMwareやHyper-Vにシリアルポート接続が可能</a>となる。</li>
           <li><a href="../menu/file-new.html">New connectionダイアログ</a>のTCP/IP:Hostに名前付きパイプを指定できるようにした。</li>
-          <li><a href="../commandline/teraterm.html#namedpipe">/NAMEDPIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
+          <li><a href="../commandline/teraterm.html#pipe">/PIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
         </ul></li>
       <li><a href="../menu/setup-terminal.html#CRReceive">受信改行モード</a>にAUTOを追加した。tentner氏に感謝します。</li>
       <li>表示フォントの品質を選択できるようにした。
@@ -1693,7 +1693,7 @@
       <li>シリアルポート接続のボーレートを選択肢以外からも手入力出来るようにした。
         <ul>
           <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a>で任意のボーレートを指定できるようにした。</li>
-          <li><a href="../commandline/teraterm.html#BAUD">/BAUD</a> オプションで任意のボーレートを指定できるようにした。</li>
+          <li><a href="../commandline/teraterm.html#baud">/BAUD</a> オプションで任意のボーレートを指定できるようにした。</li>
           <li>マクロコマンド "<a href="../macro/command/setbaud.html">setbaud</a>" の引数にボーレートの値を直接指定できるようにした。</li>
         </ul></li>
       <li>VPB, HPB 制御シーケンスに対応した。</li>
@@ -1851,7 +1851,7 @@
         </ul></li>
       <li>ウィンドウ操作/報告制御シーケンスに対応した。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a>, <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> エントリを追加した。デフォルトはすべて on。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-ini.html#WindowReportSequence">WindowReportSequence</a>, <a href="../setup/teraterm-ini.html#TitleReportSequence">TitleReportSequence</a> エントリを追加した。デフォルトはすべて on。</li>
         </ul></li>
       <li>行単位送信(Line at a time)モードに対応した。
         <ul>
@@ -1880,7 +1880,7 @@
         <ul>
           <li>文字セットを選択できるようにした。</li>
           <li>Enable bold style を <a href="../menu/setup-window.html">[Setup]-[Window]</a> に移動した。</li>
-          <li>ロシア語モードの Font char set を、<a href="../menu/setup-terminalr.html">ロシア語モードの [Setup]-[Terminal]</a> に移動した。</li>
+          <li>ロシア語モードの Font char set を、<a href="../menu/setup-terminal_ru.html">ロシア語モードの [Setup]-[Terminal]</a> に移動した。</li>
         </ul></li>
       <li>AltキーでMSBをセットした文字を送信する機能を追加した。
         <ul>
@@ -1900,7 +1900,7 @@
         </ul></li>
       <li>Duplicate session のアクセラレータキーを無効にできるようにした。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
       <li>コマンドラインオプションで、 <a href="../commandline/teraterm.html#f">/F</a> オプションは他のオプションより先に処理する(上書きされる)ように変更した。</li>
       <li>コマンドライン解析の仕様を変更した。
@@ -2203,7 +2203,7 @@
         </ul></li>
       <li>マウス操作の通知に対応した。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> を追加した。デフォルトはon。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#MouseEventTracking">MouseEventTracking</a> を追加した。デフォルトはon。</li>
         </ul></li>
       <li>Broadcast Commandにリアルタイムモードを追加した。TeraTermウィンドウにすべてのキー入力を送ることができるため、vi操作などが可能となる。<a href="http://www.vector.co.jp/soft/win95/net/se276622.html" target="_blank">TeraTerm Proアシスタント</a>に近い機能。
         <ul>
@@ -2220,7 +2220,7 @@
       <li>Font linking 誤動作のパッチを追加した。naoh氏に感謝します。</li>
       <li>マウスの右クリックおよびAlt+Vでクリップボードの内容を貼り付けるときに、改行コードが含まれていたら、確認ダイアログを出現させるようにした。誤操作により、端末へ予期せぬコマンド投入を防ぐことができる。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ConfirmChangePaste">ConfirmChangePaste</a> を追加した。デフォルトはoff。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#ConfirmChangePaste">ConfirmChangePaste</a> を追加した。デフォルトはoff。</li>
         </ul></li>
       <li>ウィンドウの位置を保存するオプションを追加した。
         <ul>

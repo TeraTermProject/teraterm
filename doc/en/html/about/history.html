@@ -1292,7 +1292,7 @@
         <ul>
           <li>added support for the named pipe. Tera Term can <a href="../usage/tips/namedpipe.html">connect the serial port of the VMware and Hyper-V</a>.</li>
           <li>A named pipe can be specified into the TCP/IP:Host entry of <a href="../menu/file-new.html">New connection dialog</a>.</li>
-          <li>added the <a href="../commandline/teraterm.html#namedpipe">/NAMEDPIPE</a> option by specifying the named pipe.</li>
+          <li>added the <a href="../commandline/teraterm.html#pipe">/PIPE</a> option by specifying the named pipe.</li>
         </ul></li>
       <li>added the AUTO entry in the <a href="../menu/setup-terminal.html#CRReceive">New-line(receive)</a>. Special thanks to tentner.</li>
       <li>added the selection of the font quality.
@@ -1694,7 +1694,7 @@
       <li>added support for specifying any baud rate of the serial port connection.
         <ul>
           <li>A user can specify any baud rate at the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> menu.</li>
-          <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#BAUD">/BAUD</a> option.</li>
+          <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#baud">/BAUD</a> option.</li>
           <li>A user can specify any baud rate at the "<a href="../macro/command/setbaud.html">setbaud</a>" macro command.</li>
         </ul></li>
       <li>added support for the VPB and HPB control sequence.</li>
@@ -1852,7 +1852,7 @@
         </ul></li>
       <li>added support for the control sequences for window operation.
         <ul>
-          <li>added the <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a> and <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> entry in the teraterm.ini file. The default is on.</li>
+          <li>added the <a href="../setup/teraterm-ini.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-ini.html#WindowReportSequence">WindowReportSequence</a> and <a href="../setup/teraterm-ini.html#TitleReportSequence">TitleReportSequence</a> entry in the teraterm.ini file. The default is on.</li>
         </ul></li>
       <li>added support of "Line at a time" mode.
         <ul>
@@ -1881,7 +1881,7 @@
         <ul>
           <li>added the character set (aka "Script") drop-down combo box.</li>
           <li>moved the Enable bold style to <a href="../menu/setup-window.html">[Setup]-[Window]</a>.</li>
-          <li>moved the Russian Font char set to <a href="../menu/setup-terminalr.html">[Setup]-[Terminal] for Russian mode</a>.</li>
+          <li>moved the Russian Font char set to <a href="../menu/setup-terminal_ru.html">[Setup]-[Terminal] for Russian mode</a>.</li>
         </ul></li>
       <li>added the MSB set character by using the Alt key.
         <ul>
@@ -1901,7 +1901,7 @@
         </ul></li>
       <li>added a new optional setting that can disable the accelerator key for the Duplicate session.
         <ul>
-          <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
+          <li>added the <a href="../setup/teraterm-ini.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
       <li>The <a href="../commandline/teraterm.html#f">/F</a> command line option overwrites the other option.</li>
       <li>Changed the command line specification regarding the double quotation.
@@ -1910,7 +1910,7 @@
         </ul></li>
       <li>added support for specifying any strings as the ConfirmChangePaste function.
         <ul>
-          <li>added the <a href="../menu/setup-additional.html#ConfirmChagePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
+          <li>added the <a href="../menu/setup-additional.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
         </ul></li>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
@@ -2205,7 +2205,7 @@
         </ul></li>
       <li>added support of mouse event tracking.
         <ul>
-          <li>added <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> entry in teraterm.ini file. The default value is on.</li>
+          <li>added <a href="../setup/teraterm-ini.html#MouseEventTracking">MouseEventTracking</a> entry in teraterm.ini file. The default value is on.</li>
         </ul></li>
       <li>added the "Realtime mode" feature on Broadcast Command. This feature can send all user's key sequence to TeraTerm window, and then a user can use vi editor on all window. This feature takes after "<a href="http://www.vector.co.jp/soft/win95/net/se276622.html" target="_blank">TeraTerm Pro assistant</a>" free ware in lots of ways.
         <ul>
@@ -2222,7 +2222,7 @@
       <li>added Font linking fixed patch. Special thanks to naoh.</li>
       <li>added the confirmation dialog when the Clipboard includes CR/LF by right-click or Alt+V. This is a foolproof way.
         <ul>
-          <li>added <a href="../setup/teraterm-misc.html#ConfirmChangePaste">ConfirmChangePaste</a> entry in teraterm.ini file. The default value is on.</li>
+          <li>added <a href="../setup/teraterm-ini.html#ConfirmChangePaste">ConfirmChangePaste</a> entry in teraterm.ini file. The default value is on.</li>
         </ul></li>
       <li>added the configuration entry to save the window position.
         <ul>
