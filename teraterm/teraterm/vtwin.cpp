@@ -2122,7 +2122,7 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 		mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
 
 	if (! (LButton || MButton || RButton)) {
-		if (BuffCheckMouseOnURL(point.x, point.y))
+		if (BuffCheckMouseOnURL(point.x, point.y) && ts.EnableClickableUrl)
 			SetMouseCursor("HAND");
 		else
 			SetMouseCursor(ts.MouseCursorName);
