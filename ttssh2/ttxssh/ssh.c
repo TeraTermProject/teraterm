@@ -3056,13 +3056,13 @@ void SSH_notify_host_OK(PTInstVar pvar)
 			// 認証ダイアログは実質使えないので、このタイミングで問題ない。
 			AUTH_advance_to_next_cred(pvar);
 		}
-		else { // SSH2
-			// SSH2_MSG_NEWKEYS が未送信ならば送る
-			if ((pvar->kex_status & KEX_FLAG_NEWKEYS_SENT) == 0) {
-				ssh2_send_newkeys(pvar);
-			}
-		}
+	}
 
+	if (SSHv2(pvar)) {
+		// SSH2_MSG_NEWKEYS が未送信ならば送る
+		if ((pvar->kex_status & KEX_FLAG_NEWKEYS_SENT) == 0) {
+			ssh2_send_newkeys(pvar);
+		}
 	}
 }
 
@@ -5770,6 +5770,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	if (ret == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
+		// known_hostsダイアログの呼び出したので、以降、何もしない。
 	}
 
 error:
