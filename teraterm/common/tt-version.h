@@ -30,7 +30,7 @@
 
 #define TT_VERSION_MAJOR             5
 #define TT_VERSION_MINOR             0
-#define TT_VERSION_SUBSTR            "rc"
+#define TT_VERSION_SUBSTR            "rc2"
 // #undef TT_VERSION_SUBSTR
 // SUBSTR が不要な時は undef する
 //  使用例 "dev", "rc", "rc2"
