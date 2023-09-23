@@ -66,48 +66,47 @@
     <h2 id="migrate_config">設定ファイル</h2>
 
     <ul>
-      <li>Tera Term 5 は Tera Trem 4用の設定ファイルをそのまま使用できます。</li>
+      <li>Tera Term 5 は Tera Trem 4 用の設定ファイルをそのまま使用できます。</li>
       <ul>
-        <li>TERATERM.INI,KEYBOARD.CNFはUnicode対応となりました。
+        <li>設定ファイルは Unicode になりました。
           <ul>
-            <li>cygterm.cfgの文字コードは、cygwin 3.3.4ではUTF-8です</li>
+            <li>TERATERM.INI, KEYBOARD.CNF の文字コードは UTF-16 (with LE BOM) です。</li>
+            <li>cygterm.cfg の文字コードは、Cygwin 3.3.4ではUTF-8です。</li>
           </ul>
         </li>
-        <li>Windows 10,11ではiniファイルをUnicode化することができます。<br>
+        <li>Tera Term 5 は UTF-16 (with LE BOM) の ini ファイルを扱うことができます。cf. <a href="../reference/dev/win32api.html#ini_file">Win32API/iniファイル</a><br>
           <ul>
-            <li>iniファイルを扱うWin32APIはUnicode対応版を使用します</li>
-            <li>cygterm.cfgはWin32APIを使って読み書きしていません</li>
+            <li>iniファイルを扱う Win32API は Unicode 対応版を使用します。<br>
+                Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
+            <li>cygterm.cfg は Win32API を使って読み書きしていません。</li>
           </ul>
         </li>
-        <li>Unicode化したiniファイルの文字コードはUTF-16 (with LE BOM)です。<br>
-            Tera Term 4 ではUnicode版APIを使用していないため、Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えませんでした。</li>
-        <li>Tera Term 5 は起動時にiniファイルの文字コードを自動的にUnicodeに変換します。</li>
-        <li>Tera Term 5 でTERATERM.INI保存時にiniファイルの文字コードを自動的にUnicodeに変換します。<br>
-          変換前のファイルはバックアップされています。</li>
+        <li>Tera Term 5 は起動時に読み込んだ TERATERM.INI が UTF-16 (with LE BOM) でなかった場合、TERATERM.INI を自動的に UTF-16 (with LE BOM) に変換します。<br>
+            変換時には、元のファイルをバックアップします。</li>
+        <li>Tera Term 5 は設定ファイルを UTF-16 (with LE BOM) で保存します。</li>
       </ul>
       <li>Tera Trem 4 は Tera Term 5 で保存した設定ファイルを読み込めます。</li>
       <ul>
-        <li>Tera Trem 4 は Unicode化したiniファイルを読み込めます(Windows 10,11の場合)。<br>
-          Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えません。</li>
-        <li><a href="../reference/dev/win32api.html#ini_file">Win32API/iniファイル</a>を参照ください</li>
+        <li>Tera Trem 4 は UTF-16 (with LE BOM) の iniファイルを読み込めます(Windows 10,11の場合)。cf. <a href="../reference/dev/win32api.html#ini_file">Win32API/iniファイル</a><br>
+            Shift_JISで表現できない文字が含まれていると、その項目は正しく扱えません。</li>
       </ul>
       <li>設定ファイルのデフォルトフォルダが変更されました。
         <ul>
-          <li>%APPDATA%\teraterm5\</li>
-          <li>Tera Term 4 の設定ファイルをコピーしてください。
+          <li>%APPDATA%\teraterm5 (C:\Users\[username]\AppData\Roaming\teraterm5) になりました。
+            <ul>
+              <li>cf. <a href="../setup/folder.html">フォルダについて</a></li>
+              <li>Tera Term 4 では、実行ファイルと同じフォルダ(またはVirtual Store)でした。</li>
+              <li>Tera Term 5 では、"My Documents\TERATERM.INI" は読み込まれなくなりました。</li>
+            </ul>
+          </li>
+          <li>今までの設定を引き継ぐには Tera Term 4 の設定ファイルをコピーしてください。
             <ul>
               <li>TERATERM.INI</li>
               <li>KEYBOARD.CNF</li>
               <li>cygterm.cfg</li>
             </ul>
           </li>
-          <li>ファイルがない場合、ttermpro.exe起動時にデフォルトの設定ファイルがコピーされます。</li>
-          <li>4のときは実行ファイルと同じフォルダ(またはVirtual Store)でした。
-            <ul>
-              <li>My Documents\TERATERM.INI は読み込まれなくなりました。</li>
-            </ul>
-          </li>
-          <li><a href="../setup/folder.html">フォルダについて</a></li>
+          <li>ファイルがない場合、ttermpro.exe 起動時にデフォルトの設定ファイルがコピーされます。</li>
         </ul>
       </li>
       <li>設定値のデフォルトが変更されました。

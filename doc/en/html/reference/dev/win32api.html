@@ -18,12 +18,14 @@ Notes on Win32API
 <p>
   in Windows 2000(NT3?) Unicode-aware version of
   WritePrivateProfileStringW()... were implemented.
+</p>
 
 <p>
   We can't find any document about character encoding of ini files and
   mixed use of Unicode/ANSI. We have documented the behavior.
   In recent versions of Windows (at least Windows 10 and 11), the
   following behavior is used to support Unicode.
+</p>
 
 <ul>
   <li>If the file has a UTF-16LE BOM (0xff 0xfe) at the beginning, the ini file is a Unicode file.</li>
@@ -34,8 +36,8 @@ Notes on Win32API
     <li>So possible to use the API transparently regardless of the character encoding of the ini file.</li>
     <li>If Unicode characters that cannot be represented by ACP are written to a non-Unicode ini file, they are replaced by "?" and written to the file.</li>
   </ul>
-  <li>When a file is created with the Unicode API, it will not be a Unicode ini file.</li>
-  <li>When a file is created with only BOM, it will be a Unicode ini file.</li>
+  <li>When a file is created with the Unicode API writing, it will not be a Unicode ini file.</li>
+  <li>When a file is already exist that only included BOM (0xff 0xfe), write by Unicode API, it will be a Unicode ini file.</li>
 </ul>
 
 </html>

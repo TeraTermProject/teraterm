@@ -68,33 +68,38 @@
     <ul>
       <li>Tera Term 5 can use the setup file for Tera Trem 4 without modification.</li>
       <ul>
-        <li>TERATERM.INI,KEYBOARD.CNF are supported Unicode
+        <li>Configuration files became Unicode.
           <ul>
-            <li>character encoding of cygterm.cfg is UTF-8 in cygwin 3.3.4.</li>
+            <li>character encoding of TERATERM.INI and KEYBOARD.CNF.cfg is UTF-16 (with LE BOM).</li>
+            <li>character encoding of cygterm.cfg is UTF-8 in Cygwin 3.3.4.</li>
           </ul>
         </li>
-        <li>ini files are supported Unicode in Windows 10,11.<br>
+        <li>Tera Term 5 suports UTF-16 (with LE BOM) ini file.<br>
           <ul>
-            <li>Win32APIs for ini files are used Unicode version</li>
-            <li>cygterm.cfg is not using Win32API</li>
+            <li>Win32APIs for ini files are used Unicode version.  cf. <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a><br>
+                Tera Term 4 does not use the Unicode version of the API. the item in ini file could not be handled correctly if non ACP characters are included.</li>
+            <li>cygterm.cfg is not using Win32API.</li>
           </ul>
         </li>
-        <li>Character encoding of ini files is UTF-16 (with LE BOM).<br>
-            Tera Term 4 does not use the Unicode version of the API. the item in ini file could not be handled correctly if non ACP characters are included.
-        <li>Tera Term 5 automatically converts character encoding of ini files to Unicode when Tera Term 5 starts.</li>
-        <li>Tera Term 5 automatically converts character encoding of ini files to Unicode when saving TERATERM.INI.<br>
-          ini file before conversion is backed up.
+        <li>Tera Term 5 automatically converts character encoding of TERATERM.INI files to UTF-16 (with LE BOM) when Tera Term 5 starts if TERATERM.INI is not UTF-16 (with LE BOM).<br>
+            Before conversion, original ini file is backed up.</li>
+        <li>Tera Term 5 uses UTF-16 (with LE BOM) character encoding saving setup file (TERATERM.INI).</li>
       </ul>
       <li>Tera Trem 4 can read ini files saved by Tera Term 5.</li>
       <ul>
-        <li>Tera Trem 4 can read UTF-16 ini files(on Windows 10,11).<br>
+        <li>Tera Trem 4 can read UTF-16 (with LE BOM) ini files (on Windows 10,11). cf. <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a><br>
           Item in ini file cannot be handled correctly if non ACP characters are included.</li>
-        <li>refer to <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a></li>
       </ul>
       <li>The default folder for configuration files has been changed.
         <ul>
-          <li>%APPDATA%\teraterm5\</li>
-          <li>Copy Tera Term 4 setup files.
+          <li>Now %APPDATA%\teraterm5 (C:\Users\[username]\AppData\Roaming\teraterm5)
+            <ul>
+              <li>cf. <a href="../setup/folder.html">about folder</a></li>
+              <li>In Tera Term 4, the folder of the configuration files were the same as the folder where the executable file was placed.</li>
+              <li>In Tera Term 5, "My Documents\TERATERM.INI" does not read.</li>
+            </ul>
+          </li>
+          <li>Copy Tera Term 4 setup files for use existing settings.
             <ul>
               <li>TERATERM.INI</li>
               <li>KEYBOARD.CNF</li>
@@ -102,12 +107,6 @@
             </ul>
           </li>
           <li>If the files are not exists, the default configuration file is copied when ttermpro.exe start.
-          <li>In Tera Term 4, the folder of the configuration files were the same as the folder where the executable file was placed.
-            <ul>
-              <li>My Documents\TERATERM.INI dose not read.</li>
-            </ul>
-          </li>
-          <li><a href="../setup/folder.html">about folder</a></li>
         </ul>
       </li>
       <li>Default values have been changed.
