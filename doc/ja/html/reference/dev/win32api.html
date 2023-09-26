@@ -9,33 +9,86 @@
 </HEAD>
 <BODY>
 
-<h1>Win32API</h1>
+<h1>Win32 API</h1>
 
-Win32API に関するメモ
+Win32 API に関するメモ
 
-<h2 id="ini_file">iniファイル</h2>
-
-<p>
-  Windows 2000(NT3?) ごろに Unicode 対応版 WritePrivateProfileStringW()
-  等が実装されたと思われます。
-</p>
+<h2 id="ini_file">ini ファイル</h2>
 
 <p>
-  iniファイルの文字コードや Unicode/ANSI を混在して使用していた場合のドキュメントは見当たらないため動作をまとめました。
-  最近のWindows(少なくともWindows 10,11)では、Unicode に対応するため次のような動作となっています。
+ini ファイルには、文字コードが ACP (日本語環境では Shift_JIS) のものと、Unicode (UTF-16 with LE BOM) のものがあります。<br>
+また、ini ファイルを操作する Win32 API には、char * を引数とする ANSI版 (GetPrivateProfileStringA, WritePrivateProfileStringA など) と、wchar_t * を引数とする Wide文字版 (GetPrivateProfileStringW, WritePrivateProfileStringW など) があります。<br>
+ini ファイル (ACP, Unicode) と API (ANSI版, Wide文字版) で 4 パターンの組み合わせが発生します。
 </p>
 
 <ul>
-  <li>ファイルの先頭に UTF-16LE BOM (0xff 0xfe) がついているとき、iniファイルは Unicode のファイルとして扱われます。</li>
-  <li>ANSI/Unicode API で Unicode/非Unicode iniファイルを読み書きしたとき、自動で ACP/Unicode 変換が行わます(9x系では行われません)。</li>
-  <ul>
-    <li>Unicode ini ファイルのとき、Unicode として読み書きします。</li>
-    <li>Unicode ini ファイルではないとき、日本語環境では Shift_JIS(ACP) として読み書きします。</li>
-    <li>このため ini ファイルの文字コードによらず透過的に API を利用できます。</li>
-    <li>Unicode ではない ini ファイルに Shift_JIS で表現できない Unicode 文字を書き込むと"?"に置換されて書き込まれます。</li>
-  </ul>
-  <li>Unicode API で書き込んで新規にファイルが作成されたときは Unicode ini ファイルになりません。</li>
-  <li>BOM (0xff 0xfe) だけの空ファイルを作っておいて、そのファイルに Unicode API で書き込むと Unicode ini ファイルになります。</li>
+  <li>ACP ini file : Get/WritePrivateProfileStringA</li>
+  <li>ACP ini file : Get/WritePrivateProfileStringW</li>
+  <li>Unicode (UTF-16LE) ini file : Get/WritePrivateProfileStringA</li>
+  <li>Unicode (UTF-16LE) ini file : Get/WritePrivateProfileStringW</li>
 </ul>
+
+<p>
+Windows 2000 以降の API は、読み書き時に内部で ini ファイルの文字コードにあわせて自動的に変換が行われるようになっています。
+</p>
+
+<ul>
+  <li>ANSI版の API で Unicode ini ファイルを扱うときには自動的に変換されます。</li>
+  <li>Wide文字版の API で ACP ini ファイルを扱うときには自動的に変換されます。</li>
+  <li>このため ini ファイルの文字コードによらず透過的に API を利用できます。</li>
+  <li>Unicode ではない ini ファイルに ACP で表現できない Unicode 文字を書き込むと "?" に置換されて書き込まれます。</li>
+  <li>ファイルの先頭に UTF-16LE BOM (0xff 0xfe) が付いているとき、ini ファイルは Unicode と判定されます。
+    <ul>
+      <li>存在しないファイルに WritePrivateProfileStringA/W で書き込んで ini ファイルが新規作成されたときは、ACP で書き込まれます。</li>
+      <li>BOM (0xff 0xfe) だけの空ファイルを作っておいて、そのファイルに WritePrivateProfileStringA/W で書き込んだときは、Unicode で書き込まれます。</li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+Windows NT 4 では、"ANSI版 API と ACP ini ファイルの組み合わせ", "Wide文字版 API と ACP ini ファイルの組み合わせ" が正しく動作するようです。<br>
+Wide文字版 API で ACP ini ファイルを扱う場合のみ自動的に変換されるようです。
+</p>
+
+<p>
+Windows 95, 98, Me では、ANSI版 API と ACP ini ファイルの組み合わせのみが正しく動作するようです。<br>
+自動的な変換は行われないようです。
+</p>
+
+<table border="1">
+  <tr>
+    <th></th>
+    <th colspan="2">Windows 2000-</th>
+    <th colspan="2">Windows NT 4</th>
+    <th colspan="2">Windows 95, 98, Me</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th>ANSI API</th>
+    <th>Wide API</th>
+    <th>ANSI API</th>
+    <th>Wide API</th>
+    <th>ANSI API</th>
+    <th>Wide API</th>
+  </tr>
+  <tr>
+    <th>ACP ini file</th>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+    <td>OK</td>
+    <td>NG</td>
+  </tr>
+  <tr>
+    <th>Unicode (UTF-16LE) ini file</th>
+    <td>OK</td>
+    <td>OK</td>
+    <td>NG</td>
+    <td>NG</td>
+    <td>NG</td>
+    <td>NG</td>
+  </tr>
+</table>
 
 </html>
