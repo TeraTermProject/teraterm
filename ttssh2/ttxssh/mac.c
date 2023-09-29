@@ -170,7 +170,8 @@ void SSH2_update_hmac_myproposal(PTInstVar pvar)
 	int index;
 	int len, i;
 
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
+	// 通信中に呼ばれるということはキー再作成
+	// キー再作成の場合は何もしない
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}

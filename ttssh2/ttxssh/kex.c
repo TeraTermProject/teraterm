@@ -140,8 +140,18 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 	int index;
 	int i;
 
-	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
+	// 通信中に呼ばれるということはキー再作成
 	if (pvar->socket != INVALID_SOCKET) {
+		if (pvar->kex_status & KEX_FLAG_REKEYING) {
+			// キー再作成の場合には、すでに組み立てられている myproposal を書き換える
+			//   pvar->settings も pvar->session_settings も、
+			//   接続時に myproposal を作成した設定値から変わっていない保証がない。
+			//   再度組み立てるのではなく既存の myproposal を書き換えることにした。
+			int pos = strlen(myproposal[PROPOSAL_KEX_ALGS]) - strlen(",ext-info-c");
+			if (strcmp(myproposal[PROPOSAL_KEX_ALGS] + pos, ",ext-info-c") == 0) {
+				myproposal[PROPOSAL_KEX_ALGS][pos] = '\0';
+			}
+		}
 		return;
 	}
 
@@ -153,7 +163,10 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), get_kex_algorithm_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
+
+	// RFC 8308 Extension Negotiation
 	strncat_s(buf, sizeof(buf), "ext-info-c", _TRUNCATE);
+
 	myproposal[PROPOSAL_KEX_ALGS] = buf; 
 }
 

@@ -4780,6 +4780,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	if (pvar->kex_status == KEX_FLAG_KEXDONE) {
 		pvar->kex_status = KEX_FLAG_REKEYING;
 
+		// キー再作成時は myproposal から ",ext-info-c" を削除する
+		// 更新するのは KEX のみでよい
+		SSH2_update_kex_myproposal(pvar);
+
 		// サーバへSSH2_MSG_KEXINIT を送る
 		SSH2_send_kexinit(pvar);
 	}
