@@ -14,7 +14,7 @@
 
 - teraterm が使用するライブラリをビルドして準備しておきます
   - ビルドに使用するツールに合わせたライブラリが必要です
-- ビルド方法は [`build_library_with_cmake`](<build_library_with_cmake.html>) を参照してください
+- ビルド方法は [`build_library_with_cmake.html`](<build_library_with_cmake.html>) を参照してください
 - ライブラリについては [`develop.html`](<develop.html>) を参照してください
 
 ## teratermのビルド

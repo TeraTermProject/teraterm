@@ -47,7 +47,7 @@
 #include "getcontent.h"
 
 #define ORDER 4000
-#define ID_MENUITEM 55900	// see reference/develop.txt
+#define ID_MENUITEM 55900	// see reference/develop.html
 
 typedef struct {
 	HANDLE hInst;
