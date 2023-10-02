@@ -974,7 +974,9 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 		HOSTS_open(pvar);
 		FWDUI_open(pvar);
 
-		// 設定を myproposal に反映するのは、接続直前のここだけ。
+		// 接続直前のここで、設定を myproposal に反映している
+		//   キー再作成のときは、同じ SSH2_update_kex_myproposal() を呼び出して
+		//   myproposal から ",ext-info-c" を削除している
 		SSH2_update_kex_myproposal(pvar);
 		SSH2_update_host_key_myproposal(pvar);
 		SSH2_update_cipher_myproposal(pvar);
