@@ -3770,7 +3770,11 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		// default key type
 		SendMessage(GetDlgItem(dlg, IDC_ED25519_TYPE), BM_SETCHECK, BST_CHECKED, 0);
 		key_type = KEY_ED25519;
-		saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+
+		// bit 長を変更できる RSA/RSA1 のためにデフォルト値を保存
+		//   ここでダイアログから取得すると 0 になってしまうので NG
+		//   bit長固定の ED25519 をデフォルトにしたため、WM_INITDIALOG の最後でダイアログから取得するのも NG
+		saved_key_bits = 3072;
 
 		// default key bits
 		EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
@@ -4031,7 +4035,6 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			break;
 
 		case IDC_ED25519_TYPE | (BN_CLICKED << 16):
-			/* ED25519 ではビット数を指定できない。*/
 			if (!isFixedLengthKey(key_type)) {
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
