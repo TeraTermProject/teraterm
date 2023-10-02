@@ -143,9 +143,8 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 	// 通信中に呼ばれるということはキー再作成
 	if (pvar->socket != INVALID_SOCKET) {
 		if (pvar->kex_status & KEX_FLAG_REKEYING) {
-			// キー再作成の場合には、すでに組み立てられている myproposal を書き換える
-			//   pvar->settings も pvar->session_settings も、
-			//   接続時に myproposal を作成した設定値から変わっていない保証がない。
+			// キー再作成の場合には、接続時に pvar->settings から組み立てられた myproposal を書き換える。
+			//   pvar->settings が 接続時に myproposal を作成したときの値から変わっていない保証がない。
 			//   再度組み立てるのではなく既存の myproposal を書き換えることにした。
 			int pos = strlen(myproposal[PROPOSAL_KEX_ALGS]) - strlen(",ext-info-c");
 			if (strcmp(myproposal[PROPOSAL_KEX_ALGS] + pos, ",ext-info-c") == 0) {
