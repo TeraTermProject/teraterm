@@ -319,7 +319,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			int amount_read;
 
 			// SCPファイル受信処理を一時停止中ならば、recv()をしない。
-			if (pvar->recv_suspended) {
+			if (pvar->recv.suspended) {
 				// それまでに受信したデータサイズをTera Term側に返す。
 				return amount_in_buf;
 

@@ -529,7 +529,7 @@ typedef struct PacketList {
 
 // SCP受信処理におけるフロー制御の閾値
 // 適用先 scp_t.filercvsize
-#define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 16MB
+#define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
 #define SCPRCV_LOW_WATER_MARK (0)  // 0MB
 
 typedef struct scp {
@@ -552,6 +552,9 @@ typedef struct scp {
 	PacketList_t *pktlist_head;
 	PacketList_t *pktlist_tail;
 	unsigned long pktlist_cursize;
+	struct {
+		uint64_t received_size;
+	} recv;
 } scp_t;
 
 enum sftp_state {

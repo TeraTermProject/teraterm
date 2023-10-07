@@ -327,7 +327,6 @@ static void ssh2_channel_delete(Channel_t *c)
 {
 	bufchain_t *ch, *ptr;
 	enum scp_state prev_state;
-	PTInstVar pvar;
 
 	ch = c->bufchain;
 	while (ch) {
@@ -371,12 +370,12 @@ static void ssh2_channel_delete(Channel_t *c)
 
 		// SCP受信の場合のみ、SCP用リストの開放を行う。
 		// Windows9xで落ちる問題を修正した。
-		if (c->scp.dir == FROMREMOTE)
-			ssh2_scp_free_packetlist(c);
+		if (c->scp.dir == FROMREMOTE) {
+			PTInstVar pvar = c->scp.pvar;
+			ssh2_scp_free_packetlist(pvar, c);
+		}
 
 		g_scp_sending = FALSE;
-		pvar = c->scp.pvar;
-		ssh2_scp_free_packetlist(pvar, c);
 	}
 	if (c->type == TYPE_AGENT) {
 		buffer_free(c->agent_msg);
@@ -8104,10 +8103,6 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 			{
 			scp_dlg_parm_t *parm = (scp_dlg_parm_t *)wp;
 
-			// SCPの受信処理を中断した場合にも、recv()のブロックを解除する。
-			// これをやらないと、Tera Termが固まったままになってしまう。
-			ssh2_scp_recv_unblocked(parm->pvar);
-
 			ssh2_channel_send_close(parm->pvar, parm->c);
 			}
 			return TRUE;
@@ -8484,27 +8479,43 @@ done:
 	c->scp.state = SCP_CLOSING;
 	ShowWindow(c->scp.progress_window, SW_HIDE);
 
-cancel_abort:
 	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
 	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
 	// (2011.6.1 yutaka)
 	parm.c = c;
 	parm.pvar = pvar;
 	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
+	return 0;
 
+cancel_abort:
+	pvar->recv.close_request = TRUE;
 	return 0;
 }
 
-// SCPファイル受信処理中に recv をブロックしている場合は、ブロックを解除する。
-static void ssh2_scp_recv_unblocked(PTInstVar pvar)
+// do_SSH2_adjust_window_size() をある程度時間が経過してからコールする
+// フロー制御、受信処理を再開
+static void CALLBACK do_SSH2_adjust_window_size_timer(
+	HWND hWnd, UINT uMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
-	// ブロックしている場合
-	if (pvar->recv_suspended) {
-		// recv()のブロックを解除する。
-		pvar->recv_suspended = FALSE;
-		// FD_READメッセージを投げて recv() の再開を促す。
-		PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY, pvar->socket, MAKELPARAM(FD_READ, 0));
+	(void)hWnd;
+	(void)uMsg;
+	(void)dwTime;
+	Channel_t *c = (Channel_t *)nIDEvent;
+	PTInstVar pvar = c->scp.pvar;
+
+	if (pvar->recv.data_finished) {
+		// 送信終了したのにメッセージが残っていた時対策
+		return;
 	}
+	if (pvar->recv.timer_id != 0) {
+		// SetTimer() はインターバルに発生するので削除する
+		KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
+		pvar->recv.timer_id = 0;
+	}
+
+	logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive, send SSH_MSG_CHANNEL_WINDOW_ADJUST", __FUNCTION__);
+	pvar->recv.suspended = FALSE;
+	do_SSH2_adjust_window_size(pvar, c);
 }
 
 // SSHサーバから送られてきたファイルのデータをリストにつなぐ。
@@ -8544,13 +8555,15 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 		// このフラグを立てた場合、SSH通信全体のrecv()をブロックするため、
 		// SCP処理が完了 or 中断された場合は、かならずフラグを落としておく
 		// 必要がある。
-		pvar->recv_suspended = TRUE;
+		logprintf(LOG_LEVEL_NOTICE,
+			"%s: enter suspend", __FUNCTION__);
+		pvar->recv.suspended = TRUE;
 	}
 
 	logprintf(LOG_LEVEL_NOTICE,
-		"%s: channel=#%d SCP recv %lu(bytes) and enqueued.(%s)",
+		"%s: channel=#%d SCP recv %lu(bytes) and enqueued.%s",
 		__FUNCTION__, c->local_num, c->scp.pktlist_cursize,
-		pvar->recv_suspended ? "recv suspended" : "recv resumed"
+		pvar->recv.suspended ? "(suspended)" : ""
 		);
 
 error:;
@@ -8586,14 +8599,23 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	// キューに詰んだデータの総サイズが下限閾値を下回った場合、
 	// SSHサーバからの受信を再開するように指示を出す。
 	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
-		// recv()のブロックを解除する。
-		ssh2_scp_recv_unblocked(pvar);
+		logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive resumed", __FUNCTION__);
+		// ブロックしている場合
+		if (pvar->recv.suspended) {
+			// SCP受信のブロックを解除する。
+			pvar->recv.suspended = FALSE;
+			if (c->scp.filercvsize < c->scp.filetotalsize) {
+				// 続きを受信
+				pvar->recv.timer_id =
+					SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
+			}
+		}
 	}
 
 	logprintf(LOG_LEVEL_NOTICE,
-		"%s: channel=#%d SCP recv %lu(bytes) and dequeued.(%s)",
+		"%s: channel=#%d SCP recv %lu(bytes) and dequeued.%s",
 		__FUNCTION__, c->local_num, c->scp.pktlist_cursize,
-		pvar->recv_suspended ? "recv suspended" : "recv resumed"
+		pvar->recv.suspended ? "(suspended)" : ""
 	);
 
 end:;
@@ -8606,7 +8628,9 @@ static void ssh2_scp_alloc_packetlist(PTInstVar pvar, Channel_t *c)
 	c->scp.pktlist_tail = NULL;
 	InitializeCriticalSection(&g_ssh_scp_lock);
 	c->scp.pktlist_cursize = 0;
-	pvar->recv_suspended = FALSE;
+	pvar->recv.suspended = FALSE;
+	pvar->recv.timer_id = 0;
+	pvar->recv.close_request = FALSE;
 }
 
 static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c)
@@ -8626,19 +8650,12 @@ static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c)
 	c->scp.pktlist_tail = NULL;
 	DeleteCriticalSection(&g_ssh_scp_lock);
 	c->scp.pktlist_cursize = 0;
-	pvar->recv_suspended = FALSE;
+	pvar->recv.suspended = FALSE;
+	pvar->recv.data_finished = FALSE;
 }
 
 static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
-	int permission;
-	long long size;
-	char filename[MAX_PATH];
-	char ch;
-	HWND hDlgWnd;
-	char msg[256];
-	int copylen;
-
 	if (buflen == 0)
 		return FALSE;
 
@@ -8660,14 +8677,22 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			goto reply;
 
 		} else if (data[0] == 'C') {  // C0666 size file
+			HWND hDlgWnd;
 			HANDLE thread;
 			unsigned int tid;
+			int permission;
+			long long size;
+			char filename[MAX_PATH];
 
 			sscanf_s(data, "C%o %lld %s", &permission, &size, filename, (unsigned int)sizeof(filename));
+			logprintf(LOG_LEVEL_NOTICE, "%s: SCP '%s', size=%lld, perm=0x%08x",
+					  __FUNCTION__,
+					  filename, size, permission);
 
 			// Windowsなのでパーミッションは無視。サイズのみ記録。
 			c->scp.filetotalsize = size;
 			c->scp.filercvsize = 0;
+			c->scp.recv.received_size = 0;
 
 			c->scp.state = SCP_DATA;
 
@@ -8703,6 +8728,9 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 		} else {
 			// サーバからのデータが不定の場合は、エラー表示を行う。
 			// (2014.7.13 yutaka)
+			char msg[256];
+			int copylen;
+
 			copylen = min(buflen, sizeof(msg));
 			memcpy(msg, data, copylen);
 			msg[copylen - 1] = 0;
@@ -8713,16 +8741,60 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 		}
 
 	} else if (c->scp.state == SCP_DATA) {  // payloadの受信
-		unsigned char *newdata = malloc(buflen);
-		if (newdata != NULL) {
-			memcpy(newdata, data, buflen);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: SCP_DATA size=%lld",
+				  __FUNCTION__,
+				  buflen);
+		if (pvar->recv.close_request) {
+			// キャンセルボタンを押された
+			ssh2_channel_send_close(pvar, c);
+		}
+		else {
+			unsigned char *newdata = malloc(buflen);
+			if (newdata != NULL) {
+				memcpy(newdata, data, buflen);
 
-			// SCP受信処理のスピードが速い場合、スレッドのメッセージキューがフル(10000個)に
-			// なり、かつスレッド上での SendMessage がブロックすることにより、Tera Term(TTSSH)
-			// 自体がストールしてしまう。この問題を回避するため、スレッドのメッセージキューを
-			// 使うのをやめて、リンクドリスト方式に切り替える。
-			// (2016.11.3 yutaka)
-			ssh2_scp_add_packetlist(pvar, c, newdata, buflen);
+				// この中で suspended が TRUE になることがある
+				ssh2_scp_add_packetlist(pvar, c, newdata, buflen);
+			}
+
+			c->scp.recv.received_size += buflen;
+
+			if (c->scp.recv.received_size >= c->scp.filetotalsize) {
+				// 受信終了
+				assert (pvar->recv.timer_id == 0);
+				PTInstVar pvar = c->scp.pvar;
+				pvar->recv.data_finished = TRUE;
+				if (pvar->recv.timer_id != 0) {
+					pvar->recv.timer_id = 0;
+					KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
+				}
+			}
+			else if (pvar->recv.suspended) {
+				// フロー制御中
+				logprintf(LOG_LEVEL_NOTICE, "%s: scp receive suspended", __FUNCTION__);
+			}
+			else {
+				// ローカルのwindow sizeをチェック
+				//	こまめにやらずに、ある程度まとめて調整を行う
+				if (c->local_window < c->local_window_max/2) {
+					// windowサイズを調整する
+#if 0
+					// すぐに調整する
+					//		すぐにサーバーからデータが受信できる環境の場合、
+					// 		FD_READが優先されてメッセージキューに積まれて
+					// 		他のwindowsのメッセージ処理(キャンセルボタン押下など)が
+					//		できなくなるため使用しない
+					do_ssh2_adjust_window_size(pvar, c);
+#else
+					// 少し時間を置いてから調整
+					//		タイマーを使ってGUIスレッドで関数をコールする
+					if (pvar->recv.timer_id == 0) {
+						pvar->recv.timer_id =
+							SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
+					}
+#endif
+				}
+			}
 		}
 
 	} else if (c->scp.state == SCP_CLOSING) {  // EOFの受信
@@ -8733,8 +8805,11 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 	return TRUE;
 
 reply:
-	ch = '\0';
-	SSH2_send_channel_data(pvar, c, &ch, 1, 0);
+	{
+		char ch;
+		ch = '\0';
+		SSH2_send_channel_data(pvar, c, &ch, 1, 0);
+	}
 	return TRUE;
 }
 
@@ -8857,6 +8932,9 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 
 	} else if (c->type == TYPE_SCP) {  // SCP
 		SSH2_scp_response(pvar, c, data, str_len);
+		// ウィンドウサイズの調整
+		c->local_window -= str_len;
+		return TRUE;
 
 	} else if (c->type == TYPE_SFTP) {  // SFTP
 		sftp_response(pvar, c, data, str_len);
@@ -8956,7 +9034,12 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	// ウィンドウサイズの調整
 	c->local_window -= strlen;
 
-	do_SSH2_adjust_window_size(pvar, c);
+	if (c->type == TYPE_SCP && pvar->recv.suspended) {
+		logprintf(LOG_LEVEL_NOTICE, "%s: SCP suspended", __FUNCTION__);
+	}
+	else {
+		do_SSH2_adjust_window_size(pvar, c);
+	}
 
 	return TRUE;
 }
@@ -9209,6 +9292,10 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 		ssh2_channel_delete(c);
 
 	} else if (c->type == TYPE_SCP) {
+		// 受信終了
+		PTInstVar pvar = c->scp.pvar;
+		pvar->recv.data_finished = TRUE;
+
 		ssh2_channel_delete(c);
 
 	} else if (c->type == TYPE_AGENT) {
