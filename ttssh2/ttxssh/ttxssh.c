@@ -819,6 +819,7 @@ void logputs(int level, char *msg)
 		strtime = mctimelocal("%Y-%m-%d %H:%M:%S.%NZ", TRUE);
 		len = asprintf(&buf, "%s [%lu] %s\n",
 					   strtime, GetCurrentProcessId(), msg);
+		free(strtime);
 
 		if (enable_log) {
 			wchar_t *fname = get_log_dir_relative_nameW(L"TTSSH.LOG");

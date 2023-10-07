@@ -615,6 +615,7 @@ static wchar_t *TimeStampStr(PFileVar fv)
 	strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
 	strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
 	strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
+	free(strtime);
 
 	return ToWcharA(tmp);
 }
