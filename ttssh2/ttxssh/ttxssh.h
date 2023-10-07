@@ -358,6 +358,8 @@ typedef struct _TInstVar {
 	char *server_sig_algs;
 
 	char UIMsg[MAX_UIMSG];
+	BOOL recv_suspended;  // SCP受信のフロー制御用
+
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data
