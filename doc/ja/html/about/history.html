@@ -3372,6 +3372,7 @@
   <li>バグ修正
     <ul>
       <li>SSH2ダイナミックポートフォワーディングを使用すると異常終了する問題を修正した。</li>
+      <li>鍵再交換の最中に発生した SSH_MSG_CHANNEL_DATA の送信を破棄せず、鍵交換完了後にまとめて送信するようにした。</li>
       <li><a href="../menu/setup-sshauth.html">Authentication Setup ダイアログ</a>を開いたときに、SSH 認証に使用するユーザ名設定が "Use default username" (DefaultUserType=1) なのに "Do not enter username" が選択される問題を修正した。</li>
     </ul>
   </li>
