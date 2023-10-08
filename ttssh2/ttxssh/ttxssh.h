@@ -352,6 +352,14 @@ typedef struct _TInstVar {
 	// dialog resource
 	HFONT hFontFixed;		// hosts.c内のダイアログ用
 
+	struct {
+		BOOL suspended;  // SCP受信のフロー制御用,TRUEのとき応答を返さない状態
+		//BOOL timer_triggerd;
+		UINT_PTR timer_id;
+		BOOL data_finished;	// TRUEのとき,データの受信は完了した
+		BOOL close_request;
+	} recv;
+
 	char *server_sig_algs;
 
 } TInstVar;
