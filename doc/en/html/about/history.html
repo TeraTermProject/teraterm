@@ -3364,7 +3364,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>when SSH2 dynamic port forwarding is used, an application fault occurs.</li>
-      <li>when receiving SSH_MSG_CHANNEL_EXTENDED_DATA on SCP channel, SCP stops with error.
+      <li>when receiving SSH_MSG_CHANNEL_EXTENDED_DATA on SCP channel, there is a possibility that cause problem because it is processed as normal SCP data.
         <ul>
           <li>a message from remote is shown by balloon notify.</li>
         </ul></li>
