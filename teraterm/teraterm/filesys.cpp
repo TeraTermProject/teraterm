@@ -1015,6 +1015,7 @@ void LogToFile()
 					strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
 					strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
 					strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
+					free(strtime);
 				}
 
 				/* 2007.05.24 Gentaro */

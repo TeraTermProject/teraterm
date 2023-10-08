@@ -102,7 +102,7 @@ DllExport BOOL HasBalloonTipSupport();
 int KanjiCode2List(int lang, int kcode);
 int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
-DllExport char *mctimelocal(char *format, BOOL utc_flag);
+DllExport char *mctimelocal(const char *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);
 
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);

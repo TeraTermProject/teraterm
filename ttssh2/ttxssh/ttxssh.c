@@ -831,6 +831,7 @@ void logputs(int level, char *msg)
 			_write(file, msg, strlen(msg));
 			_write(file, "\n", 1);
 			_close(file);
+			free(strtime);
 		}
 	}
 }
