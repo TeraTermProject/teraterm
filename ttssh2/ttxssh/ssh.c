@@ -229,6 +229,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 		c->scp.localfp = NULL;
 		c->scp.filemtime = 0;
 		c->scp.fileatime = 0;
+		c->scp.pktlist_cursize = 0;
 	}
 	if (type == TYPE_AGENT) {
 		c->agent_msg = buffer_init();
@@ -4130,6 +4131,11 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
 		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		goto error;
+	}
+	if (c->type == TYPE_SCP) {
+		c->scp.pvar = pvar;
+		pvar->recv.suspended = FALSE;
+		pvar->recv.data_finished = FALSE;
 	}
 
 	if (direction == TOREMOTE) {  // copy local to remote
@@ -8237,8 +8243,6 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		HANDLE thread;
 		unsigned int tid;
 
-		c->scp.pvar = pvar;
-
 		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
 		                       pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
 		if (hDlgWnd != NULL) {
@@ -8538,9 +8542,6 @@ static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c)
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
 	DeleteCriticalSection(&g_ssh_scp_lock);
-	c->scp.pktlist_cursize = 0;
-	pvar->recv.suspended = FALSE;
-	pvar->recv.data_finished = FALSE;
 }
 
 static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
