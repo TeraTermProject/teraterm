@@ -154,7 +154,6 @@ static void get_window_pixel_size(PTInstVar pvar, int *x, int *y);
 static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar);
 static void ssh2_prep_userauth(PTInstVar pvar);
 static void ssh2_send_newkeys(PTInstVar pvar);
-static void ssh2_scp_recv_unblocked(PTInstVar pvar);
 
 // マクロ
 #define remained_payload(pvar) ((pvar)->ssh_state.payload + payload_current_offset(pvar))
@@ -8548,13 +8547,10 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	c->scp.pktlist_cursize += buflen;
 
 	// キューに詰んだデータの総サイズが上限閾値を超えた場合、
-	// SSHサーバからの受信を停止するように指示を出す。
+	// SSHサーバのwindows sizeの更新を停止する
 	// これによりリストエントリが増え続け、消費メモリの肥大化を
 	// 回避できる。
 	if (c->scp.pktlist_cursize >= SCPRCV_HIGH_WATER_MARK) {
-		// このフラグを立てた場合、SSH通信全体のrecv()をブロックするため、
-		// SCP処理が完了 or 中断された場合は、かならずフラグを落としておく
-		// 必要がある。
 		logprintf(LOG_LEVEL_NOTICE,
 			"%s: enter suspend", __FUNCTION__);
 		pvar->recv.suspended = TRUE;
@@ -8597,7 +8593,7 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	c->scp.pktlist_cursize -= *buflen;
 
 	// キューに詰んだデータの総サイズが下限閾値を下回った場合、
-	// SSHサーバからの受信を再開するように指示を出す。
+	// SSHサーバへwindow sizeの更新を再開する
 	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
 		logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive resumed", __FUNCTION__);
 		// ブロックしている場合
