@@ -8908,7 +8908,16 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 		FWD_received_data(pvar, c->local_num, data, strlen);
 
 	} else if (c->type == TYPE_SCP) {  // SCP
-		SSH2_scp_response(pvar, c, data, strlen);
+		char *msg = (char *)malloc(strlen+1);
+		char *msgA;
+		memcpy(msg, data, strlen);
+		msg[strlen] = '\0';
+		msgA = ToCharU8(msg);
+		if (msgA) {
+			NotifyWarnMessage(pvar->cv, msgA, "SSH_MSG_CHANNEL_EXTENDED_DATA");
+			free(msgA);
+		}
+		free(msg);
 
 	} else if (c->type == TYPE_SFTP) {  // SFTP
 
