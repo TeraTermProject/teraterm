@@ -8561,10 +8561,10 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	}
 
 	logprintf(LOG_LEVEL_NOTICE,
-		"%s: channel=#%d SCP recv %lu(bytes) and enqueued.%s",
-		__FUNCTION__, c->local_num, c->scp.pktlist_cursize,
+		"%s: channel=#%d SCP recv %u(bytes) and enqueued.%s",
+		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
 		pvar->recv.suspended ? "(suspended)" : ""
-		);
+	);
 
 error:;
 	LeaveCriticalSection(&g_ssh_scp_lock);
@@ -8613,8 +8613,8 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	}
 
 	logprintf(LOG_LEVEL_NOTICE,
-		"%s: channel=#%d SCP recv %lu(bytes) and dequeued.%s",
-		__FUNCTION__, c->local_num, c->scp.pktlist_cursize,
+		"%s: channel=#%d SCP recv %u(bytes) and dequeued.%s",
+		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
 		pvar->recv.suspended ? "(suspended)" : ""
 	);
 
@@ -8741,7 +8741,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 		}
 
 	} else if (c->scp.state == SCP_DATA) {  // payload‚ÌŽóM
-		logprintf(LOG_LEVEL_VERBOSE, "%s: SCP_DATA size=%lld",
+		logprintf(LOG_LEVEL_VERBOSE, "%s: SCP_DATA size=%u",
 				  __FUNCTION__,
 				  buflen);
 		if (pvar->recv.close_request) {
