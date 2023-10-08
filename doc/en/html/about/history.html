@@ -3364,6 +3364,10 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>when SSH2 dynamic port forwarding is used, an application fault occurs.</li>
+      <li>when receiving SSH_MSG_CHANNEL_EXTENDED_DATA on SCP channel, SCP stops with error.
+        <ul>
+          <li>a message from remote is shown by balloon notify.</li>
+        </ul></li>
       <li>stop discarding SSH_MSG_CHANNEL_DATA send that occurs while key re-exchange, send them after finish key exchange.</li>
       <li>when <a href="../menu/setup-sshauth.html">Authentication Setup dialog</a> is opened, username setting value is "Use default username" (DefaultUserType=1), nevertheless "Do not enter username" is selected.</li>
     </ul>
