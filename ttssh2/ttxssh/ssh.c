@@ -8650,7 +8650,6 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			if (c->scp.recv.received_size >= c->scp.filetotalsize) {
 				// ŽóMI—¹
-				assert (pvar->recv.timer_id == 0);
 				PTInstVar pvar = c->scp.pvar;
 				pvar->recv.data_finished = TRUE;
 				if (pvar->recv.timer_id != 0) {
