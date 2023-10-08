@@ -3540,14 +3540,9 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 	unsigned char *outmsg;
 	unsigned int len;
 
-	// SSH2鍵交換中の場合、パケットを捨てる。(2005.6.19 yutaka)
+	// SSH2鍵交換中の場合は、パケットを送れないのでいったん保存しておく
 	if (pvar->kex_status & KEX_FLAG_REKEYING) {
-		// TODO: 理想としてはパケット破棄ではなく、パケット読み取り遅延にしたいところだが、
-		// 将来直すことにする。
-		logprintf(LOG_LEVEL_INFO, "%s: now rekeying. data is not sent.", __FUNCTION__);
-
-		c = NULL;
-
+		ssh2_channel_add_bufchain(pvar, c, buf, buflen);
 		return;
 	}
 
@@ -6108,7 +6103,18 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	// SSH2_MSG_NEWKEYS を既に送っていたらKEXは完了。次の処理に移る。
 	if (pvar->kex_status & KEX_FLAG_NEWKEYS_SENT) {
 		if (pvar->kex_status & KEX_FLAG_REKEYING) {
+			int i;
+			Channel_t *c;
+
 			do_SSH2_dispatch_setup_for_transfer(pvar);
+
+			// 送らずバッファに保存しておいたデータを送る
+			for (i = 0 ; i < CHANNEL_MAX ; i++) {
+				c = &channels[i];
+				if (c->used) {
+					ssh2_channel_retry_send_bufchain(pvar, c);
+				}
+			}
 		}
 		else {
 			// 初回の SSH2_MSG_NEWKEYS の送受信が完了し、以降の通信は暗号化された状態になる
@@ -9324,7 +9330,7 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 	// window sizeの調整
 	c->remote_window += adjust;
 
-	// 送り残し
+	// 送らずバッファに保存しておいたデータを送る
 	ssh2_channel_retry_send_bufchain(pvar, c);
 
 	return TRUE;
