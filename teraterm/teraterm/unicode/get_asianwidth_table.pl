@@ -24,7 +24,7 @@ my $type;
 while(my $a = <FILE>) {
 	my $start;
 	my $end;
-	if ($a =~ /^([0-9A-F]+)\.\.([0-9A-F]+);([A-Za-z]+)/) {
+	if ($a =~ /^([0-9A-F]+)\.\.([0-9A-F]+)\s*;\s*([A-Za-z]+)/) {
 		$start = hex $1;
 		$end = hex $2;
 		$type = $3;
@@ -32,7 +32,7 @@ while(my $a = <FILE>) {
 			$type = "n";
 		}
 	}
-	elsif ($a =~ /^([0-9A-F]+);([A-Za-z]+)/) {
+	elsif ($a =~ /^([0-9A-F]+)\s*;\s*([A-Za-z]+)/) {
 		$start = hex $1;
 		$end = hex $1;
 		$type = $2;
