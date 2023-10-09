@@ -7,6 +7,8 @@ environment:
 build: off
 
 init:
+  # タイムゾーンを JST に変更
+  - tzutil /s "Tokyo Standard Time"
   - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake
 
 cache:

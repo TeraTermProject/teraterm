@@ -8,6 +8,8 @@ environment:
 build: off
 
 init:
+  # タイムゾーンを JST に変更
+  - tzutil /s "Tokyo Standard Time"
 # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   # c:\cygwin64 の Cygwin に cmake をインストール
   # このコマンドではインストール済みパッケージは更新されない
