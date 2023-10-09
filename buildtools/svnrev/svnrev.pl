@@ -273,14 +273,6 @@ if (-d "$source_root/.svn" && $svn ne "") {
 			my $name = $url;
 			$name =~ s/^\^\/(.*)$/$1/; # "\/" を削除する
 			$svninfo{'name'} = $name;
-			my $release = 0;
-			if ($url =~ /tags\/(teraterm-(\d+)_(\d+))/) {
-				# パス名からリリースと判定
-				my $tag = $1;
-				my $version = "$2.$3";
-				$release = 1;
-			}
-			$svninfo{'release'} = $release;
 		}
 	}
 }
@@ -303,20 +295,18 @@ elsif(-d "$source_root/.git" && $git ne "") {
 		else {
 			$svninfo{'Revision'} = '';
 		}
-
-		my $release = 0;
-		if ($branch =~ /tags\/(teraterm-(\d+)_(\d+))/) {
-			# リリースと判定
-			my $tag = $1;
-			my $version = "$2.$3";
-			$release = 1;
-		}
-		$svninfo{'release'} = $release;
 	}
 }
 else {
 	# do not use VCS
 }
+
+my $release = 0;
+if ($tt_version_substr eq "") {
+	$release = 1;
+}
+$svninfo{'release'} = $release;
+
 
 if ($verbose != 0) {
 	&dump_info(%svninfo);
