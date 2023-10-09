@@ -891,13 +891,20 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
 wchar_t *GetUILanguageFileFullW(const wchar_t *ExeDir, const wchar_t *UILanguageFileRel)
 {
 	wchar_t *fullpath;
-	size_t size = wcslen(ExeDir) + 1 + wcslen(UILanguageFileRel) + 1;
-	wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
-	wcscpy_s(rel, size, ExeDir);
-	wcscat_s(rel, size, L"\\");
-	wcscat_s(rel, size, UILanguageFileRel);
-	hGetFullPathNameW(rel, &fullpath, NULL);
-	free(rel);
+	if (IsRelativePathW(UILanguageFileRel)) {
+		// 相対パス、実行ファイルフォルダから絶対パスを作る
+		size_t size = wcslen(ExeDir) + 1 + wcslen(UILanguageFileRel) + 1;
+		wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
+		wcscpy_s(rel, size, ExeDir);
+		wcscat_s(rel, size, L"\\");
+		wcscat_s(rel, size, UILanguageFileRel);
+		hGetFullPathNameW(rel, &fullpath, NULL);
+		free(rel);
+	}
+	else {
+		// 絶対パス
+		hGetFullPathNameW(UILanguageFileRel, &fullpath, NULL);
+	}
 	return fullpath;
 }
 
@@ -1150,7 +1157,11 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
 
 /**
  *	pathが相対パスかどうかを返す
- *		TODO "\path\path" は 相対パスではないのではないか?
+ *		TODO
+ *			- "\path\path" ("c:\path"などドライブがない場合)は相対パス?
+ *			- "a:path" は相対パス?
+ *			- "a:\path" は絶対パス
+ *			- "\\path\path" は絶対パス
  */
 BOOL IsRelativePathW(const wchar_t *path)
 {
