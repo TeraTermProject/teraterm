@@ -35,6 +35,16 @@ Windows image の Visual Studio を使用したビルド
   - teraterm
 - Artifacts にsnapshot.zip ができている
 
+
+appveyor_release_bat.yml
+========================
+
+リリース用
+
+- appveyor_vs2022_bat.yml がベース
+- キャッシュを使用しない
+
+
 appveyor_ubuntu2004.yml
 =======================
 

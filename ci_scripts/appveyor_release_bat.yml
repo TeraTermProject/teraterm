@@ -1,21 +1,20 @@
 image: Visual Studio 2022
 
 environment:
-# ƒLƒƒƒbƒVƒ…‚ğg‚í‚È‚¢
+# ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã‚’ä½¿ã‚ãªã„
 # APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VS_VERSION: 2022
 
 build: off
 
 init:
-  # ƒ^ƒCƒ€ƒ][ƒ“‚ğ JST ‚É•ÏX
+  # ã‚¿ã‚¤ãƒ ã‚¾ãƒ¼ãƒ³ã‚’ JST ã«å¤‰æ›´
   - tzutil /s "Tokyo Standard Time"
-# - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  # c:\cygwin64 ‚Ì Cygwin ‚É cmake ‚ğƒCƒ“ƒXƒg[ƒ‹
-  # ‚±‚ÌƒRƒ}ƒ“ƒh‚Å‚ÍƒCƒ“ƒXƒg[ƒ‹Ï‚İƒpƒbƒP[ƒW‚ÍXV‚³‚ê‚È‚¢
+  # c:\cygwin64 ã® Cygwin ã« cmake ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+  # ã“ã®ã‚³ãƒãƒ³ãƒ‰ã§ã¯ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ¸ˆã¿ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã¯æ›´æ–°ã•ã‚Œãªã„
   - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake
 
-# ƒLƒƒƒbƒVƒ…‚ğg‚í‚È‚¢
+# ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã‚’ä½¿ã‚ãªã„
 # cache:
 #   - libs
 
@@ -32,4 +31,5 @@ on_success:
 on_failure:
 # - ci_scripts\notify.bat failure
 on_finish:
+# ãƒ“ãƒ«ãƒ‰å®Œäº†å¾Œã« RDP ãŒæœ‰åŠ¹ã«ãªã‚‹ã€‚blockRdp ã‚’æŒ‡å®šã—ã¦ã„ã‚‹ã®ã§ã€å®Œäº†å¾Œã«ã‚‚çµ‚äº†ã—ãªã„ã€‚
 # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
