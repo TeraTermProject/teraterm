@@ -858,12 +858,12 @@ To release Tera Term installation package is shown in the following step:
     <ul>
       <li>
         teraterm\common\tt-version.h<br>
-        set TT_VERSION_SUBSTR to "rc".
+        set TT_VERSION_SUBSTR to "RC".
 <pre>
   #define TT_VERSION_MAJOR             5
   #define TT_VERSION_MINOR             0
 - #define TT_VERSION_SUBSTR            "dev"
-+ #define TT_VERSION_SUBSTR            "rc"
++ #define TT_VERSION_SUBSTR            "RC"
 </pre>
         TT_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
       </li>
@@ -876,7 +876,7 @@ To release Tera Term installation package is shown in the following step:
         Change to "RC" and enable create archive.
 <pre>
 - #define AppVer "5.0-dev"
-+ #define AppVer "5.0-rc"
++ #define AppVer "5.0-RC"
 
   [PreCompile]
   Name: makechm.bat
@@ -977,14 +977,14 @@ To release Tera Term installation package is shown in the following step:
 <pre>
   #define TT_VERSION_MAJOR             5
   #define TT_VERSION_MINOR             0
-- #define TT_VERSION_SUBSTR            "rc"
+- #define TT_VERSION_SUBSTR            "RC"
 + #undef TT_VERSION_SUBSTR
 </pre>
       </li>
       <li>
         installer\teraterm.iss<br>
 <pre>
-- #define AppVer "5.0-rc"
+- #define AppVer "5.0-RC"
 + #define AppVer "5.0"
 </pre>
      </li>

@@ -851,12 +851,12 @@ TeraTerm Project でのリリース手順について以下に示します。
     <ul>
       <li>
         teraterm\common\tt-version.h<br>
-        TT_VERSION_SUBSTR を "rc" にする
+        TT_VERSION_SUBSTR を "RC" にする
 <pre>
   #define TT_VERSION_MAJOR             5
   #define TT_VERSION_MINOR             0
 - #define TT_VERSION_SUBSTR            "dev"
-+ #define TT_VERSION_SUBSTR            "rc"
++ #define TT_VERSION_SUBSTR            "RC"
 </pre>
         TT_VERSION_MINOR だけは、前回のリリース直後にインクリメントされている。
       </li>
@@ -869,7 +869,7 @@ TeraTerm Project でのリリース手順について以下に示します。
         RC に変更し、アーカイブの作成も有効にします。
 <pre>
 - #define AppVer "5.0-dev"
-+ #define AppVer "5.0-rc"
++ #define AppVer "5.0-RC"
 
   [PreCompile]
   Name: makechm.bat
@@ -970,14 +970,14 @@ TeraTerm Project でのリリース手順について以下に示します。
 <pre>
   #define TT_VERSION_MAJOR             5
   #define TT_VERSION_MINOR             0
-- #define TT_VERSION_SUBSTR            "rc"
+- #define TT_VERSION_SUBSTR            "RC"
 + #undef TT_VERSION_SUBSTR
 </pre>
       </li>
       <li>
         installer\teraterm.iss<br>
 <pre>
-- #define AppVer "5.0-rc"
+- #define AppVer "5.0-RC"
 + #define AppVer "5.0"
 </pre>
      </li>
