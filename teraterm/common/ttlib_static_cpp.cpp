@@ -881,6 +881,34 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
 }
 
 /**
+ *	フルパスを取得する
+ *
+ *	@param[in]		dir					ファイルが相対パスだった時に元とするディレクトリ
+ *	@param[in]		rel_path			rel_path 相対/絶対パス, これをフルパスに変換する
+ *	@return			ファイルのフルパス
+ *					不要になったらfree()すること
+ */
+wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path)
+{
+	wchar_t *fullpath;
+	if (IsRelativePathW(rel_path)) {
+		// 相対パス、実行ファイルフォルダから絶対パスを作る
+		size_t size = wcslen(dir) + 1 + wcslen(rel_path) + 1;
+		wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
+		wcscpy_s(rel, size, dir);
+		wcscat_s(rel, size, L"\\");
+		wcscat_s(rel, size, rel_path);
+		hGetFullPathNameW(rel, &fullpath, NULL);
+		free(rel);
+	}
+	else {
+		// 絶対パス
+		hGetFullPathNameW(rel_path, &fullpath, NULL);
+	}
+	return fullpath;
+}
+
+/**
  *	UILanguageFileのフルパスを取得する
  *
  *	@param[in]		ExeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
@@ -890,22 +918,7 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
  */
 wchar_t *GetUILanguageFileFullW(const wchar_t *ExeDir, const wchar_t *UILanguageFileRel)
 {
-	wchar_t *fullpath;
-	if (IsRelativePathW(UILanguageFileRel)) {
-		// 相対パス、実行ファイルフォルダから絶対パスを作る
-		size_t size = wcslen(ExeDir) + 1 + wcslen(UILanguageFileRel) + 1;
-		wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
-		wcscpy_s(rel, size, ExeDir);
-		wcscat_s(rel, size, L"\\");
-		wcscat_s(rel, size, UILanguageFileRel);
-		hGetFullPathNameW(rel, &fullpath, NULL);
-		free(rel);
-	}
-	else {
-		// 絶対パス
-		hGetFullPathNameW(UILanguageFileRel, &fullpath, NULL);
-	}
-	return fullpath;
+	return GetFullPathW(ExeDir, UILanguageFileRel);
 }
 
 /**

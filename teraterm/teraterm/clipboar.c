@@ -65,10 +65,10 @@ static void TrimTrailingNLW(wchar_t *src)
  * ファイルに定義された文字列が、textに含まれるかを調べる。
  * 見つかれば TRUEを返す
  */
-static BOOL search_dictW(char *filename, const wchar_t *text)
+static BOOL search_dictW(const wchar_t *filename, const wchar_t *text)
 {
 	BOOL result = FALSE;
-	const wchar_t *buf_top = LoadFileWA(filename, NULL);
+	const wchar_t *buf_top = LoadFileWW(filename, NULL);
 	const wchar_t *buf = buf_top;
 	if (buf == NULL) {
 		return FALSE;
@@ -157,8 +157,14 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	}
 
 	// 辞書をサーチする
-	if (!confirm && search_dictW(ts.ConfirmChangePasteStringFile, str_w)) {
-		confirm = TRUE;
+	if (ts.ConfirmChangePasteStringFile[0] != '\0') {
+		wchar_t *fname_rel =ToWcharA(ts.ConfirmChangePasteStringFile);
+		wchar_t *fnameW = GetFullPathW(ts.HomeDirW, fname_rel);
+		if (!confirm && search_dictW(fnameW, str_w)) {
+			confirm = TRUE;
+		}
+		free(fnameW);
+		free(fname_rel);
 	}
 
 	ret = IDOK;
