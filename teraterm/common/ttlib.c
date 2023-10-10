@@ -899,7 +899,6 @@ char *mctimelocal(const char *format, BOOL utc_flag)
 	SYSTEMTIME systime;
 	const size_t sizeof_strtime = 29;
 	char *strtime = malloc(sizeof_strtime);
-	*strtime = '\0';
 	static const char week[][4] = {
 		"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 	};
@@ -910,6 +909,7 @@ char *mctimelocal(const char *format, BOOL utc_flag)
 	char tmp[5];
 	unsigned int i = strlen(format);
 
+	*strtime = '\0';
 	if (utc_flag) {
 		GetSystemTime(&systime);
 	}

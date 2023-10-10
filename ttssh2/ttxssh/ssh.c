@@ -8500,11 +8500,12 @@ cancel_abort:
 static void CALLBACK do_SSH2_adjust_window_size_timer(
 	HWND hWnd, UINT uMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
+	Channel_t *c = (Channel_t *)nIDEvent;
+	PTInstVar pvar = c->scp.pvar;
+
 	(void)hWnd;
 	(void)uMsg;
 	(void)dwTime;
-	Channel_t *c = (Channel_t *)nIDEvent;
-	PTInstVar pvar = c->scp.pvar;
 
 	if (pvar->recv.data_finished) {
 		// 送信終了したのにメッセージが残っていた時対策
