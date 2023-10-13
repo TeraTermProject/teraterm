@@ -102,14 +102,30 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	</td>
 	<td>
 		<ul>
-			<li>Oniguruma</li>
-			<li>SFMT</li>
+			<li>Oniguruma
+				<ul>
+					<li>used as the regular expressions library</li>
+				</ul>
+			</li>
+			<li>SFMT
+				<ul>
+					<li>used as the random number generator</li>
+				</ul>
+			</li>
 		</ul>
 	</td>
 	<td>
 		<ul>
-			<li>Oniguruma</li>
-			<li>SFMT</li>
+			<li>Oniguruma
+				<ul>
+					<li>used as the regular expressions library</li>
+				</ul>
+			</li>
+			<li>SFMT
+				<ul>
+					<li>used as the random number generator</li>
+				</ul>
+			</li>
 		</ul>
 	</td>
 </tr>
@@ -150,23 +166,42 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 	<td>Linked library<a id="fn_link_6" href="#fn_6">*6</a></td>
 	<td>
 		<ul>
-			<li>SSLeay</li>
-			<li>zlib</li>
+			<li>SSLeay
+				<ul>
+					<li>used as the cryptographic library (libeay32.lib)</li>
+					<li>not used as SSL library (not ssleay32.lib)</li>
+				</ul>
+			</li>
+			<li>zlib
+				<ul>
+					<li>used as the compression library</li>
+				</ul>
+			</li>
 		<ul>
 	</td>
 	<td>
 		<ul>
 			<li>OpenSSL
 				<ul>
-					<li>used as the encryption library, but not used as TLS</li>
+					<li>used as the cryptographic library</li>
+					<li>not used as TLS library</li>
 				</ul>
 			</li>
-			<li>zlib</li>
-			<li>argon2</li>
+			<li>zlib
+				<ul>
+					<li>used as the compression library</li>
+				</ul>
+			</li>
+			<li>argon2
+				<ul>
+					<li>used for decrypt PuTTY private key file </li>
+				</ul>
+			</li>
 			<li>PuTTY
 				<ul>
 			    	<li>used for display tooltip</li>
-			    	<li>used for cooperation with Pageant, but not used for communication and terminal emulation</li>
+			    	<li>used for cooperation with Pageant</li>
+			    	<li>not used for communication and terminal emulation</li>
 			    </ul>
 			</li>
 		</ul>
@@ -175,14 +210,23 @@ Overview of difference between Teraterm 2.3 (original version) by Takashi Terani
 		<ul>
 			<li>LibreSSL
 				<ul>
-					<li>used as the encryption library, but not used as TLS</li>
+					<li>used as the cryptographic library, but not used as TLS</li>
 				</ul>
-			<li>zlib</li>
-			<li>argon2</li>
+			<li>zlib
+				<ul>
+					<li>used as the compression library</li>
+				</ul>
+			</li>
+			<li>argon2
+				<ul>
+					<li>used for decrypt PuTTY private key file </li>
+				</ul>
+			</li>
 			<li>PuTTY
 				<ul>
 			    	<li>used for display tooltip</li>
-			    	<li>used for cooperation with Pageant, but not used for communication and terminal emulation</li>
+			    	<li>used for cooperation with Pageant</li>
+			    	<li>not used for communication and terminal emulation</li>
 			    </ul>
 			</li>
 			<li>RLogin
