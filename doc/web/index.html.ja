@@ -69,15 +69,11 @@ TeraTerm Project は、ターミナルエミュレータ Tera Term 、および 
 <h2 id="Download">ダウンロード</h2>
 
 <p>
-最新のリリースは、OSDN より<a href="https://ja.osdn.net/projects/ttssh2/releases/">ダウンロード</a>することができますが、現在 OSDN が不安定なため <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub からダウンロード</a>できるようにしています。現在の最新版は <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-4_106"><!--https://ja.osdn.net/rel/ttssh2/4.106-->4.106</a> です。
+最新のリリースは、OSDN より<a href="https://ja.osdn.net/projects/ttssh2/releases/">ダウンロード</a>することができますが、現在 OSDN が不安定なため <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub からダウンロード</a>できるようにしています。現在の最新版は <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0"><!--https://ja.osdn.net/rel/ttssh2/5.0-->5.0</a> です。
 </p>
 
 <p>
-Tera Term 5 beta1 をテストしています。GitHub から<a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0_beta1"><!--https://osdn.net/projects/ttssh2/releases/p19105-->ダウンロード</a>できます。
-</p>
-
-<p>
-いち早く最新版を試したい方は、<a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVNリポジトリ</a>からソースコードを入手することができます。<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">スナップショット</a>もあります。<br>
+いち早く最新版を試したい方は、<a href="https://ja.osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVNリポジトリ</a>からソースコードを入手することができます。<br>
 <a href="https://ja.osdn.net/projects/ttssh2/releases/p15375">古いリリース</a>はこちらから入手可能ですが、なるべく最新版を利用することを推奨します。
 </p>
 
@@ -89,8 +85,18 @@ Tera Term 5 beta1 をテストしています。GitHub から<a href="https://gi
 しかし、ユーザは次のリリース内容を知ることができます。リリース内容に関する修正や要望を事前に挙げていただければ、開発者が対応しやすくなります。
 </p>
 <ul>
-<li><a href="/manual/4/ja/">Tera Term ヘルプ(Tera Term 4)</a> / <a href="/manual/5/ja/">Tera Term ヘルプ(Tera Term 5)</a></li>
-<li><a href="/manual/4/ja/macro/">MACROヘルプ(Tera Term 4)</a> / <a href="/manual/5/ja/macro/">MACROヘルプ(Tera Term 5)</a></li>
+  <li>Tera Term 5
+    <ul>
+      <li><a href="/manual/5/ja/">Tera Term ヘルプ</a></li>
+      <li><a href="/manual/5/ja/macro/">MACRO ヘルプ</a></li>
+    </ul>
+  </li>
+  <li>Tera Term 4
+    <ul>
+      <li><a href="/manual/4/ja/">Tera Term ヘルプ</a></li>
+      <li><a href="/manual/4/ja/macro/">MACRO ヘルプ</a></li>
+    </ul>
+  </li>
 </ul>
 
 <h2 id="Support">サポート</h2>

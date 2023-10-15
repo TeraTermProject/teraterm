@@ -69,15 +69,11 @@ TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH
 <h2 id="Download">Download</h2>
 
 <p>
-Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>, but currently OSDN is slow. We put a release binary to <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub</a>. Current latest release is <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-4_106"><!--https://osdn.net/rel/ttssh2/4.106-->4.106</a>.
+Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>, but currently OSDN is slow. We put a release binary to <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub</a>. Current latest release is <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0"><!--https://osdn.net/rel/ttssh2/4.107-->4.107</a>.
 </p>
 
 <p>
-Tera Term 5 beta1 is testing. Download from GitHub <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0_beta1"><!--https://osdn.net/projects/ttssh2/releases/p19105-->download page</a>.
-</p>
-
-<p>
-If you can get latest development version, the source code is available from <a href="https://osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVN repository</a>. And <a href="https://osdn.net/projects/ttssh2/storage/snapshot/">snapshot</a> is here.<br>
+If you can get latest development version, the source code is available from <a href="https://osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVN repository</a>.<br>
 Here is the <a href="https://osdn.net/projects/ttssh2/releases/p15375">Old release</a>, however we recommend using the latest release as possible.
 </p>
 
@@ -89,8 +85,18 @@ These manuals are the latest contents. New feature not including the release ver
 However, a user can check next version contents. Tera Term developer can preliminarily respond the user request.
 </p>
 <ul>
-<li><a href="/manual/4/en/">Tera Term Help Index(Tera Term 4)</a> / <a href="/manual/5/en/">Tera Term Help Index(Tera Term 5)</a></li>
-<li><a href="/manual/4/en/macro/">MACRO for Tera Term(Tera Term 4)</a> / <a href="/manual/5/en/macro/">MACRO for Tera Term(Tera Term 5)</a></li>
+  <li>Tera Term 5
+    <ul>
+      <li><a href="/manual/5/ja/">Tera Term Help</a></li>
+      <li><a href="/manual/5/ja/macro/">MACRO Help</a></li>
+    </ul>
+  </li>
+  <li>Tera Term 4
+    <ul>
+      <li><a href="/manual/4/ja/">Tera Term Help</a></li>
+      <li><a href="/manual/4/ja/macro/">MACRO Help</a></li>
+    </ul>
+  </li>
 </ul>
 
 <h2 id="Support">Support</h2>
