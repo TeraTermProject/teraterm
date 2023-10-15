@@ -1,4 +1,6 @@
 @echo off
+rem この外で set された RELEASE を上書きしないために setlocal する
+setlocal
 
 SET plugins=no
 SET rebuild=
@@ -91,6 +93,7 @@ copy nul %dst%\ttpmenu.ini
 copy nul %dst%\portable.ini
 )
 
+endlocal
 exit /b
 
 :help
@@ -103,6 +106,7 @@ echo   %0 release  通常のビルド + プラグインを含む + フォルダ名が特殊(Normal + P
 echo      アーカイブ版リリース作成用(for archive version released)
 echo   %0 rebuild ^>build.log 2^>^&1  ビルドログを採取する(Retrieve building log)
 echo.
+endlocal
 exit /b
 
 :fail
@@ -112,5 +116,6 @@ echo ================= E R R O R =======================
 echo ===================================================
 echo.
 echo ビルドに失敗しました (Failed to build source code)
+endlocal
 exit /b
 
