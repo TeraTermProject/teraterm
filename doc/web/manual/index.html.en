@@ -6,16 +6,16 @@
   <meta http-equiv="Content-Script-Type" content="text/javascript">
   <title>Tera Term Manual</title>
   <script type="text/javascript">
-    location.replace('https://ttssh2.osdn.jp/manual/4/en/');
+    location.replace('https://ttssh2.osdn.jp/manual/5/en/');
   </script>
-  <meta http-equiv="Refresh" content="0; URL=https://ttssh2.osdn.jp/manual/4/en/">
+  <meta http-equiv="Refresh" content="0; URL=https://ttssh2.osdn.jp/manual/5/en/">
 </head>
 
 <body>
 <noscript>
   <ul>
-    <li><a href="https://ttssh2.osdn.jp/manual/4/en/">Tera Term Manual (English)</a></li>
-    <li><a href="https://ttssh2.osdn.jp/manual/4/ja/">Tera Term マニュアル (日本語)</a></li>
+    <li><a href="https://ttssh2.osdn.jp/manual/5/en/">Tera Term Manual (English)</a></li>
+    <li><a href="https://ttssh2.osdn.jp/manual/5/ja/">Tera Term マニュアル (日本語)</a></li>
   </ul>
 </noscript>
 </body>
