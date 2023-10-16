@@ -34,6 +34,7 @@
 #include "key.h"
 #include "ttcommon.h"
 #include "codeconv.h"
+#include "ttxssh-version.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>

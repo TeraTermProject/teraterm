@@ -29,7 +29,7 @@ BEGIN
             VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2023 TeraTerm Project"
             VALUE "OriginalFilename", "TTPMACRO.EXE"
             VALUE "ProductName", "Tera Term"
-            VALUE "ProductVersion", TT_RES_VERSION_STR
+            VALUE "ProductVersion", TT_RES_PRODUCT_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"

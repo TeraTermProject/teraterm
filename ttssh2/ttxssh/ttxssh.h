@@ -68,7 +68,6 @@ See LICENSE.TXT for the license.
 
 typedef struct _TInstVar *PTInstVar;
 
-#include "ttxssh-version.h"
 #include "util.h"
 #include "pkt.h"
 #include "ssh.h"

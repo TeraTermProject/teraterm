@@ -34,6 +34,7 @@
 */
 
 #include "ttxssh.h"
+#include "ttxssh-version.h"
 #include "fwdui.h"
 #include "util.h"
 #include "ssh.h"

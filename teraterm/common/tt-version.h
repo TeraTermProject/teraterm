@@ -35,9 +35,29 @@
 // SUBSTR が不要な時は undef する
 //  使用例 "dev", "RC", "RC2"
 
-#define TT_TOSTR(x)                  TT_TOSTR2(x)
-#define TT_TOSTR2(x)                 #x
-#define TT_VERSION_STR(sep)          TT_TOSTR(TT_VERSION_MAJOR) sep TT_TOSTR(TT_VERSION_MINOR)
-#define TT_RES_VERSION_STR           TT_VERSION_STR(", ") ", 0, 0"
+#define TT_TOSTR(x)					TT_TOSTR_HELPER(x)
+#define TT_TOSTR_HELPER(x)			#x
+#define TT_VERSION_STR(sep)			TT_TOSTR(TT_VERSION_MAJOR) sep TT_TOSTR(TT_VERSION_MINOR)
 
 #include "svnversion.h"
+
+// TT_RES_PRODUCT_VERSION_STR
+//	リソースファイル(rcファイル) ProductVersion 用
+#if !defined(TT_VERSION_SUBSTR)
+	// ex "5.1"
+#define TT_RES_PRODUCT_VERSION_STR	TT_TOSTR(TT_VERSION_MAJOR) "." TT_TOSTR(TT_VERSION_MINOR)
+#elif !defined(SVNVERSION)
+	// ex "5.1 dev"
+#define TT_RES_PRODUCT_VERSION_STR	\
+				TT_TOSTR(TT_VERSION_MAJOR) "." TT_TOSTR(TT_VERSION_MINOR) " " TT_VERSION_SUBSTR
+#else
+	// ex "5.1 dev r9999"
+#define TT_RES_PRODUCT_VERSION_STR	\
+				TT_TOSTR(TT_VERSION_MAJOR) "." TT_TOSTR(TT_VERSION_MINOR) " " TT_VERSION_SUBSTR " r" TT_TOSTR(SVNVERSION)
+#endif
+
+// TT_RES_VERSION_STR
+// 	リソースファイル(rcファイル) FileVersion 用
+// 	ex "5, 1, 0, 0"
+#undef TT_RES_VERSION_STR
+#define TT_RES_VERSION_STR	TT_TOSTR(TT_VERSION_MAJOR) ", " TT_TOSTR(TT_VERSION_MINOR) ", 0, 0"
