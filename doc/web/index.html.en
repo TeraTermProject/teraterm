@@ -69,7 +69,7 @@ TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH
 <h2 id="Download">Download</h2>
 
 <p>
-Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>, but currently OSDN is slow. We put a release binary to <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub</a>. Current latest release is <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0"><!--https://osdn.net/rel/ttssh2/4.107-->4.107</a>.
+Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>, but currently OSDN is slow. We put a release binary to <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub</a>. Current latest release is <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0"><!--https://osdn.net/rel/ttssh2/5.0-->5.0</a>.
 </p>
 
 <p>
