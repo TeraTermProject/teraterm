@@ -5046,12 +5046,12 @@ WORD TTLStrSplit()
 #undef MAXVARNUM
 }
 
-WORD TTLStrJoin()
+static WORD TTLStrJoin(void)
 {
 #define MAXVARNUM 9
 	TStrVal delimchars, buf;
 	WORD Err;
-	TVarId VarId;
+	TVarId TargetVarId;
 	WORD VarType;
 	int maxvar;
 	int i;
@@ -5060,7 +5060,7 @@ WORD TTLStrJoin()
 	const char *p;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVar(&TargetVarId,&Err);
 	GetStrVal(delimchars,&Err);
 	// 3rd arg (optional)
 	if (CheckParameterGiven()) {
@@ -5088,7 +5088,7 @@ WORD TTLStrJoin()
 		return ErrSyntax;
 
 	char dest[MaxStrLen];
-	strcpy_s(dest, sizeof(dest), StrVarPtr(VarId));
+	strcpy_s(dest, sizeof(dest), StrVarPtr(TargetVarId));
 	srcptr = dest;
 
 	srcptr[0] = '\0';
@@ -5097,6 +5097,7 @@ WORD TTLStrJoin()
 	}
 	else {
 		for (i = 0 ; i < maxvar ; i++) {
+			TVarId VarId;
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "groupmatchstr%d", i + 1);
 			if (CheckVar(buf,&VarType,&VarId)) {
 				if (VarType!=TypString)
@@ -5109,7 +5110,7 @@ WORD TTLStrJoin()
 			}
 		}
 	}
-	SetStrVal(VarId, dest);
+	SetStrVal(TargetVarId, dest);
 
 	return Err;
 #undef MAXVARNUM
