@@ -141,7 +141,7 @@ UnicodeDebugParam_t UnicodeDebugParam;
 typedef struct {
 	char dbcs_lead_byte;
 	UINT monitor_DPI;			// ウィンドウが表示されているディスプレイのDPI
-	DWORD help_data;
+	DWORD help_id;				// WM_HELPメッセージ時、表示するヘルプID(0で表示しない)
 } vtwin_work_t;
 static vtwin_work_t vtwin_work;
 
@@ -329,6 +329,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 	vtwin_work.dbcs_lead_byte = 0;
 	vtwin_work.monitor_DPI = 0;
+	vtwin_work.help_id = 0;
 
 	// UnicodeDebugParam
 	{
@@ -5328,11 +5329,21 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	}
 	case WM_HELP: {
+		// 次の場合に発生する
+		//		- F1 キー押下
+		//		- MessageBox() の MB_HELP の HELP ボタン押下
+		// - F1キー押下時、WM_HELP, WM_KEYDOWN, KEYUP とメッセージが発生する
+		// - WM_HELP で何か処理をしていると WM_KEYDOWN がなくなるようだ
 		vtwin_work_t *w = &vtwin_work;
-		OpenHelpCV(&cv, HH_HELP_CONTEXT, w->help_data);
-		break;
+		if (w->help_id != 0) {
+			// ヘルプがセットされている
+			OpenHelpCV(&cv, HH_HELP_CONTEXT, w->help_id);
+			break;
+		}
+		goto default_proc;
 	}
 	default:
+	default_proc:
 		retval = DefWindowProc(msg, wp, lp);
 		break;
 	}
@@ -5340,14 +5351,18 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 }
 
 /**
- *	WM_HELP メッセージを受信したとき表示するヘルプのヘルプIDを設定する
+ *	WM_HELP メッセージを受信したとき表示するヘルプのヘルプIDを設定/解除する
  *
- *		MessageBox() の uType に MB_HELP を設定すると
- *		表示されるHELPボタンを押したときに
- *		WM_HELP が親ウィンドウに送られる
+ *	@param data		0		ヘルプ解除
+ *					0以外	ヘルプID
+ *
+ * - MessageBox() の uType に MB_HELP を設定時、HELPボタンが表示される
+ * - VTWindows を親にした MessageBox() の HELPボタンが押されたとき、
+ *	 このAPIで設定したヘルプIDのヘルプが表示される
+ * - MessageBox() を閉じたときに 0をセットすること
  */
-void VtwinSetHelpId(DWORD data)
+void VtwinSetHelpId(DWORD help_id)
 {
 	vtwin_work_t *w = &vtwin_work;
-	w->help_data = data;
+	w->help_id = help_id;
 }

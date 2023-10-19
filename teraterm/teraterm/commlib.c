@@ -418,6 +418,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					};
 					VtwinSetHelpId(HlpAboutQandaConnection);
 					TTMessageBoxW(cv->HWin, &info, ts->UILanguageFileW);
+					VtwinSetHelpId(0);
 				}
 				goto BreakSC;
 			}
