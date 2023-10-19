@@ -145,34 +145,19 @@ static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
 	}
 }
 
-/*
- * Log ダイアログのうち、Enable/Disable が変化するコントロール
- *
- * - Append
- *   指定されたファイルが存在する場合は Enable
- *   指定されたファイルが存在しない場合は Disable
- *
- * - BOM, Encoding
- *   Text かつ New/Overwrite の場合に Enable
- *   そうでない場合に Disable
- *   BOM はファイルの先頭から書き込むときしか意味がない
- *   Encoding は追記でも意味があるが、既存ファイルのエンコーディングを
- *   強制的にダイアログに反映するので、ユーザによる指定はさせない
- *
- * - Plain Text, Timestamp, Timestamp 種別
- *   Text の場合は Enable
- *   Binary の場合は Disable
- *
- * - Timestamp 種別
- *   Timestamp=on の場合は Enable
- *   Timestamp=off の場合は Disable
+/**
+ * ラジオボタン、ファイルの状態からコントロールをEnable/Disableする
  */
-static void ArrangeControls(HWND Dialog, LogDlgWork_t *work,
-                            WORD Append, WORD LogBinary,
-                            WORD LogTypePlainText, WORD LogTimestamp)
+static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 {
+	WORD Append, LogBinary;
+
+	GetRB(Dialog, &Append, IDC_APPEND, IDC_APPEND);
+	GetRB(Dialog, &LogBinary, IDC_FOPTBIN, IDC_FOPTBIN);
+
+	// Append ラジオボタン
 	if (work->file_exist) {
-		// Append ラジオボタンは、ファイルがあるときだけ有効になる
+		// 指定されたファイルが存在する場合は Enable
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), TRUE);
 
 		if (Append > 0) {
@@ -182,21 +167,32 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work,
 			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 		}
 	}
-	else { // ファイルがない -> 新規
+	else {
+		// 指定されたファイルが存在しない場合は Disable
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), FALSE);
+
+		// ファイルがない -> 新規
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 	}
 
+	// BOM, Encoding
 	if (!LogBinary && !Append) {
+		// Text かつ New/Overwrite の場合に Enable
 		EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
 		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
 	}
 	else {
+		// そうでない場合に Disable
+		//   BOM はファイルの先頭から書き込むときしか意味がない
+		//   Encoding は追記でも意味があるが、既存ファイルのエンコーディングを
+		//   強制的にダイアログに反映するので、ユーザによる指定はさせない
 		EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
 		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
 	}
 
+	// Plain Text, Timestamp, Timestamp 種別
 	if (LogBinary) {
+		// Binary の場合は Disable
 		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTBIN);
 
 		DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
@@ -204,20 +200,19 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work,
 		DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 	}
 	else {
+		// Text の場合は Enable
 		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTTEXT);
 
 		EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		EnableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 
-		if (LogTypePlainText) {
-			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		}
-		if (LogTimestamp) {
-			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-		else {
+		// Timestamp 種別
+		if (IsDlgButtonChecked(Dialog, IDC_TIMESTAMP) == BST_UNCHECKED) {
+			// Timestamp=off の場合は Disable
 			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+		} else {
+			// Timestamp=on の場合は Enable
+			EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		}
 	}
 
@@ -312,12 +307,19 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		SetWindowLongPtr(file_edit, GWLP_USERDATA, (LONG_PTR)work);
 		work->proc = (WNDPROC)SetWindowLongPtrW(file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
 
+		// timestamp
+		CheckDlgButton(Dialog, IDC_TIMESTAMP, pts->LogTimestamp == 0 ? BST_UNCHECKED : BST_CHECKED);
+
 		// timestamp 種別
 		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
 		             pts->LogTimestampType == TIMESTAMP_UTC ? 1 :
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
 		SendDlgItemMessageA(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
+		EnableWindow(GetDlgItem(Dialog, IDC_TIMESTAMPTYPE), pts->LogTimestamp == 0 ? FALSE : TRUE);
+
+		// plain text
+		CheckDlgButton(Dialog, IDC_PLAINTEXT, pts->LogTypePlainText == 0 ? BST_UNCHECKED : BST_CHECKED);
 
 		// Hide dialog チェックボックス
 		if (pts->LogHideDialog) {
@@ -402,14 +404,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		case IDC_FOPTTEXT:
 		case IDC_FOPTBIN:
 		case IDC_TIMESTAMP:
-			{
-				WORD Appnd, LogBinary, LogTypePlainText, LogTimestamp;
-				GetRB(Dialog, &Appnd, IDC_APPEND, IDC_APPEND);
-				GetRB(Dialog, &LogBinary, IDC_FOPTBIN, IDC_FOPTBIN);
-				GetRB(Dialog, &LogTypePlainText, IDC_PLAINTEXT, IDC_PLAINTEXT);
-				GetRB(Dialog, &LogTimestamp, IDC_TIMESTAMP, IDC_TIMESTAMP);
-				ArrangeControls(Dialog, work, Appnd, LogBinary, LogTypePlainText, LogTimestamp);
-			}
+			ArrangeControls(Dialog, work);
 			break;
 		case IDC_FOPT_FILENAME_EDIT:
 			if (HIWORD(wParam) == EN_CHANGE){
@@ -417,14 +412,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
 				CheckLogFile(Dialog, filename, work);
 				free(filename);
-				{
-					WORD Appnd, LogBinary, LogTypePlainText, LogTimestamp;
-					GetRB(Dialog, &Appnd, IDC_APPEND, IDC_APPEND);
-					GetRB(Dialog, &LogBinary, IDC_FOPTBIN, IDC_FOPTBIN);
-					GetRB(Dialog, &LogTypePlainText, IDC_PLAINTEXT, IDC_PLAINTEXT);
-					GetRB(Dialog, &LogTimestamp, IDC_TIMESTAMP, IDC_TIMESTAMP);
-					ArrangeControls(Dialog, work, Appnd, LogBinary, LogTypePlainText, LogTimestamp);
-				}
+				ArrangeControls(Dialog, work);
 			}
 			break;
 		}
