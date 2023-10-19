@@ -3793,6 +3793,8 @@ void CVTWindow::OnFileLog()
 {
 	FLogDlgInfo_t info;
 	info.filename = NULL;
+	info.pts = &ts;
+	info.pcv = &cv;
 	BOOL r = FLogOpenDialog(hInst, m_hWnd, &info);
 	if (r) {
 		const wchar_t *filename = info.filename;

@@ -35,6 +35,8 @@ typedef struct {
 	BOOL append;			// TRUE/FALSE = append/new(overwrite)
 	BOOL bom;				// TRUE = BOM‚ ‚è
 	LogCode_t code;
+	TTTSet *pts;
+	TComVar *pcv;
 } FLogDlgInfo_t;
 
 BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);

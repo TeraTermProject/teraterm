@@ -39,7 +39,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ftdlg.h"
-#include "ttwinman.h"
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -73,31 +72,31 @@ typedef struct {
  *		ダイアログで設定した値は一時的なもので
  *		設定を上書きするのは良くないのではないだろうか?
  */
-static void SetLogFlags(HWND Dialog)
+static void SetLogFlags(HWND Dialog, TTTSet *pts)
 {
 	WORD BinFlag, val;
 
 	GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
-	ts.LogBinary = BinFlag;
+	pts->LogBinary = BinFlag;
 
 	GetRB(Dialog, &val, IDC_APPEND, IDC_APPEND);
-	ts.Append = val;
+	pts->Append = val;
 
 	if (!BinFlag) {
 		GetRB(Dialog, &val, IDC_PLAINTEXT, IDC_PLAINTEXT);
-		ts.LogTypePlainText = val;
+		pts->LogTypePlainText = val;
 
 		GetRB(Dialog, &val, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		ts.LogTimestamp = val;
+		pts->LogTimestamp = val;
 	}
 
 	GetRB(Dialog, &val, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
-	ts.LogHideDialog = val;
+	pts->LogHideDialog = val;
 
 	GetRB(Dialog, &val, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
-	ts.LogAllBuffIncludedInFirst = val;
+	pts->LogAllBuffIncludedInFirst = val;
 
-	ts.LogTimestampType = (WORD)(GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1);
+	pts->LogTimestampType = (WORD)(GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1);
 }
 
 /**
@@ -122,8 +121,9 @@ static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
 		*exist = TRUE;
 
 		// BOM有り/無しチェック
-		FILE *fp = _wfopen(filename, L"rb");
-		if (fp != NULL) {
+		FILE *fp;
+		errno_t e = _wfopen_s(&fp, filename, L"rb");
+		if (e == 0 && fp != NULL) {
 			unsigned char tmp[4];
 			size_t l = fread(tmp, 1, sizeof(tmp), fp);
 			fclose(fp);
@@ -143,6 +143,15 @@ static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
 			}
 		}
 	}
+}
+
+static void CheckLogFile(const wchar_t *filename, LogDlgWork_t *work)
+{
+	BOOL exist;
+	int bom;
+	CheckLogFile(filename, &exist, &bom);
+	work->file_exist = exist;
+	work->current_bom = bom;
 }
 
 /**
@@ -225,15 +234,6 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 			bom == 3 ? 2 : 0;
 		SendDlgItemMessage(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, cur, 0);
 	}
-}
-
-static void CheckLogFile(HWND Dialog, const wchar_t *filename, LogDlgWork_t *work)
-{
-	BOOL exist;
-	int bom;
-	CheckLogFile(filename, &exist, &bom);
-	work->file_exist = exist;
-	work->current_bom = bom;
 }
 
 static LRESULT CALLBACK FNameEditProc(HWND dlg, UINT msg,
@@ -350,7 +350,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			work->info->append = IsDlgButtonChecked(Dialog, IDC_APPEND) == BST_CHECKED;
 			work->info->bom = IsDlgButtonChecked(Dialog, IDC_BOM) == BST_CHECKED;
 			work->info->code = (LogCode_t)SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_GETCURSEL, 0, 0);
-			SetLogFlags(Dialog);
+			SetLogFlags(Dialog, work->pts);
 			EndDialog(Dialog, IDOK);
 			break;
 		}
@@ -410,7 +410,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			if (HIWORD(wParam) == EN_CHANGE){
 				wchar_t *filename;
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
-				CheckLogFile(Dialog, filename, work);
+				CheckLogFile(filename, work);
 				free(filename);
 				ArrangeControls(Dialog, work);
 			}
@@ -464,14 +464,14 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
  *	@retval	TRUE	[ok] が押された
  *	@retval	FALSE	キャンセルされた
  */
-BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info)
+BOOL FLogOpenDialog(HINSTANCE hInst_, HWND hWnd, FLogDlgInfo_t *info)
 {
 	LogDlgWork_t *work = (LogDlgWork_t *)calloc(sizeof(LogDlgWork_t), 1);
 	work->info = info;
-	work->pts = &ts;
-	work->pcv = &cv;
+	work->pts = info->pts;
+	work->pcv = info->pcv;
 	INT_PTR ret = TTDialogBoxParam(
-		hInst, MAKEINTRESOURCE(IDD_LOGDLG),
+		hInst_, MAKEINTRESOURCE(IDD_LOGDLG),
 		hWnd, LogFnHook, (LPARAM)work);
 	free(work);
 	return ret == IDOK ? TRUE : FALSE;
