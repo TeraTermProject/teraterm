@@ -159,33 +159,21 @@ static void CheckLogFile(const wchar_t *filename, LogDlgWork_t *work)
  */
 static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 {
-	WORD Append, LogBinary;
-
-	GetRB(Dialog, &Append, IDC_APPEND, IDC_APPEND);
-	GetRB(Dialog, &LogBinary, IDC_FOPTBIN, IDC_FOPTBIN);
-
 	// Append ラジオボタン
 	if (work->file_exist) {
 		// 指定されたファイルが存在する場合は Enable
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), TRUE);
-
-		if (Append > 0) {
-			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
-		}
-		else {
-			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
-		}
 	}
 	else {
 		// 指定されたファイルが存在しない場合は Disable
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), FALSE);
-
-		// ファイルがない -> 新規
-		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 	}
 
+	const bool log_binary = IsDlgButtonChecked(Dialog, IDC_FOPTBIN) == BST_CHECKED;
+	const bool new_overwrite = IsDlgButtonChecked(Dialog, IDC_NEW_OVERWRITE) == BST_CHECKED;
+
 	// BOM, Encoding
-	if (!LogBinary && !Append) {
+	if (!log_binary && new_overwrite) {
 		// Text かつ New/Overwrite の場合に Enable
 		EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
 		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
@@ -200,18 +188,14 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 	}
 
 	// Plain Text, Timestamp, Timestamp 種別
-	if (LogBinary) {
+	if (log_binary) {
 		// Binary の場合は Disable
-		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTBIN);
-
 		DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 	}
 	else {
 		// Text の場合は Enable
-		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, IDC_FOPTTEXT);
-
 		EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		EnableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 
@@ -225,7 +209,7 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 		}
 	}
 
-	if (work->file_exist && Append) {
+	if (work->file_exist && !new_overwrite) {
 		// 既存ファイルのエンコーディングを反映する
 		int bom = work->current_bom;
 		int cur =
@@ -297,6 +281,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)"UTF-16BE");
 		SendDlgItemMessageA(Dialog, IDC_TEXTCODING_DROPDOWN, CB_SETCURSEL, 0, 0);
 
+		// new(overwrite)/append radio button
+		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
+						 pts->Append == 0 ? IDC_NEW_OVERWRITE : IDC_APPEND);
+
 		// ファイル名を設定する
 		//   ファイルのチェック、コントロールの設定も行われる
 		//		WM_COMMAND, EN_CHANGE が発生する
@@ -330,6 +318,9 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		if (pts->LogAllBuffIncludedInFirst) {
 			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 		}
+
+		// text/binary radio button
+		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, pts->LogBinary == 0 ? IDC_FOPTTEXT : IDC_FOPTBIN);
 
 		CenterWindow(Dialog, GetParent(Dialog));
 
@@ -410,8 +401,20 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			if (HIWORD(wParam) == EN_CHANGE){
 				wchar_t *filename;
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
+				const BOOL file_exist_prev = work->file_exist;
 				CheckLogFile(filename, work);
 				free(filename);
+				if (file_exist_prev != work->file_exist) {
+					if (work->file_exist) {
+						// ファイルが存在する、設定に合わせて新規(上書き)/追記を選択する
+						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
+										 work->pts->Append == 0 ? IDC_NEW_OVERWRITE : IDC_APPEND);
+					}
+					else {
+						// ファイルが存在しない、新規を選択する
+						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
+					}
+				}
 				ArrangeControls(Dialog, work);
 			}
 			break;
