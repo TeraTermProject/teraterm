@@ -52,14 +52,16 @@
 #include "logdlg.h"
 
 #define TitLog      L"Log"
+#define ID_EVENT	0
 
 typedef struct {
 	FLogDlgInfo_t *info;
 	// work
-	BOOL file_exist;
+	bool file_exist;
 	int current_bom; // 存在するファイルのエンコーディング（ファイルのBOMから判定）
-	UINT_PTR timer;
-	BOOL enable_timer;
+	bool available_timer;
+	bool enable_timer;
+	bool on_initdialog;
 	WNDPROC proc;
 	TTTSet *pts;
 	TComVar *pcv;
@@ -103,13 +105,13 @@ static void SetLogFlags(HWND Dialog, TTTSet *pts)
  *	ログファイルチェック
  *
  *	@param[in]	filename
- *	@param[out]	exist	TURE/FALSE
- *	@param[out]	bom		0	no BOM (or file not exist)
+ *	@param[out]	exist	ture/false
+ *	@param[out]	bom		0	no BOM (or file not exist or too short)
  *						1	UTF-8
  *						2	UTF-16LE
  *						3	UTF-16BE
  */
-static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
+static void CheckLogFile(const wchar_t *filename, bool *exist, int *bom)
 {
 	*exist = FALSE;
 	*bom = 0;
@@ -147,7 +149,7 @@ static void CheckLogFile(const wchar_t *filename, BOOL *exist, int *bom)
 
 static void CheckLogFile(const wchar_t *filename, LogDlgWork_t *work)
 {
-	BOOL exist;
+	bool exist;
 	int bom;
 	CheckLogFile(filename, &exist, &bom);
 	work->file_exist = exist;
@@ -229,7 +231,7 @@ static LRESULT CALLBACK FNameEditProc(HWND dlg, UINT msg,
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
 	case WM_KILLFOCUS:
-		work->enable_timer = FALSE;
+		work->enable_timer = false;
 		break;
 	}
 	return CallWindowProcW(work->proc, dlg, msg, wParam, lParam);
@@ -268,6 +270,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	switch (Message) {
 	case WM_INITDIALOG: {
 		work = (LogDlgWork_t *)lParam;
+		work->on_initdialog = true;
 		TTTSet *pts = work->pts;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)work);
 		::DragAcceptFiles(Dialog, TRUE);
@@ -284,16 +287,6 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// new(overwrite)/append radio button
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
 						 pts->Append == 0 ? IDC_NEW_OVERWRITE : IDC_APPEND);
-
-		// ファイル名を設定する
-		//   ファイルのチェック、コントロールの設定も行われる
-		//		WM_COMMAND, EN_CHANGE が発生する
-		wchar_t *fname = FLogGetLogFilename(work->info->filename);
-		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
-		free(fname);
-		HWND file_edit = GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT);
-		SetWindowLongPtr(file_edit, GWLP_USERDATA, (LONG_PTR)work);
-		work->proc = (WNDPROC)SetWindowLongPtrW(file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
 
 		// timestamp
 		CheckDlgButton(Dialog, IDC_TIMESTAMP, pts->LogTimestamp == 0 ? BST_UNCHECKED : BST_CHECKED);
@@ -322,12 +315,25 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// text/binary radio button
 		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, pts->LogBinary == 0 ? IDC_FOPTTEXT : IDC_FOPTBIN);
 
+		// ファイル名を設定する
+		//   ファイルのチェック、コントロールの設定も行われる
+		//		WM_COMMAND, EN_CHANGE が発生する
+		wchar_t *fname = FLogGetLogFilename(work->info->filename);
+		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+		free(fname);
+		HWND file_edit = GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT);
+		SetWindowLongPtr(file_edit, GWLP_USERDATA, (LONG_PTR)work);
+		work->proc = (WNDPROC)SetWindowLongPtrW(file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
+
 		CenterWindow(Dialog, GetParent(Dialog));
 
 		SetFocus(GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT));
 
-		work->enable_timer = TRUE;
-		work->timer = SetTimer(Dialog, 0, 1000, NULL);
+		work->enable_timer = true;
+		work->available_timer = true;
+		SetTimer(Dialog, ID_EVENT, 1000, NULL);
+
+		work->on_initdialog = false;
 
 		return TRUE;
 	}
@@ -401,10 +407,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			if (HIWORD(wParam) == EN_CHANGE){
 				wchar_t *filename;
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
-				const BOOL file_exist_prev = work->file_exist;
+				const bool file_exist_prev = work->file_exist;
 				CheckLogFile(filename, work);
 				free(filename);
-				if (file_exist_prev != work->file_exist) {
+				if (work->on_initdialog || file_exist_prev != work->file_exist) {
 					if (work->file_exist) {
 						// ファイルが存在する、設定に合わせて新規(上書き)/追記を選択する
 						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
@@ -414,8 +420,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						// ファイルが存在しない、新規を選択する
 						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 					}
+					ArrangeControls(Dialog, work);
 				}
-				ArrangeControls(Dialog, work);
 			}
 			break;
 		}
@@ -440,20 +446,20 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	}
 	case WM_TIMER: {
 		if (!work->enable_timer) {
-			KillTimer(Dialog, work->timer);
-			work->timer = 0;
+			KillTimer(Dialog, ID_EVENT);
+			work->available_timer = false;
 			break;
 		}
 		wchar_t *fname = FLogGetLogFilename(work->info->filename);
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
 		SendDlgItemMessageW(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, 0, -1);
 		free(fname);
-		work->timer = SetTimer(Dialog, 0, 1000, NULL);
 		break;
 	}
 	case WM_DESTROY:
-		if (work->timer != 0) {
-			KillTimer(Dialog, work->timer);
+		if (work->available_timer) {
+			KillTimer(Dialog, ID_EVENT);
+			work->available_timer = false;
 		}
 		break;
 	}
