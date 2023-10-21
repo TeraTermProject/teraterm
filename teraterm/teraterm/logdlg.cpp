@@ -51,7 +51,6 @@
 
 #include "logdlg.h"
 
-#define TitLog      L"Log"
 #define ID_EVENT	0
 
 typedef struct {
@@ -297,7 +296,6 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_CONNECTED ? 3 : 0;
 		SendDlgItemMessageA(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
-		EnableWindow(GetDlgItem(Dialog, IDC_TIMESTAMPTYPE), pts->LogTimestamp == 0 ? FALSE : TRUE);
 
 		// plain text
 		CheckDlgButton(Dialog, IDC_PLAINTEXT, pts->LogTypePlainText == 0 ? BST_UNCHECKED : BST_CHECKED);
@@ -367,10 +365,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			const wchar_t* simple_log_filter = L"*.txt;*.log";
 			wchar_t *FNFilter = GetCommonDialogFilterWW(simple_log_filter, UILanguageFile);
 
-			wchar_t *caption;
 			wchar_t *uimsg;
 			GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG",
-						 TitLog, UILanguageFile, &uimsg);
+						 L"Log", UILanguageFile, &uimsg);
+			wchar_t *caption;
 			aswprintf(&caption, L"Tera Term: %s", uimsg);
 			free(uimsg);
 
