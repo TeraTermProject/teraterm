@@ -4313,7 +4313,7 @@ void CVTWindow::OnSetupWindow()
 
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	char *orgTitle = strdup(ts.Title);
+	char *orgTitle = _strdup(ts.Title);
 	Ok = (*SetupWin)(HVTWin, &ts);
 
 	if (Ok) {
