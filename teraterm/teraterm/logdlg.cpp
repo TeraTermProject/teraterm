@@ -427,19 +427,13 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	case WM_DROPFILES: {
 		// ï°êîÉhÉçÉbÉvÇ≥ÇÍÇƒÇ‡ç≈èâÇÃ1Ç¬ÇæÇØÇàµÇ§
 		HDROP hDrop = (HDROP)wParam;
-		const UINT len = DragQueryFileW(hDrop, 0, NULL, 0);
-		if (len == 0) {
-			DragFinish(hDrop);
-			return TRUE;
-		}
-		wchar_t *filename = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
-		DragQueryFileW(hDrop, 0, filename, len + 1);
-		filename[len] = '\0';
+		wchar_t *filename;
+		hDragQueryFileW(hDrop, 0, &filename);
+		DragFinish(hDrop);
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename);
-		SendDlgItemMessage(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, len, len);
+		SendDlgItemMessageW(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, 0, -1);
 		free(filename);
-		DragFinish(hDrop);
 		return TRUE;
 	}
 	case WM_TIMER: {

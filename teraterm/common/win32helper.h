@@ -49,6 +49,7 @@ DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded);
 LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
 						  LPDWORD lpcbData);
 DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text);
+DWORD hDragQueryFileW(HDROP hDrop, UINT iFile, wchar_t **filename);
 
 #ifdef __cplusplus
 }

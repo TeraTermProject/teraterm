@@ -323,3 +323,21 @@ DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text)
 	*text = dest;
 	return NO_ERROR;
 }
+
+DWORD hDragQueryFileW(HDROP hDrop, UINT iFile, wchar_t **filename)
+{
+	const UINT len = DragQueryFileW(hDrop, iFile, NULL, 0);
+	if (len == 0) {
+		*filename = NULL;
+		return NO_ERROR;
+	}
+	wchar_t *fname = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
+	if (fname == NULL) {
+		*filename = NULL;
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	DragQueryFileW(hDrop, iFile, fname, len + 1);
+	fname[len] = '\0';
+	*filename = fname;
+	return NO_ERROR;
+}
