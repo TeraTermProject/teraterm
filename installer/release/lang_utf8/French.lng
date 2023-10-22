@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-09-09)
+﻿; Updated by TeraTerm Project (2023-10-22)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -988,10 +988,10 @@ MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
 MSG_SSH_AGENTERROR_TITLE=Bad agent request
 MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
 MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=TTSSH: file open error
-MSG_SSH_SCP_FILEOPEN_READ_ERROR=Can't open file for reading:
+MSG_SSH_SCP_FILEOPEN_READ_ERROR=Can't open file for reading: %s %s
 MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=`%s' file is read only.
 MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM=`%s' file exists.\noverwrite it?
-MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=Can't open file for writing:
+MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=Can't open file for writing: %s %s
 MSG_SSH_SCP_CONFIRM_TITLE=TTSSH: confirm
 MSG_SSH_SCP_ERROR_TITLE=TTSSH: SCP error
 MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)

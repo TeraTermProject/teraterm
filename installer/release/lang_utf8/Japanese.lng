@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-09-09)
+﻿; Updated by TeraTerm Project (2023-10-22)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -985,10 +985,10 @@ MSG_SSH_SUBSYSTEM_REQUEST_ERROR=サブシステムの要求が失敗しました
 MSG_SSH_AGENTERROR_TITLE=不正なエージェント要求
 MSG_SSH_AGENTERROR_TOOLARGE=エージェント要求のメッセージが大きすぎるので無視します.
 MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=TTSSH: ファイルオープンエラー
-MSG_SSH_SCP_FILEOPEN_READ_ERROR=読み取り用にファイルを開けません:
+MSG_SSH_SCP_FILEOPEN_READ_ERROR=読み取り用にファイルを開けません: %s %s
 MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=ファイル `%s' は読み取り専用です.
 MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM=ファイル `%s' が存在します.\n上書きしますか？
-MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=書き込み用にファイルを開けません:
+MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=書き込み用にファイルを開けません: %s %s
 MSG_SSH_SCP_CONFIRM_TITLE=TTSSH: 確認
 MSG_SSH_SCP_ERROR_TITLE=TTSSH: SCP エラー
 MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP エラー (SCP_INIT)

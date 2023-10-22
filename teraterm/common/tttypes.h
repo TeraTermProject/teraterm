@@ -347,7 +347,7 @@ struct tttset {
 	WORD XmodemOpt, XmodemBin;
 	int ZmodemDataLen, ZmodemWinSize;
 	int QVWinSize;
-	char FileDir[MAXPATHLEN];		// switch FileDirW
+	char reserve_FileDir[256];		// switch FileDirW
 	char FileSendFilter[128];
 	WORD Language;
 	char DelimList[52];
@@ -541,7 +541,7 @@ struct tttset {
 	WORD LogLockExclusive;
 	WORD KermitOpt;
 	WORD FontQuality;
-	char ScpSendDir[MAXPATHLEN];
+	char ScpSendDir[MAXPATHLEN];				// SCP 送信先(ホストのディレクトリ)
 	char reserver_BGImageFilePath[MAX_PATH];
 	int LogRotate;		//	enum rotate_mode LogRotate;
 	DWORD LogRotateSize;

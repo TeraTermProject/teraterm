@@ -43,21 +43,18 @@
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
 #include <openssl/md5.h>
+
 #include <limits.h>
 #include <malloc.h>
 #include <string.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
 #include <stdlib.h>
+#include <crtdbg.h>
 #include <process.h>
 #include <time.h>
 #include <commctrl.h>
-#include "buffer.h"
-#include "ssh.h"
-#include "crypt.h"
-#include "fwd.h"
-#include "sftp.h"
-#include "kex.h"
-#include "dlglib.h"
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/utime.h>
@@ -68,6 +65,16 @@
 #ifdef _DEBUG	// KEX logging
 #include <fcntl.h>
 #endif
+
+
+#include "buffer.h"
+#include "ssh.h"
+#include "crypt.h"
+#include "fwd.h"
+#include "sftp.h"
+#include "kex.h"
+#include "dlglib.h"
+#include "win32helper.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
@@ -4196,22 +4203,55 @@ static void ExtractFileNameU8(const char *PathName, char *FileName, size_t destl
 	}
 }
 
+static int accessU8(const char *pathU8, int mode)
+{
+	wchar_t *pathW = ToWcharU8(pathU8);
+	int r = _waccess(pathW, mode);
+	free(pathW);
+	return r;
+}
+
+DWORD hFormatMessageW(DWORD error, wchar_t **message)
+{
+	LPWSTR lpMsgBuf;
+	DWORD r =
+		FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+		NULL,
+		error,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPWSTR)&lpMsgBuf,
+		0,
+		NULL);
+	if (r == 0) {
+		*message = NULL;
+		return GetLastError();
+	}
+	*message = _wcsdup(lpMsgBuf);
+	LocalFree(lpMsgBuf);
+	return NO_ERROR;
+}
+
 /**
  *	SCP support
  *
- *	@param sendfile		UTF-8
- *	@param dstfile		UTF-8
- *	@param direction
+ *	@param sendfile		ファイル名,UTF-8
+ *	@param dstfile		ファイル名,UTF-8
+ *						TOREMOTE のとき、
+ *							NULL のとき、ホームフォルダ
+ *							相対パス、ホームフォルダからの相対?
+ *							絶対パス
+ *						TOLOCAL のとき
+ *							NULL のとき、ダウンロードフォルダ
+ *							相対パス、カレントフォルダからの相対?
+ *							絶対パス
+ *	@param direction	TOREMOTE	copy local to remote
+ *						FROMREMOTE	copy remote to local
+ *
  */
-int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_dir direction)
+int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction)
 {
-	buffer_t *msg;
-	char *s;
-	unsigned char *outmsg;
-	int len;
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
-	struct __stat64 st;
 
 	// ソケットがクローズされている場合は何もしない。
 	if (pvar->socket == INVALID_SOCKET)
@@ -4235,25 +4275,22 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	}
 
 	if (direction == TOREMOTE) {  // copy local to remote
+		struct __stat64 st;
 		fp = fopenU8(sendfile, "rb");
 		if (fp == NULL) {
-			char buf[1024];
-			int len;
-			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_READ_ERROR", pvar,
-			                  "Can't open file for reading:");
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s ", pvar->UIMsg);
-			len = strlen(buf);
-			FormatMessage(
-			    FORMAT_MESSAGE_FROM_SYSTEM,
-			    NULL,
-			    GetLastError(),
-			    0,
-			    buf+len,
-			    sizeof(buf)-len,
-			    NULL);
-			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", pvar,
-			                  "TTSSH: file open error");
-			MessageBox(NULL, buf, pvar->UIMsg, MB_OK | MB_ICONERROR);
+			static const TTMessageBoxInfoW info = {
+				"TTSSH",
+				"MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", L"TTSSH: file open error",
+				"MSG_SSH_SCP_FILEOPEN_READ_ERROR", L"Can't open file for reading: %s %s",
+				MB_OK | MB_ICONERROR
+			};
+			DWORD error = GetLastError();
+			wchar_t *err_str;
+			hFormatMessageW(error, &err_str);
+			wchar_t *fname = ToWcharU8(sendfile);
+			TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, err_str, fname);
+			free(fname);
+			free(err_str);
 			goto error;
 		}
 
@@ -4276,62 +4313,67 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 
 		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
 			char *fn;
-			char FileDirExpanded[MAX_PATH];
+			wchar_t *FileDirExpanded;
+			char *FileDirExpandedU8;
 
 			fn = strrchr(sendfile, '/');
 			if (fn && fn[1] == '\0')
 				goto error;
 
-			ExpandEnvironmentStrings(pvar->ts->FileDir, FileDirExpanded, sizeof(FileDirExpanded));
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpanded, fn ? fn : sendfile);
+			hExpandEnvironmentStringsW(pvar->ts->FileDirW, &FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpanded);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
+			free(FileDirExpanded);
+			free(FileDirExpandedU8);
 			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
 		} else {
 			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dstfile);
 			ExtractFileName(dstfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
 		}
 
-		if (_access(c->scp.localfilefull, 0x00) == 0) {
-			char buf[512];
+		if (accessU8(c->scp.localfilefull, 0x00) == 0) {
 			int dlgresult;
-			if (_access(c->scp.localfilefull, 0x02) == -1) { // 0x02 == writable
-				UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_READONLY_ERROR", pvar,
-				                  "`%s' file is read only.");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, c->scp.localfilefull);
-				UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", pvar,
-				                  "TTSSH: file open error");
-				MessageBox(NULL, buf, pvar->UIMsg, MB_OK | MB_ICONERROR);
+			if (accessU8(c->scp.localfilefull, 0x02) == -1) { // 0x02 == writable
+				static const TTMessageBoxInfoW info = {
+					"TTSSH",
+					"MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", L"TTSSH: file open error",
+					"MSG_SSH_SCP_FILEOPEN_READONLY_ERROR", L"`%s' file is read only.",
+					MB_OK | MB_ICONERROR
+				};
+				wchar_t *fname = ToWcharU8(c->scp.localfilefull);
+				TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, fname);
+				free(fname);
 				goto error;
 			}
-			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM", pvar,
-			                  "`%s' file exists.\noverwrite it?");
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, c->scp.localfilefull);
-			UTIL_get_lang_msg("MSG_SSH_SCP_CONFIRM_TITLE", pvar,
-			                  "TTSSH: confirm");
-			dlgresult = MessageBox(NULL, buf, pvar->UIMsg, MB_YESNO | MB_ICONQUESTION);
+			static const TTMessageBoxInfoW info = {
+				"TTSSH",
+				"MSG_SSH_SCP_CONFIRM_TITLE", L"TTSSH: confirm",
+				"MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM", L"`%s' file exists.\noverwrite it?",
+				MB_YESNO | MB_ICONQUESTION
+			};
+			wchar_t *fname = ToWcharU8(c->scp.localfilefull);
+			dlgresult = TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, fname);
+			free(fname);
 			if (dlgresult == IDNO) {
 				goto error;
 			}
 		}
 
-		fp = fopen(c->scp.localfilefull, "wb");
+		fp = fopenU8(c->scp.localfilefull, "wb");
 		if (fp == NULL) {
-			char buf[1024];
-			int len;
-			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_WRITE_ERROR", pvar,
-			                  "Can't open file for writing:");
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s ", pvar->UIMsg);
-			len = strlen(buf);
-			FormatMessage(
-			    FORMAT_MESSAGE_FROM_SYSTEM,
-			    NULL,
-			    GetLastError(),
-			    0,
-			    buf+len,
-			    sizeof(buf)-len,
-			    NULL);
-			UTIL_get_lang_msg("MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", pvar,
-			                  "TTSSH: file open error");
-			MessageBox(NULL, buf, pvar->UIMsg, MB_OK | MB_ICONERROR);
+			static const TTMessageBoxInfoW info = {
+				"TTSSH",
+				"MSG_SSH_SCP_FILEOPEN_ERROR_TITLE", L"TTSSH: file open error",
+				"MSG_SSH_SCP_FILEOPEN_WRITE_ERROR", L"Can't open file for writing: %s %s",
+				MB_OK | MB_ICONERROR
+			};
+			DWORD error = GetLastError();
+			wchar_t *err_str;
+			hFormatMessageW(error, &err_str);
+			wchar_t *fname = ToWcharU8(c->scp.localfilefull);
+			TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, err_str, fname);
+			free(fname);
+			free(err_str);
 			goto error;
 		}
 
@@ -4342,21 +4384,28 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	c->scp.dir = direction;
 	c->scp.state = SCP_INIT;
 
-	// session open
-	msg = buffer_init();
-	if (msg == NULL) {
-		goto error;
+	{
+		buffer_t *msg;
+		char *s;
+		unsigned char *outmsg;
+		int len;
+
+		// session open
+		msg = buffer_init();
+		if (msg == NULL) {
+			goto error;
+		}
+		s = "session";
+		buffer_put_string(msg, s, strlen(s));  // ctype
+		buffer_put_int(msg, c->self_id);  // self(channel number)
+		buffer_put_int(msg, c->local_window);  // local_window
+		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
+		len = buffer_len(msg);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
+		memcpy(outmsg, buffer_ptr (msg), len);
+		finish_send_packet(pvar);
+		buffer_free(msg);
 	}
-	s = "session";
-	buffer_put_string(msg, s, strlen(s));  // ctype
-	buffer_put_int(msg, c->self_id);  // self(channel number)
-	buffer_put_int(msg, c->local_window);  // local_window
-	buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
-	len = buffer_len(msg);
-	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-	memcpy(outmsg, buffer_ptr (msg), len);
-	finish_send_packet(pvar);
-	buffer_free(msg);
 
 	g_scp_sending = TRUE;
 
@@ -7426,7 +7475,8 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 {
-	int len, ret;
+	int len;
+	INT_PTR ret;
 	char *data;
 	buffer_t *msg = NULL;
 	char *s, *username;
@@ -8094,7 +8144,7 @@ typedef struct scp_dlg_parm {
 	size_t buflen;
 } scp_dlg_parm_t;
 
-static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static int closed = 0;
 
@@ -8181,21 +8231,13 @@ static int is_canceled_window(HWND hd)
 		return 0;
 }
 
-/* dlglib に全く同じものがあるのでそちらを利用する */
-#if 0
-void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
-	HWND HProg;
-	HProg = GetDlgItem(HDlg, id_Progress);
-
-	*CurProgStat = 0;
-
-	SendMessage(HProg, PBM_SETRANGE, (WPARAM)0, MAKELPARAM(0, 100));
-	SendMessage(HProg, PBM_SETSTEP, (WPARAM)1, 0);
-	SendMessage(HProg, PBM_SETPOS, (WPARAM)0, 0);
-
-	return;
+static BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8)
+{
+	wchar_t *strW = ToWcharU8(strU8);
+	BOOL retval = SetDlgItemTextW(hDlg, nIDDlgItem, strW);
+	free(strW);
+	return retval;
 }
-#endif
 
 static unsigned __stdcall ssh_scp_thread(void *p)
 {
@@ -8215,8 +8257,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	buflen = min(c->remote_window, 8192*4); // max 32KB
 	buf = malloc(buflen);
 
-	//SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfile);
-	SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
+	SetDlgItemTextU8(hWnd, IDC_FILENAME, c->scp.localfilefull);
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
@@ -8351,8 +8392,8 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		HANDLE thread;
 		unsigned int tid;
 
-		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
-		                       pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
+		hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
+								 pvar->cv->HWin, ssh_scp_dlg_proc);
 		if (hDlgWnd != NULL) {
 			static const DlgTextInfo text_info[] = {
 				{ 0, "DLG_SCP_PROGRESS_TITLE_SENDFILE" },
@@ -8697,8 +8738,8 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			// 進捗ウィンドウ
 			c->scp.pvar = pvar;
-			hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
-			                       pvar->cv->HWin, (DLGPROC)ssh_scp_dlg_proc);
+			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
+									 pvar->cv->HWin, ssh_scp_dlg_proc);
 			if (hDlgWnd != NULL) {
 				static const DlgTextInfo text_info[] = {
 					{ 0, "DLG_SCP_PROGRESS_TITLE_RECEIVEFILE" },
@@ -8709,7 +8750,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 				c->scp.progress_window = hDlgWnd;
-				SendMessage(GetDlgItem(hDlgWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
+				SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
 				ShowWindow(hDlgWnd, SW_SHOW);
 			}
 
@@ -8830,7 +8871,7 @@ static void SSH2_scp_response(PTInstVar pvar, Channel_t *c, unsigned char *data,
 error:
 	{  // error
 		char msg[2048];
-		unsigned int i, max;
+		unsigned int max;
 		int offset, resp;
 
 		resp = data[0];
@@ -8843,14 +8884,12 @@ error:
 			offset = 0;
 		}
 
-		if (buflen > sizeof(msg))
-			max = sizeof(msg);
+		if (buflen > sizeof(msg) - 1)
+			max = sizeof(msg) - 1;
 		else
 			max = buflen - offset;
-		for (i = 0 ; i < max ; i++) {
-			msg[i] = data[i + offset];
-		}
-		msg[i] = '\0';
+		memcpy(msg, &data[offset], max);
+		msg[max] = '\0';
 
 		// よく分からないエラーの場合は、自身でチャネルをクローズする。
 		// .bashrc に"stty stop undef"が定義されていると、TTSSHが落ちる問題への暫定処置。
@@ -8863,9 +8902,12 @@ error:
 			//ssh2_channel_send_close(pvar, c);
 		}
 
-		UTIL_get_lang_msg("MSG_SSH_SCP_ERROR_TITLE", pvar,
-		                  "TTSSH: SCP error");
-		MessageBox(NULL, msg, pvar->UIMsg, MB_OK | MB_ICONEXCLAMATION);
+		wchar_t uimsgW[MAX_UIMSG];
+		UTIL_get_lang_msgW("MSG_SSH_SCP_ERROR_TITLE", pvar,
+						   L"TTSSH: SCP error", uimsgW);
+		wchar_t *msgW = ToWcharU8(msg);
+		MessageBoxW(pvar->cv->HWin, msgW, uimsgW, MB_OK | MB_ICONEXCLAMATION);
+		free(msgW);
 	}
 }
 

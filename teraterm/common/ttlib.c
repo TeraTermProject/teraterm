@@ -237,7 +237,7 @@ BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos)
 	return TRUE;
 }
 
-BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen)
+BOOL ExtractFileName(const char *PathName, PCHAR FileName, int destlen)
 {
 	int i, j;
 
@@ -249,7 +249,7 @@ BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen)
 	return (strlen(FileName)>0);
 }
 
-BOOL ExtractDirName(PCHAR PathName, PCHAR DirName)
+BOOL ExtractDirName(const char *PathName, PCHAR DirName)
 {
 	int i, j;
 

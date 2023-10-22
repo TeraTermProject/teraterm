@@ -1175,7 +1175,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		free(ts->FileDirW);
 		ts->FileDirW = GetDownloadFolderW();
 	}
-	WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
 
 	/* filter on file send (2007.6.5 maya) */
 	GetPrivateProfileString(Section, "FileSendFilter", "",
@@ -3770,7 +3769,9 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			if (dir != NULL && wcslen(dir) > 0 && DoesFolderExistW(dir)) {
 				free(ts->FileDirW);
 				ts->FileDirW = _wcsdup(dir);
+#if 0
 				WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
+#endif
 			}
 			free(dir);
 		}

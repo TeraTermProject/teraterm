@@ -450,7 +450,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	}
 	case CmdChangeDir:
-		strncpy_s(ts.FileDir, sizeof(ts.FileDir),ParamFileName, _TRUNCATE);
+		free(ts.FileDirW);
+		ts.FileDirW = ToWcharU8(ParamFileName);
 		break;
 	case CmdClearScreen:
 		switch (ParamFileName[0]) {

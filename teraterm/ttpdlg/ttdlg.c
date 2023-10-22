@@ -1891,7 +1891,6 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						if (DoesFolderExistW(FileDirExpanded)) {
 							free(ts->FileDirW);
 							ts->FileDirW = new_dir;
-							WideCharToACP_t(ts->FileDirW, ts->FileDir, sizeof(ts->FileDir));
 							OK = TRUE;
 						}
 						else {

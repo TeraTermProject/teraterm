@@ -104,6 +104,7 @@
 #include "win32helper.h"
 #include "comportinfo.h"
 #include "asprintf.h"
+#include "ttcommdlg.h"
 
 #include "libputty.h"
 
@@ -3283,51 +3284,56 @@ int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize
 	return (datalength); // success
 }
 
+/**
+ *	SCPのパスを保存する
+ *
+ *	TODO
+ *	- tsに書き戻してしまってよい?
+ *	- Unicode化する
+ */
+static void SavePaths(HWND dlg, TTTSet *pts)
+{
+	// 送信パスを ts->ScpSendDir に保存
+	char sendfiledir[MAX_PATH];
+	GetDlgItemTextA(dlg, IDC_SENDFILE_TO, sendfiledir, _countof(sendfiledir));
+	strncpy_s(pts->ScpSendDir, sizeof(pts->ScpSendDir), sendfiledir, _TRUNCATE);
+
+#if 0
+	// 受信パスを ts->FileDir に保存
+	char recvdir[MAX_PATH];
+	GetDlgItemTextA(dlg, IDC_RECVFILE_TO, recvdir, _countof(recvdir));
+	strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
+#endif
+}
+
 //
 // SCP dialog
 //
 static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
-	static char sendfile[MAX_PATH] = "";
-	static char sendfiledir[MAX_PATH] = "";
-	static char recvdir[MAX_PATH] = "";
-	HWND hWnd;
-	HDROP hDrop;
-	UINT uFileNo;
-	char szFileName[256];
-	int i;
-
 	switch (msg) {
-	case WM_INITDIALOG:
-		{
-			static const DlgTextInfo text_info[] = {
-				{ 0, "DLG_SCP_TITLE" },
-				{ IDC_SENDFILE_FROM_LABEL, "DLG_SCP_SENDFILE_FROM" },
-				{ IDC_SENDFILE_TO_LABEL, "DLG_SCP_SENDFILE_TO" },
-				{ IDC_SENDFILE_NOTE, "DLG_SCP_SENDFILE_DRAG" },
-				{ IDOK, "DLG_SCP_SENDFILE_SEND" },
-				{ IDCANCEL, "DLG_SCP_SENDFILE_CANCEL" },
-				{ IDC_RECEIVEFILE_FROM_LABEL, "DLG_SCP_RECEIVEFILE_FROM" },
-				{ IDC_RECVFILE_TO_LABEL, "DLG_SCP_RECEIVEFILE_TO" },
-				{ IDC_RECV, "DLG_SCP_RECEIVEFILE_RECEIVE" },
-			};
-			SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
-		}
+	case WM_INITDIALOG: {
+		static const DlgTextInfo text_info[] = {
+			{ 0, "DLG_SCP_TITLE" },
+			{ IDC_SENDFILE_FROM_LABEL, "DLG_SCP_SENDFILE_FROM" },
+			{ IDC_SENDFILE_TO_LABEL, "DLG_SCP_SENDFILE_TO" },
+			{ IDC_SENDFILE_NOTE, "DLG_SCP_SENDFILE_DRAG" },
+			{ IDOK, "DLG_SCP_SENDFILE_SEND" },
+			{ IDCANCEL, "DLG_SCP_SENDFILE_CANCEL" },
+			{ IDC_RECEIVEFILE_FROM_LABEL, "DLG_SCP_RECEIVEFILE_FROM" },
+			{ IDC_RECVFILE_TO_LABEL, "DLG_SCP_RECEIVEFILE_TO" },
+			{ IDC_RECV, "DLG_SCP_RECEIVEFILE_RECEIVE" },
+		};
+		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 		DragAcceptFiles(dlg, TRUE);
 
 		// SCPファイル送信先を表示する
-		if (sendfiledir[0] == '\0') {
-			_snprintf_s(sendfiledir, sizeof(sendfiledir), _TRUNCATE, pvar->ts->ScpSendDir); // home directory
-		}
-		SendMessage(GetDlgItem(dlg, IDC_SENDFILE_TO), WM_SETTEXT, 0, (LPARAM)sendfiledir);
+		SetDlgItemTextA(dlg, IDC_SENDFILE_TO, pvar->ts->ScpSendDir);
 
 		// SCPファイル受信先を表示する
-		if (recvdir[0] == '\0') {
-			_snprintf_s(recvdir, sizeof(recvdir), _TRUNCATE, "%s", pvar->ts->FileDir);
-		}
-		SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
+		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, pvar->ts->FileDirW);
 
 #ifdef SFTP_DEBUG
 		ShowWindow(GetDlgItem(dlg, IDC_SFTP_TEST), SW_SHOW);
@@ -3335,126 +3341,109 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		CenterWindow(dlg, GetParent(dlg));
 
 		return TRUE;
+	}
 
-	case WM_DROPFILES:
-		{
-		hDrop = (HDROP)wParam;
-		uFileNo = DragQueryFile((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
-		for(i = 0; i < (int)uFileNo; i++) {
-			DragQueryFile(hDrop, i, szFileName, sizeof(szFileName));
-
+	case WM_DROPFILES: {
+		HDROP hDrop = (HDROP)wParam;
+		UINT uFileNo = DragQueryFile((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
+		if (uFileNo > 0) {
+			const UINT len = DragQueryFileW(hDrop, 0, NULL, 0);
+			if (len == 0) {
+				DragFinish(hDrop);
+				return TRUE;
+			}
+			wchar_t *filename = (wchar_t *)malloc(sizeof(wchar_t) * (len + 1));
+			DragQueryFileW(hDrop, 0, filename, len + 1);
+			filename[len] = '\0';
 			// update edit box
-			hWnd = GetDlgItem(dlg, IDC_SENDFILE_EDIT);
-			SendMessage(hWnd, WM_SETTEXT , 0, (LPARAM)szFileName);
+			SetDlgItemTextW(dlg, IDC_SENDFILE_EDIT, filename);
+			free(filename);
 		}
 		DragFinish(hDrop);
-		}
 		return TRUE;
+	}
 
 	case WM_COMMAND:
 		switch (wParam) {
-		case IDC_SENDFILE_SELECT | (BN_CLICKED << 16):
-			{
-			OPENFILENAME ofn;
+		case IDC_SENDFILE_SELECT | (BN_CLICKED << 16): {
+			TTOPENFILENAMEW ofn = {0};
 
-			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = dlg;
 #if 0
 			get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
 			             "exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
 #endif
-			ofn.lpstrFilter = "all(*.*)\0*.*\0\0";
-			ofn.lpstrFile = sendfile;
-			ofn.nMaxFile = sizeof(sendfile);
-#if 0
-			get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_TITLE", uimsg, sizeof(uimsg),
-			             "Choose a executing file with launching logging file", ts.UILanguageFile);
-#endif
+			ofn.lpstrFilter = L"all(*.*)\0*.*\0\0";
 			UTIL_get_lang_msg("DLG_SCP_SELECT_FILE_TITLE", pvar,
 			                  "Choose a sending file with SCP");
-			ofn.lpstrTitle = pvar->UIMsg;
-
+			wchar_t *UIMsgW;
+			GetI18nStrWW("TTSSH", "DLG_SCP_SELECT_FILE_TITLE", L"Choose a sending file with SCP", pvar->ts->UILanguageFileW, &UIMsgW);
+			ofn.lpstrTitle = UIMsgW;
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 			ofn.Flags |= OFN_FORCESHOWHIDDEN;
-			if (GetOpenFileName(&ofn) != 0) {
-				hWnd = GetDlgItem(dlg, IDC_SENDFILE_EDIT);
-				SendMessage(hWnd, WM_SETTEXT , 0, (LPARAM)sendfile);
+			wchar_t *filename;
+			if (TTGetOpenFileNameW(&ofn, &filename)) {
+				SetDlgItemTextW(dlg, IDC_SENDFILE_EDIT, filename);
+				free(filename);
 			}
-			}
+			free(UIMsgW);
+
 			return TRUE;
-		case IDC_RECVDIR_SELECT | (BN_CLICKED << 16):
-			{
-			wchar_t *buf, *buf2, uimsg[MAX_UIMSG];
-			hGetDlgItemTextW(dlg, IDC_RECVFILE_TO, &buf);
+		}
+		case IDC_RECVDIR_SELECT | (BN_CLICKED << 16): {
+			wchar_t *cur_dir, *new_dir, uimsg[MAX_UIMSG];
+			hGetDlgItemTextW(dlg, IDC_RECVFILE_TO, &cur_dir);
 			UTIL_get_lang_msgW("DLG_SCP_SELECT_DEST_TITLE", pvar,
 			                   L"Choose destination directory", uimsg);
-			if (doSelectFolderW(dlg, buf, uimsg, &buf2)) {
-				WideCharToACP_t(buf2, recvdir, sizeof(recvdir));
-				SetDlgItemTextA(dlg, IDC_RECVFILE_TO, recvdir);
-				free(buf2);
+			if (doSelectFolderW(dlg, cur_dir, uimsg, &new_dir)) {
+				SetDlgItemTextW(dlg, IDC_RECVFILE_TO, new_dir);
+				free(new_dir);
 			}
-			free(buf);
+			free(cur_dir);
 			}
 			return TRUE;
 		}
 
 		switch (LOWORD(wParam)) {
-		case IDOK:  // ファイル送信
-			hWnd = GetDlgItem(dlg, IDC_SENDFILE_EDIT);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfile), (LPARAM)sendfile);
-			if (sendfile[0] != '\0') {
-				// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
-				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
-				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
-				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
+		case IDOK: {  // ファイル送信
+			wchar_t *filenameW;
+			hGetDlgItemTextW(dlg, IDC_SENDFILE_EDIT, &filenameW);
+			if (filenameW != NULL) {
+				// 送信パス
+				wchar_t *sendfiledirW;
+				hGetDlgItemTextW(dlg, IDC_SENDFILE_TO, &sendfiledirW);
 
-				// 受信パスを取り出し、ts->FileDir も合わせて更新する。
-				hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
-				SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
-				strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
-
-				SSH_start_scp(pvar, sendfile, sendfiledir);
+				char *sendfiledirU8 = ToU8W(sendfiledirW);
+				char *filenameU8 = ToU8W(filenameW);
+				SSH_start_scp(pvar, filenameU8, sendfiledirU8);
 				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
+				free(filenameU8);
+				free(sendfiledirU8);
+				free(sendfiledirW);
+				free(filenameW);
+
+				SavePaths(dlg, pvar->ts);
+
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;
 			}
 			return FALSE;
+		}
 
-		case IDCANCEL:
-			// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
-			hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
-			strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
-
-			// 受信パスを取り出し、ts->FileDir も合わせて更新する。
-			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
-			strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
+		case IDCANCEL: {
+			SavePaths(dlg, pvar->ts);
 
 			EndDialog(dlg, 0); // dialog close
 			return TRUE;
+		}
 
-		case IDC_RECV:  // ファイル受信
-			hWnd = GetDlgItem(dlg, IDC_RECVFILE);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(szFileName), (LPARAM)szFileName);
-			if (szFileName[0] != '\0') {
-				char recvpath[MAX_PATH] = "";
-				char* fn = strrchr(szFileName, '/');
-				char recvfn[sizeof(szFileName)];
-				char recvdir_expanded[MAX_PATH];
-
-				// 送信パスを取り出し、ts->ScpSendDir も合わせて更新する。
-				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
-				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
-				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
-
-				// 受信パスを取り出し、ts->FileDir も合わせて更新する。
-				hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
-				SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
-				ExpandEnvironmentStrings(recvdir, recvdir_expanded, sizeof(recvdir_expanded));
-				strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
-
+		case IDC_RECV: {
+			// ファイル受信
+			wchar_t *FileNameW;
+			hGetDlgItemTextW(dlg, IDC_RECVFILE, &FileNameW);
+			if (FileNameW != NULL) {
+				// 受信ファイルからパスを取り除く
+				wchar_t *fn = wcsrchr(FileNameW, L'/');
 				if (fn) {
 					fn++;
 					if (*fn == '\0') {
@@ -3462,16 +3451,40 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 					}
 				}
 				else {
-					fn = szFileName;
+					fn = FileNameW;
 				}
-				strncpy_s(recvfn, sizeof(recvfn), fn, _TRUNCATE);
-				replaceInvalidFileNameChar(recvfn, '_');
-				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir_expanded, recvfn);
-				SSH_scp_transaction(pvar, szFileName, recvpath, FROMREMOTE);
+				wchar_t *recvfn = replaceInvalidFileNameCharW(fn, '_');
+
+				// 受信パス
+				wchar_t *recvdirW;
+				hGetDlgItemTextW(dlg, IDC_RECVFILE_TO, &recvdirW);
+				wchar_t *recvdir_expanded;
+				hExpandEnvironmentStringsW(recvdirW, &recvdir_expanded);
+
+				wchar_t *recvpathW;
+				if (recvdir_expanded[0] != 0) {
+					aswprintf(&recvpathW, L"%s\\%s", recvdir_expanded, recvfn);
+				} else {
+					recvpathW = _wcsdup(recvfn);
+				}
+				char *recvpathU8 = ToU8W(recvpathW);
+				char *FileNameU8 = ToU8W(FileNameW);
+				SSH_scp_transaction(pvar, FileNameU8, recvpathU8, FROMREMOTE);
+				free(FileNameW);
+				free(recvfn);
+				free(recvdirW);
+				free(recvdir_expanded);
+				free(recvpathW);
+				free(recvpathU8);
+				free(FileNameU8);
+
+				SavePaths(dlg, pvar->ts);
+
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;
 			}
 			return FALSE;
+		}
 
 		case IDC_SFTP_TEST:
 			SSH_sftp_transaction(pvar);
