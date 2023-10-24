@@ -674,14 +674,16 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSetDebug:
 		TermSetDebugMode(Command[1] - '0');
 		break;
-	case CmdSetTitle:
-		strncpy_s(ts.Title, sizeof(ts.Title),ParamFileName, _TRUNCATE);
+	case CmdSetTitle: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		WideCharToACP_t(ParamFileNameW, ts.Title, _countof(ts.Title));
 		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
 			free(cv.TitleRemoteW);
 			cv.TitleRemoteW = NULL;
 		}
 		ChangeTitle();
 		break;
+	}
 	case CmdShowTT:
 		switch (ParamFileName[0]) {
 		case '-': ShowWindow(HVTWin,SW_HIDE); break;
