@@ -499,10 +499,18 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdEnableKeyb:
 		KeybEnabled = (ParamBinaryFlag!=0);
 		break;
-	case CmdGetTitle:
+	case CmdGetTitle: {
 		// title is transferred later by XTYP_REQUEST
-		strncpy_s(ParamFileName, sizeof(ParamFileName),ts.Title, _TRUNCATE);
+		char *titleU8 = ToU8A(ts.Title);
+		if (titleU8 == NULL) {
+			ParamFileName[0] = 0;
+		}
+		else {
+			strncpy_s(ParamFileName, sizeof(ParamFileName), titleU8, _TRUNCATE);
+			free(titleU8);
+		}
 		break;
+	}
 	case CmdInit: // initialization signal from TTMACRO
 		if (StartupFlag) // in case of startup macro
 		{ // TTMACRO is waiting for connecting to the host
