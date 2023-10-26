@@ -3784,7 +3784,6 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			if (f != NULL) {
 				free(ts->KeyCnfFNW);
 				ts->KeyCnfFNW = f;
-				WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 			}
 		}
 		else if ((_wcsnicmp(Temp, L"/KR=", 4) == 0) ||

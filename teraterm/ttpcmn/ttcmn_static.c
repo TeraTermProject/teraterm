@@ -221,7 +221,6 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 	// KEYBOARD.CNF のフルパス
 	ts->KeyCnfFNW = NULL;
 	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
-	WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 
 	// ポータブルモードではなく、
 	// 個人設定ファイルのあるフォルダ HomeDirW に TERATERM.INI が存在しないとき

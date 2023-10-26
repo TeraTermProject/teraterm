@@ -4707,7 +4707,6 @@ void CVTWindow::OnSetupLoadKeyMap()
 	if (Ok) {
 		free(ts.KeyCnfFNW);
 		ts.KeyCnfFNW = NameW;
-		WideCharToACP_t(ts.KeyCnfFNW, ts.KeyCnfFN, _countof(ts.KeyCnfFN));
 
 		// load key map
 		SetKeyMap();
