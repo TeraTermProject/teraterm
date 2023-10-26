@@ -3698,7 +3698,7 @@ void CVTWindow::OnDuplicateSession()
 	// セッション複製を行う際、/K= があれば引き継ぎを行うようにする。
 	// cf. http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682
 	// (2011.3.27 yutaka)
-	if (strlen(ts.KeyCnfFN) > 0) {
+	if (ts.KeyCnfFNW != NULL) {
 		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}

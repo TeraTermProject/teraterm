@@ -556,10 +556,14 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	}
-	case CmdLoadKeyMap:
-		strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN),ParamFileName, _TRUNCATE);
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdLoadKeyMap,0);
+	case CmdLoadKeyMap: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		free(ts.KeyCnfFNW);
+		ts.KeyCnfFNW = ParamFileNameW;
+		WideCharToACP_t(ts.KeyCnfFNW, ts.KeyCnfFN, sizeof(ts.KeyCnfFN));
+		PostMessage(HVTWin, WM_USER_ACCELCOMMAND, IdCmdLoadKeyMap, 0);
 		break;
+	}
 
 	case CmdLogRotate: {
 		char *p = ParamFileName;

@@ -3782,6 +3782,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		else if (_wcsnicmp(Temp, L"/K=", 3) == 0) {	/* Keyboard setup file */
 			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".CNF");
 			if (f != NULL) {
+				free(ts->KeyCnfFNW);
 				ts->KeyCnfFNW = f;
 				WideCharToACP_t(ts->KeyCnfFNW, ts->KeyCnfFN, _countof(ts->KeyCnfFN));
 			}
