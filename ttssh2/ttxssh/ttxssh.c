@@ -51,6 +51,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <locale.h>		// for setlocale()
 
 #include "resource.h"
 #include <commctrl.h>
@@ -4976,6 +4977,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		// リーク時のブロック番号を元にブレークを仕掛けるには、以下のようにする。
 		//_CrtSetBreakAlloc(3228);
 #endif
+		setlocale(LC_ALL, "");
 		DisableThreadLibraryCalls(hInstance);
 		hInst = hInstance;
 		pvar = &InstVar;
