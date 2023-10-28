@@ -5,13 +5,13 @@ Background {
 }
 
 Viewpoint {
-	position -0 -30 350
+	position 0 -30 350
 }
 
 # T Logo
 DEF T Transform {
 	children [
-		Transform { 
+		Transform {
 			translation 0 0 -1
 			children [
 				Shape {
@@ -24,19 +24,19 @@ DEF T Transform {
 						solid TRUE
 						coord Coordinate{
 							point	[
-							-40	40	3,
-							-40	30	3,
-							40	30	3,
-							40	40	3,
-							-6	30	3,
-							-6	-40	3,
-							6	-40	3,
-							6	30	3
+							-45 43  2,
+							-45 25  2,
+							-10  25  2,
+							-10 -41 2,
+							10  -41  2,
+							10 25 2,
+							45 25 2,
+							45  43 2
 							]
 						}
 						coordIndex	[
-							0,1,2,3,-1,
-							4,5,6,7,-1
+						0,1,6,7,-1,
+						2,3,4,5,-1
 						]
 					}
 				}
@@ -53,7 +53,6 @@ DEF monitor Transform {
 				Shape {
 					appearance Appearance {
 						material Material {
-#							transparency   0.2
 							diffuseColor 1 0.9 0.5
 						}
 					}
@@ -75,7 +74,7 @@ DEF monitor Transform {
 			]
 		}
 		#Back ground 02
-		Transform { 
+		Transform {
 			children [
 				Shape {
 					appearance Appearance {
@@ -594,6 +593,7 @@ DEF monitor Transform {
 				}
 			]
 		}
+		#Back ground 22
 		Transform {
 			children [
 				Shape {
@@ -621,23 +621,6 @@ DEF monitor Transform {
 		}
 
 		# monitor
-#		Transform { 
-#			translation 0 0 -0.2
-#			children [
-#				Shape {
-#					appearance Appearance {
-#						material Material {
-#							transparency   0
-#							diffuseColor 0.8 0.8 0.4
-#						}
-#						texture ImageTexture{
-#							url "yellow_grad.jpg"
-#						}
-#					}
-#					geometry Box {size 150 110 0.2}
-#				}
-#			]
-#		}
 		Transform {
 			translation -80 -60 0
 			rotation 1 0 0 1.57
@@ -695,7 +678,7 @@ DEF monitor Transform {
 			]
 		}
 		#TOP Bezel
-		Transform { 
+		Transform {
 			translation 0 60 0
 			children [
 				Shape {
@@ -709,7 +692,7 @@ DEF monitor Transform {
 			]
 		}
 		#BOTTOM Bezel
-		Transform { 
+		Transform {
 			translation 0 -60 0
 			children [
 				Shape {
@@ -723,7 +706,7 @@ DEF monitor Transform {
 			]
 		}
 		#LEFT Bezel
-		Transform { 
+		Transform {
 			translation -80 0 0
 			children [
 				Shape {
@@ -737,7 +720,7 @@ DEF monitor Transform {
 			]
 		}
 		#Right Bezel
-		Transform { 
+		Transform {
 			translation 80 0 0
 			children [
 				Shape {
@@ -768,7 +751,7 @@ DEF keyboad Transform {
 							emissiveColor 0.3 0.3 0.3
 						}
 					}
-					geometry Cylinder {radius 5 height 2}
+					geometry Cylinder {radius 5 height 3}
 				}
 			]
 		}
@@ -783,7 +766,7 @@ DEF keyboad Transform {
 							emissiveColor 0.3 0.3 0.3
 						}
 					}
-					geometry Cylinder {radius 5 height 2}
+					geometry Cylinder {radius 5 height 3}
 				}
 			]
 		}
@@ -798,7 +781,7 @@ DEF keyboad Transform {
 							emissiveColor 0.3 0.3 0.3
 						}
 					}
-					geometry Cylinder {radius 5 height 2}
+					geometry Cylinder {radius 5 height 3}
 				}
 			]
 		}
@@ -813,12 +796,12 @@ DEF keyboad Transform {
 							emissiveColor 0.3 0.3 0.3
 						}
 					}
-					geometry Cylinder {radius 5 height 2}
+					geometry Cylinder {radius 5 height 3}
 				}
 			]
 		}
-		#SIDE FIT
-		Transform { 
+		#Keyboard width
+		Transform {
 			translation 0 10 0
 			children [
 				Shape {
@@ -828,12 +811,12 @@ DEF keyboad Transform {
 							emissiveColor 0.3 0.3 0.3
 						}
 					}
-					geometry Box {size 170 80 2}
+					geometry Box {size 170 80 3}
 				}
 			]
 		}
-		#TATE FIT
-		Transform { 
+		#keybord height
+		Transform {
 			translation 0 10 0
 			children [
 				Shape {
@@ -843,12 +826,12 @@ DEF keyboad Transform {
 							emissiveColor 0.3 0.3 0.3
 						}
 					}
-					geometry Box {size 160 90 2}
+					geometry Box {size 160 90 3}
 				}
 			]
 		}
 		#KEY TOP
-		Transform { 
+		Transform {
 			translation 0 12 2
 			children [
 				Shape {
@@ -858,7 +841,7 @@ DEF keyboad Transform {
 							emissiveColor 0.5 0.5 0.5
 						}
 					}
-					geometry Box {size 150 45 1}
+					geometry Box {size 150 45 2}
 				}
 			]
 		}
