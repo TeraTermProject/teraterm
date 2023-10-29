@@ -28,9 +28,9 @@
 <h1><!--img src="images/teraterm.gif" alt="" width="32" height="32"-->Tera Term Home Page<!--img src="images/ttssh.gif" alt="" width="32" height="32"--></h1>
 
 <p>
-[<a href="https://osdn.net/projects/ttssh2/">Project page</a>] 
+[<a href="https://github.com/TeraTermProject/teraterm">Project page</a>] 
 [<a href="/manual/en/about/copyright.html">License</a>] 
-[<a href="https://osdn.net/projects/ttssh2/releases/">Download</a> (<a href="https://github.com/TeraTermProject/osdn-download/releases">mirror</a>)]  
+[<a href="<a href="https://github.com/TeraTermProject/teraterm/releases">Download</a>] 
 [<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
 [<a href="/manual/en/">Document</a>] 
 [<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
@@ -63,17 +63,18 @@ document.write('(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###
 <h2 id="Project">TeraTerm Project</h2>
 
 <p>
-TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH module "TTSSH". This software is open source software under <a href="/manual/en/about/copyright.html">BSD License</a>. This is Tera Term Pro 2.3 succession version and is being officially recognized by the original author. Development is continuing in <a href="https://osdn.net/projects/ttssh2/">Project Page</a> on OSDN.
+TeraTerm Project would have been developed terminal emulator "Tera Term" and SSH module "TTSSH". This software is open source software under <a href="/manual/en/about/copyright.html">BSD License</a>. This is Tera Term Pro 2.3 succession version and is being officially recognized by the original author. Development is continuing in <a href="https://github.com/TeraTermProject/teraterm">Project Page</a> on GitHub.
 </p>
 
 <h2 id="Download">Download</h2>
 
 <p>
-Latest version is available from OSDN <a href="https://osdn.net/projects/ttssh2/releases/">download page</a>, but currently OSDN is slow. We put a release binary to <a href="https://github.com/TeraTermProject/osdn-download/releases">GitHub</a>. Current latest release is <a href="https://github.com/TeraTermProject/osdn-download/releases/tag/teraterm-5.0"><!--https://osdn.net/rel/ttssh2/5.0-->5.0</a>.
+Latest version is available from GitHub <a href="https://github.com/TeraTermProject/teraterm/releases">release page</a>.<br>
+Current latest release is <a href="https://github.com/TeraTermProject/teraterm/releases/tag/v5.0">5.0</a>.
 </p>
 
 <p>
-If you can get latest development version, the source code is available from <a href="https://osdn.net/projects/ttssh2/svn/view/trunk/?root=ttssh2">SVN repository</a>.<br>
+If you can get latest development version, the source code is available from <a href="https://github.com/TeraTermProject/teraterm">repository</a>.<br>
 Here is the <a href="https://osdn.net/projects/ttssh2/releases/p15375">Old release</a>, however we recommend using the latest release as possible.
 </p>
 
@@ -102,11 +103,7 @@ However, a user can check next version contents. Tera Term developer can prelimi
 <h2 id="Support">Support</h2>
 
 <p>
-Please report bugs to <a href="https://osdn.net/projects/ttssh2/ticket/?type%5B%5D=5333&type_mode%5B%5D=eq&status%5B%5D=1">Bugs</a> of Ticket.
-</p>
-
-<p>
-If you have a request to Tera Term, please post to <a href="https://osdn.net/projects/ttssh2/ticket/?type%5B%5D=5336&type_mode%5B%5D=eq&status%5B%5D=1">Feature Requests</a> of ticket. It is possibly implemeneted to future release.
+Please report bugs, or you have a request to Tera Term, please post to <a href="https://github.com/TeraTermProject/teraterm/issues">issues</a>.
 </p>
 
 <p>
@@ -120,13 +117,8 @@ The <a href="http://logmett.com/forum/">support forum</a> is maintanced by Boris
 <h2 id="Source">Source code</h2>
 
 <p>
-<a href="https://osdn.net/projects/ttssh2/scm/svn/tree/head/trunk/">View source code with web browser and download ZIP/TAR archive.</a>
+Repository: <a href="https://github.com/TeraTermProject/teraterm">https://github.com/TeraTermProject/teraterm</a>
 </p>
-
-<p>
-<a href="tsvn:http://svn.osdn.net/svnroot/ttssh2/trunk">Checkout source code by using TortoiseSVN software.</a>
-</p>
-
 
 <h2 id="Development">Development</h2>
 
@@ -161,10 +153,10 @@ Tera Term language files to localize the menu and the message are as follows. If
 
 <tr>
   <td>English</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/English.lng">English.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/English.lng">English.lng</a></td>
   <td rowspan="8">2019-11-22</td>
   <td>-</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/English.lng">English.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/English.lng">English.lng</a></td>
   <td rowspan="8">2021-12-08</td>
   <td>-</td>
   <td>-</td>
@@ -172,63 +164,63 @@ Tera Term language files to localize the menu and the message are as follows. If
 
 <tr>
   <td>Japanese</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Japanese.lng">Japanese.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Japanese.lng">Japanese.lng</a></td>
   <td>-</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Japanese.lng">Japanese.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Japanese.lng">Japanese.lng</a></td>
   <td>-</td>
   <td>-</td>
 </tr>
 
 <tr>
   <td>German</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/German.lng">German.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/German.lng">German.lng</a></td>
   <td>2010-05-17</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/German.lng">German.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/German.lng">German.lng</a></td>
   <td>2010-05-17</td>
   <td>Alexander Wiechert</td>
 </tr>
 
 <tr>
   <td>French</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/French.lng">French.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/French.lng">French.lng</a></td>
   <td>2010-07-21</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/French.lng">French.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/French.lng">French.lng</a></td>
   <td>2010-07-21</td>
   <td>Francois MOCQ</td>
 </tr>
 
 <tr>
   <td>Russian</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Russian.lng">Russian.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Russian.lng">Russian.lng</a></td>
   <td>2017-07-19</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Russian.lng">Russian.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Russian.lng">Russian.lng</a></td>
   <td>2017-07-19</td>
   <td>Sergey Ryumik</td>
 </tr>
 
 <tr>
   <td>Korean</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Korean.lng">Korean.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Korean.lng">Korean.lng</a></td>
   <td>2013-07-25</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Korean.lng">Korean.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Korean.lng">Korean.lng</a></td>
   <td>2013-07-25</td>
   <td>Daehong Kim</td>
 </tr>
 
 <tr>
   <td>Chinese (Simplified)</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
   <td>2017-04-11</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
   <td>2017-04-11</td>
   <td>LiShaohui</td>
 </tr>
 
 <tr>
   <td>Chinese (Traditional)</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/branches/4-stable/installer/release/lang/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
   <td>2014-09-22</td>
-  <td><a href="https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/installer/release/lang_utf8/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
   <td>2014-09-22</td>
   <td>Wei Yan</td>
 </tr>
