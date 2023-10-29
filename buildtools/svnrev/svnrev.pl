@@ -26,8 +26,9 @@ my $overwrite = 0;
 my %svninfo = (
 	name => '',
 	release => 0,
-	Revision => ''
-	);
+	Revision => '',
+	vcs => '',
+);
 
 sub read_toolinfo {
 	my $info = "toolinfo.txt";
@@ -129,13 +130,29 @@ sub compare_file {
 sub write_info_header {
 	my ($out_header, %svninfo) = @_;
 	my $revision = $svninfo{'Revision'};
+	my $vcs = $svninfo{'vcs'};
 
 	open(my $FD, ">$out_header") or die "error $out_header";
 	print $FD "/* $header */\n";
 	print $FD "/* #define TT_VERSION_STR \"$version\" check teraterm/common/tt-version.h */\n";
-	if ($revision ne '') {
-		print $FD "#define SVNVERSION $revision\n";
-	} else {
+	if ($vcs eq 'git') {
+		if ($revision ne '') {
+			print $FD "#define GITVERSION \"$revision\"\n";
+		} else {
+			print $FD "#undef GITVERSION\n";
+		}
+		print $FD "#undef SVNVERSION\n";
+	}
+	elsif ($vcs eq 'svn') {
+		print $FD "#undef GITVERSION\n";
+		if ($revision ne '') {
+			print $FD "#define SVNVERSION $revision\n";
+		} else {
+			print $FD "#undef SVNVERSION\n";
+		}
+	}
+	else {
+		print $FD "#undef GITVERSION\n";
 		print $FD "#undef SVNVERSION\n";
 	}
 	if ($svninfo{'release'}) {
@@ -150,13 +167,29 @@ sub write_info_header {
 sub write_info_bat {
 	my ($out_bat, %svninfo) = @_;
 	my $revision = $svninfo{'Revision'};
+	my $vcs = $svninfo{'vcs'};
 
 	open(my $FD, ">$out_bat") or die "error $out_bat";
 	print $FD "\@rem $header\n";
 	print $FD "set VERSION=$version\n";
-	if ($revision ne '') {
-		print $FD "set SVNVERSION=$revision\n";
-	} else {
+	if ($vcs eq 'git') {
+		if ($revision ne '') {
+			print $FD "set GITVERSION=$revision\n";
+		} else {
+			print $FD "set GITVERSION=unknown\n";
+		}
+		print $FD "set SVNVERSION=unknown\n";
+	}
+	elsif ($vcs eq 'svn') {
+		print $FD "set GITVERSION=unknown\n";
+		if ($revision ne '') {
+			print $FD "set SVNVERSION=$revision\n";
+		} else {
+			print $FD "set SVNVERSION=unknown\n";
+		}
+	}
+	else {
+		print $FD "set GITVERSION=unknown\n";
 		print $FD "set SVNVERSION=unknown\n";
 	}
 	print $FD "set RELEASE=$svninfo{'release'}\n";
@@ -168,13 +201,29 @@ sub write_info_bat {
 sub write_info_cmake {
 	my ($out_cmake, %svninfo) = @_;
 	my $revision = $svninfo{'Revision'};
+	my $vcs = $svninfo{'vcs'};
 
 	open(my $FD, ">$out_cmake") or die "error $out_cmake";
 	print $FD "# $header\n";
 	print $FD "set(VERSION \"$version\")\n";
-	if ($revision ne '') {
-		print $FD "set(SVNVERSION \"$revision\")\n";
-	} else {
+	if ($vcs eq 'git') {
+		if ($revision ne '') {
+			print $FD "set(GITVERSION \"$revision\")\n";
+		} else {
+			print $FD "#set(GITVERSION \"0000\")\n";
+		}
+		print $FD "#set(SVNVERSION \"0000\")\n";
+	}
+	elsif ($vcs eq 'svn') {
+		print $FD "#set(GITVERSION \"0000\")\n";
+		if ($revision ne '') {
+			print $FD "set(SVNVERSION \"$revision\")\n";
+		} else {
+			print $FD "#set(SVNVERSION \"0000\")\n";
+		}
+	}
+	else {
+		print $FD "#set(GITVERSION \"0000\")\n";
 		print $FD "#set(SVNVERSION \"0000\")\n";
 	}
 	print $FD "set(RELEASE $svninfo{'release'})\n";
@@ -250,6 +299,8 @@ if ($verbose != 0) {
 }
 
 if (-d "$source_root/.svn" && $svn ne "") {
+	$svninfo{'vcs'} = 'svn';
+
 	# svn infoを実行、出力をすべて取り込む
 	if (!open(my $FD, "-|", "\"$svn\" info --xml $source_root 2>&1")) {
 		# svn が実行できない
@@ -277,6 +328,8 @@ if (-d "$source_root/.svn" && $svn ne "") {
 	}
 }
 elsif(-d "$source_root/.git" && $git ne "") {
+	$svninfo{'vcs'} = 'git';
+
 	my $branch = `\"$git\" rev-parse --abbrev-ref HEAD`;
 	if ($branch eq '') {
 		# git が実行できない
@@ -289,11 +342,15 @@ elsif(-d "$source_root/.git" && $git ne "") {
 		if (-d "$source_root/.git/svn") {
 			# use git svn log
 			my $revision = `\"$git\" svn log --oneline -1`;
+			chomp($revision);
 			$revision =~ s/^r(\d+).*$/$1/;
 			$svninfo{'Revision'} = $1;
 		}
 		else {
-			$svninfo{'Revision'} = '';
+			my $revision = `\"$git\" log --oneline -1`;
+			chomp($revision);
+			$revision =~ s/^(\w+) .+/$1/;
+			$svninfo{'Revision'} = $revision;
 		}
 	}
 }

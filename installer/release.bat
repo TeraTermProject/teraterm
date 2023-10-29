@@ -147,9 +147,11 @@ if exist toolinfo.bat (
 set PATH=%SystemRoot%;%PATH%
 set PATH=%SystemRoot%\system32;%PATH%
 call :search_perl
-call :search_svn
+rem call :search_svn
+call :search_git
 call :search_iscc
-set PATH=%SVN_PATH%;%PATH%
+rem set PATH=%SVN_PATH%;%PATH%
+set PATH=%GIT_PATH%;%PATH%
 set PATH=%PERL_PATH%;%PATH%
 call :set_vs_env
 call :search_cmake
@@ -186,22 +188,44 @@ if not "%NOPAUSE%" == "1" pause
 exit
 
 rem ####################
-:search_svn
-if exist %SVN_PATH%\svn.exe (
-    set SVN=%SVN_PATH%\svn.exe
+rem :search_svn
+rem if exist %SVN_PATH%\svn.exe (
+rem     set SVN=%SVN_PATH%\svn.exe
+rem     exit /b 0
+rem )
+rem 
+rem set SVN=svn.exe
+rem where %SVN% > nul 2>&1
+rem if %errorlevel% == 0 exit /b 0
+rem set SVN_PATH=C:\Program Files (x86)\Subversion\bin
+rem set SVN="%SVN_PATH%\svn.exe"
+rem if exist %SVN% exit /b 0
+rem set SVN_PATH=C:\Program Files\TortoiseSVN\bin
+rem set SVN="%SVN_PATH%\svn.exe"
+rem if exist %SVN% exit /b 0
+rem echo svn not found
+rem if not "%NOPAUSE%" == "1" pause
+rem exit
+
+rem ####################
+:search_git
+if exist %GIT_PATH%\git.exe (
+    set GIT=%GIT_PATH%\git.exe
     exit /b 0
 )
 
-set SVN=svn.exe
-where %SVN% > nul 2>&1
+set GIT=git.exe
+where %GIT% > nul 2>&1
+echo %errorlevel%
+pause
 if %errorlevel% == 0 exit /b 0
-set SVN_PATH=C:\Program Files (x86)\Subversion\bin
-set SVN="%SVN_PATH%\svn.exe"
-if exist %SVN% exit /b 0
-set SVN_PATH=C:\Program Files\TortoiseSVN\bin
-set SVN="%SVN_PATH%\svn.exe"
-if exist %SVN% exit /b 0
-echo svn not found
+set GIT_PATH=C:\Program Files\Git\cmd
+set GIT="%GIT_PATH%\git.exe"
+if exist %GIT% exit /b 0
+set GIT_PATH=C:\Program Files (x86)\Git\cmd
+set GIT="%GIT_PATH%\git.exe"
+if exist %GIT% exit /b 0
+echo git not found
 if not "%NOPAUSE%" == "1" pause
 exit
 
@@ -282,11 +306,17 @@ echo Visual Studio
 echo VS_BASE=%VS_BASE%
 cl
 
-echo svn
-where svn
-echo SVN_PATH=%SVN_PATH%
-echo SVN=%SVN%
-svn --version
+rem echo svn
+rem where svn
+rem echo SVN_PATH=%SVN_PATH%
+rem echo SVN=%SVN%
+rem svn --version
+
+echo git
+where git
+echo GIT_PATH=%GIT_PATH%
+echo GIT=%GIT%
+%GIT% --version
 
 echo perl
 where perl

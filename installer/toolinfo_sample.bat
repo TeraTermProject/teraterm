@@ -7,6 +7,7 @@ rem set PATH=
 rem 各ツールへのパスなどを指定する
 rem set PERL_PATH=C:\Strawberry\perl\bin
 rem set SVN_PATH=C:\Program Files (x86)\Subversion\bin
+rem set GIT_PATH=C:\Program Files\Git\cmd
 rem set VS_BASE=C:\Program Files\Microsoft Visual Studio\2022
 rem set CMAKE_PATH=C:\Program Files\CMake\bin
 rem set CURL=C:\Windows\System32\curl.exe

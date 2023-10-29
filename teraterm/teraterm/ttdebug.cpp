@@ -259,9 +259,12 @@ static wchar_t *CreateDumpFilename()
 	SYSTEMTIME local_time;
 	GetLocalTime(&local_time);
 
-#if defined(SVNVERSION)
+#if defined(GITVERSION)
 	char *version;
-	asprintf(&version, "r%04d", SVNVERSION);
+	asprintf(&version, "%s", GITVERSION);
+#elif defined(SVNVERSION)
+	char *version;
+	asprintf(&version, "r%d", SVNVERSION);
 #else
 	char *version = _strdup("unknown");
 #endif
