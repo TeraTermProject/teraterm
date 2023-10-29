@@ -1,23 +1,26 @@
 ﻿AppVeyorの使用
 ==============
 
-現在のところCIのために利用します。
+git(GitHubも含む)リポジトリからのビルド
 
 ## プロジェクト作成 / 設定
 
 - Select repository for your new project
-  - Subversion を選択
-  - Checkout URL
-    - http://svn.osdn.net/svnroot/ttssh2/trunk
-    - Authentication None
-  - プロジェクトができる
+  - Generic の Git を選択
+  - Clone URL
+    - https://github.com/TeraTermProject/teraterm.git など
+    - Authentication
+      - None (public repository)
+    - push [Add Git repository] button
 - 設定
   - Settings/General
     - Project name 設定する
+  - Default branch
+    - main など
   - Custom configuration .yml file name (重要)
     - AppVeyorからアクセスできるところに appveyor_*.ymlを置く
-    - https://osdn.net/projects/ttssh2/scm/svn/blobs/head/trunk/ci_scripts/appveyor_vs2022.yml?export=raw など
-
+    - https://raw.githubusercontent.com/TeraTermProject/teraterm/main/ci_scripts/appveyor_vs2022_bat.yml など
+  - push [save] button
 
 appveyor_vs*_bat.yml
 ====================
