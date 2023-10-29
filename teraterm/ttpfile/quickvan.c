@@ -63,7 +63,7 @@ typedef struct {
 	const char *FullName;	// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	WORD LogState;
 } TQVVar;
-typedef TQVVar far *PQVVar;
+typedef TQVVar *PQVVar;
 
   /* Quick-VAN states */
 #define QV_RecvInit1 1

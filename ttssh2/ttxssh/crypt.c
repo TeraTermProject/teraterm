@@ -975,7 +975,7 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 	server_key_bytes = (server_key_bits + 7) / 8;
 	host_key_bytes = (host_key_bits + 7) / 8;
 	session_buf_len = server_key_bytes + host_key_bytes + 8;
-	session_buf = (char FAR *) malloc(session_buf_len);
+	session_buf = (char *) malloc(session_buf_len);
 
 	decrypted_challenge_len =
 		RSA_private_decrypt(challenge_len, challenge, challenge,

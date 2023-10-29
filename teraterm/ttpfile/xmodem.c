@@ -73,7 +73,7 @@ typedef struct {
 	const char *FullName;		// Windowsè„ÇÃÉtÉ@ÉCÉãñº UTF-8
 	WORD LogState;
 } TXVar;
-typedef TXVar far *PXVar;
+typedef TXVar *PXVar;
 
 static void XCancel(PFileVarProto fv, PComVar cv);
 

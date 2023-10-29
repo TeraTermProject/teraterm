@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-BOOL EncSeparate(const char *Str, int far *i, LPBYTE b)
+BOOL EncSeparate(const char *Str, int *i, LPBYTE b)
 {
 	int cptr, bptr;
 	unsigned int d;

@@ -76,7 +76,7 @@ typedef struct {
 	const char *FullName;		// Windowsè„ÇÃÉtÉ@ÉCÉãñº UTF-8
 	WORD LogState;
 } TBPVar;
-typedef TBPVar far *PBPVar;
+typedef TBPVar *PBPVar;
 
   /* B Plus states */
 #define BP_Init      1

@@ -2672,7 +2672,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			server_key_bytes = (server_key_bits + 7) / 8;
 			host_key_bytes = (host_key_bits + 7) / 8;
 			session_buf_len = server_key_bytes + host_key_bytes + 8;
-			session_buf = (char FAR *) malloc(session_buf_len);
+			session_buf = (char *) malloc(session_buf_len);
 
 			/* Pageant にハッシュを計算してもらう */
 			// 公開鍵の長さ

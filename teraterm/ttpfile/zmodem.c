@@ -80,7 +80,7 @@ typedef struct {
 	const char *FullName;		// Windowsè„ÇÃÉtÉ@ÉCÉãñº UTF-8
 	WORD LogState;
 } TZVar;
-typedef TZVar far *PZVar;
+typedef TZVar *PZVar;
 
 #define Z_RecvInit 1
 #define Z_RecvInit2 2

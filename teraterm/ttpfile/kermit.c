@@ -77,7 +77,7 @@ typedef struct {
 	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	const wchar_t *UILanguageFileW;
 } TKmtVar;
-typedef TKmtVar far *PKmtVar;
+typedef TKmtVar *PKmtVar;
 
   /* Kermit states */
 #define WaitMark  0
