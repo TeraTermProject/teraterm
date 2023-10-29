@@ -499,10 +499,18 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdEnableKeyb:
 		KeybEnabled = (ParamBinaryFlag!=0);
 		break;
-	case CmdGetTitle:
+	case CmdGetTitle: {
 		// title is transferred later by XTYP_REQUEST
-		strncpy_s(ParamFileName, sizeof(ParamFileName),ts.Title, _TRUNCATE);
+		char *titleU8 = ToU8A(ts.Title);
+		if (titleU8 == NULL) {
+			ParamFileName[0] = 0;
+		}
+		else {
+			strncpy_s(ParamFileName, sizeof(ParamFileName), titleU8, _TRUNCATE);
+			free(titleU8);
+		}
 		break;
+	}
 	case CmdInit: // initialization signal from TTMACRO
 		if (StartupFlag) // in case of startup macro
 		{ // TTMACRO is waiting for connecting to the host
@@ -556,10 +564,13 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			return DDE_FNOTPROCESSED;
 		break;
 	}
-	case CmdLoadKeyMap:
-		strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN),ParamFileName, _TRUNCATE);
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdLoadKeyMap,0);
+	case CmdLoadKeyMap: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		free(ts.KeyCnfFNW);
+		ts.KeyCnfFNW = ParamFileNameW;
+		PostMessage(HVTWin, WM_USER_ACCELCOMMAND, IdCmdLoadKeyMap, 0);
 		break;
+	}
 
 	case CmdLogRotate: {
 		char *p = ParamFileName;
@@ -671,14 +682,16 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSetDebug:
 		TermSetDebugMode(Command[1] - '0');
 		break;
-	case CmdSetTitle:
-		strncpy_s(ts.Title, sizeof(ts.Title),ParamFileName, _TRUNCATE);
+	case CmdSetTitle: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		WideCharToACP_t(ParamFileNameW, ts.Title, _countof(ts.Title));
 		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
 			free(cv.TitleRemoteW);
 			cv.TitleRemoteW = NULL;
 		}
 		ChangeTitle();
 		break;
+	}
 	case CmdShowTT:
 		switch (ParamFileName[0]) {
 		case '-': ShowWindow(HVTWin,SW_HIDE); break;

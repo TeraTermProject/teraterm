@@ -112,19 +112,6 @@ static void InitKeyMap()
 
 void SetKeyMap()
 {
-	char TempDir[MAXPATHLEN];
-	char TempName[MAX_PATH];
-
-	ExtractFileName(ts.KeyCnfFN, TempName, sizeof(TempName));
-	ExtractDirName(ts.KeyCnfFN, TempDir);
-	if (TempDir[0] == 0)
-		strncpy_s(TempDir, sizeof(TempDir), ts.HomeDir, _TRUNCATE);
-	FitFileName(TempName, sizeof(TempName), ".CNF");
-
-	strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN), TempDir, _TRUNCATE);
-	AppendSlash(ts.KeyCnfFN, sizeof(ts.KeyCnfFN));
-	strncat_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN), TempName, _TRUNCATE);
-
 	InitKeyMap();
 	if (KeyMap == NULL) {
 		return;

@@ -43,6 +43,11 @@
       <li>MACRO: <a href="../macro/command/strjoin.html">strjoin</a> command set concatenated string to the wrong variable.</li>
       <li>Fixed when F1 key is pressed in VT window, configured sequence is not sent and dialog that can't open open HTML help file shows.</li>
       <li>Fixed default values were not set in the log dialog.</li>
+      <li>MACOR: <a href="../macro/command/settitle.html">settitle</a> command using Kanji characters will be crashed.</li>
+      <ul>
+        <li>Fixed <a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> to handel string in Unicode.
+        <li>Currently, Tera Term handle local title strings in ANSI strings. Characters that cannot be converted are replaced by "?".</li>
+      </ul>
     </ul>
   </li>
 

@@ -315,11 +315,11 @@ typedef struct {
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
-	char HomeDir[MAXPATHLEN];		// 個人設定ファイルのあるフォルダ
+	char HomeDir[MAXPATHLEN];		// 個人設定ファイルのあるフォルダ switch HomeDirW
 
 	/* Setup file name */
 	char SetupFName[MAX_PATH];
-	char KeyCnfFN[MAX_PATH];
+	char reserve_KeyCnfFN[MAX_PATH];	// switch KeyCnfFNW
 	char LogFN[MAX_PATH];
 	char MacroFN[MAX_PATH];
 	char HostName[1024];
