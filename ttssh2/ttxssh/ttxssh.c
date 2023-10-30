@@ -2083,11 +2083,14 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	if (sizeof(TT_VERSION_SUBSTR) > 1) {
 		char tmpbuf[128];
 		strncat_s(buf, sizeof(buf), " " TT_VERSION_SUBSTR, _TRUNCATE);
-#ifdef SVNVERSION
+#if defined(GITVERSION)
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
+		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#elif defined(SVNVERSION)
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
 		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #else
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# UNK)");
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Unknown)");
 		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #endif
 	}

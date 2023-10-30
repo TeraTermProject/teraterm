@@ -51,8 +51,8 @@
     
     <h2 id="misc">misc</h2>
     <ul>
-      <li><a href="https://osdn.net/projects/ttssh2/wiki/%E6%B1%BA%E5%AE%9A%E4%BA%8B%E9%A0%85#h1-Tera.20Term.205.x" target="_blank">Development tools, libraries , etc.</a>
-      <li><a href="https://osdn.net/projects/ttssh2/wiki/UNICODE" target="_blank">implementation status</a>
+      <li><a href="https://github.com/TeraTermProject/teraterm/wiki/Decision#tera-term-5x" target="_blank">Development tools, libraries , etc.</a>
+      <li><a href="https://github.com/TeraTermProject/teraterm/wiki/TODO-Unicode" target="_blank">implementation status</a>
       <li>LogMeTT, TTLEditor, and Collector have been removed from the installer. Source codes for this tools are not available and This tools are not open source license.</li>
     </ul>
 
@@ -143,20 +143,20 @@
     <ul>
       <li>compat_w95.h is no longer needed.
         <ul>
-          <li><a href="https://osdn.net/projects/ttssh2/scm/svn/commits/9129" target="_blank">r9239</a></li>
+          <li><a href="https://github.com/TeraTermProject/teraterm/commit/3a0103c97511ea94d5892c7ee33aaed4faac01a6" target="_blank">r9239</a></li>
         </ul>
       </li>
       <li>Changed plugin API
         <ul>
           <li>filename string is Unicode (type is 'wchar_t' from 'char')</li>
-          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l44" target="_blank">trunk/teraterm/ttsetup.h</a></li>
-          <li><a href="https://osdn.net/projects/ttssh2/svn/view/branches/4-stable/teraterm/teraterm/ttsetup.h?view=markup&root=ttssh2#l39" target="_blank">4-stable/teraterm/ttsetup.h</a></li>
+          <li><a href="https://github.com/TeraTermProject/teraterm/blob/main/teraterm/teraterm/ttsetup.h#L44" target="_blank">teraterm/ttsetup.h in main</a></li>
+          <li><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/teraterm/teraterm/ttsetup.h#L39" target="_blank">teraterm/ttsetup.h in 4-stable</a></li>
         </ul>
       </li>
       <li>Common functions for reading and writing ini files have been added.
         <ul>
           <li>Added a function that converts only file names to Unicode and performs the same operation as before.</li>
-          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/common/inifile_com.h?view=markup&root=ttssh2" target="_blank">trunk/teraterm/common/inifile_com.h</a></li>
+          <li><a href="https://github.com/TeraTermProject/teraterm/blob/main/teraterm/common/inifile_com.h" target="_blank">teraterm/common/inifile_com.h in main</a></li>
         </ul>
       </li>
       <li>Change member in struct tttset (tttypes.h)
@@ -170,13 +170,13 @@
         <ul>
           <li>High DPI is supported.</li>
           <li>SetVerNotifyIcon(), SetCustomNotifyIcon(), GetCustomNotifyIcon() was removed.</li>
-          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_notify.h?view=markup&root=ttssh2" target="_blank">trunk/teraterm/ttpcmn/ttcmn_notify.h</a></li>
+          <li><a href="https://github.com/TeraTermProject/teraterm/blob/main/teraterm/ttpcmn/ttcmn_notify.h" target="_blank">teraterm/ttpcmn/ttcmn_notify.h in main</a></li>
         </ul>
       </li>
       <li>Add Help API
         <ul>
           <li>Added API for Unicode filename support.<br>
-          <li><a href="https://osdn.net/projects/ttssh2/svn/view/trunk/teraterm/ttpcmn/ttcmn_lib.h?view=markup&root=ttssh2" target="_blank">trunk/teraterm/ttpcmn/ttcmn_lib.h</a></li>
+          <li><a href="https://github.com/TeraTermProject/teraterm/blob/main/teraterm/ttpcmn/ttcmn_lib.h" target="_blank">teraterm/ttpcmn/ttcmn_lib.h in main</a></li>
         </ul>
       </li>
     </ul>

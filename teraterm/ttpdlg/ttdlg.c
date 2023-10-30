@@ -2414,11 +2414,14 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 #if defined(_M_X64)
 			strncat_s(buf, sizeof(buf), " 64bit", _TRUNCATE);
 #endif
-#ifdef SVNVERSION
+#if defined(GITVERSION)
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
+			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#elif defined(SVNVERSION)
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #else
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# UNK)");
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Unknown)");
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #endif
 			SetDlgItemTextA(Dialog, IDC_TT_VERSION, buf);
