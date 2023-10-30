@@ -21,10 +21,10 @@ endif()
 
 # unrar
 #   https://www.rarlab.com/rar_add.htm
-#   RAR/Extras page, UnRAR for Windows 6.22
-set(UNRAR_ZIP "unrarw32.exe")
-set(UNRAR_URL "https://www.rarlab.com/rar/unrarw32.exe")
-set(UNRAR_HASH "79c7bd2d05295a4bb21fba602c59c11f84a7ad26b0cf064f891ba38e164c099b")
+#   RAR/Extras page, UnRAR for Windows 7.00 beta 1 x64
+set(UNRAR_ZIP "unrarw64.exe")
+set(UNRAR_URL "https://www.rarlab.com/rar/unrarw64.exe")
+set(UNRAR_HASH "3a371fa935130283dfae4cf117386316a74971bf7895f1890d454bcf68285cb8")
 file(MAKE_DIRECTORY "download/unrar")
 file(DOWNLOAD
   ${UNRAR_URL}
@@ -33,7 +33,7 @@ file(DOWNLOAD
   SHOW_PROGRESS
   )
 if(EXISTS "unrar")
-    file(REMOVE_RECURSE "unrar")
+  file(REMOVE_RECURSE "unrar")
 endif()
 file(MAKE_DIRECTORY "unrar")
 execute_process(
