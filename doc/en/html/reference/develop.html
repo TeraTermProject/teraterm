@@ -29,7 +29,7 @@
       </li>
       <li><a href="#build-detail">How to build (Detail)</a>
         <ol>
-          <li><a href="#build-checkout">Checkout source code</a></li>
+          <li><a href="#build-checkout">Clone source code</a></li>
           <li><a href="#build-library">Build libaries</a></li>
           <li><a href="#build-teraterm">Build Tera Term</a></li>
           <li><a href="#build-ttssh">Build TTSSH</a></li>
@@ -40,6 +40,7 @@
           <li><a href="#build-cygterm">Build CygTerm</a></li>
           <li><a href="#build-cyglaunch">Build Cyglaunch</a></li>
           <li><a href="#build-htmlhelp">Build HTML help file</a></li>
+          <li><a href="#build-installer">Create installer</a></li>
         </ol>
       </li>
     </ol>
@@ -97,15 +98,12 @@ Following tools are needed to build Tera Term:
       <li>For get the revision number.</li>
     </ul>
   </li>
-  <li>Subversion<br />
-    Any of the following:
+  <li>Git<br />
     <ul>
-      <li>VisualSVN (<a href="https://www.visualsvn.com/downloads/" target="_blank">https://www.visualsvn.com/downloads/</a>)</li>
-      <li>TortoiseSVN (<a href="https://tortoisesvn.net/downloads.html" target="_blank">https://tortoisesvn.net/downloads.html</a>)</li>
-      <li>Subversion for Windows (<a href="http://sourceforge.net/projects/win32svn/" target="_blank">http://sourceforge.net/projects/win32svn/</a>)</li>
+      <li>Git for Windows (<a href="https://github.com/git-for-windows/git/releases" target="_blank">https://github.com/git-for-windows/git/releases</a>)</li>
     </ul>
-    For checkout source code.<br />
-    The command line version of the same version that was used for checkout source code. For get the revision number.
+    For clone source code.<br />
+    The command line version is necewssaly necessary for get the commit hash.
   </li>
   <li>HTML Help Compiler<br />
     For build HTML help file.
@@ -185,8 +183,7 @@ And if necessary, copy buildtools\svnrev\toolinfo_sample.txt as buildtools\svnre
 <h4 id="build-quick-checkout">Checkout source code</h4>
 
 <p>
-Checkout source code from OSDN (http://svn.osdn.net/svnroot/ttssh2/trunk/).<br />
-Project member have to use svn+ssh://&lt;username&gt;@svn.osdn.net/svnroot/ttssh2/trunk/ or https://svn.osdn.net/svnroot/ttssh2/trunk/.
+Clone source code from GitHub (https://github.com/TeraTermProject/teraterm).
 </p>
 
 <h4 id="build-quick-all">Build</h4>
@@ -197,11 +194,10 @@ Run installer\release.bat, and select 3.
 
 <h3 id="build-detail">How to build (Detail)</h3>
 
-<h4 id="build-checkout">Checkout source code</h4>
+<h4 id="build-checkout">Clone source code</h4>
 
 <p>
-Checkout source code from OSDN (http://svn.osdn.net/svnroot/ttssh2/trunk/).<br />
-Project member have to use svn+ssh://&lt;username&gt;@svn.osdn.net/svnroot/ttssh2/trunk/ or https://svn.osdn.net/svnroot/ttssh2/trunk/.
+Clone source code from GitHub (https://github.com/TeraTermProject/teraterm).
 </p>
 
 <h4 id="build-library">Build libaries</h4>
@@ -358,6 +354,39 @@ common_static.lib must be built beforehand by teraterm\ttermpro.sln.
 <ol>
   <li>Run doc\makechm.bat.</li>
 </ol>
+
+<h4 id="build-installer">Create installer</h4>
+
+<dl>
+  <dt>When use AppVeyor</dt>
+  <dd>
+    Run "NEW BUILD" in AppVeyor.<br>
+    installer\release.bat is called.
+  </dd>
+  <dt>When use installer\release.bat</dt>
+  <dd>
+    Run installer\release.bat to create installer and zip.<br>
+    File name is constructed from buildtool\svnrev\sourcetree_info.bat. It is written by buildtools\svnrev\svnrev.bat from teraterm\common\tt-version.h.
+    <ul>
+      <li>
+        Run installer\release.bat.<br>
+        Create installer in installer\iscc.bat called installer\release.bat.
+      </li>
+      <li>A installer and zipped portable version is generated in installer\Output folder.</li>
+    </ul>
+  </dd>
+  <dt>When use Inno Script Studio</dt>
+  <dd>
+    It is easier to use installer\release.bat when create an RC,release.<br>
+    Debugging installer is easy to use Inno Script Studio.
+    File name of installer is constructed from definition of installer\teraterm.iss. File name of portable version is constructed from buildtool\svnrev\sourcetree_info.bat.
+    <ul>
+      <li>Open installer\teraterm.iss with Inno Script Studio, and create installer by "Project"-"Compile."</li>
+      <li>A installer and portable version is generated in installer\Output folder.</li>
+      <li>Compress portable version with zip.</li>
+    </ul>
+  </dd>
+</dl>
 
 
 <h2 id="develop">Note for development</h2>
@@ -854,7 +883,6 @@ To release Tera Term installation package is shown in the following step:
     </ul>
   </li>
   <li>Increment the version while RC release process.
-    <p>The binary is released for test in this timing. Prevent that old and new binary have same version number.</p>
     <ul>
       <li>
         teraterm\common\tt-version.h<br>
@@ -867,7 +895,9 @@ To release Tera Term installation package is shown in the following step:
 </pre>
         TT_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
       </li>
-      <li>ttssh2\ttxssh\ttxssh-version.h</li>
+      <li>ttssh2\ttxssh\ttxssh-version.h<br>
+        TTSSH_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
+      </li>
       <li>Onttpmenu\ttpmenu.rc // only modifying</li>
       <li>TTProxy\TTProxy.rc // only modifying</li>
       <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
@@ -921,40 +951,9 @@ To release Tera Term installation package is shown in the following step:
     </ul>
   </li>
   <li id="RC_commit">Commit this state.</li>
-  <li>Create installer.
-    <dl>
-      <dt>When use installer\release.bat</dt>
-      <dd>
-        Run installer\release.bat to create installer and zip.<br>
-        File name is constructed from buildtool\svnrev\sourcetree_info.bat. It is written by buildtools\svnrev\svnrev.bat from teraterm\common\tt-version.h.
-        <ul>
-          <li>
-            Run installer\release.bat.<br>
-            Create installer in installer\iscc.bat called installer\release.bat.
-          </li>
-          <li>A installer and zipped portable version is generated in installer\Output folder.</li>
-        </ul>
-      </dd>
-      <dt>When use Inno Script Studio</dt>
-      <dd>
-        It is easier to use installer\release.bat when create an RC,release.<br>
-        Debugging installer is easy to use Inno Script Studio.
-        File name of installer is constructed from definition of installer\teraterm.iss. File name of portable version is constructed from buildtool\svnrev\sourcetree_info.bat.
-        <ul>
-          <li>Open installer\teraterm.iss with Inno Script Studio, and create installer by "Project"-"Compile."</li>
-          <li>A installer and portable version is generated in installer\Output folder.</li>
-          <li>Compress portable version with zip.</li>
-        </ul>
-      </dd>
-    </dl>
-  </li>
+  <li>Create installer.</li>
   <li>Test run installer, run and connect in all supported OS.</li>
-  <li>Add to OSDN Release
-    <ul>
-      <li>Add new release (e.g. "4.106 RC") to "Tera Term RC" Package.</li>
-      <li>Add installer and portable zip file to new release.</li>
-    </ul>
-  </li>
+  <li>Push and build on AppVeyor</li>
   <li>Announce RC release.
     <ul>
       <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users" target="_blank">ttssh2-users</a> mailing list</li>
@@ -996,79 +995,38 @@ To release Tera Term installation package is shown in the following step:
     </ul>
   </li>
   <li>Create installer.
-    <dl>
-      <dt>Use installer\release.bat</dt>
-      <dd>
-        Run installer\release.bat to create installer and zip.<br>
-    <ul>
-          <li>run installer\release.bat.</li>
-          <li>Installer and zip are output to installer\Output folder.</li>
-        </ul>
-      </dd>
-      <dt>Use Inno Script Studio</dt>
-      <dd>
-        <ul>
-          <li>Open installer\teraterm.iss with Inno Script Studio, and create installer by "Project"-"Compile."</li>
-          <li>A installer and zipped portable version is generated in installer\Output folder.</li>
-        </ul>
-      </dd>
-    </dl>
+    <p>
+      Check that build and installer generation without error.
+    </p>
   </li>
   <li>Commit this state.</li>
-  <li>Create SVN tag.<br />
-    The naming rule is `teraterm-version' (e.g. teraterm-5_0).
+  <li>Create SVN tag.
+    <p>
+      Use annotated tags.
+      The naming rule is `v(version)' (e.g. v5.0).
+    </p>
     <pre>
-svn copy -m "Release 5.0" \
-    svn+ssh://svn.osdn.net/svnroot/ttssh2/trunk \
-    svn+ssh://svn.osdn.net/svnroot/ttssh2/tags/teraterm-5_0
+git tag -a v5.0 -m "Release 5.0"
     </pre>
   </li>
-  <li>Re-checkout from svn tag.<br />
-    <p>All source code is same as development branch. Only SVN revision is different.</p>
-  </li>
-  <li>Create installer.
-    <dl>
-      <dt>Use installer\release.bat</dt>
-      <dd>
-        <ul>
-          <li>run installer\release.bat.</li>
-          <li>A installer and zipped portable version is generated in installer\Output folder.</li>
-        </ul>
-      </dd>
-      <dt>Use Inno Script Studio</dt>
-      <dd>
-        <ul>
-          <li>Open installer\teraterm.iss with Inno Script Studio, and create installer by "Project"-"Compile."</li>
-          <li>A installer and portable version is generated in installer\Output folder.</li>
-          <li>Compress portable version with zip.</li>
-        </ul>
-      </dd>
-    </dl>
-  </li>
-  <li>Update OSDN project site.
+  <li>Create installer.</li>
+  <li>Update project site.
     <ul>
-      <li>add new release (e.g. "4.106") to "Tera Term" Package.</li>
-      <li>Add installer and portable zip file to new release.</li>
-<!--
-      <li>ドキュメントの変更履歴から、リリースの「変更履歴」に（Wikiフォーマットで）転記する（日本語・英語とも）</li>
--->
-      <li>Submit news.</li>
+      <li>add new release with a new tag.</li>
+      <li>put installer and portable zip file.</li>
+      <li>copy release note from changelog of document (in Japanese and English).</li>
     </ul>
   </li>
-  <li>Update OSDN project home page (<a href="https://ttssh2.osdn.jp" target="_blank">https://ttssh2.osdn.jp</a>).
-    <p><a href="https://osdn.net/projects/ttssh2/wiki/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%83%9A%E3%83%BC%E3%82%B8%E3%81%AE%E6%9B%B4%E6%96%B0%E6%89%8B%E9%A0%86" target="_blank">How to update project home page (in Japanese).</a></p>
+  <li>Update project web page (<a href="https://ttssh2.osdn.jp" target="_blank">https://ttssh2.osdn.jp</a>).
+    <p><a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page (in Japanese).</a></p>
   </li>
   <li>Announce release.
     <ul>
       <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users" target="_blank">ttssh2-users</a> mailing list</li>
-      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)
-        <ul>
-          <li>Pin announce tweet.</li>
-        </ul>
-      </li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
     </ul>
   </li>
-  <li id="revert_teraterm_iss">Revert teraterm.iss in development branch.
+  <li id="increment_version">Increment the version
     <ul>
       <li>
         teraterm/common/tt-version.h<br>
@@ -1079,6 +1037,15 @@ svn copy -m "Release 5.0" \
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_MINOR             1
 + #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </li>
+      <li>
+        ttssh2/ttssh/ttxssh-version.h<br>
+        Increment TT_VERSION_MINOR.
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+- #define TTSSH_VERSION_MINOR             0
++ #define TTSSH_VERSION_MINOR             1
 </pre>
       </li>
       <li>
@@ -1109,7 +1076,7 @@ svn copy -m "Release 5.0" \
 
 <p>
 After code freeze, only critical bug fix is able to committed.<br />
-Code freeze start with <a href="#RC_commit">RC commit in development branch</a>, and end with <a href="#revert_teraterm_iss">revert teraterm.iss commit in development branch</a>.
+Code freeze start with <a href="#RC_commit">RC commit in development branch</a>, and end with <a href="#increment_version">version increment commit.</a>.
 </p>
 
 </body>
