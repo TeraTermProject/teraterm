@@ -216,8 +216,6 @@ if exist %GIT_PATH%\git.exe (
 
 set GIT=git.exe
 where %GIT% > nul 2>&1
-echo %errorlevel%
-pause
 if %errorlevel% == 0 exit /b 0
 set GIT_PATH=C:\Program Files\Git\cmd
 set GIT="%GIT_PATH%\git.exe"
