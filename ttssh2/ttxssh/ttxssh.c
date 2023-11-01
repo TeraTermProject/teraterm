@@ -2068,7 +2068,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 
 static void init_about_dlg(PTInstVar pvar, HWND dlg)
 {
-	char buf[1024];
+	char buf[1024], tmpbuf[128];
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_ABOUT_TITLE" },
 		{ IDC_FP_HASH_ALG, "DLG_ABOUT_FP_HASH_ALGORITHM" },
@@ -2081,22 +2081,21 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
 #if defined(TT_VERSION_SUBSTR)
 	if (sizeof(TT_VERSION_SUBSTR) > 1) {
-		char tmpbuf[128];
 		strncat_s(buf, sizeof(buf), " " TT_VERSION_SUBSTR, _TRUNCATE);
-#if defined(GITVERSION)
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
-		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#elif defined(SVNVERSION)
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
-		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#else
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Unknown)");
-		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#endif
 	}
 #endif
 #if defined(_M_X64)
 	strncat_s(buf, sizeof(buf), " 64bit", _TRUNCATE);
+#endif
+#if defined(GITVERSION)
+	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
+	strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#elif defined(SVNVERSION)
+	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
+	strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#else
+	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Unknown)");
+	strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #endif
 	strncat_s(buf, sizeof(buf),
 			  "\r\nCompatible with SSH protocol version 1.5 and 2.0", _TRUNCATE);
