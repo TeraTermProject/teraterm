@@ -1,4 +1,4 @@
-echo %~dp0\install.bat
+echo %~dp0\install_mycygwin.bat
 
 pushd %~dp0
 
@@ -7,9 +7,5 @@ if "%CMAKE_COMMAND%" == "" (
 )
 
 "%CMAKE_COMMAND%" -P ../buildtools/install_cygwin.cmake
-
-if exist c:\msys64\usr\bin\pacman.exe (
-  c:\msys64\usr\bin\pacman.exe  -S --noconfirm --needed cmake
-)
 
 popd

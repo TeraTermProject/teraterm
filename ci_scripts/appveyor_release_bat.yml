@@ -1,7 +1,7 @@
 image: Visual Studio 2022
 
 environment:
-# キャッシュを使わない
+# リリースではキャッシュを使わない
 # APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VS_VERSION: 2022
 
@@ -10,26 +10,39 @@ build: off
 init:
   # タイムゾーンを JST に変更
   - tzutil /s "Tokyo Standard Time"
-  # c:\cygwin64 の Cygwin に cmake をインストール
-  # このコマンドではインストール済みパッケージは更新されない
-  - c:\cygwin64\setup-x86_64.exe --quiet-mode --packages cmake
 
-# キャッシュを使わない
+# リリースではキャッシュを使わない
 # cache:
 #   - libs
 
+before_build:
+  # インストール済みの Cygwin を更新
+  # - ci_scripts/upgrade_syscygwin.bat
+  # インストール済みの Cygwin にパッケージを追加
+  - ci_scripts/addpkg_syscygwin.bat
+  # インストール済みの MSYS2 にパッケージを追加
+  # - ci_scripts/addpkg_msys2.bat
+  # 自前の Cygwin をインストール
+  # - ci_scripts/install_mycygwin.bat
+
 build_script:
   - ci_scripts/build_appveyor_release_bat.bat
-# - ci_scripts/build_appveyor_release_bat_pre_cache.bat
+
+after_build:
+  # ソース管理しているファイルがキャッシュされて更新されなくなるのを防ぐため削除
+  #   リリースではキャッシュを使わないので呼ばなくてよい
+  # - ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
 artifacts:
   - path: installer/Output/*.exe
   - path: installer/Output/*.zip
 
+# AppVeyor のプロジェクトの Settings - Environment に WEBHOOK_URL を設定するかどうかで制御する
 on_success:
-# - ci_scripts\notify.bat success
+  - ci_scripts\notify.bat success
 on_failure:
-# - ci_scripts\notify.bat failure
+  - ci_scripts\notify.bat failure
+
 on_finish:
 # ビルド完了後に RDP が有効になる。blockRdp を指定しているので、完了後にも終了しない。
 # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
