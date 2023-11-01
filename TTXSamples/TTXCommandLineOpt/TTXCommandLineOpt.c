@@ -35,7 +35,7 @@ static BOOL ColorStr2ColorRef(COLORREF *color, wchar_t *Str) {
     if (!cur)
       return FALSE;
 
-    if ((next = wcsrchr(cur, L',')) != NULL)
+    if ((next = wcschr(cur, L',')) != NULL)
       *next = 0;
 
     result = swscanf_s(cur, L"%d", &TmpColor[i]);
