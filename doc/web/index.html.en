@@ -5,12 +5,8 @@
     <meta http-equiv="Content-Style-Type" content="text/css">
     <meta http-equiv="Content-Script-Type" content="text/javascript">
     <link rel="stylesheet" type="text/css" href="teraterm.css">
-    <link rel="shortcut icon" href="/images/teraterm.ico" type="image/vnd.microsoft.icon">
-    <link rel="icon" href="/images/teraterm.ico" type="image/vnd.microsoft.icon">
-    <link rel="apple-touch-icon-precomposed" href="/images/teraterm-57.png"/>
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/teraterm-72.png"/>
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/teraterm-114.png"/>
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/teraterm-144.png"/>
+    <link rel="icon" href="/images/teraterm.ico">
+    <link rel="icon" type="image/png" href="images/teraterm.png">
     <title>Tera Term Open Source Project</title>
     <meta property="og:title" content="Tera Term - Terminal Emulator for Windows">
     <meta property="og:type" content="website">
