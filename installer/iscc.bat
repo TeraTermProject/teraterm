@@ -11,7 +11,7 @@ SET VCSVERSION=%GITVERSION%
 IF NOT "%SVNVERSION%" == "unknown" (
     SET VCSVERSION=r%SVNVERSION%
 )
-set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-%VCSVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
+set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot"
 if "%RELEASE%" == "1" (
     pushd Output
     %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
@@ -26,8 +26,8 @@ if "%RELEASE%" == "1" (
     %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%_pdb.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%_pdb
     %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT% snapshot-%DATE%_%TIME%
     %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT%_pdb snapshot-%DATE%_%TIME%_pdb
-    set INNO_SETUP_OPT_VERSION="/DVerSubStr=%VCSVERSION%-%DATE%_%TIME%"
-    set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=%VCSVERSION%-%DATE%_%TIME%-%USERNAME%-snapshot"
+    set INNO_SETUP_OPT_VERSION="/DVerSubStr=%DATE%_%TIME%"-%VCSVERSION%
+    set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot"
 )
 %INNO_SETUP% %INNO_SETUP_OPT_VERSION% /DAppVer=%VERSION% %INNO_SETUP_OPT_OUTPUT% teraterm.iss
 
