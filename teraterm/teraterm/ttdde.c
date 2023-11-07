@@ -387,6 +387,15 @@ static WORD HexStr2Word(PCHAR Str)
 	return w;
 }
 
+/**
+ *	送信完了コールバック
+ */
+static void SendCallback(void *callback_data)
+{
+	(void)callback_data;
+	EndDdeCmnd(0);
+}
+
 static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
 	char Command[MaxStrLen + 1];
@@ -658,7 +667,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		BOOL r = FileSendStart(ParamFileNameW, ParamBinaryFlag);
 #else
 		// 5 で追加した方法で送信
-		BOOL r = SendMemSendFile(ParamFileNameW, ParamBinaryFlag, 0, 0, 0);
+		BOOL r = SendMemSendFile2(ParamFileNameW, ParamBinaryFlag, 0, 0, 0, SendCallback, NULL);
 #endif
 		free(ParamFileNameW);
 		if (r) {
