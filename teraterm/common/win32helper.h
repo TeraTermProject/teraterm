@@ -50,6 +50,7 @@ LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LP
 						  LPDWORD lpcbData);
 DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text);
 DWORD hDragQueryFileW(HDROP hDrop, UINT iFile, wchar_t **filename);
+DWORD hFormatMessageW(DWORD error, wchar_t **message);
 
 #ifdef __cplusplus
 }

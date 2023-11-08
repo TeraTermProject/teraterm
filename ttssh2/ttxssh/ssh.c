@@ -4211,26 +4211,6 @@ static int accessU8(const char *pathU8, int mode)
 	return r;
 }
 
-DWORD hFormatMessageW(DWORD error, wchar_t **message)
-{
-	LPWSTR lpMsgBuf;
-	DWORD r =
-		FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_MAX_WIDTH_MASK,
-		NULL,
-		error,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPWSTR)&lpMsgBuf,
-		0,
-		NULL);
-	if (r == 0) {
-		*message = NULL;
-		return GetLastError();
-	}
-	*message = _wcsdup(lpMsgBuf);
-	LocalFree(lpMsgBuf);
-	return NO_ERROR;
-}
-
 /**
  *	SCP support
  *
