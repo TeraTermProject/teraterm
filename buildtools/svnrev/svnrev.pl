@@ -339,19 +339,10 @@ elsif(-d "$source_root/.git" && $git ne "") {
 		$branch =~ s/[\r\n]$//g;
 		$svninfo{'name'} = $branch;
 
-		if (-d "$source_root/.git/svn") {
-			# use git svn log
-			my $revision = `\"$git\" svn log --oneline -1`;
-			chomp($revision);
-			$revision =~ s/^r(\d+).*$/$1/;
-			$svninfo{'Revision'} = $1;
-		}
-		else {
-			my $revision = `\"$git\" log --oneline -1`;
-			chomp($revision);
-			$revision =~ s/^(\w+) .+/$1/;
-			$svninfo{'Revision'} = $revision;
-		}
+		my $revision = `\"$git\" log --oneline -1`;
+		chomp($revision);
+		$revision =~ s/^(\w+) .+/$1/;
+		$svninfo{'Revision'} = $revision;
 	}
 }
 else {
