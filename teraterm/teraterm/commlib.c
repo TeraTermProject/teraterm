@@ -677,9 +677,7 @@ void CommThread(void *arg)
 
 void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 {
-	wchar_t ErrMsgW[31];
 	char Temp[20];
-	wchar_t *UIMsgW;
 
 	if (! cv->Open ) {
 		return;
@@ -695,32 +693,11 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 	switch (cv->PortType) {
 		case IdTCPIP:
-			switch (HIWORD(lParam)) {
-				case WSAECONNREFUSED:
-					GetI18nStrWW("Tera Term", "MSG_COMM_REFUSE_ERROR", L"Connection refused", ts->UILanguageFileW, &UIMsgW);
-					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
-					free(UIMsgW);
-					break;
-				case WSAENETUNREACH:
-					GetI18nStrWW("Tera Term", "MSG_COMM_REACH_ERROR", L"Network cannot be reached", ts->UILanguageFileW, &UIMsgW);
-					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
-					free(UIMsgW);
-					break;
-				case WSAETIMEDOUT:
-					GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
-					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
-					free(UIMsgW);
-					break;
-				default:
-					GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
-					_snwprintf_s(ErrMsgW, _countof(ErrMsgW), _TRUNCATE, L"%s", UIMsgW);
-					free(UIMsgW);
-					break;
-			}
 			if (HIWORD(lParam)>0) {
 				/* connect() failed */
+
+				/* try to connect with other protocol */
 				if (cv->res->ai_next != NULL) {
-					/* try to connect with other protocol */
 					CloseSocket(cv->s);
 					for (cv->res = cv->res->ai_next; cv->res; cv->res = cv->res->ai_next) {
 						cv->s = OpenSocket(cv);
@@ -733,24 +710,40 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 						cv->RetryWithOtherProtocol = TRUE; /* retry with other procotol */
 						return;
 					}
-				} else {
-					/* trying with all protocol family are failed */
-					if (cv->NoMsg==0)
-					{
-						static const TTMessageBoxInfoW info = {
-							"Tera Term",
-							"MSG_TT_ERROR", L"Tera Term: Error",
-							NULL, NULL,
-							MB_TASKMODAL | MB_ICONEXCLAMATION | MB_HELP
-						};
-						VtwinSetHelpId(HlpAboutQandaConnection);
-						TTMessageBoxW(cv->HWin, &info, ts->UILanguageFileW, ErrMsgW);
-						VtwinSetHelpId(0);
-					}
-					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
-					cv->RetryWithOtherProtocol = FALSE;
-					return;
 				}
+
+				/* trying with all protocol family are failed */
+				if (cv->NoMsg==0) {
+					wchar_t *UIMsgW;
+					switch (HIWORD(lParam)) {
+					case WSAECONNREFUSED:
+						GetI18nStrWW("Tera Term", "MSG_COMM_REFUSE_ERROR", L"Connection refused", ts->UILanguageFileW, &UIMsgW);
+						break;
+					case WSAENETUNREACH:
+						GetI18nStrWW("Tera Term", "MSG_COMM_REACH_ERROR", L"Network cannot be reached", ts->UILanguageFileW, &UIMsgW);
+						break;
+					case WSAETIMEDOUT:
+						GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
+						break;
+					default:
+						GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
+						break;
+					}
+
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+						NULL, NULL,
+						MB_TASKMODAL | MB_ICONEXCLAMATION | MB_HELP
+					};
+					VtwinSetHelpId(HlpAboutQandaConnection);
+					TTMessageBoxW(cv->HWin, &info, ts->UILanguageFileW, UIMsgW);
+					free(UIMsgW);
+					VtwinSetHelpId(0);
+				}
+				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
+				cv->RetryWithOtherProtocol = FALSE;
+				return;
 			}
 
 			/* here is connection established */
