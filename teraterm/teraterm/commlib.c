@@ -741,9 +741,11 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 							"Tera Term",
 							"MSG_TT_ERROR", L"Tera Term: Error",
 							NULL, NULL,
-							MB_TASKMODAL | MB_ICONEXCLAMATION
+							MB_TASKMODAL | MB_ICONEXCLAMATION | MB_HELP
 						};
+						VtwinSetHelpId(HlpAboutQandaConnection);
 						TTMessageBoxW(cv->HWin, &info, ts->UILanguageFileW, ErrMsgW);
+						VtwinSetHelpId(0);
 					}
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RetryWithOtherProtocol = FALSE;
