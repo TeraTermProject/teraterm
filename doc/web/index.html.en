@@ -26,7 +26,7 @@
 <p>
 [<a href="https://github.com/TeraTermProject/teraterm">Project page</a>] 
 [<a href="/manual/en/about/copyright.html">License</a>] 
-[<a href="<a href="https://github.com/TeraTermProject/teraterm/releases">Download</a>] 
+[<a href="https://github.com/TeraTermProject/teraterm/releases">Download</a>] 
 [<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
 [<a href="/manual/en/">Document</a>] 
 [<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
@@ -226,10 +226,6 @@ Tera Term language files to localize the menu and the message are as follows. If
 <hr>
 
 <p>If you want to comment on this web site, e-mail us at ttssh2-contact<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me.</p>
-
-<div>
-Powered by <a href="https://osdn.net/"><img src="//osdn.net/sflogo.php?group_id=1412&type=1" width="96" height="31" border="0" alt="OSDN"></a>
-</div>
 
 <p>
 <script type="text/javascript">
