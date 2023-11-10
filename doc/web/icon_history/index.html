@@ -3,8 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>History of Tera Term & TTSSH icon</title>
-<script src="//code.jquery.com/jquery-2.2.4.js"></script>
-<script src="//code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
 
 <script type="text/javascript">
 <!--
@@ -13,15 +13,35 @@ $(function () {
         title: 'Tera Term & TTSSH icon history',
         credits: false,
         chart: {
-            height: 350,
+            height: 420,
             marginLeft: 50,
             marginRight: 50,
         },
-        yAxis: {
+        yAxis: [{
             title: {
-            	  text: null
-            }
-        },
+                text: 'Windows',
+            },
+            height: '15%',
+            top: '85%',
+        },{
+            title: {
+                text: 'Icon',
+            },
+            height: '15%',
+            top: '70%',
+        },{
+            title: {
+                text: null,
+            },
+            height: '30%',
+            top: '40%',
+        },{
+            title: {
+                text: null,
+            },
+            height: '30%',
+            top: '10%',
+        }],
         xAxis: {
             type: 'datetime',
             plotBands: [{
@@ -36,9 +56,20 @@ $(function () {
                 }
             },
             {
+                color: '#CCCCCC',
+                from: Date.UTC(1998, 3-1, 10),
+                to: Date.UTC(2004, 3-1, 2),
+                label: {
+                    text: null,
+                    style: {
+                        color: '#999999'
+                    }
+                }
+            },
+            {
                 color: '#C5FCFF',
                 from: Date.UTC(2004, 3-1, 2),
-                to: Date.UTC(2016, 8-1, 31),
+                to: Date.now(),
                 label: {
                     text: 'Yutaka Hirata / TeraTerm Project',
                     style: {
@@ -49,16 +80,65 @@ $(function () {
         },
         series: [{
             type: 'flags',
-            name: 'Tera Term',
+            name: 'Windows',
+            color: '#000000',
+            shape: 'squarepin',
+            y: -30,
+            data: [
+                { x: Date.UTC(1992,  4-1,  6), text: 'Windows 3.1',     title: 'Windows 3.1', shape: 'squarepin' },
+                { x: Date.UTC(1995,  8-1, 25), text: 'Windows 95',      title: '95',          shape: 'squarepin' },
+                { x: Date.UTC(1998,  6-1, 25), text: 'Windows 98',      title: '98',          shape: 'squarepin' },
+                { x: Date.UTC(2000,  9-1, 14), text: 'Windows Me',      title: 'Me',          shape: 'squarepin' },
+            ],
+            showInLegend: false
+        },{
+            type: 'flags',
+            name: 'Windows NT',
+            color: '#000000',
+            shape: 'squarepin',
+            y: -50,
+            data: [
+                { x: Date.UTC(1993,  7-1, 27), text: 'Windows NT 3.1',  title: 'NT 3.1' ,     shape: 'squarepin' },
+                { x: Date.UTC(1994,  9-1, 21), text: 'Windows NT 3.5',  title: 'NT 3.5' ,     shape: 'squarepin' },
+                { x: Date.UTC(1995,  5-1, 30), text: 'Windows NT 3.51', title: 'NT 3.51',     shape: 'squarepin' },
+                { x: Date.UTC(1996,  9-1,  3), text: 'Windows NT 4.0',  title: 'NT 4.0',      shape: 'squarepin' },
+                { x: Date.UTC(2000,  2-1, 18), text: 'Windows 2000',    title: '2000',        shape: 'squarepin' },
+                { x: Date.UTC(2001, 10-1, 25), text: 'Windows XP',      title: 'XP',          shape: 'squarepin' },
+                { x: Date.UTC(2007,  1-1, 30), text: 'Windows Vista',   title: 'Vista',       shape: 'squarepin' },
+                { x: Date.UTC(2009, 10-1, 22), text: 'Windows 7',       title: '7',           shape: 'squarepin' },
+                { x: Date.UTC(2012, 10-1, 26), text: 'Windows 8',       title: '8',           shape: 'squarepin' },
+                { x: Date.UTC(2013, 10-1, 18), text: 'Windows 8.1',     title: '8.1',         shape: 'squarepin' },
+                { x: Date.UTC(2015,  7-1, 28), text: 'Windows 10',      title: '10',          shape: 'squarepin' },
+                { x: Date.UTC(2021, 10-1,  5), text: 'Windows 11',      title: '11',          shape: 'squarepin' },
+            ],
+            showInLegend: false
+        },{
+            type: 'flags',
+            name: 'icon',
             color: '#333333',
             shape: 'squarepin',
             y: -40,
+            yAxis: 1,
             data: [
-                { x: Date.UTC(1994,  2-1, 24), text: 'Tera Term 0.0 (16bit)', title: '0.0', shape: 'squarepin' },
-                { x: Date.UTC(1996,  6-1,  7), text: 'Tera Term Pro 2.0 (32bit)', title: 'Pro 2.0', shape: 'squarepin' },
+                { x: Date.UTC(2001, 10-1, 25), text: 'Windows XP (3D icon)', title: 'Windows XP<br />3D icon', shape: 'squarepin' },
+                { x: Date.UTC(2011,  9-1, 18), text: 'iOS 7 (flat design)', title: 'iOS 7<br />flat design', shape: 'squarepin' },
+                { x: Date.UTC(2017,  5-1, 12), text: 'Microsoft Build 2017 (fluent design)', title: 'fluent design', shape: 'squarepin' },
+            ],
+            showInLegend: false
+        },{
+            type: 'flags',
+            name: 'Tera Term',
+            color: '#333333',
+            shape: 'squarepin',
+            y: -30,
+            yAxis: 2,
+            data: [
+                { x: Date.UTC(1994,  2-1, 24), text: 'Tera Term 0.0 (16bit)', title: 'Tera Term 0.0', shape: 'squarepin' },
+                { x: Date.UTC(1996,  6-1,  7), text: 'Tera Term Pro 2.0 (32bit)', title: 'Tera Term Pro 2.0', shape: 'squarepin' },
                 { x: Date.UTC(1998,  3-1, 10), text: 'Tera Term Pro 2.3 (latest original)', title: 'Pro 2.3', shape: 'squarepin' },
                 { x: Date.UTC(2004,  3-1,  2), text: 'Tera Term Pro 2.3 UTF-8 1.00 (restart)', title: 'Pro 2.3+UTF-8 1.00', shape: 'squarepin' },
-                { x: Date.UTC(2008,  6-1, 25), text: 'Tera Term 4.59 (remove "Pro")', title: '4.59', shape: 'squarepin' },
+                { x: Date.UTC(2008,  6-1, 25), text: 'Tera Term 4.59 (remove "Pro")', title: 'Tera Term 4.59', shape: 'squarepin' },
+                { x: Date.UTC(2023, 10-1, 15), text: 'Tera Term 5.0', title: 'Tera Term 5.0', shape: 'squarepin' },
             ],
             showInLegend: false
         },{
@@ -66,11 +146,13 @@ $(function () {
             name: 'TTSSH',
             color: '#333333',
             shape: 'squarepin',
-            y: -80,
+            yAxis: 3,
+            y: -30,
             data: [
-                { x: Date.UTC(1998,  6-1,  6), text: 'TTSSH 1.2', title: '1.2', shape: 'circlepin' },
-                { x: Date.UTC(2001,  2-1, 18), text: 'TTSSH 1.5.4 (latest original)', title: '1.5.4', shape: 'circlepin' },
-                { x: Date.UTC(2004, 10-1, 11), text: 'TTSSH2 1.00 alpha2 (restart)', title: 'TTSSH2 1.00 alpha2', shape: 'circlepin' },
+                { x: Date.UTC(1998,  6-1,  6), text: 'TTSSH 1.2', title: 'TTSSH 1.2', shape: 'squarepin' },
+                { x: Date.UTC(2001,  2-1, 18), text: 'TTSSH 1.5.4 (latest original)', title: '1.5.4', shape: 'squarepin' },
+                { x: Date.UTC(2004, 10-1, 11), text: 'TTSSH2 1.00 alpha2 (restart)', title: 'TTSSH2 1.00 alpha2', shape: 'squarepin' },
+                { x: Date.UTC(2023, 10-1, 15), text: 'TTSSH 3.0', title: 'TTSSH 3.0', shape: 'squarepin' },
             ],
             showInLegend: false
         },{
@@ -79,13 +161,15 @@ $(function () {
             color: '#333333',
             fillColor: '#7cb5ec',
             useHTML: true,
-            y: -160,
+            yAxis: 2,
+            y: -80,
             data: [
-                { x: Date.UTC(1994,  2-1, 24), text: '0.0',  title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-1.png" /><br />0.0', shape: 'squarepin' },
-                { x: Date.UTC(1998,  3-1, 10), text: '2.3',  title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-2.png" /><br />2.3', shape: 'squarepin' },
-                { x: Date.UTC(2006,  7-1, 26), text: '4.42', title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-3.png" /><br />4.42', shape: 'squarepin' },
-                { x: Date.UTC(2008,  6-1, 25), text: '4.59', title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-4.png" /><br />4.59', shape: 'squarepin' },
-                { x: Date.UTC(2016,  3-1, 31), text: '4.91', title: '<img src="//ttssh2.osdn.jp/icon_history/teraterm-5.png" /><br />4.91', shape: 'squarepin' },
+                { x: Date.UTC(1994,  2-1, 24), text: '0.0',  title: '<img src="https://ttssh2.osdn.jp/icon_history/teraterm-1.png" /><br />0.0',  shape: 'squarepin' },
+                { x: Date.UTC(1998,  3-1, 10), text: '2.3',  title: '<img src="https://ttssh2.osdn.jp/icon_history/teraterm-2.png" /><br />2.3',  shape: 'squarepin' },
+                { x: Date.UTC(2006,  7-1, 26), text: '4.42', title: '<img src="https://ttssh2.osdn.jp/icon_history/teraterm-3.png" /><br />4.42', shape: 'squarepin' },
+                { x: Date.UTC(2008,  6-1, 25), text: '4.59', title: '<img src="https://ttssh2.osdn.jp/icon_history/teraterm-4.png" /><br />4.59', shape: 'squarepin' },
+                { x: Date.UTC(2016,  3-1, 31), text: '4.91', title: '<img src="https://ttssh2.osdn.jp/icon_history/teraterm-5.png" /><br />4.91', shape: 'squarepin' },
+                { x: Date.UTC(2023, 10-1, 15), text: '5.0',  title: '<img src="https://ttssh2.osdn.jp/icon_history/teraterm-6.png" /><br />5.0',  shape: 'squarepin' },
             ],
             showInLegend: false
         },{
@@ -94,14 +178,16 @@ $(function () {
             color: '#333333',
             fillColor: '#7cb5ec',
             useHTML: true,
-            y: -240,
+            yAxis: 3,
+            y: -80,
             data: [
-                { x: Date.UTC(1998,  6-1,  6), text: '1.2',  title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-1.png" /><br />1.2', shape: 'squarepin' },
-                { x: Date.UTC(2006,  7-1, 26), text: '2.30', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-2.png" /><br />2.30', shape: 'squarepin' },
-                { x: Date.UTC(2008,  6-1, 25), text: '2.47', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-3.png" /><br />2.47', shape: 'squarepin' },
-                { x: Date.UTC(2012, 12-1, 02), text: '2.63', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-4.png" /><br />2.63', shape: 'squarepin' },
-                { x: Date.UTC(2014,  2-1, 28), text: '2.68', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-5.png" /><br />2.68', shape: 'squarepin' },
-                { x: Date.UTC(2016,  3-1, 31), text: '2.77', title: '<img src="//ttssh2.osdn.jp/icon_history/ttsecure-6.png" /><br />2.77', shape: 'squarepin' },
+                { x: Date.UTC(1998,  6-1,  6), text: '1.2',  title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-1.png" /><br />1.2',  shape: 'squarepin' },
+                { x: Date.UTC(2006,  7-1, 26), text: '2.30', title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-2.png" /><br />2.30', shape: 'squarepin' },
+                { x: Date.UTC(2008,  6-1, 25), text: '2.47', title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-3.png" /><br />2.47', shape: 'squarepin' },
+                { x: Date.UTC(2012, 12-1, 02), text: '2.63', title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-4.png" /><br />2.63', shape: 'squarepin' },
+                { x: Date.UTC(2014,  2-1, 28), text: '2.68', title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-5.png" /><br />2.68', shape: 'squarepin' },
+                { x: Date.UTC(2016,  3-1, 31), text: '2.77', title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-6.png" /><br />2.77', shape: 'squarepin' },
+                { x: Date.UTC(2023, 10-1, 15), text: '3.0',  title: '<img src="https://ttssh2.osdn.jp/icon_history/ttsecure-7.png" /><br />3.0',  shape: 'squarepin' },
             ],
             showInLegend: false
         }]
