@@ -122,7 +122,7 @@ Tera Term 開発のためのメーリングリスト <a href="https://lists.osdn
 
 <h3>開発者募集</h3>
 <p>
-TeraTerm Projectでは、共同開発者を募集しています。オープンソース開発に興味ある方は、プロジェクトチーム(ttssh2-contact<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me)までご連絡願います。
+TeraTerm Projectでは、共同開発者を募集しています。オープンソース開発に興味ある方は、プロジェクトチーム(ttssh2-contact<img src="./images/atmark.gif" alt="@" class="atmark">lists.osdn.me)までご連絡願います。
 </p>
 
 <h3 id="build">ソースコードのビルド方法</h3>
@@ -230,7 +230,7 @@ Tera Termのメニューやメッセージをローカライズするための�
 
 <hr>
 
-<p>If you want to comment on this web site, e-mail us at ttssh2-contact<img src="https://static.osdn.net/atmark24.gif" alt="@" class="atmark">lists.osdn.me.</p>
+<p>If you want to comment on this web site, e-mail us at ttssh2-contact<img src="./images/atmark.gif" alt="@" class="atmark">lists.osdn.me.</p>
 
 <p>
 <script type="text/javascript">
