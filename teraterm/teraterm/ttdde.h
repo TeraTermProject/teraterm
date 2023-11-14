@@ -41,6 +41,7 @@ void DDEAdv(void);
 void EndDdeCmnd(int Result);
 void SetDdeComReady(WORD Ready);
 void RunMacro(PCHAR FName, BOOL Startup);
+void RunMacroW(const wchar_t *FNameW, BOOL Startup);
 
 extern char TopicName[21];
 extern BOOL AdvFlag;

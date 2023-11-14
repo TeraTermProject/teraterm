@@ -1329,13 +1329,6 @@ static void SendBinary(const wchar_t *strW, size_t len, size_t repeat)
 	free(strA);
 }
 
-static void RunMacroW(const wchar_t *FNameW, BOOL Startup)
-{
-	char *fname = ToCharW(FNameW);
-	RunMacro(fname, Startup);
-	free(fname);
-}
-
 /**
  *	@param	VKey	virtual-key code
  *	@param	count	The value is the number of times the keystroke

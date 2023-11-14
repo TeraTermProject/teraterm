@@ -1253,3 +1253,10 @@ void RunMacro(PCHAR FName, BOOL Startup)
 		CloseHandle(pi.hProcess);
 	}
 }
+
+void RunMacroW(const wchar_t *FNameW, BOOL Startup)
+{
+	char *fname = ToCharW(FNameW);
+	RunMacro(fname, Startup);
+	free(fname);
+}
