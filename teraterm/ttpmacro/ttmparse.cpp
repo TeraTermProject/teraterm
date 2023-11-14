@@ -331,6 +331,9 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		break;
 	case 'o':
 		if (_stricmp(Str,"or")==0) *WordId = RsvBOr;
+#if defined(OUTPUTDEBUGSTRING_ENABLE)
+		if (_stricmp(Str,"outputdebugstring")==0) *WordId = RsvOutputDebugString;
+#endif
 		break;
 	case 'p':
 		if (_stricmp(Str,"passwordbox")==0) *WordId = RsvPasswordBox;

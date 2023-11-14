@@ -5611,6 +5611,21 @@ WORD TTLScpRecv()
 	return SendCmnd(CmdScpRcv, 0);
 }
 
+#if defined(OUTPUTDEBUGSTRING_ENABLE)
+static WORD TTLOutputDebugstring(void)
+{
+	TStrVal str;
+
+	WORD Err = 0;
+	GetStrVal(str, &Err);
+	if (Err !=0) {
+		return ErrSyntax;
+	}
+	OutputDebugStringW(wc::fromUtf8(str));
+	return 0;
+}
+#endif
+
 int ExecCmnd()
 {
 	WORD WId, Err;
@@ -6098,6 +6113,10 @@ int ExecCmnd()
 			Err = TTLCommCmd(CmdYmodemRecv,IdTTLWaitCmndResult); break;
 		case RsvYmodemSend:
 			Err = TTLYmodemSend(); break;
+#if defined(OUTPUTDEBUGSTRING_ENABLE)
+		case RsvOutputDebugString:
+			Err = TTLOutputDebugstring(); break;
+#endif
 		default:
 			Err = ErrSyntax;
 		}

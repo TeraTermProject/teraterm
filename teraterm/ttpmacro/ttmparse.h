@@ -33,6 +33,8 @@
 
 #include "ttmdef.h"
 
+//#define OUTPUTDEBUGSTRING_ENABLE 1
+
 #define IdTTLRun            1
 #define IdTTLWait           2
 #define IdTTLWaitLn         3
@@ -276,6 +278,9 @@
 #define RsvGetModemStatus	213
 #define RsvDirnameBox   214
 #define RsvSetFlowCtrl   215
+#if defined(OUTPUTDEBUGSTRING_ENABLE)
+#define RsvOutputDebugString	216
+#endif
 
 #define RsvOperator     1000
 #define RsvBNot         1001
