@@ -493,7 +493,7 @@ static SendMem *SendMemInit_()
 	p->hWnd = HVTWin;		// delay時に使用するタイマー用
 	p->timer_id = IdPasteDelayTimer;
 	p->hWndParent_ = NULL;
-	p->ceol = CheckEOLCreate();
+	p->ceol = CheckEOLCreate(CheckEOLTypeFile);
 	return p;
 }
 

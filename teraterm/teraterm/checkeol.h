@@ -35,12 +35,17 @@ extern "C" {
 typedef struct CheckEOLData_st CheckEOLData_t;
 
 typedef enum {
+	CheckEOLTypeFile,	// ファイルから読む
+	CheckEOLTypeLog,	// ログへ書き込む
+} CheckEOLType;
+
+typedef enum {
 	CheckEOLNoOutput = 0x00,	// 何も出力しない
 	CheckEOLOutputEOL = 0x01,	// EOLを出力する
 	CheckEOLOutputChar = 0x02,	// そのまま出力する
 } CheckEOLRet;
 
-CheckEOLData_t *CheckEOLCreate(void);
+CheckEOLData_t *CheckEOLCreate(CheckEOLType type);
 void CheckEOLDestroy(CheckEOLData_t *self);
 void CheckEOLClear(CheckEOLData_t *self);
 CheckEOLRet CheckEOLCheck(CheckEOLData_t *self, unsigned int u32);
