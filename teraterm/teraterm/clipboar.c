@@ -205,6 +205,10 @@ static void CBSendStart(wchar_t *str_w)
 	else {
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, ts.PasteDelayPerLine, 0);
 	}
+	if (ts.LocalEcho > 0) {
+		SendMemInitEcho(sm, TRUE);
+	}
+
 #if 0
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
 	SendMemInitDialogCaption(sm, L"from clipboard");
