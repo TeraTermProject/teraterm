@@ -349,7 +349,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 	{
 		vtterm_work_t *vtterm = &vtterm_work;
 		if (vtterm->check_eol == NULL) {
-			vtterm->check_eol = CheckEOLCreate();
+			vtterm->check_eol = CheckEOLCreate(CheckEOLTypeLog);
 		}
 		else {
 			CheckEOLClear(vtterm->check_eol);
