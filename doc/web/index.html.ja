@@ -38,23 +38,6 @@
 <!-- [<a href="http://logmett.com/forum/index.php">Forum</a>] -->
 </p>
 
-<p>
-<script type="text/javascript">
-<!--
-var ref = escape(document.referrer);
-document.write('<a href="/cgi-bin/yucntssi/icounter.cgi?logmode"><img src="/cgi-bin/yucntssi/icounter.cgi?refer=' + ref + '" alt="Counter:"></a>');
-document.write('(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###"> Yesterday: <img src="/cgi-bin/yucntssi/icounter.cgi?yesterday" alt="###">)');
-// -->
-</script>
-</p>
-
-<noscript>
-<p>
-<img src="/cgi-bin/yucntssi/icounter.cgi" alt="Counter:">
-(Today: <img src="/cgi-bin/yucntssi/icounter.cgi?today" alt="###"> Yesterday: <img src="/cgi-bin/yucntssi/icounter.cgi?yesterday" alt="###">)
-</p>
-</noscript>
-
 
 <h2 id="Project">TeraTerm Project</h2>
 
