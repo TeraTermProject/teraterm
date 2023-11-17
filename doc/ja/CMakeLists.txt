@@ -43,6 +43,8 @@ file(
   CONFIGURE_DEPENDS
   *.html *.md *.png
 )
+list(FILTER SRC EXCLUDE REGEX "build_library_with_cmake.html")
+list(FILTER SRC EXCLUDE REGEX "build_with_cmake.html")
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SRC})
 
