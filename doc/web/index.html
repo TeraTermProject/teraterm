@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <link rel="stylesheet" type="text/css" href="teraterm.css">
+    <link rel="icon" href="/images/teraterm.ico">
+    <link rel="icon" type="image/png" href="images/teraterm.png">
+    <title>Tera Term Open Source Project</title>
+    <meta property="og:title" content="Tera Term - Windows用端末エミュレータ">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Tera TermはWindowsで動作する端末エミュレータで、telnet/ssh/シリアル接続に対応しています">
+    <meta property="og:url" content="https://teratermproject.github.io/">
+    <meta property="og:image" content="https://teratermproject.github.io/images/teraterm.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Tera_Term">
+</head>
+
+<body>
+
+<h1><!--img src="images/teraterm.gif" alt="" width="32" height="32"-->Tera Term Home Page<!--img src="images/ttssh.gif" alt="" width="32" height="32"--></h1>
+
+<p><small><a href="index-en.html">English Page</a></small></p>
+
+<p>
+[<a href="https://github.com/TeraTermProject/teraterm">Project page</a>] 
+[<a href="/manual/ja/about/copyright.html">License</a>] 
+[<a href="https://github.com/TeraTermProject/teraterm/releases">Download</a>]  
+[<a href="https://osdn.net/projects/ttssh2/storage/snapshot/">Snapshot</a>] 
+[<a href="/manual/ja/">Document</a>] 
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">Users ML</a>] 
+[<a href="https://twitter.com/Tera_Term">Twitter</a>] 
+[<a href="#Source">SourceCode</a>] 
+[<a href="#Development">Development</a>]
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">Dev ML</a>] 
+[<a href="https://lists.osdn.me/mailman/listinfo/ttssh2-commit">Commit ML</a>] 
+<!-- [<a href="http://logmett.com/forum/index.php">Forum</a>] -->
+</p>
+
+
+<h2 id="Project">TeraTerm Project</h2>
+
+<p>
+TeraTerm Project は、ターミナルエミュレータ Tera Term 、および SSH 対応拡張モジュール TTSSH の開発をしています。<a href="/manual/ja/about/copyright.html">BSDライセンス</a>に基づくオープンソース・ソフトウェアです。オリジナルの Tera Term Pro 2.3 の原作者公認の後継版です。開発は、GitHub 上の<a href="https://github.com/TeraTermProject/teraterm">プロジェクトページ</a>で行われています。
+</p>
+
+<h2 id="Download">ダウンロード</h2>
+
+<p>
+最新のリリースは、GitHub より<a href="https://github.com/TeraTermProject/teraterm/releases">ダウンロード</a>することができます。<br>
+現在の最新版は <a href="https://github.com/TeraTermProject/teraterm/releases/tag/v5.0">5.0</a> です。
+</p>
+
+<p>
+いち早く最新版を試したい方は、<a href="https://github.com/TeraTermProject/teraterm">リポジトリ</a>からソースコードを入手することができます。<br>
+<a href="https://ja.osdn.net/projects/ttssh2/releases/p15375">古いリリース</a>はこちらから入手可能ですが、なるべく最新版を利用することを推奨します。
+</p>
+
+<h2 id="Manual">マニュアル</h2>
+
+<p>
+以下のマニュアルがあります。<br>
+ここのマニュアルは開発最先端のものです。リリース版には実装されていない内容が含まれていることがあります。<br>
+しかし、ユーザは次のリリース内容を知ることができます。リリース内容に関する修正や要望を事前に挙げていただければ、開発者が対応しやすくなります。
+</p>
+<ul>
+  <li>Tera Term 5
+    <ul>
+      <li><a href="/manual/5/ja/">Tera Term ヘルプ</a></li>
+      <li><a href="/manual/5/ja/macro/">MACRO ヘルプ</a></li>
+    </ul>
+  </li>
+  <li>Tera Term 4
+    <ul>
+      <li><a href="/manual/4/ja/">Tera Term ヘルプ</a></li>
+      <li><a href="/manual/4/ja/macro/">MACRO ヘルプ</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="Support">サポート</h2>
+
+<p>
+バグの報告や、機能の追加や変更をしてほしい場合には、<a href="https://github.com/TeraTermProject/teraterm/issues">issues</a>までお願いします。
+</p>
+
+<p>
+Tera Term ユーザーのためのメーリングリスト <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users">ttssh2-users</a> が設置されています。
+</p>
+
+<!-- <p>
+英語の<a href="http://logmett.com/forum/">フォーラム</a>が、Boris Maisuradze によって運営されています。
+</p> -->
+
+<h2 id="Source">ソースコード</h2>
+
+<p>
+リポジトリ: <a href="https://github.com/TeraTermProject/teraterm">https://github.com/TeraTermProject/teraterm</a>
+</p>
+
+<h2 id="Development">開発情報</h2>
+
+Tera Term 開発のためのメーリングリスト <a href="https://lists.osdn.me/mailman/listinfo/ttssh2-dev">ttssh2-dev</a> が設置されています。
+
+<h3>開発者募集</h3>
+<p>
+TeraTerm Projectでは、共同開発者を募集しています。オープンソース開発に興味ある方は、プロジェクトチーム(ttssh2-contact<img src="./images/atmark.gif" alt="@" class="atmark">lists.osdn.me)までご連絡願います。
+</p>
+
+<h3 id="build">ソースコードのビルド方法</h3>
+<p>
+<a href="/manual/ja/reference/develop.html">develop.html</a>を参照願います。
+</p>
+
+<h3 id="localize">言語ファイルの翻訳</h3>
+<p>
+Tera Termのメニューやメッセージをローカライズするための、言語ファイルの各言語への翻訳状況は以下のようになっています。他言語への翻訳を行われた場合は、プロジェクトチームまでご連絡願います。
+</p>
+
+<table border="1">
+<tr>
+  <th rowspan="2">Language</th>
+  <th colspan="3">4-stable(Tera Term 4)</th>
+  <th colspan="3">trunk(Tera Term 5)</th>
+  <th rowspan="2">Contributor</th>
+</tr>
+
+<tr>
+  <th>File</th>
+  <th>Updated</th>
+  <th>Last translated</th>
+  <th>File</th>
+  <th>Updated</th>
+  <th>Last translated</th>
+</tr>
+
+<tr>
+  <td>English</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/English.lng">English.lng</a></td>
+  <td rowspan="8">2019-11-22</td>
+  <td>-</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/English.lng">English.lng</a></td>
+  <td rowspan="8">2021-12-08</td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+
+<tr>
+  <td>Japanese</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Japanese.lng">Japanese.lng</a></td>
+  <td>-</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Japanese.lng">Japanese.lng</a></td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+
+<tr>
+  <td>German</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/German.lng">German.lng</a></td>
+  <td>2010-05-17</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/German.lng">German.lng</a></td>
+  <td>2010-05-17</td>
+  <td>Alexander Wiechert</td>
+</tr>
+
+<tr>
+  <td>French</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/French.lng">French.lng</a></td>
+  <td>2010-07-21</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/French.lng">French.lng</a></td>
+  <td>2010-07-21</td>
+  <td>Francois MOCQ</td>
+</tr>
+
+<tr>
+  <td>Russian</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Russian.lng">Russian.lng</a></td>
+  <td>2017-07-19</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Russian.lng">Russian.lng</a></td>
+  <td>2017-07-19</td>
+  <td>Sergey Ryumik</td>
+</tr>
+
+<tr>
+  <td>Korean</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Korean.lng">Korean.lng</a></td>
+  <td>2013-07-25</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Korean.lng">Korean.lng</a></td>
+  <td>2013-07-25</td>
+  <td>Daehong Kim</td>
+</tr>
+
+<tr>
+  <td>Chinese (Simplified)</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
+  <td>2017-04-11</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Simplified%20Chinese.lng">Simplified Chinese.lng</a></td>
+  <td>2017-04-11</td>
+  <td>LiShaohui</td>
+</tr>
+
+<tr>
+  <td>Chinese (Traditional)</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/installer/release/lang/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
+  <td>2014-09-22</td>
+  <td><a href="https://github.com/TeraTermProject/teraterm/blob/main/installer/release/lang_utf8/Traditional%20Chinese.lng">Traditional Chinese.lng</a></td>
+  <td>2014-09-22</td>
+  <td>Wei Yan</td>
+</tr>
+
+</table>
+
+<hr>
+
+<p>If you want to comment on this web site, e-mail us at ttssh2-contact<img src="./images/atmark.gif" alt="@" class="atmark">lists.osdn.me.</p>
+
+<p>
+<script type="text/javascript">
+<!--
+document.write('(last modified on ' + document.lastModified + ')');
+//-->
+</script>
+</p>
+
+</body>
+</html>
