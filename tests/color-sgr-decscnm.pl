@@ -48,7 +48,7 @@ sub ShowAttributesSGR {
 		},
 		{
 			Enter => "\x1b[0m",
-			Str => "https://ttssh2.osdn.jp/  SGR 0(Normal) + URL string",
+			Str => "https://teratermproject.github.io/  SGR 0(Normal) + URL string",
 		},
 		{
 			Enter => "\x1b[0m\x1b[31m",

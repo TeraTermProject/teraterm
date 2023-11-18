@@ -27,7 +27,7 @@ Wait_3sec() {
 }
 
 simple() {
-	printf "https://ttssh2.osdn.jp/"
+	printf "https://teratermproject.github.io/"
 }
 
 Wrap() {
@@ -37,7 +37,7 @@ Wrap() {
 		for ((j=0; j<i; j++)); do
 			printf "_"
 		done
-		printf "https://ttssh2.osdn.jp/"
+		printf "https://teratermproject.github.io/"
 		printf "\n"
 	done
 }
@@ -47,7 +47,7 @@ Repeat() {
 	printf "repeat test\n"
 	count=50
 	for ((i=0; i < $count; i++)); do
-		printf "https://ttssh2.osdn.jp/  "
+		printf "https://teratermproject.github.io/  "
 	done
 	printf "\n"
 }
@@ -56,7 +56,7 @@ Break() {
 	InitScreen
 	printf "break url test\n"
 	for ((i=14; i < 23; i++)); do
-		printf "https://ttssh2.osdn.jp/"
+		printf "https://teratermproject.github.io/"
 		Left "$i"
 		printf "!\n"
 	done

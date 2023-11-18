@@ -32,8 +32,8 @@ Name: build.bat
 [Setup]
 AppCopyright=(C) 2004-2023 TeraTerm Project
 AppPublisher=TeraTerm Project
-AppPublisherURL=https://ttssh2.osdn.jp/
-AppSupportURL=https://ttssh2.osdn.jp/
+AppPublisherURL=https://teratermproject.github.io/
+AppSupportURL=https://teratermproject.github.io/
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
 #ifndef VerSubStr
