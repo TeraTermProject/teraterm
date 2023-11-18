@@ -7,8 +7,8 @@
     <meta property="og:site_name" content="Tera Term - Terminal Emulator for Windows">
     <meta property="og:type" content="website">
     <meta property="og:description" content="There is snapshots of development version. It is possibly fickleness than release version. It is also possibly contains pre-released bug fix and/or new feature.">
-    <meta property="og:url" content="https://ttssh2.osdn.jp/snapshot/">
-    <meta property="og:image" content="https://ttssh2.osdn.jp/images/teraterm.png">
+    <meta property="og:url" content="https://teratermproject.github.io/snapshot/">
+    <meta property="og:image" content="https://teratermproject.github.io/images/teraterm.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@Tera_Term">
 </head>

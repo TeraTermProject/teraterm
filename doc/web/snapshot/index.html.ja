@@ -7,8 +7,8 @@
     <meta property="og:site_name" content="Tera Term - Windows用端末エミュレータ">
     <meta property="og:type" content="website">
     <meta property="og:description" content="Tera Termの開発版スナップショット置き場です。まだリリースされていないバグ修正や新機能が実装されているかもしれませんが、リリース版より不安定な事があります。">
-    <meta property="og:url" content="https://ttssh2.osdn.jp/snapshot/">
-    <meta property="og:image" content="https://ttssh2.osdn.jp/images/teraterm.png">
+    <meta property="og:url" content="https://teratermproject.github.io/snapshot/">
+    <meta property="og:image" content="https://teratermproject.github.io/images/teraterm.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@Tera_Term">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
