@@ -2741,6 +2741,8 @@ static void DrawChar(HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t
 	HBITMAP prev_bitmap;
 	RECT rc;
 	vtdisp_work_t *w = &vtdisp_work;
+	int width;
+	int height;
 
 	GetTextExtentPoint32W(hDC, str, (int)len, &char_size);
 
@@ -2758,8 +2760,8 @@ static void DrawChar(HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t
 	ExtTextOutW(char_dc, 0, 0, ETO_OPAQUE, &rc, str, (UINT)len, 0);
 
 	// ‰¡‚ğcell•(cell*FontWidth pixel)‚ÉŠg‘å/k¬‚µ‚Ä•`‰æ
-	int width = cell * FontWidth;
-	int height = char_size.cy;
+	width = cell * FontWidth;
+	height = char_size.cy;
 	if (pTransparentBlt == NULL || BGDC == NULL || w->DCBackAlpha == 255) {
 		// ’¼Ú•`‰æ
 		SetStretchBltMode(hDC, COLORONCOLOR);

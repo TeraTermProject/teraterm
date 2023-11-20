@@ -4892,14 +4892,16 @@ static void ParseControlBuf(BYTE b, void *client_data)
 static wchar_t *ConvertUTF16(const BYTE *ptr, size_t len)
 {
 	CharSetOp op;
+	CharSetBuf b;
+	CharSetData *h;
+	size_t i;
 	op.PutU32 = PutU32Buf;
 	op.ParseControl = ParseControlBuf;
-	CharSetBuf b;
 	b.size = 32;
 	b.ptr = (wchar_t *)malloc(sizeof(wchar_t) * b.size);
 	b.index = 0;
-	CharSetData *h = CharSetInit(&op, &b);
-	for (size_t i = 0; i < len; i++) {
+	h = CharSetInit(&op, &b);
+	for (i = 0; i < len; i++) {
 		BYTE c = *ptr++;
 		ParseFirst(h, c);
 	}
@@ -4947,6 +4949,7 @@ static void XsProcClipboard(PCHAR buff)
 			}
 		}
 		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access
+			wchar_t *cbbuffW;
 			size_t len = strlen(buff);
 			size_t blen = len * 3 / 4 + 1;
 			char *cbbuff = malloc(blen);
@@ -4958,7 +4961,7 @@ static void XsProcClipboard(PCHAR buff)
 			cbbuff[len] = 0;
 
 			// cbbuff ‚ð wchar_t ‚Ö•ÏŠ·
-			wchar_t *cbbuffW = ConvertUTF16(cbbuff, len);
+			cbbuffW = ConvertUTF16(cbbuff, len);
 			free(cbbuff);
 			cbbuff = NULL;
 

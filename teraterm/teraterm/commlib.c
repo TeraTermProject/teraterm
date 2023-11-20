@@ -714,7 +714,14 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 				/* trying with all protocol family are failed */
 				if (cv->NoMsg==0) {
+					static const TTMessageBoxInfoW info = {
+						"Tera Term",
+						"MSG_TT_ERROR", L"Tera Term: Error",
+						NULL, NULL,
+						MB_TASKMODAL | MB_ICONEXCLAMATION | MB_HELP
+					};
 					wchar_t *UIMsgW;
+
 					switch (HIWORD(lParam)) {
 					case WSAECONNREFUSED:
 						GetI18nStrWW("Tera Term", "MSG_COMM_REFUSE_ERROR", L"Connection refused", ts->UILanguageFileW, &UIMsgW);
@@ -730,12 +737,6 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 						break;
 					}
 
-					static const TTMessageBoxInfoW info = {
-						"Tera Term",
-						"MSG_TT_ERROR", L"Tera Term: Error",
-						NULL, NULL,
-						MB_TASKMODAL | MB_ICONEXCLAMATION | MB_HELP
-					};
 					VtwinSetHelpId(HlpAboutQandaConnection);
 					TTMessageBoxW(cv->HWin, &info, ts->UILanguageFileW, UIMsgW);
 					free(UIMsgW);

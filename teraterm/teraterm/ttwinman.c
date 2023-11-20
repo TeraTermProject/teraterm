@@ -93,11 +93,12 @@ void ChangeTitle(void)
 	wchar_t TempTitleWithRemote[TitleBuffSize * 2];
 
 	{
+		const wchar_t *title_remote;
 		wchar_t *title = ToWcharA(ts.Title);
 		if (title == NULL) {
 			title = _wcsdup(L"");
 		}
-		const wchar_t *title_remote = cv.TitleRemoteW;
+		title_remote = cv.TitleRemoteW;
 		if (Connecting || !cv.Ready || title_remote == NULL || title_remote[0] == 0) {
 			// リモートタイトルを使用しない or 設定されていない
 			wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
