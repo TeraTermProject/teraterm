@@ -28,9 +28,8 @@
 #pragma once
 
 // Oniguruma: Regular expression library
-#define ONIG_EXTERN extern
+#define ONIG_STATIC
 #include "oniguruma.h"
-#undef ONIG_EXTERN
 
 #ifdef __cplusplus
 extern "C" {

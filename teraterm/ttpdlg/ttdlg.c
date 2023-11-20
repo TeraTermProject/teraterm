@@ -62,9 +62,8 @@
 #include "ttwinman.h"
 
 // Oniguruma: Regular expression library
-#define ONIG_EXTERN extern
+#define ONIG_STATIC
 #include "oniguruma.h"
-#undef ONIG_EXTERN
 
 // SFMT: SIMD-oriented Fast Mersenne Twister
 #include "SFMT_version_for_teraterm.h"
