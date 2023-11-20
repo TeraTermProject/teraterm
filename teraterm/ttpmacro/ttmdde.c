@@ -116,7 +116,7 @@ BOOL Wait4allGotIndex = FALSE;
 int Wait4allFoundNum = 0;
 
 // ring buffer
-void Put1Byte(BYTE b)
+static void Put1Byte(BYTE b)
 {
 	// 従来のリングバッファへ書き込むと同時に、wait4all用共有メモリへも書き出す。(2009.3.12 yutaka)
 	if (is_wait4all_enabled()) {
@@ -138,7 +138,7 @@ void Put1Byte(BYTE b)
 	}
 }
 
-BOOL Read1Byte(LPBYTE b)
+static BOOL Read1Byte(LPBYTE b)
 {
 	if (is_wait4all_enabled()) {
 		return read_macro_1byte(macro_shmem_index, b);

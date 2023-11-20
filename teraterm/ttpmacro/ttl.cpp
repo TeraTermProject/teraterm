@@ -93,9 +93,9 @@ static HANDLE FHandle[NumFHandle];
 static long FPointer[NumFHandle];
 
 // forward declaration
-int ExecCmnd();
+static int ExecCmnd(void);
 
-static void HandleInit()
+static void HandleInit(void)
 {
 	int i;
 	for (i=0; i<_countof(FHandle); i++) {
@@ -311,6 +311,7 @@ void EndTTL()
 	EndVar();
 }
 
+#if 0
 long int CalcTime()
 {
 	time_t time1;
@@ -323,9 +324,10 @@ long int CalcTime()
 	        (long int)ptm->tm_sec
 	       );
 }
+#endif
 
 //////////////// Beginning of TTL commands //////////////
-WORD TTLCommCmd(char Cmd, int Wait)
+static WORD TTLCommCmd(char Cmd, int Wait)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -335,7 +337,7 @@ WORD TTLCommCmd(char Cmd, int Wait)
 		return SendCmnd(Cmd,Wait);
 }
 
-WORD TTLCommCmdFile(char Cmd, int Wait)
+static WORD TTLCommCmdFile(char Cmd, int Wait)
 {
 	TStrVal Str;
 	WORD Err;
@@ -356,7 +358,7 @@ WORD TTLCommCmdFile(char Cmd, int Wait)
 	return Err;
 }
 
-WORD TTLCommCmdBin(char Cmd, int Wait)
+static WORD TTLCommCmdBin(char Cmd, int Wait)
 {
 	int Val;
 	WORD Err;
@@ -377,8 +379,7 @@ WORD TTLCommCmdBin(char Cmd, int Wait)
 	return Err;
 }
 
-
-WORD TTLCommCmdDeb()
+static WORD TTLCommCmdDeb(void)
 {
 	int Val;
 	WORD Err;
@@ -398,7 +399,7 @@ WORD TTLCommCmdDeb()
 	return Err;
 }
 
-WORD TTLCommCmdInt(char Cmd, int Wait)
+static WORD TTLCommCmdInt(char Cmd, int Wait)
 {
 	int Val;
 	char Str[21];
@@ -421,7 +422,7 @@ WORD TTLCommCmdInt(char Cmd, int Wait)
 	return Err;
 }
 
-WORD TTLBeep()
+static WORD TTLBeep(void)
 {
 	int val = 0;
 	WORD Err = 0;
@@ -461,14 +462,15 @@ WORD TTLBeep()
 	return 0;
 }
 
-WORD TTLBreak(WORD WId) {
+static WORD TTLBreak(WORD WId)
+{
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
 
 	return BreakLoop(WId);
 }
 
-WORD TTLBringupBox()
+static WORD TTLBringupBox(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -476,7 +478,7 @@ WORD TTLBringupBox()
 	return 0;
 }
 
-WORD TTLCall()
+static WORD TTLCall(void)
 {
 	TName LabName;
 	WORD Err, VarType;
@@ -494,7 +496,7 @@ WORD TTLCall()
 	return Err;
 }
 
-WORD TTLCloseSBox()
+static WORD TTLCloseSBox(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -502,7 +504,7 @@ WORD TTLCloseSBox()
 	return 0;
 }
 
-WORD TTLCloseTT()
+static WORD TTLCloseTT(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -517,7 +519,7 @@ WORD TTLCloseTT()
 	}
 }
 
-WORD TTLCode2Str()
+static WORD TTLCode2Str(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -549,7 +551,7 @@ WORD TTLCode2Str()
 	return Err;
 }
 
-WORD TTLConnect(WORD mode)
+static WORD TTLConnect(WORD mode)
 {
 	TStrVal Str;
 	WORD Err;
@@ -714,7 +716,7 @@ static unsigned long crc32(int n, unsigned char c[])
 }
 
 // チェックサムアルゴリズム・共通ルーチン
-WORD TTLDoChecksum(enum checksum_type type)
+static WORD TTLDoChecksum(enum checksum_type type)
 {
 	TStrVal Str;
 	WORD Err;
@@ -757,7 +759,7 @@ WORD TTLDoChecksum(enum checksum_type type)
 	return Err;
 }
 
-WORD TTLDoChecksumFile(enum checksum_type type)
+static WORD TTLDoChecksumFile(enum checksum_type type)
 {
 	TStrVal Str;
 	int result = 0;
@@ -838,7 +840,7 @@ error:
 	return Err;
 }
 
-WORD TTLDelPassword()
+static WORD TTLDelPassword(void)
 {
 	TStrVal Str, Str2;
 	WORD Err;
@@ -860,7 +862,7 @@ WORD TTLDelPassword()
 	return Err;
 }
 
-WORD TTLDim(WORD type)
+static WORD TTLDim(WORD type)
 {
 	WORD Err, WordId, VarType;
 	TName Name;
@@ -885,7 +887,7 @@ WORD TTLDim(WORD type)
 	return Err;
 }
 
-WORD TTLDisconnect()
+static WORD TTLDisconnect(void)
 {
 	WORD Err;
 	int Val = 1;
@@ -911,7 +913,7 @@ WORD TTLDisconnect()
 	return Err;
 }
 
-WORD TTLDispStr()
+static WORD TTLDispStr(void)
 {
 	TStrVal Str, buff;
 	WORD Err, ValType;
@@ -950,7 +952,7 @@ WORD TTLDispStr()
 	return SendCmnd(CmdDispStr, 0);
 }
 
-WORD TTLDo()
+static WORD TTLDo(void)
 {
 	WORD WId, Err;
 	int Val = 1;
@@ -986,7 +988,7 @@ WORD TTLDo()
 	return Err;
 }
 
-WORD TTLElse()
+static WORD TTLElse(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -1000,7 +1002,7 @@ WORD TTLElse()
 	return 0;
 }
 
-int CheckElseIf(LPWORD Err)
+static int CheckElseIf(LPWORD Err)
 {
 	int Val;
 	WORD WId;
@@ -1015,7 +1017,7 @@ int CheckElseIf(LPWORD Err)
 	return Val;
 }
 
-WORD TTLElseIf()
+static WORD TTLElseIf(void)
 {
 	WORD Err;
 	int Val;
@@ -1032,7 +1034,7 @@ WORD TTLElseIf()
 	return Err;
 }
 
-WORD TTLEnd()
+static WORD TTLEnd(void)
 {
 	if (GetFirstChar()==0)
 	{
@@ -1043,7 +1045,7 @@ WORD TTLEnd()
 		return ErrSyntax;
 }
 
-WORD TTLEndIf()
+static WORD TTLEndIf(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -1055,7 +1057,7 @@ WORD TTLEndIf()
 	return 0;
 }
 
-WORD TTLEndWhile(BOOL mode)
+static WORD TTLEndWhile(BOOL mode)
 {
 	WORD Err;
 	int Val = mode;
@@ -1072,7 +1074,7 @@ WORD TTLEndWhile(BOOL mode)
 	return BackToWhile((Val!=0) == mode);
 }
 
-WORD TTLExec()
+static WORD TTLExec(void)
 {
 	TStrVal Str,Str2, CurDir;
 	int mode = SW_SHOW;
@@ -1156,7 +1158,7 @@ WORD TTLExec()
 	return Err;
 }
 
-WORD TTLExecCmnd()
+static WORD TTLExecCmnd(void)
 {
 	WORD Err;
 	TStrVal NextLine;
@@ -1177,7 +1179,7 @@ WORD TTLExecCmnd()
 	return Err;
 }
 
-WORD TTLExit()
+static WORD TTLExit(void)
 {
 	if (GetFirstChar()==0)
 	{
@@ -1189,7 +1191,7 @@ WORD TTLExit()
 	return ErrSyntax;
 }
 
-WORD TTLExpandEnv()
+static WORD TTLExpandEnv(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -1220,7 +1222,7 @@ WORD TTLExpandEnv()
 	return Err;
 }
 
-WORD TTLFileClose()
+static WORD TTLFileClose(void)
 {
 	WORD Err;
 	int fhi;	// handle index
@@ -1237,7 +1239,7 @@ WORD TTLFileClose()
 	return Err;
 }
 
-WORD TTLFileConcat()
+static WORD TTLFileConcat(void)
 {
 	WORD Err;
 	TStrVal FName1, FName2;
@@ -1311,7 +1313,7 @@ WORD TTLFileConcat()
 	return Err;
 }
 
-WORD TTLFileCopy()
+static WORD TTLFileCopy(void)
 {
 	WORD Err;
 	TStrVal FName1, FName2;
@@ -1353,7 +1355,7 @@ WORD TTLFileCopy()
 	return Err;
 }
 
-WORD TTLFileCreate()
+static WORD TTLFileCreate(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -1397,7 +1399,7 @@ WORD TTLFileCreate()
 	return Err;
 }
 
-WORD TTLFileDelete()
+static WORD TTLFileDelete(void)
 {
 	WORD Err;
 	TStrVal FName;
@@ -1427,7 +1429,7 @@ WORD TTLFileDelete()
 	return Err;
 }
 
-WORD TTLFileMarkPtr()
+static WORD TTLFileMarkPtr(void)
 {
 	WORD Err;
 	int fhi;
@@ -1448,7 +1450,7 @@ WORD TTLFileMarkPtr()
 	return Err;
 }
 
-WORD TTLFileOpen()
+static WORD TTLFileOpen(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -1509,7 +1511,7 @@ WORD TTLFileOpen()
 
 // Format: filelock <file handle> [<timeout>]
 // (2012.4.19 yutaka)
-WORD TTLFileLock()
+static WORD TTLFileLock(void)
 {
 	WORD Err;
 	HANDLE FH;
@@ -1549,7 +1551,7 @@ WORD TTLFileLock()
 
 // Format: fileunlock <file handle>
 // (2012.4.19 yutaka)
-WORD TTLFileUnLock()
+static WORD TTLFileUnLock(void)
 {
 	WORD Err;
 	HANDLE FH;
@@ -1573,7 +1575,7 @@ WORD TTLFileUnLock()
 	return Err;
 }
 
-WORD TTLFileReadln()
+static WORD TTLFileReadln(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -1632,7 +1634,7 @@ WORD TTLFileReadln()
 // 指定したバイト数だけファイルから読み込む。
 // ただし、<read byte>は 1～255 まで。
 // (2006.11.1 yutaka)
-WORD TTLFileRead()
+static WORD TTLFileRead(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -1679,7 +1681,7 @@ WORD TTLFileRead()
 }
 
 
-WORD TTLFileRename()
+static WORD TTLFileRename(void)
 {
 	WORD Err;
 	TStrVal FName1, FName2;
@@ -1719,7 +1721,7 @@ WORD TTLFileRename()
 	return Err;
 }
 
-WORD TTLFileSearch()
+static WORD TTLFileSearch(void)
 {
 	WORD Err;
 	TStrVal FName;
@@ -1741,7 +1743,7 @@ WORD TTLFileSearch()
 	return Err;
 }
 
-WORD TTLFileSeek()
+static WORD TTLFileSeek(void)
 {
 	WORD Err;
 	int fhi;
@@ -1760,7 +1762,7 @@ WORD TTLFileSeek()
 	return Err;
 }
 
-WORD TTLFileSeekBack()
+static WORD TTLFileSeekBack(void)
 {
 	WORD Err;
 	int fhi;
@@ -1790,7 +1792,7 @@ static time_t FileTimeToUnixTime(const FILETIME *ft)
 	return (time_t)((ll - 116444736000000000) / 10000000);
 }
 
-WORD TTLFileStat()
+static WORD TTLFileStat(void)
 {
 	WORD Err;
 	TStrVal FName;
@@ -1876,7 +1878,7 @@ end:
 	return Err;
 }
 
-WORD TTLFileStrSeek()
+static WORD TTLFileStrSeek(void)
 {
 	WORD Err;
 	int fhi;
@@ -1921,7 +1923,7 @@ WORD TTLFileStrSeek()
 	return Err;
 }
 
-WORD TTLFileStrSeek2()
+static WORD TTLFileStrSeek2(void)
 {
 	WORD Err;
 	int fhi;
@@ -1975,7 +1977,7 @@ WORD TTLFileStrSeek2()
 	return Err;
 }
 
-WORD TTLFileTruncate()
+static WORD TTLFileTruncate(void)
 {
 	WORD Err = 0;
 	TStrVal FName;
@@ -2031,7 +2033,7 @@ end:
 	return Err;
 }
 
-WORD TTLFileWrite(BOOL addCRLF)
+static WORD TTLFileWrite(BOOL addCRLF)
 {
 	WORD Err, P;
 	int fhi;
@@ -2073,7 +2075,7 @@ WORD TTLFileWrite(BOOL addCRLF)
 	return 0;
 }
 
-WORD TTLFindClose()
+static WORD TTLFindClose(void)
 {
 	WORD Err;
 	int DH;
@@ -2093,7 +2095,7 @@ WORD TTLFindClose()
 	return Err;
 }
 
-WORD TTLFindFirst()
+static WORD TTLFindFirst(void)
 {
 	TVarId DH, Name;
 	WORD Err;
@@ -2137,7 +2139,7 @@ WORD TTLFindFirst()
 	return Err;
 }
 
-WORD TTLFindNext()
+static WORD TTLFindNext(void)
 {
 	TVarId Name;
 	WORD Err;
@@ -2165,7 +2167,7 @@ WORD TTLFindNext()
 	return Err;
 }
 
-WORD TTLFlushRecv()
+static WORD TTLFlushRecv(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -2173,7 +2175,7 @@ WORD TTLFlushRecv()
 	return 0;
 }
 
-WORD TTLFolderCreate()
+static WORD TTLFolderCreate(void)
 {
 	WORD Err;
 	TStrVal FName;
@@ -2202,7 +2204,7 @@ WORD TTLFolderCreate()
 	return Err;
 }
 
-WORD TTLFolderDelete()
+static WORD TTLFolderDelete(void)
 {
 	WORD Err;
 	TStrVal FName;
@@ -2231,7 +2233,7 @@ WORD TTLFolderDelete()
 	return Err;
 }
 
-WORD TTLFolderSearch()
+static WORD TTLFolderSearch(void)
 {
 	WORD Err;
 	TStrVal FName;
@@ -2254,7 +2256,7 @@ WORD TTLFolderSearch()
 	return Err;
 }
 
-WORD TTLFor()
+static WORD TTLFor(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -2292,7 +2294,7 @@ WORD TTLFor()
 	return Err;
 }
 
-WORD TTLGetDir()
+static WORD TTLGetDir(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -2309,7 +2311,7 @@ WORD TTLGetDir()
 	return Err;
 }
 
-WORD TTLGetEnv()
+static WORD TTLGetEnv(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -2332,7 +2334,7 @@ WORD TTLGetEnv()
 	return Err;
 }
 
-WORD TTLGetFileAttr()
+static WORD TTLGetFileAttr(void)
 {
 	WORD Err;
 	TStrVal Filename;
@@ -2349,7 +2351,7 @@ WORD TTLGetFileAttr()
 	return Err;
 }
 
-WORD TTLGetHostname()
+static WORD TTLGetHostname(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -2374,7 +2376,7 @@ WORD TTLGetHostname()
  strdim ipaddr 10
  getipv4addr ipaddr num
  */
-WORD TTLGetIPv4Addr()
+static WORD TTLGetIPv4Addr(void)
 {
 	WORD Err;
 	TVarId VarId, VarId2, id;
@@ -2450,7 +2452,7 @@ static void myInetNtop(int Family, char *pAddr, char *pStringBuf, size_t StringB
 }
 
 
-WORD TTLGetIPv6Addr()
+static WORD TTLGetIPv6Addr(void)
 {
 	WORD Err;
 	TVarId VarId, VarId2, id;
@@ -2522,7 +2524,7 @@ WORD TTLGetIPv6Addr()
 }
 
 // setpassword 'password.dat' 'mypassword' passowrd
-WORD TTLSetPassword()
+static WORD TTLSetPassword(void)
 {
 	TStrVal FileNameStr, KeyStr, PassStr;
 	char Temp[512];
@@ -2557,7 +2559,7 @@ WORD TTLSetPassword()
 }
 
 // ispassword 'password.dat' 'username' ; result: 0=false; 1=true
-WORD TTLIsPassword()
+static WORD TTLIsPassword(void)
 {
 	TStrVal FileNameStr, KeyStr;
 	char Temp[512];
@@ -2592,7 +2594,7 @@ WORD TTLIsPassword()
 	return Err;
 }
 
-WORD TTLGetSpecialFolder()
+static WORD TTLGetSpecialFolder(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -2696,7 +2698,7 @@ static WORD TTLGetTime(WORD mode)
 	return Err;
 }
 
-WORD TTLGetTitle()
+static WORD TTLGetTitle(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -2716,7 +2718,7 @@ WORD TTLGetTitle()
 	return Err;
 }
 
-WORD TTLGetTTDir()
+static WORD TTLGetTTDir(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -2742,7 +2744,7 @@ WORD TTLGetTTDir()
 
 // COMポートからレジスタ値を読む。
 // (2015.1.8 yutaka)
-WORD TTLGetModemStatus()
+static WORD TTLGetModemStatus(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -2776,7 +2778,7 @@ WORD TTLGetModemStatus()
 // バージョン番号はコンパイル時に決定する。
 // (現在は実行ファイルのバージョン情報は参照しない)
 //
-WORD TTLGetVer()
+static WORD TTLGetVer(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -2829,7 +2831,7 @@ WORD TTLGetVer()
 	return Err;
 }
 
-WORD TTLGoto()
+static WORD TTLGoto(void)
 {
 	TName LabName;
 	WORD Err, VarType;
@@ -2852,7 +2854,7 @@ WORD TTLGoto()
 }
 
 // add 'ifdefined' (2006.9.23 maya)
-WORD TTLIfDefined()
+static WORD TTLIfDefined(void)
 {
 	WORD VarType, Err;
 	int Val;
@@ -2864,7 +2866,7 @@ WORD TTLIfDefined()
 	return Err;
 }
 
-BOOL CheckThen(LPWORD Err)
+static BOOL CheckThen(LPWORD Err)
 {
 	BYTE b;
 	TName Temp;
@@ -2887,7 +2889,7 @@ BOOL CheckThen(LPWORD Err)
 	return TRUE;
 }
 
-WORD TTLIf()
+static WORD TTLIf(void)
 {
 	WORD Err, ValType, Tmp, WId;
 	int Val;
@@ -2921,7 +2923,7 @@ WORD TTLIf()
 	return Err;
 }
 
-WORD TTLInclude()
+static WORD TTLInclude(void)
 {
 	WORD Err;
 	TStrVal Str;
@@ -2943,7 +2945,7 @@ WORD TTLInclude()
 	return Err;
 }
 
-WORD TTLInt2Str()
+static WORD TTLInt2Str(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -2969,7 +2971,7 @@ WORD TTLInt2Str()
 // logrotate rotate num
 // logrotate halt
 //
-WORD TTLLogRotate()
+static WORD TTLLogRotate(void)
 {
 	WORD Err;
 	char Str[MaxStrLen];
@@ -3034,7 +3036,7 @@ WORD TTLLogRotate()
 	return Err;
 }
 
-WORD TTLLogInfo()
+static WORD TTLLogInfo(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -3056,7 +3058,7 @@ WORD TTLLogInfo()
 	return Err;
 }
 
-WORD TTLLogOpen()
+static WORD TTLLogOpen(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -3117,7 +3119,7 @@ EndLogOptions:
 	return Err;
 }
 
-WORD TTLLoop()
+static WORD TTLLoop(void)
 {
 	WORD WId, Err;
 	int Val = 1;
@@ -3149,7 +3151,7 @@ WORD TTLLoop()
 	return BackToWhile(Val!=0);
 }
 
-WORD TTLMakePath()
+static WORD TTLMakePath(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -3210,7 +3212,7 @@ static void dirname(char *fullpath, char *dest, int len) {
 	basedirname(fullpath, NULL, 0, dest, len);
 }
 
-WORD TTLBasename()
+static WORD TTLBasename(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -3231,7 +3233,7 @@ WORD TTLBasename()
 	return Err;
 }
 
-WORD TTLDirname()
+static WORD TTLDirname(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -3252,14 +3254,14 @@ WORD TTLDirname()
 	return Err;
 }
 
-WORD TTLNext()
+static WORD TTLNext(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
 	return NextLoop();
 }
 
-WORD TTLPause()
+static WORD TTLPause(void)
 {
 	int TimeOut;
 	WORD Err;
@@ -3284,7 +3286,7 @@ WORD TTLPause()
 // SYNOPSIS: mpause millisecoand
 // DESCRIPTION: This command would sleep Tera Term macro program by specified millisecond time.
 // (2006.2.10 yutaka)
-WORD TTLMilliPause()
+static WORD TTLMilliPause(void)
 {
 	int TimeOut;
 	WORD Err;
@@ -3309,7 +3311,7 @@ WORD TTLMilliPause()
 // This command generates the random value from 0 to <value> and
 // stores the value to <intvar>.
 // (2006.2.11 yutaka)
-WORD TTLRandom()
+static WORD TTLRandom(void)
 {
 	static int init_done = 0;
 	static sfmt_t sfmt;
@@ -3345,7 +3347,7 @@ WORD TTLRandom()
 	return Err;
 }
 
-WORD TTLRecvLn()
+static WORD TTLRecvLn(void)
 {
 	TStrVal Str;
 	WORD ValType;
@@ -3383,7 +3385,7 @@ WORD TTLRecvLn()
 	return 0;
 }
 
-WORD TTLRegexOption()
+static WORD TTLRegexOption(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -3663,7 +3665,7 @@ WORD TTLRegexOption()
 	return 0;
 }
 
-WORD TTLReturn()
+static WORD TTLReturn(void)
 {
 	if (GetFirstChar()==0)
 		return ReturnFromSub();
@@ -3674,7 +3676,7 @@ WORD TTLReturn()
 // add 'rotateleft' and 'rotateright' (2007.8.19 maya)
 #define ROTATE_DIR_LEFT 0
 #define ROTATE_DIR_RIGHT 1
-WORD BitRotate(int direction)
+static WORD BitRotate(int direction)
 {
 	TVarId VarId;
 	WORD Err;
@@ -3704,17 +3706,17 @@ WORD BitRotate(int direction)
 	return Err;
 }
 
-WORD TTLRotateLeft()
+static WORD TTLRotateLeft(void)
 {
 	return BitRotate(ROTATE_DIR_LEFT);
 }
 
-WORD TTLRotateRight()
+static WORD TTLRotateRight(void)
 {
 	return BitRotate(ROTATE_DIR_RIGHT);
 }
 
-WORD TTLSend()
+static WORD TTLSend(void)
 {
 	TStrVal Str;
 	WORD Err, ValType;
@@ -3852,7 +3854,7 @@ static WORD TTLSendBroadcast(BOOL crlf)
 	return SendCmnd(CmdSendBroadcast, 0);
 }
 
-WORD TTLSetMulticastName()
+static WORD TTLSetMulticastName(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -3866,7 +3868,7 @@ WORD TTLSetMulticastName()
 }
 
 // sendmulticast / sendlnmulticast の二つから利用 (crlfの値で動作を変える)
-WORD TTLSendMulticast(BOOL crlf)
+static WORD TTLSendMulticast(BOOL crlf)
 {
 	TStrVal buf, Str;
 	WORD Err;
@@ -3887,7 +3889,7 @@ WORD TTLSendMulticast(BOOL crlf)
 	return SendCmnd(CmdSendMulticast, 0);
 }
 
-WORD TTLSendFile()
+static WORD TTLSendFile(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -3907,7 +3909,7 @@ WORD TTLSendFile()
 	return SendCmnd(CmdSendFile,IdTTLWaitCmndEnd);
 }
 
-WORD TTLSendKCode()
+static WORD TTLSendKCode(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -3926,7 +3928,7 @@ WORD TTLSendKCode()
 	return SendCmnd(CmdSendKCode,0);
 }
 
-WORD TTLSendLn()
+static WORD TTLSendLn(void)
 {
 	WORD Err;
 	char Str[2];
@@ -3944,7 +3946,7 @@ WORD TTLSendLn()
 	return Err;
 }
 
-WORD TTLSetDate()
+static WORD TTLSetDate(void)
 {
 	WORD Err;
 	TStrVal Str;
@@ -3971,7 +3973,7 @@ WORD TTLSetDate()
 	return Err;
 }
 
-WORD TTLSetDir()
+static WORD TTLSetDir(void)
 {
 	WORD Err;
 	TStrVal Str;
@@ -3987,7 +3989,7 @@ WORD TTLSetDir()
 	return Err;
 }
 
-WORD TTLSetDlgPos()
+static WORD TTLSetDlgPos(void)
 {
 	WORD Err = 0;
 
@@ -4009,7 +4011,7 @@ WORD TTLSetDlgPos()
 }
 
 // reactivate 'setenv' (2007.8.31 maya)
-WORD TTLSetEnv()
+static WORD TTLSetEnv(void)
 {
 	WORD Err;
 	TStrVal Str, Str2;
@@ -4025,7 +4027,7 @@ WORD TTLSetEnv()
 	return Err;
 }
 
-WORD TTLSetExitCode()
+static WORD TTLSetExitCode(void)
 {
 	WORD Err;
 	int Val;
@@ -4039,7 +4041,7 @@ WORD TTLSetExitCode()
 	return Err;
 }
 
-WORD TTLSetFileAttr()
+static WORD TTLSetFileAttr(void)
 {
 	WORD Err;
 	TStrVal Filename;
@@ -4070,7 +4072,7 @@ WORD TTLSetFileAttr()
 	return Err;
 }
 
-WORD TTLSetSync()
+static WORD TTLSetSync(void)
 {
 	WORD Err;
 	int Val;
@@ -4091,7 +4093,7 @@ WORD TTLSetSync()
 	return 0;
 }
 
-WORD TTLSetTime()
+static WORD TTLSetTime(void)
 {
 	WORD Err;
 	TStrVal Str;
@@ -4120,7 +4122,7 @@ WORD TTLSetTime()
 	return Err;
 }
 
-WORD TTLShow()
+static WORD TTLShow(void)
 {
 	WORD Err;
 	int Val;
@@ -4145,7 +4147,7 @@ WORD TTLShow()
 //
 // (2007.5.1 yutaka)
 // (2007.5.3 maya)
-WORD TTLSprintf(int getvar)
+static WORD TTLSprintf(int getvar)
 {
 	TStrVal Fmt;
 	int Num, NumWidth, NumPrecision;
@@ -4424,7 +4426,7 @@ exit2:
 	return Err;
 }
 
-WORD TTLStr2Code()
+static WORD TTLStr2Code(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -4453,7 +4455,7 @@ WORD TTLStr2Code()
 	return Err;
 }
 
-WORD TTLStr2Int()
+static WORD TTLStr2Int(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -4503,7 +4505,7 @@ WORD TTLStr2Int()
 	return Err;
 }
 
-WORD TTLStrCompare()
+static WORD TTLStrCompare(void)
 {
 	TStrVal Str1, Str2;
 	WORD Err;
@@ -4525,7 +4527,7 @@ WORD TTLStrCompare()
 	return Err;
 }
 
-WORD TTLStrConcat()
+static WORD TTLStrConcat(void)
 {
 	TVarId VarId;
 	WORD Err;
@@ -4546,7 +4548,7 @@ WORD TTLStrConcat()
 	return Err;
 }
 
-WORD TTLStrCopy()
+static WORD TTLStrCopy(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -4573,7 +4575,7 @@ WORD TTLStrCopy()
 	return Err;
 }
 
-WORD TTLStrLen()
+static WORD TTLStrLen(void)
 {
 	WORD Err;
 	TStrVal Str;
@@ -4593,7 +4595,7 @@ WORD TTLStrLen()
   resultには、マッチした位置をセット(マッチしない場合は0)。
   マッチした場合は、waitregexと同様にmatchstr,groupmatchstr1-9をセット。
  */
-WORD TTLStrMatch()
+static WORD TTLStrMatch(void)
 {
 	WORD Err;
 	TStrVal Str1, Str2;
@@ -4621,7 +4623,7 @@ WORD TTLStrMatch()
 	return Err;
 }
 
-WORD TTLStrScan()
+static WORD TTLStrScan(void)
 {
 	WORD Err;
 	TStrVal Str1, Str2;
@@ -4668,7 +4670,7 @@ static void insert_string(char *str, int index, char *addstr)
 	str[srclen + addlen] = '\0';
 }
 
-WORD TTLStrInsert()
+static WORD TTLStrInsert(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -4738,7 +4740,7 @@ static void remove_string(char *str, int index, int len)
 	str[srclen - len] = '\0';
 }
 
-WORD TTLStrRemove()
+static WORD TTLStrRemove(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -4769,7 +4771,7 @@ WORD TTLStrRemove()
 	return Err;
 }
 
-WORD TTLStrReplace()
+static WORD TTLStrReplace(void)
 {
 	WORD Err, VarType;
 	TVarId DestVarId;
@@ -4843,7 +4845,7 @@ error:
 	return Err;
 }
 
-WORD TTLStrSpecial()
+static WORD TTLStrSpecial(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -4874,7 +4876,7 @@ WORD TTLStrSpecial()
 	return Err;
 }
 
-WORD TTLStrTrim()
+static WORD TTLStrTrim(void)
 {
 	TStrVal trimchars;
 	WORD Err;
@@ -4931,7 +4933,7 @@ WORD TTLStrTrim()
 	return Err;
 }
 
-WORD TTLStrSplit()
+static WORD TTLStrSplit(void)
 {
 #define MAXVARNUM 9
 	TStrVal src, delimchars, buf;
@@ -5116,7 +5118,7 @@ static WORD TTLStrJoin(void)
 #undef MAXVARNUM
 }
 
-WORD TTLTestLink()
+static WORD TTLTestLink(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -5132,7 +5134,7 @@ WORD TTLTestLink()
 }
 
 // added (2007.7.12 maya)
-WORD TTLToLower()
+static WORD TTLToLower(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -5158,7 +5160,7 @@ WORD TTLToLower()
 }
 
 // added (2007.7.12 maya)
-WORD TTLToUpper()
+static WORD TTLToUpper(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -5183,7 +5185,7 @@ WORD TTLToUpper()
 	return Err;
 }
 
-WORD TTLUnlink()
+static WORD TTLUnlink(void)
 {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
@@ -5196,7 +5198,7 @@ WORD TTLUnlink()
 }
 
 
-WORD TTLUptime()
+static WORD TTLUptime(void)
 {
 	WORD Err;
 	TVarId VarId;
@@ -5220,7 +5222,7 @@ WORD TTLUptime()
 
 
 
-WORD TTLWait(BOOL Ln)
+static WORD TTLWait(BOOL Ln)
 {
 	TStrVal Str;
 	WORD Err, ValType;
@@ -5282,7 +5284,7 @@ WORD TTLWait(BOOL Ln)
 }
 
 
-WORD TTLWait4all(BOOL Ln)
+static WORD TTLWait4all(BOOL Ln)
 {
 	WORD Err = 0;
 
@@ -5303,7 +5305,7 @@ WORD TTLWait4all(BOOL Ln)
 // cf. http://www.geocities.jp/kosako3/oniguruma/
 //
 // (2005.10.5 yutaka)
-WORD TTLWaitRegex(BOOL Ln)
+static WORD TTLWaitRegex(BOOL Ln)
 {
 	WORD ret;
 
@@ -5316,7 +5318,7 @@ WORD TTLWaitRegex(BOOL Ln)
 
 
 
-WORD TTLWaitEvent()
+static WORD TTLWaitEvent(void)
 {
 	WORD Err, ValType;
 	TVarId VarId;
@@ -5349,7 +5351,7 @@ WORD TTLWaitEvent()
 }
 
 
-WORD TTLWaitN()
+static WORD TTLWaitN(void)
 {
 	WORD Err, ValType;
 	TVarId VarId;
@@ -5389,7 +5391,7 @@ WORD TTLWaitN()
 }
 
 
-WORD TTLWaitRecv()
+static WORD TTLWaitRecv(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -5427,7 +5429,7 @@ WORD TTLWaitRecv()
 	return Err;
 }
 
-WORD TTLWhile(BOOL mode)
+static WORD TTLWhile(BOOL mode)
 {
 	WORD Err;
 	int Val = mode;
@@ -5448,7 +5450,7 @@ WORD TTLWhile(BOOL mode)
 	return Err;
 }
 
-WORD TTLXmodemRecv()
+static WORD TTLXmodemRecv(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -5482,7 +5484,7 @@ WORD TTLXmodemRecv()
 	return SendCmnd(CmdXmodemRecv,IdTTLWaitCmndResult);
 }
 
-WORD TTLXmodemSend()
+static WORD TTLXmodemSend(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -5509,7 +5511,7 @@ WORD TTLXmodemSend()
 	return SendCmnd(CmdXmodemSend,IdTTLWaitCmndResult);
 }
 
-WORD TTLZmodemSend()
+static WORD TTLZmodemSend(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -5528,7 +5530,7 @@ WORD TTLZmodemSend()
 	return SendCmnd(CmdZmodemSend,IdTTLWaitCmndResult);
 }
 
-WORD TTLYmodemSend()
+static WORD TTLYmodemSend(void)
 {
 	TStrVal Str;
 	WORD Err;
@@ -5550,7 +5552,7 @@ WORD TTLYmodemSend()
 // SYNOPSIS:
 //   scpsend "c:\usr\sample.chm" "doc/sample.chm"
 //   scpsend "c:\usr\sample.chm"
-WORD TTLScpSend()
+static WORD TTLScpSend(void)
 {
 	TStrVal Str;
 	TStrVal Str2;
@@ -5582,7 +5584,7 @@ WORD TTLScpSend()
 // SYNOPSIS:
 //   scprecv "foo.txt"
 //   scprecv "src/foo.txt" "c:\foo.txt"
-WORD TTLScpRecv()
+static WORD TTLScpRecv(void)
 {
 	TStrVal Str;
 	TStrVal Str2;
@@ -5626,7 +5628,7 @@ static WORD TTLOutputDebugstring(void)
 }
 #endif
 
-int ExecCmnd()
+static int ExecCmnd(void)
 {
 	WORD WId, Err;
 	BOOL StrConst, E, WithIndex, Result;
@@ -6200,7 +6202,7 @@ int ExecCmnd()
 	return Err;
 }
 
-void Exec()
+void Exec(void)
 {
 	WORD Err;
 
