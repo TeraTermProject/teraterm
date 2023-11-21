@@ -31,6 +31,11 @@
 #include <sys/stat.h>
 #include <sys/utime.h>
 #include <assert.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
+#include <crtdbg.h>
 
 #include "filesys_io.h"
 #include "filesys_win32.h"
@@ -313,34 +318,42 @@ static char *CreateUniqueFilename(const char *fullpath)
  */
 static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
 {
-	char* new_name;
-	if (utf8) {
+	char* new_name = NULL;
+	if (!utf8) {
+		// ANSI -> UTF8
+		int FnPos;
+		GetFileNamePos(filename, NULL, &FnPos);
+		new_name = ToU8A(&filename[FnPos]);
+		// new_name == NULL ‚Ì‚Æ‚« UTF-8‚É•ÏŠ·‚Å‚«‚È‚©‚Á‚½
+	}
+	if (new_name == NULL) {
 		// UTF8 -> UTF8
 		int FnPos;
 		GetFileNamePosU8(filename, NULL, &FnPos);
 		new_name = _strdup(&filename[FnPos]);
 	}
-	else {
-		// ANSI -> UTF8
-		int FnPos;
-		GetFileNamePos(filename, NULL, &FnPos);
-		new_name = ToU8A(&filename[FnPos]);
+	if (new_name == NULL) {
+		return NULL;
 	}
 	size_t len = strlen(new_name) + 1;
 	FitFileName(new_name, len, NULL);
-	replaceInvalidFileNameChar(new_name, '_');
+	char *new_name_safe = replaceInvalidFileNameCharU8(new_name, '_');
+	free(new_name);
+	new_name = NULL;
 
 	// to fullpath
 	char *full;
 	if (path == NULL) {
-		full = new_name;
+		full = new_name_safe;
 	}
 	else {
-		size_t full_len = len + strlen(path);
+		size_t full_len = strlen(new_name_safe) + strlen(path) + 1;
 		full = (char *)malloc(full_len);
 		strcpy(full, path);
-		strcat(full, new_name);
+		strcat(full, new_name_safe);
 	}
+	free(new_name_safe);
+	new_name_safe = NULL;
 
 	// to unique
 	if (unique && DoesFileExist(full)) {

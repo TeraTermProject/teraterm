@@ -83,6 +83,7 @@ BOOL isInvalidFileNameCharW(const wchar_t *FName);
 int isInvalidFileNameChar(const char *FName);
 #define deleteInvalidFileNameChar(name) replaceInvalidFileNameChar(name, 0)
 wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c);
+char *replaceInvalidFileNameCharU8(const char *FName, char c);
 DllExport void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 BOOL isInvalidStrftimeCharW(const wchar_t *format);
 int isInvalidStrftimeChar(PCHAR FName);

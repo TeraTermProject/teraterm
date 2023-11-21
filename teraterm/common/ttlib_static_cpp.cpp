@@ -1733,8 +1733,13 @@ BOOL isInvalidFileNameCharW(const wchar_t *FName)
 	return FALSE;
 }
 
-// ファイル名に使用できない文字を c に置き換える
-// c に 0 を指定した場合は文字を削除する
+/**
+ *	ファイル名に使用できない文字を c に置き換える
+ *
+ *	@param[in]	FName	ファイル名
+ *	@param[in]	c		置き換える文字(0のとき削除する)
+ *	@return		置き換えた後のファイル名(不要になったらfree()すること)
+ */
 wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 {
 	size_t i, j = 0, len;
@@ -1759,6 +1764,20 @@ wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 	}
 	dest[j] = 0;
 	return dest;
+}
+
+/**
+ *	ファイル名に使用できない文字を c に置き換える
+ *	replaceInvalidFileNameCharW() の UTF-8 版
+ */
+char *replaceInvalidFileNameCharU8(const char *FName, char c)
+{
+	wchar_t *FNameW = ToWcharU8(FName);
+	wchar_t *retW = replaceInvalidFileNameCharW(FNameW, c);
+	char *retU8 = ToU8W(retW);
+	free(retW);
+	free(FNameW);
+	return retU8;
 }
 
 /**
