@@ -34,7 +34,7 @@
 
 ## ico ファイルについて
 
-- [プロジェクトページのアイコンについて](https://osdn.net/projects/ttssh2/wiki/%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3)
+- [プロジェクトページのアイコンについて](https://github.com/TeraTermProject/teraterm/wiki/Icon)
 - *注意点* Visual Studio 2005 では png形式は扱えない
   - bmp形式にしておく必要がある
 
@@ -48,3 +48,11 @@
 - cygwin では icoutils パッケージに入っている
 - linux では icoutils パッケージに入っている
   - `apt-get install icoutils`
+
+# bmp形式icoファイル作成
+
+次のように実行する
+```
+icon_extract.bat
+icon_combine.bat
+```

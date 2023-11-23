@@ -52,8 +52,11 @@ if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
   endif()
 endif()
 if(${BMP_ICO})
-  # cmake 3.11でうまく設定されない?→手で設定する
+  # cmake 3.11でRC_FLAGSが反映されない?,C_FLAGSも設定するとok
+  # bmp形式icoについて teraterm/teraterm/common/ico/ico_scripts/readme.md 参照
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /DBMP_ICO")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /DBMP_ICO")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBMP_ICO")
 endif()
 
 if(MSVC)
