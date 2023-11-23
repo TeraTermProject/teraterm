@@ -321,7 +321,7 @@ struct tttset {
 	char SetupFName[MAX_PATH];
 	char reserve_KeyCnfFN[MAX_PATH];	// switch KeyCnfFNW
 	char LogFN[MAX_PATH];
-	char MacroFN[MAX_PATH];
+	char reserve_MacroFN[MAX_PATH];		// switch MacroFNW
 	char HostName[1024];
 
 	POINT VTPos;

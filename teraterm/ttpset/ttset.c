@@ -1391,7 +1391,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Startup macro -- special option */
 	hGetPrivateProfileStringW(SectionW, L"StartupMacro", L"", FName, &ts->MacroFNW);
-	WideCharToACP_t(ts->MacroFNW, ts->MacroFN, sizeof(ts->MacroFN));
 
 	/* TEK GIN Mouse keycode -- special option */
 	ts->GINMouseCode =
@@ -2799,7 +2798,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "SendBreakTime", FName, ts->SendBreakTime);
 
 	/* Startup macro -- special option */
-	WritePrivateProfileString(Section, "StartupMacro", ts->MacroFN, FName);
+	WritePrivateProfileStringW(SectionW, L"StartupMacro", ts->MacroFNW, FName);
 
 	/* TEK GIN Mouse keycode -- special option */
 	WriteInt(Section, "TEKGINMouseCode", FName, ts->GINMouseCode);
@@ -3848,13 +3847,11 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			} else {
 				ts->MacroFNW = GetFilePath(&Temp[3], ts->HomeDirW, L".TTL");
 			}
-			WideCharToACP_t(ts->MacroFNW, ts->MacroFN, _countof(ts->MacroFN));
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
 		}
 		else if (_wcsicmp(Temp, L"/M") == 0) {	/* macro option without file name */
 			ts->MacroFNW = _wcsdup(L"*");
-			WideCharToACP_t(ts->MacroFNW, ts->MacroFN, _countof(ts->MacroFN));
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
 		}
@@ -3979,8 +3976,10 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		ts->KanjiCodeSend = KanjiCodeTranslate(ts->Language,KanjiCodeSend);
 	}
 
-	if ((DDETopic != NULL) && (DDETopic[0] != 0))
-		ts->MacroFN[0] = 0;
+	if ((DDETopic != NULL) && (DDETopic[0] != 0)) {
+		free(ts->MacroFNW);
+		ts->MacroFNW = NULL;
+	}
 
 	if ((ts->HostName[0] != 0) && (ParamPort == IdTCPIP)) {
 		ParseHostName(ts->HostName, &ParamTCP);

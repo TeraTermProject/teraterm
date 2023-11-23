@@ -1117,10 +1117,11 @@ void CVTWindow::Startup()
 	/* auto log */
 	/* OnCommOpen で開始されるのでここでは開始しない (2007.5.14 maya) */
 
-	if ((TopicName[0]==0) && (ts.MacroFN[0]!=0)) {
+	if ((TopicName[0]==0) && (ts.MacroFNW != NULL)) {
 		// start the macro specified in the command line or setup file
-		RunMacro(ts.MacroFN,TRUE);
-		ts.MacroFN[0] = 0;
+		RunMacroW(ts.MacroFNW, TRUE);
+		free(ts.MacroFNW);
+		ts.MacroFNW = NULL;
 	}
 	else {// start connection
 		if (TopicName[0]!=0) {
@@ -3571,9 +3572,10 @@ void CVTWindow::OnFileNewConnection()
 			}
 			SetKeyMap();
 			BGLoadThemeFile(&ts);
-			if (ts.MacroFN[0]!=0) {
-				RunMacro(ts.MacroFN,TRUE);
-				ts.MacroFN[0] = 0;
+			if (ts.MacroFNW != NULL) {
+				RunMacroW(ts.MacroFNW,TRUE);
+				free(ts.MacroFNW);
+				ts.MacroFNW = NULL;
 			}
 			else {
 				Connecting = TRUE;
@@ -4822,12 +4824,12 @@ void CVTWindow::OnControlCloseTEK()
 
 void CVTWindow::OnControlMacro()
 {
-	RunMacro(NULL,FALSE);
+	RunMacroW(NULL,FALSE);
 }
 
 void CVTWindow::OnShowMacroWindow()
 {
-	RunMacro(NULL,FALSE);
+	RunMacroW(NULL,FALSE);
 }
 
 void CVTWindow::OnWindowWindow()

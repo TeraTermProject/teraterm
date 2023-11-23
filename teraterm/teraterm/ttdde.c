@@ -1183,41 +1183,47 @@ void SetDdeComReady(WORD Ready)
 	PostMessage(HWndDdeCli,WM_USER_DDECOMREADY,Ready,0);
 }
 
-void RunMacro(PCHAR FName, BOOL Startup)
-//  FName: macro filename
-//  Startup: TRUE in case of startup macro execution.
-//		  In this case, the connection to the host will
-//		  made after the link to TT(P)MACRO is established.
+/**
+ *	マクロを起動する
+ *
+ *	@param  FName: macro filename
+ *	@param  startup: TRUE in case of startup macro execution.
+ *		  In this case, the connection to the host will
+ *		  made after the link to TT(P)MACRO is established.
+ */
+void RunMacroW(const wchar_t *FName, BOOL startup)
 {
 	PROCESS_INFORMATION pi;
-	char Cmnd[MAX_PATH+36]; // "TTPMACRO /D="(12) + TopicName(20) + " "(1) + MAX_PATH + " /S"(3)
-	STARTUPINFO si;
+	wchar_t *Cmnd;
+	STARTUPINFOW si;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
 
 	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
 	// 該当する"ttpmacro"をフラッシュする。
 	// (2010.4.2 yutaka, maya)
-	if ((FName == NULL && Startup == FALSE) && ConvH != 0) {
+	if ((FName == NULL && startup == FALSE) && ConvH != 0) {
 		BringupMacroWindow(TRUE);
 		return;
 	}
 
 	SetTopic();
 	if (! InitDDE()) return;
-	strncpy_s(Cmnd, sizeof(Cmnd),"TTPMACRO /D=", _TRUNCATE);
-	strncat_s(Cmnd,sizeof(Cmnd),TopicName,_TRUNCATE);
-	if (FName!=NULL)
-	{
-		size_t i;
-		strncat_s(Cmnd,sizeof(Cmnd)," ",_TRUNCATE);
-		i = strlen(Cmnd);
-		strncat_s(Cmnd,sizeof(Cmnd),FName,_TRUNCATE);
-		QuoteFName(&Cmnd[i]);
+
+	aswprintf(&Cmnd, L"TTPMACRO /D=%hs", TopicName);
+	if (FName != NULL) {
+		if (wcschr(FName, ' ') != NULL) {
+			// ファイル名にスペースが含まれている -> quote('"'で囲む)する
+			awcscats(&Cmnd, L" \"", FName, L"\"", NULL);
+		}
+		else {
+			awcscats(&Cmnd, L" ", FName, NULL);
+		}
+	}
+	if (startup) {
+		awcscat(&Cmnd, L" /S"); // "startup" flag
 	}
 
-	StartupFlag = Startup;
-	if (Startup)
-		strncat_s(Cmnd,sizeof(Cmnd)," /S",_TRUNCATE); // "startup" flag
+	StartupFlag = startup;
 
 	// ログ採取中も下げないことにする。(2005.8.14 yutaka)
 #if 0
@@ -1234,10 +1240,10 @@ void RunMacro(PCHAR FName, BOOL Startup)
 
 	ZeroMemory(&si, sizeof(si));
 	ZeroMemory(&pi, sizeof(pi));
-	GetStartupInfo(&si);
+	GetStartupInfoW(&si);
 	si.wShowWindow = SW_MINIMIZE;
 
-	if (CreateProcess(
+	if (CreateProcessW(
 		NULL,
 		Cmnd,
 		NULL,
@@ -1252,11 +1258,12 @@ void RunMacro(PCHAR FName, BOOL Startup)
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
 	}
+	free(Cmnd);
 }
 
-void RunMacroW(const wchar_t *FNameW, BOOL Startup)
+void RunMacro(PCHAR FName, BOOL Startup)
 {
-	char *fname = ToCharW(FNameW);
-	RunMacro(fname, Startup);
-	free(fname);
+	wchar_t *fnameW = ToWcharA(FName);
+	RunMacroW(fnameW, Startup);
+	free(fnameW);
 }
