@@ -47,10 +47,6 @@ message("zlib")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildzlib.cmake
   )
-message("putty")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -P buildputty.cmake
-  )
 message("SFMT")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildsfmt.cmake

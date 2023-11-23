@@ -205,35 +205,6 @@ function(download_oniguruma)
   )
 endfunction()
 
-# putty
-function(download_putty)
-  message("putty")
-  set(EXT_DIR "${CMAKE_CURRENT_LIST_DIR}")
-  set(DIR_IN_ARC "putty-0.76")
-  #set(DIR_IN_ARC "putty-0.78")
-  set(RENAME_DIR "putty")
-  set(CHECK_FILE "putty/version.h")
-  set(CHECK_HASH "c6975607ae6fb8510d56fae403fdd83bbafa3efe32397e5956375db49d0fadda")
-  #set(CHECK_HASH "6909c326781299a12368a32b11d62f5fbbe75e3e8ef881a3dec81adff2694320")
-  set(SRC_URL "https://the.earth.li/~sgtatham/putty/0.76/putty-0.76.tar.gz")
-  #set(SRC_URL "https://the.earth.li/~sgtatham/putty/0.78/putty-0.78.tar.gz")
-  set(ARC_HASH "547cd97a8daa87ef71037fab0773bceb54a8abccb2f825a49ef8eba5e045713f")
-  #   ARC_HASH was picked from https://the.earth.li/~sgtatham/putty/0.76/sha256sums
-  #set(ARC_HASH "274e01bcac6bd155dfd647b2f18f791b4b17ff313753aa919fcae2e32d34614f")
-  #   ARC_HASH was picked from https://the.earth.li/~sgtatham/putty/0.78/sha256sums
-  set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/putty")
-  download_extract(
-    ${SRC_URL}
-    ${ARC_HASH}
-    ${DOWN_DIR}
-    ${EXT_DIR}
-    ${DIR_IN_ARC}
-    ${RENAME_DIR}
-    ${CHECK_FILE}
-    ${CHECK_HASH}
-  )
-endfunction()
-
 # SFMT
 function(download_sfmt)
   message("SFMT")
@@ -312,9 +283,6 @@ if ((${TARGET} STREQUAL "all") OR (${TARGET} STREQUAL "libressl"))
 endif()
 if ((${TARGET} STREQUAL "all") OR (${TARGET} STREQUAL "oniguruma"))
   download_oniguruma()
-endif()
-if (${TARGET} STREQUAL "putty")
-  download_putty()
 endif()
 if ((${TARGET} STREQUAL "all") OR (${TARGET} STREQUAL "sfmt"))
   download_sfmt()
