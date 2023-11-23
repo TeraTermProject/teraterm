@@ -163,11 +163,11 @@ static void BringupMacroWindow(BOOL flash_flag)
 }
 
 
-void GetClientHWnd(PCHAR HWndStr)
+static void GetClientHWnd(PCHAR HWndStr)
 {
 	int i;
 	BYTE b;
-	LONG HCli;
+	UINT_PTR HCli;
 
 	HCli = 0;
 	i = 0;
