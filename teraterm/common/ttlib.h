@@ -76,9 +76,6 @@ unsigned long long GetFSize64A(const char *FName);
 long GetFMtime(const char *FName);
 BOOL SetFMtime(const char *FName, DWORD mtime);
 void uint2str(UINT i, PCHAR Str, int destlen, int len);
-#ifdef WIN32
-void QuoteFName(PCHAR FName);
-#endif
 BOOL isInvalidFileNameCharW(const wchar_t *FName);
 int isInvalidFileNameChar(const char *FName);
 #define deleteInvalidFileNameChar(name) replaceInvalidFileNameChar(name, 0)

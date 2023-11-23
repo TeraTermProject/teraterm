@@ -514,23 +514,6 @@ void uint2str(UINT i, PCHAR Str, int destlen, int len)
 	strncpy_s(Str,destlen,Temp,_TRUNCATE);
 }
 
-void QuoteFName(PCHAR FName)
-{
-	int i;
-
-	if (FName[0]==0) {
-		return;
-	}
-	if (strchr(FName,' ')==NULL) {
-		return;
-	}
-	i = strlen(FName);
-	memmove(&(FName[1]),FName,i);
-	FName[0] = '\"';
-	FName[i+1] = '\"';
-	FName[i+2] = 0;
-}
-
 // ファイル名に使用できない文字が含まれているか確かめる (2006.8.28 maya)
 int isInvalidFileNameChar(const char *FName)
 {
