@@ -2078,25 +2078,12 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 	// TTSSH‚Ìƒo[ƒWƒ‡ƒ“‚ðÝ’è‚·‚é (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
-#if defined(TT_VERSION_SUBSTR)
-	if (sizeof(TT_VERSION_SUBSTR) > 1) {
-		strncat_s(buf, sizeof(buf), " " TT_VERSION_SUBSTR, _TRUNCATE);
+	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d ", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
+	{
+		char *substr = GetVersionSubstr();
+		strncat_s(buf, sizeof(buf), substr, _TRUNCATE);
+		free(substr);
 	}
-#endif
-#if defined(_M_X64)
-	strncat_s(buf, sizeof(buf), " 64bit", _TRUNCATE);
-#endif
-#if defined(GITVERSION)
-	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
-	strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#elif defined(SVNVERSION)
-	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
-	strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#else
-	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Unknown)");
-	strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#endif
 	strncat_s(buf, sizeof(buf),
 			  "\r\nCompatible with SSH protocol version 1.5 and 2.0", _TRUNCATE);
 	SetDlgItemTextA(dlg, IDC_TTSSH_VERSION, buf);

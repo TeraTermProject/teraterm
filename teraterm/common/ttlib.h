@@ -215,6 +215,7 @@ void RandomFile(const char *filespec_src,char *filename, int destlen);
 int __ismbblead(BYTE b, int code_page);
 void SetDPIAwareness(const wchar_t *SetupFNameW);
 wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path);
+char *GetVersionSubstr(void);
 
 #ifdef __cplusplus
 }

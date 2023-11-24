@@ -2352,7 +2352,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_ABOUT_TITLE" },
 	};
-	char buf[128], tmpbuf[128];
+	char buf[128];
 #if 0
 	HDC hdc;
 	HWND hwnd;
@@ -2404,25 +2404,12 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 			// Tera Term 本体のバージョン
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
-#if defined(TT_VERSION_SUBSTR)
-			if (sizeof(TT_VERSION_SUBSTR) > 1) {
-				strncat_s(buf, sizeof(buf), " " TT_VERSION_SUBSTR, _TRUNCATE);
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d ", TT_VERSION_MAJOR, TT_VERSION_MINOR);
+			{
+				char *substr = GetVersionSubstr();
+				strncat_s(buf, sizeof(buf), substr, _TRUNCATE);
+				free(substr);
 			}
-#endif
-#if defined(_M_X64)
-			strncat_s(buf, sizeof(buf), " 64bit", _TRUNCATE);
-#endif
-#if defined(GITVERSION)
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#elif defined(SVNVERSION)
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#else
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Unknown)");
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#endif
 			SetDlgItemTextA(Dialog, IDC_TT_VERSION, buf);
 
 			// Onigurumaのバージョンを設定する
@@ -2443,6 +2430,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			{
 				// コンパイラ、日時、SDK
 				char *info;
+				char tmpbuf[128];
 				char sdk[128];
 				GetCompilerInfo(tmpbuf, sizeof(tmpbuf));
 				GetSDKInfo(sdk, _countof(sdk));

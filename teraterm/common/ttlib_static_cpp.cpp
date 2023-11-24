@@ -49,6 +49,7 @@
 #include "codeconv.h"
 #include "compat_win.h"
 #include "fileread.h"
+#include "tt-version.h"
 
 #include "ttlib.h"
 
@@ -1882,4 +1883,38 @@ void SetDPIAwareness(const wchar_t *SetupFNameW)
 			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 		}
 	}
+}
+
+/**
+ *	バージョン情報(aboutbox)用バージョン文字列
+ *	TT_VERSION_SUBSTR + ("64bit ") + GITVERSION を文字列にして返す
+ *	例
+ *		"dev (Git 914287eda)"
+ *		"dev 64bit (Git 914287eda)"
+ *		"(Git 914287eda)"
+ *
+ *	@return 副バージョン文字列 不要になったらfree()すること
+ */
+char *GetVersionSubstr(void)
+{
+	size_t sizeof_buf = 128;
+	char *buf = (char *)malloc(sizeof_buf);
+
+	buf[0] = 0;
+#if defined(TT_VERSION_SUBSTR)
+	if (sizeof(TT_VERSION_SUBSTR) > 1) {
+		strncat_s(buf, sizeof_buf, TT_VERSION_SUBSTR " ", _TRUNCATE);
+	}
+#endif
+#if defined(_M_X64)
+	strncat_s(buf, sizeof_buf, "64bit ", _TRUNCATE);
+#endif
+#if defined(GITVERSION)
+	strncat_s(buf, sizeof_buf, "(Git " GITVERSION ")", _TRUNCATE);
+#elif defined(SVNVERSION)
+	strncat_s(buf, sizeof_buf, "(SVN# " TT_TOSTR(SVNVERSION) ")", _TRUNCATE);
+#else
+	strncat_s(buf, sizeof_buf, "(Unknown)", _TRUNCATE);
+#endif
+	return buf;
 }
