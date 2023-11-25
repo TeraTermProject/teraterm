@@ -1391,6 +1391,11 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Startup macro -- special option */
 	hGetPrivateProfileStringW(SectionW, L"StartupMacro", L"", FName, &ts->MacroFNW);
+	if (ts->MacroFNW != NULL && ts->MacroFNW[0] == L'\0') {
+		// Žw’è‚È‚µ
+		free(ts->MacroFNW);
+		ts->MacroFNW = NULL;
+	}
 
 	/* TEK GIN Mouse keycode -- special option */
 	ts->GINMouseCode =
