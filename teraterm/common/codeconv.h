@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <stdlib.h>	// for size_t
 #include "ttcstd.h"
 
 #ifdef __cplusplus
