@@ -521,7 +521,7 @@ static void ReadANSIColorSetting(const wchar_t *section, TAnsiColorSetting *colo
 		9, 10, 11, 12, 13, 14, 15,
 	};
 
-	GetPrivateProfileStringW(section, L"ANSIColor", L"0", BuffW, sizeof(BuffW), fn);
+	GetPrivateProfileStringW(section, L"ANSIColor", L"0", BuffW, _countof(BuffW), fn);
 	WideCharToACP_t(BuffW, Buff, _countof(Buff));
 
 	GetNthNum(Buff, 1, &c);
