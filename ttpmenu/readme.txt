@@ -220,6 +220,8 @@ TeraTerm Menu 1.18 (2023.12.02)
 ・従来の設定を引き継げるようiniファイルをコピーするようにした。
   - ttpmenu.exeと同じパスの ttpmenu.ini が存在して
     %APPDATA%\teraterm5\ttpmenu.ini が存在しない場合
+・ポータブル版動作(exeフォルダにportable.iniが存在する)に対応
+・%APPDATA%\teraterm5\ttpmenu.ini が0byteの時、UTF-16 LE BOM を書き込むようにした
 
 TeraTerm Menu 1.17 (2023.10.15)
 

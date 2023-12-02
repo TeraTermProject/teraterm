@@ -41,11 +41,11 @@
 #include	"asprintf.h"
 #include	"fileread.h"
 
-#define ENABLE_CONVERT_OLD_INI 1
+#define ENABLE_CONVERT_EXE_INI 1
 
 static BOOL bUseINI = FALSE;					// 保存先(TRUE=INI, FALSE=レジストリ)
 static wchar_t szSectionName[MAX_PATH];			// INIのセクション名
-static wchar_t szSectionNames[1024*10]={0};	// INIのセクション名一覧
+static wchar_t szSectionNames[1024*10]={0};		// INIのセクション名一覧
 static wchar_t *szApplicationName;				// INIファイルのフルパス
 
 static BOOL getSection(const wchar_t *str)
@@ -71,72 +71,75 @@ static const wchar_t *getModuleName()
 }
 
 /**
- *	古い(exeと同じパスにある)iniファイルを
- *	Unicode iniファイルに変換して
+ *	exeと同じパスにあるiniファイルを
  *	%APPDATA%\teraterm5\ttpmenu.ini にコピーする
  */
-#if ENABLE_CONVERT_OLD_INI
-static void ConvertIniFile(void)
+#if ENABLE_CONVERT_EXE_INI
+static void CopyIniFile(const wchar_t *ini)
 {
-	if (IsPortableMode()) {
-		// コピー不要
-		// ポータブル版の時はexeと同じフォルダのiniを使用する
-		return;
-	}
-
-	wchar_t *old_ini;
+	// exeフォルダのiniファイル
+	wchar_t *exe_ini;
 	wchar_t *exe_dir = GetExeDirW(NULL);
-	aswprintf(&old_ini, L"%s\\ttpmenu.ini", exe_dir);
+	aswprintf(&exe_ini, L"%s\\ttpmenu.ini", exe_dir);
 	free(exe_dir);
-	if (::GetFileAttributesW(old_ini) == INVALID_FILE_ATTRIBUTES) {
-		// 存在しないのでコピーしない
-		free(old_ini);
+	if (::GetFileAttributesW(exe_ini) == INVALID_FILE_ATTRIBUTES) {
+		// 存在しないので何もしない
+		free(exe_ini);
 		return;
 	}
 
-	wchar_t *ini;
-	wchar_t *home_dir = GetHomeDirW(NULL);
-	aswprintf(&ini, L"%s\\ttpmenu.ini", home_dir);
-	free(home_dir);
-	if (::GetFileAttributesW(ini) != INVALID_FILE_ATTRIBUTES) {
-		// ファイルあり、コピーしない
-		free(old_ini);
-		free(ini);
-		return;
-	}
-
+	// UTF-16 で書き出す
 	size_t content_len = 0;
-	wchar_t *old_ini_content = LoadFileWW(old_ini, &content_len);
-	if (old_ini_content != NULL) {
+	wchar_t *exe_ini_content = LoadFileWW(exe_ini, &content_len);
+	if (exe_ini_content != NULL) {
 		// write unicode ini
 		FILE *fp;
 		_wfopen_s(&fp, ini, L"wb");
 		if (fp != NULL) {
 			fwrite("\xff\xfe", 2, 1, fp);
-			fwrite(old_ini_content, content_len, sizeof(wchar_t), fp);
+			fwrite(exe_ini_content, content_len, sizeof(wchar_t), fp);
 			fclose(fp);
 		}
-		free(old_ini_content);
+		free(exe_ini_content);
 	}
-	free(old_ini);
-	free(ini);
+	free(exe_ini);
 }
 #endif
 
 void RegInit()
 {
-#if ENABLE_CONVERT_OLD_INI
-	ConvertIniFile();
-#endif
-
+	// 通常			%APPDATA%\teraterm5\ttpmenu.ini
+	// ポータブル	exeフォルダの\ttpmenu.ini
 	wchar_t *ini;
-
-	// 設定ファイルフォルダに"ttpmenu.ini" がある?
 	wchar_t *home_dir = GetHomeDirW(NULL);
 	aswprintf(&ini, L"%s\\ttpmenu.ini", home_dir);
 	free(home_dir);
+
+#if ENABLE_CONVERT_EXE_INI
+	// ポータブル版?
+	if (!IsPortableMode()) {
+		// %APPDATA%\teraterm5\ttpmenu.ini が存在する?
+		if (::GetFileAttributesW(ini) == INVALID_FILE_ATTRIBUTES) {
+			// iniファイルが存在しないなら
+			// exeと同じフォルダのiniファイルをコピーする
+			CopyIniFile(ini);
+		}
+	}
+#endif
+
+	// iniファイル存在する?
 	if (::GetFileAttributesW(ini) != INVALID_FILE_ATTRIBUTES) {
-		// ファイルあり, ttpmenu.iniを使用する
+		// ファイルサイズが0のとき UTF16 LE BOM を書き込む
+		if (GetFSize64W(ini) == 0) {
+			FILE *fp;
+			_wfopen_s(&fp, ini, L"wb");
+			if (fp != NULL) {
+				fwrite("\xff\xfe", 2, 1, fp);
+				fclose(fp);
+			}
+		}
+
+		// ttpmenu.iniを使用する
 		szApplicationName = ini;
 		bUseINI = TRUE;
 		return;
