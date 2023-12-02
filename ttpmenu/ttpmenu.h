@@ -78,10 +78,10 @@
 #define		KEY_CHALLENGE			L"Challenge"       // add (2007.11.14 yutaka)
 #define		KEY_PAGEANT				L"Pageant"         // add (2008.5.26 maya)
 
-#define		STR_ICONMODE			"showing large icon"
-#define		STR_LEFTBUTTONPOPUP		"showing list by left-click"
-#define		STR_HOTKEY				"showing list hotkey(Ctl+Alt+M)"
-#define		STR_NOENTRY				"(none)"
+#define		STR_ICONMODE			L"showing large icon"
+#define		STR_LEFTBUTTONPOPUP		L"showing list by left-click"
+#define		STR_HOTKEY				L"showing list hotkey(Ctl+Alt+M)"
+#define		STR_NOENTRY				L"(none)"
 
 // ê›íËèÓïÒç\ë¢ëÃ
 struct JobInfo {

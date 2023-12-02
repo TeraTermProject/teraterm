@@ -69,7 +69,6 @@ JobInfo		g_JobInfo;			// カレントの設定情報構造体（設定ダイアログ）
 MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
 
 wchar_t		*SetupFNameW;		// TERATERM.INI
-char		UILanguageFile[MAX_PATH];
 wchar_t		*UILanguageFileW;
 HFONT		g_ConfigFont;
 HFONT		g_DetailFont;
@@ -120,7 +119,7 @@ BOOL ExecStartup(HWND hWnd)
 	Function Name	: (BOOL) ErrorMessage()
 	Outline			: 指定メッセージ＋システムのエラーメッセージを表示する。
 	Arguments		: HWND			hWnd		(In) 親ウインドウのハンドル
-					: LPTSTR		msg,...		(In) 任意メッセージ文字列
+					: const wchar_t *msg,...	(In) 任意メッセージ文字列
 	Return Value	: 成功 TRUE
 	Reference		: 
 	Renewal			: 
@@ -128,24 +127,24 @@ BOOL ExecStartup(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL ErrorMessage(HWND hWnd, DWORD dwErr, LPTSTR msg,...)
+static BOOL ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
 {
-	char	szBuffer[MAX_PATH] = "";
+	wchar_t	szBuffer[MAX_PATH] = L"";
 
 	va_list ap;
 	va_start(ap, msg);
-	vsprintf(szBuffer + ::lstrlen(szBuffer), msg, ap);
+	_vswprintf(szBuffer + ::wcslen(szBuffer), msg, ap);
 	va_end(ap);
 
-	::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
+	::FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM,
 					NULL,
 					dwErr,
 					LANG_NEUTRAL,
-					szBuffer + ::lstrlen(szBuffer),
+					szBuffer + wcslen(szBuffer),
 					MAX_PATH,
 					NULL);
 
-	MessageBox(hWnd, szBuffer, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+	MessageBoxW(hWnd, szBuffer, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 
 	return TRUE;
 }
@@ -313,15 +312,15 @@ BOOL AddTooltip(int idControl)
 BOOL LoadConfig(void)
 {
 	HKEY	hKey;
-	char	uimsg[MAX_UIMSG];
+	wchar_t	uimsg[MAX_UIMSG];
 
 	if ((hKey = RegCreate(HKEY_CURRENT_USER, TTERM_KEY)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 	
 	if (RegGetDword(hKey, KEY_ICONMODE, &(g_MenuData.dwIconMode)) == TRUE) {
 		if (g_MenuData.dwIconMode == MODE_LARGEICON) {
-			UTIL_get_lang_msg("MENU_ICON", uimsg, sizeof(uimsg), STR_ICONMODE, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_ICON, MF_CHECKED | MF_BYCOMMAND, ID_ICON, uimsg);
+			UTIL_get_lang_msgW("MENU_ICON", uimsg, _countof(uimsg), STR_ICONMODE, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_ICON, MF_CHECKED | MF_BYCOMMAND, ID_ICON, uimsg);
 		}
 	} else
 		g_MenuData.dwIconMode = MODE_SMALLICON;
@@ -329,8 +328,8 @@ BOOL LoadConfig(void)
 	if (RegGetDword(hKey, KEY_LEFTBUTTONPOPUP, (LPDWORD) &(g_MenuData.bLeftButtonPopup)) == FALSE)
 		g_MenuData.bLeftButtonPopup = TRUE;
 	if (g_MenuData.bLeftButtonPopup == TRUE) {
-		UTIL_get_lang_msg("MENU_LEFTPOPUP", uimsg, sizeof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFile);
-		::ModifyMenu(g_hConfigMenu, ID_LEFTPOPUP, MF_CHECKED | MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
+		UTIL_get_lang_msgW("MENU_LEFTPOPUP", uimsg, _countof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFileW);
+		::ModifyMenuW(g_hConfigMenu, ID_LEFTPOPUP, MF_CHECKED | MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
 	}
 
 	if (RegGetDword(hKey, KEY_MENUTEXTCOLOR, &(g_MenuData.crMenuTxt)) == FALSE)
@@ -339,8 +338,8 @@ BOOL LoadConfig(void)
 	if (RegGetDword(hKey, KEY_HOTKEY, (LPDWORD) &(g_MenuData.bHotkey)) == FALSE)
 		g_MenuData.bHotkey	= FALSE;
 	if (g_MenuData.bHotkey == TRUE) {
-		UTIL_get_lang_msg("MENU_HOTKEY", uimsg, sizeof(uimsg), STR_HOTKEY, UILanguageFile);
-		::ModifyMenu(g_hConfigMenu, ID_HOTKEY, MF_CHECKED | MF_BYCOMMAND, ID_HOTKEY, uimsg);
+		UTIL_get_lang_msgW("MENU_HOTKEY", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+		::ModifyMenuW(g_hConfigMenu, ID_HOTKEY, MF_CHECKED | MF_BYCOMMAND, ID_HOTKEY, uimsg);
 		::RegisterHotKey(g_hWnd, WM_MENUOPEN, MOD_CONTROL | MOD_ALT, 'M');
 	}
 
@@ -1055,14 +1054,14 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wchar_t	cur[MAX_PATH], modulePath[MAX_PATH], fullpath[MAX_PATH];
 
 	DWORD	dwErr;
-	char uimsg[MAX_UIMSG];
+	wchar_t uimsg[MAX_UIMSG];
 
 	wcscpy(szName, (szJobName == NULL) ? g_MenuData.szName[idItem - ID_MENU_MIN] : szJobName);
 
 	if (RegLoadLoginHostInformation(szName, &jobInfo) == FALSE) {
 		dwErr = ::GetLastError();
-		UTIL_get_lang_msg("MSG_ERROR_MAKETTL", uimsg, sizeof(uimsg),
-		                  "Couldn't read the registry data.\n", UILanguageFile);
+		UTIL_get_lang_msgW("MSG_ERROR_MAKETTL", uimsg, _countof(uimsg),
+						   L"Couldn't read the registry data.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
@@ -1095,8 +1094,8 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 			::GetTempFileNameW(szTempPath, L"ttm", 0, szMacroFile);
 			if (MakeTTL(szMacroFile, &jobInfo) == FALSE) {
 				dwErr = ::GetLastError();
-				UTIL_get_lang_msg("MSG_ERROR_MAKETTL", uimsg, sizeof(uimsg),
-								  "Could not make 'ttpmenu.TTL'\n", UILanguageFile);
+				UTIL_get_lang_msgW("MSG_ERROR_MAKETTL", uimsg, _countof(uimsg),
+								   L"Could not make 'ttpmenu.TTL'\n", UILanguageFileW);
 				ErrorMessage(hWnd, dwErr, uimsg);
 				return FALSE;
 			}
@@ -1201,8 +1200,8 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 	if (::ShellExecuteExW(&ExecInfo) == FALSE) {
 		dwErr = ::GetLastError();
-		UTIL_get_lang_msg("MSG_ERROR_LAUNCH", uimsg, sizeof(uimsg),
-		                  "Launching the application was failure.\n", UILanguageFile);
+		UTIL_get_lang_msgW("MSG_ERROR_LAUNCH", uimsg, _countof(uimsg),
+						   L"Launching the application was failure.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		::DeleteFileW(szTempPath);
 	}
@@ -1232,7 +1231,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL InitMenu(void)
 {
-	char	uimsg[MAX_UIMSG];
+	wchar_t	uimsg[MAX_UIMSG];
 
 	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
 		g_MenuData.hLargeIcon[cnt] = NULL;
@@ -1263,8 +1262,8 @@ BOOL InitMenu(void)
 			ID_HOTKEY, "MENU_HOTKEY",
 		};
 		SetI18nMenuStrsW(g_hConfigMenu, "TTMenu", ConfigMenuTextInfo, _countof(ConfigMenuTextInfo), UILanguageFileW);
-		UTIL_get_lang_msg("MENU_EXEC", uimsg, sizeof(uimsg), "Execute", UILanguageFile);
-		::ModifyMenu(g_hSubMenu, ID_EXEC, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)g_hListMenu, (LPCTSTR) uimsg);
+		UTIL_get_lang_msgW("MENU_EXEC", uimsg, _countof(uimsg), L"Execute", UILanguageFileW);
+		::ModifyMenuW(g_hSubMenu, ID_EXEC, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)g_hListMenu, uimsg);
 	}
 
 	return TRUE;
@@ -1360,7 +1359,7 @@ BOOL RedrawMenu(HWND hWnd)
 	DWORD		dwCnt = 0;
 	DWORD		dwValidCnt = 0;
 	TEXTMETRIC	textMetric;
-	char		uimsg[MAX_UIMSG];
+	wchar_t		uimsg[MAX_UIMSG];
 
 	::DeleteMenu(g_hListMenu, ID_NOENTRY, MF_BYCOMMAND);
 	num = ::GetMenuItemCount(g_hListMenu);
@@ -1394,7 +1393,7 @@ BOOL RedrawMenu(HWND hWnd)
 		dwCnt++;
 	}
 	if (dwValidCnt == 0) {
-		UTIL_get_lang_msg("MENU_NOTRAY", uimsg, sizeof(uimsg), STR_NOENTRY, UILanguageFile);
+		UTIL_get_lang_msgW("MENU_NOTRAY", uimsg, _countof(uimsg), STR_NOENTRY, UILanguageFileW);
 		::AppendMenu(g_hListMenu, MF_STRING | MF_GRAYED, ID_NOENTRY, (LPCTSTR) uimsg);
 	}
 
@@ -1559,19 +1558,19 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	wchar_t	szTTermPath[MAX_PATH];
 	wchar_t	szName[MAX_PATH];
 	DWORD	dwErr;
-	char	uimsg[MAX_UIMSG];
+	wchar_t	uimsg[MAX_UIMSG];
 	wchar_t	cur[MAX_PATH], modulePath[MAX_PATH];
 
 	if (::GetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH) == 0) {
-		UTIL_get_lang_msg("MSG_ERROR_NOREGNAME", uimsg, sizeof(uimsg),
-		                  "error: no registry name", UILanguageFile);
-		::MessageBox(hWnd, uimsg, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+		UTIL_get_lang_msgW("MSG_ERROR_NOREGNAME", uimsg, _countof(uimsg),
+						   L"error: no registry name", UILanguageFileW);
+		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
 	if (wcschr(g_JobInfo.szName, L'\\') != NULL) {
-		UTIL_get_lang_msg("MSG_ERROR_INVALIDREGNAME", uimsg, sizeof(uimsg),
-		                  "can't use \"\\\" in registry name", UILanguageFile);
-		::MessageBox(hWnd, uimsg, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+		UTIL_get_lang_msgW("MSG_ERROR_INVALIDREGNAME", uimsg, _countof(uimsg),
+						   L"can't use \"\\\" in registry name", UILanguageFileW);
+		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
 
@@ -1583,9 +1582,9 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		g_JobInfo.dwMode = MODE_DIRECT;
 
 	if (::GetDlgItemTextW(hWnd, EDIT_HOST, g_JobInfo.szHostName, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_AUTOLOGIN) {
-		UTIL_get_lang_msg("MSG_ERROR_NOHOST", uimsg, sizeof(uimsg),
-		                  "error: no host name", UILanguageFile);
-		::MessageBox(hWnd, uimsg, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+		UTIL_get_lang_msgW("MSG_ERROR_NOHOST", uimsg, _countof(uimsg),
+						   L"error: no host name", UILanguageFileW);
+		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
 
@@ -1596,9 +1595,9 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	::GetDlgItemTextA(hWnd, EDIT_PASSWORD, g_JobInfo.szPassword, MAX_PATH);
 
 	if (::GetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_MACRO) {
-		UTIL_get_lang_msg("MSG_ERROR_NOMACRO", uimsg, sizeof(uimsg),
-		                  "error: no macro filename", UILanguageFile);
-		::MessageBox(hWnd, uimsg, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+		UTIL_get_lang_msgW("MSG_ERROR_NOMACRO", uimsg, _countof(uimsg),
+						   L"error: no macro filename", UILanguageFileW);
+		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
 
@@ -1622,8 +1621,8 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	if (::GetFileAttributesW(g_JobInfo.szTeraTerm) == INVALID_FILE_ATTRIBUTES) {
 		dwErr = ::GetLastError();
 		if (dwErr == ERROR_FILE_NOT_FOUND || dwErr == ERROR_PATH_NOT_FOUND) {
-			UTIL_get_lang_msg("MSG_ERROR_CHECKFILE", uimsg, sizeof(uimsg),
-			                  "checking [%s] file was failure.\n", UILanguageFile);
+			UTIL_get_lang_msgW("MSG_ERROR_CHECKFILE", uimsg, _countof(uimsg),
+							   L"checking [%s] file was failure.\n", UILanguageFileW);
 			ErrorMessage(hWnd, dwErr, uimsg, g_JobInfo.szTeraTerm);
 			SetCurrentDirectoryW(cur);
 			return FALSE;
@@ -1640,8 +1639,8 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 
 	if (RegSaveLoginHostInformation(&g_JobInfo) == FALSE) {
 		dwErr = ::GetLastError();
-		UTIL_get_lang_msg("MSG_ERROR_SAVEREG", uimsg, sizeof(uimsg),
-		                  "error: couldn't save to registry.\n", UILanguageFile);
+		UTIL_get_lang_msgW("MSG_ERROR_SAVEREG", uimsg, _countof(uimsg),
+						   L"error: couldn't save to registry.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		SetCurrentDirectoryW(cur);
 		return FALSE;
@@ -1678,7 +1677,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	long	index;
 //	char	*pt;
 	wchar_t	szName[MAX_PATH];
-	char	uimsg[MAX_UIMSG];
+	wchar_t	uimsg[MAX_UIMSG];
 	DWORD	dwErr;
 
 	index = ::SendDlgItemMessage(hWnd, LIST_HOST, LB_GETCURSEL, 0, 0);
@@ -1686,8 +1685,8 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 
 	if (RegLoadLoginHostInformation(szName, &g_JobInfo) == FALSE) {
 		dwErr = ::GetLastError();
-		UTIL_get_lang_msg("MSG_ERROR_OPENREG", uimsg, sizeof(uimsg),
-		                  "Couldn't open the registry.\n", UILanguageFile);
+		UTIL_get_lang_msgW("MSG_ERROR_OPENREG", uimsg, _countof(uimsg),
+						   L"Couldn't open the registry.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
@@ -1796,28 +1795,28 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 	long	index;
 	wchar_t	szEntryName[MAX_PATH];
 	wchar_t	szSubKey[MAX_PATH];
-	char	uimsg[MAX_UIMSG];
+	wchar_t	uimsg[MAX_UIMSG];
 	DWORD	dwErr;
 
 	if ((index = ::SendDlgItemMessage(hWnd, LIST_HOST, LB_GETCURSEL, 0, 0)) == LB_ERR) {
-		UTIL_get_lang_msg("MSG_ERROR_SELECTREG", uimsg, sizeof(uimsg),
-		                  "Select deleted registry name", UILanguageFile);
-		::MessageBox(hWnd, uimsg, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+		UTIL_get_lang_msgW("MSG_ERROR_SELECTREG", uimsg, _countof(uimsg),
+						   L"Select deleted registry name", UILanguageFileW);
+		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
 
 	if (::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM) index, (LPARAM) (LPCTSTR) szEntryName) == LB_ERR) {
-		UTIL_get_lang_msg("MSG_ERROR_GETDELETEREG", uimsg, sizeof(uimsg),
-		                  "Couldn't get the deleting entry", UILanguageFile);
-		::MessageBox(hWnd, uimsg, "TeraTerm Menu", MB_ICONSTOP | MB_OK);
+		UTIL_get_lang_msgW("MSG_ERROR_GETDELETEREG", uimsg, _countof(uimsg),
+						   L"Couldn't get the deleting entry", UILanguageFileW);
+		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
 
 	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szEntryName);
 	if (RegDelete(HKEY_CURRENT_USER, szSubKey) != ERROR_SUCCESS) {
 		dwErr = ::GetLastError();
-		UTIL_get_lang_msg("MSG_ERROR_DELETEREG", uimsg, sizeof(uimsg),
-		                  "Couldn't delete the registry.\n", UILanguageFile);
+		UTIL_get_lang_msgW("MSG_ERROR_DELETEREG", uimsg, _countof(uimsg),
+						   L"Couldn't delete the registry.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
@@ -1954,18 +1953,18 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	case BUTTON_MACRO:
 		::GetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_MACRO_TITLE", title, _countof(title),
-		                  L"specifying macro file", UILanguageFile);
+						   L"specifying macro file", UILanguageFileW);
 		UTIL_get_lang_msgW("FILEDLG_MACRO_FILTER", filter, _countof(filter),
-		                  L"macro file(*.ttl)\\0*.ttl\\0all files(*.*)\\0*.*\\0\\0", UILanguageFile);
+						   L"macro file(*.ttl)\\0*.ttl\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
 		OpenFileDlg(hWnd, EDIT_MACRO, title, filter, g_JobInfo.szMacroFile);
 		return TRUE;
 
 	case IDC_KEYFILE_BUTTON:
 		::GetDlgItemTextW(hWnd, IDC_KEYFILE_PATH, g_JobInfo.PrivateKeyFile, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_KEY_TITLE", title, _countof(title),
-		                  L"specifying private key file", UILanguageFile);
+						   L"specifying private key file", UILanguageFileW);
 		UTIL_get_lang_msgW("FILEDLG_KEY_FILTER", filter, _countof(filter),
-		                  L"identity files\\0identity;id_rsa;id_dsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0all(*.*)\\0*.*\\0\\0", UILanguageFile);
+						   L"identity files\\0identity;id_rsa;id_dsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0all(*.*)\\0*.*\\0\\0", UILanguageFileW);
 		OpenFileDlg(hWnd, IDC_KEYFILE_PATH, title, filter, g_JobInfo.PrivateKeyFile);
 		return TRUE;
 
@@ -2045,25 +2044,25 @@ BOOL ManageWMCommand_Etc(HWND hWnd, WPARAM wParam)
 	case BUTTON_TTMPATH:
 		::GetDlgItemTextW(hWnd, EDIT_TTMPATH, szPath, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_TERATERM_TITLE", title, _countof(title),
-		                  L"specifying TeraTerm", UILanguageFile);
+						   L"specifying TeraTerm", UILanguageFileW);
 		UTIL_get_lang_msgW("FILEDLG_TERATERM_FILTER", filter, _countof(filter),
-		                  L"execute file(*.exe)\\0*.exe\\0all files(*.*)\\0*.*\\0\\0", UILanguageFile);
+						   L"execute file(*.exe)\\0*.exe\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
 		OpenFileDlg(hWnd, EDIT_TTMPATH, title, filter, szPath);
 		return TRUE;
 	case BUTTON_INITFILE:
 		::GetDlgItemTextW(hWnd, EDIT_INITFILE, szPath, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_INI_TITLE", title, _countof(title),
-		                  L"specifying config file", UILanguageFile);
+						   L"specifying config file", UILanguageFileW);
 		UTIL_get_lang_msgW("FILEDLG_INI_FILTER", filter, _countof(filter),
-		                  L"config file(*.ini)\\0*.ini\\0all files(*.*)\\0*.*\\0\\0", UILanguageFile);
+						   L"config file(*.ini)\\0*.ini\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
 		OpenFileDlg(hWnd, EDIT_INITFILE, title, filter, szPath);
 		return TRUE;
 	case BUTTON_LOG:
 		::GetDlgItemTextW(hWnd, EDIT_LOG, szPath, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_LOG_TITLE", title, _countof(title),
-		                  L"specifying log file", UILanguageFile);
+						   L"specifying log file", UILanguageFileW);
 		UTIL_get_lang_msgW("FILEDLG_LOG_FILTER", filter, _countof(filter),
-		                  L"log file(*.log)\\0*.log\\0all files(*.*)\\0*.*\\0\\0", UILanguageFile);
+						   L"log file(*.log)\\0*.log\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
 		OpenFileDlg(hWnd, EDIT_LOG, title, filter, szPath);
 		return TRUE;
 	}
@@ -2112,7 +2111,7 @@ BOOL ManageWMCommand_Version(HWND hWnd, WPARAM wParam)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 {
-	char	uimsg[MAX_UIMSG];
+	wchar_t	uimsg[MAX_UIMSG];
 
 	switch(LOWORD(wParam)) {
 	case ID_TMENU_ADD:
@@ -2126,36 +2125,36 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 		return TRUE;
 	case ID_ICON:
 		if (GetMenuState(g_hConfigMenu, ID_ICON, MF_BYCOMMAND & MF_CHECKED) != 0) {
-			UTIL_get_lang_msg("MENU_ICON", uimsg, sizeof(uimsg), STR_ICONMODE, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_ICON, MF_BYCOMMAND, ID_ICON, uimsg);
+			UTIL_get_lang_msgW("MENU_ICON", uimsg, _countof(uimsg), STR_ICONMODE, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_ICON, MF_BYCOMMAND, ID_ICON, uimsg);
 			g_MenuData.dwIconMode = MODE_SMALLICON;
 		} else {
-			UTIL_get_lang_msg("MENU_ICON", uimsg, sizeof(uimsg), STR_ICONMODE, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_ICON, MF_CHECKED | MF_BYCOMMAND, ID_ICON, uimsg);
+			UTIL_get_lang_msgW("MENU_ICON", uimsg, _countof(uimsg), STR_ICONMODE, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_ICON, MF_CHECKED | MF_BYCOMMAND, ID_ICON, uimsg);
 			g_MenuData.dwIconMode = MODE_LARGEICON;
 		}
 		RedrawMenu(hWnd);
 		return	TRUE;
 	case ID_LEFTPOPUP:
 		if (GetMenuState(g_hConfigMenu, ID_LEFTPOPUP, MF_BYCOMMAND & MF_CHECKED) != 0) {
-			UTIL_get_lang_msg("MENU_LEFTPOPUP", uimsg, sizeof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_LEFTPOPUP, MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
+			UTIL_get_lang_msgW("MENU_LEFTPOPUP", uimsg, _countof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_LEFTPOPUP, MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
 			g_MenuData.bLeftButtonPopup = FALSE;
 		} else {
-			UTIL_get_lang_msg("MENU_LEFTPOPUP", uimsg, sizeof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_LEFTPOPUP, MF_CHECKED | MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
+			UTIL_get_lang_msgW("MENU_LEFTPOPUP", uimsg, _countof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_LEFTPOPUP, MF_CHECKED | MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
 			g_MenuData.bLeftButtonPopup = TRUE;
 		}
 		return	TRUE;
 	case ID_HOTKEY:
 		if (GetMenuState(g_hConfigMenu, ID_HOTKEY, MF_BYCOMMAND & MF_CHECKED) != 0) {
-			UTIL_get_lang_msg("MENU_HOTKEY", uimsg, sizeof(uimsg), STR_HOTKEY, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_HOTKEY, MF_BYCOMMAND, ID_HOTKEY, uimsg);
+			UTIL_get_lang_msgW("MENU_HOTKEY", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_HOTKEY, MF_BYCOMMAND, ID_HOTKEY, uimsg);
 			::UnregisterHotKey(g_hWnd, WM_MENUOPEN);
 			g_MenuData.bHotkey = FALSE;
 		} else {
-			UTIL_get_lang_msg("MENU_HOTKEY", uimsg, sizeof(uimsg), STR_HOTKEY, UILanguageFile);
-			::ModifyMenu(g_hConfigMenu, ID_HOTKEY, MF_CHECKED | MF_BYCOMMAND, ID_HOTKEY, uimsg);
+			UTIL_get_lang_msgW("MENU_HOTKEY", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_HOTKEY, MF_CHECKED | MF_BYCOMMAND, ID_HOTKEY, uimsg);
 			::RegisterHotKey(g_hWnd, WM_MENUOPEN, MOD_CONTROL | MOD_ALT, 'M');
 			g_MenuData.bHotkey = TRUE;
 		}
@@ -2469,8 +2468,6 @@ static void GetUILanguageFile()
 	UILanguageFileW = GetUILanguageFileFullW(ExeDirW, lng_rel);
 	free(ExeDirW);
 	free(lng_rel);
-
-	WideCharToACP_t(UILanguageFileW, UILanguageFile, sizeof(UILanguageFile));
 }
 
 /* ==========================================================================
@@ -2546,10 +2543,10 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	if (::FindWindowW(TTPMENU_CLASS, NULL) == NULL) {
 		if (::RegisterClassW(&winClass) == 0) {
-			char		uimsg[MAX_UIMSG];
+			wchar_t		uimsg[MAX_UIMSG];
 			dwErr = ::GetLastError();
-			UTIL_get_lang_msg("MSG_ERROR_WINCLASS", uimsg, sizeof(uimsg),
-			                  "Couldn't register the window class.\n", UILanguageFile);
+			UTIL_get_lang_msgW("MSG_ERROR_WINCLASS", uimsg, _countof(uimsg),
+							   L"Couldn't register the window class.\n", UILanguageFileW);
 			ErrorMessage(NULL, dwErr, uimsg);
 			return FALSE;
 		}

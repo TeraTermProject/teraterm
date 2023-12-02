@@ -248,14 +248,12 @@ BOOL SetForceForegroundWindow(HWND hWnd)
 	return	ret;
 }
 
-void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const wchar_t *iniFile)
 {
-	GetI18nStr("TTMenu", key, buf, buf_len, def, iniFile);
-}
-
-void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
-{
-	GetI18nStrW("TTMenu", key, buf, buf_len, def, iniFile);
+	wchar_t *str;
+	GetI18nStrWW("TTMenu", key, def, iniFile, &str);
+	wcscpy_s(buf, buf_len, str);
+	free(str);
 }
 
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
