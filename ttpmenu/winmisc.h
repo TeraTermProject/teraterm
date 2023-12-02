@@ -31,14 +31,6 @@
 #define	WINMISC_H
 
 #include	<windows.h>
-//#include	<tchar.h>
-
-#include	<shlobj.h>
-#include	<shellapi.h>
-
-#include	<stdio.h>
-#include	<time.h>
-//#include	"i18n.h"
 
 // Window Position
 #define		POSITION_LEFTTOP		0x00
@@ -49,19 +41,12 @@
 #define		POSITION_OUTSIDE		0x05
 
 // misc
-//void	GetTime(TCHAR *cTimeStr);
-//void	GetTimeEx(LPTSTR lpszTimeStr);
 void	SetDlgPos(HWND hWnd, int pos);
 void	EncodePassword(const char *cPassword, char *cEncodePassword);
 BOOL	EnableItem(HWND hWnd, int idControl, BOOL flag);
 BOOL	OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir);
 BOOL	SaveFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, wchar_t *filter, wchar_t *defaultDir);
-//BOOL	BrowseForFolder(HWND hWnd, TCHAR *szTitle, TCHAR *szPath);
-//BOOL	GetModulePath(TCHAR *szPath, DWORD dwMaxPath);
 BOOL	SetForceForegroundWindow(HWND hWnd);
-//UINT	GetResourceType(LPCTSTR lpszPath);
-//int		CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
-//TCHAR	*PathTok(TCHAR *str, TCHAR *separator);
 wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2);
 void	UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 void	UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);

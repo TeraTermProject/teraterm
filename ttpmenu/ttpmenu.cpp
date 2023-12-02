@@ -30,12 +30,11 @@
 
 #include	<windows.h>
 #include	<commctrl.h>
-#include	<windowsx.h>  // for GET_X_LPARAM(), GET_Y_LPARAM()
+#include	<stdio.h>
 #include	<string.h>
 #define _CRTDBG_MAP_ALLOC
 #include	<stdlib.h>
 #include	<crtdbg.h>
-#include	"shlwapi.h" // for StrStrIW()
 
 #include	"ttpmenu.h"
 #include	"ttpmenu-version.h"
