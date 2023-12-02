@@ -1,4 +1,0 @@
-<files "JVN06770361.html.*">
-  order allow,deny
-  deny from all
-</files>
