@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-10-22)
+﻿; Updated by TeraTerm Project (2023-12-02)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -1125,7 +1125,7 @@ MENU_CLOSE=종료
 MENU_NOTRAY=(없슴)
 
 DLG_ABOUT_TITLE=버전 정보
-DLG_ABOUT_APPNAME=실행 도구
+DLG_ABOUT_APPNAME=Tera Term 실행 도구\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=목록 설정
 DLG_CONFIG_ITEM=목록 항목

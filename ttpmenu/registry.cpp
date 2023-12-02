@@ -30,33 +30,33 @@
 //保存先にiniファイルを使用したい場合は、0バイトのファイルでよいのでttpmenu.exeと同じフォルダにttpmenu.iniを用意する
 #define		STRICT
 #include	"registry.h"
-#include	"tchar.h"
 #include	"stdio.h"
+#include	"wchar.h"
 
-BOOL bUseINI = FALSE;					// 保存先(TRUE=INI, FALSE=レジストリ)
-TCHAR szSectionName[MAX_PATH];			// INIのセクション名
-TCHAR szSectionNames[1024*10]={0};	// INIのセクション名一覧
-TCHAR szApplicationName[MAX_PATH]={0};	// INIファイルのフルパス
+static BOOL bUseINI = FALSE;					// 保存先(TRUE=INI, FALSE=レジストリ)
+static wchar_t szSectionName[MAX_PATH];			// INIのセクション名
+static wchar_t szSectionNames[1024*10]={0};	// INIのセクション名一覧
+static wchar_t szApplicationName[MAX_PATH]={0};	// INIファイルのフルパス
 
-BOOL getSection(LPCTSTR str)
+static BOOL getSection(const wchar_t *str)
 {
 	szSectionNames[0] = 0;
-	LPCTSTR t = _tcsrchr(str, _T('\\'));
+	const wchar_t *t = wcsrchr(str, L'\\');
 	if(t){
 		t++;
 	}else{
 		t = str;
 	}
-	_tcscpy(szSectionName, t);
+	wcscpy(szSectionName, t);
 	return TRUE;
 }
 
-LPCTSTR getModuleName()
+static wchar_t *getModuleName()
 {
 	if(*szApplicationName == 0){
-		GetModuleFileName(NULL, szApplicationName, sizeof(TCHAR)*sizeof(szApplicationName));
-		LPTSTR t = szApplicationName + _tcslen(szApplicationName) - 3;
-		_tcscpy(t, _T("ini"));
+		GetModuleFileNameW(NULL, szApplicationName, _countof(szApplicationName));
+		wchar_t *t = szApplicationName + wcslen(szApplicationName) - 3;
+		wcscpy(t, L"ini");
 	}
 	return szApplicationName;
 }
@@ -64,7 +64,7 @@ LPCTSTR getModuleName()
 //exeと同じフォルダにiniファイルが存在すればiniを使用、その他の場合はレジストリを使用
 void checkIniFile()
 {
-	DWORD dwAttr = ::GetFileAttributes(getModuleName());
+	DWORD dwAttr = ::GetFileAttributesW(getModuleName());
 	bUseINI = dwAttr != INVALID_FILE_ATTRIBUTES;
 }
 
@@ -72,7 +72,7 @@ void checkIniFile()
 	Function Name	: (HKEY) RegCreate()
 	Outline			: 指定したレジストリキーを作成（またはオープン）する
 	Arguments		: HKEY		hCurrentKey		(in)	現在のオープンキー
-					: LPCTSTR	lpszKeyName		(in)	オープンするサブキーの
+					: const wchar_t *lpszKeyName		(in)	オープンするサブキーの
 					: 									名前
 	Return Value	: 成功	オープンまたは作成されたキーのハンドル
 					: 失敗	NULL
@@ -82,7 +82,7 @@ void checkIniFile()
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-HKEY RegCreate(HKEY hCurrentKey, LPCTSTR lpszKeyName)
+HKEY RegCreate(HKEY hCurrentKey, const wchar_t *lpszKeyName)
 {
 	if(bUseINI){
 		getSection(lpszKeyName);
@@ -92,7 +92,7 @@ HKEY RegCreate(HKEY hCurrentKey, LPCTSTR lpszKeyName)
 		HKEY	hkResult;
 		DWORD	dwDisposition;
 
-		lError = ::RegCreateKeyEx(hCurrentKey,
+		lError = ::RegCreateKeyExW(hCurrentKey,
 								lpszKeyName,
 								0,
 								NULL,
@@ -114,7 +114,7 @@ HKEY RegCreate(HKEY hCurrentKey, LPCTSTR lpszKeyName)
 	Function Name	: (HKEY) RegOpen()
 	Outline			: 指定したレジストリキーをオープンする
 	Arguments		: HKEY		hCurrentKey		(in)	現在のオープンキー
-					: LPCTSTR	lpszKeyName		(in)	オープンするサブキーの
+					: const wchar_t *lpszKeyName		(in)	オープンするサブキーの
 					: 									名前
 	Return Value	: 成功	オープンまたは作成されたキーのハンドル
 					: 失敗	NULL
@@ -124,7 +124,7 @@ HKEY RegCreate(HKEY hCurrentKey, LPCTSTR lpszKeyName)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-HKEY RegOpen(HKEY hCurrentKey, LPCTSTR lpszKeyName)
+HKEY RegOpen(HKEY hCurrentKey, const wchar_t *lpszKeyName)
 {
 	if(bUseINI){
 		getSection(lpszKeyName);
@@ -133,7 +133,7 @@ HKEY RegOpen(HKEY hCurrentKey, LPCTSTR lpszKeyName)
 		long	lError;
 		HKEY	hkResult;
 
-		lError = ::RegOpenKeyEx(hCurrentKey,
+		lError = ::RegOpenKeyExW(hCurrentKey,
 								lpszKeyName,
 								0,
 								KEY_ALL_ACCESS,
@@ -180,8 +180,8 @@ BOOL RegClose(HKEY hKey)
 	Function Name	: (BOOL) RegSetStr()
 	Outline			: レジストリキーの値に文字列を書き込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
-					: LPCTSTR	lpszValueName	(in)	設定する値
-					: char		*buf			(in)	値データ
+					: const wchar_t *lpszValueName	(in)	設定する値
+					: const wchar_t *buf			(in)	値データ
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
 	Reference		: 
@@ -190,19 +190,19 @@ BOOL RegClose(HKEY hKey)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RegSetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf)
+BOOL RegSetStr(HKEY hKey, const wchar_t *lpszValueName, const wchar_t *buf)
 {
 	if(bUseINI){
-		return WritePrivateProfileString(szSectionName, lpszValueName, buf, getModuleName());
+		return WritePrivateProfileStringW(szSectionName, lpszValueName, buf, getModuleName());
 	}else{
 		long	lError;
 
-		lError = ::RegSetValueEx(hKey,
+		lError = ::RegSetValueExW(hKey,
 								lpszValueName,
 								0,
 								REG_SZ,
-								(CONST BYTE *) buf,
-								(::lstrlen(buf) + 1) * sizeof(TCHAR));
+								(const BYTE *) buf,
+								(DWORD)((wcslen(buf) + 1) * sizeof(wchar_t)));
 		if (lError != ERROR_SUCCESS) {
 			::SetLastError(lError);
 			return FALSE;
@@ -217,8 +217,8 @@ BOOL RegSetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf)
 	Outline			: レジストリキーの値から文字列を読み込む
 	Arguments		: HKEY		hKey			(in)		値を設定するキーの
 					: 										ハンドル
-					: LPCTSTR	lpszValueName	(in)		設定する値
-					: char		*buf			(out)		値データを格納する
+					: const wchar_t *	lpszValueName	(in)		設定する値
+					: wchar_t	*buf			(out)		値データを格納する
 					: 										バッファ
 					: DWORD		dwSize			(in/out)	文字数
 	Return Value	: 成功	TRUE
@@ -229,18 +229,18 @@ BOOL RegSetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RegGetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf, DWORD dwSize)
+BOOL RegGetStr(HKEY hKey, const wchar_t *lpszValueName, wchar_t *buf, DWORD dwSize)
 {
 	if(bUseINI){
-		return GetPrivateProfileString(szSectionName, lpszValueName, _T(""), buf, dwSize, getModuleName());
+		return GetPrivateProfileStringW(szSectionName, lpszValueName, L"", buf, dwSize, getModuleName());
 	}else{
 		LONG	lError;
 		DWORD	dwWriteSize;
 		DWORD	dwType = REG_SZ;
 
-		dwWriteSize = dwSize * sizeof(TCHAR);
+		dwWriteSize = dwSize * sizeof(wchar_t);
 
-		lError = ::RegQueryValueEx(hKey, lpszValueName, 0, &dwType, (LPBYTE) buf, &dwWriteSize);
+		lError = ::RegQueryValueExW(hKey, lpszValueName, 0, &dwType, (LPBYTE) buf, &dwWriteSize);
 		if (lError != ERROR_SUCCESS) {
 			::SetLastError(lError);
 			return FALSE;
@@ -256,7 +256,7 @@ BOOL RegGetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf, DWORD dwSize)
 	Function Name	: (BOOL) RegSetDword()
 	Outline			: レジストリキーの値に DWORDを書き込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
-					: LPCTSTR	lpszValueName	(in)	設定する値
+					: const wchar_t *lpszValueName	(in)	設定する値
 					: DWORD		dwValue			(in)	値データ
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
@@ -266,16 +266,16 @@ BOOL RegGetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf, DWORD dwSize)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RegSetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD dwValue)
+BOOL RegSetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD dwValue)
 {
 	if(bUseINI){
-		TCHAR t[64];
-		_stprintf(t, _T("%d"), dwValue);
-		return WritePrivateProfileString(szSectionName, lpszValueName, t, getModuleName());
+		wchar_t t[64];
+		_swprintf(t, L"%d", dwValue);
+		return WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
 	}else{
 		long	lError;
 
-		lError = ::RegSetValueEx(hKey,
+		lError = ::RegSetValueExW(hKey,
 								lpszValueName,
 								0,
 								REG_DWORD,
@@ -294,7 +294,7 @@ BOOL RegSetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD dwValue)
 	Function Name	: (BOOL) RegGetDword()
 	Outline			: レジストリキーの値から DWORDを読み込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
-					: LPCTSTR	lpszValueName	(in)	設定する値
+					: const wchar_t *lpszValueName	(in)	設定する値
 					: DWORD		*dwValue		(out)	値データ
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
@@ -304,13 +304,13 @@ BOOL RegSetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD dwValue)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RegGetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD *dwValue)
+BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 {
 	int defmark = 0xdeadbeef;
 
 	if(bUseINI){
 		// 読み込みに失敗した場合は false を返す (2007.11.14 yutaka)
-		*dwValue = GetPrivateProfileInt(szSectionName, lpszValueName, defmark, getModuleName());
+		*dwValue = GetPrivateProfileIntW(szSectionName, lpszValueName, defmark, getModuleName());
 		if (*dwValue == defmark) {
 			*dwValue = 0;
 			return FALSE;
@@ -322,7 +322,7 @@ BOOL RegGetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD *dwValue)
 		DWORD	dwType = REG_DWORD;
 		DWORD	dwSize = sizeof(DWORD);
 
-		lError = ::RegQueryValueEx(hKey,
+		lError = ::RegQueryValueExW(hKey,
 									lpszValueName,
 									0,
 									&dwType,
@@ -339,9 +339,9 @@ BOOL RegGetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD *dwValue)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSetBinary()
-	Outline			: レジストリキーの値から BINARYを読み込む
+	Outline			: レジストリキーの値から BINARYを書き込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
-					: LPCTSTR	lpszValueName	(in)	設定する値
+					: const wchar_t *lpszValueName	(in)	設定する値
 					: void		*buf			(out)	値データ
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
@@ -351,25 +351,25 @@ BOOL RegGetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD *dwValue)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RegSetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, DWORD dwSize)
+BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSize)
 {
 	if(bUseINI){
-		TCHAR t[1024] = {0};
+		wchar_t t[1024] = {0};
 		LPBYTE s = (LPBYTE)buf;
 		for(DWORD i=0; i<dwSize; i++){
-			TCHAR c[4];
-			_stprintf(c, _T("%02X "), s[i]);
-			_tcscat(t, c);
+			wchar_t c[4];
+			_swprintf(c, L"%02X ", s[i]);
+			wcscat(t, c);
 		}
-		BOOL ret =  WritePrivateProfileString(szSectionName, lpszValueName, t, getModuleName());
+		BOOL ret =  WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
 		return ret;
 	}else{
 		long	lError;
 		DWORD	dwWriteSize;
 
-		dwWriteSize = dwSize * sizeof(TCHAR);
+		dwWriteSize = dwSize;
 
-		if ((lError = ::RegSetValueEx(hKey,
+		if ((lError = ::RegSetValueExW(hKey,
 									lpszValueName,
 									0,
 									REG_BINARY,
@@ -387,7 +387,7 @@ BOOL RegSetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, DWORD dwSize)
 	Function Name	: (BOOL) RegGetBinary()
 	Outline			: レジストリキーの値から BINARYを読み込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
-					: LPCTSTR	lpszValueName	(in)	設定する値
+					: const wchar_t *lpszValueName	(in)	設定する値
 					: int		*buf			(out)	値データ
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
@@ -398,23 +398,23 @@ BOOL RegSetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, DWORD dwSize)
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
 // 関数の返値の型を追加 (2006.2.18 yutaka)
-int RegGetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, LPDWORD lpdwSize)
+int RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lpdwSize)
 {
 	if(bUseINI){
-		TCHAR t[1024] = {0};
-		BOOL ret = GetPrivateProfileString(szSectionName, lpszValueName, _T(""), t, sizeof(t), getModuleName());
+		wchar_t t[1024] = {0};
+		BOOL ret = GetPrivateProfileStringW(szSectionName, lpszValueName, L"", t, _countof(t), getModuleName());
 		if(ret){
-			int size = _tcslen(t);
+			size_t size = wcslen(t);
 			while(t[size-1] == ' '){
 				size--;
 				t[size] = 0;
 			}
-			LPCTSTR s = t;
+			wchar_t *s = t;
 			LPBYTE p = (LPBYTE)buf;
 			DWORD cnt = 0;
 			*p = 0;
-			for(int i=0; i<(size+1)/3; i++){
-				*p++ = (BYTE)_tcstol(s, NULL, 16);
+			for(size_t i=0; i<(size+1)/3; i++){
+				*p++ = (BYTE)wcstol(s, NULL, 16);
 				s += 3;
 				cnt ++;
 			}
@@ -428,7 +428,7 @@ int RegGetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, LPDWORD lpdwSize)
 
 		dwWriteSize = *lpdwSize * sizeof(TCHAR);
 
-		if ((lError = ::RegQueryValueEx(hKey,
+		if ((lError = ::RegQueryValueExW(hKey,
 										lpszValueName,
 										NULL,
 										&dwType,
@@ -443,15 +443,15 @@ int RegGetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, LPDWORD lpdwSize)
 }
 
 
-LONG RegEnumEx(HKEY hKey, DWORD dwIndex, LPTSTR lpName, LPDWORD lpcName, LPDWORD lpReserved, LPTSTR lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
+LONG RegEnumEx(HKEY hKey, DWORD dwIndex, wchar_t *lpName, LPDWORD lpcName, LPDWORD lpReserved, wchar_t *lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
 {
-	static LPCTSTR ptr = szSectionNames;
+	static wchar_t *ptr = szSectionNames;
 	if(bUseINI){
 		if(*szSectionNames == 0){
-			GetPrivateProfileSectionNames(szSectionNames, sizeof(szSectionNames), getModuleName());
+			GetPrivateProfileSectionNamesW(szSectionNames, _countof(szSectionNames), getModuleName());
 			ptr = szSectionNames;
 		}
-		if(_tcscmp(ptr, _T("TTermMenu")) == 0){
+		if(wcscmp(ptr, L"TTermMenu") == 0){
 			//skip
 			while(*ptr++);
 //			ptr++;
@@ -459,20 +459,20 @@ LONG RegEnumEx(HKEY hKey, DWORD dwIndex, LPTSTR lpName, LPDWORD lpcName, LPDWORD
 		if(*ptr == 0){
 			return ERROR_NO_MORE_ITEMS;
 		}
-		_tcscpy(lpName, ptr);
+		wcscpy(lpName, ptr);
 		while(*ptr++);
 //		ptr++;
 		return ERROR_SUCCESS;
 	}else{
-		return ::RegEnumKeyEx(hKey, dwIndex, lpName, lpcName, lpReserved, lpClass, lpcClass, lpftLastWriteTime);
+		return ::RegEnumKeyExW(hKey, dwIndex, lpName, lpcName, lpReserved, lpClass, lpcClass, lpftLastWriteTime);
 	}
 }
 
-LONG RegDelete(HKEY hKey, LPCTSTR lpSubKey)
+LONG RegDelete(HKEY hKey, const wchar_t *lpSubKey)
 {
 	if(bUseINI){
-		return WritePrivateProfileString(szSectionName, NULL, NULL, getModuleName()) ? ERROR_SUCCESS : ERROR_ACCESS_DENIED;
+		return WritePrivateProfileStringW(szSectionName, NULL, NULL, getModuleName()) ? ERROR_SUCCESS : ERROR_ACCESS_DENIED;
 	}else{
-		return ::RegDeleteKey(hKey, lpSubKey);
+		return ::RegDeleteKeyW(hKey, lpSubKey);
 	}
 }

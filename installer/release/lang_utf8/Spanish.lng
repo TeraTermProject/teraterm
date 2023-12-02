@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-10-22)
+﻿; Updated by TeraTerm Project (2023-12-02)
 ; Traducido por Filiberto Olguin Ascona.
 
 [Tera Term]
@@ -1016,7 +1016,7 @@ MENU_CLOSE=Quit
 MENU_NOTRAY=(none)
 
 DLG_ABOUT_TITLE=Version Information
-DLG_ABOUT_APPNAME=launch tool
+DLG_ABOUT_APPNAME=Tera Term launch tool\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=List Cofiguration
 DLG_CONFIG_ITEM=List Item

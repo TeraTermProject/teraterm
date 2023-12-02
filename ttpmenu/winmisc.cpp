@@ -28,6 +28,10 @@
  */
 
 #define		STRICT
+
+#include	"codeconv.h"
+#include	"i18n.h"
+
 #include	"winmisc.h"
 
 
@@ -113,8 +117,10 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 /* ==========================================================================
 	Function Name	: (void) EncodePassword()
 	Outline			: パスワードをエンコード(?)する。
-	Arguments		: char		cPassword		(in)	変換する文字列
-					: int		cEncodePassword	(out)	変換された文字列
+					  エンコードされた文字列をデコードする
+					  入出力は文字列またはバイナリとなる
+	Arguments		: const char *cPassword			(in)	変換する文字列
+					: char		 *cEncodePassword	(out)	変換された文字列
 	Return Value	: なし
 	Reference		: 
 	Renewal			: 
@@ -122,7 +128,7 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-void EncodePassword(TCHAR *cPassword, TCHAR *cEncodePassword)
+void EncodePassword(const char *cPassword, char *cEncodePassword)
 {
 	DWORD	dwCnt;
 	DWORD	dwPasswordLength = ::lstrlen(cPassword);
@@ -131,78 +137,6 @@ void EncodePassword(TCHAR *cPassword, TCHAR *cEncodePassword)
 		cEncodePassword[dwPasswordLength - 1 - dwCnt] = cPassword[dwCnt] ^ 0xff;
 
 	cEncodePassword[dwPasswordLength] = '\0';
-}
-
-/* ==========================================================================
-	Function Name	: (BOOL) SaveFileDlg()
-	Outline			: 「名前を指定して保存」ダイアログを開き、指定されたファイル
-					: パスを指定されたアイテムに送る
-	Arguments		: HWND		hWnd		(in)	親ウインドウのハンドル
-					: UINT		editCtl		(in)	アイテムの ID
-					: char		*title		(in)	ウインドウタイトル
-					: char		*filter		(in)	表示するファイルのフィルタ
-					: char		*defaultDir	(in)	デフォルトのパス
-	Return Value	: 成功 TRUE
-					: 失敗 FALSE
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL SaveFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *defaultDir)
-{
-	TCHAR			*szDirName;
-	TCHAR			szFile[MAX_PATH] = _T("");
-	TCHAR			szPath[MAX_PATH];
-	OPENFILENAME	ofn;
-
-	szDirName	= (TCHAR *) malloc(MAX_PATH);
-
-	if (editCtl == 0xffffffff) {
-		::GetDlgItemText(hWnd, editCtl, szDirName, MAX_PATH);
-		::lstrcpy(szDirName, defaultDir);
-	}
-
-	if (*szDirName == '"')
-		szDirName++;
-	if (szDirName[::lstrlen(szDirName) - 1] == '"')
-		szDirName[::lstrlen(szDirName) - 1] = '\0';
-
-	TCHAR *ptr = _tcsrchr(szDirName, '\\');
-	if (ptr == NULL) {
-		::lstrcpy(szFile, szDirName);
-		if (defaultDir != NULL && *szDirName == 0)
-			::lstrcpy(szDirName, defaultDir);
-	} else {
-		*ptr = 0;
-		::lstrcpy(szFile, ptr + 1);
-	}
-
-	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize		= sizeof(OPENFILENAME);
-	ofn.hwndOwner		= hWnd;
-	ofn.lpstrFilter		= filter;
-	ofn.nFilterIndex	= 1;
-	ofn.lpstrFile		= szFile;
-	ofn.nMaxFile		= sizeof(szFile);
-	ofn.lpstrTitle		= title;
-	ofn.lpstrInitialDir	= szDirName;
-	ofn.Flags			= OFN_HIDEREADONLY;
-
-	if (::GetSaveFileName(&ofn) == FALSE) {
-		free(szDirName);
-		return	FALSE;
-	}
-
-	::lstrcpy(szPath, ofn.lpstrFile);
-
-	::SetDlgItemText(hWnd, editCtl, szPath);
-	::lstrcpy(defaultDir, szPath);
-
-	free(szDirName);
-
-	return	TRUE;
 }
 
 /* ==========================================================================
@@ -222,33 +156,33 @@ BOOL SaveFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *de
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL OpenFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *defaultDir)
+BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir)
 {
-	TCHAR			*szDirName;
-	TCHAR			szFile[MAX_PATH] = _T("");
-	TCHAR			szPath[MAX_PATH];
-	OPENFILENAME	ofn;
+	wchar_t			*szDirName;
+	wchar_t			szFile[MAX_PATH] = L"";
+	wchar_t			szPath[MAX_PATH];
+	OPENFILENAMEW	ofn;
 
-	szDirName	= (TCHAR *) malloc(MAX_PATH);
+	szDirName	= (wchar_t *) malloc(MAX_PATH * sizeof(wchar_t));
 
 	if (editCtl != 0xffffffff) {
-		::GetDlgItemText(hWnd, editCtl, szDirName, MAX_PATH);
-		::lstrcpy(szDirName, defaultDir);
+		::GetDlgItemTextW(hWnd, editCtl, szDirName, MAX_PATH);
+		wcscpy(szDirName, defaultDir);
 	}
 
 	if (*szDirName == '"')
 		szDirName++;
-	if (szDirName[::lstrlen(szDirName) - 1] == '"')
-		szDirName[::lstrlen(szDirName) - 1] = '\0';
+	if (szDirName[wcslen(szDirName) - 1] == '"')
+		szDirName[wcslen(szDirName) - 1] = '\0';
 
-	TCHAR *ptr = _tcsrchr(szDirName, '\\');
+	wchar_t *ptr = wcsrchr(szDirName, '\\');
 	if (ptr == NULL) {
-		::lstrcpy(szFile, szDirName);
+		wcscpy(szFile, szDirName);
 		if (defaultDir != NULL && *szDirName == 0)
-			::lstrcpy(szDirName, defaultDir);
+			wcscpy(szDirName, defaultDir);
 	} else {
 		*ptr = 0;
-		::lstrcpy(szFile, ptr + 1);
+		wcscpy(szFile, ptr + 1);
 	}
 
 	memset(&ofn, 0, sizeof(ofn));
@@ -262,158 +196,30 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *de
 	ofn.lpstrInitialDir	= szDirName;
 	ofn.Flags			= OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS;
 
-	if (::GetOpenFileName(&ofn) == FALSE) {
+	if (::GetOpenFileNameW(&ofn) == FALSE) {
 		free(szDirName);
 		return	FALSE;
 	}
 
-	::lstrcpy(szPath, ofn.lpstrFile);
+	wcscpy(szPath, ofn.lpstrFile);
 
-	::SetDlgItemText(hWnd, editCtl, szPath);
-	::lstrcpy(defaultDir, szPath);
+	::SetDlgItemTextW(hWnd, editCtl, szPath);
+	wcscpy(defaultDir, szPath);
 
 	free(szDirName);
 
 	return	TRUE;
 }
 
-/* ==========================================================================
-	Function Name	: (int CALLBACK) BrowseCallbackProc()
-	Outline			: BrowseForFolder()のコールバック関数。
-	Arguments		: HWND		hWnd		(in)	親ウインドウのハンドル
-					: UINT		uMsg		(in)	ウインドウタイトル
-					: LPARAM	lParam		(in)	LPARAM
-					: LPARAM	lpData		(in)	BROWSEINFO の lParam
-	Return Value	: 
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
+wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2)
 {
-    switch (uMsg) {
-    case BFFM_INITIALIZED:
-		::SendMessage(hWnd, BFFM_SETSELECTION, TRUE, lpData);
-		break;
-    case BFFM_SELCHANGED:
-		break;
-    }
+	size_t	dwLen1 = wcslen(s1);
+	size_t	dwLen2 = wcslen(s2);
 
-    return 0;
-}
-
-/* ==========================================================================
-	Function Name	: (BOOL) GetModulePath()
-	Outline			: この関数を実行したモジュールのパスを取得する。
-	Arguments		: char		szPath		(out)	モジュールのパス
-					: DWORD		dwMaxPath	(in)	szPathの大きさ
-	Return Value	: 成功 TRUE
-					: 失敗 FALSE
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL GetModulePath(TCHAR *szPath, DWORD dwMaxPath)
-{
-	TCHAR	*pt;
-
-	if (::GetModuleFileName(NULL, szPath, dwMaxPath) == FALSE)
-		return FALSE;
-
-	pt	= _tcsrchr(szPath, '\\');
-	*pt	= '\0';
-
-	return TRUE;
-}
-
-/* ==========================================================================
-	Function Name	: (UINT) GetResourceType()
-	Outline			: 指定されたパスのドライブ情報を取得する
-	Arguments		: LPCTSTR	lpszPath	(in)	ドライブ情報を知りたいパス
-	Return Value	: リソースタイプ
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-UINT GetResourceType(LPCTSTR lpszPath)
-{
-	UINT	ret;
-	TCHAR	szCurrentPath[MAX_PATH];
-
-	if (::GetCurrentDirectory(MAX_PATH, szCurrentPath) == 0)
-		return 0;
-
-	if (::SetCurrentDirectory(lpszPath) == FALSE)
-		return 0;
-
-	ret = ::GetDriveType(NULL);
-
-	::SetCurrentDirectory(szCurrentPath);
-
-	return ret;
-}
-
-/* ==========================================================================
-	Function Name	: (char *) pathTok()
-	Outline			: パス用の strtok
-	Arguments		: char		*str		(in)	トークン解析するパス
-					: char		*separator	(in)	トークン文字列
-	Return Value	: 成功 切り出した文字列
-					: 失敗 NULL
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-TCHAR *PathTok(TCHAR *str, TCHAR *separator)
-{
-	static TCHAR	*sv_str;
-
-	if (str != NULL)
-		sv_str = str;
-	else if (sv_str != NULL)
-		str = sv_str;
-	else
-		return	NULL;
-
-	while (*str != '\0' && _tcschr(separator, *str) != NULL)
-		str++;
-
- 	if (*str == '\"') {
-		for (sv_str = ++str; *sv_str != '\0' && *sv_str != '\"'; sv_str++) 
-			;
-		*sv_str++ = '\0';
-	} else {
-		for (sv_str=str ; *sv_str != '\0'; sv_str++) {
-			if (_tcschr(separator, *sv_str) != NULL) {
-				*sv_str++ = '\0';
-				break;
-			}
-		}
-	}
-	if (sv_str != str)
-		return	str;
-	else
-		return	sv_str = NULL;
-}
-
-TCHAR *lstrstri(TCHAR *s1, TCHAR *s2)
-{
-	DWORD	dwLen1= ::lstrlen(s1);
-	DWORD	dwLen2= ::lstrlen(s2);
-
-	for (DWORD dwCnt = 0; dwCnt <= dwLen1; dwCnt++) {
-		// VS2005でビルドエラーとなるため dwCnt2 宣言を追加 (2006.2.18 yutaka)
-		DWORD dwCnt2;
+	for (size_t dwCnt = 0; dwCnt <= dwLen1; dwCnt++) {
+		size_t dwCnt2;
 		for (dwCnt2 = 0; dwCnt2 <= dwLen2; dwCnt2++)
-			if (tolower(s1[dwCnt + dwCnt2]) != tolower(s2[dwCnt2]))
+			if (towlower(s1[dwCnt + dwCnt2]) != towlower(s2[dwCnt2]))
 				break;
 		if (dwCnt2 > dwLen2)
 			return s1 + dwCnt;
@@ -442,9 +248,12 @@ BOOL SetForceForegroundWindow(HWND hWnd)
 	return	ret;
 }
 
-void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const wchar_t *iniFile)
 {
-	GetI18nStr("TTMenu", key, buf, buf_len, def, iniFile);
+	wchar_t *str;
+	GetI18nStrWW("TTMenu", key, def, iniFile, &str);
+	wcscpy_s(buf, buf_len, str);
+	free(str);
 }
 
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)

@@ -4,10 +4,13 @@ project(${PACKAGE_NAME})
 
 add_executable(
   ${PACKAGE_NAME} WIN32
-  resource.h
   registry.cpp
-  ttpmenu.h
+  registry.h
+  resource.h
+  ttpmenu-version.h
+  ttpmenu-version.rc
   ttpmenu.cpp
+  ttpmenu.h
   winmisc.cpp
   #
   left.ico
@@ -81,7 +84,6 @@ target_link_libraries(
   ${PACKAGE_NAME}
   PRIVATE
   common_static
-  version
   comctl32
   user32
   gdi32

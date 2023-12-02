@@ -23,11 +23,11 @@
 #define		ICONSPACE_SMALL			24
 #define		LISTBOX_HEIGHT			18
 #define		LISTBOX_WIDTH			20
-#define		TERATERM				"ttermpro.exe"
-#define		TTERM_KEY				"Software\\ShinpeiTools\\TTermMenu"
-#define		LOGIN_PROMPT			"login:"
-#define		PASSWORD_PROMPT			"Password:"
-#define		TTPMENU_CLASS			"TMenuClass"
+#define		TERATERM				L"ttermpro.exe"
+#define		TTERM_KEY				L"Software\\ShinpeiTools\\TTermMenu"
+#define		LOGIN_PROMPT			L"login:"
+#define		PASSWORD_PROMPT			L"Password:"
+#define		TTPMENU_CLASS			L"TMenuClass"
 
 #define		DATA_NOENTRY			0xffffffff
 
@@ -39,83 +39,83 @@
 #define		MODE_DIRECT				0x0002
 
 // レジストリの値名（一般設定）
-#define		KEY_ICONMODE			"IconMode"
-#define		KEY_LEFTBUTTONPOPUP		"LeftButtonPopup"
-#define		KEY_MENUTEXTCOLOR		"MenuTextColor"
-#define		KEY_LF_HEIGHT			"lfHeight"
-#define		KEY_LF_WIDTH			"lfWidth"
-#define		KEY_LF_ESCAPEMENT		"lfEscapement"
-#define		KEY_LF_ORIENTATION		"lfOrientation"
-#define		KEY_LF_WEIGHT			"lfWeight"
-#define		KEY_LF_ITALIC			"lfItalic"
-#define		KEY_LF_UNDERLINE		"lfUnderline"
-#define		KEY_LF_STRIKEOUT		"lfStrikeOut"
-#define		KEY_LF_CHARSET			"lfCharSet"
-#define		KEY_LF_OUTPRECISION		"lfOutPrecision"
-#define		KEY_LF_CLIPPRECISION	"lfClipPrecision"
-#define		KEY_LF_QUALITY			"lfQuality"
-#define		KEY_LF_PITCHANDFAMILY	"lfPitchAndFamily"
-#define		KEY_LF_FACENAME			"lfFaceName"
-#define		KEY_HOTKEY				"Hotkey"
+#define		KEY_ICONMODE			L"IconMode"
+#define		KEY_LEFTBUTTONPOPUP		L"LeftButtonPopup"
+#define		KEY_MENUTEXTCOLOR		L"MenuTextColor"
+#define		KEY_LF_HEIGHT			L"lfHeight"
+#define		KEY_LF_WIDTH			L"lfWidth"
+#define		KEY_LF_ESCAPEMENT		L"lfEscapement"
+#define		KEY_LF_ORIENTATION		L"lfOrientation"
+#define		KEY_LF_WEIGHT			L"lfWeight"
+#define		KEY_LF_ITALIC			L"lfItalic"
+#define		KEY_LF_UNDERLINE		L"lfUnderline"
+#define		KEY_LF_STRIKEOUT		L"lfStrikeOut"
+#define		KEY_LF_CHARSET			L"lfCharSet"
+#define		KEY_LF_OUTPRECISION		L"lfOutPrecision"
+#define		KEY_LF_CLIPPRECISION	L"lfClipPrecision"
+#define		KEY_LF_QUALITY			L"lfQuality"
+#define		KEY_LF_PITCHANDFAMILY	L"lfPitchAndFamily"
+#define		KEY_LF_FACENAME			L"lfFaceName"
+#define		KEY_HOTKEY				L"Hotkey"
 
 // レジストリの値名（ジョブ設定）
-#define		KEY_MODE				"Mode"
-#define		KEY_HOSTNAME			"HostName"
-#define		KEY_USERFLAG			"UserFlag"
-#define		KEY_USERNAME			"UserName"
-#define		KEY_PASSWDFLAG			"PasswdFlag"
-#define		KEY_PASSWORD			"Password"
-#define		KEY_INITFILE			"INI_File"
-#define		KEY_TERATERM			"TeraTerm"
-#define		KEY_OPTION				"Option"
-#define		KEY_LOGIN_PROMPT		"LoginPrompt"
-#define		KEY_PASSWORD_PROMPT		"PasswdPrompt"
-#define		KEY_MACROFILE			"MacroFile"
-#define		KEY_TTSSH				"TeraTerm Mode"
-#define		KEY_LOG					"Log"
-#define		KEY_STARTUP				"Startup"
-#define		KEY_KEYFILE				"PrivateKeyFile"  // add (2005.1.27 yutaka)
-#define		KEY_CHALLENGE			"Challenge"       // add (2007.11.14 yutaka)
-#define		KEY_PAGEANT				"Pageant"         // add (2008.5.26 maya)
+#define		KEY_MODE				L"Mode"
+#define		KEY_HOSTNAME			L"HostName"
+#define		KEY_USERFLAG			L"UserFlag"
+#define		KEY_USERNAME			L"UserName"
+#define		KEY_PASSWDFLAG			L"PasswdFlag"
+#define		KEY_PASSWORD			L"Password"
+#define		KEY_INITFILE			L"INI_File"
+#define		KEY_TERATERM			L"TeraTerm"
+#define		KEY_OPTION				L"Option"
+#define		KEY_LOGIN_PROMPT		L"LoginPrompt"
+#define		KEY_PASSWORD_PROMPT		L"PasswdPrompt"
+#define		KEY_MACROFILE			L"MacroFile"
+#define		KEY_TTSSH				L"TeraTerm Mode"
+#define		KEY_LOG					L"Log"
+#define		KEY_STARTUP				L"Startup"
+#define		KEY_KEYFILE				L"PrivateKeyFile"  // add (2005.1.27 yutaka)
+#define		KEY_CHALLENGE			L"Challenge"       // add (2007.11.14 yutaka)
+#define		KEY_PAGEANT				L"Pageant"         // add (2008.5.26 maya)
 
-#define		STR_ICONMODE			"showing large icon"
-#define		STR_LEFTBUTTONPOPUP		"showing list by left-click"
-#define		STR_HOTKEY				"showing list hotkey(Ctl+Alt+M)"
-#define		STR_NOENTRY				"(none)"
+#define		STR_ICONMODE			L"showing large icon"
+#define		STR_LEFTBUTTONPOPUP		L"showing list by left-click"
+#define		STR_HOTKEY				L"showing list hotkey(Ctl+Alt+M)"
+#define		STR_NOENTRY				L"(none)"
 
 // 設定情報構造体
 struct JobInfo {
-	char	szName[MAX_PATH];			// ジョブ名
+	wchar_t	szName[MAX_PATH];			// ジョブ名
 	BOOL	bStartup;					// 起動時にジョブを実行するかどうかのフラグ
 	BOOL	bTtssh;						// ttsshを使用するかどうかのフラグ
 	DWORD	dwMode;						// ジョブの種類
 
 	// 自動ログイン用設定
-	char	szHostName[MAX_PATH];		// ホスト名
+	wchar_t	szHostName[MAX_PATH];		// ホスト名
 	BOOL	bUsername;					// ユーザ名を入力するかどうかのフラグ
-	char	szUsername[MAX_PATH];		// ユーザ名
+	wchar_t	szUsername[MAX_PATH];		// ユーザ名
 	BOOL	bPassword;					// パスワードを入力するかどうかのフラグ
 	char	szPassword[MAX_PATH];		// パスワード
 
 	// マクロ実行用設定
-	char	szMacroFile[MAX_PATH];		// 実行するマクロファイルのファイル名
+	wchar_t	szMacroFile[MAX_PATH];		// 実行するマクロファイルのファイル名
 
 	// 詳細設定
-	char	szTeraTerm[MAX_PATH];		// 起動アプリ（TeraTerm）のファイル名
-	char	szInitFile[MAX_PATH];		// TeraTermの設定ファイル（起動のみ意外）
-	char	szOption[MAX_PATH];			// アプリケーションのオプション/引数
-	char	szLog[MAX_PATH];			// ログファイル名（自動ログインのみ）
-	char	szLoginPrompt[MAX_PATH];	// ログインプロンプト（自動ログインのみ）
-	char	szPasswdPrompt[MAX_PATH];	// パスワードプロンプト（自動ログインのみ）
+	wchar_t	szTeraTerm[MAX_PATH];		// 起動アプリ（TeraTerm）のファイル名
+	wchar_t	szInitFile[MAX_PATH];		// TeraTermの設定ファイル（起動のみ意外）
+	wchar_t	szOption[MAX_PATH];			// アプリケーションのオプション/引数
+	wchar_t	szLog[MAX_PATH];			// ログファイル名（自動ログインのみ）
+	wchar_t	szLoginPrompt[MAX_PATH];	// ログインプロンプト（自動ログインのみ）
+	wchar_t	szPasswdPrompt[MAX_PATH];	// パスワードプロンプト（自動ログインのみ）
 
-	char    PrivateKeyFile[MAX_PATH];   // 秘密鍵ファイル (2005.1.27 yutaka)
+	wchar_t PrivateKeyFile[MAX_PATH];   // 秘密鍵ファイル (2005.1.27 yutaka)
 	BOOL    bChallenge;                 // keyboard-interative method(/challenge)
 	BOOL    bPageant;                   // use Pageant(/pageant)
 };
 
 // 表示設定構造体
 struct MenuData {
-	TCHAR		szName[MAXJOBNUM][MAX_PATH];
+	wchar_t		szName[MAXJOBNUM][MAX_PATH];
 	HICON		hLargeIcon[MAXJOBNUM];
 	HICON		hSmallIcon[MAXJOBNUM];
 	DWORD		dwMenuHeight;
@@ -123,7 +123,7 @@ struct MenuData {
 	BOOL		bLeftButtonPopup;
 	BOOL		bHotkey;
 	HFONT		hFont;
-	LOGFONT		lfFont;
+	LOGFONTW	lfFont;
 	COLORREF	crMenuBg;
 	COLORREF	crMenuTxt;
 	COLORREF	crSelMenuBg;
@@ -134,13 +134,12 @@ struct MenuData {
 void	PopupMenu(HWND hWnd);
 void	PopupListMenu(HWND hWnd);
 BOOL	AddTooltip(int idControl);
-BOOL	ConnectHost(HWND hWnd, UINT idItem, char *szJobName = NULL);
+BOOL	ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName = NULL);
 BOOL	CreateTooltip(void);
 BOOL	DeleteLoginHostInformation(HWND hWnd);
 BOOL	ErrorMessage(HWND hWnd, LPTSTR msg,...);
 BOOL	ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon);
 BOOL	ExecStartup(HWND hWnd);
-BOOL	GetApplicationFilename(char *szName, char *szPath);
 BOOL	InitConfigDlg(HWND hWnd);
 BOOL	InitEtcDlg(HWND hWnd);
 BOOL	InitListMenu(HWND hWnd);
@@ -155,7 +154,7 @@ BOOL	ManageWMCommand_Menu(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMCommand_Version(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMNotify_Config(LPARAM lParam);
 BOOL	RedrawMenu(HWND hWnd);
-BOOL	RegLoadLoginHostInformation(char *szName, JobInfo *jobInfo);
+BOOL	RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *jobInfo);
 BOOL	RegSaveLoginHostInformation(JobInfo *jobInfo);
 BOOL	SaveConfig(void);
 BOOL	SaveEtcInformation(HWND hWnd);

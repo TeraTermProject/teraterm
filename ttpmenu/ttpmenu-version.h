@@ -1,6 +1,5 @@
 /*
- * Copyright (C) S.Hayakawa NTT-IT 1998-2002
- * (C) 2002- TeraTerm Project
+ * Copyright (C) 2023- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,30 +26,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WINMISC_H
-#define	WINMISC_H
+#pragma once
 
-#include	<windows.h>
+#include "tt-version.h"
 
-// Window Position
-#define		POSITION_LEFTTOP		0x00
-#define		POSITION_LEFTBOTTOM		0x01
-#define		POSITION_RIGHTTOP		0x02
-#define		POSITION_RIGHTBOTTOM	0x03
-#define		POSITION_CENTER			0x04
-#define		POSITION_OUTSIDE		0x05
+#define TTPMENU_VERSION_MAJOR             1
+#define TTPMENU_VERSION_MINOR             18
+#define TTPMENU_VERSION_STR(sep)          TT_TOSTR(TTPMENU_VERSION_MAJOR) sep TT_TOSTR(TTPMENU_VERSION_MINOR)
+#define TTPMENU_RES_VERSION_STR           TTPMENU_VERSION_STR(", ") ", 0, 0"
 
-// misc
-void	SetDlgPos(HWND hWnd, int pos);
-void	EncodePassword(const char *cPassword, char *cEncodePassword);
-BOOL	EnableItem(HWND hWnd, int idControl, BOOL flag);
-BOOL	OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir);
-BOOL	SaveFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, wchar_t *filter, wchar_t *defaultDir);
-BOOL	SetForceForegroundWindow(HWND hWnd);
-wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2);
-void	UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const wchar_t *iniFile);
-int		UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
-LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
-                                   WPARAM wParam, LPARAM lParam);
-
+// TTPMENU_RES_PRODUCT_VERSION_STR
+//	リソースファイル(rcファイル) ProductVersion 用
+#if defined(TT_VERSION_SUBSTR_HASH)
+#define TTPMENU_RES_PRODUCT_VERSION_STR \
+	TTPMENU_VERSION_STR(".") " " TT_VERSION_SUBSTR_HASH
+#else
+#define TTPMENU_RES_PRODUCT_VERSION_STR \
+	TTPMENU_VERSION_STR(".")
 #endif
