@@ -37,6 +37,7 @@
 #include	<crtdbg.h>
 
 #include	"ttpmenu.h"
+#include    "ttpmenu-version.h"
 #include	"registry.h"
 #include	"winmisc.h"
 #include	"resource.h"
@@ -72,67 +73,6 @@ wchar_t		*UILanguageFileW;
 HFONT		g_AboutFont;
 HFONT		g_ConfigFont;
 HFONT		g_DetailFont;
-
-// ttdlg.c と同じ内容
-// 実行ファイルからバージョン情報を得る (2005.2.28 yutaka)
-void get_file_version(char *exefile, int *major, int *minor, int *release, int *build)
-{
-	typedef struct {
-		WORD wLanguage;
-		WORD wCodePage;
-	} LANGANDCODEPAGE, *LPLANGANDCODEPAGE;
-	LPLANGANDCODEPAGE lplgcode;
-	UINT unLen;
-	DWORD size;
-	char *buf = NULL;
-	BOOL ret;
-	int i;
-	char fmt[80];
-	char *pbuf;
-
-	size = GetFileVersionInfoSize(exefile, NULL);
-	if (size == 0) {
-		goto error;
-	}
-	buf = (char *)malloc(size);
-	ZeroMemory(buf, size);
-
-	if (GetFileVersionInfo(exefile, 0, size, buf) == FALSE) {
-		goto error;
-	}
-
-	ret = VerQueryValue(buf,
-			"\\VarFileInfo\\Translation", 
-			(LPVOID *)&lplgcode, &unLen);
-	if (ret == FALSE)
-		goto error;
-
-	for (i = 0 ; i < (int)(unLen / sizeof(LANGANDCODEPAGE)) ; i++) {
-		_snprintf(fmt, sizeof(fmt), "\\StringFileInfo\\%04x%04x\\FileVersion", 
-			lplgcode[i].wLanguage, lplgcode[i].wCodePage);
-		VerQueryValue(buf, fmt, (LPVOID *)&pbuf, &unLen);
-		if (unLen > 0) { // get success
-			int n, a, b, c, d;
-
-			n = sscanf(pbuf, "%d, %d, %d, %d", &a, &b, &c, &d);
-			if (n == 4) { // convert success
-				*major = a;
-				*minor = b;
-				*release = c;
-				*build = d;
-				break;
-			}
-		}
-	}
-
-	free(buf);
-	return;
-
-error:
-	free(buf);
-	*major = *minor = *release = *build = 0;
-}
-
 
 /* ==========================================================================
 	Function Name	: (BOOL) ExecStartup()
@@ -818,29 +758,28 @@ BOOL InitEtcDlg(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL InitVersionDlg(HWND hWnd)
 {
-	int a, b, c, d;
-	char app[_MAX_PATH];
+	static const DlgTextInfo text_info[] = {
+		{ 0, "DLG_ABOUT_TITLE" },
+		{ IDC_APP_NAME, "DLG_ABOUT_APPNAME" },
+		{ IDOK, "BTN_OK" },
+	};
 
 	::DeleteMenu(::GetSystemMenu(hWnd, FALSE), SC_MAXIMIZE, MF_BYCOMMAND);
 	::DeleteMenu(::GetSystemMenu(hWnd, FALSE), SC_SIZE, MF_BYCOMMAND);
 	::DeleteMenu(::GetSystemMenu(hWnd, FALSE), SC_MINIMIZE, MF_BYCOMMAND);
 	::DeleteMenu(::GetSystemMenu(hWnd, FALSE), SC_RESTORE, MF_BYCOMMAND);
 
-	GetModuleFileName(NULL, app, sizeof(app));
-	get_file_version(app, &a, &b, &c, &d);
+	SetI18nDlgStrsW(hWnd, "TTMenu", text_info, _countof(text_info), UILanguageFileW);
 
-	wchar_t *app_name;
-	GetI18nStrWW("TTMenu", "DLG_ABOUT_APPNAME", L"launch tool", UILanguageFileW, &app_name);
+	char buf[128];
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "version %d.%d ", TTPMENU_VERSION_MAJOR, TTPMENU_VERSION_MINOR);
 
-	wchar_t *ver_str_fmt;
-	hGetDlgItemTextW(hWnd, IDC_VERSION, &ver_str_fmt);
-	wchar_t *ver_str;
-	aswprintf(&ver_str, ver_str_fmt, app_name, a, b);
-	SetDlgItemTextW(hWnd, IDC_VERSION, ver_str);
-
-	free(app_name);
-	free(ver_str_fmt);
-	free(ver_str);
+	{
+		char *substr = GetVersionSubstr();
+		strncat_s(buf, sizeof(buf), substr, _TRUNCATE);
+		free(substr);
+	}
+	SetDlgItemTextA(hWnd, IDC_VERSION, buf);
 
 	return TRUE;
 }

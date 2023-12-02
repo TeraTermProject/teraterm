@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-09-09)
+﻿; Updated by TeraTerm Project (2023-12-02)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -1117,7 +1117,7 @@ MENU_CLOSE=退出
 MENU_NOTRAY=(无)
 
 DLG_ABOUT_TITLE=版本信息
-DLG_ABOUT_APPNAME=支持工具
+DLG_ABOUT_APPNAME=Tera Term 支持工具\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=配置列表
 DLG_CONFIG_ITEM=配置项目

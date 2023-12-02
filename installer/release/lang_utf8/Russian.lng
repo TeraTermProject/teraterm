@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-10-22)
+﻿; Updated by TeraTerm Project (2023-12-02)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -1125,7 +1125,7 @@ MENU_CLOSE=Выход
 MENU_NOTRAY=(нет)
 
 DLG_ABOUT_TITLE=Информация о версии
-DLG_ABOUT_APPNAME=запустить инструмент
+DLG_ABOUT_APPNAME=Tera Term запустить инструмент\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=Конфигурация
 DLG_CONFIG_ITEM=Элемент списка

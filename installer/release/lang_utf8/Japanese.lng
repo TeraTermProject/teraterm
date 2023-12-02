@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-10-22)
+﻿; Updated by TeraTerm Project (2023-12-02)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -1122,7 +1122,7 @@ MENU_CLOSE=終了
 MENU_NOTRAY=(なし)
 
 DLG_ABOUT_TITLE=バージョン情報
-DLG_ABOUT_APPNAME=支援ツール
+DLG_ABOUT_APPNAME=Tera Term 支援ツール\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=リスト編集
 DLG_CONFIG_ITEM=リスト項目

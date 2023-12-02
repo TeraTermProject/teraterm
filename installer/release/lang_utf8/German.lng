@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-10-22)
+﻿; Updated by TeraTerm Project (2023-12-02)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -1117,7 +1117,7 @@ MENU_CLOSE=Beenden
 MENU_NOTRAY=(none)
 
 DLG_ABOUT_TITLE=Versionsinformation
-DLG_ABOUT_APPNAME=launch tool
+DLG_ABOUT_APPNAME=Tera Term launch tool\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=Listenkonfiguration
 DLG_CONFIG_ITEM=Listenelement
